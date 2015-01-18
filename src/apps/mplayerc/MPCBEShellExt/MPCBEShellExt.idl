@@ -1,0 +1,27 @@
+import "oaidl.idl";
+import "ocidl.idl";
+[
+	object,
+	uuid(6F28F887-69C8-4ADD-9E5F-FDDBFC2ABBED),
+	helpstring("IMPCBEContextMenu Interface"),
+	pointer_default(unique)
+]
+interface IMPCBEContextMenu : IUnknown{
+};
+[
+	uuid(E39D69B0-F09E-41DE-BE14-B90A375D290E),
+	version(1.0),
+	helpstring("MPCBEShellExt 1.0 Type Library")
+]
+library MPCBEShellExtLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(A2CF4243-6525-4764-B3F5-2FCDE2F47989),
+		helpstring("MPCBEContextMenu Class")
+	]
+	coclass MPCBEContextMenu
+	{
+		[default] interface IMPCBEContextMenu;
+	};
+};

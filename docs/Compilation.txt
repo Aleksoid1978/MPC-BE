@@ -1,0 +1,52 @@
+﻿Part A: Preparing the Visual Studio 2013 environment
+
+Visual Studio 2013
+  1. Install Visual C++ 2013, part of Visual Studio 2013 with Update 4 (Express won't work, other editions work fine) -> http://www.visualstudio.com/downloads/download-visual-studio-vs .
+
+Part B: Preparing the GCC environment
+ NOTES:
+  * If you installed the MSYS/MinGW package in an other directory you will have to use that path in the following steps.
+
+ 1. Download and extract MSYS_MinGW-w64_GCC_492_x86-x64_Full.7z to "C:\MSYS" -> http://mpc-be.org/MSYS/MSYS_MinGW-w64_GCC_492_x86-x64_Full.7z
+ 2. Add the following environment variables (in System Properties->Advanced->Environment Variables):
+
+    Variable    Value
+    MSYS        C:\MSYS
+    MINGW32     C:\MSYS\mingw
+    MINGW64     C:\MSYS\mingw
+    YASM        C:\MSYS\bin
+
+Part C: Downloading and compiling the MPC-BE source
+
+1. Use a subversion client to checkout MPC-BE's trunk to "C:\mpc-be" (or anywhere else you like)
+    Repository URL: svn://mpc-next.ru/mpc-be/trunk 
+    The recommended SVN client is TortoiseSVN (grab it from http://dev.mpc-next.ru/index.php/board,16.0.html)
+2. When using TortoiseSVN
+    a) Create an empty directory where you want to store the source files. e.g: C:\mpc-be
+    b) Right-click on that directory and choose "SVN checkout".
+    c) Put svn://mpc-next.ru/mpc-be/trunk in "URL of Repository" and press OK.
+    d) Wait for the source tree to be downloaded.
+
+3. Open folder "C:\mpc-be\"
+   Execute the batch file update_gcc.bat (it is necessary to do to copy the files libgcc.a and libmingwex.a, in the folders "lib" and "lib64")
+4. Open the solution file: C:\mpc-be\mpc-be_2013.sln 
+   Change the solution's configuration to "Release" (in the toolbar).
+
+5. Press OK to save the changes and close the Properties window.
+6. Press F7 to build the solution.
+7. You now have mpc-be.exe under C:\mpc-be\bin\mpc-be_x86
+8. Open the solution file C:\mpc-be\mpciconlib.sln
+9. Press F7 to build the solution.
+10. You now have mpciconlib.dll under C:\mpc-be\bin\mpc-be_x86
+11. Open the solution file C:\mpc-be\mpcresources.sln
+    In Visual Studio go to Build->Batch Build->Press Select All->Press Build
+12. You now have mpcresources.XX.dll under C:\mpc-be\bin\mpc-be_x86\Lang
+
+Alternatively, you can use build.bat (run: build.bat help for more info)
+
+
+Part D: Building the installer
+
+Download Inno Setup Unicode v5.5.5 or newer from: http://www.jrsoftware.org/isdl.php
+Install everything and then go to C:\mpc-be\distrib, open mpc-be_setup.iss with Inno Setup, read the first comments in the script and compile it.
+Note: Use Inno Setup's built-in IDE.

@@ -1,0 +1,1040 @@
+  Language_ISO639;fr
+  Author_Email;Info@MediaArea.net
+  Author_Name;Zen
+  Author_OldNames;Traducteur initial
+  Language_Name;Français
+  Config_Text_ColumnSize;40
+  Config_Text_Separator; : 
+  Config_Text_NumberTag; #
+  Config_Text_FloatSeparator;,
+  Config_Text_ThousandsSeparator; 
+ audio stream1; flux audio
+ audio stream2; flux audio
+ audio stream3; flux audio
+ bit1; bit
+ bit2; bits
+ bit3; bits
+ bps; bps
+ Bps; Bps
+ Byte1; Octet
+ Byte2; Octets
+ Byte3; Octets
+ channel1; canal
+ channel2; canaux
+ channel3; canaux
+ chapter1; chapitre
+ chapter2; chapitres
+ chapter3; chapitres
+ chapters stream1; flux chapitres
+ chapters stream2; flux chapitres
+ chapters stream3; flux chapitres
+ day1; jour
+ day2; jours
+ day3; jours
+ dB1; dB
+ dB2; dB
+ dB3; dB
+ file1; fichier
+ file2; fichiers
+ file3; fichiers
+ frame1; image
+ frame2; images
+ frame3; images
+ fps1; Im/s
+ fps2; Im/s
+ fps3; Im/s
+ GB; Go
+ Gb; Gb
+ Gbps; Gbps
+ GBps; Go/s
+ GHz; GHz
+ GiB; Gio
+ GibiByte1; GibiOctets
+ GibiByte2; GibiOctets
+ GibiByte3; GibiOctets
+ GiBps; GiBps
+ GigaBit1; GigaBit
+ GigaBit2; GigaBits
+ GigaBit3; GigaBits
+ GigaByte1; GigaOctet
+ GigaByte2; GigaOctets
+ GigaByte3; GigaOctets
+ hour1; heure
+ hour2; heures
+ hour3; heures
+ Hz; Hz
+ image stream1; flux image
+ image stream2; flux images
+ image stream3; flux images
+ KB; Ko
+ Kb; Kb
+ KBps; KBps
+ Kbps; Kbps
+ KHz; KHz
+ KiB; Kio
+ KibiBit1; KibiBit
+ KibiBit2; KibiBits
+ KibiBit3; KibiBits
+ KibiByte1; KibiOctet
+ KibiByte2; KibiOctets
+ KibiByte3; KibiOctets
+ KiBps; KiBps
+ KiloBit1; KiloBit
+ KiloBit2; KiloBits
+ KiloBit3; KiloBits
+ KiloByte1; KiloOctet
+ KiloByte2; KiloOctets
+ KiloByte3; KiloOctets
+ MB; MB
+ Mb; Mb
+ Mbps; Mb/s
+ MBps; Mbps
+ MebiBit1; MebiBit
+ MebiBit2; MebiBits
+ MebiBit3; MebiBits
+ MebiByte1; MebiOctet
+ MebiByte2; MebiOctets
+ MebiByte3; MebiOctets
+ MegaBit1; MegaBit
+ MegaBit2; MegaBits
+ MegaBit3; MegaBits
+ MegaByte1; MegaOctet
+ MegaByte2; MegaOctets
+ MegaByte3; MegaOctets
+ MHz; MHz
+ MiB; Mio
+ Mib; Mib
+ MiBps; MiBps
+ millisecond1; milliseconde
+ millisecond2; millisecondes
+ millisecond3; millisecondes
+ minute1; minute
+ minute2; minutes
+ minute3; minutes
+ month1; mois
+ month2; mois
+ month3; mois
+ pixel1; pixel
+ pixel2; pixels
+ pixel3; pixels
+ second1; seconde
+ second2; secondes
+ second3; secondes
+ text stream1; flux texte
+ text stream2; flux texte
+ text stream3; flux texte
+ video frames1; image vidéo
+ video frames2; images vidéo
+ video frames3; images vidéo
+ video stream1; flux vidéo
+ video stream2; flux vidéo
+ video stream3; flux vidéo
+ warppoint0;Pas de warppoints
+ warppoint1; warppoint
+ warppoint2; warppoints
+ warppoint3; warppoints
+ week1; semaine
+ week2; semaines
+ week3; semaines
+ year1; année
+ year2; années
+ year3; années
+, ;, 
+: ; : 
+About;À propos
+About_Hint;Comment me contacter et trouver la dernière version
+Accompaniment;Accompagnement
+ActiveFormatDescription;
+ActiveFormatDescription_MuxingMode;
+Actor;Acteur
+Actor_Character;Personnage joué
+Added_Date;Date d'ajout
+Address;Adresse
+Advanced;Avancée
+Advanced mode;Mode Avancé
+Album;Album
+Album_ReplayGain_Gain;Gain en lecture de l'album
+Album_ReplayGain_Peak;Crête de gain en lecture de l'album
+Alignment;Alignement
+Alignment_Aligned;Alignée sur les interleaves
+Alignment_Split;Eparpillé à travers les interleaves
+All;Tout
+Archival_Location;Archivé à
+Arranger;Arrangement
+ArtDirector;Directeur artistique
+AspectRatio;Format à l'écran
+AssistantDirector;Assistant-directeur
+at;à
+At least one file;(Vous devez ouvrir au moins un fichier)
+Audio;Audio
+Audio stream(s);Piste(s) audio
+Audio_Codec_List;Codecs Audio
+Audio_No;Pas d'audio
+Audio1;Première piste Audio
+Audio2;Deuxième piste Audio
+AudioCount;Nombre de pistes audio
+Author;Auteur / Réalisateur
+BarCode;Code-barre
+Basic;Basique
+Basic_Note;Note : pour plus d'informations sur ce fichier, vous devez utiliser une vue différente (Tableau, Arbre...)
+BitDepth;Profondeur des couleurs
+BitDepth_Stored;Profondeur stockée des couleurs
+BitRate;Débit
+BitRate_Maximum;Débit maximum
+BitRate_Minimum;Débit minimum
+BitRate_Mode;Type de débit
+BitRate_Mode_CBR;Constant
+BitRate_Mode_VBR;Variable
+BitRate_Nominal;Débit nominal
+BitRate_Encoded;débit encodé
+Bits-(Pixel*Frame);Bits/(Pixel*Image)
+BufferSize;Taille du buffer
+Cancel;Annuler
+Channel(s);Canaux
+ChannelPositions;Position des cannaux
+Chapter(s);Chapitre(s)
+Chapters;Chapitres
+Chapters stream(s);Piste(s) chapitre
+Chapters_Codec_List;Codecs Chapitres
+Chapters_No;Pas de chapitres
+ChaptersCount;Nombre de pistes chapitre
+CheckNewVersion;Vérifier si nouvelle version
+Choose custom;Choisissez le texte personnalisé
+Choose custom sheet;Choisissez le tableau personnalisé
+Choose custom text;Choisissez le texte personnalisé
+Choose export format;Choisissez le format d'exportation désiré
+Choose file(s);Choisissez le(s) fichier(s) à ouvrir
+Choose filename;Choisissez le nom du fichier
+Choose language;Choisissez la langue personnalisée
+Choregrapher;Responsable de la chorégraphie
+Chroma;Chrominance
+ChromaSubsampling;Sous-échantillonnage de la chrominance
+Close;Fermer
+Close all before open;Tout fermer avant d'ouvrir
+Codec;Codec
+Codec_Description;Description du codec
+Codec_Info;Infos sur le Codec
+Codec_Settings;Paramètres du codec
+Codec_Settings_PacketBitStream;Paramètres du codec, Packet bitstream
+Codec_Settings_BVOP;Paramètres du codec, BVOP
+Codec_Settings_QPel;Paramètres du codec, QPel
+Codec_Settings_GMC;Paramètres du codec, GMC
+Codec_Settings_Matrix;Paramètres du codec, Matrice
+Codec_Settings_Floor;Paramètres du codec, Seuil
+Codec_Settings_CABAC;Paramètres du codec, CABAC
+Codec_Settings_Firm;Paramètres du codec, Entreprise
+Codec_Settings_Endianness;Paramètres du codec, Endianness
+Codec_Settings_Sign;Paramètres du codec, Signe
+Codec_Settings_Law;Paramètres du codec, Law
+Codec_Settings_ITU;Paramètres du codec, ITU
+Codec_Profile;Profile du codec
+Codec_Url;Lien Internet sur le codec
+CodecID;Identifiant du codec
+CodecID_Description;Description du codec
+Collection;Collection
+Colorimetry;Colorimétrie
+ColorSpace;Espace de couleurs
+colour_primaries;Coordonnées de chromaticité
+Comment;Commentaire
+CommissionedBy;Commanditaire
+Compilation;Compilation
+CompleteName;Nom complet
+Composer;Compositeur
+Compression_Mode;Mode de compression
+Compression_Mode_Lossless;Sans perte
+Compression_Mode_Lossy;Avec perte
+Compression_Ratio;Taux de compression
+Conductor;Chef d'orchestre
+Container and general information;Conteneur et informations générales
+ContentType;Type de contenu
+CoProducer;Coproducteur
+Copyright;Copyright
+CostumeDesigner;Responsable des costumes
+Count;Nombre
+Country;Pays
+Cover;Couverture
+Cover_Datas;Couverture
+Cover_Description;Couverture, description
+Cover_Mime;Couverture, MIME
+Cover_Type;Couverture, origine
+Cropped;Dimensions du retaillage
+Custom;Partie personnalisée
+Customize;Personnaliser
+Date;Date
+Debug;Debug
+Decimal point;Point décimal
+Delay;Délai
+Delay_Source;Délai, origine
+Delay_Source_Container;Conteneur
+Delay_Source_Stream;Flux brut
+Delete;Supprimer
+Description;Description
+Digitized_Date;Date de numérisation
+Dimensions;Dimensions
+Director;Réalisateur
+DirectorOfPhotography;Responsable de la photographie
+DisplayAspectRatio;Format à l'écran
+DisplayAspectRatio_Original;Format à l'écran d'origine
+DistributedBy;Distribué par
+Donate;Faire un don
+DotsPerInch;Point par pouce
+Duration;Durée
+Duration_End;Heure de fin
+Duration_Start;Heure de début
+Edit;Modifier
+EditedBy;Monté par
+EMail;E-mail
+Encoded_Application;Application utilisée
+Encoded_Date;Date d'encodage
+Encoded_Library;Bibliothèque utilisée
+Encoded_Library_Settings;Paramètres d'encodage
+Encoded_Original;Support original
+EncodedBy;Encodé par
+EPG_Positions;Positions de l'EPG (interne)
+Error_File;Erreur lors de la lecture du fichier
+ExecutiveProducer;Producteur éxécutif
+Exit;Quitter
+Exit_Hint;Quitte le programme
+Export;Exporte
+Export_Hint;Exporte dans un format personnalisé
+Extensions;Extensions généralement utilisées
+Family;Famille
+Fax;Fax
+File;Fichier
+File size;Taille du fichier
+File_Append;Ajouter à un fichier déjà existant (Faites attention à ce que les paramètres soient identiques)
+File_Created_Date;Date de création du fichier
+File_Created_Date_Local;Date de création du fichier (local)
+File_Hint;Sélectionne un fichier multimédia à étudier
+File_Modified_Date;Date de dernière modification du fichier
+File_Modified_Date_Local;Date de dernière modification du fichier
+FileExtension;Extension du fichier
+FileName;Nom du fichier
+FileSize;Taille du fichier
+Folder;Dossier
+Folder (R);Dossier (R)
+Folder (R)_Hint;Sélectionne un dossier à étudier (avec tous ses sous-dossiers)
+Folder (Recursively);Dossier (Récursif)
+Folder_Hint;Sélectionne un dossier à étudier
+FolderName;Nom du dossier
+Format;Format
+Format_Commercial;Nom commercial
+Format_Commercial_IfAny;Nom commercial
+Format_Description;Description du format
+Format_Info;Infos sur le format
+Format_Profile;Profil du format
+Format_Settings;Paramètres du format
+Format_Settings_PacketBitStream;Paramètres du format, Packet bitstream
+Format_Settings_BVOP;Paramètres du format, BVOP
+Format_Settings_QPel;Paramètres du format, QPel
+Format_Settings_GMC;Paramètres du format, GMC
+Format_Settings_Matrix;Paramètres du format, Matrice
+Format_Settings_Matrix_Custom;Personnalisée
+Format_Settings_Matrix_Default;Par défaut
+Format_Settings_Floor;Paramètres du format, Seuil
+Format_Settings_CABAC;Paramètres du format, CABAC
+Format_Settings_Firm;Paramètres du format, Entreprise
+Format_Settings_Endianness;Paramètres du format, Endianness
+Format_Settings_RefFrames;Paramètres du format, RefFrames
+Format_Settings_Sign;Paramètres du format, Signe
+Format_Settings_Law;Paramètres du format, Law
+Format_Settings_ITU;Paramètres du format, ITU
+Format_Settings_SBR;Paramètres du format, SBR
+Format_Settings_PS;Paramètres du format, PS
+Format_Settings_Pulldown;Paramètres du format, Pulldown
+Format_Settings_Mode;Paramètres du format, Mode
+Format_Settings_FrameMode;Type de répétition
+Format_Settings_Emphasis;Emphase
+Format_Settings_ModeExtension;Extension du mode
+Format_Settings_GOP;Paramètres du format, GOP
+Format_Version;Version du format
+Format_Url;Lien Internet sur le format
+FrameCount;Nombre d'images
+FrameRate;Images par seconde
+FrameRate_Mode;Type d'images/s
+FrameRate_Mode_CFR;Constant
+FrameRate_Mode_VFR;Variable
+FrameRate_Minimum;Images/s mini
+FrameRate_Nominal;Images/s nominal
+FrameRate_Maximum;Images/s maxi
+FrameRate_Original;Images/s d'origine
+General;Général
+Genre;Genre
+Genre_000;Blues
+Genre_001;Rock classique
+Genre_002;Country
+Genre_003;Dance
+Genre_004;Disco
+Genre_005;Funk
+Genre_006;Grunge
+Genre_007;Hip-Hop
+Genre_008;Jazz
+Genre_009;Metal
+Genre_010;New Age
+Genre_011;Oldies
+Genre_012;Autre
+Genre_013;Pop
+Genre_014;R&B
+Genre_015;Rap
+Genre_016;Reggae
+Genre_017;Rock
+Genre_018;Techno
+Genre_019;Industrial
+Genre_020;Alternative
+Genre_021;Ska
+Genre_022;Death Metal
+Genre_023;Pranks
+Genre_024;Musique de film
+Genre_025;Euro-Techno
+Genre_026;Ambient
+Genre_027;Trip-Hop
+Genre_028;Vocal
+Genre_029;Jazz+Funk
+Genre_030;Fusion
+Genre_031;Trance
+Genre_032;Classical
+Genre_033;Instrumental
+Genre_034;Acid
+Genre_035;House
+Genre_036;Game
+Genre_037;Sound Clip
+Genre_038;Gospel
+Genre_039;Noise
+Genre_040;Rock Alternatif
+Genre_041;Bass
+Genre_042;Soul
+Genre_043;Punk
+Genre_044;Space
+Genre_045;Meditative
+Genre_046;Pop Instrumental
+Genre_047;Rock Instrumental
+Genre_048;Ethnic
+Genre_049;Gothic
+Genre_050;Darkwave
+Genre_051;Techno-Industrial
+Genre_052;Electronic
+Genre_053;Pop-Folk
+Genre_054;Eurodance
+Genre_055;Dream
+Genre_056;Southern Rock
+Genre_057;Comedy
+Genre_058;Cult
+Genre_059;Gangsta
+Genre_060;Top 40
+Genre_061;Christian Rap
+Genre_062;Pop/Funk
+Genre_063;Jungle
+Genre_064;Native American
+Genre_065;Cabaret
+Genre_066;New Wave
+Genre_067;Psychadelic
+Genre_068;Rave
+Genre_069;Showtunes
+Genre_070;Trailer
+Genre_071;Lo-Fi
+Genre_072;Tribal
+Genre_073;Acid Punk
+Genre_074;Acid Jazz
+Genre_075;Polka
+Genre_076;Retro
+Genre_077;Musical
+Genre_078;Rock & Roll
+Genre_079;Hard Rock
+Genre_080;Folk
+Genre_081;Folk-Rock
+Genre_082;Folk Nationale
+Genre_083;Swing
+Genre_084;Fast Fusion
+Genre_085;Bebob
+Genre_086;Latin
+Genre_087;Revival
+Genre_088;Celtic
+Genre_089;Bluegrass
+Genre_090;Avantgarde
+Genre_091;Rock Gothique
+Genre_092;Rock Progressiste
+Genre_093;Rock Psychédélique
+Genre_094;Rock Symphonique
+Genre_095;Slow Rock
+Genre_096;Big Band
+Genre_097;Chorus
+Genre_098;Easy Listening
+Genre_099;Acoustic
+Genre_100;Humour
+Genre_101;Paroles
+Genre_102;Chanson
+Genre_103;Opera
+Genre_104;Musique de Chambre
+Genre_105;Sonata
+Genre_106;Symphonie
+Genre_107;Booty Bass
+Genre_108;Primus
+Genre_109;Porn Groove
+Genre_110;Satire
+Genre_111;Slow Jam
+Genre_112;Club
+Genre_113;Tango
+Genre_114;Samba
+Genre_115;Folklore
+Genre_116;Ballade
+Genre_117;Power Ballad
+Genre_118;Soul Rhytmique
+Genre_119;Freestyle
+Genre_120;Duet
+Genre_121;Punk Rock
+Genre_122;Drum Solo
+Genre_123;A capella
+Genre_124;Euro-House
+Genre_125;Dance Hall
+Genre_126;Goa
+Genre_127;Drum & Bass
+Genre_128;Club-House
+Genre_129;Hardcore
+Genre_130;Terror
+Genre_131;Indie
+Genre_132;Britpop
+Genre_133;Negerpunk
+Genre_134;Polsk Punk
+Genre_135;Beat
+Genre_136;Christian Gangsta Rap
+Genre_137;Heavy Metal
+Genre_138;Black Metal
+Genre_139;Crossover
+Genre_140;Contemporary Christian
+Genre_141;Christian Rock
+Genre_142;Merengue
+Genre_143;Salsa
+Genre_144;Trash Metal
+Genre_145;Anime
+Genre_146;JPop
+Genre_147;Synthpop
+Genre_148;
+Genre_149;
+Genre_150;
+Genre_151;
+Genre_152;
+Genre_153;
+Genre_154;
+Genre_155;
+Genre_156;
+Genre_157;
+Genre_158;
+Genre_159;
+Genre_160;
+Genre_161;
+Genre_162;
+Genre_163;
+Genre_164;
+Genre_165;
+Genre_166;
+Genre_167;
+Genre_168;
+Genre_169;
+Genre_170;
+Genre_171;
+Genre_172;
+Genre_173;
+Genre_174;
+Genre_175;
+Genre_176;
+Genre_177;
+Genre_178;
+Genre_179;
+Genre_180;
+Genre_181;
+Genre_182;
+Genre_183;
+Genre_184;
+Genre_185;
+Genre_186;
+Genre_187;
+Genre_188;
+Genre_189;
+Genre_190;
+Genre_191;
+Go to WebSite;Aller sur le site Web
+Grouping;Grouping
+h;h
+Header file;Créer un fichier Header
+Height;Hauteur
+Height_Original;Largeur originale
+Help;Aide
+Hint;Suggestion
+How many audio streams?;Combien de flux audio?
+How many chapters streams?;Combien de flux chapitres?
+How many text streams?;Combien de flux texte?
+How many video streams?;Combien de flux vidéo?
+HTML;HTML
+ID;ID
+Image;Image
+Image stream(s);Piste(s) image
+Image_Codec_List;Codecs Image
+ImageCount;Nombre de pistes image
+Info;Info
+Instruments;Instruments
+Interlacement;Entrelacement
+Interlaced_Interlaced;Entrelacé
+Interlaced_TFF;Ligne du haut d'abord
+Interlaced_BFF;Ligne du bas d'abord
+Interlaced_PPF;Progressif
+Interlaced_Progressive;Progressif
+Interleaved;Imbrication
+Interleave_Duration;Imbrication, durée
+Interleave_Preload;Imbrication, d. de pré-chargement
+Interleave_VideoFrames;Imbrication, durée
+InternetMediaType;
+IRCA;IRCA
+ISBN;ISBN
+ISRC;ISRC
+Keywords;Mots clé
+Known codecs;Codecs connus
+Known formats;Formats connus
+Known parameters;Paramètres connus
+Label;Label
+Language;Langue
+Language_More;Langue, plus d'info
+Language_aa;Afar
+Language_ab;Abkhaze
+Language_ae;Avestique
+Language_af;Afrikaans
+Language_ak;Akan
+Language_am;Amharique
+Language_an;Aragonais
+Language_ar;Arabe
+Language_as;Assamais
+Language_av;Avar
+Language_ay;Aymara
+Language_az;Azéri
+Language_ba;Bachkir
+Language_be;Biélorusse
+Language_bg;Bulgare
+Language_bh;Bihari
+Language_bi;Bichlamar
+Language_bm;Bambara
+Language_bn;Bengali
+Language_bo;Tibétain
+Language_br;Breton
+Language_bs;Bosniaque
+Language_ca;Catalan
+Language_ce;Tchétchène
+Language_ch;Chamorro
+Language_co;Corse
+Language_cr;Cree
+Language_cs;Tchèque
+Language_cu;Slave
+Language_cv;Tchouvache
+Language_cy;Gallois
+Language_da;Danois
+Language_de;Allemand
+Language_dv;Maldivien
+Language_dz;Dzongkha
+Language_ee;Éwé
+Language_el;Grec
+Language_en;Anglais
+Language_en-gb;Anglais (Royaume-Uni)
+Language_en-us;Anglais (États-Unis)
+Language_eo;Espéranto
+Language_es;Espagnol
+Language_et;Estonien
+Language_eu;Basque
+Language_fa;Persan
+Language_ff;Peul
+Language_fi;Finnois
+Language_fj;Fidjien
+Language_fo;Féroïen
+Language_fr;Français
+Language_fy;Frison
+Language_ga;Irlandais
+Language_gd;Gaélique
+Language_gl;Galicien
+Language_gn;Guarani
+Language_gu;Goudjrati
+Language_gv;Manx
+Language_ha;Haoussa
+Language_he;Hébreu
+Language_hi;Hindi
+Language_ho;Hiri motu
+Language_hr;Croate
+Language_ht;Haïtien
+Language_hu;Hongrois
+Language_hy;Arménien
+Language_hz;Herero
+Language_ia;Langue auxiliaire internationale
+Language_id;Indonésien
+Language_ie;Interlingue
+Language_ig;Igbo
+Language_ii;Yi de Sichuan
+Language_ik;Inupiaq
+Language_Info;Langage, plus d'info
+Language_io;Ido
+Language_is;Islandais
+Language_it;Italien
+Language_iu;Inuktitut
+Language_ja;Japonais
+Language_jv;Javanais
+Language_ka;Géorgien
+Language_kg;Kongo
+Language_ki;Kikuyu
+Language_kj;Kuanyama
+Language_kk;Kazakh
+Language_kl;Groenlandais
+Language_km;Khmer
+Language_kn;Kannada
+Language_ko;Coréen
+Language_kr;Kanouri
+Language_ks;Kashmiri
+Language_ku;Kurde
+Language_kv;Komi
+Language_kw;Cornique
+Language_ky;Kirghize
+Language_la;Latin
+Language_lb;Luxembourgeois
+Language_lg;Ganda
+Language_li;Limbourgeois
+Language_ln;Lingala
+Language_lo;Lao
+Language_lt;Lituanien
+Language_lu;Luba-katanga
+Language_lv;Letton
+Language_mg;Malgache
+Language_mh;Marshall
+Language_mi;Maori
+Language_mk;Macédonien
+Language_ml;Malayalam
+Language_mn;Mongol
+Language_mo;Moldave
+Language_mr;Marathe
+Language_ms;Malais
+Language_mt;Maltais
+Language_mul;Langues multiples
+Language_my;Birman
+Language_na;Nauruan
+Language_nb;Norwegian bokmål
+Language_nd;Ndébélé du Nord
+Language_ne;Népalais
+Language_ng;Ndonga
+Language_nl;Néerlandais
+Language_nn;Norvégien Bokmål
+Language_no;Norvégien
+Language_nr;Ndébélé du Sud
+Language_nv;Navaho
+Language_ny;Nyanja
+Language_oc;Occitan
+Language_oj;Ojibwa
+Language_om;Galla
+Language_or;Oriya
+Language_os;Ossète
+Language_pa;Panjâbî
+Language_pi;Pali
+Language_pl;Polonais
+Language_ps;Pachto
+Language_pt;Portugais
+Language_pt-br;Portugais (Brésil)
+Language_qu;Quechua
+Language_rm;Rhéto-roman
+Language_rn;Rundi
+Language_ro;Roumain
+Language_ru;Russe
+Language_rw;Rwanda
+Language_sa;Sanskrit
+Language_sc;Sarde
+Language_sd;Sindhi
+Language_se;Sami du Nord
+Language_sg;Sango
+Language_si;Singhalais
+Language_sk;Slovaque
+Language_sl;Slovène
+Language_sm;Samoan
+Language_sn;Shona
+Language_so;Somali
+Language_sq;Albanais
+Language_sr;Serbe
+Language_ss;Swati
+Language_st;Sotho du Sud
+Language_su;Soundanais
+Language_sv;Suédois
+Language_sw;Swahili
+Language_ta;Tamoul
+Language_te;Télougou
+Language_tg;Tadjik
+Language_th;Thaï
+Language_ti;Tigrigna
+Language_tk;Turkmène
+Language_tl;Tagalog
+Language_tn;Tswana
+Language_to;Tongan
+Language_tr;Turc
+Language_ts;Tsonga
+Language_tt;Tatar
+Language_tw;Twi
+Language_ty;Tahitien
+Language_ug;Ouïgour
+Language_uk;Ukrainien
+Language_ur;Ourdou
+Language_uz;Ouszbek
+Language_ve;Venda
+Language_vi;Vietnamien
+Language_vo;Volapük
+Language_wa;Wallon
+Language_wo;Wolof
+Language_xh;Xhosa
+Language_yi;Yiddish
+Language_yo;Yoruba
+Language_za;Zhuang
+Language_zh;Chinois
+Language_zh-cn;Chinois (Chine)
+Language_zh-tw;Chinois (Taiwan)
+Language_zu;Zoulou
+LawRating;Classé
+LCCN;LCCN
+Library;Bibliotheque utilisée
+Lightness;Luminosité
+List;Liste
+Lyrics;Paroles
+Lyricist;Parolier
+Mastered_Date;Date de création
+MasteredBy;Créé par
+matrix_coefficients;Coefficients de la matrice
+MediaInfo_About;MediaInfo fournit des informations techniques et les tags à propos de vos fichiers video et audio.\r\nExcepté l'interface graphique du Mac App Store, c'est un logiciel libre, ce qui signifie qu'il est gratuit pour l'utilisateur final et que les développeurs on la liberté de l'étudier, l'améliorer et le redistribuer (licence BSD)
+Menu;Menu
+Menu stream(s);Piste(s) menu
+Menu_Codec_List;Codecs Menu
+Menu_No;Pas de menu
+MenuCount;Nombre de pistes menu
+Menu_Hint;Plus de possibilités
+MenuID;ID de menu
+mn;mn
+Mood;Humeur
+More;Plus
+Movie;Nom du film
+ms;ms
+MSDI;MSDI
+MusicBy;Musique par
+MuxingMode;Type de muxing
+MuxingMode_MoreInfo;Type de muxing, plus d'info
+MuxingMode_PackedBitstream;Packed bitstream
+Name;Nom
+Nationality;Nationalité
+NetworkName;Nom du réseau
+New;Nouveau
+Newest version;Vérifier s'il y a une nouvelle version
+NewVersion_Menu;Une nouvelle version est disponible
+NewVersion_Question_Title;Une nouvelle version est sortie!
+NewVersion_Question_Content;Une nouvelle version (v%Version%) est disponible, souhaitez-vous la télécharger?
+No;Non
+Not yet;Pas encore
+NumColors;Nombre de couleurs
+OK;OK
+One output file per input file;Erreur de lecture du fichier
+Open;Ouvrir
+OpenCandy_01;Téléchargement de _____
+OpenCandy_02;____% Terminé
+OpenCandy_03;Connexion Internet interrompue
+OpenCandy_04;Téléchargement de ____ terminé.
+OpenCandy_05;Cliquez ici pour installer ______
+OpenCandy_06;Êtes-vous sûr de vouloir annuler l'installation?\r\nSi vous souhaitez reporter l'installation à plus tard, sélectionnez 'Non'.\r\nRemarque: Vous pouvez choisir 'Quitter' depuis le menu pour reporter l'installation au prochain redémarrage.
+OpenCandy_07;Le téléchargement de ______ a été mis en pause.\r\nCliquez sur l'icône dans la barre d'état pour reprendre le téléchargement.
+OpenCandy_08;Une erreur critique est survenue. L'installation de ______ va être annulée.
+OpenCandy_09;Mettre le téléchargement en pause.
+OpenCandy_10;Annuler l'installation
+OpenCandy_11;Reprendre le téléchargement
+OpenCandy_12;Quitter l'installation
+OpenCandy_13;________ - recommandé par __________
+OpenCandy_14;Téléchargement de _____
+OpenCandy_15;_________, le logiciel recommandé par _______, est en cours de téléchargement selon votre demande. Nous vous ferons savoir quand il sera prêt à être installé.
+OpenCandy_16;_______ est prêt à être installé.
+OpenCandy_17;_______ est maintenant entièrement téléchargé. Cliquez sur 'Installer' pour continuer.
+OpenCandy_18;_______ sur _______ téléchargé
+OpenCandy_19;Un service de OpenCandy
+OpenCandy_20;En savoir plus : OpenCandy.com
+OpenCandy_21;Installer
+OpenCandy_22;Installation de _______
+OpenCandy_23;Ceci va annuler l'installation de _______.\r\Êtes-vous sûr de vouloir quitter?
+OpenCandy_24;Interrompre
+OpenCandy_25;Votre téléchargement a été interrompu. Cliquez sur 'Reprendre' lorsque vous êtes prêts à continuer.
+OpenCandy_26;Reprendre
+OpenCandy_27;Installer Maintenant
+OpenCandy_28;Interrompre le Téléchargement
+OpenCandy_29;Reprendre le Téléchargement
+OpenCandy_30;Annuler l'installation
+OpenCandy_31;Veuillez choisir une option d'installation
+OpenCandy_32;Installer _______
+OpenCandy_33;Ne pas installer
+OpenCandy_34;Veuillez sélectionner une option d'installation
+OpenCandy_35;______ recommande ce logiciel
+OpenCandy_36;Votre installation en cours ne sera pas interrompue
+Options;Options
+Options_Hint;Préférences
+Original;Original
+OriginalNetworkName;Nom d'origine du réseau
+OriginalSourceForm;Format d'origine
+OriginalSourceMedium;Support d'origine
+Other;Autre
+Output;Sortie
+Output format;Format de sortie
+OverallBitRate;Débit global moyen
+OverallBitRate_Maximum;Débit global maximum
+OverallBitRate_Minimum;Débit global minimum
+OverallBitRate_Mode;Type de débit global
+OverallBitRate_Nominal;Débit global nominal
+Part;Partie
+Part_Count;Nombre de parties
+Performer;Interprète
+Period;Période
+Phone;Téléphone
+PixelAspectRatio;Taille du pixel
+PixelAspectRatio_Original;Taille originale du pixel
+PlayCounter;Compteur de lecture
+Played_Count;Nombre de lectures
+Played_First_Date;Première lecture
+Played_Last_Date;Dernière lecture
+PlayTime;Durée
+Position;Position
+Position_Total;Total
+Preferences;Préférences
+Producer;Producteur
+ProductionDesigner;Directeur artistique
+ProductionStudio;Studio de production
+Publisher;Publicateur
+Purchased_Date;Date d'achat
+Quote character;Caractère de citation
+RadioStation;Station de radio
+Rating;Note
+Recorded_Date;Date d'enregistrement
+Recorded_Location;Lieu d'enregistrement
+Released_Date;Date de première diffusion
+RemixedBy;Remixé par
+ReplayGain_Gain;Gain en lecture
+ReplayGain_Peak;Crête de gain en lecture
+Resolution;Résolution
+s;s
+SamplingRate;Echantillonnage
+Save;Sauvegarder
+ScanType;Type de balayage
+ScanType_Original;Type de balayage original
+ScanType_StoreMethod;Ordre de balayage, mode d'enregistrement
+ScanOrder;Ordre de balayage
+ScanOrder_Original;Ordre original de balayage
+ScanOrder_Stored;Ordre stocké de balayage
+ScanOrder_StoredDisplayedInverted;Ordre de balayage invversé entre affiché/stocké
+ScanOrder_StoreMethod;Ordre de balayage, mode d'enregistrement
+ScreenplayBy;Joué par
+Season;Saison
+see below;voir ci-dessous
+Send HeaderFile;SVP envoyez-moi le fichier Header ici : http://sourceforge.net/projects/mediainfo/ (partie Bugs)
+Separator_Columns;Séparateur de colonnes
+Separator_Lines;Séparateur de lignes
+ServiceChannel;Numéro du service
+ServiceName;Nom du service
+ServiceProvider;Fournisseur du service
+ServiceType;Type de service
+Set;Ensemble
+Set_Count;Nombre d'ensembles
+Setup;Configuration
+Sharpness;Netteté
+Sheet;Tableau
+Sheet (Complete);Tableau (Complet)
+Shell extension;Extension Shell (clic droit sur le fichier, il y aura un menu 'Media Info')
+Shell extension, folder;Pour les répertoires aussi
+Shell InfoTip;Extension bulle d'aide (passez la souris sur un fichier, il y aura toutes les infos)
+Show menu;Montrer le menu
+Show toolbar;Montrer la barre d'outils
+Sort;Trié par
+SamplingCount;Nombre d'échantillons
+SoundEngineer;Ingénieur du son
+Source;Source
+Source_Duration;Durée de la source duration
+Source_FrameCount;Nombre d'images de la source
+Source_SamplingCount;Nombre d'échantillons de la source
+Source_StreamSize;Taille du flux source
+Source_StreamSize_Encoded;Taille du flux encodé source
+Standard;Norme
+StoreMethod_InterleavedFields;Trames entrelacées
+StoreMethod_SeparatedFields;Trames séparées
+StoreMethod_SeparatedFields_1;Trames séparées (1 trame par bloc)
+StoreMethod_SeparatedFields_2;Trames séparées (2 trames par bloc)
+Stream;Type de flux
+Stream_MoreInfo;Plus d'information au sujet de ce flux
+StreamCount;Nombre de pistes de ce type
+StreamID;ID de flux
+StreamKind;Type de flux
+StreamKindID;Identifiant du flux
+StreamKindPos;Identifiant du flux
+StreamSize;Taille du flux
+StreamSize_Encoded;Taille du flux encodé
+StreamSize_Proportion;Proportion de ce flux
+Subject;Sujet
+SubTrack;Sous-piste
+Summary;Résumé
+Supported formats;Formats supportés
+Supported?;Supporté?
+Synopsis;Synopsis
+SystemId;Id
+Tagged_Application;Application de marquage
+Tagged_Date;Date de marquage
+Technician;Technicien
+TermsOfUse;Conditions d'utilisation
+Text;Texte
+Text - Custom;Personnalisé
+Text (HTML);Texte (HTML)
+Text stream(s);Piste(s) texte
+Text streams;Flux texte
+Text_Codec_List;Codecs Texte
+Text_No;Pas de sous-titres
+Text1;Première piste Texte
+Text2;Deuxième piste Texte
+Text3;Troisième piste Texte
+TextCount;Nombre de pistes texte
+ThanksTo;Remerciements
+Thousands separator;Séparateur de milliers
+Title;Titre
+Title_More;Titre, plus d'info
+TimeCode;Time code
+TimeCode_FirstFrame;Time code de la première image
+TimeCode_Settings;Paramètres du time code
+TimeCode_Source;Source du time code
+TimeStamp;Time stamp
+TimeZone;Fuseau horaire
+Total;Total
+Track;Piste
+Track_Count;Nombre de pistes
+transfer_characteristics;Caractéristiques du transfert
+Translator;Traducteur
+Tree;Arbre
+Tree & Text;Arbre & Texte
+Type;Type
+UniqueID;Identifiant unique
+Unknown;Inconnu
+Url;Url
+Video;Vidéo
+Video stream(s);Piste(s) vidéo
+Video_Codec_List;Codecs Video
+Video_Delay;Délai par rapport Vidéo
+Video_No;Pas de vidéo
+Video0_Delay;Délai par rapport Vidéo0
+Video1;Première piste Vidéo
+VideoCount;Nombre de pistes vidéo
+View;Vue
+View_Hint;Change la façon de voir les informations
+Warning : more streams in the files;Attention : il y a davantage de flux dans les fichiers!
+Web;Web
+WebSite_Audio;Aller sur le site web du codec audio
+WebSite_Audio_More;Aller sur le site web (%Url%) du codec audio
+WebSite_General;Aller sur le site web d'un lecteur pour ce fichier
+WebSite_General_More;Aller sur le site web (%Url%) d'un lecteur pour ce fichier
+WebSite_Text;Aller sur le site web du codec text
+WebSite_Text_More;Aller sur le site web (%Url%) du codec texte
+WebSite_Url;http://MediaArea.net/MediaInfo/
+WebSite_Video;Aller sur le site web du codec vidéo
+WebSite_Video_More;Aller sur le site web (%Url%) du codec vidéo
+Width;Largeur
+Width_Original;Largeur
+WriteMe;écrire à l'auteur
+WriteToTranslator;Écrire au traducteur
+Written_Date;Date d'écriture
+Written_Location;Lieu d'écriture
+WrittenBy;Écrit par
+Yes;Oui
+Your system;Votre système
+ZZ_Automatic_Percent;95
+ZZ_AutomaticLanguage_Percent;99

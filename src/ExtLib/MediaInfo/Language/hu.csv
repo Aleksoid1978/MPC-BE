@@ -1,0 +1,1040 @@
+  Language_ISO639;hu
+  Author_Email;DirektX@freemail.hu
+  Author_Name;DirektX
+  Author_OldNames;
+  Language_Name;magyar
+  Config_Text_ColumnSize;40
+  Config_Text_Separator; : 
+  Config_Text_NumberTag; #
+  Config_Text_FloatSeparator;,
+  Config_Text_ThousandsSeparator; 
+ audio stream1; hangsáv
+ audio stream2; hangsáv
+ audio stream3; hangsáv
+ bit1; bit
+ bit2; bit
+ bit3; bit
+ bps; bps
+ Bps; Bps
+ Byte1; bájt
+ Byte2; bájt
+ Byte3; bájt
+ channel1; csatorna
+ channel2; csatorna
+ channel3; csatorna
+ chapter1; fejezet
+ chapter2; fejezet
+ chapter3; fejezet
+ chapters stream1; fejezetsáv
+ chapters stream2; fejezetsáv
+ chapters stream3; fejezetsáv
+ day1; nap
+ day2; nap
+ day3; nap
+ dB1; dB
+ dB2; dB
+ dB3; dB
+ file1; fájl
+ file2; fájl
+ file3; fájl
+ frame1; képkocka
+ frame2; képkocka
+ frame3; képkocka
+ fps1; fps
+ fps2; fps
+ fps3; fps
+ GB; GB
+ Gb; Gb
+ Gbps; Gbps
+ GBps; GBps
+ GHz; GHz
+ GiB; GiB
+ GibiByte1; GibiBájt
+ GibiByte2; GibiBájt
+ GibiByte3; GibiBájt
+ GiBps; GiBps
+ GigaBit1; GigaBit
+ GigaBit2; GigaBit
+ GigaBit3; GigaBit
+ GigaByte1; GigaBájt
+ GigaByte2; GigaBájt
+ GigaByte3; GigaBájt
+ hour1; óra
+ hour2; óra
+ hour3; óra
+ Hz; Hz
+ image stream1; képadat
+ image stream2; képadat
+ image stream3; képadat
+ KB; Kbps
+ Kb; Kb
+ KBps; KBps
+ Kbps; Kbps
+ KHz; KHz
+ KiB; KiB
+ KibiBit1; KibiBit
+ KibiBit2; KibiBit
+ KibiBit3; KibiBit
+ KibiByte1; KibiBájt
+ KibiByte2; KibiBájt
+ KibiByte3; KibiBájt
+ KiBps; KiBps
+ KiloBit1; KiloBit
+ KiloBit2; KiloBit
+ KiloBit3; KiloBit
+ KiloByte1; KiloBájt
+ KiloByte2; KiloBájt
+ KiloByte3; KiloBájt
+ MB; MB
+ Mb; Mb
+ Mbps; Mbps
+ MBps; MebiBájt
+ MebiBit1; MebiBit
+ MebiBit2; MebiBit
+ MebiBit3; MebiBit
+ MebiByte1; MebiBájt
+ MebiByte2; MebiBájt
+ MebiByte3; MebiBájt
+ MegaBit1; MegaBit
+ MegaBit2; MegaBit
+ MegaBit3; MegaBit
+ MegaByte1; MegaBájt
+ MegaByte2; MegaBájt
+ MegaByte3; MegaBájt
+ MHz; MHz
+ MiB; MiB
+ Mib; Mib
+ MiBps; MiBps
+ millisecond1; ezredmásodperc
+ millisecond2; ezredmásodperc
+ millisecond3; ezredmásodperc
+ minute1; perc
+ minute2; perc
+ minute3; perc
+ month1; hónap
+ month2; hónap
+ month3; hónap
+ pixel1; képpont
+ pixel2; képpont
+ pixel3; képpont
+ second1; másodperc
+ second2; másodperc
+ second3; másodperc
+ text stream1; szövegsáv
+ text stream2; szövegsáv
+ text stream3; szövegsáv
+ video frames1; képkocka
+ video frames2; képkocka
+ video frames3; képkocka
+ video stream1; képsáv
+ video stream2; képsáv
+ video stream3; képsáv
+ warppoint0;
+ warppoint1;
+ warppoint2;
+ warppoint3;
+ week1; hét
+ week2; hét
+ week3; hét
+ year1; év
+ year2; év
+ year3; év
+, ;,
+: ;:
+About;Névjegy
+About_Hint;Hogyan léphet velem kapcsolatba, illetve a legfrissebb változat lelőhelye
+Accompaniment;Kíséret
+ActiveFormatDescription;
+ActiveFormatDescription_MuxingMode;
+Actor;Előadó
+Actor_Character;Szerep
+Added_Date;Hozzáadva
+Address;Cím
+Advanced;Bővített
+Advanced mode;Bővített mód
+Album;Album
+Album_ReplayGain_Gain;Album erősítése
+Album_ReplayGain_Peak;Album csúcserősítése
+Alignment;Igazítás
+Alignment_Aligned;igazított
+Alignment_Split;osztott
+All;Mind
+Archival_Location;Arhiválás helye
+Arranger;Szerkesztő
+ArtDirector;Művészeti vezető
+AspectRatio;Képarány
+AssistantDirector;Segédrendező
+at;, képsebesség:
+At least one file;(Legalább egy fájlt meg kell nyitni)
+Audio;Hang
+Audio stream(s);Hangsávok
+Audio_Codec_List;Hangkódekek
+Audio_No;Nincs hang
+Audio1;Első hangsáv
+Audio2;Második hangsáv
+AudioCount;Hangsávok száma
+Author;Szerző
+BarCode;Vonalkód
+Basic;Egyszerű
+Basic_Note;Megjegyzés: a többi nézet (Táblázat, Fa ...) bővebb adatokat mutat a fájlról
+BitDepth;
+BitDepth_Stored;
+BitRate;Adatsebesség
+BitRate_Maximum;Legnagyobb adatsebesség
+BitRate_Minimum;Legkisebb adatsebesség
+BitRate_Mode;Adatsebesség mód
+BitRate_Mode_CBR;állandó
+BitRate_Mode_VBR;változó
+BitRate_Nominal;Névleges adatsebesség
+BitRate_Encoded;
+Bits-(Pixel*Frame);Bit/(képpont*képkocka)
+BufferSize;
+Cancel;Mégsem
+Channel(s);Csatornák száma
+ChannelPositions;Csatorna kiosztás
+Chapter(s);Fejezet
+Chapters;Fejezet
+Chapters stream(s);Fejezetsávok
+Chapters_Codec_List;Fejezetkódekek
+Chapters_No;Nincs fejezet
+ChaptersCount;Fejezetsávok száma
+CheckNewVersion;Új változat keresése
+Choose custom;Egyedi
+Choose custom sheet;Adja meg a kívánt egyedi táblázatot
+Choose custom text;Adja meg a kívánt egyedi szöveget
+Choose export format;Adja meg a kívánt egyedi exportálási formátumot
+Choose file(s);Adja meg a megnyitni kívánt fájl nevét
+Choose filename;Adja meg a kívánt fájlnevet
+Choose language;Adja meg a használni kívánt nyelvet
+Choregrapher;Koreográfus
+Chroma;Szín
+ChromaSubsampling;
+Close;Bezárás
+Close all before open;Mindent bezár megnyitás előtt
+Codec;kódek
+Codec_Description;Kódek leírás
+Codec_Info;A kódek részletei
+Codec_Settings;Kódek beállításai
+Codec_Settings_PacketBitStream;Codec settings, Packet bitstream
+Codec_Settings_BVOP;Kódek beállításai, BVOP
+Codec_Settings_QPel;Kódek beállításai, QPel
+Codec_Settings_GMC;Kódek beállításai, GMC
+Codec_Settings_Matrix;Kódek beállításai, Matrix
+Codec_Settings_Floor;Kódek beállításai, Floor
+Codec_Settings_CABAC;Kódek beállításai, CABAC
+Codec_Settings_Firm;Kódek beállításai, Firm
+Codec_Settings_Endianness;Kódek beállításai, Endianness
+Codec_Settings_Sign;Kódek beállításai, Sign
+Codec_Settings_Law;Kódek beállításai, Law
+Codec_Settings_ITU;Kódek beállításai, ITU
+Codec_Profile;Kódek profil
+Codec_Url;Kódek weblapja
+CodecID;Kódek azonosító
+CodecID_Description;Kódek leírás
+Collection;Gyűjtemény
+Colorimetry;Színkódolás
+ColorSpace;
+colour_primaries;
+Comment;Megjegyzés
+CommissionedBy;Megbízó
+Compilation;
+CompleteName;Teljes név
+Composer;Zeneszerző
+Compression_Mode;
+Compression_Mode_Lossless;
+Compression_Mode_Lossy;
+Compression_Ratio;Tömörítési arány
+Conductor;Vezényel
+Container and general information;Gyűjtő és általános adatok
+ContentType;Tartalom típusa
+CoProducer;Gyártó
+Copyright;Jogok
+CostumeDesigner;Jelmeztervező
+Count;Számláló
+Country;Ország
+Cover;Borító
+Cover_Datas;Borító adatai
+Cover_Description;Borító leírás
+Cover_Mime;Borító MIME
+Cover_Type;Borító típusa
+Cropped;Méretek
+Custom;Egyedi
+Customize;Testreszabás
+Date;Dátum
+Debug;Hibakeresés
+Decimal point;Tizedesjel
+Delay;Késleltetés
+Delay_Source;
+Delay_Source_Container;
+Delay_Source_Stream;
+Delete;Törlés
+Description;Leírás
+Digitized_Date;Digitalizálás dátuma
+Dimensions;Méretek
+Director;Rendező
+DirectorOfPhotography;Fényképezte
+DisplayAspectRatio;Képarány
+DisplayAspectRatio_Original;Eredeti képarány
+DistributedBy;Terjesztő
+Donate;Adomány
+DotsPerInch;
+Duration;Időtartam
+Duration_End;
+Duration_Start;
+Edit;Szerkesztés
+EditedBy;Szerkesztő
+EMail;Email
+Encoded_Application;Kódoló szoftver
+Encoded_Date;Kódolás dátuma
+Encoded_Library;Kódoló könyvtár
+Encoded_Library_Settings;Kódoló könyvtár beállításai
+Encoded_Original;Eredeti
+EncodedBy;Kódolta
+EPG_Positions;
+Error_File;Fájlolvasási hiba
+ExecutiveProducer;Gyártó
+Exit;Kilépés
+Exit_Hint;Kilépés a programból
+Export;Exportálás
+Export_Hint;Exportálás egyedi formátumba
+Extensions;Általában használatos kiterjesztések
+Family;Család
+Fax;fax
+File;Fájl
+File size;Fájlméret
+File_Append;Meglévő fájlhoz hozzáfűzés (Figyelem: ügyeljünk az azonos paraméterekre)
+File_Created_Date;Fájl létrehozásának dátuma
+File_Created_Date_Local;
+File_Hint;Adja meg a vizsgálandó fájt
+File_Modified_Date;Fájl módosításának dátuma
+File_Modified_Date_Local;
+FileExtension;Fájl kiterjesztés
+FileName;Fájlnév
+FileSize;Fájlméret
+Folder;Mappa
+Folder (R);Mappa (R)
+Folder (R)_Hint;Adja meg az almappáival együtt vizsgálandó mappát
+Folder (Recursively);Mappa (rekurzív)
+Folder_Hint;Adja meg a vizsgálandó mappát
+FolderName;Mappanév
+Format;Formátum
+Format_Commercial;
+Format_Commercial_IfAny;
+Format_Description;Formátum leírás
+Format_Info;A kódek részletei
+Format_Profile;Formátum profil
+Format_Settings;Formátum beállítások
+Format_Settings_PacketBitStream;Formátum beállítások, Packet bitstream
+Format_Settings_BVOP;Formátum beállítások, BVOP
+Format_Settings_QPel;Formátum beállítások, QPel
+Format_Settings_GMC;Formátum beállítások, GMC
+Format_Settings_Matrix;Formátum beállítások, mátrix
+Format_Settings_Matrix_Custom;egyedi
+Format_Settings_Matrix_Default;alapérték
+Format_Settings_Floor;Formátum beállítások, Floor
+Format_Settings_CABAC;Formátum beállítások, CABAC
+Format_Settings_Firm;Formátum beállítások, Firm
+Format_Settings_Endianness;Formátum beállítások, Endianness
+Format_Settings_RefFrames;Formátum beállítások, ReFrames
+Format_Settings_Sign;Formátum beállítások, Sign
+Format_Settings_Law;Formátum beállítások, Law
+Format_Settings_ITU;Formátum beállítások, ITU
+Format_Settings_SBR;Formátum beállítások, SBR
+Format_Settings_PS;Formátum beállítások, PS
+Format_Settings_Pulldown;Formátum beállítások, Pulldown
+Format_Settings_Mode;
+Format_Settings_FrameMode;
+Format_Settings_Emphasis;
+Format_Settings_ModeExtension;
+Format_Settings_GOP;
+Format_Version;Formátum változat
+Format_Url;Formátum weblapja
+FrameCount;Képkockaszám
+FrameRate;Képkockasebesség
+FrameRate_Mode;Képkockasebességi mód
+FrameRate_Mode_CFR;állandó
+FrameRate_Mode_VFR;változó
+FrameRate_Minimum;Legkisebb képkockasebesség
+FrameRate_Nominal;Névleges képkockasebesség
+FrameRate_Maximum;Legnagyobb képkockasebesség
+FrameRate_Original;Eredeti képkockasebesség
+General;Általános
+Genre;Műfaj
+Genre_000;blues
+Genre_001;klasszikus rock
+Genre_002;country
+Genre_003;dance
+Genre_004;disco
+Genre_005;funk
+Genre_006;grunge
+Genre_007;hip-hop
+Genre_008;jazz
+Genre_009;metal
+Genre_010;new age
+Genre_011;oldies
+Genre_012;egyéb
+Genre_013;pop
+Genre_014;r&b
+Genre_015;rap
+Genre_016;reggae
+Genre_017;rock
+Genre_018;techno
+Genre_019;industrial
+Genre_020;alternatív
+Genre_021;ska
+Genre_022;death metal
+Genre_023;pranks
+Genre_024;filmzene
+Genre_025;euro-techno
+Genre_026;ambient
+Genre_027;trip-hop
+Genre_028;vocal
+Genre_029;jazz+funk
+Genre_030;fusion
+Genre_031;trance
+Genre_032;klasszikus
+Genre_033;hangszeres
+Genre_034;acid
+Genre_035;house
+Genre_036;játék
+Genre_037;sound clip
+Genre_038;gospel
+Genre_039;zaj
+Genre_040;alternrock
+Genre_041;bass
+Genre_042;soul
+Genre_043;punk
+Genre_044;space
+Genre_045;meditative
+Genre_046;instrumental pop
+Genre_047;instrumental rock
+Genre_048;ethnic
+Genre_049;gothic
+Genre_050;darkwave
+Genre_051;techno-industrial
+Genre_052;electronic
+Genre_053;pop-folk
+Genre_054;eurodance
+Genre_055;dream
+Genre_056;southern rock
+Genre_057;comedy
+Genre_058;cult
+Genre_059;gangsta
+Genre_060;top 40
+Genre_061;keresztény rap
+Genre_062;pop/funk
+Genre_063;jungle
+Genre_064;amerikai bennszülött
+Genre_065;kabaré
+Genre_066;újhullám
+Genre_067;psychadelic
+Genre_068;rave
+Genre_069;showtunes
+Genre_070;trailer
+Genre_071;lo-fi
+Genre_072;tribal
+Genre_073;acid punk
+Genre_074;acid jazz
+Genre_075;polka
+Genre_076;retró
+Genre_077;musical
+Genre_078;rock & roll
+Genre_079;hard rock
+Genre_080;népzene
+Genre_081;folk-rock
+Genre_082;nemzeti népzene
+Genre_083;swing
+Genre_084;fast fusion
+Genre_085;bebob
+Genre_086;latin
+Genre_087;revival
+Genre_088;kelta
+Genre_089;bluegrass
+Genre_090;avantgarde
+Genre_091;gothic rock
+Genre_092;progressive rock
+Genre_093;psychedelic rock
+Genre_094;szimfónikus rock
+Genre_095;slow rock
+Genre_096;big band
+Genre_097;chorus
+Genre_098;easy listening
+Genre_099;acoustic
+Genre_100;humor
+Genre_101;beszéd
+Genre_102;chanson
+Genre_103;opera
+Genre_104;kamarazene
+Genre_105;szonáta
+Genre_106;szimfónia
+Genre_107;booty bass
+Genre_108;primus
+Genre_109;porn groove
+Genre_110;satire
+Genre_111;slow jam
+Genre_112;club
+Genre_113;tangó
+Genre_114;szamba
+Genre_115;folklór
+Genre_116;ballad
+Genre_117;power ballad
+Genre_118;rhythmic soul
+Genre_119;freestyle
+Genre_120;duett
+Genre_121;punk rock
+Genre_122;dobszóló
+Genre_123;a capella
+Genre_124;euro-house
+Genre_125;dance hall
+Genre_126;goa
+Genre_127;drum & bass
+Genre_128;club-house
+Genre_129;hardcore
+Genre_130;terror
+Genre_131;indie
+Genre_132;britpop
+Genre_133;negerpunk
+Genre_134;polsk punk
+Genre_135;beat
+Genre_136;keresztény gengszter rap
+Genre_137;heavy metal
+Genre_138;black metal
+Genre_139;crossover
+Genre_140;modern keresztény
+Genre_141;keresztény rock
+Genre_142;merengue
+Genre_143;salsa
+Genre_144;trash metal
+Genre_145;anime
+Genre_146;jpop
+Genre_147;synthpop
+Genre_148;
+Genre_149;
+Genre_150;
+Genre_151;
+Genre_152;
+Genre_153;
+Genre_154;
+Genre_155;
+Genre_156;
+Genre_157;
+Genre_158;
+Genre_159;
+Genre_160;
+Genre_161;
+Genre_162;
+Genre_163;
+Genre_164;
+Genre_165;
+Genre_166;
+Genre_167;
+Genre_168;
+Genre_169;
+Genre_170;
+Genre_171;
+Genre_172;
+Genre_173;
+Genre_174;
+Genre_175;
+Genre_176;
+Genre_177;
+Genre_178;
+Genre_179;
+Genre_180;
+Genre_181;
+Genre_182;
+Genre_183;
+Genre_184;
+Genre_185;
+Genre_186;
+Genre_187;
+Genre_188;
+Genre_189;
+Genre_190;
+Genre_191;
+Go to WebSite;A weblap meglátogatása
+Grouping;
+h; óra
+Header file;Fejléc fájl létrehozása
+Height;Magasság
+Height_Original;
+Help;Súgó
+Hint;Tipp
+How many audio streams?;Hány hangsáv?
+How many chapters streams?;Hány fejezetsáv?
+How many text streams?;Hány szövegsáv?
+How many video streams?;Hány képsáv?
+HTML;HTML
+ID;Sáv száma
+Image;Állókép
+Image stream(s);Állóképsávok
+Image_Codec_List;Állóképkódekek
+ImageCount;Állóképsávok száma
+Info;adatok
+Instruments;Hangszerek
+Interlacement;Sorváltás
+Interlaced_Interlaced;váltottsoros
+Interlaced_TFF;felső mezővel kezdődő
+Interlaced_BFF;alsó mezővel kezdődő
+Interlaced_PPF;folytonos
+Interlaced_Progressive;folytonos
+Interleaved;
+Interleave_Duration;Átfedés hossza
+Interleave_Preload;Átfedés előolvasási hossz
+Interleave_VideoFrames;Átfedés képkockák
+InternetMediaType;
+IRCA;IRCA
+ISBN;ISBN
+ISRC;ISRC
+Keywords;Kulcsszavak
+Known codecs;Ismert kódekek
+Known formats;Ismert formátumok
+Known parameters;Ismert paraméterek
+Label;Címke
+Language;Nyelv
+Language_More;Nyelv, további adatok
+Language_aa;afar
+Language_ab;abház
+Language_ae;
+Language_af;afrikaans
+Language_ak;
+Language_am;amharai
+Language_an;
+Language_ar;arab
+Language_as;
+Language_av;
+Language_ay;
+Language_az;azerbajdzsáni
+Language_ba;baskír
+Language_be;belorusz
+Language_bg;bolgár
+Language_bh;bihari
+Language_bi;
+Language_bm;
+Language_bn;bengáli
+Language_bo;tibeti
+Language_br;breton
+Language_bs;bosnyák
+Language_ca;katalán
+Language_ce;csecsen
+Language_ch;
+Language_co;korzikai
+Language_cr;
+Language_cs;cseh
+Language_cu;szláv
+Language_cv;csuvas
+Language_cy;wales-i
+Language_da;dán
+Language_de;német
+Language_dv;divehi
+Language_dz;dzonka
+Language_ee;
+Language_el;görög
+Language_en;angol
+Language_en-gb;
+Language_en-us;
+Language_eo;eszperantó
+Language_es;spanyol
+Language_et;észt
+Language_eu;baszk
+Language_fa;perzsa
+Language_ff;
+Language_fi;finn
+Language_fj;fidzsi
+Language_fo;férői
+Language_fr;francia
+Language_fy;fríz
+Language_ga;ír
+Language_gd;skót gael
+Language_gl;gall
+Language_gn;galíciai
+Language_gu;gudzsarati
+Language_gv;
+Language_ha;
+Language_he;héber
+Language_hi;hindi
+Language_ho;
+Language_hr;horvát
+Language_ht;haiti
+Language_hu;magyar
+Language_hy;örmény
+Language_hz;herero
+Language_ia;interlingua
+Language_id;indonéz
+Language_ie;interlinga
+Language_ig; 
+Language_ii; 
+Language_ik;
+Language_Info;Nyelv adatok
+Language_io;
+Language_is;izlandi
+Language_it;olasz
+Language_iu; 
+Language_ja;japán
+Language_jv;jávai
+Language_ka;grúz
+Language_kg;kongó
+Language_ki; 
+Language_kj; 
+Language_kk;kazah
+Language_kl; 
+Language_km;kmer
+Language_kn;kanadai
+Language_ko;koreai
+Language_kr; 
+Language_ks;kasmír
+Language_ku;kurd
+Language_kv; komi
+Language_kw;
+Language_ky;kirgiz
+Language_la;latin
+Language_lb;luxemburgi
+Language_lg;
+Language_li;
+Language_ln; 
+Language_lo; 
+Language_lt;litván
+Language_lu; 
+Language_lv;lett
+Language_mg; 
+Language_mh; 
+Language_mi;maori 
+Language_mk;macedón
+Language_ml;malajziai
+Language_mn;mongol
+Language_mo;moldáv
+Language_mr;marathi
+Language_ms;maláj
+Language_mt;máltai
+Language_mul;Többnyelvű
+Language_my;burmai
+Language_na; 
+Language_nb;norvég bokmál
+Language_nd; 
+Language_ne;nepáli
+Language_ng; 
+Language_nl;holland
+Language_nn;norvég bokmál
+Language_no;norvég
+Language_nr; 
+Language_nv;navaho
+Language_ny; 
+Language_oc;okcitán
+Language_oj; 
+Language_om; 
+Language_or; 
+Language_os;oszét
+Language_pa;pandzsábi
+Language_pi; 
+Language_pl;lengyel
+Language_ps; 
+Language_pt;portugál
+Language_pt-br;portugál (brazíliai)
+Language_qu;kecsua
+Language_rm;rétoromán
+Language_rn; 
+Language_ro;román
+Language_ru;orosz
+Language_rw; 
+Language_sa;szanszkrit
+Language_sc;szárd
+Language_sd; 
+Language_se; 
+Language_sg; 
+Language_si;szingaléz
+Language_sk;szlovák
+Language_sl;szlovén
+Language_sm;szamoai
+Language_sn; 
+Language_so;szomáli
+Language_sq;albán
+Language_sr;szerb
+Language_ss; 
+Language_st; 
+Language_su;
+Language_sv;svéd
+Language_sw;szuahéli
+Language_ta;tamil
+Language_te;telugu
+Language_tg;tadzsik 
+Language_th;thai
+Language_ti;tigriniai
+Language_tk;türkmén
+Language_tl;tagalog
+Language_tn; 
+Language_to;tonga
+Language_tr;török
+Language_ts; 
+Language_tt;tatár
+Language_tw; 
+Language_ty;tahiti
+Language_ug;vigér
+Language_uk;ukrán
+Language_ur;urdu
+Language_uz;üzbég
+Language_ve; 
+Language_vi;vietnámi
+Language_vo;volapük
+Language_wa;vallon
+Language_wo; 
+Language_xh; 
+Language_yi;jiddis
+Language_yo;joruba
+Language_za; 
+Language_zh;kínai
+Language_zh-cn;
+Language_zh-tw;
+Language_zu;zulu
+LawRating;Korhatár
+LCCN;LCCN
+Library;Keverőkönyvtár
+Lightness;Fényesség
+List;Lista
+Lyrics;Dalszöveg
+Lyricist;Szövegíró
+Mastered_Date;Mesterpéldány kelte
+MasteredBy;Mesterpéldány
+matrix_coefficients;
+MediaInfo_About;Igen részletes adatok az alábbi\r\nmultimédia fájlokról:\r\nMatroska, OGG (OGM is)\r\nMPEG1 (VCD is)\r\nMPEG2 (DVD és SVCD is)\r\nMPEG4 (Itunes M4A is)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA is)\r\nMicrosoft RIFF (AVI, WAV is)\r\nCsak hangot tartalmazó fájlok (AC3, DTS, AAC, AU, AIFF...)
+Menu;Menü
+Menu stream(s);Menüsáv
+Menu_Codec_List;Menükódek lista
+Menu_No;Menüszám
+MenuCount;Menüsávok száma
+Menu_Hint;További lehetőségek
+MenuID;Menü azonosító
+mn; perc
+Mood;Hangnem
+More;Több
+Movie;Film
+ms;emp
+MSDI;MSDI
+MusicBy;Zeneszerző
+MuxingMode;Keverési mód
+MuxingMode_MoreInfo;
+MuxingMode_PackedBitstream;adatcsomag
+Name;Név
+Nationality;Nemzetiség
+NetworkName;
+New;Új
+Newest version;Frissítés keresése (internet kapcsolat szükséges)
+NewVersion_Menu;Elérhető egy újabb változat.
+NewVersion_Question_Title;Új változat jelent meg!
+NewVersion_Question_Content;Elérhető egy újabb (v%Version%) változat. Kívánja letölteni?
+No;nem
+Not yet;Még nincs
+NumColors;Színek száma
+OK;OK
+One output file per input file;Bemeneti fájlonként egy kimeneti fájl
+Open;Megnyit
+OpenCandy_01;
+OpenCandy_02;
+OpenCandy_03;
+OpenCandy_04;
+OpenCandy_05;
+OpenCandy_06;
+OpenCandy_07;
+OpenCandy_08;
+OpenCandy_09;
+OpenCandy_10;
+OpenCandy_11;
+OpenCandy_12;
+OpenCandy_13;
+OpenCandy_14;
+OpenCandy_15;
+OpenCandy_16;
+OpenCandy_17;
+OpenCandy_18;
+OpenCandy_19;
+OpenCandy_20;
+OpenCandy_21;
+OpenCandy_22;
+OpenCandy_23;
+OpenCandy_24;
+OpenCandy_25;
+OpenCandy_26;
+OpenCandy_27;
+OpenCandy_28;
+OpenCandy_29;
+OpenCandy_30;
+OpenCandy_31;
+OpenCandy_32;
+OpenCandy_33;
+OpenCandy_34;
+OpenCandy_35;
+OpenCandy_36;
+Options;Beállítások
+Options_Hint;Beállítások
+Original;Eredeti
+OriginalNetworkName;
+OriginalSourceForm;Eredeti forrás formátuma
+OriginalSourceMedium;Eredeti adathordozója
+Other;Egyéb
+Output;Kimenet
+Output format;Kimeneti formátum
+OverallBitRate;Teljes adatsebesség
+OverallBitRate_Maximum;Legnagyobb adatsebesség
+OverallBitRate_Minimum;Legkisebb adatsebesség
+OverallBitRate_Mode;Teljes adatsebesség
+OverallBitRate_Nominal;Névleges adatsebesség
+Part;Rész
+Part_Count;Részek száma
+Performer;Előadó
+Period;Korszak
+Phone;Telefon
+PixelAspectRatio;Képpont arány
+PixelAspectRatio_Original;Képpont arány
+PlayCounter;Lejátszás számláló
+Played_Count;Lejátszások száma
+Played_First_Date;Első lejátszás dátuma
+Played_Last_Date;Utolsó lejátszás dátuma
+PlayTime;Játékidő
+Position;Helyzet
+Position_Total;
+Preferences;Beállítások
+Producer;Gyártó
+ProductionDesigner;Tervező
+ProductionStudio;Gyártó stúdió
+Publisher;Kiadó
+Purchased_Date;Vásárlás dátuma
+Quote character;Idézőjel karakter
+RadioStation;Rádióállomás
+Rating;Értékelés
+Recorded_Date;Rögzítés dátuma
+Recorded_Location;Rögzítés helye
+Released_Date;Kiadás dátuma
+RemixedBy;Újrakeverte
+ReplayGain_Gain;Visszajátszás erősítése
+ReplayGain_Peak;Visszajátszás csúcserősítése
+Resolution;Felbontás
+s; mp
+SamplingRate;Mintavételezési gyakoriság
+Save;Mentés
+ScanType;Sorváltás típusa
+ScanType_Original;
+ScanType_StoreMethod;
+ScanOrder;Sorváltási sorrend
+ScanOrder_Original;
+ScanOrder_Stored;
+ScanOrder_StoredDisplayedInverted;
+ScanOrder_StoreMethod;
+ScreenplayBy;Forgatókönyvíró
+Season;Évad
+see below;lásd alant
+Send HeaderFile;Kérem, küdje el a fejléc fájlt ide: http://sourceforge.net/projects/mediainfo/ (Bug section)
+Separator_Columns;Oszlop elválasztó
+Separator_Lines;Sor elválasztó
+ServiceChannel;Szolgáltatás csatornája
+ServiceName;Szolgáltatás neve
+ServiceProvider;Szolgáltató
+ServiceType;Szolgáltatás típusa
+Set;Sorszám
+Set_Count;Összesen
+Setup;Beállítások
+Sharpness;Élesség
+Sheet;Táblázat
+Sheet (Complete);Táblázat (teljes)
+Shell extension;Rendszerhéj-kiterjesztés (az Intézőben a helyzetérzékeny menüben Media Info menüpont...)
+Shell extension, folder;
+Shell InfoTip;Rendszerhéj tipp (ha az egérmutató az Intézőben a fájl fölé visszük, adatokat láthatunk)
+Show menu;Menü mutatása
+Show toolbar;Eszköztár mutatása
+Sort;Sorba rendezte
+SamplingCount;
+SoundEngineer;Hangmérnök
+Source;
+Source_Duration;
+Source_FrameCount;
+Source_SamplingCount;
+Source_StreamSize;
+Source_StreamSize_Encoded;
+Standard;Szabvány
+StoreMethod_InterleavedFields;
+StoreMethod_SeparatedFields;
+StoreMethod_SeparatedFields_1;
+StoreMethod_SeparatedFields_2;
+Stream;Sáv
+Stream_MoreInfo;Több adat a sávról
+StreamCount;A hasonló fajtájú sávok száma
+StreamID;Sávazonosító
+StreamKind;Sáv fajtája
+StreamKindID;Sáv fajta azonosító
+StreamKindPos;Sáv fajta sorszáma
+StreamSize;Adatfolyam mérete
+StreamSize_Encoded;
+StreamSize_Proportion;Adatofolyam aránya
+Subject;Tárgy
+SubTrack;Alsáv
+Summary;Kivonat
+Supported formats;Támogatott formátumok
+Supported?;Támogatott?
+Synopsis;Áttekintés
+SystemId;Azonosító
+Tagged_Application;Jelölő alkalmazás
+Tagged_Date;Jelölés dátuma
+Technician;Technikus
+TermsOfUse;Felhasználási feltételek
+Text;Szöveg
+Text - Custom;Szöveg - egyedi
+Text (HTML);Text (HTML)
+Text stream(s);Szövegsávok
+Text streams;Szövegsávok
+Text_Codec_List;Szövegkódekek
+Text_No;Nincs szöveg
+Text1;Első szövegsáv
+Text2;Második szövegsáv
+Text3;Harmadik szövegsáv
+TextCount;Szövegsávok száma
+ThanksTo;Köszönetnyilvánítás
+Thousands separator;Ezres elválasztó jel
+Title;Cím
+Title_More;Cím, több adat
+TimeCode;
+TimeCode_FirstFrame;
+TimeCode_Settings;
+TimeCode_Source;
+TimeStamp;
+TimeZone;
+Total;Összesen
+Track;Sáv
+Track_Count;Sávok száma
+transfer_characteristics;
+Translator;Fordító
+Tree;Fa
+Tree & Text;Fa és szöveg
+Type;
+UniqueID;
+Unknown;Ismeretlen
+Url;Url
+Video;Kép
+Video stream(s);Képsávok
+Video_Codec_List;Képkódekek
+Video_Delay;Videó késleltetés
+Video_No;Nincs kép
+Video0_Delay;Video0 késleltetés
+Video1;Első képsáv
+VideoCount;Képsávok száma
+View;Nézet
+View_Hint;Megtekintési adatok megváltoztatása
+Warning : more streams in the files;Figyelem: ebben a fájlban több sáv van
+Web;Web
+WebSite_Audio;A hangkódek weblapjának meglátogatása
+WebSite_Audio_More;Látogassa meg a hangkódek weblapját (%Url%)
+WebSite_General;A fájl lejátszó weblapjának meglátogatása
+WebSite_General_More;Látogassa meg a fájl lejátszó weblapját (%Url%)
+WebSite_Text;A szövegkódek weblapjának meglátogatása
+WebSite_Text_More;Látogassa meg a szövegkódek weblapját (%Url%)
+WebSite_Url;http://MediaArea.net/MediaInfo
+WebSite_Video;A képkódek weblapjának meglátogatása
+WebSite_Video_More;Látogassa meg a képkódek weblapját (%Url%)
+Width;Szélesség
+Width_Original;
+WriteMe;Írjon
+WriteToTranslator;Írjon a fordítónak
+Written_Date;Írás dátuma
+Written_Location;Írás helye
+WrittenBy;Írta
+Yes;igen
+Your system;Rendszer
+ZZ_Automatic_Percent;82
+ZZ_AutomaticLanguage_Percent;93

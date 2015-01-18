@@ -1,0 +1,80 @@
+People with Git commit rights (sorted by name):
+--------
+Armada                  <armada651@users.sourceforge.net>       Code
+Goran 'vBm' Džaferi     <thevbm@users.sourceforge.net>          New website, Trac moderator, IRC
+janwillem32             <janwillem32@users.sourceforge.net>     Code
+nevcairiel              <nevcairiel@users.sourceforge.net>      Code
+Underground78           <underground78@users.sourceforge.net>   Code, French, Admin
+v0lt                    <v0lt@users.sourceforge.net>            Code, Russian
+XhmikosR                <xhmikosr@users.sourceforge.net>        Various stuff, Admin
+
+
+Inactive:
+----------
+_xxl                    <drevil_xxl@users.sourceforge.net>      FFmpeg
+Alexander Wild          <alexwild@users.sourceforge.net>        Code, German
+Arto Jarvinen           <ar-jar@users.sourceforge.net>          Code
+Attila T. Afra          <attila.afra@gmail.com>                 Code
+Beliyaal                <beliyaal@users.sourceforge.net>        Code
+Casimir666              <casimir666@users.sourceforge.net>      Founder, Code, Admin, French
+bobdynlan               <bobdynlan@users.sourceforge.net>       Code
+clsid                   <clsid2@users.sourceforge.net>          Code
+demi_alucard            <alysson87@gmail.com>                   Code, Portuguese (Brazil)
+Di Luo                  <sansnom05@users.sourceforge.net>       Code
+jonasno                 <jonasno@users.sourceforge.net>         Code, Swedish
+KindDragon              <kinddragon@users.sourceforge.net>      Code
+Martin Panayotov        <mvpsoft@users.sourceforge.net>         Old Website
+MatMaul                 <matmaul@users.sourceforge.net>         Code
+spec-chum               <spec-chum@users.sourceforge.net>       Code
+tetsuo55                <tetsuo55@users.sourceforge.net>        Project Manager, Admin
+Tomas Sen               <tomasen@users.sourceforge.net>         Code
+Vodyannikov Aleksandr   <aleksoid@users.sourceforge.net>        Code, Russian
+xpc1000                 <xpc1000@users.sourceforge.net>         Code
+
+
+Translators:
+-------------
+Armenian                hrant77                 <hrant77@users.sourceforge.net>
+Basque                  Xabier Aramendi         <azpidatziak@users.sourceforge.net>
+Belarusian              Mister-sh               <mister-sh@users.sourceforge.net>
+Catalan                 xiulet                  <xiulet@users.sourceforge.net>
+Chinese Simplified      Bonami                  <bonami@users.sourceforge.net>
+Chinese Traditional     Kene Lin                <kenelin@users.sourceforge.net>
+Czech                   khagaroth               <khagaroth@users.sourceforge.net>
+Dutch                   Paul Tjepkema           <pietpuk123@users.sourceforge.net>
+French                  Sebastiii               <sebastiii@users.sourceforge.net>
+German                  Markus Gaugg            <markusgaugg@users.sourceforge.net>
+Greek                   geogeo.gr               <geogeo64@users.sourceforge.net>
+Greek                   Zouloumis               <zouloumis@users.sourceforge.net>
+Hebrew                  Superb                  <superbsubs@users.sourceforge.net>
+Hungarian               Tamas Kleiber           <klei@users.sourceforge.net>
+Italian                 SigiTM                  <sigitm@users.sourceforge.net>
+Japanese, Chinese
+Simplified/Traditional  roytam                  <roytam1@users.sourceforge.net>
+Korean                  XNeo                    <xneokr@users.sourceforge.net>
+Polish                  arch__stanton           <arch__stanton@users.sourceforge.net>
+Polish                  Haix                    <haix@users.sourceforge.net>
+Polish                  kasper93                <kasper93@users.sourceforge.net>
+Portuguese (Brazil)     Roger Felipe            <rfrfrfrf@users.sourceforge.net>
+Russian                 YDY                     <ydy@users.sourceforge.net>
+Slovak                  Marián Hikaník          <mhikanik@users.sourceforge.net>
+Spanish                 SquallMX                <squallmx@users.sourceforge.net>
+Turkish                 Bosluk                  <bosluk@users.sourceforge.net>
+Ukrainian               Ihor Bobalo             <ibobalo@users.sourceforge.net>
+Ukrainian               arestarh                <arestarh1986@users.sourceforge.net>
+
+
+Contributors:
+--------------
+Alexx999, foxx1337, heksesang, judelaw, kasper93, madshi, mtrz, nielsm,
+skaarj1, VSFilterMod Team, X-Dron
+
+
+Trac moderators:
+-----------------
+namaiki
+
+
+Many thanks to everyone who supported development without having access to the source repository.
+
+Based on the original version (C) 2002-2006 by Gabest (e-mail unknown)

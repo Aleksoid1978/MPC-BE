@@ -1,0 +1,1040 @@
+  Language_ISO639;ko
+  Author_Email;starcodec@gmail.com
+  Author_Name;starcodec(http://www.starcodec.com)
+  Author_OldNames;Initial translator
+  Language_Name;한국어
+  Config_Text_ColumnSize;40
+  Config_Text_Separator; : 
+  Config_Text_NumberTag; #
+  Config_Text_FloatSeparator;.
+  Config_Text_ThousandsSeparator; 
+ audio stream1; 오디오 스트림
+ audio stream2; 오디오 스트림
+ audio stream3; 오디오 스트림
+ bit1; 비트
+ bit2; 비트
+ bit3; 비트
+ bps; bps
+ Bps; Bps
+ Byte1; 바이트
+ Byte2; 바이트
+ Byte3; 바이트
+ channel1; 채널
+ channel2; 채널
+ channel3; 채널
+ chapter1; 챕터
+ chapter2; 챕터
+ chapter3; 챕터
+ chapters stream1; 챕터 스트림
+ chapters stream2; 챕터 스트림
+ chapters stream3; 챕터 스트림
+ day1; 일
+ day2; 일
+ day3; 일
+ dB1; dB
+ dB2; dB
+ dB3; dB
+ file1; 파일
+ file2; 파일
+ file3; 파일
+ frame1; 프레임
+ frame2; 프레임
+ frame3; 프레임
+ fps1; fps
+ fps2; fps
+ fps3; fps
+ GB; GB
+ Gb; Gb
+ Gbps; Gbps
+ GBps; GBps
+ GHz; GHz
+ GiB; GiB
+ GibiByte1; GibiBytes
+ GibiByte2; GibiBytes
+ GibiByte3; GibiBytes
+ GiBps; GiBps
+ GigaBit1; GigaBit
+ GigaBit2; GigaBits
+ GigaBit3; GigaBits
+ GigaByte1; GigaByte
+ GigaByte2; GigaBytes
+ GigaByte3; GigaBytes
+ hour1; 시간
+ hour2; 시간
+ hour3; 시간
+ Hz; Hz
+ image stream1; 이미지 스트림
+ image stream2; 이미지 스트림
+ image stream3; 이미지 스트림
+ KB; KB
+ Kb; Kb
+ KBps; KBps
+ Kbps; Kbps
+ KHz; KHz
+ KiB; KiB
+ KibiBit1; KibiBit
+ KibiBit2; KibiBits
+ KibiBit3; KibiBits
+ KibiByte1; KibiByte
+ KibiByte2; KibiBytes
+ KibiByte3; KibiBytes
+ KiBps; KiBps
+ KiloBit1; KiloBit
+ KiloBit2; KiloBits
+ KiloBit3; KiloBits
+ KiloByte1; KiloByte
+ KiloByte2; KiloBytes
+ KiloByte3; KiloBytes
+ MB; MB
+ Mb; Mb
+ Mbps; Mbps
+ MBps; MebiBytes
+ MebiBit1; MebiBit
+ MebiBit2; MebiBits
+ MebiBit3; MebiBits
+ MebiByte1; MebiByte
+ MebiByte2; MebiBytes
+ MebiByte3; MebiBytes
+ MegaBit1; MegaBit
+ MegaBit2; MegaBits
+ MegaBit3; MegaBits
+ MegaByte1; MegaByte
+ MegaByte2; MegaBytes
+ MegaByte3; MegaBytes
+ MHz; MHz
+ MiB; MiB
+ Mib; Mib
+ MiBps; MiBps
+ millisecond1; 미리초
+ millisecond2; 미리초
+ millisecond3; 미리초
+ minute1; 분
+ minute2; 분
+ minute3; 분
+ month1; 월
+ month2; 월
+ month3; 월
+ pixel1; 픽셀
+ pixel2; 픽셀
+ pixel3; 픽셀
+ second1; 초
+ second2; 초
+ second3; 초
+ text stream1; 텍스트 스트림
+ text stream2; 텍스트 스트림
+ text stream3; 텍스트 스트림
+ video frames1; 비디오 프레임
+ video frames2; 비디오 프레임
+ video frames3; 비디오 프레임
+ video stream1; 비디오 스트림
+ video stream2; 비디오 스트림
+ video stream3; 비디오 스트림
+ warppoint0; 워프포인트 없음
+ warppoint1; 워프포인트
+ warppoint2; 워프포인트
+ warppoint3; 워프포인트
+ week1; 주
+ week2; 주
+ week3; 주
+ year1; 년
+ year2; 년
+ year3; 년
+, ;, 
+: ;: 
+About;정보
+About_Hint;연락처와 최신 버전 확인
+Accompaniment;반주
+ActiveFormatDescription;
+ActiveFormatDescription_MuxingMode;
+Actor;배우
+Actor_Character;배역
+Added_Date;추가된 날짜
+Address;주소
+Advanced;고급
+Advanced mode;고급 모드
+Album;앨범
+Album_ReplayGain_Gain;앨범 재생 게인
+Album_ReplayGain_Peak;앨범 재생 게인 피크
+Alignment;정렬
+Alignment_Aligned;인터리브에 정렬
+Alignment_Split;인터리브로 분할
+All;전체
+Archival_Location;기록 장소
+Arranger;편곡자
+ArtDirector;미술 감독
+AspectRatio;종횡비
+AssistantDirector;조감독
+at;at
+At least one file;(최소한 하나의 파일을 열어야 합니다)
+Audio;오디오
+Audio stream(s);오디오 스트림
+Audio_Codec_List;오디오 코덱
+Audio_No;오디오 없음
+Audio1;첫번째 오디오 스트림
+Audio2;두번째 오디오 스트림
+AudioCount;오디오 스트림 개수
+Author;작가
+BarCode;바코드
+Basic;기본
+Basic_Note;노트 : 이 파일에 관한 더 자세한 정보를 원하시면 다른 보기를 선택하세요(시트, 트리...)
+BitDepth;
+BitDepth_Stored;
+BitRate;비트레이트
+BitRate_Maximum;최고 비트레이트
+BitRate_Minimum;최소 비트레이트
+BitRate_Mode;비트레이트 모드
+BitRate_Mode_CBR;고정
+BitRate_Mode_VBR;변동
+BitRate_Nominal;명목상의 비트레이트
+BitRate_Encoded;
+Bits-(Pixel*Frame);비트/(픽셀*프레임)
+BufferSize;
+Cancel;취소
+Channel(s);채널
+ChannelPositions;채널 위치
+Chapter(s);챕터
+Chapters;챕터
+Chapters stream(s);챕터 스트림
+Chapters_Codec_List;챕터 코덱
+Chapters_No;챕터 없음
+ChaptersCount;챕터 스트림 개수
+CheckNewVersion;최신 버전 확인
+Choose custom;커스텀 선택
+Choose custom sheet;원하는 커스텀 시트를 선택하세요
+Choose custom text;원하는 커스텀 텍스트를 선택하세요
+Choose export format;원하는 내보내기 형식을 선택하세요
+Choose file(s);열기 원하는 파일을 선택하세요
+Choose filename;원하는 파일명을 선택하세요
+Choose language;원하는 언어를 선택하세요
+Choregrapher;안무가
+Chroma;색차
+ChromaSubsampling;
+Close;닫기
+Close all before open;열기 전에 모두 닫기
+Codec;코덱
+Codec_Description;코덱 설명
+Codec_Info;코덱에 대한 상세 정보
+Codec_Settings;코덱 설정
+Codec_Settings_PacketBitStream;코덱 설정, 패킷 비트스트림
+Codec_Settings_BVOP;코덱 설정, BVOP
+Codec_Settings_QPel;코덱 설정, QPel
+Codec_Settings_GMC;코덱 설정, GMC
+Codec_Settings_Matrix;코덱 설정, 매트릭스
+Codec_Settings_Floor;코덱 설정, Floor
+Codec_Settings_CABAC;코덱 설정, CABAC
+Codec_Settings_Firm;코덱 설정, Firm
+Codec_Settings_Endianness;코덱 설정, Endianness
+Codec_Settings_Sign;코덱 설정, Sign
+Codec_Settings_Law;코덱 설정, Law
+Codec_Settings_ITU;코덱 설정, ITU
+Codec_Profile;코덱 프로파일
+Codec_Url;코덱 웹링크
+CodecID;코덱 ID
+CodecID_Description;코덱 설명
+Collection;콜렉션
+Colorimetry;색체계
+ColorSpace;
+colour_primaries;
+Comment;주석
+CommissionedBy;의뢰
+Compilation;
+CompleteName;전체 이름
+Composer;작곡가
+Compression_Mode;
+Compression_Mode_Lossless;
+Compression_Mode_Lossy;
+Compression_Ratio;압축률
+Conductor;지휘자
+Container and general information;컨테이너와 일반 정보
+ContentType;내용 종류
+CoProducer;공동 제작자
+Copyright;저작권
+CostumeDesigner;의상 디자이너
+Count;개수
+Country;국가
+Cover;표지
+Cover_Datas;표지 정보
+Cover_Description;표지 설명
+Cover_Mime;표지 MIME
+Cover_Type;표지 타입
+Cropped;자른 영역
+Custom;커스텀
+Customize;커스터마이즈
+Date;날짜
+Debug;디버그
+Decimal point;소수점
+Delay;딜레이
+Delay_Source;
+Delay_Source_Container;
+Delay_Source_Stream;
+Delete;삭제
+Description;설명
+Digitized_Date;디지털화 날짜
+Dimensions;영역
+Director;감독
+DirectorOfPhotography;촬영 감독
+DisplayAspectRatio;화면 종횡비
+DisplayAspectRatio_Original;원본 화면 종횡비
+DistributedBy;배포
+Donate;기부하기
+DotsPerInch;인치당 도트
+Duration;길이
+Duration_End;종료 시간
+Duration_Start;시작 시간
+Edit;편집
+EditedBy;편집
+EMail;이메일
+Encoded_Application;인코딩 프로그램
+Encoded_Date;인코딩 날짜
+Encoded_Library;인코딩 라이브러리
+Encoded_Library_Settings;인코딩 설정
+Encoded_Original;원본
+EncodedBy;인코딩
+EPG_Positions;EPG 포지션 (내부)
+Error_File;파일을 읽는 중 에러
+ExecutiveProducer;제작 감독
+Exit;종료
+Exit_Hint;프로그램을 종료합니다
+Export;내보내기
+Export_Hint;원하는 형식으로 내보냅니다
+Extensions;일반적인 확장자
+Family;가족
+Fax;팩스
+File;파일
+File size;파일 크기
+File_Append;존재하는 파일에 이어쓰기 (경고 : 같은 파라미터인지 주의하세요)
+File_Created_Date;파일 만든 날짜
+File_Created_Date_Local;파일 만든 날짜 (로컬)
+File_Hint;조사할 미디어 파일을 선택
+File_Modified_Date;파일 수정한 날짜
+File_Modified_Date_Local;파일 수정한 날짜 (로컬)
+FileExtension;파일 확장자
+FileName;파일명
+FileSize;파일 크기
+Folder;폴더
+Folder (R);폴더 (R)
+Folder (R)_Hint;조사할 폴더를 선택 (모든 하위 폴더를 포함)
+Folder (Recursively);폴더 (하위 포함)
+Folder_Hint;조사할 폴더를 선택
+FolderName;폴더명
+Format;포맷
+Format_Commercial;
+Format_Commercial_IfAny;
+Format_Description;포맷 설명
+Format_Info;포맷 정보
+Format_Profile;포맷 프로파일
+Format_Settings;포맷 설정
+Format_Settings_PacketBitStream;포맷 설정, 패킷 스트림
+Format_Settings_BVOP;포맷 설정, BVOP
+Format_Settings_QPel;포맷 설정, QPel
+Format_Settings_GMC;포맷 설정, GMC
+Format_Settings_Matrix;포맷 설정, 매트릭스
+Format_Settings_Matrix_Custom;커스텀
+Format_Settings_Matrix_Default;기본
+Format_Settings_Floor;포맷 설정, Floor
+Format_Settings_CABAC;포맷 설정, CABAC
+Format_Settings_Firm;포맷 설정, Firm
+Format_Settings_Endianness;포맷 설정, Endianness
+Format_Settings_RefFrames;포맷 설정, RefFrames
+Format_Settings_Sign;포맷 설정, Sign
+Format_Settings_Law;포맷 설정, Law
+Format_Settings_ITU;포맷 설정, ITU
+Format_Settings_SBR;포맷 설정, SBR
+Format_Settings_PS;포맷 설정, PS
+Format_Settings_Pulldown;포맷 설정, Pulldown
+Format_Settings_Mode;
+Format_Settings_FrameMode;
+Format_Settings_Emphasis;
+Format_Settings_ModeExtension;
+Format_Settings_GOP;
+Format_Version;포맷 버전
+Format_Url;포맷 웹링크
+FrameCount;포맷 개수
+FrameRate;프레임레이트
+FrameRate_Mode;프레임레이트 모드
+FrameRate_Mode_CFR;고정
+FrameRate_Mode_VFR;변동
+FrameRate_Minimum;최소 프레임레이트
+FrameRate_Nominal;명목상의 프레임레이트
+FrameRate_Maximum;최대 프레임레이트
+FrameRate_Original;원본 프레임레이트
+General;일반
+Genre;장르
+Genre_000;Blues
+Genre_001;Classic Rock
+Genre_002;Country
+Genre_003;Dance
+Genre_004;Disco
+Genre_005;Funk
+Genre_006;Grunge
+Genre_007;Hip-Hop
+Genre_008;Jazz
+Genre_009;Metal
+Genre_010;New Age
+Genre_011;Oldies
+Genre_012;Other
+Genre_013;Pop
+Genre_014;R&B
+Genre_015;Rap
+Genre_016;Reggae
+Genre_017;Rock
+Genre_018;Techno
+Genre_019;Industrial
+Genre_020;Alternative
+Genre_021;Ska
+Genre_022;Death Metal
+Genre_023;Pranks
+Genre_024;Soundtrack
+Genre_025;Euro-Techno
+Genre_026;Ambient
+Genre_027;Trip-Hop
+Genre_028;Vocal
+Genre_029;Jazz+Funk
+Genre_030;Fusion
+Genre_031;Trance
+Genre_032;Classical
+Genre_033;Instrumental
+Genre_034;Acid
+Genre_035;House
+Genre_036;Game
+Genre_037;Sound Clip
+Genre_038;Gospel
+Genre_039;Noise
+Genre_040;AlternRock
+Genre_041;Bass
+Genre_042;Soul
+Genre_043;Punk
+Genre_044;Space
+Genre_045;Meditative
+Genre_046;Instrumental Pop
+Genre_047;Instrumental Rock
+Genre_048;Ethnic
+Genre_049;Gothic
+Genre_050;Darkwave
+Genre_051;Techno-Industrial
+Genre_052;Electronic
+Genre_053;Pop-Folk
+Genre_054;Eurodance
+Genre_055;Dream
+Genre_056;Southern Rock
+Genre_057;Comedy
+Genre_058;Cult
+Genre_059;Gangsta
+Genre_060;Top 40
+Genre_061;Christian Rap
+Genre_062;Pop/Funk
+Genre_063;Jungle
+Genre_064;Native American
+Genre_065;Cabaret
+Genre_066;New Wave
+Genre_067;Psychadelic
+Genre_068;Rave
+Genre_069;Showtunes
+Genre_070;Trailer
+Genre_071;Lo-Fi
+Genre_072;Tribal
+Genre_073;Acid Punk
+Genre_074;Acid Jazz
+Genre_075;Polka
+Genre_076;Retro
+Genre_077;Musical
+Genre_078;Rock & Roll
+Genre_079;Hard Rock
+Genre_080;Folk
+Genre_081;Folk-Rock
+Genre_082;National Folk
+Genre_083;Swing
+Genre_084;Fast Fusion
+Genre_085;Bebob
+Genre_086;Latin
+Genre_087;Revival
+Genre_088;Celtic
+Genre_089;Bluegrass
+Genre_090;Avantgarde
+Genre_091;Gothic Rock
+Genre_092;Progressive Rock
+Genre_093;Psychedelic Rock
+Genre_094;Symphonic Rock
+Genre_095;Slow Rock
+Genre_096;Big Band
+Genre_097;Chorus
+Genre_098;Easy Listening
+Genre_099;Acoustic
+Genre_100;Humour
+Genre_101;Speech
+Genre_102;Chanson
+Genre_103;Opera
+Genre_104;Chamber Music
+Genre_105;Sonata
+Genre_106;Symphony
+Genre_107;Booty Bass
+Genre_108;Primus
+Genre_109;Porn Groove
+Genre_110;Satire
+Genre_111;Slow Jam
+Genre_112;Club
+Genre_113;Tango
+Genre_114;Samba
+Genre_115;Folklore
+Genre_116;Ballad
+Genre_117;Power Ballad
+Genre_118;Rhythmic Soul
+Genre_119;Freestyle
+Genre_120;Duet
+Genre_121;Punk Rock
+Genre_122;Drum Solo
+Genre_123;A capella
+Genre_124;Euro-House
+Genre_125;Dance Hall
+Genre_126;Goa
+Genre_127;Drum & Bass
+Genre_128;Club-House
+Genre_129;Hardcore
+Genre_130;Terror
+Genre_131;Indie
+Genre_132;Britpop
+Genre_133;Negerpunk
+Genre_134;Polsk Punk
+Genre_135;Beat
+Genre_136;Christian Gangsta Rap
+Genre_137;Heavy Metal
+Genre_138;Black Metal
+Genre_139;Crossover
+Genre_140;Contemporary Christian
+Genre_141;Christian Rock
+Genre_142;Merengue
+Genre_143;Salsa
+Genre_144;Trash Metal
+Genre_145;Anime
+Genre_146;JPop
+Genre_147;Synthpop
+Genre_148;
+Genre_149;
+Genre_150;
+Genre_151;
+Genre_152;
+Genre_153;
+Genre_154;
+Genre_155;
+Genre_156;
+Genre_157;
+Genre_158;
+Genre_159;
+Genre_160;
+Genre_161;
+Genre_162;
+Genre_163;
+Genre_164;
+Genre_165;
+Genre_166;
+Genre_167;
+Genre_168;
+Genre_169;
+Genre_170;
+Genre_171;
+Genre_172;
+Genre_173;
+Genre_174;
+Genre_175;
+Genre_176;
+Genre_177;
+Genre_178;
+Genre_179;
+Genre_180;
+Genre_181;
+Genre_182;
+Genre_183;
+Genre_184;
+Genre_185;
+Genre_186;
+Genre_187;
+Genre_188;
+Genre_189;
+Genre_190;
+Genre_191;
+Go to WebSite;웹사이트로 가기
+Grouping;
+h;시
+Header file;헤더 파일 만들기
+Height;높이
+Height_Original;
+Help;도움말
+Hint;힌트
+How many audio streams?;몇 개의 오디오 스트림?
+How many chapters streams?;몇 개의 챕터 스트림?
+How many text streams?;몇 개의 텍스트 스트림?
+How many video streams?;몇 개의 비디오 스트림?
+HTML;HTML
+ID;ID
+Image;이미지
+Image stream(s);이미지 스트림
+Image_Codec_List;이미지 코덱
+ImageCount;이미지 스트림 개수
+Info;정보
+Instruments;악기
+Interlacement;인터레이스방식
+Interlaced_Interlaced;인터레이스
+Interlaced_TFF;Top Field First
+Interlaced_BFF;Bottom Field First
+Interlaced_PPF;프로그레시브
+Interlaced_Progressive;프로그레시브
+Interleaved;
+Interleave_Duration;인터리브,길이
+Interleave_Preload;인터리브,프리로드 길이
+Interleave_VideoFrames;인터리브,길이
+InternetMediaType;
+IRCA;IRCA
+ISBN;ISBN
+ISRC;ISRC
+Keywords;키워드
+Known codecs;알고 있는 코덱
+Known formats;알고 있는 포맷
+Known parameters;알고 있는 파라미터
+Label;라벨
+Language;언어
+Language_More;언어, 추가 정보
+Language_aa;Afar
+Language_ab;Abkhazian
+Language_ae;Avestan
+Language_af;Afrikaans
+Language_ak;Akan
+Language_am;Amharic
+Language_an;Aragonese
+Language_ar;Arabic
+Language_as;Assamese
+Language_av;Avaric
+Language_ay;Aymara
+Language_az;Azerbaijani
+Language_ba;Bashkir
+Language_be;Belarusian
+Language_bg;Bulgarian
+Language_bh;Bihari
+Language_bi;Bislama
+Language_bm;Bambara
+Language_bn;Bengali
+Language_bo;Tibetan
+Language_br;Breton
+Language_bs;Bosnian
+Language_ca;Catalan
+Language_ce;Chechen
+Language_ch;Chamorro
+Language_co;Corsican
+Language_cr;Cree
+Language_cs;Czech
+Language_cu;Slave
+Language_cv;Chuvash
+Language_cy;Welsh
+Language_da;Danish
+Language_de;German
+Language_dv;Divehi
+Language_dz;Dzongkha
+Language_ee;Ewe
+Language_el;Greek
+Language_en;English
+Language_en-gb;English (Great Britain)
+Language_en-us;English (United States)
+Language_eo;Esperanto
+Language_es;Spanish
+Language_et;Estonian
+Language_eu;Basque
+Language_fa;Persian
+Language_ff;Fulah
+Language_fi;Finnish
+Language_fj;Fijian
+Language_fo;Faroese
+Language_fr;French
+Language_fy;Frisian
+Language_ga;Irish
+Language_gd;Gaelic
+Language_gl;Galician
+Language_gn;Guarani
+Language_gu;Gujarati
+Language_gv;Manx
+Language_ha;Hausa
+Language_he;Hebrew
+Language_hi;Hindi
+Language_ho;Hiri Motu
+Language_hr;Croatian
+Language_ht;Haitian
+Language_hu;Hungarian
+Language_hy;Armenian
+Language_hz;Herero
+Language_ia;Auxiliary Language Association
+Language_id;Indonesian
+Language_ie;Interlingue
+Language_ig;Igbo
+Language_ii;Sichuan Yi
+Language_ik;Inupiaq
+Language_Info;Language info
+Language_io;Ido
+Language_is;Icelandic
+Language_it;Italian
+Language_iu;Inuktitut
+Language_ja;Japanese
+Language_jv;Javanese
+Language_ka;Georgian
+Language_kg;Kongo
+Language_ki;Kikuyu
+Language_kj;Kuanyama
+Language_kk;Kazakh
+Language_kl;Kalaallisut
+Language_km;Khmer
+Language_kn;Kannada
+Language_ko;Korean
+Language_kr;Kanuri
+Language_ks;Kashmiri
+Language_ku;Kurdish
+Language_kv;Komi
+Language_kw;Cornish
+Language_ky;Kirghiz
+Language_la;Latin
+Language_lb;Luxembourgish
+Language_lg;Ganda
+Language_li;Limburgish
+Language_ln;Lingala
+Language_lo;Lao
+Language_lt;Lithuanian
+Language_lu;Luba-Katanga
+Language_lv;Latvian
+Language_mg;Malagasy
+Language_mh;Marshallese
+Language_mi;Maori
+Language_mk;Macedonian
+Language_ml;Malayalam
+Language_mn;Mongolian
+Language_mo;Moldavian
+Language_mr;Marathi
+Language_ms;Malay
+Language_mt;Maltese
+Language_mul;Multiple languages
+Language_my;Burmese
+Language_na;Nauru
+Language_nb;Norwegian Bokmal
+Language_nd;Ndebele
+Language_ne;Nepali
+Language_ng;Ndonga
+Language_nl;Dutch
+Language_nn;Norwegian Nynorsk
+Language_no;Norwegian
+Language_nr;Ndebele
+Language_nv;Navaho
+Language_ny;Nyanja
+Language_oc;Occitan
+Language_oj;Ojibwa
+Language_om;Oromo
+Language_or;Oriya
+Language_os;Ossetic
+Language_pa;Panjabi
+Language_pi;Pali
+Language_pl;Polish
+Language_ps;Pushto
+Language_pt;Portuguese
+Language_pt-br;Portuguese (Brazil)
+Language_qu;Quechua
+Language_rm;Raeto-Romance
+Language_rn;Rundi
+Language_ro;Romanian
+Language_ru;Russian
+Language_rw;Kinyarwanda
+Language_sa;Sanskrit
+Language_sc;Sardinian
+Language_sd;Sindhi
+Language_se;Northern Sami
+Language_sg;Sango
+Language_si;Sinhala
+Language_sk;Slovak
+Language_sl;Slovenian
+Language_sm;Samoan
+Language_sn;Shona
+Language_so;Somali
+Language_sq;Albanian
+Language_sr;Serbian
+Language_ss;Swati
+Language_st;Sotho
+Language_su;Sundanese
+Language_sv;Swedish
+Language_sw;Swahili
+Language_ta;Tamil
+Language_te;Telugu
+Language_tg;Tajik
+Language_th;Thai
+Language_ti;Tigrinya
+Language_tk;Turkmen
+Language_tl;Tagalog
+Language_tn;Tswana
+Language_to;Tonga
+Language_tr;Turkish
+Language_ts;Tsonga
+Language_tt;Tatar
+Language_tw;Twi
+Language_ty;Tahitian
+Language_ug;Uighur
+Language_uk;Ukrainian
+Language_ur;Urdu
+Language_uz;Uzbek
+Language_ve;Venda
+Language_vi;Vietnamese
+Language_vo;Volapuk
+Language_wa;Walloon
+Language_wo;Wolof
+Language_xh;Xhosa
+Language_yi;Yiddish
+Language_yo;Yoruba
+Language_za;Zhuang
+Language_zh;Chinese
+Language_zh-cn;Chinese (China)
+Language_zh-tw;Chinese (Taiwan)
+Language_zu;Zulu
+LawRating;법률 등급
+LCCN;LCCN
+Library;Muxing 라이브러리
+Lightness;밝기
+List;목록
+Lyrics;가사
+Lyricist;작사가
+Mastered_Date;마스터 날짜
+MasteredBy;마스터
+matrix_coefficients;
+MediaInfo_About;미디어 파일에 대한\r\n상세한 정보를 제공:\r\nMatroska, OGG (OGM 포함)\r\nMPEG1 (VCD 포함)\r\nMPEG2 (DVD와 SVCD 포함)\r\nMPEG4 (Itunes M4A 포함)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA 포함)\r\nMicrosoft RIFF (AVI, WAV 포함)\r\n음악 포맷 (AC3, DTS, AAC, AU, AIFF...)
+Menu;메뉴
+Menu stream(s);메뉴 스트림
+Menu_Codec_List;메뉴 코덱
+Menu_No;메뉴 없음
+MenuCount;메뉴 스트림 개수
+Menu_Hint;더 자세히
+MenuID;메뉴 ID
+mn;분
+Mood;무드
+More;상세
+Movie;영화 이름
+ms;미리초
+MSDI;MSDI
+MusicBy;음악
+MuxingMode;먹싱 모드
+MuxingMode_MoreInfo;먹싱 모드, 추가 정보
+MuxingMode_PackedBitstream;팩드 비트스트림
+Name;이름
+Nationality;국적
+NetworkName;네트워크 이름
+New;새로 만들기
+Newest version;최신 버전 확인 (인터넷 연결이 필요함)
+NewVersion_Menu;새 버전이 있습니다
+NewVersion_Question_Title;새 버전이 릴리즈되었습니다!
+NewVersion_Question_Content;새 버전(v%Version%)이 사용 가능합니다, 다운로드하시겠습니까?
+No;아니오
+Not yet;미정
+NumColors;색상수
+OK;확인
+One output file per input file;입력 파일 마다 하나의 출력 파일
+Open;열기
+OpenCandy_01;________ 다운로드 중
+OpenCandy_02;__% 완료
+OpenCandy_03;인터넷 연결 중단
+OpenCandy_04;________ 다운로드 완료
+OpenCandy_05;클릭하면 ________ 설치를 시작합니다
+OpenCandy_06;설치를 중단하시겠습니까?\r\n설치를 다음에 하시려면 '아니오'를 선택해주십시오.\r\n주: 시스템 재시작 시에 다시 설치하려면 메뉴에서 종료를 선택할 수 있습니다.
+OpenCandy_07;________ 다운로드를 일시정지했습니다.\r\n다운로드를 다시 시작하려면 트레이 아이콘을 클릭해주십시오.
+OpenCandy_08;심각한 오류가 발생했습니다. _________ 설치가 중단됩니다.
+OpenCandy_09;다운로드 일시정지
+OpenCandy_10;설치 중단
+OpenCandy_11;다운로드 재시작
+OpenCandy_12;설치 종료
+OpenCandy_13;___________ - ____________ 추천
+OpenCandy_14;_________ 다운로드 중
+OpenCandy_15;요청하신 ___________, ___________가 추천한 소프트웨어,가 다운로드 중입니다. 설치 준비가 완료되면 알려드리겠습니다.
+OpenCandy_16;___________ 설치가 준비되었습니다.
+OpenCandy_17;___________가 다운로드되었습니다. 설치를 진행하시려면 '설치'를 눌러주십시오.
+OpenCandy_18;___________ / ___________ 다운로드
+OpenCandy_19;Powered by OpenCandy
+OpenCandy_20;Learn more at OpenCandy.com
+OpenCandy_21;설치
+OpenCandy_22;___________ 설치
+OpenCandy_23;___________ 설치를 중단합니다.\r\n종료하시겠습니까?
+OpenCandy_24;일시정지
+OpenCandy_25;다운로드를 일시정지했습니다. 다시 시작하려면 '재시작'를 눌러주십시오.
+OpenCandy_26;재시작
+OpenCandy_27;지금 설치
+OpenCandy_28;다운로드 일시정지
+OpenCandy_29;다운로드 재시작
+OpenCandy_30;설치 중단
+OpenCandy_31;설치 옵션을 선택해주십시오.
+OpenCandy_32;___________ 설치
+OpenCandy_33;설치하지 않음
+OpenCandy_34;설치 옵션을 선택해주십시오.
+OpenCandy_35;______에서 이 소프트웨어를 추천합니다.
+OpenCandy_36;현재 설치 과정은 중단되지 않습니다.
+Options;옵션
+Options_Hint;환경 설정
+Original;원본
+OriginalNetworkName;원본 네트워크 이름
+OriginalSourceForm;원본 소스 폼
+OriginalSourceMedium;원본 소스 미디어
+Other;기타
+Output;출력
+Output format;출력 형식
+OverallBitRate;총 비트레이트
+OverallBitRate_Maximum;최대 총 비트레이트
+OverallBitRate_Minimum;최소 총 비트레이트
+OverallBitRate_Mode;총 비트레이트 모드
+OverallBitRate_Nominal;명목상의 총 비트레이트
+Part;파트
+Part_Count;총계
+Performer;연기자
+Period;시대
+Phone;전화
+PixelAspectRatio;픽셀 종횡비
+PixelAspectRatio_Original;원본 픽셀 종횡비
+PlayCounter;재생 횟수
+Played_Count;재생 횟수
+Played_First_Date;최초 재생
+Played_Last_Date;마지막 재생
+PlayTime;재생시간
+Position;위치
+Position_Total;전체
+Preferences;환경 설정
+Producer;제작자
+ProductionDesigner;프로덕션
+ProductionStudio;스튜디오
+Publisher;발행자
+Purchased_Date;구매일
+Quote character;인용 문자
+RadioStation;라디오 스테이션
+Rating;등급
+Recorded_Date;기록일
+Recorded_Location;기록 장소
+Released_Date;개봉일
+RemixedBy;리믹스
+ReplayGain_Gain;재생 게인
+ReplayGain_Peak;재생 게인 피크
+Resolution;해상도
+s;초
+SamplingRate;샘플링레이트
+Save;저장
+ScanType;스캔 방식
+ScanType_Original;
+ScanType_StoreMethod;
+ScanOrder;스캔 순서
+ScanOrder_Original;
+ScanOrder_Stored;
+ScanOrder_StoredDisplayedInverted;
+ScanOrder_StoreMethod;
+ScreenplayBy;각본
+Season;시즌
+see below;아래 참고
+Send HeaderFile;여기로 헤더 파일을 보내주세요 : http://sourceforge.net/projects/mediainfo/ (Bug section)
+Separator_Columns;컬럼 구분자
+Separator_Lines;라인 구분자
+ServiceChannel;서비스 채널 번호
+ServiceName;서비스 이름
+ServiceProvider;서비스 제공자
+ServiceType;서비스 종류
+Set;세트
+Set_Count;세트 개수
+Setup;설정
+Sharpness;샤프니스
+Sheet;시트
+Sheet (Complete);시트 (전체)
+Shell extension;쉘 익스텐션 (탐색기 마우스 오른쪽 버튼 메뉴에 Media Info를 추가합니다)
+Shell extension, folder;폴더에도 추가
+Shell InfoTip;쉘 인포팁 (탐색기에서 파일에 마우스를 올려 놓으면 정보를 보여줍니다)
+Show menu;메뉴 보기
+Show toolbar;도구 모음 보기
+Sort;소팅
+SamplingCount;
+SoundEngineer;사운드 엔지니어
+Source;
+Source_Duration;
+Source_FrameCount;
+Source_SamplingCount;
+Source_StreamSize;
+Source_StreamSize_Encoded;
+Standard;표준
+StoreMethod_InterleavedFields;
+StoreMethod_SeparatedFields;
+StoreMethod_SeparatedFields_1;
+StoreMethod_SeparatedFields_2;
+Stream;스트림
+Stream_MoreInfo;이 스트림에 대한 자세한 정보
+StreamCount;이 종류의 스트림 개수
+StreamID;스트림 ID
+StreamKind;스트림 종류
+StreamKindID;스트림 ID
+StreamKindPos;스트림 ID
+StreamSize;스트림 크기
+StreamSize_Encoded;
+StreamSize_Proportion;이 스트림의 비율
+Subject;제목
+SubTrack;서브트랙
+Summary;요약
+Supported formats;지원하는 포맷
+Supported?;지원?
+Synopsis;시놉시스
+SystemId;Id
+Tagged_Application;태깅 어플리케이션
+Tagged_Date;태깅한 날짜
+Technician;기술자
+TermsOfUse;사용권한
+Text;텍스트
+Text - Custom;텍스트 - 커스텀
+Text (HTML);텍스트 (HTML)
+Text stream(s);텍스트 스트림
+Text streams;텍스트 스트팀
+Text_Codec_List;텍스트 코덱
+Text_No;텍스트 없음
+Text1;첫번째 텍스트 스트림
+Text2;두번째 텍스트 스트림
+Text3;세번째 텍스트 스트림
+TextCount;텍스트 스트림 개수
+ThanksTo;감사
+Thousands separator;천단위 구분자
+Title;제목
+Title_More;제목, 자세히
+TimeCode;
+TimeCode_FirstFrame;
+TimeCode_Settings;
+TimeCode_Source;
+TimeStamp;
+TimeZone;시간대
+Total;총
+Track;트랙 이름
+Track_Count;트랙 개수
+transfer_characteristics;
+Translator;번역
+Tree;트리
+Tree & Text;트리 & 텍스트
+Type;
+UniqueID;
+Unknown;알 수 없음
+Url;Url
+Video;비디오
+Video stream(s);비디오 스트림
+Video_Codec_List;비디오 코덱
+Video_Delay;비디오 딜레이
+Video_No;비디오 없음
+Video0_Delay;비디오0 딜레이
+Video1;첫번째 비디오 스트림
+VideoCount;비디오 스트림 개수
+View;보기
+View_Hint;정보를 보는 방식을 변경합니다.
+Warning : more streams in the files;경고 : 파일에 더 많은 스트림이 있습니다
+Web;웹
+WebSite_Audio;이 오디오 코덱의 웹사이트로 가기
+WebSite_Audio_More;이 오디오 코덱을 찾기 위한 웹사이트(%Url%)로 가기
+WebSite_General;이 파일을 재생하기 위한 플레이어의 웹사이트로 가기
+WebSite_General_More;이 파일을 재생하기 위한 플레이어의 웹사이트로 가기
+WebSite_Text;이 텍스트 코덱의 웹사이트로 가기
+WebSite_Text_More;이 텍스트 코덱을 찾기 위한 웹사이트(%Url%)로 가기
+WebSite_Url;http://MediaArea.net/MediaInfo
+WebSite_Video;이 비디오 코덱의 웹사이트로 가기
+WebSite_Video_More;이 비디오 코덱을 찾기 위한 웹사이트(%Url%)로 가기
+Width;폭
+Width_Original;
+WriteMe;제작자에게 메일쓰기
+WriteToTranslator;번역자에게 메일쓰기
+Written_Date;제작일
+Written_Location;제작 장소
+WrittenBy;제작자
+Yes;예
+Your system;이 시스템
+ZZ_Automatic_Percent;90
+ZZ_AutomaticLanguage_Percent;94

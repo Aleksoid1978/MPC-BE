@@ -1,0 +1,10 @@
+﻿The following files have MPC-BE specific custom code (compared to libflac from http://git.xiph.org/?p=flac.git;a=summary):
+
+* src/ExtLib/libflac/src/libflac/bitreader.c
+* src/ExtLib/libflac/src/libflac/metadata_iterators.c
+* src/ExtLib/libflac/src/libflac/stream_decoder.c
+* src/ExtLib/libflac/src/libflac/stream_encoder.c
+
+* src/ExtLib/libflac/src/libflac/include/private/bitmath.h
+
+* src/ExtLib/libflac/include/share/alloc.h

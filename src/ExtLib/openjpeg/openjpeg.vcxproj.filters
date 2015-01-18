@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{65ae02f7-7823-4d41-b101-45ef452df4b8}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{53954850-f4af-433e-97cf-8e28a81233fa}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dwt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="int.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="j2k.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="j2k_lib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jp2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jpt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mqc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="opj_config_private.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="opj_includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="opj_malloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="raw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="t1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="t1_luts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="t2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tcd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tgt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="bio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dwt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="event.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="image.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="j2k.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="j2k_lib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="jp2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="jpt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mqc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="raw.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="t1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="t2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tcd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

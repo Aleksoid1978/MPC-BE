@@ -1,0 +1,1040 @@
+  Language_ISO639;sk
+  Author_Email;
+  Author_Name;Addams
+  Author_OldNames;
+  Language_Name;Slovak
+  Config_Text_ColumnSize;40
+  Config_Text_Separator; : 
+  Config_Text_NumberTag; #
+  Config_Text_FloatSeparator;,
+  Config_Text_ThousandsSeparator; 
+ audio stream1; audio stream
+ audio stream2; audio streamy
+ audio stream3; audio streamy
+ bit1; bit
+ bit2; bity
+ bit3; bitov
+ bps; b/s
+ Bps; B/s
+ Byte1; Byte
+ Byte2; Byty
+ Byte3; Bytov
+ channel1; kanál
+ channel2; kanály
+ channel3; kanálov
+ chapter1; kapitola
+ chapter2; kapitoly
+ chapter3; kapitol
+ chapters stream1; chapters stream
+ chapters stream2; chapters streams
+ chapters stream3; chapters streams
+ day1; deň
+ day2; dni
+ day3; dní
+ dB1; dB
+ dB2; dB
+ dB3; dB
+ file1; súbor
+ file2; súbory
+ file3; súborov
+ frame1;snímka
+ frame2;snímky
+ frame3;snímok
+ fps1; snímok/sek.
+ fps2; snímok/sek.
+ fps3; snímok/sek.
+ GB; GB
+ Gb; Gb
+ Gbps; Gb/s
+ GBps; GB/s
+ GHz; GHz
+ GiB; GiB
+ GibiByte1; GibiBytes
+ GibiByte2; GibiBytes
+ GibiByte3; GibiBytes
+ GiBps; GiB/s
+ GigaBit1; GigaBit
+ GigaBit2; GigaBitov
+ GigaBit3; GigaBitov
+ GigaByte1; GigaByte
+ GigaByte2; GigaBytov
+ GigaByte3; GigaBytov
+ hour1; hodina
+ hour2; hodiny
+ hour3; hodín
+ Hz; Hz
+ image stream1; image stream
+ image stream2; image streams
+ image stream3; image streams
+ KB; KB
+ Kb; kb
+ KBps; kB/s
+ Kbps; kb/s
+ KHz; kHz
+ KiB; kiB
+ KibiBit1; kibiBit
+ KibiBit2; kibiBitov
+ KibiBit3; kibiBitov
+ KibiByte1; kibiByte
+ KibiByte2; kibiBytov
+ KibiByte3; kibiBytov
+ KiBps; kiB/s
+ KiloBit1; kiloBit
+ KiloBit2; kiloBitov
+ KiloBit3; kiloBitov
+ KiloByte1; kiloByte
+ KiloByte2; kiloBytov
+ KiloByte3; kiloBytov
+ MB; MB
+ Mb; Mb
+ Mbps; Mb/s
+ MBps; MebiBytov
+ MebiBit1; MebiBit
+ MebiBit2; MebiBitov
+ MebiBit3; MebiBitov
+ MebiByte1; MebiByte
+ MebiByte2; MebiBytov
+ MebiByte3; MebiBytov
+ MegaBit1; MegaBit
+ MegaBit2; MegaBitov
+ MegaBit3; MegaBitov
+ MegaByte1; MegaByte
+ MegaByte2; MegaBytov
+ MegaByte3; MegaBytov
+ MHz; MHz
+ MiB; MiB
+ Mib; Mib
+ MiBps; MiB/s
+ millisecond1; milisekunda
+ millisecond2; milisekundy
+ millisecond3; milisekúnd
+ minute1; minúta
+ minute2; minúty
+ minute3; minút
+ month1; mesiac
+ month2; mesiace
+ month3; mesiacov
+ pixel1; pixel
+ pixel2; pixelov
+ pixel3; pixelov
+ second1; sekunda
+ second2; sekúndy
+ second3; sekúnd
+ text stream1; text stream
+ text stream2; text streams
+ text stream3; text streams
+ video frames1;
+ video frames2;
+ video frames3;
+ video stream1; video stream
+ video stream2; video streams
+ video stream3; video streams
+ warppoint0;
+ warppoint1;
+ warppoint2;
+ warppoint3;
+ week1; týždeň
+ week2; týždne
+ week3; týždňo
+ year1; rok
+ year2; roky
+ year3; rokov
+, ;, 
+: ;: 
+About;O programe
+About_Hint;O programe
+Accompaniment;Accompaniment
+ActiveFormatDescription;
+ActiveFormatDescription_MuxingMode;
+Actor;Herec
+Actor_Character;Character played
+Added_Date;Dátum pridania
+Address;Adresa
+Advanced;Pokročilé
+Advanced mode;Viac detailov
+Album;Album
+Album_ReplayGain_Gain;
+Album_ReplayGain_Peak;
+Alignment;
+Alignment_Aligned;
+Alignment_Split;
+All;Všetko
+Archival_Location;Archival location
+Arranger;Arranger
+ArtDirector;ArtDirector
+AspectRatio;Pomer strán
+AssistantDirector;AssistantDirector
+at;pri
+At least one file;(Musíš najprv otvoriť súbor)
+Audio;Audio
+Audio stream(s);Audio streamy
+Audio_Codec_List;Audio kodeky
+Audio_No;Bez audia
+Audio1;Prvý audio stream
+Audio2;Druhý audio stream
+AudioCount;Počet audio streamov
+Author;Autor
+BarCode;BarCode
+Basic;Základné
+Basic_Note;Info : Pre viac detailov vyberte iný režim zobrazenia (List, Strom...)
+BitDepth;
+BitDepth_Stored;
+BitRate;Dátový tok
+BitRate_Maximum;Maximálny dátový tok
+BitRate_Minimum;Minimálny dátový tok
+BitRate_Mode;Režim dátového toku
+BitRate_Mode_CBR;Konštantný dátový tok
+BitRate_Mode_VBR;Variabilný dátový tok
+BitRate_Nominal;
+BitRate_Encoded;
+Bits-(Pixel*Frame);Bitov/(Bod*Snímka)
+BufferSize;
+Cancel;Zrušiť
+Channel(s);Kanál(y)
+ChannelPositions;Channel positions
+Chapter(s);Kapitola(y)
+Chapters;Kapitoly
+Chapters stream(s);Chapters stream(s)
+Chapters_Codec_List;Chapters Codecs
+Chapters_No;No chapters
+ChaptersCount;Count of chapter streams
+CheckNewVersion;Skontrolovať novú verziu
+Choose custom;Výber užívateľa
+Choose custom sheet;Vyberte požadovaný formát zobrazení
+Choose custom text;Vyberte vlastné nastavenie textu
+Choose export format;Vyberte požadovaný exportný formát
+Choose file(s);Vyberte súbor pre otvorenie
+Choose filename;Vyberte požadovaný názov súboru
+Choose language;Vybrať jazyk
+Choregrapher;Choreograf
+Chroma;Chroma
+ChromaSubsampling;
+Close;Zatvoriť
+Close all before open;Zatvoriť všetko pred otvorením nového
+Codec;Kodek
+Codec_Description;Popis kodeku
+Codec_Info;Detaily kodeku
+Codec_Settings;Nastavenia kodeku
+Codec_Settings_PacketBitStream;
+Codec_Settings_BVOP;
+Codec_Settings_QPel;
+Codec_Settings_GMC;
+Codec_Settings_Matrix;
+Codec_Settings_Floor;
+Codec_Settings_CABAC;
+Codec_Settings_Firm;
+Codec_Settings_Endianness;
+Codec_Settings_Sign;
+Codec_Settings_Law;
+Codec_Settings_ITU;
+Codec_Profile;Profil kodeku
+Codec_Url;Adresa pre stiahnutie kodeku
+CodecID;Označenie kodeku
+CodecID_Description;Popis kodeku
+Collection;Collection
+Colorimetry;
+ColorSpace;
+colour_primaries;
+Comment;Komentár
+CommissionedBy;Commissioned by
+Compilation;
+CompleteName;Celý názov a cesta
+Composer;Skladateľ
+Compression_Mode;
+Compression_Mode_Lossless;
+Compression_Mode_Lossy;
+Compression_Ratio;
+Conductor;Conductor
+Container and general information;Hlavné informácie
+ContentType;Typ obsahu
+CoProducer;sPoluproducent
+Copyright;Autorské práva
+CostumeDesigner;Costume designer
+Count;Count
+Country;Krajina
+Cover;Obal
+Cover_Datas;Údaje obalu
+Cover_Description;Popis obalu
+Cover_Mime;
+Cover_Type;Typ obalu
+Cropped;
+Custom;Vlastné
+Customize;Prispôsobiť
+Date;Dátum
+Debug;Pokročilé
+Decimal point;Decimal point
+Delay;Delay
+Delay_Source;
+Delay_Source_Container;
+Delay_Source_Stream;
+Delete;Odstrániť
+Description;Popis
+Digitized_Date;Digitized date
+Dimensions;
+Director;Director
+DirectorOfPhotography;Director of photography
+DisplayAspectRatio;Pomer strán
+DisplayAspectRatio_Original;Pôvodný pomer strán pre zobrazenie
+DistributedBy;Distribútor
+Donate;Zaslat finančný dar
+DotsPerInch;Bodov na palec
+Duration;Trvanie
+Duration_End;
+Duration_Start;
+Edit;Upraviť
+EditedBy;Upravil
+EMail;E-Mail
+Encoded_Application;Použitý software
+Encoded_Date;Dátum zakódovania
+Encoded_Library;Zakódoval
+Encoded_Library_Settings;Nastavenie kodéru
+Encoded_Original;Originál
+EncodedBy;Zakódoval
+EPG_Positions;
+Error_File;Zlyhalo načítavanie súboru
+ExecutiveProducer;Executive producer
+Exit;Koniec
+Exit_Hint;Ukončiť program
+Export;Exportovať
+Export_Hint;Exportovať do vybraného formátu
+Extensions;Všeobecne používaná koncovka
+Family;
+Fax;Fax
+File;Súbor
+File size;Veľkosť súboru
+File_Append;Pripojiť k existujúcemu súboru (Upozornenie : buďte si istý rovnakými parametrami)
+File_Created_Date;Dátum vytvorenia súboru
+File_Created_Date_Local;Dátum (miestny) vytvorenia súboru
+File_Hint;Otvoriť súbor
+File_Modified_Date;Dátum poslednej úpravy súboru
+File_Modified_Date_Local;Dátum (miestny) poslednej úpravy súboru
+FileExtension;Prípona súboru
+FileName;Názov súboru
+FileSize;Veľkosť súboru
+Folder;Adresár
+Folder (R);Adresár (R)
+Folder (R)_Hint;Select a folder to study (with all folders recursively)
+Folder (Recursively);Adresár (Recursively)
+Folder_Hint;Otvoriť všetko v adresári
+FolderName;Názov adresára
+Format;Formát
+Format_Commercial;
+Format_Commercial_IfAny;
+Format_Description;Popis formátu
+Format_Info;Informácie o formáte
+Format_Profile;Profil formátu
+Format_Settings;Nastavenia formátu
+Format_Settings_PacketBitStream;
+Format_Settings_BVOP;
+Format_Settings_QPel;
+Format_Settings_GMC;
+Format_Settings_Matrix;
+Format_Settings_Matrix_Custom;Vlastné
+Format_Settings_Matrix_Default;Pôvodné
+Format_Settings_Floor;
+Format_Settings_CABAC;
+Format_Settings_Firm;
+Format_Settings_Endianness;
+Format_Settings_RefFrames;
+Format_Settings_Sign;
+Format_Settings_Law;
+Format_Settings_ITU;
+Format_Settings_SBR;
+Format_Settings_PS;
+Format_Settings_Pulldown;
+Format_Settings_Mode;Režim
+Format_Settings_FrameMode;
+Format_Settings_Emphasis;
+Format_Settings_ModeExtension;
+Format_Settings_GOP;
+Format_Version;
+Format_Url;
+FrameCount;
+FrameRate;Frekvencia snímok
+FrameRate_Mode;Režim frekvencie snímok
+FrameRate_Mode_CFR;Konštantný
+FrameRate_Mode_VFR;Variabilný
+FrameRate_Minimum;Minimálna frekvencia snímok
+FrameRate_Nominal;Nominálna frekvencia snímok
+FrameRate_Maximum;Maximálna frekvencia snímok
+FrameRate_Original;Pôvodná frekvencia snímok
+General;Hlavné parametre
+Genre;žáner
+Genre_000;Blues
+Genre_001;Classic Rock
+Genre_002;Country
+Genre_003;Dance
+Genre_004;Disco
+Genre_005;Funk
+Genre_006;Grunge
+Genre_007;Hip-Hop
+Genre_008;Jazz
+Genre_009;Metal
+Genre_010;New Age
+Genre_011;Oldies
+Genre_012;Iné
+Genre_013;Pop
+Genre_014;R&B
+Genre_015;Rap
+Genre_016;Reggae
+Genre_017;Rock
+Genre_018;Techno
+Genre_019;Industrial
+Genre_020;Alternative
+Genre_021;Ska
+Genre_022;Death Metal
+Genre_023;Pranks
+Genre_024;Soundtrack
+Genre_025;Euro-Techno
+Genre_026;Ambient
+Genre_027;Trip-Hop
+Genre_028;Vocal
+Genre_029;Jazz+Funk
+Genre_030;Fusion
+Genre_031;Trance
+Genre_032;Classical
+Genre_033;Instrumental
+Genre_034;Acid
+Genre_035;House
+Genre_036;Game
+Genre_037;Sound Clip
+Genre_038;Gospel
+Genre_039;Noise
+Genre_040;AlternRock
+Genre_041;Bass
+Genre_042;Soul
+Genre_043;Punk
+Genre_044;Space
+Genre_045;Meditative
+Genre_046;Instrumental Pop
+Genre_047;Instrumental Rock
+Genre_048;Ethnic
+Genre_049;Gothic
+Genre_050;Darkwave
+Genre_051;Techno-Industrial
+Genre_052;Electronic
+Genre_053;Pop-Folk
+Genre_054;Eurodance
+Genre_055;Dream
+Genre_056;Southern Rock
+Genre_057;Comedy
+Genre_058;Cult
+Genre_059;Gangsta
+Genre_060;Top 40
+Genre_061;Christian Rap
+Genre_062;Pop/Funk
+Genre_063;Jungle
+Genre_064;Native American
+Genre_065;Cabaret
+Genre_066;New Wave
+Genre_067;Psychadelic
+Genre_068;Rave
+Genre_069;Showtunes
+Genre_070;Trailer
+Genre_071;Lo-Fi
+Genre_072;Tribal
+Genre_073;Acid Punk
+Genre_074;Acid Jazz
+Genre_075;Polka
+Genre_076;Retro
+Genre_077;Musical
+Genre_078;Rock & Roll
+Genre_079;Hard Rock
+Genre_080;Folk
+Genre_081;Folk-Rock
+Genre_082;National Folk
+Genre_083;Swing
+Genre_084;Fast Fusion
+Genre_085;Bebob
+Genre_086;Latin
+Genre_087;Revival
+Genre_088;Celtic
+Genre_089;Bluegrass
+Genre_090;Avantgarde
+Genre_091;Gothic Rock
+Genre_092;Progressive Rock
+Genre_093;Psychedelic Rock
+Genre_094;Symphonic Rock
+Genre_095;Slow Rock
+Genre_096;Big Band
+Genre_097;Chorus
+Genre_098;Easy Listening
+Genre_099;Acoustic
+Genre_100;Humour
+Genre_101;Speech
+Genre_102;Chanson
+Genre_103;Opera
+Genre_104;Chamber Music
+Genre_105;Sonata
+Genre_106;Symphony
+Genre_107;Booty Bass
+Genre_108;Primus
+Genre_109;Porn Groove
+Genre_110;Satire
+Genre_111;Slow Jam
+Genre_112;Club
+Genre_113;Tango
+Genre_114;Samba
+Genre_115;Folklore
+Genre_116;Ballad
+Genre_117;Power Ballad
+Genre_118;Rhythmic Soul
+Genre_119;Freestyle
+Genre_120;Duet
+Genre_121;Punk Rock
+Genre_122;Drum Solo
+Genre_123;A capella
+Genre_124;Euro-House
+Genre_125;Dance Hall
+Genre_126;Goa
+Genre_127;Drum & Bass
+Genre_128;Club-House
+Genre_129;Hardcore
+Genre_130;Terror
+Genre_131;Indie
+Genre_132;Britpop
+Genre_133;Negerpunk
+Genre_134;Polsk Punk
+Genre_135;Beat
+Genre_136;Christian Gangsta Rap
+Genre_137;Heavy Metal
+Genre_138;Black Metal
+Genre_139;Crossover
+Genre_140;Contemporary Christian
+Genre_141;Christian Rock
+Genre_142;Merengue
+Genre_143;Salsa
+Genre_144;Trash Metal
+Genre_145;Anime
+Genre_146;JPop
+Genre_147;Synthpop
+Genre_148;
+Genre_149;
+Genre_150;
+Genre_151;
+Genre_152;
+Genre_153;
+Genre_154;
+Genre_155;
+Genre_156;
+Genre_157;
+Genre_158;
+Genre_159;
+Genre_160;
+Genre_161;
+Genre_162;
+Genre_163;
+Genre_164;
+Genre_165;
+Genre_166;
+Genre_167;
+Genre_168;
+Genre_169;
+Genre_170;
+Genre_171;
+Genre_172;
+Genre_173;
+Genre_174;
+Genre_175;
+Genre_176;
+Genre_177;
+Genre_178;
+Genre_179;
+Genre_180;
+Genre_181;
+Genre_182;
+Genre_183;
+Genre_184;
+Genre_185;
+Genre_186;
+Genre_187;
+Genre_188;
+Genre_189;
+Genre_190;
+Genre_191;
+Go to WebSite;Web programu
+Grouping;
+h;h
+Header file;Create a header file
+Height;Výška
+Height_Original;Pôvodná výška
+Help;Pomocník
+Hint;
+How many audio streams?;How many audio streams?
+How many chapters streams?;How many chapters streams?
+How many text streams?;How many text streams?
+How many video streams?;How many video streams?
+HTML;HTML
+ID;ID
+Image;Obrázok
+Image stream(s);Image streams
+Image_Codec_List;Codecs Image
+ImageCount;Count of image streams
+Info;Info
+Instruments;Instruments
+Interlacement;Prekladanie riadkov obrazu
+Interlaced_Interlaced;Prekladané
+Interlaced_TFF;Horný riadok ako prvý
+Interlaced_BFF;Dolný riadok ako prvý
+Interlaced_PPF;Progresívne
+Interlaced_Progressive;Progresívne
+Interleaved;
+Interleave_Duration;
+Interleave_Preload;
+Interleave_VideoFrames;
+InternetMediaType;
+IRCA;IRCA
+ISBN;ISBN
+ISRC;ISRC
+Keywords;Identifikujúce slová
+Known codecs;Známe kodeky
+Known formats;Známe formáty
+Known parameters;Známe parametre
+Label;Label
+Language;Jazyk
+Language_More;
+Language_aa;Afar
+Language_ab;Abkhazian
+Language_ae;Avestan
+Language_af;Afrikaans
+Language_ak;Akan
+Language_am;Amharic
+Language_an;Aragonese
+Language_ar;Arabic
+Language_as;Assamese
+Language_av;Avaric
+Language_ay;Aymara
+Language_az;Azerbaijani
+Language_ba;Bashkir
+Language_be;Belarusian
+Language_bg;Bulgarian
+Language_bh;Bihari
+Language_bi;Bislama
+Language_bm;Bambara
+Language_bn;Bengali
+Language_bo;Tibetsky
+Language_br;Breton
+Language_bs;Bosansky
+Language_ca;Catalan
+Language_ce;Chechen
+Language_ch;Chamorro
+Language_co;Corsican
+Language_cr;Cree
+Language_cs;Česky
+Language_cu;Slave
+Language_cv;Chuvash
+Language_cy;Welsh
+Language_da;Dánsky
+Language_de;Nemecky
+Language_dv;Divehi
+Language_dz;Dzongkha
+Language_ee;Ewe
+Language_el;Grécky
+Language_en;Anglicky
+Language_en-gb;Anglicky (V.Británia)
+Language_en-us;Anglicky (USA)
+Language_eo;Esperanto
+Language_es;Španielsky
+Language_et;Estónsky
+Language_eu;Baskidsky
+Language_fa;Perzsky
+Language_ff;Fulah
+Language_fi;Fínsky
+Language_fj;Fijian
+Language_fo;Faroese
+Language_fr;Francúzsky
+Language_fy;Frisian
+Language_ga;Írsky
+Language_gd;Gaelic
+Language_gl;Galician
+Language_gn;Guarani
+Language_gu;Gujarati
+Language_gv;Manx
+Language_ha;Hausa
+Language_he;Hebrew
+Language_hi;Hindsky
+Language_ho;Hiri Motu
+Language_hr;Chorvátsky
+Language_ht;Haitian
+Language_hu;Maďarsky
+Language_hy;Arménsky
+Language_hz;Herero
+Language_ia;Auxiliary Language Association
+Language_id;Indonesian
+Language_ie;Interlingue
+Language_ig;Igbo
+Language_ii;Sichuan Yi
+Language_ik;Inupiaq
+Language_Info;Informácie o jazyku
+Language_io;Ido
+Language_is;Islandsky
+Language_it;Taliansky
+Language_iu;Inuktitut
+Language_ja;Japonsky
+Language_jv;Javanese
+Language_ka;Georgian
+Language_kg;Kongo
+Language_ki;Kikuyu
+Language_kj;Kuanyama
+Language_kk;Kazašsky
+Language_kl;Kalaallisut
+Language_km;Khmer
+Language_kn;Kannada
+Language_ko;Kórejsky
+Language_kr;Kanuri
+Language_ks;Kashmiri
+Language_ku;Kurdsky
+Language_kv;Komi
+Language_kw;Cornish
+Language_ky;Kirgyzsky
+Language_la;Latin
+Language_lb;Luxembursky
+Language_lg;Ganda
+Language_li;Limburgish
+Language_ln;Lingala
+Language_lo;Lao
+Language_lt;Lithuanian
+Language_lu;Luba-Katanga
+Language_lv;Lytovsky
+Language_mg;Malagasy
+Language_mh;Marshallese
+Language_mi;Maori
+Language_mk;Macedónsky
+Language_ml;Malayalam
+Language_mn;Mongolsky
+Language_mo;Moldavsky
+Language_mr;Marathi
+Language_ms;Malay
+Language_mt;Maltese
+Language_mul;Multiple languages
+Language_my;Burmese
+Language_na;Nauru
+Language_nb;Norwegian Bokmal
+Language_nd;Ndebele
+Language_ne;Nepali
+Language_ng;Ndonga
+Language_nl;Holandsky
+Language_nn;Norwegian Nynorsk
+Language_no;Nórsky
+Language_nr;Ndebele
+Language_nv;Navaho
+Language_ny;Nyanja
+Language_oc;Occitan
+Language_oj;Ojibwa
+Language_om;Oromo
+Language_or;Oriya
+Language_os;Ossetic
+Language_pa;Panjabi
+Language_pi;Pali
+Language_pl;Poľsky
+Language_ps;Pushto
+Language_pt;Portugalsky
+Language_pt-br;Portugalsky (Brazília)
+Language_qu;Quechua
+Language_rm;Raeto-Romance
+Language_rn;Rundi
+Language_ro;Rumunsky
+Language_ru;Rusky
+Language_rw;Kinyarwanda
+Language_sa;Sanskrit
+Language_sc;Sardinian
+Language_sd;Sindhi
+Language_se;Northern Sami
+Language_sg;Sango
+Language_si;Sinhala
+Language_sk;Slovensky
+Language_sl;Slovinsky
+Language_sm;Samoan
+Language_sn;Shona
+Language_so;Somali
+Language_sq;Albánsky
+Language_sr;Srbsky
+Language_ss;Swati
+Language_st;Sotho
+Language_su;Sundanese
+Language_sv;Švédsky
+Language_sw;Swahili
+Language_ta;Tamil
+Language_te;Telugu
+Language_tg;Tajik
+Language_th;Thai
+Language_ti;Tigrinya
+Language_tk;Turkménsky
+Language_tl;Tagalog
+Language_tn;Tswana
+Language_to;Tonga
+Language_tr;Turecky
+Language_ts;Tsonga
+Language_tt;Tatar
+Language_tw;Twi
+Language_ty;Tahitian
+Language_ug;Uighur
+Language_uk;Ukrajinsky
+Language_ur;Urdu
+Language_uz;Uzbecky
+Language_ve;Venda
+Language_vi;Vietnamsky
+Language_vo;Volapuk
+Language_wa;Walloon
+Language_wo;Wolof
+Language_xh;Xhosa
+Language_yi;Yiddish
+Language_yo;Yoruba
+Language_za;Zhuang
+Language_zh;Čínsky
+Language_zh-cn;Čínsky (Čína)
+Language_zh-tw;Čínsky (Taiwan)
+Language_zu;Zulu
+LawRating;Law rating
+LCCN;LCCN
+Library;Muxing library
+Lightness;
+List;Zoznam
+Lyrics;Text
+Lyricist;Textár
+Mastered_Date;Mastered date
+MasteredBy;Mastered by
+matrix_coefficients;
+MediaInfo_About;Supply very detailled information\r\nabout a multimedia file:\r\nMatroska, OGG (including OGM)\r\nMPEG1 (including VCD)\r\nMPEG2 (including DVD and SVCD)\r\nMPEG4 (including Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (including WMV, WMA)\r\nMicrosoft RIFF (including AVI, WAV)\r\nSound-only formats (AC3, DTS, AAC, AU, AIFF...)
+Menu;Menu
+Menu stream(s);Menu streams
+Menu_Codec_List;
+Menu_No;Žiadne menu
+MenuCount;Count of menu streams
+Menu_Hint;More possibilities
+MenuID;Označenie menu
+mn; min
+Mood;Mood
+More;Viac
+Movie;Názov filmu
+ms; ms
+MSDI;MSDI
+MusicBy;Hudbu zložil
+MuxingMode;
+MuxingMode_MoreInfo;
+MuxingMode_PackedBitstream;
+Name;Názov
+Nationality;Národnosť
+NetworkName;
+New;Nový
+Newest version;Pri spustení kontrolovať nové verzie
+NewVersion_Menu;Nová verzia je k dispozícii
+NewVersion_Question_Title;Bola vydaná nová verzia!
+NewVersion_Question_Content;K dispozícii je nová verzia (v%Version%), chcete si ju stiahnuť ?
+No;Nie
+Not yet;Ešte nie
+NumColors;
+OK;OK
+One output file per input file;One output file per input file
+Open;Otvoriť
+OpenCandy_01;Sťahovanie
+OpenCandy_02;Dokončené:    %
+OpenCandy_03;Internetové spojenie prerušené!
+OpenCandy_04;Sťahovanie ukončené.
+OpenCandy_05;Kliknutím nainštalujte.
+OpenCandy_06;
+OpenCandy_07;
+OpenCandy_08;
+OpenCandy_09;
+OpenCandy_10;Zrušiť inštaláciu
+OpenCandy_11;
+OpenCandy_12;Ukončiť inštalátor
+OpenCandy_13;
+OpenCandy_14;Sťahovanie
+OpenCandy_15;
+OpenCandy_16;
+OpenCandy_17;
+OpenCandy_18;
+OpenCandy_19;
+OpenCandy_20;
+OpenCandy_21;Inštalácia
+OpenCandy_22;Inštalácia
+OpenCandy_23;
+OpenCandy_24;Prerušenie
+OpenCandy_25;
+OpenCandy_26;
+OpenCandy_27;Inštalujte teraz
+OpenCandy_28;
+OpenCandy_29;
+OpenCandy_30;Zrušenie inštalácie
+OpenCandy_31;Vyberte inštalačné nastavenia
+OpenCandy_32;Inštalujte
+OpenCandy_33;Neinštalujte
+OpenCandy_34;Vyberte inštalačné nastavenia
+OpenCandy_35;
+OpenCandy_36;
+Options;Nastavenie
+Options_Hint;Predvoľby
+Original;Originál
+OriginalNetworkName;
+OriginalSourceForm;
+OriginalSourceMedium;
+Other;Rôzne
+Output;Výstup
+Output format;Zobraziť ako
+OverallBitRate;Celkový dátový tok
+OverallBitRate_Maximum;
+OverallBitRate_Minimum;
+OverallBitRate_Mode;
+OverallBitRate_Nominal;
+Part;Časť
+Part_Count;Celkový počet
+Performer;Umelec
+Period;Period
+Phone;Telefón
+PixelAspectRatio;Pomer bodov
+PixelAspectRatio_Original;Pomer bodov
+PlayCounter;PlayCounter
+Played_Count;
+Played_First_Date;Dátum prvého prehratia
+Played_Last_Date;Dátum posledného prehratia
+PlayTime;Hrací čas
+Position;Pozícia
+Position_Total;Celkom
+Preferences;Predvoľby
+Producer;Producent
+ProductionDesigner;ProductionDesigner
+ProductionStudio;ProductionStudio
+Publisher;Publisher
+Purchased_Date;Dátum zakúpenia
+Quote character;Quote character
+RadioStation;Rozhlasová stanica
+Rating;Hodnotenie
+Recorded_Date;Dátum nahrávania
+Recorded_Location;Lokalita nahrávania
+Released_Date;Dátum vydania
+RemixedBy;Remixoval/-a
+ReplayGain_Gain;
+ReplayGain_Peak;
+Resolution;Rozlíšenie
+s; sek.
+SamplingRate;Sampling rate
+Save;Uložiť
+ScanType;
+ScanType_Original;
+ScanType_StoreMethod;
+ScanOrder;
+ScanOrder_Original;
+ScanOrder_Stored;
+ScanOrder_StoredDisplayedInverted;
+ScanOrder_StoreMethod;
+ScreenplayBy;Screenplay by
+Season;Season
+see below;pozri nižšie
+Send HeaderFile;
+Separator_Columns;Oddeľovač stĺpcov
+Separator_Lines;Oddeľovač riadkov
+ServiceChannel;
+ServiceName;
+ServiceProvider;
+ServiceType;
+Set;Nastaviť
+Set_Count;Set count
+Setup;Hlavné
+Sharpness;
+Sheet;List
+Sheet (Complete);List (kompletný) 
+Shell extension;Integrovať do kontextového menu Prieskumníka (pravé tlačíidlo myši)
+Shell extension, folder;
+Shell InfoTip;Integrovať do kontextového menu (pri nadídení myši na súbor)
+Show menu;Zobraziť menu
+Show toolbar;Zobraziť nástrojovú lištu
+Sort;Zoradiť podľa
+SamplingCount;
+SoundEngineer;Sound engineer
+Source;
+Source_Duration;
+Source_FrameCount;
+Source_SamplingCount;
+Source_StreamSize;
+Source_StreamSize_Encoded;
+Standard;Štandard
+StoreMethod_InterleavedFields;
+StoreMethod_SeparatedFields;
+StoreMethod_SeparatedFields_1;
+StoreMethod_SeparatedFields_2;
+Stream;Dátový stream
+Stream_MoreInfo;More information about the stream
+StreamCount;Count of stream of this kind
+StreamID;Stream ID
+StreamKind;Kind of stream
+StreamKindID;
+StreamKindPos;
+StreamSize;
+StreamSize_Encoded;
+StreamSize_Proportion;
+Subject;Subjekt
+SubTrack;SubTrack
+Summary;Summary
+Supported formats;Podporované formáty
+Supported?;Podporovaný?
+Synopsis;Synopsis
+SystemId;Id
+Tagged_Application;
+Tagged_Date;Tagged date
+Technician;Technician
+TermsOfUse;Terms of use
+Text;Text
+Text - Custom;Text - Vlastný
+Text (HTML);Text (HTML)
+Text stream(s);Text streams
+Text streams;Text streams
+Text_Codec_List;Text codecs
+Text_No;Bez textu
+Text1;Prvý text stream
+Text2;Druhý text stream
+Text3;Tretí text stream
+TextCount;Count of text streams
+ThanksTo;Poďakovanie
+Thousands separator;Oddeľovač tisícok
+Title;Titul
+Title_More;Titul, ďalšie informácie
+TimeCode;
+TimeCode_FirstFrame;
+TimeCode_Settings;
+TimeCode_Source;
+TimeStamp;
+TimeZone;Časová zóna
+Total;Celkom
+Track;Názov stopy
+Track_Count;Počet stôp
+transfer_characteristics;
+Translator;Preložil
+Tree;Strom
+Tree & Text;Strom a text
+Type;
+UniqueID;
+Unknown;Neznámy
+Url;Url
+Video;Video
+Video stream(s);Video stream(y)
+Video_Codec_List;Video kodeky
+Video_Delay;Video delay
+Video_No;Žiadne video
+Video0_Delay;Video0 delay
+Video1;Prvý video stream
+VideoCount;Počet video streamov
+View;Zobraziť
+View_Hint;Zobraziť
+Warning : more streams in the files;Pozor: v súboroch je viacero streamov !
+Web;Web
+WebSite_Audio;Navštív webstránku tohoto audiokodeku
+WebSite_Audio_More;Vyhľadaj tento audiokodek na webstránke (%Url%)
+WebSite_General;Go to the web site of a player for this file
+WebSite_General_More;Go to the web site of a player for this file
+WebSite_Text;Go to the web site of this text codec
+WebSite_Text_More;Go to the web site (%Url%) to find this text codec
+WebSite_Url;http://MediaArea.net/MediaInfo
+WebSite_Video;Ísť na stránku s týmto video-kodekom
+WebSite_Video_More;Vyhľadaj tento videokodek na webstránke (%Url%)
+Width;Šírka
+Width_Original;
+WriteMe;Napíš autorovi
+WriteToTranslator;Napíš prekladateľovi
+Written_Date;Written date
+Written_Location;Written location
+WrittenBy;Napísal
+Yes;Áno
+Your system;Váš systém
+ZZ_Automatic_Percent;80
+ZZ_AutomaticLanguage_Percent;86

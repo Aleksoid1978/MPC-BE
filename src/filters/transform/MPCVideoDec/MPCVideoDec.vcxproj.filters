@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{e15c9785-536b-4371-9e8e-ddbcfdb5c17e}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{2f29e203-dfe5-49ab-8326-55ff62a38d80}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{29435264-dc59-4006-a197-91a4bd1e583f}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Header Files\DXVA1">
+      <UniqueIdentifier>{6c6db163-3759-4569-8494-2b6a17bb8944}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DXVA1">
+      <UniqueIdentifier>{0476f273-431d-4107-af4a-0240498b4bc5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CpuId.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVAAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVADecoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVADecoderH264.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVADecoderMpeg2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVADecoderVC1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ffmpegContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FormatConverter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MPCVideoDec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MPCVideoDecSettingsWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pixconv_functions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVA1\DXVADecoderH264_DXVA1.cpp">
+      <Filter>Source Files\DXVA1</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVA1\ffmpegContext_DXVA1.cpp">
+      <Filter>Source Files\DXVA1</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CpuId.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVAAllocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoderH264.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoderMpeg2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoderVC1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ffmpegContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FormatConverter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IMPCVideoDec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MPCVideoDec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MPCVideoDecSettingsWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pixconv_sse2_templates.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="memcpy_sse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVA1\DXVADecoderH264_DXVA1.h">
+      <Filter>Header Files\DXVA1</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVA1\ffmpegContext_DXVA1.h">
+      <Filter>Header Files\DXVA1</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MPCVideoDec.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{86251DC4-9298-424C-AE6C-07844F79C0B5}</ProjectGuid>
+    <RootNamespace>mpciconlib</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>mpciconlib</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="..\..\..\platform.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\mpc-be_x86\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\mpc-be_x64\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\mpc-be_x86\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\mpc-be_x64\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\mpc-be_x86\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\mpc-be_x64\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <NoEntryPoint>true</NoEntryPoint>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>..\..\..\..\include</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <NoEntryPoint>true</NoEntryPoint>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>..\..\..\..\include</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="mpciconlib.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="mpciconlib.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icons\3g2.ico" />
+    <Image Include="icons\3gp.ico" />
+    <Image Include="icons\3gp2.ico" />
+    <Image Include="icons\3gpp.ico" />
+    <Image Include="icons\aac.ico" />
+    <Image Include="icons\ac3.ico" />
+    <Image Include="icons\aif.ico" />
+    <Image Include="icons\aifc.ico" />
+    <Image Include="icons\aiff.ico" />
+    <Image Include="icons\alac.ico" />
+    <Image Include="icons\amr.ico" />
+    <Image Include="icons\amv.ico" />
+    <Image Include="icons\aob.ico" />
+    <Image Include="icons\ape.ico" />
+    <Image Include="icons\apl.ico" />
+    <Image Include="icons\asf.ico" />
+    <Image Include="icons\au.ico" />
+    <Image Include="icons\avi.ico" />
+    <Image Include="icons\bik.ico" />
+    <Image Include="icons\cda.ico" />
+    <Image Include="icons\d2v.ico" />
+    <Image Include="icons\default_audio.ico" />
+    <Image Include="icons\default_video.ico" />
+    <Image Include="icons\divx.ico" />
+    <Image Include="icons\dsa.ico" />
+    <Image Include="icons\dsm.ico" />
+    <Image Include="icons\dss.ico" />
+    <Image Include="icons\dsv.ico" />
+    <Image Include="icons\dts.ico" />
+    <Image Include="icons\evo.ico" />
+    <Image Include="icons\f4v.ico" />
+    <Image Include="icons\flac.ico" />
+    <Image Include="icons\flc.ico" />
+    <Image Include="icons\fli.ico" />
+    <Image Include="icons\flic.ico" />
+    <Image Include="icons\flv.ico" />
+    <Image Include="icons\hdmov.ico" />
+    <Image Include="icons\icon.ico" />
+    <Image Include="icons\ifo.ico" />
+    <Image Include="icons\ivf.ico" />
+    <Image Include="icons\m1a.ico" />
+    <Image Include="icons\m1v.ico" />
+    <Image Include="icons\m2a.ico" />
+    <Image Include="icons\m2p.ico" />
+    <Image Include="icons\m2t.ico" />
+    <Image Include="icons\m2ts.ico" />
+    <Image Include="icons\m2v.ico" />
+    <Image Include="icons\m4a.ico" />
+    <Image Include="icons\m4b.ico" />
+    <Image Include="icons\m4v.ico" />
+    <Image Include="icons\mid.ico" />
+    <Image Include="icons\midi.ico" />
+    <Image Include="icons\mka.ico" />
+    <Image Include="icons\mkv.ico" />
+    <Image Include="icons\mlp.ico" />
+    <Image Include="icons\mov.ico" />
+    <Image Include="icons\mp2.ico" />
+    <Image Include="icons\mp2v.ico" />
+    <Image Include="icons\mp3.ico" />
+    <Image Include="icons\mp4.ico" />
+    <Image Include="icons\mp4v.ico" />
+    <Image Include="icons\mpa.ico" />
+    <Image Include="icons\mpc.ico" />
+    <Image Include="icons\mpe.ico" />
+    <Image Include="icons\mpeg.ico" />
+    <Image Include="icons\mpg.ico" />
+    <Image Include="icons\mpv2.ico" />
+    <Image Include="icons\mpv4.ico" />
+    <Image Include="icons\mts.ico" />
+    <Image Include="icons\ofr.ico" />
+    <Image Include="icons\ofs.ico" />
+    <Image Include="icons\oga.ico" />
+    <Image Include="icons\ogg.ico" />
+    <Image Include="icons\ogm.ico" />
+    <Image Include="icons\ogv.ico" />
+    <Image Include="icons\playlist.ico" />
+    <Image Include="icons\pva.ico" />
+    <Image Include="icons\ra.ico" />
+    <Image Include="icons\ram.ico" />
+    <Image Include="icons\ratdvd.ico" />
+    <Image Include="icons\rec.ico" />
+    <Image Include="icons\rm.ico" />
+    <Image Include="icons\rmi.ico" />
+    <Image Include="icons\rmm.ico" />
+    <Image Include="icons\rmvb.ico" />
+    <Image Include="icons\roq.ico" />
+    <Image Include="icons\rp.ico" />
+    <Image Include="icons\rt.ico" />
+    <Image Include="icons\smi.ico" />
+    <Image Include="icons\smil.ico" />
+    <Image Include="icons\smk.ico" />
+    <Image Include="icons\snd.ico" />
+    <Image Include="icons\swf.ico" />
+    <Image Include="icons\tak.ico" />
+    <Image Include="icons\tp.ico" />
+    <Image Include="icons\trp.ico" />
+    <Image Include="icons\ts.ico" />
+    <Image Include="icons\tta.ico" />
+    <Image Include="icons\vob.ico" />
+    <Image Include="icons\wav.ico" />
+    <Image Include="icons\webm.ico" />
+    <Image Include="icons\wm.ico" />
+    <Image Include="icons\wma.ico" />
+    <Image Include="icons\wmp.ico" />
+    <Image Include="icons\wmv.ico" />
+    <Image Include="icons\wv.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
