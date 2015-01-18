@@ -39,10 +39,10 @@ extern "C" {
 	#include <ffmpeg/libavcodec/mpeg12.h>
 }
 
-static const WORD PCID_NVIDIA_VP5 [] = {
-	// http://us.download.nvidia.com/XFree86/Linux-x86_64/343.22/README/supportedchips.html
+static const WORD PCID_NVIDIA_VP5_VP6[] = {
+	// http://us.download.nvidia.com/XFree86/Linux-x86_64/346.35/README/supportedchips.html
 	// http://pci-ids.ucw.cz/read/PC/10de
-	// VP5, Nvidia VDPAU Feature Set D: GF119, GK104, GK106, GK107, GK110, GK208
+	// VP5, Nvidia VDPAU Feature Set D: GF117, GF119, GK104, GK106, GK107, GK110, GK208.
 	0x0FC2, // GeForce GT 630 (GK107) (not officially supported or typo, 4k tested)
 	0x0FC6, // GeForce GTX 650
 	0x0FC8, // GeForce GT 740
@@ -93,7 +93,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1040, // GeForce GT 520 (GF119) (not officially supported or typo, 4k tested)
 	0x1042, // GeForce 510
 	0x1048, // GeForce 605
-	0x104A, // GeForce GT 610 (fully tested)
+	0x104A, // GeForce GT 610 ((not officially supported or typo, fully tested)
 	0x104B, // GeForce GT 625 (OEM)
 	0x104C, // GeForce GT 705
 	0x1050, // GeForce GT 520M (GF119) (not officially supported or typo)
@@ -103,7 +103,6 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1055, // GeForce 410M
 	0x1056, // NVS 4200M
 	0x1057, // NVS 4200M
-	0x105B, // GeForce 705M
 	0x107C, // NVS 315
 	0x107D, // NVS 310
 	0x1180, // GeForce GTX 680
@@ -117,6 +116,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x118E, // GeForce GTX 760 (192-bit)
 	0x118F, // Tesla K10
 	0x1193, // GeForce GTX 760 Ti OEM
+	0x1194, // Tesla K8
 	0x1195, // GeForce GTX 660
 	0x1198, // GeForce GTX 880M
 	0x1199, // GeForce GTX 870M
@@ -142,6 +142,7 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x11C2, // GeForce GTX 650 Ti BOOST
 	0x11C3, // GeForce GTX 650 Ti
 	0x11C4, // GeForce GTX 645
+	0x11C5, // GeForce GT 740
 	0x11C6, // GeForce GTX 650 Ti
 	0x11C8, // GeForce GTX 650
 	0x11E0, // GeForce GTX 770M
@@ -155,15 +156,17 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1282, // GeForce GT 640 rev. 2 (not officially supported or typo, fully tested)
 	0x1284, // GeForce GT 630 rev. 2 (not officially supported or typo, fully tested)
 	0x1286, // GeForce GT 720
+	0x1288, // GeForce GT 720
 	0x1290, // GeForce GT 730M
 	0x1291, // GeForce GT 735M
 	0x1292, // GeForce GT 740M
 	0x1293, // GeForce GT 730M
+	0x1295, // GeForce 710M
 	0x1296, // GeForce 825M
 	0x12B9, // Quadro K610M
 	0x12BA, // Quadro K510M
 
-	// VP6
+	// VP6, Nvidia VDPAU Feature Set E: GM107, GM108, GM204.
 	0x1340, // GeForce 830M
 	0x1341, // GeForce 840M
 	0x1380, // GeForce GTX 750 Ti
@@ -172,8 +175,13 @@ static const WORD PCID_NVIDIA_VP5 [] = {
 	0x1390, // GeForce 845M
 	0x1391, // GeForce GTX 850M
 	0x1392, // GeForce GTX 860M
+	0x1393, // GeForce 840M
 	0x13BA, // Quadro K2200
 	0x13BB, // Quadro K620
+	0x13C0, // GeForce GTX 980
+	0x13C2, // GeForce GTX 970
+	0x13D7, // GeForce GTX 980M
+	0x13D8, // GeForce GTX 970M
 };
 
 static const WORD PCID_ATI_UVD [] = {
@@ -225,7 +233,13 @@ static const WORD PCID_INTEL_4K [] = {
 	0x0A2E, // Intel Iris Graphics 5100
 	0x0D22, // Intel Iris Graphics 5200
 	0x0D26, // Intel Iris Graphics 5200
+	// Broadwell
+	0x1606, // Intel HD Graphics
+	0x1616, // Intel HD Graphics 5500
+	0x160E, // Intel HD Graphics
 	0x161E, // Intel HD Graphics 5300
+	0x1626, // Intel HD Graphics 6000
+	0x162B, // Intel HD Graphics 6100
 };
 
 static bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t count)
@@ -573,7 +587,7 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 	//}
 
 	if (nPCIVendor == PCIV_nVidia) {
-		if (CheckPCID(nPCIDevice, PCID_NVIDIA_VP5, _countof(PCID_NVIDIA_VP5)) && width <= 4096 && height <= 4096 && width * height <= 4080 * 4080) {
+		if (CheckPCID(nPCIDevice, PCID_NVIDIA_VP5_VP6, _countof(PCID_NVIDIA_VP5_VP6)) && width <= 4096 && height <= 4096 && width * height <= 4080 * 4080) {
 			// tested H.264 on VP5 (GT 610, GTX 660 Ti)
 			// 4080x4080 = 65025 macroblocks
 			return TRUE;
