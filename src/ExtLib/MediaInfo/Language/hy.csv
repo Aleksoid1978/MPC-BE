@@ -1,0 +1,1040 @@
+  Language_ISO639;hy
+  Author_Email;hrantohanyan@mail.am
+  Author_Name;http://haysoft.org
+  Author_OldNames;NO
+  Language_Name;Հայերեն
+  Config_Text_ColumnSize;40
+  Config_Text_Separator; : 
+  Config_Text_NumberTag; #
+  Config_Text_FloatSeparator;,
+  Config_Text_ThousandsSeparator;
+ audio stream1; ձայնի հոսքը
+ audio stream2; ձայնի հոսքերը
+ audio stream3; ձայնի հոսքերը
+ bit1; բիթ
+ bit2; բիթ
+ bit3; բիթ
+ bps; բիթ/վայր.
+ Bps; բայթ/վայր.
+ Byte1; բայթ
+ Byte2; բայթ
+ Byte3; բայթ
+ channel1; ալիք
+ channel2; ալիքներ
+ channel3; ալիքներ
+ chapter1; բաժինը
+ chapter2; բաժինները
+ chapter3; բաժինները
+ chapters stream1; բաժինների հոսքը
+ chapters stream2; բաժինների հոսքը
+ chapters stream3; բաժինների հոսքը
+ day1; օր.
+ day2; օր.
+ day3; օր.
+ dB1; դԲ
+ dB2; դԲ
+ dB3; դԲ
+ file1; ֆայլ
+ file2; ֆայլեր
+ file3; ֆայլեր
+ frame1; կադր
+ frame2; կադրեր
+ frame3; կադրեր
+ fps1; կադր/վայր.
+ fps2; կադր/վայր.
+ fps3; կադր/վայր.
+ GB; ԳԲ
+ Gb; Գբիթ
+ Gbps; Գբիթ/վայր.
+ GBps; Գբայթ/վայր.
+ GHz; ԳՀց
+ GiB; Գբայթ
+ GibiByte1;Գիբիբայթ
+ GibiByte2;Գիբիբայթ
+ GibiByte3;Գիբիբայթ
+ GiBps; Գբայթ/վայր.
+ GigaBit1; Գիգաբիթ
+ GigaBit2; Գիգաբիթ
+ GigaBit3; Գիգաբիթ
+ GigaByte1; Գիգաբայթ
+ GigaByte2; Գիգաբայթ
+ GigaByte3; Գիգաբայթ
+ hour1; ժամ
+ hour2; ժամ.
+ hour3; ժամ.
+ Hz; Գհ
+ image stream1; պատկերի հոսքը
+ image stream2; պատկերի հոսքերը
+ image stream3; պատկերի հոսքերը
+ KB; ԿԲ
+ Kb; Կբ
+ KBps; Կբայթ/վայր.
+ Kbps; Կբիթ/վայր.
+ KHz; ԿԳհ
+ KiB; Կբայթ
+ KibiBit1; Կիբիբիթ
+ KibiBit2; Կիբիբիթ
+ KibiBit3; Կիբիբիթ
+ KibiByte1; Կիբիբայթ
+ KibiByte2; Կիբիբայթ
+ KibiByte3; Կիբիբայթ
+ KiBps; Կբայթ/վայր.
+ KiloBit1; Կիլոբիթ
+ KiloBit2; Կիլոբիթ
+ KiloBit3; Կիլոբիթ
+ KiloByte1; Կիլոբայթ
+ KiloByte2; Կիլոբայթ
+ KiloByte3; Կիլոբայթ
+ MB; ՄԲ
+ Mb; Մբ
+ Mbps; Մբիթ/վայր.
+ MBps; Մբայթ/վայր.
+ MebiBit1; Մեբիբիթ
+ MebiBit2; Մեբիբիթ
+ MebiBit3; Մեբիբիթ
+ MebiByte1; Մեբիբայթ
+ MebiByte2; Մեբիբայթ
+ MebiByte3; Մեբիբայթ
+ MegaBit1; Մեգաբիթ
+ MegaBit2; Մեգաբիթ
+ MegaBit3; Մեգաբիթ
+ MegaByte1; Մեգաբայթ
+ MegaByte2; Մեգաբայթ
+ MegaByte3; Մեգաբայթ
+ MHz; ՄԳհ
+ MiB; Մբայթ
+ Mib; Միբ
+ MiBps; Մբայթ/վայր.
+ millisecond1; միլիվայր.
+ millisecond2; միլիվայր.
+ millisecond3; միլիվայր.
+ minute1; րոպե.
+ minute2; րոպե.
+ minute3; րոպե.
+ month1; ամիս.
+ month2; ամիս.
+ month3; ամիս.
+ pixel1; փիքս.
+ pixel2; փիքս.
+ pixel3; փիքս.
+ second1; վայր.
+ second2; վայր.
+ second3; վայր.
+ text stream1; տեքստային հոսք
+ text stream2; տեքստային հոսքեր
+ text stream3; տեքստային հոսքեր
+ video frames1; կադր
+ video frames2; կադրեր
+ video frames3; կադրեր
+ video stream1; տեսահոսքը
+ video stream2; տեսահոսքերը
+ video stream3; տեսահոսքերը
+ warppoint0;Առանց անցման հենքերի
+ warppoint1; Անցման հենքը
+ warppoint2; Անցման հենքերը
+ warppoint3; Անցման հենքերը
+ week1; շաբ.
+ week2; շաբ.
+ week3; շաբ.
+ year1; տարի
+ year2; տարի
+ year3; տարի
+, ;, 
+: ;: 
+About;Ծրագրի մասին
+About_Hint;Կապնվել ծրագրի հեղինակի հետ կամ բացել ծրագրի կայքը
+Accompaniment;Ուղեկցումը
+ActiveFormatDescription;
+ActiveFormatDescription_MuxingMode;
+Actor;Կատարողը
+Actor_Character;Դերը
+Added_Date;Ավելացման ամսաթիվը
+Address;Հասցեն
+Advanced;Լրացուցիչ
+Advanced mode;Ընդլայնված եղանակ
+Album;Ալբոմը
+Album_ReplayGain_Gain;Ալբոմի ձայնի կարգավորիչ
+Album_ReplayGain_Peak;Ալբոմի ձայնի կարգավորիչի գագաթը
+Alignment;Հավասարեցումը
+Alignment_Aligned;Միացում դադարներով
+Alignment_Split;Բաժանում դադարներով
+All;Բոլորը
+Archival_Location;Տեղադրությունը
+Arranger;Կազմակերպիչը
+ArtDirector;ArtDirector
+AspectRatio;Հարաբերակցությունը
+AssistantDirector;Ռեժիսորի օգնականը
+at;ընդ.
+At least one file;Ընտրեք որևէ ֆայլ
+Audio;Ձայնը
+Audio stream(s);Ձայնի հոսքը
+Audio_Codec_List;Ձայնի կոդավորիչները
+Audio_No;Չկա ձայն
+Audio1;Առաջին ձայնը
+Audio2;Երկրորդ ձայնը
+AudioCount;Ձայների քանակը
+Author;Հեղինակը
+BarCode;Կոդը
+Basic;Կարճ
+Basic_Note;Ուշադր. լրացուցիչ տեղեկությունների համար ընտրեք այլ տարբերակ (աղյուսակ, ծառի տեսքով,...)
+BitDepth;Բիթայնությունը
+BitDepth_Stored;
+BitRate;Բիթրեյթը
+BitRate_Maximum;Առավելագույն բիթրեյթը
+BitRate_Minimum;Նվազագույն բիթրեյթը
+BitRate_Mode;Բիթրեյթի տեսակը
+BitRate_Mode_CBR;Մշտական
+BitRate_Mode_VBR;Փոփոխական
+BitRate_Nominal;Նոմինալ բիթրեյթը
+BitRate_Encoded;
+Bits-(Pixel*Frame);Բիթ/(Փիքսել*Կադր)
+BufferSize;Պահոցի չափը
+Cancel;Մերժել
+Channel(s);Ալիք(ներ)
+ChannelPositions;Դիրքը
+Chapter(s);Հոսքերը
+Chapters;Հոսքերը
+Chapters stream(s);Բաժինների հոսքերը
+Chapters_Codec_List;Բաժինների կոդ-ները
+Chapters_No;Չկան բաժիններ
+ChaptersCount;Բաժինների ք-ը
+CheckNewVersion;Ստուգել նոր տարբերակը
+Choose custom;Ընտրել
+Choose custom sheet;Ընտրել աղյուսակը
+Choose custom text;Ընտրել տեքստը
+Choose export format;Ընտրեք արտածման եղանակը
+Choose file(s);Ընտրեք ֆայլը
+Choose filename;Ընտրեք ֆայլի անունը
+Choose language;Ընտրեք լեզուն
+Choregrapher;Պարարվեստը
+Chroma;Գույնայնությունը
+ChromaSubsampling;Գույների ընտրություն
+Close;Փակել
+Close all before open;Բացելուց առաջ փակել բոլորը
+Codec;Կոդավորիչը
+Codec_Description;Կոդավորիչի նկարագր-ը
+Codec_Info;Մանրամասներ կոդավորիչի մասին
+Codec_Settings;Կոդավորիչի կարգավորումները
+Codec_Settings_PacketBitStream;Կոդավորիչի տվյալների փաթեթային հոսքի ցուցիչներ
+Codec_Settings_BVOP;BVOP կոդավորիչի ցուցիչը
+Codec_Settings_QPel;QPel կոդավորիչի ցուցիչը
+Codec_Settings_GMC;GMC կոդավորիչի ցուցիչը
+Codec_Settings_Matrix;Կոդավորիչի կետացանցի ցուցիչը
+Codec_Settings_Floor;Floor կոդավորիչի ցուցիչը
+Codec_Settings_CABAC;CABAC կոդավորիչի ցուցիչը
+Codec_Settings_Firm;Firm կոդավորիչի ցուցիչը
+Codec_Settings_Endianness;Endianness կոդավորիչի ցուցիչը
+Codec_Settings_Sign;Sign կոդավորիչի ցուցիչը
+Codec_Settings_Law;Law կոդավորիչի ցուցիչը
+Codec_Settings_ITU;ITU կոդավորիչի ցուցիչը
+Codec_Profile;Կոդավորիչի պրոֆիլը
+Codec_Url;Կոդավորիչի հղումը
+CodecID;Կոդավորիչի ID-ին
+CodecID_Description;Կոդավորիչի նկարագրությունը
+Collection;Հավաքածուն
+Colorimetry;Գույնայնությունը
+ColorSpace;Գույնային տարածքը
+colour_primaries;Հիմնական գույները
+Comment;Մեկնաբանություն
+CommissionedBy;Երաշխավորող
+Compilation;
+CompleteName;Ամբողջական անունը
+Composer;Կոմպոզիտորը
+Compression_Mode;Սեղման եղանակը
+Compression_Mode_Lossless;Առանց կորստի
+Compression_Mode_Lossy;Կորստով
+Compression_Ratio;Սեղման աստիճանը
+Conductor;Դիրիժորը
+Container and general information;Ընդհանուր տեղեկությունը
+ContentType;Պարունակության տեսակը
+CoProducer;Համառեժիսոր
+Copyright;Հեղ. իրավունքը
+CostumeDesigner;Հագուստի դիզայնը
+Count;Քանակը
+Country;Երկիրը
+Cover;Կազմը
+Cover_Datas;Կազմի տվյալները
+Cover_Description;Կազմի նկարագրությունը
+Cover_Mime;Կազմի MIME տեսակ
+Cover_Type;Կազմի տեսակը
+Cropped;Կտրման չափերը
+Custom;Ընտրված
+Customize;Կարգավորում
+Date;Ամսաթիվը
+Debug;Փոխադրիչ
+Decimal point;Տասնորդական կետ
+Delay;Հապաղում
+Delay_Source;Հապաղում օրիգինալում
+Delay_Source_Container;Փաթեթը
+Delay_Source_Stream;'Աղբյուր' հոսքը
+Delete;Ջնջել
+Description;Նկարագրությունը
+Digitized_Date;Թվայնացման ամսաթիվը
+Dimensions;Չափերը
+Director;Ռեժիսորը
+DirectorOfPhotography;Օպերատորը
+DisplayAspectRatio;Կողմերի հարաբերականությունը
+DisplayAspectRatio_Original;Կողմերի հարաբեր-ը օրիգինալում
+DistributedBy;Տարածողը
+Donate;Օժանդակություն
+DotsPerInch;Կետեր դյույմի վրա
+Duration;Տևողությունը
+Duration_End;Ավարտվելու ժ-ը
+Duration_Start;Սկսվելու ժ-ը
+Edit;Փոփոխել
+EditedBy;Փոփոխվել է
+EMail;Փոստը
+Encoded_Application;Կոդավորող ծրագիրը
+Encoded_Date;Կոդավորման ամսաթիվը
+Encoded_Library;Կոդավորման շտեմարանը
+Encoded_Library_Settings;Ծրագրի կարգավորումները
+Encoded_Original;Օրիգինալի աղբյուրը
+EncodedBy;Կոդավորիչը
+EPG_Positions;EPG-ի դիրքը (ներքին)
+Error_File;Սխալ ֆայլում
+ExecutiveProducer;Ռեժիսորի օգնականը
+Exit;Ելք
+Exit_Hint;Ելք ծրագրից
+Export;Արտածել
+Export_Hint;Արտածել տվյալները
+Extensions;Օգտագործվում է՝
+Family;Խումբը
+Fax;Ֆաքս
+File;Ֆայլ
+File size;Ֆայլի չափը
+File_Append;Ավելացնել ֆայլին
+File_Created_Date;Ֆայլի ամսաթիվը
+File_Created_Date_Local;Ֆայլի ամսաթիվը (տեղային)
+File_Hint;Գործողություններ ֆայլի հետ
+File_Modified_Date;Ֆայլի փոփոխման ամսաթիվը
+File_Modified_Date_Local;Ֆայլի փոփոխման ամսաթիվը (տեղային)
+FileExtension;Տեսակը
+FileName;Ֆայլի անունը
+FileSize;Ֆայլի չափը
+Folder;Թղթապանակը
+Folder (R);Թղթապանակը (R)
+Folder (R)_Hint;Ընտրեք թղթապանակը (բոլոր ենթաթղթապանակներով)
+Folder (Recursively);Թղթապանակը (նվազմամբ)...
+Folder_Hint;Գործողություն թղթ-երի հետ
+FolderName;Թղթապանակի անունը
+Format;Տեսակը
+Format_Commercial;Կոմերցիոն անվանումը
+Format_Commercial_IfAny;
+Format_Description;Տեսակի նկարագրությունը
+Format_Info;Մանրամասն տեսակի մասին
+Format_Profile;Տեսակի պրոֆիլը
+Format_Settings;Տեսակի կարգավորումները
+Format_Settings_PacketBitStream;Տեսակի տվյալների փաթեթային հոսքի ցուցիչներ
+Format_Settings_BVOP;BVOP տեսակի ցուցիչները
+Format_Settings_QPel;QPel տեսակի ցուցիչները
+Format_Settings_GMC;GMC տեսակի ցուցիչները
+Format_Settings_Matrix;Տեսակի կետացանցի ցուցիչները
+Format_Settings_Matrix_Custom;Ընտրովի
+Format_Settings_Matrix_Default;Ծրագրային
+Format_Settings_Floor;Floor տեսակի ցուցիչները
+Format_Settings_CABAC;CABAC տեսակի ցուցիչները
+Format_Settings_Firm;irm տեսակի ցուցիչները
+Format_Settings_Endianness;Endianness տեսակի ցուցիչները
+Format_Settings_RefFrames;ReFrames տեսակի ցուցիչները
+Format_Settings_Sign;Sign տեսակի ցուցիչները
+Format_Settings_Law;Law տեսակի ցուցիչները
+Format_Settings_ITU;ITU տեսակի ցուցիչները
+Format_Settings_SBR;SBR տեսակի ցուցիչները
+Format_Settings_PS;PS տեսակի ցուցիչները
+Format_Settings_Pulldown;Ընտրել տեսակի կարգավորումը
+Format_Settings_Mode;Եղանակը
+Format_Settings_FrameMode;Կադրի եղանակը
+Format_Settings_Emphasis;Ակցենտը
+Format_Settings_ModeExtension;Ընդլայնված եղանակը
+Format_Settings_GOP;GOP տեսակի ցուցիչներ
+Format_Version;Տեսակի տարբերակը
+Format_Url;Տեսակի հղումը
+FrameCount;Կադրերի հաշվիչ
+FrameRate;Կադրերի հաճախականությունը
+FrameRate_Mode;Կադրերի հաճախականության եղանակը
+FrameRate_Mode_CFR;Մշտական
+FrameRate_Mode_VFR;Փոփոխական
+FrameRate_Minimum;Կադրերի նվազագույն հաճախ-ը
+FrameRate_Nominal;Կադրերի պայմանական հաճախ-ը
+FrameRate_Maximum;Կադրերի առավելագույն հաճախ-ը
+FrameRate_Original;Կադրերի հաճախ-ը օրիգինալում
+General;Ընդհանուր
+Genre;Ժանրը
+Genre_000;Blues
+Genre_001;Classic Rock
+Genre_002;Country
+Genre_003;Dance
+Genre_004;Disco
+Genre_005;Funk
+Genre_006;Grunge
+Genre_007;Hip-Hop
+Genre_008;Jazz
+Genre_009;Metal
+Genre_010;New Age
+Genre_011;Oldies
+Genre_012;Other
+Genre_013;Pop
+Genre_014;R&B
+Genre_015;Rap
+Genre_016;Reggae
+Genre_017;Rock
+Genre_018;Techno
+Genre_019;Industrial
+Genre_020;Alternative
+Genre_021;Ska
+Genre_022;Death Metal
+Genre_023;Pranks
+Genre_024;Soundtrack
+Genre_025;Euro-Techno
+Genre_026;Ambient
+Genre_027;Trip-Hop
+Genre_028;Vocal
+Genre_029;Jazz+Funk
+Genre_030;Fusion
+Genre_031;Trance
+Genre_032;Classical
+Genre_033;Instrumental
+Genre_034;Acid
+Genre_035;House
+Genre_036;Game
+Genre_037;Sound Clip
+Genre_038;Gospel
+Genre_039;Noise
+Genre_040;AlternRock
+Genre_041;Bass
+Genre_042;Soul
+Genre_043;Punk
+Genre_044;Space
+Genre_045;Meditative
+Genre_046;Instrumental Pop
+Genre_047;Instrumental Rock
+Genre_048;Ethnic
+Genre_049;Gothic
+Genre_050;Darkwave
+Genre_051;Techno-Industrial
+Genre_052;Electronic
+Genre_053;Pop-Folk
+Genre_054;Eurodance
+Genre_055;Dream
+Genre_056;Southern Rock
+Genre_057;Comedy
+Genre_058;Cult
+Genre_059;Gangsta
+Genre_060;Top 40
+Genre_061;Christian Rap
+Genre_062;Pop/Funk
+Genre_063;Jungle
+Genre_064;Native American
+Genre_065;Cabaret
+Genre_066;New Wave
+Genre_067;Psychadelic
+Genre_068;Rave
+Genre_069;Showtunes
+Genre_070;Trailer
+Genre_071;Lo-Fi
+Genre_072;Tribal
+Genre_073;Acid Punk
+Genre_074;Acid Jazz
+Genre_075;Polka
+Genre_076;Retro
+Genre_077;Musical
+Genre_078;Rock & Roll
+Genre_079;Hard Rock
+Genre_080;Folk
+Genre_081;Folk-Rock
+Genre_082;National Folk
+Genre_083;Swing
+Genre_084;Fast Fusion
+Genre_085;Bebob
+Genre_086;Latin
+Genre_087;Revival
+Genre_088;Celtic
+Genre_089;Bluegrass
+Genre_090;Avantgarde
+Genre_091;Gothic Rock
+Genre_092;Progressive Rock
+Genre_093;Psychedelic Rock
+Genre_094;Symphonic Rock
+Genre_095;Slow Rock
+Genre_096;Big Band
+Genre_097;Chorus
+Genre_098;Easy Listening
+Genre_099;Acoustic
+Genre_100;Humour
+Genre_101;Speech
+Genre_102;Chanson
+Genre_103;Opera
+Genre_104;Chamber Music
+Genre_105;Sonata
+Genre_106;Symphony
+Genre_107;Booty Bass
+Genre_108;Primus
+Genre_109;Porn Groove
+Genre_110;Satire
+Genre_111;Slow Jam
+Genre_112;Club
+Genre_113;Tango
+Genre_114;Samba
+Genre_115;Folklore
+Genre_116;Ballad
+Genre_117;Power Ballad
+Genre_118;Rhythmic Soul
+Genre_119;Freestyle
+Genre_120;Duet
+Genre_121;Punk Rock
+Genre_122;Drum Solo
+Genre_123;A capella
+Genre_124;Euro-House
+Genre_125;Dance Hall
+Genre_126;Goa
+Genre_127;Drum & Bass
+Genre_128;Club-House
+Genre_129;Hardcore
+Genre_130;Terror
+Genre_131;Indie
+Genre_132;Britpop
+Genre_133;Negerpunk
+Genre_134;Polsk Punk
+Genre_135;Beat
+Genre_136;Christian Gangsta Rap
+Genre_137;Heavy Metal
+Genre_138;Black Metal
+Genre_139;Crossover
+Genre_140;Contemporary Christian
+Genre_141;Christian Rock
+Genre_142;Merengue
+Genre_143;Salsa
+Genre_144;Trash Metal
+Genre_145;Anime
+Genre_146;JPop
+Genre_147;Synthpop
+Genre_148;
+Genre_149;
+Genre_150;
+Genre_151;
+Genre_152;
+Genre_153;
+Genre_154;
+Genre_155;
+Genre_156;
+Genre_157;
+Genre_158;
+Genre_159;
+Genre_160;
+Genre_161;
+Genre_162;
+Genre_163;
+Genre_164;
+Genre_165;
+Genre_166;
+Genre_167;
+Genre_168;
+Genre_169;
+Genre_170;
+Genre_171;
+Genre_172;
+Genre_173;
+Genre_174;
+Genre_175;
+Genre_176;
+Genre_177;
+Genre_178;
+Genre_179;
+Genre_180;
+Genre_181;
+Genre_182;
+Genre_183;
+Genre_184;
+Genre_185;
+Genre_186;
+Genre_187;
+Genre_188;
+Genre_189;
+Genre_190;
+Genre_191;
+Go to WebSite;Բացել կայքը
+Grouping;
+h; ժ.
+Header file;Ստեղծել գլխագիրը
+Height;Բարձր-ը
+Height_Original;Օրիգինալի բարձր-ը
+Help;Օգնություն
+Hint;Հուշում
+How many audio streams?;Ձայնի հոսքերը.
+How many chapters streams?;Մասերի հոսքերի քանակը.
+How many text streams?;Տեքստային հոսքերի քանակը.
+How many video streams?;Տեսանյութերի հոսքերի քանակը.
+HTML;HTML
+ID;ID-ին
+Image;Պատկերը
+Image stream(s);Պատկերների հոսքերը
+Image_Codec_List;Պատկերների կոդավորիչները
+ImageCount;Պատկերների հոսքերի քանակը
+Info;Տեղեկություն
+Instruments;Գործիքներ
+Interlacement;Միահյուսում
+Interlaced_Interlaced;Միահյուսված
+Interlaced_TFF;Առաջինը վերին դաշտը
+Interlaced_BFF;Առաջինը ներքին դաշտը
+Interlaced_PPF;Առաջադեմ
+Interlaced_Progressive;Առաջադեմ
+Interleaved;Միահյուսվող
+Interleave_Duration;Միահյուսման տևողությունը
+Interleave_Preload;Միահյուսման ժամանակը
+Interleave_VideoFrames;Միահյուսման շարունակականությունը
+InternetMediaType;Կրիչի ինտերնետային տեսակ
+IRCA;IRCA
+ISBN;ISBN
+ISRC;ISRC
+Keywords;Հիմնաբառերը
+Known codecs;Հայտնի կոդավորիչները
+Known formats;Հայտնի տեսակները
+Known parameters;Հայտնի ցուցիչները
+Label;Նիշը
+Language;Լեզուն
+Language_More;Լեզուն, լրացուցիչ
+Language_aa;Afar
+Language_ab;Abkhazian
+Language_ae;Avestan
+Language_af;Afrikaans
+Language_ak;Akan
+Language_am;Amharic
+Language_an;Aragonese
+Language_ar;Arabic
+Language_as;Assamese
+Language_av;Avaric
+Language_ay;Aymara
+Language_az;Azerbaijani
+Language_ba;Bashkir
+Language_be;Belarusian
+Language_bg;Bulgarian
+Language_bh;Bihari
+Language_bi;Bislama
+Language_bm;Bambara
+Language_bn;Bengali
+Language_bo;Tibetan
+Language_br;Breton
+Language_bs;Bosnian
+Language_ca;Catalan
+Language_ce;Chechen
+Language_ch;Chamorro
+Language_co;Corsican
+Language_cr;Cree
+Language_cs;Czech
+Language_cu;Slave
+Language_cv;Chuvash
+Language_cy;Welsh
+Language_da;Danish
+Language_de;German
+Language_dv;Divehi
+Language_dz;Dzongkha
+Language_ee;Ewe
+Language_el;Greek
+Language_en;English
+Language_en-gb;English (Great Britain)
+Language_en-us;English (United States)
+Language_eo;Esperanto
+Language_es;Spanish
+Language_et;Estonian
+Language_eu;Basque
+Language_fa;Persian
+Language_ff;Fulah
+Language_fi;Finnish
+Language_fj;Fijian
+Language_fo;Faroese
+Language_fr;French
+Language_fy;Frisian
+Language_ga;Irish
+Language_gd;Gaelic
+Language_gl;Galician
+Language_gn;Guarani
+Language_gu;Gujarati
+Language_gv;Manx
+Language_ha;Hausa
+Language_he;Hebrew
+Language_hi;Hindi
+Language_ho;Hiri Motu
+Language_hr;Croatian
+Language_ht;Haitian
+Language_hu;Hungarian
+Language_hy;Armenian
+Language_hz;Herero
+Language_ia;Auxiliary Language Association
+Language_id;Indonesian
+Language_ie;Interlingue
+Language_ig;Igbo
+Language_ii;Sichuan Yi
+Language_ik;Inupiaq
+Language_Info;Լեզվի մասին
+Language_io;Ido
+Language_is;Icelandic
+Language_it;Italian
+Language_iu;Inuktitut
+Language_ja;Japanese
+Language_jv;Javanese
+Language_ka;Georgian
+Language_kg;Kongo
+Language_ki;Kikuyu
+Language_kj;Kuanyama
+Language_kk;Kazakh
+Language_kl;Kalaallisut
+Language_km;Khmer
+Language_kn;Kannada
+Language_ko;Korean
+Language_kr;Kanuri
+Language_ks;Kashmiri
+Language_ku;Kurdish
+Language_kv;Komi
+Language_kw;Cornish
+Language_ky;Kirghiz
+Language_la;Latin
+Language_lb;Luxembourgish
+Language_lg;Ganda
+Language_li;Limburgish
+Language_ln;Lingala
+Language_lo;Lao
+Language_lt;Lithuanian
+Language_lu;Luba-Katanga
+Language_lv;Latvian
+Language_mg;Malagasy
+Language_mh;Marshallese
+Language_mi;Maori
+Language_mk;Macedonian
+Language_ml;Malayalam
+Language_mn;Mongolian
+Language_mo;Moldavian
+Language_mr;Marathi
+Language_ms;Malay
+Language_mt;Maltese
+Language_mul;Մի քանի լեզու
+Language_my;Burmese
+Language_na;Nauru
+Language_nb;Norwegian Bokmal
+Language_nd;Ndebele
+Language_ne;Nepali
+Language_ng;Ndonga
+Language_nl;Dutch
+Language_nn;Norwegian Nynorsk
+Language_no;Norwegian
+Language_nr;Ndebele
+Language_nv;Navaho
+Language_ny;Nyanja
+Language_oc;Occitan
+Language_oj;Ojibwa
+Language_om;Oromo
+Language_or;Oriya
+Language_os;Ossetic
+Language_pa;Panjabi
+Language_pi;Pali
+Language_pl;Polish
+Language_ps;Pushto
+Language_pt;Portuguese
+Language_pt-br;Portuguese (Brazil)
+Language_qu;Quechua
+Language_rm;Raeto-Romance
+Language_rn;Rundi
+Language_ro;Romanian
+Language_ru;Russian
+Language_rw;Kinyarwanda
+Language_sa;Sanskrit
+Language_sc;Sardinian
+Language_sd;Sindhi
+Language_se;Northern Sami
+Language_sg;Sango
+Language_si;Sinhala
+Language_sk;Slovak
+Language_sl;Slovenian
+Language_sm;Samoan
+Language_sn;Shona
+Language_so;Somali
+Language_sq;Albanian
+Language_sr;Serbian
+Language_ss;Swati
+Language_st;Sotho
+Language_su;Sundanese
+Language_sv;Swedish
+Language_sw;Swahili
+Language_ta;Tamil
+Language_te;Telugu
+Language_tg;Tajik
+Language_th;Thai
+Language_ti;Tigrinya
+Language_tk;Turkmen
+Language_tl;Tagalog
+Language_tn;Tswana
+Language_to;Tonga
+Language_tr;Turkish
+Language_ts;Tsonga
+Language_tt;Tatar
+Language_tw;Twi
+Language_ty;Tahitian
+Language_ug;Uighur
+Language_uk;Ukrainian
+Language_ur;Urdu
+Language_uz;Uzbek
+Language_ve;Venda
+Language_vi;Vietnamese
+Language_vo;Volapuk
+Language_wa;Walloon
+Language_wo;Wolof
+Language_xh;Xhosa
+Language_yi;Yiddish
+Language_yo;Yoruba
+Language_za;Zhuang
+Language_zh;Chinese
+Language_zh-cn;Chinese (China)
+Language_zh-tw;Chinese (Taiwan)
+Language_zu;Zulu
+LawRating;Իրավունքների սահ-ում
+LCCN;LCCN
+Library;Շտեմարանը
+Lightness;Պայծառությունը
+List;Ցանկը
+Lyrics;Երգերի տեքստը
+Lyricist;Երգի տեքստը
+Mastered_Date;Օրիգինալի ամսաթիվը
+MasteredBy;Օրիգինալը՝
+matrix_coefficients;Կետացանցի գործակիցը
+MediaInfo_About;Ցուցադրում է մանրամասն տեղեկություններ\r\nմուլտիմեդիային ֆայլեր Matroska-ի, OGG-ի (ներառյալ OGM)\r\nMPEG1-ի (ներառյալ VCD), MPEG2-ի (ներառյալ DVD և SVCD), MPEG4-ի (ներառյալ iTunes M4A)\r\nQuicktime-ի\r\nRealMedia-ի\r\nWindowsMedia-ի (ներառյալ WMV, WMA)\r\nMicrosoft RIFF-ի (ներառյալ AVI, WAV, DivX)\r\nձայնային ֆայլերի (AC3, DTS, SSC, AU, AIFF) վերաբերյալ
+Menu;Ընտրացանկը
+Menu stream(s);Հոսքերի ընտրացանկը
+Menu_Codec_List;Կոդավորիչների ընտրացանկը
+Menu_No;Չկա Ընտրացանկ
+MenuCount;Ընտրացանկի հոսքերի ք-ը
+Menu_Hint;Լրացուցիչ հնարավորություններ
+MenuID;Ընտրացանկի ID-ին
+mn; ր.
+Mood;Կարգավորված
+More;Ավելին
+Movie;Ֆիլմի անունը
+ms; մվ.
+MSDI;MSDI
+MusicBy;Երգահանը
+MuxingMode;Խառման եղանակը
+MuxingMode_MoreInfo;Խառման եղանակը, լր. տեղեկություն
+MuxingMode_PackedBitstream;Սեղմված բիթային հոսք
+Name;Անունը
+Nationality;Ազգությունը
+NetworkName;Ցանցի անունը
+New;Նոր
+Newest version;Ստուգել նոր տարբերակը
+NewVersion_Menu;Հասանելի է նոր տարբերակը
+NewVersion_Question_Title;Հասանելի է նոր տարբերակ!
+NewVersion_Question_Content;Հասանելի է նոր %Version% տարբերակը, բեռնե՞լ այն։
+No;Ոչ
+Not yet;Դեռ չկա
+NumColors;Գույների քանակը
+OK;ԼԱՎ
+One output file per input file;Նոր ֆայլ յուրաքանչյուրի համար
+Open;Բացել
+OpenCandy_01;Բացվում է ________
+OpenCandy_02;__% կատարվել է
+OpenCandy_03;Մուտքը ինտերնետ հնարավոր չէ
+OpenCandy_04;________ բեռնվել է
+OpenCandy_05;Սեղմեք տեղադրման համար ________
+OpenCandy_06;Կանգնեցնե՞լ տեղակայումը։\r\nԵթե ցանկանում եք հետաձգել տեղակայումը սեղմեք, 'Ոչ'։\r\nՈւշադր. Կարող եք դուրս գալ ընտրացանկից՝ տեղակայումը հետաձգելու համար։
+OpenCandy_07;________-ի բեռնումը կանգնեցված է։\r\nՍեղմեք էկրանի ներքևի մասում գտնվող պատկերի վրա՝ բեռնումը վերսկսելու համար։
+OpenCandy_08;Կրիտիկական սխալ։ _________-ի տեղակայումը ընդհատված է։
+OpenCandy_09;Կանգնեցնել բեռնումը
+OpenCandy_10;Ետարկել տեղակայումը
+OpenCandy_11;Շարունակել բեռնումը
+OpenCandy_12;Ելք տեղակայումից
+OpenCandy_13;___________ - խորհուրդ է տրվում ____________
+OpenCandy_14;_________-ը բեռնվում է
+OpenCandy_15;___________, ծրագիրը, երաշխավորված ___________-ի կողմից, այժմ բեռնվում է։
+OpenCandy_16;___________-ը պատրաստ է տեղակայման
+OpenCandy_17;___________-ը բեռնվել է։ Սեղմեք 'Տեղակայել'՝ սկսելու համար։
+OpenCandy_18;___________-ը ___________-ից բեռնվել է
+OpenCandy_19;Ստեղծված է OpenCandy-ի կողմից
+OpenCandy_20;Լրացուցիչ տեղեկությունները OpenCandy.com-ում
+OpenCandy_21;Տեղակայում
+OpenCandy_22;___________-ի տեղակայում
+OpenCandy_23;Սա կընդհատի ___________-ի տեղակայումը\r\nԴուրս գա՞լ։
+OpenCandy_24;Դադար
+OpenCandy_25;Բեռնումը ընդհատվել է։ Սեղմեք 'Շարունակել'՝ վերսկսելու համար։
+OpenCandy_26;Շարունակել
+OpenCandy_27;Տեղակայում
+OpenCandy_28;Կանգնեցնել բեռնումը
+OpenCandy_29;Շարունակել բեռնումը
+OpenCandy_30;Կանգնեցնել բեռնումը
+OpenCandy_31;Ընտրեք տեղակայման ցուցիչները
+OpenCandy_32;___________-ի տեղակայում
+OpenCandy_33;Չտեղակայել
+OpenCandy_34;Ընտրեք տեղակայման ցուցիչները
+OpenCandy_35;______-ի երաշխավորած ծրագիրը
+OpenCandy_36;Ընթացիկ տեղակայումը չի ընդհատվի
+Options;Ընտրանքներ
+Options_Hint;Ծրագրի կարգավորումները
+Original;Բնօրինակը
+OriginalNetworkName;Ցանցի հիմնական անունը
+OriginalSourceForm;Օրիգինալի ֆայլը
+OriginalSourceMedium;Օրիգինալի կրիչը
+Other;Այլ
+Output;Արտածում
+Output format;Արտածման տեսակը
+OverallBitRate;Ընդհանուր հոսքը
+OverallBitRate_Maximum;Առավելագույն ընդ. բիթրեյթը
+OverallBitRate_Minimum;Նվազագույն ընդ. բիթրեյթը
+OverallBitRate_Mode;Բիթրեյթի ընդ. եղանակը
+OverallBitRate_Nominal;Բիթրեյթի պայմ. եղանակը
+Part;Մաս
+Part_Count;Ժամերի ք-ը.
+Performer;Կատարողը
+Period;Շրջանը
+Phone;Հեռախոս
+PixelAspectRatio;Փիքսելների համամասնությունը
+PixelAspectRatio_Original;Փիքսելների հարաբեր-ը օրիգինալում
+PlayCounter;Վերարտադրման հաշվիչ
+Played_Count;Վերարտադրվել է մեկ անգամ
+Played_First_Date;Առաջին վերարտադրումը
+Played_Last_Date;Վերջին վերարտադրումը
+PlayTime;Տևողությունը
+Position;Դիրքը
+Position_Total;Ընդամենը
+Preferences;Կարգավորումներ
+Producer;Պրոդյուսերը
+ProductionDesigner;Դիզայնի մշակողը
+ProductionStudio;Դիզայնի ստուդիան
+Publisher;Թողարկողը
+Purchased_Date;Գնման ամսաթիվը
+Quote character;Չակերտների նշանը
+RadioStation;Ռադիոկայանը
+Rating;Վարկանիշը
+Recorded_Date;Գրելու ամսաթիվը
+Recorded_Location;Գրելու տեղը
+Released_Date;Թողարկման ամսաթիվը
+RemixedBy;Ռեմիքսը՝
+ReplayGain_Gain;Ձայնի կարգավորիչ
+ReplayGain_Peak;Ձայնի կարգավորման գագաթը
+Resolution;Լուծաչափը
+s; վայր.
+SamplingRate;Հաճախականությունը
+Save;Պահպանել
+ScanType;Ստուգման տեսակը
+ScanType_Original;
+ScanType_StoreMethod;
+ScanOrder;Ստուգման հերթը
+ScanOrder_Original;
+ScanOrder_Stored;
+ScanOrder_StoredDisplayedInverted;
+ScanOrder_StoreMethod;
+ScreenplayBy;Սցենարը՝
+Season;Խաղաշրջանը
+see below;նայեք ներքև
+Send HeaderFile;Ուղարկեք այս ֆայլի գլխագիրը http://sourceforge.net/projects/mediainfo/ (Սխալների բաժին)
+Separator_Columns;Սյուների բաժանիչ
+Separator_Lines;Տողերի բաժանիչ
+ServiceChannel;Ծառայության ալիքի համարը
+ServiceName;Ծառայության անունը
+ServiceProvider;Ծառայության մատակարարը
+ServiceType;Ծառայության տեսակը
+Set;Տեղակայում
+Set_Count;Տեղակայումների ք-ը
+Setup;Կարգավորում
+Sharpness;Սրությունը
+Sheet;Աղյուսակ
+Sheet (Complete);Աղյուսակը (ամբողջական)
+Shell extension;Ինտեգրել Explorer-ում
+Shell extension, folder;Ինտեգրել թղթապանակների Explorer-ում
+Shell InfoTip;Ցուցադրել հուշում Explorer-ում
+Show menu;Ցուցադրել ընտրացանկը
+Show toolbar;Ցուցադրել վահանակը
+Sort;Դասավորել ըստ
+SamplingCount;Նմուշների քանակը
+SoundEngineer;Ձայն. ռեժիսորը
+Source;
+Source_Duration;
+Source_FrameCount;
+Source_SamplingCount;
+Source_StreamSize;
+Source_StreamSize_Encoded;
+Standard;Ստանդարտ
+StoreMethod_InterleavedFields;
+StoreMethod_SeparatedFields;
+StoreMethod_SeparatedFields_1;
+StoreMethod_SeparatedFields_2;
+Stream;Հոսքը
+Stream_MoreInfo;Լր. տեղեկություններ հոսքի մասին
+StreamCount;Այս տեսակի հոսքերի ք-ը
+StreamID;Հոսքի ID-ին
+StreamKind;Հոսքի տեսակը
+StreamKindID;Հոսքի տեսակ ID-ին
+StreamKindPos;Հոսքի տեսակ ID-ի դիրքը
+StreamSize;Հոսքի չափը
+StreamSize_Encoded;
+StreamSize_Proportion;Հոսքի համամասնությունը
+Subject;Թեման
+SubTrack;Ենթահոսքը
+Summary;Համառոտ
+Supported formats;Աջակցվող տեսակները
+Supported?;Աջակցվու՞մ է
+Synopsis;Համառոտ
+SystemId;ID-ին
+Tagged_Application;Նշված ծրագիրը
+Tagged_Date;Նշման ամսաթիվը
+Technician;Տեխնիկը
+TermsOfUse;Օգտագ. կանոնները
+Text;Տեքստ
+Text - Custom;Տեքստ - Ընտրովի
+Text (HTML);Տեքստ (HTML)
+Text stream(s);Տեքստային հոսքեր
+Text streams;Տեքստային հոսքեր
+Text_Codec_List;Տեքստային կոդավորիչները
+Text_No;Չկա տեքստ
+Text1;Առաջին տեքստային հոսքը
+Text2;Երկրորդ տեքստային հոսքը
+Text3;Երրորդ տեքստային հոսքը
+TextCount;Տեքստային հոսքը ք-ը
+ThanksTo;Շնորհակալ ենք
+Thousands separator;Հազարյակի բաժանիչը
+Title;Անունը
+Title_More;Անունը, լրացուցիչ
+TimeCode;
+TimeCode_FirstFrame;
+TimeCode_Settings;
+TimeCode_Source;
+TimeStamp;
+TimeZone;Ժամային գոտին
+Total;Ընդամենը
+Track;Շավիղը
+Track_Count;Շավիղների ք-ը
+transfer_characteristics;Փոխանցման բնութագրումը
+Translator;Hrant Ohanyan
+Tree;Ծառի տեսքով
+Tree & Text;Ծառի տեսքով և տեքստ
+Type;
+UniqueID;Բացառիկ ID-ին
+Unknown;Անհայտ է
+Url;Հղումը
+Video;Տեսանյութը
+Video stream(s);Տեսահոսքը
+Video_Codec_List;Տեսակոդավորիչները
+Video_Delay;Տեսանյութի դադարը
+Video_No;Չկա տեսանյութ
+Video0_Delay;Տեսանյութի դադարը
+Video1;Առաջին տեսահոսքը
+VideoCount;Տեսահոսքերի ք-ը
+View;Տեսքը
+View_Hint;Պատկերման եղանակը
+Warning : more streams in the files;Ուշադրություն. ֆայլում դեռ կան հոսքեր
+Web;Կայքը
+WebSite_Audio;Կոդավորիչի կայքը
+WebSite_Audio_More;Բացել (%Url%) կայքը՝ կոդավորիչը փնտրելու համար
+WebSite_General;Բացել այս ֆայլի վերարտադրման համար ծրագրի կայքը
+WebSite_General_More;Բացել այս ֆայլի վերարտադրման համար ծրագրի կայքը
+WebSite_Text;Տեքստային կոդավորիչի կայքը
+WebSite_Text_More;Բացել (%Url%) կայքը՝ տեքստային կոդավորիչի համար
+WebSite_Url;http://MediaArea.net/MediaInfo
+WebSite_Video;Տեսակոդավորիչի կայքը
+WebSite_Video_More;Բացել (%Url%) կայքը՝ այս տեսակոդավորիչի մանրամասների համար
+Width;Լայն-ը
+Width_Original;Օրիգինալի լայն-ը
+WriteMe;Նամակ հեղինակին
+WriteToTranslator;Նամակ թարգմանչին
+Written_Date;Գրելու ամսաթիվը
+Written_Location;Գրելու տեղը
+WrittenBy;Գրվել է՝
+Yes;Այո
+Your system;Ձեր համակարգը
+ZZ_Automatic_Percent;92
+ZZ_AutomaticLanguage_Percent;97

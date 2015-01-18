@@ -1,0 +1,1040 @@
+  Language_ISO639;tr
+  Author_Email;BouRock@live.com
+  Author_Name;BouRock
+  Author_OldNames;İlk çevirmen
+  Language_Name;Türkçe
+  Config_Text_ColumnSize;40
+  Config_Text_Separator; :
+  Config_Text_NumberTag; #
+  Config_Text_FloatSeparator;.
+  Config_Text_ThousandsSeparator; 
+ audio stream1; seslendirme
+ audio stream2; seslendirme
+ audio stream3; seslendirme
+ bit1; bit
+ bit2; bit
+ bit3; bit
+ bps; bps
+ Bps; Bps
+ Byte1; Bayt
+ Byte2; Bayt
+ Byte3; Bayt
+ channel1; kanal
+ channel2; kanal
+ channel3; kanal
+ chapter1; bölüm
+ chapter2; bölüm
+ chapter3; bölüm
+ chapters stream1; bölüm akışı
+ chapters stream2; bölüm akışı
+ chapters stream3; bölüm akışı
+ day1; gün
+ day2; gün
+ day3; gün
+ dB1;dB
+ dB2;dB
+ dB3;dB
+ file1; dosya
+ file2; dosya
+ file3; dosya
+ frame1; kare
+ frame2; kare
+ frame3; kare
+ fps1; kare/s
+ fps2; kare/s
+ fps3; kare/s
+ GB; GB
+ Gb; Gb
+ Gbps; Gbps
+ GBps; GBps
+ GHz; GHz
+ GiB; GiB
+ GibiByte1; GibiBayt
+ GibiByte2; GibiBayt
+ GibiByte3; GibiBayt
+ GiBps; GiBps
+ GigaBit1; GigaBit
+ GigaBit2; GigaBit
+ GigaBit3; GigaBit
+ GigaByte1; GigaBayt
+ GigaByte2; GigaBayt
+ GigaByte3; GigaBayt
+ hour1; saat
+ hour2; saat
+ hour3; saat
+ Hz; Hz
+ image stream1; imaj akışı
+ image stream2; imaj akışı
+ image stream3; imaj akışı
+ KB; KB
+ Kb; Kb
+ KBps; KBps
+ Kbps; Kbps
+ KHz; KHz
+ KiB; KiB
+ KibiBit1; KibiBit
+ KibiBit2; KibiBit
+ KibiBit3; KibiBit
+ KibiByte1; KibiBayt
+ KibiByte2; KibiBayt
+ KibiByte3; KibiBayt
+ KiBps; KiBps
+ KiloBit1; KiloBit
+ KiloBit2; KiloBit
+ KiloBit3; KiloBit
+ KiloByte1; KiloBayt
+ KiloByte2; KiloBayt
+ KiloByte3; KiloBayt
+ MB; MB
+ Mb; Mb
+ Mbps; Mbps
+ MBps; MebiBayt
+ MebiBit1; MebiBit
+ MebiBit2; MebiBit
+ MebiBit3; MebiBit
+ MebiByte1; MebiBayt
+ MebiByte2; MebiBayt
+ MebiByte3; MebiBayt
+ MegaBit1; MegaBit
+ MegaBit2; MegaBit
+ MegaBit3; MegaBit
+ MegaByte1; MegaBayt
+ MegaByte2; MegaBayt
+ MegaByte3; MegaBayt
+ MHz; MHz
+ MiB; MiB
+ Mib; Mib
+ MiBps; MiBps
+ millisecond1; milisaniye
+ millisecond2; milisaniye
+ millisecond3; milisaniye
+ minute1; dakika
+ minute2; dakika
+ minute3; dakika
+ month1; ay
+ month2; ay
+ month3; ay
+ pixel1; piksel
+ pixel2; piksel
+ pixel3; piksel
+ second1; saniye
+ second2; saniye
+ second3; saniye
+ text stream1; yazı akışı
+ text stream2; yazı akışı
+ text stream3; yazı akışı
+ video frames1;görüntü karesi
+ video frames2;görüntü karesi
+ video frames3;görüntü karesi
+ video stream1; görüntü akışı
+ video stream2; görüntü akışı
+ video stream3; görüntü akışı
+ warppoint0; Sapma noktası yok
+ warppoint1; sapma noktası
+ warppoint2; sapma noktası
+ warppoint3; sapma noktası
+ week1; hafta
+ week2; hafta
+ week3; hafta
+ year1; yıl
+ year2; yıl
+ year3; yıl
+, ;, 
+: ;: 
+About;Hakkında
+About_Hint;Son sürümü bulmak ve benle nasıl bağlantı kurmanız için
+Accompaniment;Refakat
+ActiveFormatDescription;Aktif Biçim Açıklaması
+ActiveFormatDescription_MuxingMode;Aktif Biçim Açıklaması, Çoklama kipi
+Actor;Oyuncu
+Actor_Character;Oynayan karakter
+Added_Date;Eklenme tarihi
+Address;Adres
+Advanced;Gelişmiş
+Advanced mode;Gelişmiş kip
+Album;Albüm
+Album_ReplayGain_Gain;Albüm tekrar çalma kazancı
+Album_ReplayGain_Peak;Albüm tekrar çalma kazanç ucu
+Alignment;Hizalama
+Alignment_Aligned;Boşluklarda sıraya dizilmiş
+Alignment_Split;Boşlukları karşılıklı böl
+All;Tümü
+Archival_Location;Arşiv konumu
+Arranger;Düzenleyici
+ArtDirector;Sanat Yönetmeni
+AspectRatio;En-Boy oranı
+AssistantDirector;Yardımcı Yönetmen
+at;de
+At least one file;(En az bir dosya açmak zorundasınız)
+Audio;Ses
+Audio stream(s);Seslendirme
+Audio_Codec_List;Ses kodekleri
+Audio_No;Ses yok
+Audio1;Birinci ses
+Audio2;İkinci ses
+AudioCount;Ses sayısı
+Author;Hazırlayan
+BarCode;BarKod
+Basic;Temel
+Basic_Note;Not : Bu dosya hakkında daha fazla bilgi için farklı görünüm seçmelisiniz (Sayfa, Ağaç...)
+BitDepth;Bit yoğunluğu
+BitDepth_Stored;
+BitRate;Bit oranı
+BitRate_Maximum;En fazla bit oranı
+BitRate_Minimum;En az bit oranı
+BitRate_Mode;Bit oranı modu
+BitRate_Mode_CBR;Sabit
+BitRate_Mode_VBR;Değişken
+BitRate_Nominal;Düşük bit oranı
+BitRate_Encoded;Kodlanmış bit oranı
+Bits-(Pixel*Frame);Bit/(Piksel*Kare)
+BufferSize;Arabellek boyutu
+Cancel;İptal
+Channel(s);Kanal
+ChannelPositions;Kanal konumları
+Chapter(s);Bölüm
+Chapters;Bölüm
+Chapters stream(s);Bölüm akışı
+Chapters_Codec_List;Bölüm Kodekleri
+Chapters_No;Bölüm yok
+ChaptersCount;Bölüm sayısı
+CheckNewVersion;Yeni sürümü kontrol et
+Choose custom;Özel seç
+Choose custom sheet;İstediğiniz özel sayfayı seçin
+Choose custom text;İstediğiniz özel metni seçin
+Choose export format;İstediğiniz dışarı aktarma biçimini seçin
+Choose file(s);Açmak için dosya seçin
+Choose filename;İstediğiniz dosya adını seçin
+Choose language;İstediğiniz dili seçin
+Choregrapher;Koreograf
+Chroma;Krom
+ChromaSubsampling;Krom altörnekleme
+Close;Kapat
+Close all before open;Açmadan önce tümünü kapat
+Codec;Kodek
+Codec_Description;Kodek açıklaması
+Codec_Info;Kodek için ayrıntılar
+Codec_Settings;Kodek ayarları
+Codec_Settings_PacketBitStream;Kodek ayarları, Paket bit akışı
+Codec_Settings_BVOP;Kodek ayarları, BVOP
+Codec_Settings_QPel;Kodek ayarları, QPel
+Codec_Settings_GMC;Kodek ayarları, GMC
+Codec_Settings_Matrix;Kodek ayarları, Matrix
+Codec_Settings_Floor;Kodek ayarları, Floor
+Codec_Settings_CABAC;Kodek ayarları, CABAC
+Codec_Settings_Firm;Kodek ayarları, Firm
+Codec_Settings_Endianness;Kodek ayarları, Endianness
+Codec_Settings_Sign;Kodek ayarları, Sign
+Codec_Settings_Law;Kodek ayarları, Law
+Codec_Settings_ITU;Kodek ayarları, ITU
+Codec_Profile;Kodek profili
+Codec_Url;Kodek için web bağlantısı
+CodecID;Kodek ID
+CodecID_Description;Kodek açıklaması
+Collection;Koleksiyon
+Colorimetry;Renkölçüm
+ColorSpace;Renk alanı
+colour_primaries;Renk öncelikleri
+Comment;Yorum
+CommissionedBy;Görevlendiren
+Compilation;Derleme
+CompleteName;Tam isim
+Composer;Besteci
+Compression_Mode;Sıkıştırma kipi
+Compression_Mode_Lossless;Kayıpsız
+Compression_Mode_Lossy;Kayıplı
+Compression_Ratio;Sıkıştırma oranı
+Conductor;Orkestra şefi
+Container and general information;Kalıp ve genel bilgi
+ContentType;İçerik Türü
+CoProducer;Yardımcı yapımcı
+Copyright;Telif Hakkı
+CostumeDesigner;Kıyafet tasarımcısı
+Count;Sayım
+Country;Ülke
+Cover;Kapak
+Cover_Datas;Kapak verileri
+Cover_Description;Kapak açıklaması
+Cover_Mime;Kapak MIME
+Cover_Type;Kapak türü
+Cropped;Kırpma boyutları
+Custom;Özel
+Customize;Özelleştir
+Date;Tarih
+Debug;Hata Ayıklama
+Decimal point;Ondalık ayırıcı
+Delay;Gecikme
+Delay_Source;Gecikme, kaynağı
+Delay_Source_Container;Kalıp
+Delay_Source_Stream;Ham akış
+Delete;Sil
+Description;Açıklama
+Digitized_Date;Sayısallaştırılmış tarih
+Dimensions;Boyutlar
+Director;Yönetmen
+DirectorOfPhotography;Fotoğrafçılık yönetmeni
+DisplayAspectRatio;Görüntü en-boy oranı
+DisplayAspectRatio_Original;Orijinal görüntü en-boy oranı
+DistributedBy;Dağıtan
+Donate;Bağış
+DotsPerInch;İnç başına nokta
+Duration;Süre
+Duration_End;Bitiş zamanı
+Duration_Start;Başlangıç zamanı
+Edit;Düzenle
+EditedBy;Düzenleyen
+EMail;E-Posta
+Encoded_Application;Yapım uygulaması
+Encoded_Date;Kodlanma tarihi
+Encoded_Library;Yapım kütüphanesi
+Encoded_Library_Settings;Kodlama ayarları
+Encoded_Original;Orijinal
+EncodedBy;Kodlayan
+EPG_Positions;EPG konumu (dahili)
+Error_File;Dosya okunurken hata
+ExecutiveProducer;İdari yapımcı
+Exit;Çıkış
+Exit_Hint;Programdan çıkış
+Export;Dışarı Aktar
+Export_Hint;Özelleştirilmiş biçimde dışarı aktarır
+Extensions;Genellikle kullanılan uzantılar
+Family;Aile
+Fax;Faks
+File;Dosya
+File size;Dosya boyutu
+File_Append;Mevcut dosyaya ekle (Uyarı : aynı parametlere sahip olmak için dikkatli olun)
+File_Created_Date;Dosya oluşturma tarihi
+File_Created_Date_Local;Dosya oluşturma tarihi (yerel)
+File_Hint;Çalışmak için çokluortam dosyası seç
+File_Modified_Date;Dosya son değiştirme tarihi
+File_Modified_Date_Local;Dosya son değiştirme tarihi (yerel)
+FileExtension;Dosya uzantısı
+FileName;Dosya adı
+FileSize;Dosya boyutu
+Folder;Klasör
+Folder (R);Klasör (R)
+Folder (R)_Hint;Çalışmak için klasör seç (yinelemeli tüm klasörler ile)
+Folder (Recursively);Klasör (Yinelemeli)
+Folder_Hint;Çalışmak için klasör seç
+FolderName;Klasör adı
+Format;Biçim
+Format_Commercial;Ticari adı
+Format_Commercial_IfAny;Ticari adı
+Format_Description;Biçim açıklaması
+Format_Info;Biçim için ayrıntılar
+Format_Profile;Biçim profili
+Format_Settings;Biçim ayarları
+Format_Settings_PacketBitStream;Biçim ayarları, Paket bit akışı
+Format_Settings_BVOP;Biçim ayarları, BVOP
+Format_Settings_QPel;Biçim ayarları, QPel
+Format_Settings_GMC;Biçim ayarları, GMC
+Format_Settings_Matrix;Biçim ayarları, Matrix
+Format_Settings_Matrix_Custom;Özel
+Format_Settings_Matrix_Default;Varsayılan
+Format_Settings_Floor;Biçim ayarları, Floor
+Format_Settings_CABAC;Biçim ayarları, CABAC
+Format_Settings_Firm;Biçim ayarları, Firm
+Format_Settings_Endianness;Biçim ayarları, Endianess
+Format_Settings_RefFrames;Biçim ayarları, ReFrames
+Format_Settings_Sign;Biçim ayarları, Sign
+Format_Settings_Law;Biçim ayarları, Law
+Format_Settings_ITU;Biçim ayarları, ITU
+Format_Settings_SBR;Biçim ayarları, SBR
+Format_Settings_PS;Biçim ayarları, PS
+Format_Settings_Pulldown;Biçim ayarları, Pulldown
+Format_Settings_Mode;Kip
+Format_Settings_FrameMode;Kare kipi
+Format_Settings_Emphasis;Vurgu
+Format_Settings_ModeExtension;Kip uzantısı
+Format_Settings_GOP;Biçim ayarları, GOP
+Format_Version;Biçim sürümü
+Format_Url;Biçim için web bağlantısı
+FrameCount;Kare sayısı
+FrameRate;Kare hızı
+FrameRate_Mode;Kare hız modu
+FrameRate_Mode_CFR;Sabit
+FrameRate_Mode_VFR;Değişken
+FrameRate_Minimum;En az kare hızı
+FrameRate_Nominal;Düşük kare hızı
+FrameRate_Maximum;En fazla kare hızı
+FrameRate_Original;Orijinal kare hızı
+General;Genel
+Genre;Tarz
+Genre_000;Blues
+Genre_001;Classic Rock
+Genre_002;Country
+Genre_003;Dans
+Genre_004;Disko
+Genre_005;Funk
+Genre_006;Grunge
+Genre_007;Hip-Hop
+Genre_008;Jazz
+Genre_009;Metal
+Genre_010;New Age
+Genre_011;Oldies
+Genre_012;Other
+Genre_013;Pop
+Genre_014;R&B
+Genre_015;Rap
+Genre_016;Reggae
+Genre_017;Rock
+Genre_018;Techno
+Genre_019;Industrial
+Genre_020;Alternative
+Genre_021;Ska
+Genre_022;Death Metal
+Genre_023;Pranks
+Genre_024;Film Müziği
+Genre_025;Euro-Techno
+Genre_026;Ambient
+Genre_027;Trip-Hop
+Genre_028;Vocal
+Genre_029;Jazz+Funk
+Genre_030;Fusion
+Genre_031;Trance
+Genre_032;Klasik
+Genre_033;Enstrümantal
+Genre_034;Asit
+Genre_035;House
+Genre_036;Oyun
+Genre_037;Ses Klibi
+Genre_038;Gospel
+Genre_039;Noise
+Genre_040;AlternRock
+Genre_041;Bass
+Genre_042;Soul
+Genre_043;Punk
+Genre_044;Space
+Genre_045;Meditative
+Genre_046;Enstrümantal Pop
+Genre_047;Enstrümantal Rock
+Genre_048;Ethnik
+Genre_049;Gothic
+Genre_050;Darkwave
+Genre_051;Techno-Industrial
+Genre_052;Elektronik
+Genre_053;Pop-Folk
+Genre_054;Eurodance
+Genre_055;Dream
+Genre_056;Güney Rock
+Genre_057;Komedi
+Genre_058;Cult
+Genre_059;Gangsta
+Genre_060;Top 40
+Genre_061;Christian Rap
+Genre_062;Pop/Funk
+Genre_063;Jungle
+Genre_064;Native American
+Genre_065;Cabaret
+Genre_066;New Wave
+Genre_067;Psychadelic
+Genre_068;Rave
+Genre_069;Showtunes
+Genre_070;Trailer
+Genre_071;Lo-Fi
+Genre_072;Tribal
+Genre_073;Acid Punk
+Genre_074;Acid Jazz
+Genre_075;Polka
+Genre_076;Retro
+Genre_077;Musical
+Genre_078;Rock & Roll
+Genre_079;Hard Rock
+Genre_080;Folk
+Genre_081;Folk-Rock
+Genre_082;National Folk
+Genre_083;Swing
+Genre_084;Fast Fusion
+Genre_085;Bebob
+Genre_086;Latin
+Genre_087;Revival
+Genre_088;Celtic
+Genre_089;Bluegrass
+Genre_090;Avantgarde
+Genre_091;Gothic Rock
+Genre_092;Progressive Rock
+Genre_093;Psychedelic Rock
+Genre_094;Symphonic Rock
+Genre_095;Slow Rock
+Genre_096;Big Band
+Genre_097;Chorus
+Genre_098;Easy Listening
+Genre_099;Acoustic
+Genre_100;Humour
+Genre_101;Speech
+Genre_102;Chanson
+Genre_103;Opera
+Genre_104;Chamber Music
+Genre_105;Sonata
+Genre_106;Symphony
+Genre_107;Booty Bass
+Genre_108;Primus
+Genre_109;Porn Groove
+Genre_110;Satire
+Genre_111;Slow Jam
+Genre_112;Club
+Genre_113;Tango
+Genre_114;Samba
+Genre_115;Folklore
+Genre_116;Ballad
+Genre_117;Power Ballad
+Genre_118;Rhythmic Soul
+Genre_119;Freestyle
+Genre_120;Duet
+Genre_121;Punk Rock
+Genre_122;Drum Solo
+Genre_123;A capella
+Genre_124;Euro-House
+Genre_125;Dance Hall
+Genre_126;Goa
+Genre_127;Davul & Bass
+Genre_128;Club-House
+Genre_129;Hardcore
+Genre_130;Terror
+Genre_131;Indie
+Genre_132;Britpop
+Genre_133;Negerpunk
+Genre_134;Polsk Punk
+Genre_135;Beat
+Genre_136;Christian Gangsta Rap
+Genre_137;Heavy Metal
+Genre_138;Black Metal
+Genre_139;Crossover
+Genre_140;Contemporary Christian
+Genre_141;Christian Rock
+Genre_142;Merengue
+Genre_143;Salsa
+Genre_144;Trash Metal
+Genre_145;Anime
+Genre_146;JPop
+Genre_147;Synthpop
+Genre_148;Abstract
+Genre_149;Art Rock
+Genre_150;Baroque
+Genre_151;Bhangra
+Genre_152;Big Beat
+Genre_153;Breakbeat
+Genre_154;Chillout
+Genre_155;Downtempo
+Genre_156;Dub
+Genre_157;EBM
+Genre_158;Eclectic
+Genre_159;Electro
+Genre_160;Electroclash
+Genre_161;Emo
+Genre_162;Experimental
+Genre_163;Garage
+Genre_164;Genel
+Genre_165;IDM
+Genre_166;Illbient
+Genre_167;Industro-Goth
+Genre_168;Jam Band
+Genre_169;Krautrock
+Genre_170;Leftfield
+Genre_171;Lounge
+Genre_172;Math Rock
+Genre_173;New Romantic
+Genre_174;Nu-Breakz
+Genre_175;Post-Punk
+Genre_176;Post-Rock
+Genre_177;Psytrance
+Genre_178;Shoegaze
+Genre_179;Space Rock
+Genre_180;Trop Rock
+Genre_181;World Music
+Genre_182;Neoclassical
+Genre_183;Audiobook
+Genre_184;Audio Theatre
+Genre_185;Neue Deutsche Welle
+Genre_186;Podcast
+Genre_187;Indie Rock
+Genre_188;G-Funk
+Genre_189;Dubstep
+Genre_190;Garage Rock
+Genre_191;Psybient
+Go to WebSite;Web sitesine git
+Grouping;Gruplama
+h;s
+Header file;Üst bilgi dosyası oluştur
+Height;Yükseklik
+Height_Original;Orijinal yükseklik
+Help;Yardım
+Hint;İpucu
+How many audio streams?;Kaç tane seslendirme?
+How many chapters streams?;Kaç tane bölüm akışı?
+How many text streams?;Kaç tane yazı akışı?
+How many video streams?;Kaç tane görüntü akışı?
+HTML;HTML
+ID;ID
+Image;İmaj
+Image stream(s);İmaj akışı
+Image_Codec_List;Kodek İmajı
+ImageCount;İmaj akışı sayısı
+Info;Bilgi
+Instruments;Enstrüman
+Interlacement;Karıştırma
+Interlaced_Interlaced;Karışık
+Interlaced_TFF;En Üst Alanın İlki
+Interlaced_BFF;En Alt Alanın İlki
+Interlaced_PPF;Aşamalı
+Interlaced_Progressive;Aşamalı
+Interleaved;Boşluklu
+Interleave_Duration;Boşluk, süre
+Interleave_Preload;Boşluk, önyükleme süresi
+Interleave_VideoFrames;Boşluk, süre
+InternetMediaType;Internet medya türü
+IRCA;IRCA
+ISBN;ISBN
+ISRC;ISRC
+Keywords;Anahtar kelime
+Known codecs;Bilinen kodekler
+Known formats;Bilinen biçimler
+Known parameters;Bilinen parametreler
+Label;Etiket
+Language;Dil
+Language_More;Dil, daha fazla bilgi
+Language_aa;Afar
+Language_ab;Abkhazian
+Language_ae;Avestan
+Language_af;Afrikaanca
+Language_ak;Akan
+Language_am;Amharic
+Language_an;Aragonese
+Language_ar;Arapça
+Language_as;Assamese
+Language_av;Avaric
+Language_ay;Aymara
+Language_az;Azeri
+Language_ba;Bashkir
+Language_be;Beyaz rusça
+Language_bg;Bulgarca
+Language_bh;Bihari
+Language_bi;Bislama
+Language_bm;Bambara
+Language_bn;Bengali
+Language_bo;Tibetan
+Language_br;Breton
+Language_bs;Boşnakça
+Language_ca;Katalanca
+Language_ce;Chechen
+Language_ch;Chamorro
+Language_co;Corsican
+Language_cr;Cree
+Language_cs;Çekçe
+Language_cu;Slave
+Language_cv;Chuvash
+Language_cy;Welsh
+Language_da;Flemenkçe
+Language_de;Almanca
+Language_dv;Divehi
+Language_dz;Dzongkha
+Language_ee;Ewe
+Language_el;Yunanca
+Language_en;İngilizce
+Language_en-gb;İngilizce (UK)
+Language_en-us;İngilizce (ABD)
+Language_eo;Esperanto
+Language_es;İspanyolca
+Language_et;Estonca
+Language_eu;Basque
+Language_fa;Farsça
+Language_ff;Fulah
+Language_fi;Fince
+Language_fj;Fijian
+Language_fo;Faroese
+Language_fr;Fransızca
+Language_fy;Frisian
+Language_ga;Irish
+Language_gd;Gaelic
+Language_gl;Galician
+Language_gn;Guarani
+Language_gu;Gujarati
+Language_gv;Manx
+Language_ha;Hausa
+Language_he;İbranice
+Language_hi;Hintçe
+Language_ho;Hiri Motu
+Language_hr;Hırvatça
+Language_ht;Haitice
+Language_hu;Macarca
+Language_hy;Ermenice
+Language_hz;Herero
+Language_ia;Yardımcı  Dil Derneği
+Language_id;Endonezca
+Language_ie;Interlingue
+Language_ig;Igbo
+Language_ii;Sichuan Yi
+Language_ik;Inupiaq
+Language_Info;Dil bilgisi
+Language_io;Ido
+Language_is;Icelandic
+Language_it;İtalyanca
+Language_iu;Inuktitut
+Language_ja;Japonca
+Language_jv;Javanese
+Language_ka;Gürcüce
+Language_kg;Kongo
+Language_ki;Kikuyu
+Language_kj;Kuanyama
+Language_kk;Kazakh
+Language_kl;Kalaallisut
+Language_km;Khmer
+Language_kn;Kannada
+Language_ko;Korece
+Language_kr;Kanuri
+Language_ks;Kashmiri
+Language_ku;Kürtçe
+Language_kv;Komi
+Language_kw;Cornish
+Language_ky;Kirghiz
+Language_la;Latince
+Language_lb;Luxembourgish
+Language_lg;Ganda
+Language_li;Limburgish
+Language_ln;Lingala
+Language_lo;Lao
+Language_lt;Lithuanian
+Language_lu;Luba-Katanga
+Language_lv;Latvian
+Language_mg;Malagasy
+Language_mh;Marshallese
+Language_mi;Maori
+Language_mk;Macedonian
+Language_ml;Malayalam
+Language_mn;Mongolian
+Language_mo;Moldavian
+Language_mr;Marathi
+Language_ms;Malay
+Language_mt;Maltese
+Language_mul;Çoklu diller
+Language_my;Burmese
+Language_na;Nauru
+Language_nb;Norveççe Bokmal
+Language_nd;Ndebele
+Language_ne;Nepali
+Language_ng;Ndonga
+Language_nl;Flemenkçe
+Language_nn;Norveççe Bokmal
+Language_no;Norveççe
+Language_nr;Ndebele
+Language_nv;Navaho
+Language_ny;Nyanja
+Language_oc;Occitan
+Language_oj;Ojibwa
+Language_om;Oromo
+Language_or;Oriya
+Language_os;Ossetic
+Language_pa;Panjabi
+Language_pi;Pali
+Language_pl;Polonyaca
+Language_ps;Pushto
+Language_pt;Portekizce
+Language_pt-br;Portekizce (Birazilya)
+Language_qu;Quechua
+Language_rm;Raeto-Romance
+Language_rn;Rundi
+Language_ro;Romance
+Language_ru;Rusça
+Language_rw;Kinyarwanda
+Language_sa;Sanskrit
+Language_sc;Sardinian
+Language_sd;Sindhi
+Language_se;Northern Sami
+Language_sg;Sango
+Language_si;Sinhalaca
+Language_sk;Slovakça
+Language_sl;Slovenian
+Language_sm;Samoan
+Language_sn;Shona
+Language_so;Somalica
+Language_sq;Albanian
+Language_sr;Sırpça
+Language_ss;Swati
+Language_st;Sotho
+Language_su;Sundanese
+Language_sv;Swedish
+Language_sw;Swahili
+Language_ta;Tamil
+Language_te;Telugu
+Language_tg;Tajik
+Language_th;Tayca
+Language_ti;Tigrinya
+Language_tk;Türkmence
+Language_tl;Tagalog
+Language_tn;Tswana
+Language_to;Tonga
+Language_tr;Türkçe
+Language_ts;Tsonga
+Language_tt;Tatar
+Language_tw;Twi
+Language_ty;Tahitian
+Language_ug;Uighur
+Language_uk;Ukrainian
+Language_ur;Urdu
+Language_uz;Özbekçe
+Language_ve;Venda
+Language_vi;Vietnamca
+Language_vo;Volapuk
+Language_wa;Walloon
+Language_wo;Wolof
+Language_xh;Xhosa
+Language_yi;Yiddish
+Language_yo;Yoruba
+Language_za;Zhuang
+Language_zh;Çince
+Language_zh-cn;Çince (Çin)
+Language_zh-tw;Çince (Tayvan)
+Language_zu;Zulu
+LawRating;Kanun oranı
+LCCN;LCCN
+Library;Çoklama kütüphanesi
+Lightness;Canlılık
+List;Liste
+Lyrics;Şarkı Sözleri
+Lyricist;Söz yazarı
+Mastered_Date;Sahip olma tarihi
+MasteredBy;Sahibi
+matrix_coefficients;Matriks katsayısı
+MediaInfo_About;Çok ayrıntılı bilgi sağlanan çokluortam\r\ndosyaları:\r\nMatroska, OGG (OGM dahil)\r\nMPEG1 (VCD dahil)\r\nMPEG2 (DVD ve SVCD dahil)\r\nMPEG4 (Itunes M4A dahil)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA dahil)\r\nMicrosoft RIFF (AVI, WAV dahil)\r\nSadece-ses biçimleri (AC3, DTS, AAC, AU, AIFF...)
+Menu;Menü
+Menu stream(s);Menü akışları
+Menu_Codec_List;Menü kodekleri
+Menu_No;Menü yok
+MenuCount;Meni sayısı
+Menu_Hint;Daha fazla olasılık
+MenuID;Menü ID
+mn;dk
+Mood;Mizaç
+More;Daha
+Movie;Film adı
+ms;ms
+MSDI;MSDI
+MusicBy;Müziği yapan
+MuxingMode;Çoklama kipi
+MuxingMode_MoreInfo;Çoklama kipi, daha fazla bilgi
+MuxingMode_PackedBitstream;Paketlenmiş bit akışı
+Name;Adı
+Nationality;Uyruk
+NetworkName;Ağ adı
+New;Yeni
+Newest version;Yeni sürümleri kontrol et (Internet bağlantısı gerekir)
+NewVersion_Menu;Yeni bir sürüm mevcut
+NewVersion_Question_Title;Yeni bir sürüm yayımlandı!
+NewVersion_Question_Content;Yeni sürüm (s%Version%) mevcut, indirmek istiyor musunuz?
+No;Hayır
+Not yet;Henüz değil
+NumColors;Renk sayısı
+OK;TAMAM
+One output file per input file;Girdi dosyası başına bir çıktı dosyası
+Open;Aç
+OpenCandy_01;İndirilen ________
+OpenCandy_02;__% Tamamlandı
+OpenCandy_03;Internet bağlantısı kopmuş
+OpenCandy_04;________ indirme tamamlandı
+OpenCandy_05;Kurmak için tıklayın ________
+OpenCandy_06;Kur'u iptal etmek istediğinize emin misiniz?\r\nEğer kurmayı sonraya ertelemek isterseniz, 'Hayır'ı seçin.\r\nNot: Bir dahaki seferden sonra yeniden başlatana kadar kurulumu ertelemek için menüden Çıkış'ı seçebilirsiniz.
+OpenCandy_07;Download of ________ has been paused.\r\nClick on the tray icon to resume downloading.
+OpenCandy_08;A critical error has occurred. Installation of _________ will be aborted.
+OpenCandy_09;İndirmeyi duraklat
+OpenCandy_10;Kurulumu iptal et
+OpenCandy_11;İndirmeye devam et
+OpenCandy_12;Kur'dan çık
+OpenCandy_13;___________ - Recommended by ____________
+OpenCandy_14;Downloading _________
+OpenCandy_15;___________, the software recommended to you by ___________, is now downloading at your requestWe will let you know when it is ready to be installed.
+OpenCandy_16;___________ is ready for installation
+OpenCandy_17;___________ is now fully downloaded. Please click on 'Install' to proceed.
+OpenCandy_18;___________ of ___________ downloaded
+OpenCandy_19;OpenCandy tarafından desteklenir
+OpenCandy_20;OpenCandy.com 'dan daha fazlasını öğrenin
+OpenCandy_21;Kur
+OpenCandy_22;Installation of ___________
+OpenCandy_23;This will cancel the installation of ___________\r\nAre you sure you wish to exit?
+OpenCandy_24;Duraklat
+OpenCandy_25;Your download has been paused. Click 'Resume' when you are ready to continue.
+OpenCandy_26;Devam
+OpenCandy_27;Hemen Kur
+OpenCandy_28;İndirmeyi duraklat
+OpenCandy_29;İndirmeye devam et
+OpenCandy_30;Kurulumu iptal et
+OpenCandy_31;Lütfen kurulum seçeneği seçin
+OpenCandy_32;Kur ___________
+OpenCandy_33;Kurma
+OpenCandy_34;Lütfen kurma seçeneği seçin
+OpenCandy_35;______ recommends this software
+OpenCandy_36;Your current installation will not be interrupted
+Options;Seçenekler
+Options_Hint;Tercihler
+Original;Orijinal
+OriginalNetworkName;Orijinal ağ adı
+OriginalSourceForm;Orijinal kaynak biçimi
+OriginalSourceMedium;Orijinal kaynak ortamı
+Other;Diğer
+Output;Çıktı
+Output format;Çıktı biçimi
+OverallBitRate;Kapsamlı bit oranı
+OverallBitRate_Maximum;En fazla kapsamlı bit oranı
+OverallBitRate_Minimum;En düşük kapsamlı bit oranı
+OverallBitRate_Mode;Kapsamlı bit oranı modu
+OverallBitRate_Nominal;Düşük kapsamlı bit oranı
+Part;Parça
+Part_Count;Toplam sayı
+Performer;Sanatçı
+Period;Dönem
+Phone;Telefon
+PixelAspectRatio;Piksel oranı
+PixelAspectRatio_Original;Piksel oranı
+PlayCounter;Oynatma Sayacı
+Played_Count;Oynatma süresi
+Played_First_Date;İlk oynatma
+Played_Last_Date;Son oynatma
+PlayTime;Oynatma Süresi
+Position;Konum
+Position_Total;Toplam
+Preferences;Tercihler
+Producer;Yapımcı
+ProductionDesigner;Üretim tasarımcısı
+ProductionStudio;Üretim sütüdyosu
+Publisher;Yayıncı
+Purchased_Date;Satın alma tarihi
+Quote character;Alıntı bölümü
+RadioStation;Radyo istasyonu
+Rating;İzlenme oranı
+Recorded_Date;Kaydedildiği tarih
+Recorded_Location;Kaydedildiği yer
+Released_Date;Yayım tarihi
+RemixedBy;Remiksleyen
+ReplayGain_Gain;Tekrar oynatma kazancı
+ReplayGain_Peak;Tekrar oynatma kazancı ucu
+Resolution;Çözünürlük
+s;s
+SamplingRate;Örnekleme oranı
+Save;Kaydet
+ScanType;Tarama türü
+ScanType_Original;Orijinal tarama türü
+ScanType_StoreMethod;
+ScanOrder;Tarama sırası
+ScanOrder_Original;Orijinal tarama sırası
+ScanOrder_Stored;
+ScanOrder_StoredDisplayedInverted;
+ScanOrder_StoreMethod;
+ScreenplayBy;Senaryo
+Season;Sezon
+see below;aşağı bakın
+Send HeaderFile;Lütfen Header dosyasını buraya gönderin : http://sourceforge.net/projects/mediainfo/ (Bug bölümü)
+Separator_Columns;Sütun ayırıcı
+Separator_Lines;Satır ayırıcı
+ServiceChannel;Hizmet kanal numarası
+ServiceName;Hizmet adı
+ServiceProvider;Hizmet sağlayıcısı
+ServiceType;Hizmet türü
+Set;Ayar
+Set_Count;Ayar sayısı
+Setup;Kurulum
+Sharpness;Keskinlik
+Sheet;Sayfa
+Sheet (Complete);Sayfa (Tam)
+Shell extension;Sistem uzantısı (gezginde sağ tuş tıklamada Media Info seçeneği olacak...)
+Shell extension, folder;Klasörler içinde
+Shell InfoTip;Sistem Bilgisi İpucu (gezginde, fareyi dosya üzerine taşıyın, bilgi görüntülenecek)
+Show menu;Menü göster
+Show toolbar;Araç çubuğu göster
+Sort;Sıralayan
+SamplingCount;Örnek sayısı
+SoundEngineer;Ses teknisyeni
+Source;Kaynak
+Source_Duration;Kaynak süresi
+Source_FrameCount;Kaynak kare sayısı
+Source_SamplingCount;Kaynak örnek sayısı
+Source_StreamSize;Kaynak akış boyutu
+Source_StreamSize_Encoded;Kaynak kodlanmış akış boyutu
+Standard;Standart
+StoreMethod_InterleavedFields;
+StoreMethod_SeparatedFields;
+StoreMethod_SeparatedFields_1;
+StoreMethod_SeparatedFields_2;
+Stream;Akış
+Stream_MoreInfo;Akış hakkında daha fazla bilgi
+StreamCount;Bu çeşidin akış sayısı
+StreamID;Akış ID
+StreamKind;Akış çeşidi
+StreamKindID;Akış tanımlayıcısı
+StreamKindPos;Akış tanımlayıcısı
+StreamSize;Akış boyutu
+StreamSize_Encoded;Kodlanmış akış boyutu
+StreamSize_Proportion;Bu akışın oranı
+Subject;Konu
+SubTrack;Altİz
+Summary;Özet
+Supported formats;Desteklenen biçimler
+Supported?;Desteklenen?
+Synopsis;Özet
+SystemId;Id
+Tagged_Application;Etiketleme uygulaması
+Tagged_Date;Etiketleme tarihi
+Technician;Teknisyen
+TermsOfUse;Kullanım şarları
+Text;Metin
+Text - Custom;Metin - Özel
+Text (HTML);Metin (HTML)
+Text stream(s);Yazı akış(lar)ı
+Text streams;Yazı akışı
+Text_Codec_List;Yazı kodekleri
+Text_No;Yazı yok
+Text1;Birinci altyazı
+Text2;İkinci altyazı
+Text3;Üçüncü altyazı
+TextCount;Altyazı sayısı
+ThanksTo;Teşekkürler
+Thousands separator;Binlik basamak ayırıcı
+Title;Başlık
+Title_More;Başlık, daha fazla bilgi
+TimeCode;Zaman kodu
+TimeCode_FirstFrame;İlk karenin zaman kodu
+TimeCode_Settings;Zaman kodu ayarları
+TimeCode_Source;Zaman kodu kaynağı
+TimeStamp;Zaman damgası
+TimeZone;Saat dilimi
+Total;Toplam
+Track;Parça adı
+Track_Count;Parça sayısı
+transfer_characteristics;Aktarım nitelikleri
+Translator;Çevirmen
+Tree;Ağaç
+Tree & Text;Ağaç ve Metin
+Type;Tür
+UniqueID;Eşsiz ID
+Unknown;Bilinmiyor
+Url;Url
+Video;Görüntü
+Video stream(s);Görüntü akış(lar)ı
+Video_Codec_List;Görüntü kodekleri
+Video_Delay;Görüntü gecikmesi
+Video_No;Görüntü yok
+Video0_Delay;Görüntü0 gecikmesi
+Video1;Birinci hareketli görüntü
+VideoCount;Hareketli görüntü sayısı
+View;Görünüm
+View_Hint;Görünüm bilgilerinin anlamını değiştirir
+Warning : more streams in the files;Uyarı : Dosyalarda fazla akış var
+Web;Web
+WebSite_Audio;Bu ses kodek'inin web sitesine git
+WebSite_Audio_More;Bu ses kodek'ini bulmak için (%Url%) web sitesine git
+WebSite_General;Bu dosya için oynatıcının sitesine git
+WebSite_General_More;Bu dosya için oynatıcının sitesine git
+WebSite_Text;Bu yazı kodek'inin web sitesine git
+WebSite_Text_More;Bu yazı ses kodek'ini bulmak için (%Url%) web sitesine git
+WebSite_Url;http://MediaArea.net/MediaInfo
+WebSite_Video;Bu görüntü kodek'inin web sitesine git
+WebSite_Video_More;Bu görüntü kodek'ini bulmak için (%Url%) web sitesine git
+Width;Genişlik
+Width_Original;Orijinal genişlik
+WriteMe;Bana yazın
+WriteToTranslator;Çevirmene yazın
+Written_Date;Yazıldığı tarih
+Written_Location;Yazıldığı yer
+WrittenBy;Yazan
+Yes;Evet
+Your system;Sisteminiz
+ZZ_Automatic_Percent;99
+ZZ_AutomaticLanguage_Percent;99

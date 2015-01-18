@@ -1,0 +1,13 @@
+HKCR
+{
+  NoRemove CLSID
+  {
+    ForceRemove {631B91DB-D412-4947-8E5A-340E4FF7E1BD} = s 'MPCBEShellExt Class'
+    {
+      InprocServer32 = s '%MODULE%'
+      {
+        val ThreadingModel = s 'Apartment'
+      }
+    }
+  }	
+}

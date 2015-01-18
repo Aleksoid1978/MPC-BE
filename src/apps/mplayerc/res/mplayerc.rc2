@@ -1,0 +1,178 @@
+//
+// mplayerc.rc2 - resources Microsoft Visual C++ does not edit directly
+//
+
+#ifdef APSTUDIO_INVOKED
+#error this file is not editable by Microsoft Visual C++
+#endif //APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Add manually edited resources here...
+#include "resource.h"
+#include "Version.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+1                       RT_MANIFEST             "res\\mpc-be.exe.manifest"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// FILE
+//
+
+IDF_LOGO0                        FILE                    "res\\logo.0.png"
+IDF_LOGO1                        FILE                    "res\\logo.1.png"
+IDF_SHADER_EMPTY                 FILE                    "res\\empty.hlsl"
+IDF_1PIX_GIF                     FILE                    "res\\web\\1pix.gif"
+IDF_BOTTOMSIDE_PNG               FILE                    "res\\web\\bottomside.png"
+IDF_CONTROLBACK_PNG              FILE                    "res\\web\\controlback.png"
+IDF_CONTROLBUTTONDECRATE_PNG     FILE                    "res\\web\\controlbuttondecrate.png"
+IDF_CONTROLBUTTONINCRATE_PNG     FILE                    "res\\web\\controlbuttonincrate.png"
+IDF_CONTROLBUTTONPAUSE_PNG       FILE                    "res\\web\\controlbuttonpause.png"
+IDF_CONTROLBUTTONPLAY_PNG        FILE                    "res\\web\\controlbuttonplay.png"
+IDF_CONTROLBUTTONSKIPBACK_PNG    FILE                    "res\\web\\controlbuttonskipback.png"
+IDF_CONTROLBUTTONSKIPFORWARD_PNG FILE                    "res\\web\\controlbuttonskipforward.png"
+IDF_CONTROLBUTTONSTEP_PNG        FILE                    "res\\web\\controlbuttonstep.png"
+IDF_CONTROLBUTTONSTOP_PNG        FILE                    "res\\web\\controlbuttonstop.png"
+IDF_CONTROLVOLUMEBAR_PNG         FILE                    "res\\web\\controlvolumebar.png"
+IDF_CONTROLVOLUMEGRIP_PNG        FILE                    "res\\web\\controlvolumegrip.png"
+IDF_CONTROLVOLUMEOFF_PNG         FILE                    "res\\web\\controlvolumeoff.png"
+IDF_CONTROLVOLUMEON_PNG          FILE                    "res\\web\\controlvolumeon.png"
+IDF_DEFAULT_CSS                  FILE                    "res\\web\\default.css"
+IDF_HEADERBACK_PNG               FILE                    "res\\web\\headerback.png"
+IDF_HEADERCLOSE_PNG              FILE                    "res\\web\\headerclose.png"
+IDF_HEADERICON_PNG               FILE                    "res\\web\\headericon.png"
+IDF_LEFTBOTTOMSIDE_PNG           FILE                    "res\\web\\leftbottomside.png"
+IDF_LEFTSIDE_PNG                 FILE                    "res\\web\\leftside.png"
+IDF_RIGHTBOTTOMSIDE_PNG          FILE                    "res\\web\\rightbottomside.png"
+IDF_RIGHTSIDE_PNG                FILE                    "res\\web\\rightside.png"
+IDF_SEEKBARGRIP_PNG              FILE                    "res\\web\\seekbargrip.png"
+IDF_SEEKBARLEFT_PNG              FILE                    "res\\web\\seekbarleft.png"
+IDF_SEEKBARMID_PNG               FILE                    "res\\web\\seekbarmid.png"
+IDF_SEEKBARRIGHT_PNG             FILE                    "res\\web\\seekbarright.png"
+IDF_SLIDERBACK_PNG               FILE                    "res\\web\\sliderback.png"
+IDF_SLIDERBAR_GIF                FILE                    "res\\web\\sliderbar.gif"
+IDF_SLIDERGRIP_GIF               FILE                    "res\\web\\slidergrip.gif"
+IDF_VBR_PNG                      FILE                    "res\\web\\vbg.png"
+IDF_VBS_PNG                      FILE                    "res\\web\\vbs.png"
+IDF_FAVICON                      FILE                    "res\\web\\favicon.png"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// HTML
+//
+
+IDR_HTML_404                     HTML                    "res\\web\\404.html"
+IDR_HTML_BROWSER                 HTML                    "res\\web\\browser.html"
+IDR_HTML_CONTROLS                HTML                    "res\\web\\controls.html"
+IDR_HTML_INDEX                   HTML                    "res\\web\\index.html"
+IDR_HTML_INFO                    HTML                    "res\\web\\info.html"
+IDR_HTML_PLAYER                  HTML                    "res\\web\\player.html"
+IDR_HTML_VARIABLES               HTML                    "res\\web\\variables.html"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+IDR_MAINFRAME                    ICON                    "res\\icon.ico"
+IDI_AUDIOCD                      ICON                    "res\\Icon_41.ico"
+IDI_DVD                          ICON                    "res\\Icon_114.ico"
+IDI_UNKNOWN                      ICON                    "res\\Icon_116.ico"
+IDR_TB_PLAY                      ICON                    "res\\tb_play_16.ico"
+IDR_TB_PAUSE                     ICON                    "res\\tb_pause_16.ico"
+IDR_TB_STOP                      ICON                    "res\\tb_stop_16.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_ONOFF                        BITMAP                  "res\\onoff.bmp"
+IDB_MONO                         BITMAP                  "res\\mono.bmp"
+IDB_STEREO                       BITMAP                  "res\\stereo.bmp"
+IDB_NOAUDIO                      BITMAP                  "res\\noaudio.bmp"
+IDB_STREAMTYPES                  BITMAP                  "res\\streamtypes.bmp"
+IDB_PLAYERTOOLBAR_PNG            PNG                     "res\\toolbar.png"
+IDB_PLAYERFLYBAR_PNG             PNG                     "res\\flybar.png"
+IDB_W7_TOOLBAR                   PNG                     "res\\Toolbarw7.png"
+IDB_W7_AUDIO                     PNG                     "res\\audio.png"
+IDB_DXVA_ON                      PNG                     "res\\gpu.png"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AVI
+//
+
+IDR_AVI_FILECOPY                 AVI                     "res\\ani.avi"
+IDR_AVI_WEB_FILECOPY             AVI                     "res\\ani_web.avi"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION MPC_VERSION_NUM_SVN
+ PRODUCTVERSION MPC_VERSION_NUM
+ FILEFLAGSMASK 0x1fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "Based on the original MPC v6.4.9.0 © Gabest & MPC-HC"
+            VALUE "CompanyName", MPC_COMP_NAME_STR
+            VALUE "FileVersion", MPC_VERSION_STR_SVN
+            VALUE "LegalCopyright", MPC_COPYRIGHT_STR
+#ifdef _WIN64
+            VALUE "FileDescription", "MPC-BE x64"
+            VALUE "InternalName", "mpc-be64"
+            VALUE "OriginalFilename", "mpc-be64.exe"
+            VALUE "ProductName", "MPC-BE x64"
+#else
+            VALUE "FileDescription", "MPC-BE"
+            VALUE "InternalName", "mpc-be"
+            VALUE "OriginalFilename", "mpc-be.exe"
+            VALUE "ProductName", "MPC-BE"
+#endif
+            VALUE "ProductVersion", MPC_VERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // English (United States) resources

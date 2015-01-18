@@ -1,0 +1,143 @@
+
+
+This is a timeline change log, see features included in each release ABOVE release number
+
+
+-----------------------
+2.0 Major version bump
+-----------------------
+
+Fixed a bug on V2 CHAD construction, affects absolute colorimetric intent
+Fixed a bug that prevented linkicc to work
+Fixed a bug on transicc that made profiles with output colorants info to malfunction
+Fixed a bug on Lab + Alpha float formatters, added such predefined formatters as well
+Added cmsChangeBufferFormat for backwards compatibility
+Added UTILS_UNUSED_PARAMETER for samples
+Added a check on jpgicc for NULL transforms
+Fixed VC2010, VC2008 projects
+Added cmsTagLinkedTo
+Fixed some typos in error messages
+Peliminary Delphi wrapper 
+Fixed a bug in tificc in floating point formats
+Fixed a bug in device link creation on v4 profiles
+Fixed a bug in psid and profile sequence tags 
+Fixed memory leaks on when recovering from errors
+Fixed an issue on curve inversion
+Fixed several integer overflow and other integrity checks, thanks to Chris Evans
+linkicc now stores the rendering intent in the profile header
+Fixed delphi interface
+Added Duotone support (Bilinear interpolation)
+Fixed a bug on curve reversing when source curves have few points
+Added bound check in floating point interpolation
+
+-----------------------
+2.1 Maintenance release
+-----------------------
+
+Fixed severa bugs in absolute colorimetric intent
+Removed pthreads need
+Updated linkicc to 2.1, cleanup
+Fixed some potential issues as NULL dereferencing
+Fixed GBD bug (out of bounds memory overwrite) 
+changed memmove to memcpy in cache for xput improvement 
+Profiles with weird curves are not prone to p`relinearization optimization.
+Added functions to retrieve formatters from transforms
+Fixed a bug that made crash black preservation on CMYK2CMYK devicelinks
+Added named color functionality
+Fixed a bug in black preservation and sligtly non-monotonic curves
+Added dictionary metatag support
+Fixed a bug on ReadRAWtag 
+Pascal unit now is supported by Free Pascal Compiler
+
+-----------------------
+2.2 Maintenance release
+-----------------------
+
+Fixed a 0 byte allocation issue in _cmsCreateSubAllocChunk
+Fixed encoding for floating point tags in Lab/XYZ 
+Fixed Absolute colorimetric intent issues
+Fixed a bug on the range of data in transicc, when colorant tag is specified
+Adding a memory alignment macro for CGATS parser
+Updated to ICC spec 4.3
+Added compatibilty with Argyll's CGATS parser
+
+-----------------------
+2.3 Maintenance release
+-----------------------
+
+Fixed a bug in the named color devicelink generation
+Fixed uint64 to work in systems without long long native type
+Added performance improvements from several contributors, mostly Artifex
+Fixed a bug in black preservation checking
+Added black point detection algorithm from Adobe paper
+Added support for transforms on planar data with different stride
+Added a new plug in entry for full transform
+Exposed internal overview table for tone curves
+gamma 1.0 can now operate in unbounded mode
+Fixed a bug in pipeline duplication
+Added getPipelineContextID
+Added a new plug-in type
+Internal stage structs are now accessible through plug-in API
+Fixed a bug on ending zero when saving a IT8 to memory
+Fixed a bug on IT8 reading of negative numbers.
+Increased security checks, thanks to Mateusz Jurczyk, from Google.
+Added half float support
+Fixed a typo on tificc and jpgicc names, thanks to Elle Stone for reporting.
+Fixed a bug on named color profiles.
+Added a conditional compilatio flag for "half" support
+Fixed a bug in transicc when clot tables are present
+Added formatter resolution after xform optimization plugin
+added half float variants (ABGR and so)
+Fixed a bug in XYZ floating point PCS
+Fixed an unitialized read on PatchLUT
+Added a check for maximum input channels
+
+--------------------
+2.4 Featured release
+--------------------
+
+User defined parametric curves can now be saved in ICC profiles.
+RGB profiles using same tone curves for several channels are storing now only one copy of the curve (saves space)
+Fixed a multithead bug on optimization (StageDEF)
+Fixed some 64 bit warnings on size_t to uint32 conversions
+update black point detection algorithm to reflect ICC changes
+Added new cmsPlugInTHR() and fixed some race conditions (thanks to Artifex)
+Added error descriptions on cmsSmoothToneCurve 
+Fixed a bug on  big endian platforms not supporting uint64 or long long.
+Fixed some bugs on floating point curves.
+Several improvements in cgats parser.
+Several minor issues found by cppcheck
+Fixed devicelink generation for 8 bits
+Added a reference for Mac MLU tag
+Added a way to read the profile creator from header
+Added identity curves support for write V2 LUT 
+More changes from Artifex
+Added TIFF Lab16 handling on tifficc
+Added some fixes from XhmikosR
+Fixed a bug in parametric curves
+Remove spurious tabs added by git merge of pull request
+Added support for VS2012
+Added a simple project for cppcheck
+Rendering intent used when creating the transform is now propagated to profile header in cmsTransform2Devicelink. This is because 7.2.15 in spec 4.3
+Transform2Devicelink now keeps white point when guessing deviceclass is enabled
+Added some checks for non-happy path, mostly failing mallocs
+
+-----------------------
+2.5 Maintenance release
+-----------------------
+
+Fixed a double free in recovering from a previous error in default intent handler.
+Fixed some indexing out of bounds in floating point interpolation
+Fixed a bug in PCS/Colorspace order when reading V2 Lab devicelinks
+Added a way to retrieve matrix shaper always, no matter LUT is present
+Changed endianess detection for PowerPC
+Fixed memory leaks on error handling
+Big revamp on Contexts, from Artifex
+New locking plug-in, from Artifex
+Added directories for tiff, jpeg in configure script
+Fix for delete tag memory corruption
+Added pthread dependency. From now lcms supports multithreading
+
+-----------------------
+2.6 Featured release
+-----------------------

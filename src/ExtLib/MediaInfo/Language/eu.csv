@@ -1,0 +1,1040 @@
+  Language_ISO639;eu
+  Author_Email;azpidatziak@gmail.com
+  Author_Name;Xabier Aramendi
+  Author_OldNames;
+  Language_Name;Euskara
+  Config_Text_ColumnSize;40
+  Config_Text_Separator; : 
+  Config_Text_NumberTag; Z
+  Config_Text_FloatSeparator;,
+  Config_Text_ThousandsSeparator; 
+ audio stream1; audio jarioa
+ audio stream2; audio jarioa
+ audio stream3; audio jarioa
+ bit1; bit
+ bit2; bit
+ bit3; bit
+ bps; bs-ko
+ Bps; Bs-ko
+ Byte1; Byte
+ Byte2; Byte
+ Byte3; Byte
+ channel1; bide
+ channel2; bide
+ channel3; bide
+ chapter1; atala
+ chapter2; atal
+ chapter3; atal
+ chapters stream1; atal jarioa
+ chapters stream2; atal jarioa
+ chapters stream3; atal jarioa
+ day1; egun
+ day2; egun
+ day3; egun
+ dB1; dB
+ dB2; dB
+ dB3; dB
+ file1; agiri
+ file2; agiri
+ file3; agiri
+ frame1; frame
+ frame2; frame
+ frame3; frame
+ fps1; fs-ko
+ fps2; fs-ko
+ fps3; fs-ko
+ GB; GB
+ Gb; Gb
+ Gbps; Gbs-ko
+ GBps; GBs-ko
+ GHz; GHz
+ GiB; GiB
+ GibiByte1; GibiByte
+ GibiByte2; GibiByte
+ GibiByte3; GibiByte
+ GiBps; GiBs-ko
+ GigaBit1; GigaBit
+ GigaBit2; GigaBit
+ GigaBit3; GigaBit
+ GigaByte1; GigaByte
+ GigaByte2; GigaByte
+ GigaByte3; GigaByte
+ hour1; ordu
+ hour2; ordu
+ hour3; ordu
+ Hz; Hz
+ image stream1; irudi jarioa
+ image stream2; irudi jarioa
+ image stream3; irudi jarioa
+ KB; KB
+ Kb; Kb
+ KBps; KBs-ko
+ Kbps; Kbs-ko
+ KHz; KHz
+ KiB; KiB
+ KibiBit1; KibiBit
+ KibiBit2; KibiBit
+ KibiBit3; KibiBit
+ KibiByte1; KibiByte
+ KibiByte2; KibiByte
+ KibiByte3; KibiByte
+ KiBps; KiBs-ko
+ KiloBit1; KiloBit
+ KiloBit2; KiloBit
+ KiloBit3; KiloBit
+ KiloByte1; KiloByte
+ KiloByte2; KiloByte
+ KiloByte3; KiloByte
+ MB; MB
+ Mb; Mb
+ Mbps; Mbs-ko
+ MBps; MebiByte
+ MebiBit1; MebiBit
+ MebiBit2; MebiBit
+ MebiBit3; MebiBit
+ MebiByte1; MebiByte
+ MebiByte2; MebiByte
+ MebiByte3; MebiByte
+ MegaBit1; MegaBit
+ MegaBit2; MegaBit
+ MegaBit3; MegaBit
+ MegaByte1; MegaByte
+ MegaByte2; MegaByte
+ MegaByte3; MegaByte
+ MHz; MHz
+ MiB; MiB
+ Mib; Mib
+ MiBps; MiBs-ko
+ millisecond1; segundumilaen
+ millisecond2; segundumilaen
+ millisecond3; segundumilaen
+ minute1; minutu
+ minute2; minutu
+ minute3; minutu
+ month1; hilabete
+ month2; hilabete
+ month3; hilabete
+ pixel1; pixel
+ pixel2; pixel
+ pixel3; pixel
+ second1; segundu
+ second2; segundu
+ second3; segundu
+ text stream1; idazki jarioa
+ text stream2; idazki jarioa
+ text stream3; idazki jarioa
+ video frames1; bideo framea
+ video frames2; bideo framea
+ video frames3; bideo framea
+ video stream1; bideo jarioa
+ video stream2; bideo jarioa
+ video stream3; bideo jarioa
+ warppoint0;Zakartze-punturik ez
+ warppoint1; zakartzepuntua
+ warppoint2; zakartzepuntu
+ warppoint3; zakartzepuntu
+ week1; aste
+ week2; aste
+ week3; aste
+ year1; urte
+ year2; urte
+ year3; urte
+, ;, 
+: ;: 
+About;Honi buruz
+About_Hint;Nola jarri harremanetan nirekin eta azken bertsioa aurkitu
+Accompaniment;Laguntza
+ActiveFormatDescription;Eragin Heuskarri Azalpena
+ActiveFormatDescription_MuxingMode;Eragin Heuskarri Azalpena, Nahasketa modua
+Actor;Antzezlea
+Actor_Character;Pertsonaia
+Added_Date;Gehitze eguna
+Address;Helbidea
+Advanced;Aurreratua
+Advanced mode;Modu aurreratua
+Album;Bilduma
+Album_ReplayGain_Gain;Bilduma berrirakurketa irabazia
+Album_ReplayGain_Peak;Bilduma berrirakurketa irabazi gailurra
+Alignment;Lerrokapena
+Alignment_Aligned;Lerrokatu tarteetan
+Alignment_Split;Banandu tarteetan
+All;Denak
+Archival_Location;Agiritegi helbidea
+Arranger;Konpontzailea
+ArtDirector;Arte-Zuzendaria
+AspectRatio;Ikuspegi maila
+AssistantDirector;Laguntzaile-Zuzendaria
+at;
+At least one file;(Agiri bat gutxienez ireki behar duzu)
+Audio;Audioa
+Audio stream(s);Audio jarioak
+Audio_Codec_List;Audio kodekak
+Audio_No;Audiorik ez
+Audio1;Lehen audioa jarioa
+Audio2;Bigarren audioa jarioa
+AudioCount;Audio jario zenbatekoa
+Author;Egilea
+BarCode;BarraKodea
+Basic;Ohinarrizkoa
+Basic_Note;Oharra: Agiri honi buruzko argibide gehiagorako, ikuspegi ezberdin bat hautatu behar duzu (Orria, Zuhaitza...)
+BitDepth;Bit sakonera
+BitDepth_Stored;
+BitRate;Bit neurria
+BitRate_Maximum;Gehinezko bit neurria
+BitRate_Minimum;Gutxienezko bit neurria
+BitRate_Mode;Bit neurri modua
+BitRate_Mode_CBR;Aldagaitza
+BitRate_Mode_VBR;Aldakorra
+BitRate_Nominal;Bit neurri izendatua
+BitRate_Encoded;Kodeaketa bit neurria
+Bits-(Pixel*Frame);Bit/(Pixel*Frame)
+BufferSize;Buffer neurria
+Cancel;Ezeztatu
+Channel(s);Bide
+ChannelPositions;Bide kokapenak
+Chapter(s);Atal
+Chapters;Atalak
+Chapters stream(s);Atal jarioa(k)
+Chapters_Codec_List;Atal kodekak
+Chapters_No;Atalik ez
+ChaptersCount;Atal jario zenbatekoa
+CheckNewVersion;Egiaztatu bertsio berririk dagoen
+Choose custom;Hautatu egilea
+Choose custom sheet;Hautatu gogoko duzun egile orria
+Choose custom text;Hautatu gogoko duzun egile idazkia
+Choose export format;Hautatu gogoko duzun esportazio heuskarria
+Choose file(s);Hautatu irekitzeko agiriak
+Choose filename;Hautatu gogoko duzun agirizena
+Choose language;Hautatu gogoko duzun hizkuntza
+Choregrapher;Dantza-musikaria
+Chroma;Margoa
+ChromaSubsampling;Margo azpilaginketa
+Close;Itxi
+Close all before open;Itxi dena ireki aurretik
+Codec;Kodeka
+Codec_Description;Kodek azalpena
+Codec_Info;Kodekaren xehetasunak
+Codec_Settings;Kodek ezarpenak
+Codec_Settings_PacketBitStream;Kodek ezarpenak, Pakete bitjarioa
+Codec_Settings_BVOP;Kodek ezarpenak, BVOP
+Codec_Settings_QPel;Kodek ezarpenak, QPel
+Codec_Settings_GMC;Kodek ezarpenak, GMC
+Codec_Settings_Matrix;Kodek ezarpenak, Matrix
+Codec_Settings_Floor;Kodek ezarpenak, Floor
+Codec_Settings_CABAC;Kodek ezarpenak, CABAC
+Codec_Settings_Firm;Kodek ezarpenak, Firm
+Codec_Settings_Endianness;Kodek ezarpenak, Endianness
+Codec_Settings_Sign;Kodek ezarpenak, Sign
+Codec_Settings_Law;Kodek ezarpenak, Law
+Codec_Settings_ITU;Kodek ezarpenak, ITU
+Codec_Profile;Kodek profila
+Codec_Url;Kodekaren weblotura
+CodecID;Kodek ID-a
+CodecID_Description;Kodekaren azalpena:
+Collection;Bilduma
+Colorimetry;Margoneurketa
+ColorSpace;Margo tartea
+colour_primaries;Lehen margoak
+Comment;Aipamena
+CommissionedBy;Eskatzailea
+Compilation;Bilketa
+CompleteName;Izen osoa
+Composer;Osatzailea
+Compression_Mode;Konpresio modua
+Compression_Mode_Lossless;Galeragabe
+Compression_Mode_Lossy;Galerakin
+Compression_Ratio;Konpresio maila
+Conductor;Gidaria
+Container and general information;Edukiontzia eta argibide orokorrak
+ContentType;Eduki-Mota
+CoProducer;Ekoizkidea
+Copyright;Copyrighta
+CostumeDesigner;Diseinatzailea
+Count;Zenbatekoa
+Country;Herrialdea
+Cover;Azala
+Cover_Datas;Azal datuak
+Cover_Description;Azal azalpena
+Cover_Mime;Azal MIME
+Cover_Type;Azal mota
+Cropped;Mozketa neurriak
+Custom;Egilea
+Customize;Norbereratu
+Date;Eguna
+Debug;Garbiketa
+Decimal point;Hamarren puntua
+Delay;Atzerapena
+Delay_Source;Atzerapena, jatorria
+Delay_Source_Container;Edukiontzia
+Delay_Source_Stream;Raw jarioa
+Delete;Ezabatu
+Description;Azalpena
+Digitized_Date;Digitalizatze eguna
+Dimensions;Neurriak
+Director;Zuzendaria
+DirectorOfPhotography;Argazki zuzendaria
+DisplayAspectRatio;Erakuspen ikuspegi maila
+DisplayAspectRatio_Original;Jatorrizko ikuspegi maila
+DistributedBy;Banatzailea
+Donate;Eman dirulaguntza bat
+DotsPerInch;Puntu hatzbeteko
+Duration;Iraupena
+Duration_End;Amaiera denbora
+Duration_Start;Hasiera denbora
+Edit;Editatu
+EditedBy;Editatzailea
+EMail;Post@
+Encoded_Application;Idazketa aplikazioa
+Encoded_Date;Kodeaketa eguna
+Encoded_Library;Idazketa liburutegia
+Encoded_Library_Settings;Kodeaketa ezarpenak
+Encoded_Original;Jatorrizko sostengua
+EncodedBy;Kodeatzailea
+EPG_Positions;EPG kokapenak (barnean)
+Error_File;Akatsa agiria irakurtzerakoan
+ExecutiveProducer;Ekintza ekoizlea
+Exit;Irten
+Exit_Hint;Utzi programa
+Export;Esportatu
+Export_Hint;Esportatu norbere heuskarri batean
+Extensions;Arrunt erabilitako hedapenak
+Family;Sendia
+Fax;Faxa
+File;Agiria
+File size;Agiri neurria
+File_Append;Gehitu dagoen agiriari (Kontuz : zaindu parametroak berdinak izatea)
+File_Created_Date;Agiriaren sortze eguna
+File_Created_Date_Local;Agiriaren sortze eguna (tokikoa)
+File_Hint;Hautatu aztertzeko multimedia agiri bat
+File_Modified_Date;Agiriaren azken aldaketa eguna
+File_Modified_Date_Local;Agiriaren azken aldaketa eguna (tokikoa)
+FileExtension;Agiri hedapena
+FileName;Agiri izena
+FileSize;Agiri neurria
+Folder;Agiritegia
+Folder (R);Agiritegia (R)
+Folder (R)_Hint;Hautatu aztertzeko agiritegi bat (agiritegi guztiak jarraian)
+Folder (Recursively);Agiritegia (Jarrian)
+Folder_Hint;Hautatu aztertzeko agiritegi bat
+FolderName;Agiritegi izena
+Format;Heuskarria
+Format_Commercial;Merkatal izena
+Format_Commercial_IfAny;Merkatal izena
+Format_Description;Heuskarriaren azalpena
+Format_Info;Heuskarriaren xehatasunak
+Format_Profile;Heuskarriaren profila
+Format_Settings;Heuskarriaren ezarpenak
+Format_Settings_PacketBitStream;Heuskarri ezarpenak, Pakete bitjarioa
+Format_Settings_BVOP;Heuskarri ezarpenak, BVOP
+Format_Settings_QPel;Heuskarri ezarpenak, QPel
+Format_Settings_GMC;Heuskarri ezarpenak, GMC
+Format_Settings_Matrix;Heuskarri ezarpenak, Matrix
+Format_Settings_Matrix_Custom;Egilea
+Format_Settings_Matrix_Default;Berezkoa
+Format_Settings_Floor;Heuskarri ezarpenak, Floor
+Format_Settings_CABAC;Heuskarri ezarpenak, CABAC
+Format_Settings_Firm;Heuskarri ezarpenak, Firm
+Format_Settings_Endianness;Heuskarri ezarpenak, Endianness
+Format_Settings_RefFrames;Heuskarri ezarpenak, ReFrames
+Format_Settings_Sign;Heuskarri ezarpenak, Sign
+Format_Settings_Law;Heuskarri ezarpenak, Law
+Format_Settings_ITU;Heuskarri ezarpenak, ITU
+Format_Settings_SBR;Heuskarri ezarpenak, SBR
+Format_Settings_PS;Heuskarri ezarpenak, PS
+Format_Settings_Pulldown;Heuskarri ezarpenak, Pulldown
+Format_Settings_Mode;Modua
+Format_Settings_FrameMode;Frame modua
+Format_Settings_Emphasis;Emfasia
+Format_Settings_ModeExtension;Modu hedapena
+Format_Settings_GOP;Heuskarri ezarpenak, GOP
+Format_Version;Heuskarri bertsioa
+Format_Url;Heuskarriaren weblotura
+FrameCount;Frame zenbatekoa
+FrameRate;Frame neurria
+FrameRate_Mode;Frame neurri modua
+FrameRate_Mode_CFR;Aldagaitza
+FrameRate_Mode_VFR;Aldakorra
+FrameRate_Minimum;Gutxienezko frame neurria
+FrameRate_Nominal;Frame neurria izendatua
+FrameRate_Maximum;Gehienezko frame neurria
+FrameRate_Original;Jatorrizko frame neurria
+General;Orokorra
+Genre;Mota
+Genre_000;Bluesa
+Genre_001;Rock Klasikoa
+Genre_002;Countrya
+Genre_003;Dancea
+Genre_004;Diskoa
+Genre_005;Funka
+Genre_006;Grungea
+Genre_007;Hip-Hopa
+Genre_008;Jazza
+Genre_009;Metala
+Genre_010;New Agea
+Genre_011;Oldiesa
+Genre_012;Beste
+Genre_013;Popa
+Genre_014;R&B-a
+Genre_015;Rapa
+Genre_016;Reggaea
+Genre_017;Rocka
+Genre_018;Teknoa
+Genre_019;Industriala
+Genre_020;Alternatiboa
+Genre_021;Ska
+Genre_022;Death Metala
+Genre_023;Pranksa
+Genre_024;Soundtracka
+Genre_025;Euro-Teknoa
+Genre_026;Ambienta
+Genre_027;Trip-Hopa
+Genre_028;Ahotsa
+Genre_029;Jazza+Funka
+Genre_030;Fusiona
+Genre_031;Tranzea
+Genre_032;Klasikoa
+Genre_033;Instrumentala
+Genre_034;Acida
+Genre_035;Housea
+Genre_036;Gamea
+Genre_037;Sound Klipa
+Genre_038;Gospela
+Genre_039;Noisea
+Genre_040;AlternRocka
+Genre_041;Bassa
+Genre_042;Soula
+Genre_043;Punka
+Genre_044;Spacea
+Genre_045;Meditatiboa
+Genre_046;Pop Instrumentala
+Genre_047;Rock Instrumentala
+Genre_048;Etnikoa
+Genre_049;Gotikoa
+Genre_050;Darkwavea
+Genre_051;Tekno-Industriala
+Genre_052;Elektronikoa
+Genre_053;Pop-Folka
+Genre_054;Eurodancea
+Genre_055;Dreama
+Genre_056;Southern Rocka
+Genre_057;Komedia
+Genre_058;Culta
+Genre_059;Gangsta
+Genre_060;Top 40
+Genre_061;Kristau Rapa
+Genre_062;Pop/Funka
+Genre_063;Junglea
+Genre_064;Indira Amerikarra
+Genre_065;Kabareta
+Genre_066;New Wavea
+Genre_067;Psikodelikoa
+Genre_068;Ravea
+Genre_069;Showtunesa
+Genre_070;Trailerra
+Genre_071;Lo-Fia
+Genre_072;Tribala
+Genre_073;Acid Punka
+Genre_074;Acid Jazza
+Genre_075;Polka
+Genre_076;Retroa
+Genre_077;Musikala
+Genre_078;Rock & Rolla
+Genre_079;Hard Rocka
+Genre_080;Folka
+Genre_081;Folk-Rocka
+Genre_082;Folk Nazionala
+Genre_083;Swinga
+Genre_084;Fast Fusiona
+Genre_085;Beboba
+Genre_086;Latina
+Genre_087;Revivala
+Genre_088;Zeltiarra
+Genre_089;Bluegrassa
+Genre_090;Avantgardea
+Genre_091;Rock Gotikoa
+Genre_092;Rock Progresiboa
+Genre_093;Rock Psikodelikoa
+Genre_094;Rock Sinfonikoa
+Genre_095;Slow Rocka
+Genre_096;Big Banda
+Genre_097;Abesbatza
+Genre_098;Entzun Erraza
+Genre_099;Akustikoa
+Genre_100;Humorea
+Genre_101;Hizketa
+Genre_102;Abestia
+Genre_103;Antzez-abestia
+Genre_104;Ganbara Musika
+Genre_105;Sonata
+Genre_106;Sinfonia
+Genre_107;Booty Bassa
+Genre_108;Primusa
+Genre_109;Porn Groovea
+Genre_110;Satirea
+Genre_111;Slow Jama
+Genre_112;Cluba
+Genre_113;Tangoa
+Genre_114;Samba
+Genre_115;Folklorea
+Genre_116;Balada
+Genre_117;Power Balada
+Genre_118;Soul Ritmikoa
+Genre_119;Freestylea
+Genre_120;Dueta
+Genre_121;Punk Rocka
+Genre_122;Drum Soloa
+Genre_123;A capella
+Genre_124;Euro-Housea
+Genre_125;Dance Halla
+Genre_126;Goa
+Genre_127;Drum & Bassa
+Genre_128;Club-Housea
+Genre_129;Hardcorea
+Genre_130;Beldurrezkoa
+Genre_131;Indiea
+Genre_132;Britpopa
+Genre_133;Negerpunka
+Genre_134;Polsk Punka
+Genre_135;Beata
+Genre_136;Kristau Gangsta Rapa
+Genre_137;Heavy Metala
+Genre_138;Black Metala
+Genre_139;Crossoverra
+Genre_140;Kristau Garaikidea
+Genre_141;Kristau Rocka
+Genre_142;Merengea
+Genre_143;Salsa
+Genre_144;Trash Metala
+Genre_145;Anima
+Genre_146;JPopa
+Genre_147;Synthpopa
+Genre_148;Abstraktoa
+Genre_149;Art Rocka
+Genre_150;Baroque
+Genre_151;Bhangra
+Genre_152;Big Beata
+Genre_153;Breakbeata
+Genre_154;Chillouta
+Genre_155;Downtempoa
+Genre_156;Duba
+Genre_157;EBM
+Genre_158;Eklektikoa
+Genre_159;Elektroa
+Genre_160;Elektroclasha
+Genre_161;Emoa
+Genre_162;Esperimentala
+Genre_163;Garagea
+Genre_164;Globala
+Genre_165;IDM-a
+Genre_166;Illbienta
+Genre_167;Industri-Gotikoa
+Genre_168;Jam Banda
+Genre_169;Krautrocka
+Genre_170;Leftfielda
+Genre_171;Loungea
+Genre_172;Math Rocka
+Genre_173;Erromantiko Berria
+Genre_174;Nu-Breakza
+Genre_175;Post-Punka
+Genre_176;Post-Rocka
+Genre_177;Psytrance
+Genre_178;Shoegaze
+Genre_179;Space Rocka
+Genre_180;Trop Rocka
+Genre_181;Munduko Musika
+Genre_182;Neoklasikoa
+Genre_183;Audio-liburua
+Genre_184;Audio Zinema
+Genre_185;Neue Deutsche Welle
+Genre_186;Podcasta
+Genre_187;Indie Rocka
+Genre_188;G-Funka
+Genre_189;Dubstep
+Genre_190;Garage Rocka
+Genre_191;Psybienta
+Go to WebSite;Joan webgunera
+Grouping;Multzokapena
+h;h
+Header file;Sortu idazburu agiria
+Height;Garaiera
+Height_Original;Jatorrizko garaiera
+Help;Laguntza
+Hint;Hint
+How many audio streams?;Zenbat audio jario?
+How many chapters streams?;Zenbat atal jario?
+How many text streams?;Zenbat idazki jario?
+How many video streams?;Zenbat bideo jario?
+HTML;HTML
+ID;ID-a
+Image;Irudia
+Image stream(s);Irudi jarioak
+Image_Codec_List;Kodek Irudia
+ImageCount;Irudi jario zenbatekoa
+Info;Argibideak
+Instruments;Tresnak
+Interlacement;Elkarlotura
+Interlaced_Interlaced;Elkarlotuta
+Interlaced_TFF;Goiko Eremua Lehenik
+Interlaced_BFF;Beheko Eremua Lehenik
+Interlaced_PPF;Aurrerakorra
+Interlaced_Progressive;Aurrerakorra
+Interleaved;Tartekatuta
+Interleave_Duration;Tartekatuta, iraupena
+Interleave_Preload;Tartekatuta, aurregertaketa iraupena
+Interleave_VideoFrames;Tartekatuta, iraupena
+InternetMediaType;Internet multimedia mota
+IRCA;IRCA
+ISBN;ISBN
+ISRC;ISRC
+Keywords;Laterteklak
+Known codecs;Ezagutu kodekak
+Known formats;Ezagutu heuskarriak
+Known parameters;Ezagutu parametroak
+Label;Etiketa
+Language;Hizkuntza
+Language_More;Hizkuntza, argibide gehiago
+Language_aa;Afarera
+Language_ab;Abkhazianera
+Language_ae;Avestanera
+Language_af;Afrikaanera
+Language_ak;Akanera
+Language_am;Amharicera
+Language_an;Aragoiera
+Language_ar;Arabiera
+Language_as;Assamesera
+Language_av;Avarikera
+Language_ay;Aymarera
+Language_az;Azerbaianera
+Language_ba;Bashkirera
+Language_be;Belaerrusiera
+Language_bg;Bulgariera
+Language_bh;Bihariera
+Language_bi;Bislamera
+Language_bm;Bambarera
+Language_bn;Bengaliera
+Language_bo;Tibetera
+Language_br;Bretainiera
+Language_bs;Bosniera
+Language_ca;Kataluniera
+Language_ce;Txetxeniera
+Language_ch;Chamorroera
+Language_co;Korsikera
+Language_cr;Creeera
+Language_cs;Txekiera
+Language_cu;Eslavera
+Language_cv;Chuvashera
+Language_cy;Galesera
+Language_da;Daniera
+Language_de;Alemaniera
+Language_dv;Divehiera
+Language_dz;Dzongkhaera
+Language_ee;Eweera
+Language_el;Greziera
+Language_en;Ingelera
+Language_en-gb;Ingelera (Erresuma Batua)
+Language_en-us;Ingelera (Estatu Batuak)
+Language_eo;Esperantoera
+Language_es;Espainiera
+Language_et;Estoniera
+Language_eu;Euskara
+Language_fa;Persiera
+Language_ff;Fulahera
+Language_fi;Finlandiera
+Language_fj;Fijianera
+Language_fo;Faroera
+Language_fr;Frantziera
+Language_fy;Frisiera
+Language_ga;Irlandera
+Language_gd;Gaeliera
+Language_gl;Galiziera
+Language_gn;Guaraniera
+Language_gu;Gujaratiera
+Language_gv;Manxera
+Language_ha;Hausaera
+Language_he;Hebraiera
+Language_hi;Hindera
+Language_ho;Hiri Motuera
+Language_hr;Kroaziera
+Language_ht;Haitiera
+Language_hu;Hungariera
+Language_hy;Armeniera
+Language_hz;Hereroera
+Language_ia;Hizkuntza Elkarte Laguntzailea
+Language_id;Indonesiera
+Language_ie;Interlinguera
+Language_ig;Igboera
+Language_ii;Sichuan Yiera
+Language_ik;Inupiaqera
+Language_Info;Hizkuntza argibideak
+Language_io;Idoera
+Language_is;Islandiera
+Language_it;Italiera
+Language_iu;Inuktitutera
+Language_ja;Japoniera
+Language_jv;Javanera
+Language_ka;Georgiera
+Language_kg;Kongoera
+Language_ki;Kikuyuera
+Language_kj;Kuanyamaera
+Language_kk;Kazakhera
+Language_kl;Kalaallisutera
+Language_km;Khmerera
+Language_kn;Kannadera
+Language_ko;Koreaera
+Language_kr;Kanuriera
+Language_ks;Kashmiriera
+Language_ku;Kurdistanera
+Language_kv;Komiera
+Language_kw;Korniera
+Language_ky;Kirghizera
+Language_la;Latinera
+Language_lb;Luxenburgera
+Language_lg;Gandaera
+Language_li;Linburgera
+Language_ln;Lingalaera
+Language_lo;Laoera
+Language_lt;Lituaniera
+Language_lu;Luba-Katangera
+Language_lv;Letoniea
+Language_mg;Malagasiera
+Language_mh;Marshallera
+Language_mi;Maoriera
+Language_mk;Mazedoniera
+Language_ml;Malayalamera
+Language_mn;Mongoliera
+Language_mo;Moldabiera
+Language_mr;Marathiera
+Language_ms;Malaiera
+Language_mt;Maltaera
+Language_mul;Hizkuntza anitz
+Language_my;Burmesera
+Language_na;Nauruera
+Language_nb;Norbegiera Bokmal
+Language_nd;Ndebelera
+Language_ne;Nepaliera
+Language_ng;Ndongaera
+Language_nl;Herbeherera
+Language_nn;Norbegiera Nynorsk
+Language_no;Norbegiera
+Language_nr;Ndebelera
+Language_nv;Navajoera
+Language_ny;Nyanjera
+Language_oc;Okzitaniera
+Language_oj;Ojibwaera
+Language_om;Oromoera
+Language_or;Oriyaera
+Language_os;Osetiera
+Language_pa;Panjabiera
+Language_pi;Paliera
+Language_pl;Poloniera
+Language_ps;Pushtoera
+Language_pt;Portugalera
+Language_pt-br;Portugalera (Brazil)
+Language_qu;Quechuera
+Language_rm;Raeto-Erromantzea
+Language_rn;Rundiera
+Language_ro;Errumaniera
+Language_ru;Errusiera
+Language_rw;Kinyarwandera
+Language_sa;Sanskritera
+Language_sc;Sardiniera
+Language_sd;Sindhiera
+Language_se;Ipar Samiera
+Language_sg;Sangoera
+Language_si;Sinhalaera
+Language_sk;Eslobakiera
+Language_sl;Eslobeniera
+Language_sm;Samoera
+Language_sn;Shonaera
+Language_so;Somaliera
+Language_sq;Albaniera
+Language_sr;Serbiera
+Language_ss;Swatiera
+Language_st;Sothoera
+Language_su;Sundanera
+Language_sv;Suediera
+Language_sw;Swahiliera
+Language_ta;Tamilera
+Language_te;Teluguera
+Language_tg;Tajikera
+Language_th;Thailandiera
+Language_ti;Tigrinyera
+Language_tk;Turkmeniera
+Language_tl;Tagalogera
+Language_tn;Tswanaera
+Language_to;Tongaera
+Language_tr;Turkiera
+Language_ts;Tsongaera
+Language_tt;Tatarrera
+Language_tw;Twiera
+Language_ty;Tahitiera
+Language_ug;Uighurrera
+Language_uk;Ukrainiera
+Language_ur;Urduera
+Language_uz;Uzbekera
+Language_ve;Vendaera
+Language_vi;Vietnamiera
+Language_vo;Volapukera
+Language_wa;Waloniera
+Language_wo;Wolofera
+Language_xh;Xhosaera
+Language_yi;Yiddiera
+Language_yo;Yorubera
+Language_za;Zhuangera
+Language_zh;Txinera
+Language_zh-cn;Txinera (Txina)
+Language_zh-tw;Txinera (Taiwan)
+Language_zu;Zuluera
+LawRating;Lege maila
+LCCN;LCCN
+Library;Nahasketa liburutegia
+Lightness;Argitasuna
+List;Zerrenda
+Lyrics;Abestidatziak
+Lyricist;Abestidazlea
+Mastered_Date;Masterizatze eguna
+MasteredBy;Masterizatzailea
+matrix_coefficients;Matrize ezaugarriak
+MediaInfo_About;MediaInfo-k sarbide erraza eskaintzen du bideo eta audio agirien argibide teknikoetara eta etiketara.\r\nSoftware askea da, honek esanahi du dohainekoa dela erabiltzaileentzat eta garatzaileek askatasuna dutela ikertzeko, hobetzeko eta programa birbanatzeko (BSD baimena)
+Menu;Menua
+Menu stream(s);Menu jarioak
+Menu_Codec_List;Menu kodekak
+Menu_No;Menurik ez
+MenuCount;Menu jario zenbatekoa
+Menu_Hint;Aukera gehiago
+MenuID;Menu ID-a
+mn;mn
+Mood;Modua
+More;Gehiago
+Movie;Filma izena
+ms;sm
+MSDI;MSDI
+MusicBy;Musikaria
+MuxingMode;Nahasketa modua
+MuxingMode_MoreInfo;Nahasketa modua, argibide gehiago
+MuxingMode_PackedBitstream;Paketatutako bitjarioa
+Name;Izena
+Nationality;Herrialdetasuna
+NetworkName;Sare izena
+New;Berria
+Newest version;Egiaztatu bertsio berririk dagoen (beharrezkoa Internet elkarketa)
+NewVersion_Menu;Bertsio berri bat eskuragarri dago
+NewVersion_Question_Title;Bertsio berri bat argitaratu da!
+NewVersion_Question_Content;Bertsio berri bat (v%Version%) eskuragarri dago, jeistea nahi duzu?
+No;Ez
+Not yet;Oraindik ez
+NumColors;Margo zenbatekoa
+OK;Ongi
+One output file per input file;Irteera agiri bat sarrera agiriko
+Open;Ireki
+OpenCandy_01;Jeisten ________
+OpenCandy_02;__% Osatuta
+OpenCandy_03;Internet elkarketa etenda
+OpenCandy_04;________ jeisketa osatatuta
+OpenCandy_05;Klikatu ezartzeko ________
+OpenCandy_06;Zihur zaude ezarpena ezeztatzea nahi duzula?\r\nEzarpen geroagorako uztea nahi baduzu, hautatu 'Ez'.\r\nOharra: Irten hautatu dezakezu menutik ezarpena geroagoratzeko hurrengo aldian berrabiarazi arte.
+OpenCandy_07;________ jeisketa pausatuta dago.\r\nKlikatu erretilu ikurrean jeisketari berrekiteko.
+OpenCandy_08;Akats larri bat gertatu da. _________-ren ezarpena utzi egin da.
+OpenCandy_09;Pausatu jeisketa
+OpenCandy_10;Ezarpena ezeztatu
+OpenCandy_11;Berrekin jeisketa
+OpenCandy_12;Irten Ezartzailetik
+OpenCandy_13;___________ - Gomendatzailea: ____________
+OpenCandy_14;_________ Jeisten
+OpenCandy_15;___________, ___________-k gomendatzen dizun softwarea jeisten ari da. Ezartzeko gertu dagoenean jakinaraziko dizugu.
+OpenCandy_16;___________ gertu dago ezartzeko
+OpenCandy_17;___________ osorik jeitsita dago. Mesedez klikatu 'Ezarri' jarraitzeko.
+OpenCandy_18;___________ -> ___________ jeitsita
+OpenCandy_19;OpenCandy-ek garatuta
+OpenCandy_20;Gehiago jakiteko: OpenCandy.com
+OpenCandy_21;Ezarri
+OpenCandy_22;___________-ren ezarpena
+OpenCandy_23;Honek ___________-ren ezarpena ezeztatuko du\r\nZihur zaude irtetzea nahi duzula?
+OpenCandy_24;Pausatu
+OpenCandy_25;Zure jeisketa pausatuta dago. Klikatu 'Berrekin' jarraitzeko gertu zaudenean.
+OpenCandy_26;Berrekin
+OpenCandy_27;Ezarri Orain
+OpenCandy_28;Pausatu Jeisketa
+OpenCandy_29;Berrekin Jeisketa
+OpenCandy_30;Ezeztatu Ezarpena
+OpenCandy_31;Mesedez hautatu ezarpen aukera
+OpenCandy_32;Ezarri ___________
+OpenCandy_33;Ez Ezarri
+OpenCandy_34;Mesedez hautatu ezarpen aukera
+OpenCandy_35;______ software hau gomendatzen du
+OpenCandy_36;Zure uneko ezarpena ez da etengo
+Options;Aukerak
+Options_Hint;Hobespenak
+Original;Jatorrizkoa
+OriginalNetworkName;Jatorrizko sare izena
+OriginalSourceForm;Jatorrizko iturburua forma
+OriginalSourceMedium;Jatorrizko iturburu tartekoa
+Other;Beste
+Output;Irteera
+Output format;Irteera heuskarria
+OverallBitRate;Bit neurria guztira
+OverallBitRate_Maximum;Gehienezko bit neurria guztira
+OverallBitRate_Minimum;Gutxienezko bit neurria guztira
+OverallBitRate_Mode;Bit neurri modua guztira
+OverallBitRate_Nominal;Bit neurria izendatua guztira
+Part;Zatia
+Part_Count;Zenbatekoa guztira
+Performer;Egilea
+Period;Aldia
+Phone;Urrutizkina
+PixelAspectRatio;Pixel ikuspegi maila
+PixelAspectRatio_Original;Jatorrizko ikuspegi maila
+PlayCounter;Irakurketa-Zenbatzailea
+Played_Count;Irakurritako aldiak
+Played_First_Date;Lehen irakurria
+Played_Last_Date;Azken irakurria
+PlayTime;Irakurketa-Denbora
+Position;Kokapena
+Position_Total;Guztira
+Preferences;Hobespenak
+Producer;Ekoizlea
+ProductionDesigner;Ekoizpen diseinatzailea
+ProductionStudio;Ekoizpen estudioa
+Publisher;Argitaratzailea
+Purchased_Date;erosketa eguna
+Quote character;Kakotxa hizkirria
+RadioStation;Irrati katea
+Rating;Mailaketa
+Recorded_Date;Grabaketa eguna
+Recorded_Location;Grabaketa helbidea
+Released_Date;Argitaratze eguna
+RemixedBy;Bernahastzailea
+ReplayGain_Gain;Berrirakurkea irabazia
+ReplayGain_Peak;Berrirakurkea irabazi gailurra
+Resolution;Bereizmena
+s;s
+SamplingRate;Laginketa neurria
+Save;Gorde
+ScanType;Mihaketa mota
+ScanType_Original;
+ScanType_StoreMethod;
+ScanOrder;Mihaketa hurrenkera
+ScanOrder_Original;
+ScanOrder_Stored;
+ScanOrder_StoredDisplayedInverted;
+ScanOrder_StoreMethod;
+ScreenplayBy;Gidoilaria
+Season;Denboraldia
+see below;ikusi behean
+Send HeaderFile;Mesedez bidalidazu Idazburu agiria hona : http://sourceforge.net/projects/mediainfo/ (Akats arloa)
+Separator_Columns;Zutabe banantzailea
+Separator_Lines;Lerro banatzailea
+ServiceChannel;Zerbitzuaren bide zenbatekoa
+ServiceName;Zerbitzuaren izena
+ServiceProvider;Zerbitzu hornitzailea
+ServiceType;Zerbitzu mota
+Set;Ezarri
+Set_Count;Ezarri zenbatekoa
+Setup;Ezarpena
+Sharpness;Garbitasuna
+Sheet;Orria
+Sheet (Complete);Orria (Osoa)
+Shell extension;Explorer hedapena (Windows Explorer, eskuin klikatu agiri bat, MediaInfo aukera bat egongo da)
+Shell extension, folder;Agiritegientzat ere bai
+Shell InfoTip;Explorer Tresnaburua (Explorerrean, mugitu sagua agiriaren gainean, argibideak erakutsiko dira)
+Show menu;Erakutsi menua
+Show toolbar;Erakutsi tresnabarra
+Sort;Antolatu honela
+SamplingCount;Lagin zenbatekoa
+SoundEngineer;Soinu ingeniaria
+Source;Iturburua
+Source_Duration;Iturburu iraupena
+Source_FrameCount;Iturburu frame zenbatekoa
+Source_SamplingCount;Iturburu lagin zenbatekoa
+Source_StreamSize;Iturburu jario neurria
+Source_StreamSize_Encoded;Iturburu kodeaketa jario neurria
+Standard;Estandarra
+StoreMethod_InterleavedFields;
+StoreMethod_SeparatedFields;
+StoreMethod_SeparatedFields_1;
+StoreMethod_SeparatedFields_2;
+Stream;Jarioa
+Stream_MoreInfo;Jarioari buruzko argibide gehiago
+StreamCount;Mota honetako jario zenbatekoa
+StreamID;Jario ID-a
+StreamKind;Jario Mota
+StreamKindID;Jario ezagutarazlea
+StreamKindPos;Jario ezagutarazlea
+StreamSize;Jario neurria
+StreamSize_Encoded;Kodeaketa jario neurria
+StreamSize_Proportion;Jario honen proporzioa
+Subject;Gaia
+SubTrack;Azpibidea
+Summary;Laburpena
+Supported formats;Sostengatutako heuskarriak
+Supported?;Sostengatua?
+Synopsis;Laburpena
+SystemId;Id-a
+Tagged_Application;Aplikazio etiketatzea
+Tagged_Date;Etiketatze eguna
+Technician;Teknikaria
+TermsOfUse;Erabilpen baldintzak
+Text;Idazkia
+Text - Custom;Idazkia - Egilea
+Text (HTML);Idazkia (HTML)
+Text stream(s);Idazki jarioak
+Text streams;Idazki jarioak
+Text_Codec_List;Idazki kodekak
+Text_No;Idazkirik ez
+Text1;Lehen idazki jarioa
+Text2;Bigarren idazki jarioa
+Text3;Hirugarren idazki jarioa
+TextCount;Idazki jario zenbatekoa
+ThanksTo;Eskerrak
+Thousands separator;Milaka bananatzaile
+Title;Izenburua
+Title_More;Izenburua, argibide gehiago
+TimeCode;Denbora-kodea
+TimeCode_FirstFrame;Denbora-kodea, lehen Framea
+TimeCode_Settings;Denbora-kodea, ezarpenak
+TimeCode_Source;Denbora-kodea, iturburua
+TimeStamp;TimeZone
+TimeZone;Ordu-Eremua
+Total;Guztira
+Track;Bide izena
+Track_Count;Bide zenbatekoa
+transfer_characteristics;Eskualdaketa ezaugarriak
+Translator;Itzultzailea
+Tree;Zuhaitza
+Tree & Text;Zuhaitza eta Idazkia
+Type;Mota
+UniqueID;ID bakarra
+Unknown;Ezezaguna
+Url;Url-a
+Video;Bideoa
+Video stream(s);Bideo jarioa(k)
+Video_Codec_List;Bideo Kodekak
+Video_Delay;Bideoarekiko atzerapena
+Video_No;Bideorik ez
+Video0_Delay;Bideo0 atzerapena
+Video1;Lehen bideo jarioa
+VideoCount;Bideo jario zenbatekoa
+View;Ikusi
+View_Hint;Aldatu argibideak ikusteko modua
+Warning : more streams in the files;Kontuz : jario gehiago daude agirietan
+Web;Webgunea
+WebSite_Audio;Joan audio kodek honen webgunera
+WebSite_Audio_More;Joan webgunera (%Url%) audio kodek hau bilatzeko
+WebSite_General;Joan agiri honentzako irakurgailu webgunera
+WebSite_General_More;Joan agiri honentzako irakurgailu webgunera
+WebSite_Text;Joan idazki kode honen webgunera
+WebSite_Text_More;Joan webgunera (%Url%) idazki kodek hau bilatzeko
+WebSite_Url;http://MediaArea.net/MediaInfo
+WebSite_Video;Joan bideo kodek honen webgunera
+WebSite_Video_More;Joan webgunera (%Url%) bideo kodek hau bilatzeko
+Width;Zabalera
+Width_Original;Jatorrizko zabalera
+WriteMe;Idatzi post@ egileari
+WriteToTranslator;Idatzi itzultzaileari
+Written_Date;Idazte eguna
+Written_Location;Idazte helbidea
+WrittenBy;Idazlea
+Yes;Bai
+Your system;Zure sistema
+ZZ_Automatic_Percent;98
+ZZ_AutomaticLanguage_Percent;98

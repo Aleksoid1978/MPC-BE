@@ -1,0 +1,12 @@
+﻿The following files have MPC-BE specific custom code (compared to VirtualDub):
+
+* src/ExtLib/VirtualDub/h/vd2/system/vdstl_vector.h
+* src/ExtLib/VirtualDub/h/vd2/system/vdtypes.h
+
+* src/ExtLib/VirtualDub/Kasumi/h/stdafx.h
+* src/ExtLib/VirtualDub/Kasumi/source/resample_stages_x64.cpp
+
+* src/ExtLib/VirtualDub/system/h/stdafx.h
+* src/ExtLib/VirtualDub/system/source/a_memory.asm
+* src/ExtLib/VirtualDub/system/source/memory.cpp
+* src/ExtLib/VirtualDub/system/source/time.cpp

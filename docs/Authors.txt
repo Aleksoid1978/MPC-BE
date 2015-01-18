@@ -1,0 +1,65 @@
+﻿Based on the original version (C) 2002-2006 by Gabest (e-mail unknown)
+On the basis of the source code of the "Media Player Classic Home Cinema", Casimir666 (casimir666@users.sourceforge.net).
+The GUI on the basis of the original patch bobdynlan (bobdynlan@users.sourceforge.net), with the adaptation of Leo1000 (leothousan@users.sourceforge.net).
+
+Active: (with SVN commit rights)
+--------
+aleksoid (Admin, Senior Software Engineer, Forum moderator, Code) - Aleksoid1978@mail.ru, Russia
+arestarh1986 (Documentation) - Ukraine
+Dimbat (Design) - zingerus@mail.ru, Russia
+exodus8 (Code) - Russia
+judelaw (Code) - judelaw@mpc-next.ru, Ukraine
+kinjalka (Code) - Russia
+szl (Software Engineer Technologist, Forum moderator) - szl@mpc-next.ru, icq:6531931, Russia
+v0lt (Admin, Forum moderator, Code)
+u_shell (translate documents) - Russia
+
+Inactive:
+----------
+leothousan (Code)
+
+Translators:
+-------------
+Basque - azpidatziak - Xabier Aramendi (azpidatziak@users.sourceforge.net)
+Chinese (Simplified) - insolo
+Chinese (Traditional) - beter
+Dutch - beter
+German - Markus Gaugg (gaugg@gmx.at), Sylt, Luan, Klaus
+Italian - Lord Maius
+Korean - kuh3h3
+Turkish - Thingol
+Ukrainian - arestarh1986, Ukraine
+Japanese - Gyeong, Socket774
+
+Official Beta testers:
+----------------------
+7Azimuth
+Al321 - barnoba2011@yandex.ru
+Amour - France
+Antonij72 - Russia
+DroneZ
+Evgeniy1990
+Gideon Vi
+gest
+gjf
+Karinas
+krmit
+kuh3h3
+NaNo3791
+Nexuss
+Mezonix
+pIv
+realister12
+sid44sid
+Shark007 - http://shark007.net
+SoulMasterTm
+sumdumguy
+textbook
+usalex
+Venomsword
+vitsat
+wanezhiling
+watcherhd
+z_mashine
+
+Many thanks to everyone who supported development without having svn write access.

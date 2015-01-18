@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0DA1DA7D-F393-4E7C-A7CE-CB5C6A67BC94}</ProjectGuid>
+    <RootNamespace>ZenLib</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>ZenLib</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="..\..\platform.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_LIB;ZENLIB_NO_WIN9X_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>ZenLib/PreComp.h</PrecompiledHeaderFile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <EnablePREfast>false</EnablePREfast>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_LIB;ZENLIB_NO_WIN9X_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>ZenLib/PreComp.h</PrecompiledHeaderFile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_LIB;ZENLIB_NO_WIN9X_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>ZenLib/PreComp.h</PrecompiledHeaderFile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <EnablePREfast>false</EnablePREfast>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_LIB;ZENLIB_NO_WIN9X_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>ZenLib/PreComp.h</PrecompiledHeaderFile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="ZenLib\Conf.cpp" />
+    <ClCompile Include="ZenLib\CriticalSection.cpp" />
+    <ClCompile Include="ZenLib\Dir.cpp" />
+    <ClCompile Include="ZenLib\File.cpp" />
+    <ClCompile Include="ZenLib\FileName.cpp" />
+    <ClCompile Include="ZenLib\HTTP_Client.cpp" />
+    <ClCompile Include="ZenLib\InfoMap.cpp" />
+    <ClCompile Include="ZenLib\int128s.cpp" />
+    <ClCompile Include="ZenLib\int128u.cpp" />
+    <ClCompile Include="ZenLib\MemoryDebug.cpp" />
+    <ClCompile Include="ZenLib\OS_Utils.cpp" />
+    <ClCompile Include="ZenLib\PreComp.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ZenLib\Thread.cpp" />
+    <ClCompile Include="ZenLib\Translation.cpp" />
+    <ClCompile Include="ZenLib\Utils.cpp" />
+    <ClCompile Include="ZenLib\Ztring.cpp" />
+    <ClCompile Include="ZenLib\ZtringList.cpp" />
+    <ClCompile Include="ZenLib\ZtringListList.cpp" />
+    <ClCompile Include="ZenLib\ZtringListListF.cpp" />
+    <ClCompile Include="ZenLib\Format\Http\Http_Cookies.cpp" />
+    <ClCompile Include="ZenLib\Format\Http\Http_Handler.cpp" />
+    <ClCompile Include="ZenLib\Format\Http\Http_Request.cpp" />
+    <ClCompile Include="ZenLib\Format\Http\Http_Utils.cpp" />
+    <ClCompile Include="ZenLib\Format\Html\Html_Handler.cpp" />
+    <ClCompile Include="ZenLib\Format\Html\Html_Request.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ZenLib\BitStream.h" />
+    <ClInclude Include="ZenLib\BitStream_Fast.h" />
+    <ClInclude Include="ZenLib\BitStream_LE.h" />
+    <ClInclude Include="ZenLib\Conf.h" />
+    <ClInclude Include="ZenLib\CriticalSection.h" />
+    <ClInclude Include="ZenLib\Dir.h" />
+    <ClInclude Include="ZenLib\File.h" />
+    <ClInclude Include="ZenLib\FileName.h" />
+    <ClInclude Include="ZenLib\HTTP_Client.h" />
+    <ClInclude Include="ZenLib\InfoMap.h" />
+    <ClInclude Include="ZenLib\int128s.h" />
+    <ClInclude Include="ZenLib\int128u.h" />
+    <ClInclude Include="ZenLib\MemoryDebug.h" />
+    <ClInclude Include="ZenLib\MemoryUtils.h" />
+    <ClInclude Include="ZenLib\OS_Utils.h" />
+    <ClInclude Include="ZenLib\PreComp.h" />
+    <ClInclude Include="ZenLib\Thread.h" />
+    <ClInclude Include="ZenLib\Trace.h" />
+    <ClInclude Include="ZenLib\Translation.h" />
+    <ClInclude Include="ZenLib\Utils.h" />
+    <ClInclude Include="ZenLib\Ztring.h" />
+    <ClInclude Include="ZenLib\ZtringList.h" />
+    <ClInclude Include="ZenLib\ZtringListList.h" />
+    <ClInclude Include="ZenLib\ZtringListListF.h" />
+    <ClInclude Include="ZenLib\Format\Html\Html_Handler.h" />
+    <ClInclude Include="ZenLib\Format\Html\Html_Request.h" />
+    <ClInclude Include="ZenLib\Format\Http\Http_Cookies.h" />
+    <ClInclude Include="ZenLib\Format\Http\Http_Handler.h" />
+    <ClInclude Include="ZenLib\Format\Http\Http_Request.h" />
+    <ClInclude Include="ZenLib\Format\Http\Http_Utils.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

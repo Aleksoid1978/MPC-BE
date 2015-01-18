@@ -1,0 +1,1040 @@
+  Language_ISO639;ru
+  Author_Email;solokot@gmail.com
+  Author_Name;solokot
+  Author_OldNames;lost in history
+  Language_Name;Русский
+  Config_Text_ColumnSize;40
+  Config_Text_Separator; : 
+  Config_Text_NumberTag; #
+  Config_Text_FloatSeparator;,
+  Config_Text_ThousandsSeparator;
+ audio stream1; аудиопоток
+ audio stream2; аудиопотока
+ audio stream3; аудиопотоков
+ bit1; бит
+ bit2; бит
+ bit3; бит
+ bps; бит/сек
+ Bps; байт/сек
+ Byte1; байт
+ Byte2; байт
+ Byte3; байт
+ channel1; канал
+ channel2; канала
+ channel3; каналов
+ chapter1; раздел
+ chapter2; раздела
+ chapter3; разделов
+ chapters stream1; поток разделов
+ chapters stream2; потока разделов
+ chapters stream3; потоков разделов
+ day1; день
+ day2; дня
+ day3; дней
+ dB1; дБ
+ dB2; дБ
+ dB3; дБ
+ file1; файл
+ file2; файла
+ file3; файлов
+ frame1; кадр
+ frame2; кадра
+ frame3; кадров
+ fps1; кадр/сек
+ fps2; кадра/сек
+ fps3; кадров/сек
+ GB; ГБ
+ Gb; Гб
+ Gbps; Гбит/сек
+ GBps; Гбайт/сек
+ GHz; ГГц
+ GiB; Гбайт
+ GibiByte1; Гибибайт
+ GibiByte2; Гибибайт
+ GibiByte3; Гибибайт
+ GiBps; Гбайт/сек
+ GigaBit1; Гигабит
+ GigaBit2; Гигабит
+ GigaBit3; Гигабит
+ GigaByte1; Гигабайт
+ GigaByte2; Гигабайт
+ GigaByte3; Гигабайт
+ hour1; час
+ hour2; часа
+ hour3; часов
+ Hz; Гц
+ image stream1; поток изображений
+ image stream2; потока изображений
+ image stream3; потоков изображений
+ KB; КБ
+ Kb; Кб
+ KBps; Кбайт/сек
+ Kbps; Кбит/сек
+ KHz; КГц
+ KiB; Кбайт
+ KibiBit1; Кибибит
+ KibiBit2; Кибибит
+ KibiBit3; Кибибит
+ KibiByte1; Кибибайт
+ KibiByte2; Кибибайт
+ KibiByte3; Кибибайт
+ KiBps; Кбайт/сек
+ KiloBit1; Килобит
+ KiloBit2; Килобит
+ KiloBit3; Килобит
+ KiloByte1; Килобайт
+ KiloByte2; Килобайт
+ KiloByte3; Килобайт
+ MB; МБ
+ Mb; Мб
+ Mbps; Мбит/сек
+ MBps; Мбайт/сек
+ MebiBit1; Мебибит
+ MebiBit2; Мебибит
+ MebiBit3; Мебибит
+ MebiByte1; Мебибайт
+ MebiByte2; Мебибайт
+ MebiByte3; Мебибайт
+ MegaBit1; Мегабит
+ MegaBit2; Мегабит
+ MegaBit3; Мегабит
+ MegaByte1; Мегабайт
+ MegaByte2; Мегабайт
+ MegaByte3; Мегабайт
+ MHz; МГц
+ MiB; Мбайт
+ Mib; Миб
+ MiBps; Мбайт/сек
+ millisecond1; миллисекунда
+ millisecond2; миллисекунды
+ millisecond3; миллисекунд
+ minute1; минута
+ minute2; минуты
+ minute3; минут
+ month1; месяц
+ month2; месяца
+ month3; месяцов
+ pixel1; пиксель
+ pixel2; пикселя
+ pixel3; пикселей
+ second1; секунда
+ second2; секунды
+ second3; секунд
+ text stream1; текстовый поток
+ text stream2; текстовых потока
+ text stream3; текстовых потоков
+ video frames1; видеокадр
+ video frames2; видеокадра
+ video frames3; видеокадров
+ video stream1; видеопоток
+ video stream2; видеопотока
+ video stream3; видеопотоков
+ warppoint0;Без точки перехода
+ warppoint1; точка перехода
+ warppoint2; точки перехода
+ warppoint3; точек перехода
+ week1; неделя
+ week2; недели
+ week3; недель
+ year1; год
+ year2; года
+ year3; лет
+, ;, 
+: ;: 
+About;О программе
+About_Hint;Как связаться со мной и найти последнюю версию программы
+Accompaniment;Сопровождение
+ActiveFormatDescription;Описание активного формата
+ActiveFormatDescription_MuxingMode;Описание активного формата, режим смешивания
+Actor;Исполнитель
+Actor_Character;Роль
+Added_Date;Дата добавлениия
+Address;Адрес
+Advanced;Дополнительно
+Advanced mode;Расширенный режим
+Album;Альбом
+Album_ReplayGain_Gain;Нормализатор звука альбома
+Album_ReplayGain_Peak;Пик нормализатора звука альбома
+Alignment;Выравнивание
+Alignment_Aligned;Соединение по промежуткам
+Alignment_Split;Разделение по промежуткам
+All;Все
+Archival_Location;Место хранения
+Arranger;Аранжировщик
+ArtDirector;Арт-директор
+AspectRatio;Соотношение
+AssistantDirector;Помощник режиссёра
+at;в
+At least one file;Необходимо открыть как минимум один файл
+Audio;Аудио
+Audio stream(s);Аудиопотоки
+Audio_Codec_List;Аудиокодеки
+Audio_No;Нет аудио
+Audio1;Первый аудиопоток
+Audio2;Второй аудиопоток
+AudioCount;Кол-во аудиопотоков
+Author;Автор
+BarCode;Штрихкод
+Basic;Кратко
+Basic_Note;Примечание: для дополнительной информации выберите другую закладку (таблица, дерево,...)
+BitDepth;Битовая глубина
+BitDepth_Stored;
+BitRate;Битрейт
+BitRate_Maximum;Максимальный битрейт
+BitRate_Minimum;Минимальный битрейт
+BitRate_Mode;Вид битрейта
+BitRate_Mode_CBR;Постоянный
+BitRate_Mode_VBR;Переменный
+BitRate_Nominal;Номинальный битрейт
+BitRate_Encoded;Закодированный битрейт
+Bits-(Pixel*Frame);Бит/(Пиксели*Кадры)
+BufferSize;Размер буфера
+Cancel;Отмена
+Channel(s);Каналы
+ChannelPositions;Расположение каналов
+Chapter(s);Разделы
+Chapters;Разделы
+Chapters stream(s);Потоки разделов
+Chapters_Codec_List;Кодеки разделов
+Chapters_No;Нет разделов
+ChaptersCount;Кол-во разделов
+CheckNewVersion;Проверить наличие новой версии
+Choose custom;Выбрать
+Choose custom sheet;Выбрать таблицу
+Choose custom text;Выбрать текст
+Choose export format;Выберите формат вывода
+Choose file(s);Выберите файлы
+Choose filename;Выберите имя файла
+Choose language;Выберите язык
+Choregrapher;Хореограф
+Chroma;Цветность
+ChromaSubsampling;Субдискретизация насыщенности
+Close;Закрыть
+Close all before open;Закрывать всё перед открытием новых файлов
+Codec;Кодек
+Codec_Description;Описание кодека
+Codec_Info;Подробно о кодеке
+Codec_Settings;Настройки кодека
+Codec_Settings_PacketBitStream;Параметр пакетного потока данных кодека
+Codec_Settings_BVOP;Параметр BVOP кодека
+Codec_Settings_QPel;Параметр QPel кодека
+Codec_Settings_GMC;Параметр GMC кодека
+Codec_Settings_Matrix;Параметр матрицы кодека
+Codec_Settings_Floor;Параметр Floor кодека
+Codec_Settings_CABAC;Параметр CABAC кодека
+Codec_Settings_Firm;Параметр Firm кодека
+Codec_Settings_Endianness;Параметр Endianness кодека
+Codec_Settings_Sign;Параметр Sign кодека
+Codec_Settings_Law;Параметр Law кодека
+Codec_Settings_ITU;Параметр ITU кодека
+Codec_Profile;Профиль кодека
+Codec_Url;Ссылка на кодек
+CodecID;Идентификатор кодека
+CodecID_Description;Описание кодека
+Collection;Коллекция
+Colorimetry;Колориметрия
+ColorSpace;Цветовое пространство
+colour_primaries;Основные цвета
+Comment;Примечание
+CommissionedBy;Поручитель
+Compilation;Компиляция
+CompleteName;Полное имя
+Composer;Композитор
+Compression_Mode;Метод сжатия
+Compression_Mode_Lossless;Без потерь
+Compression_Mode_Lossy;С потерями
+Compression_Ratio;Степень сжатия
+Conductor;Дирижёр
+Container and general information;Общая информация
+ContentType;Тип содержимого
+CoProducer;Сопродюсер
+Copyright;Правообладатель
+CostumeDesigner;Художник по костюмам
+Count;Кол-во
+Country;Страна
+Cover;Обложка
+Cover_Datas;Данные обложки
+Cover_Description;Описание обложки
+Cover_Mime;MIME-тип обложки
+Cover_Type;Тип обложки
+Cropped;Размеры подрезки
+Custom;Выборочно
+Customize;Настройка
+Date;Дата
+Debug;Отладка
+Decimal point;Десятичная точка
+Delay;Задержка
+Delay_Source;Задержка в оригинале
+Delay_Source_Container;Контейнер
+Delay_Source_Stream;'Сырой' поток
+Delete;Удалить
+Description;Описание
+Digitized_Date;Дата оцифровки
+Dimensions;Размеры
+Director;Режиссёр
+DirectorOfPhotography;Оператор
+DisplayAspectRatio;Соотношение сторон
+DisplayAspectRatio_Original;Соотношение сторон в оригинале
+DistributedBy;Распространитель
+Donate;Внести пожертвование
+DotsPerInch;Точек на дюйм
+Duration;Продолжительность
+Duration_End;Время окончания
+Duration_Start;Время начала
+Edit;Изменение
+EditedBy;Изменено
+EMail;Почта
+Encoded_Application;Программа кодирования
+Encoded_Date;Дата кодирования
+Encoded_Library;Библиотека кодирования
+Encoded_Library_Settings;Настройки программы
+Encoded_Original;Источник оригинала
+EncodedBy;Кодирование произвёл
+EPG_Positions;Позиции EPG (внутренние)
+Error_File;Ошибка в файле
+ExecutiveProducer;Исполнительный продюсер
+Exit;Выход
+Exit_Hint;Выход из программы
+Export;Экспорт
+Export_Hint;Экспорт данных в различных форматах
+Extensions;Используется в
+Family;Семейство
+Fax;Факс
+File;Файл
+File size;Размер файла
+File_Append;Добавить к файлу
+File_Created_Date;Дата файла
+File_Created_Date_Local;Дата файла (местная)
+File_Hint;Операции с файлами
+File_Modified_Date;Дата изменения файла
+File_Modified_Date_Local;Дата изменения файла (местная)
+FileExtension;Расширение
+FileName;Имя файла
+FileSize;Размер файла
+Folder;Папка
+Folder (R);Папка (R)
+Folder (R)_Hint;Выберите папку для обработки (со всеми вложенными папками)
+Folder (Recursively);Папка (рекурсивно)
+Folder_Hint;Операции с папками
+FolderName;Имя папки
+Format;Формат
+Format_Commercial;Коммерческое название
+Format_Commercial_IfAny;Коммерческое название
+Format_Description;Описание формата
+Format_Info;Подробно о формате
+Format_Profile;Профиль формата
+Format_Settings;Настройки формата
+Format_Settings_PacketBitStream;Параметр пакетного потока данных формата
+Format_Settings_BVOP;Параметр BVOP формата
+Format_Settings_QPel;Параметр QPel формата
+Format_Settings_GMC;Параметр GMC формата
+Format_Settings_Matrix;Параметр матрицы формата
+Format_Settings_Matrix_Custom;Выборочная
+Format_Settings_Matrix_Default;По умолчанию
+Format_Settings_Floor;Параметр Floor формата
+Format_Settings_CABAC;Параметр CABAC формата
+Format_Settings_Firm;Параметр Firm формата
+Format_Settings_Endianness;Параметр Endianness формата
+Format_Settings_RefFrames;Параметр ReFrames формата
+Format_Settings_Sign;Параметр Sign формата
+Format_Settings_Law;Параметр Law формата
+Format_Settings_ITU;Параметр ITU формата
+Format_Settings_SBR;Параметр SBR формата
+Format_Settings_PS;Параметр PS формата
+Format_Settings_Pulldown;Параметр Pulldownd формата
+Format_Settings_Mode;Режим
+Format_Settings_FrameMode;Режим кадров
+Format_Settings_Emphasis;Акцент
+Format_Settings_ModeExtension;Расширение режима
+Format_Settings_GOP;Параметр GOP формата
+Format_Version;Версия формата
+Format_Url;Ссылка на формат
+FrameCount;Счётчик кадров
+FrameRate;Частота кадров
+FrameRate_Mode;Режим частоты кадров
+FrameRate_Mode_CFR;Постоянный
+FrameRate_Mode_VFR;Переменный
+FrameRate_Minimum;Минимальная частота кадров
+FrameRate_Nominal;Номинальная частота кадров
+FrameRate_Maximum;Максимальная частота кадров
+FrameRate_Original;Частота кадров в оригинале
+General;Общее
+Genre;Жанр
+Genre_000;Blues
+Genre_001;Classic Rock
+Genre_002;Country
+Genre_003;Dance
+Genre_004;Disco
+Genre_005;Funk
+Genre_006;Grunge
+Genre_007;Hip-Hop
+Genre_008;Jazz
+Genre_009;Metal
+Genre_010;New Age
+Genre_011;Oldies
+Genre_012;Other
+Genre_013;Pop
+Genre_014;R&B
+Genre_015;Rap
+Genre_016;Reggae
+Genre_017;Rock
+Genre_018;Techno
+Genre_019;Industrial
+Genre_020;Alternative
+Genre_021;Ska
+Genre_022;Death Metal
+Genre_023;Pranks
+Genre_024;Soundtrack
+Genre_025;Euro-Techno
+Genre_026;Ambient
+Genre_027;Trip-Hop
+Genre_028;Vocal
+Genre_029;Jazz+Funk
+Genre_030;Fusion
+Genre_031;Trance
+Genre_032;Classical
+Genre_033;Instrumental
+Genre_034;Acid
+Genre_035;House
+Genre_036;Game
+Genre_037;Sound Clip
+Genre_038;Gospel
+Genre_039;Noise
+Genre_040;AlternRock
+Genre_041;Bass
+Genre_042;Soul
+Genre_043;Punk
+Genre_044;Space
+Genre_045;Meditative
+Genre_046;Instrumental Pop
+Genre_047;Instrumental Rock
+Genre_048;Ethnic
+Genre_049;Gothic
+Genre_050;Darkwave
+Genre_051;Techno-Industrial
+Genre_052;Electronic
+Genre_053;Pop-Folk
+Genre_054;Eurodance
+Genre_055;Dream
+Genre_056;Southern Rock
+Genre_057;Comedy
+Genre_058;Cult
+Genre_059;Gangsta
+Genre_060;Top 40
+Genre_061;Christian Rap
+Genre_062;Pop/Funk
+Genre_063;Jungle
+Genre_064;Native American
+Genre_065;Cabaret
+Genre_066;New Wave
+Genre_067;Psychadelic
+Genre_068;Rave
+Genre_069;Showtunes
+Genre_070;Trailer
+Genre_071;Lo-Fi
+Genre_072;Tribal
+Genre_073;Acid Punk
+Genre_074;Acid Jazz
+Genre_075;Polka
+Genre_076;Retro
+Genre_077;Musical
+Genre_078;Rock & Roll
+Genre_079;Hard Rock
+Genre_080;Folk
+Genre_081;Folk-Rock
+Genre_082;National Folk
+Genre_083;Swing
+Genre_084;Fast Fusion
+Genre_085;Bebob
+Genre_086;Latin
+Genre_087;Revival
+Genre_088;Celtic
+Genre_089;Bluegrass
+Genre_090;Avantgarde
+Genre_091;Gothic Rock
+Genre_092;Progressive Rock
+Genre_093;Psychedelic Rock
+Genre_094;Symphonic Rock
+Genre_095;Slow Rock
+Genre_096;Big Band
+Genre_097;Chorus
+Genre_098;Easy Listening
+Genre_099;Acoustic
+Genre_100;Humour
+Genre_101;Speech
+Genre_102;Chanson
+Genre_103;Opera
+Genre_104;Chamber Music
+Genre_105;Sonata
+Genre_106;Symphony
+Genre_107;Booty Bass
+Genre_108;Primus
+Genre_109;Porn Groove
+Genre_110;Satire
+Genre_111;Slow Jam
+Genre_112;Club
+Genre_113;Tango
+Genre_114;Samba
+Genre_115;Folklore
+Genre_116;Ballad
+Genre_117;Power Ballad
+Genre_118;Rhythmic Soul
+Genre_119;Freestyle
+Genre_120;Duet
+Genre_121;Punk Rock
+Genre_122;Drum Solo
+Genre_123;A capella
+Genre_124;Euro-House
+Genre_125;Dance Hall
+Genre_126;Goa
+Genre_127;Drum & Bass
+Genre_128;Club-House
+Genre_129;Hardcore
+Genre_130;Terror
+Genre_131;Indie
+Genre_132;Britpop
+Genre_133;Negerpunk
+Genre_134;Polsk Punk
+Genre_135;Beat
+Genre_136;Christian Gangsta Rap
+Genre_137;Heavy Metal
+Genre_138;Black Metal
+Genre_139;Crossover
+Genre_140;Contemporary Christian
+Genre_141;Christian Rock
+Genre_142;Merengue
+Genre_143;Salsa
+Genre_144;Trash Metal
+Genre_145;Anime
+Genre_146;JPop
+Genre_147;Synthpop
+Genre_148;Abstract
+Genre_149;Art Rock
+Genre_150;Baroque
+Genre_151;Bhangra
+Genre_152;Big Beat
+Genre_153;Breakbeat
+Genre_154;Chillout
+Genre_155;Downtempo
+Genre_156;Dub
+Genre_157;EBM
+Genre_158;Eclectic
+Genre_159;Electro
+Genre_160;Electroclash
+Genre_161;Emo
+Genre_162;Experimental
+Genre_163;Garage
+Genre_164;Global
+Genre_165;IDM
+Genre_166;Illbient
+Genre_167;Industro-Goth
+Genre_168;Jam Band
+Genre_169;Krautrock
+Genre_170;Leftfield
+Genre_171;Lounge
+Genre_172;Math Rock
+Genre_173;New Romantic
+Genre_174;Nu-Breakz
+Genre_175;Post-Punk
+Genre_176;Post-Rock
+Genre_177;Psytrance
+Genre_178;Shoegaze
+Genre_179;Space Rock
+Genre_180;Trop Rock
+Genre_181;World Music
+Genre_182;Neoclassical
+Genre_183;Audiobook
+Genre_184;Audio Theatre
+Genre_185;Neue Deutsche Welle
+Genre_186;Podcast
+Genre_187;Indie Rock
+Genre_188;G-Funk
+Genre_189;Dubstep
+Genre_190;Garage Rock
+Genre_191;Psybient
+Go to WebSite;Перейти на сайт программы
+Grouping;Группирование
+h; ч.
+Header file;Создать заголовок
+Height;Высота
+Height_Original;Высота оригинала
+Help;Помощь
+Hint;Подсказка
+How many audio streams?;Количество аудиопотоков?
+How many chapters streams?;Количество потоков разделов?
+How many text streams?;Количество текстовых потоков?
+How many video streams?;Количество видеопотоков?
+HTML;HTML
+ID;Идентификатор
+Image;Изображения
+Image stream(s);Потоки изображений
+Image_Codec_List;Кодеки изображений
+ImageCount;Кол-во потоков изображений
+Info;Информация
+Instruments;Инструменты
+Interlacement;Переплетение
+Interlaced_Interlaced;Чересстрочная
+Interlaced_TFF;Верхнее поле первое
+Interlaced_BFF;Нижнее поле первое
+Interlaced_PPF;Прогрессивная
+Interlaced_Progressive;Прогрессивная
+Interleaved;Чередующаяся
+Interleave_Duration;Продолжительность промежутка
+Interleave_Preload;Время предзагрузки промежутка
+Interleave_VideoFrames;Продолжительность промежутка
+InternetMediaType;Интернет-тип носителя
+IRCA;IRCA
+ISBN;ISBN
+ISRC;ISRC
+Keywords;Ключевые слова
+Known codecs;Известные кодеки
+Known formats;Известные форматы
+Known parameters;Известные параметры
+Label;Метка
+Language;Язык
+Language_More;Язык, дополнительно
+Language_aa;Afar
+Language_ab;Abkhazian
+Language_ae;Avestan
+Language_af;Afrikaans
+Language_ak;Akan
+Language_am;Amharic
+Language_an;Aragonese
+Language_ar;Arabic
+Language_as;Assamese
+Language_av;Avaric
+Language_ay;Aymara
+Language_az;Azerbaijani
+Language_ba;Bashkir
+Language_be;Belarusian
+Language_bg;Bulgarian
+Language_bh;Bihari
+Language_bi;Bislama
+Language_bm;Bambara
+Language_bn;Bengali
+Language_bo;Tibetan
+Language_br;Breton
+Language_bs;Bosnian
+Language_ca;Catalan
+Language_ce;Chechen
+Language_ch;Chamorro
+Language_co;Corsican
+Language_cr;Cree
+Language_cs;Czech
+Language_cu;Slave
+Language_cv;Chuvash
+Language_cy;Welsh
+Language_da;Danish
+Language_de;German
+Language_dv;Divehi
+Language_dz;Dzongkha
+Language_ee;Ewe
+Language_el;Greek
+Language_en;English
+Language_en-gb;English (Great Britain)
+Language_en-us;English (United States)
+Language_eo;Esperanto
+Language_es;Spanish
+Language_et;Estonian
+Language_eu;Basque
+Language_fa;Persian
+Language_ff;Fulah
+Language_fi;Finnish
+Language_fj;Fijian
+Language_fo;Faroese
+Language_fr;French
+Language_fy;Frisian
+Language_ga;Irish
+Language_gd;Gaelic
+Language_gl;Galician
+Language_gn;Guarani
+Language_gu;Gujarati
+Language_gv;Manx
+Language_ha;Hausa
+Language_he;Hebrew
+Language_hi;Hindi
+Language_ho;Hiri Motu
+Language_hr;Croatian
+Language_ht;Haitian
+Language_hu;Hungarian
+Language_hy;Armenian
+Language_hz;Herero
+Language_ia;Auxiliary Language Association
+Language_id;Indonesian
+Language_ie;Interlingue
+Language_ig;Igbo
+Language_ii;Sichuan Yi
+Language_ik;Inupiaq
+Language_Info;Об языке
+Language_io;Ido
+Language_is;Icelandic
+Language_it;Italian
+Language_iu;Inuktitut
+Language_ja;Japanese
+Language_jv;Javanese
+Language_ka;Georgian
+Language_kg;Kongo
+Language_ki;Kikuyu
+Language_kj;Kuanyama
+Language_kk;Kazakh
+Language_kl;Kalaallisut
+Language_km;Khmer
+Language_kn;Kannada
+Language_ko;Korean
+Language_kr;Kanuri
+Language_ks;Kashmiri
+Language_ku;Kurdish
+Language_kv;Komi
+Language_kw;Cornish
+Language_ky;Kirghiz
+Language_la;Latin
+Language_lb;Luxembourgish
+Language_lg;Ganda
+Language_li;Limburgish
+Language_ln;Lingala
+Language_lo;Lao
+Language_lt;Lithuanian
+Language_lu;Luba-Katanga
+Language_lv;Latvian
+Language_mg;Malagasy
+Language_mh;Marshallese
+Language_mi;Maori
+Language_mk;Macedonian
+Language_ml;Malayalam
+Language_mn;Mongolian
+Language_mo;Moldavian
+Language_mr;Marathi
+Language_ms;Malay
+Language_mt;Maltese
+Language_mul;Несколько языков
+Language_my;Burmese
+Language_na;Nauru
+Language_nb;Norwegian Bokmal
+Language_nd;Ndebele
+Language_ne;Nepali
+Language_ng;Ndonga
+Language_nl;Dutch
+Language_nn;Norwegian Nynorsk
+Language_no;Norwegian
+Language_nr;Ndebele
+Language_nv;Navaho
+Language_ny;Nyanja
+Language_oc;Occitan
+Language_oj;Ojibwa
+Language_om;Oromo
+Language_or;Oriya
+Language_os;Ossetic
+Language_pa;Panjabi
+Language_pi;Pali
+Language_pl;Polish
+Language_ps;Pushto
+Language_pt;Portuguese
+Language_pt-br;Portuguese (Brazil)
+Language_qu;Quechua
+Language_rm;Raeto-Romance
+Language_rn;Rundi
+Language_ro;Romanian
+Language_ru;Russian
+Language_rw;Kinyarwanda
+Language_sa;Sanskrit
+Language_sc;Sardinian
+Language_sd;Sindhi
+Language_se;Northern Sami
+Language_sg;Sango
+Language_si;Sinhala
+Language_sk;Slovak
+Language_sl;Slovenian
+Language_sm;Samoan
+Language_sn;Shona
+Language_so;Somali
+Language_sq;Albanian
+Language_sr;Serbian
+Language_ss;Swati
+Language_st;Sotho
+Language_su;Sundanese
+Language_sv;Swedish
+Language_sw;Swahili
+Language_ta;Tamil
+Language_te;Telugu
+Language_tg;Tajik
+Language_th;Thai
+Language_ti;Tigrinya
+Language_tk;Turkmen
+Language_tl;Tagalog
+Language_tn;Tswana
+Language_to;Tonga
+Language_tr;Turkish
+Language_ts;Tsonga
+Language_tt;Tatar
+Language_tw;Twi
+Language_ty;Tahitian
+Language_ug;Uighur
+Language_uk;Ukrainian
+Language_ur;Urdu
+Language_uz;Uzbek
+Language_ve;Venda
+Language_vi;Vietnamese
+Language_vo;Volapuk
+Language_wa;Walloon
+Language_wo;Wolof
+Language_xh;Xhosa
+Language_yi;Yiddish
+Language_yo;Yoruba
+Language_za;Zhuang
+Language_zh;Chinese
+Language_zh-cn;Chinese (China)
+Language_zh-tw;Chinese (Taiwan)
+Language_zu;Zulu
+LawRating;Ограничения прав
+LCCN;LCCN
+Library;Библиотека смешивания
+Lightness;Якрость
+List;Список
+Lyrics;Текст песен
+Lyricist;Поэт-песенник
+Mastered_Date;Дата мастеринга
+MasteredBy;Мастеринг произвёл
+matrix_coefficients;Коэффициенты матрицы
+MediaInfo_About;Отображает детальную информацию\r\nо мультимедиа-файлах Matroska, OGG (включая OGM)\r\nMPEG1 (включая VCD), MPEG2 (включая DVD и SVCD), MPEG4 (включая iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (включая WMV, WMA)\r\nMicrosoft RIFF (включая AVI, WAV, DivX)\r\nзвуковых форматах (AC3, DTS, SSC, AU, AIFF)
+Menu;Меню
+Menu stream(s);Меню потоков
+Menu_Codec_List;Меню кодеков
+Menu_No;Нет меню
+MenuCount;Кол-во потоков меню
+Menu_Hint;Дополнительные возможности
+MenuID;Идентификатор меню
+mn; м.
+Mood;Настроение
+More;Ещё
+Movie;Название фильма
+ms; мс.
+MSDI;MSDI
+MusicBy;Композитор
+MuxingMode;Режим смешивания
+MuxingMode_MoreInfo;Режим смешивания, доп. информация
+MuxingMode_PackedBitstream;Сжатый битовый поток
+Name;Имя
+Nationality;Национальность
+NetworkName;Название сети
+New;Новый
+Newest version;Проверять на обновление (требуется подключение к интернету)
+NewVersion_Menu;Доступна новая версия
+NewVersion_Question_Title;Выпущена новая версия!
+NewVersion_Question_Content;Доступна новая версия %Version%, хотите скачать её?
+No;Нет
+Not yet;Ещё нет
+NumColors;Количество цветов
+OK;OK
+One output file per input file;Новый файл для каждого исходного
+Open;Открыть
+OpenCandy_01;Загружается ________
+OpenCandy_02;__% выполнено
+OpenCandy_03;Выход в интернет невозможен
+OpenCandy_04;________ скачано
+OpenCandy_05;Щёлкните для установки ________
+OpenCandy_06;Вы действительно хотите прервать установку?\r\nЕсли вы хотите отложить установку, выберите 'Нет'.\r\nПрим.: Вы можете выбрать Выйти из меню, чтобы отложить установку до следующей перезагрузки.
+OpenCandy_07;Загрузка ________ была приостановлена.\r\nЩёлкните по значку в трее для возобновления загрузки.
+OpenCandy_08;Обнаружена критическая ошибка. Установка _________ будет прервана.
+OpenCandy_09;Приостановить загрузку
+OpenCandy_10;Отменить установку
+OpenCandy_11;Продолжить загрузку
+OpenCandy_12;Выйти из установки
+OpenCandy_13;___________ - рекомендовано ____________
+OpenCandy_14;Загружается _________
+OpenCandy_15;___________, программа, рекомендованная ___________, сейчас загружается по Вашему запросу. Мы дадим знать, когда она будет готова для установки.
+OpenCandy_16;___________ готова для установки
+OpenCandy_17;___________ полностью загружена. Нажмите 'Установка' для начала процесса.
+OpenCandy_18;___________ из ___________ загружено
+OpenCandy_19;При содействии OpenCandy
+OpenCandy_20;Дополнительная информация на OpenCandy.com
+OpenCandy_21;Установка
+OpenCandy_22;Установка ___________
+OpenCandy_23;Это прервёт установку ___________\r\nВы действительно хотите выйти?
+OpenCandy_24;Пауза
+OpenCandy_25;Загрузка была приостановлена. Нажмите 'Продолжить' для возобновления.
+OpenCandy_26;Продолжить
+OpenCandy_27;Установка
+OpenCandy_28;Приостановить загрузку
+OpenCandy_29;Продолжить загрузку
+OpenCandy_30;Отменить установку
+OpenCandy_31;Выберите параметры установки
+OpenCandy_32;Установка ___________
+OpenCandy_33;Не устанавливать
+OpenCandy_34;Выберите параметры установки
+OpenCandy_35;______ рекомендуемая программа
+OpenCandy_36;Ваша текущая установка не будет прерываться
+Options;Параметры
+Options_Hint;Настройки программы
+Original;Оригинал
+OriginalNetworkName;Оригинальное название сети
+OriginalSourceForm;Формат оригинала
+OriginalSourceMedium;Носитель оригинала
+Other;Прочее
+Output;Вывод
+Output format;Формат вывода
+OverallBitRate;Общий поток
+OverallBitRate_Maximum;Максимальный общий битрейт
+OverallBitRate_Minimum;Минимальный общий битрейт
+OverallBitRate_Mode;Режим общего битрейта
+OverallBitRate_Nominal;Номинальный общий битрейт
+Part;Часть
+Part_Count;Кол-во частей
+Performer;Исполнитель
+Period;Период
+Phone;Телефон
+PixelAspectRatio;Пропорции пикселя
+PixelAspectRatio_Original;Пропорции пикселя в оригинале
+PlayCounter;Счётчик воспроизведения
+Played_Count;Воспроизведено раз
+Played_First_Date;Первое воспроизведение
+Played_Last_Date;Последнее воспроизведение
+PlayTime;Длительность
+Position;Положение
+Position_Total;Всего
+Preferences;Настройки
+Producer;Продюсер
+ProductionDesigner;Художник-постановщик
+ProductionStudio;Студия-производитель
+Publisher;Издатель
+Purchased_Date;Дата покупки
+Quote character;Символ кавычек
+RadioStation;Радиостанция
+Rating;Рейтинг
+Recorded_Date;Дата записи
+Recorded_Location;Место записи
+Released_Date;Дата выпуска
+RemixedBy;Ремикс выполнил
+ReplayGain_Gain;Нормализатор звука
+ReplayGain_Peak;Пик нормализатор звука
+Resolution;Разрешение
+s; с.
+SamplingRate;Частота
+Save;Сохранить
+ScanType;Тип развёртки
+ScanType_Original;Тип развёртки в оригинале
+ScanType_StoreMethod;
+ScanOrder;Порядок развёртки
+ScanOrder_Original;Порядок развёртки в оригинале
+ScanOrder_Stored;Сохранённый порядок развёртки
+ScanOrder_StoredDisplayedInverted;Порядок развёртки, сохранённый в обратном порядке
+ScanOrder_StoreMethod;
+ScreenplayBy;Сценарист
+Season;Сезон
+see below;см. ниже
+Send HeaderFile;Отправить заголовок этого файла на http://sourceforge.net/projects/mediainfo/ (Раздел ошибок)
+Separator_Columns;Разделитель столбцов
+Separator_Lines;Разделитель строк
+ServiceChannel;Номер канала сервиса
+ServiceName;Название сервиса
+ServiceProvider;Поставщик сервиса
+ServiceType;Тип сервиса
+Set;Установка
+Set_Count;Кол-во установок
+Setup;Настройка
+Sharpness;Резкость
+Sheet;Таблица
+Sheet (Complete);Таблица (полная)
+Shell extension;Расширение Проводника (пункт в меню по правой кнопке)
+Shell extension, folder;Расширение Проводника для папок
+Shell InfoTip;Всплывающая подсказка в Проводнике
+Show menu;Показывать меню
+Show toolbar;Показывать панель
+Sort;Сортировать по
+SamplingCount;Количество образцов
+SoundEngineer;Звукорежиссёр
+Source;Оригинал
+Source_Duration;Продолжительность оригинала
+Source_FrameCount;Количество кадров оригинала
+Source_SamplingCount;Количество примеров оригинала
+Source_StreamSize;Размер потока оригинала
+Source_StreamSize_Encoded;Закодированный размер потока оригинала
+Standard;Стандарт вещания
+StoreMethod_InterleavedFields;
+StoreMethod_SeparatedFields;
+StoreMethod_SeparatedFields_1;
+StoreMethod_SeparatedFields_2;
+Stream;Поток
+Stream_MoreInfo;Дополнительная информация о потоке
+StreamCount;Кол-во потоков такого типа
+StreamID;Идентификатор потока
+StreamKind;Тип потока
+StreamKindID;Идентификатор типа потока
+StreamKindPos;Позиция идентификатора типа потока
+StreamSize;Размер потока
+StreamSize_Encoded;Закодированный размер потока
+StreamSize_Proportion;Пропорции потока
+Subject;Тема
+SubTrack;Подпоток
+Summary;Сводка
+Supported formats;Поддерживаемые форматы
+Supported?;Поддерживается?
+Synopsis;Сводка
+SystemId;Идентификатор
+Tagged_Application;Пометившая программа
+Tagged_Date;Дата пометки
+Technician;Техник
+TermsOfUse;Условия использования
+Text;Текст
+Text - Custom;Текст - выборочно
+Text (HTML);Текст (HTML)
+Text stream(s);Текстовые потоки
+Text streams;Текстовые потоки
+Text_Codec_List;Текстовые кодеки
+Text_No;Нет текста
+Text1;Первый текстовый поток
+Text2;Второй текстовый поток
+Text3;Третий текстовый поток
+TextCount;Кол-во текстовых потоков
+ThanksTo;Благодарности
+Thousands separator;Разделитель тысяч
+Title;Заголовок
+Title_More;Заголовок, дополнительно
+TimeCode;Временной код
+TimeCode_FirstFrame;Временной код первого кадра
+TimeCode_Settings;Параметры временного кода
+TimeCode_Source;Оригинал временного кода
+TimeStamp;Временная метка
+TimeZone;Часовой пояс
+Total;Всего
+Track;Трек
+Track_Count;Кол-во треков
+transfer_characteristics;Характеристики трансфера
+Translator;Переводчик
+Tree;Дерево
+Tree & Text;Дерево и текст
+Type;Тип
+UniqueID;Уникальный идентификатор
+Unknown;Неизвестно
+Url;Ссылка
+Video;Видео
+Video stream(s);Видеопотоки
+Video_Codec_List;Видеокодеки
+Video_Delay;Задержка видео
+Video_No;Нет видео
+Video0_Delay;Задержка видео
+Video1;Первый видеопоток
+VideoCount;Кол-во видеопотоков
+View;Вид
+View_Hint;Измените отношение к просмотру информации
+Warning : more streams in the files;Внимание: в файлах есть ещё потоки
+Web;Сайт
+WebSite_Audio;Сайт аудиокодека
+WebSite_Audio_More;Перейти на сайт (%Url%) для поиска этого аудиокодека
+WebSite_General;Перейти на сайт проигрывателя для этого файла
+WebSite_General_More;Перейти на сайт проигрывателя для этого файла
+WebSite_Text;Сайт текстового кодека
+WebSite_Text_More;Перейти на сайт (%Url%) для поиска этого текстового кодека
+WebSite_Url;http://MediaArea.net/MediaInfo
+WebSite_Video;Сайт видеокодека
+WebSite_Video_More;Перейти на сайт (%Url%) для поиска этого видеокодека
+Width;Ширина
+Width_Original;Ширина оригинала
+WriteMe;Написать автору
+WriteToTranslator;Написать переводчику
+Written_Date;Дата записи
+Written_Location;Место записи
+WrittenBy;Запись произвёл
+Yes;Да
+Your system;Ваша система
+ZZ_Automatic_Percent;99
+ZZ_AutomaticLanguage_Percent;99
