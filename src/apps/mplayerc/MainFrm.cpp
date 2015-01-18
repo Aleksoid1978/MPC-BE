@@ -16737,12 +16737,15 @@ void CMainFrame::InvalidateSubtitle(DWORD_PTR nSubtitleId, REFERENCE_TIME rtInva
 
 void CMainFrame::ReloadSubtitle()
 {
-	CAutoLock cAutoLock(&m_csSubLock);
+	{
+		CAutoLock cAutoLock(&m_csSubLock);
 
-	POSITION pos = m_pSubStreams.GetHeadPosition();
-	while (pos) {
-		m_pSubStreams.GetNext(pos)->Reload();
+		POSITION pos = m_pSubStreams.GetHeadPosition();
+		while (pos) {
+			m_pSubStreams.GetNext(pos)->Reload();
+		}
 	}
+
 	UpdateSubtitle();
 
 	if (AfxGetAppSettings().fUseSybresync) {
