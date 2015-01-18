@@ -10695,7 +10695,7 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 		}
 	}
 
-	if (desc.Find(CString(BLU_RAY) + L" \"") == 0 && OpenBD(args.GetHead(), rtStart)) {
+	if (::PathIsDirectory(args.GetHead()) && OpenBD(args.GetHead(), rtStart)) {
 		return;
 	}
 
