@@ -219,15 +219,6 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	unsigned in_samples        = pIn->GetActualDataLength() / (in_channels * in_bytespersample);
 	unsigned in_allsamples     = in_samples * in_channels;
 
-	REFERENCE_TIME rtDur = 10000000i64 * in_samples / in_wfe->nSamplesPerSec;
-
-	REFERENCE_TIME rtStart, rtStop;
-	if (FAILED(pIn->GetTime(&rtStart, &rtStop))) {
-		rtStart = m_rtNextStart;
-		rtStop  = m_rtNextStart + rtDur;
-	}
-	m_rtNextStart = rtStop;
-
 	//if (pIn->IsDiscontinuity() == S_OK) {
 	//}
 
@@ -254,24 +245,29 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	}
 
 	BYTE* data = pDataIn;
+	int delay = 0;
 
 	// Mixer
 	DWORD in_layout = GetChannelLayout(in_wfe);
 	DWORD out_layout = GetChannelLayout(out_wfe);
-	if (in_layout != out_layout) {
+	if (in_layout != out_layout || in_wfe->nSamplesPerSec != out_wfe->nSamplesPerSec) {
+		m_Mixer.UpdateInput(in_sampleformat, in_layout, in_wfe->nSamplesPerSec);
+		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, out_layout, out_wfe->nSamplesPerSec);
+
+		int out_samples = m_Mixer.CalcOutSamples(in_samples);
+
 		BYTE* out;
 		if (in_sampleformat == SAMPLE_FMT_FLT) {
 			out = pDataOut;
 		} else {
-			UpdateBufferSize(in_allsamples * out_wfe->nChannels);
+			UpdateBufferSize(out_samples * out_wfe->nChannels);
 			out = (BYTE*)m_buffer;
 		}
 
-		m_Mixer.UpdateInput(in_sampleformat, in_layout);
-		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, out_layout);
-
-		in_samples		= m_Mixer.Mixing(out, in_samples, data, in_samples);
+		delay			= m_Mixer.GetInputDelay();
+		out_samples		= m_Mixer.Mixing(out, out_samples, data, in_samples);
 		data			= out;
+		in_samples		= out_samples;
 		in_channels		= out_wfe->nChannels;
 		in_allsamples	= in_samples * in_channels;
 	} else if (in_sampleformat == SAMPLE_FMT_FLT) {
@@ -320,6 +316,17 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 	pOut->SetActualDataLength(in_allsamples * get_bytes_per_sample(in_sampleformat));
 
+	REFERENCE_TIME rtDur = 10000000i64 * in_samples / out_wfe->nSamplesPerSec;
+	REFERENCE_TIME rtStart, rtStop;
+	if (FAILED(pIn->GetTime(&rtStart, &rtStop))) {
+		rtStart = m_rtNextStart;
+		rtStop  = m_rtNextStart + rtDur;
+	} else if (delay) {
+		rtStart -= 10000000i64 * delay / in_wfe->nSamplesPerSec;
+		rtStop   = rtStart + rtDur;
+	}
+	m_rtNextStart = rtStop;
+
 	rtStart += m_rtAudioTimeShift;
 	rtStop  += m_rtAudioTimeShift;
 	pOut->SetTime(&rtStart, &rtStop);
@@ -367,6 +374,13 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt)
 			}
 		}
 
+		DWORD samplerate = wfe->nSamplesPerSec;
+		if (samplerate > 192000) {
+			while (samplerate > 96000) {
+				samplerate >>= 1;
+			}
+		}
+
 		if (channels <= 2
 				&& (formattag == WAVE_FORMAT_PCM && (wfe->wBitsPerSample == 8 || wfe->wBitsPerSample == 16)
 				|| formattag == WAVE_FORMAT_IEEE_FLOAT && wfe->wBitsPerSample == 32)) {
@@ -376,6 +390,7 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt)
 			}
 			wfe->wFormatTag			= formattag;
 			wfe->nChannels			= channels;
+			wfe->nSamplesPerSec		= samplerate;
 			wfe->nBlockAlign		= channels * wfe->wBitsPerSample / 8;
 			wfe->nAvgBytesPerSec	= wfe->nBlockAlign * wfe->nSamplesPerSec;
 			wfe->cbSize = 0;
@@ -386,6 +401,7 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt)
 			}
 			wfex->Format.wFormatTag			= WAVE_FORMAT_EXTENSIBLE;
 			wfex->Format.nChannels			= channels;
+			wfe->nSamplesPerSec				= samplerate;
 			wfex->Format.nBlockAlign		= channels * wfex->Format.wBitsPerSample / 8;
 			wfex->Format.nAvgBytesPerSec	= wfex->Format.nBlockAlign * wfex->Format.nSamplesPerSec;
 			wfex->Format.cbSize				= 22;
