@@ -115,6 +115,16 @@ AP4_Movie::AP4_Movie(AP4_MoovAtom* moov, AP4_ByteStream& mdat) :
         AP4_Track* track = new AP4_Track(*item->GetData(), 
                                          mdat,
                                          time_scale);
+        // small hack for tracks with the same numbers
+        AP4_UI32 trackId = track->GetId();
+        AP4_Track* oldTrack = GetTrack(trackId);
+        while (oldTrack) {
+            trackId++;
+            track->SetId(trackId);
+            oldTrack = GetTrack(trackId);
+        }
+        //
+
         m_Tracks.Add(track);
         item = item->GetNext();
     }
