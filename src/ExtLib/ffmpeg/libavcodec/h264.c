@@ -1412,7 +1412,7 @@ static void fill_picture_parameters(const H264Context *h,
     memset(pp, 0, sizeof(*pp));
     /* Configure current picture */
     fill_picture_entry(&pp->CurrPic,
-                       (unsigned)h->cur_pic_ptr->f.data[4],
+                       (unsigned)current_picture->f.data[4],
                        h->picture_structure == PICT_BOTTOM_FIELD);
     /* Configure the set of references */
     pp->UsedForReferenceFlags  = 0;
@@ -1634,7 +1634,6 @@ static int dxva_decode_slice(AVCodecContext *avctx,
                              uint32_t size)
 {
     const H264Context *h = avctx->priv_data;
-    const H264Picture *current_picture = h->cur_pic_ptr;
     unsigned position;
 
     if (ctx_pic->slice_count >= MAX_SLICES)
