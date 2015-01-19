@@ -1553,30 +1553,6 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWOR
 
 	int nSamples = size / (nChannels * get_bytes_per_sample(sfmt));
 
-	// convert DSD to PCM float
-	AVCodecID codecID = m_FFAudioDec.GetCodecId();
-	if (nSamplesPerSec > 192000) {
-		DWORD new_samplerate = nSamplesPerSec;
-		while (new_samplerate > 96000) {
-			new_samplerate >>= 1;
-		}
-
-		m_Mixer.UpdateInput(sfmt, dwChannelMask, nSamplesPerSec);
-		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, dwChannelMask, new_samplerate);
-
-		int out_samples = m_Mixer.CalcOutSamples(nSamples);
-		m_encbuff.SetCount(out_samples * nChannels);
-
-		out_samples = m_Mixer.Mixing((BYTE*)m_encbuff.GetData(), out_samples, pBuff, nSamples);
-		if (out_samples > 0) {
-			pBuff = (BYTE*)m_encbuff.GetData();
-			size = out_samples * nChannels * get_bytes_per_sample(SAMPLE_FMT_FLT);
-			sfmt = SAMPLE_FMT_FLT;
-			nSamplesPerSec = new_samplerate;
-			nSamples = out_samples;
-		}
-	}
-
 	REFERENCE_TIME rtDur = 10000000i64 * nSamples / nSamplesPerSec;
 	REFERENCE_TIME rtStart = m_rtStart;
 	REFERENCE_TIME rtStop  = m_rtStart + rtDur;
@@ -1986,11 +1962,6 @@ HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 		if (wfe->dwInterleave & 0xf) { // has to be a multiple of the block size (16 bytes)
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
-	} else if (mtIn->subtype == MEDIASUBTYPE_PCM) {
-		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn->Format();
-		if (wfe->nSamplesPerSec <= 192000) { // only for sample rate > 192 kHz
-			return VFW_E_TYPE_NOT_ACCEPTED;  // not needed any decoders for sample rate <= 192 kH
-		}
 	} else if (mtIn->subtype == MEDIASUBTYPE_IEEE_FLOAT) {
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn->Format();
 		if (wfe->wBitsPerSample != 64) {    // only for 64-bit float PCM
@@ -2113,12 +2084,6 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 			out_layout = s_scmap_hdmv[wfelpcm->channel_conf].dwChannelMask;
 		} else {
 			out_layout = GetDefChannelMask(wfe->nChannels);
-		}
-	}
-
-	if (out_samplerate > 192000) {
-		while (out_samplerate > 96000) {
-			out_samplerate >>= 1;
 		}
 	}
 

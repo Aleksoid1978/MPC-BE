@@ -296,6 +296,11 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 	return out_samples;
 }
 
+int CMixer::GetInputDelay()
+{
+	return avresample_get_delay(m_pAVRCxt);
+}
+
 int CMixer::CalcOutSamples(int in_samples)
 {
 	if (!m_ActualContext && !Init()) {
