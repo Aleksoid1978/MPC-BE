@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Acerca De"
 7		"MPC-BE"
 8		"Copyright © 2002-2015 vea archivo Authors.txt"
@@ -8,8 +8,8 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 13		"Este programa es gratuito y fue lanzado bajo la Licencia Publica General GNU."
 14		"Compilador MPC-BE :"
 15		"Compilador FFmpeg :"
-20		"Traducido al castellano por SquallMX. Revisión XPC."
-23		"Libavcodec / Libavutil :"
+19		"Traducido al castellano por SquallMX. Revisión XPC."
+22		"Libavcodec / Libavutil :"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10

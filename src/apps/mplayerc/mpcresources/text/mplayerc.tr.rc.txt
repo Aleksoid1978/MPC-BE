@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Hakkında"
 7		"MPC-BE"
 8		"Telif Hakkı © 2002-2015, Authors.txt dosyasına bakınız"
@@ -8,8 +8,8 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 13		"Bu program ücretsiz olup Genel Kamusal GNU Lisansı altında sunulmaktadır."
 14		"MPC-BE Derlemesi :"
 15		"FFmpeg Derlemesi :"
-20		"bosluk (Sinan Hunerel) tarafından Türkçeleştirilmiştir"
-23		"Libavcodec / Libavutil :"
+19		"bosluk (Sinan Hunerel) tarafından Türkçeleştirilmiştir"
+22		"Libavcodec / Libavutil :"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10

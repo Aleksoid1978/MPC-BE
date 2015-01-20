@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Ծրագրի մասին"
 7		"MPC-BE"
 8		"Copyright © 2002-2015, նայեք Authors.txt ֆայլը"
@@ -8,8 +8,8 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 13		"Այս ծրագիրը անվճար է և տարածվում է GNU General Public-ի լիցենզիայով։"
 14		"MPC-BE կազմարկիչ."
 15		"FFmpeg կազմարկիչ."
-20		"Թարգմանեց Հրանտ Օհանյանը »»» http://haysoft.org"
-23		"Libavcodec / Libavutil :"
+19		"Թարգմանեց Հրանտ Օհանյանը »»» http://haysoft.org"
+22		"Libavcodec / Libavutil :"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10

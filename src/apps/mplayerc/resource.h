@@ -877,7 +877,6 @@
 #define IDC_UPDATE_ICON                 22058
 #define IDC_AUTHORS_LINK                22059
 #define IDC_SVNBUILD                    22060
-#define IDC_SVN_NUMBER                  22061
 #define IDC_LCDSUPPORT                  22062
 #define IDC_CHECK_LCD                   22063
 #define IDC_CHECK_PRV                   22064

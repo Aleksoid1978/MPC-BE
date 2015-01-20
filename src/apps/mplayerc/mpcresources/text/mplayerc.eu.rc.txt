@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Honi buruz"
 7		"MPC-BE"
 8		"Copyrighta © 2002-2015 Ikusi: Authors.txt"
@@ -8,8 +8,8 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 13		"Programa hau dohainekoa da eta GNU Baimen Publiko Orokorrarekin argitaratzen da."
 14		"MPC-BE Biltzailea  :"
 15		"FFmpeg Biltzailea :"
-20		"Euskarazko itzulpena: Xabier Aramendi"
-23		"Libavcodec / Libavutil :"
+19		"Euskarazko itzulpena: Xabier Aramendi"
+22		"Libavcodec / Libavutil :"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10

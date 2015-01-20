@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"O programu"
 7		"MPC-BE"
 8		"Copyright © 2002-2015, viz soubor Authors.txt"
@@ -8,8 +8,8 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 13		"Tento program je freeware vydaný pod\nGNU General Public License."
 14		"MPC-BE zkompilován :"
 15		"FFmpeg zkompilován :"
-20		"Překlad: khagaroth"
-23		"Libavcodec / Libavutil :"
+19		"Překlad: khagaroth"
+22		"Libavcodec / Libavutil :"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10

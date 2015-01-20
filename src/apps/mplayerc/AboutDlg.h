@@ -26,7 +26,6 @@ class CAboutDlg : public CDialog
 {
 	CString m_appname;
 	CString m_strVersionNumber;
-	CString m_strSVNNumber;
 	CString m_MPCCompiler;
 	CString m_FFmpegCompiler;
 	CString m_libavcodecVersion;

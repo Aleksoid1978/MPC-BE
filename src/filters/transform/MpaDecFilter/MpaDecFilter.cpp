@@ -2339,7 +2339,7 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 	CString infostr;
 
 	if (index == AINFO_MPCVersion) {
-		infostr.Format(_T("v%d.%d.%d.%d (build %d)"), MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_PATCH, MPC_VERSION_STATUS, MPC_VERSION_REV);
+		infostr.Format(_T("v%d.%d.%d (build %d)"), MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_PATCH, MPC_VERSION_REV);
 
 		return infostr;
 	}

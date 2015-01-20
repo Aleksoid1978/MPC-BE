@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Пра праграму"
 7		"MPC-BE"
 8		"Copyright © 2002-2015 глядзiце файл Authors.txt"
@@ -8,8 +8,8 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 13		"Гэтая праграма бясплатная і распаўсюджваецца пад ліцэнзіяй GNU General Public License."
 14		"Кампiлятар MPC-BE :"
 15		"Кампiлятар FFmpeg :"
-20		"Лакалізацыя: Містэр Ш"
-23		"Libavcodec / Libavutil :"
+19		"Лакалізацыя: Містэр Ш"
+22		"Libavcodec / Libavutil :"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10

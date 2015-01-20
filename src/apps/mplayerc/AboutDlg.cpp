@@ -47,7 +47,10 @@ BOOL CAboutDlg::OnInitDialog()
 	m_appname += _T(" (64-bit)");
 #endif
 
-	m_strVersionNumber = CString(MPC_VERSION_STR);
+	m_strVersionNumber.Format(L"%s (build %d)", CString(MPC_VERSION_STR), MPC_VERSION_REV);
+#if (MPC_VERSION_STATUS == 0)
+	m_strVersionNumber.Append(L" beta");
+#endif
 #if DBOXVersion
 	m_strVersionNumber.Append(_T(" (D-BOX)"));
 #endif
@@ -122,7 +125,6 @@ BOOL CAboutDlg::OnInitDialog()
 	m_MPCCompiler += _T(" Debug");
 #endif
 
-	m_strSVNNumber.Format(_T("%d"), MPC_VERSION_REV);
 	m_FFmpegCompiler	= GetFFmpegCompiler();
 	m_libavcodecVersion	= GetlibavcodecVersion();
 
@@ -151,7 +153,6 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Text(pDX, IDC_STATIC1, m_appname);
 	DDX_Text(pDX, IDC_VERSION_NUMBER, m_strVersionNumber);
-	DDX_Text(pDX, IDC_SVN_NUMBER, m_strSVNNumber);
 	DDX_Text(pDX, IDC_MPC_COMPILER, m_MPCCompiler);
 	DDX_Text(pDX, IDC_FFMPEG_COMPILER, m_FFmpegCompiler);
 	DDX_Text(pDX, IDC_LIBAVCODEC_VERSION, m_libavcodecVersion);
