@@ -214,10 +214,10 @@ static int dxva_decode_slice(AVCodecContext *avctx,
     unsigned position;
 
     if (ctx->frame_count > 2)
-        return AVERROR_INVALIDDATA;
+        return -1;
 
     if (ctx_pic->slice_count >= MAX_SLICE)
-        return AVERROR_INVALIDDATA;
+        return -1;
 
     if (!ctx_pic->bitstream)
         ctx_pic->bitstream = buffer;

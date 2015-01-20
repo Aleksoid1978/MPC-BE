@@ -256,6 +256,7 @@ update_version.bat</Command>
     </ClCompile>
     <ClCompile Include="DXVADecoder.cpp" />
     <ClCompile Include="DXVADecoderH264.cpp" />
+    <ClCompile Include="DXVADecoderHEVC.cpp" />
     <ClCompile Include="DXVADecoderMpeg2.cpp" />
     <ClCompile Include="DXVADecoderVC1.cpp" />
     <ClCompile Include="ffmpegContext.cpp">
@@ -277,6 +278,7 @@ update_version.bat</Command>
     <ClInclude Include="DXVA1\ffmpegContext_DXVA1.h" />
     <ClInclude Include="DXVADecoder.h" />
     <ClInclude Include="DXVADecoderH264.h" />
+    <ClInclude Include="DXVADecoderHEVC.h" />
     <ClInclude Include="DXVADecoderMpeg2.h" />
     <ClInclude Include="DXVADecoderVC1.h" />
     <ClInclude Include="ffmpegContext.h" />

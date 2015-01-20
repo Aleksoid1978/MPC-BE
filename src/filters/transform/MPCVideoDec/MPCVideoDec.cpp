@@ -110,6 +110,7 @@ vcodecs[] = {
 	{_T("quicktime"),	CODEC_QT		},
 	// dxva codecs
 	{_T("h264_dxva"),	CODEC_H264_DXVA	},
+	{_T("hevc_dxva"),	CODEC_HEVC_DXVA	},
 	{_T("mpeg2_dxva"),	CODEC_MPEG2_DXVA},
 	{_T("vc1_dxva"),	CODEC_VC1_DXVA	},
 	{_T("wmv3_dxva"),	CODEC_WMV3_DXVA	}
@@ -147,6 +148,24 @@ struct FFMPEG_CODECS {
 	}
 };
 
+// DXVA modes supported for H264
+DXVA_PARAMS DXVA_H264 = {
+	16,		// PicEntryNumber - DXVA1
+	24,		// PicEntryNumber - DXVA2
+	2,		// PreferedConfigBitstream
+	{ &DXVA2_ModeH264_E, &DXVA2_ModeH264_F, &DXVA_Intel_H264_ClearVideo, &GUID_NULL },
+	{ DXVA_RESTRICTED_MODE_H264_E, 0 }
+};
+
+// DXVA modes supported for HEVC
+DXVA_PARAMS DXVA_HEVC = {
+	16,		// PicEntryNumber - DXVA1
+	24,		// PicEntryNumber - DXVA2
+	2,		// PreferedConfigBitstream
+	{ &DXVA_ModeHEVC_VLD_Main, &GUID_NULL },
+	{ 0 }
+};
+
 // DXVA modes supported for Mpeg2
 DXVA_PARAMS DXVA_Mpeg2 = {
 	16,		// PicEntryNumber - DXVA1
@@ -156,23 +175,15 @@ DXVA_PARAMS DXVA_Mpeg2 = {
 	{ DXVA_RESTRICTED_MODE_MPEG2_D, 0 }
 };
 
-// DXVA modes supported for H264
-DXVA_PARAMS DXVA_H264 = {
-	16,		// PicEntryNumber - DXVA1
-	24,		// PicEntryNumber - DXVA2
-	2,		// PreferedConfigBitstream
-	{ &DXVA2_ModeH264_E, &DXVA2_ModeH264_F, &DXVA_Intel_H264_ClearVideo, &GUID_NULL },
-	{ DXVA_RESTRICTED_MODE_H264_E, 0}
-};
-
 // DXVA modes supported for VC1
 DXVA_PARAMS DXVA_VC1 = {
 	16,		// PicEntryNumber - DXVA1
 	24,		// PicEntryNumber - DXVA2
 	1,		// PreferedConfigBitstream
 	{ &DXVA2_ModeVC1_D2010, &DXVA2_ModeVC1_D, &GUID_NULL },
-	{ DXVA_RESTRICTED_MODE_VC1_D, 0}
+	{ DXVA_RESTRICTED_MODE_VC1_D, 0 }
 };
+
 
 FFMPEG_CODECS ffCodecs[] = {
 	// Flash video
@@ -409,10 +420,10 @@ FFMPEG_CODECS ffCodecs[] = {
 	{ &MEDIASUBTYPE_CLLC, AV_CODEC_ID_CLLC, NULL, VDEC_CANOPUS, -1 },
 
 	// HEVC
-	{ &MEDIASUBTYPE_HEVC, AV_CODEC_ID_HEVC, NULL, VDEC_HEVC, -1 },
-	{ &MEDIASUBTYPE_HVC1, AV_CODEC_ID_HEVC, NULL, VDEC_HEVC, -1 },
+	{ &MEDIASUBTYPE_HEVC, AV_CODEC_ID_HEVC, &DXVA_HEVC, VDEC_HEVC, VDEC_DXVA_HEVC },
+	{ &MEDIASUBTYPE_HVC1, AV_CODEC_ID_HEVC, &DXVA_HEVC, VDEC_HEVC, VDEC_DXVA_HEVC },
 //	{ &MEDIASUBTYPE_HM91, AV_CODEC_ID_HEVC, NULL, VDEC_HEVC, -1 },
-	{ &MEDIASUBTYPE_HM10, AV_CODEC_ID_HEVC, NULL, VDEC_HEVC, -1 },
+	{ &MEDIASUBTYPE_HM10, AV_CODEC_ID_HEVC, &DXVA_HEVC, VDEC_HEVC, VDEC_DXVA_HEVC },
 //	{ &MEDIASUBTYPE_HM12, AV_CODEC_ID_HEVC, NULL, VDEC_HEVC, -1 },
 
 	// Avid DNxHD
@@ -1052,7 +1063,7 @@ void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 			m_nPCIDevice = adapterIdentifier.DeviceId;
 			m_VideoDriverVersion	= adapterIdentifier.DriverVersion;
 			m_strDeviceDescription	= adapterIdentifier.Description;
-			m_strDeviceDescription.AppendFormat (_T(" (%04X:%04X)"), m_nPCIVendor, m_nPCIDevice);
+			m_strDeviceDescription.AppendFormat(_T(" (%04X:%04X)"), m_nPCIVendor, m_nPCIDevice);
 		}
 		pD3D9->Release();
 	}
@@ -1191,6 +1202,11 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 					m_bUseFFmpeg	= (m_nActiveCodecs & CODEC_H264) != 0;
 					bCodecActivated	= m_bUseDXVA || m_bUseFFmpeg;
 					break;
+				case AV_CODEC_ID_HEVC :
+					m_bUseDXVA		= (m_nActiveCodecs & CODEC_HEVC_DXVA) != 0;
+					m_bUseFFmpeg	= (m_nActiveCodecs & CODEC_HEVC) != 0;
+					bCodecActivated	= m_bUseDXVA || m_bUseFFmpeg;
+					break;
 				case AV_CODEC_ID_SVQ3 :
 				case AV_CODEC_ID_SVQ1 :
 					bCodecActivated = (m_nActiveCodecs & CODEC_SVQ3) != 0;
@@ -1280,9 +1296,6 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
 				case AV_CODEC_ID_V410 :
 				case AV_CODEC_ID_RAWVIDEO :
 					bCodecActivated = (m_nActiveCodecs & CODEC_UNCOMPRESSED) != 0;
-					break;
-				case AV_CODEC_ID_HEVC :
-					bCodecActivated = (m_nActiveCodecs & CODEC_HEVC) != 0;
 					break;
 				case AV_CODEC_ID_DNXHD :
 					bCodecActivated = (m_nActiveCodecs & CODEC_DNXHD) != 0;
@@ -1743,6 +1756,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 					break;
 				}
 			} else if ((m_nCodecId == AV_CODEC_ID_WMV3 || m_nCodecId == AV_CODEC_ID_VC1) && m_pAVCtx->profile == FF_PROFILE_VC1_COMPLEX) {
+				break;
+			} else if (m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile > FF_PROFILE_HEVC_MAIN) {
 				break;
 			}
 
@@ -2907,7 +2922,7 @@ HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3D
 	if (SUCCEEDED(hr)) {
 		// need recreate dxva decoder after "stop" on Intel HD Graphics
 		SAFE_DELETE(m_pDXVADecoder);
-		m_pDXVADecoder = CDXVADecoder::CreateDecoder(this, pDirectXVideoDec, &m_DXVADecoderGUID, GetPicEntryNumber(), &m_DXVA2Config);
+		m_pDXVADecoder = CDXVADecoder::CreateDecoderDXVA2(this, pDirectXVideoDec, &m_DXVADecoderGUID, GetPicEntryNumber(), &m_DXVA2Config);
 		if (m_pDXVADecoder) {
 			m_pDXVADecoder->SetDirectXVideoDec(pDirectXVideoDec);
 		} else {
@@ -2999,7 +3014,7 @@ WORD CMPCVideoDecFilter::GetDXVA1RestrictedMode()
 	if (m_nCodecNb != -1) {
 		for (int i=0; i<MAX_SUPPORTED_MODE; i++)
 			if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == m_DXVADecoderGUID) {
-				return ffCodecs[m_nCodecNb].DXVAModes->RestrictedMode [i];
+				return ffCodecs[m_nCodecNb].DXVAModes->RestrictedMode[i];
 			}
 	}
 
@@ -3016,7 +3031,7 @@ HRESULT CMPCVideoDecFilter::CreateDXVA1Decoder(IAMVideoAccelerator* pAMVideoAcce
 
 	m_nDecoderMode		= MODE_DXVA1;
 	m_DXVADecoderGUID	= *pDecoderGuid;
-	m_pDXVADecoder		= CDXVADecoder::CreateDecoder(this, pAMVideoAccelerator, &m_DXVADecoderGUID, dwSurfaceCount);
+	m_pDXVADecoder		= CDXVADecoder::CreateDecoderDXVA1(this, pAMVideoAccelerator, &m_DXVADecoderGUID, dwSurfaceCount);
 
 	return S_OK;
 }

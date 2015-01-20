@@ -9,6 +9,9 @@ Legend:
 
 1.4.4 (beta)
 ==============================
+Added (+):
+	+ MPCVideoDec - add HEVC DXVA decoder;
+
 
 1.4.3
 ==============================

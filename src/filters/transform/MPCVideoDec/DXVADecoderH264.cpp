@@ -88,8 +88,8 @@ HRESULT CDXVADecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& 
 
 		slice = m_bUseLongSlice ? (DXVA_Slice_H264_Short*)&ctx_pic->slice_long[i] : &ctx_pic->slice_short[i];
 
-		UINT position	= slice->BSNALunitDataLocation;
-		UINT size		= slice->SliceBytesInBuffer;
+		UINT position					= slice->BSNALunitDataLocation;
+		UINT size						= slice->SliceBytesInBuffer;
 
 		slice->BSNALunitDataLocation	= current - pDXVABuffer;
 		slice->SliceBytesInBuffer		= start_code_size + size;

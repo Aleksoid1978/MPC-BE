@@ -469,6 +469,7 @@ static const struct {
 	LPCTSTR		CodeName;
 } mpc_codecs[] = {
 	{CODEC_H264_DXVA,	_T("H.264/AVC (DXVA)")},
+	{CODEC_HEVC_DXVA,	_T("HEVC (DXVA)")},
 	{CODEC_MPEG2_DXVA,	_T("MPEG-2 (DXVA)")},
 	{CODEC_VC1_DXVA,	_T("VC-1 (DXVA)")},
 	{CODEC_WMV3_DXVA,	_T("WMV3 (DXVA)")},
@@ -512,9 +513,9 @@ bool CMPCVideoDecCodecWnd::OnActivate()
 	int nPos				= 0;
 	ULONGLONG nActiveCodecs	= m_pMDF ? m_pMDF->GetActiveCodecs() : 0;
 
-	m_grpSelectedCodec.Create (_T("Selected codecs"), WS_VISIBLE|WS_CHILD | BS_GROUPBOX, CRect (10,  10, 330, 280), this, (UINT)IDC_STATIC);
+	m_grpSelectedCodec.Create(_T("Selected codecs"), WS_VISIBLE|WS_CHILD | BS_GROUPBOX, CRect (10,  10, 330, 280), this, (UINT)IDC_STATIC);
 
-	m_lstCodecs.Create (dwStyle | LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP, CRect (20,30, 320, 270), this, 0);
+	m_lstCodecs.Create(dwStyle | LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP, CRect (20,30, 320, 270), this, 0);
 
 	for (size_t i = 0; i < _countof(mpc_codecs); i++) {
 		m_lstCodecs.AddString(mpc_codecs[i].CodeName);

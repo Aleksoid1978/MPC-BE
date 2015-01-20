@@ -7,7 +7,7 @@
 
 #ifdef __GNUC__
 #pragma GCC push_options
-#pragma GCC target("sse4.2")
+#pragma GCC target("sse4.1")
 #endif
 
 #if HAVE_SSE2
@@ -16,11 +16,11 @@
 #if HAVE_SSSE3
 #include <tmmintrin.h>
 #endif
-#if HAVE_SSE42
+#if HAVE_SSE4
 #include <smmintrin.h>
 #endif
 
-#if HAVE_SSE42
+#if HAVE_SSE4
 #define _MM_PACKUS_EPI32 _mm_packus_epi32
 #else
 static av_always_inline __m128i _MM_PACKUS_EPI32( __m128i a, __m128i b )
@@ -37,7 +37,7 @@ static av_always_inline __m128i _MM_PACKUS_EPI32( __m128i a, __m128i b )
 ////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////
-#if HAVE_SSE42
+#if HAVE_SSE4
 #define PLANAR_INIT_8()                                                        \
     uint8_t *src = (uint8_t*)_src;                                             \
     const uint8_t *top = (const uint8_t*)_top;                                 \
@@ -634,7 +634,7 @@ PRED_PLANAR_3(10)
 ////////////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////////////
-#if HAVE_SSE42
+#if HAVE_SSE4
 #define ANGULAR_COMPUTE_10(W)                                                  \
     for (x = 0; x < W; x += 4) {                                               \
         r3 = _mm_set1_epi32((fact << 16) + (32 - fact));                       \

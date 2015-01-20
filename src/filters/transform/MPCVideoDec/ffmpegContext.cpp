@@ -35,6 +35,7 @@ extern "C" {
 #define new newFFMPEG
 	#include <ffmpeg/libavcodec/h264.h>
 #undef new
+	#include <ffmpeg/libavcodec/hevc.h>
 	#include <ffmpeg/libavcodec/vc1.h>
 	#include <ffmpeg/libavcodec/mpeg12.h>
 }
@@ -419,6 +420,13 @@ void FFMPEG2SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context)
 {
 	MpegEncContext* s	= (MpegEncContext*)pAVCtx->priv_data;
 	s->dxva_context		= pDXVA_Context;
+}
+
+// === HEVC functions
+void FFHEVCSetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context)
+{
+	HEVCContext* s	= (HEVCContext*)pAVCtx->priv_data;
+	s->dxva_context	= pDXVA_Context;
 }
 
 // === Common functions

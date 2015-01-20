@@ -71,6 +71,7 @@ class CDXVADecoder
 public :
 	enum DXVAMode {
 		H264_VLD,
+		HEVC_VLD,
 		VC1_VLD,
 		MPEG2_VLD
 	};
@@ -87,8 +88,8 @@ public :
 
 	HRESULT						ConfigureDXVA1();
 
-	static CDXVADecoder*		CreateDecoder(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, int nPicEntryNumber);
-	static CDXVADecoder*		CreateDecoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
+	static CDXVADecoder*		CreateDecoderDXVA1(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, int nPicEntryNumber);
+	static CDXVADecoder*		CreateDecoderDXVA2(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
 
 	void						EndOfStream();
 

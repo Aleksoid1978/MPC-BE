@@ -11,6 +11,11 @@
 * libavcodec/h264.h
 * libavcodec/h264_ps.c
 * libavcodec/h264_slice.c
+* libavcodec/hevc.c
+* libavcodec/hevc.h
+* libavcodec/hevc_parser.c
+* libavcodec/hevc_ps.c
+* libavcodec/hevc_refs.c
 * libavcodec/internal.h
 * libavcodec/mpeg12dec.c
 * libavcodec/mpegvideo.c
@@ -34,5 +39,6 @@ The following files are available only in MPC-BE (compared with ffmpeg):
 
 * config.c
 * libavcodec/dxva_h264.h
+* libavcodec/dxva_hevc.h
 * libavcodec/dxva_mpeg2.h
 * libavcodec/h264_slice.h
