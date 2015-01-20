@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Informazioni"
 7		"MPC-BE"
 8		"Copyright © 2002-2015 vedi file Authors.txt"
@@ -8,8 +8,8 @@
 13		"Questo software è freeware ed è rilasciato secondo la GNU (General Public License)."
 14		"Compilatore MPC-BE:"
 15		"Compilatore FFmpeg:"
-20		"Traduzione italiana di Lord Maius"
-23		"Libavcodec / Libavutil:"
+19		"Traduzione italiana di Lord Maius"
+22		"Libavcodec / Libavutil:"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10

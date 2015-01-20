@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Névjegy"
 7		"MPC-BE"
 8		"Szerzői jog © 2002-2015 lásd Authors.txt fájl"
@@ -8,8 +8,8 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 13		"Ez a program freeware és a GNU General Public License alatt lett kiadva."
 14		"MPC-BE Fordítóprogram :"
 15		"FFmpeg Fordítóprogram :"
-20		"Magyarra fordította Kleiber Tamás."
-23		"Libavcodec / Libavutil :"
+19		"Magyarra fordította Kleiber Tamás."
+22		"Libavcodec / Libavutil :"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10

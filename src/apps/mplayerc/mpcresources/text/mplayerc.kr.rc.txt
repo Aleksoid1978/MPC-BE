@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"정보"
 7		"MPC-BE"
 8		"Copyright © 2002-2015 'Authors.txt' 파일 참조"
@@ -8,8 +8,8 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 25
 13		"이 프로그램은 프리웨어이며 GNU GPL 라이센스로 릴리즈됩니다."
 14		"MPC-BE 컴파일러 :"
 15		"FFmpeg 컴파일러 :"
-20		"한글번역제공: XNeo(xneokr@naver.com)"
-23		"Libavcodec / Libavutil :"
+19		"한글번역제공: XNeo(xneokr@naver.com)"
+22		"Libavcodec / Libavutil :"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
