@@ -729,12 +729,12 @@ void ff_hevc_pred_init_x86(HEVCPredContext *hpc, int bit_depth)
     int mm_flags = av_get_cpu_flags();
 
     if (bit_depth == 8) {
-        if (HAVE_SSE42 && EXTERNAL_SSE42(mm_flags)) {
+        if (EXTERNAL_SSE4(mm_flags)) {
             HEVC_PRED(8);
         }
     }
     if (bit_depth == 10) {
-        if (HAVE_SSE42 && EXTERNAL_SSE42(mm_flags)) {
+        if (EXTERNAL_SSE4(mm_flags)) {
             HEVC_PRED(10);
         }
     }

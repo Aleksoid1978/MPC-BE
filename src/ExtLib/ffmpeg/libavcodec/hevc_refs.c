@@ -390,6 +390,9 @@ static HEVCFrame *generate_missing_ref(HEVCContext *s, int poc)
     if (!frame)
         return NULL;
 
+    // ==> Start patch MPC
+    if (!s->avctx->using_dxva) {
+    // ==> End patch MPC
     if (!s->sps->pixel_shift) {
         for (i = 0; frame->frame->buf[i]; i++)
             memset(frame->frame->buf[i]->data, 1 << (s->sps->bit_depth - 1),
@@ -401,6 +404,9 @@ static HEVCFrame *generate_missing_ref(HEVCContext *s, int poc)
                     AV_WN16(frame->frame->data[i] + y * frame->frame->linesize[i] + 2 * x,
                             1 << (s->sps->bit_depth - 1));
                 }
+    // ==> Start patch MPC
+                }
+    // ==> End patch MPC
     }
 
     frame->poc      = poc;

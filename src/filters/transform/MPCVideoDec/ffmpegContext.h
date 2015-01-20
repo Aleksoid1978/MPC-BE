@@ -55,6 +55,9 @@ void			FFVC1SetDxvaParams(struct AVCodecContext* pAVCtx, void* pPicParams, void*
 int				MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
 void			FFMPEG2SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context);
 
+// === HEVC functions
+void			FFHEVCSetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context);
+
 // === Common functions
 HRESULT			FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 							  BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop,

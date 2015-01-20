@@ -22,6 +22,7 @@
 #include <dxva2api.h>
 #include <moreuuids.h>
 #include "DXVADecoderH264.h"
+#include "DXVADecoderHEVC.h"
 #include "DXVA1/DXVADecoderH264_DXVA1.h"
 #include "DXVADecoderVC1.h"
 #include "DXVADecoderMpeg2.h"
@@ -168,7 +169,7 @@ HRESULT CDXVADecoder::ConfigureDXVA1()
 	return hr;
 }
 
-CDXVADecoder* CDXVADecoder::CreateDecoder(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, int nPicEntryNumber)
+CDXVADecoder* CDXVADecoder::CreateDecoderDXVA1(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, int nPicEntryNumber)
 {
 	CDXVADecoder* pDecoder = NULL;
 
@@ -185,7 +186,7 @@ CDXVADecoder* CDXVADecoder::CreateDecoder(CMPCVideoDecFilter* pFilter, IAMVideoA
 	return pDecoder;
 }
 
-CDXVADecoder* CDXVADecoder::CreateDecoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config)
+CDXVADecoder* CDXVADecoder::CreateDecoderDXVA2(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config)
 {
 	CDXVADecoder* pDecoder = NULL;
 
@@ -195,8 +196,10 @@ CDXVADecoder* CDXVADecoder::CreateDecoder(CMPCVideoDecFilter* pFilter, IDirectXV
 		pDecoder	= DNew CDXVADecoderVC1(pFilter, pDirectXVideoDec, guidDecoder, VC1_VLD, nPicEntryNumber, pDXVA2Config);
 	} else if (*guidDecoder == DXVA2_ModeMPEG2_VLD) {
 		pDecoder	= DNew CDXVADecoderMpeg2(pFilter, pDirectXVideoDec, guidDecoder, MPEG2_VLD, nPicEntryNumber, pDXVA2Config);
+	} else if (*guidDecoder == DXVA_ModeHEVC_VLD_Main) {
+		pDecoder	= DNew CDXVADecoderHEVC(pFilter, pDirectXVideoDec, guidDecoder, HEVC_VLD, nPicEntryNumber, pDXVA2Config);
 	} else {
-		ASSERT(FALSE);    // Unknown decoder !!
+		ASSERT(FALSE); // Unknown decoder !!
 	}
 
 	return pDecoder;

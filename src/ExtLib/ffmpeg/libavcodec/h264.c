@@ -1954,7 +1954,9 @@ again:
                         DXVA_H264_Context* ctx = (DXVA_H264_Context*)h->dxva_context;
                         if (ctx) {
                             DXVA_H264_Picture_Context* ctx_pic = &ctx->ctx_pic[nal_pass - 1];
-                            dxva_decode_slice(avctx, ctx, ctx_pic, &buf[buf_index - consumed], consumed);
+                            ret = dxva_decode_slice(avctx, ctx, ctx_pic, &buf[buf_index - consumed], consumed);
+                            if (ret < 0)
+                                return ret;
                         }
                     }
                     // <== End patch MPC

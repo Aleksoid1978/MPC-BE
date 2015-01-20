@@ -63,6 +63,9 @@
     <ClCompile Include="DXVA1\ffmpegContext_DXVA1.cpp">
       <Filter>Source Files\DXVA1</Filter>
     </ClCompile>
+    <ClCompile Include="DXVADecoderHEVC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CpuId.h">
@@ -115,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="DXVA1\ffmpegContext_DXVA1.h">
       <Filter>Header Files\DXVA1</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoderHEVC.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

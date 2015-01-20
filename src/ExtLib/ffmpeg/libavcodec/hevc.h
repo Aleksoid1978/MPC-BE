@@ -108,9 +108,14 @@ enum NALUnitType {
     NAL_IDR_N_LP   = 20,
     NAL_CRA_NUT    = 21,
     NAL_VPS        = 32,
-    NAL_SPS        = 33,
-    NAL_PPS        = 34,
-    NAL_AUD        = 35,
+    // ==> Start patch MPC
+    // NAL_SPS        = 33,
+    // NAL_PPS        = 34,
+    // NAL_AUD        = 35,
+    NAL_SPS_HEVC   = 33,
+    NAL_PPS_HEVC   = 34,
+    NAL_AUD_HEVC   = 35,
+    // ==> End patch MPC
     NAL_EOS_NUT    = 36,
     NAL_EOB_NUT    = 37,
     NAL_FD_NUT     = 38,
@@ -575,6 +580,10 @@ typedef struct SliceHeader {
     uint8_t colour_plane_id;
 
     ///< RPS coded in the slice header itself is stored here
+    // ==> Start patch MPC
+    int short_term_ref_pic_set_sps_flag;
+    int short_term_ref_pic_set_size;
+    // ==> End patch MPC
     ShortTermRPS slice_rps;
     const ShortTermRPS *short_term_rps;
     LongTermRPS long_term_rps;
@@ -734,6 +743,11 @@ typedef struct HEVCNAL {
 
     int size;
     const uint8_t *data;
+
+    // ==> Start patch MPC
+    int raw_size;
+    const uint8_t *raw_data;
+    // ==> End patch MPC
 } HEVCNAL;
 
 typedef struct HEVCLocalContext {
@@ -915,6 +929,10 @@ typedef struct HEVCContext {
     int sei_hflip, sei_vflip;
 
     int picture_struct;
+
+    // ==> Start patch MPC
+    void* dxva_context;
+    // <== End patch MPC
 } HEVCContext;
 
 int ff_hevc_decode_short_term_rps(HEVCContext *s, ShortTermRPS *rps,

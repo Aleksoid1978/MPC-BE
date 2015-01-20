@@ -53,7 +53,7 @@ static int hevc_find_frame_end(AVCodecParserContext *s, const uint8_t *buf,
 
         nut = (pc->state64 >> 2 * 8 + 1) & 0x3F;
         // Beginning of access unit
-        if ((nut >= NAL_VPS && nut <= NAL_AUD) || nut == NAL_SEI_PREFIX ||
+        if ((nut >= NAL_VPS && nut <= NAL_AUD_HEVC) || nut == NAL_SEI_PREFIX ||
             (nut >= 41 && nut <= 44) || (nut >= 48 && nut <= 55)) {
             if (pc->frame_start_found) {
                 pc->frame_start_found = 0;
@@ -139,10 +139,10 @@ static inline int parse_nal_units(AVCodecParserContext *s, AVCodecContext *avctx
         case NAL_VPS:
             ff_hevc_decode_nal_vps(h);
             break;
-        case NAL_SPS:
+        case NAL_SPS_HEVC:
             ff_hevc_decode_nal_sps(h);
             break;
-        case NAL_PPS:
+        case NAL_PPS_HEVC:
             ff_hevc_decode_nal_pps(h);
             break;
         case NAL_SEI_PREFIX:
@@ -294,7 +294,7 @@ static int hevc_split(AVCodecContext *avctx, const uint8_t *buf, int buf_size)
         state = (state << 8) | buf[i];
         if (((state >> 8) & 0xFFFFFF) == START_CODE) {
             int nut = (state >> 1) & 0x3F;
-            if (nut >= NAL_VPS && nut <= NAL_PPS)
+            if (nut >= NAL_VPS && nut <= NAL_PPS_HEVC)
                 has_ps = 1;
             else if (has_ps)
                 return i - 3;

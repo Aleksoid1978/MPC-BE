@@ -92,6 +92,7 @@ CAppSettings::CAppSettings()
 
 	// Internal DXVA decoders
 	DXVAFiltersKeys[VDEC_DXVA_H264]			= _T("vdec_dxva_h264");
+	DXVAFiltersKeys[VDEC_DXVA_HEVC]			= _T("vdec_dxva_hevc");
 	DXVAFiltersKeys[VDEC_DXVA_MPEG2]		= _T("vdec_dxva_mpeg2");
 	DXVAFiltersKeys[VDEC_DXVA_VC1]			= _T("vdec_dxva_vc1");
 	DXVAFiltersKeys[VDEC_DXVA_WMV3]			= _T("vdec_dxva_wmv3");
