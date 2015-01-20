@@ -7508,6 +7508,7 @@ void CMainFrame::OnShaderToggle()
 		if (m_pCAP) {
 			m_pCAP->SetPixelShader(NULL, NULL);
 		}
+		RepaintVideo();
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_66));
 	}
 }
@@ -7522,6 +7523,7 @@ void CMainFrame::OnShaderToggleScreenSpace()
 		if (m_pCAP2) {
 			m_pCAP2->SetPixelShader2(NULL, NULL, true);
 		}
+		RepaintVideo();
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_PPOFFSCR));
 	}
 }
