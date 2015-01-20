@@ -82,7 +82,10 @@ Update_Status UpdateChecker::CheckNewVersion()
 		m_UpdateURL = updateinfo.Tokenize("\r\n", pos).Trim();
 
 		if (sscanf_s(updateversion, "%u.%u.%u.%u", &m_UpdateVersion.major, &m_UpdateVersion.minor, &m_UpdateVersion.patch, &m_UpdateVersion.revision) == 4) {
-			if (MPC_VERSION_REV < m_UpdateVersion.revision) {
+			if (MPC_VERSION_MAJOR < m_UpdateVersion.major
+					|| MPC_VERSION_MAJOR == m_UpdateVersion.major && MPC_VERSION_MINOR < m_UpdateVersion.minor
+					|| MPC_VERSION_MAJOR == m_UpdateVersion.major && MPC_VERSION_MINOR == m_UpdateVersion.minor && MPC_VERSION_PATCH < m_UpdateVersion.patch
+					|| MPC_VERSION_MAJOR == m_UpdateVersion.major && MPC_VERSION_MINOR == m_UpdateVersion.minor && MPC_VERSION_PATCH == m_UpdateVersion.patch && MPC_VERSION_REV < m_UpdateVersion.revision) {
 				updatestatus = UPDATER_NEW_VERSION_IS_AVAILABLE;
 			} else {
 				updatestatus = UPDATER_NO_NEW_VERSION;
