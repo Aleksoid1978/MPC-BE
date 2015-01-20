@@ -402,7 +402,7 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 23		"Als u de ondertitelingspositie aanpast en ergens in de instellingen van uw grafische kaart full-screen antialiasing aanzet, zal de ondertiteling er niet beter uitzien, maar de CPU wordt wel zwaar belast."
 25		"Waarschuwing"
 26		"Animatie toestaan tijdens bufferen"
-28		"Sommige subafbeeldingen laten vallen als de queue te laat aan het lopen is"
+28		"Sommige subafbeeldingen laten vallen als de queue achterloopt"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
@@ -511,7 +511,7 @@ END
 
 BEGIN DIALOGEX IDD_SAVETEXTFILEDIALOGTEMPL LINES 8
 5		"Codering:"
-7		"Save custom style"
+7		"Sla aangepaste stijl op"
 END
 
 BEGIN DIALOGEX IDD_SAVETHUMBSDIALOGTEMPL LINES 20
@@ -692,7 +692,7 @@ BEGIN MENU IDR_MAINFRAME LINES 248
 172		"Nooit"
 173		"Altijd"
 174		"Tijdens afspelen"
-175		"Tijdens video afspelen"
+175		"Tijdens afspelen van video"
 177		"&Opties..."
 179		"&Afspelen"
 181		"Afspelen/&Pauze\tSpatie"
@@ -843,7 +843,7 @@ BEGIN MENU IDR_POPUP LINES 236
 141		"Nooit"
 142		"Altijd"
 143		"Tijdens afspelen"
-144		"Tijdens video afspelen"
+144		"Tijdens afspelen van video"
 147		"Titelbalk && Menu\tCtrl+0"
 148		"&Zoekbalk\tCtrl+1"
 149		"Bedieningspaneel\tCtrl+2"
@@ -1021,7 +1021,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 317
 171		"Nooit"
 172		"Altijd"
 173		"Tijdens afspelen"
-174		"Tijdens video afspelen"
+174		"Tijdens afspelen van video"
 176		"&Opties..."
 178		"&Afspelen"
 180		"Afspelen/&Pauze\tSpatie"
@@ -1940,7 +1940,7 @@ STRING IDS_SUB_POS_LEFT		"Ondertitelingspositie naar links schuiven"
 STRING IDS_SUB_POS_RESTORE		"Herstel de positie van ondertitels"
 STRING IDS_SUB_POS_RIGHT		"Ondertitelingspositie naar rechts schuiven"
 STRING IDS_SUB_POS_UP		"Ondertitelingspositie naar boven schuiven"
-STRING IDS_SUB_SAVE_EXTERNAL_STYLE_FILE		"Save custom style"
+STRING IDS_SUB_SAVE_EXTERNAL_STYLE_FILE		"Sla aangepaste stijl op"
 STRING IDS_TEXTFILE_ENC		"Codering:"
 STRING IDS_THUMB_COLNUMBER		"Kolommen:"
 STRING IDS_THUMB_IMAGE_QUALITY		"Kwaliteit"
