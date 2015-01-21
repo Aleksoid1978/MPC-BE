@@ -3353,7 +3353,9 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 		m_wndToolBar.Invalidate();
 	}
 
-	SetDwmPreview();
+	if (m_bAudioOnly) {
+		SetDwmPreview();
+	}
 
 	return 0L;
 }
@@ -19214,7 +19216,7 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 
 	bool extimage = false;
 
-	if (OpenImageCheck(m_strFnFull)) {
+	if (show && OpenImageCheck(m_strFnFull)) {
 		m_InternalImage.Attach(OpenImage(m_strFnFull));
 		bLoadRes = true;
 		extimage = true;
