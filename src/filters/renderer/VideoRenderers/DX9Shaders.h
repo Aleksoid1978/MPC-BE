@@ -476,18 +476,15 @@ char const shader_resizer_downscaling[] =
 "}";
 
 char const shader_final[] =
-"#define LUT3D_ENABLED (_LUT3D_ENABLED_VALUE_)\n"
-
+// #define QUANTIZATION 255.0 or 1023 (Maximum quantized integer value)
+// #define LUT3D_ENABLED 0 or 1
+// #define LUT3D_SIZE ...
 "sampler image : register(s0);"
 "sampler ditherMatrix : register(s1);"
-"float2 ditherMatrixCoordScale : register(c0);"
-
-// Maximum quantized integer value
-"static const float QUANTIZATION = _QUANTIZATION_VALUE_;\n"
+"float2 ditherMatrixCoordScale : register(c0);\n"
 
 "#if LUT3D_ENABLED\n"
 "sampler lut3D : register(s2);"
-"static const float LUT3D_SIZE = _LUT3D_SIZE_VALUE_;"
 
 // 3D LUT texture coordinate scale and offset required for correct linear interpolation
 "static const float LUT3D_SCALE = (LUT3D_SIZE - 1.0f) / LUT3D_SIZE;"
