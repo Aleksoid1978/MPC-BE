@@ -648,7 +648,7 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 	bool twopass = false;
 	LPCSTR pSrcData = NULL;
 	D3DXMACRO ShaderMacros[3] = {
-		{ "Ml", strcmp(m_ShaderProfile, "ps_3_0") >= 0 ? "1" : "0" },
+		{ "Ml", m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "1" : "0" },
 		{ NULL, NULL },
 		{ NULL, NULL }
 	};
@@ -1125,31 +1125,22 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	}
 
 	// Compile the final pixel shader
-	CStringA shaderSourceCode = shader_final;
+	LPCSTR pSrcData = shader_final;
+	D3DXMACRO ShaderMacros[5] = { { NULL, NULL }, };
+	size_t i = 0;
 
-	int quantization;
-	if (m_DisplayType == D3DFMT_A2R10G10B10) {
-		quantization = 1023;    // 10-bit
-	} else {
-		quantization = 255;    // 8-bit
-	}
-
-	CStringA quantizationString;
-	quantizationString.Format("%d.", quantization);
-	shaderSourceCode.Replace("_QUANTIZATION_VALUE_", quantizationString);
-
-	CStringA lut3DEnabledString;
-	lut3DEnabledString.Format("%d", static_cast<int>(bColorManagement));
-	shaderSourceCode.Replace("_LUT3D_ENABLED_VALUE_", lut3DEnabledString);
+	ShaderMacros[i++] = { "Ml", m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "1" : "0" };
+	ShaderMacros[i++] = { "QUANTIZATION", m_DisplayType == D3DFMT_A2R10G10B10 ? "1023.0" : "255.0"}; // 10-bit or 8-bit
+	ShaderMacros[i++] = { "LUT3D_ENABLED", bColorManagement ? "1": "0" };
 
 	if (bColorManagement) {
-		CStringA lut3DSizeString;
-		lut3DSizeString.Format("%d.", m_Lut3DSize);
-		shaderSourceCode.Replace("_LUT3D_SIZE_VALUE_", lut3DSizeString);
+		static char lut3DSizeStr[12];
+		sprintf(lut3DSizeStr, "%d", m_Lut3DSize);
+		ShaderMacros[i++] = { "LUT3D_SIZE", lut3DSizeStr };
 	}
 
 	CString ErrorMessage;
-	hr = m_pPSC->CompileShader(shaderSourceCode, "main", m_ShaderProfile, 0, NULL, &m_pFinalPixelShader, &ErrorMessage);
+	hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pFinalPixelShader, &ErrorMessage);
 	if (FAILED(hr)) {
 		TRACE("%ws", ErrorMessage.GetString());
 		ASSERT (0);

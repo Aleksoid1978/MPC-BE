@@ -1069,7 +1069,7 @@ HRESULT CBaseAP::InitShaderResizer(int iShader)
 
 	LPCSTR pSrcData = NULL;
 	D3DXMACRO ShaderMacros[3] = {
-		{ "Ml", strcmp(m_ShaderProfile, "ps_3_0") >= 0 ? "1" : "0" },
+		{ "Ml", m_caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "1" : "0" },
 		{ NULL, NULL },
 		{ NULL, NULL }
 	};
