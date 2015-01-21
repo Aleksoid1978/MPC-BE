@@ -1042,8 +1042,17 @@ HRESULT CBaseAP::InitShaderResizer(int iShader)
 		return S_OK;
 	}
 
+	if (m_caps.PixelShaderVersion < D3DPS_VERSION(2, 0)) {
+		return E_FAIL;
+	}
+	LPCSTR pProfile = m_caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "ps_3_0" : "ps_2_0";
+
 	LPCSTR pSrcData = NULL;
-	CStringA str;
+	D3DXMACRO ShaderMacros[3] = {
+		{ "Ml", strcmp(pProfile, "ps_3_0") >= 0 ? "1" : "0" },
+		{ NULL, NULL },
+		{ NULL, NULL }
+	};
 
 	switch (iShader) {
 	case shader_bilinear:
@@ -1053,19 +1062,16 @@ HRESULT CBaseAP::InitShaderResizer(int iShader)
 		pSrcData = shader_resizer_smootherstep;
 		break;
 	case shader_bicubic06:
-		str = shader_resizer_bicubic;
-		str.Replace("VALUE", "-0.6f");
-		pSrcData = str;
+		pSrcData = shader_resizer_bicubic;
+		ShaderMacros[1] = { "A", "-0.6" };
 		break;
 	case shader_bicubic08:
-		str = shader_resizer_bicubic;
-		str.Replace("VALUE", "-0.8f");
-		pSrcData = str;
+		pSrcData = shader_resizer_bicubic;
+		ShaderMacros[1] = { "A", "-0.8" };
 		break;
 	case shader_bicubic10:
-		str = shader_resizer_bicubic;;
-		str.Replace("VALUE", "-1.0f");
-		pSrcData = str;
+		pSrcData = shader_resizer_bicubic;
+		ShaderMacros[1] = { "A", "-1.0" };
 		break;
 	case shader_bspline4:
 		pSrcData = shader_resizer_bspline4;
@@ -1082,16 +1088,10 @@ HRESULT CBaseAP::InitShaderResizer(int iShader)
 		return E_FAIL;
 	}
 
-	if (m_caps.PixelShaderVersion < D3DPS_VERSION(2, 0)) {
-		return E_FAIL;
-	}
-	LPCSTR pProfile = m_caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "ps_3_0" : "ps_2_0";
-
 	HRESULT hr = S_OK;
 	CString ErrorMessage;
-	CString DissAssembly;
 
-	hr = m_pPSC->CompileShader(pSrcData, "main", pProfile, 0, &m_pResizerPixelShader[iShader], &DissAssembly, &ErrorMessage);
+	hr = m_pPSC->CompileShader(pSrcData, "main", pProfile, 0, ShaderMacros, &m_pResizerPixelShader[iShader], &ErrorMessage);
 
 	if (FAILED(hr)) {
 		TRACE("%ws", ErrorMessage.GetString());

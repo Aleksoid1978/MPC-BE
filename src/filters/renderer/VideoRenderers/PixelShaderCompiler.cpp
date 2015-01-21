@@ -56,9 +56,10 @@ HRESULT CPixelShaderCompiler::CompileShader(
 	LPCSTR pFunctionName,
 	LPCSTR pProfile,
 	DWORD Flags,
+	const D3DXMACRO* pDefines,
 	IDirect3DPixelShader9** ppPixelShader,
-	CString* disasm,
-	CString* errmsg)
+	CString* errmsg,
+	CString* disasm)
 {
 	if (!m_pD3DXCompileShader || !m_pD3DXDisassembleShader) {
 		return E_FAIL;
@@ -66,9 +67,8 @@ HRESULT CPixelShaderCompiler::CompileShader(
 
 	HRESULT hr;
 
-	D3DXMACRO ShaderMacros[2] = {{"Ml", "1"}, {NULL, NULL}};
 	CComPtr<ID3DXBuffer> pShader, pDisAsm, pErrorMsgs;
-	hr = m_pD3DXCompileShader(pSrcData, (UINT)strlen(pSrcData), strcmp(pProfile, "ps_3_0") >= 0 ? ShaderMacros : NULL, NULL, pFunctionName, pProfile, Flags, &pShader, &pErrorMsgs, NULL);
+	hr = m_pD3DXCompileShader(pSrcData, (UINT)strlen(pSrcData), pDefines, NULL, pFunctionName, pProfile, Flags, &pShader, &pErrorMsgs, NULL);
 
 	if (FAILED(hr)) {
 		if (errmsg) {

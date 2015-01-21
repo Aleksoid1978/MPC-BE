@@ -123,7 +123,7 @@ namespace DSObjects
 			CStringA m_SourceData;
 			CStringA m_SourceTarget;
 			HRESULT Compile(CPixelShaderCompiler *pCompiler) {
-				HRESULT hr = pCompiler->CompileShader(m_SourceData, "main", m_SourceTarget, 0, &m_pPixelShader);
+				HRESULT hr = pCompiler->CompileShader(m_SourceData, "main", m_SourceTarget, 0, NULL, &m_pPixelShader);
 				if (FAILED(hr)) {
 					return hr;
 				}

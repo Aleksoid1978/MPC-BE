@@ -78,11 +78,10 @@ char const shader_resizer_smootherstep[] =
 
 
 char const shader_resizer_bicubic[] =
+// "#define A -0.6, -0.8 or -1.0
 "#if Ml\n"
 "#define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))\n"
 "#endif\n"
-
-"#define A VALUE\n"
 
 "sampler s0 : register(s0);"
 "float2 dxdy :   register(c0);"
