@@ -58,7 +58,8 @@ public:
 		LPCSTR pFunctionName,
 		LPCSTR pProfile,
 		DWORD Flags,
+		const D3DXMACRO* pDefines,
 		IDirect3DPixelShader9** ppPixelShader,
-		CString* disasm = NULL,
-		CString* errmsg = NULL);
+		CString* errmsg = NULL,
+		CString* disasm = NULL);
 };

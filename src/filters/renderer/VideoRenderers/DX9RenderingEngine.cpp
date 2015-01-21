@@ -647,7 +647,11 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 
 	bool twopass = false;
 	LPCSTR pSrcData = NULL;
-	CStringA str;
+	D3DXMACRO ShaderMacros[3] = {
+		{ "Ml", strcmp(m_ShaderProfile, "ps_3_0") >= 0 ? "1" : "0" },
+		{ NULL, NULL },
+		{ NULL, NULL }
+	};
 
 	switch (iShader) {
 	case shader_bilinear:
@@ -660,25 +664,22 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 	case shader_bicubic06_y:
 		iShader--;
 	case shader_bicubic06_x:
-		str = shader_resizer_bicubic;
-		str.Replace("VALUE", "-0.6f");
-		pSrcData = str;
+		pSrcData = shader_resizer_bicubic;
+		ShaderMacros[1] = { "A", "-0.6" };
 		twopass = true;
 		break;
 	case shader_bicubic08_y:
 		iShader--;
 	case shader_bicubic08_x:
-		str = shader_resizer_bicubic;
-		str.Replace("VALUE", "-0.8f");
-		pSrcData = str;
+		pSrcData = shader_resizer_bicubic;
+		ShaderMacros[1] = { "A", "-0.8" };
 		twopass = true;
 		break;
 	case shader_bicubic10_y:
 		iShader--;
 	case shader_bicubic10_x:
-		str = shader_resizer_bicubic;
-		str.Replace("VALUE", "-1.0f");
-		pSrcData = str;
+		pSrcData = shader_resizer_bicubic;
+		ShaderMacros[1] = { "A", "-1.0" };
 		twopass = true;
 		break;
 	case shader_bspline4_y:
@@ -707,19 +708,16 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 		break;
 #else
 	case shader_bicubic06:
-		str = shader_resizer_bicubic;
-		str.Replace("VALUE", "-0.6f");
-		pSrcData = str;
+		pSrcData = shader_resizer_bicubic;
+		ShaderMacros[1] = { "A", "-0.6" };
 		break;
 	case shader_bicubic08:
-		str = shader_resizer_bicubic;
-		str.Replace("VALUE", "-0.8f");
-		pSrcData = str;
+		pSrcData = shader_resizer_bicubic;
+		ShaderMacros[1] = { "A", "-0.8" };
 		break;
 	case shader_bicubic10:
-		str = shader_resizer_bicubic;;
-		str.Replace("VALUE", "-1.0f");
-		pSrcData = str;
+		pSrcData = shader_resizer_bicubic;
+		ShaderMacros[1] = { "A", "-1.0" };
 		break;
 	case shader_bspline4:
 		pSrcData = shader_resizer_bspline4;
@@ -739,26 +737,25 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 
 	HRESULT hr = S_OK;
 	CString ErrorMessage;
-	CString DissAssembly;
 
 	if (twopass) {
 #if ENABLE_2PASS_RESIZE
-		hr = m_pPSC->CompileShader(pSrcData, "main_x", m_ShaderProfile, 0, &m_pResizerPixelShaders[iShader], &DissAssembly, &ErrorMessage);
+		hr = m_pPSC->CompileShader(pSrcData, "main_x", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[iShader], &ErrorMessage);
 		if (hr == S_OK) {
-			hr = m_pPSC->CompileShader(pSrcData, "main_y", m_ShaderProfile, 0, &m_pResizerPixelShaders[iShader + 1], &DissAssembly, &ErrorMessage);
+			hr = m_pPSC->CompileShader(pSrcData, "main_y", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[iShader + 1], &ErrorMessage);
 		}
 
 		if (hr == S_OK && !m_pResizerPixelShaders[shader_downscaling_x]) {
 			pSrcData = shader_resizer_downscaling;
 
-			hr = m_pPSC->CompileShader(pSrcData, "main_x", m_ShaderProfile, 0, &m_pResizerPixelShaders[shader_downscaling_x], &DissAssembly, &ErrorMessage);
+			hr = m_pPSC->CompileShader(pSrcData, "main_x", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling_x], &ErrorMessage);
 			if (hr == S_OK) {
-				hr = m_pPSC->CompileShader(pSrcData, "main_y", m_ShaderProfile, 0, &m_pResizerPixelShaders[shader_downscaling_y], &DissAssembly, &ErrorMessage);
+				hr = m_pPSC->CompileShader(pSrcData, "main_y", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling_y], &ErrorMessage);
 			}
 		}
 #endif
 	} else {
-		hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, &m_pResizerPixelShaders[iShader], &DissAssembly, &ErrorMessage);
+		hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[iShader], &ErrorMessage);
 	}
 
 	if (FAILED(hr)) {
@@ -1152,8 +1149,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	}
 
 	CString ErrorMessage;
-	CString DissAssembly;
-	hr = m_pPSC->CompileShader(shaderSourceCode, "main", m_ShaderProfile, 0, &m_pFinalPixelShader, &DissAssembly, &ErrorMessage);
+	hr = m_pPSC->CompileShader(shaderSourceCode, "main", m_ShaderProfile, 0, NULL, &m_pFinalPixelShader, &ErrorMessage);
 	if (FAILED(hr)) {
 		TRACE("%ws", ErrorMessage.GetString());
 		ASSERT (0);
