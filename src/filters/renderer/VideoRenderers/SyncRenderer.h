@@ -166,6 +166,7 @@ namespace GothSync
 		D3DTEXTUREFILTERTYPE m_filter;
 		D3DCAPS9 m_caps;
 		D3DPRESENT_PARAMETERS pp;
+		LPCSTR m_ShaderProfile;
 
 		bool SettingsNeedResetDevice();
 		void SendResetRequest();

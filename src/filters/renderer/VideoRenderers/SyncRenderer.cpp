@@ -161,6 +161,27 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 
 	m_pGenlock = DNew CGenlock(s.m_AdvRendSets.fTargetSyncOffset, s.m_AdvRendSets.fControlLimit, s.m_AdvRendSets.iLineDelta, s.m_AdvRendSets.iColumnDelta, s.m_AdvRendSets.fCycleDelta, 0); // Must be done before CreateDXDevice
 	hr = CreateDXDevice(_Error);
+
+	// Define the shader profile.
+	if (m_caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
+		m_ShaderProfile = "ps_3_0";
+	} else if (m_caps.PixelShaderVersion >= D3DPS_VERSION(2,0)) {
+		// http://en.wikipedia.org/wiki/High-level_shader_language
+
+		if (m_caps.PS20Caps.NumTemps >= 22
+			&& (m_caps.PS20Caps.Caps & (D3DPS20CAPS_ARBITRARYSWIZZLE | D3DPS20CAPS_GRADIENTINSTRUCTIONS |
+			D3DPS20CAPS_PREDICATION | D3DPS20CAPS_NODEPENDENTREADLIMIT | D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT))) {
+			m_ShaderProfile = "ps_2_a";
+		} else if (m_caps.PS20Caps.NumTemps >= 32
+			&& (m_caps.PS20Caps.Caps & D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT)) {
+			m_ShaderProfile = "ps_2_b";
+		} else {
+			m_ShaderProfile = "ps_2_0";
+		}
+	} else {
+		m_ShaderProfile = NULL;
+	}
+
 	memset (m_pllJitter, 0, sizeof(m_pllJitter));
 	memset (m_pllSyncOffset, 0, sizeof(m_pllSyncOffset));
 }
@@ -1045,11 +1066,10 @@ HRESULT CBaseAP::InitShaderResizer(int iShader)
 	if (m_caps.PixelShaderVersion < D3DPS_VERSION(2, 0)) {
 		return E_FAIL;
 	}
-	LPCSTR pProfile = m_caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "ps_3_0" : "ps_2_0";
 
 	LPCSTR pSrcData = NULL;
 	D3DXMACRO ShaderMacros[3] = {
-		{ "Ml", strcmp(pProfile, "ps_3_0") >= 0 ? "1" : "0" },
+		{ "Ml", strcmp(m_ShaderProfile, "ps_3_0") >= 0 ? "1" : "0" },
 		{ NULL, NULL },
 		{ NULL, NULL }
 	};
@@ -1091,7 +1111,7 @@ HRESULT CBaseAP::InitShaderResizer(int iShader)
 	HRESULT hr = S_OK;
 	CString ErrorMessage;
 
-	hr = m_pPSC->CompileShader(pSrcData, "main", pProfile, 0, ShaderMacros, &m_pResizerPixelShader[iShader], &ErrorMessage);
+	hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShader[iShader], &ErrorMessage);
 
 	if (FAILED(hr)) {
 		TRACE("%ws", ErrorMessage.GetString());
