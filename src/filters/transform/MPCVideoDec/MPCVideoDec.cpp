@@ -1091,7 +1091,7 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 		rtStop = INVALID_TIME;
 	}
 
-	if (rtStop == INVALID_TIME || rtStop - 1 <= rtStart) {
+	if (rtStop == INVALID_TIME) {
 		REFERENCE_TIME rtFrameDuration = AvgTimePerFrame * (m_pFrame->repeat_pict ? 3 : 2)  / 2;
 		rtStop = rtStart + (rtFrameDuration / m_dRate);
 	}
@@ -2132,8 +2132,10 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 		m_pDXVADecoder->Flush();
 	}
 
-	memset(&m_BFrames, 0, sizeof(m_BFrames));
+	m_BFrames[0].rtStart = m_BFrames[0].rtStop = INVALID_TIME;
+	m_BFrames[1].rtStart = m_BFrames[1].rtStop = INVALID_TIME;
 	m_nPosB = 1;
+
 	m_dRate	= dRate;
 
 	m_bWaitingForKeyFrame = TRUE;
