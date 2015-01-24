@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -122,7 +122,6 @@ STDMETHODIMP CDX9SubPic::CopyTo(ISubPic* pSubPic)
 	SetRect(&r, 0, 0, min(srcDesc.Width, dstDesc.Width), min(srcDesc.Height, dstDesc.Height));
 	POINT p = { 0, 0 };
 	hr = pD3DDev->UpdateSurface(pSrcSurf, &r, pDstSurf, &p);
-	//	ASSERT (SUCCEEDED (hr));
 
 	return SUCCEEDED(hr) ? S_OK : E_FAIL;
 }
@@ -199,7 +198,7 @@ STDMETHODIMP CDX9SubPic::Lock(SubPicDesc& spd)
 
 STDMETHODIMP CDX9SubPic::Unlock(RECT* pDirtyRect)
 {
-	HRESULT hr = m_pSurface->UnlockRect();
+	m_pSurface->UnlockRect();
 
 	if (pDirtyRect) {
 		m_rcDirty = *pDirtyRect;
@@ -217,7 +216,7 @@ STDMETHODIMP CDX9SubPic::Unlock(RECT* pDirtyRect)
 
 	CComPtr<IDirect3DTexture9> pTexture = (IDirect3DTexture9*)GetObject();
 	if (pTexture && !((CRect*)pDirtyRect)->IsRectEmpty()) {
-		hr = pTexture->AddDirtyRect(&m_rcDirty);
+		pTexture->AddDirtyRect(&m_rcDirty);
 	}
 
 	return S_OK;
@@ -284,7 +283,7 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		hr = pD3DDev->SetRenderState(D3DRS_ZENABLE, FALSE);
 		hr = pD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 		hr = pD3DDev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE); // pre-multiplied src and ...
-		hr = pD3DDev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_SRCALPHA); // ... inverse alpha channel for dst
+		hr = pD3DDev->SetRenderState(D3DRS_DESTBLEND, m_bInvAlpha ? D3DBLEND_INVSRCALPHA : D3DBLEND_SRCALPHA); // ... inverse alpha channel for dst
 
 		hr = pD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 		hr = pD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
@@ -302,7 +301,7 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 
 		hr = pD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
 		hr = pD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
-		hr = pD3DDev->SetSamplerState(0, D3DSAMP_BORDERCOLOR, 0xFF000000);
+		hr = pD3DDev->SetSamplerState(0, D3DSAMP_BORDERCOLOR, m_bInvAlpha ? 0x00000000 : 0xFF000000);
 
 		/*//
 
@@ -393,15 +392,26 @@ STDMETHODIMP CDX9SubPicAllocator::ChangeDevice(IUnknown* pDev)
 	}
 
 	CAutoLock cAutoLock(this);
-	m_pD3DDev = pD3DDev;
+	HRESULT hr = S_FALSE;
+	if (m_pD3DDev != pD3DDev) {
+	    ClearCache();
+	    m_pD3DDev = pD3DDev;
+	    hr = __super::ChangeDevice(pDev);
+	}
 
-	return __super::ChangeDevice(pDev);
+	return hr;
 }
 
 STDMETHODIMP CDX9SubPicAllocator::SetMaxTextureSize(SIZE MaxTextureSize)
 {
-	ClearCache();
-	m_maxsize = MaxTextureSize;
+	CAutoLock cAutoLock(this);
+	if (m_maxsize != MaxTextureSize) {
+		if (m_maxsize.cx < MaxTextureSize.cx || m_maxsize.cy < MaxTextureSize.cy) {
+			ClearCache();
+		}
+		m_maxsize = MaxTextureSize;
+	}
+
 	SetCurSize(MaxTextureSize);
 	SetCurVidRect(CRect(CPoint(0,0), MaxTextureSize));
 
@@ -424,10 +434,8 @@ bool CDX9SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 
 	if (!fStatic) {
 		CAutoLock cAutoLock(&ms_SurfaceQueueLock);
-		POSITION FreeSurf = m_FreeSurfaces.GetHeadPosition();
-		if (FreeSurf) {
-			pSurface = m_FreeSurfaces.GetHead();
-			m_FreeSurfaces.RemoveHead();
+		if (!m_FreeSurfaces.IsEmpty()) {
+		    pSurface = m_FreeSurfaces.RemoveHead();
 		}
 	}
 

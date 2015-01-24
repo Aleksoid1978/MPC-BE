@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -52,7 +52,7 @@ HRESULT CRM9AllocatorPresenter::AllocSurfaces()
 	HRESULT hr;
 
 	if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(
-						m_NativeVideoSize.cx, m_NativeVideoSize.cy, D3DFMT_X8R8G8B8,
+						m_nativeVideoSize.cx, m_nativeVideoSize.cy, D3DFMT_X8R8G8B8,
 						D3DPOOL_DEFAULT, &m_pVideoSurfaceOff, NULL))) {
 		return hr;
 	}
@@ -60,7 +60,7 @@ HRESULT CRM9AllocatorPresenter::AllocSurfaces()
 	m_pD3DDev->ColorFill(m_pVideoSurfaceOff, NULL, 0);
 
 	if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(
-						m_NativeVideoSize.cx, m_NativeVideoSize.cy, D3DFMT_YUY2,
+						m_nativeVideoSize.cx, m_nativeVideoSize.cy, D3DFMT_YUY2,
 						D3DPOOL_DEFAULT, &m_pVideoSurfaceYUY2, NULL))) {
 		m_pVideoSurfaceYUY2 = NULL;
 	}
@@ -214,7 +214,7 @@ STDMETHODIMP CRM9AllocatorPresenter::BeginOptimizedBlt(RMABitmapInfoHeader* pBit
 	CAutoLock cAutoLock(this);
 	CAutoLock cRenderLock(&m_RenderLock);
 	DeleteSurfaces();
-	m_NativeVideoSize = m_AspectRatio = CSize(pBitmapInfo->biWidth, abs(pBitmapInfo->biHeight));
+	m_nativeVideoSize = m_aspectRatio = CSize(pBitmapInfo->biWidth, abs(pBitmapInfo->biHeight));
 	if (FAILED(AllocSurfaces())) {
 		return E_FAIL;
 	}

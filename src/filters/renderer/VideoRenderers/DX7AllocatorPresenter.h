@@ -28,7 +28,6 @@
 
 namespace DSObjects
 {
-
 	class CDX7AllocatorPresenter
 		: public CSubPicAllocatorPresenterImpl
 	{
@@ -69,5 +68,4 @@ namespace DSObjects
 			return m_bIsRendering;
 		}
 	};
-
 }

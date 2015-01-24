@@ -690,59 +690,30 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		m_pSubPicQueue->GetSubPicProvider(&pSubPicProvider);
 	}
 
-	CSize size;
-	switch (GetRenderersSettings().nSPMaxTexRes) {
-		case 0:
-			size = m_ScreenSize;
-			break;
-		case 384:
-			size.SetSize(384, 288);
-			break;
-		case 512:
-			size.SetSize(512, 384);
-			break;
-		case 640:
-			size.SetSize(640, 480);
-			break;
-		case 800:
-			size.SetSize(800, 600);
-			break;
-		case 1024:
-			size.SetSize(1024, 768);
-			break;
-		case 1280:
-		default:
-			size.SetSize(1280, 720);
-			break;
-		case 1320:
-			size.SetSize(1320, 900);
-			break;
-		case 1920:
-			size.SetSize(1920, 1080);
-			break;
-		case 2560:
-			size.SetSize(2560, 1600);
-			break;
-	}
+	InitMaxSubtitleTextureSize(GetRenderersSettings().nSPMaxTexRes, m_ScreenSize);
 
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(m_pD3DDev);
 	} else {
-		m_pAllocator = DNew CDX9SubPicAllocator(m_pD3DDev, size, false);
+		m_pAllocator = DNew CDX9SubPicAllocator(m_pD3DDev, m_maxSubtitleTextureSize, false);
 	}
 	if (!m_pAllocator) {
 		_Error += L"CDX9SubPicAllocator failed\n";
-
 		return E_FAIL;
 	}
 
 	hr = S_OK;
-	m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
-					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, GetRenderersSettings().bSPAllowDropSubPic, m_pAllocator, &hr)
-					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr);
+	if (!m_pSubPicQueue) {
+		CAutoLock cAutoLock(this);
+		m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
+						 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, GetRenderersSettings().bSPAllowDropSubPic, m_pAllocator, &hr)
+						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr);
+	} else {
+		m_pSubPicQueue->Invalidate();
+	}
+
 	if (!m_pSubPicQueue || FAILED(hr)) {
 		_Error += L"m_pSubPicQueue failed\n";
-
 		return E_FAIL;
 	}
 
@@ -1233,8 +1204,8 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	LONGLONG StartPaint = pApp->GetPerfCounter();
 	CAutoLock cRenderLock(&m_RenderLock);
 
-	if (m_WindowRect.right <= m_WindowRect.left || m_WindowRect.bottom <= m_WindowRect.top
-			|| m_NativeVideoSize.cx <= 0 || m_NativeVideoSize.cy <= 0) {
+	if (m_windowRect.right <= m_windowRect.left || m_windowRect.bottom <= m_windowRect.top
+			|| m_nativeVideoSize.cx <= 0 || m_nativeVideoSize.cy <= 0) {
 		if (m_OrderedPaint) {
 			--m_OrderedPaint;
 		} else {
@@ -1257,10 +1228,10 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	hr = m_pD3DDev->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0);
 
 	CRect rSrcVid(CPoint(0, 0), GetVisibleVideoSize());
-	CRect rDstVid(m_VideoRect);
+	CRect rDstVid(m_videoRect);
 
-	CRect rSrcPri(CPoint(0, 0), m_WindowRect.Size());
-	CRect rDstPri(m_WindowRect);
+	CRect rSrcPri(CPoint(0, 0), m_windowRect.Size());
+	CRect rDstPri(m_windowRect);
 
 	// Render the current video frame
 	hr = RenderVideo(pBackBuffer, rSrcVid, rDstVid);
@@ -1786,16 +1757,16 @@ void CDX9AllocatorPresenter::DrawStats()
 	static int		TextHeight = 0;
 	static CRect	WindowRect(0, 0, 0, 0);
 
-	if (WindowRect != m_WindowRect) {
+	if (WindowRect != m_windowRect) {
 		m_pFont.Release();
 	}
-	WindowRect = m_WindowRect;
+	WindowRect = m_windowRect;
 
 	if (!m_pFont && m_pD3DXCreateFont) {
-		int  FontHeight = max(m_WindowRect.Height() / 35, 6); // must be equal to 5 or more
-		UINT FontWidth  = max(m_WindowRect.Width() / 130, 4); // 0 = auto
+		int  FontHeight = max(m_windowRect.Height() / 35, 6); // must be equal to 5 or more
+		UINT FontWidth  = max(m_windowRect.Width() / 130, 4); // 0 = auto
 		UINT FontWeight = FW_BOLD;
-		if ((m_rcMonitor.Width() - m_WindowRect.Width()) > 100) {
+		if ((m_rcMonitor.Width() - m_windowRect.Width()) > 100) {
 			FontWeight  = FW_NORMAL;
 		}
 
@@ -2052,7 +2023,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		OffsetRect(&rc, 0, TextHeight);
 
 		if (bDetailedStats > 1) {
-			strText.Format(L"Video size   : %d x %d  (AR = %d : %d)", m_NativeVideoSize.cx, m_NativeVideoSize.cy, m_AspectRatio.cx, m_AspectRatio.cy);
+			strText.Format(L"Video size   : %d x %d  (AR = %d : %d)", m_nativeVideoSize.cx, m_nativeVideoSize.cy, m_aspectRatio.cx, m_aspectRatio.cy);
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 			if (m_pVideoTexture[0] || m_pVideoSurface[0]) {
@@ -2063,7 +2034,7 @@ void CDX9AllocatorPresenter::DrawStats()
 					m_pVideoSurface[0]->GetDesc(&desc);
 				}
 
-				if (desc.Width != (UINT)m_NativeVideoSize.cx || desc.Height != (UINT)m_NativeVideoSize.cy) {
+				if (desc.Width != (UINT)m_nativeVideoSize.cx || desc.Height != (UINT)m_nativeVideoSize.cy) {
 					strText.Format(L"Texture size : %d x %d", desc.Width, desc.Height);
 					DrawText(rc, strText, 1);
 					OffsetRect(&rc, 0, TextHeight);
@@ -2128,13 +2099,13 @@ void CDX9AllocatorPresenter::DrawStats()
 
 		int StartX = 0;
 		int StartY = 0;
-		float ScaleX = min(1.0f, max(0.4f, 1.4f * m_WindowRect.Width() / m_rcMonitor.Width()));
-		float ScaleY = min(1.0f, max(0.4f, 1.4f * m_WindowRect.Height() / m_rcMonitor.Height()));
+		float ScaleX = min(1.0f, max(0.4f, 1.4f * m_windowRect.Width() / m_rcMonitor.Width()));
+		float ScaleY = min(1.0f, max(0.4f, 1.4f * m_windowRect.Height() / m_rcMonitor.Height()));
 		int DrawWidth = 625 * ScaleX + 50 * ScaleX;
 		int DrawHeight = 250 * ScaleY;
 		int Alpha = 80;
-		StartX = m_WindowRect.Width() - (DrawWidth + 20);
-		StartY = m_WindowRect.Height() - (DrawHeight + 20);
+		StartX = m_windowRect.Width() - (DrawWidth + 20);
+		StartY = m_windowRect.Height() - (DrawHeight + 20);
 
 		DrawRect(RGB(0,0,0), Alpha, CRect(StartX, StartY, StartX + DrawWidth, StartY + DrawHeight));
 		// === Jitter Graduation

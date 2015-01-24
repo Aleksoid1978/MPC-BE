@@ -586,63 +586,32 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_filter = D3DTEXF_LINEAR;
 	}
 
-	CSize size;
-	switch (GetRenderersSettings().nSPMaxTexRes) {
-		case 0:
-			size = m_ScreenSize;
-			break;
-		case 384:
-			size.SetSize(384, 288);
-			break;
-		case 512:
-			size.SetSize(512, 384);
-			break;
-		case 640:
-			size.SetSize(640, 480);
-			break;
-		case 800:
-			size.SetSize(800, 600);
-			break;
-		case 1024:
-			size.SetSize(1024, 768);
-			break;
-		case 1280:
-		default:
-			size.SetSize(1280, 720);
-			break;
-		case 1320:
-			size.SetSize(1320, 900);
-			break;
-		case 1920:
-			size.SetSize(1920, 1080);
-			break;
-		case 2560:
-			size.SetSize(2560, 1600);
-			break;
-	}
+	InitMaxSubtitleTextureSize(GetRenderersSettings().nSPMaxTexRes, m_ScreenSize);
 
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(m_pD3DDev);
 	} else {
-		m_pAllocator = DNew CDX9SubPicAllocator(m_pD3DDev, size, false);
+		m_pAllocator = DNew CDX9SubPicAllocator(m_pD3DDev, m_maxSubtitleTextureSize, false);
 		if (!m_pAllocator) {
 			_Error += L"CDX9SubPicAllocator failed\n";
 			return E_FAIL;
 		}
 	}
 
-	hr = S_OK;
-
 	CComPtr<ISubPicProvider> pSubPicProvider;
 	if (m_pSubPicQueue) {
-		DEBUG_ONLY(_tprintf_s(_T("m_pSubPicQueue != NULL\n")));
 		m_pSubPicQueue->GetSubPicProvider(&pSubPicProvider);
 	}
 
-	m_pSubPicQueue = NULL;
-	m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
-					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, !GetRenderersSettings().bSPAllowDropSubPic, m_pAllocator, &hr)
-					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr);
+	hr = S_OK;
+	if (!m_pSubPicQueue) {
+		CAutoLock cAutoLock(this);
+		m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
+						 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, GetRenderersSettings().bSPAllowDropSubPic, m_pAllocator, &hr)
+						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr);
+	} else {
+		m_pSubPicQueue->Invalidate();
+	}
 	if (!m_pSubPicQueue || FAILED(hr)) {
 		_Error += L"m_pSubPicQueue failed\n";
 		return E_FAIL;
@@ -955,7 +924,7 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 
 		for (int i = 0; i < nTexturesNeeded; i++) {
 			if (FAILED(hr = m_pD3DDev->CreateTexture(
-								m_NativeVideoSize.cx, m_NativeVideoSize.cy, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &m_pVideoTexture[i], NULL))) {
+								m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &m_pVideoTexture[i], NULL))) {
 				return hr;
 			}
 
@@ -969,7 +938,7 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 			}
 		}
 	} else {
-		if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(m_NativeVideoSize.cx, m_NativeVideoSize.cy, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &m_pVideoSurface[m_nCurSurface], NULL))) {
+		if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(m_nativeVideoSize.cx, m_nativeVideoSize.cy, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &m_pVideoSurface[m_nCurSurface], NULL))) {
 			return hr;
 		}
 	}
@@ -1417,17 +1386,17 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	llSyncOffset = REFERENCE_TIME(10000.0 * dSyncOffset); // Reference time units (100 ns)
 	m_llEstVBlankTime = llCurRefTime + llSyncOffset; // Estimated time for the start of next vblank
 
-	if (m_WindowRect.right <= m_WindowRect.left || m_WindowRect.bottom <= m_WindowRect.top
-			|| m_NativeVideoSize.cx <= 0 || m_NativeVideoSize.cy <= 0
+	if (m_windowRect.right <= m_windowRect.left || m_windowRect.bottom <= m_windowRect.top
+			|| m_nativeVideoSize.cx <= 0 || m_nativeVideoSize.cy <= 0
 			|| !m_pVideoSurface) {
 		return false;
 	}
 
 	HRESULT hr;
-	CRect rSrcVid(CPoint(0, 0), m_NativeVideoSize);
-	CRect rDstVid(m_VideoRect);
-	CRect rSrcPri(CPoint(0, 0), m_WindowRect.Size());
-	CRect rDstPri(m_WindowRect);
+	CRect rSrcVid(CPoint(0, 0), m_nativeVideoSize);
+	CRect rDstVid(m_videoRect);
+	CRect rSrcPri(CPoint(0, 0), m_windowRect.Size());
+	CRect rDstPri(m_windowRect);
 
 	m_pD3DDev->BeginScene();
 	CComPtr<IDirect3DSurface9> pBackBuffer;
@@ -1515,14 +1484,14 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 			if (bNeedScreenSizeTexture && (!m_pScreenSizeTemporaryTexture[0] || !m_pScreenSizeTemporaryTexture[1])) {
 				if (FAILED(m_pD3DDev->CreateTexture(
-					min(m_ScreenSize.cx, (int)m_caps.MaxTextureWidth), min(max(m_ScreenSize.cy, m_NativeVideoSize.cy), (int)m_caps.MaxTextureHeight), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
+					min(m_ScreenSize.cx, (int)m_caps.MaxTextureWidth), min(max(m_ScreenSize.cy, m_nativeVideoSize.cy), (int)m_caps.MaxTextureHeight), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
 					D3DPOOL_DEFAULT, &m_pScreenSizeTemporaryTexture[0], NULL))) {
 					ASSERT(0);
 					m_pScreenSizeTemporaryTexture[0] = NULL; // will do 1 pass then
 					bScreenSpacePixelShaders = false;
 				}
 				else if (FAILED(m_pD3DDev->CreateTexture(
-					min(m_ScreenSize.cx, (int)m_caps.MaxTextureWidth), min(max(m_ScreenSize.cy, m_NativeVideoSize.cy), (int)m_caps.MaxTextureHeight), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
+					min(m_ScreenSize.cx, (int)m_caps.MaxTextureWidth), min(max(m_ScreenSize.cy, m_nativeVideoSize.cy), (int)m_caps.MaxTextureHeight), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
 					D3DPOOL_DEFAULT, &m_pScreenSizeTemporaryTexture[1], NULL))) {
 					ASSERT(0);
 					m_pScreenSizeTemporaryTexture[1] = NULL; // will do 1 pass then
@@ -1933,7 +1902,7 @@ void CBaseAP::DrawStats()
 			}
 #endif
 
-			strText.Format(L"Video size   : %d x %d  (AR = %d : %d)  Display resolution %d x %d ", m_NativeVideoSize.cx, m_NativeVideoSize.cy, m_AspectRatio.cx, m_AspectRatio.cy, m_ScreenSize.cx, m_ScreenSize.cy);
+			strText.Format(L"Video size   : %d x %d  (AR = %d : %d)  Display resolution %d x %d ", m_nativeVideoSize.cx, m_nativeVideoSize.cy, m_aspectRatio.cx, m_aspectRatio.cy, m_ScreenSize.cx, m_ScreenSize.cy);
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
@@ -2029,8 +1998,8 @@ void CBaseAP::DrawStats()
 		int DrawWidth = 625;
 		int DrawHeight = 250;
 		int Alpha = 80;
-		int StartX = m_WindowRect.Width() - (DrawWidth + 20);
-		int StartY = m_WindowRect.Height() - (DrawHeight + 20);
+		int StartX = m_windowRect.Width() - (DrawWidth + 20);
+		int StartY = m_windowRect.Height() - (DrawHeight + 20);
 
 		DrawRect(RGB(0, 0, 0), Alpha, CRect(StartX, StartY, StartX + DrawWidth, StartY + DrawHeight));
 		m_pLine->SetWidth(2.5);
@@ -2795,8 +2764,8 @@ HRESULT CSyncAP::CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType
 	VideoFormat = (MFVIDEOFORMAT*)pAMMedia->pbFormat;
 	hr = pfMFCreateVideoMediaType(VideoFormat, &m_pMediaType);
 
-	m_AspectRatio.cx = VideoFormat->videoInfo.PixelAspectRatio.Numerator;
-	m_AspectRatio.cy = VideoFormat->videoInfo.PixelAspectRatio.Denominator;
+	m_aspectRatio.cx = VideoFormat->videoInfo.PixelAspectRatio.Numerator;
+	m_aspectRatio.cy = VideoFormat->videoInfo.PixelAspectRatio.Denominator;
 
 	if (SUCCEEDED (hr)) {
 		i64Size.HighPart = VideoFormat->videoInfo.dwWidth;
@@ -2812,19 +2781,19 @@ HRESULT CSyncAP::CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType
 		}
 
 		m_LastSetOutputRange = s.m_AdvRendSets.iEVROutputRange;
-		i64Size.HighPart = m_AspectRatio.cx;
-		i64Size.LowPart  = m_AspectRatio.cy;
+		i64Size.HighPart = m_aspectRatio.cx;
+		i64Size.LowPart  = m_aspectRatio.cy;
 		m_pMediaType->SetUINT64(MF_MT_PIXEL_ASPECT_RATIO, i64Size.QuadPart);
 
 		MFVideoArea Area = GetArea(0, 0, VideoFormat->videoInfo.dwWidth, VideoFormat->videoInfo.dwHeight);
 		m_pMediaType->SetBlob(MF_MT_GEOMETRIC_APERTURE, (UINT8*)&Area, sizeof(MFVideoArea));
 	}
 
-	m_AspectRatio.cx *= VideoFormat->videoInfo.dwWidth;
-	m_AspectRatio.cy *= VideoFormat->videoInfo.dwHeight;
+	m_aspectRatio.cx *= VideoFormat->videoInfo.dwWidth;
+	m_aspectRatio.cy *= VideoFormat->videoInfo.dwHeight;
 
-	if (m_AspectRatio.cx >= 1 && m_AspectRatio.cy >= 1) {
-		ReduceDim(m_AspectRatio);
+	if (m_aspectRatio.cx >= 1 && m_aspectRatio.cy >= 1) {
+		ReduceDim(m_aspectRatio);
 	}
 
 	pMixerType->FreeRepresentation(FORMAT_MFVideoFormat, (void*)pAMMedia);
@@ -2906,6 +2875,17 @@ HRESULT CSyncAP::RenegotiateMediaType()
 
 	if (!m_pMixer) {
 		return MF_E_INVALIDREQUEST;
+	}
+
+	// Get the mixer's input type
+	hr = m_pMixer->GetInputCurrentType(0, &pType);
+	if (SUCCEEDED(hr)) {
+	    AM_MEDIA_TYPE* pMT;
+	    hr = pType->GetRepresentation(FORMAT_VideoInfo2, (void**)&pMT);
+	    if (SUCCEEDED(hr)) {
+	        m_inputMediaType = *pMT;
+	        pType->FreeRepresentation(FORMAT_VideoInfo2, pMT);
+	    }
 	}
 
 	CInterfaceArray<IMFMediaType> ValidMixerTypes;
@@ -3019,13 +2999,13 @@ bool CSyncAP::GetSampleFromMixer()
 			rcTearing.left = m_nTearingPos;
 			rcTearing.top = 0;
 			rcTearing.right	= rcTearing.left + 4;
-			rcTearing.bottom = m_NativeVideoSize.cy;
+			rcTearing.bottom = m_nativeVideoSize.cy;
 			m_pD3DDev->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
 
-			rcTearing.left = (rcTearing.right + 15) % m_NativeVideoSize.cx;
+			rcTearing.left = (rcTearing.right + 15) % m_nativeVideoSize.cx;
 			rcTearing.right	= rcTearing.left + 4;
 			m_pD3DDev->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
-			m_nTearingPos = (m_nTearingPos + 7) % m_NativeVideoSize.cx;
+			m_nTearingPos = (m_nTearingPos + 7) % m_nativeVideoSize.cx;
 		}
 		MoveToScheduledList(pSample, false); // Schedule, then go back to see if there is more where that came from
 	}
@@ -3103,12 +3083,12 @@ STDMETHODIMP CSyncAP::Invoke( __RPC__in_opt IMFAsyncResult *pAsyncResult)
 STDMETHODIMP CSyncAP::GetNativeVideoSize(SIZE *pszVideo, SIZE *pszARVideo)
 {
 	if (pszVideo) {
-		pszVideo->cx	= m_NativeVideoSize.cx;
-		pszVideo->cy	= m_NativeVideoSize.cy;
+		pszVideo->cx	= m_nativeVideoSize.cx;
+		pszVideo->cy	= m_nativeVideoSize.cy;
 	}
 	if (pszARVideo) {
-		pszARVideo->cx	= m_NativeVideoSize.cx * m_AspectRatio.cx;
-		pszARVideo->cy	= m_NativeVideoSize.cy * m_AspectRatio.cy;
+		pszARVideo->cx	= m_nativeVideoSize.cx * m_aspectRatio.cx;
+		pszARVideo->cy	= m_nativeVideoSize.cy * m_aspectRatio.cy;
 	}
 	return S_OK;
 }
@@ -3146,7 +3126,7 @@ STDMETHODIMP CSyncAP::GetVideoPosition(MFVideoNormalizedRect *pnrcSource, LPRECT
 		pnrcSource->bottom	= 1.0;
 	}
 	if (prcDest) {
-		memcpy (prcDest, &m_VideoRect, sizeof(m_VideoRect));    //GetClientRect (m_hWnd, prcDest);
+		memcpy (prcDest, &m_videoRect, sizeof(m_videoRect));    //GetClientRect (m_hWnd, prcDest);
 	}
 	return S_OK;
 }
@@ -3312,16 +3292,16 @@ STDMETHODIMP CSyncAP::GetNativeVideoSize(LONG* lpWidth, LONG* lpHeight, LONG* lp
 	ASSERT (FALSE);
 
 	if (lpWidth) {
-		*lpWidth	= m_NativeVideoSize.cx;
+		*lpWidth	= m_nativeVideoSize.cx;
 	}
 	if (lpHeight)	{
-		*lpHeight	= m_NativeVideoSize.cy;
+		*lpHeight	= m_nativeVideoSize.cy;
 	}
 	if (lpARWidth)	{
-		*lpARWidth	= m_AspectRatio.cx;
+		*lpARWidth	= m_aspectRatio.cx;
 	}
 	if (lpARHeight)	{
-		*lpARHeight	= m_AspectRatio.cy;
+		*lpARHeight	= m_aspectRatio.cy;
 	}
 	return S_OK;
 }
@@ -3340,7 +3320,7 @@ STDMETHODIMP CSyncAP::InitializeDevice(AM_MEDIA_TYPE* pMediaType)
 	int w = vih2->bmiHeader.biWidth;
 	int h = abs(vih2->bmiHeader.biHeight);
 
-	m_NativeVideoSize = CSize(w, h);
+	m_nativeVideoSize = CSize(w, h);
 	if (m_bHighColorResolution) {
 		hr = AllocSurfaces(D3DFMT_A2R10G10B10);
 	} else {

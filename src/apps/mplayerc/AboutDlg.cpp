@@ -1,5 +1,5 @@
 /*
- * (C) 2014 see Authors.txt
+ * (C) 2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -50,9 +50,6 @@ BOOL CAboutDlg::OnInitDialog()
 	m_strVersionNumber.Format(L"%s (build %d)", CString(MPC_VERSION_STR), MPC_VERSION_REV);
 #if (MPC_VERSION_STATUS == 0)
 	m_strVersionNumber.Append(L" beta");
-#endif
-#if DBOXVersion
-	m_strVersionNumber.Append(_T(" (D-BOX)"));
 #endif
 
 #if defined(__INTEL_COMPILER)

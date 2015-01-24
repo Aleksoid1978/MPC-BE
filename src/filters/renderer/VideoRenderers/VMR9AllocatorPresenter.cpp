@@ -176,16 +176,16 @@ STDMETHODIMP CVMR9AllocatorPresenter::InitializeDevice(DWORD_PTR dwUserID, VMR9A
 	m_pSurfaces.SetCount(*lpNumBuffers);
 
 	m_bNeedCheckSample = true;
-	m_NativeVideoSize = CSize(w, h);
+	m_nativeVideoSize = CSize(w, h);
 	CSize VideoSize = GetVisibleVideoSize();
 	int arx = lpAllocInfo->szAspectRatio.cx;
 	int ary = lpAllocInfo->szAspectRatio.cy;
 	if (arx > 0 && ary > 0) {
-		arx = arx * VideoSize.cx / m_NativeVideoSize.cx;
-		ary = ary * VideoSize.cy / m_NativeVideoSize.cy;
-		m_AspectRatio.SetSize(arx, ary);
+		arx = arx * VideoSize.cx / m_nativeVideoSize.cx;
+		ary = ary * VideoSize.cy / m_nativeVideoSize.cy;
+		m_aspectRatio.SetSize(arx, ary);
 	} else {
-		m_AspectRatio = VideoSize;
+		m_aspectRatio = VideoSize;
 	}
 
 	if (FAILED(hr = AllocSurfaces())) {
@@ -293,6 +293,13 @@ STDMETHODIMP CVMR9AllocatorPresenter::StartPresenting(DWORD_PTR dwUserID)
 	CAutoLock cAutoLock(this);
 	CAutoLock cRenderLock(&m_RenderLock);
 
+	CComPtr<IBaseFilter> pVMR9;
+	CComPtr<IPin> pPin;
+	if (SUCCEEDED(m_pIVMRSurfAllocNotify->QueryInterface(IID_PPV_ARGS(&pVMR9))) &&
+			SUCCEEDED(pVMR9->FindPin(L"VMR Input0", &pPin))) {
+	    VERIFY(SUCCEEDED(pPin->ConnectionMediaType(&m_inputMediaType)));
+	}
+
 	m_bIsRendering = true;
 
 	return m_pD3DDev ? S_OK : E_FAIL;
@@ -322,8 +329,8 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 
 			FillAddingField(pPin, &mt);
 
-			CSize NativeVideoSize = m_NativeVideoSize;
-			CSize AspectRatio = m_AspectRatio;
+			CSize NativeVideoSize = m_nativeVideoSize;
+			CSize AspectRatio = m_aspectRatio;
 			if (mt.formattype == FORMAT_VideoInfo || mt.formattype == FORMAT_MPEGVideo) {
 				VIDEOINFOHEADER *vh = (VIDEOINFOHEADER*)mt.pbFormat;
 
@@ -359,9 +366,9 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 					NativeVideoSize.cy = vh->rcSource.bottom - vh->rcSource.top;
 				}
 			}
-			if (m_NativeVideoSize != NativeVideoSize || m_AspectRatio != AspectRatio) {
-				m_NativeVideoSize = NativeVideoSize;
-				m_AspectRatio = AspectRatio;
+			if (m_nativeVideoSize != NativeVideoSize || m_aspectRatio != AspectRatio) {
+				m_nativeVideoSize = NativeVideoSize;
+				m_aspectRatio = AspectRatio;
 				AfxGetApp()->m_pMainWnd->PostMessage(WM_REARRANGERENDERLESS);
 			}
 		}
@@ -396,12 +403,12 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 	int arx = lpPresInfo->szAspectRatio.cx;
 	int ary = lpPresInfo->szAspectRatio.cy;
 	if (arx > 0 && ary > 0) {
-		arx = arx * VideoSize.cx / m_NativeVideoSize.cx;
-		ary = ary * VideoSize.cy / m_NativeVideoSize.cy;
+		arx = arx * VideoSize.cx / m_nativeVideoSize.cx;
+		ary = ary * VideoSize.cy / m_nativeVideoSize.cy;
 		VideoSize.cx = VideoSize.cy*arx/ary;
 	}
 	if (VideoSize != GetVideoSize()) {
-		m_AspectRatio.SetSize(arx, ary);
+		m_aspectRatio.SetSize(arx, ary);
 		AfxGetApp()->m_pMainWnd->PostMessage(WM_REARRANGERENDERLESS);
 	}
 
@@ -425,14 +432,14 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 			rcTearing.left		= m_nTearingPos;
 			rcTearing.top		= 0;
 			rcTearing.right		= rcTearing.left + 4;
-			rcTearing.bottom	= m_NativeVideoSize.cy;
+			rcTearing.bottom	= m_nativeVideoSize.cy;
 			m_pD3DDev->ColorFill (m_pVideoSurface[m_nCurSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
 
-			rcTearing.left	= (rcTearing.right + 15) % m_NativeVideoSize.cx;
+			rcTearing.left	= (rcTearing.right + 15) % m_nativeVideoSize.cx;
 			rcTearing.right	= rcTearing.left + 4;
 			m_pD3DDev->ColorFill (m_pVideoSurface[m_nCurSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
 
-			m_nTearingPos = (m_nTearingPos + 7) % m_NativeVideoSize.cx;
+			m_nTearingPos = (m_nTearingPos + 7) % m_nativeVideoSize.cx;
 		}
 	}
 
@@ -450,16 +457,16 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 STDMETHODIMP CVMR9AllocatorPresenter::GetNativeVideoSize(LONG* lpWidth, LONG* lpHeight, LONG* lpARWidth, LONG* lpARHeight)
 {
 	if (lpWidth) {
-		*lpWidth = m_NativeVideoSize.cx;
+		*lpWidth = m_nativeVideoSize.cx;
 	}
 	if (lpHeight) {
-		*lpHeight = m_NativeVideoSize.cy;
+		*lpHeight = m_nativeVideoSize.cy;
 	}
 	if (lpARWidth) {
-		*lpARWidth = m_AspectRatio.cx;
+		*lpARWidth = m_aspectRatio.cx;
 	}
 	if (lpARHeight) {
-		*lpARHeight = m_AspectRatio.cy;
+		*lpARHeight = m_aspectRatio.cy;
 	}
 	return S_OK;
 }
@@ -482,7 +489,7 @@ STDMETHODIMP CVMR9AllocatorPresenter::SetVideoPosition(const LPRECT lpSRCRect, c
 STDMETHODIMP CVMR9AllocatorPresenter::GetVideoPosition(LPRECT lpSRCRect, LPRECT lpDSTRect)
 {
 	CopyRect(lpSRCRect, CRect(CPoint(0, 0), GetVisibleVideoSize()));
-	CopyRect(lpDSTRect, &m_VideoRect);
+	CopyRect(lpDSTRect, &m_videoRect);
 	return S_OK;
 }
 

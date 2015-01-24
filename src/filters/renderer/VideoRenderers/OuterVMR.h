@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,11 +32,11 @@ namespace DSObjects
 	{
 		CComPtr<IUnknown>	m_pVMR;
 		VMR9AlphaBitmap*	m_pVMR9AlphaBitmap;
-		CDX9AllocatorPresenter* m_pAllocatorPresenter;
+		CVMR9AllocatorPresenter* m_pAllocatorPresenter;
 
 	public:
 
-		COuterVMR9(const TCHAR* pName, LPUNKNOWN pUnk, VMR9AlphaBitmap* pVMR9AlphaBitmap, CDX9AllocatorPresenter* pAllocatorPresenter) : CUnknown(pName, pUnk) {
+		COuterVMR9(const TCHAR* pName, LPUNKNOWN pUnk, VMR9AlphaBitmap* pVMR9AlphaBitmap, CVMR9AllocatorPresenter* pAllocatorPresenter) : CUnknown(pName, pUnk) {
 			m_pVMR.CoCreateInstance(CLSID_VideoMixingRenderer9, GetOwner());
 			m_pVMR9AlphaBitmap = pVMR9AlphaBitmap;
 			m_pAllocatorPresenter = pAllocatorPresenter;
@@ -57,21 +57,24 @@ namespace DSObjects
 
 			hr = m_pVMR ? m_pVMR->QueryInterface(riid, ppv) : E_NOINTERFACE;
 			if (m_pVMR && FAILED(hr)) {
-				if (riid == __uuidof(IVideoWindow)) {
-					return GetInterface((IVideoWindow*)this, ppv);
+				hr = m_pAllocatorPresenter ? m_pAllocatorPresenter->QueryInterface(riid, ppv) : E_NOINTERFACE;
+				if (FAILED(hr)) {
+					if (riid == __uuidof(IVideoWindow)) {
+						return GetInterface((IVideoWindow*)this, ppv);
+					}
+					if (riid == __uuidof(IBasicVideo)) {
+						return GetInterface((IBasicVideo*)this, ppv);
+					}
+					if (riid == __uuidof(IBasicVideo2)) {
+						return GetInterface((IBasicVideo2*)this, ppv);
+					}
+					if (riid == __uuidof(IVMRffdshow9)) { // Support ffdshow queueing. We show ffdshow that this is patched MPC-BE.
+						return GetInterface((IVMRffdshow9*)this, ppv);
+					}
+						/*if (riid == __uuidof(IVMRWindowlessControl))
+					return GetInterface((IVMRWindowlessControl*)this, ppv);
+					*/
 				}
-				if (riid == __uuidof(IBasicVideo)) {
-					return GetInterface((IBasicVideo*)this, ppv);
-				}
-				if (riid == __uuidof(IBasicVideo2)) {
-					return GetInterface((IBasicVideo2*)this, ppv);
-				}
-				if (riid == __uuidof(IVMRffdshow9)) { // Support ffdshow queueing. We show ffdshow that this is patched MPC-BE.
-					return GetInterface((IVMRffdshow9*)this, ppv);
-				}
-					/*if (riid == __uuidof(IVMRWindowlessControl))
-				return GetInterface((IVMRWindowlessControl*)this, ppv);
-				*/
 			}
 
 			return SUCCEEDED(hr) ? hr : __super::NonDelegatingQueryInterface(riid, ppv);

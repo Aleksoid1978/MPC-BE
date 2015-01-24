@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,43 +26,6 @@
 #include <d3d9.h>
 
 // CDX9SubPic
-
-class CVirtualLock
-{
-public:
-	virtual void Lock() PURE;
-	virtual void Unlock() PURE;
-};
-
-typedef void (FLock)(void *_pLock);
-
-class CScopeLock
-{
-	void *m_pLock;
-	FLock *m_pUnlockFunc;
-public:
-	CScopeLock() {}; // let's make cppcheck happy
-
-	template <typename t_Lock>
-	class TCLocker
-	{
-	public:
-		static void fs_Locker(void *_pLock) {
-			((t_Lock *)_pLock)->Unlock();
-		}
-	};
-
-	template <typename t_Lock>
-	CScopeLock(t_Lock &_Lock) {
-		_Lock.Lock();
-		m_pLock = &_Lock;
-		m_pUnlockFunc = TCLocker<t_Lock>::fs_Locker;
-	}
-
-	~CScopeLock() {
-		m_pUnlockFunc(m_pLock);
-	}
-};
 
 
 class CDX9SubPicAllocator;

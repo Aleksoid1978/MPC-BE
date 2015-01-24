@@ -927,9 +927,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 #if (MPC_VERSION_STATUS == 0)
 	m_strTitle.Append(L" beta");
 #endif
-#if DBOXVersion
-	m_strTitle.Append(_T(" (D-BOX)"));
-#endif
 
 	SetWindowText(m_strTitle);
 	m_Lcd.SetMediaTitle(m_strTitle);

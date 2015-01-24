@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -55,8 +55,8 @@ HRESULT CRM7AllocatorPresenter::AllocSurfaces()
 	INITDDSTRUCT(ddsd);
 	ddsd.dwFlags = DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT|DDSD_PIXELFORMAT;
 	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-	ddsd.dwWidth = m_NativeVideoSize.cx;
-	ddsd.dwHeight = m_NativeVideoSize.cy;
+	ddsd.dwWidth = m_nativeVideoSize.cx;
+	ddsd.dwHeight = m_nativeVideoSize.cy;
 	ddsd.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
 	ddsd.ddpfPixelFormat.dwFlags = DDPF_RGB;
 	ddsd.ddpfPixelFormat.dwRGBBitCount = 32;
@@ -77,8 +77,8 @@ HRESULT CRM7AllocatorPresenter::AllocSurfaces()
 	INITDDSTRUCT(ddsd);
 	ddsd.dwFlags = DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT|DDSD_PIXELFORMAT;
 	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-	ddsd.dwWidth = m_NativeVideoSize.cx;
-	ddsd.dwHeight = m_NativeVideoSize.cy;
+	ddsd.dwWidth = m_nativeVideoSize.cx;
+	ddsd.dwHeight = m_nativeVideoSize.cy;
 	ddsd.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
 	ddsd.ddpfPixelFormat.dwFlags = DDPF_FOURCC;
 	ddsd.ddpfPixelFormat.dwYUVBitCount = 16;
@@ -237,7 +237,7 @@ STDMETHODIMP CRM7AllocatorPresenter::BeginOptimizedBlt(RMABitmapInfoHeader* pBit
 {
 	CAutoLock cAutoLock(this);
 	DeleteSurfaces();
-	m_NativeVideoSize = m_AspectRatio = CSize(pBitmapInfo->biWidth, abs(pBitmapInfo->biHeight));
+	m_nativeVideoSize = m_aspectRatio = CSize(pBitmapInfo->biWidth, abs(pBitmapInfo->biHeight));
 	if (FAILED(AllocSurfaces())) {
 		return E_FAIL;
 	}

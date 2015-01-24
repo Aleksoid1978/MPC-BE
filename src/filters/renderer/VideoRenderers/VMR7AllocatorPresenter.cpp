@@ -154,11 +154,11 @@ STDMETHODIMP CVMR7AllocatorPresenter::AllocateSurface(DWORD_PTR dwUserID, VMRALL
 		return hr;
 	}
 
-	m_NativeVideoSize = CSize(abs(lpAllocInfo->lpHdr->biWidth), abs(lpAllocInfo->lpHdr->biHeight));
-	m_AspectRatio = m_NativeVideoSize;
+	m_nativeVideoSize = CSize(abs(lpAllocInfo->lpHdr->biWidth), abs(lpAllocInfo->lpHdr->biHeight));
+	m_aspectRatio = m_nativeVideoSize;
 	int arx = lpAllocInfo->szAspectRatio.cx, ary = lpAllocInfo->szAspectRatio.cy;
 	if (arx > 0 && ary > 0) {
-		m_AspectRatio.SetSize(arx, ary);
+		m_aspectRatio.SetSize(arx, ary);
 	}
 
 	if (FAILED(hr = AllocSurfaces())) {
@@ -264,13 +264,13 @@ STDMETHODIMP CVMR7AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMRPRESEN
 		}
 	}
 
-	CSize VideoSize = m_NativeVideoSize;
+	CSize VideoSize = m_nativeVideoSize;
 	int arx = lpPresInfo->szAspectRatio.cx, ary = lpPresInfo->szAspectRatio.cy;
 	if (arx > 0 && ary > 0) {
 		VideoSize.cx = VideoSize.cy*arx/ary;
 	}
 	if (VideoSize != GetVideoSize()) {
-		m_AspectRatio.SetSize(arx, ary);
+		m_aspectRatio.SetSize(arx, ary);
 		AfxGetApp()->m_pMainWnd->PostMessage(WM_REARRANGERENDERLESS);
 	}
 
@@ -287,7 +287,7 @@ STDMETHODIMP CVMR7AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMRPRESEN
 
 STDMETHODIMP CVMR7AllocatorPresenter::GetNativeVideoSize(LONG* lpWidth, LONG* lpHeight, LONG* lpARWidth, LONG* lpARHeight)
 {
-	CSize vs = m_NativeVideoSize, ar = m_AspectRatio;
+	CSize vs = m_nativeVideoSize, ar = m_aspectRatio;
 	// DVD Nav. bug workaround fix
 	vs.cx = vs.cy * ar.cx / ar.cy;
 	if (lpWidth) {
@@ -322,8 +322,8 @@ STDMETHODIMP CVMR7AllocatorPresenter::SetVideoPosition(const LPRECT lpSRCRect, c
 
 STDMETHODIMP CVMR7AllocatorPresenter::GetVideoPosition(LPRECT lpSRCRect, LPRECT lpDSTRect)
 {
-	CopyRect(lpSRCRect, CRect(CPoint(0, 0), m_NativeVideoSize));
-	CopyRect(lpDSTRect, &m_VideoRect);
+	CopyRect(lpSRCRect, CRect(CPoint(0, 0), m_nativeVideoSize));
+	CopyRect(lpDSTRect, &m_videoRect);
 	// DVD Nav. bug workaround fix
 	GetNativeVideoSize(&lpSRCRect->right, &lpSRCRect->bottom, NULL, NULL);
 	return S_OK;

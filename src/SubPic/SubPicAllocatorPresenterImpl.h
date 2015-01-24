@@ -25,11 +25,13 @@
 #include <atlcoll.h>
 #include "ISubPic.h"
 #include "CoordGeom.h"
+#include "SubRenderIntf.h"
 
 class CSubPicAllocatorPresenterImpl
 	: public CUnknown
 	, public CCritSec
 	, public ISubPicAllocatorPresenter2
+	, public ISubRenderConsumer2
 {
 private:
 	CCritSec m_csSubPicProvider;
@@ -38,19 +40,24 @@ protected:
 	HWND m_hWnd;
 	REFERENCE_TIME m_rtSubtitleDelay;
 
-	CSize m_NativeVideoSize, m_AspectRatio;
-	CRect m_VideoRect, m_WindowRect;
+	CSize m_maxSubtitleTextureSize;
+	CSize m_nativeVideoSize, m_aspectRatio;
+	CRect m_videoRect, m_windowRect;
 
 	REFERENCE_TIME m_rtNow;
 	double m_fps;
+	UINT m_refreshRate;
 
-	CComPtr<ISubPicProvider> m_SubPicProvider;
+	CMediaType m_inputMediaType;
+
+	CComPtr<ISubPicProvider> m_pSubPicProvider;
 	CComPtr<ISubPicAllocator> m_pAllocator;
 	CComPtr<ISubPicQueue> m_pSubPicQueue;
 
 	bool m_bDeviceResetRequested;
 	bool m_bPendingResetDevice;
 
+	void InitMaxSubtitleTextureSize(int maxSize, CSize desktopSize);
 	void AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, SubPicDesc* pTarget = NULL);
 	void AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget);
 
@@ -69,9 +76,7 @@ public:
 	STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) PURE;
 
 	STDMETHODIMP_(SIZE) GetVideoSize(bool fCorrectAR = true);
-	STDMETHODIMP_(SIZE) GetVisibleVideoSize() {
-		return m_NativeVideoSize;
-	};
+	STDMETHODIMP_(SIZE) GetVisibleVideoSize() { return m_nativeVideoSize; };
 	STDMETHODIMP_(void) SetPosition(RECT w, RECT v);
 	STDMETHODIMP_(bool) Paint(bool fAll) PURE;
 
@@ -90,9 +95,10 @@ public:
 	STDMETHODIMP_(bool) DisplayChange() { return false; }
 
 	STDMETHODIMP SetVideoAngle(Vector v, bool fRepaint = true);
-	STDMETHODIMP SetPixelShader(LPCSTR pSrcData, LPCSTR pTarget) {
-		return E_NOTIMPL;
-	}
+	STDMETHODIMP SetPixelShader(LPCSTR pSrcData, LPCSTR pTarget) { return E_NOTIMPL; }
+
+	// ISubPicAllocatorPresenter2
+
 	STDMETHODIMP SetPixelShader2(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace) {
 		if (!bScreenSpace) {
 			return SetPixelShader(pSrcData, pTarget);
@@ -101,4 +107,38 @@ public:
 	}
 
 	STDMETHODIMP SetIsRendering(bool bIsRendering) { return E_NOTIMPL; }
+
+	// ISubRenderOptions
+
+	STDMETHODIMP GetBool(LPCSTR field, bool* value);
+	STDMETHODIMP GetInt(LPCSTR field, int* value);
+	STDMETHODIMP GetSize(LPCSTR field, SIZE* value);
+	STDMETHODIMP GetRect(LPCSTR field, RECT* value);
+	STDMETHODIMP GetUlonglong(LPCSTR field, ULONGLONG* value);
+	STDMETHODIMP GetDouble(LPCSTR field, double* value);
+	STDMETHODIMP GetString(LPCSTR field, LPWSTR* value, int* chars);
+	STDMETHODIMP GetBin(LPCSTR field, LPVOID* value, int* size);
+	STDMETHODIMP SetBool(LPCSTR field, bool value);
+	STDMETHODIMP SetInt(LPCSTR field, int value);
+	STDMETHODIMP SetSize(LPCSTR field, SIZE value);
+	STDMETHODIMP SetRect(LPCSTR field, RECT value);
+	STDMETHODIMP SetUlonglong(LPCSTR field, ULONGLONG value);
+	STDMETHODIMP SetDouble(LPCSTR field, double value);
+	STDMETHODIMP SetString(LPCSTR field, LPWSTR value, int chars);
+	STDMETHODIMP SetBin(LPCSTR field, LPVOID value, int size);
+
+	// ISubRenderConsumer
+
+	STDMETHODIMP GetMerit(ULONG* plMerit) {
+		CheckPointer(plMerit, E_POINTER);
+		*plMerit = 4 << 16;
+		return S_OK;
+	}
+	STDMETHODIMP Connect(ISubRenderProvider* subtitleRenderer);
+	STDMETHODIMP Disconnect();
+	STDMETHODIMP DeliverFrame(REFERENCE_TIME start, REFERENCE_TIME stop, LPVOID context, ISubRenderFrame* subtitleFrame);
+
+	// ISubRenderConsumer2
+
+	STDMETHODIMP Clear(REFERENCE_TIME clearNewerThan = 0);
 };
