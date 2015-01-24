@@ -40,7 +40,7 @@ extern "C" {
 	#include <ffmpeg/libavcodec/mpeg12.h>
 }
 
-static const WORD PCID_NVIDIA_VP5_VP6[] = {
+static const WORD PCID_NVIDIA_VP567[] = {
 	// http://us.download.nvidia.com/XFree86/Linux-x86_64/346.35/README/supportedchips.html
 	// http://pci-ids.ucw.cz/read/PC/10de
 	// VP5, Nvidia VDPAU Feature Set D: GF117, GF119, GK104, GK106, GK107, GK110, GK208.
@@ -183,6 +183,9 @@ static const WORD PCID_NVIDIA_VP5_VP6[] = {
 	0x13C2, // GeForce GTX 970
 	0x13D7, // GeForce GTX 980M
 	0x13D8, // GeForce GTX 970M
+
+	// VP7, Nvidia VDPAU Feature Set F: GM206.
+	0x1401, // GeForce GTX 960
 };
 
 static const WORD PCID_ATI_UVD [] = {
@@ -595,7 +598,7 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 	//}
 
 	if (nPCIVendor == PCIV_nVidia) {
-		if (CheckPCID(nPCIDevice, PCID_NVIDIA_VP5_VP6, _countof(PCID_NVIDIA_VP5_VP6)) && width <= 4096 && height <= 4096 && width * height <= 4080 * 4080) {
+		if (CheckPCID(nPCIDevice, PCID_NVIDIA_VP567, _countof(PCID_NVIDIA_VP567)) && width <= 4096 && height <= 4096 && width * height <= 4080 * 4080) {
 			// tested H.264 on VP5 (GT 610, GTX 660 Ti)
 			// 4080x4080 = 65025 macroblocks
 			return TRUE;
