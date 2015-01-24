@@ -36,16 +36,13 @@ char const shader_resizer_bilinear[] =
 
 "float4 main(float2 tex : TEXCOORD0) : COLOR"
 "{"
-"	float2 dd = frac(tex);"
-"	float2 ExactPixel = tex - dd;"
-"	float2 samplePos = ExactPixel * dxdy + dxdy05;"
+	"float2 t = frac(tex);"
+	"float2 pos = tex-t;"
 
-"	float4 c = lerp("
-"		lerp(tex2D(s0, samplePos), tex2D(s0, samplePos + dx), dd.x),"
-"		lerp(tex2D(s0, samplePos + dy), tex2D(s0, samplePos + dxdy), dd.x),"
-"		dd.y);"
-
-"	return c;"
+	"return lerp("
+		"lerp(tex2D(s0, (pos+.5)*dxdy), tex2D(s0, (pos+float2(1.5, .5))*dxdy), t.x),"
+		"lerp(tex2D(s0, (pos+float2(.5, 1.5))*dxdy), tex2D(s0, (pos+1.5)*dxdy), t.x),"
+		"t.y);"// interpolate and output
 "}";
 
 
@@ -59,21 +56,14 @@ char const shader_resizer_smootherstep[] =
 
 "float4 main(float2 tex : TEXCOORD0) : COLOR"
 "{"
-"	float2 t = frac(tex);"
-"	float2 pos = tex - t;"
+	"float2 t = frac(tex);"
+	"float2 pos = tex-t;"
+	"t *= ((6.*t-15.)*t+10.)*t*t;"// redistribute weights
 
-	// weights
-"	float2 w1 = ((6.*t - 15.)*t + 10.)*pow(t, 3), w0 = 1. - w1;"
-"	float4 M0 = tex2D(s0, (pos + .5)*dxdy);"
-"	float4 M1 = tex2D(s0, (pos + float2(.5, 1.5))*dxdy);"
-"	float4 L0 = tex2D(s0, (pos + float2(1.5, .5))*dxdy);"
-"	float4 L1 = tex2D(s0, (pos + 1.5)*dxdy);" // original pixels
-
-	// vertical interpolation
-"	float4 Q0 = M0*w0.y + M1*w1.y;"
-"	float4 Q1 = L0*w0.y + L1*w1.y;"
-
-"	return Q0*w0.x + Q1*w1.x;" // horizontal interpolation and output
+	"return lerp("
+		"lerp(tex2D(s0, (pos+.5)*dxdy), tex2D(s0, (pos+float2(1.5, .5))*dxdy), t.x),"
+		"lerp(tex2D(s0, (pos+float2(.5, 1.5))*dxdy), tex2D(s0, (pos+1.5)*dxdy), t.x),"
+		"t.y);"// interpolate and output
 "}";
 
 
