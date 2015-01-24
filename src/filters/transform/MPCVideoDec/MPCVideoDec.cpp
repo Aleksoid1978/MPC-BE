@@ -1091,7 +1091,7 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 		rtStop = INVALID_TIME;
 	}
 
-	if (rtStop == INVALID_TIME) {
+	if (rtStop == INVALID_TIME || rtStop - 1 <= rtStart) {
 		REFERENCE_TIME rtFrameDuration = AvgTimePerFrame * (m_pFrame->repeat_pict ? 3 : 2)  / 2;
 		rtStop = rtStart + (rtFrameDuration / m_dRate);
 	}
