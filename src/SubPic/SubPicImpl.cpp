@@ -40,6 +40,7 @@ CSubPicImpl::CSubPicImpl()
 	, m_virtualTextureSize(0, 0)
 	, m_virtualTextureTopLeft(0, 0)
 	, m_eSubtitleType(SUBTITLE_TYPE::ST_TEXT)
+	, m_bInvAlpha(false)
 {
 }
 
@@ -103,6 +104,7 @@ STDMETHODIMP CSubPicImpl::CopyTo(ISubPic* pSubPic)
 	pSubPic->SetDirtyRect(m_rcDirty);
 	pSubPic->SetSize(m_size, m_vidrect);
 	pSubPic->SetVirtualTextureSize(m_virtualTextureSize, m_virtualTextureTopLeft);
+	pSubPic->SetInverseAlpha(m_bInvAlpha);
 
 	return S_OK;
 }
@@ -121,9 +123,9 @@ STDMETHODIMP CSubPicImpl::GetSourceAndDest(RECT rcWindow, RECT rcVideo, BOOL bPo
 		CPoint offset(0, 0);
 		double scaleX = 1.0, scaleY = 1.0;
 
-		const CRect rcTarget = bPositionRelative || m_eSubtitleType == SUBTITLE_TYPE::ST_VOBSUB || m_eSubtitleType == SUBTITLE_TYPE::ST_XSUB ? rcVideo : rcWindow;
+		const CRect rcTarget = bPositionRelative || m_eSubtitleType == SUBTITLE_TYPE::ST_VOBSUB || m_eSubtitleType == SUBTITLE_TYPE::ST_XSUB || m_eSubtitleType == SUBTITLE_TYPE::ST_XYSUBPIC ? rcVideo : rcWindow;
 		const CSize szTarget = rcTarget.Size();
-		const bool bNeedSpecialCase = (m_eSubtitleType == SUBTITLE_TYPE::ST_HDMV || m_eSubtitleType == SUBTITLE_TYPE::ST_DVB) && m_virtualTextureSize.cx > 720;
+		const bool bNeedSpecialCase = (m_eSubtitleType == SUBTITLE_TYPE::ST_HDMV || m_eSubtitleType == SUBTITLE_TYPE::ST_DVB || m_eSubtitleType == SUBTITLE_TYPE::ST_XYSUBPIC) && m_virtualTextureSize.cx > 720;
 		if (bNeedSpecialCase) {
 			const double subtitleAR	= double(m_virtualTextureSize.cx) / m_virtualTextureSize.cy;
 			const double videoAR	= double(szTarget.cx) / szTarget.cy;
@@ -233,6 +235,15 @@ STDMETHODIMP CSubPicImpl::GetType(SUBTITLE_TYPE* pSubtitleType)
 	return S_OK;
 }
 
+STDMETHODIMP_(bool) CSubPicImpl::GetInverseAlpha() const
+{
+	return m_bInvAlpha;
+}
+
+STDMETHODIMP_(void) CSubPicImpl::SetInverseAlpha(bool bInverted)
+{
+	m_bInvAlpha = bInverted;
+}
 
 //
 // ISubPicAllocatorImpl

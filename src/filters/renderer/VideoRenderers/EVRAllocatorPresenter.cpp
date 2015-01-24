@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -694,10 +694,10 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 	LARGE_INTEGER		i64Size;
 	MFVIDEOFORMAT*		VideoFormat;
 
-	CHECK_HR(pMixerType->GetRepresentation  (FORMAT_MFVideoFormat, (void**)&pAMMedia));
+	CHECK_HR(pMixerType->GetRepresentation(FORMAT_MFVideoFormat, (void**)&pAMMedia));
 
 	VideoFormat = (MFVIDEOFORMAT*)pAMMedia->pbFormat;
-	hr = pfMFCreateVideoMediaType  (VideoFormat, &m_pMediaType);
+	hr = pfMFCreateVideoMediaType(VideoFormat, &m_pMediaType);
 
 #if 0
 	// This code doesn't work, use same method as VMR9 instead
@@ -722,26 +722,25 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 	}
 #endif
 
-	m_AspectRatio.cx	= VideoFormat->videoInfo.PixelAspectRatio.Numerator;
-	m_AspectRatio.cy	= VideoFormat->videoInfo.PixelAspectRatio.Denominator;
+	m_aspectRatio.cx	= VideoFormat->videoInfo.PixelAspectRatio.Numerator;
+	m_aspectRatio.cy	= VideoFormat->videoInfo.PixelAspectRatio.Denominator;
 
 	if (SUCCEEDED(hr)) {
 		i64Size.HighPart = VideoFormat->videoInfo.dwWidth;
 		i64Size.LowPart	 = VideoFormat->videoInfo.dwHeight;
-		m_pMediaType->SetUINT64 (MF_MT_FRAME_SIZE, i64Size.QuadPart);
-
-		m_pMediaType->SetUINT32 (MF_MT_PAN_SCAN_ENABLED, 0);
+		m_pMediaType->SetUINT64(MF_MT_FRAME_SIZE, i64Size.QuadPart);
+		m_pMediaType->SetUINT32(MF_MT_PAN_SCAN_ENABLED, 0);
 
 		CRenderersSettings& s = GetRenderersSettings();
 
 #if 1
 		if (s.m_AdvRendSets.iEVROutputRange == 1) {
-			m_pMediaType->SetUINT32 (MF_MT_VIDEO_NOMINAL_RANGE, MFNominalRange_16_235);
+			m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, MFNominalRange_16_235);
 		} else {
-			m_pMediaType->SetUINT32 (MF_MT_VIDEO_NOMINAL_RANGE, MFNominalRange_0_255);
+			m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, MFNominalRange_0_255);
 		}
 
-		//		m_pMediaType->SetUINT32 (MF_MT_TRANSFER_FUNCTION, MFVideoTransFunc_10);
+		// m_pMediaType->SetUINT32 (MF_MT_TRANSFER_FUNCTION, MFVideoTransFunc_10);
 #else
 
 		m_pMediaType->SetUINT32 (MF_MT_VIDEO_NOMINAL_RANGE, MFNominalRange_0_255);
@@ -755,26 +754,26 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 
 		m_LastSetOutputRange = s.m_AdvRendSets.iEVROutputRange;
 
-		i64Size.HighPart = m_AspectRatio.cx;
-		i64Size.LowPart  = m_AspectRatio.cy;
-		m_pMediaType->SetUINT64 (MF_MT_PIXEL_ASPECT_RATIO, i64Size.QuadPart);
+		i64Size.HighPart = m_aspectRatio.cx;
+		i64Size.LowPart  = m_aspectRatio.cy;
+		m_pMediaType->SetUINT64(MF_MT_PIXEL_ASPECT_RATIO, i64Size.QuadPart);
 
-		MFVideoArea Area = MakeArea (0, 0, VideoFormat->videoInfo.dwWidth, VideoFormat->videoInfo.dwHeight);
+		MFVideoArea Area = MakeArea(0, 0, VideoFormat->videoInfo.dwWidth, VideoFormat->videoInfo.dwHeight);
 		m_pMediaType->SetBlob(MF_MT_GEOMETRIC_APERTURE, (UINT8*)&Area, sizeof(MFVideoArea));
 
 	}
 
-	m_AspectRatio.cx	*= VideoFormat->videoInfo.dwWidth;
-	m_AspectRatio.cy	*= VideoFormat->videoInfo.dwHeight;
+	m_aspectRatio.cx	*= VideoFormat->videoInfo.dwWidth;
+	m_aspectRatio.cy	*= VideoFormat->videoInfo.dwHeight;
 
-	if (m_AspectRatio.cx >= 1 && m_AspectRatio.cy >= 1) {
-		ReduceDim(m_AspectRatio);
+	if (m_aspectRatio.cx >= 1 && m_aspectRatio.cy >= 1) {
+		ReduceDim(m_aspectRatio);
 	}
 
 	AfxGetApp()->m_pMainWnd->PostMessage(WM_REARRANGERENDERLESS);
 
-	pMixerType->FreeRepresentation (FORMAT_MFVideoFormat, (void*)pAMMedia);
-	m_pMediaType->QueryInterface (__uuidof(IMFMediaType), (void**) pType);
+	pMixerType->FreeRepresentation(FORMAT_MFVideoFormat, (void*)pAMMedia);
+	m_pMediaType->QueryInterface(__uuidof(IMFMediaType), (void**)pType);
 
 	return hr;
 }
@@ -965,6 +964,17 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 
 	CInterfaceArray<IMFMediaType> ValidMixerTypes;
 
+	// Get the mixer's input type
+	hr = m_pMixer->GetInputCurrentType(0, &pType);
+	if (SUCCEEDED(hr)) {
+	    AM_MEDIA_TYPE* pMT;
+	    hr = pType->GetRepresentation(FORMAT_VideoInfo2, (void**)&pMT);
+	    if (SUCCEEDED(hr)) {
+	        m_inputMediaType = *pMT;
+	        pType->FreeRepresentation(FORMAT_VideoInfo2, pMT);
+	    }
+	}
+
 	// Loop through all of the mixer's proposed output types.
 	DWORD iTypeIndex = 0;
 	while ((hr != MF_E_NO_MORE_TYPES)) {
@@ -1110,13 +1120,13 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 			rcTearing.left		= m_nTearingPos;
 			rcTearing.top		= 0;
 			rcTearing.right		= rcTearing.left + 4;
-			rcTearing.bottom	= m_NativeVideoSize.cy;
+			rcTearing.bottom	= m_nativeVideoSize.cy;
 			m_pD3DDev->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
 
-			rcTearing.left		= (rcTearing.right + 15) % m_NativeVideoSize.cx;
+			rcTearing.left		= (rcTearing.right + 15) % m_nativeVideoSize.cx;
 			rcTearing.right		= rcTearing.left + 4;
 			m_pD3DDev->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
-			m_nTearingPos		= (m_nTearingPos + 7) % m_NativeVideoSize.cx;
+			m_nTearingPos		= (m_nTearingPos + 7) % m_nativeVideoSize.cx;
 		}
 
 		TRACE_EVR ("EVR: Get from Mixer : %d  (%I64d) (%I64d)\n", dwSurface, nsSampleTime, m_rtTimePerFrame ? nsSampleTime / m_rtTimePerFrame : 0);
@@ -1228,12 +1238,12 @@ STDMETHODIMP CEVRAllocatorPresenter::Invoke		 (	/* [in] */ __RPC__in_opt IMFAsyn
 STDMETHODIMP CEVRAllocatorPresenter::GetNativeVideoSize(SIZE *pszVideo, SIZE *pszARVideo)
 {
 	if (pszVideo) {
-		pszVideo->cx	= m_NativeVideoSize.cx;
-		pszVideo->cy	= m_NativeVideoSize.cy;
+		pszVideo->cx	= m_nativeVideoSize.cx;
+		pszVideo->cy	= m_nativeVideoSize.cy;
 	}
 	if (pszARVideo) {
-		pszARVideo->cx	= m_NativeVideoSize.cx * m_AspectRatio.cx;
-		pszARVideo->cy	= m_NativeVideoSize.cy * m_AspectRatio.cy;
+		pszARVideo->cx	= m_nativeVideoSize.cx * m_aspectRatio.cx;
+		pszARVideo->cy	= m_nativeVideoSize.cy * m_aspectRatio.cy;
 	}
 	return S_OK;
 }
@@ -1274,7 +1284,7 @@ STDMETHODIMP CEVRAllocatorPresenter::GetVideoPosition(MFVideoNormalizedRect *pnr
 	}
 
 	if (prcDest) {
-		memcpy (prcDest, &m_VideoRect, sizeof(m_VideoRect));    //GetClientRect (m_hWnd, prcDest);
+		memcpy (prcDest, &m_videoRect, sizeof(m_videoRect));    //GetClientRect (m_hWnd, prcDest);
 	}
 
 	return S_OK;
@@ -1442,16 +1452,16 @@ STDMETHODIMP CEVRAllocatorPresenter::GetNativeVideoSize(LONG* lpWidth, LONG* lpH
 	ASSERT(FALSE);
 
 	if (lpWidth) {
-		*lpWidth	= m_NativeVideoSize.cx;
+		*lpWidth	= m_nativeVideoSize.cx;
 	}
 	if (lpHeight)	{
-		*lpHeight	= m_NativeVideoSize.cy;
+		*lpHeight	= m_nativeVideoSize.cy;
 	}
 	if (lpARWidth)	{
-		*lpARWidth	= m_AspectRatio.cx;
+		*lpARWidth	= m_aspectRatio.cx;
 	}
 	if (lpARHeight)	{
-		*lpARHeight	= m_AspectRatio.cy;
+		*lpARHeight	= m_aspectRatio.cy;
 	}
 	return S_OK;
 }
@@ -1475,7 +1485,7 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 
 	D3DFORMAT Format;
 	if (SUCCEEDED(hr)) {
-		m_NativeVideoSize = CSize(Width, Height);
+		m_nativeVideoSize = CSize(Width, Height);
 		hr = GetMediaTypeFourCC(pMediaType, (DWORD*)&Format);
 	}
 

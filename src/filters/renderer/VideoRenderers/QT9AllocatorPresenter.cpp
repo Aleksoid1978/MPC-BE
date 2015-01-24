@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -48,7 +48,7 @@ HRESULT CQT9AllocatorPresenter::AllocSurfaces()
 	m_pVideoSurfaceOff = NULL;
 
 	if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(
-						m_NativeVideoSize.cx, m_NativeVideoSize.cy, D3DFMT_X8R8G8B8,
+						m_nativeVideoSize.cx, m_nativeVideoSize.cy, D3DFMT_X8R8G8B8,
 						D3DPOOL_DEFAULT, &m_pVideoSurfaceOff, NULL))) {
 		return hr;
 	}
@@ -70,7 +70,7 @@ STDMETHODIMP CQT9AllocatorPresenter::BeginBlt(const BITMAP& bm)
 	CAutoLock cAutoLock(this);
 	CAutoLock cRenderLock(&m_RenderLock);
 	DeleteSurfaces();
-	m_NativeVideoSize = m_AspectRatio = CSize(bm.bmWidth, abs(bm.bmHeight));
+	m_nativeVideoSize = m_aspectRatio = CSize(bm.bmWidth, abs(bm.bmHeight));
 	if (FAILED(AllocSurfaces())) {
 		return E_FAIL;
 	}

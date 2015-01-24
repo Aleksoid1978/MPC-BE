@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -171,7 +171,7 @@ STDMETHODIMP CDX7SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		m_pD3DDev->SetRenderState(D3DRENDERSTATE_LIGHTING, FALSE);
 		m_pD3DDev->SetRenderState(D3DRENDERSTATE_BLENDENABLE, TRUE);
 		m_pD3DDev->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE); // pre-multiplied src and ...
-		m_pD3DDev->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCALPHA); // ... inverse alpha channel for dst
+		m_pD3DDev->SetRenderState(D3DRENDERSTATE_DESTBLEND, m_bInvAlpha ? D3DBLEND_INVSRCALPHA : D3DBLEND_SRCALPHA); // ... inverse alpha channel for dst
 
 		m_pD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 		m_pD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);

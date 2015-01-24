@@ -23,15 +23,24 @@
 #include "SubPicAllocatorPresenterImpl.h"
 #include "../DSUtil/DSUtil.h"
 #include "../filters/renderer/VideoRenderers/RenderersSettings.h"
+#include <Version.h>
+#include <math.h>
+#include "XySubPicQueueImpl.h"
+#include "XySubPicProvider.h"
+#include <d3d9.h>
+#include <evr.h>
+#include <dxva2api.h>
 
 CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError)
 	: CUnknown(NAME("CSubPicAllocatorPresenterImpl"), NULL)
 	, m_hWnd(hWnd)
-	, m_NativeVideoSize(0, 0)
-	, m_AspectRatio(0, 0)
-	, m_VideoRect(0, 0, 0, 0)
-	, m_WindowRect(0, 0, 0, 0)
+	, m_maxSubtitleTextureSize(0, 0)
+	, m_nativeVideoSize(0, 0)
+	, m_aspectRatio(0, 0)
+	, m_videoRect(0, 0, 0, 0)
+	, m_windowRect(0, 0, 0, 0)
 	, m_fps(25.0)
+	, m_refreshRate(0)
 	, m_rtSubtitleDelay(0)
 	, m_bDeviceResetRequested(false)
 	, m_bPendingResetDevice(false)
@@ -44,7 +53,7 @@ CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT&
 		}
 		return;
 	}
-	GetWindowRect(m_hWnd, &m_WindowRect);
+	GetWindowRect(m_hWnd, &m_windowRect);
 	SetVideoAngle(Vector(), false);
 	hr = S_OK;
 }
@@ -55,11 +64,49 @@ CSubPicAllocatorPresenterImpl::~CSubPicAllocatorPresenterImpl()
 
 STDMETHODIMP CSubPicAllocatorPresenterImpl::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
-
 	return
 		QI(ISubPicAllocatorPresenter)
 		QI(ISubPicAllocatorPresenter2)
+		QI(ISubRenderOptions)
+		QI(ISubRenderConsumer)
 		__super::NonDelegatingQueryInterface(riid, ppv);
+}
+
+void CSubPicAllocatorPresenterImpl::InitMaxSubtitleTextureSize(int maxSize, CSize desktopSize)
+{
+	switch (maxSize) {
+		case 0:
+			m_maxSubtitleTextureSize = desktopSize;
+			break;
+		case 384:
+			m_maxSubtitleTextureSize.SetSize(384, 288);
+			break;
+		case 512:
+			m_maxSubtitleTextureSize.SetSize(512, 384);
+			break;
+		case 640:
+			m_maxSubtitleTextureSize.SetSize(640, 480);
+			break;
+		case 800:
+			m_maxSubtitleTextureSize.SetSize(800, 600);
+			break;
+		case 1024:
+			m_maxSubtitleTextureSize.SetSize(1024, 768);
+			break;
+		case 1280:
+		default:
+			m_maxSubtitleTextureSize.SetSize(1280, 720);
+			break;
+		case 1320:
+			m_maxSubtitleTextureSize.SetSize(1320, 900);
+			break;
+		case 1920:
+			m_maxSubtitleTextureSize.SetSize(1920, 1080);
+			break;
+		case 2560:
+			m_maxSubtitleTextureSize.SetSize(2560, 1600);
+			break;
+	}
 }
 
 void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, SubPicDesc* pTarget)
@@ -100,8 +147,8 @@ STDMETHODIMP_(SIZE) CSubPicAllocatorPresenterImpl::GetVideoSize(bool fCorrectAR)
 {
 	CSize VideoSize(GetVisibleVideoSize());
 
-	if (fCorrectAR && m_AspectRatio.cx > 0 && m_AspectRatio.cy > 0) {
-		VideoSize.cx = (LONGLONG(VideoSize.cy) * LONGLONG(m_AspectRatio.cx)) / LONGLONG(m_AspectRatio.cy);
+	if (fCorrectAR && m_aspectRatio.cx > 0 && m_aspectRatio.cy > 0) {
+		VideoSize.cx = (LONGLONG(VideoSize.cy) * LONGLONG(m_aspectRatio.cx)) / LONGLONG(m_aspectRatio.cy);
 	}
 
 	return VideoSize;
@@ -109,19 +156,19 @@ STDMETHODIMP_(SIZE) CSubPicAllocatorPresenterImpl::GetVideoSize(bool fCorrectAR)
 
 STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetPosition(RECT w, RECT v)
 {
-	bool fWindowPosChanged = !!(m_WindowRect != w);
-	bool fWindowSizeChanged = !!(m_WindowRect.Size() != CRect(w).Size());
+	bool fWindowPosChanged = !!(m_windowRect != w);
+	bool fWindowSizeChanged = !!(m_windowRect.Size() != CRect(w).Size());
 
-	m_WindowRect = w;
+	m_windowRect = w;
 
-	bool fVideoRectChanged = !!(m_VideoRect != v);
+	bool fVideoRectChanged = !!(m_videoRect != v);
 
-	m_VideoRect = v;
+	m_videoRect = v;
 
 	if (fWindowSizeChanged || fVideoRectChanged) {
 		if (m_pAllocator) {
-			m_pAllocator->SetCurSize(m_WindowRect.Size());
-			m_pAllocator->SetCurVidRect(m_VideoRect);
+			m_pAllocator->SetCurSize(m_windowRect.Size());
+			m_pAllocator->SetCurVidRect(m_videoRect);
 		}
 
 		if (m_pSubPicQueue) {
@@ -162,11 +209,14 @@ STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetSubPicProvider(ISubPicProv
 {
 	CAutoLock cAutoLock(&m_csSubPicProvider);
 	
-	m_SubPicProvider = pSubPicProvider;
+	m_pSubPicProvider = pSubPicProvider;
 
+	// Reset the default state to be sure text subtitles will be displayed right.
+	// Subtitles with specific requirements will adapt those values later.
 	if (m_pAllocator) {
-		m_pAllocator->SetCurSize(m_WindowRect.Size());
-		m_pAllocator->SetCurVidRect(m_VideoRect);
+		m_pAllocator->SetMaxTextureSize(m_maxSubtitleTextureSize);
+		m_pAllocator->SetCurSize(m_windowRect.Size());
+		m_pAllocator->SetCurVidRect(m_videoRect);
 		m_pAllocator->Reset();
 	}
 
@@ -212,4 +262,247 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::SetVideoAngle(Vector v, bool fRepain
 		Paint(true);
 	}
 	return S_OK;
+}
+
+// ISubRenderOptions
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::GetBool(LPCSTR field, bool* value)
+{
+	CheckPointer(value, E_POINTER);
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::GetInt(LPCSTR field, int* value)
+{
+	CheckPointer(value, E_POINTER);
+	if (!strcmp(field, "supportedLevels")) {
+		if (CComQIPtr<IMFVideoPresenter> pEVR = (ISubPicAllocatorPresenter*)this) {
+			const CRenderersSettings& r = GetRenderersSettings();
+			if (r.m_AdvRendSets.iEVROutputRange == 1) {
+				*value = 3; // TV preferred
+			} else {
+				*value = 2; // PC preferred
+			}
+		} else {
+			*value = 0; // PC only
+		}
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::GetSize(LPCSTR field, SIZE* value)
+{
+	CheckPointer(value, E_POINTER);
+	if (!strcmp(field, "originalVideoSize")) {
+		*value = GetVideoSize(false);
+		return S_OK;
+	} else if (!strcmp(field, "arAdjustedVideoSize")) {
+		*value = GetVideoSize(true);
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::GetRect(LPCSTR field, RECT* value)
+{
+	CheckPointer(value, E_POINTER);
+	if (!strcmp(field, "videoOutputRect") || !strcmp(field, "subtitleTargetRect")) {
+		if (m_videoRect.IsRectEmpty()) {
+			*value = m_windowRect;
+		} else {
+			value->left = 0;
+			value->top = 0;
+			value->right = m_videoRect.Width();
+			value->bottom = m_videoRect.Height();
+		}
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::GetUlonglong(LPCSTR field, ULONGLONG* value)
+{
+	CheckPointer(value, E_POINTER);
+	if (!strcmp(field, "frameRate")) {
+		*value = (REFERENCE_TIME)(10000000.0 / m_fps);
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::GetDouble(LPCSTR field, double* value)
+{
+	CheckPointer(value, E_POINTER);
+	if (!strcmp(field, "refreshRate")) {
+		*value = 1000.0 / m_refreshRate;
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* value, int* chars)
+{
+	CheckPointer(value, E_POINTER);
+	CheckPointer(chars, E_POINTER);
+	CString ret = NULL;
+
+	if (!strcmp(field, "name")) {
+		ret = L"MPC-BE";
+	} else if (!strcmp(field, "version")) {
+		ret = MPC_VERSION_STR;
+	} else if (!strcmp(field, "yuvMatrix")) {
+		ret = L"None";
+
+		if (m_inputMediaType.IsValid() && m_inputMediaType.formattype == FORMAT_VideoInfo2) {
+			VIDEOINFOHEADER2* pVIH2 = (VIDEOINFOHEADER2*)m_inputMediaType.pbFormat;
+
+			if (pVIH2->dwControlFlags & AMCONTROL_COLORINFO_PRESENT) {
+				DXVA2_ExtendedFormat& flags = (DXVA2_ExtendedFormat&)pVIH2->dwControlFlags;
+
+				ret = (flags.NominalRange == DXVA2_NominalRange_Normal) ? L"PC." : L"TV.";
+
+				switch (flags.VideoTransferMatrix) {
+					case DXVA2_VideoTransferMatrix_BT601:
+						ret.Append(L"601");
+						break;
+					case DXVA2_VideoTransferMatrix_BT709:
+						ret.Append(L"709");
+						break;
+					case DXVA2_VideoTransferMatrix_SMPTE240M:
+						ret.Append(L"240M");
+						break;
+					default:
+						ret = L"None";
+						break;
+				}
+			}
+		}
+	}
+
+	if (!ret.IsEmpty()) {
+		int len = ret.GetLength();
+		size_t sz = (len + 1) * sizeof(WCHAR);
+		LPWSTR buf = (LPWSTR)LocalAlloc(LPTR, sz);
+
+		if (!buf) {
+			return E_OUTOFMEMORY;
+		}
+
+		wcscpy_s(buf, len + 1, ret);
+		*chars = len;
+		*value = buf;
+
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::GetBin(LPCSTR field, LPVOID* value, int* size)
+{
+	CheckPointer(value, E_POINTER);
+	CheckPointer(size, E_POINTER);
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::SetBool(LPCSTR field, bool value)
+{
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::SetInt(LPCSTR field, int value)
+{
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::SetSize(LPCSTR field, SIZE value)
+{
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::SetRect(LPCSTR field, RECT value)
+{
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::SetUlonglong(LPCSTR field, ULONGLONG value)
+{
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::SetDouble(LPCSTR field, double value)
+{
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::SetString(LPCSTR field, LPWSTR value, int chars)
+{
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::SetBin(LPCSTR field, LPVOID value, int size)
+{
+	return E_INVALIDARG;
+}
+
+// ISubRenderConsumer
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::Connect(ISubRenderProvider* subtitleRenderer)
+{
+	HRESULT hr = E_FAIL;
+
+	if (m_pSubPicProvider) {
+		return hr;
+	}
+
+	hr = subtitleRenderer->SetBool("combineBitmaps", true);
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	if (CComQIPtr<ISubRenderConsumer> pSubConsumer = m_pSubPicQueue) {
+		hr = pSubConsumer->Connect(subtitleRenderer);
+	} else {
+		CComPtr<ISubPicProvider> pSubPicProvider = (ISubPicProvider*)DNew CXySubPicProvider(subtitleRenderer);
+		CComPtr<ISubPicQueue> pSubPicQueue = (ISubPicQueue*)DNew CXySubPicQueueNoThread(m_pAllocator, &hr);
+
+		if (SUCCEEDED(hr)) {
+			CAutoLock cAutoLock(this);
+			pSubPicQueue->SetSubPicProvider(pSubPicProvider);
+			m_pSubPicProvider = pSubPicProvider;
+			m_pSubPicQueue = pSubPicQueue;
+		}
+	}
+
+	return hr;
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::Disconnect()
+{
+	m_pSubPicProvider = NULL;
+	return m_pSubPicQueue->SetSubPicProvider(m_pSubPicProvider);
+}
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::DeliverFrame(REFERENCE_TIME start, REFERENCE_TIME stop, LPVOID context, ISubRenderFrame* subtitleFrame)
+{
+	HRESULT hr = E_FAIL;
+
+	if (CComQIPtr<IXyCompatProvider> pXyProvider = m_pSubPicProvider) {
+		hr = pXyProvider->DeliverFrame(start, stop, context, subtitleFrame);
+	}
+
+	return hr;
+}
+
+// ISubRenderConsumer2
+
+STDMETHODIMP CSubPicAllocatorPresenterImpl::Clear(REFERENCE_TIME clearNewerThan /* = 0 */)
+{
+	return m_pSubPicQueue->Invalidate(clearNewerThan);
 }

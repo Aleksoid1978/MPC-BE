@@ -116,7 +116,7 @@ CDX7AllocatorPresenter::CDX7AllocatorPresenter(HWND hWnd, HRESULT& hr)
 		return;
 	}
 
-	DirectDrawCreateExPtr	pDirectDrawCreateEx	= NULL;
+	DirectDrawCreateExPtr pDirectDrawCreateEx = NULL;
 
 	m_hDDrawLib = LoadLibrary(L"ddraw.dll");
 	if (m_hDDrawLib) {
@@ -235,54 +235,26 @@ HRESULT CDX7AllocatorPresenter::CreateDevice()
 		m_pSubPicQueue->GetSubPicProvider(&pSubPicProvider);
 	}
 
-	CSize size;
-	switch (GetRenderersSettings().nSPMaxTexRes) {
-		case 0:
-			size = m_ScreenSize;
-			break;
-		case 384:
-			size.SetSize(384, 288);
-			break;
-		case 512:
-			size.SetSize(512, 384);
-			break;
-		case 640:
-			size.SetSize(640, 480);
-			break;
-		case 800:
-			size.SetSize(800, 600);
-			break;
-		case 1024:
-			size.SetSize(1024, 768);
-			break;
-		case 1280:
-		default:
-			size.SetSize(1280, 720);
-			break;
-		case 1320:
-			size.SetSize(1320, 900);
-			break;
-		case 1920:
-			size.SetSize(1920, 1080);
-			break;
-		case 2560:
-			size.SetSize(2560, 1600);
-			break;
-	}
+	InitMaxSubtitleTextureSize(GetRenderersSettings().nSPMaxTexRes, m_ScreenSize);
 
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(m_pD3DDev);
 	} else {
-		m_pAllocator = DNew CDX7SubPicAllocator(m_pD3DDev, size);
+		m_pAllocator = DNew CDX7SubPicAllocator(m_pD3DDev, m_maxSubtitleTextureSize);
 		if (!m_pAllocator || FAILED(hr)) {
 			return E_FAIL;
 		}
 	}
 
 	hr = S_OK;
-	m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
-					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, GetRenderersSettings().bSPAllowDropSubPic, m_pAllocator, &hr)
-					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr);
+	if (!m_pSubPicQueue) {
+		CAutoLock cAutoLock(this);
+		m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
+						 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, GetRenderersSettings().bSPAllowDropSubPic, m_pAllocator, &hr)
+						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr);
+	} else {
+		m_pSubPicQueue->Invalidate();
+	}
 	if (!m_pSubPicQueue || FAILED(hr)) {
 		return E_FAIL;
 	}
@@ -307,8 +279,8 @@ HRESULT CDX7AllocatorPresenter::AllocSurfaces()
 	INITDDSTRUCT(ddsd);
 	ddsd.dwFlags = DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT|DDSD_PIXELFORMAT;
 	ddsd.ddsCaps.dwCaps = DDSCAPS_VIDEOMEMORY;
-	ddsd.dwWidth = m_NativeVideoSize.cx;
-	ddsd.dwHeight = m_NativeVideoSize.cy;
+	ddsd.dwWidth = m_nativeVideoSize.cx;
+	ddsd.dwHeight = m_nativeVideoSize.cy;
 	ddsd.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
 	ddsd.ddpfPixelFormat.dwFlags = DDPF_RGB;
 	ddsd.ddpfPixelFormat.dwRGBBitCount	= 32;
@@ -378,19 +350,19 @@ STDMETHODIMP_(bool) CDX7AllocatorPresenter::Paint(bool fAll)
 
 	CAutoLock cAutoLock(this);
 
-	if (m_WindowRect.right <= m_WindowRect.left || m_WindowRect.bottom <= m_WindowRect.top
-			|| m_NativeVideoSize.cx <= 0 || m_NativeVideoSize.cy <= 0
+	if (m_windowRect.right <= m_windowRect.left || m_windowRect.bottom <= m_windowRect.top
+			|| m_nativeVideoSize.cx <= 0 || m_nativeVideoSize.cy <= 0
 			|| !m_pPrimary || !m_pBackBuffer || !m_pVideoSurface) {
 		return false;
 	}
 
 	HRESULT hr;
 
-	CRect rSrcVid(CPoint(0, 0), m_NativeVideoSize);
-	CRect rDstVid(m_VideoRect);
+	CRect rSrcVid(CPoint(0, 0), m_nativeVideoSize);
+	CRect rDstVid(m_videoRect);
 
-	CRect rSrcPri(CPoint(0, 0), m_WindowRect.Size());
-	CRect rDstPri(m_WindowRect);
+	CRect rSrcPri(CPoint(0, 0), m_windowRect.Size());
+	CRect rDstPri(m_windowRect);
 
 	// clear the backbuffer
 

@@ -69,6 +69,4 @@
 #define DIRECTX_SDK_DATE        "June 2010"
 #define DIRECTX_SDK_NUMBER      43
 
-#define DBOXVersion             0
-
 #endif

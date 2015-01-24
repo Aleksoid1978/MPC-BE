@@ -1127,16 +1127,6 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 					DbgLog((LOG_TRACE, 3, L"FGM: '%s' Successfully connected", pFGF->GetName()));
 
-#if DBOXVersion
-					if (IsAudioWaveRenderer(pBF)) {
-						POSITION pos = m_transform.Find(pFGF);
-						if (pos != NULL) {
-							m_transform.MoveToTail(pos);
-							delete m_transform.RemoveTail();
-						}
-					}
-#endif
-
 					return hr;
 				}
 			}
@@ -1495,38 +1485,6 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 
 			BOOL bInfPinTeeConnected = FALSE;
 			if (s.fDualAudioOutput) {
-#if DBOXVersion
-				// for D-Box users :)
-				if (clsid == CLSID_LAVSplitter || clsid == CLSID_LAVSource) {
-					BeginEnumMediaTypes(pPin, pEM, pmt) {
-						// Find the Audio out pin
-						if (pmt->majortype == MEDIATYPE_Audio && pPinIn == NULL) {
-							// Add infinite Pin Tee Filter
-							CComPtr<IBaseFilter> pInfPinTee;
-							pInfPinTee.CoCreateInstance(CLSID_InfTee);
-							AddFilter(pInfPinTee, L"Infinite Pin Tee");
-
-							hr = ConnectFilterDirect(pPin, pInfPinTee, NULL);
-							if (SUCCEEDED(hr)) {
-								bInfPinTeeConnected = TRUE;
-
-								for (int ar = 0; ar < 2; ar++) {
-									IPin *infTeeFilterOutPin = GetFirstDisconnectedPin(pInfPinTee, PINDIR_OUTPUT);
-									hr = Connect(infTeeFilterOutPin, pPinIn);
-									if(SUCCEEDED(hr)){
-										// do something
-									}
-								}
-							}
-
-							if (bInfPinTeeConnected) {
-								break;
-							}
-						}
-					}
-					EndEnumMediaTypes(pmt)
-				} else
-#endif
 				if (CComQIPtr<IAudioSwitcherFilter> pASF = pBF) {
 					BeginEnumMediaTypes(pPin, pEM, pmt) {
 						// Find the Audio out pin
@@ -2642,9 +2600,8 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	{
 		CRegKey key;
 
-		TCHAR buff[256];
+		TCHAR buff[256] = { 0 };
 		ULONG len = sizeof(buff);
-		memset(buff, 0, len);
 
 		CString clsid = _T("{B38C58A0-1809-11D6-A458-EDAE78F1DF12}");
 
@@ -2668,10 +2625,13 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_DO_NOT_USE));
 	}
 
-	if (s.iDSVideoRendererType != VIDRNDT_DS_MADVR) {
-		// Prevent XySubFilter from connecting while the renderer not a madVR
+	if (s.iDSVideoRendererType != VIDRNDT_DS_MADVR
+			&& s.iDSVideoRendererType != VIDRNDT_DS_EVR_CUSTOM
+			&& s.iDSVideoRendererType != VIDRNDT_DS_SYNC
+			&& s.iDSVideoRendererType != VIDRNDT_DS_VMR9RENDERLESS) {
+		// Prevent XySubFilter from connecting while renderer is not compatible
 		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_DO_NOT_USE));
-		// Prevent XySubFilter's loader from connecting while the renderer not a madVR
+		// Prevent XySubFilter's loader from connecting while renderer is not compatible
 		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_DO_NOT_USE));
 	}
 
@@ -2805,7 +2765,6 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_armerit += 0x100;
 	}
 
-#if !DBOXVersion
 	if (!m_bIsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSwitcherFilter>(L"Audio Switcher", MERIT64_HIGHEST);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
@@ -2814,7 +2773,6 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		// morgan stream switcher
 		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_MorganSwitcher, MERIT64_DO_NOT_USE));
 	}
-#endif
 
 	// Renderers
 	if (!m_bIsPreview) {

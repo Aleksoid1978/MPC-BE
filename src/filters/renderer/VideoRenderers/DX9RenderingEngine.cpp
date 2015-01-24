@@ -211,7 +211,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 
 	if (settings.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE2D) {
 		if (FAILED(hr = m_pD3DDev->CreateTexture(
-			m_NativeVideoSize.cx, m_NativeVideoSize.cy, 1,
+			m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
 			D3DUSAGE_RENDERTARGET, m_SurfaceType,
 			D3DPOOL_DEFAULT, &m_pVideoTexture[0], NULL))) {
 			return hr;
@@ -229,7 +229,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 	else if (settings.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
 		for (int i = 0; i < m_nNbDXSurface; i++) {
 			if (FAILED(hr = m_pD3DDev->CreateTexture(
-								m_NativeVideoSize.cx, m_NativeVideoSize.cy, 1,
+								m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
 								D3DUSAGE_RENDERTARGET, m_SurfaceType,
 								D3DPOOL_DEFAULT, &m_pVideoTexture[i], NULL))) {
 				return hr;
@@ -244,7 +244,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 	}
 	else {
 		if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(
-							m_NativeVideoSize.cx, m_NativeVideoSize.cy,
+							m_nativeVideoSize.cx, m_nativeVideoSize.cy,
 							m_SurfaceType,
 							D3DPOOL_DEFAULT, &m_pVideoSurface[m_nCurSurface], NULL))) {
 			return hr;
@@ -574,7 +574,7 @@ HRESULT CDX9RenderingEngine::InitVideoTextures(size_t count)
 	for (size_t i = 0; i < count; i++) {
 		if (m_pFrameTextures[i] == NULL) {
 			hr = m_pD3DDev->CreateTexture(
-					 m_NativeVideoSize.cx, m_NativeVideoSize.cy, 1, D3DUSAGE_RENDERTARGET, m_SurfaceType,
+					 m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1, D3DUSAGE_RENDERTARGET, m_SurfaceType,
 					 D3DPOOL_DEFAULT, &m_pFrameTextures[i], NULL);
 
 			if (FAILED(hr)) {
@@ -603,7 +603,7 @@ HRESULT CDX9RenderingEngine::InitScreenSpaceTextures(size_t count)
 
 	m_ScreenSpaceTexWidth = min(m_ScreenSize.cx, (int)m_Caps.MaxTextureWidth);
 #if ENABLE_2PASS_RESIZE
-	m_ScreenSpaceTexHeight = min(max(m_ScreenSize.cy, m_NativeVideoSize.cy), (int)m_Caps.MaxTextureHeight);
+	m_ScreenSpaceTexHeight = min(max(m_ScreenSize.cy, m_nativeVideoSize.cy), (int)m_Caps.MaxTextureHeight);
 #else
 	m_ScreenSpaceTexHeight = min(m_ScreenSize.cy, (int)m_Caps.MaxTextureHeight);
 #endif
@@ -1171,13 +1171,13 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(TCHAR* profilePath, float* lut3
 		videoSystem = VIDEO_SYSTEM_HDTV; // default
 
 		for (int i = 0; i < _countof(ntscSizes); i++) {
-			if (m_NativeVideoSize.cx == ntscSizes[i][0] && m_NativeVideoSize.cy == ntscSizes[i][1]) {
+			if (m_nativeVideoSize.cx == ntscSizes[i][0] && m_nativeVideoSize.cy == ntscSizes[i][1]) {
 				videoSystem = VIDEO_SYSTEM_SDTV_NTSC;
 			}
 		}
 
 		for (int i = 0; i < _countof(palSizes); i++) {
-			if (m_NativeVideoSize.cx == palSizes[i][0] && m_NativeVideoSize.cy == palSizes[i][1]) {
+			if (m_nativeVideoSize.cx == palSizes[i][0] && m_nativeVideoSize.cy == palSizes[i][1]) {
 				videoSystem = VIDEO_SYSTEM_SDTV_PAL;
 			}
 		}

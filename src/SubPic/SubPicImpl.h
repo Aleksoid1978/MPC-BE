@@ -35,6 +35,7 @@ protected:
 	CSize			m_virtualTextureSize;
 	CPoint			m_virtualTextureTopLeft;
 	SUBTITLE_TYPE	m_eSubtitleType;
+	bool			m_bInvAlpha;
 
 	/*
 
@@ -105,6 +106,9 @@ public:
 
 	STDMETHODIMP SetType(SUBTITLE_TYPE subtitleType);
 	STDMETHODIMP GetType(SUBTITLE_TYPE* pSubtitleType);
+	
+	STDMETHODIMP_(bool) GetInverseAlpha() const;
+	STDMETHODIMP_(void) SetInverseAlpha(bool bInverted);
 };
 
 

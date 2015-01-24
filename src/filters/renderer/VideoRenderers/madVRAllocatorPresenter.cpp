@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -91,61 +91,32 @@ HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 		return S_OK;
 	}
 
-	CSize size;
-	switch (GetRenderersSettings().nSPMaxTexRes) {
-		case 0:
-			size = m_ScreenSize;
-			break;
-		case 384:
-			size.SetSize(384, 288);
-			break;
-		case 512:
-			size.SetSize(512, 384);
-			break;
-		case 640:
-			size.SetSize(640, 480);
-			break;
-		case 800:
-			size.SetSize(800, 600);
-			break;
-		case 1024:
-			size.SetSize(1024, 768);
-			break;
-		case 1280:
-		default:
-			size.SetSize(1280, 720);
-			break;
-		case 1320:
-			size.SetSize(1320, 900);
-			break;
-		case 1920:
-			size.SetSize(1920, 1080);
-			break;
-		case 2560:
-			size.SetSize(2560, 1600);
-			break;
-	}
+	InitMaxSubtitleTextureSize(GetRenderersSettings().nSPMaxTexRes, m_ScreenSize);
 
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(pD3DDev);
 	} else {
-		m_pAllocator = DNew CDX9SubPicAllocator(pD3DDev, size, true);
+		m_pAllocator = DNew CDX9SubPicAllocator(pD3DDev, m_maxSubtitleTextureSize, true);
 		if (!m_pAllocator) {
 			return E_FAIL;
 		}
 	}
 
 	HRESULT hr = S_OK;
-
-	m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
-					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, false, m_pAllocator, &hr)
-					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr);
+	if (!m_pSubPicQueue) {
+		CAutoLock cAutoLock(this);
+		m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
+						 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, GetRenderersSettings().bSPAllowDropSubPic, m_pAllocator, &hr)
+						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr);
+	} else {
+		m_pSubPicQueue->Invalidate();
+	}
 	if (!m_pSubPicQueue || FAILED(hr)) {
 		return E_FAIL;
 	}
 
-	if (m_SubPicProvider) {
-		m_pSubPicQueue->SetSubPicProvider(m_SubPicProvider);
+	if (m_pSubPicProvider) {
+		m_pSubPicQueue->SetSubPicProvider(m_pSubPicProvider);
 	}
 
 	return hr;
@@ -195,7 +166,7 @@ STDMETHODIMP CmadVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		return E_FAIL;
 	}
 
-	(*ppRenderer = this)->AddRef();
+	(*ppRenderer = (IUnknown*)(INonDelegatingUnknown*)(this))->AddRef();
 
 	MONITORINFO mi;
 	mi.cbSize = sizeof(MONITORINFO);
