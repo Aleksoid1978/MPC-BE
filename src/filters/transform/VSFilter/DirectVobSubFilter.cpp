@@ -187,12 +187,20 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 {
 	EXECUTE_ASSERT(WAIT_OBJECT_0 == WaitForSingleObject(m_hEvtTransform, INFINITE));
 
-	REFERENCE_TIME rtStart = INVALID_TIME, rtStop = INVALID_TIME;
-	if (SUCCEEDED(pIn->GetTime(&rtStart, &rtStop))) {
-		double dRate = m_pInput->CurrentRate();
+	REFERENCE_TIME rtStart, rtStop;
+	HRESULT hr = pIn->GetTime(&rtStart, &rtStop);
+	if (FAILED(hr)) {
+		rtStart = rtStop = INVALID_TIME;
+	} else if (hr == VFW_S_NO_STOP_TIME || rtStop - 1 <= rtStart) {
+		rtStop = INVALID_TIME;
+	}
 
+	double dRate = m_pInput->CurrentRate();
+	if (rtStart != INVALID_TIME) {
 		m_tPrev = m_pInput->CurrentStartTime() + dRate * rtStart;
+	}
 
+	if (rtStop != INVALID_TIME) {
 		REFERENCE_TIME rtAvgTimePerFrame = rtStop - rtStart;
 		if (CComQIPtr<ISubClock2> pSC2 = m_pSubClock) {
 			REFERENCE_TIME rt;
@@ -274,8 +282,6 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 	}
 
 	SubPicDesc spd = m_spd;
-
-	HRESULT hr;
 	CComPtr<IMediaSample> pOut;
 	BYTE* pDataOut = NULL;
 	if (FAILED(hr = GetDeliveryBuffer(spd.w, spd.h, &pOut))
