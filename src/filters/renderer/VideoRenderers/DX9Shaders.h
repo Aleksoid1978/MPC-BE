@@ -18,21 +18,18 @@
  *
  */
 
-// Some shaders are taken from Jan-Willem Krans "Video pixel shader pack v1.4.7" and "MPC-HC tester builds".
+// Some shaders are taken from Jan-Willem Krans "Video pixel shader pack v1.4" and "MPC-HC tester builds".
 
 #pragma once
 
-
+// Bilinear
 char const shader_resizer_bilinear[] =
 "#if Ml\n"
 "#define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))\n"
 "#endif\n"
 
 "sampler s0 : register(s0);"
-"float2 dxdy :   register(c0);"
-"float4 dxdy05 : register(c1);"
-"float2 dx :     register(c2);"
-"float2 dy :     register(c3);"
+"float2 dxdy : register(c0);"
 
 "float4 main(float2 tex : TEXCOORD0) : COLOR"
 "{"
@@ -45,7 +42,7 @@ char const shader_resizer_bilinear[] =
 		"t.y);"// interpolate and output
 "}";
 
-
+// Perlin Smootherstep
 char const shader_resizer_smootherstep[] =
 "#if Ml\n"
 "#define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))\n"
@@ -66,7 +63,7 @@ char const shader_resizer_smootherstep[] =
 		"t.y);"// interpolate and output
 "}";
 
-
+// Bicubic
 char const shader_resizer_bicubic[] =
 // "#define A -0.6, -0.8 or -1.0
 "#if Ml\n"
@@ -145,7 +142,7 @@ char const shader_resizer_bicubic[] =
 "	return mul(mul(tco, float4(1., t, t*t, t*t*t)), float4x4(Q0, Q1, Q2, Q3));"
 "}";
 
-
+// B-spline4
 char const shader_resizer_bspline4[] =
 "#if Ml\n"
 "#define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))\n"
@@ -217,7 +214,7 @@ char const shader_resizer_bspline4[] =
 "	return w0123.x*Q0 + w0123.y*Q1 + w0123.z*Q2 + w0123.w*Q3;" // interpolation output
 "}";
 
-
+// Mitchell-Netravali spline4
 char const shader_resizer_mitchell4[] =
 "#if Ml\n"
 "#define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))\n"
@@ -289,7 +286,7 @@ char const shader_resizer_mitchell4[] =
 "	return w0123.x*Q0+w0123.y*Q1+w0123.z*Q2+w0123.w*Q3;" // interpolation output
 "}";
 
-
+// Catmull-Rom spline4
 char const shader_resizer_catmull4[] =
 "#if Ml\n"
 "#define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))\n"
@@ -362,7 +359,7 @@ char const shader_resizer_catmull4[] =
 "	return w0123.x*Q0+w0123.y*Q1+w0123.z*Q2+w0123.w*Q3;" // interpolation output
 "}";
 
-
+// compensated Lanczos2
 char const shader_resizer_lanczos2[] =
 "#if Ml\n"
 "#define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))\n"
@@ -418,7 +415,7 @@ char const shader_resizer_lanczos2[] =
 "	return Q1;" // case t == 0. is required to return sample Q1, because of a possible division by 0.
 "}";
 
-
+// downscaling (experimental)
 char const shader_resizer_downscaling[] =
 "#if Ml\n"
 "#define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))\n"
@@ -465,6 +462,7 @@ char const shader_resizer_downscaling[] =
 "	return result;"
 "}";
 
+// Final pass
 char const shader_final[] =
 // #define QUANTIZATION 255.0 or 1023 (Maximum quantized integer value)
 // #define LUT3D_ENABLED 0 or 1
