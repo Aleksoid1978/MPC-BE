@@ -1660,6 +1660,9 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	} else if (pTE->DefaultDuration) {																\
 		duration = (pTE->DefaultDuration / 100) * p->bg->Block.BlockData.GetCount();				\
 	}																								\
+	if (pTE->TrackType == TrackEntry::TypeSubtitle && !duration) {									\
+		duration = 1;																				\
+	}																								\
 	\
 	p->rtStart = m_pFile->m_segment.GetRefTime((REFERENCE_TIME)c.TimeCode + p->bg->Block.TimeCode);	\
 	p->rtStop = p->rtStart + duration;																\
