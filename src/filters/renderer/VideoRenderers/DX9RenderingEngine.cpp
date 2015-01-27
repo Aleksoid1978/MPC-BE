@@ -849,13 +849,13 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 		return E_FAIL;
 	}
 
-	float rx = srcRect.Width() / (dst[3].x - dst[0].x);
-	float ry = srcRect.Height() / (dst[3].y - dst[0].y);
+	float rx = srcRect.Width() / abs(dst[3].x - dst[0].x);
+	float ry = srcRect.Height() / abs(dst[3].y - dst[0].y);
 
 	const float dx0 = 1.0f/(float)desc.Width;
 	const float dy0 = 1.0f/(float)desc.Height;
 
-	float w1 = dst[3].x - dst[0].x;
+	float w1 = abs(dst[3].x - dst[0].x);
 	float h1 = (float)srcRect.Height();
 
 	if (!m_pScreenSpaceTextures[0]
