@@ -8078,32 +8078,38 @@ void CMainFrame::OnViewRotate(UINT nID)
 	}
 
 	switch (nID) {
-		case ID_PANSCAN_ROTATEXP:
-			m_AngleX += 2;
-			break;
-		case ID_PANSCAN_ROTATEXM:
-			m_AngleX -= 2;
-			break;
-		case ID_PANSCAN_ROTATEYP:
-			m_AngleY += 2;
-			break;
-		case ID_PANSCAN_ROTATEYM:
-			m_AngleY -= 2;
-			break;
-		case ID_PANSCAN_ROTATEZP:
-			m_AngleZ += 2;
-			break;
-		case ID_PANSCAN_ROTATEZM:
-			m_AngleZ -= 2;
-			break;
-		default:
-			return;
+	case ID_PANSCAN_ROTATEXP:
+		m_AngleX += 2;
+		if (m_AngleX >= 360) { m_AngleX -= 360; }
+		break;
+	case ID_PANSCAN_ROTATEXM:
+		m_AngleX -= 2;
+		if (m_AngleX <= -360) { m_AngleX += 360; }
+		break;
+	case ID_PANSCAN_ROTATEYP:
+		m_AngleY += 2;
+		if (m_AngleY >= 360) { m_AngleY -= 360; }
+		break;
+	case ID_PANSCAN_ROTATEYM:
+		m_AngleY -= 2;
+		if (m_AngleY <= -360) { m_AngleY += 360; }
+		break;
+	case ID_PANSCAN_ROTATEZP:
+		m_AngleZ += 2;
+		if (m_AngleZ >= 360) { m_AngleZ -= 360; }
+		break;
+	case ID_PANSCAN_ROTATEZM:
+		m_AngleZ -= 2;
+		if (m_AngleZ <= -360) { m_AngleZ += 360; }
+		break;
+	default:
+		return;
 	}
 
 	m_pCAP->SetVideoAngle(Vector(Vector::DegToRad(m_AngleX), Vector::DegToRad(m_AngleY), Vector::DegToRad(m_AngleZ)));
 
 	CString info;
-	info.Format(_T("x: %d, y: %d, z: %d"), m_AngleX, m_AngleY, m_AngleZ);
+	info.Format(_T("x: %d°, y: %d°, z: %d°"), m_AngleX, m_AngleY, m_AngleZ);
 	SendStatusMessage(info, 3000);
 }
 
