@@ -239,6 +239,8 @@ STDMETHODIMP CSubtitleInputPin::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME
 		pXSUBSubtitle->NewSegment (tStart, tStop, dRate);
 	}
 
+	InvalidateSubtitle(tStart, m_pSubStream);
+
 	return __super::NewSegment(tStart, tStop, dRate);
 }
 
