@@ -838,24 +838,21 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 {
 	HRESULT hr;
 
-	// rotated?
-	if (dst[0].z != dst[1].z || dst[2].z != dst[3].z || dst[0].z != dst[3].z
-			|| dst[0].y != dst[1].y || dst[0].x != dst[2].x || dst[2].y != dst[3].y || dst[1].x != dst[3].x) {
-		return TextureResize(pTexture, dst, srcRect, D3DTEXF_LINEAR);
-	}
-
 	D3DSURFACE_DESC desc;
 	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc))) {
 		return E_FAIL;
 	}
 
-	float rx = srcRect.Width() / abs(dst[3].x - dst[0].x);
-	float ry = srcRect.Height() / abs(dst[3].y - dst[0].y);
+	float w2 = sqrt(pow(dst[1].x - dst[0].x, 2) + pow(dst[1].y - dst[0].y, 2) + pow(dst[1].z - dst[0].z, 2));
+	float h2 = sqrt(pow(dst[2].x - dst[0].x, 2) + pow(dst[2].y - dst[0].y, 2) + pow(dst[2].z - dst[0].z, 2));
+
+	float rx = srcRect.Width() / w2;
+	float ry = srcRect.Height() / h2;
 
 	const float dx0 = 1.0f/(float)desc.Width;
 	const float dy0 = 1.0f/(float)desc.Height;
 
-	float w1 = abs(dst[3].x - dst[0].x);
+	float w1 = w2;
 	float h1 = (float)srcRect.Height();
 
 	if (!m_pScreenSpaceTextures[0]
