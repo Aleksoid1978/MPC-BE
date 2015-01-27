@@ -843,6 +843,10 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 		return E_FAIL;
 	}
 
+	if (!m_pScreenSpaceTextures[1]) {
+		return TextureResize(pTexture, dst, srcRect, D3DTEXF_LINEAR);
+	}
+
 	float w2 = sqrt(pow(dst[1].x - dst[0].x, 2) + pow(dst[1].y - dst[0].y, 2) + pow(dst[1].z - dst[0].z, 2));
 	float h2 = sqrt(pow(dst[2].x - dst[0].x, 2) + pow(dst[2].y - dst[0].y, 2) + pow(dst[2].z - dst[0].z, 2));
 
@@ -852,12 +856,10 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 	const float dx0 = 1.0f/(float)desc.Width;
 	const float dy0 = 1.0f/(float)desc.Height;
 
-	float w1 = w2;
-	float h1 = (float)srcRect.Height();
+	float w1 = min(w2, (float)m_ScreenSpaceTexWidth);
+	float h1 = (float)min(srcRect.Height(), m_ScreenSpaceTexHeight);
 
-	if (!m_pScreenSpaceTextures[0]
-			|| FAILED(m_pScreenSpaceTextures[0]->GetLevelDesc(0, &desc))
-			|| w1 > desc.Width || h1 > desc.Height) {
+	if (FAILED(m_pScreenSpaceTextures[1]->GetLevelDesc(0, &desc))) {
 		return TextureResize(pTexture, dst, srcRect, D3DTEXF_LINEAR);
 	}
 
