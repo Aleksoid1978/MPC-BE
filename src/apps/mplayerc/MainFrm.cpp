@@ -4152,6 +4152,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 
+	OpenSetupSubStream(m_lastOMD);
+
 	AppSettings& s = AfxGetAppSettings();
 
 	if (s.fEnableEDLEditor) {
@@ -5846,11 +5848,11 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 
 	CSize framesize, dar;
 
-	if (m_pMFVDC) {
-		m_pMFVDC->GetNativeVideoSize(&framesize, &dar);
-	} else if (m_pCAP) {
+	if (m_pCAP) {
 		framesize = m_pCAP->GetVideoSize(false);
 		dar = m_pCAP->GetVideoSize(true);
+	} else if (m_pMFVDC) {
+		m_pMFVDC->GetNativeVideoSize(&framesize, &dar);
 	} else {
 		m_pBV->GetVideoSize(&framesize.cx, &framesize.cy);
 
@@ -9897,9 +9899,9 @@ void CMainFrame::OnNavigateAudioMix(UINT nID)
 void CMainFrame::OnNavigateSubpic(UINT nID)
 {
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
-		OnNavMixStreamSubtitleSelectSubMenu(nID - (ID_NAVIGATE_SUBP_SUBITEM_START+1), 2);
+		OnNavMixStreamSubtitleSelectSubMenu(nID - (ID_NAVIGATE_SUBP_SUBITEM_START + 1), 2);
 	} else if (GetPlaybackMode() == PM_DVD) {
-		int i = (int)nID - (1 + ID_NAVIGATE_SUBP_SUBITEM_START);
+		int i = (int)nID - (ID_NAVIGATE_SUBP_SUBITEM_START + 1);
 
 		if (i == -1) {
 			ULONG ulStreamsAvailable, ulCurrentStream;
@@ -9919,7 +9921,6 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 	bool bSplitterMenu = false;
 	int splsubcnt = 0;
 	int i = (int)id;
-	//m_nSelSub2 = m_iSubtitleSel;
 
 	if (GetPlaybackMode() == PM_FILE && b_UseVSFilter) {
 		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
@@ -10007,25 +10008,8 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 
 					bSplitterMenu = true;
 					if (id == 0) {
-
-						if (m_iSubtitleSel != 0) {
-							m_iSubtitleSel = 0;
-							UpdateSubtitle();
-						}
 						pSS->Enable(m, AMSTREAMSELECTENABLE_ENABLE);
-						m_nSelSub2 = m_iSubtitleSel;
-
-						if (!AfxGetAppSettings().fEnableSubtitles) {
-							m_iSubtitleSel = -1;
-							UpdateSubtitle();
-						}// else {
-							//OnStreamSubOnOff();
-							//OnStreamSubOnOff();
-						//}
-						if (m_pCAP) {
-							m_pCAP->Invalidate();
-						}
-						return;
+						break;
 					}
 
 					id--;
@@ -11098,11 +11082,11 @@ CSize CMainFrame::GetVideoSize()
 
 	CSize wh(0, 0), arxy(0, 0);
 
-	if (m_pMFVDC) {
-		m_pMFVDC->GetNativeVideoSize(&wh, &arxy);	// TODO : check AR !!
-	} else if (m_pCAP) {
+	if (m_pCAP) {
 		wh = m_pCAP->GetVideoSize(false);
 		arxy = m_pCAP->GetVideoSize(fKeepAspectRatio);
+	} else if (m_pMFVDC) {
+		m_pMFVDC->GetNativeVideoSize(&wh, &arxy);	// TODO : check AR !!
 	} else {
 		m_pBV->GetVideoSize(&wh.cx, &wh.cy);
 
@@ -14189,7 +14173,6 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			}
 			OnNavMixStreamSubtitleSelectSubMenu(checkedsplsub, 2);
 		} else {
-
 			int cnt = subarray.GetCount();
 			size_t defsub = GetSubSelIdx();
 
@@ -14197,13 +14180,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 				defsub++;
 			}
 
-			if (s.fEnableSubtitles && m_pSubStreams.GetCount() > 0) {
-				CComPtr<ISubStream> pSub = m_pSubStreams.GetHead();
-				SetSubtitle(pSub);
-			}
-
 			if (cnt > 0) {
-				//UINT udefsub = defsub;
 				OnNavMixStreamSubtitleSelectSubMenu(defsub, 2);
 			}
 		}
@@ -14525,11 +14502,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		}
 
 		OpenSetupWindowTitle(pOMD->title);
-
-		OpenSetupSubStream(pOMD);
-		if (m_fOpeningAborted) {
-			BREAK(aborted)
-		}
 
 		m_pSwitcherFilter = FindSwitcherFilter();
 

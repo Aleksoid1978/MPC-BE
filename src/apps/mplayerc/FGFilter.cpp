@@ -459,11 +459,11 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 				*ppBF = CComQIPtr<IBaseFilter>(pRenderer).Detach();
 				pUnks.AddTail(pCAP);
 
-				if (m_clsid == CLSID_madVRAllocatorPresenter) {
-					if (CComQIPtr<ISubPicAllocatorPresenter2> pCAP2 = pCAP) {
-						pUnks.AddTail(pCAP2);
-					}
+				if (CComQIPtr<ISubPicAllocatorPresenter2> pCAP2 = pCAP) {
+					pUnks.AddTail(pCAP2);
+				}
 
+				if (m_clsid == CLSID_madVRAllocatorPresenter) {
 					// madVR supports calling IVideoWindow::put_Owner before the pins are connected - from MPC-HC
 					if (CComQIPtr<IVideoWindow> pVW = pCAP) {
 						HRESULT hrVR = pVW->put_Owner((OAHWND)m_hWnd);
