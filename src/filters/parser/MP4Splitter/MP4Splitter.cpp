@@ -1367,7 +1367,7 @@ bool CMP4SplitterFilter::DemuxLoop()
 					nBlockAlign = wfe->nBlockAlign * (wfe->nSamplesPerSec >> 4); // 1/16s=62.5ms
 				} else {
 					nBlockAlign = wfe->nBlockAlign;
-					pPairNext->m_value.index -= pPairNext->m_value.index % wfe->nBlockAlign;
+					//pPairNext->m_value.index -= pPairNext->m_value.index % wfe->nBlockAlign; // if this code is necessary - we need explanations and examples
 				}
 
 				p->rtStop = p->rtStart;
