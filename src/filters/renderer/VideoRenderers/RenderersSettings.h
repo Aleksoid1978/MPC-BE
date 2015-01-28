@@ -22,7 +22,7 @@
 #pragma once
 
 #define WM_MYMOUSELAST WM_XBUTTONDBLCLK
-#define ENABLE_2PASS_RESIZE 0
+#define ENABLE_2PASS_RESIZE 1
 
 enum {
 	WM_REARRANGERENDERLESS = WM_APP+1,
@@ -121,7 +121,6 @@ public:
 		double fControlLimit;
 
 		void SetDefault();
-		void SetOptimal();
 	};
 
 	CAdvRendererSettings m_AdvRendSets;

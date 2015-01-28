@@ -1551,11 +1551,7 @@ BEGIN
                 MENUITEM "Flush GPU after Present",     ID_VIEW_FLUSHGPU_AFTERPRESENT
                 MENUITEM "Wait for flushes",            ID_VIEW_FLUSHGPU_WAIT
             END
-            POPUP "Reset"
-            BEGIN
-                MENUITEM "Reset to default renderer settings", ID_VIEW_RESET_DEFAULT
-                MENUITEM "Reset to optimal renderer settings", ID_VIEW_RESET_OPTIMAL
-            END
+            MENUITEM "Reset to default renderer settings", ID_VIEW_RESET_DEFAULT
         END
         POPUP "&Video Frame"
         BEGIN
@@ -1902,11 +1898,7 @@ BEGIN
                 MENUITEM "Flush GPU after Present",     ID_VIEW_FLUSHGPU_AFTERPRESENT
                 MENUITEM "Wait for flushes",            ID_VIEW_FLUSHGPU_WAIT
             END
-            POPUP "Reset"
-            BEGIN
-                MENUITEM "Reset to default renderer settings", ID_VIEW_RESET_DEFAULT
-                MENUITEM "Reset to optimal renderer settings", ID_VIEW_RESET_OPTIMAL
-            END
+            MENUITEM "Reset to default renderer settings", ID_VIEW_RESET_DEFAULT
         END
         MENUITEM "P&roperties",                 ID_FILE_PROPERTIES
         MENUITEM "&Options...",                 ID_VIEW_OPTIONS
@@ -2036,11 +2028,7 @@ BEGIN
                     MENUITEM "Flush GPU after Present",     ID_VIEW_FLUSHGPU_AFTERPRESENT
                     MENUITEM "Wait for flushes",            ID_VIEW_FLUSHGPU_WAIT
                 END
-                POPUP "Reset"
-                BEGIN
-                    MENUITEM "Reset to default renderer settings", ID_VIEW_RESET_DEFAULT
-                    MENUITEM "Reset to optimal renderer settings", ID_VIEW_RESET_OPTIMAL
-                END
+                MENUITEM "Reset to default renderer settings", ID_VIEW_RESET_DEFAULT
             END
             POPUP "&Video Frame"
             BEGIN
@@ -2220,11 +2208,7 @@ BEGIN
                 MENUITEM "Flush GPU after Present",     ID_VIEW_FLUSHGPU_AFTERPRESENT
                 MENUITEM "Wait for flushes",            ID_VIEW_FLUSHGPU_WAIT
             END
-            POPUP "Reset"
-            BEGIN
-                MENUITEM "Reset to default renderer settings", ID_VIEW_RESET_DEFAULT
-                MENUITEM "Reset to optimal renderer settings", ID_VIEW_RESET_OPTIMAL
-            END
+            MENUITEM "Reset to default renderer settings", ID_VIEW_RESET_DEFAULT
         END
         MENUITEM "P&roperties",                 ID_FILE_PROPERTIES
         MENUITEM "&Options...",                 ID_VIEW_OPTIONS
