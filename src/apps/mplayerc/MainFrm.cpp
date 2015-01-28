@@ -4149,10 +4149,6 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		m_LastOpenBDPath.Empty();
 	}
 
-	SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
-
-	OpenSetupSubStream(m_lastOMD);
-
 	AppSettings& s = AfxGetAppSettings();
 
 	if (s.fEnableEDLEditor) {
@@ -4259,6 +4255,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	if (!(s.nCLSwitches & CLSW_OPEN) && (s.nLoops > 0)) {
 		SendMessage(WM_COMMAND, ID_PLAY_PLAY);
+	} else {
+		SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 	}
 	s.nCLSwitches &= ~CLSW_OPEN;
 
@@ -8294,31 +8292,31 @@ void CMainFrame::OnPlayPauseI()
 {
 	OAFilterState fs = GetMediaState();
 
-	if (m_iMediaLoadState == MLS_LOADED) {
+	if (m_iMediaLoadState == MLS_LOADED && fs == State_Stopped) {
+		MoveVideoWindow();
+	}
 
-		if (GetPlaybackMode() == PM_FILE) {
+	if (m_iMediaLoadState == MLS_LOADED) {
+		if (GetPlaybackMode() == PM_FILE
+				|| GetPlaybackMode() == PM_DVD
+				|| GetPlaybackMode() == PM_CAPTURE) {
 			m_pMC->Pause();
-		} else if (GetPlaybackMode() == PM_DVD) {
-			m_pMC->Pause();
-		} else if (GetPlaybackMode() == PM_CAPTURE) {
-			m_pMC->Pause();
+		} else {
+			ASSERT(FALSE);
 		}
 
 		KillTimer(TIMER_STATS);
 		SetAlwaysOnTop(AfxGetAppSettings().iOnTop);
 	}
 
-	MoveVideoWindow();
-
-	if (fs == State_Running) {
-		CString strOSD = ResStr(ID_PLAY_PAUSE);
-		int i = strOSD.Find(_T("\n"));
-		if (i > 0) {
-			strOSD.Delete(i, strOSD.GetLength() - i);
-		}
-		m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
-		m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_PAUSED), 3000);
+	CString strOSD = ResStr(ID_PLAY_PAUSE);
+	int i = strOSD.Find(_T("\n"));
+	if (i > 0) {
+		strOSD.Delete(i, strOSD.GetLength() - i);
 	}
+	m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
+	m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_PAUSED), 3000);
+
 	SetPlayState(PS_PAUSE);
 }
 
@@ -14493,6 +14491,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		}
 
 		OpenSetupWindowTitle(pOMD->title);
+
+		OpenSetupSubStream(pOMD);
 
 		m_pSwitcherFilter = FindSwitcherFilter();
 
