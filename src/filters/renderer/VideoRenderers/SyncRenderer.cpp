@@ -818,63 +818,34 @@ HRESULT CBaseAP::ResetDXDevice(CString &_Error)
 		m_filter = D3DTEXF_LINEAR;
 	}
 
-	CComPtr<ISubPicProvider> pSubPicProvider;
-	if (m_pSubPicQueue) {
-		m_pSubPicQueue->GetSubPicProvider(&pSubPicProvider);
-	}
-	CSize size;
-	switch (GetRenderersSettings().nSPMaxTexRes) {
-		case 0:
-			size = m_ScreenSize;
-			break;
-		case 384:
-			size.SetSize(384, 288);
-			break;
-		case 512:
-			size.SetSize(512, 384);
-			break;
-		case 640:
-			size.SetSize(640, 480);
-			break;
-		case 800:
-			size.SetSize(800, 600);
-			break;
-		case 1024:
-			size.SetSize(1024, 768);
-			break;
-		case 1280:
-		default:
-			size.SetSize(1280, 720);
-			break;
-		case 1320:
-			size.SetSize(1320, 900);
-			break;
-		case 1920:
-			size.SetSize(1920, 1080);
-			break;
-		case 2560:
-			size.SetSize(2560, 1600);
-			break;
-	}
+	InitMaxSubtitleTextureSize(GetRenderersSettings().nSPMaxTexRes, m_ScreenSize);
 
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(m_pD3DDev);
 	} else {
-		m_pAllocator = DNew CDX9SubPicAllocator(m_pD3DDev, size, false);
+		m_pAllocator = DNew CDX9SubPicAllocator(m_pD3DDev, m_maxSubtitleTextureSize, false);
 		if (!m_pAllocator) {
 			_Error += L"CDX9SubPicAllocator failed\n";
-
 			return E_FAIL;
 		}
 	}
 
+	CComPtr<ISubPicProvider> pSubPicProvider;
+	if (m_pSubPicQueue) {
+		m_pSubPicQueue->GetSubPicProvider(&pSubPicProvider);
+	}
+
 	hr = S_OK;
-	m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
-					 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, !GetRenderersSettings().bSPAllowDropSubPic, m_pAllocator, &hr)
-					 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr);
+	if (!m_pSubPicQueue) {
+		CAutoLock cAutoLock(this);
+		m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
+						 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, GetRenderersSettings().bSPAllowDropSubPic, m_pAllocator, &hr)
+						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr);
+	} else {
+		m_pSubPicQueue->Invalidate();
+	}
 	if (!m_pSubPicQueue || FAILED(hr)) {
 		_Error += L"m_pSubPicQueue failed\n";
-
 		return E_FAIL;
 	}
 
@@ -3777,6 +3748,8 @@ HRESULT CreateSyncRenderer(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISub
 CSyncRenderer::CSyncRenderer(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, VMR9AlphaBitmap* pVMR9AlphaBitmap, CSyncAP *pAllocatorPresenter): CUnknown(pName, pUnk)
 {
 	hr = m_pEVR.CoCreateInstance(CLSID_EnhancedVideoRenderer, GetOwner());
+	CComQIPtr<IBaseFilter> pEVRBase = m_pEVR;
+	m_pEVRBase = pEVRBase; // Don't keep a second reference on the EVR filter
 	m_pVMR9AlphaBitmap = pVMR9AlphaBitmap;
 	m_pAllocatorPresenter = pAllocatorPresenter;
 }
@@ -3787,144 +3760,96 @@ CSyncRenderer::~CSyncRenderer()
 
 HRESULT STDMETHODCALLTYPE CSyncRenderer::GetState(DWORD dwMilliSecsTimeout, __out  FILTER_STATE *State)
 {
-	CComPtr<IBaseFilter> pEVRBase;
-	if (m_pEVR) {
-		m_pEVR->QueryInterface(&pEVRBase);
-	}
-	if (pEVRBase) {
-		return pEVRBase->GetState(dwMilliSecsTimeout, State);
+	if (m_pEVRBase) {
+		return m_pEVRBase->GetState(dwMilliSecsTimeout, State);
 	}
 	return E_NOTIMPL;
 }
 
 STDMETHODIMP CSyncRenderer::EnumPins(__out IEnumPins **ppEnum)
 {
-	CComPtr<IBaseFilter> pEVRBase;
-	if (m_pEVR) {
-		m_pEVR->QueryInterface(&pEVRBase);
-	}
-	if (pEVRBase) {
-		return pEVRBase->EnumPins(ppEnum);
+	if (m_pEVRBase) {
+		return m_pEVRBase->EnumPins(ppEnum);
 	}
 	return E_NOTIMPL;
 }
 
 STDMETHODIMP CSyncRenderer::FindPin(LPCWSTR Id, __out  IPin **ppPin)
 {
-	CComPtr<IBaseFilter> pEVRBase;
-	if (m_pEVR) {
-		m_pEVR->QueryInterface(&pEVRBase);
-	}
-	if (pEVRBase) {
-		return pEVRBase->FindPin(Id, ppPin);
+	if (m_pEVRBase) {
+		return m_pEVRBase->FindPin(Id, ppPin);
 	}
 	return E_NOTIMPL;
 }
 
 STDMETHODIMP CSyncRenderer::QueryFilterInfo(__out  FILTER_INFO *pInfo)
 {
-	CComPtr<IBaseFilter> pEVRBase;
-	if (m_pEVR) {
-		m_pEVR->QueryInterface(&pEVRBase);
-	}
-	if (pEVRBase) {
-		return pEVRBase->QueryFilterInfo(pInfo);
+	if (m_pEVRBase) {
+		return m_pEVRBase->QueryFilterInfo(pInfo);
 	}
 	return E_NOTIMPL;
 }
 
 STDMETHODIMP CSyncRenderer::JoinFilterGraph(__in_opt  IFilterGraph *pGraph, __in_opt  LPCWSTR pName)
 {
-	CComPtr<IBaseFilter> pEVRBase;
-	if (m_pEVR) {
-		m_pEVR->QueryInterface(&pEVRBase);
-	}
-	if (pEVRBase) {
-		return pEVRBase->JoinFilterGraph(pGraph, pName);
+	if (m_pEVRBase) {
+		return m_pEVRBase->JoinFilterGraph(pGraph, pName);
 	}
 	return E_NOTIMPL;
 }
 
 STDMETHODIMP CSyncRenderer::QueryVendorInfo(__out  LPWSTR *pVendorInfo)
 {
-	CComPtr<IBaseFilter> pEVRBase;
-	if (m_pEVR) {
-		m_pEVR->QueryInterface(&pEVRBase);
-	}
-	if (pEVRBase) {
-		return pEVRBase->QueryVendorInfo(pVendorInfo);
+	if (m_pEVRBase) {
+		return m_pEVRBase->QueryVendorInfo(pVendorInfo);
 	}
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP CSyncRenderer::Stop( void)
+STDMETHODIMP CSyncRenderer::Stop()
 {
-	CComPtr<IBaseFilter> pEVRBase;
-	if (m_pEVR) {
-		m_pEVR->QueryInterface(&pEVRBase);
-	}
-	if (pEVRBase) {
-		return pEVRBase->Stop();
+	if (m_pEVRBase) {
+		return m_pEVRBase->Stop();
 	}
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP CSyncRenderer::Pause(void)
+STDMETHODIMP CSyncRenderer::Pause()
 {
-	CComPtr<IBaseFilter> pEVRBase;
-	if (m_pEVR) {
-		m_pEVR->QueryInterface(&pEVRBase);
-	}
-	if (pEVRBase) {
-		return pEVRBase->Pause();
+	if (m_pEVRBase) {
+		return m_pEVRBase->Pause();
 	}
 	return E_NOTIMPL;
 }
 
 STDMETHODIMP CSyncRenderer::Run(REFERENCE_TIME tStart)
 {
-	CComPtr<IBaseFilter> pEVRBase;
-	if (m_pEVR) {
-		m_pEVR->QueryInterface(&pEVRBase);
-	}
-	if (pEVRBase) {
-		return pEVRBase->Run(tStart);
+	if (m_pEVRBase) {
+		return m_pEVRBase->Run(tStart);
 	}
 	return E_NOTIMPL;
 }
 
 STDMETHODIMP CSyncRenderer::SetSyncSource(__in_opt IReferenceClock *pClock)
 {
-	CComPtr<IBaseFilter> pEVRBase;
-	if (m_pEVR) {
-		m_pEVR->QueryInterface(&pEVRBase);
-	}
-	if (pEVRBase) {
-		return pEVRBase->SetSyncSource(pClock);
+	if (m_pEVRBase) {
+		return m_pEVRBase->SetSyncSource(pClock);
 	}
 	return E_NOTIMPL;
 }
 
 STDMETHODIMP CSyncRenderer::GetSyncSource(__deref_out_opt IReferenceClock **pClock)
 {
-	CComPtr<IBaseFilter> pEVRBase;
-	if (m_pEVR) {
-		m_pEVR->QueryInterface(&pEVRBase);
-	}
-	if (pEVRBase) {
-		return pEVRBase->GetSyncSource(pClock);
+	if (m_pEVRBase) {
+		return m_pEVRBase->GetSyncSource(pClock);
 	}
 	return E_NOTIMPL;
 }
 
 STDMETHODIMP CSyncRenderer::GetClassID(__RPC__out CLSID *pClassID)
 {
-	CComPtr<IBaseFilter> pEVRBase;
-	if (m_pEVR) {
-		m_pEVR->QueryInterface(&pEVRBase);
-	}
-	if (pEVRBase) {
-		return pEVRBase->GetClassID(pClassID);
+	if (m_pEVRBase) {
+		return m_pEVRBase->GetClassID(pClassID);
 	}
 	return E_NOTIMPL;
 }
@@ -3987,9 +3912,12 @@ STDMETHODIMP CSyncRenderer::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 
 	hr = m_pEVR ? m_pEVR->QueryInterface(riid, ppv) : E_NOINTERFACE;
 	if (m_pEVR && FAILED(hr)) {
-		if (riid == __uuidof(IVMRffdshow9)) { // Support ffdshow queueing. We show ffdshow that this is patched MPC-BE.
-			return GetInterface((IVMRffdshow9*)this, ppv);
-		}
+	    hr = m_pAllocatorPresenter ? m_pAllocatorPresenter->QueryInterface(riid, ppv) : E_NOINTERFACE;
+	    if (FAILED(hr)) {
+	        if (riid == __uuidof(IVMRffdshow9)) { // Support ffdshow queueing. We show ffdshow that this is patched MPC-BE.
+	            return GetInterface((IVMRffdshow9*)this, ppv);
+	        }
+	    }
 	}
 	return SUCCEEDED(hr) ? hr : __super::NonDelegatingQueryInterface(riid, ppv);
 }
