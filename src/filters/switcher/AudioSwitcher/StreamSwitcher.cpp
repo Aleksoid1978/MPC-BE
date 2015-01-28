@@ -1038,11 +1038,11 @@ HRESULT CStreamSwitcherOutputPin::CheckConnect(IPin* pPin)
 	return
 		IsAudioWaveRenderer(pBF)
 			|| clsid == CLSID_InfTee
-			|| clsid == CLSID_ffdshowAudioProcessor
-			|| clsid == CLSID_XySubFilter_AutoLoader
-			//|| clsid == GUIDFromCString(L"{AEFA5024-215A-4FC7-97A4-1043C86FD0B8}") // MatrixMixer may be unstable when changing format, use at your own risk ...
+			|| clsid == GUIDFromCString(L"{B86F6BEE-E7C0-4D03-8D52-5B4430CF6C88}") // ffdshow Audio Processor
 			|| clsid == GUIDFromCString(L"{A753A1EC-973E-4718-AF8E-A3F554D45C44}") // AC3Filter
 			|| clsid == GUIDFromCString(L"{B38C58A0-1809-11D6-A458-EDAE78F1DF12}") // DC-DSP Filter
+			//|| clsid == GUIDFromCString(L"{AEFA5024-215A-4FC7-97A4-1043C86FD0B8}") // MatrixMixer unstable when changing format
+			|| clsid == CLSID_XySubFilter_AutoLoader // crutch
 		? __super::CheckConnect(pPin)
 		: E_FAIL;
 
