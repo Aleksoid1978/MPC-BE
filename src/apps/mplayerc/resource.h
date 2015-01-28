@@ -332,7 +332,6 @@
 #define ID_VIEW_FLUSHGPU_AFTERPRESENT   1073
 #define ID_VIEW_FLUSHGPU_WAIT           1074
 #define ID_VIEW_RESET_DEFAULT           1075
-#define ID_VIEW_RESET_OPTIMAL           1076
 
 #define ID_AFTERPLAYBACK_EXIT               1077
 #define ID_AFTERPLAYBACK_NEXT               1078

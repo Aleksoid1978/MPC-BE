@@ -444,8 +444,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_ALTERNATIVEVSYNC, OnUpdateViewAlternativeVSync)
 
 	ON_COMMAND(ID_VIEW_RESET_DEFAULT, OnViewResetDefault)
-	ON_COMMAND(ID_VIEW_RESET_OPTIMAL, OnViewResetOptimal)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_RESET_DEFAULT, ID_VIEW_RESET_OPTIMAL, OnUpdateViewReset)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_RESET_DEFAULT, OnUpdateViewReset)
 
 	ON_COMMAND(ID_VIEW_VSYNCOFFSET_INCREASE, OnViewVSyncOffsetIncrease)
 	ON_COMMAND(ID_VIEW_VSYNCOFFSET_DECREASE, OnViewVSyncOffsetDecrease)
@@ -7292,14 +7291,6 @@ void CMainFrame::OnViewResetDefault()
 	s.m_AdvRendSets.SetDefault();
 	s.UpdateData(true);
 	m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_OSD_RS_RESET_DEFAULT));
-}
-
-void CMainFrame::OnViewResetOptimal()
-{
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.SetOptimal();
-	s.UpdateData(true);
-	m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_OSD_RS_RESET_OPTIMAL));
 }
 
 void CMainFrame::OnUpdateViewReset(CCmdUI* pCmdUI)
