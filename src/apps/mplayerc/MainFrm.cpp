@@ -11203,13 +11203,6 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	ModifyStyleEx(dwRemoveEx, dwAddEx, SWP_NOZORDER);
 	::SetMenu(m_hWnd, hMenu);
 
-	if (IsZoomed() && m_fFullScreen) {
-		m_bWndWasZoomed = true;
-		WINDOWPLACEMENT wp; GetWindowPlacement(&wp);
-		rc_NP = wp.rcNormalPosition;
-		ShowWindow(SW_RESTORE);
-	}
-
 	static bool m_Change_Monitor = false;
 	// try disable shader when move from one monitor to other ...
 	if (m_fFullScreen) {
@@ -11224,7 +11217,6 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 				m_pCAP2->SetPixelShader2(NULL, NULL, true);
 			}
 		}
-
 	} else {
 		if (m_Change_Monitor && m_bToggleShader) {
 			if (m_pCAP) {
@@ -11311,15 +11303,6 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	if ((m_Change_Monitor) && (!m_bToggleShader || !m_bToggleShaderScreenSpace)) { // Enabled shader ...
 		SetShaders();
-	}
-
-	if (m_bWndWasZoomed && !m_fFullScreen) {
-		m_bWndWasZoomed = false;
-		WINDOWPLACEMENT wp;
-		GetWindowPlacement(&wp);
-		wp.rcNormalPosition = rc_NP;
-		SetWindowPlacement(&wp);
-		ShowWindow(SW_MAXIMIZE);
 	}
 
 	UpdateThumbarButton();
