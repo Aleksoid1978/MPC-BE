@@ -34,7 +34,7 @@ public:
 	virtual ~CPPageSubtitles();
 
 	enum { IDD = IDD_PPAGESUBTITLES };
-	BOOL m_fAutoloadSubtitles;
+	CComboBox m_cbSubtitleRenderer;
 	BOOL m_fPrioritizeExternalSubtitles;
 	BOOL m_fDisableInternalSubtitles;
 	BOOL m_fAutoReloadExtSubtitles;
@@ -47,6 +47,8 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
+
+	void UpdateSubRenderersList(int select);
 
 	DECLARE_MESSAGE_MAP()
 public:

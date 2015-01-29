@@ -895,8 +895,8 @@ HRESULT CMpeg2DecFilter::CheckConnect(PIN_DIRECTION dir, IPin* pPin)
 					&& clsid != CLSID_EnhancedVideoRenderer
 					&& clsid != GUIDFromCString(_T("{04FE9017-F873-410E-871E-AB91661A4EF7}")) // ffdshow Video Decoder
 					&& clsid != GUIDFromCString(_T("{0B390488-D80F-4A68-8408-48DC199F0E97}")) // ffdshow raw video filter
-					&& (clsid != GUIDFromCString(_T("{93A22E7A-5091-45ef-BA61-6DA26156A5D0}")) || ver < 0x0234) // dvobsub
-					&& (clsid != CLSID_VSFilter || ver < 0x0234) // dvobsub auto
+					&& (clsid != CLSID_VSFilter || ver < 0x0234) // dvobsub
+					&& (clsid != CLSID_VSFilter_autoloading || ver < 0x0234) // dvobsub auto
 					&& clsid != CLSID_madVR
 					&& clsid != CLSID_DXR) { // Haali's video renderer
 				return E_FAIL;

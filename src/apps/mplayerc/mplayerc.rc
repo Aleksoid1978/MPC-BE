@@ -1096,7 +1096,8 @@ IDD_PPAGESUBTITLES DIALOGEX 0, 0, 296, 241
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "Use the built-in subtitle renderer",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,5,276,8
+    LTEXT           "Subtitle renderer:",IDC_STATIC,10,6,74,8
+    COMBOBOX        IDC_COMBO2,89,4,201,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Prefer external subtitles over embedded subtitles",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,52,285,8
     CONTROL         "Ignore embedded subtitles",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,64,285,8

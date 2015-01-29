@@ -28,7 +28,6 @@ IMPLEMENT_DYNAMIC(CPPageSubtitles, CPPageBase)
 
 CPPageSubtitles::CPPageSubtitles()
 	: CPPageBase(CPPageSubtitles::IDD, CPPageSubtitles::IDD)
-	, m_fAutoloadSubtitles(FALSE)
 	, m_fPrioritizeExternalSubtitles(FALSE)
 	, m_fDisableInternalSubtitles(FALSE)
 	, m_fAutoReloadExtSubtitles(FALSE)
@@ -45,7 +44,7 @@ void CPPageSubtitles::DoDataExchange(CDataExchange* pDX)
 {
 	CPPageBase::DoDataExchange(pDX);
 
-	DDX_Check(pDX, IDC_CHECK4, m_fAutoloadSubtitles);
+	DDX_Control(pDX, IDC_COMBO2, m_cbSubtitleRenderer);
 	DDX_Check(pDX, IDC_CHECK1, m_fPrioritizeExternalSubtitles);
 	DDX_Check(pDX, IDC_CHECK2, m_fDisableInternalSubtitles);
 	DDX_Check(pDX, IDC_CHECK3, m_fAutoReloadExtSubtitles);
@@ -61,7 +60,8 @@ BOOL CPPageSubtitles::OnInitDialog()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	m_fAutoloadSubtitles			= s.fAutoloadSubtitles;
+	UpdateSubRenderersList(s.iSubtitleRenderer);
+
 	m_fPrioritizeExternalSubtitles	= s.fPrioritizeExternalSubtitles;
 	m_fDisableInternalSubtitles		= s.fDisableInternalSubtitles;
 	m_fAutoReloadExtSubtitles		= s.fAutoReloadExtSubtitles;
@@ -88,7 +88,7 @@ BOOL CPPageSubtitles::OnApply()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	s.fAutoloadSubtitles			= !!m_fAutoloadSubtitles;
+	s.iSubtitleRenderer				= m_cbSubtitleRenderer.GetCurSel();
 	s.fPrioritizeExternalSubtitles	= !!m_fPrioritizeExternalSubtitles;
 	s.fDisableInternalSubtitles		= !!m_fDisableInternalSubtitles;
 	s.fAutoReloadExtSubtitles		= !!m_fAutoReloadExtSubtitles;
@@ -99,6 +99,22 @@ BOOL CPPageSubtitles::OnApply()
 	s.strISDb.TrimRight('/');
 
 	return __super::OnApply();
+}
+
+void CPPageSubtitles::UpdateSubRenderersList(int select)
+{
+	for (int i = m_cbSubtitleRenderer.GetCount() - 1; i >= 0; i--) {
+		m_cbSubtitleRenderer.DeleteString(i);
+	}
+
+	m_cbSubtitleRenderer.AddString(L"Do not show subtitles");		// SUBRNDT_NONE
+	m_cbSubtitleRenderer.AddString(L"Internal subtitle renderer");	// SUBRNDT_ISR
+	m_cbSubtitleRenderer.AddString(L"VSFilter/xy-VSFilter");		// SUBRNDT_VSFILTER
+	m_cbSubtitleRenderer.AddString(L"XySubFilter");					// SUBRNDT_XYSUBFILTER
+
+	if (m_cbSubtitleRenderer.SetCurSel(select) == CB_ERR) {
+		m_cbSubtitleRenderer.SetCurSel(1);
+	}
 }
 
 BEGIN_MESSAGE_MAP(CPPageSubtitles, CPPageBase)
