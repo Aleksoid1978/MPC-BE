@@ -431,17 +431,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Use the built-in subtitle renderer"
-6		"Her zaman harici alt yazıları tercih et"
-8		"Gömülü altyazıları yükleme"
-10		"Yükleme konumları"
-11		"Sıfırla"
-12		"Çevrimiçi altyazı veritabanı adresi:"
-14		"Dene"
-16		"Çevrimiçi veritabanı"
-17		"Auto-reload subtitle files after detecting modification"
-18		"Use Subresync"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+5		"Subtitle renderer:"
+7		"Her zaman harici alt yazıları tercih et"
+9		"Gömülü altyazıları yükleme"
+11		"Yükleme konumları"
+12		"Sıfırla"
+13		"Çevrimiçi altyazı veritabanı adresi:"
+15		"Dene"
+17		"Çevrimiçi veritabanı"
+18		"Auto-reload subtitle files after detecting modification"
+19		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

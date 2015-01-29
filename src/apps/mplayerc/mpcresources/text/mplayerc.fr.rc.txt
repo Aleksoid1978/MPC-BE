@@ -431,17 +431,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Use the built-in subtitle renderer"
-6		"Préférer les sous-titres externes aux sous-titres internes"
-8		"Ignorer les sous-titres internes"
-10		"Dossiers à utiliser pour le chargement automatique"
-11		"Reset"
-12		"Racine du site de la base de données de sous-titres :"
-14		"Tester"
-16		"Base de données en ligne"
-17		"Auto-reload subtitle files after detecting modification"
-18		"Use Subresync"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+5		"Subtitle renderer:"
+7		"Préférer les sous-titres externes aux sous-titres internes"
+9		"Ignorer les sous-titres internes"
+11		"Dossiers à utiliser pour le chargement automatique"
+12		"Reset"
+13		"Racine du site de la base de données de sous-titres :"
+15		"Tester"
+17		"Base de données en ligne"
+18		"Auto-reload subtitle files after detecting modification"
+19		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

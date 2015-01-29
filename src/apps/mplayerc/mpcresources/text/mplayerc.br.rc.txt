@@ -431,17 +431,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Use the built-in subtitle renderer"
-6		"Sempre padronizar para legendas externas se disponível"
-8		"Não carregar legendas incorporadas"
-10		"Carregar automaticamente os caminhos"
-11		"Reiniciar"
-12		"Digite a URL da base de dados de legendas:"
-14		"Testar"
-16		"Base de dados online"
-17		"Auto-reload subtitle files after detecting modification"
-18		"Use Subresync"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+5		"Subtitle renderer:"
+7		"Sempre padronizar para legendas externas se disponível"
+9		"Não carregar legendas incorporadas"
+11		"Carregar automaticamente os caminhos"
+12		"Reiniciar"
+13		"Digite a URL da base de dados de legendas:"
+15		"Testar"
+17		"Base de dados online"
+18		"Auto-reload subtitle files after detecting modification"
+19		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

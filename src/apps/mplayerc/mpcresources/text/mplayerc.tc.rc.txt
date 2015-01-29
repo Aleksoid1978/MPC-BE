@@ -431,17 +431,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"重設"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"使用內部字幕繪製器"
-6		"存在時預設優先使用外部字幕檔案"
-8		"不載入內嵌字幕"
-10		"自動載入路徑"
-11		"重設"
-12		"線上字幕資料庫的基礎網址:"
-14		"測試"
-16		"線上資料庫"
-17		"偵測到變更後自動重新載入字幕檔案"
-18		"啟用字幕同步編輯器"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+5		"Subtitle renderer:"
+7		"存在時預設優先使用外部字幕檔案"
+9		"不載入內嵌字幕"
+11		"自動載入路徑"
+12		"重設"
+13		"線上字幕資料庫的基礎網址:"
+15		"測試"
+17		"線上資料庫"
+18		"偵測到變更後自動重新載入字幕檔案"
+19		"啟用字幕同步編輯器"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

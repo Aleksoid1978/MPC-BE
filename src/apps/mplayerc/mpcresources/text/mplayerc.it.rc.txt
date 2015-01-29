@@ -431,17 +431,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Resetta"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Usa rederer interno per i sottotitoli"
-6		"Usa sempre i sottotitoli esterni se disponibili"
-8		"Non caricare i sottotitoli interni al video"
-10		"Percorsi di caricamento automatico"
-11		"Reimposta"
-12		"Indirizzo del database di sottotitoli online:"
-14		"Prova"
-16		"Database online"
-17		"Ricarica file sottotitoli se rilevate modifiche"
-18		"Usa subresync"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+5		"Subtitle renderer:"
+7		"Usa sempre i sottotitoli esterni se disponibili"
+9		"Non caricare i sottotitoli interni al video"
+11		"Percorsi di caricamento automatico"
+12		"Reimposta"
+13		"Indirizzo del database di sottotitoli online:"
+15		"Prova"
+17		"Database online"
+18		"Ricarica file sottotitoli se rilevate modifiche"
+19		"Usa subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

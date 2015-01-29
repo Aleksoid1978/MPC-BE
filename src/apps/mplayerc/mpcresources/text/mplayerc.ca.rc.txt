@@ -431,17 +431,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Use the built-in subtitle renderer"
-6		"Subtítols externs er defecte si hi són"
-8		"No carregar subtítols incrustats"
-10		"Auto-càrrega de ruta"
-11		"Reiniciar"
-12		"La URL on-line dels subtítols:"
-14		"Provar"
-16		"Base de dades on-line"
-17		"Auto-reload subtitle files after detecting modification"
-18		"Use Subresync"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+5		"Subtitle renderer:"
+7		"Subtítols externs er defecte si hi són"
+9		"No carregar subtítols incrustats"
+11		"Auto-càrrega de ruta"
+12		"Reiniciar"
+13		"La URL on-line dels subtítols:"
+15		"Provar"
+17		"Base de dades on-line"
+18		"Auto-reload subtitle files after detecting modification"
+19		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
