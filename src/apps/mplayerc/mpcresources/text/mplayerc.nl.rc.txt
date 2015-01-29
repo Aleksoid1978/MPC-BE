@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"Bronfilters"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"Bestandsextensies"
 8		"Standaard"
 9		"Toepassen"
-10		"Real-Time Streaming Protocol handler (voor rtsp://... URL's)"
-11		"RealMedia"
-12		"QuickTime"
-13		"DirectShow"
-14		"Kijk eerst naar extensie"
-15		"Video"
-16		"Muziek"
-17		"Dvd"
-18		"Audio-cd"
-19		"&Video"
-20		"A&udio"
-21		"&Beheerder"
-22		"A&lle"
-23		"Automatisch afspelen"
-24		"Verkenner Snelmenu"
-25		"Map"
-26		"Bestand(en)"
-27		"Koppeling"
-28		"Met pictogrammen"
-29		"&Niets"
+10		"Video"
+11		"Muziek"
+12		"Dvd"
+13		"Audio-cd"
+14		"&Video"
+15		"A&udio"
+16		"&Beheerder"
+17		"A&lle"
+18		"Automatisch afspelen"
+19		"Verkenner Snelmenu"
+20		"Map"
+21		"Bestand(en)"
+22		"Koppeling"
+23		"Met pictogrammen"
+24		"&Niets"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Vereist heropening van de video."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"Videorenderer"
-7		"RealMedia-video"
-9		"QuickTime-video"
-11		"Instellingen van VMR-7/VMR-9 (Renderless) en EVR-CP"
-12		"Kies D3D9-renderapparaat"
-14		"Oppervlak:"
-16		"Herschalen:"
-18		"D3D-volledigscherm"
-19		"Alternatieve VSync"
-20		"VMR-Mixermodus"
-21		"Herinitialisatie bij verandering van monitor"
-22		"YUV-Mixen"
-23		"EVR-buffers:"
+7		"Instellingen van VMR-7/VMR-9 (Renderless) en EVR-CP"
+8		"Kies D3D9-renderapparaat"
+10		"Oppervlak:"
+12		"Herschalen:"
+14		"D3D-volledigscherm"
+15		"Alternatieve VSync"
+16		"VMR-Mixermodus"
+17		"Herinitialisatie bij verandering van monitor"
+18		"YUV-Mixen"
+19		"EVR-buffers:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

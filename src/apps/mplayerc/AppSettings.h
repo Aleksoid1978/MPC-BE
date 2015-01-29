@@ -577,8 +577,6 @@ public:
 	// Formats
 	CMediaFormats	m_Formats;
 	bool			fAssociatedWithIcons;
-	engine_t		iRtspHandler;
-	bool			fRtspFileExtFirst;
 	// file/dir context menu
 	bool			bSetContextFiles;
 	bool			bSetContextDir;
@@ -841,10 +839,7 @@ public:
 	bool			bStatusBarIsVisible;
 
 	bool			fIntRealMedia;
-	//bool			fRealMediaRenderless;
-	//float			dRealMediaQuickTimeFPS;
 	//int			iVideoRendererType;
-	//int			iQuickTimeRenderer;
 	//bool			fMonitorAutoRefreshRate;
 	bool			fEnableEDLEditor;
 
@@ -916,8 +911,6 @@ public:
 
 	int				GetMultiInst();
 
-	engine_t		GetRtspHandler(bool& lookext);
-	void			SetRtspHandler(engine_t e, bool lookext);
 	bool			IsUsingRtspEngine(CString path, engine_t e);
 	engine_t		GetRtspEngine(CString path);
 

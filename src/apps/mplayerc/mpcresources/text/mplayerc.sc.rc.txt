@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"源滤镜"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"文件扩展类型"
 8		"默认"
 9		"保存"
-10		"实时流协议(比如 rtsp://... URLs)"
-11		"RealMedia格式"
-12		"QuickTime格式"
-13		"DirectShow格式"
-14		"先检查文件扩展类型"
-15		"视频"
-16		"音乐"
-17		"DVD"
-18		"音频 CD"
-19		"视频(&V)"
-20		"音频(&U)"
-21		"修改(&M)"
-22		"全部(&L)"
-23		"自动播放"
-24		"资源管理器右键菜单"
-25		"目录"
-26		"文件"
-27		"关联"
-28		"关联图标"
-29		"全不(&N)"
+10		"视频"
+11		"音乐"
+12		"DVD"
+13		"音频 CD"
+14		"视频(&V)"
+15		"音频(&U)"
+16		"修改(&M)"
+17		"全部(&L)"
+18		"自动播放"
+19		"资源管理器右键菜单"
+20		"目录"
+21		"文件"
+22		"关联"
+23		"关联图标"
+24		"全不(&N)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"设置在关闭并重新启动后生效。"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"Video renderer"
-7		"RealMedia 视频"
-9		"QuickTime 视频"
-11		"VMR-7/VMR-9 (未渲染)and EVR (自定义)设置"
-12		"选择 D3D9 渲染设备"
-14		"表面:"
-16		"改变大小:"
-18		"D3D 全屏"
-19		"其它垂直同步"
-20		"VMR-9 混合器模式"
-21		"在更改显示时重新初始化"
-22		"YUV 混合"
-23		"EVR 缓冲:"
+7		"VMR-7/VMR-9 (未渲染)and EVR (自定义)设置"
+8		"选择 D3D9 渲染设备"
+10		"表面:"
+12		"改变大小:"
+14		"D3D 全屏"
+15		"其它垂直同步"
+16		"VMR-9 混合器模式"
+17		"在更改显示时重新初始化"
+18		"YUV 混合"
+19		"EVR 缓冲:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

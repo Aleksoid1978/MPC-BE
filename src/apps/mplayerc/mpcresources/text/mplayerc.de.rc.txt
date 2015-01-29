@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"Quell-Filter"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"Dateierweiterungen"
 8		"&Standard"
 9		"&Übernehmen"
-10		"Echtzeitstreaming-Protokollhandler (für rtsp://... URLs)"
-11		"&RealMedia"
-12		"&QuickTime"
-13		"Dir&ectShow"
-14		"Erst Dateier&weiterung prüfen"
-15		"Video"
-16		"Audio"
-17		"DVD"
-18		"Audio-CD"
-19		"V&ideo"
-20		"A&udio"
-21		"&Administrator"
-22		"A&lle"
-23		"AutoPlay"
-24		"Explorer-Kontextmenü"
-25		"Verzeichnis"
-26		"Datei(en)"
-27		"Dateiverknüpfungen"
-28		"Inkl. Icons"
-29		"&Nichts"
+10		"Video"
+11		"Audio"
+12		"DVD"
+13		"Audio-CD"
+14		"V&ideo"
+15		"A&udio"
+16		"&Administrator"
+17		"A&lle"
+18		"AutoPlay"
+19		"Explorer-Kontextmenü"
+20		"Verzeichnis"
+21		"Datei(en)"
+22		"Dateiverknüpfungen"
+23		"Inkl. Icons"
+24		"&Nichts"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Änderungen werden erst nach Neustart der Wiedergabe wirksam."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"Video-Renderer"
-7		"RealMedia-Video"
-9		"QuickTime-Video"
-11		"Einstellungen für VMR-7/VMR-9 (Renderless) und EVR (Benutzerdefiniert) "
-12		"Rendergerät verwenden:"
-14		"Oberfläche:"
-16		"Resizer:"
-18		"Direct3D-Vollbildmodus"
-19		"Alternativer VSync"
-20		"VMR-Mixer-Modus"
-21		"Bei Anzeigewechsel neu initialisieren"
-22		"YUV-Mix-Modus"
-23		"EVR-Puffer:"
+7		"Einstellungen für VMR-7/VMR-9 (Renderless) und EVR (Benutzerdefiniert) "
+8		"Rendergerät verwenden:"
+10		"Oberfläche:"
+12		"Resizer:"
+14		"Direct3D-Vollbildmodus"
+15		"Alternativer VSync"
+16		"VMR-Mixer-Modus"
+17		"Bei Anzeigewechsel neu initialisieren"
+18		"YUV-Mix-Modus"
+19		"EVR-Puffer:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

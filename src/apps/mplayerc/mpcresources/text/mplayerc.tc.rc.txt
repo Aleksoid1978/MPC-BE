@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"來源篩選器"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"副檔名"
 8		"預設值"
 9		"設定"
-10		"即時串流協定處理器 (給 rtsp://... 網址用)"
-11		"RealMedia"
-12		"QuickTime"
-13		"DirectShow"
-14		"先看副檔名"
-15		"影片"
-16		"音樂"
-17		"DVD"
-18		"音樂 CD"
-19		"視訊(&V)"
-20		"音訊(&U)"
-21		"修改(&M)"
-22		"全部(&L)"
-23		"自動播放"
-24		"檔案總管右鍵選單"
-25		"目錄"
-26		"檔案"
-27		"檔案關聯"
-28		"包含圖示"
-29		"清空(&N)"
+10		"影片"
+11		"音樂"
+12		"DVD"
+13		"音樂 CD"
+14		"視訊(&V)"
+15		"音訊(&U)"
+16		"修改(&M)"
+17		"全部(&L)"
+18		"自動播放"
+19		"檔案總管右鍵選單"
+20		"目錄"
+21		"檔案"
+22		"檔案關聯"
+23		"包含圖示"
+24		"清空(&N)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"要關閉或是重新啟動播放後，變更才會有效。"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"視訊繪製器"
-7		"RealMedia 視訊"
-9		"QuickTime 視訊"
-11		"VMR-7/VMR-9 (無轉換) 及 EVR 自訂呈現設定"
-12		"選擇 D3D9 繪製裝置"
-14		"繪圖頁:"
-16		"變更大小:"
-18		"Direct3D 全螢幕"
-19		"替代式垂直同步"
-20		"VMR 混合模式"
-21		"變更螢幕時重新初始化"
-22		"YUV 混合"
-23		"EVR 緩衝區:"
+7		"VMR-7/VMR-9 (無轉換) 及 EVR 自訂呈現設定"
+8		"選擇 D3D9 繪製裝置"
+10		"繪圖頁:"
+12		"變更大小:"
+14		"Direct3D 全螢幕"
+15		"替代式垂直同步"
+16		"VMR 混合模式"
+17		"變更螢幕時重新初始化"
+18		"YUV 混合"
+19		"EVR 緩衝區:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"Source Filters"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"Koncovky súborov"
 8		"Predvol."
 9		"Nastaviť"
-10		"Real-Time Streaming Protocol handler (pre adresy začínajúce na rtsp://... )"
-11		"RealMedia"
-12		"QuickTime"
-13		"DirectShow"
-14		"Vyhľadať najskôr koncovku súb."
-15		"Video"
-16		"Hudba"
-17		"DVD"
-18		"Audio CD"
-19		"&Video"
-20		"A&udio"
-21		"&Upraviť"
-22		"&Všetko"
-23		"Autom. prehrávanie (len systém Win XP)"
-24		"Kontextové menu Prieskumníka"
-25		"Priečinok"
-26		"Súbor(y)"
-27		"Asociácia"
-28		"S ikonami"
-29		"&None"
+10		"Video"
+11		"Hudba"
+12		"DVD"
+13		"Audio CD"
+14		"&Video"
+15		"A&udio"
+16		"&Upraviť"
+17		"&Všetko"
+18		"Autom. prehrávanie (len systém Win XP)"
+19		"Kontextové menu Prieskumníka"
+20		"Priečinok"
+21		"Súbor(y)"
+22		"Asociácia"
+23		"S ikonami"
+24		"&None"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Zmeny sa uplatnia až po zastavení aktuálneho prehrávania a po reštartovaní."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"Video renderer"
-7		"RealMedia Video"
-9		"QuickTime Video"
-11		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
-12		"Select D3D9 Render Device"
-14		"Povrch:"
-16		"Resizer:"
-18		"Direct3D - celá obrazovka"
-19		"Alternatívne VSync"
-20		"VMR Mixer Mode"
-21		"Reset when changing display"
-22		"YUV Mixing"
-23		"EVR Buffers:"
+7		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
+8		"Select D3D9 Render Device"
+10		"Povrch:"
+12		"Resizer:"
+14		"Direct3D - celá obrazovka"
+15		"Alternatívne VSync"
+16		"VMR Mixer Mode"
+17		"Reset when changing display"
+18		"YUV Mixing"
+19		"EVR Buffers:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

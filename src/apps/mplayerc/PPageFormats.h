@@ -91,9 +91,6 @@ public:
 	CButton m_fContextFiles;
 	CButton m_fAssociatedWithIcons;
 
-	int		m_iRtspHandler;
-	BOOL	m_fRtspFileExtFirst;
-
 	enum { IDD = IDD_PPAGEFORMATS };
 
 protected:

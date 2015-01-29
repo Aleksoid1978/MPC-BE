@@ -353,7 +353,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	int m_nLoops;
 
 	bool m_fCustomGraph;
-	bool m_fRealMediaGraph, m_fShockwaveGraph, m_fQuicktimeGraph;
+	bool m_fShockwaveGraph;
 
 	CComPtr<ISubClock> m_pSubClock;
 
@@ -448,7 +448,7 @@ public:
 		return(m_wndPlaylistBar.GetCount() == 0);
 	}
 	bool IsInteractiveVideo() const {
-		return(AfxGetAppSettings().fIntRealMedia && m_fRealMediaGraph || m_fShockwaveGraph);
+		return(m_fShockwaveGraph);
 	}
 	bool IsD3DFullScreenMode() const;
 

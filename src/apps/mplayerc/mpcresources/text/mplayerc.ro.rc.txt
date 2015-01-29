@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"Source Filters"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"Extensii fișier"
 8		"Implicit"
 9		"Definește"
-10		"Operator al protocolului pentru transfer în timp real (pentru rtsp://... URL-uri)"
-11		"RealMedia"
-12		"QuickTime"
-13		"DirectShow"
-14		"Vezi înainte extensia fișierului"
-15		"Video"
-16		"Muzică"
-17		"DVD"
-18		"CD Audio"
-19		"&Video"
-20		"A&udio"
-21		"&Modifică"
-22		"Toat&e"
-23		"Redare automată"
-24		"Meniu contextual pentru Explorator"
-25		"Directoare"
-26		"Fișier(e)"
-27		"Asociere"
-28		"Cu pictograme"
-29		"&None"
+10		"Video"
+11		"Muzică"
+12		"DVD"
+13		"CD Audio"
+14		"&Video"
+15		"A&udio"
+16		"&Modifică"
+17		"Toat&e"
+18		"Redare automată"
+19		"Meniu contextual pentru Explorator"
+20		"Directoare"
+21		"Fișier(e)"
+22		"Asociere"
+23		"Cu pictograme"
+24		"&None"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Modificările vor avea efect după ce redarea a fost închisă și repornită."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"Video renderer"
-7		"Video RealMedia"
-9		"Video QuickTime"
-11		"Setări pentru VMR-7/VMR-9 (fără randare) și EVR (CP)"
-12		"Selectați dispozitivul de randare D3D9"
-14		"Suprafaţă:"
-16		"Redimensionare:"
-18		"Ecran complet D3D"
-19		"VSync alternativ"
-20		"VMR în mod mixare"
-21		"Reinițializează la schimbarea ecranului"
-22		"Mixare YUV"
-23		"Preîncărcări EVR:"
+7		"Setări pentru VMR-7/VMR-9 (fără randare) și EVR (CP)"
+8		"Selectați dispozitivul de randare D3D9"
+10		"Suprafaţă:"
+12		"Redimensionare:"
+14		"Ecran complet D3D"
+15		"VSync alternativ"
+16		"VMR în mod mixare"
+17		"Reinițializează la schimbarea ecranului"
+18		"Mixare YUV"
+19		"Preîncărcări EVR:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

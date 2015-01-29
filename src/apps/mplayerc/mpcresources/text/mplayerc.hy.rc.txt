@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"Source Filters"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"Ֆայլերի տեսակները"
 8		"Ըստ ծրագրայինի"
 9		"Տեղակայել"
-10		"Բացել Real-Time Streaming արձանագր. (rtsp://...)՝"
-11		"RealMedia"
-12		"QuickTime"
-13		"DirectShow"
-14		"Սկզբում նայել ընդլայնումը"
-15		"Տեսանյութ"
-16		"Երաժշտություն"
-17		"DVD"
-18		"Audio CD"
-19		"&Տեսանյութ"
-20		"&Ձայնը"
-21		"&Փոխել"
-22		"Բ&ոլորը"
-23		"Ինքնավերարտադրում"
-24		"Explorer-ի համատեքստային ընտրացանկը"
-25		"Թղթապանակների համար"
-26		"Ֆայլերի համար"
-27		"Ասոցացումներ"
-28		"Նշաններով"
-29		"&None"
+10		"Տեսանյութ"
+11		"Երաժշտություն"
+12		"DVD"
+13		"Audio CD"
+14		"&Տեսանյութ"
+15		"&Ձայնը"
+16		"&Փոխել"
+17		"Բ&ոլորը"
+18		"Ինքնավերարտադրում"
+19		"Explorer-ի համատեքստային ընտրացանկը"
+20		"Թղթապանակների համար"
+21		"Ֆայլերի համար"
+22		"Ասոցացումներ"
+23		"Նշաններով"
+24		"&None"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Ցուցադրել մոտագույն vsync-ի հետ"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"Video renderer"
-7		"RealMedia տեսանյութ"
-9		"QuickTime տեսանյութ"
-11		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
-12		"Select D3D9 Render Device"
-14		"Մակերեսը."
-16		"Resizer:"
-18		"D3D Ամբողջ էկրանով"
-19		"Այլընտրանքային VSync"
-20		"VMR Mixer Mode"
-21		"Reset when changing display"
-22		"YUV Mixing"
-23		"EVR Buffers:"
+7		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
+8		"Select D3D9 Render Device"
+10		"Մակերեսը."
+12		"Resizer:"
+14		"D3D Ամբողջ էկրանով"
+15		"Այլընտրանքային VSync"
+16		"VMR Mixer Mode"
+17		"Reset when changing display"
+18		"YUV Mixing"
+19		"EVR Buffers:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
