@@ -46,10 +46,6 @@
 #include "../../SubPic/ISubPic.h"
 
 #include "BaseGraph.h"
-#include "RealMediaGraph.h"
-#ifndef _WIN64
-#include "QuicktimeGraph.h"
-#endif
 #include "ShockwaveGraph.h"
 
 #include <IChapterInfo.h>

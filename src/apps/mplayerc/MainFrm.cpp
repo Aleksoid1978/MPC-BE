@@ -11468,7 +11468,7 @@ void CMainFrame::MoveVideoWindow(bool fShowStats)
 			int w = ws.cx;
 			int h = ws.cy;
 
-			if (!m_fShockwaveGraph) { //&& !m_fQuicktimeGraph)
+			if (!m_fShockwaveGraph) {
 				if (iDefaultVideoSize == DVS_FROMINSIDE || iDefaultVideoSize == DVS_FROMOUTSIDE ||
 						iDefaultVideoSize == DVS_ZOOM1 || iDefaultVideoSize == DVS_ZOOM2) {
 					int dh = ws.cy;
