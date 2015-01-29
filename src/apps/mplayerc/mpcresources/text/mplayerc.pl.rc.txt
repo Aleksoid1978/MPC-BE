@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"Source Filters"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"Typy plików"
 8		"Domyślne"
 9		"Ustaw"
-10		"Protokół RTSP (adresy rtsp://...)"
-11		"RealMedia"
-12		"QuickTime"
-13		"DirectShow"
-14		"Na podstawie rozszerzenia"
-15		"Wideo"
-16		"Audio"
-17		"DVD"
-18		"Audio CD"
-19		"&Wideo"
-20		"A&udio"
-21		"&Zmodyfikuj"
-22		"W&szystkie"
-23		"Automatyczne odtwarzanie"
-24		"Menu kontekstowe"
-25		"Foldery"
-26		"Pliki"
-27		"Powiązania"
-28		"Ikony"
-29		"&None"
+10		"Wideo"
+11		"Audio"
+12		"DVD"
+13		"Audio CD"
+14		"&Wideo"
+15		"A&udio"
+16		"&Zmodyfikuj"
+17		"W&szystkie"
+18		"Automatyczne odtwarzanie"
+19		"Menu kontekstowe"
+20		"Foldery"
+21		"Pliki"
+22		"Powiązania"
+23		"Ikony"
+24		"&None"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Zmiany zostaną wprowadzone po ponownym uruchomieniu programu."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"Video renderer"
-7		"Obraz RealMedia"
-9		"Obraz QuickTime"
-11		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
-12		"Select D3D9 Render Device"
-14		"Płaszczyzna:"
-16		"Resizer:"
-18		"Pełny ekran Direct3D"
-19		"Alternatywny VSync"
-20		"VMR Mixer Mode"
-21		"Reset when changing display"
-22		"YUV Mixing"
-23		"EVR Buffers:"
+7		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
+8		"Select D3D9 Render Device"
+10		"Płaszczyzna:"
+12		"Resizer:"
+14		"Pełny ekran Direct3D"
+15		"Alternatywny VSync"
+16		"VMR Mixer Mode"
+17		"Reset when changing display"
+18		"YUV Mixing"
+19		"EVR Buffers:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

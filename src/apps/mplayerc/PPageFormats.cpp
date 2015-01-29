@@ -54,8 +54,6 @@ IMPLEMENT_DYNAMIC(CPPageFormats, CPPageBase)
 CPPageFormats::CPPageFormats()
 	: CPPageBase(CPPageFormats::IDD, CPPageFormats::IDD)
 	, m_list(0)
-	, m_iRtspHandler(0)
-	, m_fRtspFileExtFirst(FALSE)
 	, m_bInsufficientPrivileges(false)
 {
 	if (m_pAAR == NULL) {
@@ -83,8 +81,6 @@ void CPPageFormats::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK2, m_apmusic);
 	DDX_Control(pDX, IDC_CHECK3, m_apaudiocd);
 	DDX_Control(pDX, IDC_CHECK4, m_apdvd);
-	DDX_Radio(pDX, IDC_RADIO1, m_iRtspHandler);
-	DDX_Check(pDX, IDC_CHECK5, m_fRtspFileExtFirst);
 	DDX_Control(pDX, IDC_CHECK6, m_fContextDir);
 	DDX_Control(pDX, IDC_CHECK7, m_fContextFiles);
 	DDX_Control(pDX, IDC_CHECK8, m_fAssociatedWithIcons);
@@ -655,10 +651,6 @@ BOOL CPPageFormats::OnInitDialog()
 	m_exts = mf[(int)m_list.GetItemData(0)].GetExtsWithPeriod();
 
 	AppSettings& s = AfxGetAppSettings();
-	bool fRtspFileExtFirst;
-	engine_t e = s.GetRtspHandler(fRtspFileExtFirst);
-	m_iRtspHandler = (e == RealMedia ? 0 : e == QuickTime ? 1 : 2);
-	m_fRtspFileExtFirst = fRtspFileExtFirst;
 
 	UpdateData(FALSE);
 
@@ -686,14 +678,9 @@ BOOL CPPageFormats::OnInitDialog()
 		GetDlgItem(IDC_CHECK2)->EnableWindow(FALSE);
 		GetDlgItem(IDC_CHECK3)->EnableWindow(FALSE);
 		GetDlgItem(IDC_CHECK4)->EnableWindow(FALSE);
-		GetDlgItem(IDC_CHECK5)->EnableWindow(FALSE);
 		GetDlgItem(IDC_CHECK6)->EnableWindow(FALSE);
 		GetDlgItem(IDC_CHECK7)->EnableWindow(FALSE);
 		GetDlgItem(IDC_CHECK8)->EnableWindow(FALSE);
-
-		GetDlgItem(IDC_RADIO1)->EnableWindow(FALSE);
-		GetDlgItem(IDC_RADIO2)->EnableWindow(FALSE);
-		GetDlgItem(IDC_RADIO3)->EnableWindow(FALSE);
 
 		GetDlgItem(IDC_BUTTON5)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_BUTTON5)->SendMessage(BCM_SETSHIELD, 0, 1);
@@ -984,8 +971,6 @@ BOOL CPPageFormats::OnApply()
 	AddAutoPlayToRegistry(AP_AUDIOCD,	!!m_apaudiocd.GetCheck());
 	AddAutoPlayToRegistry(AP_DVDMOVIE,	!!m_apdvd.GetCheck());
 	AddAutoPlayToRegistry(AP_BDMOVIE,	!!m_apdvd.GetCheck());
-
-	s.SetRtspHandler(m_iRtspHandler == 0 ? RealMedia : m_iRtspHandler == 1 ? QuickTime:DirectShow, !!m_fRtspFileExtFirst);
 
 	s.bSetContextFiles		= !!m_fContextFiles.GetCheck();
 	s.bSetContextDir		= !!m_fContextDir.GetCheck();

@@ -61,8 +61,6 @@ CPPageVideo::CPPageVideo()
 	: CPPageBase(CPPageVideo::IDD, CPPageVideo::IDD)
 	, m_iDSVideoRendererType(VIDRNDT_DS_DEFAULT)
 	, m_iDSVideoRendererType_store(VIDRNDT_DS_DEFAULT)
-	, m_iRMVideoRendererType(VIDRNDT_RM_DEFAULT)
-	, m_iQTVideoRendererType(VIDRNDT_QT_DEFAULT)
 	, m_iAPSurfaceUsage(0)
 	, m_fVMRMixerMode(FALSE)
 	, m_fVMRMixerYUV(FALSE)
@@ -83,11 +81,7 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_VIDRND_COMBO, m_iDSVideoRendererTypeCtrl);
-	DDX_Control(pDX, IDC_RMRND_COMBO, m_iRMVideoRendererTypeCtrl);
-	DDX_Control(pDX, IDC_QTRND_COMBO, m_iQTVideoRendererTypeCtrl);
 	DDX_Control(pDX, IDC_D3D9DEVICE_COMBO, m_iD3D9RenderDeviceCtrl);
-	DDX_CBIndex(pDX, IDC_RMRND_COMBO, m_iRMVideoRendererType);
-	DDX_CBIndex(pDX, IDC_QTRND_COMBO, m_iQTVideoRendererType);
 	DDX_CBIndex(pDX, IDC_DX_SURFACE, m_iAPSurfaceUsage);
 	DDX_Control(pDX, IDC_DX9RESIZER_COMBO, m_cbDX9ResizerCtrl);
 	DDX_CBIndex(pDX, IDC_D3D9DEVICE_COMBO, m_iD3D9RenderDevice);
@@ -102,8 +96,6 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
 	ON_CBN_SELCHANGE(IDC_VIDRND_COMBO, OnDSRendererChange)
-	ON_CBN_SELCHANGE(IDC_RMRND_COMBO, OnRMRendererChange)
-	ON_CBN_SELCHANGE(IDC_QTRND_COMBO, OnQTRendererChange)
 	ON_CBN_SELCHANGE(IDC_DX_SURFACE, OnSurfaceChange)
 	ON_BN_CLICKED(IDC_D3D9DEVICE, OnD3D9DeviceCheck)
 	ON_BN_CLICKED(IDC_FULLSCREEN_MONITOR_CHECK, OnFullscreenCheck)
@@ -123,8 +115,6 @@ BOOL CPPageVideo::OnInitDialog()
 
 	CRenderersSettings& renderersSettings = s.m_RenderersSettings;
 	m_iDSVideoRendererType	= s.iDSVideoRendererType;
-	m_iRMVideoRendererType	= s.iRMVideoRendererType;
-	m_iQTVideoRendererType	= s.iQTVideoRendererType;
 	m_iAPSurfaceUsage		= renderersSettings.iAPSurfaceUsage;
 	m_fVMRMixerMode			= renderersSettings.fVMRMixerMode;
 	m_fVMRMixerYUV			= renderersSettings.fVMRMixerYUV;
@@ -267,31 +257,13 @@ BOOL CPPageVideo::OnInitDialog()
 	m_iDSVRTC.Invalidate();
 	m_iDSVRTC.UpdateWindow();
 
-	CComboBox& m_iQTVRTC = m_iQTVideoRendererTypeCtrl;
-	m_iQTVRTC.SetItemData(m_iQTVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_SYS_DEF)), VIDRNDT_QT_DEFAULT);
-	m_iQTVRTC.SetItemData(m_iQTVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_VMR7RENDERLESS)), VIDRNDT_QT_DX7);
-	m_iQTVRTC.SetItemData(m_iQTVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_VMR9RENDERLESS)), VIDRNDT_QT_DX9);
-	m_iQTVRTC.SetCurSel(m_iQTVideoRendererType);
-	CorrectComboListWidth(m_iQTVRTC);
-
-	CComboBox& m_iRMVRTC = m_iRMVideoRendererTypeCtrl;
-	m_iRMVideoRendererTypeCtrl.SetItemData(m_iRMVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_SYS_DEF)), VIDRNDT_RM_DEFAULT);
-	m_iRMVRTC.SetItemData(m_iRMVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_VMR7RENDERLESS)), VIDRNDT_RM_DX7);
-	m_iRMVRTC.SetItemData(m_iRMVRTC.AddString(ResStr(IDS_PPAGE_OUTPUT_VMR9RENDERLESS)), VIDRNDT_RM_DX9);
-	m_iRMVRTC.SetCurSel(m_iRMVideoRendererType);
-	CorrectComboListWidth(m_iRMVRTC);
-
 	UpdateData(FALSE);
 
 	CreateToolTip();
 	m_wndToolTip.AddTool(GetDlgItem(IDC_VIDRND_COMBO), L"");
-	m_wndToolTip.AddTool(GetDlgItem(IDC_RMRND_COMBO), L"");
-	m_wndToolTip.AddTool(GetDlgItem(IDC_QTRND_COMBO), L"");
 	m_wndToolTip.AddTool(GetDlgItem(IDC_DX_SURFACE), L"");
 
 	OnDSRendererChange();
-	OnRMRendererChange();
-	OnQTRendererChange();
 	OnSurfaceChange();
 
 	CheckDlgButton(IDC_D3D9DEVICE, BST_UNCHECKED);
@@ -328,8 +300,6 @@ BOOL CPPageVideo::OnApply()
 
 	CRenderersSettings& renderersSettings                   = s.m_RenderersSettings;
 	s.iDSVideoRendererType		                            = m_iDSVideoRendererType = m_iDSVideoRendererType_store = m_iDSVideoRendererTypeCtrl.GetItemData(m_iDSVideoRendererTypeCtrl.GetCurSel());
-	s.iRMVideoRendererType		                            = m_iRMVideoRendererType;
-	s.iQTVideoRendererType		                            = m_iQTVideoRendererType;
 	renderersSettings.iAPSurfaceUsage	                    = m_iAPSurfaceUsage;
 	renderersSettings.iDX9Resizer							= m_cbDX9ResizerCtrl.GetCurSel();
 	renderersSettings.fVMRMixerMode							= !!m_fVMRMixerMode;
@@ -534,44 +504,6 @@ void CPPageVideo::OnDSRendererChange()
 			break;
 		default:
 			m_wndToolTip.UpdateTipText(L"", GetDlgItem(IDC_VIDRND_COMBO));
-	}
-
-	SetModified();
-}
-
-void CPPageVideo::OnRMRendererChange()
-{
-	UpdateData();
-
-	switch (m_iRMVideoRendererType) {
-		case VIDRNDT_RM_DEFAULT:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_RMSYSDEF), GetDlgItem(IDC_RMRND_COMBO));
-			break;
-		case VIDRNDT_RM_DX7:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_RMDX7), GetDlgItem(IDC_RMRND_COMBO));
-			break;
-		case VIDRNDT_RM_DX9:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_RMDX9), GetDlgItem(IDC_RMRND_COMBO));
-			break;
-	}
-
-	SetModified();
-}
-
-void CPPageVideo::OnQTRendererChange()
-{
-	UpdateData();
-
-	switch (m_iQTVideoRendererType) {
-		case VIDRNDT_QT_DEFAULT:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_QTSYSDEF), GetDlgItem(IDC_QTRND_COMBO));
-			break;
-		case VIDRNDT_QT_DX7:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_QTDX7), GetDlgItem(IDC_QTRND_COMBO));
-			break;
-		case VIDRNDT_QT_DX9:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_QTDX9), GetDlgItem(IDC_QTRND_COMBO));
-			break;
 	}
 
 	SetModified();

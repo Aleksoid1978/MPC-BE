@@ -593,9 +593,6 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEWORKERTHREADFOROPENING, fEnableWorkerThreadForOpening);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REPORTFAILEDPINS, fReportFailedPins);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_RTSPHANDLER, iRtspHandler);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_RTSPFILEEXTFIRST, fRtspFileExtFirst);
-
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_DVDPATH, strDVDPath);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USEDVDPATH, fUseDVDPath);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MENULANG, idMenuLang);
@@ -750,9 +747,6 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFULLSCREEN, (int)fLastFullScreen);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_INTREALMEDIA, fIntRealMedia);
-	//pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REALMEDIARENDERLESS, fRealMediaRenderless);
-	//pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_QUICKTIMERENDERER, iQuickTimeRenderer);
-	//pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REALMEDIAFPS, *((DWORD*)&dRealMediaQuickTimeFPS));
 
 	pApp->WriteProfileString(IDS_R_SETTINGS _T("\\") IDS_RS_PNSPRESETS, NULL, NULL);
 	for (int i = 0, j = m_pnspresets.GetCount(); i < j; i++) {
@@ -1032,9 +1026,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fEnableWorkerThreadForOpening = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEWORKERTHREADFOROPENING, TRUE);
 	fReportFailedPins = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REPORTFAILEDPINS, TRUE);
 
-	iRtspHandler		= (engine_t)AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_RTSPHANDLER, (int)RealMedia);
-	fRtspFileExtFirst	= !!AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_RTSPFILEEXTFIRST, TRUE);
-
 	iMultipleInst = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, 1);
 	if (iMultipleInst < 0 || iMultipleInst > 2) {
 		iMultipleInst = 1;
@@ -1259,10 +1250,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 
 	fIntRealMedia = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_INTREALMEDIA, 0);
-	//fRealMediaRenderless = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REALMEDIARENDERLESS, 0);
-	//iQuickTimeRenderer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_QUICKTIMERENDERER, 2);
-	//dRealMediaQuickTimeFPS = 25.0;
-	//*((DWORD*)&dRealMediaQuickTimeFPS) = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REALMEDIAFPS, *((DWORD*)&dRealMediaQuickTimeFPS));
 
 	m_pnspresets.RemoveAll();
 	for (int i = 0; i < (ID_PANNSCAN_PRESETS_END - ID_PANNSCAN_PRESETS_START); i++) {
@@ -1637,18 +1624,6 @@ int CAppSettings::GetMultiInst()
 	return multiinst;
 }
 
-engine_t CAppSettings::GetRtspHandler(bool& lookext)
-{
-	lookext = fRtspFileExtFirst;
-	return iRtspHandler;
-}
-
-void CAppSettings::SetRtspHandler(engine_t e, bool lookext)
-{
-	iRtspHandler		= e;
-	fRtspFileExtFirst	= lookext;
-}
-
 bool CAppSettings::IsUsingRtspEngine(CString path, engine_t e)
 {
 	return (GetRtspEngine(path) == e);
@@ -1658,33 +1633,16 @@ engine_t CAppSettings::GetRtspEngine(CString path)
 {
 	path.Trim().MakeLower();
 
-	if (!fRtspFileExtFirst && path.Find(_T("rtsp://")) == 0) {
-		return iRtspHandler;
-	}
-
 	CString ext = CPath(path).GetExtension();
 	ext.MakeLower();
 
 	if (!ext.IsEmpty()) {
-		if (path.Find(_T("rtsp://")) == 0) {
-			if (ext == _T(".ram") || ext == _T(".rm") || ext == _T(".ra")) {
-				return RealMedia;
-			}
-			if (ext == _T(".qt") || ext == _T(".mov")) {
-				return QuickTime;
-			}
-		}
-
 		for (size_t i = 0; i < m_Formats.GetCount(); i++) {
 			CMediaFormatCategory& mfc = m_Formats.GetAt(i);
 			if (mfc.FindExt(ext)) {
 				return mfc.GetEngineType();
 			}
 		}
-	}
-
-	if (fRtspFileExtFirst && path.Find(_T("rtsp://")) == 0) {
-		return iRtspHandler;
 	}
 
 	return DirectShow;

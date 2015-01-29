@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"Source Filters"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"סיומות קבצים"
 8		"ברירת מחדל"
 9		"קבע"
-10		"מטפל בפרוטוקול הזרמת Real-Time (עבור קישורי rtsp://...)"
-11		"RealMedia"
-12		"QuickTime"
-13		"DirectShow"
-14		"הבט בסיומת הקובץ תחילה"
-15		"וידאו"
-16		"מוזיקה"
-17		"די.וי.די"
-18		"דיסק שמע"
-19		"&ודיאו"
-20		"&אודיו"
-21		"&ערוך"
-22		"&הכל"
-23		"ניגון אוטומטי"
-24		"תפריט ימני בסייר חלונות"
-25		"תיקייה"
-26		"קובץ/קבצים"
-27		"שיוך קבצים"
-28		"עם אייקונים"
-29		"&None"
+10		"וידאו"
+11		"מוזיקה"
+12		"די.וי.די"
+13		"דיסק שמע"
+14		"&ודיאו"
+15		"&אודיו"
+16		"&ערוך"
+17		"&הכל"
+18		"ניגון אוטומטי"
+19		"תפריט ימני בסייר חלונות"
+20		"תיקייה"
+21		"קובץ/קבצים"
+22		"שיוך קבצים"
+23		"עם אייקונים"
+24		"&None"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"השינויים נכנסים לתוקף רק לאחר שהניגון הופסק והופעל מחדש."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"Video renderer"
-7		"וידאו RealMedia"
-9		"וידאו QuickTime"
-11		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
-12		"Select D3D9 Render Device"
-14		"משטח:"
-16		"Resizer:"
-18		"D3D במסך מלא"
-19		"VSync אלטרנטיבי"
-20		"VMR Mixer Mode"
-21		"Reset when changing display"
-22		"YUV Mixing"
-23		"EVR Buffers:"
+7		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
+8		"Select D3D9 Render Device"
+10		"משטח:"
+12		"Resizer:"
+14		"D3D במסך מלא"
+15		"VSync אלטרנטיבי"
+16		"VMR Mixer Mode"
+17		"Reset when changing display"
+18		"YUV Mixing"
+19		"EVR Buffers:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

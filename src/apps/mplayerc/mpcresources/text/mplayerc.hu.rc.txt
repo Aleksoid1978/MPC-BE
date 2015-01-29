@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"Source Filters"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"Fájlkiterjesztések"
 8		"Alapértelmezés"
 9		"Beállítás"
-10		"Real-Time Streaming Protokoll kezelő (rtsp://... URL-ekhez)"
-11		"RealMedia"
-12		"QuickTime"
-13		"DirectShow"
-14		"Kiterjesztés figyelése legelőször"
-15		"Videó"
-16		"Zene"
-17		"DVD"
-18		"Audió CD"
-19		"&Videó"
-20		"A&udió"
-21		"M&ódosít"
-22		"&Mind"
-23		"Automatikus lejátszás (csak XP-n)"
-24		"Windows Intéző kontextus menü"
-25		"Mappákhoz"
-26		"Fájlokhoz"
-27		"Társítás"
-28		"Ikonokkal"
-29		"&None"
+10		"Videó"
+11		"Zene"
+12		"DVD"
+13		"Audió CD"
+14		"&Videó"
+15		"A&udió"
+16		"M&ódosít"
+17		"&Mind"
+18		"Automatikus lejátszás (csak XP-n)"
+19		"Windows Intéző kontextus menü"
+20		"Mappákhoz"
+21		"Fájlokhoz"
+22		"Társítás"
+23		"Ikonokkal"
+24		"&None"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"A módosítások akkor lépnek érvénybe, ha a lejátszót bezárta és újraindította."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"Video renderer"
-7		"RealMedia Videó"
-9		"QuickTime Videó"
-11		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
-12		"Select D3D9 Render Device"
-14		"Felület:"
-16		"Resizer:"
-18		"Direct3D Teljes képernyő"
-19		"Alternatív VSync"
-20		"VMR Mixer Mode"
-21		"Reset when changing display"
-22		"YUV Mixing"
-23		"EVR Buffers:"
+7		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
+8		"Select D3D9 Render Device"
+10		"Felület:"
+12		"Resizer:"
+14		"Direct3D Teljes képernyő"
+15		"Alternatív VSync"
+16		"VMR Mixer Mode"
+17		"Reset when changing display"
+18		"YUV Mixing"
+19		"EVR Buffers:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

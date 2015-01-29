@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"Source Filters"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"Přípony souborů"
 8		"Standardní"
 9		"Nastavit"
-10		"Zpracování Real-Time Streaming Protocolu (adresy rtsp://...)"
-11		"RealMedia"
-12		"QuickTime"
-13		"DirectShow"
-14		"Podle přípony souboru"
-15		"Video"
-16		"Hudba"
-17		"DVD"
-18		"Audio CD"
-19		"&Video"
-20		"A&udio"
-21		"Upravit"
-22		"Vše"
-23		"Autoplay"
-24		"Kontextová nabídka Průzkumníka"
-25		"Adresáře"
-26		"Soubory"
-27		"Asociace"
-28		"Přiřadit ikony"
-29		"&None"
+10		"Video"
+11		"Hudba"
+12		"DVD"
+13		"Audio CD"
+14		"&Video"
+15		"A&udio"
+16		"Upravit"
+17		"Vše"
+18		"Autoplay"
+19		"Kontextová nabídka Průzkumníka"
+20		"Adresáře"
+21		"Soubory"
+22		"Asociace"
+23		"Přiřadit ikony"
+24		"&None"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Změny se projeví až po zastavení a opětovném spuštění přehrávání."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"Video renderer"
-7		"RealMedia Video"
-9		"QuickTime video"
-11		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
-12		"Select D3D9 Render Device"
-14		"Povrch:"
-16		"Resizer:"
-18		"Direct3D Fullscreen"
-19		"Alternativní VSync"
-20		"VMR Mixer Mode"
-21		"Reset when changing display"
-22		"YUV Mixing"
-23		"EVR Buffers:"
+7		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
+8		"Select D3D9 Render Device"
+10		"Povrch:"
+12		"Resizer:"
+14		"Direct3D Fullscreen"
+15		"Alternativní VSync"
+16		"VMR Mixer Mode"
+17		"Reset when changing display"
+18		"YUV Mixing"
+19		"EVR Buffers:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

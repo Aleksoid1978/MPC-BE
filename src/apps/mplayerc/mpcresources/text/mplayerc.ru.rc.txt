@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"Фильтры источников"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"Расширения файлов"
 8		"По умолчанию"
 9		"Установить"
-10		"Открывать Real-Time Streaming Protocol (rtsp://...) через:"
-11		"RealMedia"
-12		"QuickTime"
-13		"DirectShow"
-14		"Сначала смотреть расширение"
-15		"Видео"
-16		"Музыка"
-17		"DVD"
-18		"Audio CD"
-19		"&Видео"
-20		"&Аудио"
-21		"&Изменить"
-22		"В&се"
-23		"Автовоспроизведение"
-24		"Контекстное меню проводника"
-25		"Для папок"
-26		"Для файлов"
-27		"Ассоциации"
-28		"Со значками"
-29		"&Ничего"
+10		"Видео"
+11		"Музыка"
+12		"DVD"
+13		"Audio CD"
+14		"&Видео"
+15		"&Аудио"
+16		"&Изменить"
+17		"В&се"
+18		"Автовоспроизведение"
+19		"Контекстное меню проводника"
+20		"Для папок"
+21		"Для файлов"
+22		"Ассоциации"
+23		"Со значками"
+24		"&Ничего"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Изменения применятся после остановки и перезапуска воспроизведения."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"Видео-рендерер"
-7		"RealMedia видео"
-9		"QuickTime видео"
-11		"Параметры VMR-7/9 (renderless) и EVR-CP"
-12		"Устройство D3D9-рендеринга"
-14		"Поверхность:"
-16		"Интерполяция:"
-18		"Полноэкранный Direct3D"
-19		"Альт. VSync"
-20		"Режим VMR Mixer"
-21		"Реинициализация при смене монитора"
-22		"YUV Mixing"
-23		"Буферы EVR:"
+7		"Параметры VMR-7/9 (renderless) и EVR-CP"
+8		"Устройство D3D9-рендеринга"
+10		"Поверхность:"
+12		"Интерполяция:"
+14		"Полноэкранный Direct3D"
+15		"Альт. VSync"
+16		"Режим VMR Mixer"
+17		"Реинициализация при смене монитора"
+18		"YUV Mixing"
+19		"Буферы EVR:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

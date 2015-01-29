@@ -34,8 +34,6 @@ private:
 	CStringArray m_D3D9GUIDNames;
 
 	CComboBox m_iDSVideoRendererTypeCtrl;
-	CComboBox m_iRMVideoRendererTypeCtrl;
-	CComboBox m_iQTVideoRendererTypeCtrl;
 	CComboBox m_iD3D9RenderDeviceCtrl;
 	CComboBox m_cbDX9ResizerCtrl;
 
@@ -46,8 +44,6 @@ public:
 
 	enum { IDD = IDD_PPAGEVIDEO };
 	int m_iDSVideoRendererType;
-	int m_iRMVideoRendererType;
-	int m_iQTVideoRendererType;
 	int m_iAPSurfaceUsage;
 	BOOL m_fVMRMixerMode;
 	BOOL m_fVMRMixerYUV;
@@ -72,8 +68,6 @@ public:
 	afx_msg void OnUpdateMixerYUV(CCmdUI* pCmdUI);
 	afx_msg void OnSurfaceChange();
 	afx_msg void OnDSRendererChange();
-	afx_msg void OnRMRendererChange();
-	afx_msg void OnQTRendererChange();
 	afx_msg void OnFullscreenCheck();
 	afx_msg void OnD3D9DeviceCheck();
 };

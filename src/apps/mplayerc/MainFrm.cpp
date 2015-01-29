@@ -670,7 +670,7 @@ CMainFrame::CMainFrame() :
 	m_ZoomX(1), m_ZoomY(1), m_PosX(0.5), m_PosY(0.5),
 	m_AngleX(0), m_AngleY(0), m_AngleZ(0),
 	m_fCustomGraph(false),
-	m_fRealMediaGraph(false), m_fShockwaveGraph(false), m_fQuicktimeGraph(false),
+	m_fShockwaveGraph(false),
 	m_fFrameSteppingActive(false),
 	m_fEndOfStream(false),
 	m_fCapturing(false),
@@ -6116,13 +6116,7 @@ BOOL CMainFrame::IsRendererCompatibleWithSaveImage()
 	BOOL result = TRUE;
 	AppSettings& s = AfxGetAppSettings();
 
-	if (m_fRealMediaGraph && (s.iRMVideoRendererType == VIDRNDT_RM_DEFAULT)) {
-		AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_REAL), MB_ICONEXCLAMATION | MB_OK);
-		result = FALSE;
-	} else if (m_fQuicktimeGraph && (s.iQTVideoRendererType == VIDRNDT_QT_DEFAULT)) {
-		AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_QT), MB_ICONEXCLAMATION | MB_OK);
-		result = FALSE;
-	} else if (m_fShockwaveGraph) {
+	if (m_fShockwaveGraph) {
 		AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_SHOCKWAVE), MB_ICONEXCLAMATION | MB_OK);
 		result = FALSE;
 	} else if (s.iDSVideoRendererType == VIDRNDT_DS_OVERLAYMIXER) {
@@ -8436,9 +8430,7 @@ void CMainFrame::OnUpdatePlayPauseStop(CCmdUI* pCmdUI)
 		if (GetPlaybackMode() == PM_FILE || GetPlaybackMode() == PM_CAPTURE) {
 			fEnable = true;
 
-			if (fs == State_Stopped && pCmdUI->m_nID == ID_PLAY_PAUSE && m_fRealMediaGraph) {
-				fEnable = false;
-			} else if (m_fCapturing) {
+			if (m_fCapturing) {
 				fEnable = false;
 			} else if (m_fLiveWM && pCmdUI->m_nID == ID_PLAY_PAUSE) {
 				fEnable = false;
@@ -8464,13 +8456,7 @@ void CMainFrame::OnPlayFrameStep(UINT nID)
 {
 	m_OSD.EnableShowMessage(false);
 
-	if (m_pFS && m_fQuicktimeGraph) {
-		if (GetMediaState() != State_Paused) {
-			SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
-		}
-
-		m_pFS->Step(nID == ID_PLAY_FRAMESTEP ? 1 : -1, NULL);
-	} else if (m_pFS && nID == ID_PLAY_FRAMESTEP) {
+	if (m_pFS && nID == ID_PLAY_FRAMESTEP) {
 		if (GetMediaState() != State_Paused && !queue_ffdshow_support) {
 			SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 		}
@@ -8547,8 +8533,6 @@ void CMainFrame::OnUpdatePlayFrameStep(CCmdUI* pCmdUI)
 		} else if (pCmdUI->m_nID == ID_PLAY_FRAMESTEP) {
 			fEnable = TRUE;
 		} else if (pCmdUI->m_nID == ID_PLAY_FRAMESTEPCANCEL && m_pFS && m_pFS->CanStep(0, NULL) == S_OK) {
-			fEnable = TRUE;
-		} else if (m_fQuicktimeGraph && m_pFS) {
 			fEnable = TRUE;
 		}
 	}
@@ -11489,7 +11473,7 @@ void CMainFrame::MoveVideoWindow(bool fShowStats)
 		CRect vr = CRect(0,0,0,0);
 
 		OAFilterState fs = GetMediaState();
-		if (fs == State_Paused || fs == State_Running || (fs == State_Stopped && (m_fShockwaveGraph || m_fQuicktimeGraph))) {
+		if (fs == State_Paused || fs == State_Running || (fs == State_Stopped && m_fShockwaveGraph)) {
 			CSize arxy = GetVideoSize();
 
 			dvstype iDefaultVideoSize = (dvstype)AfxGetAppSettings().iDefaultVideoSize;
@@ -11956,7 +11940,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	ASSERT(m_pGB == NULL);
 
 	m_fCustomGraph = false;
-	m_fRealMediaGraph = m_fShockwaveGraph = m_fQuicktimeGraph = false;
+	m_fShockwaveGraph = false;
 
 	AppSettings& s = AfxGetAppSettings();
 
@@ -11992,42 +11976,14 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 		if (ct == "video/x-ms-asf") {
 			// TODO: put something here to make the windows media source filter load later
-		} else if (ct == "audio/x-pn-realaudio"
-				   || ct == "audio/x-pn-realaudio-plugin"
-				   || ct == "audio/x-realaudio-secure"
-				   || ct == "video/vnd.rn-realvideo-secure"
-				   || ct == "application/vnd.rn-realmedia"
-				   || ct.Find("vnd.rn-") >= 0
-				   || ct.Find("realaudio") >= 0
-				   || ct.Find("realvideo") >= 0) {
-			engine = RealMedia;
 		} else if (ct == "application/x-shockwave-flash") {
 			engine = ShockWave;
-		} else if (ct == "video/quicktime"
-				   || ct == "application/x-quicktimeplayer") {
-			engine = QuickTime;
 		}
 
 		HRESULT hr = E_FAIL;
 		CComPtr<IUnknown> pUnk;
 
-		if (engine == RealMedia) {
-			// TODO : see why Real SDK crash here ...
-			//if (!IsRealEngineCompatible(p->fns.GetHead()))
-			//	return ResStr(IDS_REALVIDEO_INCOMPATIBLE);
-
-			pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew DSObjects::CRealMediaGraph(m_pVideoWnd->m_hWnd, hr);
-			if (!pUnk) {
-				return ResStr(IDS_AG_OUT_OF_MEMORY);
-			}
-
-			if (SUCCEEDED(hr)) {
-				m_pGB = CComQIPtr<IGraphBuilder>(pUnk);
-				if (m_pGB) {
-					m_fRealMediaGraph = true;
-				}
-			}
-		} else if (engine == ShockWave) {
+		if (engine == ShockWave) {
 			pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew DSObjects::CShockwaveGraph(m_pVideoWnd->m_hWnd, hr);
 			if (!pUnk) {
 				return ResStr(IDS_AG_OUT_OF_MEMORY);
@@ -12040,25 +11996,9 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 				return ResStr(IDS_MAINFRM_77);
 			}
 			m_fShockwaveGraph = true;
-		} else if (engine == QuickTime) {
-#ifdef _WIN64	// TODOX64
-			//MessageBox (ResStr(IDS_MAINFRM_78), _T(""), MB_OK);
-#else
-			pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew DSObjects::CQuicktimeGraph(m_pVideoWnd->m_hWnd, hr);
-			if (!pUnk) {
-				return ResStr(IDS_AG_OUT_OF_MEMORY);
-			}
-
-			if (SUCCEEDED(hr)) {
-				m_pGB = CComQIPtr<IGraphBuilder>(pUnk);
-				if (m_pGB) {
-					m_fQuicktimeGraph = true;
-				}
-			}
-#endif
 		}
 
-		m_fCustomGraph = m_fRealMediaGraph || m_fShockwaveGraph || m_fQuicktimeGraph;
+		m_fCustomGraph = m_fShockwaveGraph;
 
 		if (!m_fCustomGraph) {
 			m_pGB = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_pVideoWnd->m_hWnd);
@@ -13972,7 +13912,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 		}
 	}
 
-	if (!b_UseVSFilter && m_pCAP && (!m_bAudioOnly || m_fRealMediaGraph)) {
+	if (!b_UseVSFilter && m_pCAP && !m_bAudioOnly) {
 		Stream substream;
 		subarray.RemoveAll();
 		int checkedsplsub	= 0;
@@ -14654,7 +14594,7 @@ void CMainFrame::CloseMediaPrivate()
 
 	m_pProv.Release();
 
-	m_fRealMediaGraph = m_fShockwaveGraph = m_fQuicktimeGraph = false;
+	m_fShockwaveGraph = false;
 
 	m_VidDispName.Empty();
 	m_AudDispName.Empty();

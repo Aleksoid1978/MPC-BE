@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"Iturburu Iragazkiak"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"Agiri hedapenak"
 8		"Berez"
 9		"Ezarri"
-10		"Real-Time Jario Protokolo kudeatzailea (rtsp://... URL-ak)"
-11		"RealMedia"
-12		"QuickTime"
-13		"DirectShow"
-14		"Begiratu agiri hedapena lehenik"
-15		"Bideoa"
-16		"Musika"
-17		"DVD"
-18		"Audio CD"
-19		"&Bideoa"
-20		"A&udioa"
-21		"&Aldatu"
-22		"&Denak"
-23		"Berez-irakurri"
-24		"Explorer Hitzinguru Menua"
-25		"Zuzenbidea"
-26		"Agiria(k)"
-27		"Elkarketa"
-28		"Ikurrekin"
-29		"&Ezer ez"
+10		"Bideoa"
+11		"Musika"
+12		"DVD"
+13		"Audio CD"
+14		"&Bideoa"
+15		"A&udioa"
+16		"&Aldatu"
+17		"&Denak"
+18		"Berez-irakurri"
+19		"Explorer Hitzinguru Menua"
+20		"Zuzenbidea"
+21		"Agiria(k)"
+22		"Elkarketa"
+23		"Ikurrekin"
+24		"&Ezer ez"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Aldaketek eragina dute irakurketa itxi eta berrabiarazi ondoren."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"Bideo aurkezlea"
-7		"RealMedia Bideoa"
-9		"QuickTime Bideoa"
-11		"VMR-7/VMR-9 (Aurkezgabe) eta EVR-CP ezarpenak"
-12		"Hautatu D3D9 Aurkezpen Gailua"
-14		"Azalekoa:"
-16		"Birneurr.:"
-18		"D3D Ikusleiho-osoa"
-19		"Aukerazko ZAlb"
-20		"VMR Nahastzaile Modua"
-21		"Berrezarri erakuspena aldatzerakoan"
-22		"YUV Nahasketa"
-23		"EVR Bufferrak:"
+7		"VMR-7/VMR-9 (Aurkezgabe) eta EVR-CP ezarpenak"
+8		"Hautatu D3D9 Aurkezpen Gailua"
+10		"Azalekoa:"
+12		"Birneurr.:"
+14		"D3D Ikusleiho-osoa"
+15		"Aukerazko ZAlb"
+16		"VMR Nahastzaile Modua"
+17		"Berrezarri erakuspena aldatzerakoan"
+18		"YUV Nahasketa"
+19		"EVR Bufferrak:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

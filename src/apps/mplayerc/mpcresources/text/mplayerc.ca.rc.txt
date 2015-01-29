@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"Source Filters"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"Extensions d'arxiu"
 8		"Per defecte"
 9		"Fixar"
-10		"Gestor del Protocol de Transmisions en Temps Real (per rtsp://... URLs)"
-11		"RealMedia"
-12		"QuickTime"
-13		"DirectShow"
-14		"Mirar primer l'extensió"
-15		"Vídeo"
-16		"Música"
-17		"DVD"
-18		"CDs Àudio"
-19		"&Vídeo"
-20		"À&udio"
-21		"&Modificar"
-22		"&Tots"
-23		"Reproducció Automàtica"
-24		"Menú contextual del gestor d'arxius"
-25		"Directori"
-26		"Arxiu(s)"
-27		"Associació"
-28		"Amb Icones"
-29		"&None"
+10		"Vídeo"
+11		"Música"
+12		"DVD"
+13		"CDs Àudio"
+14		"&Vídeo"
+15		"À&udio"
+16		"&Modificar"
+17		"&Tots"
+18		"Reproducció Automàtica"
+19		"Menú contextual del gestor d'arxius"
+20		"Directori"
+21		"Arxiu(s)"
+22		"Associació"
+23		"Amb Icones"
+24		"&None"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Els canvis tindran efecte després de tencar i reiniciar la reproducció."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"Video renderer"
-7		"Vídeo RealMedia"
-9		"Vídeo QuickTime"
-11		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
-12		"Select D3D9 Render Device"
-14		"Superfície:"
-16		"Resizer:"
-18		"Pantalla completa en D3D"
-19		"VSync alternatiu"
-20		"VMR Mixer Mode"
-21		"Reset when changing display"
-22		"YUV Mixing"
-23		"EVR Buffers:"
+7		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
+8		"Select D3D9 Render Device"
+10		"Superfície:"
+12		"Resizer:"
+14		"Pantalla completa en D3D"
+15		"VSync alternatiu"
+16		"VMR Mixer Mode"
+17		"Reset when changing display"
+18		"YUV Mixing"
+19		"EVR Buffers:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

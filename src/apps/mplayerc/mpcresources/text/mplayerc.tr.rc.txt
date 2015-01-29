@@ -227,30 +227,25 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 19		"Kaynak Süzgeçleri"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 30
+BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 6		"Dosya uzantıları"
 8		"Varsayılan"
 9		"Ayarla"
-10		"Gerçek Zamanlı Yayın İletişim kontrolcüsü (rtsp://... adresleri için)"
-11		"RealMedia"
-12		"QuickTime"
-13		"DirectShow"
-14		"Önce dosya uzantısına bak"
-15		"Video"
-16		"Müzik"
-17		"DVD"
-18		"Ses CD'si"
-19		"&Video"
-20		"S&es"
-21		"&Değiştir"
-22		"T&ümü"
-23		"Otomatik yürütme"
-24		"Sağ tuş menüsü"
-25		"Konum"
-26		"Dosya"
-27		"İlişkilendirme"
-28		"Özel simgeler kullan"
-29		"&Hiçbiri"
+10		"Video"
+11		"Müzik"
+12		"DVD"
+13		"Ses CD'si"
+14		"&Video"
+15		"S&es"
+16		"&Değiştir"
+17		"T&ümü"
+18		"Otomatik yürütme"
+19		"Sağ tuş menüsü"
+20		"Konum"
+21		"Dosya"
+22		"İlişkilendirme"
+23		"Özel simgeler kullan"
+24		"&Hiçbiri"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
@@ -464,20 +459,18 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Değişiklikler, yürütme kapatıldıktan ve uygulama yeniden başlatıldıktan sonra uygulanacaktır."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 25
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 21
 5		"Video renderer"
-7		"RealMedia Video'su"
-9		"QuickTime Video'su"
-11		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
-12		"Select D3D9 Render Device"
-14		"Yüzey:"
-16		"Resizer:"
-18		"Tam Ekran Direct3D"
-19		"Değişken Eşzam."
-20		"VMR Mixer Mode"
-21		"Reset when changing display"
-22		"YUV Mixing"
-23		"EVR Buffers:"
+7		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
+8		"Select D3D9 Render Device"
+10		"Yüzey:"
+12		"Resizer:"
+14		"Tam Ekran Direct3D"
+15		"Değişken Eşzam."
+16		"VMR Mixer Mode"
+17		"Reset when changing display"
+18		"YUV Mixing"
+19		"EVR Buffers:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
