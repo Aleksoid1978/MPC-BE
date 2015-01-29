@@ -1042,7 +1042,7 @@ HRESULT CStreamSwitcherOutputPin::CheckConnect(IPin* pPin)
 			|| clsid == GUIDFromCString(L"{A753A1EC-973E-4718-AF8E-A3F554D45C44}") // AC3Filter
 			|| clsid == GUIDFromCString(L"{B38C58A0-1809-11D6-A458-EDAE78F1DF12}") // DC-DSP Filter
 			//|| clsid == GUIDFromCString(L"{AEFA5024-215A-4FC7-97A4-1043C86FD0B8}") // MatrixMixer unstable when changing format
-			|| clsid == CLSID_XySubFilter_AutoLoader // crutch
+			//|| clsid == CLSID_XySubFilter_AutoLoader // crutch
 		? __super::CheckConnect(pPin)
 		: E_FAIL;
 

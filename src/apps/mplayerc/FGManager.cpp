@@ -2615,24 +2615,30 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	// mainconcept color space converter
 	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{272D77A0-A852-4851-ADA4-9091FEAD4C86}")), MERIT64_DO_NOT_USE));
 
-	// VSFilter blocking routines
-	if (s.fBlockVSFilter && s.IsISRAutoLoadEnabled()) {
-		// Prevent VSFilter from connecting while the ISR is select
-		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VSFilter, MERIT64_DO_NOT_USE));
-		// Prevent XySubFilter from connecting while the ISR is select
-		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_DO_NOT_USE));
-		// Prevent XySubFilter's loader from connecting while the ISR is select
-		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_DO_NOT_USE));
-	}
+	// block auto loaders
+	m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VSFilter_autoloading, MERIT64_DO_NOT_USE));
+	m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_DO_NOT_USE));
 
-	if (s.iDSVideoRendererType != VIDRNDT_DS_MADVR
-			&& s.iDSVideoRendererType != VIDRNDT_DS_EVR_CUSTOM
-			&& s.iDSVideoRendererType != VIDRNDT_DS_SYNC
-			&& s.iDSVideoRendererType != VIDRNDT_DS_VMR9RENDERLESS) {
-		// Prevent XySubFilter from connecting while renderer is not compatible
+	switch (s.iSubtitleRenderer) {
+	case SUBRNDT_NONE:
+	case SUBRNDT_ISR:
+		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VSFilter, MERIT64_DO_NOT_USE));
 		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_DO_NOT_USE));
-		// Prevent XySubFilter's loader from connecting while renderer is not compatible
-		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_DO_NOT_USE));
+		break;
+	case SUBRNDT_VSFILTER:
+		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VSFilter, MERIT64_ABOVE_DSHOW));
+		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_DO_NOT_USE));
+	case SUBRNDT_XYSUBFILTER:
+		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VSFilter, MERIT64_DO_NOT_USE));
+		if (s.iDSVideoRendererType == VIDRNDT_DS_MADVR
+			|| s.iDSVideoRendererType != VIDRNDT_DS_EVR_CUSTOM
+			|| s.iDSVideoRendererType != VIDRNDT_DS_SYNC
+			|| s.iDSVideoRendererType != VIDRNDT_DS_VMR9RENDERLESS) {
+			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_ABOVE_DSHOW));
+		} else {
+			// Prevent XySubFilter from connecting while renderer is not compatible
+			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_DO_NOT_USE));
+		}
 	}
 
 	// Blacklist Accusoft PICVideo M-JPEG Codec 2.1 since causes a DEP crash

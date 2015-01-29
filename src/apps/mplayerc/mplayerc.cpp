@@ -2268,7 +2268,7 @@ void CMPlayerCApp::SetLanguage(int nLanguage)
 
 bool CMPlayerCApp::IsVSFilterInstalled()
 {
-	return IsCLSIDRegistered(CLSID_VSFilter);
+	return IsCLSIDRegistered(CLSID_VSFilter_autoloading);
 }
 
 bool CMPlayerCApp::HasEVR()
