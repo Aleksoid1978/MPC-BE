@@ -431,17 +431,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Use the built-in subtitle renderer"
-6		"Always default to external subtitles if available"
-8		"Do not load embedded subtitles"
-10		"Autoload paths"
-11		"Reset"
-12		"La URL base de la base de datos de subtítulos:"
-14		"Probar"
-16		"Online database"
-17		"Auto-reload subtitle files after detecting modification"
-18		"Use Subresync"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+5		"Subtitle renderer:"
+7		"Always default to external subtitles if available"
+9		"Do not load embedded subtitles"
+11		"Autoload paths"
+12		"Reset"
+13		"La URL base de la base de datos de subtítulos:"
+15		"Probar"
+17		"Online database"
+18		"Auto-reload subtitle files after detecting modification"
+19		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

@@ -431,17 +431,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Use the built-in subtitle renderer"
-6		"Wczytywanie zewnętrznych napisów zamiast zawartych w kontenerze"
-8		"Zaniechanie wczytywania napisów zawartych w kontenerze"
-10		"Położenia napisów"
-11		"Domyślne"
-12		"Adres internetowej bazy napisów:"
-14		"Przetestuj"
-16		"Internetowa baza napisów"
-17		"Auto-reload subtitle files after detecting modification"
-18		"Use Subresync"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+5		"Subtitle renderer:"
+7		"Wczytywanie zewnętrznych napisów zamiast zawartych w kontenerze"
+9		"Zaniechanie wczytywania napisów zawartych w kontenerze"
+11		"Położenia napisów"
+12		"Domyślne"
+13		"Adres internetowej bazy napisów:"
+15		"Przetestuj"
+17		"Internetowa baza napisów"
+18		"Auto-reload subtitle files after detecting modification"
+19		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

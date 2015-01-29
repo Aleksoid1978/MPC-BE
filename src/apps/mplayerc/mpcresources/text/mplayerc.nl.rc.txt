@@ -431,17 +431,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Resetten"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Interne ondertitelingsrenderer gebruiken"
-6		"Prefereer externe ondertiteling boven interne ondertiteling"
-8		"Geïntegreerde ondertiteling niet laden"
-10		"Automatisch geladen locaties"
-11		"Resetten"
-12		"URL naar de online ondertitelings-database:"
-14		"Testen"
-16		"Online database"
-17		"Herlaad ondertitel-bestanden automatisch na de ontdekking van wijziging"
-18		"Activeer ondertitelings-resync"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+5		"Subtitle renderer:"
+7		"Prefereer externe ondertiteling boven interne ondertiteling"
+9		"Geïntegreerde ondertiteling niet laden"
+11		"Automatisch geladen locaties"
+12		"Resetten"
+13		"URL naar de online ondertitelings-database:"
+15		"Testen"
+17		"Online database"
+18		"Herlaad ondertitel-bestanden automatisch na de ontdekking van wijziging"
+19		"Activeer ondertitelings-resync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

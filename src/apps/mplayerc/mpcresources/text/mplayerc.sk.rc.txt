@@ -431,17 +431,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Use the built-in subtitle renderer"
-6		"Uprednostniť externé titulky, ak sú dostupné"
-8		"Nenačítavať vložené titulky"
-10		"Cesty pre automotické načítavanie"
-11		"Reset"
-12		"Základná URL adresa webovej databázy titulkov:"
-14		"Otestovať"
-16		"Online-databáza"
-17		"Auto-reload subtitle files after detecting modification"
-18		"Use Subresync"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+5		"Subtitle renderer:"
+7		"Uprednostniť externé titulky, ak sú dostupné"
+9		"Nenačítavať vložené titulky"
+11		"Cesty pre automotické načítavanie"
+12		"Reset"
+13		"Základná URL adresa webovej databázy titulkov:"
+15		"Otestovať"
+17		"Online-databáza"
+18		"Auto-reload subtitle files after detecting modification"
+19		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

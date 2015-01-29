@@ -431,17 +431,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Use the built-in subtitle renderer"
-6		"Preferă subtitrările externe în locul celor integrate"
-8		"Ignoră subtitrările integrate"
-10		"Căi de încărcare automată"
-11		"Resetează"
-12		"URL de bază pentru baza de date cu subtitrări online:"
-14		"Testează"
-16		"Bază de date online"
-17		"Auto-reload subtitle files after detecting modification"
-18		"Use Subresync"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+5		"Subtitle renderer:"
+7		"Preferă subtitrările externe în locul celor integrate"
+9		"Ignoră subtitrările integrate"
+11		"Căi de încărcare automată"
+12		"Resetează"
+13		"URL de bază pentru baza de date cu subtitrări online:"
+15		"Testează"
+17		"Bază de date online"
+18		"Auto-reload subtitle files after detecting modification"
+19		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

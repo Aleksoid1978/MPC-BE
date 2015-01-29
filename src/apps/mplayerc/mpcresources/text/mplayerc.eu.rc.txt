@@ -431,17 +431,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Berrezarri"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Erabili barnebildutako azpidatzi aurkezlea"
-6		"Hobetsi kanpoko azpidatziak barneko azpidatziei"
-8		"Ezikusi barneratutako azpidatziak"
-10		"Berez-gertatu helburuak"
-11		"Berrezarri"
-12		"Onlineko azpidatzi datubaseko URL-a:"
-14		"Azterketa"
-16		"Online datubasea"
-17		"Berez-birgertatu azpidatzi agiriak aldaketa atzeman ondoren"
-18		"Erabili Azpberraldb"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+5		"Subtitle renderer:"
+7		"Hobetsi kanpoko azpidatziak barneko azpidatziei"
+9		"Ezikusi barneratutako azpidatziak"
+11		"Berez-gertatu helburuak"
+12		"Berrezarri"
+13		"Onlineko azpidatzi datubaseko URL-a:"
+15		"Azterketa"
+17		"Online datubasea"
+18		"Berez-birgertatu azpidatzi agiriak aldaketa atzeman ondoren"
+19		"Erabili Azpberraldb"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

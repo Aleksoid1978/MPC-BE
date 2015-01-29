@@ -431,17 +431,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Use the built-in subtitle renderer"
-6		"Միշտ օգտագործել արտաքին տողագրերը որպես հիմնական"
-8		"Չօգտագործել ներքին տողագրերը"
-10		"Տողագրերի ճանապարհը"
-11		"Ետարկել"
-12		"Տողագրերի ցանցային բազայի URL-ն."
-14		"Թեստ"
-16		"Ցանցային տվյալներ"
-17		"Auto-reload subtitle files after detecting modification"
-18		"Use Subresync"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+5		"Subtitle renderer:"
+7		"Միշտ օգտագործել արտաքին տողագրերը որպես հիմնական"
+9		"Չօգտագործել ներքին տողագրերը"
+11		"Տողագրերի ճանապարհը"
+12		"Ետարկել"
+13		"Տողագրերի ցանցային բազայի URL-ն."
+15		"Թեստ"
+17		"Ցանցային տվյալներ"
+18		"Auto-reload subtitle files after detecting modification"
+19		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25

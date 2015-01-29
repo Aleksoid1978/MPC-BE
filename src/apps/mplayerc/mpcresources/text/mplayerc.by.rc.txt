@@ -431,17 +431,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 19
-5		"Use the built-in subtitle renderer"
-6		"Заўсёды выкарыстоўваць знешнія субтытры як асноўныя"
-8		"Не загружаць убудаваныя субтытры"
-10		"Шлях да знешніх субтытраў"
-11		"Скід"
-12		"URL анлайнавай базы субтытраў:"
-14		"Тэст"
-16		"Online База"
-17		"Auto-reload subtitle files after detecting modification"
-18		"Use Subresync"
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+5		"Subtitle renderer:"
+7		"Заўсёды выкарыстоўваць знешнія субтытры як асноўныя"
+9		"Не загружаць убудаваныя субтытры"
+11		"Шлях да знешніх субтытраў"
+12		"Скід"
+13		"URL анлайнавай базы субтытраў:"
+15		"Тэст"
+17		"Online База"
+18		"Auto-reload subtitle files after detecting modification"
+19		"Use Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
