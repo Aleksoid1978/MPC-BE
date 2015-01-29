@@ -699,7 +699,6 @@ CMainFrame::CMainFrame() :
 	m_bOpenedThruThread(false),
 	m_nMenuHideTick(0),
 	m_bWasSnapped(false),
-	m_bWndWasZoomed(false),
 	m_nWasSetDispMode(0),
 	m_bIsBDPlay(FALSE),
 	m_bClosingState(false),

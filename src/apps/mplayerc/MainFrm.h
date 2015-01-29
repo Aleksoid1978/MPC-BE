@@ -685,7 +685,6 @@ public:
 	BOOL isSnapClose( int a, int b );
 	BOOL m_bWndZoomed;
 	RECT rc_forceNP;
-	BOOL m_bWndWasZoomed;
 	RECT rc_NP;
 
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
