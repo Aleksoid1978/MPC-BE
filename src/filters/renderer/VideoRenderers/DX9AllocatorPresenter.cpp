@@ -1935,7 +1935,7 @@ void CDX9AllocatorPresenter::DrawStats()
 			OffsetRect(&rc, 0, TextHeight);
 		}
 
-		if (m_pAllocator && bDetailedStats > 1) {
+		if (m_pAllocator && m_pSubPicProvider && bDetailedStats > 1) {
 			CDX9SubPicAllocator *pAlloc = (CDX9SubPicAllocator *)m_pAllocator.p;
 			int nFree = 0;
 			int nAlloc = 0;
