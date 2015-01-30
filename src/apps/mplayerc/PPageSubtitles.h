@@ -56,6 +56,6 @@ public:
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnUpdateButton2(CCmdUI* pCmdUI);
 	afx_msg void OnURLModified();
+	afx_msg void OnSubRendModified();
 	afx_msg void OnUpdateISRSelect(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateISRSelect2(CCmdUI* pCmdUI);
 };

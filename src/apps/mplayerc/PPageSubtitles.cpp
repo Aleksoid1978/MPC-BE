@@ -58,6 +58,8 @@ BOOL CPPageSubtitles::OnInitDialog()
 {
 	__super::OnInitDialog();
 
+	SetHandCursor(m_hWnd, IDC_COMBO2);
+
 	AppSettings& s = AfxGetAppSettings();
 
 	UpdateSubRenderersList(s.iSubtitleRenderer);
@@ -122,11 +124,10 @@ BEGIN_MESSAGE_MAP(CPPageSubtitles, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedButton2)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON2, OnUpdateButton2)
 	ON_CBN_EDITCHANGE(IDC_COMBO1, OnURLModified)
-	//ON_UPDATE_COMMAND_UI(IDC_CHECK1, OnUpdateISRSelect2)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK2, OnUpdateISRSelect2)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK3, OnUpdateISRSelect2)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK4, OnUpdateISRSelect)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK_SUBRESYNC, OnUpdateISRSelect2)
+	ON_CBN_SELCHANGE(IDC_COMBO2, OnSubRendModified)
+	ON_UPDATE_COMMAND_UI(IDC_CHECK2, OnUpdateISRSelect)
+	ON_UPDATE_COMMAND_UI(IDC_CHECK3, OnUpdateISRSelect)
+	ON_UPDATE_COMMAND_UI(IDC_CHECK_SUBRESYNC, OnUpdateISRSelect)
 END_MESSAGE_MAP()
 
 void CPPageSubtitles::OnBnClickedButton1()
@@ -172,12 +173,12 @@ void CPPageSubtitles::OnURLModified()
 	SetModified();
 }
 
-void CPPageSubtitles::OnUpdateISRSelect(CCmdUI* pCmdUI)
+void CPPageSubtitles::OnSubRendModified()
 {
-	pCmdUI->Enable(AfxGetAppSettings().IsISRSelect());
+	SetModified();
 }
 
-void CPPageSubtitles::OnUpdateISRSelect2(CCmdUI* pCmdUI)
+void CPPageSubtitles::OnUpdateISRSelect(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(AfxGetAppSettings().IsISRSelect() && IsDlgButtonChecked(IDC_CHECK4));
+	pCmdUI->Enable(m_cbSubtitleRenderer.GetCurSel() == SUBRNDT_ISR);
 }
