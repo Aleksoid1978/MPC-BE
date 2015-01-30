@@ -2211,7 +2211,7 @@ STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetCalcDuration()
 //
 
 CMatroskaSplitterOutputPin::CMatroskaSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
-	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr, 0, 5)
+	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
 {
 }
 

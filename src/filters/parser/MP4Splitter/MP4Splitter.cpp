@@ -1855,6 +1855,5 @@ HRESULT CMP4SplitterOutputPin::DeliverEndFlush()
 HRESULT CMP4SplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 {
 	CAutoLock cAutoLock(this);
-
 	return __super::DeliverPacket(p);
 }
