@@ -16332,10 +16332,12 @@ void CMainFrame::AddTextPassThruFilter()
 
 bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 {
+	AppSettings& s = AfxGetAppSettings();
+
 	CComPtr<ISubStream> pSubStream;
 	CString fname = subItem;
 
-	if (GetFileExt(fname).MakeLower() == L".mks" && AfxGetAppSettings().IsISRAutoLoadEnabled()) {
+	if (GetFileExt(fname).MakeLower() == L".mks" && s.IsISRAutoLoadEnabled()) {
 		if (CComQIPtr<IGraphBuilderSub> pGBS = m_pGB) {
 			HRESULT hr = pGBS->RenderSubFile(fname);
 			if (SUCCEEDED(hr)) {
@@ -16347,7 +16349,7 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 					if (actualStream != NULL) {
 						*actualStream = r;
 
-						AfxGetAppSettings().fEnableSubtitles = true;
+						s.fEnableSubtitles = true;
 					}
 
 					return true;
@@ -16393,7 +16395,7 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 		if (actualStream != NULL) {
 			*actualStream = r;
 
-			AfxGetAppSettings().fEnableSubtitles = true;
+			s.fEnableSubtitles = true;
 		}
 
 		if (m_hNotifyRenderThread) {
