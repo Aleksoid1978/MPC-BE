@@ -31,9 +31,6 @@
 #include <BaseClasses/streams.h>
 #include <dvdmedia.h>
 #include <mpconfig.h>
-#ifndef _WIN64
-#include <qt/qt.h>
-#endif
 
 #include "../../../DSUtil/DSUtil.h"
 

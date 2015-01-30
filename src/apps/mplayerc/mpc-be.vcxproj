@@ -254,12 +254,7 @@
     <ClCompile Include="PPageSubtitles.cpp" />
     <ClCompile Include="PPageSync.cpp" />
     <ClCompile Include="PPageWebServer.cpp" />
-    <ClCompile Include="QuicktimeGraph.cpp">
-      <ExcludedFromBuild Condition="'$(PlatForm)'=='x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="RateControl.cpp" />
-    <ClCompile Include="RealMediaGraph.cpp" />
-    <ClCompile Include="RealMediaWindowlessSite.cpp" />
     <ClCompile Include="RegFilterChooserDlg.cpp" />
     <ClCompile Include="SaveDlg.cpp" />
     <ClCompile Include="SaveTextFileDialog.cpp" />
@@ -374,11 +369,6 @@
     <ClInclude Include="PPageSubtitles.h" />
     <ClInclude Include="PPageSync.h" />
     <ClInclude Include="PPageWebServer.h" />
-    <ClInclude Include="QuicktimeGraph.h">
-      <ExcludedFromBuild Condition="'$(PlatForm)'=='x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="RealMediaGraph.h" />
-    <ClInclude Include="RealMediaWindowlessSite.h" />
     <ClInclude Include="RegFilterChooserDlg.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SaveDlg.h" />

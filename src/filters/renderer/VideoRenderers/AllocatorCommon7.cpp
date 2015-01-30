@@ -27,9 +27,6 @@
 
 #include "DX7AllocatorPresenter.h"
 #include "VMR7AllocatorPresenter.h"
-#include "RM7AllocatorPresenter.h"
-#include "QT7AllocatorPresenter.h"
-
 
 bool IsVMR7InGraph(IFilterGraph* pFG)
 {
@@ -55,12 +52,6 @@ HRESULT CreateAP7(const CLSID& clsid, HWND hWnd, ISubPicAllocatorPresenter** ppA
 
 	if ( IsEqualCLSID(clsid, CLSID_VMR7AllocatorPresenter) ) {
 		*ppAP = DNew CVMR7AllocatorPresenter(hWnd, hr);
-	}
-	else if ( IsEqualCLSID(clsid, CLSID_RM7AllocatorPresenter) ) {
-		*ppAP = DNew CRM7AllocatorPresenter(hWnd, hr);
-	}
-	else if ( IsEqualCLSID(clsid, CLSID_QT7AllocatorPresenter) ) {
-		*ppAP = DNew CQT7AllocatorPresenter(hWnd, hr);
 	}
 	else {
 		return E_FAIL;
