@@ -147,7 +147,6 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_IN32},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_FL32},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_FL64},
-	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM},        // only for sample rate > 192 kHz
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_IEEE_FLOAT}, // only for 64-bit float PCM
 	// ADPCM
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_IMA4},
@@ -640,8 +639,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 			   subtype == MEDIASUBTYPE_PCM_IN24 ||
 			   subtype == MEDIASUBTYPE_PCM_IN32) {
 		hr = ProcessPCMintBE();
-	} else if (subtype == MEDIASUBTYPE_PCM_SOWT ||
-			   subtype == MEDIASUBTYPE_PCM) {
+	} else if (subtype == MEDIASUBTYPE_PCM_SOWT) {
 		hr = ProcessPCMintLE();
 	} else if (subtype == MEDIASUBTYPE_PCM_FL32 ||
 			   subtype == MEDIASUBTYPE_PCM_FL64) {
@@ -2383,7 +2381,6 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 					|| subtype == MEDIASUBTYPE_PCM_IN32
 					|| subtype == MEDIASUBTYPE_PCM_FL32
 					|| subtype == MEDIASUBTYPE_PCM_FL64
-					|| subtype == MEDIASUBTYPE_PCM
 					|| subtype == MEDIASUBTYPE_IEEE_FLOAT) {
 				infostr += "PCM";
 			}

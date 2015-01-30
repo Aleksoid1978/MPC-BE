@@ -2383,7 +2383,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_PCM_IN32);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_PCM_FL32);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_PCM_FL64);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_PCM); // only for sample rate > 192 kHz
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IEEE_FLOAT); // only for 64-bit float PCM
 		/* todo: this should not depend on PCM */
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IMA4);
