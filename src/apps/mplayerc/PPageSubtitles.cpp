@@ -109,8 +109,8 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 		m_cbSubtitleRenderer.DeleteString(i);
 	}
 
-	m_cbSubtitleRenderer.AddString(L"Do not show subtitles");		// SUBRNDT_NONE
-	m_cbSubtitleRenderer.AddString(L"Internal subtitle renderer");	// SUBRNDT_ISR
+	m_cbSubtitleRenderer.AddString(ResStr(IDS_SUB_NOT_USE));		// SUBRNDT_NONE
+	m_cbSubtitleRenderer.AddString(ResStr(IDS_SUB_USE_INTERNAL));	// SUBRNDT_ISR
 	m_cbSubtitleRenderer.AddString(L"VSFilter/xy-VSFilter");		// SUBRNDT_VSFILTER
 	m_cbSubtitleRenderer.AddString(L"XySubFilter");					// SUBRNDT_XYSUBFILTER
 
