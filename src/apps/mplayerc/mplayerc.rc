@@ -1096,21 +1096,21 @@ IDD_PPAGESUBTITLES DIALOGEX 0, 0, 296, 241
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Subtitle renderer:",IDC_STATIC,10,6,74,8
+    LTEXT           "Subtitle renderer:",IDC_STATIC,10,7,74,8
     COMBOBOX        IDC_COMBO2,89,4,201,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Prefer external subtitles over embedded subtitles",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,52,285,8
-    CONTROL         "Ignore embedded subtitles",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,64,285,8
-    EDITTEXT        IDC_EDIT1,10,30,224,13,ES_AUTOHSCROLL
-    GROUPBOX        "Autoload paths",IDC_STATIC,5,17,286,31
-    PUSHBUTTON      "Reset",IDC_BUTTON1,237,30,50,13
-    LTEXT           "Base URL of the online subtitle database:",IDC_STATIC,10,113,222,8
-    COMBOBOX        IDC_COMBO1,35,125,199,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Test",IDC_BUTTON2,237,124,50,14
-    LTEXT           "http://",IDC_STATIC,10,127,22,8
-    GROUPBOX        "Online database",IDC_STATIC,5,102,286,45
-    CONTROL         "Auto-reload subtitle files after detecting modification",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,76,285,8
-    CONTROL         "Use Subresync",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,88,285,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,55,285,8
+    CONTROL         "Ignore embedded subtitles",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,67,285,8
+    EDITTEXT        IDC_EDIT1,10,33,224,13,ES_AUTOHSCROLL
+    GROUPBOX        "Autoload paths",IDC_STATIC,5,20,286,31
+    PUSHBUTTON      "Reset",IDC_BUTTON1,237,33,50,13
+    LTEXT           "Base URL of the online subtitle database:",IDC_STATIC,10,116,222,8
+    COMBOBOX        IDC_COMBO1,35,128,199,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Test",IDC_BUTTON2,237,127,50,14
+    LTEXT           "http://",IDC_STATIC,10,130,22,8
+    GROUPBOX        "Online database",IDC_STATIC,5,105,286,45
+    CONTROL         "Auto-reload subtitle files after detecting modification",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,8
+    CONTROL         "Use Subresync",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,8
 END
 
 IDD_UPDATE_DIALOG DIALOGEX 0, 0, 238, 60
@@ -2360,12 +2360,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_RMSYSDEF            "Real's own renderer. SMIL scripts will work, but interaction not likely. Uses DirectDraw and runs in Overlay when it can."
-    IDC_RMDX7               "The output of Real's engine rendered by the DX7-based Allocator-Presenter of VMR-7 (renderless)."
-    IDC_RMDX9               "The output of Real's engine rendered by the DX9-based Allocator-Presenter of VMR-9 (renderless)."
-    IDC_QTSYSDEF            "QuickTime's own renderer. Gets a little slow when its video area is resized or partially covered by another window. When Overlay is not available it likes to fall back to GDI."
-    IDC_QTDX7               "The output of QuickTime's engine rendered by the DX7-based Allocator-Presenter of VMR-7 (renderless)."
-    IDC_QTDX9               "The output of QuickTime's engine rendered by the DX9-based Allocator-Presenter of VMR-9 (renderless)."
     IDC_REGULARSURF         "Video surface will be allocated as a regular offscreen surface."
     IDS_PPAGE_OUTPUT_OVERLAYMIXER   "Overlay Mixer Renderer"
     IDS_PPAGE_OUTPUT_VMR7WINDOWED   "Video Mixing Renderer 7 (windowed)"
@@ -2812,8 +2806,6 @@ BEGIN
     IDS_MAINFRM_59          "{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}File Name: %s\\N%sResolution: %dx%d %s\\NDuration: %02d:%02d:%02d"
     IDS_MAINFRM_60          "To load subtitles you have to change the video renderer type and reopen the file.\n"
     IDS_MAINFRM_61          "- DirectShow: VMR-7/VMR-9 (renderless), EVR Custom, EVR Sync, or Haali\n"
-    IDS_MAINFRM_62          "- RealMedia: Special renderer for RealMedia, or open it through DirectShow\n"
-    IDS_MAINFRM_63          "- QuickTime: DX7 or DX9 renderer for QuickTime\n"
     IDS_MAINFRM_64          "- ShockWave: n/a\n"
 END
 
@@ -2831,7 +2823,6 @@ BEGIN
     IDS_AG_SHADER           "Shader: "
     IDS_AG_OUT_OF_MEMORY    "Out of memory"
     IDS_MAINFRM_77          "Error: Flash player for IE is required"
-    IDS_MAINFRM_78          "QuickTime not yet supported for X64 (apple library not available)"
     IDS_MAINFRM_80          "Failed to create the filter graph object"
     IDS_MAINFRM_81          "Invalid argument"
     IDS_MAINFRM_82          "Opening aborted"
@@ -2922,8 +2913,6 @@ STRINGTABLE
 BEGIN
     IDS_D3DFS_WARNING       "This option is designed to avoid tearing. However, it will also prevent MPC-BE from displaying the context menu and any dialog box during playback.\n\nTo exit Direct3D fullscreen and stop playback, you must press: Ctrl + C.\n\nDo you really want to activate this option?"
     IDS_MAINFRM_139         "Sub delay: %ld ms"
-    IDS_REALVIDEO_INCOMPATIBLE 
-                            "Filename contains unsupported characters (use only A-Z, 0-9)"
     IDS_PPSDB_URLCORRECT    "The URL appears to be correct!"
     IDS_PPSDB_PROTOCOLERR   "Protocol version mismatch, please upgrade your player or choose a different address!"
 END
@@ -3311,8 +3300,6 @@ BEGIN
     IDS_GOTO_ERROR_PARSING_FPS          "Error parsing the entered frame rate!"
     IDS_GOTO_ERROR_INVALID_TIME         "The entered time is greater than the file duration."
     IDS_FRAME_STEP_ERROR_RENDERER       "Cannot frame step, try a different video renderer."
-    IDS_SCREENSHOT_ERROR_REAL           "The 'Save Image' and 'Save Thumbnails' functions do not work with the default video renderer for RealMedia.\nSelect one of the DirectX renderers for RealMedia in MPC-BE's output options and reopen the file."
-    IDS_SCREENSHOT_ERROR_QT             "The 'Save Image' and 'Save Thumbnails' functions do not work with the default video renderer for QuickTime.\nSelect one of the DirectX renderers for QuickTime in MPC-BE's output options and reopen the file."
     IDS_SCREENSHOT_ERROR_SHOCKWAVE      "The 'Save Image' and 'Save Thumbnails' functions do not work for Shockwave files."
     IDS_SCREENSHOT_ERROR_OVERLAY        "The 'Save Image' and 'Save Thumbnails' functions do not work with the Overlay Mixer video renderer.\nChange the video renderer in MPC's output options and reopen the file."
     IDS_SCREENSHOT_ERROR_MADVR          "The 'Save Image' and 'Save Thumbnails' functions do not work with the madVR video renderer.\nChange the video renderer in MPC's output options and reopen the file."

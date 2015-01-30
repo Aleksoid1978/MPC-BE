@@ -6356,8 +6356,6 @@ void CMainFrame::OnFileLoadSubtitle()
 	if (!m_pCAP && !b_UseVSFilter) {
 		AfxMessageBox(ResStr(IDS_MAINFRM_60)+
 					  ResStr(IDS_MAINFRM_61)+
-					  ResStr(IDS_MAINFRM_62)+
-					  ResStr(IDS_MAINFRM_63)+
 					  ResStr(IDS_MAINFRM_64)
 					  , MB_OK);
 		return;

@@ -707,12 +707,6 @@
 #define IDC_DSEVR_CUSTOM                10711
 #define IDC_DSMADVR                     10712
 #define IDC_DSSYNC                      10713
-#define IDC_RMSYSDEF                    10720
-#define IDC_RMDX7                       10721
-#define IDC_RMDX9                       10722
-#define IDC_QTSYSDEF                    10723
-#define IDC_QTDX7                       10724
-#define IDC_QTDX9                       10725
 #define IDC_REULARSURF                  10726
 #define IDC_REGULARSURF                 10727
 #define IDC_TEXTURESURF2D               10728
@@ -733,6 +727,14 @@
 #define IDC_CACH_SIZE                   10744
 #define IDC_PERFOMANCE_DEFAULT          10745
 #define IDC_BUTTON_MI_CLIPBOARD         10746
+#define IDC_BUTTON_CLRFONT              10747
+#define IDC_BUTTON_CLRGRAD1             10748
+#define IDC_BUTTON_CLRGRAD2             10749
+#define IDC_SLIDER_OSDTRANS             10750
+#define IDC_CHECK_SHADOW                10751
+#define IDC_CHECK_AA                    10752
+#define IDC_VIDRND_COMBO                10753
+#define IDC_AUDRND_COMBO                10754
 //
 // 11000...13999 are reserved
 //
@@ -1068,8 +1070,6 @@
 #define IDS_MAINFRM_59                  33066
 #define IDS_MAINFRM_60                  33067
 #define IDS_MAINFRM_61                  33068
-#define IDS_MAINFRM_62                  33069
-#define IDS_MAINFRM_63                  33070
 #define IDS_MAINFRM_64                  33071
 #define IDS_MAINFRM_65                  33072
 #define IDS_MAINFRM_66                  33073
@@ -1081,7 +1081,6 @@
 #define IDS_AG_SHADER                   33080
 #define IDS_AG_OUT_OF_MEMORY            33081
 #define IDS_MAINFRM_77                  33082
-#define IDS_MAINFRM_78                  33083
 #define IDS_MAINFRM_80                  33084
 #define IDS_MAINFRM_81                  33085
 #define IDS_MAINFRM_82                  33086
@@ -1144,7 +1143,6 @@
 #define IDS_D3DFS_WARNING               33190
 #define IDS_MAINFRM_139                 33191
 #define IDS_AG_TITLE2                   33192
-#define IDS_REALVIDEO_INCOMPATIBLE      33193
 #define IDS_THUMB_ROWNUMBER             33195
 #define IDS_THUMB_COLNUMBER             33196
 #define IDS_THUMB_IMAGE_WIDTH           33197
@@ -1426,8 +1424,6 @@
 #define IDS_GOTO_ERROR_PARSING_TEXT     41271
 #define IDS_GOTO_ERROR_PARSING_FPS      41272
 #define IDS_FRAME_STEP_ERROR_RENDERER   41273
-#define IDS_SCREENSHOT_ERROR_REAL       41274
-#define IDS_SCREENSHOT_ERROR_QT         41275
 #define IDS_SCREENSHOT_ERROR_SHOCKWAVE  41276
 #define IDS_SCREENSHOT_ERROR_OVERLAY    41277
 #define IDS_SUBDL_DLG_CONNECT_ERROR     41278
@@ -1571,10 +1567,6 @@
 #define IDS_PPAGE_OUTPUT_NULL_UNCOMP    42011
 #define IDS_PPAGE_OUTPUT_MADVR          42012
 #define IDS_PPAGE_OUTPUT_SYNC           42013
-#define IDC_VIDRND_COMBO                42014
-#define IDC_RMRND_COMBO                 42015
-#define IDC_QTRND_COMBO                 42016
-#define IDC_AUDRND_COMBO                42017
 #define IDS_PPAGE_OUTPUT_UNAVAILABLE    42018
 #define IDS_PPAGE_OUTPUT_UNAVAILABLEMSG 42019
 #define IDS_DOWNLOAD_SUBS               42020
@@ -1584,12 +1576,6 @@
 #define IDS_AG_LOAD_AUDIO               43006
 #define IDS_AG_OSD_LOCAL_TIME           44002
 #define IDS_AG_OSD_FILE_NAME            44004
-#define IDC_BUTTON_CLRFONT              44010
-#define IDC_BUTTON_CLRGRAD1             44011
-#define IDC_BUTTON_CLRGRAD2             44012
-#define IDC_SLIDER_OSDTRANS             44013
-#define IDC_CHECK_SHADOW                44014
-#define IDC_CHECK_AA                    44015
 #define IDS_AG_WINDOW_TO_PRIMARYSCREEN  44102
 #define IDS_EXTERNAL                    44103
 #define IDS_SUB_SAVE_EXTERNAL_STYLE_FILE 44104
