@@ -1251,6 +1251,9 @@
 #define IDS_SUB_POS_LEFT                34012
 #define IDS_SUB_POS_RIGHT               34013
 #define IDS_SUB_POS_RESTORE             34014
+// subtitle renderer
+#define IDS_SUB_NOT_USE                 34020
+#define IDS_SUB_USE_INTERNAL            34021
 // youtube
 #define IDS_PUBLISHED                   34100
 // video files

@@ -3496,6 +3496,8 @@ BEGIN
     IDS_SUB_POS_RIGHT                   "Subtitle shift positions right"
     IDS_SUB_POS_RESTORE                 "Restore the position of subtitles"
     IDS_SUB_SAVE_EXTERNAL_STYLE_FILE    "Save custom style"
+    IDS_SUB_NOT_USE                     "Do not show subtitles"
+    IDS_SUB_USE_INTERNAL                "Internal subtitle renderer"
 END
 
 STRINGTABLE
