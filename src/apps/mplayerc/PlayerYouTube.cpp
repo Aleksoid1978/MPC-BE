@@ -24,11 +24,11 @@
 #include "../../DSUtil/text.h"
 #include <jsoncpp/include/json/json.h>
 
-#define MATCH_STREAM_MAP_START		"\"url_encoded_fmt_stream_map\": \""
-#define MATCH_ADAPTIVE_FMTS_START	"\"adaptive_fmts\": \""
+#define MATCH_STREAM_MAP_START		"\"url_encoded_fmt_stream_map\":\""
+#define MATCH_ADAPTIVE_FMTS_START	"\"adaptive_fmts\":\""
 #define MATCH_WIDTH_START			"meta property=\"og:video:width\" content=\""
-#define MATCH_DASHMPD_START			"\"dashmpd\": \"http:\\/\\/www.youtube.com\\/api\\/manifest\\/dash\\/"
-#define MATCH_HLSVP_START			"\"hlsvp\": \""
+#define MATCH_DASHMPD_START			"\"dashmpd\":\"http:\\/\\/www.youtube.com\\/api\\/manifest\\/dash\\/"
+#define MATCH_HLSVP_START			"\"hlsvp\":\""
 #define MATCH_END					"\""
 
 #define MATCH_PLAYLIST_ITEM_START	"<li class=\"yt-uix-scroller-scroll-unit "
