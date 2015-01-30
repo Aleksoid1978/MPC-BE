@@ -16334,6 +16334,10 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 {
 	AppSettings& s = AfxGetAppSettings();
 
+	if (!s.IsISRAutoLoadEnabled()) {
+		return false;
+	}
+
 	CComPtr<ISubStream> pSubStream;
 	CString fname = subItem;
 
