@@ -92,8 +92,6 @@ protected:
 
 enum engine_t {
 	DirectShow = 0,
-	RealMedia,
-	QuickTime,
 	ShockWave
 };
 

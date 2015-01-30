@@ -237,15 +237,6 @@
     <ClCompile Include="PPageWebServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="QuicktimeGraph.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RealMediaGraph.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RealMediaWindowlessSite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RegFilterChooserDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -573,15 +564,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PPageWebServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="QuicktimeGraph.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RealMediaGraph.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RealMediaWindowlessSite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RegFilterChooserDlg.h">
