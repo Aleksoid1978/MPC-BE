@@ -1438,6 +1438,7 @@ bool CMPCVideoDecFilter::IsAVI()
 		DbgLog((LOG_TRACE, 3, _T("CMPCVideoDecFilter::IsAVI() : '%s' is not valid AVI file"), fname));
 	}
 
+	m_fSYNC = -1; // set non-zero value to avoid recheck of the file
 	return false;
 }
 
