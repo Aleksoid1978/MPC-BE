@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include <algorithm>
+#include <chrono>
 #include <intsafe.h>
 #include "SubPicQueueImpl.h"
 #include "../DSUtil/DSUtil.h"
@@ -388,7 +389,8 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, bool bAdvis
 							   || (!m_queue.IsEmpty() && m_queue.GetTail()->GetStop() > rtNow);
 					};
 
-					m_condQueueReady.wait(lock, queueReady);
+					auto duration = bAdviseBlocking ? std::chrono::milliseconds(m_rtTimePerFrame / 10000) : std::chrono::seconds(1);
+					m_condQueueReady.wait_for(lock, duration, queueReady);
 				}
 			}
 		} else {
