@@ -19,8 +19,9 @@
  */
 
 #include "stdafx.h"
-#include "PPageSubtitles.h"
 #include "ISDb.h"
+#include <moreuuids.h>
+#include "PPageSubtitles.h"
 
 // CPPageSubtitles dialog
 
@@ -109,10 +110,28 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 		m_cbSubtitleRenderer.DeleteString(i);
 	}
 
-	m_cbSubtitleRenderer.AddString(ResStr(IDS_SUB_NOT_USE));		// SUBRNDT_NONE
-	m_cbSubtitleRenderer.AddString(ResStr(IDS_SUB_USE_INTERNAL));	// SUBRNDT_ISR
-	m_cbSubtitleRenderer.AddString(L"VSFilter/xy-VSFilter");		// SUBRNDT_VSFILTER
-	m_cbSubtitleRenderer.AddString(L"XySubFilter");					// SUBRNDT_XYSUBFILTER
+	AppSettings& s = AfxGetAppSettings();
+	CString str;
+
+	m_cbSubtitleRenderer.AddString(ResStr(IDS_SUB_NOT_USE)); // SUBRNDT_NONE
+
+	str = ResStr(IDS_SUB_USE_INTERNAL);
+	if (!s.IsISRSelect()) {
+		str += " ** not available**";
+	}
+	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_ISR
+
+	str = L"VSFilter/xy-VSFilter";
+	if (!IsCLSIDRegistered(CLSID_VSFilter_autoloading)) {
+		str += " ** not installed**";
+	}
+	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_VSFILTER
+
+	str = L"XySubFilter";
+	if (!IsCLSIDRegistered(CLSID_XySubFilter_AutoLoader)) {
+		str += " ** not installed**";
+	}
+	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_XYSUBFILTER
 
 	if (m_cbSubtitleRenderer.SetCurSel(select) == CB_ERR) {
 		m_cbSubtitleRenderer.SetCurSel(1);
