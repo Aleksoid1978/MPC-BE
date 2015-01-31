@@ -218,7 +218,7 @@ BOOL CPPageVideo::OnInitDialog()
 		}
 
 		if (!IsRenderTypeAvailable(nID, m_hWnd)) {
-			sName.AppendFormat(L" %s", ResStr(IDS_PPAGE_OUTPUT_UNAVAILABLE));
+			sName.AppendFormat(L" %s", ResStr(IDS_REND_NOT_AVAILABLE));
 		}
 
 		m_iDSVideoRendererTypeCtrl.SetItemData(m_iDSVideoRendererTypeCtrl.AddString(sName), nID);

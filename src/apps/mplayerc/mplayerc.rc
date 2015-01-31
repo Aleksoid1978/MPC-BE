@@ -2373,8 +2373,10 @@ BEGIN
     IDS_PPAGE_OUTPUT_NULL_UNCOMP    "Null (uncompressed)"
     IDS_PPAGE_OUTPUT_MADVR          "madVR"
     IDS_PPAGE_OUTPUT_SYNC           "Sync Video Renderer"
-    IDS_PPAGE_OUTPUT_UNAVAILABLE    "**unavailable**"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "The selected renderer is not installed."
+    IDS_REND_NOT_AVAILABLE          "**not available**"
+    IDS_REND_NOT_INSTALLED          "**not installed**"
+
 END
 
 STRINGTABLE

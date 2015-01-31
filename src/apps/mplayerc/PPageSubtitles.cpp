@@ -117,19 +117,19 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 
 	str = ResStr(IDS_SUB_USE_INTERNAL);
 	if (!s.IsISRSelect()) {
-		str += " ** not available**";
+		str += L" " + ResStr(IDS_REND_NOT_AVAILABLE);
 	}
 	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_ISR
 
 	str = L"VSFilter/xy-VSFilter";
 	if (!IsCLSIDRegistered(CLSID_VSFilter_autoloading)) {
-		str += " ** not installed**";
+		str += L" " + ResStr(IDS_REND_NOT_INSTALLED);
 	}
 	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_VSFILTER
 
 	str = L"XySubFilter";
 	if (!IsCLSIDRegistered(CLSID_XySubFilter_AutoLoader)) {
-		str += " ** not installed**";
+		str += L" " + ResStr(IDS_REND_NOT_INSTALLED);
 	}
 	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_XYSUBFILTER
 
