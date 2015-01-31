@@ -385,6 +385,22 @@ CMPlayerCApp::CMPlayerCApp()
 //	: m_hMutexOneInstance(NULL)
 {
 	GetRemoteControlCode = GetRemoteControlCodeMicrosoft;
+
+	// set program directory as current directory
+	WCHAR buf[MAX_PATH+1];
+	GetModuleFileNameW(NULL, buf, MAX_PATH);
+	WCHAR *p = buf;
+	WCHAR *lastslash = NULL;
+	while (*p) {
+		if (*p == '\\') {
+			lastslash = p;
+		}
+		p++;
+	}
+	if (lastslash)  {
+		*lastslash = 0;
+	}
+	SetCurrentDirectoryW(buf);
 }
 
 void CMPlayerCApp::ShowCmdlnSwitches() const
