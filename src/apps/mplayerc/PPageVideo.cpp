@@ -301,7 +301,7 @@ BOOL CPPageVideo::OnApply()
 	CRenderersSettings& renderersSettings                   = s.m_RenderersSettings;
 	s.iDSVideoRendererType		                            = m_iDSVideoRendererType = m_iDSVideoRendererType_store = m_iDSVideoRendererTypeCtrl.GetItemData(m_iDSVideoRendererTypeCtrl.GetCurSel());
 	renderersSettings.iAPSurfaceUsage	                    = m_iAPSurfaceUsage;
-	renderersSettings.iDX9Resizer							= m_cbDX9ResizerCtrl.GetCurSel();
+	renderersSettings.iDX9Resizer							= (int)m_cbDX9ResizerCtrl.GetItemData(m_cbDX9ResizerCtrl.GetCurSel());
 	renderersSettings.fVMRMixerMode							= !!m_fVMRMixerMode;
 	renderersSettings.fVMRMixerYUV		                    = !!m_fVMRMixerYUV;
 
@@ -329,27 +329,28 @@ void CPPageVideo::UpdateResizerList(int select)
 		m_cbDX9ResizerCtrl.DeleteString(i);
 	}
 
-	m_cbDX9ResizerCtrl.AddString(L"Nearest neighbor");
-	m_cbDX9ResizerCtrl.AddString(L"Bilinear");
+	m_cbDX9ResizerCtrl.SetItemData(m_cbDX9ResizerCtrl.AddString(L"Nearest neighbor"), RESIZER_NEAREST);
+	m_cbDX9ResizerCtrl.SetItemData(m_cbDX9ResizerCtrl.AddString(L"Bilinear"), RESIZER_BILINEAR);
 
 	if (m_iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
-		m_cbDX9ResizerCtrl.AddString(L"Bilinear (PS 2.0)");
-		m_cbDX9ResizerCtrl.AddString(L"Bicubic A=-0.6 (PS 2.0)");
-		m_cbDX9ResizerCtrl.AddString(L"Bicubic A=-0.8 (PS 2.0)");
-		m_cbDX9ResizerCtrl.AddString(L"Bicubic A=-1.0 (PS 2.0)");
-		m_cbDX9ResizerCtrl.AddString(L"Perlin Smootherstep (PS 2.0)");
-		m_cbDX9ResizerCtrl.AddString(L"B-spline4 (PS 2.0)");
-		m_cbDX9ResizerCtrl.AddString(L"Mitchell-Netravali spline4 (PS 2.0)");
-		m_cbDX9ResizerCtrl.AddString(L"Catmull-Rom spline4 (PS 2.0)");
+		m_cbDX9ResizerCtrl.SetItemData(m_cbDX9ResizerCtrl.AddString(L"Perlin Smootherstep (PS 2.0)"), RESIZER_SHADER_SMOOTHERSTEP);
+		m_cbDX9ResizerCtrl.SetItemData(m_cbDX9ResizerCtrl.AddString(L"Bicubic A=-0.6 (PS 2.0)"), RESIZER_SHADER_BICUBIC06);
+		m_cbDX9ResizerCtrl.SetItemData(m_cbDX9ResizerCtrl.AddString(L"Bicubic A=-0.8 (PS 2.0)"), RESIZER_SHADER_BICUBIC08);
+		m_cbDX9ResizerCtrl.SetItemData(m_cbDX9ResizerCtrl.AddString(L"Bicubic A=-1.0 (PS 2.0)"), RESIZER_SHADER_BICUBIC10);
+		m_cbDX9ResizerCtrl.SetItemData(m_cbDX9ResizerCtrl.AddString(L"B-spline4 (PS 2.0)"), RESIZER_SHADER_BSPLINE4);
+		m_cbDX9ResizerCtrl.SetItemData(m_cbDX9ResizerCtrl.AddString(L"Mitchell-Netravali spline4 (PS 2.0)"), RESIZER_SHADER_MITCHELL4);
+		m_cbDX9ResizerCtrl.SetItemData(m_cbDX9ResizerCtrl.AddString(L"Catmull-Rom spline4 (PS 2.0)"), RESIZER_SHADER_CATMULL4);
 #if ENABLE_2PASS_RESIZE
-		m_cbDX9ResizerCtrl.AddString(L"Lanczos2 (PS 2.0)");
+		m_cbDX9ResizerCtrl.SetItemData(m_cbDX9ResizerCtrl.AddString(L"Lanczos2 (PS 2.0)"), RESIZER_SHADER_LANCZOS2);
 #endif
 	}
 
-	int gg = m_cbDX9ResizerCtrl.SetCurSel(select);
-
-	if (m_cbDX9ResizerCtrl.SetCurSel(select) == CB_ERR) {
-		m_cbDX9ResizerCtrl.SetCurSel(1);
+	m_cbDX9ResizerCtrl.SetCurSel(1); // default
+	for (int i = 0; i < m_cbDX9ResizerCtrl.GetCount(); i++) {
+		if ((int)m_cbDX9ResizerCtrl.GetItemData(i) == select) {
+			m_cbDX9ResizerCtrl.SetCurSel(select);
+			break;
+		}
 	}
 }
 

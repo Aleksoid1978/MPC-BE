@@ -27,7 +27,6 @@
 #include "../SubPic/SubPicAllocatorPresenterImpl.h"
 
 enum {
-	shader_bilinear = 0,
 	shader_smootherstep,
 #if ENABLE_2PASS_RESIZE
 	shader_bicubic06_x,
