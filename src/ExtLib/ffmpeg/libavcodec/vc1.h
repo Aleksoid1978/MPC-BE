@@ -394,7 +394,9 @@ typedef struct VC1Context{
 
     int parse_only;              ///< Context is used within parser
     int resync_marker;           ///< could this stream contain resync markers
+
     // ==> Start patch MPC
+    int recovered;
     int second_field_offset;
     void* pPictureParameters;
     void* pSliceInfo;
