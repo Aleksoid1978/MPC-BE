@@ -1015,9 +1015,6 @@ HRESULT CBaseAP::InitShaderResizer(int iShader)
 	};
 
 	switch (iShader) {
-	case shader_bilinear:
-		pSrcData = shader_resizer_bilinear;
-		break;
 	case shader_smootherstep:
 		pSrcData = shader_resizer_smootherstep;
 		break;
@@ -1434,20 +1431,21 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			hr = E_FAIL;
 
 			switch (iDX9Resizer) {
-			case 0: hr = S_OK; break;
-			case 1: hr = S_OK; break;
-			case 2: hr = InitShaderResizer(shader_bilinear); break;
-			case 6: hr = InitShaderResizer(shader_smootherstep); break;
-			case 3: hr = InitShaderResizer(shader_bicubic06); break;
-			case 4: hr = InitShaderResizer(shader_bicubic08); break;
-			case 5: hr = InitShaderResizer(shader_bicubic10); break;
-			case 7: hr = InitShaderResizer(shader_bspline4); break;
-			case 8: hr = InitShaderResizer(shader_mitchell4); break;
-			case 9: hr = InitShaderResizer(shader_catmull4); break;
+			case RESIZER_NEAREST:
+			case RESIZER_BILINEAR:
+				hr = S_OK;
+				break;
+			case RESIZER_SHADER_SMOOTHERSTEP: hr = InitShaderResizer(shader_smootherstep); break;
+			case RESIZER_SHADER_BICUBIC06: hr = InitShaderResizer(shader_bicubic06); break;
+			case RESIZER_SHADER_BICUBIC08: hr = InitShaderResizer(shader_bicubic08); break;
+			case RESIZER_SHADER_BICUBIC10: hr = InitShaderResizer(shader_bicubic10); break;
+			case RESIZER_SHADER_BSPLINE4:  hr = InitShaderResizer(shader_bspline4);  break;
+			case RESIZER_SHADER_MITCHELL4: hr = InitShaderResizer(shader_mitchell4); break;
+			case RESIZER_SHADER_CATMULL4:  hr = InitShaderResizer(shader_catmull4);  break;
 			}
 
 			if (FAILED(hr)) {
-				iDX9Resizer = 1;
+				iDX9Resizer = RESIZER_BILINEAR;
 			}
 
 			bool bScreenSpacePixelShaders = !m_pPixelShadersScreenSpace.IsEmpty();
@@ -1487,16 +1485,15 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 			if (rSrcVid.Size() != rDstVid.Size()) {
 				switch (iDX9Resizer) {
-				case 0: hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT); break;
-				case 1: hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_LINEAR); break;
-				case 2: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bilinear); break;
-				case 6: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_smootherstep); break;
-				case 3: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic06); break;
-				case 4: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic08); break;
-				case 5: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic10); break;
-				case 7: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bspline4); break;
-				case 8: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_mitchell4); break;
-				case 9: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_catmull4); break;
+				case RESIZER_NEAREST:  hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT);  break;
+				case RESIZER_BILINEAR: hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_LINEAR); break;
+				case RESIZER_SHADER_SMOOTHERSTEP: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_smootherstep); break;
+				case RESIZER_SHADER_BICUBIC06: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic06); break;
+				case RESIZER_SHADER_BICUBIC08: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic08); break;
+				case RESIZER_SHADER_BICUBIC10: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic10); break;
+				case RESIZER_SHADER_BSPLINE4:  hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bspline4);  break;
+				case RESIZER_SHADER_MITCHELL4: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_mitchell4); break;
+				case RESIZER_SHADER_CATMULL4:  hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_catmull4);  break;
 				}
 			} else {
 				hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT);
