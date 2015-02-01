@@ -18833,8 +18833,8 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 	m_LastOpenBDPath.Empty();
 
 	path.TrimRight('\\');
-	if (path.Right(11).MakeLower() == L"\\index.bdmv") {
-		path.Truncate(path.GetLength() - 11);
+	if (path.Right(5).MakeLower() == L".bdmv") {
+		path.Truncate(path.ReverseFind('\\'));
 	} else if (::PathIsDirectory(path + L"\\BDMV")) {
 		path += L"\\BDMV";
 	}
@@ -18844,7 +18844,7 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 		CString			strPlaylistFile;
 		CHdmvClipInfo::CPlaylist MainPlaylist;
 
-		if (SUCCEEDED (ClipInfo.FindMainMovie(path, strPlaylistFile, MainPlaylist, m_MPLSPlaylist))) {
+		if (SUCCEEDED(ClipInfo.FindMainMovie(path, strPlaylistFile, MainPlaylist, m_MPLSPlaylist))) {
 			if (path.Right(5).MakeUpper() == L"\\BDMV") {
 				path.Truncate(path.GetLength() - 5);
 				CString infFile = path + L"\\disc.inf";
