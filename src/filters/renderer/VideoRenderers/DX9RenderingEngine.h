@@ -52,6 +52,7 @@ enum {
 	shader_bspline4,
 	shader_mitchell4,
 	shader_catmull4,
+	shader_downscaling,
 #endif
 	shader_count
 };
