@@ -783,10 +783,10 @@ HRESULT CDX9RenderingEngine::TextureResize(IDirect3DTexture9* pTexture, Vector d
 	float dy2 = 1.0f/h;
 
 	MYD3DVERTEX<1> v[] = {
-		{dst[0].x, dst[0].y, dst[0].z, 1.0f/dst[0].z,  srcRect.left * dx2, srcRect.top * dy2},
-		{dst[1].x, dst[1].y, dst[1].z, 1.0f/dst[1].z,  srcRect.right * dx2, srcRect.top * dy2},
-		{dst[2].x, dst[2].y, dst[2].z, 1.0f/dst[2].z,  srcRect.left * dx2, srcRect.bottom * dy2},
-		{dst[3].x, dst[3].y, dst[3].z, 1.0f/dst[3].z,  srcRect.right * dx2, srcRect.bottom * dy2},
+		{dst[0].x, dst[0].y, dst[0].z, 1.0f/dst[0].z, {srcRect.left * dx2,  srcRect.top * dy2} },
+		{dst[1].x, dst[1].y, dst[1].z, 1.0f/dst[1].z, {srcRect.right * dx2, srcRect.top * dy2} },
+		{dst[2].x, dst[2].y, dst[2].z, 1.0f/dst[2].z, {srcRect.left * dx2,  srcRect.bottom * dy2} },
+		{dst[3].x, dst[3].y, dst[3].z, 1.0f/dst[3].z, {srcRect.right * dx2, srcRect.bottom * dy2} },
 	};
 	AdjustQuad(v, 0, 0);
 

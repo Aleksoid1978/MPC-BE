@@ -22,6 +22,20 @@
 
 #pragma once
 
+// Nearest neighbor
+char const shader_resizer_nearest[] =
+"#if Ml\n"
+"#define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))\n"
+"#endif\n"
+
+"sampler s0 : register(s0);"
+"float2 dxdy : register(c0);"
+
+"float4 main(float2 tex : TEXCOORD0) : COLOR"
+"{"
+	"return tex2D(s0, (tex+.5)*dxdy);"// output nearest neighbor
+"}";
+
 // Bilinear
 char const shader_resizer_bilinear[] =
 "#if Ml\n"
