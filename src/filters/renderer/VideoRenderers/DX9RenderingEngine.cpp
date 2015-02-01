@@ -753,6 +753,11 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 #endif
 	} else {
 		hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[iShader], &ErrorMessage);
+
+		if (hr == S_OK && m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) && !m_pResizerPixelShaders[shader_downscaling]) {
+			pSrcData = shader_resizer_downscaling;
+			hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling], &ErrorMessage);
+		}
 	}
 
 	if (FAILED(hr)) {
@@ -803,6 +808,11 @@ HRESULT CDX9RenderingEngine::TextureResizeShader(IDirect3DTexture9* pTexture, Ve
 		return E_FAIL;
 	}
 
+	const float w = sqrt(pow(dst[1].x - dst[0].x, 2) + pow(dst[1].y - dst[0].y, 2) + pow(dst[1].z - dst[0].z, 2));
+	const float h = sqrt(pow(dst[2].x - dst[0].x, 2) + pow(dst[2].y - dst[0].y, 2) + pow(dst[2].z - dst[0].z, 2));
+	const float rx = srcRect.Width() / w;
+	const float ry = srcRect.Height() / h;
+
 	// make const to give compiler a chance of optimising, also float faster than double and converted to float to sent to PS anyway
 	const float dx = 1.0f/(float)desc.Width;
 	const float dy = 1.0f/(float)desc.Height;
@@ -820,10 +830,16 @@ HRESULT CDX9RenderingEngine::TextureResizeShader(IDirect3DTexture9* pTexture, Ve
 
 	hr = m_pD3DDev->SetTexture(0, pTexture);
 
-	float fConstData[][4] = {{dx, dy, 0, 0}, {dx*0.5f, dy*0.5f, 0, 0}, {dx, 0, 0, 0}, {0, dy, 0, 0}};
-	hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-
-	hr = m_pD3DDev->SetPixelShader(m_pResizerPixelShaders[iShader]);
+	if (m_pResizerPixelShaders[shader_downscaling] && rx > 2.0f && ry > 2.0f) {
+		float fConstData[][4] = {{dx, dy, 0, 0}, {rx, 0, 0, 0}, {ry, 0, 0, 0}};
+		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+		hr = m_pD3DDev->SetPixelShader(m_pResizerPixelShaders[shader_downscaling]);
+	}
+	else {
+		float fConstData[][4] = { { dx, dy, 0, 0 }, { dx*0.5f, dy*0.5f, 0, 0 }, { dx, 0, 0, 0 }, { 0, dy, 0, 0 } };
+		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+		hr = m_pD3DDev->SetPixelShader(m_pResizerPixelShaders[iShader]);
+	}
 	hr = TextureBlt(m_pD3DDev, v, D3DTEXF_POINT);
 
 	return hr;
