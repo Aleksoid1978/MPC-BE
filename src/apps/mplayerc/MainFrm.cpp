@@ -7511,49 +7511,53 @@ void CMainFrame::OnViewCaptionmenu()
 	s.iCaptionMenuMode++;
 	s.iCaptionMenuMode %= MODE_COUNT; // three states: normal->borderless->frame only->
 
-	if ( m_fFullScreen ) {
+	if (m_fFullScreen) {
 		return;
 	}
 
 	DWORD dwRemove = 0, dwAdd = 0;
 	DWORD dwFlags = SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOZORDER;
-	HMENU hMenu = NULL;
+
+	DWORD dwMenuFlags = GetMenuBarVisibility();
 
 	CRect wr;
-	GetWindowRect( &wr );
+	GetWindowRect(&wr);
 
 	switch (s.iCaptionMenuMode) {
 		case MODE_SHOWCAPTIONMENU:	// borderless -> normal
 			dwAdd = WS_CAPTION | WS_THICKFRAME;
-			hMenu = m_hMenuDefault;
+			dwMenuFlags = AFX_MBV_KEEPVISIBLE;
 			wr.right  += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
 			wr.bottom += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
 			wr.bottom += GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU);
 			break;
 
 		case MODE_HIDEMENU:			// normal -> hidemenu
-			hMenu =  NULL;
+			dwMenuFlags = AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10;
 			wr.bottom -= GetSystemMetrics(SM_CYMENU);
 			break;
 
 		case MODE_FRAMEONLY:		// hidemenu -> frameonly
 			dwRemove = WS_CAPTION;
+			dwMenuFlags = AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10;
 			wr.right  -= 2;
 			wr.bottom -= GetSystemMetrics(SM_CYCAPTION) + 2;
 			break;
 
 		case MODE_BORDERLESS:		// frameonly -> borderless
 			dwRemove = WS_THICKFRAME;
+			dwMenuFlags = AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10;
 			wr.right  -= GetSystemMetrics(SM_CXSIZEFRAME) * 2 - 2;
 			wr.bottom -= GetSystemMetrics(SM_CYSIZEFRAME) * 2 - 2;
 			break;
 	}
 
 	ModifyStyle(dwRemove, dwAdd, SWP_NOZORDER);
-	::SetMenu(m_hWnd, hMenu);
 	if (IsZoomed()) { // If the window is maximized, we want it to stay maximized.
 		dwFlags |= SWP_NOSIZE;
 	}
+	
+	SetMenuBarVisibility(dwMenuFlags);
 	// NOTE: wr.left and wr.top are ignored due to SWP_NOMOVE flag
 	SetWindowPos(NULL, wr.left, wr.top, wr.Width(), wr.Height(), dwFlags);
 
@@ -10921,8 +10925,8 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		} else if (s.iCaptionMenuMode == MODE_BORDERLESS) {
 			ModifyStyle(WS_CAPTION | WS_THICKFRAME, 0, SWP_NOZORDER);
 		}
-		::SetMenu(m_hWnd, NULL);
-		SetWindowPos(NULL, 0, 0, 0, 0, SWP_FRAMECHANGED|SWP_NOSIZE|SWP_NOMOVE|SWP_NOZORDER);
+		SetMenuBarVisibility(AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10);
+		SetWindowPos(NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER);
 	}
 
 	if (!s.fRememberWindowPos) {
@@ -11122,7 +11126,6 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	CRect r;
 	DWORD dwRemove = 0, dwAdd = 0;
 	DWORD dwRemoveEx = 0, dwAddEx = 0;
-	HMENU hMenu;
 	MONITORINFO mi;
 	mi.cbSize = sizeof(MONITORINFO);
 
@@ -11170,17 +11173,17 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 		} else {
 			GetDesktopWindow()->GetWindowRect(&r);
 		}
-		hMenu = NULL;
+
+		SetMenuBarVisibility(AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10);
 	} else {
 		if (s.AutoChangeFullscrRes.bEnabled == 1 && s.AutoChangeFullscrRes.bApplyDefault && s.AutoChangeFullscrRes.dmFullscreenRes[0].bChecked == 1) {
 			SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[0].dmFSRes, s.strFullScreenMonitor);
 		}
 
-		dwAdd = (s.iCaptionMenuMode==MODE_BORDERLESS ? 0 : s.iCaptionMenuMode==MODE_FRAMEONLY? WS_THICKFRAME: WS_CAPTION | WS_THICKFRAME);
+		dwAdd = (s.iCaptionMenuMode == MODE_BORDERLESS ? 0 : s.iCaptionMenuMode == MODE_FRAMEONLY? WS_THICKFRAME: WS_CAPTION | WS_THICKFRAME);
 		if (!m_fFirstFSAfterLaunchOnFS) {
 			r = m_lastWindowRect;
 		}
-		hMenu = (s.iCaptionMenuMode==MODE_SHOWCAPTIONMENU) ? m_hMenuDefault: NULL;
 
 		if (s.bHidePlaylistFullScreen && m_wndPlaylistBar.IsHiddenDueToFullscreen()) {
 			m_wndPlaylistBar.SetHiddenDueToFullscreen(false);
@@ -11198,7 +11201,6 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	ModifyStyle(dwRemove, dwAdd, SWP_NOZORDER);
 	ModifyStyleEx(dwRemoveEx, dwAddEx, SWP_NOZORDER);
-	::SetMenu(m_hWnd, hMenu);
 
 	static bool m_Change_Monitor = false;
 	// try disable shader when move from one monitor to other ...
@@ -11230,8 +11232,8 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 				ShowControls(CS_NONE, false);
 				ShowControlBar(&m_wndNavigationBar, false, TRUE);
 			} else if (nTimeOut > 0) {
-				SetTimer(TIMER_FULLSCREENCONTROLBARHIDER, nTimeOut*1000, NULL);
-				SetTimer(TIMER_FULLSCREENMOUSEHIDER, max(nTimeOut*1000, 2000), NULL);
+				SetTimer(TIMER_FULLSCREENCONTROLBARHIDER, nTimeOut * 1000, NULL);
+				SetTimer(TIMER_FULLSCREENMOUSEHIDER, max(nTimeOut * 1000, 2000), NULL);
 			}
 		} else {
 			ShowControls(CS_NONE, false);
@@ -11272,7 +11274,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 				r = CRect(r.left, r.top, r.left + vsize.cx, r.top + vsize.cy);
 				ShowWindow(SW_HIDE);
 			}
-			SetWindowPos(NULL, r.left, r.top, r.Width(), r.Height(), SWP_NOZORDER|SWP_NOSENDCHANGING);
+			SetWindowPos(NULL, r.left, r.top, r.Width(), r.Height(), SWP_NOZORDER | SWP_NOSENDCHANGING);
 			if (!s.fRememberWindowSize) {
 				ZoomVideoWindow();
 				ShowWindow(SW_SHOW);
@@ -11282,7 +11284,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 				GetMonitorInfo(m_LastWindow_HM, &mi);
 				r = mi.rcMonitor;
 				ShowWindow(SW_HIDE);
-				SetWindowPos(NULL, r.left, r.top, r.Width(), r.Height(), SWP_NOZORDER|SWP_NOSENDCHANGING);
+				SetWindowPos(NULL, r.left, r.top, r.Width(), r.Height(), SWP_NOZORDER | SWP_NOSENDCHANGING);
 			}
 			ZoomVideoWindow();
 			if (m_LastWindow_HM != hm_cur) {
@@ -11291,10 +11293,15 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 		}
 		m_fFirstFSAfterLaunchOnFS = false;
 	} else {
-		SetWindowPos(NULL, r.left, r.top, r.Width(), r.Height(), SWP_NOZORDER|SWP_NOSENDCHANGING);
+		SetWindowPos(NULL, r.left, r.top, r.Width(), r.Height(), SWP_NOZORDER | SWP_NOSENDCHANGING);
 	}
 
 	SetAlwaysOnTop(s.iOnTop);
+
+	if (!m_fFullScreen) {
+		SetMenuBarVisibility(s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU ?
+							 AFX_MBV_KEEPVISIBLE : AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10);
+	}
 
 	MoveVideoWindow();
 
@@ -17929,11 +17936,6 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 		oldMenu->DestroyMenu();
 	}
 	m_hMenuDefault = defaultMenu.Detach();
-
-	if (AfxGetAppSettings().iCaptionMenuMode != MODE_SHOWCAPTIONMENU) {
-		HMENU hMenu = NULL;
-		::SetMenu(m_hWnd, hMenu);
-	}
 
 	// Re-create Win 7 TaskBar preview button for change button hint
 	CreateThumbnailToolbar();
