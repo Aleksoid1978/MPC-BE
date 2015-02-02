@@ -343,7 +343,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 
 		screenSpacePassCount++; // currently all resizers are 1-pass
 #if ENABLE_2PASS_RESIZE
-		if (iDX9Resizer >= 3 && iDX9Resizer != 6 && srcRect.Size() != destRect.Size()) {
+		if (iDX9Resizer >= RESIZER_SHADER_BICUBIC06 && iDX9Resizer != RESIZER_SHADER_SMOOTHERSTEP && srcRect.Size() != destRect.Size()) {
 			screenSpacePassCount++;
 		}
 #endif
@@ -364,8 +364,8 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		}
 	} else {
 		bCustomPixelShaders = false;
-		if (iDX9Resizer != 0) {
-			iDX9Resizer = 1;
+		if (iDX9Resizer != RESIZER_NEAREST) {
+			iDX9Resizer = RESIZER_BILINEAR;
 		}
 		bCustomScreenSpacePixelShaders = false;
 		bFinalPass = false;
@@ -547,7 +547,7 @@ HRESULT CDX9RenderingEngine::RenderVideoStretchRectPath(IDirect3DSurface9* pRend
 		return S_OK;
 	}
 
-	D3DTEXTUREFILTERTYPE filter = GetRenderersSettings().iDX9Resizer == 0 ? D3DTEXF_POINT : D3DTEXF_LINEAR;
+	D3DTEXTUREFILTERTYPE filter = GetRenderersSettings().iDX9Resizer == RESIZER_NEAREST ? D3DTEXF_POINT : D3DTEXF_LINEAR;
 
 	CRect rSrcVid(srcRect);
 	CRect rDstVid(destRect);

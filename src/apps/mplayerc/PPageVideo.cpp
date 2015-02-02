@@ -348,7 +348,7 @@ void CPPageVideo::UpdateResizerList(int select)
 	m_cbDX9ResizerCtrl.SetCurSel(1); // default
 	for (int i = 0; i < m_cbDX9ResizerCtrl.GetCount(); i++) {
 		if ((int)m_cbDX9ResizerCtrl.GetItemData(i) == select) {
-			m_cbDX9ResizerCtrl.SetCurSel(select);
+			m_cbDX9ResizerCtrl.SetCurSel(i);
 			break;
 		}
 	}
@@ -379,7 +379,7 @@ void CPPageVideo::OnSurfaceChange()
 			break;
 	}
 
-	UpdateResizerList(m_cbDX9ResizerCtrl.GetCurSel());
+	UpdateResizerList(AfxGetAppSettings().m_RenderersSettings.iDX9Resizer);
 
 	SetModified();
 }
