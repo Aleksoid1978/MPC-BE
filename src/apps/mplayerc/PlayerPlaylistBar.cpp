@@ -1012,8 +1012,13 @@ static CString CombinePath(CPath p, CString fn)
 	if (fn.Find(':') >= 0 || fn.Find(_T("\\")) == 0) {
 		return fn;
 	}
+	
 	p.Append(CPath(fn));
-	return (LPCTSTR)p;
+	CString out(p);
+	if (out.Find(L"://")) {
+		out.Replace('\\', '/');
+	}
+	return out;
 }
 
 bool CPlayerPlaylistBar::ParseBDMVPlayList(CString fn)
@@ -1180,7 +1185,13 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 	}
 
 	CPath base(fn);
-	base.RemoveFileSpec();
+	if (fn.Find(L"://")) {
+		CString tmp(fn);
+		tmp.Truncate(tmp.ReverseFind('/'));
+		base = (CPath)tmp;
+	} else {
+		base.RemoveFileSpec();
+	}
 
 	CPlaylistItem *pli = NULL;
 
@@ -1194,7 +1205,6 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 
 		if (!pli) {
 			pli = DNew CPlaylistItem;
-			pli->m_type = CPlaylistItem::file;
 		}
 
 		if (str.Find(L"#") == 0) {
