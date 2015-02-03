@@ -1560,7 +1560,9 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 		}
 	}
 
-	AlphaBltSubPic(rDstPri, rDstVid);
+	if (m_pSubPicProvider) {
+		AlphaBltSubPic(rDstPri, rDstVid);
+	}
 
 	if (m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_UPDATE) {
 		CAutoLock BitMapLock(&m_VMR9AlphaBitmapLock);

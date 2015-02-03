@@ -1252,7 +1252,9 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	// paint subtitles on the backbuffer
-	AlphaBltSubPic(rDstPri, rDstVid);
+	if (m_pSubPicProvider) {
+		AlphaBltSubPic(rDstPri, rDstVid);
+	}
 
 	if (pApp->m_bResetStats) {
 		ResetStats();
