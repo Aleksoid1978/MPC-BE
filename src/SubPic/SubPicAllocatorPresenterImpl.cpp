@@ -111,24 +111,26 @@ void CSubPicAllocatorPresenterImpl::InitMaxSubtitleTextureSize(int maxSize, CSiz
 
 void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, SubPicDesc* pTarget)
 {
-	CComPtr<ISubPic> pSubPic;
-	if (m_pSubPicQueue->LookupSubPic(m_rtNow, !IsRendering(), pSubPic)) {
-		CRect rcSubs(windowRect);
+	if (m_pSubPicProvider) {
+		CComPtr<ISubPic> pSubPic;
+		if (m_pSubPicQueue->LookupSubPic(m_rtNow, !IsRendering(), pSubPic)) {
+			CRect rcSubs(windowRect);
 
-		CRenderersSettings& s = GetRenderersSettings();
-		if (s.bSideBySide) {
-			CRect rcTemp(windowRect);
-			rcTemp.right -= rcTemp.Width() / 2;
-			AlphaBlt(rcTemp, videoRect, pSubPic, pTarget);
-			rcSubs.left += rcSubs.Width() / 2;
-		} else if (s.bTopAndBottom) {
-			CRect rcTemp(windowRect);
-			rcTemp.bottom -= rcTemp.Height() / 2;
-			AlphaBlt(rcTemp, videoRect, pSubPic, pTarget);
-			rcSubs.top += rcSubs.Height() / 2;
+			CRenderersSettings& s = GetRenderersSettings();
+			if (s.bSideBySide) {
+				CRect rcTemp(windowRect);
+				rcTemp.right -= rcTemp.Width() / 2;
+				AlphaBlt(rcTemp, videoRect, pSubPic, pTarget);
+				rcSubs.left += rcSubs.Width() / 2;
+			} else if (s.bTopAndBottom) {
+				CRect rcTemp(windowRect);
+				rcTemp.bottom -= rcTemp.Height() / 2;
+				AlphaBlt(rcTemp, videoRect, pSubPic, pTarget);
+				rcSubs.top += rcSubs.Height() / 2;
+			}
+
+			AlphaBlt(rcSubs, videoRect, pSubPic, pTarget);
 		}
-
-		AlphaBlt(rcSubs, videoRect, pSubPic, pTarget);
 	}
 }
 
