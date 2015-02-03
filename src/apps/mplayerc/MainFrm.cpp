@@ -11362,7 +11362,9 @@ void CMainFrame::AutoChangeMonitorMode()
 			MediaFPS = miFPS;
 		} else {
 			const REFERENCE_TIME rtAvgTimePerFrame = std::llround(GetAvgTimePerFrame() * 10000000i64);
-			MediaFPS = 10000000.0 / rtAvgTimePerFrame;
+			if (rtAvgTimePerFrame > 0) {
+				MediaFPS = 10000000.0 / rtAvgTimePerFrame;
+			}
 		}
 
 		for (int rs = 0; rs < MaxFpsCount ; rs++) {
