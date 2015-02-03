@@ -127,9 +127,7 @@ HRESULT CDXRAllocatorPresenter::Render(
 		m_pSubPicQueue->SetFPS(10000000.0 / atpf);
 	}
 
-	if (m_pSubPicProvider) {
-		AlphaBltSubPic(wndRect, videoRect);
-	}
+	AlphaBltSubPic(wndRect, videoRect);
 
 	return S_OK;
 }

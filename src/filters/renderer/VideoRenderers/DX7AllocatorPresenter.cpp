@@ -389,9 +389,7 @@ STDMETHODIMP_(bool) CDX7AllocatorPresenter::Paint(bool fAll)
 	}
 
 	// paint subtitles on the backbuffer
-	if (m_pSubPicProvider) {
-		AlphaBltSubPic(rDstPri, rDstVid);
-	}
+	AlphaBltSubPic(rDstPri, rDstVid);
 
 	// wait vsync
 	if (fAll) {
