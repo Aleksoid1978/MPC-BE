@@ -11360,34 +11360,9 @@ void CMainFrame::AutoChangeMonitorMode()
 		double MediaFPS = 0.0;
 		if (s.IsD3DFullscreen() && miFPS > 0.9) {
 			MediaFPS = miFPS;
-		}
-		else if (GetPlaybackMode() == PM_FILE) {
-			LONGLONG m_rtTimePerFrame = 1;
-			// if ExtractAvgTimePerFrame isn't executed then MediaFPS=10000000.0,
-			// (int)(MediaFPS + 0.5)=10000000 and SetDispMode is executed to Default.
-			BeginEnumFilters(m_pGB, pEF, pBF) {
-				BeginEnumPins(pBF, pEP, pPin) {
-					CMediaTypeEx mt;
-					PIN_DIRECTION dir;
-					if (FAILED(pPin->QueryDirection(&dir)) || dir != PINDIR_OUTPUT
-							|| FAILED(pPin->ConnectionMediaType(&mt))) {
-						continue;
-					}
-					ExtractAvgTimePerFrame(&mt, m_rtTimePerFrame);
-				}
-				EndEnumPins;
-			}
-			EndEnumFilters;
-			MediaFPS = 10000000.0 / m_rtTimePerFrame;
-		}
-		else if (GetPlaybackMode() == PM_DVD) {
-			DVD_PLAYBACK_LOCATION2 Location;
-			if (m_pDVDI->GetCurrentLocation(&Location) == S_OK) {
-				MediaFPS  = Location.TimeCodeFlags == DVD_TC_FLAG_25fps ? 25.0
-							: Location.TimeCodeFlags == DVD_TC_FLAG_30fps ? 30.0
-							: Location.TimeCodeFlags == DVD_TC_FLAG_DropFrame ? 29.97
-							: 25.0;
-			}
+		} else {
+			const REFERENCE_TIME rtAvgTimePerFrame = std::llround(GetAvgTimePerFrame() * 10000000i64);
+			MediaFPS = 10000000.0 / rtAvgTimePerFrame;
 		}
 
 		for (int rs = 0; rs < MaxFpsCount ; rs++) {
@@ -14200,6 +14175,9 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			mi_fn = fn;
 		}
 
+		miFPS	= 0.0;
+		s.dFPS	= 0.0;
+
 		if ((s.AutoChangeFullscrRes.bEnabled == 1 && s.IsD3DFullscreen()) || s.AutoChangeFullscrRes.bEnabled == 2) {
 			// DVD
 			if (pDVDData) {
@@ -14221,7 +14199,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 					CHdmvClipInfo ClipInfo;
 					CHdmvClipInfo::CPlaylist CurPlaylist;
 					REFERENCE_TIME rtDuration;
-					if (SUCCEEDED (ClipInfo.ReadPlaylist(mi_fn, rtDuration, CurPlaylist))) {
+					if (SUCCEEDED(ClipInfo.ReadPlaylist(mi_fn, rtDuration, CurPlaylist))) {
 						mi_fn = CurPlaylist.GetHead()->m_strFileName;
 					}
 				} else if (ext == _T(".IFO")) {
@@ -14243,31 +14221,40 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			}
 
 			// Get FPS
-			miFPS	= 0.0;
-			s.dFPS	= 0.0;
-
 			MediaInfo MI;
 			MI.Option(_T("ParseSpeed"), _T("0"));
 			if (MI.Open(mi_fn.GetString())) {
-				CString strFPS =  MI.Get(Stream_Video, 0, _T("FrameRate"), Info_Text, Info_Name).c_str();
-				if (strFPS.IsEmpty() || _wtof(strFPS) > 200.0) {
-					strFPS =  MI.Get(Stream_Video, 0, _T("FrameRate_Original"), Info_Text, Info_Name).c_str();
-				}
-				CString strST = MI.Get(Stream_Video, 0, _T("ScanType"), Info_Text, Info_Name).c_str();
-				CString strSO = MI.Get(Stream_Video, 0, _T("ScanOrder"), Info_Text, Info_Name).c_str();
+				for (int i = 0; i < 2; i++) {
+					CString strFPS = MI.Get(Stream_Video, 0, _T("FrameRate"), Info_Text, Info_Name).c_str();
+					if (strFPS.IsEmpty() || _wtof(strFPS) > 200.0) {
+						strFPS = MI.Get(Stream_Video, 0, _T("FrameRate_Original"), Info_Text, Info_Name).c_str();
+					}
+					CString strST = MI.Get(Stream_Video, 0, _T("ScanType"), Info_Text, Info_Name).c_str();
+					CString strSO = MI.Get(Stream_Video, 0, _T("ScanOrder"), Info_Text, Info_Name).c_str();
 
-				double nFactor = 1.0;
+					double nFactor = 1.0;
 
-				// 2:3 pulldown
-				if (strFPS == _T("29.970") && (strSO == _T("2:3 Pulldown") || (strST == _T("Progressive") && (strSO == _T("TFF") || strSO  == _T("BFF") || strSO  == _T("2:3 Pulldown"))))) {
-					strFPS = _T("23.976");
-				} else if (strST == _T("Interlaced") || strST == _T("MBAFF")) {
-					// double fps for Interlaced video.
-					nFactor = 2.0;
-				}
-				miFPS = _wtof(strFPS);
-				if (miFPS < 30.0 && nFactor > 1.0) {
-					miFPS *= nFactor;
+					// 2:3 pulldown
+					if (strFPS == _T("29.970") && (strSO == _T("2:3 Pulldown") || (strST == _T("Progressive") && (strSO == _T("TFF") || strSO == _T("BFF") || strSO == _T("2:3 Pulldown"))))) {
+						strFPS = _T("23.976");
+					} else if (strST == _T("Interlaced") || strST == _T("MBAFF")) {
+						// double fps for Interlaced video.
+						nFactor = 2.0;
+					}
+					miFPS = _wtof(strFPS);
+					if (miFPS < 30.0 && nFactor > 1.0) {
+						miFPS *= nFactor;
+					}
+
+					if (miFPS > 0.9) {
+						break;
+					}
+
+					MI.Close();
+					MI.Option(_T("ParseSpeed"), _T("0.5"));
+					if (!MI.Open(mi_fn.GetString())) {
+						break;
+					}
 				}
 				s.dFPS	= miFPS;
 
