@@ -856,8 +856,17 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 		return E_FAIL;
 	}
 
-	if (!m_pScreenSpaceTextures[1]) {
-		return TextureResize(pTexture, dst, srcRect, D3DTEXF_LINEAR);
+	UINT texWidth = min((UINT)m_ScreenSize.cx, m_Caps.MaxTextureWidth);
+	UINT TexHeight = min((UINT)m_nativeVideoSize.cy, m_Caps.MaxTextureHeight);
+	if (!m_pResizeTexture) {
+		hr = m_pD3DDev->CreateTexture(
+					texWidth, TexHeight, 1, D3DUSAGE_RENDERTARGET,
+					m_SurfaceType == D3DFMT_A32B32G32R32F ? D3DFMT_A32B32G32R32F : D3DFMT_A16B16G16R16F, // use only float textures here
+					D3DPOOL_DEFAULT, &m_pResizeTexture, NULL);
+		if (FAILED(hr)) {
+			m_pResizeTexture = NULL;
+			return TextureResize(pTexture, dst, srcRect, D3DTEXF_LINEAR);
+		}
 	}
 
 	float w2 = sqrt(pow(dst[1].x - dst[0].x, 2) + pow(dst[1].y - dst[0].y, 2) + pow(dst[1].z - dst[0].z, 2));
@@ -869,10 +878,10 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 	const float dx0 = 1.0f/(float)desc.Width;
 	const float dy0 = 1.0f/(float)desc.Height;
 
-	float w1 = min(w2, (float)m_ScreenSpaceTexWidth);
-	float h1 = (float)min(srcRect.Height(), m_ScreenSpaceTexHeight);
+	float w1 = min(w2, (float)texWidth);
+	float h1 = (float)min(srcRect.Height(), (int)TexHeight);
 
-	if (FAILED(m_pScreenSpaceTextures[1]->GetLevelDesc(0, &desc))) {
+	if (FAILED(m_pResizeTexture->GetLevelDesc(0, &desc))) {
 		return TextureResize(pTexture, dst, srcRect, D3DTEXF_LINEAR);
 	}
 
@@ -906,7 +915,7 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 	hr = m_pD3DDev->GetRenderTarget(0, &pRenderTarget);
 	// set temp RenderTarget
 	CComPtr<IDirect3DSurface9> pTempRenderTarget;
-	hr = m_pScreenSpaceTextures[1]->GetSurfaceLevel(0, &pTempRenderTarget);
+	hr = m_pResizeTexture->GetSurfaceLevel(0, &pTempRenderTarget);
 	hr = m_pD3DDev->SetRenderTarget(0, pTempRenderTarget);
 
 	// resize width
@@ -927,7 +936,7 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 	hr = m_pD3DDev->SetRenderTarget(0, pRenderTarget);
 
 	// resize height
-	hr = m_pD3DDev->SetTexture(0, m_pScreenSpaceTextures[1]);
+	hr = m_pD3DDev->SetTexture(0, m_pResizeTexture);
 	if (ry > 2.0f) {
 		float fConstData[][4] = {{dx1, dy1, 0, 0}, {rx, 0, 0, 0}, {ry, 0, 0, 0}};
 		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
