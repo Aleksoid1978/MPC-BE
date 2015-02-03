@@ -136,7 +136,11 @@ HRESULT CmadVRAllocatorPresenter::Render(
 		m_fps = (double)(10000000.0 / atpf);
 		m_pSubPicQueue->SetFPS(m_fps);
 	}
-	AlphaBltSubPic(wndRect, videoRect);
+
+	if (m_pSubPicProvider) {
+		AlphaBltSubPic(wndRect, videoRect);
+	}
+
 	return S_OK;
 }
 
