@@ -602,11 +602,7 @@ HRESULT CDX9RenderingEngine::InitScreenSpaceTextures(size_t count)
 	}
 
 	m_ScreenSpaceTexWidth = min(m_ScreenSize.cx, (int)m_Caps.MaxTextureWidth);
-#if ENABLE_2PASS_RESIZE
-	m_ScreenSpaceTexHeight = min(max(m_ScreenSize.cy, m_nativeVideoSize.cy), (int)m_Caps.MaxTextureHeight);
-#else
 	m_ScreenSpaceTexHeight = min(m_ScreenSize.cy, (int)m_Caps.MaxTextureHeight);
-#endif
 
 	for (size_t i = 0; i < count; i++) {
 		if (m_pScreenSpaceTextures[i] == NULL) {
