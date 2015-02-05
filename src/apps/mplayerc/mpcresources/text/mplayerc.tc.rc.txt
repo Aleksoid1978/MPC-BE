@@ -54,7 +54,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"組織我的最愛"
-8		"更名"
+8		"Edit"
 9		"上移"
 10		"下移"
 11		"刪除"
@@ -91,6 +91,13 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 10		"輸入兩組數字來跳至指定的影格。第一個數字指的是影格號碼，第二個數字指的是影格播放速率。"
 11		"影格:"
 13		"前往"
+END
+
+BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
+5		"&Save"
+6		"&Cansel"
+7		"Title:"
+9		"Path:"
 END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
@@ -1813,6 +1820,7 @@ STRING IDS_PPAGE_OUTPUT_VMR9WINDOWED		"VMR-9 (視窗式)"
 STRING IDS_PPSDB_BADURL		"錯誤的網址，無法定位字幕資料庫！"
 STRING IDS_PPSDB_PROTOCOLERR		"協定的版本不合，請升級您的播放程式或是選擇不同的網址！"
 STRING IDS_PPSDB_URLCORRECT		"網址應該正確！"
+STRING IDS_PROPERTIESFOR		"Properties for '%s'"
 STRING IDS_PROPSHEET_PROPERTIES		"內容"
 STRING IDS_PUBLISHED		"發佈時間 : "
 STRING IDS_RECENT_FILES		"最近的檔案"

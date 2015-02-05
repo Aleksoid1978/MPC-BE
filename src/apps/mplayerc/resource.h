@@ -552,6 +552,7 @@
 #define IDD_NAVIGATION_DLG              10063
 #define IDD_PPAGESUBRENDERING           10064
 #define IDD_UPDATE_DIALOG               10065
+#define IDD_ITEMPROPERTIES_DIALOG       10066
 // controls
 #define IDC_STATIC1                     10201
 #define IDC_STATIC2                     10202
@@ -1224,6 +1225,7 @@
 #define IDS_TOUCH_WINDOW_FROM_OUTSIDE   33433
 #define IDS_AUDIO_STREAM                33434
 #define IDS_AG_REOPEN                   33435
+#define IDS_PROPERTIESFOR               33436
 #define IDS_TIME_TOOLTIP_ABOVE          33440
 #define IDS_TIME_TOOLTIP_BELOW          33441
 #define IDS_VIDEO_STREAM                33442

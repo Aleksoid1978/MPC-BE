@@ -54,7 +54,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"Edycja zakładek"
-8		"Zmień nazwę"
+8		"Edit"
 9		"W górę"
 10		"W dół"
 11		"Usuń"
@@ -91,6 +91,13 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 10		"Możliwe jest także określenie położenia za pomocą numeru klatki oraz liczby kl./s nagrania wideo."
 11		"Klatka:"
 13		"Przejdź"
+END
+
+BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
+5		"&Save"
+6		"&Cansel"
+7		"Title:"
+9		"Path:"
 END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
@@ -1812,6 +1819,7 @@ STRING IDS_PPAGE_OUTPUT_VMR9WINDOWED		"Video Mixing Renderer 9 (windowed)"
 STRING IDS_PPSDB_BADURL		"Niepoprawny adres internetowy. Nie można odnaleźć bazy napisów."
 STRING IDS_PPSDB_PROTOCOLERR		"Niezgodna wersja protokołu. Proszę zaktualizować program lub wybrać inny adres."
 STRING IDS_PPSDB_URLCORRECT		"Adres internetowy jest poprawny."
+STRING IDS_PROPERTIESFOR		"Properties for '%s'"
 STRING IDS_PROPSHEET_PROPERTIES		"Właściwości"
 STRING IDS_PUBLISHED		"Published : "
 STRING IDS_RECENT_FILES		"Ostatnio otwarte"

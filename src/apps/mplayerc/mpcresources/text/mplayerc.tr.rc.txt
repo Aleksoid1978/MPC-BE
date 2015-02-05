@@ -54,7 +54,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"Sık Kullanılanları Düzenle"
-8		"Adlandır"
+8		"Edit"
 9		"Yukarı Taşı"
 10		"Aşağı Taşı"
 11		"Sil"
@@ -91,6 +91,13 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 10		"Belirtilmiş bir görüntüye atlamak için iki sayı giriniz. İlki çerçeve sayısı, ikincisi çerçeve oranı içindir."
 11		"Görüntü"
 13		"Git!"
+END
+
+BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
+5		"&Save"
+6		"&Cansel"
+7		"Title:"
+9		"Path:"
 END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
@@ -1813,6 +1820,7 @@ STRING IDS_PPAGE_OUTPUT_VMR9WINDOWED		"Video Mixing Renderer 9 (windowed)"
 STRING IDS_PPSDB_BADURL		"Hatalı adres, alt yazı veritabanı açılamıyor!"
 STRING IDS_PPSDB_PROTOCOLERR		"Uyumsuz iletişim kuralı sürümü, lütfen oynatıcınızı güncelleyiniz ya da farklı bir adres deneyiniz!"
 STRING IDS_PPSDB_URLCORRECT		"Adres doğru gözüküyor!"
+STRING IDS_PROPERTIESFOR		"Properties for '%s'"
 STRING IDS_PROPSHEET_PROPERTIES		"Seçenekler"
 STRING IDS_PUBLISHED		"Published : "
 STRING IDS_RECENT_FILES		"Belgelerim"

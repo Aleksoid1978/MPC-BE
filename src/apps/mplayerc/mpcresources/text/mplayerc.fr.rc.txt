@@ -54,7 +54,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"Organiser les favoris"
-8		"Renommer"
+8		"Edit"
 9		"Vers le haut"
 10		"Vers le bas"
 11		"Supprimer"
@@ -91,6 +91,13 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 10		"Saisissez deux valeurs numériques pour atteindre une image spécifique : la première indiquera le numéro de l'image, et la seconde le nombre d'images par secondes."
 11		"Image"
 13		"Atteindre"
+END
+
+BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
+5		"&Save"
+6		"&Cansel"
+7		"Title:"
+9		"Path:"
 END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
@@ -1813,6 +1820,7 @@ STRING IDS_PPAGE_OUTPUT_VMR9WINDOWED		"Video Mixing Renderer 9 (windowed)"
 STRING IDS_PPSDB_BADURL		"Adresse du site incorrect, impossible de contacter la base de données des sous-titres"
 STRING IDS_PPSDB_PROTOCOLERR		"Protocole de communication incorrect, veuillez mettre à jour MPC-BE ou bien sélectionner une autre adresse"
 STRING IDS_PPSDB_URLCORRECT		"Adresse du site correcte"
+STRING IDS_PROPERTIESFOR		"Properties for '%s'"
 STRING IDS_PROPSHEET_PROPERTIES		"Propriétés"
 STRING IDS_PUBLISHED		"Published : "
 STRING IDS_RECENT_FILES		"Fichiers récents"
