@@ -54,7 +54,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"Οργάνωση αγαπημένων"
-8		"Μετονομασία"
+8		"Edit"
 9		"Μετακίν. πάνω"
 10		"Μετακίν. κάτω"
 11		"Διαγραφή"
@@ -91,6 +91,13 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 10		"Εισάγετε δύο αριθμούς για να μεταβείτε σε ένα συγκεκριμένο καρέ. Ο πρώτος είναι ο αριθμός του καρέ και ο δεύτερος είναι ο ρυθμός μετάδοσης καρέ."
 11		"Καρέ"
 13		"Μετάβαση"
+END
+
+BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
+5		"&Save"
+6		"&Cansel"
+7		"Title:"
+9		"Path:"
 END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
@@ -1816,6 +1823,7 @@ STRING IDS_PPAGE_OUTPUT_VMR9WINDOWED		"Απόδοση μείξης βίντεο 
 STRING IDS_PPSDB_BADURL		"Εσφαλμένη διεύθυνση. Δεν υπάρχει βάση δεδομένων υποτίτλων εδώ!"
 STRING IDS_PPSDB_PROTOCOLERR		"Ασυμφωνία έκδοσης πρωτοκόλλου. Παρακαλώ να αναβαθμίσετε το πρόγραμμα αναπαραγωγής ή να επιλέξετε μια διαφορετική διεύθυνση!"
 STRING IDS_PPSDB_URLCORRECT		"Η διεύθυνση URL φαίνεται να είναι σωστή!"
+STRING IDS_PROPERTIESFOR		"Properties for '%s'"
 STRING IDS_PROPSHEET_PROPERTIES		"Ιδιότητες"
 STRING IDS_PUBLISHED		"Published : "
 STRING IDS_RECENT_FILES		"Πρόσφατα αρχεία"

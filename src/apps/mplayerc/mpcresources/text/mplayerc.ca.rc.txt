@@ -54,7 +54,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"Organitzar Favorits"
-8		"Renombrar"
+8		"Edit"
 9		"Pujar"
 10		"Baixar"
 11		"Borrar"
@@ -91,6 +91,13 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 10		"Escriu dos números per accedir a un cuadre específic, el primer es el núm. de cuadres i el segon la velocitat de cuadre."
 11		"Cuadre"
 13		"Ves!"
+END
+
+BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
+5		"&Save"
+6		"&Cansel"
+7		"Title:"
+9		"Path:"
 END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
@@ -1813,6 +1820,7 @@ STRING IDS_PPAGE_OUTPUT_VMR9WINDOWED		"Video Mixing Renderer 9 (windowed)"
 STRING IDS_PPSDB_BADURL		"URL errònia, no s'hi pot localitzar la base de dades de subtítols!"
 STRING IDS_PPSDB_PROTOCOLERR		"Versió del protocol diferent, actualitza el teu reproductor o escull una altre direcció!"
 STRING IDS_PPSDB_URLCORRECT		"La URL sembla correcta!"
+STRING IDS_PROPERTIESFOR		"Properties for '%s'"
 STRING IDS_PROPSHEET_PROPERTIES		"Propietats"
 STRING IDS_PUBLISHED		"Published : "
 STRING IDS_RECENT_FILES		"Arxius Recents"

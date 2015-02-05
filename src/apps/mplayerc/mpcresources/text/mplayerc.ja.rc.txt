@@ -54,7 +54,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"お気に入りの整理"
-8		"名前の変更"
+8		"Edit"
 9		"上へ"
 10		"下へ"
 11		"削除"
@@ -91,6 +91,13 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 10		"フレーム番号、フレームレートの順で数値を入力し、移動先フレームを指定してください。"
 11		"フレーム"
 13		"移動"
+END
+
+BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
+5		"&Save"
+6		"&Cansel"
+7		"Title:"
+9		"Path:"
 END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
@@ -1813,6 +1820,7 @@ STRING IDS_PPAGE_OUTPUT_VMR9WINDOWED		"Video Mixing Renderer 9 (ウィンドウ)
 STRING IDS_PPSDB_BADURL		"間違った URL です。字幕データベースがありません！"
 STRING IDS_PPSDB_PROTOCOLERR		"プロトコルのバージョンが一致しません。プレーヤーのアップグレードか違うアドレスを選択してください！"
 STRING IDS_PPSDB_URLCORRECT		"URL は正しいと思われます！"
+STRING IDS_PROPERTIESFOR		"Properties for '%s'"
 STRING IDS_PROPSHEET_PROPERTIES		"プロパティ"
 STRING IDS_PUBLISHED		"発行 : "
 STRING IDS_RECENT_FILES		"最近使ったファイル"

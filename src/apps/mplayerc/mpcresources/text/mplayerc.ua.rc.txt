@@ -54,7 +54,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"Закладки"
-8		"Змінити ім'я"
+8		"Edit"
 9		"Догори"
 10		"Донизу"
 11		"Видалити"
@@ -91,6 +91,13 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 10		"Уведіть два числа для переходу до заданого кадру: перше - номер кадру, друге - кількість кадрів на секунду."
 11		"Кадр"
 13		"Перейти!"
+END
+
+BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
+5		"&Save"
+6		"&Cansel"
+7		"Title:"
+9		"Path:"
 END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
@@ -1813,6 +1820,7 @@ STRING IDS_PPAGE_OUTPUT_VMR9WINDOWED		"Video Mixing Renderer 9 (windowed)"
 STRING IDS_PPSDB_BADURL		"Введено неправильний URL, база субтитрів недоступна!"
 STRING IDS_PPSDB_PROTOCOLERR		"Версія протоколу не співпадає, Обновіть програму або виберіть інший сервер!"
 STRING IDS_PPSDB_URLCORRECT		"Введено правильний URL (напевно)!"
+STRING IDS_PROPERTIESFOR		"Properties for '%s'"
 STRING IDS_PROPSHEET_PROPERTIES		"Властивості"
 STRING IDS_PUBLISHED		"Опубліковано : "
 STRING IDS_RECENT_FILES		"&Недавно відкриті файли"

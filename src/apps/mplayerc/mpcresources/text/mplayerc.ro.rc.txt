@@ -54,7 +54,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"Organizare favorite"
-8		"Redenumește"
+8		"Edit"
 9		"Mută în sus"
 10		"Mută în jos"
 11		"Șterge"
@@ -91,6 +91,13 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 10		"Introduceți două numere pentru a sări la un cadru specificat, primul este numărul cadrului, al doilea este rata cadrelor."
 11		"Cadru"
 13		"Du-te!"
+END
+
+BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
+5		"&Save"
+6		"&Cansel"
+7		"Title:"
+9		"Path:"
 END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
@@ -1816,6 +1823,7 @@ STRING IDS_PPAGE_OUTPUT_VMR9WINDOWED		"Randor Mixare Video 9 (în fereastră)"
 STRING IDS_PPSDB_BADURL		"URL nevalid, baza de date a subtitrărilor nu a putut fi localizată!"
 STRING IDS_PPSDB_PROTOCOLERR		"Nepotrivire versiune protocol, actualizați playerul sau alegeți o altă adresă!"
 STRING IDS_PPSDB_URLCORRECT		"URL-ul pare a fi corect!"
+STRING IDS_PROPERTIESFOR		"Properties for '%s'"
 STRING IDS_PROPSHEET_PROPERTIES		"Proprietăți"
 STRING IDS_PUBLISHED		"Published : "
 STRING IDS_RECENT_FILES		"Fișiere recente"

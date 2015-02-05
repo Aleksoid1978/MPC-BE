@@ -54,7 +54,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"Organizar favoritos"
-8		"Renomear"
+8		"Edit"
 9		"Subir"
 10		"Baixar"
 11		"Apagar"
@@ -91,6 +91,13 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 10		"Entre com dois números para pular para o quadro específico, o primeiro é o número do quadro, o segundo é a taxa de quadros por segundo."
 11		"Quadro"
 13		"Ir..."
+END
+
+BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
+5		"&Save"
+6		"&Cansel"
+7		"Title:"
+9		"Path:"
 END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
@@ -1813,6 +1820,7 @@ STRING IDS_PPAGE_OUTPUT_VMR9WINDOWED		"Video Mixing Renderer 9 (windowed)"
 STRING IDS_PPSDB_BADURL		"URL ruim, não foi encontrada a base de dados de legendas!"
 STRING IDS_PPSDB_PROTOCOLERR		"Versão do protocolo não compativel, atualize seu tocador ou escolha outro endereço."
 STRING IDS_PPSDB_URLCORRECT		"A URL parece estar correta !!!!"
+STRING IDS_PROPERTIESFOR		"Properties for '%s'"
 STRING IDS_PROPSHEET_PROPERTIES		"Propriedades"
 STRING IDS_PUBLISHED		"Published : "
 STRING IDS_RECENT_FILES		"Arquivos recentes"

@@ -54,7 +54,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"Абранае"
-8		"Змяніць імя"
+8		"Edit"
 9		"Вышэй"
 10		"Ніжэй"
 11		"Выдаліць"
@@ -91,6 +91,13 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 10		"Увядзіце два ліка для пераходу да зададзенага кадра: першы - нумар кадра, другі - лік кадраў у секунду."
 11		"Кадр"
 13		"Наперад!"
+END
+
+BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
+5		"&Save"
+6		"&Cansel"
+7		"Title:"
+9		"Path:"
 END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
@@ -1813,6 +1820,7 @@ STRING IDS_PPAGE_OUTPUT_VMR9WINDOWED		"Video Mixing Renderer 9 (windowed)"
 STRING IDS_PPSDB_BADURL		"URL няслушны немагчыма выявіць базу субтытраў!"
 STRING IDS_PPSDB_PROTOCOLERR		"Версія пратаколу не супадае. Калі ласка абнавіце ваш плэер або абярыце іншы адрас!"
 STRING IDS_PPSDB_URLCORRECT		"Уведзены URL дакладны!"
+STRING IDS_PROPERTIESFOR		"Properties for '%s'"
 STRING IDS_PROPSHEET_PROPERTIES		"Уласцівасці"
 STRING IDS_PUBLISHED		"Published : "
 STRING IDS_RECENT_FILES		"Апошнія адкрыт. файлы"

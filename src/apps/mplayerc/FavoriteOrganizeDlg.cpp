@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
+#include "ItemPropertiesDlg.h"
 #include "FavoriteOrganizeDlg.h"
 
 // CFavoriteOrganizeDlg dialog
@@ -102,8 +103,8 @@ void CFavoriteOrganizeDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CFavoriteOrganizeDlg, CResizableDialog)
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, OnTcnSelchangeTab1)
 	ON_WM_DRAWITEM()
-	ON_BN_CLICKED(IDC_BUTTON1, OnRenameBnClicked)
-	ON_UPDATE_COMMAND_UI(IDC_BUTTON1, OnUpdateRenameBn)
+	ON_BN_CLICKED(IDC_BUTTON1, OnEditBnClicked)
+	ON_UPDATE_COMMAND_UI(IDC_BUTTON1, OnUpdateEditBn)
 	ON_BN_CLICKED(IDC_BUTTON2, OnDeleteBnClicked)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON2, OnUpdateDeleteBn)
 	ON_BN_CLICKED(IDC_BUTTON3, OnUpBnClicked)
@@ -209,15 +210,27 @@ void CFavoriteOrganizeDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStr
 	}
 }
 
-void CFavoriteOrganizeDlg::OnRenameBnClicked()
+void CFavoriteOrganizeDlg::OnEditBnClicked()
 {
 	if (POSITION pos = m_list.GetFirstSelectedItemPosition()) {
-		m_list.SetFocus();
-		m_list.EditLabel(m_list.GetNextSelectedItem(pos));
+		int nItem = m_list.GetNextSelectedItem(pos);
+		CString name = m_list.GetItemText(nItem, 0);
+
+		CAtlList<CString> args;
+		ExplodeEsc(m_sl[m_tab.GetCurSel()].GetAt((POSITION)m_list.GetItemData(nItem)), args, _T(';'));
+		CString path = args.RemoveTail();
+
+		CItemPropertiesDlg ipd(name, path);
+		if (ipd.DoModal() == IDOK) {
+			m_list.SetItemText(nItem, 0, ipd.GetPropertyName());
+			args.AddTail(ipd.GetPropertyPath());
+			CString str = ImplodeEsc(args, _T(';'));
+			m_sl[m_tab.GetCurSel()].SetAt((POSITION)m_list.GetItemData(nItem), str);
+		}
 	}
 }
 
-void CFavoriteOrganizeDlg::OnUpdateRenameBn(CCmdUI* pCmdUI)
+void CFavoriteOrganizeDlg::OnUpdateEditBn(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(m_list.GetSelectedCount() == 1);
 }

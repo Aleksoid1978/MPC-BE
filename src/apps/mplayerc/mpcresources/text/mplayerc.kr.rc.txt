@@ -54,7 +54,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"즐겨찾기 편집"
-8		"이름 바꾸기"
+8		"Edit"
 9		"위로"
 10		"아래로"
 11		"삭제"
@@ -91,6 +91,13 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 10		"프레임이나 프레임률을 입력하면 특정 프레임으로 이동, 재생할수 있습니다.\n예)12345, 20.25 -> 12345프레임 20.25fps"
 11		"프레임:"
 13		"이동"
+END
+
+BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
+5		"&Save"
+6		"&Cansel"
+7		"Title:"
+9		"Path:"
 END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
@@ -1813,6 +1820,7 @@ STRING IDS_PPAGE_OUTPUT_VMR9WINDOWED		"Video Mixing Renderer 9 (windowed)"
 STRING IDS_PPSDB_BADURL		"부정확한 URL, 자막 데이터베이스를 찾을수 없습니다!"
 STRING IDS_PPSDB_PROTOCOLERR		"프로토콜 버전이 다릅니다. 플레이어를 업그레이드하거나 다른 주소를 선택하세요!"
 STRING IDS_PPSDB_URLCORRECT		"올바른 URL입니다!"
+STRING IDS_PROPERTIESFOR		"Properties for '%s'"
 STRING IDS_PROPSHEET_PROPERTIES		"등록정보"
 STRING IDS_PUBLISHED		"Published : "
 STRING IDS_RECENT_FILES		"최근 파일"
