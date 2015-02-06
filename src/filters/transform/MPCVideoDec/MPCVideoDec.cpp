@@ -1096,6 +1096,7 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 		rtStop = rtStart + (rtFrameDuration / m_dRate);
 	}
 
+	m_rtLastStart = rtStart;
 	m_rtLastStop = rtStop;
 }
 
