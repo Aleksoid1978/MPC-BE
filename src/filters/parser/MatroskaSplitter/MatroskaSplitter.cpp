@@ -38,8 +38,6 @@
 #define OPT_LoadEmbeddedFonts		_T("LoadEmbeddedFonts")
 #define OPT_CalcDuration			_T("CalculateDuration")
 
-using namespace MatroskaReader;
-
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -1669,6 +1667,8 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	\
 	p->rtStart -= m_pFile->m_rtOffset;																\
 	p->rtStop -= m_pFile->m_rtOffset;																\
+	\
+	p->TrackType = pTE->TrackType;																	\
 
 bool CMatroskaSplitterFilter::DemuxLoop()
 {
@@ -2255,12 +2255,17 @@ HRESULT CMatroskaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 	CAutoPtr<CMatroskaPacket> p2;
 	p.Detach();
 	p2.Attach(mp);
-	m_packets.AddTail(p2);
 
 	HRESULT hr = S_OK;
-	if (m_packets.GetCount() == 2) {
-		REFERENCE_TIME rtBlockDuration = m_packets.GetTail()->rtStart - m_packets.GetHead()->rtStart;
-		hr = DeliverMatroskaBlock(m_packets.RemoveHead(), rtBlockDuration);
+	if (p2->TrackType == TrackEntry::TypeSubtitle) {
+		hr = DeliverMatroskaBlock(p2);
+	} else {
+		m_packets.AddTail(p2);
+
+		if (m_packets.GetCount() == 2) {
+			REFERENCE_TIME rtBlockDuration = m_packets.GetTail()->rtStart - m_packets.GetHead()->rtStart;
+			hr = DeliverMatroskaBlock(m_packets.RemoveHead(), rtBlockDuration);
+		}
 	}
 
 	return hr;

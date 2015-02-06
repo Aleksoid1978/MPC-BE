@@ -31,6 +31,8 @@
 #define MatroskaSplitterName L"MPC Matroska Splitter"
 #define MatroskaSourceName   L"MPC Matroska Source"
 
+using namespace MatroskaReader;
+
 class CMatroskaPacket : public CPacket
 {
 protected:
@@ -43,6 +45,7 @@ protected:
 		return size;
 	}
 public:
+	CUInt TrackType;
 	CAutoPtr<MatroskaReader::BlockGroup> bg;
 };
 
