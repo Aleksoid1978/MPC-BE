@@ -1,5 +1,5 @@
 /*
- * (C) 2014 see Authors.txt
+ * (C) 2014-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -57,9 +57,20 @@ __inline int FixedToInt(__in const DXVA2_Fixed32 _fixed_, __in const SHORT facto
 
 class CColorControl
 {
-	COLORPROPERTY_RANGE		m_ColorControl[4];
-	VMR9ProcAmpControlRange	m_VMR9ColorControl[4];
-	DXVA2_ValueRange		m_EVRColorControl[4];
+	COLORPROPERTY_RANGE		m_ColorBri;
+	COLORPROPERTY_RANGE		m_ColorCon;
+	COLORPROPERTY_RANGE		m_ColorHue;
+	COLORPROPERTY_RANGE		m_ColorSat;
+
+	VMR9ProcAmpControlRange	m_VMR9ColorBri;
+	VMR9ProcAmpControlRange	m_VMR9ColorCon;
+	VMR9ProcAmpControlRange	m_VMR9ColorHue;
+	VMR9ProcAmpControlRange	m_VMR9ColorSat;
+
+	DXVA2_ValueRange		m_EVRColorBri;
+	DXVA2_ValueRange		m_EVRColorCon;
+	DXVA2_ValueRange		m_EVRColorHue;
+	DXVA2_ValueRange		m_EVRColorSat;
 
 public:
 	CColorControl();
