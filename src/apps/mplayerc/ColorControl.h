@@ -32,23 +32,10 @@ enum ControlType {
 	ProcAmp_All = ProcAmp_Brightness | ProcAmp_Contrast | ProcAmp_Hue | ProcAmp_Saturation,
 };
 
-struct COLORPROPERTY_RANGE {
-	DWORD	dwProperty;
-	int		MinValue;
-	int		MaxValue;
-	int		DefaultValue;
-	int		StepSize;
-};
-
 // CColorControl
 
 class CColorControl
 {
-	COLORPROPERTY_RANGE		m_ColorBri;
-	COLORPROPERTY_RANGE		m_ColorCon;
-	COLORPROPERTY_RANGE		m_ColorHue;
-	COLORPROPERTY_RANGE		m_ColorSat;
-
 	VMR9ProcAmpControlRange	m_VMR9ColorBri;
 	VMR9ProcAmpControlRange	m_VMR9ColorCon;
 	VMR9ProcAmpControlRange	m_VMR9ColorHue;
@@ -59,15 +46,18 @@ class CColorControl
 	DXVA2_ValueRange		m_EVRColorHue;
 	DXVA2_ValueRange		m_EVRColorSat;
 
+	bool					m_VMR9Used;
+
 public:
 	CColorControl();
 
-	COLORPROPERTY_RANGE*		GetColorControl(ControlType nFlag);
-	void						ResetColorControlRange();
-	void						UpdateColorControlRange(bool isEVR);
 	VMR9ProcAmpControlRange*	GetVMR9ColorControl(ControlType nFlag);
 	DXVA2_ValueRange*			GetEVRColorControl(ControlType nFlag);
+	void						EnableVMR9ColorControl();
+	void						EnableEVRColorControl();
 
-	VMR9ProcAmpControl			GetVMR9ProcAmpValues(DWORD flags, int brightness, int contrast, int hue, int saturation);
+	VMR9ProcAmpControl			GetVMR9ProcAmpControl(DWORD flags, int brightness, int contrast, int hue, int saturation);
 	DXVA2_ProcAmpValues			GetEVRProcAmpValues(int brightness, int contrast, int hue, int saturation);
+
+	void						GetDefaultValues(int& brightness, int& contrast, int& hue, int& saturation);
 };
