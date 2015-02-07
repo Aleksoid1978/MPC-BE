@@ -100,6 +100,7 @@ protected:
 	CFFAudioDecoder m_FFAudioDec;
 
 	BOOL			m_bHasVideo;
+	BOOL			m_bDoAdditionalCheck;
 
 	enum BitstreamType {
 		SPDIF,
