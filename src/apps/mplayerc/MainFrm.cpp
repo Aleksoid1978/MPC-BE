@@ -17766,22 +17766,11 @@ void CMainFrame::SetColorControl(DWORD flags, int& brightness, int& contrast, in
 	}
 
 	if (m_pVMRMC9) {
-		VMR9ProcAmpControl ClrControl;
-		ClrControl.dwSize     = sizeof(ClrControl);
-		ClrControl.dwFlags    = flags;
-		ClrControl.Brightness = (float)brightness;
-		ClrControl.Contrast   = (float)(contrast + 100) / 100;
-		ClrControl.Hue        = (float)hue;
-		ClrControl.Saturation = (float)(saturation + 100) / 100;
-
+		VMR9ProcAmpControl ClrControl = m_ColorCintrol.GetVMR9ProcAmpValues(flags, brightness, contrast, hue, saturation);
 		m_pVMRMC9->SetProcAmpControl(0, &ClrControl);
-	} else if (m_pMFVP) {
-		DXVA2_ProcAmpValues ClrValues;
-		ClrValues.Brightness = IntToFixed(brightness);
-		ClrValues.Contrast   = IntToFixed(contrast + 100, 100);
-		ClrValues.Hue        = IntToFixed(hue);
-		ClrValues.Saturation = IntToFixed(saturation + 100, 100);
-
+	}
+	else if (m_pMFVP) {
+		DXVA2_ProcAmpValues ClrValues = m_ColorCintrol.GetEVRProcAmpValues(brightness, contrast, hue, saturation);
 		m_pMFVP->SetProcAmpValues(flags, &ClrValues);
 	}
 }
