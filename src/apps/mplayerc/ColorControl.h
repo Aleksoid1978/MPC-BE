@@ -40,19 +40,6 @@ struct COLORPROPERTY_RANGE {
 	int		StepSize;
 };
 
-__inline DXVA2_Fixed32 IntToFixed(__in const int _int_, __in const SHORT divisor = 1)
-{
-	DXVA2_Fixed32 _fixed_;
-	_fixed_.Value = _int_ / divisor;
-	_fixed_.Fraction = (_int_ % divisor * 0x10000 + divisor/2) / divisor;
-	return _fixed_;
-}
-
-__inline int FixedToInt(__in const DXVA2_Fixed32 _fixed_, __in const SHORT factor = 1)
-{
-	return (int)_fixed_.Value * factor + ((int)_fixed_.Fraction * factor + 0x8000) / 0x10000;
-}
-
 // CColorControl
 
 class CColorControl
@@ -80,4 +67,7 @@ public:
 	void						UpdateColorControlRange(bool isEVR);
 	VMR9ProcAmpControlRange*	GetVMR9ColorControl(ControlType nFlag);
 	DXVA2_ValueRange*			GetEVRColorControl(ControlType nFlag);
+
+	VMR9ProcAmpControl			GetVMR9ProcAmpValues(DWORD flags, int brightness, int contrast, int hue, int saturation);
+	DXVA2_ProcAmpValues			GetEVRProcAmpValues(int brightness, int contrast, int hue, int saturation);
 };
