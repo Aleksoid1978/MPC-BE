@@ -349,6 +349,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_truehd_samplerate(0)
 	, m_truehd_framelength(0)
 	, m_bHasVideo(TRUE)
+	, m_bDoAdditionalCheck(FALSE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -2101,8 +2102,10 @@ HRESULT CMpaDecFilter::StartStreaming()
 
 	m_fDiscontinuity = false;
 
-	memset(&m_bBitstreamSupported, 0, sizeof(m_bBitstreamSupported));
-	if (IsWinVistaOrLater()) {
+	if (!m_bDoAdditionalCheck) {
+		m_bDoAdditionalCheck = TRUE;
+
+		memset(&m_bBitstreamSupported, FALSE, sizeof(m_bBitstreamSupported));
 		CComPtr<IPin> pPin = m_pOutput;
 		CComPtr<IPin> pPinRenderer;
 		for (CComPtr<IBaseFilter> pBF = this; pBF = GetDownStreamFilter(pBF, pPin); pPin = GetFirstPin(pBF, PINDIR_OUTPUT)) {
@@ -2113,25 +2116,23 @@ HRESULT CMpaDecFilter::StartStreaming()
 
 		if (pPinRenderer) {
 			CMediaType mt;
-			mt = CreateMediaTypeSPDIF(48000);
-			m_bBitstreamSupported[SPDIF]	= pPinRenderer->QueryAccept(&mt) == S_OK;
+			mt = CreateMediaTypeSPDIF();
+			m_bBitstreamSupported[SPDIF]		= pPinRenderer->QueryAccept(&mt) == S_OK;
 
-			mt = CreateMediaTypeHDMI(IEC61937_EAC3);
-			m_bBitstreamSupported[EAC3]		= pPinRenderer->QueryAccept(&mt) == S_OK;
+			if (IsWinVistaOrLater()) {
+				mt = CreateMediaTypeHDMI(IEC61937_EAC3);
+				m_bBitstreamSupported[EAC3]		= pPinRenderer->QueryAccept(&mt) == S_OK;
 
-			mt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
-			m_bBitstreamSupported[TRUEHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
+				mt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
+				m_bBitstreamSupported[TRUEHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
 
-			mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
-			m_bBitstreamSupported[DTSHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
+				mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
+				m_bBitstreamSupported[DTSHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
+			}
 		}
-	} else {
-		m_bBitstreamSupported[SPDIF] = TRUE;
-	}
 
-	{
 		BOOL b_HasVideo = FALSE;
-		if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
+		if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected())) {
 			if (GetCLSID(pFilter) == GUIDFromCString(_T("{09144FD6-BB29-11DB-96F1-005056C00008}"))) { // PBDA DTFilter
 				b_HasVideo = TRUE;
 			} else {
