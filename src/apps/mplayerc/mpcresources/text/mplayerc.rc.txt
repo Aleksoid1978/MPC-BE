@@ -95,7 +95,7 @@ END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
 5		"&Save"
-6		"&Cansel"
+6		"&Cancel"
 7		"Title:"
 9		"Path:"
 END
