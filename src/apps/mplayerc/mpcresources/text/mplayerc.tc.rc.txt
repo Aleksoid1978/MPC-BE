@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"關於"
 7		"MPC-BE"
 8		"Copyright © 2002-2015 詳見 Authors.txt 檔案"
@@ -54,7 +54,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"組織我的最愛"
-8		"Edit"
+8		"編輯"
 9		"上移"
 10		"下移"
 11		"刪除"
@@ -94,10 +94,10 @@ BEGIN DIALOGEX IDD_GOTO_DLG LINES 14
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
-5		"&Save"
-6		"&Cansel"
-7		"Title:"
-9		"Path:"
+5		"儲存(&S)"
+6		"取消(&C)"
+7		"標題:"
+9		"位置:"
 END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
@@ -270,7 +270,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 25		"刪除"
 26		"上移"
 27		"下移"
-28		"於登錄檔修改顯示模式 (只建議於 D3D 全螢幕使用)"
+28		"於登錄檔修改顯示模式 (只建議於 Direct3D 全螢幕使用)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
@@ -439,7 +439,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
-5		"Subtitle renderer:"
+5		"字幕繪製器:"
 7		"存在時預設優先使用外部字幕檔案"
 9		"不載入內嵌字幕"
 11		"自動載入路徑"
@@ -482,7 +482,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 5		"監聽連接埠:"
-7		"開啟網頁瀏覽器..."
+7		"於網頁瀏覽器開啟..."
 9		"影像品質 %:"
 12		"啟用壓縮"
 13		"列印偵錯資訊"
@@ -517,7 +517,7 @@ END
 BEGIN DIALOGEX IDD_SAVETHUMBSDIALOGTEMPL LINES 20
 5		"縮圖:"
 10		"列"
-11		"行"
+11		"欄"
 14		"影像寬度:"
 15		"像素"
 16		"品質:"
@@ -1125,10 +1125,10 @@ STRING IDC_DSNULL_UNCOMP		"與無繪製器相同，但只會連到未壓縮的�
 STRING IDC_DSOVERLAYMIXER		"總是以覆疊模式繪製。一般來說只允許使用 YUV 格式，但這會不做任何 RGB 色彩轉換而直接呈現。這是最快速的繪製方法，而且是你唯一能確保全螢幕鏡射輸出到電視的方法。"
 STRING IDC_DSSYNC		"與 EVR 自訂呈現 相同，但提供額外選項來同步化影格速率及顯示器更新頻率，以減少被丟棄或重複的影格。"
 STRING IDC_DSSYSDEF		"DirectShow 預設的視訊繪製篩選器。當其它繪製器因為某些原因無法載入時，就會回復到這個設定。在 Windows XP 裡這個與 VMR-7 (視窗式) 相同。"
-STRING IDC_DSVMR7REN		"和 VMR-7 (視窗式) 相同，但藉助 MPC-BE 的配置呈現器顯示字幕。覆疊式視訊鏡射輸出將不會運作。桌面建議使用'全彩'顯示。"
+STRING IDC_DSVMR7REN		"和 VMR-7 (視窗式) 相同，但藉助 MPC-BE 的配置呈現器顯示字幕。覆疊式視訊鏡射輸出將不會運作。桌面建議使用「全彩」顯示。"
 STRING IDC_DSVMR7WIN		"Windows XP 的預設繪製器。非常穩定，而且只比覆疊合成器慢一點。使用 DirectDraw，並且可以的話會在覆疊模式下運行。"
 STRING IDC_DSVMR9ALTERNATIVEVSYNC		"繞過 D3D 內置的垂直同步以減少畫面撕裂。"
-STRING IDC_DSVMR9REN		"和 VMR-9 (視窗式) 相同，但藉助 MPC-BE 的配置呈現器顯示字幕。覆疊式視訊鏡射輸出可能能運作。桌面建議使用'全彩'顯示。"
+STRING IDC_DSVMR9REN		"和 VMR-9 (視窗式) 相同，但藉助 MPC-BE 的配置呈現器顯示字幕。覆疊式視訊鏡射輸出可能能運作。桌面建議使用「全彩」顯示。"
 STRING IDC_DSVMR9WIN		"只有在您安裝了 DirectX 9 之後才能用。它有著和 VMR-7 (視窗式) 相同的能力，但永遠不會使用覆疊模式繪製。因此這可能會比 VMR-7 (視窗式) 慢一點。"
 STRING IDC_DSVMRLOADMIXER		"將 VMR 放進合成器模式，這表示在內容頁面的多數控制項都能執行，並使用獨立的工作執行緒來繪製畫面。"
 STRING IDC_DSVMRYUVMIXER		"減低繪製器的相容性來提高效能。"
@@ -1820,7 +1820,7 @@ STRING IDS_PPAGE_OUTPUT_VMR9WINDOWED		"VMR-9 (視窗式)"
 STRING IDS_PPSDB_BADURL		"錯誤的網址，無法定位字幕資料庫！"
 STRING IDS_PPSDB_PROTOCOLERR		"協定的版本不合，請升級您的播放程式或是選擇不同的網址！"
 STRING IDS_PPSDB_URLCORRECT		"網址應該正確！"
-STRING IDS_PROPERTIESFOR		"Properties for '%s'"
+STRING IDS_PROPERTIESFOR		"「%s」 - 內容"
 STRING IDS_PROPSHEET_PROPERTIES		"內容"
 STRING IDS_PUBLISHED		"發佈時間 : "
 STRING IDS_RECENT_FILES		"最近的檔案"
@@ -1828,7 +1828,7 @@ STRING IDS_RECENT_FILES_CLEAR		"清除清單"
 STRING IDS_RECENT_FILES_QUESTION		"您確定要刪除最近的檔案清單？"
 STRING IDS_REGAIN_VOLUME		"切換回復音量"
 STRING IDS_REND_NOT_AVAILABLE		"**無法使用**"
-STRING IDS_REND_NOT_INSTALLED		"**not installed**"
+STRING IDS_REND_NOT_INSTALLED		"**未安裝**"
 STRING IDS_RESET_COLOR		"重設色彩設定"
 STRING IDS_RESET_SETTINGS		"重設設定"
 STRING IDS_RESET_SETTINGS_MUTEX		"請關閉所有的 MPC-BE 實體使到預設設定可以被還原。"
@@ -1917,14 +1917,14 @@ STRING IDS_SUBTITLES_STEREO_TOPANDBOTTOM		"上/下 (Top-and-bottom)"
 STRING IDS_SUBTITLES_STYLES		"樣式(&S)..."
 STRING IDS_SUBTITLE_STREAM		"字幕: %s"
 STRING IDS_SUBTITLE_STREAM_OFF		"字幕: 關閉"
-STRING IDS_SUB_NOT_USE		"do not show subtitles"
+STRING IDS_SUB_NOT_USE		"不顯示字幕"
 STRING IDS_SUB_POS_DOWN		"字幕位置下移"
 STRING IDS_SUB_POS_LEFT		"字幕位置左移"
 STRING IDS_SUB_POS_RESTORE		"還原字幕位置"
 STRING IDS_SUB_POS_RIGHT		"字幕位置右移"
 STRING IDS_SUB_POS_UP		"字幕位置上移"
 STRING IDS_SUB_SAVE_EXTERNAL_STYLE_FILE		"儲存自訂樣式"
-STRING IDS_SUB_USE_INTERNAL		"internal subtitle renderer"
+STRING IDS_SUB_USE_INTERNAL		"內部字幕繪製器"
 STRING IDS_TEXTFILE_ENC		"編碼:"
 STRING IDS_THUMB_COLNUMBER		"行:"
 STRING IDS_THUMB_IMAGE_QUALITY		"品質"
