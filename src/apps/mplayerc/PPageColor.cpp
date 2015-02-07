@@ -158,10 +158,7 @@ void CPPageColor::OnBnClickedReset()
 {
 	CMainFrame* pMainFrame = ((CMainFrame*)AfxGetMyApp()->GetMainWnd());
 
-	m_iBrightness	= pMainFrame->m_ColorCintrol.GetColorControl(ProcAmp_Brightness)->DefaultValue;
-	m_iContrast		= pMainFrame->m_ColorCintrol.GetColorControl(ProcAmp_Contrast)->DefaultValue;
-	m_iHue			= pMainFrame->m_ColorCintrol.GetColorControl(ProcAmp_Hue)->DefaultValue;
-	m_iSaturation	= pMainFrame->m_ColorCintrol.GetColorControl(ProcAmp_Saturation)->DefaultValue;
+	pMainFrame->m_ColorCintrol.GetDefaultValues(m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
 
 	m_SliBrightness.SetPos	(m_iBrightness);
 	m_SliContrast.SetPos	(m_iContrast);

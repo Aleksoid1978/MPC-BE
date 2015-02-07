@@ -37,125 +37,16 @@ __inline int FixedToInt(__in const DXVA2_Fixed32 _fixed_, __in const SHORT facto
 // CColorControl
 
 CColorControl::CColorControl()
-	: m_VMR9ColorBri({sizeof(VMR9ProcAmpControlRange), ProcAmpControl9_Brightness, 0, 0, 0, 0})
+	: m_VMR9ColorBri({sizeof(VMR9ProcAmpControlRange), ProcAmpControl9_Brightness, -100, 100, 0, 1})
 	, m_VMR9ColorCon({sizeof(VMR9ProcAmpControlRange), ProcAmpControl9_Contrast, 0, 0, 0, 0})
-	, m_VMR9ColorHue({sizeof(VMR9ProcAmpControlRange), ProcAmpControl9_Hue, 0, 0, 0, 0})
+	, m_VMR9ColorHue({sizeof(VMR9ProcAmpControlRange), ProcAmpControl9_Hue, -180, 180, 0, 1})
 	, m_VMR9ColorSat({sizeof(VMR9ProcAmpControlRange), ProcAmpControl9_Saturation, 0, 0, 0, 0})
+	, m_EVRColorBri({DXVA2FloatToFixed(-100), DXVA2FloatToFixed(100), DXVA2FloatToFixed(0), DXVA2FloatToFixed(1)})
+	, m_EVRColorCon({DXVA2FloatToFixed(0), DXVA2FloatToFixed(0), DXVA2FloatToFixed(0), DXVA2FloatToFixed(0)})
+	, m_EVRColorHue({DXVA2FloatToFixed(-180), DXVA2FloatToFixed(180), DXVA2FloatToFixed(0), DXVA2FloatToFixed(1)})
+	, m_EVRColorSat({DXVA2FloatToFixed(0), DXVA2FloatToFixed(0), DXVA2FloatToFixed(0), DXVA2FloatToFixed(0)})
+	, m_VMR9Used(false)
 {
-	ResetColorControlRange();
-
-	memset(&m_EVRColorBri, 0, sizeof(DXVA2_ValueRange));
-	memset(&m_EVRColorCon, 0, sizeof(DXVA2_ValueRange));
-	memset(&m_EVRColorHue, 0, sizeof(DXVA2_ValueRange));
-	memset(&m_EVRColorSat, 0, sizeof(DXVA2_ValueRange));
-}
-
-COLORPROPERTY_RANGE* CColorControl::GetColorControl(ControlType nFlag)
-{
-	switch (nFlag) {
-	case ProcAmp_Brightness:
-		return &m_ColorBri;
-	case ProcAmp_Contrast:
-		return &m_ColorCon;
-	case ProcAmp_Hue:
-		return &m_ColorHue;
-	case ProcAmp_Saturation:
-		return &m_ColorSat;
-	}
-
-	return NULL;
-}
-
-void CColorControl::ResetColorControlRange()
-{
-	m_ColorBri.dwProperty	= ProcAmp_Brightness;
-	m_ColorBri.MinValue		= -100;
-	m_ColorBri.MaxValue		= 100;
-	m_ColorBri.DefaultValue	= 0;
-	m_ColorBri.StepSize		= 1;
-
-	m_ColorCon.dwProperty	= ProcAmp_Contrast;
-	m_ColorCon.MinValue		= -100;
-	m_ColorCon.MaxValue		= 100;
-	m_ColorCon.DefaultValue	= 0;
-	m_ColorCon.StepSize		= 1;
-
-	m_ColorHue.dwProperty	= ProcAmp_Hue;
-	m_ColorHue.MinValue		= -180;
-	m_ColorHue.MaxValue		= 180;
-	m_ColorHue.DefaultValue	= 0;
-	m_ColorHue.StepSize		= 1;
-
-	m_ColorSat.dwProperty	= ProcAmp_Saturation;
-	m_ColorSat.MinValue		= -100;
-	m_ColorSat.MaxValue		= 100;
-	m_ColorSat.DefaultValue	= 0;
-	m_ColorSat.StepSize		= 1;
-}
-
-void CColorControl::UpdateColorControlRange(bool isEVR)
-{
-	if (isEVR) {
-		// Brightness
-		m_ColorBri.MinValue		= FixedToInt(m_EVRColorBri.MinValue);
-		m_ColorBri.MaxValue		= FixedToInt(m_EVRColorBri.MaxValue);
-		m_ColorBri.DefaultValue	= FixedToInt(m_EVRColorBri.DefaultValue);
-		m_ColorBri.StepSize		= max(1, FixedToInt(m_EVRColorBri.StepSize));
-		// Contrast
-		m_ColorCon.MinValue		= FixedToInt(m_EVRColorCon.MinValue, 100) - 100;
-		m_ColorCon.MaxValue		= FixedToInt(m_EVRColorCon.MaxValue, 100) - 100;
-		m_ColorCon.DefaultValue	= FixedToInt(m_EVRColorCon.DefaultValue, 100) - 100;
-		m_ColorCon.StepSize		= max(1, FixedToInt(m_EVRColorCon.StepSize, 100));
-		// Hue
-		m_ColorHue.MinValue		= FixedToInt(m_EVRColorHue.MinValue);
-		m_ColorHue.MaxValue		= FixedToInt(m_EVRColorHue.MaxValue);
-		m_ColorHue.DefaultValue	= FixedToInt(m_EVRColorHue.DefaultValue);
-		m_ColorHue.StepSize		= max(1, FixedToInt(m_EVRColorHue.StepSize));
-		// Saturation
-		m_ColorSat.MinValue		= FixedToInt(m_EVRColorSat.MinValue, 100) - 100;
-		m_ColorSat.MaxValue		= FixedToInt(m_EVRColorSat.MaxValue, 100) - 100;
-		m_ColorSat.DefaultValue	= FixedToInt(m_EVRColorSat.DefaultValue, 100) - 100;
-		m_ColorSat.StepSize		= max(1, FixedToInt(m_EVRColorSat.StepSize, 100));
-	} else {
-		// Brightness
-		m_ColorBri.MinValue		= (int)floor(m_VMR9ColorBri.MinValue + 0.5);
-		m_ColorBri.MaxValue		= (int)floor(m_VMR9ColorBri.MaxValue + 0.5);
-		m_ColorBri.DefaultValue	= (int)floor(m_VMR9ColorBri.DefaultValue + 0.5);
-		m_ColorBri.StepSize		= max(1,(int)(m_VMR9ColorBri.StepSize + 0.5));
-		// Contrast
-		//if(m_VMR9ColorCon.MinValue == 0.0999908447265625) m_VMR9ColorCon.MinValue = 0.11; //fix nvidia bug
-		if (*(int*)&m_VMR9ColorCon.MinValue == 1036830720) {
-			m_VMR9ColorCon.MinValue = 0.11f; //fix nvidia bug
-		}
-		m_ColorCon.MinValue		= (int)floor(m_VMR9ColorCon.MinValue * 100 + 0.5) - 100;
-		m_ColorCon.MaxValue		= (int)floor(m_VMR9ColorCon.MaxValue * 100 + 0.5) - 100;
-		m_ColorCon.DefaultValue	= (int)floor(m_VMR9ColorCon.DefaultValue * 100 + 0.5) - 100;
-		m_ColorCon.StepSize		= max(1, (int)(m_VMR9ColorCon.StepSize * 100 + 0.5));
-		// Hue
-		m_ColorHue.MinValue		= (int)floor(m_VMR9ColorHue.MinValue + 0.5);
-		m_ColorHue.MaxValue		= (int)floor(m_VMR9ColorHue.MaxValue + 0.5);
-		m_ColorHue.DefaultValue	= (int)floor(m_VMR9ColorHue.DefaultValue + 0.5);
-		m_ColorHue.StepSize		= max(1,(int)(m_VMR9ColorHue.StepSize + 0.5));
-		// Saturation
-		m_ColorSat.MinValue		= (int)floor(m_VMR9ColorSat.MinValue * 100 + 0.5) - 100;
-		m_ColorSat.MaxValue		= (int)floor(m_VMR9ColorSat.MaxValue * 100 + 0.5) - 100;
-		m_ColorSat.DefaultValue	= (int)floor(m_VMR9ColorSat.DefaultValue * 100 + 0.5) - 100;
-		m_ColorSat.StepSize		= max(1, (int)(m_VMR9ColorSat.StepSize * 100 + 0.5));
-	}
-
-	// limit the minimum and maximum values
-	// Brightness
-	if (m_ColorBri.MinValue < -100) m_ColorBri.MinValue = -100;
-	if (m_ColorBri.MaxValue > 100) m_ColorBri.MaxValue = 100;
-	// Contrast
-	if (m_ColorCon.MinValue < -100) m_ColorCon.MinValue = -100;
-	if (m_ColorCon.MaxValue > 100) m_ColorCon.MaxValue = 100;
-	// Hue
-	if (m_ColorHue.MinValue < -180) m_ColorHue.MinValue = -180;
-	if (m_ColorHue.MaxValue > 180) m_ColorHue.MaxValue = 180;
-	// Saturation
-	if (m_ColorSat.MinValue < -100) m_ColorSat.MinValue = -100;
-	if (m_ColorSat.MaxValue > 100) m_ColorSat.MaxValue = 100;
 }
 
 VMR9ProcAmpControlRange* CColorControl::GetVMR9ColorControl(ControlType nFlag)
@@ -188,7 +79,22 @@ DXVA2_ValueRange* CColorControl::GetEVRColorControl(ControlType nFlag)
 	return NULL;
 }
 
-VMR9ProcAmpControl CColorControl::GetVMR9ProcAmpValues(DWORD flags, int brightness, int contrast, int hue, int saturation)
+void CColorControl::EnableVMR9ColorControl()
+{
+	// fix nvidia min contrast bug
+	if (*(int*)&m_VMR9ColorCon.MinValue == 1036830720) {
+		m_VMR9ColorCon.MinValue = 0.11f;
+	}
+
+	m_VMR9Used = true;
+}
+
+void CColorControl::EnableEVRColorControl()
+{
+	m_VMR9Used = true;
+}
+
+VMR9ProcAmpControl CColorControl::GetVMR9ProcAmpControl(DWORD flags, int brightness, int contrast, int hue, int saturation)
 {
 	VMR9ProcAmpControl procAmpControl;
 	procAmpControl.dwSize     = sizeof(VMR9ProcAmpControl);
@@ -210,4 +116,21 @@ DXVA2_ProcAmpValues CColorControl::GetEVRProcAmpValues(int brightness, int contr
 	procAmpValues.Saturation.ll = min(max(m_EVRColorSat.MinValue.ll, IntToFixed(saturation + 100, 100).ll), m_EVRColorSat.MaxValue.ll);
 
 	return procAmpValues;
+}
+
+void CColorControl::GetDefaultValues(int& brightness, int& contrast, int& hue, int& saturation)
+{
+	if (m_VMR9Used) {
+		brightness = (int)floor(m_VMR9ColorBri.DefaultValue + 0.5);
+		contrast   = (int)floor(m_VMR9ColorCon.DefaultValue * 100 + 0.5) - 100;
+		hue		   = (int)floor(m_VMR9ColorHue.DefaultValue + 0.5);
+		saturation = (int)floor(m_VMR9ColorSat.DefaultValue * 100 + 0.5) - 100;
+
+	}
+	else {
+		brightness = FixedToInt(m_EVRColorBri.DefaultValue);
+		contrast   = FixedToInt(m_EVRColorCon.DefaultValue, 100) - 100;
+		hue		   = FixedToInt(m_EVRColorHue.DefaultValue);
+		saturation = FixedToInt(m_EVRColorSat.DefaultValue, 100) - 100;
+	}
 }
