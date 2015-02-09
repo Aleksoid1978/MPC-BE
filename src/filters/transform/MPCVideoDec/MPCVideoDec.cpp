@@ -911,8 +911,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_PixelFormat(AV_PIX_FMT_NONE)
 	, m_bInterlaced(FALSE)
 	, m_fSYNC(0)
-	, m_dwFrameCount(0)
-	, m_nWrongFramesOrdering(0)
+	, m_bCheckFramesOrdering(FALSE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -1059,11 +1058,11 @@ void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 	if (pD3D9) {
 		D3DADAPTER_IDENTIFIER9 adapterIdentifier;
 		if (pD3D9->GetAdapterIdentifier(GetAdapter(pD3D9, hWnd), 0, &adapterIdentifier) == S_OK) {
-			m_nPCIVendor = adapterIdentifier.VendorId;
-			m_nPCIDevice = adapterIdentifier.DeviceId;
+			m_nPCIVendor			= adapterIdentifier.VendorId;
+			m_nPCIDevice			= adapterIdentifier.DeviceId;
 			m_VideoDriverVersion	= adapterIdentifier.DriverVersion;
 			m_strDeviceDescription	= adapterIdentifier.Description;
-			m_strDeviceDescription.AppendFormat(_T(" (%04X:%04X)"), m_nPCIVendor, m_nPCIDevice);
+			m_strDeviceDescription.AppendFormat(L" (%04X:%04X)", m_nPCIVendor, m_nPCIDevice);
 		}
 		pD3D9->Release();
 	}
@@ -1094,6 +1093,12 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 	if (rtStop == INVALID_TIME) {
 		REFERENCE_TIME rtFrameDuration = AvgTimePerFrame * (m_pFrame->repeat_pict ? 3 : 2)  / 2;
 		rtStop = rtStart + (rtFrameDuration / m_dRate);
+	}
+
+	if (m_bCheckFramesOrdering
+			&& !m_bReorderBFrame && m_pAVCtx->has_b_frames
+			&& rtStart > 0 && rtStart < m_rtLastStart) {
+		m_bReorderBFrame = true;
 	}
 
 	m_rtLastStart = rtStart;
@@ -1451,10 +1456,6 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 			return hr;
 		}
 
-		if (*pmt != m_InputMT) {
-			m_dwFrameCount = 0;
-		}
-
 		m_InputMT = *pmt;
 	} else if (direction == PINDIR_OUTPUT) {
 		BITMAPINFOHEADER bihOut;
@@ -1602,6 +1603,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 								|| m_nCodecId == AV_CODEC_ID_DIRAC
 								|| m_nCodecId == AV_CODEC_ID_RV10
 								|| m_nCodecId == AV_CODEC_ID_RV20));
+
+	m_bCheckFramesOrdering = (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC);
 
 	m_bCalculateStopTime = (m_nCodecId == AV_CODEC_ID_H264 ||
 							m_nCodecId == AV_CODEC_ID_DIRAC || 
@@ -2627,7 +2630,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 		rtStop = INVALID_TIME;
 	}
 
-	if (m_pAVCtx->has_b_frames) {
+	if (m_bReorderBFrame && m_pAVCtx->has_b_frames) {
 		m_BFrames[m_nPosB].rtStart	= rtStart;
 		m_BFrames[m_nPosB].rtStop	= rtStop;
 		m_nPosB						= 1 - m_nPosB;
@@ -2708,19 +2711,8 @@ void CMPCVideoDecFilter::UpdateAspectRatio()
 
 void CMPCVideoDecFilter::ReorderBFrames(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
-	if (m_dwFrameCount < 150 && m_nCodecId == AV_CODEC_ID_H264 && !m_bReorderBFrame) {
-		if (rtStart < m_rtLastStart && rtStart > 0) {
-			if (m_nWrongFramesOrdering == 5) {
-				m_bReorderBFrame = true;
-			} else {
-				m_nWrongFramesOrdering++;
-			}
-		}
-	}
-	m_dwFrameCount++;
-
 	// Re-order B-frames if needed
-	if (m_pAVCtx->has_b_frames && m_bReorderBFrame) {
+	if (m_bReorderBFrame && m_pAVCtx->has_b_frames) {
 		rtStart	= m_BFrames[m_nPosB].rtStart;
 		rtStop	= m_BFrames[m_nPosB].rtStop;
 	}
@@ -2836,14 +2828,11 @@ HRESULT CMPCVideoDecFilter::ConfigureDXVA2(IPin *pPin)
 	HANDLE									hDevice = INVALID_HANDLE_VALUE;
 
 	// Query the pin for IMFGetService.
-	hr = pPin->QueryInterface(__uuidof(IMFGetService), (void**)&pGetService);
+	hr = pPin->QueryInterface(IID_PPV_ARGS(&pGetService));
 
 	// Get the Direct3D device manager.
 	if (SUCCEEDED(hr)) {
-		hr = pGetService->GetService(
-				 MR_VIDEO_ACCELERATION_SERVICE,
-				 __uuidof(IDirect3DDeviceManager9),
-				 (void**)&pDeviceManager);
+		hr = pGetService->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_PPV_ARGS(&pDeviceManager));
 	}
 
 	// Open a new device handle.
@@ -2853,10 +2842,7 @@ HRESULT CMPCVideoDecFilter::ConfigureDXVA2(IPin *pPin)
 
 	// Get the video decoder service.
 	if (SUCCEEDED(hr)) {
-		hr = pDeviceManager->GetVideoService(
-				 hDevice,
-				 __uuidof(IDirectXVideoDecoderService),
-				 (void**)&pDecoderService);
+		hr = pDeviceManager->GetVideoService(hDevice, IID_PPV_ARGS(&pDecoderService));
 	}
 
 	if (SUCCEEDED(hr)) {
@@ -2881,10 +2867,10 @@ HRESULT CMPCVideoDecFilter::ConfigureDXVA2(IPin *pPin)
 HRESULT CMPCVideoDecFilter::SetEVRForDXVA2(IPin *pPin)
 {
     IMFGetService* pGetService;
-    HRESULT hr = pPin->QueryInterface(__uuidof(IMFGetService), reinterpret_cast<void**>(&pGetService));
+    HRESULT hr = pPin->QueryInterface(IID_PPV_ARGS(&pGetService));
 	if (SUCCEEDED(hr)) {
 		IDirectXVideoMemoryConfiguration* pVideoConfig;
-		hr = pGetService->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_IDirectXVideoMemoryConfiguration, reinterpret_cast<void**>(&pVideoConfig));
+		hr = pGetService->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_PPV_ARGS(&pVideoConfig));
 		if (SUCCEEDED(hr)) {
 			// Notify the EVR.
 			DXVA2_SurfaceType surfaceType;
@@ -2950,7 +2936,7 @@ HRESULT CMPCVideoDecFilter::InitAllocator(IMemAllocator **ppAlloc)
 	}
 
 	// Return the IMemAllocator interface.
-	return m_pDXVA2Allocator->QueryInterface(__uuidof(IMemAllocator), (void **)ppAlloc);
+	return m_pDXVA2Allocator->QueryInterface(IID_PPV_ARGS(ppAlloc));
 }
 
 HRESULT CMPCVideoDecFilter::RecommitAllocator()
@@ -3086,11 +3072,11 @@ STDMETHODIMP CMPCVideoDecFilter::CreatePage(const GUID& guid, IPropertyPage** pp
 HRESULT CMPCVideoDecFilter::DetectVideoCard_EVR(IPin *pPin)
 {
 	IMFGetService* pGetService;
-	HRESULT hr = pPin->QueryInterface(__uuidof(IMFGetService), reinterpret_cast<void**>(&pGetService));
+	HRESULT hr = pPin->QueryInterface(IID_PPV_ARGS(&pGetService));
 	if (SUCCEEDED(hr)) {
 		// Try to get the adapter description of the active DirectX 9 device.
 		IDirect3DDeviceManager9* pDevMan9;
-		hr = pGetService->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_IDirect3DDeviceManager9, reinterpret_cast<void**>(&pDevMan9));
+		hr = pGetService->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_PPV_ARGS(&pDevMan9));
 		if (SUCCEEDED(hr)) {
 			HANDLE hDevice;
 			hr = pDevMan9->OpenDeviceHandle(&hDevice);

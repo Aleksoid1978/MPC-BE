@@ -90,11 +90,10 @@ protected:
 	bool									m_bReorderBFrame;
 	bool									m_bCalculateStopTime;
 
-	struct B_FRAME {
-		REFERENCE_TIME	rtStart;
-		REFERENCE_TIME	rtStop;
-	};
-	B_FRAME									m_BFrames[2];
+	struct {
+		REFERENCE_TIME rtStart;
+		REFERENCE_TIME rtStop;
+	} m_BFrames[2];
 	int										m_nPosB;
 
 	bool									m_bWaitKeyFrame;
@@ -149,8 +148,7 @@ protected:
 
 	DWORD									m_fSYNC;
 
-	DWORD									m_dwFrameCount;
-	BYTE									m_nWrongFramesOrdering;
+	BOOL									m_bCheckFramesOrdering;
 
 	CMediaType								m_InputMT;
 
@@ -251,14 +249,13 @@ public:
 	int							PictWidthRounded();
 	int							PictHeightRounded();
 
-	inline bool					UseDXVA2()				{ return (m_nDecoderMode == MODE_DXVA2); };
-	inline AVCodecContext*		GetAVCtx()				{ return m_pAVCtx; };
-	inline AVFrame*				GetFrame()				{ return m_pFrame; };
-	inline enum AVCodecID		GetCodec()				{ return m_nCodecId; };
-	inline bool					IsReorderBFrame()		{ return m_bReorderBFrame; };
-	inline DWORD				GetPCIVendor()			{ return m_nPCIVendor; };
-	inline DWORD				GetPCIDevice()			{ return m_nPCIDevice; };
-	inline double				GetRate()				{ return m_dRate; };
+	inline bool					UseDXVA2()		const { return (m_nDecoderMode == MODE_DXVA2); };
+	inline AVCodecContext*		GetAVCtx()		const { return m_pAVCtx; };
+	inline AVFrame*				GetFrame()		const { return m_pFrame; };
+	inline enum AVCodecID		GetCodec()		const { return m_nCodecId; };
+	inline DWORD				GetPCIVendor()	const { return m_nPCIVendor; };
+	inline DWORD				GetPCIDevice()	const { return m_nPCIDevice; };
+
 	bool						IsDXVASupported();
 	void						UpdateAspectRatio();
 	void						ReorderBFrames(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
@@ -267,7 +264,7 @@ public:
 	void						HandleKeyFrame(int& got_picture);
 
 	// === DXVA1 functions
-	DDPIXELFORMAT*				GetPixelFormat() { return &m_DDPixelFormat; }
+	const DDPIXELFORMAT*		GetPixelFormat() { return &m_DDPixelFormat; }
 	HRESULT						FindDXVA1DecoderConfiguration(IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, DDPIXELFORMAT* pPixelFormat);
 	HRESULT						CheckDXVA1Decoder(const GUID *pGuid);
 	void						SetDXVA1Params(const GUID* pGuid, DDPIXELFORMAT* pPixelFormat);
