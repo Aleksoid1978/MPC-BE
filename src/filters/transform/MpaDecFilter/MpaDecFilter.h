@@ -85,7 +85,7 @@ protected:
 	CCritSec m_csReceive;
 	CPaddedArray    m_buff;
 	REFERENCE_TIME  m_rtStart;
-	bool            m_fDiscontinuity;
+	BOOL            m_bDiscontinuity;
 	bool            m_bResync;
 
 	ps2_state_t     m_ps2_state;

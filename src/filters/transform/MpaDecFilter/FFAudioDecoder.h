@@ -56,6 +56,9 @@ protected:
 
 	CMediaType* m_pCurrentMediaType;
 
+	BOOL m_bIgnoreJitterChecking;
+	BOOL m_bNeedSyncpoint;
+
 public:
 	CFFAudioDecoder();
 
@@ -75,4 +78,7 @@ public:
 	WORD  GetChannels();         // unsafe
 	DWORD GetChannelMask();      // unsafe
 	WORD  GetCoddedBitdepth();   // unsafe
+
+	BOOL GetIgnoreJitterChecking() const { return m_bIgnoreJitterChecking; }
+	BOOL GetNeedSyncPoint() const { return m_bNeedSyncpoint; }
 };

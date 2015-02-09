@@ -199,6 +199,8 @@ CFFAudioDecoder::CFFAudioDecoder()
 	, m_pParser(NULL)
 	, m_pFrame(NULL)
 	, m_pCurrentMediaType(NULL)
+	, m_bIgnoreJitterChecking(FALSE)
+	, m_bNeedSyncpoint(FALSE)
 {
 	memset(&m_raData, 0, sizeof(m_raData));
 }
@@ -320,6 +322,13 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput)
 	if (!bRet) {
 		StreamFinish();
 	}
+
+	m_bIgnoreJitterChecking = (nCodecId == AV_CODEC_ID_COOK
+							   || nCodecId == AV_CODEC_ID_ATRAC3
+							   || nCodecId == AV_CODEC_ID_SIPR
+							   || nCodecId == AV_CODEC_ID_BINKAUDIO_DCT);
+
+	m_bNeedSyncpoint = (m_raData.deint_id != 0);
 
 	return bRet;
 }
@@ -461,6 +470,9 @@ void CFFAudioDecoder::StreamFinish()
 	}
 
 	av_frame_free(&m_pFrame);
+
+	m_bIgnoreJitterChecking = FALSE;
+	m_bNeedSyncpoint = FALSE;
 }
 
 // RealAudio
