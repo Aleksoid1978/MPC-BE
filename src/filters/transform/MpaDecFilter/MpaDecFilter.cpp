@@ -341,7 +341,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CTransformFilter(NAME("CMpaDecFilter"), lpunk, __uuidof(this))
 	, m_InternalSampleFormat(SAMPLE_FMT_NONE)
 	, m_rtStart(0)
-	, m_fDiscontinuity(false)
+	, m_bDiscontinuity(FALSE)
 	, m_bResync(false)
 	, m_buff(PADDING_SIZE)
 	, m_hdmicount(0)
@@ -554,13 +554,13 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	}
 #endif
 
-	if (pIn->IsDiscontinuity() == S_OK) {
-		m_fDiscontinuity = true;
+	if (pIn->IsDiscontinuity() == S_OK
+			|| (m_FFAudioDec.GetNeedSyncPoint() && S_OK == pIn->IsSyncPoint())) {
+		m_bDiscontinuity = TRUE;
 		m_buff.RemoveAll();
 #if ENABLE_AC3_ENCODER
 		m_encbuff.RemoveAll();
 #endif
-		// LOOKATTHIS // m_rtStart = rtStart;
 		m_bResync = true;
 		if (FAILED(hr)) {
 			DbgLog((LOG_TRACE, 3, L"CMpaDecFilter::Receive() : Discontinuity without timestamp"));
@@ -572,25 +572,26 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	enum AVCodecID nCodecId = FindCodec(subtype);
 
 	REFERENCE_TIME jitterLimit = MAX_JITTER;
-	if (nCodecId == AV_CODEC_ID_COOK || nCodecId == AV_CODEC_ID_ATRAC3 || nCodecId == AV_CODEC_ID_SIPR || !m_bHasVideo) {
+	if (!m_bHasVideo || m_FFAudioDec.GetIgnoreJitterChecking()) {
 		jitterLimit = INT64_MAX;
 	} else if (nCodecId == AV_CODEC_ID_DTS) {
 		jitterLimit = MAX_DTS_JITTER;
 	}
 
-	if ((nCodecId == AV_CODEC_ID_COOK && S_OK == pIn->IsSyncPoint())
-			|| (rtStart != INVALID_TIME && abs(m_rtStart - rtStart) > jitterLimit)) {
+	if (rtStart != INVALID_TIME && abs(m_rtStart - rtStart) > jitterLimit) {
 		m_bResync = true;
 	}
 
-	if (SUCCEEDED(hr) && m_bResync) {
+	if (m_bResync && SUCCEEDED(hr)) {
 		m_buff.RemoveAll();
 #if ENABLE_AC3_ENCODER
 		m_encbuff.RemoveAll();
 #endif
-		if (rtStart != INVALID_TIME) { // LOOKATTHIS
-			m_rtStart = rtStart;
+		if (m_rtStart != INVALID_TIME && rtStart != m_rtStart) {
+			m_bDiscontinuity = TRUE;
 		}
+		
+		m_rtStart = rtStart;
 		m_bResync = false;
 	}
 
@@ -1590,8 +1591,8 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWOR
 	pOut->SetMediaTime(NULL, NULL);
 
 	pOut->SetPreroll(FALSE);
-	pOut->SetDiscontinuity(m_fDiscontinuity);
-	m_fDiscontinuity = false;
+	pOut->SetDiscontinuity(m_bDiscontinuity);
+	m_bDiscontinuity = FALSE;
 	pOut->SetSyncPoint(TRUE);
 
 	pOut->SetActualDataLength(nSamples * nChannels * wfe->wBitsPerSample / 8);
@@ -1727,8 +1728,8 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 	pOut->SetMediaTime(NULL, NULL);
 
 	pOut->SetPreroll(FALSE);
-	pOut->SetDiscontinuity(m_fDiscontinuity);
-	m_fDiscontinuity = false;
+	pOut->SetDiscontinuity(m_bDiscontinuity);
+	m_bDiscontinuity = FALSE;
 	pOut->SetSyncPoint(TRUE);
 
 	pOut->SetActualDataLength(length);
@@ -2100,8 +2101,6 @@ HRESULT CMpaDecFilter::StartStreaming()
 
 	m_ps2_state.reset();
 
-	m_fDiscontinuity = false;
-
 	if (!m_bDoAdditionalCheck) {
 		m_bDoAdditionalCheck = TRUE;
 
@@ -2168,6 +2167,10 @@ HRESULT CMpaDecFilter::StopStreaming()
 HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 {
 	if (dir == PINDIR_INPUT) {
+		if (m_FFAudioDec.GetCodecId() != AV_CODEC_ID_NONE) {
+			m_FFAudioDec.StreamFinish();
+		}
+
 		enum AVCodecID nCodecId = FindCodec(pmt->subtype);
 		if (nCodecId != AV_CODEC_ID_NONE) {
 			if (m_FFAudioDec.Init(nCodecId, m_pInput)) {
