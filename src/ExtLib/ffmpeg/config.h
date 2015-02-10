@@ -802,4 +802,6 @@ Note: when adding a new codec, you have to:
 #define CONFIG_ATEMPO_FILTER 1
 #define CONFIG_LOWPASS_FILTER 0
 
+#define CONFIG_HEVC_DXVA2_HWACCEL 0
+
 #endif /* FFMPEG_CONFIG_H */

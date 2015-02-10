@@ -37,7 +37,6 @@
 #include "h264pred.h"
 #include "h264qpel.h"
 #include "internal.h" // for avpriv_find_start_code()
-#include "me_cmp.h"
 #include "mpegutils.h"
 #include "parser.h"
 #include "qpeldsp.h"
@@ -340,12 +339,10 @@ typedef struct H264Picture {
 typedef struct H264Context {
     AVClass *av_class;
     AVCodecContext *avctx;
-    MECmpContext mecc;
     VideoDSPContext vdsp;
     H264DSPContext h264dsp;
     H264ChromaContext h264chroma;
     H264QpelContext h264qpel;
-    ParseContext parse_context;
     GetBitContext gb;
     ERContext er;
 
@@ -366,7 +363,6 @@ typedef struct H264Context {
 
     int qscale;
     int droppable;
-    int data_partitioning;
     int coded_picture_number;
     int low_delay;
 
@@ -566,7 +562,6 @@ typedef struct H264Context {
      */
     int is_avc;           ///< this flag is != 0 if codec is avc1
     int nal_length_size;  ///< Number of bytes used for nal length (1, 2 or 4)
-    int got_first;        ///< this flag is != 0 if we've parsed a frame
 
     int bit_depth_luma;         ///< luma bit depth from sps to detect changes
     int chroma_format_idc;      ///< chroma format from sps to detect changes
@@ -740,6 +735,8 @@ typedef struct H264Context {
 
     int has_recovery_point;
 
+    int missing_fields;
+
     int luma_weight_flag[2];    ///< 7.4.3.2 luma_weight_lX_flag
     int chroma_weight_flag[2];  ///< 7.4.3.2 chroma_weight_lX_flag
 
@@ -899,6 +896,13 @@ void ff_h264_reset_sei(H264Context *h);
  * @param h H.264 context.
  */
 const char* ff_h264_sei_stereo_mode(H264Context *h);
+
+#define COPY_PICTURE(dst, src) \
+do {\
+    *(dst) = *(src);\
+    (dst)->f.extended_data = (dst)->f.data;\
+    (dst)->tf.f = &(dst)->f;\
+} while (0)
 
 /*
  * o-o o-o

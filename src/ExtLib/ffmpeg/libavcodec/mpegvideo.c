@@ -384,7 +384,6 @@ static av_cold int dct_init(MpegEncContext *s)
     ff_blockdsp_init(&s->bdsp, s->avctx);
     ff_h264chroma_init(&s->h264chroma, 8); //for lowres
     ff_hpeldsp_init(&s->hdsp, s->avctx->flags);
-    ff_me_cmp_init(&s->mecc, s->avctx);
     ff_mpegvideodsp_init(&s->mdsp);
     ff_videodsp_init(&s->vdsp, s->avctx->bits_per_raw_sample);
 
@@ -1132,8 +1131,6 @@ void ff_mpv_decode_init(MpegEncContext *s, AVCodecContext *avctx)
 
     /* convert fourcc to upper case */
     s->codec_tag          = avpriv_toupper4(avctx->codec_tag);
-
-    s->stream_codec_tag   = avpriv_toupper4(avctx->stream_codec_tag);
 }
 
 static int init_er(MpegEncContext *s)
@@ -1143,7 +1140,6 @@ static int init_er(MpegEncContext *s)
     int i;
 
     er->avctx       = s->avctx;
-    er->mecc        = &s->mecc;
 
     er->mb_index2xy = s->mb_index2xy;
     er->mb_num      = s->mb_num;
@@ -2146,8 +2142,6 @@ static int add_mb(AVMotionVector *mb, uint32_t mb_type,
                   int src_x, int src_y,
                   int direction)
 {
-    if (dst_x == src_x && dst_y == src_y)
-        return 0;
     mb->w = IS_8X8(mb_type) || IS_8X16(mb_type) ? 8 : 16;
     mb->h = IS_8X8(mb_type) || IS_16X8(mb_type) ? 8 : 16;
     mb->src_x = src_x;

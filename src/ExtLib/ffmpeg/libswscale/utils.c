@@ -204,8 +204,6 @@ static const FormatEntry format_entries[AV_PIX_FMT_NB] = {
     [AV_PIX_FMT_GBRP14BE]    = { 1, 1 },
     [AV_PIX_FMT_GBRP16LE]    = { 1, 0 },
     [AV_PIX_FMT_GBRP16BE]    = { 1, 0 },
-    [AV_PIX_FMT_XYZ12BE]     = { 1, 1, 1 },
-    [AV_PIX_FMT_XYZ12LE]     = { 1, 1, 1 },
     [AV_PIX_FMT_GBRAP]       = { 1, 1 },
     [AV_PIX_FMT_GBRAP16LE]   = { 1, 0 },
     [AV_PIX_FMT_GBRAP16BE]   = { 1, 0 },
@@ -221,6 +219,8 @@ static const FormatEntry format_entries[AV_PIX_FMT_NB] = {
     [AV_PIX_FMT_BAYER_GBRG16BE] = { 1, 0 },
     [AV_PIX_FMT_BAYER_GRBG16LE] = { 1, 0 },
     [AV_PIX_FMT_BAYER_GRBG16BE] = { 1, 0 },
+    [AV_PIX_FMT_XYZ12BE]     = { 1, 1, 1 },
+    [AV_PIX_FMT_XYZ12LE]     = { 1, 1, 1 },
 };
 
 int sws_isSupportedInput(enum AVPixelFormat pix_fmt)
@@ -611,14 +611,15 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
         }
 
         if ((*filterPos)[i] + filterSize > srcW) {
-            int shift = (*filterPos)[i] + filterSize - srcW;
+            int shift = (*filterPos)[i] + FFMIN(filterSize - srcW, 0);
+
             // move filter coefficients right to compensate for filterPos
             for (j = filterSize - 2; j >= 0; j--) {
                 int right = FFMIN(j + shift, filterSize - 1);
                 filter[i * filterSize + right] += filter[i * filterSize + j];
                 filter[i * filterSize + j]      = 0;
             }
-            (*filterPos)[i]= srcW - filterSize;
+            (*filterPos)[i]-= shift;
         }
     }
 

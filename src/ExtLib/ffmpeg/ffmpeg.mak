@@ -230,6 +230,7 @@ SRCS_LC = \
 	libavcodec/huffyuvdsp.c \
 	libavcodec/idctdsp.c \
 	libavcodec/imc.c \
+	libavcodec/imdct15.c \
 	libavcodec/imgconvert.c \
 	libavcodec/indeo3.c \
 	libavcodec/indeo4.c \
@@ -313,7 +314,6 @@ SRCS_LC = \
 	libavcodec/options.c \
 	libavcodec/opus.c \
 	libavcodec/opus_celt.c \
-	libavcodec/opus_imdct.c \
 	libavcodec/opus_parser.c \
 	libavcodec/opus_silk.c \
 	libavcodec/opusdec.c \
