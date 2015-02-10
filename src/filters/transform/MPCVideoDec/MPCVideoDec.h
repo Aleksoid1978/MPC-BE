@@ -150,12 +150,12 @@ protected:
 
 	BOOL									m_bCheckFramesOrdering;
 
-	CMediaType								m_InputMT;
+	CMediaType								m_pCurrentMediaType;
 
 	// === Private functions
 	void				Cleanup();
 	void				ffmpegCleanup();
-	int					FindCodec(const CMediaType* mtIn, bool bForced = false);
+	int					FindCodec(const CMediaType* mtIn, BOOL bForced = FALSE);
 	void				AllocExtradata(AVCodecContext* pAVCtx, const CMediaType* mt);
 	void				GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
 	void				DetectVideoCard(HWND hWnd);

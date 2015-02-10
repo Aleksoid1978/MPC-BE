@@ -1159,7 +1159,7 @@ static bool IsDXVAEnabled(FFMPEG_CODECS ffcodec, const bool DXVAFilters[VDEC_DXV
 	return DXVAFilters[ffcodec.DXVACode];
 }
 
-int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, bool bForced)
+int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE*/)
 {
 	m_bUseFFmpeg	= false;
 	m_bUseDXVA		= false;
@@ -1456,7 +1456,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 			return hr;
 		}
 
-		m_InputMT = *pmt;
+		m_pCurrentMediaType = *pmt;
 	} else if (direction == PINDIR_OUTPUT) {
 		BITMAPINFOHEADER bihOut;
 		if (!ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut)) {
@@ -1565,7 +1565,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 {
 	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::InitDecoder()"));
 
-	bool bReinit = ((m_pAVCtx != NULL));
+	BOOL bReinit = (m_pAVCtx != NULL);
+	BOOL bChangeType = (m_pCurrentMediaType != *pmt);
 
 	ffmpegCleanup();
 
@@ -1581,35 +1582,37 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		}
 	}
 
-	CLSID clsidInput = GetCLSID(m_pInput->GetConnected());
-	// Daum PotPlayer's MKV Source - {A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}
-	BOOL bNotTrustSourceTimeStamp = (clsidInput == GUIDFromCString(L"{A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}"));
-
 	m_nCodecNb = nNewCodec;
 	m_nCodecId = ffCodecs[nNewCodec].nFFCodec;
 	m_pAVCodec = avcodec_find_decoder(m_nCodecId);
 	CheckPointer(m_pAVCodec, VFW_E_UNSUPPORTED_VIDEO);
 
-	bool bH264_HEVCIsAVI	= ((m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC) && IsAVI());
-	bool bMPEG4BFrames		= (m_nCodecId == AV_CODEC_ID_MPEG4 && pmt->formattype != FORMAT_MPEG2Video);
-	// code from LAV ... thanks to it's author
-	// Use ffmpegs logic to reorder timestamps
-	// This is required for H264 content (except AVI), and generally all codecs that use frame threading
-	m_bReorderBFrame = (bH264_HEVCIsAVI
-						|| bMPEG4BFrames
-						|| !((m_pAVCodec->capabilities & CODEC_CAP_FRAME_THREADS)
-								|| m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
-								|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
-								|| m_nCodecId == AV_CODEC_ID_DIRAC
-								|| m_nCodecId == AV_CODEC_ID_RV10
-								|| m_nCodecId == AV_CODEC_ID_RV20));
+	if (bChangeType) {
+		bool bH264_HEVCIsAVI = ((m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC) && IsAVI());
+		bool bMPEG4BFrames = (m_nCodecId == AV_CODEC_ID_MPEG4 && pmt->formattype != FORMAT_MPEG2Video);
+		// code from LAV ... thanks to it's author
+		// Use ffmpegs logic to reorder timestamps
+		// This is required for H264 content (except AVI), and generally all codecs that use frame threading
+		m_bReorderBFrame = (bH264_HEVCIsAVI
+							|| bMPEG4BFrames
+							|| !((m_pAVCodec->capabilities & CODEC_CAP_FRAME_THREADS)
+									|| m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
+									|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
+									|| m_nCodecId == AV_CODEC_ID_DIRAC
+									|| m_nCodecId == AV_CODEC_ID_RV10
+									|| m_nCodecId == AV_CODEC_ID_RV20));
 
-	m_bCheckFramesOrdering = (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC);
+		m_bCheckFramesOrdering = (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC);
 
-	m_bCalculateStopTime = (m_nCodecId == AV_CODEC_ID_H264 ||
-							m_nCodecId == AV_CODEC_ID_DIRAC || 
-							(m_nCodecId == AV_CODEC_ID_MPEG4 && pmt->formattype == FORMAT_MPEG2Video)
-							|| bNotTrustSourceTimeStamp);
+		CLSID clsidInput = GetCLSID(m_pInput->GetConnected());
+		// Daum PotPlayer's MKV Source - {A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}
+		BOOL bNotTrustSourceTimeStamp = (clsidInput == GUIDFromCString(L"{A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}"));
+
+		m_bCalculateStopTime = (m_nCodecId == AV_CODEC_ID_H264 ||
+								m_nCodecId == AV_CODEC_ID_DIRAC || 
+								(m_nCodecId == AV_CODEC_ID_MPEG4 && pmt->formattype == FORMAT_MPEG2Video)
+								|| bNotTrustSourceTimeStamp);
+	}
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
 	CheckPointer(m_pAVCtx, E_POINTER);
@@ -1652,16 +1655,18 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		return VFW_E_INVALIDMEDIATYPE;
 	}
 
-	m_bWaitKeyFrame =	m_nCodecId == AV_CODEC_ID_VC1
-					 || m_nCodecId == AV_CODEC_ID_VC1IMAGE
-					 || m_nCodecId == AV_CODEC_ID_WMV3
-					 || m_nCodecId == AV_CODEC_ID_WMV3IMAGE
-					 || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
-					 || m_nCodecId == AV_CODEC_ID_RV30
-					 || m_nCodecId == AV_CODEC_ID_RV40
-					 || m_nCodecId == AV_CODEC_ID_VP3
-					 || m_nCodecId == AV_CODEC_ID_THEORA
-					 || m_nCodecId == AV_CODEC_ID_MPEG4;
+	if (bChangeType) {
+		m_bWaitKeyFrame =	m_nCodecId == AV_CODEC_ID_VC1
+						 || m_nCodecId == AV_CODEC_ID_VC1IMAGE
+						 || m_nCodecId == AV_CODEC_ID_WMV3
+						 || m_nCodecId == AV_CODEC_ID_WMV3IMAGE
+						 || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
+						 || m_nCodecId == AV_CODEC_ID_RV30
+						 || m_nCodecId == AV_CODEC_ID_RV40
+						 || m_nCodecId == AV_CODEC_ID_VP3
+						 || m_nCodecId == AV_CODEC_ID_THEORA
+						 || m_nCodecId == AV_CODEC_ID_MPEG4;
+	}
 
 	m_pAVCtx->codec_id              = m_nCodecId;
 	m_pAVCtx->codec_tag             = pBMI->biCompression ? pBMI->biCompression : pmt->subtype.Data1;
@@ -1675,8 +1680,12 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	m_pAVCtx->skip_loop_filter      = (AVDiscard)m_nDiscardMode;
 	m_pAVCtx->refcounted_frames		= 1;
 	m_pAVCtx->opaque				= this;
+	m_pAVCtx->using_dxva			= IsDXVASupported();
+	if (m_pAVCtx->codec_tag == MAKEFOURCC('m','p','g','2')) {
+		m_pAVCtx->codec_tag = MAKEFOURCC('M','P','E','G');
+	}
 
-	if (IsDXVASupported()) {
+	if (m_pAVCtx->using_dxva) {
 		m_pAVCtx->get_buffer2		= av_get_buffer;
 		if (m_nCodecId == AV_CODEC_ID_H264 && !IsWinVistaOrLater()) {
 			// for DXVA1 decoder ...
@@ -1684,19 +1693,15 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		}
 	}
 
-	if (m_pAVCtx->codec_tag == MAKEFOURCC('m','p','g','2')) {
-		m_pAVCtx->codec_tag = MAKEFOURCC('M','P','E','G');
-	}
-
 	AllocExtradata(m_pAVCtx, pmt);
 
-	ExtractAvgTimePerFrame(&m_pInput->CurrentMediaType(), m_rtAvrTimePerFrame);
-	int wout, hout;
-	ExtractDim(&m_pInput->CurrentMediaType(), wout, hout, m_nARX, m_nARY);
-	UNREFERENCED_PARAMETER(wout);
-	UNREFERENCED_PARAMETER(hout);
-
-	m_pAVCtx->using_dxva = IsDXVASupported();
+	if (bChangeType) {
+		ExtractAvgTimePerFrame(&m_pInput->CurrentMediaType(), m_rtAvrTimePerFrame);
+		int wout, hout;
+		ExtractDim(&m_pInput->CurrentMediaType(), wout, hout, m_nARX, m_nARY);
+		UNREFERENCED_PARAMETER(wout);
+		UNREFERENCED_PARAMETER(hout);
+	}
 
 	if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL) < 0) {
 		return VFW_E_INVALIDMEDIATYPE;
@@ -1705,7 +1710,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	FFGetFrameProps(m_pAVCtx, m_pFrame, m_nOutputWidth, m_nOutputHeight);
 	m_PixelFormat = m_pAVCtx->pix_fmt;
 
-	if (IsDXVASupported()) {
+	if (bChangeType && IsDXVASupported()) {
 		do {
 			m_bDXVACompatible = false;
 
