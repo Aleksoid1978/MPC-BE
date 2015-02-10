@@ -152,6 +152,8 @@ protected:
 
 	CMediaType								m_pCurrentMediaType;
 
+	BOOL									m_bDecodingStart;
+
 	// === Private functions
 	void				Cleanup();
 	void				ffmpegCleanup();

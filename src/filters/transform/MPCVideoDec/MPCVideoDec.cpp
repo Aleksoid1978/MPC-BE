@@ -912,6 +912,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bInterlaced(FALSE)
 	, m_fSYNC(0)
 	, m_bCheckFramesOrdering(FALSE)
+	, m_bDecodingStart(FALSE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -1456,6 +1457,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 			return hr;
 		}
 
+		m_bDecodingStart = FALSE;
 		m_pCurrentMediaType = *pmt;
 	} else if (direction == PINDIR_OUTPUT) {
 		BITMAPINFOHEADER bihOut;
@@ -2157,7 +2159,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	m_rtLastStart	= 0;
 	m_rtLastStop	= 0;
 
-	if (m_nCodecId == AV_CODEC_ID_H264 && (m_nDecoderMode == MODE_SOFTWARE || (m_nPCIVendor == PCIV_ATI && m_bInterlaced))) {
+	if (m_nCodecId == AV_CODEC_ID_H264 && m_bDecodingStart && (m_nDecoderMode == MODE_SOFTWARE || (m_nPCIVendor == PCIV_ATI && m_bInterlaced))) {
 		InitDecoder(&m_pInput->CurrentMediaType());
 	}
 
@@ -2679,6 +2681,8 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 			ASSERT(FALSE);
 			hr = E_UNEXPECTED;
 	}
+
+	m_bDecodingStart = TRUE;
 
 	return hr;
 }
