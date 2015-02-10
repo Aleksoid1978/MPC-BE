@@ -580,10 +580,8 @@ typedef struct SliceHeader {
     uint8_t colour_plane_id;
 
     ///< RPS coded in the slice header itself is stored here
-    // ==> Start patch MPC
     int short_term_ref_pic_set_sps_flag;
     int short_term_ref_pic_set_size;
-    // ==> End patch MPC
     ShortTermRPS slice_rps;
     const ShortTermRPS *short_term_rps;
     LongTermRPS long_term_rps;
@@ -725,6 +723,9 @@ typedef struct HEVCFrame {
     AVBufferRef *rpl_tab_buf;
     AVBufferRef *rpl_buf;
 
+    AVBufferRef *hwaccel_priv_buf;
+    void *hwaccel_picture_private;
+
     /**
      * A sequence counter, so that old frames are output first
      * after a POC reset
@@ -744,10 +745,8 @@ typedef struct HEVCNAL {
     int size;
     const uint8_t *data;
 
-    // ==> Start patch MPC
     int raw_size;
     const uint8_t *raw_data;
-    // ==> End patch MPC
 } HEVCNAL;
 
 typedef struct HEVCLocalContext {
@@ -775,8 +774,9 @@ typedef struct HEVCLocalContext {
     int     end_of_tiles_y;
     /* +7 is for subpixel interpolation, *2 for high bit depths */
     DECLARE_ALIGNED(32, uint8_t, edge_emu_buffer)[(MAX_PB_SIZE + 7) * EDGE_EMU_BUFFER_STRIDE * 2];
+    /* The extended size between the new edge emu buffer is abused by SAO */
     DECLARE_ALIGNED(32, uint8_t, edge_emu_buffer2)[(MAX_PB_SIZE + 7) * EDGE_EMU_BUFFER_STRIDE * 2];
-    DECLARE_ALIGNED(16, int16_t, tmp [MAX_PB_SIZE * MAX_PB_SIZE]);
+    DECLARE_ALIGNED(32, int16_t, tmp [MAX_PB_SIZE * MAX_PB_SIZE]);
 
     int ct_depth;
     CodingUnit cu;
