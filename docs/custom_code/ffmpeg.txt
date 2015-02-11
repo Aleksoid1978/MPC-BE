@@ -9,6 +9,7 @@
 * libavcodec/error_resilience.c
 * libavcodec/h264.c
 * libavcodec/h264.h
+* libavcodec/h264_refs.c
 * libavcodec/h264_ps.c
 * libavcodec/h264_slice.c
 * libavcodec/hevc.c
