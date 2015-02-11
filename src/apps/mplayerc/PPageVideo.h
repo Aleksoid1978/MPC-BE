@@ -39,8 +39,10 @@ private:
 	CComboBox m_cbD3D9RenderDevice;
 	CComboBox m_cbDX9SurfaceFormat;
 	CComboBox m_cbDX9Resizer;
+	CComboBox m_cbEVROutputRange;
 	CButton   m_chkD3DFullscreen;
 	CButton   m_chk10bitOutput;
+	CButton   m_chkDisableAero;
 
 	int m_iVideoRendererType_store;
 	int m_iVideoRendererType;
@@ -51,10 +53,8 @@ private:
 	BOOL m_bVMRMixerMode;
 	BOOL m_bVMRMixerYUV;
 	BOOL m_bResetDevice;
-	//BOOL m_bDisableAero;
 
 	int m_iAPSurfaceUsage;
-	//int m_iOutputRange;
 	CString m_iEvrBuffers;
 
 	//BOOL m_bColorManagment;

@@ -1715,7 +1715,7 @@ void CAppSettings::UpdateRenderersData(bool fSave)
 		ars.iEVREnableFrameTimeCorrection = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("EVREnableFrameTimeCorrection"), DefaultSettings.iEVREnableFrameTimeCorrection);
 		ars.iVMR9VSync = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRVSync"), DefaultSettings.iVMR9VSync);
 		ars.iVMRDisableDesktopComposition = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRDisableDesktopComposition"), DefaultSettings.iVMRDisableDesktopComposition);
-		ars.b10BitOutput = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_10BITOUTPUT, FALSE);
+		ars.b10BitOutput = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_10BITOUTPUT, FALSE);
 		ars.iDX9SurfaceFormat = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_SURFACEFORMAT, D3DFMT_X8R8G8B8);
 
 		ars.iVMR9ColorManagementEnable = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementEnable"), DefaultSettings.iVMR9ColorManagementEnable);
