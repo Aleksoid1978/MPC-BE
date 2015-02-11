@@ -409,10 +409,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_VIEW_COLORMANAGEMENT_INTENT_ABSOLUTECOLORIMETRIC, OnViewColorManagementIntentAbsoluteColorimetric)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_COLORMANAGEMENT_INTENT_PERCEPTUAL, ID_VIEW_COLORMANAGEMENT_INTENT_ABSOLUTECOLORIMETRIC, OnUpdateViewColorManagementIntent)
 
-	ON_COMMAND(ID_VIEW_EVROUTPUTRANGE_0_255, OnViewEVROutputRange_0_255)
-	ON_COMMAND(ID_VIEW_EVROUTPUTRANGE_16_235, OnViewEVROutputRange_16_235)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_EVROUTPUTRANGE_0_255, ID_VIEW_EVROUTPUTRANGE_16_235, OnUpdateViewEVROutputRange)
-
 	ON_COMMAND(ID_VIEW_FLUSHGPU_BEFOREVSYNC, OnViewFlushGPUBeforeVSync)
 	ON_COMMAND(ID_VIEW_FLUSHGPU_AFTERPRESENT, OnViewFlushGPUAfterVSync)
 	ON_COMMAND(ID_VIEW_FLUSHGPU_WAIT, OnViewFlushGPUWait)
@@ -6847,35 +6843,6 @@ void CMainFrame::OnUpdateViewColorManagementIntent(CCmdUI* pCmdUI)
 	*/
 }
 
-void CMainFrame::OnUpdateViewEVROutputRange(CCmdUI* pCmdUI)
-{
-	AppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = ((s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
-					   s.iDSVideoRendererType == VIDRNDT_DS_SYNC) &&
-					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
-
-	pCmdUI->Enable(supported);
-
-	BOOL fChecked = FALSE;
-	switch (pCmdUI->m_nID) {
-		case ID_VIEW_EVROUTPUTRANGE_0_255:
-			fChecked = r.m_AdvRendSets.iEVROutputRange == 0;
-			break;
-		case ID_VIEW_EVROUTPUTRANGE_16_235:
-			fChecked = r.m_AdvRendSets.iEVROutputRange == 1;
-			break;
-	}
-
-	pCmdUI->SetCheck(fChecked);
-
-	/*
-	if (fChecked) {
-		CheckMenuRadioItem(ID_VIEW_EVROUTPUTRANGE_0_255, ID_VIEW_EVROUTPUTRANGE_16_235, pCmdUI->m_nID);
-	}
-	*/
-}
-
 void CMainFrame::OnUpdateViewFlushGPU(CCmdUI* pCmdUI)
 {
 	AppSettings& s = AfxGetAppSettings();
@@ -7135,26 +7102,6 @@ void CMainFrame::OnViewColorManagementIntentAbsoluteColorimetric()
 	s.m_AdvRendSets.iVMR9ColorManagementIntent = COLOR_RENDERING_INTENT_ABSOLUTE_COLORIMETRIC;
 	s.UpdateData(true);
 	m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_OSD_RS_REND_INTENT_ABSOLUTE));
-}
-
-void CMainFrame::OnViewEVROutputRange_0_255()
-{
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.iEVROutputRange = 0;
-	s.UpdateData(true);
-	CString strOSD;
-	strOSD.Format(ResStr(IDS_OSD_RS_OUTPUT_RANGE), _T("0 - 255"));
-	m_OSD.DisplayMessage(OSD_TOPRIGHT, strOSD);
-}
-
-void CMainFrame::OnViewEVROutputRange_16_235()
-{
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.iEVROutputRange = 1;
-	s.UpdateData(true);
-	CString strOSD;
-	strOSD.Format(ResStr(IDS_OSD_RS_OUTPUT_RANGE), _T("16 - 235"));
-	m_OSD.DisplayMessage(OSD_TOPRIGHT, strOSD);
 }
 
 void CMainFrame::OnViewFlushGPUBeforeVSync()

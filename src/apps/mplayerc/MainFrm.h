@@ -848,7 +848,6 @@ public:
 	afx_msg void OnUpdateViewColorManagementAmbientLight(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewColorManagementIntent(CCmdUI* pCmdUI);
 
-	afx_msg void OnUpdateViewEVROutputRange(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewFullscreenGUISupport(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewVSyncOffsetIncrease(CCmdUI* pCmdUI);
@@ -872,9 +871,6 @@ public:
 	afx_msg void OnViewColorManagementIntentRelativeColorimetric();
 	afx_msg void OnViewColorManagementIntentSaturation();
 	afx_msg void OnViewColorManagementIntentAbsoluteColorimetric();
-
-	afx_msg void OnViewEVROutputRange_0_255();
-	afx_msg void OnViewEVROutputRange_16_235();
 
 	afx_msg void OnViewFlushGPUBeforeVSync();
 	afx_msg void OnViewFlushGPUAfterVSync();

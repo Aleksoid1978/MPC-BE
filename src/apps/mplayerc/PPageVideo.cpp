@@ -93,6 +93,8 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_DSVMRLOADMIXER, m_bVMRMixerMode);
 	DDX_Check(pDX, IDC_DSVMRYUVMIXER, m_bVMRMixerYUV);
 	DDX_CBString(pDX, IDC_EVR_BUFFERS, m_iEvrBuffers);
+	DDX_Control(pDX, IDC_COMBO2, m_cbEVROutputRange);
+	DDX_Control(pDX, IDC_CHECK2, m_chkDisableAero);
 }
 
 BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
@@ -124,6 +126,12 @@ BOOL CPPageVideo::OnInitDialog()
 	m_chkD3DFullscreen.SetCheck(s.fD3DFullscreen);
 	m_chk10bitOutput.SetCheck(rs.m_AdvRendSets.b10BitOutput);
 	m_chk10bitOutput.EnableWindow(s.fD3DFullscreen);
+
+	m_chkDisableAero.SetCheck(rs.m_AdvRendSets.iVMRDisableDesktopComposition);
+
+	m_cbEVROutputRange.AddString(L"0-255");
+	m_cbEVROutputRange.AddString(L"16-235");
+	m_cbEVROutputRange.SetCurSel(rs.m_AdvRendSets.iEVROutputRange);
 
 	m_iEvrBuffers.Format(L"%d", rs.iEvrBuffers);
 
@@ -315,6 +323,9 @@ BOOL CPPageVideo::OnApply()
 
 	rs.m_AdvRendSets.iDX9SurfaceFormat		= m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel());
 	rs.m_AdvRendSets.b10BitOutput			= !!m_chk10bitOutput.GetCheck();
+	rs.m_AdvRendSets.iVMRDisableDesktopComposition = !!m_chkDisableAero.GetCheck();
+	rs.m_AdvRendSets.iEVROutputRange		= m_cbEVROutputRange.GetCurSel();
+
 	rs.m_AdvRendSets.fVMR9AlterativeVSync	= m_bVMR9AlterativeVSync != 0;
 
 	if (!m_iEvrBuffers.IsEmpty()) {
@@ -341,9 +352,7 @@ void CPPageVideo::UpdateSurfaceFormatList(int select)
 	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"8-bit Integer Surfaces"), D3DFMT_X8R8G8B8);
 
 	if ((videoRenderer == VIDRNDT_DS_VMR9RENDERLESS || videoRenderer == VIDRNDT_DS_EVR_CUSTOM) && m_iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
-		//if (videoRenderer == VIDRNDT_DS_EVR_CUSTOM) {
-			m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"10-bit Integer Surfaces"), D3DFMT_A2R10G10B10);
-		//}
+		m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"10-bit Integer Surfaces"), D3DFMT_A2R10G10B10);
 		m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"16-bit Floating Point Surfaces"), D3DFMT_A16B16G16R16F);
 		m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"32-bit Floating Point Surfaces"), D3DFMT_A32B32G32R32F);
 	}
@@ -449,6 +458,8 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_EVR_BUFFERS_TXT)->EnableWindow(FALSE);
 	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(FALSE);
+	m_chkDisableAero.EnableWindow(FALSE);
+	m_cbEVROutputRange.EnableWindow(FALSE);
 
 	switch (CurrentVR) {
 		case VIDRNDT_DS_DEFAULT:
@@ -491,6 +502,9 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 			GetDlgItem(IDC_DX_SURFACE)->EnableWindow(TRUE);
+			if (IsWinVista() || IsWinSeven() && m_iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
+				m_chkDisableAero.EnableWindow(TRUE);
+			}
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9REN), GetDlgItem(IDC_VIDRND_COMBO));
 			break;
@@ -515,6 +529,11 @@ void CPPageVideo::OnDSRendererChange()
 			((CComboBox*)GetDlgItem(IDC_DX_SURFACE))->SetCurSel(2);
 			OnSurfaceChange();
 
+			if (IsWinVista() || IsWinSeven()) {
+				m_chkDisableAero.EnableWindow(TRUE);
+			}
+			m_cbEVROutputRange.EnableWindow(TRUE);
+
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR_CUSTOM), GetDlgItem(IDC_VIDRND_COMBO));
 			break;
 		case VIDRNDT_DS_SYNC:
@@ -525,6 +544,12 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 			GetDlgItem(IDC_DX_SURFACE)->EnableWindow(FALSE);
 			((CComboBox*)GetDlgItem(IDC_DX_SURFACE))->SetCurSel(2);
+			OnSurfaceChange();
+
+			if (IsWinVista() || IsWinSeven()) {
+				m_chkDisableAero.EnableWindow(TRUE);
+			}
+			m_cbEVROutputRange.EnableWindow(TRUE);
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYNC), GetDlgItem(IDC_VIDRND_COMBO));
 			break;
