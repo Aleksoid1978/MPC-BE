@@ -95,8 +95,6 @@ public:
 		int    iVMR9VSyncOffset;
 		bool   iVMR9VSyncAccurate;
 		bool   iVMR9VSync;
-		bool   iVMR9FullFloatingPointProcessing;
-		bool   iVMR9HalfFloatingPointProcessing;
 		bool   iVMR9ColorManagementEnable;
 		int    iVMR9ColorManagementInput;
 		int    iVMR9ColorManagementAmbientLight;
@@ -105,10 +103,10 @@ public:
 		int    iVMRFlushGPUBeforeVSync;
 		int    iVMRFlushGPUAfterPresent;
 		int    iVMRFlushGPUWait;
+		int    iDX9SurfaceFormat;
+		bool   b10BitOutput;
 
 		// EVR
-		bool   iEVRHighColorResolution;
-		bool   iEVRForceInputHighColorResolution;
 		bool   iEVREnableFrameTimeCorrection;
 		int    iEVROutputRange;
 

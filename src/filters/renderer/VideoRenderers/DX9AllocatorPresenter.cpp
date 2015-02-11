@@ -407,9 +407,10 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 	}
 
 	if (m_bIsEVR) {
-		bRet = bRet || New.iEVRHighColorResolution != Current.iEVRHighColorResolution;
-		bRet = bRet || New.iEVRForceInputHighColorResolution != Current.iEVRForceInputHighColorResolution;
+		bRet = bRet || New.b10BitOutput != Current.b10BitOutput;
+
 	}
+	bRet = bRet || New.iDX9SurfaceFormat != Current.iDX9SurfaceFormat;
 
 	m_LastRendererSettings = s.m_AdvRendSets;
 
@@ -535,23 +536,21 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	renderersData->m_b10bitSupport = SUCCEEDED(m_pD3D->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_TEXTURE, D3DFMT_A2R10G10B10));
 
 	// detect 10-bit device support
-	bool bHighColorSupport = SUCCEEDED(m_pD3D->CheckDeviceType(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_A2R10G10B10, D3DFMT_A2R10G10B10, FALSE));
+	bool b10BitOutputSupport = SUCCEEDED(m_pD3D->CheckDeviceType(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_A2R10G10B10, D3DFMT_A2R10G10B10, FALSE));
 
-	// set settings that depend on hardware feature support
-	m_bForceInputHighColorResolution = s.m_AdvRendSets.iEVRForceInputHighColorResolution && m_bIsEVR && renderersData->m_b10bitSupport && bHighColorSupport;
-	m_bHighColorResolution = s.m_AdvRendSets.iEVRHighColorResolution && m_bIsEVR && renderersData->m_b10bitSupport;
-	m_bFullFloatingPointProcessing = s.m_AdvRendSets.iVMR9FullFloatingPointProcessing && renderersData->m_bFP16Support;
-	m_bHalfFloatingPointProcessing = s.m_AdvRendSets.iVMR9HalfFloatingPointProcessing && renderersData->m_bFP16Support && !m_bFullFloatingPointProcessing;
 
-	// set color formats
-	if (m_bFullFloatingPointProcessing) {
-		m_SurfaceType = D3DFMT_A32B32G32R32F;
-	} else if (m_bHalfFloatingPointProcessing) {
-		m_SurfaceType = D3DFMT_A16B16G16R16F;
-	} else if (m_bForceInputHighColorResolution || m_bHighColorResolution) {
-		m_SurfaceType = D3DFMT_A2R10G10B10;
-	} else {
-		m_SurfaceType = D3DFMT_X8R8G8B8;
+	// set surface formats
+	m_SurfaceType = D3DFMT_X8R8G8B8;
+	switch (s.m_AdvRendSets.iDX9SurfaceFormat) {
+	case D3DFMT_A2R10G10B10:
+		if (m_bIsEVR && renderersData->m_b10bitSupport) {
+			m_SurfaceType = D3DFMT_A2R10G10B10;
+		}
+	case D3DFMT_A16B16G16R16F:
+	case D3DFMT_A32B32G32R32F:
+		if (renderersData->m_bFP16Support) {
+			m_SurfaceType = (D3DFORMAT)s.m_AdvRendSets.iDX9SurfaceFormat;
+		}
 	}
 
 	D3DDISPLAYMODEEX DisplayMode;
@@ -562,7 +561,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	ZeroMemory(&d3ddm, sizeof(d3ddm));
 
 	if (m_bIsFullscreen) {
-		if (m_bHighColorResolution) {
+		if (b10BitOutputSupport && s.m_AdvRendSets.b10BitOutput) {
 			m_pp.BackBufferFormat = D3DFMT_A2R10G10B10;
 		} else {
 			m_pp.BackBufferFormat = D3DFMT_X8R8G8B8;
@@ -1879,21 +1878,7 @@ void CDX9AllocatorPresenter::DrawStats()
 				strText.AppendFormat(L"VSOfst(%d)", s.m_AdvRendSets.iVMR9VSyncOffset);
 			}
 
-			if (m_bFullFloatingPointProcessing) {
-				strText += L"FullFP ";
-			}
-
-			if (m_bHalfFloatingPointProcessing) {
-				strText += L"HalfFP ";
-			}
-
 			if (m_bIsEVR) {
-				if (m_bHighColorResolution) {
-					strText += L"10bitOut ";
-				}
-				if (m_bForceInputHighColorResolution) {
-					strText += L"For10bitIn ";
-				}
 				if (s.m_AdvRendSets.iEVREnableFrameTimeCorrection) {
 					strText += L"FTC ";
 				}
@@ -2185,7 +2170,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 	D3DLOCKED_RECT r;
 	CComPtr<IDirect3DSurface9> pSurface;
-	if (m_bFullFloatingPointProcessing || m_bHalfFloatingPointProcessing || m_bHighColorResolution) {
+	if (m_SurfaceType != D3DFMT_X8R8G8B8) {
 		CComPtr<IDirect3DSurface9> fSurface = m_pVideoSurface[m_nCurSurface];
 		if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(desc.Width, desc.Height, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &fSurface, NULL))
 				|| FAILED(hr = m_pD3DXLoadSurfaceFromSurface(fSurface, NULL, NULL, m_pVideoSurface[m_nCurSurface], NULL, NULL, D3DX_DEFAULT, 0))) {
