@@ -36,8 +36,6 @@ void CRenderersSettings::CAdvRendererSettings::SetDefault()
 	iVMR9VSyncOffset                  = 0;
 	iVMR9VSyncAccurate                = 0;
 	iVMR9VSync                        = 0;
-	iVMR9FullFloatingPointProcessing  = 0;
-	iVMR9HalfFloatingPointProcessing  = 0;
 	iVMR9ColorManagementEnable        = 0;
 	iVMR9ColorManagementInput         = VIDEO_SYSTEM_UNKNOWN;
 	iVMR9ColorManagementAmbientLight  = AMBIENT_LIGHT_BRIGHT;
@@ -46,8 +44,6 @@ void CRenderersSettings::CAdvRendererSettings::SetDefault()
 	iVMRFlushGPUBeforeVSync           = 0;
 	iVMRFlushGPUAfterPresent          = 0;
 	iVMRFlushGPUWait                  = 0;
-	iEVRHighColorResolution           = 0;
-	iEVRForceInputHighColorResolution = 0;
 	iEVREnableFrameTimeCorrection     = 0;
 	iEVROutputRange                   = 0;
 	bSynchronizeVideo                 = 0;

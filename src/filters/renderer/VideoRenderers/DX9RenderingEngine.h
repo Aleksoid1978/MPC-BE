@@ -85,9 +85,6 @@ namespace DSObjects
 		int							m_nNbDXSurface;					// Total number of DX Surfaces
 		int							m_nCurSurface;					// Surface currently displayed
 
-		bool						m_bHighColorResolution;
-		bool						m_bForceInputHighColorResolution;
-
 		// Variables initialized/managed by this class but can be accessed by the allocator-presenter
 		bool						m_bD3DX;
 		RenderingPath				m_RenderingPath;
@@ -95,8 +92,6 @@ namespace DSObjects
 		CComPtr<IDirect3DTexture9>	m_pVideoTexture[MAX_VIDEO_SURFACES];
 		CComPtr<IDirect3DSurface9>	m_pVideoSurface[MAX_VIDEO_SURFACES];
 
-		bool						m_bFullFloatingPointProcessing;
-		bool						m_bHalfFloatingPointProcessing;
 		bool						m_bColorManagement;
 
 		CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError);

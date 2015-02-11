@@ -392,7 +392,8 @@ bool CBaseAP::SettingsNeedResetDevice()
 			}
 		}
 	}
-	bRet = bRet || New.iEVRHighColorResolution != Current.iEVRHighColorResolution;
+	bRet = bRet || New.b10BitOutput != Current.b10BitOutput;
+	bRet = bRet || New.iDX9SurfaceFormat != Current.iDX9SurfaceFormat;
 	m_LastRendererSettings = s.m_AdvRendSets;
 	return bRet;
 }
@@ -469,7 +470,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		pp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 		pp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 		pp.Flags = D3DPRESENTFLAG_VIDEO;
-		m_bHighColorResolution = s.m_AdvRendSets.iEVRHighColorResolution;
+		m_bHighColorResolution = s.m_AdvRendSets.b10BitOutput;
 		if (m_bHighColorResolution) {
 			if (FAILED(m_pD3D->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3ddm.Format, D3DFMT_A2R10G10B10, false))) {
 				m_strStatsMsg[MSG_ERROR] = L"10 bit RGB is not supported by this graphics device in this resolution.";
@@ -524,7 +525,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		pp.BackBufferHeight = d3ddm.Height;
 		m_BackbufferType = d3ddm.Format;
 		m_DisplayType = d3ddm.Format;
-		m_bHighColorResolution = s.m_AdvRendSets.iEVRHighColorResolution;
+		m_bHighColorResolution = s.m_AdvRendSets.b10BitOutput;
 		if (m_bHighColorResolution) {
 			if (FAILED(m_pD3D->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3ddm.Format, D3DFMT_A2R10G10B10, false))) {
 				m_strStatsMsg[MSG_ERROR] = L"10 bit RGB is not supported by this graphics device in this resolution.";
@@ -728,7 +729,7 @@ HRESULT CBaseAP::ResetDXDevice(CString &_Error)
 		m_pDwmIsCompositionEnabled(&bCompositionEnabled);
 	}
 	m_bCompositionEnabled = bCompositionEnabled != 0;
-	m_bHighColorResolution = s.m_AdvRendSets.iEVRHighColorResolution;
+	m_bHighColorResolution = s.m_AdvRendSets.b10BitOutput;
 
 	if (m_bIsFullscreen) { // Exclusive mode fullscreen
 		pp.BackBufferWidth = d3ddm.Width;

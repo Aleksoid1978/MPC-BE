@@ -31,35 +31,47 @@ class CPPageVideo : public CPPageBase
 	DECLARE_DYNAMIC(CPPageVideo)
 
 private:
+	enum { IDD = IDD_PPAGEVIDEO };
+
 	CStringArray m_D3D9GUIDNames;
 
-	CComboBox m_iDSVideoRendererTypeCtrl;
-	CComboBox m_iD3D9RenderDeviceCtrl;
-	CComboBox m_cbDX9ResizerCtrl;
+	CComboBox m_cbVideoRenderer;
+	CComboBox m_cbD3D9RenderDevice;
+	CComboBox m_cbDX9SurfaceFormat;
+	CComboBox m_cbDX9Resizer;
+	CButton   m_chkD3DFullscreen;
+	CButton   m_chk10bitOutput;
 
-	int m_iDSVideoRendererType_store;
+	int m_iVideoRendererType_store;
+	int m_iVideoRendererType;
+
+	BOOL m_bD3D9RenderDevice;
+	int  m_iD3D9RenderDevice;
+	BOOL m_bVMR9AlterativeVSync;
+	BOOL m_bVMRMixerMode;
+	BOOL m_bVMRMixerYUV;
+	BOOL m_bResetDevice;
+	//BOOL m_bDisableAero;
+
+	int m_iAPSurfaceUsage;
+	//int m_iOutputRange;
+	CString m_iEvrBuffers;
+
+	//BOOL m_bColorManagment;
+	//int  m_iCMInputType;
+	//int  m_iCMAmbientLight;
+	//int  m_iCMRenderingIntent;
+
 public:
 	CPPageVideo();
 	virtual ~CPPageVideo();
-
-	enum { IDD = IDD_PPAGEVIDEO };
-	int m_iDSVideoRendererType;
-	int m_iAPSurfaceUsage;
-	BOOL m_fVMRMixerMode;
-	BOOL m_fVMRMixerYUV;
-	BOOL m_fD3DFullscreen;
-	BOOL m_fVMR9AlterativeVSync;
-	BOOL m_fResetDevice;
-	CString m_iEvrBuffers;
-
-	BOOL m_fD3D9RenderDevice;
-	int m_iD3D9RenderDevice;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 
+	void UpdateSurfaceFormatList(int select);
 	void UpdateResizerList(int select);
 
 	DECLARE_MESSAGE_MAP()

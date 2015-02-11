@@ -850,10 +850,6 @@ public:
 
 	afx_msg void OnUpdateViewEVROutputRange(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewFullscreenGUISupport(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewHighColorResolution(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewForceInputHighColorResolution(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewFullFloatingPointProcessing(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewHalfFloatingPointProcessing(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewVSyncOffsetIncrease(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewVSyncOffsetDecrease(CCmdUI* pCmdUI);
@@ -891,10 +887,6 @@ public:
 	afx_msg void OnUpdateViewReset(CCmdUI* pCmdUI);
 
 	afx_msg void OnViewFullscreenGUISupport();
-	afx_msg void OnViewHighColorResolution();
-	afx_msg void OnViewForceInputHighColorResolution();
-	afx_msg void OnViewFullFloatingPointProcessing();
-	afx_msg void OnViewHalfFloatingPointProcessing();
 	afx_msg void OnViewEnableFrameTimeCorrection();
 	afx_msg void OnViewVSyncOffsetIncrease();
 	afx_msg void OnViewVSyncOffsetDecrease();

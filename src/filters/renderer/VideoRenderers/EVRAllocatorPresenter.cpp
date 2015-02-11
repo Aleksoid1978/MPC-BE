@@ -824,13 +824,13 @@ HRESULT CEVRAllocatorPresenter::GetMediaTypeMerit(IMFMediaType* pType, int* pMer
 
 	if (SUCCEEDED(hr)) {
 		switch (Format) {
-			case FCC('AI44')://	Palettized, 4:4:4
+			case FCC('AI44'):// Palettized, 4:4:4
 				*pMerit = 31;
 				break;
-			case FCC('YVU9')://	8-bit, 16:1:1
+			case FCC('YVU9'):// 8-bit, 16:1:1
 				*pMerit = 30;
 				break;
-			case FCC('NV11')://	8-bit, 4:1:1
+			case FCC('NV11'):// 8-bit, 4:1:1
 				*pMerit = 29;
 				break;
 			case FCC('Y41P'):
@@ -839,7 +839,7 @@ HRESULT CEVRAllocatorPresenter::GetMediaTypeMerit(IMFMediaType* pType, int* pMer
 			case FCC('Y41T'):
 				*pMerit = 27;
 				break;
-			case FCC('P016')://	4:2:0
+			case FCC('P016'):// 4:2:0
 				*pMerit = 26;
 				break;
 			case FCC('P010'):
@@ -869,7 +869,7 @@ HRESULT CEVRAllocatorPresenter::GetMediaTypeMerit(IMFMediaType* pType, int* pMer
 			case FCC('IYUV'):
 				*pMerit = 17;
 				break;
-			case FCC('Y216')://	4:2:2
+			case FCC('Y216'):// 4:2:2
 				*pMerit = 16;
 				break;
 			case FCC('v216'):
@@ -899,7 +899,7 @@ HRESULT CEVRAllocatorPresenter::GetMediaTypeMerit(IMFMediaType* pType, int* pMer
 			case FCC('YVYU'):
 				*pMerit = 7;
 				break;
-			case FCC('Y416')://	4:4:4
+			case FCC('Y416'):// 4:4:4
 				*pMerit = 6;
 				break;
 			case FCC('Y410'):
@@ -912,11 +912,11 @@ HRESULT CEVRAllocatorPresenter::GetMediaTypeMerit(IMFMediaType* pType, int* pMer
 				*pMerit = 3;
 				break;
 			case D3DFMT_X8R8G8B8:
-				if (m_bForceInputHighColorResolution) {
-					*pMerit = 63;
-				} else {
+				//if (m_bForceInputHighColorResolution) {
+				//	*pMerit = 63;
+				//} else {
 					*pMerit = 1;
-				}
+				//}
 				break;
 			case D3DFMT_A8R8G8B8:// an accepted format, but fails on most surface types
 			case D3DFMT_A8B8G8R8:

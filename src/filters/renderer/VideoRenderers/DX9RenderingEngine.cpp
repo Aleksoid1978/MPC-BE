@@ -997,7 +997,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	m_RenderingIntent = renderingIntent;
 
 	// Check whether the final pass is required
-	m_bFinalPass = bColorManagement || m_bFullFloatingPointProcessing || m_bHalfFloatingPointProcessing || ((m_bForceInputHighColorResolution || m_bHighColorResolution) && (m_DisplayType != D3DFMT_A2R10G10B10));
+	m_bFinalPass = bColorManagement || m_SurfaceType == D3DFMT_A16B16G16R16F || m_SurfaceType == D3DFMT_A32B32G32R32F || m_SurfaceType == D3DFMT_A2R10G10B10 && m_DisplayType != D3DFMT_A2R10G10B10;
 
 	if (!m_bFinalPass) {
 		return S_OK;
