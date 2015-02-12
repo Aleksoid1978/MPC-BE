@@ -463,7 +463,6 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(FALSE);
 	GetDlgItem(IDC_RESETDEVICE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(FALSE);
-	GetDlgItem(IDC_EVR_BUFFERS_TXT)->EnableWindow(FALSE);
 	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(FALSE);
 	m_chkDisableAero.EnableWindow(FALSE);
@@ -530,7 +529,6 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
-			GetDlgItem(IDC_EVR_BUFFERS_TXT)->EnableWindow(TRUE);
 
 			// Force 3D surface with EVR Custom
 			GetDlgItem(IDC_DX_SURFACE)->EnableWindow(FALSE);
@@ -546,7 +544,6 @@ void CPPageVideo::OnDSRendererChange()
 			break;
 		case VIDRNDT_DS_SYNC:
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
-			GetDlgItem(IDC_EVR_BUFFERS_TXT)->EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
