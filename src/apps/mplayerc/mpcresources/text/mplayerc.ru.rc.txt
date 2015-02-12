@@ -466,7 +466,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Изменения применятся после остановки и перезапуска воспроизведения."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Видео-рендерер"
 7		"Параметры VMR-7/9 (renderless) и EVR-CP"
 8		"Устройство D3D9-рендеринга"
@@ -482,10 +482,10 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 23		"Диапазон вывода:"
 25		"10-bit RGB вывод"
 26		"Отключить эфекты рабочего стола (Aero)"
-28		"      Управление цветом"
-30		"Тип входа:"
-32		"Окружающий свет:"
-34		"Метод пересчета:"
+27		"Управление цветом"
+29		"Тип входа:"
+31		"Окружающий свет:"
+33		"Метод пересчета:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
