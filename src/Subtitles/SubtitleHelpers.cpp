@@ -90,9 +90,11 @@ void Subtitle::GetSubFileNames(CString fn, const CAtlArray<CString>& paths, CAtl
 				path += '/';
 			}
 
+			/*
 			if (path.Find(':') == -1 && path.Find(_T("\\\\")) != 0) {
 				path = orgpath + path;
 			}
+			*/
 
 			path.Replace(_T("/./"), _T("/"));
 			path.Replace('/', '\\');
