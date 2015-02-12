@@ -452,16 +452,16 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"Videó képernyőhöz illesztése"
-6		"Képernyő videóhoz illesztése"
-8		"Cél szink. eltolás:"
-9		"ms"
-11		"Frekvencia hangolás:"
-13		"Frekvencia hangolás:"
-14		"sor"
-16		"oszlop"
-18		"Vezérlési határok:"
-19		"ms"
+6		"Videó képernyőhöz illesztése"
+7		"Képernyő videóhoz illesztése"
+9		"Cél szink. eltolás:"
+10		"ms"
+12		"Frekvencia hangolás:"
+14		"Frekvencia hangolás:"
+15		"sor"
+17		"oszlop"
+19		"Vezérlési határok:"
+20		"ms"
 23		"Megjelenítés a legközelebbi vsync-nél"
 24		"A módosítások akkor lépnek érvénybe, ha a lejátszót bezárta és újraindította."
 END

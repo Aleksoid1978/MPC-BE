@@ -452,16 +452,16 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"Aldiberetu bideoa erakuspenera"
-6		"Aldiberetu erakuspena bideora"
-8		"Xede aldiberetze oreka::"
-9		"sm"
-11		"Maiztasun zehaztapena:"
-13		"Maiztasun zehaztapena:"
-14		"lerro"
-16		"zutabe"
-18		"Aginte mugak:"
-19		"sm"
+6		"Aldiberetu bideoa erakuspenera"
+7		"Aldiberetu erakuspena bideora"
+9		"Xede aldiberetze oreka::"
+10		"sm"
+12		"Maiztasun zehaztapena:"
+14		"Maiztasun zehaztapena:"
+15		"lerro"
+17		"zutabe"
+19		"Aginte mugak:"
+20		"sm"
 23		"Hurbileneko ZAlb"
 24		"Aldaketek eragina dute irakurketa itxi eta berrabiarazi ondoren."
 END

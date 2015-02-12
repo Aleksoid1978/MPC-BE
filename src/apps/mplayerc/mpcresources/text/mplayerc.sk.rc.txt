@@ -452,16 +452,16 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"Synchronizovať video s displejom"
-6		"Synchronizovať displej s videom"
-8		"Cieľový synch. offset:"
-9		"ms"
-11		"Prispôsobenie frekvencie o:"
-13		"Prispôsobenie frekvencie o:"
-14		"riadkov"
-16		"stĺpcov"
-18		"Obmedzenia:"
-19		"ms"
+6		"Synchronizovať video s displejom"
+7		"Synchronizovať displej s videom"
+9		"Cieľový synch. offset:"
+10		"ms"
+12		"Prispôsobenie frekvencie o:"
+14		"Prispôsobenie frekvencie o:"
+15		"riadkov"
+17		"stĺpcov"
+19		"Obmedzenia:"
+20		"ms"
 23		"Prezentovať pri najbližšej vsync"
 24		"Zmeny sa uplatnia až po zastavení aktuálneho prehrávania a po reštartovaní."
 END
