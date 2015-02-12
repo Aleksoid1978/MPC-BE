@@ -452,16 +452,16 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"Sincronizar o vídeo a tela"
-6		"Sincronizar tela ao vídeo"
-8		"Ajuste de sincronismo:"
-9		"ms"
-11		"Ajuste de frequência:"
-13		"Ajuste de frequência:"
-14		"linhas"
-16		"colunas"
-18		"Controle de limites:"
-19		"ms"
+6		"Sincronizar o vídeo a tela"
+7		"Sincronizar tela ao vídeo"
+9		"Ajuste de sincronismo:"
+10		"ms"
+12		"Ajuste de frequência:"
+14		"Ajuste de frequência:"
+15		"linhas"
+17		"colunas"
+19		"Controle de limites:"
+20		"ms"
 23		"Apresentar no modo de sincronismo mais próximo"
 24		"As mudanças terão efeito ao fechar o vídeo e reinicia-lo."
 END

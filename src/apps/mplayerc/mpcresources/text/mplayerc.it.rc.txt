@@ -452,16 +452,16 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"Sincronizza video allo schermo"
-6		"Sincronizza schermo al video"
-8		"Scarto sincronizzazione:"
-9		"ms"
-11		"Regolazione frequenza:"
-13		"Regolazione frequenza:"
-14		"linee"
-16		"colonne"
-18		"Limiti controllo:"
-19		"ms"
+6		"Sincronizza video allo schermo"
+7		"Sincronizza schermo al video"
+9		"Scarto sincronizzazione:"
+10		"ms"
+12		"Regolazione frequenza:"
+14		"Regolazione frequenza:"
+15		"linee"
+17		"colonne"
+19		"Limiti controllo:"
+20		"ms"
 23		"Presenza al vsync più vicino"
 24		"Le modifiche saranno effettive dopo un riavvio della riproduzione."
 END

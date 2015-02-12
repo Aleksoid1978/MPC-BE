@@ -452,16 +452,16 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"Synka video till skärm"
-6		"Synka skärm till video"
-8		"Önskad synkoffset:"
-9		"ms"
-11		"Frekvensjustering:"
-13		"Frekvensjustering:"
-14		"rader"
-16		"kolumner"
-18		"Styrgränser:"
-19		"ms"
+6		"Synka video till skärm"
+7		"Synka skärm till video"
+9		"Önskad synkoffset:"
+10		"ms"
+12		"Frekvensjustering:"
+14		"Frekvensjustering:"
+15		"rader"
+17		"kolumner"
+19		"Styrgränser:"
+20		"ms"
 23		"Visa vid närmaste vertikalsynk"
 24		"Ändring slår igenom efter omstart av uppspelning."
 END

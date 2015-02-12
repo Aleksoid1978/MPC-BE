@@ -452,16 +452,16 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"Sync video to display"
-6		"Sync display to video"
-8		"Target sync offset:"
-9		"ms"
-11		"Frequency adjustment:"
-13		"Frequency adjustment:"
-14		"lines"
-16		"columns"
-18		"Control limits:"
-19		"ms"
+6		"Sync video to display"
+7		"Sync display to video"
+9		"Target sync offset:"
+10		"ms"
+12		"Frequency adjustment:"
+14		"Frequency adjustment:"
+15		"lines"
+17		"columns"
+19		"Control limits:"
+20		"ms"
 23		"Present at nearest VSync"
 24		"Changes take effect after the playback has been closed and restarted."
 END

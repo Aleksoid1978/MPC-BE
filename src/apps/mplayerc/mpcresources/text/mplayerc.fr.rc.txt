@@ -452,16 +452,16 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"Synchroniser la fréquence de la vidéo avec celle de l'écran"
-6		"Synchroniser la fréquence de l'écran avec celle de la vidéo"
-8		"Décalage de synchronisation cible :"
-9		"ms"
-11		"Fréquence d'ajustement :"
-13		"Fréquence d'ajustement :"
-14		"lignes"
-16		"colonnes"
-18		"Limites de contrôle :"
-19		"ms"
+6		"Synchroniser la fréquence de la vidéo avec celle de l'écran"
+7		"Synchroniser la fréquence de l'écran avec celle de la vidéo"
+9		"Décalage de synchronisation cible :"
+10		"ms"
+12		"Fréquence d'ajustement :"
+14		"Fréquence d'ajustement :"
+15		"lignes"
+17		"colonnes"
+19		"Limites de contrôle :"
+20		"ms"
 23		"Présenter à la Vsync la plus proche"
 24		"Les changements prennent effet après que la lecture soit arretée et redémarrée."
 END

@@ -452,16 +452,16 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"Sincronizează video cu afișarea"
-6		"Sincronizează afișarea cu video"
-8		"Decalaj de sincronizare:"
-9		"ms"
-11		"Ajustare frecvență:"
-13		"Ajustare frecvență:"
-14		"linii"
-16		"coloane"
-18		"Limite de control:"
-19		"ms"
+6		"Sincronizează video cu afișarea"
+7		"Sincronizează afișarea cu video"
+9		"Decalaj de sincronizare:"
+10		"ms"
+12		"Ajustare frecvență:"
+14		"Ajustare frecvență:"
+15		"linii"
+17		"coloane"
+19		"Limite de control:"
+20		"ms"
 23		"Prezintă la cel mai apropiat VSync (Sincronizare Verticală)"
 24		"Modificările vor avea efect după ce redarea a fost închisă și repornită."
 END

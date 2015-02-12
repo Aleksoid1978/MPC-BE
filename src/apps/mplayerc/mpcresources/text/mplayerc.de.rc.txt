@@ -452,16 +452,16 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"Videowiedergabe an Anzeige anpassen"
-6		"Anzeige an Videowiedergabe anpassen"
-8		"Ziel-Sync-Offset:"
-9		"ms"
-11		"Frequenzabstimmung:"
-13		"Frequenzabstimmung:"
-14		"Zeilen"
-16		"Spalten"
-18		"Regelgrenze:"
-19		"ms"
+6		"Videowiedergabe an Anzeige anpassen"
+7		"Anzeige an Videowiedergabe anpassen"
+9		"Ziel-Sync-Offset:"
+10		"ms"
+12		"Frequenzabstimmung:"
+14		"Frequenzabstimmung:"
+15		"Zeilen"
+17		"Spalten"
+19		"Regelgrenze:"
+20		"ms"
 23		"Videobilder mit nächstgelegenen VSync darstellen"
 24		"Änderungen werden erst nach Neustart der Wiedergabe wirksam."
 END

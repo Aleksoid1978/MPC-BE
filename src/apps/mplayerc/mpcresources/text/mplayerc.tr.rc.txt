@@ -452,16 +452,16 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"Video'yu görüntüye eşzamanla"
-6		"Görüntüyü video'ya eşzamanla"
-8		"Hedef uyum dengesi:"
-9		"ms"
-11		"Frekans düzeltmesi:"
-13		"Frekans düzeltmesi:"
-14		"satır"
-16		"sütun"
-18		"Kontrol sınırı:"
-19		"ms"
+6		"Video'yu görüntüye eşzamanla"
+7		"Görüntüyü video'ya eşzamanla"
+9		"Hedef uyum dengesi:"
+10		"ms"
+12		"Frekans düzeltmesi:"
+14		"Frekans düzeltmesi:"
+15		"satır"
+17		"sütun"
+19		"Kontrol sınırı:"
+20		"ms"
 23		"En yakın eşzamanlılık örneği"
 24		"Değişiklikler, yürütme kapatıldıktan ve uygulama yeniden başlatıldıktan sonra uygulanacaktır."
 END

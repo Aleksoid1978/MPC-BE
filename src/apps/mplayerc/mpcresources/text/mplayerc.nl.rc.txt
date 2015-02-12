@@ -452,16 +452,16 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"Synchroniseer video aan monitor"
-6		"Synchroniseer monitor aan video"
-8		"Synchronisatie offset:"
-9		"ms"
-11		"Frequentie aanpassing:"
-13		"Frequentie aanpassing:"
-14		"regels"
-16		"kolommen"
-18		"Beperkt tot:"
-19		"ms"
+6		"Synchroniseer video aan monitor"
+7		"Synchroniseer monitor aan video"
+9		"Synchronisatie offset:"
+10		"ms"
+12		"Frequentie aanpassing:"
+14		"Frequentie aanpassing:"
+15		"regels"
+17		"kolommen"
+19		"Beperkt tot:"
+20		"ms"
 23		"Toon bij de dichtstbijzijnde VSync"
 24		"Vereist heropening van de video."
 END

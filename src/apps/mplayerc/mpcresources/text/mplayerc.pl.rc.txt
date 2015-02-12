@@ -452,16 +452,16 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"Synchronizowanie wideo z ekranem"
-6		"Synchronizowanie ekranu z wideo"
-8		"Przesunięcie synchronizacji:"
-9		"ms"
-11		"Regulacja częstotliwości:"
-13		"Regulacja częstotliwości:"
-14		"wierszy"
-16		"kolumn"
-18		"Kontrola limitów:"
-19		"ms"
+6		"Synchronizowanie wideo z ekranem"
+7		"Synchronizowanie ekranu z wideo"
+9		"Przesunięcie synchronizacji:"
+10		"ms"
+12		"Regulacja częstotliwości:"
+14		"Regulacja częstotliwości:"
+15		"wierszy"
+17		"kolumn"
+19		"Kontrola limitów:"
+20		"ms"
 23		"Wyświetlanie najbliższej synchronizacji pionowej"
 24		"Zmiany zostaną wprowadzone po ponownym uruchomieniu programu."
 END

@@ -452,16 +452,16 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"Sync el vídeo a la pantalla"
-6		"Sync la pantalla al vídeo"
-8		"Diana d'òfset sync:"
-9		"ms"
-11		"Ajustar freqüència:"
-13		"Ajustar freqüència:"
-14		"línies"
-16		"columnes"
-18		"Límits de control:"
-19		"ms"
+6		"Sync el vídeo a la pantalla"
+7		"Sync la pantalla al vídeo"
+9		"Diana d'òfset sync:"
+10		"ms"
+12		"Ajustar freqüència:"
+14		"Ajustar freqüència:"
+15		"línies"
+17		"columnes"
+19		"Límits de control:"
+20		"ms"
 23		"Presentar al vsync més proper"
 24		"Els canvis tindran efecte després de tencar i reiniciar la reproducció."
 END
