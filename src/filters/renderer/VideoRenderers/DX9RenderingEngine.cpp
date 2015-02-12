@@ -141,6 +141,13 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	}
 }
 
+CDX9RenderingEngine::~CDX9RenderingEngine()
+{
+	if (m_compileShaderThread.joinable()) {
+		m_compileShaderThread.join();
+	}
+}
+
 void CDX9RenderingEngine::InitRenderingEngine()
 {
 	// Get the device caps
@@ -166,6 +173,10 @@ void CDX9RenderingEngine::InitRenderingEngine()
 	} else {
 		m_ShaderProfile = NULL;
 	}
+
+	m_shaderMacros[0] = { "Ml", m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "1" : "0" };
+	m_shaderMacros[1] = { NULL, NULL };
+	m_shaderMacros[2] = { NULL, NULL };
 
 	// Initialize the pixel shader compiler
 	m_pPSC.Attach(DNew CPixelShaderCompiler(m_pD3DDev, true));
@@ -642,89 +653,86 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 	}
 
 	bool twopass = false;
-	LPCSTR pSrcData = NULL;
-	D3DXMACRO ShaderMacros[3] = {
-		{ "Ml", m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "1" : "0" },
-		{ NULL, NULL },
-		{ NULL, NULL }
-	};
+	
+	m_pSrcData = NULL;
+	m_shaderMacros[1] = { NULL, NULL };
 
 	switch (iShader) {
 	case shader_smootherstep:
-		pSrcData = shader_resizer_smootherstep;
+		m_pSrcData = shader_resizer_smootherstep;
 		break;
 #if ENABLE_2PASS_RESIZE
 	case shader_bicubic06_y:
 		iShader--;
 	case shader_bicubic06_x:
-		pSrcData = shader_resizer_bicubic;
-		ShaderMacros[1] = { "A", "-0.6" };
+		m_pSrcData = shader_resizer_bicubic;
+		m_shaderMacros[1] = { "A", "-0.6" };
 		twopass = true;
 		break;
 	case shader_bicubic08_y:
 		iShader--;
 	case shader_bicubic08_x:
-		pSrcData = shader_resizer_bicubic;
-		ShaderMacros[1] = { "A", "-0.8" };
+		m_pSrcData = shader_resizer_bicubic;
+		m_shaderMacros[1] = { "A", "-0.8" };
 		twopass = true;
 		break;
 	case shader_bicubic10_y:
 		iShader--;
 	case shader_bicubic10_x:
-		pSrcData = shader_resizer_bicubic;
-		ShaderMacros[1] = { "A", "-1.0" };
+		m_pSrcData = shader_resizer_bicubic;
+		m_shaderMacros[1] = { "A", "-1.0" };
 		twopass = true;
 		break;
 	case shader_bspline4_y:
 		iShader--;
 	case shader_bspline4_x:
-		pSrcData = shader_resizer_bspline4;
+		m_pSrcData = shader_resizer_bspline4;
 		twopass = true;
 		break;
 	case shader_mitchell4_y:
 		iShader--;
 	case shader_mitchell4_x:
-		pSrcData = shader_resizer_mitchell4;
+		m_pSrcData = shader_resizer_mitchell4;
 		twopass = true;
 		break;
 	case shader_catmull4_y:
 		iShader--;
 	case shader_catmull4_x:
-		pSrcData = shader_resizer_catmull4;
+		m_pSrcData = shader_resizer_catmull4;
 		twopass = true;
 		break;
 	case shader_lanczos2_y:
 		iShader--;
 	case shader_lanczos2_x:
-		pSrcData = shader_resizer_lanczos2;
+		m_pSrcData = shader_resizer_lanczos2;
 		twopass = true;
 		break;
 #else
 	case shader_bicubic06:
-		pSrcData = shader_resizer_bicubic;
-		ShaderMacros[1] = { "A", "-0.6" };
+		m_pSrcData = shader_resizer_bicubic;
+		m_shaderMacros[1] = { "A", "-0.6" };
 		break;
 	case shader_bicubic08:
-		pSrcData = shader_resizer_bicubic;
-		ShaderMacros[1] = { "A", "-0.8" };
+		m_pSrcData = shader_resizer_bicubic;
+		m_shaderMacros[1] = { "A", "-0.8" };
 		break;
 	case shader_bicubic10:
-		pSrcData = shader_resizer_bicubic;
-		ShaderMacros[1] = { "A", "-1.0" };
+		m_pSrcData = shader_resizer_bicubic;
+		m_shaderMacros[1] = { "A", "-1.0" };
 		break;
 	case shader_bspline4:
-		pSrcData = shader_resizer_bspline4;
+		m_pSrcData = shader_resizer_bspline4;
 		break;
 	case shader_mitchell4:
-		pSrcData = shader_resizer_mitchell4;
+		m_pSrcData = shader_resizer_mitchell4;
 		break;
 	case shader_catmull4:
-		pSrcData = shader_resizer_catmull4;
+		m_pSrcData = shader_resizer_catmull4;
 		break;
 #endif
 	}
 
-	if (!pSrcData) {
+	if (!m_pSrcData) {
 		return E_FAIL;
 	}
 
@@ -748,16 +756,18 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 		}
 #endif
 	} else {
-		hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[iShader], &ErrorMessage);
+		hr = m_pPSC->CompileShader(m_pSrcData, "main", m_ShaderProfile, 0, m_shaderMacros, &m_pResizerPixelShaders[iShader], &ErrorMessage);
 
 		if (hr == S_OK && m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) && !m_pResizerPixelShaders[shader_downscaling]) {
-			pSrcData = shader_resizer_downscaling;
-			hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling], &ErrorMessage);
+			m_pSrcData = shader_resizer_downscaling;
+			m_compileShaderThread = std::thread([this] {
+				m_pPSC->CompileShader(m_pSrcData, "main", m_ShaderProfile, 0, m_shaderMacros, &m_pResizerPixelShaders[shader_downscaling]);
+			});
 		}
 	}
 
 	if (FAILED(hr)) {
-		TRACE("%ws", ErrorMessage.GetString());
+		DbgLog((LOG_TRACE, 3, L"CDX9RenderingEngine::InitShaderResizer() : failed '%s'", ErrorMessage.GetString()));
 		ASSERT(0);
 		return hr;
 	}
@@ -1159,8 +1169,8 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	CString ErrorMessage;
 	hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pFinalPixelShader, &ErrorMessage);
 	if (FAILED(hr)) {
-		TRACE("%ws", ErrorMessage.GetString());
-		ASSERT (0);
+		DbgLog((LOG_TRACE, 3, L"CDX9RenderingEngine::InitFinalPass() : failed '%s'", ErrorMessage.GetString()));
+		ASSERT(0);
 		CleanupFinalPass();
 		return hr;
 	}
@@ -1171,9 +1181,9 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 void CDX9RenderingEngine::CleanupFinalPass()
 {
 	m_bFinalPass = false;
-	m_pDitherTexture = NULL;
-	m_pLut3DTexture = NULL;
-	m_pFinalPixelShader = NULL;
+	m_pDitherTexture.Release();
+	m_pLut3DTexture.Release();
+	m_pFinalPixelShader.Release();
 }
 
 HRESULT CDX9RenderingEngine::CreateIccProfileLut(TCHAR* profilePath, float* lut3D)
