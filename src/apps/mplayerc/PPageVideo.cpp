@@ -122,6 +122,13 @@ BOOL CPPageVideo::OnInitDialog()
 	SetHandCursor(m_hWnd, IDC_COMBO4);
 	SetHandCursor(m_hWnd, IDC_COMBO5);
 
+	CString dlgText;
+	GetDlgItemText(IDC_STATIC2, dlgText);
+	if (!dlgText.IsEmpty()) {
+		dlgText = _T("     ") + dlgText;
+		SetDlgItemText(IDC_STATIC2, dlgText);
+	}
+
 	AppSettings& s = AfxGetAppSettings();
 
 	CRenderersSettings& rs = s.m_RenderersSettings;

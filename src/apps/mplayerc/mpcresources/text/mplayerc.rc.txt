@@ -466,7 +466,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Changes take effect after the playback has been closed and restarted."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Video renderer"
 7		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
 8		"Select D3D9 Render Device"
@@ -482,10 +482,10 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 23		"Output range:"
 25		"10-bit RGB output"
 26		"Disable desktop composition (Aero)"
-28		"      Color Management"
-30		"Input type:"
-32		"Ambient Light:"
-34		"Rendering Intent:"
+27		"Color Management"
+29		"Input type:"
+31		"Ambient Light:"
+33		"Rendering Intent:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
