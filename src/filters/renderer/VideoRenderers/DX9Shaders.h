@@ -433,65 +433,80 @@ char const shader_resizer_lanczos2[] =
 char const shader_resizer_downscaling[] =
 "#if Ml\n"
 "#define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))\n"
-"#define MAXSTEPS 32\n"
+"#define MAXSTEPS 16\n"
 "#else\n"
 "#define MAXSTEPS 9\n"
 "#endif\n"
 
 "sampler s0 : register(s0);"
 "float2 dxdy : register(c0);"
-"float rx :    register(c1);"
-"float ry :    register(c2);"
+"float rx : register(c1);"
+"float ry : register(c2);"
 
-//static const int kx = clamp(int(ceil(rx)), 2, MAXSTEPS);
-//static const int ky = clamp(int(ceil(ry)), 2, MAXSTEPS);
 "static const int kx = clamp(int(rx+0.5), 2, MAXSTEPS);"
 "static const int ky = clamp(int(ry+0.5), 2, MAXSTEPS);"
 "static const int kxy = kx*ky;"
 
 "float4 main(float2 tex : TEXCOORD0) : COLOR0"
 "{"
-"	float2 t = frac(tex);"
-"	float2 pos = tex-t+0.5;"
+	"float2 t = frac(tex);"
+	"float2 pos = tex-t+0.5;"
 
-"	float4 result = 0;"
-"	int startx = kx/2 - kx;"
-"	int starty = ky/2 - ky;"
-"	for (int ix = 0; ix < kx; ix++) {"
-"		for (int iy = 0; iy < ky; iy++) {"
-"			result = result + tex2D(s0, (pos + float2(startx+ix, startx+iy))*dxdy) / kxy;"
-"		}"
-"	}"
+	"float4 result = 0;"
+	"int startx = kx/2 - kx;"
+	"int starty = ky/2 - ky;"
+	"for (int ix = 0; ix < kx; ix++) {"
+		"for (int iy = 0; iy < ky; iy++) {"
+			"result = result + tex2D(s0, (pos + float2(startx+ix, startx+iy))*dxdy) / kxy;"
+		"}"
+	"}"
 
-"	return result;"
-"}"
+	"return result;"
+"}";
+
+char const shader_resizer_downscaling_2pass[] =
+"#if Ml\n"
+"#define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))\n"
+"#define MAXSTEPS 16\n"
+"#else\n"
+"#define MAXSTEPS 9\n"
+"#endif\n"
+
+"sampler s0 : register(s0);"
+"float2 dxdy : register(c0);"
+"float rx : register(c1);"
+"float ry : register(c2);"
+
+"static const int kx = clamp(int(rx+0.5), 2, MAXSTEPS);"
+"static const int ky = clamp(int(ry+0.5), 2, MAXSTEPS);"
+"static const int kxy = kx*ky;"
 
 "float4 main_x(float2 tex : TEXCOORD0) : COLOR0"
 "{"
-"	float t = frac(tex.x);"
-"	float2 pos = tex - float2(t, 0.);"
+	"float t = frac(tex.x);"
+	"float2 pos = tex - float2(t, 0.);"
 
-"	float4 result = 0;"
-"	int start = kx / 2 - kx;"
-"	for (int i = 0; i < kx; i++) {"
-"		result = result + tex2D(s0, (pos + float2(start+i+0.5, .5))*dxdy) / kx;"
-"	}"
+	"float4 result = 0;"
+	"int start = kx / 2 - kx;"
+	"for (int i = 0; i < kx; i++) {"
+		"result = result + tex2D(s0, (pos + float2(start+i+0.5, .5))*dxdy) / kx;"
+	"}"
 
-"	return result;"
+	"return result;"
 "}"
 
 "float4 main_y(float2 tex : TEXCOORD0) : COLOR0"
 "{"
-"	float t = frac(tex.y);"
-"	float2 pos = tex-float2(0., t);"
+	"float t = frac(tex.y);"
+	"float2 pos = tex-float2(0., t);"
 
-"	float4 result = 0;"
-"	int start = ky / 2 - ky;"
-"	for (int i = 0; i < ky; i++) {"
-"		result = result + tex2D(s0, (pos + float2(.5, start+i+0.5))*dxdy) / ky;"
-"	}"
+	"float4 result = 0;"
+	"int start = ky / 2 - ky;"
+	"for (int i = 0; i < ky; i++) {"
+		"result = result + tex2D(s0, (pos + float2(.5, start+i+0.5))*dxdy) / ky;"
+	"}"
 
-"	return result;"
+	"return result;"
 "}";
 
 // Final pass

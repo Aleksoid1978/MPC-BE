@@ -739,7 +739,7 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 		}
 
 		if (hr == S_OK && !m_pResizerPixelShaders[shader_downscaling_x]) {
-			pSrcData = shader_resizer_downscaling;
+			pSrcData = shader_resizer_downscaling_2pass;
 
 			hr = m_pPSC->CompileShader(pSrcData, "main_x", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling_x], &ErrorMessage);
 			if (hr == S_OK) {
