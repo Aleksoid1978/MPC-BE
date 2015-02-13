@@ -843,11 +843,6 @@ public:
 	afx_msg void OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewAlternativeVSync(CCmdUI* pCmdUI);
 
-	afx_msg void OnUpdateViewColorManagementEnable(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewColorManagementInput(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewColorManagementAmbientLight(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewColorManagementIntent(CCmdUI* pCmdUI);
-
 	afx_msg void OnUpdateViewFullscreenGUISupport(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewVSyncOffsetIncrease(CCmdUI* pCmdUI);
@@ -858,19 +853,6 @@ public:
 	afx_msg void OnViewSynchronizeVideo();
 	afx_msg void OnViewSynchronizeDisplay();
 	afx_msg void OnViewSynchronizeNearest();
-
-	afx_msg void OnViewColorManagementEnable();
-	afx_msg void OnViewColorManagementInputAuto();
-	afx_msg void OnViewColorManagementInputHDTV();
-	afx_msg void OnViewColorManagementInputSDTV_NTSC();
-	afx_msg void OnViewColorManagementInputSDTV_PAL();
-	afx_msg void OnViewColorManagementAmbientLightBright();
-	afx_msg void OnViewColorManagementAmbientLightDim();
-	afx_msg void OnViewColorManagementAmbientLightDark();
-	afx_msg void OnViewColorManagementIntentPerceptual();
-	afx_msg void OnViewColorManagementIntentRelativeColorimetric();
-	afx_msg void OnViewColorManagementIntentSaturation();
-	afx_msg void OnViewColorManagementIntentAbsoluteColorimetric();
 
 	afx_msg void OnViewFlushGPUBeforeVSync();
 	afx_msg void OnViewFlushGPUAfterVSync();
