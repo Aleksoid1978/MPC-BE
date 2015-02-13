@@ -57,10 +57,11 @@ private:
 	int m_iAPSurfaceUsage;
 	CString m_iEvrBuffers;
 
-	//BOOL m_bColorManagment;
-	//int  m_iCMInputType;
-	//int  m_iCMAmbientLight;
-	//int  m_iCMRenderingIntent;
+	// Color Managment
+	CButton   m_chkColorManagment;
+	CComboBox m_cbCMInputType;
+	CComboBox m_cbCMAmbientLight;
+	CComboBox m_cbCMRenderingIntent;
 
 public:
 	CPPageVideo();
@@ -82,4 +83,6 @@ public:
 	afx_msg void OnDSRendererChange();
 	afx_msg void OnFullscreenCheck();
 	afx_msg void OnD3D9DeviceCheck();
+	afx_msg void OnSurfaceFormatChange();
+	afx_msg void OnColorManagmentCheck();
 };

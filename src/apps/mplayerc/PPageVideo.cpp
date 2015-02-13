@@ -95,6 +95,11 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	DDX_CBString(pDX, IDC_EVR_BUFFERS, m_iEvrBuffers);
 	DDX_Control(pDX, IDC_COMBO2, m_cbEVROutputRange);
 	DDX_Control(pDX, IDC_CHECK2, m_chkDisableAero);
+
+	DDX_Control(pDX, IDC_CHECK3, m_chkColorManagment);
+	DDX_Control(pDX, IDC_COMBO3, m_cbCMInputType);
+	DDX_Control(pDX, IDC_COMBO4, m_cbCMAmbientLight);
+	DDX_Control(pDX, IDC_COMBO5, m_cbCMRenderingIntent);
 }
 
 BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
@@ -103,6 +108,8 @@ BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
 	ON_BN_CLICKED(IDC_D3D9DEVICE, OnD3D9DeviceCheck)
 	ON_BN_CLICKED(IDC_FULLSCREEN_MONITOR_CHECK, OnFullscreenCheck)
 	ON_UPDATE_COMMAND_UI(IDC_DSVMRYUVMIXER, OnUpdateMixerYUV)
+	ON_CBN_SELCHANGE(IDC_COMBO1, OnSurfaceFormatChange)
+	ON_BN_CLICKED(IDC_CHECK3, OnColorManagmentCheck)
 END_MESSAGE_MAP()
 
 // CPPageVideo message handlers
@@ -315,7 +322,29 @@ BOOL CPPageVideo::OnInitDialog()
 		default:
 			GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
 			GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(FALSE);
- 	}
+	}
+
+	// Color Managment
+	m_chkColorManagment.SetCheck(rs.m_AdvRendSets.iVMR9ColorManagementEnable != 0);
+	m_cbCMInputType.AddString(L"Auto-Detect");
+	m_cbCMInputType.AddString(L"HDTV");
+	m_cbCMInputType.AddString(L"SDTV NTSC");
+	m_cbCMInputType.AddString(L"SDTV PAL");
+	m_cbCMInputType.SetCurSel(rs.m_AdvRendSets.iVMR9ColorManagementInput);
+	m_cbCMAmbientLight.AddString(L"Bright (2.2 Gamma)");
+	m_cbCMAmbientLight.AddString(L"Dim (2.35 Gamma)");
+	m_cbCMAmbientLight.AddString(L"Dark (2.4 Gamma)");
+	m_cbCMAmbientLight.SetCurSel(rs.m_AdvRendSets.iVMR9ColorManagementAmbientLight);
+	m_cbCMRenderingIntent.AddString(L"Perceptual");
+	m_cbCMRenderingIntent.AddString(L"Relative Colorimetric");
+	m_cbCMRenderingIntent.AddString(L"Saturation");
+	m_cbCMRenderingIntent.AddString(L"Absolute Colorimetric");
+	m_cbCMRenderingIntent.SetCurSel(rs.m_AdvRendSets.iVMR9ColorManagementIntent);
+	// TODO: get strings with translation from revision 110 resources
+
+	OnSurfaceFormatChange();
+	OnColorManagmentCheck();
+
 	UpdateData(TRUE);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -352,6 +381,12 @@ BOOL CPPageVideo::OnApply()
 	}
 
 	rs.D3D9RenderDevice = m_bD3D9RenderDevice ? m_D3D9GUIDNames[m_iD3D9RenderDevice] : L"";
+
+	// Color Managment
+	rs.m_AdvRendSets.iVMR9ColorManagementEnable = !!m_chkColorManagment.GetCheck();
+	rs.m_AdvRendSets.iVMR9ColorManagementInput = m_cbCMInputType.GetCurSel();
+	rs.m_AdvRendSets.iVMR9ColorManagementAmbientLight = m_cbCMAmbientLight.GetCurSel();
+	rs.m_AdvRendSets.iVMR9ColorManagementIntent = m_cbCMRenderingIntent.GetCurSel();
 
 	return __super::OnApply();
 }
@@ -475,6 +510,16 @@ void CPPageVideo::OnDSRendererChange()
 	m_chkDisableAero.EnableWindow(FALSE);
 	m_cbEVROutputRange.EnableWindow(FALSE);
 
+	// Color Managment
+	m_chkColorManagment.ShowWindow(SW_HIDE);
+	m_cbCMInputType.ShowWindow(SW_HIDE);
+	m_cbCMAmbientLight.ShowWindow(SW_HIDE);
+	m_cbCMRenderingIntent.ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC2)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC3)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC4)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC5)->ShowWindow(SW_HIDE);
+
 	switch (CurrentVR) {
 		case VIDRNDT_DS_DEFAULT:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYSDEF), GetDlgItem(IDC_VIDRND_COMBO));
@@ -516,8 +561,24 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 			GetDlgItem(IDC_DX_SURFACE)->EnableWindow(TRUE);
-			if (IsWinVista() || IsWinSeven() && m_iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
-				m_chkDisableAero.EnableWindow(TRUE);
+			if (m_iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
+				
+				if (IsWinVista() || IsWinSeven()) {
+					m_chkDisableAero.EnableWindow(TRUE);
+				}
+
+				D3DFORMAT surfmt = (D3DFORMAT)m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel());
+				if (surfmt == D3DFMT_A16B16G16R16F || surfmt == D3DFMT_A32B32G32R32F) {
+					// Color Managment
+					m_chkColorManagment.ShowWindow(SW_SHOW);
+					m_cbCMInputType.ShowWindow(SW_SHOW);
+					m_cbCMAmbientLight.ShowWindow(SW_SHOW);
+					m_cbCMRenderingIntent.ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC2)->ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC3)->ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC4)->ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC5)->ShowWindow(SW_SHOW);
+				}
 			}
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9REN), GetDlgItem(IDC_VIDRND_COMBO));
@@ -546,6 +607,21 @@ void CPPageVideo::OnDSRendererChange()
 				m_chkDisableAero.EnableWindow(TRUE);
 			}
 			m_cbEVROutputRange.EnableWindow(TRUE);
+
+			{
+				D3DFORMAT surfmt = (D3DFORMAT)m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel());
+				if (surfmt == D3DFMT_A16B16G16R16F || surfmt == D3DFMT_A32B32G32R32F) {
+					// Color Managment
+					m_chkColorManagment.ShowWindow(SW_SHOW);
+					m_cbCMInputType.ShowWindow(SW_SHOW);
+					m_cbCMAmbientLight.ShowWindow(SW_SHOW);
+					m_cbCMRenderingIntent.ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC2)->ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC3)->ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC4)->ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC5)->ShowWindow(SW_SHOW);
+				}
+			}
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR_CUSTOM), GetDlgItem(IDC_VIDRND_COMBO));
 			break;
@@ -599,5 +675,58 @@ void CPPageVideo::OnD3D9DeviceCheck()
 {
 	UpdateData();
 	GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(m_bD3D9RenderDevice);
+	SetModified();
+}
+
+void CPPageVideo::OnSurfaceFormatChange()
+{
+	D3DFORMAT surfmt = (D3DFORMAT)m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel());
+	UINT CurrentVR = m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel());
+
+	if ((CurrentVR == VIDRNDT_DS_VMR9RENDERLESS || CurrentVR == VIDRNDT_DS_EVR_CUSTOM) && (surfmt == D3DFMT_A16B16G16R16F || surfmt == D3DFMT_A32B32G32R32F)) {
+		// Color Managment
+		m_chkColorManagment.ShowWindow(SW_SHOW);
+		m_cbCMInputType.ShowWindow(SW_SHOW);
+		m_cbCMAmbientLight.ShowWindow(SW_SHOW);
+		m_cbCMRenderingIntent.ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC2)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC3)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC4)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC5)->ShowWindow(SW_SHOW);
+	}
+	else {
+		// Color Managment
+		m_chkColorManagment.ShowWindow(SW_HIDE);
+		m_cbCMInputType.ShowWindow(SW_HIDE);
+		m_cbCMAmbientLight.ShowWindow(SW_HIDE);
+		m_cbCMRenderingIntent.ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC2)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC3)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC4)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC5)->ShowWindow(SW_HIDE);
+	}
+
+	SetModified();
+}
+
+void CPPageVideo::OnColorManagmentCheck()
+{
+	if (m_chkColorManagment.GetCheck() == BST_CHECKED) {
+		m_cbCMInputType.EnableWindow(TRUE);
+		m_cbCMAmbientLight.EnableWindow(TRUE);
+		m_cbCMRenderingIntent.EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC4)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
+	}
+	else {
+		m_cbCMInputType.EnableWindow(FALSE);
+		m_cbCMAmbientLight.EnableWindow(FALSE);
+		m_cbCMRenderingIntent.EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC3)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC4)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
+	}
+
 	SetModified();
 }
