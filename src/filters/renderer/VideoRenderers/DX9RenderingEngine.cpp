@@ -757,7 +757,7 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 	}
 
 	if (FAILED(hr)) {
-		TRACE("%ws", ErrorMessage.GetString());
+		DbgLog((LOG_TRACE, 3, L"CDX9RenderingEngine::InitShaderResizer() : shader compilation failed\n%s", ErrorMessage.GetString()));
 		ASSERT(0);
 		return hr;
 	}
@@ -1159,8 +1159,8 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	CString ErrorMessage;
 	hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pFinalPixelShader, &ErrorMessage);
 	if (FAILED(hr)) {
-		TRACE("%ws", ErrorMessage.GetString());
-		ASSERT (0);
+		DbgLog((LOG_TRACE, 3, L"CDX9RenderingEngine::InitFinalPass() : shader compilation failed\n%s", ErrorMessage.GetString()));
+		ASSERT(0);
 		CleanupFinalPass();
 		return hr;
 	}
