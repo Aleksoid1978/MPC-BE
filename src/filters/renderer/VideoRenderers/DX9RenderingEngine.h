@@ -25,7 +25,6 @@
 #include <d3d9.h>
 #include <dx/d3dx9.h>
 #include "../SubPic/SubPicAllocatorPresenterImpl.h"
-#include <thread>
 
 enum {
 	shader_smootherstep,
@@ -96,7 +95,6 @@ namespace DSObjects
 		bool						m_bColorManagement;
 
 		CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError);
-		virtual ~CDX9RenderingEngine();
 
 		void InitRenderingEngine();
 		void CleanupRenderingEngine();
@@ -111,9 +109,7 @@ namespace DSObjects
 
 		HRESULT SetCustomPixelShader(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace);
 
-		std::thread m_compileShaderThread;
-		LPCSTR m_pSrcData = NULL;
-		D3DXMACRO m_shaderMacros[3];
+
 	private:
 		class CExternalPixelShader
 		{
