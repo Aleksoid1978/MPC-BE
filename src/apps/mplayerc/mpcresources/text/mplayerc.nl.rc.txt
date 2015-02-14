@@ -466,7 +466,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Vereist heropening van de video."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 5		"Videorenderer"
 7		"Instellingen van VMR-7/VMR-9 (Renderless) en EVR-CP"
 8		"Kies D3D9-renderapparaat"
@@ -486,6 +486,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 29		"Input type:"
 31		"Ambient Light:"
 33		"Rendering Intent:"
+35		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

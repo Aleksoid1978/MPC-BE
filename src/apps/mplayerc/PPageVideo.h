@@ -37,12 +37,15 @@ private:
 
 	CComboBox m_cbVideoRenderer;
 	CComboBox m_cbD3D9RenderDevice;
+	CComboBox m_cbAPSurfaceUsage;
 	CComboBox m_cbDX9SurfaceFormat;
 	CComboBox m_cbDX9Resizer;
 	CComboBox m_cbEVROutputRange;
 	CButton   m_chkD3DFullscreen;
 	CButton   m_chk10bitOutput;
 	CButton   m_chkDisableAero;
+	CButton   m_chkVMRMixerMode;
+	CButton   m_chkVMRMixerYUV;
 
 	int m_iVideoRendererType_store;
 	int m_iVideoRendererType;
@@ -50,11 +53,8 @@ private:
 	BOOL m_bD3D9RenderDevice;
 	int  m_iD3D9RenderDevice;
 	BOOL m_bVMR9AlterativeVSync;
-	BOOL m_bVMRMixerMode;
-	BOOL m_bVMRMixerYUV;
 	BOOL m_bResetDevice;
 
-	int m_iAPSurfaceUsage;
 	CString m_iEvrBuffers;
 
 	// Color Managment
@@ -85,4 +85,5 @@ public:
 	afx_msg void OnD3D9DeviceCheck();
 	afx_msg void OnSurfaceFormatChange();
 	afx_msg void OnColorManagmentCheck();
+	afx_msg void OnBnClickedDefault();
 };

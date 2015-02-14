@@ -61,9 +61,6 @@ CPPageVideo::CPPageVideo()
 	: CPPageBase(CPPageVideo::IDD, CPPageVideo::IDD)
 	, m_iVideoRendererType(VIDRNDT_DS_DEFAULT)
 	, m_iVideoRendererType_store(VIDRNDT_DS_DEFAULT)
-	, m_iAPSurfaceUsage(0)
-	, m_bVMRMixerMode(FALSE)
-	, m_bVMRMixerYUV(FALSE)
 	, m_bVMR9AlterativeVSync(FALSE)
 	, m_bResetDevice(FALSE)
 	, m_iEvrBuffers(L"5")
@@ -81,7 +78,7 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_VIDRND_COMBO, m_cbVideoRenderer);
 	DDX_Control(pDX, IDC_D3D9DEVICE_COMBO, m_cbD3D9RenderDevice);
-	DDX_CBIndex(pDX, IDC_DX_SURFACE, m_iAPSurfaceUsage);
+	DDX_Control(pDX, IDC_DX_SURFACE, m_cbAPSurfaceUsage);
 	DDX_Control(pDX, IDC_COMBO1, m_cbDX9SurfaceFormat);
 	DDX_Control(pDX, IDC_DX9RESIZER_COMBO, m_cbDX9Resizer);
 	DDX_CBIndex(pDX, IDC_D3D9DEVICE_COMBO, m_iD3D9RenderDevice);
@@ -90,8 +87,8 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_FULLSCREEN_MONITOR_CHECK, m_chkD3DFullscreen);
 	DDX_Control(pDX, IDC_CHECK1, m_chk10bitOutput);
 	DDX_Check(pDX, IDC_DSVMR9ALTERNATIVEVSYNC, m_bVMR9AlterativeVSync);
-	DDX_Check(pDX, IDC_DSVMRLOADMIXER, m_bVMRMixerMode);
-	DDX_Check(pDX, IDC_DSVMRYUVMIXER, m_bVMRMixerYUV);
+	DDX_Control(pDX, IDC_DSVMRLOADMIXER, m_chkVMRMixerMode);
+	DDX_Control(pDX, IDC_DSVMRYUVMIXER, m_chkVMRMixerYUV);
 	DDX_CBString(pDX, IDC_EVR_BUFFERS, m_iEvrBuffers);
 	DDX_Control(pDX, IDC_COMBO2, m_cbEVROutputRange);
 	DDX_Control(pDX, IDC_CHECK2, m_chkDisableAero);
@@ -110,6 +107,7 @@ BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_DSVMRYUVMIXER, OnUpdateMixerYUV)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnSurfaceFormatChange)
 	ON_BN_CLICKED(IDC_CHECK3, OnColorManagmentCheck)
+	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedDefault)
 END_MESSAGE_MAP()
 
 // CPPageVideo message handlers
@@ -140,16 +138,20 @@ BOOL CPPageVideo::OnInitDialog()
 
 	CRenderersSettings& rs = s.m_RenderersSettings;
 	m_iVideoRendererType	= s.iDSVideoRendererType;
-	m_iAPSurfaceUsage		= rs.iAPSurfaceUsage;
-	m_bVMRMixerMode			= rs.fVMRMixerMode;
-	m_bVMRMixerYUV			= rs.fVMRMixerYUV;
-	m_bVMR9AlterativeVSync	= rs.m_AdvRendSets.fVMR9AlterativeVSync;
 
 	m_chkD3DFullscreen.SetCheck(s.fD3DFullscreen);
-	m_chk10bitOutput.SetCheck(rs.m_AdvRendSets.b10BitOutput);
 	m_chk10bitOutput.EnableWindow(s.fD3DFullscreen);
+	m_chk10bitOutput.SetCheck(rs.m_AdvRendSets.b10BitOutput);
+	m_chkVMRMixerMode.SetCheck(rs.fVMRMixerMode);
+	m_chkVMRMixerYUV.SetCheck(rs.fVMRMixerYUV);
 
+	m_bVMR9AlterativeVSync = rs.m_AdvRendSets.fVMR9AlterativeVSync;
 	m_chkDisableAero.SetCheck(rs.m_AdvRendSets.iVMRDisableDesktopComposition);
+
+	m_cbAPSurfaceUsage.AddString(L"Regular offscreen plain surface");
+	m_cbAPSurfaceUsage.AddString(L"2D surface");
+	m_cbAPSurfaceUsage.AddString(L"3D surface");
+	m_cbAPSurfaceUsage.SetCurSel(rs.iAPSurfaceUsage);
 
 	m_cbEVROutputRange.AddString(L"0-255");
 	m_cbEVROutputRange.AddString(L"16-235");
@@ -297,31 +299,31 @@ BOOL CPPageVideo::OnInitDialog()
 
 	CreateToolTip();
 	m_wndToolTip.AddTool(GetDlgItem(IDC_VIDRND_COMBO), L"");
-	m_wndToolTip.AddTool(GetDlgItem(IDC_DX_SURFACE), L"");
+	m_wndToolTip.AddTool(&m_cbAPSurfaceUsage, L"");
 
 	OnDSRendererChange();
 	OnSurfaceChange();
 
 	CheckDlgButton(IDC_D3D9DEVICE, BST_UNCHECKED);
 	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
-	GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(FALSE);
+	m_cbD3D9RenderDevice.EnableWindow(FALSE);
 
 	switch (m_iVideoRendererType) {
 		case VIDRNDT_DS_VMR9RENDERLESS:
 		case VIDRNDT_DS_EVR_CUSTOM:
 			if (m_cbD3D9RenderDevice.GetCount() > 1) {
 					GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
-					GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(FALSE);
+					m_cbD3D9RenderDevice.EnableWindow(FALSE);
 					CheckDlgButton(IDC_D3D9DEVICE, BST_UNCHECKED);
 					if (m_iD3D9RenderDevice != -1) {
 						CheckDlgButton(IDC_D3D9DEVICE, BST_CHECKED);
-						GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(TRUE);
+						m_cbD3D9RenderDevice.EnableWindow(TRUE);
 					}
 			}
 			break;
 		default:
 			GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
-			GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(FALSE);
+			m_cbD3D9RenderDevice.EnableWindow(FALSE);
 	}
 
 	// Color Managment
@@ -358,10 +360,10 @@ BOOL CPPageVideo::OnApply()
 	CRenderersSettings& rs = s.m_RenderersSettings;
 
 	s.iDSVideoRendererType	= m_iVideoRendererType = m_iVideoRendererType_store = m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel());
-	rs.iAPSurfaceUsage		= m_iAPSurfaceUsage;
+	rs.iAPSurfaceUsage		= m_cbAPSurfaceUsage.GetCurSel();
 	rs.iDX9Resizer			= (int)m_cbDX9Resizer.GetItemData(m_cbDX9Resizer.GetCurSel());
-	rs.fVMRMixerMode		= !!m_bVMRMixerMode;
-	rs.fVMRMixerYUV			= !!m_bVMRMixerYUV;
+	rs.fVMRMixerMode		= !!m_chkVMRMixerMode.GetCheck();
+	rs.fVMRMixerYUV			= !!m_chkVMRMixerYUV.GetCheck();
 	s.fD3DFullscreen		= !!m_chkD3DFullscreen.GetCheck();
 	rs.fResetDevice			= !!m_bResetDevice;
 
@@ -401,7 +403,7 @@ void CPPageVideo::UpdateSurfaceFormatList(int select)
 
 	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"8-bit Integer Surfaces"), D3DFMT_X8R8G8B8);
 
-	if ((videoRenderer == VIDRNDT_DS_VMR9RENDERLESS || videoRenderer == VIDRNDT_DS_EVR_CUSTOM) && m_iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
+	if ((videoRenderer == VIDRNDT_DS_VMR9RENDERLESS || videoRenderer == VIDRNDT_DS_EVR_CUSTOM) && m_cbAPSurfaceUsage.GetCurSel() == VIDRNDT_AP_TEXTURE3D) {
 		m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"10-bit Integer Surfaces"), D3DFMT_A2R10G10B10);
 		m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"16-bit Floating Point Surfaces"), D3DFMT_A16B16G16R16F);
 		m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"32-bit Floating Point Surfaces"), D3DFMT_A32B32G32R32F);
@@ -425,7 +427,7 @@ void CPPageVideo::UpdateResizerList(int select)
 	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Nearest neighbor"), RESIZER_NEAREST);
 	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Bilinear"), RESIZER_BILINEAR);
 
-	if (m_iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
+	if (m_cbAPSurfaceUsage.GetCurSel() == VIDRNDT_AP_TEXTURE3D) {
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Perlin Smootherstep (PS 2.0)"), RESIZER_SHADER_SMOOTHERSTEP);
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Bicubic A=-0.6 (PS 2.0)"), RESIZER_SHADER_BICUBIC06);
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Bicubic A=-0.8 (PS 2.0)"), RESIZER_SHADER_BICUBIC08);
@@ -460,15 +462,15 @@ void CPPageVideo::OnSurfaceChange()
 {
 	UpdateData();
 
-	switch (m_iAPSurfaceUsage) {
+	switch (m_cbAPSurfaceUsage.GetCurSel()) {
 		case VIDRNDT_AP_SURFACE:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_REGULARSURF), GetDlgItem(IDC_DX_SURFACE));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_REGULARSURF), &m_cbAPSurfaceUsage);
 			break;
 		case VIDRNDT_AP_TEXTURE2D:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_TEXTURESURF2D), GetDlgItem(IDC_DX_SURFACE));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_TEXTURESURF2D), &m_cbAPSurfaceUsage);
 			break;
 		case VIDRNDT_AP_TEXTURE3D:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_TEXTURESURF3D), GetDlgItem(IDC_DX_SURFACE));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_TEXTURESURF3D), &m_cbAPSurfaceUsage);
 			break;
 	}
 
@@ -496,17 +498,17 @@ void CPPageVideo::OnDSRendererChange()
 		}
 	}
 
-	GetDlgItem(IDC_DX_SURFACE)->EnableWindow(FALSE);
+	m_cbAPSurfaceUsage.EnableWindow(FALSE);
 	m_cbDX9SurfaceFormat.EnableWindow(FALSE);
 	m_cbDX9Resizer.EnableWindow(FALSE);
 	GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(FALSE);
-	GetDlgItem(IDC_DSVMRLOADMIXER)->EnableWindow(FALSE);
-	GetDlgItem(IDC_DSVMRYUVMIXER)->EnableWindow(FALSE);
+	m_chkVMRMixerMode.EnableWindow(FALSE);
+	m_chkVMRMixerYUV.EnableWindow(FALSE);
 	GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(FALSE);
 	GetDlgItem(IDC_RESETDEVICE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(FALSE);
 	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
-	GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(FALSE);
+	m_cbD3D9RenderDevice.EnableWindow(FALSE);
 	m_chkDisableAero.EnableWindow(FALSE);
 	m_cbEVROutputRange.EnableWindow(FALSE);
 
@@ -522,46 +524,46 @@ void CPPageVideo::OnDSRendererChange()
 
 	switch (CurrentVR) {
 		case VIDRNDT_DS_DEFAULT:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYSDEF), GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYSDEF), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DS_OVERLAYMIXER:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSOVERLAYMIXER), GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSOVERLAYMIXER), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DS_VMR7WINDOWED:
-			GetDlgItem(IDC_DSVMRLOADMIXER)->EnableWindow(TRUE);
-			GetDlgItem(IDC_DSVMRYUVMIXER)->EnableWindow(TRUE);
+			m_chkVMRMixerMode.EnableWindow(TRUE);
+			m_chkVMRMixerYUV.EnableWindow(TRUE);
 
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR7WIN), GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR7WIN), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DS_VMR9WINDOWED:
-			GetDlgItem(IDC_DSVMRLOADMIXER)->EnableWindow(TRUE);
-			GetDlgItem(IDC_DSVMRYUVMIXER)->EnableWindow(TRUE);
+			m_chkVMRMixerMode.EnableWindow(TRUE);
+			m_chkVMRMixerYUV.EnableWindow(TRUE);
 
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9WIN), GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9WIN), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DS_VMR7RENDERLESS:
-			GetDlgItem(IDC_DX_SURFACE)->EnableWindow(TRUE);
-			GetDlgItem(IDC_DSVMRLOADMIXER)->EnableWindow(TRUE);
-			GetDlgItem(IDC_DSVMRYUVMIXER)->EnableWindow(TRUE);
+			m_cbAPSurfaceUsage.EnableWindow(TRUE);
+			m_chkVMRMixerMode.EnableWindow(TRUE);
+			m_chkVMRMixerYUV.EnableWindow(TRUE);
 
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR7REN), GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR7REN), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DS_VMR9RENDERLESS:
 			if (m_cbD3D9RenderDevice.GetCount() > 1) {
 				GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
-				GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE));
+				m_cbD3D9RenderDevice.EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE));
 			}
-			GetDlgItem(IDC_DSVMRLOADMIXER)->EnableWindow(TRUE);
-			GetDlgItem(IDC_DSVMRYUVMIXER)->EnableWindow(TRUE);
+			m_chkVMRMixerMode.EnableWindow(TRUE);
+			m_chkVMRMixerYUV.EnableWindow(TRUE);
 			GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
+			m_cbAPSurfaceUsage.EnableWindow(TRUE);
 			m_cbDX9SurfaceFormat.EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
 			GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
-			GetDlgItem(IDC_DX_SURFACE)->EnableWindow(TRUE);
-			if (m_iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
+			if (m_cbAPSurfaceUsage.GetCurSel() == VIDRNDT_AP_TEXTURE3D) {
 				
 				if (IsWinVista() || IsWinSeven()) {
 					m_chkDisableAero.EnableWindow(TRUE);
@@ -581,15 +583,15 @@ void CPPageVideo::OnDSRendererChange()
 				}
 			}
 
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9REN), GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9REN), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DS_EVR:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR), GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DS_EVR_CUSTOM:
 			if (m_cbD3D9RenderDevice.GetCount() > 1) {
 				GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
-				GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE));
+				m_cbD3D9RenderDevice.EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE));
 			}
 			m_cbDX9SurfaceFormat.EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
@@ -599,8 +601,8 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
 
 			// Force 3D surface with EVR Custom
-			GetDlgItem(IDC_DX_SURFACE)->EnableWindow(FALSE);
-			((CComboBox*)GetDlgItem(IDC_DX_SURFACE))->SetCurSel(2);
+			m_cbAPSurfaceUsage.EnableWindow(FALSE);
+			m_cbAPSurfaceUsage.SetCurSel(2);
 			OnSurfaceChange();
 
 			if (IsWinVista() || IsWinSeven()) {
@@ -623,15 +625,15 @@ void CPPageVideo::OnDSRendererChange()
 				}
 			}
 
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR_CUSTOM), GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR_CUSTOM), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DS_SYNC:
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
-			GetDlgItem(IDC_DX_SURFACE)->EnableWindow(FALSE);
-			((CComboBox*)GetDlgItem(IDC_DX_SURFACE))->SetCurSel(2);
+			m_cbAPSurfaceUsage.EnableWindow(FALSE);
+			m_cbAPSurfaceUsage.SetCurSel(2);
 			OnSurfaceChange();
 
 			if (IsWinVista() || IsWinSeven()) {
@@ -639,22 +641,22 @@ void CPPageVideo::OnDSRendererChange()
 			}
 			m_cbEVROutputRange.EnableWindow(TRUE);
 
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYNC), GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYNC), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DS_DXR:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSDXR), GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSDXR), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DS_NULL_COMP:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_COMP), GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_COMP), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DS_NULL_UNCOMP:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_UNCOMP), GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_UNCOMP), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DS_MADVR:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSMADVR), GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSMADVR), &m_cbVideoRenderer);
 			break;
 		default:
-			m_wndToolTip.UpdateTipText(L"", GetDlgItem(IDC_VIDRND_COMBO));
+			m_wndToolTip.UpdateTipText(L"", &m_cbVideoRenderer);
 	}
 
 	SetModified();
@@ -674,7 +676,7 @@ void CPPageVideo::OnFullscreenCheck()
 void CPPageVideo::OnD3D9DeviceCheck()
 {
 	UpdateData();
-	GetDlgItem(IDC_D3D9DEVICE_COMBO)->EnableWindow(m_bD3D9RenderDevice);
+	m_cbD3D9RenderDevice.EnableWindow(m_bD3D9RenderDevice);
 	SetModified();
 }
 
@@ -727,6 +729,47 @@ void CPPageVideo::OnColorManagmentCheck()
 		GetDlgItem(IDC_STATIC4)->EnableWindow(FALSE);
 		GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
 	}
+
+	SetModified();
+}
+
+void CPPageVideo::OnBnClickedDefault()
+{
+	UpdateData();
+
+	UINT CurrentVR = m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel());
+
+	m_bD3D9RenderDevice = FALSE;
+	m_bVMR9AlterativeVSync = FALSE;
+	m_bResetDevice = TRUE;
+	m_iEvrBuffers = L"5";
+
+	m_cbAPSurfaceUsage.SetCurSel(IsWinVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D);
+	m_cbEVROutputRange.SetCurSel(0);
+	m_chkDisableAero.SetCheck(BST_UNCHECKED);
+	m_chkVMRMixerMode.SetCheck(IsWinVistaOrLater() ? BST_CHECKED : BST_UNCHECKED);
+	m_chkVMRMixerYUV.SetCheck(IsWinVistaOrLater() ? BST_CHECKED : BST_UNCHECKED);
+
+
+	m_chkD3DFullscreen.SetCheck(BST_UNCHECKED);
+	m_chk10bitOutput.SetCheck(BST_UNCHECKED);
+	m_cbAPSurfaceUsage.SetCurSel(IsWinVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D);
+
+	UpdateSurfaceFormatList(D3DFMT_X8R8G8B8);
+	UpdateResizerList(1);
+
+	m_chkColorManagment.SetCheck(BST_UNCHECKED);
+
+	m_cbCMInputType.SetCurSel(0);
+	m_cbCMAmbientLight.SetCurSel(0);
+	m_cbCMRenderingIntent.SetCurSel(0);
+
+	OnFullscreenCheck();
+	OnSurfaceChange();
+	OnSurfaceFormatChange();
+	OnColorManagmentCheck();
+
+	UpdateData(FALSE);
 
 	SetModified();
 }

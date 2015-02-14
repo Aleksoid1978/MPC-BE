@@ -466,7 +466,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Le modifiche saranno effettive dopo un riavvio della riproduzione."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 5		"Video renderer"
 7		"Impostazioni di VMR-7/VMR-9 (Renderless) e EVR-CP"
 8		"Seleziona D3D9 Render Device"
@@ -486,6 +486,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 29		"Input type:"
 31		"Ambient Light:"
 33		"Rendering Intent:"
+35		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
