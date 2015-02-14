@@ -172,25 +172,24 @@ void CDX9RenderingEngine::InitRenderingEngine()
 
 	if (GetRenderersSettings().iDX9Resizer > RESIZER_BILINEAR) {
 		HRESULT hr = S_OK;
-		CString ErrorMessage;
-		D3DXMACRO ShaderMacros[3] = {
-			{ "Ml", m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "1" : "0" },
-			{ NULL, NULL },
-		};
-
+		switch (GetRenderersSettings().iDX9Resizer) {
+		case RESIZER_SHADER_SMOOTHERSTEP: hr = InitShaderResizer(shader_smootherstep); break;
 #if ENABLE_2PASS_RESIZE
-		hr = m_pPSC->CompileShader(shader_resizer_downscaling_2pass, "main_x", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling_x], &ErrorMessage);
-		if (hr == S_OK) {
-			hr = m_pPSC->CompileShader(shader_resizer_downscaling_2pass, "main_y", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling_y], &ErrorMessage);
-		}
+		case RESIZER_SHADER_BICUBIC06: hr = InitShaderResizer(shader_bicubic06_x); break;
+		case RESIZER_SHADER_BICUBIC08: hr = InitShaderResizer(shader_bicubic08_x); break;
+		case RESIZER_SHADER_BICUBIC10: hr = InitShaderResizer(shader_bicubic10_x); break;
+		case RESIZER_SHADER_BSPLINE4:  hr = InitShaderResizer(shader_bspline4_x);  break;
+		case RESIZER_SHADER_MITCHELL4: hr = InitShaderResizer(shader_mitchell4_x); break;
+		case RESIZER_SHADER_CATMULL4:  hr = InitShaderResizer(shader_catmull4_x);  break;
+		case RESIZER_SHADER_LANCZOS2:  hr = InitShaderResizer(shader_lanczos2_x);  break;
+#else
+		case RESIZER_SHADER_BICUBIC06: hr = InitShaderResizer(shader_bicubic06); break;
+		case RESIZER_SHADER_BICUBIC08: hr = InitShaderResizer(shader_bicubic08); break;
+		case RESIZER_SHADER_BICUBIC10: hr = InitShaderResizer(shader_bicubic10); break;
+		case RESIZER_SHADER_BSPLINE4:  hr = InitShaderResizer(shader_bspline4);  break;
+		case RESIZER_SHADER_MITCHELL4: hr = InitShaderResizer(shader_mitchell4); break;
+		case RESIZER_SHADER_CATMULL4:  hr = InitShaderResizer(shader_catmull4);  break;
 #endif
-		if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
-			hr = m_pPSC->CompileShader(shader_resizer_downscaling, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling], &ErrorMessage);
-		}
-
-		if (FAILED(hr)) {
-			DbgLog((LOG_TRACE, 3, L"CDX9RenderingEngine::InitRenderingEngine() : shader compilation failed\n%s", ErrorMessage.GetString()));
-			ASSERT(0);
 		}
 	}
 }
