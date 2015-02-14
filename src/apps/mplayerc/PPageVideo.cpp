@@ -733,21 +733,18 @@ void CPPageVideo::OnColorManagmentCheck()
 
 void CPPageVideo::OnBnClickedDefault()
 {
-	UpdateData();
-
-	UINT CurrentVR = m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel());
-
 	m_bD3D9RenderDevice = FALSE;
 	m_bVMR9AlterativeVSync = FALSE;
 	m_bResetDevice = TRUE;
 	m_iEvrBuffers = 5;
+
+	UpdateData(FALSE);
 
 	m_cbAPSurfaceUsage.SetCurSel(IsWinVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D);
 	m_cbEVROutputRange.SetCurSel(0);
 	m_chkDisableAero.SetCheck(BST_UNCHECKED);
 	m_chkVMRMixerMode.SetCheck(IsWinVistaOrLater() ? BST_CHECKED : BST_UNCHECKED);
 	m_chkVMRMixerYUV.SetCheck(IsWinVistaOrLater() ? BST_CHECKED : BST_UNCHECKED);
-
 
 	m_chkD3DFullscreen.SetCheck(BST_UNCHECKED);
 	m_chk10bitOutput.SetCheck(BST_UNCHECKED);
@@ -757,7 +754,6 @@ void CPPageVideo::OnBnClickedDefault()
 	UpdateResizerList(1);
 
 	m_chkColorManagment.SetCheck(BST_UNCHECKED);
-
 	m_cbCMInputType.SetCurSel(0);
 	m_cbCMAmbientLight.SetCurSel(0);
 	m_cbCMRenderingIntent.SetCurSel(0);
@@ -766,8 +762,6 @@ void CPPageVideo::OnBnClickedDefault()
 	OnSurfaceChange();
 	OnSurfaceFormatChange();
 	OnColorManagmentCheck();
-
-	UpdateData(FALSE);
 
 	SetModified();
 }
