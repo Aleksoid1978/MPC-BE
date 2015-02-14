@@ -46,6 +46,9 @@ private:
 	CButton   m_chkDisableAero;
 	CButton   m_chkVMRMixerMode;
 	CButton   m_chkVMRMixerYUV;
+	
+	int m_iEvrBuffers;
+	CSpinButtonCtrl m_spnEvrBuffers;
 
 	int m_iVideoRendererType_store;
 	int m_iVideoRendererType;
@@ -54,8 +57,6 @@ private:
 	int  m_iD3D9RenderDevice;
 	BOOL m_bVMR9AlterativeVSync;
 	BOOL m_bResetDevice;
-
-	CString m_iEvrBuffers;
 
 	// Color Managment
 	CButton   m_chkColorManagment;

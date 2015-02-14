@@ -63,7 +63,7 @@ CPPageVideo::CPPageVideo()
 	, m_iVideoRendererType_store(VIDRNDT_DS_DEFAULT)
 	, m_bVMR9AlterativeVSync(FALSE)
 	, m_bResetDevice(FALSE)
-	, m_iEvrBuffers(L"5")
+	, m_iEvrBuffers(5)
 	, m_bD3D9RenderDevice(FALSE)
 	, m_iD3D9RenderDevice(-1)
 {
@@ -89,8 +89,9 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_DSVMR9ALTERNATIVEVSYNC, m_bVMR9AlterativeVSync);
 	DDX_Control(pDX, IDC_DSVMRLOADMIXER, m_chkVMRMixerMode);
 	DDX_Control(pDX, IDC_DSVMRYUVMIXER, m_chkVMRMixerYUV);
-	DDX_CBString(pDX, IDC_EVR_BUFFERS, m_iEvrBuffers);
 	DDX_Control(pDX, IDC_COMBO2, m_cbEVROutputRange);
+	DDX_Text(pDX, IDC_EVR_BUFFERS, m_iEvrBuffers);
+	DDX_Control(pDX, IDC_SPIN1, m_spnEvrBuffers);
 	DDX_Control(pDX, IDC_CHECK2, m_chkDisableAero);
 
 	DDX_Control(pDX, IDC_CHECK3, m_chkColorManagment);
@@ -120,7 +121,6 @@ BOOL CPPageVideo::OnInitDialog()
 	SetHandCursor(m_hWnd, IDC_D3D9DEVICE_COMBO);
 	SetHandCursor(m_hWnd, IDC_DX_SURFACE);
 	SetHandCursor(m_hWnd, IDC_DX9RESIZER_COMBO);
-	SetHandCursor(m_hWnd, IDC_EVR_BUFFERS);
 	SetHandCursor(m_hWnd, IDC_COMBO1);
 	SetHandCursor(m_hWnd, IDC_COMBO2);
 	SetHandCursor(m_hWnd, IDC_COMBO3);
@@ -157,7 +157,8 @@ BOOL CPPageVideo::OnInitDialog()
 	m_cbEVROutputRange.AddString(L"16-235");
 	m_cbEVROutputRange.SetCurSel(rs.m_AdvRendSets.iEVROutputRange);
 
-	m_iEvrBuffers.Format(L"%d", rs.iEvrBuffers);
+	m_iEvrBuffers = rs.iEvrBuffers;
+	m_spnEvrBuffers.SetRange(4, 60);
 
 	UpdateSurfaceFormatList(rs.m_AdvRendSets.iDX9SurfaceFormat);
 	UpdateResizerList(rs.iDX9Resizer);
@@ -374,13 +375,7 @@ BOOL CPPageVideo::OnApply()
 
 	rs.m_AdvRendSets.fVMR9AlterativeVSync	= m_bVMR9AlterativeVSync != 0;
 
-	if (!m_iEvrBuffers.IsEmpty()) {
-		int Temp = 5;
-		swscanf_s(m_iEvrBuffers.GetBuffer(), L"%d", &Temp);
-		rs.iEvrBuffers = Temp;
-	} else {
-		rs.iEvrBuffers = 5;
-	}
+	rs.iEvrBuffers = min(max(4, m_iEvrBuffers), 60);
 
 	rs.D3D9RenderDevice = m_bD3D9RenderDevice ? m_D3D9GUIDNames[m_iD3D9RenderDevice] : L"";
 
@@ -507,6 +502,7 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(FALSE);
 	GetDlgItem(IDC_RESETDEVICE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(FALSE);
+	m_spnEvrBuffers.EnableWindow(FALSE);
 	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
 	m_cbD3D9RenderDevice.EnableWindow(FALSE);
 	m_chkDisableAero.EnableWindow(FALSE);
@@ -599,6 +595,7 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
+			m_spnEvrBuffers.EnableWindow(TRUE);
 
 			// Force 3D surface with EVR Custom
 			m_cbAPSurfaceUsage.EnableWindow(FALSE);
@@ -629,6 +626,7 @@ void CPPageVideo::OnDSRendererChange()
 			break;
 		case VIDRNDT_DS_SYNC:
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
+			m_spnEvrBuffers.EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
@@ -742,7 +740,7 @@ void CPPageVideo::OnBnClickedDefault()
 	m_bD3D9RenderDevice = FALSE;
 	m_bVMR9AlterativeVSync = FALSE;
 	m_bResetDevice = TRUE;
-	m_iEvrBuffers = L"5";
+	m_iEvrBuffers = 5;
 
 	m_cbAPSurfaceUsage.SetCurSel(IsWinVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D);
 	m_cbEVROutputRange.SetCurSel(0);
