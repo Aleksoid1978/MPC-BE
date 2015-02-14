@@ -1177,15 +1177,13 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRem
 
 bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 {
-	CString str;
-
 	CWebTextFile f(CTextFile::UTF8, CTextFile::ANSI);
 	if (!f.Open(fn)) {
 		return false;
 	}
 
 	CPath base(fn);
-	if (fn.Find(L"://")) {
+	if (fn.Find(L"://") > 0) {
 		CString tmp(fn);
 		tmp.Truncate(tmp.ReverseFind('/'));
 		base = (CPath)tmp;
@@ -1196,6 +1194,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 	CPlaylistItem *pli = NULL;
 
 	INT_PTR c = m_pl.GetCount();
+	CString str;
 	while (f.ReadString(str)) {
 		str = str.Trim();
 
