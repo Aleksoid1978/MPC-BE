@@ -466,7 +466,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
 24		"Změny se projeví až po zastavení a opětovném spuštění přehrávání."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 5		"Video renderer"
 7		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
 8		"Select D3D9 Render Device"
@@ -478,15 +478,15 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 36
 17		"Reset when changing display"
 18		"YUV Mixing"
 19		"EVR Buffers:"
-21		"Format:"
-23		"Output range:"
-25		"10-bit RGB output"
-26		"Disable desktop composition (Aero)"
-27		"Color Management"
-29		"Input type:"
-31		"Ambient Light:"
-33		"Rendering Intent:"
-35		"Default"
+22		"Format:"
+24		"Output range:"
+26		"10-bit RGB output"
+27		"Disable desktop composition (Aero)"
+28		"Color Management"
+30		"Input type:"
+32		"Ambient Light:"
+34		"Rendering Intent:"
+36		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
