@@ -2209,7 +2209,17 @@ BEGIN
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "The selected renderer is not installed."
     IDS_REND_NOT_AVAILABLE          "**not available**"
     IDS_REND_NOT_INSTALLED          "**not installed**"
-
+    IDS_PPAGE_OUTPUT_SURF_OFFSCREEN "Regular offscreen plain surface"
+    IDS_PPAGE_OUTPUT_SURF_2D        "2D surfaces"
+    IDS_PPAGE_OUTPUT_SURF_3D        "3D surfaces (recommended)"
+    IDS_CM_INPUT_AUTO               "Auto-Detect"
+    IDS_CM_AMBIENTLIGHT_BRIGHT      "Bright (2.2 Gamma)"
+    IDS_CM_AMBIENTLIGHT_DIM         "Dim (2.35 Gamma)"
+    IDS_CM_AMBIENTLIGHT_DARK        "Dark (2.4 Gamma)"
+    IDS_CM_INTENT_PERCEPTUAL        "Perceptual"
+    IDS_CM_INTENT_RELATIVECM        "Relative Colorimetric"
+    IDS_CM_INTENT_SATURATION        "Saturation"
+    IDS_CM_INTENT_ABSOLUTECM        "Absolute Colorimetric"
 END
 
 STRINGTABLE

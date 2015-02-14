@@ -148,9 +148,9 @@ BOOL CPPageVideo::OnInitDialog()
 	m_bVMR9AlterativeVSync = rs.m_AdvRendSets.fVMR9AlterativeVSync;
 	m_chkDisableAero.SetCheck(rs.m_AdvRendSets.iVMRDisableDesktopComposition);
 
-	m_cbAPSurfaceUsage.AddString(L"Regular offscreen plain surface");
-	m_cbAPSurfaceUsage.AddString(L"2D surface");
-	m_cbAPSurfaceUsage.AddString(L"3D surface");
+	m_cbAPSurfaceUsage.AddString(ResStr(IDS_PPAGE_OUTPUT_SURF_OFFSCREEN));
+	m_cbAPSurfaceUsage.AddString(ResStr(IDS_PPAGE_OUTPUT_SURF_2D));
+	m_cbAPSurfaceUsage.AddString(ResStr(IDS_PPAGE_OUTPUT_SURF_3D));
 	m_cbAPSurfaceUsage.SetCurSel(rs.iAPSurfaceUsage);
 
 	m_cbEVROutputRange.AddString(L"0-255");
@@ -329,19 +329,19 @@ BOOL CPPageVideo::OnInitDialog()
 
 	// Color Managment
 	m_chkColorManagment.SetCheck(rs.m_AdvRendSets.iVMR9ColorManagementEnable != 0);
-	m_cbCMInputType.AddString(L"Auto-Detect");
+	m_cbCMInputType.AddString(ResStr(IDS_CM_INPUT_AUTO));
 	m_cbCMInputType.AddString(L"HDTV");
 	m_cbCMInputType.AddString(L"SDTV NTSC");
 	m_cbCMInputType.AddString(L"SDTV PAL");
 	m_cbCMInputType.SetCurSel(rs.m_AdvRendSets.iVMR9ColorManagementInput);
-	m_cbCMAmbientLight.AddString(L"Bright (2.2 Gamma)");
-	m_cbCMAmbientLight.AddString(L"Dim (2.35 Gamma)");
-	m_cbCMAmbientLight.AddString(L"Dark (2.4 Gamma)");
+	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_BRIGHT));
+	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_DIM));
+	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_DARK));
 	m_cbCMAmbientLight.SetCurSel(rs.m_AdvRendSets.iVMR9ColorManagementAmbientLight);
-	m_cbCMRenderingIntent.AddString(L"Perceptual");
-	m_cbCMRenderingIntent.AddString(L"Relative Colorimetric");
-	m_cbCMRenderingIntent.AddString(L"Saturation");
-	m_cbCMRenderingIntent.AddString(L"Absolute Colorimetric");
+	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_PERCEPTUAL));
+	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_RELATIVECM));
+	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_SATURATION));
+	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_ABSOLUTECM));
 	m_cbCMRenderingIntent.SetCurSel(rs.m_AdvRendSets.iVMR9ColorManagementIntent);
 	// TODO: get strings with translation from revision 110 resources
 
