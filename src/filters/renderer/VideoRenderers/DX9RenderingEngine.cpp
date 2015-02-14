@@ -169,6 +169,30 @@ void CDX9RenderingEngine::InitRenderingEngine()
 
 	// Initialize the pixel shader compiler
 	m_pPSC.Attach(DNew CPixelShaderCompiler(m_pD3DDev, true));
+
+	if (GetRenderersSettings().iDX9Resizer > RESIZER_BILINEAR) {
+		HRESULT hr = S_OK;
+		CString ErrorMessage;
+		D3DXMACRO ShaderMacros[3] = {
+			{ "Ml", m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "1" : "0" },
+			{ NULL, NULL },
+		};
+
+#if ENABLE_2PASS_RESIZE
+		hr = m_pPSC->CompileShader(shader_resizer_downscaling_2pass, "main_x", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling_x], &ErrorMessage);
+		if (hr == S_OK) {
+			hr = m_pPSC->CompileShader(shader_resizer_downscaling_2pass, "main_y", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling_y], &ErrorMessage);
+		}
+#endif
+		if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
+			hr = m_pPSC->CompileShader(shader_resizer_downscaling, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling], &ErrorMessage);
+		}
+
+		if (FAILED(hr)) {
+			DbgLog((LOG_TRACE, 3, L"CDX9RenderingEngine::InitRenderingEngine() : shader compilation failed\n%s", ErrorMessage.GetString()));
+			ASSERT(0);
+		}
+	}
 }
 
 void CDX9RenderingEngine::CleanupRenderingEngine()
@@ -739,11 +763,9 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 		}
 
 		if (hr == S_OK && !m_pResizerPixelShaders[shader_downscaling_x]) {
-			pSrcData = shader_resizer_downscaling_2pass;
-
-			hr = m_pPSC->CompileShader(pSrcData, "main_x", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling_x], &ErrorMessage);
+			hr = m_pPSC->CompileShader(shader_resizer_downscaling_2pass, "main_x", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling_x], &ErrorMessage);
 			if (hr == S_OK) {
-				hr = m_pPSC->CompileShader(pSrcData, "main_y", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling_y], &ErrorMessage);
+				hr = m_pPSC->CompileShader(shader_resizer_downscaling_2pass, "main_y", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling_y], &ErrorMessage);
 			}
 		}
 #endif
@@ -751,8 +773,7 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 		hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[iShader], &ErrorMessage);
 
 		if (hr == S_OK && m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) && !m_pResizerPixelShaders[shader_downscaling]) {
-			pSrcData = shader_resizer_downscaling;
-			hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling], &ErrorMessage);
+			hr = m_pPSC->CompileShader(shader_resizer_downscaling, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling], &ErrorMessage);
 		}
 	}
 
