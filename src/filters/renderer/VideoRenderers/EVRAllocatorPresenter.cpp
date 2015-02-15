@@ -823,10 +823,10 @@ HRESULT CEVRAllocatorPresenter::GetMediaTypeMerit(IMFMediaType* pType, int* pMer
 	HRESULT hr = GetMediaTypeFourCC(pType, &mix_fmt);
 
 	if (SUCCEEDED(hr)) {
-		// EVR input formats: NV12, YV12, YUY2, AYUV, RGB32, ARGB32.
+		// EVR input formats: NV12, YV12, YUY2, AYUV, RGB32, ARGB32, AI44.
 		// EVR mixer formats
-		// Intel: YUY2, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8.
-		// Nvidia:
+		// Intel: YUY2, X8R8G8B8, A8R8G8B8 (HD 4000).
+		// Nvidia: NV12, YUY2, X8R8G8B8 (GTX 660Ti).
 		// AMD:
 
 		switch (mix_fmt) {
