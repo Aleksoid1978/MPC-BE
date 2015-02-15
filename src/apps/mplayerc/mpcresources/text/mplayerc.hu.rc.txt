@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"Use Subresync"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"Videó képernyőhöz illesztése"
-7		"Képernyő videóhoz illesztése"
-9		"Cél szink. eltolás:"
-10		"ms"
-12		"Frekvencia hangolás:"
-14		"Frekvencia hangolás:"
-15		"sor"
-17		"oszlop"
-19		"Vezérlési határok:"
-20		"ms"
-23		"Megjelenítés a legközelebbi vsync-nél"
-24		"A módosítások akkor lépnek érvénybe, ha a lejátszót bezárta és újraindította."
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"Videó képernyőhöz illesztése"
+14		"Képernyő videóhoz illesztése"
+16		"Cél szink. eltolás:"
+17		"ms"
+19		"Frekvencia hangolás:"
+21		"Frekvencia hangolás:"
+22		"sor"
+24		"oszlop"
+26		"Vezérlési határok:"
+27		"ms"
+30		"Megjelenítés a legközelebbi vsync-nél"
+31		"A módosítások akkor lépnek érvénybe, ha a lejátszót bezárta és újraindította."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37

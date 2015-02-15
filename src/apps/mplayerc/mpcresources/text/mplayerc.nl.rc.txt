@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"Activeer ondertitelings-resync"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"Synchroniseer video aan monitor"
-7		"Synchroniseer monitor aan video"
-9		"Synchronisatie offset:"
-10		"ms"
-12		"Frequentie aanpassing:"
-14		"Frequentie aanpassing:"
-15		"regels"
-17		"kolommen"
-19		"Beperkt tot:"
-20		"ms"
-23		"Toon bij de dichtstbijzijnde VSync"
-24		"Vereist heropening van de video."
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"Synchroniseer video aan monitor"
+14		"Synchroniseer monitor aan video"
+16		"Synchronisatie offset:"
+17		"ms"
+19		"Frequentie aanpassing:"
+21		"Frequentie aanpassing:"
+22		"regels"
+24		"kolommen"
+26		"Beperkt tot:"
+27		"ms"
+30		"Toon bij de dichtstbijzijnde VSync"
+31		"Vereist heropening van de video."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37

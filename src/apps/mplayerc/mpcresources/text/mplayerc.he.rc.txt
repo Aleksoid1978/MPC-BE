@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"Use Subresync"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"סנכרן וידאו למסך"
-7		"סנכרן מסך לוידאו"
-9		"יעד פיצוי סנכרון:"
-10		"מילישניות"
-12		"כיוונון תדירות:"
-14		"כיוונון תדירות:"
-15		"שורות"
-17		"טורים"
-19		"מגבלת שליטה:"
-20		"מילישניות"
-23		"הצג בסנכרון האנכי הקרוב ביותר"
-24		"השינויים נכנסים לתוקף רק לאחר שהניגון הופסק והופעל מחדש."
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"סנכרן וידאו למסך"
+14		"סנכרן מסך לוידאו"
+16		"יעד פיצוי סנכרון:"
+17		"מילישניות"
+19		"כיוונון תדירות:"
+21		"כיוונון תדירות:"
+22		"שורות"
+24		"טורים"
+26		"מגבלת שליטה:"
+27		"מילישניות"
+30		"הצג בסנכרון האנכי הקרוב ביותר"
+31		"השינויים נכנסים לתוקף רק לאחר שהניגון הופסק והופעל מחדש."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37

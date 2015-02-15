@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"Subresync を使用"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"ビデオをディスプレイに同期させる"
-7		"ディスプレイをビデオに同期させる"
-9		"目標同期オフセット:"
-10		"ミリ秒"
-12		"周波数調整:"
-14		"周波数調整:"
-15		"行"
-17		"列"
-19		"調整制限:"
-20		"ミリ秒"
-23		"最も近い垂直同期で表示する"
-24		"ファイルを開き直すと変更が有効になります。"
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"ビデオをディスプレイに同期させる"
+14		"ディスプレイをビデオに同期させる"
+16		"目標同期オフセット:"
+17		"ミリ秒"
+19		"周波数調整:"
+21		"周波数調整:"
+22		"行"
+24		"列"
+26		"調整制限:"
+27		"ミリ秒"
+30		"最も近い垂直同期で表示する"
+31		"ファイルを開き直すと変更が有効になります。"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
