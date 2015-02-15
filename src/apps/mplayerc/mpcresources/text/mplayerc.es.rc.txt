@@ -452,6 +452,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
+5		"EVR Sync Settings"
 6		"Sincronizar video a pantalla"
 7		"Sincronizar pantalla a video"
 9		"Target sync offset:"
@@ -1090,7 +1091,7 @@ STRING IDD_PPAGEPLAYER		"Reproductor"
 STRING IDD_PPAGESUBRENDERING		"Subtítulos::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Subtítulos::Estilo Predeterminado"
 STRING IDD_PPAGESUBTITLES		"Subtítulos"
-STRING IDD_PPAGESYNC		"Video::Opciones de sincronización de EVR"
+STRING IDD_PPAGESYNC		"Video::Frame synchronization"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Reproductor::Interfaz Web"
 STRING IDD_PPAGEYOUTUBE		"Reproducción::YouTube"

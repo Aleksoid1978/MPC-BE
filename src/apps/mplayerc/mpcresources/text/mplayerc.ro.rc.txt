@@ -452,6 +452,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
+5		"EVR Sync Settings"
 6		"Sincronizează video cu afișarea"
 7		"Sincronizează afișarea cu video"
 9		"Decalaj de sincronizare:"
@@ -1093,7 +1094,7 @@ STRING IDD_PPAGEPLAYER		"Player"
 STRING IDD_PPAGESUBRENDERING		"Subtitrări::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Subtitrări::Stil implicit"
 STRING IDD_PPAGESUBTITLES		"Subtitrări"
-STRING IDD_PPAGESYNC		"Video::Setările Randorului Sync"
+STRING IDD_PPAGESYNC		"Video::Frame synchronization"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Player::Interfață web"
 STRING IDD_PPAGEYOUTUBE		"Redare::YouTube"

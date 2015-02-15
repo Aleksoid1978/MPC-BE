@@ -1044,7 +1044,7 @@ IDD_PPAGESYNC DIALOGEX 0, 0, 296, 241
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "",IDC_STATIC,5,5,286,146
+    GROUPBOX        "EVR Sync Settings",IDC_STATIC,5,5,286,146
     CONTROL         "Sync video to display",IDC_SYNCVIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,17,280,8
     CONTROL         "Sync display to video",IDC_SYNCDISPLAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,46,280,8
     EDITTEXT        IDC_TARGETSYNCOFFSET,114,93,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
@@ -2148,7 +2148,7 @@ BEGIN
     IDD_PPAGEYOUTUBE        "Playback::YouTube"
     IDD_PPAGEVIDEO          "Video"
     IDD_PPAGECOLOR          "Video::Color correction"
-    IDD_PPAGESYNC           "Video::EVR Sync Settings"
+    IDD_PPAGESYNC           "Video::Frame synchronization"
     IDD_PPAGEFULLSCREEN     "Video::Fullscreen"
     IDD_PPAGEAUDIO          "Audio"
     IDD_PPAGESUBTITLES      "Subtitles"

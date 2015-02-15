@@ -452,6 +452,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
+5		"EVR Sync Settings"
 6		"Synka video till skärm"
 7		"Synka skärm till video"
 9		"Önskad synkoffset:"
@@ -1090,7 +1091,7 @@ STRING IDD_PPAGEPLAYER		"Spelare"
 STRING IDD_PPAGESUBRENDERING		"Undertexter::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Undertexter::Standard Stil"
 STRING IDD_PPAGESUBTITLES		"Undertexter"
-STRING IDD_PPAGESYNC		"Video::EVR Sync Settings"
+STRING IDD_PPAGESYNC		"Video::Frame synchronization"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Spelare::Webb Gränssnitt"
 STRING IDD_PPAGEYOUTUBE		"Uppspelning::YouTube"

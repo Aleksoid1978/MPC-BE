@@ -452,6 +452,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
+5		"EVR Sync Settings"
 6		"Synchroniser la fréquence de la vidéo avec celle de l'écran"
 7		"Synchroniser la fréquence de l'écran avec celle de la vidéo"
 9		"Décalage de synchronisation cible :"
@@ -1090,7 +1091,7 @@ STRING IDD_PPAGEPLAYER		"Lecteur"
 STRING IDD_PPAGESUBRENDERING		"Sous-titres::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Sous-titres::Style par défaut"
 STRING IDD_PPAGESUBTITLES		"Sous-titres"
-STRING IDD_PPAGESYNC		"Video::Paramètre EVR Sync"
+STRING IDD_PPAGESYNC		"Video::Frame synchronization"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Lecteur::Interface Web"
 STRING IDD_PPAGEYOUTUBE		"Lecture::YouTube"

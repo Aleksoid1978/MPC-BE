@@ -452,6 +452,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
+5		"EVR Sync Settings"
 6		"Συγχρονισμός βίντεο με οθόνη"
 7		"Συγχρονισμός οθόνης με βίντεο"
 9		"Στόχος μετατόπισης συγχρον.:"
@@ -1093,7 +1094,7 @@ STRING IDD_PPAGEPLAYER		"Αναπαραγωγός"
 STRING IDD_PPAGESUBRENDERING		"Υπότιτλοι::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Υπότιτλοι::Προεπιλεγμένο στυλ"
 STRING IDD_PPAGESUBTITLES		"Υπότιτλοι"
-STRING IDD_PPAGESYNC		"Video::Ρυθμίσεις συγχρ. απόδοσης"
+STRING IDD_PPAGESYNC		"Video::Frame synchronization"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Αναπαραγωγός::Διεπαφή διαδικτύου"
 STRING IDD_PPAGEYOUTUBE		"Αναπαραγωγή::YouTube"

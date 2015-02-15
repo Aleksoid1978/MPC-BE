@@ -452,6 +452,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
+5		"EVR Sync Settings"
 6		"Sincronizar o vídeo a tela"
 7		"Sincronizar tela ao vídeo"
 9		"Ajuste de sincronismo:"
@@ -1090,7 +1091,7 @@ STRING IDD_PPAGEPLAYER		"Tocador"
 STRING IDD_PPAGESUBRENDERING		"Legendas::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Legendas::Estilo Pré-determinado"
 STRING IDD_PPAGESUBTITLES		"Legendas"
-STRING IDD_PPAGESYNC		"Video::Ajuste Sincr. EVR"
+STRING IDD_PPAGESYNC		"Video::Frame synchronization"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Tocador::Interface Web"
 STRING IDD_PPAGEYOUTUBE		"Reprodução::YouTube"
