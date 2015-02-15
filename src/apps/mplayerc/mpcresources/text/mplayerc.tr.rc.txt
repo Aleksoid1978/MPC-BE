@@ -452,6 +452,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
+5		"EVR Sync Settings"
 6		"Video'yu görüntüye eşzamanla"
 7		"Görüntüyü video'ya eşzamanla"
 9		"Hedef uyum dengesi:"
@@ -1090,7 +1091,7 @@ STRING IDD_PPAGEPLAYER		"Oynatıcı"
 STRING IDD_PPAGESUBRENDERING		"Altyazılar::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Altyazılar::Görünüm"
 STRING IDD_PPAGESUBTITLES		"Altyazılar"
-STRING IDD_PPAGESYNC		"Video::EVR Zam. Ayarları"
+STRING IDD_PPAGESYNC		"Video::Frame synchronization"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Oynatıcı::İnternet Arabirimi"
 STRING IDD_PPAGEYOUTUBE		"Yürütme::YouTube"

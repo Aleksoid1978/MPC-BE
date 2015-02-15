@@ -452,6 +452,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
+5		"EVR Sync Settings"
 6		"Сінхр. відэа да дысплэя"
 7		"Сінхр. дысплэй да відэа"
 9		"Зрух сінхранізацыі:"
@@ -1090,7 +1091,7 @@ STRING IDD_PPAGEPLAYER		"Прайгравальнік"
 STRING IDD_PPAGESUBRENDERING		"Субтытры::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Субтытры::Стандартны стыль"
 STRING IDD_PPAGESUBTITLES		"Субтытры"
-STRING IDD_PPAGESYNC		"Video::Налады EVR Sync"
+STRING IDD_PPAGESYNC		"Video::Frame synchronization"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Прайгравальнік::Web-інтэрфейс"
 STRING IDD_PPAGEYOUTUBE		"Прайграванне::YouTube"

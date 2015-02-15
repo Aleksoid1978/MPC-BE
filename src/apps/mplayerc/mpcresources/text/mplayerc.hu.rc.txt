@@ -452,6 +452,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
+5		"EVR Sync Settings"
 6		"Videó képernyőhöz illesztése"
 7		"Képernyő videóhoz illesztése"
 9		"Cél szink. eltolás:"
@@ -1090,7 +1091,7 @@ STRING IDD_PPAGEPLAYER		"Lejátszó"
 STRING IDD_PPAGESUBRENDERING		"Feliratok::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Feliratok::Alapstílus"
 STRING IDD_PPAGESUBTITLES		"Feliratok"
-STRING IDD_PPAGESYNC		"Video::EVR Sync Beállítások"
+STRING IDD_PPAGESYNC		"Video::Frame synchronization"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Lejátszó::Webes felület"
 STRING IDD_PPAGEYOUTUBE		"Lejátszás::YouTube"

@@ -452,6 +452,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
+5		"EVR Sync Settings"
 6		"Համաժեցնել տեսանյութը էկրանի հետ"
 7		"Համաժեցնել էկրանը տեսանյութը հետ"
 9		"Համաժեցման նպ. փոփ."
@@ -1090,7 +1091,7 @@ STRING IDD_PPAGEPLAYER		"Վերարտադրիչը"
 STRING IDD_PPAGESUBRENDERING		"Տողագրերը::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Տողագրերը::Ծրագրային ոճը"
 STRING IDD_PPAGESUBTITLES		"Տողագրերը"
-STRING IDD_PPAGESYNC		"Video::EVR Sync-ի կարգավորումներ"
+STRING IDD_PPAGESYNC		"Video::Frame synchronization"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Վերարտադրիչը::Web տեսքը"
 STRING IDD_PPAGEYOUTUBE		"Վերարտադրում::YouTube"

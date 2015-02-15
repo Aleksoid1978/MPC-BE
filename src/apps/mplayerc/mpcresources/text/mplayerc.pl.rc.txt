@@ -452,6 +452,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
+5		"EVR Sync Settings"
 6		"Synchronizowanie wideo z ekranem"
 7		"Synchronizowanie ekranu z wideo"
 9		"Przesunięcie synchronizacji:"
@@ -1081,7 +1082,7 @@ STRING IDD_PPAGEPLAYER		"Program"
 STRING IDD_PPAGESUBRENDERING		"Napisy::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Napisy::Domyślny styl"
 STRING IDD_PPAGESUBTITLES		"Napisy"
-STRING IDD_PPAGESYNC		"Video::Synchronizacja EVR"
+STRING IDD_PPAGESYNC		"Video::Frame synchronization"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Program::Interfejs internetowy"
 STRING IDD_PPAGEYOUTUBE		"Odtwarzanie::YouTube"

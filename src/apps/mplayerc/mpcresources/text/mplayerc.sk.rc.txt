@@ -452,6 +452,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
+5		"EVR Sync Settings"
 6		"Synchronizovať video s displejom"
 7		"Synchronizovať displej s videom"
 9		"Cieľový synch. offset:"
@@ -1090,7 +1091,7 @@ STRING IDD_PPAGEPLAYER		"Prehrávač"
 STRING IDD_PPAGESUBRENDERING		"Titulky::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Titulky::Predvolený štýl"
 STRING IDD_PPAGESUBTITLES		"Titulky"
-STRING IDD_PPAGESYNC		"Video::EVR synchronizácia"
+STRING IDD_PPAGESYNC		"Video::Frame synchronization"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Prehrávač::Webové rozhranie"
 STRING IDD_PPAGEYOUTUBE		"Prehrávanie::YouTube"

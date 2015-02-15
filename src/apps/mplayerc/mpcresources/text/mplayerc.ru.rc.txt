@@ -452,6 +452,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
+5		"Настройка EVR Sync
 6		"Синхронизировать видео с дисплеем"
 7		"Синхронизировать дисплей с видео"
 9		"Целевое смещение синхр-ции:"
@@ -1090,7 +1091,7 @@ STRING IDD_PPAGEPLAYER		"Проигрыватель"
 STRING IDD_PPAGESUBRENDERING		"Субтитры::Отрисовка"
 STRING IDD_PPAGESUBSTYLE		"Субтитры::Стандартный стиль"
 STRING IDD_PPAGESUBTITLES		"Субтитры"
-STRING IDD_PPAGESYNC		"Видео::Настройка EVR Sync"
+STRING IDD_PPAGESYNC		"Видео::Синхронизация кадров"
 STRING IDD_PPAGEVIDEO		"Видео"
 STRING IDD_PPAGEWEBSERVER		"Проигрыватель::Web-интерфейс"
 STRING IDD_PPAGEYOUTUBE		"Воспроизведение::YouTube"

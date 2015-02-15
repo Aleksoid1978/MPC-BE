@@ -452,6 +452,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
+5		"EVR Sync Settings"
 6		"Aldiberetu bideoa erakuspenera"
 7		"Aldiberetu erakuspena bideora"
 9		"Xede aldiberetze oreka::"
@@ -1090,7 +1091,7 @@ STRING IDD_PPAGEPLAYER		"Irakurgailua"
 STRING IDD_PPAGESUBRENDERING		"Azpidatziak::Aurkezpena"
 STRING IDD_PPAGESUBSTYLE		"Azpidatziak::Berezko Estiloa"
 STRING IDD_PPAGESUBTITLES		"Azpidatziak"
-STRING IDD_PPAGESYNC		"Bideoa::EVR Aldiberetze Ezarpenak"
+STRING IDD_PPAGESYNC		"Bideoa::Frame synchronization"
 STRING IDD_PPAGEVIDEO		"Bideoa"
 STRING IDD_PPAGEWEBSERVER		"Irakurgailua::Web Interfazea"
 STRING IDD_PPAGEYOUTUBE		"Irakurketa::YouTube"
