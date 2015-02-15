@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"启用字幕同步编辑器"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"将视频同步到显示器"
-7		"将显示器同步到视频"
-9		"目标同步偏移: "
-10		"毫秒"
-12		"频率调整: "
-14		"频率调整: "
-15		"行"
-17		"列"
-19		"控制限制: "
-20		"毫秒"
-23		"使用显示器刷新率和视频帧率最接近的同步方式"
-24		"设置在关闭并重新启动后生效。"
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"将视频同步到显示器"
+14		"将显示器同步到视频"
+16		"目标同步偏移: "
+17		"毫秒"
+19		"频率调整: "
+21		"频率调整: "
+22		"行"
+24		"列"
+26		"控制限制: "
+27		"毫秒"
+30		"使用显示器刷新率和视频帧率最接近的同步方式"
+31		"设置在关闭并重新启动后生效。"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37

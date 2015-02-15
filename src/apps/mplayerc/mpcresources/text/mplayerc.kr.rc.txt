@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"Use Subresync"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"비디오에서 디스플레이로 싱크"
-7		"디스클레이에서 비디오로 싱크"
-9		"목표 싱크 오프셋:"
-10		"ms"
-12		"주파수 조정:"
-14		"주파수 조정:"
-15		"가로"
-17		"세로"
-19		"한계:"
-20		"ms"
-23		"가장 근접한 VSync에 맞추기"
-24		"현재 파일을 닫고 다시 시작해야만 설정이 적용됩니다."
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"비디오에서 디스플레이로 싱크"
+14		"디스클레이에서 비디오로 싱크"
+16		"목표 싱크 오프셋:"
+17		"ms"
+19		"주파수 조정:"
+21		"주파수 조정:"
+22		"가로"
+24		"세로"
+26		"한계:"
+27		"ms"
+30		"가장 근접한 VSync에 맞추기"
+31		"현재 파일을 닫고 다시 시작해야만 설정이 적용됩니다."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37

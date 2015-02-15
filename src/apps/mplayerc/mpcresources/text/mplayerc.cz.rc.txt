@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"Use Subresync"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"Synchronizovat video k displeji"
-7		"Synchronizovat displej k videu"
-9		"Cílový offset synchronizace:"
-10		"ms"
-12		"Přizpůsobit frekvenci o:"
-14		"Přizpůsobit frekvenci o:"
-15		"řádky"
-17		"sloupce"
-19		"Meze přizpůsobení:"
-20		"ms"
-23		"Zobrazit při nejbližším vsync"
-24		"Změny se projeví až po zastavení a opětovném spuštění přehrávání."
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"Synchronizovat video k displeji"
+14		"Synchronizovat displej k videu"
+16		"Cílový offset synchronizace:"
+17		"ms"
+19		"Přizpůsobit frekvenci o:"
+21		"Přizpůsobit frekvenci o:"
+22		"řádky"
+24		"sloupce"
+26		"Meze přizpůsobení:"
+27		"ms"
+30		"Zobrazit při nejbližším vsync"
+31		"Změny se projeví až po zastavení a opětovném spuštění přehrávání."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37

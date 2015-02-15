@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"Use Subresync"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"Sync video to display"
-7		"Sync display to video"
-9		"Target sync offset:"
-10		"ms"
-12		"Frequency adjustment:"
-14		"Frequency adjustment:"
-15		"lines"
-17		"columns"
-19		"Control limits:"
-20		"ms"
-23		"Present at nearest VSync"
-24		"Changes take effect after the playback has been closed and restarted."
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"Sync video to display"
+14		"Sync display to video"
+16		"Target sync offset:"
+17		"ms"
+19		"Frequency adjustment:"
+21		"Frequency adjustment:"
+22		"lines"
+24		"columns"
+26		"Control limits:"
+27		"ms"
+30		"Present at nearest VSync"
+31		"Changes take effect after the playback has been closed and restarted."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37

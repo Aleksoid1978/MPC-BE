@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"啟用字幕同步編輯器"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"同步視訊至顯示"
-7		"同步顯示至視訊"
-9		"目標同步偏移量:"
-10		"毫秒"
-12		"頻率調整:"
-14		"頻率調整:"
-15		"列 (Ln)"
-17		"欄 (Col)"
-19		"控制限制:"
-20		"毫秒"
-23		"於最近的垂直同步呈現"
-24		"要關閉或是重新啟動播放後，變更才會有效。"
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"同步視訊至顯示"
+14		"同步顯示至視訊"
+16		"目標同步偏移量:"
+17		"毫秒"
+19		"頻率調整:"
+21		"頻率調整:"
+22		"列 (Ln)"
+24		"欄 (Col)"
+26		"控制限制:"
+27		"毫秒"
+30		"於最近的垂直同步呈現"
+31		"要關閉或是重新啟動播放後，變更才會有效。"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37

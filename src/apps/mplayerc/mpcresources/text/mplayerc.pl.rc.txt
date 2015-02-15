@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"Use Subresync"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"Synchronizowanie wideo z ekranem"
-7		"Synchronizowanie ekranu z wideo"
-9		"Przesunięcie synchronizacji:"
-10		"ms"
-12		"Regulacja częstotliwości:"
-14		"Regulacja częstotliwości:"
-15		"wierszy"
-17		"kolumn"
-19		"Kontrola limitów:"
-20		"ms"
-23		"Wyświetlanie najbliższej synchronizacji pionowej"
-24		"Zmiany zostaną wprowadzone po ponownym uruchomieniu programu."
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"Synchronizowanie wideo z ekranem"
+14		"Synchronizowanie ekranu z wideo"
+16		"Przesunięcie synchronizacji:"
+17		"ms"
+19		"Regulacja częstotliwości:"
+21		"Regulacja częstotliwości:"
+22		"wierszy"
+24		"kolumn"
+26		"Kontrola limitów:"
+27		"ms"
+30		"Wyświetlanie najbliższej synchronizacji pionowej"
+31		"Zmiany zostaną wprowadzone po ponownym uruchomieniu programu."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37

@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"Use Subresync"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"Сінхр. відэа да дысплэя"
-7		"Сінхр. дысплэй да відэа"
-9		"Зрух сінхранізацыі:"
-10		"мс"
-12		"Карэкцыя частаты:"
-14		"Карэкцыя частаты:"
-15		"радкі"
-17		"слупкі"
-19		"Ліміты кіравання:"
-20		"мс"
-23		"Перадаць на бліжэйшы vsync"
-24		"Змены ўступяць у моц пасля перазагрузкі відэа."
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"Сінхр. відэа да дысплэя"
+14		"Сінхр. дысплэй да відэа"
+16		"Зрух сінхранізацыі:"
+17		"мс"
+19		"Карэкцыя частаты:"
+21		"Карэкцыя частаты:"
+22		"радкі"
+24		"слупкі"
+26		"Ліміты кіравання:"
+27		"мс"
+30		"Перадаць на бліжэйшы vsync"
+31		"Змены ўступяць у моц пасля перазагрузкі відэа."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37

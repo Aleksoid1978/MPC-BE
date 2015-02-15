@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"Use Subresync"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"Video'yu görüntüye eşzamanla"
-7		"Görüntüyü video'ya eşzamanla"
-9		"Hedef uyum dengesi:"
-10		"ms"
-12		"Frekans düzeltmesi:"
-14		"Frekans düzeltmesi:"
-15		"satır"
-17		"sütun"
-19		"Kontrol sınırı:"
-20		"ms"
-23		"En yakın eşzamanlılık örneği"
-24		"Değişiklikler, yürütme kapatıldıktan ve uygulama yeniden başlatıldıktan sonra uygulanacaktır."
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"Video'yu görüntüye eşzamanla"
+14		"Görüntüyü video'ya eşzamanla"
+16		"Hedef uyum dengesi:"
+17		"ms"
+19		"Frekans düzeltmesi:"
+21		"Frekans düzeltmesi:"
+22		"satır"
+24		"sütun"
+26		"Kontrol sınırı:"
+27		"ms"
+30		"En yakın eşzamanlılık örneği"
+31		"Değişiklikler, yürütme kapatıldıktan ve uygulama yeniden başlatıldıktan sonra uygulanacaktır."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37

@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"Use Subresync"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"Synka video till skärm"
-7		"Synka skärm till video"
-9		"Önskad synkoffset:"
-10		"ms"
-12		"Frekvensjustering:"
-14		"Frekvensjustering:"
-15		"rader"
-17		"kolumner"
-19		"Styrgränser:"
-20		"ms"
-23		"Visa vid närmaste vertikalsynk"
-24		"Ändring slår igenom efter omstart av uppspelning."
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"Synka video till skärm"
+14		"Synka skärm till video"
+16		"Önskad synkoffset:"
+17		"ms"
+19		"Frekvensjustering:"
+21		"Frekvensjustering:"
+22		"rader"
+24		"kolumner"
+26		"Styrgränser:"
+27		"ms"
+30		"Visa vid närmaste vertikalsynk"
+31		"Ändring slår igenom efter omstart av uppspelning."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37

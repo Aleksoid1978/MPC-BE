@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"Use Subresync"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"Sincronizează video cu afișarea"
-7		"Sincronizează afișarea cu video"
-9		"Decalaj de sincronizare:"
-10		"ms"
-12		"Ajustare frecvență:"
-14		"Ajustare frecvență:"
-15		"linii"
-17		"coloane"
-19		"Limite de control:"
-20		"ms"
-23		"Prezintă la cel mai apropiat VSync (Sincronizare Verticală)"
-24		"Modificările vor avea efect după ce redarea a fost închisă și repornită."
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"Sincronizează video cu afișarea"
+14		"Sincronizează afișarea cu video"
+16		"Decalaj de sincronizare:"
+17		"ms"
+19		"Ajustare frecvență:"
+21		"Ajustare frecvență:"
+22		"linii"
+24		"coloane"
+26		"Limite de control:"
+27		"ms"
+30		"Prezintă la cel mai apropiat VSync (Sincronizare Verticală)"
+31		"Modificările vor avea efect după ce redarea a fost închisă și repornită."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37

@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"Use Subresync"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"Համաժեցնել տեսանյութը էկրանի հետ"
-7		"Համաժեցնել էկրանը տեսանյութը հետ"
-9		"Համաժեցման նպ. փոփ."
-10		"մվ"
-12		"Հաճախականության ուղղում."
-14		"Հաճախականության ուղղում."
-15		"գծեր"
-17		"սյուներ"
-19		"Սահմանափակումներ."
-20		"մվ"
-23		"Ցուցադրել մոտագույն vsync-ի հետ"
-24		"Ցուցադրել մոտագույն vsync-ի հետ"
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"Համաժեցնել տեսանյութը էկրանի հետ"
+14		"Համաժեցնել էկրանը տեսանյութը հետ"
+16		"Համաժեցման նպ. փոփ."
+17		"մվ"
+19		"Հաճախականության ուղղում."
+21		"Հաճախականության ուղղում."
+22		"գծեր"
+24		"սյուներ"
+26		"Սահմանափակումներ."
+27		"մվ"
+30		"Ցուցադրել մոտագույն vsync-ի հետ"
+31		"Ցուցադրել մոտագույն vsync-ի հետ"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37

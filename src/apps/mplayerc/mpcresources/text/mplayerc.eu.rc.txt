@@ -451,20 +451,25 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 19		"Erabili Azpberraldb"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 25
-5		"EVR Sync Settings"
-6		"Aldiberetu bideoa erakuspenera"
-7		"Aldiberetu erakuspena bideora"
-9		"Xede aldiberetze oreka::"
-10		"sm"
-12		"Maiztasun zehaztapena:"
-14		"Maiztasun zehaztapena:"
-15		"lerro"
-17		"zutabe"
-19		"Aginte mugak:"
-20		"sm"
-23		"Hurbileneko ZAlb"
-24		"Aldaketek eragina dute irakurketa itxi eta berrabiarazi ondoren."
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+5		"VSync"
+6		"Accurate VSync"
+7		"Alternative VSync"
+8		"VSync Offset:"
+11		"Disable desktop composition (Aero)"
+12		"EVR Sync Settings"
+13		"Aldiberetu bideoa erakuspenera"
+14		"Aldiberetu erakuspena bideora"
+16		"Xede aldiberetze oreka::"
+17		"sm"
+19		"Maiztasun zehaztapena:"
+21		"Maiztasun zehaztapena:"
+22		"lerro"
+24		"zutabe"
+26		"Aginte mugak:"
+27		"sm"
+30		"Hurbileneko ZAlb"
+31		"Aldaketek eragina dute irakurketa itxi eta berrabiarazi ondoren."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
