@@ -823,6 +823,10 @@ HRESULT CEVRAllocatorPresenter::GetMediaTypeMerit(IMFMediaType* pType, int* pMer
 	HRESULT hr = GetMediaTypeFourCC(pType, &mix_fmt);
 
 	if (SUCCEEDED(hr)) {
+		// Information about actual YUV formats - http://msdn.microsoft.com/en-us/library/windows/desktop/dd206750%28v=vs.85%29.aspx
+		// DirectShow EVR not support 10 and 16-bit format
+
+		// Test result
 		// EVR input formats: NV12, YV12, YUY2, AYUV, RGB32, ARGB32, AI44.
 		// EVR mixer formats
 		// Intel: YUY2, X8R8G8B8, A8R8G8B8 (HD 4000).
@@ -841,17 +845,30 @@ HRESULT CEVRAllocatorPresenter::GetMediaTypeMerit(IMFMediaType* pType, int* pMer
 		case FCC('IMC3'): *pMerit = 24; break;
 		case FCC('IMC2'): *pMerit = 23; break;
 		case FCC('IMC4'): *pMerit = 22; break;
-		case FCC('YV12'): *pMerit = 21; break;
-		case FCC('NV12'): *pMerit = 20; break;
-		case FCC('I420'): *pMerit = 19; break;
-		case FCC('IYUV'): *pMerit = 18; break;
-		case FCC('Y216'): *pMerit = 17; break; // 4:2:2
-		case FCC('v216'): *pMerit = 16; break;
-		case FCC('P216'): *pMerit = 15; break;
-		case FCC('Y210'): *pMerit = 14; break;
-		case FCC('v210'): *pMerit = 13; break;
-		case FCC('P210'): *pMerit = 12; break;
-		case FCC('YUY2'): *pMerit = 10; break;
+		case FCC('YV12'): *pMerit = 20; break;
+		case FCC('NV12'):
+			if (m_inputMediaType.subtype == MEDIASUBTYPE_NV12) {
+				*pMerit = 63;
+			} else if (m_inputMediaType.subtype == MEDIASUBTYPE_YV12) {
+				*pMerit = 62;
+			} else {
+				*pMerit = 19;
+			}
+			break;
+		case FCC('I420'): *pMerit = 18; break;
+		case FCC('IYUV'): *pMerit = 17; break;
+		case FCC('Y216'): *pMerit = 16; break; // 4:2:2
+		case FCC('v216'): *pMerit = 15; break;
+		case FCC('P216'): *pMerit = 14; break;
+		case FCC('Y210'): *pMerit = 13; break;
+		case FCC('v210'): *pMerit = 12; break;
+		case FCC('P210'): *pMerit = 11; break;
+		case FCC('YUY2'):
+			if (m_inputMediaType.subtype == MEDIASUBTYPE_YUY2) {
+				*pMerit = 63;
+			} else {
+				*pMerit = 10;
+			}
 		case FCC('UYVY'): *pMerit = 9; break;
 		case FCC('Y42T'): *pMerit = 8; break;
 		case FCC('YVYU'): *pMerit = 7; break;
@@ -862,11 +879,9 @@ HRESULT CEVRAllocatorPresenter::GetMediaTypeMerit(IMFMediaType* pType, int* pMer
 		case D3DFMT_X8R8G8B8:
 			if (m_inputMediaType.subtype == MEDIASUBTYPE_RGB32 || m_inputMediaType.subtype == MEDIASUBTYPE_ARGB32) {
 				*pMerit = 63;
-			}
-			else if (m_inputMediaType.subtype == MEDIASUBTYPE_AYUV) {
-				*pMerit = 11;
-			}
-			else {
+			} else if (m_inputMediaType.subtype == MEDIASUBTYPE_AYUV) {
+				*pMerit = 21;
+			} else {
 				*pMerit = 1;
 			}
 			break;
