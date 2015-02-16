@@ -266,7 +266,7 @@ namespace DSObjects
 		HRESULT									CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType** pType);
 		HRESULT									SetMediaType(IMFMediaType* pType);
 		HRESULT									GetMediaTypeFourCC(IMFMediaType* pType, DWORD* pFourCC);
-		HRESULT									GetMediaTypeMerit(IMFMediaType* pType, int *pMerit);
+		HRESULT									GetMixerMediaTypeMerit(IMFMediaType* pType, int *pMerit);
 		LPCTSTR									GetMediaTypeFormatDesc(IMFMediaType* pMediaType);
 
 		// === Functions pointers on Vista / .Net3 specifics library
