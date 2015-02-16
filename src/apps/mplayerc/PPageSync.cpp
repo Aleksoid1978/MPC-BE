@@ -125,10 +125,42 @@ void CPPageSync::InitDialogPrivate()
 		GetDlgItem(IDC_SYNCVIDEO)->EnableWindow(TRUE);
 		GetDlgItem(IDC_SYNCDISPLAY)->EnableWindow(TRUE);
 		GetDlgItem(IDC_SYNCNEAREST)->EnableWindow(TRUE);
+		GetDlgItem(IDC_TARGETSYNCOFFSET)->EnableWindow(TRUE);
+		GetDlgItem(IDC_CYCLEDELTA)->EnableWindow(TRUE);
+		GetDlgItem(IDC_LINEDELTA)->EnableWindow(TRUE);
+		GetDlgItem(IDC_COLUMNDELTA)->EnableWindow(TRUE);
+		GetDlgItem(IDC_CONTROLLIMIT)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC4)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC6)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC7)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC8)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC9)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC10)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC11)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC12)->EnableWindow(TRUE);
 	} else {
 		GetDlgItem(IDC_SYNCVIDEO)->EnableWindow(FALSE);
 		GetDlgItem(IDC_SYNCDISPLAY)->EnableWindow(FALSE);
 		GetDlgItem(IDC_SYNCNEAREST)->EnableWindow(FALSE);
+		GetDlgItem(IDC_TARGETSYNCOFFSET)->EnableWindow(FALSE);
+		GetDlgItem(IDC_CYCLEDELTA)->EnableWindow(FALSE);
+		GetDlgItem(IDC_LINEDELTA)->EnableWindow(FALSE);
+		GetDlgItem(IDC_COLUMNDELTA)->EnableWindow(FALSE);
+		GetDlgItem(IDC_CONTROLLIMIT)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC2)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC3)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC4)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC6)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC7)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC8)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC9)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC10)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC11)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC12)->EnableWindow(FALSE);
 	}
 
 	m_bSynchronizeVideo = ars.bSynchronizeVideo;
