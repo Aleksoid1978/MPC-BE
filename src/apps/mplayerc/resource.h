@@ -547,6 +547,9 @@
 #define IDC_STATIC7                     10207
 #define IDC_STATIC8                     10208
 #define IDC_STATIC9                     10209
+#define IDC_STATIC10                    10210
+#define IDC_STATIC11                    10211
+#define IDC_STATIC12                    10212
 //
 #define IDC_CHECK1                      10221
 #define IDC_CHECK2                      10222
