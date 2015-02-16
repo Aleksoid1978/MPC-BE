@@ -61,7 +61,6 @@ CPPageVideo::CPPageVideo()
 	: CPPageBase(CPPageVideo::IDD, CPPageVideo::IDD)
 	, m_iVideoRendererType(VIDRNDT_DS_DEFAULT)
 	, m_iVideoRendererType_store(VIDRNDT_DS_DEFAULT)
-	, m_bVMR9AlterativeVSync(FALSE)
 	, m_bResetDevice(FALSE)
 	, m_iEvrBuffers(5)
 	, m_bD3D9RenderDevice(FALSE)
@@ -86,13 +85,11 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_RESETDEVICE, m_bResetDevice);
 	DDX_Control(pDX, IDC_FULLSCREEN_MONITOR_CHECK, m_chkD3DFullscreen);
 	DDX_Control(pDX, IDC_CHECK1, m_chk10bitOutput);
-	DDX_Check(pDX, IDC_DSVMR9ALTERNATIVEVSYNC, m_bVMR9AlterativeVSync);
 	DDX_Control(pDX, IDC_DSVMRLOADMIXER, m_chkVMRMixerMode);
 	DDX_Control(pDX, IDC_DSVMRYUVMIXER, m_chkVMRMixerYUV);
 	DDX_Control(pDX, IDC_COMBO2, m_cbEVROutputRange);
 	DDX_Text(pDX, IDC_EVR_BUFFERS, m_iEvrBuffers);
 	DDX_Control(pDX, IDC_SPIN1, m_spnEvrBuffers);
-	DDX_Control(pDX, IDC_CHECK2, m_chkDisableAero);
 
 	DDX_Control(pDX, IDC_CHECK3, m_chkColorManagment);
 	DDX_Control(pDX, IDC_COMBO3, m_cbCMInputType);
@@ -144,9 +141,6 @@ BOOL CPPageVideo::OnInitDialog()
 	m_chk10bitOutput.SetCheck(rs.m_AdvRendSets.b10BitOutput);
 	m_chkVMRMixerMode.SetCheck(rs.fVMRMixerMode);
 	m_chkVMRMixerYUV.SetCheck(rs.fVMRMixerYUV);
-
-	m_bVMR9AlterativeVSync = rs.m_AdvRendSets.fVMR9AlterativeVSync;
-	m_chkDisableAero.SetCheck(rs.m_AdvRendSets.iVMRDisableDesktopComposition);
 
 	m_cbAPSurfaceUsage.AddString(ResStr(IDS_PPAGE_OUTPUT_SURF_OFFSCREEN));
 	m_cbAPSurfaceUsage.AddString(ResStr(IDS_PPAGE_OUTPUT_SURF_2D));
@@ -349,6 +343,7 @@ BOOL CPPageVideo::OnInitDialog()
 	OnColorManagmentCheck();
 
 	UpdateData(TRUE);
+	SetModified(FALSE);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 }
@@ -370,10 +365,7 @@ BOOL CPPageVideo::OnApply()
 
 	rs.m_AdvRendSets.iDX9SurfaceFormat		= m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel());
 	rs.m_AdvRendSets.b10BitOutput			= !!m_chk10bitOutput.GetCheck();
-	rs.m_AdvRendSets.iVMRDisableDesktopComposition = !!m_chkDisableAero.GetCheck();
 	rs.m_AdvRendSets.iEVROutputRange		= m_cbEVROutputRange.GetCurSel();
-
-	rs.m_AdvRendSets.fVMR9AlterativeVSync	= m_bVMR9AlterativeVSync != 0;
 
 	rs.iEvrBuffers = min(max(4, m_iEvrBuffers), 60);
 
@@ -499,13 +491,11 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(FALSE);
 	m_chkVMRMixerMode.EnableWindow(FALSE);
 	m_chkVMRMixerYUV.EnableWindow(FALSE);
-	GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(FALSE);
 	GetDlgItem(IDC_RESETDEVICE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(FALSE);
 	m_spnEvrBuffers.EnableWindow(FALSE);
 	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
 	m_cbD3D9RenderDevice.EnableWindow(FALSE);
-	m_chkDisableAero.EnableWindow(FALSE);
 	m_cbEVROutputRange.EnableWindow(FALSE);
 
 	// Color Managment
@@ -551,20 +541,13 @@ void CPPageVideo::OnDSRendererChange()
 			}
 			m_chkVMRMixerMode.EnableWindow(TRUE);
 			m_chkVMRMixerYUV.EnableWindow(TRUE);
-			GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 			m_cbAPSurfaceUsage.EnableWindow(TRUE);
 			m_cbDX9SurfaceFormat.EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
-			GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 			if (m_cbAPSurfaceUsage.GetCurSel() == VIDRNDT_AP_TEXTURE3D) {
-				
-				if (IsWinVista() || IsWinSeven()) {
-					m_chkDisableAero.EnableWindow(TRUE);
-				}
-
 				D3DFORMAT surfmt = (D3DFORMAT)m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel());
 				if (surfmt == D3DFMT_A16B16G16R16F || surfmt == D3DFMT_A32B32G32R32F) {
 					// Color Managment
@@ -592,7 +575,6 @@ void CPPageVideo::OnDSRendererChange()
 			m_cbDX9SurfaceFormat.EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
-			GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
 			m_spnEvrBuffers.EnableWindow(TRUE);
@@ -602,9 +584,6 @@ void CPPageVideo::OnDSRendererChange()
 			m_cbAPSurfaceUsage.SetCurSel(2);
 			OnSurfaceChange();
 
-			if (IsWinVista() || IsWinSeven()) {
-				m_chkDisableAero.EnableWindow(TRUE);
-			}
 			m_cbEVROutputRange.EnableWindow(TRUE);
 
 			{
@@ -634,9 +613,6 @@ void CPPageVideo::OnDSRendererChange()
 			m_cbAPSurfaceUsage.SetCurSel(2);
 			OnSurfaceChange();
 
-			if (IsWinVista() || IsWinSeven()) {
-				m_chkDisableAero.EnableWindow(TRUE);
-			}
 			m_cbEVROutputRange.EnableWindow(TRUE);
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYNC), &m_cbVideoRenderer);
@@ -734,7 +710,6 @@ void CPPageVideo::OnColorManagmentCheck()
 void CPPageVideo::OnBnClickedDefault()
 {
 	m_bD3D9RenderDevice = FALSE;
-	m_bVMR9AlterativeVSync = FALSE;
 	m_bResetDevice = TRUE;
 	m_iEvrBuffers = 5;
 
@@ -742,7 +717,6 @@ void CPPageVideo::OnBnClickedDefault()
 
 	m_cbAPSurfaceUsage.SetCurSel(IsWinVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D);
 	m_cbEVROutputRange.SetCurSel(0);
-	m_chkDisableAero.SetCheck(BST_UNCHECKED);
 	m_chkVMRMixerMode.SetCheck(IsWinVistaOrLater() ? BST_CHECKED : BST_UNCHECKED);
 	m_chkVMRMixerYUV.SetCheck(IsWinVistaOrLater() ? BST_CHECKED : BST_UNCHECKED);
 

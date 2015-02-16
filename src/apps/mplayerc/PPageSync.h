@@ -33,6 +33,17 @@ public:
 	virtual ~CPPageSync();
 
 	enum {IDD = IDD_PPAGESYNC};
+
+	CButton m_chkVMR9VSync;
+	CButton m_chkVMR9VSyncAccurate;
+	CButton m_chkVMR9AlterativeVSync;
+	int m_iVMR9VSyncOffset;
+	CSpinButtonCtrl m_spnVMR9VSyncOffset;
+	CButton m_chkDisableAero;
+	CButton m_chkVMRFlushGPUBeforeVSync;
+	CButton m_chkVMRFlushGPUAfterPresent;
+	CButton m_chkVMRFlushGPUWait;
+
 	BOOL m_bSynchronizeVideo;
 	BOOL m_bSynchronizeDisplay;
 	BOOL m_bSynchronizeNearest;
@@ -53,6 +64,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
+	afx_msg void OnAlterativeVSyncCheck();
 	afx_msg void OnBnClickedSyncVideo();
 	afx_msg void OnBnClickedSyncDisplay();
 	afx_msg void OnBnClickedSyncNearest();

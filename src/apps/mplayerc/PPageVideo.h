@@ -43,7 +43,6 @@ private:
 	CComboBox m_cbEVROutputRange;
 	CButton   m_chkD3DFullscreen;
 	CButton   m_chk10bitOutput;
-	CButton   m_chkDisableAero;
 	CButton   m_chkVMRMixerMode;
 	CButton   m_chkVMRMixerYUV;
 	
@@ -55,7 +54,6 @@ private:
 
 	BOOL m_bD3D9RenderDevice;
 	int  m_iD3D9RenderDevice;
-	BOOL m_bVMR9AlterativeVSync;
 	BOOL m_bResetDevice;
 
 	// Color Managment
