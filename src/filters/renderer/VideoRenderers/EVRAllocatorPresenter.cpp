@@ -675,7 +675,7 @@ HRESULT CEVRAllocatorPresenter::IsMediaTypeSupported(IMFMediaType* pMixerType)
 	int Merit = 0;
 
 	if (SUCCEEDED(hr)) {
-		hr = GetMediaTypeMerit(pMixerType, &Merit);
+		hr = GetMixerMediaTypeMerit(pMixerType, &Merit);
 	}
 
 	if (SUCCEEDED(hr)) {
@@ -817,7 +817,7 @@ HRESULT CEVRAllocatorPresenter::GetMediaTypeFourCC(IMFMediaType* pType, DWORD* p
 	return hr;
 }
 
-HRESULT CEVRAllocatorPresenter::GetMediaTypeMerit(IMFMediaType* pType, int* pMerit)
+HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int* pMerit)
 {
 	DWORD mix_fmt;
 	HRESULT hr = GetMediaTypeFourCC(pType, &mix_fmt);
@@ -831,60 +831,31 @@ HRESULT CEVRAllocatorPresenter::GetMediaTypeMerit(IMFMediaType* pType, int* pMer
 		// EVR mixer formats
 		// Intel: YUY2, X8R8G8B8, A8R8G8B8 (HD 4000).
 		// Nvidia: NV12, YUY2, X8R8G8B8 (GTX 660Ti).
-		// AMD:
+		// ATI/AMD: NV12, X8R8G8B8 (HD 5770)
+
+		if (m_inputMediaType.subtype == MEDIASUBTYPE_NV12 || m_inputMediaType.subtype == MEDIASUBTYPE_YV12) {
+			switch (mix_fmt) {
+			case FCC('NV12'): *pMerit = 90; break;
+			case FCC('YUY2'): *pMerit = 80; break;
+			case D3DFMT_X8R8G8B8: *pMerit = 70; break;
+			}
+		}
+		else if (m_inputMediaType.subtype == MEDIASUBTYPE_YUY2) {
+			switch (mix_fmt) {
+			case FCC('YUY2'): *pMerit = 90; break;
+			case D3DFMT_X8R8G8B8: *pMerit = 80; break; // need test for ATI/AMD
+			case FCC('NV12'): *pMerit = 70; break;
+			}
+		}
+		else if (m_inputMediaType.subtype == MEDIASUBTYPE_AYUV || m_inputMediaType.subtype == MEDIASUBTYPE_RGB32 || m_inputMediaType.subtype == MEDIASUBTYPE_ARGB32) {
+			switch (mix_fmt) {
+			case D3DFMT_X8R8G8B8: *pMerit = 90; break;
+			case FCC('YUY2'): *pMerit = 80; break;
+			case FCC('NV12'): *pMerit = 70; break;
+			}
+		}
 
 		switch (mix_fmt) {
-		case FCC('AI44'): *pMerit = 32; break; // Palettized, 4:4:4
-		case FCC('YVU9'): *pMerit = 31; break; // 8-bit, 16:1:1
-		case FCC('NV11'): *pMerit = 30; break; // 8-bit, 4:1:1
-		case FCC('Y41P'): *pMerit = 29; break;
-		case FCC('Y41T'): *pMerit = 28; break;
-		case FCC('P016'): *pMerit = 27; break; // 4:2:0
-		case FCC('P010'): *pMerit = 26; break;
-		case FCC('IMC1'): *pMerit = 25; break;
-		case FCC('IMC3'): *pMerit = 24; break;
-		case FCC('IMC2'): *pMerit = 23; break;
-		case FCC('IMC4'): *pMerit = 22; break;
-		case FCC('YV12'): *pMerit = 20; break;
-		case FCC('NV12'):
-			if (m_inputMediaType.subtype == MEDIASUBTYPE_NV12) {
-				*pMerit = 63;
-			} else if (m_inputMediaType.subtype == MEDIASUBTYPE_YV12) {
-				*pMerit = 62;
-			} else {
-				*pMerit = 19;
-			}
-			break;
-		case FCC('I420'): *pMerit = 18; break;
-		case FCC('IYUV'): *pMerit = 17; break;
-		case FCC('Y216'): *pMerit = 16; break; // 4:2:2
-		case FCC('v216'): *pMerit = 15; break;
-		case FCC('P216'): *pMerit = 14; break;
-		case FCC('Y210'): *pMerit = 13; break;
-		case FCC('v210'): *pMerit = 12; break;
-		case FCC('P210'): *pMerit = 11; break;
-		case FCC('YUY2'):
-			if (m_inputMediaType.subtype == MEDIASUBTYPE_YUY2) {
-				*pMerit = 63;
-			} else {
-				*pMerit = 10;
-			}
-		case FCC('UYVY'): *pMerit = 9; break;
-		case FCC('Y42T'): *pMerit = 8; break;
-		case FCC('YVYU'): *pMerit = 7; break;
-		case FCC('Y416'): *pMerit = 6; break; // 4:4:4
-		case FCC('Y410'): *pMerit = 5; break;
-		case FCC('v410'): *pMerit = 4; break;
-		case FCC('AYUV'): *pMerit = 3; break;
-		case D3DFMT_X8R8G8B8:
-			if (m_inputMediaType.subtype == MEDIASUBTYPE_RGB32 || m_inputMediaType.subtype == MEDIASUBTYPE_ARGB32) {
-				*pMerit = 63;
-			} else if (m_inputMediaType.subtype == MEDIASUBTYPE_AYUV) {
-				*pMerit = 21;
-			} else {
-				*pMerit = 1;
-			}
-			break;
 		case D3DFMT_A8R8G8B8:// an accepted format, but fails on most surface types
 		case D3DFMT_A8B8G8R8:
 		case D3DFMT_X8B8G8R8:
@@ -971,7 +942,7 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 
 		int Merit;
 		if (SUCCEEDED(hr)) {
-			hr = GetMediaTypeMerit(pType, &Merit);
+			hr = GetMixerMediaTypeMerit(pType, &Merit);
 		}
 
 		if (SUCCEEDED(hr)) {
@@ -979,7 +950,7 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 			size_t iInsertPos = 0;
 			for (size_t i = 0; i < nTypes; ++i) {
 				int ThisMerit;
-				GetMediaTypeMerit(ValidMixerTypes[i], &ThisMerit);
+				GetMixerMediaTypeMerit(ValidMixerTypes[i], &ThisMerit);
 
 				if (Merit > ThisMerit) {
 					iInsertPos = i;
