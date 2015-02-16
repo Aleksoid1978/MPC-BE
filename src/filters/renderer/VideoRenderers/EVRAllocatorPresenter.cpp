@@ -833,6 +833,8 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int*
 		// Nvidia: NV12, YUY2, X8R8G8B8 (GTX 660Ti).
 		// ATI/AMD: NV12, X8R8G8B8 (HD 5770)
 
+		*pMerit = 2;
+
 		if (m_inputMediaType.subtype == MEDIASUBTYPE_NV12 || m_inputMediaType.subtype == MEDIASUBTYPE_YV12) {
 			switch (mix_fmt) {
 			case FCC('NV12'): *pMerit = 90; break;
@@ -870,9 +872,6 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int*
 		case D3DFMT_A8P8:
 		case D3DFMT_P8:
 			*pMerit = 0;
-			break;
-		default:
-			*pMerit = 2;
 			break;
 		}
 	}
