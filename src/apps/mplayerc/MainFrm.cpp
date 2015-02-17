@@ -384,35 +384,16 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_VIEW_RESETSTATS, OnViewResetStats)
 	ON_COMMAND(ID_VIEW_DISPLAYSTATS, OnViewDisplayStatsSC)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_ENABLEFRAMETIMECORRECTION, OnUpdateViewEnableFrameTimeCorrection)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_VSYNC, OnUpdateViewVSync)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_VSYNCOFFSET, OnUpdateViewVSyncOffset)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_VSYNCACCURATE, OnUpdateViewVSyncAccurate)
 
-	ON_UPDATE_COMMAND_UI(ID_VIEW_SYNCHRONIZEVIDEO, OnUpdateViewSynchronizeVideo)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_SYNCHRONIZEDISPLAY, OnUpdateViewSynchronizeDisplay)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_SYNCHRONIZENEAREST, OnUpdateViewSynchronizeNearest)
-
-	ON_COMMAND(ID_VIEW_FLUSHGPU_BEFOREVSYNC, OnViewFlushGPUBeforeVSync)
-	ON_COMMAND(ID_VIEW_FLUSHGPU_AFTERPRESENT, OnViewFlushGPUAfterVSync)
-	ON_COMMAND(ID_VIEW_FLUSHGPU_WAIT, OnViewFlushGPUWait)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_FLUSHGPU_BEFOREVSYNC, ID_VIEW_FLUSHGPU_WAIT, OnUpdateViewFlushGPU)
-
-	ON_UPDATE_COMMAND_UI(ID_VIEW_VSYNCOFFSET_INCREASE, OnUpdateViewVSyncOffsetIncrease)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_VSYNCOFFSET_DECREASE, OnUpdateViewVSyncOffsetDecrease)
 	ON_COMMAND(ID_VIEW_ENABLEFRAMETIMECORRECTION, OnViewEnableFrameTimeCorrection)
 	ON_COMMAND(ID_VIEW_VSYNC, OnViewVSync)
 	ON_COMMAND(ID_VIEW_VSYNCACCURATE, OnViewVSyncAccurate)
-
-	ON_COMMAND(ID_VIEW_SYNCHRONIZEVIDEO, OnViewSynchronizeVideo)
-	ON_COMMAND(ID_VIEW_SYNCHRONIZEDISPLAY, OnViewSynchronizeDisplay)
-	ON_COMMAND(ID_VIEW_SYNCHRONIZENEAREST, OnViewSynchronizeNearest)
 
 	ON_COMMAND(ID_VIEW_D3DFULLSCREEN, OnViewD3DFullScreen)
 	ON_COMMAND(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnViewDisableDesktopComposition)
 	ON_COMMAND(ID_VIEW_ALTERNATIVEVSYNC, OnViewAlternativeVSync)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_D3DFULLSCREEN, OnUpdateViewD3DFullscreen)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnUpdateViewDisableDesktopComposition)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_ALTERNATIVEVSYNC, OnUpdateViewAlternativeVSync)
 
 	ON_COMMAND(ID_VIEW_RESET_DEFAULT, OnViewResetDefault)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_RESET_DEFAULT, OnUpdateViewReset)
@@ -6627,94 +6608,6 @@ void CMainFrame::OnViewDisplayStatsSC()
 	}
 }
 
-void CMainFrame::OnUpdateViewVSync(CCmdUI* pCmdUI)
-{
-	AppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = ((s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
-					   s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) &&
-					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
-
-	pCmdUI->Enable(supported);
-	pCmdUI->SetCheck (!supported || (r.m_AdvRendSets.iVMR9VSync));
-}
-
-void CMainFrame::OnUpdateViewVSyncOffset(CCmdUI* pCmdUI)
-{
-	AppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported =  ((s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
-						s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) &&
-					   r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) &&
-					  r.m_AdvRendSets.fVMR9AlterativeVSync;
-
-	pCmdUI->Enable(supported);
-	CString Temp;
-	Temp.Format(L"%d", r.m_AdvRendSets.iVMR9VSyncOffset);
-	pCmdUI->SetText(Temp);
-}
-
-void CMainFrame::OnUpdateViewVSyncAccurate(CCmdUI* pCmdUI)
-{
-	AppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = ((s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
-					   s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) &&
-					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
-
-	pCmdUI->Enable(supported);
-	pCmdUI->SetCheck(r.m_AdvRendSets.iVMR9VSyncAccurate);
-}
-
-void CMainFrame::OnUpdateViewSynchronizeVideo(CCmdUI* pCmdUI)
-{
-	AppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = ((s.iDSVideoRendererType == VIDRNDT_DS_SYNC) && GetPlaybackMode() == PM_NONE);
-
-	pCmdUI->Enable(supported);
-	pCmdUI->SetCheck(r.m_AdvRendSets.bSynchronizeVideo);
-}
-
-void CMainFrame::OnUpdateViewSynchronizeDisplay(CCmdUI* pCmdUI)
-{
-	AppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = ((s.iDSVideoRendererType == VIDRNDT_DS_SYNC) && GetPlaybackMode() == PM_NONE);
-
-	pCmdUI->Enable(supported);
-	pCmdUI->SetCheck(r.m_AdvRendSets.bSynchronizeDisplay);
-}
-
-void CMainFrame::OnUpdateViewSynchronizeNearest(CCmdUI* pCmdUI)
-{
-	AppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = (s.iDSVideoRendererType == VIDRNDT_DS_SYNC);
-
-	pCmdUI->Enable(supported);
-	pCmdUI->SetCheck(r.m_AdvRendSets.bSynchronizeNearest);
-}
-
-void CMainFrame::OnUpdateViewFlushGPU(CCmdUI* pCmdUI)
-{
-	AppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = ((s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
-					   s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) &&
-					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
-
-	pCmdUI->Enable(supported);
-
-	if (pCmdUI->m_nID == ID_VIEW_FLUSHGPU_BEFOREVSYNC) {
-		pCmdUI->SetCheck(r.m_AdvRendSets.iVMRFlushGPUBeforeVSync != 0);
-	} else if (pCmdUI->m_nID == ID_VIEW_FLUSHGPU_AFTERPRESENT) {
-		pCmdUI->SetCheck(r.m_AdvRendSets.iVMRFlushGPUAfterPresent != 0);
-	} else if (pCmdUI->m_nID == ID_VIEW_FLUSHGPU_WAIT) {
-		pCmdUI->SetCheck(r.m_AdvRendSets.iVMRFlushGPUWait != 0);
-	}
-}
-
 void CMainFrame::OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI)
 {
 	AppSettings& s = AfxGetAppSettings();
@@ -6742,18 +6635,6 @@ void CMainFrame::OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI)
 	pCmdUI->SetCheck(r.m_AdvRendSets.iVMRDisableDesktopComposition);
 }
 
-void CMainFrame::OnUpdateViewAlternativeVSync(CCmdUI* pCmdUI)
-{
-	AppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = ((s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
-					   s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) &&
-					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
-
-	pCmdUI->Enable(supported);
-	pCmdUI->SetCheck(r.m_AdvRendSets.fVMR9AlterativeVSync);
-}
-
 void CMainFrame::OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI)
 {
 	AppSettings& s = AfxGetAppSettings();
@@ -6763,32 +6644,6 @@ void CMainFrame::OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI)
 
 	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(r.m_AdvRendSets.iEVREnableFrameTimeCorrection);
-}
-
-void CMainFrame::OnUpdateViewVSyncOffsetIncrease(CCmdUI* pCmdUI)
-{
-	AppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = s.iDSVideoRendererType == VIDRNDT_DS_SYNC ||
-					 (((s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
-						s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) &&
-					   r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) &&
-					  r.m_AdvRendSets.fVMR9AlterativeVSync);
-
-	pCmdUI->Enable(supported);
-}
-
-void CMainFrame::OnUpdateViewVSyncOffsetDecrease(CCmdUI* pCmdUI)
-{
-	AppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = s.iDSVideoRendererType == VIDRNDT_DS_SYNC ||
-					 (((s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
-						s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) &&
-					   r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) &&
-					  r.m_AdvRendSets.fVMR9AlterativeVSync);
-
-	pCmdUI->Enable(supported);
 }
 
 void CMainFrame::OnViewVSync()
@@ -6807,84 +6662,6 @@ void CMainFrame::OnViewVSyncAccurate()
 	s.UpdateData(true);
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 s.m_AdvRendSets.iVMR9VSyncAccurate ? ResStr(IDS_OSD_RS_ACCURATE_VSYNC_ON) : ResStr(IDS_OSD_RS_ACCURATE_VSYNC_OFF));
-}
-
-void CMainFrame::OnViewSynchronizeVideo()
-{
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.bSynchronizeVideo = !s.m_AdvRendSets.bSynchronizeVideo;
-	if (s.m_AdvRendSets.bSynchronizeVideo) {
-		s.m_AdvRendSets.bSynchronizeDisplay = false;
-		s.m_AdvRendSets.bSynchronizeNearest = false;
-		s.m_AdvRendSets.iVMR9VSync = false;
-		s.m_AdvRendSets.iVMR9VSyncAccurate = false;
-		s.m_AdvRendSets.fVMR9AlterativeVSync = false;
-	}
-
-	s.UpdateData(true);
-	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 s.m_AdvRendSets.bSynchronizeVideo ? ResStr(IDS_OSD_RS_SYNC_TO_DISPLAY_ON) : ResStr(IDS_OSD_RS_SYNC_TO_DISPLAY_ON));
-}
-
-void CMainFrame::OnViewSynchronizeDisplay()
-{
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.bSynchronizeDisplay = !s.m_AdvRendSets.bSynchronizeDisplay;
-	if (s.m_AdvRendSets.bSynchronizeDisplay) {
-		s.m_AdvRendSets.bSynchronizeVideo = false;
-		s.m_AdvRendSets.bSynchronizeNearest = false;
-		s.m_AdvRendSets.iVMR9VSync = false;
-		s.m_AdvRendSets.iVMR9VSyncAccurate = false;
-		s.m_AdvRendSets.fVMR9AlterativeVSync = false;
-	}
-
-	s.UpdateData(true);
-	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 s.m_AdvRendSets.bSynchronizeDisplay ? ResStr(IDS_OSD_RS_SYNC_TO_VIDEO_ON) : ResStr(IDS_OSD_RS_SYNC_TO_VIDEO_ON));
-}
-
-void CMainFrame::OnViewSynchronizeNearest()
-{
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.bSynchronizeNearest = !s.m_AdvRendSets.bSynchronizeNearest;
-	if (s.m_AdvRendSets.bSynchronizeNearest) {
-		s.m_AdvRendSets.bSynchronizeVideo = false;
-		s.m_AdvRendSets.bSynchronizeDisplay = false;
-		s.m_AdvRendSets.iVMR9VSync = false;
-		s.m_AdvRendSets.iVMR9VSyncAccurate = false;
-		s.m_AdvRendSets.fVMR9AlterativeVSync = false;
-	}
-
-	s.UpdateData(true);
-	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 s.m_AdvRendSets.bSynchronizeNearest ? ResStr(IDS_OSD_RS_PRESENT_NEAREST_ON) : ResStr(IDS_OSD_RS_PRESENT_NEAREST_OFF));
-}
-
-void CMainFrame::OnViewFlushGPUBeforeVSync()
-{
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.iVMRFlushGPUBeforeVSync = !s.m_AdvRendSets.iVMRFlushGPUBeforeVSync;
-	s.UpdateData(true);
-	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 s.m_AdvRendSets.iVMRFlushGPUBeforeVSync ? ResStr(IDS_OSD_RS_FLUSH_BEF_VSYNC_ON) : ResStr(IDS_OSD_RS_FLUSH_BEF_VSYNC_OFF));
-}
-
-void CMainFrame::OnViewFlushGPUAfterVSync()
-{
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.iVMRFlushGPUAfterPresent = !s.m_AdvRendSets.iVMRFlushGPUAfterPresent;
-	s.UpdateData(true);
-	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 s.m_AdvRendSets.iVMRFlushGPUAfterPresent ? ResStr(IDS_OSD_RS_FLUSH_AFT_PRES_ON) : ResStr(IDS_OSD_RS_FLUSH_AFT_PRES_OFF));
-}
-
-void CMainFrame::OnViewFlushGPUWait()
-{
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.iVMRFlushGPUWait = !s.m_AdvRendSets.iVMRFlushGPUWait;
-	s.UpdateData(true);
-	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 s.m_AdvRendSets.iVMRFlushGPUWait ? ResStr(IDS_OSD_RS_WAIT_ON) : ResStr(IDS_OSD_RS_WAIT_OFF));
 }
 
 void CMainFrame::OnViewD3DFullScreen()

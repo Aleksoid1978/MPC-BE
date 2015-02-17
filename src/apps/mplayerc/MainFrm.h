@@ -830,33 +830,14 @@ public:
 	afx_msg void OnUpdateViewDisplayStats(CCmdUI* pCmdUI);
 	afx_msg void OnViewResetStats();
 	afx_msg void OnViewDisplayStatsSC();
-	afx_msg void OnUpdateViewVSync(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewVSyncOffset(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewVSyncAccurate(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewFlushGPU(CCmdUI* pCmdUI);
-
-	afx_msg void OnUpdateViewSynchronizeVideo(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewSynchronizeDisplay(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewSynchronizeNearest(CCmdUI* pCmdUI);
 
 	afx_msg void OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewAlternativeVSync(CCmdUI* pCmdUI);
 
 	afx_msg void OnUpdateViewFullscreenGUISupport(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewVSyncOffsetIncrease(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateViewVSyncOffsetDecrease(CCmdUI* pCmdUI);
 	afx_msg void OnViewVSync();
 	afx_msg void OnViewVSyncAccurate();
-
-	afx_msg void OnViewSynchronizeVideo();
-	afx_msg void OnViewSynchronizeDisplay();
-	afx_msg void OnViewSynchronizeNearest();
-
-	afx_msg void OnViewFlushGPUBeforeVSync();
-	afx_msg void OnViewFlushGPUAfterVSync();
-	afx_msg void OnViewFlushGPUWait();
 
 	afx_msg void OnViewD3DFullScreen();
 	afx_msg void OnViewDisableDesktopComposition();
