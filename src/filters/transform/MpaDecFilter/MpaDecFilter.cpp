@@ -2103,8 +2103,8 @@ HRESULT CMpaDecFilter::StartStreaming()
 
 	if (!m_bDoAdditionalCheck) {
 		m_bDoAdditionalCheck = TRUE;
-
 		memset(&m_bBitstreamSupported, FALSE, sizeof(m_bBitstreamSupported));
+
 		CComPtr<IPin> pPin = m_pOutput;
 		CComPtr<IPin> pPinRenderer;
 		for (CComPtr<IBaseFilter> pBF = this; pBF = GetDownStreamFilter(pBF, pPin); pPin = GetFirstPin(pBF, PINDIR_OUTPUT)) {
@@ -2114,6 +2114,9 @@ HRESULT CMpaDecFilter::StartStreaming()
 		}
 
 		if (pPinRenderer) {
+			CMediaType mtOutput;
+			m_pOutput->ConnectionMediaType(&mtOutput);
+
 			CMediaType mt;
 			mt = CreateMediaTypeSPDIF();
 			m_bBitstreamSupported[SPDIF]		= pPinRenderer->QueryAccept(&mt) == S_OK;
@@ -2128,6 +2131,8 @@ HRESULT CMpaDecFilter::StartStreaming()
 				mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
 				m_bBitstreamSupported[DTSHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
 			}
+
+			pPinRenderer->QueryAccept(&mtOutput);
 		}
 
 		BOOL b_HasVideo = FALSE;
