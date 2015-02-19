@@ -119,6 +119,8 @@ void avcodec_register_all(void)
     REGISTER_DECODER (QTRLE, qtrle);
     REGISTER_DECODER (PNG, png);
     REGISTER_DECODER (PRORES, prores);
+    REGISTER_DECODER (R10K, r10k);
+    REGISTER_DECODER (R210, r210);
     REGISTER_DECODER (RPZA, rpza);
     REGISTER_DECODER (RV10, rv10);
     REGISTER_DECODER (RV20, rv20);
