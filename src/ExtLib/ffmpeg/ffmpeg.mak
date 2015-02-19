@@ -331,6 +331,7 @@ SRCS_LC = \
 	libavcodec/proresdata.c \
 	libavcodec/proresdec2.c \
 	libavcodec/proresdsp.c \
+	libavcodec/r210dec.c \
 	libavcodec/ra144.c \
 	libavcodec/ra144dec.c \
 	libavcodec/ra288.c \

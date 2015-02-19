@@ -483,6 +483,8 @@ FFMPEG_CODECS ffCodecs[] = {
 	{ &MEDIASUBTYPE_444P, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_cyuv, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_yuv2, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
+	{ &MEDIASUBTYPE_r210, AV_CODEC_ID_R210, NULL, VDEC_UNCOMPRESSED, -1 },
+	{ &MEDIASUBTYPE_R10k, AV_CODEC_ID_R10K, NULL, VDEC_UNCOMPRESSED, -1 },
 };
 
 /* Important: the order should be exactly the same as in ffCodecs[] */
@@ -782,6 +784,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_444P }, // YUV 4:4:4 Planar
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_cyuv }, // UYVY flipped vertically
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_yuv2 }, // modified YUY2, used in QuickTime
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_r210 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_R10k },
 };
 
 #pragma endregion any_constants
@@ -1302,6 +1306,8 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 				case AV_CODEC_ID_V210 :
 				case AV_CODEC_ID_V410 :
 				case AV_CODEC_ID_RAWVIDEO :
+				case AV_CODEC_ID_R210 :
+				case AV_CODEC_ID_R10K :
 					bCodecActivated = (m_nActiveCodecs & CODEC_UNCOMPRESSED) != 0;
 					break;
 				case AV_CODEC_ID_DNXHD :
