@@ -22,7 +22,6 @@
 #pragma once
 
 #include <d3d9.h>
-#include <dx/d3dx9.h>
 #include <vmr9.h>
 #include "../../../SubPic/ISubPic.h"
 #include "PixelShaderCompiler.h"
