@@ -2649,25 +2649,25 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		}
 	}
 
-	if (m_ePARCompensationType == EPCTUpscale) {
-		if (stss.fontScaleX / stss.fontScaleY == 1.0 && m_dPARCompensation != 1.0) {
+	if (stss.fontScaleX == stss.fontScaleY && m_dPARCompensation != 1.0) {
+		switch(m_ePARCompensationType) {
+		case EPCTUpscale:
 			if (m_dPARCompensation < 1.0) {
 				stss.fontScaleY /= m_dPARCompensation;
 			} else {
 				stss.fontScaleX *= m_dPARCompensation;
 			}
-		}
-	} else if (m_ePARCompensationType == EPCTDownscale) {
-		if (stss.fontScaleX / stss.fontScaleY == 1.0 && m_dPARCompensation != 1.0) {
+			break;
+		case EPCTDownscale:
 			if (m_dPARCompensation < 1.0) {
 				stss.fontScaleX *= m_dPARCompensation;
 			} else {
 				stss.fontScaleY /= m_dPARCompensation;
 			}
-		}
-	} else if (m_ePARCompensationType == EPCTAccurateSize) {
-		if (stss.fontScaleX / stss.fontScaleY == 1.0 && m_dPARCompensation != 1.0) {
+			break;
+		case EPCTAccurateSize:
 			stss.fontScaleX *= m_dPARCompensation;
+			break;
 		}
 	}
 
