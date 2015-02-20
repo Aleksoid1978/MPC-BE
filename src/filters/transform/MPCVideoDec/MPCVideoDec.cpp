@@ -1100,11 +1100,13 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 		rtStop = rtStart + (rtFrameDuration / m_dRate);
 	}
 
+	/*
 	if (m_bCheckFramesOrdering
 			&& !m_bReorderBFrame && m_pAVCtx->has_b_frames
 			&& rtStart > 0 && rtStart < m_rtLastStart) {
 		m_bReorderBFrame = true;
 	}
+	*/
 
 	m_rtLastStart = rtStart;
 	m_rtLastStop = rtStop;
