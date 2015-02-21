@@ -15903,7 +15903,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 						szVideoFrame = m_pCAP->GetVideoSize(false);
 					}
 
-					pRTS->m_ePARCompensationType = CSimpleTextSubtitle::EPARCompensationType::EPCTAccurateSize;
+					pRTS->m_ePARCompensationType = CSimpleTextSubtitle::EPARCompensationType::EPCTAccurateSize_ISR;
 					if (szAspectRatio.cx && szAspectRatio.cy && szVideoFrame.cx && szVideoFrame.cy && bKeepAspectRatio) {
 						pRTS->m_dPARCompensation = ((double)szAspectRatio.cx / szAspectRatio.cy) /
 													((double)szVideoFrame.cx / szVideoFrame.cy);

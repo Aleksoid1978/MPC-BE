@@ -147,7 +147,8 @@ public:
 		EPCTDisabled,
 		EPCTDownscale,
 		EPCTUpscale,
-		EPCTAccurateSize
+		EPCTAccurateSize,
+		EPCTAccurateSize_ISR
 	};
 
 	EPARCompensationType m_ePARCompensationType;
