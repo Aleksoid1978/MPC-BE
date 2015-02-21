@@ -828,44 +828,47 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int*
 		// ATI/AMD: NV12, X8R8G8B8 (HD 5770)
 
 		switch (mix_fmt) {
-		case D3DFMT_A8R8G8B8:// an accepted format, but fails on most surface types
-		case D3DFMT_A8B8G8R8:
-		case D3DFMT_X8B8G8R8:
-		case D3DFMT_R8G8B8:
-		case D3DFMT_R5G6B5:
-		case D3DFMT_X1R5G5B5:
-		case D3DFMT_A1R5G5B5:
-		case D3DFMT_A4R4G4B4:
-		case D3DFMT_R3G3B2:
-		case D3DFMT_A8R3G3B2:
-		case D3DFMT_X4R4G4B4:
-		case D3DFMT_A8P8:
-		case D3DFMT_P8:
-			*pMerit = 0;
-			return MF_E_INVALIDMEDIATYPE;
+			case D3DFMT_A8R8G8B8:// an accepted format, but fails on most surface types
+			case D3DFMT_A8B8G8R8:
+			case D3DFMT_X8B8G8R8:
+			case D3DFMT_R8G8B8:
+			case D3DFMT_R5G6B5:
+			case D3DFMT_X1R5G5B5:
+			case D3DFMT_A1R5G5B5:
+			case D3DFMT_A4R4G4B4:
+			case D3DFMT_R3G3B2:
+			case D3DFMT_A8R3G3B2:
+			case D3DFMT_X4R4G4B4:
+			case D3DFMT_A8P8:
+			case D3DFMT_P8:
+				*pMerit = 0;
+				return MF_E_INVALIDMEDIATYPE;
 		}
 
 		*pMerit = 2;
 
 		if (m_inputMediaType.subtype == MEDIASUBTYPE_NV12 || m_inputMediaType.subtype == MEDIASUBTYPE_YV12) {
 			switch (mix_fmt) {
-			case FCC('NV12'): *pMerit = 90; break;
-			case FCC('YUY2'): *pMerit = 80; break;
-			case D3DFMT_X8R8G8B8: *pMerit = 70; break;
+				case FCC('NV12'): *pMerit = 90; break;
+				case FCC('YUY2'): *pMerit = 80; break;
+				case D3DFMT_X8R8G8B8: *pMerit = 70; break;
 			}
 		}
 		else if (m_inputMediaType.subtype == MEDIASUBTYPE_YUY2) {
 			switch (mix_fmt) {
-			case FCC('YUY2'): *pMerit = 90; break;
-			case D3DFMT_X8R8G8B8: *pMerit = 80; break; // need test for ATI/AMD
-			case FCC('NV12'): *pMerit = 70; break;
+				case FCC('YUY2'): *pMerit = 90; break;
+				case D3DFMT_X8R8G8B8: *pMerit = 80; break; // need test for ATI/AMD
+				case FCC('NV12'): *pMerit = 70; break;
 			}
 		}
-		else if (m_inputMediaType.subtype == MEDIASUBTYPE_AYUV || m_inputMediaType.subtype == MEDIASUBTYPE_RGB32 || m_inputMediaType.subtype == MEDIASUBTYPE_ARGB32) {
+		else if (m_inputMediaType.subtype == MEDIASUBTYPE_AYUV
+				|| m_inputMediaType.subtype == MEDIASUBTYPE_RGB32
+				|| m_inputMediaType.subtype == MEDIASUBTYPE_ARGB32
+				|| m_inputMediaType.subtype == MEDIASUBTYPE_P010) {
 			switch (mix_fmt) {
-			case D3DFMT_X8R8G8B8: *pMerit = 90; break;
-			case FCC('YUY2'): *pMerit = 80; break;
-			case FCC('NV12'): *pMerit = 70; break;
+				case D3DFMT_X8R8G8B8: *pMerit = 90; break;
+				case FCC('YUY2'): *pMerit = 80; break;
+				case FCC('NV12'): *pMerit = 70; break;
 			}
 		}
 	}
