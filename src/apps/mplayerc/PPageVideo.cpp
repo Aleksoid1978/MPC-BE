@@ -337,7 +337,9 @@ BOOL CPPageVideo::OnInitDialog()
 	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_SATURATION));
 	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_ABSOLUTECM));
 	m_cbCMRenderingIntent.SetCurSel(rs.m_AdvRendSets.iVMR9ColorManagementIntent);
-	// TODO: get strings with translation from revision 110 resources
+	CorrectComboListWidth(m_cbCMInputType);
+	CorrectComboListWidth(m_cbCMAmbientLight);
+	CorrectComboListWidth(m_cbCMRenderingIntent);
 
 	OnSurfaceFormatChange();
 	OnColorManagmentCheck();
