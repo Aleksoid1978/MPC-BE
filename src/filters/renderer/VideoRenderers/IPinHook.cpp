@@ -152,7 +152,7 @@ LPCTSTR FindD3DFormat(const D3DFORMAT Format)
 }
 
 // === DirectShow hooks
-static HRESULT (STDMETHODCALLTYPE * NewSegmentOrg)(IPinC * This, /* [in] */ REFERENCE_TIME tStart, /* [in] */ REFERENCE_TIME tStop, /* [in] */ double dRate) = NULL;
+static HRESULT(STDMETHODCALLTYPE* NewSegmentOrg)(IPinC * This, /* [in] */ REFERENCE_TIME tStart, /* [in] */ REFERENCE_TIME tStop, /* [in] */ double dRate) = NULL;
 
 static HRESULT STDMETHODCALLTYPE NewSegmentMine(IPinC * This, /* [in] */ REFERENCE_TIME tStart, /* [in] */ REFERENCE_TIME tStop, /* [in] */ double dRate)
 {
@@ -163,7 +163,31 @@ static HRESULT STDMETHODCALLTYPE NewSegmentMine(IPinC * This, /* [in] */ REFEREN
 	return NewSegmentOrg(This, tStart, tStop, dRate);
 }
 
-static HRESULT ( STDMETHODCALLTYPE *ReceiveOrg )( IMemInputPinC * This, IMediaSample *pSample) = NULL;
+static HRESULT(STDMETHODCALLTYPE* ReceiveConnectionOrg)(IPinC* This, /* [in] */ IPinC* pConnector, /* [in] */ const AM_MEDIA_TYPE* pmt) = NULL;
+
+static HRESULT STDMETHODCALLTYPE ReceiveConnectionMine(IPinC* This, /* [in] */ IPinC* pConnector, /* [in] */ const AM_MEDIA_TYPE* pmt)
+{
+	// Force the renderer to always reject the P010 pixel format
+	if (pmt && pmt->subtype == MEDIASUBTYPE_P010) {
+		if (pmt->pbFormat) {
+			VIDEOINFOHEADER2& vih2 = *(VIDEOINFOHEADER2*)pmt->pbFormat;
+			BITMAPINFOHEADER* bih = &vih2.bmiHeader;
+			switch (bih->biCompression) {
+				case FCC('dxva'):
+				case FCC('DXVA'):
+				case FCC('DxVA'):
+				case FCC('DXvA'):
+					return ReceiveConnectionOrg(This, pConnector, pmt);
+			}
+		}
+
+		return VFW_E_TYPE_NOT_ACCEPTED;
+	} else {
+		return ReceiveConnectionOrg(This, pConnector, pmt);
+	}
+}
+
+static HRESULT(STDMETHODCALLTYPE* ReceiveOrg)(IMemInputPinC * This, IMediaSample *pSample) = NULL;
 
 static HRESULT STDMETHODCALLTYPE ReceiveMineI(IMemInputPinC * This, IMediaSample *pSample)
 {
@@ -215,6 +239,11 @@ void UnhookNewSegmentAndReceive()
 		if (g_pPinCVtbl->NewSegment == NewSegmentMine) {
 			g_pPinCVtbl->NewSegment = NewSegmentOrg;
 		}
+
+		if (g_pPinCVtbl->ReceiveConnection == ReceiveConnectionMine) {
+			g_pPinCVtbl->ReceiveConnection = ReceiveConnectionOrg;
+		}
+
 		res = VirtualProtect(g_pPinCVtbl, sizeof(IPinCVtbl), flOldProtect, &flOldProtect);
 
 		res = VirtualProtect(g_pMemInputPinCVtbl, sizeof(IMemInputPinCVtbl), PAGE_WRITECOPY, &flOldProtect);
@@ -223,13 +252,14 @@ void UnhookNewSegmentAndReceive()
 		}
 		res = VirtualProtect(g_pMemInputPinCVtbl, sizeof(IMemInputPinCVtbl), flOldProtect, &flOldProtect);
 
-		g_pPinCVtbl			= NULL;
-		g_pMemInputPinCVtbl = NULL;
-		NewSegmentOrg		= NULL;
-		ReceiveOrg			= NULL;
+		g_pPinCVtbl				= NULL;
+		g_pMemInputPinCVtbl		= NULL;
+		NewSegmentOrg			= NULL;
+		ReceiveConnectionOrg	= NULL;
+		ReceiveOrg				= NULL;
 
 		// Aleksoid : validate Pin
-		g_pPin				= NULL;
+		g_pPin					= NULL;
 	}
 }
 
@@ -253,6 +283,12 @@ bool HookNewSegmentAndReceive(IPinC* pPinC, IMemInputPinC* pMemInputPinC)
 		NewSegmentOrg = pPinC->lpVtbl->NewSegment;
 	}
 	pPinC->lpVtbl->NewSegment = NewSegmentMine; // Function sets global variable(s)
+
+    if (ReceiveConnectionOrg == NULL) {
+        ReceiveConnectionOrg = pPinC->lpVtbl->ReceiveConnection;
+    }
+    pPinC->lpVtbl->ReceiveConnection = ReceiveConnectionMine;
+
 	res = VirtualProtect(pPinC->lpVtbl, sizeof(IPinCVtbl), flOldProtect, &flOldProtect);
 
 	// Casimir666 : change sizeof(IMemInputPinC) to sizeof(IMemInputPinCVtbl) to fix crash with EVR hack on Vista!
