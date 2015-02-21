@@ -2649,7 +2649,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		}
 	}
 
-	if (stss.fontScaleX == stss.fontScaleY && m_dPARCompensation != 1.0) {
+	if (m_dPARCompensation != 1.0) {
 		switch(m_ePARCompensationType) {
 		case EPCTUpscale:
 			if (m_dPARCompensation < 1.0) {
@@ -2666,7 +2666,12 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 			}
 			break;
 		case EPCTAccurateSize:
-			stss.fontScaleX *= m_dPARCompensation;
+			if (stss.fontAngleZ != 0) {
+				stss.fontScaleX *= 1.0 + abs((m_dPARCompensation - 1.0) * cos((M_PI / 180.0) * stss.fontAngleZ));
+				stss.fontScaleY *= 1.0 + abs((m_dPARCompensation - 1.0) * sin((M_PI / 180.0) * stss.fontAngleZ));
+			} else {
+				stss.fontScaleX *= m_dPARCompensation;
+			}
 			break;
 		}
 	}

@@ -15890,6 +15890,28 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 
 				pRTS->SetOverride(s.fUseDefaultSubtitlesStyle, s.subdefstyle);
 				pRTS->SetAlignment(s.fOverridePlacement, s.nHorPos, s.nVerPos);
+
+				if (m_pCAP) {
+					bool bKeepAspectRatio = s.fKeepAspectRatio;
+					CSize szAspectRatio = m_pCAP->GetVideoSize(true);
+					CSize szVideoFrame;
+					if (CComQIPtr<IMadVRInfo> pMVRI = m_pCAP) {
+						// Use IMadVRInfo to get size. See http://bugs.madshi.net/view.php?id=180
+						pMVRI->GetSize("originalVideoSize", &szVideoFrame);
+						bKeepAspectRatio = true;
+					} else {
+						szVideoFrame = m_pCAP->GetVideoSize(false);
+					}
+
+					pRTS->m_ePARCompensationType = CSimpleTextSubtitle::EPARCompensationType::EPCTAccurateSize;
+					if (szAspectRatio.cx && szAspectRatio.cy && szVideoFrame.cx && szVideoFrame.cy && bKeepAspectRatio) {
+						pRTS->m_dPARCompensation = ((double)szAspectRatio.cx / szAspectRatio.cy) /
+													((double)szVideoFrame.cx / szVideoFrame.cy);
+					} else {
+						pRTS->m_dPARCompensation = 1.0;
+					}
+				}
+
 				pRTS->Deinit();
 			} else if (clsid == __uuidof(CRenderedHdmvSubtitle) || clsid == __uuidof(CSupSubFile)) {
 				s.m_RenderersSettings.bPositionRelative	= s.subdefstyle.relativeTo;
