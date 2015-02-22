@@ -237,6 +237,8 @@ static const WORD PCID_INTEL_4K [] = {
 	0x0A2E, // Intel Iris Graphics 5100
 	0x0D22, // Intel Iris Graphics 5200
 	0x0D26, // Intel Iris Graphics 5200
+	// Atom Z3700 Series
+	0x0F31, // Intel HD Graphics
 	// Broadwell
 	0x1606, // Intel HD Graphics
 	0x1616, // Intel HD Graphics 5500
