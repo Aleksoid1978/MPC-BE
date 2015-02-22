@@ -57,7 +57,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_LastSampleTime(0)
 	, m_LastFrameDuration(0)
 	, m_bAlternativeVSync(0)
-	, m_bIsEVR(bIsEVR)
 	, m_VSyncMode(0)
 	, m_TextScale(1.0)
 	, m_MainThreadId(0)
@@ -73,6 +72,8 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_pD3DXCreateSprite(NULL)
 	, m_bIsRendering(false)
 {
+	m_bIsEVR = bIsEVR;
+
 	if (FAILED(hr)) {
 		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
 		return;
@@ -775,6 +776,7 @@ UINT CDX9AllocatorPresenter::GetAdapter(IDirect3D9* pD3D, bool bGetAdapter)
 				if ((::StringFromGUID2(adapterIdentifier.DeviceIdentifier, strGUID, 50) > 0) && (s.D3D9RenderDevice == strGUID)) {
 					m_D3D9Device		= adapterIdentifier.Description;
 					m_D3D9DeviceName	= adapterIdentifier.DeviceName;
+					m_D3D9VendorId		= adapterIdentifier.VendorId;
 					return adp;
 				}
 			}
@@ -794,6 +796,7 @@ UINT CDX9AllocatorPresenter::GetAdapter(IDirect3D9* pD3D, bool bGetAdapter)
 				if (pD3D->GetAdapterIdentifier(adp, 0, &adapterIdentifier) == S_OK) {
 					m_D3D9Device		= adapterIdentifier.Description;
 					m_D3D9DeviceName	= adapterIdentifier.DeviceName;
+					m_D3D9VendorId		= adapterIdentifier.VendorId;
 				}
 			}
 			return adp;
@@ -2182,7 +2185,9 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 			pSurface = NULL;
 			if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(desc.Width, desc.Height, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &pSurface, NULL))
 					|| FAILED(hr = m_pD3DDev->GetRenderTargetData(fSurface, pSurface))
-					|| FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY))) return hr;
+					|| FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY))) {
+				return hr;
+			}
 		}
 	}
 	else {

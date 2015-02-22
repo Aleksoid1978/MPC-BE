@@ -46,7 +46,6 @@ namespace DSObjects
 		UINT	m_RefreshRate;
 		bool	m_bAlternativeVSync;
 		bool	m_bCompositionEnabled;
-		bool	m_bIsEVR;
 		int		m_OrderedPaint;
 		int		m_VSyncMode;
 		bool	m_bDesktopCompositionDisabled;
