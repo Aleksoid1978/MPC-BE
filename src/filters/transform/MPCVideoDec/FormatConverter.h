@@ -90,6 +90,8 @@ struct FrameProps {
 	enum AVColorRange	colorrange;
 };
 
+MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt);
+
 class CFormatConverter
 {
 #define CONV_FUNC_PARAMS const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[]
