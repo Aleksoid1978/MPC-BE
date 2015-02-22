@@ -162,7 +162,7 @@ DXVA_PARAMS DXVA_HEVC = {
 	16,		// PicEntryNumber - DXVA1
 	24,		// PicEntryNumber - DXVA2
 	2,		// PreferedConfigBitstream
-	{ &DXVA_ModeHEVC_VLD_Main, &GUID_NULL },
+	{ &DXVA_ModeHEVC_VLD_Main10, &DXVA_ModeHEVC_VLD_Main, &GUID_NULL },
 	{ 0 }
 };
 
@@ -806,11 +806,11 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_RGB32},
 };
 
-VIDEO_OUTPUT_FORMATS DXVAFormats[] = { // DXVA2
+VIDEO_OUTPUT_FORMATS DXVAFormats[]		= { // DXVA2 8bit
 	{&MEDIASUBTYPE_NV12, 1, 12, FCC('dxva')},
-	{&MEDIASUBTYPE_NV12, 1, 12, FCC('DXVA')},
-	{&MEDIASUBTYPE_NV12, 1, 12, FCC('DxVA')},
-	{&MEDIASUBTYPE_NV12, 1, 12, FCC('DXvA')}
+};
+VIDEO_OUTPUT_FORMATS DXVAFormats10bit[]	= { // DXVA2 10bit
+	{&MEDIASUBTYPE_P010, 1, 24, FCC('dxva')},
 };
 
 #ifdef REGISTER_FILTER
@@ -917,6 +917,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_fSYNC(0)
 	, m_bCheckFramesOrdering(FALSE)
 	, m_bDecodingStart(FALSE)
+	, m_bHEVC10bit(FALSE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -1720,6 +1721,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	FFGetFrameProps(m_pAVCtx, m_pFrame, m_nOutputWidth, m_nOutputHeight);
 	m_PixelFormat = m_pAVCtx->pix_fmt;
 
+	m_bHEVC10bit = (m_nCodecId == AV_CODEC_ID_HEVC && (m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10 || GetPixFmtType(m_PixelFormat) == PFType_YUV420Px));
+
 	if (bChangeType && IsDXVASupported()) {
 		do {
 			m_bDXVACompatible = false;
@@ -1777,7 +1780,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 				}
 			} else if ((m_nCodecId == AV_CODEC_ID_WMV3 || m_nCodecId == AV_CODEC_ID_VC1) && m_pAVCtx->profile == FF_PROFILE_VC1_COMPLEX) {
 				break;
-			} else if (m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile > FF_PROFILE_HEVC_MAIN) {
+			} else if (m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile > FF_PROFILE_HEVC_MAIN_10) {
 				break;
 			}
 
@@ -1880,7 +1883,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	m_nVideoOutputCount = m_bUseFFmpeg ? nSwCount : 0;
 	if (IsDXVASupported()) {
 		if (IsWinVistaOrLater()) {
-			m_nVideoOutputCount += _countof(DXVAFormats);
+			m_nVideoOutputCount += m_bHEVC10bit ? _countof(DXVAFormats10bit) : _countof(DXVAFormats);
 		} else {
 			m_nVideoOutputCount += ffCodecs[m_nCodecNb].DXVAModeCount();
 		}
@@ -1892,8 +1895,13 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	if (IsDXVASupported()) {
 		if (IsWinVistaOrLater()) {
 			// Static list for DXVA2
-			memcpy(&m_pVideoOutputFormat[nPos], DXVAFormats, sizeof(DXVAFormats));
-			nPos += _countof(DXVAFormats);
+			if (m_bHEVC10bit) {
+				memcpy(&m_pVideoOutputFormat[nPos], DXVAFormats10bit, sizeof(DXVAFormats10bit));
+				nPos += _countof(DXVAFormats10bit);
+			} else {
+				memcpy(&m_pVideoOutputFormat[nPos], DXVAFormats, sizeof(DXVAFormats));
+				nPos += _countof(DXVAFormats);
+			}
 		} else {
 			// Dynamic DXVA media types for DXVA1
 			for (int pos = 0; pos < ffCodecs[m_nCodecNb].DXVAModeCount(); pos++) {
@@ -2756,13 +2764,15 @@ void CMPCVideoDecFilter::FillInVideoDescription(DXVA2_VideoDesc *pDesc, D3DFORMA
 
 BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID* mode)
 {
-	const CString dxvaMode = GetDXVAMode(mode);
-
 	if (IsDXVASupported()) {
 		for (int i = 0; i < MAX_SUPPORTED_MODE; i++) {
-			if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == GUID_NULL) {
+			const GUID decoderGUID = *ffCodecs[m_nCodecNb].DXVAModes->Decoder[i];
+			if (decoderGUID == GUID_NULL) {
 				break;
-			} else if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[i] == *mode) {
+			}
+
+			if (m_bHEVC10bit && *mode == DXVA_ModeHEVC_VLD_Main10
+					|| !m_bHEVC10bit && decoderGUID != DXVA_ModeHEVC_VLD_Main10 && *mode == decoderGUID) {
 				return TRUE;
 			}
 		}
@@ -2774,7 +2784,8 @@ BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID* mode)
 BOOL CMPCVideoDecFilter::IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered)
 {
 	bIsPrefered = (config.ConfigBitstreamRaw == ffCodecs[m_nCodecNb].DXVAModes->PreferedConfigBitstream);
-	return (nD3DFormat == MAKEFOURCC('N', 'V', '1', '2') || nD3DFormat == MAKEFOURCC('I', 'M', 'C', '3'));
+	return (m_bHEVC10bit && nD3DFormat == MAKEFOURCC('P', '0', '1', '0')
+			|| (!m_bHEVC10bit && (nD3DFormat == MAKEFOURCC('N', 'V', '1', '2') || nD3DFormat == MAKEFOURCC('I', 'M', 'C', '3'))));
 }
 
 HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderService *pDecoderService,
@@ -2924,7 +2935,7 @@ HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3D
 	}
 
 	hr = m_pDecoderService->CreateVideoDecoder(m_DXVADecoderGUID, &m_VideoDesc, &m_DXVA2Config,
-			pDecoderRenderTargets, nNumRenderTargets, &pDirectXVideoDec);
+											   pDecoderRenderTargets, nNumRenderTargets, &pDirectXVideoDec);
 
 	if (SUCCEEDED(hr)) {
 		// need recreate dxva decoder after "stop" on Intel HD Graphics
