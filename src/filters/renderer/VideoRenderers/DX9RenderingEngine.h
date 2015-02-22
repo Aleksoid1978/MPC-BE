@@ -84,6 +84,8 @@ namespace DSObjects
 		CSize						m_ScreenSize;
 		int							m_nNbDXSurface;					// Total number of DX Surfaces
 		int							m_nCurSurface;					// Surface currently displayed
+		bool						m_bIsEVR;
+		DWORD						m_D3D9VendorId;
 
 		// Variables initialized/managed by this class but can be accessed by the allocator-presenter
 		bool						m_bD3DX;
