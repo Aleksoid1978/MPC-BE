@@ -75,9 +75,8 @@ HRESULT CDXVA2DecoderVC1::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDX
 
 HRESULT CDXVA2DecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
-	HRESULT	hr				= S_FALSE;
-	UINT	nSize_Result	= 0;
-	int		got_picture		= 0;
+	HRESULT	hr			= S_FALSE;
+	int		got_picture	= 0;
 
 	memset(&m_DXVA_Context, 0, sizeof(m_DXVA_Context));
 	m_DXVA_Context.ctx_pic[0].pp.bBidirectionalAveragingMode =
