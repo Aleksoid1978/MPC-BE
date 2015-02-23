@@ -24,12 +24,6 @@
 #include "../FfmpegContext.h"
 #include <ffmpeg/libavcodec/avcodec.h>
 
-#if 0
-	#define TRACE_MPEG2 TRACE
-#else
-	#define TRACE_MPEG2 __noop
-#endif
-
 CDXVA1DecoderMPEG2::CDXVA1DecoderMPEG2(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, int nPicEntryNumber)
 	: CDXVA1Decoder(pFilter, pAMVideoAccelerator, nPicEntryNumber)
 {
@@ -96,7 +90,6 @@ HRESULT CDXVA1DecoderMPEG2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIM
 
 	// Wait I frame after a flush
 	if (m_bFlushed && !m_DXVA_Context.ctx_pic[0].pp.bPicIntra) {
-		TRACE_MPEG2 ("CDXVA1DecoderMPEG2::DecodeFrame() : Flush - wait I frame\n");
 		return S_FALSE;
 	}
 

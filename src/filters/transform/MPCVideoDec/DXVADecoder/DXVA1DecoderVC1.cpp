@@ -25,12 +25,6 @@
 #include <ffmpeg/libavcodec/avcodec.h>
 #include <vector>
 
-#if 0
-	#define TRACE_VC1 TRACE
-#else
-	#define TRACE_VC1 __noop
-#endif
-
 CDXVA1DecoderVC1::CDXVA1DecoderVC1(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, int nPicEntryNumber)
 	: CDXVA1Decoder(pFilter, pAMVideoAccelerator, nPicEntryNumber)
 {
@@ -51,13 +45,6 @@ void CDXVA1DecoderVC1::Flush()
 	m_nDelayedSurfaceIndex		= -1;
 	m_rtStartDelayed			= _I64_MAX;
 	m_rtStopDelayed				= _I64_MAX;
-
-	if (m_wRefPictureIndex[0] != NO_REF_FRAME) {
-		RemoveRefFrame(m_wRefPictureIndex[0]);
-	}
-	if (m_wRefPictureIndex[1] != NO_REF_FRAME) {
-		RemoveRefFrame(m_wRefPictureIndex[1]);
-	}
 
 	m_wRefPictureIndex[0]		= NO_REF_FRAME;
 	m_wRefPictureIndex[1]		= NO_REF_FRAME;
