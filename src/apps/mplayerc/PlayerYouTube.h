@@ -23,9 +23,9 @@
 #include <afxinet.h>
 
 #define YOUTUBE_MP_URL	"://www.youtube.com/"
-#define YOUTUBE_PL_URL	_T("://www.youtube.com/playlist?")
-#define YOUTUBE_URL		_T("://www.youtube.com/watch?")
-#define YOUTU_BE_URL	_T("://youtu.be/")
+#define YOUTUBE_PL_URL	_T("youtube.com/playlist?")
+#define YOUTUBE_URL		_T("youtube.com/watch?")
+#define YOUTU_BE_URL	_T("youtu.be/")
 
 #define ENABLE_YOUTUBE_3D	0
 #define ENABLE_YOUTUBE_DASH	0
@@ -114,8 +114,8 @@ static DWORD strpos(char* h, char* n)
 	return 0;
 }
 
-bool PlayerYouTubeCheck(CString fn);
-bool PlayerYouTubePlaylistCheck(CString fn);
+bool PlayerYouTubeCheck(CString& fn, BOOL bHandleURL = FALSE);
+bool PlayerYouTubePlaylistCheck(CString& fn, BOOL bHandleURL = FALSE);
 CString PlayerYouTube(CString fn, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* subs);
 
 struct YoutubePlaylistItem {
