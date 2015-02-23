@@ -96,22 +96,43 @@ static CStringA GetEntry(LPCSTR pszBuff, LPCSTR pszMatchStart, LPCSTR pszMatchEn
 	return "";
 }
 
-bool PlayerYouTubeCheck(CString fn)
+static void HandleURL(CString& url)
 {
-	CString tmp_fn(CString(fn).MakeLower());
+	int pos = url.Find(L"youtube.com/");
+	if (pos == -1) {
+		pos = url.Find(L"youtu.be/");
+	}
+
+	if (pos != -1) {
+		url.Delete(0, pos);
+		url = L"https://www." + url;
+	}
+}
+
+bool PlayerYouTubeCheck(CString& fn, BOOL bHandleURL/* = FALSE*/)
+{
+	CString tmp_fn(fn);
+	tmp_fn.MakeLower();
 
 	if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1) {
+		if (bHandleURL) {
+			HandleURL(fn);
+		}
 		return true;
 	}
 
 	return false;
 }
 
-bool PlayerYouTubePlaylistCheck(CString fn)
+bool PlayerYouTubePlaylistCheck(CString& fn, BOOL bHandleURL/* = FALSE*/)
 {
-	CString tmp_fn(CString(fn).MakeLower());
+	CString tmp_fn(fn);
+	tmp_fn.MakeLower();
 
 	if (tmp_fn.Find(YOUTUBE_PL_URL) != -1 || (tmp_fn.Find(YOUTUBE_URL) != -1 && tmp_fn.Find(_T("&list=")) != -1)) {
+		if (bHandleURL) {
+			HandleURL(fn);
+		}
 		return true;
 	}
 

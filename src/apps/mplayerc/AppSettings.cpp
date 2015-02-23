@@ -24,6 +24,7 @@
 #include <atlpath.h>
 #include <d3d9types.h>
 #include "MiniDump.h"
+#include "PlayerYouTube.h"
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/WinAPIUtils.h"
@@ -1893,7 +1894,10 @@ CString CAppSettings::ParseFileName(CString const& param)
 		}
 	}
 
-	return param;
+	CString tmp(param);
+	PlayerYouTubeCheck(tmp, TRUE);
+
+	return tmp;
 }
 
 void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)

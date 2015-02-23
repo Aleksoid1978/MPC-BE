@@ -11665,10 +11665,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		local.MakeLower();
 		bool validateUrl = true;
 
-		if (PlayerYouTubeCheck(local)) {
-			local.Replace(L"http://", L"https://");
-		}
-
 		for (;;) {
 			if (local.Find(_T("http://")) == 0 || local.Find(_T("www.")) == 0) {
 				// validate url before try to opening
@@ -11695,10 +11691,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			hr = VFW_E_NOT_FOUND;
 		} else {
 			CString tmpName = m_strUrl = fn;
-			if (PlayerYouTubeCheck(fn)) {
-				CString fn_https = fn;
-				fn_https.Replace(L"http://", L"https://");
-				tmpName = PlayerYouTube(fn_https, &m_youtubeFields, &pOFD->subs);
+			if (PlayerYouTubeCheck(fn), TRUE) {
+				tmpName = PlayerYouTube(fn, &m_youtubeFields, &pOFD->subs);
 				m_strUrl = tmpName;
 
 				if (s.iYoutubeSource == 0 && CString(tmpName).MakeLower().Find(L".m3u8") == -1) {
@@ -19219,7 +19213,7 @@ REFTIME CMainFrame::GetAvgTimePerFrame() const
 
 BOOL CMainFrame::OpenYoutubePlaylist(CString url)
 {
-	if (AfxGetAppSettings().bYoutubeLoadPlaylist && PlayerYouTubePlaylistCheck(url)) {
+	if (AfxGetAppSettings().bYoutubeLoadPlaylist && PlayerYouTubePlaylistCheck(url, TRUE)) {
 		YoutubePlaylist youtubePlaylist;
 		int idx_CurrentPlay = 0;
 		if (PlayerYouTubePlaylist(url, youtubePlaylist, idx_CurrentPlay)) {
