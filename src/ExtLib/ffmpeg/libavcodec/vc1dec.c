@@ -770,10 +770,6 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
 
     v->second_field = 0;
 
-    // ==> Start patch MPC
-    v->second_field_offset = 0;
-    // <== End patch MPC
-
     if(s->flags & CODEC_FLAG_LOW_DELAY)
         s->low_delay = 1;
 
@@ -1259,17 +1255,6 @@ image:
             *got_frame = 1;
         }
     }
-
-    // ==> Start patch MPC
-    if (avctx->using_dxva) {
-        if (v->field_mode && buf_start_second_field) {
-            s->picture_structure   = PICT_BOTTOM_FIELD - v->tff;
-            v->second_field_offset = buf_start_second_field - buf;
-        } else {
-            s->picture_structure = PICT_FRAME;
-        }
-	}
-    // <== End patch MPC
 
 end:
     av_free(buf2);

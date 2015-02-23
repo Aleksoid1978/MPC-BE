@@ -396,9 +396,6 @@ typedef struct VC1Context{
     int resync_marker;           ///< could this stream contain resync markers
 
     // ==> Start patch MPC
-    // ==> start DXVA 1.0
-    int second_field_offset;
-    // ==> end DXVA 1.0
     int recovered;
     void* dxva_context;
     // <== End patch MPC
