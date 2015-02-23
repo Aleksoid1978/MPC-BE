@@ -11665,7 +11665,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		local.MakeLower();
 		bool validateUrl = true;
 
-		for (;;) {
+		if (!PlayerYouTubeCheck(fn)) {
 			if (local.Find(_T("http://")) == 0 || local.Find(_T("www.")) == 0) {
 				// validate url before try to opening
 				if (local.Find(_T("www.")) == 0) {
@@ -11673,25 +11673,22 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 
 				CMPCSocket socket;
-				if (!socket.Create()) {
-					break;
-				}
+				if (socket.Create()) {
+					socket.SetTimeOut(3000);
+					if (!socket.Connect(local, TRUE)) {
+						validateUrl = false;
+					}
 
-				socket.SetTimeOut(3000);
-				if (!socket.Connect(local, TRUE)) {
-					validateUrl = false;
+					socket.Close();
 				}
-
-				socket.Close();
 			}
-			break;
 		}
 
 		if (!validateUrl) {
 			hr = VFW_E_NOT_FOUND;
 		} else {
 			CString tmpName = m_strUrl = fn;
-			if (PlayerYouTubeCheck(fn), TRUE) {
+			if (PlayerYouTubeCheck(fn)) {
 				tmpName = PlayerYouTube(fn, &m_youtubeFields, &pOFD->subs);
 				m_strUrl = tmpName;
 
@@ -19213,7 +19210,7 @@ REFTIME CMainFrame::GetAvgTimePerFrame() const
 
 BOOL CMainFrame::OpenYoutubePlaylist(CString url)
 {
-	if (AfxGetAppSettings().bYoutubeLoadPlaylist && PlayerYouTubePlaylistCheck(url, TRUE)) {
+	if (AfxGetAppSettings().bYoutubeLoadPlaylist && PlayerYouTubePlaylistCheck(url)) {
 		YoutubePlaylist youtubePlaylist;
 		int idx_CurrentPlay = 0;
 		if (PlayerYouTubePlaylist(url, youtubePlaylist, idx_CurrentPlay)) {

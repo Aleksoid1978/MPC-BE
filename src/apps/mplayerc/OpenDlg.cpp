@@ -110,9 +110,8 @@ BOOL COpenDlg::OnInitDialog()
 			LPCTSTR pText = (LPCTSTR)::GlobalLock(hglb);
 			if (pText) {
 				if (AfxIsValidString(pText)) {
-					CString tmp(pText);
-					if (PlayerYouTubeCheck(tmp, TRUE) || PlayerYouTubePlaylistCheck(tmp, TRUE)) {
-						m_mrucombo.SetWindowTextW(tmp);
+					if (PlayerYouTubeCheck(pText) || PlayerYouTubePlaylistCheck(pText)) {
+						m_mrucombo.SetWindowTextW(pText);
 					}
 				}
 				GlobalUnlock(hglb);
