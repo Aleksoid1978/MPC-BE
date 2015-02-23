@@ -1739,6 +1739,9 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size,
     // <== End patch MPC
 
     h->nal_unit_type= 0;
+    // ==> Start patch MPC
+    h->second_field_offset = 0;
+    // <== End patch MPC
 
     if(!h->slice_context_count)
          h->slice_context_count= 1;
@@ -1917,6 +1920,8 @@ again:
                         }
                     }
                     nal_pass++;
+                    if (nal_pass == 1)
+                        h->second_field_offset = buf_index;
 					// <== End patch MPC
 
                     if (h->avctx->hwaccel &&
@@ -2041,6 +2046,11 @@ end:
         ff_thread_report_progress(&h->cur_pic_ptr->tf, INT_MAX,
                                   h->picture_structure == PICT_BOTTOM_FIELD);
     }
+
+    // ==> Start patch MPC
+    if (nal_pass < 2)
+        h->second_field_offset = 0;
+    // <== End patch MPC
 
     return (ret < 0) ? ret : buf_index;
 }

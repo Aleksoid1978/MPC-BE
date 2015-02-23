@@ -26,7 +26,9 @@
 #include "../BaseVideoFilter/BaseVideoFilter.h"
 #include "IMPCVideoDec.h"
 #include "MPCVideoDecSettingsWnd.h"
-#include "DXVADecoder.h"
+#include "./DXVADecoder/DXVADecoder.h"
+#include "./DXVADecoder/DXVA1Decoder.h"
+#include "./DXVADecoder/DXVA2Decoder.h"
 #include "FormatConverter.h"
 #include "../../../apps/mplayerc/FilterEnum.h"
 
@@ -134,7 +136,6 @@ protected:
 	// === DXVA2 variables
 	CComPtr<IDirect3DDeviceManager9>		m_pDeviceManager;
 	CComPtr<IDirectXVideoDecoderService>	m_pDecoderService;
-	CComPtr<IDirect3DSurface9>				m_pDecoderRenderTarget;
 	DXVA2_ConfigPictureDecode				m_DXVA2Config;
 	HANDLE									m_hDevice;
 	DXVA2_VideoDesc							m_VideoDesc;
@@ -253,12 +254,13 @@ public:
 	int							PictWidthRounded();
 	int							PictHeightRounded();
 
-	inline bool					UseDXVA2()		const { return (m_nDecoderMode == MODE_DXVA2); };
-	inline AVCodecContext*		GetAVCtx()		const { return m_pAVCtx; };
-	inline AVFrame*				GetFrame()		const { return m_pFrame; };
-	inline enum AVCodecID		GetCodec()		const { return m_nCodecId; };
-	inline DWORD				GetPCIVendor()	const { return m_nPCIVendor; };
-	inline DWORD				GetPCIDevice()	const { return m_nPCIDevice; };
+	inline bool					UseDXVA2()			const { return (m_nDecoderMode == MODE_DXVA2); };
+	inline AVCodecContext*		GetAVCtx()			const { return m_pAVCtx; };
+	inline AVFrame*				GetFrame()			const { return m_pFrame; };
+	inline enum AVCodecID		GetCodec()			const { return m_nCodecId; };
+	inline bool					IsReorderBFrame()	const { return m_bReorderBFrame; };
+	inline DWORD				GetPCIVendor()		const { return m_nPCIVendor; };
+	inline DWORD				GetPCIDevice()		const { return m_nPCIDevice; };
 
 	bool						IsDXVASupported();
 	void						UpdateAspectRatio();
@@ -268,8 +270,10 @@ public:
 	void						HandleKeyFrame(int& got_picture);
 
 	// === DXVA1 functions
-	const DDPIXELFORMAT*		GetPixelFormat() { return &m_DDPixelFormat; }
-	HRESULT						FindDXVA1DecoderConfiguration(IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, DDPIXELFORMAT* pPixelFormat);
+	const DDPIXELFORMAT*		GetDXVA1PixelFormat() { return &m_DDPixelFormat; }
+	HRESULT						FindDXVA1DecoderConfiguration(IAMVideoAccelerator* pAMVideoAccelerator,
+															  const GUID* guidDecoder,
+															  DDPIXELFORMAT* pPixelFormat);
 	HRESULT						CheckDXVA1Decoder(const GUID *pGuid);
 	void						SetDXVA1Params(const GUID* pGuid, DDPIXELFORMAT* pPixelFormat);
 	WORD						GetDXVA1RestrictedMode();

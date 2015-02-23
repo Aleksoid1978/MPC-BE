@@ -13,11 +13,11 @@
       <UniqueIdentifier>{29435264-dc59-4006-a197-91a4bd1e583f}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
-    <Filter Include="Header Files\DXVA1">
-      <UniqueIdentifier>{6c6db163-3759-4569-8494-2b6a17bb8944}</UniqueIdentifier>
+    <Filter Include="Source Files\DXVADecoder">
+      <UniqueIdentifier>{2142786b-97ca-4daa-bedf-1cd9e788e19f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\DXVA1">
-      <UniqueIdentifier>{0476f273-431d-4107-af4a-0240498b4bc5}</UniqueIdentifier>
+    <Filter Include="Header Files\DXVADecoder">
+      <UniqueIdentifier>{26a70972-2c74-42ba-b2a6-c6652f6df5a3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -25,18 +25,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DXVAAllocator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DXVADecoder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DXVADecoderH264.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DXVADecoderMpeg2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DXVADecoderVC1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ffmpegContext.cpp">
@@ -57,14 +45,35 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DXVA1\DXVADecoderH264_DXVA1.cpp">
-      <Filter>Source Files\DXVA1</Filter>
+    <ClCompile Include="DXVADecoder\DXVA2Decoder.cpp">
+      <Filter>Source Files\DXVADecoder</Filter>
     </ClCompile>
-    <ClCompile Include="DXVA1\ffmpegContext_DXVA1.cpp">
-      <Filter>Source Files\DXVA1</Filter>
+    <ClCompile Include="DXVADecoder\DXVA2DecoderH264.cpp">
+      <Filter>Source Files\DXVADecoder</Filter>
     </ClCompile>
-    <ClCompile Include="DXVADecoderHEVC.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="DXVADecoder\DXVA2DecoderHEVC.cpp">
+      <Filter>Source Files\DXVADecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVADecoder\DXVA2DecoderMPEG2.cpp">
+      <Filter>Source Files\DXVADecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVADecoder\DXVA2DecoderVC1.cpp">
+      <Filter>Source Files\DXVADecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVADecoder\DXVA1Decoder.cpp">
+      <Filter>Source Files\DXVADecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVADecoder\DXVA1DecoderH264.cpp">
+      <Filter>Source Files\DXVADecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVADecoder\ffmpegContext_DXVA1.cpp">
+      <Filter>Source Files\DXVADecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVADecoder\DXVA1DecoderVC1.cpp">
+      <Filter>Source Files\DXVADecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="DXVADecoder\DXVA1DecoderMPEG2.cpp">
+      <Filter>Source Files\DXVADecoder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -72,18 +81,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DXVAAllocator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DXVADecoder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DXVADecoderH264.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DXVADecoderMpeg2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DXVADecoderVC1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ffmpegContext.h">
@@ -113,14 +110,41 @@
     <ClInclude Include="memcpy_sse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DXVA1\DXVADecoderH264_DXVA1.h">
-      <Filter>Header Files\DXVA1</Filter>
+    <ClInclude Include="DXVADecoder\DXVA2Decoder.h">
+      <Filter>Header Files\DXVADecoder</Filter>
     </ClInclude>
-    <ClInclude Include="DXVA1\ffmpegContext_DXVA1.h">
-      <Filter>Header Files\DXVA1</Filter>
+    <ClInclude Include="DXVADecoder\DXVA2DecoderH264.h">
+      <Filter>Header Files\DXVADecoder</Filter>
     </ClInclude>
-    <ClInclude Include="DXVADecoderHEVC.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="DXVADecoder\DXVA2DecoderHEVC.h">
+      <Filter>Header Files\DXVADecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoder\DXVA2DecoderMPEG2.h">
+      <Filter>Header Files\DXVADecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoder\DXVA2DecoderVC1.h">
+      <Filter>Header Files\DXVADecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoder\DXVADecoder.h">
+      <Filter>Header Files\DXVADecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoder\stdafx.h">
+      <Filter>Header Files\DXVADecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoder\DXVA1Decoder.h">
+      <Filter>Header Files\DXVADecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoder\DXVA1DecoderH264.h">
+      <Filter>Header Files\DXVADecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoder\ffmpegContext_DXVA1.h">
+      <Filter>Header Files\DXVADecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoder\DXVA1DecoderVC1.h">
+      <Filter>Header Files\DXVADecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoder\DXVA1DecoderMPEG2.h">
+      <Filter>Header Files\DXVADecoder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -20,24 +20,19 @@
 
 #pragma once
 
-#include "DXVADecoder.h"
+#include "DXVA2Decoder.h"
 #include <ffmpeg/libavcodec/dxva_mpeg2.h>
 
-class CDXVADecoderMpeg2 : public CDXVADecoder
+class CDXVA2DecoderMPEG2 : public CDXVA2Decoder
 {
-public:
-	CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber);
-	CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
-	virtual ~CDXVADecoderMpeg2();
-
-	virtual HRESULT		CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize, UINT nDXVASize = UINT_MAX);
-	virtual HRESULT		DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-
-private:
 	DXVA_MPEG2_Context	m_DXVA_Context;
-
 	UINT				m_nFieldNum;
 
-	void				Init();
 	void				UpdatePictureParams();
+
+public:
+	CDXVA2DecoderMPEG2(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config);
+
+	virtual HRESULT		CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDXVASize = UINT_MAX);
+	virtual HRESULT		DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 };

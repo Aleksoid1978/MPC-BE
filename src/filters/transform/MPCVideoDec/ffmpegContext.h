@@ -49,7 +49,7 @@ int				FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* 
 void			FFH264SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context);
 
 // === VC1 functions
-void			FFVC1SetDxvaParams(struct AVCodecContext* pAVCtx, void* pPicParams, void* pSliceInfo);
+void			FFVC1SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context);
 
 // === Mpeg2 functions
 int				MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
@@ -61,7 +61,7 @@ void			FFHEVCSetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context);
 // === Common functions
 HRESULT			FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 							  BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop,
-							  int* got_picture, UINT* nFrameSize = NULL);
+							  int* got_picture, AVFrame** ppFrameOut);
 BOOL			FFGetAlternateScan(struct AVCodecContext* pAVCtx);
 UINT			FFGetMBCount(struct AVCodecContext* pAVCtx);
 void			FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height);

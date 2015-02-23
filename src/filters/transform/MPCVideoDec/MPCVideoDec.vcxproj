@@ -247,18 +247,19 @@ update_version.bat</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CpuId.cpp" />
-    <ClCompile Include="DXVA1\DXVADecoderH264_DXVA1.cpp">
-      <PrecompiledHeaderFile>../stdafx.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="DXVA1\ffmpegContext_DXVA1.cpp">
+    <ClCompile Include="DXVADecoder\DXVA1Decoder.cpp" />
+    <ClCompile Include="DXVADecoder\DXVA1DecoderH264.cpp" />
+    <ClCompile Include="DXVADecoder\DXVA1DecoderMPEG2.cpp" />
+    <ClCompile Include="DXVADecoder\DXVA1DecoderVC1.cpp" />
+    <ClCompile Include="DXVADecoder\DXVA2Decoder.cpp" />
+    <ClCompile Include="DXVADecoder\DXVA2DecoderH264.cpp" />
+    <ClCompile Include="DXVADecoder\DXVA2DecoderHEVC.cpp" />
+    <ClCompile Include="DXVADecoder\DXVA2DecoderMPEG2.cpp" />
+    <ClCompile Include="DXVADecoder\DXVA2DecoderVC1.cpp" />
+    <ClCompile Include="DXVADecoder\ffmpegContext_DXVA1.cpp">
       <WarningLevel>Level1</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="DXVADecoder.cpp" />
-    <ClCompile Include="DXVADecoderH264.cpp" />
-    <ClCompile Include="DXVADecoderHEVC.cpp" />
-    <ClCompile Include="DXVADecoderMpeg2.cpp" />
-    <ClCompile Include="DXVADecoderVC1.cpp" />
     <ClCompile Include="ffmpegContext.cpp">
       <WarningLevel>Level1</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -274,13 +275,18 @@ update_version.bat</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CpuId.h" />
-    <ClInclude Include="DXVA1\DXVADecoderH264_DXVA1.h" />
-    <ClInclude Include="DXVA1\ffmpegContext_DXVA1.h" />
-    <ClInclude Include="DXVADecoder.h" />
-    <ClInclude Include="DXVADecoderH264.h" />
-    <ClInclude Include="DXVADecoderHEVC.h" />
-    <ClInclude Include="DXVADecoderMpeg2.h" />
-    <ClInclude Include="DXVADecoderVC1.h" />
+    <ClInclude Include="DXVADecoder\DXVA1Decoder.h" />
+    <ClInclude Include="DXVADecoder\DXVA1DecoderH264.h" />
+    <ClInclude Include="DXVADecoder\DXVA1DecoderMPEG2.h" />
+    <ClInclude Include="DXVADecoder\DXVA1DecoderVC1.h" />
+    <ClInclude Include="DXVADecoder\DXVA2Decoder.h" />
+    <ClInclude Include="DXVADecoder\DXVA2DecoderH264.h" />
+    <ClInclude Include="DXVADecoder\DXVA2DecoderHEVC.h" />
+    <ClInclude Include="DXVADecoder\DXVA2DecoderMPEG2.h" />
+    <ClInclude Include="DXVADecoder\DXVA2DecoderVC1.h" />
+    <ClInclude Include="DXVADecoder\DXVADecoder.h" />
+    <ClInclude Include="DXVADecoder\ffmpegContext_DXVA1.h" />
+    <ClInclude Include="DXVADecoder\stdafx.h" />
     <ClInclude Include="ffmpegContext.h" />
     <ClInclude Include="FormatConverter.h" />
     <ClInclude Include="IMPCVideoDec.h" />
