@@ -90,6 +90,7 @@ namespace DSObjects
 		// Variables initialized/managed by this class but can be accessed by the allocator-presenter
 		bool						m_bD3DX;
 		RenderingPath				m_RenderingPath;
+		D3DFORMAT					m_VideoBufferType;
 		D3DFORMAT					m_SurfaceType;
 		CComPtr<IDirect3DTexture9>	m_pVideoTexture[MAX_VIDEO_SURFACES];
 		CComPtr<IDirect3DSurface9>	m_pVideoSurface[MAX_VIDEO_SURFACES];

@@ -588,7 +588,11 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 					 GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS, //D3DCREATE_MANAGED
 					 &m_pp, &DisplayMode, &m_pD3DDevEx);
 
-			m_D3DDevExError = GetWindowsErrorMessage(hr, m_hD3D9);
+			if (S_OK == hr) {
+				m_D3DDevExError.Empty();
+			} else {
+				m_D3DDevExError = GetWindowsErrorMessage(hr, m_hD3D9);
+			}
 			if (m_pD3DDevEx) {
 				m_pD3DDev = m_pD3DDevEx;
 				m_BackbufferType = m_pp.BackBufferFormat;
@@ -1896,7 +1900,10 @@ void CDX9AllocatorPresenter::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
-			strText.Format(L"Formats      : Surface %s    Backbuffer %s    Display %s     Device %s      D3DExError: %s", GetD3DFormatStr(m_SurfaceType), GetD3DFormatStr(m_BackbufferType), GetD3DFormatStr(m_DisplayType), m_pD3DDevEx ? L"D3DDevEx" : L"D3DDev", m_D3DDevExError.GetString());
+			strText.Format(L"Formats      : VideoBuffer %s, Surface %s, Backbuffer %s, Display %s. Device %s", GetD3DFormatStr(m_VideoBufferType), GetD3DFormatStr(m_SurfaceType), GetD3DFormatStr(m_BackbufferType), GetD3DFormatStr(m_DisplayType), m_pD3DDevEx ? L"D3DDevEx" : L"D3DDev");
+			if (m_D3DDevExError.GetLength()) {
+				strText.AppendFormat(L". D3DExError: %s", m_D3DDevExError.GetString());
+			}
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 

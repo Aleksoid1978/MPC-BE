@@ -133,6 +133,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_nCurSurface(0)
 	, m_CurrentAdapter(0)
 	, m_D3D9VendorId(0)
+	, m_VideoBufferType(D3DFMT_X8R8G8B8)
 {
 	HINSTANCE hDll = GetRenderersData()->GetD3X9Dll();
 	m_bD3DX = hDll != NULL;
@@ -251,12 +252,12 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 		m_RenderingPath = RENDERING_PATH_STRETCHRECT;
 	}
 	else if (settings.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
-		D3DFORMAT videosurfacefmt = (m_bIsEVR && m_D3D9VendorId == 0x8086) ? D3DFMT_X8R8G8B8 : m_SurfaceType;
+		m_VideoBufferType = (m_bIsEVR && m_D3D9VendorId == 0x8086) ? D3DFMT_X8R8G8B8 : m_SurfaceType;
 		// TODO: show that surface in the statistics
 		for (int i = 0; i < m_nNbDXSurface; i++) {
 			if (FAILED(hr = m_pD3DDev->CreateTexture(
 								m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
-								D3DUSAGE_RENDERTARGET, videosurfacefmt,
+								D3DUSAGE_RENDERTARGET, m_VideoBufferType,
 								D3DPOOL_DEFAULT, &m_pVideoTexture[i], NULL))) {
 				return hr;
 			}
