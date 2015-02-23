@@ -21,26 +21,25 @@
 #pragma once
 
 #include "DXVA1Decoder.h"
+#include <ffmpeg/libavcodec/dxva_vc1.h>
 
 class CDXVA1DecoderVC1 : public CDXVA1Decoder
 {
+	DXVA_VC1_Context	m_DXVA_Context;
+	UINT				m_nFieldNum;
+	UINT				StatusReportFeedbackNumber;
+
+	WORD				m_wRefPictureIndex[2];
+	int					m_nDelayedSurfaceIndex;
+	REFERENCE_TIME		m_rtStartDelayed;
+	REFERENCE_TIME		m_rtStopDelayed;
+
+	void				UpdatePictureParams(int nSurfaceIndex);
+
 public:
 	CDXVA1DecoderVC1(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, int nPicEntryNumber);
 
-	// === Public functions
-	virtual HRESULT 		DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	virtual void			CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
-	virtual void			Flush();
-
-private:
-	DXVA_PictureParameters	m_PictureParams;
-	DXVA_SliceInfo			m_SliceInfo;
-	WORD					m_wRefPictureIndex[2];
-
-	int						m_nDelayedSurfaceIndex;
-	REFERENCE_TIME			m_rtStartDelayed;
-	REFERENCE_TIME			m_rtStopDelayed;
-
-	// Private functions
-	BYTE*					FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize);
+	virtual HRESULT 	DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	virtual void		CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
+	virtual void		Flush();
 };
