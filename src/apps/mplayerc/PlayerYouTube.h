@@ -114,9 +114,9 @@ static DWORD strpos(char* h, char* n)
 	return 0;
 }
 
-bool PlayerYouTubeCheck(CString& fn, BOOL bHandleURL = FALSE);
-bool PlayerYouTubePlaylistCheck(CString& fn, BOOL bHandleURL = FALSE);
-CString PlayerYouTube(CString fn, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* subs);
+bool PlayerYouTubeCheck(CString url);
+bool PlayerYouTubePlaylistCheck(CString url);
+CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* subs);
 
 struct YoutubePlaylistItem {
 	CString url, title;
@@ -128,4 +128,4 @@ struct YoutubePlaylistItem {
 };
 typedef CAtlList<YoutubePlaylistItem> YoutubePlaylist;
 
-bool PlayerYouTubePlaylist(CString fn, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay);
+bool PlayerYouTubePlaylist(CString url, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay);

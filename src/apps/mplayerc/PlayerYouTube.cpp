@@ -109,30 +109,24 @@ static void HandleURL(CString& url)
 	}
 }
 
-bool PlayerYouTubeCheck(CString& fn, BOOL bHandleURL/* = FALSE*/)
+bool PlayerYouTubeCheck(CString url)
 {
-	CString tmp_fn(fn);
+	CString tmp_fn(url);
 	tmp_fn.MakeLower();
 
 	if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1) {
-		if (bHandleURL) {
-			HandleURL(fn);
-		}
 		return true;
 	}
 
 	return false;
 }
 
-bool PlayerYouTubePlaylistCheck(CString& fn, BOOL bHandleURL/* = FALSE*/)
+bool PlayerYouTubePlaylistCheck(CString url)
 {
-	CString tmp_fn(fn);
+	CString tmp_fn(url);
 	tmp_fn.MakeLower();
 
 	if (tmp_fn.Find(YOUTUBE_PL_URL) != -1 || (tmp_fn.Find(YOUTUBE_URL) != -1 && tmp_fn.Find(_T("&list=")) != -1)) {
-		if (bHandleURL) {
-			HandleURL(fn);
-		}
 		return true;
 	}
 
@@ -156,11 +150,9 @@ static CString RegExpParse(CString szIn, CString szRE)
 	return L"";
 }
 
-CString PlayerYouTube(CString fn, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* subs)
+CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* subs)
 {
-	CString tmp_fn(CString(fn).MakeLower());
-
-	if (PlayerYouTubeCheck(fn)) {
+	if (PlayerYouTubeCheck(url)) {
 		char* data = NULL;
 		DWORD dataSize = 0;
 
@@ -197,7 +189,8 @@ CString PlayerYouTube(CString fn, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* s
 
 		HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
 		if (s) {
-			CString link = fn;
+			CString link = url;
+			HandleURL(link);
 			if (link.Find(YOUTU_BE_URL) != -1) {
 				link.Replace(YOUTU_BE_URL, YOUTUBE_URL);
 				link.Replace(_T("watch?"), _T("watch?v="));
@@ -270,16 +263,16 @@ CString PlayerYouTube(CString fn, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* s
 		}
 
 		if (!data || !f || !s) {
-			return fn;
+			return url;
 		}
 
 		if (!stream_map_len && !hlsvp_len) {
 			if (strstr(data, YOUTUBE_MP_URL)) {
 				// This is looks like Youtube page, but this page doesn't contains necessary information about video, so may be you have to register on google.com to view it.
-				fn.Empty();
+				url.Empty();
 			}
 			free(data);
-			return fn;
+			return url;
 		}
 
 		CString Title = UTF8To16(GetEntry(data, "<title>", "</title>"));
@@ -519,20 +512,23 @@ CString PlayerYouTube(CString fn, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* s
 		}
 	}
 
-	return fn;
+	return url;
 }
 
-bool PlayerYouTubePlaylist(CString fn, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay)
+bool PlayerYouTubePlaylist(CString url, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay)
 {
 	idx_CurrentPlay = 0;
-	if (PlayerYouTubePlaylistCheck(fn)) {
+	if (PlayerYouTubePlaylistCheck(url)) {
 
 		char* data = NULL;
 		DWORD dataSize = 0;
 
 		HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
 		if (s) {
-			f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_OPEN_FALGS, 0);
+			CString link(url);
+			HandleURL(link);
+
+			f = InternetOpenUrl(s, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
 			if (f) {
 				char buffer[4096] = { 0 };
 				DWORD dwBytesRead = 0;

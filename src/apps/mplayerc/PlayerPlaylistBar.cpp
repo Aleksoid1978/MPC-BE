@@ -33,7 +33,7 @@
 
 static CString MakePath(CString path)
 {
-	if (path.Find(L"://") >= 0) { // skip URLs
+	if (path.Find(L"://") >= 0 || PlayerYouTubeCheck(path)) { // skip URLs
 		return path;
 	}
 
@@ -939,7 +939,7 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CSubtitleItemList
 
 	ResolveLinkFiles(fns);
 
-	if (bCheck) {
+	if (bCheck && !PlayerYouTubeCheck(fns.GetHead())) {
 		CAtlList<CString> sl;
 		if (SearchFiles(fns.GetHead(), sl)) {
 
