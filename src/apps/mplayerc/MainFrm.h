@@ -621,6 +621,9 @@ protected:  // control bar embedded members
 	void OnDragLeave();
 	DROPEFFECT OnDragScroll(DWORD dwKeyState, CPoint point);
 
+	const UINT CF_URL = RegisterClipboardFormat(_T("UniformResourceLocator"));
+	void DropFiles(CAtlList<CString>& slFiles);
+
 	LPCTSTR GetRecentFile();
 
 	friend class CPPagePlayback; // TODO
@@ -744,7 +747,6 @@ public:
 	afx_msg void OnFileOpenDevice();
 	afx_msg void OnFileOpenCD(UINT nID);
 	afx_msg void OnFileReOpen();
-	afx_msg void OnDropFiles(HDROP hDropInfo); // no menu item
 	afx_msg void OnFileSaveAs();
 	afx_msg void OnUpdateFileSaveAs(CCmdUI* pCmdUI);
 	afx_msg void OnFileSaveImage();
@@ -1112,6 +1114,7 @@ public:
 	bool			b_UseReclock;
 
 	void			CheckMenuRadioItem(UINT first, UINT last, UINT check);
+
 private:
 	enum TH_STATE {
 		TH_START,

@@ -293,7 +293,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_FILE_OPEN_CD_START, ID_FILE_OPEN_CD_END, OnFileOpenCD)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_FILE_OPEN_CD_START, ID_FILE_OPEN_CD_END, OnUpdateFileOpen)
 	ON_COMMAND(ID_FILE_REOPEN, OnFileReOpen)
-	ON_WM_DROPFILES()
 	ON_COMMAND(ID_FILE_SAVE_COPY, OnFileSaveAs)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_COPY, OnUpdateFileSaveAs)
 	ON_COMMAND(ID_FILE_SAVE_IMAGE, OnFileSaveImage)
@@ -1065,35 +1064,37 @@ DROPEFFECT CMainFrame::OnDragEnter(COleDataObject* pDataObject, DWORD dwKeyState
 
 DROPEFFECT CMainFrame::OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
 {
-	UINT CF_URL = RegisterClipboardFormat(_T("UniformResourceLocator"));
-	return pDataObject->IsDataAvailable(CF_URL) ? DROPEFFECT_COPY : DROPEFFECT_NONE;
+	return (pDataObject->IsDataAvailable(CF_URL) || pDataObject->IsDataAvailable(CF_HDROP)) ? DROPEFFECT_COPY : DROPEFFECT_NONE;
 }
 
 BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point)
 {
-	UINT CF_URL = RegisterClipboardFormat(_T("UniformResourceLocator"));
-
 	BOOL bResult = FALSE;
+	CAtlList<CString> slFiles;
 
-	if (pDataObject->IsDataAvailable(CF_URL)) {
+    if (pDataObject->IsDataAvailable(CF_HDROP)) {
+		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(CF_HDROP)) {
+			if (HDROP hDrop = (HDROP)GlobalLock(hGlobal)) {
+				UINT nFiles = ::DragQueryFile(hDrop, UINT_MAX, NULL, 0);
+				for (UINT iFile = 0; iFile < nFiles; iFile++) {
+					CString fn;
+					fn.ReleaseBuffer(::DragQueryFile(hDrop, iFile, fn.GetBuffer(MAX_PATH), MAX_PATH));
+					slFiles.AddTail(fn);
+				}
+				::DragFinish(hDrop);
+				DropFiles(slFiles);
+				bResult = TRUE;
+			}
+			GlobalUnlock(hGlobal);
+		}
+	} else if (pDataObject->IsDataAvailable(CF_URL)) {
 		FORMATETC fmt = {CF_URL, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
 		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(CF_URL, &fmt)) {
 			LPCSTR pText = (LPCSTR)GlobalLock(hGlobal);
 			if (AfxIsValidString(pText)) {
-				CStringA url(pText);
-
-				SetForegroundWindow();
-
 				CAtlList<CString> sl;
-				sl.AddTail(CString(url));
-
-				if (m_wndPlaylistBar.IsWindowVisible()) {
-					m_wndPlaylistBar.Append(sl, true);
-				} else {
-					m_wndPlaylistBar.Open(sl, true);
-					OpenCurPlaylistItem();
-				}
-
+				sl.AddTail(pText);
+				DropFiles(sl);
 				GlobalUnlock(hGlobal);
 				bResult = TRUE;
 			}
@@ -1105,7 +1106,11 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 
 DROPEFFECT CMainFrame::OnDropEx(COleDataObject* pDataObject, DROPEFFECT dropDefault, DROPEFFECT dropList, CPoint point)
 {
-	return (DROPEFFECT)-1;
+	if (OnDrop(pDataObject, dropDefault, point)) {
+		return dropDefault;
+	}
+
+	return DROPEFFECT_NONE;
 }
 
 void CMainFrame::OnDragLeave()
@@ -5427,37 +5432,24 @@ void CMainFrame::OnFileReOpen()
 	OpenCurPlaylistItem();
 }
 
-void CMainFrame::OnDropFiles(HDROP hDropInfo)
+void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 {
 	SetForegroundWindow();
 
+	if (slFiles.IsEmpty()) {
+		return;
+	}
+
 	if (m_wndPlaylistBar.IsWindowVisible()) {
-		m_wndPlaylistBar.OnDropFiles(hDropInfo);
+		m_wndPlaylistBar.DropFiles(slFiles);
 		return;
 	}
-
-	UINT nFiles = ::DragQueryFile(hDropInfo, (UINT)-1, NULL, 0);
-
-	CAtlList<CString> sl;
-	for (UINT iFile = 0; iFile < nFiles; iFile++) {
-		CString fn;
-		fn.ReleaseBuffer(::DragQueryFile(hDropInfo, iFile, fn.GetBuffer(_MAX_PATH), _MAX_PATH));
-		sl.AddTail(fn);
-	}
-
-	ParseDirs(sl);
-
-	::DragFinish(hDropInfo);
-
-	if (sl.IsEmpty()) {
-		return;
-	}
-
+	
 	BOOL bIsValidSubExtAll = TRUE;
 
-	POSITION pos = sl.GetHeadPosition();
+	POSITION pos = slFiles.GetHeadPosition();
 	while (pos) {
-		CString ext = GetFileExt(sl.GetNext(pos)).Mid(1); // extension without a dot
+		CString ext = GetFileExt(slFiles.GetNext(pos)).Mid(1); // extension without a dot
 		ext.MakeLower();
 
 		bool validate_ext = false;
@@ -5477,9 +5469,9 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 
 	if (bIsValidSubExtAll && m_iMediaLoadState == MLS_LOADED && (m_pCAP || b_UseVSFilter)) {
 
-		POSITION pos = sl.GetHeadPosition();
+		POSITION pos = slFiles.GetHeadPosition();
 		while (pos) {
-			CString fname = sl.GetNext(pos);
+			CString fname = slFiles.GetNext(pos);
 			BOOL b_SubLoaded = FALSE;
 
 			if (b_UseVSFilter) {
@@ -5517,13 +5509,13 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 	}
 
 	{
-		CString path = sl.GetHead();
-		if (OpenBD(path) || (sl.GetCount() == 1 && OpenIso(path))) {
+		CString path = slFiles.GetHead();
+		if (OpenBD(path) || (slFiles.GetCount() == 1 && OpenIso(path))) {
 			return;
 		}
 	}
 
-	m_wndPlaylistBar.Open(sl, true);
+	m_wndPlaylistBar.Open(slFiles, true);
 	OpenCurPlaylistItem();
 }
 

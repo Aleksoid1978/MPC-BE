@@ -1774,7 +1774,6 @@ BEGIN_MESSAGE_MAP(CPlayerPlaylistBar, CSizingControlBarG)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_PLAYLIST, OnCustomdrawList)
 	ON_WM_DRAWITEM()
 	ON_COMMAND_EX(ID_PLAY_PLAY, OnPlayPlay)
-	ON_WM_DROPFILES()
 	ON_NOTIFY(LVN_BEGINDRAG, IDC_PLAYLIST, OnBeginDrag)
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONUP()
@@ -2007,22 +2006,15 @@ BOOL CPlayerPlaylistBar::OnPlayPlay(UINT nID)
 	return FALSE;
 }
 
-void CPlayerPlaylistBar::OnDropFiles(HDROP hDropInfo)
+void CPlayerPlaylistBar::DropFiles(CAtlList<CString>& slFiles)
 {
 	SetForegroundWindow();
 	m_list.SetFocus();
 
-	CAtlList<CString> sl;
+	AfxGetMainFrame()->ParseDirs(slFiles);
 
-	UINT nFiles = ::DragQueryFile(hDropInfo, (UINT)-1, NULL, 0);
-	for (UINT iFile = 0; iFile < nFiles; iFile++) {
-		TCHAR szFileName[MAX_PATH];
-		::DragQueryFile(hDropInfo, iFile, szFileName, MAX_PATH);
-		sl.AddTail(szFileName);
-	}
-	::DragFinish(hDropInfo);
+	Append(slFiles, true);
 
-	Append(sl, true);
 }
 
 void CPlayerPlaylistBar::OnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
