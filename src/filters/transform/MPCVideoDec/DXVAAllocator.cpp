@@ -114,7 +114,7 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 	CComPtr<IDirectXVideoDecoderService> pDXVA2Service;
 
 	CheckPointer(m_pVideoDecFilter->m_pDeviceManager, E_UNEXPECTED);
-	hr = m_pVideoDecFilter->m_pDeviceManager->GetVideoService(m_pVideoDecFilter->m_hDevice, IID_IDirectXVideoDecoderService, (void**)&pDXVA2Service);
+	hr = m_pVideoDecFilter->m_pDeviceManager->GetVideoService(m_pVideoDecFilter->m_hDevice, IID_PPV_ARGS(&pDXVA2Service));
 	CheckPointer(pDXVA2Service, E_UNEXPECTED);
 	CAutoLock lock(this);
 
@@ -137,19 +137,23 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 	}
 
 	// Allocate the surfaces.
-	D3DFORMAT m_dwFormat = m_pVideoDecFilter->m_VideoDesc.Format;
+	D3DFORMAT dwFormat = m_pVideoDecFilter->m_VideoDesc.Format;
 	if (SUCCEEDED(hr)) {
 		hr = pDXVA2Service->CreateSurface(
-				 m_pVideoDecFilter->PictWidthRounded(),
-				 m_pVideoDecFilter->PictHeightRounded(),
-				 m_lCount - 1,
-				 (D3DFORMAT)m_dwFormat,
-				 D3DPOOL_DEFAULT,
-				 0,
-				 DXVA2_VideoDecoderRenderTarget,
-				 m_ppRTSurfaceArray,
-				 NULL
+				m_pVideoDecFilter->PictWidthRounded(),
+				m_pVideoDecFilter->PictHeightRounded(),
+				m_lCount - 1,
+				dwFormat,
+				D3DPOOL_DEFAULT,
+				0,
+				DXVA2_VideoDecoderRenderTarget,
+				m_ppRTSurfaceArray,
+				NULL
 			 );
+	}
+
+	if (FAILED(hr)) {
+		DbgLog((LOG_TRACE, 3, L"CVideoDecDXVAAllocator::Alloc() : IDirectXVideoDecoderService::CreateSurface() FAILED(0x%08x)"));
 	}
 
 	if (SUCCEEDED(hr)) {
@@ -158,7 +162,7 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 		m_ppRTSurfaceArray[0]->GetDevice(&pDev);
 
 		// Important : create samples in reverse order !
-		for (m_lAllocated = m_lCount-1; m_lAllocated >= 0; m_lAllocated--) {
+		for (m_lAllocated = m_lCount - 1; m_lAllocated >= 0; m_lAllocated--) {
 			// fill the surface in black, to avoid the "green screen" in case the first frame fails to decode.
 			if (pDev) {
 				pDev->ColorFill(m_ppRTSurfaceArray[m_lAllocated], NULL, D3DCOLOR_XYUV(0, 128, 128));
@@ -181,6 +185,7 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 
 		hr = m_pVideoDecFilter->CreateDXVA2Decoder(m_lCount, m_ppRTSurfaceArray);
 		if (FAILED(hr)) {
+			DbgLog((LOG_TRACE, 3, L"CVideoDecDXVAAllocator::Alloc() : CMPCVideoDecFilter::CreateDXVA2Decoder() FAILED(0x%08x)"));
 			Free();
 		}
 	}
@@ -188,6 +193,7 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 	if (SUCCEEDED(hr)) {
 		m_bChanged = FALSE;
 	}
+
 	return hr;
 }
 

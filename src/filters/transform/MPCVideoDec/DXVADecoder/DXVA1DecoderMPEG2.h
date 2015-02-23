@@ -20,27 +20,27 @@
 
 #pragma once
 
-#include "DXVADecoder.h"
-#include <ffmpeg/libavcodec/dxva_h264.h>
+#include "DXVA1Decoder.h"
+#include <ffmpeg/libavcodec/dxva_mpeg2.h>
 
-class CDXVADecoderH264 : public CDXVADecoder
+class CDXVA1DecoderMPEG2 : public CDXVA1Decoder
 {
-public:
-	CDXVADecoderH264(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config);
-	virtual ~CDXVADecoderH264();
-
-	virtual void		Flush();
-	virtual HRESULT		CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize, UINT nDXVASize = UINT_MAX);
-	virtual HRESULT		DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-
-private:
-	DXVA_H264_Context	m_DXVA_Context;
-
-	bool				m_bUseLongSlice;
-
+	DXVA_MPEG2_Context	m_DXVA_Context;
 	UINT				m_nFieldNum;
-	UINT				StatusReportFeedbackNumber;
-	USHORT				Reserved16Bits;
 
-	void				Init();
+	WORD				m_wRefPictureIndex[2];
+	int					m_nNextCodecIndex;
+
+	void				UpdatePictureParams(int nSurfaceIndex);
+
+public:
+	CDXVA1DecoderMPEG2(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, int nPicEntryNumber);
+
+	// === Public functions
+	virtual HRESULT		DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	virtual void		CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
+	virtual void		Flush();
+
+protected :
+	virtual int			FindOldestFrame();
 };

@@ -19,48 +19,22 @@
  */
 
 #include "stdafx.h"
-#include "DXVADecoderMpeg2.h"
-#include "MPCVideoDec.h"
-#include "FfmpegContext.h"
+#include "DXVA2DecoderMPEG2.h"
+#include "../MPCVideoDec.h"
+#include "../FfmpegContext.h"
 #include <ffmpeg/libavcodec/avcodec.h>
 
-CDXVADecoderMpeg2::CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber)
-	: CDXVADecoder(pFilter, pAMVideoAccelerator, guidDecoder, nMode, nPicEntryNumber)
+CDXVA2DecoderMPEG2::CDXVA2DecoderMPEG2(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config)
+	: CDXVA2Decoder(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config, 4)
 {
-	Init();
-}
-
-CDXVADecoderMpeg2::CDXVADecoderMpeg2(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config)
-	: CDXVADecoder(pFilter, pDirectXVideoDec, guidDecoder, nMode, nPicEntryNumber, pDXVA2Config)
-{
-	Init();
-}
-
-CDXVADecoderMpeg2::~CDXVADecoderMpeg2(void)
-{
-	DbgLog((LOG_TRACE, 3, L"CDXVADecoderMpeg2::Destroy()"));
-}
-
-void CDXVADecoderMpeg2::Init()
-{
-	DbgLog((LOG_TRACE, 3, L"CDXVADecoderMpeg2::Init()"));
-
 	memset(&m_DXVA_Context, 0, sizeof(m_DXVA_Context));
-
-	switch (GetMode()) {
-		case MPEG2_VLD :
-			AllocExecuteParams(4);
-			break;
-		default :
-			ASSERT(FALSE);
-	}
 
 	FFMPEG2SetDxvaParams(m_pFilter->GetAVCtx(), &m_DXVA_Context);
 
 	Flush();
 }
 
-HRESULT CDXVADecoderMpeg2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize, UINT nDXVASize/* = UINT_MAX*/)
+HRESULT CDXVA2DecoderMPEG2::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDXVASize/* = UINT_MAX*/)
 {
 	DXVA_MPEG2_Picture_Context *ctx_pic	= &m_DXVA_Context.ctx_pic[m_nFieldNum];
 	BYTE* current						= pDXVABuffer;
@@ -95,20 +69,23 @@ HRESULT CDXVADecoderMpeg2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT&
 	return S_OK;
 }
 
-HRESULT CDXVADecoderMpeg2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
+HRESULT CDXVA2DecoderMPEG2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	HRESULT	hr			= S_FALSE;
-	bool	bIsField	= false;
 	int		got_picture	= 0;
 
+	AVFrame* pFrame;
 	memset(&m_DXVA_Context, 0, sizeof(m_DXVA_Context));
 	CHECK_HR_FALSE (FFDecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
 								  pDataIn, nSize, rtStart, rtStop,
-								  &got_picture));
+								  &got_picture, &pFrame));
 
-	if (m_nSurfaceIndex == -1 || !m_DXVA_Context.ctx_pic[0].slice_count) {
+	if (!pFrame || !m_DXVA_Context.ctx_pic[0].slice_count) {
 		return S_FALSE;
 	}
+
+	IMediaSample* pSample;
+	CHECK_HR_FALSE (GetSapleWrapperData(pFrame, &pSample, NULL, NULL));
 
 	m_pFilter->HandleKeyFrame(got_picture);
 
@@ -122,31 +99,31 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 		m_nFieldNum = i;
 		UpdatePictureParams();
 
-		CHECK_HR_FALSE (BeginFrame(m_nSurfaceIndex, m_pSampleToDeliver));
+		// Begin frame
+		CHECK_HR_FALSE (BeginFrame(pSample));
 		// Send picture parameters
 		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(DXVA_PictureParameters), &ctx_pic->pp));
-		// Add quantization matrix
+		// Send quantization matrix
 		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_InverseQuantizationMatrixBufferType, sizeof(DXVA_QmatrixData), &ctx_pic->qm));
-		// Add bitstream
+		// Send bitstream
 		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType));
-		// Add slice control
+		// Send slice control
 		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_SliceInfo) * ctx_pic->slice_count, ctx_pic->slice));
 		// Decode frame
 		CHECK_HR_FRAME (Execute());
-		CHECK_HR_FALSE (EndFrame(m_nSurfaceIndex));
+		CHECK_HR_FALSE (EndFrame());
 	}
 
 	if (got_picture) {
-		AddToStore(m_nSurfaceIndex, m_pSampleToDeliver);
 		hr = DisplayNextFrame();
 	}
 
 	return hr;
 }
 
-void CDXVADecoderMpeg2::UpdatePictureParams()
+void CDXVA2DecoderMPEG2::UpdatePictureParams()
 {
-	DXVA2_ConfigPictureDecode* cpd			= GetDXVA2Config(); // Ok for DXVA1 too (parameters have been copied)
+	DXVA2_ConfigPictureDecode* cpd			= &m_DXVA2Config;
 	DXVA_PictureParameters* DXVAPicParams	= &m_DXVA_Context.ctx_pic[m_nFieldNum].pp;
 
 	// Shall be 0 if bConfigResidDiffHost is 0 or if BPP > 8

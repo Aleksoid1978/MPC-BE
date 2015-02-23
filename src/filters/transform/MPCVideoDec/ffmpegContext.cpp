@@ -355,7 +355,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 			no_level51_support = 0;
 			max_ref_frames = 16;
 		} else if (nPCIVendor == PCIV_ATI && nIsAtiDXVACompatible) {
-			TCHAR path[MAX_PATH];
+			TCHAR path[MAX_PATH] = { 0 };
 			GetSystemDirectory(path, MAX_PATH);
 			wcscat(path, L"\\drivers\\atikmdag.sys\0");
 			unsigned __int64 f_version = GetFileVersion(path);
@@ -399,18 +399,17 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 	return Flags;
 }
 
-void FFH264SetDxvaParams(struct AVCodecContext* pAVCtx, void* DXVA_Context)
+void FFH264SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context)
 {
-	H264Context* h			= (H264Context*)pAVCtx->priv_data;
-	h->dxva_context			= DXVA_Context;
+	H264Context* h		= (H264Context*)pAVCtx->priv_data;
+	h->dxva_context		= pDXVA_Context;
 }
 
 // === VC1 functions
-void FFVC1SetDxvaParams(struct AVCodecContext* pAVCtx, void* pPicParams, void* pSliceInfo)
+void FFVC1SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context)
 {
-	VC1Context* vc1			= (VC1Context*)pAVCtx->priv_data;
-	vc1->pPictureParameters	= pPicParams;
-	vc1->pSliceInfo			= pSliceInfo;
+	VC1Context* vc1		= (VC1Context*)pAVCtx->priv_data;
+	vc1->dxva_context	= pDXVA_Context;
 }
 
 // === Mpeg2 functions
@@ -430,30 +429,31 @@ void FFMPEG2SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context)
 // === HEVC functions
 void FFHEVCSetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context)
 {
-	HEVCContext* s	= (HEVCContext*)pAVCtx->priv_data;
-	s->dxva_context	= pDXVA_Context;
+	HEVCContext* s		= (HEVCContext*)pAVCtx->priv_data;
+	s->dxva_context		= pDXVA_Context;
 }
 
 // === Common functions
 #define INVALID_TIME _I64_MIN
 HRESULT FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 					  BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop,
-					  int* got_picture, UINT* nFrameSize/* = NULL*/)
+					  int* got_picture, AVFrame** ppFrameOut)
 {
-	HRESULT	hr = E_FAIL;
+	HRESULT	hr	= E_FAIL;
 	if (pBuffer) {
-		AVPacket		avpkt;
+	
+		AVPacket avpkt;
 		av_init_packet(&avpkt);
-		avpkt.data		= pBuffer;
-		avpkt.size		= nSize;
-		avpkt.pts		= rtStart;
+		avpkt.data	= pBuffer;
+		avpkt.size	= nSize;
+		avpkt.pts	= rtStart;
 		if (rtStart != INVALID_TIME && rtStop != INVALID_TIME) {
 			avpkt.duration = (int)(rtStop - rtStart);
 		} else {
 			avpkt.duration = 0;
 		}
+		avpkt.flags	= AV_PKT_FLAG_KEY;
 
-		avpkt.flags		= AV_PKT_FLAG_KEY;
 		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, got_picture, &avpkt);
 
 #if defined(_DEBUG) && 0
@@ -464,9 +464,34 @@ HRESULT FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 			return hr;
 		}
 
-		if (nFrameSize && pAVCtx->codec_id == AV_CODEC_ID_VC1) {
-			VC1Context* vc1	= (VC1Context*)pAVCtx->priv_data;
-			*nFrameSize		= vc1->second_field_offset;
+		switch (pAVCtx->codec_id) {
+			case AV_CODEC_ID_H264:
+				{
+					H264Context* h		= (H264Context*)pAVCtx->priv_data;
+					*ppFrameOut			= &h->cur_pic.f;
+				}
+				break;
+			case AV_CODEC_ID_HEVC:
+				{
+					HEVCContext *h		= (HEVCContext*)pAVCtx->priv_data;
+					*ppFrameOut			= h->ref->frame;
+				}
+				break;
+			case AV_CODEC_ID_VC1:
+			case AV_CODEC_ID_WMV3:
+				{
+					VC1Context* v		= (VC1Context*)pAVCtx->priv_data;
+					*ppFrameOut			= v->s.current_picture_ptr->f;
+				}
+				break;
+			case AV_CODEC_ID_MPEG2VIDEO:
+				{
+					MpegEncContext *s	= (MpegEncContext*)pAVCtx->priv_data;
+					*ppFrameOut			= s->current_picture.f;
+				}
+				break;
+			default:
+				return hr;
 		}
 
 		hr = S_OK;
@@ -486,12 +511,14 @@ UINT FFGetMBCount(struct AVCodecContext* pAVCtx)
 {
 	UINT MBCount = 0;
 	switch (pAVCtx->codec_id) {
-		case AV_CODEC_ID_H264 : {
+		case AV_CODEC_ID_H264 :
+			{
 				H264Context* h		= (H264Context*)pAVCtx->priv_data;
 				MBCount				= h->mb_width * h->mb_height;
 			}
 			break;
-		case AV_CODEC_ID_MPEG2VIDEO: {
+		case AV_CODEC_ID_MPEG2VIDEO:
+			{
 				MpegEncContext* s	= (MpegEncContext*)pAVCtx->priv_data;
 				const int is_field	= s->picture_structure != PICT_FRAME;
 				MBCount				= s->mb_width * (s->mb_height >> is_field);

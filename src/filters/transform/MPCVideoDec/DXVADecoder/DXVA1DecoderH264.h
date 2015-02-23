@@ -20,41 +20,38 @@
 
 #pragma once
 
-#include "../DXVADecoder.h"
+#include "DXVA1Decoder.h"
 
-#define MAX_SLICES 32 // Also define in ffmpeg!
+#define MAX_SLICES 32	// Also define in ffmpeg!
 
-class CDXVADecoderH264_DXVA1 : public CDXVADecoder
+class CDXVA1DecoderH264 : public CDXVA1Decoder
 {
 public:
-	CDXVADecoderH264_DXVA1(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator* pAMVideoAccelerator, const GUID* guidDecoder, DXVAMode nMode, int nPicEntryNumber);
-	virtual ~CDXVADecoderH264_DXVA1();
+	CDXVA1DecoderH264(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, int nPicEntryNumber);
 
-	virtual HRESULT			DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	virtual HRESULT			CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize, UINT nDXVASize = UINT_MAX);
+	virtual HRESULT 		DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	virtual void			CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
 	virtual void			Flush();
 
 protected :
 	virtual int				FindOldestFrame();
-	virtual HRESULT			GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppSampleToDeliver, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	bool					AddToStore(int nSurfaceIndex, IMediaSample* pSample, bool bRefPicture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, bool bIsField, int nCodecSpecific);
 
 private:
 	DXVA_PicParams_H264		m_DXVAPicParams;
 	DXVA_Qmatrix_H264		m_DXVAScalingMatrix;
 	DXVA_Slice_H264_Short	m_pSliceShort[MAX_SLICES];
 	DXVA_Slice_H264_Long	m_pSliceLong[MAX_SLICES];
+	UINT					m_nMaxSlices;
 	int						m_nNALLength;
+	bool					m_bUseLongSlice;
 	int						m_nOutPOC;
 	REFERENCE_TIME			m_rtOutStart;
 
 	UINT					m_nSlices;
-	bool					m_bFlushed;
-	int						m_nFieldSurface;
 
-	bool					m_IsATIUVD;
-
-	void					Init();
+	// DXVA functions
 	void					ClearUnusedRefFrames();
-	void					RemoveRefFrame(int nSurfaceIndex);
+
+	int						m_nPictStruct;
+	bool					m_IsATIUVD;
 };
