@@ -24,6 +24,7 @@
 #include <atlpath.h>
 #include <d3d9types.h>
 #include "MiniDump.h"
+#include "PlayerYouTube.h"
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/WinAPIUtils.h"
@@ -2158,7 +2159,7 @@ void CAppSettings::CRecentFileAndURLList::Add(LPCTSTR lpszPathName)
 		return;
 	}
 
-	bool fURL = (pathName.Find(_T("://")) >= 0);
+	bool fURL = (pathName.Find(_T("://")) >= 0 || PlayerYouTubeCheck(lpszPathName));
 
 	// fully qualify the path name
 	if (!fURL) {
