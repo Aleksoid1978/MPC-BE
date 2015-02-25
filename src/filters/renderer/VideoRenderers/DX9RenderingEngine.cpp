@@ -252,7 +252,14 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 		m_RenderingPath = RENDERING_PATH_STRETCHRECT;
 	}
 	else if (settings.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
-		m_VideoBufferType = (m_bIsEVR && m_D3D9VendorId == 0x8086) ? D3DFMT_X8R8G8B8 : m_SurfaceType;
+		m_VideoBufferType = m_SurfaceType;
+		if (m_D3D9VendorId == 0x8086) {
+			if (m_bIsEVR) {
+				m_VideoBufferType = D3DFMT_X8R8G8B8;
+			} else if (m_SurfaceType == D3DFMT_A32B32G32R32F && settings.fVMRMixerMode && settings.fVMRMixerYUV) {
+				m_VideoBufferType = D3DFMT_A16B16G16R16F;
+			}
+		}
 		// TODO: show that surface in the statistics
 		for (int i = 0; i < m_nNbDXSurface; i++) {
 			if (FAILED(hr = m_pD3DDev->CreateTexture(
