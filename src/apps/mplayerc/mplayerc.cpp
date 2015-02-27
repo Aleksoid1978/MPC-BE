@@ -1970,7 +1970,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				}
 			}
 
-			if (location.GetLength() > 0 &&  PlayerYouTubeCheck(CString(location)) && CString(location) != fn) {
+			if (location.GetLength() > 0 && PlayerYouTubeCheck(CString(location)) && CString(location) != fn) {
 				if (redir) {
 					redir->AddTail(CString(location));
 				}
