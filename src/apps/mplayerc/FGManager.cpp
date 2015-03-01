@@ -89,25 +89,21 @@ public:
 
 		bool dxva_filters[VDEC_DXVA_LAST];
 		bool video_filters[VDEC_LAST];
-		bool audio_filters[ADEC_LAST];
-
 
 		AppSettings& s = AfxGetAppSettings();
 
 		memcpy(&dxva_filters, &s.DXVAFilters, sizeof(s.DXVAFilters));
 		memcpy(&video_filters, &s.VideoFilters, sizeof(s.VideoFilters));
-		memcpy(&audio_filters, &s.AudioFilters, sizeof(s.AudioFilters));
 
 		if (m_merit == MERIT64_DO_USE) {
 			memset(&dxva_filters, true, sizeof(dxva_filters));
 			memset(&video_filters, true, sizeof(video_filters));
-			memset(&audio_filters, true, sizeof(audio_filters));
 		}
 		if (m_bIsPreview) {
 			memset(&dxva_filters, false, sizeof(dxva_filters));
 			memset(&video_filters, true, sizeof(video_filters));
-			memset(&audio_filters, false, sizeof(audio_filters));
 		}
+		video_filters[VDEC_UNCOMPRESSED] = false;
 
 		for (size_t i = 0; i < VDEC_DXVA_LAST; i++) {
 			pBF->SetDXVACodec(i, dxva_filters[i]);
@@ -2542,6 +2538,27 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF = DNew CFGMPCVideoDecoderInternal(LowMerit(MPCVideoDecName));
 		m_transform.AddTail(pFGF);
 	}
+
+	pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(
+				(video[VDEC_UNCOMPRESSED] || IsPreview) ? MPCVideoConvName : LowMerit(MPCVideoConvName),
+				(video[VDEC_UNCOMPRESSED] || IsPreview) ? MERIT64_UNLIKELY : MERIT64_DO_USE); // merit of video converter must be lower than merit of video renderers
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_v210);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_V410);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_Y800);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_I420);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_Y41B);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_Y42B);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_444P);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_cyuv);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_yuv2);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_r210);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_R10g);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_R10k);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_NV12);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_YV12);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_YV16);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_YV24);
+	m_transform.AddTail(pFGF);
 
 	// Keep MPEG decoder after DXVA/ffmpeg decoder !
 	pFGF = DNew CFGFilterInternal<CMpeg2DecFilter>(

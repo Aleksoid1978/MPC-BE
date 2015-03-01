@@ -483,7 +483,13 @@ FFMPEG_CODECS ffCodecs[] = {
 	{ &MEDIASUBTYPE_cyuv, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_yuv2, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_r210, AV_CODEC_ID_R210, NULL, VDEC_UNCOMPRESSED, -1 },
+	{ &MEDIASUBTYPE_R10g, AV_CODEC_ID_R10K, NULL, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_R10k, AV_CODEC_ID_R10K, NULL, VDEC_UNCOMPRESSED, -1 },
+
+	{ &MEDIASUBTYPE_NV12, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
+	{ &MEDIASUBTYPE_YV12, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
+	{ &MEDIASUBTYPE_YV16, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
+	{ &MEDIASUBTYPE_YV24, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
 };
 
 /* Important: the order should be exactly the same as in ffCodecs[] */
@@ -770,7 +776,9 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_ump4 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_WV1F },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_wv1f },
+};
 
+const AMOVIESETUP_MEDIATYPE sudPinTypesInUncompressed[] = {
 	// QT uncompressed video
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_v210 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_V410 },
@@ -784,7 +792,13 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_cyuv }, // UYVY flipped vertically
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_yuv2 }, // modified YUY2, used in QuickTime
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_r210 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_R10g },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_R10k },
+
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_NV12 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_YV12 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_YV16 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_YV24 },
 };
 
 #pragma endregion any_constants
@@ -821,8 +835,14 @@ const AMOVIESETUP_PIN sudpPins[] = {
 	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
 };
 
+const AMOVIESETUP_PIN sudpPinsUncompressed[] = {
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesInUncompressed),  sudPinTypesInUncompressed},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
+};
+
 const AMOVIESETUP_FILTER sudFilters[] = {
-	{&__uuidof(CMPCVideoDecFilter), MPCVideoDecName, MERIT_NORMAL + 1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory}
+	{&__uuidof(CMPCVideoDecFilter), MPCVideoDecName, MERIT_NORMAL + 1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CMPCVideoDecFilter), MPCVideoConvName, MERIT_UNLIKELY, _countof(sudpPinsUncompressed), sudpPinsUncompressed, CLSID_LegacyAmFilterCategory} // merit of video converter must be lower than merit of video renderers
 };
 
 CFactoryTemplate g_Templates[] = {
@@ -943,6 +963,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 	memset(&m_DXVAFilters, false, sizeof(m_DXVAFilters));
 	memset(&m_VideoFilters, false, sizeof(m_VideoFilters));
+	m_VideoFilters[VDEC_UNCOMPRESSED] = true;
 
 	m_pCpuId = DNew CCpuId();
 
@@ -1037,9 +1058,13 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	// Check codec definition table
 	size_t nCodecs		= _countof(ffCodecs);
 	size_t nPinTypes	= _countof(sudPinTypesIn);
-	ASSERT(nCodecs == nPinTypes);
+	size_t nPinTypesUncompressed = _countof(sudPinTypesInUncompressed);
+	ASSERT(nCodecs == nPinTypes + nPinTypesUncompressed );
 	for (size_t i = 0; i < nPinTypes; i++) {
 		ASSERT(ffCodecs[i].clsMinorType == sudPinTypesIn[i].clsMinorType);
+	}
+	for (size_t i = 0; i < nPinTypesUncompressed ; i++) {
+		ASSERT(ffCodecs[nPinTypes + i].clsMinorType == sudPinTypesInUncompressed[i].clsMinorType);
 	}
 #endif
 }
@@ -1309,6 +1334,7 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 				case AV_CODEC_ID_V410 :
 				case AV_CODEC_ID_RAWVIDEO :
 				case AV_CODEC_ID_R210 :
+				case AV_CODEC_ID_R10G :
 				case AV_CODEC_ID_R10K :
 					bCodecActivated = (m_nActiveCodecs & CODEC_UNCOMPRESSED) != 0;
 					break;
@@ -1395,6 +1421,13 @@ HRESULT CMPCVideoDecFilter::CheckInputType(const CMediaType* mtIn)
 	for (size_t i = 0; i < _countof(sudPinTypesIn); i++) {
 		if ((mtIn->majortype == *sudPinTypesIn[i].clsMajorType) &&
 				(mtIn->subtype == *sudPinTypesIn[i].clsMinorType)) {
+			return S_OK;
+		}
+	}
+
+	for (size_t i = 0; i < _countof(sudPinTypesInUncompressed); i++) {
+		if ((mtIn->majortype == *sudPinTypesInUncompressed[i].clsMajorType) &&
+				(mtIn->subtype == *sudPinTypesInUncompressed[i].clsMinorType)) {
 			return S_OK;
 		}
 	}
@@ -3583,7 +3616,7 @@ void GetFormatList(CAtlList<SUPPORTED_FORMATS>& fmts)
 {
 	fmts.RemoveAll();
 
-	for (size_t i = 0; i < _countof(ffCodecs); i++) {
+	for (size_t i = 0; i < _countof(sudPinTypesIn); i++) {
 		SUPPORTED_FORMATS fmt = {sudPinTypesIn[i].clsMajorType, ffCodecs[i].clsMinorType, ffCodecs[i].FFMPEGCode, ffCodecs[i].DXVACode};
 		fmts.AddTail(fmt);
 	}
