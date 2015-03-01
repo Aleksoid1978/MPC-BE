@@ -33,6 +33,7 @@
 #include "../../../apps/mplayerc/FilterEnum.h"
 
 #define MPCVideoDecName L"MPC Video Decoder"
+#define MPCVideoConvName L"MPC Video Converter"
 
 struct AVCodec;
 struct AVCodecContext;
