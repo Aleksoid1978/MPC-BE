@@ -320,7 +320,7 @@ void CPPageAudio::OnAudioRendererChange()
 
 			if (str == m_AudioRendererDisplayNames[m_iAudioRendererType]) {
 				CComPtr<IBaseFilter> pBF;
-				HRESULT hr = pMoniker->BindToObject(NULL, NULL, __uuidof(IBaseFilter), (void**)&pBF);
+				HRESULT hr = pMoniker->BindToObject(NULL, NULL, IID_PPV_ARGS(&pBF));
 				if (SUCCEEDED(hr)) {
 					if (CComQIPtr<ISpecifyPropertyPages> pSPP = pBF) {
 						flag = TRUE;
@@ -355,17 +355,17 @@ void CPPageAudio::OnAudioRenderPropClick()
 
 			if (str == str_audio) {
 				CComPtr<IBaseFilter> pBF;
-				HRESULT hr = pMoniker->BindToObject(NULL, NULL, __uuidof(IBaseFilter), (void**)&pBF);
+				HRESULT hr = pMoniker->BindToObject(NULL, NULL, IID_PPV_ARGS(&pBF));
 				if (SUCCEEDED(hr)) {
 					ISpecifyPropertyPages *pProp = NULL;
-					hr = pBF->QueryInterface(IID_ISpecifyPropertyPages, (void **)&pProp);
+					hr = pBF->QueryInterface(IID_PPV_ARGS(&pProp));
 					if (SUCCEEDED(hr)) {
 						// Get the filter's name and IUnknown pointer.
 						FILTER_INFO FilterInfo;
 						hr = pBF->QueryFilterInfo(&FilterInfo);
 						if (SUCCEEDED(hr)) {
 							IUnknown *pFilterUnk;
-							hr = pBF->QueryInterface(IID_IUnknown, (void **)&pFilterUnk);
+							hr = pBF->QueryInterface(IID_PPV_ARGS(&pFilterUnk));
 							if (SUCCEEDED(hr)) {
 
 								// Show the page.

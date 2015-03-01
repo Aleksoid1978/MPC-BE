@@ -12389,14 +12389,14 @@ void CMainFrame::OpenCustomizeGraph()
 		m_pGB->AddFilter(m_pRefClock, name);
 
 		CComPtr<IReferenceClock> refClock;
-		m_pRefClock->QueryInterface(IID_IReferenceClock, reinterpret_cast<void**>(&refClock));
+		m_pRefClock->QueryInterface(IID_PPV_ARGS(&refClock));
 		CComPtr<IMediaFilter> mediaFilter;
-		m_pGB->QueryInterface(IID_IMediaFilter, reinterpret_cast<void**>(&mediaFilter));
+		m_pGB->QueryInterface(IID_PPV_ARGS(&mediaFilter));
 		mediaFilter->SetSyncSource(refClock);
 		mediaFilter = NULL;
 		refClock = NULL;
 
-		m_pRefClock->QueryInterface(IID_ISyncClock, reinterpret_cast<void**>(&m_pSyncClock));
+		m_pRefClock->QueryInterface(IID_PPV_ARGS(&m_pSyncClock));
 
 		CComQIPtr<ISyncClockAdviser> pAdviser = m_pCAP;
 		if (pAdviser) {
@@ -13681,18 +13681,18 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		m_pCAP2	= NULL;
 		m_pCAP	= NULL;
 
-		m_pGB->FindInterface(__uuidof(ISubPicAllocatorPresenter),  (void**)&m_pCAP,    TRUE);
-		m_pGB->FindInterface(__uuidof(ISubPicAllocatorPresenter2), (void**)&m_pCAP2,   TRUE);
-		m_pGB->FindInterface(__uuidof(IVMRMixerControl9),          (void**)&m_pVMRMC9, TRUE);
-		m_pGB->FindInterface(__uuidof(IVMRMixerBitmap9),           (void**)&pVMB,      TRUE);
-		m_pGB->FindInterface(__uuidof(IMFVideoMixerBitmap),        (void**)&pMFVMB,    TRUE);
+		m_pGB->FindInterface(IID_PPV_ARGS(&m_pCAP), TRUE);
+		m_pGB->FindInterface(IID_PPV_ARGS(&m_pCAP2), TRUE);
+		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRMC9), TRUE);
+		m_pGB->FindInterface(IID_PPV_ARGS(&pVMB), TRUE);
+		m_pGB->FindInterface(IID_PPV_ARGS(&pMFVMB), TRUE);
 		pMVTO = m_pCAP;
 
 		SetupVMR9ColorControl();
 
 		// === EVR !
-		m_pGB->FindInterface(__uuidof(IMFVideoDisplayControl), (void**)&m_pMFVDC, TRUE);
-		m_pGB->FindInterface(__uuidof(IMFVideoProcessor),      (void**)&m_pMFVP,  TRUE);
+		m_pGB->FindInterface(IID_PPV_ARGS(&m_pMFVDC), TRUE);
+		m_pGB->FindInterface(IID_PPV_ARGS(&m_pMFVP), TRUE);
 		if (m_pMFVDC) {
 			RECT Rect;
 			::GetClientRect (m_pVideoWnd->m_hWnd, &Rect);
@@ -13701,8 +13701,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		}
 
 		if (m_bUseSmartSeek && m_wndPreView) {
-			m_pGB_preview->FindInterface(__uuidof(IMFVideoDisplayControl), (void**)&m_pMFVDC_preview, TRUE);
-			m_pGB_preview->FindInterface(__uuidof(IMFVideoProcessor),      (void**)&m_pMFVP_preview,  TRUE);
+			m_pGB_preview->FindInterface(IID_PPV_ARGS(&m_pMFVDC_preview), TRUE);
+			m_pGB_preview->FindInterface(IID_PPV_ARGS(&m_pMFVP_preview), TRUE);
 
 			if (m_pMFVDC_preview) {
 				RECT Rect2;
@@ -16546,8 +16546,8 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 			m_pCAP = NULL;
 			m_pCAP2 = NULL;
 			m_pGB->Render(pVidPrevPin);
-			m_pGB->FindInterface(__uuidof(ISubPicAllocatorPresenter),  (void**)&m_pCAP,  TRUE);
-			m_pGB->FindInterface(__uuidof(ISubPicAllocatorPresenter2), (void**)&m_pCAP2, TRUE);
+			m_pGB->FindInterface(IID_PPV_ARGS(&m_pCAP), TRUE);
+			m_pGB->FindInterface(IID_PPV_ARGS(&m_pCAP2), TRUE);
 		}
 
 		if (fVidCap) {

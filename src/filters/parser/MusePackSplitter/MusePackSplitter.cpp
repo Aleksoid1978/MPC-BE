@@ -766,7 +766,7 @@ HRESULT CMusePackInputPin::CompleteConnect(IPin *pReceivePin)
 	if (reader) reader->Release(); reader = NULL;
 
 	// and make sure it supports IAsyncReader
-	HRESULT hr = pReceivePin->QueryInterface(IID_IAsyncReader, (void **)&reader);
+	HRESULT hr = pReceivePin->QueryInterface(IID_PPV_ARGS(&reader));
 	if (FAILED(hr)) {
 		return hr;
 	}

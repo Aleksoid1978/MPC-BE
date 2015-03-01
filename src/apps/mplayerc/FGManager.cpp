@@ -975,46 +975,22 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 			}
 
 			if (!m_bIsPreview && !pMadVRAllocatorPresenter) {
-				if (CComQIPtr<IMFGetService, &__uuidof(IMFGetService)> pMFGS = pBF) {
+				if (CComQIPtr<IMFGetService> pMFGS = pBF) {
 					// hook IDirectXVideoDecoderService to get DXVA status & logging;
 					// why before ConnectFilterDirect() - some decoder, like ArcSoft & Cyberlink, init DXVA2 decoder while connect to the renderer ...
 					// madVR crash on call ::GetService() before connect
 					CComPtr<IDirectXVideoDecoderService>	pDecoderService;
-					CComPtr<IMFGetService>					pGetService;
 					CComPtr<IDirect3DDeviceManager9>		pDeviceManager;
 					HANDLE									hDevice = INVALID_HANDLE_VALUE;
 
-					// Query the pin for IMFGetService.
-					hr = pMFGS->QueryInterface(__uuidof(IMFGetService), (void**)&pGetService);
-
-					// Get the Direct3D device manager.
-					if (SUCCEEDED(hr)) {
-						hr = pGetService->GetService(
-									MR_VIDEO_ACCELERATION_SERVICE,
-									__uuidof(IDirect3DDeviceManager9),
-									reinterpret_cast<void**>(&pDeviceManager));
-					}
-
-					// Open a new device handle.
-					if (SUCCEEDED(hr)) {
-						hr = pDeviceManager->OpenDeviceHandle(&hDevice);
-					}
-
-					// Get the video decoder service.
-					if (SUCCEEDED(hr)) {
-						hr = pDeviceManager->GetVideoService(
-									hDevice,
-									__uuidof(IDirectXVideoDecoderService),
-									reinterpret_cast<void**>(&pDecoderService));
-					}
-
-					if (SUCCEEDED(hr)) {
+					if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_PPV_ARGS(&pDeviceManager)))
+							&& SUCCEEDED(pDeviceManager->OpenDeviceHandle(&hDevice))
+							&& SUCCEEDED(pDeviceManager->GetVideoService(hDevice, IID_PPV_ARGS(&pDecoderService)))) {
 						HookDirectXVideoDecoderService(pDecoderService);
-					}
-
-					if (hDevice != INVALID_HANDLE_VALUE) {
 						pDeviceManager->CloseDeviceHandle(hDevice);
 					}
+					pDeviceManager.Release();
+					pDecoderService.Release();
 				}
 			}
 
@@ -1050,75 +1026,46 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 					}
 
 					if (CComQIPtr<IVMRMixerControl9> pVMRMC9 = pBF) {
-						m_pUnks.AddTail (pVMRMC9);
+						m_pUnks.AddTail(pVMRMC9);
 					}
 
 					if (CComQIPtr<IVMRMixerBitmap9> pMB = pBF) {
-						m_pUnks.AddTail (pMB);
+						m_pUnks.AddTail(pMB);
 					}
 
-					if (CComQIPtr<IMFGetService, &__uuidof(IMFGetService)> pMFGS = pBF) {
+					if (CComQIPtr<IMFGetService> pMFGS = pBF) {
 						CComPtr<IMFVideoDisplayControl>	pMFVDC;
 						CComPtr<IMFVideoMixerBitmap>	pMFMB;
 						CComPtr<IMFVideoProcessor>		pMFVP;
 
-						if (SUCCEEDED (pMFGS->GetService (MR_VIDEO_RENDER_SERVICE, IID_IMFVideoDisplayControl, (void**)&pMFVDC))) {
-							m_pUnks.AddTail (pMFVDC);
+						if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_RENDER_SERVICE, IID_PPV_ARGS(&pMFVDC)))) {
+							m_pUnks.AddTail(pMFVDC);
 						}
 
-						if (SUCCEEDED (pMFGS->GetService (MR_VIDEO_MIXER_SERVICE, IID_IMFVideoMixerBitmap, (void**)&pMFMB))) {
-							m_pUnks.AddTail (pMFMB);
+						if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_MIXER_SERVICE, IID_PPV_ARGS(&pMFMB)))) {
+							m_pUnks.AddTail(pMFMB);
 						}
 
-						if (SUCCEEDED (pMFGS->GetService (MR_VIDEO_MIXER_SERVICE, IID_IMFVideoProcessor, (void**)&pMFVP))) {
-							m_pUnks.AddTail (pMFVP);
+						if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_MIXER_SERVICE, IID_PPV_ARGS(&pMFVP)))) {
+							m_pUnks.AddTail(pMFVP);
 						}
-
-						//	CComPtr<IMFWorkQueueServices>		pMFWQS;
-						//	pMFGS->GetService (MF_WORKQUEUE_SERVICES, IID_IMFWorkQueueServices, (void**)&pMFWQS);
-						//	pMFWQS->BeginRegisterPlatformWorkQueueWithMMCSS(
 
 						if (!m_bIsPreview && pMadVRAllocatorPresenter) {
 							// hook IDirectXVideoDecoderService to get DXVA status & logging;
 							// madVR crash on call ::GetService() before connect - so set Hook after ConnectFilterDirect()
 							CComPtr<IDirectXVideoDecoderService>	pDecoderService;
-							CComPtr<IMFGetService>					pGetService;
 							CComPtr<IDirect3DDeviceManager9>		pDeviceManager;
 							HANDLE									hDevice = INVALID_HANDLE_VALUE;
 
-							// Query the pin for IMFGetService.
-							hr = pMFGS->QueryInterface(__uuidof(IMFGetService), (void**)&pGetService);
-
-							// Get the Direct3D device manager.
-							if (SUCCEEDED(hr)) {
-								hr = pGetService->GetService(
-											MR_VIDEO_ACCELERATION_SERVICE,
-											__uuidof(IDirect3DDeviceManager9),
-											reinterpret_cast<void**>(&pDeviceManager));
-							}
-
-							// Open a new device handle.
-							if (SUCCEEDED(hr)) {
-								hr = pDeviceManager->OpenDeviceHandle(&hDevice);
-							}
-
-							// Get the video decoder service.
-							if (SUCCEEDED(hr)) {
-								hr = pDeviceManager->GetVideoService(
-											hDevice,
-											__uuidof(IDirectXVideoDecoderService),
-											reinterpret_cast<void**>(&pDecoderService));
-							}
-
-							if (SUCCEEDED(hr)) {
+							if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_PPV_ARGS(&pDeviceManager)))
+									&& SUCCEEDED(pDeviceManager->OpenDeviceHandle(&hDevice))
+									&& SUCCEEDED(pDeviceManager->GetVideoService(hDevice, IID_PPV_ARGS(&pDecoderService)))) {
 								HookDirectXVideoDecoderService(pDecoderService);
-							}
-
-							if (hDevice != INVALID_HANDLE_VALUE) {
 								pDeviceManager->CloseDeviceHandle(hDevice);
 							}
+							pDeviceManager.Release();
+							pDecoderService.Release();
 						}
-
 					}
 
 					DbgLog((LOG_TRACE, 3, L"FGM: '%s' Successfully connected", pFGF->GetName()));
