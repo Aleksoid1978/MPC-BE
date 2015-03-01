@@ -167,24 +167,30 @@ static HRESULT(STDMETHODCALLTYPE* ReceiveConnectionOrg)(IPinC* This, /* [in] */ 
 
 static HRESULT STDMETHODCALLTYPE ReceiveConnectionMine(IPinC* This, /* [in] */ IPinC* pConnector, /* [in] */ const AM_MEDIA_TYPE* pmt)
 {
-	// Force the renderer to always reject the P010 pixel format
-	if (pmt && pmt->subtype == MEDIASUBTYPE_P010) {
-		if (pmt->pbFormat) {
-			VIDEOINFOHEADER2& vih2 = *(VIDEOINFOHEADER2*)pmt->pbFormat;
-			BITMAPINFOHEADER* bih = &vih2.bmiHeader;
-			switch (bih->biCompression) {
-				case FCC('dxva'):
-				case FCC('DXVA'):
-				case FCC('DxVA'):
-				case FCC('DXvA'):
-					return ReceiveConnectionOrg(This, pConnector, pmt);
+	if (pmt) {
+		// Force the renderer to always reject the P010(except the DXVA) and P016 pixel format
+		if (pmt->subtype == MEDIASUBTYPE_P010) {
+			if (pmt->pbFormat) {
+				VIDEOINFOHEADER2& vih2 = *(VIDEOINFOHEADER2*)pmt->pbFormat;
+				BITMAPINFOHEADER* bih = &vih2.bmiHeader;
+				switch (bih->biCompression) {
+					case FCC('dxva'):
+					case FCC('DXVA'):
+					case FCC('DxVA'):
+					case FCC('DXvA'):
+						return ReceiveConnectionOrg(This, pConnector, pmt);
+				}
 			}
+
+			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
 
-		return VFW_E_TYPE_NOT_ACCEPTED;
-	} else {
-		return ReceiveConnectionOrg(This, pConnector, pmt);
+		if (pmt->subtype == MEDIASUBTYPE_P016) {
+			return VFW_E_TYPE_NOT_ACCEPTED;
+		}
 	}
+
+	return ReceiveConnectionOrg(This, pConnector, pmt);
 }
 
 static HRESULT(STDMETHODCALLTYPE* ReceiveOrg)(IMemInputPinC * This, IMediaSample *pSample) = NULL;
