@@ -262,7 +262,7 @@ HRESULT WINAPI Mine_CoCreateInstance(IN REFCLSID rclsid, IN LPUNKNOWN pUnkOuter,
 			CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)pMK;
 			CComPtr<IUnknown> pInner;
 			HRESULT hr;
-			if (SUCCEEDED(hr = Real_CoCreateInstance(rclsid, pUnk, dwClsContext, __uuidof(IUnknown), (void**)&pInner))) {
+			if (SUCCEEDED(hr = Real_CoCreateInstance(rclsid, pUnk, dwClsContext, IID_PPV_ARGS(&pInner)))) {
 				pMK->SetInner(pInner);
 				return pUnk->QueryInterface(riid, ppv);
 			}
@@ -562,9 +562,7 @@ CFilterMapper2::CFilterMapper2(bool fRefCounted, bool fAllowUnreg, LPUNKNOWN pUn
 
 	Init();
 
-	HRESULT hr = Real_CoCreateInstance(
-					 CLSID_FilterMapper2, (IUnknown*)(INonDelegatingUnknown*)this, CLSCTX_ALL,
-					 __uuidof(IUnknown), (void**)&m_pFM2);
+	HRESULT hr = Real_CoCreateInstance(CLSID_FilterMapper2, (IUnknown*)(INonDelegatingUnknown*)this, CLSCTX_ALL, IID_PPV_ARGS(&m_pFM2));
 	if (FAILED(hr) || !m_pFM2) {
 		ASSERT(0);
 		return;

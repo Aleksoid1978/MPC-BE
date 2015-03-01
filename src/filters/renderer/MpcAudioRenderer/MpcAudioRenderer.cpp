@@ -2325,7 +2325,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCh
 	EXIT_ON_ERROR(hr);
 
 	// enables a client to write output data to a rendering endpoint buffer
-	hr = m_pAudioClient->GetService(__uuidof(IAudioRenderClient), (void**)(&m_pRenderClient));
+	hr = m_pAudioClient->GetService(IID_PPV_ARGS(&m_pRenderClient));
 
 	if (FAILED(hr)) {
 		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::InitAudioClient() - service initialization FAILED(0x%08x)", hr));

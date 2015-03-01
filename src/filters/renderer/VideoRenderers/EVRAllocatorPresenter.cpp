@@ -303,10 +303,10 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 			break;
 		}
 
-		hr = pMFGS->GetService(MR_VIDEO_RENDER_SERVICE, IID_IMFVideoRenderer, (void**)&pMFVR);
+		hr = pMFGS->GetService(MR_VIDEO_RENDER_SERVICE, IID_PPV_ARGS(&pMFVR));
 
 		if (SUCCEEDED(hr)) {
-			hr = QueryInterface(__uuidof(IMFVideoPresenter), (void**)&pVP);
+			hr = QueryInterface(IID_PPV_ARGS(&pVP));
 		}
 		if (SUCCEEDED(hr)) {
 			hr = pMFVR->InitializeRenderer(NULL, pVP);

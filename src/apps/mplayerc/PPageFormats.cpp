@@ -61,8 +61,7 @@ CPPageFormats::CPPageFormats()
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 									  NULL,
 									  CLSCTX_INPROC,
-									  __uuidof(IApplicationAssociationRegistration),
-									  (void**)&m_pAAR);
+									  IID_PPV_ARGS(&m_pAAR));
 		UNREFERENCED_PARAMETER(hr);
 	}
 }
@@ -127,8 +126,7 @@ bool CPPageFormats::IsRegistered(CString ext)
 		hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 							  NULL,
 							  CLSCTX_INPROC,
-							  __uuidof(IApplicationAssociationRegistration),
-							  (void**)&m_pAAR);
+							  IID_PPV_ARGS(&m_pAAR));
 	}
 
 	if (m_pAAR) {
@@ -195,8 +193,7 @@ bool CPPageFormats::RegisterApp()
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 									  NULL,
 									  CLSCTX_INPROC,
-									  __uuidof(IApplicationAssociationRegistration),
-									  (void**)&m_pAAR);
+									  IID_PPV_ARGS(&m_pAAR));
 		UNREFERENCED_PARAMETER(hr);
 	}
 
@@ -368,8 +365,7 @@ HRESULT CPPageFormats::RegisterUI()
 	HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI,
 					NULL,
 					CLSCTX_INPROC,
-					__uuidof(IApplicationAssociationRegistrationUI),
-					(void **)&pUI);
+					IID_PPV_ARGS(&pUI));
 
 	if (SUCCEEDED(hr) && pUI) {
 		hr = pUI->LaunchAdvancedAssociationUI(CPPageFormats::GetRegisteredAppName());
@@ -710,8 +706,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 									  NULL,
 									  CLSCTX_INPROC,
-									  __uuidof(IApplicationAssociationRegistration),
-									  (void**)&m_pAAR);
+									  IID_PPV_ARGS(&m_pAAR));
 		UNREFERENCED_PARAMETER(hr);
 	}
 
