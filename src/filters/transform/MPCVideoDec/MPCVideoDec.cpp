@@ -485,6 +485,11 @@ FFMPEG_CODECS ffCodecs[] = {
 	{ &MEDIASUBTYPE_cyuv, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_yuv2, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
 
+	{ &MEDIASUBTYPE_YVU9, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
+	{ &MEDIASUBTYPE_IYUV, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
+	{ &MEDIASUBTYPE_UYVY, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
+	{ &MEDIASUBTYPE_YUY2, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
+
 	{ &MEDIASUBTYPE_NV12, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_YV12, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_YV16, AV_CODEC_ID_RAWVIDEO, NULL, VDEC_UNCOMPRESSED, -1 },
@@ -793,6 +798,11 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesInUncompressed[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_cyuv }, // UYVY flipped vertically
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_yuv2 }, // modified YUY2, used in QuickTime
 
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_YVU9 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_IYUV },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_UYVY },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_YUY2 },
+
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_NV12 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_YV12 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_YV16 },
@@ -840,7 +850,8 @@ const AMOVIESETUP_PIN sudpPinsUncompressed[] = {
 
 const AMOVIESETUP_FILTER sudFilters[] = {
 	{&__uuidof(CMPCVideoDecFilter), MPCVideoDecName, MERIT_NORMAL + 1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CMPCVideoDecFilter), MPCVideoConvName, MERIT_UNLIKELY, _countof(sudpPinsUncompressed), sudpPinsUncompressed, CLSID_LegacyAmFilterCategory} // merit of video converter must be lower than merit of video renderers
+	{&__uuidof(CMPCVideoDecFilter), MPCVideoConvName, MERIT_NORMAL + 1, _countof(sudpPinsUncompressed), sudpPinsUncompressed, CLSID_LegacyAmFilterCategory}
+	// merit of video converter must be lower than merit of video renderers
 };
 
 CFactoryTemplate g_Templates[] = {
