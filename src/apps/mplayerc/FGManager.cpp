@@ -2488,7 +2488,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	pFGF = DNew CFGFilterInternal<CMPCVideoDecFilter>(
 				(video[VDEC_UNCOMPRESSED] || IsPreview) ? MPCVideoConvName : LowMerit(MPCVideoConvName),
-				(video[VDEC_UNCOMPRESSED] || IsPreview) ? MERIT64_UNLIKELY : MERIT64_DO_USE); // merit of video converter must be lower than merit of video renderers
+				(video[VDEC_UNCOMPRESSED] || IsPreview) ? MERIT64_NORMAL + 1 : MERIT64_DO_USE); // merit of video converter must be lower than merit of video renderers
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_v210);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_V410);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_r210);
@@ -2501,6 +2501,10 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_444P);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_cyuv);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_yuv2);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_YVU9);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_IYUV);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_UYVY);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_YUY2);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_NV12);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_YV12);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_YV16);
