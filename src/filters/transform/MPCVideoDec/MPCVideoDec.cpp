@@ -848,14 +848,17 @@ const AMOVIESETUP_PIN sudpPinsUncompressed[] = {
 	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
 };
 
+CLSID Converter_clsID = GUIDFromCString(L"{0B7FA55E-FA38-4671-A2F2-B8F300C955C4}");
+
 const AMOVIESETUP_FILTER sudFilters[] = {
 	{&__uuidof(CMPCVideoDecFilter), MPCVideoDecName, MERIT_NORMAL + 1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CMPCVideoDecFilter), MPCVideoConvName, MERIT_NORMAL + 1, _countof(sudpPinsUncompressed), sudpPinsUncompressed, CLSID_LegacyAmFilterCategory}
+	{&Converter_clsID, MPCVideoConvName, MERIT_NORMAL + 1, _countof(sudpPinsUncompressed), sudpPinsUncompressed, CLSID_LegacyAmFilterCategory}
 	// merit of video converter must be lower than merit of video renderers
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilters[0].strName, &__uuidof(CMPCVideoDecFilter), CreateInstance<CMPCVideoDecFilter>, NULL, &sudFilters[0]},
+	{sudFilters[0].strName, sudFilters[0].clsID, CreateInstance<CMPCVideoDecFilter>, NULL, &sudFilters[0]},
+	{sudFilters[1].strName, sudFilters[1].clsID, CreateInstance<CMPCVideoDecFilter>, NULL, &sudFilters[1]},
 	{L"CMPCVideoDecPropertyPage", &__uuidof(CMPCVideoDecSettingsWnd), CreateInstance<CInternalPropertyPageTempl<CMPCVideoDecSettingsWnd> >},
 	{L"CMPCVideoDecPropertyPage2", &__uuidof(CMPCVideoDecCodecWnd), CreateInstance<CInternalPropertyPageTempl<CMPCVideoDecCodecWnd> >},
 };
