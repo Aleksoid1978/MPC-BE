@@ -173,6 +173,8 @@ HRESULT CDX7AllocatorPresenter::CreateDevice()
 		return DDERR_INVALIDMODE;
 	}
 
+	m_refreshRate = ddsd.dwRefreshRate;
+
 	// HACK: This fixes an issue when multiple display is connected, and
 	// primary display has lower resolution than secondary one.
 	// 2048 -- it's a max surface size for DD.

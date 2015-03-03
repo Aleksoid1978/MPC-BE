@@ -45,7 +45,6 @@ using namespace DSObjects;
 
 CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error)
 	: CDX9RenderingEngine(hWnd, hr, &_Error)
-	, m_RefreshRate(0)
 	, m_nTearingPos(0)
 	, m_nVMR9Surfaces(0)
 	, m_iVMR9Surface(0)
@@ -579,7 +578,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 			DisplayMode.Format = m_pp.BackBufferFormat;
 			m_ScreenSize.SetSize(DisplayMode.Width, DisplayMode.Height);
-			m_pp.FullScreen_RefreshRateInHz = m_RefreshRate = DisplayMode.RefreshRate;
+			m_pp.FullScreen_RefreshRateInHz = m_refreshRate = DisplayMode.RefreshRate;
 			m_pp.BackBufferWidth = m_ScreenSize.cx;
 			m_pp.BackBufferHeight = m_ScreenSize.cy;
 
@@ -603,7 +602,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			m_pD3D->GetAdapterDisplayMode(m_CurrentAdapter, &d3ddm);
 			d3ddm.Format = m_pp.BackBufferFormat;
 			m_ScreenSize.SetSize(d3ddm.Width, d3ddm.Height);
-			m_pp.FullScreen_RefreshRateInHz = m_RefreshRate = d3ddm.RefreshRate;
+			m_pp.FullScreen_RefreshRateInHz = m_refreshRate = d3ddm.RefreshRate;
 			m_pp.BackBufferWidth = m_ScreenSize.cx;
 			m_pp.BackBufferHeight = m_ScreenSize.cy;
 
@@ -628,7 +627,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		if (m_pD3DEx) {
 			m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &DisplayMode, NULL);
 			m_ScreenSize.SetSize(DisplayMode.Width, DisplayMode.Height);
-			m_RefreshRate = DisplayMode.RefreshRate;
+			m_refreshRate = DisplayMode.RefreshRate;
 			m_pp.BackBufferWidth = m_ScreenSize.cx;
 			m_pp.BackBufferHeight = m_ScreenSize.cy;
 
@@ -646,7 +645,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		if (!m_pD3DDev) {
 			m_pD3D->GetAdapterDisplayMode(m_CurrentAdapter, &d3ddm);
 			m_ScreenSize.SetSize(d3ddm.Width, d3ddm.Height);
-			m_RefreshRate = d3ddm.RefreshRate;
+			m_refreshRate = d3ddm.RefreshRate;
 			m_pp.BackBufferWidth = m_ScreenSize.cx;
 			m_pp.BackBufferHeight = m_ScreenSize.cy;
 
@@ -1627,7 +1626,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 
 			DisplayMode.Format = m_pp.BackBufferFormat;
 			m_ScreenSize.SetSize(DisplayMode.Width, DisplayMode.Height);
-			m_pp.FullScreen_RefreshRateInHz = m_RefreshRate = DisplayMode.RefreshRate;
+			m_pp.FullScreen_RefreshRateInHz = m_refreshRate = DisplayMode.RefreshRate;
 			m_pp.BackBufferWidth = m_ScreenSize.cx;
 			m_pp.BackBufferHeight = m_ScreenSize.cy;
 
@@ -1636,7 +1635,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 			m_pD3D->GetAdapterDisplayMode(m_CurrentAdapter, &d3ddm);
 			d3ddm.Format = m_pp.BackBufferFormat;
 			m_ScreenSize.SetSize(d3ddm.Width, d3ddm.Height);
-			m_pp.FullScreen_RefreshRateInHz = m_RefreshRate = d3ddm.RefreshRate;
+			m_pp.FullScreen_RefreshRateInHz = m_refreshRate = d3ddm.RefreshRate;
 			m_pp.BackBufferWidth = m_ScreenSize.cx;
 			m_pp.BackBufferHeight = m_ScreenSize.cy;
 
@@ -1646,7 +1645,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 		if (m_pD3DEx) {
 			m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &DisplayMode, NULL);
 			m_ScreenSize.SetSize(DisplayMode.Width, DisplayMode.Height);
-			m_RefreshRate = DisplayMode.RefreshRate;
+			m_refreshRate = DisplayMode.RefreshRate;
 			m_pp.BackBufferWidth = m_ScreenSize.cx;
 			m_pp.BackBufferHeight = m_ScreenSize.cy;
 
@@ -1654,7 +1653,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 		} else {
 			m_pD3D->GetAdapterDisplayMode(m_CurrentAdapter, &d3ddm);
 			m_ScreenSize.SetSize(d3ddm.Width, d3ddm.Height);
-			m_RefreshRate = d3ddm.RefreshRate;
+			m_refreshRate = d3ddm.RefreshRate;
 			m_pp.BackBufferWidth = m_ScreenSize.cx;
 			m_pp.BackBufferHeight = m_ScreenSize.cy;
 
@@ -1908,7 +1907,12 @@ void CDX9AllocatorPresenter::DrawStats()
 			OffsetRect(&rc, 0, TextHeight);
 
 			if (m_bIsEVR) {
-				strText.Format(L"Refresh rate : %.05f Hz    SL: %4d     (%3d Hz)      Last Duration: %10.6f      Corrected Frame Time: %s", m_DetectedRefreshRate, int(m_DetectedScanlinesPerFrame + 0.5), m_RefreshRate, double(m_LastFrameDuration)/10000.0, m_bCorrectedFrameTime?L"Yes":L"No");
+				if (s.m_AdvRendSets.iVMR9VSync) {
+					strText.Format(L"Refresh rate : %.05f Hz    SL: %4d     (%3u Hz)      ", m_DetectedRefreshRate, int(m_DetectedScanlinesPerFrame + 0.5), m_refreshRate);
+				} else {
+					strText.Format(L"Refresh rate : %3u Hz      ", m_refreshRate);
+				}
+				strText.AppendFormat(L"Last Duration: %10.6f      Corrected Frame Time: %s", double(m_LastFrameDuration) / 10000.0, m_bCorrectedFrameTime ? L"Yes" : L"No");
 				DrawText(rc, strText, 1);
 				OffsetRect(&rc, 0, TextHeight);
 			}

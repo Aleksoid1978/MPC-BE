@@ -43,7 +43,6 @@ namespace DSObjects
 		void					UpdateAlphaBitmap();
 
 	protected:
-		UINT	m_RefreshRate;
 		bool	m_bAlternativeVSync;
 		bool	m_bCompositionEnabled;
 		int		m_OrderedPaint;
@@ -201,7 +200,7 @@ namespace DSObjects
 			if (m_DetectedRefreshRate) {
 				return m_DetectedRefreshRate;
 			}
-			return m_RefreshRate;
+			return m_refreshRate;
 		}
 
 		LONG GetScanLines() {
