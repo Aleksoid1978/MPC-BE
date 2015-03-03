@@ -2389,29 +2389,26 @@ STDMETHODIMP CSyncAP::CreateRenderer(IUnknown** ppRenderer)
 		}
 
 		// Set EVR custom presenter
-		CComPtr<IMFVideoPresenter> pVP;
-		CComPtr<IMFVideoRenderer> pMFVR;
-		CComQIPtr<IMFGetService, &__uuidof(IMFGetService)> pMFGS = pBF;
-		CComQIPtr<IEVRFilterConfig> pConfig = pBF;
+		CComPtr<IMFVideoPresenter>	pVP;
+		CComPtr<IMFVideoRenderer>	pMFVR;
+		CComQIPtr<IMFGetService>	pMFGS	= pBF;
+		CComQIPtr<IEVRFilterConfig> pConfig	= pBF;
 
 		if (FAILED(pConfig->SetNumberOfStreams(3))) { // TODO - maybe need other number of input stream ...
 			DbgLog((LOG_TRACE, 3, L"IEVRFilterConfig->SetNumberOfStreams(3) fail"));
 			break;
 		}
 
-		hr = pMFGS->GetService (MR_VIDEO_RENDER_SERVICE, IID_IMFVideoRenderer, (void**)&pMFVR);
-
+		hr = pMFGS->GetService(MR_VIDEO_RENDER_SERVICE, IID_PPV_ARGS(&pMFVR));
 		if (SUCCEEDED(hr)) {
-			hr = QueryInterface(__uuidof(IMFVideoPresenter), (void**)&pVP);
+			hr = QueryInterface(IID_PPV_ARGS(&pVP));
 		}
 		if (SUCCEEDED(hr)) {
 			hr = pMFVR->InitializeRenderer(NULL, pVP);
 		}
 
-		CComPtr<IPin> pPin = GetFirstPin(pBF);
-		CComQIPtr<IMemInputPin> pMemInputPin = pPin;
+		m_bUseInternalTimer = HookNewSegmentAndReceive(GetFirstPin(pBF));
 
-		m_bUseInternalTimer = HookNewSegmentAndReceive((IPinC*)(IPin*)pPin, (IMemInputPinC*)(IMemInputPin*)pMemInputPin);
 		if (FAILED(hr)) {
 			*ppRenderer = NULL;
 		} else {

@@ -99,10 +99,6 @@ STDMETHODIMP CVMR9AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	pMK->SetInner((IUnknown*)(INonDelegatingUnknown*)pOuter);
 	CComQIPtr<IBaseFilter> pBF = pUnk;
 
-	CComPtr<IPin> pPin = GetFirstPin(pBF);
-	CComQIPtr<IMemInputPin> pMemInputPin = pPin;
-	m_fUseInternalTimer = HookNewSegmentAndReceive((IPinC*)(IPin*)pPin, (IMemInputPinC*)(IMemInputPin*)pMemInputPin);
-
 	CComQIPtr<IVMRFilterConfig9> pConfig = pBF;
 	if (!pConfig) {
 		return E_FAIL;
@@ -123,6 +119,8 @@ STDMETHODIMP CVMR9AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 			|| FAILED(hr = AdviseNotify(pSAN))) {
 		return hr;
 	}
+
+	m_fUseInternalTimer = HookNewSegmentAndReceive(GetFirstPin(pBF));
 
 	*ppRenderer = (IUnknown*)pBF.Detach();
 
