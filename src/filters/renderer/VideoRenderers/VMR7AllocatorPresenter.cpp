@@ -122,9 +122,7 @@ STDMETHODIMP CVMR7AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		return hr;
 	}
 
-	CComPtr<IPin> pPin = GetFirstPin(pBF);
-	CComQIPtr<IMemInputPin> pMemInputPin = pPin;
-	m_fUseInternalTimer = HookNewSegmentAndReceive((IPinC*)(IPin*)pPin, (IMemInputPinC*)(IMemInputPin*)pMemInputPin);
+	m_fUseInternalTimer = HookNewSegmentAndReceive(GetFirstPin(pBF));
 
 	*ppRenderer = (IUnknown*)pBF.Detach();
 

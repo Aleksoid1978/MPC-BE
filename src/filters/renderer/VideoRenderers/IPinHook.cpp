@@ -42,16 +42,15 @@
 #define LOG_FILE_BITSTREAM  _T("bitstream.log")
 #endif
 
-REFERENCE_TIME		g_tSegmentStart		= 0;
-REFERENCE_TIME		g_tSampleStart		= 0;
 GUID				g_guidDXVADecoder	= GUID_NULL;
 int					g_nDXVAVersion		= 0;
 
 IPinCVtbl*			g_pPinCVtbl			= NULL;
 IMemInputPinCVtbl*	g_pMemInputPinCVtbl = NULL;
+IPinC*				g_pPinC				= NULL;
 
-// Aleksoid : validate Pin
-IPinC*				g_pPin				= NULL;
+REFERENCE_TIME		g_tSegmentStart		= 0;
+REFERENCE_TIME		g_tSampleStart		= 0;
 
 volatile BOOL		g_bGetFrameType		= FALSE;
 FRAME_TYPE			g_nFrameType		= PICT_NONE;
@@ -121,7 +120,7 @@ const LPCTSTR DXVAVersion[] = { _T("DXVA "), _T("DXVA1"), _T("DXVA2") };
 
 CString GetDXVADecoderDescription()
 {
-	return GetDXVAMode (&g_guidDXVADecoder);
+	return GetDXVAMode(&g_guidDXVADecoder);
 }
 
 LPCTSTR GetDXVAVersion()
@@ -142,7 +141,7 @@ void ClearDXVAState()
 
 LPCTSTR FindD3DFormat(const D3DFORMAT Format)
 {
-	for (int i=0; i<_countof(D3DFormatType); i++) {
+	for (int i = 0; i < _countof(D3DFormatType); i++) {
 		if (Format == D3DFormatType[i].Format) {
 			return D3DFormatType[i].Description;
 		}
@@ -152,19 +151,17 @@ LPCTSTR FindD3DFormat(const D3DFORMAT Format)
 }
 
 // === DirectShow hooks
-static HRESULT(STDMETHODCALLTYPE* NewSegmentOrg)(IPinC * This, /* [in] */ REFERENCE_TIME tStart, /* [in] */ REFERENCE_TIME tStop, /* [in] */ double dRate) = NULL;
-
+static HRESULT (STDMETHODCALLTYPE* NewSegmentOrg)(IPinC * This, /* [in] */ REFERENCE_TIME tStart, /* [in] */ REFERENCE_TIME tStop, /* [in] */ double dRate) PURE;
 static HRESULT STDMETHODCALLTYPE NewSegmentMine(IPinC * This, /* [in] */ REFERENCE_TIME tStart, /* [in] */ REFERENCE_TIME tStop, /* [in] */ double dRate)
 {
-	if (g_pPin == This) { // Aleksoid : validate Pin
+	if (g_pPinC == This) {
 		g_tSegmentStart = tStart;
 	}
 
 	return NewSegmentOrg(This, tStart, tStop, dRate);
 }
 
-static HRESULT(STDMETHODCALLTYPE* ReceiveConnectionOrg)(IPinC* This, /* [in] */ IPinC* pConnector, /* [in] */ const AM_MEDIA_TYPE* pmt) = NULL;
-
+static HRESULT (STDMETHODCALLTYPE* ReceiveConnectionOrg)(IPinC* This, /* [in] */ IPinC* pConnector, /* [in] */ const AM_MEDIA_TYPE* pmt) PURE;
 static HRESULT STDMETHODCALLTYPE ReceiveConnectionMine(IPinC* This, /* [in] */ IPinC* pConnector, /* [in] */ const AM_MEDIA_TYPE* pmt)
 {
 	if (pmt) {
@@ -193,8 +190,7 @@ static HRESULT STDMETHODCALLTYPE ReceiveConnectionMine(IPinC* This, /* [in] */ I
 	return ReceiveConnectionOrg(This, pConnector, pmt);
 }
 
-static HRESULT(STDMETHODCALLTYPE* ReceiveOrg)(IMemInputPinC * This, IMediaSample *pSample) = NULL;
-
+static HRESULT (STDMETHODCALLTYPE* ReceiveOrg)(IMemInputPinC * This, IMediaSample *pSample) PURE;
 static HRESULT STDMETHODCALLTYPE ReceiveMineI(IMemInputPinC * This, IMediaSample *pSample)
 {
 	REFERENCE_TIME rtStart, rtStop;
@@ -260,17 +256,19 @@ void UnhookNewSegmentAndReceive()
 
 		g_pPinCVtbl				= NULL;
 		g_pMemInputPinCVtbl		= NULL;
+		g_pPinC					= NULL;
 		NewSegmentOrg			= NULL;
 		ReceiveConnectionOrg	= NULL;
 		ReceiveOrg				= NULL;
-
-		// Aleksoid : validate Pin
-		g_pPin					= NULL;
 	}
 }
 
-bool HookNewSegmentAndReceive(IPinC* pPinC, IMemInputPinC* pMemInputPinC)
+bool HookNewSegmentAndReceive(IPin* pPin)
 {
+	IPinC* pPinC = (IPinC*)pPin;
+	CComQIPtr<IMemInputPin> pMemInputPin = pPin;
+	IMemInputPinC* pMemInputPinC = (IMemInputPinC*)(IMemInputPin*)pMemInputPin;
+
 	if (!pPinC || !pMemInputPinC) {
 		return false;
 	}
@@ -288,7 +286,7 @@ bool HookNewSegmentAndReceive(IPinC* pPinC, IMemInputPinC* pMemInputPinC)
 	if (NewSegmentOrg == NULL) {
 		NewSegmentOrg = pPinC->lpVtbl->NewSegment;
 	}
-	pPinC->lpVtbl->NewSegment = NewSegmentMine; // Function sets global variable(s)
+	pPinC->lpVtbl->NewSegment = NewSegmentMine;
 
     if (ReceiveConnectionOrg == NULL) {
         ReceiveConnectionOrg = pPinC->lpVtbl->ReceiveConnection;
@@ -302,14 +300,12 @@ bool HookNewSegmentAndReceive(IPinC* pPinC, IMemInputPinC* pMemInputPinC)
 	if (ReceiveOrg == NULL) {
 		ReceiveOrg = pMemInputPinC->lpVtbl->Receive;
 	}
-	pMemInputPinC->lpVtbl->Receive = ReceiveMine; // Function sets global variable(s)
+	pMemInputPinC->lpVtbl->Receive = ReceiveMine;
 	res = VirtualProtect(pMemInputPinC->lpVtbl, sizeof(IMemInputPinCVtbl), flOldProtect, &flOldProtect);
 
 	g_pPinCVtbl			= pPinC->lpVtbl;
 	g_pMemInputPinCVtbl = pMemInputPinC->lpVtbl;
-
-	// Aleksoid : validate Pin
-	g_pPin			= pPinC;
+	g_pPinC				= pPinC;
 
 	return true;
 }
@@ -320,25 +316,25 @@ bool HookNewSegmentAndReceive(IPinC* pPinC, IMemInputPinC* pMemInputPinC)
 IAMVideoAcceleratorCVtbl* g_pIAMVideoAcceleratorCVtbl = NULL;
 
 #ifdef _DEBUG
-#define MAX_BUFFER_TYPE		15
-BYTE*		g_ppBuffer[MAX_BUFFER_TYPE]; // Only used for debug logging
+#define	MAX_BUFFER_TYPE 15
+BYTE*	g_ppBuffer[MAX_BUFFER_TYPE]; // Only used for debug logging
 
-static HRESULT ( STDMETHODCALLTYPE *GetVideoAcceleratorGUIDsOrg )( IAMVideoAcceleratorC * This,/* [out][in] */ LPDWORD pdwNumGuidsSupported,/* [out][in] */ LPGUID pGuidsSupported) = NULL;
-static HRESULT ( STDMETHODCALLTYPE *GetUncompFormatsSupportedOrg )( IAMVideoAcceleratorC * This,/* [in] */ const GUID *pGuid,/* [out][in] */ LPDWORD pdwNumFormatsSupported,/* [out][in] */ LPDDPIXELFORMAT pFormatsSupported) = NULL;
-static HRESULT ( STDMETHODCALLTYPE *GetInternalMemInfoOrg )( IAMVideoAcceleratorC * This,/* [in] */ const GUID *pGuid,/* [in] */ const AMVAUncompDataInfo *pamvaUncompDataInfo,/* [out][in] */ LPAMVAInternalMemInfo pamvaInternalMemInfo) = NULL;
+static HRESULT ( STDMETHODCALLTYPE *GetVideoAcceleratorGUIDsOrg )( IAMVideoAcceleratorC * This,/* [out][in] */ LPDWORD pdwNumGuidsSupported,/* [out][in] */ LPGUID pGuidsSupported) PURE;
+static HRESULT ( STDMETHODCALLTYPE *GetUncompFormatsSupportedOrg )( IAMVideoAcceleratorC * This,/* [in] */ const GUID *pGuid,/* [out][in] */ LPDWORD pdwNumFormatsSupported,/* [out][in] */ LPDDPIXELFORMAT pFormatsSupported) PURE;
+static HRESULT ( STDMETHODCALLTYPE *GetInternalMemInfoOrg )( IAMVideoAcceleratorC * This,/* [in] */ const GUID *pGuid,/* [in] */ const AMVAUncompDataInfo *pamvaUncompDataInfo,/* [out][in] */ LPAMVAInternalMemInfo pamvaInternalMemInfo) PURE;
 #endif
 
-static HRESULT ( STDMETHODCALLTYPE *GetCompBufferInfoOrg )( IAMVideoAcceleratorC * This,/* [in] */ const GUID *pGuid,/* [in] */ const AMVAUncompDataInfo *pamvaUncompDataInfo,/* [out][in] */ LPDWORD pdwNumTypesCompBuffers,/* [out] */ LPAMVACompBufferInfo pamvaCompBufferInfo) = NULL;
+static HRESULT ( STDMETHODCALLTYPE *GetCompBufferInfoOrg )( IAMVideoAcceleratorC * This,/* [in] */ const GUID *pGuid,/* [in] */ const AMVAUncompDataInfo *pamvaUncompDataInfo,/* [out][in] */ LPDWORD pdwNumTypesCompBuffers,/* [out] */ LPAMVACompBufferInfo pamvaCompBufferInfo) PURE;
 
 #ifdef _DEBUG
-static HRESULT ( STDMETHODCALLTYPE *GetInternalCompBufferInfoOrg )( IAMVideoAcceleratorC * This,/* [out][in] */ LPDWORD pdwNumTypesCompBuffers,/* [out] */ LPAMVACompBufferInfo pamvaCompBufferInfo) = NULL;
-static HRESULT ( STDMETHODCALLTYPE *BeginFrameOrg )( IAMVideoAcceleratorC * This,/* [in] */ const AMVABeginFrameInfo *amvaBeginFrameInfo) = NULL;
-static HRESULT ( STDMETHODCALLTYPE *EndFrameOrg )( IAMVideoAcceleratorC * This,/* [in] */ const AMVAEndFrameInfo *pEndFrameInfo) = NULL;
-static HRESULT ( STDMETHODCALLTYPE *GetBufferOrg )( IAMVideoAcceleratorC * This,/* [in] */ DWORD dwTypeIndex,/* [in] */ DWORD dwBufferIndex,/* [in] */ BOOL bReadOnly,/* [out] */ LPVOID *ppBuffer,/* [out] */ LONG *lpStride) = NULL;
-static HRESULT ( STDMETHODCALLTYPE *ReleaseBufferOrg )( IAMVideoAcceleratorC * This,/* [in] */ DWORD dwTypeIndex,/* [in] */ DWORD dwBufferIndex) = NULL;
-static HRESULT ( STDMETHODCALLTYPE *ExecuteOrg )( IAMVideoAcceleratorC * This,/* [in] */ DWORD dwFunction,/* [in] */ LPVOID lpPrivateInputData,/* [in] */ DWORD cbPrivateInputData,/* [in] */ LPVOID lpPrivateOutputDat,/* [in] */ DWORD cbPrivateOutputData,/* [in] */ DWORD dwNumBuffers,/* [in] */ const AMVABUFFERINFO *pamvaBufferInfo) = NULL;
-static HRESULT ( STDMETHODCALLTYPE *QueryRenderStatusOrg )( IAMVideoAcceleratorC * This,/* [in] */ DWORD dwTypeIndex,/* [in] */ DWORD dwBufferIndex,/* [in] */ DWORD dwFlags) = NULL;
-static HRESULT ( STDMETHODCALLTYPE *DisplayFrameOrg )( IAMVideoAcceleratorC * This,/* [in] */ DWORD dwFlipToIndex,/* [in] */ IMediaSample *pMediaSample) = NULL;
+static HRESULT ( STDMETHODCALLTYPE *GetInternalCompBufferInfoOrg )( IAMVideoAcceleratorC * This,/* [out][in] */ LPDWORD pdwNumTypesCompBuffers,/* [out] */ LPAMVACompBufferInfo pamvaCompBufferInfo) PURE;
+static HRESULT ( STDMETHODCALLTYPE *BeginFrameOrg )( IAMVideoAcceleratorC * This,/* [in] */ const AMVABeginFrameInfo *amvaBeginFrameInfo) PURE;
+static HRESULT ( STDMETHODCALLTYPE *EndFrameOrg )( IAMVideoAcceleratorC * This,/* [in] */ const AMVAEndFrameInfo *pEndFrameInfo) PURE;
+static HRESULT ( STDMETHODCALLTYPE *GetBufferOrg )( IAMVideoAcceleratorC * This,/* [in] */ DWORD dwTypeIndex,/* [in] */ DWORD dwBufferIndex,/* [in] */ BOOL bReadOnly,/* [out] */ LPVOID *ppBuffer,/* [out] */ LONG *lpStride) PURE;
+static HRESULT ( STDMETHODCALLTYPE *ReleaseBufferOrg )( IAMVideoAcceleratorC * This,/* [in] */ DWORD dwTypeIndex,/* [in] */ DWORD dwBufferIndex) PURE;
+static HRESULT ( STDMETHODCALLTYPE *ExecuteOrg )( IAMVideoAcceleratorC * This,/* [in] */ DWORD dwFunction,/* [in] */ LPVOID lpPrivateInputData,/* [in] */ DWORD cbPrivateInputData,/* [in] */ LPVOID lpPrivateOutputDat,/* [in] */ DWORD cbPrivateOutputData,/* [in] */ DWORD dwNumBuffers,/* [in] */ const AMVABUFFERINFO *pamvaBufferInfo) PURE;
+static HRESULT ( STDMETHODCALLTYPE *QueryRenderStatusOrg )( IAMVideoAcceleratorC * This,/* [in] */ DWORD dwTypeIndex,/* [in] */ DWORD dwBufferIndex,/* [in] */ DWORD dwFlags) PURE;
+static HRESULT ( STDMETHODCALLTYPE *DisplayFrameOrg )( IAMVideoAcceleratorC * This,/* [in] */ DWORD dwFlipToIndex,/* [in] */ IMediaSample *pMediaSample) PURE;
 #endif
 
 #if defined(_DEBUG) && DXVA_LOGFILE_A
@@ -403,7 +399,7 @@ static void LOGUDI(LPCTSTR prefix, const AMVAUncompDataInfo* p, int n)
 	}
 }
 
-static void LogDXVA_PicParams_H264 (DXVA_PicParams_H264* pPic)
+static void LogDXVA_PicParams_H264(DXVA_PicParams_H264* pPic)
 {
 	CString			strRes;
 	int				i;
@@ -441,7 +437,7 @@ static void LogDXVA_PicParams_H264 (DXVA_PicParams_H264* pPic)
 	strRes.AppendFormat(_T("%d,"), pPic->Reserved16Bits);
 	strRes.AppendFormat(_T("%d,"), pPic->StatusReportFeedbackNumber);
 
-	for (i =0; i<16; i++) {
+	for (i = 0; i < 16; i++) {
 		//strRes.AppendFormat(_T("%d,"), pPic->RefFrameList[i].AssociatedFlag);
 		//strRes.AppendFormat(_T("%d,"), pPic->RefFrameList[i].bPicEntry);
 		strRes.AppendFormat(_T("%d,"), pPic->RefFrameList[i].Index7Bits);
@@ -449,7 +445,7 @@ static void LogDXVA_PicParams_H264 (DXVA_PicParams_H264* pPic)
 
 	strRes.AppendFormat(_T("%d, %d,"), pPic->CurrFieldOrderCnt[0], pPic->CurrFieldOrderCnt[1]);
 
-	for (int i=0; i<16; i++) {
+	for (int i = 0; i < 16; i++) {
 		strRes.AppendFormat(_T("%d, %d,"), pPic->FieldOrderCntList[i][0], pPic->FieldOrderCntList[i][1]);
 	}
 	//strRes.AppendFormat(_T("%d,"), pPic->FieldOrderCntList[16][2]);
@@ -544,7 +540,7 @@ static void LogDXVA_PicParams_H264 (DXVA_PicParams_H264* pPic)
 
 }
 
-static void LogH264SliceShort (DXVA_Slice_H264_Short* pSlice, int nCount)
+static void LogH264SliceShort(DXVA_Slice_H264_Short* pSlice, int nCount)
 {
 	CString		strRes;
 	static bool	bFirstSlice = true;
@@ -556,7 +552,7 @@ static void LogH264SliceShort (DXVA_Slice_H264_Short* pSlice, int nCount)
 		bFirstSlice = false;
 	}
 
-	for (int i=0; i<nCount; i++) {
+	for (int i = 0; i < nCount; i++) {
 		strRes.AppendFormat(_T("%d,"), i);
 		strRes.AppendFormat(_T("%d,"), pSlice[i].BSNALunitDataLocation);
 		strRes.AppendFormat(_T("%d,"), pSlice[i].SliceBytesInBuffer);
@@ -567,7 +563,7 @@ static void LogH264SliceShort (DXVA_Slice_H264_Short* pSlice, int nCount)
 	}
 }
 
-static void LogSliceInfo (DXVA_SliceInfo* pSlice, int nCount)
+static void LogSliceInfo(DXVA_SliceInfo* pSlice, int nCount)
 {
 	CString		strRes;
 	static bool	bFirstSlice = true;
@@ -580,7 +576,7 @@ static void LogSliceInfo (DXVA_SliceInfo* pSlice, int nCount)
 		bFirstSlice = false;
 	}
 
-	for (int i=0; i<nCount; i++) {
+	for (int i = 0; i < nCount; i++) {
 		strRes.AppendFormat(_T("%d,"), i);
 		strRes.AppendFormat(_T("%d,"), pSlice[i].wHorizontalPosition);
 		strRes.AppendFormat(_T("%d,"), pSlice[i].wVerticalPosition);
@@ -598,7 +594,7 @@ static void LogSliceInfo (DXVA_SliceInfo* pSlice, int nCount)
 	}
 }
 
-static void LogH264SliceLong (DXVA_Slice_H264_Long* pSlice, int nCount)
+static void LogH264SliceLong(DXVA_Slice_H264_Long* pSlice, int nCount)
 {
 	static bool	bFirstSlice = true;
 	CString		strRes;
@@ -634,7 +630,7 @@ static void LogH264SliceLong (DXVA_Slice_H264_Long* pSlice, int nCount)
 	}
 	bFirstSlice = false;
 
-	for (int i=0; i<nCount; i++) {
+	for (int i = 0; i < nCount; i++) {
 		strRes.AppendFormat(_T("%d,"), i);
 		strRes.AppendFormat(_T("%d,"), pSlice[i].BSNALunitDataLocation);
 		strRes.AppendFormat(_T("%d,"), pSlice[i].SliceBytesInBuffer);
@@ -686,7 +682,7 @@ static void LogH264SliceLong (DXVA_Slice_H264_Long* pSlice, int nCount)
 	}
 }
 
-static void LogDXVA_PictureParameters (DXVA_PictureParameters* pPic)
+static void LogDXVA_PictureParameters(DXVA_PictureParameters* pPic)
 {
 	static bool	bFirstPictureParam = true;
 	CString		strRes;
@@ -1036,7 +1032,7 @@ static HRESULT STDMETHODCALLTYPE ExecuteMine(IAMVideoAcceleratorC* This, DWORD d
 	}
 
 
-	for (DWORD i=0; i<dwNumBuffers; i++) {
+	for (DWORD i = 0; i < dwNumBuffers; i++) {
 		if (pamvaBufferInfo[i].dwTypeIndex == DXVA_PICTURE_DECODE_BUFFER) {
 			if (g_guidDXVADecoder == DXVA2_ModeH264_E || g_guidDXVADecoder == DXVA_Intel_H264_ClearVideo) {
 				LogDXVA_PicParams_H264 ((DXVA_PicParams_H264*)g_ppBuffer[pamvaBufferInfo[i].dwTypeIndex]);
@@ -1044,7 +1040,7 @@ static HRESULT STDMETHODCALLTYPE ExecuteMine(IAMVideoAcceleratorC* This, DWORD d
 				LogDXVA_PictureParameters((DXVA_PictureParameters*)g_ppBuffer[pamvaBufferInfo[i].dwTypeIndex]);
 			}
 		} else if (pamvaBufferInfo[i].dwTypeIndex == DXVA_SLICE_CONTROL_BUFFER && (pamvaBufferInfo[i].dwDataSize % sizeof(DXVA_Slice_H264_Short)) == 0) {
-			for (WORD j=0; j<pamvaBufferInfo[i].dwDataSize / sizeof(DXVA_Slice_H264_Short); j++) {
+			for (WORD j = 0; j < pamvaBufferInfo[i].dwDataSize / sizeof(DXVA_Slice_H264_Short); j++) {
 				DXVA_Slice_H264_Short*	pSlice = &(((DXVA_Slice_H264_Short*)g_ppBuffer[pamvaBufferInfo[i].dwTypeIndex])[j]);
 				LOG(_T("	- BSNALunitDataLocation  %d"), pSlice->BSNALunitDataLocation);
 				LOG(_T("	- SliceBytesInBuffer     %d"), pSlice->SliceBytesInBuffer);
@@ -1315,7 +1311,7 @@ public :
 	virtual HRESULT STDMETHODCALLTYPE Execute(const DXVA2_DecodeExecuteParams *pExecuteParams) {
 
 #if defined(_DEBUG) && DXVA_LOGFILE_A
-		for (DWORD i=0; i<pExecuteParams->NumCompBuffers; i++) {
+		for (DWORD i = 0; i < pExecuteParams->NumCompBuffers; i++) {
 			CString		strBuffer;
 
 			LogDecodeBufferDesc (&pExecuteParams->pCompressedBuffers[i]);
@@ -1332,7 +1328,7 @@ public :
 
 			if (pExecuteParams->pCompressedBuffers[i].CompressedBufferType == DXVA2_PictureParametersBufferType) {
 				if (g_guidDXVADecoder == DXVA2_ModeH264_E || g_guidDXVADecoder == DXVA_Intel_H264_ClearVideo) {
-					LogDXVA_PicParams_H264 ((DXVA_PicParams_H264*)m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType]);
+					LogDXVA_PicParams_H264((DXVA_PicParams_H264*)m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType]);
 				} else if (g_guidDXVADecoder == DXVA2_ModeVC1_D || g_guidDXVADecoder == DXVA2_ModeMPEG2_VLD || g_guidDXVADecoder == DXVA_Intel_VC1_ClearVideo || g_guidDXVADecoder == DXVA2_ModeVC1_D2010) {
 					LogDXVA_PictureParameters((DXVA_PictureParameters*)m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType]);
 				}
@@ -1342,16 +1338,16 @@ public :
 				if (pExecuteParams->pCompressedBuffers[i].CompressedBufferType == DXVA2_SliceControlBufferType) {
 					if (pExecuteParams->pCompressedBuffers[i].DataSize % sizeof(DXVA_Slice_H264_Long) == 0) {
 						DXVA_Slice_H264_Long*	pSlice = (DXVA_Slice_H264_Long*)m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType];
-						LogH264SliceLong (pSlice, pExecuteParams->pCompressedBuffers[i].DataSize / sizeof(DXVA_Slice_H264_Long));
+						LogH264SliceLong(pSlice, pExecuteParams->pCompressedBuffers[i].DataSize / sizeof(DXVA_Slice_H264_Long));
 					} else if (pExecuteParams->pCompressedBuffers[i].DataSize % sizeof(DXVA_Slice_H264_Short) == 0) {
 						DXVA_Slice_H264_Short*	pSlice = (DXVA_Slice_H264_Short*)m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType];
-						LogH264SliceShort (pSlice, pExecuteParams->pCompressedBuffers[i].DataSize / sizeof(DXVA_Slice_H264_Short));
+						LogH264SliceShort(pSlice, pExecuteParams->pCompressedBuffers[i].DataSize / sizeof(DXVA_Slice_H264_Short));
 					}
 				}
 			} else if (g_guidDXVADecoder == DXVA2_ModeVC1_D || g_guidDXVADecoder == DXVA2_ModeMPEG2_VLD || g_guidDXVADecoder == DXVA_Intel_VC1_ClearVideo || g_guidDXVADecoder == DXVA2_ModeVC1_D2010) {
 				if (pExecuteParams->pCompressedBuffers[i].CompressedBufferType == DXVA2_SliceControlBufferType) {
 					DXVA_SliceInfo*	pSlice = (DXVA_SliceInfo*)m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType];
-					LogSliceInfo (pSlice, pExecuteParams->pCompressedBuffers[i].DataSize / sizeof(DXVA_SliceInfo));
+					LogSliceInfo(pSlice, pExecuteParams->pCompressedBuffers[i].DataSize / sizeof(DXVA_SliceInfo));
 				}
 			}
 
@@ -1394,16 +1390,14 @@ public :
 		HRESULT		hr = m_pDec->Execute (pExecuteParams);
 
 #ifdef _DEBUG
-		if (pExecuteParams->pExtensionData)
-		{
+		if (pExecuteParams->pExtensionData) {
 			LOG(_T("IDirectXVideoDecoder::Execute  %d buffer, fct = %d  (in=%d, out=%d),  hr = %08x"),
 				pExecuteParams->NumCompBuffers,
 				pExecuteParams->pExtensionData->Function,
 				pExecuteParams->pExtensionData->PrivateInputDataSize,
 				pExecuteParams->pExtensionData->PrivateOutputDataSize,
 				hr);
-		}
-		else {
+		} else {
 			LOG(_T("IDirectXVideoDecoder::Execute  %d buffer, hr = %08x"), pExecuteParams->NumCompBuffers, hr);
 		}
 #endif
@@ -1413,8 +1407,6 @@ public :
 #endif
 
 
-// Both IDirectXVideoDecoderServiceCVtbl and IDirectXVideoDecoderServiceC already exists in file \Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include\dxva2api.h
-// Why was the code duplicated ?
 interface IDirectXVideoDecoderServiceC;
 struct IDirectXVideoDecoderServiceCVtbl {
 	BEGIN_INTERFACE
@@ -1458,16 +1450,15 @@ interface IDirectXVideoDecoderServiceC {
 	CONST_VTBL struct IDirectXVideoDecoderServiceCVtbl *lpVtbl;
 };
 
-
 IDirectXVideoDecoderServiceCVtbl*	g_pIDirectXVideoDecoderServiceCVtbl = NULL;
-static HRESULT (STDMETHODCALLTYPE* CreateVideoDecoderOrg )  (IDirectXVideoDecoderServiceC* pThis, __in  REFGUID Guid, __in  const DXVA2_VideoDesc* pVideoDesc, __in  const DXVA2_ConfigPictureDecode* pConfig, __in_ecount(NumRenderTargets)  IDirect3DSurface9 **ppDecoderRenderTargets, __in  UINT NumRenderTargets, __deref_out  IDirectXVideoDecoder** ppDecode) = NULL;
+static HRESULT (STDMETHODCALLTYPE* CreateVideoDecoderOrg )(IDirectXVideoDecoderServiceC* pThis, __in  REFGUID Guid, __in  const DXVA2_VideoDesc* pVideoDesc, __in  const DXVA2_ConfigPictureDecode* pConfig, __in_ecount(NumRenderTargets)  IDirect3DSurface9 **ppDecoderRenderTargets, __in  UINT NumRenderTargets, __deref_out  IDirectXVideoDecoder** ppDecode) PURE;
 #ifdef _DEBUG
-static HRESULT (STDMETHODCALLTYPE* GetDecoderDeviceGuidsOrg)(IDirectXVideoDecoderServiceC* pThis, __out  UINT* pCount, __deref_out_ecount_opt(*pCount)  GUID** pGuids) = NULL;
-static HRESULT (STDMETHODCALLTYPE* GetDecoderConfigurationsOrg) (IDirectXVideoDecoderServiceC* pThis, __in  REFGUID Guid, __in const DXVA2_VideoDesc* pVideoDesc, __reserved void* pReserved, __out UINT* pCount, __deref_out_ecount_opt(*pCount)  DXVA2_ConfigPictureDecode **ppConfigs) = NULL;
+static HRESULT (STDMETHODCALLTYPE* GetDecoderDeviceGuidsOrg)(IDirectXVideoDecoderServiceC* pThis, __out  UINT* pCount, __deref_out_ecount_opt(*pCount)  GUID** pGuids) PURE;
+static HRESULT (STDMETHODCALLTYPE* GetDecoderConfigurationsOrg)(IDirectXVideoDecoderServiceC* pThis, __in  REFGUID Guid, __in const DXVA2_VideoDesc* pVideoDesc, __reserved void* pReserved, __out UINT* pCount, __deref_out_ecount_opt(*pCount)  DXVA2_ConfigPictureDecode **ppConfigs) PURE;
 #endif
 
 #ifdef _DEBUG
-static void LogDXVA2Config (const DXVA2_ConfigPictureDecode* pConfig)
+static void LogDXVA2Config(const DXVA2_ConfigPictureDecode* pConfig)
 {
 	LOG(_T("Config"));
 	LOG(_T("	- Config4GroupedCoefs               %d"), pConfig->Config4GroupedCoefs);
@@ -1489,7 +1480,7 @@ static void LogDXVA2Config (const DXVA2_ConfigPictureDecode* pConfig)
 	LOG(_T("	- guidConfigResidDiffEncryption     %s"), CStringFromGUID(pConfig->guidConfigResidDiffEncryption));
 }
 
-static void LogDXVA2VideoDesc (const DXVA2_VideoDesc* pVideoDesc)
+static void LogDXVA2VideoDesc(const DXVA2_VideoDesc* pVideoDesc)
 {
 	LOG(_T("VideoDesc"));
 	LOG(_T("	- Format                            %s  (0x%08x)"), FindD3DFormat(pVideoDesc->Format), pVideoDesc->Format);
@@ -1557,14 +1548,13 @@ static void LogVideoCardCaps(IDirectXVideoDecoderService* pDecoderService)
 }
 #endif
 
-static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(
-	IDirectXVideoDecoderServiceC*					pThis,
-	__in  REFGUID									Guid,
-	__in  const DXVA2_VideoDesc*					pVideoDesc,
-	__in  const DXVA2_ConfigPictureDecode*			pConfig,
-	__in_ecount(NumRenderTargets)  IDirect3DSurface9 **ppDecoderRenderTargets,
-	__in  UINT										NumRenderTargets,
-	__deref_out  IDirectXVideoDecoder**				ppDecode)
+static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(IDirectXVideoDecoderServiceC*					pThis,
+														__in  REFGUID									Guid,
+														__in  const DXVA2_VideoDesc*					pVideoDesc,
+														__in  const DXVA2_ConfigPictureDecode*			pConfig,
+														__in_ecount(NumRenderTargets)  IDirect3DSurface9 **ppDecoderRenderTargets,
+														__in  UINT										NumRenderTargets,
+														__deref_out  IDirectXVideoDecoder**				ppDecode)
 {
 	//	DebugBreak();
 	//	((DXVA2_VideoDesc*)pVideoDesc)->Format = (D3DFORMAT)0x3231564E;
@@ -1591,7 +1581,7 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(
 				(Guid == DXVA_Intel_VC1_ClearVideo) ||
 				(Guid == DXVA2_ModeVC1_D2010) ||
 				(Guid == DXVA2_ModeMPEG2_VLD)) {
-			*ppDecode	= DNew CFakeDirectXVideoDecoder (NULL, *ppDecode);
+			*ppDecode	= DNew CFakeDirectXVideoDecoder(NULL, *ppDecode);
 			(*ppDecode)->AddRef();
 		}
 
@@ -1609,9 +1599,9 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(
 }
 
 #ifdef _DEBUG
-static HRESULT STDMETHODCALLTYPE GetDecoderDeviceGuidsMine (IDirectXVideoDecoderServiceC*					pThis,
-		__out  UINT*									pCount,
-		__deref_out_ecount_opt(*pCount)  GUID**			pGuids)
+static HRESULT STDMETHODCALLTYPE GetDecoderDeviceGuidsMine(IDirectXVideoDecoderServiceC*			pThis,
+															__out  UINT*							pCount,
+															__deref_out_ecount_opt(*pCount) GUID**	pGuids)
 {
 	HRESULT hr = GetDecoderDeviceGuidsOrg(pThis, pCount, pGuids);
 	LOG(_T("IDirectXVideoDecoderService::GetDecoderDeviceGuids  hr = %08x\n"), hr);
@@ -1619,12 +1609,12 @@ static HRESULT STDMETHODCALLTYPE GetDecoderDeviceGuidsMine (IDirectXVideoDecoder
 	return hr;
 }
 
-static HRESULT STDMETHODCALLTYPE GetDecoderConfigurationsMine (IDirectXVideoDecoderServiceC*		pThis,
-		__in  REFGUID						Guid,
-		__in  const DXVA2_VideoDesc*		pVideoDesc,
-		__reserved  void*					pReserved,
-		__out  UINT*						pCount,
-		__deref_out_ecount_opt(*pCount)		DXVA2_ConfigPictureDecode **ppConfigs)
+static HRESULT STDMETHODCALLTYPE GetDecoderConfigurationsMine(IDirectXVideoDecoderServiceC*		pThis,
+															  __in  REFGUID						Guid,
+															  __in  const DXVA2_VideoDesc*		pVideoDesc,
+															  __reserved  void*					pReserved,
+															  __out  UINT*						pCount,
+															  __deref_out_ecount_opt(*pCount)	DXVA2_ConfigPictureDecode **ppConfigs)
 {
 	HRESULT hr = GetDecoderConfigurationsOrg(pThis, Guid, pVideoDesc, pReserved, pCount, ppConfigs);
 
@@ -1691,6 +1681,6 @@ void HookDirectXVideoDecoderService(void* pIDirectXVideoDecoderService)
 
 		res = VirtualProtect(pIDirectXVideoDecoderServiceC->lpVtbl, sizeof(IDirectXVideoDecoderServiceCVtbl), flOldProtect, &flOldProtect);
 
-		g_pIDirectXVideoDecoderServiceCVtbl			= pIDirectXVideoDecoderServiceC->lpVtbl;
+		g_pIDirectXVideoDecoderServiceCVtbl = pIDirectXVideoDecoderServiceC->lpVtbl;
 	}
 }

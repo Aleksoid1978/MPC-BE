@@ -72,7 +72,7 @@ interface IMemInputPinC {
 	CONST_VTBL struct IMemInputPinCVtbl *lpVtbl;
 };
 
-extern bool HookNewSegmentAndReceive(IPinC* pPinC, IMemInputPinC* pMemInputPin);
+extern bool HookNewSegmentAndReceive(IPin* pPin);
 extern void UnhookNewSegmentAndReceive();
 
 extern REFERENCE_TIME	g_tSegmentStart, g_tSampleStart;
