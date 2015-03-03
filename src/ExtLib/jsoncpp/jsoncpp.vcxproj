@@ -120,12 +120,9 @@
     <ClInclude Include="include\json\reader.h" />
     <ClInclude Include="include\json\value.h" />
     <ClInclude Include="include\json\writer.h" />
-    <ClInclude Include="src\json_batchallocator.h" />
     <ClInclude Include="src\json_tool.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\json_internalarray.inl" />
-    <None Include="src\json_internalmap.inl" />
     <None Include="src\json_valueiterator.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

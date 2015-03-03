@@ -22,9 +22,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\json_batchallocator.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\json_tool.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -57,12 +54,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\json_internalarray.inl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="src\json_internalmap.inl">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="src\json_valueiterator.inl">
       <Filter>Source Files</Filter>
     </None>
