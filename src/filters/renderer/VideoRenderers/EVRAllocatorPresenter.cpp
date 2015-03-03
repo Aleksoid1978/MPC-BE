@@ -547,7 +547,7 @@ float CEVRAllocatorPresenter::GetMaxRate(BOOL bThin)
 							&fpsNumerator, &fpsDenominator);
 
 		// Monitor refresh rate:
-		UINT MonitorRateHz = m_RefreshRate; // D3DDISPLAYMODE
+		UINT MonitorRateHz = m_refreshRate; // D3DDISPLAYMODE
 
 		if (fpsDenominator && fpsNumerator && MonitorRateHz) {
 			// Max Rate = Refresh Rate / Frame Rate
@@ -1968,7 +1968,7 @@ void CEVRAllocatorPresenter::RenderThread()
 								}
 
 								if (DetectedRefreshRatePos < 20 || !DetectedRefreshTime || !DetectedScanlinesPerFrame) {
-									DetectedRefreshTime = 1.0/m_RefreshRate;
+									DetectedRefreshTime = 1.0/m_refreshRate;
 									DetectedScanlinesPerFrame = m_ScreenSize.cy;
 									DetectedScanlineTime = DetectedRefreshTime / double(m_ScreenSize.cy);
 								}
@@ -2202,7 +2202,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 					if (m_nRenderState == Started) {
 						int VSyncPos = GetVBlackPos();
 						int WaitRange = max(m_ScreenSize.cy / 40, 5);
-						int MinRange = max(min(int(0.003 * double(m_ScreenSize.cy) * double(m_RefreshRate) + 0.5), m_ScreenSize.cy / 3), 5); // 1.8  ms or max 33 % of Time
+						int MinRange = max(min(int(0.003 * double(m_ScreenSize.cy) * double(m_refreshRate) + 0.5), m_ScreenSize.cy / 3), 5); // 1.8  ms or max 33 % of Time
 
 						VSyncPos += MinRange + WaitRange;
 
