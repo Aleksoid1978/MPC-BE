@@ -456,7 +456,9 @@ int ff_hevc_decode_nal_vps(HEVCContext *s)
     if (get_bits_left(gb) < 0) {
         av_log(s->avctx, AV_LOG_ERROR,
                "Overread VPS by %d bits\n", -get_bits_left(gb));
-        goto err;
+        // ==> Start patch MPC
+        // goto err;
+        // ==> End patch MPC
     }
 
     av_buffer_unref(&s->vps_list[vps_id]);
