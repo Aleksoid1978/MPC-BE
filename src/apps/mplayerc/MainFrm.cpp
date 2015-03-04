@@ -239,6 +239,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_MESSAGE(WM_POSTOPEN, OnPostOpen)
 
+	ON_MESSAGE_VOID(WM_SAVESETTINGS, SaveAppSettings)
+
 	ON_WM_LBUTTONDOWN()
 	ON_WM_NCLBUTTONDOWN()
 	ON_WM_LBUTTONUP()
@@ -3313,6 +3315,14 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 	}
 
 	return 0L;
+}
+
+void CMainFrame::SaveAppSettings()
+{
+	MSG msg;
+	if (!PeekMessage(&msg, m_hWnd, WM_SAVESETTINGS, WM_SAVESETTINGS, PM_NOREMOVE | PM_NOYIELD)) {
+		AfxGetAppSettings().SaveSettings();
+	}
 }
 
 BOOL CMainFrame::OnButton(UINT id, UINT nFlags, CPoint point)
@@ -16707,12 +16717,9 @@ void CMainFrame::ShowOptions(int idPage)
 		}
 
 		m_wndView.LoadLogo();
-
-		s.SaveSettings();
-
 	}
+	
 	Invalidate();
-
 	m_wndStatusBar.Relayout();
 	m_wndPlaylistBar.Invalidate();
 
@@ -17778,8 +17785,6 @@ void CMainFrame::OnFileOpenDirectory()
 		OpenCurPlaylistItem();
 	}
 }
-
-#define GetAValue(rgb) (rgb >> 24)
 
 HRESULT CMainFrame::CreateThumbnailToolbar()
 {

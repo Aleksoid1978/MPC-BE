@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPagePlayer.h"
+#include "../../DSUtil/Filehandle.h"
 
 #define MIN_RECENT_FILES 10
 #define MAX_RECENT_FILES 50
@@ -131,6 +132,13 @@ BOOL CPPagePlayer::OnInitDialog()
 	GetDlgItem(IDC_FILE_POS)->EnableWindow(s.fKeepHistory);
 	GetDlgItem(IDC_DVD_POS)->EnableWindow(s.fKeepHistory);
 	m_RecentFilesCtrl.EnableWindow(s.fKeepHistory);
+
+	CString iniDirPath = GetProgramPath();
+	HANDLE hDir = CreateFile(iniDirPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+							 OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	// gray-out "Store settings in the player folder" option when we don't have writing permissions in the target directory
+	GetDlgItem(IDC_CHECK8)->EnableWindow(hDir != INVALID_HANDLE_VALUE);
+	CloseHandle(hDir);
 
 	return TRUE;
 }

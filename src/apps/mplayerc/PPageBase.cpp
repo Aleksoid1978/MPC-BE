@@ -100,9 +100,8 @@ void CPPageBase::OnDestroy()
 
 BOOL CPPageBase::OnApply()
 {
-	if (auto pFrame = AfxGetMainFrame()) {
-		pFrame->CreateThumbnailToolbar();
-		pFrame->UpdateThumbarButton();
+	if (auto pMainFrame = AfxGetMainFrame()) {
+		pMainFrame->PostMessage(WM_SAVESETTINGS);
 	}
 
 	return __super::OnApply();

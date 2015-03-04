@@ -331,3 +331,17 @@ enum {
 };
 
 #define IsWaveFormatExtensible(wfe) (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)))
+
+namespace CStringUtils
+{
+	struct IgnoreCaseLess {
+		bool operator()(const CString& str1, const CString& str2) const {
+			return str1.CompareNoCase(str2) < 0;
+		}
+	};
+	struct LogicalLess {
+		bool operator()(const CString& str1, const CString& str2) const {
+			return StrCmpLogicalW(str1, str2) < 0;
+		}
+	};
+}
