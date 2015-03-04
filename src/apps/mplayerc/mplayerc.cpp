@@ -382,9 +382,428 @@ END_MESSAGE_MAP()
 // CMPlayerCApp construction
 
 CMPlayerCApp::CMPlayerCApp()
-//	: m_hMutexOneInstance(NULL)
+	: m_bProfileInitialized(false)
+	, m_bQueuedProfileFlush(false)
+	, m_dwProfileLastAccessTick(0)
+	, GetRemoteControlCode(GetRemoteControlCodeMicrosoft)
 {
-	GetRemoteControlCode = GetRemoteControlCodeMicrosoft;
+}
+
+CMPlayerCApp::~CMPlayerCApp()
+{
+	// Wait for any pending I/O operations to be canceled
+	while (WAIT_IO_COMPLETION == SleepEx(0, TRUE));
+}
+
+BOOL CMPlayerCApp::OnIdle(LONG lCount)
+{
+	BOOL ret = __super::OnIdle(lCount);
+	if (!ret) {
+		FlushProfile(false);
+	}
+
+	return ret;
+}
+
+void CMPlayerCApp::InitProfile()
+{
+	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
+
+	if (!m_pszRegistryKey) {
+		// Don't reread mpc-be.ini if the cache needs to be flushed or it was accessed recently
+		if (m_bProfileInitialized && (m_bQueuedProfileFlush || GetTickCount() - m_dwProfileLastAccessTick < 100)) {
+			m_dwProfileLastAccessTick = GetTickCount();
+			return;
+		}
+
+		m_bProfileInitialized = true;
+		m_dwProfileLastAccessTick = GetTickCount();
+
+		ASSERT(m_pszProfileName);
+		if (!::PathFileExists(m_pszProfileName)) {
+			return;
+		}
+
+		FILE* fp;
+		int fpStatus;
+		do { // Open mpc-be.ini in UNICODE mode, retry if it is already being used by another process
+			fp = _tfsopen(m_pszProfileName, _T("r, ccs=UNICODE"), _SH_SECURE);
+			if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
+				break;
+			}
+			Sleep(100);
+		} while (true);
+		if (!fp) {
+			ASSERT(FALSE);
+			return;
+		}
+		if (_ftell_nolock(fp) == 0L) {
+			// No BOM was consumed, assume mpc-be.ini is ANSI encoded
+			fpStatus = fclose(fp);
+			ASSERT(fpStatus == 0);
+			do { // Reopen mpc-be.ini in ANSI mode, retry if it is already being used by another process
+				fp = _tfsopen(m_pszProfileName, _T("r"), _SH_SECURE);
+				if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
+					break;
+				}
+				Sleep(100);
+			} while (true);
+			if (!fp) {
+				ASSERT(FALSE);
+				return;
+			}
+		}
+
+		CStdioFile file(fp);
+
+		ASSERT(!m_bQueuedProfileFlush);
+		m_ProfileMap.clear();
+
+		CString line, section, var, val;
+		while (file.ReadString(line)) {
+			// Parse mpc-be.ini file, this parser:
+			//  - doesn't trim whitespaces
+			//  - doesn't remove quotation marks
+			//  - omits keys with empty names
+			//  - omits unnamed sections
+			int pos = 0;
+			if (line[0] == _T('[')) {
+				pos = line.Find(_T(']'));
+				if (pos == -1) {
+					continue;
+				}
+				section = line.Mid(1, pos - 1);
+			} else if (line[0] != _T(';')) {
+				pos = line.Find(_T('='));
+				if (pos == -1) {
+					continue;
+				}
+				var = line.Mid(0, pos);
+				val = line.Mid(pos + 1);
+				if (!section.IsEmpty() && !var.IsEmpty()) {
+					m_ProfileMap[section][var] = val;
+				}
+			}
+		}
+		fpStatus = fclose(fp);
+		ASSERT(fpStatus == 0);
+
+		m_dwProfileLastAccessTick = GetTickCount();
+	}
+}
+
+void CMPlayerCApp::FlushProfile(bool bForce/* = true*/)
+{
+    std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
+
+    if (!m_pszRegistryKey) {
+        if (!bForce && !m_bQueuedProfileFlush) {
+            return;
+        }
+
+        m_bQueuedProfileFlush = false;
+
+        ASSERT(m_bProfileInitialized);
+        ASSERT(m_pszProfileName);
+
+        FILE* fp;
+        int fpStatus;
+        do { // Open mpc-be.ini, retry if it is already being used by another process
+            fp = _tfsopen(m_pszProfileName, _T("w, ccs=UTF-8"), _SH_SECURE);
+            if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
+                break;
+            }
+            Sleep(100);
+        } while (true);
+        if (!fp) {
+            ASSERT(FALSE);
+            return;
+        }
+        CStdioFile file(fp);
+        CString line;
+        try {
+            file.WriteString(_T("; MPC-BE\n"));
+            for (auto it1 = m_ProfileMap.begin(); it1 != m_ProfileMap.end(); ++it1) {
+                line.Format(_T("[%s]\n"), it1->first);
+                file.WriteString(line);
+                for (auto it2 = it1->second.begin(); it2 != it1->second.end(); ++it2) {
+                    line.Format(_T("%s=%s\n"), it2->first, it2->second);
+                    file.WriteString(line);
+                }
+            }
+        } catch (CFileException& e) {
+            // Fail silently if disk is full
+            UNREFERENCED_PARAMETER(e);
+            ASSERT(FALSE);
+        }
+        fpStatus = fclose(fp);
+        ASSERT(fpStatus == 0);
+    }
+}
+
+BOOL CMPlayerCApp::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE* ppData, UINT* pBytes)
+{
+    std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
+
+    if (m_pszRegistryKey) {
+        return CWinApp::GetProfileBinary(lpszSection, lpszEntry, ppData, pBytes);
+    } else {
+        if (!lpszSection || !lpszEntry || !ppData || !pBytes) {
+            ASSERT(FALSE);
+            return FALSE;
+        }
+        CString sectionStr(lpszSection);
+        CString keyStr(lpszEntry);
+        if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
+            ASSERT(FALSE);
+            return FALSE;
+        }
+        CString valueStr;
+
+        InitProfile();
+        auto it1 = m_ProfileMap.find(sectionStr);
+        if (it1 != m_ProfileMap.end()) {
+            auto it2 = it1->second.find(keyStr);
+            if (it2 != it1->second.end()) {
+                valueStr = it2->second;
+            }
+        }
+        if (valueStr.IsEmpty()) {
+            return FALSE;
+        }
+        int length = valueStr.GetLength();
+        // Encoding: each 4-bit sequence is coded in one character, from 'A' for 0x0 to 'P' for 0xf
+        if (length % 2) {
+            ASSERT(FALSE);
+            return FALSE;
+        }
+        for (int i = 0; i < length; i++) {
+            if (valueStr[i] < 'A' || valueStr[i] > 'P') {
+                ASSERT(FALSE);
+                return FALSE;
+            }
+        }
+        *pBytes = length / 2;
+        *ppData = new(std::nothrow) BYTE[*pBytes];
+        if (!(*ppData)) {
+            ASSERT(FALSE);
+            return FALSE;
+        }
+        for (UINT i = 0; i < *pBytes; i++) {
+            (*ppData)[i] = BYTE((valueStr[i * 2] - 'A') | ((valueStr[i * 2 + 1] - 'A') << 4));
+        }
+        return TRUE;
+    }
+}
+
+UINT CMPlayerCApp::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault)
+{
+    std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
+
+    int res = nDefault;
+    if (m_pszRegistryKey) {
+        res = CWinApp::GetProfileInt(lpszSection, lpszEntry, nDefault);
+    } else {
+        if (!lpszSection || !lpszEntry) {
+            ASSERT(FALSE);
+            return res;
+        }
+        CString sectionStr(lpszSection);
+        CString keyStr(lpszEntry);
+        if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
+            ASSERT(FALSE);
+            return res;
+        }
+
+        InitProfile();
+        auto it1 = m_ProfileMap.find(sectionStr);
+        if (it1 != m_ProfileMap.end()) {
+            auto it2 = it1->second.find(keyStr);
+            if (it2 != it1->second.end()) {
+                res = _ttoi(it2->second);
+            }
+        }
+    }
+    return res;
+}
+
+CString CMPlayerCApp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault/* = NULL*/)
+{
+    std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
+
+    CString res;
+    if (m_pszRegistryKey) {
+        res = CWinApp::GetProfileString(lpszSection, lpszEntry, lpszDefault);
+    } else {
+        if (!lpszSection || !lpszEntry) {
+            ASSERT(FALSE);
+            return res;
+        }
+        CString sectionStr(lpszSection);
+        CString keyStr(lpszEntry);
+        if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
+            ASSERT(FALSE);
+            return res;
+        }
+        if (lpszDefault) {
+            res = lpszDefault;
+        }
+
+        InitProfile();
+        auto it1 = m_ProfileMap.find(sectionStr);
+        if (it1 != m_ProfileMap.end()) {
+            auto it2 = it1->second.find(keyStr);
+            if (it2 != it1->second.end()) {
+                res = it2->second;
+            }
+        }
+    }
+    return res;
+}
+
+BOOL CMPlayerCApp::WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE pData, UINT nBytes)
+{
+    std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
+
+    if (m_pszRegistryKey) {
+        return CWinApp::WriteProfileBinary(lpszSection, lpszEntry, pData, nBytes);
+    } else {
+        if (!lpszSection || !lpszEntry || !pData || !nBytes) {
+            ASSERT(FALSE);
+            return FALSE;
+        }
+        CString sectionStr(lpszSection);
+        CString keyStr(lpszEntry);
+        if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
+            ASSERT(FALSE);
+            return FALSE;
+        }
+        CString valueStr;
+
+        TCHAR* buffer = valueStr.GetBufferSetLength(nBytes * 2);
+        // Encoding: each 4-bit sequence is coded in one character, from 'A' for 0x0 to 'P' for 0xf
+        for (UINT i = 0; i < nBytes; i++) {
+            buffer[i * 2] = 'A' + (pData[i] & 0xf);
+            buffer[i * 2 + 1] = 'A' + (pData[i] >> 4 & 0xf);
+        }
+        valueStr.ReleaseBufferSetLength(nBytes * 2);
+
+        InitProfile();
+        CString& old = m_ProfileMap[sectionStr][keyStr];
+        if (old != valueStr) {
+            old = valueStr;
+            m_bQueuedProfileFlush = true;
+        }
+        return TRUE;
+    }
+}
+
+BOOL CMPlayerCApp::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue)
+{
+    std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
+
+    if (m_pszRegistryKey) {
+        return CWinApp::WriteProfileInt(lpszSection, lpszEntry, nValue);
+    } else {
+        if (!lpszSection || !lpszEntry) {
+            ASSERT(FALSE);
+            return FALSE;
+        }
+        CString sectionStr(lpszSection);
+        CString keyStr(lpszEntry);
+        if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
+            ASSERT(FALSE);
+            return FALSE;
+        }
+        CString valueStr;
+        valueStr.Format(_T("%d"), nValue);
+
+        InitProfile();
+        CString& old = m_ProfileMap[sectionStr][keyStr];
+        if (old != valueStr) {
+            old = valueStr;
+            m_bQueuedProfileFlush = true;
+        }
+        return TRUE;
+    }
+}
+
+BOOL CMPlayerCApp::WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszValue)
+{
+    std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
+
+    if (m_pszRegistryKey) {
+        return CWinApp::WriteProfileString(lpszSection, lpszEntry, lpszValue);
+    } else {
+        if (!lpszSection) {
+            ASSERT(FALSE);
+            return FALSE;
+        }
+        CString sectionStr(lpszSection);
+        if (sectionStr.IsEmpty()) {
+            ASSERT(FALSE);
+            return FALSE;
+        }
+        CString keyStr(lpszEntry);
+        if (lpszEntry && keyStr.IsEmpty()) {
+            ASSERT(FALSE);
+            return FALSE;
+        }
+
+        InitProfile();
+
+        // Mimic CWinApp::WriteProfileString() behavior
+        if (lpszEntry) {
+            if (lpszValue) {
+                CString& old = m_ProfileMap[sectionStr][keyStr];
+                if (old != lpszValue) {
+                    old = lpszValue;
+                    m_bQueuedProfileFlush = true;
+                }
+            } else { // Delete key
+                auto it = m_ProfileMap.find(sectionStr);
+                if (it != m_ProfileMap.end()) {
+                    if (it->second.erase(keyStr)) {
+                        m_bQueuedProfileFlush = true;
+                    }
+                }
+            }
+        } else { // Delete section
+            if (m_ProfileMap.erase(sectionStr)) {
+                m_bQueuedProfileFlush = true;
+            }
+        }
+        return TRUE;
+    }
+}
+
+bool CMPlayerCApp::HasProfileEntry(LPCTSTR lpszSection, LPCTSTR lpszEntry)
+{
+    std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
+
+    bool ret = false;
+    if (m_pszRegistryKey) {
+        if (HKEY hAppKey = GetAppRegistryKey()) {
+            HKEY hSectionKey;
+            if (RegOpenKeyEx(hAppKey, lpszSection, 0, KEY_READ, &hSectionKey) == ERROR_SUCCESS) {
+                LONG lResult = RegQueryValueEx(hSectionKey, lpszEntry, NULL, NULL, NULL, NULL);
+                ret = (lResult == ERROR_SUCCESS);
+                VERIFY(RegCloseKey(hSectionKey) == ERROR_SUCCESS);
+            }
+            VERIFY(RegCloseKey(hAppKey) == ERROR_SUCCESS);
+        } else {
+            ASSERT(FALSE);
+        }
+    } else {
+        InitProfile();
+        auto it1 = m_ProfileMap.find(lpszSection);
+        if (it1 != m_ProfileMap.end()) {
+            auto& sectionMap = it1->second;
+            auto it2 = sectionMap.find(lpszEntry);
+            ret = (it2 != sectionMap.end());
+        }
+    }
+    return ret;
 }
 
 void CMPlayerCApp::ShowCmdlnSwitches() const
@@ -418,46 +837,22 @@ bool CMPlayerCApp::StoreSettingsToIni()
 	free((void*)m_pszProfileName);
 	m_pszProfileName = _tcsdup(GetIniPath());
 
-	// Validate .ini file
-	if (::PathFileExists(m_pszProfileName)) {
-		FILE* fp = _tfopen(m_pszProfileName, _T("r, ccs=UNICODE"));
-		if (fp) {
-			CStdioFile cf(fp);
-			CString str;
-			BOOL bIsValid = FALSE;
-			while (cf.ReadString(str)) {
-				str.Trim();
-				if (str.IsEmpty()) {
-					continue;
-				}
-				if (str.Find(L";") >= 0 || (str.Find(L"[") >= 0 && str.Find(L"]") > 0)) {
-					bIsValid = TRUE;
-					break;
-				}
+	if (!::PathFileExists(m_pszProfileName)) {
+		// Create an empty mpc-be.ini file to be sure that the function IsIniValid() works correctly
+		FILE* fp;
+		int fpStatus;
+		do { // Open mpc-be.ini, retry if it is already being used by another process
+			fp = _tfsopen(m_pszProfileName, _T("w, ccs=UTF-8"), _SH_SECURE);
+			if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
 				break;
 			}
-
-			fclose(fp);
-			if (!bIsValid) {
-				::DeleteFile(m_pszProfileName);
-			}
-		}
-	}
-
-	// We can only use UTF16-LE for unicode ini files in windows. UTF8/UTF16-BE do not work.
-	// So to ensure we have correct encoding for ini files, create a file with right BOM first,
-	// then add some comments in first line to make sure it's not empty.
-	if (!::PathFileExists(m_pszProfileName)) { // don't overwrite existing ini file
-		LPTSTR pszComments = L"; MPC-BE";
-		WORD wBOM = 0xFEFF; // UTF16-LE BOM (FFFE)
-		DWORD nBytes;
-
-		HANDLE hFile = ::CreateFile(m_pszProfileName, GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (hFile != INVALID_HANDLE_VALUE)
-		{
-			::WriteFile(hFile, &wBOM, sizeof(WORD), &nBytes, NULL);
-			::WriteFile(hFile, pszComments, (_tcslen(pszComments)+1)*(sizeof(TCHAR)), &nBytes, NULL);
-			::CloseHandle(hFile);
+			Sleep(100);
+		} while (true);
+		if (!fp) {
+			ASSERT(FALSE);
+		} else {
+			fpStatus = fclose(fp);
+			ASSERT(fpStatus == 0);
 		}
 	}
 
@@ -483,36 +878,7 @@ CString CMPlayerCApp::GetIniPath() const
 
 bool CMPlayerCApp::IsIniValid() const
 {
-	CFileStatus fs;
-	return !!CFile::GetStatus(GetIniPath(), fs);
-}
-
-bool CMPlayerCApp::IsIniUTF16LE() const
-{
-	bool isUTF16LE = false;
-
-	try {
-		CFile f(GetIniPath(), CFile::modeRead);
-
-		if (f) {
-			WORD bom;
-			if (f.Read(&bom, sizeof(bom)) == sizeof(bom)) {
-				isUTF16LE = (bom == 0xFEFF);
-			}
-		}
-	} catch(CFileException* e) {
-		// If something goes wrong, we try to recreate the ini file
-		// instead of crashing because it seems to work in most of
-		// the cases but maybe we could do something better.
-#ifdef _DEBUG
-		TCHAR szCause[500];
-		e->GetErrorMessage(szCause, 500);
-		AfxMessageBox(szCause);
-#endif // _DEBUG
-		e->Delete();
-	}
-
-	return isUTF16LE;
+	return !!::PathFileExists(GetIniPath());
 }
 
 bool CMPlayerCApp::GetAppSavePath(CString& path)
@@ -548,13 +914,11 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	AfxGetAppSettings().GetFav(FAV_DVD, DVDsFav);
 	AfxGetAppSettings().GetFav(FAV_DEVICE, devicesFav);
 
-	// In case an ini file is present, we remove it so that it will be recreated
-	_tremove(GetIniPath());
-
 	if (useIni) {
 		success = StoreSettingsToIni();
 	} else {
 		success = StoreSettingsToRegistry();
+		_tremove(GetIniPath());
 	}
 
 	if (success && oldpath.GetLength() > 0) {
@@ -572,14 +936,17 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	}
 	// Ensure the shaders are properly saved
 	AfxGetAppSettings().fShadersNeedSave = true;
-
-	// Write settings immediately
-	m_s.SaveSettings();
-
+	
 	// Save favorites to the new location
 	AfxGetAppSettings().SetFav(FAV_FILE, filesFav);
 	AfxGetAppSettings().SetFav(FAV_DVD, DVDsFav);
 	AfxGetAppSettings().SetFav(FAV_DEVICE, devicesFav);
+
+	// Save external filters to the new location
+	m_s.SaveExternalFilters();
+
+	// Write settings immediately
+	m_s.SaveSettings();
 
 	return success;
 }
@@ -1196,11 +1563,6 @@ BOOL CMPlayerCApp::InitInstance()
 
 	m_s.LoadSettings(); // read settings
 
-	// If we use an ASCII ini file, let's recreate it to switch to UTF-16LE
-	if (IsIniValid() && !IsIniUTF16LE()) {
-		ChangeSettingsLocation(true);
-	}
-
 	if (!__super::InitInstance()) {
 		AfxMessageBox(_T("InitInstance failed!"));
 		return FALSE;
@@ -1216,7 +1578,7 @@ BOOL CMPlayerCApp::InitInstance()
 
 	CMainFrame* pFrame = DNew CMainFrame;
 	m_pMainWnd = pFrame;
-	if ( !pFrame->LoadFrame(IDR_MAINFRAME, WS_OVERLAPPEDWINDOW|FWS_ADDTOTITLE, NULL, NULL) ) {
+	if (!pFrame->LoadFrame(IDR_MAINFRAME, WS_OVERLAPPEDWINDOW|FWS_ADDTOTITLE, NULL, NULL)) {
 		AfxMessageBox(_T("CMainFrame::LoadFrame failed!"));
 		return FALSE;
 	}

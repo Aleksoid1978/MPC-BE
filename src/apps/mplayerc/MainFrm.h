@@ -672,6 +672,8 @@ public:
 
 	afx_msg LRESULT OnPostOpen(WPARAM wParam, LPARAM lParam);
 
+	afx_msg void SaveAppSettings();
+
 	BOOL OnButton(UINT id, UINT nFlags, CPoint point);
 
 	bool bDVDMenuClicked;

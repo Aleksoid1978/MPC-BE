@@ -34,6 +34,9 @@
 #include "../../../Include/Version.h"
 #include "WinDebugMonitor.h"
 
+#include <map>
+#include <mutex>
+
 #define DEF_LOGO IDF_LOGO1
 
 enum {
@@ -42,7 +45,8 @@ enum {
 	WM_TUNER_SCAN_END,
 	WM_TUNER_STATS,
 	WM_TUNER_NEW_CHANNEL,
-	WM_POSTOPEN
+	WM_POSTOPEN,
+	WM_SAVESETTINGS
 };
 
 #define WM_MYMOUSELAST WM_XBUTTONDBLCLK
@@ -81,23 +85,16 @@ class CMPlayerCApp : public CWinApp
 	static UINT	GetRemoteControlCodeSRM7500(UINT nInputcode, HRAWINPUT hRawInput);
 
 	static UINT RunTHREADCopyData(LPVOID pParam);
+
+	virtual BOOL OnIdle(LONG lCount) override;
 public:
 	CMPlayerCApp();
+	~CMPlayerCApp();
 
 	void ShowCmdlnSwitches() const;
 
-	bool StoreSettingsToIni();
-	bool StoreSettingsToRegistry();
-	CString GetIniPath() const;
-	bool IsIniValid() const;
-	bool IsIniUTF16LE() const;
-	bool ChangeSettingsLocation(bool useIni);
-	void ExportSettings();
-
-	bool GetAppSavePath(CString& path);
-
-	CRenderersData m_Renderers;
-	CString		m_AudioRendererDisplayName_CL;
+	CRenderersData	m_Renderers;
+	CString			m_AudioRendererDisplayName_CL;
 
 	CAppSettings m_s;
 
@@ -121,17 +118,39 @@ public:
 
 	void						RegisterHotkeys();
 	void						UnregisterHotkeys();
-	// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CMPlayerCApp)
+
+private:
+	std::map<CString, std::map<CString, CString, CStringUtils::IgnoreCaseLess>, CStringUtils::IgnoreCaseLess> m_ProfileMap;
+	bool m_bProfileInitialized;
+	bool m_bQueuedProfileFlush;
+	std::recursive_mutex m_profileMutex;
+	DWORD m_dwProfileLastAccessTick;
+
+	void InitProfile();
+
+public:
+	bool			StoreSettingsToIni();
+	bool			StoreSettingsToRegistry();
+	CString			GetIniPath() const;
+	bool			IsIniValid() const;
+	bool			ChangeSettingsLocation(bool useIni);
+	void			ExportSettings();
+
+	bool			GetAppSavePath(CString& path);
+
+	void			FlushProfile(bool bForce = true);
+	virtual BOOL	GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE* ppData, UINT* pBytes) override;
+	virtual UINT	GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault) override;
+	virtual CString	GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault = NULL) override;
+	virtual BOOL	WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE pData, UINT nBytes) override;
+	virtual BOOL	WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue) override;
+	virtual BOOL	WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszValue) override;
+	bool			HasProfileEntry(LPCTSTR lpszSection, LPCTSTR lpszEntry);
+
 public:
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
-	//}}AFX_VIRTUAL
 
-	// Implementation
-
-public:
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnAppAbout();
 	afx_msg void OnFileExit();

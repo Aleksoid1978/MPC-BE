@@ -513,7 +513,7 @@ CString CAppSettings::SerializeHex (BYTE* pBuffer, int nBufSize) const
 
 void CAppSettings::SaveSettings()
 {
-	CWinApp* pApp = AfxGetApp();
+	CMPlayerCApp* pApp = AfxGetMyApp();
 	ASSERT(pApp);
 
 	if (!fInitialized) {
@@ -876,6 +876,8 @@ void CAppSettings::SaveSettings()
 		SaveShaders();
 		fShadersNeedSave = false;
 	}
+
+	pApp->FlushProfile();
 }
 
 void CAppSettings::SaveExternalFilters()
