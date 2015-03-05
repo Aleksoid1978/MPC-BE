@@ -4,6 +4,12 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//
+// Contributor: Lionel Duchateau, kurtnoise@free.fr
+//
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 //---------------------------------------------------------------------------
 // Pre-compilation
 #include "MediaInfo/PreComp.h"
@@ -215,8 +221,6 @@ void File_Hevc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator se
     Fill(Stream_Video, 0, Video_Codec_Profile, Profile);
     Fill(Stream_Video, StreamPos_Last, Video_Width, Width);
     Fill(Stream_Video, StreamPos_Last, Video_Height, Height);
-    //Fill(Stream_Video, 0, Video_PixelAspectRatio, PixelAspectRatio, 3, true);
-    //Fill(Stream_Video, 0, Video_DisplayAspectRatio, Width*PixelAspectRatio/Height, 3, true); //More precise
 
     Fill(Stream_Video, 0, Video_ColorSpace, "YUV");
     Fill(Stream_Video, 0, Video_Colorimetry, Hevc_chroma_format_idc((*seq_parameter_set_Item)->chroma_format_idc));
@@ -225,11 +229,24 @@ void File_Hevc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator se
 
     if ((*seq_parameter_set_Item)->vui_parameters)
     {
-            if ((*seq_parameter_set_Item)->vui_parameters->timing_info_present_flag)
-            {
-                    if ((*seq_parameter_set_Item)->vui_parameters->time_scale && (*seq_parameter_set_Item)->vui_parameters->num_units_in_tick)
-                            Fill(Stream_Video, StreamPos_Last, Video_FrameRate, (float64)(*seq_parameter_set_Item)->vui_parameters->time_scale / (*seq_parameter_set_Item)->vui_parameters->num_units_in_tick);
-            }
+        if ((*seq_parameter_set_Item)->vui_parameters->timing_info_present_flag)
+        {
+                if ((*seq_parameter_set_Item)->vui_parameters->time_scale && (*seq_parameter_set_Item)->vui_parameters->num_units_in_tick)
+                        Fill(Stream_Video, StreamPos_Last, Video_FrameRate, (float64)(*seq_parameter_set_Item)->vui_parameters->time_scale / (*seq_parameter_set_Item)->vui_parameters->num_units_in_tick);
+        }
+
+        if ((*seq_parameter_set_Item)->vui_parameters->aspect_ratio_info_present_flag)
+        {
+                float64 PixelAspectRatio = 1;
+                if ((*seq_parameter_set_Item)->vui_parameters->aspect_ratio_idc<Avc_PixelAspectRatio_Size)
+                        PixelAspectRatio = Avc_PixelAspectRatio[(*seq_parameter_set_Item)->vui_parameters->aspect_ratio_idc];
+                else if ((*seq_parameter_set_Item)->vui_parameters->aspect_ratio_idc == 0xFF && (*seq_parameter_set_Item)->vui_parameters->sar_height)
+                        PixelAspectRatio = ((float64) (*seq_parameter_set_Item)->vui_parameters->sar_width) / (*seq_parameter_set_Item)->vui_parameters->sar_height;
+
+                Fill(Stream_Video, 0, Video_PixelAspectRatio, PixelAspectRatio, 3, true);
+                Fill(Stream_Video, 0, Video_DisplayAspectRatio, Width*PixelAspectRatio/Height, 3, true); //More precise
+        }
+
         //Colour description
         if ((*seq_parameter_set_Item)->vui_parameters->video_signal_type_present_flag)
         {
@@ -1890,7 +1907,7 @@ void File_Hevc::sei_message_user_data_unregistered_x265(int32u payloadSize)
             Element_Begin1("options");
             size_t Options_Pos_Before=Data_Pos_Before;
             Encoded_Library_Settings.clear();
-            do
+            while (Options_Pos_Before!=Data.size())
             {
                 size_t Options_Pos=Data.find(__T(" "), Options_Pos_Before);
                 if (Options_Pos==std::string::npos)
@@ -1898,7 +1915,7 @@ void File_Hevc::sei_message_user_data_unregistered_x265(int32u payloadSize)
                 Ztring option;
                 Get_Local (Options_Pos-Options_Pos_Before, option, "option");
                 Options_Pos_Before=Options_Pos;
-                do
+                while (Options_Pos_Before!=Data.size())
                 {
                     Ztring Separator;
                     Peek_Local(1, Separator);
@@ -1910,7 +1927,6 @@ void File_Hevc::sei_message_user_data_unregistered_x265(int32u payloadSize)
                     else
                         break;
                 }
-                while (Options_Pos_Before!=Data.size());
 
                 //Filling
                 if (option!=__T("options:") && !(!option.empty() && option[0]>=__T('0') && option[0]<=__T('9')) && option.find(__T("fps="))!=0 && option.find(__T("bitdepth="))!=0) //Ignoring redundant information e.g. width, height, frame rate, bit depth
@@ -1920,7 +1936,6 @@ void File_Hevc::sei_message_user_data_unregistered_x265(int32u payloadSize)
                     Encoded_Library_Settings+=option;
                 }
             }
-            while (Options_Pos_Before!=Data.size());
             Element_End0();
         }
         else

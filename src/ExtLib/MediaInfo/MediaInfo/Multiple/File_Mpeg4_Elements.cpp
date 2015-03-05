@@ -79,6 +79,9 @@
 #if defined(MEDIAINFO_PCM_YES)
     #include "MediaInfo/Audio/File_Pcm.h"
 #endif
+#if defined(MEDIAINFO_SMPTEST0337_YES)
+    #include "MediaInfo/Audio/File_SmpteSt0337.h"
+#endif
 #if defined(MEDIAINFO_CDP_YES)
     #include "MediaInfo/Text/File_Cdp.h"
 #endif
@@ -691,6 +694,9 @@ namespace Elements
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_clap=0x636C6170;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_chan=0x6368616E;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr=0x636F6C72;
+    const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr_clcn=0x636C636E;
+    const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc=0x6E636C63;
+    const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr_prof=0x70726F66;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_d263=0x64323633;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_dac3=0x64616333;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_damr=0x64616D72;
@@ -1313,7 +1319,8 @@ void File_Mpeg4::cdat()
 
     #if MEDIAINFO_DEMUX
         Demux(Buffer+Buffer_Offset, (size_t)Element_Size, ContentType_MainStream);
-        Streams[(int32u)Element_Code].Parsers[0]->FrameInfo=FrameInfo;
+        Streams[(int32u)Element_Code].Parsers[0]->FrameInfo.DTS=FrameInfo.DTS;
+        Streams[(int32u)Element_Code].Parsers[0]->FrameInfo.DUR=FrameInfo.DUR/(Element_Size/2);
     #endif //MEDIAINFO_DEMUX
     while (Element_Offset+2<=Element_Size)
     {
@@ -2515,11 +2522,11 @@ void File_Mpeg4::moov_meta_ilst_xxxx_data()
                         {
                             File_PropertyList MI;
                             Open_Buffer_Init(&MI);
-                            Open_Buffer_Continue(&MI, Buffer+Buffer_Offset+8, Element_Size-8);
+                            Open_Buffer_Continue(&MI, Buffer+Buffer_Offset+8, (size_t)(Element_Size-8));
                             Open_Buffer_Finalize(&MI);
                             Merge(MI, Stream_General, 0, 0);
                         }
-                        else   
+                        else
                             Metadata_Get(Parameter, moov_meta_ilst_xxxx_name_Name);
                     }
                     else
@@ -4244,6 +4251,25 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
                 Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
             }
 
+            //Specific cases
+            #if defined(MEDIAINFO_SMPTEST0337_YES)
+            if (Channels==2 && SampleSize<=32 && SampleRate==48000) //Some SMPTE ST 337 streams are hidden in PCM stream
+            {
+                File_SmpteSt0337* Parser=new File_SmpteSt0337;
+                Parser->Container_Bits=(int8u)SampleSize;
+                Parser->Endianness=(Flags&0x02)?'B':'L';
+                Parser->ShouldContinueParsing=true;
+                #if MEDIAINFO_DEMUX
+                    if (Config->Demux_Unpacketize_Get())
+                    {
+                        Parser->Demux_Level=2; //Container
+                        Parser->Demux_UnpacketizeContainer=true;
+                    }
+                #endif //MEDIAINFO_DEMUX
+                Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
+            }
+            #endif
+
             //PCM parser
             File_Pcm* Parser=new File_Pcm;
             Parser->Channels=(int8u)Channels;
@@ -4466,6 +4492,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxVideo()
 
     int16u Width, Height, Depth, ColorTableID;
     int8u  CompressorName_Size;
+    bool   IsGreyscale;
     Skip_B2(                                                    "Version");
     Skip_B2(                                                    "Revision level");
     Skip_C4(                                                    "Vendor");
@@ -4489,9 +4516,31 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxVideo()
         //this is hard-coded 32-byte string
         Skip_Local(32,                                          "Compressor name");
     Get_B2 (Depth,                                              "Depth");
+    if (Depth>0x20 && Depth<0x40)
+    {
+        Depth-=0x20;
+        IsGreyscale=true;
+    }
+    else if (Depth==1)
+        IsGreyscale=true;
+    else
+        IsGreyscale=false;
     Get_B2 (ColorTableID,                                       "Color table ID");
-    if (ColorTableID==0 && Width && Height) //In one file, if Zero-filled, Color table is not present
-        Skip_XX(32,                                             "Color Table");
+    if (!IsGreyscale && (Depth>1 && Depth<=8) && !ColorTableID)
+    {
+        int32u ColorStart;
+        int16u ColorEnd;
+        Get_B4 (ColorStart,                                     "Color Start");
+        Skip_B2(                                                "Color Count");
+        Get_B2 (ColorEnd,                                       "Color End");
+        for (int32u Color=ColorStart; Color<=ColorEnd; Color++)
+        {
+            Skip_B2(                                            "Alpha");
+            Skip_B2(                                            "Red");
+            Skip_B2(                                            "Green");
+            Skip_B2(                                            "Blue");
+        }
+    }
 
     if (moov_trak_mdia_minf_stbl_stsd_Pos)
         return; //Handling only the first description
@@ -4670,17 +4719,12 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxVideo()
         //RGB(A)
         if (Codec=="raw " || Codec=="rle ")
         {
-            if (Depth==1)
+            if (IsGreyscale)
             {
                 Fill(Stream_Video, StreamPos_Last, Video_ColorSpace, "Y", Unlimited, true, true);
-                Fill(Stream_Video, StreamPos_Last, Video_BitDepth, 1);
+                Fill(Stream_Video, StreamPos_Last, Video_BitDepth, Depth);
             }
-            else if (Depth<15)
-            {
-                Fill(Stream_Video, StreamPos_Last, Video_ColorSpace, "RGB", Unlimited, true, true);
-                Fill(Stream_Video, StreamPos_Last, Video_BitDepth, 8);
-            }
-            else if (Depth==32 || Depth==36)
+            else if (Depth==32)
             {
                 Fill(Stream_Video, StreamPos_Last, Video_ColorSpace, "RGBA", Unlimited, true, true);
                 Fill(Stream_Video, StreamPos_Last, Video_BitDepth, Depth/4);
@@ -5012,11 +5056,37 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_colr()
     Element_Name("Color Parameter");
 
     //Parsing
+    int32u ColorParameterType;
+    Get_C4 (ColorParameterType,                                 "Color parameter type");
+    switch (ColorParameterType)
+    {
+        case Elements::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_clcn: moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc(true); break;
+        case Elements::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc: moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc(); break;
+        case Elements::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_prof: moov_trak_mdia_minf_stbl_stsd_xxxx_colr_prof(); break;
+        default                                                    : Skip_XX(Element_Size-Element_Offset, "Unknown");
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc(bool LittleEndian)
+{
+    //Parsing
     int16u  colour_primaries, transfer_characteristics, matrix_coefficients;
-    Skip_C4(                                                    "Color parameter type");
-    Get_B2 (colour_primaries,                                   "Primaries index"); Param_Info1(Mpegv_colour_primaries((int8u)colour_primaries));
-    Get_B2 (transfer_characteristics,                           "Transfer function index"); Param_Info1(Mpegv_transfer_characteristics((int8u)transfer_characteristics));
-    Get_B2 (matrix_coefficients,                                "Matrix index"); Param_Info1(Mpegv_matrix_coefficients((int8u)matrix_coefficients));
+    if (LittleEndian)
+        Get_L2 (colour_primaries,                               "Primaries index");
+    else
+        Get_B2 (colour_primaries,                               "Primaries index");
+    Param_Info1(Mpegv_colour_primaries((int8u)colour_primaries));
+    if (LittleEndian)
+        Get_L2 (transfer_characteristics,                       "Transfer function index");
+    else
+        Get_B2 (transfer_characteristics,                       "Transfer function index");
+    Param_Info1(Mpegv_transfer_characteristics((int8u)transfer_characteristics));
+    if (LittleEndian)
+        Get_L2 (matrix_coefficients,                            "Matrix index");
+    else
+        Get_B2 (matrix_coefficients,                            "Matrix index");
+    Param_Info1(Mpegv_matrix_coefficients((int8u)matrix_coefficients));
 
     FILLING_BEGIN();
         if (Retrieve(Stream_Video, StreamPos_Last, Video_colour_description_present).empty()) //Using only the first one met
@@ -5027,6 +5097,13 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_colr()
             Fill(Stream_Video, StreamPos_Last, Video_matrix_coefficients, Mpegv_matrix_coefficients((int8u)matrix_coefficients));
         }
     FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_prof()
+{
+    //Parsing
+    Skip_XX(Element_Size-Element_Offset,                        "ICC profile"); //TODO: parse ICC profile
 }
 
 //---------------------------------------------------------------------------

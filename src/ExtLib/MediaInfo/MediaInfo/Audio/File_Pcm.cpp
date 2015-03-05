@@ -258,7 +258,7 @@ void File_Pcm::Read_Buffer_Continue()
         int64u BitRate=SamplingRate*BitDepth*Channels;
         int64u ByteRate=BitRate/8;
         if (Buffer_Size>=ByteRate/4) // 1/4 of second is enough for detection
-            Frame_Count_Valid=1;
+            Frame_Count_Valid=2;
     }
 
     #if MEDIAINFO_DEMUX
@@ -407,7 +407,10 @@ void File_Pcm::Data_Parse()
         Frame_Count_NotParsedIncluded++;
     if (FrameInfo.DTS!=(int64u)-1 && FrameInfo.DUR!=(int64u)-1)
     {
-        FrameInfo.DTS+=FrameInfo.DUR;
+        if (BitDepth && Channels && SamplingRate)
+            FrameInfo.DTS+=Element_Size*1000000000*8/BitDepth/Channels/SamplingRate;
+        else
+            FrameInfo.DTS+=FrameInfo.DUR;
         FrameInfo.PTS=FrameInfo.DTS;
     }
     if ((!Status[IsAccepted] && Frame_Count>=Frame_Count_Valid) || File_Offset+Buffer_Size>=File_Size)

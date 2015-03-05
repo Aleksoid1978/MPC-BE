@@ -11,6 +11,7 @@
 	+ MPCVideoDec - добавлен HEVC DXVA декодер;
 
 Обновлены библиотеки:
+	MediaInfo 0.7.72+ svn rev.6720;
 	jsoncpp 1.0.0-212 git-gc1e834a
 
 1.4.3

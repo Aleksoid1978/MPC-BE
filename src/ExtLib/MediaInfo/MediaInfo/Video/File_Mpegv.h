@@ -290,6 +290,8 @@ private :
     bool   group_start_FirstPass;
     bool   group_start_drop_frame_flag;
     bool   group_start_closed_gop;
+    size_t group_start_closed_gop_Closed;
+    size_t group_start_closed_gop_Open;
     bool   group_start_broken_link;
     bool   Searching_TimeStamp_Start_DoneOneTime;
     bool   Parsing_End_ForDTS;
@@ -338,9 +340,9 @@ private :
         vlc_fast coded_block_pattern;
     #endif //MEDIAINFO_MACROBLOCKS
 
-    #if MEDIAINFO_IBI
+    #if MEDIAINFO_IBIUSAGE
         bool    Ibi_SliceParsed;
-    #endif //MEDIAINFO_IBI
+    #endif //MEDIAINFO_IBIUSAGE
 
     #if MEDIAINFO_ADVANCED
         int64u  InitDataNotRepeated;

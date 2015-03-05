@@ -58,9 +58,11 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     #if MEDIAINFO_ADVANCED
         File_IgnoreSequenceFileSize=false;
         File_IgnoreSequenceFilesCount=false;
+        File_SequenceFilesSkipFrames=0;
         File_DefaultFrameRate=0;
         File_Source_List=false;
         File_RiskyBitRateEstimation=false;
+        File_MergeBitRateInfo=true;
         #if MEDIAINFO_DEMUX
             File_Demux_Unpacketize_StreamLayoutChange_Skip=false;
         #endif //MEDIAINFO_DEMUX
@@ -105,10 +107,12 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
         Demux_FirstFrameNumber=(int64u)-1;
         Demux_InitData=0; //In Demux event
     #endif //MEDIAINFO_DEMUX
-    #if MEDIAINFO_IBI
-        Ibi_Create=false;
+    #if MEDIAINFO_IBIUSAGE
         Ibi_UseIbiInfoIfAvailable=false;
-    #endif //MEDIAINFO_IBI
+    #endif //MEDIAINFO_IBIUSAGE
+    #if MEDIAINFO_IBIUSAGE
+        Ibi_Create=false;
+    #endif //MEDIAINFO_IBIUSAGE
 
     //Specific
     File_MpegTs_ForceMenu=false;
@@ -148,11 +152,12 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     File_Buffer_Repeat_IsSupported=false;
     File_IsGrowing=false;
     File_IsNotGrowingAnymore=false;
+    File_IsImageSequence=false;
     File_Current_Offset=0;
     File_Current_Size=(int64u)-1;
-    File_IgnoreFramesBefore=0;
-    File_IgnoreFramesAfter=(int64u)-1;
-    File_IgnoreFramesRate=0;
+    File_IgnoreEditsBefore=0;
+    File_IgnoreEditsAfter=(int64u)-1;
+    File_EditRate=0;
     File_Size=(int64u)-1;
     ParseSpeed=MediaInfoLib::Config.ParseSpeed_Get();
     #if MEDIAINFO_EVENTS
@@ -308,6 +313,15 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
             return __T("Disabled due to compilation options");
         #endif //MEDIAINFO_MD5
     }
+    else if (Option_Lower==__T("file_sequencefilesskipframes") || Option_Lower==__T("file_sequencefileskipframes"))
+    {
+        #if MEDIAINFO_ADVANCED
+            File_SequenceFilesSkipFrames_Set(Ztring(Value).To_int64u());
+            return Ztring();
+        #else //MEDIAINFO_ADVANCED
+            return __T("Disabled due to compilation options");
+        #endif //MEDIAINFO_ADVANCED
+    }
     else if (Option_Lower==__T("file_defaultframerate"))
     {
         #if MEDIAINFO_MD5
@@ -330,6 +344,15 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     {
         #if MEDIAINFO_ADVANCED
             File_RiskyBitRateEstimation_Set(!(Value==__T("0") || Value.empty()));
+            return Ztring();
+        #else //MEDIAINFO_ADVANCED
+            return __T("Advanced features are disabled due to compilation options");
+        #endif //MEDIAINFO_ADVANCED
+    }
+    else if (Option_Lower==__T("file_mergebitrateinfo"))
+    {
+        #if MEDIAINFO_ADVANCED
+            File_MergeBitRateInfo_Set(!(Value==__T("0") || Value.empty()));
             return Ztring();
         #else //MEDIAINFO_ADVANCED
             return __T("Advanced features are disabled due to compilation options");
@@ -616,36 +639,36 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     }
     else if (Option_Lower==__T("file_ibi"))
     {
-        #if MEDIAINFO_IBI
+        #if MEDIAINFO_IBIUSAGE
             Ibi_Set(Value);
             return Ztring();
-        #else //MEDIAINFO_IBI
+        #else //MEDIAINFO_IBIUSAGE
             return __T("IBI support is disabled due to compilation options");
-        #endif //MEDIAINFO_IBI
+        #endif //MEDIAINFO_IBIUSAGE
     }
     else if (Option_Lower==__T("file_ibi_create"))
     {
-        #if MEDIAINFO_IBI
+        #if MEDIAINFO_IBIUSAGE
             if (Ztring(Value).To_int64u()==0)
                 Ibi_Create_Set(false);
             else
                 Ibi_Create_Set(true);
             return Ztring();
-        #else //MEDIAINFO_IBI
+        #else //MEDIAINFO_IBIUSAGE
             return __T("IBI support is disabled due to compilation options");
-        #endif //MEDIAINFO_IBI
+        #endif //MEDIAINFO_IBIUSAGE
     }
     else if (Option_Lower==__T("file_ibi_useibiinfoifavailable"))
     {
-        #if MEDIAINFO_IBI
+        #if MEDIAINFO_IBIUSAGE
             if (Ztring(Value).To_int64u()==0)
                 Ibi_UseIbiInfoIfAvailable_Set(false);
             else
                 Ibi_UseIbiInfoIfAvailable_Set(true);
             return Ztring();
-        #else //MEDIAINFO_IBI
+        #else //MEDIAINFO_IBIUSAGE
             return __T("IBI support is disabled due to compilation options");
-        #endif //MEDIAINFO_IBI
+        #endif //MEDIAINFO_IBIUSAGE
     }
     else if (Option_Lower==__T("file_encryption_format"))
     {
@@ -1194,6 +1217,21 @@ bool MediaInfo_Config_MediaInfo::File_IgnoreSequenceFilesCount_Get ()
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_ADVANCED
+void MediaInfo_Config_MediaInfo::File_SequenceFilesSkipFrames_Set (int64u NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    File_SequenceFilesSkipFrames=NewValue;
+}
+
+int64u MediaInfo_Config_MediaInfo::File_SequenceFilesSkipFrames_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return File_SequenceFilesSkipFrames;
+}
+#endif //MEDIAINFO_ADVANCED
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_ADVANCED
 void MediaInfo_Config_MediaInfo::File_DefaultFrameRate_Set (float64 NewValue)
 {
     CriticalSectionLocker CSL(CS);
@@ -1237,6 +1275,21 @@ bool MediaInfo_Config_MediaInfo::File_RiskyBitRateEstimation_Get ()
 {
     CriticalSectionLocker CSL(CS);
     return File_RiskyBitRateEstimation;
+}
+#endif //MEDIAINFO_ADVANCED
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_ADVANCED
+void MediaInfo_Config_MediaInfo::File_MergeBitRateInfo_Set (bool NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    File_MergeBitRateInfo=NewValue;
+}
+
+bool MediaInfo_Config_MediaInfo::File_MergeBitRateInfo_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return File_MergeBitRateInfo;
 }
 #endif //MEDIAINFO_ADVANCED
 
@@ -1675,7 +1728,7 @@ int8u MediaInfo_Config_MediaInfo::Demux_InitData_Get ()
 // IBI support
 //***************************************************************************
 
-#if MEDIAINFO_IBI
+#if MEDIAINFO_IBIUSAGE
 //---------------------------------------------------------------------------
 void MediaInfo_Config_MediaInfo::Ibi_Set (const Ztring &Value)
 {
@@ -1692,19 +1745,6 @@ string MediaInfo_Config_MediaInfo::Ibi_Get ()
 }
 
 //---------------------------------------------------------------------------
-void MediaInfo_Config_MediaInfo::Ibi_Create_Set (bool NewValue)
-{
-    CriticalSectionLocker CSL(CS);
-    Ibi_Create=NewValue;
-}
-
-bool MediaInfo_Config_MediaInfo::Ibi_Create_Get ()
-{
-    CriticalSectionLocker CSL(CS);
-    return Ibi_Create;
-}
-
-//---------------------------------------------------------------------------
 void MediaInfo_Config_MediaInfo::Ibi_UseIbiInfoIfAvailable_Set (bool NewValue)
 {
     CriticalSectionLocker CSL(CS);
@@ -1716,7 +1756,22 @@ bool MediaInfo_Config_MediaInfo::Ibi_UseIbiInfoIfAvailable_Get ()
     CriticalSectionLocker CSL(CS);
     return Ibi_UseIbiInfoIfAvailable;
 }
-#endif //MEDIAINFO_IBI
+#endif //MEDIAINFO_IBIUSAGE
+
+#if MEDIAINFO_IBIUSAGE
+//---------------------------------------------------------------------------
+void MediaInfo_Config_MediaInfo::Ibi_Create_Set (bool NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    Ibi_Create=NewValue;
+}
+
+bool MediaInfo_Config_MediaInfo::Ibi_Create_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return Ibi_Create;
+}
+#endif //MEDIAINFO_IBIUSAGE
 
 //***************************************************************************
 // Encryption
@@ -2087,20 +2142,20 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
                     Temp->PTS-=Demux_Offset_DTS_FromStream;
             }
         }
-        if (File_IgnoreFramesBefore)
+        if (File_IgnoreEditsBefore)
         {
             if (Temp->FrameNumber!=(int64u)-1)
             {
-                if (Temp->FrameNumber>File_IgnoreFramesBefore)
-                    Temp->FrameNumber-=File_IgnoreFramesBefore;
+                if (Temp->FrameNumber>File_IgnoreEditsBefore)
+                    Temp->FrameNumber-=File_IgnoreEditsBefore;
                 else
                     Temp->FrameNumber=0;
             }
             if (Temp->DTS!=(int64u)-1)
             {
-                if (File_IgnoreFramesBefore && File_IgnoreFramesRate)
+                if (File_IgnoreEditsBefore && File_EditRate)
                 {
-                    int64u TimeOffset=float64_int64s(((float64)File_IgnoreFramesBefore)/File_IgnoreFramesRate*1000000000);
+                    int64u TimeOffset=float64_int64s(((float64)File_IgnoreEditsBefore)/File_EditRate*1000000000);
                     if (Temp->DTS>TimeOffset)
                         Temp->DTS-=TimeOffset;
                     else
@@ -2109,9 +2164,9 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
             }
             if (Temp->PTS!=(int64u)-1)
             {
-                if (File_IgnoreFramesBefore && File_IgnoreFramesRate)
+                if (File_IgnoreEditsBefore && File_EditRate)
                 {
-                    int64u TimeOffset=float64_int64s(((float64)File_IgnoreFramesBefore)/File_IgnoreFramesRate*1000000000);
+                    int64u TimeOffset=float64_int64s(((float64)File_IgnoreEditsBefore)/File_EditRate*1000000000);
                     if (Temp->PTS>TimeOffset)
                         Temp->PTS-=TimeOffset;
                     else

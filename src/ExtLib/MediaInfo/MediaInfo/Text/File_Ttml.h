@@ -39,7 +39,7 @@ public :
 
     #if MEDIAINFO_EVENTS
         int8u   MuxingMode;
-    #endif MEDIAINFO_EVENTS
+    #endif //MEDIAINFO_EVENTS
 
 private :
     //Streams management
@@ -49,6 +49,7 @@ private :
     bool FileHeader_Begin();
 
     //Buffer - Global
+    void Read_Buffer_Unsynched();
     #if MEDIAINFO_SEEK
     size_t Read_Buffer_Seek (size_t Method, int64u Value, int64u ID);
     #endif //MEDIAINFO_SEEK
