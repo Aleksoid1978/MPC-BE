@@ -6608,6 +6608,8 @@ void CMainFrame::OnViewDisplayStatsSC()
 	if (AfxGetMyApp()->m_Renderers.m_fDisplayStats > 3) {
 		AfxGetMyApp()->m_Renderers.m_fDisplayStats = 0;
 	}
+
+	RepaintVideo();
 }
 
 void CMainFrame::OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI)
