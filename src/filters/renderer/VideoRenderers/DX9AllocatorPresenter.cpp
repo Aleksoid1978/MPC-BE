@@ -2184,7 +2184,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 	D3DLOCKED_RECT r;
 	CComPtr<IDirect3DSurface9> pSurface;
-	if (m_SurfaceType != D3DFMT_X8R8G8B8) {
+	if (m_VideoBufferType != D3DFMT_X8R8G8B8) {
 		CComPtr<IDirect3DSurface9> fSurface = m_pVideoSurface[m_nCurSurface];
 		if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(desc.Width, desc.Height, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &fSurface, NULL))
 				|| FAILED(hr = m_pD3DXLoadSurfaceFromSurface(fSurface, NULL, NULL, m_pVideoSurface[m_nCurSurface], NULL, NULL, D3DX_DEFAULT, 0))) {
