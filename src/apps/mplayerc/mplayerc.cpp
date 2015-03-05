@@ -955,10 +955,10 @@ void CMPlayerCApp::ExportSettings()
 {
 	CString ext = IsIniValid() ? _T("ini") : _T("reg");
 	CString ext_list;
-	ext_list.Format(_T("Export files (*.%ws)|*.%ws|"), ext, ext);
+	ext_list.Format(L"Export files (*.%s)|*.%s|", ext, ext);
 
-	CFileDialog fileSaveDialog(FALSE, 0, _T("mpc-be-settings.") + ext,
-							   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST|OFN_NOCHANGEDIR,
+	CFileDialog fileSaveDialog(FALSE, 0, L"mpc-be-settings." + ext,
+							   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 							   ext_list);
 
 	if (fileSaveDialog.DoModal() == IDOK) {
@@ -966,8 +966,8 @@ void CMPlayerCApp::ExportSettings()
 		if (ext.CompareNoCase(fileSaveDialog.GetFileExt()) != 0) {
 			savePath.Append(_T(".") + ext);
 		}
-		bool success;
-
+		
+		bool success = false;
 		AfxGetAppSettings().SaveSettings();
 
 		if (IsIniValid()) {
