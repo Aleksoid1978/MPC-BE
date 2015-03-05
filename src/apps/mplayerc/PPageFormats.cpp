@@ -888,12 +888,6 @@ BOOL CPPageFormats::OnApply()
 	bool bSetAssociatedWithIcon	= !!m_fAssociatedWithIcons.GetCheck();
 	bool bSetContextFile		= !!m_fContextFiles.GetCheck();
 
-	BOOL bIs64 = IsW64();
-	UnRegisterShellExt(ShellExt);
-	if (bIs64) {
-		UnRegisterShellExt(ShellExt64);
-	}
-
 	m_bFileExtChanged = m_bFileExtChanged || (bSetContextFileOld != bSetContextFile || bSetAssociatedWithIconOld != bSetAssociatedWithIcon);
 
 	if (m_bFileExtChanged) {
@@ -918,7 +912,9 @@ BOOL CPPageFormats::OnApply()
 		}
 	}
 
-	if (m_fContextFiles.GetCheck() || m_fContextDir.GetCheck()) {
+	if (m_bFileExtChanged
+			|| !!m_fContextFiles.GetCheck() != s.bSetContextFiles
+			|| !!m_fContextDir.GetCheck() != s.bSetContextDir) {
 		CRegKey key;
 		if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
 			key.SetStringValue(L"Play", ResStr(IDS_OPEN_WITH_MPC));
@@ -928,6 +924,12 @@ BOOL CPPageFormats::OnApply()
 			key.SetDWORDValue(L"ShowDir", !!m_fContextDir.GetCheck());
 
 			key.Close();
+		}
+
+		BOOL bIs64 = IsW64();
+		UnRegisterShellExt(ShellExt);
+		if (bIs64) {
+			UnRegisterShellExt(ShellExt64);
 		}
 
 		RegisterShellExt(ShellExt);
@@ -976,7 +978,9 @@ BOOL CPPageFormats::OnApply()
 		UNREFERENCED_PARAMETER(hr);
 	}
 
-	SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+	if (m_bFileExtChanged) {
+		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+	}
 
 	m_bFileExtChanged = false;
 
