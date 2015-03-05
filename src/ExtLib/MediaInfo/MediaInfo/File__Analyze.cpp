@@ -20,12 +20,12 @@
 #include "MediaInfo/File__Analyze.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "MediaInfo/MediaInfo_Config.h"
-#if MEDIAINFO_IBI
-    #if MEDIAINFO_SEEK
-        #include "MediaInfo/Multiple/File_Ibi.h"
-    #endif //MEDIAINFO_SEEK
+#if MEDIAINFO_IBIUSAGE && MEDIAINFO_SEEK
+    #include "MediaInfo/Multiple/File_Ibi.h"
+#endif //MEDIAINFO_IBIUSAGE && MEDIAINFO_SEEK
+#if MEDIAINFO_IBIUSAGE
     #include "MediaInfo/Multiple/File_Ibi_Creation.h"
-#endif //MEDIAINFO_IBI
+#endif //MEDIAINFO_IBIUSAGE
 #include <cstring>
 using namespace std;
 using namespace tinyxml2;
@@ -216,12 +216,14 @@ File__Analyze::File__Analyze ()
     #endif //MEDIAINFO_MD5
 
     Unsynch_Frame_Count=(int64u)-1;
-    #if MEDIAINFO_IBI
-        Config_Ibi_Create=false;
+    #if MEDIAINFO_IBIUSAGE
         Ibi_SynchronizationOffset_Current=0;
         Ibi_SynchronizationOffset_BeginOfFrame=0;
+    #endif //MEDIAINFO_IBIUSAGE
+    #if MEDIAINFO_IBIUSAGE
+        Config_Ibi_Create=false;
         IbiStream=NULL;
-    #endif //MEDIAINFO_IBI
+    #endif //MEDIAINFO_IBIUSAGE
 }
 
 //---------------------------------------------------------------------------
@@ -247,10 +249,10 @@ File__Analyze::~File__Analyze ()
         delete MD5; //MD5=NULL;
     #endif //MEDIAINFO_MD5
 
-    #if MEDIAINFO_IBI
+    #if MEDIAINFO_IBIUSAGE
         if (!IsSub)
             delete IbiStream; //IbiStream=NULL;
-    #endif //MEDIAINFO_IBI
+    #endif //MEDIAINFO_IBIUSAGE
 }
 
 //***************************************************************************
@@ -318,11 +320,11 @@ void File__Analyze::Open_Buffer_Init (int64u File_Size_)
             }
         }
     #endif //MEDIAINFO_EVENTS
-    #if MEDIAINFO_IBI
+    #if MEDIAINFO_IBIUSAGE
         Config_Ibi_Create=Config->Ibi_Create_Get() && Config->ParseSpeed==1.0;
         if (Config_Ibi_Create && !IsSub && IbiStream==NULL)
             IbiStream=new ibi::stream;
-    #endif //MEDIAINFO_IBI
+    #endif //MEDIAINFO_IBIUSAGE
 }
 
 void File__Analyze::Open_Buffer_Init (File__Analyze* Sub)
@@ -333,7 +335,11 @@ void File__Analyze::Open_Buffer_Init (File__Analyze* Sub)
 void File__Analyze::Open_Buffer_Init (File__Analyze* Sub, int64u File_Size_)
 {
     //Integrity
-    if (Sub==NULL)
+    if (Sub==NULL
+ 	    #if MEDIAINFO_EVENTS
+ 	            || StreamIDs_Size==0
+ 	    #endif
+                )
         return;
 
     //Parsing
@@ -565,8 +571,7 @@ void File__Analyze::Open_Buffer_Continue (const int8u* ToAdd, size_t ToAdd_Size)
         #endif //MEDIAINFO_DEMUX
          )
     {
-        if (!BookMark_Code.empty())
-            BookMark_Get();
+        BookMark_Get();
 
         if (File_GoTo>=File_Size)
         {
@@ -3003,8 +3008,7 @@ void File__Analyze::GoTo (int64u GoTo, const char* ParserName)
 
     if (GoTo==File_Size)
     {
-        if (!BookMark_Code.empty())
-            BookMark_Get();
+        BookMark_Get();
         if (File_GoTo==(int64u)-1)
             ForceFinish();
         return;
@@ -3070,8 +3074,7 @@ void File__Analyze::GoTo (int64u GoTo)
 
     if (GoTo==File_Size)
     {
-        if (!BookMark_Code.empty())
-            BookMark_Get();
+        BookMark_Get();
         if (File_GoTo==(int64u)-1)
             ForceFinish();
         return;
@@ -3316,13 +3319,17 @@ void File__Analyze::BookMark_Get ()
         Element_WantNextLevel=true;
     }
 
-    for (size_t Pos=0; Pos<=Element_Level; Pos++)
+    if (!BookMark_Code.empty())
     {
-        Element[Pos].Code=BookMark_Code[Pos];
-        Element[Pos].Next=BookMark_Next[Pos];
+        for (size_t Pos=0; Pos<=BookMark_Element_Level; Pos++)
+        {
+            Element[Pos].Code=BookMark_Code[Pos];
+            Element[Pos].Next=BookMark_Next[Pos];
+        }
+        BookMark_Code.clear();
+        BookMark_Next.clear();
+        BookMark_Element_Level=0;
     }
-    BookMark_Code.clear();
-    BookMark_Next.clear();
     if (File_GoTo==(int64u)-1)
     {
         #if MEDIAINFO_MD5
@@ -3518,7 +3525,7 @@ void File__Analyze::Demux_UnpacketizeContainer_Demux_Clear ()
 //***************************************************************************
 // IBI
 //***************************************************************************
-#if MEDIAINFO_IBI
+#if MEDIAINFO_IBIUSAGE
 void File__Analyze::Ibi_Read_Buffer_Unsynched ()
 {
     Ibi_SynchronizationOffset_Current=(int64u)-1;
@@ -3538,6 +3545,7 @@ void File__Analyze::Ibi_Read_Buffer_Unsynched ()
     }
 }
 
+#if MEDIAINFO_SEEK
 size_t File__Analyze::Ibi_Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
 {
     if (IbiStream==NULL)
@@ -3720,7 +3728,10 @@ size_t File__Analyze::Ibi_Read_Buffer_Seek (size_t Method, int64u Value, int64u 
         default :   return (size_t)-1; //Not supported
     }
 }
+#endif //MEDIAINFO_SEEK
+#endif //MEDIAINFO_IBIUSAGE
 
+#if MEDIAINFO_IBIUSAGE
 void File__Analyze::Ibi_Stream_Finish ()
 {
     if (IsSub)
@@ -3823,6 +3834,6 @@ void File__Analyze::Ibi_Add ()
         Frame_Count_NotParsedIncluded=IbiStream->Infos[IbiStream->Infos_Pos-1].FrameNumber;
 }
 
-#endif //MEDIAINFO_IBI
+#endif //MEDIAINFO_IBCREATION
 
 } //NameSpace

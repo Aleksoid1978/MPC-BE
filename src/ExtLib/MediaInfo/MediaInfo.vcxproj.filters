@@ -674,6 +674,24 @@
     <ClInclude Include="MediaInfo\Text\File_Sdp.h">
       <Filter>Header Files\Text</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Audio\File_Caf.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Image\File_Bpg.h">
+      <Filter>Header Files\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Common.h">
+      <Filter>Header Files\Multiple</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Resource.h">
+      <Filter>Header Files\Multiple</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence.h">
+      <Filter>Header Files\Multiple</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence_Common.h">
+      <Filter>Header Files\Multiple</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1290,6 +1308,18 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Text\File_Sdp.cpp">
       <Filter>Source Files\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Audio\File_Caf.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Image\File_Bpg.cpp">
+      <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Resource.cpp">
+      <Filter>Source Files\Multiple</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence.cpp">
+      <Filter>Source Files\Multiple</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

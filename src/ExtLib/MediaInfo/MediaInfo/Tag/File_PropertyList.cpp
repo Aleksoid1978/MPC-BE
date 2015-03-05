@@ -66,7 +66,6 @@ bool File_PropertyList::FileHeader_Begin()
     if (!FileHeader_Begin_XML(document))
        return false;
 
-    std::string NameSpace;
     XMLElement* plist=document.FirstChildElement("plist");
     if (!plist)
     {

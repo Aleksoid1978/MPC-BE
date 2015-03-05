@@ -608,6 +608,10 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "Genre_190;Garage Rock\n"
     "Genre_191;Psybient\n"
     "Go to WebSite;Go to website\n"
+    "Gop_OpenClosed;GOP, Open/Closed\n"
+    "Gop_OpenClosed_Open;Open\n"
+    "Gop_OpenClosed_Closed;Closed\n"
+    "Gop_OpenClosed_FirstFrame;GOP, Open/Closed of first frame\n"
     "Grouping;Grouping\n"
     "h;h\n"
     "Header file;Create a header file\n"
@@ -1001,7 +1005,7 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "Send HeaderFile;Please send me the Header file here : http://sourceforge.net/projects/mediainfo/ (Bug section)\n"
     "Separator_Columns;columns separator\n"
     "Separator_Lines;lines separator\n"
-    "SerieTitle;Serie Title\n"
+    "SeriesTitle;Series Title\n"
     "ServiceChannel;Service channel number\n"
     "ServiceName;Service name\n"
     "ServiceProvider;Service provider\n"
@@ -2360,6 +2364,7 @@ void MediaInfo_Config_CodecID_Audio_Mpeg4 (InfoMap &Info)
     Info.Write(Ztring().From_UTF8(
     ".mp3;MPEG Audio;;;\n"
     "A104;AMR;;;http://www.apple.com/quicktime/download/standalone.html;Wide band\n"
+    "aac ;AAC;;;\n"
     "ac-3;AC-3;;;\n"
     "alac;ALAC;;Apple Lossless Audio Codec;http://www.apple.com/quicktime/download/standalone.html\n"
     "alaw;ADPCM;;;http://www.apple.com/quicktime/download/standalone.html\n"
@@ -2688,8 +2693,9 @@ void MediaInfo_Config_CodecID_Text_Matroska (InfoMap &Info)
     "S_TEXT/UTF8;UTF-8;;UTF-8 Plain Text\n"
     "S_USF;USF;;Universal Subtitle Format\n"
     "S_UTF8;UTF-8;;UTF-8 Plain Text\n"
-    "S_VOBSUB;VobSub;;The same subtitle format used on DVDs\n"
-    "S_HDMV/PGS;PGS;;The same subtitle format used on BDs/HD-DVDs\n"
+    "S_VOBSUB;VobSub;;Picture based subtitle format used on DVDs\n"
+    "S_HDMV/PGS;PGS;;Picture based subtitle format used on BDs/HD-DVDs\n"
+    "S_HDMV/TEXTST;TEXTST;;Text based subtitle format used on BDs\n"
     ));
     Info.Separator_Set(0, ZenLib::EOL);
 }
@@ -3816,7 +3822,9 @@ void MediaInfo_Config_Codec (InfoMap &Info)
     "S_TEXT/ASS;ASS;Mk;T;;;Advanced Sub Station Alpha\n"
     "S_TEXT/USF;USF;Mk;T;;;Universal Subtitle Format\n"
     "S_IMAGE/BMP;Bitmap;Mk;T;;;Basic image based subtitle format\n"
-    "S_VOBSUB;VobSub;Mk;T;;;The same subtitle format used on DVDs\n"
+    "S_VOBSUB;VobSub;Mk;T;;;Picture based subtitle format used on DVDs\n"
+    "S_HDMV/PGS;PGS;Mk;T;;;Picture based subtitle format used on BDs/HD-DVDs\n"
+    "S_HDMV/TEXTST;TEXTST;Mk;T;;;Text based subtitle format used on BDs\n"
     ));
     Info.Separator_Set(0, ZenLib::EOL);
 }
@@ -4494,6 +4502,10 @@ void MediaInfo_Config_Video (ZtringListList &Info)
     "TimeCode_FirstFrame;;;Y YC;;;Time code in HH:MM:SS:FF, last colon replaced by semicolon for drop frame if available format\n"
     "TimeCode_Settings;;;Y YT;;;Time code settings\n"
     "TimeCode_Source;;;Y YT;;;Time code source (Container, Stream, SystemScheme1, SDTI, ANC...)\n"
+    "Gop_OpenClosed;; ;N YT;;;Time code information about Open/Closed\n"
+    "Gop_OpenClosed/String;;;Y NT;;;Time code information about Open/Closed\n"
+    "Gop_OpenClosed;; ;N YT;;;Time code information about Open/Closed of first frame if GOP is Open for the other GOPs\n"
+    "Gop_OpenClosed/String;;;Y NT;;;Time code information about Open/Closed of first frame if GOP is Open for the other GOPs\n"
     "StreamSize;; byte;N YI;;;Streamsize in bytes;\n"
     "StreamSize/String;;;Y NT;;;Streamsize in with percentage value;\n"
     "StreamSize/String1;;;N NT;;;;\n"

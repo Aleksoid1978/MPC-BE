@@ -78,7 +78,7 @@ void File_Teletext::Streams_Fill()
 //---------------------------------------------------------------------------
 void File_Teletext::Streams_Finish()
 {
-    for (streams::iterator Stream=Streams.begin(); Stream!=Streams.end(); Stream++)
+    for (streams::iterator Stream=Streams.begin(); Stream!=Streams.end(); ++Stream)
     {
         Stream_Prepare(Stream_Text);
         Fill(Stream_Text, StreamPos_Last, Text_Format, IsSubtitle?"Teletext Subtitle":"Teletext");
@@ -136,7 +136,7 @@ bool File_Teletext::Synchronize()
             Reject();
             return false;
         }
-        
+
         Accept();
     }
     return true;
@@ -180,7 +180,7 @@ void File_Teletext::Synched_Init()
 //---------------------------------------------------------------------------
 void File_Teletext::Read_Buffer_Unsynched()
 {
-    for (streams::iterator Stream=Streams.begin(); Stream!=Streams.end(); Stream++)
+    for (streams::iterator Stream=Streams.begin(); Stream!=Streams.end(); ++Stream)
         {
             Stream_HasChanged=0;
             for (size_t PosY=0; PosY<26; ++PosY)
@@ -217,7 +217,7 @@ void File_Teletext::Read_Buffer_Continue()
         {
             if (!Status[IsAccepted])
                 Accept();
-            
+
             Skip_B1(                                            "data_identifier");
             while (Element_Offset<Element_Size)
             {
@@ -264,7 +264,7 @@ void File_Teletext::Header_Parse()
     if (MustSynchronize)
         Skip_B2(                                                "Clock run-in");
     Skip_B1(                                                    "Framing code");
-    
+
     //Magazine and Packet Number (for all packets)
     X=0, Y=0;
     bool P1, D1, P2, D2, P3, D3, P4, D4;
@@ -330,7 +330,7 @@ void File_Teletext::Header_Parse()
     if (Y==0)
     {
         C.reset();
-        
+
         Element_Begin1("Page header");
         int8u PU=0, PT=0;
         bool B;
@@ -558,7 +558,7 @@ void File_Teletext::Data_Parse()
             Get_B1(byte,                                            "Byte");
             byte&=0x7F;
             if (byte<0x20)
-                byte=0x20;    
+                byte=0x20;
             Param_Info1(Ztring().From_Local((const char*)&byte, 1));
             if (byte!=Stream.CC_Displayed_Values[Y][PosX] && (!C[7] || Y)) // C[7] is "Suppress Header", to be tested when Y==0
             {
@@ -580,7 +580,6 @@ void File_Teletext::Data_Parse()
             Element_Info1(Y);
             if (Y<26)
             {
-                wstring line;
                 Element_Info1(Streams[(X<<8)|PageNumber].CC_Displayed_Values[Y].c_str());
                 if (Y==0)
                 {

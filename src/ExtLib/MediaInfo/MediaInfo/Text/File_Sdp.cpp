@@ -68,7 +68,7 @@ void File_Sdp::Streams_Fill()
 //---------------------------------------------------------------------------
 void File_Sdp::Streams_Finish()
 {
-    for (streams::iterator Stream=Streams.begin(); Stream!=Streams.end(); Stream++)
+    for (streams::iterator Stream=Streams.begin(); Stream!=Streams.end(); ++Stream)
     {
         if (Stream->second.Parser && Stream->first<0x80) //For the moment, we filter and use only field 1)
         {
@@ -88,9 +88,9 @@ void File_Sdp::Streams_Finish()
 bool File_Sdp::Synchronize()
 {
     //Synchronizing
-    while (Buffer_Offset+3<=Buffer_Size)
+    while (Buffer_Offset+2<Buffer_Size)
     {
-        while (Buffer_Offset+3<=Buffer_Size)
+        while (Buffer_Offset+2<Buffer_Size)
         {
             if (Buffer[Buffer_Offset  ]==0x51
              && Buffer[Buffer_Offset+1]==0x15)
@@ -99,16 +99,19 @@ bool File_Sdp::Synchronize()
             Buffer_Offset++;
         }
 
-        if (Buffer_Offset+3<=Buffer_Size) //Testing if size is coherant
+        if (IsSub)
+            break; // Found one file with unknown bytes at the end of the stream, so removing this integrity test for the moment
+
+        if (Buffer_Offset+2<Buffer_Size) //Testing if size is coherant
         {
-            if (Buffer_Offset+3+Buffer[Buffer_Offset+2]==Buffer_Size)
+            if (Buffer_Offset+Buffer[Buffer_Offset+2]==Buffer_Size)
                 break;
 
-            if (Buffer_Offset+3+Buffer[Buffer_Offset+2]+3>Buffer_Size)
+            if (Buffer_Offset+Buffer[Buffer_Offset+2]+3>Buffer_Size)
                 return false; //Wait for more data
 
-            if (Buffer[Buffer_Offset+3+Buffer[Buffer_Offset+2]  ]==0x51
-             && Buffer[Buffer_Offset+3+Buffer[Buffer_Offset+2]+1]==0x15)
+            if (Buffer[Buffer_Offset+Buffer[Buffer_Offset+2]  ]==0x51
+             && Buffer[Buffer_Offset+Buffer[Buffer_Offset+2]+1]==0x15)
                 break; //while()
 
             Buffer_Offset++;
@@ -116,7 +119,7 @@ bool File_Sdp::Synchronize()
     }
 
     //Must have enough buffer for having header
-    if (Buffer_Offset+3>=Buffer_Size)
+    if (Buffer_Offset+2>=Buffer_Size)
         return false;
 
     //Synched is OK
@@ -128,7 +131,7 @@ bool File_Sdp::Synchronize()
             Reject();
             return false;
         }
-        
+
         Accept();
     }
     return true;
@@ -160,7 +163,7 @@ bool File_Sdp::Synched_Test()
 //---------------------------------------------------------------------------
 void File_Sdp::Read_Buffer_Unsynched()
 {
-    for (streams::iterator Stream=Streams.begin(); Stream!=Streams.end(); Stream++)
+    for (streams::iterator Stream=Streams.begin(); Stream!=Streams.end(); ++Stream)
     {
         if (Stream->second.Parser)
         {
@@ -206,14 +209,17 @@ void File_Sdp::Header_Parse()
         #endif //MEDIAINFO_TRACE
     }
 
-    Header_Fill_Size(3+Length);
+    if (IsSub)
+        Header_Fill_Size(Buffer_Size);
+    else
+        Header_Fill_Size(Length);
 }
 
 //---------------------------------------------------------------------------
 void File_Sdp::Data_Parse()
 {
     Element_Name("Packet");
-    
+
     for (int8u Pos=0; Pos<5; Pos++)
     {
         if (FieldLines[Pos])
@@ -237,8 +243,9 @@ void File_Sdp::Data_Parse()
     Element_Begin1("SDP Footer");
     Skip_B1(                                                    "Footer ID");
     Skip_B2(                                                    "Footer Sequence number");
-    Skip_B2(                                                    "SDP Cheksum");
-    Skip_B2(                                                    "SMPTE 291 Cheksum");
+    Skip_B1(                                                    "SDP Cheksum");
+    if (Element_Offset<Element_Size)
+        Skip_XX(Element_Size-Element_Offset,                    "Unknown, out of specs");
     Element_End0();
 }
 
