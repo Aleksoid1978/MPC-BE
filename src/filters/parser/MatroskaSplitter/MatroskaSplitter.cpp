@@ -261,6 +261,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							pvih->bmiHeader.biBitCount == 32 ? MEDIASUBTYPE_ARGB32 :
 							MEDIASUBTYPE_NULL;
 						mt.bTemporalCompression = FALSE;
+						pvih->bmiHeader.biSize = sizeof(BITMAPINFOHEADER); // fix mkvmerge bug (http://msdn.microsoft.com/en-us/library/windows/desktop/dd318229%28v=vs.85%29.aspx)
 						break;
 					//case BI_RLE8: mt.subtype = MEDIASUBTYPE_RGB8; break;
 					//case BI_RLE4: mt.subtype = MEDIASUBTYPE_RGB4; break;
