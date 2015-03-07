@@ -256,7 +256,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							pvih->bmiHeader.biBitCount == 1 ? MEDIASUBTYPE_RGB1 :
 							pvih->bmiHeader.biBitCount == 4 ? MEDIASUBTYPE_RGB4 :
 							pvih->bmiHeader.biBitCount == 8 ? MEDIASUBTYPE_RGB8 :
-							pvih->bmiHeader.biBitCount == 16 ? MEDIASUBTYPE_RGB565 :
+							pvih->bmiHeader.biBitCount == 16 ? pvih->bmiHeader.biCompression == BI_RGB ? MEDIASUBTYPE_RGB555 : MEDIASUBTYPE_RGB565 :
 							pvih->bmiHeader.biBitCount == 24 ? MEDIASUBTYPE_RGB24 :
 							pvih->bmiHeader.biBitCount == 32 ? MEDIASUBTYPE_ARGB32 :
 							MEDIASUBTYPE_NULL;
