@@ -64,8 +64,7 @@ Update_Status UpdateChecker::CheckNewVersion()
 	if (s) {
 		f = InternetOpenUrl(s, L"http://mpc-be.org/version.txt", NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 		if (f) {
-			char buffer[1024]; // limit update file to 1024 bytes
-			memset(buffer, 0, _countof(buffer));
+			char buffer[1024] = { 0 }; // limit update file to 1024 bytes
 			DWORD dwBytesRead = 0;
 
 			if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == TRUE && dwBytesRead < _countof(buffer)) {
