@@ -944,6 +944,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_hDevice(INVALID_HANDLE_VALUE)
 	, m_bWaitingForKeyFrame(TRUE)
 	, m_PixelFormat(AV_PIX_FMT_NONE)
+	, m_bFrameDecodingStart(FALSE)
 	, m_bInterlaced(FALSE)
 	, m_fSYNC(0)
 	, m_bCheckFramesOrdering(FALSE)
@@ -1508,8 +1509,9 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 			return hr;
 		}
 
-		m_bDecodingStart = FALSE;
-		m_pCurrentMediaType = *pmt;
+		m_bDecodingStart		= FALSE;
+		m_bFrameDecodingStart	= FALSE;
+		m_pCurrentMediaType		= *pmt;
 	} else if (direction == PINDIR_OUTPUT) {
 		BITMAPINFOHEADER bihOut;
 		if (!ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut)) {
@@ -2366,12 +2368,12 @@ static int64_t process_rv_timestamp(RMDemuxContext *rm, enum AVCodecID nCodecId,
 #define Continue av_frame_unref(m_pFrame); continue;
 HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStartIn, REFERENCE_TIME& rtStopIn)
 {
-	HRESULT			hr = S_OK;
-	int				got_picture;
-	int				used_bytes;
-	BOOL			bFlush = (pDataIn == NULL);
+	HRESULT	hr		= S_OK;
+	BOOL	bFlush	= (pDataIn == NULL);
+	int		got_picture;
+	int		used_bytes;
 
-	AVPacket		avpkt;
+	AVPacket avpkt;
 	av_init_packet(&avpkt);
 
 	BYTE *pDataBuffer = NULL;
@@ -2531,12 +2533,11 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			Continue;
 		}
 
-		/*
-		if (m_FormatConverter.FormatChanged(&m_PixelFormat, (AVPixelFormat*)&m_pFrame->format)) {
+		if (!m_bFrameDecodingStart && m_FormatConverter.FormatChanged(&m_PixelFormat, (AVPixelFormat*)&m_pFrame->format)) {
 			ChangeOutputMediaFormat(2);
+			m_PixelFormat = (AVPixelFormat)m_pFrame->format;
 		}
-		m_PixelFormat = (AVPixelFormat)m_pFrame->format;
-		*/
+		m_bFrameDecodingStart = TRUE;
 
 		CComPtr<IMediaSample>	pOut;
 		BYTE*					pDataOut = NULL;
@@ -2614,7 +2615,6 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 		IPin* pPin = m_pOutput->GetConnected();
 		if (IsVideoRenderer(GetFilterFromPin(pPin))) {
 			hr = NotifyEvent(EC_DISPLAY_CHANGED, (LONG_PTR)pPin, NULL);
-			SleepEx(100, FALSE);
 			if (S_OK != hr) {
 				hr = E_FAIL;
 			}
