@@ -253,15 +253,17 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 		names['HM12'] = _T("HEVC(HM12)");
 	}
 
-	if (biCompression) {
-		BYTE* b = (BYTE*)&biCompression;
+	if (biCompression != BI_RGB && biCompression != BI_BITFIELDS) {
+		DWORD fourcc = biCompression;
+		BYTE* b = (BYTE*)&fourcc;
 
-		for (ptrdiff_t i = 0; i < 4; i++)
+		for (size_t i = 0; i < 4; i++) {
 			if (b[i] >= 'a' && b[i] <= 'z') {
-				b[i] = toupper(b[i]);
+				b[i] = b[i] + 32;
 			}
+		}
 
-		if (!names.Lookup(MAKEFOURCC(b[3], b[2], b[1], b[0]), str)) {
+		if (!names.Lookup(fourcc, str)) {
 			if (subtype == MEDIASUBTYPE_DiracVideo) {
 				str = _T("Dirac Video");
 			} else if (subtype == MEDIASUBTYPE_apch ||
@@ -285,8 +287,10 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 			str = _T("RGB555");
 		else if (subtype == MEDIASUBTYPE_RGB565)
 			str = _T("RGB565");
-        else if (subtype == MEDIASUBTYPE_ARGB32)
-            str = _T("ARGB32");
+		else if (subtype == MEDIASUBTYPE_ARGB32)
+			str = _T("ARGB32");
+		else if (subtype == MEDIASUBTYPE_RGB8)
+			str = _T("RGB8");
 	}
 
 	return str;
