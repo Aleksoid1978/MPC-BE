@@ -206,6 +206,8 @@ private:
 	BOOL					m_bUseSystemLayoutChannels;
 	FILTER_STATE			m_filterState;
 
+	UINT32					m_nSampleOffset;
+
 	typedef HANDLE			(__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
 	typedef BOOL			(__stdcall *PTR_AvRevertMmThreadCharacteristics)(HANDLE AvrtHandle);
 
