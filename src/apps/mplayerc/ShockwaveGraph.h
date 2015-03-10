@@ -23,6 +23,7 @@
 
 #include "BaseGraph.h"
 #include "CShockwaveFlash.h"
+#include <Audioclient.h>
 
 
 namespace DSObjects
@@ -36,6 +37,8 @@ namespace DSObjects
 		FILTER_STATE m_fs;
 
 		CSize vsize;
+		CComPtr<ISimpleAudioVolume> m_pSimpleVolume;
+		float m_fInitialVolume;
 
 	public:
 		CShockwaveGraph(HWND hParent, HRESULT& hr);
