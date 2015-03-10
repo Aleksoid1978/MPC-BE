@@ -944,7 +944,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_hDevice(INVALID_HANDLE_VALUE)
 	, m_bWaitingForKeyFrame(TRUE)
 	, m_PixelFormat(AV_PIX_FMT_NONE)
-	, m_bFrameDecodingStart(FALSE)
 	, m_bInterlaced(FALSE)
 	, m_fSYNC(0)
 	, m_bCheckFramesOrdering(FALSE)
@@ -1510,7 +1509,6 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 		}
 
 		m_bDecodingStart		= FALSE;
-		m_bFrameDecodingStart	= FALSE;
 		m_pCurrentMediaType		= *pmt;
 	} else if (direction == PINDIR_OUTPUT) {
 		BITMAPINFOHEADER bihOut;
@@ -2533,22 +2531,18 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			Continue;
 		}
 
-		if (!m_bFrameDecodingStart && m_FormatConverter.FormatChanged(&m_PixelFormat, (AVPixelFormat*)&m_pFrame->format)) {
+		if (m_pAVCtx->frame_number == 1 && m_FormatConverter.FormatChanged(&m_PixelFormat, (AVPixelFormat*)&m_pFrame->format)) {
 			ChangeOutputMediaFormat(2);
 			m_PixelFormat = (AVPixelFormat)m_pFrame->format;
 		}
-		m_bFrameDecodingStart = TRUE;
-
-		CComPtr<IMediaSample>	pOut;
-		BYTE*					pDataOut = NULL;
 
 		UpdateAspectRatio();
+
+		CComPtr<IMediaSample> pOut;
+		BYTE* pDataOut = NULL;
 		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut, GetDuration())) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
 			Continue;
 		}
-
-		pOut->SetTime(&rtStart, &rtStop);
-		pOut->SetMediaTime(NULL, NULL);
 
 		// Check alignment on rawvideo, which can be off depending on the source file
 		AVFrame* pTmpFrame = NULL;
@@ -2574,6 +2568,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		} else {
 			m_FormatConverter.Converting(pDataOut, m_pFrame);
 		}
+		av_frame_unref(m_pFrame);
 
 #if defined(_DEBUG) && 0
 		static REFERENCE_TIME	rtLast = 0;
@@ -2582,8 +2577,9 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		rtLast = rtStart;
 #endif
 
+		pOut->SetTime(&rtStart, &rtStop);
+		pOut->SetMediaTime(NULL, NULL);
 		SetTypeSpecificFlags(pOut);
-		av_frame_unref(m_pFrame);
 
 		hr = m_pOutput->Deliver(pOut);
 	}
