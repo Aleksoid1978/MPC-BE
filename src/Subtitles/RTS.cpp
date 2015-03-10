@@ -145,8 +145,8 @@ void CWord::Paint(const CPoint& p, const CPoint& org)
 				}
 
 				if (m_style.borderStyle == 0 && (m_style.outlineWidthX + m_style.outlineWidthY > 0)) {
-					int rx = max(0, std::lround(m_style.outlineWidthX));
-					int ry = max(0, std::lround(m_style.outlineWidthY));
+					int rx = max(1, std::lround(m_style.outlineWidthX));
+					int ry = max(1, std::lround(m_style.outlineWidthY));
 
 					if (!m_pEllipse || m_pEllipse->GetXRadius() != rx || m_pEllipse->GetYRadius() != ry) {
 						CEllipseKey ellipseKey(rx, ry);
