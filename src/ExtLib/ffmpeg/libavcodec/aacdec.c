@@ -88,7 +88,6 @@
 #include "get_bits.h"
 #include "fft.h"
 #include "imdct15.h"
-#include "fmtconvert.h"
 #include "lpc.h"
 #include "kbdwin.h"
 #include "sinewin.h"
@@ -1133,7 +1132,6 @@ static av_cold int aac_decode_init(AVCodecContext *avctx)
 
     ff_aac_sbr_init();
 
-    ff_fmt_convert_init(&ac->fmt_conv, avctx);
     ac->fdsp = avpriv_float_dsp_alloc(avctx->flags & CODEC_FLAG_BITEXACT);
     if (!ac->fdsp) {
         return AVERROR(ENOMEM);
@@ -1238,7 +1236,8 @@ static int decode_ics_info(AACContext *ac, IndividualChannelStream *ics,
     if (aot != AOT_ER_AAC_ELD) {
         if (get_bits1(gb)) {
             av_log(ac->avctx, AV_LOG_ERROR, "Reserved bit set.\n");
-            return AVERROR_INVALIDDATA;
+            if (ac->avctx->err_recognition & AV_EF_BITSTREAM)
+                return AVERROR_INVALIDDATA;
         }
         ics->window_sequence[1] = ics->window_sequence[0];
         ics->window_sequence[0] = get_bits(gb, 2);

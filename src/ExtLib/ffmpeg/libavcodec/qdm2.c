@@ -78,7 +78,7 @@ typedef int8_t sb_int8_array[2][30][64];
 /**
  * Subpacket
  */
-typedef struct {
+typedef struct QDM2SubPacket {
     int type;            ///< subpacket type
     unsigned int size;   ///< subpacket size
     const uint8_t *data; ///< pointer to subpacket data (points to input data buffer, it's not a private copy)
@@ -92,12 +92,12 @@ typedef struct QDM2SubPNode {
     struct QDM2SubPNode *next; ///< pointer to next packet in the list, NULL if leaf node
 } QDM2SubPNode;
 
-typedef struct {
+typedef struct QDM2Complex {
     float re;
     float im;
 } QDM2Complex;
 
-typedef struct {
+typedef struct FFTTone {
     float level;
     QDM2Complex *complex;
     const float *table;
@@ -108,7 +108,7 @@ typedef struct {
     short cutoff;
 } FFTTone;
 
-typedef struct {
+typedef struct FFTCoefficient {
     int16_t sub_packet;
     uint8_t channel;
     int16_t offset;
@@ -116,14 +116,14 @@ typedef struct {
     uint8_t phase;
 } FFTCoefficient;
 
-typedef struct {
+typedef struct QDM2FFT {
     DECLARE_ALIGNED(32, QDM2Complex, complex)[MPA_MAX_CHANNELS][256];
 } QDM2FFT;
 
 /**
  * QDM2 decoder context
  */
-typedef struct {
+typedef struct QDM2Context {
     /// Parameters from codec header, do not change during playback
     int nb_channels;         ///< number of channels
     int channels;            ///< number of channels
@@ -1646,7 +1646,7 @@ static av_cold int qdm2_decode_init(AVCodecContext *avctx)
 
     if (!avctx->extradata || (avctx->extradata_size < 48)) {
         av_log(avctx, AV_LOG_ERROR, "extradata missing or truncated\n");
-        return -1;
+        return AVERROR_INVALIDDATA;
     }
 
     extradata      = avctx->extradata;
@@ -1662,18 +1662,18 @@ static av_cold int qdm2_decode_init(AVCodecContext *avctx)
     if (extradata_size < 12) {
         av_log(avctx, AV_LOG_ERROR, "not enough extradata (%i)\n",
                extradata_size);
-        return -1;
+        return AVERROR_INVALIDDATA;
     }
 
     if (memcmp(extradata, "frmaQDM", 7)) {
         av_log(avctx, AV_LOG_ERROR, "invalid headers, QDM? not found\n");
-        return -1;
+        return AVERROR_INVALIDDATA;
     }
 
     if (extradata[7] == 'C') {
 //        s->is_qdmc = 1;
-        av_log(avctx, AV_LOG_ERROR, "stream is QDMC version 1, which is not supported\n");
-        return -1;
+        avpriv_report_missing_feature(avctx, "QDMC version 1");
+        return AVERROR_PATCHWELCOME;
     }
 
     extradata += 8;
@@ -1684,14 +1684,14 @@ static av_cold int qdm2_decode_init(AVCodecContext *avctx)
     if(size > extradata_size){
         av_log(avctx, AV_LOG_ERROR, "extradata size too small, %i < %i\n",
                extradata_size, size);
-        return -1;
+        return AVERROR_INVALIDDATA;
     }
 
     extradata += 4;
     av_log(avctx, AV_LOG_DEBUG, "size: %d\n", size);
     if (AV_RB32(extradata) != MKBETAG('Q','D','C','A')) {
         av_log(avctx, AV_LOG_ERROR, "invalid extradata, expecting QDCA\n");
-        return -1;
+        return AVERROR_INVALIDDATA;
     }
 
     extradata += 8;
@@ -1760,8 +1760,8 @@ static av_cold int qdm2_decode_init(AVCodecContext *avctx)
 
     // Fail on unknown fft order
     if ((s->fft_order < 7) || (s->fft_order > 9)) {
-        av_log(avctx, AV_LOG_ERROR, "Unknown FFT order (%d), contact the developers!\n", s->fft_order);
-        return -1;
+        avpriv_request_sample(avctx, "Unknown FFT order %d", s->fft_order);
+        return AVERROR_PATCHWELCOME;
     }
     if (s->fft_size != (1 << (s->fft_order - 1))) {
         av_log(avctx, AV_LOG_ERROR, "FFT size %d not power of 2.\n", s->fft_size);
@@ -1869,8 +1869,8 @@ static int qdm2_decode_frame(AVCodecContext *avctx, void *data,
     out = (int16_t *)frame->data[0];
 
     for (i = 0; i < 16; i++) {
-        if (qdm2_decode(s, buf, out) < 0)
-            return -1;
+        if ((ret = qdm2_decode(s, buf, out)) < 0)
+            return ret;
         out += s->channels * s->frame_size;
     }
 

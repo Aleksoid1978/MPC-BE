@@ -230,6 +230,7 @@ void avcodec_register_all(void)
     REGISTER_PARSER (MPEGAUDIO, mpegaudio);
     REGISTER_PARSER (MPEGVIDEO, mpegvideo);
     REGISTER_PARSER (TAK, tak);
+    REGISTER_PARSER (VORBIS, vorbis);
     REGISTER_PARSER (VP3, vp3);
     REGISTER_PARSER (VP8, vp8);
     REGISTER_PARSER (VP9, vp9);

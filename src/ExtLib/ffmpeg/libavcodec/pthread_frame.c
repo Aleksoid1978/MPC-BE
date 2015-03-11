@@ -237,10 +237,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
         dst->sample_fmt     = src->sample_fmt;
         dst->channel_layout = src->channel_layout;
         dst->internal->hwaccel_priv_data = src->internal->hwaccel_priv_data;
-
-        // ==> Start patch MPC
-        dst->using_dxva     = src->using_dxva;
-        // <== End patch MPC
     }
 
     if (for_user) {

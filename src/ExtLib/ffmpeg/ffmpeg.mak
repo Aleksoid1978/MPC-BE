@@ -144,7 +144,9 @@ SRCS_LC = \
 	libavcodec/cook.c \
 	libavcodec/cscd.c \
 	libavcodec/dca.c \
+	libavcodec/dca_exss.c \
 	libavcodec/dca_parser.c \
+	libavcodec/dcadata.c \
 	libavcodec/dcadec.c \
 	libavcodec/dcadsp.c \
 	libavcodec/dct.c \
@@ -395,6 +397,7 @@ SRCS_LC = \
 	libavcodec/vmnc.c \
 	libavcodec/vorbis.c \
 	libavcodec/vorbis_data.c \
+	libavcodec/vorbis_parser.c \
 	libavcodec/vorbisdec.c \
 	libavcodec/vorbisdsp.c \
 	libavcodec/vp3.c \
@@ -534,7 +537,6 @@ SRCS_LU = \
 	libavutil/float_dsp.c \
 	libavutil/frame.c \
 	libavutil/imgutils.c \
-	libavutil/intfloat_readwrite.c \
 	libavutil/intmath.c \
 	libavutil/lfg.c \
 	libavutil/lls.c \

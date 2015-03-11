@@ -434,6 +434,7 @@ av_cold int ff_snow_common_init(AVCodecContext *avctx){
 
     s->avctx= avctx;
     s->max_ref_frames=1; //just make sure it's not an invalid value in case of no initial keyframe
+    s->spatial_decomposition_count = 1;
 
     ff_me_cmp_init(&s->mecc, avctx);
     ff_hpeldsp_init(&s->hdsp, avctx->flags);
@@ -718,8 +719,8 @@ av_cold void ff_snow_common_end(SnowContext *s)
         av_frame_free(&s->last_picture[i]);
     }
 
-    for(plane_index=0; plane_index < s->nb_planes; plane_index++){
-        for(level=s->spatial_decomposition_count-1; level>=0; level--){
+    for(plane_index=0; plane_index < MAX_PLANES; plane_index++){
+        for(level=MAX_DECOMPOSITIONS-1; level>=0; level--){
             for(orientation=level ? 1 : 0; orientation<4; orientation++){
                 SubBand *b= &s->plane[plane_index].band[level][orientation];
 
