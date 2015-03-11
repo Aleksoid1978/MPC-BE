@@ -447,6 +447,7 @@ HRESULT FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 		avpkt.data	= pBuffer;
 		avpkt.size	= nSize;
 		avpkt.pts	= rtStart;
+		avpkt.dts	= rtStop;
 		if (rtStart != INVALID_TIME && rtStop != INVALID_TIME) {
 			avpkt.duration = (int)(rtStop - rtStart);
 		} else {

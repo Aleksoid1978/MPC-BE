@@ -222,12 +222,7 @@ HRESULT CDXVA2Decoder::GetSapleWrapperData(AVFrame* pFrame, IMediaSample** pSamp
 		*pSample = pSampleWrapper->pSample;
 		
 		if (rtStart && rtStop) {
-			*rtStart = pFrame->pkt_pts;
-			if (pFrame->pkt_duration) {
-				*rtStop = *rtStart + pFrame->pkt_duration;
-			} else {
-				*rtStop = INVALID_TIME;
-			}
+			m_pFilter->GetFrameTimeStamp(pFrame, *rtStart, *rtStop);
 		}
 
 		return S_OK;

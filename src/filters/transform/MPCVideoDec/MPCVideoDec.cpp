@@ -943,10 +943,10 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nVideoOutputCount(0)
 	, m_hDevice(INVALID_HANDLE_VALUE)
 	, m_bWaitingForKeyFrame(TRUE)
+	, m_bRVDropBFrameTimings(FALSE)
 	, m_PixelFormat(AV_PIX_FMT_NONE)
 	, m_bInterlaced(FALSE)
 	, m_fSYNC(0)
-	, m_bCheckFramesOrdering(FALSE)
 	, m_bDecodingStart(FALSE)
 	, m_bHEVC10bit(FALSE)
 {
@@ -1132,21 +1132,28 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 		rtStop = INVALID_TIME;
 	}
 
+	if (m_bCalculateStopTime) {
+		rtStop = INVALID_TIME;
+	}
+
 	if (rtStop == INVALID_TIME) {
 		REFERENCE_TIME rtFrameDuration = AvgTimePerFrame * (m_pFrame->repeat_pict ? 3 : 2)  / 2;
 		rtStop = rtStart + (rtFrameDuration / m_dRate);
 	}
 
-	/*
-	if (m_bCheckFramesOrdering
-			&& !m_bReorderBFrame && m_pAVCtx->has_b_frames
-			&& rtStart > 0 && rtStart < m_rtLastStart) {
-		m_bReorderBFrame = true;
-	}
-	*/
-
 	m_rtLastStart = rtStart;
 	m_rtLastStop = rtStop;
+}
+
+void CMPCVideoDecFilter::GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
+{
+	rtStart = av_frame_get_best_effort_timestamp(pFrame);
+	int64_t pkt_duration = av_frame_get_pkt_duration(pFrame);
+	if (pkt_duration) {
+		rtStop = rtStart + pkt_duration;
+	} else {
+		rtStop = INVALID_TIME;
+	}
 }
 
 void CMPCVideoDecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& RealWidth, int& RealHeight)
@@ -1655,8 +1662,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 									|| m_nCodecId == AV_CODEC_ID_RV10
 									|| m_nCodecId == AV_CODEC_ID_RV20));
 
-		m_bCheckFramesOrdering = (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC);
-
 		CLSID clsidInput = GetCLSID(m_pInput->GetConnected());
 		// Daum PotPlayer's MKV Source - {A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}
 		BOOL bNotTrustSourceTimeStamp = (clsidInput == GUIDFromCString(L"{A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}"));
@@ -1665,6 +1670,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 								m_nCodecId == AV_CODEC_ID_DIRAC || 
 								(m_nCodecId == AV_CODEC_ID_MPEG4 && pmt->formattype == FORMAT_MPEG2Video)
 								|| bNotTrustSourceTimeStamp);
+
+		m_bRVDropBFrameTimings = (m_nCodecId == AV_CODEC_ID_RV10 || m_nCodecId == AV_CODEC_ID_RV20 || m_nCodecId == AV_CODEC_ID_RV30 || m_nCodecId == AV_CODEC_ID_RV40);
 	}
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
@@ -2211,8 +2218,6 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 
 	m_bWaitingForKeyFrame = TRUE;
 
-	rm.video_after_seek	= true;
-
 	m_rtStart		= rtStart;
 	m_rtStartCache	= INVALID_TIME;
 	m_rtLastStart	= 0;
@@ -2309,60 +2314,6 @@ void CMPCVideoDecFilter::HandleKeyFrame(int& got_picture)
 	}
 }
 
-#define RM_SKIP_BITS(n)	(buffer<<=n)
-#define RM_SHOW_BITS(n)	((buffer)>>(32-(n)))
-static int rm_fix_timestamp(uint8_t *buf, int64_t timestamp, enum AVCodecID nCodecId, int64_t *kf_base, int *kf_pts)
-{
-	uint8_t *s = buf + 1 + (*buf+1)*8;
-	uint32_t buffer = (s[0]<<24) + (s[1]<<16) + (s[2]<<8) + s[3];
-	uint32_t kf = timestamp;
-	int pict_type;
-	uint32_t orig_kf;
-
-	if (nCodecId == AV_CODEC_ID_RV30) {
-		RM_SKIP_BITS(3);
-		pict_type = RM_SHOW_BITS(2);
-		RM_SKIP_BITS(2 + 7);
-	} else {
-		RM_SKIP_BITS(1);
-		pict_type = RM_SHOW_BITS(2);
-		RM_SKIP_BITS(2 + 7 + 3);
-	}
-	orig_kf = kf = RM_SHOW_BITS(13); // kf= 2*RM_SHOW_BITS(12);
-	if (pict_type <= 1) {
-		// I frame, sync timestamps:
-		*kf_base = (int64_t)timestamp-kf;
-		kf = timestamp;
-	} else {
-		// P/B frame, merge timestamps:
-		int64_t tmp = (int64_t)timestamp - *kf_base;
-		kf |= tmp&(~0x1fff); // combine with packet timestamp
-		if (kf<tmp-4096) {
-			kf += 8192;
-		} else if (kf>tmp+4096) { // workaround wrap-around problems
-			kf -= 8192;
-		}
-		kf += *kf_base;
-	}
-	if (pict_type != 3) { // P || I  frame -> swap timestamps
-		uint32_t tmp=kf;
-		kf = *kf_pts;
-		*kf_pts = tmp;
-	}
-
-	return kf;
-}
-
-static int64_t process_rv_timestamp(RMDemuxContext *rm, enum AVCodecID nCodecId, uint8_t *buf, int64_t timestamp)
-{
-	if (rm->video_after_seek) {
-		rm->kf_base	= 0;
-		rm->kf_pts	= timestamp;
-		rm->video_after_seek = false;
-	}
-	return rm_fix_timestamp(buf, timestamp, nCodecId, &rm->kf_base, &rm->kf_pts);
-}
-
 #define Continue av_frame_unref(m_pFrame); continue;
 HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStartIn, REFERENCE_TIME& rtStopIn)
 {
@@ -2404,6 +2355,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			avpkt.data	= pDataBuffer;
 			avpkt.size	= nSize;
 			avpkt.pts	= rtStartIn;
+			avpkt.dts	= rtStopIn;
 			if (rtStartIn != INVALID_TIME && rtStopIn != INVALID_TIME) {
 				avpkt.duration = (int)(rtStopIn - rtStartIn);
 			} else {
@@ -2511,19 +2463,12 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			Continue;
 		}
 
-		rtStop = INVALID_TIME;
-		if ((m_nCodecId == AV_CODEC_ID_RV10 || m_nCodecId == AV_CODEC_ID_RV20) && m_pFrame->pict_type == AV_PICTURE_TYPE_B) {
+		GetFrameTimeStamp(m_pFrame, rtStart, rtStop);
+		if (m_bRVDropBFrameTimings && m_pFrame->pict_type == AV_PICTURE_TYPE_B) {
 			rtStart = m_rtLastStop;
-		} else if ((m_nCodecId == AV_CODEC_ID_RV30 || m_nCodecId == AV_CODEC_ID_RV40) && avpkt.data) {
-			rtStart = m_pFrame->pkt_pts;
-			rtStart = (rtStart == INVALID_TIME) ? m_rtLastStop : (10000i64 * process_rv_timestamp(&rm, m_nCodecId, avpkt.data, (rtStart + m_rtStart) / 10000i64) - m_rtStart);
-		} else {
-			rtStart = m_pFrame->pkt_pts;
-			if (m_pFrame->pkt_duration) {
-				rtStop = rtStart + m_pFrame->pkt_duration;
-			}
+			rtStop = INVALID_TIME;
 		}
-
+		
 		ReorderBFrames(rtStart, rtStop);
 		UpdateFrameTime(rtStart, rtStop);
 
@@ -2689,7 +2634,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 	hr = pIn->GetTime(&rtStart, &rtStop);
 	if (FAILED(hr)) {
 		rtStart = rtStop = INVALID_TIME;
-	} else if (hr == VFW_S_NO_STOP_TIME || rtStop - 1 <= rtStart || m_bCalculateStopTime) {
+	} else if (hr == VFW_S_NO_STOP_TIME || rtStop - 1 <= rtStart) {
 		rtStop = INVALID_TIME;
 	}
 

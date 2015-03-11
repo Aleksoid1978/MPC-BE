@@ -42,12 +42,6 @@ struct AVFrame;
 
 class CCpuId;
 
-struct RMDemuxContext {
-	bool	video_after_seek;
-	__int32	kf_pts;		///< timestamp of next video keyframe
-	__int64	kf_base;	///< timestamp of the prev. video keyframe
-};
-
 class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	CMPCVideoDecFilter
 	: public CBaseVideoFilter
@@ -142,15 +136,12 @@ protected:
 	DXVA2_VideoDesc							m_VideoDesc;
 
 	BOOL									m_bWaitingForKeyFrame;
+	BOOL									m_bRVDropBFrameTimings;
 
-	RMDemuxContext							rm;
 	REFERENCE_TIME							m_rtStart;
-
 	REFERENCE_TIME							m_rtStartCache;
 
 	DWORD									m_fSYNC;
-
-	BOOL									m_bCheckFramesOrdering;
 
 	CMediaType								m_pCurrentMediaType;
 
@@ -189,6 +180,7 @@ public:
 
 	REFERENCE_TIME	GetDuration();
 	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
+	void			GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	bool			IsAVI();
 
 	// === Overriden DirectShow functions
