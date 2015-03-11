@@ -96,35 +96,34 @@ HRESULT CDXVA2DecoderHEVC::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	HRESULT	hr			= S_FALSE;
 	int		got_picture	= 0;
 
-	AVFrame* pFrame;
+	AVFrame* pFrame = NULL;
 	CHECK_HR_FALSE (FFDecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
 								  pDataIn, nSize, rtStart, rtStop,
 								  &got_picture, &pFrame));
-
-	if (!pFrame || !m_DXVA_Picture_Context.slice_count) {
-		return S_FALSE;
-	}
+	CheckPointer(pFrame, S_FALSE);
 
 	IMediaSample* pSample;
 	CHECK_HR_FALSE (GetSapleWrapperData(pFrame, &pSample, NULL, NULL));
 
-	DXVA_HEVC_Picture_Context *ctx_pic		= &m_DXVA_Picture_Context;
-	ctx_pic->pp.StatusReportFeedbackNumber	= StatusReportFeedbackNumber++;
+	if (m_DXVA_Picture_Context.slice_count) {
+		DXVA_HEVC_Picture_Context *ctx_pic		= &m_DXVA_Picture_Context;
+		ctx_pic->pp.StatusReportFeedbackNumber	= StatusReportFeedbackNumber++;
 
-	// Begin frame
-	CHECK_HR_FALSE (BeginFrame(pSample));
-	// Send picture parameters
-	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(DXVA_PicParams_HEVC), &ctx_pic->pp));
-	// Send quantization matrix
-	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_InverseQuantizationMatrixBufferType, sizeof(DXVA_Qmatrix_HEVC), &ctx_pic->qm));
-	// Send bitstream
-	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType));
-	// Send slice control
-	CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_Slice_HEVC_Short) * ctx_pic->slice_count, ctx_pic->slice_short));
+		// Begin frame
+		CHECK_HR_FALSE (BeginFrame(pSample));
+		// Send picture parameters
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_PictureParametersBufferType, sizeof(DXVA_PicParams_HEVC), &ctx_pic->pp));
+		// Send quantization matrix
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_InverseQuantizationMatrixBufferType, sizeof(DXVA_Qmatrix_HEVC), &ctx_pic->qm));
+		// Send bitstream
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType));
+		// Send slice control
+		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_Slice_HEVC_Short) * ctx_pic->slice_count, ctx_pic->slice_short));
 
-	// Decode frame
-	CHECK_HR_FRAME (Execute());
-	CHECK_HR_FALSE (EndFrame());
+		// Decode frame
+		CHECK_HR_FRAME (Execute());
+		CHECK_HR_FALSE (EndFrame());
+	}
 
 	if (got_picture) {
 		hr = DisplayNextFrame();

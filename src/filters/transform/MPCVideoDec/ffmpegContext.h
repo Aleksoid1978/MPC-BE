@@ -61,7 +61,7 @@ void			FFHEVCSetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context);
 // === Common functions
 HRESULT			FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 							  BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop,
-							  int* got_picture, AVFrame** ppFrameOut);
+							  int* got_picture_ptr, AVFrame** ppFrameOut);
 BOOL			FFGetAlternateScan(struct AVCodecContext* pAVCtx);
 UINT			FFGetMBCount(struct AVCodecContext* pAVCtx);
 void			FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height);

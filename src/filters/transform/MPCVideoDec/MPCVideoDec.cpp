@@ -2234,7 +2234,7 @@ HRESULT CMPCVideoDecFilter::EndOfStream()
 {
 	CAutoLock cAutoLock(&m_csReceive);
 
-	if (m_nDecoderMode == MODE_SOFTWARE) {
+	if (m_nDecoderMode == MODE_SOFTWARE || m_pParser) {
 		REFERENCE_TIME rtStart = INVALID_TIME, rtStop = INVALID_TIME;
 		SoftwareDecode(NULL, NULL, 0, rtStart, rtStop);
 	} else if (m_pDXVADecoder) {
@@ -2431,6 +2431,9 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 				if (m_nDecoderMode != MODE_SOFTWARE) {
 					// use ffmpeg's parser for DXVA decoder - H.264 AnnexB & MPEG2 format
 					hr = m_pDXVADecoder->DecodeFrame(avpkt.data, avpkt.size, avpkt.pts, INVALID_TIME);
+					if (hr != S_OK && bFlush) {
+						bFlush = FALSE;
+					}
 
 					Continue;
 				}
