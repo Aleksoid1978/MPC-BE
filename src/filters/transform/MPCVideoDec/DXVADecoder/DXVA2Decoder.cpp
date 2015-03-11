@@ -73,6 +73,11 @@ CDXVA2Decoder* CDXVA2Decoder::CreateDXVA2Decoder(CMPCVideoDecFilter* pFilter, ID
 	return pDecoder;
 }
 
+void CDXVA2Decoder::EndOfStream()
+{
+	while (DecodeFrame(NULL, 0, INVALID_TIME, INVALID_TIME) == S_OK);
+}
+
 HRESULT CDXVA2Decoder::AddExecuteBuffer(DWORD CompressedBufferType, UINT nSize, void* pBuffer)
 {
 	HRESULT	hr			= E_INVALIDARG;

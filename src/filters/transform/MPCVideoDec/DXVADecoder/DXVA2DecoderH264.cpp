@@ -119,10 +119,7 @@ HRESULT CDXVA2DecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	CHECK_HR_FALSE (FFDecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
 								  pDataIn, nSize, rtStart, rtStop,
 								  &got_picture, &pFrame));
-
-	if (!m_DXVA_Context.ctx_pic[0].slice_count || !pFrame) {
-		return S_FALSE;
-	}
+	CheckPointer(pFrame, S_FALSE);
 
 	IMediaSample* pSample;
 	CHECK_HR_FALSE (GetSapleWrapperData(pFrame, &pSample, NULL, NULL));

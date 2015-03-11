@@ -437,13 +437,11 @@ void FFHEVCSetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context)
 #define INVALID_TIME _I64_MIN
 HRESULT FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 					  BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop,
-					  int* got_picture, AVFrame** ppFrameOut)
+					  int* got_picture_ptr, AVFrame** ppFrameOut)
 {
-	HRESULT	hr	= E_FAIL;
+	AVPacket avpkt;
+	av_init_packet(&avpkt);
 	if (pBuffer) {
-	
-		AVPacket avpkt;
-		av_init_packet(&avpkt);
 		avpkt.data	= pBuffer;
 		avpkt.size	= nSize;
 		avpkt.pts	= rtStart;
@@ -454,51 +452,56 @@ HRESULT FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 			avpkt.duration = 0;
 		}
 		avpkt.flags	= AV_PKT_FLAG_KEY;
-
-		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, got_picture, &avpkt);
-
-#if defined(_DEBUG) && 0
-		av_log(pAVCtx, AV_LOG_INFO, "FFDecodeFrame() : %d, %d\n", used_bytes, got_picture);
-#endif
-
-		if (used_bytes < 0) {
-			return hr;
-		}
-
-		switch (pAVCtx->codec_id) {
-			case AV_CODEC_ID_H264:
-				{
-					H264Context* h		= (H264Context*)pAVCtx->priv_data;
-					*ppFrameOut			= &h->cur_pic.f;
-				}
-				break;
-			case AV_CODEC_ID_HEVC:
-				{
-					HEVCContext *h		= (HEVCContext*)pAVCtx->priv_data;
-					*ppFrameOut			= h->ref->frame;
-				}
-				break;
-			case AV_CODEC_ID_VC1:
-			case AV_CODEC_ID_WMV3:
-				{
-					VC1Context* v		= (VC1Context*)pAVCtx->priv_data;
-					*ppFrameOut			= v->s.current_picture_ptr->f;
-				}
-				break;
-			case AV_CODEC_ID_MPEG2VIDEO:
-				{
-					MpegEncContext *s	= (MpegEncContext*)pAVCtx->priv_data;
-					*ppFrameOut			= s->current_picture.f;
-				}
-				break;
-			default:
-				return hr;
-		}
-
-		hr = S_OK;
+	} else {
+		avpkt.data	= NULL;
+		avpkt.size	= 0;
 	}
 
-	return hr;
+	int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, got_picture_ptr, &avpkt);
+
+#if defined(_DEBUG) && 0
+	av_log(pAVCtx, AV_LOG_INFO, "FFDecodeFrame() : %d, %d\n", used_bytes, got_picture);
+#endif
+
+	if (used_bytes < 0) {
+		return E_FAIL;
+	}
+
+	if (!(*got_picture_ptr) && !avpkt.size) {
+		return E_FAIL;
+	}
+
+	switch (pAVCtx->codec_id) {
+		case AV_CODEC_ID_H264:
+			{
+				H264Context* h		= (H264Context*)pAVCtx->priv_data;
+				*ppFrameOut			= &h->cur_pic.f;
+			}
+			break;
+		case AV_CODEC_ID_HEVC:
+			{
+				HEVCContext *h		= (HEVCContext*)pAVCtx->priv_data;
+				*ppFrameOut			= h->ref->frame;
+			}
+			break;
+		case AV_CODEC_ID_VC1:
+		case AV_CODEC_ID_WMV3:
+			{
+				VC1Context* v		= (VC1Context*)pAVCtx->priv_data;
+				*ppFrameOut			= v->s.current_picture_ptr->f;
+			}
+			break;
+		case AV_CODEC_ID_MPEG2VIDEO:
+			{
+				MpegEncContext *s	= (MpegEncContext*)pAVCtx->priv_data;
+				*ppFrameOut			= s->current_picture.f;
+			}
+			break;
+		default:
+			return E_FAIL;
+	}
+
+	return S_OK;
 }
 
 BOOL FFGetAlternateScan(struct AVCodecContext* pAVCtx)
