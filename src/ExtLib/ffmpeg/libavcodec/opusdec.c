@@ -43,8 +43,6 @@
 #include "libswresample/swresample.h"
 
 #include "avcodec.h"
-#include "celp_filters.h"
-#include "fft.h"
 #include "get_bits.h"
 #include "internal.h"
 #include "mathops.h"
@@ -451,6 +449,14 @@ static int opus_decode_packet(AVCodecContext *avctx, void *data,
     int coded_samples   = 0;
     int decoded_samples = 0;
     int i, ret;
+    int delayed_samples = 0;
+
+    for (i = 0; i < c->nb_streams; i++) {
+        OpusStreamContext *s = &c->streams[i];
+        s->out[0] =
+        s->out[1] = NULL;
+        delayed_samples = FFMAX(delayed_samples, s->delayed_samples);
+    }
 
     /* decode the header of the first sub-packet to find out the sample count */
     if (buf) {
@@ -464,7 +470,7 @@ static int opus_decode_packet(AVCodecContext *avctx, void *data,
         c->streams[0].silk_samplerate = get_silk_samplerate(pkt->config);
     }
 
-    frame->nb_samples = coded_samples + c->streams[0].delayed_samples;
+    frame->nb_samples = coded_samples + delayed_samples;
 
     /* no input or buffered data => nothing to do */
     if (!frame->nb_samples) {
@@ -474,10 +480,8 @@ static int opus_decode_packet(AVCodecContext *avctx, void *data,
 
     /* setup the data buffers */
     ret = ff_get_buffer(avctx, frame, 0);
-    if (ret < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+    if (ret < 0)
         return ret;
-    }
     frame->nb_samples = 0;
 
     for (i = 0; i < avctx->channels; i++) {

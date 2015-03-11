@@ -44,11 +44,11 @@
  * big-endian CPUs.
  *
  * @par
- * When the pixel format is palettized RGB (AV_PIX_FMT_PAL8), the palettized
+ * When the pixel format is palettized RGB32 (AV_PIX_FMT_PAL8), the palettized
  * image data is stored in AVFrame.data[0]. The palette is transported in
  * AVFrame.data[1], is 1024 bytes long (256 4-byte entries) and is
  * formatted the same as in AV_PIX_FMT_RGB32 described above (i.e., it is
- * also endian-specific). Note also that the individual RGB palette
+ * also endian-specific). Note also that the individual RGB32 palette
  * components stored in AVFrame.data[1] should be in the range 0..255.
  * This is important as many custom PAL8 video codecs that were designed
  * to run on the IBM VGA graphics adapter use 6-bit palette components.
@@ -247,7 +247,11 @@ enum AVPixelFormat {
     AV_PIX_FMT_GBRAP_LIBAV,        ///< planar GBRA 4:4:4:4 32bpp
     AV_PIX_FMT_GBRAP16BE_LIBAV,    ///< planar GBRA 4:4:4:4 64bpp, big-endian
     AV_PIX_FMT_GBRAP16LE_LIBAV,    ///< planar GBRA 4:4:4:4 64bpp, little-endian
-
+    /**
+     *  HW acceleration through QSV, data[3] contains a pointer to the
+     *  mfxFrameSurface1 structure.
+     */
+    AV_PIX_FMT_QSV,
 
 #ifndef AV_PIX_FMT_ABI_GIT_MASTER
     AV_PIX_FMT_RGBA64BE=0x123,  ///< packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian

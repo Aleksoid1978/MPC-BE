@@ -410,7 +410,7 @@ static void init_dequant4_coeff_table(H264Context *h)
     }
 }
 
-void h264_init_dequant_tables(H264Context *h)
+void ff_h264_init_dequant_tables(H264Context *h)
 {
     int i, x;
     init_dequant4_coeff_table(h);
@@ -661,8 +661,11 @@ int ff_h264_update_thread_context(AVCodecContext *dst,
 
     h->cur_pic_ptr = REBASE_PICTURE(h1->cur_pic_ptr, h, h1);
     ff_h264_unref_picture(h, &h->cur_pic);
-    if (h1->cur_pic.f.buf[0] && (ret = ff_h264_ref_picture(h, &h->cur_pic, &h1->cur_pic)) < 0)
-        return ret;
+    if (h1->cur_pic.f.buf[0]) {
+        ret = ff_h264_ref_picture(h, &h->cur_pic, &h1->cur_pic);
+        if (ret < 0)
+            return ret;
+    }
 
     h->workaround_bugs = h1->workaround_bugs;
     h->low_delay       = h1->low_delay;
@@ -967,9 +970,9 @@ static void implicit_weight_table(H264Context *h, int field)
             int w = 32;
             if (!h->ref_list[0][ref0].long_ref && !h->ref_list[1][ref1].long_ref) {
                 int poc1 = h->ref_list[1][ref1].poc;
-                int td   = av_clip(poc1 - poc0, -128, 127);
+                int td   = av_clip_int8(poc1 - poc0);
                 if (td) {
-                    int tb = av_clip(cur_poc - poc0, -128, 127);
+                    int tb = av_clip_int8(cur_poc - poc0);
                     int tx = (16384 + (FFABS(td) >> 1)) / td;
                     int dist_scale_factor = (tb * tx + 32) >> 8;
                     if (dist_scale_factor >= -64 && dist_scale_factor <= 128)
@@ -1608,9 +1611,9 @@ int ff_h264_decode_slice_header(H264Context *h, H264Context *h0)
         }
     }
 
-    if (h == h0 && h->dequant_coeff_pps != pps_id) {
+    if (first_slice && h->dequant_coeff_pps != pps_id) {
         h->dequant_coeff_pps = pps_id;
-        h264_init_dequant_tables(h);
+        ff_h264_init_dequant_tables(h);
     }
 
     frame_num = get_bits(&h->gb, h->sps.log2_max_frame_num);
