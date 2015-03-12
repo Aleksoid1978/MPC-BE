@@ -101,7 +101,9 @@ int ff_hevc_decode_short_term_rps(HEVCContext *s, ShortTermRPS *rps,
                 return AVERROR_INVALIDDATA;
             }
             rps_ridx = &sps->st_rps[sps->nb_st_rps - delta_idx];
+            // ==> Start patch MPC
             rps->rps_idx_num_delta_pocs = rps_ridx->num_delta_pocs;
+            // ==> End patch MPC
         } else
             rps_ridx = &sps->st_rps[rps - sps->st_rps - 1];
 

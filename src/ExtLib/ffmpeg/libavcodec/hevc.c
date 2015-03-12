@@ -285,24 +285,6 @@ static int decode_lt_rps(HEVCContext *s, LongTermRPS *rps, GetBitContext *gb)
     return 0;
 }
 
-static int get_buffer_sao(HEVCContext *s, AVFrame *frame, const HEVCSPS *sps)
-{
-    int ret, i;
-
-    frame->width  = s->avctx->coded_width  + 2;
-    frame->height = s->avctx->coded_height + 2;
-    if ((ret = ff_get_buffer(s->avctx, frame, AV_GET_BUFFER_FLAG_REF)) < 0)
-        return ret;
-    for (i = 0; frame->data[i]; i++) {
-        int offset = frame->linesize[i] + (1 << sps->pixel_shift);
-        frame->data[i] += offset;
-    }
-    frame->width  = s->avctx->coded_width;
-    frame->height = s->avctx->coded_height;
-
-    return 0;
-}
-
 static int set_sps(HEVCContext *s, const HEVCSPS *sps)
 {
     #define HWACCEL_MAX (CONFIG_HEVC_DXVA2_HWACCEL)
@@ -357,14 +339,29 @@ static int set_sps(HEVCContext *s, const HEVCSPS *sps)
     ff_hevc_dsp_init (&s->hevcdsp, sps->bit_depth);
     ff_videodsp_init (&s->vdsp,    sps->bit_depth);
 
+    for (i = 0; i < 3; i++) {
+        av_freep(&s->sao_pixel_buffer_h[i]);
+        av_freep(&s->sao_pixel_buffer_v[i]);
+    }
+
     if (sps->sao_enabled &&
-    // ==> Start patch MPC
-    !s->avctx->using_dxva &&
-    // ==> End patch MPC
-    !s->avctx->hwaccel) {
-        av_frame_unref(s->tmp_frame);
-        ret = get_buffer_sao(s, s->tmp_frame, sps);
-        s->sao_frame = s->tmp_frame;
+        // ==> Start patch MPC
+        !s->avctx->using_dxva &&
+        // ==> End patch MPC
+        !s->avctx->hwaccel) {
+        int c_count = (sps->chroma_format_idc != 0) ? 3 : 1;
+        int c_idx;
+
+        for(c_idx = 0; c_idx < c_count; c_idx++) {
+            int w = sps->width >> sps->hshift[c_idx];
+            int h = sps->height >> sps->vshift[c_idx];
+            s->sao_pixel_buffer_h[c_idx] =
+                av_malloc((w * 2 * sps->ctb_height) <<
+                          sps->pixel_shift);
+            s->sao_pixel_buffer_v[c_idx] =
+                av_malloc((h * 2 * sps->ctb_width) <<
+                          sps->pixel_shift);
+        }
     }
 
     s->sps = sps;
@@ -2612,8 +2609,10 @@ static int hevc_frame_start(HEVCContext *s)
     if (ret < 0)
         goto fail;
 
+    // ==> Start patch MPC
     if (IS_IRAP(s))
         s->NoRaslOutputFlag = 0;
+    // ==> End patch MPC
 
     ff_thread_finish_setup(s->avctx);
 
@@ -2969,12 +2968,6 @@ static int decode_nal_unit(HEVCContext *s, const HEVCNAL *nal)
             }
         }
 
-        if (s->sh.first_slice_in_pic_flag && s->avctx->hwaccel) {
-            ret = s->avctx->hwaccel->start_frame(s->avctx, NULL, 0);
-            if (ret < 0)
-                goto fail;
-        }
-		
         // ==> Start patch MPC
         if (s->sh.first_slice_in_pic_flag && s->avctx->using_dxva && s->avctx->dxva_context) {
             dxva_start_frame(s->avctx);
@@ -2986,6 +2979,13 @@ static int decode_nal_unit(HEVCContext *s, const HEVCNAL *nal)
                 goto fail;
         } else
         // <== End patch MPC
+
+        if (s->sh.first_slice_in_pic_flag && s->avctx->hwaccel) {
+            ret = s->avctx->hwaccel->start_frame(s->avctx, NULL, 0);
+            if (ret < 0)
+                goto fail;
+        }
+
         if (s->avctx->hwaccel) {
             ret = s->avctx->hwaccel->decode_slice(s->avctx, nal->raw_data, nal->raw_size);
             if (ret < 0)
@@ -3144,8 +3144,10 @@ static int decode_nal_units(HEVCContext *s, const uint8_t *buf, int length)
 
     s->ref = NULL;
     s->last_eos = s->eos;
+    // ==> Start patch MPC
     if (s->last_eos)
         s->NoRaslOutputFlag = 1;
+    // ==> End patch MPC
     s->eos = 0;
 
     /* split the input packet into NAL units, so we know the upper bound on the
@@ -3461,7 +3463,10 @@ static av_cold int hevc_decode_free(AVCodecContext *avctx)
 
     av_freep(&s->cabac_state);
 
-    av_frame_free(&s->tmp_frame);
+    for (i = 0; i < 3; i++) {
+        av_freep(&s->sao_pixel_buffer_h[i]);
+        av_freep(&s->sao_pixel_buffer_v[i]);
+    }
     av_frame_free(&s->output_frame);
 
     for (i = 0; i < FF_ARRAY_ELEMS(s->DPB); i++) {
@@ -3519,10 +3524,6 @@ static av_cold int hevc_init_context(AVCodecContext *avctx)
 
     s->cabac_state = av_malloc(HEVC_CONTEXTS);
     if (!s->cabac_state)
-        goto fail;
-
-    s->tmp_frame = av_frame_alloc();
-    if (!s->tmp_frame)
         goto fail;
 
     s->output_frame = av_frame_alloc();
@@ -3621,7 +3622,9 @@ static int hevc_update_thread_context(AVCodecContext *dst,
     s->pocTid0    = s0->pocTid0;
     s->max_ra     = s0->max_ra;
     s->eos        = s0->eos;
+    // ==> Start patch MPC
     s->NoRaslOutputFlag = s0->NoRaslOutputFlag;
+    // ==> End patch MPC
 
     s->is_nalff        = s0->is_nalff;
     s->nal_length_size = s0->nal_length_size;
@@ -3704,7 +3707,10 @@ static int hevc_decode_extradata(HEVCContext *s)
 static av_cold int hevc_decode_init(AVCodecContext *avctx)
 {
     HEVCContext *s = avctx->priv_data;
-    int ret, i;
+    int ret;
+    // ==> Start patch MPC
+    int i;
+    // ==> End patch MPC
 
     ff_init_cabac_states();
 
@@ -3716,7 +3722,9 @@ static av_cold int hevc_decode_init(AVCodecContext *avctx)
 
     s->enable_parallel_tiles = 0;
     s->picture_struct = 0;
+    // ==> Start patch MPC
     s->NoRaslOutputFlag = 1;
+    // ==> End patch MPC
 
     if(avctx->active_thread_type & FF_THREAD_SLICE)
         s->threads_number = avctx->thread_count;
@@ -3781,7 +3789,9 @@ static void hevc_decode_flush(AVCodecContext *avctx)
     HEVCContext *s = avctx->priv_data;
     ff_hevc_flush_dpb(s);
     s->max_ra = INT_MAX;
+    // ==> Start patch MPC
     s->NoRaslOutputFlag = 1;
+    // ==> End patch MPC
 }
 
 #define OFFSET(x) offsetof(HEVCContext, x)

@@ -174,7 +174,11 @@ int ff_hevc_output_frame(HEVCContext *s, AVFrame *out, int flush)
         int min_poc   = INT_MAX;
         int i, min_idx, ret;
 
-        if (s->sh.no_output_of_prior_pics_flag == 1 && s->NoRaslOutputFlag) {
+        if (s->sh.no_output_of_prior_pics_flag == 1
+            // ==> Start patch MPC
+            && s->NoRaslOutputFlag
+            // ==> End patch MPC
+            ) {
             for (i = 0; i < FF_ARRAY_ELEMS(s->DPB); i++) {
                 HEVCFrame *frame = &s->DPB[i];
                 if (!(frame->flags & HEVC_FRAME_FLAG_BUMPING) && frame->poc != s->poc &&
