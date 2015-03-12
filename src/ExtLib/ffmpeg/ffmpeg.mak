@@ -450,7 +450,6 @@ SRCS_LC = \
 	libavcodec/x86/h264dsp_init.c \
 	libavcodec/x86/hevc_idct_intrinsic.c \
 	libavcodec/x86/hevc_intra_intrinsic.c \
-	libavcodec/x86/hevc_sao_intrinsic.c \
 	libavcodec/x86/hevcdsp_init.c \
 	libavcodec/x86/h264_qpel.c \
 	libavcodec/x86/hpeldsp_init.c \
@@ -624,6 +623,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/hevc_idct.asm \
 	libavcodec/x86/hevc_mc.asm \
 	libavcodec/x86/hevc_res_add.asm \
+	libavcodec/x86/hevc_sao.asm \
 	libavcodec/x86/hpeldsp.asm \
 	libavcodec/x86/huffyuvdsp.asm \
 	libavcodec/x86/idctdsp.asm \

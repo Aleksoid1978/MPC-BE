@@ -4,6 +4,9 @@
 * config.asm
 * ffmpeg.mak
 
+* libavcodec/x86/hevcdsp.h
+* libavcodec/x86/hevcdsp_init.c
+
 * libavcodec/allcodecs.c
 * libavcodec/avcodec.h
 * libavcodec/error_resilience.c
@@ -14,11 +17,16 @@
 * libavcodec/h264_slice.c
 * libavcodec/hevc.c
 * libavcodec/hevc.h
+* libavcodec/hevc_parser.c
+* libavcodec/hevc_ps.c
 * libavcodec/hevc_refs.c
+* libavcodec/hevcdsp.c
+* libavcodec/hevcdsp.h
+* libavcodec/hevcpred.c
+* libavcodec/hevcpred.h
 * libavcodec/internal.h
 * libavcodec/mpeg12dec.c
 * libavcodec/mpegvideo.c
-* libavcodec/mpegvideo.h
 * libavcodec/options.c
 * libavcodec/utils.c
 * libavcodec/vc1.h
@@ -37,7 +45,14 @@
 The following files are available only in MPC-BE (compared with ffmpeg):
 
 * config.c
+
+* libavcodec/x86/hevc_idct_intrinsic.c
+* libavcodec/x86/hevc_intra_intrinsic.c
+* libavcodec/x86/hevcpred.h
+
 * libavcodec/dxva_h264.h
 * libavcodec/dxva_hevc.h
+* libavcodec/dxva_internal.h
 * libavcodec/dxva_mpeg2.h
+* libavcodec/dxva_vc1.h
 * libavcodec/h264_slice.h

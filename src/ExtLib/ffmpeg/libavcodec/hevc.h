@@ -281,7 +281,9 @@ enum ScanType {
 typedef struct ShortTermRPS {
     unsigned int num_negative_pics;
     int num_delta_pocs;
+    // ==> Start patch MPC
     int rps_idx_num_delta_pocs;
+    // ==> End patch MPC
     int32_t delta_poc[32];
     uint8_t used[32];
 } ShortTermRPS;
@@ -814,9 +816,9 @@ typedef struct HEVCContext {
     uint8_t slice_initialized;
 
     AVFrame *frame;
-    AVFrame *sao_frame;
-    AVFrame *tmp_frame;
     AVFrame *output_frame;
+    uint8_t *sao_pixel_buffer_h[3];
+    uint8_t *sao_pixel_buffer_v[3];
 
     const HEVCVPS *vps;
     const HEVCSPS *sps;
@@ -850,7 +852,9 @@ typedef struct HEVCContext {
     int bs_height;
 
     int is_decoded;
+    // ==> Start patch MPC
     int NoRaslOutputFlag;
+    // ==> End patch MPC
 
     HEVCPredContext hpc;
     HEVCDSPContext hevcdsp;
