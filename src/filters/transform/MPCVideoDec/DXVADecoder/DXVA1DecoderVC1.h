@@ -27,7 +27,6 @@ class CDXVA1DecoderVC1 : public CDXVA1Decoder
 {
 	DXVA_VC1_Context	m_DXVA_Context;
 	UINT				m_nFieldNum;
-	UINT				StatusReportFeedbackNumber;
 
 	WORD				m_wRefPictureIndex[2];
 	int					m_nDelayedSurfaceIndex;

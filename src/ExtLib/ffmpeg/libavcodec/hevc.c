@@ -40,6 +40,7 @@
 #include "hevc.h"
 
 // ==> Start patch MPC
+#include "dxva_internal.h"
 #include "dxva_hevc.h"
 // <== End patch MPC
 
@@ -2644,6 +2645,7 @@ static int get_refpic_index(const DXVA_PicParams_HEVC *pp, int surface_index)
 }
 
 static void fill_picture_parameters(const HEVCContext *h,
+                                    dxva_context *ctx,
                                     DXVA_PicParams_HEVC *pp)
 {
     const HEVCFrame *current_picture = h->ref;
@@ -2776,6 +2778,8 @@ static void fill_picture_parameters(const HEVCContext *h,
     DO_REF_LIST(ST_CURR_BEF, RefPicSetStCurrBefore);
     DO_REF_LIST(ST_CURR_AFT, RefPicSetStCurrAfter);
     DO_REF_LIST(LT_CURR, RefPicSetLtCurr);
+
+    pp->StatusReportFeedbackNumber = 1 + ctx->report_id++;
 }
 
 static void fill_scaling_lists(const HEVCContext *h, DXVA_Qmatrix_HEVC *qm)
@@ -2815,15 +2819,16 @@ static void fill_slice_short(DXVA_Slice_HEVC_Short *slice,
     slice->wBadSliceChopping     = 0;
 }
 
-static int dxva_start_frame(AVCodecContext *avctx,
-                            DXVA_HEVC_Picture_Context* ctx_pic)
+static int dxva_start_frame(AVCodecContext *avctx)
 {
     const HEVCContext *h = avctx->priv_data;
+    dxva_context* ctx = (dxva_context*)avctx->dxva_context;
+    DXVA_HEVC_Picture_Context* ctx_pic = (DXVA_HEVC_Picture_Context*)ctx->dxva_decoder_context;
 
     memset(ctx_pic, 0, sizeof(*ctx_pic));
 
     /* Fill up DXVA_PicParams_HEVC */
-    fill_picture_parameters(h, &ctx_pic->pp);
+    fill_picture_parameters(h, ctx, &ctx_pic->pp);
 
     /* Fill up DXVA_Qmatrix_HEVC */
     fill_scaling_lists(h, &ctx_pic->qm);
@@ -2835,10 +2840,12 @@ static int dxva_start_frame(AVCodecContext *avctx,
 }
 
 static int dxva_decode_slice(AVCodecContext *avctx,
-                             DXVA_HEVC_Picture_Context* ctx_pic,
                              const uint8_t *buffer,
                              uint32_t size)
 {
+    dxva_context* ctx = (dxva_context*)avctx->dxva_context;
+    DXVA_HEVC_Picture_Context* ctx_pic = (DXVA_HEVC_Picture_Context*)ctx->dxva_decoder_context;
+    
     unsigned position;
 
     if (ctx_pic->slice_count >= MAX_SLICES)
@@ -2969,14 +2976,12 @@ static int decode_nal_unit(HEVCContext *s, const HEVCNAL *nal)
         }
 		
         // ==> Start patch MPC
-        if (s->sh.first_slice_in_pic_flag && s->avctx->using_dxva && s->dxva_context) {
-            DXVA_HEVC_Picture_Context* ctx_pic = (DXVA_HEVC_Picture_Context*)s->dxva_context;
-            dxva_start_frame(s->avctx, ctx_pic);
+        if (s->sh.first_slice_in_pic_flag && s->avctx->using_dxva && s->avctx->dxva_context) {
+            dxva_start_frame(s->avctx);
         }
 
-        if (s->avctx->using_dxva && s->dxva_context) {
-            DXVA_HEVC_Picture_Context* ctx_pic = (DXVA_HEVC_Picture_Context*)s->dxva_context;
-            ret = dxva_decode_slice(s->avctx, ctx_pic, nal->raw_data, nal->raw_size);
+        if (s->avctx->using_dxva && s->avctx->dxva_context) {
+            ret = dxva_decode_slice(s->avctx, nal->raw_data, nal->raw_size);
             if (ret < 0)
                 goto fail;
         } else
@@ -3342,6 +3347,14 @@ static int hevc_decode_frame(AVCodecContext *avctx, void *data, int *got_output,
     int ret;
     HEVCContext *s = avctx->priv_data;
 
+    // ==> Start patch MPC
+    if (avctx->using_dxva && avctx->dxva_context) {
+        dxva_context* ctx = (dxva_context*)avctx->dxva_context;
+        DXVA_HEVC_Picture_Context* ctx_pic = (DXVA_HEVC_Picture_Context*)ctx->dxva_decoder_context;
+        memset(ctx_pic, 0, sizeof(*ctx_pic));
+    }
+    // ==> End patch MPC
+
     if (!avpkt->size) {
         ret = ff_hevc_output_frame(s, data, 1);
         if (ret < 0)
@@ -3350,13 +3363,6 @@ static int hevc_decode_frame(AVCodecContext *avctx, void *data, int *got_output,
         *got_output = ret;
         return 0;
     }
-
-    // ==> Start patch MPC
-    if (s->avctx->using_dxva && s->dxva_context) {
-        DXVA_HEVC_Picture_Context* ctx_pic = (DXVA_HEVC_Picture_Context*)s->dxva_context;
-        memset(ctx_pic, 0, sizeof(*ctx_pic));
-    }
-    // ==> End patch MPC
 
     s->ref = NULL;
     ret    = decode_nal_units(s, avpkt->data, avpkt->size);

@@ -28,8 +28,7 @@ CDXVA1DecoderMPEG2::CDXVA1DecoderMPEG2(CMPCVideoDecFilter* pFilter, IAMVideoAcce
 	: CDXVA1Decoder(pFilter, pAMVideoAccelerator, nPicEntryNumber)
 {
 	memset(&m_DXVA_Context, 0, sizeof(m_DXVA_Context));
-
-	FFMPEG2SetDxvaParams(m_pFilter->GetAVCtx(), &m_DXVA_Context);
+	m_dxva_context.dxva_decoder_context = &m_DXVA_Context;
 
 	Flush();
 }
@@ -134,8 +133,7 @@ HRESULT CDXVA1DecoderMPEG2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIM
 
 void CDXVA1DecoderMPEG2::UpdatePictureParams(int nSurfaceIndex)
 {
-	DXVA_ConfigPictureDecode* cpd			= &m_DXVA1Config;
-	DXVA_PictureParameters* DXVAPicParams	= &m_DXVA_Context.ctx_pic[m_nFieldNum].pp;
+	DXVA_PictureParameters* DXVAPicParams = &m_DXVA_Context.ctx_pic[m_nFieldNum].pp;
 
 	DXVAPicParams->wDecodedPictureIndex = nSurfaceIndex;
 
@@ -149,37 +147,6 @@ void CDXVA1DecoderMPEG2::UpdatePictureParams(int nSurfaceIndex)
 	}
 	DXVAPicParams->wForwardRefPictureIndex	= (DXVAPicParams->bPicIntra == 0)			   ? m_wRefPictureIndex[0] : NO_REF_FRAME;
 	DXVAPicParams->wBackwardRefPictureIndex	= (DXVAPicParams->bPicBackwardPrediction == 1) ? m_wRefPictureIndex[1] : NO_REF_FRAME;
-
-	// Shall be 0 if bConfigResidDiffHost is 0 or if BPP > 8
-	if (cpd->bConfigResidDiffHost == 0 || DXVAPicParams->bBPPminus1 > 7) {
-		DXVAPicParams->bPicSpatialResid8 = 0;
-	} else {
-		if (DXVAPicParams->bBPPminus1 == 7 && DXVAPicParams->bPicIntra && cpd->bConfigResidDiffHost) {
-			// Shall be 1 if BPP is 8 and bPicIntra is 1 and bConfigResidDiffHost is 1
-			DXVAPicParams->bPicSpatialResid8 = 1;
-		} else {
-			// Shall be 1 if bConfigSpatialResid8 is 1
-			DXVAPicParams->bPicSpatialResid8 = cpd->bConfigSpatialResid8;
-		}
-	}
-
-	// Shall be 0 if bConfigResidDiffHost is 0 or if bConfigSpatialResid8 is 0 or if BPP > 8
-	if (cpd->bConfigResidDiffHost == 0 || cpd->bConfigSpatialResid8 == 0 || DXVAPicParams->bBPPminus1 > 7) {
-		DXVAPicParams->bPicOverflowBlocks = 0;
-	}
-
-	// Shall be 1 if bConfigHostInverseScan is 1 or if bConfigResidDiffAccelerator is 0.
-	if (cpd->bConfigHostInverseScan == 1 || cpd->bConfigResidDiffAccelerator == 0) {
-		DXVAPicParams->bPicScanFixed = 1;
-
-		if (cpd->bConfigHostInverseScan != 0) {
-			DXVAPicParams->bPicScanMethod	= 3;    // 11 = Arbitrary scan with absolute coefficient address.
-		} else if (FFGetAlternateScan(m_pFilter->GetAVCtx())) {
-			DXVAPicParams->bPicScanMethod	= 1;    // 00 = Zig-zag scan (MPEG-2 Figure 7-2)
-		} else {
-			DXVAPicParams->bPicScanMethod	= 0;    // 01 = Alternate-vertical (MPEG-2 Figure 7-3),
-		}
-	}
 }
 
 int CDXVA1DecoderMPEG2::FindOldestFrame()

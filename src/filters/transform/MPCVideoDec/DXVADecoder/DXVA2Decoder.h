@@ -38,7 +38,7 @@ class CDXVA2Decoder : public CDXVADecoder
 public :
 	static CDXVA2Decoder*			CreateDXVA2Decoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config);
 	virtual							~CDXVA2Decoder();
-
+	
 	virtual void					EndOfStream();
 
 	virtual HRESULT					CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDXVASize = UINT_MAX) PURE;

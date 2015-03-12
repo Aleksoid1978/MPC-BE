@@ -144,6 +144,7 @@ int avcodec_get_context_defaults3(AVCodecContext *s, const AVCodec *codec)
 
     // ==> Start patch MPC
     s->using_dxva               = 0;
+    s->dxva_context             = NULL;
     s->entangled_thread_counter = 0;
     s->ff_avcodec_locked        = 0;
     // ==> End patch MPC

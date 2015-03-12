@@ -28,17 +28,7 @@ CDXVA2DecoderVC1::CDXVA2DecoderVC1(CMPCVideoDecFilter* pFilter, IDirectXVideoDec
 	: CDXVA2Decoder(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config, 3)
 {
 	memset(&m_DXVA_Context, 0, sizeof(m_DXVA_Context));
-
-	FFVC1SetDxvaParams(m_pFilter->GetAVCtx(), &m_DXVA_Context);
-
-	Flush();
-}
-
-void CDXVA2DecoderVC1::Flush()
-{
-	StatusReportFeedbackNumber = 0;
-
-	__super::Flush();
+	m_dxva_context.dxva_decoder_context = &m_DXVA_Context;
 }
 
 HRESULT CDXVA2DecoderVC1::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDXVASize/* = UINT_MAX*/)
@@ -78,12 +68,6 @@ HRESULT CDXVA2DecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 	HRESULT	hr			= S_FALSE;
 	int		got_picture	= 0;
 
-	memset(&m_DXVA_Context, 0, sizeof(m_DXVA_Context));
-	m_DXVA_Context.ctx_pic[0].pp.bBidirectionalAveragingMode =
-	m_DXVA_Context.ctx_pic[1].pp.bBidirectionalAveragingMode = (1                                        << 7) |
-															   (m_DXVA2Config.ConfigIntraResidUnsigned   << 6) |
-															   (m_DXVA2Config.ConfigResidDiffAccelerator << 5);
-
 	AVFrame* pFrame = NULL;
 	CHECK_HR_FALSE (FFDecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
 								  pDataIn, nSize, rtStart, rtStop,
@@ -99,13 +83,6 @@ HRESULT CDXVA2DecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 		DXVA_VC1_Picture_Context *ctx_pic = &m_DXVA_Context.ctx_pic[i];
 
 		m_nFieldNum = i;
-
-		StatusReportFeedbackNumber++;
-		if (StatusReportFeedbackNumber >= (1 << 16)) {
-			StatusReportFeedbackNumber = 1;
-		}
-		ctx_pic->pp.bPicScanFixed	= StatusReportFeedbackNumber >> 8;
-		ctx_pic->pp.bPicScanMethod	= StatusReportFeedbackNumber & 0xff;
 
 		// Begin frame
 		CHECK_HR_FALSE (BeginFrame(pSample));

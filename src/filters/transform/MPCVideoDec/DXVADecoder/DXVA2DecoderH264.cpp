@@ -28,28 +28,14 @@
 CDXVA2DecoderH264::CDXVA2DecoderH264(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config)
 	: CDXVA2Decoder(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config, 4)
 {
-	memset(&m_DXVA_Context, 0, sizeof(m_DXVA_Context));
-	m_DXVA_Context.longslice = (m_DXVA2Config.ConfigBitstreamRaw != 2);
-
-	Reserved16Bits = 3;
 	if (m_pFilter->GetPCIVendor() == PCIV_Intel && m_guidDecoder == DXVA_Intel_H264_ClearVideo) {
-		Reserved16Bits				= 0x534c;
-		m_DXVA_Context.workaround	= FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
+		m_dxva_context.workaround	= FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
 	} else if (IsATIUVD(m_pFilter->GetPCIVendor(), m_pFilter->GetPCIDevice())) {
-		Reserved16Bits				= 0;
-		m_DXVA_Context.workaround	= FF_DXVA2_WORKAROUND_SCALING_LIST_ZIGZAG;
+		m_dxva_context.workaround	= FF_DXVA2_WORKAROUND_SCALING_LIST_ZIGZAG;
 	}
 
-	FFH264SetDxvaParams(m_pFilter->GetAVCtx(), &m_DXVA_Context);
-
-	Flush();
-}
-
-void CDXVA2DecoderH264::Flush()
-{
-	StatusReportFeedbackNumber = 1;
-
-	__super::Flush();
+	memset(&m_DXVA_Context, 0, sizeof(m_DXVA_Context));
+	m_dxva_context.dxva_decoder_context = &m_DXVA_Context;
 }
 
 HRESULT CDXVA2DecoderH264::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDXVASize/* = UINT_MAX*/)
@@ -63,7 +49,7 @@ HRESULT CDXVA2DecoderH264::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nD
 		static const BYTE start_code[]		= { 0, 0, 1 };
 		static const UINT start_code_size	= sizeof(start_code);
 
-		slice = m_DXVA_Context.longslice ? (DXVA_Slice_H264_Short*)&ctx_pic->slice_long[i] : &ctx_pic->slice_short[i];
+		slice = m_dxva_context.longslice ? (DXVA_Slice_H264_Short*)&ctx_pic->slice_long[i] : &ctx_pic->slice_short[i];
 
 		UINT position					= slice->BSNALunitDataLocation;
 		UINT size						= slice->SliceBytesInBuffer;
@@ -71,7 +57,7 @@ HRESULT CDXVA2DecoderH264::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nD
 		slice->BSNALunitDataLocation	= current - pDXVABuffer;
 		slice->SliceBytesInBuffer		= start_code_size + size;
 
-		if (m_DXVA_Context.longslice) {
+		if (m_dxva_context.longslice) {
 			DXVA_Slice_H264_Long *slice_long = (DXVA_Slice_H264_Long*)slice;
 			if (i < ctx_pic->slice_count - 1) {
 				slice_long->NumMbsForSlice = slice_long[1].first_mb_in_slice - slice_long[0].first_mb_in_slice;
@@ -124,7 +110,7 @@ HRESULT CDXVA2DecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	IMediaSample* pSample;
 	CHECK_HR_FALSE (GetSapleWrapperData(pFrame, &pSample, NULL, NULL));
 
-	for (UINT i = 0; i < _countof(m_DXVA_Context.ctx_pic); i++) {
+	for (UINT i = 0; i < m_DXVA_Context.frame_count; i++) {
 		DXVA_H264_Picture_Context* ctx_pic = &m_DXVA_Context.ctx_pic[i];
 
 		if (!ctx_pic->slice_count) {
@@ -132,9 +118,6 @@ HRESULT CDXVA2DecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 		}
 
 		m_nFieldNum = i;
-
-		ctx_pic->pp.Reserved16Bits				= Reserved16Bits;
-		ctx_pic->pp.StatusReportFeedbackNumber	= StatusReportFeedbackNumber++;
 
 		// Begin frame
 		CHECK_HR_FALSE (BeginFrame(pSample));
@@ -145,7 +128,7 @@ HRESULT CDXVA2DecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 		// Send bitstream
 		CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_BitStreamDateBufferType));
 		// Send slice control
-		if (m_DXVA_Context.longslice) {
+		if (m_dxva_context.longslice) {
 			CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_Slice_H264_Long) * ctx_pic->slice_count, ctx_pic->slice_long));
 		} else {
 			CHECK_HR_FRAME (AddExecuteBuffer(DXVA2_SliceControlBufferType, sizeof(DXVA_Slice_H264_Short) * ctx_pic->slice_count, ctx_pic->slice_short));

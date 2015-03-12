@@ -681,10 +681,6 @@ typedef struct MpegEncContext {
 
     /* temporary frames used by b_frame_strategy = 2 */
     AVFrame *tmp_frames[MAX_B_FRAMES + 2];
-
-    // ==> Start patch MPC
-    void* dxva_context;
-    // <== End patch MPC
 } MpegEncContext;
 
 /* mpegvideo_enc common options */

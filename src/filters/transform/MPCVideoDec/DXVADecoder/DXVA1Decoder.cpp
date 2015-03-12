@@ -47,6 +47,10 @@ CDXVA1Decoder::CDXVA1Decoder(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator* p
 	m_DXVA1Config.bConfigBitstreamRaw			= 2;
 
 	memset(&m_DXVA1BufferInfo, 0, sizeof(m_DXVA1BufferInfo));
+
+	memset(&m_DXVA2Config, 0, sizeof(DXVA2_ConfigPictureDecode));
+	memset(&m_dxva_context, 0, sizeof(dxva_context));
+	m_pFilter->GetAVCtx()->dxva_context = &m_dxva_context;
 }
 
 CDXVA1Decoder::~CDXVA1Decoder()
@@ -74,6 +78,8 @@ void CDXVA1Decoder::Flush()
 	m_nWaitingPics		= 0;
 	m_nSurfaceIndex		= -1;
 	m_dwDisplayCount	= 1;
+
+	__super::Flush();
 }
 
 void CDXVA1Decoder::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
@@ -96,15 +102,20 @@ HRESULT CDXVA1Decoder::ConfigureDXVA1()
 		writeDXVA_QueryOrReplyFunc(&ConfigRequested.dwFunction, DXVA_QUERYORREPLYFUNCFLAG_DECODER_PROBE_QUERY, DXVA_PICTURE_DECODING_FUNCTION);
 		hr = m_pAMVideoAccelerator->Execute(ConfigRequested.dwFunction, &ConfigRequested, sizeof(DXVA_ConfigPictureDecode), &m_DXVA1Config, sizeof(DXVA_ConfigPictureDecode), 0, NULL);
 
+		// Copy to DXVA2 structure (simplify code based on accelerator config)
+		m_DXVA2Config.ConfigBitstreamRaw			= m_DXVA1Config.bConfigBitstreamRaw;
+		m_DXVA2Config.ConfigIntraResidUnsigned		= m_DXVA1Config.bConfigIntraResidUnsigned;
+		m_DXVA2Config.ConfigResidDiffAccelerator	= m_DXVA1Config.bConfigResidDiffAccelerator;
+
+		m_dxva_context.cfg = &m_DXVA2Config;
+		m_dxva_context.longslice = (m_DXVA1Config.bConfigBitstreamRaw != 2);
+
 		if (SUCCEEDED(hr)) {
 			writeDXVA_QueryOrReplyFunc(&m_DXVA1Config.dwFunction, DXVA_QUERYORREPLYFUNCFLAG_DECODER_LOCK_QUERY, DXVA_PICTURE_DECODING_FUNCTION);
 			hr = m_pAMVideoAccelerator->Execute(m_DXVA1Config.dwFunction, &m_DXVA1Config, sizeof(DXVA_ConfigPictureDecode), &ConfigRequested, sizeof(DXVA_ConfigPictureDecode), 0, NULL);
 
-			// TODO : check config!
-			// ASSERT(ConfigRequested.bConfigBitstreamRaw == 2);
-
-			AMVAUncompDataInfo		DataInfo;
-			DWORD					dwNum = COMP_BUFFER_COUNT;
+			AMVAUncompDataInfo	DataInfo;
+			DWORD				dwNum = COMP_BUFFER_COUNT;
 			DataInfo.dwUncompWidth	= m_pFilter->PictWidthRounded();
 			DataInfo.dwUncompHeight	= m_pFilter->PictHeightRounded();
 			memcpy(&DataInfo.ddUncompPixelFormat, m_pFilter->GetDXVA1PixelFormat(), sizeof(DDPIXELFORMAT));

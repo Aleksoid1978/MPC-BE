@@ -930,10 +930,6 @@ typedef struct HEVCContext {
     int sei_hflip, sei_vflip;
 
     int picture_struct;
-
-    // ==> Start patch MPC
-    void* dxva_context;
-    // <== End patch MPC
 } HEVCContext;
 
 int ff_hevc_decode_short_term_rps(HEVCContext *s, ShortTermRPS *rps,

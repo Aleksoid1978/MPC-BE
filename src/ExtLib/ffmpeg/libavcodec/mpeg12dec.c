@@ -72,10 +72,10 @@ typedef struct Mpeg1Context {
 
 // ==> Start patch MPC
 #include <windows.h>
+#include "dxva_internal.h"
 #include "dxva_mpeg2.h"
 
 static void fill_picture_parameters(AVCodecContext *avctx,
-                                    struct DXVA_MPEG2_Context *ctx,
                                     const struct MpegEncContext *s,
                                     DXVA_PictureParameters *pp)
 {
@@ -141,7 +141,6 @@ static void fill_picture_parameters(AVCodecContext *avctx,
 }
 
 static void fill_quantization_matrices(AVCodecContext *avctx,
-                                       struct DXVA_MPEG2_Context *ctx,
                                        const struct MpegEncContext *s,
                                        DXVA_QmatrixData *qm)
 {
@@ -163,12 +162,10 @@ static int dxva_start_frame(AVCodecContext *avctx,
 {
     const struct MpegEncContext *s = avctx->priv_data;
 
-    if (ctx->frame_count > 2)
-        return AVERROR_INVALIDDATA;
     assert(ctx_pic);
 
-    fill_picture_parameters(avctx, ctx, s, &ctx_pic->pp);
-    fill_quantization_matrices(avctx, ctx, s, &ctx_pic->qm);
+    fill_picture_parameters(avctx, s, &ctx_pic->pp);
+    fill_quantization_matrices(avctx, s, &ctx_pic->qm);
 
     ctx_pic->slice_count    = 0;
     ctx_pic->bitstream_size = 0;
@@ -206,15 +203,11 @@ static void fill_slice(AVCodecContext *avctx,
 }
 
 static int dxva_decode_slice(AVCodecContext *avctx,
-                             DXVA_MPEG2_Context *ctx,
                              DXVA_MPEG2_Picture_Context *ctx_pic,
                              const uint8_t *buffer, uint32_t size)
 {
     const struct MpegEncContext *s = avctx->priv_data;
     unsigned position;
-
-    if (ctx->frame_count > 2)
-        return -1;
 
     if (ctx_pic->slice_count >= MAX_SLICE)
         return -1;
@@ -1892,12 +1885,13 @@ static int mpeg_field_start(MpegEncContext *s, const uint8_t *buf, int buf_size)
     }
 
     // ==> Start patch MPC
-    if (avctx->using_dxva && s->dxva_context) {
-        DXVA_MPEG2_Context* ctx = (DXVA_MPEG2_Context*)s->dxva_context;
-        ctx->frame_count++;
-        if (ctx->frame_count <= 2) {
-            DXVA_MPEG2_Picture_Context* ctx_pic = &ctx->ctx_pic[ctx->frame_count - 1];
-            if (dxva_start_frame(avctx, ctx, ctx_pic) < 0)
+    if (avctx->using_dxva && avctx->dxva_context) {
+        dxva_context* ctx = (dxva_context*)avctx->dxva_context;
+        DXVA_MPEG2_Context* decoder_ctx = (DXVA_MPEG2_Context*)ctx->dxva_decoder_context;
+        decoder_ctx->frame_count++;
+        if (decoder_ctx->frame_count <= 2) {
+            DXVA_MPEG2_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[decoder_ctx->frame_count - 1];
+            if (dxva_start_frame(avctx, decoder_ctx, ctx_pic) < 0)
                 return AVERROR_INVALIDDATA;
         }
     }
@@ -1988,17 +1982,18 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
     }
 
     // ==> Start patch MPC
-    if (avctx->using_dxva && s->dxva_context) {
-        DXVA_MPEG2_Context* ctx = (DXVA_MPEG2_Context*)s->dxva_context;
-        if (ctx->frame_count <= 2) {
-            DXVA_MPEG2_Picture_Context* ctx_pic = &ctx->ctx_pic[ctx->frame_count - 1];
+    if (avctx->using_dxva && avctx->dxva_context) {
+        dxva_context* ctx = (dxva_context*)avctx->dxva_context;
+        DXVA_MPEG2_Context* decoder_ctx = (DXVA_MPEG2_Context*)ctx->dxva_decoder_context;
+        if (decoder_ctx->frame_count <= 2) {
+            DXVA_MPEG2_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[decoder_ctx->frame_count - 1];
             const uint8_t *buf_end, *buf_start = *buf - 4; /* include start_code */
             int start_code = -1;
             buf_end = avpriv_find_start_code(buf_start + 2, *buf + buf_size, &start_code);
             if (buf_end < *buf + buf_size)
                 buf_end -= 4;
             s->mb_y = mb_y;
-		    if (dxva_decode_slice(avctx, ctx, ctx_pic, buf_start, buf_end - buf_start) < 0)
+		    if (dxva_decode_slice(avctx, ctx_pic, buf_start, buf_end - buf_start) < 0)
                 return DECODE_SLICE_ERROR;
             *buf = buf_end;
 		}
@@ -2996,6 +2991,14 @@ static int mpeg_decode_frame(AVCodecContext *avctx, void *data,
     Mpeg1Context *s = avctx->priv_data;
     AVFrame *picture = data;
     MpegEncContext *s2 = &s->mpeg_enc_ctx;
+
+    // ==> Start patch MPC
+    if (avctx->using_dxva && avctx->dxva_context) {
+        dxva_context* ctx = (dxva_context*)avctx->dxva_context;
+        DXVA_MPEG2_Context* decoder_ctx = (DXVA_MPEG2_Context*)ctx->dxva_decoder_context;
+        memset(decoder_ctx, 0, sizeof(*decoder_ctx));
+    }
+    // ==> End patch MPC
 
     if (buf_size == 0 || (buf_size == 4 && AV_RB32(buf) == SEQ_END_CODE)) {
         /* special case for last picture */

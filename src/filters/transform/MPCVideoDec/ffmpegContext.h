@@ -46,23 +46,14 @@ bool			IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
 // === H264 functions
 int				FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
 										 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible);
-void			FFH264SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context);
-
-// === VC1 functions
-void			FFVC1SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context);
 
 // === Mpeg2 functions
 int				MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
-void			FFMPEG2SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context);
-
-// === HEVC functions
-void			FFHEVCSetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context);
 
 // === Common functions
 HRESULT			FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 							  BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop,
 							  int* got_picture_ptr, AVFrame** ppFrameOut);
-BOOL			FFGetAlternateScan(struct AVCodecContext* pAVCtx);
 UINT			FFGetMBCount(struct AVCodecContext* pAVCtx);
 void			FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height);
 BOOL			DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nPCIVendor, DWORD nPCIDevice);

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2015 see Authors.txt
+ * (C) 2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -18,19 +18,16 @@
  *
  */
 
-#pragma once
+#include <dxva2api.h>
 
-#include "DXVA2Decoder.h"
-#include <ffmpeg/libavcodec/dxva_vc1.h>
+#define FF_DXVA2_WORKAROUND_SCALING_LIST_ZIGZAG 1 ///< Work around for DXVA2 and old UVD/UVD+ ATI video cards
+#define FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO    2 ///< Work around for DXVA2 and old Intel GPUs with ClearVideo interface
 
-class CDXVA2DecoderVC1 : public CDXVA2Decoder
-{
-	DXVA_VC1_Context	m_DXVA_Context;
-	UINT				m_nFieldNum;
-
-public:
-	CDXVA2DecoderVC1(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config);
-
-	virtual HRESULT		CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDXVASize = UINT_MAX);
-	virtual HRESULT		DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-};
+typedef struct dxva_context {
+    DXVA2_ConfigPictureDecode *cfg;
+    int                       longslice;
+    uint64_t                  workaround;
+    unsigned                  report_id;
+    
+    void                      *dxva_decoder_context;
+} dxva_context;
