@@ -20,12 +20,15 @@
 
 #pragma once
 
+#include "stdafx.h"
 #include "../../../../DSUtil/DSUtil.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
 #include <stdint.h>
 #pragma warning(pop)
+
+#include <ffmpeg/libavcodec/dxva_internal.h>
 
 #define CHECK_HR_FALSE(x)	hr = ##x; if (FAILED(hr)) { DbgLog((LOG_TRACE, 3, L"DXVA Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__)); return S_FALSE; }
 
@@ -43,10 +46,13 @@ struct AVFrame;
 
 class CDXVADecoder
 {
-public :
+public:
 	virtual			~CDXVADecoder() {};
 
-	virtual void	Flush() { return; };
+	virtual void	Flush() { m_dxva_context.report_id = 0; };
 	virtual HRESULT	DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop) PURE;
 	virtual void	EndOfStream() { return; };
+
+protected:
+	dxva_context	m_dxva_context;
 };

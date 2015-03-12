@@ -24,9 +24,6 @@
 #define MAX_SLICES 32
 #endif
 
-#define FF_DXVA2_WORKAROUND_SCALING_LIST_ZIGZAG 1 ///< Work around for DXVA2 and old UVD/UVD+ ATI video cards
-#define FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO    2 ///< Work around for DXVA2 and old Intel GPUs with ClearVideo interface
-
 typedef struct DXVA_H264_Picture_Context {
     DXVA_PicParams_H264       pp;
     DXVA_Qmatrix_H264         qm;
@@ -37,7 +34,6 @@ typedef struct DXVA_H264_Picture_Context {
     unsigned                  bitstream_size;
 } DXVA_H264_Picture_Context;
 typedef struct DXVA_H264_Context {
-    uint64_t                  workaround;
-    int                       longslice;
+    unsigned                  frame_count;
     DXVA_H264_Picture_Context ctx_pic[2];
 } DXVA_H264_Context;

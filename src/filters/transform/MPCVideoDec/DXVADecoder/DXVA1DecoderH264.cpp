@@ -39,9 +39,9 @@ CDXVA1DecoderH264::CDXVA1DecoderH264(CMPCVideoDecFilter* pFilter, IAMVideoAccele
 	, m_nSlices(0)
 	, m_IsATIUVD(false)
 {
-	memset (&m_DXVAPicParams, 0, sizeof(DXVA_PicParams_H264));
-	memset (&m_pSliceLong,    0, sizeof(DXVA_Slice_H264_Long) * MAX_SLICES);
-	memset (&m_pSliceShort,   0, sizeof(DXVA_Slice_H264_Short) * MAX_SLICES);
+	memset(&m_DXVAPicParams, 0, sizeof(DXVA_PicParams_H264));
+	memset(&m_pSliceLong,    0, sizeof(DXVA_Slice_H264_Long) * MAX_SLICES);
+	memset(&m_pSliceShort,   0, sizeof(DXVA_Slice_H264_Short) * MAX_SLICES);
 
 	m_DXVAPicParams.MbsConsecutiveFlag					= 1;
 	m_DXVAPicParams.Reserved16Bits						= 3;

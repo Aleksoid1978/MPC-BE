@@ -3060,12 +3060,6 @@ typedef struct AVCodecContext {
     int64_t pts_correction_last_pts;       /// PTS of the last frame
     int64_t pts_correction_last_dts;       /// DTS of the last frame
 
-    // ==> Start patch MPC
-    int using_dxva;
-    int volatile entangled_thread_counter;
-    volatile int ff_avcodec_locked;
-    // ==> End patch MPC
-
     /**
      * Character encoding of the input subtitles file.
      * - decoding: set by user
@@ -3144,6 +3138,14 @@ typedef struct AVCodecContext {
      * - decoding: set by user through AVOPtions (NO direct access)
      */
     char *codec_whitelist;
+
+    // ==> Start patch MPC
+    int          using_dxva;
+    void         *dxva_context;
+
+    int volatile entangled_thread_counter;
+    volatile int ff_avcodec_locked;
+    // ==> End patch MPC
 } AVCodecContext;
 
 AVRational av_codec_get_pkt_timebase         (const AVCodecContext *avctx);

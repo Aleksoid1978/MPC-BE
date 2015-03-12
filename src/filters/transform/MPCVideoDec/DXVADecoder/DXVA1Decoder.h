@@ -68,6 +68,7 @@ protected :
 	int								m_nSurfaceIndex;
 
 	DXVA_ConfigPictureDecode		m_DXVA1Config;
+	DXVA2_ConfigPictureDecode		m_DXVA2Config;
 
 	// === DXVA functions
 	HRESULT							BeginFrame(int nSurfaceIndex);

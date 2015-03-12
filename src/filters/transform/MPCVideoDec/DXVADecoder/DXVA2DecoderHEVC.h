@@ -26,12 +26,10 @@
 class CDXVA2DecoderHEVC : public CDXVA2Decoder
 {
 	DXVA_HEVC_Picture_Context	m_DXVA_Picture_Context;
-	UINT						StatusReportFeedbackNumber;
 
 public:
 	CDXVA2DecoderHEVC(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config);
 
-	virtual void				Flush();
 	virtual HRESULT				CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDXVASize = UINT_MAX);
 	virtual HRESULT				DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 };

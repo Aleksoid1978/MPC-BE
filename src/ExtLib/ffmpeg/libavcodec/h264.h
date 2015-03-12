@@ -765,7 +765,6 @@ typedef struct H264Context {
     qpel_mc_func (*qpel_avg)[16];
 
     // ==> Start patch MPC
-    // ==> start DXVA 1.0
     int          slice_qs_delta;
     int          slice_qp_delta;
     unsigned int first_mb_in_slice;
@@ -776,9 +775,6 @@ typedef struct H264Context {
     int          ref_pic_flag;
 
     int          second_field_offset;
-    // ==> end DXVA 1.0
-
-    void* dxva_context;
     // <== End patch MPC
 } H264Context;
 

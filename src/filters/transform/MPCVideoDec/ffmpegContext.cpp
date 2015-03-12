@@ -399,38 +399,12 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 	return Flags;
 }
 
-void FFH264SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context)
-{
-	H264Context* h		= (H264Context*)pAVCtx->priv_data;
-	h->dxva_context		= pDXVA_Context;
-}
-
-// === VC1 functions
-void FFVC1SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context)
-{
-	VC1Context* vc1		= (VC1Context*)pAVCtx->priv_data;
-	vc1->dxva_context	= pDXVA_Context;
-}
-
 // === Mpeg2 functions
 int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx)
 {
 	MpegEncContext*	s = (MpegEncContext*)pAVCtx->priv_data;
 
 	return (s->chroma_format < 2);
-}
-
-void FFMPEG2SetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context)
-{
-	MpegEncContext* s	= (MpegEncContext*)pAVCtx->priv_data;
-	s->dxva_context		= pDXVA_Context;
-}
-
-// === HEVC functions
-void FFHEVCSetDxvaParams(struct AVCodecContext* pAVCtx, void* pDXVA_Context)
-{
-	HEVCContext* s		= (HEVCContext*)pAVCtx->priv_data;
-	s->dxva_context		= pDXVA_Context;
 }
 
 // === Common functions
@@ -502,13 +476,6 @@ HRESULT FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 	}
 
 	return S_OK;
-}
-
-BOOL FFGetAlternateScan(struct AVCodecContext* pAVCtx)
-{
-	MpegEncContext* s = (MpegEncContext*)pAVCtx->priv_data;
-
-	return s ? s->alternate_scan : FALSE;
 }
 
 UINT FFGetMBCount(struct AVCodecContext* pAVCtx)

@@ -29,17 +29,7 @@ CDXVA2DecoderHEVC::CDXVA2DecoderHEVC(CMPCVideoDecFilter* pFilter, IDirectXVideoD
 	: CDXVA2Decoder(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config, 4)
 {
 	memset(&m_DXVA_Picture_Context, 0, sizeof(m_DXVA_Picture_Context));
-
-	FFHEVCSetDxvaParams(m_pFilter->GetAVCtx(), &m_DXVA_Picture_Context);
-
-	Flush();
-}
-
-void CDXVA2DecoderHEVC::Flush()
-{
-	StatusReportFeedbackNumber = 1;
-
-	__super::Flush();
+	m_dxva_context.dxva_decoder_context = &m_DXVA_Picture_Context;
 }
 
 HRESULT CDXVA2DecoderHEVC::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDXVASize/* = UINT_MAX*/)
@@ -47,7 +37,6 @@ HRESULT CDXVA2DecoderHEVC::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nD
 	DXVA_HEVC_Picture_Context *ctx_pic	= &m_DXVA_Picture_Context;
 	DXVA_Slice_HEVC_Short *slice		= NULL;
 	BYTE* current						= pDXVABuffer;
-	UINT MBCount						= FFGetMBCount(m_pFilter->GetAVCtx());
 
 	for (unsigned i = 0; i < ctx_pic->slice_count; i++) {
 		static const BYTE start_code[]		= { 0, 0, 1 };
@@ -106,8 +95,7 @@ HRESULT CDXVA2DecoderHEVC::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	CHECK_HR_FALSE (GetSapleWrapperData(pFrame, &pSample, NULL, NULL));
 
 	if (m_DXVA_Picture_Context.slice_count) {
-		DXVA_HEVC_Picture_Context *ctx_pic		= &m_DXVA_Picture_Context;
-		ctx_pic->pp.StatusReportFeedbackNumber	= StatusReportFeedbackNumber++;
+		DXVA_HEVC_Picture_Context *ctx_pic = &m_DXVA_Picture_Context;
 
 		// Begin frame
 		CHECK_HR_FALSE (BeginFrame(pSample));

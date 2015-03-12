@@ -29,19 +29,13 @@ CDXVA1DecoderVC1::CDXVA1DecoderVC1(CMPCVideoDecFilter* pFilter, IAMVideoAccelera
 	: CDXVA1Decoder(pFilter, pAMVideoAccelerator, nPicEntryNumber)
 {
 	memset(&m_DXVA_Context, 0, sizeof(m_DXVA_Context));
-
-	m_wRefPictureIndex[0] = NO_REF_FRAME;
-	m_wRefPictureIndex[1] = NO_REF_FRAME;
-
-	FFVC1SetDxvaParams(m_pFilter->GetAVCtx(), &m_DXVA_Context);
+	m_dxva_context.dxva_decoder_context = &m_DXVA_Context;
 
 	Flush();
 }
 
 void CDXVA1DecoderVC1::Flush()
 {
-	StatusReportFeedbackNumber	= 0;
-	
 	m_nDelayedSurfaceIndex		= -1;
 	m_rtStartDelayed			= _I64_MAX;
 	m_rtStopDelayed				= _I64_MAX;
@@ -108,18 +102,10 @@ HRESULT CDXVA1DecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 	CHECK_HR_FALSE (GetFreeSurfaceIndex(nSurfaceIndex));
 
 	for (UINT i = 0; i < m_DXVA_Context.frame_count; i++) {
-
 		DXVA_VC1_Picture_Context *ctx_pic = &m_DXVA_Context.ctx_pic[i];
 
 		m_nFieldNum = i;
 		UpdatePictureParams(nSurfaceIndex);
-
-		StatusReportFeedbackNumber++;
-		if (StatusReportFeedbackNumber >= (1 << 16)) {
-			StatusReportFeedbackNumber = 1;
-		}
-		ctx_pic->pp.bPicScanFixed	= StatusReportFeedbackNumber >> 8;
-		ctx_pic->pp.bPicScanMethod	= StatusReportFeedbackNumber & 0xff;
 
 		// Begin frame
 		CHECK_HR_FALSE (BeginFrame(nSurfaceIndex));
@@ -162,7 +148,6 @@ HRESULT CDXVA1DecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 
 void CDXVA1DecoderVC1::UpdatePictureParams(int nSurfaceIndex)
 {
-	DXVA_ConfigPictureDecode* cpd			= &m_DXVA1Config;
 	DXVA_PictureParameters* DXVAPicParams	= &m_DXVA_Context.ctx_pic[m_nFieldNum].pp;
 
 	DXVAPicParams->wDecodedPictureIndex		= 

@@ -40,6 +40,7 @@
 
 // ==> Start patch MPC
 #include <windows.h>
+#include "dxva_internal.h"
 #include "dxva_vc1.h"
 // <== End patch MPC
 
@@ -611,6 +612,7 @@ static void dxva_fill_picture_parameters(AVCodecContext *avctx,
 {
     const MpegEncContext *s = &v->s;
     const Picture *current_picture = s->current_picture_ptr;
+    dxva_context* ctx = (dxva_context*)avctx->dxva_context;
     int intcomp = 0;
 
     // determine if intensity compensation is needed
@@ -620,8 +622,10 @@ static void dxva_fill_picture_parameters(AVCodecContext *avctx,
           intcomp = 1;
       }
     }
+
+    memset(pp, 0, sizeof(*pp));
     pp->wDecodedPictureIndex    =
-    pp->wDeblockedPictureIndex  = (unsigned)s->current_picture_ptr->f->data[4];
+    pp->wDeblockedPictureIndex  = (unsigned)current_picture->f->data[4];
     if (s->pict_type != AV_PICTURE_TYPE_I && !v->bi_type)
         pp->wForwardRefPictureIndex = (unsigned)s->last_picture.f->data[4];
     else
@@ -651,7 +655,9 @@ static void dxva_fill_picture_parameters(AVCodecContext *avctx,
     pp->bSecondField            = v->interlace && v->fcm == ILACE_FIELD && v->second_field;
     pp->bPicIntra               = s->pict_type == AV_PICTURE_TYPE_I || v->bi_type;
     pp->bPicBackwardPrediction  = s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type;
-    pp->bBidirectionalAveragingMode = (pp->bBidirectionalAveragingMode           & 0xE0) |
+    pp->bBidirectionalAveragingMode = (1                                           << 7) |
+                                      ((ctx->cfg->ConfigIntraResidUnsigned != 0)   << 6) |
+                                      ((ctx->cfg->ConfigResidDiffAccelerator != 0) << 5) |
                                       (intcomp                                     << 4) |
                                       ((v->profile == PROFILE_ADVANCED)            << 3);
     pp->bMVprecisionAndChromaRelation = ((v->mv_mode == MV_PMODE_1MV_HPEL_BILIN) << 3) |
@@ -659,6 +665,11 @@ static void dxva_fill_picture_parameters(AVCodecContext *avctx,
                                         (0                                       << 1) |
                                         (!s->quarter_sample                          );
     pp->bChromaFormat           = v->chromaformat;
+    ctx->report_id++;
+    if (ctx->report_id >= (1 << 16))
+        ctx->report_id = 1;
+    pp->bPicScanFixed           = ctx->report_id >> 8;
+    pp->bPicScanMethod          = ctx->report_id & 0xff;
     pp->bPicReadbackRequests    = 0;
     pp->bRcontrol               = v->rnd;
     pp->bPicSpatialResid8       = (v->panscanflag  << 7) |
@@ -767,6 +778,14 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
         GetBitContext gb;
         int mby_start;
     } *slices = NULL, *tmp;
+
+    // ==> Start patch MPC
+    if (avctx->using_dxva && avctx->dxva_context) {
+        dxva_context* ctx = (dxva_context*)avctx->dxva_context;
+        DXVA_VC1_Context* decoder_ctx = (DXVA_VC1_Context*)ctx->dxva_decoder_context;
+        memset(decoder_ctx, 0, sizeof(*decoder_ctx));
+    }
+    // ==> End patch MPC
 
     v->second_field = 0;
 
@@ -1085,45 +1104,44 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
         }
     } else
         // ==> Start patch MPC
-        if (avctx->using_dxva) {
-            if (v->dxva_context) {
-                DXVA_VC1_Context* ctx = (DXVA_VC1_Context*)v->dxva_context;
+        if (avctx->using_dxva && avctx->dxva_context) {
+            dxva_context* ctx = (dxva_context*)avctx->dxva_context;
+            DXVA_VC1_Context* decoder_ctx = (DXVA_VC1_Context*)ctx->dxva_decoder_context;
 
-                if (v->field_mode && buf_start_second_field) {
-                    // decode first field
-                    DXVA_VC1_Picture_Context* ctx_pic = &ctx->ctx_pic[0];
+            if (v->field_mode && buf_start_second_field) {
+                // decode first field
+                DXVA_VC1_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[0];
 
-                    s->picture_structure = PICT_BOTTOM_FIELD - v->tff;
+                s->picture_structure = PICT_BOTTOM_FIELD - v->tff;
 
-                    dxva_fill_picture_parameters(avctx, v, &ctx_pic->pp);
-                    dxva_fill_slice(avctx, ctx_pic, buf_start, buf_start_second_field - buf_start);
+                dxva_fill_picture_parameters(avctx, v, &ctx_pic->pp);
+                dxva_fill_slice(avctx, ctx_pic, buf_start, buf_start_second_field - buf_start);
 
-                    // decode second field
-                    s->gb = slices[n_slices1 + 1].gb;
-                    s->picture_structure = PICT_TOP_FIELD + v->tff;
-                    v->second_field = 1;
-                    v->pic_header_flag = 0;
-                    if (ff_vc1_parse_frame_header_adv(v, &s->gb) < 0) {
-                        av_log(avctx, AV_LOG_ERROR, "parsing header for second field failed");
-                        goto err;
-                    }
-                    v->s.current_picture_ptr->f->pict_type = v->s.pict_type;
-
-                    ctx_pic = &ctx->ctx_pic[1];
-                    dxva_fill_picture_parameters(avctx, v, &ctx_pic->pp);
-                    dxva_fill_slice(avctx, ctx_pic, buf_start_second_field, (buf + buf_size) - buf_start_second_field);
-
-                    ctx->frame_count = 2;
-                } else {
-                    s->picture_structure = PICT_FRAME;
-
-                    DXVA_VC1_Picture_Context* ctx_pic = &ctx->ctx_pic[0];
-
-                    dxva_fill_picture_parameters(avctx, v, &ctx_pic->pp);
-                    dxva_fill_slice(avctx, ctx_pic, buf_start, (buf + buf_size) - buf_start);
-
-                    ctx->frame_count = 1;
+                // decode second field
+                s->gb = slices[n_slices1 + 1].gb;
+                s->picture_structure = PICT_TOP_FIELD + v->tff;
+                v->second_field = 1;
+                v->pic_header_flag = 0;
+                if (ff_vc1_parse_frame_header_adv(v, &s->gb) < 0) {
+                    av_log(avctx, AV_LOG_ERROR, "parsing header for second field failed");
+                    goto err;
                 }
+                v->s.current_picture_ptr->f->pict_type = v->s.pict_type;
+
+                ctx_pic = &decoder_ctx->ctx_pic[1];
+                dxva_fill_picture_parameters(avctx, v, &ctx_pic->pp);
+                dxva_fill_slice(avctx, ctx_pic, buf_start_second_field, (buf + buf_size) - buf_start_second_field);
+
+                decoder_ctx->frame_count = 2;
+            } else {
+                s->picture_structure = PICT_FRAME;
+
+                DXVA_VC1_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[0];
+
+                dxva_fill_picture_parameters(avctx, v, &ctx_pic->pp);
+                dxva_fill_slice(avctx, ctx_pic, buf_start, (buf + buf_size) - buf_start);
+
+                decoder_ctx->frame_count = 1;
             }
         } else
         // <== End patch MPC

@@ -21,11 +21,11 @@
 #include "stdafx.h"
 #include <dxva2api.h>
 #include <moreuuids.h>
+#include "DXVA2Decoder.h"
 #include "DXVA2DecoderH264.h"
 #include "DXVA2DecoderHEVC.h"
 #include "DXVA2DecoderVC1.h"
 #include "DXVA2DecoderMPEG2.h"
-#include "DXVA2Decoder.h"
 #include "../MPCVideoDec.h"
 #include "../DXVAAllocator.h"
 #include "../FfmpegContext.h"
@@ -46,6 +46,11 @@ CDXVA2Decoder::CDXVA2Decoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* 
 	for (int i = 0; i < CompressedBuffersSize; i++) {
 		memset(&m_ExecuteParams.pCompressedBuffers[i], 0, sizeof(DXVA2_DecodeBufferDesc));
 	}
+
+	memset(&m_dxva_context, 0, sizeof(dxva_context));
+	m_dxva_context.cfg = &m_DXVA2Config;
+	m_dxva_context.longslice = (m_DXVA2Config.ConfigBitstreamRaw != 2);
+	m_pFilter->GetAVCtx()->dxva_context = &m_dxva_context;
 };
 
 CDXVA2Decoder::~CDXVA2Decoder()

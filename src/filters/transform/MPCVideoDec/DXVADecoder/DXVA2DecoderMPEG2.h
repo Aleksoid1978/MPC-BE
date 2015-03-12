@@ -28,8 +28,6 @@ class CDXVA2DecoderMPEG2 : public CDXVA2Decoder
 	DXVA_MPEG2_Context	m_DXVA_Context;
 	UINT				m_nFieldNum;
 
-	void				UpdatePictureParams();
-
 public:
 	CDXVA2DecoderMPEG2(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config);
 

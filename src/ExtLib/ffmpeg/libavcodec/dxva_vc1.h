@@ -21,12 +21,12 @@
 #include <dxva.h>
 
 typedef struct DXVA_VC1_Picture_Context {
-    DXVA_PictureParameters     pp;
-    DXVA_SliceInfo             slice;
-    const uint8_t              *bitstream;
-    unsigned                   bitstream_size;
+    DXVA_PictureParameters   pp;
+    DXVA_SliceInfo           slice;
+    const uint8_t            *bitstream;
+    unsigned                 bitstream_size;
 } DXVA_VC1_Picture_Context;
 typedef struct DXVA_VC1_Context {
-    unsigned                   frame_count;
-    DXVA_VC1_Picture_Context   ctx_pic[2];	
+    unsigned                 frame_count;
+    DXVA_VC1_Picture_Context ctx_pic[2];	
 } DXVA_VC1_Context;
