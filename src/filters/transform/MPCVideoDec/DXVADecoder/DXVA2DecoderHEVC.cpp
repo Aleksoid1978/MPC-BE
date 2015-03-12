@@ -94,6 +94,8 @@ HRESULT CDXVA2DecoderHEVC::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	IMediaSample* pSample;
 	CHECK_HR_FALSE (GetSapleWrapperData(pFrame, &pSample, NULL, NULL));
 
+	m_pFilter->HandleKeyFrame(got_picture);
+
 	if (m_DXVA_Picture_Context.slice_count) {
 		DXVA_HEVC_Picture_Context *ctx_pic = &m_DXVA_Picture_Context;
 
