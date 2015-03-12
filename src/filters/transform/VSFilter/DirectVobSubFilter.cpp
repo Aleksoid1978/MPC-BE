@@ -290,6 +290,14 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 		return hr;
 	}
 
+	if (rtStop == INVALID_TIME) {
+		if (m_fps > 0.0) {
+			REFERENCE_TIME rtAvgTimePerFrame = 10000000.0 / m_fps;
+			rtStop = rtStart + rtAvgTimePerFrame;
+		} else {
+			rtStop = rtStart + 1;
+		}
+	}
 	pOut->SetTime(&rtStart, &rtStop);
 	pOut->SetMediaTime(NULL, NULL);
 
