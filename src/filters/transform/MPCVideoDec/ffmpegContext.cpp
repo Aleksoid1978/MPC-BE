@@ -455,7 +455,7 @@ HRESULT FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 		case AV_CODEC_ID_HEVC:
 			{
 				HEVCContext *h		= (HEVCContext*)pAVCtx->priv_data;
-				*ppFrameOut			= h->ref->frame;
+				*ppFrameOut			= h->ref ? h->ref->frame : NULL;
 			}
 			break;
 		case AV_CODEC_ID_VC1:
