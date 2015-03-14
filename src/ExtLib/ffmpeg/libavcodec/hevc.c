@@ -2968,6 +2968,12 @@ static int decode_nal_unit(HEVCContext *s, const HEVCNAL *nal)
             }
         }
 
+        if (s->sh.first_slice_in_pic_flag && s->avctx->hwaccel) {
+            ret = s->avctx->hwaccel->start_frame(s->avctx, NULL, 0);
+            if (ret < 0)
+                goto fail;
+        }
+
         // ==> Start patch MPC
         if (s->sh.first_slice_in_pic_flag && s->avctx->using_dxva && s->avctx->dxva_context) {
             dxva_start_frame(s->avctx);
@@ -2979,13 +2985,6 @@ static int decode_nal_unit(HEVCContext *s, const HEVCNAL *nal)
                 goto fail;
         } else
         // <== End patch MPC
-
-        if (s->sh.first_slice_in_pic_flag && s->avctx->hwaccel) {
-            ret = s->avctx->hwaccel->start_frame(s->avctx, NULL, 0);
-            if (ret < 0)
-                goto fail;
-        }
-
         if (s->avctx->hwaccel) {
             ret = s->avctx->hwaccel->decode_slice(s->avctx, nal->raw_data, nal->raw_size);
             if (ret < 0)
