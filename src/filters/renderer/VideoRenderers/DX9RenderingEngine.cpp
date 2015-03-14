@@ -691,46 +691,46 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 	case shader_bicubic06_y:
 		iShader--;
 	case shader_bicubic06_x:
-		pSrcData = shader_resizer_bicubic;
+		pSrcData = shader_resizer_bicubic_2pass;
 		ShaderMacros[1] = { "A", "-0.6" };
 		twopass = true;
 		break;
 	case shader_bicubic08_y:
 		iShader--;
 	case shader_bicubic08_x:
-		pSrcData = shader_resizer_bicubic;
+		pSrcData = shader_resizer_bicubic_2pass;
 		ShaderMacros[1] = { "A", "-0.8" };
 		twopass = true;
 		break;
 	case shader_bicubic10_y:
 		iShader--;
 	case shader_bicubic10_x:
-		pSrcData = shader_resizer_bicubic;
+		pSrcData = shader_resizer_bicubic_2pass;
 		ShaderMacros[1] = { "A", "-1.0" };
 		twopass = true;
 		break;
 	case shader_bspline4_y:
 		iShader--;
 	case shader_bspline4_x:
-		pSrcData = shader_resizer_bspline4;
+		pSrcData = shader_resizer_bspline4_2pass;
 		twopass = true;
 		break;
 	case shader_mitchell4_y:
 		iShader--;
 	case shader_mitchell4_x:
-		pSrcData = shader_resizer_mitchell4;
+		pSrcData = shader_resizer_mitchell4_2pass;
 		twopass = true;
 		break;
 	case shader_catmull4_y:
 		iShader--;
 	case shader_catmull4_x:
-		pSrcData = shader_resizer_catmull4;
+		pSrcData = shader_resizer_catmull4_2pass;
 		twopass = true;
 		break;
 	case shader_lanczos2_y:
 		iShader--;
 	case shader_lanczos2_x:
-		pSrcData = shader_resizer_lanczos2;
+		pSrcData = shader_resizer_lanczos2_2pass;
 		twopass = true;
 		break;
 #else
