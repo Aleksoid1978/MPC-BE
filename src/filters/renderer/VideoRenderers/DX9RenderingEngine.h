@@ -43,6 +43,8 @@ enum {
 	shader_catmull4_y,
 	shader_lanczos2_x,
 	shader_lanczos2_y,
+	shader_lanczos3_x,
+	shader_lanczos3_y,
 	shader_downscaling_x,
 	shader_downscaling_y,
 #else
