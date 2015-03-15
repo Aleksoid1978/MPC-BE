@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
+ * (C) 2012-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
