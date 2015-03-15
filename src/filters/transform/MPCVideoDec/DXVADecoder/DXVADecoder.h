@@ -50,9 +50,10 @@ public:
 	virtual			~CDXVADecoder() {};
 
 	virtual void	Flush() { m_dxva_context.report_id = 0; };
-	virtual HRESULT	DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop) PURE;
-	virtual void	EndOfStream() { return; };
+	virtual HRESULT	DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop) { return S_OK; };
+	virtual HRESULT	DeliverFrame(int got_picture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop) { return S_OK; };
 
 protected:
+	UINT			m_nFieldNum;
 	dxva_context	m_dxva_context;
 };

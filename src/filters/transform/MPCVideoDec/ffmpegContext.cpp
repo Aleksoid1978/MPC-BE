@@ -260,11 +260,6 @@ static bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t count)
 	return false;
 }
 
-bool IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice)
-{
-	return (nPCIVendor == PCIV_ATI && CheckPCID(nPCIDevice, PCID_ATI_UVD, _countof(PCID_ATI_UVD)));
-}
-
 // === H264 functions
 // returns TRUE if version is equal to or higher than A.B.C.D, returns FALSE otherwise
 static BOOL DriverVersionCheck(LARGE_INTEGER VideoDriverVersion, int A, int B, int C, int D)
@@ -408,43 +403,9 @@ int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx)
 }
 
 // === Common functions
-#define INVALID_TIME _I64_MIN
-HRESULT FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
-					  BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop,
-					  int* got_picture_ptr, AVFrame** ppFrameOut)
+HRESULT FFGetCurFrame(struct AVCodecContext* pAVCtx, AVFrame** ppFrameOut)
 {
-	AVPacket avpkt;
-	av_init_packet(&avpkt);
-	if (pBuffer) {
-		avpkt.data	= pBuffer;
-		avpkt.size	= nSize;
-		avpkt.pts	= rtStart;
-		avpkt.dts	= rtStop;
-		if (rtStart != INVALID_TIME && rtStop != INVALID_TIME) {
-			avpkt.duration = (int)(rtStop - rtStart);
-		} else {
-			avpkt.duration = 0;
-		}
-		avpkt.flags	= AV_PKT_FLAG_KEY;
-	} else {
-		avpkt.data	= NULL;
-		avpkt.size	= 0;
-	}
-
-	int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, got_picture_ptr, &avpkt);
-
-#if defined(_DEBUG) && 0
-	av_log(pAVCtx, AV_LOG_INFO, "FFDecodeFrame() : %d, %d\n", used_bytes, got_picture);
-#endif
-
-	if (used_bytes < 0) {
-		return E_FAIL;
-	}
-
-	if (!(*got_picture_ptr) && !avpkt.size) {
-		return E_FAIL;
-	}
-
+	*ppFrameOut = NULL;
 	switch (pAVCtx->codec_id) {
 		case AV_CODEC_ID_H264:
 			{
@@ -585,8 +546,12 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int&
 	}
 }
 
-#define CHECK_AVC_L52_SIZE(w, h) ((w) <= 4096 && (h) <= 4096 && (w) * (h) <= 36864 * 16 * 16)
+bool IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice)
+{
+	return (nPCIVendor == PCIV_ATI && CheckPCID(nPCIDevice, PCID_ATI_UVD, _countof(PCID_ATI_UVD)));
+}
 
+#define CHECK_AVC_L52_SIZE(w, h) ((w) <= 4096 && (h) <= 4096 && (w) * (h) <= 36864 * 16 * 16)
 BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nPCIVendor, DWORD nPCIDevice)
 {
 	width = (width + 15) & ~15; // (width + 15) / 16 * 16;

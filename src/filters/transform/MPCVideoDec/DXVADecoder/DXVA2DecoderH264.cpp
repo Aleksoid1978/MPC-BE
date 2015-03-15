@@ -96,19 +96,9 @@ HRESULT CDXVA2DecoderH264::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nD
 	return S_OK;
 }
 
-HRESULT CDXVA2DecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
+HRESULT CDXVA2DecoderH264::ProcessDXVAFrame(IMediaSample* pSample)
 {
-	HRESULT	hr			= S_FALSE;
-	int		got_picture	= 0;
-
-	AVFrame* pFrame = NULL;
-	CHECK_HR_FALSE (FFDecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
-								  pDataIn, nSize, rtStart, rtStop,
-								  &got_picture, &pFrame));
-	CheckPointer(pFrame, S_FALSE);
-
-	IMediaSample* pSample;
-	CHECK_HR_FALSE (GetSapleWrapperData(pFrame, &pSample, NULL, NULL));
+	HRESULT hr = S_OK;
 
 	for (UINT i = 0; i < m_DXVA_Context.frame_count; i++) {
 		DXVA_H264_Picture_Context* ctx_pic = &m_DXVA_Context.ctx_pic[i];
@@ -136,10 +126,6 @@ HRESULT CDXVA2DecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 		// Decode frame
 		CHECK_HR_FRAME (Execute());
 		CHECK_HR_FALSE (EndFrame());
-	}
-
-	if (got_picture) {
-		hr = DisplayNextFrame();
 	}
 
 	return hr;

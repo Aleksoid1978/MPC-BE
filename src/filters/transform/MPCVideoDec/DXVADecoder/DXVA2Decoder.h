@@ -28,8 +28,8 @@
 class CDXVA2Decoder : public CDXVADecoder
 {
 	struct SampleWrapper {
-		void*						opaque;
-		CComPtr<IMediaSample>		pSample;
+		void*						opaque	= NULL;
+		CComPtr<IMediaSample>		pSample	= NULL;
 	};
 
 	CComPtr<IDirectXVideoDecoder>	m_pDirectXVideoDec;
@@ -39,9 +39,10 @@ public :
 	static CDXVA2Decoder*			CreateDXVA2Decoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config);
 	virtual							~CDXVA2Decoder();
 	
-	virtual void					EndOfStream();
-
 	virtual HRESULT					CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDXVASize = UINT_MAX) PURE;
+	virtual HRESULT					ProcessDXVAFrame(IMediaSample* pSample) PURE;
+
+	virtual HRESULT					DeliverFrame(int got_picture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
 	HRESULT							get_buffer_dxva(struct AVFrame *pic);
 	static void						release_buffer_dxva(void *opaque, uint8_t *data);
@@ -54,7 +55,7 @@ protected :
 	HRESULT							BeginFrame(IMediaSample* pSampleToDeliver);
 	HRESULT							EndFrame();
 
-	HRESULT							DisplayNextFrame();
+	HRESULT							DeliverDXVAFrame();
 	HRESULT							GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppSampleToDeliver);
 
 	HRESULT							GetSapleWrapperData(AVFrame* pFrame, IMediaSample** pSample, REFERENCE_TIME* rtStart, REFERENCE_TIME* rtStop);

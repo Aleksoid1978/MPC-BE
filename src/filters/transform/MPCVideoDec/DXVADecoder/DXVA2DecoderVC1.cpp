@@ -63,21 +63,9 @@ HRESULT CDXVA2DecoderVC1::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDX
 	return S_OK;
 }
 
-HRESULT CDXVA2DecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
+HRESULT	CDXVA2DecoderVC1::ProcessDXVAFrame(IMediaSample* pSample)
 {
-	HRESULT	hr			= S_FALSE;
-	int		got_picture	= 0;
-
-	AVFrame* pFrame = NULL;
-	CHECK_HR_FALSE (FFDecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
-								  pDataIn, nSize, rtStart, rtStop,
-							      &got_picture, &pFrame));
-	CheckPointer(pFrame, S_FALSE);
-
-	IMediaSample* pSample;
-	CHECK_HR_FALSE (GetSapleWrapperData(pFrame, &pSample, NULL, NULL));
-
-	m_pFilter->HandleKeyFrame(got_picture);
+	HRESULT	hr = S_OK;
 
 	for (UINT i = 0; i < m_DXVA_Context.frame_count; i++) {
 		DXVA_VC1_Picture_Context *ctx_pic = &m_DXVA_Context.ctx_pic[i];
@@ -95,10 +83,6 @@ HRESULT CDXVA2DecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 		// Decode frame
 		CHECK_HR_FRAME (Execute());
 		CHECK_HR_FALSE (EndFrame());
-	}
-
-	if (got_picture) {
-		hr = DisplayNextFrame();
 	}
 
 	return hr;

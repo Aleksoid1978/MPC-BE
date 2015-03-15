@@ -42,18 +42,17 @@ enum PCI_Vendors {
 #define DXVA_PROFILE_HIGHER_THAN_HIGH	DXVA_UNSUPPORTED_LEVEL << 3
 #define DXVA_HIGH_BIT					DXVA_UNSUPPORTED_LEVEL << 4
 
-bool			IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
 // === H264 functions
-int				FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
+int		FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
 										 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible);
 
 // === Mpeg2 functions
-int				MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
+int		MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
 
 // === Common functions
-HRESULT			FFDecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
-							  BYTE* pBuffer, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop,
-							  int* got_picture_ptr, AVFrame** ppFrameOut);
-UINT			FFGetMBCount(struct AVCodecContext* pAVCtx);
-void			FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height);
-BOOL			DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nPCIVendor, DWORD nPCIDevice);
+HRESULT	FFGetCurFrame(struct AVCodecContext* pAVCtx, AVFrame** ppFrameOut);
+UINT	FFGetMBCount(struct AVCodecContext* pAVCtx);
+void	FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height);
+
+bool	IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
+BOOL	DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nPCIVendor, DWORD nPCIDevice);
