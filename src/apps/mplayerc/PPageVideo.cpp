@@ -426,7 +426,7 @@ void CPPageVideo::UpdateResizerList(int select)
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Bicubic A=-1.0 (PS 2.0)"), RESIZER_SHADER_BICUBIC10);
 #if ENABLE_2PASS_RESIZE
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Lanczos2 (PS 2.0)"), RESIZER_SHADER_LANCZOS2);
-		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Lanczos3 (PS 2.0)"), RESIZER_SHADER_LANCZOS3);
+		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Lanczos3 (PS 2.x)"), RESIZER_SHADER_LANCZOS3);
 #endif
 	}
 
