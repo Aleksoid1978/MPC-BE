@@ -184,6 +184,7 @@ void CDX9RenderingEngine::InitRenderingEngine()
 		case RESIZER_SHADER_MITCHELL4: hr = InitShaderResizer(shader_mitchell4_x); break;
 		case RESIZER_SHADER_CATMULL4:  hr = InitShaderResizer(shader_catmull4_x);  break;
 		case RESIZER_SHADER_LANCZOS2:  hr = InitShaderResizer(shader_lanczos2_x);  break;
+		case RESIZER_SHADER_LANCZOS3:  hr = InitShaderResizer(shader_lanczos3_x);  break;
 #else
 		case RESIZER_SHADER_BICUBIC06: hr = InitShaderResizer(shader_bicubic06); break;
 		case RESIZER_SHADER_BICUBIC08: hr = InitShaderResizer(shader_bicubic08); break;
@@ -361,6 +362,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		case RESIZER_SHADER_MITCHELL4: hr = InitShaderResizer(shader_mitchell4_x); break;
 		case RESIZER_SHADER_CATMULL4:  hr = InitShaderResizer(shader_catmull4_x);  break;
 		case RESIZER_SHADER_LANCZOS2:  hr = InitShaderResizer(shader_lanczos2_x);  break;
+		case RESIZER_SHADER_LANCZOS3:  hr = InitShaderResizer(shader_lanczos3_x);  break;
 #else
 		case RESIZER_SHADER_BICUBIC06: hr = InitShaderResizer(shader_bicubic06); break;
 		case RESIZER_SHADER_BICUBIC08: hr = InitShaderResizer(shader_bicubic08); break;
@@ -502,6 +504,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		case RESIZER_SHADER_MITCHELL4: hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_mitchell4_x); break;
 		case RESIZER_SHADER_CATMULL4:  hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_catmull4_x);  break;
 		case RESIZER_SHADER_LANCZOS2:  hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_lanczos2_x);  break;
+		case RESIZER_SHADER_LANCZOS3:  hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_lanczos3_x);  break;
 #else
 		case RESIZER_SHADER_BICUBIC06: hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_bicubic06); break;
 		case RESIZER_SHADER_BICUBIC08: hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_bicubic08); break;
@@ -731,6 +734,12 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 		iShader--;
 	case shader_lanczos2_x:
 		pSrcData = shader_resizer_lanczos2_2pass;
+		twopass = true;
+		break;
+	case shader_lanczos3_y:
+		iShader--;
+	case shader_lanczos3_x:
+		pSrcData = shader_resizer_lanczos3_2pass;
 		twopass = true;
 		break;
 #else
