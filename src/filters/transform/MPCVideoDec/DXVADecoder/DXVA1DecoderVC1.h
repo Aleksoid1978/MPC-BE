@@ -26,7 +26,6 @@
 class CDXVA1DecoderVC1 : public CDXVA1Decoder
 {
 	DXVA_VC1_Context	m_DXVA_Context;
-	UINT				m_nFieldNum;
 
 	WORD				m_wRefPictureIndex[2];
 	int					m_nDelayedSurfaceIndex;
@@ -38,7 +37,7 @@ class CDXVA1DecoderVC1 : public CDXVA1Decoder
 public:
 	CDXVA1DecoderVC1(CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, int nPicEntryNumber);
 
-	virtual HRESULT 	DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
-	virtual void		CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
 	virtual void		Flush();
+	virtual void		CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize);
+	virtual HRESULT		DeliverFrame(int got_picture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 };

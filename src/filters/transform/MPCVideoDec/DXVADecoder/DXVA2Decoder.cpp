@@ -78,9 +78,27 @@ CDXVA2Decoder* CDXVA2Decoder::CreateDXVA2Decoder(CMPCVideoDecFilter* pFilter, ID
 	return pDecoder;
 }
 
-void CDXVA2Decoder::EndOfStream()
+HRESULT CDXVA2Decoder::DeliverFrame(int got_picture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
-	while (DecodeFrame(NULL, 0, INVALID_TIME, INVALID_TIME) == S_OK);
+	HRESULT	hr;
+
+	AVFrame* pFrame;
+	CHECK_HR_FALSE (FFGetCurFrame(m_pFilter->GetAVCtx(), &pFrame));
+	CheckPointer(pFrame, S_FALSE);
+
+	IMediaSample* pSample;
+	CHECK_HR_FALSE (GetSapleWrapperData(pFrame, &pSample, NULL, NULL));
+
+	hr = ProcessDXVAFrame(pSample);
+	if (hr != S_OK) {
+		return hr;
+	}
+
+	if (got_picture) {
+		hr = DeliverDXVAFrame();
+	}
+
+	return hr;
 }
 
 HRESULT CDXVA2Decoder::AddExecuteBuffer(DWORD CompressedBufferType, UINT nSize, void* pBuffer)
@@ -153,7 +171,7 @@ HRESULT CDXVA2Decoder::EndFrame()
 	return m_pDirectXVideoDec->EndFrame(NULL);
 }
 
-HRESULT CDXVA2Decoder::DisplayNextFrame()
+HRESULT CDXVA2Decoder::DeliverDXVAFrame()
 {
 	HRESULT hr = E_FAIL;
 
@@ -175,11 +193,11 @@ HRESULT CDXVA2Decoder::DisplayNextFrame()
 	pSample->SetTime(&rtStart, &rtStop);
 	pSample->SetMediaTime(NULL, NULL);
 
-	CMediaType& mt = m_pFilter->GetOutputPin()->CurrentMediaType();
 
 	bool bSizeChanged = false;
 	LONG biWidth, biHeight = 0;
 
+	CMediaType& mt = m_pFilter->GetOutputPin()->CurrentMediaType();
 	if (m_pFilter->GetSendMediaType()) {
 		AM_MEDIA_TYPE *sendmt = CreateMediaType(&mt);
 		BITMAPINFOHEADER *pBMI = NULL;
@@ -204,7 +222,7 @@ HRESULT CDXVA2Decoder::DisplayNextFrame()
 	hr = m_pFilter->GetOutputPin()->Deliver(pSample);
 
 	if (bSizeChanged && biHeight) {
-		m_pFilter->NotifyEvent(EC_VIDEO_SIZE_CHANGED, MAKELPARAM(biWidth, biHeight), 0);
+		m_pFilter->NotifyEvent(EC_VIDEO_SIZE_CHANGED, MAKELPARAM(biWidth, abs(biHeight)), 0);
 	}
 
 	return hr;

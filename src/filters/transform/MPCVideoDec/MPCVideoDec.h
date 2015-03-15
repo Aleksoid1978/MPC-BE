@@ -150,24 +150,24 @@ protected:
 	BOOL									m_bHEVC10bit;
 
 	// === Private functions
-	void				Cleanup();
-	void				ffmpegCleanup();
-	int					FindCodec(const CMediaType* mtIn, BOOL bForced = FALSE);
-	void				AllocExtradata(AVCodecContext* pAVCtx, const CMediaType* mt);
-	void				GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
-	void				DetectVideoCard(HWND hWnd);
-	void				BuildOutputFormat();
+	void			Cleanup();
+	void			ffmpegCleanup();
+	int				FindCodec(const CMediaType* mtIn, BOOL bForced = FALSE);
+	void			AllocExtradata(AVCodecContext* pAVCtx, const CMediaType* mt);
+	void			GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
+	void			DetectVideoCard(HWND hWnd);
+	void			BuildOutputFormat();
 
-	HRESULT				SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
-	HRESULT				ChangeOutputMediaFormat(int nType);
+	HRESULT			Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	HRESULT			ChangeOutputMediaFormat(int nType);
 
-	HRESULT				ReopenVideo();
-	void				SetThreadCount();
-	HRESULT				FindDecoderConfiguration();
+	HRESULT			ReopenVideo();
+	void			SetThreadCount();
+	HRESULT			FindDecoderConfiguration();
 
-	HRESULT				InitDecoder(const CMediaType *pmt);
+	HRESULT			InitDecoder(const CMediaType *pmt);
 
-	static int			av_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
+	static int		av_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
 
 public:
 	CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr);
@@ -260,7 +260,6 @@ public:
 	void						ReorderBFrames(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	void						FlushDXVADecoder();
 	void						SetTypeSpecificFlags(IMediaSample* pMS);
-	void						HandleKeyFrame(int& got_picture);
 
 	// === DXVA1 functions
 	const DDPIXELFORMAT*		GetDXVA1PixelFormat() { return &m_DDPixelFormat; }

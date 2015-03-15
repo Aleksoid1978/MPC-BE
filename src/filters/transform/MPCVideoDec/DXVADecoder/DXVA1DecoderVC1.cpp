@@ -71,24 +71,12 @@ void CDXVA1DecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSi
 	slice->dwSliceBitsInBuffer = 8 * nSize;
 }
 
-HRESULT CDXVA1DecoderVC1::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
+HRESULT CDXVA1DecoderVC1::DeliverFrame(int got_picture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	HRESULT	hr				= S_FALSE;
 	int		nSurfaceIndex	= -1;
-	int		got_picture		= 0;
 
-	memset(&m_DXVA_Context, 0, sizeof(m_DXVA_Context));
-	m_DXVA_Context.ctx_pic[0].pp.bBidirectionalAveragingMode =
-	m_DXVA_Context.ctx_pic[1].pp.bBidirectionalAveragingMode = (1                                         << 7) |
-															   (m_DXVA1Config.bConfigIntraResidUnsigned   << 6) |
-															   (m_DXVA1Config.bConfigResidDiffAccelerator << 5);
-
-	AVFrame* pFrame;
-	CHECK_HR_FALSE (FFDecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
-								  pDataIn, nSize, rtStart, rtStop,
-							      &got_picture, &pFrame));
-
-	if (!pFrame || !m_DXVA_Context.frame_count) {
+	if (!m_DXVA_Context.frame_count) {
 		return S_FALSE;
 	}
 

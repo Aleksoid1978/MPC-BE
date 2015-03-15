@@ -71,21 +71,18 @@ void CDXVA1DecoderMPEG2::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& n
 	nSize = current - pDXVABuffer;
 }
 
-HRESULT CDXVA1DecoderMPEG2::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
+HRESULT CDXVA1DecoderMPEG2::DeliverFrame(int got_picture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	HRESULT	hr				= S_FALSE;
-	int		got_picture		= 0;
 	int		nSurfaceIndex	= -1;
 
-	AVFrame* pFrame;
-	memset(&m_DXVA_Context, 0, sizeof(m_DXVA_Context));
-	CHECK_HR_FALSE (FFDecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(),
-								  pDataIn, nSize, rtStart, rtStop,
-								  &got_picture, &pFrame));
-
-	if (!pFrame || !m_DXVA_Context.ctx_pic[0].slice_count) {
+	if (!m_DXVA_Context.ctx_pic[0].slice_count) {
 		return S_FALSE;
 	}
+
+	AVFrame* pFrame;
+	CHECK_HR_FALSE (FFGetCurFrame(m_pFilter->GetAVCtx(), &pFrame));
+	CheckPointer(pFrame, S_FALSE);
 
 	// Wait I frame after a flush
 	if (m_bFlushed && !m_DXVA_Context.ctx_pic[0].pp.bPicIntra) {

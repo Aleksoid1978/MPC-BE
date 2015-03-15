@@ -2234,13 +2234,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 HRESULT CMPCVideoDecFilter::EndOfStream()
 {
 	CAutoLock cAutoLock(&m_csReceive);
-
-	if (m_nDecoderMode == MODE_SOFTWARE || m_pParser) {
-		REFERENCE_TIME rtStart = INVALID_TIME, rtStop = INVALID_TIME;
-		SoftwareDecode(NULL, NULL, 0, rtStart, rtStop);
-	} else if (m_pDXVADecoder) {
-		m_pDXVADecoder->EndOfStream();
-	}
+	Decode(NULL, NULL, 0, INVALID_TIME, INVALID_TIME);
 
 	return __super::EndOfStream();
 }
@@ -2302,22 +2296,13 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 	m_bInterlaced = m_pFrame->interlaced_frame;
 }
 
-void CMPCVideoDecFilter::HandleKeyFrame(int& got_picture)
-{
-	if (m_bWaitKeyFrame) {
-		if (m_bWaitingForKeyFrame && got_picture) {
-			if (m_pFrame->key_frame) {
-				m_bWaitingForKeyFrame = FALSE;
-			} else {
-				got_picture = 0;
-			}
-		}
-	}
-}
-
 #define Continue av_frame_unref(m_pFrame); continue;
-HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStartIn, REFERENCE_TIME& rtStopIn)
+HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn)
 {
+	if (m_nDecoderMode == MODE_DXVA1 && !m_pParser && m_nCodecId == AV_CODEC_ID_H264) {
+		return m_pDXVADecoder->DecodeFrame(pDataIn, nSize, rtStartIn, rtStopIn);
+	}
+
 	HRESULT	hr		= S_OK;
 	BOOL	bFlush	= (pDataIn == NULL);
 	int		got_picture;
@@ -2329,7 +2314,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 	BYTE *pDataBuffer = NULL;
 	if (!bFlush && nSize > 0) {
 		// code from LAV
-		if (!(m_pAVCtx->active_thread_type & FF_THREAD_FRAME) || m_pParser) {
+		if (!((m_pAVCtx->active_thread_type & FF_THREAD_FRAME) || m_nDecoderMode != MODE_SOFTWARE) || m_pParser) {
 			// Copy bitstream into temporary buffer to ensure overread protection
 			// Verify buffer size
 			if (nSize > m_nFFBufferSize) {
@@ -2368,15 +2353,18 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			avpkt.size	= 0;
 		}
 
+		int decode_ret = 0;
 		// all Parser code from LAV ... thanks to it's author
 		if (m_pParser) {
+			decode_ret		= -1;
+			rtStop			= INVALID_TIME;
 			BYTE *pOut		= NULL;
 			int pOut_size	= 0;
 
 			used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, avpkt.data, avpkt.size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
 
 			if (used_bytes == 0 && pOut_size == 0 && !bFlush) {
-				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::SoftwareDecode() - could not process buffer, starving?"));
+				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::Decode() - could not process buffer, starving?"));
 				break;
 			} else if (used_bytes > 0) {
 				nSize		-= used_bytes;
@@ -2423,15 +2411,16 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 					avpkt.data		= m_pFFBuffer2;
 					avpkt.size		= pOut_size;
 					avpkt.pts		= rtStart;
+					avpkt.dts		= rtStop;
 					avpkt.duration	= 0;
 				} else {
 					avpkt.data		= NULL;
 					avpkt.size		= 0;
 				}
 
-				if (m_nDecoderMode != MODE_SOFTWARE) {
-					// use ffmpeg's parser for DXVA decoder - H.264 AnnexB & MPEG2 format
-					hr = m_pDXVADecoder->DecodeFrame(avpkt.data, avpkt.size, avpkt.pts, INVALID_TIME);
+
+				if (m_nDecoderMode == MODE_DXVA1 && m_nCodecId == AV_CODEC_ID_H264) {
+					hr =  m_pDXVADecoder->DecodeFrame(avpkt.data, avpkt.size, rtStart, rtStop);
 					if (hr != S_OK && bFlush) {
 						bFlush = FALSE;
 					}
@@ -2439,9 +2428,9 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 					Continue;
 				}
 
-				int ret2 = avcodec_decode_video2(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
-				if (ret2 < 0) {
-					DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::SoftwareDecode() - decoding failed despite successfull parsing"));
+				int ret = decode_ret = avcodec_decode_video2(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
+				if (ret < 0) {
+					DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::Decode() - decoding failed despite successfull parsing"));
 					got_picture = 0;
 				}
 			} else {
@@ -2457,13 +2446,31 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			return S_OK;
 		}
 
-		HandleKeyFrame(got_picture);
+		if (m_bWaitKeyFrame) {
+			if (m_bWaitingForKeyFrame && got_picture) {
+				if (m_pFrame->key_frame) {
+					m_bWaitingForKeyFrame = FALSE;
+				} else {
+					got_picture = 0;
+				}
+			}
+		}
+
+		UpdateAspectRatio();
+
+		if (m_nDecoderMode != MODE_SOFTWARE && decode_ret >= 0) {
+			hr = m_pDXVADecoder->DeliverFrame(got_picture, rtStart, rtStop);
+		}
 
 		if (!got_picture || !m_pFrame->data[0]) {
 			if (!avpkt.size) {
 				bFlush = FALSE; // End flushing, no more frames
 			}
 
+			Continue;
+		}
+
+		if (m_nDecoderMode != MODE_SOFTWARE) {
 			Continue;
 		}
 
@@ -2484,8 +2491,6 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 			ChangeOutputMediaFormat(2);
 			m_PixelFormat = (AVPixelFormat)m_pFrame->format;
 		}
-
-		UpdateAspectRatio();
 
 		CComPtr<IMediaSample> pOut;
 		BYTE* pDataOut = NULL;
@@ -2517,13 +2522,6 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		} else {
 			m_FormatConverter.Converting(pDataOut, m_pFrame);
 		}
-
-#if defined(_DEBUG) && 0
-		static REFERENCE_TIME	rtLast = 0;
-		TRACE ("Deliver : %10I64d - %10I64d   (%10I64d)  {%10I64d}\n", rtStart, rtStop,
-			   rtStop - rtStart, rtStart - rtLast);
-		rtLast = rtStart;
-#endif
 
 		pOut->SetTime(&rtStart, &rtStop);
 		pOut->SetMediaTime(NULL, NULL);
@@ -2630,7 +2628,6 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 	}
 
 	nSize = pIn->GetActualDataLength();
-	// Skip empty packet
 	if (nSize == 0) {
 		return S_OK;
 	}
@@ -2648,43 +2645,28 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 		m_nPosB						= 1 - m_nPosB;
 	}
 
+	int nWidth	= PictWidthRounded();
+	int nHeight	= PictHeightRounded();
+
 	switch (m_nDecoderMode) {
-		case MODE_SOFTWARE :
-			hr = SoftwareDecode(pIn, pDataIn, nSize, rtStart, rtStop);
-			break;
 		case MODE_DXVA2 :
 			CheckPointer(m_pDXVA2Allocator, E_UNEXPECTED);
 		case MODE_DXVA1 :
-			{
-				CheckPointer(m_pDXVADecoder, E_UNEXPECTED);
-				UpdateAspectRatio();
+			CheckPointer(m_pDXVADecoder, E_UNEXPECTED);
 
-				// Change aspect ratio for DXVA1
-				// stupid DXVA1 - size for the output MediaType should be the same that size of DXVA surface
-				if (m_nDecoderMode == MODE_DXVA1 && ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, false, GetDuration(), PictWidth(), PictHeight()) == S_OK) {
-					(static_cast<CDXVA1Decoder*>(m_pDXVADecoder))->ConfigureDXVA1();
-				}
-
-				int nWidth	= PictWidthRounded();
-				int nHeight	= PictHeightRounded();
-
-				if (m_pParser) {
-					hr = SoftwareDecode(pIn, pDataIn, nSize, rtStart, rtStop);
-				} else {
-					hr = m_pDXVADecoder->DecodeFrame(pDataIn, nSize, rtStart, rtStop);
-					av_frame_unref(m_pFrame);
-				}
-
-				if (nWidth != PictWidthRounded() || nHeight != PictHeightRounded()) {
-					FindDecoderConfiguration();
-					RecommitAllocator();
-					ReconnectOutput(PictWidth(), PictHeight());
-				}
+			// stupid DXVA1 - size for the output MediaType should be the same that size of DXVA surface
+			if (m_nDecoderMode == MODE_DXVA1 && ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, false, GetDuration(), PictWidth(), PictHeight()) == S_OK) {
+				(static_cast<CDXVA1Decoder*>(m_pDXVADecoder))->ConfigureDXVA1();
 			}
-			break;
-		default :
-			ASSERT(FALSE);
-			hr = E_UNEXPECTED;
+	}
+
+	hr = Decode(pIn, pDataIn, nSize, rtStart, rtStop);
+
+	if (m_nDecoderMode == MODE_DXVA2
+			&& (nWidth != PictWidthRounded() || nHeight != PictHeightRounded())) {
+		FindDecoderConfiguration();
+		RecommitAllocator();
+		ReconnectOutput(PictWidth(), PictHeight());
 	}
 
 	m_bDecodingStart = TRUE;
@@ -2959,9 +2941,6 @@ HRESULT CMPCVideoDecFilter::RecommitAllocator()
 		hr = m_pDXVA2Allocator->Decommit();
 		if (m_pDXVA2Allocator->DecommitInProgress()) {
 			DbgLog((LOG_TRACE, 3, L"CVideoDecOutputPin::Recommit() : WARNING! DXVA2 Allocator is still busy, trying to flush downstream"));
-			if (m_pDXVA2Allocator) {
-				m_pDXVADecoder->EndOfStream();
-			}
 			if (m_pDXVA2Allocator->DecommitInProgress()) {
 				DbgLog((LOG_TRACE, 3, L"CVideoDecOutputPin::Recommit() : WARNING! Flush had no effect, decommit of the allocator still not complete"));
 			} else {

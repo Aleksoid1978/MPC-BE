@@ -35,13 +35,13 @@ class CDXVA1Decoder : public CDXVADecoder
 	#define NO_REF_FRAME			0xFFFF
 
 	struct PICTURE_STORE {
-		bool			bRefPicture		= false;	// True if reference picture
-		bool			bInUse			= false;	// Slot in use
-		bool			bDisplayed		= false;	// True if picture have been presented
-		REFERENCE_TIME	rtStart			= INVALID_TIME;
-		REFERENCE_TIME	rtStop			= INVALID_TIME;
-		int				nCodecSpecific	= -1;
-		DWORD			dwDisplayCount	= 0;
+		bool						bRefPicture		= false;	// True if reference picture
+		bool						bInUse			= false;	// Slot in use
+		bool						bDisplayed		= false;	// True if picture have been presented
+		REFERENCE_TIME				rtStart			= INVALID_TIME;
+		REFERENCE_TIME				rtStop			= INVALID_TIME;
+		int							nCodecSpecific	= -1;
+		DWORD						dwDisplayCount	= 0;
 	};
 
 public :

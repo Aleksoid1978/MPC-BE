@@ -26,11 +26,10 @@
 class CDXVA2DecoderMPEG2 : public CDXVA2Decoder
 {
 	DXVA_MPEG2_Context	m_DXVA_Context;
-	UINT				m_nFieldNum;
 
 public:
 	CDXVA2DecoderMPEG2(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config);
 
 	virtual HRESULT		CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDXVASize = UINT_MAX);
-	virtual HRESULT		DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	virtual HRESULT		ProcessDXVAFrame(IMediaSample* pSample);
 };
