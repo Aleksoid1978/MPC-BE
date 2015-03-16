@@ -2664,6 +2664,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 
 	if (m_nDecoderMode == MODE_DXVA2
 			&& (nWidth != PictWidthRounded() || nHeight != PictHeightRounded())) {
+		avcodec_flush_buffers(m_pAVCtx);
 		FindDecoderConfiguration();
 		RecommitAllocator();
 		ReconnectOutput(PictWidth(), PictHeight());
