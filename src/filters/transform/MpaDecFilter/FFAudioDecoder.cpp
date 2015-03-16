@@ -610,14 +610,19 @@ HRESULT CFFAudioDecoder::RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOu
 
 enum AVCodecID CFFAudioDecoder::GetCodecId()
 {
-	if (m_pAVCtx) {
-		return m_pAVCtx->codec_id;
-	}
-	return AV_CODEC_ID_NONE;
+	return m_pAVCtx ? m_pAVCtx->codec_id : AV_CODEC_ID_NONE;
 }
 
 const char* CFFAudioDecoder::GetCodecName()
 {
+	if (m_pAVCtx->codec_id == AV_CODEC_ID_DTS) {
+		switch (m_pAVCtx->profile) {
+			case FF_PROFILE_DTS_ES		: return "dts-es";
+			case FF_PROFILE_DTS_96_24	: return "dts 96/24";
+			case FF_PROFILE_DTS_HD_HRA	: return "dts-hd hra";
+			case FF_PROFILE_DTS_HD_MA	: return "dts-hd ma";
+		}
+	}
 	return (m_pAVCtx->codec_descriptor)->name;
 }
 
@@ -634,7 +639,6 @@ DWORD CFFAudioDecoder::GetSampleRate()
 WORD CFFAudioDecoder::GetChannels()
 {
 	return (WORD)m_pAVCtx->channels;
-
 }
 
 DWORD CFFAudioDecoder::GetChannelMask()
