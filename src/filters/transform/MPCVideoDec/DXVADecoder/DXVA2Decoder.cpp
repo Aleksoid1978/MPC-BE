@@ -268,7 +268,6 @@ HRESULT CDXVA2Decoder::get_buffer_dxva(AVFrame *pic)
 	CHECK_HR_FALSE (GetFreeSurfaceIndex(nSurfaceIndex, &pSample));
 
 	SampleWrapper* pSampleWrapper	= DNew SampleWrapper();
-	pSampleWrapper->opaque			= (void*)this;
 	pSampleWrapper->pSample			= pSample;
 
 	pic->data[3]	= (uint8_t *)pSampleWrapper;
@@ -281,9 +280,9 @@ HRESULT CDXVA2Decoder::get_buffer_dxva(AVFrame *pic)
 void CDXVA2Decoder::release_buffer_dxva(void *opaque, uint8_t *data)
 {
 	SampleWrapper* pSampleWrapper = (SampleWrapper*)opaque;
+	if (pSampleWrapper) {
+		pSampleWrapper->pSample.Release();
 
-	CDXVA2Decoder* pDec = (CDXVA2Decoder*)pSampleWrapper->opaque;
-	pSampleWrapper->pSample.Release();
-
-	delete pSampleWrapper;
+		delete pSampleWrapper;
+	}
 }

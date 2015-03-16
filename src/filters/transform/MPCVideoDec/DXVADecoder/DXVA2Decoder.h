@@ -28,7 +28,6 @@
 class CDXVA2Decoder : public CDXVADecoder
 {
 	struct SampleWrapper {
-		void*						opaque	= NULL;
 		CComPtr<IMediaSample>		pSample	= NULL;
 	};
 
