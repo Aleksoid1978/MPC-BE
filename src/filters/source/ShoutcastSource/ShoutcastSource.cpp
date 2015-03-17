@@ -26,6 +26,7 @@
 #endif
 #include "ShoutcastSource.h"
 #include "../../../DSUtil/GolombBuffer.h"
+#include "../../../DSUtil/AudioParser.h"
 #include <MMReg.h>
 #include <moreuuids.h>
 #include "../apps/mplayerc/SettingsDefines.h"
@@ -36,6 +37,7 @@
 #define AVGBUFFERLENGTH	30000000i64
 #define MAXBUFFERLENGTH	100000000i64
 
+#define MPA_FRAME_SIZE	4
 #define ADTS_FRAME_SIZE	9
 
 static const DWORD s_bitrate[2][16] = {
@@ -420,7 +422,7 @@ HRESULT CShoutcastStream::DecideBufferSize(IMemAllocator* pAlloc, ALLOCATOR_PROP
 	ASSERT(pAlloc);
 	ASSERT(pProperties);
 
-	HRESULT hr = NOERROR;
+	HRESULT hr = S_OK;
 
 	pProperties->cBuffers = BUFFERS;
 	pProperties->cbBuffer = MAXFRAMESIZE;
@@ -435,7 +437,7 @@ HRESULT CShoutcastStream::DecideBufferSize(IMemAllocator* pAlloc, ALLOCATOR_PROP
 	}
 	ASSERT(Actual.cBuffers == pProperties->cBuffers);
 
-	return NOERROR;
+	return hr;
 }
 
 HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
@@ -522,7 +524,7 @@ HRESULT CShoutcastStream::GetMediaType(int iPosition, CMediaType* pmt)
 		wfe->wFormatTag			= (WORD)MEDIASUBTYPE_MP3.Data1;
 		wfe->nChannels			= (WORD)m_socket.m_channels;
 		wfe->nSamplesPerSec		= m_socket.m_freq;
-		wfe->nAvgBytesPerSec	= m_socket.m_bitrate/8;
+		wfe->nAvgBytesPerSec	= m_socket.m_bitrate / 8;
 		wfe->nBlockAlign		= 1;
 		wfe->wBitsPerSample		= 0;
 	} else if (m_socket.m_Format == AUDIO_AAC) {
@@ -530,14 +532,14 @@ HRESULT CShoutcastStream::GetMediaType(int iPosition, CMediaType* pmt)
 		pmt->SetSubtype(&MEDIASUBTYPE_RAW_AAC1);
 		pmt->SetFormatType(&FORMAT_WaveFormatEx);
 
-		WAVEFORMATEX* wfe		= (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX)+5];
-		memset(wfe, 0, sizeof(WAVEFORMATEX)+5);
+		WAVEFORMATEX* wfe		= (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + 5];
+		memset(wfe, 0, sizeof(WAVEFORMATEX) + 5);
 		wfe->wFormatTag			= WAVE_FORMAT_RAW_AAC1;
 		wfe->nChannels			= m_socket.m_aachdr.channels <= 6 ? m_socket.m_aachdr.channels : 2;
 		wfe->nSamplesPerSec		= aacfreq[m_socket.m_aachdr.freq];
 		wfe->nBlockAlign		= m_socket.m_aachdr.aac_frame_length;
 		wfe->nAvgBytesPerSec	= m_socket.m_aachdr.nBytesPerSec;
-		wfe->cbSize				= MakeAACInitData((BYTE*)(wfe+1), m_socket.m_aachdr.profile, wfe->nSamplesPerSec, wfe->nChannels);
+		wfe->cbSize				= MakeAACInitData((BYTE*)(wfe + 1), m_socket.m_aachdr.profile, wfe->nSamplesPerSec, wfe->nChannels);
 
 		pmt->SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX) + wfe->cbSize);
 
@@ -546,7 +548,7 @@ HRESULT CShoutcastStream::GetMediaType(int iPosition, CMediaType* pmt)
 		return VFW_E_INVALID_MEDIA_TYPE;
 	}
 
-	return NOERROR;
+	return S_OK;
 }
 
 HRESULT CShoutcastStream::CheckMediaType(const CMediaType* pmt)
@@ -566,6 +568,8 @@ static UINT SocketThreadProc(LPVOID pParam)
 	return (static_cast<CShoutcastStream*>(pParam))->SocketThreadProc();
 }
 
+#define MOVE_TO_MPA_START_CODE(b, e)	while(b <= e - MPA_FRAME_SIZE  && ((*(WORD*)b & 0xe0ff) != 0xe0ff)) b++;
+#define MOVE_TO_AAC_START_CODE(b, e)	while(b <= e - ADTS_FRAME_SIZE && ((*(WORD*)b & 0xf0ff) != 0xf0ff)) b++;
 UINT CShoutcastStream::SocketThreadProc()
 {
 	fExitThread = false;
@@ -577,10 +581,20 @@ UINT CShoutcastStream::SocketThreadProc()
 	CShoutcastSocket soc;
 
 	CAutoVectorPtr<BYTE> pData;
-	if (!pData.Allocate(max(m_socket.m_metaint, MAXFRAMESIZE)) || !soc.Create()) {
+	size_t nSize = max(m_socket.m_metaint, MAXFRAMESIZE);
+	if (!pData.Allocate(nSize) || !soc.Create()) {
 		return 1;
 	}
 
+	if (m_hSocket == INVALID_SOCKET) {
+		CString redirectUrl;
+		if (!m_socket.Create() || !m_socket.Connect(m_url, redirectUrl)) {
+			return 1;
+		}
+
+		m_hSocket = m_socket.Detach();
+	}
+	
 	soc.Attach(m_hSocket);
 	soc = m_socket;
 
@@ -589,11 +603,10 @@ UINT CShoutcastStream::SocketThreadProc()
 
 	REFERENCE_TIME m_rtSampleTime = 0;
 
-	CAutoPtr<CPacket> m_p;
-
 	DWORD MinQueuePackets = max(10, min(MAXQUEUEPACKETS, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MINQUEUEPACKETS, MINQUEUEPACKETS)));
-	DWORD MaxQueuePackets = max(MinQueuePackets*2, min(MAXQUEUEPACKETS*10, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MAXQUEUEPACKETS, MAXQUEUEPACKETS)));
+	DWORD MaxQueuePackets = max(MinQueuePackets * 2, min(MAXQUEUEPACKETS * 10, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MAXQUEUEPACKETS, MAXQUEUEPACKETS)));
 
+	CAutoPtr<CPacket> m_p;
 	while (!fExitThread) {
 		{
 			if (m_queue.GetCount() >= MaxQueuePackets) {
@@ -603,93 +616,140 @@ UINT CShoutcastStream::SocketThreadProc()
 			}
 		}
 
-		int len = soc.Receive(pData, MAXFRAMESIZE);
-		if (len <= 0) {
+		int len = soc.Receive(pData, nSize);
+		if (len == 0) {
 			break;
+		}
+		if (len == SOCKET_ERROR) {
+			soc.Close();
+			CString redirectUrl;
+			if (!soc.Create() || !soc.Connect(m_url, redirectUrl)) {
+				break;
+			}
+
+			len = soc.Receive(pData, nSize);
+			if (len <= 0) {
+				break;
+			}
 		}
 
 		if (m_socket.m_Format == AUDIO_MPEG) {
-			CAutoPtr<CShoutCastPacket> p(DNew CShoutCastPacket());
-
-			p->SetData(pData, len);
-			p->rtStop = (p->rtStart = m_rtSampleTime) + (10000000i64 * len * 8/soc.m_bitrate);
-			p->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
-			m_rtSampleTime = p->rtStop;
-
-			CAutoLock cAutoLock(&m_queue);
-			m_queue.AddTail(p);
-		} else if (m_socket.m_Format == AUDIO_AAC) {
-			// code from MpegSplitter.cpp
-			CAutoPtr<CPacket> p(DNew CPacket());
-			p->SetData(pData, len);
-
-			if (m_p && m_p->GetCount() == 1 && m_p->GetAt(0) == 0xff && !(!p->IsEmpty() && (p->GetAt(0) & 0xf6) == 0xf0)) {
-				m_p.Free();
-			}
-
 			if (!m_p) {
-				BYTE* base = p->GetData();
-				BYTE* s = base;
-				BYTE* e = s + p->GetCount();
+				m_p.Attach(DNew CPacket());
+			}
+			size_t nSize = m_p->GetCount();
+			m_p->SetCount(nSize + len, 1024);
+			memcpy(m_p->GetData() + nSize, pData, (size_t)len);
 
-				for (; s < e; s++) {
-					if (*s != 0xff) {
-						continue;
-					}
+			if (m_p->GetCount() > MPA_FRAME_SIZE) {
+				BYTE* start	= m_p->GetData();
+				BYTE* end	= start + m_p->GetCount();
 
-					if (s == e-1 || (s[1]&0xf6) == 0xf0) {
-						memmove(base, s, e - s);
-						p->SetCount(e - s);
-						m_p = p;
+				for(;;) {
+					MOVE_TO_MPA_START_CODE(start, end);
+					if (start <= end - MPA_FRAME_SIZE) {
+						audioframe_t aframe;
+						int size = ParseMPAHeader(start, &aframe);
+						if (size == 0) {
+							start++;
+							continue;
+						}
+						if (start + size > end) {
+							break;
+						}
+
+						if (start + size + MPA_FRAME_SIZE <= end) {
+							int size2 = ParseMPAHeader(start + size, &aframe);
+							if (size2 == 0) {
+								start++;
+								continue;
+							}
+						}
+
+						CAutoPtr<CShoutCastPacket> p2(DNew CShoutCastPacket());
+						p2->SetData(start, size);
+						p2->rtStop = (p2->rtStart = m_rtSampleTime) + (10000000i64 * size * 8/soc.m_bitrate);
+						p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
+						m_rtSampleTime = p2->rtStop;
+
+						{
+							CAutoLock cAutoLock(&m_queue);
+							m_queue.AddTail(p2);
+						}
+
+						start += size;
+					} else {
 						break;
 					}
 				}
-			} else {
-				m_p->Append(*p);
+
+				if (start > m_p->GetData()) {
+					m_p->RemoveAt(0, start - m_p->GetData());
+				}
 			}
+		} else if (m_socket.m_Format == AUDIO_AAC) {
+			if (!m_p) {
+				m_p.Attach(DNew CPacket());
+			}
+			size_t nSize = m_p->GetCount();
+			m_p->SetCount(nSize + len, 1024);
+			memcpy(m_p->GetData() + nSize, pData, (size_t)len);
 
-			while (m_p && m_p->GetCount() > ADTS_FRAME_SIZE) {
-				BYTE* base	= m_p->GetData();
-				BYTE* s		= base;
-				BYTE* e		= s + m_p->GetCount();
-				int len		= ((s[3]&3)<<11)|(s[4]<<3)|(s[5]>>5);
-				bool crc	= !(s[1]&1);
-				s	+= 7;
-				len	-= 7;
-				if (crc) {
-					s += 2, len -= 2;
+			if (m_p->GetCount() > ADTS_FRAME_SIZE) {
+				BYTE* start	= m_p->GetData();
+				BYTE* end	= start + m_p->GetCount();
+
+				for(;;) {
+					MOVE_TO_AAC_START_CODE(start, end);
+					if (start <= end - ADTS_FRAME_SIZE) {
+						audioframe_t aframe;
+						int size = ParseADTSAACHeader(start, &aframe);
+						if (size == 0) {
+							start++;
+							continue;
+						}
+						if (start + size > end) {
+							break;
+						}
+
+						if (start + size + ADTS_FRAME_SIZE <= end) {
+							int size2 = ParseADTSAACHeader(start + size, &aframe);
+							if (size2 == 0) {
+								start++;
+								continue;
+							}
+						}
+
+						CAutoPtr<CShoutCastPacket> p2(DNew CShoutCastPacket());
+						p2->SetData(start, size);
+						p2->rtStop = (p2->rtStart = m_rtSampleTime) + (10000000i64 * size * 8/soc.m_bitrate);
+						p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
+						m_rtSampleTime = p2->rtStop;
+
+						{
+							CAutoLock cAutoLock(&m_queue);
+							m_queue.AddTail(p2);
+						}
+
+						start += size;
+					} else {
+						break;
+					}
 				}
 
-				if (e - s < len) {
-					break;
+				if (start > m_p->GetData()) {
+					m_p->RemoveAt(0, start - m_p->GetData());
 				}
-
-				if (len <= 0 || (e - s >= len + 2 && (s[len] != 0xff || (s[len+1]&0xf6) != 0xf0))) {
-					m_p.Free();
-					break;
-				}
-
-				{
-					CAutoPtr<CShoutCastPacket> p2(DNew CShoutCastPacket());
-					p2->SetData(s, len);
-					p2->rtStop = (p2->rtStart = m_rtSampleTime) + (10000000i64 * len * 8/soc.m_bitrate);
-					p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
-					m_rtSampleTime = p2->rtStop;
-
-					CAutoLock cAutoLock(&m_queue);
-					m_queue.AddTail(p2);
-				}
-
-				s += len;
-				memmove(base, s, e - s);
-				m_p->SetCount(e - s);
 			}
 		}
 	}
 
 	m_p.Free();
 
-	m_hSocket = soc.Detach();
+	soc.Close();
+	m_hSocket = INVALID_SOCKET;
+
+	fExitThread = true;
 
 	return 0;
 }
@@ -705,7 +765,7 @@ HRESULT CShoutcastStream::OnThreadCreate()
 		Sleep(10);
 	}
 
-	return NOERROR;
+	return S_OK;
 }
 
 HRESULT CShoutcastStream::OnThreadDestroy()
@@ -714,9 +774,9 @@ HRESULT CShoutcastStream::OnThreadDestroy()
 
 	fExitThread = true;
 	m_socket.CancelBlockingCall();
-	WaitForSingleObject(m_hSocketThread, (DWORD)-1);
+	WaitForSingleObject(m_hSocketThread, INFINITE);
 
-	return NOERROR;
+	return S_OK;
 }
 
 HRESULT CShoutcastStream::Inactive()
@@ -736,6 +796,7 @@ HRESULT CShoutcastStream::SetName(LPCWSTR pName)
 	m_pName = DNew WCHAR[len];
 	CheckPointer(m_pName, E_OUTOFMEMORY);
 	wcscpy_s(m_pName, len, pName);
+	
 	return S_OK;
 }
 
@@ -753,7 +814,7 @@ static CString ConvertStr(LPCSTR S)
 
 int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nFlags)
 {
-	if (nFlags&MSG_PEEK) {
+	if (nFlags & MSG_PEEK) {
 		return __super::Receive(lpBuf, nBufLen, nFlags);
 	}
 
@@ -966,13 +1027,14 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 	}
 
 	m_metaint = metaint;
-	m_nBytesRead = 0;
 
 	return FindSync();
 }
 
 bool CShoutcastStream::CShoutcastSocket::FindSync()
 {
+	m_nBytesRead = 0;
+
 	if (m_Format == AUDIO_NONE || m_Format == AUDIO_PLAYLIST) {
 		return false; // not supported
 	}
