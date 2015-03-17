@@ -41,7 +41,7 @@ extern "C" {
 }
 
 static const WORD PCID_NVIDIA_VP567[] = {
-	// http://us.download.nvidia.com/XFree86/Linux-x86_64/346.35/README/supportedchips.html
+	// http://us.download.nvidia.com/XFree86/Linux-x86_64/346.47/README/supportedchips.html
 	// http://pci-ids.ucw.cz/read/PC/10de
 	// VP5, Nvidia VDPAU Feature Set D: GF117, GF119, GK104, GK106, GK107, GK110, GK208.
 	0x0FC2, // GeForce GT 630 (GK107) (not officially supported or typo, 4k tested)
@@ -177,12 +177,14 @@ static const WORD PCID_NVIDIA_VP567[] = {
 	0x1391, // GeForce GTX 850M
 	0x1392, // GeForce GTX 860M
 	0x1393, // GeForce 840M
+	0x13B3, // Quadro K2200M
 	0x13BA, // Quadro K2200
 	0x13BB, // Quadro K620
 	0x13C0, // GeForce GTX 980
 	0x13C2, // GeForce GTX 970
 	0x13D7, // GeForce GTX 980M
 	0x13D8, // GeForce GTX 970M
+	0x13D9, // GeForce GTX 965M
 
 	// VP7, Nvidia VDPAU Feature Set F: GM206.
 	0x1401, // GeForce GTX 960
@@ -225,6 +227,7 @@ static const WORD PCID_INTEL_4K [] = {
 	// Haswell
 	0x0402, // Intel HD Graphics
 	0x0406, // Intel HD Graphics Mobile
+	0x040A, // Intel HD Graphics
 	0x0412, // Intel HD Graphics 4600
 	0x0416, // Intel HD Graphics 4600 Mobile
 	0x041A, // Intel HD Graphics P4600/P4700
@@ -235,17 +238,17 @@ static const WORD PCID_INTEL_4K [] = {
 	0x0A1E, // Intel HD Graphics Family
 	0x0A26, // Intel HD Graphics 5000
 	0x0A2E, // Intel Iris Graphics 5100
-	0x0D22, // Intel Iris Graphics 5200
-	0x0D26, // Intel Iris Graphics 5200
+	0x0D22, // Intel Iris Pro Graphics 5200
+	0x0D26, // Intel Iris Pro Graphics 5200
 	// Atom Z3700 Series
 	0x0F31, // Intel HD Graphics
 	// Broadwell
 	0x1606, // Intel HD Graphics
-	0x1616, // Intel HD Graphics 5500
 	0x160E, // Intel HD Graphics
+	0x1616, // Intel HD Graphics 5500
 	0x161E, // Intel HD Graphics 5300
 	0x1626, // Intel HD Graphics 6000
-	0x162B, // Intel HD Graphics 6100
+	0x162B, // Intel Iris Graphics 6100
 };
 
 static bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t count)
