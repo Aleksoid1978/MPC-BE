@@ -1315,7 +1315,7 @@ static bool LoadFont(const CString& font)
 	HANDLE hFont = INVALID_HANDLE_VALUE;
 
 	if (HMODULE hModule = LoadLibrary(L"gdi32.dll")) {
-		typedef HANDLE (WINAPI *PAddFontMemResourceEx)( IN PVOID, IN DWORD, IN PVOID , IN DWORD*);
+		typedef HANDLE (WINAPI *PAddFontMemResourceEx)(IN PVOID, IN DWORD, IN PVOID , IN DWORD*);
 		if (PAddFontMemResourceEx f = (PAddFontMemResourceEx)GetProcAddress(hModule, "AddFontMemResourceEx")) {
 			DWORD cFonts;
 			hFont = f(pData, datalen, NULL, &cFonts);
@@ -1344,7 +1344,7 @@ static bool LoadFont(const CString& font)
 			}
 		}
 
-		AddFontResource(fn);
+		return !!AddFontResource(fn);
 	}
 
 	return true;
@@ -1353,6 +1353,7 @@ static bool LoadFont(const CString& font)
 static bool LoadUUEFont(CTextFile* file)
 {
 	CString s, font;
+	int cnt = 0;
 	while (file->ReadString(s)) {
 		FastTrim(s);
 		if (s.IsEmpty()) {
@@ -1379,7 +1380,7 @@ static bool LoadUUEFont(CTextFile* file)
 			}
 		}
 		if (s.Find(_T("fontname:")) == 0) {
-			LoadFont(font);
+			cnt += LoadFont(font);
 			font.Empty();
 			continue;
 		}
@@ -1388,15 +1389,20 @@ static bool LoadUUEFont(CTextFile* file)
 	}
 
 	if (!font.IsEmpty()) {
-		LoadFont(font);
+		cnt += LoadFont(font);
 	}
 
-	return true;
+	return cnt ? true : false;
 }
 
 static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 {
-	bool fRet = false;
+	bool bRet = false;
+
+	bool script_info = false;
+	bool events = false;
+	bool styles = false;
+
 	int version = 3, sver = 3;
 	CStringW buff;
 
@@ -1412,202 +1418,222 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 		entry.MakeLower();
 
 		if (entry == L"dialogue") {
-			try {
-				int hh1, mm1, ss1, ms1_div10, hh2, mm2, ss2, ms2_div10, layer = 0;
-				CRect marginRect;
+			if (events) {
+				try {
+					int hh1, mm1, ss1, ms1_div10, hh2, mm2, ss2, ms2_div10, layer = 0;
+					CRect marginRect;
 
-				if (version <= 4) {
-					GetStrW(pszBuff, nBuffLength, L'=');		/* Marked = */
-					GetInt(pszBuff, nBuffLength);
-				}
-				if (version >= 5) {
-					layer = GetInt(pszBuff, nBuffLength);
-				}
-				hh1 = GetInt(pszBuff, nBuffLength, L':');
-				mm1 = GetInt(pszBuff, nBuffLength, L':');
-				ss1 = GetInt(pszBuff, nBuffLength, L'.');
-				ms1_div10 = GetInt(pszBuff, nBuffLength);
-				hh2 = GetInt(pszBuff, nBuffLength, L':');
-				mm2 = GetInt(pszBuff, nBuffLength, L':');
-				ss2 = GetInt(pszBuff, nBuffLength, L'.');
-				ms2_div10 = GetInt(pszBuff, nBuffLength);
-				CString Style = WToT(GetStrW(pszBuff, nBuffLength));
-				CString Actor = WToT(GetStrW(pszBuff, nBuffLength));
-				marginRect.left = GetInt(pszBuff, nBuffLength);
-				marginRect.right = GetInt(pszBuff, nBuffLength);
-				marginRect.top = marginRect.bottom = GetInt(pszBuff, nBuffLength);
-				if (version >= 6) {
-					marginRect.bottom = GetInt(pszBuff, nBuffLength);
-				}
+					if (version <= 4) {
+						GetStrW(pszBuff, nBuffLength, L'=');		/* Marked = */
+						GetInt(pszBuff, nBuffLength);
+					}
+					if (version >= 5) {
+						layer = GetInt(pszBuff, nBuffLength);
+					}
+					hh1 = GetInt(pszBuff, nBuffLength, L':');
+					mm1 = GetInt(pszBuff, nBuffLength, L':');
+					ss1 = GetInt(pszBuff, nBuffLength, L'.');
+					ms1_div10 = GetInt(pszBuff, nBuffLength);
+					hh2 = GetInt(pszBuff, nBuffLength, L':');
+					mm2 = GetInt(pszBuff, nBuffLength, L':');
+					ss2 = GetInt(pszBuff, nBuffLength, L'.');
+					ms2_div10 = GetInt(pszBuff, nBuffLength);
+					CString Style = WToT(GetStrW(pszBuff, nBuffLength));
+					CString Actor = WToT(GetStrW(pszBuff, nBuffLength));
+					marginRect.left = GetInt(pszBuff, nBuffLength);
+					marginRect.right = GetInt(pszBuff, nBuffLength);
+					marginRect.top = marginRect.bottom = GetInt(pszBuff, nBuffLength);
+					if (version >= 6) {
+						marginRect.bottom = GetInt(pszBuff, nBuffLength);
+					}
 
-				CString Effect = WToT(GetStrW(pszBuff, nBuffLength));
-				int len = min(Effect.GetLength(), nBuffLength);
-				if (Effect.Left(len) == WToT(CStringW(pszBuff, len))) {
-					Effect.Empty();
-				}
+					CString Effect = WToT(GetStrW(pszBuff, nBuffLength));
+					int len = min(Effect.GetLength(), nBuffLength);
+					if (Effect.Left(len) == WToT(CStringW(pszBuff, len))) {
+						Effect.Empty();
+					}
 
-				Style.TrimLeft(L'*');
-				if (!Style.CompareNoCase(_T("Default"))) {
-					Style = _T("Default");
-				}
+					Style.TrimLeft(L'*');
+					if (!Style.CompareNoCase(_T("Default"))) {
+						Style = _T("Default");
+					}
 
-				ret.Add(pszBuff,
-						file->IsUnicode(),
-						(((hh1*60 + mm1)*60) + ss1)*1000 + ms1_div10*10,
-						(((hh2*60 + mm2)*60) + ss2)*1000 + ms2_div10*10,
-						Style, Actor, Effect,
-						marginRect,
-						layer);
-			} catch (...) {
-				return false;
+					ret.Add(pszBuff,
+							file->IsUnicode(),
+							(((hh1*60 + mm1)*60) + ss1)*1000 + ms1_div10*10,
+							(((hh2*60 + mm2)*60) + ss2)*1000 + ms2_div10*10,
+							Style, Actor, Effect,
+							marginRect,
+							layer);
+
+					bRet = true;
+				} catch (...) {
+					return false;
+				}
 			}
 		} else if (entry == L"style") {
-			STSStyle* style = DNew STSStyle;
-			if (!style) {
-				return false;
-			}
-
-			try {
-				CString StyleName = WToT(GetStrW(pszBuff, nBuffLength));
-				style->fontName = WToT(GetStrW(pszBuff, nBuffLength));
-				style->fontSize = GetFloat(pszBuff, nBuffLength);
-				for (size_t i = 0; i < 4; i++) {
-					style->colors[i] = (COLORREF)GetInt(pszBuff, nBuffLength);
-				}
-				style->fontWeight = GetInt(pszBuff, nBuffLength) ? FW_BOLD : FW_NORMAL;
-				style->fItalic = GetInt(pszBuff, nBuffLength);
-				if (sver >= 5)	{
-					style->fUnderline  = GetInt(pszBuff, nBuffLength);
-					style->fStrikeOut  = GetInt(pszBuff, nBuffLength);
-					style->fontScaleX  = GetFloat(pszBuff, nBuffLength);
-					style->fontScaleY  = GetFloat(pszBuff, nBuffLength);
-					style->fontSpacing = GetFloat(pszBuff, nBuffLength);
-					style->fontAngleZ  = GetFloat(pszBuff, nBuffLength);
-				}
-				if (sver >= 4)	{
-					style->borderStyle = GetInt(pszBuff, nBuffLength);
-				}
-				style->outlineWidthX = style->outlineWidthY = GetFloat(pszBuff, nBuffLength);
-				style->shadowDepthX = style->shadowDepthY = GetFloat(pszBuff, nBuffLength);
-				style->scrAlignment = GetInt(pszBuff, nBuffLength);
-				style->marginRect.left = GetInt(pszBuff, nBuffLength);
-				style->marginRect.right = GetInt(pszBuff, nBuffLength);
-				style->marginRect.top = style->marginRect.bottom = GetInt(pszBuff, nBuffLength);
-				if (sver >= 6)	{
-					style->marginRect.bottom = GetInt(pszBuff, nBuffLength);
+			if (styles) {
+				STSStyle* style = DNew STSStyle;
+				if (!style) {
+					return false;
 				}
 
-				int alpha = 0;
-				if (sver <= 4)	{
-					alpha = GetInt(pszBuff, nBuffLength);
-				}
-				style->charSet = GetInt(pszBuff, nBuffLength);
-				if (sver >= 6)	{
-					style->relativeTo = GetInt(pszBuff, nBuffLength);
-				}
-
-				if (sver <= 4)	{
-					style->colors[2] = style->colors[3];	// style->colors[2] is used for drawing the outline
-					alpha = max(min(alpha, 0xff), 0);
-					for (size_t i = 0; i < 3; i++) {
-						style->alpha[i] = alpha;
-					}
-					style->alpha[3] = 0x80;
-				}
-				if (sver >= 5)	{
+				try {
+					CString StyleName = WToT(GetStrW(pszBuff, nBuffLength));
+					style->fontName = WToT(GetStrW(pszBuff, nBuffLength));
+					style->fontSize = GetFloat(pszBuff, nBuffLength);
 					for (size_t i = 0; i < 4; i++) {
-						style->alpha[i] = (BYTE)(style->colors[i] >> 24);
-						style->colors[i] &= 0xffffff;
+						style->colors[i] = (COLORREF)GetInt(pszBuff, nBuffLength);
 					}
-					style->fontScaleX = max(style->fontScaleX, 0.0);
-					style->fontScaleY = max(style->fontScaleY, 0.0);
-				}
-				style->fontAngleX = style->fontAngleY = 0;
-				style->borderStyle = style->borderStyle == 1 ? 0 : style->borderStyle == 3 ? 1 : 0;
-				style->outlineWidthX = max(style->outlineWidthX, 0.0);
-				style->outlineWidthY = max(style->outlineWidthY, 0.0);
-				style->shadowDepthX = max(style->shadowDepthX, 0.0);
-				style->shadowDepthY = max(style->shadowDepthY, 0.0);
-				if (sver <= 4)	{
-					style->scrAlignment = (style->scrAlignment & 4) ? ((style->scrAlignment & 3) + 6) // top
-										: (style->scrAlignment & 8) ? ((style->scrAlignment & 3) + 3) // mid
-										: (style->scrAlignment & 3); // bottom
-				}
+					style->fontWeight = GetInt(pszBuff, nBuffLength) ? FW_BOLD : FW_NORMAL;
+					style->fItalic = GetInt(pszBuff, nBuffLength);
+					if (sver >= 5)	{
+						style->fUnderline  = GetInt(pszBuff, nBuffLength);
+						style->fStrikeOut  = GetInt(pszBuff, nBuffLength);
+						style->fontScaleX  = GetFloat(pszBuff, nBuffLength);
+						style->fontScaleY  = GetFloat(pszBuff, nBuffLength);
+						style->fontSpacing = GetFloat(pszBuff, nBuffLength);
+						style->fontAngleZ  = GetFloat(pszBuff, nBuffLength);
+					}
+					if (sver >= 4)	{
+						style->borderStyle = GetInt(pszBuff, nBuffLength);
+					}
+					style->outlineWidthX = style->outlineWidthY = GetFloat(pszBuff, nBuffLength);
+					style->shadowDepthX = style->shadowDepthY = GetFloat(pszBuff, nBuffLength);
+					style->scrAlignment = GetInt(pszBuff, nBuffLength);
+					style->marginRect.left = GetInt(pszBuff, nBuffLength);
+					style->marginRect.right = GetInt(pszBuff, nBuffLength);
+					style->marginRect.top = style->marginRect.bottom = GetInt(pszBuff, nBuffLength);
+					if (sver >= 6)	{
+						style->marginRect.bottom = GetInt(pszBuff, nBuffLength);
+					}
 
-				StyleName.TrimLeft(L'*');
+					int alpha = 0;
+					if (sver <= 4)	{
+						alpha = GetInt(pszBuff, nBuffLength);
+					}
+					style->charSet = GetInt(pszBuff, nBuffLength);
+					if (sver >= 6)	{
+						style->relativeTo = GetInt(pszBuff, nBuffLength);
+					}
 
-				ret.AddStyle(StyleName, style);
-			} catch (...) {
-				ret.CreateDefaultStyle(CharSet);
+					if (sver <= 4)	{
+						style->colors[2] = style->colors[3];	// style->colors[2] is used for drawing the outline
+						alpha = max(min(alpha, 0xff), 0);
+						for (size_t i = 0; i < 3; i++) {
+							style->alpha[i] = alpha;
+						}
+						style->alpha[3] = 0x80;
+					}
+					if (sver >= 5)	{
+						for (size_t i = 0; i < 4; i++) {
+							style->alpha[i] = (BYTE)(style->colors[i] >> 24);
+							style->colors[i] &= 0xffffff;
+						}
+						style->fontScaleX = max(style->fontScaleX, 0.0);
+						style->fontScaleY = max(style->fontScaleY, 0.0);
+					}
+					style->fontAngleX = style->fontAngleY = 0;
+					style->borderStyle = style->borderStyle == 1 ? 0 : style->borderStyle == 3 ? 1 : 0;
+					style->outlineWidthX = max(style->outlineWidthX, 0.0);
+					style->outlineWidthY = max(style->outlineWidthY, 0.0);
+					style->shadowDepthX = max(style->shadowDepthX, 0.0);
+					style->shadowDepthY = max(style->shadowDepthY, 0.0);
+					if (sver <= 4)	{
+						style->scrAlignment = (style->scrAlignment & 4) ? ((style->scrAlignment & 3) + 6) // top
+											: (style->scrAlignment & 8) ? ((style->scrAlignment & 3) + 3) // mid
+											: (style->scrAlignment & 3); // bottom
+					}
+
+					StyleName.TrimLeft(L'*');
+
+					ret.AddStyle(StyleName, style);
+				} catch (...) {
+					ret.CreateDefaultStyle(CharSet);
+				}
 			}
 		} else if (entry == L"[script info]") {
-			fRet = true;
+			script_info = true;
 		} else if (entry == L"playresx") {
-			try {
-				ret.m_dstScreenSize.cx = GetInt(pszBuff, nBuffLength);
-			} catch (...) {
-				ret.m_dstScreenSize = CSize(0, 0);
-				return false;
-			}
+			if (script_info) {
+				try {
+					ret.m_dstScreenSize.cx = GetInt(pszBuff, nBuffLength);
+				} catch (...) {
+					ret.m_dstScreenSize = CSize(0, 0);
+					return false;
+				}
 
-			if (ret.m_dstScreenSize.cy <= 0) {
-				ret.m_dstScreenSize.cy = (ret.m_dstScreenSize.cx == 1280)
-										 ? 1024
-										 : ret.m_dstScreenSize.cx * 3 / 4;
+				if (ret.m_dstScreenSize.cy <= 0) {
+					ret.m_dstScreenSize.cy = (ret.m_dstScreenSize.cx == 1280)
+											 ? 1024
+											 : ret.m_dstScreenSize.cx * 3 / 4;
+				}
 			}
 		} else if (entry == L"playresy") {
-			try {
-				ret.m_dstScreenSize.cy = GetInt(pszBuff, nBuffLength);
-			} catch (...) {
-				ret.m_dstScreenSize = CSize(0, 0);
-				return false;
-			}
+			if (script_info) {
+				try {
+					ret.m_dstScreenSize.cy = GetInt(pszBuff, nBuffLength);
+				} catch (...) {
+					ret.m_dstScreenSize = CSize(0, 0);
+					return false;
+				}
 
-			if (ret.m_dstScreenSize.cx <= 0) {
-				ret.m_dstScreenSize.cx = (ret.m_dstScreenSize.cy == 1024)
-										 ? 1280
-										 : ret.m_dstScreenSize.cy * 4 / 3;
+				if (ret.m_dstScreenSize.cx <= 0) {
+					ret.m_dstScreenSize.cx = (ret.m_dstScreenSize.cy == 1024)
+											 ? 1280
+											 : ret.m_dstScreenSize.cy * 4 / 3;
+				}
 			}
 		} else if (entry == L"wrapstyle") {
-			try {
-				ret.m_defaultWrapStyle = GetInt(pszBuff, nBuffLength);
-			} catch (...) {
-				ret.m_defaultWrapStyle = 1;
-				return false;
+			if (script_info) {
+				try {
+					ret.m_defaultWrapStyle = GetInt(pszBuff, nBuffLength);
+				} catch (...) {
+					ret.m_defaultWrapStyle = 1;
+					return false;
+				}
 			}
 		} else if (entry == L"scripttype") {
-			if (buff.GetLength() >= 4 && !buff.Right(4).CompareNoCase(L"4.00")) {
-				version = sver = 4;
-			} else if (buff.GetLength() >= 5 && !buff.Right(5).CompareNoCase(L"4.00+")) {
-				version = sver = 5;
-			} else if (buff.GetLength() >= 6 && !buff.Right(6).CompareNoCase(L"4.00++")) {
-				version = sver = 6;
+			if (script_info) {
+				if (buff.GetLength() >= 4 && !buff.Right(4).CompareNoCase(L"4.00")) {
+					version = sver = 4;
+				} else if (buff.GetLength() >= 5 && !buff.Right(5).CompareNoCase(L"4.00+")) {
+					version = sver = 5;
+				} else if (buff.GetLength() >= 6 && !buff.Right(6).CompareNoCase(L"4.00++")) {
+					version = sver = 6;
+				}
 			}
 		} else if (entry == L"collisions") {
-			buff = GetStrW(pszBuff, nBuffLength);
-			buff.MakeLower();
-			ret.m_collisions = buff.Find(L"reverse") >= 0 ? 1 : 0;
+			if (script_info) {
+				buff = GetStrW(pszBuff, nBuffLength);
+				buff.MakeLower();
+				ret.m_collisions = buff.Find(L"reverse") >= 0 ? 1 : 0;
+			}
 		} else if (entry == L"scaledborderandshadow") {
-			buff = GetStrW(pszBuff, nBuffLength);
-			buff.MakeLower();
-			ret.m_fScaledBAS = buff.Find(L"yes") >= 0;
+			if (script_info) {
+				buff = GetStrW(pszBuff, nBuffLength);
+				buff.MakeLower();
+				ret.m_fScaledBAS = buff.Find(L"yes") >= 0;
+			}
 		} else if (entry == L"[v4 styles]") {
-			fRet = true;
+			styles = true;
 			sver = 4;
 		} else if (entry == L"[v4+ styles]") {
-			fRet = true;
+			styles = true;
 			sver = 5;
 		} else if (entry == L"[v4++ styles]") {
-			fRet = true;
+			styles = true;
 			sver = 6;
 		} else if (entry == L"[events]") {
-			fRet = true;
+			events = true;
 		} else if (entry == L"fontname") {
-			LoadUUEFont(file);
+			if (LoadUUEFont(file)) {
+				bRet = true;
+			}
 		}
 	}
 
-	return fRet;
+	return bRet;
 }
 
 static bool OpenXombieSub(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
