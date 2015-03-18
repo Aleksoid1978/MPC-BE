@@ -32,7 +32,7 @@ CPPageSubRend::CPPageSubRend()
 	, m_fOverridePlacement(FALSE)
 	, m_nHorPos(0)
 	, m_nVerPos(0)
-	, m_nSPCSize(0)
+	, m_nSPCSize(RS_SPCSIZE_DEF)
 	, m_bSPCAllowAnimationWhenBuffering(TRUE)
 	, m_bbSPAllowDropSubPic(TRUE)
 	, m_nSubDelayInterval(0)
@@ -60,6 +60,8 @@ void CPPageSubRend::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_SPCANIMWITHBUFFER, m_bSPCAllowAnimationWhenBuffering);
 	DDX_Check(pDX, IDC_CHECK_ALLOW_DROPPING_SUBPIC, m_bbSPAllowDropSubPic);
 	DDX_Text(pDX, IDC_EDIT4, m_nSubDelayInterval);
+
+	m_nSPCSize = min(max(RS_SPCSIZE_MIN, m_nSPCSize), RS_SPCSIZE_MAX);
 }
 
 BEGIN_MESSAGE_MAP(CPPageSubRend, CPPageBase)
@@ -128,7 +130,7 @@ BOOL CPPageSubRend::OnInitDialog()
 	m_nVerPos = s.nVerPos;
 	m_nVerPosCtrl.SetRange(110,-10);
 	m_nSPCSize = s.m_RenderersSettings.nSPCSize;
-	m_nSPCSizeCtrl.SetRange(0, 60);
+	m_nSPCSizeCtrl.SetRange(RS_SPCSIZE_MIN, RS_SPCSIZE_MAX);
 	for (int i = 0; i < _countof(s_maxTexRes); i++) {
 		m_spmaxres.AddString(s_maxTexRes[i].name);
 	}

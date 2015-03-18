@@ -79,6 +79,8 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT2, m_iTimeShift);
 	DDX_Control(pDX, IDC_EDIT2, m_edtTimeShift);
 	DDX_Control(pDX, IDC_SPIN2, m_spnTimeShift);
+
+	m_iTimeShift = min(max(APP_AUDIOTIMESHIFT_MIN, m_iTimeShift), APP_AUDIOTIMESHIFT_MAX);
 }
 
 BEGIN_MESSAGE_MAP(CPPageAudio, CPPageBase)
@@ -223,7 +225,7 @@ BOOL CPPageAudio::OnInitDialog()
 
 	m_chkTimeShift.SetCheck(s.bAudioTimeShift);
 	m_iTimeShift = s.iAudioTimeShift;
-	m_spnTimeShift.SetRange32(-1000*60*60*24, 1000*60*60*24);
+	m_spnTimeShift.SetRange32(APP_AUDIOTIMESHIFT_MIN, APP_AUDIOTIMESHIFT_MAX);
 
 	UpdateGainInfo();
 	UpdateNormLevelInfo();

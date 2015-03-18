@@ -24,10 +24,6 @@
 #include "PPagePlayer.h"
 #include "../../DSUtil/Filehandle.h"
 
-#define MIN_RECENT_FILES 10
-#define MAX_RECENT_FILES 50
-
-
 // CPPagePlayer dialog
 
 IMPLEMENT_DYNAMIC(CPPagePlayer, CPPageBase)
@@ -37,7 +33,7 @@ CPPagePlayer::CPPagePlayer()
 	, m_iTitleBarTextStyle(0)
 	, m_bTitleBarTextTitle(FALSE)
 	, m_fKeepHistory(FALSE)
-	, m_nRecentFiles(20)
+	, m_nRecentFiles(APP_RECENTFILES_DEF)
 	, m_fRememberDVDPos(FALSE)
 	, m_fRememberFilePos(FALSE)
 	, m_fRememberWindowPos(FALSE)
@@ -81,6 +77,8 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK2, m_bRememberPlaylistItems);
 	DDX_Text(pDX, IDC_EDIT1, m_nRecentFiles);
 	DDX_Control(pDX, IDC_SPIN1, m_RecentFilesCtrl);
+
+	m_nRecentFiles = min(max(APP_RECENTFILES_MIN, m_nRecentFiles), APP_RECENTFILES_MAX);
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayer, CPPageBase)
@@ -122,7 +120,7 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_bRememberPlaylistItems = s.bRememberPlaylistItems;
 
 	m_nRecentFiles = s.iRecentFilesNumber;
-	m_RecentFilesCtrl.SetRange(MIN_RECENT_FILES, MAX_RECENT_FILES);
+	m_RecentFilesCtrl.SetRange(APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 	m_RecentFilesCtrl.SetPos(m_nRecentFiles);
 	UDACCEL acc = {0, 5};
 	m_RecentFilesCtrl.SetAccel(1, &acc);
@@ -203,7 +201,6 @@ BOOL CPPagePlayer::OnApply()
 		s.ClearFilePositions();
 	}
 
-	m_nRecentFiles = min(max(MIN_RECENT_FILES, m_nRecentFiles), MAX_RECENT_FILES);
 	s.iRecentFilesNumber = m_nRecentFiles;
 	s.MRU.SetSize(s.iRecentFilesNumber);
 	s.MRUDub.SetSize(s.iRecentFilesNumber);
@@ -240,7 +237,7 @@ void CPPagePlayer::OnUpdatePos(CCmdUI* pCmdUI)
 
 void CPPagePlayer::OnKillFocusEdit1()
 {
-	m_nRecentFiles = min(max(MIN_RECENT_FILES, m_nRecentFiles), MAX_RECENT_FILES); // CSpinButtonCtrl.SetRange() does not affect the manual input
+	m_nRecentFiles = min(max(APP_RECENTFILES_MIN, m_nRecentFiles), APP_RECENTFILES_MAX); // CSpinButtonCtrl.SetRange() does not affect the manual input
 
 	UpdateData(FALSE);
 }

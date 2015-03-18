@@ -26,17 +26,14 @@
 #include "../../DSUtil/SysVersion.h"
 #include <afxglobals.h>
 
-#define MIN_PORT_NUMBER 1
-#define MAX_PORT_NUMBER 65535
-
 // CPPageWebServer dialog
 
 IMPLEMENT_DYNAMIC(CPPageWebServer, CPPageBase)
 CPPageWebServer::CPPageWebServer()
 	: CPPageBase(CPPageWebServer::IDD, CPPageWebServer::IDD)
 	, m_fEnableWebServer(FALSE)
-	, m_nWebServerPort(13579)
-	, m_nWebServerQuality(85)
+	, m_nWebServerPort(APP_WEBSRVPORT_DEF)
+	, m_nWebServerQuality(APP_WEBSRVQUALITY_DEF)
 	, m_launch(_T("http://localhost:13579/"))
 	, m_fWebServerPrintDebugInfo(FALSE)
 	, m_fWebServerUseCompression(FALSE)
@@ -65,6 +62,9 @@ void CPPageWebServer::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK5, m_fWebServerLocalhostOnly);
 	DDX_Text(pDX, IDC_EDIT3, m_WebServerCGI);
 	DDX_Text(pDX, IDC_EDIT9, m_WebDefIndex);
+
+	m_nWebServerPort = min(max(APP_WEBSRVPORT_MIN, m_nWebServerPort), APP_WEBSRVPORT_MAX);
+	m_nWebServerQuality = min(max(APP_WEBSRVQUALITY_MIN, m_nWebServerQuality), APP_WEBSRVQUALITY_MAX);
 }
 
 BOOL CPPageWebServer::PreTranslateMessage(MSG* pMsg)
@@ -108,8 +108,8 @@ BOOL CPPageWebServer::OnInitDialog()
 
 	m_launch.EnableWindow(m_fEnableWebServer);
 
-	m_nWebServerQualityCtrl.SetRange(70, 100);
-	m_nWebServerQualityCtrl.SetPos(m_nWebServerQuality);
+	m_nWebServerQualityCtrl.SetRange(APP_WEBSRVQUALITY_MIN, APP_WEBSRVQUALITY_MAX);
+//	m_nWebServerQualityCtrl.SetPos(m_nWebServerQuality);
 
 	UpdateData(FALSE);
 
@@ -134,7 +134,6 @@ BOOL CPPageWebServer::OnApply()
 					|| s.strWebRoot != NewWebRoot || s.strWebServerCGI != m_WebServerCGI;
 
 	s.fEnableWebServer = !!m_fEnableWebServer;
-	m_nWebServerPort = min(max(MIN_PORT_NUMBER, m_nWebServerPort), MAX_PORT_NUMBER);
 	s.nWebServerPort = m_nWebServerPort;
 	s.nWebServerQuality = m_nWebServerQuality;
 	s.fWebServerPrintDebugInfo = !!m_fWebServerPrintDebugInfo;
@@ -288,7 +287,7 @@ void CPPageWebServer::OnUpdateButton2(CCmdUI* pCmdUI)
 
 void CPPageWebServer::OnKillFocusEdit1()
 {
-	m_nWebServerPort = min(max(MIN_PORT_NUMBER, m_nWebServerPort), MAX_PORT_NUMBER);
+	m_nWebServerPort = min(max(APP_WEBSRVPORT_MIN, m_nWebServerPort), APP_WEBSRVPORT_MAX);
 
 	UpdateData(FALSE);
 }
