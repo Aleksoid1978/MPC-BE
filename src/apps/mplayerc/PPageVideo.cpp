@@ -62,7 +62,7 @@ CPPageVideo::CPPageVideo()
 	, m_iVideoRendererType(VIDRNDT_DS_DEFAULT)
 	, m_iVideoRendererType_store(VIDRNDT_DS_DEFAULT)
 	, m_bResetDevice(FALSE)
-	, m_iEvrBuffers(5)
+	, m_iEvrBuffers(RS_EVRBUFFERS_DEF)
 	, m_bD3D9RenderDevice(FALSE)
 	, m_iD3D9RenderDevice(-1)
 {
@@ -95,6 +95,8 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO3, m_cbCMInputType);
 	DDX_Control(pDX, IDC_COMBO4, m_cbCMAmbientLight);
 	DDX_Control(pDX, IDC_COMBO5, m_cbCMRenderingIntent);
+
+	m_iEvrBuffers = min(max(RS_EVRBUFFERS_MIN, m_iEvrBuffers), RS_EVRBUFFERS_MAX);
 }
 
 BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
@@ -152,7 +154,7 @@ BOOL CPPageVideo::OnInitDialog()
 	m_cbEVROutputRange.SetCurSel(rs.m_AdvRendSets.iEVROutputRange);
 
 	m_iEvrBuffers = rs.iEvrBuffers;
-	m_spnEvrBuffers.SetRange(4, 60);
+	m_spnEvrBuffers.SetRange(RS_EVRBUFFERS_MIN, RS_EVRBUFFERS_MAX);
 
 	UpdateSurfaceFormatList(rs.m_AdvRendSets.iDX9SurfaceFormat);
 	UpdateResizerList(rs.iDX9Resizer);
@@ -369,7 +371,7 @@ BOOL CPPageVideo::OnApply()
 	rs.m_AdvRendSets.b10BitOutput			= !!m_chk10bitOutput.GetCheck();
 	rs.m_AdvRendSets.iEVROutputRange		= m_cbEVROutputRange.GetCurSel();
 
-	rs.iEvrBuffers = min(max(4, m_iEvrBuffers), 60);
+	rs.iEvrBuffers = m_iEvrBuffers;
 
 	rs.D3D9RenderDevice = m_bD3D9RenderDevice ? m_D3D9GUIDNames[m_iD3D9RenderDevice] : L"";
 

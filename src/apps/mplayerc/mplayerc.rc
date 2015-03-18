@@ -129,7 +129,7 @@ BEGIN
     CONTROL         "Mix channels to:",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,119,106,8
     COMBOBOX        IDC_COMBO2,129,116,58,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Audio time shift (ms):",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,208,115,8
-    EDITTEXT        IDC_EDIT2,129,206,46,13,ES_AUTOHSCROLL,WS_EX_RIGHT
+    EDITTEXT        IDC_EDIT2,129,206,46,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,174,206,12,13
     CONTROL         "Auto volume control",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,149,154,8
     RTEXT           "Static",IDC_STATIC4,10,135,110,8
@@ -335,7 +335,7 @@ BEGIN
     EDITTEXT        IDC_EDIT4,217,17,40,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     GROUPBOX        "Texture settings (open the video again to see the changes)",IDC_STATIC,5,37,286,68
     LTEXT           "Sub pictures to buffer:",IDC_STATIC,10,51,125,8
-    EDITTEXT        IDC_EDIT1,139,49,32,12,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
+    EDITTEXT        IDC_EDIT1,139,49,32,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,159,49,12,12
     LTEXT           "Maximum texture resolution:",IDC_STATIC,10,67,125,8
     LTEXT           "If you override and enable full-screen antialiasing somewhere at your videocard's settings, subtitles aren't going to look any better but it will surely eat your cpu.",IDC_STATIC,10,120,267,27
@@ -867,7 +867,7 @@ BEGIN
     LTEXT           "Launch in web browser...",IDC_STATIC1,150,26,120,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,22,284,1
     LTEXT           "Image quality %:",IDC_STATIC,150,7,95,8
-    EDITTEXT        IDC_EDIT4,250,5,30,13,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT4,250,5,30,13,ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,280,5,12,13
     CONTROL         "Enable compression",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,26,138,8
     CONTROL         "Print debug information",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,50,285,8

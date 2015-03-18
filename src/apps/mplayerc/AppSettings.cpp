@@ -1108,7 +1108,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	sizeAspectRatio.cx = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_X, 0);
 	sizeAspectRatio.cy = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, 0);
 	fKeepHistory = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, 1);
-	iRecentFilesNumber = max(0, (int)pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, 20));
+	iRecentFilesNumber = max(0, (int)pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, APP_RECENTFILES_DEF));
 	MRU.SetSize(iRecentFilesNumber);
 	MRUDub.SetSize(iRecentFilesNumber);
 
@@ -1375,8 +1375,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fLaunchfullscreen = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, FALSE);
 
 	fEnableWebServer = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEWEBSERVER, FALSE);
-	nWebServerPort = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPORT, 13579);
-	nWebServerQuality = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERQUALITY, 85);
+	nWebServerPort = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPORT, APP_WEBSRVPORT_DEF);
+	nWebServerQuality = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERQUALITY, APP_WEBSRVQUALITY_DEF);
 	fWebServerPrintDebugInfo = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPRINTDEBUGINFO, FALSE);
 	fWebServerUseCompression = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERUSECOMPRESSION, TRUE);
 	fWebServerLocalhostOnly = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERLOCALHOSTONLY, FALSE);
@@ -1756,12 +1756,12 @@ void CAppSettings::UpdateRenderersData(bool fSave)
 
 		r.fResetDevice = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), TRUE);
 
-		r.nSPCSize							= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, 10);
+		r.nSPCSize							= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, RS_SPCSIZE_DEF);
 		r.nSPMaxTexRes						= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, 1280);
 		r.bSPAllowDropSubPic				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWDROPSUBPIC, TRUE);
 		r.bSPCAllowAnimationWhenBuffering	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, TRUE);
 
-		r.iEvrBuffers		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, 5);
+		r.iEvrBuffers		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, RS_EVRBUFFERS_DEF);
 		r.D3D9RenderDevice	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE);
 
 		// Stereoscopic Subtitles
