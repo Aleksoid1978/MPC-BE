@@ -29,15 +29,8 @@ IMPLEMENT_DYNAMIC(CPPageSubStyle, CPPageBase)
 CPPageSubStyle::CPPageSubStyle()
 	: CPPageBase(CPPageSubStyle::IDD, CPPageSubStyle::IDD)
 	, m_iCharset(0)
-	, m_spacing(0)
-	, m_angle(0)
-	, m_scalex(0)
-	, m_scaley(0)
 	, m_borderstyle(0)
-	, m_borderwidth(0)
-	, m_shadowdepth(0)
 	, m_screenalignment(0)
-	, m_margin(0,0,0,0)
 	, m_linkalphasliders(FALSE)
 	, m_relativeTo(FALSE)
 	, m_bUseDefaultStyle(TRUE)
@@ -81,27 +74,27 @@ void CPPageSubStyle::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BUTTON1, m_font);
 	DDX_CBIndex(pDX, IDC_COMBO1, m_iCharset);
 	DDX_Control(pDX, IDC_COMBO1, m_charset);
-	DDX_Text(pDX, IDC_EDIT3, m_spacing);
+	DDX_Control(pDX, IDC_EDIT3, m_spacing);
 	DDX_Control(pDX, IDC_SPIN3, m_spacingspin);
-	DDX_Text(pDX, IDC_EDIT4, m_angle);
+	DDX_Control(pDX, IDC_EDIT4, m_angle);
 	DDX_Control(pDX, IDC_SPIN10, m_anglespin);
-	DDX_Text(pDX, IDC_EDIT5, m_scalex);
+	DDX_Control(pDX, IDC_EDIT5, m_scalex);
 	DDX_Control(pDX, IDC_SPIN4, m_scalexspin);
-	DDX_Text(pDX, IDC_EDIT6, m_scaley);
+	DDX_Control(pDX, IDC_EDIT6, m_scaley);
 	DDX_Control(pDX, IDC_SPIN5, m_scaleyspin);
 	DDX_Radio(pDX, IDC_RADIO1, m_borderstyle);
-	DDX_Text(pDX, IDC_EDIT1, m_borderwidth);
+	DDX_Control(pDX, IDC_EDIT1, m_borderwidth);
 	DDX_Control(pDX, IDC_SPIN1, m_borderwidthspin);
-	DDX_Text(pDX, IDC_EDIT2, m_shadowdepth);
+	DDX_Control(pDX, IDC_EDIT2, m_shadowdepth);
 	DDX_Control(pDX, IDC_SPIN2, m_shadowdepthspin);
 	DDX_Radio(pDX, IDC_RADIO3, m_screenalignment);
-	DDX_Text(pDX, IDC_EDIT7, m_margin.left);
+	DDX_Control(pDX, IDC_EDIT7, m_marginleft);
 	DDX_Control(pDX, IDC_SPIN6, m_marginleftspin);
-	DDX_Text(pDX, IDC_EDIT8, m_margin.right);
+	DDX_Control(pDX, IDC_EDIT8, m_marginright);
 	DDX_Control(pDX, IDC_SPIN7, m_marginrightspin);
-	DDX_Text(pDX, IDC_EDIT9, m_margin.top);
+	DDX_Control(pDX, IDC_EDIT9, m_margintop);
 	DDX_Control(pDX, IDC_SPIN8, m_margintopspin);
-	DDX_Text(pDX, IDC_EDIT10, m_margin.bottom);
+	DDX_Control(pDX, IDC_EDIT10, m_marginbottom);
 	DDX_Control(pDX, IDC_SPIN9, m_marginbottomspin);
 	DDX_Slider(pDX, IDC_SLIDER1, m_alpha[0]);
 	DDX_Slider(pDX, IDC_SLIDER2, m_alpha[1]);
@@ -113,6 +106,17 @@ void CPPageSubStyle::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SLIDER4, m_alphasliders[3]);
 	DDX_Check(pDX, IDC_CHECK1, m_linkalphasliders);
 	DDX_Check(pDX, IDC_CHECK_RELATIVETO, m_relativeTo);
+
+	m_spacing = min(max(-10000, m_spacing), 10000);
+	m_angle = min(max(0, m_angle), 360);
+	m_scalex = min(max(-10000, m_scalex), 10000);
+	m_scaley = min(max(-10000, m_scaley), 10000);
+	m_borderwidth = min(max(0, m_borderwidth), 10000);
+	m_shadowdepth = min(max(0, m_shadowdepth), 10000);
+	m_marginleft = min(max(-10000, m_marginleft), 10000);
+	m_marginright = min(max(-10000, m_marginright), 10000);
+	m_margintop = min(max(-10000, m_margintop), 10000);
+	m_marginbottom = min(max(-10000, m_marginbottom), 10000);
 }
 
 BEGIN_MESSAGE_MAP(CPPageSubStyle, CPPageBase)
@@ -144,6 +148,20 @@ BOOL CPPageSubStyle::OnInitDialog()
 	SetHandCursor(m_hWnd, IDC_RESET);
 	SetHandCursor(m_hWnd, IDC_COMBO1);
 
+	m_spacingspin.SetRange(-10000, 10000);
+	m_anglespin.SetRange(0, 359);
+	m_scalexspin.SetRange(-10000, 10000);
+	m_scaleyspin.SetRange(-10000, 10000);
+	m_borderwidthspin.SetRange(0, 10000);
+	m_shadowdepthspin.SetRange(0, 10000);
+	m_marginleftspin.SetRange(-10000, 10000);
+	m_marginrightspin.SetRange(-10000, 10000);
+	m_margintopspin.SetRange(-10000, 10000);
+	m_marginbottomspin.SetRange(-10000, 10000);
+	for (int i = 0; i < _countof(m_alphasliders); i++) {
+		m_alphasliders[i].SetRange(0, 255);
+	}
+
 	Init();
 
 	CreateToolTip();
@@ -169,36 +187,32 @@ void CPPageSubStyle::Init()
 
 	// TODO: allow floats in these edit boxes
 	m_spacing = (int)m_stss->fontSpacing;
-	m_spacingspin.SetRange32(-10000, 10000);
 
 	while (m_stss->fontAngleZ < 0) {
 		m_stss->fontAngleZ += 360;
 	}
 
 	m_angle = (int)fmod(m_stss->fontAngleZ, 360);
-	m_anglespin.SetRange32(0, 359);
+
 	m_scalex = (int)m_stss->fontScaleX;
-	m_scalexspin.SetRange32(-10000, 10000);
+
 	m_scaley = (int)m_stss->fontScaleY;
-	m_scaleyspin.SetRange32(-10000, 10000);
+
 
 	m_borderstyle = m_stss->borderStyle;
 	m_borderwidth = (int)min(m_stss->outlineWidthX, m_stss->outlineWidthY);
-	m_borderwidthspin.SetRange32(0, 10000);
 	m_shadowdepth = (int)min(m_stss->shadowDepthX, m_stss->shadowDepthY);
-	m_shadowdepthspin.SetRange32(0, 10000);
 
 	m_screenalignment = m_stss->scrAlignment-1;
-	m_margin = m_stss->marginRect;
-	m_marginleftspin.SetRange32(-10000, 10000);
-	m_marginrightspin.SetRange32(-10000, 10000);
-	m_margintopspin.SetRange32(-10000, 10000);
-	m_marginbottomspin.SetRange32(-10000, 10000);
+	m_marginleft = m_stss->marginRect.left;
+	m_marginright = m_stss->marginRect.right;
+	m_margintop = m_stss->marginRect.top;
+	m_marginbottom = m_stss->marginRect.bottom;
+
 	m_relativeTo = m_stss->relativeTo;
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < _countof(m_alpha); i++) {
 		m_alpha[i] = 255-m_stss->alpha[i];
-		m_alphasliders[i].SetRange(0, 255);
 	}
 
 	m_linkalphasliders = FALSE;
@@ -224,10 +238,10 @@ BOOL CPPageSubStyle::OnApply()
 	m_stss->shadowDepthX	= m_stss->shadowDepthY	= m_shadowdepth;
 
 	m_stss->scrAlignment	= m_screenalignment + 1;
-	m_stss->marginRect		= m_margin;
+	m_stss->marginRect		= CRect(m_marginleft, m_margintop, m_marginright, m_marginbottom);
 	m_stss->relativeTo		= m_relativeTo;
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < _countof(m_alpha); i++) {
 		m_stss->alpha[i]	= 255 - m_alpha[i];
 	}
 
@@ -306,13 +320,13 @@ void CPPageSubStyle::OnBnClickedCheck1()
 
 	int avg = 0;
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < _countof(m_alphasliders); i++) {
 		avg += m_alphasliders[i].GetPos();
 	}
 
 	avg /= 4;
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < _countof(m_alphasliders); i++) {
 		m_alphasliders[i].SetPos(avg);
 	}
 
@@ -369,7 +383,7 @@ void CPPageSubStyle::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	if (m_linkalphasliders && pScrollBar) {
 		int pos = ((CSliderCtrl*)pScrollBar)->GetPos();
 
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < _countof(m_alphasliders); i++) {
 			m_alphasliders[i].SetPos(pos);
 		}
 	}
