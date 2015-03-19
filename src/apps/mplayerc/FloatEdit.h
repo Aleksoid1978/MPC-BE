@@ -36,6 +36,7 @@ public:
 
 public:
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg LRESULT OnPaste(WPARAM wParam, LPARAM lParam);
 };
 
 // CIntEdit
@@ -43,11 +44,16 @@ public:
 class CIntEdit : public CEdit
 {
 public:
+	bool GetInt(int& integer);
+	int operator = (int integer);
+	operator int();
+
 	DECLARE_DYNAMIC(CIntEdit)
 	DECLARE_MESSAGE_MAP()
 
 public:
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg LRESULT OnPaste(WPARAM wParam, LPARAM lParam);
 };
 
 // CHexEdit
@@ -64,4 +70,5 @@ public:
 
 public:
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg LRESULT OnPaste(WPARAM wParam, LPARAM lParam);
 };

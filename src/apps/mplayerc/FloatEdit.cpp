@@ -55,64 +55,144 @@ CFloatEdit::operator double()
 
 BEGIN_MESSAGE_MAP(CFloatEdit, CEdit)
 	ON_WM_CHAR()
+	ON_MESSAGE(WM_PASTE, OnPaste)
 END_MESSAGE_MAP()
 
 void CFloatEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	if (!(nChar >= '0' && nChar <= '9' || nChar == '.' || nChar == '\b')) {
-		return;
-	}
+	if (nChar >= '0' && nChar <= '9' || nChar == '-' || nChar == '.') {
+		CString str;
+		GetWindowText(str);
+		int nStartChar, nEndChar;
+		GetSel(nStartChar, nEndChar);
 
+		CEdit::OnChar(nChar, nRepCnt, nFlags);
+
+		CString s;
+		GetWindowText(s);
+		float f = 0;
+		wchar_t ch;
+		if (_stscanf_s(s, L"%f%c", &f, &ch) != 1) {
+			SetWindowText(str);
+			SetSel(nStartChar, nEndChar);
+		};
+	}
+	else if (nChar == VK_BACK
+			|| nChar == 0x01 // Ctrl+A
+			|| nChar == 0x03 // Ctrl+C
+			|| nChar == 0x16 // Ctrl+V
+			|| nChar == 0x18) { // Ctrl+X
+		CEdit::OnChar(nChar, nRepCnt, nFlags);
+	}
+}
+
+LRESULT CFloatEdit::OnPaste(WPARAM wParam, LPARAM lParam)
+{
 	CString str;
 	GetWindowText(str);
-
-	if (nChar == '.' && (str.Find('.') >= 0 || str.IsEmpty())) {
-		return;
-	}
-
 	int nStartChar, nEndChar;
 	GetSel(nStartChar, nEndChar);
 
-	if (nChar == '\b' && nStartChar <= 0) {
-		return;
+	LRESULT lr = DefWindowProc(WM_PASTE, wParam, lParam);
+
+	if (lr == 1) {
+		CString s;
+		GetWindowText(s);
+		float f = 0;
+		wchar_t ch;
+		if (_stscanf_s(s, L"%f%c", &f, &ch) != 1) {
+			SetWindowText(str);
+			SetSel(nStartChar, nEndChar);
+		};
 	}
 
-	CEdit::OnChar(nChar, nRepCnt, nFlags);
+	return lr;
 }
 
 // CIntEdit
 
 IMPLEMENT_DYNAMIC(CIntEdit, CEdit)
 
+bool CIntEdit::GetInt(int& integer)
+{
+	CString s;
+	GetWindowText(s);
+
+	return(_stscanf_s(s, _T("%d"), &integer) == 1);
+}
+
+int CIntEdit::operator = (int integer)
+{
+	CString s;
+	s.Format(_T("%d"), integer);
+	SetWindowText(s);
+
+	return(integer);
+}
+
+CIntEdit::operator int()
+{
+	CString s;
+	GetWindowText(s);
+	int integer;
+
+	return(_stscanf_s(s, _T("%d"), &integer) == 1 ? integer : 0);
+}
+
 BEGIN_MESSAGE_MAP(CIntEdit, CEdit)
 	ON_WM_CHAR()
+	ON_MESSAGE(WM_PASTE, OnPaste)
 END_MESSAGE_MAP()
 
 void CIntEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	if (!(nChar >= '0' && nChar <= '9' || nChar == '-' || nChar == '\b')) {
-		return;
-	}
+	if (nChar >= '0' && nChar <= '9' || nChar == '-') {
+		CString str;
+		GetWindowText(str);
+		int nStartChar, nEndChar;
+		GetSel(nStartChar, nEndChar);
 
+		CEdit::OnChar(nChar, nRepCnt, nFlags);
+
+		CString s;
+		GetWindowText(s);
+		int d = 0;
+		wchar_t ch;
+		if (_stscanf_s(s, L"%d%c", &d, &ch) != 1) {
+			SetWindowText(str);
+			SetSel(nStartChar, nEndChar);
+		};
+	}
+	else if (nChar == VK_BACK
+			|| nChar == 0x01 // Ctrl+A
+			|| nChar == 0x03 // Ctrl+C
+			|| nChar == 0x16 // Ctrl+V
+			|| nChar == 0x18) { // Ctrl+X
+		CEdit::OnChar(nChar, nRepCnt, nFlags);
+	}
+}
+
+LRESULT CIntEdit::OnPaste(WPARAM wParam, LPARAM lParam)
+{
 	CString str;
 	GetWindowText(str);
-
-	if (nChar == '-' && !str.IsEmpty() && str[0] == '-') {
-		return;
-	}
-
 	int nStartChar, nEndChar;
 	GetSel(nStartChar, nEndChar);
 
-	if (nChar == '\b' && nStartChar <= 0) {
-		return;
+	LRESULT lr = DefWindowProc(WM_PASTE, wParam, lParam);
+
+	if (lr == 1) {
+		CString s;
+		GetWindowText(s);
+		int d = 0;
+		wchar_t ch;
+		if (_stscanf_s(s, L"%d%c", &d, &ch) != 1) {
+			SetWindowText(str);
+			SetSel(nStartChar, nEndChar);
+		};
 	}
 
-	if (nChar == '-' && (nStartChar != 0 || nEndChar != 0)) {
-		return;
-	}
-
-	CEdit::OnChar(nChar, nRepCnt, nFlags);
+	return lr;
 }
 
 // CHexEdit
@@ -147,28 +227,58 @@ CHexEdit::operator DWORD()
 
 BEGIN_MESSAGE_MAP(CHexEdit, CEdit)
 	ON_WM_CHAR()
+	ON_MESSAGE(WM_PASTE, OnPaste)
 END_MESSAGE_MAP()
 
 void CHexEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	if (!(nChar >= 'A' && nChar <= 'F' || nChar >= 'a' && nChar <= 'f'
-			|| nChar >= '0' && nChar <= '9' || nChar == '\b')) {
-		return;
-	}
+	if (nChar >= '0' && nChar <= '9'
+			|| nChar >= 'A' && nChar <= 'F'
+			|| nChar >= 'a' && nChar <= 'f') {
+		CString str;
+		GetWindowText(str);
+		int nStartChar, nEndChar;
+		GetSel(nStartChar, nEndChar);
 
+		CEdit::OnChar(nChar, nRepCnt, nFlags);
+
+		CString s;
+		GetWindowText(s);
+		DWORD x = 0;
+		wchar_t ch;
+		if (_stscanf_s(s, L"%x%c", &x, &ch) != 1) {
+			SetWindowText(str);
+			SetSel(nStartChar, nEndChar);
+		};
+	}
+	else if (nChar == VK_BACK
+			|| nChar == 0x01 // Ctrl+A
+			|| nChar == 0x03 // Ctrl+C
+			|| nChar == 0x16 // Ctrl+V
+			|| nChar == 0x18) { // Ctrl+X
+		CEdit::OnChar(nChar, nRepCnt, nFlags);
+	}
+}
+
+LRESULT CHexEdit::OnPaste(WPARAM wParam, LPARAM lParam)
+{
 	CString str;
 	GetWindowText(str);
-
 	int nStartChar, nEndChar;
 	GetSel(nStartChar, nEndChar);
 
-	if (nChar == '\b' && nStartChar <= 0) {
-		return;
+	LRESULT lr = DefWindowProc(WM_PASTE, wParam, lParam);
+
+	if (lr == 1) {
+		CString s;
+		GetWindowText(s);
+		DWORD x = 0;
+		wchar_t ch;
+		if (_stscanf_s(s, L"%x%c", &x, &ch) != 1) {
+			SetWindowText(str);
+			SetSel(nStartChar, nEndChar);
+		};
 	}
 
-	if (nChar != '\b' && nEndChar - nStartChar == 0 && str.GetLength() >= 8) {
-		return;
-	}
-
-	CEdit::OnChar(nChar, nRepCnt, nFlags);
+	return lr;
 }
