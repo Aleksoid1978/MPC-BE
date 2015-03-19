@@ -68,8 +68,7 @@ public:
 	CSliderCtrl	m_sldNormRealeaseTime;
 
 	CButton		m_chkTimeShift;
-	int			m_iTimeShift;
-	CEdit		m_edtTimeShift;
+	CIntEdit	m_edtTimeShift;
 	CSpinButtonCtrl m_spnTimeShift;
 
 	void UpdateGainInfo() { CString str; str.Format(ResStr(IDS_AUDIO_GAIN), m_sldGain.GetPos() / 10.0f); m_stcGain.SetWindowText(str); };
