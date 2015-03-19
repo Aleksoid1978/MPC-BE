@@ -37,8 +37,6 @@ CPPageAudio::CPPageAudio(IFilterGraph* pFG)
 
 	, m_fAutoloadAudio(FALSE)
 	, m_fPrioritizeExternalAudio(FALSE)
-
-	, m_iTimeShift(0)
 {
 	m_pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG);
 }
@@ -76,11 +74,10 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SLIDER4, m_sldNormRealeaseTime);
 
 	DDX_Control(pDX, IDC_CHECK4, m_chkTimeShift);
-	DDX_Text(pDX, IDC_EDIT2, m_iTimeShift);
 	DDX_Control(pDX, IDC_EDIT2, m_edtTimeShift);
 	DDX_Control(pDX, IDC_SPIN2, m_spnTimeShift);
 
-	m_iTimeShift = min(max(APP_AUDIOTIMESHIFT_MIN, m_iTimeShift), APP_AUDIOTIMESHIFT_MAX);
+	m_edtTimeShift = min(max(APP_AUDIOTIMESHIFT_MIN, m_edtTimeShift), APP_AUDIOTIMESHIFT_MAX);
 }
 
 BEGIN_MESSAGE_MAP(CPPageAudio, CPPageBase)
@@ -224,7 +221,7 @@ BOOL CPPageAudio::OnInitDialog()
 	m_sldNormRealeaseTime.SetPos(s.iAudioNormRealeaseTime);
 
 	m_chkTimeShift.SetCheck(s.bAudioTimeShift);
-	m_iTimeShift = s.iAudioTimeShift;
+	m_edtTimeShift = s.iAudioTimeShift;
 	m_spnTimeShift.SetRange32(APP_AUDIOTIMESHIFT_MIN, APP_AUDIOTIMESHIFT_MAX);
 
 	UpdateGainInfo();
@@ -266,7 +263,7 @@ BOOL CPPageAudio::OnApply()
 	s.iAudioNormLevel			= m_sldNormLevel.GetPos();
 	s.iAudioNormRealeaseTime	= m_sldNormRealeaseTime.GetPos();
 	s.bAudioTimeShift			= !!m_chkTimeShift.GetCheck();
-	s.iAudioTimeShift			= m_iTimeShift;
+	s.iAudioTimeShift			= m_edtTimeShift;
 
 	if (m_pASF) {
 		m_pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
