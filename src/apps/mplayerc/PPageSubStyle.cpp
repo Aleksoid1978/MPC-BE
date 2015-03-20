@@ -106,17 +106,6 @@ void CPPageSubStyle::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SLIDER4, m_alphasliders[3]);
 	DDX_Check(pDX, IDC_CHECK1, m_linkalphasliders);
 	DDX_Check(pDX, IDC_CHECK_RELATIVETO, m_relativeTo);
-
-	m_spacing = min(max(-10000, m_spacing), 10000);
-	m_angle = min(max(0, m_angle), 360);
-	m_scalex = min(max(-10000, m_scalex), 10000);
-	m_scaley = min(max(-10000, m_scaley), 10000);
-	m_borderwidth = min(max(0, m_borderwidth), 10000);
-	m_shadowdepth = min(max(0, m_shadowdepth), 10000);
-	m_marginleft = min(max(-10000, m_marginleft), 10000);
-	m_marginright = min(max(-10000, m_marginright), 10000);
-	m_margintop = min(max(-10000, m_margintop), 10000);
-	m_marginbottom = min(max(-10000, m_marginbottom), 10000);
 }
 
 BEGIN_MESSAGE_MAP(CPPageSubStyle, CPPageBase)
@@ -147,6 +136,17 @@ BOOL CPPageSubStyle::OnInitDialog()
 	SetHandCursor(m_hWnd, IDC_BUTTON1);
 	SetHandCursor(m_hWnd, IDC_RESET);
 	SetHandCursor(m_hWnd, IDC_COMBO1);
+
+	m_spacing.SetRange(-10000, 10000);
+	m_angle.SetRange(0, 359);
+	m_scalex.SetRange(-10000, 10000);
+	m_scaley.SetRange(-10000, 10000);
+	m_borderwidth.SetRange(0, 10000);
+	m_shadowdepth.SetRange(0, 10000);
+	m_marginleft.SetRange(-10000, 10000);
+	m_marginright.SetRange(-10000, 10000);
+	m_margintop.SetRange(-10000, 10000);
+	m_marginbottom.SetRange(-10000, 10000);
 
 	m_spacingspin.SetRange(-10000, 10000);
 	m_anglespin.SetRange(0, 359);
