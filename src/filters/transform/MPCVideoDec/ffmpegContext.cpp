@@ -186,8 +186,9 @@ static const WORD PCID_NVIDIA_VP567[] = {
 	0x13D8, // GeForce GTX 970M
 	0x13D9, // GeForce GTX 965M
 
-	// VP7, Nvidia VDPAU Feature Set F: GM206.
+	// VP7, Nvidia VDPAU Feature Set F: GM200, GM206.
 	0x1401, // GeForce GTX 960
+	0x17C2, // GeForce GTX TITAN X
 };
 
 static const WORD PCID_ATI_UVD [] = {
