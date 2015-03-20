@@ -43,10 +43,14 @@ public:
 
 class CIntEdit : public CEdit
 {
+	int m_lower = INT_MIN;
+	int m_upper = INT_MAX;
+
 public:
 	bool GetInt(int& integer);
 	int operator = (int integer);
 	operator int();
+	void SetRange(int nLower, int nUpper);
 
 	DECLARE_DYNAMIC(CIntEdit)
 	DECLARE_MESSAGE_MAP()
@@ -54,6 +58,7 @@ public:
 public:
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg LRESULT OnPaste(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnKillFocus(CWnd* pNewWnd);
 };
 
 // CHexEdit

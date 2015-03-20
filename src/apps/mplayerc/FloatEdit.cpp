@@ -139,9 +139,17 @@ CIntEdit::operator int()
 	return(_stscanf_s(s, _T("%d"), &integer) == 1 ? integer : 0);
 }
 
+void CIntEdit::SetRange(int nLower, int nUpper)
+{
+	ASSERT(nLower < nUpper);
+	m_lower = nLower;
+	m_upper = nUpper;
+}
+
 BEGIN_MESSAGE_MAP(CIntEdit, CEdit)
 	ON_WM_CHAR()
 	ON_MESSAGE(WM_PASTE, OnPaste)
+	ON_WM_KILLFOCUS()
 END_MESSAGE_MAP()
 
 void CIntEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -193,6 +201,25 @@ LRESULT CIntEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 	}
 
 	return lr;
+}
+
+void CIntEdit::OnKillFocus (CWnd* pNewWnd)
+{
+	CString s;
+	GetWindowText(s);
+	int integer;
+
+	if (_stscanf_s(s, _T("%d"), &integer) != 1) {
+		integer = 0;
+	}
+
+	if (integer > m_upper) { integer = m_upper; }
+	else if (integer < m_lower) { integer = m_lower; }
+
+	s.Format(_T("%d"), integer);
+	SetWindowText(s);
+
+	CEdit::OnKillFocus(pNewWnd);
 }
 
 // CHexEdit
