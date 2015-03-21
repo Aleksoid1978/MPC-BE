@@ -72,7 +72,7 @@ void CFloatEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		GetWindowText(s);
 		float f = 0;
 		wchar_t ch;
-		if (_stscanf_s(s, L"%f%c", &f, &ch) != 1) {
+		if (_stscanf_s(s, L"%f%c", &f, &ch) != 1 && s != "-") {
 			SetWindowText(str);
 			SetSel(nStartChar, nEndChar);
 		};
@@ -166,7 +166,7 @@ void CIntEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		GetWindowText(s);
 		int d = 0;
 		wchar_t ch;
-		if (_stscanf_s(s, L"%d%c", &d, &ch) != 1) {
+		if (_stscanf_s(s, L"%d%c", &d, &ch) != 1 && s != "-") {
 			SetWindowText(str);
 			SetSel(nStartChar, nEndChar);
 		};
