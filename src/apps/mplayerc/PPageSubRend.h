@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "FloatEdit.h"
 #include "../../Subtitles/STS.h"
 
 
@@ -35,11 +36,9 @@ public:
 	virtual ~CPPageSubRend();
 
 	BOOL m_fOverridePlacement;
-	int m_nHorPos;
-	CEdit m_nHorPosEdit;
+	CIntEdit m_edtHorPos;
 	CSpinButtonCtrl m_nHorPosCtrl;
-	int m_nVerPos;
-	CEdit m_nVerPosEdit;
+	CIntEdit m_edtVerPos;
 	CSpinButtonCtrl m_nVerPosCtrl;
 	int m_nSPCSize;
 	CSpinButtonCtrl m_nSPCSizeCtrl;

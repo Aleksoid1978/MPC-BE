@@ -36,7 +36,6 @@ CPPageFullscreen::CPPageFullscreen()
 	, m_bSetDefault(FALSE)
 	, m_bSetGlobal(FALSE)
 	, m_bShowBarsWhenFullScreen(FALSE)
-	, m_nShowBarsWhenFullScreenTimeOut(0)
 	, m_bExitFullScreenAtTheEnd(FALSE)
 	, m_bExitFullScreenAtFocusLost(FALSE)
 	, m_bRestoreResAfterExit(TRUE)
@@ -60,9 +59,9 @@ void CPPageFullscreen::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO1, m_iMonitorTypeCtrl);
 	DDX_Control(pDX, IDC_LIST1, m_list);
 	DDX_Check(pDX, IDC_CHECK4, m_bShowBarsWhenFullScreen);
-	DDX_Text(pDX, IDC_EDIT1, m_nShowBarsWhenFullScreenTimeOut);
 	DDX_Check(pDX, IDC_CHECK5, m_bExitFullScreenAtTheEnd);
 	DDX_Check(pDX, IDC_CHECK6, m_bExitFullScreenAtFocusLost);
+	DDX_Control(pDX, IDC_EDIT1, m_edtTimeOut);
 	DDX_Control(pDX, IDC_SPIN1, m_nTimeOutCtrl);
 	DDX_Check(pDX, IDC_RESTORERESCHECK, m_bRestoreResAfterExit);
 }
@@ -118,7 +117,8 @@ BOOL CPPageFullscreen::OnInitDialog()
 	m_f_hmonitor						= s.strFullScreenMonitor;
 	m_f_hmonitorID						= s.strFullScreenMonitorID;
 	m_bShowBarsWhenFullScreen			= s.fShowBarsWhenFullScreen;
-	m_nShowBarsWhenFullScreenTimeOut	= s.nShowBarsWhenFullScreenTimeOut;
+	m_edtTimeOut						= s.nShowBarsWhenFullScreenTimeOut;
+	m_edtTimeOut.SetRange(-1, 10);
 	m_nTimeOutCtrl.SetRange(-1, 10);
 	m_bExitFullScreenAtTheEnd			= s.fExitFullScreenAtTheEnd;
 	m_bExitFullScreenAtFocusLost		= s.fExitFullScreenAtFocusLost;
@@ -300,7 +300,7 @@ BOOL CPPageFullscreen::OnApply()
 	s.strFullScreenMonitorID				= m_f_hmonitorID;
 
 	s.fShowBarsWhenFullScreen				= !!m_bShowBarsWhenFullScreen;
-	s.nShowBarsWhenFullScreenTimeOut		= m_nShowBarsWhenFullScreenTimeOut;
+	s.nShowBarsWhenFullScreenTimeOut		= m_edtTimeOut;
 	s.fExitFullScreenAtTheEnd				= !!m_bExitFullScreenAtTheEnd;
 	s.fExitFullScreenAtFocusLost			= !!m_bExitFullScreenAtFocusLost;
 	s.fRestoreResAfterExit					= !!m_bRestoreResAfterExit;

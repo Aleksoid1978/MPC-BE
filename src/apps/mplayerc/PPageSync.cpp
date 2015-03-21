@@ -33,9 +33,6 @@ CPPageSync::CPPageSync()
 	, m_bSynchronizeNearest(0)
 	, m_iLineDelta(0)
 	, m_iColumnDelta(0)
-	, m_fCycleDelta(0.0012)
-	, m_fTargetSyncOffset(10.0)
-	, m_fControlLimit(2.0)
 {
 }
 
@@ -50,7 +47,7 @@ void CPPageSync::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK1, m_chkVMR9VSync);
 	DDX_Control(pDX, IDC_CHECK2, m_chkVMR9VSyncAccurate);
 	DDX_Control(pDX, IDC_CHECK3, m_chkVMR9AlterativeVSync);
-	DDX_Text(pDX, IDC_EDIT1, m_iVMR9VSyncOffset);
+	DDX_Control(pDX, IDC_EDIT1, m_edtVMR9VSyncOffset);
 	DDX_Control(pDX, IDC_SPIN1, m_spnVMR9VSyncOffset);
 	DDX_Control(pDX, IDC_CHECK4, m_chkDisableAero);
 	DDX_Control(pDX, IDC_CHECK5, m_chkVMRFlushGPUBeforeVSync);
@@ -60,11 +57,11 @@ void CPPageSync::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_SYNCVIDEO, m_bSynchronizeVideo);
 	DDX_Check(pDX, IDC_SYNCDISPLAY, m_bSynchronizeDisplay);
 	DDX_Check(pDX, IDC_SYNCNEAREST, m_bSynchronizeNearest);
-	DDX_Text(pDX, IDC_CYCLEDELTA, m_fCycleDelta);
+	DDX_Control(pDX, IDC_CYCLEDELTA, m_edtCycleDelta);
 	DDX_Text(pDX, IDC_LINEDELTA, m_iLineDelta);
 	DDX_Text(pDX, IDC_COLUMNDELTA, m_iColumnDelta);
-	DDX_Text(pDX, IDC_TARGETSYNCOFFSET, m_fTargetSyncOffset);
-	DDX_Text(pDX, IDC_CONTROLLIMIT, m_fControlLimit);
+	DDX_Control(pDX, IDC_TARGETSYNCOFFSET, m_edtTargetSyncOffset);
+	DDX_Control(pDX, IDC_CONTROLLIMIT, m_edtControlLimit);
 }
 
 BOOL CPPageSync::OnInitDialog()
@@ -96,7 +93,8 @@ void CPPageSync::InitDialogPrivate()
 	m_chkVMR9VSyncAccurate.SetCheck(ars.iVMR9VSyncAccurate);
 	m_chkVMR9AlterativeVSync.SetCheck(ars.fVMR9AlterativeVSync);
 	m_spnVMR9VSyncOffset.SetRange(-20, 20);
-	m_iVMR9VSyncOffset = ars.iVMR9VSyncOffset;
+	m_edtVMR9VSyncOffset.SetRange(-20, 20);
+	m_edtVMR9VSyncOffset = ars.iVMR9VSyncOffset;
 	m_chkDisableAero.SetCheck(ars.iVMRDisableDesktopComposition);
 	m_chkVMRFlushGPUBeforeVSync.SetCheck(ars.iVMRFlushGPUBeforeVSync);
 	m_chkVMRFlushGPUAfterPresent.SetCheck(ars.iVMRFlushGPUAfterPresent);
@@ -168,9 +166,9 @@ void CPPageSync::InitDialogPrivate()
 	m_bSynchronizeNearest = ars.bSynchronizeNearest;
 	m_iLineDelta = ars.iLineDelta;
 	m_iColumnDelta = ars.iColumnDelta;
-	m_fCycleDelta = ars.fCycleDelta;
-	m_fTargetSyncOffset = ars.fTargetSyncOffset;
-	m_fControlLimit = ars.fControlLimit;
+	m_edtCycleDelta = ars.fCycleDelta;
+	m_edtTargetSyncOffset = ars.fTargetSyncOffset;
+	m_edtControlLimit = ars.fControlLimit;
 
 	UpdateData(FALSE);
 	SetModified(FALSE);
@@ -186,7 +184,7 @@ BOOL CPPageSync::OnApply()
 	ars.iVMR9VSync						= !!m_chkVMR9VSync.GetCheck();
 	ars.iVMR9VSyncAccurate				= !!m_chkVMR9VSyncAccurate.GetCheck();
 	ars.fVMR9AlterativeVSync			= !!m_chkVMR9AlterativeVSync.GetCheck();
-	ars.iVMR9VSyncOffset				 = min(max(-20, m_iVMR9VSyncOffset), 20);
+	ars.iVMR9VSyncOffset				 = m_edtVMR9VSyncOffset;
 	ars.iVMRDisableDesktopComposition	= !!m_chkDisableAero.GetCheck();
 	ars.iVMRFlushGPUBeforeVSync			= !!m_chkVMRFlushGPUBeforeVSync.GetCheck();
 	ars.iVMRFlushGPUAfterPresent		= !!m_chkVMRFlushGPUAfterPresent.GetCheck();
@@ -197,9 +195,9 @@ BOOL CPPageSync::OnApply()
 	ars.bSynchronizeNearest	= !!m_bSynchronizeNearest;
 	ars.iLineDelta			= m_iLineDelta;
 	ars.iColumnDelta		= m_iColumnDelta;
-	ars.fCycleDelta			= m_fCycleDelta;
-	ars.fTargetSyncOffset	= m_fTargetSyncOffset;
-	ars.fControlLimit		= m_fControlLimit;
+	ars.fCycleDelta			= m_edtCycleDelta;
+	ars.fTargetSyncOffset	= m_edtTargetSyncOffset;
+	ars.fControlLimit		= m_edtControlLimit;
 
 	return __super::OnApply();
 }

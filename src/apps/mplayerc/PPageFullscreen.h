@@ -22,6 +22,7 @@
 #pragma once
 
 #include "PPageBase.h"
+#include "FloatEdit.h"
 #include "PlayerListCtrl.h"
 
 // CPPageFullscreen dialog
@@ -57,8 +58,8 @@ private:
 	CComboBox m_iMonitorTypeCtrl;
 
 	BOOL m_bShowBarsWhenFullScreen;
-	int m_nShowBarsWhenFullScreenTimeOut;
 	BOOL m_bExitFullScreenAtTheEnd, m_bExitFullScreenAtFocusLost;
+	CIntEdit m_edtTimeOut;
 	CSpinButtonCtrl m_nTimeOutCtrl;
 	BOOL m_bRestoreResAfterExit;
 

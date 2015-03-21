@@ -21,6 +21,7 @@
 #pragma once
 
 #include "PPageBase.h"
+#include "FloatEdit.h"
 #include "StaticLink.h"
 
 
@@ -37,7 +38,7 @@ public:
 	CButton m_chkVMR9VSync;
 	CButton m_chkVMR9VSyncAccurate;
 	CButton m_chkVMR9AlterativeVSync;
-	int m_iVMR9VSyncOffset;
+	CIntEdit m_edtVMR9VSyncOffset;
 	CSpinButtonCtrl m_spnVMR9VSyncOffset;
 	CButton m_chkDisableAero;
 	CButton m_chkVMRFlushGPUBeforeVSync;
@@ -50,10 +51,10 @@ public:
 
 	int m_iLineDelta;
 	int m_iColumnDelta;
-	double m_fCycleDelta;
+	CFloatEdit m_edtCycleDelta;
 
-	double m_fTargetSyncOffset;
-	double m_fControlLimit;
+	CIntEdit m_edtTargetSyncOffset;
+	CIntEdit m_edtControlLimit;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
