@@ -30,8 +30,6 @@ IMPLEMENT_DYNAMIC(CPPageSubRend, CPPageBase)
 CPPageSubRend::CPPageSubRend()
 	: CPPageBase(CPPageSubRend::IDD, CPPageSubRend::IDD)
 	, m_fOverridePlacement(FALSE)
-	, m_nHorPos(0)
-	, m_nVerPos(0)
 	, m_nSPCSize(RS_SPCSIZE_DEF)
 	, m_bSPCAllowAnimationWhenBuffering(TRUE)
 	, m_bbSPAllowDropSubPic(TRUE)
@@ -48,15 +46,13 @@ void CPPageSubRend::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 
 	DDX_Check(pDX, IDC_CHECK3, m_fOverridePlacement);
-	DDX_Text(pDX, IDC_EDIT2, m_nHorPos);
+	DDX_Control(pDX, IDC_EDIT2, m_edtHorPos);
+	DDX_Control(pDX, IDC_EDIT3, m_edtVerPos);
 	DDX_Control(pDX, IDC_SPIN2, m_nHorPosCtrl);
-	DDX_Text(pDX, IDC_EDIT3, m_nVerPos);
 	DDX_Control(pDX, IDC_SPIN3, m_nVerPosCtrl);
 	DDX_Text(pDX, IDC_EDIT1, m_nSPCSize);
 	DDX_Control(pDX, IDC_SPIN1, m_nSPCSizeCtrl);
 	DDX_Control(pDX, IDC_COMBO1, m_spmaxres);
-	DDX_Control(pDX, IDC_EDIT2, m_nHorPosEdit);
-	DDX_Control(pDX, IDC_EDIT3, m_nVerPosEdit);
 	DDX_Check(pDX, IDC_CHECK_SPCANIMWITHBUFFER, m_bSPCAllowAnimationWhenBuffering);
 	DDX_Check(pDX, IDC_CHECK_ALLOW_DROPPING_SUBPIC, m_bbSPAllowDropSubPic);
 	DDX_Text(pDX, IDC_EDIT4, m_nSubDelayInterval);
@@ -125,9 +121,11 @@ BOOL CPPageSubRend::OnInitDialog()
 	AppSettings& s = AfxGetAppSettings();
 
 	m_fOverridePlacement = s.fOverridePlacement;
-	m_nHorPos = s.nHorPos;
+	m_edtHorPos = s.nHorPos;
+	m_edtHorPos.SetRange(-10,110);
 	m_nHorPosCtrl.SetRange(-10,110);
-	m_nVerPos = s.nVerPos;
+	m_edtVerPos = s.nVerPos;
+	m_edtVerPos.SetRange(-10,110);
 	m_nVerPosCtrl.SetRange(110,-10);
 	m_nSPCSize = s.m_RenderersSettings.nSPCSize;
 	m_nSPCSizeCtrl.SetRange(RS_SPCSIZE_MIN, RS_SPCSIZE_MAX);
@@ -155,16 +153,16 @@ BOOL CPPageSubRend::OnApply()
 	AppSettings& s = AfxGetAppSettings();
 
 	if (s.fOverridePlacement != !!m_fOverridePlacement
-			|| s.nHorPos != m_nHorPos
-			|| s.nVerPos != m_nVerPos
+			|| s.nHorPos != m_edtHorPos
+			|| s.nVerPos != m_edtVerPos
 			|| s.m_RenderersSettings.nSPCSize != m_nSPCSize
 			|| s.nSubDelayInterval != m_nSubDelayInterval
 			|| s.m_RenderersSettings.nSPMaxTexRes != TexIndex2Width(m_spmaxres.GetCurSel())
 			|| s.m_RenderersSettings.bSPAllowDropSubPic != !!m_bbSPAllowDropSubPic
 			|| s.m_RenderersSettings.bSPCAllowAnimationWhenBuffering != !!m_bSPCAllowAnimationWhenBuffering) {
 		s.fOverridePlacement = !!m_fOverridePlacement;
-		s.nHorPos = m_nHorPos;
-		s.nVerPos = m_nVerPos;
+		s.nHorPos = m_edtHorPos;
+		s.nVerPos = m_edtVerPos;
 		s.m_RenderersSettings.nSPCSize = m_nSPCSize;
 		s.nSubDelayInterval = m_nSubDelayInterval;
 		s.m_RenderersSettings.nSPMaxTexRes = TexIndex2Width(m_spmaxres.GetCurSel());
