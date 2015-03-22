@@ -445,7 +445,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile->Seek(0);
 
 		CBaseSplitterFileEx::hevchdr h;
-		if (m_pFile->Read(h, min(KILOBYTE, m_pFile->GetLength()), &mt)) {
+		if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt)) {
 			mts.Add(mt);
 			m_RAWType = RAW_HEVC;
 			pName = L"H.265/HEVC Video Output";
