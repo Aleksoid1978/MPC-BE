@@ -39,6 +39,8 @@ double CFloatEdit::operator = (double d)
 {
 	CString s;
 	s.Format(_T("%.4f"), d);
+	s.TrimRight('0');
+	if (s[s.GetLength() - 1] == '.') s.Truncate(s.GetLength() - 1);
 	SetWindowText(s);
 
 	return(d);
