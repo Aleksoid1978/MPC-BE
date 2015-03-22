@@ -9,9 +9,113 @@ Legend:
 
 1.4.4 (beta)
 ==============================
-Added (+):
-	+ MPCVideoDec - add HEVC DXVA decoder;
+AviSplitter
+Fixed work with RGB555 video.
 
+MatroskaSplitter
+Fixed calculation TimeStamp for subtitles.
+Reduced memory consumption.
+Fixed processing subtitles (too long subtitles can be displayed with high latency).
+Fixed work with RGB555 video.
+Adjust correctly filled parameter biSize
+Correct the invalid parameter biSize BITMAPINFOHEADER structure after mkvmerge v7.7.0 for RGB8 formats and RGB565.
+
+MP4Splitter (Bento4)
+Fixed playback of files in which different tracks have the same TrackId.
+Added support for 'R10k' and 'R10g'.
+
+ShoutcastSource
+Fixed processing "Stop" command.
+Works better with MPEG Audio.
+
+MPCVideoDecoder
+Added HEVC DXVA decoder (thanks to the author for his code LAV), 10bit decoding only works with EVR Custom / Sync.
+Updated list of Nvidia and Intel graphics card with support for hardware decoding 4k.
+A small adjustment in calculating the timestamp.
+Fixed crash after a "pause" include H.264 DXVA and "stop."
+Fixed crash mode H.264 DXVA 2.0 when the file is closed.
+Fixed crash when decoding VC1 on Intel's DXVA mode on some files.
+Fixed Displays the last frame for DXVA 2.0 decoder.
+Corrected calculation of timestamps.
+If the video parameters were determined inaccurately, after decoding the first frame to update the parameters of current and do reconect output pin.
+
+MPCVideoConverter
+Video decoder for uncompressed formats now works as a converter.
+Added support for r210, R10k, R10g, YVU9, IYUV, UYVY, YUY2, NV12, YV12, YV16, YV24.
+
+MpaDecFilter
+Fixed wrong connection to the PCM stream.
+Improved checking output support SPDIF/Bitstream.
+Fixed playback of some BINK audio.
+Fixed incorrect (intensive) playing on WinXP.
+
+AudioSwitcher
+Reduce the frequency of the sound, if it is more 192000 Hz.
+Added timestamp adjustment after the frequency converter.
+Allow XySubFilter AutoLoader connections (it needed to connect XySubFilter).
+
+MPC Audio Renderer (WASAPI)
+Fixed mechanism of A/V sync.
+
+VSFilter / ISR
+Fixed crash when matching timestamps (rtStart and rtStop) of input sample.
+Fixed incorrect display of VobSub subtitles when fast.
+Fixed queue subtitles.
+Adjusted compensation font sizes for anamorphic video.
+Correction fall on some subtitles.
+Corrected automatic loading external subtitles.
+
+VideoRenderers
+Updated frame in pause mode after disabling shaders.
+Optimized Shader compilation.
+Added support XySubFilter.
+Fixed and updated output statistics renderers.
+Removed Shader bilinear interpolation.
+For graphics cards with support for ps_3_0 and above at the picture size of less than 50% use simple averaging of pixels.
+A more correct choice format mixer for EVR-custom.
+Optimization of displaying subtitles.
+Fixed format selection videobuffer on Intel cards.
+Fixed support for input formats.
+Update statistics (Ctrl+J) to pause.
+
+Player
+Fixed opening of BD structure from favorites after renaming.
+Fixed crash when calling "Reset subtitle".
+Fixed check for updates.
+Fixed playback of animated GIF files.
+Adjustment of the output current value of the rotation angle.
+Removed command "Reset to default renderer settings".
+Removed support frameworks QuickTime and RealMedia.
+Improved transition from full window to full screen and back.
+Added ability to select specific subtitle renderer.
+Fixed opening .bdmv files.
+Fixed opening HLS links that specify a relative path.
+Added the ability to display the menu by pressing Alt.
+Improved get fps using MediaInfo for switching frequencies.
+The button "Rename" in the Bookmarks renamed "Edit" to display a dialog box in which you added the ability to edit the path.
+Fixed color adjustment at the extreme values.
+The settings panel "EVR Sync Settings" renamed to "Frame synchronization".
+Advanced settings renderer redesigned and moved to the settings panel of the "Video" and "Frame synchronization".
+Fixed opening some .m3u playlists.
+Fixed autoload subtitles when opening files from a network path (the path starts with "\\").
+Improved work with Drag'n'drop.
+Restored and improved open Youtube links. Now don't need to have http, https and www.
+Added a caching mechanism to save in .ini file (thanks to the team MPC-HC for the code and idea).
+The ability to save in .ini file will be unavailable in the absence of permission entries in the directory.
+Improved logic to apply the settings file associations and context menus of Windows Explorer.
+Fixed display of information for RGB8 and RGB565. Do not change the register when displaying FourCC.
+Correctly restore the sound after playing ShockwaveGraph on Vista and later systems.
+
+Updated Dutch and Chinese (Traditional) translation (by beter).
+Updated Ukrainian translation (by arestarh1986).
+Updated Japanese translation (by Socket774).
+Updated German translation (by Klaus1189).
+Updated Chinese (Simplified) translation (by beter and insolo).
+
+Updated libraries:
+	jsoncpp 1.0.0-212 git-gc1e834a.
+	MediaInfo 0.7.72+ svn rev.6720;
+	ffmpeg git-g399e314.
 
 1.4.3
 ==============================
