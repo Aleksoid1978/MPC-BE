@@ -359,8 +359,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 30		"字幕"
 31		"(例如: eng jap swe)"
 32		"音轨:"
-34		"缺省设置"
-36		"速度步进"
+35		"缺省设置"
+37		"速度步进"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
@@ -489,7 +489,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 21		"格式:"
 23		"输出范围:"
 25		"10-bit RGB 输出"
-26		"色彩管理"
+27		"色彩管理"
 28		"输入类型:"
 30		"环境光线:"
 32		"渲染意图:"

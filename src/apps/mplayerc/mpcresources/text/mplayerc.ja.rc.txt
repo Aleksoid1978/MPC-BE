@@ -359,8 +359,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 30		"字幕"
 31		"(例: eng jap swe)"
 32		"音声:"
-34		"デフォルト トラックの優先順序"
-36		"速度調節の刻み幅"
+35		"デフォルト トラックの優先順序"
+37		"速度調節の刻み幅"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
@@ -489,7 +489,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 21		"方式:"
 23		"出力範囲:"
 25		"10-bit RGB 出力"
-26		"色管理"
+27		"色管理"
 28		"入力タイプ:"
 30		"アンビエント ライト:"
 32		"レンダリング インテント:"

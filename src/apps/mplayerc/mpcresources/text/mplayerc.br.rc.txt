@@ -359,8 +359,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 30		"Legenda"
 31		"(Exemplo: eng jap swe)"
 32		"Áudio"
-34		"Preferência de faixa padrão"
-36		"Speed Step"
+35		"Preferência de faixa padrão"
+37		"Speed Step"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
@@ -489,7 +489,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 21		"Format:"
 23		"Output range:"
 25		"10-bit RGB output"
-26		"Color Management"
+27		"Color Management"
 28		"Input type:"
 30		"Ambient Light:"
 32		"Rendering Intent:"

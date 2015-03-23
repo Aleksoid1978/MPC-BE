@@ -130,7 +130,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 	CMonitors monitors;
 	CString strCurMon;
 
- 	m_iMonitorTypeCtrl.AddString(ResStr(IDS_FULLSCREENMONITOR_CURRENT));
+	m_iMonitorTypeCtrl.AddString(ResStr(IDS_FULLSCREENMONITOR_CURRENT));
 	m_MonitorDisplayNames.Add(L"Current");
 	m_MonitorDeviceName.Add(L"Current");
 	curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
@@ -138,7 +138,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 	if(m_f_hmonitor.IsEmpty()) {
 		m_f_hmonitor = L"Current";
 		m_iMonitorType = 0;
- 	}
+	}
 
 	DISPLAY_DEVICE dd;
 	dd.cb = sizeof(dd);
@@ -148,15 +148,15 @@ BOOL CPPageFullscreen::OnInitDialog()
 	CString DeviceID;
 	CString strMonID;
 	while (EnumDisplayDevices(0, dev, &dd, 0)) {
-        DISPLAY_DEVICE ddMon;
-        ZeroMemory(&ddMon, sizeof(ddMon));
-        ddMon.cb = sizeof(ddMon);
-        DWORD devMon = 0;
+		DISPLAY_DEVICE ddMon;
+		ZeroMemory(&ddMon, sizeof(ddMon));
+		ddMon.cb = sizeof(ddMon);
+		DWORD devMon = 0;
 
-        while (EnumDisplayDevices(dd.DeviceName, devMon, &ddMon, 0)) {
+		while (EnumDisplayDevices(dd.DeviceName, devMon, &ddMon, 0)) {
 			if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE && !(ddMon.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
 				DeviceID.Format (L"%s", ddMon.DeviceID);
-                strMonID = DeviceID = DeviceID.Mid (8, DeviceID.Find (L"\\", 9) - 8);
+				strMonID = DeviceID = DeviceID.Mid (8, DeviceID.Find (L"\\", 9) - 8);
 				str.Format(L"%s", ddMon.DeviceName);
 				str = str.Left(12);
 				if (str == strCurMon) {
@@ -182,14 +182,14 @@ BOOL CPPageFullscreen::OnInitDialog()
 					id = m_iMonitorType = m_iMonitorTypeCtrl.GetCount()-1;
 					str2 = str;
 				}
-            }
-            devMon++;
-            ZeroMemory(&ddMon, sizeof(ddMon));
-            ddMon.cb = sizeof(ddMon);
-        }
-        ZeroMemory(&dd, sizeof(dd));
-        dd.cb = sizeof(dd);
-        dev++;
+			}
+			devMon++;
+			ZeroMemory(&ddMon, sizeof(ddMon));
+			ddMon.cb = sizeof(ddMon);
+		}
+		ZeroMemory(&dd, sizeof(dd));
+		dd.cb = sizeof(dd);
+		dev++;
 	}
 
 	if(m_iMonitorTypeCtrl.GetCount() > 2) {
@@ -197,21 +197,21 @@ BOOL CPPageFullscreen::OnInitDialog()
 			if ( id > 0 ) {
 				m_iMonitorType = id;
 				m_f_hmonitor = str2;
- 			}
- 		}
-	 	GetDlgItem(IDC_COMBO1)->EnableWindow(TRUE);
- 	} else {
+			}
+		}
+		GetDlgItem(IDC_COMBO1)->EnableWindow(TRUE);
+	} else {
 		if(m_AutoChangeFullscrRes.bEnabled == false)  {
 			m_iMonitorType = 0;
 		} else {
 			m_iMonitorType = 1;
- 		}
- 		GetDlgItem(IDC_COMBO1)->EnableWindow(FALSE);
- 	}
+		}
+		GetDlgItem(IDC_COMBO1)->EnableWindow(FALSE);
+	}
 
 	if (m_AutoChangeFullscrRes.bEnabled == false && (m_MonitorDisplayNames[m_iMonitorType]).Left(7) == L"Current"){
 		m_f_hmonitor = L"Current";
- 	}
+	}
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER
 							| LVS_EX_GRIDLINES | LVS_EX_BORDERSELECT | LVS_EX_ONECLICKACTIVATE | LVS_EX_CHECKBOXES | LVS_EX_FLATSB);
@@ -243,16 +243,16 @@ void CPPageFullscreen::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 		if (m_AutoChangeFullscrRes.bEnabled == false) {
 			crText = RGB(128,128,128);
 			crBkgnd = RGB(240, 240, 240);
- 		} else {
- 			crText = RGB(0,0,0);
+		} else {
+			crText = RGB(0,0,0);
 			crBkgnd = RGB(255,255,255);
- 		}
+		}
 		if (m_list.GetCheck(pLVCD->nmcd.dwItemSpec) == false) {
 			crText = RGB(128,128,128);
 		}
- 		pLVCD->clrText = crText;
+		pLVCD->clrText = crText;
 		pLVCD->clrTextBk = crBkgnd;
- 		*pResult = CDRF_DODEFAULT;
+		*pResult = CDRF_DODEFAULT;
 	}
 }
 
@@ -296,7 +296,7 @@ BOOL CPPageFullscreen::OnApply()
 	if (m_AutoChangeFullscrRes.bEnabled == false && m_f_hmonitor == L"Current") {
 		m_f_hmonitor = L"Current";
 	}
- 	s.strFullScreenMonitor					= m_f_hmonitor;
+	s.strFullScreenMonitor					= m_f_hmonitor;
 	s.strFullScreenMonitorID				= m_f_hmonitorID;
 
 	s.fShowBarsWhenFullScreen				= !!m_bShowBarsWhenFullScreen;
@@ -478,8 +478,8 @@ void CPPageFullscreen::OnUpdateFullScrCombo()
 	}
 
 	if (m_f_hmonitor != L"Current" && m_f_hmonitor != strCurMon) {
- 		m_AutoChangeFullscrRes.bEnabled = false;
- 	}
+		m_AutoChangeFullscrRes.bEnabled = false;
+	}
 
 	ModesUpdate();
 	SetModified();

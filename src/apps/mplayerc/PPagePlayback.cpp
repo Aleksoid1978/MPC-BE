@@ -146,12 +146,7 @@ BOOL CPPagePlayback::OnInitDialog()
 
 	m_fUseInternalSelectTrackLogic = s.fUseInternalSelectTrackLogic;
 
-	CString dlgText;
-	GetDlgItemText(IDC_STATIC2, dlgText);
-	if (!dlgText.IsEmpty()) {
-		dlgText = _T("     ") + dlgText;
-		SetDlgItemText(IDC_STATIC2, dlgText);
-	}
+	CorrectCWndWidth(GetDlgItem(IDC_CHECK4));
 
 	UpdateData(FALSE);
 

@@ -359,8 +359,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 30		"Untertitel:"
 31		"(Beispiel: eng jap swe)"
 32		"Audio:"
-34		"Bevorzugte Sprachspuren"
-36		"Geschwindigkeitsstufe\nder Wiedergabe"
+35		"Bevorzugte Sprachspuren"
+37		"Geschwindigkeitsstufe\nder Wiedergabe"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
@@ -489,7 +489,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 21		"Format:"
 23		"Ausgabebereich:"
 25		"10-Bit-RGB-Ausgabe"
-26		"Farbmanagement"
+27		"Farbmanagement"
 28		"Eingangstyp:"
 30		"Umgebungslicht:"
 32		"Wiedergabeziel:"
