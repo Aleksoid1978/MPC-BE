@@ -231,10 +231,13 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput)
 	switch (nCodecId) {
 		case AV_CODEC_ID_MP1:
 			m_pAVCodec = avcodec_find_decoder_by_name("mp1float");
+			break;
 		case AV_CODEC_ID_MP2:
 			m_pAVCodec = avcodec_find_decoder_by_name("mp2float");
+			break;
 		case AV_CODEC_ID_MP3:
 			m_pAVCodec = avcodec_find_decoder_by_name("mp3float");
+			break;
 		default:
 			m_pAVCodec = avcodec_find_decoder(nCodecId);
 	}
