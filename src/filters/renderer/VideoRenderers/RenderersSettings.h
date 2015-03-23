@@ -27,7 +27,7 @@
 #define RS_EVRBUFFERS_MIN	4
 #define RS_EVRBUFFERS_DEF	5
 #define RS_EVRBUFFERS_MAX	60
-#define RS_SPCSIZE_MIN		4
+#define RS_SPCSIZE_MIN		0
 #define RS_SPCSIZE_DEF		10
 #define RS_SPCSIZE_MAX		60
 
