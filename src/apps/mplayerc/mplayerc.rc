@@ -312,7 +312,7 @@ BEGIN
     LTEXT           "(Example: eng jap swe)",IDC_STATIC,147,144,132,8
     LTEXT           "Audio:",IDC_STATIC,142,131,44,8
     EDITTEXT        IDC_EDIT3,190,129,94,13,ES_AUTOHSCROLL
-    GROUPBOX        "",IDC_STATIC,137,102,154,54
+    GROUPBOX        "",IDC_STATIC,137,102,154,55
     CONTROL         "Default track preference",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,101,100,9
     GROUPBOX        "Control",IDC_STATIC,5,115,129,42
     LTEXT           "Volume step:",IDC_STATIC,10,127,82,8
