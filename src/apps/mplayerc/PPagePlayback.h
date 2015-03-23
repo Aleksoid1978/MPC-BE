@@ -51,6 +51,8 @@ public:
 	BOOL		m_iRememberZoomLevel;
 	int			m_iZoomLevel;
 	CComboBox	m_zoomlevelctrl;
+	int			m_nAutoFitFactor;
+	CSpinButtonCtrl m_spnAutoFitFactor;
 	BOOL		m_fUseInternalSelectTrackLogic;
 	CString		m_subtitlesLanguageOrder;
 	CString		m_audiosLanguageOrder;

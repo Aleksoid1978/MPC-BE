@@ -95,6 +95,7 @@
 #define IDS_RS_LOOPNUM						_T("LoopNum")
 #define IDS_RS_REWIND						_T("Rewind")
 #define IDS_RS_ZOOM							_T("Zoom")
+#define IDS_RS_AUTOFITFACTOR				_T("AutoFitFactor")
 #define IDS_RS_VOLUME_STEP					_T("VolumeStep")
 #define IDS_RS_SPEED_STEP					_T("SpeedStep")
 #define IDS_RS_MULTIINST					_T("MultipleInstances")

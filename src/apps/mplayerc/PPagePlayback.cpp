@@ -33,6 +33,7 @@ CPPagePlayback::CPPagePlayback()
 	, m_fRewind(FALSE)
 	, m_iZoomLevel(0)
 	, m_iRememberZoomLevel(FALSE)
+	, m_nAutoFitFactor(50)
 	, m_nVolume(0)
 	, m_nBalance(0)
 	, m_fEnableWorkerThreadForOpening(FALSE)
@@ -69,6 +70,8 @@ void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBOSPEEDSTEP, m_nSpeedStepCtrl);
 	DDX_Check(pDX, IDC_CHECK4, m_fUseInternalSelectTrackLogic);
 	DDX_Control(pDX, IDC_COMBO1, m_zoomlevelctrl);
+	DDX_Text(pDX, IDC_EDIT4, m_nAutoFitFactor);
+	DDX_Control(pDX, IDC_SPIN1, m_spnAutoFitFactor);
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayback, CPPageBase)
@@ -116,6 +119,8 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_zoomlevelctrl.AddString(ResStr(IDS_ZOOM_AUTOFIT));
 	CorrectComboListWidth(m_zoomlevelctrl);
 	m_iZoomLevel = s.iZoomLevel;
+	m_nAutoFitFactor = s.nAutoFitFactor;
+	m_spnAutoFitFactor.SetRange(20, 80);
 
 	for (int idx = 1; idx <= 10; idx++) {
 		CString str; str.Format(_T("%d"), idx);
@@ -166,6 +171,7 @@ BOOL CPPagePlayback::OnApply()
 	s.fRewind = !!m_fRewind;
 	s.iZoomLevel = m_iZoomLevel;
 	s.fRememberZoomLevel = !!m_iRememberZoomLevel;
+	s.nAutoFitFactor = m_nAutoFitFactor = min(max(20, m_nAutoFitFactor), 80);
 	s.fEnableWorkerThreadForOpening = !!m_fEnableWorkerThreadForOpening;
 	s.fReportFailedPins = !!m_fReportFailedPins;
 	s.strSubtitlesLanguageOrder = m_subtitlesLanguageOrder;

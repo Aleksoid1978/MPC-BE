@@ -11108,10 +11108,11 @@ double CMainFrame::GetZoomAutoFitScale()
 		return 1.0;
 	}
 
+	const CAppSettings& s = AfxGetAppSettings();
 	CSize arxy = GetVideoSize();
 
-	double sx = 2.0/3 * m_rcDesktop.Width() / arxy.cx;
-	double sy = 2.0/3 * m_rcDesktop.Height() / arxy.cy;
+	double sx = s.nAutoFitFactor / 100.0 * m_rcDesktop.Width() / arxy.cx;
+	double sy = s.nAutoFitFactor / 100.0 * m_rcDesktop.Height() / arxy.cy;
 
 	return sx < sy ? sx : sy;
 }
