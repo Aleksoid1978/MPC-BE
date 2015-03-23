@@ -1465,8 +1465,6 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 							Style, Actor, Effect,
 							marginRect,
 							layer);
-
-					bRet = true;
 				} catch (...) {
 					return false;
 				}
@@ -1552,8 +1550,6 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 					ret.CreateDefaultStyle(CharSet);
 				}
 			}
-		} else if (entry == L"[script info]") {
-			script_info = true;
 		} else if (entry == L"playresx") {
 			if (script_info) {
 				try {
@@ -1615,16 +1611,23 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 				buff.MakeLower();
 				ret.m_fScaledBAS = buff.Find(L"yes") >= 0;
 			}
+		} else if (entry == L"[script info]") {
+			bRet = true;
+			script_info = true;
 		} else if (entry == L"[v4 styles]") {
+			bRet = true;
 			styles = true;
 			sver = 4;
 		} else if (entry == L"[v4+ styles]") {
+			bRet = true;
 			styles = true;
 			sver = 5;
 		} else if (entry == L"[v4++ styles]") {
+			bRet = true;
 			styles = true;
 			sver = 6;
 		} else if (entry == L"[events]") {
+			bRet = true;
 			events = true;
 		} else if (entry == L"fontname") {
 			if (LoadUUEFont(file)) {
