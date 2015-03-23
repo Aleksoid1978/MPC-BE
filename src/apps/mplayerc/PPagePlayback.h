@@ -48,9 +48,8 @@ public:
 	int			m_nLoops;
 	BOOL		m_fRewind;
 	CComboBox	m_nSpeedStepCtrl;
-	BOOL		m_iRememberZoomLevel;
-	int			m_iZoomLevel;
-	CComboBox	m_zoomlevelctrl;
+	CButton		m_chkRememberZoomLevel;
+	CComboBox	m_cmbZoomLevel;
 	int			m_nAutoFitFactor;
 	CSpinButtonCtrl m_spnAutoFitFactor;
 	BOOL		m_fUseInternalSelectTrackLogic;
@@ -72,9 +71,9 @@ public:
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnBnClickedRadio12(UINT nID);
 	afx_msg void OnUpdateLoopNum(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateAutoZoomCombo(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateTrackOrder(CCmdUI* pCmdUI);
-
+	afx_msg void OnAutoZoomCheck();
+	afx_msg void OnAutoZoomSelChange();
 	afx_msg void OnBalanceTextDblClk();
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 	virtual void OnCancel();
