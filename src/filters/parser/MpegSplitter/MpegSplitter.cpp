@@ -104,24 +104,24 @@ CFilterApp theApp;
 
 #endif
 
-static CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipInfo::Stream *pClipInfo, int _PresentationType, CStringA lang)
+static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInfo::Stream *pClipInfo, PES_STREAM_TYPE pesStreamType, CStringA lang)
 {
 	const WCHAR *pPresentationDesc = NULL;
 
 	if (pClipInfo) {
 		pPresentationDesc = StreamTypeToName(pClipInfo->m_Type);
 	} else {
-		pPresentationDesc = StreamTypeToName((PES_STREAM_TYPE)_PresentationType);
+		pPresentationDesc = StreamTypeToName(pesStreamType);
 	}
 
 	CString MajorType;
 	CAtlList<CString> Infos;
 
-	if (_pMediaType->majortype == MEDIATYPE_Video) {
+	if (pMediaType->majortype == MEDIATYPE_Video) {
 		MajorType = "Video";
-		if (_pMediaType->subtype == MEDIASUBTYPE_DVD_SUBPICTURE
-			|| _pMediaType->subtype == MEDIASUBTYPE_SVCD_SUBPICTURE
-			|| _pMediaType->subtype == MEDIASUBTYPE_CVD_SUBPICTURE) {
+		if (pMediaType->subtype == MEDIASUBTYPE_DVD_SUBPICTURE
+			|| pMediaType->subtype == MEDIASUBTYPE_SVCD_SUBPICTURE
+			|| pMediaType->subtype == MEDIASUBTYPE_CVD_SUBPICTURE) {
 			MajorType = "Subtitle";
 		}
 
@@ -142,22 +142,22 @@ static CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipIn
 		const VIDEOINFOHEADER *pVideoInfo = NULL;
 		const VIDEOINFOHEADER2 *pVideoInfo2 = NULL;
 
-		if (_pMediaType->formattype == FORMAT_VideoInfo) {
-			pVideoInfo = GetFormatHelper(pVideoInfo, _pMediaType);
+		if (pMediaType->formattype == FORMAT_VideoInfo) {
+			pVideoInfo = GetFormatHelper(pVideoInfo, pMediaType);
 
 			if (pVideoInfo->bmiHeader.biCompression == FCC('drac')) {
 				Infos.AddTail(L"DIRAC");
 			}
 
-		} else if (_pMediaType->formattype == FORMAT_MPEGVideo) {
+		} else if (pMediaType->formattype == FORMAT_MPEGVideo) {
 			Infos.AddTail(L"MPEG");
 
-			const MPEG1VIDEOINFO *pInfo = GetFormatHelper(pInfo, _pMediaType);
+			const MPEG1VIDEOINFO *pInfo = GetFormatHelper(pInfo, pMediaType);
 
 			pVideoInfo = &pInfo->hdr;
 
-		} else if (_pMediaType->formattype == FORMAT_MPEG2_VIDEO) {
-			const MPEG2VIDEOINFO *pInfo = GetFormatHelper(pInfo, _pMediaType);
+		} else if (pMediaType->formattype == FORMAT_MPEG2_VIDEO) {
+			const MPEG2VIDEOINFO *pInfo = GetFormatHelper(pInfo, pMediaType);
 
 			pVideoInfo2 = &pInfo->hdr;
 
@@ -257,8 +257,8 @@ static CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipIn
 					Infos.AddTail(FormatString(L"Level %d", pInfo->dwLevel));
 				}
 			}
-		} else if (_pMediaType->formattype == FORMAT_VIDEOINFO2) {
-			const VIDEOINFOHEADER2 *pInfo = GetFormatHelper(pInfo, _pMediaType);
+		} else if (pMediaType->formattype == FORMAT_VIDEOINFO2) {
+			const VIDEOINFOHEADER2 *pInfo = GetFormatHelper(pInfo, pMediaType);
 			pVideoInfo2 = pInfo;
 
 			DWORD CodecType = pInfo->bmiHeader.biCompression;
@@ -273,11 +273,11 @@ static CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipIn
 				Temp[3] = (CodecType >> 24) & 0xFF;
 				Infos.AddTail(Temp);
 			}
-		} else if (_pMediaType->subtype == MEDIASUBTYPE_DVD_SUBPICTURE) {
+		} else if (pMediaType->subtype == MEDIASUBTYPE_DVD_SUBPICTURE) {
 			Infos.AddTail(L"DVD Sub Picture");
-		} else if (_pMediaType->subtype == MEDIASUBTYPE_SVCD_SUBPICTURE) {
+		} else if (pMediaType->subtype == MEDIASUBTYPE_SVCD_SUBPICTURE) {
 			Infos.AddTail(L"SVCD Sub Picture");
-		} else if (_pMediaType->subtype == MEDIASUBTYPE_CVD_SUBPICTURE) {
+		} else if (pMediaType->subtype == MEDIASUBTYPE_CVD_SUBPICTURE) {
 			Infos.AddTail(L"CVD Sub Picture");
 		}
 
@@ -303,7 +303,7 @@ static CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipIn
 			}
 		}
 
-	} else if (_pMediaType->majortype == MEDIATYPE_Audio) {
+	} else if (pMediaType->majortype == MEDIATYPE_Audio) {
 		MajorType = "Audio";
 		if (pClipInfo) {
 			CString name = ISO6392ToLanguage(pClipInfo->m_LanguageCode);
@@ -318,21 +318,21 @@ static CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipIn
 				}
 			}
 		}
-		if (_pMediaType->formattype == FORMAT_WaveFormatEx) {
-			const WAVEFORMATEX *pInfo = GetFormatHelper(pInfo, _pMediaType);
+		if (pMediaType->formattype == FORMAT_WaveFormatEx) {
+			const WAVEFORMATEX *pInfo = GetFormatHelper(pInfo, pMediaType);
 
-			if (_pMediaType->subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
+			if (pMediaType->subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
 				Infos.AddTail(L"DVD LPCM");
-			} else if (_pMediaType->subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
-				const WAVEFORMATEX_HDMV_LPCM *pInfoHDMV = GetFormatHelper(pInfoHDMV, _pMediaType);
+			} else if (pMediaType->subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
+				const WAVEFORMATEX_HDMV_LPCM *pInfoHDMV = GetFormatHelper(pInfoHDMV, pMediaType);
 				UNREFERENCED_PARAMETER(pInfoHDMV);
 				Infos.AddTail(L"HDMV LPCM");
 			}
-			if (_pMediaType->subtype == MEDIASUBTYPE_DOLBY_DDPLUS) {
+			if (pMediaType->subtype == MEDIASUBTYPE_DOLBY_DDPLUS) {
 				Infos.AddTail(L"Dolby Digital Plus");
-			} else if (_pMediaType->subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
+			} else if (pMediaType->subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
 				Infos.AddTail(L"Dolby TrueHD");
-			} else if (_pMediaType->subtype == MEDIASUBTYPE_MLP) {
+			} else if (pMediaType->subtype == MEDIASUBTYPE_MLP) {
 				Infos.AddTail(L"MLP");
 			} else {
 				switch (pInfo->wFormatTag) {
@@ -373,7 +373,7 @@ static CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipIn
 					}
 					break;
 					case WAVE_FORMAT_MPEG: {
-						const MPEG1WAVEFORMAT* pInfoMPEG1 = GetFormatHelper(pInfoMPEG1, _pMediaType);
+						const MPEG1WAVEFORMAT* pInfoMPEG1 = GetFormatHelper(pInfoMPEG1, pMediaType);
 
 						int layer = GetHighestBitSet32(pInfoMPEG1->fwHeadLayer) + 1;
 						Infos.AddTail(FormatString(L"MPEG1 - Layer %d", layer));
@@ -399,17 +399,21 @@ static CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipIn
 			}
 			if (pInfo->wBitsPerSample) {
 				Infos.AddTail(FormatString(L"%d bit", pInfo->wBitsPerSample));
+			} else if (pesStreamType == AUDIO_STREAM_DTS_HD || pesStreamType == AUDIO_STREAM_DTS_HD_MASTER_AUDIO) {
+				Infos.AddTail(L"24 bit");
 			}
 			if (pInfo->nAvgBytesPerSec) {
-				Infos.AddTail(FormatBitrate(pInfo->nAvgBytesPerSec * 8));
+				if (pesStreamType != AUDIO_STREAM_DTS_HD && pesStreamType != AUDIO_STREAM_DTS_HD_MASTER_AUDIO) {
+					Infos.AddTail(FormatBitrate(pInfo->nAvgBytesPerSec * 8));
+				}
 			}
 
 		}
-	} else if (_pMediaType->majortype == MEDIATYPE_Subtitle) {
+	} else if (pMediaType->majortype == MEDIATYPE_Subtitle) {
 		MajorType = "Subtitle";
 
 		if ((pPresentationDesc == NULL)
-				&& ((PES_STREAM_TYPE)_PresentationType == PES_PRIVATE || _pMediaType->subtype == MEDIASUBTYPE_DVB_SUBTITLES)) {
+				&& (pesStreamType == PES_PRIVATE || pMediaType->subtype == MEDIASUBTYPE_DVB_SUBTITLES)) {
 			pPresentationDesc = L"DVB";
 		}
 
@@ -427,8 +431,8 @@ static CString GetMediaTypeDesc(const CMediaType *_pMediaType, const CHdmvClipIn
 					Infos.AddHead(name);
 				}
 			}
-		} else if (_pMediaType->cbFormat == sizeof(SUBTITLEINFO)) {
-			const SUBTITLEINFO *pInfo = GetFormatHelper(pInfo, _pMediaType);
+		} else if (pMediaType->cbFormat == sizeof(SUBTITLEINFO)) {
+			const SUBTITLEINFO *pInfo = GetFormatHelper(pInfo, pMediaType);
 			CString name = ISO6392ToLanguage(pInfo->IsoLang);
 
 			if (!lang.IsEmpty()) {
@@ -888,7 +892,7 @@ CString CMpegSplitterFilter::FormatStreamName(CMpegSplitterFile::stream& s, CMpe
 	const CHdmvClipInfo::Stream *pClipInfo;
 	const CMpegSplitterFile::program * pProgram = m_pFile->FindProgram(s.pid, iProgram, pClipInfo);
 	const wchar_t *pStreamName	= NULL;
-	int StreamType				= pClipInfo ? pClipInfo->m_Type : pProgram ? pProgram->streams[iProgram].type : 0;
+	PES_STREAM_TYPE StreamType	= pClipInfo ? pClipInfo->m_Type : pProgram ? pProgram->streams[iProgram].type : INVALID;
 	pStreamName					= StreamTypeToName((PES_STREAM_TYPE)StreamType);
 
 	CStringA lang_name	= s.lang;
