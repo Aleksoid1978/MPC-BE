@@ -126,13 +126,6 @@ BOOL CPPageVideo::OnInitDialog()
 	SetHandCursor(m_hWnd, IDC_COMBO4);
 	SetHandCursor(m_hWnd, IDC_COMBO5);
 
-	CString dlgText;
-	GetDlgItemText(IDC_STATIC2, dlgText);
-	if (!dlgText.IsEmpty()) {
-		dlgText = _T("     ") + dlgText;
-		SetDlgItemText(IDC_STATIC2, dlgText);
-	}
-
 	AppSettings& s = AfxGetAppSettings();
 
 	CRenderersSettings& rs = s.m_RenderersSettings;
@@ -324,6 +317,7 @@ BOOL CPPageVideo::OnInitDialog()
 	}
 
 	// Color Managment
+	CorrectCWndWidth(&m_chkColorManagment);
 	m_chkColorManagment.SetCheck(rs.m_AdvRendSets.iVMR9ColorManagementEnable != 0);
 	m_cbCMInputType.AddString(ResStr(IDS_CM_INPUT_AUTO));
 	m_cbCMInputType.AddString(L"HDTV");
