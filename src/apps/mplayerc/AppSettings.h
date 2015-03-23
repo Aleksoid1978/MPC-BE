@@ -638,6 +638,7 @@ public:
 	int				nSpeedStep;
 	bool			fRememberZoomLevel;
 	int				iZoomLevel;
+	int				nAutoFitFactor;
 	CStringW		strSubtitlesLanguageOrder;
 	CStringW		strAudiosLanguageOrder;
 	bool			fUseInternalSelectTrackLogic;
