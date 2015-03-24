@@ -1192,14 +1192,20 @@ bool CBaseSplitterFileEx::Read(dtshdr& h, int len, CMediaType* pmt, bool find_sy
 	h.lfe = BitRead(2);
 	h.predictor_history = BitRead(1);
 
+	if (h.fcrc) {
+		BitRead(16);
+	}
+	BitRead(1); // Multirate Interpolator
+	BitRead(4); // Encoder Software Revision
+	BitRead(2); // Copy History
+	h.bits_per_sample = BitRead(2); // Source PCM Resolution
 
 	if (pmt) {
 		WAVEFORMATEX wfe;
 		memset(&wfe, 0, sizeof(wfe));
 		wfe.wFormatTag = WAVE_FORMAT_DTS2;
 
-		static int channels[] = { 1, 2, 2, 2, 2, 3, 3, 4, 4, 5, 6, 6, 6, 7, 8, 8 };
-
+		static WORD channels[] = { 1, 2, 2, 2, 2, 3, 3, 4, 4, 5, 6, 6, 6, 7, 8, 8 };
 		if (h.amode < _countof(channels)) {
 			wfe.nChannels = channels[h.amode];
 			if (h.lfe > 0) {
@@ -1207,8 +1213,10 @@ bool CBaseSplitterFileEx::Read(dtshdr& h, int len, CMediaType* pmt, bool find_sy
 			}
 		}
 
-		static int freq[] = { 0, 8000, 16000, 32000, 0, 0, 11025, 22050, 44100, 0, 0, 12000, 24000, 48000, 0, 0 };
-		wfe.nSamplesPerSec = freq[h.sfreq];
+		static DWORD freq[] = { 0, 8000, 16000, 32000, 0, 0, 11025, 22050, 44100, 0, 0, 12000, 24000, 48000, 0, 0 };
+		if (h.sfreq < _countof(freq)) {
+			wfe.nSamplesPerSec = freq[h.sfreq];
+		}
 
 		/*static int rate[] = {
 			  32000,   56000,   64000,   96000,
@@ -1226,6 +1234,15 @@ bool CBaseSplitterFileEx::Read(dtshdr& h, int len, CMediaType* pmt, bool find_sy
 
 		wfe.nAvgBytesPerSec	= (bitrate + 4) / 8;
 		wfe.nBlockAlign		= h.framebytes;
+
+		static const WORD bits_per_sample[] = { 16, 20, 24, 24 };
+		if (h.bits_per_sample < _countof(bits_per_sample)) {
+			wfe.wBitsPerSample	= bits_per_sample[h.bits_per_sample];
+		}
+
+		if (!wfe.nChannels || !wfe.nSamplesPerSec) {
+			return false;
+		}
 
 		pmt->majortype		= MEDIATYPE_Audio;
 		pmt->subtype		= MEDIASUBTYPE_DTS;
