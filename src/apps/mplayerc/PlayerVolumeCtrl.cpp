@@ -27,7 +27,8 @@
 
 IMPLEMENT_DYNAMIC(CVolumeCtrl, CSliderCtrl)
 
-CVolumeCtrl::CVolumeCtrl(bool fSelfDrawn) : m_fSelfDrawn(fSelfDrawn)
+CVolumeCtrl::CVolumeCtrl(bool bSelfDrawn/* = true*/)
+	: m_bSelfDrawn(bSelfDrawn)
 {
 }
 
@@ -54,12 +55,12 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	SetPageSize(s.nVolumeStep);
 	SetLineSize(0);
 
-	m_iUseDarkTheme = s.bUseDarkTheme + 1;
+	m_nUseDarkTheme		= s.bUseDarkTheme + 1;
 
-	m_iThemeBrightness = s.nThemeBrightness;
-	m_iThemeRed = s.nThemeRed;
-	m_iThemeGreen = s.nThemeGreen;
-	m_iThemeBlue = s.nThemeBlue;
+	m_nThemeBrightness	= s.nThemeBrightness;
+	m_nThemeRed			= s.nThemeRed;
+	m_nThemeGreen		= s.nThemeGreen;
+	m_nThemeBlue		= s.nThemeBlue;
 
 	return TRUE;
 }
@@ -111,15 +112,15 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 	GRADIENT_RECT gr[1] = {{0, 1}};
 
-	if (m_fSelfDrawn) {
+	if (m_bSelfDrawn) {
 		switch (pNMCD->dwDrawStage) {
 			case CDDS_PREPAINT:
 				if (s.bUseDarkTheme && (m_bmUnderCtrl.GetSafeHandle() == NULL
-								|| m_iUseDarkTheme == 1
-								|| m_iThemeBrightness != s.nThemeBrightness
-								|| m_iThemeRed != s.nThemeRed
-								|| m_iThemeGreen != s.nThemeGreen
-								|| m_iThemeBlue != s.nThemeBlue)) {
+						|| m_nUseDarkTheme == 1
+						|| m_nThemeBrightness != s.nThemeBrightness
+						|| m_nThemeRed != s.nThemeRed
+						|| m_nThemeGreen != s.nThemeGreen
+						|| m_nThemeBlue != s.nThemeBlue)) {
 					CDC dc;
 					dc.Attach(pNMCD->hdc);
 					CRect r;
@@ -153,8 +154,8 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					m_bmUnderCtrl.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
-					if (m_iUseDarkTheme == 1) {
-						m_iUseDarkTheme++;
+					if (m_nUseDarkTheme == 1) {
+						m_nUseDarkTheme++;
 					}
 
 					memdc.BitBlt(r.left, r.top, r.Width(), r.Height(), &dc, r.left, r.top, SRCCOPY);
@@ -162,10 +163,12 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					dc.Detach();
 					DeleteObject(memdc.SelectObject(bmOld));
 					memdc.DeleteDC();
+
+					m_bItemRedraw = true;
 				}
 
 				lr = CDRF_NOTIFYITEMDRAW;
-				if (m_fSetRedraw) {
+				if (m_bItemRedraw) {
 					lr |= CDRF_NOTIFYPOSTPAINT;
 				}
 				break;
@@ -183,14 +186,14 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					CBitmap *bmOld = memdc.SelectObject(&m_bmUnderCtrl);
 
-					if (m_iUseDarkTheme == 0) {
-						m_iUseDarkTheme++;
+					if (m_nUseDarkTheme == 0) {
+						m_nUseDarkTheme++;
 					}
 
-					m_iThemeBrightness = s.nThemeBrightness;
-					m_iThemeRed = s.nThemeRed;
-					m_iThemeGreen = s.nThemeGreen;
-					m_iThemeBlue = s.nThemeBlue;
+					m_nThemeBrightness	= s.nThemeBrightness;
+					m_nThemeRed			= s.nThemeRed;
+					m_nThemeGreen		= s.nThemeGreen;
+					m_nThemeBlue		= s.nThemeBlue;
 
 					int pa = 255 * 256;
 					unsigned p1 = s.clrOutlineABGR, p2 = s.clrFaceABGR;
@@ -257,7 +260,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					dc.Detach();
 
 					lr = CDRF_SKIPDEFAULT;
-					m_fSetRedraw = false;
+					m_bItemRedraw = false;
 				} else if (!s.bUseDarkTheme && pNMCD->dwItemSpec == TBCD_CHANNEL) {
 					if (m_bmUnderCtrl.GetSafeHandle() != NULL) {
 						m_bmUnderCtrl.DeleteObject();
@@ -301,9 +304,11 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					dc.Detach();
 					lr = CDRF_SKIPDEFAULT;
 				}
+
 				if (!s.bUseDarkTheme) {
-					m_iUseDarkTheme = 0;
+					m_nUseDarkTheme = 0;
 				}
+
 				break;
 			default:
 				break;
