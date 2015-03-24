@@ -399,8 +399,6 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 			}
 			if (pInfo->wBitsPerSample) {
 				Infos.AddTail(FormatString(L"%d bit", pInfo->wBitsPerSample));
-			} else if (pesStreamType == AUDIO_STREAM_DTS_HD || pesStreamType == AUDIO_STREAM_DTS_HD_MASTER_AUDIO) {
-				Infos.AddTail(L"24 bit");
 			}
 			if (pInfo->nAvgBytesPerSec) {
 				if (pesStreamType != AUDIO_STREAM_DTS_HD && pesStreamType != AUDIO_STREAM_DTS_HD_MASTER_AUDIO) {

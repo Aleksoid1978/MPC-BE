@@ -239,6 +239,7 @@ public:
 		BYTE aspf:1;
 		BYTE lfe:2;
 		BYTE predictor_history:1;
+		BYTE bits_per_sample:2;
 	};
 
 	struct lpcmhdr
