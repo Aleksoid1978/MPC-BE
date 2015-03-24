@@ -30,22 +30,23 @@ class CVolumeCtrl : public CSliderCtrl
 	DECLARE_DYNAMIC(CVolumeCtrl)
 
 private:
-	bool	m_fSelfDrawn;
+	bool	m_bSelfDrawn;
+	bool	m_bItemRedraw;
+
 	CBitmap	m_bmUnderCtrl;
 
 	CMPCPngImage m_BackGroundbm;
 	CMPCPngImage m_Volumebm;
 
-	int		m_iUseDarkTheme;
-	int		m_iThemeBrightness;
-	int		m_iThemeRed;
-	int		m_iThemeGreen;
-	int		m_iThemeBlue;
+	int		m_nUseDarkTheme;
 
-	bool	m_fSetRedraw;
+	int		m_nThemeBrightness;
+	int		m_nThemeRed;
+	int		m_nThemeGreen;
+	int		m_nThemeBlue;
 
 public:
-	CVolumeCtrl(bool fSelfDrawn = true);
+	CVolumeCtrl(bool bSelfDrawn = true);
 	virtual ~CVolumeCtrl();
 
 	bool Create(CWnd* pParentWnd);
@@ -67,5 +68,5 @@ public:
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 	afx_msg void HScroll(UINT nSBCode, UINT nPos);
 
-	virtual void Invalidate(BOOL bErase = TRUE) { m_fSetRedraw = true; CSliderCtrl::Invalidate(bErase); }
+	virtual void Invalidate(BOOL bErase = TRUE) { m_bItemRedraw = true; CSliderCtrl::Invalidate(bErase); }
 };

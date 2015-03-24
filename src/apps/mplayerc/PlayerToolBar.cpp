@@ -643,11 +643,11 @@ void CPlayerToolBar::OnInitialUpdate()
 		vr2.SetRect(r.right + br.right - 60, r.bottom - 25, r.right + br.right + 6, r.bottom);
 	}
 
-	m_volctrl.MoveWindow(vr2);
-
 	if (m_iUseDarkTheme != (__int64)AfxGetAppSettings().bUseDarkTheme) {
 		SwitchTheme();
 	}
+
+	m_volctrl.MoveWindow(vr2);
 
 	SetButtonInfo(7, GetItemID(7), TBBS_SEPARATOR | TBBS_DISABLED, 48);
 	CRect r10, r12;
