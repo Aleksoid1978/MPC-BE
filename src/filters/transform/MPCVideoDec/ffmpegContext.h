@@ -55,4 +55,4 @@ UINT	FFGetMBCount(struct AVCodecContext* pAVCtx);
 void	FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height);
 
 bool	IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
-BOOL	DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nPCIVendor, DWORD nPCIDevice);
+BOOL	DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion);
