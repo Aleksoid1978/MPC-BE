@@ -341,6 +341,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CTransformFilter(NAME("CMpaDecFilter"), lpunk, __uuidof(this))
 	, m_InternalSampleFormat(SAMPLE_FMT_NONE)
 	, m_rtStart(0)
+	, m_dStartOffset(0.0)
 	, m_bDiscontinuity(FALSE)
 	, m_bResync(false)
 	, m_buff(PADDING_SIZE)
@@ -579,10 +580,13 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	}
 
 	if (rtStart != INVALID_TIME && abs(m_rtStart - rtStart) > jitterLimit) {
+		DbgLog((LOG_TRACE, 3, L"CMpaDecFilter::Receive() : jitter limit is exceeded - %I64d", abs(m_rtStart - rtStart)));
 		m_bResync = true;
 	}
 
 	if (m_bResync && SUCCEEDED(hr)) {
+		DbgLog((LOG_TRACE, 3, L"CMpaDecFilter::Receive() : Resync Request - [%I64d -> %I64d], buffer : %u", m_rtStart, rtStart, m_buff.GetCount()));
+
 		m_buff.RemoveAll();
 #if ENABLE_AC3_ENCODER
 		m_encbuff.RemoveAll();
@@ -592,6 +596,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 		}
 		
 		m_rtStart = rtStart;
+		m_dStartOffset = 0.0;
 		m_bResync = false;
 	}
 
@@ -1553,12 +1558,10 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWOR
 
 	int nSamples = size / (nChannels * get_bytes_per_sample(sfmt));
 
-	REFERENCE_TIME rtDur = 10000000i64 * nSamples / nSamplesPerSec;
-	REFERENCE_TIME rtStart = m_rtStart;
-	REFERENCE_TIME rtStop  = m_rtStart + rtDur;
-	m_rtStart += rtDur;
-	//TRACE(_T("CMpaDecFilter: %I64d - %I64d\n"), rtStart/10000, rtStop/10000);
-	if (rtStart < 0 /*200000*/ /* < 0, FIXME: 0 makes strange noises */) {
+	REFERENCE_TIME rtStart, rtStop;
+	CalculateDuration(nSamples, nSamplesPerSec, rtStart, rtStop);
+
+	if (rtStart < 0) {
 		return S_OK;
 	}
 
@@ -1710,10 +1713,8 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 		}
 	}
 
-	REFERENCE_TIME rtDur;
-	rtDur = 10000000i64 * samples / sample_rate;
-	REFERENCE_TIME rtStart = m_rtStart, rtStop = m_rtStart + rtDur;
-	m_rtStart += rtDur;
+	REFERENCE_TIME rtStart, rtStop;
+	CalculateDuration(samples, sample_rate, rtStart, rtStop, type == IEC61937_TRUEHD);
 
 	if (rtStart < 0) {
 		return S_OK;
@@ -1948,6 +1949,30 @@ CMediaType CMpaDecFilter::CreateMediaTypeHDMI(WORD type)
 	mt.SetFormat((BYTE*)&wfex, sizeof(wfex.Format) + wfex.Format.cbSize);
 
 	return mt;
+}
+
+void CMpaDecFilter::CalculateDuration(int samples, int sample_rate, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, BOOL bIsTrueHDBitstream/* = FALSE*/)
+{
+	if (bIsTrueHDBitstream) {
+		// Delivery Timestamps
+		// TrueHD frame size, 24 * 0.83333ms
+		rtStart = m_rtStart, m_rtStart = rtStop = m_rtStart + 200000;
+	} else {
+		// Length of the sample
+		double dDuration = (double)samples / sample_rate * 10000000.0;
+		m_dStartOffset += fmod(dDuration, 1.0);
+
+		// Delivery Timestamps
+		rtStart = m_rtStart, rtStop = m_rtStart + (REFERENCE_TIME)(dDuration + 0.5);
+
+		// Compute next start time
+		m_rtStart += (REFERENCE_TIME)dDuration;
+		// If the offset reaches one (100ns), add it to the next frame
+		if (m_dStartOffset > 0.5) {
+			m_rtStart++;
+			m_dStartOffset -= 1.0;
+		}
+	}
 }
 
 HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)

@@ -84,7 +84,10 @@ protected:
 
 	CCritSec m_csReceive;
 	CPaddedArray    m_buff;
+	
 	REFERENCE_TIME  m_rtStart;
+	double			m_dStartOffset;
+
 	BOOL            m_bDiscontinuity;
 	bool            m_bResync;
 
@@ -138,11 +141,13 @@ protected:
 
 	HRESULT GetDeliveryBuffer(IMediaSample** pSample, BYTE** pData);
 	HRESULT Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
-	HRESULT DeliverBitstream(BYTE* pBuff, int size, WORD type, int sample_rate, int frame_length);
+	HRESULT DeliverBitstream(BYTE* pBuff, int size, WORD type, int sample_rate, int samples);
 	HRESULT ReconnectOutput(int nSamples, CMediaType& mt);
 	CMediaType CreateMediaType(MPCSampleFormat sf, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
 	CMediaType CreateMediaTypeSPDIF(DWORD nSamplesPerSec = 48000);
 	CMediaType CreateMediaTypeHDMI(WORD type);
+
+	void CalculateDuration(int samples, int sample_rate, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, BOOL bIsTrueHDBitstream = FALSE);
 
 public:
 	CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr);
