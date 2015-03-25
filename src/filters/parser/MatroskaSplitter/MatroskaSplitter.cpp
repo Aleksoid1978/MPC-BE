@@ -1502,6 +1502,10 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 	m_pBlock.Free();
 
+	if (!m_pCluster) {
+		return;
+	}
+
 	m_Seek_rt = INVALID_TIME;
 
 	if (rt > 0) {
@@ -1674,6 +1678,10 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 bool CMatroskaSplitterFilter::DemuxLoop()
 {
 	HRESULT hr = S_OK;
+
+	if (!m_pCluster) {
+		return true;
+	}
 
 	SendVorbisHeaderSample(); // HACK: init vorbis decoder with the headers
 
