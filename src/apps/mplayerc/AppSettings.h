@@ -850,7 +850,6 @@ public:
 	CRect			rcLastWindowPos;
 	UINT			nLastUsedPage;
 	bool			fRemainingTime;
-	bool			fLastFullScreen;
 
 	CString			strTimeOnSeekBar;
 	bool			bStatusBarIsVisible;

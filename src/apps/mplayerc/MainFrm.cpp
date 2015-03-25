@@ -10333,9 +10333,6 @@ void CMainFrame::SetDefaultFullscreenState()
 		SetCursor(NULL);
 		s.nCLSwitches &= ~CLSW_FULLSCREEN;
 		m_fFirstFSAfterLaunchOnFS = true;
-	} else if (s.fRememberWindowSize && s.fRememberWindowPos && !m_fFullScreen && s.fLastFullScreen) {
-		// if fullscreen was on, put it on back
-		ToggleFullscreen(true, true);
 	}
 }
 
@@ -10573,7 +10570,6 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	m_bAudioOnly = true;
 
 	m_fFullScreen		= !m_fFullScreen;
-	s.fLastFullScreen	= m_fFullScreen;
 
 	ModifyStyle(dwRemove, dwAdd, SWP_NOZORDER);
 	ModifyStyleEx(dwRemoveEx, dwAddEx, SWP_NOZORDER);
