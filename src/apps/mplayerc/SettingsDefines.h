@@ -47,7 +47,6 @@
 #define IDS_RS_DVD_START_MAIN_TITLE			_T("Start Main Title DVD")
 #define IDS_RS_DVD_MADVR_CHANGE				_T("Change madVR to Another renderer")
 #define IDS_RS_FILEPOS						_T("Remember File Pos")
-#define IDS_RS_LASTFULLSCREEN				_T("LastFullScreen")
 #define IDS_RS_EVR_BUFFERS					_T("EVRBuffers")
 #define IDS_RS_SHOWOSD						_T("Show OSD")
 #define IDS_RS_LANGUAGE						_T("Language")
