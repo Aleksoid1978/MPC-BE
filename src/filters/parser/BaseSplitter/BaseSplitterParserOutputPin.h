@@ -71,6 +71,7 @@ protected:
 	HRESULT ParseDirac(CAutoPtr<CPacket> p);
 	HRESULT ParseVobSub(CAutoPtr<CPacket> p);
 	HRESULT ParseAdxADPCM(CAutoPtr<CPacket> p);
+	HRESULT ParseDTS(CAutoPtr<CPacket> p);
 
 public:
 	CBaseSplitterParserOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int factor = 1);

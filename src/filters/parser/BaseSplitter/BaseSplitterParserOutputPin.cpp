@@ -27,9 +27,10 @@
 #include "../../../DSUtil/MediaDescription.h"
 
 #define MOVE_TO_H264_START_CODE(b, e)	while(b <= e - 4 && !((*(DWORD*)b == 0x01000000) || ((*(DWORD*)b & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e - 4) && *(DWORD*)b == 0x01000000) b++;
-#define MOVE_TO_AC3_START_CODE(b, e)	while(b <= e - 8 && (*(WORD*)b != 0x770b)) b++;
+#define MOVE_TO_AC3_START_CODE(b, e)	while(b <= e - 8 && (*(WORD*)b != AC3_SYNC_WORD)) b++;
 #define MOVE_TO_AAC_START_CODE(b, e)	while(b <= e - 9 && ((*(WORD*)b & 0xf0ff) != 0xf0ff)) b++;
 #define MOVE_TO_DIRAC_START_CODE(b, e)	while(b <= e - 4 && (*(DWORD*)b != 0x44434242)) b++;
+#define MOVE_TO_DTS_START_CODE(b, e)	while(b <= e - 16 && (*(DWORD*)b != DTS_SYNC_WORD)) b++;
 
 //
 // CBaseSplitterParserOutputPin
@@ -212,6 +213,9 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 	} else if (m_mt.subtype == MEDIASUBTYPE_ADX_ADPCM) {
 		// ADX ADPCM
 		return ParseAdxADPCM(p);
+	} else if (m_mt.subtype == MEDIASUBTYPE_DTS) {
+		// DTS
+		return ParseDTS(p);
 	} else {
 		m_p.Free();
 		m_pl.RemoveAll();
@@ -931,6 +935,68 @@ HRESULT CBaseSplitterParserOutputPin::ParseAdxADPCM(CAutoPtr<CPacket> p)
 	}
 
 	return hr;
+}
+
+HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
+{
+	if (!m_p) {
+		InitPacket(p);
+	}
+
+	if (!m_p) {
+		return S_OK;
+	}
+
+	if (p) m_p->Append(*p);
+
+	HandleInvalidPacket(16);
+
+	BYTE* start	= m_p->GetData();
+	BYTE* end	= start + m_p->GetCount();
+
+	for(;;) {
+		MOVE_TO_DTS_START_CODE(start, end);
+		if (start <= end - 16) {
+			audioframe_t aframe;
+			int size = ParseDTSHeader(start, &aframe);
+			if (size == 0) {
+				start++;
+				continue;
+			}
+
+			int sizehd = 0;
+			if (start + size + 16 <= end) {
+				sizehd = GetDTSHDFrameSize(start + size);
+			} else if (!m_bEndOfStream) {
+				break; // need more data
+			}
+
+			if (start + size + sizehd > end) {
+				break; // need more data
+			}
+
+			if (start + size + sizehd + 16 <= end) {
+				if (!ParseDTSHeader(start + size + sizehd, &aframe)) {
+					start++;
+					continue;
+				}
+			}
+
+			size += sizehd;
+
+			HandlePacket(0);
+
+			start += size;
+		} else {
+			break;
+		}
+	}
+
+	if (start > m_p->GetData()) {
+		m_p->RemoveAt(0, start - m_p->GetData());
+	}
+
+	return S_OK;
 }
 
 HRESULT CBaseSplitterParserOutputPin::DeliverEndOfStream()
