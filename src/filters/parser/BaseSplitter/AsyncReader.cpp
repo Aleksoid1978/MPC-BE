@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,9 +21,6 @@
 
 #include "stdafx.h"
 #include "AsyncReader.h"
-#include <afxsock.h>
-#include <afxinet.h>
-#include "../../../DSUtil/DSUtil.h"
 
 //
 // CAsyncFileReader
@@ -31,11 +28,11 @@
 
 CAsyncFileReader::CAsyncFileReader(CString fn, HRESULT& hr)
 	: CUnknown(NAME("CAsyncFileReader"), NULL, &hr)
-	, m_len((ULONGLONG)-1)
+	, m_len(ULONGLONG_ERROR)
 	, m_hBreakEvent(NULL)
 	, m_lOsError(0)
 {
-	hr = Open(fn, modeRead|shareDenyNone|typeBinary|osSequentialScan) ? S_OK : E_FAIL;
+	hr = Open(fn) ? S_OK : E_FAIL;
 	if (SUCCEEDED(hr)) {
 		m_len = GetLength();
 	}
@@ -43,11 +40,11 @@ CAsyncFileReader::CAsyncFileReader(CString fn, HRESULT& hr)
 
 CAsyncFileReader::CAsyncFileReader(CHdmvClipInfo::CPlaylist& Items, HRESULT& hr)
 	: CUnknown(NAME("CAsyncFileReader"), NULL, &hr)
-	, m_len((ULONGLONG)-1)
+	, m_len(ULONGLONG_ERROR)
 	, m_hBreakEvent(NULL)
 	, m_lOsError(0)
 {
-	hr = OpenFiles(Items, modeRead|shareDenyNone|typeBinary|osSequentialScan) ? S_OK : E_FAIL;
+	hr = OpenFiles(Items) ? S_OK : E_FAIL;
 	if (SUCCEEDED(hr)) {
 		m_len = GetLength();
 	}
@@ -70,42 +67,22 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 {
 	do {
 		try {
-			if ((ULONGLONG)llPosition+lLength > GetLength()) {
-				return E_FAIL;    // strange, but the Seek below can return llPosition even if the file is not that big (?)
+			if ((ULONGLONG)llPosition + lLength > GetLength()) {
+				return E_FAIL; // strange, but the Seek below can return llPosition even if the file is not that big (?)
 			}
-			if ((ULONGLONG)llPosition != Seek(llPosition, begin)) {
+			if ((ULONGLONG)llPosition != Seek(llPosition, FILE_BEGIN)) {
 				return E_FAIL;
 			}
-			if ((UINT)lLength < Read(pBuffer, lLength)) {
+			DWORD dwError;
+			if ((UINT)lLength < Read(pBuffer, lLength, dwError) || dwError != ERROR_SUCCESS) {
 				return E_FAIL;
 			}
-
-#if 0 // def DEBUG
-			static __int64 s_total = 0, s_laststoppos = 0;
-			s_total += lLength;
-			if (s_laststoppos > llPosition) {
-				TRACE(_T("[%I64d - %I64d] %d (%I64d)\n"), llPosition, llPosition + lLength, lLength, s_total);
-			}
-			s_laststoppos = llPosition + lLength;
-#endif
 
 			return S_OK;
 		} catch (CFileException* e) {
 			m_lOsError = e->m_lOsError;
 			e->Delete();
-			Sleep(1);
-			CString fn = m_strFileName;
-			try {
-				Close();
-			} catch (CFileException* e) {
-				e->Delete();
-			}
-			try {
-				Open(fn, modeRead|shareDenyNone|typeBinary|osSequentialScan);
-			} catch (CFileException* e) {
-				e->Delete();
-			}
-			m_strFileName = fn;
+			break;
 		}
 	} while (m_hBreakEvent && WaitForSingleObject(m_hBreakEvent, 0) == WAIT_TIMEOUT);
 
@@ -121,21 +98,4 @@ STDMETHODIMP CAsyncFileReader::Length(LONGLONG* pTotal, LONGLONG* pAvailable)
 		*pAvailable = GetLength();
 	}
 	return S_OK;
-}
-
-// IFileHandle
-
-STDMETHODIMP_(HANDLE) CAsyncFileReader::GetFileHandle()
-{
-	return m_hFile;
-}
-
-STDMETHODIMP_(LPCTSTR) CAsyncFileReader::GetFileName()
-{
-	return m_nCurPart != -1 ? m_strFiles[m_nCurPart] : m_strFiles[0];
-}
-
-STDMETHODIMP_(bool) CAsyncFileReader::IsValidFilename()
-{
-	return m_strFiles.IsEmpty() ? false : true;
 }

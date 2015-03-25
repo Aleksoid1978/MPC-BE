@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,7 +40,7 @@ void CMultiFiles::Reset()
 	m_llTotalLength = 0;
 }
 
-BOOL CMultiFiles::Open(LPCTSTR lpszFileName, UINT nOpenFlags)
+BOOL CMultiFiles::Open(LPCTSTR lpszFileName)
 {
 	Reset();
 	m_strFiles.Add(lpszFileName);
@@ -48,7 +48,7 @@ BOOL CMultiFiles::Open(LPCTSTR lpszFileName, UINT nOpenFlags)
 	return OpenPart(0);
 }
 
-BOOL CMultiFiles::OpenFiles(CHdmvClipInfo::CPlaylist& files, UINT nOpenFlags)
+BOOL CMultiFiles::OpenFiles(CHdmvClipInfo::CPlaylist& files)
 {
 	POSITION		pos = files.GetHeadPosition();
 	LARGE_INTEGER	llSize;
@@ -82,8 +82,8 @@ BOOL CMultiFiles::OpenFiles(CHdmvClipInfo::CPlaylist& files, UINT nOpenFlags)
 
 ULONGLONG CMultiFiles::Seek(LONGLONG lOff, UINT nFrom)
 {
-	LARGE_INTEGER	llNewPos;
-	LARGE_INTEGER	llOff;
+	LARGE_INTEGER llNewPos;
+	LARGE_INTEGER llOff;
 
 	if (m_strFiles.GetCount() == 1) {
 		llOff.QuadPart = lOff;
@@ -95,7 +95,7 @@ ULONGLONG CMultiFiles::Seek(LONGLONG lOff, UINT nFrom)
 		int			nNewPart	 = 0;
 		ULONGLONG	llSum		 = 0;
 
-		while (m_FilesSize[nNewPart]+llSum <= lAbsolutePos) {
+		while (m_FilesSize[nNewPart] + llSum <= lAbsolutePos) {
 			llSum += m_FilesSize[nNewPart];
 			nNewPart++;
 		}
@@ -110,16 +110,16 @@ ULONGLONG CMultiFiles::Seek(LONGLONG lOff, UINT nFrom)
 
 ULONGLONG CMultiFiles::GetAbsolutePosition(LONGLONG lOff, UINT nFrom)
 {
-	LARGE_INTEGER	llNoMove = {0, 0};
-	LARGE_INTEGER	llCurPos;
+	LARGE_INTEGER llNoMove = {0, 0};
+	LARGE_INTEGER llCurPos;
 
 	switch (nFrom) {
-		case begin :
+		case FILE_BEGIN :
 			return lOff;
-		case current :
+		case FILE_CURRENT :
 			SetFilePointerEx(m_hFile, llNoMove, &llCurPos, FILE_CURRENT);
 			return llCurPos.QuadPart + lOff;
-		case end :
+		case FILE_END :
 			return m_llTotalLength - lOff;
 		default:
 			return 0;	// just used to quash "not all control paths return a value" warning
@@ -129,7 +129,7 @@ ULONGLONG CMultiFiles::GetAbsolutePosition(LONGLONG lOff, UINT nFrom)
 ULONGLONG CMultiFiles::GetLength() const
 {
 	if (m_strFiles.GetCount() == 1) {
-		LARGE_INTEGER	llSize;
+		LARGE_INTEGER llSize;
 		GetFileSizeEx(m_hFile, &llSize);
 		return llSize.QuadPart;
 	} else {
@@ -137,25 +137,50 @@ ULONGLONG CMultiFiles::GetLength() const
 	}
 }
 
-UINT CMultiFiles::Read(BYTE* lpBuf, UINT nCount)
+UINT CMultiFiles::Read(BYTE* lpBuf, UINT nCount, DWORD& dwError)
 {
-	DWORD dwRead = 0;
+	if (m_hFile == INVALID_HANDLE_VALUE) {
+		dwError = ERROR_INVALID_HANDLE;
+		return 0;
+	}
+
+	dwError			= ERROR_SUCCESS;
+	DWORD dwRead	= 0;
 	int nCurPart;
 
 	do {
+		LARGE_INTEGER llNoMove = {0, 0};
+		LARGE_INTEGER llCurPos;
+		SetFilePointerEx(m_hFile, llNoMove, &llCurPos, FILE_CURRENT);
+
+again:
 		DWORD nNumberOfBytesRead = 0;
 		if (!ReadFile(m_hFile, lpBuf, nCount - dwRead, &nNumberOfBytesRead, NULL)) {
+			DWORD dwLastError = GetLastError();
+			if (dwLastError != ERROR_SUCCESS) {
+				// TODO - select only the necessary error codes : ERROR_INVALID_HANDLE, ERROR_BAD_NETPATH, ERROR_DEV_NOT_EXIST, ERROR_FILE_INVALID ... 
+				nCurPart = m_nCurPart;
+				ClosePart();
+				if (OpenPart(nCurPart)) {
+					LARGE_INTEGER llNewPos;
+					if (SetFilePointerEx(m_hFile, llCurPos, &llNewPos, FILE_BEGIN) && llCurPos.QuadPart == llNewPos.QuadPart) {
+						goto again;
+					}
+				}
+			}
+
+			dwError = dwLastError;
 			break;
 		}
 
 		dwRead		+= nNumberOfBytesRead;
 		nCurPart	= m_nCurPart;
 
-		if (dwRead != nCount && (nCurPart < 0 || (size_t)nCurPart < m_strFiles.GetCount()-1)) {
-			OpenPart(nCurPart+1);
+		if (dwRead != nCount && (nCurPart < 0 || (size_t)nCurPart < m_strFiles.GetCount() - 1)) {
+			OpenPart(nCurPart + 1);
 			lpBuf	+= dwRead;
 		}
-	} while (nCount != dwRead && (nCurPart < 0 || (size_t)nCurPart < m_strFiles.GetCount()-1));
+	} while (nCount != dwRead && (nCurPart < 0 || (size_t)nCurPart < m_strFiles.GetCount() - 1));
 
 	return dwRead;
 }
@@ -176,15 +201,13 @@ BOOL CMultiFiles::OpenPart(int nPart)
 	if (m_nCurPart == nPart) {
 		return TRUE;
 	} else {
-		CString		fn;
-
 		ClosePart();
 
-		fn			= m_strFiles.GetAt(nPart);
-		m_hFile		= CreateFile(fn, GENERIC_READ, FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+		CString fn	= m_strFiles.GetAt(nPart);
+		m_hFile		= CreateFile(fn, GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 
 		if (m_hFile != INVALID_HANDLE_VALUE) {
-			m_nCurPart	= nPart;
+			m_nCurPart = nPart;
 			if (m_pCurrentPTSOffset != NULL) {
 				*m_pCurrentPTSOffset = m_rtPtsOffsets[nPart];
 			}

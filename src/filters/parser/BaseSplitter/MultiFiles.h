@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,58 +29,16 @@ class CMultiFiles : public CObject
 	DECLARE_DYNAMIC(CMultiFiles)
 
 public:
-	// Flag values
-	enum OpenFlags {
-		modeRead =         (int) 0x00000,
-		modeWrite =        (int) 0x00001,
-		modeReadWrite =    (int) 0x00002,
-		shareCompat =      (int) 0x00000,
-		shareExclusive =   (int) 0x00010,
-		shareDenyWrite =   (int) 0x00020,
-		shareDenyRead =    (int) 0x00030,
-		shareDenyNone =    (int) 0x00040,
-		modeNoInherit =    (int) 0x00080,
-		modeCreate =       (int) 0x01000,
-		modeNoTruncate =   (int) 0x02000,
-		typeText =         (int) 0x04000, // typeText and typeBinary are
-		typeBinary =       (int) 0x08000, // used in derived classes only
-		osNoBuffer =       (int) 0x10000,
-		osWriteThrough =   (int) 0x20000,
-		osRandomAccess =   (int) 0x40000,
-		osSequentialScan = (int) 0x80000,
-	};
-
-	enum Attribute {
-		normal =    0x00,
-		readOnly =  0x01,
-		hidden =    0x02,
-		system =    0x04,
-		volume =    0x08,
-		directory = 0x10,
-		archive =   0x20
-	};
-
-	enum SeekPosition { begin = 0x0, current = 0x1, end = 0x2 };
-
-	// Constructors
 	CMultiFiles();
+	virtual ~CMultiFiles();
 
-	CString			m_strFileName;
-
-	// Operations
-	virtual BOOL Open(LPCTSTR lpszFileName, UINT nOpenFlags);
-	virtual BOOL OpenFiles(CHdmvClipInfo::CPlaylist& files, UINT nOpenFlags);
-
+	virtual BOOL Open(LPCTSTR lpszFileName);
+	virtual BOOL OpenFiles(CHdmvClipInfo::CPlaylist& files);
 
 	virtual ULONGLONG Seek(LONGLONG lOff, UINT nFrom);
 	virtual ULONGLONG GetLength() const;
-
-	virtual UINT Read(BYTE* lpBuf, UINT nCount);
+	virtual UINT Read(BYTE* lpBuf, UINT nCount, DWORD& dwError);
 	virtual void Close();
-
-	// Implementation
-public:
-	virtual ~CMultiFiles();
 
 protected:
 	REFERENCE_TIME*				m_pCurrentPTSOffset;
