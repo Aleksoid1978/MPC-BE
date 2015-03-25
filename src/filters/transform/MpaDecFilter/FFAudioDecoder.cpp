@@ -230,23 +230,11 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/*
 	if (m_pAVCodec) {
 		StreamFinish();
 	}
-	switch (nCodecId) {
-		case AV_CODEC_ID_MP1:
-			m_pAVCodec = avcodec_find_decoder_by_name("mp1float");
-			break;
-		case AV_CODEC_ID_MP2:
-			m_pAVCodec = avcodec_find_decoder_by_name("mp2float");
-			break;
-		case AV_CODEC_ID_MP3:
-			m_pAVCodec = avcodec_find_decoder_by_name("mp3float");
-			break;
-		case AV_CODEC_ID_DTS:
-			if (!bForceDca) {
-				m_pAVCodec = avcodec_find_decoder_by_name("libdcadec");
-				break;
-			}
-		default:
-			m_pAVCodec = avcodec_find_decoder(nCodecId);
+
+	if (nCodecId == AV_CODEC_ID_DTS && !bForceDca) {
+		m_pAVCodec = avcodec_find_decoder_by_name("libdcadec");
+	} else {
+		m_pAVCodec = avcodec_find_decoder(nCodecId);
 	}
 
 	if (m_pAVCodec) {
