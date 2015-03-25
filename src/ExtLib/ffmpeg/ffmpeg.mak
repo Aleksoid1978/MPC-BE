@@ -146,6 +146,7 @@ SRCS_LC = \
 	libavcodec/dca.c \
 	libavcodec/dca_exss.c \
 	libavcodec/dca_parser.c \
+	libavcodec/dca_xll.c \
 	libavcodec/dcadata.c \
 	libavcodec/dcadec.c \
 	libavcodec/dcadsp.c \
@@ -250,6 +251,7 @@ SRCS_LC = \
 	libavcodec/lagarith.c \
 	libavcodec/lagarithrac.c \
 	libavcodec/latm_parser.c \
+	libavcodec/libdcadec.c \
 	libavcodec/libopenjpegdec.c \
 	libavcodec/libspeexdec.c \
 	libavcodec/lossless_audiodsp.c \
