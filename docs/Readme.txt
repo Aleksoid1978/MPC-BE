@@ -61,6 +61,7 @@ CSizingControlBar   GPLv2                      http://datamekanix.com/sizecbar/
 Detours             MSR-SSLA                   http://research.microsoft.com/en-us/projects/detours/
 FFmpeg              GPLv3                      http://ffmpeg.org/
 jsoncpp             MIT License                https://github.com/open-source-parsers/jsoncpp
+libdcadec           LGPLv2.1                   https://github.com/foo86/dcadec/
 libflac             GPLv2 / BSD License        http://sourceforge.net/projects/flac/
 libpng              zlib / libpng License      http://sourceforge.net/projects/libpng/
 libopenjpeg         BSD License                http://code.google.com/p/openjpeg/
