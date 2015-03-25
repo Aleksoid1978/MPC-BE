@@ -1778,7 +1778,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		do {
 			m_bDXVACompatible = false;
 
-			if (!DXVACheckFramesize(m_nCodecId, PictWidth(), PictHeight(), m_nPCIVendor, m_nPCIDevice)) { // check frame size
+			if (!DXVACheckFramesize(m_nCodecId, PictWidth(), PictHeight(), m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion)) { // check frame size
 				break;
 			}
 

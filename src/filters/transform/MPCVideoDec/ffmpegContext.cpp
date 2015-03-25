@@ -556,7 +556,7 @@ bool IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice)
 }
 
 #define CHECK_AVC_L52_SIZE(w, h) ((w) <= 4096 && (h) <= 4096 && (w) * (h) <= 36864 * 16 * 16)
-BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nPCIVendor, DWORD nPCIDevice)
+BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion)
 {
 	width = (width + 15) & ~15; // (width + 15) / 16 * 16;
 	height = (height + 15) & ~15; // (height + 15) / 16 * 16;
@@ -567,10 +567,13 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 	//}
 
 	if (nPCIVendor == PCIV_nVidia) {
-		if (CheckPCID(nPCIDevice, PCID_NVIDIA_VP567, _countof(PCID_NVIDIA_VP567)) && width <= 4096 && height <= 4096 && width * height <= 4080 * 4080) {
+		if (DriverVersionCheck(VideoDriverVersion, 9, 18, 13, 2018)) { // The video frame size is checked in the driver
+			// For graphics cards with support for 4k, you must install the driver v320.18 and newer.
+			return TRUE;
+			// old check:
+			// if (CheckPCID(nPCIDevice, PCID_NVIDIA_VP567, _countof(PCID_NVIDIA_VP567)) && width <= 4096 && height <= 4096 && width * height <= 4080 * 4080) {
 			// tested H.264 on VP5 (GT 610, GTX 660 Ti)
 			// 4080x4080 = 65025 macroblocks
-			return TRUE;
 		} else if (width <= 2032 && height <= 2032 && width * height <= 8190 * 16 * 16) {
 			// tested H.264, VC-1 and MPEG-2 on VP4 (feature set C) (G210M, GT220)
 			return TRUE;
