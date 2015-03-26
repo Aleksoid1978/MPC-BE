@@ -249,4 +249,6 @@ void CPPagePlayer::OnChangeEdit1()
 	if (rString.IsEmpty()) {
 		OnKillFocusEdit1();
 	}
+
+	SetModified();
 }
