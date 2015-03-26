@@ -232,6 +232,8 @@ void CPPagePlayback::OnAutoZoomCheck()
 		GetDlgItem(IDC_EDIT4)->EnableWindow(FALSE);
 		m_spnAutoFitFactor.EnableWindow(FALSE);
 	}
+
+	SetModified();
 }
 
 void CPPagePlayback::OnAutoZoomSelChange()
@@ -245,6 +247,8 @@ void CPPagePlayback::OnAutoZoomSelChange()
 		GetDlgItem(IDC_EDIT4)->EnableWindow(FALSE);
 		m_spnAutoFitFactor.EnableWindow(FALSE);
 	}
+
+	SetModified();
 }
 
 void CPPagePlayback::OnBalanceTextDblClk()
