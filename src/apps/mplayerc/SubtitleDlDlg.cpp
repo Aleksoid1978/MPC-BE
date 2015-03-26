@@ -275,34 +275,32 @@ void CSubtitleDlDlg::OnOK()
 
 		if (OpenUrl(is, CString(url), str)) {
 
-			if (pFrame->b_UseVSFilter) {
-				if (CComQIPtr<IDirectVobSub> pDVS = pFrame->GetVSFilter()) {
-					TCHAR lpszTempPath[_MAX_PATH] = { 0 };
-					if (::GetTempPath(_MAX_PATH, lpszTempPath)) {
-						CString subFileName(lpszTempPath);
-						subFileName.Append(CString(sub.name));
-						if (::PathFileExists(subFileName)) {
-							::DeleteFile(subFileName);
-						}
-
-						CFile cf;
-						if (cf.Open(subFileName, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyNone)) {
-							cf.Write(str.GetString(), str.GetLength());
-							cf.Close();
-
-							if (SUCCEEDED(pDVS->put_FileName((LPWSTR)(LPCWSTR)subFileName))) {
-								pDVS->put_SelectedLanguage(0);
-								pDVS->put_HideSubtitles(true);
-								pDVS->put_HideSubtitles(false);
-							}
-
-							::DeleteFile(subFileName);
-						}
+			if (pFrame->m_pDVS) {
+				TCHAR lpszTempPath[_MAX_PATH] = { 0 };
+				if (::GetTempPath(_MAX_PATH, lpszTempPath)) {
+					CString subFileName(lpszTempPath);
+					subFileName.Append(CString(sub.name));
+					if (::PathFileExists(subFileName)) {
+						::DeleteFile(subFileName);
 					}
 
-					__super::OnOK();
-					return;
+					CFile cf;
+					if (cf.Open(subFileName, CFile::modeCreate|CFile::modeWrite|CFile::shareDenyNone)) {
+						cf.Write(str.GetString(), str.GetLength());
+						cf.Close();
+
+						if (SUCCEEDED(pFrame->m_pDVS->put_FileName((LPWSTR)(LPCWSTR)subFileName))) {
+							pFrame->m_pDVS->put_SelectedLanguage(0);
+							pFrame->m_pDVS->put_HideSubtitles(true);
+							pFrame->m_pDVS->put_HideSubtitles(false);
+						}
+
+						::DeleteFile(subFileName);
+					}
 				}
+
+				__super::OnOK();
+				return;
 			}
 
 			CAutoPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&pFrame->m_csSubLock));

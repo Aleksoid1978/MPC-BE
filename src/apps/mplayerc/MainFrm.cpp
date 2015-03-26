@@ -79,7 +79,6 @@
 #include "OpenImage.h"
 #include "PlayerYouTube.h"
 
-#include "../../filters/transform/VSFilter/IDirectVobSub.h"
 #include "../../Subtitles/RenderedHdmvSubtitle.h"
 #include "../../Subtitles/SupSubFile.h"
 #include "../../Subtitles/XSUBSubtitle.h"
@@ -660,7 +659,6 @@ CMainFrame::CMainFrame() :
 	bDVDMenuClicked(false),
 	m_bfirstPlay(false),
 	m_dwLastRun(0),
-	b_UseVSFilter(false),
 	IsMadVRExclusiveMode(false),
 	m_fYoutubeThreadWork(TH_CLOSE),
 	m_YoutubeThread(NULL),
@@ -4296,8 +4294,6 @@ void CMainFrame::OnFilePostCloseMedia()
 	m_YoutubeTotal		= 0;
 	m_YoutubeCurrent	= 0;
 
-	b_UseVSFilter = false;
-
 	m_ExtSubFiles.RemoveAll();
 	m_ExtSubFilesTime.RemoveAll();
 	m_ExtSubPaths.RemoveAll();
@@ -4535,115 +4531,112 @@ void CMainFrame::OnStreamSub(UINT nID)
 		return;
 	}
 
-	if (GetPlaybackMode() == PM_FILE && b_UseVSFilter) {
-		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
-		if (pDVS) {
-			int nLangs;
-			if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
-				bool fHideSubtitles = false;
-				pDVS->get_HideSubtitles(&fHideSubtitles);
+	if (GetPlaybackMode() == PM_FILE && m_pDVS) {
+		int nLangs;
+		if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
+			bool fHideSubtitles = false;
+			m_pDVS->get_HideSubtitles(&fHideSubtitles);
 
-				if (!fHideSubtitles) {
-					int subcount = GetStreamCount(2);
-					if (subcount) {
-						CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
-						DWORD cStreams = 0;
-						pSS->Count(&cStreams);
-
-						int iSelected = 0;
-						pDVS->get_SelectedLanguage(&iSelected);
-						if (iSelected == (nLangs - 1)) {
-							int selectedStream = (nLangs - 1);
-							DWORD cStreamsS = 0;
-							pSS->Count(&cStreamsS);
-							for (long i = 0; i < (long)cStreamsS; i++) {
-								DWORD dwFlags = DWORD_MAX;
-								DWORD dwGroup = DWORD_MAX;
-
-								if (FAILED(pSS->Info(i, NULL, &dwFlags, NULL, &dwGroup, NULL, NULL, NULL))) {
-									continue;
-								}
-
-								if (dwGroup != 2) {
-									continue;
-								}
-
-								if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
-									iSelected = selectedStream;
-								}
-
-								selectedStream++;
-							}
-						}
-
-						subcount += (nLangs - 1);
-
-						iSelected = (iSelected + (nID == 0 ? 1 : subcount - 1)) % subcount;
-
-						WCHAR* pName = NULL;
-						CString	strMessage;
-
-						if (iSelected < (nLangs - 1)) {
-							pDVS->put_SelectedLanguage(iSelected);
-							pDVS->get_LanguageName(iSelected, &pName);
-
-							strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), pName);
-						} else {
-							pDVS->put_SelectedLanguage(nLangs - 1);
-							iSelected -= (nLangs - 1);
-
-							long substream = 0;
-							DWORD cStreamsS = 0;
-							pSS->Count(&cStreamsS);
-							for (long i = 0; i < (long)cStreamsS; i++) {
-								DWORD dwGroup = DWORD_MAX;
-
-								if (FAILED(pSS->Info(i, NULL, NULL, NULL, &dwGroup, &pName, NULL, NULL))
-										|| !pName) {
-									continue;
-								}
-
-								CString sub_stream(pName);
-								if (pName) {
-									CoTaskMemFree(pName);
-								}
-
-								if (dwGroup != 2) {
-									continue;
-								}
-
-								if (substream == iSelected) {
-									pSS->Enable(i, AMSTREAMSELECTENABLE_ENABLE);
-									int k = sub_stream.Find(_T("Subtitle - "));
-									if (k >= 0) {
-										sub_stream = sub_stream.Right(sub_stream.GetLength() - k - 8);
-									}
-									strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), sub_stream);
-
-									break;
-								}
-
-								substream++;
-							}
-						}
-
-						m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
-						return;
-					}
+			if (!fHideSubtitles) {
+				int subcount = GetStreamCount(2);
+				if (subcount) {
+					CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
+					DWORD cStreams = 0;
+					pSS->Count(&cStreams);
 
 					int iSelected = 0;
-					pDVS->get_SelectedLanguage(&iSelected);
-					iSelected = (iSelected + (nID == 0 ? 1 : nLangs - 1)) % nLangs;
-					pDVS->put_SelectedLanguage(iSelected);
+					m_pDVS->get_SelectedLanguage(&iSelected);
+					if (iSelected == (nLangs - 1)) {
+						int selectedStream = (nLangs - 1);
+						DWORD cStreamsS = 0;
+						pSS->Count(&cStreamsS);
+						for (long i = 0; i < (long)cStreamsS; i++) {
+							DWORD dwFlags = DWORD_MAX;
+							DWORD dwGroup = DWORD_MAX;
+
+							if (FAILED(pSS->Info(i, NULL, &dwFlags, NULL, &dwGroup, NULL, NULL, NULL))) {
+								continue;
+							}
+
+							if (dwGroup != 2) {
+								continue;
+							}
+
+							if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
+								iSelected = selectedStream;
+							}
+
+							selectedStream++;
+						}
+					}
+
+					subcount += (nLangs - 1);
+
+					iSelected = (iSelected + (nID == 0 ? 1 : subcount - 1)) % subcount;
 
 					WCHAR* pName = NULL;
-					pDVS->get_LanguageName(iSelected, &pName);
 					CString	strMessage;
-					strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), pName);
-					CoTaskMemFree(pName);
+
+					if (iSelected < (nLangs - 1)) {
+						m_pDVS->put_SelectedLanguage(iSelected);
+						m_pDVS->get_LanguageName(iSelected, &pName);
+
+						strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), pName);
+					} else {
+						m_pDVS->put_SelectedLanguage(nLangs - 1);
+						iSelected -= (nLangs - 1);
+
+						long substream = 0;
+						DWORD cStreamsS = 0;
+						pSS->Count(&cStreamsS);
+						for (long i = 0; i < (long)cStreamsS; i++) {
+							DWORD dwGroup = DWORD_MAX;
+
+							if (FAILED(pSS->Info(i, NULL, NULL, NULL, &dwGroup, &pName, NULL, NULL))
+									|| !pName) {
+								continue;
+							}
+
+							CString sub_stream(pName);
+							if (pName) {
+								CoTaskMemFree(pName);
+							}
+
+							if (dwGroup != 2) {
+								continue;
+							}
+
+							if (substream == iSelected) {
+								pSS->Enable(i, AMSTREAMSELECTENABLE_ENABLE);
+								int k = sub_stream.Find(_T("Subtitle - "));
+								if (k >= 0) {
+									sub_stream = sub_stream.Right(sub_stream.GetLength() - k - 8);
+								}
+								strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), sub_stream);
+
+								break;
+							}
+
+							substream++;
+						}
+					}
 
 					m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
+					return;
 				}
+
+				int iSelected = 0;
+				m_pDVS->get_SelectedLanguage(&iSelected);
+				iSelected = (iSelected + (nID == 0 ? 1 : nLangs - 1)) % nLangs;
+				m_pDVS->put_SelectedLanguage(iSelected);
+
+				WCHAR* pName = NULL;
+				m_pDVS->get_LanguageName(iSelected, &pName);
+				CString	strMessage;
+				strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), pName);
+				CoTaskMemFree(pName);
+
+				m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
 			}
 		}
 
@@ -4778,29 +4771,26 @@ void CMainFrame::OnStreamSubOnOff()
 		return;
 	}
 
-	if (GetPlaybackMode() == PM_FILE && b_UseVSFilter) {
-		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
-		if (pDVS) {
-			int nLangs;
-			if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
-				bool fHideSubtitles = false;
-				pDVS->get_HideSubtitles(&fHideSubtitles);
-				fHideSubtitles = !fHideSubtitles;
-				pDVS->put_HideSubtitles(fHideSubtitles);
+	if (GetPlaybackMode() == PM_FILE && m_pDVS) {
+		int nLangs;
+		if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
+			bool fHideSubtitles = false;
+			m_pDVS->get_HideSubtitles(&fHideSubtitles);
+			fHideSubtitles = !fHideSubtitles;
+			m_pDVS->put_HideSubtitles(fHideSubtitles);
 
-				if (fHideSubtitles) {
-					m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_SUBTITLE_STREAM_OFF));
-				} else {
-					int iSelected = 0;
-					pDVS->get_SelectedLanguage(&iSelected);
-					WCHAR* pName = NULL;
-					pDVS->get_LanguageName(iSelected, &pName);
+			if (fHideSubtitles) {
+				m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_SUBTITLE_STREAM_OFF));
+			} else {
+				int iSelected = 0;
+				m_pDVS->get_SelectedLanguage(&iSelected);
+				WCHAR* pName = NULL;
+				m_pDVS->get_LanguageName(iSelected, &pName);
 
-					CString	strMessage;
-					strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), pName);
-					m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
-					CoTaskMemFree(pName);
-				}
+				CString	strMessage;
+				strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), pName);
+				m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
+				CoTaskMemFree(pName);
 			}
 		}
 
@@ -5465,7 +5455,7 @@ void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 		bool validate_ext = false;
 		for (size_t i = 0; i < Subtitle::subTypesExt.size(); i++) {
 			if (ext == Subtitle::subTypesExt[i] &&
-					!(b_UseVSFilter && ext == "mks")) {
+					!(m_pDVS && ext == "mks")) {
 				validate_ext = true;
 				break;
 			}
@@ -5477,19 +5467,18 @@ void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 		}
 	}
 
-	if (bIsValidSubExtAll && m_iMediaLoadState == MLS_LOADED && (m_pCAP || b_UseVSFilter)) {
+	if (bIsValidSubExtAll && m_iMediaLoadState == MLS_LOADED && (m_pCAP || m_pDVS)) {
 
 		POSITION pos = slFiles.GetHeadPosition();
 		while (pos) {
 			CString fname = slFiles.GetNext(pos);
 			BOOL b_SubLoaded = FALSE;
 
-			if (b_UseVSFilter) {
-				CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
-				if (pDVS && SUCCEEDED(pDVS->put_FileName((LPWSTR)(LPCWSTR)fname))) {
-					pDVS->put_SelectedLanguage(0);
-					pDVS->put_HideSubtitles(true);
-					pDVS->put_HideSubtitles(false);
+			if (m_pDVS) {
+				if (SUCCEEDED(m_pDVS->put_FileName((LPWSTR)(LPCWSTR)fname))) {
+					m_pDVS->put_SelectedLanguage(0);
+					m_pDVS->put_HideSubtitles(true);
+					m_pDVS->put_HideSubtitles(false);
 
 					b_SubLoaded = TRUE;
 				}
@@ -5505,7 +5494,7 @@ void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 
 			if (b_SubLoaded) {
 				SendStatusMessage(GetFileOnly(fname) + ResStr(IDS_MAINFRM_47), 3000);
-				if (b_UseVSFilter) {
+				if (m_pDVS) {
 					return;
 				}
 			}
@@ -6307,7 +6296,7 @@ void CMainFrame::OnUpdateFileSaveThumbnails(CCmdUI* pCmdUI)
 
 void CMainFrame::OnFileLoadSubtitle()
 {
-	if (!m_pCAP && !b_UseVSFilter) {
+	if (!m_pCAP && !m_pDVS) {
 		AfxMessageBox(ResStr(IDS_MAINFRM_60)+
 					  ResStr(IDS_MAINFRM_61)+
 					  ResStr(IDS_MAINFRM_64)
@@ -6341,12 +6330,11 @@ void CMainFrame::OnFileLoadSubtitle()
 		fns.AddTail(fd.GetNextPathName(pos));
 	}
 
-	if (b_UseVSFilter) {
-		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
-		if (pDVS && SUCCEEDED(pDVS->put_FileName((LPWSTR)(LPCWSTR)fns.GetHead()))) {
-			pDVS->put_SelectedLanguage(0);
-			pDVS->put_HideSubtitles(true);
-			pDVS->put_HideSubtitles(false);
+	if (m_pDVS) {
+		if (SUCCEEDED(m_pDVS->put_FileName((LPWSTR)(LPCWSTR)fns.GetHead()))) {
+			m_pDVS->put_SelectedLanguage(0);
+			m_pDVS->put_HideSubtitles(true);
+			m_pDVS->put_HideSubtitles(false);
 		}
 		return;
 	}
@@ -6542,7 +6530,7 @@ void CMainFrame::OnFileISDBDownload()
 
 void CMainFrame::OnUpdateFileISDBDownload(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && GetPlaybackMode() != PM_CAPTURE && (m_pCAP || b_UseVSFilter) && !m_bAudioOnly);
+	pCmdUI->Enable(m_iMediaLoadState == MLS_LOADED && GetPlaybackMode() != PM_CAPTURE && (m_pCAP || m_pDVS) && !m_bAudioOnly);
 }
 
 void CMainFrame::OnFileProperties()
@@ -8264,7 +8252,7 @@ void CMainFrame::SetAudioDelay(REFERENCE_TIME rtShift)
 
 void CMainFrame::SetSubtitleDelay(int delay_ms)
 {
-	if (!m_pCAP && !b_UseVSFilter) {
+	if (!m_pCAP && !m_pDVS) {
 		return;
 	}
 
@@ -8466,14 +8454,12 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 		s.fUseDefaultSubtitlesStyle = !s.fUseDefaultSubtitlesStyle;
 		UpdateSubtitle();
 	} else if (i == -4) {
-		if (b_UseVSFilter) {
-			CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
-			if (pDVS) {
-				bool fBuffer, fOnlyShowForcedSubs, fPolygonize;
-				pDVS->get_VobSubSettings(&fBuffer, &fOnlyShowForcedSubs, &fPolygonize);
-				fOnlyShowForcedSubs = !fOnlyShowForcedSubs;
-				pDVS->put_VobSubSettings(fBuffer, fOnlyShowForcedSubs, fPolygonize);
-			}
+		if (m_pDVS) {
+			bool fBuffer, fOnlyShowForcedSubs, fPolygonize;
+			m_pDVS->get_VobSubSettings(&fBuffer, &fOnlyShowForcedSubs, &fPolygonize);
+			fOnlyShowForcedSubs = !fOnlyShowForcedSubs;
+			m_pDVS->put_VobSubSettings(fBuffer, fOnlyShowForcedSubs, fPolygonize);
+			
 			return;
 		}
 
@@ -8528,19 +8514,16 @@ void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 
-		if (b_UseVSFilter) {
-			CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
-			if (pDVS) {
-				int nLangs;
-				if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
-					bool fHideSubtitles = false;
-					pDVS->get_HideSubtitles(&fHideSubtitles);
-					pCmdUI->Enable();
-					if (i == -1) {
-						pCmdUI->SetCheck(!fHideSubtitles);
-					} else {
-						pCmdUI->Enable(!fHideSubtitles);
-					}
+		if (m_pDVS) {
+			int nLangs;
+			if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
+				bool fHideSubtitles = false;
+				m_pDVS->get_HideSubtitles(&fHideSubtitles);
+				pCmdUI->Enable();
+				if (i == -1) {
+					pCmdUI->SetCheck(!fHideSubtitles);
+				} else {
+					pCmdUI->Enable(!fHideSubtitles);
 				}
 			}
 
@@ -8567,9 +8550,9 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 	pCmdUI->Enable(m_pCAP && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
 
 	if (i == -10) {
-		pCmdUI->Enable(GetPlaybackMode() == PM_NONE || (m_pCAP && !b_UseVSFilter && !m_bAudioOnly)) ;
+		pCmdUI->Enable(GetPlaybackMode() == PM_NONE || (m_pCAP && !m_pDVS && !m_bAudioOnly)) ;
 	} else if (i == -9) {
-		pCmdUI->Enable((m_pCAP || b_UseVSFilter) && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
+		pCmdUI->Enable((m_pCAP || m_pDVS) && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
 	} else if (i == -8) {
 		// styles
 		pCmdUI->Enable(FALSE);
@@ -8577,19 +8560,16 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 			pCmdUI->Enable(TRUE);
 		}
 	} else if (i == -7) {
-		if (b_UseVSFilter) {
+		if (m_pDVS) {
 			pCmdUI->SetCheck(FALSE);
 			pCmdUI->Enable(FALSE);
 			return;
 		}
 	} else if (i == -6) {
 		// enabled
-		if (b_UseVSFilter) {
-			CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
+		if (m_pDVS) {
 			bool fHideSubtitles = false;
-			if (pDVS) {
-				pDVS->get_HideSubtitles(&fHideSubtitles);
-			}
+			m_pDVS->get_HideSubtitles(&fHideSubtitles);
 
 			pCmdUI->Enable();
 			pCmdUI->SetCheck(!fHideSubtitles);
@@ -8598,7 +8578,7 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 		pCmdUI->SetCheck(s.fEnableSubtitles);
 	} else if (i == -5) {
 		// override
-		if (b_UseVSFilter) {
+		if (m_pDVS) {
 			pCmdUI->SetCheck(FALSE);
 			pCmdUI->Enable(FALSE);
 			return;
@@ -8608,13 +8588,10 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 		pCmdUI->SetCheck(s.fUseDefaultSubtitlesStyle);
 		pCmdUI->Enable(s.fEnableSubtitles && m_pCAP && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
 	} else if (i == -4) {
-		if (b_UseVSFilter) {
-			CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
+		if (m_pDVS) {
 			bool fOnlyShowForcedSubs = false;
-			if (pDVS) {
-				bool fBuffer, fPolygonize;
-				pDVS->get_VobSubSettings(&fBuffer, &fOnlyShowForcedSubs, &fPolygonize);
-			}
+			bool fBuffer, fPolygonize;
+			m_pDVS->get_VobSubSettings(&fBuffer, &fOnlyShowForcedSubs, &fPolygonize);
 
 			pCmdUI->Enable();
 			pCmdUI->SetCheck(fOnlyShowForcedSubs);
@@ -8628,20 +8605,20 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 			CheckMenuRadioItem(ID_SUBTITLES_SUBITEM_START + 7, ID_SUBTITLES_SUBITEM_START + 9, pCmdUI->m_nID);
 		}
 		pCmdUI->Enable(TRUE);
-		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !b_UseVSFilter && !m_bAudioOnly && GetPlaybackMode() != PM_DVD;
+		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !m_pDVS && !m_bAudioOnly && GetPlaybackMode() != PM_DVD;
 		//pCmdUI->Enable(bEnabled);
 	} else if (i == -2) {
 		if (s.m_RenderersSettings.bSideBySide) {
 			CheckMenuRadioItem(ID_SUBTITLES_SUBITEM_START + 7, ID_SUBTITLES_SUBITEM_START + 9, pCmdUI->m_nID);
 		}
-		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !b_UseVSFilter && !m_bAudioOnly && GetPlaybackMode() != PM_DVD;
+		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !m_pDVS && !m_bAudioOnly && GetPlaybackMode() != PM_DVD;
 		//pCmdUI->Enable(bEnabled);
 		pCmdUI->Enable(TRUE);
 	} else if (i == -1) {
 		if (s.m_RenderersSettings.bTopAndBottom) {
 			CheckMenuRadioItem(ID_SUBTITLES_SUBITEM_START + 7, ID_SUBTITLES_SUBITEM_START + 9, pCmdUI->m_nID);
 		}
-		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !b_UseVSFilter && !m_bAudioOnly && GetPlaybackMode() != PM_DVD;
+		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !m_pDVS && !m_bAudioOnly && GetPlaybackMode() != PM_DVD;
 		//pCmdUI->Enable(bEnabled);
 		pCmdUI->Enable(TRUE);
 	}
@@ -9272,57 +9249,54 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 	int splsubcnt = 0;
 	int i = (int)id;
 
-	if (GetPlaybackMode() == PM_FILE && b_UseVSFilter) {
-		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
-		if (pDVS) {
-			if (i == -1) {
-				bool fHideSubtitles = false;
-				pDVS->get_HideSubtitles(&fHideSubtitles);
-				fHideSubtitles = !fHideSubtitles;
-				pDVS->put_HideSubtitles(fHideSubtitles);
-			} else {
-				int nLangs;
-				if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
+	if (GetPlaybackMode() == PM_FILE && m_pDVS) {
+		if (i == -1) {
+			bool fHideSubtitles = false;
+			m_pDVS->get_HideSubtitles(&fHideSubtitles);
+			fHideSubtitles = !fHideSubtitles;
+			m_pDVS->put_HideSubtitles(fHideSubtitles);
+		} else {
+			int nLangs;
+			if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 
-					int subcount = GetStreamCount(2);
-					if (subcount) {
-						CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
-						DWORD cStreams = 0;
-						pSS->Count(&cStreams);
+				int subcount = GetStreamCount(2);
+				if (subcount) {
+					CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
+					DWORD cStreams = 0;
+					pSS->Count(&cStreams);
 
-						if (nLangs > 1) {
-							if (i < (nLangs-1)) {
-								pDVS->put_SelectedLanguage(i);
-								return;
-							} else {
-								pDVS->put_SelectedLanguage(nLangs - 1);
-								id -= (nLangs - 1);
-							}
-						}
-
-						for (int m = 0, j = cStreams; m < j; m++) {
-							DWORD dwGroup = DWORD_MAX;
-
-							if (FAILED(pSS->Info(m, NULL, NULL, NULL, &dwGroup, NULL, NULL, NULL))) {
-								continue;
-							}
-
-							if (dwGroup != 2) {
-								continue;
-							}
-
-							if (id == 0) {
-								pSS->Enable(m, AMSTREAMSELECTENABLE_ENABLE);
-								return;
-							}
-
-							id--;
+					if (nLangs > 1) {
+						if (i < (nLangs-1)) {
+							m_pDVS->put_SelectedLanguage(i);
+							return;
+						} else {
+							m_pDVS->put_SelectedLanguage(nLangs - 1);
+							id -= (nLangs - 1);
 						}
 					}
 
-					if (i <= (nLangs-1)) {
-						pDVS->put_SelectedLanguage(i);
+					for (int m = 0, j = cStreams; m < j; m++) {
+						DWORD dwGroup = DWORD_MAX;
+
+						if (FAILED(pSS->Info(m, NULL, NULL, NULL, &dwGroup, NULL, NULL, NULL))) {
+							continue;
+						}
+
+						if (dwGroup != 2) {
+							continue;
+						}
+
+						if (id == 0) {
+							pSS->Enable(m, AMSTREAMSELECTENABLE_ENABLE);
+							return;
+						}
+
+						id--;
 					}
+				}
+
+				if (i <= (nLangs-1)) {
+					m_pDVS->put_SelectedLanguage(i);
 				}
 			}
 		}
@@ -13146,12 +13120,17 @@ size_t CMainFrame::GetSubSelIdx()
 void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 {
 	AppSettings& s = AfxGetAppSettings();
-	CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
-	b_UseVSFilter = (pDVS != NULL);
 
-	if (pDVS) {
+	BeginEnumFilters(m_pGB, pEF, pBF) {
+		if (m_pDVS = pBF) {
+			break;
+		}
+	}
+	EndEnumFilters;
+
+	if (m_pDVS) {
 		int nLangs;
-		if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
+		if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 			subarray.RemoveAll();
 
 			int subcount = GetStreamCount(2);
@@ -13159,7 +13138,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			if (subcount) {
 				for (int i = 0; i < nLangs - 1; i++) {
 					WCHAR *pName;
-					if (SUCCEEDED(pDVS->get_LanguageName(i, &pName)) && pName) {
+					if (SUCCEEDED(m_pDVS->get_LanguageName(i, &pName)) && pName) {
 						Stream substream;
 						substream.Filter	= 1;
 						substream.Num		= i;
@@ -13212,14 +13191,14 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			} else {
 				for (int i = 0; i < nLangs; i++) {
 					WCHAR *pName;
-					if (SUCCEEDED(pDVS->get_LanguageName(i, &pName)) && pName) {
+					if (SUCCEEDED(m_pDVS->get_LanguageName(i, &pName)) && pName) {
 						Stream substream;
 						substream.Filter	= 1;
 						substream.Num		= i;
 						substream.Index		= i;
 						substream.Name		= pName;
 
-						if (CComQIPtr<IDirectVobSub3> pDVS3 = pDVS) {
+						if (CComQIPtr<IDirectVobSub3> pDVS3 = m_pDVS) {
 							int nType = 0;
 							pDVS3->get_LanguageType(i, &nType);
 							substream.Ext = !!nType;
@@ -13235,12 +13214,14 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			if (s.fUseInternalSelectTrackLogic) {
 				OnNavMixStreamSubtitleSelectSubMenu(GetSubSelIdx(), 2);
 			} else if (subcount && !s.fPrioritizeExternalSubtitles) {
-				pDVS->put_SelectedLanguage(nLangs - 1);
+				m_pDVS->put_SelectedLanguage(nLangs - 1);
 			}
 		}
+
+		return;
 	}
 
-	if (!b_UseVSFilter && m_pCAP && !m_bAudioOnly) {
+	if (m_pCAP && !m_bAudioOnly) {
 		Stream substream;
 		subarray.RemoveAll();
 		int checkedsplsub	= 0;
@@ -13791,7 +13772,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			}
 		}
 
-		b_UseReclock = (FindFilter(CLSID_ReClock, m_pGB) != NULL);
+		m_bUseReclock = (FindFilter(CLSID_ReClock, m_pGB) != NULL);
 
 		if (pFileData) {
 			if (pFileData->rtStart > 0 && m_pMS) {
@@ -13906,6 +13887,7 @@ void CMainFrame::CloseMediaPrivate()
 	m_pMainFSF.Release();
 	m_pMainSourceFilter.Release();
 	m_pSwitcherFilter.Release();
+	m_pDVS.Release();
 
 	if (m_pGB) {
 		m_pGB->RemoveFromROT();
@@ -14538,98 +14520,95 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 
-		if (b_UseVSFilter) {
-			CComQIPtr<IDirectVobSub> pDVS	= GetVSFilter();
+		if (m_pDVS) {
 			CComQIPtr<IAMStreamSelect> pSS	= m_pMainSourceFilter;
-			if (pDVS) {
-				int nLangs;
-				if (SUCCEEDED(pDVS->get_LanguageCount(&nLangs)) && nLangs) {
+			int nLangs;
+			if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 
-					bool fHideSubtitles = false;
-					pDVS->get_HideSubtitles(&fHideSubtitles);
-					pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | (!fHideSubtitles ? MF_ENABLED : MF_DISABLED), id++, ResStr(IDS_SUBTITLES_ENABLE));
-					pSub->AppendMenu(MF_SEPARATOR);
+				bool fHideSubtitles = false;
+				m_pDVS->get_HideSubtitles(&fHideSubtitles);
+				pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | (!fHideSubtitles ? MF_ENABLED : MF_DISABLED), id++, ResStr(IDS_SUBTITLES_ENABLE));
+				pSub->AppendMenu(MF_SEPARATOR);
 
-					int subcount = GetStreamCount(dwSelGroup);
-					if (subcount) {
-						int iSelectedLanguage = 0;
-						pDVS->get_SelectedLanguage(&iSelectedLanguage);
+				int subcount = GetStreamCount(dwSelGroup);
+				if (subcount) {
+					int iSelectedLanguage = 0;
+					m_pDVS->get_SelectedLanguage(&iSelectedLanguage);
 
-						if (nLangs > 1) {
-							for (int i = 0; i < nLangs - 1; i++) {
-								WCHAR *pName = NULL;
-								pDVS->get_LanguageName(i, &pName);
-								CString streamName(pName);
-								CoTaskMemFree(pName);
-
-								UINT flags = MF_BYCOMMAND | MF_STRING | (!fHideSubtitles ? MF_ENABLED : MF_DISABLED);
-								if (i == iSelectedLanguage) {
-									flags |= MF_CHECKED | MFT_RADIOCHECK;
-								}
-
-								streamName.Replace(_T("&"), _T("&&"));
-								pSub->AppendMenu(flags, id++, streamName);
-							}
-
-							pSub->AppendMenu(MF_SEPARATOR);
-						}
-
-						DWORD cStreams;
-						pSS->Count(&cStreams);
-						UINT baseid = id;
-
-						for (int i = 0, j = cStreams; i < j; i++) {
-							DWORD dwFlags	= DWORD_MAX;
-							DWORD dwGroup	= DWORD_MAX;
-							LCID lcid		= DWORD_MAX;
-							WCHAR* pszName = NULL;
-
-							if (FAILED(pSS->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))
-									|| !pszName) {
-								continue;
-							}
-
-							CString name(pszName);
-
-							if (pszName) {
-								CoTaskMemFree(pszName);
-							}
-
-							if (dwGroup != dwSelGroup) {
-								continue;
-							}
-
-							CString str = FormatStreamName(name, lcid, id - baseid);
+					if (nLangs > 1) {
+						for (int i = 0; i < nLangs - 1; i++) {
+							WCHAR *pName = NULL;
+							m_pDVS->get_LanguageName(i, &pName);
+							CString streamName(pName);
+							CoTaskMemFree(pName);
 
 							UINT flags = MF_BYCOMMAND | MF_STRING | (!fHideSubtitles ? MF_ENABLED : MF_DISABLED);
-							if (dwFlags && iSelectedLanguage == (nLangs - 1)) {
+							if (i == iSelectedLanguage) {
 								flags |= MF_CHECKED | MFT_RADIOCHECK;
 							}
 
-							str.Replace(_T("&"), _T("&&"));
-							pSub->AppendMenu(flags, id++, str);
+							streamName.Replace(_T("&"), _T("&&"));
+							pSub->AppendMenu(flags, id++, streamName);
 						}
 
-						return;
+						pSub->AppendMenu(MF_SEPARATOR);
 					}
 
-					int iSelectedLanguage = 0;
-					pDVS->get_SelectedLanguage(&iSelectedLanguage);
+					DWORD cStreams;
+					pSS->Count(&cStreams);
+					UINT baseid = id;
 
-					for (int i = 0; i < nLangs; i++) {
-						WCHAR *pName = NULL;
-						pDVS->get_LanguageName(i, &pName);
-						CString streamName(pName);
-						CoTaskMemFree(pName);
+					for (int i = 0, j = cStreams; i < j; i++) {
+						DWORD dwFlags	= DWORD_MAX;
+						DWORD dwGroup	= DWORD_MAX;
+						LCID lcid		= DWORD_MAX;
+						WCHAR* pszName = NULL;
+
+						if (FAILED(pSS->Info(i, NULL, &dwFlags, &lcid, &dwGroup, &pszName, NULL, NULL))
+								|| !pszName) {
+							continue;
+						}
+
+						CString name(pszName);
+
+						if (pszName) {
+							CoTaskMemFree(pszName);
+						}
+
+						if (dwGroup != dwSelGroup) {
+							continue;
+						}
+
+						CString str = FormatStreamName(name, lcid, id - baseid);
 
 						UINT flags = MF_BYCOMMAND | MF_STRING | (!fHideSubtitles ? MF_ENABLED : MF_DISABLED);
-						if (i == iSelectedLanguage) {
+						if (dwFlags && iSelectedLanguage == (nLangs - 1)) {
 							flags |= MF_CHECKED | MFT_RADIOCHECK;
 						}
 
-						streamName.Replace(_T("&"), _T("&&"));
-						pSub->AppendMenu(flags, id++, streamName);
+						str.Replace(_T("&"), _T("&&"));
+						pSub->AppendMenu(flags, id++, str);
 					}
+
+					return;
+				}
+
+				int iSelectedLanguage = 0;
+				m_pDVS->get_SelectedLanguage(&iSelectedLanguage);
+
+				for (int i = 0; i < nLangs; i++) {
+					WCHAR *pName = NULL;
+					m_pDVS->get_LanguageName(i, &pName);
+					CString streamName(pName);
+					CoTaskMemFree(pName);
+
+					UINT flags = MF_BYCOMMAND | MF_STRING | (!fHideSubtitles ? MF_ENABLED : MF_DISABLED);
+					if (i == iSelectedLanguage) {
+						flags |= MF_CHECKED | MFT_RADIOCHECK;
+					}
+
+					streamName.Replace(_T("&"), _T("&&"));
+					pSub->AppendMenu(flags, id++, streamName);
 				}
 			}
 
@@ -16162,7 +16141,7 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 
 		m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
 
-		if (b_UseReclock) {
+		if (m_bUseReclock) {
 			// Crazy ReClock require delay between seek operation or causes crash in EVR :)
 			Sleep(50);
 		}
@@ -17215,20 +17194,18 @@ afx_msg void CMainFrame::OnShiftSubtitle(UINT nID)
 
 afx_msg void CMainFrame::OnSubtitleDelay(UINT nID)
 {
-	if (b_UseVSFilter) {
-		CComQIPtr<IDirectVobSub> pDVS = GetVSFilter();
-		if (pDVS) {
-			int SubtitleDelay, SubtitleSpeedMul, SubtitleSpeedDiv;
-			if (SUCCEEDED(pDVS->get_SubtitleTiming(&SubtitleDelay, &SubtitleSpeedMul, &SubtitleSpeedDiv))) {
-				if (nID == ID_SUB_DELAY_DOWN) {
-					SubtitleDelay -= AfxGetAppSettings().nSubDelayInterval;
-				} else {
-					SubtitleDelay += AfxGetAppSettings().nSubDelayInterval;
-				}
-				pDVS->put_SubtitleTiming(SubtitleDelay, SubtitleSpeedMul, SubtitleSpeedDiv);
-				SetSubtitleDelay(SubtitleDelay);
+	if (m_pDVS) {
+		int SubtitleDelay, SubtitleSpeedMul, SubtitleSpeedDiv;
+		if (SUCCEEDED(m_pDVS->get_SubtitleTiming(&SubtitleDelay, &SubtitleSpeedMul, &SubtitleSpeedDiv))) {
+			if (nID == ID_SUB_DELAY_DOWN) {
+				SubtitleDelay -= AfxGetAppSettings().nSubDelayInterval;
+			} else {
+				SubtitleDelay += AfxGetAppSettings().nSubDelayInterval;
 			}
+			m_pDVS->put_SubtitleTiming(SubtitleDelay, SubtitleSpeedMul, SubtitleSpeedDiv);
+			SetSubtitleDelay(SubtitleDelay);
 		}
+		
 		return;
 	}
 
@@ -18809,21 +18786,6 @@ CString CMainFrame::GetAltFileName()
 	}
 
 	return ret;
-}
-
-IBaseFilter* CMainFrame::GetVSFilter()
-{
-	IBaseFilter* _pDVS = NULL;
-
-	BeginEnumFilters(m_pGB, pEF, pBF) {
-		if (CComQIPtr<IDirectVobSub> pDVS = pBF) {
-			_pDVS = pBF;
-			break;
-		}
-	}
-	EndEnumFilters;
-
-	return _pDVS;
 }
 
 void CMainFrame::SetupNotifyRenderThread(CAtlArray<HANDLE>& handles)
