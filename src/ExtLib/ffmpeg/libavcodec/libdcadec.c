@@ -63,12 +63,12 @@ static int dcadec_decode_frame(AVCodecContext *avctx, void *data,
 
     if ((ret = dcadec_context_parse(s->ctx, input, input_size)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "dcadec_context_parse() failed: %d (%s)\n", -ret, dcadec_strerror(ret));
-        return ret;//AVERROR_EXTERNAL;
+        return AVERROR_EXTERNAL;
     }
     if ((ret = dcadec_context_filter(s->ctx, &samples, &nsamples, &channel_mask,
                                      &sample_rate, &bits_per_sample, &profile)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "dcadec_context_filter() failed: %d (%s)\n", -ret, dcadec_strerror(ret));
-        return ret;//AVERROR_EXTERNAL;
+        return AVERROR_EXTERNAL;
     }
 
     avctx->channels       = av_get_channel_layout_nb_channels(channel_mask);

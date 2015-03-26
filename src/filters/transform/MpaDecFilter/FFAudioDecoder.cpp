@@ -26,8 +26,6 @@ extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 	#include <ffmpeg/libavutil/intreadwrite.h>
 	#include <ffmpeg/libavutil/opt.h>
-
-	#include <libdcadec/dca_context.h>
 }
 #pragma warning(default: 4005 4244)
 
@@ -206,7 +204,7 @@ CFFAudioDecoder::CFFAudioDecoder()
 	memset(&m_raData, 0, sizeof(m_raData));
 }
 
-bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/* = NULL*/, BOOL bForceDca/* = FALSE*/)
+bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/* = NULL*/)
 {
 	if (nCodecId == AV_CODEC_ID_NONE) {
 		return false;
@@ -231,12 +229,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/*
 		StreamFinish();
 	}
 
-	if (nCodecId == AV_CODEC_ID_DTS && !bForceDca) {
-		m_pAVCodec = avcodec_find_decoder_by_name("libdcadec");
-	} else {
-		m_pAVCodec = avcodec_find_decoder(nCodecId);
-	}
-
+	m_pAVCodec = avcodec_find_decoder(nCodecId);
 	if (m_pAVCodec) {
 		DWORD nSamples, nBytesPerSec;
 		WORD nChannels, nBitsPerSample, nBlockAlign;
@@ -369,19 +362,12 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 		size = used_bytes;
 
 		if (pOut_size > 0) {
-again:
 			avpkt.data = pOut;
 			avpkt.size = pOut_size;
 
 			int ret = avcodec_decode_audio4(m_pAVCtx, m_pFrame, &got_frame, &avpkt);
 			if (ret < 0) {
-				if (nCodecId == AV_CODEC_ID_DTS && ret == -DCADEC_ENOSUP) {
-					Init(nCodecId, NULL, TRUE);
-					goto again;
-				}
-
 				DbgLog((LOG_TRACE, 3, L"CFFAudioDecoder::Decode() : decoding failed despite successfull parsing"));
-
 				av_frame_unref(m_pFrame);
 				return S_FALSE;
 			}
