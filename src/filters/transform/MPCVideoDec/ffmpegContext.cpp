@@ -567,7 +567,7 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 	//}
 
 	if (nPCIVendor == PCIV_nVidia) {
-		if (DriverVersionCheck(VideoDriverVersion, 9, 18, 13, 2018)) { // The video frame size is checked in the driver
+		if (IsWinVistaOrLater() && DriverVersionCheck(VideoDriverVersion, 9, 18, 13, 2018)) { // The video frame size is checked in the driver
 			// For graphics cards with support for 4k, you must install the driver v320.18 and newer.
 			return TRUE;
 			// old check:
