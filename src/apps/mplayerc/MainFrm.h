@@ -63,6 +63,7 @@
 #include "MpcApi.h"
 #include "../../filters/renderer/SyncClock/SyncClock.h"
 #include "../../filters/transform/DecSSFilter/VobFile.h"
+#include "../../filters/transform/VSFilter/IDirectVobSub.h"
 #include <sizecbar/scbarg.h>
 #include <afxinet.h>
 #include <afxmt.h>
@@ -250,6 +251,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CComQIPtr<IBaseFilter>			m_pMainSourceFilter;
 	CComQIPtr<IBaseFilter>			m_pSwitcherFilter;
 	CComQIPtr<IFileSourceFilter>	m_pMainFSF;
+
+	CComQIPtr<IDirectVobSub>		m_pDVS;
 
 	void EnableAutoVolumeControl(bool enable);
 	void SetBalance(int balance);
@@ -1110,12 +1113,9 @@ public:
 	BOOL m_bIsBDPlay;
 	BOOL OpenBD(CString Path, REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
 
-	IBaseFilter*	GetVSFilter();
-	bool			b_UseVSFilter;
+	void CheckMenuRadioItem(UINT first, UINT last, UINT check);
 
-	bool			b_UseReclock;
-
-	void			CheckMenuRadioItem(UINT first, UINT last, UINT check);
+	bool m_bUseReclock;
 
 private:
 	enum TH_STATE {
