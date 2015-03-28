@@ -1126,7 +1126,7 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF()
 
 		int sizehd = 0;
 		if (p + size + 16 <= end) {
-			sizehd = GetDTSHDFrameSize(p + size);
+			sizehd = ParseDTSHDHeader(p + size);
 		} else {
 			break; // need more data
 		}
