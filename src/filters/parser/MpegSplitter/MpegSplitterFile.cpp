@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include <MMReg.h>
 #include "MpegSplitterFile.h"
+#include "../../../DSUtil/AudioParser.h"
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -642,16 +643,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 	const __int64 start		= GetPos();
 	enum stream_type type	= stream_type::unknown;
 
-	BOOL bStreamExists = FALSE;
-	for (int t = stream_type::video; t < stream_type::unknown && !bStreamExists; t++) {
-		if (m_streams[t].Find(s)) {
-			bStreamExists = TRUE;
-		}
-	}
-
 	ULONGLONG stream_type = PES_STREAM_TYPE_ANY;
 	PES_STREAM_TYPE pes_stream_type = INVALID;
-	if (!bStreamExists && GetStreamType(s.pid ? s.pid : s.pesid, pes_stream_type)) {
+	if (GetStreamType(s.pid ? s.pid : s.pesid, pes_stream_type)) {
 		stream_type = 0ULL;
 
 		for (size_t i = 0; i < _countof(PES_types); i++) {
@@ -834,6 +828,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 					Seek(start);
 					dtshdr h;
 					if (Read(h, len, &s.mt, false)) {
+						s.dts.bDTSCore = true;
 						type = stream_type::audio;
 					}
 				}
@@ -887,18 +882,33 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 						type = stream_type::subpic;
 					}
 				}
-			} else if ((!m_AC3CoreOnly) && !m_bOpeningCompleted) {
-				int iProgram;
-				const CHdmvClipInfo::Stream *pClipInfo;
-				const program* pProgram = FindProgram(s.pid, iProgram, pClipInfo);
-				if ((type == stream_type::unknown) && (pProgram != NULL) && AUDIO_STREAM_AC3_TRUE_HD == pProgram->streams[iProgram].type) {
-					stream* source = (stream*)m_streams[stream_type::audio].FindStream(s);
-					if (source && source->mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
+			} else if (!m_bOpeningCompleted && type == stream_type::unknown) {
+				stream* source = (stream*)m_streams[stream_type::audio].FindStream(s);
+				if (source) {
+					if (!m_AC3CoreOnly && pes_stream_type == AUDIO_STREAM_AC3_TRUE_HD && source->mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
+						Seek(start);
 						ac3hdr h;
 						if (Read(h, len, &s.mt, false, false) && s.mt.subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
 							source->mts.push_back(s.mt);
 							source->mts.push_back(source->mt);
 							source->mt = s.mt;
+						}
+					} else if ((pes_stream_type == AUDIO_STREAM_DTS_HD || pes_stream_type == AUDIO_STREAM_DTS_HD_MASTER_AUDIO) && source->dts.bDTSCore && !source->dts.bDTSHD && source->mt.pbFormat) {
+						Seek(start);
+						if (BitRead(32, true) == FCC(DTSHD_SYNC_WORD)) {
+							BYTE* buf = DNew BYTE[len];
+							audioframe_t audioframe;
+							if (ByteRead(buf, len) == S_OK && ParseDTSHDHeader(buf, len, &audioframe)) {
+								WAVEFORMATEX* wfe = (WAVEFORMATEX*)source->mt.pbFormat;
+								wfe->nSamplesPerSec		= audioframe.samplerate;
+								wfe->nChannels			= audioframe.channels;
+								if (audioframe.param1) {
+									wfe->wBitsPerSample = audioframe.param1;
+								}
+
+								source->dts.bDTSHD	= true;
+							}
+							delete [] buf;
 						}
 					}
 				}
@@ -1339,13 +1349,13 @@ void CMpegSplitterFile::UpdatePrograms(CGolombBuffer& gb, WORD pid)
 	}
 }
 
-const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(WORD pid, int &iStream, const CHdmvClipInfo::Stream* &_pClipInfo)
+const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(WORD pid, int &iStream, const CHdmvClipInfo::Stream* &pClipInfo)
 {
 	iStream		= -1;
-	_pClipInfo	= NULL;
+	pClipInfo	= NULL;
 
 	if (m_type == MPEG_TYPES::mpeg_ts) {
-		_pClipInfo = m_ClipInfo.FindStream(pid);
+		pClipInfo = m_ClipInfo.FindStream(pid);
 
 		POSITION pos = m_programs.GetStartPosition();
 		while (pos) {

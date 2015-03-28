@@ -966,7 +966,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
 
 			int sizehd = 0;
 			if (start + size + 16 <= end) {
-				sizehd = GetDTSHDFrameSize(start + size);
+				sizehd = ParseDTSHDHeader(start + size);
 			} else if (!m_bEndOfStream) {
 				break; // need more data
 			}

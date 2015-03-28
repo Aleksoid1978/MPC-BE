@@ -110,17 +110,26 @@ public:
 		bool lang_set;
 		char lang[4];
 
+		struct {
+			bool bDTSCore;
+			bool bDTSHD;
+		} dts;
+
 		enum stream_type {
 			NONE,
 			H264
 		} type;
 
 		stream() {
-			pid			= 0;
-			pesid		= 0;
-			ps1id		= 0;
-			lang_set	= false;
-			type		= stream_type::NONE;
+			pid				= 0;
+			pesid			= 0;
+			ps1id			= 0;
+			lang_set		= false;
+			type			= stream_type::NONE;
+
+			dts.bDTSCore	= false;
+			dts.bDTSHD		= false;
+
 			mt.InitMediaType();
 			memset(lang, 0, _countof(lang));
 		}
@@ -284,7 +293,7 @@ public:
 	void SearchPrograms(__int64 start, __int64 stop);
 	void UpdatePrograms(const trhdr& h);
 	void UpdatePrograms(CGolombBuffer& gb, WORD pid);
-	const program* FindProgram(WORD pid, int &iStream, const CHdmvClipInfo::Stream* &_pClipInfo);
+	const program* FindProgram(WORD pid, int &iStream, const CHdmvClipInfo::Stream* &pClipInfo);
 
 	// program stream map - mpeg-ps
 	PES_STREAM_TYPE m_psm[256];
