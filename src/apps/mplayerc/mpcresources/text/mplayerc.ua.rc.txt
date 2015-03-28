@@ -352,7 +352,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 19		"раз"
 20		"Вивід"
 21		"Автомасштаб:"
-23		"Auto fit factor:"
+23		"Вписати в:"
 27		"Налаштування відкриття файлів"
 28		"Окремий потік для ланцюжка фільтрів"
 30		"Звіт про помилки рендерингу потоків"
@@ -360,9 +360,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 33		"(Наприклад: eng jap swe)"
 34		"Аудіо"
 37		"Уподобання користувача щодо вибору:"
-38		"Control"
-39		"Volume step:"
-41		"Speed step:"
+38		"Регулювання"
+39		"Крок зміни гучності:"
+41		"Крок зміни швидкості відтвор.:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
