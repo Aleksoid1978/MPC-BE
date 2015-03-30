@@ -805,9 +805,9 @@ int ParseDTSHDHeader(BYTE* buf, int nSize/* = 0*/, audioframe_t* audioframe/* = 
 
 	gb.BitRead(8);
 	UINT ss_index = gb.BitRead(2);
-	UINT blownup = gb.BitRead(1);
-	gb.BitRead(8 + 4 * blownup);
-	gb.BitRead(16 + 4 * blownup);
+	gb.BitRead(1);
+	gb.BitRead(8 + 4 * isBlownUpHeader);
+	gb.BitRead(16 + 4 * isBlownUpHeader);
 
 	BYTE static_fields = gb.BitRead(1);
 	if (static_fields) {
@@ -845,7 +845,7 @@ int ParseDTSHDHeader(BYTE* buf, int nSize/* = 0*/, audioframe_t* audioframe/* = 
 	}
 
 	for (UINT i = 0; i < num_assets; i++) {
-		gb.BitRead(16 + 4 * blownup);
+		gb.BitRead(16 + 4 * isBlownUpHeader);
 	}
 
 	for (UINT i = 0; i < num_assets; i++) {

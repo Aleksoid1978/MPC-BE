@@ -606,7 +606,7 @@ UINT CShoutcastStream::SocketThreadProc()
 	DWORD MinQueuePackets = max(10, min(MAXQUEUEPACKETS, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MINQUEUEPACKETS, MINQUEUEPACKETS)));
 	DWORD MaxQueuePackets = max(MinQueuePackets * 2, min(MAXQUEUEPACKETS * 10, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MAXQUEUEPACKETS, MAXQUEUEPACKETS)));
 
-	CAutoPtr<CPacket> m_p;
+	CAtlArray<BYTE> m_p;
 	while (!fExitThread) {
 		{
 			if (m_queue.GetCount() >= MaxQueuePackets) {
@@ -634,16 +634,13 @@ UINT CShoutcastStream::SocketThreadProc()
 		}
 
 		if (m_socket.m_Format == AUDIO_MPEG) {
-			if (!m_p) {
-				m_p.Attach(DNew CPacket());
-			}
-			size_t nSize = m_p->GetCount();
-			m_p->SetCount(nSize + len, 1024);
-			memcpy(m_p->GetData() + nSize, pData, (size_t)len);
+			size_t nSize = m_p.GetCount();
+			m_p.SetCount(nSize + len, 1024);
+			memcpy(m_p.GetData() + nSize, pData, (size_t)len);
 
-			if (m_p->GetCount() > MPA_FRAME_SIZE) {
-				BYTE* start	= m_p->GetData();
-				BYTE* end	= start + m_p->GetCount();
+			if (m_p.GetCount() > MPA_FRAME_SIZE) {
+				BYTE* start	= m_p.GetData();
+				BYTE* end	= start + m_p.GetCount();
 
 				for(;;) {
 					MOVE_TO_MPA_START_CODE(start, end);
@@ -683,21 +680,18 @@ UINT CShoutcastStream::SocketThreadProc()
 					}
 				}
 
-				if (start > m_p->GetData()) {
-					m_p->RemoveAt(0, start - m_p->GetData());
+				if (start > m_p.GetData()) {
+					m_p.RemoveAt(0, start - m_p.GetData());
 				}
 			}
 		} else if (m_socket.m_Format == AUDIO_AAC) {
-			if (!m_p) {
-				m_p.Attach(DNew CPacket());
-			}
-			size_t nSize = m_p->GetCount();
-			m_p->SetCount(nSize + len, 1024);
-			memcpy(m_p->GetData() + nSize, pData, (size_t)len);
+			size_t nSize = m_p.GetCount();
+			m_p.SetCount(nSize + len, 1024);
+			memcpy(m_p.GetData() + nSize, pData, (size_t)len);
 
-			if (m_p->GetCount() > ADTS_FRAME_SIZE) {
-				BYTE* start	= m_p->GetData();
-				BYTE* end	= start + m_p->GetCount();
+			if (m_p.GetCount() > ADTS_FRAME_SIZE) {
+				BYTE* start	= m_p.GetData();
+				BYTE* end	= start + m_p.GetCount();
 
 				for(;;) {
 					MOVE_TO_AAC_START_CODE(start, end);
@@ -737,14 +731,12 @@ UINT CShoutcastStream::SocketThreadProc()
 					}
 				}
 
-				if (start > m_p->GetData()) {
-					m_p->RemoveAt(0, start - m_p->GetData());
+				if (start > m_p.GetData()) {
+					m_p.RemoveAt(0, start - m_p.GetData());
 				}
 			}
 		}
 	}
-
-	m_p.Free();
 
 	soc.Close();
 	m_hSocket = INVALID_SOCKET;
