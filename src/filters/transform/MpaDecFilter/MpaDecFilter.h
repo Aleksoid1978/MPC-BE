@@ -110,7 +110,6 @@ protected:
 		EAC3,
 		TRUEHD,
 		DTSHD,
-		DTSFORCE,
 		BTCOUNT
 	};
 	BOOL			m_bBitstreamSupported[BTCOUNT];

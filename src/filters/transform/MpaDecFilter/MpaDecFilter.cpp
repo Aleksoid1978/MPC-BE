@@ -606,10 +606,10 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	len += (long)bufflen;
 
 	if (m_bBitstreamSupported[SPDIF]) {
-		if (GetSPDIF(ac3) && (nCodecId == AV_CODEC_ID_AC3)) {
+		if (GetSPDIF(ac3) && nCodecId == AV_CODEC_ID_AC3) {
 			return ProcessAC3_SPDIF();
 		}
-		if (GetSPDIF(dts) && (nCodecId == AV_CODEC_ID_DTS)) {
+		if (GetSPDIF(dts) && nCodecId == AV_CODEC_ID_DTS) {
 			return ProcessDTS_SPDIF();
 		}
 	}
@@ -1133,17 +1133,6 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF()
 
 		if (p + size + sizehd > end) {
 			break; // need more data
-		}
-
-		if (GetSPDIF(dtshd) && !m_bBitstreamSupported[DTSHD] && !m_bBitstreamSupported[DTSFORCE]) {
-			CMediaType mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
-			HRESULT hr = m_pOutput->GetConnected()->QueryAccept(&mt);
-
-			if (hr == S_OK) {
-				m_bBitstreamSupported[DTSHD] = TRUE;
-			} else {
-				m_bBitstreamSupported[DTSFORCE] = TRUE;
-			}
 		}
 
 		bool usehdmi = sizehd && GetSPDIF(dtshd) && m_bBitstreamSupported[DTSHD];
