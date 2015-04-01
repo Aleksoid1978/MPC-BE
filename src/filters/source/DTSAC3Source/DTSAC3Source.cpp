@@ -258,12 +258,14 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		audioframe_t aframe;
 
 		// DTS & DTS-HD
+		BOOL x96k = FALSE;
 		if (m_streamtype == DTS && ParseDTSHeader(buf, &aframe)) {
 			// DTS header
 			int fsize     = aframe.size;
 			m_samplerate  = aframe.samplerate;
 			m_channels    = aframe.channels;
 			m_framelength = aframe.samples;
+			x96k          = aframe.param2;
 
 			// DTS-HD header and zero padded
 			DWORD sync = -1;
@@ -371,7 +373,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		}
 
 		if (m_samplerate > 0) {
-			m_AvgTimePerFrame = 10000000i64 * m_framelength / m_samplerate;
+			m_AvgTimePerFrame = (10000000i64 * m_framelength / m_samplerate) << x96k;
 		}
 
 		m_rtDuration = m_AvgTimePerFrame * (m_dataEnd - m_dataStart) / m_framesize;

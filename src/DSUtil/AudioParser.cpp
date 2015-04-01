@@ -770,6 +770,13 @@ int ParseDTSHeader(const BYTE* buf, audioframe_t* audioframe)
 		if (audioframe->samples < 6 * 32 || audioframe->samplerate == 0) {
 			return 0;
 		}
+
+		BYTE ext_audio_id = (hdr[10] & 0xE0) >> 5;
+		BYTE ext_audio_coding = (hdr[10] & 0x10) >> 4;
+		if (ext_audio_id == 2 && ext_audio_coding == 1) {
+			audioframe->param2 = 1;
+			audioframe->samplerate <<= 1;
+		}
 	}
 
 	return frame_size;

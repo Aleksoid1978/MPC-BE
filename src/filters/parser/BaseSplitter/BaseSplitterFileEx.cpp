@@ -1218,6 +1218,12 @@ bool CBaseSplitterFileEx::Read(dtshdr& h, int len, CMediaType* pmt, bool find_sy
 			wfe.nSamplesPerSec = freq[h.sfreq];
 		}
 
+		BOOL x96k = (h.ext_descr == 2 && h.ext_coding == 1);
+		if (x96k) {
+			// x96k extension present
+			wfe.nSamplesPerSec <<= 1;
+		}
+
 		/*static int rate[] = {
 			  32000,   56000,   64000,   96000,
 			  112000,  128000,  192000,  224000,
@@ -1230,7 +1236,7 @@ bool CBaseSplitterFileEx::Read(dtshdr& h, int len, CMediaType* pmt, bool find_sy
 		};
 		int nom_bitrate = rate[h.rate];*/
 
-		unsigned int bitrate = (unsigned int)(8ui64 * h.framebytes * wfe.nSamplesPerSec / (h.nblocks * 32));
+		unsigned int bitrate = (unsigned int)(8ui64 * h.framebytes * wfe.nSamplesPerSec / (h.nblocks * 32)) >> x96k;
 
 		wfe.nAvgBytesPerSec	= (bitrate + 4) / 8;
 		wfe.nBlockAlign		= h.framebytes;
