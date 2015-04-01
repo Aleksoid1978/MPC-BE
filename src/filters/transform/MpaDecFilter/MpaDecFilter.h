@@ -121,6 +121,8 @@ protected:
 	HRESULT AC3Encode(BYTE* pBuff, int size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
 #endif
 
+	BOOL ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL bEOF = FALSE);
+
 	HRESULT ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF = FALSE);
 
 	HRESULT ProcessLPCM();
@@ -129,7 +131,7 @@ protected:
 	HRESULT ProcessAC3_SPDIF();
 	HRESULT ProcessEAC3_SPDIF();
 	HRESULT ProcessTrueHD_SPDIF();
-	HRESULT ProcessDTS_SPDIF();
+	HRESULT ProcessDTS_SPDIF(BOOL bEOF = FALSE);
 	HRESULT ProcessPS2PCM();
 	HRESULT ProcessPS2ADPCM();
 	HRESULT ProcessPCMraw();
