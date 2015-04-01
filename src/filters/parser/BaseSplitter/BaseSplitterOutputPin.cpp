@@ -31,7 +31,7 @@
 // CBaseSplitterOutputPin
 //
 
-CBaseSplitterOutputPin::CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int nBuffers, int factor)
+CBaseSplitterOutputPin::CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, double dFactor/* = 1.0*/)
 	: CBaseOutputPin(NAME("CBaseSplitterOutputPin"), pFilter, pLock, phr, GetMediaTypeDesc(mts, pName, pFilter))
 	, m_hrDeliver(S_OK) // just in case it were asked before the worker thread could be created and reset it
 	, m_fFlushing(false)
@@ -40,28 +40,26 @@ CBaseSplitterOutputPin::CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWS
 	, m_rtPrev(0)
 	, m_rtOffset(0)
 	, m_MinQueuePackets((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMinQueuePackets())
-	, m_MaxQueuePackets((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMaxQueuePackets() * factor)
+	, m_MaxQueuePackets((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMaxQueuePackets() * dFactor)
 	, m_MinQueueSize((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMinQueueSize())
 	, m_MaxQueueSize((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMaxQueueSize())
 {
 	m_mts.Copy(mts);
-	m_nBuffers = max(nBuffers, 1);
 	memset(&m_brs, 0, sizeof(m_brs));
 	m_brs.rtLastDeliverTime = INVALID_TIME;
 }
 
-CBaseSplitterOutputPin::CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int nBuffers, int factor)
+CBaseSplitterOutputPin::CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, double dFactor/* = 1.0*/)
 	: CBaseOutputPin(NAME("CBaseSplitterOutputPin"), pFilter, pLock, phr, pName)
 	, m_hrDeliver(S_OK) // just in case it were asked before the worker thread could be created and reset it
 	, m_fFlushing(false)
 	, m_fFlushed(false)
 	, m_eEndFlush(TRUE)
 	, m_MinQueuePackets((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMinQueuePackets())
-	, m_MaxQueuePackets((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMaxQueuePackets() * factor)
+	, m_MaxQueuePackets((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMaxQueuePackets() * dFactor)
 	, m_MinQueueSize((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMinQueueSize())
 	, m_MaxQueueSize((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMaxQueueSize())
 {
-	m_nBuffers = max(nBuffers, 1);
 	memset(&m_brs, 0, sizeof(m_brs));
 	m_brs.rtLastDeliverTime = INVALID_TIME;
 }

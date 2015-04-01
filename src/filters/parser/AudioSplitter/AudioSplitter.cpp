@@ -164,7 +164,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			CAtlArray<CMediaType> mts;
 			mts.Add(mt);
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, m_pAudioFile->GetName() + L" Audio Output", this, this, &hr));
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, m_pAudioFile->GetName() + L" Audio Output", this, this, &hr, 0.1));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 		}
 	}
@@ -235,13 +235,11 @@ bool CAudioSplitterFilter::DemuxLoop()
 
 	while (m_pAudioFile && SUCCEEDED(hr) && !CheckRequest(NULL)) {
 		CAutoPtr<CPacket> p(DNew CPacket());
+		p->bSyncPoint = TRUE;
 
 		if (!m_pAudioFile->GetAudioFrame(p, m_rtime)) {
 			break;
 		}
-
-		p->TrackNumber	= 0;
-		p->bSyncPoint	= TRUE;
 
 		m_rtime = p->rtStop;
 

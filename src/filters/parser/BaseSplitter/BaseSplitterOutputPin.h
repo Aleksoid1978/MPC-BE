@@ -39,7 +39,7 @@ class CBaseSplitterOutputPin
 {
 protected:
 	CAtlArray<CMediaType> m_mts;
-	int m_nBuffers;
+	int m_nBuffers = 1;
 
 private:
 	CPacketQueue m_queue;
@@ -103,8 +103,8 @@ protected:
 	STDMETHODIMP GetPreroll(LONGLONG* pllPreroll);
 
 public:
-	CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int nBuffers = 0, int factor = 1);
-	CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int nBuffers = 0, int factor = 1);
+	CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, double dFactor = 1.0);
+	CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, double dFactor = 1.0);
 	virtual ~CBaseSplitterOutputPin();
 
 	DECLARE_IUNKNOWN;

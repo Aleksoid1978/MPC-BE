@@ -140,7 +140,7 @@ class CMpegSplitterOutputPin : public CBaseSplitterParserOutputPin
 {
 	CMpegSplitterFile::stream_type m_type;
 public:
-	CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpegSplitterFile::stream_type type, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, int factor);
+	CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpegSplitterFile::stream_type type, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, double dFactor);
 
 	HRESULT CheckMediaType(const CMediaType* pmt);
 
