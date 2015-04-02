@@ -63,6 +63,7 @@ public:
 
 	bool    Init(enum AVCodecID nCodecId, CTransformInputPin* m_pInput = NULL);
 	void    SetDRC(bool fDRC);
+	void    SetStereoDownmix(bool stereodownmix);
 
 	HRESULT RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOut);
 	HRESULT Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, int& size, CAtlArray<BYTE>& BuffOut, SampleFormat& samplefmt);
