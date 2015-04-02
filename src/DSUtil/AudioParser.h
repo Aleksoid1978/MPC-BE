@@ -58,15 +58,14 @@ struct audioframe_t {
 	}
 };
 
-int ParseAC3IEC61937Header(const BYTE* buf); // need >= 8 bytes
-
-int ParseMPAHeader        (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 4 bytes,  param1 = bitrate, param2 = MP3 flag
-int ParseMPEG1Header      (const BYTE* buf, MPEG1WAVEFORMAT* mpeg1wf);        // need >= 4 bytes
-int ParseMP3Header        (const BYTE* buf, MPEGLAYER3WAVEFORMAT* mp3wf);     // need >= 4 bytes (experimental)
-int ParseAC3Header        (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 7 bytes,  param1 = bitrate
-int ParseEAC3Header       (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 6 bytes,  param1 = eac3 frame type
-int ParseMLPHeader        (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 12 bytes, param1 = bitdepth, param2 = TrueHD flag
-int ParseDTSHeader        (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 10 bytes, param1 = transmission bitrate
-int ParseDTSHDHeader      (BYTE* buf, int nSize = 0, audioframe_t* audioframe = NULL); // need >= 20 bytes,  param1 = bitrate, param2 = x96k extension flag
-int ParseHdmvLPCMHeader   (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 4 bytes,  param1 = bitdepth, param2 = bytes per frame
-int ParseADTSAACHeader    (const BYTE* buf, audioframe_t* audioframe = NULL); // need >= 7 bytes,  param1 = header size
+int ParseAC3IEC61937Header	(const BYTE* buf);											// need >= 8 bytes
+int ParseMPAHeader			(const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 4 bytes,  param1 = bitrate, param2 = MP3 flag
+int ParseMPEG1Header		(const BYTE* buf, MPEG1WAVEFORMAT* mpeg1wf);				// need >= 4 bytes
+int ParseMP3Header			(const BYTE* buf, MPEGLAYER3WAVEFORMAT* mp3wf);				// need >= 4 bytes (experimental)
+int ParseAC3Header			(const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 7 bytes,  param1 = bitrate
+int ParseEAC3Header			(const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 6 bytes,  param1 = eac3 frame type
+int ParseMLPHeader			(const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 12 bytes, param1 = bitdepth, param2 = TrueHD flag
+int ParseDTSHeader			(const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 10 bytes, param1 = transmission bitrate, param2 = x96k extension flag
+int ParseDTSHDHeader		(BYTE* buf, int nSize = 0, audioframe_t* audioframe = NULL);// need >= 20 bytes, param1 = bitdepth
+int ParseHdmvLPCMHeader		(const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 4 bytes,  param1 = bitdepth, param2 = bytes per frame
+int ParseADTSAACHeader		(const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 7 bytes,  param1 = header size
