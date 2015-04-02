@@ -255,7 +255,7 @@ DWORD CBaseSplitterFilter::ThreadProc()
 			return 0;
 		}
 
-		SetThreadPriority(m_hThread, m_priority = THREAD_PRIORITY_NORMAL);
+		SetThreadPriority(m_hThread, m_priority);
 
 		m_rtStart = m_rtNewStart;
 		m_rtStop = m_rtNewStop;
@@ -360,37 +360,12 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 
 bool CBaseSplitterFilter::IsAnyPinDrying(DWORD MaxQueuePackets)
 {
-	size_t totalcount = 0, totalsize = 0;
-
 	POSITION pos = m_pActivePins.GetHeadPosition();
 	while (pos) {
 		CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
-		size_t count	= pPin->QueueCount();
-		size_t size		= pPin->QueueSize();
-		if (!pPin->IsDiscontinuous() && (count < m_MinQueuePackets || size < GetMinQueueSize())) {
-			if (m_priority != THREAD_PRIORITY_BELOW_NORMAL && (count < m_MinQueuePackets/3 || size < GetMinQueueSize()/3)) {
-				POSITION pos = m_pOutputs.GetHeadPosition();
-				while (pos) {
-					m_pOutputs.GetNext(pos)->SetThreadPriority(THREAD_PRIORITY_BELOW_NORMAL);
-				}
-				m_priority = THREAD_PRIORITY_BELOW_NORMAL;
-			}
+		if (!pPin->IsDiscontinuous() && (pPin->QueueCount() < m_MinQueuePackets || pPin->QueueSize() < m_MinQueueSize)) {
 			return true;
 		}
-		totalcount += count;
-		totalsize += size;
-	}
-
-	if (m_priority != THREAD_PRIORITY_NORMAL && (totalcount > MaxQueuePackets*2/3 || totalsize > GetMaxQueueSize()*2/3)) {
-		POSITION pos = m_pOutputs.GetHeadPosition();
-		while (pos) {
-			m_pOutputs.GetNext(pos)->SetThreadPriority(THREAD_PRIORITY_NORMAL);
-		}
-		m_priority = THREAD_PRIORITY_NORMAL;
-	}
-
-	if (totalcount < m_MaxQueuePackets && totalsize < GetMaxQueueSize()) {
-		return true;
 	}
 
 	return false;
