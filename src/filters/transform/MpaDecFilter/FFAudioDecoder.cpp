@@ -333,6 +333,19 @@ void CFFAudioDecoder::SetDRC(bool fDRC)
 	}
 }
 
+void CFFAudioDecoder::SetStereoDownmix(bool stereodownmix)
+{
+	if (m_pAVCtx) {
+		AVCodecID codec_id = m_pAVCtx->codec_id;
+		if (codec_id == AV_CODEC_ID_AC3
+				|| codec_id == AV_CODEC_ID_EAC3
+				|| codec_id == AV_CODEC_ID_TRUEHD) {
+			av_opt_set_int(m_pAVCtx, "request_channels", stereodownmix ? 2 : 0, AV_OPT_SEARCH_CHILDREN);
+			av_opt_set_int(m_pAVCtx, "request_channel_layout", stereodownmix ? AV_CH_LAYOUT_STEREO : AV_CH_LAYOUT_NATIVE, AV_OPT_SEARCH_CHILDREN);
+		}
+	}
+}
+
 HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, int& size, CAtlArray<BYTE>& BuffOut, SampleFormat& samplefmt)
 {
 	size = 0;
