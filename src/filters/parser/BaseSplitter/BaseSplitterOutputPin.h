@@ -41,6 +41,7 @@ protected:
 	CAtlArray<CMediaType> m_mts;
 	int m_nBuffers = 1;
 
+	CBaseSplitterFilter* pSplitter;
 private:
 	CPacketQueue m_queue;
 
@@ -117,7 +118,7 @@ public:
 	HRESULT GetMediaType(int iPosition, CMediaType* pmt);
 	CMediaType& CurrentMediaType() {return m_mt;}
 
-	STDMETHODIMP Notify(IBaseFilter* pSender, Quality q);
+	STDMETHODIMP Notify(IBaseFilter* pSender, Quality q) { return E_NOTIMPL; }
 
 	// Queueing
 

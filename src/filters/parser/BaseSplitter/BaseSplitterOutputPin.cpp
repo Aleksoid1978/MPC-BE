@@ -33,16 +33,17 @@
 
 CBaseSplitterOutputPin::CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, double dFactor/* = 1.0*/)
 	: CBaseOutputPin(NAME("CBaseSplitterOutputPin"), pFilter, pLock, phr, GetMediaTypeDesc(mts, pName, pFilter))
+	, pSplitter(static_cast<CBaseSplitterFilter*>(m_pFilter))
 	, m_hrDeliver(S_OK) // just in case it were asked before the worker thread could be created and reset it
 	, m_fFlushing(false)
 	, m_fFlushed(false)
 	, m_eEndFlush(TRUE)
 	, m_rtPrev(0)
 	, m_rtOffset(0)
-	, m_MinQueuePackets((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMinQueuePackets())
-	, m_MaxQueuePackets((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMaxQueuePackets() * dFactor)
-	, m_MinQueueSize((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMinQueueSize())
-	, m_MaxQueueSize((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMaxQueueSize())
+	, m_MinQueuePackets(max(10, pSplitter->GetMinQueuePackets() * (dFactor < 1.0 ? dFactor : 1)))
+	, m_MaxQueuePackets(max(m_MinQueuePackets * 2, pSplitter->GetMaxQueuePackets() * dFactor))
+	, m_MinQueueSize(pSplitter->GetMinQueueSize())
+	, m_MaxQueueSize(pSplitter->GetMaxQueueSize())
 {
 	m_mts.Copy(mts);
 	memset(&m_brs, 0, sizeof(m_brs));
@@ -51,14 +52,16 @@ CBaseSplitterOutputPin::CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWS
 
 CBaseSplitterOutputPin::CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, double dFactor/* = 1.0*/)
 	: CBaseOutputPin(NAME("CBaseSplitterOutputPin"), pFilter, pLock, phr, pName)
+	, pSplitter(static_cast<CBaseSplitterFilter*>(m_pFilter))
 	, m_hrDeliver(S_OK) // just in case it were asked before the worker thread could be created and reset it
 	, m_fFlushing(false)
 	, m_fFlushed(false)
 	, m_eEndFlush(TRUE)
-	, m_MinQueuePackets((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMinQueuePackets())
-	, m_MaxQueuePackets((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMaxQueuePackets() * dFactor)
-	, m_MinQueueSize((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMinQueueSize())
-	, m_MaxQueueSize((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetMaxQueueSize())
+	, m_MinQueuePackets(max(10, pSplitter->GetMinQueuePackets() * (dFactor < 1.0 ? dFactor : 1)))
+	, m_MaxQueuePackets(max(m_MinQueuePackets * 2, pSplitter->GetMaxQueuePackets() * dFactor))
+	, m_MinQueueSize(pSplitter->GetMinQueueSize())
+	, m_MaxQueueSize(pSplitter->GetMaxQueueSize())
+
 {
 	memset(&m_brs, 0, sizeof(m_brs));
 	m_brs.rtLastDeliverTime = INVALID_TIME;
@@ -73,7 +76,6 @@ STDMETHODIMP CBaseSplitterOutputPin::NonDelegatingQueryInterface(REFIID riid, vo
 	CheckPointer(ppv, E_POINTER);
 
 	return
-		//		riid == __uuidof(IMediaSeeking) ? m_pFilter->QueryInterface(riid, ppv) :
 		QI(IMediaSeeking)
 		QI(IPropertyBag)
 		QI(IPropertyBag2)
@@ -85,9 +87,7 @@ STDMETHODIMP CBaseSplitterOutputPin::NonDelegatingQueryInterface(REFIID riid, vo
 HRESULT CBaseSplitterOutputPin::SetName(LPCWSTR pName)
 {
 	CheckPointer(pName, E_POINTER);
-	if (m_pName) {
-		delete [] m_pName;
-	}
+	SAFE_DELETE_ARRAY(m_pName);
 
 	size_t len = wcslen(pName) + 1;
 	m_pName = DNew WCHAR[len];
@@ -150,11 +150,6 @@ HRESULT CBaseSplitterOutputPin::GetMediaType(int iPosition, CMediaType* pmt)
 	*pmt = m_mts[iPosition];
 
 	return S_OK;
-}
-
-STDMETHODIMP CBaseSplitterOutputPin::Notify(IBaseFilter* pSender, Quality q)
-{
-	return E_NOTIMPL;
 }
 
 //
@@ -252,9 +247,9 @@ HRESULT CBaseSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 	}
 
 	while (S_OK == m_hrDeliver
-			&& ((m_queue.GetCount() > (m_MaxQueuePackets*3/2) || m_queue.GetSize() > (m_MaxQueueSize*3/2))
-				|| ((m_queue.GetCount() > m_MaxQueuePackets || m_queue.GetSize() > m_MaxQueueSize)
-					&& !(static_cast<CBaseSplitterFilter*>(m_pFilter))->IsAnyPinDrying(m_MaxQueuePackets)))) {
+			&& (m_queue.GetSize() > m_MaxQueueSize
+				|| m_queue.GetCount() > (m_MaxQueuePackets * 3 / 2)
+				|| (m_queue.GetCount() > m_MaxQueuePackets && !pSplitter->IsAnyPinDrying(m_MaxQueuePackets)))) {
 		Sleep(10);
 	}
 
@@ -368,7 +363,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		return S_OK;
 	}
 
-	DWORD nFlag = (static_cast<CBaseSplitterFilter*>(m_pFilter))->GetFlag();
+	DWORD nFlag = pSplitter->GetFlag();
 
 	if (p->rtStart != INVALID_TIME && (nFlag & PACKET_PTS_DISCONTINUITY)) {
 		// Filter invalid PTS value (if too different from previous packet)
@@ -421,7 +416,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		}
 
 		double dRate = 1.0;
-		if (SUCCEEDED((static_cast<CBaseSplitterFilter*>(m_pFilter))->GetRate(&dRate))) {
+		if (SUCCEEDED(pSplitter->GetRate(&dRate))) {
 			p->rtStart = (REFERENCE_TIME)((double)p->rtStart / dRate);
 			p->rtStop = (REFERENCE_TIME)((double)p->rtStop / dRate);
 		}
@@ -553,85 +548,85 @@ HRESULT CBaseSplitterOutputPin::Deliver(IMediaSample* pSample)
 
 STDMETHODIMP CBaseSplitterOutputPin::GetCapabilities(DWORD* pCapabilities)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->GetCapabilities(pCapabilities);
+	return pSplitter->GetCapabilities(pCapabilities);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::CheckCapabilities(DWORD* pCapabilities)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->CheckCapabilities(pCapabilities);
+	return pSplitter->CheckCapabilities(pCapabilities);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::IsFormatSupported(const GUID* pFormat)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->IsFormatSupported(pFormat);
+	return pSplitter->IsFormatSupported(pFormat);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::QueryPreferredFormat(GUID* pFormat)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->QueryPreferredFormat(pFormat);
+	return pSplitter->QueryPreferredFormat(pFormat);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetTimeFormat(GUID* pFormat)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->GetTimeFormat(pFormat);
+	return pSplitter->GetTimeFormat(pFormat);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::IsUsingTimeFormat(const GUID* pFormat)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->IsUsingTimeFormat(pFormat);
+	return pSplitter->IsUsingTimeFormat(pFormat);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::SetTimeFormat(const GUID* pFormat)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->SetTimeFormat(pFormat);
+	return pSplitter->SetTimeFormat(pFormat);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetDuration(LONGLONG* pDuration)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->GetDuration(pDuration);
+	return pSplitter->GetDuration(pDuration);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetStopPosition(LONGLONG* pStop)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->GetStopPosition(pStop);
+	return pSplitter->GetStopPosition(pStop);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetCurrentPosition(LONGLONG* pCurrent)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->GetCurrentPosition(pCurrent);
+	return pSplitter->GetCurrentPosition(pCurrent);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::ConvertTimeFormat(LONGLONG* pTarget, const GUID* pTargetFormat, LONGLONG Source, const GUID* pSourceFormat)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->ConvertTimeFormat(pTarget, pTargetFormat, Source, pSourceFormat);
+	return pSplitter->ConvertTimeFormat(pTarget, pTargetFormat, Source, pSourceFormat);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::SetPositions(LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->SetPositionsInternal(this, pCurrent, dwCurrentFlags, pStop, dwStopFlags);
+	return pSplitter->SetPositionsInternal(this, pCurrent, dwCurrentFlags, pStop, dwStopFlags);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetPositions(LONGLONG* pCurrent, LONGLONG* pStop)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->GetPositions(pCurrent, pStop);
+	return pSplitter->GetPositions(pCurrent, pStop);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetAvailable(LONGLONG* pEarliest, LONGLONG* pLatest)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->GetAvailable(pEarliest, pLatest);
+	return pSplitter->GetAvailable(pEarliest, pLatest);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::SetRate(double dRate)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->SetRate(dRate);
+	return pSplitter->SetRate(dRate);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetRate(double* pdRate)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->GetRate(pdRate);
+	return pSplitter->GetRate(pdRate);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetPreroll(LONGLONG* pllPreroll)
 {
-	return (static_cast<CBaseSplitterFilter*>(m_pFilter))->GetPreroll(pllPreroll);
+	return pSplitter->GetPreroll(pllPreroll);
 }
