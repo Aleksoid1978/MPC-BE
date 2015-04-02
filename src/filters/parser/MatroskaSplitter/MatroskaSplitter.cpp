@@ -306,18 +306,14 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
 									bg->Block.Parse(m_pBlock, true);
-									if (!(bg->Block.Lacing & 0x80)) {
-										bg->ReferenceBlock.Set(0);    // not a kf
-									}
-
 									bgn.AddTail(bg);
 								}
 								__int64 endpos = m_pFile->GetPos();
 
-								while (bgn.GetCount() && SUCCEEDED(hr)) {
-									CAutoPtr<CMatroskaPacket> p(DNew CMatroskaPacket());
-									p->bg = bgn.RemoveHead();
-									if ((DWORD)p->bg->Block.TrackNumber != pTE->TrackNumber) {
+								POSITION pos = bgn.GetHeadPosition();
+								while (pos) {
+									BlockGroup* bg = bgn.GetNext(pos);
+									if (bg->Block.TrackNumber != pTE->TrackNumber) {
 										continue;
 									}
 
@@ -666,9 +662,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 											CAutoPtr<BlockGroup> bg(DNew BlockGroup());
 											bg->Block.Parse(pBlock, true);
-											if (!(bg->Block.Lacing & 0x80)) {
-												bg->ReferenceBlock.Set(0);    // not a kf
-											}
 											bgn.AddTail(bg);
 										}
 
@@ -862,6 +855,72 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.Add(mt);
 				} else if (CodecID == "A_DTS") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DTS2);
+
+					__int64 pos = m_pFile->GetPos();
+
+					CMatroskaNode Root(m_pFile);
+					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
+					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
+
+					Cluster c;
+					c.ParseTimeCode(m_pCluster);
+
+					if (!m_pBlock) {
+						m_pBlock = m_pCluster->GetFirstBlock();
+					}
+
+					BOOL bIsParse = FALSE;
+					do {
+						CBlockGroupNode bgn;
+
+						if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
+							bgn.Parse(m_pBlock, true);
+						} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
+							CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+							bg->Block.Parse(m_pBlock, true);
+							bgn.AddTail(bg);
+						}
+
+						POSITION pos = bgn.GetHeadPosition();
+						while (pos) {
+							BlockGroup* bg = bgn.GetNext(pos);
+							if (bg->Block.TrackNumber != pTE->TrackNumber) {
+								continue;
+							}
+
+							CBinary* pb = bg->Block.BlockData.GetHead();
+							if (pb) {
+								pTE->Expand(*pb, ContentEncoding::AllFrameContents);
+
+								BYTE* start	= pb->GetData();
+								BYTE* end	= start + pb->GetCount();
+								audioframe_t aframe;
+								int size = ParseDTSHeader(start, &aframe);
+								if (size) {
+									int sizehd = 0;
+									if (start + size + 16 <= end) {
+										sizehd = ParseDTSHDHeader(start + size, pb->GetCount(), &aframe);
+										if (sizehd) {
+											wfe->nChannels			= (WORD)aframe.channels;
+											wfe->nSamplesPerSec		= (DWORD)aframe.samplerate;
+											wfe->wBitsPerSample		= (WORD)aframe.param1;
+											wfe->nBlockAlign		= (WORD)((wfe->nChannels * wfe->wBitsPerSample) / 8);
+											wfe->nAvgBytesPerSec	= 0;
+										}
+									}
+								}
+							}
+								
+							bIsParse = TRUE;
+							break;
+						}
+					} while (m_pBlock->NextBlock() && SUCCEEDED(hr) && !CheckRequest(NULL) && !bIsParse);
+
+					m_pBlock.Free();
+					m_pCluster.Free();
+
+					m_pFile->Seek(pos);
+
 					mts.Add(mt);
 				} else if (CodecID == "A_TTA1") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_TTA1);
@@ -1160,9 +1219,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
 									bg->Block.Parse(pBlock, true);
-									if (!(bg->Block.Lacing & 0x80)) {
-										bg->ReferenceBlock.Set(0); // not a kf
-									}
 									bgn.AddTail(bg);
 								}
 
@@ -1566,9 +1622,6 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 								} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
 									bg->Block.Parse(pBlock, true);
-									if (!(bg->Block.Lacing & 0x80)) {
-										bg->ReferenceBlock.Set(0); // not a kf
-									}
 									bgn.AddTail(bg);
 								}
 
@@ -1768,7 +1821,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 										CAutoPtr<BlockGroup> bg(DNew BlockGroup());
 										bg->Block.Parse(pBlock, true);
 										if (!(bg->Block.Lacing & 0x80)) {
-											bg->ReferenceBlock.Set(0);    // not a kf
+											bg->ReferenceBlock.Set(0); // not a kf
 										}
 										bgn.AddTail(bg);
 									}
@@ -1917,7 +1970,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 				CAutoPtr<BlockGroup> bg(DNew BlockGroup());
 				bg->Block.Parse(m_pBlock, true);
 				if (!(bg->Block.Lacing & 0x80)) {
-					bg->ReferenceBlock.Set(0);    // not a kf
+					bg->ReferenceBlock.Set(0); // not a kf
 				}
 				bgn.AddTail(bg);
 			}
