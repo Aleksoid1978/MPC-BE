@@ -681,12 +681,11 @@ BOOL CMpaDecFilter::ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL 
 #define ENDDATA										\
 		if (p == end) {								\
 			m_buff.RemoveAll();						\
-		} else {									\
+		} else if (p > base) {						\
 			size_t remaining = (size_t)(end - p);	\
 			memmove(base, p, remaining);			\
 			m_buff.SetCount(remaining);				\
 		}
-
 
 HRESULT CMpaDecFilter::ProcessLPCM()
 {

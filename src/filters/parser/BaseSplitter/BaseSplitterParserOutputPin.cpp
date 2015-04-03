@@ -226,6 +226,20 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 
 #define HandleInvalidPacket(size) if (m_p->GetCount() < size) { return S_OK; } // Should be invalid packet
 
+#define BEGINDATA										\
+		BYTE* const base = m_p->GetData();				\
+		BYTE* start = m_p->GetData();					\
+		BYTE* end = start + m_p->GetCount();			\
+
+#define ENDDATA											\
+		if (start == end) {								\
+			m_p->RemoveAll();							\
+		} else if (start > base) {						\
+			size_t remaining = (size_t)(end - start);	\
+			memmove(base, start, remaining);			\
+			m_p->SetCount(remaining);					\
+		}
+
 HRESULT CBaseSplitterParserOutputPin::ParseAAC(CAutoPtr<CPacket> p)
 {
 	if (!m_p) {
@@ -240,8 +254,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAAC(CAutoPtr<CPacket> p)
 
 	HandleInvalidPacket(9);
 
-	BYTE* start	= m_p->GetData();
-	BYTE* end	= start + m_p->GetCount();
+	BEGINDATA;
 
 	for(;;) {
 		MOVE_TO_AAC_START_CODE(start, end);
@@ -272,9 +285,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAAC(CAutoPtr<CPacket> p)
 		}
 	}
 
-	if (start > m_p->GetData()) {
-		m_p->RemoveAt(0, start - m_p->GetData());
-	}
+	ENDDATA;
 
 	return S_OK;
 }
@@ -294,8 +305,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 
 	HandleInvalidPacket(6);
 
-	BYTE* start	= m_p->GetData();
-	BYTE* end	= start + m_p->GetCount();
+	BEGINDATA;
 
 	MOVE_TO_H264_START_CODE(start, end);
 
@@ -396,9 +406,8 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 			p->pmt = NULL;
 		}
 	}
-	if (start > m_p->GetData()) {
-		m_p->RemoveAt(0, start - m_p->GetData());
-	}
+
+	ENDDATA;
 
 	if (m_bEndOfStream) {
 		if (m_pl.GetCount()) {
@@ -542,8 +551,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseHEVC(CAutoPtr<CPacket> p)
 
 	HandleInvalidPacket(6);
 
-	BYTE* start	= m_p->GetData();
-	BYTE* end	= start + m_p->GetCount();
+	BEGINDATA;
 
 	int size = 0;
 
@@ -577,9 +585,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseHEVC(CAutoPtr<CPacket> p)
 		}
 	}
 
-	if (start > m_p->GetData()) {
-		m_p->RemoveAt(0, start - m_p->GetData());
-	}
+	ENDDATA;
 
 	return S_OK;
 }
@@ -598,8 +604,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseVC1(CAutoPtr<CPacket> p)
 
 	HandleInvalidPacket(5);
 
-	BYTE* start = m_p->GetData();
-	BYTE* end = start + m_p->GetCount();
+	BEGINDATA;
 
 	bool bSeqFound = false;
 	while (start <= end - 4) {
@@ -643,9 +648,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseVC1(CAutoPtr<CPacket> p)
 		bSeqFound	= (*(DWORD*)start == 0x0D010000);
 	}
 
-	if (start > m_p->GetData()) {
-		m_p->RemoveAt(0, start - m_p->GetData());
-	}
+	ENDDATA;
 
 	return S_OK;
 }
@@ -681,8 +684,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAC3(CAutoPtr<CPacket> p)
 
 	HandleInvalidPacket(8);
 
-	BYTE* start	= m_p->GetData();
-	BYTE* end	= start + m_p->GetCount();
+	BEGINDATA;
 
 	for(;;) {
 		MOVE_TO_AC3_START_CODE(start, end);
@@ -713,9 +715,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAC3(CAutoPtr<CPacket> p)
 		}
 	}
 
-	if (start > m_p->GetData()) {
-		m_p->RemoveAt(0, start - m_p->GetData());
-	}
+	ENDDATA;
 
 	return S_OK;
 }
@@ -734,8 +734,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseTrueHD(CAutoPtr<CPacket> p, BOOL bChe
 
 	HandleInvalidPacket(16);
 
-	BYTE* start	= m_p->GetData();
-	BYTE* end	= start + m_p->GetCount();
+	BEGINDATA;
 
 	while (start + 16 <= end) {
 		audioframe_t aframe;
@@ -775,9 +774,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseTrueHD(CAutoPtr<CPacket> p, BOOL bChe
 		start += size;
 	}
 
-	if (start > m_p->GetData()) {
-		m_p->RemoveAt(0, start - m_p->GetData());
-	}
+	ENDDATA;
 
 	return S_OK;
 }
@@ -796,8 +793,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseDirac(CAutoPtr<CPacket> p)
 
 	HandleInvalidPacket(5);
 
-	BYTE* start	= m_p->GetData();
-	BYTE* end	= start + m_p->GetCount();
+	BEGINDATA;
 
 	MOVE_TO_DIRAC_START_CODE(start, end);
 
@@ -821,9 +817,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseDirac(CAutoPtr<CPacket> p)
 		start = next;
 	}
 
-	if (start > m_p->GetData()) {
-		m_p->RemoveAt(0, start - m_p->GetData());
-	}
+	ENDDATA;
 
 	return S_OK;
 }
@@ -951,8 +945,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
 
 	HandleInvalidPacket(16);
 
-	BYTE* start	= m_p->GetData();
-	BYTE* end	= start + m_p->GetCount();
+	BEGINDATA;
 
 	for(;;) {
 		MOVE_TO_DTS_START_CODE(start, end);
@@ -992,9 +985,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
 		}
 	}
 
-	if (start > m_p->GetData()) {
-		m_p->RemoveAt(0, start - m_p->GetData());
-	}
+	ENDDATA;
 
 	return S_OK;
 }
