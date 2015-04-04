@@ -898,7 +898,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								int size = ParseDTSHeader(start, &aframe);
 								if (size) {
 									int sizehd = 0;
-									if (start + size + 16 <= end) {
+									if (start + size + 20 <= end) {
 										sizehd = ParseDTSHDHeader(start + size, pb->GetCount(), &aframe);
 										if (sizehd) {
 											wfe->nChannels			= (WORD)aframe.channels;
