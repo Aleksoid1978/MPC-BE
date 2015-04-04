@@ -784,8 +784,10 @@ int ParseDTSHeader(const BYTE* buf, audioframe_t* audioframe)
 
 // DTS-HD
 
-int ParseDTSHDHeader(BYTE* buf, int nSize/* = 0*/, audioframe_t* audioframe/* = NULL*/)
+int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t* audioframe /* = NULL*/)
 {
+	static const DWORD exss_sample_rates[16] = { 8000, 16000, 32000, 64000, 128000, 22050, 44100, 88200, 176400, 352800, 12000, 24000, 48000, 96000, 192000, 384000 };
+
 	if (*(DWORD*)buf != DTSHD_SYNC_WORD) { // syncword
 		return 0;
 	}
@@ -799,13 +801,13 @@ int ParseDTSHDHeader(BYTE* buf, int nSize/* = 0*/, audioframe_t* audioframe/* = 
 		hd_frame_size = ((buf[6] & 31) << 11 | buf[7] << 3 | buf[8] >> 5) + 1;
 	}
 
-	if (!nSize || !audioframe) {
+	if (!buffsize || !audioframe) {
 		return hd_frame_size;
 	}
 
 	audioframe->clear();
 
-	CGolombBuffer gb(buf + 4, nSize - 4); // skip DTSHD_SYNC_WORD
+	CGolombBuffer gb((BYTE*)buf + 4, buffsize - 4); // skip DTSHD_SYNC_WORD
 
 	UINT num_audiop = 1;
 	UINT num_assets = 1;
@@ -871,13 +873,6 @@ int ParseDTSHDHeader(BYTE* buf, int nSize/* = 0*/, audioframe_t* audioframe/* = 
 					gb.BitRead(8);
 				}
 			}
-
-			static const DWORD exss_sample_rates[16] = {
-				8000,   16000,  32000,  64000,
-				128000, 22050,  44100,  88200,
-				176400, 352800, 12000,  24000,
-				48000,  96000,  192000, 384000
-			};
 
 			audioframe->param1 = gb.BitRead(5) + 1;
 			UINT exss_sample_rates_index = gb.BitRead(4);
