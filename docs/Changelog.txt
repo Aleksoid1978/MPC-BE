@@ -24,6 +24,9 @@ MP4Splitter (Bento4)
 Fixed playback of files in which different tracks have the same TrackId.
 Added support for 'R10k' and 'R10g'.
 
+MPEGSplitter
+Added info about DTS-HD streams.
+
 ShoutcastSource
 Fixed processing "Stop" command.
 Works better with MPEG Audio.
@@ -38,6 +41,7 @@ Fixed crash when decoding VC1 on Intel's DXVA mode on some files.
 Fixed Displays the last frame for DXVA 2.0 decoder.
 Corrected calculation of timestamps.
 If the video parameters were determined inaccurately, after decoding the first frame to update the parameters of current and do reconect output pin.
+No longer use the table of Nvidia graphics cards with support for decoding 4k. Now to support decoding 4k driver must be installed v320.18 (v9.18.13.2018) or later.
 
 MPCVideoConverter
 Video decoder for uncompressed formats now works as a converter.
@@ -48,6 +52,8 @@ Fixed wrong connection to the PCM stream.
 Improved checking output support SPDIF/Bitstream.
 Fixed playback of some BINK audio.
 Fixed incorrect (intensive) playing on WinXP.
+The adjusted timestamp calculation.
+To decode DTS use libdcadec. Added support for decoding DTS 96/24 and DTS-HD MA.
 
 AudioSwitcher
 Reduce the frequency of the sound, if it is more 192000 Hz.
@@ -105,6 +111,8 @@ The ability to save in .ini file will be unavailable in the absence of permissio
 Improved logic to apply the settings file associations and context menus of Windows Explorer.
 Fixed display of information for RGB8 and RGB565. Do not change the register when displaying FourCC.
 Correctly restore the sound after playing ShockwaveGraph on Vista and later systems.
+Added option "Auto fit factor".
+Don't remember the full screen, if the option "RememberWindowPos" and "RememberWindowSize".
 
 Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated Ukrainian translation (by arestarh1986).
