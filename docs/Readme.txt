@@ -5,14 +5,14 @@ MPC-BE имеет внушительный набор аудио-видео фи
 
 Поддерживаемые Операционные Системы:
 -----------------------------
-* Windows XP SP2, Windows Vista 32bit/64bit, Windows 7 32bit/64bit, Windows 8 32bit/64bit
+* Windows XP SP2, Windows Vista, Windows 7, Windows 8, Windows 8.1 32bit/64bit
 
 
 Системные Требования:
 ---------------------
 * Процессор с поддержкой SSE
-* Последняя версия DirectX 9.0c runtime (июнь 2010 года). Установка обязательна, независимо от операционной системы.
-  Веб-инсталлятор:  http://www.microsoft.com/download/en/details.aspx?id=35 (рекомендуется)
+* Рекомендуется наличие DirectX 9.0c runtime (июнь 2010 года).
+  Веб-инсталлятор:  http://www.microsoft.com/download/en/details.aspx?id=35
   Полный пакет:     http://www.microsoft.com/download/en/details.aspx?id=8109
 
 
@@ -22,14 +22,13 @@ MPC-BE is based on the original Guliverkli project and "Media Player Classic Hom
 
 Supported Operating Systems:
 -----------------------------
-* Windows XP SP2, Windows Vista 32bit/64bit, Windows 7 32bit/64bit, Windows 8 32bit/64bit
+* Windows XP SP2, Windows Vista, Windows 7, Windows 8, Windows 8.1 32bit/64bit
 
 
 System Requirements:
 ---------------------
 * An SSE capable CPU
-* The latest DirectX 9.0c runtime (June 2010). Install it regardless of
-  the operating system, they all need it.
+* Recommended to have DirectX 9.0c runtime.
   Web installer:  http://www.microsoft.com/download/en/details.aspx?id=35
   Full:           http://www.microsoft.com/download/en/details.aspx?id=8109
 
@@ -37,9 +36,7 @@ System Requirements:
 Links:
 -------
 Project Page:        http://sourceforge.net/projects/mpcbe/
-Help and Support:    http://dev.mpc-next.ru
-Get code:            svn://mpc-next.ru/mpc-be
-Add-ons:             http://dev.mpc-next.ru/index.php/board,42.0.html
+Get code:            svn://svn.code.sf.net/p/mpcbe/code/trunk
 Nightly Builds:      http://sourceforge.net/projects/mpcbe/files/MPC-BE/Nightly Builds (from svn trunk)/
 
 
@@ -71,8 +68,6 @@ Little CMS          MIT License                http://littlecms.com/
 Logitech SDK        -                          -
 MediaInfo           BSD License                http://sourceforge.net/projects/mediainfo/
 MusePack            GPL                        http://musepack.net/
-QuickTime SDK       -                          -
-RealMedia SDK       -                          -
 ResizableLib        Artistic License           http://sourceforge.net/projects/resizablelib/
 TreePropSheet       -                          -
 VirtualDub          GPLv2                      http://virtualdub.org/

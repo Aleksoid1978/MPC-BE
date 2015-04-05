@@ -119,6 +119,7 @@ Updated Ukrainian translation (by arestarh1986).
 Updated Japanese translation (by Socket774).
 Updated German translation (by Klaus1189).
 Updated Chinese (Simplified) translation (by beter and insolo).
+Updated Italian translation (by Lord Maius).
 
 Updated libraries:
 	jsoncpp 1.0.0-212 git-gc1e834a.
