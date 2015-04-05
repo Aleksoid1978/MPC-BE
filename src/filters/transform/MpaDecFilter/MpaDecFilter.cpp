@@ -1177,7 +1177,7 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF(BOOL bEOF/* = FALSE*/)
 					DbgLog((LOG_TRACE, 3, L"CMpaDecFilter:ProcessDTS_SPDIF() - framelength is not supported"));
 					return E_FAIL;
 			}
-			if (FAILED(hr = DeliverBitstream(p, size, type, aframe.samplerate, aframe.samples))) {
+			if (FAILED(hr = DeliverBitstream(p, size, type, aframe.samplerate >> aframe.param2, aframe.samples))) {
 				return hr;
 			}
 		}
