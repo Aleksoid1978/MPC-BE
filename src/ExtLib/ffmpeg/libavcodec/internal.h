@@ -33,6 +33,21 @@
 #include "avcodec.h"
 #include "config.h"
 
+/**
+ * The codec does not modify any global variables in the init function,
+ * allowing to call the init function without locking any global mutexes.
+ */
+#define FF_CODEC_CAP_INIT_THREADSAFE        (1 << 0)
+/**
+ * The codec allows calling the close function for deallocation even if
+ * the init function returned a failure. Without this capability flag, a
+ * codec does such cleanup internally when returning failures from the
+ * init function and does not expect the close function to be called at
+ * all.
+ */
+#define FF_CODEC_CAP_INIT_CLEANUP           (1 << 1)
+
+
 #define FF_SANE_NB_CHANNELS 63U
 
 #define FF_SIGNBIT(x) ((x) >> CHAR_BIT * sizeof(x) - 1)
@@ -157,7 +172,7 @@ int ff_init_buffer_info(AVCodecContext *s, AVFrame *frame);
 void avpriv_color_frame(AVFrame *frame, const int color[4]);
 
 extern volatile int ff_avcodec_locked;
-int ff_lock_avcodec(AVCodecContext *log_ctx);
+int ff_lock_avcodec(AVCodecContext *log_ctx, const AVCodec *codec);
 // ==> Start patch MPC
 int ff_unlock_avcodec(AVCodecContext *log_ctx);
 // ==> End patch MPC
@@ -187,7 +202,7 @@ int avpriv_unlock_avformat(void);
  *                avpkt->size is set to the specified size.
  *                All other AVPacket fields will be reset with av_init_packet().
  * @param size    the minimum required packet size
- * @return        0 on success, negative error code on failure
+ * @return        non negative on success, negative error code on failure
  */
 int ff_alloc_packet2(AVCodecContext *avctx, AVPacket *avpkt, int64_t size);
 

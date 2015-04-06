@@ -5,7 +5,7 @@
  * Copyright (C) 2006 Benjamin Larsson
  * Copyright (C) 2007 Konstantin Shishkov
  * Copyright (C) 2012 Paul B Mahol
- * Copyright (C) 2014 Niels Moller
+ * Copyright (C) 2014 Niels Möller
  *
  * This file is part of FFmpeg.
  *

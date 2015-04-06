@@ -242,10 +242,11 @@ SRCS_LC = \
 	libavcodec/intrax8.c \
 	libavcodec/intrax8dsp.c \
 	libavcodec/ituh263dec.c \
-	libavcodec/ivi_common.c \
+	libavcodec/ivi.c \
 	libavcodec/ivi_dsp.c \
 	libavcodec/jpegls.c \
 	libavcodec/jpeglsdec.c \
+	libavcodec/jpegtables.c \
 	libavcodec/jrevdct.c \
 	libavcodec/kbdwin.c \
 	libavcodec/lagarith.c \
@@ -265,7 +266,6 @@ SRCS_LC = \
 	libavcodec/mdct_float.c \
 	libavcodec/metasound.c \
 	libavcodec/metasound_data.c \
-	libavcodec/mjpeg.c \
 	libavcodec/mjpeg_parser.c \
 	libavcodec/mjpegbdec.c \
 	libavcodec/mjpegdec.c \
@@ -484,9 +484,7 @@ SRCS_LC = \
 	libavcodec/x86/vp6dsp_init.c \
 	libavcodec/x86/vp8dsp_init.c \
 	libavcodec/x86/vp9dsp_init.c \
-	libavcodec/x86/xvididct_init.c \
-	libavcodec/x86/xvididct_mmx.c \
-	libavcodec/x86/xvididct_sse2.c
+	libavcodec/x86/xvididct_init.c
 
 SRCS_LF = \
 	libavfilter/af_atempo.c \
@@ -655,7 +653,8 @@ SRCS_YASM_LC = \
 	libavcodec/x86/vp9intrapred.asm \
 	libavcodec/x86/vp9itxfm.asm \
 	libavcodec/x86/vp9lpf.asm \
-	libavcodec/x86/vp9mc.asm
+	libavcodec/x86/vp9mc.asm \
+	libavcodec/x86/xvididct.asm
 
 SRCS_YASM_LBR = \
 	libavresample/x86/audio_convert.asm \

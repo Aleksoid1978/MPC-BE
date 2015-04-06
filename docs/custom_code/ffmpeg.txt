@@ -55,4 +55,3 @@ The following files are available only in MPC-BE (compared with ffmpeg):
 * libavcodec/dxva_internal.h
 * libavcodec/dxva_mpeg2.h
 * libavcodec/dxva_vc1.h
-* libavcodec/h264_slice.h
