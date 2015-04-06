@@ -128,12 +128,13 @@ USHORT FFH264FindRefFrameIndex(USHORT num_frame, DXVA_PicParams_H264* pDXVAPicPa
 
 HRESULT FFH264BuildPicParams(struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DWORD nPCIDevice, DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nPictStruct, bool IsATIUVD)
 {
-	H264Context*	h = (H264Context*)pAVCtx->priv_data;
-	SPS*			cur_sps;
-	PPS*			cur_pps;
-	int				field_pic_flag;
-	HRESULT			hr = E_FAIL;
-	const			H264Picture *current_picture = h->cur_pic_ptr;
+	H264Context*			h 				= (H264Context*)pAVCtx->priv_data;
+	const H264SliceContext*	sl				= &h->slice_ctx[0];
+	const H264Picture*		current_picture	= h->cur_pic_ptr;
+	SPS*					cur_sps;
+	PPS*					cur_pps;
+	int						field_pic_flag;
+	HRESULT					hr				= E_FAIL;
 
 	field_pic_flag = (h->picture_structure != PICT_FRAME);
 
@@ -161,7 +162,7 @@ HRESULT FFH264BuildPicParams(struct AVCodecContext* pAVCtx, DWORD nPCIVendor, DW
 		pDXVAPicParams->frame_mbs_only_flag						= cur_sps->frame_mbs_only_flag;
 		pDXVAPicParams->transform_8x8_mode_flag					= cur_pps->transform_8x8_mode;
 		pDXVAPicParams->MinLumaBipredSize8x8Flag				= h->sps.level_idc >= 31;
-		pDXVAPicParams->IntraPicFlag							= (h->slice_type == AV_PICTURE_TYPE_I || h->slice_type == AV_PICTURE_TYPE_SI);
+		pDXVAPicParams->IntraPicFlag							= (sl->slice_type == AV_PICTURE_TYPE_I || sl->slice_type == AV_PICTURE_TYPE_SI);
 
 		pDXVAPicParams->bit_depth_luma_minus8					= cur_sps->bit_depth_luma   - 8;
 		pDXVAPicParams->bit_depth_chroma_minus8					= cur_sps->bit_depth_chroma - 8;
@@ -229,11 +230,11 @@ void FFH264SetCurrentPicture(int nIndex, DXVA_PicParams_H264* pDXVAPicParams, st
 
 void FFH264UpdateRefFramesList(DXVA_PicParams_H264* pDXVAPicParams, struct AVCodecContext* pAVCtx)
 {
-	H264Context*	h = (H264Context*)pAVCtx->priv_data;
-	UINT			nUsedForReferenceFlags = 0;
-	int				i, j;
-	H264Picture*	pic;
-	UCHAR			AssociatedFlag;
+	const H264Context*	h						= (H264Context*)pAVCtx->priv_data;
+	H264Picture*		pic						= NULL;
+	UINT				nUsedForReferenceFlags	= 0;
+	int					i, j;
+	UCHAR				AssociatedFlag;
 
 	for (i = 0, j = 0; i < 16; i++) {
 		if (i < h->short_ref_count) {
@@ -298,7 +299,8 @@ BOOL FFH264IsRefFrameInUse(int nFrameNum, struct AVCodecContext* pAVCtx)
 
 void FF264UpdateRefFrameSliceLong(DXVA_PicParams_H264* pDXVAPicParams, DXVA_Slice_H264_Long* pSlice, struct AVCodecContext* pAVCtx)
 {
-	H264Context* h = (H264Context*)pAVCtx->priv_data;
+	const H264Context*		h	= (H264Context*)pAVCtx->priv_data;
+	const H264SliceContext*	sl	= &h->slice_ctx[0];
 
 	for (unsigned i = 0; i < _countof(pSlice->RefPicList[0]); i++) {
 		pSlice->RefPicList[0][i].bPicEntry = 255;
@@ -307,9 +309,9 @@ void FF264UpdateRefFrameSliceLong(DXVA_PicParams_H264* pDXVAPicParams, DXVA_Slic
 
 	for (unsigned list = 0; list < 2; list++) {
 		for (unsigned i = 0; i < _countof(pSlice->RefPicList[list]); i++) {
-			if (list < h->list_count && i < h->ref_count[list]) {
-				const H264Picture *r = &h->ref_list[list][i];
-				pSlice->RefPicList[list][i].Index7Bits		= FFH264FindRefFrameIndex(h->ref_list[list][i].frame_num, pDXVAPicParams);
+			if (list < sl->list_count && i < sl->ref_count[list]) {
+				const H264Picture *r = sl->ref_list[list][i].parent;
+				pSlice->RefPicList[list][i].Index7Bits		= FFH264FindRefFrameIndex(r->frame_num, pDXVAPicParams);
 				pSlice->RefPicList[list][i].AssociatedFlag	= (r->reference == PICT_BOTTOM_FIELD);
 			}
 		}

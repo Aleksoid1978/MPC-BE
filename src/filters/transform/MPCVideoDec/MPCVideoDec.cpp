@@ -1802,7 +1802,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 				} else if (m_nPCIVendor == PCIV_Intel && !IsWinVistaOrLater()) {
 					break; // Disable support H.264 DXVA on Intel in WinXP ...
 				}
-				int nCompat = FFH264CheckCompatibility (PictWidthRounded(), PictHeightRounded(), m_pAVCtx, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, IsAtiDXVACompatible);
+				int nCompat = FFH264CheckCompatibility(PictWidthRounded(), PictHeightRounded(), m_pAVCtx, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, IsAtiDXVACompatible);
 
 				if ((nCompat & DXVA_PROFILE_HIGHER_THAN_HIGH) || (nCompat & DXVA_HIGH_BIT)) { // DXVA unsupported
 					break;

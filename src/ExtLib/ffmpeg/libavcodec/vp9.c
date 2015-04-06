@@ -689,10 +689,10 @@ static int decode_frame_header(AVCodecContext *ctx,
         for (j = 1; j < 4; j++) {
             s->segmentation.feat[i].lflvl[j][0] =
                 av_clip_uintp2(lflvl + ((s->lf_delta.ref[j] +
-                                         s->lf_delta.mode[0]) << sh), 6);
+                                         s->lf_delta.mode[0]) * (1 << sh)), 6);
             s->segmentation.feat[i].lflvl[j][1] =
                 av_clip_uintp2(lflvl + ((s->lf_delta.ref[j] +
-                                         s->lf_delta.mode[1]) << sh), 6);
+                                         s->lf_delta.mode[1]) * (1 << sh)), 6);
         }
     }
 
@@ -2506,7 +2506,7 @@ static void intra_recon(AVCodecContext *ctx, ptrdiff_t y_off, ptrdiff_t uv_off)
             for (x = 0; x < end_x; x += uvstep1d, ptr += 4 * uvstep1d,
                                    ptr_r += 4 * uvstep1d, n += step) {
                 int mode = b->uvmode;
-                uint8_t *a = &a_buf[16];
+                uint8_t *a = &a_buf[32];
                 int eob = b->skip ? 0 : b->uvtx > TX_8X8 ? AV_RN16A(&s->uveob[p][n]) : s->uveob[p][n];
 
                 mode = check_intra_mode(s, mode, &a, ptr_r,

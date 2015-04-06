@@ -1,5 +1,5 @@
 /*
- * XVID MPEG-4 VIDEO CODEC
+ * JPEG-related tables
  *
  * This file is part of FFmpeg.
  *
@@ -18,26 +18,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/**
- * @file
- * header for Xvid IDCT functions
- */
-
-#ifndef AVCODEC_X86_XVIDIDCT_H
-#define AVCODEC_X86_XVIDIDCT_H
+#ifndef AVCODEC_JPEGTABLES_H
+#define AVCODEC_JPEGTABLES_H
 
 #include <stdint.h>
 
-void ff_xvid_idct_mmx(short *block);
-void ff_xvid_idct_mmx_put(uint8_t *dest, int line_size, int16_t *block);
-void ff_xvid_idct_mmx_add(uint8_t *dest, int line_size, int16_t *block);
+#include "libavutil/internal.h"
 
-void ff_xvid_idct_mmxext(short *block);
-void ff_xvid_idct_mmxext_put(uint8_t *dest, int line_size, int16_t *block);
-void ff_xvid_idct_mmxext_add(uint8_t *dest, int line_size, int16_t *block);
+extern av_export const uint8_t avpriv_mjpeg_bits_dc_luminance[];
+extern av_export const uint8_t avpriv_mjpeg_val_dc[];
 
-void ff_xvid_idct_sse2(short *block);
-void ff_xvid_idct_put_sse2(uint8_t *dest, int line_size, short *block);
-void ff_xvid_idct_add_sse2(uint8_t *dest, int line_size, short *block);
+extern av_export const uint8_t avpriv_mjpeg_bits_dc_chrominance[];
 
-#endif /* AVCODEC_X86_XVIDIDCT_H */
+extern av_export const uint8_t avpriv_mjpeg_bits_ac_luminance[];
+extern av_export const uint8_t avpriv_mjpeg_val_ac_luminance[];
+
+extern av_export const uint8_t avpriv_mjpeg_bits_ac_chrominance[];
+extern av_export const uint8_t avpriv_mjpeg_val_ac_chrominance[];
+
+void ff_mjpeg_build_huffman_codes(uint8_t *huff_size, uint16_t *huff_code,
+                                  const uint8_t *bits_table,
+                                  const uint8_t *val_table);
+
+#endif /* AVCODEC_JPEGTABLES_H */

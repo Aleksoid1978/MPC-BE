@@ -312,13 +312,13 @@ static unsigned __int64 GetFileVersion(LPCTSTR lptstrFilename)
 int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
 							 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible)
 {
-	H264Context* h				= (H264Context*)pAVCtx->priv_data;
-	SPS* cur_sps				= &h->sps;
+	H264Context*	h				= (H264Context*)pAVCtx->priv_data;
+	SPS*			cur_sps			= &h->sps;
 
-	int video_is_level51		= 0;
-	int no_level51_support		= 1;
-	int too_much_ref_frames		= 0;
-	int max_ref_frames_dpb41	= min(11, 8388608/(nWidth * nHeight) );
+	int video_is_level51			= 0;
+	int no_level51_support			= 1;
+	int too_much_ref_frames			= 0;
+	const int max_ref_frames_dpb41	= min(11, 8388608/(nWidth * nHeight));
 
 	if (cur_sps != NULL) {
 		if (cur_sps->bit_depth_luma > 8 || cur_sps->chroma_format_idc > 1) {
@@ -401,7 +401,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 // === Mpeg2 functions
 int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx)
 {
-	MpegEncContext*	s = (MpegEncContext*)pAVCtx->priv_data;
+	const MpegEncContext* s = (MpegEncContext*)pAVCtx->priv_data;
 
 	return (s->chroma_format < 2);
 }
@@ -449,15 +449,15 @@ UINT FFGetMBCount(struct AVCodecContext* pAVCtx)
 	switch (pAVCtx->codec_id) {
 		case AV_CODEC_ID_H264 :
 			{
-				H264Context* h		= (H264Context*)pAVCtx->priv_data;
-				MBCount				= h->mb_width * h->mb_height;
+				const H264Context* h	= (H264Context*)pAVCtx->priv_data;
+				MBCount					= h->mb_width * h->mb_height;
 			}
 			break;
 		case AV_CODEC_ID_MPEG2VIDEO:
 			{
-				MpegEncContext* s	= (MpegEncContext*)pAVCtx->priv_data;
-				const int is_field	= s->picture_structure != PICT_FRAME;
-				MBCount				= s->mb_width * (s->mb_height >> is_field);
+				const MpegEncContext* s	= (MpegEncContext*)pAVCtx->priv_data;
+				const int is_field		= s->picture_structure != PICT_FRAME;
+				MBCount					= s->mb_width * (s->mb_height >> is_field);
 			}
 			break;
 	}
@@ -481,10 +481,10 @@ void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int&
 	case AV_CODEC_ID_MPEG1VIDEO:
 	case AV_CODEC_ID_MPEG2VIDEO:
 		{
-			MpegEncContext*	s = (MpegEncContext*)pAVCtx->priv_data;
+			const MpegEncContext* s = (MpegEncContext*)pAVCtx->priv_data;
 
-			width	= FFALIGN(s->width, 16);
-			height	= FFALIGN(s->height, 16);
+			width					= FFALIGN(s->width, 16);
+			height					= FFALIGN(s->height, 16);
 			if (!s->progressive_sequence) {
 				height = int((s->height + 31) / 32 * 2) * 16;
 			}
