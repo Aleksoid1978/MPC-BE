@@ -48,6 +48,7 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CH
 	, m_bIsBadPacked(FALSE)
 	, m_lastLen(0)
 	, m_programs(&m_streams)
+	, m_bIMKH_CCTV(FALSE)
 {
 	memset(m_psm, 0, sizeof(m_psm));
 	if (SUCCEEDED(hr)) {
@@ -68,6 +69,8 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	WaitAvailable(3000, MEGABYTE);
 
 	Seek(0);
+	m_bIMKH_CCTV = (BitRead(32, true) == 'IMKH');
+
 	{
 		byte b = 0;
 		while (GetPos() < (65 * KILOBYTE) && (b = BitRead(8)) != 0x47 && GetRemaining());
@@ -747,13 +750,11 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			Seek(start);
 			latm_aachdr h = { 0 };
 
-			if (!m_streams[stream_type::audio].Find(s)) {
-				if (Read(h, len, &s.mt)) {
-					if (m_aaclatmValid[s].IsValid()) {
-						type = stream_type::audio;
-					} else {
-						m_aaclatmValid[s].Handle(h);
-					}
+			if (Read(h, len, &s.mt)) {
+				if (m_aaclatmValid[s].IsValid()) {
+					type = stream_type::audio;
+				} else {
+					m_aaclatmValid[s].Handle(h);
 				}
 			}
 		}
@@ -763,13 +764,11 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			Seek(start);
 			aachdr h = { 0 };
 
-			if (!m_streams[stream_type::audio].Find(s)) {
-				if (Read(h, len, &s.mt)) {
-					if (m_aacValid[s].IsValid()) {
-						type = stream_type::audio;
-					} else {
-						m_aacValid[s].Handle(h);
-					}
+			if (Read(h, len, &s.mt)) {
+				if (m_aacValid[s].IsValid()) {
+					type = stream_type::audio;
+				} else {
+					m_aacValid[s].Handle(h);
 				}
 			}
 		}
@@ -777,12 +776,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		// MPEG Audio
 		if (type == stream_type::unknown && (stream_type & MPEG_AUDIO)) {
 			Seek(start);
-			mpahdr h = { 0 };
+			mpahdr h;
 
-			if (!m_streams[stream_type::audio].Find(s)) {
-				if (Read(h, len, &s.mt, false, m_type == MPEG_TYPES::mpeg_ps)) {
-					type = stream_type::audio;
-				}
+			if (Read(h, len, &s.mt, false, m_type == MPEG_TYPES::mpeg_ps)) {
+				type = stream_type::audio;
 			}
 		}
 
@@ -791,21 +788,31 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			Seek(start);
 			ac3hdr h = { 0 };
 
-			if (!m_streams[stream_type::audio].Find(s)) {
-				if (Read(h, len, &s.mt)) {
-					if (m_ac3Valid[s].IsValid()) {
-						type = stream_type::audio;
-					} else {
-						m_ac3Valid[s].Handle(h);
-					}
+			if (Read(h, len, &s.mt)) {
+				if (m_ac3Valid[s].IsValid()) {
+					type = stream_type::audio;
+				} else {
+					m_ac3Valid[s].Handle(h);
 				}
 			}
 		}
+
 		// ADX ADPCM
 		if (type == unknown && m_type == MPEG_TYPES::mpeg_ps) {
 			Seek(start);
 			CMpegSplitterFile::adx_adpcm_hdr h;
-			if (!m_streams[audio].Find(s) && Read(h, len, &s.mt)) {
+			if (Read(h, len, &s.mt)) {
+				type = audio;
+			}
+		}
+
+		// A-law PCM
+		if (type == unknown && m_type == MPEG_TYPES::mpeg_ps
+				&& m_bIMKH_CCTV && pesid == 0xc0
+				&& stream_type != MPEG_AUDIO && stream_type != AAC_AUDIO) {
+
+			CMpegSplitterFile::pcm_law_hdr h;
+			if (Read(h, len, true, &s.mt)) {
 				type = audio;
 			}
 		}

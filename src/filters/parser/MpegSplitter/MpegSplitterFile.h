@@ -77,6 +77,8 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	__int64 m_lastLen;
 	virtual void OnUpdateDuration();
 
+	BOOL m_bIMKH_CCTV;
+
 public:
 	bool m_bIsBD;
 	CHdmvClipInfo &m_ClipInfo;

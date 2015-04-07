@@ -2313,11 +2313,22 @@ bool CBaseSplitterFileEx::Read(adx_adpcm_hdr& h, int len, CMediaType* pmt)
 	return true;
 }
 
+bool CBaseSplitterFileEx::Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* pmt)
+{
+	if (pmt) {
+		pmt->majortype			= MEDIATYPE_Audio;
+		pmt->subtype			= bAlaw ? MEDIASUBTYPE_ALAW : MEDIASUBTYPE_MULAW;
+		pmt->formattype			= FORMAT_WaveFormatEx;
 
-/*
+		WAVEFORMATEX* wfe		= (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX));
+		memset(wfe, 0, sizeof(WAVEFORMATEX));
+		wfe->wFormatTag			= bAlaw ? WAVE_FORMAT_ALAW : WAVE_FORMAT_MULAW;
+		wfe->nChannels			= 1;
+		wfe->nSamplesPerSec		= 8000;
+		wfe->wBitsPerSample		= 8;
+		wfe->nBlockAlign		= wfe->nChannels * wfe->wBitsPerSample >> 3;
+		wfe->nAvgBytesPerSec	= wfe->nBlockAlign * wfe->nSamplesPerSec;
+	}
 
-To see working buffer in debugger, look :
-	- m_pCache.m_p	 for the cached buffer
-	- m_pos			 for current read position
-
-*/
+	return true;
+}

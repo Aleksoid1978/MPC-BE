@@ -379,6 +379,8 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 						Infos.AddTail(FormatString(L"MPEG1 - Layer %d", layer));
 					}
 					break;
+					case WAVE_FORMAT_ALAW:
+						Infos.AddTail(L"A-law PCM");
 				}
 			}
 
