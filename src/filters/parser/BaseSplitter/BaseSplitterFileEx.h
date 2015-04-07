@@ -438,6 +438,9 @@ public:
 		DWORD samplerate;
 	};
 
+	struct pcm_law_hdr {
+	};
+
 #pragma pack(pop)
 
 	bool Read(pshdr& h);
@@ -470,4 +473,5 @@ public:
 	bool Read(avchdr& h, spsppsindex index);
 	bool Read(hevchdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(adx_adpcm_hdr& h, int len, CMediaType* pmt = NULL);
+	bool Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* pmt = NULL);
 };
