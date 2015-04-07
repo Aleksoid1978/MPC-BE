@@ -55,7 +55,7 @@
 #include <windows.h>
 #include "dxva_internal.h"
 #include "dxva_h264.h"
-// <== End patch MPC
+// ==> End patch MPC
 
 const uint16_t ff_h264_mb_sizes[4] = { 256, 384, 512, 768 };
 
@@ -690,14 +690,13 @@ av_cold int ff_h264_decode_init(AVCodecContext *avctx)
         }
     }
 
-
     // ==> Start patch MPC
     h->avctx->colorspace = h->sps.colorspace;
     h->avctx->pix_fmt    = ff_h264_get_pixel_format(h);
     h->avctx->profile    = ff_h264_get_profile(&h->sps);
     h->avctx->level      = h->sps.level_idc;
     h->avctx->refs       = h->sps.ref_frame_count;
-    // <== End patch MPC
+    // ==> End patch MPC
 
     if (h->sps.bitstream_restriction_flag &&
         h->avctx->has_b_frames < h->sps.num_reorder_frames) {
@@ -768,7 +767,11 @@ static void decode_postinit(H264Context *h, int setup_finished)
         //    ff_thread_finish_setup(h->avctx);
         if (cur->field_poc[0] == INT_MAX && cur->field_poc[1] == INT_MAX)
             return;
-        if (h->avctx->hwaccel || h->avctx->using_dxva || h->missing_fields <=1)
+        if (h->avctx->hwaccel ||
+            // ==> Start patch MPC
+            h->avctx->using_dxva ||
+            // ==> End patch MPC
+            h->missing_fields <=1)
             return;
     }
 
@@ -994,7 +997,7 @@ static void decode_postinit(H264Context *h, int setup_finished)
     if (setup_finished && !h->avctx->hwaccel
         // ==> Start patch MPC
         && !h->avctx->using_dxva)
-        // <== End patch MPC
+        // ==> End patch MPC
         ff_thread_finish_setup(h->avctx);
 }
 
@@ -1645,7 +1648,7 @@ static int dxva_decode_slice(AVCodecContext *avctx,
         ctx_pic->pp.wBitFields &= ~(1 << 15); /* Set IntraPicFlag to 0 */
     return 0;
 }
-// <== End patch MPC
+// ==> End patch MPC
 
 static const uint8_t start_code[] = { 0x00, 0x00, 0x01 };
 
@@ -1746,12 +1749,12 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size,
     int ret = 0;
     // ==> Start patch MPC
     int nal_pass = 0;
-    // <== End patch MPC
+    // ==> End patch MPC
 
     h->nal_unit_type= 0;
     // ==> Start patch MPC
     h->second_field_offset = 0;
-    // <== End patch MPC
+    // ==> End patch MPC
 
     if(!h->slice_context_count)
          h->slice_context_count= 1;
@@ -1883,7 +1886,7 @@ again:
 
                 // ==> Start patch MPC
                 h->ref_pic_flag = (h->nal_ref_idc != 0);
-                // <== End patch MPC
+                // ==> End patch MPC
                 if ((err = ff_h264_decode_slice_header(h, sl)))
                     break;
 
@@ -1938,7 +1941,7 @@ again:
                     nal_pass++;
                     if (nal_pass == 1)
                         h->second_field_offset = buf_index;
-					// <== End patch MPC
+					// ==> End patch MPC
 
                     if (h->avctx->hwaccel &&
                         (ret = h->avctx->hwaccel->start_frame(h->avctx, buf, buf_size)) < 0)
@@ -1960,7 +1963,7 @@ again:
                                 goto end;
                         }
                     }
-                    // <== End patch MPC
+                    // ==> End patch MPC
                     if (avctx->hwaccel) {
                         ret = avctx->hwaccel->decode_slice(avctx,
                                                            &buf[buf_index - consumed],
@@ -2039,6 +2042,12 @@ again:
                     av_log(h->avctx, AV_LOG_ERROR, "decode_slice_header error\n");
                 sl->ref_count[0] = sl->ref_count[1] = sl->list_count = 0;
             } else if (err == SLICE_SINGLETHREAD) {
+                if (context_count > 1) {
+                    ret = ff_h264_execute_decode_slices(h, context_count - 1);
+                    if (ret < 0 && (h->avctx->err_recognition & AV_EF_EXPLODE))
+                        goto end;
+                    context_count = 0;
+                }
                 /* Slice could not be decoded in parallel mode, restart. Note
                  * that rbsp_buffer is not transferred, but since we no longer
                  * run in parallel mode this should not be an issue. */
@@ -2064,7 +2073,7 @@ end:
     // ==> Start patch MPC
     if (nal_pass < 2)
         h->second_field_offset = 0;
-    // <== End patch MPC
+    // ==> End patch MPC
 
     return (ret < 0) ? ret : buf_index;
 }

@@ -29,7 +29,7 @@
 #ifdef __GNUC__
 #include "intfloat.h"
 #endif
-// <== End patch MPC
+// ==> End patch MPC
 
 #ifndef M_E
 #define M_E            2.7182818284590452354   /* e */

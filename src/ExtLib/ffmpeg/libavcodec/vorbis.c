@@ -84,7 +84,7 @@ int ff_vorbis_len2vlc(uint8_t *bits, uint32_t *codes, unsigned num)
         av_log(NULL, AV_LOG_INFO, "%s", get_bits1(&gb) ? "1" : "0");
     av_log(NULL, AV_LOG_INFO, "\n");
     */
-// <== End patch MPC
+// ==> End patch MPC
 #endif
 
     ++p;
@@ -121,7 +121,7 @@ int ff_vorbis_len2vlc(uint8_t *bits, uint32_t *codes, unsigned num)
             av_log(NULL, AV_LOG_INFO, "%s", get_bits1(&gb) ? "1" : "0");
         av_log(NULL, AV_LOG_INFO, "\n");
     */
-// <== End patch MPC
+// ==> End patch MPC
 #endif
 
     }

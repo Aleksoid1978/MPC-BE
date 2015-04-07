@@ -42,7 +42,7 @@
 // ==> Start patch MPC
 #include "dxva_internal.h"
 #include "dxva_hevc.h"
-// <== End patch MPC
+// ==> End patch MPC
 
 const uint8_t ff_hevc_pel_weight[65] = { [2] = 0, [4] = 1, [6] = 2, [8] = 3, [12] = 4, [16] = 5, [24] = 6, [32] = 7, [48] = 8, [64] = 9 };
 
@@ -2626,7 +2626,12 @@ static int hevc_frame_start(HEVCContext *s)
     if (IS_IRAP(s))
         s->NoRaslOutputFlag = 0;
     // ==> End patch MPC
-    if (!s->avctx->hwaccel && !s->avctx->using_dxva)
+
+    if (!s->avctx->hwaccel &&
+        // ==> Start patch MPC
+        !s->avctx->using_dxva
+        // ==> End patch MPC
+        )
         ff_thread_finish_setup(s->avctx);
 
     return 0;
@@ -2875,7 +2880,7 @@ static int dxva_decode_slice(AVCodecContext *avctx,
         ctx_pic->pp.wBitFields &= ~(1 << 15); /* Set IntraPicFlag to 0 */
     return 0;
 }
-// <== End patch MPC
+// ==> End patch MPC
 
 static int decode_nal_unit(HEVCContext *s, const HEVCNAL *nal)
 {
@@ -2997,7 +3002,7 @@ static int decode_nal_unit(HEVCContext *s, const HEVCNAL *nal)
             if (ret < 0)
                 goto fail;
         } else
-        // <== End patch MPC
+        // ==> End patch MPC
         if (s->avctx->hwaccel) {
             ret = s->avctx->hwaccel->decode_slice(s->avctx, nal->raw_data, nal->raw_size);
             if (ret < 0)

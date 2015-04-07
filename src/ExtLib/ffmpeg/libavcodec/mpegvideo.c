@@ -2247,7 +2247,7 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_
     if (avctx->hwaccel || !mbtype_table
         // ==> Start patch MPC
         || avctx->using_dxva 
-        // <== End patch MPC
+        // ==> End patch MPC
         || (avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU))
         return;
 
