@@ -221,7 +221,7 @@ static int dxva_decode_slice(AVCodecContext *avctx,
                buffer, size);
     return 0;
 }
-// <== End patch MPC
+// ==> End patch MPC
 
 #define MB_TYPE_ZERO_MV   0x20000000
 
@@ -1895,7 +1895,7 @@ static int mpeg_field_start(MpegEncContext *s, const uint8_t *buf, int buf_size)
                 return AVERROR_INVALIDDATA;
         }
     }
-    // <== End patch MPC
+    // ==> End patch MPC
 
     return 0;
 }
@@ -1999,7 +1999,7 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
 		}
         return DECODE_SLICE_OK;
     }
-    // <== End patch MPC
+    // ==> End patch MPC
 
     s->resync_mb_x = s->mb_x;
     s->resync_mb_y = s->mb_y = mb_y;

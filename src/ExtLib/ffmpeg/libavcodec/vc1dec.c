@@ -42,7 +42,7 @@
 #include <windows.h>
 #include "dxva_internal.h"
 #include "dxva_vc1.h"
-// <== End patch MPC
+// ==> End patch MPC
 
 #if CONFIG_WMV3IMAGE_DECODER || CONFIG_VC1IMAGE_DECODER
 
@@ -757,7 +757,7 @@ static void dxva_fill_slice(AVCodecContext *avctx, DXVA_VC1_Picture_Context *ctx
     ctx_pic->slice.wQuantizerScaleCode = v->pq;
     ctx_pic->slice.wBadSliceChopping   = 0;
 }
-// <== End patch MPC
+// ==> End patch MPC
 
 /** Decode a VC1/WMV3 frame
  * @todo TODO: Handle VC-1 IDUs (Transport level?)
@@ -835,7 +835,7 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
                         s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU
                         // ==> Start patch MPC
                         || avctx->using_dxva
-                        // <== End patch MPC
+                        // ==> End patch MPC
                         )
                         buf_start = start;
                     buf_size2 = vc1_unescape_buffer(start + 4, size, buf2);
@@ -846,7 +846,7 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
                         s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU
                         // ==> Start patch MPC
                         || avctx->using_dxva
-                        // <== End patch MPC
+                        // ==> End patch MPC
                         )
                         buf_start_second_field = start;
                     tmp = av_realloc_array(slices, sizeof(*slices), (n_slices+1));
@@ -904,7 +904,7 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
                     s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU
                     // ==> Start patch MPC
                     || s->avctx->using_dxva
-                    // <== End patch MPC
+                    // ==> End patch MPC
                     )
                     buf_start_second_field = divider;
                 tmp = av_realloc_array(slices, sizeof(*slices), (n_slices+1));
@@ -1018,7 +1018,7 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
         // ==> Start patch MPC
         if (avctx->using_dxva)
             goto err;
-        // <== End patch MPC
+        // ==> End patch MPC
         goto end;
     }
     if ((avctx->skip_frame >= AVDISCARD_NONREF && s->pict_type == AV_PICTURE_TYPE_B) ||
@@ -1144,7 +1144,7 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
                 decoder_ctx->frame_count = 1;
             }
         } else
-        // <== End patch MPC
+        // ==> End patch MPC
         {
         int header_ret = 0;
 

@@ -46,7 +46,7 @@
 // ==> Start patch MPC
 #include <windows.h>
 #include <dxva.h>
-// <== End patch MPC
+// ==> End patch MPC
 
 static const uint8_t rem6[QP_MAX_NUM + 1] = {
     0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2,
@@ -1061,12 +1061,12 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
     return ff_thread_get_format(h->avctx, choices);
 }
 
-// <== Start patch MPC
+// ==> Start patch MPC
 enum AVPixelFormat ff_h264_get_pixel_format(H264Context *h)
 {
     return get_pixel_format(h, 1);
 }
-// <== End patch MPC
+// ==> End patch MPC
 
 /* export coded and cropped frame dimensions to AVCodecContext */
 static int init_dimensions(H264Context *h)
@@ -1268,7 +1268,7 @@ static void fill_dxva_slice_long(H264Context *h)
     else
         pSlice->disable_deblocking_filter_idc = sl->deblocking_filter;
 }
-// <== End patch MPC
+// ==> End patch MPC
 
 /**
  * Decode a slice header.
@@ -1337,7 +1337,7 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
 
     // ==> Start patch MPC
     h->raw_slice_type = slice_type;
-    // <== End patch MPC
+    // ==> End patch MPC
     slice_type = golomb_to_pict_type[slice_type];
 
     sl->slice_type     = slice_type;
@@ -1868,7 +1868,7 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
     // ==> Start patch MPC
     h->slice_qp_delta = get_se_golomb(&sl->gb);
     tmp = h->pps.init_qp + h->slice_qp_delta;
-    // <== End patch MPC
+    // ==> End patch MPC
     if (tmp > 51 + 6 * (h->sps.bit_depth_luma - 8)) {
         av_log(h->avctx, AV_LOG_ERROR, "QP %u out of range\n", tmp);
         return AVERROR_INVALIDDATA;
@@ -1883,7 +1883,7 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
         sl->slice_type == AV_PICTURE_TYPE_SI)
         // ==> Start patch MPC
         h->slice_qs_delta = get_se_golomb(&sl->gb); /* slice_qs_delta */
-        // <== End patch MPC
+        // ==> End patch MPC
     sl->deblocking_filter     = 1;
     sl->slice_alpha_c0_offset = 0;
     sl->slice_beta_offset     = 0;
@@ -1959,7 +1959,7 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
         if (h->pps.cabac) align_get_bits(&sl->gb);
         h->bit_offset_to_slice_data = sl->gb.index;
     }
-    // <== End patch MPC
+    // ==> End patch MPC
 
     h->last_slice_type = slice_type;
     memcpy(h->last_ref_count, sl->ref_count, sizeof(h->last_ref_count));
@@ -2464,8 +2464,17 @@ static int decode_slice(struct AVCodecContext *avctx, void *arg)
 
         for (;;) {
             // START_TIMER
-            int ret = ff_h264_decode_mb_cabac(h, sl);
-            int eos;
+            int ret, eos;
+
+            if (sl->mb_x + sl->mb_y * h->mb_width >= sl->mb_index_end) {
+                av_log(h->avctx, AV_LOG_ERROR, "Slice overlaps next at %d\n",
+                       sl->mb_index_end);
+                er_add_slice(sl, sl->resync_mb_x, sl->resync_mb_y, sl->mb_x,
+                             sl->mb_y, ER_MB_ERROR);
+                return AVERROR_INVALIDDATA;
+            }
+
+            ret = ff_h264_decode_mb_cabac(h, sl);
             // STOP_TIMER("decode_mb_cabac")
 
             if (ret >= 0)
@@ -2527,7 +2536,17 @@ static int decode_slice(struct AVCodecContext *avctx, void *arg)
         }
     } else {
         for (;;) {
-            int ret = ff_h264_decode_mb_cavlc(h, sl);
+            int ret;
+
+            if (sl->mb_x + sl->mb_y * h->mb_width >= sl->mb_index_end) {
+                av_log(h->avctx, AV_LOG_ERROR, "Slice overlaps next at %d\n",
+                       sl->mb_index_end);
+                er_add_slice(sl, sl->resync_mb_x, sl->resync_mb_y, sl->mb_x,
+                             sl->mb_y, ER_MB_ERROR);
+                return AVERROR_INVALIDDATA;
+            }
+
+            ret = ff_h264_decode_mb_cavlc(h, sl);
 
             if (ret >= 0)
                 ff_h264_hl_decode_mb(h, sl);
@@ -2615,10 +2634,12 @@ int ff_h264_execute_decode_slices(H264Context *h, unsigned context_count)
 
     av_assert0(context_count && h->slice_ctx[context_count - 1].mb_y < h->mb_height);
 
+    h->slice_ctx[0].mb_index_end = INT_MAX;
+
     if (h->avctx->hwaccel ||
         // ==> Start patch MPC
         h->avctx->using_dxva ||
-        // <== End patch MPC
+        // ==> End patch MPC
         h->avctx->codec->capabilities & CODEC_CAP_HWACCEL_VDPAU)
         return 0;
     if (context_count == 1) {
@@ -2626,12 +2647,24 @@ int ff_h264_execute_decode_slices(H264Context *h, unsigned context_count)
         h->mb_y = h->slice_ctx[0].mb_y;
         return ret;
     } else {
+        int j, mb_index;
         av_assert0(context_count > 0);
-        for (i = 1; i < context_count; i++) {
+        for (i = 0; i < context_count; i++) {
+            int mb_index_end = h->mb_width * h->mb_height;
             sl                 = &h->slice_ctx[i];
+            mb_index = sl->resync_mb_x + sl->resync_mb_y * h->mb_width;
             if (CONFIG_ERROR_RESILIENCE) {
                 sl->er.error_count = 0;
             }
+            for (j = 0; j < context_count; j++) {
+                H264SliceContext *sl2 = &h->slice_ctx[j];
+                int mb_index2 = sl2->resync_mb_x + sl2->resync_mb_y * h->mb_width;
+
+                if (i==j || mb_index > mb_index2)
+                    continue;
+                mb_index_end = FFMIN(mb_index_end, mb_index2);
+            }
+            sl->mb_index_end = mb_index_end;
         }
 
         avctx->execute(avctx, decode_slice, h->slice_ctx,

@@ -397,7 +397,7 @@ typedef struct VC1Context{
 
     // ==> Start patch MPC
     int recovered;
-    // <== End patch MPC
+    // ==> End patch MPC
 } VC1Context;
 
 /**

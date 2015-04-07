@@ -32,7 +32,7 @@
 #error missing -D__STDC_CONSTANT_MACROS / #define __STDC_CONSTANT_MACROS
 #endif
 #endif
-// <== End patch MPC BE
+// ==> End patch MPC BE
 
 #include <errno.h>
 #include <inttypes.h>
@@ -85,7 +85,7 @@
     #pragma warning(push)
     #pragma warning(disable: 4244)
 #endif
-// <== End patch MPC BE
+// ==> End patch MPC BE
 
 /* misc math functions */
 
@@ -461,7 +461,7 @@ static av_always_inline av_const int av_popcount64_c(uint64_t x)
 #ifdef _MSC_VER
     #pragma warning(pop)
 #endif
-// <== End patch MPC BE
+// ==> End patch MPC BE
 
 #endif /* AVUTIL_COMMON_H */
 

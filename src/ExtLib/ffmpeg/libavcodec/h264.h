@@ -411,6 +411,7 @@ typedef struct H264SliceContext {
     int mb_xy;
     int resync_mb_x;
     int resync_mb_y;
+    int mb_index_end;
     int mb_skip_run;
     int is_complex;
 
@@ -810,7 +811,7 @@ typedef struct H264Context {
     int          ref_pic_flag;
 
     int          second_field_offset;
-    // <== End patch MPC
+    // ==> End patch MPC
 } H264Context;
 
 extern const uint8_t ff_h264_chroma_qp[7][QP_MAX_NUM + 1]; ///< One chroma qp table for each possible bit depth (8-14).

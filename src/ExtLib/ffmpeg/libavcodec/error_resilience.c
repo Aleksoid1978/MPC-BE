@@ -807,7 +807,7 @@ void ff_er_add_slice(ERContext *s, int startx, int starty,
     // ==> Start patch MPC
     if (s->avctx->using_dxva)
         return;
-    // <== End patch MPC
+    // ==> End patch MPC
 
     if (start_i > end_i || start_xy > end_xy) {
         av_log(s->avctx, AV_LOG_ERROR,
