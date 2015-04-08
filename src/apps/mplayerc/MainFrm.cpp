@@ -649,7 +649,6 @@ CMainFrame::CMainFrame() :
 	m_pTaskbarList(NULL),
 	m_pGraphThread(NULL),
 	m_bOpenedThruThread(false),
-	m_nMenuHideTick(0),
 	m_bWasSnapped(false),
 	m_nWasSetDispMode(0),
 	m_bIsBDPlay(FALSE),
@@ -1876,20 +1875,19 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 
 	GetDesktopWindow()->GetWindowRect(&m_rcDesktop);
 	if (m_pFullscreenWnd && m_pFullscreenWnd->IsWindow()) {
-		MONITORINFO		MonitorInfo;
-		HMONITOR		hMonitor;
-		ZeroMemory (&MonitorInfo, sizeof(MonitorInfo));
-		MonitorInfo.cbSize	= sizeof(MonitorInfo);
-		hMonitor			= MonitorFromWindow (m_pFullscreenWnd->m_hWnd, 0);
-		if (GetMonitorInfo (hMonitor, &MonitorInfo)) {
-			CRect MonitorRect = CRect (MonitorInfo.rcMonitor);
-			m_fullWndSize.cx	= MonitorRect.Width();
-			m_fullWndSize.cy	= MonitorRect.Height();
-			m_pFullscreenWnd->SetWindowPos (NULL,
-											MonitorRect.left,
-											MonitorRect.top,
-											MonitorRect.Width(),
-											MonitorRect.Height(), SWP_NOZORDER);
+		MONITORINFO MonitorInfo;
+		ZeroMemory(&MonitorInfo, sizeof(MonitorInfo));
+		MonitorInfo.cbSize = sizeof(MonitorInfo);
+
+		HMONITOR hMonitor = MonitorFromWindow(m_pFullscreenWnd->m_hWnd, 0);
+		if (GetMonitorInfo(hMonitor, &MonitorInfo)) {
+			CRect MonitorRect = CRect(MonitorInfo.rcMonitor);
+			m_pFullscreenWnd->SetWindowPos(NULL,
+										   MonitorRect.left,
+										   MonitorRect.top,
+										   MonitorRect.Width(),
+										   MonitorRect.Height(),
+										   SWP_NOZORDER);
 			MoveVideoWindow();
 		}
 	}
@@ -3367,8 +3365,6 @@ static BOOL bFullScreen_LDOWN = FALSE;
 
 void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	if (((GetTickCount()-m_nMenuHideTick)<100)) return;
-
 	if (!m_pFullscreenWnd->IsWindow() || !m_OSD.OnLButtonDown (nFlags, point)) {
 		SetFocus();
 
@@ -3991,7 +3987,8 @@ void CMainFrame::OnUnInitMenuPopup(CMenu* pPopupMenu, UINT nFlags)
 {
 	__super::OnUnInitMenuPopup(pPopupMenu, nFlags);
 
-	m_nMenuHideTick = GetTickCount();
+	MSG msg;
+	PeekMessage(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDOWN, PM_REMOVE); //remove the click LMB, which closes the popup menu
 }
 
 BOOL CMainFrame::OnMenu(CMenu* pMenu)
@@ -4016,9 +4013,7 @@ BOOL CMainFrame::OnMenu(CMenu* pMenu)
 	KillTimer(TIMER_FULLSCREENMOUSEHIDER);
 	m_fHideCursor = false;
 
-	MSG msg;
 	pMenu->TrackPopupMenu(TPM_RIGHTBUTTON | TPM_NOANIMATION, point.x + 1, point.y + 1, this);
-	PeekMessage(&msg, this->m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDOWN, PM_REMOVE); //remove the click LMB, which closes the popup menu
 
 	s_fLDown = false;
 	if (m_fFullScreen) {
@@ -17015,65 +17010,37 @@ void CMainFrame::SetPlayState(MPC_PLAYSTATE iState)
 
 bool CMainFrame::CreateFullScreenWindow()
 {
-	HMONITOR		hMonitor;
-	MONITORINFOEX	MonitorInfo;
-	CRect			MonitorRect;
+	const CAppSettings& s = AfxGetAppSettings();
+	CMonitor monitor;
 
 	if (m_pFullscreenWnd->IsWindow()) {
 		m_pFullscreenWnd->DestroyWindow();
 	}
 
-	ZeroMemory (&MonitorInfo, sizeof(MonitorInfo));
-	MonitorInfo.cbSize	= sizeof(MonitorInfo);
-
-	CMonitors monitors;
-	CString str;
-	CMonitor monitor;
-	AppSettings& s = AfxGetAppSettings();
-	hMonitor = NULL;
-
-	if (!s.iMonitor) {
-		if (s.strFullScreenMonitor == _T("Current")) {
-			hMonitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
-		} else {
-			for ( int i = 0; i < monitors.GetCount(); i++ ) {
-				monitor = monitors.GetMonitor( i );
+	if (s.iMonitor == 0 && s.strFullScreenMonitor != L"Current") {
+		CMonitors monitors;
+		for (int i = 0; i < monitors.GetCount(); i++) {
+			monitor = monitors.GetMonitor(i);
+			if (monitor.IsMonitor()) {
+				CString str;
 				monitor.GetName(str);
-
-				if ((monitor.IsMonitor()) && (s.strFullScreenMonitor == str)) {
-					hMonitor = monitor;
+				if (s.strFullScreenMonitor == str) {
 					break;
 				}
-			}
-			if (!hMonitor) {
-				hMonitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
+				monitor.Detach();
 			}
 		}
-	} else {
-		hMonitor = MonitorFromWindow (m_hWnd, 0);
-	}
-	if (GetMonitorInfo (hMonitor, &MonitorInfo)) {
-		MonitorRect = CRect (MonitorInfo.rcMonitor);
-		// Window creation
-		DWORD dwStyle		= WS_POPUP  | WS_VISIBLE ;
-		m_fullWndSize.cx	= MonitorRect.Width();
-		m_fullWndSize.cy	= MonitorRect.Height();
-
-		m_pFullscreenWnd->CreateEx (WS_EX_TOPMOST | WS_EX_TOOLWINDOW, _T(""), ResStr(IDS_MAINFRM_136), dwStyle, MonitorRect.left, MonitorRect.top, MonitorRect.Width(), MonitorRect.Height(), NULL, NULL, NULL);
-		//SetWindowLongPtr(m_pFullscreenWnd->m_hWnd, GWL_EXSTYLE, WS_EX_TOPMOST); // TODO : still freezing sometimes...
-		/*
-		CRect r;
-		GetWindowRect(r);
-
-		int x = MonitorRect.left + (MonitorRect.Width()/2)-(r.Width()/2);
-		int y = MonitorRect.top + (MonitorRect.Height()/2)-(r.Height()/2);
-		int w = r.Width();
-		int h = r.Height();
-		MoveWindow(x, y, w, h);
-		*/
 	}
 
-	return m_pFullscreenWnd->IsWindow();
+	if (!monitor.IsMonitor()) {
+		monitor = CMonitors::GetNearestMonitor(this);
+	}
+
+	CRect monitorRect;
+	monitor.GetMonitorRect(monitorRect);
+
+	return !!m_pFullscreenWnd->CreateEx(WS_EX_TOPMOST | WS_EX_TOOLWINDOW, L"", ResStr(IDS_MAINFRM_136),
+										WS_POPUP | WS_VISIBLE, monitorRect, this, 0);
 }
 
 bool CMainFrame::IsD3DFullScreenMode() const
