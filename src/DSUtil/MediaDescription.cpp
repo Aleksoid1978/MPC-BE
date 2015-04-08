@@ -170,7 +170,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 			bool fBIH = ExtractBIH(pmt, &bih);
 			if (fBIH) {
 				CString codecName = CMediaTypeEx::GetVideoCodecName(pmt->subtype, bih.biCompression);
-				if (codecName.GetLength() > 0) {
+				if (!codecName.IsEmpty()) {
 					Infos.AddTail(codecName);
 				}
 			}
@@ -211,21 +211,16 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 			if (pmt->subtype == MEDIASUBTYPE_DOLBY_DDPLUS) {
 				Infos.AddTail(L"Dolby Digital Plus");
 			} else {
-				switch (pInfo->wFormatTag) {
-					case WAVE_FORMAT_MPEG: {
-						const MPEG1WAVEFORMAT* pInfoMPEG1 = GetFormatHelper(pInfoMPEG1, pmt);
+				if (pInfo->wFormatTag == WAVE_FORMAT_MPEG && pmt->cbFormat >= sizeof(MPEG1WAVEFORMAT)) {
+					const MPEG1WAVEFORMAT* pInfoMPEG1 = GetFormatHelper(pInfoMPEG1, pmt);
 
-						int layer = GetHighestBitSet32(pInfoMPEG1->fwHeadLayer) + 1;
-						Infos.AddTail(FormatString(L"MPEG1 - Layer %d", layer));
+					int layer = GetHighestBitSet32(pInfoMPEG1->fwHeadLayer) + 1;
+					Infos.AddTail(FormatString(L"MPEG1 - Layer %d", layer));
+				} else {
+					CString codecName = CMediaTypeEx::GetAudioCodecName(pmt->subtype, pInfo->wFormatTag);
+					if (!codecName.IsEmpty()) {
+						Infos.AddTail(codecName);
 					}
-					break;
-					default: {
-						CString codecName = CMediaTypeEx::GetAudioCodecName(pmt->subtype, pInfo->wFormatTag);
-						if (codecName.GetLength() > 0) {
-							Infos.AddTail(codecName);
-						}
-					}
-					break;
 				}
 			}
 
