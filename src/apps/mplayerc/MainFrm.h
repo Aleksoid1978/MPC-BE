@@ -987,7 +987,6 @@ public:
 	HRESULT PreviewWindowShow(REFERENCE_TIME rtCur2);
 	bool CanPreviewUse();
 
-	SIZE			m_fullWndSize;
 	CFullscreenWnd*	m_pFullscreenWnd;
 	COSD		m_OSD;
 
@@ -1074,7 +1073,6 @@ protected:
 	void SetStatusMessage(CString m_msg);
 	CString FillMessage();
 
-	DWORD	m_nMenuHideTick;
 	bool	m_fValidDVDOpen;
 
 	CComPtr<IBaseFilter> m_pBFmadVR;
