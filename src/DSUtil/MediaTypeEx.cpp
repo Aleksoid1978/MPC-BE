@@ -231,8 +231,8 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 		names['DIVX'] = _T("DivX 6");
 		names['XVID'] = _T("Xvid");
 		names['MP4V'] = _T("MPEG4 Video");
-		names['AVC1'] = _T("MPEG4 Video (H264)");
-		names['H264'] = _T("MPEG4 Video (H264)");
+		names['AVC1'] = _T("H.264/AVC");
+		names['H264'] = _T("H.264/AVC");
 		names['RV10'] = _T("RealVideo 1");
 		names['RV20'] = _T("RealVideo 2");
 		names['RV30'] = _T("RealVideo 3");
