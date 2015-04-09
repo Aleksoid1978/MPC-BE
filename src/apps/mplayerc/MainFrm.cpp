@@ -3978,7 +3978,9 @@ void CMainFrame::OnUnInitMenuPopup(CMenu* pPopupMenu, UINT nFlags)
 	__super::OnUnInitMenuPopup(pPopupMenu, nFlags);
 
 	MSG msg;
-	PeekMessage(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDOWN, PM_REMOVE); //remove the click LMB, which closes the popup menu
+	PeekMessage(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDOWN, PM_REMOVE);
+
+	m_bLeftMouseDown = FALSE;
 }
 
 BOOL CMainFrame::OnMenu(CMenu* pMenu)
