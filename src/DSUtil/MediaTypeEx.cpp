@@ -254,7 +254,7 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 	}
 
 	if (biCompression != BI_RGB && biCompression != BI_BITFIELDS) {
-		DWORD fourcc = biCompression;
+		DWORD fourcc = FCC(biCompression);
 		BYTE* b = (BYTE*)&fourcc;
 
 		for (size_t i = 0; i < 4; i++) {
