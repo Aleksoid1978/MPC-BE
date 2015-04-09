@@ -77,7 +77,12 @@ using namespace MediaInfoLib;
 
 class CFullscreenWnd;
 
-enum {PM_NONE, PM_FILE, PM_DVD, PM_CAPTURE, };
+enum PMODE {
+	PM_NONE,
+	PM_FILE,
+	PM_DVD,
+	PM_CAPTURE
+};
 
 interface __declspec(uuid("6E8D4A21-310C-11d0-B79A-00AA003767A7")) // IID_IAMLine21Decoder
 IAMLine21Decoder_2 :
@@ -148,7 +153,14 @@ public:
 	BOOL InitInstance();
 	int ExitInstance();
 
-	enum {TM_EXIT=WM_APP, TM_OPEN, TM_CLOSE, TM_RESET, TM_TUNER_SCAN, TM_DISPLAY_CHANGE};
+	enum {
+		TM_EXIT = WM_APP,
+		TM_OPEN,
+		TM_CLOSE,
+		TM_RESET,
+		TM_TUNER_SCAN,
+		TM_DISPLAY_CHANGE
+	};
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnExit(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnOpen(WPARAM wParam, LPARAM lParam);
@@ -395,7 +407,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	friend class CWebClientSocket;
 	friend class CWebServer;
 	CAutoPtr<CWebServer> m_pWebServer;
-	int m_iPlaybackMode;
+	PMODE m_ePlaybackMode;
 	ULONG m_lCurrentChapter;
 	ULONG m_lChapterStartTime;
 
@@ -404,10 +416,10 @@ public:
 	void StopWebServer();
 
 	CString GetStatusMessage();
-	int GetPlaybackMode() const {
-		return m_iPlaybackMode;
+	PMODE GetPlaybackMode() const {
+		return m_ePlaybackMode;
 	}
-	void SetPlaybackMode(int iNewStatus);
+	void SetPlaybackMode(PMODE eNewStatus);
 	bool IsMuted() {
 		return m_wndToolBar.GetVolume() == -10000;
 	}
@@ -423,25 +435,26 @@ public:
 
 	// Attributes
 public:
-	bool m_fFullScreen;
-	bool m_fFirstFSAfterLaunchOnFS;
-	bool m_fHideCursor;
+	bool m_bFullScreen;
+	bool m_bFirstFSAfterLaunchOnFullScreen;
+	bool m_bHideCursor;
+
 	CMenu m_navMixAudioMenu, m_navMixSubtitleMenu;
 
 	CComPtr<IBaseFilter> m_pRefClock; // Adjustable reference clock. GothSync
 	CComPtr<ISyncClock> m_pSyncClock;
 
 	bool IsFrameLessWindow() const {
-		return(m_fFullScreen || AfxGetAppSettings().iCaptionMenuMode==MODE_BORDERLESS);
+		return(m_bFullScreen || AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS);
 	}
 	bool IsCaptionHidden() const {//If no caption, there is no menu bar. But if is no menu bar, then the caption can be.
-		return(!m_fFullScreen && AfxGetAppSettings().iCaptionMenuMode>MODE_HIDEMENU);//!=MODE_SHOWCAPTIONMENU && !=MODE_HIDEMENU
+		return(!m_bFullScreen && AfxGetAppSettings().iCaptionMenuMode > MODE_HIDEMENU);//!=MODE_SHOWCAPTIONMENU && !=MODE_HIDEMENU
 	}
 	bool IsMenuHidden() const {
-		return(!m_fFullScreen && AfxGetAppSettings().iCaptionMenuMode!=MODE_SHOWCAPTIONMENU);
+		return(!m_bFullScreen && AfxGetAppSettings().iCaptionMenuMode != MODE_SHOWCAPTIONMENU);
 	}
 	bool IsSomethingLoaded() const {
-		return((m_iMediaLoadState == MLS_LOADING || m_iMediaLoadState == MLS_LOADED) && !IsD3DFullScreenMode());
+		return((m_eMediaLoadState == MLS_LOADING || m_eMediaLoadState == MLS_LOADED) && !IsD3DFullScreenMode());
 	}
 	bool IsPlaylistEmpty() {
 		return(m_wndPlaylistBar.GetCount() == 0);
@@ -455,7 +468,7 @@ public:
 
 protected:
 	bool			m_bUseSmartSeek;
-	MPC_LOADSTATE	m_iMediaLoadState;
+	MPC_LOADSTATE	m_eMediaLoadState;
 	bool			m_bClosingState;
 	bool			m_bAudioOnly;
 
@@ -1145,6 +1158,9 @@ private:
 	int			GetStreamCount(DWORD dwSelGroup);
 
 	DWORD_PTR	m_nMainFilterId;
+
+	BOOL		m_bLeftMouseDown			= FALSE;
+	BOOL		m_bLeftMouseDownFullScreen	= FALSE;
 
 public:
 	UINT		YoutubeThreadProc();

@@ -305,11 +305,11 @@ BOOL CPlayerStatusBar::OnEraseBkgnd(CDC* pDC)
 
 		auto pFrame = AfxGetMainFrame();
 
-		if (pFrame->m_pLastBar != this || pFrame->m_fFullScreen) {
+		if (pFrame->m_pLastBar != this || pFrame->m_bFullScreen) {
 			r.InflateRect(0, 0, 0, 1);
 		}
 
-		if (pFrame->m_fFullScreen) {
+		if (pFrame->m_bFullScreen) {
 			r.InflateRect(1, 0, 1, 0);
 		}
 
@@ -444,7 +444,7 @@ void CPlayerStatusBar::OnLButtonDown(UINT nFlags, CPoint point)
 		return;
 	}
 
-	if (!pFrame->m_fFullScreen && wp.showCmd != SW_SHOWMAXIMIZED) {
+	if (!pFrame->m_bFullScreen && wp.showCmd != SW_SHOWMAXIMIZED) {
 		CRect r;
 		GetClientRect(r);
 		CPoint p = point;
@@ -475,7 +475,7 @@ BOOL CPlayerStatusBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		return TRUE;
 	}
 
-	if (!pFrame->m_fFullScreen && wp.showCmd != SW_SHOWMAXIMIZED) {
+	if (!pFrame->m_bFullScreen && wp.showCmd != SW_SHOWMAXIMIZED) {
 		CRect r;
 		GetClientRect(r);
 		if (p.x >= r.Width()-r.Height() && !pFrame->IsCaptionHidden()) {

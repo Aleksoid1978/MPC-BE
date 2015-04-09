@@ -579,7 +579,7 @@ void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 				MoveThumb(point);
 				m_pMainFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 			} else {
-				if (!m_pMainFrame->m_fFullScreen) {
+				if (!m_pMainFrame->m_bFullScreen) {
 					MapWindowPoints(m_pMainFrame, &point, 1);
 					m_pMainFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 				}
