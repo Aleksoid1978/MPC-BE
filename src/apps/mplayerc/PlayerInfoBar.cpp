@@ -180,11 +180,11 @@ BOOL CPlayerInfoBar::OnEraseBkgnd(CDC* pDC)
 
 	auto pFrame = AfxGetMainFrame();
 
-	if (pFrame->m_pLastBar != this || pFrame->m_fFullScreen) {
+	if (pFrame->m_pLastBar != this || pFrame->m_bFullScreen) {
 		r.InflateRect(0, 0, 0, 1);
 	}
 
-	if (pFrame->m_fFullScreen) {
+	if (pFrame->m_bFullScreen) {
 		r.InflateRect(1, 0, 1, 0);
 	}
 
@@ -222,7 +222,7 @@ void CPlayerInfoBar::OnSize(UINT nType, int cx, int cy)
 void CPlayerInfoBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	auto pFrame = AfxGetMainFrame();
-	if (!pFrame->m_fFullScreen) {
+	if (!pFrame->m_bFullScreen) {
 		MapWindowPoints(pFrame, &point, 1);
 		pFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 	}

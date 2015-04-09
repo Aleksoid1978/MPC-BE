@@ -778,7 +778,7 @@ void CPlayerToolBar::OnLButtonDown(UINT nFlags, CPoint point)
 	if (i == 0 && fs != -1) {
 		m_pMainFrame->PostMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
 	} else if (i == -1 || (GetButtonStyle(i) & (TBBS_SEPARATOR | TBBS_DISABLED))) {
-		if (!m_pMainFrame->m_fFullScreen) {
+		if (!m_pMainFrame->m_bFullScreen) {
 			MapWindowPoints(m_pMainFrame, &point, 1);
 			m_pMainFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 		}

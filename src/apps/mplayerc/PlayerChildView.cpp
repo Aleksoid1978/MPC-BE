@@ -267,7 +267,7 @@ BOOL CChildView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 {
 	auto pFrame = AfxGetMainFrame();
 
-	if (pFrame->m_fHideCursor) {
+	if (pFrame->m_bHideCursor) {
 		SetCursor(NULL);
 		return TRUE;
 	}
@@ -294,7 +294,7 @@ LRESULT CChildView::OnNcHitTest(CPoint point)
 	WINDOWPLACEMENT wp;
 	pFrame->GetWindowPlacement(&wp);
 
-	if (!pFrame->m_fFullScreen && wp.showCmd != SW_SHOWMAXIMIZED && AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS) {
+	if (!pFrame->m_bFullScreen && wp.showCmd != SW_SHOWMAXIMIZED && AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS) {
 		CRect rcClient, rcFrame;
 		GetWindowRect(&rcFrame);
 		rcClient = rcFrame;
@@ -337,7 +337,7 @@ void CChildView::OnNcLButtonDown(UINT nHitTest, CPoint point)
 	auto pFrame = AfxGetMainFrame();
 	bool fLeftMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN);
 
-	if (!pFrame->m_fFullScreen && (pFrame->IsCaptionHidden() || fLeftMouseBtnUnassigned)) {
+	if (!pFrame->m_bFullScreen && (pFrame->IsCaptionHidden() || fLeftMouseBtnUnassigned)) {
 		BYTE bFlag = 0;
 		switch (nHitTest) {
 			case HTTOP:

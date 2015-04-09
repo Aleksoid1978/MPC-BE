@@ -197,7 +197,7 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 	} else if (r_MinIcon.PtInRect(p)) {
 		pFrame->m_fTrayIcon ? pFrame->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE, -1) : pFrame->ShowWindow(SW_SHOWMINIMIZED);
 	} else if (r_RestoreIcon.PtInRect(p)) {
-		if (wp.showCmd != SW_SHOWMAXIMIZED && pFrame->m_fFullScreen) {
+		if (wp.showCmd != SW_SHOWMAXIMIZED && pFrame->m_bFullScreen) {
 			pFrame->ToggleFullscreen(true, true);
 			pFrame->ShowWindow(SW_SHOWMAXIMIZED);
 		} else if (wp.showCmd == SW_SHOWMAXIMIZED) {
@@ -277,7 +277,7 @@ void CFlyBar::UpdateWnd(CPoint point)
 		}
 		bt_idx = 4;
 	} else if (r_FSIcon.PtInRect(point)) {
-		str2 = pFrame->m_fFullScreen ? ResStr(IDS_TOOLTIP_WINDOW) : ResStr(IDS_TOOLTIP_FULLSCREEN);
+		str2 = pFrame->m_bFullScreen ? ResStr(IDS_TOOLTIP_WINDOW) : ResStr(IDS_TOOLTIP_FULLSCREEN);
 		if (str != str2) {
 			m_tooltip.UpdateTipText(str2, this);
 		}
@@ -372,7 +372,7 @@ void CFlyBar::DrawWnd()
 			}
 
 			if (!i || bt_idx == 5) { // fs
-				if (pFrame->m_fFullScreen) {
+				if (pFrame->m_bFullScreen) {
 					DrawButton(&mdc, x, sep[8][i], 4);
 				} else {
 					DrawButton(&mdc, x, sep[10][i], 4);
