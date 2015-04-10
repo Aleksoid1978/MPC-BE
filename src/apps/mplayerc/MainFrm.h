@@ -287,6 +287,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 
 	void ShowControls(int nCS, bool fSave = true);
 
+	bool m_bDelaySetOutputRect = false;
 	void SetDefaultWindowRect(int iMonitor = 0);
 	void SetDefaultFullscreenState();
 	void RestoreDefaultWindowRect();
@@ -549,7 +550,7 @@ public:
 
 	CSize GetVideoSize();
 	void ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasTo);
-	void MoveVideoWindow(bool fShowStats = false);
+	void MoveVideoWindow(bool bShowStats = false, bool bForcedSetVideoRect = false);
 	void RepaintVideo();
 	void HideVideoWindow(bool fHide);
 
