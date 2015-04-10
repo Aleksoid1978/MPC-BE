@@ -4203,6 +4203,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	m_bfirstPlay	= true;
 	m_LastOpenFile	= m_lastOMD->title;
 
+	m_bDelaySetOutputRect = false;
+
 	if (!(s.nCLSwitches & CLSW_OPEN) && (s.nLoops > 0)) {
 		SendMessage(WM_COMMAND, ID_PLAY_PLAY);
 	} else {
@@ -7577,7 +7579,7 @@ void CMainFrame::OnPlayPlay()
 		SetAlwaysOnTop(AfxGetAppSettings().iOnTop);
 	}
 
-	MoveVideoWindow();
+	MoveVideoWindow(false, true);
 	m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_PLAYING), 3000);
 	SetPlayState(PS_PLAY);
 
@@ -10749,9 +10751,9 @@ void CMainFrame::AutoChangeMonitorMode()
 	}
 }
 
-void CMainFrame::MoveVideoWindow(bool fShowStats)
+void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVideoRect/* = false*/)
 {
-	if (m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly && IsWindowVisible()) {
+	if (!m_bDelaySetOutputRect && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly && IsWindowVisible()) {
 		CRect wr, wr2;
 
 		if (m_pFullscreenWnd->IsWindow()) {
@@ -10769,7 +10771,7 @@ void CMainFrame::MoveVideoWindow(bool fShowStats)
 		CRect vr = CRect(0,0,0,0);
 
 		OAFilterState fs = GetMediaState();
-		if (fs == State_Paused || fs == State_Running || (fs == State_Stopped && m_fShockwaveGraph)) {
+		if (fs != State_Stopped || bForcedSetVideoRect || (fs == State_Stopped && m_fShockwaveGraph)) {
 			CSize arxy = GetVideoSize();
 
 			dvstype iDefaultVideoSize = (dvstype)AfxGetAppSettings().iDefaultVideoSize;
@@ -10892,7 +10894,7 @@ void CMainFrame::MoveVideoWindow(bool fShowStats)
 			m_pVW_preview->SetWindowPosition(wr2.left, wr2.top, wr2.Width(), wr2.Height());
 		}
 
-		if (fShowStats && vr.Height() > 0) {
+		if (bShowStats && vr.Height() > 0) {
 			CString info;
 			info.Format(_T("Pos %.2f %.2f, Zoom %.2f %.2f, AR %.2f"), m_PosX, m_PosY, m_ZoomX, m_ZoomY, (float)vr.Width()/vr.Height());
 			SendStatusMessage(info, 3000);
@@ -11075,7 +11077,7 @@ double CMainFrame::GetZoomAutoFitScale()
 
 void CMainFrame::RepaintVideo()
 {
-	if (GetMediaState() != State_Running) {
+	if (!m_bDelaySetOutputRect && GetMediaState() != State_Running) {
 		if (m_pCAP) {
 			m_pCAP->Paint(false);
 		} else if (m_pMFVDC) {
@@ -16796,6 +16798,9 @@ void CMainFrame::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	} else if (OpenDeviceData* p = dynamic_cast<OpenDeviceData*>(pOMD.m_p)) {
 		fUseThread = false;
 	}
+
+	// don't set video renderer output rect until the window is repositioned
+	m_bDelaySetOutputRect = true;
 
 	SetLoadState(MLS_LOADING);
 
