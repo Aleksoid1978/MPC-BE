@@ -1064,7 +1064,10 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
 // ==> Start patch MPC
 enum AVPixelFormat ff_h264_get_pixel_format(H264Context *h)
 {
-    return get_pixel_format(h, 1);
+    int ret = get_pixel_format(h, 1);
+    if (ret < 0)
+        ret = AV_PIX_FMT_YUV420P;
+    return ret;
 }
 // ==> End patch MPC
 
