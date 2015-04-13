@@ -1880,48 +1880,59 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 
 	if (m_pAVCtx->pix_fmt != AV_PIX_FMT_NONE) {
 		const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt);
-		int lumabits = av_pfdesc->comp->depth_minus1 + 1;
+		if (av_pfdesc) {
+			int lumabits = av_pfdesc->comp->depth_minus1 + 1;
 
-		const MPCPixelFormat* InOutList = NULL;
+			const MPCPixelFormat* InOutList = NULL;
 
-		if (av_pfdesc->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL)) {
-			InOutList = RGB_8;
-		} else if (av_pfdesc->nb_components >= 3) {
-			if (av_pfdesc->log2_chroma_w == 1 && av_pfdesc->log2_chroma_h == 1) { // 4:2:0
-				if (lumabits <= 8) {
-					InOutList = YUV420_8;
-				} else if (lumabits <= 10) {
-					InOutList = YUV420_10;
-				} else {
-					InOutList = YUV420_16;
+			if (av_pfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL)) {
+				InOutList = RGB_8;
+			}
+			else if (av_pfdesc->nb_components >= 3) {
+				if (av_pfdesc->log2_chroma_w == 1 && av_pfdesc->log2_chroma_h == 1) { // 4:2:0
+					if (lumabits <= 8) {
+						InOutList = YUV420_8;
+					}
+					else if (lumabits <= 10) {
+						InOutList = YUV420_10;
+					}
+					else {
+						InOutList = YUV420_16;
+					}
 				}
-			} else if (av_pfdesc->log2_chroma_w == 1 && av_pfdesc->log2_chroma_h == 0) { // 4:2:2
-				if (lumabits <= 8) {
-					InOutList = YUV422_8;
-				} else if (lumabits <= 10) {
-					InOutList = YUV422_10;
-				} else {
-					InOutList = YUV422_16;
+				else if (av_pfdesc->log2_chroma_w == 1 && av_pfdesc->log2_chroma_h == 0) { // 4:2:2
+					if (lumabits <= 8) {
+						InOutList = YUV422_8;
+					}
+					else if (lumabits <= 10) {
+						InOutList = YUV422_10;
+					}
+					else {
+						InOutList = YUV422_16;
+					}
 				}
-			} else if (av_pfdesc->log2_chroma_w == 0 && av_pfdesc->log2_chroma_h == 0) { // 4:4:4
-				if (lumabits <= 8) {
-					InOutList = YUV444_8;
-				} else if (lumabits <= 10) {
-					InOutList = YUV444_10;
-				} else {
-					InOutList = YUV444_16;
+				else if (av_pfdesc->log2_chroma_w == 0 && av_pfdesc->log2_chroma_h == 0) { // 4:4:4
+					if (lumabits <= 8) {
+						InOutList = YUV444_8;
+					}
+					else if (lumabits <= 10) {
+						InOutList = YUV444_10;
+					}
+					else {
+						InOutList = YUV444_16;
+					}
 				}
 			}
-		}
 
-		if (InOutList == NULL) {
-			InOutList = YUV420_8;
-		}
+			if (InOutList == NULL) {
+				InOutList = YUV420_8;
+			}
 
-		for (int i = 0; i < PixFmt_count; i++) {
-			int index = InOutList[i];
-			if (m_fPixFmts[index]) {
-				nSwIndex[nSwCount++] = index;
+			for (int i = 0; i < PixFmt_count; i++) {
+				int index = InOutList[i];
+				if (m_fPixFmts[index]) {
+					nSwIndex[nSwCount++] = index;
+				}
 			}
 		}
 	}
@@ -3377,7 +3388,11 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetColorSpaceConversion()
 		return -2; // no conversion
 	}
 
-	bool in_rgb		= !!(av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL));
+	const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt);
+	if (!av_pfdesc) {
+		return -2;
+	}
+	bool in_rgb		= !!(av_pfdesc->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL));
 	bool out_rgb	= (m_FormatConverter.GetOutPixFormat() == PixFmt_RGB32);
 	if (in_rgb < out_rgb) {
 		return 1; // YUV->RGB conversion
