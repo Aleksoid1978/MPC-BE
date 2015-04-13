@@ -131,6 +131,10 @@ MPCPixelFormat GetPixFormat(DWORD biCompression)
 MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 {
 	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
+	if (!pfdesc) {
+		return PFType_unspecified;
+	}
+
 	int lumabits = pfdesc->comp->depth_minus1 + 1;
 
 	if (pfdesc->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL)) {
@@ -241,7 +245,8 @@ void  CFormatConverter::UpdateDetails()
 		int srcRange, dstRange, brightness, contrast, saturation;
 		int ret = sws_getColorspaceDetails(m_pSwsContext, &inv_tbl, &srcRange, &tbl, &dstRange, &brightness, &contrast, &saturation);
 		if (ret >= 0) {
-			if (m_out_pixfmt == PixFmt_RGB32 && !(av_pix_fmt_desc_get(m_FProps.avpixfmt)->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL))) {
+			const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
+			if (pfdesc && m_out_pixfmt == PixFmt_RGB32 && !(av_pix_fmt_desc_get(m_FProps.avpixfmt)->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL))) {
 				dstRange = m_dstRGBRange;
 			}
 			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, dstRange, brightness, contrast, saturation);
@@ -496,6 +501,9 @@ bool CFormatConverter::FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2)
 	}
 	const AVPixFmtDescriptor* av_pfdesc_fmt1 = av_pix_fmt_desc_get(*fmt1);
 	const AVPixFmtDescriptor* av_pfdesc_fmt2 = av_pix_fmt_desc_get(*fmt2);
+	if (!av_pfdesc_fmt1 || !av_pfdesc_fmt2) {
+		return false;
+	}
 	return av_pfdesc_fmt1->log2_chroma_h != av_pfdesc_fmt2->log2_chroma_h
 			|| av_pfdesc_fmt1->log2_chroma_w != av_pfdesc_fmt2->log2_chroma_w
 			|| av_pfdesc_fmt1->nb_components != av_pfdesc_fmt2->nb_components
