@@ -772,6 +772,7 @@ namespace HEVCParser {
 		if (gb.BitRead(1)) {     // scaling_list_enable_flag
 			if (gb.BitRead(1)) { // scaling_list_data
 				uint8 scaling_list_pred_mode_flag = 0;
+				int coef_num, i;
 				for (int size_id = 0; size_id < 4; size_id++) {
 					for (uint32 matrix_id = 0; matrix_id < 6; matrix_id += ((size_id == 3) ? 3 : 1)) {
 						scaling_list_pred_mode_flag = gb.BitRead(1);
@@ -780,9 +781,14 @@ namespace HEVCParser {
 							if (matrix_id < delta) {
 								return false;
 							}
-						}
-						else {
-							gb.SExpGolombRead();
+						} else {
+							coef_num = min(64, 1 << (4 + (size_id << 1)));
+							if (size_id > 1) {
+								gb.SExpGolombRead();
+							}
+							for (i = 0; i < coef_num; i++) {
+								gb.SExpGolombRead();
+							}
 						}
 					}
 				}
