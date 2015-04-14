@@ -3349,13 +3349,6 @@ BOOL CMainFrame::OnButton(UINT id, UINT nFlags, CPoint point)
 	return ret;
 }
 
-void CMainFrame::OnNcLButtonDown(UINT nFlags, CPoint point)
-{
-	__super::OnNcLButtonDown(nFlags, point);
-
-	m_bLeftMouseDown = FALSE;
-}
-
 void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if (!m_pFullscreenWnd->IsWindow() || !m_OSD.OnLButtonDown (nFlags, point)) {
@@ -3716,12 +3709,6 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 
 		__super::OnMouseMove(nFlags, point);
 	}
-}
-
-LRESULT CMainFrame::OnNcHitTest(CPoint point)
-{
-	LRESULT nHitTest = __super::OnNcHitTest(point);
-	return /*((IsCaptionHidden()) && nHitTest == HTCLIENT) ? HTCAPTION : */nHitTest;
 }
 
 void CMainFrame::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
