@@ -55,15 +55,14 @@ protected:
 
 	CMediaType* m_pCurrentMediaType;
 
-	BOOL m_bIgnoreJitterChecking;
-	BOOL m_bNeedSyncpoint;
+	bool m_bIgnoreJitterChecking;
+	bool m_bNeedSyncpoint;
 
 public:
 	CFFAudioDecoder();
 
 	bool    Init(enum AVCodecID nCodecId, CTransformInputPin* m_pInput = NULL);
 	void    SetDRC(bool fDRC);
-	void    SetStereoDownmix(bool stereodownmix);
 
 	HRESULT RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOut);
 	HRESULT Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, int& size, CAtlArray<BYTE>& BuffOut, SampleFormat& samplefmt);
@@ -79,6 +78,6 @@ public:
 	DWORD GetChannelMask();      // unsafe
 	WORD  GetCoddedBitdepth();   // unsafe
 
-	BOOL GetIgnoreJitterChecking() const { return m_bIgnoreJitterChecking; }
-	BOOL GetNeedSyncPoint() const { return m_bNeedSyncpoint; }
+	bool GetIgnoreJitterChecking() const { return m_bIgnoreJitterChecking; }
+	bool GetNeedSyncPoint() const { return m_bNeedSyncpoint; }
 };

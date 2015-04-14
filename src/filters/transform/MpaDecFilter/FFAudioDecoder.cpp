@@ -198,8 +198,8 @@ CFFAudioDecoder::CFFAudioDecoder()
 	, m_pParser(NULL)
 	, m_pFrame(NULL)
 	, m_pCurrentMediaType(NULL)
-	, m_bIgnoreJitterChecking(FALSE)
-	, m_bNeedSyncpoint(FALSE)
+	, m_bIgnoreJitterChecking(false)
+	, m_bNeedSyncpoint(false)
 {
 	memset(&m_raData, 0, sizeof(m_raData));
 }
@@ -218,8 +218,6 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/*
 		return false;
 	}
 
-	CMediaType *pCurrentMediaType = m_pCurrentMediaType;
-
 	bool bRet = false;
 
 	avcodec_register_all();
@@ -233,7 +231,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/*
 	if (m_pAVCodec) {
 		DWORD nSamples, nBytesPerSec;
 		WORD nChannels, nBitsPerSample, nBlockAlign;
-		audioFormatTypeHandler((BYTE*)pCurrentMediaType->Format(), pCurrentMediaType->FormatType(), &nSamples, &nChannels, &nBitsPerSample, &nBlockAlign, &nBytesPerSec);
+		audioFormatTypeHandler((BYTE*)m_pCurrentMediaType->Format(), m_pCurrentMediaType->FormatType(), &nSamples, &nChannels, &nBitsPerSample, &nBlockAlign, &nBytesPerSec);
 
 		if (nCodecId == AV_CODEC_ID_AMR_NB) {
 			nChannels = 1;
@@ -261,11 +259,20 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/*
 			m_pAVCtx->flags				|= CODEC_FLAG_TRUNCATED;
 		}
 
+		//if (stereodownmix &&
+		//		(nCodecId == AV_CODEC_ID_AC3
+		//		|| nCodecId == AV_CODEC_ID_EAC3
+		//		|| nCodecId == AV_CODEC_ID_TRUEHD
+		//		|| nCodecId == AV_CODEC_ID_DTS)) {
+		//	m_pAVCtx->request_channels = 2;
+		//	m_pAVCtx->request_channel_layout = AV_CH_LAYOUT_STEREO;
+		//}
+
 		m_pParser = av_parser_init(nCodecId);
 
-		const void* format = pCurrentMediaType->Format();
-		GUID format_type = pCurrentMediaType->formattype;
-		DWORD formatlen = pCurrentMediaType->cbFormat;
+		const void* format = m_pCurrentMediaType->Format();
+		GUID format_type = m_pCurrentMediaType->formattype;
+		DWORD formatlen = m_pCurrentMediaType->cbFormat;
 		unsigned extralen = 0;
 		getExtraData((BYTE*)format, &format_type, formatlen, NULL, &extralen);
 
@@ -329,19 +336,6 @@ void CFFAudioDecoder::SetDRC(bool fDRC)
 		AVCodecID codec_id = m_pAVCtx->codec_id;
 		if (codec_id == AV_CODEC_ID_AC3 || codec_id == AV_CODEC_ID_EAC3) {
 			av_opt_set_double(m_pAVCtx, "drc_scale", fDRC ? 1.0f : 0.0f, AV_OPT_SEARCH_CHILDREN);
-		}
-	}
-}
-
-void CFFAudioDecoder::SetStereoDownmix(bool stereodownmix)
-{
-	if (m_pAVCtx) {
-		AVCodecID codec_id = m_pAVCtx->codec_id;
-		if (codec_id == AV_CODEC_ID_AC3
-				|| codec_id == AV_CODEC_ID_EAC3
-				|| codec_id == AV_CODEC_ID_TRUEHD) {
-			av_opt_set_int(m_pAVCtx, "request_channels", stereodownmix ? 2 : 0, AV_OPT_SEARCH_CHILDREN);
-			av_opt_set_int(m_pAVCtx, "request_channel_layout", stereodownmix ? AV_CH_LAYOUT_STEREO : AV_CH_LAYOUT_NATIVE, AV_OPT_SEARCH_CHILDREN);
 		}
 	}
 }
@@ -473,8 +467,8 @@ void CFFAudioDecoder::StreamFinish()
 
 	av_frame_free(&m_pFrame);
 
-	m_bIgnoreJitterChecking = FALSE;
-	m_bNeedSyncpoint = FALSE;
+	m_bIgnoreJitterChecking = false;
+	m_bNeedSyncpoint = false;
 }
 
 // RealAudio
