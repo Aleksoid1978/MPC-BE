@@ -53,7 +53,7 @@ static int dcadec_decode_frame(AVCodecContext *avctx, void *data,
         return AVERROR_INVALIDDATA;
     }
     mrk = AV_RB32(input);
-    if (/*mrk != DCA_SYNCWORD_CORE_BE && */mrk != DCA_SYNCWORD_SUBSTREAM) {
+    if (mrk != DCA_SYNCWORD_CORE_BE && mrk != DCA_SYNCWORD_SUBSTREAM) {
         s->buffer = av_fast_realloc(s->buffer, &s->buffer_size, avpkt->size + FF_INPUT_BUFFER_PADDING_SIZE);
         if (!s->buffer)
             return AVERROR(ENOMEM);
@@ -167,8 +167,13 @@ static av_cold int dcadec_close(AVCodecContext *avctx)
 static av_cold int dcadec_init(AVCodecContext *avctx)
 {
     DCADecContext *s = avctx->priv_data;
+    int flags = 0;
 
-    s->ctx = dcadec_context_create(0);
+    /* Affects only lossy DTS profiles. DTS-HD MA is always bitexact */
+    if (avctx->flags & CODEC_FLAG_BITEXACT)
+        flags |= DCADEC_FLAG_CORE_BIT_EXACT;
+
+    s->ctx = dcadec_context_create(flags);
     if (!s->ctx)
         return AVERROR(ENOMEM);
 
