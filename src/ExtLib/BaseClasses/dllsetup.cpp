@@ -260,6 +260,7 @@ AMovieSetupRegisterFilter2( const AMOVIESETUP_FILTER * const psetupdata
   //
   if( NULL == psetupdata ) return S_FALSE;
 
+  const CLSID *filterCategory = &psetupdata->filterCategory;
 
   // unregister filter
   // (as pins are subkeys of filter's CLSID key
@@ -267,7 +268,7 @@ AMovieSetupRegisterFilter2( const AMOVIESETUP_FILTER * const psetupdata
   //
   DbgLog((LOG_TRACE, 3, TEXT("= = unregister filter")));
   HRESULT hr = pIFM2->UnregisterFilter(
-      0,                        // default category
+      filterCategory,           // category
       0,                        // default instance name
       *psetupdata->clsID );
 
@@ -280,15 +281,13 @@ AMovieSetupRegisterFilter2( const AMOVIESETUP_FILTER * const psetupdata
     rf2.cPins = psetupdata->nPins;
     rf2.rgPins = psetupdata->lpPin;
 
-    const CLSID *filterCategory=&psetupdata->filterCategory;
-    
     // register filter
     //
     DbgLog((LOG_TRACE, 3, TEXT("= = register filter")));
     hr = pIFM2->RegisterFilter(*psetupdata->clsID
                              , psetupdata->strName
                              , 0 // moniker
-                             ,filterCategory // category
+                             , filterCategory // category
                              , NULL // instance
                              , &rf2);
   }
