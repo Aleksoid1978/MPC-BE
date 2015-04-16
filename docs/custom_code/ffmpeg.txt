@@ -25,6 +25,7 @@
 * libavcodec/hevcpred.c
 * libavcodec/hevcpred.h
 * libavcodec/internal.h
+*.libavcodec/libdcadec.c 
 * libavcodec/mpeg12dec.c
 * libavcodec/mpegvideo.c
 * libavcodec/options.c
