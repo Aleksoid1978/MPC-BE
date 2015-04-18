@@ -925,6 +925,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_rtLastStart(0)
 	, m_rtLastStop(0)
 	, m_rtStartCache(INVALID_TIME)
+	, m_rtStopCache(INVALID_TIME)
 	, m_nWorkaroundBug(FF_BUG_AUTODETECT)
 	, m_nErrorConcealment(FF_EC_DEBLOCK | FF_EC_GUESS_MVS)
 	, m_bDXVACompatible(true)
@@ -2232,6 +2233,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 
 	m_rtStart		= rtStart;
 	m_rtStartCache	= INVALID_TIME;
+	m_rtStopCache	= INVALID_TIME;
 	m_rtLastStart	= 0;
 	m_rtLastStop	= 0;
 
@@ -2368,7 +2370,6 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 		// all Parser code from LAV ... thanks to it's author
 		if (m_pParser) {
 			decode_ret		= -1;
-			rtStop			= INVALID_TIME;
 			BYTE *pOut		= NULL;
 			int pOut_size	= 0;
 
@@ -2387,7 +2388,8 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 			// If output is bigger or equal, a frame was completed, update the actual rtStart with the cached value, and then overwrite the cache
 			if (used_bytes > pOut_size) {
 				if (rtStartIn != INVALID_TIME) {
-					m_rtStartCache = rtStartIn;
+					m_rtStartCache	= rtStartIn;
+					m_rtStopCache	= rtStopIn;
 				}
 			/*
 			} else if (used_bytes == pOut_size || ((used_bytes + 9) == pOut_size)) {
@@ -2400,9 +2402,12 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 			*/
 			} else {
 				rtStart			= m_rtStartCache;
+				rtStop			= m_rtStopCache;
 				m_rtStartCache	= rtStartIn;
+				m_rtStopCache	= rtStopIn;
 				// The value was used once, don't use it for multiple frames, that ends up in weird timings
 				rtStartIn		= INVALID_TIME;
+				rtStopIn		= INVALID_TIME;
 			}
 
 			if (pOut_size > 0 || bFlush) {
@@ -2423,7 +2428,11 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 					avpkt.size		= pOut_size;
 					avpkt.pts		= rtStart;
 					avpkt.dts		= rtStop;
-					avpkt.duration	= 0;
+					if (rtStart != INVALID_TIME && rtStop != INVALID_TIME) {
+						avpkt.duration = (int)(rtStop - rtStart);
+					} else {
+						avpkt.duration = 0;
+					}
 				} else {
 					avpkt.data		= NULL;
 					avpkt.size		= 0;
@@ -2491,7 +2500,6 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 			rtStop = INVALID_TIME;
 		}
 		
-		ReorderBFrames(rtStart, rtStop);
 		UpdateFrameTime(rtStart, rtStop);
 
 		if ((pIn && pIn->IsPreroll() == S_OK) || rtStart < 0) {

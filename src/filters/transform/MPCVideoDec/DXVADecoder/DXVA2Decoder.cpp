@@ -180,7 +180,6 @@ HRESULT CDXVA2Decoder::DeliverDXVAFrame()
 	REFERENCE_TIME rtStop, rtStart;
 	CHECK_HR_FALSE (GetSapleWrapperData(pFrame, &pSample, &rtStart, &rtStop));
 
-	m_pFilter->ReorderBFrames(rtStart, rtStop);
 	m_pFilter->UpdateFrameTime(rtStart, rtStop);
 
 	if (rtStart < 0) {

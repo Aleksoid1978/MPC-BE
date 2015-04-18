@@ -140,6 +140,7 @@ protected:
 
 	REFERENCE_TIME							m_rtStart;
 	REFERENCE_TIME							m_rtStartCache;
+	REFERENCE_TIME							m_rtStopCache;
 
 	DWORD									m_fSYNC;
 
