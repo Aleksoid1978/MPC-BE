@@ -17979,7 +17979,6 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 					SendMessage(WM_SYSCOMMAND, SC_RESTORE, -1);
 				}
 				SetForegroundWindow();
-
 				SendMessage(WM_COMMAND, ID_VIEW_FULLSCREEN);
 				break;
 
@@ -17989,7 +17988,18 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
-	return __super::WindowProc(message, wParam, lParam);
+	LRESULT ret = 0;
+	bool bCallOurProc = true;
+	if (m_pBFmadVR) {
+		CComQIPtr<IMadVRSubclassReplacement> pMVRSR = m_pBFmadVR;
+		// call madVR window proc directly when the interface is available
+		bCallOurProc = !pMVRSR->ParentWindowProc(m_hWnd, message, &wParam, &lParam, &ret);
+	}
+	if (bCallOurProc) {
+		ret = __super::WindowProc(message, wParam, lParam);
+	}
+
+	return ret;
 }
 
 #if (_MSC_VER < 1800)
