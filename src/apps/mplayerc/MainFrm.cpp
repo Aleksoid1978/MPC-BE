@@ -13651,6 +13651,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRMC9), TRUE);
 		m_pGB->FindInterface(IID_PPV_ARGS(&pVMB), TRUE);
 		m_pGB->FindInterface(IID_PPV_ARGS(&pMFVMB), TRUE);
+		m_pMVRSR = m_pCAP;
 		pMVTO = m_pCAP;
 
 		SetupVMR9ColorControl();
@@ -13827,6 +13828,7 @@ void CMainFrame::CloseMediaPrivate()
 	//if (pVW) pVW->put_MessageDrain((OAHWND)NULL), pVW->put_Owner((OAHWND)NULL);
 
 	// IMPORTANT: IVMRSurfaceAllocatorNotify/IVMRSurfaceAllocatorNotify9 has to be released before the VMR/VMR9, otherwise it will crash in Release()
+	m_pMVRSR.Release();
 	m_pCAP2.Release();
 	m_pCAP.Release();
 	m_pVMRMC9.Release();
@@ -17990,10 +17992,9 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 	LRESULT ret = 0;
 	bool bCallOurProc = true;
-	if (m_pBFmadVR) {
-		CComQIPtr<IMadVRSubclassReplacement> pMVRSR = m_pBFmadVR;
+	if (m_pMVRSR) {
 		// call madVR window proc directly when the interface is available
-		bCallOurProc = !pMVRSR->ParentWindowProc(m_hWnd, message, &wParam, &lParam, &ret);
+		bCallOurProc = !m_pMVRSR->ParentWindowProc(m_hWnd, message, &wParam, &lParam, &ret);
 	}
 	if (bCallOurProc) {
 		ret = __super::WindowProc(message, wParam, lParam);
