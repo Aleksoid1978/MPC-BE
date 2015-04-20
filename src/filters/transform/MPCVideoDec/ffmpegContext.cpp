@@ -41,7 +41,7 @@ extern "C" {
 }
 
 static const WORD PCID_NVIDIA_VP567[] = {
-	// http://us.download.nvidia.com/XFree86/Linux-x86_64/346.47/README/supportedchips.html
+	// http://us.download.nvidia.com/XFree86/Linux-x86_64/349.16/README/supportedchips.html
 	// http://pci-ids.ucw.cz/read/PC/10de
 	// VP5, Nvidia VDPAU Feature Set D: GF117, GF119, GK104, GK106, GK107, GK110, GK208.
 	0x0FC2, // GeForce GT 630 (GK107) (not officially supported or typo, 4k tested)
@@ -158,18 +158,22 @@ static const WORD PCID_NVIDIA_VP567[] = {
 	0x1284, // GeForce GT 630 rev. 2 (not officially supported or typo, fully tested)
 	0x1286, // GeForce GT 720
 	0x1288, // GeForce GT 720
+	0x1289, // GeForce GT 710
 	0x1290, // GeForce GT 730M
 	0x1291, // GeForce GT 735M
 	0x1292, // GeForce GT 740M
 	0x1293, // GeForce GT 730M
 	0x1295, // GeForce 710M
 	0x1296, // GeForce 825M
+	0x1299, // GeForce 920M
 	0x12B9, // Quadro K610M
 	0x12BA, // Quadro K510M
 
 	// VP6, Nvidia VDPAU Feature Set E: GM107, GM108, GM204.
 	0x1340, // GeForce 830M
 	0x1341, // GeForce 840M
+	0x1346, // GeForce 930M
+	0x1347, // GeForce 940M
 	0x1380, // GeForce GTX 750 Ti
 	0x1381, // GeForce GTX 750
 	0x1382, // GeForce GTX 745
@@ -177,18 +181,24 @@ static const WORD PCID_NVIDIA_VP567[] = {
 	0x1391, // GeForce GTX 850M
 	0x1392, // GeForce GTX 860M
 	0x1393, // GeForce 840M
+	0x139A, // GeForce GTX 950M
+	0x139B, // GeForce GTX 960M
 	0x13B3, // Quadro K2200M
 	0x13BA, // Quadro K2200
 	0x13BB, // Quadro K620
+	0x13BC, // Quadro K1200
 	0x13C0, // GeForce GTX 980
 	0x13C2, // GeForce GTX 970
 	0x13D7, // GeForce GTX 980M
 	0x13D8, // GeForce GTX 970M
 	0x13D9, // GeForce GTX 965M
 
-	// VP7, Nvidia VDPAU Feature Set F: GM200, GM206.
+	// VP7, Nvidia VDPAU Feature Set F: GM206.
 	0x1401, // GeForce GTX 960
+
+	// VP6, Nvidia VDPAU Feature Set E: GM200.
 	0x17C2, // GeForce GTX TITAN X
+	0x17F0, // Quadro M6000
 };
 
 static const WORD PCID_ATI_UVD [] = {
