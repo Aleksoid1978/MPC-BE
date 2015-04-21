@@ -4163,6 +4163,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	OnTimer(TIMER_STREAMPOSPOLLER);
 	OnTimer(TIMER_STREAMPOSPOLLER2);
 
+	m_bDelaySetOutputRect = false;
+
 	if (s.fLaunchfullscreen && !s.IsD3DFullscreen() && !m_bFullScreen && !m_bAudioOnly) {
 		ToggleFullscreen(true, true);
 	}
@@ -4182,15 +4184,14 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 		// restore magnification
 		if (IsWindowVisible() && s.fRememberZoomLevel
-				&& !(m_bFullScreen || wp.showCmd == SW_SHOWMAXIMIZED || wp.showCmd == SW_SHOWMINIMIZED)) {
+				&& !(m_bFullScreen || s.IsD3DFullscreen()
+					|| wp.showCmd == SW_SHOWMAXIMIZED || wp.showCmd == SW_SHOWMINIMIZED)) {
 			ZoomVideoWindow(false);
 		}
 	}
 
 	m_bfirstPlay	= true;
 	m_LastOpenFile	= m_lastOMD->title;
-
-	m_bDelaySetOutputRect = false;
 
 	if (!(s.nCLSwitches & CLSW_OPEN) && (s.nLoops > 0)) {
 		SendMessage(WM_COMMAND, ID_PLAY_PLAY);
