@@ -1107,7 +1107,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			for(size_t i = 0; i < s.mts.size(); i++) {
 				mts.Add(s.mts[i]);
 			}
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, (CMpegSplitterFile::stream_type)type, str, this, this, &hr, (type != CMpegSplitterFile::stream_type::video) ? 20.0 : 1.0));
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, (CMpegSplitterFile::stream_type)type, str, this, this, &hr));
 
 			if (type == CMpegSplitterFile::stream_type::audio) {
 				if (audio_sel == stream_idx && (S_OK == AddOutputPin(s, pPinOut))) {
@@ -1822,8 +1822,8 @@ CMpegSourceFilter::CMpegSourceFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& 
 // CMpegSplitterOutputPin
 //
 
-CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpegSplitterFile::stream_type type, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, double dFactor)
-	: CBaseSplitterParserOutputPin(mts, pName, pFilter, pLock, phr, dFactor)
+CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpegSplitterFile::stream_type type, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+	: CBaseSplitterParserOutputPin(mts, pName, pFilter, pLock, phr, CalcQueryFactor(&mts[0]))
 	, m_type(type)
 {
 }

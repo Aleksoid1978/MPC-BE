@@ -156,4 +156,6 @@ public:
 	STDMETHODIMP_(DWORD) GetAverageBitRate() { return m_brs.nAverageBitRate; }
 
 	REFERENCE_TIME GetOffset() { return m_rtOffset; }
+
+	double CalcQueryFactor(const CMediaType* pmt);
 };
