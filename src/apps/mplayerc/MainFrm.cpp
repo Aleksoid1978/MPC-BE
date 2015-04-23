@@ -12069,7 +12069,7 @@ void CMainFrame::SetupChapters()
 
 				CAtlList<CString> files;
 				CVobFile vob;
-				if (::PathFileExists(path) && vob.OpenIFO(path, files, TTN) && ulNumOfChapters + 1 == vob.GetChaptersCount()) {
+				if (::PathFileExists(path) && vob.OpenIFO(path, files, TTN) && ulNumOfChapters == vob.GetChaptersCount()) {
 					for (UINT i = 0; i < vob.GetChaptersCount(); i++) {
 						REFERENCE_TIME rt = vob.GetChapterOffset(i);
 						CString str;
