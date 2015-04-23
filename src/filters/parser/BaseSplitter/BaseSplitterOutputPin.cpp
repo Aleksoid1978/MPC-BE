@@ -630,3 +630,21 @@ STDMETHODIMP CBaseSplitterOutputPin::GetPreroll(LONGLONG* pllPreroll)
 {
 	return pSplitter->GetPreroll(pllPreroll);
 }
+
+double CBaseSplitterOutputPin::CalcQueryFactor(const CMediaType* pmt)
+{
+	if (pmt->majortype == MEDIATYPE_Audio) {
+		double dFactor = 4.0;
+		if (pmt->subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
+			dFactor *= 5.0;
+		} else if (pmt->subtype == MEDIASUBTYPE_PCM || pmt->subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
+			dFactor *= 3.0;
+		} else if (pmt->subtype == MEDIASUBTYPE_DTS || pmt->subtype == MEDIASUBTYPE_DTS2) {
+			dFactor *= 2.0;
+		}
+
+		return dFactor;
+	}
+	
+	return 1.0;
+}

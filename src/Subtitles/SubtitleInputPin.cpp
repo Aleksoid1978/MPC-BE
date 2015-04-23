@@ -255,13 +255,6 @@ STDMETHODIMP CSubtitleInputPin::EndOfStream()
 	return __super::EndOfStream();
 }
 
-interface __declspec(uuid("D3D92BC3-713B-451B-9122-320095D51EA5"))
-IMpeg2DemultiplexerTesting :
-public IUnknown {
-	STDMETHOD(GetMpeg2StreamType)(ULONG* plType) = NULL;
-	STDMETHOD(toto)() = NULL;
-};
-
 STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 {
 	HRESULT hr = S_OK;
