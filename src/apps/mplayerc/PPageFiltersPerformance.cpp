@@ -75,14 +75,14 @@ BOOL CPPageFiltersPerformance::OnInitDialog()
 	m_nMaxQueueSizeCtrl.SetRange(10, min(512, m_halfMemMB));
 	m_nCachSizeCtrl.SetRange(16, KILOBYTE);
 
-	m_nMinQueueSize	= s.PerfomanceSettings.iMinQueueSize;
-	m_nMaxQueueSize	= s.PerfomanceSettings.iMaxQueueSize;
-	m_nCachSize		= s.PerfomanceSettings.iCacheLen;
+	m_nMinQueueSize	= s.PerfomanceSettings.nMinQueueSize;
+	m_nMaxQueueSize	= s.PerfomanceSettings.nMaxQueueSize;
+	m_nCachSize		= s.PerfomanceSettings.nCacheSize;
 
-	m_nMinQueuePackets = s.PerfomanceSettings.iMinQueuePackets;
-	m_nMaxQueuePackets = s.PerfomanceSettings.iMaxQueuePackets;
+	m_nMinQueuePackets = s.PerfomanceSettings.nMinQueuePackets;
+	m_nMaxQueuePackets = s.PerfomanceSettings.nMaxQueuePackets;
 
-	m_DefaultCtrl.SetCheck(s.PerfomanceSettings.fDefault);
+	m_DefaultCtrl.SetCheck(s.PerfomanceSettings.bDefault);
 	OnBnClickedCheck1();
 
 	CorrectCWndWidth(GetDlgItem(IDC_PERFOMANCE_DEFAULT));
@@ -100,12 +100,12 @@ BOOL CPPageFiltersPerformance::OnApply()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	s.PerfomanceSettings.iMinQueueSize	= max(64, min(KILOBYTE, m_nMinQueueSize));
-	s.PerfomanceSettings.iMaxQueueSize	= max(10, min(min(512, m_halfMemMB), m_nMaxQueueSize));
-	s.PerfomanceSettings.iCacheLen		= max(16, min(KILOBYTE, m_nCachSize));
+	s.PerfomanceSettings.nMinQueueSize	= max(64, min(KILOBYTE, m_nMinQueueSize));
+	s.PerfomanceSettings.nMaxQueueSize	= max(10, min(min(512, m_halfMemMB), m_nMaxQueueSize));
+	s.PerfomanceSettings.nCacheSize		= max(16, min(KILOBYTE, m_nCachSize));
 
-	s.PerfomanceSettings.iMinQueuePackets = max(10, min(MAXQUEUEPACKETS, m_nMinQueuePackets));
-	s.PerfomanceSettings.iMaxQueuePackets = max(s.PerfomanceSettings.iMinQueuePackets*2, min(MAXQUEUEPACKETS*10, m_nMaxQueuePackets));
+	s.PerfomanceSettings.nMinQueuePackets = max(10, min(MAXQUEUEPACKETS, m_nMinQueuePackets));
+	s.PerfomanceSettings.nMaxQueuePackets = max(s.PerfomanceSettings.nMinQueuePackets*2, min(MAXQUEUEPACKETS*10, m_nMaxQueuePackets));
 
 	s.PerfomanceSettings.UpdateStatus();
 
@@ -119,12 +119,12 @@ void CPPageFiltersPerformance::OnBnClickedCheck1()
 
 		s.PerfomanceSettings.SetDefault();
 
-		m_nMinQueueSize	= s.PerfomanceSettings.iMinQueueSize;
-		m_nMaxQueueSize	= s.PerfomanceSettings.iMaxQueueSize;
-		m_nCachSize		= s.PerfomanceSettings.iCacheLen;
+		m_nMinQueueSize	= s.PerfomanceSettings.nMinQueueSize;
+		m_nMaxQueueSize	= s.PerfomanceSettings.nMaxQueueSize;
+		m_nCachSize		= s.PerfomanceSettings.nCacheSize;
 
-		m_nMinQueuePackets = s.PerfomanceSettings.iMinQueuePackets;
-		m_nMaxQueuePackets = s.PerfomanceSettings.iMaxQueuePackets;
+		m_nMinQueuePackets = s.PerfomanceSettings.nMinQueuePackets;
+		m_nMaxQueuePackets = s.PerfomanceSettings.nMaxQueuePackets;
 
 		UpdateData(FALSE);
 	}
@@ -134,4 +134,6 @@ void CPPageFiltersPerformance::OnBnClickedCheck1()
 			pChild->EnableWindow(!m_DefaultCtrl.GetCheck());
 		}
 	}
+
+	SetModified();
 }

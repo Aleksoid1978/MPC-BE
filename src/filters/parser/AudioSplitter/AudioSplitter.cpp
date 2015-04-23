@@ -164,7 +164,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			CAtlArray<CMediaType> mts;
 			mts.Add(mt);
-			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, m_pAudioFile->GetName() + L" Audio Output", this, this, &hr, 0.1));
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, m_pAudioFile->GetName() + L" Audio Output", this, this, &hr, 0.2));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 		}
 	}
