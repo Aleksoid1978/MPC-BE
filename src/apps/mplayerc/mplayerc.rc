@@ -1661,8 +1661,8 @@ BEGIN
                 MENUITEM "4:3",                         ID_ASPECTRATIO_4_3
                 MENUITEM "5:4",                         ID_ASPECTRATIO_5_4
                 MENUITEM "16:9",                        ID_ASPECTRATIO_16_9
-                MENUITEM "235:100",                     ID_ASPECTRATIO_235_100
-                MENUITEM "185:100",                     ID_ASPECTRATIO_185_100
+                MENUITEM "2.35:1",                      ID_ASPECTRATIO_235_100
+                MENUITEM "1.85:1",                      ID_ASPECTRATIO_185_100
             END
             MENUITEM "Correct Monitor/Desktop AR Diff", ID_VIEW_VF_COMPMONDESKARDIFF
         END
@@ -1874,8 +1874,8 @@ BEGIN
                     MENUITEM "4:3",                         ID_ASPECTRATIO_4_3
                     MENUITEM "5:4",                         ID_ASPECTRATIO_5_4
                     MENUITEM "16:9",                        ID_ASPECTRATIO_16_9
-                    MENUITEM "235:100",                     ID_ASPECTRATIO_235_100
-                    MENUITEM "185:100",                     ID_ASPECTRATIO_185_100
+                    MENUITEM "2.35:1",                      ID_ASPECTRATIO_235_100
+                    MENUITEM "1.85:1",                      ID_ASPECTRATIO_185_100
                 END
                 MENUITEM "Correct Monitor/Desktop AR Diff", ID_VIEW_VF_COMPMONDESKARDIFF
             END
