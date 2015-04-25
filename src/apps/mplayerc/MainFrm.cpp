@@ -71,7 +71,6 @@
 #include <SyncAllocatorPresenter.h>
 #include "ComPropertyPage.h"
 #include "LcdSupport.h"
-#include "SettingsDefines.h"
 #include <IPinHook.h>
 #include <comdef.h>
 #include <dwmapi.h>

@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include "AuthDlg.h"
-#include "SettingsDefines.h"
 
 // CAuthDlg dialog
 

@@ -29,7 +29,6 @@
 #include "../../../DSUtil/AudioParser.h"
 #include <MMReg.h>
 #include <moreuuids.h>
-#include "../apps/mplayerc/SettingsDefines.h"
 
 #define MAXFRAMESIZE	((144 * 320000 / 8000) + 1)
 #define BUFFERS			2

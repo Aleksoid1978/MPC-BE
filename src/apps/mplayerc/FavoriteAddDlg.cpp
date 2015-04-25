@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include "FavoriteAddDlg.h"
-#include "SettingsDefines.h"
 
 // CFavoriteAddDlg dialog
 

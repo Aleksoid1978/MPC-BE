@@ -28,7 +28,6 @@
 #include "../../DSUtil/Filehandle.h"
 #include "SaveTextFileDialog.h"
 #include "PlayerPlaylistBar.h"
-#include "SettingsDefines.h"
 #include "OpenDlg.h"
 
 static CString MakePath(CString path)
