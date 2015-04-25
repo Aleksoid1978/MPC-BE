@@ -1746,10 +1746,12 @@ void CPPageAccelTbl::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		case COL_MOUSE:
 			wc.mouse = pItem->lParam;
 			m_list.SetItemText(pItem->iItem, COL_MOUSE, pItem->pszText);
+			*pResult = TRUE;
 			break;
 		case COL_MOUSE_FS:
 			wc.mouseFS = pItem->lParam;
 			m_list.SetItemText(pItem->iItem, COL_MOUSE_FS, pItem->pszText);
+			*pResult = TRUE;
 			break;
 		case COL_RMCMD:
 			wc.rmcmd = CStringA(CString(pItem->pszText)).Trim();
