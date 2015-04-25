@@ -647,6 +647,7 @@ protected:  // control bar embedded members
 
 	friend class CPPagePlayback; // TODO
 	friend class CPPageAudio; // TODO
+	friend class CPPagePlayer;
 	friend class CMPlayerCApp; // TODO
 
 	void RestoreControlBars();
