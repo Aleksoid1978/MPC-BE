@@ -29,9 +29,6 @@
 #include "text.h"
 #include "..\..\include\basestruct.h"
 
-#define LCID_NOSUBTITLES	-1
-#define INVALID_TIME		_I64_MIN
-
 #ifndef FCC
 #define FCC(ch4) ((((DWORD)(ch4) & 0xFF) << 24) |     \
                   (((DWORD)(ch4) & 0xFF00) << 8) |    \
@@ -40,6 +37,12 @@
 #endif
 
 #define SCALE64(a, b, c) (__int64)((double)(a) * (b) / (c))
+
+#define LCID_NOSUBTITLES	-1
+#define INVALID_TIME		_I64_MIN
+
+#define KILOBYTE			1024
+#define MEGABYTE			KILOBYTE * KILOBYTE
 
 extern CString			ResStr(UINT nID);
 
