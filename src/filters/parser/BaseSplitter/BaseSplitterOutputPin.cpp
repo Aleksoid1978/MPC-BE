@@ -253,11 +253,9 @@ HRESULT CBaseSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		Sleep(10);
 	}
 
-	if (S_OK != m_hrDeliver) {
-		return m_hrDeliver;
+	if (S_OK == m_hrDeliver) {
+		m_queue.Add(p);
 	}
-
-	m_queue.Add(p);
 
 	return m_hrDeliver;
 }

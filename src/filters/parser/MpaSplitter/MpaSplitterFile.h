@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "../BaseSplitter/BaseSplitter.h"
+#include "../BaseSplitter/BaseSplitterFileEx.h"
 #include "../../../DSUtil/ID3Tag.h"
 
 #define DEF_SYNC_SIZE 8096
