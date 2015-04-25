@@ -146,10 +146,14 @@ BOOL CPPagePlayer::OnApply()
 	UpdateData();
 
 	AppSettings& s = AfxGetAppSettings();
+	auto pFrame = AfxGetMainFrame();
 
 	s.iMultipleInst = m_iMultipleInst;
-	s.iTitleBarTextStyle = m_iTitleBarTextStyle;
-	s.fTitleBarTextTitle = !!m_bTitleBarTextTitle;
+	if (s.iTitleBarTextStyle != m_iTitleBarTextStyle || s.fTitleBarTextTitle != !!m_bTitleBarTextTitle) {
+		s.iTitleBarTextStyle = m_iTitleBarTextStyle;
+		s.fTitleBarTextTitle = !!m_bTitleBarTextTitle;
+		pFrame->OpenSetupWindowTitle(pFrame->m_strFnFull);
+	}
 	s.fTrayIcon = !!m_fTrayIcon;
 	s.fRememberWindowPos = !!m_fRememberWindowPos;
 	s.fRememberWindowSize = !!m_fRememberWindowSize;
@@ -161,7 +165,6 @@ BOOL CPPagePlayer::OnApply()
 	BOOL bShowOSDChanged = (s.fShowOSD != !!m_fShowOSD);
 	s.fShowOSD = !!m_fShowOSD;
 	if (bShowOSDChanged) {
-		auto pFrame = AfxGetMainFrame();
 		if (m_fShowOSD) {
 			pFrame->m_OSD.Start(pFrame->m_pOSDWnd);
 			pFrame->OSDBarSetPos();
