@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include "PPageSheet.h"
-#include "SettingsDefines.h"
 
 // CPPageSheet
 

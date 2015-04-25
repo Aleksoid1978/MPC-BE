@@ -23,7 +23,6 @@
 #include "UDPReader.h"
 #include <moreuuids.h>
 #include "../../../DSUtil/DSUtil.h"
-#include "../../../apps/mplayerc/SettingsDefines.h"
 
 #ifdef REGISTER_FILTER
 

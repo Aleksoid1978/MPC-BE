@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPageBase.h"
-#include "SettingsDefines.h"
 
 // CPPageBase dialog
 

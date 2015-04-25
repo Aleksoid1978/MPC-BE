@@ -30,7 +30,6 @@
 #include <basestruct.h>
 #include <atlpath.h>
 
-#include "../../../apps/mplayerc/SettingsDefines.h"
 #include "../../reader/VTSReader/VTSReader.h"
 
 // option names
