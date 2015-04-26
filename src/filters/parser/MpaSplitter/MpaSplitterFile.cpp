@@ -36,7 +36,8 @@ CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 	, m_mode(none)
 	, m_rtDuration(0)
 	, m_startpos(0)
-	, m_totalbps(0)
+	, m_procsize(0)
+	, m_coefficient(0.0)
 	, m_bIsVBR(false)
 	, ID3Tag(NULL)
 {
@@ -207,8 +208,14 @@ HRESULT CMpaSplitterFile::Init()
 			DWORD dwSamplesPerFrame = m_mpahdr.layer == 1 ? 384 : l3ext ? 576 : 1152;
 
 			m_bIsVBR = true;
-			m_rtDuration = 10000000i64 * (dwFrames * dwSamplesPerFrame / m_mpahdr.nSamplesPerSec);
+			m_rtDuration = 10000000i64 * (dwFrames * dwSamplesPerFrame / m_mpahdr.Samplerate);
 		}
+	}
+
+	if (m_mode == mpa) {
+		m_coefficient = 10000000.0 * (GetTotal() - m_startpos) * m_mpahdr.FrameSamples / m_mpahdr.Samplerate;
+	} else if (m_mode == mp4a) {
+		m_coefficient = 10000000.0 * (GetTotal() - m_startpos) * m_aachdr.FrameSamples / m_aachdr.Samplerate;
 	}
 
 	Seek(m_startpos);
@@ -258,7 +265,7 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 					}
 					Seek(pos);
 				}
-				AdjustDuration(h.nBytesPerSec);
+				AdjustDuration(h.FrameSize);
 
 				FrameSize	= h.FrameSize;
 				rtDuration	= h.rtDuration;
@@ -277,7 +284,7 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 			if (Read(h, (int)(endpos - GetPos()))) {
 				if (m_aachdr == h) {
 					Seek(GetPos() - (h.fcrc ? 7 : 9));
-					AdjustDuration(h.nBytesPerSec);
+					AdjustDuration(h.FrameSize);
 					Seek(GetPos() + (h.fcrc ? 7 : 9));
 
 					FrameSize	= h.FrameSize;
@@ -294,20 +301,18 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 	return false;
 }
 
-void CMpaSplitterFile::AdjustDuration(int nBytesPerSec)
+void CMpaSplitterFile::AdjustDuration(int framesize)
 {
-	ASSERT(nBytesPerSec);
+	if (!framesize) {
+		return;
+	}
 
 	if (!m_bIsVBR) {
 		int rValue;
-		if (!m_pos2bps.Lookup(GetPos(), rValue)) {
-			m_totalbps += nBytesPerSec;
-			if (!m_totalbps) {
-				return;
-			}
-			m_pos2bps.SetAt(GetPos(), nBytesPerSec);
-			__int64 avgbps = m_totalbps / m_pos2bps.GetCount();
-			m_rtDuration = 10000000i64 * (GetTotal() - m_startpos) / avgbps;
+		if (!m_pos2fsize.Lookup(GetPos(), rValue)) {
+			m_procsize += framesize;
+			m_pos2fsize.SetAt(GetPos(), framesize);
+			m_rtDuration = m_coefficient * m_pos2fsize.GetCount() / m_procsize;
 		}
 	}
 }

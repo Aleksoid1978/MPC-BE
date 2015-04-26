@@ -129,7 +129,7 @@ public:
 		WORD original:1;
 		WORD emphasis:2;
 
-		int nSamplesPerSec, FrameSize, nBytesPerSec;
+		int Samplerate, FrameSize, FrameSamples;
 		REFERENCE_TIME rtDuration;
 
 		bool operator == (const struct mpahdr& h) const {
@@ -162,7 +162,7 @@ public:
 
 		WORD crc;
 
-		int FrameSize, nBytesPerSec;
+		int Samplerate, FrameSize, FrameSamples;
 		REFERENCE_TIME rtDuration;
 
 		bool operator == (const struct aachdr& h) const {

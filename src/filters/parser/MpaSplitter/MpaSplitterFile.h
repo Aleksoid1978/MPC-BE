@@ -37,11 +37,12 @@ class CMpaSplitterFile : public CBaseSplitterFileEx
 	aachdr m_aachdr;
 	__int64 m_startpos;
 
-	__int64 m_totalbps;
-	CRBMap<__int64, int> m_pos2bps;
+	__int64 m_procsize;
+	CRBMap<__int64, int> m_pos2fsize;
+	double m_coefficient;
 
 	HRESULT Init();
-	void AdjustDuration(int nBytesPerSec);
+	void AdjustDuration(int framesize);
 
 	bool m_bIsVBR;
 
