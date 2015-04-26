@@ -636,12 +636,12 @@ bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt/* = NULL*/, b
 
 	bool l3ext = h.layer == 3 && !(h.version&1);
 
-	h.nSamplesPerSec = freq[h.freq][h.version];
+	h.Samplerate = freq[h.freq][h.version];
 	h.FrameSize = h.layer == 1
-				  ? (12 * bitrate / h.nSamplesPerSec + h.padding) * 4
-				  : (l3ext ? 72 : 144) * bitrate / h.nSamplesPerSec + h.padding;
-	h.rtDuration = 10000000i64 * (h.layer == 1 ? 384 : l3ext ? 576 : 1152) / h.nSamplesPerSec;// / (h.channels == 3 ? 1 : 2);
-	h.nBytesPerSec = bitrate / 8;
+				  ? (12 * bitrate / h.Samplerate + h.padding) * 4
+				  : (l3ext ? 72 : 144) * bitrate / h.Samplerate + h.padding;
+	h.FrameSamples = h.layer == 1 ? 384 : l3ext ? 576 : 1152;
+	h.rtDuration = 10000000i64 * h.FrameSamples / h.Samplerate;
 
 	if (pmt) {
 		size_t size = h.layer == 3
@@ -685,9 +685,9 @@ bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt/* = NULL*/, b
 		}
 
 		wfe->nChannels			= h.channels == 3 ? 1 : 2;
-		wfe->nSamplesPerSec		= h.nSamplesPerSec;
+		wfe->nSamplesPerSec		= h.Samplerate;
 		wfe->nBlockAlign		= h.FrameSize;
-		wfe->nAvgBytesPerSec	= h.nBytesPerSec;
+		wfe->nAvgBytesPerSec	= h.bitrate / 8;
 
 		pmt->majortype			= MEDIATYPE_Audio;
 		pmt->subtype			= FOURCCMap(wfe->wFormatTag);
@@ -789,10 +789,11 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 		return false;
 	}
 
-	h.FrameSize = h.aac_frame_length - (h.fcrc == 0 ? 9 : 7);
 	static int freq[] = {96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350};
-	h.nBytesPerSec = h.aac_frame_length * freq[h.freq] / 1024; // ok?
-	h.rtDuration = 10000000i64 * 1024 / freq[h.freq]; // ok?
+	h.Samplerate = freq[h.freq];
+	h.FrameSize = h.aac_frame_length - (h.fcrc == 0 ? 9 : 7);
+	h.FrameSamples = 1024; // ok?
+	h.rtDuration = 10000000i64 * h.FrameSamples / h.FrameSize;
 
 	if (pmt) {
 		WAVEFORMATEX* wfe		= (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + 5];
@@ -801,7 +802,7 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 		wfe->nChannels			= h.channels <= 6 ? h.channels : 2;
 		wfe->nSamplesPerSec		= freq[h.freq];
 		wfe->nBlockAlign		= h.aac_frame_length;
-		wfe->nAvgBytesPerSec	= h.nBytesPerSec;
+		wfe->nAvgBytesPerSec	= h.aac_frame_length * h.Samplerate / h.FrameSamples;
 		wfe->cbSize				= MakeAACInitData((BYTE*)(wfe + 1), h.profile, wfe->nSamplesPerSec, wfe->nChannels);
 
 		pmt->majortype			= MEDIATYPE_Audio;
