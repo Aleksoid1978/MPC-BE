@@ -142,6 +142,8 @@ protected:
 	REFERENCE_TIME							m_rtStartCache;
 	REFERENCE_TIME							m_rtStopCache;
 
+	BOOL									m_bUsePTS;
+
 	DWORD									m_fSYNC;
 
 	CMediaType								m_pCurrentMediaType;
