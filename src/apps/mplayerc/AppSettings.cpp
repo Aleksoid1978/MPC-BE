@@ -998,8 +998,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fLoopForever = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LOOP, 0);
 	fRewind = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REWIND, FALSE);
 	iZoomLevel = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ZOOM, 1);
-	nAutoFitFactor = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, 50);
-	nVolumeStep = max(1, min(10, pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, 5)));
+	nAutoFitFactor = min(max(20, pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, 50)), 80);
+	nVolumeStep = min(max(1, pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, 5)), 10);
 	nSpeedStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, 0);
 	if (nSpeedStep != 10 && nSpeedStep != 20 && nSpeedStep != 25 && nSpeedStep != 50 && nSpeedStep != 100) {
 		nSpeedStep = 0;
