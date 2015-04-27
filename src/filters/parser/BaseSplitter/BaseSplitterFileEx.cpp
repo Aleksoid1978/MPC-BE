@@ -620,7 +620,7 @@ bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt/* = NULL*/, b
 			{0, 3, 4, 4},
 			{0, 0, 1, 2}
 		};
-		bitrate = 1000 * brtbl[h.bitrate][brtblcol[h.version&1][h.layer]];
+		bitrate = 1000 * brtbl[h.bitrate][brtblcol[h.version & 1][h.layer]];
 		if (bitrate == 0) {
 			AGAIN_OR_EXIT
 		}
@@ -687,7 +687,7 @@ bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt/* = NULL*/, b
 		wfe->nChannels			= h.channels == 3 ? 1 : 2;
 		wfe->nSamplesPerSec		= h.Samplerate;
 		wfe->nBlockAlign		= h.FrameSize;
-		wfe->nAvgBytesPerSec	= h.bitrate / 8;
+		wfe->nAvgBytesPerSec	= bitrate / 8;
 
 		pmt->majortype			= MEDIATYPE_Audio;
 		pmt->subtype			= FOURCCMap(wfe->wFormatTag);
