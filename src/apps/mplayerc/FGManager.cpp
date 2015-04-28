@@ -102,6 +102,13 @@ public:
 		if (m_bIsPreview) {
 			memset(&dxva_filters, false, sizeof(dxva_filters));
 			memset(&video_filters, true, sizeof(video_filters));
+			for (int i = 0; i < PixFmt_count; i++) {
+				pBF->SetSwPixelFormat((MPCPixelFormat)i, false);
+			}
+			pBF->SetSwPixelFormat(PixFmt_NV12, true);
+			pBF->SetSwPixelFormat(PixFmt_YV12, true);
+			pBF->SetSwPixelFormat(PixFmt_YUY2, true);
+			pBF->SetSwPixelFormat(PixFmt_RGB32, true);
 		}
 		video_filters[VDEC_UNCOMPRESSED] = false;
 
