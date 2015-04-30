@@ -154,6 +154,12 @@ public:
 	COggTextOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 };
 
+class COggKateOutputPin : public COggStreamOutputPin
+{
+public:
+	COggKateOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+};
+
 class COggTheoraOutputPin : public COggSplitterOutputPin
 {
 	CAutoPtrList<CPacket>	m_initpackets;

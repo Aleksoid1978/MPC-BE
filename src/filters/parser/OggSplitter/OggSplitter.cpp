@@ -301,6 +301,18 @@ start:
 					pPinOut.Attach(DNew COggSpeexOutputPin(page.GetData(), page.GetCount(), name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 				}
+			} else if (!memcmp(page.GetData(), "\x80kate\x00\x00\x00", 8) && page.GetCount() == 64) {
+				if (PinNotExist) {
+					CStringA lang;
+					memcpy(lang.GetBufferSetLength(16), page.GetData() + 32, 16);
+					lang.ReleaseBuffer();
+
+					name.Format(L"Kate %d (%hS)", streamId++, lang);
+					CAutoPtr<CBaseSplitterOutputPin> pPinOut;
+					pPinOut.Attach(DNew COggKateOutputPin((OggStreamHeader*)p, name, this, this, &hr));
+					// TODO
+					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
+				}
 			} else if (!(type&1) && !streamMoreInit.GetCount()) {
 				break;
 			}
@@ -1277,6 +1289,24 @@ COggTextOutputPin::COggTextOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseFil
 	mt.subtype		= MEDIASUBTYPE_NULL;
 	mt.formattype	= FORMAT_None;
 	mt.SetSampleSize(1);
+	m_mts.Add(mt);
+}
+
+//
+// COggKateOutputPin
+//
+
+COggKateOutputPin::COggKateOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+	: COggStreamOutputPin(h, pName, pFilter, pLock, phr)
+{
+	CMediaType mt;
+	mt.majortype	= MEDIATYPE_Subtitle;
+	mt.subtype		= FOURCCMap(FCC('KATE')); // TODO: use the correct subtype for KATE subtitles
+	mt.formattype	= FORMAT_SubtitleInfo;
+
+	SUBTITLEINFO* psi = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO));
+	memset(psi, 0, mt.FormatLength());
+
 	m_mts.Add(mt);
 }
 

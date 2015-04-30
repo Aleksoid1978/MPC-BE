@@ -1084,6 +1084,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						CodecID == "S_HDMV/PGS" ? MEDIASUBTYPE_HDMVSUB :
 						CodecID == "S_DVBSUB" ? MEDIASUBTYPE_DVB_SUBTITLES :
 						CodecID == "S_VOBSUB" ? MEDIASUBTYPE_VOBSUB :
+						CodecID == "S_KATE" ? FOURCCMap(FCC('KATE')) : // TODO: use the correct subtype for KATE subtitles
 						MEDIASUBTYPE_NULL;
 
 					if (mt.subtype != MEDIASUBTYPE_NULL) {
