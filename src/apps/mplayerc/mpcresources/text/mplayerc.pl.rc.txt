@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Copyright © 2002-2015 szczegóły w pliku Authors.txt"
 10		"Version :"
 11		"SVN Build :"
-12		"OK"
-13		"Ten program został opublikowany na zasadach Powszechnej Licencji Publicznej GNU."
-14		"Kompilator MPC-BE :"
-15		"Kompilator FFmpeg :"
-19		"Tłumaczenie: Piotr Sokół, Kasper93, Haix"
-22		"Libavcodec / Libavutil :"
+12		"Kompilator MPC-BE :"
+13		"Kompilator FFmpeg :"
+14		"Libavcodec / Libavutil :"
+21		"Ten program został opublikowany na zasadach Powszechnej Licencji Publicznej GNU."
+22		"Tłumaczenie: Piotr Sokół, Kasper93, Haix"
+23		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Nowa zakładka"
 6		"Proszę wprowadzić nazwę zakładki:"
 8		"Zapamiętanie położenia"
-9		"Anuluj"
+9		"Względne położenie napędu"
 10		"OK"
-11		"Względne położenie napędu"
+11		"Anuluj"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"Łączenie shaderów"
-7		"OK"
-8		"Anuluj"
-9		"W górę"
-10		"W dół"
-11		"&Usuń"
-14		"D&odaj"
-16		"Włącz shadery używane przed skalowaniem"
-17		"Włącz shadery używane po skalowaniu"
+7		"D&odaj"
+9		"Włącz shadery używane przed skalowaniem"
+11		"Włącz shadery używane po skalowaniu"
+13		"&Usuń"
+14		"W górę"
+15		"W dół"
+16		"OK"
+17		"Anuluj"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"Usuń"
+7		"Usuń"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9

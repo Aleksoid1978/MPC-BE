@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Drepturi de autor © 2002-2015 vedeți Authors.txt"
 10		"Versiune :"
 11		"SVN Build :"
-12		"OK"
-13		"Acesta program este gratuit și eliberat sub licența GNU General Public License."
-14		"Compilator MPC-BE :"
-15		"Compilator FFmpeg :"
-19		"Traducerea în română realizată de Daniel Alămiță, actualizată şi corectată de lordkag"
-22		"Libavcodec / Libavutil :"
+12		"Compilator MPC-BE :"
+13		"Compilator FFmpeg :"
+14		"Libavcodec / Libavutil :"
+21		"Acesta program este gratuit și eliberat sub licența GNU General Public License."
+22		"Traducerea în română realizată de Daniel Alămiță, actualizată şi corectată de lordkag"
+23		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Adaugă la favorite"
 6		"Alegeți un nume pentru scurtătură:"
 8		"Memorează poziția"
-9		"Renunță"
+9		"Unitate relativă"
 10		"OK"
-11		"Unitate relativă"
+11		"Renunță"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"Combinare shadere"
-7		"OK"
-8		"Renunță"
-9		"Mută în &sus"
-10		"Mută în &jos"
-11		"&Elimină"
-14		"&Adaugă"
-16		"Activează shadere pixel pre-redimensionare"
-17		"Activează shadere pixel post-redimensionare"
+7		"&Adaugă"
+9		"Activează shadere pixel pre-redimensionare"
+11		"Activează shadere pixel post-redimensionare"
+13		"&Elimină"
+14		"Mută în &sus"
+15		"Mută în &jos"
+16		"OK"
+17		"Renunță"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"Șterge"
+7		"Șterge"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9

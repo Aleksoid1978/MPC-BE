@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Copyright © 2002-2015, смотрите файл Authors.txt"
 10		"Версия :"
 11		"SVN Build :"
-12		"OK"
-13		"Эта программа бесплатна и распространяется под лицензией GNU General Public License."
-14		"Компилятор MPC-BE :"
-15		"Компилятор FFmpeg :"
-19		"Локализация выполнена командой MPC-BE"
-22		"Libavcodec / Libavutil :"
+12		"Компилятор MPC-BE :"
+13		"Компилятор FFmpeg :"
+14		"Libavcodec / Libavutil :"
+21		"Эта программа бесплатна и распространяется под лицензией GNU General Public License."
+22		"Локализация выполнена командой MPC-BE"
+23		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Добавить в закладки"
 6		"Выберите имя для ярлыка:"
 8		"Запомнить позицию"
-9		"Отмена"
+9		"Относительно диска"
 10		"OK"
-11		"Относительно диска"
+11		"Отмена"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"Комбинирование шейдеров"
-7		"OK"
-8		"Отмена"
-9		"&Выше"
-10		"&Ниже"
-11		"&Убрать"
-14		"&Добавить"
-16		"Включить пиксельные шейдеры кадра"
-17		"Включить пиксельные шейдеры окна"
+7		"&Добавить"
+9		"Включить пиксельные шейдеры кадра"
+11		"Включить пиксельные шейдеры окна"
+13		"&Убрать"
+14		"&Выше"
+15		"&Ниже"
+16		"OK"
+17		"Отмена"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"Удалить"
+7		"Удалить"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9

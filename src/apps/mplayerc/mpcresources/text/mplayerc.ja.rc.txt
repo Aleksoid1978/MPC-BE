@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Copyright © 2002-2015 (Authors.txt ファイルを参照)"
 10		"バージョン :"
 11		"SVN Build :"
-12		"OK"
-13		"このプログラムはフリーウェアであり、GNU 一般公衆利用許諾書 (GPL) に基づいて配布されます。"
-14		"MPC-BE コンパイラ :"
-15		"FFmpeg コンパイラ :"
-19		"Japanese translation made by Anonymous@2ch"
-22		"Libavcodec / Libavutil :"
+12		"MPC-BE コンパイラ :"
+13		"FFmpeg コンパイラ :"
+14		"Libavcodec / Libavutil :"
+21		"このプログラムはフリーウェアであり、GNU 一般公衆利用許諾書 (GPL) に基づいて配布されます。"
+22		"Japanese translation made by Anonymous@2ch"
+23		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"お気に入りの追加"
 6		"ショートカットの名前を選択してください:"
 8		"再生開始位置を保存"
-9		"キャンセル"
+9		"相対ドライブ"
 10		"OK"
-11		"相対ドライブ"
+11		"キャンセル"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"ピクセルシェーダーの効果を併用"
-7		"OK"
-8		"キャンセル"
-9		"上へ移動(&U)"
-10		"下へ移動(&D)"
-11		"消去(&R)"
-14		"追加(&A)"
-16		"リサイズ前のピクセル シェーダーを有効化"
-17		"リサイズ後のピクセル シェーダーを有効化"
+7		"追加(&A)"
+9		"リサイズ前のピクセル シェーダーを有効化"
+11		"リサイズ後のピクセル シェーダーを有効化"
+13		"消去(&R)"
+14		"上へ移動(&U)"
+15		"下へ移動(&D)"
+16		"OK"
+17		"キャンセル"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"削除"
+7		"削除"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9

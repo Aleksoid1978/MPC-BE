@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Copyright © 2002-2015 voir le fichier Authors.txt"
 10		"Version :"
 11		"SVN Build :"
-12		"OK"
-13		"Ce programme est gratuit et est distribué sous GNU General Public License."
-14		"Compilateur MPC-BE :"
-15		"Compilateur FFmpeg :"
-19		"Traduction : Julien (Vk), Pho3nX et al. (voir Authors.txt)"
-22		"Libavcodec / Libavutil :"
+12		"Compilateur MPC-BE :"
+13		"Compilateur FFmpeg :"
+14		"Libavcodec / Libavutil :"
+21		"Ce programme est gratuit et est distribué sous GNU General Public License."
+22		"Traduction : Julien (Vk), Pho3nX et al. (voir Authors.txt)"
+23		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Ajouter aux favoris"
 6		"Choisissez un nom pour votre raccourci :"
 8		"Se souvenir de la position"
-9		"Annuler"
+9		"Chemin relatif"
 10		"OK"
-11		"Chemin relatif"
+11		"Annuler"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"Combinaison de shaders"
-7		"OK"
-8		"Annuler"
-9		"Vers le &haut"
-10		"Vers le &bas"
-11		"&Enlever"
-14		"&Ajouter"
-16		"Activer les shaders pré-redimensionnement"
-17		"Activer les shaders post-redimensionnement"
+7		"&Ajouter"
+9		"Activer les shaders pré-redimensionnement"
+11		"Activer les shaders post-redimensionnement"
+13		"&Enlever"
+14		"Vers le &haut"
+15		"Vers le &bas"
+16		"OK"
+17		"Annuler"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"Supprimer"
+7		"Supprimer"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9

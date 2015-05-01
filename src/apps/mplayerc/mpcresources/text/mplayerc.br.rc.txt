@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Copyright © 2002-2015 - veja o arquivo Authors.txt"
 10		"Version :"
 11		"SVN Build :"
-12		"OK"
-13		"Este programa é gratuito e foi liberado sob a licença pública geral - GNU."
-14		"Compilador do MPC-BE :"
-15		"Compilador do FFmpeg :"
-19		"Traduzido para o Português por Roger Filipe (2010)"
-22		"Libavcodec / Libavutil :"
+12		"Compilador do MPC-BE :"
+13		"Compilador do FFmpeg :"
+14		"Libavcodec / Libavutil :"
+21		"Este programa é gratuito e foi liberado sob a licença pública geral - GNU."
+22		"Traduzido para o Português por Roger Filipe (2010)"
+23		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Adicionar a favoritos"
 6		"Escolha um nome para o seu atalho:"
 8		"Lembrar posição"
-9		"Cancelar"
+9		"Drive relativo"
 10		"Aceitar"
-11		"Drive relativo"
+11		"Cancelar"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"Combinador Shader"
-7		"Aceitar"
-8		"Cancelar"
-9		"&Subir"
-10		"&Baixar"
-11		"&Remover"
-14		"&Adicionar"
-16		"Enable pre-resize pixel shaders"
-17		"Enable post-resize pixel shaders"
+7		"&Adicionar"
+9		"Enable pre-resize pixel shaders"
+11		"Enable post-resize pixel shaders"
+13		"&Remover"
+14		"&Subir"
+15		"&Baixar"
+16		"Aceitar"
+17		"Cancelar"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"Apagar"
+7		"Apagar"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9

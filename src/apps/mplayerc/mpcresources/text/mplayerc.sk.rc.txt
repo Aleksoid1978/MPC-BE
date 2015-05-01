@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Copyright © 2002-2015 viď súbor Authors.txt"
 10		"Version :"
 11		"SVN Build :"
-12		"OK"
-13		"Tento program je šírený ako freeware a bol vydaný pod licenciou GNU General Public."
-14		"Kompilátor MPC-BE :"
-15		"Kompilátor FFmpeg :"
-19		"Preložil: Marián Hikaník"
-22		"Libavcodec / Libavutil :"
+12		"Kompilátor MPC-BE :"
+13		"Kompilátor FFmpeg :"
+14		"Libavcodec / Libavutil :"
+21		"Tento program je šírený ako freeware a bol vydaný pod licenciou GNU General Public."
+22		"Preložil: Marián Hikaník"
+23		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Pridať obľúbené položky"
 6		"Zvoľte si názov pre nový odkaz:"
 8		"Zapamätať si pozíciu"
-9		"Storno"
+9		"Relatívna jednotka"
 10		"OK"
-11		"Relatívna jednotka"
+11		"Storno"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"Kombinátor shaderov"
-7		"OK"
-8		"Storno"
-9		"Presunúť &hore"
-10		"Presunúť &dole"
-11		"&Odstrániť"
-14		"&Pridať"
-16		"Zapnúť pixel shadery pre predbežnú zmenu veľkosti"
-17		"Zapnúť pixel shader pre následnú zmenu veľkosti"
+7		"&Pridať"
+9		"Zapnúť pixel shadery pre predbežnú zmenu veľkosti"
+11		"Zapnúť pixel shader pre následnú zmenu veľkosti"
+13		"&Odstrániť"
+14		"Presunúť &hore"
+15		"Presunúť &dole"
+16		"OK"
+17		"Storno"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"Vymazať"
+7		"Vymazať"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9

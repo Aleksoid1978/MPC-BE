@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Copyright © 2002-2015, viz soubor Authors.txt"
 10		"Version :"
 11		"SVN Build :"
-12		"OK"
-13		"Tento program je freeware vydaný pod\nGNU General Public License."
-14		"MPC-BE zkompilován :"
-15		"FFmpeg zkompilován :"
-19		"Překlad: khagaroth"
-22		"Libavcodec / Libavutil :"
+12		"MPC-BE zkompilován :"
+13		"FFmpeg zkompilován :"
+14		"Libavcodec / Libavutil :"
+21		"Tento program je freeware vydaný pod\nGNU General Public License."
+22		"Překlad: khagaroth"
+23		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Přidat k oblíbeným"
 6		"Zadejte název oblíbené položky:"
 8		"Zapamatovat si pozici"
-9		"Storno"
+9		"Vyjímatelný disk"
 10		"OK"
-11		"Vyjímatelný disk"
+11		"Storno"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"Kombinace shaderů"
-7		"OK"
-8		"Storno"
-9		"Nahoru"
-10		"Dolů"
-11		"Odebrat"
-14		"Přidat"
-16		"Povolit shadery před změnou velikost"
-17		"Povolit shadery po změně velikosti"
+7		"Přidat"
+9		"Povolit shadery před změnou velikost"
+11		"Povolit shadery po změně velikosti"
+13		"Odebrat"
+14		"Nahoru"
+15		"Dolů"
+16		"OK"
+17		"Storno"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"Smazat"
+7		"Smazat"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
