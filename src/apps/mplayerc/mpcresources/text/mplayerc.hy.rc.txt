@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Copyright © 2002-2015, նայեք Authors.txt ֆայլը"
 10		"Version :"
 11		"SVN Build :"
-12		"ԼԱՎ"
-13		"Այս ծրագիրը անվճար է և տարածվում է GNU General Public-ի լիցենզիայով։"
-14		"MPC-BE կազմարկիչ."
-15		"FFmpeg կազմարկիչ."
-19		"Թարգմանեց Հրանտ Օհանյանը »»» http://haysoft.org"
-22		"Libavcodec / Libavutil :"
+12		"MPC-BE կազմարկիչ."
+13		"FFmpeg կազմարկիչ."
+14		"Libavcodec / Libavutil :"
+21		"Այս ծրագիրը անվճար է և տարածվում է GNU General Public-ի լիցենզիայով։"
+22		"Թարգմանեց Հրանտ Օհանյանը »»» http://haysoft.org"
+23		"ԼԱՎ"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Ավելացնել ընտրյալներին"
 6		"Նշեք պիտակի անունը."
 8		"Հիշել դիրքը"
-9		"Մերժել"
+9		"Հարաբերված պնակին"
 10		"ԼԱՎ"
-11		"Հարաբերված պնակին"
+11		"Մերժել"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"Շեյդերների կոմբինացում"
-7		"ԼԱՎ"
-8		"Մերժել"
-9		"&Վեր"
-10		"&Վար"
-11		"&Հանել"
-14		"&Ավելացնել"
-16		"Միացնել փիքսելի շեյդերների նախաչափումը"
-17		"Միացնել փիքսելի շեյդերների հետաչափումը"
+7		"&Ավելացնել"
+9		"Միացնել փիքսելի շեյդերների նախաչափումը"
+11		"Միացնել փիքսելի շեյդերների հետաչափումը"
+13		"&Հանել"
+14		"&Վեր"
+15		"&Վար"
+16		"ԼԱՎ"
+17		"Մերժել"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"Ջնջել"
+7		"Ջնջել"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9

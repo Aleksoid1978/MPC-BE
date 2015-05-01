@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Copyright © 2002-2015 MPC-BE Team, siehe Authors.txt Datei"
 10		"Version :"
 11		"SVN Build :"
-12		"OK"
-13		"Dieses Programm ist Freeware und steht unter der\nGNU General Public License."
-14		"MPC-BE Compiler :"
-15		"FFmpeg Compiler :"
-19		"Deutsche Übersetzung von Markus Gaugg,\nLuan und Klaus Luppert"
-22		"Libavcodec / Libavutil :"
+12		"MPC-BE Compiler :"
+13		"FFmpeg Compiler :"
+14		"Libavcodec / Libavutil :"
+21		"Dieses Programm ist Freeware und steht unter der\nGNU General Public License."
+22		"Deutsche Übersetzung von Markus Gaugg,\nLuan und Klaus Luppert"
+23		"OK"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Zu Favoriten hinzufügen"
 6		"Name des Favoriten"
 8		"Aktuelle Wiedergabeposition merken"
-9		"&Abbrechen"
+9		"Relativen Pfadnamen ohne Laufwerksangabe verwenden"
 10		"&OK"
-11		"Relativen Pfadnamen ohne Laufwerksangabe verwenden"
+11		"&Abbrechen"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"Shader kombinieren"
-7		"&OK"
-8		"&Abbrechen"
-9		"&Hoch"
-10		"&Runter"
-11		"&Löschen"
-14		"&Hinzufügen"
-16		"Pre-Resize Pixel-Shader aktivieren"
-17		"Post-Resize Pixel-Shader aktivieren"
+7		"&Hinzufügen"
+9		"Pre-Resize Pixel-Shader aktivieren"
+11		"Post-Resize Pixel-Shader aktivieren"
+13		"&Löschen"
+14		"&Hoch"
+15		"&Runter"
+16		"&OK"
+17		"&Abbrechen"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"&Löschen"
+7		"&Löschen"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9

@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Copyrighta © 2002-2015 Ikusi: Authors.txt"
 10		"Bertsioa :"
 11		"SVN Eraiketa :"
-12		"Ongi"
-13		"Programa hau dohainekoa da eta GNU Baimen Publiko Orokorrarekin argitaratzen da."
-14		"MPC-BE Biltzailea  :"
-15		"FFmpeg Biltzailea :"
-19		"Euskarazko itzulpena: Xabier Aramendi"
-22		"Libavcodec / Libavutil :"
+12		"MPC-BE Biltzailea  :"
+13		"FFmpeg Biltzailea :"
+14		"Libavcodec / Libavutil :"
+21		"Programa hau dohainekoa da eta GNU Baimen Publiko Orokorrarekin argitaratzen da."
+22		"Euskarazko itzulpena: Xabier Aramendi"
+23		"Ongi"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Gehitu Gogokoenetara"
 6		"Hautatu izen bat zure lasterbiderako:"
 8		"Gogoratu kokapena"
-9		"Ezeztatu"
+9		"Gidagailua"
 10		"Ongi"
-11		"Gidagailua"
+11		"Ezeztatu"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"Itzal Nahaslea"
-7		"Ongi"
-8		"Ezeztatu"
-9		"Mugitu &Gora"
-10		"Mugitu &Behera"
-11		"&Kendu"
-14		"Ge&hitu"
-16		"Gaitu aurre-birneurritze pixel itzalak"
-17		"Gaitu birneurritze-ondorengo pixel itzalak"
+7		"Ge&hitu"
+9		"Gaitu aurre-birneurritze pixel itzalak"
+11		"Gaitu birneurritze-ondorengo pixel itzalak"
+13		"&Kendu"
+14		"Mugitu &Gora"
+15		"Mugitu &Behera"
+16		"Ongi"
+17		"Ezeztatu"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"Ezeztatu"
+7		"Ezeztatu"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9

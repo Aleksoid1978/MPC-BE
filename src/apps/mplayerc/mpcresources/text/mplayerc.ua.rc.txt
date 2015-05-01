@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Copyright © 2002-2015, див. файл Authors.txt"
 10		"Версія :"
 11		"Збірка SVN :"
-12		"Гаразд"
-13		"Ця програма безкоштовна та розповсюджується за ліцензією GNU General Public License.\n"
-14		"MPC-BE Компілятор :"
-15		"FFmpeg Компілятор :"
-19		"Локалізація: Ihor Bobalo (http://www.eleks.com)"
-22		"Libavcodec / Libavutil :"
+12		"MPC-BE Компілятор :"
+13		"FFmpeg Компілятор :"
+14		"Libavcodec / Libavutil :"
+21		"Ця програма безкоштовна та розповсюджується за ліцензією GNU General Public License.\n"
+22		"Локалізація: Ihor Bobalo (http://www.eleks.com)"
+23		"Гаразд"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Додати до закладок"
 6		"Назва закладки:"
 8		"Зберегти позицію"
-9		"Скасувати"
+9		"Відносно USB-носія"
 10		"Гаразд"
-11		"Відносно USB-носія"
+11		"Скасувати"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"Комбінування шейдерів"
-7		"Гаразд"
-8		"Скасувати"
-9		"До&гори"
-10		"До&низу"
-11		"&Прибрати"
-14		"&Додати"
-16		"Ввімк. перед-масштабовні пікс. шейдери"
-17		"Ввімк. після-масштабовні пікс. шейдери"
+7		"&Додати"
+9		"Ввімк. перед-масштабовні пікс. шейдери"
+11		"Ввімк. після-масштабовні пікс. шейдери"
+13		"&Прибрати"
+14		"До&гори"
+15		"До&низу"
+16		"Гаразд"
+17		"Скасувати"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"Видалити"
+7		"Видалити"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9

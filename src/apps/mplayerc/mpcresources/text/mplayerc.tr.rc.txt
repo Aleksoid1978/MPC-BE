@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Telif Hakkı © 2002-2015, Authors.txt dosyasına bakınız"
 10		"Sürüm :"
 11		"SVN Derlemesi :"
-12		"Tamam"
-13		"Bu program ücretsiz olup Genel Kamusal GNU Lisansı altında sunulmaktadır."
-14		"MPC-BE Derlemesi :"
-15		"FFmpeg Derlemesi :"
-19		"bosluk (Sinan Hunerel) tarafından Türkçeleştirilmiştir"
-22		"Libavcodec / Libavutil :"
+12		"MPC-BE Derlemesi :"
+13		"FFmpeg Derlemesi :"
+14		"Libavcodec / Libavutil :"
+21		"Bu program ücretsiz olup Genel Kamusal GNU Lisansı altında sunulmaktadır."
+22		"bosluk (Sinan Hunerel) tarafından Türkçeleştirilmiştir"
+23		"Tamam"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Sık Kullanılanlara Ekle"
 6		"Kısayolunuz için bir ad seçiniz:"
 8		"Yerleşimi hatırla"
-9		"İptal"
+9		"İlişkili sürücü"
 10		"Tamam"
-11		"İlişkili sürücü"
+11		"İptal"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"Tonlama Birleştiricisi"
-7		"Tamam"
-8		"İptal"
-9		"Yukarı &Taşı"
-10		"&Aşağı Taşı"
-11		"&Sil"
-14		"&Ekle"
-16		"Ön piksel tonlamalarını kullan"
-17		"Arka piksel tonlamalarını kullan"
+7		"&Ekle"
+9		"Ön piksel tonlamalarını kullan"
+11		"Arka piksel tonlamalarını kullan"
+13		"&Sil"
+14		"Yukarı &Taşı"
+15		"&Aşağı Taşı"
+16		"Tamam"
+17		"İptal"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"Sil"
+7		"Sil"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9

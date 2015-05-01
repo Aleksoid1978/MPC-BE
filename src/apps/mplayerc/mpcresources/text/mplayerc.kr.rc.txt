@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Copyright © 2002-2015 'Authors.txt' 파일 참조"
 10		"버젼 :"
 11		"SVN 빌드 :"
-12		"확인"
-13		"이 프로그램은 프리웨어이며 GNU GPL 라이센스로 릴리즈됩니다."
-14		"MPC-BE 컴파일러 :"
-15		"FFmpeg 컴파일러 :"
-19		"한글번역제공: XNeo(xneokr@naver.com)"
-22		"Libavcodec / Libavutil :"
+12		"MPC-BE 컴파일러 :"
+13		"FFmpeg 컴파일러 :"
+14		"Libavcodec / Libavutil :"
+21		"이 프로그램은 프리웨어이며 GNU GPL 라이센스로 릴리즈됩니다."
+22		"한글번역제공: XNeo(xneokr@naver.com)"
+23		"확인"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"즐겨찾기에 추가"
 6		"바로가기의 이름을 입력하세요:"
 8		"재생위치 기억"
-9		"취소"
+9		"연결된 드라이브"
 10		"확인"
-11		"연결된 드라이브"
+11		"취소"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"셰이더 조합기"
-7		"확인"
-8		"취소"
-9		"위로(&U)"
-10		"아래로(&D)"
-11		"제거(&R)"
-14		"추가(&A)"
-16		"전처리 리사이즈 픽셸 셰이더 사용"
-17		"후처리 리사이즈 픽셸 셰이더 사용"
+7		"추가(&A)"
+9		"전처리 리사이즈 픽셸 셰이더 사용"
+11		"후처리 리사이즈 픽셸 셰이더 사용"
+13		"제거(&R)"
+14		"위로(&U)"
+15		"아래로(&D)"
+16		"확인"
+17		"취소"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"삭제"
+7		"삭제"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9

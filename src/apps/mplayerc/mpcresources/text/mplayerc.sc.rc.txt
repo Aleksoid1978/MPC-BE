@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"版权所有 © 2002-2015 请查看 Authors.txt"
 10		"版本 :"
 11		"SVN 构建版本 :"
-12		"确定"
-13		"此程序是遵守 GNU 通用公众授权协议发布的自由软件。"
-14		"MPC-BE 编译器: "
-15		"FFmpeg 编译器: "
-19		"简体中文翻译调整：insolo and xikuai"
-22		"Libavcodec / Libavutil :"
+12		"MPC-BE 编译器: "
+13		"FFmpeg 编译器: "
+14		"Libavcodec / Libavutil :"
+21		"此程序是遵守 GNU 通用公众授权协议发布的自由软件。"
+22		"简体中文翻译调整：insolo and xikuai"
+23		"确定"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"添加到收藏夹"
 6		"选择快捷方式的名称: "
 8		"记忆位置"
-9		"取消"
+9		"相对硬盘位置"
 10		"确定"
-11		"相对硬盘位置"
+11		"取消"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"着色混合器"
-7		"确定"
-8		"取消"
-9		"上移(&U)"
-10		"下移(&D)"
-11		"移除(&R)"
-14		"添加(&A)"
-16		"启用预调整大小像素着色器"
-17		"启用后调整大小像素着色器"
+7		"添加(&A)"
+9		"启用预调整大小像素着色器"
+11		"启用后调整大小像素着色器"
+13		"移除(&R)"
+14		"上移(&U)"
+15		"下移(&D)"
+16		"确定"
+17		"取消"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"删除"
+7		"删除"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9

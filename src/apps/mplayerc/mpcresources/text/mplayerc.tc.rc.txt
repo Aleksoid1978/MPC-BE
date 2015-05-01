@@ -4,12 +4,12 @@ BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 8		"Copyright © 2002-2015 詳見 Authors.txt 檔案"
 10		"版本 :"
 11		"SVN 組建版本 :"
-12		"確認"
-13		"本程式係依 GNU 通用公共授權 (GPL) 發行之自由軟體。"
-14		"MPC-BE 編譯器 :"
-15		"FFmpeg 編譯器 :"
-19		"本翻譯版本延伸自 Kene Lin 及 roytam \n之譯本，並作多處擴充，特此鳴謝。"
-22		"Libavcodec / Libavutil :"
+12		"MPC-BE 編譯器 :"
+13		"FFmpeg 編譯器 :"
+14		"Libavcodec / Libavutil :"
+21		"本程式係依 GNU 通用公共授權 (GPL) 發行之自由軟體。"
+22		"本翻譯版本延伸自 Kene Lin 及 roytam \n之譯本，並作多處擴充，特此鳴謝。"
+23		"確認"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -47,9 +47,9 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"加到我的最愛"
 6		"請選擇捷徑的名稱:"
 8		"記住位置"
-9		"取消"
+9		"相對磁碟機"
 10		"確認"
-11		"相對磁碟機"
+11		"取消"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -554,18 +554,18 @@ END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 3		"Shader 混合器"
-7		"確認"
-8		"取消"
-9		"上移(&U)"
-10		"下移(&D)"
-11		"移除(&R)"
-14		"新增(&A)"
-16		"啟用 pre-resize pixel shader"
-17		"啟用 post-resize pixel shader"
+7		"新增(&A)"
+9		"啟用 pre-resize pixel shader"
+11		"啟用 post-resize pixel shader"
+13		"移除(&R)"
+14		"上移(&U)"
+15		"下移(&D)"
+16		"確認"
+17		"取消"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 10
-9		"移除"
+7		"移除"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
