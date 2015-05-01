@@ -702,7 +702,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 			__int64 pos = m_pFile->GetPos();
 
-			DWORD TrackNumber = m_pFile->AddStream(0, b, peshdr.id_ext, peshdr.len);
+			DWORD TrackNumber = m_pFile->AddStream(0, b, peshdr.id_ext, peshdr.len, TRUE, peshdr.fpts);
 			if (GetOutputPin(TrackNumber)) {
 				__int64 nBytes = peshdr.len - (m_pFile->GetPos() - pos);
 				HandlePacket(peshdr, nBytes);
@@ -728,7 +728,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 								ASSERT(0);
 								return E_FAIL;
 							}
-							TrackNumber = m_pFile->AddStream(h.pid, b, 0, (DWORD)(h.bytes - (m_pFile->GetPos() - pos)));
+							TrackNumber = m_pFile->AddStream(h.pid, b, 0, (DWORD)(h.bytes - (m_pFile->GetPos() - pos)), TRUE, peshdr.fpts);
 						}
 					} else {
 						m_pFile->Seek(pos);

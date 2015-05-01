@@ -816,7 +816,7 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 	return true;
 }
 
-bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sync, bool AC3CoreOnly)
+bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool AC3CoreOnly/* = true*/, bool find_sync/* = false*/)
 {
 	static int freq[] = {48000, 44100, 32000, 0};
 
@@ -968,7 +968,7 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 	return true;
 }
 
-bool CBaseSplitterFileEx::Read(dtshdr& h, int len, CMediaType* pmt, bool find_sync)
+bool CBaseSplitterFileEx::Read(dtshdr& h, int len, CMediaType* pmt, bool find_sync/* = false*/)
 {
 	memset(&h, 0, sizeof(h));
 
