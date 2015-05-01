@@ -270,14 +270,15 @@ HRESULT CBaseSplitterParserOutputPin::ParseAAC(CAutoPtr<CPacket> p)
 			}
 
 			if (start + size + 9 <= end) {
-				int size2 = ParseADTSAACHeader(start + size, &aframe);
+				audioframe_t aframe2;
+				int size2 = ParseADTSAACHeader(start + size, &aframe2);
 				if (size2 == 0) {
 					start++;
 					continue;
 				}
 			}
 
-			HandlePacket(0);
+			HandlePacket(aframe.param1);
 
 			start += size;
 		} else {
