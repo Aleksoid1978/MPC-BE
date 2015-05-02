@@ -714,7 +714,7 @@ UINT CShoutcastStream::SocketThreadProc()
 						}
 
 						CAutoPtr<CShoutCastPacket> p2(DNew CShoutCastPacket());
-						p2->SetData(start, size);
+						p2->SetData(start + aframe.param1, size - aframe.param1);
 						p2->rtStop = (p2->rtStart = m_rtSampleTime) + (10000000i64 * size * 8/soc.m_bitrate);
 						p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
 						m_rtSampleTime = p2->rtStop;
