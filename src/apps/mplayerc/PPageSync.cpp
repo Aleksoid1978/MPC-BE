@@ -50,6 +50,7 @@ void CPPageSync::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT1, m_edtVMR9VSyncOffset);
 	DDX_Control(pDX, IDC_SPIN1, m_spnVMR9VSyncOffset);
 	DDX_Control(pDX, IDC_CHECK4, m_chkDisableAero);
+	DDX_Control(pDX, IDC_CHECK8, m_chkEnableFrameTimeCorrection);
 	DDX_Control(pDX, IDC_CHECK5, m_chkVMRFlushGPUBeforeVSync);
 	DDX_Control(pDX, IDC_CHECK6, m_chkVMRFlushGPUAfterPresent);
 	DDX_Control(pDX, IDC_CHECK7, m_chkVMRFlushGPUWait);
@@ -96,6 +97,7 @@ void CPPageSync::InitDialogPrivate()
 	m_edtVMR9VSyncOffset.SetRange(-20, 20);
 	m_edtVMR9VSyncOffset = ars.iVMR9VSyncOffset;
 	m_chkDisableAero.SetCheck(ars.iVMRDisableDesktopComposition);
+	m_chkEnableFrameTimeCorrection.SetCheck(ars.iEVREnableFrameTimeCorrection);
 	m_chkVMRFlushGPUBeforeVSync.SetCheck(ars.iVMRFlushGPUBeforeVSync);
 	m_chkVMRFlushGPUAfterPresent.SetCheck(ars.iVMRFlushGPUAfterPresent);
 	m_chkVMRFlushGPUWait.SetCheck(ars.iVMRFlushGPUWait);
@@ -118,6 +120,7 @@ void CPPageSync::InitDialogPrivate()
 	OnAlterativeVSyncCheck();
 
 	m_chkDisableAero.EnableWindow(IsWinVista() || IsWinSeven() ? TRUE : FALSE);
+	m_chkEnableFrameTimeCorrection.EnableWindow(s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ? TRUE : FALSE);
 
 	if ((s.iDSVideoRendererType == VIDRNDT_DS_SYNC) && (pFrame->GetPlaybackMode() == PM_NONE)) {
 		GetDlgItem(IDC_SYNCVIDEO)->EnableWindow(TRUE);
@@ -186,6 +189,7 @@ BOOL CPPageSync::OnApply()
 	ars.fVMR9AlterativeVSync			= !!m_chkVMR9AlterativeVSync.GetCheck();
 	ars.iVMR9VSyncOffset				 = m_edtVMR9VSyncOffset;
 	ars.iVMRDisableDesktopComposition	= !!m_chkDisableAero.GetCheck();
+	ars.iEVREnableFrameTimeCorrection	= !!m_chkEnableFrameTimeCorrection.GetCheck();
 	ars.iVMRFlushGPUBeforeVSync			= !!m_chkVMRFlushGPUBeforeVSync.GetCheck();
 	ars.iVMRFlushGPUAfterPresent		= !!m_chkVMRFlushGPUAfterPresent.GetCheck();
 	ars.iVMRFlushGPUWait				= !!m_chkVMRFlushGPUWait.GetCheck();
