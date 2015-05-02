@@ -41,6 +41,7 @@ public:
 	CIntEdit m_edtVMR9VSyncOffset;
 	CSpinButtonCtrl m_spnVMR9VSyncOffset;
 	CButton m_chkDisableAero;
+	CButton m_chkEnableFrameTimeCorrection;
 	CButton m_chkVMRFlushGPUBeforeVSync;
 	CButton m_chkVMRFlushGPUAfterPresent;
 	CButton m_chkVMRFlushGPUWait;
