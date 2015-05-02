@@ -496,16 +496,21 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
 	m_cbD3D9RenderDevice.EnableWindow(FALSE);
 	m_cbEVROutputRange.EnableWindow(FALSE);
+	GetDlgItem(IDC_STATIC1)->EnableWindow(FALSE);
+	GetDlgItem(IDC_STATIC2)->EnableWindow(FALSE);
+	GetDlgItem(IDC_STATIC3)->EnableWindow(FALSE);
+	GetDlgItem(IDC_STATIC4)->EnableWindow(FALSE);
+	GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
 
 	// Color Managment
 	m_chkColorManagment.ShowWindow(SW_HIDE);
 	m_cbCMInputType.ShowWindow(SW_HIDE);
 	m_cbCMAmbientLight.ShowWindow(SW_HIDE);
 	m_cbCMRenderingIntent.ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_STATIC2)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_STATIC3)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_STATIC4)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_STATIC5)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC6)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC7)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC8)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC9)->ShowWindow(SW_HIDE);
 
 	switch (CurrentVR) {
 		case VIDRNDT_DS_DEFAULT:
@@ -527,6 +532,7 @@ void CPPageVideo::OnDSRendererChange()
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9WIN), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DS_VMR7RENDERLESS:
+			GetDlgItem(IDC_STATIC1)->EnableWindow(TRUE);
 			m_cbAPSurfaceUsage.EnableWindow(TRUE);
 			m_chkVMRMixerMode.EnableWindow(TRUE);
 			m_chkVMRMixerYUV.EnableWindow(TRUE);
@@ -541,8 +547,11 @@ void CPPageVideo::OnDSRendererChange()
 			m_chkVMRMixerMode.EnableWindow(TRUE);
 			m_chkVMRMixerYUV.EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
+			GetDlgItem(IDC_STATIC1)->EnableWindow(TRUE);
 			m_cbAPSurfaceUsage.EnableWindow(TRUE);
+			GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
 			m_cbDX9SurfaceFormat.EnableWindow(TRUE);
+			GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
@@ -554,10 +563,10 @@ void CPPageVideo::OnDSRendererChange()
 					m_cbCMInputType.ShowWindow(SW_SHOW);
 					m_cbCMAmbientLight.ShowWindow(SW_SHOW);
 					m_cbCMRenderingIntent.ShowWindow(SW_SHOW);
-					GetDlgItem(IDC_STATIC2)->ShowWindow(SW_SHOW);
-					GetDlgItem(IDC_STATIC3)->ShowWindow(SW_SHOW);
-					GetDlgItem(IDC_STATIC4)->ShowWindow(SW_SHOW);
-					GetDlgItem(IDC_STATIC5)->ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC6)->ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC7)->ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC8)->ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC9)->ShowWindow(SW_SHOW);
 				}
 			}
 
@@ -571,18 +580,21 @@ void CPPageVideo::OnDSRendererChange()
 				GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
 				m_cbD3D9RenderDevice.EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE));
 			}
+			GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
 			m_cbDX9SurfaceFormat.EnableWindow(TRUE);
+			GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
+			GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
 			m_spnEvrBuffers.EnableWindow(TRUE);
 
 			// Force 3D surface with EVR Custom
-			m_cbAPSurfaceUsage.EnableWindow(FALSE);
 			m_cbAPSurfaceUsage.SetCurSel(2);
 			OnSurfaceChange();
 
+			GetDlgItem(IDC_STATIC4)->EnableWindow(TRUE);
 			m_cbEVROutputRange.EnableWindow(TRUE);
 
 			{
@@ -593,25 +605,28 @@ void CPPageVideo::OnDSRendererChange()
 					m_cbCMInputType.ShowWindow(SW_SHOW);
 					m_cbCMAmbientLight.ShowWindow(SW_SHOW);
 					m_cbCMRenderingIntent.ShowWindow(SW_SHOW);
-					GetDlgItem(IDC_STATIC2)->ShowWindow(SW_SHOW);
-					GetDlgItem(IDC_STATIC3)->ShowWindow(SW_SHOW);
-					GetDlgItem(IDC_STATIC4)->ShowWindow(SW_SHOW);
-					GetDlgItem(IDC_STATIC5)->ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC6)->ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC7)->ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC8)->ShowWindow(SW_SHOW);
+					GetDlgItem(IDC_STATIC9)->ShowWindow(SW_SHOW);
 				}
 			}
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR_CUSTOM), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_DS_SYNC:
+			GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
 			m_spnEvrBuffers.EnableWindow(TRUE);
+			GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
-			m_cbAPSurfaceUsage.EnableWindow(FALSE);
+			// Force 3D surface with EVR Sync
 			m_cbAPSurfaceUsage.SetCurSel(2);
 			OnSurfaceChange();
 
+			GetDlgItem(IDC_STATIC4)->EnableWindow(TRUE);
 			m_cbEVROutputRange.EnableWindow(TRUE);
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYNC), &m_cbVideoRenderer);
@@ -664,10 +679,10 @@ void CPPageVideo::OnSurfaceFormatChange()
 		m_cbCMInputType.ShowWindow(SW_SHOW);
 		m_cbCMAmbientLight.ShowWindow(SW_SHOW);
 		m_cbCMRenderingIntent.ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_STATIC2)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_STATIC3)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_STATIC4)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_STATIC5)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC6)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC7)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC8)->ShowWindow(SW_SHOW);
+		GetDlgItem(IDC_STATIC9)->ShowWindow(SW_SHOW);
 	}
 	else {
 		// Color Managment
@@ -675,10 +690,10 @@ void CPPageVideo::OnSurfaceFormatChange()
 		m_cbCMInputType.ShowWindow(SW_HIDE);
 		m_cbCMAmbientLight.ShowWindow(SW_HIDE);
 		m_cbCMRenderingIntent.ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_STATIC2)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_STATIC3)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_STATIC4)->ShowWindow(SW_HIDE);
-		GetDlgItem(IDC_STATIC5)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC6)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC7)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC8)->ShowWindow(SW_HIDE);
+		GetDlgItem(IDC_STATIC9)->ShowWindow(SW_HIDE);
 	}
 
 	SetModified();
@@ -690,17 +705,17 @@ void CPPageVideo::OnColorManagmentCheck()
 		m_cbCMInputType.EnableWindow(TRUE);
 		m_cbCMAmbientLight.EnableWindow(TRUE);
 		m_cbCMRenderingIntent.EnableWindow(TRUE);
-		GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
-		GetDlgItem(IDC_STATIC4)->EnableWindow(TRUE);
-		GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC7)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC8)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC9)->EnableWindow(TRUE);
 	}
 	else {
 		m_cbCMInputType.EnableWindow(FALSE);
 		m_cbCMAmbientLight.EnableWindow(FALSE);
 		m_cbCMRenderingIntent.EnableWindow(FALSE);
-		GetDlgItem(IDC_STATIC3)->EnableWindow(FALSE);
-		GetDlgItem(IDC_STATIC4)->EnableWindow(FALSE);
-		GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC7)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC8)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC9)->EnableWindow(FALSE);
 	}
 
 	SetModified();
