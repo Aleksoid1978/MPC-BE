@@ -1129,7 +1129,7 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 {
 	const REFERENCE_TIME AvgTimePerFrame = GetDuration();
 
-	if (rtStart == INVALID_TIME) {
+	if (rtStart == INVALID_TIME || (m_rtLastStart && rtStart < m_rtLastStart)) {
 		rtStart = m_rtLastStop;
 		rtStop = INVALID_TIME;
 	}
