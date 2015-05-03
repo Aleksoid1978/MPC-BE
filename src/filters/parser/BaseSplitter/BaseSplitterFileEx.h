@@ -451,8 +451,8 @@ public:
 	bool Read(mpahdr& h, int len, CMediaType* pmt = NULL, bool fAllowV25 = false, bool find_sync = false);
 	bool Read(aachdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
 	bool Read(latm_aachdr& h, int len, CMediaType* pmt = NULL);
-	bool Read(ac3hdr& h, int len, CMediaType* pmt = NULL, bool AC3CoreOnly = true, bool find_sync = false);
-	bool Read(dtshdr& h, int len, CMediaType* pmt = NULL, bool find_sync = false);
+	bool Read(ac3hdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true, bool AC3CoreOnly = true);
+	bool Read(dtshdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
 	bool Read(lpcmhdr& h, CMediaType* pmt = NULL);
 	bool Read(dvdalpcmhdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(hdmvlpcmhdr& h, CMediaType* pmt = NULL);

@@ -46,7 +46,7 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 
 	CAtlMap<DWORD, int> streamPTSCount;
 
-	template<class T, int validCount = 3>
+	template<class T, int validCount = 5>
 	class CValidStream {
 		BYTE m_nValidStream;
 		T m_val;
@@ -65,8 +65,11 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 		}
 		BOOL IsValid() { return m_nValidStream >= validCount; }
 	};
-	CAtlMap<DWORD, CValidStream<latm_aachdr>>	m_aaclatmValid;
-	CAtlMap<DWORD, CValidStream<ac3hdr>>		m_ac3Valid;
+
+	CAtlMap<DWORD, CValidStream<latm_aachdr, 3>>	m_aaclatmValid;
+	CAtlMap<DWORD, CValidStream<aachdr>>			m_aacValid;
+	CAtlMap<DWORD, CValidStream<ac3hdr>>			m_ac3Valid;
+	CAtlMap<DWORD, CValidStream<mpahdr>>			m_mpaValid;
 
 	BOOL m_bOpeningCompleted;
 
@@ -214,7 +217,7 @@ public:
 	CStreamsList m_streams;
 
 	void SearchStreams(__int64 start, __int64 stop, BOOL CalcDuration = FALSE);
-	DWORD AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, BOOL bAddStream, BOOL bStartPacket = FALSE);
+	DWORD AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, BOOL bAddStream = TRUE);
 	void  AddHdmvPGStream(WORD pid, const char* language_code);
 	CAtlList<stream>* GetMasterStream();
 	bool IsHdmv() {
