@@ -143,6 +143,7 @@ protected:
 	REFERENCE_TIME							m_rtStopCache;
 
 	BOOL									m_bUsePTS;
+	BOOL									m_bCorrectPTS;
 
 	DWORD									m_fSYNC;
 
@@ -182,7 +183,7 @@ public:
 	CTransformOutputPin*	GetOutputPin() { return m_pOutput; };
 
 	REFERENCE_TIME	GetDuration();
-	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, BOOL bCorrectPTS = TRUE);
+	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	void			GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	bool			IsAVI();
 

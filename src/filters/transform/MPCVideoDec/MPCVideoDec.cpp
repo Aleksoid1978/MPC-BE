@@ -946,6 +946,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bWaitingForKeyFrame(TRUE)
 	, m_bRVDropBFrameTimings(FALSE)
 	, m_bUsePTS(FALSE)
+	, m_bCorrectPTS(FALSE)
 	, m_PixelFormat(AV_PIX_FMT_NONE)
 	, m_bInterlaced(FALSE)
 	, m_fSYNC(0)
@@ -1125,11 +1126,11 @@ REFERENCE_TIME CMPCVideoDecFilter::GetDuration()
 	return AvgTimePerFrame;
 }
 
-void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, BOOL bCorrectPTS/* = TRUE*/)
+void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
 	const REFERENCE_TIME AvgTimePerFrame = GetDuration();
 
-	if (rtStart == INVALID_TIME || (bCorrectPTS && m_rtLastStart && rtStart < m_rtLastStart)) {
+	if (rtStart == INVALID_TIME || (m_bCorrectPTS && m_rtLastStart && rtStart < m_rtLastStart)) {
 		rtStart = m_rtLastStop;
 		rtStop = INVALID_TIME;
 	}
@@ -1676,6 +1677,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		m_bRVDropBFrameTimings = (m_nCodecId == AV_CODEC_ID_RV10 || m_nCodecId == AV_CODEC_ID_RV20 || m_nCodecId == AV_CODEC_ID_RV30 || m_nCodecId == AV_CODEC_ID_RV40);
 
 		m_bUsePTS = (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_MPEG1VIDEO);
+		m_bCorrectPTS = m_bUsePTS;
 	}
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
