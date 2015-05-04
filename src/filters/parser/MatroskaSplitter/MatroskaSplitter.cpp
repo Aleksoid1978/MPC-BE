@@ -573,104 +573,51 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
-					QWORD lastCueClusterPosition = ULONGLONG_MAX;
-
 					CAtlArray<INT64> timecodes;
 					bool readmore = true;
 
-					CNode<Cue>* pCues;
-					CNode<Cue>  Cues;
-					if (m_pFile->m_segment.Cues.GetCount()) {
-						pCues = &m_pFile->m_segment.Cues;
-					} else {
-						UINT64 TrackNumber = m_pFile->m_segment.GetMasterTrack();
+					do {
+						Cluster c;
+						c.ParseTimeCode(m_pCluster);
 
-						CAutoPtr<Cue> pCue(DNew Cue());
+						if (CAutoPtr<CMatroskaNode> pBlock = m_pCluster->GetFirstBlock()) {
+							do {
+								CBlockGroupNode bgn;
 
-						do {
-							Cluster c;
-							c.ParseTimeCode(m_pCluster);
-
-							CAutoPtr<CuePoint> pCuePoint(DNew CuePoint());
-							CAutoPtr<CueTrackPosition> pCueTrackPosition(DNew CueTrackPosition());
-							pCuePoint->CueTime.Set(c.TimeCode);
-							pCueTrackPosition->CueTrack.Set(TrackNumber);
-							pCueTrackPosition->CueClusterPosition.Set(m_pCluster->m_filepos - m_pSegment->m_start);
-							pCuePoint->CueTrackPositions.AddTail(pCueTrackPosition);
-							pCue->CuePoints.AddTail(pCuePoint);
-						} while (m_pCluster->Next(true) && pCue->CuePoints.GetCount() < 2);
-
-						Cues.AddTail(pCue);
-						pCues = &Cues;
-					}
-
-					POSITION pos1 = pCues->GetHeadPosition();
-					while (readmore && pos1) {
-						Cue* pCue = pCues->GetNext(pos1);
-						POSITION pos2 = pCue->CuePoints.GetHeadPosition();
-						while (readmore && pos2) {
-							CuePoint* pCuePoint = pCue->CuePoints.GetNext(pos2);
-							POSITION pos3 = pCuePoint->CueTrackPositions.GetHeadPosition();
-							while (readmore && pos3) {
-								CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetNext(pos3);
-								if (pCueTrackPositions->CueTrack != pTE->TrackNumber) {
-									continue;
+								if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
+									bgn.Parse(pBlock, true);
+								}
+								else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
+									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+									bg->Block.Parse(pBlock, true);
+									bgn.AddTail(bg);
 								}
 
-								if (lastCueClusterPosition == pCueTrackPositions->CueClusterPosition) {
-									continue;
+								POSITION pos4 = bgn.GetHeadPosition();
+								while (pos4) {
+									BlockGroup* bg = bgn.GetNext(pos4);
+									if (bg->Block.TrackNumber != pTE->TrackNumber) {
+										continue;
+									}
+									INT64 tc = c.TimeCode + bg->Block.TimeCode;
+
+									if (tc < 0) {
+										continue;
+									}
+
+									timecodes.Add(tc);
+									DbgLog((LOG_TRACE, 3, L"	=> Frame: %02d, TimeCode: %5I64d = %10I64d", timecodes.GetCount(), tc, m_pFile->m_segment.GetRefTime(tc)));
+
+									if (timecodes.GetCount() >= 120) {
+										readmore = false;
+										break;
+									}
 								}
-								lastCueClusterPosition = pCueTrackPositions->CueClusterPosition;
-
-								m_pCluster->SeekTo(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition);
-								m_pCluster->Parse();
-
-								Cluster c;
-								c.ParseTimeCode(m_pCluster);
-
-								if (CAutoPtr<CMatroskaNode> pBlock = m_pCluster->GetFirstBlock()) {
-									do {
-										CBlockGroupNode bgn;
-
-										if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-											bgn.Parse(pBlock, true);
-										} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
-											CAutoPtr<BlockGroup> bg(DNew BlockGroup());
-											bg->Block.Parse(pBlock, true);
-											bgn.AddTail(bg);
-										}
-
-										POSITION pos4 = bgn.GetHeadPosition();
-										while (pos4) {
-											BlockGroup* bg = bgn.GetNext(pos4);
-											if (bg->Block.TrackNumber != pTE->TrackNumber) {
-												continue;
-											}
-											INT64 tc = c.TimeCode + bg->Block.TimeCode;
-
-											if (tc < 0) {
-												continue;
-											}
-
-											timecodes.Add(tc);
-											DbgLog((LOG_TRACE, 3, L"	=> Frame: %02d, TimeCode: %5I64d = %10I64d", timecodes.GetCount(), tc, m_pFile->m_segment.GetRefTime(tc)));
-
-											if (timecodes.GetCount() >= 120) {
-												readmore = false;
-												break;
-											}
-										}
-									} while (readmore && pBlock->NextBlock());
-								}
-							}
+							} while (readmore && pBlock->NextBlock());
 						}
-					}
+					} while (readmore && m_pCluster->Next(true));
 
 					m_pCluster.Free();
-
-					if (Cues.GetCount()) {
-						Cues.RemoveAll();
-					}
 
 					if (timecodes.GetCount()) {
 						qsort(timecodes.GetData(), timecodes.GetCount(), sizeof(INT64), compare);
@@ -703,8 +650,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									count = 1;
 								}
 							}
-
-
 
 							if (longsum && longcount) {
 								double fps = 1000000000.0 * longcount / (m_pFile->m_segment.SegmentInfo.TimeCodeScale * longsum);
