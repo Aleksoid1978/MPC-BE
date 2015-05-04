@@ -109,7 +109,7 @@ HRESULT CDXVA1DecoderVC1::DeliverFrame(int got_picture, REFERENCE_TIME rtStart, 
 	}
 
 	// Update timestamp & Re-order B frames
-	m_pFilter->UpdateFrameTime(rtStart, rtStop);
+	m_pFilter->UpdateFrameTime(rtStart, rtStop, FALSE);
 	if (m_pFilter->IsReorderBFrame() && m_pFilter->GetAVCtx()->has_b_frames) {
 		if (bPicBackwardPrediction == 1) {
 			std::swap(rtStart, m_rtStartDelayed);
