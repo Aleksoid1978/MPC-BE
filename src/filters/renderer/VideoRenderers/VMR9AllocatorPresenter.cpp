@@ -370,9 +370,9 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 				AfxGetApp()->m_pMainWnd->PostMessage(WM_REARRANGERENDERLESS);
 			}
 		}
-		// If framerate not set by Video Decoder choose 23.97...
+		// If framerate not set by Video Decoder choose 23.976
 		if (m_rtTimePerFrame == 0) {
-			m_rtTimePerFrame = 417166;
+			m_rtTimePerFrame = 417083;
 		}
 
 		m_fps = 10000000.0 / m_rtTimePerFrame;
