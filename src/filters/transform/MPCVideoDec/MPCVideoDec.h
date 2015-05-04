@@ -182,7 +182,7 @@ public:
 	CTransformOutputPin*	GetOutputPin() { return m_pOutput; };
 
 	REFERENCE_TIME	GetDuration();
-	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
+	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, BOOL bCorrectPTS = TRUE);
 	void			GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	bool			IsAVI();
 

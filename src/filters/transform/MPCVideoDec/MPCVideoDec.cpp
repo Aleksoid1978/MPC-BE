@@ -1125,11 +1125,11 @@ REFERENCE_TIME CMPCVideoDecFilter::GetDuration()
 	return AvgTimePerFrame;
 }
 
-void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
+void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, BOOL bCorrectPTS/* = TRUE*/)
 {
 	const REFERENCE_TIME AvgTimePerFrame = GetDuration();
 
-	if (rtStart == INVALID_TIME || (m_rtLastStart && rtStart < m_rtLastStart)) {
+	if (rtStart == INVALID_TIME || (bCorrectPTS && m_rtLastStart && rtStart < m_rtLastStart)) {
 		rtStart = m_rtLastStop;
 		rtStop = INVALID_TIME;
 	}
