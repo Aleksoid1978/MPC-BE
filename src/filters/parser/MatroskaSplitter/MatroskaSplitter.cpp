@@ -159,18 +159,19 @@ static int compare(const void* a, const void* b)
 // code from MediaInfo
 static double Video_FrameRate_Rounding(double FrameRate)
 {
-	     if (FrameRate> 9.990 && FrameRate<=10.010)		FrameRate=10.000;
-	else if (FrameRate>14.990 && FrameRate<=15.010)		FrameRate=15.000;
-	else if (FrameRate>23.964 && FrameRate<=23.988)		FrameRate=23.976;
-	else if (FrameRate>23.988 && FrameRate<=24.012)		FrameRate=24.000;
-	else if (FrameRate>24.988 && FrameRate<=25.012)		FrameRate=25.000;
-	else if (FrameRate>29.955 && FrameRate<=29.985)		FrameRate=29.970;
-	else if (FrameRate>29.985 && FrameRate<=30.015)		FrameRate=30.000;
-	else if (FrameRate>23.964*2 && FrameRate<=23.988*2)	FrameRate=23.976*2;
-	else if (FrameRate>23.988*2 && FrameRate<=24.012*2)	FrameRate=24.000*2;
-	else if (FrameRate>24.988*2 && FrameRate<=25.012*2)	FrameRate=25.000*2;
-	else if (FrameRate>29.955*2 && FrameRate<=29.985*2)	FrameRate=29.970*2;
-	else if (FrameRate>29.985*2 && FrameRate<=30.015*2)	FrameRate=30.000*2;
+	     if (FrameRate > 14.993 && FrameRate <  15.008) FrameRate = 15.000;
+	else if (FrameRate > 23.964 && FrameRate <  23.988) FrameRate = 24/1.001;
+	else if (FrameRate > 23.988 && FrameRate <  24.012) FrameRate = 24;
+	else if (FrameRate > 24.988 && FrameRate <  25.013) FrameRate = 25.000;
+	else if (FrameRate > 29.955 && FrameRate <  29.985) FrameRate = 30/1.001;
+	else if (FrameRate > 29.985 && FrameRate <  30.015) FrameRate = 30.000;
+	else if (FrameRate > 47.928 && FrameRate <  47.976) FrameRate = 48/1.001;
+	else if (FrameRate > 47.976 && FrameRate <  48.024) FrameRate = 48;
+	else if (FrameRate > 49.975 && FrameRate <  50.025) FrameRate = 50;
+	else if (FrameRate > 59.910 && FrameRate <  59.970) FrameRate = 60/1.001;
+	else if (FrameRate > 59.970 && FrameRate <  60.030) FrameRate = 60;
+	else if (FrameRate >119.820 && FrameRate < 119.940) FrameRate = 120/1.001;
+	else if (FrameRate >119.940 && FrameRate < 120.060) FrameRate = 120;
 
 	return FrameRate;
 }
@@ -728,7 +729,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 
 				if (AvgTimePerFrame < 50000) {
-					AvgTimePerFrame = 417082; // set 23.976 as default
+					AvgTimePerFrame = 417083; // set 23.976 as default
 				}
 
 				for (size_t i = 0; i < mts.GetCount(); i++) {
