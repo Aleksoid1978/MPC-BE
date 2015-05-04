@@ -655,7 +655,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 											timecodes.Add(tc);
 											DbgLog((LOG_TRACE, 3, L"	=> Frame: %02d, TimeCode: %5I64d = %10I64d", timecodes.GetCount(), tc, m_pFile->m_segment.GetRefTime(tc)));
 
-											if (timecodes.GetCount() >= 50) {
+											if (timecodes.GetCount() >= 120) {
 												readmore = false;
 												break;
 											}
@@ -675,55 +675,42 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (timecodes.GetCount()) {
 						qsort(timecodes.GetData(), timecodes.GetCount(), sizeof(INT64), compare);
 
-						CAtlArray<INT64> timecodes_diff;
+						CAtlArray<int> frametimes;
 						for (size_t i = 1; i < timecodes.GetCount(); i++) {
-							if ((timecodes[i] - timecodes[i-1]) > 0) {
-								timecodes_diff.Add(timecodes[i] - timecodes[i-1]);
+							INT64 diff = timecodes[i] - timecodes[i-1];
+							if (diff > 0 && diff < INT_MAX) {
+								frametimes.Add((int)diff);
 							}
 						}
 
-						INT64 matchTC	= 0;
-						UINT count		= 0;
-						for (size_t i = 0; i < timecodes_diff.GetCount(); i++) {
-							if (timecodes_diff[i] == 0 || timecodes_diff[i] == matchTC) {
-								continue;
-							}
-							INT64 tc	= timecodes_diff[i];
-							UINT count2	= 0;
-							for (size_t j = 0; j < timecodes_diff.GetCount(); j++) {
-								if ((timecodes_diff[j] >= tc * 0.9) && (timecodes_diff[j] <= tc * 1.1)) {
-									count2++;
-								}
-							}
-							if (count2 > count) {
-								matchTC	= tc;
-								count	= count2;
-							}
-						}
+						if (frametimes.GetCount()) {
+							int longsum = 0;
+							int longcount = 0;
 
-						if (matchTC) {
+							int sum = frametimes[0];
+							int count = 1;
+							for (size_t i = 1; i < frametimes.GetCount(); i++) {
+								if (abs(frametimes[i-1] - frametimes[i]) <= 1) {
+									sum += frametimes[i];
+									count++;
 
-							for (size_t i = 0; i < timecodes_diff.GetCount();) {
-								if ((timecodes_diff[i] < matchTC * 0.9) || (timecodes_diff[i] > matchTC * 1.1)) {
-									timecodes_diff.RemoveAt(i);
+									if (count > longcount) {
+										longsum = sum;
+										longcount = count;
+									}
 								} else {
-									i++;
+									sum = frametimes[i];
+									count = 1;
 								}
 							}
 
-							INT64 timecode = 0;
-							count = 0;
-							for (size_t i = 0; i < timecodes_diff.GetCount(); i++) {
-								timecode += timecodes_diff[i];
-								count++;
-								DbgLog((LOG_TRACE, 3, L"	=> TimeCode_Diff: %02d : %5I64d", count, timecodes_diff[i]));
+
+
+							if (longsum && longcount) {
+								double fps = 1000000000.0 * longcount / (m_pFile->m_segment.SegmentInfo.TimeCodeScale * longsum);
+								fps = Video_FrameRate_Rounding(fps);
+								AvgTimePerFrame = 10000000.0 / fps;
 							}
-
-							AvgTimePerFrame = m_pFile->m_segment.SegmentInfo.TimeCodeScale * (timecode) / (count * 100);
-
-							double fps = 10000000.0 / AvgTimePerFrame;
-							fps = Video_FrameRate_Rounding(fps);
-							AvgTimePerFrame = 10000000.0 / fps;
 						}
 					}
 				}
