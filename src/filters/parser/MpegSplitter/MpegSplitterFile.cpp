@@ -481,21 +481,30 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDura
 								Seek(h.next);
 							}
 
-							if (h2.fpts && CalcDuration && (m_AlternativeDuration || (GetMasterStream() && GetMasterStream()->GetHead() == h.pid))) {
-								if ((m_rtMin == -1)) {
-									m_rtMin = m_rtMax = h2.pts;
-									m_posMin = m_posMax = GetPos();
-#if (DEBUG) && 0
-									DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMin = %s [%10I64d], pID = %d", ReftimeToString(m_rtMin), m_rtMin, h.pid));
-#endif
-								}
+							if (h2.fpts && CalcDuration) {
+								stream s;
+								s.pid	= h.pid;
+								s.pesid	= b;
 
-								if (m_rtMin < h2.pts && m_rtMax < h2.pts) {
-									m_rtMax = h2.pts;
-									m_posMax = GetPos();
+								BOOL bStreamExists = m_AlternativeDuration ? (m_streams[stream_type::video].Find(s) || m_streams[stream_type::audio].Find(s))
+																		   : (GetMasterStream() && GetMasterStream()->GetHead() == s);
+
+								if (bStreamExists) {
+									if ((m_rtMin == -1)) {
+										m_rtMin = m_rtMax = h2.pts;
+										m_posMin = m_posMax = GetPos();
 #if (DEBUG) && 0
-									DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMax = %s [%10I64d], pID = %d", ReftimeToString(m_rtMax), m_rtMax, h.pid));
+										DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMin = %s [%10I64d], pID = %d", ReftimeToString(m_rtMin), m_rtMin, h.pid));
 #endif
+									}
+
+									if (m_rtMin < h2.pts && m_rtMax < h2.pts) {
+										m_rtMax = h2.pts;
+										m_posMax = GetPos();
+#if (DEBUG) && 0
+										DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMax = %s [%10I64d], pID = %d", ReftimeToString(m_rtMax), m_rtMax, h.pid));
+#endif
+									}
 								}
 							}
 						} else {
