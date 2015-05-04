@@ -24,6 +24,28 @@
 #include <stdbool.h>
 
 /**@{*/
+/** Make compact version code that can be compared easily */
+#define DCADEC_VERSION_CODE(major, minor, patch) \
+    (((major) << 24) | ((minor) << 12) | (patch) | 0U)
+
+/**
+ * Version of libdcadec. Major number gets bumped at each API change that
+ * breaks backward compatibility. Minor number gets bumped at each API change
+ * that remains compatible. Patch is reserved for non-API related changes.
+ *
+ * THE LIBRARY IS NOT YET RELEASED, DON'T CHECK THESE NUMBERS YET.
+ */
+#define DCADEC_VERSION_MAJOR 0
+#define DCADEC_VERSION_MINOR 0
+#define DCADEC_VERSION_PATCH 0
+
+#define DCADEC_VERSION  \
+    DCADEC_VERSION_CODE(DCADEC_VERSION_MAJOR, \
+                        DCADEC_VERSION_MINOR, \
+                        DCADEC_VERSION_PATCH)
+/**@}*/
+
+/**@{*/
 #ifdef _WIN32
 #define DCADEC_SHARED_EXPORT    __declspec(dllexport)
 #define DCADEC_SHARED_IMPORT    __declspec(dllimport)
@@ -265,5 +287,12 @@ DCADEC_API void dcadec_context_destroy(struct dcadec_context *dca);
  * @return          Constant string describing error code.
  */
 DCADEC_API const char *dcadec_strerror(int errnum);
+
+/**
+ * Get libdcadec version.
+ *
+ * @return  Version code of the currently running libdcadec.
+ */
+DCADEC_API unsigned int dcadec_version(void);
 
 #endif
