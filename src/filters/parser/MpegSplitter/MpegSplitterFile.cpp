@@ -1118,7 +1118,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 					}
 
 					if (rtAvgTimePerFrame < 50000) {
-						rtAvgTimePerFrame = 417082; // set 23.976 as default
+						rtAvgTimePerFrame = 417083; // set 23.976 as default
 					}
 
 					if (rtAvgTimePerFrame) {
