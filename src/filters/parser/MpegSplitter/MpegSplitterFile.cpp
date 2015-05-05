@@ -428,15 +428,8 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDura
 				DWORD TrackNum = AddStream(0, b, h.id_ext, h.len);
 
 				if (h.fpts) {
-					BOOL bStreamExist = FALSE;
-					for (int t = stream_type::video; t < stream_type::audio; t++) {
-						if (m_streams[t].FindStream(TrackNum)) {
-							bStreamExist = TRUE;
-							break;
-						}
-					}
-
-					if (bStreamExist) {
+					BOOL bStreamExists = m_streams[stream_type::video].FindStream(TrackNum) || m_streams[stream_type::audio].FindStream(TrackNum);
+					if (bStreamExists) {
 						if (m_rtMin == -1) {
 							m_rtMin = m_rtMax = h.pts;
 							m_posMin = m_posMax = GetPos();
