@@ -1116,8 +1116,7 @@ void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 REFERENCE_TIME CMPCVideoDecFilter::GetDuration()
 {
 	REFERENCE_TIME AvgTimePerFrame = m_rtAvrTimePerFrame;
-	if ((m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_MPEG1VIDEO)
-			|| m_rtAvrTimePerFrame < 166666) { // fps > 60 ... try to get fps value from ffmpeg
+	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_MPEG1VIDEO) {
 		if (m_pAVCtx->time_base.den && m_pAVCtx->time_base.num) {
 			AvgTimePerFrame = (UNITS * m_pAVCtx->time_base.num / m_pAVCtx->time_base.den) * m_pAVCtx->ticks_per_frame;
 		}
