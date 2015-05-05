@@ -838,7 +838,7 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 {
 	// Calculate the jitter!
 	LONGLONG	llPerf = PerfCounter;
-	if ((m_rtTimePerFrame != 0) && (labs ((long)(llPerf - m_llLastPerf)) < m_rtTimePerFrame*3) ) {
+	if (m_rtTimePerFrame != 0/* && llabs(llPerf - m_llLastPerf) < m_rtTimePerFrame*3*/) {
 		m_nNextJitter = (m_nNextJitter+1) % NB_JITTER;
 		m_pllJitter[m_nNextJitter] = llPerf - m_llLastPerf;
 
@@ -846,28 +846,26 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 		m_MinJitter = MAXLONG64;
 
 		// Calculate the real FPS
-		LONGLONG		llJitterSum = 0;
-		LONGLONG		llJitterSumAvg = 0;
+		LONGLONG llJitterSum = 0;
 		for (int i = 0; i < NB_JITTER; i++) {
 			LONGLONG Jitter = m_pllJitter[i];
 			llJitterSum += Jitter;
-			llJitterSumAvg += Jitter;
 		}
-		double FrameTimeMean = double(llJitterSumAvg) / NB_JITTER;
+		double FrameTimeMean = double(llJitterSum) / NB_JITTER;
 		m_fJitterMean = FrameTimeMean;
 		double DeviationSum = 0;
 		for (int i = 0; i < NB_JITTER; i++) {
 			LONGLONG DevInt = m_pllJitter[i] - (LONGLONG)FrameTimeMean;
 			double Deviation = (double)DevInt;
 			DeviationSum += Deviation*Deviation;
-			m_MaxJitter = max(m_MaxJitter, DevInt);
-			m_MinJitter = min(m_MinJitter, DevInt);
+			if (m_MaxJitter < DevInt) m_MaxJitter = DevInt;
+			if (m_MinJitter > DevInt) m_MinJitter = DevInt;
 		}
 		double StdDev = sqrt(DeviationSum / NB_JITTER);
 
 		m_fJitterStdDev = StdDev;
 
-		m_fAvrFps = 10000000.0/(double(llJitterSum) / NB_JITTER);
+		m_fAvrFps = 10000000.0 * NB_JITTER / llJitterSum;
 	}
 
 	m_llLastPerf = llPerf;
