@@ -838,7 +838,7 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 {
 	// Calculate the jitter!
 	LONGLONG	llPerf = PerfCounter;
-	if (m_rtTimePerFrame != 0/* && llabs(llPerf - m_llLastPerf) < m_rtTimePerFrame*3*/) {
+	if (m_rtTimePerFrame != 0 /*&& llabs(llPerf - m_llLastPerf) < m_rtTimePerFrame*6*/) {
 		m_nNextJitter = (m_nNextJitter+1) % NB_JITTER;
 		m_pllJitter[m_nNextJitter] = llPerf - m_llLastPerf;
 
