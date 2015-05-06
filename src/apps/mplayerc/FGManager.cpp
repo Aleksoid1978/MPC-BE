@@ -803,7 +803,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 	if (m_bOnlyAudio) {
 		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
-			if (pmt->majortype != MEDIATYPE_Audio) {
+			if (pmt->majortype != MEDIATYPE_Audio && pmt->majortype != MEDIATYPE_Stream) {
 				return S_FALSE;
 			}
 		}
