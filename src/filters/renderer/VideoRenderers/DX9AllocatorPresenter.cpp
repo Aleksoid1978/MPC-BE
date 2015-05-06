@@ -837,10 +837,10 @@ STDMETHODIMP CDX9AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 {
 	// Calculate the jitter!
-	LONGLONG	llPerf = PerfCounter;
-	if (m_rtTimePerFrame != 0 /*&& llabs(llPerf - m_llLastPerf) < m_rtTimePerFrame*6*/) {
+	LONGLONG curJitter = PerfCounter - m_llLastPerf;
+	if (m_rtTimePerFrame != 0 && llabs(curJitter) < m_rtTimePerFrame*6) { // filter out very large jetter values
 		m_nNextJitter = (m_nNextJitter+1) % NB_JITTER;
-		m_pllJitter[m_nNextJitter] = llPerf - m_llLastPerf;
+		m_pllJitter[m_nNextJitter] = curJitter;
 
 		m_MaxJitter = MINLONG64;
 		m_MinJitter = MAXLONG64;
@@ -848,8 +848,7 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 		// Calculate the real FPS
 		LONGLONG llJitterSum = 0;
 		for (int i = 0; i < NB_JITTER; i++) {
-			LONGLONG Jitter = m_pllJitter[i];
-			llJitterSum += Jitter;
+			llJitterSum += m_pllJitter[i];
 		}
 		double FrameTimeMean = double(llJitterSum) / NB_JITTER;
 		m_fJitterMean = FrameTimeMean;
@@ -868,7 +867,7 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 		m_fAvrFps = 10000000.0 * NB_JITTER / llJitterSum;
 	}
 
-	m_llLastPerf = llPerf;
+	m_llLastPerf = PerfCounter;
 }
 
 bool CDX9AllocatorPresenter::GetVBlank(int &_ScanLine, int &_bInVBlank, bool _bMeasureTime)
