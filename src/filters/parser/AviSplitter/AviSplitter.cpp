@@ -306,6 +306,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					break;
 				case FCC('AVRn'): // uncommon fourcc
 				case FCC('JPGL'): // uncommon fourcc
+				case FCC('MSC2'): // uncommon fourcc
 					mt.subtype = MEDIASUBTYPE_MJPG;
 					break;
 				case FCC('azpr'): // uncommon fourcc
