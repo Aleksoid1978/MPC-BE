@@ -801,7 +801,10 @@ static int decode_lowdelay(DiracContext *s)
             slice_num++;
 
             buf     += bytes;
-            bufsize -= bytes*8;
+            if (bufsize/8 >= bytes)
+                bufsize -= bytes*8;
+            else
+                bufsize = 0;
         }
 
     avctx->execute(avctx, decode_lowdelay_slice, slices, NULL, slice_num,
@@ -1702,8 +1705,9 @@ static int get_buffer_with_edge(AVCodecContext *avctx, AVFrame *f, int flags)
  */
 static int dirac_decode_picture_header(DiracContext *s)
 {
-    int retire, picnum;
-    int i, j, refnum, refdist;
+    unsigned retire, picnum;
+    int i, j;
+    int64_t refdist, refnum;
     GetBitContext *gb = &s->gb;
 
     /* [DIRAC_STD] 11.1.1 Picture Header. picture_header() PICTURE_NUM */
@@ -1719,8 +1723,8 @@ static int dirac_decode_picture_header(DiracContext *s)
 
     s->ref_pics[0] = s->ref_pics[1] = NULL;
     for (i = 0; i < s->num_refs; i++) {
-        refnum = picnum + dirac_get_se_golomb(gb);
-        refdist = INT_MAX;
+        refnum = (picnum + dirac_get_se_golomb(gb)) & 0xFFFFFFFF;
+        refdist = INT64_MAX;
 
         /* find the closest reference to the one we want */
         /* Jordi: this is needed if the referenced picture hasn't yet arrived */
@@ -1742,11 +1746,17 @@ static int dirac_decode_picture_header(DiracContext *s)
                     get_buffer_with_edge(s->avctx, s->ref_pics[i]->avframe, AV_GET_BUFFER_FLAG_REF);
                     break;
                 }
+
+        if (!s->ref_pics[i]) {
+            av_log(s->avctx, AV_LOG_ERROR, "Reference could not be allocated\n");
+            return -1;
+        }
+
     }
 
     /* retire the reference frames that are not used anymore */
     if (s->current_picture->avframe->reference) {
-        retire = picnum + dirac_get_se_golomb(gb);
+        retire = (picnum + dirac_get_se_golomb(gb)) & 0xFFFFFFFF;
         if (retire != picnum) {
             DiracFrame *retire_pic = remove_frame(s->ref_frames, retire);
 
@@ -1815,11 +1825,13 @@ static int dirac_decode_data_unit(AVCodecContext *avctx, const uint8_t *buf, int
 {
     DiracContext *s   = avctx->priv_data;
     DiracFrame *pic   = NULL;
-    int ret, i, parse_code = buf[4];
+    int ret, i, parse_code;
     unsigned tmp;
 
     if (size < DATA_UNIT_HEADER_SIZE)
         return -1;
+
+    parse_code = buf[4];
 
     init_get_bits(&s->gb, &buf[13], 8*(size - DATA_UNIT_HEADER_SIZE));
 
@@ -1937,8 +1949,8 @@ static int dirac_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
             break;
 
         data_unit_size = AV_RB32(buf+buf_idx+5);
-        if (buf_idx + data_unit_size > buf_size || !data_unit_size) {
-            if(buf_idx + data_unit_size > buf_size)
+        if (data_unit_size > buf_size - buf_idx || !data_unit_size) {
+            if(data_unit_size > buf_size - buf_idx)
             av_log(s->avctx, AV_LOG_ERROR,
                    "Data unit with size %d is larger than input buffer, discarding\n",
                    data_unit_size);

@@ -1622,7 +1622,9 @@ VP9_IDCT_IDCT_16x16_ADD_XMM avx
     PSIGNW                  m3, [pw_m1]                     ; m3=out1[w], m7=t10[w]
     SUMSUB_BA                w,  2,  6,  1                  ; m2=out14[w], m6=t11[w]
 
-%if cpuflag(ssse3)
+    ; unfortunately, the code below overflows in some cases, e.g.
+    ; http://downloads.webmproject.org/test_data/libvpx/vp90-2-14-resize-fp-tiles-16-8.webm
+%if 0; cpuflag(ssse3)
     SUMSUB_BA                w,  7,  6,  1
     pmulhrsw                m7, [pw_11585x2]                ; m7=out6[w]
     pmulhrsw                m6, [pw_11585x2]                ; m6=out9[w]
@@ -1699,7 +1701,9 @@ VP9_IDCT_IDCT_16x16_ADD_XMM avx
     SUMSUB_BA                w,  5,  7,  4
     PSIGNW                  m5, [pw_m1]                     ; m12=out15[w], m8=t3[w]
 
-%if cpuflag(ssse3)
+    ; unfortunately, the code below overflows in some cases, e.g.
+    ; http://downloads.webmproject.org/test_data/libvpx/vp90-2-14-resize-fp-tiles-16-8-4-2-1.webm
+%if 0 ; cpuflag(ssse3)
     SUMSUB_BA               w,   7,  6,  4
     pmulhrsw                m7, [pw_m11585x2]               ; m8=out7[w]
     pmulhrsw                m6, [pw_11585x2]                ; m1=out8[w]

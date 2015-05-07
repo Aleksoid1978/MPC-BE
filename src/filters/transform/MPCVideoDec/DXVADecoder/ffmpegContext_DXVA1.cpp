@@ -224,7 +224,7 @@ void FFH264SetCurrentPicture(int nIndex, DXVA_PicParams_H264* pDXVAPicParams, st
 
 	pDXVAPicParams->CurrPic.Index7Bits = nIndex;
 	if (h->cur_pic_ptr) {
-		h->cur_pic_ptr->f.opaque = (void*)nIndex;
+		h->cur_pic_ptr->f->opaque = (void*)nIndex;
 	}
 }
 
@@ -266,7 +266,7 @@ void FFH264UpdateRefFramesList(DXVA_PicParams_H264* pDXVAPicParams, struct AVCod
 			}
 
 			pDXVAPicParams->RefFrameList[i].AssociatedFlag	= AssociatedFlag;
-			pDXVAPicParams->RefFrameList[i].Index7Bits		= (UCHAR)pic->f.opaque;
+			pDXVAPicParams->RefFrameList[i].Index7Bits		= (UCHAR)pic->f->opaque;
 		} else {
 			pDXVAPicParams->RefFrameList[i].bPicEntry		= 255;
 			pDXVAPicParams->FrameNumList[i]					= 0;
@@ -283,13 +283,13 @@ BOOL FFH264IsRefFrameInUse(int nFrameNum, struct AVCodecContext* pAVCtx)
 	H264Context* h = (H264Context*)pAVCtx->priv_data;
 
 	for (int i = 0; i < h->short_ref_count; i++) {
-		if ((int)h->short_ref[i]->f.opaque == nFrameNum) {
+		if ((int)h->short_ref[i]->f->opaque == nFrameNum) {
 			return TRUE;
 		}
 	}
 
 	for (int i = 0; i < h->long_ref_count; i++) {
-		if ((int)h->long_ref[i]->f.opaque == nFrameNum) {
+		if ((int)h->long_ref[i]->f->opaque == nFrameNum) {
 			return TRUE;
 		}
 	}

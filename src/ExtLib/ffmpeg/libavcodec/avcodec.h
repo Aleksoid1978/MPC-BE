@@ -292,6 +292,7 @@ enum AVCodecID {
     AV_CODEC_ID_MVC2_DEPRECATED,
     AV_CODEC_ID_HQX,
     AV_CODEC_ID_TDSC,
+    AV_CODEC_ID_HQ_HQA,
 
     AV_CODEC_ID_BRENDER_PIX= MKBETAG('B','P','I','X'),
     AV_CODEC_ID_Y41P       = MKBETAG('Y','4','1','P'),
@@ -2910,6 +2911,9 @@ typedef struct AVCodecContext {
 #define FF_PROFILE_HEVC_MAIN_10                     2
 #define FF_PROFILE_HEVC_MAIN_STILL_PICTURE          3
 #define FF_PROFILE_HEVC_REXT                        4
+
+#define FF_PROFILE_VP9_0                            0
+#define FF_PROFILE_VP9_1                            1
 
     /**
      * level

@@ -191,13 +191,16 @@ static inline int decode_vui_parameters(H264Context *h, SPS *sps)
 
     sps->timing_info_present_flag = get_bits1(&h->gb);
     if (sps->timing_info_present_flag) {
-        sps->num_units_in_tick = get_bits_long(&h->gb, 32);
-        sps->time_scale        = get_bits_long(&h->gb, 32);
-        if (!sps->num_units_in_tick || !sps->time_scale) {
+        unsigned num_units_in_tick = get_bits_long(&h->gb, 32);
+        unsigned time_scale        = get_bits_long(&h->gb, 32);
+        if (!num_units_in_tick || !time_scale) {
             av_log(h->avctx, AV_LOG_ERROR,
-                   "time_scale/num_units_in_tick invalid or unsupported (%"PRIu32"/%"PRIu32")\n",
-                   sps->time_scale, sps->num_units_in_tick);
-            return AVERROR_INVALIDDATA;
+                   "time_scale/num_units_in_tick invalid or unsupported (%u/%u)\n",
+                   time_scale, num_units_in_tick);
+            sps->timing_info_present_flag = 0;
+        } else {
+            sps->num_units_in_tick = num_units_in_tick;
+            sps->time_scale = time_scale;
         }
         sps->fixed_frame_rate_flag = get_bits1(&h->gb);
     }
@@ -239,12 +242,6 @@ static inline int decode_vui_parameters(H264Context *h, SPS *sps)
             sps->num_reorder_frames = 16;
             return AVERROR_INVALIDDATA;
         }
-    }
-
-    if (get_bits_left(&h->gb) < 0) {
-        av_log(h->avctx, AV_LOG_ERROR,
-               "Overread VUI by %d bits\n", -get_bits_left(&h->gb));
-        return AVERROR_INVALIDDATA;
     }
 
     return 0;
@@ -303,7 +300,7 @@ static void decode_scaling_matrices(H264Context *h, SPS *sps,
     }
 }
 
-int ff_h264_decode_seq_parameter_set(H264Context *h)
+int ff_h264_decode_seq_parameter_set(H264Context *h, int ignore_truncation)
 {
     int profile_idc, level_idc, constraint_set_flags = 0;
     unsigned int sps_id;
@@ -523,6 +520,13 @@ int ff_h264_decode_seq_parameter_set(H264Context *h)
             goto fail;
     }
 
+    if (get_bits_left(&h->gb) < 0) {
+        av_log(h->avctx, ignore_truncation ? AV_LOG_WARNING : AV_LOG_ERROR,
+               "Overread %s by %d bits\n", sps->vui_parameters_present_flag ? "VUI" : "SPS", -get_bits_left(&h->gb));
+        if (!ignore_truncation)
+            goto fail;
+    }
+
     if (!sps->sar.den)
         sps->sar.den = 1;
 
@@ -562,7 +566,7 @@ int ff_h264_decode_seq_parameter_set(H264Context *h)
 
 fail:
     av_free(sps);
-    return -1;
+    return AVERROR_INVALIDDATA;
 }
 
 static void build_qp_table(PPS *pps, int t, int index, const int depth)
@@ -596,6 +600,7 @@ int ff_h264_decode_picture_parameter_set(H264Context *h, int bit_length)
     PPS *pps;
     int qp_bd_offset;
     int bits_left;
+    int ret;
 
     if (pps_id >= MAX_PPS_COUNT) {
         av_log(h->avctx, AV_LOG_ERROR, "pps_id %u out of range\n", pps_id);
@@ -609,6 +614,7 @@ int ff_h264_decode_picture_parameter_set(H264Context *h, int bit_length)
     if ((unsigned)pps->sps_id >= MAX_SPS_COUNT ||
         !h->sps_buffers[pps->sps_id]) {
         av_log(h->avctx, AV_LOG_ERROR, "sps_id %u out of range\n", pps->sps_id);
+        ret = AVERROR_INVALIDDATA;
         goto fail;
     }
     sps = h->sps_buffers[pps->sps_id];
@@ -616,11 +622,13 @@ int ff_h264_decode_picture_parameter_set(H264Context *h, int bit_length)
         av_log(h->avctx, AV_LOG_ERROR,
                "Invalid luma bit depth=%d\n",
                sps->bit_depth_luma);
+        ret = AVERROR_INVALIDDATA;
         goto fail;
     } else if (sps->bit_depth_luma == 11 || sps->bit_depth_luma == 13) {
         av_log(h->avctx, AV_LOG_ERROR,
                "Unimplemented luma bit depth=%d\n",
                sps->bit_depth_luma);
+        ret = AVERROR_PATCHWELCOME;
         goto fail;
     }
 
@@ -666,6 +674,7 @@ int ff_h264_decode_picture_parameter_set(H264Context *h, int bit_length)
     pps->ref_count[1] = get_ue_golomb(&h->gb) + 1;
     if (pps->ref_count[0] - 1 > 32 - 1 || pps->ref_count[1] - 1 > 32 - 1) {
         av_log(h->avctx, AV_LOG_ERROR, "reference overflow (pps)\n");
+        ret = AVERROR_INVALIDDATA;
         goto fail;
     }
 
@@ -727,5 +736,5 @@ int ff_h264_decode_picture_parameter_set(H264Context *h, int bit_length)
 
 fail:
     av_free(pps);
-    return -1;
+    return ret;
 }

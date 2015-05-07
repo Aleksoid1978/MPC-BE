@@ -424,7 +424,7 @@ static uint64_t sniff_channel_order(uint8_t (*layout_map)[3], int tags)
  * Save current output configuration if and only if it has been locked.
  */
 static void push_output_configuration(AACContext *ac) {
-    if (ac->oc[1].status == OC_LOCKED) {
+    if (ac->oc[1].status == OC_LOCKED || ac->oc[0].status == OC_NONE) {
         ac->oc[0] = ac->oc[1];
     }
     ac->oc[1].status = OC_NONE;
@@ -900,7 +900,7 @@ static int decode_eld_specific_config(AACContext *ac, AVCodecContext *avctx,
         if (len == 15 + 255)
             len += get_bits(gb, 16);
         if (get_bits_left(gb) < len * 8 + 4) {
-            av_log(ac->avctx, AV_LOG_ERROR, overread_err);
+            av_log(avctx, AV_LOG_ERROR, overread_err);
             return AVERROR_INVALIDDATA;
         }
         skip_bits_long(gb, 8 * len);
@@ -943,10 +943,10 @@ static int decode_audio_specific_config(AACContext *ac,
     GetBitContext gb;
     int i, ret;
 
-    av_dlog(avctx, "audio specific config size %d\n", bit_size >> 3);
+    ff_dlog(avctx, "audio specific config size %d\n", bit_size >> 3);
     for (i = 0; i < bit_size >> 3; i++)
-        av_dlog(avctx, "%02x ", data[i]);
-    av_dlog(avctx, "\n");
+        ff_dlog(avctx, "%02x ", data[i]);
+    ff_dlog(avctx, "\n");
 
     if ((ret = init_get_bits(&gb, data, bit_size)) < 0)
         return ret;
@@ -993,7 +993,7 @@ static int decode_audio_specific_config(AACContext *ac,
         return AVERROR(ENOSYS);
     }
 
-    av_dlog(avctx,
+    ff_dlog(avctx,
             "AOT %d chan config %d sampling index %d (%d) SBR %d PS %d\n",
             m4ac->object_type, m4ac->chan_config, m4ac->sampling_index,
             m4ac->sample_rate, m4ac->sbr,
@@ -1394,7 +1394,7 @@ static int decode_scalefactors(AACContext *ac, float sf[120], GetBitContext *gb,
                                int band_type_run_end[120])
 {
     int g, i, idx = 0;
-    int offset[3] = { global_gain, global_gain - 90, 0 };
+    int offset[3] = { global_gain, global_gain - NOISE_OFFSET, 0 };
     int clipped_offset;
     int noise_flag = 1;
     for (g = 0; g < ics->num_window_groups; g++) {
@@ -1406,7 +1406,7 @@ static int decode_scalefactors(AACContext *ac, float sf[120], GetBitContext *gb,
             } else if ((band_type[idx] == INTENSITY_BT) ||
                        (band_type[idx] == INTENSITY_BT2)) {
                 for (; i < run_end; i++, idx++) {
-                    offset[2] += get_vlc2(gb, vlc_scalefactors.table, 7, 3) - 60;
+                    offset[2] += get_vlc2(gb, vlc_scalefactors.table, 7, 3) - SCALE_DIFF_ZERO;
                     clipped_offset = av_clip(offset[2], -155, 100);
                     if (offset[2] != clipped_offset) {
                         avpriv_request_sample(ac->avctx,
@@ -1419,9 +1419,9 @@ static int decode_scalefactors(AACContext *ac, float sf[120], GetBitContext *gb,
             } else if (band_type[idx] == NOISE_BT) {
                 for (; i < run_end; i++, idx++) {
                     if (noise_flag-- > 0)
-                        offset[1] += get_bits(gb, 9) - 256;
+                        offset[1] += get_bits(gb, NOISE_PRE_BITS) - NOISE_PRE;
                     else
-                        offset[1] += get_vlc2(gb, vlc_scalefactors.table, 7, 3) - 60;
+                        offset[1] += get_vlc2(gb, vlc_scalefactors.table, 7, 3) - SCALE_DIFF_ZERO;
                     clipped_offset = av_clip(offset[1], -100, 155);
                     if (offset[1] != clipped_offset) {
                         avpriv_request_sample(ac->avctx,
@@ -1433,7 +1433,7 @@ static int decode_scalefactors(AACContext *ac, float sf[120], GetBitContext *gb,
                 }
             } else {
                 for (; i < run_end; i++, idx++) {
-                    offset[0] += get_vlc2(gb, vlc_scalefactors.table, 7, 3) - 60;
+                    offset[0] += get_vlc2(gb, vlc_scalefactors.table, 7, 3) - SCALE_DIFF_ZERO;
                     if (offset[0] > 255U) {
                         av_log(ac->avctx, AV_LOG_ERROR,
                                "Scalefactor (%d) out of range.\n", offset[0]);

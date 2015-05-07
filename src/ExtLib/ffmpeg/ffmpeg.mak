@@ -136,6 +136,7 @@ SRCS_LC = \
 	libavcodec/blockdsp.c \
 	libavcodec/bswapdsp.c \
 	libavcodec/cabac.c \
+	libavcodec/canopus.c \
 	libavcodec/celp_filters.c \
 	libavcodec/celp_math.c \
 	libavcodec/cinepak.c \
