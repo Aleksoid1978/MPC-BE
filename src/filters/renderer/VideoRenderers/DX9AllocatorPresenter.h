@@ -184,7 +184,7 @@ namespace DSObjects
 
 		double					m_fAvrFps;						// Estimate the real FPS
 		double					m_fJitterStdDev;				// Estimate the Jitter std dev
-		double					m_fJitterMean;
+		int						m_iJitterMean;
 		double					m_fSyncOffsetStdDev;
 		double					m_fSyncOffsetAvr;
 		double					m_DetectedRefreshRate;
@@ -214,8 +214,8 @@ namespace DSObjects
 		double					m_ldDetectedScanlineRateList[100];
 		int						m_DetectedRefreshRatePos;
 		bool					m_bSyncStatsAvailable;
-		LONGLONG				m_pllJitter [NB_JITTER];			// Jitter buffer for stats
-		LONGLONG				m_pllSyncOffset [NB_JITTER];		// Jitter buffer for stats
+		int						m_pJitter [NB_JITTER];			// Jitter buffer for stats
+		LONGLONG				m_pllSyncOffset [NB_JITTER];	// Sync offset time stats
 		LONGLONG				m_llLastPerf;
 		LONGLONG				m_JitterStdDev;
 		LONGLONG				m_MaxJitter;
