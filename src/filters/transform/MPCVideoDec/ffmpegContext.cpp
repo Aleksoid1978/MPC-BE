@@ -424,7 +424,7 @@ HRESULT FFGetCurFrame(struct AVCodecContext* pAVCtx, AVFrame** ppFrameOut)
 		case AV_CODEC_ID_H264:
 			{
 				H264Context* h		= (H264Context*)pAVCtx->priv_data;
-				*ppFrameOut			= &h->cur_pic.f;
+				*ppFrameOut			= h->cur_pic.f;
 			}
 			break;
 		case AV_CODEC_ID_HEVC:

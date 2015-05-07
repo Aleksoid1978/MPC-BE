@@ -1470,8 +1470,8 @@ static void chroma_mc_uni(HEVCContext *s, uint8_t *dst0,
     int idx              = ff_hevc_pel_weight[block_w];
     int hshift           = s->sps->hshift[1];
     int vshift           = s->sps->vshift[1];
-    intptr_t mx          = mv->x & ((1 << (2 + hshift)) - 1);
-    intptr_t my          = mv->y & ((1 << (2 + vshift)) - 1);
+    intptr_t mx          = av_mod_uintp2(mv->x, 2 + hshift);
+    intptr_t my          = av_mod_uintp2(mv->y, 2 + vshift);
     intptr_t _mx         = mx << (1 - hshift);
     intptr_t _my         = my << (1 - vshift);
 
@@ -1539,10 +1539,10 @@ static void chroma_mc_bi(HEVCContext *s, uint8_t *dst0, ptrdiff_t dststride, AVF
     int hshift = s->sps->hshift[1];
     int vshift = s->sps->vshift[1];
 
-    intptr_t mx0 = mv0->x & ((1 << (2 + hshift)) - 1);
-    intptr_t my0 = mv0->y & ((1 << (2 + vshift)) - 1);
-    intptr_t mx1 = mv1->x & ((1 << (2 + hshift)) - 1);
-    intptr_t my1 = mv1->y & ((1 << (2 + vshift)) - 1);
+    intptr_t mx0 = av_mod_uintp2(mv0->x, 2 + hshift);
+    intptr_t my0 = av_mod_uintp2(mv0->y, 2 + vshift);
+    intptr_t mx1 = av_mod_uintp2(mv1->x, 2 + hshift);
+    intptr_t my1 = av_mod_uintp2(mv1->y, 2 + vshift);
     intptr_t _mx0 = mx0 << (1 - hshift);
     intptr_t _my0 = my0 << (1 - vshift);
     intptr_t _mx1 = mx1 << (1 - hshift);
@@ -1800,8 +1800,8 @@ static int luma_intra_pred_mode(HEVCContext *s, int x0, int y0, int pu_size,
     int y_pu             = y0 >> s->sps->log2_min_pu_size;
     int min_pu_width     = s->sps->min_pu_width;
     int size_in_pus      = pu_size >> s->sps->log2_min_pu_size;
-    int x0b              = x0 & ((1 << s->sps->log2_ctb_size) - 1);
-    int y0b              = y0 & ((1 << s->sps->log2_ctb_size) - 1);
+    int x0b              = av_mod_uintp2(x0, s->sps->log2_ctb_size);
+    int y0b              = av_mod_uintp2(y0, s->sps->log2_ctb_size);
 
     int cand_up   = (lc->ctb_up_flag || y0b) ?
                     s->tab_ipm[(y_pu - 1) * min_pu_width + x_pu] : INTRA_DC;
@@ -3501,8 +3501,6 @@ static av_cold int hevc_decode_free(AVCodecContext *avctx)
     s->pps = NULL;
     s->vps = NULL;
 
-    av_buffer_unref(&s->current_sps);
-
     av_freep(&s->sh.entry_point_offset);
     av_freep(&s->sh.offset);
     av_freep(&s->sh.size);
@@ -3621,13 +3619,6 @@ static int hevc_update_thread_context(AVCodecContext *dst,
             if (!s->pps_list[i])
                 return AVERROR(ENOMEM);
         }
-    }
-
-    av_buffer_unref(&s->current_sps);
-    if (s0->current_sps) {
-        s->current_sps = av_buffer_ref(s0->current_sps);
-        if (!s->current_sps)
-            return AVERROR(ENOMEM);
     }
 
     if (s->sps != s0->sps)

@@ -618,7 +618,7 @@ static int decode_idat_chunk(AVCodecContext *avctx, PNGDecContext *s,
         } else if ((s->bits_per_pixel == 1 || s->bits_per_pixel == 2 || s->bits_per_pixel == 4 || s->bits_per_pixel == 8) &&
                 s->color_type == PNG_COLOR_TYPE_PALETTE) {
             avctx->pix_fmt = AV_PIX_FMT_PAL8;
-        } else if (s->bit_depth == 1 && s->bits_per_pixel == 1) {
+        } else if (s->bit_depth == 1 && s->bits_per_pixel == 1 && avctx->codec_id != AV_CODEC_ID_APNG) {
             avctx->pix_fmt = AV_PIX_FMT_MONOBLACK;
         } else if (s->bit_depth == 8 &&
                 s->color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
@@ -651,7 +651,7 @@ static int decode_idat_chunk(AVCodecContext *avctx, PNGDecContext *s,
                     s->cur_w);
             s->crow_size = s->pass_row_size + 1;
         }
-        av_dlog(avctx, "row_size=%d crow_size =%d\n",
+        ff_dlog(avctx, "row_size=%d crow_size =%d\n",
                 s->row_size, s->crow_size);
         s->image_buf      = p->data[0];
         s->image_linesize = p->linesize[0];
@@ -968,7 +968,7 @@ static int decode_frame_common(AVCodecContext *avctx, PNGDecContext *s,
     AVDictionary *metadata  = NULL;
     uint32_t tag, length;
     int decode_next_dat = 0;
-    int ret = AVERROR_INVALIDDATA;
+    int ret;
     AVFrame *ref;
 
     for (;;) {
@@ -984,12 +984,14 @@ static int decode_frame_common(AVCodecContext *avctx, PNGDecContext *s,
             if (   s->state & PNG_ALLIMAGE
                 && avctx->strict_std_compliance <= FF_COMPLIANCE_NORMAL)
                 goto exit_loop;
+            ret = AVERROR_INVALIDDATA;
             goto fail;
         }
 
         length = bytestream2_get_be32(&s->gb);
         if (length > 0x7fffffff || length > bytestream2_get_bytes_left(&s->gb)) {
             av_log(avctx, AV_LOG_ERROR, "chunk too big\n");
+            ret = AVERROR_INVALIDDATA;
             goto fail;
         }
         tag = bytestream2_get_le32(&s->gb);
@@ -1001,11 +1003,11 @@ static int decode_frame_common(AVCodecContext *avctx, PNGDecContext *s,
                 ((tag >> 24) & 0xff), length);
         switch (tag) {
         case MKTAG('I', 'H', 'D', 'R'):
-            if (decode_ihdr_chunk(avctx, s, length) < 0)
+            if ((ret = decode_ihdr_chunk(avctx, s, length)) < 0)
                 goto fail;
             break;
         case MKTAG('p', 'H', 'Y', 's'):
-            if (decode_phys_chunk(avctx, s) < 0)
+            if ((ret = decode_phys_chunk(avctx, s)) < 0)
                 goto fail;
             break;
         case MKTAG('f', 'c', 'T', 'L'):
@@ -1018,15 +1020,17 @@ static int decode_frame_common(AVCodecContext *avctx, PNGDecContext *s,
         case MKTAG('f', 'd', 'A', 'T'):
             if (!CONFIG_APNG_DECODER || avctx->codec_id != AV_CODEC_ID_APNG)
                 goto skip_tag;
-            if (!decode_next_dat)
+            if (!decode_next_dat) {
+                ret = AVERROR_INVALIDDATA;
                 goto fail;
+            }
             bytestream2_get_be32(&s->gb);
             length -= 4;
             /* fallthrough */
         case MKTAG('I', 'D', 'A', 'T'):
             if (CONFIG_APNG_DECODER && avctx->codec_id == AV_CODEC_ID_APNG && !decode_next_dat)
                 goto skip_tag;
-            if (decode_idat_chunk(avctx, s, length, p) < 0)
+            if ((ret = decode_idat_chunk(avctx, s, length, p)) < 0)
                 goto fail;
             break;
         case MKTAG('P', 'L', 'T', 'E'):
@@ -1051,6 +1055,7 @@ static int decode_frame_common(AVCodecContext *avctx, PNGDecContext *s,
             if (!(s->state & PNG_ALLIMAGE))
                 av_log(avctx, AV_LOG_ERROR, "IEND without all image\n");
             if (!(s->state & (PNG_ALLIMAGE|PNG_IDAT))) {
+                ret = AVERROR_INVALIDDATA;
                 goto fail;
             }
             bytestream2_skip(&s->gb, 4); /* crc */
@@ -1070,7 +1075,7 @@ exit_loop:
     /* handle p-frames only if a predecessor frame is available */
     ref = s->dispose_op == APNG_DISPOSE_OP_PREVIOUS ?
              s->previous_picture.f : s->last_picture.f;
-    if (ref->data[0]) {
+    if (ref->data[0] && s->last_picture.f->data[0]) {
         if (   !(avpkt->flags & AV_PKT_FLAG_KEY) && avctx->codec_tag != AV_RL32("MPNG")
             && ref->width == p->width
             && ref->height== p->height

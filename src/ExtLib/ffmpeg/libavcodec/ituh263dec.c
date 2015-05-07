@@ -36,6 +36,7 @@
 #include "avcodec.h"
 #include "mpegvideo.h"
 #include "h263.h"
+#include "internal.h"
 #include "mathops.h"
 #include "mpegutils.h"
 #include "unary.h"
@@ -170,17 +171,17 @@ static int h263_decode_gob_header(MpegEncContext *s)
         return -1;
 
     if(s->h263_slice_structured){
-        if(get_bits1(&s->gb)==0)
+        if(check_marker(&s->gb, "before MBA")==0)
             return -1;
 
         ff_h263_decode_mba(s);
 
         if(s->mb_num > 1583)
-            if(get_bits1(&s->gb)==0)
+            if(check_marker(&s->gb, "after MBA")==0)
                 return -1;
 
         s->qscale = get_bits(&s->gb, 5); /* SQUANT */
-        if(get_bits1(&s->gb)==0)
+        if(check_marker(&s->gb, "after SQUANT")==0)
             return -1;
         skip_bits(&s->gb, 2); /* GFID */
     }else{
@@ -302,7 +303,7 @@ static int h263p_decode_umotion(MpegEncContext * s, int pred)
    code >>= 1;
 
    code = (sign) ? (pred - code) : (pred + code);
-   av_dlog(s->avctx,"H.263+ UMV Motion = %d\n", code);
+   ff_tlog(s->avctx,"H.263+ UMV Motion = %d\n", code);
    return code;
 
 }
@@ -899,9 +900,7 @@ int ff_h263_decode_picture_header(MpegEncContext *s)
     s->picture_number= (s->picture_number&~0xFF) + i;
 
     /* PTYPE starts here */
-    if (get_bits1(&s->gb) != 1) {
-        /* marker */
-        av_log(s->avctx, AV_LOG_ERROR, "Bad marker\n");
+    if (check_marker(&s->gb, "in PTYPE") != 1) {
         return -1;
     }
     if (get_bits1(&s->gb) != 0) {
@@ -958,7 +957,7 @@ int ff_h263_decode_picture_header(MpegEncContext *s)
         if (ufep == 1) {
             /* OPPTYPE */
             format = get_bits(&s->gb, 3);
-            av_dlog(s->avctx, "ufep=1, format: %d\n", format);
+            ff_dlog(s->avctx, "ufep=1, format: %d\n", format);
             s->custom_pcf= get_bits1(&s->gb);
             s->umvplus = get_bits1(&s->gb); /* Unrestricted Motion Vector */
             if (get_bits1(&s->gb) != 0) {
@@ -1011,7 +1010,7 @@ int ff_h263_decode_picture_header(MpegEncContext *s)
             if (format == 6) {
                 /* Custom Picture Format (CPFMT) */
                 s->aspect_ratio_info = get_bits(&s->gb, 4);
-                av_dlog(s->avctx, "aspect: %d\n", s->aspect_ratio_info);
+                ff_dlog(s->avctx, "aspect: %d\n", s->aspect_ratio_info);
                 /* aspect ratios:
                 0 - forbidden
                 1 - 1:1
@@ -1022,9 +1021,9 @@ int ff_h263_decode_picture_header(MpegEncContext *s)
                 6-14 - reserved
                 */
                 width = (get_bits(&s->gb, 9) + 1) * 4;
-                skip_bits1(&s->gb);
+                check_marker(&s->gb, "in dimensions");
                 height = get_bits(&s->gb, 9) * 4;
-                av_dlog(s->avctx, "\nH.263+ Custom picture: %dx%d\n",width,height);
+                ff_dlog(s->avctx, "\nH.263+ Custom picture: %dx%d\n",width,height);
                 if (s->aspect_ratio_info == FF_ASPECT_EXTENDED) {
                     /* aspected dimensions */
                     s->avctx->sample_aspect_ratio.num= get_bits(&s->gb, 8);
@@ -1118,15 +1117,13 @@ int ff_h263_decode_picture_header(MpegEncContext *s)
         return AVERROR_INVALIDDATA;
 
     if(s->h263_slice_structured){
-        if (get_bits1(&s->gb) != 1) {
-            av_log(s->avctx, AV_LOG_ERROR, "SEPB1 marker missing\n");
+        if (check_marker(&s->gb, "SEPB1") != 1) {
             return -1;
         }
 
         ff_h263_decode_mba(s);
 
-        if (get_bits1(&s->gb) != 1) {
-            av_log(s->avctx, AV_LOG_ERROR, "SEPB2 marker missing\n");
+        if (check_marker(&s->gb, "SEPB2") != 1) {
             return -1;
         }
     }
