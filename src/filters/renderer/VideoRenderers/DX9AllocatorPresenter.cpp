@@ -447,7 +447,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	m_DetectedScanlineTimePrim	= 0;
 	m_DetectedRefreshRate		= 0;
 
-	memset (m_pllJitter, 0, sizeof(m_pllJitter));
+	memset (m_pJitter, 0, sizeof(m_pJitter));
 	memset (m_pllSyncOffset, 0, sizeof(m_pllSyncOffset));
 	m_nNextJitter			= 0;
 	m_nNextSyncOffset		= 0;
@@ -838,33 +838,31 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 {
 	// Calculate the jitter!
 	LONGLONG curJitter = PerfCounter - m_llLastPerf;
-	if (m_rtTimePerFrame != 0 && llabs(curJitter) < m_rtTimePerFrame*6) { // filter out very large jetter values
+	if (llabs(curJitter) <= (INT_MAX / NB_JITTER)) { // filter out very large jetter values
 		m_nNextJitter = (m_nNextJitter+1) % NB_JITTER;
-		m_pllJitter[m_nNextJitter] = curJitter;
+		m_pJitter[m_nNextJitter] = (int)curJitter;
 
 		m_MaxJitter = MINLONG64;
 		m_MinJitter = MAXLONG64;
 
 		// Calculate the real FPS
-		LONGLONG llJitterSum = 0;
+		int JitterSum = 0;
 		for (int i = 0; i < NB_JITTER; i++) {
-			llJitterSum += m_pllJitter[i];
+			JitterSum += m_pJitter[i];
 		}
-		double FrameTimeMean = double(llJitterSum) / NB_JITTER;
-		m_fJitterMean = FrameTimeMean;
-		double DeviationSum = 0;
+
+		int FrameTimeMean = JitterSum / NB_JITTER;
+		__int64 DeviationSum = 0;
 		for (int i = 0; i < NB_JITTER; i++) {
-			LONGLONG DevInt = m_pllJitter[i] - (LONGLONG)FrameTimeMean;
-			double Deviation = (double)DevInt;
-			DeviationSum += Deviation*Deviation;
-			if (m_MaxJitter < DevInt) m_MaxJitter = DevInt;
-			if (m_MinJitter > DevInt) m_MinJitter = DevInt;
+			int Deviation = m_pJitter[i] - FrameTimeMean;
+			DeviationSum += (__int64)Deviation * Deviation;
+			if (m_MaxJitter < Deviation) m_MaxJitter = Deviation;
+			if (m_MinJitter > Deviation) m_MinJitter = Deviation;
 		}
-		double StdDev = sqrt(DeviationSum / NB_JITTER);
 
-		m_fJitterStdDev = StdDev;
-
-		m_fAvrFps = 10000000.0 * NB_JITTER / llJitterSum;
+		m_iJitterMean = FrameTimeMean;
+		m_fJitterStdDev = sqrt(DeviationSum / NB_JITTER);
+		m_fAvrFps = 10000000.0 * NB_JITTER / JitterSum;
 	}
 
 	m_llLastPerf = PerfCounter;
@@ -2129,9 +2127,9 @@ void CDX9AllocatorPresenter::DrawStats()
 				if (nIndex < 0) {
 					nIndex += NB_JITTER;
 				}
-				double Jitter = m_pllJitter[nIndex] - m_fJitterMean;
+				int Jitter = m_pJitter[nIndex] - m_iJitterMean;
 				Points[i].x  = (FLOAT)(StartX + (i * 5 * ScaleX + 5));
-				Points[i].y  = (FLOAT)(StartY + ((Jitter * ScaleY) / 5000.0 + 125.0 * ScaleY));
+				Points[i].y  = (FLOAT)(StartY + ((Jitter * ScaleY) / 5000 + 125 * ScaleY));
 			}
 			m_pLine->Draw(Points, NB_JITTER, D3DCOLOR_XRGB(255, 100, 100));
 
