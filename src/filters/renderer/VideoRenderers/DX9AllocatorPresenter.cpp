@@ -847,8 +847,15 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 
 		// Calculate the real FPS
 		int JitterSum = 0;
+		int OneSecSum = 0;
+		int OneSecCount = 0;
 		for (int i = 0; i < NB_JITTER; i++) {
 			JitterSum += m_pJitter[i];
+			if (OneSecSum < 10000000) {
+				int index = (NB_JITTER + m_nNextSyncOffset - i) % NB_JITTER;
+				OneSecSum += m_pJitter[index];
+				OneSecCount++;
+			}
 		}
 
 		int FrameTimeMean = JitterSum / NB_JITTER;
@@ -862,7 +869,7 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 
 		m_iJitterMean = FrameTimeMean;
 		m_fJitterStdDev = sqrt(DeviationSum / NB_JITTER);
-		m_fAvrFps = 10000000.0 * NB_JITTER / JitterSum;
+		m_fAvrFps = 10000000.0 * OneSecCount / OneSecSum;
 	}
 
 	m_llLastPerf = PerfCounter;
@@ -2088,22 +2095,19 @@ void CDX9AllocatorPresenter::DrawStats()
 	}
 
 	if (m_pLine && bDetailedStats) {
-		D3DXVECTOR2	Points[NB_JITTER];
-		int			nIndex;
+		D3DXVECTOR2 Points[NB_JITTER];
 
-		int StartX = 0;
-		int StartY = 0;
 		float ScaleX = min(1.0f, max(0.4f, 1.4f * m_windowRect.Width() / m_rcMonitor.Width()));
 		float ScaleY = min(1.0f, max(0.4f, 1.4f * m_windowRect.Height() / m_rcMonitor.Height()));
 		int DrawWidth = 625 * ScaleX + 50 * ScaleX;
 		int DrawHeight = 250 * ScaleY;
 		int Alpha = 80;
-		StartX = m_windowRect.Width() - (DrawWidth + 20);
-		StartY = m_windowRect.Height() - (DrawHeight + 20);
+		int StartX = m_windowRect.Width() - (DrawWidth + 20);
+		int StartY = m_windowRect.Height() - (DrawHeight + 20);
 
 		DrawRect(RGB(0,0,0), Alpha, CRect(StartX, StartY, StartX + DrawWidth, StartY + DrawHeight));
 		// === Jitter Graduation
-		m_pLine->SetWidth(2.5 * ScaleX);	// Width
+		m_pLine->SetWidth(2.5f * ScaleX);	// Width
 		m_pLine->SetAntialias(1);
 		//m_pLine->SetGLLines(1);
 		m_pLine->Begin();
@@ -2123,10 +2127,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		// === Jitter curve
 		if (m_rtTimePerFrame) {
 			for (int i = 0; i < NB_JITTER; i++) {
-				nIndex = (m_nNextJitter + 1 + i) % NB_JITTER;
-				if (nIndex < 0) {
-					nIndex += NB_JITTER;
-				}
+				int nIndex = (m_nNextJitter + 1 + i) % NB_JITTER;
 				int Jitter = m_pJitter[nIndex] - m_iJitterMean;
 				Points[i].x  = (FLOAT)(StartX + (i * 5 * ScaleX + 5));
 				Points[i].y  = (FLOAT)(StartY + ((Jitter * ScaleY) / 5000 + 125 * ScaleY));
@@ -2135,10 +2136,7 @@ void CDX9AllocatorPresenter::DrawStats()
 
 			if (m_bSyncStatsAvailable) {
 				for (int i = 0; i < NB_JITTER; i++) {
-					nIndex = (m_nNextSyncOffset + 1 + i) % NB_JITTER;
-					if (nIndex < 0) {
-						nIndex += NB_JITTER;
-					}
+					int nIndex = (m_nNextSyncOffset + 1 + i) % NB_JITTER;
 					Points[i].x  = (FLOAT)(StartX + (i * 5 * ScaleX + 5));
 					Points[i].y  = (FLOAT)(StartY + ((m_pllSyncOffset[nIndex] * ScaleY) / 5000 + 125 * ScaleY));
 				}
