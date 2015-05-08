@@ -839,7 +839,7 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 	// Calculate the jitter!
 	LONGLONG curJitter = PerfCounter - m_llLastPerf;
 	if (llabs(curJitter) <= (INT_MAX / NB_JITTER)) { // filter out very large jetter values
-		m_nNextJitter = (m_nNextJitter+1) % NB_JITTER;
+		m_nNextJitter = (m_nNextJitter + 1) % NB_JITTER;
 		m_pJitter[m_nNextJitter] = (int)curJitter;
 
 		m_MaxJitter = MINLONG64;
@@ -852,7 +852,7 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 		for (int i = 0; i < NB_JITTER; i++) {
 			JitterSum += m_pJitter[i];
 			if (OneSecSum < 10000000) {
-				int index = (NB_JITTER + m_nNextSyncOffset - i) % NB_JITTER;
+				int index = (NB_JITTER + m_nNextJitter - i) % NB_JITTER;
 				OneSecSum += m_pJitter[index];
 				OneSecCount++;
 			}
@@ -2127,8 +2127,8 @@ void CDX9AllocatorPresenter::DrawStats()
 		// === Jitter curve
 		if (m_rtTimePerFrame) {
 			for (int i = 0; i < NB_JITTER; i++) {
-				int nIndex = (m_nNextJitter + 1 + i) % NB_JITTER;
-				int Jitter = m_pJitter[nIndex] - m_iJitterMean;
+				int index = (m_nNextJitter + 1 + i) % NB_JITTER;
+				int Jitter = m_pJitter[index] - m_iJitterMean;
 				Points[i].x  = (FLOAT)(StartX + (i * 5 * ScaleX + 5));
 				Points[i].y  = (FLOAT)(StartY + ((Jitter * ScaleY) / 5000 + 125 * ScaleY));
 			}
@@ -2136,9 +2136,9 @@ void CDX9AllocatorPresenter::DrawStats()
 
 			if (m_bSyncStatsAvailable) {
 				for (int i = 0; i < NB_JITTER; i++) {
-					int nIndex = (m_nNextSyncOffset + 1 + i) % NB_JITTER;
+					int index = (m_nNextSyncOffset + 1 + i) % NB_JITTER;
 					Points[i].x  = (FLOAT)(StartX + (i * 5 * ScaleX + 5));
-					Points[i].y  = (FLOAT)(StartY + ((m_pllSyncOffset[nIndex] * ScaleY) / 5000 + 125 * ScaleY));
+					Points[i].y  = (FLOAT)(StartY + ((m_pllSyncOffset[index] * ScaleY) / 5000 + 125 * ScaleY));
 				}
 				m_pLine->Draw(Points, NB_JITTER, D3DCOLOR_XRGB(100, 200, 100));
 			}
