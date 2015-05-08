@@ -357,6 +357,7 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 		if (!final_url.IsEmpty()) {
 			final_url.Replace(L"http://", L"https://");
 
+			/*
 			if (!videoId.IsEmpty() && y_fields) {
 				HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
 				if (s) {
@@ -435,6 +436,7 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 					InternetCloseHandle(s);
 				}
 			}
+			*/
 
 			if (!videoId.IsEmpty() && subs) { // subtitle
 				HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
