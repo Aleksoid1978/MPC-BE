@@ -36,6 +36,9 @@
                   (((DWORD)(ch4) & 0xFF000000) >> 24))
 #endif
 
+#define CLAMP(a, min, max) ((a)>(max)?(max):(a)<(min)?(min):(a))
+#define CLAMPDEF(a, min, max, def) ((a)>(max)||(a)<(min)?(def):(a))
+
 #define SCALE64(a, b, c) (__int64)((double)(a) * (b) / (c))
 
 #define LCID_NOSUBTITLES	-1
