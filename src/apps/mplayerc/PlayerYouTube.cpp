@@ -36,6 +36,8 @@
 
 #define INTERNET_OPEN_FALGS			INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD
 
+static const CString GOOGLE_API_KEY = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
+
 const YOUTUBE_PROFILES* getProfile(int iTag) {
 	for (int i = 0; i < _countof(youtubeProfiles); i++)
 		if (iTag == youtubeProfiles[i].iTag) {
@@ -357,12 +359,11 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 		if (!final_url.IsEmpty()) {
 			final_url.Replace(L"http://", L"https://");
 
-			/*
 			if (!videoId.IsEmpty() && y_fields) {
 				HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
 				if (s) {
 					CString link;
-					link.Format(L"https://gdata.youtube.com/feeds/api/videos/%s?alt=json&fields=published,title,author/name,content", videoId);
+					link.Format(L"https://www.googleapis.com/youtube/v3/videos?id=%s&key=%s&part=snippet&fields=items/snippet/title,items/snippet/publishedAt,items/snippet/channelTitle,items/snippet/description", videoId, GOOGLE_API_KEY);
 					f = InternetOpenUrl(s, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
 					if (f) {
 						char* data = NULL;
@@ -386,9 +387,10 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 							Json::Reader reader;
 							Json::Value root;
 							if (reader.parse(data, root)) {
-								if (!root["entry"]["title"]["$t"].empty()
-										&& root["entry"]["title"]["$t"].isString()) {
-									CStringA sTitle = root["entry"]["title"]["$t"].asCString();
+								Json::Value snippet = root["items"][0]["snippet"];
+								if (!snippet["title"].empty()
+										&& snippet["title"].isString()) {
+									CStringA sTitle = snippet["title"].asCString();
 									if (!sTitle.IsEmpty()) {
 										y_fields->title = FixHtmlSymbols(UTF8To16(sTitle));
 										y_fields->fname = y_fields->title + final_ext;
@@ -396,25 +398,25 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 									}
 								}
 
-								if (!root["entry"]["author"][0]["name"]["$t"].empty()
-										&& root["entry"]["author"][0]["name"]["$t"].isString()) {
-									CStringA sAuthor = root["entry"]["author"][0]["name"]["$t"].asCString();
+								if (!snippet["channelTitle"].empty()
+										&& snippet["channelTitle"].isString()) {
+									CStringA sAuthor = snippet["channelTitle"].asCString();
 									if (!sAuthor.IsEmpty()) {
 										y_fields->author = UTF8To16(sAuthor);
 									}
 								}
 
-								if (!root["entry"]["content"]["$t"].empty()
-										&& root["entry"]["content"]["$t"].isString()) {
-									CStringA sContent = root["entry"]["content"]["$t"].asCString();
+								if (!snippet["description"].empty()
+										&& snippet["description"].isString()) {
+									CStringA sContent = snippet["description"].asCString();
 									if (!sContent.IsEmpty()) {
 										y_fields->content = FixHtmlSymbols(UTF8To16(sContent));
 									}
 								}
 
-								if (!root["entry"]["published"]["$t"].empty()
-										&& root["entry"]["published"]["$t"].isString()) {
-									CStringA sDate = root["entry"]["published"]["$t"].asCString();
+								if (!snippet["publishedAt"].empty()
+										&& snippet["publishedAt"].isString()) {
+									CStringA sDate = snippet["publishedAt"].asCString();
 									if (!sDate.IsEmpty()) {
 										WORD y, m, d;
 										WORD hh, mm, ss;
@@ -436,7 +438,6 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 					InternetCloseHandle(s);
 				}
 			}
-			*/
 
 			if (!videoId.IsEmpty() && subs) { // subtitle
 				HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
