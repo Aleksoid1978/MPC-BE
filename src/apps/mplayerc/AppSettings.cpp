@@ -998,8 +998,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fLoopForever = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LOOP, 0);
 	fRewind = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REWIND, FALSE);
 	iZoomLevel = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ZOOM, 1);
-	nAutoFitFactor = min(max(20, pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, 50)), 80);
-	nVolumeStep = min(max(1, pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, 5)), 10);
+	nAutoFitFactor = CLAMP(pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, 50), 20, 80);
+	nVolumeStep = CLAMP(pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, 5), 1, 10);
 	nSpeedStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, 0);
 	if (nSpeedStep != 10 && nSpeedStep != 20 && nSpeedStep != 25 && nSpeedStep != 50 && nSpeedStep != 100) {
 		nSpeedStep = 0;
@@ -1108,7 +1108,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	sizeAspectRatio.cx = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_X, 0);
 	sizeAspectRatio.cy = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, 0);
 	fKeepHistory = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, 1);
-	iRecentFilesNumber = max(0, (int)pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, APP_RECENTFILES_DEF));
+	iRecentFilesNumber = CLAMP((int)pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, APP_RECENTFILES_DEF), APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 	MRU.SetSize(iRecentFilesNumber);
 	MRUDub.SetSize(iRecentFilesNumber);
 
@@ -1174,7 +1174,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			break;
 		}
 	}
-	fAudioGain_dB			= min(max(-3.0f, (float)_tstof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, _T("0")))), 10.0f);
+	fAudioGain_dB			= CLAMPDEF((float)_tstof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, _T("0"))), -3.0f, 10.0f, 0.0f);
 	bAudioAutoVolumeControl	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, FALSE);
 	bAudioNormBoost			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, TRUE);
 	iAudioNormLevel			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, 75);
@@ -1513,7 +1513,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	nLastFileInfoPage		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, 0);
 
 	bUpdaterAutoCheck		= !!pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, 0);
-	nUpdaterDelay			= min(max(1, pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, 7)), 365);
+	nUpdaterDelay			= CLAMP(pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, 7), 1, 365);
 
 	tUpdaterLastCheck		= 0; // force check if the previous check undefined
 	if (pApp->GetProfileBinary(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, &ptr, &len)) {
