@@ -1108,7 +1108,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						CString ChapterName;
 
 						if (avail > 2) {
-							AP4_UI16 size = (ptr[0] << 8) | ptr[1];
+							size_t size = (ptr[0] << 8) | ptr[1];
+							if (size > avail) size = avail;
 							memcpy(buff, &ptr[2], size);
 							buff[size] = 0;
 
