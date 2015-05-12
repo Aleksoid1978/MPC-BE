@@ -494,7 +494,7 @@ namespace GothSync
 		bool m_bEvtSkip;
 
 		bool m_bUseInternalTimer;
-		int32 m_LastSetOutputRange;
+		int m_LastSetOutputRange;
 		bool m_bPendingRenegotiate;
 		bool m_bPendingMediaFinished;
 		bool m_bPrerolled; // true if first sample has been displayed.

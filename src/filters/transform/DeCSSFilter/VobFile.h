@@ -86,9 +86,9 @@ class CVobFile : public CDVDSession
 
 	struct chapter_t {
 		REFERENCE_TIME rtime;
-		uint32 first_sector;
-		uint32 last_sector;
-		uint32 title:16, track:8;
+		UINT32 first_sector;
+		UINT32 last_sector;
+		UINT32 title:16, track:8;
 	};
 
 	CAtlArray<file_t> m_files;

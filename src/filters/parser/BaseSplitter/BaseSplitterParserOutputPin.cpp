@@ -891,7 +891,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAdxADPCM(CAutoPtr<CPacket> p)
 	if (p) m_p->Append(*p);
 
 	if (!m_adx_block_size) {
-		uint64 state	= 0;
+		UINT64 state	= 0;
 		BYTE* buf		= m_p->GetData();
 		for (size_t i = 0; i < m_p->GetCount(); i++) {
 			state = (state << 8) | buf[i];

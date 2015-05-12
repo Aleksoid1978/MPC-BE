@@ -105,7 +105,7 @@ HRESULT CHdmvClipInfo::ReadProgramInfo()
 				case VIDEO_STREAM_MPEG2:
 				case VIDEO_STREAM_H264:
 				case VIDEO_STREAM_VC1: {
-						uint8 Temp = ReadByte();
+						BYTE Temp = ReadByte();
 						BDVM_VideoFormat VideoFormat		= (BDVM_VideoFormat)(Temp >> 4);
 						BDVM_FrameRate FrameRate			= (BDVM_FrameRate)(Temp & 0xf);
 						Temp								= ReadByte();
@@ -127,7 +127,7 @@ HRESULT CHdmvClipInfo::ReadProgramInfo()
 				case AUDIO_STREAM_DTS_HD_MASTER_AUDIO:
 				case SECONDARY_AUDIO_AC3_PLUS:
 				case SECONDARY_AUDIO_DTS_HD: {
-						uint8 Temp = ReadByte();
+						BYTE Temp = ReadByte();
 						BDVM_ChannelLayout ChannelLayout		= (BDVM_ChannelLayout)(Temp >> 4);
 						BDVM_SampleRate SampleRate				= (BDVM_SampleRate)(Temp & 0xF);
 
@@ -258,9 +258,9 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(CAtlArray<SyncPoint>* sps)
 
 			for (int j = start; j < end; j++) {
 				ClpiEpFine* fine = &entry->fine[j];
-				uint64 pts = ((uint64)(coarse->pts_ep & ~0x01) << 18) +
-							 ((uint64)fine->pts_ep << 8);
-				uint32 spn = (coarse->spn_ep & ~0x1FFFF) + fine->spn_ep;
+				UINT64 pts = ((UINT64)(coarse->pts_ep & ~0x01) << 18) +
+							 ((UINT64)fine->pts_ep << 8);
+				UINT32 spn = (coarse->spn_ep & ~0x1FFFF) + fine->spn_ep;
 
 				SyncPoint sp = {REFERENCE_TIME(20000.0f*pts/90), (__int64)spn * 192};
 				sps->Add(sp);

@@ -302,17 +302,6 @@ static CUnknown* WINAPI CreateInstance(LPUNKNOWN lpunk, HRESULT* phr)
 
 #define EXIT_ON_ERROR(hres)  { if (FAILED(hres)) return hres; }
 
-#ifndef uint8
-	typedef unsigned char		uint8;
-	typedef unsigned short		uint16;
-	typedef unsigned long		uint32;
-	typedef unsigned __int64	uint64;
-	typedef signed char			int8;
-	typedef signed short		int16;
-	typedef signed long			int32;
-	typedef signed __int64		int64;
-#endif
-
 enum {
 	IEC61937_AC3                = 0x01,          ///< AC-3 data
 	IEC61937_MPEG1_LAYER1       = 0x04,          ///< MPEG-1 layer 1

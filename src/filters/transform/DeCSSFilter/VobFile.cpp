@@ -703,8 +703,8 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 
 		m_ifoFile.Seek(256, CFile::begin);
 		struct audio_fmt_t {
-			uint16 type;
-			uint32 format;
+			UINT16 type;
+			UINT32 format;
 		} audio_formats[8];
 
 		for (int i = 0; i < 8; i++) {
@@ -723,16 +723,16 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 		int last_byte = gb.BitRead(32);
 
 		struct track_info_t {
-			uint32 first_PTS;
-			uint32 length_PTS;
-			uint32 first_sector;
-			uint32 last_sector;
+			UINT32 first_PTS;
+			UINT32 length_PTS;
+			UINT32 first_sector;
+			UINT32 last_sector;
 		};
 
 		struct title_info_t {
-			uint32 info_offset;
+			UINT32 info_offset;
 			int nb_tracks;
-			uint32 length_PTS;
+			UINT32 length_PTS;
 			CAtlArray<track_info_t> tracks_info;
 		};
 
