@@ -22,10 +22,7 @@
 
 #include "IMPCVideoDec.h"
 
-#pragma warning(push)
-#pragma warning(disable: 4005)
 #include <stdint.h>
-#pragma warning(pop)
 
 const MPCPixelFormat YUV420_8[PixFmt_count]  = {PixFmt_NV12, PixFmt_YV12, PixFmt_YUY2, PixFmt_YV16, PixFmt_AYUV, PixFmt_YV24, PixFmt_RGB32, PixFmt_P010, PixFmt_P016, PixFmt_P210, PixFmt_P216, PixFmt_Y410, PixFmt_Y416};
 const MPCPixelFormat YUV422_8[PixFmt_count]  = {PixFmt_YUY2, PixFmt_YV16, PixFmt_AYUV, PixFmt_YV24, PixFmt_RGB32, PixFmt_NV12, PixFmt_YV12, PixFmt_P210, PixFmt_P216, PixFmt_Y410, PixFmt_P010, PixFmt_P016, PixFmt_Y416};

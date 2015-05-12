@@ -21,10 +21,7 @@
 
 #pragma once
 
-#pragma warning(push)
-#pragma warning(disable: 4005)
 #include <stdint.h>
-#pragma warning(pop)
 #include <math.h>
 #include "SampleFormat.h"
 

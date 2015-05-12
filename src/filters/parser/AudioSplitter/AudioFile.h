@@ -25,11 +25,7 @@
 #include "../DSUtil/ID3Tag.h"
 #include <MMReg.h>
 #include <moreuuids.h>
-
-#pragma warning(disable: 4005 4244)
-extern "C" {
-	#include <stdint.h>
-}
+#include <stdint.h>
 
 class CAudioFile
 {

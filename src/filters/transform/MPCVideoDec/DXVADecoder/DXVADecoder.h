@@ -22,12 +22,7 @@
 
 #include "stdafx.h"
 #include "../../../../DSUtil/DSUtil.h"
-
-#pragma warning(push)
-#pragma warning(disable: 4005)
 #include <stdint.h>
-#pragma warning(pop)
-
 #include <ffmpeg/libavcodec/dxva_internal.h>
 
 #define CHECK_HR_FALSE(x)	hr = ##x; if (FAILED(hr)) { DbgLog((LOG_TRACE, 3, L"DXVA Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__)); return S_FALSE; }
