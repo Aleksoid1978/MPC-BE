@@ -44,8 +44,8 @@ static const byte pixel_aspect[17][2]= {
 };
 
 struct timing {
-	uint32 num_units_in_tick;
-	uint32 time_scale;
+	UINT32 num_units_in_tick;
+	UINT32 time_scale;
 };
 struct vc_params_t {
 	LONG width, height;

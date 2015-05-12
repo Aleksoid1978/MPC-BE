@@ -200,7 +200,7 @@ namespace DSObjects
 		COLORREF								m_BorderColor;
 
 		bool									m_fUseInternalTimer;
-		int32									m_LastSetOutputRange;
+		int										m_LastSetOutputRange;
 		bool									m_bPendingMediaFinished;
 
 		CCritSec								m_SampleQueueLock;

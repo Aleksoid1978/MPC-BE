@@ -19,6 +19,8 @@
  */
 
 #include "stdafx.h"
+
+#include <stdint.h>
 #include "VideoParser.h"
 #include "H264Nalu.h"
 
@@ -506,15 +508,15 @@ namespace HEVCParser {
 		gb.BitRead(1);					// general_frame_only_constraint_flag
 		gb.BitRead(44);					// general_reserved_zero_44bits
 		params.level = gb.BitRead(8);	// general_level_idc
-		uint8 sub_layer_profile_present_flag[6] = { 0 };
-		uint8 sub_layer_level_present_flag[6] = { 0 };
+		uint8_t sub_layer_profile_present_flag[6] = { 0 };
+		uint8_t sub_layer_level_present_flag[6] = { 0 };
 		for (int i = 0; i < max_sub_layers_minus1; i++) {
 			sub_layer_profile_present_flag[i] = gb.BitRead(1);
 			sub_layer_level_present_flag[i] = gb.BitRead(1);
 		}
 		if (max_sub_layers_minus1 > 0) {
 			for (int i = max_sub_layers_minus1; i < 8; i++) {
-				uint8 reserved_zero_2bits = gb.BitRead(2);
+				uint8_t reserved_zero_2bits = gb.BitRead(2);
 			}
 		}
 		for (int i = 0; i < max_sub_layers_minus1; i++) {
@@ -547,14 +549,14 @@ namespace HEVCParser {
 	struct ShortTermRPS {
 		unsigned int num_negative_pics;
 		int num_delta_pocs;
-		int32 delta_poc[32];
-		uint8 used[32];
+		int32_t delta_poc[32];
+		uint8_t used[32];
 	};
 	ShortTermRPS st_rps[MAX_SHORT_TERM_RPS_COUNT];
 
 	static bool ParseShortTermRps(CGolombBuffer& gb, ShortTermRPS *rps)
 	{
-		uint8 rps_predict = 0;
+		uint8_t rps_predict = 0;
 		int delta_poc;
 		int k0 = 0;
 		int k1 = 0;
@@ -569,8 +571,8 @@ namespace HEVCParser {
 			const ShortTermRPS *rps_ridx;
 			int delta_rps;
 			unsigned abs_delta_rps;
-			uint8 use_delta_flag = 0;
-			uint8 delta_rps_sign;
+			uint8_t use_delta_flag = 0;
+			uint8_t delta_rps_sign;
 
 			rps_ridx = &st_rps[rps - st_rps - 1];
 
@@ -696,23 +698,23 @@ namespace HEVCParser {
 			return false;
 		}
 
-		uint32 sps_seq_parameter_set_id = gb.UExpGolombRead(); // "The  value  of sps_seq_parameter_set_id shall be in the range of 0 to 15, inclusive."
+		uint32_t sps_seq_parameter_set_id = gb.UExpGolombRead(); // "The  value  of sps_seq_parameter_set_id shall be in the range of 0 to 15, inclusive."
 		if (sps_seq_parameter_set_id > MAX_SPS_COUNT) {
 			return false;
 		}
-		uint32 chroma_format_idc = gb.UExpGolombRead(); // "The value of chroma_format_idc shall be in the range of 0 to 3, inclusive."
+		uint32_t chroma_format_idc = gb.UExpGolombRead(); // "The value of chroma_format_idc shall be in the range of 0 to 3, inclusive."
 		if (!(chroma_format_idc == 1 || chroma_format_idc == 2 || chroma_format_idc == 3)) {
 			return false;
 		}
 		if (chroma_format_idc == 3) {
 			gb.BitRead(1);				// separate_colour_plane_flag
 		}
-		uint32 width = gb.UExpGolombRead();	// pic_width_in_luma_samples
-		uint32 height = gb.UExpGolombRead();	// pic_height_in_luma_samples
-		uint32 pic_conf_win_left_offset = 0;
-		uint32 pic_conf_win_right_offset = 0;
-		uint32 pic_conf_win_top_offset = 0;
-		uint32 pic_conf_win_bottom_offset = 0;
+		uint32_t width = gb.UExpGolombRead();	// pic_width_in_luma_samples
+		uint32_t height = gb.UExpGolombRead();	// pic_height_in_luma_samples
+		uint32_t pic_conf_win_left_offset = 0;
+		uint32_t pic_conf_win_right_offset = 0;
+		uint32_t pic_conf_win_top_offset = 0;
+		uint32_t pic_conf_win_bottom_offset = 0;
 
 		if (gb.BitRead(1)) {			// conformance_window_flag
 			pic_conf_win_left_offset = gb.UExpGolombRead() * 2;
@@ -732,21 +734,21 @@ namespace HEVCParser {
 			return false;
 		}
 
-		uint32 bit_depth_luma_minus8 = gb.UExpGolombRead();
-		uint32 bit_depth_chroma_minus8 = gb.UExpGolombRead();
+		uint32_t bit_depth_luma_minus8 = gb.UExpGolombRead();
+		uint32_t bit_depth_chroma_minus8 = gb.UExpGolombRead();
 		if (bit_depth_luma_minus8 != bit_depth_chroma_minus8) {
 			return false;
 		}
 
-		uint32 log2_max_poc_lsb = gb.UExpGolombRead() + 4;
+		uint32_t log2_max_poc_lsb = gb.UExpGolombRead() + 4;
 		if (log2_max_poc_lsb > 16) {
 			return false;
 		}
 
-		uint8 sublayer_ordering_info = gb.BitRead(1);
+		uint8_t sublayer_ordering_info = gb.BitRead(1);
 		int start = sublayer_ordering_info ? 0 : sps_max_sub_layers_minus1;
 		for (int i = start; i <= sps_max_sub_layers_minus1; i++) {
-			uint32 max_dec_pic_buffering_minus1 = gb.UExpGolombRead();
+			uint32_t max_dec_pic_buffering_minus1 = gb.UExpGolombRead();
 			if (max_dec_pic_buffering_minus1 >= 16) {
 				return false;
 			}
@@ -758,9 +760,9 @@ namespace HEVCParser {
 			return false;
 		}
 
-		uint32 log2_min_cb_size = gb.UExpGolombRead() + 3;
+		uint32_t log2_min_cb_size = gb.UExpGolombRead() + 3;
 		gb.UExpGolombRead(); // log2_diff_max_min_coding_block_size
-		uint32 log2_min_tb_size = gb.UExpGolombRead() + 2;
+		uint32_t log2_min_tb_size = gb.UExpGolombRead() + 2;
 		gb.UExpGolombRead(); // log2_diff_max_min_transform_block_size
 		if (log2_min_tb_size >= log2_min_cb_size) {
 			return false;
@@ -771,13 +773,13 @@ namespace HEVCParser {
 
 		if (gb.BitRead(1)) {     // scaling_list_enable_flag
 			if (gb.BitRead(1)) { // scaling_list_data
-				uint8 scaling_list_pred_mode_flag = 0;
+				uint8_t scaling_list_pred_mode_flag = 0;
 				int coef_num, i;
 				for (int size_id = 0; size_id < 4; size_id++) {
-					for (uint32 matrix_id = 0; matrix_id < 6; matrix_id += ((size_id == 3) ? 3 : 1)) {
+					for (uint32_t matrix_id = 0; matrix_id < 6; matrix_id += ((size_id == 3) ? 3 : 1)) {
 						scaling_list_pred_mode_flag = gb.BitRead(1);
 						if (!scaling_list_pred_mode_flag) {
-							uint32 delta = gb.UExpGolombRead();
+							uint32_t delta = gb.UExpGolombRead();
 							if (matrix_id < delta) {
 								return false;
 							}
@@ -802,9 +804,9 @@ namespace HEVCParser {
 		gb.BitRead(1); // amp_enabled_flag
 		gb.BitRead(1); // sao_enabled
 
-		uint8 pcm_enabled_flag = gb.BitRead(1);
+		uint8_t pcm_enabled_flag = gb.BitRead(1);
 		if (pcm_enabled_flag) {
-			uint8 bit_depth_minus1 = gb.BitRead(4);
+			uint8_t bit_depth_minus1 = gb.BitRead(4);
 			gb.BitRead(4);	// bit_depth_chroma_minus1
 			gb.UExpGolombRead();		// log2_min_pcm_cb_size
 			gb.UExpGolombRead();		// log2_max_pcm_cb_size
@@ -813,13 +815,13 @@ namespace HEVCParser {
 			}
 		}
 
-		uint32 nb_st_rps = gb.UExpGolombRead();
+		uint32_t nb_st_rps = gb.UExpGolombRead();
 		if (nb_st_rps > MAX_SHORT_TERM_RPS_COUNT) {
 			return false;
 		}
 
 		memset(st_rps, 0, sizeof(st_rps));
-		for (uint32 i = 0; i < nb_st_rps; i++) {
+		for (uint32_t i = 0; i < nb_st_rps; i++) {
 			if (!ParseShortTermRps(gb, &st_rps[i])) {
 				return false;
 			}
@@ -829,13 +831,13 @@ namespace HEVCParser {
 			return false;
 		}
 
-		uint8 long_term_ref_pics_present_flag = gb.BitRead(1);
+		uint8_t long_term_ref_pics_present_flag = gb.BitRead(1);
 		if (long_term_ref_pics_present_flag) {
-			uint32 num_long_term_ref_pics_sps = gb.UExpGolombRead();
+			uint32_t num_long_term_ref_pics_sps = gb.UExpGolombRead();
 			if (num_long_term_ref_pics_sps > 31U) {
 				return false;
 			}
-			for (uint32 i = 0; i < num_long_term_ref_pics_sps; i++) {
+			for (uint32_t i = 0; i < num_long_term_ref_pics_sps; i++) {
 				gb.BitRead(log2_max_poc_lsb);	// lt_ref_pic_poc_lsb_sps
 				gb.BitRead(1);					// used_by_curr_pic_lt_sps_flag
 			}
@@ -844,11 +846,11 @@ namespace HEVCParser {
 		gb.BitRead(1); // sps_temporal_mvp_enabled_flag
 		gb.BitRead(1); // sps_strong_intra_smoothing_enable_flag
 
-		uint32 vui_present = gb.BitRead(1);
+		uint32_t vui_present = gb.BitRead(1);
 		if (vui_present) {
-			uint8 sar_present = gb.BitRead(1);
+			uint8_t sar_present = gb.BitRead(1);
 			if (sar_present) {
-				uint8 sar_idx = gb.ReadByte();
+				uint8_t sar_idx = gb.ReadByte();
 				if (255 == sar_idx) {
 					params.sar.num = gb.BitRead(16);	// sar_width
 					params.sar.den = gb.BitRead(16);	// sar_height
@@ -862,16 +864,16 @@ namespace HEVCParser {
 				}
 			}
 
-			uint8 overscan_info_present_flag = gb.BitRead(1);
+			uint8_t overscan_info_present_flag = gb.BitRead(1);
 			if (overscan_info_present_flag) {
 				gb.BitRead(1); // overscan_appropriate_flag
 			}
 
-			uint8 video_signal_type_present_flag = gb.BitRead(1);
+			uint8_t video_signal_type_present_flag = gb.BitRead(1);
 			if (video_signal_type_present_flag) {
 				gb.BitRead(3);	// video_format
 				gb.BitRead(1);	// video_full_range_flag
-				uint8 colour_description_present_flag = gb.BitRead(1);
+				uint8_t colour_description_present_flag = gb.BitRead(1);
 				if (colour_description_present_flag) {
 					gb.ReadByte(); // colour_primaries
 					gb.ReadByte(); // transfer_characteristic
@@ -879,7 +881,7 @@ namespace HEVCParser {
 				}
 			}
 
-			uint8 chroma_loc_info_present_flag = gb.BitRead(1);
+			uint8_t chroma_loc_info_present_flag = gb.BitRead(1);
 			if (chroma_loc_info_present_flag) {
 				gb.BitRead(1); // chroma_sample_loc_type_top_field
 				gb.BitRead(1); // chroma_sample_loc_type_bottom_field
@@ -889,7 +891,7 @@ namespace HEVCParser {
 			gb.BitRead(1); // field_seq_flag
 			gb.BitRead(1); // frame_field_info_present_flag
 
-			uint8 default_display_window_flag = gb.BitRead(1);
+			uint8_t default_display_window_flag = gb.BitRead(1);
 			if (default_display_window_flag) {
 				gb.UExpGolombRead(); // def_disp_win_left_offset
 				gb.UExpGolombRead(); // def_disp_win_right_offset
@@ -897,7 +899,7 @@ namespace HEVCParser {
 				gb.UExpGolombRead(); // def_disp_win_bottom_offset
 			}
 
-			uint8 vui_timing_info_present_flag = gb.BitRead(1);
+			uint8_t vui_timing_info_present_flag = gb.BitRead(1);
 			if (vui_timing_info_present_flag) {
 				params.vui_timing.num_units_in_tick = gb.BitRead(32);
 				params.vui_timing.time_scale = gb.BitRead(32);
@@ -948,7 +950,7 @@ namespace HEVCParser {
 			}
 		}
 
-		uint8 vps_timing_info_present_flag = gb.BitRead(1);
+		uint8_t vps_timing_info_present_flag = gb.BitRead(1);
 		if (vps_timing_info_present_flag) {
 			params.vps_timing.num_units_in_tick = gb.BitRead(32);
 			params.vps_timing.time_scale = gb.BitRead(32);
@@ -1087,7 +1089,7 @@ namespace HEVCParser {
 		CGolombBuffer gb(data, size);
 
 		// HEVCDecoderConfigurationRecord
-		uint8 configurationVersion = gb.BitRead(8); // configurationVersion = 1 (or 0 for beta MKV DivX HEVC)
+		uint8_t configurationVersion = gb.BitRead(8); // configurationVersion = 1 (or 0 for beta MKV DivX HEVC)
 		TRACE(L"%s", configurationVersion == 0 ? L"WARNING: beta MKV DivX HEVC\n" : L"");
 		if (configurationVersion > 1) {
 			return false;
@@ -1109,15 +1111,15 @@ namespace HEVCParser {
 		if (gb.BitRead(6) != 63) {	// reserved = ‘111111’b
 			return false;
 		}
-		uint8 chromaFormat = gb.BitRead(2); // 0 = monochrome, 1 = 4:2:0, 2 = 4:2:2, 3 = 4:4:4
+		uint8_t chromaFormat = gb.BitRead(2); // 0 = monochrome, 1 = 4:2:0, 2 = 4:2:2, 3 = 4:4:4
 		if (gb.BitRead(5) != 31) {	// reserved = ‘11111’b
 			return false;
 		}
-		uint8 bitDepthLumaMinus8 = gb.BitRead(3);
+		uint8_t bitDepthLumaMinus8 = gb.BitRead(3);
 		if (gb.BitRead(5) != 31) {	// reserved = ‘11111’b
 			return false;
 		}
-		uint8 bitDepthChromaMinus8 = gb.BitRead(3);
+		uint8_t bitDepthChromaMinus8 = gb.BitRead(3);
 		gb.BitRead(16);				// avgFrameRate
 		gb.BitRead(2);				// constantFrameRate
 		gb.BitRead(3);				// numTemporalLayers
@@ -1130,7 +1132,7 @@ namespace HEVCParser {
 
 			for (int j = 0; j < numOfArrays; j++) {
 				gb.BitRead(1);						// array_completeness
-				uint8 reserved = gb.BitRead(1);	// reserved = 0 (or 1 for MKV DivX HEVC)
+				uint8_t reserved = gb.BitRead(1);	// reserved = 0 (or 1 for MKV DivX HEVC)
 				int NAL_unit_type = gb.BitRead(6);
 				int numNalus = gb.BitRead(16);
 				if (NAL_unit_type == NAL_TYPE_HEVC_SPS && numNalus > 0) {
