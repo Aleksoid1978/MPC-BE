@@ -21,12 +21,8 @@
 #pragma once
 
 #include "../BaseSplitter/BaseSplitter.h"
+#include <stdint.h>
 #include "AudioFile.h"
-
-#pragma warning(disable: 4005 4244)
-extern "C" {
-	#include <stdint.h>
-}
 
 #define AudioSplitterName L"MPC Audio Splitter"
 #define AudioSourceName   L"MPC Audio Source"

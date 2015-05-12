@@ -23,15 +23,9 @@
 
 #include <atlcoll.h>
 #include "SampleFormat.h"
+#include <stdint.h>
 
 #define ENABLE_AC3_ENCODER 1
-
-// TODO: remove this when it's fixed in MSVC
-// Work around warning C4005: 'XXXX' : macro redefinition
-#pragma warning(push)
-#pragma warning(disable: 4005)
-#include <stdint.h>
-#pragma warning(pop)
 
 #include "../DeCSSFilter/DeCSSFilter.h"
 #include "IMpaDecFilter.h"
