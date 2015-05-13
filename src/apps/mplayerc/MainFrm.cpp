@@ -623,7 +623,7 @@ CMainFrame::CMainFrame() :
 	m_fCustomGraph(false),
 	m_fShockwaveGraph(false),
 	m_fFrameSteppingActive(false),
-	m_fEndOfStream(false),
+	m_bEndOfStream(false),
 	m_fCapturing(false),
 	m_fLiveWM(false),
 	m_fOpeningAborted(false),
@@ -2181,7 +2181,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 							m_lSubtitleShift	= 0;
 						}
 
-						if (!m_fEndOfStream) {
+						if (!m_bEndOfStream) {
 							AppSettings& s = AfxGetAppSettings();
 							FILE_POSITION*	FilePosition = s.CurrentFilePosition();
 							if (FilePosition) {
@@ -2765,7 +2765,7 @@ bool CMainFrame::GraphEventComplete()
 				if (s.fRewind) {
 					SendMessage(WM_COMMAND, ID_PLAY_STOP);
 				} else {
-					m_fEndOfStream = true;
+					m_bEndOfStream = true;
 					SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 				}
 				m_OSD.ClearMessage();
@@ -2800,7 +2800,7 @@ bool CMainFrame::GraphEventComplete()
 			if (s.fRewind) {
 				SendMessage(WM_COMMAND, ID_PLAY_STOP);
 			} else {
-				m_fEndOfStream = true;
+				m_bEndOfStream = true;
 				PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
 			}
 		}
@@ -7529,7 +7529,7 @@ void CMainFrame::OnPlayPlay()
 
 	if (m_eMediaLoadState == MLS_LOADED) {
 		if (GetPlaybackMode() == PM_FILE) {
-			if (m_fEndOfStream) {
+			if (m_bEndOfStream) {
 				SendMessage(WM_COMMAND, ID_PLAY_STOP);
 				SendMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
 			}
@@ -7743,7 +7743,7 @@ void CMainFrame::OnPlayStop()
 		}
 	}
 
-	if (!m_fEndOfStream) {
+	if (!m_bEndOfStream) {
 		CString strOSD = ResStr(ID_PLAY_STOP);
 		int i = strOSD.Find(_T("\n"));
 		if (i > 0) {
@@ -7752,7 +7752,7 @@ void CMainFrame::OnPlayStop()
 		m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
 		m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_STOPPED), 3000);
 	} else {
-		m_fEndOfStream = false;
+		m_bEndOfStream = false;
 	}
 
 	SetPlayState(PS_STOP);
@@ -9930,9 +9930,9 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	BOOL bRelativeDrive = FALSE;
 
 	ExplodeEsc(fav, args, _T(';'));
-	CString desc = args.RemoveHead(); // desc / name
-	_stscanf_s(args.RemoveHead(), _T("%I64d"), &rtStart);    // pos
-	_stscanf_s(args.RemoveHead(), _T("%d"), &bRelativeDrive);    // relative drive
+	args.RemoveHeadNoReturn();									// desc / name
+	_stscanf_s(args.RemoveHead(), _T("%I64d"), &rtStart);		// pos
+	_stscanf_s(args.RemoveHead(), _T("%d"), &bRelativeDrive);	// relative drive
 	rtStart = max(rtStart, 0ll);
 
 	// NOTE: This is just for the favorites but we could add a global settings that does this always when on. Could be useful when using removable devices.
@@ -9944,7 +9944,7 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 		if (exeDrive.StripToRoot()) {
 			POSITION pos = args.GetHeadPosition();
 
-			while (pos != NULL) {
+			while (pos) {
 				CString &stringPath = args.GetNext(pos);
 				CPath path(stringPath);
 
@@ -9954,6 +9954,7 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 					if (_tcsicmp(exeDrive, path) != 0) { // Do we need to replace the drive letter ?
 						// Replace drive letter
 						CString newPath(exeDrive);
+
 						newPath += stringPath.Mid(rootLength);//newPath += stringPath.Mid( 3 );
 
 						stringPath = newPath;
@@ -9968,8 +9969,9 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	}
 
 	m_wndPlaylistBar.Open(args, false);
-	if (GetPlaybackMode() == PM_FILE && args.GetHead() == m_lastOMD->title) {
-		m_pMS->SetPositions(&rtStart, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning);
+	if (GetPlaybackMode() == PM_FILE && args.GetHead() == m_lastOMD->title && !m_bEndOfStream) {
+		m_wndPlaylistBar.SetFirstSelected();
+		m_pMS->SetPositions(&rtStart, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
 	    OnPlayPlay();
 	} else {
 	    OpenCurPlaylistItem(rtStart);
@@ -13813,7 +13815,7 @@ void CMainFrame::CloseMediaPrivate()
 	IsMadVRExclusiveMode = false;
 
 	m_fLiveWM = false;
-	m_fEndOfStream = false;
+	m_bEndOfStream = false;
 	m_rtDurationOverride = -1;
 	m_kfs.clear();
 	m_pCB.Release();
@@ -16134,7 +16136,7 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 	} else if (GetPlaybackMode() == PM_CAPTURE) {
 		//TRACE(_T("Warning (CMainFrame::SeekTo): Trying to seek in capture mode"));
 	}
-	m_fEndOfStream = false;
+	m_bEndOfStream = false;
 
 	OnTimer(TIMER_STREAMPOSPOLLER);
 	OnTimer(TIMER_STREAMPOSPOLLER2);
@@ -16977,7 +16979,7 @@ void CMainFrame::SetPlayState(MPC_PLAYSTATE iState)
 	m_Lcd.SetPlayState((CMPC_Lcd::PlayState)iState);
 	SendAPICommand(CMD_PLAYMODE, L"%d", iState);
 
-	if (m_fEndOfStream) {
+	if (m_bEndOfStream) {
 		SendAPICommand(CMD_NOTIFYENDOFSTREAM, L"\0");    // do not pass NULL here!
 	}
 
