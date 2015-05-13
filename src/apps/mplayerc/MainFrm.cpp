@@ -3887,6 +3887,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		__int64 nID = pPopupMenu->GetMenuItemID(i); //temp ren UINT -> __int64
 		if (nID == ID_SEPARATOR || nID == -1
 				|| (nID >= ID_FAVORITES_FILE_START && nID <= ID_FAVORITES_FILE_END)
+				|| (nID >= ID_FAVORITES_DVD_START && nID <= ID_FAVORITES_DVD_END)
 				|| (nID >= ID_RECENT_FILE_START && nID <= ID_RECENT_FILE_END)
 				|| (nID >= ID_NAVIGATE_CHAP_SUBITEM_START && nID <= ID_NAVIGATE_CHAP_SUBITEM_END)) {
 			continue;
@@ -9701,31 +9702,33 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 			CString fn = path;
 			fn.TrimRight(_T("/\\"));
 
-			DVD_PLAYBACK_LOCATION2 Location;
-			m_pDVDI->GetCurrentLocation(&Location);
-			CString desc;
-			desc.Format(_T("%s - T%02d C%02d - %02d:%02d:%02d"), fn, Location.TitleNum, Location.ChapterNum,
-				Location.TimeCode.bHours, Location.TimeCode.bMinutes, Location.TimeCode.bSeconds);
-
 			CAtlList<CString> fnList;
-			fnList.AddTail(fn);
 
 			// Name
 			CString str;
 			if (bShowDialog) {
-				CFavoriteAddDlg dlg(fnList, fn);
+				CFavoriteAddDlg dlg(fnList, fn, FALSE);
 				if (dlg.DoModal() != IDOK) {
 					return;
 				}
 				str = dlg.m_name;
 			} else {
-				str = s.bFavRememberPos ? desc : fn;
+				str = fn;
 			}
 
 			str.Remove(';');
 
-			// RememberPos
+			// RememberPos - seek bar position
 			CString pos(_T("0"));
+			if (s.bFavRememberPos) {
+				pos.Format(_T("%I64d"), GetPos());
+			}
+
+			str += ';';
+			str += pos;
+
+			// RememberPos - DVD state
+			pos = _T("0");
 			if (s.bFavRememberPos) {
 				CDVDStateStream stream;
 				stream.AddRef();
@@ -9947,19 +9950,25 @@ void CMainFrame::PlayFavoriteDVD(CString fav)
 
 	stream.AddRef();
 
-	ExplodeEsc(fav, args, _T(';'), 3);
-	args.RemoveHeadNoReturn(); // desc / name
-	CString state = args.RemoveHead(); // state
+	ExplodeEsc(fav, args, _T(';'), 4);
+	size_t cnt = args.GetCount();
+	args.RemoveHeadNoReturn();			// desc / name
+	if (cnt == 4) {
+		args.RemoveHeadNoReturn();		// pos
+	}
+	CString state = args.RemoveHead();	// state
 	if (state != _T("0")) {
 	    CStringToBin(state, stream.m_data);
 	}
-	fn = args.RemoveHead(); // path
+	fn = args.RemoveHead();				// path
 
 	SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 
 	CComPtr<IDvdState> pDvdState;
-	HRESULT hr = OleLoadFromStream((IStream*)&stream, IID_PPV_ARGS(&pDvdState));
-	UNREFERENCED_PARAMETER(hr);
+	if (stream.m_data.GetCount()) {
+		HRESULT hr = OleLoadFromStream((IStream*)&stream, IID_PPV_ARGS(&pDvdState));
+		UNREFERENCED_PARAMETER(hr);
+	}
 
 	AfxGetAppSettings().fNormalStartDVD = false;
 
@@ -15325,18 +15334,18 @@ void CMainFrame::SetupFavoritesSubMenu()
 			}
 
 			// relative drive
-			if ( sl.GetCount() > 1 ) { // Here to prevent crash if old favorites settings are present
+			if (sl.GetCount() > 1) { // Here to prevent crash if old favorites settings are present
 				sl.RemoveHead();
 
 				BOOL bRelativeDrive = FALSE;
-				if ( _stscanf_s(sl.GetHead(), _T("%d"), &bRelativeDrive) == 1 ) {
+				if (_stscanf_s(sl.GetHead(), _T("%d"), &bRelativeDrive) == 1) {
 					if (bRelativeDrive) {
-						str.Format(_T("[RD]%s"), CString(str));
+						str.Format(_T("[RD]%s"), str);
 					}
 				}
 			}
 			if (!str.IsEmpty()) {
-				f_str.Format(_T("%s\t%.14s"), CString(f_str), CString(str));
+				f_str.Format(_T("%s\t%.14s"), f_str, str);
 			}
 		}
 
@@ -15365,15 +15374,26 @@ void CMainFrame::SetupFavoritesSubMenu()
 		str.Replace(_T("&"), _T("&&"));
 
 		CAtlList<CString> sl;
-		ExplodeEsc(str, sl, _T(';'), 2);
+		ExplodeEsc(str, sl, _T(';'), 4);
+		size_t cnt = sl.GetCount();
 
 		str = sl.RemoveHead();
 
-		if (!sl.IsEmpty()) {
-			// TODO
-		}
-
 		if (!str.IsEmpty()) {
+			if (cnt == 4) {
+				// pos
+				CString posStr;
+				REFERENCE_TIME rt = 0;
+				if (1 == _stscanf_s(sl.GetHead(), _T("%I64d"), &rt) && rt > 0) {
+					DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
+					posStr.Format(_T("[%02u:%02u:%02u]"), hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
+				}
+
+				if (!posStr.IsEmpty()) {
+					str.AppendFormat(_T("\t%.14s"), posStr);
+				}
+			}
+
 			pSub->AppendMenu(flags, id, str);
 		}
 

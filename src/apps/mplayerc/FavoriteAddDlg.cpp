@@ -25,11 +25,12 @@
 // CFavoriteAddDlg dialog
 
 IMPLEMENT_DYNAMIC(CFavoriteAddDlg, CCmdUIDialog)
-CFavoriteAddDlg::CFavoriteAddDlg(CAtlList<CString>& shortnames, CString fullname, CWnd* pParent)
+CFavoriteAddDlg::CFavoriteAddDlg(CAtlList<CString>& shortnames, CString fullname, BOOL bShowRelativeDrive/* = TRUE*/, CWnd* pParent/* = NULL*/)
 	: CCmdUIDialog(CFavoriteAddDlg::IDD, pParent)
 	, m_fullname(fullname)
 	, m_bRememberPos(TRUE)
 	, m_bRelativeDrive(FALSE)
+	, m_bShowRelativeDrive(bShowRelativeDrive)
 {
 	POSITION pos = shortnames.GetHeadPosition();
 	while (pos) {
@@ -71,6 +72,10 @@ BOOL CFavoriteAddDlg::OnInitDialog()
 	m_bRememberPos		= s.bFavRememberPos;
 	m_bRelativeDrive	= s.bFavRelativeDrive;
 
+	if (!m_bShowRelativeDrive) {
+		GetDlgItem(IDC_CHECK2)->ShowWindow(SW_HIDE);
+	}
+
 	UpdateData(FALSE);
 
 	m_namectrl.SetCurSel(0);
@@ -88,7 +93,7 @@ void CFavoriteAddDlg::OnUpdateOk(CCmdUI *pCmdUI)
 {
 	UpdateData();
 
-	pCmdUI->Enable( !m_name.IsEmpty() );
+	pCmdUI->Enable(!m_name.IsEmpty());
 }
 
 void CFavoriteAddDlg::OnOK()
