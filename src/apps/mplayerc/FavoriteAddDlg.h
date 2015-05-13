@@ -34,7 +34,7 @@ private:
 	CAtlList<CString> m_shortnames;
 
 public:
-	CFavoriteAddDlg(CAtlList<CString>& shortnames, CString fullname, CWnd* pParent = NULL);
+	CFavoriteAddDlg(CAtlList<CString>& shortnames, CString fullname, BOOL bShowRelativeDrive = TRUE, CWnd* pParent = NULL);
 	virtual ~CFavoriteAddDlg();
 
 	enum { IDD = IDD_FAVADD };
@@ -43,6 +43,8 @@ public:
 	CString m_name;
 	BOOL m_bRememberPos;
 	BOOL m_bRelativeDrive;
+
+	BOOL m_bShowRelativeDrive;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
