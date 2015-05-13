@@ -1078,6 +1078,8 @@ public:
 	HBITMAP		m_ThumbCashedBitmap;
 	CSize		m_ThumbCashedSize;
 
+	void		AddFavorite(bool bDisplayMessage = false, bool bShowDialog = true);
+
 protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	void WTSRegisterSessionNotification();
