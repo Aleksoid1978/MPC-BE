@@ -933,7 +933,7 @@ void CMainFrame::OnDestroy()
 	m_fileDropTarget.Revoke();
 
 	if (m_pGraphThread) {
-		CAMEvent e;
+		CAMMsgEvent e;
 		m_pGraphThread->PostThreadMessage(CGraphThread::TM_EXIT, 0, (LPARAM)&e);
 		if (!e.Wait(5000)) {
 			TRACE(_T("ERROR: Must call TerminateThread() on CMainFrame::m_pGraphThread->m_hThread\n"));
@@ -1870,7 +1870,7 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 	TRACE(_T("*** CMainFrame::OnDisplayChange()\n"));
 
 	GetDesktopWindow()->GetWindowRect(&m_rcDesktop);
-	if (m_pFullscreenWnd && m_pFullscreenWnd->IsWindow()) {
+	if (IsD3DFullScreenMode()) {
 		MONITORINFO MonitorInfo;
 		ZeroMemory(&MonitorInfo, sizeof(MonitorInfo));
 		MonitorInfo.cbSize = sizeof(MonitorInfo);
@@ -1909,7 +1909,9 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 
 	if (m_eMediaLoadState == MLS_LOADED) {
 		if (m_pGraphThread) {
-			m_pGraphThread->PostThreadMessage(CGraphThread::TM_DISPLAY_CHANGE, 0, 0);
+			CAMMsgEvent e;
+			m_pGraphThread->PostThreadMessage(CGraphThread::TM_DISPLAY_CHANGE, 0, (LPARAM)&e);
+			e.WaitMsg();
 		} else {
 			DisplayChange();
 		}
@@ -2093,7 +2095,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 	switch (nIDEvent) {
 
 		case TIMER_EXCLUSIVEBARHIDER:
-			if (m_pFullscreenWnd->IsWindow()) {
+			if (IsD3DFullScreenMode()) {
 				CPoint p;
 				GetCursorPos(&p);
 				CWnd* pWnd = WindowFromPoint(p);
@@ -2334,8 +2336,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			GetWindowRect(r);
 			bool fCursorOutside = !r.PtInRect(p);
 			CWnd* pWnd = WindowFromPoint(p);
-			if (m_pFullscreenWnd->IsWindow()) {
-				TRACE ("==> HIDE!\n");
+			if (IsD3DFullScreenMode()) {
 				if (!m_bInOptions && pWnd == m_pFullscreenWnd) {
 					m_pFullscreenWnd->ShowCursor(false);
 				}
@@ -3220,11 +3221,10 @@ LRESULT CMainFrame::OnResetDevice(WPARAM wParam, LPARAM lParam)
 		m_OSD.HideMessage(true);
 	}
 
-	BOOL bResult = false;
 	if (m_bOpenedThruThread) {
-		CAMEvent e;
-		m_pGraphThread->PostThreadMessage(CGraphThread::TM_RESET, (WPARAM)&bResult, (LPARAM)&e);
-		e.Wait();
+		CAMMsgEvent e;
+		m_pGraphThread->PostThreadMessage(CGraphThread::TM_RESET, 0, (LPARAM)&e);
+		e.WaitMsg();
 	} else {
 		ResetDevice();
 	}
@@ -3326,7 +3326,7 @@ BOOL CMainFrame::OnButton(UINT id, UINT nFlags, CPoint point)
 	SetFocus();
 
 	CRect r;
-	if (m_pFullscreenWnd->IsWindow()) {
+	if (IsD3DFullScreenMode()) {
 		m_pFullscreenWnd->GetClientRect(r);
 	} else {
 		m_wndView.GetClientRect(r);
@@ -3350,7 +3350,7 @@ BOOL CMainFrame::OnButton(UINT id, UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	if (!m_pFullscreenWnd->IsWindow() || !m_OSD.OnLButtonDown (nFlags, point)) {
+	if (!IsD3DFullScreenMode() || !m_OSD.OnLButtonDown (nFlags, point)) {
 		SetFocus();
 
 		bDVDMenuClicked = false;
@@ -3415,7 +3415,7 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		return;
 	}
 
-	if (!m_pFullscreenWnd->IsWindow() || !m_OSD.OnLButtonUp (nFlags, point)) {
+	if (!IsD3DFullScreenMode() || !m_OSD.OnLButtonUp (nFlags, point)) {
 
 		if (bDVDMenuClicked) {
 			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
@@ -3613,7 +3613,7 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 		CSize diff = m_lastMouseMove - point;
 		AppSettings& s = AfxGetAppSettings();
 
-		if (m_pFullscreenWnd->IsWindow() && (abs(diff.cx) + abs(diff.cy)) >= 1) {
+		if (IsD3DFullScreenMode() && (abs(diff.cx) + abs(diff.cy)) >= 1) {
 			m_pFullscreenWnd->ShowCursor(true);
 
 			// hide the cursor if we are not in the DVD menu
@@ -4003,7 +4003,7 @@ BOOL CMainFrame::OnMenu(CMenu* pMenu)
 
 void CMainFrame::OnMenuPlayerShort()
 {
-	if (IsMenuHidden() || m_pFullscreenWnd->IsWindow()) {
+	if (IsMenuHidden() || IsD3DFullScreenMode()) {
 		OnMenu(m_popupMainMenu.GetSubMenu(0));
 	} else {
 		OnMenu(m_popupMenu.GetSubMenu(0));
@@ -4321,7 +4321,6 @@ void CMainFrame::OnFilePostCloseMedia()
 	UnloadExternalObjects();
 
 	if (m_pFullscreenWnd->IsWindow()) {
-		m_pFullscreenWnd->ShowWindow(SW_HIDE);
 		m_pFullscreenWnd->DestroyWindow();
 	}
 
@@ -4989,7 +4988,7 @@ void CMainFrame::OnFileOpenQuick()
 
 void CMainFrame::OnFileOpenMedia()
 {
-	if (m_eMediaLoadState == MLS_LOADING || !IsWindow(m_wndPlaylistBar) || m_pFullscreenWnd->IsWindow()) {
+	if (m_eMediaLoadState == MLS_LOADING || !IsWindow(m_wndPlaylistBar) || IsD3DFullScreenMode()) {
 		return;
 	}
 
@@ -6333,7 +6332,7 @@ void CMainFrame::OnUpdateFileLoadSubtitle(CCmdUI *pCmdUI)
 
 void CMainFrame::OnFileLoadAudio()
 {
-	if (m_eMediaLoadState == MLS_LOADING || !IsWindow(m_wndPlaylistBar) || m_pFullscreenWnd->IsWindow()) {
+	if (m_eMediaLoadState == MLS_LOADING || !IsWindow(m_wndPlaylistBar) || IsD3DFullScreenMode()) {
 		return;
 	}
 
@@ -8013,7 +8012,7 @@ void CMainFrame::OnUpdatePlaySeek(CCmdUI* pCmdUI)
 
 void CMainFrame::OnPlayGoto()
 {
-	if ((m_eMediaLoadState != MLS_LOADED) || m_pFullscreenWnd->IsWindow()) {
+	if (m_eMediaLoadState != MLS_LOADED || IsD3DFullScreenMode()) {
 		return;
 	}
 
@@ -10354,7 +10353,7 @@ CSize CMainFrame::GetVideoSize()
 
 void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasTo)
 {
-	if (m_pFullscreenWnd->IsWindow()) {
+	if (IsD3DFullScreenMode()) {
 		return;
 	}
 
@@ -10657,7 +10656,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 	if (!m_bDelaySetOutputRect && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly && IsWindowVisible()) {
 		CRect wr, wr2;
 
-		if (m_pFullscreenWnd->IsWindow()) {
+		if (IsD3DFullScreenMode()) {
 			m_pFullscreenWnd->GetClientRect(&wr);
 		} else if (!m_bFullScreen) {
 			m_wndView.GetClientRect(&wr);
@@ -10808,7 +10807,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 void CMainFrame::HideVideoWindow(bool fHide)
 {
 	CRect wr;
-	if (m_pFullscreenWnd->IsWindow()) {
+	if (IsD3DFullScreenMode()) {
 		m_pFullscreenWnd->GetClientRect(&wr);
 	} else if (!m_bFullScreen) {
 		m_wndView.GetClientRect(&wr);
@@ -10952,7 +10951,7 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 		r.OffsetRect(0, mi.rcWork.top-r.top);
 	}
 
-	if ((m_bFullScreen || !s.HasFixedWindowSize()) && !m_pFullscreenWnd->IsWindow()) {
+	if ((m_bFullScreen || !s.HasFixedWindowSize()) && !IsD3DFullScreenMode()) {
 		MoveWindow(r);
 	}
 
@@ -11305,7 +11304,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 {
 	HRESULT hr = S_OK;
 
-	if (!m_bUseSmartSeek || !AfxGetAppSettings().fSmartSeek || !m_wndPreView || m_bAudioOnly || m_pFullscreenWnd->IsWindow()) {
+	if (!m_bUseSmartSeek || !AfxGetAppSettings().fSmartSeek || !m_wndPreView || m_bAudioOnly || IsD3DFullScreenMode()) {
 		return E_FAIL;
 	}
 
@@ -11615,7 +11614,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 		if (FAILED(hr)) {
 			if (bFirst) {
-				if (s.fReportFailedPins && !(m_pFullscreenWnd && m_pFullscreenWnd->IsWindow())) {
+				if (s.fReportFailedPins && !IsD3DFullScreenMode()) {
 					CComQIPtr<IGraphBuilderDeadEnd> pGBDE = m_pGB;
 					if (pGBDE && pGBDE->GetCount()) {
 						CMediaTypesDlg(pGBDE, GetModalParent()).DoModal();
@@ -12411,7 +12410,7 @@ void CMainFrame::OpenSetupVideo()
 		}
 	}
 
-	if (m_bAudioOnly && m_pFullscreenWnd->IsWindow()) {
+	if (m_bAudioOnly && IsD3DFullScreenMode()) {
 		m_pFullscreenWnd->DestroyWindow();
 	}
 }
@@ -16675,15 +16674,17 @@ void CMainFrame::AddCurDevToPlaylist()
 
 void CMainFrame::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
 {
+	auto pFileData		= dynamic_cast<const OpenFileData*>(pOMD.m_p);
+	auto pDeviceData	= dynamic_cast<const OpenDeviceData*>(pOMD.m_p);
+
 	// shortcut
-	if (OpenDeviceData* p = dynamic_cast<OpenDeviceData*>(pOMD.m_p)) {
-		if (m_eMediaLoadState == MLS_LOADED && pAMTuner
-				&& m_VidDispName == p->DisplayName[0] && m_AudDispName == p->DisplayName[1]) {
-			m_wndCaptureBar.m_capdlg.SetVideoInput(p->vinput);
-			m_wndCaptureBar.m_capdlg.SetVideoChannel(p->vchannel);
-			m_wndCaptureBar.m_capdlg.SetAudioInput(p->ainput);
-			return;
-		}
+	if (pDeviceData
+			&& m_eMediaLoadState == MLS_LOADED && pAMTuner
+			&& m_VidDispName == pDeviceData->DisplayName[0] && m_AudDispName == pDeviceData->DisplayName[1]) {
+		m_wndCaptureBar.m_capdlg.SetVideoInput(pDeviceData->vinput);
+		m_wndCaptureBar.m_capdlg.SetVideoChannel(pDeviceData->vchannel);
+		m_wndCaptureBar.m_capdlg.SetAudioInput(pDeviceData->ainput);
+		return;
 	}
 
 	if (m_eMediaLoadState != MLS_CLOSED) {
@@ -16692,27 +16693,15 @@ void CMainFrame::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	AppSettings& s = AfxGetAppSettings();
 
-	bool fUseThread = m_pGraphThread && s.fEnableWorkerThreadForOpening
-					  // don't use a worker thread in D3DFullscreen mode except madVR
-					  && (!s.IsD3DFullscreen() || s.iDSVideoRendererType == VIDRNDT_DS_MADVR);
-
-	if (OpenFileData* p = dynamic_cast<OpenFileData*>(pOMD.m_p)) {
-		if (p->fns.GetCount() > 0) {
-			engine_t e = s.GetRtspEngine(p->fns.GetHead());
-			if (e != DirectShow /*&& e != RealMedia && e != QuickTime*/) {
-				fUseThread = false;
-			}
-		}
-	} else if (OpenDeviceData* p = dynamic_cast<OpenDeviceData*>(pOMD.m_p)) {
-		fUseThread = false;
-	}
+	bool bDirectShow	= pFileData && !pFileData->fns.IsEmpty() && s.GetRtspEngine(pFileData->fns.GetHead()) == DirectShow;
+	bool bUseThread		= m_pGraphThread && s.fEnableWorkerThreadForOpening && (bDirectShow || !pFileData) && !pDeviceData && !s.IsD3DFullscreen();
 
 	// don't set video renderer output rect until the window is repositioned
 	m_bDelaySetOutputRect = true;
 
 	SetLoadState(MLS_LOADING);
 
-	if (fUseThread) {
+	if (bUseThread) {
 		m_hGraphThreadEventOpen.ResetEvent();
 		m_pGraphThread->PostThreadMessage(CGraphThread::TM_OPEN, 0, (LPARAM)pOMD.Detach());
 		m_bOpenedThruThread = true;
@@ -16949,7 +16938,7 @@ bool CMainFrame::CreateFullScreenWindow()
 
 bool CMainFrame::IsD3DFullScreenMode() const
 {
-	return m_pFullscreenWnd->IsWindow();
+	return m_pFullscreenWnd && m_pFullscreenWnd->IsWindow();
 };
 
 void CMainFrame::SetupEVRColorControl()
