@@ -682,6 +682,9 @@ __int64 COSD::GetPos() const
 void COSD::SetPos(__int64 pos)
 {
 	m_llSeekPos = pos;
+	if (m_bSeekBarVisible) {
+		InvalidateVMROSD();
+	}
 }
 
 void COSD::SetRange(__int64 start,  __int64 stop)
