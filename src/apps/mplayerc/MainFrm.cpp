@@ -4320,10 +4320,6 @@ void CMainFrame::OnFilePostCloseMedia()
 
 	UnloadExternalObjects();
 
-	if (m_pFullscreenWnd->IsWindow()) {
-		m_pFullscreenWnd->DestroyWindow();
-	}
-
 	SetDwmPreview(FALSE);
 	m_wndToolBar.SwitchTheme();
 
@@ -4335,6 +4331,10 @@ void CMainFrame::OnFilePostCloseMedia()
 	SetCurrentDirectory(GetProgramPath()); // It is necessary to unlock the folder after opening files from explorer.
 
 	SetThreadExecutionState(ES_CONTINUOUS);
+
+	if (m_pFullscreenWnd->IsWindow()) {
+		m_pFullscreenWnd->DestroyWindow();
+	}
 
 	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnFilePostCloseMedia() : end"));
 }
@@ -10601,6 +10601,10 @@ void CMainFrame::AutoChangeMonitorMode()
 			}
 		}
 
+		if (MediaFPS == 0.0) {
+			return;
+		}
+
 		for (int rs = 0; rs < MaxFpsCount ; rs++) {
 			if (s.AutoChangeFullscrRes.dmFullscreenRes[rs].bValid
 					&& s.AutoChangeFullscrRes.dmFullscreenRes[rs].bChecked
@@ -11149,13 +11153,12 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		CreateFullScreenWindow();
 		m_pVideoWnd		= m_pFullscreenWnd;
 		m_bUseSmartSeek	= false;
-		s.fIsFSWindow = true;
+		s.fIsFSWindow	= true;
 		SetTimer(TIMER_EXCLUSIVEBARHIDER, 1000, NULL);
 	} else {
 		m_pVideoWnd		= &m_wndView;
-
-		m_bUseSmartSeek = s.fSmartSeek && !s.fD3DFullscreen;
-		s.fIsFSWindow = false;
+		m_bUseSmartSeek	= s.fSmartSeek && !s.fD3DFullscreen;
+		s.fIsFSWindow	= false;
 		if (OpenFileData* p = dynamic_cast<OpenFileData*>(pOMD)) {
 			CString fn = p->fns.GetHead();
 			if (!fn.IsEmpty() && (fn.Find(_T("://")) >= 0)) { // disable SmartSeek for streaming data.
@@ -12412,6 +12415,9 @@ void CMainFrame::OpenSetupVideo()
 
 	if (m_bAudioOnly && IsD3DFullScreenMode()) {
 		m_pFullscreenWnd->DestroyWindow();
+		KillTimer(TIMER_FULLSCREENMOUSEHIDER);
+		KillTimer(TIMER_FULLSCREENCONTROLBARHIDER);
+		m_bHideCursor = false;
 	}
 }
 
@@ -13487,7 +13493,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 						break;
 					}
 				}
-				s.dFPS	= miFPS;
+				s.dFPS = miFPS;
 
 				AutoChangeMonitorMode();
 
@@ -18993,7 +18999,7 @@ REFTIME CMainFrame::GetAvgTimePerFrame() const
 {
 	REFTIME refAvgTimePerFrame = 0.0;
 
-	if (FAILED(m_pBV->get_AvgTimePerFrame(&refAvgTimePerFrame))) {
+	if (!m_pBV || FAILED(m_pBV->get_AvgTimePerFrame(&refAvgTimePerFrame))) {
 		if (m_pCAP) {
 			refAvgTimePerFrame = 1.0 / m_pCAP->GetFPS();
 		}
