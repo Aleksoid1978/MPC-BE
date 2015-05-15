@@ -3350,7 +3350,11 @@ BOOL CMainFrame::OnButton(UINT id, UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	if (!IsD3DFullScreenMode() || !m_OSD.OnLButtonDown (nFlags, point)) {
+	if (IsD3DFullScreenMode() && m_OSD.OnLButtonDown(nFlags, point)) {
+		m_pFullscreenWnd->ShowCursor(true);
+		KillTimer(TIMER_FULLSCREENMOUSEHIDER);
+		SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, NULL);
+	} else {
 		SetFocus();
 
 		bDVDMenuClicked = false;
@@ -3415,8 +3419,11 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		return;
 	}
 
-	if (!IsD3DFullScreenMode() || !m_OSD.OnLButtonUp (nFlags, point)) {
-
+	if (IsD3DFullScreenMode() && m_OSD.OnLButtonUp(nFlags, point)) {
+		m_pFullscreenWnd->ShowCursor(true);
+		KillTimer(TIMER_FULLSCREENMOUSEHIDER);
+		SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, NULL);
+	} else {
 		if (bDVDMenuClicked) {
 			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 			return;
@@ -3596,7 +3603,7 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
  	}
 	templclick = true;
 
-	if (!m_OSD.OnMouseMove (nFlags, point)) {
+	if (!m_OSD.OnMouseMove(nFlags, point)) {
 		if (GetPlaybackMode() == PM_DVD) {
 			CRect vid_rect = m_wndView.GetVideoRect();
 			m_wndView.MapWindowPoints(this, &vid_rect);
@@ -3616,11 +3623,8 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 		if (IsD3DFullScreenMode() && (abs(diff.cx) + abs(diff.cy)) >= 1) {
 			m_pFullscreenWnd->ShowCursor(true);
 
-			// hide the cursor if we are not in the DVD menu
-			if ((GetPlaybackMode() == PM_FILE) || (GetPlaybackMode() == PM_DVD)) {
-				KillTimer(TIMER_FULLSCREENMOUSEHIDER);
-				SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, NULL);
-			}
+			KillTimer(TIMER_FULLSCREENMOUSEHIDER);
+			SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, NULL);
 		} else if (m_bFullScreen && (abs(diff.cx) + abs(diff.cy)) >= 1) {
 			int nTimeOut = s.nShowBarsWhenFullScreenTimeOut;
 

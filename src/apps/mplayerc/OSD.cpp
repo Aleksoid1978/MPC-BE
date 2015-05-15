@@ -573,7 +573,7 @@ void COSD::UpdateSeekBarPos(CPoint point)
 
 bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 {
-	bool		bRet = false;
+	bool bRet = false;
 
 	if (m_pVMB || m_pMFVMB) {
 		if (m_bCursorMoving) {
@@ -635,12 +635,13 @@ bool COSD::OnLButtonDown(UINT nFlags, CPoint point)
 
 	if (m_pVMB || m_pMFVMB) {
 		if (m_rectCursor.PtInRect (point)) {
-			m_bCursorMoving	= true;
-			bRet			= true;
+			m_bCursorMoving		= true;
+			bRet				= true;
 		} else if (m_rectExitButton.PtInRect(point) || m_rectCloseButton.PtInRect(point)) {
-			bRet			= true;
+			bRet				= true;
 		} else if (m_rectSeekBar.PtInRect(point)) {
-			bRet			= true;
+			m_bSeekBarVisible	= true;
+			bRet				= true;
 			UpdateSeekBarPos(point);
 			InvalidateVMROSD();
 		}
