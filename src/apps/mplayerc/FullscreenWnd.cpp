@@ -66,8 +66,7 @@ BOOL CFullscreenWnd::PreTranslateMessage(MSG* pMsg)
 		case WM_KEYDOWN :
 		case WM_KEYUP :
 		case WM_CHAR :
-			m_pMainFrame->SendMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
-			break;
+
 		case WM_LBUTTONDOWN :
 		case WM_LBUTTONUP :
 		case WM_LBUTTONDBLCLK :
@@ -77,11 +76,12 @@ BOOL CFullscreenWnd::PreTranslateMessage(MSG* pMsg)
 		case WM_RBUTTONDOWN :
 		case WM_RBUTTONUP :
 		case WM_RBUTTONDBLCLK :
+		case WM_XBUTTONDOWN :
 
 		case WM_MOUSEWHEEL :
 
 			m_pMainFrame->PostMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
-			break;
+			return TRUE;
 	}
 
 	return CWnd::PreTranslateMessage(pMsg);
@@ -103,7 +103,7 @@ BOOL CFullscreenWnd::PreCreateWindow(CREATESTRUCT& cs)
 
 BOOL CFullscreenWnd::OnEraseBkgnd(CDC* pDC)
 {
-	return false;
+	return FALSE;
 }
 
 BOOL CFullscreenWnd::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
@@ -121,7 +121,7 @@ void CFullscreenWnd::ShowCursor(bool bVisible)
 {
 	if (m_bCursorVisible != bVisible) {
 		m_bCursorVisible = bVisible;
-		PostMessage (WM_SETCURSOR,0,0);
+		PostMessage(WM_SETCURSOR, 0, 0);
 	}
 }
 
