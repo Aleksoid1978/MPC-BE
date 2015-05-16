@@ -2100,7 +2100,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				GetCursorPos(&p);
 				CWnd* pWnd = WindowFromPoint(p);
 				bool bD3DFS = AfxGetAppSettings().fIsFSWindow;
-				if (pWnd == m_pFullscreenWnd && GetCursor() != NULL) {
+				if (*pWnd == *m_pFullscreenWnd && GetCursor() != NULL) {
 					if (!bD3DFS) {
 						AfxGetAppSettings().fIsFSWindow = true;
 					}
@@ -2337,7 +2337,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			bool fCursorOutside = !r.PtInRect(p);
 			CWnd* pWnd = WindowFromPoint(p);
 			if (IsD3DFullScreenMode()) {
-				if (!m_bInOptions && pWnd == m_pFullscreenWnd) {
+				if (!m_bInOptions && *pWnd == *m_pFullscreenWnd) {
 					m_pFullscreenWnd->ShowCursor(false);
 				}
 				KillTimer(TIMER_FULLSCREENMOUSEHIDER);
@@ -3382,13 +3382,13 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 		GetCursorPos(&p);
 
 		CRect r(0,0,0,0);
-		if (m_pFullscreenWnd && ::IsWindow(m_pFullscreenWnd->m_hWnd)) {
+		if (m_pFullscreenWnd && m_pFullscreenWnd->IsWindow()) {
 			m_pFullscreenWnd->GetWindowRect(r);
 		}
 
 		CWnd* pWnd = WindowFromPoint(p);
 		bool bFSWnd = false;
-		if (pWnd && m_pFullscreenWnd == pWnd && r.PtInRect(p)) {
+		if (pWnd && *m_pFullscreenWnd == *pWnd && r.PtInRect(p)) {
 			bFSWnd = true;
 		}
 
@@ -3437,12 +3437,12 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		GetCursorPos(&p);
 		CWnd* pWnd = WindowFromPoint(p);
 		CRect r(0,0,0,0);
-		if (m_pFullscreenWnd && ::IsWindow(m_pFullscreenWnd->m_hWnd)) {
+		if (m_pFullscreenWnd && m_pFullscreenWnd->IsWindow()) {
 			m_pFullscreenWnd->GetWindowRect(r);
 		}
 
 		bool bFSWnd = false;
-		if (pWnd && m_pFullscreenWnd == pWnd && r.PtInRect(p)) {
+		if (pWnd && *m_pFullscreenWnd == *pWnd && r.PtInRect(p)) {
 			bFSWnd = true;
 		}
 
@@ -3515,7 +3515,7 @@ void CMainFrame::OnRButtonUp(UINT nFlags, CPoint point)
 	CPoint p;
 	GetCursorPos(&p);
 	SetFocus();
-	if (WindowFromPoint(p) != m_pFullscreenWnd && !OnButton(wmcmd::RUP, nFlags, point)) {
+	if (*WindowFromPoint(p) != *m_pFullscreenWnd && !OnButton(wmcmd::RUP, nFlags, point)) {
 		__super::OnRButtonUp(nFlags, point);
 	}
 }
