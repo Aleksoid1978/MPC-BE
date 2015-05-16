@@ -30,7 +30,6 @@
 #include <Version.h>
 #include "../DSUtil/WinAPIUtils.h"
 #include "../../transform/VSFilter/IDirectVobSub.h"
-#include "FocusThread.h"
 
 CCritSec g_ffdshowReceive;
 bool queue_ffdshow_support = false;
@@ -71,7 +70,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_pD3DXCreateFont(NULL)
 	, m_pD3DXCreateSprite(NULL)
 	, m_bIsRendering(false)
-	, m_FocusThread(NULL)
 {
 	m_bIsEVR = bIsEVR;
 
@@ -163,14 +161,6 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 	if (m_hD3D9) {
 		FreeLibrary(m_hD3D9);
 		m_hD3D9 = NULL;
-	}
-
-	if (m_FocusThread) {
-		m_FocusThread->PostThreadMessage(WM_QUIT, 0, 0);
-		if (WaitForSingleObject(m_FocusThread->m_hThread, 10000) == WAIT_TIMEOUT) {
-			ASSERT(FALSE);
-			TerminateThread(m_FocusThread->m_hThread, 0xDEAD);
-		}
 	}
 }
 
@@ -583,11 +573,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		m_pp.hDeviceWindow = m_hWnd;
 		m_pp.Flags = D3DPRESENTFLAG_VIDEO;
 		m_D3DDevExError = L"No m_pD3DEx";
-
-		if (!m_FocusThread) {
-			m_FocusThread = (CFocusThread*)AfxBeginThread(RUNTIME_CLASS(CFocusThread), 0, 0, 0);
-		}
-
 		if (m_pD3DEx) {
 			m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &DisplayMode, NULL);
 
@@ -598,7 +583,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			m_pp.BackBufferHeight = m_ScreenSize.cy;
 
 			hr = m_pD3DEx->CreateDeviceEx(
-					 m_CurrentAdapter, D3DDEVTYPE_HAL, m_FocusThread->GetFocusWindow(),
+					 m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
 					 GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS, //D3DCREATE_MANAGED
 					 &m_pp, &DisplayMode, &m_pD3DDevEx);
 
@@ -622,7 +607,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			m_pp.BackBufferHeight = m_ScreenSize.cy;
 
 			hr = m_pD3D->CreateDevice(
-					 m_CurrentAdapter, D3DDEVTYPE_HAL, m_FocusThread->GetFocusWindow(),
+					 m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
 					 GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED, //D3DCREATE_MANAGED
 					 &m_pp, &m_pD3DDev);
 			m_DisplayType = d3ddm.Format;
