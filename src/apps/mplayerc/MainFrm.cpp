@@ -13447,7 +13447,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 					// DVD structure
 					CString sVOB = mi_fn;
 
-					for (int i = 0; i < 100; i++) {
+					for (int i = 1; i < 100; i++) {
 						sVOB = mi_fn;
 						CString vob;
 						vob.Format(_T("%d.VOB"), i);
