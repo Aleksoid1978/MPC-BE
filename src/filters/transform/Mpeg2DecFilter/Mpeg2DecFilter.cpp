@@ -288,7 +288,7 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	SetSaturation(1.0f);
 	EnableForcedSubtitles(true);
 	EnablePlanarYUV(true);
-	EnableInterlaced(false);
+	EnableInterlaced(true);
 	EnableReadARFromStream(true);
 
 #ifdef REGISTER_FILTER
@@ -555,29 +555,29 @@ void CMpeg2DecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 		if (SUCCEEDED(pMS2->GetProperties(sizeof(props), (BYTE*)&props))) {
 			props.dwTypeSpecificFlags &= ~0x7f;
 
-			const CMediaType& mt = m_pOutput->CurrentMediaType();
-			if (mt.formattype == FORMAT_VideoInfo2 && (((VIDEOINFOHEADER2*)mt.pbFormat)->dwInterlaceFlags & AMINTERLACE_IsInterlaced)) {
-
+			if (m_fInterlaced) {
 				if (m_dec->m_info.m_sequence->flags & SEQ_FLAG_PROGRESSIVE_SEQUENCE || m_fFilm) {
 					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
 				}
+			} else {
+				props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE; // must be progressive after software deinterlacing.
+			}
 
-				if (m_fb.flags & PIC_FLAG_TOP_FIELD_FIRST) {
-					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
-				}
-				if (m_fb.flags & PIC_FLAG_REPEAT_FIRST_FIELD) {
-					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_REPEAT_FIELD;
-				}
+			if (m_fb.flags & PIC_FLAG_TOP_FIELD_FIRST) {
+				props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
+			}
+			if (m_fb.flags & PIC_FLAG_REPEAT_FIRST_FIELD) {
+				props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_REPEAT_FIELD;
+			}
 
-				if ((m_fb.flags & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_I) {
-					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_I_SAMPLE;
-				}
-				if ((m_fb.flags & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_P) {
-					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_P_SAMPLE;
-				}
-				if ((m_fb.flags & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_B) {
-					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_B_SAMPLE;
-				}
+			if ((m_fb.flags & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_I) {
+				props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_I_SAMPLE;
+			}
+			if ((m_fb.flags & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_P) {
+				props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_P_SAMPLE;
+			}
+			if ((m_fb.flags & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_B) {
+				props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_B_SAMPLE;
 			}
 
 			pMS2->SetProperties(sizeof(props), (BYTE*)&props);
