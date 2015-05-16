@@ -243,6 +243,7 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_fWaitForKeyFrame(true)
 	, m_fInitializedBuffer(true)
 	, m_ControlThread(NULL)
+	, m_ditype(DIAuto)
 {
 	if (FAILED(*phr)) {
 		return;
@@ -281,7 +282,6 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		return;
 	}
 
-	SetDeinterlaceMethod(DIAuto);
 	SetBrightness(0.0f);
 	SetContrast(1.0f);
 	SetHue(0.0f);
@@ -527,7 +527,7 @@ void CMpeg2DecFilter::SetDeinterlaceMethod()
 	} else {
 		m_fb.di = GetDeinterlaceMethod();
 
-		if (m_fb.di == DIAuto || m_fb.di != DIWeave && m_fb.di != DIBlend && m_fb.di != DIBob && m_fb.di != DIFieldShift && m_fb.di != DIELA) {
+		if (m_fb.di == DIAuto) {
 			if (seqflags & SEQ_FLAG_PROGRESSIVE_SEQUENCE) {
 				m_fb.di = DIWeave;    // hurray!
 			} else if (m_fFilm) {
@@ -1049,6 +1049,11 @@ STDMETHODIMP CMpeg2DecFilter::CreatePage(const GUID& guid, IPropertyPage** ppPag
 STDMETHODIMP CMpeg2DecFilter::SetDeinterlaceMethod(ditype di)
 {
 	CAutoLock cAutoLock(&m_csProps);
+
+	if (di < DIAuto || di > DIELA) {
+		return E_INVALIDARG;
+	}
+
 	m_ditype = di;
 	return S_OK;
 }
