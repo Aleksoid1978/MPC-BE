@@ -254,6 +254,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_MESSAGE(WM_XBUTTONDBLCLK, OnXButtonDblClk)
 	ON_WM_MOUSEWHEEL()
 	ON_WM_MOUSEMOVE()
+	ON_WM_MOUSELEAVE()
 
 	ON_WM_NCHITTEST()
 
@@ -980,7 +981,6 @@ void CMainFrame::OnClose()
 	m_bClosingState = true;
 
 	KillTimer(TIMER_FLYBARWINDOWHIDER);
-	KillTimer(TIMER_EXCLUSIVEBARHIDER);
 	DestroyOSDBar();
 	DestroyFlyBar();
 
@@ -2093,27 +2093,7 @@ bool g_bExternalSubtitleTime	= false;
 void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
 	switch (nIDEvent) {
-
-		case TIMER_EXCLUSIVEBARHIDER:
-			if (IsD3DFullScreenMode()) {
-				CPoint p;
-				GetCursorPos(&p);
-				CWnd* pWnd = WindowFromPoint(p);
-				bool bD3DFS = AfxGetAppSettings().fIsFSWindow;
-				if (*pWnd == *m_pFullscreenWnd && GetCursor() != NULL) {
-					if (!bD3DFS) {
-						AfxGetAppSettings().fIsFSWindow = true;
-					}
-				} else {
-					if (bD3DFS) {
-						AfxGetAppSettings().fIsFSWindow = false;
-						m_OSD.HideExclusiveBars();
-					}
-				}
-			}
-			break;
 		case TIMER_FLYBARWINDOWHIDER:
-
 			if (m_wndView &&
 						(AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY
 						|| AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS
@@ -2358,61 +2338,6 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				CString info;
 				int val = 0;
 
-				/*
-				Reproduce:
-				1. Start a video
-				2. Pause video
-				3. Hibernate computer
-				4. Start computer again
-				MPC-BE window should now be hung
-
-				Stack dump from a Windows 7 64-bit machine:
-				Thread 1:
-				ntdll_77d30000!ZwWaitForSingleObject+0x15
-				ntdll_77d30000!RtlpWaitOnCriticalSection+0x13e
-				ntdll_77d30000!RtlEnterCriticalSection+0x150
-				QUARTZ!CBlockLock<CKsOpmLib>::CBlockLock<CKsOpmLib>+0x14 <- Lock
-				QUARTZ!CImageSync::get_AvgFrameRate+0x24
-				QUARTZ!CVMRFilter::get_AvgFrameRate+0x31
-				mpc_hc!CMainFrame::OnTimer+0xb80
-				mpc_hc!CWnd::OnWndMsg+0x3e8
-				mpc_hc!CWnd::WindowProc+0x24
-				mpc_hc!CMainFrame::WindowProc+0x15e
-				mpc_hc!AfxCallWndProc+0xac
-				mpc_hc!AfxWndProc+0x36
-				USER32!InternalCallWinProc+0x23
-				USER32!UserCallWinProcCheckWow+0x109
-				USER32!DispatchMessageWorker+0x3bc
-				USER32!DispatchMessageW+0xf
-				mpc_hc!AfxInternalPumpMessage+0x40
-				mpc_hc!CWinThread::Run+0x5b
-				mpc_hc!AfxWinMain+0x69
-				mpc_hc!__tmainCRTStartup+0x11a
-
-				Thread 2:
-				ntdll_77d30000!ZwWaitForSingleObject+0x15
-				ntdll_77d30000!RtlpWaitOnCriticalSection+0x13e
-				ntdll_77d30000!RtlEnterCriticalSection+0x150
-				QUARTZ!CBlockLock<CKsOpmLib>::CBlockLock<CKsOpmLib>+0x14 <- Lock
-				QUARTZ!VMR9::CVMRFilter::NonDelegatingQueryInterface+0x1b
-				mpc_hc!DSObjects::COuterVMR9::NonDelegatingQueryInterface+0x5b
-				mpc_hc!CMacrovisionKicker::NonDelegatingQueryInterface+0xdc
-				QUARTZ!CImageSync::QueryInterface+0x16
-				QUARTZ!VMR9::CVMRFilter::CIImageSyncNotifyEvent::QueryInterface+0x19
-				mpc_hc!DSObjects::CVMR9AllocatorPresenter::PresentImage+0xa9
-				QUARTZ!VMR9::CVMRFilter::CIVMRImagePresenter::PresentImage+0x2c
-				QUARTZ!VMR9::CImageSync::DoRenderSample+0xd5
-				QUARTZ!VMR9::CImageSync::ReceiveWorker+0xad
-				QUARTZ!VMR9::CImageSync::Receive+0x46
-				QUARTZ!VMR9::CVideoMixer::CompositeTheStreamsTogether+0x24f
-				QUARTZ!VMR9::CVideoMixer::MixerThread+0x184
-				QUARTZ!VMR9::CVideoMixer::MixerThreadProc+0xd
-				KERNEL32!BaseThreadInitThunk+0xe
-				ntdll_77d30000!__RtlUserThreadStart+0x70
-				ntdll_77d30000!_RtlUserThreadStart+0x1b
-
-				There can be a bug in QUARTZ or more likely MPC-BE is doing something wrong
-				*/
 				m_pQP->get_AvgFrameRate(&val); // We hang here due to a lock that never gets released.
 				info.Format(_T("%d.%02d %s"), val / 100, val % 100, rate);
 				m_wndStatsBar.SetLine(ResStr(IDS_AG_FRAMERATE), info);
@@ -3350,13 +3275,9 @@ BOOL CMainFrame::OnButton(UINT id, UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	if (IsD3DFullScreenMode() && m_OSD.OnLButtonDown(nFlags, point)) {
-		m_pFullscreenWnd->ShowCursor(true);
-		KillTimer(TIMER_FULLSCREENMOUSEHIDER);
-		SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, NULL);
-	} else {
-		SetFocus();
+	SetFocus();
 
+	if (!m_OSD.OnLButtonDown(nFlags, point)) {
 		bDVDMenuClicked = false;
 		bDVDButtonAtPosition = false;
 
@@ -3419,11 +3340,7 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		return;
 	}
 
-	if (IsD3DFullScreenMode() && m_OSD.OnLButtonUp(nFlags, point)) {
-		m_pFullscreenWnd->ShowCursor(true);
-		KillTimer(TIMER_FULLSCREENMOUSEHIDER);
-		SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, NULL);
-	} else {
+	if (!m_OSD.OnLButtonUp(nFlags, point)) {
 		if (bDVDMenuClicked) {
 			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 			return;
@@ -3603,7 +3520,9 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
  	}
 	templclick = true;
 
-	if (!m_OSD.OnMouseMove(nFlags, point)) {
+	if (IsD3DFullScreenMode() && m_OSD.OnMouseMove(nFlags, point)) {
+		KillTimer(TIMER_FULLSCREENMOUSEHIDER);
+	} else {
 		if (GetPlaybackMode() == PM_DVD) {
 			CRect vid_rect = m_wndView.GetVideoRect();
 			m_wndView.MapWindowPoints(this, &vid_rect);
@@ -3654,7 +3573,6 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 					}
 				}
 
-
 				// HACK: the controls would cover the menu too early hiding some buttons
 				if (GetPlaybackMode() == PM_DVD
 						&& (m_iDVDDomain == DVD_DOMAIN_VideoManagerMenu
@@ -3703,8 +3621,8 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 					ShowControls(s.nCS);
 				}
 
-				SetTimer(TIMER_FULLSCREENCONTROLBARHIDER, nTimeOut*1000, NULL);
-				SetTimer(TIMER_FULLSCREENMOUSEHIDER, max(nTimeOut*1000, 2000), NULL);
+				SetTimer(TIMER_FULLSCREENCONTROLBARHIDER, nTimeOut * 1000, NULL);
+				SetTimer(TIMER_FULLSCREENMOUSEHIDER, max(nTimeOut * 1000, 2000), NULL);
 			}
 		}
 
@@ -3712,6 +3630,13 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 
 		__super::OnMouseMove(nFlags, point);
 	}
+}
+
+void CMainFrame::OnMouseLeave()
+{
+	m_OSD.OnMouseLeave();
+
+	__super::OnMouseLeave();
 }
 
 void CMainFrame::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
@@ -11157,12 +11082,9 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		CreateFullScreenWindow();
 		m_pVideoWnd		= m_pFullscreenWnd;
 		m_bUseSmartSeek	= false;
-		s.fIsFSWindow	= true;
-		SetTimer(TIMER_EXCLUSIVEBARHIDER, 1000, NULL);
 	} else {
 		m_pVideoWnd		= &m_wndView;
 		m_bUseSmartSeek	= s.fSmartSeek && !s.fD3DFullscreen;
-		s.fIsFSWindow	= false;
 		if (OpenFileData* p = dynamic_cast<OpenFileData*>(pOMD)) {
 			CString fn = p->fns.GetHead();
 			if (!fn.IsEmpty() && (fn.Find(_T("://")) >= 0)) { // disable SmartSeek for streaming data.
