@@ -55,6 +55,8 @@ COSD::COSD(CMainFrame* pMainFrame)
 		m_pWndInsertAfter = &wndTop;
 	}
 
+	m_HandCursor = LoadCursor(NULL, IDC_HAND);
+
 	m_Color[OSD_TRANSPARENT]	= RGB(  0,   0,   0);
 	m_Color[OSD_BACKGROUND]		= RGB( 32,  40,  48);
 	m_Color[OSD_BORDER]			= RGB( 48,  56,  62);
@@ -71,9 +73,7 @@ COSD::COSD(CMainFrame* pMainFrame)
 	m_debugBrushBack.CreateSolidBrush(m_Color[OSD_DEBUGCLR]);
 	m_debugPenBorder.CreatePen(PS_SOLID, 1, m_Color[OSD_BORDER]);
 
-	memset(&m_BitmapInfo, 0, sizeof(m_BitmapInfo));
-
-	m_MainWndRect = CRect(0, 0, 0, 0);
+	ZeroMemory(&m_BitmapInfo, sizeof(m_BitmapInfo));
 
 	HBITMAP hBmp = CMPCPngImage::LoadExternalImage(L"flybar", IDB_PLAYERFLYBAR_PNG, IMG_TYPE::UNDEF);
 	BITMAP bm = { 0 };
@@ -186,8 +186,7 @@ void COSD::UpdateBitmap()
 {
 	CAutoLock Lock(&m_Lock);
 
-	CRect	rc;
-	CDC*	pDC = CDC::FromHandle(::GetWindowDC(m_pWnd->m_hWnd));
+	CWindowDC dc(m_pWnd);
 
 	CalcRect();
 
@@ -195,9 +194,9 @@ void COSD::UpdateBitmap()
 		m_MemDC.DeleteDC();
 	}
 
-	memset(&m_BitmapInfo, 0, sizeof(m_BitmapInfo));
+	ZeroMemory(&m_BitmapInfo, sizeof(m_BitmapInfo));
 
-	if (m_MemDC.CreateCompatibleDC(pDC)) {
+	if (m_MemDC.CreateCompatibleDC(&dc)) {
 		BITMAPINFO	bmi = {0};
 		HBITMAP		hbmpRender;
 
@@ -215,7 +214,7 @@ void COSD::UpdateBitmap()
 		if (::GetObject(hbmpRender, sizeof(BITMAP), &m_BitmapInfo) != 0) {
 			// Configure the VMR's bitmap structure
 			if (m_pVMB) {
-				ZeroMemory(&m_VMR9AlphaBitmap, sizeof(m_VMR9AlphaBitmap) );
+				ZeroMemory(&m_VMR9AlphaBitmap, sizeof(m_VMR9AlphaBitmap));
 				m_VMR9AlphaBitmap.dwFlags		= VMRBITMAP_HDC | VMRBITMAP_SRCCOLORKEY;
 				m_VMR9AlphaBitmap.hdc			= m_MemDC;
 				m_VMR9AlphaBitmap.rSrc			= m_rectWnd;
@@ -226,7 +225,7 @@ void COSD::UpdateBitmap()
 				m_VMR9AlphaBitmap.fAlpha		= 1.0;
 				m_VMR9AlphaBitmap.clrSrcKey		= m_Color[OSD_TRANSPARENT];
 			} else if (m_pMFVMB) {
-				ZeroMemory(&m_MFVideoAlphaBitmap, sizeof(m_MFVideoAlphaBitmap) );
+				ZeroMemory(&m_MFVideoAlphaBitmap, sizeof(m_MFVideoAlphaBitmap));
 				m_MFVideoAlphaBitmap.params.dwFlags			= MFVideoAlphaBitmap_SrcColorKey;
 				m_MFVideoAlphaBitmap.params.clrSrcKey		= m_Color[OSD_TRANSPARENT];
 				m_MFVideoAlphaBitmap.params.rcSrc			= m_rectWnd;
@@ -245,13 +244,11 @@ void COSD::UpdateBitmap()
 
 		DeleteObject(hbmpRender);
 	}
-
-	::ReleaseDC(m_pWnd->m_hWnd, pDC->m_hDC);
 }
 
 void COSD::Reset()
 {
-	m_bShowMessage	= true;
+	m_bShowMessage = true;
 
 	m_MainWndRect.SetRectEmpty();
 	m_strMessage.Empty();
@@ -307,25 +304,16 @@ void COSD::Start(CWnd* pWnd)
 
 void COSD::Stop()
 {
-	if (m_pWnd) {
-		::KillTimer(m_pWnd->m_hWnd, (UINT_PTR)this);
-	}
-
 	ClearMessage();
 
-	if (m_pVMB) {
-		m_pVMB.Release();
-	}
+	m_pVMB.Release();
+	m_pMFVMB.Release();
+	m_pMVTO.Release();
 
-	if (m_pMFVMB) {
-		m_pMFVMB.Release();
+	if (m_pWnd) {
+		m_pWnd->KillTimer((UINT_PTR)this);
+		m_pWnd = NULL;
 	}
-
-	if (m_pMVTO) {
-		m_pMVTO.Release();
-	}
-
-	m_pWnd = NULL;
 
 	Reset();
 }
@@ -478,8 +466,10 @@ void COSD::DrawMessage()
 			uFormat = uFormat|DT_END_ELLIPSIS;
 		}
 
+		const CAppSettings& s = AfxGetAppSettings();
+
 		CRect r;
-		if (AfxGetAppSettings().fFontShadow) {
+		if (s.fFontShadow) {
 			r		= rectMessages;
 			r.left	+= 12;
 			r.top	+= 7;
@@ -490,7 +480,7 @@ void COSD::DrawMessage()
 		r		= rectMessages;
 		r.left	+= 10;
 		r.top	+= 5;
-		m_MemDC.SetTextColor(AfxGetAppSettings().clrFontABGR);
+		m_MemDC.SetTextColor(s.clrFontABGR);
 		m_MemDC.DrawText(m_strMessage, &r, uFormat);
 	}
 }
@@ -543,6 +533,7 @@ void COSD::InvalidateVMROSD()
 	if (m_bFlyBarVisible) {
 		DrawFlyBar(&m_rectFlyBar);
 	}
+
 	DrawMessage();
 	DrawDebug();
 
@@ -550,7 +541,7 @@ void COSD::InvalidateVMROSD()
 		m_VMR9AlphaBitmap.dwFlags &= ~VMRBITMAP_DISABLE;
 		m_pVMB->SetAlphaBitmap(&m_VMR9AlphaBitmap);
 	} else if (m_pMFVMB) {
-		m_pMFVMB->SetAlphaBitmap (&m_MFVideoAlphaBitmap);
+		m_pMFVMB->SetAlphaBitmap(&m_MFVideoAlphaBitmap);
 	}
 
 	m_pMainFrame->RepaintVideo();
@@ -567,7 +558,7 @@ void COSD::UpdateSeekBarPos(CPoint point)
 	}
 
 	if (m_pWnd) {
-		AfxGetApp()->GetMainWnd()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_llSeekPos, SB_THUMBTRACK), (LPARAM)m_pWnd->m_hWnd);
+		m_pMainFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_llSeekPos, SB_THUMBTRACK), (LPARAM)m_pWnd->m_hWnd);
 	}
 }
 
@@ -577,56 +568,70 @@ bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (m_pVMB || m_pMFVMB) {
 		if (m_bCursorMoving) {
+			SetCursor(m_HandCursor);
+			bRet = true;
 			UpdateSeekBarPos(point);
 			InvalidateVMROSD();
-		} else if (!m_bSeekBarVisible && AfxGetAppSettings().fIsFSWindow && m_rectSeekBar.PtInRect(point)) {
-			m_bSeekBarVisible = true;
-			InvalidateVMROSD();
-		} else if (!m_bFlyBarVisible && AfxGetAppSettings().fIsFSWindow && m_rectFlyBar.PtInRect(point)) {
-			m_bFlyBarVisible = true;
-			InvalidateVMROSD();
-		} else if (m_bFlyBarVisible && AfxGetAppSettings().fIsFSWindow && m_rectFlyBar.PtInRect(point)) {
-			if (!bMouseOverExitButton && m_rectExitButton.PtInRect(point)) {
-				bMouseOverCloseButton	= false;
-				bMouseOverExitButton	= true;
-				SetCursor(LoadCursor(NULL, IDC_HAND));
+		} else if (m_rectSeekBar.PtInRect(point)) {
+			bRet = true;
+			if (!m_bSeekBarVisible) {
+				m_bSeekBarVisible = true;
 				InvalidateVMROSD();
-			} else if (!bMouseOverCloseButton && m_rectCloseButton.PtInRect(point)) {
-				bMouseOverExitButton	= false;
-				bMouseOverCloseButton	= true;
-				SetCursor(LoadCursor(NULL, IDC_HAND));
+			}
+
+			if (m_rectCursor.PtInRect(point)) {
+				SetCursor(m_HandCursor);
+			}
+		} else if (m_rectFlyBar.PtInRect(point)) {
+			bRet = true;
+			if (!m_bFlyBarVisible) {
+				m_bFlyBarVisible = true;
 				InvalidateVMROSD();
-			} else if ((bMouseOverCloseButton && !m_rectCloseButton.PtInRect(point)) || (bMouseOverExitButton && !m_rectExitButton.PtInRect(point))) {
-				bMouseOverExitButton	= false;
-				bMouseOverCloseButton	= false;
-				InvalidateVMROSD();
-			} else if (m_rectCloseButton.PtInRect(point) || m_rectExitButton.PtInRect(point)) {
-				SetCursor(LoadCursor(NULL, IDC_HAND));
+			} else {
+				if (!bMouseOverExitButton && m_rectExitButton.PtInRect(point)) {
+					bMouseOverCloseButton	= false;
+					bMouseOverExitButton	= true;
+					InvalidateVMROSD();
+				} else if (!bMouseOverCloseButton && m_rectCloseButton.PtInRect(point)) {
+					bMouseOverExitButton	= false;
+					bMouseOverCloseButton	= true;
+					InvalidateVMROSD();
+				} else if ((bMouseOverCloseButton && !m_rectCloseButton.PtInRect(point)) || (bMouseOverExitButton && !m_rectExitButton.PtInRect(point))) {
+					bMouseOverExitButton = false;
+					bMouseOverCloseButton = false;
+					InvalidateVMROSD();
+				}
+				
+				if (m_rectCloseButton.PtInRect(point) || m_rectExitButton.PtInRect(point)) {
+					SetCursor(m_HandCursor);
+				}
 			}
-		} else if (m_bFlyBarVisible && !m_rectFlyBar.PtInRect(point)) {
-			m_bFlyBarVisible = false;
-			bMouseOverCloseButton = false;
-			bMouseOverExitButton = false;
-			SetCursor(LoadCursor(NULL, IDC_ARROW));
-			if (m_pWnd) {
-				::KillTimer(m_pWnd->m_hWnd, (UINT_PTR)this);
-				::SetTimer(m_pWnd->m_hWnd, (UINT_PTR)this, 1000, (TIMERPROC)TimerFunc);
-			}
-			InvalidateVMROSD();
-		} else if (m_bSeekBarVisible && !m_rectSeekBar.PtInRect(point)) {
-			m_bSeekBarVisible = false;
-			// Add new timer for removing any messages
-			if (m_pWnd) {
-				::KillTimer(m_pWnd->m_hWnd, (UINT_PTR)this);
-				::SetTimer(m_pWnd->m_hWnd, (UINT_PTR)this, 1000, (TIMERPROC)TimerFunc);
-			}
-			InvalidateVMROSD();
-		} else {
-			bRet = false;
+		} else if (m_bSeekBarVisible || m_bFlyBarVisible) {
+			OnMouseLeave();
 		}
 	}
 
 	return bRet;
+}
+
+void COSD::OnMouseLeave()
+{
+	const bool bHideBars = (m_pVMB || m_pMFVMB) && (m_bSeekBarVisible || m_bFlyBarVisible);
+	
+	m_bCursorMoving			= false;
+	m_bSeekBarVisible		= false;
+	m_bFlyBarVisible		= false;
+	bMouseOverExitButton	= false;
+	bMouseOverCloseButton	= false;
+
+	if (bHideBars) {
+		// Add new timer for removing any messages
+		if (m_pWnd) {
+			m_pWnd->KillTimer((UINT_PTR)this);
+			m_pWnd->SetTimer((UINT_PTR)this, 1000, TimerFunc);
+		}
+		InvalidateVMROSD();
+	}
 }
 
 bool COSD::OnLButtonDown(UINT nFlags, CPoint point)
@@ -635,6 +640,7 @@ bool COSD::OnLButtonDown(UINT nFlags, CPoint point)
 
 	if (m_pVMB || m_pMFVMB) {
 		if (m_rectCursor.PtInRect (point)) {
+			SetCursor(m_HandCursor);
 			m_bCursorMoving		= true;
 			bRet				= true;
 		} else if (m_rectExitButton.PtInRect(point) || m_rectCloseButton.PtInRect(point)) {
@@ -658,15 +664,13 @@ bool COSD::OnLButtonUp(UINT nFlags, CPoint point)
 		m_bCursorMoving = false;
 
 		if (m_rectFlyBar.PtInRect(point)) {
-
 			if (m_rectExitButton.PtInRect(point)) {
-				AfxGetApp()->GetMainWnd()->PostMessage(WM_COMMAND, ID_FILE_EXIT); // Alt+X
+				m_pMainFrame->PostMessage(WM_COMMAND, ID_FILE_EXIT);
 			}
 
 			if (m_rectCloseButton.PtInRect(point)) {
-				AfxGetApp()->GetMainWnd()->PostMessage(WM_COMMAND, ID_FILE_CLOSEPLAYLIST); //Ctrl+C
+				m_pMainFrame->PostMessage(WM_COMMAND, ID_FILE_CLOSEPLAYLIST);
 			}
-
 		}
 
 		bRet = (m_rectCursor.PtInRect (point) || m_rectSeekBar.PtInRect(point));
@@ -722,18 +726,20 @@ void COSD::ClearMessage(bool hide)
 		m_nMessagePos = OSD_NOMESSAGE;
 	}
 
-	BOOL bRepaint = TRUE;
+	BOOL bRepaint = FALSE;
 	if (m_pVMB) {
+		bRepaint = TRUE;
 		DWORD dwBackup				= (m_VMR9AlphaBitmap.dwFlags | VMRBITMAP_DISABLE);
 		m_VMR9AlphaBitmap.dwFlags	= VMRBITMAP_DISABLE;
 		m_pVMB->SetAlphaBitmap(&m_VMR9AlphaBitmap);
 		m_VMR9AlphaBitmap.dwFlags	= dwBackup;
 	} else if (m_pMFVMB) {
+		bRepaint = TRUE;
 		m_pMFVMB->ClearAlphaBitmap();
 	} else if (m_pMVTO) {
+		bRepaint = TRUE;
 		m_pMVTO->OsdClearMessage();
 	} else if (::IsWindow(m_hWnd) && IsWindowVisible()) {
-		bRepaint = FALSE;
 		PostMessage(WM_HIDE);
 	}
 
@@ -748,6 +754,8 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 		return;
 	}
 
+	const CAppSettings& s = AfxGetAppSettings();
+
 	if (m_pVMB || m_pMFVMB) {
 		if (nPos != OSD_DEBUG) {
 			m_nMessagePos	= nPos;
@@ -760,34 +768,32 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 			nDuration = -1;
 		}
 
-		m_FontSize = FontSize ? FontSize : AfxGetAppSettings().nOSDSize;
+		m_FontSize = FontSize ? FontSize : s.nOSDSize;
 
 		if (m_FontSize < 10 || m_FontSize > 26) {
 			m_FontSize = 20;
 		}
 
-		m_OSD_Font = OSD_Font.IsEmpty() ? AfxGetAppSettings().strOSDFont : OSD_Font;
+		m_OSD_Font = OSD_Font.IsEmpty() ? s.strOSDFont : OSD_Font;
 
-		if (/*(temp_m_FontSize != m_FontSize) || (temp_m_OSD_Font != m_OSD_Font)*/TRUE) {
-			if (m_MainFont.GetSafeHandle()) {
-				m_MainFont.DeleteObject();
-			}
-
-			LOGFONT lf;
-			memset(&lf, 0, sizeof(lf));
-			lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-			lf.lfHeight			= m_FontSize * 10;
-			lf.lfQuality		= AfxGetAppSettings().fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
-			wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font.GetBuffer(0));
-
-			m_MainFont.CreatePointFontIndirect(&lf, &m_MemDC);
-			m_MemDC.SelectObject(m_MainFont);
+		if (m_MainFont.GetSafeHandle()) {
+			m_MainFont.DeleteObject();
 		}
 
+		LOGFONT lf;
+		ZeroMemory(&lf, sizeof(lf));
+		lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
+		lf.lfHeight			= m_FontSize * 10;
+		lf.lfQuality		= s.fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
+		wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font.GetBuffer(0));
+
+		m_MainFont.CreatePointFontIndirect(&lf, &m_MemDC);
+		m_MemDC.SelectObject(m_MainFont);
+
 		if (m_pWnd) {
-			::KillTimer(m_pWnd->m_hWnd, (UINT_PTR)this);
+			m_pWnd->KillTimer((UINT_PTR)this);
 			if (nDuration != -1) {
-				::SetTimer(m_pWnd->m_hWnd, (UINT_PTR)this, nDuration, (TIMERPROC)TimerFunc);
+				m_pWnd->SetTimer((UINT_PTR)this, nDuration, (TIMERPROC)TimerFunc);
 			}
 		}
 
@@ -806,18 +812,18 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 			nDuration = -1;
 		}
 
-		m_FontSize = FontSize ? FontSize : AfxGetAppSettings().nOSDSize;
+		m_FontSize = FontSize ? FontSize : s.nOSDSize;
 
 		if (m_FontSize < 10 || m_FontSize > 26) {
 			m_FontSize = 20;
 		}
 
-		m_OSD_Font = OSD_Font.IsEmpty() ? AfxGetAppSettings().strOSDFont : OSD_Font;
+		m_OSD_Font = OSD_Font.IsEmpty() ? s.strOSDFont : OSD_Font;
 
 		if (m_pWnd) {
-			::KillTimer(m_pWnd->m_hWnd, (UINT_PTR)this);
+			m_pWnd->KillTimer((UINT_PTR)this);
 			if (nDuration != -1) {
-				::SetTimer(m_pWnd->m_hWnd, (UINT_PTR)this, nDuration, (TIMERPROC)TimerFunc);
+				m_pWnd->SetTimer((UINT_PTR)this, nDuration, (TIMERPROC)TimerFunc);
 			}
 
 			SetWindowPos(m_pWndInsertAfter, 0, 0, 0, 0, m_nDEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
@@ -859,24 +865,8 @@ void COSD::HideMessage(bool hide)
 	}
 }
 
-void COSD::HideExclusiveBars()
-{
-	if (m_pVMB || m_pMFVMB) {
-		if (m_bFlyBarVisible || m_bSeekBarVisible) {
-			m_bFlyBarVisible	= false;
-			m_bSeekBarVisible	= false;
-			if (m_pWnd) {
-				::KillTimer(m_pWnd->m_hWnd, (UINT_PTR)this);
-				::SetTimer(m_pWnd->m_hWnd, (UINT_PTR)this, 1000, (TIMERPROC)TimerFunc);
-			}
-			InvalidateVMROSD();
-		}
-	}
-}
-
 BOOL COSD::PreTranslateMessage(MSG* pMsg)
 {
-
 	if (m_pWnd) {
 		switch (pMsg->message) {
 			case WM_LBUTTONDOWN :
@@ -888,7 +878,7 @@ BOOL COSD::PreTranslateMessage(MSG* pMsg)
 			case WM_RBUTTONUP :
 			case WM_RBUTTONDBLCLK :
 				m_pWnd->SetFocus();
-			break;
+				break;
 		}
 	}
 
@@ -939,11 +929,13 @@ void COSD::DrawWnd()
 		m_MainFont.DeleteObject();
 	}
 
+	const CAppSettings& s = AfxGetAppSettings();
+
 	LOGFONT lf;
-	memset(&lf, 0, sizeof(lf));
+	ZeroMemory(&lf, sizeof(lf));
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
 	lf.lfHeight			= m_FontSize * 10;
-	lf.lfQuality		= AfxGetAppSettings().fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
+	lf.lfQuality		= s.fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
 	wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font.GetBuffer(0));
 
 	m_MainFont.CreatePointFontIndirect(&lf, &temp_DC);
@@ -999,7 +991,7 @@ void COSD::DrawWnd()
 
 	CRect r;
 
-	if (AfxGetAppSettings().fFontShadow) {
+	if (s.fFontShadow) {
 		r			= rcBar;
 		r.left		= 12;
 		r.top		= 7;
@@ -1014,7 +1006,7 @@ void COSD::DrawWnd()
 	r.top		= 5;
 	r.bottom	+= rectText.Height();
 
-	mdc.SetTextColor(AfxGetAppSettings().clrFontABGR);
+	mdc.SetTextColor(s.clrFontABGR);
 	mdc.DrawText(m_strMessage, m_strMessage.GetLength(), &r, uFormat);
 
 	/*

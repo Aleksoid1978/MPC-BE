@@ -58,6 +58,7 @@ BOOL CFullscreenWnd::PreTranslateMessage(MSG* pMsg)
 {
 	switch (pMsg->message) {
 		case WM_MOUSEMOVE :
+		case WM_MOUSELEAVE :
 		case WM_SYSKEYDOWN :
 		case WM_SYSKEYUP :
 		case WM_SYSCHAR :

@@ -203,8 +203,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 		TIMER_STATS,
 		TIMER_LEFTCLICK,
 		TIMER_STATUSERASER,
-		TIMER_FLYBARWINDOWHIDER,
-		TIMER_EXCLUSIVEBARHIDER
+		TIMER_FLYBARWINDOWHIDER
 	};
 
 	friend class CPPageFileInfoSheet;
@@ -722,6 +721,7 @@ public:
 	afx_msg LRESULT OnXButtonDblClk(WPARAM wParam, LPARAM lParam);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnMouseLeave();
 
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 

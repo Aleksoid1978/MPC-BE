@@ -665,7 +665,6 @@ public:
 	CString			strSecondAudioRendererDisplayName;
 
 	bool			fD3DFullscreen;
-	bool			fIsFSWindow;
 
 	// Color control
 	int				iBrightness;

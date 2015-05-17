@@ -77,7 +77,6 @@ public:
 	void DebugMessage(LPCTSTR format, ...);
 	void ClearMessage(bool hide = false);
 	void HideMessage(bool hide);
-	void HideExclusiveBars();
 
 	void EnableShowMessage(bool bValue = true)	{ m_bShowMessage = bValue; };
 
@@ -88,6 +87,7 @@ public:
 
 	void OnSize(UINT nType, int cx, int cy);
 	bool OnMouseMove(UINT nFlags, CPoint point);
+	void OnMouseLeave();
 	bool OnLButtonDown(UINT nFlags, CPoint point);
 	bool OnLButtonUp(UINT nFlags, CPoint point);
 	bool bMouseOverCloseButton;
@@ -166,6 +166,8 @@ private :
 	CComPtr<IDSMChapterBag>	m_pChapterBag;
 
 	UINT	m_nDEFFLAGS;
+
+	HCURSOR	m_HandCursor;
 
 	void UpdateBitmap();
 	void CalcRect();
