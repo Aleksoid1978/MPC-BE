@@ -567,7 +567,10 @@ bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 	bool bRet = false;
 
 	if (m_pVMB || m_pMFVMB) {
-		if (m_bCursorMoving) {
+		CWnd* pWnd = WindowFromPoint(point);
+		if (pWnd && *pWnd != *m_pWnd) {
+			OnMouseLeave();
+		} else if (m_bCursorMoving) {
 			SetCursor(m_HandCursor);
 			bRet = true;
 			UpdateSeekBarPos(point);
