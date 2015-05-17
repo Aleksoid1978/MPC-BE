@@ -174,6 +174,8 @@ void COSD::OnSize(UINT nType, int cx, int cy)
 			m_bSeekBarVisible	= false;
 			m_bFlyBarVisible	= false;
 		}
+
+		CalcRect();
 		InvalidateVMROSD();
 		UpdateBitmap();
 	} else if (m_pWnd) {
@@ -187,8 +189,6 @@ void COSD::UpdateBitmap()
 	CAutoLock Lock(&m_Lock);
 
 	CWindowDC dc(m_pWnd);
-
-	CalcRect();
 
 	if (m_MemDC) {
 		m_MemDC.DeleteDC();
@@ -252,6 +252,8 @@ void COSD::Reset()
 
 	m_MainWndRect.SetRectEmpty();
 	m_strMessage.Empty();
+
+	CalcRect();
 }
 
 void COSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
@@ -323,20 +325,20 @@ void COSD::CalcRect()
 	if (m_pWnd) {
 		m_pWnd->GetClientRect(&m_rectWnd);
 
-		m_rectSeekBar.left			= m_rectWnd.left	+ 10;
-		m_rectSeekBar.right			= m_rectWnd.right	- 10;
-		m_rectSeekBar.top			= m_rectWnd.bottom	- SEEKBAR_HEIGHT;
-		m_rectSeekBar.bottom		= m_rectSeekBar.top	+ SEEKBAR_HEIGHT;
+		m_rectSeekBar.left			= m_rectWnd.left		+ 10;
+		m_rectSeekBar.right			= m_rectWnd.right		- 10;
+		m_rectSeekBar.top			= m_rectWnd.bottom		- SEEKBAR_HEIGHT;
+		m_rectSeekBar.bottom		= m_rectSeekBar.top		+ SEEKBAR_HEIGHT;
 
 		m_rectFlyBar.left			= m_rectWnd.left;
 		m_rectFlyBar.right			= m_rectWnd.right;
 		m_rectFlyBar.top			= m_rectWnd.top;
-		m_rectFlyBar.bottom			= m_rectWnd.top		+ 100;
+		m_rectFlyBar.bottom			= m_rectWnd.top			+ 100;
 
-		m_rectExitButton.left		= m_rectWnd.right	- 34;
-		m_rectExitButton.right		= m_rectWnd.right	- 10;
-		m_rectExitButton.top		= m_rectWnd.top		- 10;
-		m_rectExitButton.bottom		= m_rectWnd.top		+ 34;
+		m_rectExitButton.left		= m_rectWnd.right		- 34;
+		m_rectExitButton.right		= m_rectWnd.right		- 10;
+		m_rectExitButton.top		= m_rectWnd.top			- 10;
+		m_rectExitButton.bottom		= m_rectWnd.top			+ 34;
 
 		m_rectCloseButton.left		= m_rectExitButton.left	- 28;
 		m_rectCloseButton.right		= m_rectExitButton.left	- 4;
@@ -520,7 +522,6 @@ void COSD::InvalidateVMROSD()
 {
 	CAutoLock Lock(&m_Lock);
 
-	CalcRect();
 	if (m_BitmapInfo.bmWidth * m_BitmapInfo.bmHeight * (m_BitmapInfo.bmBitsPixel >> 3) == 0) {
 		return;
 	}
@@ -562,13 +563,22 @@ void COSD::UpdateSeekBarPos(CPoint point)
 	}
 }
 
+bool COSD::CheckWindowFromPoint(CPoint p) const
+{
+	if (m_pWnd) {
+		CWnd* pWnd = WindowFromPoint(p);
+		return (pWnd && *pWnd == *m_pWnd);
+	}
+
+	return false;
+}
+
 bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 {
 	bool bRet = false;
 
 	if (m_pVMB || m_pMFVMB) {
-		CWnd* pWnd = WindowFromPoint(point);
-		if (pWnd && *pWnd != *m_pWnd) {
+		if (!CheckWindowFromPoint(point)) {
 			OnMouseLeave();
 		} else if (m_bCursorMoving) {
 			SetCursor(m_HandCursor);
@@ -641,7 +651,8 @@ bool COSD::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	bool bRet = false;
 
-	if (m_pVMB || m_pMFVMB) {
+	if ((m_pVMB || m_pMFVMB)
+			&& CheckWindowFromPoint(point)) {
 		if (m_rectCursor.PtInRect (point)) {
 			SetCursor(m_HandCursor);
 			m_bCursorMoving		= true;
@@ -663,7 +674,8 @@ bool COSD::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	bool bRet = false;
 
-	if (m_pVMB || m_pMFVMB) {
+	if ((m_pVMB || m_pMFVMB)
+			&& CheckWindowFromPoint(point)) {
 		m_bCursorMoving = false;
 
 		if (m_rectFlyBar.PtInRect(point)) {
@@ -676,7 +688,7 @@ bool COSD::OnLButtonUp(UINT nFlags, CPoint point)
 			}
 		}
 
-		bRet = (m_rectCursor.PtInRect (point) || m_rectSeekBar.PtInRect(point));
+		bRet = (m_rectCursor.PtInRect(point) || m_rectSeekBar.PtInRect(point));
 	}
 
 	return bRet;
@@ -710,10 +722,10 @@ void COSD::GetRange(__int64& start, __int64& stop)
 void COSD::TimerFunc(HWND hWnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTime)
 {
 	COSD* pOSD = (COSD*)nIDEvent;
-
 	if (pOSD) {
 		pOSD->ClearMessage();
 	}
+
 	::KillTimer(hWnd, nIDEvent);
 }
 
