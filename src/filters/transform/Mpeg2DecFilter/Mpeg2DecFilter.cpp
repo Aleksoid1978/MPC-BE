@@ -1580,8 +1580,6 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 	REFERENCE_TIME rtStart = 0, rtStop = 0;
 	hr = pSample->GetTime(&rtStart, &rtStop);
 
-	bool fRefresh = false;
-
 	if (FAILED(hr)) {
 		if (!m_sps.IsEmpty()) {
 			spu* sp = m_sps.GetTail();
@@ -1618,7 +1616,6 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 
 		if (m_sphli && p->m_rtStart == PTS2RT(m_sphli->StartPTM)) {
 			p->m_psphli = m_sphli;
-			fRefresh = true;
 		}
 
 		m_sps.AddTail(p);
@@ -1626,10 +1623,6 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 
 	if (!m_sps.IsEmpty()) {
 		m_sps.GetTail()->Parse();
-	}
-
-	if (fRefresh) {
-		(static_cast<CMpeg2DecFilter*>(m_pFilter))->ControlCmd(CMpeg2DecFilter::CNTRL_REDRAW);
 	}
 
 	return S_FALSE;
@@ -1650,7 +1643,7 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 		return __super::Set(PropSet, Id, pInstanceData, InstanceLength, pPropertyData, DataLength);
 	}
 
-	bool fRefresh = false;
+	bool bRefresh = false;
 
 	switch (Id) {
 		case AM_PROPERTY_DVDSUBPIC_PALETTE: {
@@ -1675,14 +1668,14 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 				while (pos) {
 					spu* sp = m_sps.GetNext(pos);
 					if (sp->m_rtStart <= PTS2RT(pSPHLI->StartPTM) && PTS2RT(pSPHLI->StartPTM) < sp->m_rtStop) {
-						fRefresh = true;
+						bRefresh = true;
 						sp->m_psphli.Free();
 						sp->m_psphli.Attach(DNew AM_PROPERTY_SPHLI);
 						memcpy((AM_PROPERTY_SPHLI*)sp->m_psphli, pSPHLI, sizeof(AM_PROPERTY_SPHLI));
 					}
 				}
 
-				if (!fRefresh) { // save it for later, a subpic might be late for this hli
+				if (!bRefresh) { // save it for later, a subpic might be late for this hli
 					m_sphli.Attach(DNew AM_PROPERTY_SPHLI);
 					memcpy((AM_PROPERTY_SPHLI*)m_sphli, pSPHLI, sizeof(AM_PROPERTY_SPHLI));
 				}
@@ -1690,7 +1683,7 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 				POSITION pos = m_sps.GetHeadPosition();
 				while (pos) {
 					spu* sp = m_sps.GetNext(pos);
-					fRefresh |= !!sp->m_psphli;
+					bRefresh |= !!sp->m_psphli;
 					sp->m_psphli.Free();
 				}
 			}
@@ -1712,7 +1705,7 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 			return E_PROP_ID_UNSUPPORTED;
 	}
 
-	if (fRefresh) {
+	if (bRefresh) {
 		(static_cast<CMpeg2DecFilter*>(m_pFilter))->ControlCmd(CMpeg2DecFilter::CNTRL_REDRAW);
 	}
 
