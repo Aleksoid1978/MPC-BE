@@ -838,8 +838,6 @@ HRESULT CRealMediaSplitterOutputPin::DeliverEndFlush()
 
 HRESULT CRealMediaSplitterOutputPin::DeliverSegments()
 {
-	HRESULT hr;
-
 	if (m_segments.GetCount() == 0) {
 		m_segments.Clear();
 		return S_OK;
@@ -847,27 +845,28 @@ HRESULT CRealMediaSplitterOutputPin::DeliverSegments()
 
 	CAutoPtr<CPacket> p(DNew CPacket());
 
-	p->TrackNumber = (DWORD)-1;
-	p->bDiscontinuity = m_segments.fDiscontinuity;
-	p->bSyncPoint = m_segments.fSyncPoint;
-	p->rtStart = m_segments.rtStart;
-	p->rtStop = m_segments.rtStart+1;
+	p->TrackNumber		= DWORD_MAX;
+	p->bDiscontinuity	= m_segments.fDiscontinuity;
+	p->bSyncPoint		= m_segments.fSyncPoint;
+	p->rtStart			= m_segments.rtStart;
+	p->rtStop			= m_segments.rtStart + 1;
 
-	DWORD len = 0, total = 0;
+	DWORD len = 0, total = 0;;
 	POSITION pos = m_segments.GetHeadPosition();
 	while (pos) {
-		segment* s = m_segments.GetNext(pos);
+		const segment* s = m_segments.GetNext(pos);
 		len = max(len, s->offset + s->data.GetCount());
 		total += s->data.GetCount();
 	}
 	ASSERT(len == total);
-	len += 1 + 2*4*(!m_segments.fMerged ? m_segments.GetCount() : 1);
+
+	len += 1 + 2 * 4 * (!m_segments.fMerged ? m_segments.GetCount() : 1);
 
 	p->SetCount(len);
 
 	BYTE* pData = p->GetData();
 
-	*pData++ = m_segments.fMerged ? 0 : m_segments.GetCount()-1;
+	*pData++ = m_segments.fMerged ? 0 : m_segments.GetCount() - 1;
 
 	if (m_segments.fMerged) {
 		*((DWORD*)pData) = 1;
@@ -879,22 +878,20 @@ HRESULT CRealMediaSplitterOutputPin::DeliverSegments()
 		while (pos) {
 			*((DWORD*)pData) = 1;
 			pData += 4;
-			*((DWORD*)pData) = m_segments.GetNext(pos)->offset;
+			const segment* s = m_segments.GetNext(pos);
+			*((DWORD*)pData) = s->offset;
 			pData += 4;
 		}
 	}
 
 	pos = m_segments.GetHeadPosition();
 	while (pos) {
-		segment* s = m_segments.GetNext(pos);
+		const segment* s = m_segments.GetNext(pos);
 		memcpy(pData + s->offset, s->data.GetData(), s->data.GetCount());
 	}
-
-	hr = __super::DeliverPacket(p);
-
 	m_segments.Clear();
 
-	return hr;
+	return __super::DeliverPacket(p);
 }
 
 HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
@@ -936,11 +933,11 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 			BYTE hdr = *pIn++;
 			DWORD packetlen = 0, packetoffset = 0;
 
-			if ((hdr&0xc0) == 0x40) {
+			if ((hdr & 0xc0) == 0x40) {
 				pIn++;
 				packetlen = len - (pIn - pInOrg);
 			} else {
-				if ((hdr&0x40) == 0) {
+				if ((hdr & 0x40) == 0) {
 					pIn++; //BYTE subseq = (*pIn++)&0x7f;
 				}
 
@@ -949,10 +946,10 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 					var = (var<<8)|(*pIn++); \
  
 				GetWORD(packetlen);
-				if (packetlen&0x8000) {
+				if (packetlen & 0x8000) {
 					m_segments.fMerged = true;
 				}
-				if ((packetlen&0x4000) == 0) {
+				if ((packetlen & 0x4000) == 0) {
 					GetWORD(packetlen);
 					packetlen &= 0x3fffffff;
 				} else {
@@ -960,7 +957,7 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 				}
 
 				GetWORD(packetoffset);
-				if ((packetoffset&0x4000) == 0) {
+				if ((packetoffset & 0x4000) == 0) {
 					GetWORD(packetoffset);
 					packetoffset &= 0x3fffffff;
 				} else {
@@ -970,7 +967,7 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 #undef GetWORD
 
 				if ((hdr&0xc0) == 0xc0) {
-					m_segments.rtStart = 10000i64*packetoffset - m_rtStart, packetoffset = 0;
+					m_segments.rtStart = 10000i64 * packetoffset - m_rtStart, packetoffset = 0;
 				} else if ((hdr&0xc0) == 0x80) {
 					packetoffset = packetlen - packetoffset;
 				}
@@ -979,16 +976,19 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 			}
 
 			int len2 = min(len - (pIn - pInOrg), int(packetlen - packetoffset));
+			if (m_segments.IsEmpty()) {
+				packetoffset = 0;
+			}
 
 			CAutoPtr<segment> s(DNew segment);
 			s->offset = packetoffset;
-			s->data.SetCount(len2);
+			s->data.SetCount((size_t)len2);
 			memcpy(s->data.GetData(), pIn, len2);
 			m_segments.AddTail(s);
 
 			pIn += len2;
 
-			if ((hdr&0x80) || packetoffset+len2 >= packetlen) {
+			if ((hdr&0x80) || packetoffset + len2 >= packetlen) {
 				if (S_OK != (hr = DeliverSegments())) {
 					return hr;
 				}
