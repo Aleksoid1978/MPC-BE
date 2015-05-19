@@ -753,16 +753,6 @@ HRESULT CMpeg2DecFilter::Deliver()
 
 		m_fb.rtStart = rtStart;
 		m_fb.rtStop = (rtStart + rtStop) / 2;
-	} else if (m_fb.di == DIFieldShift) {
-		int soffset = tff ? 0 : spitch;
-		int doffset = tff ? 0 : dpitch;
-		BitBltFromRGBToRGB(w, h/2, m_fb.buf[0] + doffset, dpitch*2, 8, fbuf->buf[0] + soffset, spitch*2, 8);
-		BitBltFromRGBToRGB(w/2, h/4, m_fb.buf[1] + doffset/2, dpitch, 8, fbuf->buf[1] + soffset/2, spitch, 8);
-		BitBltFromRGBToRGB(w/2, h/4, m_fb.buf[2] + doffset/2, dpitch, 8, fbuf->buf[2] + soffset/2, spitch, 8);
-	} else if (m_fb.di == DIELA) {
-		DeinterlaceELA(m_fb.buf[0], fbuf->buf[0], w, h, dpitch, spitch, tff);
-		DeinterlaceELA(m_fb.buf[1], fbuf->buf[1], w/2, h/2, dpitch/2, spitch/2, tff);
-		DeinterlaceELA(m_fb.buf[2], fbuf->buf[2], w/2, h/2, dpitch/2, spitch/2, tff);
 	}
 
 	// postproc
@@ -789,16 +779,6 @@ HRESULT CMpeg2DecFilter::Deliver()
 
 		// deliver
 		hr = Deliver(false);
-	} else if (m_fb.di == DIFieldShift) {
-		int soffset = !tff ? 0 : spitch;
-		int doffset = !tff ? 0 : dpitch;
-		BitBltFromRGBToRGB(w, h/2, m_fb.buf[0] + doffset, dpitch*2, 8, fbuf->buf[0] + soffset, spitch*2, 8);
-		BitBltFromRGBToRGB(w/2, h/4, m_fb.buf[1] + doffset/2, dpitch, 8, fbuf->buf[1] + soffset/2, spitch, 8);
-		BitBltFromRGBToRGB(w/2, h/4, m_fb.buf[2] + doffset/2, dpitch, 8, fbuf->buf[2] + soffset/2, spitch, 8);
-	} else if (m_fb.di == DIELA) {
-		DeinterlaceELA(m_fb.buf[0], fbuf->buf[0], w, h, dpitch, spitch, !tff);
-		DeinterlaceELA(m_fb.buf[1], fbuf->buf[1], w/2, h/2, dpitch/2, spitch/2, !tff);
-		DeinterlaceELA(m_fb.buf[2], fbuf->buf[2], w/2, h/2, dpitch/2, spitch/2, !tff);
 	}
 
 	if (!m_fInitializedBuffer) {
@@ -1050,7 +1030,7 @@ STDMETHODIMP CMpeg2DecFilter::SetDeinterlaceMethod(ditype di)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (di < DIAuto || di > DIELA) {
+	if (di < DIAuto || di > DIBob) {
 		return E_INVALIDARG;
 	}
 
