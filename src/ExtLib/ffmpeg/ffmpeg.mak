@@ -58,6 +58,7 @@ OBJ_DIRS = $(OBJ_DIR) \
 	$(OBJ_DIR)libavcodec \
 	$(OBJ_DIR)libavcodec/x86 \
 	$(OBJ_DIR)libavfilter \
+	$(OBJ_DIR)libavfilter/x86 \
 	$(OBJ_DIR)libavresample \
 	$(OBJ_DIR)libavresample/x86 \
 	$(OBJ_DIR)libavutil \
@@ -501,7 +502,10 @@ SRCS_LF = \
 	libavfilter/formats.c \
 	libavfilter/graphparser.c \
 	libavfilter/pthread.c \
-	libavfilter/video.c
+	libavfilter/vf_yadif.c \
+	libavfilter/video.c \
+	\
+	libavfilter/x86/vf_yadif_init.c
 
 SRCS_LBR = \
 	libavresample/audio_convert.c \
@@ -657,6 +661,11 @@ SRCS_YASM_LC = \
 	libavcodec/x86/vp9mc.asm \
 	libavcodec/x86/xvididct.asm
 
+SRCS_YASM_LF = \
+	libavfilter/x86/vf_yadif.asm \
+	libavfilter/x86/yadif-10.asm \
+	libavfilter/x86/yadif-16.asm
+
 SRCS_YASM_LBR = \
 	libavresample/x86/audio_convert.asm \
 	libavresample/x86/audio_mix.asm \
@@ -684,7 +693,8 @@ OBJS_LC = \
 	$(SRCS_YASM_LC:%.asm=$(OBJ_DIR)%.o)
 
 OBJS_LF = \
-	$(SRCS_LF:%.c=$(OBJ_DIR)%.o)
+	$(SRCS_LF:%.c=$(OBJ_DIR)%.o) \
+	$(SRCS_YASM_LF:%.asm=$(OBJ_DIR)%.o)
 
 OBJS_LBR = \
 	$(SRCS_LBR:%.c=$(OBJ_DIR)%.o) \

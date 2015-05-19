@@ -47,7 +47,9 @@ void avfilter_register_all(void)
     initialized = 1;
 
     REGISTER_FILTER(ATEMPO,         atempo,         af);
-    REGISTER_FILTER(LOWPASS,        lowpass,        af);
+    //REGISTER_FILTER(LOWPASS,        lowpass,        af);
+
+    //REGISTER_FILTER(YADIF,          yadif,          vf);
 
     /* those filters are part of public or internal API => registered
      * unconditionally */
