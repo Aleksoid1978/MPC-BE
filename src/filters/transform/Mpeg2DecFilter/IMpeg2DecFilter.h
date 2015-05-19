@@ -26,8 +26,6 @@ enum ditype {
 	DIWeave,
 	DIBlend,
 	DIBob,
-	DIFieldShift,
-	DIELA
 };
 
 interface __declspec(uuid("0ABEAA65-0317-47B9-AE1D-D9EA905AFD25"))
