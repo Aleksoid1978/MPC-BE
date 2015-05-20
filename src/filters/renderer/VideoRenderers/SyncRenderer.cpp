@@ -43,6 +43,7 @@
 #include "DX9Shaders.h"
 #include "SyncRenderer.h"
 #include <Version.h>
+#include "FocusThread.h"
 
 // only for debugging
 //#define DISABLE_USING_D3D9EX
@@ -87,7 +88,8 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	m_dOptimumDisplayCycle(0.0),
 	m_dCycleDifference(1.0),
 	m_llEstVBlankTime(0),
-	m_CurrentAdapter(0)
+	m_CurrentAdapter(0),
+	m_FocusThread(NULL)
 {
 	if (FAILED(hr)) {
 		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
@@ -210,9 +212,14 @@ CBaseAP::~CBaseAP()
 		m_hD3D9 = NULL;
 	}
 	m_pAudioStats = NULL;
-	if (m_pGenlock) {
-		delete m_pGenlock;
-		m_pGenlock = NULL;
+	SAFE_DELETE(m_pGenlock);
+
+	if (m_FocusThread) {
+		m_FocusThread->PostThreadMessage(WM_QUIT, 0, 0);
+		if (WaitForSingleObject(m_FocusThread->m_hThread, 10000) == WAIT_TIMEOUT) {
+			ASSERT(FALSE);
+			TerminateThread(m_FocusThread->m_hThread, 0xDEAD);
+		}
 	}
 }
 
@@ -483,6 +490,10 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 			pp.BackBufferFormat = d3ddm.Format;
 		}
 
+		if (!m_FocusThread) {
+			m_FocusThread = (CFocusThread*)AfxBeginThread(RUNTIME_CLASS(CFocusThread), 0, 0, 0);
+		}
+
 		if (m_pD3DEx) {
 			D3DDISPLAYMODEEX DisplayMode;
 			ZeroMemory(&DisplayMode, sizeof(DisplayMode));
@@ -492,8 +503,8 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 			DisplayMode.Format = pp.BackBufferFormat;
 			pp.FullScreen_RefreshRateInHz = DisplayMode.RefreshRate;
 
-			if FAILED(hr = m_pD3DEx->CreateDeviceEx(m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
-													D3DCREATE_HARDWARE_VERTEXPROCESSING|D3DCREATE_FPU_PRESERVE|D3DCREATE_MULTITHREADED|D3DCREATE_ENABLE_PRESENTSTATS,
+			if FAILED(hr = m_pD3DEx->CreateDeviceEx(m_CurrentAdapter, D3DDEVTYPE_HAL, m_FocusThread->GetFocusWindow(),
+													D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS | D3DCREATE_NOWINDOWCHANGES,
 													&pp, &DisplayMode, &m_pD3DDevEx)) {
 				_Error += GetWindowsErrorMessage(hr, m_hD3D9);
 				return hr;
@@ -504,7 +515,9 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 				m_DisplayType = DisplayMode.Format;
 			}
 		} else {
-			if FAILED(hr = m_pD3D->CreateDevice(m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING|D3DCREATE_FPU_PRESERVE|D3DCREATE_MULTITHREADED, &pp, &m_pD3DDev)) {
+			if FAILED(hr = m_pD3D->CreateDevice(m_CurrentAdapter, D3DDEVTYPE_HAL, m_FocusThread->GetFocusWindow(),
+												D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_NOWINDOWCHANGES,
+												&pp, &m_pD3DDev)) {
 				_Error += GetWindowsErrorMessage(hr, m_hD3D9);
 				return hr;
 			}
@@ -544,7 +557,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		}
 		if (m_pD3DEx) {
 			if FAILED(hr = m_pD3DEx->CreateDeviceEx(m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
-													D3DCREATE_HARDWARE_VERTEXPROCESSING|D3DCREATE_FPU_PRESERVE|D3DCREATE_MULTITHREADED|D3DCREATE_ENABLE_PRESENTSTATS,
+													D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS,
 													&pp, NULL, &m_pD3DDevEx)) {
 				_Error += GetWindowsErrorMessage(hr, m_hD3D9);
 				return hr;
@@ -554,7 +567,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 			}
 		} else {
 			if FAILED(hr = m_pD3D->CreateDevice(m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
-												D3DCREATE_HARDWARE_VERTEXPROCESSING|D3DCREATE_FPU_PRESERVE|D3DCREATE_MULTITHREADED,
+												D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED,
 												&pp, &m_pD3DDev)) {
 				_Error += GetWindowsErrorMessage(hr, m_hD3D9);
 				return hr;
@@ -1303,6 +1316,8 @@ void CBaseAP::SyncOffsetStats(LONGLONG syncOffset)
 void CBaseAP::UpdateAlphaBitmap()
 {
 	m_VMR9AlphaBitmapData.Free();
+	m_pOSDTexture.Release();
+	m_pOSDSurface.Release();
 
 	if ((m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_DISABLE) == 0) {
 		HBITMAP hBitmap = (HBITMAP)GetCurrentObject (m_VMR9AlphaBitmap.hdc, OBJ_BITMAP);
@@ -1564,9 +1579,9 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 	if (m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_UPDATE) {
 		CAutoLock BitMapLock(&m_VMR9AlphaBitmapLock);
-		CRect		rcSrc (m_VMR9AlphaBitmap.rSrc);
-		m_pOSDTexture	= NULL;
-		m_pOSDSurface	= NULL;
+		CRect rcSrc(m_VMR9AlphaBitmap.rSrc);
+		m_pOSDTexture.Release();
+		m_pOSDSurface.Release();
 		if ((m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_DISABLE) == 0 && (BYTE *)m_VMR9AlphaBitmapData) {
 			if ( (m_pD3DXLoadSurfaceFromMemory != NULL) &&
 					SUCCEEDED(hr = m_pD3DDev->CreateTexture(rcSrc.Width(), rcSrc.Height(), 1,
@@ -1577,8 +1592,8 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 													   NULL, &m_VMR9AlphaBitmapRect, D3DX_FILTER_NONE, m_VMR9AlphaBitmap.clrSrcKey);
 				}
 				if (FAILED (hr)) {
-					m_pOSDTexture	= NULL;
-					m_pOSDSurface	= NULL;
+					m_pOSDTexture.Release();
+					m_pOSDSurface.Release();
 				}
 			}
 		}
@@ -2450,6 +2465,8 @@ STDMETHODIMP CSyncAP::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 		hr = m_pD3DManager->QueryInterface (__uuidof(IDirect3DDeviceManager9), (void**) ppv);
 	} else if (riid == __uuidof(ISyncClockAdviser)) {
 		hr = GetInterface((ISyncClockAdviser*)this, ppv);
+	} else if (riid == __uuidof(ID3DFullscreenControl)) {
+		hr = GetInterface((ID3DFullscreenControl*)this, ppv);
 	} else {
 		hr = __super::NonDelegatingQueryInterface(riid, ppv);
 	}
@@ -3111,7 +3128,15 @@ STDMETHODIMP CSyncAP::GetAspectRatioMode(DWORD *pdwAspectRatioMode)
 
 STDMETHODIMP CSyncAP::SetVideoWindow(HWND hwndVideo)
 {
-	ASSERT (m_hWnd == hwndVideo);
+	if (m_hWnd != hwndVideo) {
+		CAutoLock lock(this);
+		CAutoLock lock2(&m_ImageProcessingLock);
+		CAutoLock cRenderLock(&m_allocatorLock);
+
+		m_hWnd = hwndVideo;
+		m_bPendingResetDevice = true;
+		SendResetRequest();
+	}
 	return S_OK;
 }
 
@@ -3856,7 +3881,7 @@ STDMETHODIMP CSyncRenderer::GetAlphaBitmapParameters(VMR9AlphaBitmap* pBmpParms)
 	return S_OK;
 }
 
-STDMETHODIMP CSyncRenderer::SetAlphaBitmap(const VMR9AlphaBitmap*  pBmpParms)
+STDMETHODIMP CSyncRenderer::SetAlphaBitmap(const VMR9AlphaBitmap* pBmpParms)
 {
 	CheckPointer(pBmpParms, E_POINTER);
 	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
@@ -3914,6 +3939,19 @@ STDMETHODIMP CSyncRenderer::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 	    }
 	}
 	return SUCCEEDED(hr) ? hr : __super::NonDelegatingQueryInterface(riid, ppv);
+}
+
+STDMETHODIMP CSyncAP::SetD3DFullscreen(bool fEnabled)
+{
+	m_bIsFullscreen = fEnabled;
+	return S_OK;
+}
+
+STDMETHODIMP CSyncAP::GetD3DFullscreen(bool* pfEnabled)
+{
+	CheckPointer(pfEnabled, E_POINTER);
+	*pfEnabled = m_bIsFullscreen;
+	return S_OK;
 }
 
 CGenlock::CGenlock(DOUBLE target, DOUBLE limit, INT lineD, INT colD, DOUBLE clockD, UINT mon):

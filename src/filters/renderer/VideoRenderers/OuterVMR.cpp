@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -149,7 +149,7 @@ STDMETHODIMP COuterVMR9::GetAlphaBitmapParameters(VMR9AlphaBitmap* pBmpParms)
 	return S_OK;
 }
 
-STDMETHODIMP COuterVMR9::SetAlphaBitmap(const VMR9AlphaBitmap*  pBmpParms)
+STDMETHODIMP COuterVMR9::SetAlphaBitmap(const VMR9AlphaBitmap* pBmpParms)
 {
 	CheckPointer(pBmpParms, E_POINTER);
 	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);

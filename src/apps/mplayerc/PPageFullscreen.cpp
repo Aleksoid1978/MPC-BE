@@ -77,10 +77,7 @@ BEGIN_MESSAGE_MAP(CPPageFullscreen, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK3, OnUpdateApplyDefault)
 
 	ON_COMMAND(IDC_CHECK2, OnUpdateSetFullscreenRes)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK1, OnUpdateLaunchfullscreen)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK4, OnUpdateShowBarsWhenFullScreen)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK5, OnUpdateExitFullScreenAtTheEnd)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK6, OnUpdateExitFullScreenAtFocusLost)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT1, OnUpdateShowBarsWhenFullScreenTimeOut)
 	ON_UPDATE_COMMAND_UI(IDC_COMBO1, OnUpdateFullScrComboCtrl)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK7, OnUpdateSetGlobal)
@@ -426,27 +423,12 @@ void CPPageFullscreen::OnUpdateSetGlobal(CCmdUI* pCmdUI)
 	pCmdUI->Enable(m_bSetFullscreenRes == 2);
 }
 
-void CPPageFullscreen::OnUpdateLaunchfullscreen(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(!AfxGetAppSettings().IsD3DFullscreen());
-}
-
 void CPPageFullscreen::OnUpdateShowBarsWhenFullScreen(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(!AfxGetAppSettings().IsD3DFullscreen());
 }
 
 void CPPageFullscreen::OnUpdateShowBarsWhenFullScreenTimeOut(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(!AfxGetAppSettings().IsD3DFullscreen());
-}
-
-void CPPageFullscreen::OnUpdateExitFullScreenAtTheEnd(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(!AfxGetAppSettings().IsD3DFullscreen());
-}
-
-void CPPageFullscreen::OnUpdateExitFullScreenAtFocusLost(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(!AfxGetAppSettings().IsD3DFullscreen());
 }

@@ -352,10 +352,11 @@ STDMETHODIMP CEVRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, vo
 		hr = GetInterface((IQualProp*)this, ppv);
 	} else if (riid == __uuidof(IMFRateSupport)) {
 		hr = GetInterface((IMFRateSupport*)this, ppv);
-	} else if (riid == __uuidof(IDirect3DDeviceManager9))
-		//		hr = GetInterface((IDirect3DDeviceManager9*)this, ppv);
-	{
-		hr = m_pD3DManager->QueryInterface (__uuidof(IDirect3DDeviceManager9), (void**) ppv);
+	} else if (riid == __uuidof(IDirect3DDeviceManager9)) {
+		//hr = GetInterface((IDirect3DDeviceManager9*)this, ppv);
+		hr = m_pD3DManager->QueryInterface(__uuidof(IDirect3DDeviceManager9), (void**) ppv);
+	} else if (riid == __uuidof(ID3DFullscreenControl)) {
+		hr = GetInterface((ID3DFullscreenControl*)this, ppv);
 	} else {
 		hr = __super::NonDelegatingQueryInterface(riid, ppv);
 	}
@@ -1236,8 +1237,15 @@ STDMETHODIMP CEVRAllocatorPresenter::GetAspectRatioMode(DWORD *pdwAspectRatioMod
 
 STDMETHODIMP CEVRAllocatorPresenter::SetVideoWindow(HWND hwndVideo)
 {
-	ASSERT(m_hWnd == hwndVideo);	// What if not ??
-	//	m_hWnd = hwndVideo;
+	if (m_hWnd != hwndVideo) {
+		CAutoLock lock(this);
+		CAutoLock lock2(&m_ImageProcessingLock);
+		CAutoLock cRenderLock(&m_RenderLock);
+
+		m_hWnd = hwndVideo;
+		m_bPendingResetDevice = true;
+		SendResetRequest();
+	}
 	return S_OK;
 }
 
