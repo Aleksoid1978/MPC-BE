@@ -68,7 +68,6 @@ public:
 	HRESULT Create(CWnd* pWnd);
 
 	void Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB);
-	void Start(CWnd* pWnd, IMFVideoMixerBitmap* pVMB);
 	void Start(CWnd* pWnd, IMadVRTextOsd* pMVTO);
 	void Start(CWnd* pWnd);
 	void Stop();
@@ -90,8 +89,6 @@ public:
 	void OnMouseLeave();
 	bool OnLButtonDown(UINT nFlags, CPoint point);
 	bool OnLButtonUp(UINT nFlags, CPoint point);
-	bool bMouseOverCloseButton;
-	bool bMouseOverExitButton;
 
 	void SetWndRect(CRect rc) { m_MainWndRect = rc; };
 
@@ -102,12 +99,11 @@ public:
 	DECLARE_DYNAMIC(COSD)
 
 private :
-	CComPtr<IVMRMixerBitmap9>		m_pVMB;
-	CComPtr<IMFVideoMixerBitmap>	m_pMFVMB;
-	CComPtr<IMadVRTextOsd>			m_pMVTO;
+	CComPtr<IVMRMixerBitmap9>	m_pVMB;
+	CComPtr<IMadVRTextOsd>		m_pMVTO;
 
-	CMainFrame*						m_pMainFrame;
-	CWnd*							m_pWnd;
+	CMainFrame*			m_pMainFrame;
+	CWnd*				m_pWnd;
 
 	CCritSec			m_Lock;
 	CDC					m_MemDC;
@@ -142,6 +138,9 @@ private :
 	bool	m_bCursorMoving;
 	bool	m_bSeekBarVisible;
 	bool	m_bFlyBarVisible;
+	bool	m_bMouseOverCloseButton;
+	bool	m_bMouseOverExitButton;
+
 	__int64	m_llSeekMin;
 	__int64	m_llSeekMax;
 	__int64	m_llSeekPos;
@@ -189,7 +188,7 @@ private :
 	// Gdiplus::GdiplusStartupInput m_gdiplusStartupInput;
 	// ULONG_PTR m_gdiplusToken;
 
-	bool CheckWindowFromPoint(CPoint p) const;
+	bool CheckWindowFromCursor() const;
 
 protected:
 	BOOL PreCreateWindow(CREATESTRUCT& cs);

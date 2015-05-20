@@ -78,6 +78,8 @@ enum {
 	shader_count
 };
 
+class CFocusThread;
+
 // Guid to tag IMFSample with DirectX surface index
 static const GUID GUID_SURFACE_INDEX = { 0x30c8e9f6, 0x415, 0x4b81, { 0xa3, 0x15, 0x1, 0xa, 0xc6, 0xa9, 0xda, 0x19 } };
 
@@ -326,6 +328,7 @@ namespace GothSync
 		void EstimateRefreshTimings(); // Estimate the times for one scan line and one frame respectively from the actual refresh data
 		bool ExtractInterlaced(const AM_MEDIA_TYPE* pmt);
 
+		CFocusThread* m_FocusThread;
 	public:
 		CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);
 		~CBaseAP();
@@ -356,8 +359,8 @@ namespace GothSync
 		public IMFRateSupport,
 		public IMFVideoDisplayControl,
 		public IEVRTrustedVideoPlugin,
-		public ISyncClockAdviser
-
+		public ISyncClockAdviser,
+		public ID3DFullscreenControl
 	{
 	public:
 		CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);
@@ -451,6 +454,10 @@ namespace GothSync
 		STDMETHODIMP LockDevice(HANDLE hDevice, IDirect3DDevice9 **ppDevice, BOOL fBlock);
 		STDMETHODIMP UnlockDevice(HANDLE hDevice, BOOL fSaveState);
 		STDMETHODIMP GetVideoService(HANDLE hDevice, REFIID riid, void **ppService);
+
+		// ID3DFullscreenControl
+		STDMETHODIMP SetD3DFullscreen(bool fEnabled);
+		STDMETHODIMP GetD3DFullscreen(bool* pfEnabled);
 
 	protected:
 		void OnResetDevice();

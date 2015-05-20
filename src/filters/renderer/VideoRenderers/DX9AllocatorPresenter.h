@@ -32,11 +32,14 @@
 extern bool g_bNoDuration;
 extern bool g_bExternalSubtitleTime;
 
+class CFocusThread;
+
 namespace DSObjects
 {
 
 	class CDX9AllocatorPresenter
 		: public CDX9RenderingEngine
+		, public ID3DFullscreenControl
 	{
 	public:
 		CCritSec				m_VMR9AlphaBitmapLock;
@@ -297,6 +300,8 @@ namespace DSObjects
 		CCPUUsage				m_CPUUsage;
 		CGPUUsage				m_GPUUsage;
 
+		CFocusThread*			m_FocusThread;
+
 	public:
 		CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error);
 		~CDX9AllocatorPresenter();
@@ -315,5 +320,8 @@ namespace DSObjects
 			return m_bIsRendering;
 		}
 
+		// ID3DFullscreenControl
+		STDMETHODIMP SetD3DFullscreen(bool fEnabled);
+		STDMETHODIMP GetD3DFullscreen(bool* pfEnabled);
 	};
 }

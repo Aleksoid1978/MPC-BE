@@ -36,13 +36,12 @@ COSD::COSD(CMainFrame* pMainFrame)
 	, m_bSeekBarVisible(false)
 	, m_bFlyBarVisible(false)
 	, m_bCursorMoving(false)
-	, m_pMFVMB(NULL)
 	, m_pVMB(NULL)
 	, m_pMVTO(NULL)
 	, m_pWnd(NULL)
 	, m_FontSize(0)
-	, bMouseOverExitButton(false)
-	, bMouseOverCloseButton(false)
+	, m_bMouseOverExitButton(false)
+	, m_bMouseOverCloseButton(false)
 	, m_bShowMessage(true)
 	, m_OSDType(OSD_TYPE_NONE)
 	, m_pChapterBag(NULL)
@@ -168,7 +167,7 @@ void COSD::OnDrawWnd()
 
 void COSD::OnSize(UINT nType, int cx, int cy)
 {
-	if (m_pWnd && (m_pVMB || m_pMFVMB)) {
+	if (m_pWnd && m_pVMB) {
 		if (m_bSeekBarVisible || m_bFlyBarVisible) {
 			m_bCursorMoving		= false;
 			m_bSeekBarVisible	= false;
@@ -224,15 +223,6 @@ void COSD::UpdateBitmap()
 				m_VMR9AlphaBitmap.rDest.bottom	= 1.0;
 				m_VMR9AlphaBitmap.fAlpha		= 1.0;
 				m_VMR9AlphaBitmap.clrSrcKey		= m_Color[OSD_TRANSPARENT];
-			} else if (m_pMFVMB) {
-				ZeroMemory(&m_MFVideoAlphaBitmap, sizeof(m_MFVideoAlphaBitmap));
-				m_MFVideoAlphaBitmap.params.dwFlags			= MFVideoAlphaBitmap_SrcColorKey;
-				m_MFVideoAlphaBitmap.params.clrSrcKey		= m_Color[OSD_TRANSPARENT];
-				m_MFVideoAlphaBitmap.params.rcSrc			= m_rectWnd;
-				m_MFVideoAlphaBitmap.params.nrcDest.right	= 1;
-				m_MFVideoAlphaBitmap.params.nrcDest.bottom	= 1;
-				m_MFVideoAlphaBitmap.GetBitmapFromDC		= TRUE;
-				m_MFVideoAlphaBitmap.bitmap.hdc				= m_MemDC;
 			}
 			m_MemDC.SetTextColor(m_Color[OSD_TEXT]);
 			m_MemDC.SetBkMode(TRANSPARENT);
@@ -259,20 +249,6 @@ void COSD::Reset()
 void COSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 {
 	m_pVMB		= pVMB;
-	m_pMFVMB	= NULL;
-	m_pMVTO		= NULL;
-	m_pWnd		= pWnd;
-	m_OSDType	= OSD_TYPE_BITMAP;
-
-	Reset();
-
-	UpdateBitmap();
-}
-
-void COSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
-{
-	m_pMFVMB	= pMFVMB;
-	m_pVMB		= NULL;
 	m_pMVTO		= NULL;
 	m_pWnd		= pWnd;
 	m_OSDType	= OSD_TYPE_BITMAP;
@@ -284,7 +260,6 @@ void COSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
 
 void COSD::Start(CWnd* pWnd, IMadVRTextOsd* pMVTO)
 {
-	m_pMFVMB	= NULL;
 	m_pVMB		= NULL;
 	m_pMVTO		= pMVTO;
 	m_pWnd		= pWnd;
@@ -295,7 +270,6 @@ void COSD::Start(CWnd* pWnd, IMadVRTextOsd* pMVTO)
 
 void COSD::Start(CWnd* pWnd)
 {
-	m_pMFVMB	= NULL;
 	m_pVMB		= NULL;
 	m_pMVTO		= NULL;
 	m_pWnd		= pWnd;
@@ -306,16 +280,21 @@ void COSD::Start(CWnd* pWnd)
 
 void COSD::Stop()
 {
+	if (m_pWnd) {
+		m_pWnd->KillTimer((UINT_PTR)this);
+	}
+
+	m_bCursorMoving			= false;
+	m_bSeekBarVisible		= false;
+	m_bFlyBarVisible		= false;
+	m_bMouseOverExitButton	= false;
+	m_bMouseOverCloseButton	= false;
+
 	ClearMessage();
 
 	m_pVMB.Release();
-	m_pMFVMB.Release();
 	m_pMVTO.Release();
-
-	if (m_pWnd) {
-		m_pWnd->KillTimer((UINT_PTR)this);
-		m_pWnd = NULL;
-	}
+	m_pWnd = NULL;
 
 	Reset();
 }
@@ -421,12 +400,12 @@ void COSD::DrawFlyBar(CRect* rect)
 	DrawIconEx(m_MemDC, m_rectWnd.right - 62, 10, icoClose, 0, 0, 0, NULL, DI_NORMAL);
 	DestroyIcon(icoClose);
 
-	if (bMouseOverExitButton) {
+	if (m_bMouseOverExitButton) {
 		icoExit_a = m_pButtonsImages->ExtractIcon(1);
 		DrawIconEx(m_MemDC, m_rectWnd.right - 34, 10, icoExit_a, 0, 0, 0, NULL, DI_NORMAL);
 		DestroyIcon(icoExit_a);
 	}
-	if (bMouseOverCloseButton) {
+	if (m_bMouseOverCloseButton) {
 		icoClose_a = m_pButtonsImages->ExtractIcon(24);
 		DrawIconEx(m_MemDC, m_rectWnd.right - 62, 10, icoClose_a, 0, 0, 0, NULL, DI_NORMAL);
 		DestroyIcon(icoClose_a);
@@ -522,7 +501,7 @@ void COSD::InvalidateVMROSD()
 {
 	CAutoLock Lock(&m_Lock);
 
-	if (m_BitmapInfo.bmWidth * m_BitmapInfo.bmHeight * (m_BitmapInfo.bmBitsPixel >> 3) == 0) {
+	if (!m_BitmapInfo.bmWidth || !m_BitmapInfo.bmHeight || !m_BitmapInfo.bmBitsPixel || !m_pVMB) {
 		return;
 	}
 
@@ -538,19 +517,15 @@ void COSD::InvalidateVMROSD()
 	DrawMessage();
 	DrawDebug();
 
-	if (m_pVMB) {
-		m_VMR9AlphaBitmap.dwFlags &= ~VMRBITMAP_DISABLE;
-		m_pVMB->SetAlphaBitmap(&m_VMR9AlphaBitmap);
-	} else if (m_pMFVMB) {
-		m_pMFVMB->SetAlphaBitmap(&m_MFVideoAlphaBitmap);
-	}
+	m_VMR9AlphaBitmap.dwFlags &= ~VMRBITMAP_DISABLE;
+	m_pVMB->SetAlphaBitmap(&m_VMR9AlphaBitmap);
 
 	m_pMainFrame->RepaintVideo();
 }
 
 void COSD::UpdateSeekBarPos(CPoint point)
 {
-	m_llSeekPos = (point.x - m_rectBar.left) * (m_llSeekMax-m_llSeekMin) / (m_rectBar.Width() - SLIDER_CURSOR_WIDTH);
+	m_llSeekPos = (point.x - m_rectBar.left) * (m_llSeekMax - m_llSeekMin) / (m_rectBar.Width() - SLIDER_CURSOR_WIDTH);
 	m_llSeekPos = max (m_llSeekPos, m_llSeekMin);
 	m_llSeekPos = min (m_llSeekPos, m_llSeekMax);
 
@@ -563,10 +538,13 @@ void COSD::UpdateSeekBarPos(CPoint point)
 	}
 }
 
-bool COSD::CheckWindowFromPoint(CPoint p) const
+bool COSD::CheckWindowFromCursor() const
 {
 	if (m_pWnd) {
+		CPoint p;
+		GetCursorPos(&p);
 		CWnd* pWnd = WindowFromPoint(p);
+		
 		return (pWnd && *pWnd == *m_pWnd);
 	}
 
@@ -577,8 +555,8 @@ bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 {
 	bool bRet = false;
 
-	if (m_pVMB || m_pMFVMB) {
-		if (!CheckWindowFromPoint(point)) {
+	if (m_pVMB) {
+		if (!CheckWindowFromCursor()) {
 			OnMouseLeave();
 		} else if (m_bCursorMoving) {
 			SetCursor(m_HandCursor);
@@ -601,17 +579,17 @@ bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 				m_bFlyBarVisible = true;
 				InvalidateVMROSD();
 			} else {
-				if (!bMouseOverExitButton && m_rectExitButton.PtInRect(point)) {
-					bMouseOverCloseButton	= false;
-					bMouseOverExitButton	= true;
+				if (!m_bMouseOverExitButton && m_rectExitButton.PtInRect(point)) {
+					m_bMouseOverExitButton	= true;
+					m_bMouseOverCloseButton	= false;
 					InvalidateVMROSD();
-				} else if (!bMouseOverCloseButton && m_rectCloseButton.PtInRect(point)) {
-					bMouseOverExitButton	= false;
-					bMouseOverCloseButton	= true;
+				} else if (!m_bMouseOverCloseButton && m_rectCloseButton.PtInRect(point)) {
+					m_bMouseOverExitButton	= false;
+					m_bMouseOverCloseButton	= true;
 					InvalidateVMROSD();
-				} else if ((bMouseOverCloseButton && !m_rectCloseButton.PtInRect(point)) || (bMouseOverExitButton && !m_rectExitButton.PtInRect(point))) {
-					bMouseOverExitButton = false;
-					bMouseOverCloseButton = false;
+				} else if ((m_bMouseOverCloseButton && !m_rectCloseButton.PtInRect(point)) || (m_bMouseOverExitButton && !m_rectExitButton.PtInRect(point))) {
+					m_bMouseOverExitButton	= false;
+					m_bMouseOverCloseButton	= false;
 					InvalidateVMROSD();
 				}
 				
@@ -629,13 +607,13 @@ bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 
 void COSD::OnMouseLeave()
 {
-	const bool bHideBars = (m_pVMB || m_pMFVMB) && (m_bSeekBarVisible || m_bFlyBarVisible);
+	const bool bHideBars = (m_pVMB && (m_bSeekBarVisible || m_bFlyBarVisible));
 	
 	m_bCursorMoving			= false;
 	m_bSeekBarVisible		= false;
 	m_bFlyBarVisible		= false;
-	bMouseOverExitButton	= false;
-	bMouseOverCloseButton	= false;
+	m_bMouseOverExitButton	= false;
+	m_bMouseOverCloseButton	= false;
 
 	if (bHideBars) {
 		// Add new timer for removing any messages
@@ -651,8 +629,7 @@ bool COSD::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	bool bRet = false;
 
-	if ((m_pVMB || m_pMFVMB)
-			&& CheckWindowFromPoint(point)) {
+	if (m_pVMB && CheckWindowFromCursor()) {
 		if (m_rectCursor.PtInRect (point)) {
 			SetCursor(m_HandCursor);
 			m_bCursorMoving		= true;
@@ -674,8 +651,7 @@ bool COSD::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	bool bRet = false;
 
-	if ((m_pVMB || m_pMFVMB)
-			&& CheckWindowFromPoint(point)) {
+	if (m_pVMB && CheckWindowFromCursor()) {
 		m_bCursorMoving = false;
 
 		if (m_rectFlyBar.PtInRect(point)) {
@@ -748,11 +724,7 @@ void COSD::ClearMessage(bool hide)
 		m_VMR9AlphaBitmap.dwFlags	= VMRBITMAP_DISABLE;
 		m_pVMB->SetAlphaBitmap(&m_VMR9AlphaBitmap);
 		m_VMR9AlphaBitmap.dwFlags	= dwBackup;
-	} else if (m_pMFVMB) {
-		bRepaint = TRUE;
-		m_pMFVMB->ClearAlphaBitmap();
 	} else if (m_pMVTO) {
-		bRepaint = TRUE;
 		m_pMVTO->OsdClearMessage();
 	} else if (::IsWindow(m_hWnd) && IsWindowVisible()) {
 		PostMessage(WM_HIDE);
@@ -771,7 +743,7 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 
 	const CAppSettings& s = AfxGetAppSettings();
 
-	if (m_pVMB || m_pMFVMB) {
+	if (m_pVMB) {
 		if (nPos != OSD_DEBUG) {
 			m_nMessagePos	= nPos;
 			m_strMessage	= strMsg;
@@ -819,12 +791,6 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 		if (nPos != OSD_DEBUG) {
 			m_nMessagePos	= nPos;
 			m_strMessage	= strMsg;
-		} else {
-			m_debugMessages.AddTail(strMsg);
-			if ( m_debugMessages.GetCount() > 20 ) {
-				m_debugMessages.RemoveHead();
-			}
-			nDuration = -1;
 		}
 
 		m_FontSize = FontSize ? FontSize : s.nOSDSize;
@@ -861,7 +827,7 @@ void COSD::DebugMessage(LPCTSTR format, ...)
 
 void COSD::HideMessage(bool hide)
 {
-	if (m_pVMB || m_pMFVMB) {
+	if (m_pVMB) {
 		if (hide) {
 			ClearMessage(true);
 		} else {

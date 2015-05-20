@@ -255,6 +255,11 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CComPtr<IMFVideoDisplayControl> m_pMFVDC;
 	CComPtr<IMFVideoProcessor>      m_pMFVP;
 	CComPtr<IAMLine21Decoder_2>     m_pLN21;
+	CComPtr<IVMRWindowlessControl9> m_pVMRWC;
+
+	CComPtr<IVMRMixerBitmap9>		m_pVMB;
+	CComPtr<IMadVRTextOsd>			m_pMVTO;
+
 
 	CComPtr<ISubPicAllocatorPresenter>  m_pCAP;
 	CComPtr<ISubPicAllocatorPresenter2> m_pCAP2;
@@ -439,6 +444,7 @@ public:
 public:
 	bool m_bFullScreen;
 	bool m_bFirstFSAfterLaunchOnFullScreen;
+	bool m_bStartInD3DFullscreen;
 	bool m_bHideCursor;
 
 	CMenu m_navMixAudioMenu, m_navMixSubtitleMenu;
@@ -464,7 +470,9 @@ public:
 	bool IsInteractiveVideo() const {
 		return(m_fShockwaveGraph);
 	}
+	
 	bool IsD3DFullScreenMode() const;
+	void DestroyD3DWindow();
 
 	CControlBar* m_pLastBar;
 
@@ -512,7 +520,7 @@ protected:
 	void OpenSetupStatusBar();
 	// void OpenSetupToolBar();
 	void OpenSetupCaptureBar();
-	void OpenSetupWindowTitle(CString fn = _T(""));
+	void OpenSetupWindowTitle(CString fn);
 	void AutoChangeMonitorMode();
 	double miFPS;
 
@@ -550,7 +558,10 @@ public:
 	void SetTrayTip(CString str);
 
 	CSize GetVideoSize();
+	
 	void ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasTo);
+	void ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo);
+
 	void MoveVideoWindow(bool bShowStats = false, bool bForcedSetVideoRect = false);
 	void RepaintVideo();
 	void HideVideoWindow(bool fHide);

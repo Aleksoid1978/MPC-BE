@@ -92,13 +92,10 @@ public:
 	afx_msg void OnUpdateSetGlobal(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateFullScrComboCtrl(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateSetFullscreenRes();
-	afx_msg void OnUpdateLaunchfullscreen(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateShowBarsWhenFullScreen(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateExitFullScreenAtTheEnd(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateShowBarsWhenFullScreenTimeOut(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateStatic1(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateStatic2(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateExitFullScreenAtFocusLost(CCmdUI* pCmdUI);
 
 	afx_msg void OnUpdateFullScrCombo();
 	afx_msg void OnUpdateTimeout(CCmdUI* pCmdUI);
