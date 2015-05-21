@@ -254,7 +254,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_MESSAGE(WM_XBUTTONDBLCLK, OnXButtonDblClk)
 	ON_WM_MOUSEWHEEL()
 	ON_WM_MOUSEMOVE()
-	ON_WM_MOUSELEAVE()
 
 	ON_WM_NCHITTEST()
 
@@ -3250,60 +3249,57 @@ BOOL CMainFrame::OnButton(UINT id, UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	if (!m_OSD.OnLButtonDown(nFlags, point)) {
-		SetFocus();
+	SetFocus();
 
-		bDVDMenuClicked = false;
-		bDVDButtonAtPosition = false;
+	bDVDMenuClicked = false;
+	bDVDButtonAtPosition = false;
 
-		if (GetPlaybackMode() == PM_DVD) {
-			CRect vid_rect = m_wndView.GetVideoRect();
-			m_wndView.MapWindowPoints(this, &vid_rect);
+	if (GetPlaybackMode() == PM_DVD) {
+		CRect vid_rect = m_wndView.GetVideoRect();
+		m_wndView.MapWindowPoints(this, &vid_rect);
 
-			CPoint pDVD = point - vid_rect.TopLeft();
+		CPoint pDVD = point - vid_rect.TopLeft();
 
-			ULONG pulButtonIndex;
-			if (SUCCEEDED(m_pDVDI->GetButtonAtPosition(pDVD, &pulButtonIndex))) {
-				bDVDButtonAtPosition = true;
-			}
-
-			if (SUCCEEDED(m_pDVDC->ActivateAtPosition(pDVD))
-					|| m_iDVDDomain == DVD_DOMAIN_VideoManagerMenu
-					|| m_iDVDDomain == DVD_DOMAIN_VideoTitleSetMenu) {
-				bDVDMenuClicked = true;
-			}
+		ULONG pulButtonIndex;
+		if (SUCCEEDED(m_pDVDI->GetButtonAtPosition(pDVD, &pulButtonIndex))) {
+			bDVDButtonAtPosition = true;
 		}
 
-		CPoint p;
-		GetCursorPos(&p);
-
-		CRect r(0,0,0,0);
-		if (m_pFullscreenWnd && m_pFullscreenWnd->IsWindow()) {
-			m_pFullscreenWnd->GetWindowRect(r);
+		if (SUCCEEDED(m_pDVDC->ActivateAtPosition(pDVD))
+				|| m_iDVDDomain == DVD_DOMAIN_VideoManagerMenu
+				|| m_iDVDDomain == DVD_DOMAIN_VideoTitleSetMenu) {
+			bDVDMenuClicked = true;
 		}
-
-		CWnd* pWnd = WindowFromPoint(p);
-		bool bFSWnd = false;
-		if (pWnd && *m_pFullscreenWnd == *pWnd && r.PtInRect(p)) {
-			bFSWnd = true;
-		}
-
-		m_bLeftMouseDown = TRUE;
-
-		if (m_bFullScreen || bFSWnd) {
-			if (AssignedToCmd(wmcmd::LDOWN, m_bFullScreen)) {
-				m_bLeftMouseDownFullScreen = TRUE;
-				OnButton(wmcmd::LDOWN, nFlags, point);
-			}
-			return;
-		}
-
-		templclick = false;
-		SetCapture();
-		return;
-
-		__super::OnLButtonDown(nFlags, point);
 	}
+
+	CPoint p;
+	GetCursorPos(&p);
+
+	CRect r(0,0,0,0);
+	if (m_pFullscreenWnd && m_pFullscreenWnd->IsWindow()) {
+		m_pFullscreenWnd->GetWindowRect(r);
+	}
+
+	CWnd* pWnd = WindowFromPoint(p);
+	bool bFSWnd = false;
+	if (pWnd && *m_pFullscreenWnd == *pWnd && r.PtInRect(p)) {
+		bFSWnd = true;
+	}
+
+	m_bLeftMouseDown = TRUE;
+
+	if (m_bFullScreen || bFSWnd) {
+		if (AssignedToCmd(wmcmd::LDOWN, m_bFullScreen)) {
+			m_bLeftMouseDownFullScreen = TRUE;
+			OnButton(wmcmd::LDOWN, nFlags, point);
+		}
+		return;
+	}
+
+	templclick = false;
+	SetCapture();
+
+	__super::OnLButtonDown(nFlags, point);
 }
 
 void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
@@ -3315,43 +3311,41 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		return;
 	}
 
-	if (!m_OSD.OnLButtonUp(nFlags, point)) {
-		if (bDVDMenuClicked) {
-			PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
-			return;
-		}
-
-		if (!m_bLeftMouseDown) {
-			return;
-		}
-
-		CPoint p;
-		GetCursorPos(&p);
-		CWnd* pWnd = WindowFromPoint(p);
-		CRect r(0,0,0,0);
-		if (m_pFullscreenWnd && m_pFullscreenWnd->IsWindow()) {
-			m_pFullscreenWnd->GetWindowRect(r);
-		}
-
-		bool bFSWnd = false;
-		if (pWnd && *m_pFullscreenWnd == *pWnd && r.PtInRect(p)) {
-			bFSWnd = true;
-		}
-
-		bool fLeftDownMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_bFullScreen);
-		if (!fLeftDownMouseBtnUnassigned && !m_bFullScreen && !bFSWnd) {
-			OnButton(wmcmd::LDOWN, nFlags, point);
-			return;
- 		}
-
-		bool fLeftUpMouseBtnUnassigned = !AssignedToCmd(wmcmd::LUP, m_bFullScreen);
-		if (!fLeftUpMouseBtnUnassigned && !m_bFullScreen) {
-			OnButton(wmcmd::LUP, nFlags, point);
-			return;
- 		}
-
-		__super::OnLButtonUp(nFlags, point);
+	if (bDVDMenuClicked) {
+		PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+		return;
 	}
+
+	if (!m_bLeftMouseDown) {
+		return;
+	}
+
+	CPoint p;
+	GetCursorPos(&p);
+	CWnd* pWnd = WindowFromPoint(p);
+	CRect r(0,0,0,0);
+	if (m_pFullscreenWnd && m_pFullscreenWnd->IsWindow()) {
+		m_pFullscreenWnd->GetWindowRect(r);
+	}
+
+	bool bFSWnd = false;
+	if (pWnd && *m_pFullscreenWnd == *pWnd && r.PtInRect(p)) {
+		bFSWnd = true;
+	}
+
+	bool fLeftDownMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_bFullScreen);
+	if (!fLeftDownMouseBtnUnassigned && !m_bFullScreen && !bFSWnd) {
+		OnButton(wmcmd::LDOWN, nFlags, point);
+		return;
+ 	}
+
+	bool fLeftUpMouseBtnUnassigned = !AssignedToCmd(wmcmd::LUP, m_bFullScreen);
+	if (!fLeftUpMouseBtnUnassigned && !m_bFullScreen) {
+		OnButton(wmcmd::LUP, nFlags, point);
+		return;
+ 	}
+
+	__super::OnLButtonUp(nFlags, point);
 }
 
 void CMainFrame::OnLButtonDblClk(UINT nFlags, CPoint point)
@@ -3495,123 +3489,112 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
  	}
 	templclick = true;
 
-	if (IsD3DFullScreenMode() && m_OSD.OnMouseMove(nFlags, point)) {
-		KillTimer(TIMER_FULLSCREENMOUSEHIDER);
-	} else {
-		if (GetPlaybackMode() == PM_DVD) {
-			CRect vid_rect = m_wndView.GetVideoRect();
-			m_wndView.MapWindowPoints(this, &vid_rect);
+	if (GetPlaybackMode() == PM_DVD) {
+		CRect vid_rect = m_wndView.GetVideoRect();
+		m_wndView.MapWindowPoints(this, &vid_rect);
 
-			CPoint vp = point - vid_rect.TopLeft();
-			ULONG pulButtonIndex;
+		CPoint vp = point - vid_rect.TopLeft();
+		ULONG pulButtonIndex;
 
-			if (!m_bHideCursor) {
-				SetCursor(LoadCursor(NULL, SUCCEEDED(m_pDVDI->GetButtonAtPosition(vp, &pulButtonIndex)) ? IDC_HAND : IDC_ARROW));
-			}
-			m_pDVDC->SelectAtPosition(vp);
+		if (!m_bHideCursor) {
+			SetCursor(LoadCursor(NULL, SUCCEEDED(m_pDVDI->GetButtonAtPosition(vp, &pulButtonIndex)) ? IDC_HAND : IDC_ARROW));
 		}
+		m_pDVDC->SelectAtPosition(vp);
+	}
 
-		CSize diff = m_lastMouseMove - point;
-		AppSettings& s = AfxGetAppSettings();
+	CSize diff = m_lastMouseMove - point;
+	AppSettings& s = AfxGetAppSettings();
 
-		if (IsD3DFullScreenMode() && (abs(diff.cx) + abs(diff.cy)) >= 1) {
-			m_pFullscreenWnd->ShowCursor(true);
+	if (IsD3DFullScreenMode() && (abs(diff.cx) + abs(diff.cy)) >= 1) {
+		m_pFullscreenWnd->ShowCursor(true);
 
-			KillTimer(TIMER_FULLSCREENMOUSEHIDER);
+		KillTimer(TIMER_FULLSCREENMOUSEHIDER);
+		SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, NULL);
+	} else if (m_bFullScreen && (abs(diff.cx) + abs(diff.cy)) >= 1) {
+		int nTimeOut = s.nShowBarsWhenFullScreenTimeOut;
+
+		if (nTimeOut < 0) {
+			m_bHideCursor = false;
+			if (s.fShowBarsWhenFullScreen) {
+				ShowControls(s.nCS);
+				if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && s.iDefaultCaptureDevice == 1) {
+					m_wndNavigationBar.m_navdlg.UpdateElementList();
+					m_wndNavigationBar.ShowControls(this, TRUE);
+				}
+			}
+
+			KillTimer(TIMER_FULLSCREENCONTROLBARHIDER);
 			SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, NULL);
-		} else if (m_bFullScreen && (abs(diff.cx) + abs(diff.cy)) >= 1) {
-			int nTimeOut = s.nShowBarsWhenFullScreenTimeOut;
+		} else if (nTimeOut == 0) {
+			CRect r;
+			GetClientRect(r);
+			r.top = r.bottom;
 
-			if (nTimeOut < 0) {
-				m_bHideCursor = false;
+			POSITION pos = m_bars.GetHeadPosition();
+			for (int i = 1; pos; i <<= 1) {
+				CControlBar* pNext = m_bars.GetNext(pos);
+				CSize size = pNext->CalcFixedLayout(FALSE, TRUE);
+				if (s.nCS&i) {
+					r.top -= size.cy;
+				}
+			}
+
+			// HACK: the controls would cover the menu too early hiding some buttons
+			if (GetPlaybackMode() == PM_DVD
+					&& (m_iDVDDomain == DVD_DOMAIN_VideoManagerMenu
+						|| m_iDVDDomain == DVD_DOMAIN_VideoTitleSetMenu)) {
+				r.top = r.bottom - 10;
+			}
+
+			m_bHideCursor = false;
+
+			if (r.PtInRect(point)) {
 				if (s.fShowBarsWhenFullScreen) {
 					ShowControls(s.nCS);
-					if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && s.iDefaultCaptureDevice == 1) {
+				}
+			} else {
+				if (s.fShowBarsWhenFullScreen) {
+					ShowControls(CS_NONE, false);
+				}
+			}
+
+			// PM_CAPTURE: Left Navigation panel for switching channels
+			if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && s.iDefaultCaptureDevice == 1) {
+				CRect rLeft;
+				GetClientRect(rLeft);
+				rLeft.right = rLeft.left;
+				CSize size = m_wndNavigationBar.CalcFixedLayout(FALSE, TRUE);
+				rLeft.right += size.cx;
+
+				m_bHideCursor = false;
+
+				if (rLeft.PtInRect(point)) {
+					if (s.fShowBarsWhenFullScreen) {
 						m_wndNavigationBar.m_navdlg.UpdateElementList();
 						m_wndNavigationBar.ShowControls(this, TRUE);
 					}
-				}
-
-				KillTimer(TIMER_FULLSCREENCONTROLBARHIDER);
-				SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, NULL);
-			} else if (nTimeOut == 0) {
-				CRect r;
-				GetClientRect(r);
-				r.top = r.bottom;
-
-				POSITION pos = m_bars.GetHeadPosition();
-				for (int i = 1; pos; i <<= 1) {
-					CControlBar* pNext = m_bars.GetNext(pos);
-					CSize size = pNext->CalcFixedLayout(FALSE, TRUE);
-					if (s.nCS&i) {
-						r.top -= size.cy;
-					}
-				}
-
-				// HACK: the controls would cover the menu too early hiding some buttons
-				if (GetPlaybackMode() == PM_DVD
-						&& (m_iDVDDomain == DVD_DOMAIN_VideoManagerMenu
-							|| m_iDVDDomain == DVD_DOMAIN_VideoTitleSetMenu)) {
-					r.top = r.bottom - 10;
-				}
-
-				m_bHideCursor = false;
-
-				if (r.PtInRect(point)) {
-					if (s.fShowBarsWhenFullScreen) {
-						ShowControls(s.nCS);
-					}
 				} else {
 					if (s.fShowBarsWhenFullScreen) {
-						ShowControls(CS_NONE, false);
+						m_wndNavigationBar.ShowControls(this, FALSE);
 					}
 				}
-
-				// PM_CAPTURE: Left Navigation panel for switching channels
-				if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && s.iDefaultCaptureDevice == 1) {
-					CRect rLeft;
-					GetClientRect(rLeft);
-					rLeft.right = rLeft.left;
-					CSize size = m_wndNavigationBar.CalcFixedLayout(FALSE, TRUE);
-					rLeft.right += size.cx;
-
-					m_bHideCursor = false;
-
-					if (rLeft.PtInRect(point)) {
-						if (s.fShowBarsWhenFullScreen) {
-							m_wndNavigationBar.m_navdlg.UpdateElementList();
-							m_wndNavigationBar.ShowControls(this, TRUE);
-						}
-					} else {
-						if (s.fShowBarsWhenFullScreen) {
-							m_wndNavigationBar.ShowControls(this, FALSE);
-						}
-					}
-				}
-
-				SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, NULL);
-			} else {
-				m_bHideCursor = false;
-				if (s.fShowBarsWhenFullScreen) {
-					ShowControls(s.nCS);
-				}
-
-				SetTimer(TIMER_FULLSCREENCONTROLBARHIDER, nTimeOut * 1000, NULL);
-				SetTimer(TIMER_FULLSCREENMOUSEHIDER, max(nTimeOut * 1000, 2000), NULL);
 			}
+
+			SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, NULL);
+		} else {
+			m_bHideCursor = false;
+			if (s.fShowBarsWhenFullScreen) {
+				ShowControls(s.nCS);
+			}
+
+			SetTimer(TIMER_FULLSCREENCONTROLBARHIDER, nTimeOut * 1000, NULL);
+			SetTimer(TIMER_FULLSCREENMOUSEHIDER, max(nTimeOut * 1000, 2000), NULL);
 		}
-
-		m_lastMouseMove = point;
-
-		__super::OnMouseMove(nFlags, point);
 	}
-}
 
-void CMainFrame::OnMouseLeave()
-{
-	m_OSD.OnMouseLeave();
+	m_lastMouseMove = point;
 
-	__super::OnMouseLeave();
+	__super::OnMouseMove(nFlags, point);
 }
 
 void CMainFrame::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
