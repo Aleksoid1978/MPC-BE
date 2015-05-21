@@ -188,8 +188,6 @@ private :
 	// Gdiplus::GdiplusStartupInput m_gdiplusStartupInput;
 	// ULONG_PTR m_gdiplusToken;
 
-	bool CheckWindowFromCursor() const;
-
 protected:
 	BOOL PreCreateWindow(CREATESTRUCT& cs);
 	BOOL PreTranslateMessage(MSG* pMsg);

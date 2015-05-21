@@ -32,7 +32,7 @@ public:
 	virtual ~CFullscreenWnd();
 
 	void ShowCursor(bool bVisible);
-	bool IsWindow();
+	bool IsWindow() const;
 
 protected:
 	DECLARE_MESSAGE_MAP()
@@ -45,6 +45,11 @@ protected:
 	HCURSOR		m_hCursor;
 	bool		m_bCursorVisible;
 public:
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnMouseLeave();
+
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 };

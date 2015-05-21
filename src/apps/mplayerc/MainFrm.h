@@ -209,6 +209,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	friend class CPPageFileInfoSheet;
 	friend class CPPageLogo;
 	friend class CSubtitleDlDlg;
+	friend class CFullscreenWnd;
 
 	// TODO: wrap these graph objects into a class to make it look cleaner
 
@@ -732,7 +733,6 @@ public:
 	afx_msg LRESULT OnXButtonDblClk(WPARAM wParam, LPARAM lParam);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-	afx_msg void OnMouseLeave();
 
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 

@@ -28,10 +28,10 @@
 IMPLEMENT_DYNAMIC(CFullscreenWnd, CWnd)
 
 CFullscreenWnd::CFullscreenWnd(CMainFrame* pMainFrame)
+	: m_pMainFrame(pMainFrame)
+	, m_hCursor(::LoadCursor(NULL, IDC_ARROW))
+	, m_bCursorVisible(false)
 {
-	m_pMainFrame		= pMainFrame;
-	m_hCursor			= ::LoadCursor(NULL, IDC_ARROW);
-	m_bCursorVisible	= false;
 }
 
 CFullscreenWnd::~CFullscreenWnd()
@@ -39,6 +39,10 @@ CFullscreenWnd::~CFullscreenWnd()
 }
 
 BEGIN_MESSAGE_MAP(CFullscreenWnd, CWnd)
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
+	ON_WM_MOUSEMOVE()
+	ON_WM_MOUSELEAVE()
 	ON_WM_ERASEBKGND()
 	ON_WM_SETCURSOR()
 END_MESSAGE_MAP()
@@ -57,8 +61,6 @@ LRESULT CFullscreenWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 BOOL CFullscreenWnd::PreTranslateMessage(MSG* pMsg)
 {
 	switch (pMsg->message) {
-		case WM_MOUSEMOVE :
-		case WM_MOUSELEAVE :
 		case WM_SYSKEYDOWN :
 		case WM_SYSKEYUP :
 		case WM_SYSCHAR :
@@ -68,8 +70,6 @@ BOOL CFullscreenWnd::PreTranslateMessage(MSG* pMsg)
 		case WM_KEYUP :
 		case WM_CHAR :
 
-		case WM_LBUTTONDOWN :
-		case WM_LBUTTONUP :
 		case WM_LBUTTONDBLCLK :
 		case WM_MBUTTONDOWN :
 		case WM_MBUTTONUP :
@@ -95,12 +95,61 @@ BOOL CFullscreenWnd::PreCreateWindow(CREATESTRUCT& cs)
 	}
 
 	cs.style &= ~WS_BORDER;
-	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW|CS_VREDRAW|CS_DBLCLKS, m_hCursor, HBRUSH(COLOR_WINDOW+1), NULL);
+	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS,
+									   m_hCursor, HBRUSH(COLOR_WINDOW + 1));
 
 	return TRUE;
 }
 
 // CFullscreenWnd message handlers
+
+void CFullscreenWnd::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	if (m_pMainFrame) {
+		if (!(m_pMainFrame->IsD3DFullScreenMode() && m_pMainFrame->m_OSD.OnLButtonDown(nFlags, point))) {
+			m_pMainFrame->PostMessage(WM_LBUTTONDOWN, nFlags, MAKELPARAM(point.x, point.y));
+		}
+		return;
+	}
+
+	CWnd::OnLButtonDown(nFlags, point);
+}
+
+void CFullscreenWnd::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	if (m_pMainFrame) {
+		if (!(m_pMainFrame->IsD3DFullScreenMode() && m_pMainFrame->m_OSD.OnLButtonUp(nFlags, point))) {
+			m_pMainFrame->PostMessage(WM_RBUTTONDOWN, nFlags, MAKELPARAM(point.x, point.y));
+		}
+		return;
+	}
+
+	CWnd::OnLButtonUp(nFlags, point);
+}
+
+void CFullscreenWnd::OnMouseMove(UINT nFlags, CPoint point)
+{
+	if (m_pMainFrame) {
+		if (m_pMainFrame->IsD3DFullScreenMode() && m_pMainFrame->m_OSD.OnMouseMove(nFlags, point)) {
+			m_pMainFrame->KillTimer(CMainFrame::TIMER_FULLSCREENMOUSEHIDER);
+		} else {
+			m_pMainFrame->PostMessage(WM_MOUSEMOVE, nFlags, MAKELPARAM(point.x, point.y));
+		}
+		return;
+	}
+
+	CWnd::OnMouseMove(nFlags, point);
+}
+
+void CFullscreenWnd::OnMouseLeave()
+{
+	if (m_pMainFrame) {
+		m_pMainFrame->m_OSD.OnMouseLeave();
+		return;
+	}
+
+	CWnd::OnMouseLeave();
+}
 
 BOOL CFullscreenWnd::OnEraseBkgnd(CDC* pDC)
 {
@@ -126,7 +175,7 @@ void CFullscreenWnd::ShowCursor(bool bVisible)
 	}
 }
 
-bool CFullscreenWnd::IsWindow()
+bool CFullscreenWnd::IsWindow() const
 {
 	return (m_hWnd != NULL);
 }

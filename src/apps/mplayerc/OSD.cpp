@@ -538,27 +538,12 @@ void COSD::UpdateSeekBarPos(CPoint point)
 	}
 }
 
-bool COSD::CheckWindowFromCursor() const
-{
-	if (m_pWnd) {
-		CPoint p;
-		GetCursorPos(&p);
-		CWnd* pWnd = WindowFromPoint(p);
-		
-		return (pWnd && *pWnd == *m_pWnd);
-	}
-
-	return false;
-}
-
 bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 {
 	bool bRet = false;
 
 	if (m_pVMB) {
-		if (!CheckWindowFromCursor()) {
-			OnMouseLeave();
-		} else if (m_bCursorMoving) {
+		if (m_bCursorMoving) {
 			SetCursor(m_HandCursor);
 			bRet = true;
 			UpdateSeekBarPos(point);
@@ -629,7 +614,7 @@ bool COSD::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	bool bRet = false;
 
-	if (m_pVMB && CheckWindowFromCursor()) {
+	if (m_pVMB) {
 		if (m_rectCursor.PtInRect (point)) {
 			SetCursor(m_HandCursor);
 			m_bCursorMoving		= true;
@@ -651,7 +636,7 @@ bool COSD::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	bool bRet = false;
 
-	if (m_pVMB && CheckWindowFromCursor()) {
+	if (m_pVMB) {
 		m_bCursorMoving = false;
 
 		if (m_rectFlyBar.PtInRect(point)) {
