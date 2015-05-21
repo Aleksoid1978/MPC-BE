@@ -22,6 +22,7 @@
 #include "OSD.h"
 #include "../../DSUtil/SysVersion.h"
 #include "MainFrm.h"
+#include "FullscreenWnd.h"
 
 #define SEEKBAR_HEIGHT			60
 #define SLIDER_BAR_HEIGHT		10
@@ -53,8 +54,6 @@ COSD::COSD(CMainFrame* pMainFrame)
 		m_nDEFFLAGS &= ~SWP_NOZORDER;
 		m_pWndInsertAfter = &wndTop;
 	}
-
-	m_HandCursor = LoadCursor(NULL, IDC_HAND);
 
 	m_Color[OSD_TRANSPARENT]	= RGB(  0,   0,   0);
 	m_Color[OSD_BACKGROUND]		= RGB( 32,  40,  48);
@@ -544,23 +543,20 @@ bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (m_pVMB) {
 		if (m_bCursorMoving) {
-			SetCursor(m_HandCursor);
 			bRet = true;
 			UpdateSeekBarPos(point);
 			InvalidateVMROSD();
 		} else if (m_rectSeekBar.PtInRect(point)) {
 			bRet = true;
 			if (!m_bSeekBarVisible) {
+				m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_HAND);
 				m_bSeekBarVisible = true;
 				InvalidateVMROSD();
-			}
-
-			if (m_rectCursor.PtInRect(point)) {
-				SetCursor(m_HandCursor);
 			}
 		} else if (m_rectFlyBar.PtInRect(point)) {
 			bRet = true;
 			if (!m_bFlyBarVisible) {
+				m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_ARROW);
 				m_bFlyBarVisible = true;
 				InvalidateVMROSD();
 			} else {
@@ -579,7 +575,9 @@ bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 				}
 				
 				if (m_rectCloseButton.PtInRect(point) || m_rectExitButton.PtInRect(point)) {
-					SetCursor(m_HandCursor);
+					m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_HAND);
+				} else {
+					m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_ARROW);				
 				}
 			}
 		} else if (m_bSeekBarVisible || m_bFlyBarVisible) {
@@ -592,6 +590,8 @@ bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 
 void COSD::OnMouseLeave()
 {
+	m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_ARROW);
+
 	const bool bHideBars = (m_pVMB && (m_bSeekBarVisible || m_bFlyBarVisible));
 	
 	m_bCursorMoving			= false;
@@ -616,7 +616,6 @@ bool COSD::OnLButtonDown(UINT nFlags, CPoint point)
 
 	if (m_pVMB) {
 		if (m_rectCursor.PtInRect (point)) {
-			SetCursor(m_HandCursor);
 			m_bCursorMoving		= true;
 			bRet				= true;
 		} else if (m_rectExitButton.PtInRect(point) || m_rectCloseButton.PtInRect(point)) {
