@@ -164,9 +164,7 @@ private :
 	CCritSec				m_CBLock;
 	CComPtr<IDSMChapterBag>	m_pChapterBag;
 
-	UINT	m_nDEFFLAGS;
-
-	HCURSOR	m_HandCursor;
+	UINT m_nDEFFLAGS;
 
 	void UpdateBitmap();
 	void CalcRect();

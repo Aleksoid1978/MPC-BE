@@ -175,6 +175,13 @@ void CFullscreenWnd::ShowCursor(bool bVisible)
 	}
 }
 
+void CFullscreenWnd::SetCursor(LPCWSTR lpCursorName)
+{
+	m_hCursor = ::LoadCursor(NULL, lpCursorName);
+	m_bCursorVisible = true;
+	PostMessage(WM_SETCURSOR, 0, 0);
+}
+
 bool CFullscreenWnd::IsWindow() const
 {
 	return (m_hWnd != NULL);

@@ -32,6 +32,7 @@ public:
 	virtual ~CFullscreenWnd();
 
 	void ShowCursor(bool bVisible);
+	void SetCursor(LPCWSTR lpCursorName);
 	bool IsWindow() const;
 
 protected:
