@@ -54,7 +54,7 @@ File__ReferenceFilesHelper::File__ReferenceFilesHelper(File__Analyze* MI_, Media
     TestContinuousFileNames=false;
     ContainerHasNoId=false;
     ID_Max=0;
-    
+
     //Private
     Sequences_Current=0;
     MI=MI_;

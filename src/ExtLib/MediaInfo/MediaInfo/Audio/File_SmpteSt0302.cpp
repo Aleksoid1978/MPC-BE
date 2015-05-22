@@ -121,7 +121,7 @@ void File_SmpteSt0302::Streams_Fill()
 
     for (size_t Pos=0; Pos<Count_Get(Stream_Audio); Pos++)
         if (Retrieve(Stream_Audio, Pos, Audio_MuxingMode).empty()) //TODO: put "SMPTE ST 302" in this field, the current name is there only for legacy
-            Fill(Stream_Audio, 0, Audio_MuxingMode, "AES3");
+            Fill(Stream_Audio, 0, Audio_MuxingMode, "SMPTE ST 302");
 
     if (Count_Get(Stream_Audio)==1)
     {
@@ -129,8 +129,8 @@ void File_SmpteSt0302::Streams_Fill()
            Fill(Stream_Audio, 0, Audio_BitRate, (4+bits_per_sample)*(1+number_channels)*8*48000);
         if (Retrieve(Stream_Audio, 0, Audio_Format)==__T("PCM"))
         {
-            Fill(Stream_Audio, 0, Audio_Codec, "AES3", Unlimited, true, true);
-            Fill(Stream_Audio, 0, Audio_Codec_String, "AES3", Unlimited, true, true);
+            Fill(Stream_Audio, 0, Audio_Codec, "SMPTE ST 302", Unlimited, true, true);
+            Fill(Stream_Audio, 0, Audio_Codec_String, "SMPTE ST 302", Unlimited, true, true);
             Clear(Stream_Audio, 0, Audio_Codec_Family);
         }
     }

@@ -1919,9 +1919,6 @@ File_Mxf::File_Mxf()
     IdIsAlwaysSame_Offset=0;
     PartitionMetadata_PreviousPartition=(int64u)-1;
     PartitionMetadata_FooterPartition=(int64u)-1;
-    TimeCode_StartTimecode=(int64u)-1;
-    TimeCode_RoundedTimecodeBase=0;
-    TimeCode_DropFrame=false;
     DTS_Delay=0;
     StreamPos_StartAtOne=true;
     SDTI_TimeCode_StartTimecode_ms=(int64u)-1;
@@ -2469,19 +2466,19 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
 
     for (std::map<std::string, Ztring>::iterator Info=Essence->second.Infos.begin(); Info!=Essence->second.Infos.end(); ++Info)
         Fill(StreamKind_Last, StreamPos_Last, Info->first.c_str(), Info->second, true);
-    if (TimeCode_RoundedTimecodeBase && TimeCode_StartTimecode!=(int64u)-1)
+    if (MxfTimeCodeForDelay.RoundedTimecodeBase && MxfTimeCodeForDelay.StartTimecode!=(int64u)-1)
     {
-        float64 TimeCode_StartTimecode_Temp=((float64)(TimeCode_StartTimecode+Config->File_IgnoreEditsBefore))/TimeCode_RoundedTimecodeBase;
-        if (TimeCode_DropFrame)
+        float64 TimeCode_StartTimecode_Temp=((float64)(MxfTimeCodeForDelay.StartTimecode+Config->File_IgnoreEditsBefore))/MxfTimeCodeForDelay.RoundedTimecodeBase;
+        if (MxfTimeCodeForDelay.DropFrame)
         {
             TimeCode_StartTimecode_Temp*=1001;
             TimeCode_StartTimecode_Temp/=1000;
         }
         Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay), TimeCode_StartTimecode_Temp*1000, 0, true);
         Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay_Source), "Container");
-        Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay_DropFrame), TimeCode_DropFrame?"Yes":"No");
+        Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay_DropFrame), MxfTimeCodeForDelay.DropFrame?"Yes":"No");
 
-        //TimeCode TC(TimeCode_StartTimecode, TimeCode_RoundedTimecodeBase, TimeCode_DropFrame);
+        //TimeCode TC(MxfTimeCodeForDelay.StartTimecode, MxfTimeCodeForDelay.RoundedTimecodeBase, MxfTimeCodeForDelay.DropFrame);
         //Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_TimeCode_FirstFrame), TC.ToString().c_str());
         //Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_TimeCode_Source), "Time code track (stripped)");
     }
@@ -2693,10 +2690,10 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
                 Stream_Prepare(Stream_Audio);
                 size_t Pos=Count_Get(Stream_Audio)-1;
                 (*Parser)->Finish();
-                if (TimeCode_RoundedTimecodeBase && TimeCode_StartTimecode!=(int64u)-1)
+                if (MxfTimeCodeForDelay.RoundedTimecodeBase && MxfTimeCodeForDelay.StartTimecode!=(int64u)-1)
                 {
-                    float64 TimeCode_StartTimecode_Temp=((float64)(TimeCode_StartTimecode+Config->File_IgnoreEditsBefore))/TimeCode_RoundedTimecodeBase;
-                    if (TimeCode_DropFrame)
+                    float64 TimeCode_StartTimecode_Temp=((float64)(MxfTimeCodeForDelay.StartTimecode+Config->File_IgnoreEditsBefore))/MxfTimeCodeForDelay.RoundedTimecodeBase;
+                    if (MxfTimeCodeForDelay.DropFrame)
                     {
                         TimeCode_StartTimecode_Temp*=1001;
                         TimeCode_StartTimecode_Temp/=1000;
@@ -2733,10 +2730,10 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
             Fill_Flush();
             Stream_Prepare(Stream_Text);
             (*Parser)->Finish();
-            if (TimeCode_RoundedTimecodeBase && TimeCode_StartTimecode!=(int64u)-1)
+            if (MxfTimeCodeForDelay.RoundedTimecodeBase && MxfTimeCodeForDelay.StartTimecode!=(int64u)-1)
             {
-                float64 TimeCode_StartTimecode_Temp=((float64)(TimeCode_StartTimecode+Config->File_IgnoreEditsBefore))/TimeCode_RoundedTimecodeBase;
-                if (TimeCode_DropFrame)
+                float64 TimeCode_StartTimecode_Temp=((float64)(MxfTimeCodeForDelay.StartTimecode+Config->File_IgnoreEditsBefore))/MxfTimeCodeForDelay.RoundedTimecodeBase;
+                if (MxfTimeCodeForDelay.DropFrame)
                 {
                     TimeCode_StartTimecode_Temp*=1001;
                     TimeCode_StartTimecode_Temp/=1000;
@@ -3427,10 +3424,10 @@ void File_Mxf::Streams_Finish_Component_ForTimeCode(const int128u ComponentUID, 
     for (size_t Pos=0; Pos<Component->second.StructuralComponents.size(); Pos++)
     {
         components::iterator Component2=Components.find(Component->second.StructuralComponents[Pos]);
-        if (Component2!=Components.end() && Component2->second.TimeCode_StartTimecode!=(int64u)-1 && !Config->File_IsReferenced_Get())
+        if (Component2!=Components.end() && Component2->second.MxfTimeCode.StartTimecode!=(int64u)-1 && !Config->File_IsReferenced_Get())
         {
             //Note: Origin is not part of the StartTimecode for the first frame in the source package. From specs: "For a Timecode Track with a single Timecode Component and with origin N, where N greater than 0, the timecode value at the Zero Point of the Track equals the start timecode of the Timecode Component incremented by N units."
-            TimeCode TC(Component2->second.TimeCode_StartTimecode+Config->File_IgnoreEditsBefore, (int8u)Component2->second.TimeCode_RoundedTimecodeBase, Component2->second.TimeCode_DropFrame);
+            TimeCode TC(Component2->second.MxfTimeCode.StartTimecode+Config->File_IgnoreEditsBefore, (int8u)Component2->second.MxfTimeCode.RoundedTimecodeBase, Component2->second.MxfTimeCode.DropFrame);
             Stream_Prepare(Stream_Other);
             Fill(Stream_Other, StreamPos_Last, Other_ID, Ztring::ToZtring(TrackID)+(IsSourcePackage?__T("-Source"):__T("-Material")));
             Fill(Stream_Other, StreamPos_Last, Other_Type, "Time code");
@@ -3441,12 +3438,10 @@ void File_Mxf::Streams_Finish_Component_ForTimeCode(const int128u ComponentUID, 
 
             if ((!TimeCodeFromMaterialPackage && IsSourcePackage) || (TimeCodeFromMaterialPackage && !IsSourcePackage))
             {
-                TimeCode_RoundedTimecodeBase=Component2->second.TimeCode_RoundedTimecodeBase;
-                TimeCode_StartTimecode=Component2->second.TimeCode_StartTimecode;
-                TimeCode_DropFrame=Component2->second.TimeCode_DropFrame;
+                MxfTimeCodeForDelay=Component2->second.MxfTimeCode;
 
-                DTS_Delay=((float64)TimeCode_StartTimecode)/TimeCode_RoundedTimecodeBase;
-                if (TimeCode_DropFrame)
+                DTS_Delay=((float64)MxfTimeCodeForDelay.StartTimecode)/MxfTimeCodeForDelay.RoundedTimecodeBase;
+                if (MxfTimeCodeForDelay.DropFrame)
                 {
                     DTS_Delay*=1001;
                     DTS_Delay/=1000;
@@ -3455,6 +3450,11 @@ void File_Mxf::Streams_Finish_Component_ForTimeCode(const int128u ComponentUID, 
                 #if MEDIAINFO_DEMUX
                     Config->Demux_Offset_DTS_FromStream=FrameInfo.DTS;
                 #endif //MEDIAINFO_DEMUX
+            }
+
+            if (!IsSourcePackage)
+            {
+                MxfTimeCodeMaterial=Component2->second.MxfTimeCode;
             }
         }
     }
@@ -3471,11 +3471,11 @@ void File_Mxf::Streams_Finish_Component_ForAS11(const int128u ComponentUID, floa
     int64u TC_Temp=0;
     int8u FrameRate_TempI;
     bool DropFrame_Temp;
-    if (TimeCode_RoundedTimecodeBase && TimeCode_StartTimecode!=(int64u)-1 && TimeCode_RoundedTimecodeBase<256)
+    if (MxfTimeCodeMaterial.RoundedTimecodeBase && MxfTimeCodeMaterial.StartTimecode!=(int64u)-1)
     {
-        TC_Temp=TimeCode_StartTimecode;
-        FrameRate_TempI=(int8u)TimeCode_RoundedTimecodeBase;
-        DropFrame_Temp=TimeCode_DropFrame;
+        TC_Temp=MxfTimeCodeMaterial.StartTimecode;
+        FrameRate_TempI=(int8u)MxfTimeCodeMaterial.RoundedTimecodeBase;
+        DropFrame_Temp=MxfTimeCodeMaterial.DropFrame;
     }
     else
     {
@@ -3666,34 +3666,37 @@ void File_Mxf::Streams_Finish_Identification (const int128u IdentificationUID)
     if (Identification==Identifications.end())
         return;
 
-    if (!Identification->second.ProductName.empty())
+    //Product part
+    Ztring Encoded_Application_Version=Identification->second.ProductVersion.empty()?Identification->second.VersionString:Identification->second.ProductVersion;
+    Ztring Encoded_Application_ProductName(Identification->second.ProductName);
+    if (!Identification->second.CompanyName.empty() && Identification->second.CompanyName.size()<Encoded_Application_ProductName.size())
     {
-        Ztring Encoded_Library_Name;
-        if (!Identification->second.CompanyName.empty())
-        {
-            Encoded_Library_Name+=Identification->second.CompanyName;
-            Encoded_Library_Name+=__T(' ');
-        }
-        Encoded_Library_Name+=Identification->second.ProductName;
-        Ztring Encoded_Library_Version;
-        if (!Identification->second.ProductVersion.empty())
-        {
-            Encoded_Library_Version=Identification->second.ProductVersion;
-        }
-        else if (!Identification->second.VersionString.empty())
-        {
-            Encoded_Library_Version=Identification->second.VersionString;
-        }
-        Ztring Encoded_Application=Encoded_Library_Name;
-        if (!Encoded_Library_Version.empty())
-        {
-            Encoded_Application+=__T(' ');
-            Encoded_Application+=Encoded_Library_Version;
-        }
-        Fill(Stream_General, 0, General_Encoded_Application, Encoded_Application, true);
-        Fill(Stream_General, 0, General_Encoded_Library_Name, Encoded_Library_Name, true);
-        Fill(Stream_General, 0, General_Encoded_Library_Version, Encoded_Library_Version, true);
+        Ztring ProductName_Begin(Encoded_Application_ProductName.c_str(), Identification->second.CompanyName.size());
+        if (Identification->second.CompanyName.Compare(ProductName_Begin) && Encoded_Application_ProductName[Identification->second.CompanyName.size()]==__T(' '))
+            Encoded_Application_ProductName.erase(0, Identification->second.CompanyName.size()+1);
     }
+    size_t Encoded_Application_ProductName_Pos = Encoded_Application_ProductName.find_last_of(__T(' '));
+    if (Encoded_Application_ProductName_Pos!=string::npos)
+    {
+        Ztring Encoded_Application_ProductName_End(Encoded_Application_ProductName.c_str()+Encoded_Application_ProductName_Pos+1);
+        if (Encoded_Application_Version.find(Encoded_Application_ProductName_End)==0)
+            Encoded_Application_ProductName.resize(Encoded_Application_ProductName_Pos); //Removing version number from the name (format not conform)
+    }
+    Fill(Stream_General, 0, General_Encoded_Application_CompanyName, Identification->second.CompanyName, true);
+    Fill(Stream_General, 0, General_Encoded_Application_Name, Encoded_Application_ProductName, true);
+    Fill(Stream_General, 0, General_Encoded_Application_Version, Encoded_Application_Version, true);
+
+    //Platform part
+    Ztring Library_Name(Identification->second.Platform);
+    size_t Library_Name_Pos = Library_Name.find_last_of(__T(' '));
+    if (Library_Name_Pos!=string::npos)
+    {
+        Ztring Library_Name_End(Library_Name.c_str()+Library_Name_Pos+1);
+        if (Identification->second.ToolkitVersion.find(Library_Name_End)==0)
+            Library_Name.resize(Library_Name_Pos); //Removing version number from the name (format not conform)
+    }
+    Fill(Stream_General, 0, General_Encoded_Library_Name, Library_Name, true);
+    Fill(Stream_General, 0, General_Encoded_Library_Version, Identification->second.ToolkitVersion, true);
 
     for (std::map<std::string, Ztring>::iterator Info=Identification->second.Infos.begin(); Info!=Identification->second.Infos.end(); ++Info)
         Fill(Stream_General, 0, Info->first.c_str(), Info->second, true);
@@ -4303,7 +4306,7 @@ size_t File_Mxf::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
                         if (Descriptor==Descriptors.end())
                             return (size_t)-1; //Not supported
 
-                        else if (TimeCode_StartTimecode!=(int64u)-1)
+                        else if (MxfTimeCodeForDelay.StartTimecode!=(int64u)-1)
                         {
                             int64u Delay=float64_int64s(DTS_Delay*1000000000);
                             if (Value<Delay)
@@ -6908,9 +6911,7 @@ void File_Mxf::TimecodeComponent()
 {
     if (Element_Offset==4)
     {
-        TimeCode_StartTimecode=(int64u)-1;
-        TimeCode_RoundedTimecodeBase=0;
-        TimeCode_DropFrame=false;
+        MxfTimeCodeForDelay=mxftimecode();
         DTS_Delay=0;
         FrameInfo.DTS=0;
     }
@@ -9026,7 +9027,8 @@ void File_Mxf::Identification_ProductVersion()
     Element_Info1(Version);
 
     FILLING_BEGIN();
-        Identifications[InstanceUID].ProductVersion=Version;
+        if (Major || Minor || Patch || Build || Release)
+            Identifications[InstanceUID].ProductVersion=Version;
     FILLING_END();
 }
 
@@ -9064,17 +9066,23 @@ void File_Mxf::Identification_ModificationDate()
 void File_Mxf::Identification_ToolkitVersion()
 {
     //Parsing
-    //Parsing
-    Info_B2(Major,                                              "Major");
-    Info_B2(Minor,                                              "Minor");
-    Info_B2(Patch,                                              "Patch");
-    Info_B2(Build,                                              "Build");
-    Info_B2(Release,                                            "Release");
-    Element_Info1(Ztring::ToZtring(Major)+__T('.')
-                +Ztring::ToZtring(Minor)+__T('.')
-                +Ztring::ToZtring(Patch)+__T('.')
-                +Ztring::ToZtring(Build)+__T('.')
-                +Ztring::ToZtring(Release)      );
+    int16u Major, Minor, Patch, Build, Release;
+    Get_B2 (Major,                                              "Major");
+    Get_B2 (Minor,                                              "Minor");
+    Get_B2 (Patch,                                              "Patch");
+    Get_B2 (Build,                                              "Build");
+    Get_B2 (Release,                                            "Release");
+    Ztring Version=Ztring::ToZtring(Major)+__T('.')
+                  +Ztring::ToZtring(Minor)+__T('.')
+                  +Ztring::ToZtring(Patch)+__T('.')
+                  +Ztring::ToZtring(Build)+__T('.')
+                  +Ztring::ToZtring(Release)      ;
+    Element_Info1(Version);
+
+    FILLING_BEGIN();
+        if (Major || Minor || Patch || Build || Release)
+            Identifications[InstanceUID].ToolkitVersion=Version;
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -9082,7 +9090,13 @@ void File_Mxf::Identification_ToolkitVersion()
 void File_Mxf::Identification_Platform()
 {
     //Parsing
-    Info_UTF16B(Length2, Data,                                  "Data"); Element_Info1(Data);
+    Ztring Data;
+    Get_UTF16B(Length2, Data,                                  "Data"); Element_Info1(Data);
+
+    FILLING_BEGIN();
+        if (Data!=__T("Unknown"))
+            Identifications[InstanceUID].Platform=Data;
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -9925,6 +9939,8 @@ void File_Mxf::RGBAEssenceDescriptor_AlphaMinRef()
 // 0x1001
 void File_Mxf::Sequence_StructuralComponents()
 {
+    Components[InstanceUID].StructuralComponents.clear();
+    
     //Parsing
     //Vector
     int32u Count, Length;
@@ -10225,11 +10241,11 @@ void File_Mxf::TimecodeComponent_StartTimecode()
     FILLING_BEGIN();
         if (Data!=(int64u)-1)
         {
-            TimeCode_StartTimecode=Data;
-            if (TimeCode_RoundedTimecodeBase)
+            MxfTimeCodeForDelay.StartTimecode=Data;
+            if (MxfTimeCodeForDelay.RoundedTimecodeBase)
             {
-                DTS_Delay=((float64)TimeCode_StartTimecode)/TimeCode_RoundedTimecodeBase;
-                if (TimeCode_DropFrame)
+                DTS_Delay=((float64)MxfTimeCodeForDelay.StartTimecode)/MxfTimeCodeForDelay.RoundedTimecodeBase;
+                if (MxfTimeCodeForDelay.DropFrame)
                 {
                     DTS_Delay*=1001;
                     DTS_Delay/=1000;
@@ -10241,7 +10257,7 @@ void File_Mxf::TimecodeComponent_StartTimecode()
             }
         }
 
-        Components[InstanceUID].TimeCode_StartTimecode=Data;
+        Components[InstanceUID].MxfTimeCode.StartTimecode=Data;
     FILLING_END();
 }
 
@@ -10256,11 +10272,11 @@ void File_Mxf::TimecodeComponent_RoundedTimecodeBase()
     FILLING_BEGIN();
         if (Data && Data!=(int16u)-1)
         {
-            TimeCode_RoundedTimecodeBase=Data;
-            if (TimeCode_StartTimecode!=(int64u)-1)
+            MxfTimeCodeForDelay.RoundedTimecodeBase=Data;
+            if (MxfTimeCodeForDelay.StartTimecode!=(int64u)-1)
             {
-                DTS_Delay=((float64)TimeCode_StartTimecode)/TimeCode_RoundedTimecodeBase;
-                if (TimeCode_DropFrame)
+                DTS_Delay=((float64)MxfTimeCodeForDelay.StartTimecode)/MxfTimeCodeForDelay.RoundedTimecodeBase;
+                if (MxfTimeCodeForDelay.DropFrame)
                 {
                     DTS_Delay*=1001;
                     DTS_Delay/=1000;
@@ -10272,7 +10288,7 @@ void File_Mxf::TimecodeComponent_RoundedTimecodeBase()
             }
         }
 
-        Components[InstanceUID].TimeCode_RoundedTimecodeBase=Data;
+        Components[InstanceUID].MxfTimeCode.RoundedTimecodeBase=Data;
     FILLING_END();
 }
 
@@ -10287,7 +10303,7 @@ void File_Mxf::TimecodeComponent_DropFrame()
     FILLING_BEGIN();
         if (Data!=(int8u)-1 && Data)
         {
-            TimeCode_DropFrame=true;
+            MxfTimeCodeForDelay.DropFrame=true;
             if (DTS_Delay)
             {
                 DTS_Delay*=1001;
@@ -10299,7 +10315,7 @@ void File_Mxf::TimecodeComponent_DropFrame()
             #endif //MEDIAINFO_DEMUX
         }
 
-        Components[InstanceUID].TimeCode_DropFrame=Data?true:false;
+        Components[InstanceUID].MxfTimeCode.DropFrame=Data?true:false;
     FILLING_END();
 }
 

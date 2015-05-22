@@ -140,6 +140,7 @@
     <ClInclude Include="MediaInfo\Audio\File_Vorbis.h" />
     <ClInclude Include="MediaInfo\Audio\File_Wvpk.h" />
     <ClInclude Include="MediaInfo\Export\Export_EbuCore.h" />
+    <ClInclude Include="MediaInfo\Export\Export_Fims.h" />
     <ClInclude Include="MediaInfo\Export\Export_PBCore2.h" />
     <ClInclude Include="MediaInfo\Image\File_ArriRaw.h" />
     <ClInclude Include="MediaInfo\Image\File_Bpg.h" />
@@ -363,6 +364,7 @@
     <ClCompile Include="MediaInfo\Duplicate\File__Duplicate__Base.cpp" />
     <ClCompile Include="MediaInfo\Duplicate\File__Duplicate__Writer.cpp" />
     <ClCompile Include="MediaInfo\Export\Export_EbuCore.cpp" />
+    <ClCompile Include="MediaInfo\Export\Export_Fims.cpp" />
     <ClCompile Include="MediaInfo\Export\Export_Mpeg7.cpp" />
     <ClCompile Include="MediaInfo\Export\Export_PBCore.cpp" />
     <ClCompile Include="MediaInfo\Export\Export_PBCore2.cpp" />

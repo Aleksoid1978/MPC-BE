@@ -304,6 +304,8 @@ private :
     int64u  TrackVideoDisplayHeight;
     int32u  AvgBytesPerSec;
     int64u  Segment_Cluster_TimeCode_Value;
+    bool    Info_AlreadyParsed;
+    bool    Tracks_AlreadyParsed;
     bool    Cluster_AlreadyParsed;
 
     //Chapters

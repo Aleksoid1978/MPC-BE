@@ -170,9 +170,9 @@ void File_VorbisCom::FileHeader_Parse()
         if (vendor_string.find(__T("BS; Lancer"))==0) Library_Name="Lancer";
 
         Fill(StreamKind_Specific, 0, "Encoded_Library", vendor_string);
-        Fill(StreamKind_Specific, 0, "Encoded_Library/Name", Library_Name);
-        Fill(StreamKind_Specific, 0, "Encoded_Library/Version", Library_Version);
-        Fill(StreamKind_Specific, 0, "Encoded_Library/Date", Library_Date);
+        Fill(StreamKind_Specific, 0, "Encoded_Library_Name", Library_Name);
+        Fill(StreamKind_Specific, 0, "Encoded_Library_Version", Library_Version);
+        Fill(StreamKind_Specific, 0, "Encoded_Library_Date", Library_Date);
     FILLING_END();
 }
 
@@ -275,7 +275,7 @@ void File_VorbisCom::Data_Parse()
         else if (Key==__T("WAVEFORMATEXTENSIBLE_CHANNEL_MASK"))
         {
             //This is an hexadecimal value
-            if (Value.size()>2 && Value[0]==__T('0') && Value[1]==__T('x'))
+            if (Value.size()>2 && Value[0]==__T('0') && (Value[1]==__T('x') || Value[1]==__T('X')))
             {
                 int16u ValueI=0;
                 for (size_t Pos=2; Pos<Value.size(); Pos++)

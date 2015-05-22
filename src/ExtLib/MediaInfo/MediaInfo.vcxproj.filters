@@ -692,6 +692,9 @@
     <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence_Common.h">
       <Filter>Header Files\Multiple</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Export\Export_Fims.h">
+      <Filter>Header Files\Export</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1320,6 +1323,9 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence.cpp">
       <Filter>Source Files\Multiple</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Export\Export_Fims.cpp">
+      <Filter>Source Files\Export</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

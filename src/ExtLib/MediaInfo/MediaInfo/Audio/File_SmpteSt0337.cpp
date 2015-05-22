@@ -174,7 +174,7 @@ File_SmpteSt0337::~File_SmpteSt0337()
 //---------------------------------------------------------------------------
 void File_SmpteSt0337::Streams_Accept()
 {
-    Fill(Stream_General, 0, General_Format, "AES3");
+    Fill(Stream_General, 0, General_Format, "SMPTE ST 337");
     Fill(Stream_General, 0, General_OverallBitRate_Mode, "CBR");
 }
 
@@ -238,7 +238,8 @@ void File_SmpteSt0337::Streams_Fill()
         if (Retrieve(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitDepth)).empty())
             Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitDepth), Stream_Bits);
 
-        Fill(StreamKind_Last, Pos, "MuxingMode", "AES3");
+        if (IsSub)
+            Fill(StreamKind_Last, Pos, "MuxingMode", "SMPTE ST 337");
         if (Retrieve(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitRate_Mode))!=__T("CBR"))
             Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitRate_Mode), "CBR");
         if (File_Size!=(int64u)-1 && FrameSizes.size()==1)
@@ -591,7 +592,7 @@ bool File_SmpteSt0337::Synchronize()
     }
 
     if (!Status[IsAccepted])
-        Accept("AES3");
+        Accept("SMPTE ST 337");
 
     // Synched
     return true;
@@ -901,7 +902,7 @@ void File_SmpteSt0337::Header_Parse()
 
     // Filling
     Header_Fill_Size(Container_Bits*4/8+Size/8);
-    Header_Fill_Code(0, "AES3");
+    Header_Fill_Code(0, "SMPTE ST 337");
 
     //Guard band
     if (IsSub && FrameInfo.DTS!=(int64u)-1)
@@ -1296,9 +1297,9 @@ void File_SmpteSt0337::Data_Parse()
             Frame_Count_NotParsedIncluded++;
 
         if (Parser==NULL || (Frame_Count>=2 && Parser->Status[IsFilled]))
-            Fill("AES3");
+            Fill("SMPTE ST 337");
         if (Parser==NULL || (Frame_Count>=2 && Parser->Status[IsFinished]))
-            Finish("AES3");
+            Finish("SMPTE ST 337");
     FILLING_END();
 
     if (Save_Buffer)

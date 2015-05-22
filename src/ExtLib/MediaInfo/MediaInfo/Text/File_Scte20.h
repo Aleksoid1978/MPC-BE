@@ -51,6 +51,7 @@ private :
     void Read_Buffer_Unsynched();
 
     //Buffer - Global
+    void Read_Buffer_Init();
     void Read_Buffer_Continue();
 
     //Temp
@@ -74,6 +75,7 @@ private :
     };
     std::vector<stream*> Streams;
     size_t               Streams_Count;
+    bool                Eia608_DisplayEmptyStream;
 };
 
 } //NameSpace

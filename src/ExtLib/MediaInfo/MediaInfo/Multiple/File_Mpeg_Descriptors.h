@@ -265,7 +265,7 @@ struct complete_stream
 
         //ATSC
         int16u source_id; //Global
-        int16u source_id_IsValid;
+        bool   source_id_IsValid;
 
         transport_stream()
         {
@@ -376,7 +376,7 @@ struct complete_stream
         bool                                        IsUpdated_Info;
         bool                                        CA_system_ID_MustSkipSlices;
         bool                                        EBP_IsPresent;
-        size_t                                      IsScrambled;
+        size_t                                      Scrambled_Count;
         int16u                                      CA_system_ID;
         int16u                                      SubStream_pid;
         #if MEDIAINFO_IBIUSAGE
@@ -443,7 +443,7 @@ struct complete_stream
             IsRegistered=false;
             IsUpdated_IsRegistered=false;
             IsUpdated_Info=false;
-            IsScrambled=false;
+            Scrambled_Count=0;
             CA_system_ID_MustSkipSlices=false;
             CA_system_ID=0x0000;
             EBP_IsPresent=false;

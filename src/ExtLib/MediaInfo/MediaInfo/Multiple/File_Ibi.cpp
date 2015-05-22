@@ -421,7 +421,7 @@ void File_Ibi::Stream_ByteOffset()
     //Parsing
     #if MEDIAINFO_IBIUSAGE
     size_t Pos=0;
-    #endif MEDIAINFO_IBIUSAGE
+    #endif //MEDIAINFO_IBIUSAGE
     int64u Offset=0;
     while (Element_Offset<Element_Size)
     {
@@ -430,7 +430,7 @@ void File_Ibi::Stream_ByteOffset()
         Offset+=Item;
         #if MEDIAINFO_IBIUSAGE
         Param_Info1(Pos);
-        #endif MEDIAINFO_IBIUSAGE
+        #endif //MEDIAINFO_IBIUSAGE
         Param_Info1(Ztring::ToZtring(Offset)+__T(" (0x")+Ztring::ToZtring(Offset, 16)+__T(')'));
 
         #if MEDIAINFO_IBIUSAGE
@@ -460,7 +460,7 @@ void File_Ibi::Stream_FrameNumber()
     //Parsing
     #if MEDIAINFO_IBIUSAGE
     size_t Pos=0;
-    #endif MEDIAINFO_IBIUSAGE
+    #endif //MEDIAINFO_IBIUSAGE
     int64u Offset=0;
     while (Element_Offset<Element_Size)
     {
@@ -469,7 +469,7 @@ void File_Ibi::Stream_FrameNumber()
         Offset+=Item;
         #if MEDIAINFO_IBIUSAGE
         Param_Info1(Pos);
-        #endif MEDIAINFO_IBIUSAGE
+        #endif //MEDIAINFO_IBIUSAGE
         Param_Info1(Ztring::ToZtring(Offset)+__T(" (0x")+Ztring::ToZtring(Offset, 16)+__T(')'));
 
         #if MEDIAINFO_IBIUSAGE
@@ -521,7 +521,7 @@ void File_Ibi::Stream_Dts()
 
     #if MEDIAINFO_IBIUSAGE
     size_t Pos=0;
-    #endif MEDIAINFO_IBIUSAGE
+    #endif //MEDIAINFO_IBIUSAGE
     int64u Offset=0;
     while (Element_Offset<Element_Size)
     {
@@ -530,7 +530,7 @@ void File_Ibi::Stream_Dts()
         Offset+=Item;
         #if MEDIAINFO_IBIUSAGE
         Param_Info1(Pos);
-        #endif MEDIAINFO_IBIUSAGE
+        #endif //MEDIAINFO_IBIUSAGE
         Param_Info1(Ztring::ToZtring(Offset)+__T(" (0x")+Ztring::ToZtring(Offset, 16)+__T(')'));
 
         #if MEDIAINFO_IBIUSAGE

@@ -36,7 +36,7 @@ public:
     float64                         EditRate;
     int64u                          IgnoreEditsBefore;
     int64u                          IgnoreEditsAfter;
-        
+
     //Config
     rfhs_common*                    Sequence;
     #if MEDIAINFO_NEXTPACKET
@@ -45,7 +45,7 @@ public:
     #endif //MEDIAINFO_NEXTPACKET
 
     MediaInfo_Internal*             MI;
-    
+
 
 
     int64u  IgnoreEditsAfterDuration; //temporary value, some formats have duration instead of frame position

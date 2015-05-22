@@ -64,6 +64,16 @@ const int8u Hevc_SubHeightC[]=
 };
 
 //---------------------------------------------------------------------------
+const char* Hevc_tier_flag(bool tier_flag)
+{
+    switch (tier_flag)
+    {
+        case   true  : return "High";
+        default      : return "Main";
+    }
+}
+
+//---------------------------------------------------------------------------
 const char* Hevc_profile_idc(int32u profile_idc)
 {
     switch (profile_idc)
@@ -72,7 +82,7 @@ const char* Hevc_profile_idc(int32u profile_idc)
         case   1 : return "Main";
         case   2 : return "Main 10";
         case   3 : return "Main Still";
-        default  : return "Unknown";
+        default  : return "";
     }
 }
 
@@ -214,7 +224,9 @@ void File_Hevc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator se
         {
             if ((*seq_parameter_set_Item)->profile_idc)
                 Profile+=__T('@');
-            Profile+=__T('L')+Ztring().From_Number(((float)(*seq_parameter_set_Item)->level_idc)/30, 1);
+            Profile+=__T('L')+Ztring().From_Number(((float)(*seq_parameter_set_Item)->level_idc)/30, ((*seq_parameter_set_Item)->level_idc%10)?1:0);
+            Profile+=__T('@');
+            Profile+=Ztring().From_Local(Hevc_tier_flag((*seq_parameter_set_Item)->tier_flag));
         }
     }
     Fill(Stream_Video, 0, Video_Format_Profile, Profile);
@@ -1296,6 +1308,7 @@ void File_Hevc::seq_parameter_set()
                                                                     0,
                                                                     0,
                                                                     0,
+                                                                    0,
                                                                     false,
                                                                     false,
                                                                     false
@@ -1418,6 +1431,7 @@ void File_Hevc::seq_parameter_set()
         delete *Data_Item; *Data_Item=new seq_parameter_set_struct(
                                                                     vui_parameters_Item,
                                                                     profile_space,
+                                                                    tier_flag,
                                                                     profile_idc,
                                                                     level_idc,
                                                                     pic_width_in_luma_samples,
@@ -2087,7 +2101,7 @@ void File_Hevc::profile_tier_level(int8u maxNumSubLayersMinus1)
     //Parsing
     std::vector<bool>sub_layer_profile_present_flags, sub_layer_level_present_flags;
     Get_S1 (2,  profile_space,                                  "general_profile_space");
-    Skip_SB(                                                    "general_tier_flag");
+    Get_SB (    tier_flag,                                      "general_tier_flag");
     Get_S1 (5,  profile_idc,                                    "general_profile_idc");
     Element_Begin1("general_profile_compatibility_flags");
         for (int8u profile_pos=0; profile_pos<32; profile_pos++)
@@ -2468,11 +2482,11 @@ void File_Hevc::VPS_SPS_PPS()
     int8u  chromaFormat, bitDepthLumaMinus8, bitDepthChromaMinus8;
     int8u  general_profile_space, general_profile_idc, general_level_idc;
     int8u  numOfArrays, constantFrameRate, numTemporalLayers;
-    bool   temporalIdNested;
+    bool   general_tier_flag, temporalIdNested;
     Get_B1 (configurationVersion,                               "configurationVersion");
     BS_Begin();
         Get_S1 (2, general_profile_space,                       "general_profile_space");
-        Skip_SB(                                                "general_tier_flag");
+        Get_SB (   general_tier_flag,                           "general_tier_flag");
         Get_S1 (5, general_profile_idc,                         "general_profile_idc");
     BS_End();
     Get_B4 (general_profile_compatibility_flags,                "general_profile_compatibility_flags");

@@ -362,8 +362,8 @@ private :
         int32u                  hdlr_Manufacturer;
         struct edts_struct
         {
-            int32u  Duration;
-            int32u  Delay;
+            int64u  Duration;
+            int64u  Delay;
             int32u  Rate;
         };
         std::vector<edts_struct> edts;

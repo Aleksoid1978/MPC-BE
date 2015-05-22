@@ -25,6 +25,7 @@
 #if defined(MEDIAINFO_EIA608_YES)
     #include "MediaInfo/Text/File_Eia608.h"
 #endif
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Events.h"
 #endif //MEDIAINFO_EVENTS
@@ -148,6 +149,12 @@ void File_Scte20::Streams_Finish()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void File_Scte20::Read_Buffer_Init()
+{
+    Eia608_DisplayEmptyStream=Config->File_Eia608_DisplayEmptyStream_Get();
+}
+
+//---------------------------------------------------------------------------
 void File_Scte20::Read_Buffer_Unsynched()
 {
     //Parsing
@@ -266,6 +273,37 @@ void File_Scte20::Read_Buffer_Continue()
         Skip_XX(Element_Size-Element_Offset,                    "non_real_time_video + reserved");
     Element_End0();
     Element_Show();
+
+    FILLING_BEGIN();
+        //Filled
+        if (!Status[IsAccepted] && Eia608_DisplayEmptyStream)
+        {
+            Accept("SCTE 20");
+
+            //TODO: merge duplicated content
+            for (int8u cc_type=0; cc_type<2; cc_type++)
+            {
+                //Parsing
+                #if MEDIAINFO_DEMUX
+                    Element_Code=cc_type;
+                #endif //MEDIAINFO_DEMUX
+                if (Streams[cc_type]==NULL)
+                    Streams[cc_type]=new stream;
+                if (Streams[cc_type]->Parser==NULL)
+                {
+                    #if defined(MEDIAINFO_EIA608_YES)
+                        Streams[cc_type]->Parser=new File_Eia608();
+                        ((File_Eia608*)Streams[cc_type]->Parser)->cc_type=cc_type;
+                    #else //defined(MEDIAINFO_EIA608_YES)
+                        Streams[cc_type]->Parser=new File__Analyze();
+                    #endif //defined(MEDIAINFO_EIA608_YES)
+                    Open_Buffer_Init(Streams[cc_type]->Parser);
+
+                    Streams[cc_type]->Parser->Accept();
+                }
+            }
+        }
+    FILLING_END();
 }
 
 //***************************************************************************

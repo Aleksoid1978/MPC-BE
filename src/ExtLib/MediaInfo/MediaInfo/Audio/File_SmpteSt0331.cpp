@@ -104,7 +104,9 @@ void File_SmpteSt0331::Streams_Fill()
     Fill(Stream_Audio, 0, Audio_Format, "PCM");
     Fill(Stream_Audio, 0, Audio_Codec, "PCM");
     Fill(Stream_Audio, 0, Audio_SamplingRate, 48000);
-    Fill(Stream_Audio, 0, Audio_BitRate, 8*32*48000);
+    if (QuantizationBits)
+        Fill(Stream_Audio, 0, Audio_BitRate, Channels_Count*QuantizationBits*48000);
+    Fill(Stream_Audio, 0, Audio_BitRate_Encoded, 8*32*48000);
     Fill(Stream_Audio, 0, Audio_BitRate_Mode, "CBR");
 
     Fill(Stream_Audio, 0, Audio_Format_Settings_Endianness, "Little");
@@ -201,7 +203,7 @@ void File_SmpteSt0331::Read_Buffer_Continue()
     FILLING_BEGIN();
     if (!Status[IsAccepted])
     {
-        Accept("AES3");
+        Accept("SMPTE ST 331");
 
         int8u Channels=0;
         for (int8u Pos=0; Pos<8; Pos++)

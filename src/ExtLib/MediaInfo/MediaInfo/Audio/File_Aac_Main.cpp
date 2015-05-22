@@ -1126,7 +1126,7 @@ void File_Aac::adts_variable_header()
 
     FILLING_BEGIN();
         if (adts_buffer_fullness==0x7FF)
-            adts_buffer_fullness=true;
+            adts_buffer_fullness_Is7FF=true;
         #if MEDIAINFO_ADVANCED
             aac_frame_length_Total+=aac_frame_length;
         #endif //MEDIAINFO_ADVANCED
