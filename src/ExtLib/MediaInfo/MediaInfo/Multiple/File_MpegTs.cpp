@@ -748,7 +748,7 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
             //Encryption
             if (Temp->CA_system_ID)
                 Fill(StreamKind_Last, StreamPos, "Encryption", Mpeg_Descriptors_CA_system_ID(Temp->CA_system_ID));
-            else if (Temp->IsScrambled>16)
+            else if (Temp->Scrambled_Count>16)
                 Fill(StreamKind_Last, StreamPos, "Encryption", "Encrypted");
 
             //TS info
@@ -1940,7 +1940,7 @@ void File_MpegTs::Read_Buffer_AfterParsing()
                         MpegTs_JumpTo_Begin=File_Size-MpegTs_JumpTo_End;
                 }
             }
-            
+
             //Jumping
             if (Config->ParseSpeed<1.0 && Config->File_IsSeekable_Get()
             #if MEDIAINFO_ADVANCED
@@ -2248,7 +2248,7 @@ void File_MpegTs::Header_Parse()
         {
             //Encryption
             if (transport_scrambling_control>0)
-                Complete_Stream->Streams[pid]->IsScrambled++;
+                Complete_Stream->Streams[pid]->Scrambled_Count++;
         }
         else if (Element_Offset<TS_Size)
             Skip_XX(TS_Size-Element_Offset,                         "Junk");
@@ -2281,7 +2281,7 @@ void File_MpegTs::Header_Parse()
         {
             //Encryption
             if (transport_scrambling_control>0)
-                Complete_Stream->Streams[pid]->IsScrambled++;
+                Complete_Stream->Streams[pid]->Scrambled_Count++;
         }
 
         //Filling
@@ -2832,7 +2832,7 @@ void File_MpegTs::PES()
         if (!Complete_Stream->Streams[pid]->Searching_Payload_Continue)
             Complete_Stream->Streams[pid]->Searching_Payload_Continue_Set(true); //In order to count the packets
 
-        if (Complete_Stream->Streams[pid]->IsScrambled>16)
+        if (Complete_Stream->Streams[pid]->Scrambled_Count>16)
         {
             //Don't need anymore
             Complete_Stream->Streams[pid]->Searching_Payload_Start_Set(false);
@@ -2850,8 +2850,8 @@ void File_MpegTs::PES()
 
         return;
     }
-    else if (Complete_Stream->Streams[pid]->IsScrambled)
-        Complete_Stream->Streams[pid]->IsScrambled--;
+    else if (Complete_Stream->Streams[pid]->Scrambled_Count)
+        Complete_Stream->Streams[pid]->Scrambled_Count--;
 
     //Parser creation
     if (Complete_Stream->Streams[pid]->Parser==NULL)

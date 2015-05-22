@@ -20,7 +20,7 @@ class File__Analyze;
 class MediaInfo_Config_MediaInfo;
 
 //***************************************************************************
-// Class resource 
+// Class resource
 //***************************************************************************
 
 class rfh_common

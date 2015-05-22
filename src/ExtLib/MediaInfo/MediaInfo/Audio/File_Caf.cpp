@@ -65,13 +65,13 @@ File_Caf::File_Caf()
 //---------------------------------------------------------------------------
 bool File_Caf::FileHeader_Begin()
 {
-	//Synchro
+    //Synchro
     if (3>Buffer_Size)
         return false;
     if (Buffer[0]!=0x63 //"caff"
      || Buffer[1]!=0x61
      || Buffer[2]!=0x66
-	 || Buffer[3]!=0x66)
+     || Buffer[3]!=0x66)
     {
         Reject();
         return false;
@@ -90,18 +90,18 @@ bool File_Caf::FileHeader_Begin()
 void File_Caf::FileHeader_Parse()
 {
     //Parsing
-	int16u FileVersion;
-	Skip_C4(                                                    "FileType");
+    int16u FileVersion;
+    Skip_C4(                                                    "FileType");
     Get_B2 (FileVersion,                                        "FileVersion");
-    Skip_B2(											        "FileFlags");
+    Skip_B2(                                                    "FileFlags");
 
     FILLING_BEGIN();
         Accept();
-		Fill(Stream_General, 0, General_Format, "CAF");
-		Fill(Stream_General, 0, General_Format_Version, __T("Version ")+Ztring::ToZtring(FileVersion));
+        Fill(Stream_General, 0, General_Format, "CAF");
+        Fill(Stream_General, 0, General_Format_Version, __T("Version ")+Ztring::ToZtring(FileVersion));
         Stream_Prepare(Stream_Audio);
 
-		if (FileVersion!=1)
+        if (FileVersion!=1)
             Finish(); //Version 0 or 2+ are not supported
     FILLING_END();
 }
@@ -162,7 +162,7 @@ void File_Caf::data()
     Skip_XX(Element_Size,                                       "Data");
 
     Fill(Stream_Audio, 0, Retrieve(Stream_Audio, 0, Audio_Source_Duration).empty()?Audio_StreamSize:Audio_Source_StreamSize, Element_Size);
-    
+
     //TODO: put this code in the common section Streams_Finish_StreamOnly()
     int64u BitRate=Retrieve(Stream_Audio, 0, "BitRate").To_int64u();
     if (BitRate && Element_Size && Retrieve(Stream_Audio, 0, Audio_Source_Duration).empty() && Retrieve(Stream_Audio, 0, Audio_Duration).empty())

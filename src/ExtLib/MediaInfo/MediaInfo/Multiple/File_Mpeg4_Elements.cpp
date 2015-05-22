@@ -40,6 +40,9 @@
 #if defined(MEDIAINFO_AVC_YES)
     #include "MediaInfo/Video/File_Avc.h"
 #endif
+#if defined(MEDIAINFO_FFV1_YES)
+    #include "MediaInfo/Video/File_Ffv1.h"
+#endif
 #if defined(MEDIAINFO_H263_YES)
     #include "MediaInfo/Video/File_H263.h"
 #endif
@@ -128,7 +131,7 @@ const char* Mpeg4_Meta_Kind(int32u Kind)
         case 0x15 : return "Signed Integer"; //the size of the integer is derived from the container size
         case 0x16 : return "Float 32";
         case 0x17 : return "Float 64";
-        default   : return "Unknown";
+        default   : return "";
     }
 }
 
@@ -145,7 +148,7 @@ const char* Mpeg4_TypeModifierName(int32u TypeModifierName)
         case 0x06 : return "Matrix object";
         case 0x07 : return "Graphics mode object";
         case 0x76696465 : return "Image type";
-        default   : return "Unknown";
+        default   : return "";
     }
 }
 
@@ -843,7 +846,7 @@ const char* Mpeg4_Description(int32u Description)
         case Elements::moov_trak_mdia_minf_stbl_stsd_xxxx_idfm_priv : return "Private";
         case Elements::moov_trak_mdia_minf_stbl_stsd_xxxx_idfm_subs : return "Substitute if main codec not available";
         case Elements::moov_trak_mdia_minf_stbl_stsd_xxxx_idfm_cspc : return "Native pixel format";
-        default                                                     : return "Unknown";
+        default                                                     : return "";
     }
 }
 
@@ -2840,8 +2843,8 @@ void File_Mpeg4::moov_trak_edts_elst()
     {
         stream::edts_struct edts;
         Element_Begin1("Entry");
-        Get_B4 (edts.Duration,                                  "Track duration"); Param_Info2C(moov_mvhd_TimeScale, (int64u)edts.Duration*1000/moov_mvhd_TimeScale, " ms");
-        Get_B4 (edts.Delay,                                     "Media time"); Param_Info2C(moov_mvhd_TimeScale && (edts.Delay!=(int32u)-1), (int64u)edts.Delay*1000/moov_mvhd_TimeScale, " ms");
+        Get_B_DEPENDOFVERSION(edts.Duration,                    "Track duration"); Param_Info2C(moov_mvhd_TimeScale, (int64u)edts.Duration*1000/moov_mvhd_TimeScale, " ms");
+        Get_B_DEPENDOFVERSION(edts.Delay,                       "Media time"); Param_Info2C(moov_mvhd_TimeScale && (edts.Delay!=(int32u)-1), (int64u)edts.Delay*1000/moov_mvhd_TimeScale, " ms");
         Get_B4 (edts.Rate,                                      "Media rate"); Param_Info1(((float)edts.Rate)/0x10000);
         Element_End0();
 
@@ -4060,6 +4063,8 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx()
                                     default                                           : Skip_XX(Element_TotalSize_Get()-Element_Offset, "Unknown");
                                 }
         }
+        if (Element_IsWaitingForMoreData())
+            return;
 
         if (Streams[moov_trak_tkhd_TrackID].Parsers.size()==1 && !Retrieve(StreamKind_Last, StreamPos_Last, "Encryption").empty())
         {
@@ -4614,6 +4619,13 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxVideo()
                             Parser->Demux_UnpacketizeContainer=true;
                         }
                     #endif //MEDIAINFO_DEMUX
+                    Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
+                }
+            #endif
+            #if defined(MEDIAINFO_FFV1_YES)
+                if (MediaInfoLib::Config.CodecID_Get(Stream_Video, InfoCodecID_Format_Mpeg4, Ztring().From_CC4((int32u)Element_Code), InfoCodecID_Format)==__T("FFV1"))
+                {
+                    File_Ffv1* Parser=new File_Ffv1;
                     Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
                 }
             #endif

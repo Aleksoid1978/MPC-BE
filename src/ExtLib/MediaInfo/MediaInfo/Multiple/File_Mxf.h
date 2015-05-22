@@ -512,6 +512,29 @@ protected :
     #define Info_UL(_INFO, _NAME, _PARAM) int128u _INFO;
     #endif //MEDIAINFO_TRACE
 
+    //TimeCode
+    struct mxftimecode
+    {
+        int16u  RoundedTimecodeBase;
+        int64u  StartTimecode;
+        bool    DropFrame;
+
+        mxftimecode()
+            : RoundedTimecodeBase(0)
+            , StartTimecode((int64u)-1)
+            , DropFrame(false)
+        {
+        }
+
+        mxftimecode(int16u RoundedTimecodeBase_, int64u StartTimecode_, bool DropFrame_)
+            : RoundedTimecodeBase(RoundedTimecodeBase_)
+            , StartTimecode(StartTimecode_)
+            , DropFrame(DropFrame_)
+        {
+        }
+    };
+
+    // Temp
     struct randomindexmetadata
     {
         int64u ByteOffset;
@@ -569,6 +592,8 @@ protected :
         Ztring ProductName;
         Ztring ProductVersion;
         Ztring VersionString;
+        Ztring ToolkitVersion;
+        Ztring Platform;
         std::map<std::string, Ztring> Infos;
     };
     typedef std::map<int128u, identification> identifications; //Key is InstanceUID of identification
@@ -830,21 +855,12 @@ protected :
         int256u SourcePackageID; //Sequence from SourcePackage only
         int32u  SourceTrackID;
         std::vector<int128u> StructuralComponents; //Sequence from MaterialPackage only
-
-        //Time code component
-        int16u  TimeCode_RoundedTimecodeBase;
-        int64u  TimeCode_StartTimecode;
-        bool    TimeCode_DropFrame;
+        mxftimecode MxfTimeCode;
 
         component()
         {
             Duration=(int64u)-1;
             SourceTrackID=(int32u)-1;
-
-            //Time code component
-            TimeCode_RoundedTimecodeBase=(int16u)-1;
-            TimeCode_StartTimecode=(int64u)-1;
-            TimeCode_DropFrame=false;
         }
 
         void Update (struct component &New)
@@ -857,12 +873,12 @@ protected :
                 SourceTrackID=New.SourceTrackID;
             if (!New.StructuralComponents.empty())
                 StructuralComponents=New.StructuralComponents;
-            if (New.TimeCode_StartTimecode!=(int64u)-1)
-                TimeCode_StartTimecode=New.TimeCode_StartTimecode;
-            if (New.TimeCode_RoundedTimecodeBase!=(int16u)-1)
+            if (New.MxfTimeCode.StartTimecode!=(int64u)-1)
+                MxfTimeCode.StartTimecode=New.MxfTimeCode.StartTimecode;
+            if (New.MxfTimeCode.RoundedTimecodeBase)
             {
-                TimeCode_RoundedTimecodeBase=New.TimeCode_RoundedTimecodeBase;
-                TimeCode_DropFrame=New.TimeCode_DropFrame;
+                MxfTimeCode.RoundedTimecodeBase=New.MxfTimeCode.RoundedTimecodeBase;
+                MxfTimeCode.DropFrame=New.MxfTimeCode.DropFrame;
             }
         }
     };
@@ -1060,9 +1076,8 @@ protected :
     int128u EssenceContainer_FromPartitionMetadata;
     int64u PartitionMetadata_PreviousPartition;
     int64u PartitionMetadata_FooterPartition;
-    int64u TimeCode_StartTimecode;
-    int16u TimeCode_RoundedTimecodeBase;
-    bool   TimeCode_DropFrame;
+    mxftimecode MxfTimeCodeForDelay;
+    mxftimecode MxfTimeCodeMaterial;
     float64 DTS_Delay; //In seconds
     bool   StreamPos_StartAtOne; //information about the base of StreamPos (0 or 1, 1 is found in 1 file)
     string SDTI_TimeCode_StartTimecode;

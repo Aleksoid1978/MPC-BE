@@ -325,6 +325,9 @@
 #if !defined(MEDIAINFO_EXPORT_NO) && !defined(MEDIAINFO_EBUCORE_NO) && !defined(MEDIAINFO_EBUCORE_YES)
     #define MEDIAINFO_EBUCORE_YES
 #endif
+#if !defined(MEDIAINFO_EXPORT_NO) && !defined(MEDIAINFO_FIMS_NO) && !defined(MEDIAINFO_FIMS_YES)
+    #define MEDIAINFO_FIMS_YES
+#endif
 #if !defined(MEDIAINFO_EXPORT_NO) && !defined(MEDIAINFO_MPEG7_NO) && !defined(MEDIAINFO_MPEG7_YES)
     #define MEDIAINFO_MPEG7_YES
 #endif

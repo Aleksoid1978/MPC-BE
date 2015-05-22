@@ -203,7 +203,7 @@ private :
         std::vector<File__Analyze*> Parsers; //Sometimes, we need to do parallel tests
         Mpeg_TimeStamp TimeStamp_Start;
         Mpeg_TimeStamp TimeStamp_End;
-        size_t         StreamIsRegistred;
+        size_t         StreamRegistration_Count;
         size_t         StreamOrder;
         size_t         FirstPacketOrder;
         bool           Searching_Payload;
@@ -220,7 +220,7 @@ private :
             format_identifier=0x00000000; //No info
             descriptor_tag=0x00; //No info
             DVD_Identifier=0;
-            StreamIsRegistred=0;
+            StreamRegistration_Count=0;
             StreamOrder=(size_t)-1;
             FirstPacketOrder=(size_t)-1;
             Searching_Payload=false;

@@ -847,31 +847,9 @@ void File_Mpeg4::Streams_Finish()
         //Aperture size
         if (Temp->second.CleanAperture_Width)
         {
-            Ztring CleanAperture_Width=Ztring().From_Number(Temp->second.CleanAperture_Width, 0);
-            Ztring CleanAperture_Height=Ztring().From_Number(Temp->second.CleanAperture_Height, 0);
-            if (CleanAperture_Width!=Retrieve(Stream_Video, StreamPos_Last, Video_Width))
-            {
-                Fill(Stream_Video, StreamPos_Last, Video_Width_Original, Retrieve(Stream_Video, StreamPos_Last, Video_Width), true);
-                Fill(Stream_Video, StreamPos_Last, Video_Width, Temp->second.CleanAperture_Width, 0, true);
-            }
-            if (CleanAperture_Height!=Retrieve(Stream_Video, StreamPos_Last, Video_Height))
-            {
-                Fill(Stream_Video, StreamPos_Last, Video_Height_Original, Retrieve(Stream_Video, StreamPos_Last, Video_Height), true);
-                Fill(Stream_Video, StreamPos_Last, Video_Height, Temp->second.CleanAperture_Height, 0, true);
-            }
-            if (Temp->second.CleanAperture_PixelAspectRatio)
-            {
-                Clear(Stream_Video, StreamPos_Last, Video_DisplayAspectRatio);
-                Clear(Stream_Video, StreamPos_Last, Video_PixelAspectRatio);
-                Fill(Stream_Video, StreamPos_Last, Video_PixelAspectRatio, Temp->second.CleanAperture_PixelAspectRatio, 3, true);
-                if (Retrieve(Stream_Video, StreamPos_Last, Video_PixelAspectRatio)==Retrieve(Stream_Video, StreamPos_Last, Video_PixelAspectRatio_Original))
-                    Clear(Stream_Video, StreamPos_Last, Video_PixelAspectRatio_Original);
-                if (Retrieve(Stream_Video, StreamPos_Last, Video_DisplayAspectRatio)==Retrieve(Stream_Video, StreamPos_Last, Video_DisplayAspectRatio_Original))
-                {
-                    Clear(Stream_Video, StreamPos_Last, Video_DisplayAspectRatio_Original);
-                    Clear(Stream_Video, StreamPos_Last, Video_DisplayAspectRatio_Original_String);
-                }
-            }
+            Fill(Stream_Video, StreamPos_Last, "Width_CleanAperture", Temp->second.CleanAperture_Width, 0, true);
+            Fill(Stream_Video, StreamPos_Last, "Height_CleanAperture", Temp->second.CleanAperture_Height, 0, true);
+            Fill(Stream_Video, StreamPos_Last, "PixelAspectRatio_CleanAperture", Temp->second.CleanAperture_PixelAspectRatio, 3, true);
         }
 
         //Special case: QuickTime files and Stereo streams, there is a default value in QuickTime player, a QuickTime "standard"?
@@ -1328,7 +1306,7 @@ size_t File_Mpeg4::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
                         {
                             std::map<int64u, int64u>::iterator StreamOffset_Current=StreamOffset_Jump.end();
                             do
-                                StreamOffset_Current--;
+                                --StreamOffset_Current;
                             while (StreamOffset_Current->second>JumpTo && StreamOffset_Current!=StreamOffset_Jump.begin());
                             JumpTo=StreamOffset_Current->second;
                         }
@@ -1522,6 +1500,12 @@ void File_Mpeg4::Header_Parse()
     int32u Size_32, Name;
     if (Element_Size==2)
     {
+        if (!Element_IsComplete_Get())
+        {
+            Element_WaitForMoreData();
+            return;
+        }
+
         int16u Size_16;
         Peek_B2(Size_16);
         if (!Size_16)
@@ -1537,6 +1521,12 @@ void File_Mpeg4::Header_Parse()
     Get_B4 (Size_32,                                            "Size");
     if (Size_32==0 && (Element_Size==4 || Element_Size==8))
     {
+        if (!Element_IsComplete_Get())
+        {
+            Element_WaitForMoreData();
+            return;
+        }
+
         //Filling
         Header_Fill_Code(0, "Junk");
         Header_Fill_Size(4);

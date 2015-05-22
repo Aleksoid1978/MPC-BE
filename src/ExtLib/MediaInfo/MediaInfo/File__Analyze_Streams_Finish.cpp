@@ -110,7 +110,7 @@ void File__Analyze::TestContinuousFileNames(size_t CountOfFiles, Ztring FileExte
         return;
 
     //Trying to detect continuous file names (e.g. video stream as an image or HLS)
-	size_t Pos_Base = (size_t)-1;
+    size_t Pos_Base = (size_t)-1;
     bool AlreadyPresent=Config->File_Names.size()==1?true:false;
     FileName FileToTest(Config->File_Names.Read(Config->File_Names.size()-1));
     Ztring FileToTest_Name=FileToTest.Name_Get();
@@ -224,14 +224,14 @@ void File__Analyze::TestContinuousFileNames(size_t CountOfFiles, Ztring FileExte
     if (Config->File_Names.size()==Pos)
         return;
 
-    #if MEDIAINFO_DEMUX
     Config->File_IsImageSequence=true;
     Frame_Count_NotParsedIncluded=Pos_Base;
-    float64 Demux_Rate=Config->Demux_Rate_Get();
-    if (!Demux_Rate)
-        Demux_Rate=24;
-	Fill(Stream_Video, 0, Video_Delay, float64_int64s(Frame_Count_NotParsedIncluded*1000/Demux_Rate));
-    #endif
+    #if MEDIAINFO_DEMUX
+        float64 Demux_Rate=Config->Demux_Rate_Get();
+        if (!Demux_Rate)
+            Demux_Rate=24;
+        Fill(Stream_Video, 0, Video_Delay, float64_int64s(Frame_Count_NotParsedIncluded*1000/Demux_Rate));
+    #endif //MEDIAINFO_DEMUX
 
     #if MEDIAINFO_ADVANCED
         if (!Config->File_IgnoreSequenceFileSize_Get() || Config->File_Names.size()<=1)
@@ -420,16 +420,16 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
     //Standard
     if (Retrieve(Stream_Video, Pos, Video_Standard).empty() && (Retrieve(Stream_Video, Pos, Video_Width)==__T("720") || Retrieve(Stream_Video, Pos, Video_Width)==__T("704")))
     {
-             if (Retrieve(Stream_Video, Pos, Video_Height)==__T("576"))
+             if (Retrieve(Stream_Video, Pos, Video_Height)==__T("576") && Retrieve(Stream_Video, Pos, Video_FrameRate)==__T("25.000"))
             Fill(Stream_Video, Pos, Video_Standard, "PAL");
-        else if (Retrieve(Stream_Video, Pos, Video_Height)==__T("486") || Retrieve(Stream_Video, Pos, Video_Height)==__T("480"))
+        else if ((Retrieve(Stream_Video, Pos, Video_Height)==__T("486") || Retrieve(Stream_Video, Pos, Video_Height)==__T("480")) && Retrieve(Stream_Video, Pos, Video_FrameRate)==__T("29.970"))
             Fill(Stream_Video, Pos, Video_Standard, "NTSC");
     }
     if (Retrieve(Stream_Video, Pos, Video_Standard).empty() && Retrieve(Stream_Video, Pos, Video_Width)==__T("352"))
     {
-             if (Retrieve(Stream_Video, Pos, Video_Height)==__T("576") || Retrieve(Stream_Video, Pos, Video_Height)==__T("288"))
+             if ((Retrieve(Stream_Video, Pos, Video_Height)==__T("576") || Retrieve(Stream_Video, Pos, Video_Height)==__T("288")) && Retrieve(Stream_Video, Pos, Video_FrameRate)==__T("25.000"))
             Fill(Stream_Video, Pos, Video_Standard, "PAL");
-        else if (Retrieve(Stream_Video, Pos, Video_Height)==__T("486") || Retrieve(Stream_Video, Pos, Video_Height)==__T("480") || Retrieve(Stream_Video, Pos, Video_Height)==__T("243") || Retrieve(Stream_Video, Pos, Video_Height)==__T("240"))
+        else if ((Retrieve(Stream_Video, Pos, Video_Height)==__T("486") || Retrieve(Stream_Video, Pos, Video_Height)==__T("480") || Retrieve(Stream_Video, Pos, Video_Height)==__T("243") || Retrieve(Stream_Video, Pos, Video_Height)==__T("240")) && Retrieve(Stream_Video, Pos, Video_FrameRate)==__T("29.970"))
             Fill(Stream_Video, Pos, Video_Standard, "NTSC");
     }
 
@@ -991,19 +991,65 @@ void File__Analyze::Streams_Finish_HumanReadable_PerStream(stream_t StreamKind, 
         Fill(StreamKind, StreamPos, StreamKind==Stream_General?"OverallBitRate_Mode/String":"BitRate_Mode/String", Translated.find(__T("BitRate_Mode_"))?Translated:Value);
     }
 
-    //Encoded_Library
-    if ((ParameterName==__T("Encoded_Library")
-         || ParameterName==__T("Encoded_Library/Name")
-         || ParameterName==__T("Encoded_Library/Version")
-         || ParameterName==__T("Encoded_Library/Date"))
-        && Retrieve(StreamKind, StreamPos, "Encoded_Library/String").empty())
+    //Encoded_Application
+    if ((   ParameterName==__T("Encoded_Application")
+         || ParameterName==__T("Encoded_Application_CompanyName")
+         || ParameterName==__T("Encoded_Application_Name")
+         || ParameterName==__T("Encoded_Application_Version")
+         || ParameterName==__T("Encoded_Application_Date"))
+        && Retrieve(StreamKind, StreamPos, "Encoded_Application/String").empty())
     {
-        Ztring Name=Retrieve(StreamKind, StreamPos, "Encoded_Library/Name");
-        Ztring Version=Retrieve(StreamKind, StreamPos, "Encoded_Library/Version");
-        Ztring Date=Retrieve(StreamKind, StreamPos, "Encoded_Library/Date");
+        Ztring CompanyName=Retrieve(StreamKind, StreamPos, "Encoded_Application_CompanyName");
+        Ztring Name=Retrieve(StreamKind, StreamPos, "Encoded_Application_Name");
+        Ztring Version=Retrieve(StreamKind, StreamPos, "Encoded_Application_Version");
+        Ztring Date=Retrieve(StreamKind, StreamPos, "Encoded_Application_Date");
         if (!Name.empty())
         {
-            Ztring String=Name;
+            Ztring String;
+            if (!CompanyName.empty())
+            {
+                String+=CompanyName;
+                String+=__T(" ");
+            }
+            String+=Name;
+            if (!Version.empty())
+            {
+                String+=__T(" ");
+                String+=Version;
+            }
+            if (!Date.empty())
+            {
+                String+=__T(" (");
+                String+=Date;
+                String+=__T(")");
+            }
+            Fill(StreamKind, StreamPos, "Encoded_Application/String", String, true);
+        }
+        else
+            Fill(StreamKind, StreamPos, "Encoded_Application/String", Retrieve(StreamKind, StreamPos, "Encoded_Application"), true);
+    }
+
+    //Encoded_Library
+    if ((   ParameterName==__T("Encoded_Library")
+         || ParameterName==__T("Encoded_Library_CompanyName")
+         || ParameterName==__T("Encoded_Library_Name")
+         || ParameterName==__T("Encoded_Library_Version")
+         || ParameterName==__T("Encoded_Library_Date"))
+        && Retrieve(StreamKind, StreamPos, "Encoded_Library/String").empty())
+    {
+        Ztring CompanyName=Retrieve(StreamKind, StreamPos, "Encoded_Library_CompanyName");
+        Ztring Name=Retrieve(StreamKind, StreamPos, "Encoded_Library_Name");
+        Ztring Version=Retrieve(StreamKind, StreamPos, "Encoded_Library_Version");
+        Ztring Date=Retrieve(StreamKind, StreamPos, "Encoded_Library_Date");
+        if (!Name.empty())
+        {
+            Ztring String;
+            if (!CompanyName.empty())
+            {
+                String+=CompanyName;
+                String+=__T(" ");
+            }
+            String+=Name;
             if (!Version.empty())
             {
                 String+=__T(" ");

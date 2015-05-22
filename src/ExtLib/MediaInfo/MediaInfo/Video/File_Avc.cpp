@@ -49,7 +49,7 @@ const char* Avc_profile_idc(int8u profile_idc)
         case 138 : return "Multiview Depth High";
         case 144 : return "High 4:4:4";
         case 244 : return "High 4:4:4 Predictive";
-        default  : return "Unknown";
+        default  : return "";
     }
 }
 
@@ -492,7 +492,7 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
                     if ((*seq_parameter_set_Item)->constraint_set3_flag)
                         Profile+=__T(" Intra");
     }
-    Profile+=__T("@L")+Ztring().From_Number(((float)(*seq_parameter_set_Item)->level_idc)/10, 1);
+    Profile+=__T("@L")+Ztring().From_Number(((float)(*seq_parameter_set_Item)->level_idc)/10, ((*seq_parameter_set_Item)->level_idc%10)?1:0);
     Fill(Stream_Video, 0, Video_Format_Profile, Profile);
     Fill(Stream_Video, 0, Video_Codec_Profile, Profile);
     Fill(Stream_Video, StreamPos_Last, Video_Width, Width);
@@ -631,7 +631,7 @@ void File_Avc::Streams_Finish()
         if (GA94_03_Parser && GA94_03_Parser->Status[IsAccepted])
         {
             Clear(Stream_Text);
-            
+
             Finish(GA94_03_Parser);
             Merge(*GA94_03_Parser);
 
@@ -2953,7 +2953,7 @@ void File_Avc::seq_parameter_set()
 
         //Add
         seq_parameter_set_data_Add(seq_parameter_sets, seq_parameter_set_id, Data_Item_New);
-        
+
         //Autorisation of other streams
         Streams[0x08].Searching_Payload=true; //pic_parameter_set
         if (Streams[0x07].ShouldDuplicate)

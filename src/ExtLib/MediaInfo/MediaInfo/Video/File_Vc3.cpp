@@ -22,6 +22,9 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Video/File_Vc3.h"
+#if defined(MEDIAINFO_CDP_YES)
+    #include "MediaInfo/Text/File_Cdp.h"
+#endif
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -46,6 +49,10 @@ const bool Vc3_FromCID_IsSupported (int32u CompressionID)
         case 1251 :
         case 1252 :
         case 1253 :
+        case 1256 :
+        case 1258 :
+        case 1259 :
+        case 1260 :
                     return true;
         default   : return false;
     }
@@ -67,6 +74,10 @@ const int32u Vc3_CompressedFrameSize(int32u CompressionID)
         case 1251 : return 458752;
         case 1252 : return 303104;
         case 1253 : return 188416;
+        case 1256 : return 1835008;
+        case 1258 : return 212992;
+        case 1259 : return 417792;
+        case 1260 : return 417792;
         default   : return 0;
     }
 };
@@ -87,11 +98,23 @@ const int8u Vc3_SBD_FromCID (int32u CompressionID)
 {
     switch (CompressionID)
     {
+        case 1237 :
+        case 1238 :
+        case 1242 :
+        case 1243 :
+        case 1251 :
+        case 1252 :
+        case 1253 :
+        case 1258 :
+        case 1259 :
+        case 1260 :
+                    return 8;
         case 1235 :
         case 1241 :
         case 1250 :
+        case 1256 :
                     return 10;
-        default   : return 8;
+        default   : return 0;
     }
 }
 
@@ -132,11 +155,19 @@ const char* Vc3_SST_FromCID (int32u CompressionID)
 {
     switch (CompressionID)
     {
+        case 1235 :
+        case 1237 :
+        case 1238 :
+        case 1250 :
+        case 1251 :
+        case 1252 :
+        case 1253 :
+                    return Vc3_SST[0];
         case 1241 :
         case 1242 :
         case 1243 :
                     return Vc3_SST[1];
-        default   : return Vc3_SST[0];
+        default   : return "";
     }
 }
 
@@ -149,7 +180,15 @@ const int16u Vc3_SPL_FromCID (int32u CompressionID)
         case 1251 :
         case 1252 :
                     return 1280;
-        default   : return 1920;
+        case 1235 :
+        case 1237 :
+        case 1238 :
+        case 1241 :
+        case 1242 :
+        case 1243 :
+        case 1253 :
+                    return 1920;
+        default   : return 0;
     }
 }
 
@@ -162,9 +201,87 @@ const int16u Vc3_ALPF_PerFrame_FromCID (int32u CompressionID)
         case 1251 :
         case 1252 :
                     return 720;
-        default   : return 1080;
+        case 1235 :
+        case 1237 :
+        case 1238 :
+        case 1241 :
+        case 1242 :
+        case 1243 :
+        case 1253 :
+                    return 1080;
+        default   : return 0;
     }
 }
+
+//---------------------------------------------------------------------------
+const char* Vc3_CLR[8]=
+{
+    "YUV",
+    "RGB",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+};
+
+//---------------------------------------------------------------------------
+const char* Vc3_CLR_FromCID (int32u CompressionID)
+{
+    switch (CompressionID)
+    {
+        case 1235 :
+        case 1237 :
+        case 1238 :
+        case 1241 :
+        case 1242 :
+        case 1243 :
+        case 1250 :
+        case 1251 :
+        case 1252 :
+        case 1253 :
+        case 1258 :
+        case 1259 :
+        case 1260 :
+                    return Vc3_CLR[0];
+        case 1256 :
+                    return Vc3_CLR[1];
+        default   : return "";
+    }
+};
+
+//---------------------------------------------------------------------------
+const char* Vc3_SSC[2]=
+{
+    "4:2:2",
+    "", // 4:4:4
+};
+
+//---------------------------------------------------------------------------
+const char* Vc3_SSC_FromCID (int32u CompressionID)
+{
+    switch (CompressionID)
+    {
+        case 1235 :
+        case 1237 :
+        case 1238 :
+        case 1241 :
+        case 1242 :
+        case 1243 :
+        case 1250 :
+        case 1251 :
+        case 1252 :
+        case 1253 :
+        case 1258 :
+        case 1259 :
+        case 1260 :
+                    return Vc3_SSC[0];
+        case 1256 :
+                    return Vc3_SSC[1];
+        default   : return "";
+    }
+};
 
 //***************************************************************************
 // Constructor/Destructor
@@ -181,9 +298,21 @@ File_Vc3::File_Vc3()
     Frame_Count_Valid=2;
     FrameRate=0;
 
+    //Parsers
+    #if defined(MEDIAINFO_CDP_YES)
+        Cdp_Parser=NULL;
+    #endif //defined(MEDIAINFO_CDP_YES)
+    
     //Temp
-    Data_ToParse=0;
     FFC_FirstFrame=(int8u)-1;
+}
+
+//---------------------------------------------------------------------------
+File_Vc3::~File_Vc3()
+{
+    #if defined(MEDIAINFO_CDP_YES)
+        delete Cdp_Parser; //Cdp_Parser=NULL;
+    #endif //defined(MEDIAINFO_CDP_YES)
 }
 
 //***************************************************************************
@@ -197,16 +326,20 @@ void File_Vc3::Streams_Fill()
     Stream_Prepare(Stream_Video);
     Fill(Stream_Video, 0, Video_Format, "VC-3");
     Fill(Stream_Video, 0, Video_BitRate_Mode, "CBR");
-    if (FrameRate)
+    if (FrameRate && Vc3_CompressedFrameSize(CID))
         Fill(Stream_Video, 0, Video_BitRate, Vc3_CompressedFrameSize(CID)*8*FrameRate, 0);
+    Fill(Stream_Video, 0, Video_Format_Version, __T("Version ")+Ztring::ToZtring(HVN));
     if (Vc3_FromCID_IsSupported(CID))
     {
-        Fill(Stream_Video, 0, Video_Width, Vc3_SPL_FromCID(CID));
-        Fill(Stream_Video, 0, Video_Height, Vc3_ALPF_PerFrame_FromCID(CID));
-        Fill(Stream_Video, 0, Video_BitDepth, Vc3_SBD_FromCID(CID));
+        if (Vc3_SPL_FromCID(CID))
+            Fill(Stream_Video, 0, Video_Width, Vc3_SPL_FromCID(CID));
+        if (Vc3_ALPF_PerFrame_FromCID(CID))
+            Fill(Stream_Video, 0, Video_Height, Vc3_ALPF_PerFrame_FromCID(CID));
+        if (Vc3_SBD_FromCID(CID))
+            Fill(Stream_Video, 0, Video_BitDepth, Vc3_SBD_FromCID(CID));
         Fill(Stream_Video, 0, Video_ScanType, Vc3_SST_FromCID(CID));
-        Fill(Stream_Video, 0, Video_ColorSpace, "YUV");
-        Fill(Stream_Video, 0, Video_ChromaSubsampling, "4:2:2");
+        Fill(Stream_Video, 0, Video_ColorSpace, Vc3_CLR_FromCID(CID));
+        Fill(Stream_Video, 0, Video_ChromaSubsampling, Vc3_SSC_FromCID(CID));
     }
     else
     {
@@ -214,9 +347,35 @@ void File_Vc3::Streams_Fill()
         Fill(Stream_Video, 0, Video_Height, ALPF*(SST?2:1));
         Fill(Stream_Video, 0, Video_BitDepth, Vc3_SBD(SBD));
         Fill(Stream_Video, 0, Video_ScanType, Vc3_SST[SST]);
+        Fill(Stream_Video, 0, Video_ColorSpace, Vc3_CLR[SSC]);
+        Fill(Stream_Video, 0, Video_ChromaSubsampling, Vc3_SSC[CLR]);
     }
     if (FFC_FirstFrame!=(int8u)-1)
         Fill(Stream_Video, 0, Video_ScanOrder, Vc3_FFC_ScanOrder[FFC_FirstFrame]);
+}
+
+//---------------------------------------------------------------------------
+void File_Vc3::Streams_Finish()
+{
+    #if defined(MEDIAINFO_CDP_YES)
+        if (Cdp_Parser && !Cdp_Parser->Status[IsFinished] && Cdp_Parser->Status[IsAccepted])
+        {
+            Finish(Cdp_Parser);
+            for (size_t StreamPos=0; StreamPos<Cdp_Parser->Count_Get(Stream_Text); StreamPos++)
+            {
+                Merge(*Cdp_Parser, Stream_Text, StreamPos, StreamPos);
+                Ztring MuxingMode=Cdp_Parser->Retrieve(Stream_Text, StreamPos, "MuxingMode");
+                Fill(Stream_Text, StreamPos, "MuxingMode", __T("VC-3 / Nexio user data / ")+MuxingMode, true);
+            }
+
+            Ztring LawRating=Cdp_Parser->Retrieve(Stream_General, 0, General_LawRating);
+            if (!LawRating.empty())
+                Fill(Stream_General, 0, General_LawRating, LawRating, true);
+            Ztring Title=Cdp_Parser->Retrieve(Stream_General, 0, General_Title);
+            if (!Title.empty() && Retrieve(Stream_General, 0, General_Title).empty())
+                Fill(Stream_General, 0, General_Title, Title);
+        }
+    #endif //defined(MEDIAINFO_CDP_YES)
 }
 
 //***************************************************************************
@@ -231,7 +390,7 @@ bool File_Vc3::Synchronize()
                                          || Buffer[Buffer_Offset+1]!=0x00
                                          || Buffer[Buffer_Offset+2]!=0x02
                                          || Buffer[Buffer_Offset+3]!=0x80
-                                         || Buffer[Buffer_Offset+4]!=0x01))
+                                         || Buffer[Buffer_Offset+4]==0x00))
     {
         Buffer_Offset+=2;
         while (Buffer_Offset<Buffer_Size && Buffer[Buffer_Offset]!=0x00)
@@ -276,7 +435,7 @@ bool File_Vc3::Synched_Test()
      || Buffer[Buffer_Offset+1]!=0x00
      || Buffer[Buffer_Offset+2]!=0x02
      || Buffer[Buffer_Offset+3]!=0x80
-     || Buffer[Buffer_Offset+4]!=0x01)
+     || Buffer[Buffer_Offset+4]==0x00)
     {
         Synched=false;
         return true;
@@ -298,7 +457,16 @@ bool File_Vc3::Demux_UnpacketizeContainer_Test()
         return false;
 
     int32u CompressionID=BigEndian2int32u(Buffer+Buffer_Offset+0x28);
-    int32u Size=Vc3_CompressedFrameSize(CompressionID);
+    size_t Size=Vc3_CompressedFrameSize(CompressionID);
+    if (!Size)
+    {
+        if (!IsSub)
+        {
+            Reject();
+            return false;
+        }
+        Size=Buffer_Size; //Hoping that the packet is complete. TODO: add a flag in the container parser saying if the packet is complete
+    }
     Demux_Offset=Buffer_Offset+Size;
 
     if (Demux_Offset>Buffer_Size && File_Offset+Buffer_Size!=File_Size)
@@ -309,6 +477,19 @@ bool File_Vc3::Demux_UnpacketizeContainer_Test()
     return true;
 }
 #endif //MEDIAINFO_DEMUX
+
+//***************************************************************************
+// Buffer - Global
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_Vc3::Read_Buffer_Unsynched()
+{
+    #if defined(MEDIAINFO_CDP_YES)
+        if (Cdp_Parser)
+            Cdp_Parser->Open_Buffer_Unsynch();
+    #endif //defined(MEDIAINFO_CDP_YES)
+}
 
 //***************************************************************************
 // Buffer - Per element
@@ -329,7 +510,17 @@ void File_Vc3::Header_Parse()
     int32u CompressionID=BigEndian2int32u(Buffer+Buffer_Offset+0x28);
 
     Header_Fill_Code(0, "Frame");
-    Header_Fill_Size(Vc3_CompressedFrameSize(CompressionID));
+    size_t Size=Vc3_CompressedFrameSize(CompressionID);
+    if (!Size)
+    {
+        if (!IsSub)
+        {
+            Reject();
+            return;
+        }
+        Size=Buffer_Size; //Hoping that the packet is complete. TODO: add a flag in the container parser saying if the packet is complete
+    }
+    Header_Fill_Size(Size);
 }
 
 //---------------------------------------------------------------------------
@@ -344,21 +535,25 @@ void File_Vc3::Data_Parse()
     {
     Element_Info1(Frame_Count+1);
     HeaderPrefix();
-    CodingControlA();
-    Skip_XX(16,                                                 "Reserved");
-    ImageGeometry();
-    Skip_XX( 5,                                                 "Reserved");
-    CompressionID();
-    CodingControlB();
-    Skip_XX( 3,                                                 "Reserved");
-    TimeCode();
+    if (HVN <= 2)
+    {
+        CodingControlA();
+        Skip_XX(16,                                             "Reserved");
+        ImageGeometry();
+        Skip_XX( 5,                                             "Reserved");
+        CompressionID();
+        CodingControlB();
+        Skip_XX( 3,                                             "Reserved");
+        TimeCode();
+        Skip_XX(38,                                             "Reserved");
+        UserData();
 
-    Skip_XX(640-Element_Offset,                                 "ToDo");
+        Skip_XX(640-Element_Offset,                             "ToDo");
+    }
     Skip_XX(Element_Size-Element_Offset,                        "Data");
     }
 
     FILLING_BEGIN();
-        Data_ToParse-=Buffer_Size-(size_t)Buffer_Offset;
         Frame_Count++;
         if (Frame_Count_NotParsedIncluded!=(int64u)-1)
             Frame_Count_NotParsedIncluded++;
@@ -389,12 +584,13 @@ void File_Vc3::HeaderPrefix()
 {
     //Parsing
     Element_Begin1("Header Prefix");
-    int64u Data;
-    Get_B5 (Data,                                               "Contents");
+    int32u Data;
+    Get_B4 (Data,                                               "Magic number");
+    Get_B1 (HVN,                                                "HVN: Header Version Number");
     Element_End0();
 
     FILLING_BEGIN();
-        if (Data==0x0000028001LL)
+        if (Data==0x00000280LL)
             Accept("VC-3");
         else
             Reject("VC-3");
@@ -419,8 +615,11 @@ void File_Vc3::CodingControlA()
 
     Mark_1();
     Mark_0();
-    Mark_0();
-    Get_SB (   CRCF,                                             "CRC flag");
+    if (HVN==1)
+        Mark_0();
+    else
+        Skip_SB(                                                "MACF: Macroblock Adaptive Control Flag");
+    Get_SB (   CRCF,                                            "CRC flag");
     Mark_0();
     Mark_0();
     Mark_0();
@@ -488,9 +687,6 @@ void File_Vc3::CompressionID()
 
     FILLING_BEGIN();
         CID=Data;
-        Data_ToParse=Vc3_CompressedFrameSize(Data);
-        if (Data_ToParse==0)
-            Reject("VC-3");
     FILLING_END();
 }
 
@@ -502,13 +698,29 @@ void File_Vc3::CodingControlB()
     BS_Begin();
 
     Info_S1(1, FFE,                                             "Field/Frame Count"); Param_Info1(Vc3_FFE[FFE]);
+    if (HVN==1)
+    {
+        Mark_0();
+        SSC=false;
+    }
+    else
+    {
+        Get_SB (SSC,                                            "SSC: Sub Sampling Control"); Param_Info1(Vc3_SSC[SSC]);
+    }
     Mark_0();
     Mark_0();
     Mark_0();
-    Mark_0();
-    Mark_0();
-    Mark_0();
-    Mark_0();
+    if (HVN==1)
+    {
+        Mark_0();
+        Mark_0();
+        Mark_0();
+        CLR=0;
+    }
+    else
+    {
+        Get_S1 (3, CLR,                                         "CLR: Color"); Param_Info1(Vc3_CLR[CLR]);
+    }
 
     BS_End();
     Element_End0();
@@ -540,6 +752,62 @@ void File_Vc3::TimeCode()
         Skip_B8(                                                "Junk");
 
     Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Vc3::UserData()
+{
+    //Parsing
+    Element_Begin1("User Data");
+    int8u UserDataLabel;
+
+    BS_Begin();
+    Get_S1 (4, UserDataLabel,                                   "User Data Label");
+    Mark_0();
+    Mark_0();
+    Mark_0();
+    Mark_1();
+    BS_End();
+
+    switch (UserDataLabel)
+    {
+        case 0x00: Skip_XX(260,                                 "Reserved"); break;
+        case 0x08: UserData_8(); break;
+        default  : Skip_XX(260,                                 "Reserved for future use");
+    }
+
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Vc3::UserData_8()
+{
+    if (Element_Offset + 0x104 < Element_Size
+        && Buffer[Buffer_Offset + (size_t)Element_Offset + 0xBA] == 0x96
+        && Buffer[Buffer_Offset + (size_t)Element_Offset + 0xBB] == 0x69)
+    {
+        Skip_XX(0xBA,                                           "Nexio private data?");
+        #if defined(MEDIAINFO_CDP_YES)
+            if (Cdp_Parser==NULL)
+            {
+                Cdp_Parser=new File_Cdp;
+                Open_Buffer_Init(Cdp_Parser);
+                Frame_Count_Valid=300;
+            }
+            if (!Cdp_Parser->Status[IsFinished])
+            {
+                ((File_Cdp*)Cdp_Parser)->AspectRatio=16.0/9.0;
+                Open_Buffer_Continue(Cdp_Parser, Buffer + Buffer_Offset + (size_t)Element_Offset, 0x49);
+            }
+            Element_Offset+=0x49;
+            Skip_B1(                                            "Nexio private data?");
+        #else //MEDIAINFO_CDP_YES
+            Skip_XX(0x4A                                        "CDP data");
+        #endif //MEDIAINFO_CDP_YES
+    }
+    else
+        Skip_XX(260,                                            "Nexio private data?");
+
 }
 
 //***************************************************************************

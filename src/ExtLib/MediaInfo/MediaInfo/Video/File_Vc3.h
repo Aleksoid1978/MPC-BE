@@ -36,10 +36,12 @@ public :
 
     //constructor/Destructor
     File_Vc3();
+    ~File_Vc3();
 
 private :
     //Streams management
     void Streams_Fill();
+    void Streams_Finish();
 
     //Buffer - Synchro
     bool Synchronize();
@@ -49,6 +51,9 @@ private :
     #if MEDIAINFO_DEMUX
     bool Demux_UnpacketizeContainer_Test();
     #endif //MEDIAINFO_DEMUX
+
+    //Buffer - Global
+    void Read_Buffer_Unsynched();
 
     //Buffer - Per element
     bool Header_Begin ();
@@ -63,17 +68,25 @@ private :
     void CodingControlB();
     void TimeCode();
     void UserData();
+    void UserData_8();
     void MacroblockScanIndices();
 
+    //Parsers
+    #if defined(MEDIAINFO_CDP_YES)
+        File__Analyze*  Cdp_Parser;
+    #endif //defined(MEDIAINFO_CDP_YES)
+    
     //Temp
-    int64u  Data_ToParse;
     int32u  CID;
     bool    CRCF;
     int16u  ALPF;
     int16u  SPL;
     int8u   SBD;
     int8u   FFC_FirstFrame;
+    int8u   HVN;
+    int8u   CLR;
     bool    SST;
+    bool    SSC;
 };
 
 } //NameSpace

@@ -255,7 +255,7 @@ void File_Lxf::Streams_Fill_PerStream(File__Analyze* Parser, stream_t Container_
                     for (size_t StreamPos=0; StreamPos<Parser->Count_Get((stream_t)StreamKind); StreamPos++)
                     {
                         Ztring ID;
-                        if (Parser->Count_Get(Stream_Audio) && Parser->Retrieve(Stream_Audio, 0, Audio_MuxingMode)==__T("AES3") && Parser_Pos%2)
+                        if (Parser->Count_Get(Stream_Audio) && Parser->Retrieve(Stream_Audio, 0, Audio_MuxingMode)==__T("SMPTE ST 337") && Parser_Pos%2)
                             ID+=Ztring::ToZtring(0x100*Container_StreamKind+Parser_Pos-1)+__T(" / ");
                         ID+=Ztring::ToZtring(0x100*Container_StreamKind+Parser_Pos);
                         if (!Parser->Retrieve((stream_t)StreamKind, StreamPos, General_ID).empty())

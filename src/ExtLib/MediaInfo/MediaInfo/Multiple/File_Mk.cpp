@@ -135,7 +135,7 @@ const char* Mk_StereoMode(int64u StereoMode)
         case 0x0C : return "Anaglyph (green/magenta)";
         case 0x0D : return "Both Eyes laced in one block (left eye first)";
         case 0x0E : return "Both Eyes laced in one block (right eye first)";
-        default   : return "Unknown";
+        default   : return "";
     }
 }
 
@@ -148,7 +148,7 @@ const char* Mk_StereoMode_v2(int64u StereoMode)
         case 0x01 : return "Right Eye";
         case 0x02 : return "Left Eye";
         case 0x03 : return "Both Eye";
-        default   : return "Unknown";
+        default   : return "";
     }
 }
 
@@ -184,6 +184,8 @@ File_Mk::File_Mk()
     Format_Version=0;
     TimecodeScale=1000000; //Default value
     Duration=0;
+    Info_AlreadyParsed=false;
+    Tracks_AlreadyParsed=false;
     Cluster_AlreadyParsed=false;
 
     //Helpers
@@ -1850,8 +1852,10 @@ void File_Mk::Segment_Info()
 {
     Element_Name("Info");
 
-    if (Cluster_AlreadyParsed)
+    if (Info_AlreadyParsed)
         Skip_XX(Element_TotalSize_Get(),                        "Alreadys parsed, skipping");
+    else
+        Info_AlreadyParsed=true;
 }
 
 //---------------------------------------------------------------------------
@@ -2235,8 +2239,10 @@ void File_Mk::Segment_Tracks()
 {
     Element_Name("Tracks");
 
-    if (Cluster_AlreadyParsed)
+    if (Tracks_AlreadyParsed)
         Skip_XX(Element_TotalSize_Get(),                        "Alreadys parsed, skipping");
+    else
+        Tracks_AlreadyParsed=true;
 }
 
 //---------------------------------------------------------------------------

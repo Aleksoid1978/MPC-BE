@@ -308,7 +308,7 @@ void File_Riff::Streams_Finish ()
             }
 
             //Hack - SMPTE ST 337, RIFF channels count is wrong
-            if (StreamKind_Last==Stream_Audio && Retrieve(Stream_Audio, StreamPos_Last, Audio_MuxingMode)==__T("AES3") && Temp->second.Parsers[0]->Get(Stream_Audio, 0, Audio_Channel_s_).empty())
+            if (StreamKind_Last==Stream_Audio && Retrieve(Stream_Audio, StreamPos_Last, Audio_MuxingMode)==__T("SMPTE ST 337") && Temp->second.Parsers[0]->Get(Stream_Audio, 0, Audio_Channel_s_).empty())
                 Clear(Stream_Audio, StreamPos_Last, Audio_Channel_s_);
 
             //Alignment

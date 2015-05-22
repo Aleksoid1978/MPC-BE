@@ -47,7 +47,7 @@ private :
     void Streams_Accept();
     #if MEDIAINFO_IBIUSAGE
     void Streams_Finish();
-    #endif MEDIAINFO_IBIUSAGE
+    #endif //MEDIAINFO_IBIUSAGE
 
     //Buffer - Element
     void Header_Parse();
