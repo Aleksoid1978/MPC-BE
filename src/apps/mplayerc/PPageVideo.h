@@ -80,6 +80,7 @@ public:
 	afx_msg void OnUpdateMixerYUV(CCmdUI* pCmdUI);
 	afx_msg void OnSurfaceChange();
 	afx_msg void OnDSRendererChange();
+	afx_msg void OnResetDevice();
 	afx_msg void OnFullscreenCheck();
 	afx_msg void OnD3D9DeviceCheck();
 	afx_msg void OnSurfaceFormatChange();

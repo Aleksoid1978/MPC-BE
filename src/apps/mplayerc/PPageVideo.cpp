@@ -103,6 +103,7 @@ BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
 	ON_CBN_SELCHANGE(IDC_VIDRND_COMBO, OnDSRendererChange)
 	ON_CBN_SELCHANGE(IDC_DX_SURFACE, OnSurfaceChange)
 	ON_BN_CLICKED(IDC_D3D9DEVICE, OnD3D9DeviceCheck)
+	ON_BN_CLICKED(IDC_RESETDEVICE, OnResetDevice)
 	ON_BN_CLICKED(IDC_FULLSCREEN_MONITOR_CHECK, OnFullscreenCheck)
 	ON_UPDATE_COMMAND_UI(IDC_DSVMRYUVMIXER, OnUpdateMixerYUV)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnSurfaceFormatChange)
@@ -647,6 +648,11 @@ void CPPageVideo::OnDSRendererChange()
 			m_wndToolTip.UpdateTipText(L"", &m_cbVideoRenderer);
 	}
 
+	SetModified();
+}
+
+void CPPageVideo::OnResetDevice()
+{
 	SetModified();
 }
 
