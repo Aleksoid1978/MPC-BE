@@ -31,6 +31,7 @@ CFullscreenWnd::CFullscreenWnd(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
 	, m_hCursor(::LoadCursor(NULL, IDC_ARROW))
 	, m_bCursorVisible(false)
+	, m_bTrackingMouseLeave(false)
 {
 }
 
@@ -129,6 +130,13 @@ void CFullscreenWnd::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CFullscreenWnd::OnMouseMove(UINT nFlags, CPoint point)
 {
+	if (!m_bTrackingMouseLeave) {
+		TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, this->m_hWnd };
+		if (TrackMouseEvent(&tme)) {
+			m_bTrackingMouseLeave = true;
+		}
+	}
+
 	if (m_pMainFrame) {
 		if (m_pMainFrame->IsD3DFullScreenMode() && m_pMainFrame->m_OSD.OnMouseMove(nFlags, point)) {
 			m_pMainFrame->KillTimer(CMainFrame::TIMER_FULLSCREENMOUSEHIDER);
@@ -143,6 +151,8 @@ void CFullscreenWnd::OnMouseMove(UINT nFlags, CPoint point)
 
 void CFullscreenWnd::OnMouseLeave()
 {
+	m_bTrackingMouseLeave = false;
+
 	if (m_pMainFrame) {
 		m_pMainFrame->m_OSD.OnMouseLeave();
 		return;
