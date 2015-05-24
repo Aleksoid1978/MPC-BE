@@ -45,6 +45,8 @@ protected:
 	CMainFrame*	m_pMainFrame;
 	HCURSOR		m_hCursor;
 	bool		m_bCursorVisible;
+	bool		m_bTrackingMouseLeave;
+
 public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
