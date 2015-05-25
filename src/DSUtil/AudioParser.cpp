@@ -50,44 +50,55 @@ static inline UINT64 LatmGetValue(CGolombBuffer& gb) {
 	return value;
 }
 
-#define AOT_AAC_LC 2
-static bool ReadAudioConfig(CGolombBuffer& gb, int& samplingFrequency, int& channelConfiguration)
+#define AOT_AAC_LC	2
+#define AOT_SBR		5
+#define AOT_ER_BSAC	22
+#define AOT_PS		29
+#define AOT_ESCAPE	31
+
+static inline int get_object_type(CGolombBuffer& gb)
 {
-	static int channels_layout[] = {0, 1, 2, 3, 4, 5, 6, 8};
+	int object_type = gb.BitRead(5);
+	if (object_type == AOT_ESCAPE) {
+		object_type = 32 + gb.BitRead(6);
+	}
+
+	return object_type;
+}
+
+static inline int get_sample_rate(CGolombBuffer& gb)
+{
 	static int freq[] = {96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350, 0, 0, 0};
 
-	int sbr_present = 0;
-
-	int audioObjectType = gb.BitRead(5);
-	if (audioObjectType == 31) {
-		audioObjectType = 32 + gb.BitRead(6);
-	}
 	int samplingFrequencyIndex = gb.BitRead(4);
-	samplingFrequency = freq[samplingFrequencyIndex];
+	int samplingFrequency = freq[samplingFrequencyIndex];
 	if (samplingFrequencyIndex == 0x0f) {
 		samplingFrequency = gb.BitRead(24);
 	}
-	channelConfiguration = 0;
-	int channelconfig = gb.BitRead(4);
-	if (channelconfig < 8) {
-		channelConfiguration = channels_layout[channelconfig];
-	}
 
-	if (audioObjectType == 5) {
+	return samplingFrequency;
+}
+
+static bool ReadAudioConfig(CGolombBuffer& gb, int& samplingFrequency, int& channelConfiguration)
+{
+	static int channels_layout[8] = {0, 1, 2, 3, 4, 5, 6, 8};
+
+	int sbr_present = 0;
+
+	int audioObjectType = get_object_type(gb);
+	samplingFrequency = get_sample_rate(gb);
+
+	int channelconfig = gb.BitRead(4);
+	channelConfiguration = (channelconfig < _countof(channels_layout)) ? channels_layout[channelconfig] : 0;
+
+	if (audioObjectType == AOT_SBR
+			|| (audioObjectType == AOT_PS && !(gb.BitRead(3, true) & 0x03 && !(gb.BitRead(9, true) & 0x3F)))) {
 		sbr_present = 1;
 
-		samplingFrequencyIndex = gb.BitRead(4);
-		samplingFrequency = freq[samplingFrequencyIndex];
-		if (samplingFrequencyIndex == 0x0f) {
-			samplingFrequency = gb.BitRead(24);
-		}
+		samplingFrequency = get_sample_rate(gb);
+		audioObjectType = get_object_type(gb);
 
-		audioObjectType = gb.BitRead(5);
-		if (audioObjectType == 31) {
-			audioObjectType = 32 + gb.BitRead(6);
-		}
-
-		if (audioObjectType == 22) {
+		if (audioObjectType == AOT_ER_BSAC) {
 			gb.BitRead(4); // ext_chan_config
 		}
 	}
