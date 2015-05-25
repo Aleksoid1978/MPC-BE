@@ -54,5 +54,7 @@ void avfilter_register_all(void)
     /* those filters are part of public or internal API => registered
      * unconditionally */
     REGISTER_FILTER_UNCONDITIONAL(asrc_abuffer);
+    //REGISTER_FILTER_UNCONDITIONAL(vsrc_buffer);
     REGISTER_FILTER_UNCONDITIONAL(asink_abuffer);
+    //REGISTER_FILTER_UNCONDITIONAL(vsink_buffer);
 }
