@@ -3986,24 +3986,31 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	m_AngleZ = 0;
-	if (OpenFileData *pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.m_p)) {
-		// Rotation flag;
-		BeginEnumFilters(m_pGB, pEF, pBF) {
-			if (CComQIPtr<IPropertyBag> pPB = pBF) {
-				CComVariant var;
-				if (SUCCEEDED(pPB->Read(CComBSTR(_T("ROTATION")), &var, NULL))) {
-					CString fstr = var.bstrVal;
-					if (!fstr.IsEmpty()) {
-						int rotationValue = 0;
-						if ((_stscanf_s(fstr, _T("%d"), &rotationValue) == 1) && rotationValue) {
-							m_AngleZ = -rotationValue;
+	if (m_pCAP) {
+		if (OpenFileData *pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.m_p)) {
+			// Rotation flag;
+			BeginEnumFilters(m_pGB, pEF, pBF) {
+				if (CComQIPtr<IPropertyBag> pPB = pBF) {
+					CComVariant var;
+					if (SUCCEEDED(pPB->Read(CComBSTR(_T("ROTATION")), &var, NULL))) {
+						CString fstr = var.bstrVal;
+						var.Clear();
+						if (!fstr.IsEmpty()) {
+							int rotationValue = 0;
+							if ((_stscanf_s(fstr, _T("%d"), &rotationValue) == 1) && rotationValue && (rotationValue % 90 == 0)) {
+								m_AngleZ = -rotationValue;
+								if (rotationValue % 180 == 90) {
+									CSize vsize = GetVideoSize();
+									m_ZoomX = m_ZoomY = (double)vsize.cy / vsize.cx;
+								}
+							}
 						}
 					}
+					break;
 				}
-				break;
 			}
+			EndEnumFilters;
 		}
-		EndEnumFilters;
 	}
 
 	if (OpenDeviceData *pDeviceData = dynamic_cast<OpenDeviceData*>(m_lastOMD.m_p)) {
