@@ -459,7 +459,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 7		"替代式垂直同步"
 8		"垂直同步偏移量:"
 11		"停用桌面轉譯緩衝處理 (Aero)"
-12		"Enable frame time correction"
+12		"啟用影格時間校正"
 13		"在垂直同步之前排空 GPU"
 14		"在呈現之後排空 GPU"
 15		"等待排空"
