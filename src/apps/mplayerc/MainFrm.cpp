@@ -8447,11 +8447,11 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 		}
 	} else if (i == -6) {
 		// enabled
+		pCmdUI->Enable(TRUE);
 		if (m_pDVS) {
 			bool fHideSubtitles = false;
 			m_pDVS->get_HideSubtitles(&fHideSubtitles);
 
-			pCmdUI->Enable();
 			pCmdUI->SetCheck(!fHideSubtitles);
 			return;
 		}
