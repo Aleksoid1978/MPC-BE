@@ -37,7 +37,6 @@
 #define AC3_LFE                     16
 
 // LATM AAC
-
 static inline UINT64 LatmGetValue(CGolombBuffer& gb) {
 	int length = gb.BitRead(2);
 	UINT64 value = 0;
@@ -79,21 +78,25 @@ static inline int get_sample_rate(CGolombBuffer& gb)
 	return samplingFrequency;
 }
 
-static bool ReadAudioConfig(CGolombBuffer& gb, int& samplingFrequency, int& channelConfiguration)
+static bool ReadAudioConfig(CGolombBuffer& gb, int& samplingFrequency, int& channels)
 {
 	static int channels_layout[8] = {0, 1, 2, 3, 4, 5, 6, 8};
 
 	int sbr_present = 0;
+	int ps_present = 0;
 
 	int audioObjectType = get_object_type(gb);
 	samplingFrequency = get_sample_rate(gb);
 
 	int channelconfig = gb.BitRead(4);
-	channelConfiguration = (channelconfig < _countof(channels_layout)) ? channels_layout[channelconfig] : 0;
+	channels = (channelconfig < _countof(channels_layout)) ? channels_layout[channelconfig] : 0;
 
 	if (audioObjectType == AOT_SBR
 			|| (audioObjectType == AOT_PS && !(gb.BitRead(3, true) & 0x03 && !(gb.BitRead(9, true) & 0x3F)))) {
 		sbr_present = 1;
+		if (audioObjectType == AOT_PS) {
+			ps_present = 1;
+		}
 
 		samplingFrequency = get_sample_rate(gb);
 		audioObjectType = get_object_type(gb);
@@ -103,16 +106,22 @@ static bool ReadAudioConfig(CGolombBuffer& gb, int& samplingFrequency, int& chan
 		}
 	}
 
-	if (!sbr_present) {
-		if (samplingFrequency <= 24000) {
-			samplingFrequency *= 2;
-		}
+	if (!sbr_present && samplingFrequency <= 24000) {
+		samplingFrequency *= 2;
 	}
 
-	return audioObjectType == AOT_AAC_LC  ? true : false;
+	if (!sbr_present || audioObjectType != AOT_AAC_LC) {
+		ps_present = 0;
+	}
+	if (ps_present) {
+		// HE-AACv2 Profile, always stereo.
+		channels = 2;
+	}
+
+	return audioObjectType == AOT_AAC_LC ? true : false;
 }
 
-static bool StreamMuxConfig(CGolombBuffer& gb, int& samplingFrequency, int& channelConfiguration, int& nExtraPos)
+static bool StreamMuxConfig(CGolombBuffer& gb, int& samplingFrequency, int& channels, int& nExtraPos)
 {
 	nExtraPos = 0;
 
@@ -138,13 +147,11 @@ static bool StreamMuxConfig(CGolombBuffer& gb, int& samplingFrequency, int& chan
 		if (!audio_mux_version) {
 			// audio specific config.
 			nExtraPos = gb.GetPos();
-			return ReadAudioConfig(gb, samplingFrequency, channelConfiguration);
+			return ReadAudioConfig(gb, samplingFrequency, channels);
 		}
-	} else {
-		return false;
 	}
 
-	return true;
+	return false;
 }
 
 bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels, BYTE* extra, unsigned int& extralen)
