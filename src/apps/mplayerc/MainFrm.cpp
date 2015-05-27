@@ -1601,8 +1601,7 @@ void CMainFrame::OnEnterSizeMove()
 	GetWindowRect(&rcWindow);
 	GetCursorPos(&cur_pos);
 
-	MONITORINFO mi;
-	mi.cbSize = sizeof(mi);
+	MONITORINFO mi = { sizeof(mi) };
 	GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 	RECT rcWork = mi.rcWork;
 
@@ -1634,15 +1633,17 @@ void CMainFrame::OnMove(int x, int y)
 
 	//MoveVideoWindow(); // This isn't needed, based on my limited tests. If it is needed then please add a description the scenario(s) where it is needed.
 	m_wndView.Invalidate();
+
 	WINDOWPLACEMENT wp;
 	GetWindowPlacement(&wp);
-	if (!m_bFirstFSAfterLaunchOnFullScreen && !m_bFullScreen && wp.flags != WPF_RESTORETOMAXIMIZED && wp.showCmd != SW_SHOWMINIMIZED) {
+	if (!m_bFirstFSAfterLaunchOnFullScreen && !m_bFullScreen && IsWindowVisible() && wp.flags != WPF_RESTORETOMAXIMIZED && wp.showCmd != SW_SHOWMINIMIZED) {
 		GetWindowRect(AfxGetAppSettings().rcLastWindowPos);
 	}
 
 	if (m_wndToolBar && ::IsWindow(m_wndToolBar.GetSafeHwnd())) {
 		m_wndToolBar.Invalidate();
 	}
+
 	FlyBarSetPos();
 	OSDBarSetPos();
 }
@@ -1656,8 +1657,7 @@ void CMainFrame::ClipRectToMonitor(LPRECT prc)
 	int w = rcNormalPosition.right - rcNormalPosition.left;
 	int h = rcNormalPosition.bottom - rcNormalPosition.top;
 
-	MONITORINFO mi;
-	mi.cbSize = sizeof(mi);
+	MONITORINFO mi = { sizeof(mi) };
 	GetMonitorInfo(MonitorFromRect(prc, MONITOR_DEFAULTTONEAREST), &mi);
 	RECT rcWork = mi.rcWork;
 
@@ -1699,8 +1699,7 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 
 	if (AfxGetAppSettings().fSnapToDesktopEdges && !fCtrl) {
 
-		MONITORINFO mi;
-		mi.cbSize = sizeof(mi);
+		MONITORINFO mi = { sizeof(mi) };
 		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 		RECT rcWork = mi.rcWork;
 		RECT rcMonitor = mi.rcMonitor;
@@ -1736,7 +1735,7 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 {
 	__super::OnSize(nType, cx, cy);
 
-	if (m_OSD && m_OSD.IsWindowVisible() && AfxGetAppSettings().IsD3DFullscreen()) {
+	if (m_OSD && IsD3DFullScreenMode()) {
 		m_OSD.OnSize(nType, cx, cy);
 	}
 	if (nType == SIZE_RESTORED && m_fTrayIcon) {
@@ -1749,21 +1748,6 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 			GetWindowRect(s.rcLastWindowPos);
 		}
 		s.nLastWindowType = nType;
-	}
-
-	// maximized window in MODE_FRAMEONLY|MODE_BORDERLESS is not correct;
-	AppSettings& s = AfxGetAppSettings();
-	if (nType == SIZE_MAXIMIZED && (s.iCaptionMenuMode == MODE_FRAMEONLY || s.iCaptionMenuMode == MODE_BORDERLESS)) {
-		CRect r; GetWindowRect(&r);
-		MONITORINFO mi; mi.cbSize = sizeof(mi);
-		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
-		RECT rcWork = mi.rcWork;
-		r.bottom = rcWork.bottom;
-		if (s.iCaptionMenuMode == MODE_FRAMEONLY) {
-			SetWindowPos(NULL, r.left, r.top, r.right - r.left, r.bottom - r.top + GetSystemMetrics(SM_CYSIZEFRAME), SWP_NOZORDER | SWP_NOACTIVATE);
-		} else if (s.iCaptionMenuMode == MODE_BORDERLESS) {
-			SetWindowPos(NULL, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOZORDER | SWP_NOACTIVATE);
-		}
 	}
 
 	if (nType != SIZE_MINIMIZED) {
@@ -1881,9 +1865,7 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 
 	GetDesktopWindow()->GetWindowRect(&m_rcDesktop);
 	if (IsD3DFullScreenMode()) {
-		MONITORINFO MonitorInfo;
-		ZeroMemory(&MonitorInfo, sizeof(MonitorInfo));
-		MonitorInfo.cbSize = sizeof(MonitorInfo);
+		MONITORINFO MonitorInfo = { sizeof(MonitorInfo) };
 
 		HMONITOR hMonitor = MonitorFromWindow(m_pFullscreenWnd->m_hWnd, 0);
 		if (GetMonitorInfo(hMonitor, &MonitorInfo)) {
@@ -1937,8 +1919,7 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 		return;
 	}
 
-	MONITORINFO mi;
-	mi.cbSize = sizeof(MONITORINFO);
+	MONITORINFO mi = { sizeof(mi) };
 	GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 
 	if (!bActive && (mi.dwFlags & MONITORINFOF_PRIMARY) && m_bFullScreen && m_eMediaLoadState == MLS_LOADED) {
@@ -6758,52 +6739,69 @@ void CMainFrame::OnViewCaptionmenu()
 	}
 
 	DWORD dwRemove = 0, dwAdd = 0;
-	DWORD dwFlags = SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOZORDER;
-
 	DWORD dwMenuFlags = GetMenuBarVisibility();
 
 	CRect wr;
 	GetWindowRect(&wr);
 
+	const BOOL bZoomed = IsZoomed();
+
 	switch (s.iCaptionMenuMode) {
 		case MODE_SHOWCAPTIONMENU:	// borderless -> normal
-			dwAdd = WS_CAPTION | WS_THICKFRAME;
 			dwMenuFlags = AFX_MBV_KEEPVISIBLE;
-			wr.right  += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
-			wr.bottom += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-			wr.bottom += GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU);
+			dwAdd |= (WS_CAPTION | WS_THICKFRAME);
+			dwRemove &= ~(WS_CAPTION | WS_THICKFRAME);
+			wr.InflateRect(GetSystemMetrics(SM_CXSIZEFRAME), GetSystemMetrics(SM_CYSIZEFRAME));
+			if (!bZoomed) {
+				wr.bottom += GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU);
+			}
 			break;
-
 		case MODE_HIDEMENU:			// normal -> hidemenu
 			dwMenuFlags = AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10;
-			wr.bottom -= GetSystemMetrics(SM_CYMENU);
+			if (!bZoomed) {
+				wr.bottom -= GetSystemMetrics(SM_CYMENU);
+			}
 			break;
-
 		case MODE_FRAMEONLY:		// hidemenu -> frameonly
-			dwRemove = WS_CAPTION;
 			dwMenuFlags = AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10;
-			wr.right  -= 2;
-			wr.bottom -= GetSystemMetrics(SM_CYCAPTION) + 2;
+			dwAdd &= ~WS_CAPTION;
+			dwRemove |= WS_CAPTION;
+			wr.DeflateRect(GetSystemMetrics(SM_CXBORDER), GetSystemMetrics(SM_CYBORDER));
+			if (!bZoomed) {
+				wr.bottom -= GetSystemMetrics(SM_CYCAPTION);
+			}
 			break;
-
 		case MODE_BORDERLESS:		// frameonly -> borderless
-			dwRemove = WS_THICKFRAME;
 			dwMenuFlags = AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10;
-			wr.right  -= GetSystemMetrics(SM_CXSIZEFRAME) * 2 - 2;
-			wr.bottom -= GetSystemMetrics(SM_CYSIZEFRAME) * 2 - 2;
-			break;
+			dwAdd &= ~WS_THICKFRAME;
+			dwRemove |= WS_THICKFRAME;
+			wr.DeflateRect(GetSystemMetrics(SM_CXSIZEFRAME) - GetSystemMetrics(SM_CXBORDER),
+						   GetSystemMetrics(SM_CYSIZEFRAME) - GetSystemMetrics(SM_CYBORDER));
+		break;
 	}
 
-	ModifyStyle(dwRemove, dwAdd, SWP_NOZORDER);
-	if (IsZoomed()) { // If the window is maximized, we want it to stay maximized.
-		dwFlags |= SWP_NOSIZE;
+	if (bZoomed && (s.iCaptionMenuMode == MODE_FRAMEONLY || s.iCaptionMenuMode == MODE_BORDERLESS)) {
+		MONITORINFO mi = { sizeof(mi) };
+		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+		RECT rcWork = mi.rcWork;
+
+		wr.left = rcWork.left;
+		wr.right = rcWork.right;
+
+		LONG diff = rcWork.top - wr.top;
+		wr.top += diff;
+		wr.bottom -= diff;
 	}
-	
+
+	UINT uFlags = SWP_NOZORDER;
+	if (dwRemove || dwAdd) {
+		uFlags |= SWP_FRAMECHANGED;
+	}
+
 	SetMenuBarVisibility(dwMenuFlags);
-	// NOTE: wr.left and wr.top are ignored due to SWP_NOMOVE flag
-	SetWindowPos(NULL, wr.left, wr.top, wr.Width(), wr.Height(), dwFlags);
+	VERIFY(SetWindowLong(m_hWnd, GWL_STYLE, (GetWindowLong(m_hWnd, GWL_STYLE) | dwAdd) & ~dwRemove));
+	VERIFY(SetWindowPos(NULL, wr.left, wr.top, wr.Width(), wr.Height(), uFlags));
 
-	MoveVideoWindow();
 	FlyBarSetPos();
 	OSDBarSetPos();
 }
@@ -7032,8 +7030,7 @@ void CMainFrame::OnMoveWindowToPrimaryScreen()
 		CRect r;
 		GetClientRect(r);
 
-		MONITORINFO mi;
-		mi.cbSize = sizeof(MONITORINFO);
+		MONITORINFO mi = { sizeof(mi) };
 		GetMonitorInfo(hMonitor, &mi);
 
 		x = (mi.rcWork.left+mi.rcWork.right-r.Width())/2; // Center main window
@@ -9983,6 +9980,16 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 	AppSettings& s = AfxGetAppSettings();
 	int w, h, x, y;
 
+	if (s.iCaptionMenuMode != MODE_SHOWCAPTIONMENU) {
+		if (s.iCaptionMenuMode == MODE_FRAMEONLY) {
+			ModifyStyle(WS_CAPTION, 0, SWP_NOZORDER);
+		} else if (s.iCaptionMenuMode == MODE_BORDERLESS) {
+			ModifyStyle(WS_CAPTION | WS_THICKFRAME, 0, SWP_NOZORDER);
+		}
+		SetMenuBarVisibility(AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10);
+		SetWindowPos(NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+	}
+
 	if (s.HasFixedWindowSize()) {
 		w = s.sizeFixedWindow.cx;
 		h = s.sizeFixedWindow.cy;
@@ -10058,8 +10065,7 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 			}
 		}
 
-		MONITORINFO mi;
-		mi.cbSize = sizeof(MONITORINFO);
+		MONITORINFO mi = { sizeof(mi) };
 		GetMonitorInfo(hMonitor, &mi);
 
 		x = (mi.rcWork.left + mi.rcWork.right - w) / 2; // Center main window
@@ -10069,16 +10075,6 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 	UINT lastWindowType = s.nLastWindowType;
 	MoveWindow(x, y, w, h);
 
-	if (s.iCaptionMenuMode != MODE_SHOWCAPTIONMENU) {
-		if (s.iCaptionMenuMode == MODE_FRAMEONLY) {
-			ModifyStyle(WS_CAPTION, 0, SWP_NOZORDER);
-		} else if (s.iCaptionMenuMode == MODE_BORDERLESS) {
-			ModifyStyle(WS_CAPTION | WS_THICKFRAME, 0, SWP_NOZORDER);
-		}
-		SetMenuBarVisibility(AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10);
-		SetWindowPos(NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER);
-	}
-
 	if (!s.fRememberWindowPos) {
 		CenterWindow();
 	}
@@ -10086,6 +10082,14 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 	if (s.fRememberWindowSize && s.fRememberWindowPos) {
 		if (lastWindowType == SIZE_MAXIMIZED) {
 			ShowWindow(SW_MAXIMIZE);
+
+			// maximized window in MODE_FRAMEONLY | MODE_BORDERLESS is not correct
+			if (s.iCaptionMenuMode == MODE_FRAMEONLY || s.iCaptionMenuMode == MODE_BORDERLESS) {
+				MONITORINFO mi = { sizeof(mi) };
+				GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+				CRect wr(mi.rcWork);
+				SetWindowPos(NULL, wr.left, wr.top, wr.Width(), wr.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
+			}
 		} else if (lastWindowType == SIZE_MINIMIZED) {
 			ShowWindow(SW_MINIMIZE);
 		}
@@ -10278,8 +10282,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	CRect r;
 	DWORD dwRemove = 0, dwAdd = 0;
 	DWORD dwRemoveEx = 0, dwAddEx = 0;
-	MONITORINFO mi;
-	mi.cbSize = sizeof(MONITORINFO);
+	MONITORINFO mi = { sizeof(mi) };
 
 	HMONITOR hm		= MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
 	HMONITOR hm_cur = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
@@ -10897,8 +10900,7 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 	}
 
 	// Prevention of going beyond the scopes of screen
-	MONITORINFO mi;
-	mi.cbSize = sizeof(MONITORINFO);
+	MONITORINFO mi = { sizeof(mi) };
 	GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 	w = min(w, (mi.rcWork.right - mi.rcWork.left));
 	h = min(h, (mi.rcWork.bottom - mi.rcWork.top));
