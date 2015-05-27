@@ -9978,7 +9978,6 @@ static BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT l
 void CMainFrame::SetDefaultWindowRect(int iMonitor)
 {
 	AppSettings& s = AfxGetAppSettings();
-	int w, h, x, y;
 
 	if (s.iCaptionMenuMode != MODE_SHOWCAPTIONMENU) {
 		if (s.iCaptionMenuMode == MODE_FRAMEONLY) {
@@ -9990,96 +9989,57 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		SetWindowPos(NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 	}
 
+	CSize windowSize;
+	const CRect rcLastWindowPos = s.rcLastWindowPos;
+
 	if (s.HasFixedWindowSize()) {
-		w = s.sizeFixedWindow.cx;
-		h = s.sizeFixedWindow.cy;
+		windowSize = s.sizeFixedWindow;
 	} else if (s.fRememberWindowSize) {
-		w = s.rcLastWindowPos.Width();
-		h = s.rcLastWindowPos.Height();
+		windowSize = rcLastWindowPos.Size();
 	} else {
-		CRect r1, r2;
-		GetClientRect(&r1);
-		m_wndView.GetClientRect(&r2);
+		CRect windowRect;
+		GetWindowRect(&windowRect);
+		CRect clientRect;
+		GetClientRect(&clientRect);
 
-		CSize logosize = m_wndView.GetLogoSize();
-		int _DEFCLIENTW = max(logosize.cx, DEFCLIENTW);
-		int _DEFCLIENTH = max(logosize.cy, DEFCLIENTH);
+		CSize logoSize = m_wndView.GetLogoSize();
+		logoSize.cx = max(logoSize.cx, DEFCLIENTW);
+		logoSize.cy = max(logoSize.cy, DEFCLIENTH);
 
-		if (GetSystemMetrics(SM_REMOTESESSION)) {
-			_DEFCLIENTH = 0;
-		}
+		windowSize.cx = windowRect.Width() - clientRect.Width() + logoSize.cx;
+		windowSize.cy = windowRect.Height() - clientRect.Height() + logoSize.cy;
 
-		DWORD style = GetStyle();
+		CSize cSize;
+		CalcControlsSize(cSize);
 
-		w = _DEFCLIENTW + r1.Width() - r2.Width();
-		h = _DEFCLIENTH + r1.Height() - r2.Height();
-
-		if (s.iCaptionMenuMode != MODE_BORDERLESS) {
-			w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
-			h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-			if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU || s.iCaptionMenuMode == MODE_HIDEMENU) {
-				w -= 2;
-				h -= 2;
-			}
-		}
-
-		if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU || s.iCaptionMenuMode == MODE_HIDEMENU) {
-			h += GetSystemMetrics(SM_CYCAPTION);
-			if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
-				h += GetSystemMetrics(SM_CYMENU);
-			}
-		}
+		windowSize.cx += cSize.cx;
+		windowSize.cy += cSize.cy;
 	}
 
-	bool inmonitor = false;
+	bool bRestoredWindowPosition = false;
 	if (s.fRememberWindowPos) {
-		CMonitor monitor;
+		CRect windowRect(rcLastWindowPos.TopLeft(), windowSize);
+		if (CMonitors::IsOnScreen(windowRect)) {
+			MoveWindow(windowRect);
+			bRestoredWindowPosition = true;
+		}
+	}
+
+	if (!bRestoredWindowPosition) {
 		CMonitors monitors;
-		POINT ptA;
-		ptA.x = s.rcLastWindowPos.TopLeft().x;
-		ptA.y = s.rcLastWindowPos.TopLeft().y;
-		inmonitor = (ptA.x<0 || ptA.y<0);
-		if (!inmonitor) {
-			for ( int i = 0; i < monitors.GetCount(); i++ ) {
-				monitor = monitors.GetMonitor( i );
-				if (monitor.IsOnMonitor(ptA)) {
-					inmonitor = true;
-					break;
-				}
-			}
-		}
-	}
-
-	if (s.fRememberWindowPos && inmonitor) {
-		x = s.rcLastWindowPos.TopLeft().x;
-		y = s.rcLastWindowPos.TopLeft().y;
-	} else {
-		HMONITOR hMonitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
-
-		if (iMonitor > 0) {
-			iMonitor--;
-			CAtlArray<HMONITOR> ml;
-			EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)&ml);
-			if ((size_t)iMonitor < ml.GetCount()) {
-				hMonitor = ml[iMonitor];
-			}
+		CMonitor monitor;
+		if (iMonitor > 0 && iMonitor <= monitors.GetCount()) {
+			monitor = monitors.GetMonitor(--iMonitor);
+		} else {
+			monitor = CMonitors::GetNearestMonitor(this);
 		}
 
-		MONITORINFO mi = { sizeof(mi) };
-		GetMonitorInfo(hMonitor, &mi);
-
-		x = (mi.rcWork.left + mi.rcWork.right - w) / 2; // Center main window
-		y = (mi.rcWork.top + mi.rcWork.bottom - h) / 2; // no need to call CenterWindow()
-	}
-
-	UINT lastWindowType = s.nLastWindowType;
-	MoveWindow(x, y, w, h);
-
-	if (!s.fRememberWindowPos) {
-		CenterWindow();
+		SetWindowPos(NULL, 0, 0, windowSize.cx, windowSize.cy, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+		monitor.CenterWindowToMonitor(this, TRUE);
 	}
 
 	if (s.fRememberWindowSize && s.fRememberWindowPos) {
+		UINT lastWindowType = s.nLastWindowType;
 		if (lastWindowType == SIZE_MAXIMIZED) {
 			ShowWindow(SW_MAXIMIZE);
 
@@ -10121,64 +10081,42 @@ void CMainFrame::SetDefaultFullscreenState()
 
 void CMainFrame::RestoreDefaultWindowRect()
 {
-	AppSettings& s = AfxGetAppSettings();
+	const AppSettings& s = AfxGetAppSettings();
 
-	WINDOWPLACEMENT wp;
-	GetWindowPlacement(&wp);
-	if (!m_bFullScreen && wp.showCmd != SW_SHOWMAXIMIZED && wp.showCmd != SW_SHOWMINIMIZED
-			//&& (GetExStyle()&WS_EX_APPWINDOW)
-			&& !s.fRememberWindowSize) {
-		int x, y, w, h;
+	if (!m_bFullScreen && !IsZoomed() && !IsIconic() && !s.fRememberWindowSize) {
+		CSize windowSize;
 
 		if (s.HasFixedWindowSize()) {
-			w = s.sizeFixedWindow.cx;
-			h = s.sizeFixedWindow.cy;
+			windowSize = s.sizeFixedWindow;
+		} else if (s.fRememberWindowSize) {
+			windowSize = s.rcLastWindowPos.Size();
 		} else {
-			CRect r1, r2;
-			GetClientRect(&r1);
-			m_wndView.GetClientRect(&r2);
+			CRect windowRect;
+			GetWindowRect(&windowRect);
+			CRect clientRect;
+			GetClientRect(&clientRect);
 
-			CSize logosize = m_wndView.GetLogoSize();
-			int _DEFCLIENTW = max(logosize.cx, DEFCLIENTW);
-			int _DEFCLIENTH = max(logosize.cy, DEFCLIENTH);
+			CSize logoSize = m_wndView.GetLogoSize();
+			logoSize.cx = max(logoSize.cx, DEFCLIENTW);
+			logoSize.cy = max(logoSize.cy, DEFCLIENTH);
 
-			DWORD style = GetStyle();
-			w = _DEFCLIENTW + r1.Width() - r2.Width();
-			h = _DEFCLIENTH + r1.Height() - r2.Height();
+			windowSize.cx = windowRect.Width() - clientRect.Width() + logoSize.cx;
+			windowSize.cy = windowRect.Height() - clientRect.Height() + logoSize.cy;
 
-			if (style & WS_THICKFRAME) {
-				w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
-				h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-				if ( (style & WS_CAPTION) == 0 ) {
-					w -= 2;
-					h -= 2;
-				}
-			}
+			CSize cSize;
+			CalcControlsSize(cSize);
 
-			if (style & WS_CAPTION) {
-				h += GetSystemMetrics(SM_CYCAPTION);
-				if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
-					h += GetSystemMetrics(SM_CYMENU);
-				}
-				//else MODE_HIDEMENU
-			}
+			windowSize.cx += cSize.cx;
+			windowSize.cy += cSize.cy;
 		}
 
 		if (s.fRememberWindowPos) {
-			x = s.rcLastWindowPos.TopLeft().x;
-			y = s.rcLastWindowPos.TopLeft().y;
+			MoveWindow(CRect(s.rcLastWindowPos.TopLeft(), windowSize));
 		} else {
-			CRect r;
-			GetWindowRect(r);
-
-			x = r.CenterPoint().x - w/2; // Center window here
-			y = r.CenterPoint().y - h/2; // no need to call CenterWindow()
-		}
-
-		MoveWindow(x, y, w, h);
-
-		if (!s.fRememberWindowPos) {
-			CenterWindow();
+			SetWindowPos(NULL, 0, 0, windowSize.cx, windowSize.cy, SWP_NOMOVE | SWP_NOZORDER);
+			//CenterWindow();
+			CMonitor monitor = CMonitors::GetNearestMonitor(this);
+			monitor.CenterWindowToMonitor(this, TRUE);
 		}
 	}
 }
@@ -15466,6 +15404,36 @@ void CMainFrame::ShowControls(int nCS, bool fSave)
 	}
 
 	RecalcLayout();
+}
+
+void CMainFrame::CalcControlsSize(CSize& cSize)
+{
+	cSize.SetSize(0, 0);
+
+	POSITION pos = m_bars.GetHeadPosition();
+	while (pos) {
+		CControlBar *pCB = m_bars.GetNext(pos);
+		if (IsWindow(pCB->m_hWnd) && pCB->IsVisible()) {
+			cSize.cy += pCB->CalcFixedLayout(TRUE, TRUE).cy;
+		}
+	}
+
+	pos = m_dockingbars.GetHeadPosition();
+	while (pos) {
+		CSizingControlBar *pCB = m_dockingbars.GetNext(pos);
+		BOOL IsWindowVisible = pCB->IsWindowVisible();
+		if (auto* playlistBar = dynamic_cast<CPlayerPlaylistBar*>(pCB)) {
+			IsWindowVisible = playlistBar->IsPlaylistVisible();
+		}
+
+		if (IsWindow(pCB->m_hWnd) && IsWindowVisible && !pCB->IsFloating()) {
+			if (pCB->IsHorzDocked()) {
+				cSize.cy += pCB->CalcFixedLayout(TRUE, TRUE).cy - GetSystemMetrics(SM_CYBORDER);
+			} else if (pCB->IsVertDocked()) {
+				cSize.cx += pCB->CalcFixedLayout(TRUE, FALSE).cx;
+			}
+		}
+	}
 }
 
 void CMainFrame::SetAlwaysOnTop(int i)

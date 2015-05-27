@@ -294,6 +294,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CRect m_rcDesktop;
 
 	void ShowControls(int nCS, bool fSave = true);
+	void CalcControlsSize(CSize& cSize);
 
 	bool m_bDelaySetOutputRect = false;
 	void SetDefaultWindowRect(int iMonitor = 0);
