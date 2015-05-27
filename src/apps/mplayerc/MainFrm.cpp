@@ -1742,12 +1742,20 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 		ShowWindow(SW_SHOW);
 	}
 
+	AppSettings& s = AfxGetAppSettings();
 	if (!m_bFirstFSAfterLaunchOnFullScreen && IsWindowVisible() && !m_bFullScreen) {
-		AppSettings& s = AfxGetAppSettings();
 		if (nType != SIZE_MAXIMIZED && nType != SIZE_MINIMIZED) {
 			GetWindowRect(s.rcLastWindowPos);
 		}
 		s.nLastWindowType = nType;
+
+		// maximized window in MODE_FRAMEONLY | MODE_BORDERLESS is not correct
+		if (nType == SIZE_MAXIMIZED && (s.iCaptionMenuMode == MODE_FRAMEONLY || s.iCaptionMenuMode == MODE_BORDERLESS)) {
+			MONITORINFO mi = { sizeof(mi) };
+			GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+			const CRect wr(mi.rcWork);
+			SetWindowPos(NULL, wr.left, wr.top, wr.Width(), wr.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
+		}
 	}
 
 	if (nType != SIZE_MINIMIZED) {
@@ -6783,14 +6791,7 @@ void CMainFrame::OnViewCaptionmenu()
 	if (bZoomed && (s.iCaptionMenuMode == MODE_FRAMEONLY || s.iCaptionMenuMode == MODE_BORDERLESS)) {
 		MONITORINFO mi = { sizeof(mi) };
 		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
-		RECT rcWork = mi.rcWork;
-
-		wr.left = rcWork.left;
-		wr.right = rcWork.right;
-
-		LONG diff = rcWork.top - wr.top;
-		wr.top += diff;
-		wr.bottom -= diff;
+		wr = mi.rcWork;
 	}
 
 	UINT uFlags = SWP_NOZORDER;
@@ -10042,14 +10043,6 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		UINT lastWindowType = s.nLastWindowType;
 		if (lastWindowType == SIZE_MAXIMIZED) {
 			ShowWindow(SW_MAXIMIZE);
-
-			// maximized window in MODE_FRAMEONLY | MODE_BORDERLESS is not correct
-			if (s.iCaptionMenuMode == MODE_FRAMEONLY || s.iCaptionMenuMode == MODE_BORDERLESS) {
-				MONITORINFO mi = { sizeof(mi) };
-				GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
-				CRect wr(mi.rcWork);
-				SetWindowPos(NULL, wr.left, wr.top, wr.Width(), wr.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
-			}
 		} else if (lastWindowType == SIZE_MINIMIZED) {
 			ShowWindow(SW_MINIMIZE);
 		}
