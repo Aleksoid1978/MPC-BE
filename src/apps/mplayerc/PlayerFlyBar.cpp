@@ -183,8 +183,6 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 	auto pFrame = AfxGetMainFrame();
 	pFrame->SetFocus();
 
-	WINDOWPLACEMENT wp;
-	pFrame->GetWindowPlacement(&wp);
 	CPoint p;
 	GetCursorPos(&p);
 	CalcButtonsRect();
@@ -193,26 +191,22 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 
 	if (r_ExitIcon.PtInRect(p)) {
 		ShowWindow(SW_HIDE);
-		pFrame->OnClose();
+		pFrame->PostMessage(WM_COMMAND, ID_FILE_EXIT);
 	} else if (r_MinIcon.PtInRect(p)) {
 		pFrame->m_fTrayIcon ? pFrame->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE, -1) : pFrame->ShowWindow(SW_SHOWMINIMIZED);
 	} else if (r_RestoreIcon.PtInRect(p)) {
-		if (wp.showCmd != SW_SHOWMAXIMIZED && pFrame->m_bFullScreen) {
+		if (pFrame->m_bFullScreen) {
 			pFrame->ToggleFullscreen(true, true);
-			pFrame->ShowWindow(SW_SHOWMAXIMIZED);
-		} else if (wp.showCmd == SW_SHOWMAXIMIZED) {
-			pFrame->ShowWindow(SW_SHOWNORMAL);
-		} else if (wp.showCmd != SW_SHOWMAXIMIZED) {
-			pFrame->ShowWindow(SW_SHOWMAXIMIZED);
 		}
+		pFrame->ShowWindow(pFrame->IsZoomed() ? SW_SHOWNORMAL : SW_SHOWMAXIMIZED);
 		Invalidate();
 	} else if (r_SettingsIcon.PtInRect(p)) {
-		pFrame->OnViewOptions();
+		pFrame->PostMessage(WM_COMMAND, ID_VIEW_OPTIONS);
 		Invalidate();
 	} else if (r_InfoIcon.PtInRect(p)) {
 		OAFilterState fs = pFrame->GetMediaState();
 		if (fs != -1) {
-			pFrame->OnFileProperties();
+			pFrame->PostMessage(WM_COMMAND, ID_FILE_PROPERTIES);
 		}
 		Invalidate();
 	} else if (r_FSIcon.PtInRect(p)) {
@@ -299,8 +293,7 @@ void CFlyBar::UpdateWnd(CPoint point)
 	// set tooltip position
 	CRect r_tooltip;
 	m_tooltip.GetWindowRect(&r_tooltip);
-	MONITORINFO mi;
-	mi.cbSize = sizeof(MONITORINFO);
+	MONITORINFO mi = { sizeof(mi) };
 	GetMonitorInfo(MonitorFromWindow(this->m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 	CPoint p;
 	p.x = max(0, min(point.x, mi.rcMonitor.right - r_tooltip.Width()));
