@@ -197,6 +197,8 @@ private:
 
 	bool m_bHiddenDueToFullscreen;
 
+	bool m_bVisible;
+
 public:
 	CPlayerPlaylistBar();
 	virtual ~CPlayerPlaylistBar();
@@ -245,6 +247,8 @@ public:
 	bool SelectFileInPlaylist(CString filename);
 
 	void DropFiles(CAtlList<CString>& slFiles);
+
+	bool IsPlaylistVisible() const { return IsWindowVisible() || m_bVisible; }
 
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);

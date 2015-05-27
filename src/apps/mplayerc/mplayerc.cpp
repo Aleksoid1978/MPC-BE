@@ -1582,12 +1582,12 @@ BOOL CMPlayerCApp::InitInstance()
 		AfxMessageBox(_T("CMainFrame::LoadFrame failed!"));
 		return FALSE;
 	}
-	pFrame->SetDefaultWindowRect((m_s.nCLSwitches&CLSW_MONITOR)?m_s.iMonitor:0);
 	pFrame->RestoreControlBars();
+	pFrame->SetDefaultWindowRect((m_s.nCLSwitches & CLSW_MONITOR) ? m_s.iMonitor : 0);
 	pFrame->SetDefaultFullscreenState();
 	pFrame->SetIcon(AfxGetApp()->LoadIcon(IDR_MAINFRAME), TRUE);
 	pFrame->DragAcceptFiles();
-	pFrame->ShowWindow((m_s.nCLSwitches&CLSW_MINIMIZED)?SW_SHOWMINIMIZED:SW_SHOW);
+	pFrame->ShowWindow((m_s.nCLSwitches & CLSW_MINIMIZED) ? SW_SHOWMINIMIZED : SW_SHOW);
 	pFrame->UpdateWindow();
 	pFrame->m_hAccelTable = m_s.hAccel;
 	m_s.WinLircClient.SetHWND(m_pMainWnd->m_hWnd);

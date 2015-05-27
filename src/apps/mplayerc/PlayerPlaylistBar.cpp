@@ -661,6 +661,7 @@ CPlayerPlaylistBar::CPlayerPlaylistBar()
 	, m_nTimeColWidth(0)
 	, m_bDragging(FALSE)
 	, m_bHiddenDueToFullscreen(false)
+	, m_bVisible(false)
 {
 }
 
@@ -773,6 +774,7 @@ void CPlayerPlaylistBar::LoadState(CFrameWnd *pParent)
 
 	if (AfxGetApp()->GetProfileInt(section, _T("Visible"), FALSE)) {
 		ShowWindow(SW_SHOW);
+		m_bVisible = true;
 	}
 
 	__super::LoadState(pParent);
@@ -1803,7 +1805,10 @@ void CPlayerPlaylistBar::OnWindowPosChanged(WINDOWPOS* lpwndpos)
 	__super::OnWindowPosChanged(lpwndpos);
 
 	if (lpwndpos->flags & SWP_HIDEWINDOW) {
+		m_bVisible = false;
 		GetParentFrame()->SetFocus();
+	} else if (lpwndpos->flags & SWP_SHOWWINDOW) {
+		m_bVisible = true;
 	}
 }
 
