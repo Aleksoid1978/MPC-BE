@@ -1208,6 +1208,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				SetProperty(L"TITL", title);
 			}
 
+			if (!album.IsEmpty()) {
+				SetProperty(L"ALBUM", album);
+			}
+
 			if (!artist.IsEmpty()) {
 				SetProperty(L"AUTH", artist);
 			} else if (!writer.IsEmpty()) {
