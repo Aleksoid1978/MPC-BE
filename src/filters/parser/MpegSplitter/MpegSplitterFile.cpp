@@ -827,6 +827,19 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 	if (pesid == 0xbd || pesid == 0xfd) { // private stream 1
 		if (s.pid) {
 			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::audio].Find(s) && !m_streams[stream_type::subpic].Find(s)) {
+				// AAC_LATM
+				if (type == stream_type::unknown && (stream_type & AAC_AUDIO) && m_type == MPEG_TYPES::mpeg_ts) {
+					Seek(start);
+					latm_aachdr h = { 0 };
+
+					if (Read(h, len, &s.mt)) {
+						if (m_aaclatmValid[s].IsValid()) {
+							type = stream_type::audio;
+						} else {
+							m_aaclatmValid[s].Handle(h);
+						}
+					}
+				}
 
 				// AC3, E-AC3, TrueHD
 				if (type == stream_type::unknown && (stream_type & AC3_AUDIO)) {
