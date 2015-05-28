@@ -26,11 +26,12 @@
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/MediaDescription.h"
 
-#define MOVE_TO_H264_START_CODE(b, e)	while(b <= e - 4 && !((*(DWORD*)b == 0x01000000) || ((*(DWORD*)b & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e - 4) && *(DWORD*)b == 0x01000000) b++;
-#define MOVE_TO_AC3_START_CODE(b, e)	while(b <= e - 8 && (*(WORD*)b != AC3_SYNC_WORD)) b++;
-#define MOVE_TO_AAC_START_CODE(b, e)	while(b <= e - 9 && ((*(WORD*)b & 0xf0ff) != 0xf0ff)) b++;
-#define MOVE_TO_DIRAC_START_CODE(b, e)	while(b <= e - 4 && (*(DWORD*)b != 0x44434242)) b++;
-#define MOVE_TO_DTS_START_CODE(b, e)	while(b <= e - 16 && (*(DWORD*)b != DTS_SYNC_WORD)) b++;
+#define MOVE_TO_H264_START_CODE(b, e)		while(b <= e - 4  && !((*(DWORD*)b == 0x01000000) || ((*(DWORD*)b & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e - 4) && *(DWORD*)b == 0x01000000) b++;
+#define MOVE_TO_AC3_START_CODE(b, e)		while(b <= e - 8  && (*(WORD*)b != AC3_SYNC_WORD)) b++;
+#define MOVE_TO_AAC_START_CODE(b, e)		while(b <= e - 9  && ((*(WORD*)b & 0xf0ff) != 0xf0ff)) b++;
+#define MOVE_TO_AACLATM_START_CODE(b, e)	while(b <= e - 4  && ((*(WORD*)b & 0xe0FF) != 0xe056)) b++;
+#define MOVE_TO_DIRAC_START_CODE(b, e)		while(b <= e - 4  && (*(DWORD*)b != 0x44434242)) b++;
+#define MOVE_TO_DTS_START_CODE(b, e)		while(b <= e - 16 && (*(DWORD*)b != DTS_SYNC_WORD)) b++;
 
 //
 // CBaseSplitterParserOutputPin
@@ -180,6 +181,9 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 	if (m_mt.subtype == MEDIASUBTYPE_RAW_AAC1) {
 		// AAC
 		return ParseAAC(p);
+	} else if (m_mt.subtype == MEDIASUBTYPE_LATM_AAC) {
+		// AAC LATM
+		return ParseAACLATM(p);
 	} else if (m_mt.subtype == MEDIASUBTYPE_AVC1 || m_mt.subtype == FOURCCMap('1cva')
 			   || m_mt.subtype == FOURCCMap('CVMA') || m_mt.subtype == FOURCCMap('CVME')
 			   || m_mt.subtype == MEDIASUBTYPE_H264) {
@@ -279,6 +283,50 @@ HRESULT CBaseSplitterParserOutputPin::ParseAAC(CAutoPtr<CPacket> p)
 			}
 
 			HandlePacket(aframe.param1);
+
+			start += size;
+		} else {
+			break;
+		}
+	}
+
+	ENDDATA;
+
+	return S_OK;
+}
+
+HRESULT CBaseSplitterParserOutputPin::ParseAACLATM(CAutoPtr<CPacket> p)
+{
+	if (!m_p) {
+		InitPacket(p);
+	}
+
+	if (!m_p) {
+		return S_OK;
+	}
+
+	if (p) m_p->Append(*p);
+
+	HandleInvalidPacket(4);
+
+	BEGINDATA;
+
+	for(;;) {
+		MOVE_TO_AACLATM_START_CODE(start, end);
+		if (start <= end - 4) {
+			int size = (_byteswap_ushort(*(WORD*)(start + 1)) & 0x1FFF) + 3;
+			if (start + size > end) {
+				break;
+			}
+
+			if (start + size + 4 <= end) {
+				if ((*(WORD*)(start + size) & 0xE0FF) != 0xe056) {
+					start++;
+					continue;
+				}
+			}
+
+			HandlePacket(0);
 
 			start += size;
 		} else {

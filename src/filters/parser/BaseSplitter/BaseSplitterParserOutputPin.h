@@ -62,6 +62,7 @@ protected:
 	void InitAudioParams();
 
 	HRESULT ParseAAC(CAutoPtr<CPacket> p);
+	HRESULT ParseAACLATM(CAutoPtr<CPacket> p);
 	HRESULT ParseAnnexB(CAutoPtr<CPacket> p, bool bConvertToAVCC);
 	HRESULT ParseHEVC(CAutoPtr<CPacket> p);
 	HRESULT ParseVC1(CAutoPtr<CPacket> p);
