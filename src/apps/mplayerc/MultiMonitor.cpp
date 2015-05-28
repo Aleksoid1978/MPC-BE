@@ -4,14 +4,14 @@
  * Email: don@itsEngineering.com
  * Copyright 2002, Donald Kackman
  *
- * This file is part of mplayerc.
+ * This file is part of MPC-BE.
  *
- * Mplayerc is free software; you can redistribute it and/or modify
+ * MPC-BE is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * Mplayerc is distributed in the hope that it will be useful,
+ * MPC-BE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -158,8 +158,9 @@ void CMonitor::CenterRectToMonitor( LPRECT lprc, const BOOL UseWorkAreaRect ) co
 		GetMonitorRect( &rect );
 	}
 
-	lprc->left = rect.left + ( rect.Width() - w ) / 2;
-	lprc->top = rect.top + ( rect.Height() - h ) / 2;
+	// Added rounding to get exactly the same rect as the CWnd::CenterWindow method returns.
+	lprc->left = lround(rect.left + ( rect.Width() - w ) / 2.0);
+	lprc->top = lround(rect.top + ( rect.Height() - h ) / 2.0);
 	lprc->right	= lprc->left + w;
 	lprc->bottom = lprc->top + h;
 }
@@ -173,6 +174,10 @@ void CMonitor::CenterWindowToMonitor( CWnd* const pWnd, const BOOL UseWorkAreaRe
 	CRect rect;
 	pWnd->GetWindowRect( &rect );
 	CenterRectToMonitor( &rect, UseWorkAreaRect );
+	// Check if we are a child window and modify the coordinates accordingly
+	if (pWnd->GetStyle() & WS_CHILD) {
+		pWnd->GetParent()->ScreenToClient(&rect);
+	}
 	pWnd->SetWindowPos( NULL, rect.left, rect.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE );
 }
 
