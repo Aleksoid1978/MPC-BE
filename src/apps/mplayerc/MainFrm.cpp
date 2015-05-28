@@ -10107,9 +10107,7 @@ void CMainFrame::RestoreDefaultWindowRect()
 			MoveWindow(CRect(s.rcLastWindowPos.TopLeft(), windowSize));
 		} else {
 			SetWindowPos(NULL, 0, 0, windowSize.cx, windowSize.cy, SWP_NOMOVE | SWP_NOZORDER);
-			//CenterWindow();
-			CMonitor monitor = CMonitors::GetNearestMonitor(this);
-			monitor.CenterWindowToMonitor(this, TRUE);
+			CenterWindow();
 		}
 	}
 }
