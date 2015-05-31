@@ -6279,7 +6279,11 @@ void CMainFrame::OnFileSaveSubtitle()
 		if (OpenFileData* p = dynamic_cast<OpenFileData*>(pOMD)) {
 			// HACK: get the file name from the current playlist item
 			suggestedFileName = GetCurFileName();
-			suggestedFileName = suggestedFileName.Left(suggestedFileName.ReverseFind('.'));	// exclude the extension, it will be auto completed
+			if (IsLikelyPath(suggestedFileName)) {
+				suggestedFileName = suggestedFileName.Left(suggestedFileName.ReverseFind('.')); // exclude the extension, it will be auto completed
+			} else {
+				suggestedFileName = L"subtitle";
+			}
 		}
 
 		if (auto pVSF = dynamic_cast<CVobSubFile*>((ISubStream*)m_pCurrentSubStream)) {
@@ -11630,7 +11634,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			pMRU->ReadList();
 			pMRU->Add(fn);
 			pMRU->WriteList();
-			if (fn.Mid(1, 2) == L":\\" || fn.Left(2) == L"\\\\") { // stupid path detector
+			if (IsLikelyPath(fn)) { // stupid path detector
 				// there should not be a URL, otherwise explorer dirtied HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts
 				SHAddToRecentDocs(SHARD_PATH, fn);
 			}

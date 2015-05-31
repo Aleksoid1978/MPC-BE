@@ -1548,6 +1548,25 @@ CString MakeFullPath(LPCTSTR path)
 	return CString(c);
 }
 
+bool IsLikelyPath(LPCTSTR str) // stupid path detector
+{
+	if (_tcslen(str) > 4) {
+		// local path
+		if (str[1] == ':' && str[2] == '\\' &&
+				(str[0] >= 'A' && str[0] <= 'Z' || str[0] >= 'a' && str[0] <= 'z')) {
+			return true;
+		}
+
+		// net path
+		if (str[0] == '\\' && str[1] == '\\' &&
+				(str[2] == '-' || str[2] >= '0' && str[2] <= '9' ||  str[2] >= 'A' && str[2] <= 'Z' || str[2] >= 'a' && str[2] <= 'z')) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 //
 
 CString GetMediaTypeName(const GUID& guid)
