@@ -131,6 +131,7 @@ extern HRESULT			LoadExternalPropertyPage(IPersist* pP, REFCLSID clsid, IPropert
 extern void				UnloadExternalObjects();
 
 extern CString			MakeFullPath(LPCTSTR path);
+extern bool				IsLikelyPath(LPCTSTR str); // stupid path detector
 
 extern CString			GetMediaTypeName(const GUID& guid);
 extern GUID				GUIDFromCString(CString str);
