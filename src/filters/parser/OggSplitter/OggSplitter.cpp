@@ -258,7 +258,7 @@ start:
 				if (COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
 					pOggPin->AddComment(p + 6, page.GetCount() - 6 - 1);
 				}
-			} else if (type == 0x7F && page.GetCount() > 12 && *(DWORD*)(p + 8) == FCC('fLaC')) {	// Flac
+			} else if (type == 0x7F && page.GetCount() > 12 && GETDWORD(p + 8) == FCC('fLaC')) {	// Flac
 				if (PinNotExist) {
 					// Ogg Flac : method 1
 					CAutoPtr<CBaseSplitterOutputPin> pPinOut;
@@ -266,7 +266,7 @@ start:
 					pPinOut.Attach(DNew COggFlacOutputPin(p + 12, page.GetCount() - 14, name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 				}
-			} else if (*(DWORD*)(p-1) == FCC('fLaC')) {
+			} else if (GETDWORD(p-1) == FCC('fLaC')) {
 				// Ogg Flac : method 2
 				if (PinNotExist && m_pFile->Read(page)) {
 					CAutoPtr<CBaseSplitterOutputPin> pPinOut;
@@ -1582,7 +1582,7 @@ HRESULT COggDiracOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int 
 		return E_FAIL;
 	}
 
-	if (m_IsInitialized && *(DWORD*)pData != FCC('BBCD')) { // not found Dirac SYNC 'BBCD'
+	if (m_IsInitialized && GETDWORD(pData) != FCC('BBCD')) { // not found Dirac SYNC 'BBCD'
 		return E_FAIL;
 	}
 

@@ -113,11 +113,11 @@ HRESULT CAVI2AC3Filter::Transform(IMediaSample* pSample, IMediaSample* pOutSampl
 
 	if ((CheckAC3(&m_pInput->CurrentMediaType()) || CheckDTS(&m_pInput->CurrentMediaType()))
 			&& (CheckWAVEAC3(&m_pOutput->CurrentMediaType()) || CheckWAVEDTS(&m_pOutput->CurrentMediaType()))) {
-		if (*(DWORD*)pIn == 0xBA010000) {
+		if (GETDWORD(pIn) == 0xBA010000) {
 			pIn += 14;
 		}
 
-		if (*(DWORD*)pIn == 0xBD010000) {
+		if (GETDWORD(pIn) == 0xBD010000) {
 			pIn += 8 + 1 + pIn[8] + 1 + 3;
 		}
 
@@ -214,7 +214,7 @@ HRESULT CAVI2AC3Filter::Transform(IMediaSample* pSample, IMediaSample* pOutSampl
 
 					if (*subtype == MEDIASUBTYPE_DOLBY_AC3) {
 						for (int i = 0; i < curlen; i++) {
-							if (*(DWORD*)&pIn[i] == 0x770B) {
+							if (GETDWORD(&pIn[i]) == 0x770B) {
 								i++;
 								Private1Header[19] = (i>>8)&0xff;
 								Private1Header[20] = i&0xff;
@@ -223,7 +223,7 @@ HRESULT CAVI2AC3Filter::Transform(IMediaSample* pSample, IMediaSample* pOutSampl
 						}
 					} else if (*subtype == MEDIASUBTYPE_DTS) {
 						for (int i = 0; i < curlen; i++) {
-							if (*(DWORD*)&pIn[i] == 0x0180FE7F) {
+							if (GETDWORD(&pIn[i]) == 0x0180FE7F) {
 								i++;
 								Private1Header[19] = (i>>8)&0xff;
 								Private1Header[20] = i&0xff;

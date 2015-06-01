@@ -85,13 +85,13 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 	else if (memcmp(data, AMR_header, 6) == 0 || memcmp(data, AMRWB_header, 9) == 0) {
 		pAudioFile = DNew CAMRFile();
 	}
-	else if (*id == FCC('RIFF') && *(DWORD*)(data+8) == FCC('WAVE')) {
+	else if (*id == FCC('RIFF') && GETDWORD(data+8) == FCC('WAVE')) {
 		pAudioFile = DNew CWAVFile();
 	}
 	else if (memcmp(data, w64_guid_riff, 16) == 0 &&  memcmp(data+24, w64_guid_wave, 16) == 0) {
 		pAudioFile = DNew CWave64File();
 	}
-	else if (*id == FCC('FRM8') && *(DWORD*)(data+12) == FCC('DSD ')) {
+	else if (*id == FCC('FRM8') && GETDWORD(data+12) == FCC('DSD ')) {
 		pAudioFile = DNew CDFFFile();
 	}
 	else if (*id == FCC('DSD ') && data[4] == 0x1C) {
