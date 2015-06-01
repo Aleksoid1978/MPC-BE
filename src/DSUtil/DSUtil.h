@@ -47,8 +47,8 @@
 #define KILOBYTE			1024
 #define MEGABYTE			KILOBYTE * KILOBYTE
 
-#define GETWORD(b)		*(WORD*)b
-#define GETDWORD(b)		*(DWORD*)b
+#define GETWORD(b)		*(WORD*)(b)
+#define GETDWORD(b)		*(DWORD*)(b)
 
 extern CString			ResStr(UINT nID);
 
