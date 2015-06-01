@@ -495,7 +495,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						case AP4_MPEG2_AAC_AUDIO_LC_OTI:
 						case AP4_MPEG2_AAC_AUDIO_SSRP_OTI:
 							if (di->GetDataSize() > 10) {
-								if (*(DWORD*)(di->GetData()+6) == 0x00534c41) { // 'ALS\0' sync word
+								if (GETDWORD(di->GetData()+6) == 0x00534c41) { // 'ALS\0' sync word
 									wfe->wFormatTag = WAVE_FORMAT_UNKNOWN;
 									mt.subtype = FOURCCMap(MAKEFOURCC('A','L','S',' ')); // create our own GUID - {20534C41-0000-0010-8000-00AA00389B71}
 									mts.Add(mt);
@@ -971,7 +971,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							AP4_Size size = db.GetDataSize();
 
 							while (size >= 36) {
-								if ((*(DWORD*)(data) == 0x24000000) && (*(DWORD*)(data+4) == 0x63616c61)) {
+								if ((GETDWORD(data) == 0x24000000) && (GETDWORD(data+4) == 0x63616c61)) {
 									break;
 								}
 								size--;
@@ -1150,12 +1150,12 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 						} else if (atom->GetType() == AP4_ATOM_TYPE_COVR) {
 							if (db->GetDataSize() > 10) {
-								DWORD sync = *(DWORD*)(db->GetData()+6);
+								DWORD sync = GETDWORD(db->GetData()+6);
 								// check for JFIF or Exif sync ...
 								if (sync == MAKEFOURCC('J', 'F', 'I', 'F') || sync == MAKEFOURCC('E', 'x', 'i', 'f')) {
 									ResAppend(_T("cover.jpg"), _T("cover"), _T("image/jpeg"), (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
 								} else {
-									sync = *(DWORD*)db->GetData();
+									sync = GETDWORD(db->GetData());
 									// check for PNG sync ...
 									if (sync == MAKEFOURCC(0x89, 'P', 'N', 'G')) {
 										ResAppend(_T("cover.png"), _T("cover"), _T("image/png"), (BYTE*)db->GetData(), (DWORD)db->GetDataSize());

@@ -47,6 +47,9 @@
 #define KILOBYTE			1024
 #define MEGABYTE			KILOBYTE * KILOBYTE
 
+#define GETWORD(b)		*(WORD*)b
+#define GETDWORD(b)		*(DWORD*)b
+
 extern CString			ResStr(UINT nID);
 
 extern int				CountPins(IBaseFilter* pBF, int& nIn, int& nOut, int& nInC, int& nOutC);

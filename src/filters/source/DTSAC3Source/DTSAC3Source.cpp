@@ -269,7 +269,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 			m_file.Seek(m_dataStart + fsize, CFile::begin);
 			if (m_file.Read(&buf, 20) == 20) {
-				sync = *(DWORD*)buf;
+				sync = GETDWORD(buf);
 				HD_size = ParseDTSHDHeader(buf, 20, &aframe);
 				if (HD_size) {
 					m_samplerate = aframe.samplerate;

@@ -77,7 +77,7 @@ inline long crc_octets(BYTE *octets, size_t len)
 
 static int GetTAKFrameNumber(BYTE* buf, int size)
 {
-	if (size < 32 || *(WORD*)buf != 0xA0FF) { // sync
+	if (size < 32 || GETWORD(buf) != 0xA0FF) { // sync
 		return -1;
 	}
 

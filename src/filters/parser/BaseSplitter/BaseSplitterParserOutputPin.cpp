@@ -26,12 +26,12 @@
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/MediaDescription.h"
 
-#define MOVE_TO_H264_START_CODE(b, e)		while(b <= e - 4  && !((*(DWORD*)b == 0x01000000) || ((*(DWORD*)b & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e - 4) && *(DWORD*)b == 0x01000000) b++;
-#define MOVE_TO_AC3_START_CODE(b, e)		while(b <= e - 8  && (*(WORD*)b != AC3_SYNC_WORD)) b++;
-#define MOVE_TO_AAC_START_CODE(b, e)		while(b <= e - 9  && ((*(WORD*)b & 0xf0ff) != 0xf0ff)) b++;
-#define MOVE_TO_AACLATM_START_CODE(b, e)	while(b <= e - 4  && ((*(WORD*)b & 0xe0FF) != 0xe056)) b++;
-#define MOVE_TO_DIRAC_START_CODE(b, e)		while(b <= e - 4  && (*(DWORD*)b != 0x44434242)) b++;
-#define MOVE_TO_DTS_START_CODE(b, e)		while(b <= e - 16 && (*(DWORD*)b != DTS_SYNC_WORD)) b++;
+#define MOVE_TO_H264_START_CODE(b, e)		while(b <= e - 4  && !((GETDWORD(b) == 0x01000000) || ((GETDWORD(b) & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e - 4) && GETDWORD(b) == 0x01000000) b++;
+#define MOVE_TO_AC3_START_CODE(b, e)		while(b <= e - 8  && (GETWORD(b) != AC3_SYNC_WORD)) b++;
+#define MOVE_TO_AAC_START_CODE(b, e)		while(b <= e - 9  && ((GETWORD(b) & 0xf0ff) != 0xf0ff)) b++;
+#define MOVE_TO_AACLATM_START_CODE(b, e)	while(b <= e - 4  && ((GETWORD(b) & 0xe0FF) != 0xe056)) b++;
+#define MOVE_TO_DIRAC_START_CODE(b, e)		while(b <= e - 4  && (GETDWORD(b) != 0x44434242)) b++;
+#define MOVE_TO_DTS_START_CODE(b, e)		while(b <= e - 16 && (GETDWORD(b) != DTS_SYNC_WORD)) b++;
 
 //
 // CBaseSplitterParserOutputPin
@@ -314,13 +314,13 @@ HRESULT CBaseSplitterParserOutputPin::ParseAACLATM(CAutoPtr<CPacket> p)
 	for(;;) {
 		MOVE_TO_AACLATM_START_CODE(start, end);
 		if (start <= end - 4) {
-			int size = (_byteswap_ushort(*(WORD*)(start + 1)) & 0x1FFF) + 3;
+			int size = (_byteswap_ushort(GETWORD(start + 1)) & 0x1FFF) + 3;
 			if (start + size > end) {
 				break;
 			}
 
 			if (start + size + 4 <= end) {
-				if ((*(WORD*)(start + size) & 0xE0FF) != 0xe056) {
+				if ((GETWORD(start + size) & 0xE0FF) != 0xe056) {
 					start++;
 					continue;
 				}
@@ -657,10 +657,10 @@ HRESULT CBaseSplitterParserOutputPin::ParseVC1(CAutoPtr<CPacket> p)
 
 	bool bSeqFound = false;
 	while (start <= end - 4) {
-		if (*(DWORD*)start == 0x0D010000) {
+		if (GETDWORD(start) == 0x0D010000) {
 			bSeqFound = true;
 			break;
-		} else if (*(DWORD*)start == 0x0F010000) {
+		} else if (GETDWORD(start) == 0x0F010000) {
 			break;
 		}
 		start++;
@@ -673,12 +673,12 @@ HRESULT CBaseSplitterParserOutputPin::ParseVC1(CAutoPtr<CPacket> p)
 			next = end;
 		} else {
 			while (next <= end - 4) {
-				if (*(DWORD*)next == 0x0D010000) {
+				if (GETDWORD(next) == 0x0D010000) {
 					if (bSeqFound) {
 						break;
 					}
 					bSeqFound = true;
-				} else if (*(DWORD*)next == 0x0F010000) {
+				} else if (GETDWORD(next) == 0x0F010000) {
 					break;
 				}
 				next++;
@@ -694,7 +694,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseVC1(CAutoPtr<CPacket> p)
 		HandlePacket(0);
 
 		start		= next;
-		bSeqFound	= (*(DWORD*)start == 0x0D010000);
+		bSeqFound	= (GETDWORD(start) == 0x0D010000);
 	}
 
 	ENDDATA;

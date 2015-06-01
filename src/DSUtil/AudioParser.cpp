@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "AudioParser.h"
 #include "GolombBuffer.h"
+#include "DSUtil.h"
 
 #define AC3_CHANNEL                  0
 #define AC3_MONO                     1
@@ -286,7 +287,7 @@ DWORD CountBits(DWORD v) { // used code from \VirtualDub\h\vd2\system\bitmath.h 
 int ParseAC3IEC61937Header(const BYTE* buf)
 {
 	WORD* wbuf = (WORD*)buf;
-	if (*(DWORD*)buf != IEC61937_SYNC_WORD
+	if (GETDWORD(buf) != IEC61937_SYNC_WORD
 			|| wbuf[2] !=  0x0001
 			|| wbuf[3] == 0
 			|| wbuf[3] >= (6144-8)*8
@@ -313,7 +314,7 @@ static const int mpeg1_samplerates[] = { 44100, 48000, 32000, 0 };
 
 int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe)
 {
-	if ((*(WORD*)buf & 0xe0ff) != 0xe0ff) { // sync
+	if ((GETWORD(buf) & 0xe0ff) != 0xe0ff) { // sync
 		return 0;
 	}
 
@@ -376,7 +377,7 @@ int ParseMPEG1Header(const BYTE* buf, MPEG1WAVEFORMAT* mpeg1wf)
 {
 	// http://msdn.microsoft.com/en-us/library/windows/desktop/dd390701%28v=vs.85%29.aspx
 
-	if ((*(WORD*)buf & 0xf8ff) != 0xf8ff) { // sync + (mpaver_id = MPEG Version 1)
+	if ((GETWORD(buf) & 0xf8ff) != 0xf8ff) { // sync + (mpaver_id = MPEG Version 1)
 		return 0;
 	}
 
@@ -427,7 +428,7 @@ int ParseMP3Header(const BYTE* buf, MPEGLAYER3WAVEFORMAT* mp3wf) // experimental
 {
 	// http://msdn.microsoft.com/en-us/library/windows/desktop/dd390710%28v=vs.85%29.aspx
 
-	if ((*(WORD*)buf & 0xfeff) != 0xfaff) { // sync + (mpaver_id = MPEG Version 1 = 11b) + (layer_desc = Layer 3 = 01b)
+	if ((GETWORD(buf) & 0xfeff) != 0xfaff) { // sync + (mpaver_id = MPEG Version 1 = 11b) + (layer_desc = Layer 3 = 01b)
 		return 0;
 	}
 
@@ -466,7 +467,7 @@ int ParseAC3Header(const BYTE* buf, audioframe_t* audioframe)
 	static const BYTE  ac3_halfrate[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3 };
 	static const BYTE  ac3_lfeon[8]     = { 0x10, 0x10, 0x04, 0x04, 0x04, 0x01, 0x04, 0x01 };
 
-	if (*(WORD*)buf != AC3_SYNC_WORD) { // syncword
+	if (GETWORD(buf) != AC3_SYNC_WORD) { // syncword
 		return 0;
 	}
 
@@ -550,7 +551,7 @@ int ParseEAC3Header(const BYTE* buf, audioframe_t* audioframe)
 	static const BYTE  eac3_channels[8]    = { 2, 1, 2, 3, 3, 4, 4, 5 };
 	static const short eac3_samples_tbl[4] = { 256, 512, 768, 1536 };
 
-	if (*(WORD*)buf != AC3_SYNC_WORD) { // syncword
+	if (GETWORD(buf) != AC3_SYNC_WORD) { // syncword
 		return 0;
 	}
 
@@ -599,7 +600,7 @@ int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 		   2,   1,   1,   2,   2,   2,   2,   1,   1,   2,   2,   1,   1
 	};
 
-	DWORD sync = *(DWORD*)(buf+4);
+	DWORD sync = GETDWORD(buf+4);
 	bool isTrueHD;
 	if (sync == TRUEHD_SYNC_WORD) {
 		isTrueHD = true;
@@ -724,7 +725,7 @@ int ParseDTSHeader(const BYTE* buf, audioframe_t* audioframe)
 	};
 
 	int frame_size = 0;
-	DWORD sync = *(DWORD*)buf;
+	DWORD sync = GETDWORD(buf);
 	switch (sync) {
 		case 0x0180fe7f:    // '7FFE8001' 16 bits and big endian bitstream
 			frame_size = ((buf[5] & 3) << 12 | buf[6] << 4 | (buf[7] & 0xf0) >> 4) + 1;
@@ -768,7 +769,7 @@ int ParseDTSHeader(const BYTE* buf, audioframe_t* audioframe)
 				dts14le_to_dts16be(buf, (BYTE*)hdr, 16);
 				break;
 		}
-		ASSERT(*(DWORD*)hdr == 0x0180fe7f);
+		ASSERT(GETDWORD(hdr) == 0x0180fe7f);
 
 		audioframe->size = frame_size;
 
@@ -806,7 +807,7 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 {
 	static const DWORD exss_sample_rates[16] = { 8000, 16000, 32000, 64000, 128000, 22050, 44100, 88200, 176400, 352800, 12000, 24000, 48000, 96000, 192000, 384000 };
 
-	if (*(DWORD*)buf != DTSHD_SYNC_WORD) { // syncword
+	if (GETDWORD(buf) != DTSHD_SYNC_WORD) { // syncword
 		return 0;
 	}
 
@@ -945,7 +946,7 @@ int ParseADTSAACHeader(const BYTE* buf, audioframe_t* audioframe)
 	static const int  mp4a_samplerates[16] = { 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350, 0, 0, 0 };
 	static const BYTE mp4a_channels[8]     = { 0, 1, 2, 3, 4, 5, 6, 8 };
 
-	if ((*(WORD*)buf & 0xf0ff) != 0xf0ff) { // syncword
+	if ((GETWORD(buf) & 0xf0ff) != 0xf0ff) { // syncword
 		return 0;
 	}
 

@@ -490,9 +490,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						fourcc = FCC('VP90');
 					} else if (CodecID == "V_QUICKTIME" && pTE->CodecPrivate.GetCount() >= 8) {
 						if (m_pFile->m_ebml.DocTypeReadVersion == 1) {
-							fourcc = *(DWORD*)(pTE->CodecPrivate.GetData());
+							fourcc = GETDWORD(pTE->CodecPrivate.GetData());
 						} else {
-							fourcc = *(DWORD*)(pTE->CodecPrivate.GetData() + 4);
+							fourcc = GETDWORD(pTE->CodecPrivate.GetData() + 4);
 						}
 					} else if (CodecID.Left(9) == "V_REAL/RV" && CodecID.GetLength() == 11) {
 						fourcc = CodecID[7] + (CodecID[8] << 8) + (CodecID[9] << 16) + (CodecID[10] << 24);

@@ -76,7 +76,7 @@ bool ff_wv_parse_header(wv_header_t* wvh, const uint8_t* data)
 {
 	memset(wvh, 0, sizeof(*wvh));
 
-	if (*(DWORD*)data != FCC('wvpk')) {
+	if (GETDWORD(data) != FCC('wvpk')) {
 		return false;
 	}
 

@@ -327,13 +327,13 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	DWORD dw;
 	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_DeintMethod, m_ditype);
 	SetDeinterlaceMethod((ditype)dw);
-	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Brightness, *(DWORD*)&m_bright);
+	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Brightness, GETDWORD(&m_bright));
 	SetBrightness(*(float*)&dw);
-	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Contrast, *(DWORD*)&m_cont);
+	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Contrast, GETDWORD(&m_cont));
 	SetContrast(*(float*)&dw);
-	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Hue, *(DWORD*)&m_hue);
+	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Hue, GETDWORD(&m_hue));
 	SetHue(*(float*)&dw);
-	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Saturation, *(DWORD*)&m_sat);
+	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Saturation, GETDWORD(&m_sat));
 	SetSaturation(*(float*)&dw);
 	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_ForcedSubs, m_fForcedSubs);
 	EnableForcedSubtitles(!!dw);
@@ -363,10 +363,10 @@ STDMETHODIMP CMpeg2DecFilter::Apply()
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_MPEGDec)) {
 		key.SetDWORDValue(OPT_DeintMethod, m_ditype);
-		key.SetDWORDValue(OPT_Brightness, *(DWORD*)&m_bright);
-		key.SetDWORDValue(OPT_Contrast, *(DWORD*)&m_cont);
-		key.SetDWORDValue(OPT_Hue, *(DWORD*)&m_hue);
-		key.SetDWORDValue(OPT_Saturation, *(DWORD*)&m_sat);
+		key.SetDWORDValue(OPT_Brightness, GETDWORD(&m_bright));
+		key.SetDWORDValue(OPT_Contrast, GETDWORD(&m_cont));
+		key.SetDWORDValue(OPT_Hue, GETDWORD(&m_hue));
+		key.SetDWORDValue(OPT_Saturation, GETDWORD(&m_sat));
 		key.SetDWORDValue(OPT_ForcedSubs, m_fForcedSubs);
 		key.SetDWORDValue(OPT_PlanarYUV, m_fPlanarYUV);
 		key.SetDWORDValue(OPT_Interlaced, m_fInterlaced);
@@ -374,10 +374,10 @@ STDMETHODIMP CMpeg2DecFilter::Apply()
 	}
 #else
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_DeintMethod, m_ditype);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Brightness, *(DWORD*)&m_bright);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Contrast, *(DWORD*)&m_cont);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Hue, *(DWORD*)&m_hue);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Saturation, *(DWORD*)&m_sat);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Brightness, GETDWORD(&m_bright));
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Contrast, GETDWORD(&m_cont));
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Hue, GETDWORD(&m_hue));
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Saturation, GETDWORD(&m_sat));
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_ForcedSubs, m_fForcedSubs);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_PlanarYUV, m_fPlanarYUV);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Interlaced, m_fInterlaced);
@@ -2262,12 +2262,12 @@ HRESULT CClosedCaptionOutputPin::Deliver(const void* ptr, int len)
 {
 	HRESULT hr = S_FALSE;
 
-	if (len > 4 && ptr && *(DWORD*)ptr == 0xf8014343 && IsConnected()) {
+	if (len > 4 && ptr && GETDWORD(ptr) == 0xf8014343 && IsConnected()) {
 		CComPtr<IMediaSample> pSample;
 		GetDeliveryBuffer(&pSample, NULL, NULL, 0);
 		BYTE* pData = NULL;
 		pSample->GetPointer(&pData);
-		*(DWORD*)pData = 0xb2010000;
+		GETDWORD(pData) = 0xb2010000;
 		memcpy(pData + 4, ptr, len);
 		pSample->SetActualDataLength(len + 4);
 		hr = __super::Deliver(pSample);
