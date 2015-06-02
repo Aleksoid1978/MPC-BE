@@ -2042,21 +2042,19 @@ bool GetDispMode(int i, dispmode& dm, CString& DisplayName)
 	}
 
 	return dm.bValid;
-
 }
 
 void SetDispMode(dispmode& dm, CString& DisplayName)
 {
+	const AppSettings& s = AfxGetAppSettings();
+
 	dispmode dm1;
-	GetCurDispMode(dm1, DisplayName);
-	AppSettings& s = AfxGetAppSettings();
-	if ((dm.size == dm1.size) && (dm.bpp == dm1.bpp) && (dm.freq == dm1.freq)) {
+	if (!s.AutoChangeFullscrRes.bEnabled
+			|| !GetCurDispMode(dm1, DisplayName)
+			|| ((dm.size == dm1.size) && (dm.bpp == dm1.bpp) && (dm.freq == dm1.freq))) {
 		return;
 	}
 
-	if (!dm.bValid) {
-		return;
-	}
 	DEVMODE dmScreenSettings;
 	memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
 	dmScreenSettings.dmSize = sizeof(dmScreenSettings);
@@ -2068,24 +2066,15 @@ void SetDispMode(dispmode& dm, CString& DisplayName)
 	dmScreenSettings.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY  | DM_DISPLAYFLAGS;
 	CString DisplayName1 = DisplayName;
 	if (DisplayName == _T("Current") || DisplayName.IsEmpty()) {
-		CMonitor monitor;
-		CMonitors monitors;
-		monitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+		CMonitor monitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 		monitor.GetName(DisplayName1);
 	}
 
-	if (s.AutoChangeFullscrRes.bEnabled == 1) {
-		if (AfxGetAppSettings().fRestoreResAfterExit) {
-			ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, CDS_FULLSCREEN, NULL);
-		} else {
-			ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, NULL, NULL);
-		}
-	} else if (s.AutoChangeFullscrRes.bEnabled == 2){
-		if (s.AutoChangeFullscrRes.bSetGlobal) {
-			ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, (CDS_UPDATEREGISTRY/* | CDS_GLOBAL*/), NULL);
-		} else {
- 			ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, CDS_FULLSCREEN, NULL);
-		}
+	if (s.AutoChangeFullscrRes.bSetGlobal) {
+		ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, CDS_UPDATEREGISTRY | CDS_NORESET, NULL);
+		ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
+	} else {
+		ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, CDS_FULLSCREEN, NULL);
 	}
 }
 
