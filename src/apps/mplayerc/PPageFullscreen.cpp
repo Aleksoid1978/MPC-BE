@@ -26,6 +26,14 @@
 #include "MultiMonitor.h"
 #include <algorithm>
 
+static CString FormatModeString(dispmode dmod)
+{
+	CString strMode;
+	strMode.Format(L"[ %d ]  @ %dx%d %s", dmod.freq, dmod.size.cx, dmod.size.cy, dmod.dmDisplayFlags & DM_INTERLACED ? L"i" : L"p");
+
+	return strMode;
+}
+
 // CPPagePlayer dialog
 
 IMPLEMENT_DYNAMIC(CPPageFullscreen, CPPageBase)
@@ -73,24 +81,24 @@ BEGIN_MESSAGE_MAP(CPPageFullscreen, CPPageBase)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_LIST1, OnEndlabeleditList)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST1, OnCustomdrawList)
 	ON_CLBN_CHKCHANGE(IDC_LIST1, OnCheckChangeList)
-	ON_UPDATE_COMMAND_UI(IDC_LIST1, OnUpdateList)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK3, OnUpdateApplyDefault)
+	ON_UPDATE_COMMAND_UI(IDC_LIST1, OnUpdateFullscreenRes)
+	ON_UPDATE_COMMAND_UI(IDC_CHECK3, OnUpdateSetDefaultRes)
 
 	ON_COMMAND(IDC_CHECK2, OnUpdateSetFullscreenRes)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK4, OnUpdateShowBarsWhenFullScreen)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT1, OnUpdateShowBarsWhenFullScreenTimeOut)
 	ON_UPDATE_COMMAND_UI(IDC_COMBO1, OnUpdateFullScrComboCtrl)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK7, OnUpdateSetGlobal)
+	ON_UPDATE_COMMAND_UI(IDC_CHECK7, OnUpdateFullscreenRes)
 	ON_UPDATE_COMMAND_UI(IDC_STATIC1, OnUpdateStatic1)
 	ON_UPDATE_COMMAND_UI(IDC_STATIC2, OnUpdateStatic2)
 
 	ON_UPDATE_COMMAND_UI(IDC_SPIN1, OnUpdateTimeout)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT1, OnUpdateTimeout)
-	ON_UPDATE_COMMAND_UI(IDC_RESTORERESCHECK, OnUpdateRestoreRes)
+	ON_UPDATE_COMMAND_UI(IDC_RESTORERESCHECK, OnUpdateRestoreResAfterExit)
 	ON_BN_CLICKED(IDC_BUTTON2, OnRemove)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON2, OnUpdateRemove)
 	ON_BN_CLICKED(IDC_BUTTON1, OnAdd)
-	ON_UPDATE_COMMAND_UI(IDC_BUTTON1, OnUpdateAdd)
+	ON_UPDATE_COMMAND_UI(IDC_BUTTON1, OnUpdateFullscreenRes)
 	ON_BN_CLICKED(IDC_BUTTON3, OnMoveUp)
 	ON_BN_CLICKED(IDC_BUTTON4, OnMoveDown)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON3, OnUpdateUp)
@@ -383,14 +391,24 @@ void CPPageFullscreen::OnCheckChangeList()
 	SetModified();
 }
 
-void CPPageFullscreen::OnUpdateList(CCmdUI* pCmdUI)
+void CPPageFullscreen::OnUpdateFullscreenRes(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_CHECK2));
+	pCmdUI->Enable(m_bSetFullscreenRes);
 }
 
-void CPPageFullscreen::OnUpdateApplyDefault(CCmdUI* pCmdUI)
+void CPPageFullscreen::OnUpdateFullScrComboCtrl(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_CHECK2) && m_bSetFullscreenRes != 2);
+	pCmdUI->Enable(!m_bSetFullscreenRes);
+}
+
+void CPPageFullscreen::OnUpdateRestoreResAfterExit(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(m_bSetFullscreenRes && m_bSetGlobal);
+}
+
+void CPPageFullscreen::OnUpdateSetDefaultRes(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(m_bSetFullscreenRes == TRUE);
 }
 
 void CPPageFullscreen::OnUpdateSetFullscreenRes()
@@ -406,21 +424,6 @@ void CPPageFullscreen::OnUpdateSetFullscreenRes()
 	}
 
 	SetModified();
-}
-
-void CPPageFullscreen::OnUpdateRestoreRes(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_CHECK2) && m_bSetFullscreenRes != 2);
-}
-
-void CPPageFullscreen::OnUpdateFullScrComboCtrl(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(!IsDlgButtonChecked(IDC_CHECK2));
-}
-
-void CPPageFullscreen::OnUpdateSetGlobal(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(m_bSetFullscreenRes == 2);
 }
 
 void CPPageFullscreen::OnUpdateShowBarsWhenFullScreen(CCmdUI* pCmdUI)
@@ -661,7 +664,7 @@ void CPPageFullscreen::OnUpdateRemove(CCmdUI* pCmdUI)
 {
 	POSITION pos = m_list.GetFirstSelectedItemPosition();
 	int nItem = pos ? m_list.GetNextSelectedItem(pos) : -1;
-	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_CHECK2) && nItem > 0);
+	pCmdUI->Enable(m_bSetFullscreenRes && nItem > 0);
 }
 
 void CPPageFullscreen::OnAdd()
@@ -687,11 +690,6 @@ void CPPageFullscreen::OnAdd()
 
 		SetModified();
 	}
-}
-
-void CPPageFullscreen::OnUpdateAdd(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_CHECK2));
 }
 
 void CPPageFullscreen::OnMoveUp()
@@ -763,14 +761,14 @@ void CPPageFullscreen::OnUpdateUp(CCmdUI* pCmdUI)
 {
 	POSITION pos = m_list.GetFirstSelectedItemPosition();
 	int nItem = pos ? m_list.GetNextSelectedItem(pos) : -1;
-	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_CHECK2) && nItem > 1);
+	pCmdUI->Enable(m_bSetFullscreenRes && nItem > 1);
 }
 
 void CPPageFullscreen::OnUpdateDown(CCmdUI* pCmdUI)
 {
 	POSITION pos = m_list.GetFirstSelectedItemPosition();
 	int nItem = pos ? m_list.GetNextSelectedItem(pos) : -1;
-	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_CHECK2) && nItem > 0 && nItem < m_list.GetItemCount() - 1);
+	pCmdUI->Enable(m_bSetFullscreenRes && nItem > 0 && nItem < m_list.GetItemCount() - 1);
 }
 
 void CPPageFullscreen::ReindexList()
@@ -790,12 +788,4 @@ void CPPageFullscreen::GetCurDispModeString(CString& strCur)
 	GetCurDispMode(dmod, m_f_hmonitor);
 
 	strCur = FormatModeString(dmod);
-}
-
-CString CPPageFullscreen::FormatModeString(dispmode dmod)
-{
-	CString strMode;
-	strMode.Format(L"[ %d ]  @ %dx%d %s", dmod.freq, dmod.size.cx, dmod.size.cy, dmod.dmDisplayFlags & DM_INTERLACED ? L"i" : L"p");
-
-	return strMode;
 }

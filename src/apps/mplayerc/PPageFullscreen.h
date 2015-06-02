@@ -65,7 +65,6 @@ private:
 
 	void ReindexList();
 	void GetCurDispModeString(CString& strMode);
-	CString FormatModeString(dispmode dmod);
 	void ModesUpdate();
 public:
 	CPPageFullscreen();
@@ -81,16 +80,16 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnUpdateList(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateFullscreenRes(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateFullScrComboCtrl(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateRestoreResAfterExit(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateSetDefaultRes(CCmdUI* pCmdUI);
 	afx_msg void OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnCheckChangeList();
-	afx_msg void OnUpdateApplyDefault(CCmdUI* pCmdUI);
 
-	afx_msg void OnUpdateSetGlobal(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateFullScrComboCtrl(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateSetFullscreenRes();
 	afx_msg void OnUpdateShowBarsWhenFullScreen(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateShowBarsWhenFullScreenTimeOut(CCmdUI* pCmdUI);
@@ -99,11 +98,9 @@ public:
 
 	afx_msg void OnUpdateFullScrCombo();
 	afx_msg void OnUpdateTimeout(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateRestoreRes(CCmdUI* pCmdUI);
 	afx_msg void OnRemove();
 	afx_msg void OnUpdateRemove(CCmdUI* pCmdUI);
 	afx_msg void OnAdd();
-	afx_msg void OnUpdateAdd(CCmdUI* pCmdUI);
 	afx_msg void OnMoveUp();
 	afx_msg void OnMoveDown();
 	afx_msg void OnUpdateUp(CCmdUI* pCmdUI);

@@ -650,7 +650,6 @@ CMainFrame::CMainFrame() :
 	m_pGraphThread(NULL),
 	m_bOpenedThruThread(false),
 	m_bWasSnapped(false),
-	m_nWasSetDispMode(0),
 	m_bIsBDPlay(FALSE),
 	m_bClosingState(false),
 	m_bUseSmartSeek(false),
@@ -1028,7 +1027,8 @@ void CMainFrame::OnClose()
 	s.WinLircClient.DisConnect();
 	s.UIceClient.DisConnect();
 
-	if (s.AutoChangeFullscrRes.bSetGlobal && s.AutoChangeFullscrRes.bEnabled == 2) {
+	if (s.AutoChangeFullscrRes.bEnabled && s.AutoChangeFullscrRes.bSetGlobal
+			&& s.fRestoreResAfterExit) {
 		SetDispMode(s.dm_def, s.strFullScreenMonitor);
 	}
 
@@ -10475,19 +10475,17 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 void CMainFrame::AutoChangeMonitorMode()
 {
 	AppSettings& s = AfxGetAppSettings();
-	CStringW mf_hmonitor = s.strFullScreenMonitor;
+	CString mf_hmonitor = s.strFullScreenMonitor;
 
 	// EnumDisplayDevice... s.strFullScreenMonitorID == sDeviceID ???
-	bool bHasRule = 0;
-	DISPLAY_DEVICE dd;
-	dd.cb = sizeof(dd);
+	DISPLAY_DEVICE dd = { sizeof(dd) };
+	
 	DWORD dev = 0; // device index
-	int iMonValid = 0;
+	BOOL bMonValid = FALSE;
 	CString sDeviceID, strMonName;
 	while (EnumDisplayDevices(0, dev, &dd, 0)) {
-		DISPLAY_DEVICE ddMon;
-		ZeroMemory(&ddMon, sizeof(ddMon));
-		ddMon.cb = sizeof(ddMon);
+		DISPLAY_DEVICE ddMon = { sizeof(ddMon) };
+		
 		DWORD devMon = 0;
 		while (EnumDisplayDevices(dd.DeviceName, devMon, &ddMon, 0)) {
 			if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE && !(ddMon.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
@@ -10497,7 +10495,7 @@ void CMainFrame::AutoChangeMonitorMode()
 					strMonName.Format(L"%s", ddMon.DeviceName);
 					strMonName = strMonName.Left(12);
 					mf_hmonitor = /*s.strFullScreenMonitor = */strMonName;
-					iMonValid = 1;
+					bMonValid = TRUE;
 					break;
 				}
 			}
@@ -10510,15 +10508,14 @@ void CMainFrame::AutoChangeMonitorMode()
 		dev++;
  	}
 
-	CStringW strCurFS = mf_hmonitor;
+	CString strCurFS = mf_hmonitor;
 	dispmode dmCur;
 	GetCurDispMode(dmCur, strCurFS);
 
 	// Set Display Mode
-
-	if (s.AutoChangeFullscrRes.bEnabled == 1 && iMonValid == 1) {
+	if (s.AutoChangeFullscrRes.bEnabled && bMonValid == TRUE) {
 		double MediaFPS = 0.0;
-		if (s.IsD3DFullscreen() && miFPS > 0.9) {
+		if (miFPS > 0.9) {
 			MediaFPS = miFPS;
 		} else {
 			const REFERENCE_TIME rtAvgTimePerFrame = std::llround(GetAvgTimePerFrame() * 10000000i64);
@@ -10532,50 +10529,14 @@ void CMainFrame::AutoChangeMonitorMode()
 		}
 
 		for (int rs = 0; rs < MaxFpsCount ; rs++) {
-			if (s.AutoChangeFullscrRes.dmFullscreenRes[rs].bValid
-					&& s.AutoChangeFullscrRes.dmFullscreenRes[rs].bChecked
-					&& MediaFPS >= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_from
-					&& MediaFPS <= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_to) {
+			const fpsmode* fsmode = &s.AutoChangeFullscrRes.dmFullscreenRes[rs];
+			if (fsmode->bValid
+					&& fsmode->bChecked
+					&& MediaFPS >= fsmode->vfr_from
+					&& MediaFPS <= fsmode->vfr_to) {
 
 				SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes, mf_hmonitor);
 				return;
-			}
-		}
-
-	} else if (s.AutoChangeFullscrRes.bEnabled == 2) {
-
-		if (iMonValid == 1 && s.dFPS >= 1) {
-			for (int rs = 0; rs < MaxFpsCount ; rs++) {
-				if (s.AutoChangeFullscrRes.dmFullscreenRes[rs].bValid
-					&& s.AutoChangeFullscrRes.dmFullscreenRes[rs].bChecked
-					&& s.dFPS >= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_from
-					&& s.dFPS <= s.AutoChangeFullscrRes.dmFullscreenRes[rs].vfr_to) {
-
-					if ((s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes.size != dmCur.size)
-						|| (s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes.bpp != dmCur.bpp)
-						|| (s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes.freq != dmCur.freq)) {
-							SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes, mf_hmonitor);
-							m_nWasSetDispMode = 1;
-
-					} else if ((s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes.size == s.dm_def.size)
-						&& (s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes.bpp == s.dm_def.bpp)
-						&& (s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes.freq == s.dm_def.freq)) {
-
-						if (m_nWasSetDispMode == 1) {
-							ChangeDisplaySettingsEx(mf_hmonitor, NULL, NULL, 0, NULL);
-							m_nWasSetDispMode = 0;
-						}
-					}
-					bHasRule = 1;
- 					break;
-				}
-			}
-			if (bHasRule == 0) {
-				if ((dmCur.size == s.dm_def.size) && (dmCur.bpp == s.dm_def.bpp) && (dmCur.freq == s.dm_def.freq)) {
-					ChangeDisplaySettingsEx(mf_hmonitor, NULL, NULL, 0, NULL);
-				} else {
-					SetDispMode(dmCur, mf_hmonitor);
-				}
 			}
 		}
 	}

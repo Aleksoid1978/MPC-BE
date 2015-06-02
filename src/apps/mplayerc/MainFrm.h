@@ -1038,8 +1038,6 @@ public:
 	bool		m_bInOptions;
 	bool		m_bStopTunerScan;
 
-	int			m_nWasSetDispMode;
-
 	void		SetLoadState(MPC_LOADSTATE iState);
 	void		SetPlayState(MPC_PLAYSTATE iState);
 	bool		CreateFullScreenWindow();
