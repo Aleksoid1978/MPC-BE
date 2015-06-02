@@ -2666,7 +2666,7 @@ static void fill_picture_parameters(const HEVCContext *h,
                                     DXVA_PicParams_HEVC *pp)
 {
     const HEVCFrame *current_picture = h->ref;
-    int i, j, k;
+    int i, j;
 
     memset(pp, 0, sizeof(*pp));
 
@@ -2764,30 +2764,34 @@ static void fill_picture_parameters(const HEVCContext *h,
     pp->log2_parallel_merge_level_minus2 = h->pps->log2_parallel_merge_level - 2;
     pp->CurrPicOrderCntVal               = h->poc;
 
-    // empty the lists
-    memset(&pp->RefPicList, 0xff, sizeof(pp->RefPicList));
-    memset(&pp->RefPicSetStCurrBefore, 0xff, sizeof(pp->RefPicSetStCurrBefore));
-    memset(&pp->RefPicSetStCurrAfter, 0xff, sizeof(pp->RefPicSetStCurrAfter));
-    memset(&pp->RefPicSetLtCurr, 0xff, sizeof(pp->RefPicSetLtCurr));
-
     // fill RefPicList from the DPB
-    for (i = 0, j = 0; i < FF_ARRAY_ELEMS(h->DPB); i++) {
-        const HEVCFrame *frame = &h->DPB[i];
-        if (frame != current_picture && (frame->flags & (HEVC_FRAME_FLAG_LONG_REF | HEVC_FRAME_FLAG_SHORT_REF))) {
-            fill_picture_entry(&pp->RefPicList[j], (unsigned)frame->frame->data[4], !!(frame->flags & HEVC_FRAME_FLAG_LONG_REF));
-            pp->PicOrderCntValList[j] = frame->poc;
+    for (i = 0, j = 0; i < FF_ARRAY_ELEMS(pp->RefPicList); i++) {
+        const HEVCFrame *frame = NULL;
+        while (!frame && j < FF_ARRAY_ELEMS(h->DPB)) {
+            if (&h->DPB[j] != current_picture && (h->DPB[j].flags & (HEVC_FRAME_FLAG_LONG_REF | HEVC_FRAME_FLAG_SHORT_REF)))
+                frame = &h->DPB[j];
             j++;
+        }
+
+        if (frame) {
+            fill_picture_entry(&pp->RefPicList[i], (unsigned)frame->frame->data[4], !!(frame->flags & HEVC_FRAME_FLAG_LONG_REF));
+            pp->PicOrderCntValList[i] = frame->poc;
+        } else {
+            pp->RefPicList[i].bPicEntry = 0xff;
+            pp->PicOrderCntValList[i]   = 0;
         }
     }
 
     #define DO_REF_LIST(ref_idx, ref_list) { \
         const RefPicList *rpl = &h->rps[ref_idx]; \
-        av_assert0(rpl->nb_refs <= FF_ARRAY_ELEMS(pp->ref_list)); \
-        for (j = 0, k = 0; j < rpl->nb_refs; j++) { \
-            if (rpl->ref[j]) { \
-                pp->ref_list[k] = get_refpic_index(pp, (unsigned)rpl->ref[j]->frame->data[4]); \
-                k++; \
-            } \
+        for (i = 0, j = 0; i < FF_ARRAY_ELEMS(pp->ref_list); i++) { \
+            const HEVCFrame *frame = NULL; \
+            while (!frame && j < rpl->nb_refs) \
+                frame = rpl->ref[j++]; \
+            if (frame) \
+                pp->ref_list[i] = get_refpic_index(pp, (unsigned)frame->frame->data[4]); \
+            else \
+                pp->ref_list[i] = 0xff; \
         } \
     }
 
@@ -2818,12 +2822,12 @@ static void fill_scaling_lists(const HEVCContext *h, DXVA_Qmatrix_HEVC *qm)
             qm->ucScalingLists2[i][j] = sl->sl[2][i][pos];
 
             if (i < 2)
-                qm->ucScalingLists3[i][j] = sl->sl[3][i][pos];
+                qm->ucScalingLists3[i][j] = sl->sl[3][i * 3][pos];
         }
 
         qm->ucScalingListDCCoefSizeID2[i] = sl->sl_dc[0][i];
         if (i < 2)
-            qm->ucScalingListDCCoefSizeID3[i] = sl->sl_dc[1][i];
+            qm->ucScalingListDCCoefSizeID3[i] = sl->sl_dc[1][i * 3];
     }
 }
 
