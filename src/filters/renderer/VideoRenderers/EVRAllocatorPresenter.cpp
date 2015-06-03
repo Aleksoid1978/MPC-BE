@@ -1814,6 +1814,10 @@ STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResetDevice()
 
 STDMETHODIMP_(bool) CEVRAllocatorPresenter::DisplayChange()
 {
+    CAutoLock lock(this);
+    CAutoLock lock2(&m_ImageProcessingLock);
+    CAutoLock cRenderLock(&m_RenderLock);
+
 	return __super::DisplayChange();
 }
 
