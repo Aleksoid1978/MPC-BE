@@ -431,8 +431,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 {
 	DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::CreateDevice()"));
 
-	CAutoLock cRenderLock(&m_CreateLock);
-
 	// extern variable
 	g_bGetFrameType	= FALSE;
 	g_nFrameType	= PICT_NONE;
@@ -1651,10 +1649,10 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 {
 	DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::DisplayChange()"));
 
-	CAutoLock cRenderLock(&m_CreateLock);
-
 	if (m_CurrentAdapter != GetAdapter(m_pD3D)) {
-		return false;
+	    m_bPendingResetDevice = true;
+	    SendResetRequest();
+	    return true;
 	}
 
 	D3DDISPLAYMODEEX DisplayMode;
@@ -1669,7 +1667,6 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 	if (m_bIsFullscreen) {
 		if (m_pD3DEx) {
 			m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &DisplayMode, NULL);
-
 			DisplayMode.Format = m_pp.BackBufferFormat;
 			m_ScreenSize.SetSize(DisplayMode.Width, DisplayMode.Height);
 			m_pp.FullScreen_RefreshRateInHz = m_refreshRate = DisplayMode.RefreshRate;
