@@ -461,8 +461,8 @@ void CPPageVideo::OnSurfaceChange()
 			break;
 	}
 
-	UpdateSurfaceFormatList(AfxGetAppSettings().m_RenderersSettings.m_AdvRendSets.iDX9SurfaceFormat);
-	UpdateResizerList(AfxGetAppSettings().m_RenderersSettings.iDX9Resizer);
+	UpdateSurfaceFormatList((int)m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel()));
+	UpdateResizerList((int)m_cbDX9Resizer.GetItemData(m_cbDX9Resizer.GetCurSel()));
 
 	SetModified();
 }
