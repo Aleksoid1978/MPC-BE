@@ -3183,6 +3183,8 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 		OnFilePostOpenMedia(pOMD);
 	}
 
+	m_bNextIsOpened = FALSE;
+
 	m_flastnID = 0;
 
 	RecalcLayout();
@@ -10518,7 +10520,7 @@ void CMainFrame::AutoChangeMonitorMode()
 		if (miFPS > 0.9) {
 			MediaFPS = miFPS;
 		} else {
-			const REFERENCE_TIME rtAvgTimePerFrame = std::llround(GetAvgTimePerFrame() * 10000000i64);
+			const REFERENCE_TIME rtAvgTimePerFrame = std::llround(GetAvgTimePerFrame(FALSE) * 10000000i64);
 			if (rtAvgTimePerFrame > 0) {
 				MediaFPS = 10000000.0 / rtAvgTimePerFrame;
 			}
@@ -13290,7 +13292,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		miFPS	= 0.0;
 		s.dFPS	= 0.0;
 
-		if ((s.AutoChangeFullscrRes.bEnabled == 1 && IsD3DFullScreenMode() && s.fLaunchfullscreen)
+		if ((s.AutoChangeFullscrRes.bEnabled == 1 && (IsD3DFullScreenMode() || s.fLaunchfullscreen))
 				|| s.AutoChangeFullscrRes.bEnabled == 2) {
 			// DVD
 			if (pDVDData) {
@@ -16597,7 +16599,7 @@ void CMainFrame::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	if (m_eMediaLoadState != MLS_CLOSED) {
-		CloseMedia();
+		CloseMedia(TRUE);
 	}
 
 	AppSettings& s = AfxGetAppSettings();
@@ -16645,13 +16647,15 @@ bool CMainFrame::DisplayChange()
 	return true;
 }
 
-void CMainFrame::CloseMedia()
+void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 {
 	if (m_eMediaLoadState == MLS_CLOSING || m_eMediaLoadState == MLS_CLOSED) {
 		return;
 	}
 
 	DbgLog((LOG_TRACE, 3, L"CMainFrame::CloseMedia() : start"));
+
+	m_bNextIsOpened = bNextIsOpened;
 
 	if (m_eMediaLoadState == MLS_LOADING) {
 		m_fOpeningAborted = true;
@@ -18921,12 +18925,12 @@ bool NEARLY_EQ(T a, T b, T tol)
 	return (abs(a - b) < tol);
 }
 
-REFTIME CMainFrame::GetAvgTimePerFrame() const
+REFTIME CMainFrame::GetAvgTimePerFrame(BOOL bUsePCAP/* = TRUE*/) const
 {
 	REFTIME refAvgTimePerFrame = 0.0;
 
 	if (!m_pBV || FAILED(m_pBV->get_AvgTimePerFrame(&refAvgTimePerFrame))) {
-		if (m_pCAP) {
+		if (bUsePCAP && m_pCAP) {
 			refAvgTimePerFrame = 1.0 / m_pCAP->GetFPS();
 		}
 

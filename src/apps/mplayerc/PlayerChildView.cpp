@@ -26,11 +26,9 @@
 
 // CChildView
 
-CChildView::CChildView() : m_vrect(0,0,0,0)
+CChildView::CChildView()
+	: m_lastlmdowntime(0)
 {
-	m_lastlmdowntime = 0;
-	m_lastlmdownpoint.SetPoint(0, 0);
-
 	LoadLogo();
 }
 
@@ -45,7 +43,7 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 	}
 
 	cs.style &= ~WS_BORDER;
-	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW|CS_VREDRAW|CS_DBLCLKS, ::LoadCursor(NULL, IDC_ARROW), HBRUSH(COLOR_WINDOW+1), NULL);
+	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, ::LoadCursor(NULL, IDC_ARROW), HBRUSH(COLOR_WINDOW + 1), NULL);
 
 	return TRUE;
 }
@@ -108,7 +106,6 @@ BOOL CChildView::PreTranslateMessage(MSG* pMsg)
 void CChildView::SetVideoRect(CRect r)
 {
 	m_vrect = r;
-
 	Invalidate();
 }
 
@@ -135,7 +132,7 @@ void CChildView::LoadLogo()
 
 		if (!bHaveLogo) {
 			s.fLogoExternal = false;
-			s.strLogoFileName = "";
+			s.strLogoFileName.Empty();
 
 			if (!m_logo.LoadFromResource(s.nLogoId)) {
 				m_logo.LoadFromResource(s.nLogoId = DEF_LOGO);
@@ -191,60 +188,46 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 	CRect r;
 	GetClientRect(r);
 
-	BITMAP bm;
-	int x, y, w, h, oldmode;
+	auto pFrame = AfxGetMainFrame();
 
 	COLORREF bkcolor = 0;
-
-	BLENDFUNCTION bf;
-	bf.AlphaFormat = AC_SRC_ALPHA;
-	bf.BlendFlags = 0;
-	bf.BlendOp = AC_SRC_OVER;
-	bf.SourceConstantAlpha = 0xFF;
-
-	auto pFrame = AfxGetMainFrame();
-	if (pFrame->IsSomethingLoaded()) {
-
-		if (GetObject(pFrame->m_InternalImage, sizeof(bm), &bm)) {
-
-			h = min(abs(bm.bmHeight), r.Height());
-			w = min(r.Width(), MulDiv(h, bm.bmWidth, abs(bm.bmHeight)));
-			h = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
-			x = (r.Width() - w) / 2;
-			y = (r.Height() - h) / 2;
-			r = CRect(CPoint(x, y), CSize(w, h));
-
-			oldmode = pDC->SetStretchBltMode(STRETCH_HALFTONE);
-			pFrame->m_InternalImage.StretchBlt(*pDC, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
-			pDC->SetStretchBltMode(oldmode);
-			pDC->AlphaBlend(x, y, w, h, pDC, x, y, w, h, bf);
-
-			pDC->ExcludeClipRect(r);
-		} else {
-			pDC->ExcludeClipRect(m_vrect);
-		}
-		UNREFERENCED_PARAMETER(bm);
-
-	} else if (!m_logo.IsNull() /*&& (pFrame->IsPlaylistEmpty()*/) {
-
-		if (GetObject(m_logo, sizeof(bm), &bm)) {
-
-			h = min(abs(bm.bmHeight), r.Height());
-			w = min(r.Width(), MulDiv(h, bm.bmWidth, abs(bm.bmHeight)));
-			h = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
-			x = (r.Width() - w) / 2;
-			y = (r.Height() - h) / 2;
-			r = CRect(CPoint(x, y), CSize(w, h));
-
+	CImage img;
+	if (pFrame->IsD3DFullScreenMode() ||
+			((pFrame->m_eMediaLoadState != MLS_LOADED || pFrame->m_bAudioOnly) && !pFrame->m_bNextIsOpened)) {
+		if (!pFrame->m_InternalImage.IsNull()) {
+			img.Attach(pFrame->m_InternalImage);
+		} else if (!m_logo.IsNull()) {
+			img.Attach(m_logo);
 			bkcolor = m_logo.GetPixel(0,0);
+		}
+	} else {
+		pDC->ExcludeClipRect(m_vrect);
+	}
 
-			oldmode = pDC->SetStretchBltMode(STRETCH_HALFTONE);
-			m_logo.StretchBlt(*pDC, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
+	if (!img.IsNull()) {
+		BITMAP bm = { 0 };
+		if (GetObject(img, sizeof(bm), &bm)) {
+			BLENDFUNCTION bf;
+			bf.AlphaFormat = AC_SRC_ALPHA;
+			bf.BlendFlags = 0;
+			bf.BlendOp = AC_SRC_OVER;
+			bf.SourceConstantAlpha = 0xFF;
+
+			int h = min(abs(bm.bmHeight), r.Height());
+			int w = min(r.Width(), MulDiv(h, bm.bmWidth, abs(bm.bmHeight)));
+			h = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
+			int x = (r.Width() - w) / 2;
+			int y = (r.Height() - h) / 2;
+			r = CRect(CPoint(x, y), CSize(w, h));
+
+			int oldmode = pDC->SetStretchBltMode(STRETCH_HALFTONE);
+			img.StretchBlt(*pDC, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
 			pDC->SetStretchBltMode(oldmode);
 			pDC->AlphaBlend(x, y, w, h, pDC, x, y, w, h, bf);
 
 			pDC->ExcludeClipRect(r);
 		}
+		img.Detach();
 	}
 
 	GetClientRect(r);

@@ -211,6 +211,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	friend class CSubtitleDlDlg;
 	friend class CFullscreenWnd;
 	friend class COSD;
+	friend class CChildView;
 
 	// TODO: wrap these graph objects into a class to make it look cleaner
 
@@ -485,6 +486,8 @@ protected:
 	bool			m_bClosingState;
 	bool			m_bAudioOnly;
 
+	BOOL			m_bNextIsOpened = FALSE;
+
 	dispmode		m_dmBeforeFullscreen;
 
 	CString					m_LastOpenFile;
@@ -550,7 +553,7 @@ public:
 	void PlayFavoriteDVD(CString fav);
 	bool ResetDevice();
 	bool DisplayChange();
-	void CloseMedia();
+	void CloseMedia(BOOL bNextIsOpened = FALSE);
 	void StartTunerScan(CAutoPtr<TunerScanData> pTSD);
 	void StopTunerScan();
 
@@ -1203,7 +1206,7 @@ protected:
 	CString		GetVidPos();
 	CString		CreateSnapShotFileName();
 
-	REFTIME		GetAvgTimePerFrame() const;
+	REFTIME		GetAvgTimePerFrame(BOOL bUsePCAP = TRUE) const;
 
 	BOOL		OpenYoutubePlaylist(CString url);
 };
