@@ -156,9 +156,9 @@ static int compare(const void* a, const void* b)
 	return (*(INT64*)a - *(INT64*)b);
 }
 
-// code from MediaInfo
 static double Video_FrameRate_Rounding(double FrameRate)
 {
+	// rounded up to the standard values if the difference is not more than 0.05%
 	     if (FrameRate > 14.993 && FrameRate <  15.008) FrameRate = 15.000;
 	else if (FrameRate > 23.964 && FrameRate <  23.988) FrameRate = 24/1.001;
 	else if (FrameRate > 23.988 && FrameRate <  24.012) FrameRate = 24;
