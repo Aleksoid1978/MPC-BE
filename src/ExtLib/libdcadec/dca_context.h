@@ -46,12 +46,15 @@
 /**@}*/
 
 /**@{*/
-#ifdef _WIN32
+#if (defined _WIN32)
 #define DCADEC_SHARED_EXPORT    __declspec(dllexport)
 #define DCADEC_SHARED_IMPORT    __declspec(dllimport)
-#else
+#elif (__GNUC__ >= 4)
 #define DCADEC_SHARED_EXPORT    __attribute__((visibility("default")))
 #define DCADEC_SHARED_IMPORT    __attribute__((visibility("default")))
+#else
+#define DCADEC_SHARED_EXPORT
+#define DCADEC_SHARED_IMPORT
 #endif
 
 #ifdef DCADEC_SHARED
@@ -93,13 +96,13 @@
  */
 #define DCADEC_FLAG_CORE_SYNTH_X96      0x04
 
-/** Force DTS core bit width reducion to source PCM resolution */
-#define DCADEC_FLAG_CORE_SOURCE_PCM_RES 0x08
+/** Reserved flag, don't use */
+#define DCADEC_FLAG_CORE_RESERVED       0x08
 
 /* Use FIR filter for floating point DTS core LFE channel interpolation */
 #define DCADEC_FLAG_CORE_LFE_FIR        0x10
 
-/** Extract embedded 2.0 downmix */
+/** Extract embedded 2.0 downmix if present, otherwise extract 5.1 downmix */
 #define DCADEC_FLAG_KEEP_DMIX_2CH       0x20
 
 /** Extract embedded 5.1 downmix */
@@ -117,9 +120,20 @@
 #define DCADEC_PROFILE_DS       0x01    /**< Digital Surround */
 #define DCADEC_PROFILE_DS_96_24 0x02    /**< Digital Surround 96/24 */
 #define DCADEC_PROFILE_DS_ES    0x04    /**< Digital Surround ES */
-#define DCADEC_PROFILE_HD_HRA   0x08    /**< High-Resolution Audio */
+#define DCADEC_PROFILE_HD_HRA   0x08    /**< High Resolution Audio */
 #define DCADEC_PROFILE_HD_MA    0x10    /**< Master Audio */
 #define DCADEC_PROFILE_EXPRESS  0x20    /**< Express */
+/**@}*/
+
+/**@{*/
+/** Not matrix encoded */
+#define DCADEC_MATRIX_ENCODING_NONE         0
+
+/**< Encoded for matrix surround decoding */
+#define DCADEC_MATRIX_ENCODING_SURROUND     1
+
+/**< Audio processed for headphone playback */
+#define DCADEC_MATRIX_ENCODING_HEADPHONE    2
 /**@}*/
 
 /**
@@ -140,10 +154,9 @@ struct dcadec_core_info {
     int     bit_rate;       /**< Core stream bit rate in bytes per second,
                                  zero or negative if unavailable */
     int     npcmblocks;     /**< Number of audio sample blocks in a frame */
-    bool    xch_present;    /**< XCH extension data present and valid */
-    bool    xxch_present;   /**< XXCH extension data present and valid */
-    bool    xbr_present;    /**< XBR extension data present and valid */
-    bool    x96_present;    /**< X96 extension data present and valid */
+    bool    ext_audio_present;  /**< Extended audio present */
+    int     ext_audio_type;     /**< Extended audio type (only meaningful
+                                     when ext_audio_present is true) */
 };
 
 struct dcadec_exss_info {
@@ -154,6 +167,8 @@ struct dcadec_exss_info {
     int profile;            /**< Type of DTS profile encoded */
     bool embedded_stereo;   /**< 2.0 downmix has been embedded into the stream */
     bool embedded_6ch;      /**< 5.1 downmix has been embedded into the stream */
+    int spkr_mask;          /**< Speaker activity mask, zero if unavailable */
+    int matrix_encoding;    /**< Matrix encoding type */
 };
 
 /**
@@ -193,8 +208,7 @@ DCADEC_API void dcadec_context_free_core_info(struct dcadec_core_info *info);
 
 /**
  * Get information about extension sub-stream (EXSS) payload of the parsed
- * packet. When no EXSS is present but backward compatible DTS core sub-stream
- * contains extended audio, then information about extended audio in core
+ * packet. When no EXSS is present information about extended audio in core
  * sub-stream is returned.
  *
  * @param dca   Pointer to decoder context.
