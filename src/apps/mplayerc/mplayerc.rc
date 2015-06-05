@@ -2484,13 +2484,8 @@ BEGIN
     IDS_AG_PREV_SUBTITLE    "Prev Subtitle"
     IDS_MPLAYERC_85         "On/Off Subtitle"
     IDS_MPLAYERC_86         "Reload Subtitles"
-    IDS_MPLAYERC_91         "Next Angle (DVD)"
-    IDS_MPLAYERC_92         "Prev Angle (DVD)"
-    IDS_MPLAYERC_93         "Next Audio (DVD)"
-    IDS_MPLAYERC_94         "Prev Audio (DVD)"
-    IDS_MPLAYERC_95         "Next Subtitle (DVD)"
-    IDS_MPLAYERC_96         "Prev Subtitle (DVD)"
-    IDS_MPLAYERC_97         "On/Off Subtitle (DVD)"
+    IDS_AG_NEXT_VIDEO       "Next Video/DVD Angle"
+    IDS_AG_PREV_VIDEO       "Prev Video/DVD Angle"
     IDS_MPLAYERC_98         "OSD: Remaining Time"
 END
 
