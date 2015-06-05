@@ -274,7 +274,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_STREAM_AUDIO_NEXT, ID_STREAM_AUDIO_PREV, OnStreamAudio)
 	ON_COMMAND_RANGE(ID_STREAM_SUB_NEXT, ID_STREAM_SUB_PREV, OnStreamSub)
 	ON_COMMAND(ID_STREAM_SUB_ONOFF, OnStreamSubOnOff)
-	ON_COMMAND_RANGE(ID_DVD_ANGLE_NEXT, ID_DVD_ANGLE_PREV, OnStreamVideo)
+	ON_COMMAND_RANGE(ID_STREAM_VIDEO_NEXT, ID_STREAM_VIDEO_PREV, OnStreamVideo)
 
 	ON_COMMAND(ID_FILE_OPENQUICK, OnFileOpenQuick)
 	ON_UPDATE_COMMAND_UI(ID_FILE_OPENQUICK, OnUpdateFileOpen)
@@ -4790,7 +4790,7 @@ void CMainFrame::OnStreamVideo(UINT nID)
 				}
 
 				if (current >= 0 && stms.GetCount() >= 2) {
-					current += (nID == ID_DVD_ANGLE_NEXT) ? 1 : -1;
+					current += (nID == ID_STREAM_VIDEO_NEXT) ? 1 : -1;
 					if (current >= stms.GetCount()) {
 						current = 0;
 					}
@@ -4820,7 +4820,7 @@ void CMainFrame::OnStreamVideo(UINT nID)
 	if (GetPlaybackMode() == PM_DVD && m_pDVDI && m_pDVDC) {
 		ULONG ulAnglesAvailable, ulCurrentAngle;
 		if (SUCCEEDED(m_pDVDI->GetCurrentAngle(&ulAnglesAvailable, &ulCurrentAngle)) && ulAnglesAvailable > 1) {
-			ulCurrentAngle += (nID == ID_DVD_ANGLE_NEXT) ? 1 : -1;
+			ulCurrentAngle += (nID == ID_STREAM_VIDEO_NEXT) ? 1 : -1;
 			if (ulCurrentAngle > ulAnglesAvailable) {
 				ulCurrentAngle = 1;
 			} else if (ulCurrentAngle < 1) {
