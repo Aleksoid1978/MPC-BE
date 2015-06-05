@@ -766,10 +766,7 @@ public:
 	afx_msg void OnStreamAudio(UINT nID);
 	afx_msg void OnStreamSub(UINT nID);
 	afx_msg void OnStreamSubOnOff();
-	afx_msg void OnDvdAngle(UINT nID);
-//	afx_msg void OnDvdAudio(UINT nID);
-//	afx_msg void OnDvdSub(UINT nID);
-//	afx_msg void OnDvdSubOnOff();
+	afx_msg void OnStreamVideo(UINT nID);
 
 	// menu item handlers
 
