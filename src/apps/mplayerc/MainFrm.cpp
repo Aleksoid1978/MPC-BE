@@ -274,10 +274,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_STREAM_AUDIO_NEXT, ID_STREAM_AUDIO_PREV, OnStreamAudio)
 	ON_COMMAND_RANGE(ID_STREAM_SUB_NEXT, ID_STREAM_SUB_PREV, OnStreamSub)
 	ON_COMMAND(ID_STREAM_SUB_ONOFF, OnStreamSubOnOff)
-	ON_COMMAND_RANGE(ID_DVD_ANGLE_NEXT, ID_DVD_ANGLE_PREV, OnDvdAngle)
-//	ON_COMMAND_RANGE(ID_DVD_AUDIO_NEXT, ID_DVD_AUDIO_PREV, OnDvdAudio)
-//	ON_COMMAND_RANGE(ID_DVD_SUB_NEXT, ID_DVD_SUB_PREV, OnDvdSub)
-//	ON_COMMAND(ID_DVD_SUB_ONOFF, OnDvdSubOnOff)
+	ON_COMMAND_RANGE(ID_DVD_ANGLE_NEXT, ID_DVD_ANGLE_PREV, OnStreamVideo)
 
 	ON_COMMAND(ID_FILE_OPENQUICK, OnFileOpenQuick)
 	ON_UPDATE_COMMAND_UI(ID_FILE_OPENQUICK, OnUpdateFileOpen)
@@ -4764,13 +4761,67 @@ void CMainFrame::OnStreamSubOnOff()
 	}
 }
 
-void CMainFrame::OnDvdAngle(UINT nID)
+void CMainFrame::OnStreamVideo(UINT nID)
 {
 	if (m_eMediaLoadState != MLS_LOADED) {
 		return;
 	}
 
-	if (m_pDVDI && m_pDVDC) {
+	if (GetPlaybackMode() == PM_FILE) {
+		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
+		if (pSS) {
+			DWORD count = 0;
+			if (SUCCEEDED(pSS->Count(&count)) && count >= 2) {
+				CAtlArray<int> stms;
+				int current = -1;
+
+				for (DWORD i = 0; i < count; i++) {
+					AM_MEDIA_TYPE* pmt = NULL;
+					DWORD dwFlags = DWORD_MAX;
+					DWORD dwGroup = DWORD_MAX;
+					if (FAILED(pSS->Info(i, &pmt, &dwFlags, NULL, &dwGroup, NULL, NULL, NULL))) {
+						return;
+					}
+
+					if (pmt && pmt->majortype == MEDIATYPE_Video) {
+						if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
+							ASSERT(current  < 0);
+							current = stms.GetCount();
+						}
+						stms.Add(i);
+					}
+
+					DeleteMediaType(pmt);
+				}
+
+				if (current >= 0 && stms.GetCount() >= 2) {
+					current += (nID == ID_DVD_ANGLE_NEXT) ? 1 : -1;
+					if (current >= stms.GetCount()) {
+						current = 0;
+					}
+					else if (current < 0) {
+						current = stms.GetCount() - 1;
+					}
+
+					if (SUCCEEDED(pSS->Enable(stms[current], AMSTREAMSELECTENABLE_ENABLE))) {
+						WCHAR* pszName = NULL;
+						if (SUCCEEDED(pSS->Info(stms[current], NULL, NULL, NULL, NULL, &pszName, NULL, NULL))) {
+							CString strMessage;
+							CString audio_stream = pszName;
+							if (audio_stream.Left(8) == _T("Video - ")) {
+								audio_stream = audio_stream.Mid(7);
+							}
+							strMessage.Format(ResStr(IDS_AUDIO_STREAM), audio_stream);
+							m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
+						}
+					}
+				}
+			}
+		}
+		return;
+	}
+
+	if (GetPlaybackMode() == PM_DVD && m_pDVDI && m_pDVDC) {
 		ULONG ulAnglesAvailable, ulCurrentAngle;
 		if (SUCCEEDED(m_pDVDI->GetCurrentAngle(&ulAnglesAvailable, &ulCurrentAngle)) && ulAnglesAvailable > 1) {
 			ulCurrentAngle += (nID == ID_DVD_ANGLE_NEXT) ? 1 : -1;
@@ -4787,114 +4838,6 @@ void CMainFrame::OnDvdAngle(UINT nID)
 		}
 	}
 }
-
-/*
-void CMainFrame::OnDvdAudio(UINT nID)
-{
-	HRESULT		hr;
-	nID -= ID_DVD_AUDIO_NEXT;
-
-	if (m_eMediaLoadState != MLS_LOADED) {
-		return;
-	}
-
-	if (m_pDVDI && m_pDVDC) {
-		ULONG nStreamsAvailable, nCurrentStream;
-		if (SUCCEEDED(m_pDVDI->GetCurrentAudio(&nStreamsAvailable, &nCurrentStream)) && nStreamsAvailable > 1) {
-			DVD_AudioAttributes		AATR;
-			UINT					nNextStream = (nCurrentStream+(nID==0?1:nStreamsAvailable-1))%nStreamsAvailable;
-
-			hr = m_pDVDC->SelectAudioStream(nNextStream, DVD_CMD_FLAG_Block, NULL);
-			if (SUCCEEDED(m_pDVDI->GetAudioAttributes(nNextStream, &AATR))) {
-				CString lang;
-				CString	strMessage;
-				if (AATR.Language) {
-					int len = GetLocaleInfo(AATR.Language, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
-					lang.ReleaseBufferSetLength(max(len-1, 0));
-				} else {
-					lang.Format(ResStr(IDS_AG_UNKNOWN), nNextStream+1);
-				}
-
-				CString format = GetDVDAudioFormatName(AATR);
-				CString str("");
-
-				if (!format.IsEmpty()) {
-					str.Format(ResStr(IDS_MAINFRM_11),
-							   lang,
-							   format,
-							   AATR.dwFrequency,
-							   AATR.bQuantization,
-							   AATR.bNumberOfChannels,
-							   (AATR.bNumberOfChannels > 1 ? ResStr(IDS_MAINFRM_13) : ResStr(IDS_MAINFRM_12)));
-					str += FAILED(hr) ? _T(" [") + ResStr(IDS_AG_ERROR) + _T("] ") : _T("");
-					strMessage.Format(ResStr(IDS_AUDIO_STREAM), str);
-					m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
-				}
-			}
-		}
-	}
-}
-
-void CMainFrame::OnDvdSub(UINT nID)
-{
-	HRESULT		hr;
-	nID -= ID_DVD_SUB_NEXT;
-
-	if (m_eMediaLoadState != MLS_LOADED) {
-		return;
-	}
-
-	if (m_pDVDI && m_pDVDC) {
-		ULONG ulStreamsAvailable, ulCurrentStream;
-		BOOL bIsDisabled;
-		if (SUCCEEDED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled))
-				&& ulStreamsAvailable > 1) {
-			//UINT nNextStream = (ulCurrentStream+(nID==0?1:ulStreamsAvailable-1))%ulStreamsAvailable;
-			int nNextStream;
-
-			if (!bIsDisabled) {
-				nNextStream = ulCurrentStream+ (nID==0?1:-1);
-			} else {
-				nNextStream = (nID==0?0:ulStreamsAvailable-1);
-			}
-
-			if (!bIsDisabled && ((nNextStream < 0) || ((ULONG)nNextStream >= ulStreamsAvailable))) {
-				m_pDVDC->SetSubpictureState(FALSE, DVD_CMD_FLAG_Block, NULL);
-				m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_SUBTITLE_STREAM_OFF));
-			} else {
-				hr = m_pDVDC->SelectSubpictureStream(nNextStream, DVD_CMD_FLAG_Block, NULL);
-
-				DVD_SubpictureAttributes SATR;
-				m_pDVDC->SetSubpictureState(TRUE, DVD_CMD_FLAG_Block, NULL);
-				if (SUCCEEDED(m_pDVDI->GetSubpictureAttributes(nNextStream, &SATR))) {
-					CString lang;
-					CString	strMessage;
-					int len = GetLocaleInfo(SATR.Language, LOCALE_SENGLANGUAGE, lang.GetBuffer(64), 64);
-					lang.ReleaseBufferSetLength(max(len-1, 0));
-					lang += FAILED(hr) ? _T(" [") + ResStr(IDS_AG_ERROR) + _T("] ") : _T("");
-					strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), lang);
-					m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
-				}
-			}
-		}
-	}
-}
-
-void CMainFrame::OnDvdSubOnOff()
-{
-	if (m_eMediaLoadState != MLS_LOADED) {
-		return;
-	}
-
-	if (m_pDVDI && m_pDVDC) {
-		ULONG ulStreamsAvailable, ulCurrentStream;
-		BOOL bIsDisabled;
-		if (SUCCEEDED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled))) {
-			m_pDVDC->SetSubpictureState(bIsDisabled, DVD_CMD_FLAG_Block, NULL);
-		}
-	}
-}
-*/
 
 //
 // menu item handlers
