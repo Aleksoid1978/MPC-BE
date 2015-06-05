@@ -228,11 +228,11 @@
 #define ID_STREAM_SUB_ONOFF             956
 #define ID_DVD_ANGLE_NEXT               961
 #define ID_DVD_ANGLE_PREV               962
-#define ID_DVD_AUDIO_NEXT               963
-#define ID_DVD_AUDIO_PREV               964
-#define ID_DVD_SUB_NEXT                 965
-#define ID_DVD_SUB_PREV                 966
-#define ID_DVD_SUB_ONOFF                967
+//#define ID_DVD_AUDIO_NEXT               963
+//#define ID_DVD_AUDIO_PREV               964
+//#define ID_DVD_SUB_NEXT                 965
+//#define ID_DVD_SUB_PREV                 966
+//#define ID_DVD_SUB_ONOFF                967
 #define ID_VIEW_ZOOM_AUTOFIT            968
 #define ID_FILE_OPENQUICK               969
 #define ID_VOLUME_GAIN_INC              970
