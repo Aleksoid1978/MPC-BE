@@ -2330,6 +2330,8 @@ static bool ParseWavpack(CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>& p)
 	return true;
 }
 
+#define RL24(p) (p[0] | p[1] << 8 | p[1] << 16)
+
 HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REFERENCE_TIME rtBlockDuration/* = 0*/)
 {
 	HRESULT hr = S_FALSE;
@@ -2380,6 +2382,72 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 			pData[1] = FCC('icpf');
 			tmp->Copy(*ptr);
 			tmp->Append(*p->bg->Block.BlockData.GetNext(pos));
+		} else if (m_mt.subtype == MEDIASUBTYPE_VP90) {
+			REFERENCE_TIME rtStartTmp = rtStart;
+			REFERENCE_TIME rtStopTmp = rtStart;
+
+			CAutoPtr<CBinary> ptr = p->bg->Block.BlockData.GetNext(pos);
+			const BYTE* pData = ptr->GetData();
+			size_t size = ptr->GetCount();
+			BYTE marker = pData[size - 1];
+			if ((marker & 0xe0) == 0xc0) {
+				const BYTE nbytes = 1 + ((marker >> 3) & 0x3);
+				BYTE n_frames = 1 + (marker & 0x7);
+				size_t idx_sz = 2 + n_frames * nbytes;
+				if (size >= idx_sz && pData[size - idx_sz] == marker && nbytes >= 1 && nbytes <= 4) {
+					const BYTE *idx = pData + size + 1 - idx_sz;
+					int first = 1;
+
+					while (--n_frames) {
+						size_t sz;
+						switch(nbytes) {
+							case 1:
+								sz = (BYTE)*idx;
+								break;
+							case 2:
+								sz = GETWORD(idx);
+								break;
+							case 3:
+								sz = RL24(idx);
+								break;
+							case 4:
+								sz = GETDWORD(idx);
+								break;
+						}
+						
+						idx += nbytes;
+						if (sz > size) {
+							size = 0;
+							break;
+						}
+
+						CAutoPtr<CPacket> packet(DNew CPacket());
+						packet->SetData(pData, sz);
+
+						packet->TrackNumber		= tmp->TrackNumber;
+						packet->bDiscontinuity	= tmp->bDiscontinuity;
+						packet->bSyncPoint		= tmp->bSyncPoint;
+						
+						const BYTE* buf = packet->GetData();
+						if (buf[0] & 0x2) {
+							packet->rtStart		= rtStartTmp;
+							packet->rtStop		= rtStopTmp;
+							rtStartTmp			= INVALID_TIME;
+							rtStopTmp			= INVALID_TIME;
+						}
+						if (S_OK != (hr = DeliverPacket(packet))) {
+							break;
+						}
+
+						pData += sz;
+						size -= sz;
+					}
+				}
+			}
+
+			tmp->rtStart	= rtStartTmp;
+			tmp->rtStop		= rtStopTmp;
+			tmp->SetData(pData, size);
 		} else {
 			tmp->Copy(*p->bg->Block.BlockData.GetNext(pos));
 		}
