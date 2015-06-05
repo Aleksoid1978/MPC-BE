@@ -2348,6 +2348,17 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 		} else {
 			pDataBuffer = pDataIn;
 		}
+
+		if (m_bWaitingForKeyFrame
+				&& (m_nCodecId == AV_CODEC_ID_VP8 || m_nCodecId == AV_CODEC_ID_VP9)) {
+			BOOL bKeyFrame = m_nCodecId == AV_CODEC_ID_VP8 ? !(pDataBuffer[0] & 1) : !(pDataBuffer[0] & 4);
+			if (bKeyFrame) {
+				DbgLog((LOG_TRACE, 10, L"CMPCVideoDecFilter::Decode(): Found VP8/9 key-frame, resuming decoding"));
+				m_bWaitingForKeyFrame = FALSE;
+			} else {
+				return S_OK;
+			}
+		}
 	}
 
 	while (nSize > 0 || bFlush) {
@@ -2472,6 +2483,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 		if (m_bWaitKeyFrame) {
 			if (m_bWaitingForKeyFrame && got_picture) {
 				if (m_pFrame->key_frame) {
+					DbgLog((LOG_TRACE, 10, L"CMPCVideoDecFilter::Decode(): Found key-frame, resuming decoding"));
 					m_bWaitingForKeyFrame = FALSE;
 				} else {
 					got_picture = 0;
