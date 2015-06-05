@@ -4791,7 +4791,7 @@ void CMainFrame::OnStreamVideo(UINT nID)
 
 				if (current >= 0 && stms.GetCount() >= 2) {
 					current += (nID == ID_STREAM_VIDEO_NEXT) ? 1 : -1;
-					if (current >= stms.GetCount()) {
+					if (current >= (int)stms.GetCount()) {
 						current = 0;
 					}
 					else if (current < 0) {
