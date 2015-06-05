@@ -4356,13 +4356,12 @@ void CMainFrame::OnStreamAudio(UINT nID)
 				pSS->Enable(nNewStream, AMSTREAMSELECTENABLE_ENABLE);
 
 				if (SUCCEEDED(pSS->Info(nNewStream, NULL, NULL, NULL, NULL, &pszName, NULL, NULL))) {
-					CString	strMessage;
-					CString audio_stream = pszName;
-					int k = audio_stream.Find(_T("Audio - "));
-					if (k >= 0) {
-						audio_stream = audio_stream.Right(audio_stream.GetLength() - k - 8);
+					CString stream_name = pszName;
+					if (stream_name.Left(8) == _T("Audio - ")) {
+						stream_name = stream_name.Mid(7);
 					}
-					strMessage.Format(ResStr(IDS_AUDIO_STREAM), audio_stream);
+					CString strMessage;
+					strMessage.Format(ResStr(IDS_AUDIO_STREAM), stream_name);
 					m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
 				}
 			} else if (iF == 2) { // AudioSwitcher Audio Tracks
@@ -4634,19 +4633,15 @@ void CMainFrame::OnStreamSub(UINT nID)
 				pSS->Enable(nNewStream, AMSTREAMSELECTENABLE_ENABLE);
 
 				WCHAR* pszName = NULL;
-				if (SUCCEEDED(pSS->Info(nNewStream, NULL, NULL, NULL, NULL, &pszName, NULL, NULL))) {
-					CString	strMessage;
-					CString sub_stream = pszName;
-					int k = sub_stream.Find(_T("Subtitle - "));
-					if (k >= 0) {
-						sub_stream = sub_stream.Right(sub_stream.GetLength() - k - 8);
+				if (SUCCEEDED(pSS->Info(nNewStream, NULL, NULL, NULL, NULL, &pszName, NULL, NULL)) && pszName) {
+					CString stream_name = pszName;
+					CoTaskMemFree(pszName);
+					if (stream_name.Left(11) == _T("Subtitle - ")) {
+						stream_name = stream_name.Mid(10);
 					}
-					strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), sub_stream);
+					CString strMessage;
+					strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), stream_name);
 					m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
-
-					if (pszName) {
-						CoTaskMemFree(pszName);
-					}
 				}
 
 				if (m_pCAP) {
@@ -4805,13 +4800,14 @@ void CMainFrame::OnStreamVideo(UINT nID)
 
 					if (SUCCEEDED(pSS->Enable(stms[current], AMSTREAMSELECTENABLE_ENABLE))) {
 						WCHAR* pszName = NULL;
-						if (SUCCEEDED(pSS->Info(stms[current], NULL, NULL, NULL, NULL, &pszName, NULL, NULL))) {
-							CString strMessage;
-							CString audio_stream = pszName;
-							if (audio_stream.Left(8) == _T("Video - ")) {
-								audio_stream = audio_stream.Mid(7);
+						if (SUCCEEDED(pSS->Info(stms[current], NULL, NULL, NULL, NULL, &pszName, NULL, NULL)) && pszName) {
+							CString stream_name = pszName;
+							CoTaskMemFree(pszName);
+							if (stream_name.Left(8) == _T("Video - ")) {
+								stream_name = stream_name.Mid(7);
 							}
-							strMessage.Format(ResStr(IDS_AUDIO_STREAM), audio_stream);
+							CString strMessage;
+							strMessage.Format(ResStr(IDS_VIDEO_STREAM), stream_name);
 							m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
 						}
 					}
