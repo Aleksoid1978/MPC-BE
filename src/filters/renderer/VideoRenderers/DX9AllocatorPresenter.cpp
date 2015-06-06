@@ -1955,7 +1955,7 @@ void CDX9AllocatorPresenter::DrawStats()
 				} else {
 					strText.Format(L"Refresh rate : %3u Hz      ", m_refreshRate);
 				}
-				strText.AppendFormat(L"Last Duration: %10.6f      Corrected Frame Time: %s", double(m_LastFrameDuration) / 10000.0, m_bCorrectedFrameTime ? L"Yes" : L"No");
+				strText.AppendFormat(L"Last Duration: %8.4f      Corrected Frame Time: %s", double(m_LastFrameDuration) / 10000.0, m_bCorrectedFrameTime ? L"Yes" : L"No");
 				DrawText(rc, strText, 1);
 				OffsetRect(&rc, 0, TextHeight);
 			}
