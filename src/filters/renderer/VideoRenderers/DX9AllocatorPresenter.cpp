@@ -38,7 +38,7 @@ bool queue_ffdshow_support = false;
 // only for debugging
 //#define DISABLE_USING_D3D9EX
 
-#define FRAMERATE_MAX_DELTA			3000
+#define FRAMERATE_MAX_DELTA 3000
 
 using namespace DSObjects;
 
@@ -507,14 +507,14 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	CleanupRenderingEngine();
 
-    UINT currentAdapter = GetAdapter(m_pD3D);
-    bool bTryToReset = (currentAdapter == m_CurrentAdapter);
+	UINT currentAdapter = GetAdapter(m_pD3D);
+	bool bTryToReset = (currentAdapter == m_CurrentAdapter);
 
-    if (!bTryToReset) {
+	if (!bTryToReset) {
 		m_pD3DDev = NULL;
 		m_pD3DDevEx = NULL;
 		m_CurrentAdapter = currentAdapter;
-    }
+	}
 
 	if (!m_pD3D) {
 		_Error += L"Failed to create D3D9\n";
@@ -608,7 +608,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 					m_pD3DDevEx = NULL;
 				}
 			}
-            if (!bTryToReset) {
+			if (!bTryToReset) {
 				hr = m_pD3DEx->CreateDeviceEx(m_CurrentAdapter, D3DDEVTYPE_HAL, m_FocusThread->GetFocusWindow(),
 											  GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS | D3DCREATE_NOWINDOWCHANGES, //D3DCREATE_MANAGED
 											  &m_pp, &DisplayMode, &m_pD3DDevEx);
@@ -1650,9 +1650,9 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 	DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::DisplayChange()"));
 
 	if (m_CurrentAdapter != GetAdapter(m_pD3D)) {
-	    m_bPendingResetDevice = true;
-	    SendResetRequest();
-	    return true;
+		m_bPendingResetDevice = true;
+		SendResetRequest();
+		return true;
 	}
 
 	D3DDISPLAYMODEEX DisplayMode;
@@ -1712,49 +1712,14 @@ void CDX9AllocatorPresenter::DrawText(const RECT &rc, const CString &strText, in
 	if (_Priority < 1) {
 		return;
 	}
-	int Quality = 1;
 	//D3DXCOLOR Color1( 1.0f, 0.2f, 0.2f, 1.0f ); // red
 	//D3DXCOLOR Color1( 1.0f, 1.0f, 1.0f, 1.0f ); // white
 	D3DXCOLOR Color1( 1.0f, 0.8f, 0.0f, 1.0f ); // yellow
 	D3DXCOLOR Color0( 0.0f, 0.0f, 0.0f, 1.0f ); // black
 	RECT Rect1 = rc;
 	RECT Rect2 = rc;
-	if (Quality == 1) {
-		OffsetRect(&Rect2 , 2, 2);
-	} else {
-		OffsetRect(&Rect2 , -1, -1);
-	}
-	if (Quality > 0) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
-	OffsetRect(&Rect2 , 1, 0);
-	if (Quality > 3) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
-	OffsetRect(&Rect2 , 1, 0);
-	if (Quality > 2) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
-	OffsetRect(&Rect2 , 0, 1);
-	if (Quality > 3) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
-	OffsetRect(&Rect2 , 0, 1);
-	if (Quality > 1) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
-	OffsetRect(&Rect2 , -1, 0);
-	if (Quality > 3) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
-	OffsetRect(&Rect2 , -1, 0);
-	if (Quality > 2) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
-	OffsetRect(&Rect2 , 0, -1);
-	if (Quality > 3) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
+	OffsetRect(&Rect2 , 2, 2);
+	m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
 	m_pFont->DrawText(m_pSprite, strText, -1, &Rect1, DT_NOCLIP, Color1);
 }
 

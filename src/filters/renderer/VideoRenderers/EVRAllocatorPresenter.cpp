@@ -899,12 +899,12 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 	// Get the mixer's input type
 	hr = m_pMixer->GetInputCurrentType(0, &pType);
 	if (SUCCEEDED(hr)) {
-	    AM_MEDIA_TYPE* pMT;
-	    hr = pType->GetRepresentation(FORMAT_VideoInfo2, (void**)&pMT);
-	    if (SUCCEEDED(hr)) {
-	        m_inputMediaType = *pMT;
-	        pType->FreeRepresentation(FORMAT_VideoInfo2, pMT);
-	    }
+		AM_MEDIA_TYPE* pMT;
+		hr = pType->GetRepresentation(FORMAT_VideoInfo2, (void**)&pMT);
+		if (SUCCEEDED(hr)) {
+			m_inputMediaType = *pMT;
+			pType->FreeRepresentation(FORMAT_VideoInfo2, pMT);
+		}
 	}
 
 	// Loop through all of the mixer's proposed output types.
@@ -1814,9 +1814,9 @@ STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResetDevice()
 
 STDMETHODIMP_(bool) CEVRAllocatorPresenter::DisplayChange()
 {
-    CAutoLock lock(this);
-    CAutoLock lock2(&m_ImageProcessingLock);
-    CAutoLock cRenderLock(&m_RenderLock);
+	CAutoLock lock(this);
+	CAutoLock lock2(&m_ImageProcessingLock);
+	CAutoLock cRenderLock(&m_RenderLock);
 
 	return __super::DisplayChange();
 }
@@ -2267,7 +2267,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 
 							double ScanLineTime = ScanLineSeconds / nScanLines;
 
-							int iPos = m_DetectedRefreshRatePos	% 100;
+							int iPos = m_DetectedRefreshRatePos % 100;
 							m_ldDetectedScanlineRateList[iPos] = ScanLineTime;
 							if (m_DetectedScanlineTime && ScanlineStart != ScanlineEnd) {
 								int Diff = ScanlineEnd - ScanlineStart;
