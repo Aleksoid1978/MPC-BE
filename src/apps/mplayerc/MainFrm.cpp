@@ -651,7 +651,6 @@ CMainFrame::CMainFrame() :
 	m_bClosingState(false),
 	m_bUseSmartSeek(false),
 	m_flastnID(0),
-	bDVDMenuClicked(false),
 	m_bfirstPlay(false),
 	m_dwLastRun(0),
 	IsMadVRExclusiveMode(false),
@@ -3239,35 +3238,24 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	SetFocus();
 
-	bDVDMenuClicked = false;
-	bDVDButtonAtPosition = false;
-
 	if (GetPlaybackMode() == PM_DVD) {
 		CRect vid_rect = m_wndView.GetVideoRect();
 		m_wndView.MapWindowPoints(this, &vid_rect);
 
 		CPoint pDVD = point - vid_rect.TopLeft();
 
-		ULONG pulButtonIndex;
-		if (SUCCEEDED(m_pDVDI->GetButtonAtPosition(pDVD, &pulButtonIndex))) {
-			bDVDButtonAtPosition = true;
-		}
-
-		if (SUCCEEDED(m_pDVDC->ActivateAtPosition(pDVD))
-				|| m_iDVDDomain == DVD_DOMAIN_VideoManagerMenu
-				|| m_iDVDDomain == DVD_DOMAIN_VideoTitleSetMenu) {
-			bDVDMenuClicked = true;
+		if (SUCCEEDED(m_pDVDC->ActivateAtPosition(pDVD))) {
+			return;
 		}
 	}
 
-	CPoint p;
-	GetCursorPos(&p);
-
-	CRect r(0,0,0,0);
+	CRect r;
 	if (m_pFullscreenWnd && m_pFullscreenWnd->IsWindow()) {
 		m_pFullscreenWnd->GetWindowRect(r);
 	}
 
+	CPoint p;
+	GetCursorPos(&p);
 	CWnd* pWnd = WindowFromPoint(p);
 	bool bFSWnd = false;
 	if (pWnd && *m_pFullscreenWnd == *pWnd && r.PtInRect(p)) {
@@ -3299,23 +3287,18 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		return;
 	}
 
-	if (bDVDMenuClicked) {
-		PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+	if (!m_bLeftMouseDown) {
 		return;
 	}
 
-	if (!m_bLeftMouseDown) {
-		return;
+	CRect r;
+	if (m_pFullscreenWnd && m_pFullscreenWnd->IsWindow()) {
+		m_pFullscreenWnd->GetWindowRect(r);
 	}
 
 	CPoint p;
 	GetCursorPos(&p);
 	CWnd* pWnd = WindowFromPoint(p);
-	CRect r(0,0,0,0);
-	if (m_pFullscreenWnd && m_pFullscreenWnd->IsWindow()) {
-		m_pFullscreenWnd->GetWindowRect(r);
-	}
-
 	bool bFSWnd = false;
 	if (pWnd && *m_pFullscreenWnd == *pWnd && r.PtInRect(p)) {
 		bFSWnd = true;
@@ -3338,11 +3321,6 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
-
-	if (bDVDButtonAtPosition) {
-		PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
-		return;
-	}
 
 	if (m_bLeftMouseDown) {
 		OnButton(wmcmd::LDOWN, nFlags, point);
