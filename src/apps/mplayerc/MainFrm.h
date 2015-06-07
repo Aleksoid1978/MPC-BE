@@ -712,8 +712,6 @@ public:
 
 	BOOL OnButton(UINT id, UINT nFlags, CPoint point);
 
-	bool bDVDMenuClicked;
-	bool bDVDButtonAtPosition;
 	bool templclick;
 
 	afx_msg void OnEnterSizeMove();
