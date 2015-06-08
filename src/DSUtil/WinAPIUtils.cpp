@@ -278,12 +278,9 @@ static UINT16 const gk_au16CodePage437ForEDIDLookup[256] = {
 
 bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, UINT16* MonitorVerRes)
 {
-	wchar_t		szMonitorName[14];
-	UINT16		nMonitorHorRes, nMonitorVerRes;
-
-	memset(szMonitorName, 0, sizeof(szMonitorName));
-	nMonitorHorRes	= 0;
-	nMonitorVerRes	= 0;
+	wchar_t szMonitorName[14] = { 0 };
+	UINT16 nMonitorHorRes = 0;
+	UINT16 nMonitorVerRes = 0;
 
 	if (MonitorHorRes) {
 		*MonitorHorRes = 0;
@@ -301,129 +298,136 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 
 		if ((DisplayDevice.StateFlags & DISPLAY_DEVICE_ACTIVE)
 			&& !(DisplayDevice.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)
-			&& !_wcsicmp(DisplayDevice.DeviceName, szDevice)
-			&& EnumDisplayDevices(szDevice, 0, &DisplayDevice, 0)) {
+			&& !_wcsicmp(DisplayDevice.DeviceName, szDevice)) {
 
-			size_t len = wcslen(DisplayDevice.DeviceID);
-			wchar_t* szDeviceIDshort = DisplayDevice.DeviceID + len - 43;// fixed at 43 characters
+			DWORD dwMonNum = 0;
+			while (EnumDisplayDevices(szDevice, dwMonNum++, &DisplayDevice, 0)) {
+				if (DisplayDevice.StateFlags & DISPLAY_DEVICE_ACTIVE) {
+					size_t len = wcslen(DisplayDevice.DeviceID);
+					wchar_t* szDeviceIDshort = DisplayDevice.DeviceID + len - 43;// fixed at 43 characters
 
-			HKEY hKey0;
-			static wchar_t const gk_szRegCcsEnumDisplay[] = L"SYSTEM\\CurrentControlSet\\Enum\\DISPLAY\\";
-			LSTATUS ls = RegOpenKeyEx(HKEY_LOCAL_MACHINE, gk_szRegCcsEnumDisplay, 0, KEY_ENUMERATE_SUB_KEYS | KEY_READ, &hKey0);
-			if (ls == ERROR_SUCCESS) {
-				DWORD i = 0;
-				for (;;) {// iterate over the child keys
-					DWORD cbName = _countof(DisplayDevice.DeviceKey);
-					ls = RegEnumKeyEx(hKey0, i, DisplayDevice.DeviceKey, &cbName, NULL, NULL, NULL, NULL);
-					if (ls == ERROR_NO_MORE_ITEMS) {
-						break;
-					}
-
+					HKEY hKey0;
+					static wchar_t const gk_szRegCcsEnumDisplay[] = L"SYSTEM\\CurrentControlSet\\Enum\\DISPLAY\\";
+					LSTATUS ls = RegOpenKeyEx(HKEY_LOCAL_MACHINE, gk_szRegCcsEnumDisplay, 0, KEY_ENUMERATE_SUB_KEYS | KEY_READ, &hKey0);
 					if (ls == ERROR_SUCCESS) {
-						static wchar_t DeviceName[MAX_PATH] = {0};
-						memcpy(DeviceName, gk_szRegCcsEnumDisplay, sizeof(gk_szRegCcsEnumDisplay) - 2);// chop off null character
-						memcpy(DeviceName + _countof(gk_szRegCcsEnumDisplay) - 1, DisplayDevice.DeviceKey, (cbName << 1) + 2);
-						wchar_t* pEnd0 = DeviceName + _countof(gk_szRegCcsEnumDisplay) - 1 + cbName;
-						HKEY hKey1;
-						ls = RegOpenKeyEx(HKEY_LOCAL_MACHINE, DeviceName, 0, KEY_ENUMERATE_SUB_KEYS | KEY_READ, &hKey1);
+						DWORD i = 0;
+						for (;;) {// iterate over the child keys
+							DWORD cbName = _countof(DisplayDevice.DeviceKey);
+							ls = RegEnumKeyEx(hKey0, i, DisplayDevice.DeviceKey, &cbName, NULL, NULL, NULL, NULL);
+							if (ls == ERROR_NO_MORE_ITEMS) {
+								break;
+							}
 
-						if (ls == ERROR_SUCCESS) {
-							DWORD j = 0;
-							for (;;) {// iterate over the grandchild keys
-								cbName = _countof(DisplayDevice.DeviceKey);
-								ls = RegEnumKeyEx(hKey1, j, DisplayDevice.DeviceKey, &cbName, NULL, NULL, NULL, NULL);
-								if (ls == ERROR_NO_MORE_ITEMS) {
-									break;
-								}
+							if (ls == ERROR_SUCCESS) {
+								static wchar_t DeviceName[MAX_PATH] = { 0 };
+								memcpy(DeviceName, gk_szRegCcsEnumDisplay, sizeof(gk_szRegCcsEnumDisplay) - 2);// chop off null character
+								memcpy(DeviceName + _countof(gk_szRegCcsEnumDisplay) - 1, DisplayDevice.DeviceKey, (cbName << 1) + 2);
+								wchar_t* pEnd0 = DeviceName + _countof(gk_szRegCcsEnumDisplay) - 1 + cbName;
+								HKEY hKey1;
+								ls = RegOpenKeyEx(HKEY_LOCAL_MACHINE, DeviceName, 0, KEY_ENUMERATE_SUB_KEYS | KEY_READ, &hKey1);
 
 								if (ls == ERROR_SUCCESS) {
-									*pEnd0 = L'\\';
-									memcpy(pEnd0 + 1, DisplayDevice.DeviceKey, (cbName << 1) + 2);
-									wchar_t* pEnd1 = pEnd0 + 1 + cbName;
+									DWORD j = 0;
+									for (;;) {// iterate over the grandchild keys
+										cbName = _countof(DisplayDevice.DeviceKey);
+										ls = RegEnumKeyEx(hKey1, j, DisplayDevice.DeviceKey, &cbName, NULL, NULL, NULL, NULL);
+										if (ls == ERROR_NO_MORE_ITEMS) {
+											break;
+										}
 
-									HKEY hKey2;
-									ls = RegOpenKeyEx(HKEY_LOCAL_MACHINE, DeviceName, 0, KEY_ENUMERATE_SUB_KEYS | KEY_READ, &hKey2);
-									if (ls == ERROR_SUCCESS) {
-
-										static wchar_t const szTDriverKeyN[] = L"Driver";
-										cbName = sizeof(DisplayDevice.DeviceKey);// re-use it here
-										ls = RegQueryValueEx(hKey2, szTDriverKeyN, NULL, NULL, (LPBYTE)DisplayDevice.DeviceKey, &cbName);
 										if (ls == ERROR_SUCCESS) {
-											if (!wcscmp(szDeviceIDshort, DisplayDevice.DeviceKey)) {
-												static wchar_t const szTDevParKeyN[] = L"\\Device Parameters";
-												memcpy(pEnd1, szTDevParKeyN, sizeof(szTDevParKeyN));
-												static wchar_t const szkEDIDKeyN[] = L"EDID";
-												cbName = sizeof(DisplayDevice.DeviceKey);// 256, perfectly suited to receive a copy of the 128 or 256 bytes of EDID data
+											*pEnd0 = L'\\';
+											memcpy(pEnd0 + 1, DisplayDevice.DeviceKey, (cbName << 1) + 2);
+											wchar_t* pEnd1 = pEnd0 + 1 + cbName;
 
-												HKEY hKey3;
-												ls = RegOpenKeyEx(HKEY_LOCAL_MACHINE, DeviceName, 0, KEY_ENUMERATE_SUB_KEYS | KEY_READ, &hKey3);
+											HKEY hKey2;
+											ls = RegOpenKeyEx(HKEY_LOCAL_MACHINE, DeviceName, 0, KEY_ENUMERATE_SUB_KEYS | KEY_READ, &hKey2);
+											if (ls == ERROR_SUCCESS) {
+
+												static wchar_t const szTDriverKeyN[] = L"Driver";
+												cbName = sizeof(DisplayDevice.DeviceKey);// re-use it here
+												ls = RegQueryValueEx(hKey2, szTDriverKeyN, NULL, NULL, (LPBYTE)DisplayDevice.DeviceKey, &cbName);
 												if (ls == ERROR_SUCCESS) {
+													if (!wcscmp(szDeviceIDshort, DisplayDevice.DeviceKey)) {
+														static wchar_t const szTDevParKeyN[] = L"\\Device Parameters";
+														memcpy(pEnd1, szTDevParKeyN, sizeof(szTDevParKeyN));
+														static wchar_t const szkEDIDKeyN[] = L"EDID";
+														cbName = sizeof(DisplayDevice.DeviceKey);// 256, perfectly suited to receive a copy of the 128 or 256 bytes of EDID data
 
-													ls = RegQueryValueEx(hKey3, szkEDIDKeyN, NULL, NULL, (LPBYTE)DisplayDevice.DeviceKey, &cbName);
-													if ((ls == ERROR_SUCCESS) && (cbName > 127)) {
-														UINT8* EDIDdata = (UINT8*)DisplayDevice.DeviceKey;
-														// memo: bytes 25 to 34 contain the default chromaticity coordinates
+														HKEY hKey3;
+														ls = RegOpenKeyEx(HKEY_LOCAL_MACHINE, DeviceName, 0, KEY_ENUMERATE_SUB_KEYS | KEY_READ, &hKey3);
+														if (ls == ERROR_SUCCESS) {
 
-														// pixel clock in 10 kHz units (0.01–655.35 MHz)
-														UINT16 u16PixelClock = (UINT16)(EDIDdata + 54);
-														if (u16PixelClock) {// if the descriptor for pixel clock is 0, the descriptor block is invalid
-															// horizontal active pixels
-															nMonitorHorRes = (UINT16(EDIDdata[58] & 0xF0) << 4) | EDIDdata[56];
-															// vertical active pixels
-															nMonitorVerRes = (UINT16(EDIDdata[61] & 0xF0) << 4) | EDIDdata[59];
+															ls = RegQueryValueEx(hKey3, szkEDIDKeyN, NULL, NULL, (LPBYTE)DisplayDevice.DeviceKey, &cbName);
+															if ((ls == ERROR_SUCCESS) && (cbName > 127)) {
+																UINT8* EDIDdata = (UINT8*)DisplayDevice.DeviceKey;
+																// memo: bytes 25 to 34 contain the default chromaticity coordinates
 
-															// validate and identify extra descriptor blocks
-															// memo: descriptor block identifier 0xFB is used for additional white point data
-															ptrdiff_t k = 12;
-															if (!*(UINT16*)(EDIDdata + 72) && (EDIDdata[75] == 0xFC)) {// descriptor block 2, the first 16 bits must be zero, else the descriptor contains detailed timing data, identifier 0xFC is used for monitor name
-																do {
-																	szMonitorName[k] = gk_au16CodePage437ForEDIDLookup[EDIDdata[77 + k]];
-																} while (--k >= 0);
-															} else if (!*(UINT16*)(EDIDdata + 90) && (EDIDdata[93] == 0xFC)) {// descriptor block 3
-																do {
-																	szMonitorName[k] = gk_au16CodePage437ForEDIDLookup[EDIDdata[95 + k]];
-																} while (--k >= 0);
-															} else if (!*(UINT16*)(EDIDdata + 108) && (EDIDdata[111] == 0xFC)) {// descriptor block 4
-																do {
-																	szMonitorName[k] = gk_au16CodePage437ForEDIDLookup[EDIDdata[113 + k]];
-																} while (--k >= 0);
+																// pixel clock in 10 kHz units (0.01–655.35 MHz)
+																UINT16 u16PixelClock = (UINT16)(EDIDdata + 54);
+																if (u16PixelClock) {// if the descriptor for pixel clock is 0, the descriptor block is invalid
+																	// horizontal active pixels
+																	nMonitorHorRes = (UINT16(EDIDdata[58] & 0xF0) << 4) | EDIDdata[56];
+																	// vertical active pixels
+																	nMonitorVerRes = (UINT16(EDIDdata[61] & 0xF0) << 4) | EDIDdata[59];
+
+																	// validate and identify extra descriptor blocks
+																	// memo: descriptor block identifier 0xFB is used for additional white point data
+																	ptrdiff_t k = 12;
+																	if (!*(UINT16*)(EDIDdata + 72) && (EDIDdata[75] == 0xFC)) {// descriptor block 2, the first 16 bits must be zero, else the descriptor contains detailed timing data, identifier 0xFC is used for monitor name
+																		do {
+																			szMonitorName[k] = gk_au16CodePage437ForEDIDLookup[EDIDdata[77 + k]];
+																		} while (--k >= 0);
+																	}
+																	else if (!*(UINT16*)(EDIDdata + 90) && (EDIDdata[93] == 0xFC)) {// descriptor block 3
+																		do {
+																			szMonitorName[k] = gk_au16CodePage437ForEDIDLookup[EDIDdata[95 + k]];
+																		} while (--k >= 0);
+																	}
+																	else if (!*(UINT16*)(EDIDdata + 108) && (EDIDdata[111] == 0xFC)) {// descriptor block 4
+																		do {
+																			szMonitorName[k] = gk_au16CodePage437ForEDIDLookup[EDIDdata[113 + k]];
+																		} while (--k >= 0);
+																	}
+																}
+																RegCloseKey(hKey3);
+																RegCloseKey(hKey2);
+																RegCloseKey(hKey1);
+																RegCloseKey(hKey0);
+
+																if (wcslen(szMonitorName) && nMonitorHorRes && nMonitorVerRes) {
+																	if (MonitorName) {
+																		*MonitorName = szMonitorName;
+																	}
+																	if (MonitorHorRes) {
+																		*MonitorHorRes = nMonitorHorRes;
+																	}
+																	if (MonitorVerRes) {
+																		*MonitorVerRes = nMonitorVerRes;
+																	}
+
+																	return true;
+																}
+																return false;
 															}
+															RegCloseKey(hKey3);
 														}
-														RegCloseKey(hKey3);
-														RegCloseKey(hKey2);
-														RegCloseKey(hKey1);
-														RegCloseKey(hKey0);
-
-														if (wcslen(szMonitorName) && nMonitorHorRes && nMonitorVerRes) {
-															if (MonitorName) {
-																*MonitorName = szMonitorName;
-															}
-															if (MonitorHorRes) {
-																*MonitorHorRes = nMonitorHorRes;
-															}
-															if (MonitorVerRes) {
-																*MonitorVerRes = nMonitorVerRes;
-															}
-
-															return true;
-														}
-														return false;
 													}
-													RegCloseKey(hKey3);
 												}
+												RegCloseKey(hKey2);
 											}
 										}
-										RegCloseKey(hKey2);
+										++j;
 									}
+									RegCloseKey(hKey1);
 								}
-								++j;
 							}
-							RegCloseKey(hKey1);
+							++i;
 						}
+						RegCloseKey(hKey0);
 					}
-					++i;
+					break;
 				}
-				RegCloseKey(hKey0);
 			}
 			break;
 		}
