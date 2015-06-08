@@ -17069,6 +17069,10 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	// Re-create Win 7 TaskBar preview button for change button hint
 	CreateThumbnailToolbar();
 
+	m_wndInfoBar.RemoveAllLines();
+	m_wndStatsBar.RemoveAllLines();
+	OnTimer(TIMER_STATS);
+
 	AfxGetAppSettings().SaveSettings();
 }
 
