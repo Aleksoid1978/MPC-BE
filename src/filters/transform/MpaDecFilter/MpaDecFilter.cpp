@@ -2442,7 +2442,7 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 			infostr += L"\r\n";
 		}
 		else {
-			return L"The decoder is not active.";
+			return ResStr(IDS_MPADEC_NOTACTIVE);
 		}
 
 		if (samplerate) {
