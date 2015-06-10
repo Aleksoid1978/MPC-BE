@@ -143,7 +143,7 @@ bool CMpaDecSettingsWnd::OnActivate()
 
 	////////// Status //////////
 	p.y += h20;
-	m_grpStatus.Create(L"Status", WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(230), h25 + m_fontheight * 4 + m_fontheight / 2)), this, (UINT)IDC_STATIC);
+	m_grpStatus.Create(ResStr(IDS_MPADEC_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(230), h25 + m_fontheight * 4 + m_fontheight / 2)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_edtStatus.Create(WS_CHILD | WS_VISIBLE /*| WS_BORDER*/ | ES_READONLY | ES_MULTILINE, CRect(p, CSize(IPP_SCALE(220), m_fontheight * 4 + m_fontheight / 2)), this, 0);
 
