@@ -150,9 +150,6 @@ BOOL CPPageVideo::OnInitDialog()
 	m_iEvrBuffers = rs.iEvrBuffers;
 	m_spnEvrBuffers.SetRange(RS_EVRBUFFERS_MIN, RS_EVRBUFFERS_MAX);
 
-	UpdateSurfaceFormatList(rs.m_AdvRendSets.iDX9SurfaceFormat);
-	UpdateResizerList(rs.iDX9Resizer);
-
 	m_bResetDevice = s.m_RenderersSettings.fResetDevice;
 
 	IDirect3D9* pD3D = Direct3DCreate9(D3D_SDK_VERSION);
@@ -293,7 +290,9 @@ BOOL CPPageVideo::OnInitDialog()
 	m_wndToolTip.AddTool(&m_cbAPSurfaceUsage, L"");
 
 	OnDSRendererChange();
+	UpdateSurfaceFormatList(rs.m_AdvRendSets.iDX9SurfaceFormat);
 	OnSurfaceChange();
+	UpdateResizerList(rs.iDX9Resizer);
 
 	CheckDlgButton(IDC_D3D9DEVICE, BST_UNCHECKED);
 	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
