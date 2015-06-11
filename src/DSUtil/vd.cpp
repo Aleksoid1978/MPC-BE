@@ -30,6 +30,7 @@
 #include <vd2/system/cpuaccel.h>
 #include <vd2/system/memory.h>
 #include <vd2/system/vdstl.h>
+#include <vd2/system/math.h>
 
 #include <vd2/Kasumi/pixmap.h>
 #include <vd2/Kasumi/pixmaputils.h>
@@ -459,4 +460,10 @@ bool BitBltFromI420ToYUY2Interlaced(int w, int h, BYTE* dst, int dstpitch, BYTE*
 #endif
 
 	return true;
+}
+
+
+__int64 MulDiv64(__int64 a, __int64 b, __int64 c)
+{
+	return VDMulDiv64(a, b, c);
 }
