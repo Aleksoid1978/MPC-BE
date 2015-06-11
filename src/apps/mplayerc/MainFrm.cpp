@@ -1302,6 +1302,10 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			PostMessage(WM_COMMAND, ID_NAVIGATE_SKIPFORWARD);
 			return TRUE;
 		}
+	} else if (pMsg->message == WM_SYSKEYDOWN && pMsg->wParam == VK_MENU
+			&& CursorOnD3DFullScreenWindow()) {
+		// disable pressing Alt on D3D FullScreen window.
+		return TRUE;
 	}
 
 	return __super::PreTranslateMessage(pMsg);
@@ -1315,11 +1319,11 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 
 	CRect r;
 	GetWindowRect(&r);
-	MINMAXINFO mmi;
-	memset(&mmi, 0, sizeof(mmi));
+	MINMAXINFO mmi = { 0 };
 	SendMessage(WM_GETMINMAXINFO, 0, (LPARAM)&mmi);
 	r |= CRect(r.TopLeft(), CSize(r.Width(), mmi.ptMinTrackSize.y));
 	MoveWindow(&r);
+	
 	FlyBarSetPos();
 	OSDBarSetPos();
 }
@@ -3249,22 +3253,9 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 	}
 
-	CRect r;
-	if (m_pFullscreenWnd && m_pFullscreenWnd->IsWindow()) {
-		m_pFullscreenWnd->GetWindowRect(r);
-	}
-
-	CPoint p;
-	GetCursorPos(&p);
-	CWnd* pWnd = WindowFromPoint(p);
-	bool bFSWnd = false;
-	if (pWnd && *m_pFullscreenWnd == *pWnd && r.PtInRect(p)) {
-		bFSWnd = true;
-	}
-
 	m_bLeftMouseDown = TRUE;
 
-	if (m_bFullScreen || bFSWnd) {
+	if (m_bFullScreen || CursorOnD3DFullScreenWindow()) {
 		if (AssignedToCmd(wmcmd::LDOWN, m_bFullScreen)) {
 			m_bLeftMouseDownFullScreen = TRUE;
 			OnButton(wmcmd::LDOWN, nFlags, point);
@@ -3291,21 +3282,8 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		return;
 	}
 
-	CRect r;
-	if (m_pFullscreenWnd && m_pFullscreenWnd->IsWindow()) {
-		m_pFullscreenWnd->GetWindowRect(r);
-	}
-
-	CPoint p;
-	GetCursorPos(&p);
-	CWnd* pWnd = WindowFromPoint(p);
-	bool bFSWnd = false;
-	if (pWnd && *m_pFullscreenWnd == *pWnd && r.PtInRect(p)) {
-		bFSWnd = true;
-	}
-
 	bool fLeftDownMouseBtnUnassigned = !AssignedToCmd(wmcmd::LDOWN, m_bFullScreen);
-	if (!fLeftDownMouseBtnUnassigned && !m_bFullScreen && !bFSWnd) {
+	if (!fLeftDownMouseBtnUnassigned && !m_bFullScreen && !CursorOnD3DFullScreenWindow()) {
 		OnButton(wmcmd::LDOWN, nFlags, point);
 		return;
  	}
@@ -16855,13 +16833,27 @@ bool CMainFrame::CreateFullScreenWindow()
 	monitor.GetMonitorRect(monitorRect);
 
 	return !!m_pFullscreenWnd->CreateEx(WS_EX_TOPMOST | WS_EX_TOOLWINDOW, L"", ResStr(IDS_MAINFRM_136),
-										WS_POPUP | WS_VISIBLE, monitorRect, this, 0);
+										WS_POPUP | WS_VISIBLE, monitorRect, NULL, 0);
 }
 
 bool CMainFrame::IsD3DFullScreenMode() const
 {
 	return m_pFullscreenWnd && m_pFullscreenWnd->IsWindow();
 };
+
+bool CMainFrame::CursorOnD3DFullScreenWindow() const
+{
+	if (IsD3DFullScreenMode()) {
+		CPoint p;
+		GetCursorPos(&p);
+		CWnd* pWnd = WindowFromPoint(p);
+		if (pWnd && *pWnd == *m_pFullscreenWnd) {
+			return true;
+		}
+	}
+	
+	return false;
+}
 
 void CMainFrame::DestroyD3DWindow()
 {

@@ -476,6 +476,7 @@ public:
 	}
 	
 	bool IsD3DFullScreenMode() const;
+	bool CursorOnD3DFullScreenWindow() const;
 	void DestroyD3DWindow();
 
 	CControlBar* m_pLastBar;
