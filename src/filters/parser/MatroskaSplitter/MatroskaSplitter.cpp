@@ -2330,7 +2330,7 @@ static bool ParseWavpack(CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>& p)
 	return true;
 }
 
-#define RL24(p) (p[0] | p[1] << 8 | p[1] << 16)
+#define RL24(p) (p[2] << 16 | p[1] << 8 | p[0])
 
 HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REFERENCE_TIME rtBlockDuration/* = 0*/)
 {
@@ -2384,11 +2384,12 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 			tmp->Append(*p->bg->Block.BlockData.GetNext(pos));
 		} else if (m_mt.subtype == MEDIASUBTYPE_VP90) {
 			REFERENCE_TIME rtStartTmp = rtStart;
-			REFERENCE_TIME rtStopTmp = rtStart;
+			REFERENCE_TIME rtStopTmp = rtStop;
 
 			CAutoPtr<CBinary> ptr = p->bg->Block.BlockData.GetNext(pos);
 			const BYTE* pData = ptr->GetData();
 			size_t size = ptr->GetCount();
+
 			BYTE marker = pData[size - 1];
 			if ((marker & 0xe0) == 0xc0) {
 				const BYTE nbytes = 1 + ((marker >> 3) & 0x3);
@@ -2398,7 +2399,7 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 					const BYTE *idx = pData + size + 1 - idx_sz;
 					int first = 1;
 
-					while (--n_frames) {
+					while (n_frames--) {
 						size_t sz;
 						switch(nbytes) {
 							case 1:
@@ -2443,10 +2444,18 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 						size -= sz;
 					}
 				}
+
+				rtStart += rtDuration;
+				rtStop += rtDuration;
+
+				p->bSyncPoint		= false;
+				p->bDiscontinuity	= false;
+
+				continue;
 			}
 
-			tmp->rtStart	= rtStartTmp;
-			tmp->rtStop		= rtStopTmp;
+			tmp->rtStart	= rtStart;
+			tmp->rtStop		= rtStop;
 			tmp->SetData(pData, size);
 		} else {
 			tmp->Copy(*p->bg->Block.BlockData.GetNext(pos));
