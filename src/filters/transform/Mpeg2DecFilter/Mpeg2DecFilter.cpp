@@ -1461,13 +1461,9 @@ CSubpicInputPin::CSubpicInputPin(CTransformFilter* pFilter, HRESULT* phr)
 
 HRESULT CSubpicInputPin::CheckMediaType(const CMediaType* mtIn)
 {
-	return (mtIn->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK
-			|| mtIn->majortype == MEDIATYPE_MPEG2_PACK
-			|| mtIn->majortype == MEDIATYPE_MPEG2_PES
-			|| mtIn->majortype == MEDIATYPE_Video)
-		   && (mtIn->subtype == MEDIASUBTYPE_DVD_SUBPICTURE
-			   || mtIn->subtype == MEDIASUBTYPE_CVD_SUBPICTURE
-			   || mtIn->subtype == MEDIASUBTYPE_SVCD_SUBPICTURE)
+	return (mtIn->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && mtIn->subtype == MEDIASUBTYPE_DVD_SUBPICTURE)
+			|| (mtIn->majortype == MEDIATYPE_Video
+				&& (mtIn->subtype == MEDIASUBTYPE_CVD_SUBPICTURE || mtIn->subtype == MEDIASUBTYPE_SVCD_SUBPICTURE))
 		   ? S_OK
 		   : VFW_E_TYPE_NOT_ACCEPTED;
 }
