@@ -2418,7 +2418,6 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 						
 						idx += nbytes;
 						if (sz > size) {
-							size = 0;
 							break;
 						}
 
@@ -2454,9 +2453,7 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 				continue;
 			}
 
-			tmp->rtStart	= rtStart;
-			tmp->rtStop		= rtStop;
-			tmp->SetData(pData, size);
+			tmp->Copy(*ptr);
 		} else {
 			tmp->Copy(*p->bg->Block.BlockData.GetNext(pos));
 		}
