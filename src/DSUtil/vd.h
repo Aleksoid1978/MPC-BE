@@ -42,8 +42,6 @@ extern bool BitBltFromRGBToRGBStretch(int dstw, int dsth, BYTE* dst, int dstpitc
 
 extern void DeinterlaceBlend(BYTE* dst, BYTE* src, DWORD rowbytes, DWORD h, DWORD dstpitch, DWORD srcpitch);
 extern void DeinterlaceBob(BYTE* dst, BYTE* src, DWORD rowbytes, DWORD h, DWORD dstpitch, DWORD srcpitch, bool topfield);
-extern void DeinterlaceELA_X8R8G8B8(BYTE* dst, BYTE* src, DWORD w, DWORD h, DWORD dstpitch, DWORD srcpitch, bool topfield);
-extern void DeinterlaceELA(BYTE* dst, BYTE* src, DWORD w, DWORD h, DWORD dstpitch, DWORD srcpitch, bool topfield);
 
 __int64 FractionScale64(__int64 a, UINT32 b, UINT32 c);
 UINT64  UMulDiv64x32(UINT64 a, UINT32 b, UINT32 c);
