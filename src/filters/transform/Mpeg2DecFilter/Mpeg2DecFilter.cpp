@@ -241,7 +241,6 @@ CMpeg2DecFilterApp theApp;
 CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CBaseVideoFilter(NAME("CMpeg2DecFilter"), lpunk, phr, __uuidof(this), 1)
 	, m_fWaitForKeyFrame(true)
-	, m_fInitializedBuffer(true)
 	, m_ControlThread(NULL)
 	, m_ditype(DIAuto)
 {
@@ -671,7 +670,6 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 
 						if (m_fb.w != w || m_fb.h != h || m_fb.pitch != pitch) {
 							m_fb.Alloc(w, h, pitch);
-							m_fInitializedBuffer = false;
 						}
 
 						// start - end
@@ -693,9 +691,6 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 						hr = Deliver();
 						if (hr != S_OK) {
 							return hr;
-						}
-						if (hr == S_OK && !m_fWaitForKeyFrame) {
-							m_fInitializedBuffer = true;
 						}
 					}
 				}
@@ -759,11 +754,8 @@ HRESULT CMpeg2DecFilter::Deliver()
 	ApplyBrContHueSat(m_fb.buf[0], m_fb.buf[1], m_fb.buf[2], w, h, dpitch);
 
 	// deliver
-	if (m_fb.di == DIWeave || m_fInitializedBuffer) {
-		hr = Deliver(false);
-		if (FAILED(hr)) {
-			return hr;
-		}
+	if (FAILED(hr = Deliver(false))) {
+		return hr;
 	}
 
 	if (m_fb.di == DIBob) {
@@ -778,14 +770,12 @@ HRESULT CMpeg2DecFilter::Deliver()
 		ApplyBrContHueSat(m_fb.buf[0], m_fb.buf[1], m_fb.buf[2], w, h, dpitch);
 
 		// deliver
-		hr = Deliver(false);
+		if (FAILED(hr = Deliver(false))) {
+			return hr;
+		}
 	}
 
-	if (!m_fInitializedBuffer) {
-		hr = Deliver(false);
-	}
-
-	return hr;
+	return S_OK;
 }
 
 HRESULT CMpeg2DecFilter::Deliver(bool fRepeatLast)
