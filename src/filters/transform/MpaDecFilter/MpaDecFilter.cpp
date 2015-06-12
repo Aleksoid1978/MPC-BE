@@ -2383,6 +2383,7 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 		// Input
 		DWORD samplerate = 0;
 		WORD channels = 0;
+		DWORD layout = 0;
 
 		if (m_FFAudioDec.GetCodecId() != AV_CODEC_ID_NONE) {
 			infostr.Format(L"Codec: %hS", m_FFAudioDec.GetCodecName());
@@ -2393,6 +2394,7 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 			infostr += L"\r\n";
 			samplerate = m_FFAudioDec.GetSampleRate();
 			channels = m_FFAudioDec.GetChannels();
+			layout = m_FFAudioDec.GetChannelMask();
 		}
 		else if (m_pInput->CurrentMediaType().IsValid()) {
 			const GUID& subtype = m_pInput->CurrentMediaType().subtype;
@@ -2449,7 +2451,22 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 			infostr.AppendFormat(L"Sample rate: %u Hz\r\n", samplerate);
 		}
 		if (channels) {
-			infostr.AppendFormat(L"Channels: %u\r\n", channels);
+			if (channels > 2 && layout) {
+				const char* spks[] = { "L", "R", "C", "LFE", "BL", "BR", "FLC", "FRC", "BC", "SL", "SR", "TC" };
+				CStringA str;
+				for (int i = 0; i < _countof(spks); i++) {
+					if (layout & (1 << i)) {
+						if (str.GetLength()) {
+							str.Append(",");
+						}
+						str.Append(spks[i]);
+					}
+				}
+				infostr.AppendFormat(L"Channels: %u  [%hS]\r\n", channels, str);
+			}
+			else {
+				infostr.AppendFormat(L"Channels: %u\r\n", channels);
+			}
 		}
 
 		// Output
