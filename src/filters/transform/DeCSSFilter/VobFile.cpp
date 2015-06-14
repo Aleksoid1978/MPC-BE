@@ -595,29 +595,33 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 		DWORD pcgITPosition = ReadDword() * 2048;
 		m_ifoFile.Seek(pcgITPosition, CFile::begin);
 		WORD NumberOfProgramChains = (WORD)ReadShort();
-		if (nProgNum != ULONG_MAX && nProgNum > NumberOfProgramChains) {
-			return false;
-		}
 
-		//for (int nProgramChains = 0; nProgramChains < NumberOfProgramChains; nProgramChains++) {
-		for (ULONG nProgramChains = (nProgNum != ALL_PGCs ? nProgNum - 1 : 0); nProgramChains < (nProgNum != ALL_PGCs ? nProgNum : NumberOfProgramChains); nProgramChains++) {
-			m_ifoFile.Seek(pcgITPosition + 4 + 8 * (nProgramChains + 1), CFile::begin);
+		struct program_t {
+			CAtlMap<DWORD, CString> streams;
+			CAtlArray<chapter_t> chapters;
+		};
+		CAtlArray<program_t> programs;
+
+		for (int prog = 0; prog < NumberOfProgramChains; prog++) {
+			m_ifoFile.Seek(pcgITPosition + 4 + 8 * (prog + 1), CFile::begin);
 			DWORD chainOffset = ReadDword();
 			m_ifoFile.Seek(pcgITPosition + chainOffset + 2, CFile::begin);
-			/*BYTE programChainPrograms = */ReadByte();
+			BYTE programChainPrograms = ReadByte();
 
 			BYTE bytes[4];
 			ReadBuffer(bytes, 4);
+
+			programs.Add();
 
 			// PGC_AST_CTL
 			m_ifoFile.Seek(pcgITPosition + chainOffset + 0x0C, CFile::begin);
 			for (int i = 0; i < 8; i++) {
 				BYTE tmp = ReadByte();
-				BYTE avail = tmp >> 7;		// stream available
+				BYTE avail = tmp >> 7;	// stream available
 				BYTE ID = tmp & ~0x80;	// Stream number (MPEG audio) or Substream number (all others)
 
 				if (avail && audio_streams[i].ToAdd) {
-					m_pStream_Lang[audio_streams[i].ToAdd + ID] = audio_streams[i].Lang;
+					programs[prog].streams[audio_streams[i].ToAdd + ID] = audio_streams[i].Lang;
 				}
 
 				m_ifoFile.Seek(1, CFile::current);
@@ -627,42 +631,32 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 			m_ifoFile.Seek(pcgITPosition + chainOffset + 0x1C, CFile::begin);
 			for (int i = 0; i < 32; i++) {
 				BYTE avail = ReadByte() >> 7;	// stream available
-				BYTE ID = ReadByte();		// Stream number for wide
+				BYTE ID = ReadByte();			// Stream number for wide
 
 				if (avail && !subtitle_streams[i].IsEmpty()) {
-					m_pStream_Lang[0x20 + ID] = subtitle_streams[i];
+					programs[prog].streams[0x20 + ID] = subtitle_streams[i];
 				}
 
 				m_ifoFile.Seek(2, CFile::current);
 			}
-		}
-
-		m_rtDuration = 0;
-		for (ULONG nProgramChains = (nProgNum != ALL_PGCs ? nProgNum - 1 : 0); nProgramChains < (nProgNum != ALL_PGCs ? nProgNum : NumberOfProgramChains); nProgramChains++) {
-			m_ifoFile.Seek(pcgITPosition + 4 + 8 * (nProgramChains + 1), CFile::begin);
-			DWORD chainOffset = ReadDword();
-			m_ifoFile.Seek(pcgITPosition + chainOffset + 2, CFile::begin);
-			BYTE programChainPrograms = ReadByte();
-			m_pChapters.SetCount(programChainPrograms);
-
-			BYTE bytes[4];
-			ReadBuffer(bytes, 4);
 
 			m_ifoFile.Seek(pcgITPosition + chainOffset + 230, CFile::begin);
 			int programMapOffset = ReadShort();
 			m_ifoFile.Seek(pcgITPosition + chainOffset + 0xE8, CFile::begin);
 			int cellTableOffset = ReadShort();
-			for (int currentProgram = 0; currentProgram < programChainPrograms; currentProgram++) {
-				m_ifoFile.Seek(pcgITPosition + chainOffset + programMapOffset + currentProgram, CFile::begin);
+
+			for (int chap = 0; chap < programChainPrograms; chap++) {
+				m_ifoFile.Seek(pcgITPosition + chainOffset + programMapOffset + chap, CFile::begin);
 				byte entryCell = ReadByte();
 				byte exitCell = entryCell;
-				if (currentProgram < (programChainPrograms - 1)){
-					m_ifoFile.Seek(pcgITPosition + chainOffset + programMapOffset + (currentProgram + 1), CFile::begin);
+				if (chap < (programChainPrograms - 1)){
+					m_ifoFile.Seek(pcgITPosition + chainOffset + programMapOffset + (chap + 1), CFile::begin);
 					exitCell = ReadByte() - 1;
 				}
 
-				m_pChapters[currentProgram].first_sector = UINT32_MAX;
-				m_pChapters[currentProgram].last_sector = 0;
+				chapter_t chapter;
+				chapter.first_sector = UINT32_MAX;
+				chapter.last_sector = 0;
 
 				REFERENCE_TIME rtTotalTime = 0;
 				for (int currentCell = entryCell; currentCell <= exitCell; currentCell++) {
@@ -686,17 +680,57 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 					m_ifoFile.Seek(pcgITPosition + chainOffset + cellStart + 20, CFile::begin);
 					DWORD lastVOBUEndSector = ReadDword();
 
-					if (m_pChapters[currentProgram].first_sector > firstVOBUStartSector) {
-						m_pChapters[currentProgram].first_sector = firstVOBUStartSector;
+					if (chapter.first_sector > firstVOBUStartSector) {
+						chapter.first_sector = firstVOBUStartSector;
 					}
-					if (m_pChapters[currentProgram].last_sector < lastVOBUEndSector) {
-						m_pChapters[currentProgram].last_sector = lastVOBUEndSector;
+					if (chapter.last_sector < lastVOBUEndSector) {
+						chapter.last_sector = lastVOBUEndSector;
 					}
 				}
 
+				CAtlArray<chapter_t>& chapters = programs[prog].chapters;
+				if (chapters.GetCount() && chapters[chapters.GetCount()-1].last_sector + 1 != chapter.first_sector) {
+					break; // ignore jumps
+				}
+
 				m_rtDuration += rtTotalTime;
-				m_pChapters[currentProgram].rtime = m_rtDuration;
+				chapter.rtime = m_rtDuration;
+
+				programs[prog].chapters.Add(chapter);
 			}
+		}
+
+		int selected_prog = 0;
+		if (nProgNum > 0 && nProgNum < programs.GetCount()) {
+			selected_prog = nProgNum - 1;
+		} else {
+			REFERENCE_TIME longest_dur = 0;
+			for (int prog = 0; prog < NumberOfProgramChains; prog++) {
+				CAtlArray<chapter_t>& chapters = programs[prog].chapters;
+				REFERENCE_TIME dur = chapters[chapters.GetCount()-1].rtime - chapters[0].rtime;
+				int sectors = chapters[chapters.GetCount()-1].last_sector - chapters[0].first_sector;
+				if (dur > longest_dur) {
+					longest_dur = dur;
+					selected_prog = prog;
+				}
+			}
+		}
+
+		CAtlMap<DWORD, CString>& streams = programs[selected_prog].streams;
+		CAtlArray<chapter_t>& chapters = programs[selected_prog].chapters;
+		for (POSITION pos = streams.GetStartPosition(); pos != NULL;) {
+			DWORD key;
+			CString value;
+			streams.GetNextAssoc(pos, key, value);
+			m_pStream_Lang[key] = value;
+		}
+		m_rtDuration = chapters[chapters.GetCount()-1].rtime - chapters[0].rtime;
+		m_pChapters.Append(chapters);
+		// correct chapters times
+		REFERENCE_TIME start_time = m_pChapters[0].rtime;
+		for (int chap = 0; chap < m_pChapters.GetCount(); chap++) {
+			m_pChapters[chap].rtime -= start_time;
+			ASSERT(m_pChapters[chap].rtime >= 0);
 		}
 	}
 	else if(m_ifoFile.GetLength() >= 4096 && strcmp(hdr, ATS_HEADER) == 0) {
