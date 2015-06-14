@@ -728,7 +728,7 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 		m_pChapters.Append(chapters);
 		// correct chapters times
 		REFERENCE_TIME start_time = m_pChapters[0].rtime;
-		for (int chap = 0; chap < m_pChapters.GetCount(); chap++) {
+		for (int chap = 0; chap < (int)m_pChapters.GetCount(); chap++) {
 			m_pChapters[chap].rtime -= start_time;
 			ASSERT(m_pChapters[chap].rtime >= 0);
 		}
