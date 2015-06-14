@@ -56,7 +56,7 @@ public:
 
 protected:
 	DWORD ThreadProc() {
-		SetThreadName(-1, "CMpeg2DecFilter Control Thread");
+		SetThreadName(DWORD_MAX, "CMpeg2DecFilter Control Thread");
 		DWORD cmd;
 		while (TRUE) {
 			cmd = GetRequest();
@@ -66,8 +66,8 @@ protected:
 					return 0;
 				case CMpeg2DecFilter::CNTRL_REDRAW:
 					Reply(S_OK);
-					if (!g_bExternalPaused) {
-						m_pMpeg2DecFilter->Deliver(true);
+					if (m_pMpeg2DecFilter->IsGraphRunning()) {
+						m_pMpeg2DecFilter->DeliverToRenderer();
 					}
 				break;
 			}
@@ -680,11 +680,6 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 						}
 						m_fb.rtStop = m_fb.rtStart + m_AvgTimePerFrame * picture->nb_fields / (m_dec->m_info.m_display_picture_2nd ? 1 : 2);
 
-						REFERENCE_TIME rtStart = m_fb.rtStart;
-						REFERENCE_TIME rtStop = m_fb.rtStop;
-						UNREFERENCED_PARAMETER(rtStart);
-						UNREFERENCED_PARAMETER(rtStop);
-
 						SetDeinterlaceMethod();
 						UpdateAspectRatio();
 
@@ -716,8 +711,6 @@ void CMpeg2DecFilter::UpdateAspectRatio()
 HRESULT CMpeg2DecFilter::Deliver()
 {
 	HRESULT hr = S_OK;
-
-	CAutoLock cAutoLock(&m_csReceive);
 
 	mpeg2_fbuf_t* fbuf = m_dec->m_info.m_display_fbuf;
 	if (!fbuf) {
@@ -754,7 +747,7 @@ HRESULT CMpeg2DecFilter::Deliver()
 	ApplyBrContHueSat(m_fb.buf[0], m_fb.buf[1], m_fb.buf[2], w, h, dpitch);
 
 	// deliver
-	if (FAILED(hr = Deliver(false))) {
+	if (FAILED(hr = DeliverToRenderer())) {
 		return hr;
 	}
 
@@ -770,7 +763,7 @@ HRESULT CMpeg2DecFilter::Deliver()
 		ApplyBrContHueSat(m_fb.buf[0], m_fb.buf[1], m_fb.buf[2], w, h, dpitch);
 
 		// deliver
-		if (FAILED(hr = Deliver(false))) {
+		if (FAILED(hr = DeliverToRenderer())) {
 			return hr;
 		}
 	}
@@ -778,10 +771,8 @@ HRESULT CMpeg2DecFilter::Deliver()
 	return S_OK;
 }
 
-HRESULT CMpeg2DecFilter::Deliver(bool fRepeatLast)
+HRESULT CMpeg2DecFilter::DeliverToRenderer()
 {
-	CAutoLock cAutoLock(&m_csReceive);
-
 	if ((m_fb.flags & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_I) {
 		m_fWaitForKeyFrame = false;
 	}
@@ -982,6 +973,17 @@ HRESULT CMpeg2DecFilter::AlterQuality(Quality q)
 
 	//TRACE(_T("CMpeg2DecFilter::AlterQuality: Type=%d, Proportion=%d, Late=%I64d, TimeStamp=%I64d\n"), q.Type, q.Proportion, q.Late, q.TimeStamp);
 	return S_OK;
+}
+
+bool CMpeg2DecFilter::IsGraphRunning() const
+{
+	if (CComQIPtr<IMediaControl> pMC = m_pGraph) {
+		OAFilterState fs = State_Stopped;
+		pMC->GetState(0, &fs);
+		return (fs == State_Running);
+	}
+
+	return false;
 }
 
 // ISpecifyPropertyPages2

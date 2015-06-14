@@ -34,8 +34,6 @@
 #define Mpeg2DecFilterName L"MPC MPEG Video Decoder"
 #endif
 
-extern bool g_bExternalPaused;
-
 class CSubpicInputPin;
 class CClosedCaptionOutputPin;
 class CMpeg2Dec;
@@ -125,7 +123,7 @@ public:
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
 	HRESULT Deliver();
-	HRESULT Deliver(bool fRepeatLast);
+	HRESULT DeliverToRenderer();
 
 	int GetPinCount();
 	CBasePin* GetPin(int n);
@@ -144,6 +142,8 @@ public:
 
 	bool m_fDropFrames;
 	HRESULT AlterQuality(Quality q);
+
+	bool IsGraphRunning() const;
 
 protected:
 	CCritSec m_csProps;
