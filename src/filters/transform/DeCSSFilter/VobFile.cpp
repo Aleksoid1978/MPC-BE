@@ -487,10 +487,10 @@ static REFERENCE_TIME FormatTime(BYTE *bytes)
 	short frames	= GetFrames(bytes[3]);
 	int fpsMask		= bytes[3] >> 6;
 	double fps		= fpsMask == 0x01 ? 25 : fpsMask == 0x03 ? (30 / 1.001): 0;
-	CString tmp;
-	int hours		= bytes[0]; tmp.Format(_T("%x"), hours);	_stscanf_s(tmp, _T("%d"), &hours);
-	int minutes		= bytes[1]; tmp.Format(_T("%x"), minutes);	_stscanf_s(tmp, _T("%d"), &minutes);
-	int seconds		= bytes[2]; tmp.Format(_T("%x"), seconds);	_stscanf_s(tmp, _T("%d"), &seconds);
+	CStringA tmp;
+	int hours		= bytes[0]; tmp.Format("%x", hours);	sscanf_s(tmp, "%d", &hours);
+	int minutes		= bytes[1]; tmp.Format("%x", minutes);	sscanf_s(tmp, "%d", &minutes);
+	int seconds		= bytes[2]; tmp.Format("%x", seconds);	sscanf_s(tmp, "%d", &seconds);
 	int mmseconds = 0;
 	if (fps != 0){
 		mmseconds = (int)(1000 * frames / fps);
