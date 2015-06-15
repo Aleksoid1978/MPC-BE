@@ -68,6 +68,7 @@ protected:
 					Reply(S_OK);
 					if (m_pMpeg2DecFilter->IsGraphRunning()) {
 						m_pMpeg2DecFilter->DeliverToRenderer();
+						m_pMpeg2DecFilter->DeliverToRenderer(); // TODO ???
 					}
 				break;
 			}
@@ -1629,37 +1630,40 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 
 			AM_PROPERTY_SPHLI* pSPHLI = (AM_PROPERTY_SPHLI*)pPropertyData;
 
-			m_sphli.Free();
-
 			if (pSPHLI->HLISS) {
+				#define DHLI(sphli, var) (pSPHLI->var != sphli->var)
+
 				POSITION pos = m_sps.GetHeadPosition();
 				while (pos) {
 					spu* sp = m_sps.GetNext(pos);
-					if (sp->m_rtStart <= PTS2RT(pSPHLI->StartPTM) && PTS2RT(pSPHLI->StartPTM) < sp->m_rtStop) {
+					if (sp->m_rtStart <= PTS2RT(pSPHLI->StartPTM) && PTS2RT(pSPHLI->StartPTM) < sp->m_rtStop
+							&& (!sp->m_psphli || DHLI(sp->m_psphli, StartX) || DHLI(sp->m_psphli, StopX) || DHLI(sp->m_psphli, StartY) || DHLI(sp->m_psphli, StopY))) {
 						bRefresh = true;
 						sp->m_psphli.Free();
-						sp->m_psphli.Attach(DNew AM_PROPERTY_SPHLI);
-						memcpy((AM_PROPERTY_SPHLI*)sp->m_psphli, pSPHLI, sizeof(AM_PROPERTY_SPHLI));
+						sp->m_psphli.Attach(DNew AM_PROPERTY_SPHLI(*pSPHLI));
 					}
 				}
 
-				if (!bRefresh) { // save it for later, a subpic might be late for this hli
-					m_sphli.Attach(DNew AM_PROPERTY_SPHLI);
-					memcpy((AM_PROPERTY_SPHLI*)m_sphli, pSPHLI, sizeof(AM_PROPERTY_SPHLI));
+				if (!bRefresh
+						&& (!m_sphli || DHLI(m_sphli, StartX) || DHLI(m_sphli, StopX) || DHLI(m_sphli, StartY) || DHLI(m_sphli, StopY))) {
+						// save it for later, a subpic might be late for this hli
+					m_sphli.Free();
+					m_sphli.Attach(DNew AM_PROPERTY_SPHLI(*pSPHLI));
+				}
+
+				if (bRefresh) {
+					DbgLog((LOG_TRACE, 0, L"DVD HLI Event: %20I64d -> %20I64d, (%u,%u) - (%u,%u)",
+							PTS2RT(pSPHLI->StartPTM), PTS2RT(pSPHLI->EndPTM),
+							pSPHLI->StartX, pSPHLI->StartY, pSPHLI->StopX, pSPHLI->StopY));
 				}
 			} else {
+				m_sphli.Free();
 				POSITION pos = m_sps.GetHeadPosition();
 				while (pos) {
 					spu* sp = m_sps.GetNext(pos);
-					bRefresh |= !!sp->m_psphli;
 					sp->m_psphli.Free();
 				}
 			}
-
-			if (pSPHLI->HLISS)
-				DbgLog((LOG_TRACE, 0, _T("hli: %I64d - %I64d, (%d,%d) - (%d,%d)"),
-						PTS2RT(pSPHLI->StartPTM)/10000, PTS2RT(pSPHLI->EndPTM)/10000,
-						pSPHLI->StartX, pSPHLI->StartY, pSPHLI->StopX, pSPHLI->StopY));
 		}
 		break;
 		case AM_PROPERTY_DVDSUBPIC_COMPOSIT_ON: {
