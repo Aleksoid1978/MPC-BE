@@ -68,7 +68,9 @@ protected:
 					Reply(S_OK);
 					if (m_pMpeg2DecFilter->IsGraphRunning()) {
 						m_pMpeg2DecFilter->DeliverToRenderer();
-						m_pMpeg2DecFilter->DeliverToRenderer(); // TODO ???
+						if (m_pMpeg2DecFilter->IsInterlacedEnabled()) {
+							m_pMpeg2DecFilter->DeliverToRenderer(); // TODO ???
+						}
 					}
 				break;
 			}
@@ -522,7 +524,7 @@ void CMpeg2DecFilter::SetDeinterlaceMethod()
 
 	const CMediaType& mt = m_pOutput->CurrentMediaType();
 
-	if (mt.formattype == FORMAT_VideoInfo2 && (((VIDEOINFOHEADER2*)mt.pbFormat)->dwInterlaceFlags & AMINTERLACE_IsInterlaced)) {
+	if (m_fInterlaced) {
 		m_fb.di = DIWeave;
 	} else {
 		m_fb.di = GetDeinterlaceMethod();
