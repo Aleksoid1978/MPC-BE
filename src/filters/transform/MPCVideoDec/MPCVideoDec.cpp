@@ -952,6 +952,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_fSYNC(0)
 	, m_bDecodingStart(FALSE)
 	, m_bHEVC10bit(FALSE)
+	, m_dRate(1.0)
 {
 	if (phr) {
 		*phr = S_OK;
