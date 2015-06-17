@@ -1277,7 +1277,7 @@ STDMETHODIMP CMpeg2DecInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceD
 				}
 				CAutoLock cAutoLock(&m_csRateLock);
 				m_ratechange = *p;
-				DbgLog((LOG_TRACE, 0, _T("StartTime=%I64d, Rate=%d"), p->StartTime, p->Rate));
+				DbgLog((LOG_TRACE, 3, L"DVD TSRateChange Event : StartTime = %20I64d, Rate = %ld", p->StartTime, p->Rate));
 			}
 			break;
 			case AM_RATE_UseRateVersion: {
@@ -1608,6 +1608,16 @@ STDMETHODIMP CSubpicInputPin::EndFlush()
 
 // IKsPropertySet
 
+static bool IsSPHLIEqual(AM_PROPERTY_SPHLI* pSPHLI1, AM_PROPERTY_SPHLI* pSPHLI2)
+{
+	return (pSPHLI1 && pSPHLI2
+			&& pSPHLI1->StartX == pSPHLI2->StartX
+			&& pSPHLI1->StopX  == pSPHLI2->StopX
+			&& pSPHLI1->StartY == pSPHLI2->StartY
+			&& pSPHLI1->StopY  == pSPHLI2->StopY
+			&& !memcmp(&pSPHLI1->ColCon, &pSPHLI2->ColCon, sizeof(AM_COLCON)));
+}
+
 STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceData, ULONG InstanceLength, LPVOID pPropertyData, ULONG DataLength)
 {
 	if (PropSet != AM_KSPROPSETID_DvdSubPic) {
@@ -1624,7 +1634,7 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 			memcpy(m_sppal, pSPPAL->sppal, sizeof(AM_PROPERTY_SPPAL));
 			m_fsppal = true;
 
-			DbgLog((LOG_TRACE, 0, _T("new palette")));
+			DbgLog((LOG_TRACE, 3, _T("DVD Palette Event")));
 		}
 		break;
 		case AM_PROPERTY_DVDSUBPIC_HLI: {
@@ -1633,28 +1643,25 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 			AM_PROPERTY_SPHLI* pSPHLI = (AM_PROPERTY_SPHLI*)pPropertyData;
 
 			if (pSPHLI->HLISS) {
-				#define DHLI(sphli, var) (pSPHLI->var != sphli->var)
-
 				POSITION pos = m_sps.GetHeadPosition();
 				while (pos) {
 					spu* sp = m_sps.GetNext(pos);
 					if (sp->m_rtStart <= PTS2RT(pSPHLI->StartPTM) && PTS2RT(pSPHLI->StartPTM) < sp->m_rtStop
-							&& (!sp->m_psphli || DHLI(sp->m_psphli, StartX) || DHLI(sp->m_psphli, StopX) || DHLI(sp->m_psphli, StartY) || DHLI(sp->m_psphli, StopY))) {
+							&& !IsSPHLIEqual(pSPHLI, sp->m_psphli)) {
 						bRefresh = true;
 						sp->m_psphli.Free();
 						sp->m_psphli.Attach(DNew AM_PROPERTY_SPHLI(*pSPHLI));
 					}
 				}
 
-				if (!bRefresh
-						&& (!m_sphli || DHLI(m_sphli, StartX) || DHLI(m_sphli, StopX) || DHLI(m_sphli, StartY) || DHLI(m_sphli, StopY))) {
-						// save it for later, a subpic might be late for this hli
+				if (!bRefresh && !IsSPHLIEqual(pSPHLI, m_sphli)) {
+					// save it for later, a subpic might be late for this hli
 					m_sphli.Free();
 					m_sphli.Attach(DNew AM_PROPERTY_SPHLI(*pSPHLI));
 				}
 
 				if (bRefresh) {
-					DbgLog((LOG_TRACE, 0, L"DVD HLI Event: %20I64d -> %20I64d, (%u,%u) - (%u,%u)",
+					DbgLog((LOG_TRACE, 3, L"DVD HLI Event: %20I64d -> %20I64d, (%u,%u) - (%u,%u)",
 							PTS2RT(pSPHLI->StartPTM), PTS2RT(pSPHLI->EndPTM),
 							pSPHLI->StartX, pSPHLI->StartY, pSPHLI->StopX, pSPHLI->StopY));
 				}
