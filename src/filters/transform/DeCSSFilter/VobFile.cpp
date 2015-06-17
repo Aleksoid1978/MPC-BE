@@ -422,7 +422,7 @@ DWORD CVobFile::ReadDword()
 	return ReadByte()<<24 | ReadByte()<<16 | ReadByte()<<8 | ReadByte();
 }
 
-SHORT CVobFile::ReadShort()
+WORD CVobFile::ReadWord()
 {
 	return (ReadByte()<<8 | ReadByte());
 }
@@ -546,73 +546,57 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 	bool isAob = false;
 
 	if (strcmp(hdr, VTS_HEADER) == 0) {
+		BYTE buf[8];
+
 		stream_t audio_streams[8];
 		stream_t subtitle_streams[32];
 		memset(audio_streams, 0, sizeof(audio_streams));
 		memset(subtitle_streams, 0, sizeof(subtitle_streams));
 
-		BYTE buffer[SUBTITLE_BLOCK_SIZE] = { 0 };
-
+		// Video Attributes (0x0200)
 		m_ifoFile.Seek(0x200, CFile::begin);
-		m_ifoFile.Read(buffer, VIDEO_BLOCK_SIZE);
-		CGolombBuffer gb_v(buffer, VIDEO_BLOCK_SIZE);
-		gb_v.BitRead(2);				// Coding mode
-		gb_v.BitRead(2);				// Standart
-		BYTE aspect = gb_v.BitRead(2);	// Aspect ratio
-		if (aspect >= 0 && aspect <= 3) {
-			m_Aspect = IFO_Aspect[aspect];
-		}
+		m_ifoFile.Read(buf, 2);
+		BYTE aspect = (buf[0] & 0xC) >> 2; // Aspect ratio
+		m_Aspect = IFO_Aspect[aspect];
 
-		// Audio streams ...
-		m_ifoFile.Seek(0x202, CFile::begin);
-		m_ifoFile.Read(buffer, AUDIO_BLOCK_SIZE);
-		CGolombBuffer gb_a(buffer, AUDIO_BLOCK_SIZE);
-		int stream_count = gb_a.ReadShort();
-		for (int i = 0; i < min(stream_count, 8); i++) {
-			BYTE Coding_mode = (BYTE)gb_a.BitRead(3);
-			gb_a.BitRead(5);
+		int nb_audstreams = ReadWord();
+		if (nb_audstreams > 8) { nb_audstreams = 8; }
+		// Audio Attributes (0x0204)
+		for (int i = 0; i < nb_audstreams; i++) {
+			m_ifoFile.Read(buf, 8);
 
+			BYTE Coding_mode = buf[0] >> 5;
 			switch (Coding_mode) {
 			case 0: audio_streams[i].format = 0x80; break;
 			case 4: audio_streams[i].format = 0xA0; break;
 			case 6: audio_streams[i].format = 0x88; break;
 			}
 
-			gb_a.ReadByte();
-			char lang[2];
-			gb_a.ReadBuffer((BYTE*)lang, 2);
-
 			if (audio_streams[i].format) {
-				memcpy(audio_streams[i].lang, lang, 2);
+				audio_streams[i].lang[0] = buf[2];
+				audio_streams[i].lang[1] = buf[3];
 			}
-
-			gb_a.ReadDword();
 		}
 
-		// Subtitle streams ...
 		m_ifoFile.Seek(0x254, CFile::begin);
-		m_ifoFile.Read(buffer, SUBTITLE_BLOCK_SIZE);
-		CGolombBuffer gb_s(buffer, SUBTITLE_BLOCK_SIZE);
-		stream_count = gb_s.ReadShort();
-		for (int i = 0; i < min(stream_count, 32); i++) {
-			gb_s.ReadShort();
-			char lang[2];
-			gb_s.ReadBuffer((BYTE*)lang, 2);
+		int nb_substreams = min(ReadWord(), 32);
+		if (nb_substreams > 8) { nb_substreams = 8; }
+		// Subpicture Attributes (0x0256)
+		for (int i = 0; i <nb_substreams; i++) {
+			m_ifoFile.Read(buf, 6);
 
 			subtitle_streams[i].format = 0x20;
-			memcpy(subtitle_streams[i].lang, lang, 2);
-
-			gb_s.ReadShort();
+			subtitle_streams[i].lang[0] = buf[2];
+			subtitle_streams[i].lang[1] = buf[3];
 		}
 
 		// Chapters & duration ...
 		m_ifoFile.Seek(0xCC, CFile::begin); //Get VTS_PGCI adress
 		DWORD posPGCI = ReadDword() * 2048;
 		m_ifoFile.Seek(posPGCI, CFile::begin);
-		WORD nb_PGC = (WORD)ReadShort();
+		WORD nb_PGC = ReadWord();
 
 		CAtlArray<pgc_t> programs;
-		BYTE buf[4];
 
 		for (int prog = 0; prog < nb_PGC; prog++) {
 			m_ifoFile.Seek(posPGCI + 4 + 8 * (prog + 1), CFile::begin);
@@ -645,7 +629,7 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 			for (int i = 0; i < 32; i++) {
 				ReadBuffer(buf, 4);
 				BYTE avail = buf[0] >> 7;	// stream available
-				BYTE ID = buf[1] & 0x1f;		// Stream number for wide (hmm?)
+				BYTE ID = buf[1] & 0x1f;	// Stream number for wide (hmm?)
 
 				if (avail && subtitle_streams[i].format) {
 					programs[prog].subtitles[i].format = subtitle_streams[i].format + ID;
@@ -654,9 +638,9 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 			}
 
 			m_ifoFile.Seek(posPGCI + offsetPGC + 0xE6, CFile::begin);
-			int offsetProgramMap = ReadShort();
-			int offsetCellPlaybackInfoTable = ReadShort();
-			int offsetCellPositionInfoTable = ReadShort();
+			int offsetProgramMap = ReadWord();
+			int offsetCellPlaybackInfoTable = ReadWord();
+			int offsetCellPositionInfoTable = ReadWord();
 
 			for (int chap = 0; chap < nb_programs; chap++) {
 				m_ifoFile.Seek(posPGCI + offsetPGC + offsetProgramMap + chap, CFile::begin);
@@ -716,13 +700,13 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 			}
 		}
 
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < nb_audstreams; i++) {
 			stream_t& audio = programs[selected_prog].audios[i];
 			if (audio.format) {
 				m_pStream_Lang[audio.format] = ISO6391ToLanguage(audio.lang);
 			}
 		}
-		for (int i = 0; i < 32; i++) {
+		for (int i = 0; i < nb_substreams; i++) {
 			stream_t& subtitle = programs[selected_prog].subtitles[i];
 			if (subtitle.format) {
 				m_pStream_Lang[subtitle.format] = ISO6391ToLanguage(subtitle.lang);
@@ -754,7 +738,7 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 		} audio_formats[8];
 
 		for (int i = 0; i < 8; i++) {
-			audio_formats[i].type = ReadShort();
+			audio_formats[i].type = ReadWord();
 			audio_formats[i].format = ReadDword();
 			m_ifoFile.Seek(10, CFile::current);
 		}
