@@ -579,7 +579,7 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 		}
 
 		m_ifoFile.Seek(0x254, CFile::begin);
-		int nb_substreams = min(ReadWord(), 32);
+		int nb_substreams = ReadWord();
 		if (nb_substreams > 8) { nb_substreams = 8; }
 		// Subpicture Attributes (0x0256)
 		for (int i = 0; i <nb_substreams; i++) {
