@@ -68,7 +68,8 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 		ResumeThread(m_hThread);
 	}
 
-	size_t cachelen = KILOBYTE * max(16, min(KILOBYTE, AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PERFOMANCE_CACHE_LENGTH, DEFAULT_CACHE_LENGTH)));
+	size_t cachelen = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PERFOMANCE_CACHE_LENGTH, DEFAULT_CACHE_LENGTH);
+	cachelen = CLAMP(cachelen, 16, 1024) * KILOBYTE;
 	if (!SetCacheSize(cachelen)) {
 		hr = E_OUTOFMEMORY;
 		return;
