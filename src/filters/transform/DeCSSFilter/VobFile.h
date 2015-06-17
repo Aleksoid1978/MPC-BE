@@ -139,7 +139,7 @@ public:
 private:
 	CFile		m_ifoFile;
 	DWORD		ReadDword();
-	SHORT		ReadShort();
+	WORD		ReadWord();
 	BYTE		ReadByte();
 	void		ReadBuffer(BYTE* pBuff, DWORD nLen);
 };
