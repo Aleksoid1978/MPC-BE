@@ -506,6 +506,30 @@ static const AV_Rational IFO_Aspect[4] = {
 	{16, 9}
 };
 
+struct stream_t {
+	byte format;
+	char lang[2];
+};
+
+struct chapter_info_t {
+	REFERENCE_TIME duration;
+	UINT32 first_sector;
+	UINT32 last_sector;
+};
+
+struct pgc_t {
+	REFERENCE_TIME duration;
+	stream_t audios[8];
+	stream_t subtitles[32];
+	CAtlArray<chapter_info_t> chapters;
+
+	pgc_t() {
+		duration = 0;
+		memset(audios, 0, sizeof(audios));
+		memset(subtitles, 0, sizeof(subtitles));
+	}
+};
+
 bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= ALL_PGCs*/)
 {
 	if (fn.Right(6).MakeUpper() != L"_0.IFO") {
@@ -522,15 +546,10 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 	bool isAob = false;
 
 	if (strcmp(hdr, VTS_HEADER) == 0) {
-		// Audio streams ...
-		struct audio_streams_struct {
-			int ToAdd;
-			CString Lang;
-
-			audio_streams_struct() {
-				ToAdd = 0;
-			}
-		} audio_streams[8];
+		stream_t audio_streams[8];
+		stream_t subtitle_streams[32];
+		memset(audio_streams, 0, sizeof(audio_streams));
+		memset(subtitle_streams, 0, sizeof(subtitle_streams));
 
 		BYTE buffer[SUBTITLE_BLOCK_SIZE] = { 0 };
 
@@ -544,6 +563,7 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 			m_Aspect = IFO_Aspect[aspect];
 		}
 
+		// Audio streams ...
 		m_ifoFile.Seek(0x202, CFile::begin);
 		m_ifoFile.Read(buffer, AUDIO_BLOCK_SIZE);
 		CGolombBuffer gb_a(buffer, AUDIO_BLOCK_SIZE);
@@ -551,33 +571,25 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 		for (int i = 0; i < min(stream_count, 8); i++) {
 			BYTE Coding_mode = (BYTE)gb_a.BitRead(3);
 			gb_a.BitRead(5);
-			int ToAdd = 0;
+
 			switch (Coding_mode) {
-			case 0:
-				ToAdd = 0x80;
-				break;
-			case 4:
-				ToAdd = 0xA0;
-				break;
-			case 6:
-				ToAdd = 0x88;
-				break;
-			default:
-				break;
+			case 0: audio_streams[i].format = 0x80; break;
+			case 4: audio_streams[i].format = 0xA0; break;
+			case 6: audio_streams[i].format = 0x88; break;
 			}
+
 			gb_a.ReadByte();
 			char lang[2];
 			gb_a.ReadBuffer((BYTE*)lang, 2);
-			gb_a.ReadDword();
-			if (ToAdd) {
-				audio_streams[i].ToAdd = ToAdd;
-				audio_streams[i].Lang = ISO6391ToLanguage(lang);
+
+			if (audio_streams[i].format) {
+				memcpy(audio_streams[i].lang, lang, 2);
 			}
+
+			gb_a.ReadDword();
 		}
 
 		// Subtitle streams ...
-		CString subtitle_streams[32];
-
 		m_ifoFile.Seek(0x254, CFile::begin);
 		m_ifoFile.Read(buffer, SUBTITLE_BLOCK_SIZE);
 		CGolombBuffer gb_s(buffer, SUBTITLE_BLOCK_SIZE);
@@ -586,98 +598,92 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 			gb_s.ReadShort();
 			char lang[2];
 			gb_s.ReadBuffer((BYTE*)lang, 2);
+
+			subtitle_streams[i].format = 0x20;
+			memcpy(subtitle_streams[i].lang, lang, 2);
+
 			gb_s.ReadShort();
-			subtitle_streams[i] = ISO6391ToLanguage(lang);
 		}
 
 		// Chapters & duration ...
 		m_ifoFile.Seek(0xCC, CFile::begin); //Get VTS_PGCI adress
-		DWORD pcgITPosition = ReadDword() * 2048;
-		m_ifoFile.Seek(pcgITPosition, CFile::begin);
-		WORD NumberOfProgramChains = (WORD)ReadShort();
+		DWORD posPGCI = ReadDword() * 2048;
+		m_ifoFile.Seek(posPGCI, CFile::begin);
+		WORD nb_PGC = (WORD)ReadShort();
 
-		struct program_t {
-			CAtlMap<DWORD, CString> streams;
-			CAtlArray<chapter_t> chapters;
-			REFERENCE_TIME duration;
-		};
-		CAtlArray<program_t> programs;
+		CAtlArray<pgc_t> programs;
+		BYTE buf[4];
 
-		for (int prog = 0; prog < NumberOfProgramChains; prog++) {
-			m_ifoFile.Seek(pcgITPosition + 4 + 8 * (prog + 1), CFile::begin);
-			DWORD chainOffset = ReadDword();
-			m_ifoFile.Seek(pcgITPosition + chainOffset + 2, CFile::begin);
-			BYTE programChainPrograms = ReadByte();
+		for (int prog = 0; prog < nb_PGC; prog++) {
+			m_ifoFile.Seek(posPGCI + 4 + 8 * (prog + 1), CFile::begin);
+			DWORD offsetPGC = ReadDword();
+			m_ifoFile.Seek(posPGCI + offsetPGC, CFile::begin);
 
 			programs.Add();
-			programs[prog].duration = 0;
+
+			// PGC header
+			m_ifoFile.Seek(2, CFile::current);
+			int nb_programs = ReadByte();
+			int nb_cells = ReadByte();
+			ReadBuffer(buf, 4);
+			REFERENCE_TIME playback_time = FormatTime(buf);
 
 			// PGC_AST_CTL
-			m_ifoFile.Seek(pcgITPosition + chainOffset + 0x0C, CFile::begin);
+			m_ifoFile.Seek(posPGCI + offsetPGC + 0x0C, CFile::begin);
 			for (int i = 0; i < 8; i++) {
-				BYTE tmp = ReadByte();
-				BYTE avail = tmp >> 7;	// stream available
-				BYTE ID = tmp & ~0x80;	// Stream number (MPEG audio) or Substream number (all others)
+				ReadBuffer(buf, 2);
+				BYTE avail = buf[0] >> 7;	// stream available
+				BYTE ID = buf[0] & 0x07;	// Stream number (MPEG audio) or Substream number (all others)
 
-				if (avail && audio_streams[i].ToAdd) {
-					programs[prog].streams[audio_streams[i].ToAdd + ID] = audio_streams[i].Lang;
+				if (avail && audio_streams[i].format) {
+					programs[prog].audios[i].format = audio_streams[i].format + ID;
+					memcpy(programs[prog].audios[i].lang, audio_streams[i].lang, 2);
 				}
-
-				m_ifoFile.Seek(1, CFile::current);
 			}
 
 			// PGC_SPST_CTL
-			m_ifoFile.Seek(pcgITPosition + chainOffset + 0x1C, CFile::begin);
 			for (int i = 0; i < 32; i++) {
-				BYTE avail = ReadByte() >> 7;	// stream available
-				BYTE ID = ReadByte();			// Stream number for wide
+				ReadBuffer(buf, 4);
+				BYTE avail = buf[0] >> 7;	// stream available
+				BYTE ID = buf[1] & 0x1f;		// Stream number for wide (hmm?)
 
-				if (avail && !subtitle_streams[i].IsEmpty()) {
-					programs[prog].streams[0x20 + ID] = subtitle_streams[i];
+				if (avail && subtitle_streams[i].format) {
+					programs[prog].subtitles[i].format = subtitle_streams[i].format + ID;
+					memcpy(programs[prog].subtitles[i].lang, subtitle_streams[i].lang, 2);
 				}
-
-				m_ifoFile.Seek(2, CFile::current);
 			}
 
-			m_ifoFile.Seek(pcgITPosition + chainOffset + 230, CFile::begin);
-			int programMapOffset = ReadShort();
-			m_ifoFile.Seek(pcgITPosition + chainOffset + 0xE8, CFile::begin);
-			int cellTableOffset = ReadShort();
+			m_ifoFile.Seek(posPGCI + offsetPGC + 0xE6, CFile::begin);
+			int offsetProgramMap = ReadShort();
+			int offsetCellPlaybackInfoTable = ReadShort();
+			int offsetCellPositionInfoTable = ReadShort();
 
-			for (int chap = 0; chap < programChainPrograms; chap++) {
-				m_ifoFile.Seek(pcgITPosition + chainOffset + programMapOffset + chap, CFile::begin);
+			for (int chap = 0; chap < nb_programs; chap++) {
+				m_ifoFile.Seek(posPGCI + offsetPGC + offsetProgramMap + chap, CFile::begin);
 				byte entryCell = ReadByte();
 				byte exitCell = entryCell;
-				if (chap < (programChainPrograms - 1)){
-					m_ifoFile.Seek(pcgITPosition + chainOffset + programMapOffset + (chap + 1), CFile::begin);
+				if (chap < (nb_programs - 1)){
+					m_ifoFile.Seek(posPGCI + offsetPGC + offsetProgramMap + (chap + 1), CFile::begin);
 					exitCell = ReadByte() - 1;
 				}
 
-				chapter_t chapter;
+				chapter_info_t chapter;
 				chapter.first_sector = UINT32_MAX;
 				chapter.last_sector = 0;
-				chapter.rtime = 0;
+				chapter.duration = 0;
 
-				for (int currentCell = entryCell; currentCell <= exitCell; currentCell++) {
-					int cellStart = cellTableOffset + ((currentCell - 1) * 0x18);
-
+				for (int cell = entryCell; cell <= exitCell; cell++) {
 					// cell playback time
-					m_ifoFile.Seek(pcgITPosition + chainOffset + cellStart, CFile::begin);
-					BYTE bytes[4];
-					ReadBuffer(bytes, 4);
-					int cellType = bytes[0] >> 6;
+					m_ifoFile.Seek(posPGCI + offsetPGC + offsetCellPlaybackInfoTable + (cell-1)*0x18, CFile::begin);
+					ReadBuffer(buf, 4);
+					int cellType = buf[0] >> 6;
 					if (cellType == 0x00 || cellType == 0x01){
-						m_ifoFile.Seek(pcgITPosition + chainOffset + cellStart + 4, CFile::begin);
-						ReadBuffer(bytes, 4);
-						chapter.rtime += FormatTime(bytes);
+						ReadBuffer(buf, 4);
+						chapter.duration += FormatTime(buf);
 					}
-
-					// first VOBU start sector
-					m_ifoFile.Seek(pcgITPosition + chainOffset + cellStart + 8, CFile::begin);
-					DWORD firstVOBUStartSector = ReadDword();
-					// last VOBU end sector
-					m_ifoFile.Seek(pcgITPosition + chainOffset + cellStart + 20, CFile::begin);
-					DWORD lastVOBUEndSector = ReadDword();
+					DWORD firstVOBUStartSector = ReadDword(); // first VOBU start sector
+					m_ifoFile.Seek(8, CFile::current);
+					DWORD lastVOBUEndSector = ReadDword(); // last VOBU end sector
 
 					if (chapter.first_sector > firstVOBUStartSector) {
 						chapter.first_sector = firstVOBUStartSector;
@@ -687,13 +693,13 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 					}
 				}
 
-				CAtlArray<chapter_t>& chapters = programs[prog].chapters;
+				CAtlArray<chapter_info_t>& chapters = programs[prog].chapters;
 				if (chapters.GetCount() && chapters[chapters.GetCount()-1].last_sector + 1 != chapter.first_sector) {
 					break; // ignore jumps
 				}
 
 				programs[prog].chapters.Add(chapter);
-				programs[prog].duration += chapter.rtime;
+				programs[prog].duration += chapter.duration;
 			}
 		}
 
@@ -702,7 +708,7 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 			selected_prog = nProgNum - 1;
 		} else {
 			REFERENCE_TIME longest_dur = 0;
-			for (int prog = 0; prog < NumberOfProgramChains; prog++) {
+			for (int prog = 0; prog < nb_PGC; prog++) {
 				if (programs[prog].duration > longest_dur) {
 					longest_dur = programs[prog].duration;
 					selected_prog = prog;
@@ -710,22 +716,32 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 			}
 		}
 
-		CAtlMap<DWORD, CString>& streams = programs[selected_prog].streams;
-		CAtlArray<chapter_t>& chapters = programs[selected_prog].chapters;
-		for (POSITION pos = streams.GetStartPosition(); pos != NULL;) {
-			DWORD key;
-			CString value;
-			streams.GetNextAssoc(pos, key, value);
-			m_pStream_Lang[key] = value;
+		for (int i = 0; i < 8; i++) {
+			stream_t& audio = programs[selected_prog].audios[i];
+			if (audio.format) {
+				m_pStream_Lang[audio.format] = ISO6391ToLanguage(audio.lang);
+			}
 		}
+		for (int i = 0; i < 32; i++) {
+			stream_t& subtitle = programs[selected_prog].subtitles[i];
+			if (subtitle.format) {
+				m_pStream_Lang[subtitle.format] = ISO6391ToLanguage(subtitle.lang);
+			}
+		}
+
 		m_rtDuration = programs[selected_prog].duration;
-		m_pChapters.Append(chapters);
-		// correct chapters times
+
+		CAtlArray<chapter_info_t>& chapters = programs[selected_prog].chapters;
 		REFERENCE_TIME time = 0;
-		for (int chap = 0; chap < (int)m_pChapters.GetCount(); chap++) {
-			REFERENCE_TIME duration = m_pChapters[chap].rtime;
-			m_pChapters[chap].rtime += time;
-			time += duration;
+		for (size_t i = 0; i < chapters.GetCount(); i++) {
+			chapter_t chapter;
+			chapter.first_sector = chapters[i].first_sector;
+			chapter.last_sector = chapters[i].last_sector;
+			chapter.title = chapter.track = 0;
+			chapter.rtime = time;
+
+			m_pChapters.Add(chapter);
+			time += chapters[i].duration;
 		}
 		ASSERT(time == m_rtDuration);
 	}
