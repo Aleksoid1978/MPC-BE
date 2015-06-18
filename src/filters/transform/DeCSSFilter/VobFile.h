@@ -78,12 +78,6 @@ public:
 
 class CVobFile : public CDVDSession
 {
-	// all files
-	struct file_t {
-		CString fn;
-		int size;
-	};
-
 	struct chapter_t {
 		REFERENCE_TIME rtime;
 		UINT32 first_sector;
@@ -91,12 +85,19 @@ class CVobFile : public CDVDSession
 		UINT32 title:16, track:8;
 	};
 
-	CAtlArray<file_t> m_files;
-	int m_iFile;
-	int m_pos, m_size, m_offset;
+	// all files
+	struct file_t {
+		CString fn;
+		int size;
+	};
+	CAtlArray<file_t> m_files;	// group of vob files
+	int m_offset;				// first sector for group of vob files
+	int m_size;					// last sector for group of vob files
+	int m_pos;					// current sector for group of vob files
 
 	// currently opened file
-	CLBAFile m_file;
+	int m_iFile;				// current vob file index
+	CLBAFile m_file;			// current vob file
 
 	// attribs
 	bool m_fDVD, m_fHasDiscKey, m_fHasTitleKey;
