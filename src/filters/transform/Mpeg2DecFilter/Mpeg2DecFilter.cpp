@@ -66,9 +66,9 @@ protected:
 					return 0;
 				case CMpeg2DecFilter::CNTRL_REDRAW:
 					Reply(S_OK);
-					if (m_pMpeg2DecFilter->IsGraphRunning()) {
+					if (m_pMpeg2DecFilter->IsGraphRunning() && m_pMpeg2DecFilter->IsNeedDeliverToRenderer()) {
 						m_pMpeg2DecFilter->DeliverToRenderer();
-						if (m_pMpeg2DecFilter->IsInterlacedEnabled()) {
+						if (m_pMpeg2DecFilter->IsInterlaced()) {
 							m_pMpeg2DecFilter->DeliverToRenderer(); // TODO ???
 						}
 					}
@@ -237,6 +237,20 @@ CMpeg2DecFilterApp theApp;
 
 #endif
 
+inline const LONGLONG GetPerfCounter()
+{
+	LARGE_INTEGER llPerfFrequency = { 0 };
+	QueryPerformanceFrequency(&llPerfFrequency);
+	if (llPerfFrequency.QuadPart != 0) {
+		LARGE_INTEGER llPerfCounter;
+		QueryPerformanceCounter(&llPerfCounter);
+		return llMulDiv(llPerfCounter.QuadPart, 10000000, llPerfFrequency.QuadPart, 0);
+	} else {
+		// ms to 100ns units
+		return timeGetTime() * 10000;
+	}
+}
+
 //
 // CMpeg2DecFilter
 //
@@ -246,6 +260,7 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_fWaitForKeyFrame(true)
 	, m_ControlThread(NULL)
 	, m_ditype(DIAuto)
+	, m_llLastDecodeTime(0)
 {
 	if (FAILED(*phr)) {
 		return;
@@ -514,10 +529,8 @@ void CMpeg2DecFilter::SetDeinterlaceMethod()
 			&& !(oldflags & PIC_FLAG_REPEAT_FIRST_FIELD)
 			&& (newflags & PIC_FLAG_PROGRESSIVE_FRAME)) {
 		if (!m_fFilm && (newflags & PIC_FLAG_REPEAT_FIRST_FIELD)) {
-			TRACE(_T("m_fFilm = true\n"));
 			m_fFilm = true;
 		} else if (m_fFilm && !(newflags & PIC_FLAG_REPEAT_FIRST_FIELD)) {
-			TRACE(_T("m_fFilm = false\n"));
 			m_fFilm = false;
 		}
 	}
@@ -771,6 +784,8 @@ HRESULT CMpeg2DecFilter::Deliver()
 		}
 	}
 
+	m_llLastDecodeTime = GetPerfCounter();
+
 	return S_OK;
 }
 
@@ -984,6 +999,22 @@ bool CMpeg2DecFilter::IsGraphRunning() const
 		OAFilterState fs = State_Stopped;
 		pMC->GetState(0, &fs);
 		return (fs == State_Running);
+	}
+
+	return false;
+}
+
+bool CMpeg2DecFilter::IsNeedDeliverToRenderer() const
+{
+	LONGLONG llCurTime = GetPerfCounter();
+	return (llCurTime - m_llLastDecodeTime > m_AvgTimePerFrame);
+}
+
+bool CMpeg2DecFilter::IsInterlaced() const
+{
+	if (m_dec && m_fInterlaced
+			&& !(m_dec->m_info.m_sequence->flags & SEQ_FLAG_PROGRESSIVE_SEQUENCE || m_fFilm)) {
+		return true;
 	}
 
 	return false;
