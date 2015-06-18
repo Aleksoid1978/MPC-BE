@@ -105,6 +105,8 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478"))
 
 	AM_SimpleRateChange m_rate;
 
+	LONGLONG m_llLastDecodeTime;
+
 protected:
 	void InputTypeChanged();
 
@@ -144,6 +146,8 @@ public:
 	HRESULT AlterQuality(Quality q);
 
 	bool IsGraphRunning() const;
+	bool IsNeedDeliverToRenderer() const;
+	bool IsInterlaced() const;
 
 protected:
 	CCritSec m_csProps;
