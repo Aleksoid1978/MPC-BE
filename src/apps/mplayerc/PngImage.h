@@ -58,4 +58,6 @@ public:
 	bool	PaintExternalGradient(CDC* dc, CRect r, int ptop, int br = -1, int rc = -1, int gc = -1, int bc = -1);
 
 	const bool IsExtGradiendLoading() { return m_ExtGradientHB && m_width && m_height && m_bpp; };
+
+	CSize GetSize() const;
 };

@@ -3188,10 +3188,6 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 		m_wndToolBar.Invalidate();
 	}
 
-	if (m_bAudioOnly) {
-		SetDwmPreview();
-	}
-
 	return 0L;
 }
 
@@ -4009,6 +4005,10 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		ToggleFullscreen(true, true);
 	}
 
+	if (m_bAudioOnly) {
+		SetAudioPicture();
+	}
+
 	{
 		WINDOWPLACEMENT wp;
 		wp.length = sizeof(wp);
@@ -4158,7 +4158,7 @@ void CMainFrame::OnFilePostCloseMedia()
 
 	UnloadExternalObjects();
 
-	SetDwmPreview(FALSE);
+	SetAudioPicture(FALSE);
 	m_wndToolBar.SwitchTheme();
 
 	if (m_bNeedUnmountImage) {
@@ -10015,8 +10015,11 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 			monitor = CMonitors::GetNearestMonitor(this);
 		}
 
-		SetWindowPos(NULL, 0, 0, windowSize.cx, windowSize.cy, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
-		monitor.CenterWindowToMonitor(this, TRUE);
+		MINMAXINFO mmi;
+		OnGetMinMaxInfo(&mmi);
+		CRect windowRect(0, 0, max(windowSize.cx, mmi.ptMinTrackSize.x), max(windowSize.cy, mmi.ptMinTrackSize.y));
+		monitor.CenterRectToMonitor(windowRect, TRUE);
+		SetWindowPos(NULL, windowRect.left, windowRect.top, windowSize.cx, windowSize.cy, SWP_NOZORDER | SWP_NOACTIVATE);
 	}
 
 	if (s.fRememberWindowSize && s.fRememberWindowPos) {
@@ -10699,7 +10702,7 @@ void CMainFrame::HideVideoWindow(bool fHide)
 
 void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 {
-	if (m_eMediaLoadState != MLS_LOADED || m_bAudioOnly) {
+	if (m_eMediaLoadState != MLS_LOADED) {
 		return;
 	}
 
@@ -10725,49 +10728,49 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 	GetWindowRect(r);
 	int w = 0, h = 0;
 
-	if (!m_bAudioOnly) {
-		CSize arxy = GetVideoSize();
-
-		long lWidth = int(arxy.cx * scale + 0.5);
-		long lHeight = int(arxy.cy * scale + 0.5);
-
-		DWORD style = GetStyle();
-
-		CRect r1, r2;
-		GetClientRect(&r1);
-		m_wndView.GetClientRect(&r2);
-
-		w = r1.Width() - r2.Width() + lWidth;
-		h = r1.Height() - r2.Height() + lHeight;
-
-		if (style & WS_THICKFRAME) {
-			w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
-			h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-			if ( (style & WS_CAPTION) == 0 ) {
-				w -= 2;
-				h -= 2;
-			}
-		}
-
-		if ( style & WS_CAPTION ) {
-			h += GetSystemMetrics( SM_CYCAPTION );
-			if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
-				h += GetSystemMetrics( SM_CYMENU );
-			}
-			//else MODE_HIDEMENU
-		}
-
-		if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && !m_bFullScreen && !m_wndNavigationBar.IsVisible()) {
-			CSize r = m_wndNavigationBar.CalcFixedLayout(FALSE, TRUE);
-			w += r.cx;
-		}
-
-		w = max(w, mmi.ptMinTrackSize.x);
-		h = max(h, mmi.ptMinTrackSize.y);
-	} else {
-		w = r.Width(); // mmi.ptMinTrackSize.x;
-		h = mmi.ptMinTrackSize.y;
+	CSize videoSize = GetVideoSize();
+	if (m_bAudioOnly) {
+		videoSize = !m_InternalImage.IsNull() ? m_InternalImage.GetSize() : m_wndView.GetLogoSize();
+		videoSize.cx = max(videoSize.cx, DEFCLIENTW);
+		videoSize.cy = max(videoSize.cy, DEFCLIENTH);
 	}
+
+	long lWidth = long(videoSize.cx * scale + 0.5);
+	long lHeight = long(videoSize.cy * scale + 0.5);
+
+	DWORD style = GetStyle();
+
+	CRect r1, r2;
+	GetClientRect(&r1);
+	m_wndView.GetClientRect(&r2);
+
+	w = r1.Width() - r2.Width() + lWidth;
+	h = r1.Height() - r2.Height() + lHeight;
+
+	if (style & WS_THICKFRAME) {
+		w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
+		h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
+		if ( (style & WS_CAPTION) == 0 ) {
+			w -= 2;
+			h -= 2;
+		}
+	}
+
+	if ( style & WS_CAPTION ) {
+		h += GetSystemMetrics( SM_CYCAPTION );
+		if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
+			h += GetSystemMetrics( SM_CYMENU );
+		}
+		//else MODE_HIDEMENU
+	}
+
+	if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && !m_bFullScreen && !m_wndNavigationBar.IsVisible()) {
+		CSize r = m_wndNavigationBar.CalcFixedLayout(FALSE, TRUE);
+		w += r.cx;
+	}
+
+	w = max(w, mmi.ptMinTrackSize.x);
+	h = max(h, mmi.ptMinTrackSize.y);
 
 	// Prevention of going beyond the scopes of screen
 	MONITORINFO mi = { sizeof(mi) };
@@ -13190,7 +13193,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 {
 	ASSERT(m_eMediaLoadState == MLS_LOADING);
 
-	SetDwmPreview(FALSE);
+	SetAudioPicture(FALSE);
 
 	m_fValidDVDOpen	= false;
 
@@ -18213,8 +18216,7 @@ CString GetCoverImgFromPath(CString fullfilename)
 	return _T("");
 }
 
-/* this is for custom draw in windows 7 preview */
-HRESULT CMainFrame::SetDwmPreview(BOOL show)
+HRESULT CMainFrame::SetAudioPicture(BOOL show)
 {
 	BOOL set = AfxGetAppSettings().fUseWin7TaskBar && m_bAudioOnly && IsSomethingLoaded();
 	if (!show) { // forcing off custom preview bitmap ...
@@ -18228,6 +18230,7 @@ HRESULT CMainFrame::SetDwmPreview(BOOL show)
 	m_ThumbCashedSize.SetSize(0, 0);
 
 	if (IsWinSevenOrLater() && m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
+		/* this is for custom draw in windows 7 preview */
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_HAS_ICONIC_BITMAP, &set, sizeof(set));
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &set, sizeof(set));
 	}

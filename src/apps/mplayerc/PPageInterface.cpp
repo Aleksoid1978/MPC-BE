@@ -240,7 +240,7 @@ BOOL CPPageInterface::OnApply()
 
 	pFrame->CreateThumbnailToolbar();
 	pFrame->UpdateThumbarButton();
-	pFrame->SetDwmPreview();
+	pFrame->SetAudioPicture();
 
 	pFrame->Invalidate();
 
