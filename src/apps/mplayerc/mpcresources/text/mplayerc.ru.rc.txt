@@ -1916,7 +1916,7 @@ STRING IDS_VOLUME_GAIN_MAX		"Усиление громкости - максим�
 STRING IDS_VOLUME_GAIN_OFF		"Усиление громкости - выключить"
 STRING IDS_VOLUME_OSD		"Громкость: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Громкость: %d%% [Выкл.]"
-STRING IDS_VTSREADER_LOAD_PGC		"Считывать все ""программы"" для расч. длительности"
+STRING IDS_VTSREADER_LOAD_PGC		"Enable a choice of Title"
 STRING IDS_WEBSERVER_ERROR_TEST		"Вы должны применить новые настройки перед их использованием"
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"

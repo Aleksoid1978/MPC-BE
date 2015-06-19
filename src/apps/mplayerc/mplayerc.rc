@@ -2822,7 +2822,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Load Embedded Fonts"
     IDS_MKVSPLT_CALC_DURATION       "Calculate the duration based on the video data"
-    IDS_VTSREADER_LOAD_PGC        "Read All Program Chains (calculate duration)"
+    IDS_VTSREADER_LOAD_PGC          "Enable a choice of Title"
 END
 
 STRINGTABLE

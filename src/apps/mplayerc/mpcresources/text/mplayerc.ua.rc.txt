@@ -1916,7 +1916,7 @@ STRING IDS_VOLUME_GAIN_MAX		"Підсилення гучності - Макси�
 STRING IDS_VOLUME_GAIN_OFF		"Підсилення гучності - Мінімально"
 STRING IDS_VOLUME_OSD		"Гучн.: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"Гучн.: %d%% [Без звуку]"
-STRING IDS_VTSREADER_LOAD_PGC		"Читати усі ланцюжки програм (розраховувати тривалість)"
+STRING IDS_VTSREADER_LOAD_PGC		"Enable a choice of Title"
 STRING IDS_WEBSERVER_ERROR_TEST		"Вам необхідно застосувати нові налаштування перед тим, як їх тестувати."
 STRING IDS_ZOOM1		"Збільшення 1"
 STRING IDS_ZOOM2		"Збільшення 2"

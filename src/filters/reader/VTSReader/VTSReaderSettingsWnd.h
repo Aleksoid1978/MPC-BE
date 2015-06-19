@@ -30,7 +30,7 @@ class __declspec(uuid("BA18CEF2-319A-4A1F-B2CB-BCB53F6ABDE5"))
 private :
 	CComQIPtr<IVTSReader> m_pMSF;
 
-	CButton m_cbReadAllProgramChains;
+	CButton m_cbEnableTitleSelection;
 
 public:
 	CVTSReaderSettingsWnd(void);

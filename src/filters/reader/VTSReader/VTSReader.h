@@ -47,7 +47,7 @@ public:
 	CVTSStream();
 	virtual ~CVTSStream();
 
-	bool Load(const WCHAR* fnw, bool bReadAllProgramChains);
+	bool Load(const WCHAR* fnw, bool bEnableTitleSelection);
 
 	HRESULT SetPointer(LONGLONG llPos);
 	HRESULT Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWORD pdwBytesRead);
@@ -79,7 +79,7 @@ class __declspec(uuid("773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73"))
 
 private:
 	CCritSec m_csProps;
-	bool m_bReadAllProgramChains;
+	bool m_bEnableTitleSelection;
 
 public:
 	CVTSReader(IUnknown* pUnk, HRESULT* phr);
@@ -112,8 +112,8 @@ public:
 	// IVTSReader
 	STDMETHODIMP Apply();
 
-	STDMETHODIMP SetReadAllProgramChains(BOOL nValue);
-	STDMETHODIMP_(BOOL) GetReadAllProgramChains();
+	STDMETHODIMP SetEnableTitleSelection(BOOL nValue);
+	STDMETHODIMP_(BOOL) GetEnableTitleSelection();
 
 	STDMETHODIMP_(REFERENCE_TIME) GetDuration();
 	STDMETHODIMP_(AV_Rational) GetAspect();
