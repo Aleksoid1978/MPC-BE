@@ -301,7 +301,7 @@ CVTSStream::~CVTSStream()
 bool CVTSStream::Load(const WCHAR* fnw, bool bReadAllProgramChains)
 {
 	CAtlList<CString> sl;
-	return (m_vob && m_vob->OpenIFO(fnw, sl, bReadAllProgramChains ? ALL_PGCs : 1));
+	return (m_vob && m_vob->OpenIFO(fnw, sl, bReadAllProgramChains ? 0 : 1));
 }
 
 HRESULT CVTSStream::SetPointer(LONGLONG llPos)
