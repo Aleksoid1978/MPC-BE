@@ -520,6 +520,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_FFV1:
         case AP4_ATOM_TYPE_R10g:
         case AP4_ATOM_TYPE_R10k:
+        case AP4_ATOM_TYPE_OVC1:
             atom = new AP4_VisualSampleEntry(type, size, stream, *this);
             break;
 

@@ -151,6 +151,9 @@ void SetTrackName(CString *TrackName, CString Suffix)
 }
 
 #define FormatTrackName(name, append)			\
+	if (!tname.IsEmpty() && tname[0] < 0x20) {	\
+		tname.Delete(0);						\
+	}											\
 	if (tname.IsEmpty()) {						\
 		tname = name;							\
 	} else if (append) {						\
@@ -756,6 +759,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							FormatTrackName(_T("Sorenson"), 0);
 						} else if (type == AP4_ATOM_TYPE_CVID) {
 							FormatTrackName(_T("Cinepack"), 0);
+						} else if (type == AP4_ATOM_TYPE_OVC1) {
+							fourcc = FCC('WVC1');
+							FormatTrackName(_T("VC-1"), 0);
 						} else if (type == AP4_ATOM_TYPE_RAW) {
 							fourcc = BI_RGB;
 						}
