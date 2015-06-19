@@ -27,8 +27,6 @@
 
 #include "../../../DSUtil/DSUtil.h"
 
-#define ALL_PGCs	ULONG_MAX
-
 class CDVDSession
 {
 protected:
@@ -119,7 +117,7 @@ public:
 	bool HasDiscKey(BYTE* key) const;
 	bool HasTitleKey(BYTE* key) const;
 
-	bool OpenIFO(CString fn, CAtlList<CString>& files /* out */, ULONG nProgNum = ALL_PGCs); // vts ifo
+	bool OpenIFO(CString fn, CAtlList<CString>& files /* out */, ULONG nProgNum = 0); // vts ifo
 	bool OpenVOBs(const CAtlList<CString>& files); // vts vobs
 	bool SetOffsets(int start_sector, int end_sector = -1); // video vob offset in lba
 	void Close();
