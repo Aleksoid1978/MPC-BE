@@ -482,15 +482,19 @@ bool CVobFile::GetTitleInfo(LPCTSTR fn, ULONG nTitleNum, ULONG& VTSN, ULONG& TTN
 	return true;
 }
 
+int BCD2Dec(int BCD)
+{
+	return (BCD/0x10)*10 + (BCD%0x10);
+}
+
 static REFERENCE_TIME FormatTime(BYTE *bytes)
 {
 	short frames	= GetFrames(bytes[3]);
 	int fpsMask		= bytes[3] >> 6;
 	double fps		= fpsMask == 0x01 ? 25 : fpsMask == 0x03 ? (30 / 1.001): 0;
-	CStringA tmp;
-	int hours		= bytes[0]; tmp.Format("%x", hours);	sscanf_s(tmp, "%d", &hours);
-	int minutes		= bytes[1]; tmp.Format("%x", minutes);	sscanf_s(tmp, "%d", &minutes);
-	int seconds		= bytes[2]; tmp.Format("%x", seconds);	sscanf_s(tmp, "%d", &seconds);
+	int hours		= BCD2Dec(bytes[0]);
+	int minutes		= BCD2Dec(bytes[1]);
+	int seconds		= BCD2Dec(bytes[2]);
 	int mmseconds = 0;
 	if (fps != 0){
 		mmseconds = (int)(1000 * frames / fps);
@@ -546,6 +550,9 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= A
 	bool isAob = false;
 
 	if (strcmp(hdr, VTS_HEADER) == 0) {
+		// http://dvdnav.mplayerhq.hu/dvdinfo/index.html
+		// http://dvd.sourceforge.net/dvdinfo/index.html
+
 		BYTE buf[8];
 
 		stream_t audio_streams[8];
