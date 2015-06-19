@@ -10730,6 +10730,7 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 
 	CSize videoSize = GetVideoSize();
 	if (m_bAudioOnly) {
+		scale = min(1.0, scale);
 		videoSize = !m_InternalImage.IsNull() ? m_InternalImage.GetSize() : m_wndView.GetLogoSize();
 		videoSize.cx = max(videoSize.cx, DEFCLIENTW);
 		videoSize.cy = max(videoSize.cy, DEFCLIENTH);
