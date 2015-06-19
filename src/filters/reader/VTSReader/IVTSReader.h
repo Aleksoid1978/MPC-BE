@@ -27,8 +27,8 @@ IVTSReader :
 public IUnknown {
 	STDMETHOD(Apply()) PURE;
 
-	STDMETHOD(SetReadAllProgramChains(BOOL nValue)) PURE;
-	STDMETHOD_(BOOL, GetReadAllProgramChains()) PURE;
+	STDMETHOD(SetEnableTitleSelection(BOOL nValue)) PURE;
+	STDMETHOD_(BOOL, GetEnableTitleSelection()) PURE;
 
 	STDMETHOD_(REFERENCE_TIME, GetDuration()) PURE;
 	STDMETHOD_(AV_Rational, GetAspect()) PURE;

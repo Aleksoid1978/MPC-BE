@@ -62,7 +62,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_FILTER_SETTINGS_CAPTION "Settings"
-    IDS_VTSREADER_LOAD_PGC      "Read All Program Chains (calculate duration)"
+    IDS_VTSREADER_LOAD_PGC      "Enable a choice of Title"
     IDS_AG_CHAPTER              "Chapter %d"
 END
 

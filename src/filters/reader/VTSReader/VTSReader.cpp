@@ -27,7 +27,7 @@
 // option names
 #define OPT_REGKEY_VTSReader		_T("Software\\MPC-BE Filters\\VTS Reader")
 #define OPT_SECTION_VTSReader		_T("Filters\\VTS Reader")
-#define OPT_ReadAllProgramChains	_T("ReadAllProgramChains")
+#define OPT_EnableTitleSelection	_T("EnableTitleSelection")
 
 #ifdef REGISTER_FILTER
 
@@ -85,7 +85,7 @@ CFilterApp theApp;
 
 CVTSReader::CVTSReader(IUnknown* pUnk, HRESULT* phr)
 	: CAsyncReader(NAME("CVTSReader"), pUnk, &m_stream, phr, __uuidof(this))
-	, m_bReadAllProgramChains(false)
+	, m_bEnableTitleSelection(false)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -97,12 +97,12 @@ CVTSReader::CVTSReader(IUnknown* pUnk, HRESULT* phr)
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_VTSReader, KEY_READ)) {
 		DWORD dw;
 
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ReadAllProgramChains, dw)) {
-			m_bReadAllProgramChains = !!dw;
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_EnableTitleSelection, dw)) {
+			m_bEnableTitleSelection = !!dw;
 		}
 	}
 #else
-	m_bReadAllProgramChains = !!AfxGetApp()->GetProfileInt(OPT_SECTION_VTSReader, OPT_ReadAllProgramChains, m_bReadAllProgramChains);
+	m_bEnableTitleSelection = !!AfxGetApp()->GetProfileInt(OPT_SECTION_VTSReader, OPT_EnableTitleSelection, m_bEnableTitleSelection);
 #endif
 
 }
@@ -143,7 +143,7 @@ STDMETHODIMP CVTSReader::QueryFilterInfo(FILTER_INFO* pInfo)
 
 STDMETHODIMP CVTSReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 {
-	if (!m_stream.Load(pszFileName, m_bReadAllProgramChains)) {
+	if (!m_stream.Load(pszFileName, m_bEnableTitleSelection)) {
 		return E_FAIL;
 	}
 
@@ -254,26 +254,26 @@ STDMETHODIMP CVTSReader::Apply()
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_VTSReader)) {
-		key.SetDWORDValue(OPT_ReadAllProgramChains, m_bReadAllProgramChains);
+		key.SetDWORDValue(OPT_EnableTitleSelection, m_bEnableTitleSelection);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VTSReader, OPT_ReadAllProgramChains, m_bReadAllProgramChains);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_VTSReader, OPT_EnableTitleSelection, m_bEnableTitleSelection);
 #endif
 
 	return S_OK;
 }
 
-STDMETHODIMP CVTSReader::SetReadAllProgramChains(BOOL nValue)
+STDMETHODIMP CVTSReader::SetEnableTitleSelection(BOOL nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	m_bReadAllProgramChains = !!nValue;
+	m_bEnableTitleSelection = !!nValue;
 	return S_OK;
 }
 
-STDMETHODIMP_(BOOL) CVTSReader::GetReadAllProgramChains()
+STDMETHODIMP_(BOOL) CVTSReader::GetEnableTitleSelection()
 {
 	CAutoLock cAutoLock(&m_csProps);
-	return m_bReadAllProgramChains;
+	return m_bEnableTitleSelection;
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CVTSReader::GetDuration()
@@ -298,10 +298,11 @@ CVTSStream::~CVTSStream()
 {
 }
 
-bool CVTSStream::Load(const WCHAR* fnw, bool bReadAllProgramChains)
+bool CVTSStream::Load(const WCHAR* fnw, bool bEnableTitleSelection)
 {
+	// TODO bEnableTitleSelection
 	CAtlList<CString> sl;
-	return (m_vob && m_vob->OpenIFO(fnw, sl, bReadAllProgramChains ? 0 : 1));
+	return (m_vob && m_vob->OpenIFO(fnw, sl, 0));
 }
 
 HRESULT CVTSStream::SetPointer(LONGLONG llPos)

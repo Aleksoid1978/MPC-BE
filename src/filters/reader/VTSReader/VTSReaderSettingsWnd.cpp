@@ -55,10 +55,10 @@ bool CVTSReaderSettingsWnd::OnActivate()
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 	CPoint p(10, 10);
 
-	m_cbReadAllProgramChains.Create(ResStr(IDS_VTSREADER_LOAD_PGC), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(300), m_fontheight)), this, IDC_STATIC);
+	m_cbEnableTitleSelection.Create(ResStr(IDS_VTSREADER_LOAD_PGC), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_DISABLED, CRect(p, CSize(IPP_SCALE(300), m_fontheight)), this, IDC_STATIC);
 
 	if (m_pMSF) {
-		m_cbReadAllProgramChains.SetCheck(m_pMSF->GetReadAllProgramChains());
+		m_cbEnableTitleSelection.SetCheck(m_pMSF->GetEnableTitleSelection());
 	}
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
@@ -66,7 +66,7 @@ bool CVTSReaderSettingsWnd::OnActivate()
 	}
 
 	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (LONG)AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-	SetClassLongPtr(m_cbReadAllProgramChains.m_hWnd, GCLP_HCURSOR, (LONG)AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtr(m_cbEnableTitleSelection.m_hWnd, GCLP_HCURSOR, (LONG)AfxGetApp()->LoadStandardCursor(IDC_HAND));
 
 	SetDirty(false);
 
@@ -82,7 +82,7 @@ bool CVTSReaderSettingsWnd::OnApply()
 	OnDeactivate();
 
 	if (m_pMSF) {
-		m_pMSF->SetReadAllProgramChains(m_cbReadAllProgramChains.GetCheck());
+		m_pMSF->SetEnableTitleSelection(m_cbEnableTitleSelection.GetCheck());
 		m_pMSF->Apply();
 	}
 

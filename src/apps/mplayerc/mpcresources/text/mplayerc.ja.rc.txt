@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"バージョン情報"
 7		"MPC-BE"
 8		"Copyright © 2002-2015 (Authors.txt ファイルを参照)"
@@ -1916,7 +1916,7 @@ STRING IDS_VOLUME_GAIN_MAX		"音量ゲイン 最大"
 STRING IDS_VOLUME_GAIN_OFF		"音量ゲイン オフ"
 STRING IDS_VOLUME_OSD		"音量: %d%%"
 STRING IDS_VOLUME_OSD_MUTE		"音量: %d%% [ミュート]"
-STRING IDS_VTSREADER_LOAD_PGC		"すべてのプログラム連鎖を読む (時間を計算)"
+STRING IDS_VTSREADER_LOAD_PGC		"Enable a choice of Title"
 STRING IDS_WEBSERVER_ERROR_TEST		"それらをテストする前に新しい設定を適用してください。"
 STRING IDS_ZOOM1		"拡大 1"
 STRING IDS_ZOOM2		"拡大 2"
