@@ -374,3 +374,13 @@ bool CMPCPngImage::PaintExternalGradient(CDC* dc, CRect r, int ptop, int br/* = 
 
 	return false;
 }
+
+CSize CMPCPngImage::GetSize() const
+{
+	CSize size;
+	if (!IsNull()) {
+		size.SetSize(GetWidth(), GetHeight());
+	}
+
+	return size;
+}

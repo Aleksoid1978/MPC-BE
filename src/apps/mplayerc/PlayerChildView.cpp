@@ -147,13 +147,7 @@ void CChildView::LoadLogo()
 
 CSize CChildView::GetLogoSize() const
 {
-	CSize ret(0,0);
-
-	if (!m_logo.IsNull()) {
-		ret.SetSize(m_logo.GetWidth(), m_logo.GetHeight());
-	}
-
-	return ret;
+	return m_logo.GetSize();
 }
 
 IMPLEMENT_DYNAMIC(CChildView, CWnd)
