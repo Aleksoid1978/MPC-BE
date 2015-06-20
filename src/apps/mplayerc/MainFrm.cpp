@@ -10726,12 +10726,11 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 
 	CRect r;
 	GetWindowRect(r);
-	int w = 0, h = 0;
 
 	CSize videoSize = GetVideoSize();
 	if (m_bAudioOnly) {
-		scale = min(1.0, scale);
-		videoSize = !m_InternalImage.IsNull() ? m_InternalImage.GetSize() : m_wndView.GetLogoSize();
+		scale = 1.0;
+		videoSize = m_wndView.GetLogoSize();
 		videoSize.cx = max(videoSize.cx, DEFCLIENTW);
 		videoSize.cy = max(videoSize.cy, DEFCLIENTH);
 	}
@@ -10745,22 +10744,22 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 	GetClientRect(&r1);
 	m_wndView.GetClientRect(&r2);
 
-	w = r1.Width() - r2.Width() + lWidth;
-	h = r1.Height() - r2.Height() + lHeight;
+	int w = r1.Width() - r2.Width() + lWidth;
+	int h = r1.Height() - r2.Height() + lHeight;
 
 	if (style & WS_THICKFRAME) {
 		w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
 		h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-		if ( (style & WS_CAPTION) == 0 ) {
+		if ((style & WS_CAPTION) == 0 ) {
 			w -= 2;
 			h -= 2;
 		}
 	}
 
-	if ( style & WS_CAPTION ) {
-		h += GetSystemMetrics( SM_CYCAPTION );
+	if (style & WS_CAPTION) {
+		h += GetSystemMetrics(SM_CYCAPTION);
 		if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
-			h += GetSystemMetrics( SM_CYMENU );
+			h += GetSystemMetrics(SM_CYMENU);
 		}
 		//else MODE_HIDEMENU
 	}
@@ -10809,10 +10808,10 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 	r.bottom = r.top + h;
 
 	if (r.right > mi.rcWork.right) {
-		r.OffsetRect(mi.rcWork.right-r.right, 0);
+		r.OffsetRect(mi.rcWork.right - r.right, 0);
 	}
 	if (r.left < mi.rcWork.left) {
-		r.OffsetRect(mi.rcWork.left-r.left, 0);
+		r.OffsetRect(mi.rcWork.left - r.left, 0);
 	}
 	if (r.bottom > mi.rcWork.bottom) {
 		r.OffsetRect(0, mi.rcWork.bottom-r.bottom);
@@ -10824,8 +10823,6 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 	if ((m_bFullScreen || !s.HasFixedWindowSize()) && !IsD3DFullScreenMode()) {
 		MoveWindow(r);
 	}
-
-	//ShowWindow(SW_SHOWNORMAL);
 
 	MoveVideoWindow();
 }
