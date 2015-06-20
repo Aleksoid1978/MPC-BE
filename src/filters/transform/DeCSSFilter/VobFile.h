@@ -137,8 +137,7 @@ private:
 	void Close();
 
 	CFile		m_ifoFile;
-	DWORD		ReadDword();
-	WORD		ReadWord();
 	BYTE		ReadByte();
-	void		ReadBuffer(BYTE* pBuff, DWORD nLen);
+	WORD		ReadWord();
+	DWORD		ReadDword();
 };

@@ -417,26 +417,25 @@ bool CVobFile::HasTitleKey(BYTE* key) const
 	return m_fHasTitleKey;
 }
 
-DWORD CVobFile::ReadDword()
+BYTE CVobFile::ReadByte()
 {
-	return ReadByte()<<24 | ReadByte()<<16 | ReadByte()<<8 | ReadByte();
+	BYTE value;
+	m_ifoFile.Read(&value, sizeof(value));
+	return value;
 }
 
 WORD CVobFile::ReadWord()
 {
-	return (ReadByte()<<8 | ReadByte());
+	WORD value;
+	m_ifoFile.Read(&value, sizeof(value));
+	return _byteswap_ushort(value);
 }
 
-BYTE CVobFile::ReadByte()
+DWORD CVobFile::ReadDword()
 {
-	BYTE bVal;
-	m_ifoFile.Read(&bVal, sizeof(bVal));
-	return bVal;
-}
-
-void CVobFile::ReadBuffer(BYTE* pBuff, DWORD nLen)
-{
-	m_ifoFile.Read(pBuff, nLen);
+	DWORD value;
+	m_ifoFile.Read(&value, sizeof(value));
+	return _byteswap_ulong(value);
 }
 
 static short GetFrames(byte val)
@@ -648,13 +647,13 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= 0
 			m_ifoFile.Seek(2, CFile::current);
 			int nb_programs = ReadByte();
 			int nb_pgccells = ReadByte();
-			ReadBuffer(buf, 4);
+			m_ifoFile.Read(buf, 4);
 			REFERENCE_TIME playback_time = FormatTime(buf);
 
 			// PGC_AST_CTL
 			m_ifoFile.Seek(posPGCI + offsetPGC + 0x0C, CFile::begin);
 			for (int i = 0; i < 8; i++) {
-				ReadBuffer(buf, 2);
+				m_ifoFile.Read(buf, 2);
 				BYTE avail = buf[0] >> 7;	// stream available
 				BYTE ID = buf[0] & 0x07;	// Stream number (MPEG audio) or Substream number (all others)
 
@@ -666,7 +665,7 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= 0
 
 			// PGC_SPST_CTL
 			for (int i = 0; i < 32; i++) {
-				ReadBuffer(buf, 4);
+				m_ifoFile.Read(buf, 4);
 				BYTE avail = buf[0] >> 7;	// stream available
 				BYTE ID = buf[1] & 0x1f;	// Stream number for wide (hmm?)
 
@@ -698,10 +697,10 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= 0
 				for (int cell = entryCell; cell <= exitCell; cell++) {
 					// cell playback time
 					m_ifoFile.Seek(posPGCI + offsetPGC + offsetCellPlaybackInfoTable + (cell-1)*0x18, CFile::begin);
-					ReadBuffer(buf, 4);
+					m_ifoFile.Read(buf, 4);
 					int cellType = buf[0] >> 6;
 					if (cellType == 0x00 || cellType == 0x01){
-						ReadBuffer(buf, 4);
+						m_ifoFile.Read(buf, 4);
 						chapter.duration += FormatTime(buf);
 					}
 					DWORD firstVOBUStartSector = ReadDword(); // first VOBU start sector
