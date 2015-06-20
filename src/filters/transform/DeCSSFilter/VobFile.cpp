@@ -1210,9 +1210,9 @@ BSTR CVobFile::GetTrackName(UINT aTrackIdx) const
 	return TrackName.AllocSysString();
 }
 
-REFERENCE_TIME CVobFile::GetChapterOffset(UINT ChapterNumber) const
+REFERENCE_TIME CVobFile::GetChapterTime(UINT ChapterNumber) const
 {
-	if (m_pChapters.GetCount() < ChapterNumber + 1) {
+	if (ChapterNumber >= m_pChapters.GetCount()) {
 		return 0;
 	}
 
