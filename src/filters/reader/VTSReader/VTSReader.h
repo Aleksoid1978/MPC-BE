@@ -58,7 +58,7 @@ public:
 
 	BSTR			GetTrackName(UINT aTrackIdx);
 	UINT			GetChaptersCount();
-	REFERENCE_TIME	GetChapterOffset(UINT ChapterNumber);
+	REFERENCE_TIME	GetChapterTime(UINT ChapterNumber);
 
 	REFERENCE_TIME	GetDuration();
 

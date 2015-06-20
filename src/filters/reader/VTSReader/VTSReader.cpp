@@ -150,7 +150,7 @@ STDMETHODIMP CVTSReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 	ChapRemoveAll();
 	for (size_t i = 0; i < m_stream.GetChaptersCount(); i++) {
 		CString chap; chap.Format(ResStr(IDS_AG_CHAPTER), i + 1);
-		ChapAppend(m_stream.GetChapterOffset(i), chap);
+		ChapAppend(m_stream.GetChapterTime(i), chap);
 	}
 
 	m_fn = pszFileName;
@@ -381,9 +381,9 @@ UINT CVTSStream::GetChaptersCount()
 	return m_vob->GetChaptersCount();
 }
 
-REFERENCE_TIME CVTSStream::GetChapterOffset(UINT ChapterNumber)
+REFERENCE_TIME CVTSStream::GetChapterTime(UINT ChapterNumber)
 {
-	return m_vob->GetChapterOffset(ChapterNumber);
+	return m_vob->GetChapterTime(ChapterNumber);
 }
 
 REFERENCE_TIME CVTSStream::GetDuration()

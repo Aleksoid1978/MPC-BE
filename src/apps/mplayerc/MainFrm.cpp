@@ -11835,7 +11835,7 @@ void CMainFrame::SetupChapters()
 				CVobFile vob;
 				if (::PathFileExists(path) && vob.OpenIFO(path, files, TTN) && ulNumOfChapters == vob.GetChaptersCount()) {
 					for (UINT i = 0; i < vob.GetChaptersCount(); i++) {
-						REFERENCE_TIME rt = vob.GetChapterOffset(i);
+						REFERENCE_TIME rt = vob.GetChapterTime(i);
 						CString str;
 						str.Format(IDS_AG_CHAPTER, i + 1);
 						m_pCB->ChapAppend(rt, str);
