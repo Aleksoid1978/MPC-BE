@@ -512,7 +512,7 @@ static const AV_Rational IFO_Aspect[4] = {
 
 struct stream_t {
 	byte format;
-	char lang[2];
+	char lang[3];
 };
 
 struct cell_info_t {
@@ -620,6 +620,17 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= 0
 			programs[0].chapters[i].last_sector = ReadDword();
 		}
 
+		for (int i = 0; i < nb_audstreams; i++) {
+			programs[0].audios[i].format = audio_streams[i].format;
+			programs[0].audios[i].lang[0] = audio_streams[i].lang[0];
+			programs[0].audios[i].lang[1] = audio_streams[i].lang[1];
+		}
+		for (int i = 0; i < nb_substreams; i++) {
+			programs[0].subtitles[i].format = subtitle_streams[i].format;
+			programs[0].subtitles[i].lang[0] = subtitle_streams[i].lang[0];
+			programs[0].subtitles[i].lang[1] = subtitle_streams[i].lang[1];
+		}
+
 		// Chapters & duration ...
 		m_ifoFile.Seek(0xCC, CFile::begin); //Get VTS_PGCI adress
 		DWORD posPGCI = ReadDword() * 2048;
@@ -715,6 +726,8 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= 0
 						if (programs[0].chapters[i].duration == 0) {
 							programs[0].chapters[i].duration = chapter.duration;
 						}
+						ASSERT(chapter.first_sector == programs[0].chapters[i].first_sector);
+						ASSERT(chapter.last_sector == programs[0].chapters[i].last_sector);
 						break;
 					}
 				}
