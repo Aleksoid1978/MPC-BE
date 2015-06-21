@@ -6973,11 +6973,12 @@ void CMainFrame::OnUpdateViewNormal(CCmdUI* pCmdUI)
 {
 }
 
+#define IsD3DFS (IsD3DFullScreenMode() || (!m_bAudioOnly && !m_bFullScreen && (s.IsD3DFullscreen() || (m_pD3DFS && (s.fD3DFullscreen || (s.nCLSwitches & CLSW_D3DFULLSCREEN))))))
 void CMainFrame::OnViewFullscreen()
 {
 	const CAppSettings& s = AfxGetAppSettings();
 
-	if (IsD3DFullScreenMode() || (s.IsD3DFullscreen() && !m_bFullScreen && !m_bAudioOnly)) {
+	if (IsD3DFS) {
 		ToggleD3DFullscreen(true);
 	} else {
 		ToggleFullscreen(true, true);
@@ -6988,7 +6989,7 @@ void CMainFrame::OnViewFullscreenSecondary()
 {
 	const CAppSettings& s = AfxGetAppSettings();
 
-	if (IsD3DFullScreenMode() || (s.IsD3DFullscreen() && !m_bFullScreen && !m_bAudioOnly)) {
+	if (IsD3DFS) {
 		ToggleD3DFullscreen(false);
 	} else {
 		ToggleFullscreen(true, false);
@@ -7003,21 +7004,16 @@ void CMainFrame::OnUpdateViewFullscreen(CCmdUI* pCmdUI)
 
 void CMainFrame::OnMoveWindowToPrimaryScreen()
 {
-	AppSettings& s = AfxGetAppSettings();
-	if (m_bFullScreen) ToggleFullscreen(false,false);
-	if (!IsD3DFullScreenMode()){
-		HMONITOR hMonitor = MonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
-		int x, y;
-		CRect r;
-		GetClientRect(r);
+	if (m_bFullScreen) {
+		ToggleFullscreen(false,false);
+	}
 
-		MONITORINFO mi = { sizeof(mi) };
-		GetMonitorInfo(hMonitor, &mi);
-
-		x = (mi.rcWork.left+mi.rcWork.right-r.Width())/2; // Center main window
-		y = (mi.rcWork.top+mi.rcWork.bottom-r.Height())/2;
-
-		SetWindowPos(NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+	if (!IsD3DFullScreenMode()) {
+		CRect windowRect;
+		GetWindowRect(&windowRect);
+		CMonitor monitor = CMonitors::GetPrimaryMonitor();
+		monitor.CenterRectToMonitor(windowRect, TRUE);
+		SetWindowPos(NULL, windowRect.left, windowRect.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 	}
 }
 
@@ -10380,24 +10376,17 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 {
-	CComQIPtr<ID3DFullscreenControl> pD3DFS;
-	if (m_pMFVDC) {
-		pD3DFS = m_pMFVDC;
-	} else {
-		pD3DFS = m_pVMRWC;
-	}
-
-	if (pD3DFS) {
+	if (m_pD3DFS) {
 		CAppSettings& s = AfxGetAppSettings();
 
 		bool bIsFullscreen = false;
-		pD3DFS->GetD3DFullscreen(&bIsFullscreen);
+		m_pD3DFS->GetD3DFullscreen(&bIsFullscreen);
 
 		m_OSD.Stop();
 
 		if (bIsFullscreen) {
 			// Turn off D3D Fullscreen
-			pD3DFS->SetD3DFullscreen(false);
+			m_pD3DFS->SetD3DFullscreen(false);
 
 			// Assign the windowed video frame and pass it to the relevant classes.
 			m_pVideoWnd = &m_wndView;
@@ -10430,7 +10419,7 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 			CreateFullScreenWindow();
 
 			// Turn on D3D Fullscreen
-			pD3DFS->SetD3DFullscreen(true);
+			m_pD3DFS->SetD3DFullscreen(true);
 
 			// Assign the windowed video frame and pass it to the relevant classes.
 			m_pVideoWnd = m_pFullscreenWnd;
@@ -13430,6 +13419,10 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			m_pVideoWnd->GetClientRect(&Rect);
 			m_pMFVDC->SetVideoWindow(m_pVideoWnd->m_hWnd);
 			m_pMFVDC->SetVideoPosition(NULL, &Rect);
+
+			m_pD3DFS = m_pMFVDC;
+		} else {
+			m_pD3DFS = m_pVMRWC;
 		}
 
 		if (m_bUseSmartSeek && m_wndPreView) {
@@ -13596,6 +13589,7 @@ void CMainFrame::CloseMediaPrivate()
 	m_pVMRMC9.Release();
 	m_pVMB.Release();
 	m_pMVTO.Release();
+	m_pD3DFS.Release();
 
 	m_pMFVP.Release();
 	m_pMFVDC.Release();

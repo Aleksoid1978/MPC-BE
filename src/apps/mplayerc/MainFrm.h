@@ -76,6 +76,7 @@
 using namespace MediaInfoLib;
 
 class CFullscreenWnd;
+struct ID3DFullscreenControl;
 
 enum PMODE {
 	PM_NONE,
@@ -259,6 +260,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CComPtr<IMFVideoProcessor>      m_pMFVP;
 	CComPtr<IAMLine21Decoder_2>     m_pLN21;
 	CComPtr<IVMRWindowlessControl9> m_pVMRWC;
+
+	CComPtr<ID3DFullscreenControl>	m_pD3DFS;
 
 	CComPtr<IVMRMixerBitmap9>		m_pVMB;
 	CComPtr<IMadVRTextOsd>			m_pMVTO;
