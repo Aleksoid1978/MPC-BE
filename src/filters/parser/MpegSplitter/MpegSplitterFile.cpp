@@ -491,7 +491,8 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDura
 #endif
 									}
 
-									if (m_rtMin < h2.pts && m_rtMax < h2.pts) {
+									if (m_rtMin < h2.pts && m_rtMax < h2.pts
+											&& ((h2.pts - m_rtMax) < 30 * 60 * 10000000i64)) {
 										m_rtMax = h2.pts;
 										m_posMax = GetPos();
 #if (DEBUG) && 0
