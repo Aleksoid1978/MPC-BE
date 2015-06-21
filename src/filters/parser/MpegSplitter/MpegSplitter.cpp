@@ -1239,7 +1239,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 				seekpos	= save_seekpos;
 			} else {
 				seekpos = m_pFile->GetPos();
-				for (;;) {
+				while (rtPTS != INVALID_TIME) {
 					m_pFile->Seek(m_pFile->GetPos() + 192);
 					rtPTS = m_pFile->NextPTS(pMasterStream->GetHead(), TRUE);
 					if (rtPTS > rtmax) {
@@ -1250,8 +1250,12 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 				}
 			}
 
-			m_pFile->Seek(seekpos);
-			return;
+			if (rtPTS != INVALID_TIME) {
+				m_pFile->Seek(seekpos);
+				return;
+			}
+
+			seekpos	= save_seekpos;
 		}
 
 		if (!m_pFile->m_bIsBadPacked && m_pFile->m_bPESPTSPresent) {
