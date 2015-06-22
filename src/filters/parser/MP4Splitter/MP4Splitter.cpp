@@ -44,6 +44,7 @@
 #include <Bento4/Core/Ap4DataAtom.h>
 #include <Bento4/Core/Ap4PaspAtom.h>
 #include <Bento4/Core/Ap4ChapAtom.h>
+#include <Bento4/Core/Ap4Dvc1Atom.h>
 
 #ifdef REGISTER_FILTER
 
@@ -724,6 +725,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						((type << 24) & 0xff000000);
 
 					if (AP4_VisualSampleEntry* vse = dynamic_cast<AP4_VisualSampleEntry*>(atom)) {
+						AP4_DataBuffer* pData = (AP4_DataBuffer*)&db;
+
 
 						char buff[5];
 						memcpy(buff, &fourcc, 4);
@@ -759,16 +762,25 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							FormatTrackName(_T("Sorenson"), 0);
 						} else if (type == AP4_ATOM_TYPE_CVID) {
 							FormatTrackName(_T("Cinepack"), 0);
-						} else if (type == AP4_ATOM_TYPE_OVC1) {
+						} else if (type == AP4_ATOM_TYPE_OVC1 || type == AP4_ATOM_TYPE_VC1) {
 							fourcc = FCC('WVC1');
 							FormatTrackName(_T("VC-1"), 0);
+							if (AP4_Dvc1Atom* Dvc1 = dynamic_cast<AP4_Dvc1Atom*>(vse->GetChild(AP4_ATOM_TYPE_DVC1))) {
+								pData = (AP4_DataBuffer*)Dvc1->GetDecoderInfo();
+							}
 						} else if (type == AP4_ATOM_TYPE_RAW) {
 							fourcc = BI_RGB;
 						}
 
-						AP4_Size ExtraSize = db.GetDataSize();
+						AP4_Size ExtraSize = pData->GetDataSize();
 						if (type == AP4_ATOM_TYPE_FFV1) {
 							ExtraSize = 0;
+						}
+
+						BOOL bVC1ExtraData = FALSE;
+						if (type == AP4_ATOM_TYPE_OVC1 && ExtraSize > 198) {
+							ExtraSize -= 198;
+							bVC1ExtraData = TRUE;
 						}
 
 						mt.majortype	= MEDIATYPE_Video;
@@ -791,7 +803,11 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mt.SetSampleSize(vih2->bmiHeader.biSizeImage);
 
 						if (ExtraSize) {
-							memcpy(vih2 + 1, db.GetData(), ExtraSize);
+							if (bVC1ExtraData) {
+								memcpy(vih2 + 1, pData->GetData() + 198, ExtraSize);
+							} else {
+								memcpy(vih2 + 1, pData->GetData(), ExtraSize);
+							}
 						}
 
 						if (fourcc == BI_RGB) {
@@ -810,6 +826,11 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 						mt.subtype = FOURCCMap(fourcc);
 						mts.Add(mt);
+
+						if (mt.subtype == MEDIASUBTYPE_WVC1) {
+							mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
+							mts.InsertAt(0, mt);
+						}
 
 						_strlwr_s(buff);
 						AP4_Atom::Type typelwr = *(AP4_Atom::Type*)buff;

@@ -122,6 +122,7 @@
     <ClInclude Include="Core\Ap4Descriptor.h" />
     <ClInclude Include="Core\Ap4DescriptorFactory.h" />
     <ClInclude Include="Core\Ap4DrefAtom.h" />
+    <ClInclude Include="Core\Ap4Dvc1Atom.h" />
     <ClInclude Include="Core\Ap4ElstAtom.h" />
     <ClInclude Include="Core\Ap4EndaAtom.h" />
     <ClInclude Include="Core\Ap4EsDescriptor.h" />
@@ -206,6 +207,7 @@
     <ClCompile Include="Core\Ap4Descriptor.cpp" />
     <ClCompile Include="Core\Ap4DescriptorFactory.cpp" />
     <ClCompile Include="Core\Ap4DrefAtom.cpp" />
+    <ClCompile Include="Core\Ap4Dvc1Atom.cpp" />
     <ClCompile Include="Core\Ap4ElstAtom.cpp" />
     <ClCompile Include="Core\Ap4EndaAtom.cpp" />
     <ClCompile Include="Core\Ap4EsDescriptor.cpp" />
