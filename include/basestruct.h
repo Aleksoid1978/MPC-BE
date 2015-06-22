@@ -91,7 +91,7 @@ typedef struct tagDOLBYAC3WAVEFORMAT {
 	BYTE			nAuxBitsCode;	//  Aux bits per frame
 } DOLBYAC3WAVEFORMAT;
 
-struct AV_Rational {
+struct fraction_t {
 	int num;
 	int den;
 };

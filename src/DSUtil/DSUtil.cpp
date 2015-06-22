@@ -3261,7 +3261,7 @@ static INT64 av_gcd(INT64 a, INT64 b){
 int av_reduce(int *dst_num, int *dst_den,
               INT64 num, INT64 den, INT64 max)
 {
-    AV_Rational a0 = { 0, 1 }, a1 = { 1, 0 };
+    fraction_t a0 = { 0, 1 }, a1 = { 1, 0 };
     int sign = (num < 0) ^ (den < 0);
     INT64 gcd = av_gcd(abs(num), abs(den));
 
@@ -3302,9 +3302,9 @@ int av_reduce(int *dst_num, int *dst_den,
     return den == 0;
 }
 
-AV_Rational av_d2q(double d, int max)
+fraction_t av_d2q(double d, int max)
 {
-    AV_Rational a;
+    fraction_t a;
 #define LOG2  0.69314718055994530941723212145817656807550013436025
     int exponent;
     INT64 den;
@@ -3337,6 +3337,6 @@ void ReduceDim(SIZE &dim)
 
 SIZE ReduceDim(double value)
 {
-	AV_Rational a = av_d2q(value, INT_MAX);
+	fraction_t a = av_d2q(value, INT_MAX);
 	return { a.num, a.den };
 }

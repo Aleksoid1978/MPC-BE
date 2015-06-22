@@ -502,7 +502,7 @@ static REFERENCE_TIME FormatTime(BYTE *bytes)
 	return REFERENCE_TIME(10000i64*(((hours*60 + minutes)*60 + seconds)*1000 + mmseconds));
 }
 
-static const AV_Rational IFO_Aspect[4] = {
+static const fraction_t IFO_Aspect[4] = {
 	{4,  3},
 	{0,  0},
 	{0,  0},
