@@ -1040,11 +1040,20 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								   type == AP4_ATOM_TYPE_ULAW) {
 							// not need any extra data for ALAW, ULAW
 							// also extra data is not required for IMA4, MAC3, MAC6
+						} else if (type == AP4_ATOM_TYPE_OWMA && db.GetDataSize() > 36) {
+							// skip unknown first 36 bytes
+							const AP4_Size size = db.GetDataSize() - 36;
+							const AP4_Byte* pData = db.GetData() + 36;
+
+							wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(size);
+							memcpy(wfe, pData, size);
+								
+							mt.subtype = FOURCCMap(wfe->wFormatTag);
 						} else if (db.GetDataSize() > 0) {
 							//always needed extra data for QDM2
 							wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + db.GetDataSize());
 							wfe->cbSize = db.GetDataSize();
-							memcpy(wfe+1, db.GetData(), db.GetDataSize());
+							memcpy(wfe + 1, db.GetData(), db.GetDataSize());
 						}
 
 						mts.Add(mt);
