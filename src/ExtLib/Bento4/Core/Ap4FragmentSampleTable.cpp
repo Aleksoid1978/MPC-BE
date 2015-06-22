@@ -15,7 +15,8 @@
 /*----------------------------------------------------------------------
 |   constants
 +---------------------------------------------------------------------*/
-const AP4_UI32 AP4_FRAG_FLAG_SAMPLE_IS_DIFFERENCE = 0x00010000;
+const AP4_UI32 AP4_FRAG_FLAG_SAMPLE_IS_DIFFERENCE    = 0x00010000;
+const AP4_UI32 AP4_FRAG_FLAG_SAMPLE_FLAG_DEPENDS_YES = 0x01000000;
 
 /*----------------------------------------------------------------------
 |       AP4_FragmentSampleTable::AP4_FragmentSampleTable
@@ -103,6 +104,8 @@ AP4_FragmentSampleTable::AddTrun(AP4_TrunAtom* trun, AP4_TfhdAtom* tfhd, AP4_Tre
             default_sample_flags = trex->GetDefaultSampleFlags();
         }
 
+        bool found_keyframe = false;
+
         // parse all trun entries to setup the samples
         AP4_UI64 dts = dts_origin ? dts_origin : m_Duration;
         for (AP4_Cardinal i = 0; i < trun->GetEntries().ItemCount(); i++) {
@@ -131,7 +134,8 @@ AP4_FragmentSampleTable::AddTrun(AP4_TrunAtom* trun, AP4_TfhdAtom* tfhd, AP4_Tre
             } else if (trun_flags & AP4_TRUN_FLAG_SAMPLE_FLAGS_PRESENT) {
                 sample_flags = entry.sample_flags;
             }
-            if ((sample_flags & AP4_FRAG_FLAG_SAMPLE_IS_DIFFERENCE) == 0) {
+            if (!found_keyframe && !(sample_flags & (AP4_FRAG_FLAG_SAMPLE_IS_DIFFERENCE | AP4_FRAG_FLAG_SAMPLE_FLAG_DEPENDS_YES))) {
+                found_keyframe = true;
                 sample.SetSync(true);
             } else {
                 sample.SetSync(false);
