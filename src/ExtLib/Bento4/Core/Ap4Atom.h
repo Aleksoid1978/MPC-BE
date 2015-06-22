@@ -306,6 +306,8 @@ const AP4_Atom::Type AP4_ATOM_TYPE_ALAC = AP4_ATOM_TYPE('a','l','a','c');
 const AP4_Atom::Type AP4_ATOM_TYPE_MAC3 = AP4_ATOM_TYPE('M','A','C','3');
 const AP4_Atom::Type AP4_ATOM_TYPE_MAC6 = AP4_ATOM_TYPE('M','A','C','6');
 const AP4_Atom::Type AP4_ATOM_TYPE_SAWB = AP4_ATOM_TYPE('s','a','w','b');
+const AP4_Atom::Type AP4_ATOM_TYPE_WMA  = AP4_ATOM_TYPE('w','m','a',' ');
+const AP4_Atom::Type AP4_ATOM_TYPE_WFEX = AP4_ATOM_TYPE('w','f','e','x');
 
 /////////////////////////////// Video ///////////////////////////////////
 // MPEG 4 ASP

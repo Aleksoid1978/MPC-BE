@@ -80,6 +80,7 @@
 #include "Ap4ChapAtom.h"
 #include "Ap4ElstAtom.h"
 #include "Ap4Dvc1Atom.h"
+#include "Ap4WfexAtom.h"
 #include "Ap4Utils.h"
 /*----------------------------------------------------------------------
 |       class variables
@@ -589,6 +590,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_MAC3:
         case AP4_ATOM_TYPE_MAC6:
         case AP4_ATOM_TYPE_SAWB:
+        case AP4_ATOM_TYPE_WMA:
             atom = new AP4_AudioSampleEntry(type, size, stream, *this);
             break;
 
@@ -634,6 +636,10 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 
         case AP4_ATOM_TYPE_DVC1:
             atom = new AP4_Dvc1Atom(size, stream);
+            break;
+
+        case AP4_ATOM_TYPE_WFEX:
+            atom = new AP4_WfexAtom(size, stream);
             break;
 
         default:
