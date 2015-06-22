@@ -91,7 +91,7 @@ AP4_TrunAtom::AP4_TrunAtom(AP4_Size         size,
             --record_fields_count;
         }
         if (m_Flags & AP4_TRUN_FLAG_SAMPLE_COMPOSITION_TIME_OFFSET_PRESENT) {
-            stream.ReadUI32(m_Entries[i].sample_composition_time_offset);
+            stream.ReadUI32((AP4_UI32&)m_Entries[i].sample_composition_time_offset);
             --record_fields_count;
         }
     

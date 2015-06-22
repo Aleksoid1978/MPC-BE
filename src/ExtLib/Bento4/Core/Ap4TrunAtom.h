@@ -39,7 +39,7 @@ public:
         AP4_UI32 sample_duration;
         AP4_UI32 sample_size;
         AP4_UI32 sample_flags;
-        AP4_UI32 sample_composition_time_offset;
+        AP4_SI32 sample_composition_time_offset;
     };
 
     static AP4_UI32 ComputeOptionalFieldsCount(AP4_UI32 flags);
