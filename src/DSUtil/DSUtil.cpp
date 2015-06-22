@@ -3323,11 +3323,16 @@ fraction_t av_d2q(double d, int max)
 }
 //
 
+int GCD(int a, int b){
+    if(b) return GCD(b, a%b);
+    else  return a;
+}
+
 void ReduceDim(LONG& num, LONG& den)
 {
-	int _num, _den;
-	av_reduce(&_num, &_den, num, den, INT_MAX);
-	num = _num; den = _den;
+	int gcd = GCD(labs(num), labs(den));
+	num /= gcd;
+	den /= gcd;
 }
 
 void ReduceDim(SIZE &dim)
