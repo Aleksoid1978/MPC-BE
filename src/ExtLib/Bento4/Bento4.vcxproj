@@ -183,6 +183,7 @@
     <ClInclude Include="Core\Ap4UrlAtom.h" />
     <ClInclude Include="Core\Ap4Utils.h" />
     <ClInclude Include="Core\Ap4VmhdAtom.h" />
+    <ClInclude Include="Core\Ap4WfexAtom.h" />
     <ClInclude Include="Crypto\Ap4AesBlockCipher.h" />
     <ClInclude Include="Crypto\Ap4StreamCipher.h" />
   </ItemGroup>
@@ -263,6 +264,7 @@
     <ClCompile Include="Core\Ap4UrlAtom.cpp" />
     <ClCompile Include="Core\Ap4Utils.cpp" />
     <ClCompile Include="Core\Ap4VmhdAtom.cpp" />
+    <ClCompile Include="Core\Ap4WfexAtom.cpp" />
     <ClCompile Include="Crypto\Ap4AesBlockCipher.cpp" />
     <ClCompile Include="Crypto\Ap4StreamCipher.cpp" />
     <ClCompile Include="precomp.cpp">

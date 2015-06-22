@@ -45,6 +45,7 @@
 #include <Bento4/Core/Ap4PaspAtom.h>
 #include <Bento4/Core/Ap4ChapAtom.h>
 #include <Bento4/Core/Ap4Dvc1Atom.h>
+#include <Bento4/Core/Ap4WfexAtom.h>
 
 #ifdef REGISTER_FILTER
 
@@ -1047,6 +1048,18 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						mts.Add(mt);
+
+						if (AP4_WfexAtom* WfexAtom = dynamic_cast<AP4_WfexAtom*>(ase->GetChild(AP4_ATOM_TYPE_WFEX))) {
+							const AP4_DataBuffer* di = WfexAtom->GetDecoderInfo();
+							if (di && di->GetDataSize()) {
+								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(di->GetDataSize());
+								memcpy(wfe, di->GetData(), di->GetDataSize());
+								
+								mt.subtype = FOURCCMap(wfe->wFormatTag);
+								mts.InsertAt(0, mt);
+							}
+						}
+
 						break;
 					} else {
 						TRACE(_T("Unknow MP4 Stream %x\n") , fourcc);
