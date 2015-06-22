@@ -678,7 +678,8 @@ CMainFrame::CMainFrame() :
 	m_OSD(this),
 	m_wndToolBar(this),
 	m_wndSeekBar(this),
-	miFPS(0.0)
+	miFPS(0.0),
+	m_bAudioOnly(true)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -4175,6 +4176,8 @@ void CMainFrame::OnFilePostCloseMedia()
 		m_bStartInD3DFullscreen = true;
 	}
 
+	m_bAudioOnly = true;
+
 	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnFilePostCloseMedia() : end"));
 }
 
@@ -6973,7 +6976,7 @@ void CMainFrame::OnUpdateViewNormal(CCmdUI* pCmdUI)
 {
 }
 
-#define IsD3DFS (IsD3DFullScreenMode() || (!m_bAudioOnly && !m_bFullScreen && (s.IsD3DFullscreen() || (m_pD3DFS && (s.fD3DFullscreen || (s.nCLSwitches & CLSW_D3DFULLSCREEN))))))
+#define IsD3DFS (IsD3DFullScreenMode() || (m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly && !m_bFullScreen && (m_pD3DFS && (s.fD3DFullscreen || (s.nCLSwitches & CLSW_D3DFULLSCREEN)))))
 void CMainFrame::OnViewFullscreen()
 {
 	const CAppSettings& s = AfxGetAppSettings();
