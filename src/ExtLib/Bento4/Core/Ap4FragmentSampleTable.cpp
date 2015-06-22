@@ -151,7 +151,7 @@ AP4_FragmentSampleTable::AddTrun(AP4_TrunAtom* trun, AP4_TfhdAtom* tfhd, AP4_Tre
         
             // dts and cts
             sample.SetDts(dts);
-            AP4_UI32 offset = 0;
+            AP4_SI32 offset = 0;
             if (trun_flags & AP4_TRUN_FLAG_SAMPLE_COMPOSITION_TIME_OFFSET_PRESENT) {
                 offset = entry.sample_composition_time_offset;
             }
