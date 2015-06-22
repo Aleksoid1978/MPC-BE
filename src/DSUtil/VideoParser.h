@@ -60,7 +60,7 @@ struct vc_params_t {
 
 	REFERENCE_TIME AvgTimePerFrame;
 
-	AV_Rational sar;
+	fraction_t sar;
 
 	void clear() {
 		memset(this, 0, sizeof(*this));

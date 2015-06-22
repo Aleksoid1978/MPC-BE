@@ -281,9 +281,9 @@ STDMETHODIMP_(REFERENCE_TIME) CVTSReader::GetDuration()
 	return m_stream.GetDuration();
 }
 
-STDMETHODIMP_(AV_Rational) CVTSReader::GetAspect()
+STDMETHODIMP_(fraction_t) CVTSReader::GetAspectRatio()
 {
-	return m_stream.GetAspect();
+	return m_stream.GetAspectRatio();
 }
 
 
@@ -391,7 +391,7 @@ REFERENCE_TIME CVTSStream::GetDuration()
 	return m_vob->GetDuration();
 }
 
-AV_Rational CVTSStream::GetAspect()
+fraction_t CVTSStream::GetAspectRatio()
 {
-	return m_vob->GetAspect();
+	return m_vob->GetAspectRatio();
 }

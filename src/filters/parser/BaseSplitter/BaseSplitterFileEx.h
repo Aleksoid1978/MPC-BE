@@ -421,7 +421,7 @@ public:
 		BYTE psf;
 		unsigned int width, height;
 
-		AV_Rational sar;
+		fraction_t sar;
 	};
 
 	struct dirachdr {

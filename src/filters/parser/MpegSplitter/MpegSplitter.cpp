@@ -936,7 +936,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	REFERENCE_TIME	rt_IfoDuration	= 0;
-	AV_Rational		IfoASpect		= {0, 0};
+	fraction_t		IfoASpect		= {0, 0};
 	if (m_pFile->m_type == MPEG_TYPES::mpeg_ps) {
 		if (m_pInput && m_pInput->IsConnected() && (GetCLSID(m_pInput->GetConnected()) == __uuidof(CVTSReader))) { // MPC VTS Reader
 			pTI = GetFilterFromPin(m_pInput->GetConnected());
@@ -944,7 +944,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
 				if (CComQIPtr<IVTSReader> VTSReader = pFilter) {
 					rt_IfoDuration			= VTSReader->GetDuration();
-					IfoASpect				= VTSReader->GetAspect();
+					IfoASpect				= VTSReader->GetAspectRatio();
 					m_pFile->m_bIsBadPacked	= FALSE;
 				}
 			}

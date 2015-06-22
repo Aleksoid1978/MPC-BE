@@ -68,7 +68,7 @@ static const dirac_source_params dirac_source_parameters_defaults[] = {
 	{ 7680, 4320, 1, 0, 1, 6,  1, 3840, 2160, 0, 0, 3, 3 },
 };
 
-static const AV_Rational avpriv_frame_rate_tab[16] = {
+static const fraction_t avpriv_frame_rate_tab[16] = {
 	{    0,    0},
 	{24000, 1001},
 	{   24,    1},
@@ -88,7 +88,7 @@ static const AV_Rational avpriv_frame_rate_tab[16] = {
 	{    0,    0},
 };
 
-static const AV_Rational dirac_frame_rate[] = {
+static const fraction_t dirac_frame_rate[] = {
 	{15000, 1001},
 	{25, 2},
 };
@@ -132,7 +132,7 @@ bool ParseDiracHeader(BYTE* data, int size, vc_params_t& params)
 		return false;
 	}
 
-	AV_Rational frame_rate = {0,0};
+	fraction_t frame_rate = {0,0};
 	if (gb.BitRead(1)) {
 		source.frame_rate_index = gb.UintGolombRead();
 		if (source.frame_rate_index > 10) {

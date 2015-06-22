@@ -105,7 +105,7 @@ class CVobFile : public CDVDSession
 	CAtlArray<chapter_t> m_pChapters;
 
 	REFERENCE_TIME	m_rtDuration;
-	AV_Rational		m_Aspect;
+	fraction_t		m_Aspect;
 
 public:
 	CVobFile();
@@ -128,7 +128,7 @@ public:
 	UINT			GetChaptersCount() const { return (UINT)m_pChapters.GetCount(); }
 	REFERENCE_TIME	GetChapterTime(UINT ChapterNumber) const;
 	REFERENCE_TIME	GetDuration() const { return m_rtDuration; }
-	AV_Rational		GetAspect() const { return m_Aspect; }
+	fraction_t		GetAspectRatio() const { return m_Aspect; }
 
 private:
 	bool OpenVOBs(const CAtlList<CString>& files); // vts vobs

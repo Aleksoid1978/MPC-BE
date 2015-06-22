@@ -31,5 +31,5 @@ public IUnknown {
 	STDMETHOD_(BOOL, GetEnableTitleSelection()) PURE;
 
 	STDMETHOD_(REFERENCE_TIME, GetDuration()) PURE;
-	STDMETHOD_(AV_Rational, GetAspect()) PURE;
+	STDMETHOD_(fraction_t, GetAspectRatio()) PURE;
 };
