@@ -79,6 +79,7 @@
 #include "Ap4PaspAtom.h"
 #include "Ap4ChapAtom.h"
 #include "Ap4ElstAtom.h"
+#include "Ap4Dvc1Atom.h"
 #include "Ap4Utils.h"
 /*----------------------------------------------------------------------
 |       class variables
@@ -521,6 +522,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_R10g:
         case AP4_ATOM_TYPE_R10k:
         case AP4_ATOM_TYPE_OVC1:
+        case AP4_ATOM_TYPE_VC1:
             atom = new AP4_VisualSampleEntry(type, size, stream, *this);
             break;
 
@@ -628,6 +630,10 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 
         case AP4_ATOM_TYPE_ELST:
             atom = new AP4_ElstAtom(size, stream);
+            break;
+
+        case AP4_ATOM_TYPE_DVC1:
+            atom = new AP4_Dvc1Atom(size, stream);
             break;
 
         default:
