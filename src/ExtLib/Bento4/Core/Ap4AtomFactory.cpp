@@ -590,6 +590,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_MAC3:
         case AP4_ATOM_TYPE_MAC6:
         case AP4_ATOM_TYPE_SAWB:
+        case AP4_ATOM_TYPE_OWMA:
         case AP4_ATOM_TYPE_WMA:
             atom = new AP4_AudioSampleEntry(type, size, stream, *this);
             break;
