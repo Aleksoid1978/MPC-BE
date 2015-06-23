@@ -1983,21 +1983,38 @@ bool CBaseSplitterFileEx::Read(dvbsub& h, int len, CMediaType* pmt, bool bSimple
 	return false;
 }
 
-bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt)
+static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 {
-	CAtlArray<BYTE> pData;
-	pData.SetCount(len);
-	ByteRead(pData.GetData(), len);
-
 	NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
 	CH265Nalu Nalu;
+
+	{
+		int vps_present = 0;
+		int sps_present = 0;
+
+		Nalu.SetBuffer(pData.GetData(), pData.GetCount());
+		while (!(vps_present && sps_present)
+			   && Nalu.ReadNext()) {
+			NALU_TYPE nalu_type = Nalu.GetType();
+			switch (nalu_type) {
+				case NAL_TYPE_HEVC_VPS:
+				case NAL_TYPE_HEVC_SPS:
+					if (nalu_type == NAL_TYPE_HEVC_VPS) {
+						vps_present++;
+					} else if (nalu_type == NAL_TYPE_HEVC_SPS) {
+						sps_present++;
+					}
+			}
+		}
+
+		if (!(vps_present && sps_present)) {
+			return false;
+		}
+	}
+
 	Nalu.SetBuffer(pData.GetData(), pData.GetCount());
 	while (nalu_type != NAL_TYPE_HEVC_SPS && Nalu.ReadNext()) {
 		nalu_type = Nalu.GetType();
-	}
-
-	if (nalu_type != NAL_TYPE_HEVC_SPS) {
-		return false;
 	}
 
 	vc_params_t params = { 0 };
@@ -2024,32 +2041,37 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt)
 				int vps_present = 0;
 				int sps_present = 0;
 				int pps_present = 0;
+				int aud_present = 0;
 
 				Nalu.SetBuffer(pData.GetData(), pData.GetCount());
-				while (Nalu.ReadNext()) {
+				while (!(vps_present && sps_present && pps_present && aud_present)
+					   && Nalu.ReadNext()) {
 					nalu_type = Nalu.GetType();
 					switch (nalu_type) {
 						case NAL_TYPE_HEVC_VPS:
 						case NAL_TYPE_HEVC_SPS:
 						case NAL_TYPE_HEVC_PPS:
+						case NAL_TYPE_HEVC_AUD:
 							if (nalu_type == NAL_TYPE_HEVC_VPS) {
+								if (vps_present) continue;
 								vps_present++;
 								if (!HEVCParser::ParseVideoParameterSet(Nalu.GetDataBuffer() + 2, Nalu.GetDataLength() - 2, params)) {
 									return false;
 								}
 							} else if (nalu_type == NAL_TYPE_HEVC_SPS) {
+								if (sps_present) continue;
 								sps_present++;
 							} else if (nalu_type == NAL_TYPE_HEVC_PPS) {
+								if (pps_present) continue;
 								pps_present++;
+							} else if (nalu_type == NAL_TYPE_HEVC_AUD) {
+								if (aud_present) continue;
+								aud_present++;
 							}
 
 							extradata	= (BYTE*)realloc(extradata, extrasize + Nalu.GetDataLength() + 3);
 							memcpy(extradata + extrasize, Nalu.GetDataBuffer() - 3, Nalu.GetDataLength() + 3);
 							extrasize	+= Nalu.GetDataLength() + 3;
-					}
-
-					if (vps_present && sps_present && pps_present) {
-						break;
 					}
 				}
 			}
@@ -2070,6 +2092,44 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt)
 	}
 
 	return false;
+}
+
+bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt/* = NULL*/)
+{
+	CAtlArray<BYTE> pData;
+	pData.SetCount(len);
+	ByteRead(pData.GetData(), len);
+
+	return ParseHevc(pData, pmt);
+}
+
+bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt/* = NULL*/)
+{
+	if (pData.IsEmpty()) {
+		CAtlArray<BYTE> pTmpData;
+		pTmpData.SetCount(len);
+		ByteRead(pTmpData.GetData(), len);
+
+		NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
+		CH265Nalu Nalu;
+		Nalu.SetBuffer(pTmpData.GetData(), pTmpData.GetCount());
+		while (nalu_type != NAL_TYPE_HEVC_VPS && Nalu.ReadNext()) {
+			nalu_type = Nalu.GetType();
+		}
+
+		if (nalu_type != NAL_TYPE_HEVC_VPS) {
+			return false;
+		}
+
+		pData.SetCount(len);
+		memcpy(pData.GetData(), pTmpData.GetData(), len);
+	} else {
+		size_t dataLen = pData.GetCount();
+		pData.SetCount(dataLen + len);
+		ByteRead(pData.GetData() + dataLen, len);
+	}
+
+	return ParseHevc(pData, pmt);
 }
 
 bool CBaseSplitterFileEx::Read(adx_adpcm_hdr& h, int len, CMediaType* pmt)

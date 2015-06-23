@@ -472,6 +472,7 @@ public:
 	bool Read(dvbsub& h, int len, CMediaType* pmt = NULL, bool bSimpleAdd = false);
 	bool Read(avchdr& h, spsppsindex index);
 	bool Read(hevchdr& h, int len, CMediaType* pmt = NULL);
+	bool Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt = NULL);
 	bool Read(adx_adpcm_hdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* pmt = NULL);
 };

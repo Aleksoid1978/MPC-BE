@@ -723,7 +723,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		if (type == stream_type::unknown && (stream_type & HEVC_VIDEO)) {
 			Seek(start);
 			hevchdr h;
-			if (!m_streams[stream_type::video].Find(s) && Read(h, len, &s.mt)) {
+			if (!m_streams[stream_type::video].Find(s) && Read(h, len, hevch[s], &s.mt)) {
 				type = stream_type::video;
 			}
 		}
