@@ -8853,8 +8853,6 @@ void CMainFrame::OnUpdateAfterplayback(CCmdUI* pCmdUI)
 void CMainFrame::OnNavigateSkip(UINT nID)
 {
 	if (GetPlaybackMode() == PM_FILE) {
-		SetupChapters();
-
 		m_flastnID = nID;
 
 		if (DWORD nChapters = m_pCB->ChapGetCount()) {
@@ -8895,8 +8893,6 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 			SendMessage(WM_COMMAND, ID_NAVIGATE_SKIPFORWARDFILE);
 		}
 	} else if (GetPlaybackMode() == PM_DVD) {
-		SetupChapters();
-
 		m_PlaybackRate = 1.0;
 
 		if (GetMediaState() != State_Running) {
@@ -8959,6 +8955,8 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 			}
 
 			m_OSD.DisplayMessage(OSD_TOPLEFT, m_strOSD, 3000);
+
+			SetupChapters();
 		}
 
 		/*
@@ -14569,7 +14567,6 @@ void CMainFrame::SetupNavChaptersSubMenu()
 			}
 		}
 
-		SetupChapters();
 		REFERENCE_TIME rt = GetPos();
 		DWORD j = m_pCB->ChapLookup(&rt, NULL);
 
