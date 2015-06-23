@@ -11690,7 +11690,7 @@ void CMainFrame::SetupChapters()
 			IBaseFilter* pBF = pBFs.GetNext(pos);
 
 			CComQIPtr<IDSMChapterBag> pCB = pBF;
-			if (!pCB) {
+			if (!pCB || pCB->ChapGetCount() < 2) {
 				continue;
 			}
 
@@ -11708,7 +11708,7 @@ void CMainFrame::SetupChapters()
 			IBaseFilter* pBF = pBFs.GetNext(pos);
 
 			CComQIPtr<IChapterInfo> pCI = pBF;
-			if (!pCI) {
+			if (!pCI || pCI->GetChapterCount(CHAPTER_ROOT_ID) < 2) {
 				continue;
 			}
 
@@ -11744,7 +11744,8 @@ void CMainFrame::SetupChapters()
 			}
 
 			long MarkerCount = 0;
-			if (SUCCEEDED(pES->get_MarkerCount(&MarkerCount))) {
+			if (SUCCEEDED(pES->get_MarkerCount(&MarkerCount))
+					&& MarkerCount > 1) {
 				for (long i = 1; i <= MarkerCount; i++) {
 					double MarkerTime = 0;
 					if (SUCCEEDED(pES->GetMarkerTime(i, &MarkerTime))) {
@@ -11814,8 +11815,9 @@ void CMainFrame::SetupChapters()
  		DVD_PLAYBACK_LOCATION2 loc;
 		ULONG ulNumOfChapters = 0;
  		if (SUCCEEDED(m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))
-			&& SUCCEEDED(m_pDVDI->GetCurrentLocation(&loc))
-			&& SUCCEEDED(m_pDVDI->GetNumberOfChapters(loc.TitleNum, &ulNumOfChapters))) {
+				&& SUCCEEDED(m_pDVDI->GetCurrentLocation(&loc))
+				&& SUCCEEDED(m_pDVDI->GetNumberOfChapters(loc.TitleNum, &ulNumOfChapters))
+				&& ulNumOfChapters > 1) {
  			CStringW path;
 			path.Format(L"%s\\video_ts.IFO", buff);
 
