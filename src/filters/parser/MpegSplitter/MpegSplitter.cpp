@@ -945,7 +945,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				if (CComQIPtr<IVTSReader> VTSReader = pFilter) {
 					rt_IfoDuration			= VTSReader->GetDuration();
 					IfoASpect				= VTSReader->GetAspectRatio();
-					m_pFile->m_bIsBadPacked	= FALSE;
+					m_pFile->m_bIsBadPacked	= TRUE;
 				}
 			}
 		}
