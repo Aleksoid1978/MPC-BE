@@ -107,6 +107,7 @@ HRESULT CMpaSplitterFile::Init()
 		}
 	}
 
+	endpos = GetLength();
 	if (endpos > 128 && IsRandomAccess()) {
 		Seek(endpos - 128);
 
@@ -131,7 +132,7 @@ HRESULT CMpaSplitterFile::Init()
 	int searchlen		= 0;
 	__int64 startpos	= 0;
 
-	__int64 endDataPos = min(GetAvailable() - MPA_HEADER_SIZE, MEGABYTE + m_startpos);
+	__int64 endDataPos = min(endpos - MPA_HEADER_SIZE, MEGABYTE + m_startpos);
 	while (m_mode == none && endDataPos > (GetPos() + MPA_HEADER_SIZE)) {
 		searchlen = (int)min(endDataPos - GetPos(), 512);
 
