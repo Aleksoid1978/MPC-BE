@@ -43,6 +43,7 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	CAtlMap<WORD, BYTE> m_pid2pes;
 	CAtlMap<DWORD, avchdr> avch;
 	CAtlMap<DWORD, seqhdr> seqh;
+	CAtlMap<DWORD, CAtlArray<BYTE>> hevch;
 
 	CAtlMap<DWORD, int> streamPTSCount;
 
