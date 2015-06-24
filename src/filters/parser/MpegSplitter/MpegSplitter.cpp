@@ -869,7 +869,7 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 		SUBTITLEINFO* si	= (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + hdr.GetLength());
 		memset(si, 0, mt.FormatLength());
 		si->dwOffset		= sizeof(SUBTITLEINFO);
-		strncpy_s(si->IsoLang, pTI ? CStringA(pTI->GetTrackName(s.ps1id)) : "eng", _countof(si->IsoLang) - 1);
+		strncpy_s(si->IsoLang, m_pTI ? CStringA(m_pTI->GetTrackName(s.ps1id)) : "eng", _countof(si->IsoLang) - 1);
 		memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
 
 		s.mts.push_back(mt);
@@ -895,7 +895,7 @@ CString CMpegSplitterFilter::FormatStreamName(CMpegSplitterFile::stream& s, CMpe
 	pStreamName					= StreamTypeToName((PES_STREAM_TYPE)StreamType);
 
 	CStringA lang_name	= s.lang;
-	lang_name			= pTI ? CStringA(pTI->GetTrackName(s.ps1id)) : lang_name;
+	lang_name			= m_pTI ? CStringA(m_pTI->GetTrackName(s.ps1id)) : lang_name;
 
 	CString FormatDesc = GetMediaTypeDesc(&s.mt, pClipInfo, StreamType, lang_name);
 
@@ -939,14 +939,12 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	fraction_t		IfoASpect		= {0, 0};
 	if (m_pFile->m_type == MPEG_TYPES::mpeg_ps) {
 		if (m_pInput && m_pInput->IsConnected() && (GetCLSID(m_pInput->GetConnected()) == __uuidof(CVTSReader))) { // MPC VTS Reader
-			pTI = GetFilterFromPin(m_pInput->GetConnected());
-
-			if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected()) ) {
-				if (CComQIPtr<IVTSReader> VTSReader = pFilter) {
-					rt_IfoDuration			= VTSReader->GetDuration();
-					IfoASpect				= VTSReader->GetAspectRatio();
-					m_pFile->m_bIsBadPacked	= TRUE;
-				}
+			CComPtr<IBaseFilter> pBF = GetFilterFromPin(m_pInput->GetConnected());
+			m_pTI = pBF;
+			if (CComQIPtr<IVTSReader> VTSReader = pBF) {
+				rt_IfoDuration			= VTSReader->GetDuration();
+				IfoASpect				= VTSReader->GetAspectRatio();
+				m_pFile->m_bIsBadPacked	= FALSE;
 			}
 		}
 	}
@@ -1268,7 +1266,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					m_pFile->Seek(seekpos);
 					__int64 curpos = seekpos;
 
-					if (m_pFile->m_type == MPEG_TYPES::mpeg_ts) {
+					if (m_pFile->m_type == MPEG_TYPES::mpeg_ts || m_pTI) {
 						double div = 1.0;
 						for (;;) {
 							REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
