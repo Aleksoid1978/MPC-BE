@@ -11688,7 +11688,7 @@ void CMainFrame::SetupChapters()
 			IBaseFilter* pBF = pBFs.GetNext(pos);
 
 			CComQIPtr<IDSMChapterBag> pCB = pBF;
-			if (!pCB || pCB->ChapGetCount() < 2) {
+			if (!pCB) {
 				continue;
 			}
 
@@ -11706,7 +11706,7 @@ void CMainFrame::SetupChapters()
 			IBaseFilter* pBF = pBFs.GetNext(pos);
 
 			CComQIPtr<IChapterInfo> pCI = pBF;
-			if (!pCI || pCI->GetChapterCount(CHAPTER_ROOT_ID) < 2) {
+			if (!pCI) {
 				continue;
 			}
 
@@ -11742,8 +11742,7 @@ void CMainFrame::SetupChapters()
 			}
 
 			long MarkerCount = 0;
-			if (SUCCEEDED(pES->get_MarkerCount(&MarkerCount))
-					&& MarkerCount > 1) {
+			if (SUCCEEDED(pES->get_MarkerCount(&MarkerCount))) {
 				for (long i = 1; i <= MarkerCount; i++) {
 					double MarkerTime = 0;
 					if (SUCCEEDED(pES->GetMarkerTime(i, &MarkerTime))) {
