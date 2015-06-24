@@ -675,11 +675,13 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= 0
 					exitCell = ReadByte() - 1;
 				}
 
+				cell_info_t chapter;
+				chapter.first_sector = UINT32_MAX;
+				chapter.last_sector = 0;
+				chapter.duration = 0;
+
 				for (int cell = entryCell; cell <= exitCell; cell++) {
-					cell_info_t chapter;
-					chapter.first_sector = UINT32_MAX;
-					chapter.last_sector = 0;
-					chapter.duration = 0;
+					REFERENCE_TIME duration = 0;
 
 					// cell playback time
 					m_ifoFile.Seek(posPGCI + offsetPGC + offsetCellPlaybackInfoTable + (cell - 1)*0x18, CFile::begin);
@@ -687,12 +689,12 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= 0
 					int cellType = buf[0] >> 6;
 					if (cellType == 0x00 || cellType == 0x01) {
 						m_ifoFile.Read(buf, 4);
-						chapter.duration = FormatTime(buf);
+						duration = FormatTime(buf);
 					}
 					
-					chapter.first_sector = ReadDword(); // first VOBU start sector
+					DWORD firstVOBUStartSector = ReadDword(); // first VOBU start sector
 					m_ifoFile.Seek(8, CFile::current);
-					chapter.last_sector = ReadDword(); // last VOBU end sector
+					DWORD lastVOBUEndSector = ReadDword(); // last VOBU end sector
 
 					m_ifoFile.Seek(posPGCI + offsetPGC + offsetCellPositionInfoTable + (cell - 1)*4, CFile::begin);
 					chapter.VOB_id = ReadWord();
@@ -700,27 +702,35 @@ bool CVobFile::OpenIFO(CString fn, CAtlList<CString>& vobs, ULONG nProgNum /*= 0
 					chapter.Cell_id = ReadByte();
 
 					DbgLog((LOG_TRACE, 3, L"CVobFile::OpenIFO() - PGS : %2d, Pg : %2d, Cell : %2d, VOB id : %2d, Cell id : %2d, first sector : %10lu, last sector : %10lu, duration = %s",
-							prog, chap, cell, chapter.VOB_id, chapter.Cell_id, chapter.first_sector, chapter.last_sector, ReftimeToString(chapter.duration)));
+							prog, chap, cell, chapter.VOB_id, chapter.Cell_id, firstVOBUStartSector, lastVOBUEndSector, ReftimeToString(duration)));
 
 					for (size_t i = 0; i < programs[0].chapters.GetCount(); i++) {
 						if (chapter.VOB_id == programs[0].chapters[i].VOB_id && chapter.Cell_id == programs[0].chapters[i].Cell_id) {
 							if (programs[0].chapters[i].duration == 0) {
-								programs[0].chapters[i].duration = chapter.duration;
+								programs[0].chapters[i].duration = duration;
 							}
-							ASSERT(chapter.first_sector == programs[0].chapters[i].first_sector);
-							ASSERT(chapter.last_sector == programs[0].chapters[i].last_sector);
+							ASSERT(programs[0].chapters[i].first_sector == firstVOBUStartSector);
+							ASSERT(programs[0].chapters[i].last_sector == lastVOBUEndSector);
 							break;
 						}
 					}
 
-					CAtlArray<cell_info_t>& chapters = programs[prog].chapters;
-					if (chapters.GetCount() && chapters[chapters.GetCount() - 1].last_sector + 1 != chapter.first_sector) {
-						continue; // ignore jumps for program
+					chapter.duration += duration;
+					if (chapter.first_sector > firstVOBUStartSector) {
+						chapter.first_sector = firstVOBUStartSector;
 					}
-
-					programs[prog].chapters.Add(chapter);
-					programs[prog].duration += chapter.duration;
+					if (chapter.last_sector < lastVOBUEndSector) {
+						chapter.last_sector = lastVOBUEndSector;
+					}
 				}
+
+				CAtlArray<cell_info_t>& chapters = programs[prog].chapters;
+				if (chapters.GetCount() && chapters[chapters.GetCount() - 1].last_sector + 1 != chapter.first_sector) {
+					continue; // ignore jumps for program
+				}
+
+				programs[prog].chapters.Add(chapter);
+				programs[prog].duration += chapter.duration;
 			}
 		}
 
