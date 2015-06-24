@@ -42,7 +42,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	CHdmvClipInfo	m_ClipInfo;
 
 	CAutoPtr<CMpegSplitterFile> m_pFile;
-	CComQIPtr<ITrackInfo> pTI;
+	CComQIPtr<ITrackInfo> m_pTI;
 
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 	void	ReadClipInfo(LPCOLESTR pszFileName);
