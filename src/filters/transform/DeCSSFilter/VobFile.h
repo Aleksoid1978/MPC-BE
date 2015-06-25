@@ -127,6 +127,7 @@ public:
 	BSTR			GetTrackName(UINT aTrackIdx) const;
 	UINT			GetChaptersCount() const { return (UINT)m_pChapters.GetCount(); }
 	REFERENCE_TIME	GetChapterTime(UINT ChapterNumber) const;
+	__int64			GetChapterPos(UINT ChapterNumber) const;
 	REFERENCE_TIME	GetDuration() const { return m_rtDuration; }
 	fraction_t		GetAspectRatio() const { return m_Aspect; }
 
