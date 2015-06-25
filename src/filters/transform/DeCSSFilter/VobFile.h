@@ -27,6 +27,8 @@
 
 #include "../../../DSUtil/DSUtil.h"
 
+// CDVDSession
+
 class CDVDSession
 {
 protected:
@@ -57,6 +59,8 @@ public:
 	bool ReadKey(DVD_KEY_TYPE KeyType, BYTE* pKeyData, int lba = 0);
 };
 
+// CLBAFile
+
 class CLBAFile : private CFile
 {
 public:
@@ -74,20 +78,16 @@ public:
 	bool Read(BYTE* buff);
 };
 
+// CVobFile
+
 class CVobFile : public CDVDSession
 {
-	struct chapter_t {
-		REFERENCE_TIME rtime;
-		UINT32 first_sector;
-		UINT32 last_sector;
-		UINT32 title:16, track:8;
-	};
-
-	// all files
 	struct file_t {
 		CString fn;
 		int size;
 	};
+
+	// all files
 	CAtlArray<file_t> m_files;	// group of vob files
 	int m_offset;				// first sector for group of vob files
 	int m_size;					// last sector for group of vob files
@@ -100,29 +100,45 @@ class CVobFile : public CDVDSession
 	// attribs
 	bool m_fDVD, m_fHasDiscKey, m_fHasTitleKey;
 
-	CAtlMap<DWORD, CString> m_pStream_Lang;
+public:
+	CVobFile();
+	virtual ~CVobFile();
 
+	bool OpenVOBs(const CAtlList<CString>& files); // vts vobs
+	bool SetOffsets(int start_sector, int end_sector = -1); // video vob offset in lba
+	void Close();
+
+	int GetLength() const;
+	int GetPosition() const;
+	int Seek(int pos);
+	bool Read(BYTE* buff);
+
+	bool IsDVD() const;
+	bool HasDiscKey(BYTE* key) const;
+	bool HasTitleKey(BYTE* key) const;
+};
+
+// CIfoFile
+
+class CIfoFile
+{
+	struct chapter_t {
+		REFERENCE_TIME rtime;
+		UINT32 first_sector;
+		UINT32 last_sector;
+		UINT32 title:16, track:8;
+	};
+
+	CAtlMap<DWORD, CString> m_pStream_Lang;
 	CAtlArray<chapter_t> m_pChapters;
 
 	REFERENCE_TIME	m_rtDuration;
 	fraction_t		m_Aspect;
 
 public:
-	CVobFile();
-	virtual ~CVobFile();
+	CIfoFile();
 
-	static bool GetTitleInfo(LPCTSTR fn, ULONG nTitleNum, ULONG& VTSN /* out */, ULONG& TTN /* out */); // video_ts.ifo
-
-	bool OpenIFO(CString fn, CAtlList<CString>& files /* out */, ULONG nProgNum = 0); // vts ifo
-
-	bool IsDVD() const;
-	bool HasDiscKey(BYTE* key) const;
-	bool HasTitleKey(BYTE* key) const;
-
-	int GetLength() const;
-	int GetPosition() const;
-	int Seek(int pos);
-	bool Read(BYTE* buff);
+	bool OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum = 0); // vts ifo
 
 	BSTR			GetTrackName(UINT aTrackIdx) const;
 	UINT			GetChaptersCount() const { return (UINT)m_pChapters.GetCount(); }
@@ -131,12 +147,9 @@ public:
 	REFERENCE_TIME	GetDuration() const { return m_rtDuration; }
 	fraction_t		GetAspectRatio() const { return m_Aspect; }
 
+	static bool GetTitleInfo(LPCTSTR fn, ULONG nTitleNum, ULONG& VTSN /* out */, ULONG& TTN /* out */); // video_ts.ifo
+
 private:
-	bool OpenVOBs(const CAtlList<CString>& files); // vts vobs
-
-	bool SetOffsets(int start_sector, int end_sector = -1); // video vob offset in lba
-	void Close();
-
 	CFile		m_ifoFile;
 	BYTE		ReadByte();
 	WORD		ReadWord();

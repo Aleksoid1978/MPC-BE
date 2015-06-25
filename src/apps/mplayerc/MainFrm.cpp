@@ -11827,14 +11827,15 @@ void CMainFrame::SetupChapters()
 			path.Format(L"%s\\video_ts.IFO", buff);
 
 			ULONG VTSN, TTN;
-			if (::PathFileExists(path) && CVobFile::GetTitleInfo(path, loc.TitleNum, VTSN, TTN)) {
+			if (::PathFileExists(path) && CIfoFile::GetTitleInfo(path, loc.TitleNum, VTSN, TTN)) {
 				path.Format(L"%s\\VTS_%02lu_0.IFO", buff, VTSN);
-
+			
 				CAtlList<CString> files;
+				CIfoFile ifo;
 				CVobFile vob;
-				if (::PathFileExists(path) && vob.OpenIFO(path, files, TTN) && ulNumOfChapters == vob.GetChaptersCount()) {
-					for (UINT i = 0; i < vob.GetChaptersCount(); i++) {
-						REFERENCE_TIME rt = vob.GetChapterTime(i);
+				if (::PathFileExists(path) && ifo.OpenIFO(path, &vob, TTN) && ulNumOfChapters == ifo.GetChaptersCount()) {
+					for (UINT i = 0; i < ifo.GetChaptersCount(); i++) {
+						REFERENCE_TIME rt = ifo.GetChapterTime(i);
 						CString str;
 						str.Format(IDS_AG_CHAPTER, i + 1);
 						m_pCB->ChapAppend(rt, str);
@@ -18830,7 +18831,7 @@ CString CMainFrame::GetCurDVDPath(BOOL bSelectCurTitle/* = FALSE*/)
 			DVD_PLAYBACK_LOCATION2 loc;
 			if (SUCCEEDED(m_pDVDI->GetCurrentLocation(&loc))) {
 				ULONG VTSN, TTN;
-				if (::PathFileExists(path) && CVobFile::GetTitleInfo(path, loc.TitleNum, VTSN, TTN)) {
+				if (::PathFileExists(path) && CIfoFile::GetTitleInfo(path, loc.TitleNum, VTSN, TTN)) {
 					path.Format(L"%s\\VTS_%02lu_0.IFO", buff, VTSN);
 				}
 			}

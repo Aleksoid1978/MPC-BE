@@ -33,6 +33,7 @@
 
 #define VTSReaderName L"MPC VTS Reader"
 
+class CIfoFile;
 class CVobFile;
 
 class CVTSStream : public CAsyncStream
@@ -40,6 +41,7 @@ class CVTSStream : public CAsyncStream
 private:
 	CCritSec m_csLock;
 
+	CAutoPtr<CIfoFile> m_ifo;
 	CAutoPtr<CVobFile> m_vob;
 	int m_off;
 
