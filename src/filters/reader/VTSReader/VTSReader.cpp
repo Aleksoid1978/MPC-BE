@@ -291,6 +291,7 @@ STDMETHODIMP_(fraction_t) CVTSReader::GetAspectRatio()
 
 CVTSStream::CVTSStream() : m_off(0)
 {
+	m_ifo.Attach(DNew CIfoFile());
 	m_vob.Attach(DNew CVobFile());
 }
 
@@ -302,7 +303,7 @@ bool CVTSStream::Load(const WCHAR* fnw, bool bEnableTitleSelection)
 {
 	// TODO bEnableTitleSelection
 	CAtlList<CString> sl;
-	return (m_vob && m_vob->OpenIFO(fnw, sl, 0));
+	return (m_ifo && m_vob && m_ifo->OpenIFO(fnw, m_vob, 0));
 }
 
 HRESULT CVTSStream::SetPointer(LONGLONG llPos)
@@ -373,25 +374,25 @@ void CVTSStream::Unlock()
 
 BSTR CVTSStream::GetTrackName(UINT aTrackIdx)
 {
-	return m_vob->GetTrackName(aTrackIdx);
+	return m_ifo->GetTrackName(aTrackIdx);
 }
 
 UINT CVTSStream::GetChaptersCount()
 {
-	return m_vob->GetChaptersCount();
+	return m_ifo->GetChaptersCount();
 }
 
 REFERENCE_TIME CVTSStream::GetChapterTime(UINT ChapterNumber)
 {
-	return m_vob->GetChapterTime(ChapterNumber);
+	return m_ifo->GetChapterTime(ChapterNumber);
 }
 
 REFERENCE_TIME CVTSStream::GetDuration()
 {
-	return m_vob->GetDuration();
+	return m_ifo->GetDuration();
 }
 
 fraction_t CVTSStream::GetAspectRatio()
 {
-	return m_vob->GetAspectRatio();
+	return m_ifo->GetAspectRatio();
 }
