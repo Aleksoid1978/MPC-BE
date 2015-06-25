@@ -52,6 +52,8 @@ public:
 	void			SkipBytes(int nCount);
 	void			Seek(int nPos);
 
+	bool			NextMpegStartCode(BYTE& code);
+
 private :
 	BYTE*			m_pBuffer;
 	int				m_nSize;

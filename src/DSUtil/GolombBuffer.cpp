@@ -180,3 +180,18 @@ void CGolombBuffer::Seek(int nCount)
 	m_bitlen	= 0;
 	m_bitbuff	= 0;
 }
+
+bool CGolombBuffer::NextMpegStartCode(BYTE& code)
+{
+	BitByteAlign();
+	DWORD dw = DWORD_MAX;
+	do {
+		if (IsEOF()) {
+			return false;
+		}
+		dw = (dw << 8) | (BYTE)BitRead(8);
+	} while ((dw & 0xffffff00) != 0x00000100);
+	code = (BYTE)(dw & 0xff);
+	
+	return true;
+}
