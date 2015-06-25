@@ -2559,6 +2559,14 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
 				m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_SUBTITLES), Subtitles);
 			}
+
+			if (GetMediaState() == State_Running && !m_bAudioOnly && !IsWinVistaOrLater()) {
+				UINT uSaverActive = 0;
+				if (SystemParametersInfo(SPI_GETSCREENSAVEACTIVE, 0, (PVOID)&uSaverActive, 0)) {
+					SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, 0, 0, SPIF_SENDWININICHANGE); // this might not be needed at all...
+					SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, uSaverActive, 0, SPIF_SENDWININICHANGE);
+				}
+			}
 		}
 		break;
 		case TIMER_STATUSERASER: {
