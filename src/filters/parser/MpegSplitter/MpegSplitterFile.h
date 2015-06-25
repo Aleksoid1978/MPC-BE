@@ -82,11 +82,28 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	BOOL m_bIMKH_CCTV;
 
 public:
+	enum stream_codec {
+		NONE,
+		H264,
+		HEVC,
+		MPEG,
+		VC1
+	};
+
+	enum stream_type {
+		video,
+		audio,
+		subpic,
+		stereo,
+		unknown
+	};
+
 	bool m_bIsBD;
 	CHdmvClipInfo &m_ClipInfo;
 	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool m_AlternativeDuration, bool SubEmptyPin);
 
-	REFERENCE_TIME NextPTS(DWORD TrackNum, BOOL bKeyFrameOnly = FALSE);
+	BOOL CheckKeyFrame(CAtlArray<BYTE>& pData, stream_codec codec);
+	REFERENCE_TIME NextPTS(DWORD TrackNum, stream_codec codec, __int64& nextPos, BOOL bKeyFrameOnly = FALSE);
 
 	CCritSec m_csProps;
 
@@ -119,17 +136,14 @@ public:
 			bool bDTSHD;
 		} dts;
 
-		enum stream_type {
-			NONE,
-			H264
-		} type;
+		stream_codec codec;
 
 		stream() {
 			pid				= 0;
 			pesid			= 0;
 			ps1id			= 0;
 			lang_set		= false;
-			type			= stream_type::NONE;
+			codec			= stream_codec::NONE;
 
 			dts.bDTSCore	= false;
 			dts.bDTSHD		= false;
@@ -146,8 +160,6 @@ public:
 			return (DWORD)*this == (DWORD)s;
 		}
 	};
-
-	enum stream_type { video, audio, subpic, stereo, unknown };
 
 	class CStreamList : public CAtlList<stream>
 	{

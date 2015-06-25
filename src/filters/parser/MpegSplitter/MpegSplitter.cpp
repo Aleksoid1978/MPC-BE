@@ -1165,14 +1165,15 @@ bool CMpegSplitterFilter::DemuxInit()
 	return true;
 }
 
-#define SimpleSeek														\
-	REFERENCE_TIME rtPTS = m_pFile->NextPTS(pMasterStream->GetHead());	\
-	if (rtPTS != INVALID_TIME) {										\
-		m_rtStartOffset = m_pFile->m_rtMin + rtPTS - rt;				\
-	}																	\
-	if (m_rtStartOffset > m_pFile->m_rtMax) {							\
-		m_rtStartOffset = 0;											\
-	}																	\
+#define SimpleSeek																		\
+	__int64 nextPos;																	\
+	REFERENCE_TIME rtPTS = m_pFile->NextPTS(masterStream, masterStream.codec, nextPos);	\
+	if (rtPTS != INVALID_TIME) {														\
+		m_rtStartOffset = m_pFile->m_rtMin + rtPTS - rt;								\
+	}																					\
+	if (m_rtStartOffset > m_pFile->m_rtMax) {											\
+		m_rtStartOffset = 0;															\
+	}																					\
 
 #define SeekPos(t) (__int64)(1.0 * t / m_rtDuration * len)
 
@@ -1184,9 +1185,13 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		return;
 	}
 
+	CMpegSplitterFile::stream& masterStream = pMasterStream->GetHead();
+	DWORD TrackNum = masterStream;
+
 	if (m_pFile->IsStreaming()) {
 		m_pFile->Seek(max(0, m_pFile->GetLength() - 256 * KILOBYTE));
-		m_rtStartOffset = m_pFile->m_rtMin + m_pFile->NextPTS(pMasterStream->GetHead());
+		__int64 nextPos;
+		m_rtStartOffset = m_pFile->m_rtMin + m_pFile->NextPTS(TrackNum, masterStream.codec, nextPos);
 		return;
 	}
 
@@ -1197,18 +1202,16 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		}
 	} else {
 		__int64 pos = SeekBD(rt);
-		if (pos >= 0) {
-			if (pos < m_pFile->GetLength()) {
-				m_pFile->Seek(pos + 4);
+		if (pos >= 0 && pos < (m_pFile->GetLength() - 4)) {
+			m_pFile->Seek(pos + 4);
 
-				CMpegSplitterFile::stream stream = pMasterStream->GetHead();
-				REFERENCE_TIME rtmax = rt - UNITS;
-				REFERENCE_TIME rtPTS = m_pFile->NextPTS(stream);
+			REFERENCE_TIME rtmax = rt - UNITS;
+			__int64 nextPos;
+			REFERENCE_TIME rtPTS = m_pFile->NextPTS(TrackNum, masterStream.codec, nextPos);
 
-				while (rtPTS <= rtmax && rtPTS != INVALID_TIME && (m_pFile->GetPos() + 192) < m_pFile->GetLength()) {
-					m_pFile->Seek(m_pFile->GetPos() + 192);
-					rtPTS = m_pFile->NextPTS(stream);
-				}
+			while (m_pFile->GetRemaining() && rtPTS <= rtmax && rtPTS != INVALID_TIME) {
+				m_pFile->Seek(nextPos);
+				rtPTS = m_pFile->NextPTS(TrackNum, masterStream.codec, nextPos);
 			}
 
 			return;
@@ -1221,94 +1224,57 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		REFERENCE_TIME rtmax	= rt - UNITS;
 		REFERENCE_TIME rtmin	= rtmax - UNITS/2;
 
-		CMpegSplitterFile::stream stream = pMasterStream->GetHead();
-		if (m_pFile->m_bPESPTSPresent && stream.type == CMpegSplitterFile::stream::stream_type::H264) {
-			__int64 save_seekpos = seekpos;
-			m_pFile->Seek(seekpos);
-
-			REFERENCE_TIME rtPTS = m_pFile->NextPTS(pMasterStream->GetHead(), TRUE);
-			while (rtPTS > rtmax && seekpos) {
-				seekpos = max(0, seekpos - MEGABYTE);
-				m_pFile->Seek(seekpos);
-				rtPTS = m_pFile->NextPTS(pMasterStream->GetHead(), TRUE);
-			}
-
-			if (rtPTS == INVALID_TIME || rtPTS > rtmax) {
-				seekpos	= save_seekpos;
-			} else {
-				seekpos = m_pFile->GetPos();
-				while (rtPTS != INVALID_TIME) {
-					m_pFile->Seek(m_pFile->GetPos() + 192);
-					rtPTS = m_pFile->NextPTS(pMasterStream->GetHead(), TRUE);
-					if (rtPTS > rtmax) {
-						m_pFile->Seek(seekpos);
-						break;
-					}
-					seekpos = m_pFile->GetPos();
-				}
-			}
-
-			if (rtPTS != INVALID_TIME) {
-				m_pFile->Seek(seekpos);
-				return;
-			}
-
-			seekpos	= save_seekpos;
-		}
-
-		if (!m_pFile->m_bIsBadPacked && m_pFile->m_bPESPTSPresent) {
+		if (m_pFile->m_bPESPTSPresent) {
 			POSITION pos = pMasterStream->GetHeadPosition();
 			while (pos) {
-				DWORD TrackNum = pMasterStream->GetNext(pos);
+				CMpegSplitterFile::stream& stream = pMasterStream->GetNext(pos);
+				TrackNum = stream;
 
 				CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNum);
 				if (pPin && pPin->IsConnected()) {
 					m_pFile->Seek(seekpos);
 					__int64 curpos = seekpos;
 
-					if (m_pFile->m_type == MPEG_TYPES::mpeg_ts || m_pTI) {
-						double div = 1.0;
-						for (;;) {
-							REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
-							if (rt2 == INVALID_TIME) {
-								break;
-							}
-
-							if (rtmin <= rt2 && rt2 <= rtmax) {
-								minseekpos = m_pFile->GetPos();
-								break;
-							}
-
-							REFERENCE_TIME dt = rt2 - rtmax;
-							if (rt2 < 0) {
-								dt = 20 * UNITS / div;
-							}
-							dt /= div;
-							div += 0.05;
-
-							if (div >= 5.0) {
-								break;
-							}
-
-							curpos -= SeekPos(dt);
-							m_pFile->Seek(curpos);
+					double div = 1.0;
+					__int64 nextPos;
+					for (;;) {
+						REFERENCE_TIME rtPTS = m_pFile->NextPTS(TrackNum, stream.codec, nextPos);
+						if (rtPTS == INVALID_TIME) {
+							break;
 						}
-					} else {
-						for (int j = 0; j < 10; j++) {
-							REFERENCE_TIME rt2 = m_pFile->NextPTS(TrackNum);
-							if (rt2 < 0) {
-								break;
+
+						if (rtmin <= rtPTS && rtPTS < rtmax) {
+							minseekpos = m_pFile->GetPos();
+							
+							if (stream.codec == CMpegSplitterFile::stream_codec::MPEG
+									|| stream.codec == CMpegSplitterFile::stream_codec::H264) {
+								REFERENCE_TIME rtLimit = CMpegSplitterFile::stream_codec::MPEG ? rt : rtmax;
+								while (m_pFile->GetRemaining()) {
+									m_pFile->Seek(nextPos);
+									rtPTS = m_pFile->NextPTS(TrackNum, stream.codec, nextPos, TRUE);
+									if (rtPTS > rtLimit || rtPTS == INVALID_TIME) {
+										break;
+									}
+									minseekpos = m_pFile->GetPos();
+								}
 							}
 
-							if (rtmin <= rt2 && rt2 <= rtmax) {
-								minseekpos = m_pFile->GetPos();
-								break;
-							}
-
-							REFERENCE_TIME dt = rt2 - rtmax;
-							curpos -= SeekPos(dt);
-							m_pFile->Seek(curpos);
+							break;
 						}
+
+						REFERENCE_TIME dt = rtPTS - rtmax;
+						if (rtPTS < 0) {
+							dt = 20 * UNITS / div;
+						}
+						dt /= div;
+						div += 0.05;
+
+						if (div >= 5.0) {
+							break;
+						}
+
+						curpos -= SeekPos(dt);
+						m_pFile->Seek(curpos);
 					}
 				}
 			}

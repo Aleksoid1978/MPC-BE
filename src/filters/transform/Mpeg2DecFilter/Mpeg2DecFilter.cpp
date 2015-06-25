@@ -885,20 +885,6 @@ HRESULT CMpeg2DecFilter::CheckConnect(PIN_DIRECTION dir, IPin* pPin)
 	return __super::CheckConnect(dir, pPin);
 }
 
-int NextMpegStartCode(CGolombBuffer& gb, BYTE& code, __int64 len)
-{
-	gb.BitByteAlign();
-	DWORD dw = (DWORD)-1;
-	do {
-		if (len-- == 0) {
-			return false;
-		}
-		dw = (dw << 8) | (BYTE)gb.BitRead(8);
-	} while ((dw&0xffffff00) != 0x00000100);
-	code = (BYTE)(dw&0xff);
-	return true;
-}
-
 HRESULT CMpeg2DecFilter::CheckInputType(const CMediaType* mtIn)
 {
 	if (mtIn->formattype == FORMAT_MPEG2_VIDEO && mtIn->pbFormat) {
@@ -911,8 +897,8 @@ HRESULT CMpeg2DecFilter::CheckInputType(const CMediaType* mtIn)
 
 		BYTE id = 0;
 		CGolombBuffer gb(pSequenceHeader, cbSequenceHeader);
-		while (gb.GetPos() < gb.GetSize() && id != 0xb5) {
-			if (!NextMpegStartCode(gb, id, cbSequenceHeader)) {
+		while (!gb.IsEOF() && id != 0xb5) {
+			if (!gb.NextMpegStartCode(id)) {
 				break;
 			}
 		}

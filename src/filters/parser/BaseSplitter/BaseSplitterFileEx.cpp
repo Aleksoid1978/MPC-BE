@@ -320,29 +320,14 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sy
 	return Read(h, pData, pmt, find_sync);
 }
 
-static bool NextMpegStartCodeGb(CGolombBuffer& gb, BYTE& code)
-{
-	gb.BitByteAlign();
-	DWORD dw = DWORD_MAX;
-	do {
-		if (gb.IsEOF()) {
-			return false;
-		}
-		dw = (dw << 8) | (BYTE)gb.BitRead(8);
-	} while ((dw & 0xffffff00) != 0x00000100);
-	code = (BYTE)(dw & 0xff);
-	return true;
-}
-
 #define MARKERGB if (gb.BitRead(1) != 1) {DEBUG_ASSERT(0);/* return false;*/}
 bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt, bool find_sync)
 {
 	BYTE id = 0;
 
 	CGolombBuffer gb(buf.GetData(), buf.GetCount());
-
 	while (!gb.IsEOF() && id != 0xb3) {
-		if (!NextMpegStartCodeGb(gb, id)) {
+		if (!gb.NextMpegStartCode(id)) {
 			return false;
 		}
 
@@ -393,7 +378,7 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt,
 
 	__int64 shextpos = 0, shextlen = 0;
 
-	if (NextMpegStartCodeGb(gb, id) && id == 0xb5) { // sequence header ext
+	if (gb.NextMpegStartCode(id) && id == 0xb5) { // sequence header ext
 		shextpos = gb.GetPos() - 4;
 
 		h.startcodeid = gb.BitRead(4);
@@ -422,7 +407,7 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt,
 		type = mpeg2;
 
 		while (!gb.IsEOF()) {
-			if (NextMpegStartCodeGb(gb, id)) {
+			if (gb.NextMpegStartCode(id)) {
 				if (id != 0xb5) {
 					continue;
 				}

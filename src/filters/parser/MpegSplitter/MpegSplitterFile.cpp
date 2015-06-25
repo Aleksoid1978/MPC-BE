@@ -261,11 +261,51 @@ void CMpegSplitterFile::OnUpdateDuration()
 	Seek(pos);
 }
 
-REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, BOOL bKeyFrameOnly/* = FALSE*/)
+BOOL CMpegSplitterFile::CheckKeyFrame(CAtlArray<BYTE>& pData, stream_codec codec)
+{
+	if (codec == stream_codec::H264) {
+		CH264Nalu Nalu;
+		Nalu.SetBuffer(pData.GetData(), pData.GetCount());
+		while (Nalu.ReadNext()) {
+			NALU_TYPE nalu_type = Nalu.GetType();
+			if (nalu_type == NALU_TYPE_IDR || nalu_type == NALU_TYPE_SEI) {
+				// IDR/SEI Nalu
+				return TRUE;
+			}
+		}
+
+		return FALSE;
+	} else if (codec == stream_codec::MPEG) {
+		BYTE id = 0;
+		
+		CGolombBuffer gb(pData.GetData(), pData.GetCount());
+		while (!gb.IsEOF()) {
+			if (!gb.NextMpegStartCode(id)) {
+				break;
+			}
+
+			if (id == 0x00 && gb.RemainingSize()) {
+				BYTE* picture = gb.GetBufferPos();
+				BYTE pict_type = (picture[1] >> 3) & 7;
+				if (pict_type == 1) {
+					// Intra
+					return TRUE;
+				}
+			}
+		}
+
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __int64& nextPos, BOOL bKeyFrameOnly/* = FALSE*/)
 {
 	REFERENCE_TIME rt	= INVALID_TIME;
 	__int64 rtpos		= -1;
 	__int64 pos			= GetPos();
+	nextPos				= pos + 1;
 
 	BYTE b;
 
@@ -285,12 +325,28 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, BOOL bKeyFrameOnly/* =
 				}
 
 				__int64 pos3 = GetPos();
+				nextPos = pos3 + h.len;
 
 				if (h.fpts && AddStream(0, b, h.id_ext, h.len, FALSE) == TrackNum) {
-					//ASSERT(h.pts >= m_rtMin && h.pts <= m_rtMax);
 					rt		= h.pts;
 					rtpos	= pos2;
-					break;
+
+					BOOL bKeyFrame = TRUE;
+					if (bKeyFrameOnly) {
+						bKeyFrame = FALSE;
+						__int64 nBytes = h.len - (GetPos() - pos2);
+						if (nBytes > 0) {
+							CAtlArray<BYTE> p;
+							p.SetCount((size_t)nBytes);
+							ByteRead(p.GetData(), nBytes);
+
+							bKeyFrame = CheckKeyFrame(p, codec);
+						}
+					}
+
+					if (bKeyFrame) {
+						break;
+					}
 				}
 
 				Seek(pos3 + h.len);
@@ -303,6 +359,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, BOOL bKeyFrameOnly/* =
 			}
 
 			__int64 packet_pos = GetPos();
+			nextPos = h.next;
 
 			if (h.payloadstart && ISVALIDPID(h.pid) && h.pid == TrackNum) {
 				if (NextMpegStartCode(b, 4)) {
@@ -316,19 +373,49 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, BOOL bKeyFrameOnly/* =
 							if (!h.randomaccess) {
 								bKeyFrame = FALSE;
 
-								CAtlArray<BYTE> p;
 								int nBytes = h.bytes - (GetPos() - packet_pos);
 								if (nBytes > 0) {
+									CAtlArray<BYTE> p;
 									p.SetCount((size_t)nBytes);
 									ByteRead(p.GetData(), nBytes);
 
-									CH264Nalu Nalu;
-									Nalu.SetBuffer(p.GetData(), p.GetCount());
-									while (Nalu.ReadNext() && !bKeyFrame) {
-										NALU_TYPE nalu_type = Nalu.GetType();
-										if (nalu_type == NALU_TYPE_IDR || nalu_type == NALU_TYPE_SEI) {
-											bKeyFrame = TRUE;
-											break;
+									// collect solid data packet
+									{
+										Seek(h.next);
+										while (GetRemaining()) {
+											__int64 start_pos_2 = GetPos();
+
+											trhdr trhdr_2;
+											__int64 pos_trhdr = Read(trhdr_2);
+											if (pos_trhdr == -1) {
+												continue;
+											}
+
+											__int64 packet_pos_2 = GetPos();
+
+											if (trhdr_2.payload && trhdr_2.pid == TrackNum) {
+												if (trhdr_2.payloadstart) {
+													if (NextMpegStartCode(b, 4)) {
+														peshdr peshdr_2;
+														if (Read(peshdr_2, b) && peshdr_2.fpts) {
+															bKeyFrame = CheckKeyFrame(p, codec);
+															nextPos = h.next = start_pos_2;
+															break;
+														}
+													} else {
+														Seek(packet_pos_2);
+													}
+												}
+
+												if (trhdr_2.bytes > (GetPos() - packet_pos_2)) {
+													__int64 nBytes_2 = trhdr_2.bytes - (GetPos() - packet_pos_2);
+													size_t pSize = p.GetCount();
+													p.SetCount(pSize + (size_t)nBytes_2);
+													ByteRead(p.GetData() + pSize, nBytes_2);
+												}
+											}
+
+											Seek(trhdr_2.next);
 										}
 									}
 								}
@@ -348,6 +435,8 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, BOOL bKeyFrameOnly/* =
 			if (!Read(h)) {
 				continue;
 			}
+
+			nextPos = GetPos() + h.length;
 
 			if (h.fpts) {
 				rt = h.pts;
@@ -681,6 +770,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 					} else {
 						seqhdr h;
 						if (Read(h, seqh[s].data, &s.mt)) {
+							s.codec = stream_codec::MPEG;
 							type = stream_type::video;
 						}
 					}
@@ -693,6 +783,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 							ByteRead(seqh[s].data.GetData(), len);
 						} else {
 							s.mt = mt;
+							s.codec = stream_codec::MPEG;
 							type = stream_type::video;
 						}
 					}
@@ -710,7 +801,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			}
 
 			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::stereo].Find(s) && Read(avch[s], len, &s.mt)) {
-				s.type = stream::stream_type::H264;
+				s.codec = stream_codec::H264;
 				if (avch[s].spspps[index_subsetsps].complete) {
 					type = stream_type::stereo;
 				} else {
@@ -724,6 +815,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			Seek(start);
 			hevchdr h;
 			if (!m_streams[stream_type::video].Find(s) && Read(h, len, hevch[s], &s.mt)) {
+				s.codec = stream_codec::HEVC;
 				type = stream_type::video;
 			}
 		}
@@ -865,6 +957,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 					Seek(start);
 					vc1hdr h;
 					if (Read(h, len, &s.mt)) {
+						s.codec = stream_codec::VC1;
 						type = stream_type::video;
 					}
 				}
@@ -943,6 +1036,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		} else if (pesid == 0xfd) {
 			vc1hdr h;
 			if (!m_streams[stream_type::video].Find(s) && Read(h, len, &s.mt)) {
+				s.codec = stream_codec::VC1;
 				type = stream_type::video;
 			}
 		} else {
@@ -1112,13 +1206,14 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 
 			if (rtAvgTimePerFrame < 50000) {
 				__int64 _pos = GetPos();
-				REFERENCE_TIME rt_start = NextPTS(s);
+				__int64 nextPos;
+				REFERENCE_TIME rt_start = NextPTS(s, s.codec, nextPos);
 				if (rt_start != INVALID_TIME) {
-					Seek(GetPos() + 188);
+					Seek(nextPos);
 					REFERENCE_TIME rt_end = rt_start;
 					int count = 0;
 					while (count < 30) {
-						REFERENCE_TIME rt = NextPTS(s);
+						REFERENCE_TIME rt = NextPTS(s, s.codec, nextPos);
 						if (rt == INVALID_TIME) {
 							break;
 						}
@@ -1126,7 +1221,8 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 							rt_end = rt;
 							count++;
 						}
-						Seek(GetPos() + 188);
+						
+						Seek(nextPos);
 					}
 
 					if (count && (rt_start < rt_end)) {
