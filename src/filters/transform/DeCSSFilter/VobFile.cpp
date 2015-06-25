@@ -1210,3 +1210,12 @@ REFERENCE_TIME CVobFile::GetChapterTime(UINT ChapterNumber) const
 
 	return m_pChapters[ChapterNumber].rtime;
 }
+
+__int64 CVobFile::GetChapterPos(UINT ChapterNumber) const
+{
+	if (ChapterNumber >= m_pChapters.GetCount()) {
+		return 0;
+	}
+
+	return 2048i64 * (m_pChapters[ChapterNumber].first_sector - m_pChapters[0].first_sector);
+}
