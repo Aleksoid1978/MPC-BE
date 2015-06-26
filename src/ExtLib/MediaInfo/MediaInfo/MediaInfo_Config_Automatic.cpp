@@ -1173,6 +1173,7 @@ void MediaInfo_Config_Format (InfoMap &Info)
     "MTV;;;M;Other;Chinese hack of MPEG-1 layer 3;mtv;;http://en.wikipedia.org/wiki/Chinese_MP4/MTV_Player\n"
     "MXF;;;M;Mxf;;mxf;application/mxf;\n"
     "NSV;;;M;Nsv;Nullsoft Streaming Video;nsv;;http://winamp.com\n"
+    "NUT;;;M;Nut;;nut;;\n"
     "Ogg;;;M;Ogg;;ogg ogm opus;video/ogg;http://www.free-codecs.com/Ogg_DirectShow_Filters_download.htm\n"
     "PMP;;;M;Pmp;Playstation Portable;pmp;;\n"
     "PTX;;;M;Ptx;;ptx;;\n"

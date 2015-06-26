@@ -52,9 +52,38 @@ namespace Elements
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void File_Nut::FileHeader_Parse()
+{
+    //Parsing
+    Element_Begin1("Nut header");
+    std::string file_id_string;
+    int8u file_id_string_zero;
+    Get_String(24, file_id_string,                               "file_id_string");
+    Get_B1 (file_id_string_zero,                                 "file_id_string zero");
+    Element_End0();
+
+    FILLING_BEGIN();
+        //Integrity
+        if (file_id_string!="nut/multimedia container" || file_id_string_zero)
+        {
+            Reject("Nut");
+            return;
+        }
+
+        //Filling
+        Accept("Nut");
+
+        Fill(Stream_General, 0, General_Format, "Nut");
+    FILLING_END();
+}
+
+//***************************************************************************
+// Elements
+//***************************************************************************
+
+//---------------------------------------------------------------------------
 void File_Nut::Header_Parse()
 {
-    /*
     //Parsing
     int8u  N;
     Peek_B1(N);
@@ -76,47 +105,10 @@ void File_Nut::Header_Parse()
         //Frame
         Header_Fill_Code(0, "Frame");
         Header_Fill_Size(0);
-        Finished();
+        Finish();
     }
-    */
 }
 
-//***************************************************************************
-// Elements
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void File_Nut::FileHeader_Parse()
-{
-    //Parsing
-    Element_Begin1("Nut header");
-    std::string file_id_string;
-    Get_String(25, file_id_string,                               "file_id_string");
-    Element_End0();
-
-    FILLING_BEGIN();
-        //Integrity
-        if (file_id_string!="nut/multimedia container")
-        {
-            Reject("Nut");
-            return;
-        }
-
-        //Filling
-        Accept("Nut");
-
-        Fill(Stream_General, 0, General_Format, "Nut");
-
-        Finish("Nut");
-    FILLING_END();
-}
-
-//---------------------------------------------------------------------------
-void File_Nut::Data_Parse()
-{
-}
-
-/*
 //---------------------------------------------------------------------------
 void File_Nut::Data_Parse()
 {
@@ -124,6 +116,12 @@ void File_Nut::Data_Parse()
         case Elements::_NAME : _NAME(); break;
 
     //Parsing
+    if (Element_Size < 4)
+    {
+        Skip_XX(Element_Size,                                   "Unknown");
+        return;
+    }
+    Element_Size-=4;
     #ifndef __BORLANDC__
         switch (Element_Code)
     #else //__BORLANDC__
@@ -135,18 +133,19 @@ void File_Nut::Data_Parse()
         ELEMENT_CASE(syncpoint);
         ELEMENT_CASE(index);
         ELEMENT_CASE(info);
-        default : Skip_XX(Element_Size-4,                       "Data");
+        default : Skip_XX(Element_Size,                         "Data");
     }
 
+    Element_Size+=4;
+    if (Element_Offset+4!=Element_Size)
+        Skip_XX(Element_Size - 4 - Element_Offset,              "Unknown");
     Skip_B4(                                                    "cheksum");
 }
-*/
 
 //***************************************************************************
 // Elements
 //***************************************************************************
 
-/*
 //---------------------------------------------------------------------------
 void File_Nut::main()
 {
@@ -172,7 +171,7 @@ void File_Nut::main()
         Skip_VS(                                                "tmp_flag");
         Get_VS (tmp_fields,                                     "tmp_fields");
         if(tmp_fields>0)
-            Skip_SL(                                            "tmp_pts");
+            Skip_VS(                                            "tmp_pts"); //TODO: signed
         if(tmp_fields>1)
             Skip_VS(                                            "tmp_mul");
         if(tmp_fields>2)
@@ -186,7 +185,7 @@ void File_Nut::main()
         else
             tmp_res=0;
         if(tmp_fields>5)
-            Skip_VS(                                            "count");
+            Get_VS(count,                                       "count");
         else
             count=tmp_mul-tmp_size;
         for(int64u j=6; j<tmp_fields; j++)
@@ -261,27 +260,37 @@ void File_Nut::stream()
             break;
         default: ;
     }
+
+    if (Element_Offset!=Element_Size)
+        Skip_XX(Element_Size - Element_Offset,                  "Data");
 }
 
 //---------------------------------------------------------------------------
 void File_Nut::syncpoint()
 {
     Element_Name("syncpoint");
+
+    //Parsing
+    Skip_XX(Element_Size,                                        "Data");
 }
 
 //---------------------------------------------------------------------------
 void File_Nut::index()
 {
     Element_Name("index");
+
+    //Parsing
+    Skip_XX(Element_Size,                                        "Data");
 }
 
 //---------------------------------------------------------------------------
 void File_Nut::info()
 {
     Element_Name("info");
-}
 
-*/
+    //Parsing
+    Skip_XX(Element_Size,                                        "Data");
+}
 
 }
 

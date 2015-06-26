@@ -2648,16 +2648,19 @@ void File_Mk::Segment_Tracks_TrackEntry_CodecPrivate_vids()
         {
             #if defined(MEDIAINFO_FFV1_YES)
                 if (Compression==0x46465631) //FFV1
-                    ((File_Ffv1*)Stream[TrackNumber].Parser)->IsOutOfBandData=true; //TODO: implement ISOutOfBandData in a generic maner
+                    Open_Buffer_OutOfBand(Stream[TrackNumber].Parser);
             #endif
             #if defined(MEDIAINFO_FFV1_YES)
                 if (Compression==0x46465648) //FFVH
+                {
                     ((File_HuffYuv*)Stream[TrackNumber].Parser)->IsOutOfBandData=true; //TODO: implement ISOutOfBandData in a generic maner
+                    Open_Buffer_Continue(Stream[TrackNumber].Parser);
+                    Element_Offset=Element_Size;
+                }
             #endif
-            Open_Buffer_Continue(Stream[TrackNumber].Parser);
         }
         else
-            Skip_XX(Data_Remain(),                                  "Unknown");
+            Skip_XX(Element_Size-Element_Offset,                "Unknown");
         Element_End0();
     }
 }
