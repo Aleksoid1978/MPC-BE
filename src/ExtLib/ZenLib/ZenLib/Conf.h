@@ -178,7 +178,11 @@
 
 //---------------------------------------------------------------------------
 //(-1) is known to be the MAX of an unsigned int but GCC complains about it
-#include <new>
+#ifdef __cplusplus
+    #include <new> //for size_t
+#else /* __cplusplus */
+    #include <stddef.h> //for size_t
+#endif /* __cplusplus */
 #include <cstring> //size_t
 namespace ZenLib
 {
@@ -336,8 +340,8 @@ typedef unsigned int            intu;
     #define snwprintf swprintf
 #endif
 
-//Windows - MSVC
-#if defined (_MSC_VER)
+//Windows - MSVC (before Visual Studio 2015)
+#if defined (_MSC_VER) && _MSC_VER < 1900
     #define snprintf _snprintf
     #define snwprintf _snwprintf
 #endif
