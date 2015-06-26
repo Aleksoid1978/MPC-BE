@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|    AP4 - avcC Atom
+|    AP4 - DataInfo Atom
 |
  ****************************************************************/
 
@@ -9,17 +9,18 @@
 +---------------------------------------------------------------------*/
 
 #include "Ap4.h"
-#include "Ap4WfexAtom.h"
+#include "Ap4DataInfoAtom.h"
 
 /*----------------------------------------------------------------------
-|       AP4_WfexAtom::AP4_WfexAtom
+|       AP4_DataInfoAtom::AP4_DataInfoAtom
 +---------------------------------------------------------------------*/
 
-AP4_WfexAtom::AP4_WfexAtom(AP4_Size         size,
-                           AP4_ByteStream&  stream)
-    : AP4_Atom(AP4_ATOM_TYPE_WFEX)
+AP4_DataInfoAtom::AP4_DataInfoAtom(Type             type,
+                                   AP4_Size         size,
+                                   AP4_ByteStream&  stream)
+    : AP4_Atom(type)
 {
     size -= AP4_ATOM_HEADER_SIZE;
-    m_DecoderInfo.SetDataSize(size);
-    stream.Read(m_DecoderInfo.UseData(), size);    
+    m_Data.SetDataSize(size);
+    stream.Read(m_Data.UseData(), size);    
 }

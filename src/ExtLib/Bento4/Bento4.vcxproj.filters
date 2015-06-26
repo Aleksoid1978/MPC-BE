@@ -24,9 +24,6 @@
     <ClInclude Include="Core\Ap4AtomSampleTable.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Ap4AvcCAtom.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Ap4ByteStream.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -142,9 +139,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\Ap4NmhdAtom.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Ap4HvcCAtom.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\Ap4PaspAtom.h">
@@ -268,7 +262,7 @@
     <ClInclude Include="Core\Ap4Dvc1Atom.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Ap4WfexAtom.h">
+    <ClInclude Include="Core\Ap4DataInfoAtom.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
@@ -280,9 +274,6 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\Ap4AtomSampleTable.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Ap4AvcCAtom.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\Ap4ByteStream.cpp">
@@ -361,9 +352,6 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\Ap4HmhdAtom.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Ap4HvcCAtom.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\Ap4IkmsAtom.cpp">
@@ -506,7 +494,7 @@
     <ClCompile Include="Core\Ap4Dvc1Atom.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Ap4WfexAtom.cpp">
+    <ClCompile Include="Core\Ap4DataInfoAtom.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>

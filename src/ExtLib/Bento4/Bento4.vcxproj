@@ -103,7 +103,6 @@
     <ClInclude Include="Core\Ap4Atom.h" />
     <ClInclude Include="Core\Ap4AtomFactory.h" />
     <ClInclude Include="Core\Ap4AtomSampleTable.h" />
-    <ClInclude Include="Core\Ap4AvcCAtom.h" />
     <ClInclude Include="Core\Ap4ByteStream.h" />
     <ClInclude Include="Core\Ap4ChapAtom.h" />
     <ClInclude Include="Core\Ap4ChplAtom.h" />
@@ -115,6 +114,7 @@
     <ClInclude Include="Core\Ap4CttsAtom.h" />
     <ClInclude Include="Core\Ap4DataAtom.h" />
     <ClInclude Include="Core\Ap4DataBuffer.h" />
+    <ClInclude Include="Core\Ap4DataInfoAtom.h" />
     <ClInclude Include="Core\Ap4DcomAtom.h" />
     <ClInclude Include="Core\Ap4Debug.h" />
     <ClInclude Include="Core\Ap4DecoderConfigDescriptor.h" />
@@ -137,7 +137,6 @@
     <ClInclude Include="Core\Ap4HdlrAtom.h" />
     <ClInclude Include="Core\Ap4HintTrackReader.h" />
     <ClInclude Include="Core\Ap4HmhdAtom.h" />
-    <ClInclude Include="Core\Ap4HvcCAtom.h" />
     <ClInclude Include="Core\Ap4IkmsAtom.h" />
     <ClInclude Include="Core\Ap4Interfaces.h" />
     <ClInclude Include="Core\Ap4IsfmAtom.h" />
@@ -183,7 +182,6 @@
     <ClInclude Include="Core\Ap4UrlAtom.h" />
     <ClInclude Include="Core\Ap4Utils.h" />
     <ClInclude Include="Core\Ap4VmhdAtom.h" />
-    <ClInclude Include="Core\Ap4WfexAtom.h" />
     <ClInclude Include="Crypto\Ap4AesBlockCipher.h" />
     <ClInclude Include="Crypto\Ap4StreamCipher.h" />
   </ItemGroup>
@@ -191,7 +189,6 @@
     <ClCompile Include="Core\Ap4Atom.cpp" />
     <ClCompile Include="Core\Ap4AtomFactory.cpp" />
     <ClCompile Include="Core\Ap4AtomSampleTable.cpp" />
-    <ClCompile Include="Core\Ap4AvcCAtom.cpp" />
     <ClCompile Include="Core\Ap4ByteStream.cpp" />
     <ClCompile Include="Core\Ap4ChapAtom.cpp" />
     <ClCompile Include="Core\Ap4ChplAtom.cpp" />
@@ -201,6 +198,7 @@
     <ClCompile Include="Core\Ap4CttsAtom.cpp" />
     <ClCompile Include="Core\Ap4DataAtom.cpp" />
     <ClCompile Include="Core\Ap4DataBuffer.cpp" />
+    <ClCompile Include="Core\Ap4DataInfoAtom.cpp" />
     <ClCompile Include="Core\Ap4DcomAtom.cpp" />
     <ClCompile Include="Core\Ap4Debug.cpp" />
     <ClCompile Include="Core\Ap4DecoderConfigDescriptor.cpp" />
@@ -222,7 +220,6 @@
     <ClCompile Include="Core\Ap4HdlrAtom.cpp" />
     <ClCompile Include="Core\Ap4HintTrackReader.cpp" />
     <ClCompile Include="Core\Ap4HmhdAtom.cpp" />
-    <ClCompile Include="Core\Ap4HvcCAtom.cpp" />
     <ClCompile Include="Core\Ap4IkmsAtom.cpp" />
     <ClCompile Include="Core\Ap4IsfmAtom.cpp" />
     <ClCompile Include="Core\Ap4IsmaCryp.cpp" />
@@ -264,7 +261,6 @@
     <ClCompile Include="Core\Ap4UrlAtom.cpp" />
     <ClCompile Include="Core\Ap4Utils.cpp" />
     <ClCompile Include="Core\Ap4VmhdAtom.cpp" />
-    <ClCompile Include="Core\Ap4WfexAtom.cpp" />
     <ClCompile Include="Crypto\Ap4AesBlockCipher.cpp" />
     <ClCompile Include="Crypto\Ap4StreamCipher.cpp" />
     <ClCompile Include="precomp.cpp">
