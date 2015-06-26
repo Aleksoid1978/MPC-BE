@@ -697,6 +697,11 @@ struct pgc_t {
 
 bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 {
+	m_pStream_Lang.RemoveAll();
+	m_pChapters.RemoveAll();
+	m_rtDuration = 0;
+	m_Aspect = { 0, 0 };
+
 	if (fn.Right(6).MakeUpper() != L"_0.IFO") {
 		return false;
 	}
@@ -1040,9 +1045,6 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 		m_rtDuration = (__int64)pts * 1000 / 9;
 		m_pStream_Lang[0] = _T("undefined");
 		isAob = true;
-	}
-	else {
-		return false;
 	}
 
 	m_ifoFile.Close();
