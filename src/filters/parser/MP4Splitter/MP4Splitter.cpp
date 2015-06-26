@@ -37,15 +37,13 @@
 #include <Bento4/Core/Ap4StssAtom.h>
 #include <Bento4/Core/Ap4StsdAtom.h>
 #include <Bento4/Core/Ap4IsmaCryp.h>
-#include <Bento4/Core/Ap4AvcCAtom.h>
-#include <Bento4/Core/Ap4HvcCAtom.h>
 #include <Bento4/Core/Ap4ChplAtom.h>
 #include <Bento4/Core/Ap4FtabAtom.h>
 #include <Bento4/Core/Ap4DataAtom.h>
 #include <Bento4/Core/Ap4PaspAtom.h>
 #include <Bento4/Core/Ap4ChapAtom.h>
 #include <Bento4/Core/Ap4Dvc1Atom.h>
-#include <Bento4/Core/Ap4WfexAtom.h>
+#include <Bento4/Core/Ap4DataInfoAtom.h>
 
 #ifdef REGISTER_FILTER
 
@@ -636,10 +634,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			} else if (AP4_Avc1SampleEntry* avc1 = dynamic_cast<AP4_Avc1SampleEntry*>(
 					track->GetTrakAtom()->FindChild("mdia/minf/stbl/stsd/avc1"))) {
-				if (AP4_AvcCAtom* avcC = dynamic_cast<AP4_AvcCAtom*>(avc1->GetChild(AP4_ATOM_TYPE_AVCC))) {
+				if (AP4_DataInfoAtom* avcC = dynamic_cast<AP4_DataInfoAtom*>(avc1->GetChild(AP4_ATOM_TYPE_AVCC))) {
 					SetTrackName(&TrackName, _T("MPEG4 Video (H264)"));
 
-					const AP4_DataBuffer* di = avcC->GetDecoderInfo();
+					const AP4_DataBuffer* di = avcC->GetData();
 					if (!di) {
 						di = &empty;
 					}
@@ -668,10 +666,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			} else if (AP4_Hvc1SampleEntry* hvc1 = dynamic_cast<AP4_Hvc1SampleEntry*>(
 					track->GetTrakAtom()->FindChild("mdia/minf/stbl/stsd/hvc1"))) {
-				if (AP4_HvcCAtom* hvcC = dynamic_cast<AP4_HvcCAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_HVCC))) {
+				if (AP4_DataInfoAtom* hvcC = dynamic_cast<AP4_DataInfoAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_HVCC))) {
 					SetTrackName(&TrackName, _T("HEVC Video (H.265)"));
 
-					const AP4_DataBuffer* di = hvcC->GetDecoderInfo();
+					const AP4_DataBuffer* di = hvcC->GetData();
 					if (!di) {
 						di = &empty;
 					}
@@ -1058,8 +1056,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						mts.Add(mt);
 
-						if (AP4_WfexAtom* WfexAtom = dynamic_cast<AP4_WfexAtom*>(ase->GetChild(AP4_ATOM_TYPE_WFEX))) {
-							const AP4_DataBuffer* di = WfexAtom->GetDecoderInfo();
+						if (AP4_DataInfoAtom* WfexAtom = dynamic_cast<AP4_DataInfoAtom*>(ase->GetChild(AP4_ATOM_TYPE_WFEX))) {
+							const AP4_DataBuffer* di = WfexAtom->GetData();
 							if (di && di->GetDataSize()) {
 								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(di->GetDataSize());
 								memcpy(wfe, di->GetData(), di->GetDataSize());

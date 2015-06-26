@@ -1,11 +1,11 @@
 /*****************************************************************
 |
-|    AP4 - hvcC Atom
+|    AP4 - DataInfo Atom
 |
  ****************************************************************/
 
-#ifndef _AP4_HVCC_ATOM_H_
-#define _AP4_HVCC_ATOM_H_
+#ifndef _AP4_DATAINFO_ATOM_H_
+#define _AP4_DATAINFO_ATOM_H_
 
 /*----------------------------------------------------------------------
 |       includes
@@ -16,20 +16,21 @@
 #include "Ap4DataBuffer.h"
 
 /*----------------------------------------------------------------------
-|       AP4_HvcCAtom
+|       AP4_DataInfoAtom
 +---------------------------------------------------------------------*/
-class AP4_HvcCAtom : public AP4_Atom
+class AP4_DataInfoAtom : public AP4_Atom
 {
 public:
-    AP4_HvcCAtom(AP4_Size         size,
-                 AP4_ByteStream&  stream);
+    AP4_DataInfoAtom(Type             type,
+                     AP4_Size         size,
+                     AP4_ByteStream&  stream);
 
     AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
 
-    const AP4_DataBuffer* GetDecoderInfo() const { return &m_DecoderInfo; }
+    const AP4_DataBuffer* GetData() const { return &m_Data; }
 
 private:
-    AP4_DataBuffer m_DecoderInfo;
+    AP4_DataBuffer m_Data;
 };
 
-#endif // _AP4_HVCC_ATOM_H_
+#endif // _AP4_DATAINFO_ATOM_H_
