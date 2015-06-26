@@ -1911,8 +1911,7 @@ void File_Riff::AVI__hdlr_strl_strf_vids_Ffv1()
     Element_Begin1("FFV1 options");
     #if defined(MEDIAINFO_FFV1_YES)
         File_Ffv1* Parser=(File_Ffv1*)Stream[Stream_ID].Parsers[0];
-        Parser->IsOutOfBandData=true;
-        Open_Buffer_Continue(Parser);
+        Open_Buffer_OutOfBand(Parser);
     #else //MEDIAINFO_FFV1_YES
         Skip_XX(Element_Size-Element_Offset,                    "(FFV1 headers)");
     #endif

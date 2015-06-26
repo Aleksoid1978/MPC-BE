@@ -292,9 +292,20 @@ String MediaInfoList_Internal::Inform(size_t FilePos, size_t)
         FilePos=0;
         ZtringListList MediaInfo_Custom_View; MediaInfo_Custom_View.Write(Option(__T("Inform_Get")));
         bool XML=false;
-        if (MediaInfoLib::Config.Inform_Get()==__T("XML"))
+        if (MediaInfoLib::Config.Inform_Get()==__T("XML") || MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_XML)
             XML=true;
-        if (XML) Retour+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get()+__T("<Mediainfo version=\"")+MediaInfoLib::Config.Info_Version_Get().SubString(__T(" v"), Ztring())+__T("\">")+MediaInfoLib::Config.LineSeparator_Get();
+        if (XML)
+        {
+            Retour+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
+            if (MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_XML)
+                Retour+=+__T("<!-- Work in progress, not for production -->")+MediaInfoLib::Config.LineSeparator_Get();
+            Retour+=__T('<');
+            if (MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_XML)
+                Retour+=__T("MediaTrace");
+            else
+                Retour+=__T("Mediainfo");
+            Retour+=__T(" version=\"")+MediaInfoLib::Config.Info_Version_Get().SubString(__T(" v"), Ztring())+__T("\">")+MediaInfoLib::Config.LineSeparator_Get();
+        }
         else
         Retour+=MediaInfo_Custom_View("Page_Begin");
         while (FilePos<Info.size())
@@ -306,7 +317,17 @@ String MediaInfoList_Internal::Inform(size_t FilePos, size_t)
             }
             FilePos++;
         }
-        if (XML) Retour+=__T("</Mediainfo>")+MediaInfoLib::Config.LineSeparator_Get();
+        if (XML)
+        {
+            if (!Retour.empty() && Retour[Retour.size()-1]!=__T('\r') && Retour[Retour.size()-1]!=__T('\n'))
+                Retour+=MediaInfoLib::Config.LineSeparator_Get();
+            Retour+=__T("</");
+            if (MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_XML)
+                Retour+=__T("MediaTrace");
+            else
+                Retour+=__T("Mediainfo");
+            Retour+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
+        }
         else Retour+=MediaInfo_Custom_View("Page_End");//
         return Retour.c_str();
     }

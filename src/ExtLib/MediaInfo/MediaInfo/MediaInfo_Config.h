@@ -102,6 +102,7 @@ public :
           {
               Trace_Format_Tree,
               Trace_Format_CSV,
+              Trace_Format_XML,
           };
           void      Trace_Format_Set (trace_Format NewValue);
           trace_Format Trace_Format_Get ();

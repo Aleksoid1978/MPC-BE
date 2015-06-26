@@ -107,6 +107,40 @@ const char* DPX_Descriptors(int8u i)
 }
 
 //---------------------------------------------------------------------------
+const char* DPX_Descriptors_ColorSpace(int8u i)
+{
+    switch (i)
+    {
+        case   1: return "R";
+        case   2: return "G";
+        case   3: return "B";
+        case   4: return "A";
+        case   6: return "Y";
+        case   7: return "UV";
+        case   8: return "Z";
+        case  50: return "RGB";
+        case  51:
+        case  52: return "RGBA";
+        case 100:
+        case 102:
+        case 103: return "YUV";
+        case 101: return "YUVA";
+        default : return "";
+    }
+}
+
+//---------------------------------------------------------------------------
+const char* DPX_Descriptors_ChromaSubsampling(int8u i)
+{
+    switch (i)
+    {
+        case 100:
+        case 101: return "4:2:2";
+        default : return "";
+    }
+}
+
+//---------------------------------------------------------------------------
 const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
 const char* DPX_TransferCharacteristic(int8u TransferCharacteristic)
 {
@@ -679,13 +713,13 @@ void File_Dpx::GenericSectionHeader_Dpx()
 void File_Dpx::GenericSectionHeader_Dpx_ImageElement()
 {
     Element_Begin1("image element");
-    int8u TransferCharacteristic, ColorimetricSpecification, BitDephs;
+    int8u Descriptor, TransferCharacteristic, ColorimetricSpecification, BitDephs;
     Info_B4(DataSign,                                           "Data sign");Param_Info1((DataSign==0?"unsigned":"signed"));
     Skip_B4(                                                    "Reference low data code value");
     Skip_BF4(                                                   "Reference low quantity represented");
     Skip_B4(                                                    "Reference high data code value");
     Skip_BF4(                                                   "Reference high quantity represented");
-    Info_B1(Descriptor,                                         "Descriptor");Param_Info1(DPX_Descriptors(Descriptor));
+    Get_B1 (Descriptor,                                         "Descriptor");Param_Info1(DPX_Descriptors(Descriptor));
     Get_B1 (TransferCharacteristic,                             "Transfer characteristic");Param_Info1(DPX_TransferCharacteristic(TransferCharacteristic));
     Get_B1 (ColorimetricSpecification,                          "Colorimetric specification");Param_Info1(DPX_ColorimetricSpecification(ColorimetricSpecification));
     Get_B1 (BitDephs,                                           "Bit depth");Param_Info1(DPX_ValidBitDephs(BitDephs));
@@ -700,6 +734,8 @@ void File_Dpx::GenericSectionHeader_Dpx_ImageElement()
     FILLING_BEGIN();
         if (Frame_Count==0)
         {
+            Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", DPX_Descriptors_ColorSpace(Descriptor));
+            Fill(StreamKind_Last, StreamPos_Last, "ChromaSubsampling", DPX_Descriptors_ChromaSubsampling(Descriptor));
             Fill(StreamKind_Last, StreamPos_Last, "BitDepth", BitDephs);
             Fill(StreamKind_Last, StreamPos_Last, "colour_description_present", "Yes");
             Fill(StreamKind_Last, StreamPos_Last, "colour_primaries", DPX_TransferCharacteristic(TransferCharacteristic));
@@ -736,6 +772,7 @@ void File_Dpx::IndustrySpecificHeader_Dpx()
     Element_Name("Industry specific header");
 
     //Parsing
+    float32 FrameRate;
     Element_Begin1("Motion-picture film information");
     Skip_String(2,                                              "Film mfg. ID code");
     Skip_String(2,                                              "Film type");
@@ -746,7 +783,7 @@ void File_Dpx::IndustrySpecificHeader_Dpx()
     Skip_B4(                                                    "Frame position in sequence");
     Skip_B4(                                                    "Sequence length (frames)");
     Skip_B4(                                                    "Held count (1 = default)");
-    Skip_BF4(                                                   "Frame rate of original (frames/s)");
+    Get_BF4 (FrameRate,                                         "Frame rate of original (frames/s)");
     Skip_BF4(                                                   "Shutter angle of camera in degrees");
     Skip_UTF8(32,                                               "Frame identification - e.g. keyframe");
     Skip_UTF8(100,                                              "Slate information");
@@ -772,6 +809,11 @@ void File_Dpx::IndustrySpecificHeader_Dpx()
     Skip_BF4(                                                   "Integration time (s)");
     Skip_XX(76,                                                 "Reserved for future use");
     Element_End0();
+
+    FILLING_BEGIN();
+        if (FrameRate)
+            Fill(StreamKind_Last, StreamPos_Last, "FrameRate", FrameRate);
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------

@@ -5589,7 +5589,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_glbl()
 
     //Parsing
     for (size_t Pos=0; Pos<Streams[moov_trak_tkhd_TrackID].Parsers.size(); Pos++)
-        Open_Buffer_Continue(Streams[moov_trak_tkhd_TrackID].Parsers[Pos]);
+        Open_Buffer_OutOfBand(Streams[moov_trak_tkhd_TrackID].Parsers[Pos], Buffer+Buffer_Offset, (size_t)Element_Size);
 }
 
 //---------------------------------------------------------------------------
