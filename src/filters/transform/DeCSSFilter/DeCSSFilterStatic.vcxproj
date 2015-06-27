@@ -196,6 +196,7 @@
     <ClCompile Include="CSSauth.cpp" />
     <ClCompile Include="CSSscramble.cpp" />
     <ClCompile Include="DeCSSFilter.cpp" />
+    <ClCompile Include="IfoFile.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -210,6 +211,7 @@
     <ClInclude Include="CSSauth.h" />
     <ClInclude Include="CSSscramble.h" />
     <ClInclude Include="DeCSSFilter.h" />
+    <ClInclude Include="IfoFile.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>

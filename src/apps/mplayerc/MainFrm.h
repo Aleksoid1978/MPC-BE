@@ -62,7 +62,7 @@
 #include "LcdSupport.h"
 #include "MpcApi.h"
 #include "../../filters/renderer/SyncClock/SyncClock.h"
-#include "../../filters/transform/DecSSFilter/VobFile.h"
+#include "../../filters/transform/DecSSFilter/IfoFile.h"
 #include "../../filters/transform/VSFilter/IDirectVobSub.h"
 #include <sizecbar/scbarg.h>
 #include <afxinet.h>
