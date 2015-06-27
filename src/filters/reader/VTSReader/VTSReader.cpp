@@ -20,7 +20,7 @@
  */
 
 #include "stdafx.h"
-#include "../../transform/DeCSSFilter/VobFile.h"
+#include "../../transform/DeCSSFilter/IfoFile.h"
 #include "VTSReader.h"
 #include "../../../DSUtil/DSUtil.h"
 

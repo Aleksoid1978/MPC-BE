@@ -21,11 +21,8 @@
 
 #pragma once
 
-#include <atlbase.h>
 #include <atlcoll.h>
 #include <winddk/ntddcdvd.h>
-
-#include "../../../DSUtil/DSUtil.h"
 
 // CDVDSession
 
@@ -116,42 +113,4 @@ public:
 	bool IsDVD() const;
 	bool HasDiscKey(BYTE* key) const;
 	bool HasTitleKey(BYTE* key) const;
-};
-
-// CIfoFile
-
-class CIfoFile
-{
-	struct chapter_t {
-		REFERENCE_TIME rtime;
-		UINT32 first_sector;
-		UINT32 last_sector;
-		UINT32 title:16, track:8;
-	};
-
-	CAtlMap<DWORD, CString> m_pStream_Lang;
-	CAtlArray<chapter_t> m_pChapters;
-
-	REFERENCE_TIME	m_rtDuration;
-	fraction_t		m_Aspect;
-
-public:
-	CIfoFile();
-
-	bool OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum = 0); // vts ifo
-
-	BSTR			GetTrackName(UINT aTrackIdx) const;
-	UINT			GetChaptersCount() const { return (UINT)m_pChapters.GetCount(); }
-	REFERENCE_TIME	GetChapterTime(UINT ChapterNumber) const;
-	__int64			GetChapterPos(UINT ChapterNumber) const;
-	REFERENCE_TIME	GetDuration() const { return m_rtDuration; }
-	fraction_t		GetAspectRatio() const { return m_Aspect; }
-
-	static bool GetTitleInfo(LPCTSTR fn, ULONG nTitleNum, ULONG& VTSN /* out */, ULONG& TTN /* out */); // video_ts.ifo
-
-private:
-	CFile		m_ifoFile;
-	BYTE		ReadByte();
-	WORD		ReadWord();
-	DWORD		ReadDword();
 };
