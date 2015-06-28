@@ -347,53 +347,53 @@ void CWord::Transform_SSE2(const CPoint &org )
 		__m128 __zz = _mm_setzero_ps();
 
 		// xx = x * caz + y * saz
-		__tmpx   = _mm_mul_ps(__pointx, __caz);	  // x * caz
-		__tmpy   = _mm_mul_ps(__pointy, __saz);	  // y * saz
-		__xx	 = _mm_add_ps(__tmpx, __tmpy);	   // xx = x * caz + y * saz;
+		__tmpx   = _mm_mul_ps(__pointx, __caz);      // x * caz
+		__tmpy   = _mm_mul_ps(__pointy, __saz);      // y * saz
+		__xx     = _mm_add_ps(__tmpx, __tmpy);       // xx = x * caz + y * saz;
 
 		// yy = -(x * saz - y * caz)
-		__tmpx   = _mm_mul_ps(__pointx, __saz);	  // x * saz
-		__tmpy   = _mm_mul_ps(__pointy, __caz);	  // y * caz
-		__yy	 = _mm_sub_ps(__tmpy, __tmpx);	   // yy = -(x * saz - y * caz) = y * caz - x * saz
+		__tmpx   = _mm_mul_ps(__pointx, __saz);      // x * saz
+		__tmpy   = _mm_mul_ps(__pointy, __caz);      // y * caz
+		__yy     = _mm_sub_ps(__tmpy, __tmpx);       // yy = -(x * saz - y * caz) = y * caz - x * saz
 
-		__pointx = __xx;							 // x = xx
+		__pointx = __xx;                             // x = xx
 
 		// y = yy * cax + zz * sax
-		__tmpx   = _mm_mul_ps(__zz, __sax);		  // zz * sax
-		__tmpy   = _mm_mul_ps(__yy, __cax);		  // yy * cax
-		__pointy = _mm_add_ps(__tmpy, __tmpx);	   // y = yy * cax + zz * sax
+		__tmpx   = _mm_mul_ps(__zz, __sax);          // zz * sax
+		__tmpy   = _mm_mul_ps(__yy, __cax);          // yy * cax
+		__pointy = _mm_add_ps(__tmpy, __tmpx);       // y = yy * cax + zz * sax
 
 		// z = yy * sax - zz * cax
-		__tmpx   = _mm_mul_ps(__zz, __cax);		  // zz * cax
-		__tmpy   = _mm_mul_ps(__yy, __sax);		  // yy * sax
-		__zz	 = _mm_sub_ps(__tmpy, __tmpx);	   // z = yy * sax - zz * cax
+		__tmpx   = _mm_mul_ps(__zz, __cax);          // zz * cax
+		__tmpy   = _mm_mul_ps(__yy, __sax);          // yy * sax
+		__zz     = _mm_sub_ps(__tmpy, __tmpx);       // z = yy * sax - zz * cax
 
 		// xx = x * cay + z * say
-		__tmpx   = _mm_mul_ps(__pointx, __cay);	  // x * cay
-		__tmpy   = _mm_mul_ps(__zz, __say);		  // z * say
-		__xx	 = _mm_add_ps(__tmpx, __tmpy);	   // xx = x * cay + z * say
+		__tmpx   = _mm_mul_ps(__pointx, __cay);      // x * cay
+		__tmpy   = _mm_mul_ps(__zz, __say);          // z * say
+		__xx     = _mm_add_ps(__tmpx, __tmpy);       // xx = x * cay + z * say
 
-		__yy	 = __pointy;						 // yy = y
+		__yy     = __pointy;                         // yy = y
 
 		// zz = x * say - z * cay
-		__tmpx   = _mm_mul_ps(__pointx, __say);	  // x * say
-		__zz	 = _mm_mul_ps(__zz, __cay);		  // z * cay
-		__zz	 = _mm_sub_ps(__tmpx, __zz);		 // zz = x * say - z * cay
+		__tmpx   = _mm_mul_ps(__pointx, __say);      // x * say
+		__zz     = _mm_mul_ps(__zz, __cay);          // z * cay
+		__zz     = _mm_sub_ps(__tmpx, __zz);         // zz = x * say - z * cay
 
-		// x = (xx * xzoomf) / (zz + xzoomf);
-		// y = (yy * yzoomf) / (zz + yzoomf);
+		// x = xx * xzoomf / (zz + xzoomf);
+		// y = yy * yzoomf / (zz + yzoomf);
 		__m128 __tmpzz = _mm_add_ps(__zz, __xzoomf); // zz + xzoomf
 
-		__xx	 = _mm_mul_ps(__xx, __xzoomf);	   // xx * xzoomf
-		__pointx = _mm_div_ps(__xx, _mm_max_ps(__tmpzz, __1000)); // x = (xx * xzoomf) / max((zz + xzoomf), 1000.0)
+		__xx     = _mm_mul_ps(__xx, __xzoomf);       // xx * xzoomf
+		__pointx = _mm_div_ps(__xx, __tmpzz);        // x = (xx * xzoomf) / (zz + xzoomf)
 
-		__tmpzz  = _mm_add_ps(__zz, __yzoomf);	   // zz + yzoomf
+		__tmpzz  = _mm_add_ps(__zz, __yzoomf);       // zz + yzoomf
 
-		__yy	 = _mm_mul_ps(__yy, __yzoomf);	   // yy * yzoomf
-		__pointy = _mm_div_ps(__yy, _mm_max_ps(__tmpzz, __1000)); // y = yy * yzoomf / max((zz + yzoomf), 1000.0);
+		__yy     = _mm_mul_ps(__yy, __yzoomf);       // yy * yzoomf
+		__pointy = _mm_div_ps(__yy, __tmpzz);        // y = yy * yzoomf / (zz + yzoomf)
 
-		__pointx = _mm_add_ps(__pointx, __xorg);	  // x = x + org.x
-		__pointy = _mm_add_ps(__pointy, __yorg);	  // y = y + org.y
+		__pointx = _mm_add_ps(__pointx, __xorg);     // x = x + org.x
+		__pointy = _mm_add_ps(__pointy, __yorg);     // y = y + org.y
 
 		// round to integer
 		__m128i __pointxRounded = _mm_cvtps_epi32(__pointx);
