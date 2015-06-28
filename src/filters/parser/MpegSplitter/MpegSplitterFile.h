@@ -45,8 +45,6 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	CAtlMap<DWORD, seqhdr> seqh;
 	CAtlMap<DWORD, CAtlArray<BYTE>> hevch;
 
-	CAtlMap<DWORD, int> streamPTSCount;
-
 	template<class T, int validCount = 5>
 	class CValidStream {
 		BYTE m_nValidStream;
@@ -118,7 +116,6 @@ public:
 	BOOL m_bPESPTSPresent;
 
 	int m_rate; // byte/sec
-	BOOL m_bIsBadPacked;
 
 	int m_AC3CoreOnly;
 	bool m_ForcedSub, m_AlternativeDuration, m_SubEmptyPin;
