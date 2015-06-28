@@ -501,9 +501,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_sps.RemoveAll();
 
-	UINT64 maxHeaderPos = min(m_pFile->GetLength(), 5 * MEGABYTE + m_DataOffset);
-
-	while (ReadTag(t) && (fTypeFlagsVideo || fTypeFlagsAudio)) {
+	// read up to 180 tags (actual maximum was 168)
+	for (int i = 0; i < 180 && ReadTag(t) && (fTypeFlagsVideo || fTypeFlagsAudio); i++) {
 		if (!t.DataSize) {
 			continue; // skip empty Tag
 		}
@@ -527,8 +526,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		prevTagSize = t.DataSize + 11;
 
 		if (t.TagType == FLV_SCRIPTDATA && t.DataSize) {
-			maxHeaderPos += t.DataSize;
-
 			BYTE type = m_pFile->BitRead(8);
 			SHORT length = m_pFile->BitRead(16);
 			if (type == AMF_DATA_TYPE_STRING && length <= 11) {
@@ -1050,10 +1047,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mts.Add(mt);
 			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, name, this, this, &hr));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(t.TagType, pPinOut)));
-		}
-
-		if (next >= maxHeaderPos) {
-			break;
 		}
 
 		m_pFile->Seek(next);
