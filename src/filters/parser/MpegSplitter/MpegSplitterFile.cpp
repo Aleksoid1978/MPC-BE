@@ -45,7 +45,6 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CH
 	, m_AlternativeDuration(AlternativeDuration)
 	, m_SubEmptyPin(SubEmptyPin)
 	, m_bOpeningCompleted(FALSE)
-	, m_bIsBadPacked(FALSE)
 	, m_lastLen(0)
 	, m_programs(&m_streams)
 	, m_bIMKH_CCTV(FALSE)
@@ -194,26 +193,6 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	}
 
 	m_bOpeningCompleted = TRUE;
-
-	int videoCount = 0;
-	int audioCount = 0;
-	for (int type = stream_type::video; type <= stream_type::audio; type++) {
-		POSITION pos = m_streams[type].GetHeadPosition();
-		while (pos) {
-			DWORD TrackNum = m_streams[type].GetNext(pos);
-			if (streamPTSCount.Lookup(TrackNum)) {
-				if (type == stream_type::video) {
-					videoCount += streamPTSCount[TrackNum];
-				} else {
-					audioCount += streamPTSCount[TrackNum];
-				}
-			}
-		}
-	}
-
-	if (audioCount && videoCount) {
-		m_bIsBadPacked = (audioCount > videoCount * 5);
-	}
 
 	if (m_SubEmptyPin) {
 		// Add fake Subtitle stream ...
@@ -534,11 +513,6 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDura
 							DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMax = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMax), m_rtMax, b));
 #endif
 						}
-
-						if (!streamPTSCount.Lookup(TrackNum)) {
-							streamPTSCount[TrackNum] = 0;
-						}
-						streamPTSCount[TrackNum]++;
 					}
 				}
 				if (h.len) {

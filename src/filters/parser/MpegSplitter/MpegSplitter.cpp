@@ -942,9 +942,8 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CComPtr<IBaseFilter> pBF = GetFilterFromPin(m_pInput->GetConnected());
 			m_pTI = pBF;
 			if (CComQIPtr<IVTSReader> VTSReader = pBF) {
-				rt_IfoDuration			= VTSReader->GetDuration();
-				IfoASpect				= VTSReader->GetAspectRatio();
-				m_pFile->m_bIsBadPacked	= FALSE;
+				rt_IfoDuration	= VTSReader->GetDuration();
+				IfoASpect		= VTSReader->GetAspectRatio();
 			}
 		}
 	}
@@ -1197,9 +1196,6 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 	if (rt <= UNITS || m_rtDuration <= 0) {
 		m_pFile->Seek(0);
-		if (m_rtDuration && m_pFile->m_bIsBadPacked) {
-			SimpleSeek;
-		}
 	} else {
 		__int64 pos = SeekBD(rt);
 		if (pos >= 0 && pos < (m_pFile->GetLength() - 4)) {
