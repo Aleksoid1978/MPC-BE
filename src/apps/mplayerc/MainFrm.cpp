@@ -11580,8 +11580,11 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			pOFD->title = (m_youtubeFields.fname.IsEmpty() ? m_strUrl : m_youtubeFields.fname);
 			{
 				BeginEnumFilters(m_pGB, pEF, pBF);
-				if (m_pMainFSF = pBF) {
-					break;
+				if (!m_pMainFSF) {
+					m_pMainFSF = pBF;
+				}
+				if (!m_pKFI) {
+					m_pKFI = pBF;
 				}
 				EndEnumFilters;
 
@@ -13635,6 +13638,7 @@ void CMainFrame::CloseMediaPrivate()
 	m_pMainSourceFilter.Release();
 	m_pSwitcherFilter.Release();
 	m_pDVS.Release();
+	m_pKFI.Release();
 
 	if (m_pGB) {
 		m_pGB->RemoveFromROT();
@@ -15858,19 +15862,12 @@ bool CMainFrame::GetNeighbouringKeyFrames(REFERENCE_TIME rtTarget, std::pair<REF
 
 void CMainFrame::LoadKeyFrames()
 {
-	CComQIPtr<IKeyFrameInfo> pKFI;
-	BeginEnumFilters(m_pGB, pEF, pBF);
-	if (pKFI = pBF) {
-		break;
-	}
-	EndEnumFilters;
-
 	UINT nKFs = 0;
 	m_kfs.clear();
-	if (pKFI && S_OK == pKFI->GetKeyFrameCount(nKFs) && nKFs > 1) {
+	if (m_pKFI && S_OK == m_pKFI->GetKeyFrameCount(nKFs) && nKFs > 1) {
 		UINT k = nKFs;
 		m_kfs.resize(k);
-		if (FAILED(pKFI->GetKeyFrames(&TIME_FORMAT_MEDIA_TIME, m_kfs.data(), k)) || k != nKFs) {
+		if (FAILED(m_pKFI->GetKeyFrames(&TIME_FORMAT_MEDIA_TIME, m_kfs.data(), k)) || k != nKFs) {
 			m_kfs.clear();
 		}
 	}

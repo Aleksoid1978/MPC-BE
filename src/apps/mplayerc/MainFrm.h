@@ -275,6 +275,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	CComQIPtr<IBaseFilter>			m_pMainSourceFilter;
 	CComQIPtr<IBaseFilter>			m_pSwitcherFilter;
 	CComQIPtr<IFileSourceFilter>	m_pMainFSF;
+	CComQIPtr<IKeyFrameInfo>		m_pKFI;
 
 	CComQIPtr<IDirectVobSub>		m_pDVS;
 
