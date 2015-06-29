@@ -146,8 +146,9 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	}
 
 	if (!m_bIsBD) {
-		DWORD TrackNum = 0;
-		REFERENCE_TIME rtMin = _I64_MAX;
+		REFERENCE_TIME rtMin	= _I64_MAX;
+		__int64 posMin			= 0;
+		__int64 posMax			= posMin;
 
 		for (int type = stream_type::video; type <= stream_type::audio; type++) {
 			CStreamList& streams = m_streams[type];
@@ -155,24 +156,28 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			while (pos) {
 				stream& s = streams.GetNext(pos);
 				SyncPoints& sps = m_SyncPoints[s];
-				if (sps.GetCount() > 1 && sps[0].rt < rtMin) {
+				if (sps[0].rt < rtMin) {
 					rtMin = sps[0].rt;
-					TrackNum = s;
+					posMin = posMax = sps[0].fp;
 				}
 			}
 		}
 
-		if (TrackNum) {
-			SyncPoints& sps = m_SyncPoints[TrackNum];
-			m_rtMin			= sps[0].rt;
-			m_rtMax			= m_rtMin;
-			__int64 posMin	= sps[0].fp;
-			__int64 posMax	= posMin;
-			for (size_t i = 1; i < sps.GetCount(); i++) {
-				if (sps[i].rt > m_rtMax
-						&& ((sps[i].rt - m_rtMax) < 30 * 60 * 10000000i64)) {
-					m_rtMax	= sps[i].rt;
-					posMax	= sps[i].fp;
+		if (rtMin) {
+			m_rtMin = m_rtMax = rtMin;
+			for (int type = stream_type::video; type <= stream_type::audio; type++) {
+				CStreamList& streams = m_streams[type];
+				POSITION pos = streams.GetHeadPosition();
+				while (pos) {
+					stream& s = streams.GetNext(pos);
+					SyncPoints& sps = m_SyncPoints[s];
+					for (size_t i = 1; i < sps.GetCount(); i++) {
+						if (sps[i].rt > m_rtMax && sps[i].fp > posMax
+								&& ((sps[i].rt - m_rtMax) < 30 * 60 * 10000000i64)) {
+							m_rtMax	= sps[i].rt;
+							posMax	= sps[i].fp;
+						}
+					}
 				}
 			}
 
