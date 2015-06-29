@@ -488,6 +488,7 @@ void CPPageVideo::OnDSRendererChange()
 	m_cbDX9SurfaceFormat.EnableWindow(FALSE);
 	m_cbDX9Resizer.EnableWindow(FALSE);
 	GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(FALSE);
+	GetDlgItem(IDC_CHECK1)->EnableWindow(FALSE);
 	m_chkVMRMixerMode.EnableWindow(FALSE);
 	m_chkVMRMixerYUV.EnableWindow(FALSE);
 	GetDlgItem(IDC_RESETDEVICE)->EnableWindow(FALSE);
@@ -554,6 +555,7 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
+			GetDlgItem(IDC_CHECK1)->EnableWindow(m_chkD3DFullscreen.GetCheck() == BST_CHECKED);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 			if (m_cbAPSurfaceUsage.GetCurSel() == VIDRNDT_AP_TEXTURE3D) {
 				D3DFORMAT surfmt = (D3DFORMAT)m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel());
@@ -585,6 +587,7 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
+			GetDlgItem(IDC_CHECK1)->EnableWindow(m_chkD3DFullscreen.GetCheck() == BST_CHECKED);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
 			GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
@@ -621,6 +624,7 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
+			GetDlgItem(IDC_CHECK1)->EnableWindow(m_chkD3DFullscreen.GetCheck() == BST_CHECKED);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
 			// Force 3D surface with EVR Sync
 			m_cbAPSurfaceUsage.SetCurSel(2);
