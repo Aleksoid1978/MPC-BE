@@ -74,10 +74,10 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 
 	HRESULT Init(IAsyncReader* pAsyncReader);
 
-	__int64 m_lastLen;
-	virtual void OnUpdateDuration();
-
 	BOOL m_bIMKH_CCTV;
+
+	typedef CAtlArray<SyncPoint> SyncPoints;
+	CAtlMap<DWORD, SyncPoints> m_SyncPoints;
 
 public:
 	enum stream_codec {
@@ -98,7 +98,7 @@ public:
 
 	bool m_bIsBD;
 	CHdmvClipInfo &m_ClipInfo;
-	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool m_AlternativeDuration, bool SubEmptyPin);
+	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin);
 
 	BOOL CheckKeyFrame(CAtlArray<BYTE>& pData, stream_codec codec);
 	REFERENCE_TIME NextPTS(DWORD TrackNum, stream_codec codec, __int64& nextPos, BOOL bKeyFrameOnly = FALSE);
@@ -107,18 +107,15 @@ public:
 
 	MPEG_TYPES m_type;
 
-	REFERENCE_TIME m_rtMin, m_rtMax;
-	__int64 m_posMin, m_posMax;
-
-	REFERENCE_TIME m_rtPCRMin, m_rtPCRMax;
-	__int64 m_posPCRMin, m_posPCRMax;
-
 	BOOL m_bPESPTSPresent;
 
 	int m_rate; // byte/sec
 
 	int m_AC3CoreOnly;
-	bool m_ForcedSub, m_AlternativeDuration, m_SubEmptyPin;
+	bool m_ForcedSub, m_SubEmptyPin;
+
+	REFERENCE_TIME m_rtMin;
+	REFERENCE_TIME m_rtMax;
 
 	struct stream {
 		CMediaType mt;
@@ -226,7 +223,7 @@ public:
 	typedef CStreamList CStreamsList[unknown];
 	CStreamsList m_streams;
 
-	void SearchStreams(__int64 start, __int64 stop, BOOL CalcDuration = FALSE);
+	void SearchStreams(__int64 start, __int64 stop);
 	DWORD AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, BOOL bAddStream = TRUE);
 	void  AddHdmvPGStream(WORD pid, const char* language_code);
 	CAtlList<stream>* GetMasterStream();

@@ -29,25 +29,21 @@
 #endif
 #include <moreuuids.h>
 
-CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool AlternativeDuration, bool SubEmptyPin)
+CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin)
 	: CBaseSplitterFileEx(pAsyncReader, hr, false, true)
 	, m_type(MPEG_TYPES::mpeg_invalid)
 	, m_rate(0)
-	, m_rtMin(-1), m_rtMax(-1)
-	, m_posMin(1), m_posMax(-1)
-	, m_rtPCRMin(-1), m_rtPCRMax(-1)
-	, m_posPCRMin(1), m_posPCRMax(-1)
 	, m_bPESPTSPresent(TRUE)
 	, m_ClipInfo(ClipInfo)
 	, m_bIsBD(bIsBD)
 	, m_ForcedSub(ForcedSub)
 	, m_AC3CoreOnly(AC3CoreOnly)
-	, m_AlternativeDuration(AlternativeDuration)
 	, m_SubEmptyPin(SubEmptyPin)
 	, m_bOpeningCompleted(FALSE)
-	, m_lastLen(0)
 	, m_programs(&m_streams)
 	, m_bIMKH_CCTV(FALSE)
+	, m_rtMin(0)
+	, m_rtMax(0)
 {
 	memset(m_psm, 0, sizeof(m_psm));
 	if (SUCCEEDED(hr)) {
@@ -133,7 +129,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	if (IsRandomAccess() || IsStreaming()) {
 
 		WaitAvailable(5000, MEGABYTE * 2);
-		SearchPrograms(0, min(GetLength(), IsStreaming() ? MEGABYTE * 2 : MEGABYTE * 5)); // max 5Mb for search a valid Program Map Table
+		SearchPrograms(0, min(GetLength(), IsStreaming() ? MEGABYTE : MEGABYTE * 5)); // max 5Mb for search a valid Program Map Table
 
 		__int64 pfp = 0;
 		const int k = 20;
@@ -150,46 +146,41 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	}
 
 	if (!m_bIsBD) {
-		if (m_type == MPEG_TYPES::mpeg_ts) {
-			if (IsRandomAccess() || IsStreaming()) {
-				WaitAvailable(3000, MEGABYTE);
+		DWORD TrackNum = 0;
+		REFERENCE_TIME rtMin = _I64_MAX;
 
-				__int64 pfp = 0;
-				const int k = 20;
-				for (int i = 0; i <= k; i++) {
-					__int64 fp = i * GetLength() / k;
-					fp = min(GetLength() - MEGABYTE / 8, fp);
-					fp = max(pfp, fp);
-					__int64 nfp = fp + (pfp == 0 ? MEGABYTE : MEGABYTE / 16);
-					SearchStreams(fp, nfp, TRUE);
-					pfp = nfp;
+		for (int type = stream_type::video; type <= stream_type::audio; type++) {
+			CStreamList& streams = m_streams[type];
+			POSITION pos = streams.GetHeadPosition();
+			while (pos) {
+				stream& s = streams.GetNext(pos);
+				SyncPoints& sps = m_SyncPoints[s];
+				if (sps.GetCount() > 1 && sps[0].rt < rtMin) {
+					rtMin = sps[0].rt;
+					TrackNum = s;
 				}
-			} else {
-				SearchStreams(0, MEGABYTE / 2, TRUE);
 			}
 		}
 
-		if (m_posMin == -1) {
-			m_bPESPTSPresent = FALSE;
+		if (TrackNum) {
+			SyncPoints& sps = m_SyncPoints[TrackNum];
+			m_rtMin			= sps[0].rt;
+			m_rtMax			= m_rtMin;
+			__int64 posMin	= sps[0].fp;
+			__int64 posMax	= posMin;
+			for (size_t i = 1; i < sps.GetCount(); i++) {
+				if (sps[i].rt > m_rtMax
+						&& ((sps[i].rt - m_rtMax) < 30 * 60 * 10000000i64)) {
+					m_rtMax	= sps[i].rt;
+					posMax	= sps[i].fp;
+				}
+			}
+
+			int indicated_rate = m_rate;
+			int detected_rate = int(m_rtMax > m_rtMin ? UNITS * (posMax - posMin) / (m_rtMax - m_rtMin) : 0);
+
+			m_rate = detected_rate ? detected_rate : m_rate;
 		}
-
-		if (!m_bPESPTSPresent && m_posPCRMin > -1) {
-			m_rtMin = m_rtPCRMin;
-			m_rtMax = m_rtPCRMax;
-
-			m_posMin = m_posPCRMin;
-			m_posMax = m_posPCRMax;
-		}
-
-		int indicated_rate = m_rate;
-		int detected_rate = int(m_rtMax > m_rtMin ? UNITS * (m_posMax - m_posMin) / (m_rtMax - m_rtMin) : 0);
-
-		m_rate = detected_rate ? detected_rate : m_rate;
-	} else {
-		m_rtMin = m_rtMax = 0;
-
-		m_posMin = 0;
-		m_posMax = GetLength();
 	}
 
 	m_bOpeningCompleted = TRUE;
@@ -221,23 +212,9 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	m_lastLen = GetLength();
 	Seek(0);
 
 	return S_OK;
-}
-
-void CMpegSplitterFile::OnUpdateDuration()
-{
-	__int64 pos = GetPos();
-
-	__int64 len = GetLength();
-	SearchStreams(max(m_lastLen, len - MEGABYTE / 2), len, TRUE);
-	int detected_rate = int(m_rtMax > m_rtMin ? UNITS * (m_posMax - m_posMin) / (m_rtMax - m_rtMin) : 0);
-	m_rate = detected_rate ? detected_rate : m_rate;
-	m_lastLen = len;
-
-	Seek(pos);
 }
 
 BOOL CMpegSplitterFile::CheckKeyFrame(CAtlArray<BYTE>& pData, stream_codec codec)
@@ -456,7 +433,7 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 	}
 }
 
-void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDuration)
+void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop)
 {
 	Seek(start);
 	stop = min(stop, GetLength());
@@ -490,34 +467,18 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDura
 
 				if (h.type == mpeg2 && h.scrambling) {
 					Seek(GetPos() + h.len);
+					continue;
 				}
 
 				__int64 pos = GetPos();
 				DWORD TrackNum = AddStream(0, b, h.id_ext, h.len);
 
 				if (h.fpts) {
-					BOOL bStreamExists = m_streams[stream_type::video].FindStream(TrackNum) || m_streams[stream_type::audio].FindStream(TrackNum);
-					if (bStreamExists) {
-						if (m_rtMin == -1) {
-							m_rtMin = m_rtMax = h.pts;
-							m_posMin = m_posMax = GetPos();
-#if (DEBUG) && 0
-							DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMin = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMin), m_rtMin, b));
-#endif
-						}
-
-						if (m_rtMin < h.pts && m_rtMax < h.pts) {
-							m_rtMax = h.pts;
-							m_posMax = GetPos();
-#if (DEBUG) && 0
-							DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMax = %s [%10I64d], pesID = %d", ReftimeToString(m_rtMax), m_rtMax, b));
-#endif
-						}
-					}
+					SyncPoints& sps = m_SyncPoints[TrackNum];
+					sps.Add({h.pts, pos});
 				}
-				if (h.len) {
-					Seek(pos + h.len);
-				}
+				
+				Seek(pos + h.len);
 			}
 		} else if (m_type == MPEG_TYPES::mpeg_ts) {
 			trhdr h;
@@ -535,64 +496,20 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDura
 						if (Read(h2, b)) { // pes packet
 							if (h2.type == mpeg2 && h2.scrambling) {
 								Seek(h.next);
+								continue;
 							}
-
-							if (h2.fpts && CalcDuration) {
-								stream s;
-								s.pid	= h.pid;
-								s.pesid	= b;
-
-								BOOL bStreamExists = m_AlternativeDuration ? (m_streams[stream_type::video].Find(s) || m_streams[stream_type::audio].Find(s))
-																		   : (GetMasterStream() && GetMasterStream()->GetHead() == s);
-
-								if (bStreamExists) {
-									if ((m_rtMin == -1)) {
-										m_rtMin = m_rtMax = h2.pts;
-										m_posMin = m_posMax = GetPos();
-#if (DEBUG) && 0
-										DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMin = %s [%10I64d], pID = %d", ReftimeToString(m_rtMin), m_rtMin, h.pid));
-#endif
-									}
-
-									if (m_rtMin < h2.pts && m_rtMax < h2.pts
-											&& ((h2.pts - m_rtMax) < 30 * 60 * 10000000i64)) {
-										m_rtMax = h2.pts;
-										m_posMax = GetPos();
-#if (DEBUG) && 0
-										DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() : m_rtMax = %s [%10I64d], pID = %d", ReftimeToString(m_rtMax), m_rtMax, h.pid));
-#endif
-									}
-								}
-							}
-						} else {
-							b = 0;
 						}
 					} else {
 						Seek(pos);
 					}
 				}
 
-				if (!CalcDuration) {
-					AddStream(h.pid, b, 0, DWORD(h.bytes - (GetPos() - pos)));
-				}
-			}
+				__int64 pos2 = GetPos();
+				DWORD TrackNum = AddStream(h.pid, b, 0, DWORD(h.bytes - (GetPos() - pos)));
 
-			if (ISVALIDPID(h.pid) && CalcDuration
-					&& h.adapfield && h.PCR > 0) {
-				if ((m_rtPCRMin == -1)) {
-					m_rtPCRMin = m_rtPCRMax = h.PCR;
-					m_posPCRMin = m_posPCRMax = GetPos();
-#if (DEBUG) && 0
-					DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() :		m_rtPCRMin = %s [%10I64d], pID = %d", ReftimeToString(m_rtPCRMin), m_rtPCRMin, h.pid));
-#endif
-				}
-
-				if (m_rtPCRMin < h.PCR && m_rtPCRMax < h.PCR) {
-					m_rtPCRMax = h.PCR;
-					m_posPCRMax = GetPos();
-#if (DEBUG) && 0
-					DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::SearchStreams() :		m_rtPCRMax = %s [%10I64d], pID = %d", ReftimeToString(m_rtPCRMax), m_rtPCRMax, h.pid));
-#endif
+				if (h2.fpts) {
+					SyncPoints& sps = m_SyncPoints[TrackNum];
+					sps.Add({h2.pts, pos2});
 				}
 			}
 
@@ -603,29 +520,21 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, BOOL CalcDura
 				continue;
 			}
 
-			if (h.fpts) {
-				if (m_rtMin == _I64_MAX) {
-					m_rtMin = h.pts;
-					m_posMin = GetPos();
-				}
-
-				if (m_rtMin < h.pts && m_rtMax < h.pts) {
-					m_rtMax = h.pts;
-					m_posMax = GetPos();
-				}
-			}
-
 			__int64 pos = GetPos();
 
+			DWORD TrackNum = 0;
 			if (h.streamid == 1) {
-				AddStream(h.streamid, 0xe0, 0, h.length);
+				TrackNum = AddStream(h.streamid, 0xe0, 0, h.length);
 			} else if (h.streamid == 2) {
-				AddStream(h.streamid, 0xc0, 0, h.length);
+				TrackNum = AddStream(h.streamid, 0xc0, 0, h.length);
 			}
 
-			if (h.length) {
-				Seek(pos + h.length);
+			if (h.fpts && TrackNum) {
+				SyncPoints& sps = m_SyncPoints[TrackNum];
+				sps.Add({h.pts, pos});
 			}
+
+			Seek(pos + h.length);
 		}
 	}
 

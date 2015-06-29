@@ -31,7 +31,6 @@ private :
 	CComQIPtr<IMpegSplitterFilter> m_pMSF;
 
 	CButton		m_cbForcedSub;
-	CButton		m_cbAlternativeDuration;
 	CStatic		m_txtAudioLanguageOrder;
 	CEdit		m_edtAudioLanguageOrder;
 	CStatic		m_txtSubtitlesLanguageOrder;
@@ -49,7 +48,6 @@ private :
 		IDC_PP_SUBTITLES_LANGUAGE_ORDER,
 		IDC_PP_TRUEHD,
 		IDC_PP_AC3CORE,
-		IDC_PP_ALTERNATIVE_DURATION,
 		IDC_PP_ENABLE_SUB_EMPTY_PIN
 	};
 

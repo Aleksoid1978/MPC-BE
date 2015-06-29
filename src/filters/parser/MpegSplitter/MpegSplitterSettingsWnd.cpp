@@ -61,9 +61,6 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 	m_cbForcedSub.Create(ResStr(IDS_MPEGSPLITTER_SUB_FORCING), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(305), m_fontheight)), this, IDC_PP_SUBTITLE_FORCED);
 	p.y += h20;
 
-	m_cbAlternativeDuration.Create(ResStr(IDS_MPEGSPLITTER_ALT_DUR_CALC), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(305), m_fontheight)), this, IDC_PP_ALTERNATIVE_DURATION);
-	p.y += h20;
-
 	m_cbSubEmptyPin.Create(ResStr(IDS_MPEGSPLITTER_SUB_EMPTY_PIN), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(305), m_fontheight)), this, IDC_PP_ENABLE_SUB_EMPTY_PIN);
 	p.y += h25;
 
@@ -93,7 +90,6 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 #endif
 		m_cbTrueHD.SetCheck(m_pMSF->GetTrueHD() == 0);
 		m_cbAC3Core.SetCheck(!m_cbTrueHD.GetCheck());
-		m_cbAlternativeDuration.SetCheck(m_pMSF->GetAlternativeDuration());
 		m_cbSubEmptyPin.SetCheck(m_pMSF->GetSubEmptyPin());
 	}
 
@@ -120,7 +116,6 @@ bool CMpegSplitterSettingsWnd::OnApply()
 	if (m_pMSF) {
 		m_pMSF->SetForcedSub(m_cbForcedSub.GetCheck());
 		m_pMSF->SetTrueHD(m_cbTrueHD.GetCheck() ? 0 : 1);
-		m_pMSF->SetAlternativeDuration(m_cbAlternativeDuration.GetCheck());
 		m_pMSF->SetSubEmptyPin(m_cbSubEmptyPin.GetCheck());
 
 #ifdef REGISTER_FILTER

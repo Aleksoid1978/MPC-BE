@@ -1565,7 +1565,6 @@ STRING IDS_MPEG2_NOTE1		"Note : Utiliser un format ""non planar"", un désentrel
 STRING IDS_MPEG2_READ_AR		"Lire le ratio d'affichage dans le fichier"
 STRING IDS_MPEG2_RESET		"R.A.Z"
 STRING IDS_MPEG2_SATURATION		"Saturation"
-STRING IDS_MPEGSPLITTER_ALT_DUR_CALC		"Use alternate method to calculate duration"
 STRING IDS_MPEGSPLITTER_LANG_ORDER		"Ordre des pistes audios :"
 STRING IDS_MPEGSPLITTER_SUB_EMPTY_PIN		"Output empty Subtitle pin"
 STRING IDS_MPEGSPLITTER_SUB_FORCING		"Forcer le chargement de tous les sous-titres"

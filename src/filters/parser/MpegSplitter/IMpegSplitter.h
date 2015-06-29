@@ -37,9 +37,6 @@ public IUnknown {
 	STDMETHOD(SetTrueHD(int nValue)) PURE;
 	STDMETHOD_(int, GetTrueHD()) PURE;
 
-	STDMETHOD(SetAlternativeDuration(BOOL nValue)) PURE;
-	STDMETHOD_(BOOL, GetAlternativeDuration()) PURE;
-
 	STDMETHOD(SetSubEmptyPin(BOOL nValue)) PURE;
 	STDMETHOD_(BOOL, GetSubEmptyPin()) PURE;
 

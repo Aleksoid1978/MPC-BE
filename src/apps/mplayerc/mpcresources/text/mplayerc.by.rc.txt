@@ -1565,7 +1565,6 @@ STRING IDS_MPEG2_NOTE1		"Выкарыстанне непланарнага фа�
 STRING IDS_MPEG2_READ_AR		"Прачытаць AR са струменя"
 STRING IDS_MPEG2_RESET		"Скід"
 STRING IDS_MPEG2_SATURATION		"Насычанасць"
-STRING IDS_MPEGSPLITTER_ALT_DUR_CALC		"Use alternate method to calculate duration"
 STRING IDS_MPEGSPLITTER_LANG_ORDER		"Парадак выбару мовы аўдыё:"
 STRING IDS_MPEGSPLITTER_SUB_EMPTY_PIN		"Output empty Subtitle pin"
 STRING IDS_MPEGSPLITTER_SUB_FORCING		"Force loading of all subtitles"

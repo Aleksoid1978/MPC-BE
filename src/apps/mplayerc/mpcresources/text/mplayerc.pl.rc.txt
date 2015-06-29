@@ -1556,7 +1556,6 @@ STRING IDS_MPEG2_NOTE1		"Używanie formatów nie-planarnych, usuwanie przeplotu 
 STRING IDS_MPEG2_READ_AR		"Odczytywanie proporcji obrazu ze strumienia"
 STRING IDS_MPEG2_RESET		"Przywróć"
 STRING IDS_MPEG2_SATURATION		"Nasycenie:"
-STRING IDS_MPEGSPLITTER_ALT_DUR_CALC		"Alternatywna metoda obliczania czasu trwania pliku"
 STRING IDS_MPEGSPLITTER_LANG_ORDER		"Kolejność ścieżek dźwiękowych:"
 STRING IDS_MPEGSPLITTER_SUB_EMPTY_PIN		"Output empty Subtitle pin"
 STRING IDS_MPEGSPLITTER_SUB_FORCING		"Wymuś ładowanie wszystkich napisów"
