@@ -156,7 +156,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			while (pos) {
 				stream& s = streams.GetNext(pos);
 				SyncPoints& sps = m_SyncPoints[s];
-				if (sps[0].rt < rtMin) {
+				if (sps.GetCount() > 1 && sps[0].rt < rtMin) {
 					rtMin = sps[0].rt;
 					posMin = posMax = sps[0].fp;
 				}
