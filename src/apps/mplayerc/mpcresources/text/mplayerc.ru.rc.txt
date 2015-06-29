@@ -1565,7 +1565,6 @@ STRING IDS_MPEG2_NOTE1		"Использование непланарного ф�
 STRING IDS_MPEG2_READ_AR		"Считывать соотношение сторон из потока"
 STRING IDS_MPEG2_RESET		"Сброс"
 STRING IDS_MPEG2_SATURATION		"Насыщенность"
-STRING IDS_MPEGSPLITTER_ALT_DUR_CALC		"Альтернативный метод расчета длительности"
 STRING IDS_MPEGSPLITTER_LANG_ORDER		"Порядок выбора аудио:"
 STRING IDS_MPEGSPLITTER_SUB_EMPTY_PIN		"Добавлять 'пустой' вывод субтитров"
 STRING IDS_MPEGSPLITTER_SUB_FORCING		"Загружать все субтитры"

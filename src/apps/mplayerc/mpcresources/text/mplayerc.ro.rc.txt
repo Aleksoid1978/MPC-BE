@@ -1568,7 +1568,6 @@ STRING IDS_MPEG2_NOTE1		"Atenție: Folosind un format de ieșire non-planar, de�
 STRING IDS_MPEG2_READ_AR		"Citeşte raportul de aspect din flux"
 STRING IDS_MPEG2_RESET		"Resetare"
 STRING IDS_MPEG2_SATURATION		"Saturație"
-STRING IDS_MPEGSPLITTER_ALT_DUR_CALC		"Metoda alternativă pentru calculare durată"
 STRING IDS_MPEGSPLITTER_LANG_ORDER		"Ordine limbi audio:"
 STRING IDS_MPEGSPLITTER_SUB_EMPTY_PIN		"Output empty Subtitle pin"
 STRING IDS_MPEGSPLITTER_SUB_FORCING		"Încarcă forțat toate subtitrările"

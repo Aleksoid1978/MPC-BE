@@ -39,7 +39,6 @@
 #define OPT_AudioLangOrder    _T("AudioLanguageOrder")
 #define OPT_SubLangOrder      _T("SubtitlesLanguageOrder")
 #define OPT_AC3CoreOnly       _T("AC3CoreOnly")
-#define OPT_AltDuration       _T("AlternativeDuration")
 #define OPT_SubEmptyOutput    _T("SubtitleEmptyOutput")
 
 #ifdef REGISTER_FILTER
@@ -490,7 +489,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_rtMax(0)
 	, m_ForcedSub(false)
 	, m_AC3CoreOnly(0)
-	, m_AlternativeDuration(false)
 	, m_SubEmptyPin(false)
 	, bIsStreamingSupport(FALSE)
 {
@@ -519,10 +517,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 			m_AC3CoreOnly = dw;
 		}
 
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_AltDuration, dw)) {
-			m_AlternativeDuration = !!dw;
-		}
-
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SubEmptyOutput, dw)) {
 			m_SubEmptyPin = !!dw;
 		}
@@ -537,7 +531,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	}
 
 	m_AC3CoreOnly				= AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_AC3CoreOnly, m_AC3CoreOnly);
-	m_AlternativeDuration		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_AltDuration, m_AlternativeDuration);
 	m_SubEmptyPin				= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_SubEmptyOutput, m_SubEmptyPin);
 
 	m_nFlag					   |= PACKET_PTS_DISCONTINUITY;
@@ -919,7 +912,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_pFile.Free();
 
 	ReadClipInfo(GetPartFilename(pAsyncReader));
-	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo, m_rtPlaylistDuration > 0, m_ForcedSub, m_AC3CoreOnly, m_AlternativeDuration, m_SubEmptyPin));
+	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo, m_rtPlaylistDuration > 0, m_ForcedSub, m_AC3CoreOnly, m_SubEmptyPin));
 
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
@@ -1673,13 +1666,11 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 		key.SetStringValue(OPT_AudioLangOrder, m_AudioLanguageOrder);
 		key.SetStringValue(OPT_SubLangOrder, m_SubtitlesLanguageOrder);
 		key.SetDWORDValue(OPT_AC3CoreOnly, m_AC3CoreOnly);
-		key.SetDWORDValue(OPT_AltDuration, m_AlternativeDuration);
 		key.SetDWORDValue(OPT_SubEmptyOutput, m_SubEmptyPin);
 	}
 #else
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_ForcedSub, m_ForcedSub);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_AC3CoreOnly, m_AC3CoreOnly);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_AltDuration, m_AlternativeDuration);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_SubEmptyOutput, m_SubEmptyPin);
 #endif
 
@@ -1736,19 +1727,6 @@ STDMETHODIMP_(int) CMpegSplitterFilter::GetTrueHD()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_AC3CoreOnly;
-}
-
-STDMETHODIMP CMpegSplitterFilter::SetAlternativeDuration(BOOL nValue)
-{
-	CAutoLock cAutoLock(&m_csProps);
-	m_AlternativeDuration = !!nValue;
-	return S_OK;
-}
-
-STDMETHODIMP_(BOOL) CMpegSplitterFilter::GetAlternativeDuration()
-{
-	CAutoLock cAutoLock(&m_csProps);
-	return m_AlternativeDuration;
 }
 
 STDMETHODIMP CMpegSplitterFilter::SetSubEmptyPin(BOOL nValue)

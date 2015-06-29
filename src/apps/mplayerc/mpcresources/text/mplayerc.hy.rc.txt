@@ -1565,7 +1565,6 @@ STRING IDS_MPEG2_NOTE1		"Արտածման ոչ պլանային ձևի օգտա�
 STRING IDS_MPEG2_READ_AR		"Կարդալ AR հոսքից"
 STRING IDS_MPEG2_RESET		"Ետարկել"
 STRING IDS_MPEG2_SATURATION		"Հագեցվածությունը"
-STRING IDS_MPEGSPLITTER_ALT_DUR_CALC		"Use alternate method to calculate duration"
 STRING IDS_MPEGSPLITTER_LANG_ORDER		"Ձայնի լեզվի կարգը."
 STRING IDS_MPEGSPLITTER_SUB_EMPTY_PIN		"Output empty Subtitle pin"
 STRING IDS_MPEGSPLITTER_SUB_FORCING		"Բոլոր տեղագրերի ստիպող. բացում"

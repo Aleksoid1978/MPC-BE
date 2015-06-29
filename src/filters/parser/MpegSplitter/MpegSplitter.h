@@ -70,7 +70,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 
 private:
 	CString m_AudioLanguageOrder, m_SubtitlesLanguageOrder;
-	bool m_ForcedSub, m_AlternativeDuration, m_SubEmptyPin;
+	bool m_ForcedSub, m_SubEmptyPin;
 	int m_AC3CoreOnly;
 	CCritSec m_csProps;
 
@@ -119,9 +119,6 @@ public:
 
 	STDMETHODIMP SetTrueHD(int nValue);
 	STDMETHODIMP_(int) GetTrueHD();
-
-	STDMETHODIMP SetAlternativeDuration(BOOL nValue);
-	STDMETHODIMP_(BOOL) GetAlternativeDuration();
 
 	STDMETHODIMP SetSubEmptyPin(BOOL nValue);
 	STDMETHODIMP_(BOOL) GetSubEmptyPin();

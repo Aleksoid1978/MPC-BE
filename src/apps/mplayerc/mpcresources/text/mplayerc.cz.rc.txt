@@ -1565,7 +1565,6 @@ STRING IDS_MPEG2_NOTE1		"Poznámka: Použití neplanárních formátů, bob dein
 STRING IDS_MPEG2_READ_AR		"Načíst poměr stran z datového proudu videa"
 STRING IDS_MPEG2_RESET		"Výchozí"
 STRING IDS_MPEG2_SATURATION		"Sytost"
-STRING IDS_MPEGSPLITTER_ALT_DUR_CALC		"Use alternate method to calculate duration"
 STRING IDS_MPEGSPLITTER_LANG_ORDER		"Preference jazyku zvukových stop:"
 STRING IDS_MPEGSPLITTER_SUB_EMPTY_PIN		"Output empty Subtitle pin"
 STRING IDS_MPEGSPLITTER_SUB_FORCING		"Vynutit načtení všech titulků"

@@ -1565,7 +1565,6 @@ STRING IDS_MPEG2_NOTE1		"Nota: l'utilizzo di un formato di output non planare, d
 STRING IDS_MPEG2_READ_AR		"Leggi AR dal flusso"
 STRING IDS_MPEG2_RESET		"Reimposta"
 STRING IDS_MPEG2_SATURATION		"Saturazione"
-STRING IDS_MPEGSPLITTER_ALT_DUR_CALC		"Metodo di calcolo della durata alternativo"
 STRING IDS_MPEGSPLITTER_LANG_ORDER		"Ordine lingua audio:"
 STRING IDS_MPEGSPLITTER_SUB_EMPTY_PIN		"Output pin dei sottotitoli vuoti"
 STRING IDS_MPEGSPLITTER_SUB_FORCING		"Carica tutti i sottotitoli in modo forzato"

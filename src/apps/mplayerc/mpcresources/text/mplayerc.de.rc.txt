@@ -1565,7 +1565,6 @@ STRING IDS_MPEG2_NOTE1		"Hinweis: Benutzung der Nicht-Planaren Ausgabe, Bob-Dein
 STRING IDS_MPEG2_READ_AR		"Seitenverhältnis aus Stream lesen"
 STRING IDS_MPEG2_RESET		"Zurücksetzen"
 STRING IDS_MPEG2_SATURATION		"Sättigung"
-STRING IDS_MPEGSPLITTER_ALT_DUR_CALC		"Alternative Methode zur Berechnung der Dauer"
 STRING IDS_MPEGSPLITTER_LANG_ORDER		"Audiospuren Reihenfolge:"
 STRING IDS_MPEGSPLITTER_SUB_EMPTY_PIN		"Leeren Untertitel-Pin ausgeben"
 STRING IDS_MPEGSPLITTER_SUB_FORCING		"Alle Untertitel erzwungen laden"

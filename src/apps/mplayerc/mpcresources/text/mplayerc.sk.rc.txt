@@ -1565,7 +1565,6 @@ STRING IDS_MPEG2_NOTE1		"Poznámka: Použitie výstupného formátu, rozkladania
 STRING IDS_MPEG2_READ_AR		"Prečítať AR zo streamu"
 STRING IDS_MPEG2_RESET		"Obnoviť"
 STRING IDS_MPEG2_SATURATION		"Sýtosť"
-STRING IDS_MPEGSPLITTER_ALT_DUR_CALC		"Use alternate method to calculate duration"
 STRING IDS_MPEGSPLITTER_LANG_ORDER		"Poradie jazykov zvuku:"
 STRING IDS_MPEGSPLITTER_SUB_EMPTY_PIN		"Output empty Subtitle pin"
 STRING IDS_MPEGSPLITTER_SUB_FORCING		"Vynútené načítanie všetkých titulkov"
