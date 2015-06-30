@@ -111,7 +111,7 @@ namespace DSObjects
 		virtual void DeleteSurfaces();
 
 		LONGLONG m_LastAdapterCheck;
-		UINT GetAdapter(IDirect3D9 *pD3D, bool bGetAdapter = true);
+		UINT GetAdapter(IDirect3D9 *pD3D);
 		DWORD GetVertexProcessing();
 
 		bool GetVBlank(int &_ScanLine, int &_bInVBlank, bool _bMeasureTime);
