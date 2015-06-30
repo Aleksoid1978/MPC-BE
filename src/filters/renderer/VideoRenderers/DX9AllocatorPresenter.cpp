@@ -798,7 +798,7 @@ void CDX9AllocatorPresenter::DeleteSurfaces()
 	FreeVideoSurfaces();
 }
 
-UINT CDX9AllocatorPresenter::GetAdapter(IDirect3D9* pD3D, bool bGetAdapter)
+UINT CDX9AllocatorPresenter::GetAdapter(IDirect3D9* pD3D)
 {
 	if (m_hWnd == NULL || pD3D == NULL) {
 		return D3DADAPTER_DEFAULT;
@@ -807,14 +807,14 @@ UINT CDX9AllocatorPresenter::GetAdapter(IDirect3D9* pD3D, bool bGetAdapter)
 	m_D3D9Device.Empty();
 	m_D3D9DeviceName.Empty();
 
-	CRenderersSettings& s = GetRenderersSettings();
-	if (bGetAdapter && pD3D->GetAdapterCount() > 1 && s.D3D9RenderDevice.GetLength() > 0) {
+	CRenderersSettings& rs = GetRenderersSettings();
+	if (pD3D->GetAdapterCount() > 1 && rs.D3D9RenderDevice.GetLength() > 0) {
 		TCHAR		strGUID[50];
 		D3DADAPTER_IDENTIFIER9 adapterIdentifier;
 
 		for (UINT adp = 0, num_adp = pD3D->GetAdapterCount(); adp < num_adp; ++adp) {
 			if (pD3D->GetAdapterIdentifier(adp, 0, &adapterIdentifier) == S_OK) {
-				if ((::StringFromGUID2(adapterIdentifier.DeviceIdentifier, strGUID, 50) > 0) && (s.D3D9RenderDevice == strGUID)) {
+				if ((::StringFromGUID2(adapterIdentifier.DeviceIdentifier, strGUID, 50) > 0) && (rs.D3D9RenderDevice == strGUID)) {
 					m_D3D9Device		= adapterIdentifier.Description;
 					m_D3D9DeviceName	= adapterIdentifier.DeviceName;
 					m_D3D9VendorId		= adapterIdentifier.VendorId;
@@ -832,14 +832,12 @@ UINT CDX9AllocatorPresenter::GetAdapter(IDirect3D9* pD3D, bool bGetAdapter)
 	for (UINT adp = 0, num_adp = pD3D->GetAdapterCount(); adp < num_adp; ++adp) {
 		HMONITOR hAdpMon = pD3D->GetAdapterMonitor(adp);
 		if (hAdpMon == hMonitor) {
-			if (bGetAdapter) {
 				D3DADAPTER_IDENTIFIER9 adapterIdentifier;
 				if (pD3D->GetAdapterIdentifier(adp, 0, &adapterIdentifier) == S_OK) {
 					m_D3D9Device		= adapterIdentifier.Description;
 					m_D3D9DeviceName	= adapterIdentifier.DeviceName;
 					m_D3D9VendorId		= adapterIdentifier.VendorId;
 				}
-			}
 			return adp;
 		}
 	}
