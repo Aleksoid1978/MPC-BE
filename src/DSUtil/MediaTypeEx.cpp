@@ -354,6 +354,7 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 		names[WAVE_FORMAT_CREATIVE_FASTSPEECH10] = _T("Creative Fastspeech 10");
 		names[WAVE_FORMAT_UHER_ADPCM]            = _T("UHER ADPCM");
 		names[WAVE_FORMAT_DTS2]                  = _T("DTS");
+		names[WAVE_FORMAT_DOLBY_AC3_SPDIF]       = _T("S/PDIF");
 		// other
 		names[WAVE_FORMAT_DOLBY_AC3]             = _T("Dolby AC3");
 		names[WAVE_FORMAT_LATM_AAC]              = _T("AAC(LATM)");
