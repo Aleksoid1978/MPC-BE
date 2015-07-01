@@ -2095,7 +2095,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 				}
 				src += 2;
 				int nat = (src[0] >> 1) & 0x3F;
-				if (nat < NAL_TYPE_HEVC_VPS || nat > NAL_TYPE_HEVC_PPS) {
+				if (nat < NALU_TYPE_HEVC_VPS || nat > NALU_TYPE_HEVC_PPS) {
 					NALCount = 0;
 					break;
 				}
