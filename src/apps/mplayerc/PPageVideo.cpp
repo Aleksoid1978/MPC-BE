@@ -154,12 +154,10 @@ BOOL CPPageVideo::OnInitDialog()
 
 	IDirect3D9* pD3D = Direct3DCreate9(D3D_SDK_VERSION);
 	if (pD3D) {
-		TCHAR strGUID[50] = {0};
+		TCHAR strGUID[50] = { 0 };
 		CString cstrGUID;
 		CString d3ddevice_str;
-		CStringArray adapterList;
-
-		D3DADAPTER_IDENTIFIER9 adapterIdentifier;
+		D3DADAPTER_IDENTIFIER9 adapterIdentifier = { 0 };
 
 		for (UINT adp = 0; adp < pD3D->GetAdapterCount(); ++adp) {
 			if (SUCCEEDED(pD3D->GetAdapterIdentifier(adp, 0, &adapterIdentifier))) {
@@ -170,14 +168,14 @@ BOOL CPPageVideo::OnInitDialog()
 				if (::StringFromGUID2(adapterIdentifier.DeviceIdentifier, strGUID, 50) > 0) {
 					cstrGUID = strGUID;
 				}
-				if (cstrGUID.GetLength() > 0) {
-					boolean m_find = false;
-					for (INT_PTR i = 0; (!m_find) && (i < m_D3D9GUIDNames.GetCount()); i++) {
+				if (!cstrGUID.IsEmpty()) {
+					BOOL bExists = FALSE;
+					for (INT_PTR i = 0; !bExists && i < m_D3D9GUIDNames.GetCount(); i++) {
 						if (m_D3D9GUIDNames.GetAt(i) == cstrGUID) {
-							m_find = true;
+							bExists = TRUE;
 						}
 					}
-					if (!m_find) {
+					if (!bExists) {
 						m_cbD3D9RenderDevice.AddString(d3ddevice_str);
 						m_D3D9GUIDNames.Add(cstrGUID);
 						if (rs.D3D9RenderDevice == cstrGUID) {
