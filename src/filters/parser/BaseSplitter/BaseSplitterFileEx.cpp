@@ -1598,181 +1598,6 @@ bool CBaseSplitterFileEx::Read(pvahdr& h, bool fSync)
 	return true;
 }
 
-bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt)
-{
-	__int64 endpos		= min(GetPos() + len + 4, GetAvailable());
-	__int64 nalstartpos	= GetPos();
-	bool repeat			= false;
-
-	// First try search for the start code
-	DWORD _dwStartCode = (DWORD)BitRead(32, true);
-	while (GetPos() < endpos &&
-			(_dwStartCode & 0xFFFFFF1F) != 0x101 &&		// Coded slide of a non-IDR
-			(_dwStartCode & 0xFFFFFF1F) != 0x105 &&		// Coded slide of an IDR
-			(_dwStartCode & 0xFFFFFF1F) != 0x107 &&		// Sequence Parameter Set
-			(_dwStartCode & 0xFFFFFF1F) != 0x108 &&		// Picture Parameter Set
-			(_dwStartCode & 0xFFFFFF1F) != 0x109 &&		// Access Unit Delimiter
-			(_dwStartCode & 0xFFFFFF1F) != 0x10f		// Subset Sequence Parameter Set (MVC)
-		  ) {
-		BitRead(8);
-		_dwStartCode = (DWORD)BitRead(32, true);
-	}
-	if (GetPos() >= endpos) {
-		return false;
-	}
-
-	// At least a SPS (normal or subset) and a PPS is required
-	while (GetPos() < endpos && (!(h.spspps[index_sps].complete || h.spspps[index_subsetsps].complete) || !h.spspps[index_pps1].complete || repeat))
-	{
-		BYTE id = h.lastid;
-		repeat = false;
-
-		// Get array index from NAL unit type
-		spsppsindex index = index_unknown;
-
-		if ((id&0x60) != 0) {
-			if ((id&0x9f) == 0x07) {
-				index = index_sps;
-			} else if ((id&0x9f) == 0x0F) {
-				index = index_subsetsps;
-			} else if ((id&0x9f) == 0x08) {
-				index = h.spspps[index_pps1].complete ? index_pps2 : index_pps1;
-			}
-		}
-
-		// Search for next start code
-		DWORD dwStartCode = (DWORD)BitRead(32, true);
-		while (GetPos() < endpos && (dwStartCode != 0x00000001) && (dwStartCode & 0xFFFFFF00) != 0x00000100) {
-			BitRead(8);
-			dwStartCode = (DWORD)BitRead(32, true);
-		}
-
-		// Skip start code
-		__int64 pos;
-		if (GetPos() < endpos) {
-			if (dwStartCode == 0x00000001)
-				BitRead(32);
-			else
-				BitRead(24);
-
-			pos = GetPos();
-			h.lastid = (BYTE)BitRead(8);
-		} else {
-			pos = GetPos()-4;
-		}
-
-		// The SPS or PPS might be fragmented, copy data into buffer until NAL is complete
-		if (index >= 0) {
-			if (h.spspps[index].complete) {
-				// Don't handle SPS/PPS twice
-				continue;
-			} else if (pos > nalstartpos) {
-				// Copy into buffer
-				Seek(nalstartpos);
-				unsigned int bufsize = _countof(h.spspps[index].buffer);
-				int len = min(int(bufsize - h.spspps[index].size), int(pos - nalstartpos));
-				ByteRead(h.spspps[index].buffer + h.spspps[index].size, len);
-				Seek(pos);
-				h.spspps[index].size += len;
-
-				if (h.spspps[index].size >= bufsize || dwStartCode == 0x00000001 || (dwStartCode & 0xFFFFFF00) == 0x00000100) {
-					if (Read(h, index)) {
-						h.spspps[index].complete = true;
-						h.spspps[index].size -= 4;
-					} else {
-						h.spspps[index].size = 0;
-					}
-				}
-
-				repeat = true;
-			}
-		}
-
-		nalstartpos = pos;
-	}
-
-	// Exit and wait for next packet if there is no SPS and PPS yet
-	if ((!h.spspps[index_sps].complete && !h.spspps[index_subsetsps].complete) || !h.spspps[index_pps1].complete || repeat) {
-		return false;
-	}
-
-	if (pmt) {
-		CSize aspect(h.params.width * h.params.sar.num, h.params.height * h.params.sar.den);
-		ReduceDim(aspect);
-		if (aspect.cx * 2 < aspect.cy) {
-			return false;
-		}
-
-		BOOL bIsAVC = FALSE;
-
-		pmt->majortype						= MEDIATYPE_Video;
-		pmt->formattype						= FORMAT_MPEG2_VIDEO;
-		if (h.spspps[index_subsetsps].complete && !h.spspps[index_sps].complete) {
-			pmt->subtype					= FOURCCMap(FCC('EMVC'));	// MVC stream without base view
-			bIsAVC							= TRUE;
-		} else if (h.spspps[index_subsetsps].complete && h.spspps[index_sps].complete) {
-			pmt->subtype					= FOURCCMap(FCC('AMVC'));	// MVC stream with base view
-			bIsAVC							= TRUE;
-		} else {
-			pmt->subtype					= FOURCCMap(FCC('H264'));	// AVC stream
-		}
-
-		// Calculate size of extra data
-		DWORD extra = 0;
-		for (int i = 0; i < 4; i++) {
-			if (h.spspps[i].complete) {
-				extra += (bIsAVC ? 2 : 4) + (h.spspps[i].size);
-			}
-		}
-
-		MPEG2VIDEOINFO* mp2vi				= (MPEG2VIDEOINFO*)pmt->AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + extra);
-		memset(pmt->Format(), 0, pmt->FormatLength());
-
-		mp2vi->hdr.AvgTimePerFrame			= h.params.AvgTimePerFrame;
-		mp2vi->hdr.dwPictAspectRatioX		= aspect.cx;
-		mp2vi->hdr.dwPictAspectRatioY		= aspect.cy;
-		mp2vi->hdr.bmiHeader.biSize			= sizeof(mp2vi->hdr.bmiHeader);
-		mp2vi->hdr.bmiHeader.biWidth		= h.params.width;
-		mp2vi->hdr.bmiHeader.biHeight		= h.params.height;
-		mp2vi->hdr.bmiHeader.biCompression	= pmt->subtype.Data1;
-		mp2vi->hdr.bmiHeader.biPlanes		= 1;
-		mp2vi->hdr.bmiHeader.biBitCount		= 24;
-		mp2vi->hdr.bmiHeader.biSizeImage	= DIBSIZE(mp2vi->hdr.bmiHeader);
-		mp2vi->dwProfile					= h.params.profile;
-		mp2vi->dwFlags						= 4; // ?
-		mp2vi->dwLevel						= h.params.level;
-		mp2vi->cbSequenceHeader				= extra;
-
-		BYTE* p = (BYTE*)&mp2vi->dwSequenceHeader[0];
-		for (int i = 0; i < 4; i++) {
-			if (h.spspps[i].complete) {
-				if (bIsAVC) {
-					*p++ = (h.spspps[i].size) >> 8;
-					*p++ = (h.spspps[i].size) & 0xff;
-					memcpy(p, h.spspps[i].buffer, h.spspps[i].size);
-					p += h.spspps[i].size;
-				} else {
-					*p++ = 0x00; *p++ = 0x00; *p++ = 0x00; *p++ = 0x01;
-					memcpy(p, h.spspps[i].buffer, h.spspps[i].size);
-					p += h.spspps[i].size;
-				}
-			}
-		}
-	}
-
-	return true;
-}
-
-bool CBaseSplitterFileEx::Read(avchdr& h, spsppsindex index)
-{
-	// Only care about SPS and subset SPS
-	if (index != index_sps && index != index_subsetsps) {
-		return true;
-	}
-
-	return AVCParser::ParseSequenceParameterSet(h.spspps[index].buffer + 1, _countof(h.spspps[index].buffer) - 1, h.params);
-}
-
 bool CBaseSplitterFileEx::Read(vc1hdr& h, int len, CMediaType* pmt)
 {
 	memset(&h, 0, sizeof(h));
@@ -1968,6 +1793,143 @@ bool CBaseSplitterFileEx::Read(dvbsub& h, int len, CMediaType* pmt, bool bSimple
 	return false;
 }
 
+static bool ParseAvc(CAtlArray<BYTE>& pData, CMediaType* pmt)
+{
+	NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
+	CH264Nalu Nalu;
+
+	{
+		int sps_present = 0;
+		int pps_present = 0;
+
+		Nalu.SetBuffer(pData.GetData(), pData.GetCount());
+		Nalu.ReadNext();
+		while (!(sps_present && pps_present)) {
+			NALU_TYPE nalu_type = Nalu.GetType();
+			if (!Nalu.ReadNext()) {
+				break;
+			}
+			switch (nalu_type) {
+				case NALU_TYPE_SPS:
+				case NALU_TYPE_PPS:
+					if (nalu_type == NALU_TYPE_SPS) {
+						sps_present++;
+					} else if (nalu_type == NALU_TYPE_PPS) {
+						pps_present++;
+					}
+			}
+		}
+
+		if (!(sps_present && pps_present)) {
+			return false;
+		}
+	}
+
+	Nalu.SetBuffer(pData.GetData(), pData.GetCount());
+	nalu_type = NALU_TYPE_UNKNOWN;
+	while (nalu_type != NALU_TYPE_SPS && Nalu.ReadNext()) {
+		nalu_type = Nalu.GetType();
+	}
+
+	vc_params_t params = { 0 };
+	if (AVCParser::ParseSequenceParameterSet(Nalu.GetDataBuffer() + 1, Nalu.GetDataLength() - 1, params)) {
+		if (pmt) {
+			BITMAPINFOHEADER bmi = { 0 };
+			bmi.biSize			= sizeof(bmi);
+			bmi.biWidth			= params.width;
+			bmi.biHeight		= params.height;
+			bmi.biCompression	= FCC('H264');
+			bmi.biPlanes		= 1;
+			bmi.biBitCount		= 24;
+			bmi.biSizeImage		= DIBSIZE(bmi);
+
+			CSize aspect(params.width * params.sar.num, params.height * params.sar.den);
+			ReduceDim(aspect);
+
+			BYTE* extradata		= NULL;
+			size_t extrasize	= 0;
+
+			{
+				int sps_present = 0;
+				int pps_present = 0;
+
+				Nalu.SetBuffer(pData.GetData(), pData.GetCount());
+				while (!(sps_present && pps_present)
+					   && Nalu.ReadNext()) {
+					nalu_type = Nalu.GetType();
+					switch (nalu_type) {
+						case NALU_TYPE_SPS:
+						case NALU_TYPE_PPS:
+							if (nalu_type == NALU_TYPE_SPS) {
+								if (sps_present) continue;
+								sps_present++;
+							} else if (nalu_type == NALU_TYPE_PPS) {
+								if (pps_present) continue;
+								pps_present++;
+							}
+
+							static const BYTE start_code[4] = { 0, 0, 0, 1 };
+							static const UINT start_code_size = sizeof(start_code);
+
+							extradata = (BYTE*)realloc(extradata, extrasize + Nalu.GetDataLength() + start_code_size);
+							memcpy(extradata + extrasize, start_code, start_code_size);
+							extrasize += start_code_size;
+							memcpy(extradata + extrasize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
+							extrasize += Nalu.GetDataLength();
+					}
+				}
+			}
+
+			CreateMPEG2VISimple(pmt, &bmi, params.AvgTimePerFrame, aspect, extradata, extrasize, params.profile, params.level, 4);
+			pmt->SetSampleSize(bmi.biWidth * bmi.biHeight * 4);
+			free(extradata);
+		}
+
+		return true;
+	}
+
+	pData.RemoveAll();
+	return false;
+}
+
+bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt/* = NULL*/)
+{
+	CAtlArray<BYTE> pData;
+	pData.SetCount(len);
+	ByteRead(pData.GetData(), len);
+
+	return ParseAvc(pData, pmt);
+}
+
+bool CBaseSplitterFileEx::Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt/* = NULL*/)
+{
+	if (pData.IsEmpty()) {
+		CAtlArray<BYTE> pTmpData;
+		pTmpData.SetCount(len);
+		ByteRead(pTmpData.GetData(), len);
+
+		NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
+		CH264Nalu Nalu;
+		Nalu.SetBuffer(pTmpData.GetData(), pTmpData.GetCount());
+		while (nalu_type != NALU_TYPE_SPS && Nalu.ReadNext()) {
+			nalu_type = Nalu.GetType();
+		}
+
+		if (nalu_type != NALU_TYPE_SPS) {
+			return false;
+		}
+
+		pData.SetCount(len);
+		memcpy(pData.GetData(), pTmpData.GetData(), len);
+	} else {
+		size_t dataLen = pData.GetCount();
+		pData.SetCount(dataLen + len);
+		ByteRead(pData.GetData() + dataLen, len);
+	}
+
+	return ParseAvc(pData, pmt);
+}
+
 static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 {
 	NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
@@ -1978,15 +1940,18 @@ static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 		int sps_present = 0;
 
 		Nalu.SetBuffer(pData.GetData(), pData.GetCount());
-		while (!(vps_present && sps_present)
-			   && Nalu.ReadNext()) {
+		Nalu.ReadNext();
+		while (!(vps_present && sps_present)) {
 			NALU_TYPE nalu_type = Nalu.GetType();
+			if (!Nalu.ReadNext()) {
+				break;
+			}
 			switch (nalu_type) {
-				case NAL_TYPE_HEVC_VPS:
-				case NAL_TYPE_HEVC_SPS:
-					if (nalu_type == NAL_TYPE_HEVC_VPS) {
+				case NALU_TYPE_HEVC_VPS:
+				case NALU_TYPE_HEVC_SPS:
+					if (nalu_type == NALU_TYPE_HEVC_VPS) {
 						vps_present++;
-					} else if (nalu_type == NAL_TYPE_HEVC_SPS) {
+					} else if (nalu_type == NALU_TYPE_HEVC_SPS) {
 						sps_present++;
 					}
 			}
@@ -1998,27 +1963,26 @@ static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 	}
 
 	Nalu.SetBuffer(pData.GetData(), pData.GetCount());
-	while (nalu_type != NAL_TYPE_HEVC_SPS && Nalu.ReadNext()) {
+	nalu_type = NALU_TYPE_UNKNOWN;
+	while (nalu_type != NALU_TYPE_HEVC_SPS && Nalu.ReadNext()) {
 		nalu_type = Nalu.GetType();
 	}
 
 	vc_params_t params = { 0 };
 	if (HEVCParser::ParseSequenceParameterSet(Nalu.GetDataBuffer() + 2, Nalu.GetDataLength() - 2, params)) {
-
-		BITMAPINFOHEADER pbmi;
-		memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
-		pbmi.biSize			= sizeof(pbmi);
-		pbmi.biWidth		= params.width;
-		pbmi.biHeight		= params.height;
-		pbmi.biCompression	= FCC('HEVC');
-		pbmi.biPlanes		= 1;
-		pbmi.biBitCount		= 24;
-		pbmi.biSizeImage	= DIBSIZE(pbmi);
-
-		CSize aspect(params.width * params.sar.num, params.height * params.sar.den);
-		ReduceDim(aspect);
-
 		if (pmt) {
+			BITMAPINFOHEADER bmi = { 0 };
+			bmi.biSize			= sizeof(bmi);
+			bmi.biWidth			= params.width;
+			bmi.biHeight		= params.height;
+			bmi.biCompression	= FCC('HEVC');
+			bmi.biPlanes		= 1;
+			bmi.biBitCount		= 24;
+			bmi.biSizeImage		= DIBSIZE(bmi);
+
+			CSize aspect(params.width * params.sar.num, params.height * params.sar.den);
+			ReduceDim(aspect);
+
 			BYTE* extradata		= NULL;
 			size_t extrasize	= 0;
 
@@ -2033,30 +1997,35 @@ static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 					   && Nalu.ReadNext()) {
 					nalu_type = Nalu.GetType();
 					switch (nalu_type) {
-						case NAL_TYPE_HEVC_VPS:
-						case NAL_TYPE_HEVC_SPS:
-						case NAL_TYPE_HEVC_PPS:
-						case NAL_TYPE_HEVC_AUD:
-							if (nalu_type == NAL_TYPE_HEVC_VPS) {
+						case NALU_TYPE_HEVC_VPS:
+						case NALU_TYPE_HEVC_SPS:
+						case NALU_TYPE_HEVC_PPS:
+						case NALU_TYPE_HEVC_AUD:
+							if (nalu_type == NALU_TYPE_HEVC_VPS) {
 								if (vps_present) continue;
 								vps_present++;
 								if (!HEVCParser::ParseVideoParameterSet(Nalu.GetDataBuffer() + 2, Nalu.GetDataLength() - 2, params)) {
 									return false;
 								}
-							} else if (nalu_type == NAL_TYPE_HEVC_SPS) {
+							} else if (nalu_type == NALU_TYPE_HEVC_SPS) {
 								if (sps_present) continue;
 								sps_present++;
-							} else if (nalu_type == NAL_TYPE_HEVC_PPS) {
+							} else if (nalu_type == NALU_TYPE_HEVC_PPS) {
 								if (pps_present) continue;
 								pps_present++;
-							} else if (nalu_type == NAL_TYPE_HEVC_AUD) {
+							} else if (nalu_type == NALU_TYPE_HEVC_AUD) {
 								if (aud_present) continue;
 								aud_present++;
 							}
 
-							extradata	= (BYTE*)realloc(extradata, extrasize + Nalu.GetDataLength() + 3);
-							memcpy(extradata + extrasize, Nalu.GetDataBuffer() - 3, Nalu.GetDataLength() + 3);
-							extrasize	+= Nalu.GetDataLength() + 3;
+							static const BYTE start_code[3] = { 0, 0, 1 };
+							static const UINT start_code_size = sizeof(start_code);
+
+							extradata = (BYTE*)realloc(extradata, extrasize + Nalu.GetDataLength() + start_code_size);
+							memcpy(extradata + extrasize, start_code, start_code_size);
+							extrasize += start_code_size;
+							memcpy(extradata + extrasize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
+							extrasize += Nalu.GetDataLength();
 					}
 				}
 			}
@@ -2068,14 +2037,15 @@ static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 				AvgTimePerFrame = (REFERENCE_TIME)(10000000.0 * params.vui_timing.num_units_in_tick / params.vui_timing.time_scale);
 			}
 
-			CreateMPEG2VISimple(pmt, &pbmi, AvgTimePerFrame, aspect, extradata, extrasize, params.profile, params.level, params.nal_length_size);
-			pmt->SetSampleSize(pbmi.biWidth * pbmi.biHeight * 4);
+			CreateMPEG2VISimple(pmt, &bmi, AvgTimePerFrame, aspect, extradata, extrasize, params.profile, params.level, params.nal_length_size);
+			pmt->SetSampleSize(bmi.biWidth * bmi.biHeight * 4);
 			free(extradata);
 		}
 
 		return true;
 	}
 
+	pData.RemoveAll();
 	return false;
 }
 
@@ -2098,11 +2068,11 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMed
 		NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
 		CH265Nalu Nalu;
 		Nalu.SetBuffer(pTmpData.GetData(), pTmpData.GetCount());
-		while (nalu_type != NAL_TYPE_HEVC_VPS && Nalu.ReadNext()) {
+		while (nalu_type != NALU_TYPE_HEVC_VPS && Nalu.ReadNext()) {
 			nalu_type = Nalu.GetType();
 		}
 
-		if (nalu_type != NAL_TYPE_HEVC_VPS) {
+		if (nalu_type != NALU_TYPE_HEVC_VPS) {
 			return false;
 		}
 

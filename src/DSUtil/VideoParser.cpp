@@ -1038,7 +1038,7 @@ namespace HEVCParser {
 			//
 			if (flv_hm >= 90 && sps_len > 2) {
 				BYTE* sps_data = gb.GetBufferPos();
-				if ((*sps_data >> 1 & 0x3f) == (BYTE)NAL_TYPE_HEVC_SPS) {
+				if ((*sps_data >> 1 & 0x3f) == (BYTE)NALU_TYPE_HEVC_SPS) {
 					if (flv_hm >= 100) {
 						return ParseSequenceParameterSet(sps_data + 2, sps_len - 2, params);
 					}
@@ -1132,7 +1132,7 @@ namespace HEVCParser {
 				uint8_t reserved = gb.BitRead(1);	// reserved = 0 (or 1 for MKV DivX HEVC)
 				int NAL_unit_type = gb.BitRead(6);
 				int numNalus = gb.BitRead(16);
-				if (NAL_unit_type == NAL_TYPE_HEVC_SPS && numNalus > 0) {
+				if (NAL_unit_type == NALU_TYPE_HEVC_SPS && numNalus > 0) {
 					sps_len = gb.BitRead(16);
 					break;
 				}

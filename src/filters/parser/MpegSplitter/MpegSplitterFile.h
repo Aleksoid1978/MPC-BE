@@ -41,8 +41,9 @@ enum MPEG_TYPES {
 class CMpegSplitterFile : public CBaseSplitterFileEx
 {
 	CAtlMap<WORD, BYTE> m_pid2pes;
-	CAtlMap<DWORD, avchdr> avch;
+
 	CAtlMap<DWORD, seqhdr> seqh;
+	CAtlMap<DWORD, CAtlArray<BYTE>> avch;
 	CAtlMap<DWORD, CAtlArray<BYTE>> hevch;
 
 	template<class T, int validCount = 5>
@@ -92,7 +93,6 @@ public:
 		video,
 		audio,
 		subpic,
-		stereo,
 		unknown
 	};
 
@@ -205,7 +205,6 @@ public:
 				type == video	? L"Video" :
 				type == audio	? L"Audio" :
 				type == subpic	? L"Subtitle" :
-				type == stereo	? L"Stereo" :
 								  L"Unknown";
 		}
 

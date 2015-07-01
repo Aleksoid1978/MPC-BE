@@ -185,7 +185,6 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		// AAC LATM
 		return ParseAACLATM(p);
 	} else if (m_mt.subtype == MEDIASUBTYPE_AVC1 || m_mt.subtype == FOURCCMap('1cva')
-			   || m_mt.subtype == FOURCCMap('CVMA') || m_mt.subtype == FOURCCMap('CVME')
 			   || m_mt.subtype == MEDIASUBTYPE_H264) {
 		// H.264/AVC/CVMA/CVME
 		return ParseAnnexB(p, !!(m_mt.subtype != MEDIASUBTYPE_H264));

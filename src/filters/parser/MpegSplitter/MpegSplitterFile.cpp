@@ -682,19 +682,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		// AVC/H.264
 		if (type == stream_type::unknown && (stream_type & H264_VIDEO)) {
 			Seek(start);
-			// PPS and SPS can be present on differents packets
-			// and can also be split into multiple packets
-			if (!avch.Lookup(s)) {
-				memset(&avch[s], 0, sizeof(avchdr));
-			}
-
-			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::stereo].Find(s) && Read(avch[s], len, &s.mt)) {
+			avchdr h;
+			if (!m_streams[stream_type::video].Find(s) && Read(h, len, avch[s], &s.mt)) {
 				s.codec = stream_codec::H264;
-				if (avch[s].spspps[index_subsetsps].complete) {
-					type = stream_type::stereo;
-				} else {
-					type = stream_type::video;
-				}
+				type = stream_type::video;
 			}
 		}
 
@@ -1167,7 +1158,6 @@ CAtlList<CMpegSplitterFile::stream>* CMpegSplitterFile::GetMasterStream()
 		!m_streams[stream_type::video].IsEmpty()	? &m_streams[stream_type::video]  :
 		!m_streams[stream_type::audio].IsEmpty()	? &m_streams[stream_type::audio]  :
 		!m_streams[stream_type::subpic].IsEmpty()	? &m_streams[stream_type::subpic] :
-		!m_streams[stream_type::stereo].IsEmpty()	? &m_streams[stream_type::stereo] :
 		NULL;
 }
 

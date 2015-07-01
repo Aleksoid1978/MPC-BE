@@ -379,33 +379,6 @@ public:
 		REFERENCE_TIME pts;
 	};
 
-	enum spsppsindex {
-		index_unknown   = -1,
-		index_subsetsps = 0,
-		index_sps       = 1,
-		index_pps1      = 2,
-		index_pps2      = 3,
-	};
-
-	struct spsppsdata
-	{
-		BYTE buffer[MAX_SPSPPS];
-		unsigned int size;
-		bool complete;
-	};
-
-	struct avchdr
-	{
-		vc_params_t params;
-
-		spsppsdata spspps[4];
-		BYTE lastid;
-
-		avchdr() {
-			memset(this, 0, sizeof(*this));
-		}
-	};
-
 	struct vc1hdr
 	{
 		BYTE profile;
@@ -428,6 +401,9 @@ public:
 	};
 
 	struct dvbsub {
+	};
+
+	struct avchdr {
 	};
 
 	struct hevchdr {
@@ -466,11 +442,11 @@ public:
 	__int64 Read(trhdr& h, bool fSync = true);
 	bool Read(trsechdr& h);
 	bool Read(pvahdr& h, bool fSync = true);
-	bool Read(avchdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(vc1hdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(dirachdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(dvbsub& h, int len, CMediaType* pmt = NULL, bool bSimpleAdd = false);
-	bool Read(avchdr& h, spsppsindex index);
+	bool Read(avchdr& h, int len, CMediaType* pmt = NULL);
+	bool Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt = NULL);
 	bool Read(hevchdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt = NULL);
 	bool Read(adx_adpcm_hdr& h, int len, CMediaType* pmt = NULL);
