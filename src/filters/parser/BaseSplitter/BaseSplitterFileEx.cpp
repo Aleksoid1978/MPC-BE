@@ -2015,7 +2015,7 @@ static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 		pbmi.biBitCount		= 24;
 		pbmi.biSizeImage	= DIBSIZE(pbmi);
 
-		CSize aspect(pbmi.biWidth, pbmi.biHeight);
+		CSize aspect(params.width * params.sar.num, params.height * params.sar.den);
 		ReduceDim(aspect);
 
 		if (pmt) {
