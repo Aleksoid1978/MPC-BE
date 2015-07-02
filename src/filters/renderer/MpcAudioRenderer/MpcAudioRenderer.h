@@ -67,6 +67,8 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	CString				m_strDeviceId;
 	CString				m_strDeviceName;
 
+	BOOL				m_bHasVideo;
+
 public:
 	CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr);
 	virtual ~CMpcAudioRenderer();

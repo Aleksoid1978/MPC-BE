@@ -1354,6 +1354,39 @@ bool CreateFilter(CString DisplayName, IBaseFilter** ppBF, CString& FriendlyName
 	return true;
 }
 
+bool HasMediaType(IPin *pPin, const GUID &mediaType)
+{
+	CheckPointer(pPin, false);
+	bool bFound = false;
+
+	CComPtr<IPin> pOtherPin;
+	if (SUCCEEDED(pPin->ConnectedTo(&pOtherPin)) && pOtherPin) {
+		CComPtr<IBaseFilter> pFilter = GetFilterFromPin(pOtherPin);
+
+		BeginEnumPins(pFilter, pEP, pOtherPin2)
+			PIN_DIRECTION dir;
+			pOtherPin2->QueryDirection(&dir);
+			if (dir == PINDIR_OUTPUT) {
+				BeginEnumMediaTypes(pOtherPin2, pEM, pmt)
+					if (pmt->majortype == mediaType || pmt->subtype == mediaType) {
+						bFound = TRUE;
+						break;
+					}
+				EndEnumMediaTypes(pmt)
+			} else {
+				bFound = HasMediaType(pOtherPin2, mediaType);
+			}
+
+			if (bFound) {
+				break;
+			}
+
+		EndEnumPins
+	}
+
+	return bFound;
+}
+
 IBaseFilter* AppendFilter(IPin* pPin, IMoniker* pMoniker, IGraphBuilder* pGB)
 {
 	do {
