@@ -147,6 +147,8 @@ public:
 	STDMETHODIMP_(BOOL)				GetSystemLayoutChannels();
 	STDMETHODIMP_(BITSTREAM_MODE)	GetBitstreamMode();
 	STDMETHODIMP_(CString)			GetCurrentPlaybackDevice();
+	STDMETHODIMP					SetSyncMethod(INT nValue);
+	STDMETHODIMP_(INT)				GetSyncMethod();
 
 	// CMpcAudioRenderer
 private:
@@ -204,6 +206,7 @@ private:
 	BITSTREAM_MODE			m_BitstreamMode;
 	BOOL					m_bUseBitExactOutput;
 	BOOL					m_bUseSystemLayoutChannels;
+	SYNC_METHOD				m_SyncMethod;
 	FILTER_STATE			m_filterState;
 
 	UINT32					m_nSampleOffset;

@@ -39,6 +39,7 @@
 #define OPT_AudioDevice				_T("SoundDevice")
 #define OPT_UseBitExactOutput		_T("UseBitExactOutput")
 #define OPT_UseSystemLayoutChannels	_T("UseSystemLayoutChannels")
+#define OPT_SyncMethod				_T("SyncMethod")
 // TODO: rename option values
 
 // set to 1(or more) to enable more detail debug log
@@ -168,6 +169,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_eEndReceive(TRUE)
 	, m_eReinitialize(TRUE)
 	, m_nSampleOffset(0)
+	, m_SyncMethod(SYNC_TO_VIDEO)
 {
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CMpcAudioRenderer()"));
 
@@ -192,12 +194,16 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_UseSystemLayoutChannels, dw)) {
 			m_bUseSystemLayoutChannels = !!dw;
 		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SyncMethod, dw)) {
+			m_SyncMethod = (SYNC_METHOD)dw;
+		}
 	}
 #else
 	m_WASAPIMode				= (WASAPI_MODE)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, m_WASAPIMode);
 	m_DeviceName				= AfxGetApp()->GetProfileString(OPT_SECTION_AudRend, OPT_AudioDevice, m_DeviceName);
 	m_bUseBitExactOutput		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	m_bUseSystemLayoutChannels	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
+	m_SyncMethod				= (SYNC_METHOD)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_SyncMethod, m_SyncMethod);
 #endif
 
 	m_WASAPIMode				= min(max(m_WASAPIMode, MODE_WASAPI_EXCLUSIVE), MODE_WASAPI_SHARED);
@@ -317,7 +323,6 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 
 	CheckPointer(pmt, E_POINTER);
 	CheckPointer(pmt->pbFormat, VFW_E_TYPE_NOT_ACCEPTED);
-	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CheckMediaType()"));
 
 	if ((pmt->majortype != MEDIATYPE_Audio) || (pmt->formattype != FORMAT_WaveFormatEx)) {
 		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CheckMediaType() - Not supported"));
@@ -594,7 +599,7 @@ DWORD CMpcAudioRenderer::RenderThread()
 					DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderThread() - Data Event, Audio client state = %s", m_bIsAudioClientStarted ? L"Started" : L"Stoped"));
 #endif
 					HRESULT hr = RenderWasapiBuffer();
-					if (hr == AUDCLNT_E_DEVICE_INVALIDATED ) {
+					if (hr == AUDCLNT_E_DEVICE_INVALIDATED) {
 						SetEvent(m_hReinitializeEvent);
 					}
 				}
@@ -855,12 +860,14 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 		key.SetStringValue(OPT_AudioDevice, m_DeviceName);
 		key.SetDWORDValue(OPT_UseBitExactOutput, m_bUseBitExactOutput);
 		key.SetDWORDValue(OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
+		key.SetDWORDValue(OPT_SyncMethod, (DWORD)m_SyncMethod);
 	}
 #else
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, (int)m_WASAPIModeAfterRestart);
 	AfxGetApp()->WriteProfileString(OPT_SECTION_AudRend, OPT_AudioDevice, m_DeviceName);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_SyncMethod, (int)m_SyncMethod);
 #endif
 
 	return S_OK;
@@ -952,6 +959,19 @@ STDMETHODIMP_(CString) CMpcAudioRenderer::GetCurrentPlaybackDevice()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_strDeviceName;
+}
+
+STDMETHODIMP CMpcAudioRenderer::SetSyncMethod(INT nValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_SyncMethod = (SYNC_METHOD)nValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(INT) CMpcAudioRenderer::GetSyncMethod()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return (INT)m_SyncMethod;
 }
 
 HRESULT CMpcAudioRenderer::GetReferenceClockInterface(REFIID riid, void **ppv)
@@ -2055,8 +2075,8 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 					m_rtNextSampleTime = m_CurrentPacket->rtStart;
 				}
 
-				REFERENCE_TIME rWaitRenderTime = INVALID_TIME;
-
+				REFERENCE_TIME rtWaitRenderTime = INVALID_TIME;
+				
 				rtRefClock = GetRefClockTime();
 				if (rtRefClock != INVALID_TIME) {
 					BOOL bReSync = FALSE;
@@ -2069,7 +2089,13 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 									ReftimeToString(m_rtNextSampleTime), ReftimeToString(m_CurrentPacket->rtStart),
 									m_CurrentPacket->rtStart - m_rtNextSampleTime));
 #endif
-							bReSync = TRUE;
+							if (m_SyncMethod == SYNC_TO_AUDIO) {
+								// adjust the reference clock to match the audio timestamps
+								const REFERENCE_TIME& rtTimeDelta = m_CurrentPacket->rtStart - m_rtNextSampleTime;
+								m_pReferenceClock->SetTimeDelta(rtTimeDelta);
+							} else {
+								bReSync = TRUE;
+							}
 						}
 
 						REFERENCE_TIME rtDuration = GetDuration(m_CurrentPacket->GetCount(), m_pWaveFileFormatOutput);
@@ -2083,20 +2109,20 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 						m_CurrentPacket.Free();
 						continue;
 					} else if ((m_nSampleNum == 0 && dueTime > rtRefClock) || bReSync) {
-						rWaitRenderTime = dueTime;
+						rtWaitRenderTime = dueTime;
 					}
 				}
 
 				rtRefClock = GetRefClockTime();
-				if (rWaitRenderTime != INVALID_TIME
-						&& rWaitRenderTime > rtRefClock) {
-					REFERENCE_TIME rtSilenceDuration = rWaitRenderTime - rtRefClock;
+				if (rtRefClock != INVALID_TIME
+						&& rtWaitRenderTime > rtRefClock) {
+					REFERENCE_TIME rtSilenceDuration = rtWaitRenderTime - rtRefClock;
 					UINT32 nSilenceFrames = rtSilenceDuration / (UNITS / m_pWaveFileFormatOutput->nSamplesPerSec);
 					UINT32 nSilenceBytes = min(nSilenceFrames * m_pWaveFileFormatOutput->nBlockAlign, nAvailableBytes - nWritenBytes);
 #if defined(_DEBUG) && DBGLOG_LEVEL
 					DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - ReSync : %I64d -> %I64d(%s -> %s), %I64d[%s], %u[%u])",
-							rtRefClock, rWaitRenderTime,
-							ReftimeToString(rtRefClock), ReftimeToString(rWaitRenderTime),
+							rtRefClock, rtWaitRenderTime,
+							ReftimeToString(rtRefClock), ReftimeToString(rtWaitRenderTime),
 							rtSilenceDuration, ReftimeToString(rtSilenceDuration),
 							nSilenceBytes, nAvailableBytes - nWritenBytes));
 #endif
@@ -2134,42 +2160,41 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 
 		if (m_lVolume <= DSBVOLUME_MIN) {
 			bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
-		}
-		else if (m_lVolume < DSBVOLUME_MAX && !m_bIsBitstream) {
+		} else if (m_lVolume < DSBVOLUME_MAX && !m_bIsBitstream) {
 			// Adjusting volume ...
 			WAVEFORMATEX* wfeOutput = (WAVEFORMATEX*)m_pWaveFileFormatOutput;
 			SampleFormat sf = GetSampleFormat(wfeOutput);
 			size_t samples = nAvailableBytes / (wfeOutput->wBitsPerSample >> 3);
 
 			switch (sf) {
-			case SAMPLE_FMT_U8:
-				gain_uint8(m_dVolumeFactor, samples, (uint8_t*)pData);
-				break;
-			case SAMPLE_FMT_S16:
-				gain_int16(m_dVolumeFactor, samples, (int16_t*)pData);
-				break;
-			case SAMPLE_FMT_S24:
-				gain_int24(m_dVolumeFactor, samples, pData);
-				break;
-			case SAMPLE_FMT_S32:
-				gain_int32(m_dVolumeFactor, samples, (int32_t*)pData);
-				break;
-			case SAMPLE_FMT_FLT:
-				gain_float(m_dVolumeFactor, samples, (float*)pData);
-				break;
-			case SAMPLE_FMT_DBL:
-				gain_double(m_dVolumeFactor, samples, (double*)pData);
-				break;
+				case SAMPLE_FMT_U8:
+					gain_uint8(m_dVolumeFactor, samples, (uint8_t*)pData);
+					break;
+				case SAMPLE_FMT_S16:
+					gain_int16(m_dVolumeFactor, samples, (int16_t*)pData);
+					break;
+				case SAMPLE_FMT_S24:
+					gain_int24(m_dVolumeFactor, samples, pData);
+					break;
+				case SAMPLE_FMT_S32:
+					gain_int32(m_dVolumeFactor, samples, (int32_t*)pData);
+					break;
+				case SAMPLE_FMT_FLT:
+					gain_float(m_dVolumeFactor, samples, (float*)pData);
+					break;
+				case SAMPLE_FMT_DBL:
+					gain_double(m_dVolumeFactor, samples, (double*)pData);
+					break;
 			}
 		}
 	}
 
 	hr = m_pRenderClient->ReleaseBuffer(numFramesAvailable, bufferFlags);
-	if (FAILED(hr)) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
+	if (FAILED(hr)) {
 		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - ReleaseBuffer() failed with size %ld (0x%08x)", numFramesAvailable, hr));
-#endif
 	}
+#endif
 
 	return hr;
 }

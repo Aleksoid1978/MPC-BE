@@ -30,6 +30,7 @@ class __declspec(uuid("1E53BA32-3BCC-4dff-9342-34E46BE3F5A5"))
 private :
 	CComQIPtr<IMpcAudioRendererFilter> m_pMAR;
 
+	CButton		m_output_group;
 	CStatic		m_txtWasapiMode;
 	CComboBox	m_cbWasapiMode;
 
@@ -39,15 +40,20 @@ private :
 	CStatic		m_txtSoundDevice;
 	CComboBox	m_cbSoundDevice;
 
+	CButton		m_sync_group;
+	CStatic		m_txtSyncMethod;
+	CComboBox	m_cbSyncMethod;
+
 	enum {
 		IDC_PP_WASAPI_MODE = 10000,
 		IDC_PP_SOUND_DEVICE,
 		IDC_PP_USE_BITEXACT_OUTPUT,
-		IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS
+		IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS,
+		IDC_PP_SYNC_METHOD
 	};
 
 public:
-	CMpcAudioRendererSettingsWnd(void);
+	CMpcAudioRendererSettingsWnd();
 
 	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
 	void OnDisconnect();
@@ -94,7 +100,7 @@ private :
 	CEdit		m_CurrentDeviceText;
 
 public:
-	CMpcAudioRendererStatusWnd(void);
+	CMpcAudioRendererStatusWnd();
 
 	bool OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
 	void OnDisconnect();

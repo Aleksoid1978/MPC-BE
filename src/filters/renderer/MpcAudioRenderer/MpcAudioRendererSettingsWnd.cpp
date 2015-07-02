@@ -29,7 +29,7 @@ bool CALLBACK DSEnumProc(LPGUID lpGUID,
 						 LPVOID lpContext )
 {
 	CComboBox *pCombo = (CComboBox*)lpContext;
-	ASSERT ( pCombo );
+	ASSERT(pCombo);
 	LPGUID lpTemp = NULL;
 
 	if (lpGUID != NULL) {// NULL only for "Primary Sound Driver".
@@ -40,10 +40,11 @@ bool CALLBACK DSEnumProc(LPGUID lpGUID,
 	}
 	pCombo->AddString(lpszDesc);
 	free(lpTemp);
+
 	return TRUE;
 }
 
-CMpcAudioRendererSettingsWnd::CMpcAudioRendererSettingsWnd(void)
+CMpcAudioRendererSettingsWnd::CMpcAudioRendererSettingsWnd()
 {
 }
 
@@ -74,8 +75,12 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 {
 	ASSERT(IPP_FONTSIZE == 13);
 	const int h20 = IPP_SCALE(20);
+	const int h25 = IPP_SCALE(25);
 	const int h30 = IPP_SCALE(30);
 	CPoint p(10, 10);
+
+	m_output_group.Create(ResStr(IDS_ARS_OUTPUT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(330), h20 + h20 + h20 + h30 + h20 + h30 + h30)), this, (UINT)IDC_STATIC);
+	p.y += h20;
 
 	m_txtWasapiMode.Create(ResStr(IDS_ARS_WASAPI_MODE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
@@ -91,13 +96,23 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	m_txtSoundDevice.Create(ResStr(IDS_ARS_SOUND_DEVICE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_cbSoundDevice.Create(WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_SOUND_DEVICE);
+	p.y += h20 + h20;
+
+	m_sync_group.Create(ResStr(IDS_ARS_AV_SYNC), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(330), h20 + h20 + h30)), this, (UINT)IDC_STATIC);
+	p.y += h20;
+	
+	m_txtSyncMethod.Create(ResStr(IDS_ARS_SYNC_METHOD), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
+	p.y += h20;
+	m_cbSyncMethod.Create(WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_SYNC_METHOD);
+	m_cbSyncMethod.AddString(ResStr(IDS_ARS_SYNC_METHOD_TO_VIDEO));
+	m_cbSyncMethod.AddString(ResStr(IDS_ARS_SYNC_METHOD_TO_AUDIO));
 
 	HMODULE hModule = LoadLibrary(L"dsound.dll");
 	if (hModule) {
 		HRESULT (__stdcall * pDirectSoundEnumerate)(__in LPDSENUMCALLBACKW pDSEnumCallback, __in_opt LPVOID pContext);
 		(FARPROC &)pDirectSoundEnumerate = GetProcAddress(hModule, "DirectSoundEnumerateW");
 		if (pDirectSoundEnumerate) {
-			pDirectSoundEnumerate((LPDSENUMCALLBACK)DSEnumProc, (VOID*)&m_cbSoundDevice);
+			pDirectSoundEnumerate((LPDSENUMCALLBACK)DSEnumProc, (LPVOID)&m_cbSoundDevice);
 		}
 
 		FreeLibrary(hModule);
@@ -115,6 +130,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 		m_cbWasapiMode.SetCurSel(m_pMAR->GetWasapiMode());
 		m_cbUseBitExactOutput.SetCheck(m_pMAR->GetBitExactOutput());
 		m_cbUseSystemLayoutChannels.SetCheck(m_pMAR->GetSystemLayoutChannels());
+		m_cbSyncMethod.SetCurSel(m_pMAR->GetSyncMethod());
 	}
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
@@ -123,8 +139,9 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 
 	CorrectComboListWidth(m_cbSoundDevice);
 
-	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long)AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-	SetClassLongPtr(GetDlgItem(IDC_PP_SOUND_DEVICE)->m_hWnd, GCLP_HCURSOR, (long)AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (LONG)AfxGetApp()->LoadStandardCursor(IDC_ARROW));
+	SetClassLongPtr(GetDlgItem(IDC_PP_SOUND_DEVICE)->m_hWnd, GCLP_HCURSOR, (LONG)AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtr(GetDlgItem(IDC_PP_SYNC_METHOD)->m_hWnd, GCLP_HCURSOR, (LONG)AfxGetApp()->LoadStandardCursor(IDC_HAND));
 
 	OnClickedWasapiMode();
 
@@ -143,6 +160,7 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 		m_pMAR->SetWasapiMode(m_cbWasapiMode.GetCurSel());
 		m_pMAR->SetBitExactOutput(m_cbUseBitExactOutput.GetCheck());
 		m_pMAR->SetSystemLayoutChannels(m_cbUseSystemLayoutChannels.GetCheck());
+		m_pMAR->SetSyncMethod(m_cbSyncMethod.GetCurSel());
 		CString str;
 		int idx = m_cbSoundDevice.GetCurSel();
 		if (idx >= 0) {
@@ -173,7 +191,7 @@ void CMpcAudioRendererSettingsWnd::OnClickedBitExact()
 	m_cbUseSystemLayoutChannels.EnableWindow(m_cbUseBitExactOutput.GetCheck() && m_cbUseBitExactOutput.IsWindowEnabled());
 }
 
-CMpcAudioRendererStatusWnd::CMpcAudioRendererStatusWnd(void)
+CMpcAudioRendererStatusWnd::CMpcAudioRendererStatusWnd()
 {
 }
 
