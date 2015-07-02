@@ -94,7 +94,6 @@ BEGIN
     IDS_ARS_BITEXACT_OUTPUT        "Allow bit-exact output"
     IDS_ARS_SYSTEM_LAYOUT_CHANNELS "Use system layout channels"
     IDS_ARS_SOUND_DEVICE           "Sound Device:"
-    IDS_ARS_MUTE_FAST_FORWARD      "Mute on fast forward"
     IDS_ARS_WASAPI_MODE_STATUS     "Status"
     IDS_ARS_WASAPI_MODE_STATUS_1   "Not running"
     IDS_ARS_WASAPI_MODE_STATUS_2   "use WASAPI, Exclusive mode"
