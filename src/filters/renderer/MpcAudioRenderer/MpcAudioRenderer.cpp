@@ -170,6 +170,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_eReinitialize(TRUE)
 	, m_nSampleOffset(0)
 	, m_SyncMethod(SYNC_TO_VIDEO)
+	, m_bHasVideo(TRUE)
 {
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CMpcAudioRenderer()"));
 
@@ -2078,7 +2079,8 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 				REFERENCE_TIME rtWaitRenderTime = INVALID_TIME;
 				
 				rtRefClock = GetRefClockTime();
-				if (rtRefClock != INVALID_TIME) {
+				if (m_bHasVideo
+						&& rtRefClock != INVALID_TIME) {
 					BOOL bReSync = FALSE;
 					if (!m_nSampleOffset) {
 						if (abs(m_CurrentPacket->rtStart - m_rtNextSampleTime) > 20000) {
@@ -2113,8 +2115,8 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 					}
 				}
 
-				rtRefClock = GetRefClockTime();
-				if (rtRefClock != INVALID_TIME
+				if (m_bHasVideo
+						&& rtRefClock != INVALID_TIME
 						&& rtWaitRenderTime > rtRefClock) {
 					REFERENCE_TIME rtSilenceDuration = rtWaitRenderTime - rtRefClock;
 					UINT32 nSilenceFrames = rtSilenceDuration / (UNITS / m_pWaveFileFormatOutput->nSamplesPerSec);
@@ -2372,6 +2374,8 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCh
 	WasapiFlush();
 	hr = m_pAudioClient->SetEventHandle(m_hDataEvent);
 	EXIT_ON_ERROR(hr);
+
+	m_bHasVideo = HasMediaType(m_pInputPin, MEDIATYPE_Video) || HasMediaType(m_pInputPin, MEDIASUBTYPE_MPEG2_VIDEO);
 
 	hr = StartRendererThread();
 	EXIT_ON_ERROR(hr);

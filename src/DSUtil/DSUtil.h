@@ -82,6 +82,7 @@ extern IPin*			AppendFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
 extern IBaseFilter*		AppendFilter(IPin* pPin, IMoniker* pMoniker, IGraphBuilder* pGB);
 extern IPin*			InsertFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB);
 extern bool				CreateFilter(CString DisplayName, IBaseFilter** ppBF, CString& FriendlyName);
+extern bool				HasMediaType(IPin *pPin, const GUID &mediaType);
 
 extern void				ExtractMediaTypes(IPin* pPin, CAtlArray<GUID>& types);
 extern void				ExtractMediaTypes(IPin* pPin, CAtlList<CMediaType>& mts);

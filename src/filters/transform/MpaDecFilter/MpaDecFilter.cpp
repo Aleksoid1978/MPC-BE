@@ -2163,28 +2163,7 @@ HRESULT CMpaDecFilter::StartStreaming()
 			pPinRenderer->QueryAccept(&mtOutput);
 		}
 
-		BOOL b_HasVideo = FALSE;
-		if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected())) {
-			if (GetCLSID(pFilter) == GUIDFromCString(_T("{09144FD6-BB29-11DB-96F1-005056C00008}"))) { // PBDA DTFilter
-				b_HasVideo = TRUE;
-			} else {
-				BeginEnumPins(pFilter, pEP, pPin) {
-					BeginEnumMediaTypes(pPin, pEM, pmt) {
-						if (pmt->majortype == MEDIATYPE_Video || pmt->subtype == MEDIASUBTYPE_MPEG2_VIDEO) {
-							b_HasVideo = TRUE;
-							break;
-						}
-					}
-					EndEnumMediaTypes(pmt)
-					if (b_HasVideo) {
-						break;
-					}
-				}
-				EndEnumFilters
-			}
-		}
-
-		m_bHasVideo = b_HasVideo;
+		m_bHasVideo = HasMediaType(m_pInput, MEDIATYPE_Video) || HasMediaType(m_pInput, MEDIASUBTYPE_MPEG2_VIDEO);
 	}
 
 	return S_OK;
