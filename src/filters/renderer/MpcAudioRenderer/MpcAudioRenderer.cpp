@@ -2083,18 +2083,17 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 						&& rtRefClock != INVALID_TIME) {
 					BOOL bReSync = FALSE;
 					if (!m_nSampleOffset) {
-						if (abs(m_CurrentPacket->rtStart - m_rtNextSampleTime) > 20000) {
+						const REFERENCE_TIME& rtTimeDelta = m_CurrentPacket->rtStart - m_rtNextSampleTime;
+						if (abs(rtTimeDelta) > 20000) {
 #if defined(_DEBUG) && DBGLOG_LEVEL
-							DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - Discontinuity detected : %u[%u], %I64d -> %I64d(%s -> %s), %I64d)",
-									nWritenBytes, nAvailableBytes,
-									m_rtNextSampleTime, m_CurrentPacket->rtStart,
-									ReftimeToString(m_rtNextSampleTime), ReftimeToString(m_CurrentPacket->rtStart),
-									m_CurrentPacket->rtStart - m_rtNextSampleTime));
+							DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - Discontinuity detected by %.2f ms", rtTimeDelta / 10000.0));
 #endif
 							if (m_SyncMethod == SYNC_TO_AUDIO) {
 								// adjust the reference clock to match the audio timestamps
-								const REFERENCE_TIME& rtTimeDelta = m_CurrentPacket->rtStart - m_rtNextSampleTime;
 								m_pReferenceClock->SetTimeDelta(rtTimeDelta);
+#if defined(_DEBUG) && DBGLOG_LEVEL
+								DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - Correct reference clock by %.2f ms", rtTimeDelta / 10000.0));
+#endif
 							} else {
 								bReSync = TRUE;
 							}
@@ -2107,6 +2106,10 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 					REFERENCE_TIME offsetDelay = m_nSampleOffset > 0 ? GetDuration(m_nSampleOffset, m_pWaveFileFormatOutput) : 0;
 					REFERENCE_TIME dueTime = m_CurrentPacket->rtStart + offsetDelay;
 					if (dueTime < rtRefClock - m_hnsPeriod) {
+#if defined(_DEBUG) && DBGLOG_LEVEL
+						DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - Drop packet, size = %lu, dueTime = %I64d, refclock = %I64d",
+								m_CurrentPacket->GetCount(), dueTime, rtRefClock));
+#endif
 						m_nSampleNum = 0;
 						m_CurrentPacket.Free();
 						continue;
@@ -2122,11 +2125,8 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 					UINT32 nSilenceFrames = rtSilenceDuration / (UNITS / m_pWaveFileFormatOutput->nSamplesPerSec);
 					UINT32 nSilenceBytes = min(nSilenceFrames * m_pWaveFileFormatOutput->nBlockAlign, nAvailableBytes - nWritenBytes);
 #if defined(_DEBUG) && DBGLOG_LEVEL
-					DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - ReSync : %I64d -> %I64d(%s -> %s), %I64d[%s], %u[%u])",
-							rtRefClock, rtWaitRenderTime,
-							ReftimeToString(rtRefClock), ReftimeToString(rtWaitRenderTime),
-							rtSilenceDuration, ReftimeToString(rtSilenceDuration),
-							nSilenceBytes, nAvailableBytes - nWritenBytes));
+					DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - Pad silence %.2f ms [%u/%u (frames/bytes)] for clock matching at %I64d/%I64d",
+							rtSilenceDuration / 10000.0, nSilenceFrames, nSilenceBytes, rtRefClock, rtWaitRenderTime));
 #endif
 					if (nSilenceBytes == (nAvailableBytes - nWritenBytes)) {
 						bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
