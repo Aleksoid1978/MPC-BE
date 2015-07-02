@@ -14,6 +14,11 @@
 #define IDS_ARS_WASAPI_MODE_STATUS_2    7612
 #define IDS_ARS_WASAPI_MODE_STATUS_3    7613
 #define IDS_ARS_WASAPI_MODE_STATUS_5    7614
+#define IDS_ARS_OUTPUT                  7620
+#define IDS_ARS_AV_SYNC                 7621
+#define IDS_ARS_SYNC_METHOD             7622
+#define IDS_ARS_SYNC_METHOD_TO_VIDEO    7623
+#define IDS_ARS_SYNC_METHOD_TO_AUDIO    7624
 
 // Next default values for new objects
 //

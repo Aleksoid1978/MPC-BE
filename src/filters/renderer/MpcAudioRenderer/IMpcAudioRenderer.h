@@ -36,6 +36,11 @@ enum BITSTREAM_MODE {
 	BITSTREAM_DTSHD
 };
 
+enum SYNC_METHOD {
+	SYNC_TO_VIDEO,
+	SYNC_TO_AUDIO
+};
+
 interface __declspec(uuid("495D2C66-D430-439b-9DEE-40F9B7929BBA"))
 IMpcAudioRendererFilter :
 public IUnknown {
@@ -53,4 +58,6 @@ public IUnknown {
 	STDMETHOD_(BOOL, GetSystemLayoutChannels()) PURE;
 	STDMETHOD_(BITSTREAM_MODE, GetBitstreamMode()) PURE;
 	STDMETHOD_(CString, GetCurrentPlaybackDevice()) PURE;
+	STDMETHOD(SetSyncMethod(INT nValue)) PURE;
+	STDMETHOD_(INT, GetSyncMethod()) PURE;
 };
