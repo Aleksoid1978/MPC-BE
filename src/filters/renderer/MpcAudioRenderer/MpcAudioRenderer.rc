@@ -88,9 +88,9 @@ END
 STRINGTABLE
 BEGIN
     IDS_FILTER_SETTINGS_CAPTION    "Settings"
-    IDS_ARS_WASAPI_MODE            "Use WASAPI (restart playback)"
-    IDS_ARS_EXCLUSIVEMODE          ""
-    IDS_ARS_SHAREDMODE             ""
+    IDS_ARS_WASAPI_MODE            "WASAPI mode:"
+    IDS_ARS_EXCLUSIVE              "Exclusive"
+    IDS_ARS_SHARED                 "Shared"
     IDS_ARS_BITEXACT_OUTPUT        "Allow bit-exact output"
     IDS_ARS_SYSTEM_LAYOUT_CHANNELS "Use system layout channels"
     IDS_ARS_SOUND_DEVICE           "Sound Device:"
@@ -99,8 +99,6 @@ BEGIN
     IDS_ARS_WASAPI_MODE_STATUS_2   "use WASAPI, Exclusive mode"
     IDS_ARS_WASAPI_MODE_STATUS_3   "use WASAPI, Shared mode"
     IDS_ARS_WASAPI_MODE_STATUS_5   "use WASAPI, Exclusive mode, Bitstream"
-    IDS_ARS_OUTPUT                 "Output"
-    IDS_ARS_AV_SYNC                "A/V Synchronization"
     IDS_ARS_SYNC_METHOD            "Sync method:"
     IDS_ARS_SYNC_METHOD_TO_VIDEO   "Sync audio to video"
     IDS_ARS_SYNC_METHOD_TO_AUDIO   "Sync video to audio"
