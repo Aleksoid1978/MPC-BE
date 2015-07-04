@@ -79,28 +79,21 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	const int h30 = IPP_SCALE(30);
 	CPoint p(10, 10);
 
-	m_output_group.Create(ResStr(IDS_ARS_OUTPUT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(330), h20 + h20 + h20 + h30 + h20 + h30 + h30)), this, (UINT)IDC_STATIC);
-	p.y += h20;
-
-	m_txtWasapiMode.Create(ResStr(IDS_ARS_WASAPI_MODE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
-	p.y += h20;
-	m_cbWasapiMode.Create(WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_WASAPI_MODE);
-	m_cbWasapiMode.AddString(ResStr(IDS_ARS_EXCLUSIVEMODE));
-	m_cbWasapiMode.AddString(ResStr(IDS_ARS_SHAREDMODE));
-	p.y += h30;
-	m_cbUseBitExactOutput.Create(ResStr(IDS_ARS_BITEXACT_OUTPUT), WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_USE_BITEXACT_OUTPUT);
-	p.y += h20;
-	m_cbUseSystemLayoutChannels.Create(ResStr(IDS_ARS_SYSTEM_LAYOUT_CHANNELS), WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS);
-	p.y += h30;
-
 	m_txtSoundDevice.Create(ResStr(IDS_ARS_SOUND_DEVICE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_cbSoundDevice.Create(WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_SOUND_DEVICE);
 	p.y += h20 + h20;
 
-	m_sync_group.Create(ResStr(IDS_ARS_AV_SYNC), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(IPP_SCALE(330), h20 + h20 + h30)), this, (UINT)IDC_STATIC);
+	m_txtWasapiMode.Create(ResStr(IDS_ARS_WASAPI_MODE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(200), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbWasapiMode.Create(WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(200, -4), CSize(IPP_SCALE(120), 200)), this, IDC_PP_WASAPI_MODE);
+	m_cbWasapiMode.AddString(ResStr(IDS_ARS_EXCLUSIVE));
+	m_cbWasapiMode.AddString(ResStr(IDS_ARS_SHARED));
 	p.y += h20;
-	
+	m_cbUseBitExactOutput.Create(ResStr(IDS_ARS_BITEXACT_OUTPUT), WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_USE_BITEXACT_OUTPUT);
+	p.y += h20;
+	m_cbUseSystemLayoutChannels.Create(ResStr(IDS_ARS_SYSTEM_LAYOUT_CHANNELS), WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS);
+	p.y += h30;
+
 	m_txtSyncMethod.Create(ResStr(IDS_ARS_SYNC_METHOD), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_cbSyncMethod.Create(WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_SYNC_METHOD);

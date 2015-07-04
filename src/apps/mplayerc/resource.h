@@ -452,8 +452,8 @@
 #define IDS_MPEG2_READ_AR               7511
 // audio renderer
 #define IDS_ARS_WASAPI_MODE             7600
-#define IDS_ARS_EXCLUSIVEMODE           7601
-#define IDS_ARS_SHAREDMODE              7602
+#define IDS_ARS_EXCLUSIVE               7601
+#define IDS_ARS_SHARED                  7602
 #define IDS_ARS_BITEXACT_OUTPUT         7603
 #define IDS_ARS_SYSTEM_LAYOUT_CHANNELS  7604
 #define IDS_ARS_SOUND_DEVICE            7605
@@ -462,11 +462,9 @@
 #define IDS_ARS_WASAPI_MODE_STATUS_2    7612
 #define IDS_ARS_WASAPI_MODE_STATUS_3    7613
 #define IDS_ARS_WASAPI_MODE_STATUS_5    7614
-#define IDS_ARS_OUTPUT                  7620
-#define IDS_ARS_AV_SYNC                 7621
-#define IDS_ARS_SYNC_METHOD             7622
-#define IDS_ARS_SYNC_METHOD_TO_VIDEO    7623
-#define IDS_ARS_SYNC_METHOD_TO_AUDIO    7624
+#define IDS_ARS_SYNC_METHOD             7620
+#define IDS_ARS_SYNC_METHOD_TO_VIDEO    7621
+#define IDS_ARS_SYNC_METHOD_TO_AUDIO    7622
 // matroska splitter
 #define IDS_MKVSPLT_LOAD_EMBEDDED_FONTS 7700
 #define IDS_MKVSPLT_CALC_DURATION       7701
