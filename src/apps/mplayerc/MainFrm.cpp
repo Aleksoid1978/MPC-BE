@@ -9263,7 +9263,7 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 	if (GetPlaybackMode() == PM_FILE) {
 		UINT id = nID - ID_NAVIGATE_CHAP_SUBITEM_START;
 
-		if (!m_MPLSPlaylist.IsEmpty() && id < m_MPLSPlaylist.GetCount()) {
+		if (m_MPLSPlaylist.GetCount() > 1 && id < m_MPLSPlaylist.GetCount()) {
 			POSITION pos = m_MPLSPlaylist.GetHeadPosition();
 			UINT idx = 0;
 			while (pos) {
@@ -9283,7 +9283,7 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 			}
 		}
 
-		if (!m_MPLSPlaylist.IsEmpty()) {
+		if (m_MPLSPlaylist.GetCount() > 1) {
 			id -= m_MPLSPlaylist.GetCount();
 		}
 
@@ -9291,7 +9291,7 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 			REFERENCE_TIME rt;
 			CComBSTR name;
 			if (SUCCEEDED(m_pCB->ChapGet(id, &rt, &name))) {
-				SeekTo(rt);
+				SeekTo(rt, false);
 				SendStatusMessage(ResStr(IDS_AG_CHAPTER2) + CString(name), 3000);
 
 				REFERENCE_TIME rtDur;
@@ -9360,7 +9360,7 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 		nID -= ID_NAVIGATE_CHAP_SUBITEM_START;
 
 		if (s.iDefaultCaptureDevice == 1) {
-			CComQIPtr<IBDATuner>	pTun = m_pGB;
+			CComQIPtr<IBDATuner> pTun = m_pGB;
 			if (pTun) {
 				if (s.nDVBLastChannel != nID) {
 					pTun->SetChannel (nID);
