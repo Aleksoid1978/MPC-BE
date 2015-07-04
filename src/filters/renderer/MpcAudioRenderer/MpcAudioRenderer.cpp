@@ -169,7 +169,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_eEndReceive(TRUE)
 	, m_eReinitialize(TRUE)
 	, m_nSampleOffset(0)
-	, m_SyncMethod(SYNC_TO_VIDEO)
+	, m_SyncMethod(SYNC_BY_TIMESTAMPS)
 	, m_bHasVideo(TRUE)
 {
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CMpcAudioRenderer()"));
@@ -2088,7 +2088,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 #if defined(_DEBUG) && DBGLOG_LEVEL
 							DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - Discontinuity detected by %.2f ms", rtTimeDelta / 10000.0));
 #endif
-							if (m_SyncMethod == SYNC_TO_AUDIO) {
+							if (m_SyncMethod == SYNC_BY_DURATION) {
 								// adjust the reference clock to match the audio timestamps
 								m_pReferenceClock->SetTimeDelta(rtTimeDelta);
 #if defined(_DEBUG) && DBGLOG_LEVEL
