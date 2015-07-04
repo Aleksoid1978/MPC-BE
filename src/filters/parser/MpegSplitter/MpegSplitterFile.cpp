@@ -619,8 +619,16 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 	s.pesid	= pesid;
 	s.ps1id	= ps1id;
 
-	if (m_bOpeningCompleted && m_ClipInfo.IsHdmv()) {
-		return s;
+	if (m_bOpeningCompleted && m_type == MPEG_TYPES::mpeg_ts) {
+		if (m_ClipInfo.IsHdmv()) {
+			return s;
+		}
+
+		for (int type = stream_type::video; type < stream_type::unknown; type++) {
+			if (m_streams[type].Find(s)) {
+				return s;
+			}
+		}
 	}
 
 	const __int64 start		= GetPos();
