@@ -108,19 +108,19 @@ bool CALLBACK DSEnumProc2(LPGUID lpGUID,
 
 static void DumpWaveFormatEx(WAVEFORMATEX* pwfx)
 {
-	DbgLog((LOG_TRACE, 3, L"		=> wFormatTag		= 0x%04x",	pwfx->wFormatTag));
-	DbgLog((LOG_TRACE, 3, L"		=> nChannels		= %d",	pwfx->nChannels));
-	DbgLog((LOG_TRACE, 3, L"		=> nSamplesPerSec	= %d",	pwfx->nSamplesPerSec));
-	DbgLog((LOG_TRACE, 3, L"		=> nAvgBytesPerSec	= %d",	pwfx->nAvgBytesPerSec));
-	DbgLog((LOG_TRACE, 3, L"		=> nBlockAlign		= %d",	pwfx->nBlockAlign));
-	DbgLog((LOG_TRACE, 3, L"		=> wBitsPerSample	= %d",	pwfx->wBitsPerSample));
-	DbgLog((LOG_TRACE, 3, L"		=> cbSize			= %d",	pwfx->cbSize));
+	DbgLog((LOG_TRACE, 3, L"		=> wFormatTag      = 0x%04x", pwfx->wFormatTag));
+	DbgLog((LOG_TRACE, 3, L"		=> nChannels       = %d", pwfx->nChannels));
+	DbgLog((LOG_TRACE, 3, L"		=> nSamplesPerSec  = %d", pwfx->nSamplesPerSec));
+	DbgLog((LOG_TRACE, 3, L"		=> nAvgBytesPerSec = %d", pwfx->nAvgBytesPerSec));
+	DbgLog((LOG_TRACE, 3, L"		=> nBlockAlign     = %d", pwfx->nBlockAlign));
+	DbgLog((LOG_TRACE, 3, L"		=> wBitsPerSample  = %d", pwfx->wBitsPerSample));
+	DbgLog((LOG_TRACE, 3, L"		=> cbSize          = %d", pwfx->cbSize));
 	if (IsWaveFormatExtensible(pwfx)) {
 		WAVEFORMATEXTENSIBLE* wfe = (WAVEFORMATEXTENSIBLE*)pwfx;
 		DbgLog((LOG_TRACE, 3, L"		WAVEFORMATEXTENSIBLE:"));
-		DbgLog((LOG_TRACE, 3, L"			=> wValidBitsPerSample	= %d", wfe->Samples.wValidBitsPerSample));
-		DbgLog((LOG_TRACE, 3, L"			=> dwChannelMask		= 0x%x", wfe->dwChannelMask));
-		DbgLog((LOG_TRACE, 3, L"			=> SubFormat			= %s", CStringFromGUID(wfe->SubFormat)));
+		DbgLog((LOG_TRACE, 3, L"			=> wValidBitsPerSample = %d", wfe->Samples.wValidBitsPerSample));
+		DbgLog((LOG_TRACE, 3, L"			=> dwChannelMask       = 0x%x", wfe->dwChannelMask));
+		DbgLog((LOG_TRACE, 3, L"			=> SubFormat           = %s", CStringFromGUID(wfe->SubFormat)));
 	}
 }
 
