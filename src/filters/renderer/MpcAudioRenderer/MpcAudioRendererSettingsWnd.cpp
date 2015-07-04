@@ -97,8 +97,8 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	m_txtSyncMethod.Create(ResStr(IDS_ARS_SYNC_METHOD), WS_VISIBLE | WS_CHILD, CRect(p, CSize(IPP_SCALE(320), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_cbSyncMethod.Create(WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p, CSize(IPP_SCALE(320), 200)), this, IDC_PP_SYNC_METHOD);
-	m_cbSyncMethod.AddString(ResStr(IDS_ARS_SYNC_METHOD_TO_VIDEO));
-	m_cbSyncMethod.AddString(ResStr(IDS_ARS_SYNC_METHOD_TO_AUDIO));
+	m_cbSyncMethod.AddString(ResStr(IDS_ARS_SYNC_BY_TIMESTAMPS));
+	m_cbSyncMethod.AddString(ResStr(IDS_ARS_SYNC_BY_DURATION));
 
 	HMODULE hModule = LoadLibrary(L"dsound.dll");
 	if (hModule) {
