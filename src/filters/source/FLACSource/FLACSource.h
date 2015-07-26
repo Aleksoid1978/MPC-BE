@@ -96,6 +96,8 @@ class CFLACStream : public CBaseStream
 
 	file_info_struct	file_info;
 
+	CAtlArray<BYTE> m_extradata;
+
 public:
 	CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr);
 	virtual ~CFLACStream();

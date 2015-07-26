@@ -33,6 +33,7 @@ extern "C" {
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/ff_log.h"
+#include "../../../DSUtil/GolombBuffer.h"
 
 static const struct {
 	const CLSID* clsMinorType;
@@ -204,6 +205,37 @@ CFFAudioDecoder::CFFAudioDecoder()
 	memset(&m_raData, 0, sizeof(m_raData));
 }
 
+static bool flac_parse_block_header(CGolombBuffer& gb, BYTE& last, BYTE& type, DWORD& size) {
+	if (gb.RemainingSize() < 4) {
+		return false;
+	}
+
+	BYTE tmp = gb.ReadByte();
+	last = tmp & 0x80;
+	type = tmp & 0x7F;
+	size = (DWORD)gb.BitRead(24);
+
+	return true;
+}
+
+#define FLAC_METADATA_TYPE_VORBIS_COMMENT 4
+
+static bool ParseVorbisTag(const CString field_name, const CString vorbisTag, CString& tagValue) {
+	tagValue.Empty();
+
+	CString vorbis_data = vorbisTag;
+	vorbis_data.MakeUpper().Trim();
+	if (vorbis_data.Find(field_name + '=') != 0) {
+		return false;
+	}
+
+	vorbis_data = vorbisTag;
+	vorbis_data.Delete(0, vorbis_data.Find('=') + 1);
+	tagValue = vorbis_data;
+
+	return true;
+}
+
 bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/* = NULL*/)
 {
 	if (nCodecId == AV_CODEC_ID_NONE) {
@@ -312,7 +344,49 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/*
 		if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL) >= 0) {
 			m_pFrame = av_frame_alloc();
 			CheckPointer(m_pFrame, false);
-			bRet     = true;
+			bRet = true;
+		}
+
+		if (bRet && nCodecId == AV_CODEC_ID_FLAC && m_pAVCtx->extradata_size > 4) {
+			if (GETDWORD(m_pAVCtx->extradata) == FCC('fLaC') && m_pAVCtx->extradata_size > 34 + 8) {
+				BYTE metadata_last, metadata_type;
+				DWORD metadata_size;
+				CGolombBuffer gb(m_pAVCtx->extradata + 4, m_pAVCtx->extradata_size - 4);
+
+				while (flac_parse_block_header(gb, metadata_last, metadata_type, metadata_size)) {
+					if (metadata_type == FLAC_METADATA_TYPE_VORBIS_COMMENT) {
+						int vendor_length = gb.ReadDwordLE();
+						if (gb.RemainingSize() >= vendor_length) {
+							gb.SkipBytes(vendor_length);
+							int num_comments = gb.ReadDwordLE();
+							for (int i = 0; i < num_comments; i++) {
+								int comment_lenght = gb.ReadDwordLE();
+								if (comment_lenght > gb.RemainingSize()) {
+									break;
+								}
+								BYTE* comment = DNew BYTE[comment_lenght + 1];
+								ZeroMemory(comment, comment_lenght + 1);
+								gb.ReadBuffer(comment, comment_lenght);
+								CString vorbisTag = AltUTF8To16((LPCSTR)comment);
+								delete [] comment;
+								CString tagValue;
+								if (!vorbisTag.IsEmpty() && ParseVorbisTag(L"WAVEFORMATEXTENSIBLE_CHANNEL_MASK", vorbisTag, tagValue)) {
+									uint64_t channel_layout = wcstol(tagValue, NULL, 0);
+									if (channel_layout && av_get_channel_layout_nb_channels(channel_layout) == m_pAVCtx->channels) {
+										m_pAVCtx->channel_layout = channel_layout;
+									}
+									break;
+								}
+							}
+						}
+						break;
+					}
+					if (metadata_last) {
+						break;
+					}
+					gb.SkipBytes(metadata_size);
+				}
+			}
 		}
 	}
 
