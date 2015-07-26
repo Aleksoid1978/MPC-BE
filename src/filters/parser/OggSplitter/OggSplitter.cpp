@@ -1139,10 +1139,10 @@ HRESULT COggDirectShowOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData,
 
 COggStreamOutputPin::COggStreamOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: COggSplitterOutputPin(pName, pFilter, pLock, phr)
+	, m_time_unit(h->time_unit)
+	, m_samples_per_unit(h->samples_per_unit)
+	, m_default_len(h->default_len)
 {
-	m_time_unit			= h->time_unit;
-	m_samples_per_unit	= h->samples_per_unit;
-	m_default_len		= h->default_len;
 }
 
 REFERENCE_TIME COggStreamOutputPin::GetRefTime(__int64 granule_position)
@@ -1488,13 +1488,10 @@ HRESULT COggTheoraOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int
 
 COggDiracOutputPin::COggDiracOutputPin(BYTE* p, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: COggSplitterOutputPin(pName, pFilter, pLock, phr)
+	, m_rtAvgTimePerFrame(0)
+	, m_IsInitialized(false)
+	, m_bOldDirac(!memcmp(p, "KW-DIRAC\x00", 9))
 {
-	m_rtAvgTimePerFrame	= 0;
-	m_IsInitialized		= false;
-	m_bOldDirac			= !memcmp(p, "KW-DIRAC\x00", 9);
-
-	m_pFilter			= pFilter;
-	m_pName				= pName;
 }
 
 HRESULT COggDiracOutputPin::UnpackInitPage(OggPage& page)

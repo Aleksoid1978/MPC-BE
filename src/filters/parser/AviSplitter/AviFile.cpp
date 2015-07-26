@@ -634,11 +634,11 @@ REFERENCE_TIME CAviFile::strm_t::GetRefTime(DWORD frame, UINT64 size)
 		if (wfe->nBlockAlign == 0) {
 			return 0;
 		}
-		return (REFERENCE_TIME)ceil(10000000.0 * size * strh.dwScale / (unsigned __int64(strh.dwRate) * wfe->nBlockAlign));
+		return (REFERENCE_TIME)ceil(10000000.0 * (size + strh.dwStart) * strh.dwScale / (unsigned __int64(strh.dwRate) * wfe->nBlockAlign));
 		// need calculate in double, because the (10000000ui64 * size * strh.dwScale) can give overflow
 		// "ceil" is necessary to compensate for framenumber->reftime->framenumber conversion
 	}
-	return (REFERENCE_TIME)ceil(10000000.0 * frame * strh.dwScale / strh.dwRate);
+	return (REFERENCE_TIME)ceil(10000000.0 * (frame + strh.dwStart) * strh.dwScale / strh.dwRate);
 	// need calculate in double, because the (10000000ui64 * frame * strh.dwScale) can give overflow (verified in practice)
 	// "ceil" is necessary to compensate for framenumber->reftime->framenumber conversion
 }

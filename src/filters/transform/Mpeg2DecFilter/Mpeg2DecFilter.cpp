@@ -2254,6 +2254,7 @@ HRESULT CClosedCaptionOutputPin::GetMediaType(int iPosition, CMediaType* pmt)
 	pmt->majortype = MEDIATYPE_AUXLine21Data;
 	pmt->subtype = MEDIASUBTYPE_Line21_GOPPacket;
 	pmt->formattype = FORMAT_None;
+	pmt->lSampleSize = 200;
 
 	return S_OK;
 }

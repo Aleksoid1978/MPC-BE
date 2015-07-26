@@ -39,10 +39,6 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\mpc-be_x86\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\mpc-be_x64\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\mpc-be_x86\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\mpc-be_x64\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\mpc-be_x86\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\mpc-be_x64\</OutDir>
   </PropertyGroup>

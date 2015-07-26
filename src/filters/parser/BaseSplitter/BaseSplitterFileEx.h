@@ -44,7 +44,11 @@ public:
 
 #pragma pack(push, 1)
 
-	enum mpeg_t {mpegunk, mpeg1, mpeg2};
+	enum mpeg_t {
+		mpegunk,
+		mpeg1,
+		mpeg2
+	};
 
 	struct pshdr {
 		mpeg_t type;
@@ -285,24 +289,16 @@ public:
 		//WORD channels;
 	};
 
-	struct dvdspuhdr
-	{
-		// nothing ;)
+	struct dvdspuhdr {
 	};
 
-	struct hdmvsubhdr
-	{
-		// nothing ;)
+	struct hdmvsubhdr {
 	};
 
-	struct svcdspuhdr
-	{
-		// nothing ;)
+	struct svcdspuhdr {
 	};
 
-	struct cvdspuhdr
-	{
-		// nothing ;)
+	struct cvdspuhdr {
 	};
 
 	struct ps2audhdr
@@ -317,9 +313,7 @@ public:
 		// pcm or adpcm data
 	};
 
-	struct ps2subhdr
-	{
-		// nothing ;)
+	struct ps2subhdr {
 	};
 
 	struct trhdr

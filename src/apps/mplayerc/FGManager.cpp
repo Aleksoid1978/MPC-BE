@@ -1401,8 +1401,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 
 			// Disable MEDIATYPE_AUXLine21Data - prevent connect Line 21 Decoder
 			if (GetPinName(pPin)[0] == '~' && FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
-				if (clsid == __uuidof(CMpeg2DecFilter)
-					|| clsid == CLSID_NvidiaVideoDecoder
+				if (clsid == CLSID_NvidiaVideoDecoder
 					|| clsid == CLSID_SonicCinemasterVideoDecoder) {
 
 					continue;

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,9 +22,8 @@
 #include "stdafx.h"
 
 extern "C" {
-	// Hack to use MinGW64 from 2.x branch
+	// hack to avoid error "unresolved external symbol" when linking
 	void __mingw_raise_matherr(int typ, const char *name, double a1, double a2, double rslt) {}
-	void __mingw_get_msvcrt_handle() {}
 }
 
 #ifdef REGISTER_FILTER

@@ -1268,8 +1268,6 @@ bool CBaseSplitterFileEx::Read(mlphdr& h, int len, CMediaType* pmt, bool find_sy
 
 bool CBaseSplitterFileEx::Read(dvdspuhdr& h, CMediaType* pmt)
 {
-	memset(&h, 0, sizeof(h));
-
 	if (pmt) {
 		pmt->majortype	= MEDIATYPE_Video;
 		pmt->subtype	= MEDIASUBTYPE_DVD_SUBPICTURE;
@@ -1281,8 +1279,6 @@ bool CBaseSplitterFileEx::Read(dvdspuhdr& h, CMediaType* pmt)
 
 bool CBaseSplitterFileEx::Read(hdmvsubhdr& h, CMediaType* pmt, const char* language_code)
 {
-	memset(&h, 0, sizeof(h));
-
 	if (pmt) {
 		pmt->majortype	= MEDIATYPE_Subtitle;
 		pmt->subtype	= MEDIASUBTYPE_HDMVSUB;
@@ -1300,8 +1296,6 @@ bool CBaseSplitterFileEx::Read(hdmvsubhdr& h, CMediaType* pmt, const char* langu
 
 bool CBaseSplitterFileEx::Read(svcdspuhdr& h, CMediaType* pmt)
 {
-	memset(&h, 0, sizeof(h));
-
 	if (pmt) {
 		pmt->majortype	= MEDIATYPE_Video;
 		pmt->subtype	= MEDIASUBTYPE_SVCD_SUBPICTURE;
@@ -1313,8 +1307,6 @@ bool CBaseSplitterFileEx::Read(svcdspuhdr& h, CMediaType* pmt)
 
 bool CBaseSplitterFileEx::Read(cvdspuhdr& h, CMediaType* pmt)
 {
-	memset(&h, 0, sizeof(h));
-
 	if (pmt) {
 		pmt->majortype	= MEDIATYPE_Video;
 		pmt->subtype	= MEDIASUBTYPE_CVD_SUBPICTURE;
@@ -1377,8 +1369,6 @@ bool CBaseSplitterFileEx::Read(ps2audhdr& h, CMediaType* pmt)
 
 bool CBaseSplitterFileEx::Read(ps2subhdr& h, CMediaType* pmt)
 {
-	memset(&h, 0, sizeof(h));
-
 	if (pmt) {
 		pmt->majortype	= MEDIATYPE_Subtitle;
 		pmt->subtype	= MEDIASUBTYPE_PS2_SUB;
@@ -1733,8 +1723,6 @@ bool CBaseSplitterFileEx::Read(vc1hdr& h, int len, CMediaType* pmt)
 #define pc_seq_header 0x00
 bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 {
-	memset(&h, 0, sizeof(h));
-
 	if (len <= 13) {
 		return false;
 	}
@@ -1777,15 +1765,15 @@ bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 
 bool CBaseSplitterFileEx::Read(dvbsub& h, int len, CMediaType* pmt, bool bSimpleAdd)
 {
-	memset(&h, 0, sizeof(h));
-
 	if ((BitRead(32, true) & 0xFFFFFF00) == 0x20000f00 || bSimpleAdd) {
-		static const SUBTITLEINFO SubFormat = { 0, "", L"" };
+		if (pmt) {
+			static const SUBTITLEINFO SubFormat = { 0, "", L"" };
 
-		pmt->majortype		= MEDIATYPE_Subtitle;
-		pmt->subtype		= MEDIASUBTYPE_DVB_SUBTITLES;
-		pmt->formattype		= FORMAT_None;
-		pmt->SetFormat ((BYTE*)&SubFormat, sizeof(SUBTITLEINFO));
+			pmt->majortype	= MEDIATYPE_Subtitle;
+			pmt->subtype	= MEDIASUBTYPE_DVB_SUBTITLES;
+			pmt->formattype	= FORMAT_None;
+			pmt->SetFormat((BYTE*)&SubFormat, sizeof(SUBTITLEINFO));
+		}
 
 		return true;
 	}
@@ -1811,12 +1799,11 @@ static bool ParseAvc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 			}
 			switch (nalu_type) {
 				case NALU_TYPE_SPS:
+					sps_present++;
+					break;
 				case NALU_TYPE_PPS:
-					if (nalu_type == NALU_TYPE_SPS) {
-						sps_present++;
-					} else if (nalu_type == NALU_TYPE_PPS) {
-						pps_present++;
-					}
+					pps_present++;
+					break;
 			}
 		}
 
@@ -1948,12 +1935,11 @@ static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 			}
 			switch (nalu_type) {
 				case NALU_TYPE_HEVC_VPS:
+					vps_present++;
+					break;
 				case NALU_TYPE_HEVC_SPS:
-					if (nalu_type == NALU_TYPE_HEVC_VPS) {
-						vps_present++;
-					} else if (nalu_type == NALU_TYPE_HEVC_SPS) {
-						sps_present++;
-					}
+					sps_present++;
+					break;
 			}
 		}
 

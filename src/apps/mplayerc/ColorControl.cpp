@@ -37,13 +37,13 @@ __inline int FixedToInt(__in const DXVA2_Fixed32 _fixed_, __in const SHORT facto
 // CColorControl
 
 CColorControl::CColorControl()
-	: m_VMR9ColorBri({sizeof(VMR9ProcAmpControlRange), ProcAmpControl9_Brightness, -100, 100, 0, 1   })
-	, m_VMR9ColorCon({sizeof(VMR9ProcAmpControlRange), ProcAmpControl9_Contrast,      0,   2, 1, 0.01})
-	, m_VMR9ColorHue({sizeof(VMR9ProcAmpControlRange), ProcAmpControl9_Hue,        -180, 180, 0, 1   })
-	, m_VMR9ColorSat({sizeof(VMR9ProcAmpControlRange), ProcAmpControl9_Saturation,    0,   2, 1, 0.01})
-	, m_EVRColorBri({DXVA2FloatToFixed(-100), DXVA2FloatToFixed(100), DXVA2FloatToFixed(0), DXVA2FloatToFixed(1   )})
+	: m_VMR9ColorBri({sizeof(VMR9ProcAmpControlRange), ProcAmpControl9_Brightness, -100, 100, 0, 1    })
+	, m_VMR9ColorCon({sizeof(VMR9ProcAmpControlRange), ProcAmpControl9_Contrast,      0,   2, 1, 0.01f})
+	, m_VMR9ColorHue({sizeof(VMR9ProcAmpControlRange), ProcAmpControl9_Hue,        -180, 180, 0, 1    })
+	, m_VMR9ColorSat({sizeof(VMR9ProcAmpControlRange), ProcAmpControl9_Saturation,    0,   2, 1, 0.01f})
+	, m_EVRColorBri({DXVA2FloatToFixed(-100), DXVA2FloatToFixed(100), DXVA2FloatToFixed(0), DXVA2FloatToFixed(1    )})
 	, m_EVRColorCon({DXVA2FloatToFixed(   0), DXVA2FloatToFixed(  2), DXVA2FloatToFixed(1), DXVA2FloatToFixed(0.01f)})
-	, m_EVRColorHue({DXVA2FloatToFixed(-180), DXVA2FloatToFixed(180), DXVA2FloatToFixed(0), DXVA2FloatToFixed(1   )})
+	, m_EVRColorHue({DXVA2FloatToFixed(-180), DXVA2FloatToFixed(180), DXVA2FloatToFixed(0), DXVA2FloatToFixed(1    )})
 	, m_EVRColorSat({DXVA2FloatToFixed(   0), DXVA2FloatToFixed(  2), DXVA2FloatToFixed(1), DXVA2FloatToFixed(0.01f)})
 	, m_VMR9Used(false)
 {

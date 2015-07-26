@@ -55,16 +55,6 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\lib\$(Configuration)_$(Platform)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\obj\$(Configuration)_$(Platform)\$(ProjectName)\</IntDir>
-    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='100'">ffmpeg.bat 32 build debug VS2010</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='100'">ffmpeg.bat 32 rebuild debug VS2010</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='100'">ffmpeg.bat 32 clean debug VS2010</NMakeCleanCommandLine>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\lib\$(Configuration)_$(Platform)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\obj\$(Configuration)_$(Platform)\$(ProjectName)\</IntDir>
-    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='110'">ffmpeg.bat 32 build debug VS2012</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='110'">ffmpeg.bat 32 rebuild debug VS2012</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='110'">ffmpeg.bat 32 clean debug VS2012</NMakeCleanCommandLine>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\lib\$(Configuration)_$(Platform)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\obj\$(Configuration)_$(Platform)\$(ProjectName)\</IntDir>
     <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' And '$(PlatformToolsetVersion)'=='120'">ffmpeg.bat 32 build debug</NMakeBuildCommandLine>
@@ -76,16 +66,6 @@
     <NMakeForcedIncludes Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeForcedIncludes)</NMakeForcedIncludes>
     <NMakeAssemblySearchPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeAssemblySearchPath)</NMakeAssemblySearchPath>
     <NMakeForcedUsingAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeForcedUsingAssemblies)</NMakeForcedUsingAssemblies>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\lib\$(Configuration)_$(Platform)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\obj\$(Configuration)_$(Platform)\$(ProjectName)\</IntDir>
-    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='100'">ffmpeg.bat 64 build debug VS2010</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='100'">ffmpeg.bat 64 rebuild debug VS2010</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='100'">ffmpeg.bat 64 clean debug VS2010</NMakeCleanCommandLine>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\lib\$(Configuration)_$(Platform)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\obj\$(Configuration)_$(Platform)\$(ProjectName)\</IntDir>
-    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='110'">ffmpeg.bat 64 build debug VS2012</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='110'">ffmpeg.bat 64 rebuild debug VS2012</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='110'">ffmpeg.bat 64 clean debug VS2012</NMakeCleanCommandLine>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\lib\$(Configuration)_$(Platform)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\obj\$(Configuration)_$(Platform)\$(ProjectName)\</IntDir>
     <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|x64' And '$(PlatformToolsetVersion)'=='120'">ffmpeg.bat 64 build debug</NMakeBuildCommandLine>
@@ -97,16 +77,6 @@
     <NMakeForcedIncludes Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(NMakeForcedIncludes)</NMakeForcedIncludes>
     <NMakeAssemblySearchPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(NMakeAssemblySearchPath)</NMakeAssemblySearchPath>
     <NMakeForcedUsingAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(NMakeForcedUsingAssemblies)</NMakeForcedUsingAssemblies>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\lib\$(Configuration)_$(Platform)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\obj\$(Configuration)_$(Platform)\$(ProjectName)\</IntDir>
-    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='100'">ffmpeg.bat VS2010</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='100'">ffmpeg.bat 32 rebuild VS2010</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='100'">ffmpeg.bat 32 clean VS2010</NMakeCleanCommandLine>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\lib\$(Configuration)_$(Platform)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\obj\$(Configuration)_$(Platform)\$(ProjectName)\</IntDir>
-    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='110'">ffmpeg.bat VS2012</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='110'">ffmpeg.bat 32 rebuild VS2012</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='110'">ffmpeg.bat 32 clean VS2012</NMakeCleanCommandLine>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\lib\$(Configuration)_$(Platform)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\obj\$(Configuration)_$(Platform)\$(ProjectName)\</IntDir>
     <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='120'">ffmpeg.bat</NMakeBuildCommandLine>
@@ -118,16 +88,6 @@
     <NMakeForcedIncludes Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeForcedIncludes)</NMakeForcedIncludes>
     <NMakeAssemblySearchPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeAssemblySearchPath)</NMakeAssemblySearchPath>
     <NMakeForcedUsingAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeForcedUsingAssemblies)</NMakeForcedUsingAssemblies>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\lib\$(Configuration)_$(Platform)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\obj\$(Configuration)_$(Platform)\$(ProjectName)\</IntDir>
-    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='100'">ffmpeg.bat 64 VS2010</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='100'">ffmpeg.bat 64 rebuild VS2010</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='100'">ffmpeg.bat 64 clean VS2010</NMakeCleanCommandLine>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\lib\$(Configuration)_$(Platform)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\obj\$(Configuration)_$(Platform)\$(ProjectName)\</IntDir>
-    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='110'">ffmpeg.bat 64 VS2012</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='110'">ffmpeg.bat 64 rebuild VS2012</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='110'">ffmpeg.bat 64 clean VS2012</NMakeCleanCommandLine>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\lib\$(Configuration)_$(Platform)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\obj\$(Configuration)_$(Platform)\$(ProjectName)\</IntDir>
     <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='120'">ffmpeg.bat 64</NMakeBuildCommandLine>

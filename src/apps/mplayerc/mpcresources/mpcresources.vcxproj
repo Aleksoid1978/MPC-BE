@@ -323,14 +323,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <OutDir Condition="'$(Platform)'=='Win32' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\mpc-be_x86\Lang\</OutDir>
-    <OutDir Condition="'$(Platform)'=='x64' And '$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\mpc-be_x64\Lang\</OutDir>
-    <OutDir Condition="'$(Platform)'=='Win32' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\mpc-be_x86\Lang\</OutDir>
-    <OutDir Condition="'$(Platform)'=='x64' And '$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\mpc-be_x64\Lang\</OutDir>
     <OutDir Condition="'$(Platform)'=='Win32' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\mpc-be_x86\Lang\</OutDir>
     <OutDir Condition="'$(Platform)'=='x64' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\mpc-be_x64\Lang\</OutDir>
-    <IntDir Condition="'$(PlatformToolsetVersion)'=='100'">$(SolutionDir)bin\obj\$(Configuration)_$(PlatformName)\$(ProjectName)\</IntDir>
-    <IntDir Condition="'$(PlatformToolsetVersion)'=='110'">$(SolutionDir)bin12\obj\$(Configuration)_$(PlatformName)\$(ProjectName)\</IntDir>
     <IntDir Condition="'$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\obj\$(Configuration)_$(PlatformName)\$(ProjectName)\</IntDir>
     <TargetName Condition="'$(Configuration)'=='Release Armenian'">$(ProjectName).hy</TargetName>
     <TargetName Condition="'$(Configuration)'=='Release Basque'">$(ProjectName).eu</TargetName>

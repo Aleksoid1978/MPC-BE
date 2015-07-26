@@ -186,9 +186,6 @@ class COggDiracOutputPin : public COggSplitterOutputPin
 	bool			m_bOldDirac;
 	bool			m_IsInitialized;
 
-	CBaseFilter*	m_pFilter;
-	CString			m_pName;
-
 	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
 

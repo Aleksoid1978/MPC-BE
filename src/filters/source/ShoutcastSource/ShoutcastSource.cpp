@@ -958,13 +958,13 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 			} else if (1 == sscanf_s(hdrline, "icy-br:%d", &m_bitrate)) {
 				m_bitrate *= 1000;
 			} else if (1 == sscanf_s(hdrline, "icy-metaint:%d", &metaint)) {
-				metaint = metaint;
+				;
 			} else if (hdrline.Left(9) == "icy-name:") {
 				m_title = ConvertStr(dup.Mid(9).Trim());
 			} else if (hdrline.Left(8) == "icy-url:") {
 				m_url = dup.Mid(8).Trim();
 			} else if (1 == sscanf_s(hdrline, "content-length:%d", &ContentLength)) {
-				ContentLength = ContentLength;
+				;
 			} else if (hdrline.Left(9) == "location:") {
 				redirectUrl = hdrline.Mid(9).Trim();
 			} else if (hdrline.Find("content-disposition:") >= 0 && hdrline.Find("filename=") > 0) {

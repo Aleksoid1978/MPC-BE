@@ -893,7 +893,7 @@ CString CMpegSplitterFilter::FormatStreamName(CMpegSplitterFile::stream& s, CMpe
 	CString FormatDesc = GetMediaTypeDesc(&s.mt, pClipInfo, StreamType, lang_name);
 
 	if (!FormatDesc.IsEmpty()) {
-		str.Format(L"%s (%04x,%02x,%02x)", FormatDesc.GetString(), s.pid, s.pesid, s.ps1id);
+		str.Format(L"%s (%04x,%02x,%02x)", FormatDesc, s.pid, s.pesid, s.ps1id);
 	} else if (pStreamName) {
 		str.Format(L"%s - %s (%04x,%02x,%02x)", name, pStreamName, s.pid, s.pesid, s.ps1id);
 	} else {
@@ -1240,7 +1240,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 								REFERENCE_TIME rtLimit = CMpegSplitterFile::stream_codec::MPEG ? rt : rtmax;
 								while (m_pFile->GetRemaining()) {
 									m_pFile->Seek(nextPos);
-									rtPTS = m_pFile->NextPTS(TrackNum, stream.codec, nextPos, TRUE);
+									rtPTS = m_pFile->NextPTS(TrackNum, stream.codec, nextPos, TRUE, rtLimit);
 									if (rtPTS > rtLimit || rtPTS == INVALID_TIME) {
 										break;
 									}

@@ -410,6 +410,12 @@ void CPPageVideo::UpdateResizerList(int select)
 	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Nearest neighbor"), RESIZER_NEAREST);
 	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Bilinear"), RESIZER_BILINEAR);
 
+#if DXVAVP
+	if ((D3DFORMAT)m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel()) == D3DFMT_X8R8G8B8) {
+		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"DXVA2 (experimental)"), RESIZER_DXVA2);
+	}
+#endif
+
 	if (m_cbAPSurfaceUsage.GetCurSel() == VIDRNDT_AP_TEXTURE3D) {
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Perlin Smootherstep (PS 2.0)"), RESIZER_SHADER_SMOOTHERSTEP);
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"B-spline4 (PS 2.0)"), RESIZER_SHADER_BSPLINE4);
@@ -703,6 +709,8 @@ void CPPageVideo::OnSurfaceFormatChange()
 		GetDlgItem(IDC_STATIC9)->ShowWindow(SW_HIDE);
 	}
 
+	UpdateResizerList((int)m_cbDX9Resizer.GetItemData(m_cbDX9Resizer.GetCurSel()));
+
 	SetModified();
 }
 
@@ -746,7 +754,7 @@ void CPPageVideo::OnBnClickedDefault()
 	m_cbAPSurfaceUsage.SetCurSel(IsWinVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D);
 
 	UpdateSurfaceFormatList(D3DFMT_X8R8G8B8);
-	UpdateResizerList(1);
+	UpdateResizerList(RESIZER_BILINEAR);
 
 	m_chkColorManagment.SetCheck(BST_UNCHECKED);
 	m_cbCMInputType.SetCurSel(0);

@@ -211,7 +211,7 @@ HRESULT CFilter::Push(CAutoPtr<CPacket> p)
 	int buffersize = av_samples_get_buffer_size(NULL, pFrame->channels, pFrame->nb_samples, m_av_sample_fmt, 1);
 	int ret = avcodec_fill_audio_frame(pFrame, pFrame->channels, m_av_sample_fmt, pData, buffersize, 1);
 	if (ret >= 0) {
-		int ret = av_buffersrc_write_frame(m_pFilterBufferSrc, pFrame);
+		ret = av_buffersrc_write_frame(m_pFilterBufferSrc, pFrame);
 	}
 
 	SAFE_DELETE_ARRAY(pTmpBuf);

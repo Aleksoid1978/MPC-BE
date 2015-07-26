@@ -244,7 +244,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	HRESULT hr = S_OK;
 	// CBaseRenderer is using a lazy initialization for the CRendererPosPassThru - we need it always
 	CBasePin *pPin = GetPin(0);
-	m_pPosition = new CRendererPosPassThru(NAME("CRendererPosPassThru"), CBaseFilter::GetOwner(), &hr, pPin);
+	m_pPosition = DNew CRendererPosPassThru(NAME("CRendererPosPassThru"), CBaseFilter::GetOwner(), &hr, pPin);
 	if (m_pPosition == NULL) {
 		hr = E_OUTOFMEMORY;
 	} else if (FAILED(hr)) {
@@ -1382,20 +1382,16 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 
 		CopyWaveFormat(m_pWaveFileFormat, &m_pWaveFileFormatOutput);
 
-		WAVEFORMATEX *pFormat		= NULL;
-		WAVEFORMATEX* pDeviceFormat	= NULL;
-
-		WAVEFORMATEX *sharedClosestMatch = NULL;
-
-		IPropertyStore *pProps = NULL;
-		PROPVARIANT varConfig;
-
-		WAVEFORMATEXTENSIBLE wfexAsIs = {0};
-
 		if (m_WASAPIMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(pWaveFormatEx)) { // EXCLUSIVE/BITSTREAM
+			WAVEFORMATEX *pFormat = NULL;
+			IPropertyStore *pProps = NULL;
+			PROPVARIANT varConfig;
+			
 			if (IsBitstream(pWaveFormatEx)) {
 				pFormat = pWaveFormatEx;
 			} else {
+				WAVEFORMATEXTENSIBLE wfexAsIs = { 0 };
+
 				if (m_bUseBitExactOutput) {
 					if (!m_bUseSystemLayoutChannels
 							&& SUCCEEDED(SelectFormat(pWaveFormatEx, wfexAsIs))) {
@@ -1405,9 +1401,9 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 						hr = CreateAudioClient();
 						if (SUCCEEDED(hr)) {
 							WAVEFORMATEXTENSIBLE wfex = { 0 };
-							DWORD dwChannelMask	= GetDefChannelMask(pWaveFormatEx->nChannels);
+							DWORD dwChannelMask = GetDefChannelMask(pWaveFormatEx->nChannels);
 							if (IsWaveFormatExtensible(pWaveFormatEx)) {
-								dwChannelMask	= ((WAVEFORMATEXTENSIBLE*)pWaveFormatEx)->dwChannelMask;
+								dwChannelMask = ((WAVEFORMATEXTENSIBLE*)pWaveFormatEx)->dwChannelMask;
 							}
 							CreateFormat(wfex, wfexAsIs.Format.wBitsPerSample, pWaveFormatEx->nChannels, dwChannelMask, pWaveFormatEx->nSamplesPerSec);
 							hr = InitAudioClient((WAVEFORMATEX*)&wfex, FALSE);
@@ -1428,11 +1424,13 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 				}
 
 				if (!pFormat && bInitNeed) {
-					m_pMMDevice->OpenPropertyStore(STGM_READ, &pProps);
-					PropVariantInit(&varConfig);
-					hr = pProps->GetValue(PKEY_AudioEngine_DeviceFormat, &varConfig);
-					if (SUCCEEDED(hr) && varConfig.vt == VT_BLOB && varConfig.blob.pBlobData != NULL) {
-						pFormat = (WAVEFORMATEX*)varConfig.blob.pBlobData;
+					hr = m_pMMDevice->OpenPropertyStore(STGM_READ, &pProps);
+					if (SUCCEEDED(hr)) {
+						PropVariantInit(&varConfig);
+						hr = pProps->GetValue(PKEY_AudioEngine_DeviceFormat, &varConfig);
+						if (SUCCEEDED(hr) && varConfig.vt == VT_BLOB && varConfig.blob.pBlobData != NULL) {
+							pFormat = (WAVEFORMATEX*)varConfig.blob.pBlobData;
+						}
 					}
 				}
 			}
@@ -1443,41 +1441,27 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 					CopyWaveFormat(pFormat, &m_pWaveFileFormatOutput);
 				}
 			}
-		} else if (m_WASAPIMode == MODE_WASAPI_SHARED) { // SHARED
-			pFormat = pWaveFormatEx;
-			hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, pFormat, &sharedClosestMatch);
-			if (FAILED(hr)) {
-				hr = m_pAudioClient->GetMixFormat(&pDeviceFormat);
-				if (FAILED(hr)) {
-					DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CheckAudioClient() - GetMixFormat() failed"));
-					return hr;
-				}
 
-				pFormat = pDeviceFormat;
-				hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, pFormat, &sharedClosestMatch);
-				if (S_OK == hr) {
-					CopyWaveFormat(pFormat, &m_pWaveFileFormatOutput);
-				}
+			if (pProps) {
+				PropVariantClear(&varConfig);
+				SAFE_RELEASE(pProps);
+			}
+		} else if (m_WASAPIMode == MODE_WASAPI_SHARED) { // SHARED
+			WAVEFORMATEX* pDeviceFormat	= NULL;
+			hr = m_pAudioClient->GetMixFormat(&pDeviceFormat);
+			if (SUCCEEDED(hr) && pDeviceFormat) {
+				CopyWaveFormat(pDeviceFormat, &m_pWaveFileFormatOutput);
+				CoTaskMemFree(pDeviceFormat);
 			}
 		}
 
-		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CheckAudioClient() - IsFormatSupported()"));
-#if defined(_DEBUG) && DBGLOG_LEVEL > 0
+#ifdef _DEBUG
 		DbgLog((LOG_TRACE, 3, L"	Input format:"));
 		DumpWaveFormatEx(pWaveFormatEx);
 
 		DbgLog((LOG_TRACE, 3, L"	Output format:"));
 		DumpWaveFormatEx(m_pWaveFileFormatOutput);
 #endif
-
-		if (pProps) {
-			PropVariantClear(&varConfig);
-			SAFE_RELEASE(pProps);
-		}
-
-		if (pDeviceFormat) {
-			CoTaskMemFree(pDeviceFormat);
-		}
 
 		if (S_OK == hr) {
 			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CheckAudioClient() - WASAPI client accepted the format"));
@@ -1486,33 +1470,6 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 				SAFE_RELEASE(m_pRenderClient);
 				SAFE_RELEASE(m_pAudioClient);
 				hr = CreateAudioClient();
-			}
-		} else if (S_FALSE == hr) {
-			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CheckAudioClient() - WASAPI client refused the format with a closest match"));
-#if defined(_DEBUG) && DBGLOG_LEVEL > 0
-			DbgLog((LOG_TRACE, 3, L"	=> ppClosestMatch:"));
-			DumpWaveFormatEx(sharedClosestMatch);
-#endif
-
-			CopyWaveFormat(sharedClosestMatch, &m_pWaveFileFormatOutput);
-			CoTaskMemFree(sharedClosestMatch);
-
-			hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_SHARED, m_pWaveFileFormatOutput, &sharedClosestMatch);
-			if (S_OK == hr) {
-				DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CheckAudioClient() - WASAPI client accepted the closest match format"));
-				StopAudioClient();
-				SAFE_RELEASE(m_pRenderClient);
-				SAFE_RELEASE(m_pAudioClient);
-				hr = CreateAudioClient();
-			}
-
-			if (hr != S_OK) {
-				if (sharedClosestMatch) {
-					CoTaskMemFree(sharedClosestMatch);
-				}
-				SAFE_DELETE_ARRAY(m_pWaveFileFormatOutput);
-
-				return hr;
 			}
 		} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr) {
 			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CheckAudioClient() - WASAPI client refused the format"));
@@ -1570,55 +1527,53 @@ HRESULT CMpcAudioRenderer::GetAudioDevice()
 		return hr;
 	}
 
-	if (hr == S_OK && devices) {
-		IPropertyStore* pProps = NULL;
+	IPropertyStore* pProps = NULL;
 
-		for (UINT i = 0 ; i < count ; i++) {
-			LPWSTR pwszID = NULL;
-			IMMDevice *endpoint = NULL;
-			hr = devices->Item(i, &endpoint);
+	for (UINT i = 0 ; i < count ; i++) {
+		LPWSTR pwszID = NULL;
+		IMMDevice *endpoint = NULL;
+		hr = devices->Item(i, &endpoint);
+		if (hr == S_OK) {
+			hr = endpoint->GetId(&pwszID);
 			if (hr == S_OK) {
-				hr = endpoint->GetId(&pwszID);
-				if (hr == S_OK) {
-					if (endpoint->OpenPropertyStore(STGM_READ, &pProps) == S_OK) {
-						PROPVARIANT varName;
-						PropVariantInit(&varName);
+				if (endpoint->OpenPropertyStore(STGM_READ, &pProps) == S_OK) {
+					PROPVARIANT varName;
+					PropVariantInit(&varName);
 
-						// Found the configured audio endpoint
-						if ((pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK) && (m_DeviceName == varName.pwszVal)) {
-							DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->GetId() OK, num: (%d), pwszVal: '%s', pwszID: '%s'", i, varName.pwszVal, pwszID));
+					// Found the configured audio endpoint
+					if ((pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK) && (m_DeviceName == varName.pwszVal)) {
+						DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->GetId() OK, num: (%d), pwszVal: '%s', pwszID: '%s'", i, varName.pwszVal, pwszID));
 
-							m_strDeviceName = varName.pwszVal;
-							if (m_strDeviceId.IsEmpty()) {
-								m_strDeviceId = pwszID;
-							}
-
-							enumerator->GetDevice(pwszID, &m_pMMDevice);
-							SAFE_RELEASE(devices);
-							m_pMMDevice = endpoint;
-							CoTaskMemFree(pwszID);
-							pwszID = NULL;
-							PropVariantClear(&varName);
-							SAFE_RELEASE(pProps);
-							return S_OK;
-						} else {
-							PropVariantClear(&varName);
-							SAFE_RELEASE(pProps);
-							SAFE_RELEASE(endpoint);
-							CoTaskMemFree(pwszID);
-							pwszID = NULL;
+						m_strDeviceName = varName.pwszVal;
+						if (m_strDeviceId.IsEmpty()) {
+							m_strDeviceId = pwszID;
 						}
+
+						enumerator->GetDevice(pwszID, &m_pMMDevice);
+						SAFE_RELEASE(devices);
+						m_pMMDevice = endpoint;
+						CoTaskMemFree(pwszID);
+						pwszID = NULL;
+						PropVariantClear(&varName);
+						SAFE_RELEASE(pProps);
+						return S_OK;
+					} else {
+						PropVariantClear(&varName);
+						SAFE_RELEASE(pProps);
+						SAFE_RELEASE(endpoint);
+						CoTaskMemFree(pwszID);
+						pwszID = NULL;
 					}
-				} else {
-					DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->GetId() failed: (0x%08x)", hr));
 				}
 			} else {
-				DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->Item() failed: (0x%08x)", hr));
+				DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->GetId() failed: (0x%08x)", hr));
 			}
-
-			CoTaskMemFree(pwszID);
-			pwszID = NULL;
+		} else {
+			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->Item() failed: (0x%08x)", hr));
 		}
+
+		CoTaskMemFree(pwszID);
+		pwszID = NULL;
 	}
 
 	SAFE_RELEASE(devices);
@@ -1712,7 +1667,7 @@ bool CMpcAudioRenderer::CopyWaveFormat(WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMA
 
 	SAFE_DELETE_ARRAY(*ppDestWaveFormatEx);
 
-	size_t size = sizeof(WAVEFORMATEX) + pSrcWaveFormatEx->cbSize; // Always true, even for WAVEFORMATEXTENSIBLE and WAVEFORMATEXTENSIBLE_IEC61937
+	size_t size = sizeof(WAVEFORMATEX) + pSrcWaveFormatEx->cbSize;
 	*ppDestWaveFormatEx = (WAVEFORMATEX *)DNew BYTE[size];
 	if (!(*ppDestWaveFormatEx)) {
 		return false;
@@ -1849,7 +1804,7 @@ HRESULT CMpcAudioRenderer::SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE
 	wfe.nAvgBytesPerSec		= nSamplesPerSec * wfe.nBlockAlign;
 
 	wfex.Format.wFormatTag					= WAVE_FORMAT_EXTENSIBLE;
-	wfex.Format.cbSize						= sizeof(wfex) - sizeof(wfex.Format);
+	wfex.Format.cbSize						= 22;
 	wfex.SubFormat							= MEDIASUBTYPE_PCM;
 	wfex.dwChannelMask						= dwChannelMask;
 	wfex.Samples.wValidBitsPerSample		= wfex.Format.wBitsPerSample;
