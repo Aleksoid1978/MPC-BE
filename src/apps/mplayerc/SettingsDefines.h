@@ -45,7 +45,7 @@
 #define IDS_RS_DVD_MADVR_CHANGE				_T("Change madVR to Another renderer")
 #define IDS_RS_FILEPOS						_T("Remember File Pos")
 #define IDS_RS_EVR_BUFFERS					_T("EVRBuffers")
-#define IDS_RS_SHOWOSD						_T("Show OSD")
+#define IDS_RS_SHOWOSD						_T("ShowOSD")
 #define IDS_RS_LANGUAGE						_T("Language")
 #define IDS_RS_GLOBALMEDIA					_T("UseGlobalMedia")
 #define IDS_RS_DXVAFILTERS					_T("DXVAFilters")

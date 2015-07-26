@@ -365,7 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 42		"Αναφορά pin που απέτυχαν να αποδοθούν"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
 5		"Επιλογές ανοίγματος"
 6		"Force a single process"
 8		"Χρήση του ίδιου αναπαραγωγού για κάθε αρχείο πολυμέσων"
@@ -387,11 +387,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 29		"Άλλα"
 30		"Εικονίδιο στη γραμμή ειδοποιήσεων"
 31		"Εμφάνιση OSD (απαιτείται επανεκκίνηση)"
-32		"Όριο αναλογιών παραθ. σε αλλαγή μεγέθους"
-33		"Προσκόλληση στα άκρα της οθόνης"
-34		"Store settings in the player folder"
-35		"Απενεργοποίηση του μενού "" Άνοιγμα δίσκου"""
-36		"Προτεραιότητα διεργασίας πάνω από κανονική"
+32		"Show name of media file"
+33		"Show seek time"
+34		"Όριο αναλογιών παραθ. σε αλλαγή μεγέθους"
+35		"Προσκόλληση στα άκρα της οθόνης"
+36		"Store settings in the player folder"
+37		"Απενεργοποίηση του μενού "" Άνοιγμα δίσκου"""
+38		"Προτεραιότητα διεργασίας πάνω από κανονική"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

@@ -365,7 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 42		"Rapporteer pins die niet renderen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
 5		"Opties voor openen"
 6		"Forceer een enkel proces"
 8		"Gebruik hetzelfde proces voor elk bestand"
@@ -387,11 +387,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 29		"Overige"
 30		"Pictogram in systeemvak"
 31		"Toon OSD (vereist herstart)"
-32		"Beperk vensterverhouding bij herschalen"
-33		"Aan bureaubladrand aanpassen"
-34		"Instellingen in de map van MPC-BE opslaan"
-35		"'Schijf openen'-menu uitschakelen"
-36		"Procesprioriteit ""hoger dan normaal"""
+32		"Show name of media file"
+33		"Show seek time"
+34		"Beperk vensterverhouding bij herschalen"
+35		"Aan bureaubladrand aanpassen"
+36		"Instellingen in de map van MPC-BE opslaan"
+37		"'Schijf openen'-menu uitschakelen"
+38		"Procesprioriteit ""hoger dan normaal"""
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

@@ -137,7 +137,7 @@ HRESULT COSD::Create(CWnd* pWnd)
 
 	const AppSettings& s = AfxGetAppSettings();
 	SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - s.nOSDTransparent, LWA_ALPHA | LWA_COLORKEY);
-	if (s.fShowOSD) {
+	if (s.iShowOSD & OSD_ENABLE) {
 		Start(pWnd);
 	}
 

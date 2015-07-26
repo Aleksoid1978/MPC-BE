@@ -365,7 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 42		"Çevrilemeyen ilişkilendirmeleri rapor et"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
 5		"Açılış ayarları"
 6		"Force a single process"
 8		"Use same process for every file"
@@ -387,11 +387,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 29		"Diğer"
 30		"Saat simgesinde göster"
 31		"OSD göster (yeniden başlatma gerektirir)"
-32		"Boyutlandırırken pencere oranlarını sınırla"
-33		"Masaüstü kenarlarına uyarla"
-34		"Store settings in the player folder"
-35		"CD-ROM Açma özelliğini kapat"
-36		"İşlem önceliğini normalden yüksek tut"
+32		"Show name of media file"
+33		"Show seek time"
+34		"Boyutlandırırken pencere oranlarını sınırla"
+35		"Masaüstü kenarlarına uyarla"
+36		"Store settings in the player folder"
+37		"CD-ROM Açma özelliğini kapat"
+38		"İşlem önceliğini normalden yüksek tut"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

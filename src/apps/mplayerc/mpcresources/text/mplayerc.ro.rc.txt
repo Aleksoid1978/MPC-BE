@@ -365,7 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 42		"Raportează pinii care eșuează să randeze"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
 5		"Opțiuni pentru deschidere"
 6		"Force a single process"
 8		"Folosește același player pentru fiecare fișier media"
@@ -387,11 +387,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 29		"Altele"
 30		"Pictogramă în zona de notificare"
 31		"Arată OSD (necesită repornire player)"
-32		"Limitează proporțiile ferestrei la redimensionare"
-33		"Extinde până la marginile ecranului"
-34		"Store settings in the player folder"
-35		"Dezactivează meniul ""Deschide Disc"""
-36		"Prioritatea procesării peste normal"
+32		"Show name of media file"
+33		"Show seek time"
+34		"Limitează proporțiile ferestrei la redimensionare"
+35		"Extinde până la marginile ecranului"
+36		"Store settings in the player folder"
+37		"Dezactivează meniul ""Deschide Disc"""
+38		"Prioritatea procesării peste normal"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

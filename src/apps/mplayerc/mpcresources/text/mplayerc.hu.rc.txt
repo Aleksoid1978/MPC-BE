@@ -365,7 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 42		"Hibás, nem átalakítható csatlakozók jelentése"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
 5		"Megnyitási beállítások"
 6		"Force a single process"
 8		"Use same process for every file"
@@ -387,11 +387,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 29		"Egyéb"
 30		"Legyen tálca ikon"
 31		"OSD megjelenítése (újraindítást igényel)"
-32		"Ablakméretarány követése átméretezéskor"
-33		"Asztalszélekhez igazítás"
-34		"Store settings in the player folder"
-35		"Disable 'Open Disc' menu"
-36		"A lejátszó prioritása normál érték felett"
+32		"Show name of media file"
+33		"Show seek time"
+34		"Ablakméretarány követése átméretezéskor"
+35		"Asztalszélekhez igazítás"
+36		"Store settings in the player folder"
+37		"Disable 'Open Disc' menu"
+38		"A lejátszó prioritása normál érték felett"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

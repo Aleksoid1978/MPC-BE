@@ -365,7 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 42		"Հաշվետվություն՝ ցուցադրման հոսքերի սխալների համար"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
 5		"Բացելու ընտրանքներ"
 6		"Force a single process"
 8		"Use same process for every file"
@@ -387,11 +387,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 29		"Այլ"
 30		"Պատկերակը առաջադրանքների վահանակ."
 31		"Ցուցադրել OSD-ն (պահ.է վերամեկնարկում)"
-32		"Համամասնությունը ինչպես որ կադրում"
-33		"Ամրացնել էկրանի սահմաններին"
-34		"Store settings in the player folder"
-35		"Անջատել 'Բացել սկավառակը' ընտրացանկը"
-36		"Գործողության բարձր առաջնայնություն"
+32		"Show name of media file"
+33		"Show seek time"
+34		"Համամասնությունը ինչպես որ կադրում"
+35		"Ամրացնել էկրանի սահմաններին"
+36		"Store settings in the player folder"
+37		"Անջատել 'Բացել սկավառակը' ընտրացանկը"
+38		"Գործողության բարձր առաջնայնություն"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
