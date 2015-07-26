@@ -12,6 +12,7 @@
  ********************************************************************
 
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
+ last mod: $Id$
 
  ********************************************************************/
 /**
@@ -21,7 +22,7 @@
 #ifndef _SPEEX_TYPES_H
 #define _SPEEX_TYPES_H
 
-#if defined(_WIN32) 
+#if defined(_WIN32)
 
 #  if defined(__CYGWIN__)
 #    include <_G_config.h>
@@ -118,11 +119,7 @@
 
 #else
 
-# ifdef _BUILD_SPEEX
-#  include "include/speex/speex_config_types.h"
-#else
-#  include <speex/speex_config_types.h>
-#endif
+#include "speex_config_types.h"
 
 #endif
 
