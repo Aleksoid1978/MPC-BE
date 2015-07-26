@@ -973,7 +973,7 @@ BOOL CPPageFormats::OnApply()
 	s.bSetContextDir		= !!m_fContextDir.GetCheck();
 	s.fAssociatedWithIcons	= !!m_fAssociatedWithIcons.GetCheck();
 
-	if (m_bFileExtChanged && IsWinEightOrLater()) {
+	if (m_bFileExtChanged && IsWinEightOrLater() && !IsWinTenOrLater()) {
 		HRESULT hr = RegisterUI();
 		UNREFERENCED_PARAMETER(hr);
 	}
