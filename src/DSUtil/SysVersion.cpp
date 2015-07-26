@@ -76,6 +76,16 @@ BOOL IsWinEightOrLater()
 	return (GetSysVersion() >= 0x0602);
 }
 
+BOOL IsWinTen()
+{
+	return (GetSysVersion() == 0x0A00);
+}
+
+BOOL IsWinTenOrLater()
+{
+	return (GetSysVersion() >= 0x0A00);
+}
+
 BOOL IsWow64()
 {
 	typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);

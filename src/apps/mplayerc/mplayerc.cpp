@@ -1463,7 +1463,7 @@ BOOL CMPlayerCApp::InitInstance()
 				CPPageFormats::RegisterShellExt(ShellExt64);
 			}
 
-			if (IsWinEightOrLater()) {
+			if (IsWinEightOrLater() && !IsWinTenOrLater()) {
 				HRESULT hr = CPPageFormats::RegisterUI();
 				UNREFERENCED_PARAMETER(hr);
 			}
@@ -1494,7 +1494,7 @@ BOOL CMPlayerCApp::InitInstance()
 				}
 			}
 
-			if (IsWinEightOrLater()) {
+			if (IsWinEightOrLater() && !IsWinTenOrLater()) {
 				HRESULT hr = CPPageFormats::RegisterUI();
 				UNREFERENCED_PARAMETER(hr);
 			}
