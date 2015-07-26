@@ -172,7 +172,7 @@ double get_max_peak_float(float* pData, const size_t allsamples)
     float max_peak = 0.0f;
 
     for (float* end = pData + allsamples; pData < end; ++pData) {
-        float peak = abs(*pData);
+        float peak = fabsf(*pData);
         if (peak > max_peak) {
             max_peak = peak;
         }
@@ -186,7 +186,7 @@ double get_max_peak_double(double* pData, const size_t allsamples)
     double max_peak = 0.0;
 
     for (double* end = pData + allsamples; pData < end; ++pData) {
-        double peak = abs(*pData);
+        double peak = fabs(*pData);
         if (peak > max_peak) {
             max_peak = peak;
         }

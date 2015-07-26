@@ -488,9 +488,9 @@ void CAudioNormalizer::adjust_gain(short *samples, int numsamples, int nch, doub
 CAudioNormalizer::smooth_t *CAudioNormalizer::SmoothNew(int size)
 {
 	smooth_t * sm = (smooth_t *)malloc(sizeof(smooth_t));
+	if (sm == NULL) return NULL;
 
 	ZeroMemory(sm, sizeof(smooth_t));
-	if (sm == NULL) return NULL;
 
 	sm->data = (double *)malloc(size * sizeof(double));
 	if (sm->data == NULL)

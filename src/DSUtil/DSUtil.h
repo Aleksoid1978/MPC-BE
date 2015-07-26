@@ -44,8 +44,8 @@
 #define LCID_NOSUBTITLES	-1
 #define INVALID_TIME		_I64_MIN
 
-#define KILOBYTE			1024
-#define MEGABYTE			KILOBYTE * KILOBYTE
+#define KILOBYTE		1024
+#define MEGABYTE		1048576
 
 #define GETWORD(b)		*(WORD*)(b)
 #define GETDWORD(b)		*(DWORD*)(b)
@@ -330,7 +330,7 @@ enum {
 	IEC61937_TRUEHD             = 0x16,          ///< TrueHD data
 };
 
-#define IsWaveFormatExtensible(wfe) (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->cbSize == (sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)))
+#define IsWaveFormatExtensible(wfe) (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->cbSize == 22)
 
 namespace CStringUtils
 {

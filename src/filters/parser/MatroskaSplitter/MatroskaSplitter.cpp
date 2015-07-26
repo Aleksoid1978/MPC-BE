@@ -1177,9 +1177,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	while (pos) {
 		Attachment* pA = m_pFile->m_segment.Attachments.GetNext(pos);
 
-		POSITION pos = pA->AttachedFiles.GetHeadPosition();
-		while (pos) {
-			AttachedFile* pF = pA->AttachedFiles.GetNext(pos);
+		POSITION pos2 = pA->AttachedFiles.GetHeadPosition();
+		while (pos2) {
+			AttachedFile* pF = pA->AttachedFiles.GetNext(pos2);
 
 			CAtlArray<BYTE> pData;
 			pData.SetCount((size_t)pF->FileDataLen);
@@ -1208,13 +1208,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	while (pos) {
 		Tags* Tags = m_pFile->m_segment.Tags.GetNext(pos);
 
-		POSITION pos = Tags->Tag.GetHeadPosition();
-		while (pos) {
-			Tag* Tag = Tags->Tag.GetNext(pos);
+		POSITION pos2 = Tags->Tag.GetHeadPosition();
+		while (pos2) {
+			Tag* Tag = Tags->Tag.GetNext(pos2);
 
-			POSITION pos = Tag->SimpleTag.GetHeadPosition();
-			while (pos) {
-				SimpleTag* SimpleTag = Tag->SimpleTag.GetNext(pos);
+			POSITION pos3 = Tag->SimpleTag.GetHeadPosition();
+			while (pos3) {
+				SimpleTag* SimpleTag = Tag->SimpleTag.GetNext(pos3);
 				if (SimpleTag->TagName == _T("TITLE")) {
 					DelProperty(L"TITL");
 					SetProperty(L"TITL", SimpleTag->TagString);
@@ -1671,7 +1671,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 			QWORD lastCueClusterPosition = ULONGLONG_MAX;
 			BOOL bBreak = FALSE;
 
-			if (pCluster && !bBreak) {
+			if (pCluster) {
 				pos1 = s.Cues.GetHeadPosition();
 				while (pos1) {
 					Cue* pCue = s.Cues.GetNext(pos1);

@@ -7,7 +7,7 @@ Part B: Preparing the GCC environment
  NOTES:
   * If you installed the MSYS/MinGW package in an other directory you will have to use that path in the following steps.
 
- 1. Download and extract MSYS_MinGW-w64_GCC_492_x86-x64_Full.7z to "C:\MSYS" -> http://mpc-be.org/MSYS/MSYS_MinGW-w64_GCC_492_x86-x64_Full.7z
+ 1. Download and extract MSYS_MinGW-w64_GCC_510_x86-x64.7z to "C:\MSYS" -> http://mpc-be.org/MSYS/MSYS_MinGW-w64_GCC_510_x86-x64.7z
  2. Add the following environment variables (in System Properties->Advanced->Environment Variables):
 
     Variable    Value
@@ -20,7 +20,7 @@ Part C: Downloading and compiling the MPC-BE source
 
 1. Use a subversion client to checkout MPC-BE's trunk to "C:\mpc-be" (or anywhere else you like)
     Repository URL: svn://mpc-next.ru/mpc-be/trunk 
-    The recommended SVN client is TortoiseSVN (grab it from http://dev.mpc-next.ru/index.php/board,16.0.html)
+    The recommended SVN client is TortoiseSVN (http://tortoisesvn.net/downloads.html)
 2. When using TortoiseSVN
     a) Create an empty directory where you want to store the source files. e.g: C:\mpc-be
     b) Right-click on that directory and choose "SVN checkout".

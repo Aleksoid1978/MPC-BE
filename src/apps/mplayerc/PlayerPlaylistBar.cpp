@@ -1222,7 +1222,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 					}
 				}
 				pli->m_label = str.Trim();
-			} if (str.Find(L"#EXT-X-STREAM-INF:") == 0) {
+			} else if (str.Find(L"#EXT-X-STREAM-INF:") == 0) {
 				int k = str.Find(L"#EXT-X-STREAM-INF:") + CString(L"#EXT-X-STREAM-INF:").GetLength();
 				str = str.Mid(k, str.GetLength() - k);
 				pli->m_label = str.Trim();

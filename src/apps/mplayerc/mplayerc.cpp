@@ -2317,7 +2317,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 
 				hdrline.MakeLower();
 				if (1 == sscanf_s(hdrline, "content-length:%d", &ContentLength)) {
-					ContentLength = ContentLength;
+					;
 				}
 			}
 

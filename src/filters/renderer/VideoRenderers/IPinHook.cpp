@@ -1512,7 +1512,7 @@ static void LogVideoCardCaps(IDirectXVideoDecoderService* pDecoderService)
 			UINT						cConfigurations = 0;
 			D3DFORMAT*					pFormats = NULL;
 			DXVA2_ConfigPictureDecode*	pConfig = NULL;
-			DXVA2_VideoDesc				m_VideoDesc;
+			DXVA2_VideoDesc				VideoDesc;
 
 			hr = pDecoderService->GetDecoderRenderTargets(pDecoderGuids[iGuid], &cFormats, &pFormats);
 
@@ -1521,13 +1521,13 @@ static void LogVideoCardCaps(IDirectXVideoDecoderService* pDecoderService)
 				for (UINT iFormat = 0; iFormat < cFormats;  iFormat++) {
 					LOG (_T("Direct 3D format : %s"),	FindD3DFormat(pFormats[iFormat]));
 					// Fill in the video description. Set the width, height, format, and frame rate.
-					memset(&m_VideoDesc, 0, sizeof(m_VideoDesc));
-					m_VideoDesc.SampleWidth		= 1280;
-					m_VideoDesc.SampleHeight	= 720;
-					m_VideoDesc.Format			= pFormats[iFormat];
+					memset(&VideoDesc, 0, sizeof(VideoDesc));
+					VideoDesc.SampleWidth	= 1280;
+					VideoDesc.SampleHeight	= 720;
+					VideoDesc.Format		= pFormats[iFormat];
 
 					// Get the available configurations.
-					hr = pDecoderService->GetDecoderConfigurations(pDecoderGuids[iGuid], &m_VideoDesc, NULL, &cConfigurations, &pConfig);
+					hr = pDecoderService->GetDecoderConfigurations(pDecoderGuids[iGuid], &VideoDesc, NULL, &cConfigurations, &pConfig);
 
 					if (SUCCEEDED(hr)) {
 

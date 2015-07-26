@@ -964,7 +964,7 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 	for (size_t i = 0; i < nValidTypes; ++i) {
 		// Step 3. Adjust the mixer's type to match our requirements.
 		pType = ValidMixerTypes[i];
-		TRACE("EVR: Valid mixer output type: %ws\n", GetMediaTypeFormatDesc(pType));
+		DbgLog((LOG_TRACE, 3, L"EVR: Valid mixer output type: %s", GetMediaTypeFormatDesc(pType)));
 	}
 #endif
 	for (size_t i = 0; i < nValidTypes; ++i) {

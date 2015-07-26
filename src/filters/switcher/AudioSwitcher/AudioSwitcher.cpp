@@ -228,7 +228,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		return hr;
 	}
 
-	if (!pDataIn || !pDataOut || in_samples < 0) {
+	if (!pDataIn || !pDataOut) {
 		return S_FALSE;
 	}
 
