@@ -1652,6 +1652,9 @@ MPC_GUID_ENTRY(CLSID_ReClock,
 // {EC9ED6FC-7B03-4cb6-8C01-4EABE109F26B} - MediaPortal Audio Renderer
 MPC_GUID_ENTRY(CLSID_MPAudioRenderer,
 			0xEC9ED6FC, 0x7B03, 0x4cb6, 0x8C, 0x01, 0x4E, 0xAB, 0xE1, 0x09, 0xF2, 0x6B)
+// {DF557071-C9FD-433A-9627-81E0D3640ED9}
+MPC_GUID_ENTRY(CLSID_SanearAudioRenderer,
+			0xdf557071, 0xc9fd, 0x433a, 0x96, 0x27, 0x81, 0xe0, 0xd3, 0x64, 0x0e, 0xd9)
 
 // other filters
 // {AB9D6472-752F-43F6-B29E-61207BDA8E06} - RDP Redirection Filter

@@ -235,7 +235,7 @@ bool IsAudioWaveRenderer(IBaseFilter* pBF)
 	pBF->GetClassID(&clsid);
 
 	return (clsid == CLSID_DSoundRender || clsid == CLSID_AudioRender ||
-			clsid == CLSID_ReClock || clsid == CLSID_MPAudioRenderer ||
+			clsid == CLSID_ReClock || clsid == CLSID_MPAudioRenderer || clsid == CLSID_SanearAudioRenderer ||
 			clsid == CLSID_MpcAudioRenderer || clsid == __uuidof(CNullAudioRenderer) || clsid == __uuidof(CNullUAudioRenderer));
 }
 
@@ -2788,7 +2788,6 @@ COLORREF YCrCbToRGB_Rec709(BYTE Y, BYTE Cr, BYTE Cb)
 
 DWORD YCrCbToRGB_Rec709(BYTE A, BYTE Y, BYTE Cr, BYTE Cb)
 {
-
 	double rp = Y + 2*(Cr-128)*(1.0-Rec709_Kr);
 	double gp = Y - 2*(Cb-128)*(1.0-Rec709_Kb)*Rec709_Kb/Rec709_Kg - 2*(Cr-128)*(1.0-Rec709_Kr)*Rec709_Kr/Rec709_Kg;
 	double bp = Y + 2*(Cb-128)*(1.0-Rec709_Kb);
