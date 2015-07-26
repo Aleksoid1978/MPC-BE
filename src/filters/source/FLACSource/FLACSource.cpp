@@ -196,8 +196,14 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			break;
 		}
 
-		if (!FLAC__stream_decoder_process_until_end_of_metadata(FLAC_DECODER) ||
-				!FLAC__stream_decoder_seek_absolute(FLAC_DECODER, 0)) {
+		if (!FLAC__stream_decoder_process_until_end_of_metadata(FLAC_DECODER)) {
+			break;
+		}
+		
+		FLAC__uint64 metadataend = 0;
+		FLAC__stream_decoder_get_decode_position(FLAC_DECODER, &metadataend);
+		
+		if (!FLAC__stream_decoder_seek_absolute(FLAC_DECODER, 0)) {
 			break;
 		}
 
@@ -232,7 +238,26 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 				pID3Tag = DNew CID3Tag(major, flags);
 				pID3Tag->ReadTagsV2(buf, size);
 				delete [] buf;
+			} else {
+				m_file.Seek(size, CFile::current);
 			}
+		} else {
+			m_file.Seek(0, CFile::begin);
+		}
+
+		if (metadataend) {
+			ULONGLONG startpos = m_file.GetPosition();
+			metadataend -= startpos;
+			char* data = DNew char[metadataend];
+			m_file.Read(data, metadataend);
+			char* end = data + metadataend;
+			char* begin = strstr(data, "fLaC");
+			if (begin) {
+				size_t size = end - begin;
+				m_extradata.SetCount(size);
+				memcpy(m_extradata.GetData(), begin, size);
+			}
+			delete [] data;
 		}
 
 		m_file.Seek(pos, CFile::begin);
@@ -375,7 +400,7 @@ HRESULT CFLACStream::GetMediaType(int iPosition, CMediaType* pmt)
 		pmt->majortype			= MEDIATYPE_Audio;
 		pmt->subtype			= MEDIASUBTYPE_FLAC_FRAMED;
 		pmt->formattype			= FORMAT_WaveFormatEx;
-		WAVEFORMATEX* wfe		= (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX));
+		WAVEFORMATEX* wfe		= (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX) + m_extradata.GetCount());
 		memset(wfe, 0, sizeof(WAVEFORMATEX));
 		wfe->wFormatTag			= WAVE_FORMAT_FLAC;
 		wfe->nChannels			= m_nChannels;
@@ -383,7 +408,8 @@ HRESULT CFLACStream::GetMediaType(int iPosition, CMediaType* pmt)
 		wfe->nAvgBytesPerSec	= m_nAvgBytesPerSec;
 		wfe->nBlockAlign		= 1;
 		wfe->wBitsPerSample		= m_wBitsPerSample;
-		wfe->cbSize				= 0;
+		wfe->cbSize				= m_extradata.GetCount();
+		memcpy(wfe + 1, m_extradata.GetData(), m_extradata.GetCount());
 	} else {
 		return VFW_S_NO_MORE_ITEMS;
 	}
