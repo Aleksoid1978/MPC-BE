@@ -365,7 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 42		"Справазд. аб памылках рэндэрынгу струменяў"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
 5		"Адкрываць файлы выкарыст."
 6		"Force a single process"
 8		"Use same process for every file"
@@ -387,11 +387,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 29		"Іншае"
 30		"Значок у панэлі задач"
 31		"Паказаць OSD (патрабуецца перазапуск)"
-32		"Суадносіны бакоў акна як у відэакадра"
-33		"Прыліпаць да межаў экрана"
-34		"Store settings in the player folder"
-35		"Disable 'Open Disc' menu"
-36		"Падвышаны прыярытэт працэсу"
+32		"Show name of media file"
+33		"Show seek time"
+34		"Суадносіны бакоў акна як у відэакадра"
+35		"Прыліпаць да межаў экрана"
+36		"Store settings in the player folder"
+37		"Disable 'Open Disc' menu"
+38		"Падвышаны прыярытэт працэсу"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

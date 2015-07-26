@@ -365,7 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 42		"回報繪製失敗的 Pin"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
 5		"開啟選項"
 6		"強制單一程式"
 8		"所有檔案使用同一處理程序"
@@ -387,11 +387,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 29		"其它選項"
 30		"系統列 (通知區域) 圖示"
 31		"顯示 OSD (需要重新啟動)"
-32		"縮放時限定視窗長寬比例"
-33		"貼齊視窗邊緣"
-34		"儲存設定到播放程式資料夾"
-35		"停用「開啟光碟」選單"
-36		"程式優先順序調成標準以上"
+32		"Show name of media file"
+33		"Show seek time"
+34		"縮放時限定視窗長寬比例"
+35		"貼齊視窗邊緣"
+36		"儲存設定到播放程式資料夾"
+37		"停用「開啟光碟」選單"
+38		"程式優先順序調成標準以上"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

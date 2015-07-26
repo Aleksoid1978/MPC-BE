@@ -365,7 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 42		"Indiquer les connexions échouées lors du rendu"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
 5		"Options d'ouverture"
 6		"Force a single process"
 8		"Use same process for every file"
@@ -387,11 +387,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 29		"Divers"
 30		"Icône dans la barre de notification"
 31		"Montrer l'OSD (nécessite un redémarrage)"
-32		"Garder les proportions au redimensionnement"
-33		"Aimanter sur les bords du Bureau"
-34		"Store settings in the player folder"
-35		"Désactiver le menu 'Ouvrir le disque'"
-36		"Priorité supérieure à la normale"
+32		"Show name of media file"
+33		"Show seek time"
+34		"Garder les proportions au redimensionnement"
+35		"Aimanter sur les bords du Bureau"
+36		"Store settings in the player folder"
+37		"Désactiver le menu 'Ouvrir le disque'"
+38		"Priorité supérieure à la normale"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

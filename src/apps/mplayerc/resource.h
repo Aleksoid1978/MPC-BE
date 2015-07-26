@@ -557,6 +557,8 @@
 #define IDC_CHECK11                     10231
 #define IDC_CHECK12                     10232
 #define IDC_CHECK13                     10233
+#define IDC_CHECK14                     10234
+#define IDC_CHECK15                     10235
 //
 #define IDC_COMBO1                      10241
 #define IDC_COMBO2                      10242
@@ -787,7 +789,6 @@
 #define IDS_AUTOPLAY_PLAYMUSIC          14182
 #define IDS_AUTOPLAY_PLAYAUDIOCD        14183
 #define IDS_AUTOPLAY_PLAYDVDMOVIE       14184
-#define IDS_AUTOPLAY_PLAYBDMOVIE        14199
 #define IDS_PROPSHEET_PROPERTIES        14185
 #define IDS_GRAPHBUILDER_AUDIOSWITCHER  14186
 #define IDS_SHADERS_EDIT                14187
@@ -801,6 +802,7 @@
 #define IDS_STATSBAR_JITTER             14196
 #define IDS_STATSBAR_BITRATE            14197
 #define IDS_STATSBAR_BITRATE_AVG_CUR    14198
+#define IDS_AUTOPLAY_PLAYBDMOVIE        14199
 #define IDS_AG_RESET_STATS              20005
 #define IDS_VIEW_BORDERLESS             20007
 #define IDS_VIEW_FRAMEONLY              20008

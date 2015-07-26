@@ -662,7 +662,7 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, (int)fToggleShader);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, (int)fToggleShaderScreenSpace);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, (int)fShowOSD);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, iShowOSD);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEEDLEDITOR, (int)fEnableEDLEditor);
 
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LANGUAGE, CMPlayerCApp::languageResources[iLanguage].strcode);
@@ -1418,7 +1418,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fToggleShader				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, 0);
 	fToggleShaderScreenSpace	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, 0);
 
-	fShowOSD			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, 1);
+	iShowOSD			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, OSD_ENABLE);
 	fEnableEDLEditor	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEEDLEDITOR, FALSE);
 	fFastSeek			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FASTSEEK_KEYFRAME, TRUE);
 	fMiniDump			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MINI_DUMP, FALSE);

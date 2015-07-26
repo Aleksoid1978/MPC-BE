@@ -4094,7 +4094,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	s.nCLSwitches &= CLSW_OPEN | CLSW_PLAY | CLSW_AFTERPLAYBACK_MASK | CLSW_NOFOCUS;
 	s.ResetPositions();
 
-	if (s.fShowOSD) {
+	if (s.iShowOSD & OSD_ENABLE) {
 		m_OSD.Start(m_pOSDWnd);
 	}
 
@@ -6679,7 +6679,7 @@ CString CMainFrame::GetSystemLocalTime()
 void CMainFrame::OnUpdateViewOSDLocalTime(CCmdUI* pCmdUI)
 {
 	AppSettings& s = AfxGetAppSettings();
-	pCmdUI->Enable(s.fShowOSD && (m_eMediaLoadState != MLS_CLOSED));
+	pCmdUI->Enable((s.iShowOSD & OSD_ENABLE) && m_eMediaLoadState != MLS_CLOSED);
 	pCmdUI->SetCheck (m_bOSDLocalTime);
 }
 
@@ -6697,7 +6697,7 @@ void CMainFrame::OnViewOSDLocalTime()
 void CMainFrame::OnUpdateViewOSDFileName(CCmdUI* pCmdUI)
 {
 	AppSettings& s = AfxGetAppSettings();
-	pCmdUI->Enable(s.fShowOSD && (m_eMediaLoadState != MLS_CLOSED));
+	pCmdUI->Enable((s.iShowOSD & OSD_ENABLE) && m_eMediaLoadState != MLS_CLOSED);
 	pCmdUI->SetCheck (m_bOSDFileName);
 }
 
@@ -7574,7 +7574,9 @@ void CMainFrame::OnPlayPlay()
 			strOSD.Delete(i, strOSD.GetLength() - i);
 		}
 	}
-	m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
+	if (AfxGetAppSettings().iShowOSD & OSD_FILENAME) {
+		m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
+	}
 }
 
 void CMainFrame::OnPlayPauseI()
@@ -10464,7 +10466,7 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 				SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[0].dmFSRes, s.strFullScreenMonitor);
 			}
 
-			if (s.fShowOSD) {
+			if (s.iShowOSD & OSD_ENABLE) {
 				m_OSD.Start(m_pOSDWnd);
 			}
 
@@ -10493,7 +10495,7 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 				m_pVMRWC->SetVideoClippingWindow(m_pVideoWnd->m_hWnd);
 			}
 
-			if (s.fShowOSD || s.fShowDebugInfo) {
+			if ((s.iShowOSD & OSD_ENABLE) || s.fShowDebugInfo) {
 				if (m_pVMB) {
 					m_OSD.Start(m_pVideoWnd, m_pVMB);
 				}
@@ -13506,7 +13508,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
-		if (s.fShowOSD || s.fShowDebugInfo) { // Force OSD on when the debug switch is used
+		if ((s.iShowOSD & OSD_ENABLE) || s.fShowDebugInfo) { // Force OSD on when the debug switch is used
 			m_OSD.Stop();
 
 			if (IsD3DFullScreenMode() && !m_bAudioOnly) {
@@ -15938,7 +15940,7 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 			rtPos = stop;
 		}
 		m_wndStatusBar.SetStatusTimer(rtPos, stop, !!m_wndSubresyncBar.IsWindowVisible(), GetTimeFormat());
-		if (bShowOSD) {
+		if (bShowOSD && (AfxGetAppSettings().iShowOSD & OSD_SEEKTIME)) {
 			m_OSD.DisplayMessage(OSD_TOPLEFT, m_wndStatusBar.GetStatusTimer(), 1500);
 		}
 	}

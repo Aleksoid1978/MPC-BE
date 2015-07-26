@@ -47,6 +47,8 @@ public:
 	BOOL m_bRememberPlaylistItems;
 	BOOL m_fTrayIcon;
 	BOOL m_fShowOSD;
+	BOOL m_fOSDFileName;
+	BOOL m_fOSDSeekTime;
 	BOOL m_fLimitWindowProportions;
 	BOOL m_fSnapToDesktopEdges;
 	BOOL m_fUseIni;
@@ -68,6 +70,7 @@ public:
 	afx_msg void OnUpdateTimeout(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateCheck13(CCmdUI* pCmdUI);
 	afx_msg void OnUpdatePos(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateOSD(CCmdUI* pCmdUI);
 	afx_msg void OnKillFocusEdit1();
 	afx_msg void OnChangeEdit1();
 };

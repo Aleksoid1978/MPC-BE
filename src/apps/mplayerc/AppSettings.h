@@ -83,6 +83,10 @@
 #define APP_AUDIOTIMESHIFT_MIN	(-10*60*1000) // -10 munutes
 #define APP_AUDIOTIMESHIFT_MAX	(10*60*1000)  // +10 munutes
 
+#define OSD_ENABLE		(1 << 0)
+#define OSD_FILENAME	(1 << 1)
+#define OSD_SEEKTIME	(1 << 2)
+
 enum {
 	MODE_SHOWCAPTIONMENU,
 	MODE_HIDEMENU,
@@ -578,7 +582,7 @@ public:
 	// Player
 	int				iMultipleInst;
 	bool			fTrayIcon;
-	bool			fShowOSD;
+	int				iShowOSD;
 	bool			fLimitWindowProportions;
 	bool			fSnapToDesktopEdges;
 	bool			fHideCDROMsSubMenu;

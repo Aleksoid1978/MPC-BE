@@ -365,7 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 42		"报告渲染失败的接口(pin)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
 5		"打开选项"
 6		"只播放一个文件"
 8		"为每个媒体文件使用相同的播放器"
@@ -387,11 +387,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 29		"其它"
 30		"托盘图标"
 31		"显示 OSD (需要重新启动播放器)"
-32		"缩放时遵循窗口长宽比"
-33		"吸附到桌面边缘"
-34		"保存设置到播放器所在文件夹"
-35		"隐藏打开光盘菜单"
-36		"高于普通进程优先级"
+32		"Show name of media file"
+33		"Show seek time"
+34		"缩放时遵循窗口长宽比"
+35		"吸附到桌面边缘"
+36		"保存设置到播放器所在文件夹"
+37		"隐藏打开光盘菜单"
+38		"高于普通进程优先级"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

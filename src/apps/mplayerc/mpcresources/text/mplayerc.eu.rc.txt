@@ -365,7 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 42		"Jakinarazi aurkezlean huts egiten duten pin-ak"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
 5		"Ireki aukerak"
 6		"Behartu prozesu bakarra"
 8		"Erabili prozesu berdina agiri guztientzat"
@@ -387,11 +387,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 29		"Beste"
 30		"Erretilu ikurra"
 31		"Erakutsi IGE (beharrezkoa berrabiaratzea)"
-32		"Mugatu leiho proportzioak birneurriratzean"
-33		"Finkatu mahaigain hertzetara"
-34		"Biltegiratu ezarpenak irakurgailuaren agiritegian"
-35		"Ezgaitu 'Ireki Diska' menua"
-36		"Ekinbide lehentasuna arruntetik gora"
+32		"Show name of media file"
+33		"Show seek time"
+34		"Mugatu leiho proportzioak birneurriratzean"
+35		"Finkatu mahaigain hertzetara"
+36		"Biltegiratu ezarpenak irakurgailuaren agiritegian"
+37		"Ezgaitu 'Ireki Diska' menua"
+38		"Ekinbide lehentasuna arruntetik gora"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

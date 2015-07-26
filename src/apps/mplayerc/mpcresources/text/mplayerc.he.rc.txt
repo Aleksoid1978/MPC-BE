@@ -365,7 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 42		"דווח על תקעים שלא מתנגנים"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
 5		"פתח הגדרות"
 6		"Force a single process"
 8		"Use same process for every file"
@@ -387,11 +387,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 29		"הגדרות נוספות"
 30		"אייקון ליד השעון"
 31		"תצוגת מידע בוידאו (דורש הפעלה מחדש)"
-32		"הגבל יחס חלון בזמן שינוי גודל"
-33		"הדבק לקצוות שולחן העבודה"
-34		"Store settings in the player folder"
-35		"Disable 'Open Disc' menu"
-36		"הנגן מקבל קדימות על פני תהליכים אחרים"
+32		"Show name of media file"
+33		"Show seek time"
+34		"הגבל יחס חלון בזמן שינוי גודל"
+35		"הדבק לקצוות שולחן העבודה"
+36		"Store settings in the player folder"
+37		"Disable 'Open Disc' menu"
+38		"הנגן מקבל קדימות על פני תהליכים אחרים"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

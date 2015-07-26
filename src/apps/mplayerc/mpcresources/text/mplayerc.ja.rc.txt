@@ -365,7 +365,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 42		"再生に失敗したピンを報告する"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
 5		"開くオプション"
 6		"多重起動禁止"
 8		"ウィンドウを再利用"
@@ -387,11 +387,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 37
 29		"その他"
 30		"タスクトレイ アイコン"
 31		"OSD を表示"
-32		"リサイズ時にウィンドウ サイズのアスペクト比を固定"
-33		"デスクトップの端にスナップさせる"
-34		"MPC-BE のフォルダー内に設定を保存"
-35		"[ディスクを開く] のメニューを無効化"
-36		"プロセスの優先度を 通常以上 にする"
+32		"Show name of media file"
+33		"Show seek time"
+34		"リサイズ時にウィンドウ サイズのアスペクト比を固定"
+35		"デスクトップの端にスナップさせる"
+36		"MPC-BE のフォルダー内に設定を保存"
+37		"[ディスクを開く] のメニューを無効化"
+38		"プロセスの優先度を 通常以上 にする"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
