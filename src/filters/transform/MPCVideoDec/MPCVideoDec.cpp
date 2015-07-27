@@ -1114,7 +1114,7 @@ void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 	}
 }
 
-REFERENCE_TIME CMPCVideoDecFilter::GetDuration()
+REFERENCE_TIME CMPCVideoDecFilter::GetFrameDuration()
 {
 	REFERENCE_TIME AvgTimePerFrame = m_rtAvrTimePerFrame;
 	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_MPEG1VIDEO) {
@@ -1128,7 +1128,7 @@ REFERENCE_TIME CMPCVideoDecFilter::GetDuration()
 
 void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
-	const REFERENCE_TIME AvgTimePerFrame = GetDuration();
+	const REFERENCE_TIME AvgTimePerFrame = GetFrameDuration();
 
 	if (rtStart == INVALID_TIME || (m_bCorrectPTS && rtStart > 0 && rtStart < m_rtLastStart)) {
 		rtStart = m_rtLastStop;
@@ -1864,7 +1864,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			}
 		} else if (m_nDecoderMode == MODE_DXVA1) {
 			if (IsDXVASupported()) {
-				ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, true, GetDuration(), PictWidth(), PictHeight());
+				ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, true, GetFrameDuration(), NULL, PictWidth(), PictHeight());
 				if (m_pDXVADecoder) {
 					(static_cast<CDXVA1Decoder*>(m_pDXVADecoder))->ConfigureDXVA1();
 				}
@@ -2313,6 +2313,107 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 	m_bInterlaced = m_pFrame->interlaced_frame;
 }
 
+// from LAVVideo
+DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *ctx, AVFrame *frame)
+{
+	DXVA2_ExtendedFormat fmt = { 0 };
+
+	// Color Primaries
+	switch(ctx->color_primaries) {
+		case AVCOL_PRI_BT709:
+			fmt.VideoPrimaries = DXVA2_VideoPrimaries_BT709;
+			break;
+		case AVCOL_PRI_BT470M:
+			fmt.VideoPrimaries = DXVA2_VideoPrimaries_BT470_2_SysM;
+			break;
+		case AVCOL_PRI_BT470BG:
+			fmt.VideoPrimaries = DXVA2_VideoPrimaries_BT470_2_SysBG;
+			break;
+		case AVCOL_PRI_SMPTE170M:
+			fmt.VideoPrimaries = DXVA2_VideoPrimaries_SMPTE170M;
+			break;
+		case AVCOL_PRI_SMPTE240M:
+			fmt.VideoPrimaries = DXVA2_VideoPrimaries_SMPTE240M;
+			break;
+		case AVCOL_PRI_BT2020:
+			fmt.VideoPrimaries = (DXVA2_VideoPrimaries)9;
+			break;
+	}
+
+	// Color Space / Transfer Matrix
+	switch (ctx->colorspace) {
+		case AVCOL_SPC_BT709:
+			fmt.VideoTransferMatrix = DXVA2_VideoTransferMatrix_BT709;
+			break;
+		case AVCOL_SPC_FCC:
+		case AVCOL_SPC_BT470BG:
+		case AVCOL_SPC_SMPTE170M:
+			fmt.VideoTransferMatrix = DXVA2_VideoTransferMatrix_BT601;
+			break;
+		case AVCOL_SPC_SMPTE240M:
+			fmt.VideoTransferMatrix = DXVA2_VideoTransferMatrix_SMPTE240M;
+			break;
+		// Custom values, not official standard, but understood by madVR
+		case AVCOL_SPC_BT2020_CL:
+		case AVCOL_SPC_BT2020_NCL:
+			fmt.VideoTransferMatrix = (DXVA2_VideoTransferMatrix)4;
+			break;
+		case AVCOL_SPC_YCGCO:
+			fmt.VideoTransferMatrix = (DXVA2_VideoTransferMatrix)7;
+			break;
+	}
+
+	// Color Transfer Function
+	switch(ctx->color_trc) {
+		case AVCOL_TRC_BT709:
+		case AVCOL_TRC_SMPTE170M:
+		case AVCOL_TRC_BT2020_10:
+		case AVCOL_TRC_BT2020_12:
+			fmt.VideoTransferFunction = DXVA2_VideoTransFunc_709;
+			break;
+		case AVCOL_TRC_GAMMA22:
+			fmt.VideoTransferFunction = DXVA2_VideoTransFunc_22;
+			break;
+		case AVCOL_TRC_GAMMA28:
+			fmt.VideoTransferFunction = DXVA2_VideoTransFunc_28;
+			break;
+		case AVCOL_TRC_SMPTE240M:
+			fmt.VideoTransferFunction = DXVA2_VideoTransFunc_240M;
+			break;
+		case AVCOL_TRC_LOG:
+			fmt.VideoTransferFunction = MFVideoTransFunc_Log_100;
+			break;
+		case AVCOL_TRC_LOG_SQRT:
+			fmt.VideoTransferFunction = MFVideoTransFunc_Log_316;
+			break;
+	}
+
+	if (frame->format == AV_PIX_FMT_XYZ12LE || frame->format == AV_PIX_FMT_XYZ12BE) {
+		fmt.VideoPrimaries = DXVA2_VideoPrimaries_BT709;
+	}
+
+	// Chroma location
+	switch(ctx->chroma_sample_location) {
+		case AVCHROMA_LOC_LEFT:
+			fmt.VideoChromaSubsampling = DXVA2_VideoChromaSubsampling_MPEG2;
+			break;
+		case AVCHROMA_LOC_CENTER:
+			fmt.VideoChromaSubsampling = DXVA2_VideoChromaSubsampling_MPEG1;
+			break;
+		case AVCHROMA_LOC_TOPLEFT:
+			fmt.VideoChromaSubsampling = DXVA2_VideoChromaSubsampling_DV_PAL;
+			break;
+	}
+
+	// Color Range, 0-255 or 16-235
+	BOOL ffFullRange = (ctx->color_range == AVCOL_RANGE_JPEG)
+					   || frame->format == AV_PIX_FMT_YUVJ420P || frame->format == AV_PIX_FMT_YUVJ422P || frame->format == AV_PIX_FMT_YUVJ444P
+					   || frame->format == AV_PIX_FMT_YUVJ440P || frame->format == AV_PIX_FMT_YUVJ411P;
+	fmt.NominalRange = ffFullRange ? DXVA2_NominalRange_0_255 : (ctx->color_range == AVCOL_RANGE_MPEG) ? DXVA2_NominalRange_16_235 : DXVA2_NominalRange_Unknown;
+
+	return fmt;
+}
+
 #define Continue av_frame_unref(m_pFrame); continue;
 HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn)
 {
@@ -2529,7 +2630,8 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 		CComPtr<IMediaSample> pOut;
 		BYTE* pDataOut = NULL;
-		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut, GetDuration())) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
+		DXVA2_ExtendedFormat dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
+		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut, GetFrameDuration(), &dxvaExtFormat)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
 			Continue;
 		}
 
@@ -2690,7 +2792,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 			CheckPointer(m_pDXVADecoder, E_UNEXPECTED);
 
 			// stupid DXVA1 - size for the output MediaType should be the same that size of DXVA surface
-			if (m_nDecoderMode == MODE_DXVA1 && ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, false, GetDuration(), PictWidth(), PictHeight()) == S_OK) {
+			if (m_nDecoderMode == MODE_DXVA1 && ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, false, GetFrameDuration(), NULL, PictWidth(), PictHeight()) == S_OK) {
 				(static_cast<CDXVA1Decoder*>(m_pDXVADecoder))->ConfigureDXVA1();
 			}
 	}

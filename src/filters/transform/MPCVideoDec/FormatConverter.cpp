@@ -248,8 +248,11 @@ void  CFormatConverter::UpdateDetails()
 			const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
 			if (pfdesc && m_out_pixfmt == PixFmt_RGB32 && !(av_pix_fmt_desc_get(m_FProps.avpixfmt)->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL))) {
 				dstRange = m_dstRGBRange;
+			} else if (m_FProps.colorrange == AVCOL_RANGE_JPEG) {
+				srcRange = dstRange = 1;
 			}
-			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, dstRange, brightness, contrast, saturation);
+			
+ 			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, dstRange, brightness, contrast, saturation);
 		}
 	}
 }

@@ -281,10 +281,16 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 		}
 	}
 
+	DXVA2_ExtendedFormat dxvaExtFormat = { 0 };
+	if (mt.formattype == FORMAT_VideoInfo2) {
+		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.Format();
+		dxvaExtFormat.value = vih2->dwControlFlags;
+	}
+
 	SubPicDesc spd = m_spd;
 	CComPtr<IMediaSample> pOut;
 	BYTE* pDataOut = NULL;
-	if (FAILED(hr = GetDeliveryBuffer(spd.w, spd.h, &pOut))
+	if (FAILED(hr = GetDeliveryBuffer(spd.w, spd.h, &pOut, 0, &dxvaExtFormat))
 			|| FAILED(hr = pOut->GetPointer(&pDataOut))) {
 		SetEvent(m_hEvtTransform);
 		return hr;

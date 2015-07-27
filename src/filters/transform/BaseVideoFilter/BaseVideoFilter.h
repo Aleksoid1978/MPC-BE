@@ -21,6 +21,9 @@
 
 #pragma once
 
+#include <dx/d3dx9.h>
+#include <Dxva2api.h>
+
 bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* dstUV, int dstPitch, BYTE* srcY, BYTE* srcUV, int srcPitch);
 
 struct VIDEO_OUTPUT_FORMATS {
@@ -55,6 +58,8 @@ private:
 
 	long m_cBuffers;
 
+	CLSID m_RenderClsid;
+
 protected:
 	CCritSec m_csReceive;
 
@@ -62,7 +67,7 @@ protected:
 
 	DECODER_MODE m_nDecoderMode;
 
-	HRESULT GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame = 0);
+	HRESULT GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFormat = NULL);
 	HRESULT CopyBuffer(BYTE* pOut, BYTE* pIn, int w, int h, int pitchIn, const GUID& subtype, bool fInterlaced = false);
 	HRESULT CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int pitchIn, const GUID& subtype, bool fInterlaced = false);
 
@@ -71,11 +76,13 @@ protected:
 	virtual bool IsVideoInterlaced() { return true; }
 	virtual void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats) PURE;
 
+	bool ConnectionWhitelistedForExtendedFormat(CLSID clsid);
+
 public:
 	CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, REFCLSID clsid, long cBuffers = 1);
 	virtual ~CBaseVideoFilter();
 
-	HRESULT ReconnectOutput(int w, int h, bool bSendSample = true, bool bForce = false, REFERENCE_TIME AvgTimePerFrame = 0, int RealWidth = -1, int RealHeight = -1);
+	HRESULT ReconnectOutput(int w, int h, bool bSendSample = true, bool bForce = false, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFlags = NULL, int RealWidth = -1, int RealHeight = -1);
 	int GetPinCount();
 	CBasePin* GetPin(int n);
 

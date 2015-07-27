@@ -182,7 +182,7 @@ public:
 	virtual void			GetOutputSize(int& w, int& h, int& arx, int& ary, int& RealWidth, int& RealHeight);
 	CTransformOutputPin*	GetOutputPin() { return m_pOutput; };
 
-	REFERENCE_TIME	GetDuration();
+	REFERENCE_TIME	GetFrameDuration();
 	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	void			GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	bool			IsAVI();
@@ -250,6 +250,8 @@ public:
 	int							PictHeight();
 	int							PictWidthRounded();
 	int							PictHeightRounded();
+
+	DXVA2_ExtendedFormat		GetDXVA2ExtendedFormat(AVCodecContext *ctx, AVFrame *frame);
 
 	inline bool					UseDXVA2()			const { return (m_nDecoderMode == MODE_DXVA2); };
 	inline AVCodecContext*		GetAVCtx()			const { return m_pAVCtx; };
