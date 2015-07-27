@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include <mmintrin.h>
 #include <memory.h>
+#include <mfapi.h>
 #include "BaseVideoFilter.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../MPCVideoDec/memcpy_sse.h"
@@ -58,6 +59,7 @@ CBaseVideoFilter::CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, 
 	, m_cBuffers(cBuffers)
 	, m_bSendMediaType(false)
 	, m_nDecoderMode(MODE_SOFTWARE)
+	, m_RenderClsid(CLSID_NULL)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -146,13 +148,13 @@ HRESULT CBaseVideoFilter::Receive(IMediaSample* pIn)
 	return S_OK;
 }
 
-HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame)
+HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame, DXVA2_ExtendedFormat* dxvaExtFlags)
 {
 	CheckPointer(ppOut, E_POINTER);
 
 	HRESULT hr;
 
-	if (FAILED(hr = ReconnectOutput(w, h, true, false, AvgTimePerFrame))) {
+	if (FAILED(hr = ReconnectOutput(w, h, true, false, AvgTimePerFrame, dxvaExtFlags))) {
 		return hr;
 	}
 
@@ -179,9 +181,45 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, 
 	return S_OK;
 }
 
-HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool bForce, REFERENCE_TIME AvgTimePerFrame, int RealWidth, int RealHeight)
+// Checks if the filter connected to the output pin possibly works with
+// extended format control flags. Returns true if it is the case,
+// false otherwise.
+bool CBaseVideoFilter::ConnectionWhitelistedForExtendedFormat(CLSID clsid)
+{
+	bool ret = false;
+
+	// The white list
+	static const CLSID whitelist[] = {
+		CLSID_VideoMixingRenderer,
+		CLSID_VideoMixingRenderer9,
+		CLSID_EnhancedVideoRenderer,
+		CLSID_madVR
+	};
+
+	// Check if the CLSID matches to anything on the white list
+	for (int i = 0; i < _countof(whitelist); ++i) {
+		if (clsid == whitelist[i]) {
+			ret = true;
+			break;
+		}
+	}
+
+	return ret;
+}
+
+HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool bForce, REFERENCE_TIME AvgTimePerFrame, DXVA2_ExtendedFormat* dxvaExtFormat, int RealWidth, int RealHeight)
 {
 	CMediaType& mt = m_pOutput->CurrentMediaType();
+
+	if (m_RenderClsid == CLSID_NULL) {
+		CComPtr<IPin> pPin = m_pOutput;
+		CComPtr<IPin> pPinRenderer;
+		for (CComPtr<IBaseFilter> pBF = this; pBF = GetDownStreamFilter(pBF, pPin); pPin = GetFirstPin(pBF, PINDIR_OUTPUT)) {
+			m_RenderClsid = GetCLSID(pBF);
+		}
+	}
+
+	bool extformatsupport = ConnectionWhitelistedForExtendedFormat(m_RenderClsid);
 
 	bool bNeedReconnect = bForce;
 	{
@@ -217,8 +255,37 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		bNeedReconnect = true;
 	}
 
+	if (extformatsupport && dxvaExtFormat && mt.formattype == FORMAT_VideoInfo2) {
+		// from LAVVideo
+
+		// HACK: 1280 is the value when only chroma location is set to MPEG2, do not bother to send this information, as its the same for basically every clip
+		if ((dxvaExtFormat->value & ~0xff) != 0 && (dxvaExtFormat->value & ~0xff) != 1280) {
+			dxvaExtFormat->SampleFormat = AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT;
+		} else {
+			dxvaExtFormat->value = 0;
+		}
+
+		if (dxvaExtFormat->value != 0 && m_RenderClsid != CLSID_madVR) {
+			// Remove custom matrix settings, which are not understood upstream
+			if (dxvaExtFormat->VideoTransferMatrix > DXVA2_VideoTransferMatrix_SMPTE240M) {
+				dxvaExtFormat->VideoTransferMatrix = DXVA2_VideoTransferMatrix_Unknown;
+			}
+			if (dxvaExtFormat->VideoPrimaries > DXVA2_VideoPrimaries_SMPTE_C) {
+				dxvaExtFormat->VideoPrimaries = DXVA2_VideoPrimaries_Unknown;
+			}
+			if (dxvaExtFormat->VideoTransferFunction > MFVideoTransFunc_Log_316) {
+				dxvaExtFormat->VideoTransferFunction = DXVA2_VideoTransFunc_Unknown;
+			}
+		}
+
+		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.Format();
+		if (vih2->dwControlFlags != dxvaExtFormat->value) {
+			bNeedReconnect = true;
+		}
+	}
+
 	if (bNeedReconnect) {
-		CLSID clsid = GetCLSID(m_pOutput->GetConnected());
+		const CLSID clsid = GetCLSID(m_pOutput->GetConnected());
 		if (clsid == CLSID_VideoRenderer) {
 			NotifyEvent(EC_ERRORABORT, 0, 0);
 			return E_FAIL;
@@ -229,32 +296,39 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 
 		DbgLog((LOG_TRACE, 3, L"CBaseVideoFilter::ReconnectOutput() : Performing reconnect"));
 		if (m_w != vih_rect.Width() || m_h != vih_rect.Height()) {
-			DbgLog((LOG_TRACE, 3, L"	SIZE : %d:%d => %d:%d(%d:%d)\n", m_wout, m_hout, m_w, m_h, vih_rect.Width(), vih_rect.Height()));
+			DbgLog((LOG_TRACE, 3, L"	=> SIZE  : %d:%d => %d:%d(%d:%d)", m_wout, m_hout, m_w, m_h, vih_rect.Width(), vih_rect.Height()));
 		} else {
-			DbgLog((LOG_TRACE, 3, L"	SIZE : %d:%d => %d:%d\n", m_wout, m_hout, vih_rect.Width(), vih_rect.Height()));
+			DbgLog((LOG_TRACE, 3, L"	=> SIZE  : %d:%d => %d:%d", m_wout, m_hout, vih_rect.Width(), vih_rect.Height()));
 		}
 		{
-			DbgLog((LOG_TRACE, 3, L"	AR   : %d:%d => %d:%d\n", m_arxout, m_aryout, m_arx, m_ary));
-			DbgLog((LOG_TRACE, 3, L"	FPS  : %I64d => %I64d\n", nAvgTimePerFrame, AvgTimePerFrame));
+			DbgLog((LOG_TRACE, 3, L"	=> AR    : %d:%d => %d:%d", m_arxout, m_aryout, m_arx, m_ary));
+			DbgLog((LOG_TRACE, 3, L"	=> FPS   : %I64d => %I64d", nAvgTimePerFrame, AvgTimePerFrame));
 		}
 
 		BITMAPINFOHEADER* pBMI	= NULL;
 		if (mt.formattype == FORMAT_VideoInfo) {
-			VIDEOINFOHEADER* vih	= (VIDEOINFOHEADER*)mt.Format();
-			vih->rcSource			= vih->rcTarget = vih_rect;
-			vih->AvgTimePerFrame	= AvgTimePerFrame;
+			VIDEOINFOHEADER* vih		= (VIDEOINFOHEADER*)mt.Format();
+			vih->rcSource				= vih->rcTarget = vih_rect;
+			vih->AvgTimePerFrame		= AvgTimePerFrame;
 
-			pBMI					= &vih->bmiHeader;
-			pBMI->biXPelsPerMeter	= m_w * m_ary;
-			pBMI->biYPelsPerMeter	= m_h * m_arx;
+			pBMI						= &vih->bmiHeader;
+			pBMI->biXPelsPerMeter		= m_w * m_ary;
+			pBMI->biYPelsPerMeter		= m_h * m_arx;
 		} else if (mt.formattype == FORMAT_VideoInfo2) {
-			VIDEOINFOHEADER2* vih	= (VIDEOINFOHEADER2*)mt.Format();
-			vih->rcSource			= vih->rcTarget = vih_rect;
-			vih->AvgTimePerFrame	= AvgTimePerFrame;
-			vih->dwPictAspectRatioX	= m_arx;
-			vih->dwPictAspectRatioY	= m_ary;
+			VIDEOINFOHEADER2* vih2	= (VIDEOINFOHEADER2*)mt.Format();
 
-			pBMI					= &vih->bmiHeader;
+			DbgLog((LOG_TRACE, 3, L"	=> FLAGS : 0x%0.8x -> 0x%0.8x", vih2->dwControlFlags, (extformatsupport && dxvaExtFormat) ? dxvaExtFormat->value : vih2->dwControlFlags));
+
+			vih2->rcSource				= vih2->rcTarget = vih_rect;
+			vih2->AvgTimePerFrame		= AvgTimePerFrame;
+			vih2->dwPictAspectRatioX	= m_arx;
+			vih2->dwPictAspectRatioY	= m_ary;
+
+			if (extformatsupport && dxvaExtFormat) {
+				vih2->dwControlFlags	= dxvaExtFormat->value;
+			}
+
+			pBMI						= &vih2->bmiHeader;
 		} else {
 			return E_FAIL;	//should never be here? prevent null pointer refs for bmi
 		}

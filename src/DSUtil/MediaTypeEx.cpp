@@ -605,6 +605,22 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 			sl.AddTail(str);
 			str.Format(_T("dwControlFlags: 0x%08x"), vih2.dwControlFlags);
 			sl.AddTail(str);
+			if (vih2.dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
+				DXVA2_ExtendedFormat dxvaExtFormat = { 0 };
+				dxvaExtFormat.value = vih2.dwControlFlags;
+				str.Format(_T("  => VideoChromaSubsampling: %u"), dxvaExtFormat.VideoChromaSubsampling);
+				sl.AddTail(str);
+				str.Format(_T("  => NominalRange:           %u"), dxvaExtFormat.NominalRange);
+				sl.AddTail(str);
+				str.Format(_T("  => VideoTransferMatrix:    %u"), dxvaExtFormat.VideoTransferMatrix);
+				sl.AddTail(str);
+				str.Format(_T("  => VideoLighting:          %u"), dxvaExtFormat.VideoLighting);
+				sl.AddTail(str);
+				str.Format(_T("  => VideoPrimaries:         %u"), dxvaExtFormat.VideoPrimaries);
+				sl.AddTail(str);
+				str.Format(_T("  => VideoTransferFunction:  %u"), dxvaExtFormat.VideoTransferFunction);
+				sl.AddTail(str);
+			}
 			str.Format(_T("dwReserved2: 0x%08x"), vih2.dwReserved2);
 			sl.AddTail(str);
 

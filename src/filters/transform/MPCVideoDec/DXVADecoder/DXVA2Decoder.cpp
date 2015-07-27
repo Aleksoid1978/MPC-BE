@@ -186,7 +186,9 @@ HRESULT CDXVA2Decoder::DeliverDXVAFrame()
 		return S_OK;
 	}
 
-	m_pFilter->ReconnectOutput(m_pFilter->PictWidth(), m_pFilter->PictHeight(), true, false, m_pFilter->GetDuration());
+	DXVA2_ExtendedFormat dxvaExtFormat = m_pFilter->GetDXVA2ExtendedFormat(m_pFilter->GetAVCtx(), pFrame);
+
+	m_pFilter->ReconnectOutput(m_pFilter->PictWidth(), m_pFilter->PictHeight(), true, false, m_pFilter->GetFrameDuration(), &dxvaExtFormat);
 
 	m_pFilter->SetTypeSpecificFlags(pSample);
 	pSample->SetTime(&rtStart, &rtStop);
