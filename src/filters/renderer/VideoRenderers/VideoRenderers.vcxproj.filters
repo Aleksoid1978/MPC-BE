@@ -77,9 +77,6 @@
     <ClCompile Include="CPUUsage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FocusThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllocatorCommon.h">
@@ -152,9 +149,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CPUUsage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FocusThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -54,6 +54,8 @@ LRESULT CFullscreenWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_COMMAND :
 			m_pMainFrame->PostMessage(message, wParam, lParam);
 			break;
+		case WM_NCACTIVATE :
+			return 0;
 	}
 
 	return CWnd::WindowProc(message, wParam, lParam);
@@ -96,7 +98,7 @@ BOOL CFullscreenWnd::PreCreateWindow(CREATESTRUCT& cs)
 	}
 
 	cs.style &= ~WS_BORDER;
-	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS,
+	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_NOCLOSE,
 									   m_hCursor, HBRUSH(COLOR_WINDOW + 1));
 
 	return TRUE;
@@ -194,5 +196,5 @@ void CFullscreenWnd::SetCursor(LPCWSTR lpCursorName)
 
 bool CFullscreenWnd::IsWindow() const
 {
-	return (m_hWnd != NULL);
+	return !!m_hWnd;
 }
