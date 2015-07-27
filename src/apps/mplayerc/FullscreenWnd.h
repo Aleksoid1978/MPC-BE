@@ -38,9 +38,9 @@ public:
 protected:
 	DECLARE_MESSAGE_MAP()
 
-	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	BOOL PreCreateWindow(CREATESTRUCT& cs);
+	BOOL PreTranslateMessage(MSG* pMsg);
+	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 
 	CMainFrame*	m_pMainFrame;
 	HCURSOR		m_hCursor;

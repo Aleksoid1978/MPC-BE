@@ -172,7 +172,6 @@ namespace GothSync
 		bool SettingsNeedResetDevice();
 		void SendResetRequest();
 		virtual HRESULT CreateDXDevice(CString &_Error);
-		virtual HRESULT ResetDXDevice(CString &_Error);
 		virtual HRESULT AllocSurfaces(D3DFORMAT Format = D3DFMT_A8R8G8B8);
 		virtual void DeleteSurfaces();
 
@@ -328,7 +327,6 @@ namespace GothSync
 		void EstimateRefreshTimings(); // Estimate the times for one scan line and one frame respectively from the actual refresh data
 		bool ExtractInterlaced(const AM_MEDIA_TYPE* pmt);
 
-		CFocusThread* m_FocusThread;
 	public:
 		CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);
 		~CBaseAP();

@@ -2651,13 +2651,12 @@ bool CMainFrame::GraphEventComplete()
 				NextMediaExist = SearchInDir(true);
 			}
 			if (!s.fNextInDirAfterPlayback || !(NextMediaExist > 1)) {
+				m_bEndOfStream = true;
 				if (s.fRewind) {
 					SendMessage(WM_COMMAND, ID_PLAY_STOP);
 				} else {
-					m_bEndOfStream = true;
 					SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 				}
-				m_OSD.ClearMessage();
 
 				if ((m_bFullScreen || IsD3DFullScreenMode()) && s.fExitFullScreenAtTheEnd) {
 					OnViewFullscreen();
@@ -2682,15 +2681,15 @@ bool CMainFrame::GraphEventComplete()
 			SendMessage(WM_COMMAND, ID_NAVIGATE_SKIPFORWARD);
 			m_nLoops = nLoops;
 		} else {
-			if (m_bFullScreen && s.fExitFullScreenAtTheEnd) {
-				OnViewFullscreen();
-			}
-
+			m_bEndOfStream = true;
 			if (s.fRewind) {
 				SendMessage(WM_COMMAND, ID_PLAY_STOP);
 			} else {
-				m_bEndOfStream = true;
-				PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
+				SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
+			}
+
+			if ((m_bFullScreen || IsD3DFullScreenMode()) && s.fExitFullScreenAtTheEnd) {
+				OnViewFullscreen();
 			}
 		}
 	}
@@ -7600,13 +7599,16 @@ void CMainFrame::OnPlayPauseI()
 		SetAlwaysOnTop(AfxGetAppSettings().iOnTop);
 	}
 
-	CString strOSD = ResStr(ID_PLAY_PAUSE);
-	int i = strOSD.Find(_T("\n"));
-	if (i > 0) {
-		strOSD.Delete(i, strOSD.GetLength() - i);
+	if (!m_bEndOfStream) {
+		CString strOSD = ResStr(ID_PLAY_PAUSE);
+		int i = strOSD.Find(_T("\n"));
+		if (i > 0) {
+			strOSD.Delete(i, strOSD.GetLength() - i);
+		}
+		m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
+		m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_PAUSED), 3000);
 	}
-	m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
-	m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_PAUSED), 3000);
+	m_bEndOfStream = false;	
 
 	SetPlayState(PS_PAUSE);
 }
@@ -7705,9 +7707,8 @@ void CMainFrame::OnPlayStop()
 		}
 		m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
 		m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_STOPPED), 3000);
-	} else {
-		m_bEndOfStream = false;
 	}
+	m_bEndOfStream = false;
 
 	SetPlayState(PS_STOP);
 }

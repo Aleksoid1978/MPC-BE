@@ -32,8 +32,6 @@
 extern bool g_bNoDuration;
 extern bool g_bExternalSubtitleTime;
 
-class CFocusThread;
-
 namespace DSObjects
 {
 
@@ -109,6 +107,9 @@ namespace DSObjects
 		virtual HRESULT CreateDevice(CString &_Error);
 		virtual HRESULT AllocSurfaces();
 		virtual void DeleteSurfaces();
+
+		HRESULT ResetD3D9Device();
+		HRESULT InitializeISR(CString &_Error);
 
 		LONGLONG m_LastAdapterCheck;
 		UINT GetAdapter(IDirect3D9 *pD3D);
@@ -295,12 +296,10 @@ namespace DSObjects
 
 		CRect					m_rcMonitor;
 
-		D3DPRESENT_PARAMETERS	m_pp;
+		D3DPRESENT_PARAMETERS	m_d3dpp;
 
 		CCPUUsage				m_CPUUsage;
 		CGPUUsage				m_GPUUsage;
-
-		CFocusThread*			m_FocusThread;
 
 	public:
 		CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error);
