@@ -59,7 +59,9 @@ BOOL CAboutDlg::OnInitDialog()
 		#error Compiler is not supported!
 #endif
 #elif defined(_MSC_VER)
-#if (_MSC_VER == 1800)		// 2013
+#if (_MSC_VER == 1900)		// 2015
+	m_MPCCompiler = _T("MSVC 2015");
+#elif (_MSC_VER == 1800)	// 2013
 	#if (_MSC_FULL_VER == 180040629)
 		m_MPCCompiler = _T("MSVC 2013.5");
 	#elif (_MSC_FULL_VER == 180031101)
@@ -71,35 +73,7 @@ BOOL CAboutDlg::OnInitDialog()
 	#else
 		m_MPCCompiler = _T("MSVC 2013");
 	#endif
-#elif (_MSC_VER == 1700)	// 2012
-	#if (_MSC_FULL_VER == 170061030)
-		m_MPCCompiler = _T("MSVC 2012.4");
-	#elif (_MSC_FULL_VER == 170060930)
-		m_MPCCompiler = _T("MSVC 2012.4 RC4");
-	#elif (_MSC_FULL_VER == 170060830)
-		m_MPCCompiler = _T("MSVC 2012.4 RC3");
-	#elif (_MSC_FULL_VER == 170060610)
-		m_MPCCompiler = _T("MSVC 2012.3");
-	#elif (_MSC_FULL_VER == 170060521)
-		m_MPCCompiler = _T("MSVC 2012.3 RC2");
-	#elif (_MSC_FULL_VER == 170060430)
-		m_MPCCompiler = _T("MSVC 2012.3 RC1");
-	#elif (_MSC_FULL_VER == 170060315)
-		m_MPCCompiler = _T("MSVC 2012.2");
-	#elif (_MSC_FULL_VER == 170051106)
-		m_MPCCompiler = _T("MSVC 2012.1");
-	#elif (_MSC_FULL_VER < 170050727)
-		m_MPCCompiler = _T("MSVC 2012 Beta/RC/PR");
-	#else
-		m_MPCCompiler = _T("MSVC 2012");
-	#endif
-#elif (_MSC_VER == 1600)	// 2010
-	#if (_MSC_FULL_VER >= 160040219)
-		m_MPCCompiler = _T("MSVC 2010 SP1");
-	#else
-		m_MPCCompiler = _T("MSVC 2010");
-	#endif
-#elif (_MSC_VER < 1600)
+#elif (_MSC_VER < 1800)
 	#error Compiler is not supported!
 #endif
 #else

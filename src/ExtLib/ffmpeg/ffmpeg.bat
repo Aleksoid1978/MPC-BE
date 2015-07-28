@@ -46,6 +46,7 @@ FOR %%A IN (%ARG%) DO (
 	IF /I "%%A" == "rebuild" SET "BUILDTYPE=rebuild"
 	IF /I "%%A" == "64" SET "BIT=64BIT=yes"
 	IF /I "%%A" == "Debug" SET "DEBUG=DEBUG=yes"
+	IF /I "%%A" == "VS2015" SET "VS=VS2015=yes"
 )
 
 IF /I "%BUILDTYPE%" == "rebuild" (
@@ -91,6 +92,12 @@ SET "TARGETFOLDER=%CONFIGBUILDS%_%ARCHBUILDS%"
 SET "VSCOMNTOOLS=%VS120COMNTOOLS%"
 SET "BINDIR=..\..\..\bin13"
 SET "VSNAME=Visual Studio 2013"
+
+IF /I "%VS%" == "VS2015=yes" (
+	SET "VSCOMNTOOLS=%VS140COMNTOOLS%"
+	SET "BINDIR=..\..\..\bin15"
+	SET "VSNAME=Visual Studio 2015"
+)
 
 IF "%BUILDTYPE%" NEQ "clean" (
   IF NOT DEFINED VSCOMNTOOLS (

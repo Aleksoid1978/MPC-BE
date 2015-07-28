@@ -15,6 +15,10 @@ else
 	MY_DIR_PREFIX = Release
 endif
 
+ifeq ($(VS2015),yes)
+	BIN_DIR  = ../../../bin15
+endif
+
 OBJ_DIR		= $(BIN_DIR)/obj/$(MY_DIR_PREFIX)_$(MY_ARCH)/ffmpeg/
 TARGET_LIB_DIR = $(BIN_DIR)/lib/$(MY_DIR_PREFIX)_$(MY_ARCH)
 LIB_LIBAVCODEC = $(OBJ_DIR)libavcodec.a
