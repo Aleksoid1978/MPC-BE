@@ -196,7 +196,6 @@ private:
 	HMODULE					m_hModule;
 	HANDLE					m_hTask;
 	WASAPI_MODE				m_WASAPIMode;
-	WASAPI_MODE				m_WASAPIModeAfterRestart;
 	CString					m_DeviceName;
 	IMMDevice				*m_pMMDevice;
 	IAudioClient			*m_pAudioClient;
