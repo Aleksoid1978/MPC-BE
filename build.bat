@@ -63,9 +63,8 @@ FOR %%A IN (%ARG%) DO (
   IF /I "%%A" == "Packages"   SET "PACKAGES=True"     & SET /A ARGPA+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Installer"  SET "INSTALLER=True"    & SET /A ARGIN+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Zip"        SET "ZIP=True"          & SET /A ARGZI+=1 & SET /A ARGCL+=1 & SET /A ARGM+=1
-  IF /I "%%A" == "VS2010"     SET "COMPILER=VS2010"   & SET /A ARGVS+=1
-  IF /I "%%A" == "VS2012"     SET "COMPILER=VS2012"   & SET /A ARGVS+=1
   IF /I "%%A" == "VS2013"     SET "COMPILER=VS2013"   & SET /A ARGVS+=1
+  IF /I "%%A" == "VS2015"     SET "COMPILER=VS2015"   & SET /A ARGVS+=1
   IF /I "%%A" == "Sign"       SET "SIGN=True"         & SET /A ARGSIGN+=1
 )
 
@@ -100,28 +99,21 @@ IF /I "%PACKAGES%" == "True" SET "INSTALLER=True" & SET "ZIP=True"
 IF /I "%COMPILER%" == "AUTODETECT" (
   IF DEFINED VS120COMNTOOLS (
     SET "COMPILER=VS2013"
-  ) ELSE IF DEFINED VS110COMNTOOLS (
-    SET "COMPILER=VS2012"
-  ) ELSE IF DEFINED VS100COMNTOOLS (
-    SET "COMPILER=VS2010"
+  ) ELSE IF DEFINED VS140COMNTOOLS (
+    SET "COMPILER=VS2015"
   ) ELSE GOTO MissingVar
 )
 
-IF /I "%COMPILER%" == "VS2013" (
+IF /I "%COMPILER%" == "VS2015" (
+  SET SLN=_2015
+  SET BUILD=VS2015
+  SET "VSCOMNTOOLS=%VS140COMNTOOLS%"
+  SET "BIN=bin15"
+) ELSE IF /I "%COMPILER%" == "VS2013" (
   SET SLN=_2013
   SET BUILD=VS2013
   SET "VSCOMNTOOLS=%VS120COMNTOOLS%"
   SET "BIN=bin13"
-) ELSE IF /I "%COMPILER%" == "VS2012" (
-  SET SLN=_2012
-  SET BUILD=VS2012
-  SET "VSCOMNTOOLS=%VS110COMNTOOLS%"
-  SET "BIN=bin12"
-) ELSE (
-  SET SLN=
-  SET BUILD=VS2010
-  SET "VSCOMNTOOLS=%VS100COMNTOOLS%"
-  SET "BIN=bin"
 )
 
 IF NOT DEFINED VSCOMNTOOLS GOTO MissingVar
@@ -139,13 +131,6 @@ SET "LOG_DIR=%BIN%\logs"
 IF NOT EXIST "%LOG_DIR%" MD "%LOG_DIR%"
 
 CALL :SubDetectWinArch
-
-IF DEFINED PROGRAMFILES(x86) (SET "PM=%PROGRAMFILES(x86)%") ELSE (SET "PM=%PROGRAMFILES%")
-IF "%BUILD%" == "VS2013" (
-  SET "MSBUILD=%PM%\MSBuild\12.0\Bin\MSBuild.exe"
-) ELSE (
-  SET "MSBUILD=%WINDIR%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
-)
 
 SET "MSBUILD_SWITCHES=/nologo /consoleloggerparameters:Verbosity=minimal /maxcpucount /nodeReuse:true"
 
@@ -218,7 +203,7 @@ EXIT /B
 TITLE Compiling MPC-BE Filters - %BUILDCFG% Filter^|%1...
 REM Call update_version.bat before building the filters
 CALL "update_version.bat"
-"%MSBUILD%" mpc-be.sln %MSBUILD_SWITCHES%^
+MSBuild.exe mpc-be.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration="%BUILDCFG% Filter";Platform=%1^
  /flp1:LogFile=%LOG_DIR%\filters_errors_%BUILDCFG%_%1.log;errorsonly;Verbosity=diagnostic^
  /flp2:LogFile=%LOG_DIR%\filters_warnings_%BUILDCFG%_%1.log;warningsonly;Verbosity=diagnostic
@@ -243,7 +228,7 @@ EXIT /B
 
 :SubMPCBE
 TITLE Compiling MPC-BE - %BUILDCFG%^|%1...
-"%MSBUILD%" mpc-be.sln %MSBUILD_SWITCHES%^
+MSBuild.exe mpc-be.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration=%BUILDCFG%;Platform=%1^
  /flp1:LogFile=%LOG_DIR%\mpc-be_errors_%BUILDCFG%_%1.log;errorsonly;Verbosity=diagnostic^
  /flp2:LogFile=%LOG_DIR%\mpc-be_warnings_%BUILDCFG%_%1.log;warningsonly;Verbosity=diagnostic
@@ -265,7 +250,7 @@ IF /I "%SIGN%" == "True" (
 )
 
 TITLE Compiling MPCBEShellExt - %BUILDCFG%...
-"%MSBUILD%" MPCBEShellExt.sln %MSBUILD_SWITCHES%^
+MSBuild.exe MPCBEShellExt.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration=%BUILDCFG%;Platform=Win32
 IF %ERRORLEVEL% NEQ 0 (
   CALL :SubMsg "ERROR" "MPCBEShellExt.sln %BUILDCFG% Win32 - Compilation failed!"
@@ -278,7 +263,7 @@ IF /I "%SIGN%" == "True" (
   CALL :SubSign %DIR% MPCBEShellExt.dll
 )
 
-"%MSBUILD%" MPCBEShellExt.sln %MSBUILD_SWITCHES%^
+MSBuild.exe MPCBEShellExt.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration=%BUILDCFG%;Platform=x64
 IF %ERRORLEVEL% NEQ 0 (
   CALL :SubMsg "ERROR" "MPCBEShellExt.sln %BUILDCFG% x64 - Compilation failed!"
@@ -305,7 +290,7 @@ FOR %%A IN ("Armenian" "Basque" "Belarusian" "Catalan" "Chinese Simplified"
  "Swedish" "Turkish" "Ukrainian"
 ) DO (
  TITLE Compiling mpcresources - %%~A^|%1...
- "%MSBUILD%" mpcresources.sln %MSBUILD_SWITCHES%^
+ MSBuild.exe mpcresources.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration="Release %%~A";Platform=%1
  IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
 )
@@ -510,7 +495,7 @@ EXIT /B
 TITLE %~nx0 Help
 ECHO.
 ECHO Usage:
-ECHO %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|Both] [Main^|Resources^|MPCBE^|Filters^|All] [Debug^|Release] [Packages^|Installer^|Zip] [VS2010^|VS2012^|VS2013] [Sign]
+ECHO %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|Both] [Main^|Resources^|MPCBE^|Filters^|All] [Debug^|Release] [Packages^|Installer^|Zip] [VS2013^|VS2015] [Sign]
 ECHO.
 ECHO Notes: You can also prefix the commands with "-", "--" or "/".
 ECHO        Debug only applies to mpc-be.sln.
@@ -520,14 +505,14 @@ ECHO Executing %~nx0 without any arguments will use the default ones:
 ECHO "%~nx0 Build Both Release"
 ECHO. & ECHO.
 ECHO Examples:
-ECHO %~nx0 x86 Resources VS2010 -Builds the x86 resources
-ECHO %~nx0 Resources VS2010     -Builds both x86 and x64 resources
-ECHO %~nx0 x86 VS2010           -Builds x86 Main exe and the x86 resources
-ECHO %~nx0 x86 Debug VS2010     -Builds x86 Main Debug exe and x86 resources
-ECHO %~nx0 x86 Filters VS2010   -Builds x86 Filters
-ECHO %~nx0 x86 All VS2010       -Builds x86 Main exe, x86 Filters and the x86 resources
-ECHO %~nx0 x86 Packages VS2010  -Builds x86 Main exe, x86 resources and creates the installer and the .7z package
-ECHO %~nx0 x86 VS2010 Sign      -Builds x86 Main exe and the x86 resources and signing output files
+ECHO %~nx0 x86 Resources VS2013 -Builds the x86 resources
+ECHO %~nx0 Resources VS2013     -Builds both x86 and x64 resources
+ECHO %~nx0 x86 VS2013           -Builds x86 Main exe and the x86 resources
+ECHO %~nx0 x86 Debug VS2013     -Builds x86 Main Debug exe and x86 resources
+ECHO %~nx0 x86 Filters VS2013   -Builds x86 Filters
+ECHO %~nx0 x86 All VS2013       -Builds x86 Main exe, x86 Filters and the x86 resources
+ECHO %~nx0 x86 Packages VS2013  -Builds x86 Main exe, x86 resources and creates the installer and the .7z package
+ECHO %~nx0 x86 VS2013 Sign      -Builds x86 Main exe and the x86 resources and signing output files
 ECHO.
 ENDLOCAL
 EXIT /B
