@@ -23,7 +23,7 @@
 
 #include "AllocatorCommon7.h"
 #include <ddraw.h>
-#include <dx/d3d.h>
+#include <dx/d3dx7.h>
 #include "../SubPic/SubPicAllocatorPresenterImpl.h"
 
 namespace DSObjects
