@@ -856,7 +856,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_AudRend)) {
-		key.SetDWORDValue(OPT_DeviceMode, (DWORD)m_WASAPIModeAfterRestart);
+		key.SetDWORDValue(OPT_DeviceMode, (DWORD)m_WASAPIMode);
 		key.SetStringValue(OPT_AudioDevice, m_DeviceName);
 		key.SetDWORDValue(OPT_UseBitExactOutput, m_bUseBitExactOutput);
 		key.SetDWORDValue(OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
