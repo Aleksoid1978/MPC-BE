@@ -24,6 +24,9 @@
 extern "C" {
 	// hack to avoid error "unresolved external symbol" when linking
 	void __mingw_raise_matherr(int typ, const char *name, double a1, double a2, double rslt) {}
+#if defined(_MSC_VER) & (_MSC_VER >= 1900) // 2015
+	unsigned int __cdecl _get_output_format(void) { return 1; }
+#endif
 }
 
 #ifdef REGISTER_FILTER

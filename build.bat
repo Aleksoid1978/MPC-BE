@@ -218,14 +218,14 @@ EXIT /B
 TITLE Compiling MPC-BE Filters - %BUILDCFG% Filter^|%1...
 REM Call update_version.bat before building the filters
 CALL "update_version.bat"
-"%MSBUILD%" mpc-be%SLN%.sln %MSBUILD_SWITCHES%^
+"%MSBUILD%" mpc-be.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration="%BUILDCFG% Filter";Platform=%1^
  /flp1:LogFile=%LOG_DIR%\filters_errors_%BUILDCFG%_%1.log;errorsonly;Verbosity=diagnostic^
  /flp2:LogFile=%LOG_DIR%\filters_warnings_%BUILDCFG%_%1.log;warningsonly;Verbosity=diagnostic
 IF %ERRORLEVEL% NEQ 0 (
-  CALL :SubMsg "ERROR" "mpc-be%SLN%.sln %BUILDCFG% Filter %1 - Compilation failed!"
+  CALL :SubMsg "ERROR" "mpc-be.sln %BUILDCFG% Filter %1 - Compilation failed!"
 ) ELSE (
-  CALL :SubMsg "INFO" "mpc-be%SLN%.sln %BUILDCFG% Filter %1 compiled successfully"
+  CALL :SubMsg "INFO" "mpc-be.sln %BUILDCFG% Filter %1 compiled successfully"
 )
 
 IF /I "%1" == "Win32" (
@@ -243,14 +243,14 @@ EXIT /B
 
 :SubMPCBE
 TITLE Compiling MPC-BE - %BUILDCFG%^|%1...
-"%MSBUILD%" mpc-be%SLN%.sln %MSBUILD_SWITCHES%^
+"%MSBUILD%" mpc-be.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration=%BUILDCFG%;Platform=%1^
  /flp1:LogFile=%LOG_DIR%\mpc-be_errors_%BUILDCFG%_%1.log;errorsonly;Verbosity=diagnostic^
  /flp2:LogFile=%LOG_DIR%\mpc-be_warnings_%BUILDCFG%_%1.log;warningsonly;Verbosity=diagnostic
 IF %ERRORLEVEL% NEQ 0 (
-  CALL :SubMsg "ERROR" "mpc-be%SLN%.sln %BUILDCFG% %1 - Compilation failed!"
+  CALL :SubMsg "ERROR" "mpc-be.sln %BUILDCFG% %1 - Compilation failed!"
 ) ELSE (
-  CALL :SubMsg "INFO" "mpc-be%SLN%.sln %BUILDCFG% %1 compiled successfully"
+  CALL :SubMsg "INFO" "mpc-be.sln %BUILDCFG% %1 compiled successfully"
 )
 
 IF /I "%1" == "Win32" (
@@ -265,12 +265,12 @@ IF /I "%SIGN%" == "True" (
 )
 
 TITLE Compiling MPCBEShellExt - %BUILDCFG%...
-"%MSBUILD%" MPCBEShellExt%SLN%.sln %MSBUILD_SWITCHES%^
+"%MSBUILD%" MPCBEShellExt.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration=%BUILDCFG%;Platform=Win32
 IF %ERRORLEVEL% NEQ 0 (
-  CALL :SubMsg "ERROR" "MPCBEShellExt%SLN%.sln %BUILDCFG% Win32 - Compilation failed!"
+  CALL :SubMsg "ERROR" "MPCBEShellExt.sln %BUILDCFG% Win32 - Compilation failed!"
 ) ELSE (
-  CALL :SubMsg "INFO" "MPCBEShellExt%SLN%.sln %BUILDCFG% Win32 compiled successfully"
+  CALL :SubMsg "INFO" "MPCBEShellExt.sln %BUILDCFG% Win32 compiled successfully"
 )
 
 SET "DIR=%BIN%\mpc-be_x86"
@@ -278,12 +278,12 @@ IF /I "%SIGN%" == "True" (
   CALL :SubSign %DIR% MPCBEShellExt.dll
 )
 
-"%MSBUILD%" MPCBEShellExt%SLN%.sln %MSBUILD_SWITCHES%^
+"%MSBUILD%" MPCBEShellExt.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration=%BUILDCFG%;Platform=x64
 IF %ERRORLEVEL% NEQ 0 (
-  CALL :SubMsg "ERROR" "MPCBEShellExt%SLN%.sln %BUILDCFG% x64 - Compilation failed!"
+  CALL :SubMsg "ERROR" "MPCBEShellExt.sln %BUILDCFG% x64 - Compilation failed!"
 ) ELSE (
-  CALL :SubMsg "INFO" "MPCBEShellExt%SLN%.sln %BUILDCFG% x64 compiled successfully"
+  CALL :SubMsg "INFO" "MPCBEShellExt.sln %BUILDCFG% x64 compiled successfully"
 )
 
 SET "DIR=%BIN%\mpc-be_x64"
@@ -305,7 +305,7 @@ FOR %%A IN ("Armenian" "Basque" "Belarusian" "Catalan" "Chinese Simplified"
  "Swedish" "Turkish" "Ukrainian"
 ) DO (
  TITLE Compiling mpcresources - %%~A^|%1...
- "%MSBUILD%" mpcresources%SLN%.sln %MSBUILD_SWITCHES%^
+ "%MSBUILD%" mpcresources.sln %MSBUILD_SWITCHES%^
  /target:%BUILDTYPE% /property:Configuration="Release %%~A";Platform=%1
  IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
 )
@@ -513,7 +513,7 @@ ECHO Usage:
 ECHO %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|Both] [Main^|Resources^|MPCBE^|Filters^|All] [Debug^|Release] [Packages^|Installer^|Zip] [VS2010^|VS2012^|VS2013] [Sign]
 ECHO.
 ECHO Notes: You can also prefix the commands with "-", "--" or "/".
-ECHO        Debug only applies to mpc-be%SLN%.sln.
+ECHO        Debug only applies to mpc-be.sln.
 ECHO        The arguments are not case sensitive and can be ommitted.
 ECHO. & ECHO.
 ECHO Executing %~nx0 without any arguments will use the default ones:

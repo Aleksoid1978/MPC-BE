@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Release Armenian|Win32">
       <Configuration>Release Armenian</Configuration>
@@ -326,6 +326,9 @@
     <OutDir Condition="'$(Platform)'=='Win32' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\mpc-be_x86\Lang\</OutDir>
     <OutDir Condition="'$(Platform)'=='x64' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\mpc-be_x64\Lang\</OutDir>
     <IntDir Condition="'$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\obj\$(Configuration)_$(PlatformName)\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Platform)'=='Win32' And '$(PlatformToolsetVersion)'=='140'">$(SolutionDir)bin15\mpc-be_x86\Lang\</OutDir>
+    <OutDir Condition="'$(Platform)'=='x64' And '$(PlatformToolsetVersion)'=='140'">$(SolutionDir)bin15\mpc-be_x64\Lang\</OutDir>
+    <IntDir Condition="'$(PlatformToolsetVersion)'=='140'">$(SolutionDir)bin15\obj\$(Configuration)_$(PlatformName)\$(ProjectName)\</IntDir>
     <TargetName Condition="'$(Configuration)'=='Release Armenian'">$(ProjectName).hy</TargetName>
     <TargetName Condition="'$(Configuration)'=='Release Basque'">$(ProjectName).eu</TargetName>
     <TargetName Condition="'$(Configuration)'=='Release Belarusian'">$(ProjectName).by</TargetName>

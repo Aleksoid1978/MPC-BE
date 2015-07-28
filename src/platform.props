@@ -1,7 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Configuration">
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='12.0' And '$(ANALYZE)'!='true'">v120_xp</PlatformToolset>
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='12.0' And '$(ANALYZE)'=='true'">v120</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)'=='14.0' And '$(ANALYZE)'!='true'">v140_xp</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)'=='14.0' And '$(ANALYZE)'=='true'">v140</PlatformToolset>
   </PropertyGroup>
 </Project>
