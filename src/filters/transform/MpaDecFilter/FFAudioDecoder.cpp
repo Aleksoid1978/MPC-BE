@@ -347,46 +347,45 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/*
 			bRet = true;
 		}
 
-		if (bRet && nCodecId == AV_CODEC_ID_FLAC && m_pAVCtx->extradata_size > 4) {
-			if (GETDWORD(m_pAVCtx->extradata) == FCC('fLaC') && m_pAVCtx->extradata_size > 34 + 8) {
-				BYTE metadata_last, metadata_type;
-				DWORD metadata_size;
-				CGolombBuffer gb(m_pAVCtx->extradata + 4, m_pAVCtx->extradata_size - 4);
+		if (bRet && nCodecId == AV_CODEC_ID_FLAC && m_pAVCtx->extradata_size > (4+4+34) && GETDWORD(m_pAVCtx->extradata) == FCC('fLaC')) {
+			BYTE metadata_last, metadata_type;
+			DWORD metadata_size;
+			CGolombBuffer gb(m_pAVCtx->extradata + 4, m_pAVCtx->extradata_size - 4);
 
-				while (flac_parse_block_header(gb, metadata_last, metadata_type, metadata_size)) {
-					if (metadata_type == FLAC_METADATA_TYPE_VORBIS_COMMENT) {
-						int vendor_length = gb.ReadDwordLE();
-						if (gb.RemainingSize() >= vendor_length) {
-							gb.SkipBytes(vendor_length);
-							int num_comments = gb.ReadDwordLE();
-							for (int i = 0; i < num_comments; i++) {
-								int comment_lenght = gb.ReadDwordLE();
-								if (comment_lenght > gb.RemainingSize()) {
-									break;
+			while (flac_parse_block_header(gb, metadata_last, metadata_type, metadata_size)) {
+				if (metadata_type == FLAC_METADATA_TYPE_VORBIS_COMMENT) {
+					int vendor_length = gb.ReadDwordLE();
+					if (gb.RemainingSize() >= vendor_length) {
+						gb.SkipBytes(vendor_length);
+						int num_comments = gb.ReadDwordLE();
+						for (int i = 0; i < num_comments; i++) {
+							int comment_lenght = gb.ReadDwordLE();
+							if (comment_lenght > gb.RemainingSize()) {
+								break;
+							}
+							BYTE* comment = DNew BYTE[comment_lenght + 1];
+							ZeroMemory(comment, comment_lenght + 1);
+							gb.ReadBuffer(comment, comment_lenght);
+							CString vorbisTag = AltUTF8To16((LPCSTR)comment);
+							delete [] comment;
+							CString tagValue;
+							if (!vorbisTag.IsEmpty() && ParseVorbisTag(L"WAVEFORMATEXTENSIBLE_CHANNEL_MASK", vorbisTag, tagValue)) {
+								uint64_t channel_layout = wcstol(tagValue, NULL, 0);
+								if (channel_layout && av_get_channel_layout_nb_channels(channel_layout) == m_pAVCtx->channels) {
+									m_pAVCtx->channel_layout = channel_layout;
 								}
-								BYTE* comment = DNew BYTE[comment_lenght + 1];
-								ZeroMemory(comment, comment_lenght + 1);
-								gb.ReadBuffer(comment, comment_lenght);
-								CString vorbisTag = AltUTF8To16((LPCSTR)comment);
-								delete [] comment;
-								CString tagValue;
-								if (!vorbisTag.IsEmpty() && ParseVorbisTag(L"WAVEFORMATEXTENSIBLE_CHANNEL_MASK", vorbisTag, tagValue)) {
-									uint64_t channel_layout = wcstol(tagValue, NULL, 0);
-									if (channel_layout && av_get_channel_layout_nb_channels(channel_layout) == m_pAVCtx->channels) {
-										m_pAVCtx->channel_layout = channel_layout;
-									}
-									break;
-								}
+								break;
 							}
 						}
-						break;
 					}
-					if (metadata_last) {
-						break;
-					}
-					gb.SkipBytes(metadata_size);
+					break;
 				}
+				if (metadata_last) {
+					break;
+				}
+				gb.SkipBytes(metadata_size);
 			}
+			
 		}
 	}
 
