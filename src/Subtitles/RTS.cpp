@@ -2671,14 +2671,14 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		}
 	}
 
-	if (m_ePARCompensationType == EPCTAccurateSize_ISR && m_dPARCompensation != 1.0) {
-		if (stss.fontAngleZ != 0) {
-			stss.fontScaleX *= 1.0 + abs((m_dPARCompensation - 1.0) * cos((M_PI / 180.0) * stss.fontAngleZ));
-			stss.fontScaleY *= 1.0 + abs((m_dPARCompensation - 1.0) * sin((M_PI / 180.0) * stss.fontAngleZ));
-		} else {
-			stss.fontScaleX *= m_dPARCompensation;
-		}
-	}
+	//if (m_ePARCompensationType == EPCTAccurateSize_ISR && m_dPARCompensation != 1.0) {
+	//	if (stss.fontAngleZ != 0) {
+	//		stss.fontScaleX *= 1.0 + abs((m_dPARCompensation - 1.0) * cos((M_PI / 180.0) * stss.fontAngleZ));
+	//		stss.fontScaleY *= 1.0 + abs((m_dPARCompensation - 1.0) * sin((M_PI / 180.0) * stss.fontAngleZ));
+	//	} else {
+	//		stss.fontScaleX *= m_dPARCompensation;
+	//	}
+	//}
 
 	orgstss = stss;
 
