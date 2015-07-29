@@ -70,6 +70,8 @@ void avpriv_copy_bits(PutBitContext *pb, const uint8_t *src, int length)
     if (length == 0)
         return;
 
+    av_assert0(length <= put_bits_left(pb));
+
     if (CONFIG_SMALL || words < 16 || put_bits_count(pb) & 7) {
         for (i = 0; i < words; i++)
             put_bits(pb, 16, AV_RB16(src + 2 * i));
@@ -245,7 +247,7 @@ static int build_table(VLC *vlc, int table_nb_bits, int nb_codes,
 
 /* Build VLC decoding tables suitable for use with get_vlc().
 
-   'nb_bits' set thee decoding table size (2^nb_bits) entries. The
+   'nb_bits' set the decoding table size (2^nb_bits) entries. The
    bigger it is, the faster is the decoding. But it should not be too
    big to save memory and L1 cache. '9' is a good compromise.
 
@@ -263,7 +265,7 @@ static int build_table(VLC *vlc, int table_nb_bits, int nb_codes,
    'xxx_size' : gives the number of bytes of each entry of the 'bits'
    or 'codes' tables.
 
-   'wrap' and 'size' allows to use any memory configuration and types
+   'wrap' and 'size' make it possible to use any memory configuration and types
    (byte/word/long) to store the 'bits', 'codes', and 'symbols' tables.
 
    'use_static' should be set to 1 for tables, which should be freed

@@ -426,7 +426,7 @@ static void imc_decode_level_coefficients_raw(IMCContext *q, int *levlCoeffBuf,
 
     pos = q->coef0_pos;
     flcoeffs1[pos] = 20000.0 / pow (2, levlCoeffBuf[0] * 0.18945); // 0.18945 = log2(10) * 0.05703125
-    flcoeffs2[pos] = log2f(flcoeffs1[0]);
+    flcoeffs2[pos] = log2f(flcoeffs1[pos]);
     tmp  = flcoeffs1[pos];
     tmp2 = flcoeffs2[pos];
 
@@ -1021,7 +1021,7 @@ static int imc_decode_frame(AVCodecContext *avctx, void *data,
 
     IMCContext *q = avctx->priv_data;
 
-    LOCAL_ALIGNED_16(uint16_t, buf16, [IMC_BLOCK_SIZE / 2 + AV_INPUT_BUFFER_PADDING_SIZE/2]);
+    LOCAL_ALIGNED_16(uint16_t, buf16, [(IMC_BLOCK_SIZE + AV_INPUT_BUFFER_PADDING_SIZE) / 2]);
 
     if (buf_size < IMC_BLOCK_SIZE * avctx->channels) {
         av_log(avctx, AV_LOG_ERROR, "frame too small!\n");

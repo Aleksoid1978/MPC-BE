@@ -23,7 +23,10 @@
 #include "parser.h"
 #include "mpegaudiodecheader.h"
 #include "libavutil/common.h"
-
+// ==> Start patch MPC
+// #include "libavformat/id3v1.h" // for ID3v1_TAG_SIZE
+#define ID3v1_TAG_SIZE 128
+// ==> End patch MPC
 
 typedef struct MpegAudioParseContext {
     ParseContext pc;
@@ -49,6 +52,7 @@ static int mpegaudio_parse(AVCodecParserContext *s1,
     uint32_t state= pc->state;
     int i;
     int next= END_NOT_FOUND;
+    int flush = !buf_size;
 
     for(i=0; i<buf_size; ){
         if(s->frame_size){
@@ -111,6 +115,12 @@ static int mpegaudio_parse(AVCodecParserContext *s1,
         *poutbuf = NULL;
         *poutbuf_size = 0;
         return buf_size;
+    }
+
+    if (flush && buf_size >= ID3v1_TAG_SIZE && memcmp(buf, "TAG", 3) == 0) {
+        *poutbuf = NULL;
+        *poutbuf_size = 0;
+        return next;
     }
 
     *poutbuf = buf;

@@ -27,6 +27,7 @@
 #include "error_resilience.h"
 #include "internal.h"
 #include "mpeg_er.h"
+#include "msmpeg4.h"
 #include "msmpeg4data.h"
 #include "qpeldsp.h"
 #include "vc1.h"
@@ -51,9 +52,9 @@ static void arith2_normalise(ArithCoder *c)
             c->value ^= 0x8000;
             c->low   ^= 0x8000;
         }
-        c->high  = c->high  << 8 & 0xFFFFFF | 0xFF;
-        c->value = c->value << 8 & 0xFFFFFF | bytestream2_get_byte(c->gbc.gB);
-        c->low   = c->low   << 8 & 0xFFFFFF;
+        c->high  = (uint16_t)c->high  << 8  | 0xFF;
+        c->value = (uint16_t)c->value << 8  | bytestream2_get_byte(c->gbc.gB);
+        c->low   = (uint16_t)c->low   << 8;
     }
 }
 
@@ -317,7 +318,7 @@ static int decode_rle(GetBitContext *gb, uint8_t *pal_dst, int pal_stride,
     if (next_code != 1 << current_length)
         return AVERROR_INVALIDDATA;
 
-    if (i = init_vlc(&vlc, 9, alphabet_size, bits, 1, 1, codes, 4, 4, 0))
+    if ((i = init_vlc(&vlc, 9, alphabet_size, bits, 1, 1, codes, 4, 4, 0)) < 0)
         return i;
 
     /* frame decode */
