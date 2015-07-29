@@ -590,7 +590,7 @@ static void decode_vui(HEVCContext *s, HEVCSPS *sps)
         vui->def_disp_win.bottom_offset = get_ue_golomb_long(gb) * 2;
 
         if (s->apply_defdispwin &&
-            s->avctx->flags2 & CODEC_FLAG2_IGNORE_CROP) {
+            s->avctx->flags2 & AV_CODEC_FLAG2_IGNORE_CROP) {
             av_log(s->avctx, AV_LOG_DEBUG,
                    "discarding vui default display window, "
                    "original values are l:%u r:%u t:%u b:%u\n",
@@ -824,7 +824,7 @@ int ff_hevc_decode_nal_sps(HEVCContext *s)
         sps->pic_conf_win.top_offset    = get_ue_golomb_long(gb) * 2;
         sps->pic_conf_win.bottom_offset = get_ue_golomb_long(gb) * 2;
 
-        if (s->avctx->flags2 & CODEC_FLAG2_IGNORE_CROP) {
+        if (s->avctx->flags2 & AV_CODEC_FLAG2_IGNORE_CROP) {
             av_log(s->avctx, AV_LOG_DEBUG,
                    "discarding sps conformance window, "
                    "original values are l:%u r:%u t:%u b:%u\n",
@@ -1078,7 +1078,7 @@ int ff_hevc_decode_nal_sps(HEVCContext *s)
         sps->output_window.bottom_offset += sps->vui.def_disp_win.bottom_offset;
     }
     if (sps->output_window.left_offset & (0x1F >> (sps->pixel_shift)) &&
-        !(s->avctx->flags & CODEC_FLAG_UNALIGNED)) {
+        !(s->avctx->flags & AV_CODEC_FLAG_UNALIGNED)) {
         sps->output_window.left_offset &= ~(0x1F >> (sps->pixel_shift));
         av_log(s->avctx, AV_LOG_WARNING, "Reducing left output window to %d "
                "chroma samples to preserve alignment.\n",

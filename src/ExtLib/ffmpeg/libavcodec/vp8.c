@@ -639,6 +639,11 @@ static int vp8_decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_si
     int width  = s->avctx->width;
     int height = s->avctx->height;
 
+    if (buf_size < 3) {
+        av_log(s->avctx, AV_LOG_ERROR, "Insufficent data (%d) for header\n", buf_size);
+        return AVERROR_INVALIDDATA;
+    }
+
     s->keyframe  = !(buf[0] & 1);
     s->profile   =  (buf[0]>>1) & 7;
     s->invisible = !(buf[0] & 0x10);
@@ -757,8 +762,10 @@ static int vp8_decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_si
 static av_always_inline
 void clamp_mv(VP8Context *s, VP56mv *dst, const VP56mv *src)
 {
-    dst->x = av_clip(src->x, s->mv_min.x, s->mv_max.x);
-    dst->y = av_clip(src->y, s->mv_min.y, s->mv_max.y);
+    dst->x = av_clip(src->x, av_clip(s->mv_min.x, INT16_MIN, INT16_MAX),
+                             av_clip(s->mv_max.x, INT16_MIN, INT16_MAX));
+    dst->y = av_clip(src->y, av_clip(s->mv_min.y, INT16_MIN, INT16_MAX),
+                             av_clip(s->mv_max.y, INT16_MIN, INT16_MAX));
 }
 
 /**
@@ -2259,8 +2266,8 @@ static void vp8_decode_mv_mb_modes(AVCodecContext *avctx, VP8Frame *cur_frame,
         }                                                                     \
     } while (0)
 #else
-#define check_thread_pos(td, otd, mb_x_check, mb_y_check)
-#define update_pos(td, mb_y, mb_x)
+#define check_thread_pos(td, otd, mb_x_check, mb_y_check) while(0)
+#define update_pos(td, mb_y, mb_x) while(0)
 #endif
 
 static av_always_inline void decode_mb_row_no_filter(AVCodecContext *avctx, void *tdata,
@@ -2687,6 +2694,9 @@ av_cold int ff_vp8_decode_free(AVCodecContext *avctx)
     VP8Context *s = avctx->priv_data;
     int i;
 
+    if (!s)
+        return 0;
+
     vp8_decode_flush_impl(avctx, 1);
     for (i = 0; i < FF_ARRAY_ELEMS(s->frames); i++)
         av_frame_free(&s->frames[i].tf.f);
@@ -2817,7 +2827,7 @@ AVCodec ff_vp7_decoder = {
     .init                  = vp7_decode_init,
     .close                 = ff_vp8_decode_free,
     .decode                = vp7_decode_frame,
-    .capabilities          = CODEC_CAP_DR1,
+    .capabilities          = AV_CODEC_CAP_DR1,
     .flush                 = vp8_decode_flush,
 };
 #endif /* CONFIG_VP7_DECODER */
@@ -2832,7 +2842,8 @@ AVCodec ff_vp8_decoder = {
     .init                  = ff_vp8_decode_init,
     .close                 = ff_vp8_decode_free,
     .decode                = ff_vp8_decode_frame,
-    .capabilities          = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS | CODEC_CAP_SLICE_THREADS,
+    .capabilities          = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS |
+                             AV_CODEC_CAP_SLICE_THREADS,
     .flush                 = vp8_decode_flush,
     .init_thread_copy      = ONLY_IF_THREADS_ENABLED(vp8_decode_init_thread_copy),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(vp8_decode_update_thread_context),

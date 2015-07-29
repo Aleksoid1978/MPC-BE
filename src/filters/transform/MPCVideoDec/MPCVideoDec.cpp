@@ -1756,7 +1756,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			m_pAVCtx->get_buffer2	= av_get_buffer;
 		} else if (m_nCodecId == AV_CODEC_ID_H264) {
 			// for DXVA1 decoder ...
-			m_pAVCtx->flags2	    |= CODEC_FLAG2_SHOW_ALL;
+			m_pAVCtx->flags2	    |= AV_CODEC_FLAG2_SHOW_ALL;
 		}
 	}
 
@@ -2029,7 +2029,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 		// Reconstruct AVC1 extradata format
 		MPEG2VIDEOINFO *mp2vi = (MPEG2VIDEOINFO *)pmt->Format();
 		extralen += 7;
-		extra = (uint8_t *)av_mallocz(extralen + FF_INPUT_BUFFER_PADDING_SIZE);
+		extra = (uint8_t *)av_mallocz(extralen + AV_INPUT_BUFFER_PADDING_SIZE);
 		extra[0] = 1;
 		extra[1] = (BYTE)mp2vi->dwProfile;
 		extra[2] = 0;
@@ -2073,7 +2073,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 	} else if (extralen > 0) {
 		DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::AllocExtradata() : processing extradata of %d bytes", extralen));
 		// Just copy extradata for other formats
-		extra = (uint8_t *)av_mallocz(extralen + FF_INPUT_BUFFER_PADDING_SIZE);
+		extra = (uint8_t *)av_mallocz(extralen + AV_INPUT_BUFFER_PADDING_SIZE);
 		getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), extra, NULL);
 
 		if (m_nCodecId == AV_CODEC_ID_HEVC) {
@@ -2100,7 +2100,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 					break;
 				}
 
-				dst = (BYTE *)av_realloc_f(dst, dst_len + len + 3 + FF_INPUT_BUFFER_PADDING_SIZE, 1);
+				dst = (BYTE *)av_realloc_f(dst, dst_len + len + 3 + AV_INPUT_BUFFER_PADDING_SIZE, 1);
 				// put startcode 0x000001
 				dst[dst_len]		= 0x00;
 				dst[dst_len + 1]	= 0x00;
@@ -2437,7 +2437,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 			// Verify buffer size
 			if (nSize > m_nFFBufferSize) {
 				m_nFFBufferSize	= nSize;
-				m_pFFBuffer		= (BYTE *)av_realloc_f(m_pFFBuffer, m_nFFBufferSize + FF_INPUT_BUFFER_PADDING_SIZE, 1);
+				m_pFFBuffer		= (BYTE *)av_realloc_f(m_pFFBuffer, m_nFFBufferSize + AV_INPUT_BUFFER_PADDING_SIZE, 1);
 				if (!m_pFFBuffer) {
 					m_nFFBufferSize = 0;
 					return E_OUTOFMEMORY;
@@ -2445,7 +2445,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 			}
 
 			memcpy(m_pFFBuffer, pDataIn, nSize);
-			memset(m_pFFBuffer + nSize, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+			memset(m_pFFBuffer + nSize, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 			pDataBuffer = m_pFFBuffer;
 		} else {
 			pDataBuffer = pDataIn;
@@ -2531,14 +2531,14 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 				if (pOut && pOut_size > 0) {
 					if (pOut_size > m_nFFBufferSize2) {
 						m_nFFBufferSize2	= pOut_size;
-						m_pFFBuffer2		= (BYTE *)av_realloc_f(m_pFFBuffer2, m_nFFBufferSize2 + FF_INPUT_BUFFER_PADDING_SIZE, 1);
+						m_pFFBuffer2		= (BYTE *)av_realloc_f(m_pFFBuffer2, m_nFFBufferSize2 + AV_INPUT_BUFFER_PADDING_SIZE, 1);
 						if (!m_pFFBuffer2) {
 							m_nFFBufferSize2 = 0;
 							return E_OUTOFMEMORY;
 						}
 					}
 					memcpy(m_pFFBuffer2, pOut, pOut_size);
-					memset(m_pFFBuffer2 + pOut_size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+					memset(m_pFFBuffer2 + pOut_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
 					avpkt.data		= m_pFFBuffer2;
 					avpkt.size		= pOut_size;

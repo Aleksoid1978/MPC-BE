@@ -202,6 +202,7 @@ SRCS_LC = \
 	libavcodec/golomb.c \
 	libavcodec/h263.c \
 	libavcodec/h263_parser.c \
+	libavcodec/h263data.c \
 	libavcodec/h263dec.c \
 	libavcodec/h263dsp.c \
 	libavcodec/h264.c \
@@ -279,6 +280,7 @@ SRCS_LC = \
 	libavcodec/mlp_parser.c \
 	libavcodec/mlpdec.c \
 	libavcodec/mlpdsp.c \
+	libavcodec/motion_est.c \
 	libavcodec/mpc.c \
 	libavcodec/mpc7.c \
 	libavcodec/mpc8.c \
@@ -300,10 +302,12 @@ SRCS_LC = \
 	libavcodec/mpegaudiodsp.c \
 	libavcodec/mpegaudiodsp_float.c \
 	libavcodec/mpegaudiodsp_template.c \
+	libavcodec/mpegpicture.c \
 	libavcodec/mpegutils.c \
 	libavcodec/mpegvideo.c \
 	libavcodec/mpegvideo_motion.c \
 	libavcodec/mpegvideo_parser.c \
+	libavcodec/mpegvideodata.c \
 	libavcodec/mpegvideodsp.c \
 	libavcodec/mpegvideoencdsp.c \
 	libavcodec/msmpeg4.c \
@@ -350,6 +354,7 @@ SRCS_LC = \
 	libavcodec/raw.c \
 	libavcodec/rawdec.c \
 	libavcodec/rdft.c \
+	libavcodec/rl.c \
 	libavcodec/rpza.c \
 	libavcodec/rv10.c \
 	libavcodec/rv30.c \
@@ -424,6 +429,9 @@ SRCS_LC = \
 	libavcodec/vp9.c \
 	libavcodec/vp9_parser.c \
 	libavcodec/vp9dsp.c \
+	libavcodec/vp9dsp_8bpp.c \
+	libavcodec/vp9dsp_10bpp.c \
+	libavcodec/vp9dsp_12bpp.c \
 	libavcodec/wavpack.c \
 	libavcodec/wma.c \
 	libavcodec/wma_common.c \

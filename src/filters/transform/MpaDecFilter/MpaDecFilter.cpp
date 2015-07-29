@@ -64,7 +64,7 @@
 #define MAX_JITTER          1000000i64 // +-100ms jitter is allowed
 #define MAX_DTS_JITTER      1400000i64 // +-140ms jitter is allowed for DTS
 
-#define PADDING_SIZE        FF_INPUT_BUFFER_PADDING_SIZE
+#define PADDING_SIZE        AV_INPUT_BUFFER_PADDING_SIZE
 
 #define BS_HEADER_SIZE          8
 #define BS_AC3_SIZE          6144
@@ -854,7 +854,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 	}
 
 	// RealAudio
-	CPaddedArray buffRA(FF_INPUT_BUFFER_PADDING_SIZE);
+	CPaddedArray buffRA(AV_INPUT_BUFFER_PADDING_SIZE);
 	bool isRA = false;
 	if (nCodecId == AV_CODEC_ID_ATRAC3 || nCodecId == AV_CODEC_ID_COOK || nCodecId == AV_CODEC_ID_SIPR) {
 		HRESULT hrRA = m_FFAudioDec.RealPrepare(p, int(end - p), buffRA);

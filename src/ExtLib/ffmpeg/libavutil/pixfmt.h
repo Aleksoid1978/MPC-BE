@@ -57,11 +57,6 @@
  * For all the 8bit per pixel formats, an RGB32 palette is in data[1] like
  * for pal8. This palette is filled in automatically by the function
  * allocating the picture.
- *
- * @note
- * Make sure that all newly added big-endian formats have (pix_fmt & 1) == 1
- * and that all newly added little-endian formats have (pix_fmt & 1) == 0.
- * This allows simpler detection of big vs little-endian.
  */
 enum AVPixelFormat {
     AV_PIX_FMT_NONE = -1,
@@ -258,6 +253,8 @@ enum AVPixelFormat {
      */
     AV_PIX_FMT_MMAL,
 
+    AV_PIX_FMT_D3D11VA_VLD,  ///< HW decoding through Direct3D11, Picture.data[3] contains a ID3D11VideoDecoderOutputView pointer
+
 #ifndef AV_PIX_FMT_ABI_GIT_MASTER
     AV_PIX_FMT_RGBA64BE=0x123,  ///< packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as big-endian
     AV_PIX_FMT_RGBA64LE,  ///< packed RGBA 16:16:16:16, 64bpp, 16R, 16G, 16B, 16A, the 2-byte value for each R/G/B/A component is stored as little-endian
@@ -307,6 +304,12 @@ enum AVPixelFormat {
 #if !FF_API_XVMC
     AV_PIX_FMT_XVMC,///< XVideo Motion Acceleration via common packet passing
 #endif /* !FF_API_XVMC */
+    AV_PIX_FMT_YUV440P10LE, ///< planar YUV 4:4:0,20bpp, (1 Cr & Cb sample per 1x2 Y samples), little-endian
+    AV_PIX_FMT_YUV440P10BE, ///< planar YUV 4:4:0,20bpp, (1 Cr & Cb sample per 1x2 Y samples), big-endian
+    AV_PIX_FMT_YUV440P12LE, ///< planar YUV 4:4:0,24bpp, (1 Cr & Cb sample per 1x2 Y samples), little-endian
+    AV_PIX_FMT_YUV440P12BE, ///< planar YUV 4:4:0,24bpp, (1 Cr & Cb sample per 1x2 Y samples), big-endian
+    AV_PIX_FMT_AYUV64LE,    ///< packed AYUV 4:4:4,64bpp (1 Cr & Cb sample per 1x1 Y & A samples), little-endian
+    AV_PIX_FMT_AYUV64BE,    ///< packed AYUV 4:4:4,64bpp (1 Cr & Cb sample per 1x1 Y & A samples), big-endian
 
     AV_PIX_FMT_NB,        ///< number of pixel formats, DO NOT USE THIS if you want to link with shared libav* because the number of formats might differ between versions
 
@@ -362,9 +365,11 @@ enum AVPixelFormat {
 #define AV_PIX_FMT_YUV444P9  AV_PIX_FMT_NE(YUV444P9BE , YUV444P9LE)
 #define AV_PIX_FMT_YUV420P10 AV_PIX_FMT_NE(YUV420P10BE, YUV420P10LE)
 #define AV_PIX_FMT_YUV422P10 AV_PIX_FMT_NE(YUV422P10BE, YUV422P10LE)
+#define AV_PIX_FMT_YUV440P10 AV_PIX_FMT_NE(YUV440P10BE, YUV440P10LE)
 #define AV_PIX_FMT_YUV444P10 AV_PIX_FMT_NE(YUV444P10BE, YUV444P10LE)
 #define AV_PIX_FMT_YUV420P12 AV_PIX_FMT_NE(YUV420P12BE, YUV420P12LE)
 #define AV_PIX_FMT_YUV422P12 AV_PIX_FMT_NE(YUV422P12BE, YUV422P12LE)
+#define AV_PIX_FMT_YUV440P12 AV_PIX_FMT_NE(YUV440P12BE, YUV440P12LE)
 #define AV_PIX_FMT_YUV444P12 AV_PIX_FMT_NE(YUV444P12BE, YUV444P12LE)
 #define AV_PIX_FMT_YUV420P14 AV_PIX_FMT_NE(YUV420P14BE, YUV420P14LE)
 #define AV_PIX_FMT_YUV422P14 AV_PIX_FMT_NE(YUV422P14BE, YUV422P14LE)
@@ -398,6 +403,7 @@ enum AVPixelFormat {
 
 #define AV_PIX_FMT_XYZ12      AV_PIX_FMT_NE(XYZ12BE, XYZ12LE)
 #define AV_PIX_FMT_NV20       AV_PIX_FMT_NE(NV20BE,  NV20LE)
+#define AV_PIX_FMT_AYUV64     AV_PIX_FMT_NE(AYUV64BE, AYUV64LE)
 
 
 #if FF_API_PIX_FMT
@@ -524,15 +530,23 @@ enum AVColorRange {
 /**
  * Location of chroma samples.
  *
- *  X   X      3 4 X      X are luma samples,
- *             1 2        1-6 are possible chroma positions
- *  X   X      5 6 X      0 is undefined/unknown position
+ * Illustration showing the location of the first (top left) chroma sample of the
+ * image, the left shows only luma, the right
+ * shows the location of the chroma sample, the 2 could be imagined to overlay
+ * each other but are drawn separately due to limitations of ASCII
+ *
+ *                1st 2nd       1st 2nd horizontal luma sample positions
+ *                 v   v         v   v
+ *                 ______        ______
+ *1st luma line > |X   X ...    |3 4 X ...     X are luma samples,
+ *                |             |1 2           1-6 are possible chroma positions
+ *2nd luma line > |X   X ...    |5 6 X ...     0 is undefined/unknown position
  */
 enum AVChromaLocation {
     AVCHROMA_LOC_UNSPECIFIED = 0,
-    AVCHROMA_LOC_LEFT        = 1, ///< mpeg2/4, h264 default
-    AVCHROMA_LOC_CENTER      = 2, ///< mpeg1, jpeg, h263
-    AVCHROMA_LOC_TOPLEFT     = 3, ///< DV
+    AVCHROMA_LOC_LEFT        = 1, ///< mpeg2/4 4:2:0, h264 default for 4:2:0
+    AVCHROMA_LOC_CENTER      = 2, ///< mpeg1 4:2:0, jpeg 4:2:0, h263 4:2:0
+    AVCHROMA_LOC_TOPLEFT     = 3, ///< ITU-R 601, SMPTE 274M 296M S314M(DV 4:1:1), mpeg2 4:2:2
     AVCHROMA_LOC_TOP         = 4,
     AVCHROMA_LOC_BOTTOMLEFT  = 5,
     AVCHROMA_LOC_BOTTOM      = 6,

@@ -679,7 +679,7 @@ int ff_snow_frame_start(SnowContext *s){
         s->ref_frames= i;
         if(s->ref_frames==0){
             av_log(s->avctx,AV_LOG_ERROR, "No reference frames\n");
-            return -1;
+            return AVERROR_INVALIDDATA;
         }
     }
     if ((ret = ff_snow_get_buffer(s, s->current_picture)) < 0)
@@ -704,7 +704,7 @@ av_cold void ff_snow_common_end(SnowContext *s)
     av_freep(&s->m.me.scratchpad);
     av_freep(&s->m.me.map);
     av_freep(&s->m.me.score_map);
-    av_freep(&s->m.obmc_scratchpad);
+    av_freep(&s->m.sc.obmc_scratchpad);
 
     av_freep(&s->block);
     av_freep(&s->scratchbuf);

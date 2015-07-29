@@ -119,6 +119,10 @@ static const FormatEntry format_entries[AV_PIX_FMT_NB] = {
     [AV_PIX_FMT_GRAY16LE]    = { 1, 1 },
     [AV_PIX_FMT_YUV440P]     = { 1, 1 },
     [AV_PIX_FMT_YUVJ440P]    = { 1, 1 },
+    [AV_PIX_FMT_YUV440P10LE] = { 1, 1 },
+    [AV_PIX_FMT_YUV440P10BE] = { 1, 1 },
+    [AV_PIX_FMT_YUV440P12LE] = { 1, 1 },
+    [AV_PIX_FMT_YUV440P12BE] = { 1, 1 },
     [AV_PIX_FMT_YUVA420P]    = { 1, 1 },
     [AV_PIX_FMT_YUVA422P]    = { 1, 1 },
     [AV_PIX_FMT_YUVA444P]    = { 1, 1 },
@@ -162,7 +166,7 @@ static const FormatEntry format_entries[AV_PIX_FMT_NB] = {
     [AV_PIX_FMT_RGB444BE]    = { 1, 1 },
     [AV_PIX_FMT_BGR444LE]    = { 1, 1 },
     [AV_PIX_FMT_BGR444BE]    = { 1, 1 },
-    [AV_PIX_FMT_YA8]         = { 1, 0 },
+    [AV_PIX_FMT_YA8]         = { 1, 1 },
     [AV_PIX_FMT_YA16BE]      = { 1, 0 },
     [AV_PIX_FMT_YA16LE]      = { 1, 0 },
     [AV_PIX_FMT_BGR48BE]     = { 1, 1 },
@@ -221,6 +225,7 @@ static const FormatEntry format_entries[AV_PIX_FMT_NB] = {
     [AV_PIX_FMT_BAYER_GRBG16BE] = { 1, 0 },
     [AV_PIX_FMT_XYZ12BE]     = { 1, 1, 1 },
     [AV_PIX_FMT_XYZ12LE]     = { 1, 1, 1 },
+    [AV_PIX_FMT_AYUV64LE]    = { 1, 1},
 };
 
 int sws_isSupportedInput(enum AVPixelFormat pix_fmt)
@@ -1032,6 +1037,7 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
         return AVERROR(EINVAL);
     }
     }
+    av_assert2(desc_src && desc_dst);
 
     i = flags & (SWS_POINT         |
                  SWS_AREA          |
@@ -1153,6 +1159,14 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
     if (flags & SWS_FULL_CHR_H_INT &&
         isAnyRGB(dstFormat)        &&
         !isPlanarRGB(dstFormat)    &&
+        dstFormat != AV_PIX_FMT_RGBA64LE &&
+        dstFormat != AV_PIX_FMT_RGBA64BE &&
+        dstFormat != AV_PIX_FMT_BGRA64LE &&
+        dstFormat != AV_PIX_FMT_BGRA64BE &&
+        dstFormat != AV_PIX_FMT_RGB48LE &&
+        dstFormat != AV_PIX_FMT_RGB48BE &&
+        dstFormat != AV_PIX_FMT_BGR48LE &&
+        dstFormat != AV_PIX_FMT_BGR48BE &&
         dstFormat != AV_PIX_FMT_RGBA  &&
         dstFormat != AV_PIX_FMT_ARGB  &&
         dstFormat != AV_PIX_FMT_BGRA  &&
@@ -1483,9 +1497,9 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
 
     /* Allocate pixbufs (we use dynamic allocation because otherwise we would
      * need to allocate several megabytes to handle all possible cases) */
-    FF_ALLOC_OR_GOTO(c, c->lumPixBuf,  c->vLumBufSize * 3 * sizeof(int16_t *), fail);
-    FF_ALLOC_OR_GOTO(c, c->chrUPixBuf, c->vChrBufSize * 3 * sizeof(int16_t *), fail);
-    FF_ALLOC_OR_GOTO(c, c->chrVPixBuf, c->vChrBufSize * 3 * sizeof(int16_t *), fail);
+    FF_ALLOCZ_OR_GOTO(c, c->lumPixBuf,  c->vLumBufSize * 3 * sizeof(int16_t *), fail);
+    FF_ALLOCZ_OR_GOTO(c, c->chrUPixBuf, c->vChrBufSize * 3 * sizeof(int16_t *), fail);
+    FF_ALLOCZ_OR_GOTO(c, c->chrVPixBuf, c->vChrBufSize * 3 * sizeof(int16_t *), fail);
     if (CONFIG_SWSCALE_ALPHA && isALPHA(c->srcFormat) && isALPHA(c->dstFormat))
         FF_ALLOCZ_OR_GOTO(c, c->alpPixBuf, c->vLumBufSize * 3 * sizeof(int16_t *), fail);
     /* Note we need at least one pixel more at the end because of the MMX code
@@ -1649,6 +1663,22 @@ SwsContext *sws_getContext(int srcW, int srcH, enum AVPixelFormat srcFormat,
     return c;
 }
 
+static int isnan_vec(SwsVector *a)
+{
+    int i;
+    for (i=0; i<a->length; i++)
+        if (isnan(a->coeff[i]))
+            return 1;
+    return 0;
+}
+
+static void makenan_vec(SwsVector *a)
+{
+    int i;
+    for (i=0; i<a->length; i++)
+        a->coeff[i] = NAN;
+}
+
 SwsFilter *sws_getDefaultFilter(float lumaGBlur, float chromaGBlur,
                                 float lumaSharpen, float chromaSharpen,
                                 float chromaHShift, float chromaVShift,
@@ -1709,6 +1739,12 @@ SwsFilter *sws_getDefaultFilter(float lumaGBlur, float chromaGBlur,
     sws_normalizeVec(filter->chrV, 1.0);
     sws_normalizeVec(filter->lumH, 1.0);
     sws_normalizeVec(filter->lumV, 1.0);
+
+    if (isnan_vec(filter->chrH) ||
+        isnan_vec(filter->chrV) ||
+        isnan_vec(filter->lumH) ||
+        isnan_vec(filter->lumV))
+        goto fail;
 
     if (verbose)
         sws_printVec2(filter->chrH, NULL, AV_LOG_DEBUG);
@@ -1885,6 +1921,10 @@ static SwsVector *sws_getShiftedVec(SwsVector *a, int shift)
 void sws_shiftVec(SwsVector *a, int shift)
 {
     SwsVector *shifted = sws_getShiftedVec(a, shift);
+    if (!shifted) {
+        makenan_vec(a);
+        return;
+    }
     av_free(a->coeff);
     a->coeff  = shifted->coeff;
     a->length = shifted->length;
@@ -1894,6 +1934,10 @@ void sws_shiftVec(SwsVector *a, int shift)
 void sws_addVec(SwsVector *a, SwsVector *b)
 {
     SwsVector *sum = sws_sumVec(a, b);
+    if (!sum) {
+        makenan_vec(a);
+        return;
+    }
     av_free(a->coeff);
     a->coeff  = sum->coeff;
     a->length = sum->length;
@@ -1903,6 +1947,10 @@ void sws_addVec(SwsVector *a, SwsVector *b)
 void sws_subVec(SwsVector *a, SwsVector *b)
 {
     SwsVector *diff = sws_diffVec(a, b);
+    if (!diff) {
+        makenan_vec(a);
+        return;
+    }
     av_free(a->coeff);
     a->coeff  = diff->coeff;
     a->length = diff->length;
@@ -1912,6 +1960,10 @@ void sws_subVec(SwsVector *a, SwsVector *b)
 void sws_convVec(SwsVector *a, SwsVector *b)
 {
     SwsVector *conv = sws_getConvVec(a, b);
+    if (!conv) {
+        makenan_vec(a);
+        return;
+    }
     av_free(a->coeff);
     a->coeff  = conv->coeff;
     a->length = conv->length;

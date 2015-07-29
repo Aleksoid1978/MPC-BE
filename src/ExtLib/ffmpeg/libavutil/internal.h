@@ -47,7 +47,7 @@
 #endif
 
 #ifndef emms_c
-#   define emms_c()
+#   define emms_c() while(0)
 #endif
 
 #ifndef attribute_align_arg
@@ -244,6 +244,12 @@ void avpriv_request_sample(void *avc,
                            const char *msg, ...) av_printf_format(2, 3);
 
 #if HAVE_LIBC_MSVCRT
+#include <crtversion.h>
+#if defined(_VC_CRT_MAJOR_VERSION) && _VC_CRT_MAJOR_VERSION < 14
+#pragma comment(linker, "/include:" EXTERN_PREFIX "avpriv_strtod")
+#pragma comment(linker, "/include:" EXTERN_PREFIX "avpriv_snprintf")
+#endif
+
 #define avpriv_open ff_open
 #define PTRDIFF_SPECIFIER "Id"
 #define SIZE_SPECIFIER "Iu"

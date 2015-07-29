@@ -432,7 +432,7 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		if (requiredSize > m_nAlignedBufferSize) {
 			av_freep(&m_pAlignedBuffer);
 			m_nAlignedBufferSize = requiredSize;
-			m_pAlignedBuffer = (uint8_t*)av_malloc(m_nAlignedBufferSize + FF_INPUT_BUFFER_PADDING_SIZE);
+			m_pAlignedBuffer = (uint8_t*)av_malloc(m_nAlignedBufferSize + AV_INPUT_BUFFER_PADDING_SIZE);
 		}
 		out = m_pAlignedBuffer;
 	}

@@ -175,6 +175,7 @@ typedef struct SnowContext{
     slice_buffer sb;
     int memc_only;
     int no_bitstream;
+    int intra_penalty;
 
     MpegEncContext m; // needed for motion estimation, should not be used for anything else, the idea is to eventually make the motion estimation independent of MpegEncContext, so this will be removed then (FIXME/XXX)
 
@@ -303,6 +304,8 @@ static av_always_inline void add_yblock(SnowContext *s, int sliced, slice_buffer
     BlockNode *lb= lt+b_stride;
     BlockNode *rb= lb+1;
     uint8_t *block[4];
+    // When src_stride is large enough, it is possible to interleave the blocks.
+    // Otherwise the blocks are written sequentially in the tmp buffer.
     int tmp_step= src_stride >= 7*MB_SIZE ? MB_SIZE : MB_SIZE*src_stride;
     uint8_t *tmp = s->scratchbuf;
     uint8_t *ptmp;
@@ -345,8 +348,6 @@ static av_always_inline void add_yblock(SnowContext *s, int sliced, slice_buffer
     }
 
     if(b_w<=0 || b_h<=0) return;
-
-    av_assert2(src_stride > 2*MB_SIZE + 5);
 
     if(!sliced && offset_dst)
         dst += src_x + src_y*dst_stride;

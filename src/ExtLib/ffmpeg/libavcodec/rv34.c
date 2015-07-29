@@ -726,12 +726,12 @@ static inline void rv34_mc(RV34DecContext *r, const int block_type,
        (unsigned)(src_x - !!lx*2) > s->h_edge_pos - !!lx*2 - (width <<3) - 4 ||
        (unsigned)(src_y - !!ly*2) > s->v_edge_pos - !!ly*2 - (height<<3) - 4) {
         srcY -= 2 + 2*s->linesize;
-        s->vdsp.emulated_edge_mc(s->edge_emu_buffer, srcY,
+        s->vdsp.emulated_edge_mc(s->sc.edge_emu_buffer, srcY,
                                  s->linesize, s->linesize,
                                  (width << 3) + 6, (height << 3) + 6,
                                  src_x - 2, src_y - 2,
                                  s->h_edge_pos, s->v_edge_pos);
-        srcY = s->edge_emu_buffer + 2 + 2*s->linesize;
+        srcY = s->sc.edge_emu_buffer + 2 + 2*s->linesize;
         emu = 1;
     }
     if(!weighted){
@@ -756,7 +756,7 @@ static inline void rv34_mc(RV34DecContext *r, const int block_type,
     is16x16 = (block_type != RV34_MB_P_8x8) && (block_type != RV34_MB_P_16x8) && (block_type != RV34_MB_P_8x16);
     qpel_mc[!is16x16][dxy](Y, srcY, s->linesize);
     if (emu) {
-        uint8_t *uvbuf = s->edge_emu_buffer;
+        uint8_t *uvbuf = s->sc.edge_emu_buffer;
 
         s->vdsp.emulated_edge_mc(uvbuf, srcU,
                                  s->uvlinesize, s->uvlinesize,
@@ -1534,7 +1534,14 @@ int ff_rv34_decode_init_thread_copy(AVCodecContext *avctx)
 
     if (avctx->internal->is_copy) {
         r->tmp_b_block_base = NULL;
+        r->cbp_chroma       = NULL;
+        r->cbp_luma         = NULL;
+        r->deblock_coefs    = NULL;
+        r->intra_types_hist = NULL;
+        r->mb_type          = NULL;
+
         ff_mpv_idct_init(&r->s);
+
         if ((err = ff_mpv_common_init(&r->s)) < 0)
             return err;
         if ((err = rv34_decoder_alloc(r)) < 0) {

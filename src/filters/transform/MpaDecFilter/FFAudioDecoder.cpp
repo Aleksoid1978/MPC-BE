@@ -287,8 +287,8 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/*
 		m_pAVCtx->thread_type			= 0;
 		m_pAVCtx->codec_id				= nCodecId;
 		m_pAVCtx->refcounted_frames		= 1;
-		if (m_pAVCodec->capabilities & CODEC_CAP_TRUNCATED) {
-			m_pAVCtx->flags				|= CODEC_FLAG_TRUNCATED;
+		if (m_pAVCodec->capabilities & AV_CODEC_CAP_TRUNCATED) {
+			m_pAVCtx->flags				|= AV_CODEC_FLAG_TRUNCATED;
 		}
 
 		//if (stereodownmix &&
@@ -312,7 +312,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/*
 
 		if (extralen) {
 			if (nCodecId == AV_CODEC_ID_COOK || nCodecId == AV_CODEC_ID_ATRAC3 || nCodecId == AV_CODEC_ID_SIPR) {
-				uint8_t* extra = (uint8_t*)av_mallocz(extralen + FF_INPUT_BUFFER_PADDING_SIZE);
+				uint8_t* extra = (uint8_t*)av_mallocz(extralen + AV_INPUT_BUFFER_PADDING_SIZE);
 				getExtraData((BYTE*)format, &format_type, formatlen, extra, NULL);
 
 				if (extra[0] == '.' && extra[1] == 'r' && extra[2] == 'a' && extra[3] == 0xfd) {
@@ -336,7 +336,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/*
 				}
 			} else {
 				m_pAVCtx->extradata_size = extralen;
-				m_pAVCtx->extradata      = (uint8_t*)av_mallocz(m_pAVCtx->extradata_size + FF_INPUT_BUFFER_PADDING_SIZE);
+				m_pAVCtx->extradata      = (uint8_t*)av_mallocz(m_pAVCtx->extradata_size + AV_INPUT_BUFFER_PADDING_SIZE);
 				getExtraData((BYTE*)format, &format_type, formatlen, (BYTE*)m_pAVCtx->extradata, NULL);
 			}
 		}
@@ -599,7 +599,7 @@ HRESULT CFFAudioDecoder::ParseRealAudioHeader(const BYTE* extra, const int extra
 		int ra_extralen = AV_RB32(fmt);
 		if (ra_extralen > 0)  {
 			m_pAVCtx->extradata_size = ra_extralen;
-			m_pAVCtx->extradata      = (uint8_t*)av_mallocz(ra_extralen + FF_INPUT_BUFFER_PADDING_SIZE);
+			m_pAVCtx->extradata      = (uint8_t*)av_mallocz(ra_extralen + AV_INPUT_BUFFER_PADDING_SIZE);
 			memcpy((void*)m_pAVCtx->extradata, fmt + 4, ra_extralen);
 		}
 	} else {
