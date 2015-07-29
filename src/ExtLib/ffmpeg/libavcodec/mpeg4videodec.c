@@ -28,6 +28,7 @@
 #include "internal.h"
 #include "mpegutils.h"
 #include "mpegvideo.h"
+#include "mpegvideodata.h"
 #include "mpeg4video.h"
 #include "h263.h"
 #include "thread.h"
@@ -571,7 +572,7 @@ static inline int mpeg4_decode_dc(MpegEncContext *s, int n, int *dir_ptr)
 
         if (code > 8) {
             if (get_bits1(&s->gb) == 0) { /* marker */
-                if (s->err_recognition & (AV_EF_BITSTREAM|AV_EF_COMPLIANT)) {
+                if (s->avctx->err_recognition & (AV_EF_BITSTREAM|AV_EF_COMPLIANT)) {
                     av_log(s->avctx, AV_LOG_ERROR, "dc marker bit missing\n");
                     return -1;
                 }
@@ -1086,7 +1087,7 @@ static inline int mpeg4_decode_block(Mpeg4DecContext *ctx, int16_t *block,
                                 if (SHOW_UBITS(re, &s->gb, 1) == 0) {
                                     av_log(s->avctx, AV_LOG_ERROR,
                                            "1. marker bit missing in 3. esc\n");
-                                    if (!(s->err_recognition & AV_EF_IGNORE_ERR))
+                                    if (!(s->avctx->err_recognition & AV_EF_IGNORE_ERR))
                                         return -1;
                                 }
                                 SKIP_CACHE(re, &s->gb, 1);
@@ -1097,7 +1098,7 @@ static inline int mpeg4_decode_block(Mpeg4DecContext *ctx, int16_t *block,
                                 if (SHOW_UBITS(re, &s->gb, 1) == 0) {
                                     av_log(s->avctx, AV_LOG_ERROR,
                                            "2. marker bit missing in 3. esc\n");
-                                    if (!(s->err_recognition & AV_EF_IGNORE_ERR))
+                                    if (!(s->avctx->err_recognition & AV_EF_IGNORE_ERR))
                                         return -1;
                                 }
 
@@ -1132,7 +1133,7 @@ static inline int mpeg4_decode_block(Mpeg4DecContext *ctx, int16_t *block,
                                 level = level * qmul - qadd;
 
                             if ((unsigned)(level + 2048) > 4095) {
-                                if (s->err_recognition & (AV_EF_BITSTREAM|AV_EF_AGGRESSIVE)) {
+                                if (s->avctx->err_recognition & (AV_EF_BITSTREAM|AV_EF_AGGRESSIVE)) {
                                     if (level > 2560 || level < -2560) {
                                         av_log(s->avctx, AV_LOG_ERROR,
                                                "|level| overflow in 3. esc, qp=%d\n",
@@ -1297,7 +1298,7 @@ static int mpeg4_decode_mb(MpegEncContext *s, int16_t block[6][64])
     Mpeg4DecContext *ctx = (Mpeg4DecContext *)s;
     int cbpc, cbpy, i, cbp, pred_x, pred_y, mx, my, dquant;
     int16_t *mot_val;
-    static int8_t quant_tab[4] = { -1, -2, 1, 2 };
+    static const int8_t quant_tab[4] = { -1, -2, 1, 2 };
     const int xy = s->mb_x + s->mb_y * s->mb_stride;
 
     av_assert2(s->h263_pred);
@@ -1353,6 +1354,11 @@ static int mpeg4_decode_mb(MpegEncContext *s, int16_t block[6][64])
         else
             s->mcsel = 0;
         cbpy = get_vlc2(&s->gb, ff_h263_cbpy_vlc.table, CBPY_VLC_BITS, 1) ^ 0x0F;
+        if (cbpy < 0) {
+            av_log(s->avctx, AV_LOG_ERROR,
+                   "P cbpy damaged at %d %d\n", s->mb_x, s->mb_y);
+            return AVERROR_INVALIDDATA;
+        }
 
         cbp = (cbpc & 3) | (cbpy << 2);
         if (dquant)
@@ -2222,7 +2228,7 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb)
 
     s->pict_type = get_bits(gb, 2) + AV_PICTURE_TYPE_I;        /* pict type: I = 0 , P = 1 */
     if (s->pict_type == AV_PICTURE_TYPE_B && s->low_delay &&
-        ctx->vol_control_parameters == 0 && !(s->flags & CODEC_FLAG_LOW_DELAY)) {
+        ctx->vol_control_parameters == 0 && !(s->avctx->flags & AV_CODEC_FLAG_LOW_DELAY)) {
         av_log(s->avctx, AV_LOG_ERROR, "low_delay flag set incorrectly, clearing it\n");
         s->low_delay = 0;
     }
@@ -2601,7 +2607,7 @@ int ff_mpeg4_decode_picture_header(Mpeg4DecContext *ctx, GetBitContext *gb)
     }
 
 end:
-    if (s->flags & CODEC_FLAG_LOW_DELAY)
+    if (s->avctx->flags & AV_CODEC_FLAG_LOW_DELAY)
         s->low_delay = 1;
     s->avctx->has_b_frames = !s->low_delay;
 
@@ -2612,9 +2618,9 @@ av_cold void ff_mpeg4videodec_static_init(void) {
     static int done = 0;
 
     if (!done) {
-        ff_init_rl(&ff_mpeg4_rl_intra, ff_mpeg4_static_rl_table_store[0]);
-        ff_init_rl(&ff_rvlc_rl_inter, ff_mpeg4_static_rl_table_store[1]);
-        ff_init_rl(&ff_rvlc_rl_intra, ff_mpeg4_static_rl_table_store[2]);
+        ff_rl_init(&ff_mpeg4_rl_intra, ff_mpeg4_static_rl_table_store[0]);
+        ff_rl_init(&ff_rvlc_rl_inter, ff_mpeg4_static_rl_table_store[1]);
+        ff_rl_init(&ff_rvlc_rl_intra, ff_mpeg4_static_rl_table_store[2]);
         INIT_VLC_RL(ff_mpeg4_rl_intra, 554);
         INIT_VLC_RL(ff_rvlc_rl_inter, 1072);
         INIT_VLC_RL(ff_rvlc_rl_intra, 1072);
@@ -2664,14 +2670,16 @@ int ff_mpeg4_frame_end(AVCodecContext *avctx, const uint8_t *buf, int buf_size)
             if (!ctx->showed_packed_warning) {
                 av_log(s->avctx, AV_LOG_INFO, "Video uses a non-standard and "
                        "wasteful way to store B-frames ('packed B-frames'). "
-                       "Consider using the mpeg4_unpack_bframes bitstream filter to fix it.\n");
+                       "Consider using the mpeg4_unpack_bframes bitstream filter without encoding but stream copy to fix it.\n");
                 ctx->showed_packed_warning = 1;
             }
             av_fast_padded_malloc(&s->bitstream_buffer,
                            &s->allocated_bitstream_buffer_size,
                            buf_size - current_pos);
-            if (!s->bitstream_buffer)
+            if (!s->bitstream_buffer) {
+                s->bitstream_buffer_size = 0;
                 return AVERROR(ENOMEM);
+            }
             memcpy(s->bitstream_buffer, buf + current_pos,
                    buf_size - current_pos);
             s->bitstream_buffer_size = buf_size - current_pos;
@@ -2770,9 +2778,9 @@ AVCodec ff_mpeg4_decoder = {
     .init                  = decode_init,
     .close                 = ff_h263_decode_end,
     .decode                = ff_h263_decode_frame,
-    .capabilities          = CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 |
-                             CODEC_CAP_TRUNCATED | CODEC_CAP_DELAY |
-                             CODEC_CAP_FRAME_THREADS,
+    .capabilities          = AV_CODEC_CAP_DRAW_HORIZ_BAND | AV_CODEC_CAP_DR1 |
+                             AV_CODEC_CAP_TRUNCATED | AV_CODEC_CAP_DELAY |
+                             AV_CODEC_CAP_FRAME_THREADS,
     .flush                 = ff_mpeg_flush,
     .max_lowres            = 3,
     .pix_fmts              = ff_h263_hwaccel_pixfmt_list_420,
@@ -2799,8 +2807,8 @@ AVCodec ff_mpeg4_vdpau_decoder = {
     .init           = decode_init,
     .close          = ff_h263_decode_end,
     .decode         = ff_h263_decode_frame,
-    .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_TRUNCATED | CODEC_CAP_DELAY |
-                      CODEC_CAP_HWACCEL_VDPAU,
+    .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_TRUNCATED | AV_CODEC_CAP_DELAY |
+                      AV_CODEC_CAP_HWACCEL_VDPAU,
     .pix_fmts       = (const enum AVPixelFormat[]) { AV_PIX_FMT_VDPAU_MPEG4,
                                                   AV_PIX_FMT_NONE },
     .priv_class     = &mpeg4_vdpau_class,

@@ -801,6 +801,12 @@ static int tak_decode_frame(AVCodecContext *avctx, void *data,
                     if (s->mcdparams[i].present) {
                         s->mcdparams[i].index = get_bits(gb, 2);
                         s->mcdparams[i].chan2 = get_bits(gb, 4);
+                        if (s->mcdparams[i].chan2 >= avctx->channels) {
+                            av_log(avctx, AV_LOG_ERROR,
+                                   "invalid channel 2 (%d) for %d channel(s)\n",
+                                   s->mcdparams[i].chan2, avctx->channels);
+                            return AVERROR_INVALIDDATA;
+                        }
                         if (s->mcdparams[i].index == 1) {
                             if ((nbit == s->mcdparams[i].chan2) ||
                                 (ch_mask & 1 << s->mcdparams[i].chan2))
@@ -941,7 +947,7 @@ AVCodec ff_tak_decoder = {
     .decode           = tak_decode_frame,
     .init_thread_copy = ONLY_IF_THREADS_ENABLED(init_thread_copy),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
-    .capabilities     = CODEC_CAP_DR1 | CODEC_CAP_FRAME_THREADS,
+    .capabilities     = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
     .sample_fmts      = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_U8P,
                                                         AV_SAMPLE_FMT_S16P,
                                                         AV_SAMPLE_FMT_S32P,

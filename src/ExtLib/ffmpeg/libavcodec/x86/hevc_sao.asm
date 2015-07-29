@@ -39,7 +39,7 @@ cextern pb_2
 SECTION_TEXT
 
 %define MAX_PB_SIZE  64
-%define PADDING_SIZE 32 ; FF_INPUT_BUFFER_PADDING_SIZE
+%define PADDING_SIZE 32 ; AV_INPUT_BUFFER_PADDING_SIZE
 
 ;******************************************************************************
 ;SAO Band Filter
@@ -141,7 +141,7 @@ cglobal hevc_sao_band_filter_%1_8, 6, 6, 15, 7*mmsize*ARCH_X86_32, dst, src, dst
     HEVC_SAO_BAND_FILTER_INIT 8
 
 align 16
-.loop
+.loop:
 %if %1 == 8
     movq              m8, [srcq]
     punpcklbw         m8, m14
@@ -191,7 +191,7 @@ cglobal hevc_sao_band_filter_%2_%1, 6, 6, 15, 7*mmsize*ARCH_X86_32, dst, src, ds
     HEVC_SAO_BAND_FILTER_INIT %1
 
 align 16
-.loop
+.loop:
 %if %2 == 8
     movu              m8, [srcq]
     HEVC_SAO_BAND_FILTER_COMPUTE %1, m9, m8
@@ -528,7 +528,7 @@ cglobal hevc_sao_edge_filter_%2_%1, 1, 6, 8, 5*mmsize, dst, src, dststride, a_st
 %endif
 
 align 16
-.loop
+.loop:
 
 %if %2 == 8
     mova              m1, [srcq]

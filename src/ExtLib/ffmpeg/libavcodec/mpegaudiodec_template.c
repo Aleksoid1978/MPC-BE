@@ -429,7 +429,7 @@ static av_cold int decode_init(AVCodecContext * avctx)
     s->avctx = avctx;
 
 #if USE_FLOATS
-    s->fdsp = avpriv_float_dsp_alloc(avctx->flags & CODEC_FLAG_BITEXACT);
+    s->fdsp = avpriv_float_dsp_alloc(avctx->flags & AV_CODEC_FLAG_BITEXACT);
     if (!s->fdsp)
         return AVERROR(ENOMEM);
 #endif
@@ -1686,7 +1686,7 @@ static int decode_frame(AVCodecContext * avctx, void *data, int *got_frame_ptr,
     if (!avctx->bit_rate)
         avctx->bit_rate = s->bit_rate;
 
-    if (s->frame_size <= 0 || s->frame_size > buf_size) {
+    if (s->frame_size <= 0) {
         av_log(avctx, AV_LOG_ERROR, "incomplete frame\n");
         return AVERROR_INVALIDDATA;
     } else if (s->frame_size < buf_size) {
@@ -1893,6 +1893,7 @@ static av_cold int decode_init_mp3on4(AVCodecContext * avctx)
         s->mp3decctx[i]->adu_mode = 1;
         s->mp3decctx[i]->avctx = avctx;
         s->mp3decctx[i]->mpadsp = s->mp3decctx[0]->mpadsp;
+        s->mp3decctx[i]->fdsp = s->mp3decctx[0]->fdsp;
     }
 
     return 0;

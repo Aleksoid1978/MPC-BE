@@ -61,7 +61,11 @@
 #endif
 
 
-#define FF_SANE_NB_CHANNELS 63U
+#if !FF_API_QUANT_BIAS
+#define FF_DEFAULT_QUANT_BIAS 999999
+#endif
+
+#define FF_SANE_NB_CHANNELS 64U
 
 #define FF_SIGNBIT(x) ((x) >> CHAR_BIT * sizeof(x) - 1)
 
@@ -198,7 +202,7 @@ int avpriv_unlock_avformat(void);
  * This value was chosen such that every bit of the buffer is
  * addressable by a 32-bit signed integer as used by get_bits.
  */
-#define FF_MAX_EXTRADATA_SIZE ((1 << 28) - FF_INPUT_BUFFER_PADDING_SIZE)
+#define FF_MAX_EXTRADATA_SIZE ((1 << 28) - AV_INPUT_BUFFER_PADDING_SIZE)
 
 /**
  * Check AVPacket size and/or allocate data.
@@ -215,11 +219,15 @@ int avpriv_unlock_avformat(void);
  *                avpkt->size is set to the specified size.
  *                All other AVPacket fields will be reset with av_init_packet().
  * @param size    the minimum required packet size
+ * @param min_size the smallest the packet might be down sized to, can be set to
+ *                0, setting this roughly correctly allows the allocation code
+ *                to choose between several allocation stragies to improve
+ *                speed slightly.
  * @return        non negative on success, negative error code on failure
  */
-int ff_alloc_packet2(AVCodecContext *avctx, AVPacket *avpkt, int64_t size);
+int ff_alloc_packet2(AVCodecContext *avctx, AVPacket *avpkt, int64_t size, int64_t min_size);
 
-int ff_alloc_packet(AVPacket *avpkt, int size);
+attribute_deprecated int ff_alloc_packet(AVPacket *avpkt, int size);
 
 /**
  * Rescale from sample rate to AVCodecContext.time_base.
@@ -300,5 +308,7 @@ int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt);
  * Set various frame properties from the codec context / packet data.
  */
 int ff_decode_frame_props(AVCodecContext *avctx, AVFrame *frame);
+
+int ff_side_data_set_encoder_stats(AVPacket *pkt, int quality, int64_t *error, int error_count, int pict_type);
 
 #endif /* AVCODEC_INTERNAL_H */

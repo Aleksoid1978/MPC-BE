@@ -307,10 +307,13 @@ ipred_func(32, tm, avx2);
 
 #endif /* HAVE_YASM */
 
-av_cold void ff_vp9dsp_init_x86(VP9DSPContext *dsp)
+av_cold void ff_vp9dsp_init_x86(VP9DSPContext *dsp, int bpp)
 {
 #if HAVE_YASM
-    int cpu_flags = av_get_cpu_flags();
+    int cpu_flags;
+    if (bpp != 8) return;
+
+    cpu_flags = av_get_cpu_flags();
 
 #define init_fpel(idx1, idx2, sz, type, opt) \
     dsp->mc[idx1][FILTER_8TAP_SMOOTH ][idx2][0][0] = \
@@ -480,12 +483,14 @@ av_cold void ff_vp9dsp_init_x86(VP9DSPContext *dsp)
         dsp->itxfm_add[TX_32X32][ADST_DCT] =
         dsp->itxfm_add[TX_32X32][DCT_ADST] =
         dsp->itxfm_add[TX_32X32][DCT_DCT] = ff_vp9_idct_idct_32x32_add_avx;
-        init_fpel(1, 0, 32, put, avx);
-        init_fpel(0, 0, 64, put, avx);
         init_lpf(avx);
         init_dir_tm_h_ipred(8, avx);
         init_dir_tm_h_ipred(16, avx);
         init_dir_tm_h_ipred(32, avx);
+    }
+    if (EXTERNAL_AVX_FAST(cpu_flags)) {
+        init_fpel(1, 0, 32, put, avx);
+        init_fpel(0, 0, 64, put, avx);
         init_ipred(32, avx, v, VERT);
     }
 

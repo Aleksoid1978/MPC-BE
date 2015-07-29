@@ -72,7 +72,7 @@ typedef struct WmallDecodeCtx {
     AVCodecContext  *avctx;
     AVFrame         *frame;
     LLAudDSPContext dsp;                           ///< accelerated DSP functions
-    uint8_t         frame_data[MAX_FRAMESIZE + FF_INPUT_BUFFER_PADDING_SIZE];  ///< compressed frame data
+    uint8_t         frame_data[MAX_FRAMESIZE + AV_INPUT_BUFFER_PADDING_SIZE];  ///< compressed frame data
     PutBitContext   pb;                             ///< context for filling the frame_data buffer
 
     /* frame size dependent frame information (set during initialization) */
@@ -488,7 +488,7 @@ static int decode_cdlms(WmallDecodeCtx *s)
                 if ((1 << cbits) < s->cdlms[c][i].scaling + 1)
                     cbits++;
 
-                s->cdlms[c][i].bitsend = get_bits(&s->gb, cbits) + 2;
+                s->cdlms[c][i].bitsend = (cbits ? get_bits(&s->gb, cbits) : 0) + 2;
                 shift_l = 32 - s->cdlms[c][i].bitsend;
                 shift_r = 32 - s->cdlms[c][i].scaling - 2;
                 for (j = 0; j < s->cdlms[c][i].coefsend; j++)
@@ -1005,6 +1005,7 @@ static int decode_frame(WmallDecodeCtx *s)
     if ((ret = ff_get_buffer(s->avctx, s->frame, 0)) < 0) {
         /* return an error if no frame could be decoded at all */
         s->packet_loss = 1;
+        s->frame->nb_samples = 0;
         return ret;
     }
     for (i = 0; i < s->num_channels; i++) {
@@ -1298,7 +1299,7 @@ AVCodec ff_wmalossless_decoder = {
     .close          = decode_close,
     .decode         = decode_packet,
     .flush          = flush,
-    .capabilities   = CODEC_CAP_SUBFRAMES | CODEC_CAP_DR1 | CODEC_CAP_DELAY,
+    .capabilities   = AV_CODEC_CAP_SUBFRAMES | AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
     .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
                                                       AV_SAMPLE_FMT_S32P,
                                                       AV_SAMPLE_FMT_NONE },

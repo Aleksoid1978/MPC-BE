@@ -31,17 +31,21 @@
 #include <limits.h>
 
 #include "libavutil/attributes.h"
+#include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
 #include "libavutil/mathematics.h"
 #include "avcodec.h"
 #include "mpegvideo.h"
 #include "h263.h"
+#include "h263data.h"
 #include "internal.h"
 #include "mathops.h"
 #include "mpegutils.h"
 #include "unary.h"
 #include "flv.h"
+#include "rv10.h"
 #include "mpeg4video.h"
+#include "mpegvideodata.h"
 
 // The defines below define the number of bits that are read at once for
 // reading vlc values. Changing these may improve speed and data cache needs
@@ -118,8 +122,8 @@ av_cold void ff_h263_decode_init_vlc(void)
         INIT_VLC_STATIC(&mv_vlc, MV_VLC_BITS, 33,
                  &ff_mvtab[0][1], 2, 1,
                  &ff_mvtab[0][0], 2, 1, 538);
-        ff_init_rl(&ff_h263_rl_inter, ff_h263_static_rl_table_store[0]);
-        ff_init_rl(&ff_rl_intra_aic, ff_h263_static_rl_table_store[1]);
+        ff_rl_init(&ff_h263_rl_inter, ff_h263_static_rl_table_store[0]);
+        ff_rl_init(&ff_rl_intra_aic, ff_h263_static_rl_table_store[1]);
         INIT_VLC_RL(ff_h263_rl_inter, 554);
         INIT_VLC_RL(ff_rl_intra_aic, 554);
         INIT_VLC_STATIC(&h263_mbtype_b_vlc, H263_MBTYPE_B_VLC_BITS, 15,
@@ -136,12 +140,12 @@ int ff_h263_decode_mba(MpegEncContext *s)
 {
     int i, mb_pos;
 
-    for(i=0; i<6; i++){
-        if(s->mb_num-1 <= ff_mba_max[i]) break;
-    }
-    mb_pos= get_bits(&s->gb, ff_mba_length[i]);
-    s->mb_x= mb_pos % s->mb_width;
-    s->mb_y= mb_pos / s->mb_width;
+    for (i = 0; i < 6; i++)
+        if (s->mb_num - 1 <= ff_mba_max[i])
+            break;
+    mb_pos  = get_bits(&s->gb, ff_mba_length[i]);
+    s->mb_x = mb_pos % s->mb_width;
+    s->mb_y = mb_pos / s->mb_width;
 
     return mb_pos;
 }
@@ -460,7 +464,7 @@ static int h263_decode_block(MpegEncContext * s, int16_t * block,
             level = get_bits(&s->gb, 8);
             if((level&0x7F) == 0){
                 av_log(s->avctx, AV_LOG_ERROR, "illegal dc %d at %d %d\n", level, s->mb_x, s->mb_y);
-                if(s->err_recognition & (AV_EF_BITSTREAM|AV_EF_COMPLIANT))
+                if (s->avctx->err_recognition & (AV_EF_BITSTREAM|AV_EF_COMPLIANT))
                     return -1;
             }
             if (level == 255)
@@ -871,7 +875,7 @@ end:
 /* most is hardcoded. should extend to handle all h263 streams */
 int ff_h263_decode_picture_header(MpegEncContext *s)
 {
-    int format, width, height, i;
+    int format, width, height, i, ret;
     uint32_t startcode;
 
     align_get_bits(&s->gb);
@@ -1081,10 +1085,9 @@ int ff_h263_decode_picture_header(MpegEncContext *s)
         s->qscale = get_bits(&s->gb, 5);
     }
 
-    if (s->width == 0 || s->height == 0) {
-        av_log(s->avctx, AV_LOG_ERROR, "dimensions 0\n");
-        return -1;
-    }
+    if ((ret = av_image_check_size(s->width, s->height, 0, s)) < 0)
+        return ret;
+
     s->mb_width = (s->width  + 15) / 16;
     s->mb_height = (s->height  + 15) / 16;
     s->mb_num = s->mb_width * s->mb_height;

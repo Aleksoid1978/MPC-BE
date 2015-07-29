@@ -645,6 +645,8 @@ static int read_header(FFV1Context *f)
         chroma_h_shift      = get_symbol(c, state, 0);
         chroma_v_shift      = get_symbol(c, state, 0);
         transparency        = get_rac(c, state);
+        if (colorspace == 0 && f->avctx->skip_alpha)
+            transparency = 0;
 
         if (f->plane_count) {
             if (colorspace          != f->colorspace                 ||
@@ -675,7 +677,6 @@ static int read_header(FFV1Context *f)
     }
 
     if (f->colorspace == 0) {
-        if (f->avctx->skip_alpha) f->transparency = 0;
         if (!f->transparency && !f->chroma_planes) {
             if (f->avctx->bits_per_raw_sample <= 8)
                 f->avctx->pix_fmt = AV_PIX_FMT_GRAY8;
@@ -1109,6 +1110,6 @@ AVCodec ff_ffv1_decoder = {
     .decode         = decode_frame,
     .init_thread_copy = ONLY_IF_THREADS_ENABLED(init_thread_copy),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(update_thread_context),
-    .capabilities   = CODEC_CAP_DR1 /*| CODEC_CAP_DRAW_HORIZ_BAND*/ |
-                      CODEC_CAP_FRAME_THREADS | CODEC_CAP_SLICE_THREADS,
+    .capabilities   = AV_CODEC_CAP_DR1 /*| AV_CODEC_CAP_DRAW_HORIZ_BAND*/ |
+                      AV_CODEC_CAP_FRAME_THREADS | AV_CODEC_CAP_SLICE_THREADS,
 };

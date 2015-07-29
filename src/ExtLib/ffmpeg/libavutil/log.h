@@ -196,12 +196,12 @@ typedef struct AVClass {
  */
 #define AV_LOG_DEBUG    48
 
-#define AV_LOG_MAX_OFFSET (AV_LOG_DEBUG - AV_LOG_QUIET)
-
 /**
  * Extremely verbose debugging, useful for libav* development.
  */
 #define AV_LOG_TRACE    56
+
+#define AV_LOG_MAX_OFFSET (AV_LOG_TRACE - AV_LOG_QUIET)
 
 /**
  * @}
@@ -309,7 +309,7 @@ AVClassCategory av_default_get_category(void *ptr);
 
 /**
  * Format a line of log the same way as the default callback.
- * @param line          buffer to receive the formated line
+ * @param line          buffer to receive the formatted line
  * @param line_size     size of the buffer
  * @param print_prefix  used to store whether the prefix must be printed;
  *                      must point to a persistent integer initially set to 1

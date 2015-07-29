@@ -28,6 +28,7 @@
 *.libavcodec/libdcadec.c 
 * libavcodec/mpeg12dec.c
 * libavcodec/mpegvideo.c
+* libavcodec/mpegpicture.c
 * libavcodec/options.c
 * libavcodec/utils.c
 * libavcodec/vc1.h

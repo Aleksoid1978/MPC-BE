@@ -3109,7 +3109,7 @@ int ff_hevc_extract_rbsp(HEVCContext *s, const uint8_t *src, int length,
     }
 
     av_fast_malloc(&nal->rbsp_buffer, &nal->rbsp_buffer_size,
-                   length + FF_INPUT_BUFFER_PADDING_SIZE);
+                   length + AV_INPUT_BUFFER_PADDING_SIZE);
     if (!nal->rbsp_buffer)
         return AVERROR(ENOMEM);
 
@@ -3150,7 +3150,7 @@ int ff_hevc_extract_rbsp(HEVCContext *s, const uint8_t *src, int length,
         dst[di++] = src[si++];
 
 nsc:
-    memset(dst + di, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+    memset(dst + di, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
     nal->data = dst;
     nal->size = di;
@@ -3829,7 +3829,7 @@ AVCodec ff_hevc_decoder = {
     .flush                 = hevc_decode_flush,
     .update_thread_context = hevc_update_thread_context,
     .init_thread_copy      = hevc_init_thread_copy,
-    .capabilities          = CODEC_CAP_DR1 | CODEC_CAP_DELAY |
-                             CODEC_CAP_SLICE_THREADS | CODEC_CAP_FRAME_THREADS,
+    .capabilities          = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY |
+                             AV_CODEC_CAP_SLICE_THREADS | AV_CODEC_CAP_FRAME_THREADS,
     .profiles              = NULL_IF_CONFIG_SMALL(profiles),
 };
