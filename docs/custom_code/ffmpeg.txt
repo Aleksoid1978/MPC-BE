@@ -27,6 +27,7 @@
 * libavcodec/internal.h
 *.libavcodec/libdcadec.c 
 * libavcodec/mpeg12dec.c
+* libavcodec/mpegaudio_parser.c
 * libavcodec/mpegvideo.c
 * libavcodec/mpegpicture.c
 * libavcodec/options.c

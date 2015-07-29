@@ -1178,7 +1178,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
     {
         .id        = AV_CODEC_ID_SMVJPEG,
         .type      = AVMEDIA_TYPE_VIDEO,
-        .name      = "smv",
+        .name      = "smvjpeg",
         .long_name = NULL_IF_CONFIG_SMALL("Sigmatel Motion Video"),
     },
 
@@ -1252,6 +1252,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("Canopus HQ/HQA"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
+    {
+        .id        = AV_CODEC_ID_HAP,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "hap",
+        .long_name = NULL_IF_CONFIG_SMALL("Vidvox Hap decoder"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
 
     /* image codecs */
     {
@@ -1274,6 +1281,14 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "brender_pix",
         .long_name = NULL_IF_CONFIG_SMALL("BRender PIX image"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
+    },
+    {
+        .id        = AV_CODEC_ID_DDS,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "dds",
+        .long_name = NULL_IF_CONFIG_SMALL("DirectDraw Surface image decoder"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY |
+                     AV_CODEC_PROP_LOSSLESS,
     },
     {
         .id        = AV_CODEC_ID_DPX,
@@ -1820,7 +1835,14 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .id        = AV_CODEC_ID_ADPCM_THP,
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "adpcm_thp",
-        .long_name = NULL_IF_CONFIG_SMALL("ADPCM Nintendo Gamecube THP"),
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM Nintendo THP"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_THP_LE,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_thp_le",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM Nintendo THP (Little-Endian)"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
     {
@@ -2517,6 +2539,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_LOSSY,
     },
     {
+        .id        = AV_CODEC_ID_4GV,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "4gv",
+        .long_name = NULL_IF_CONFIG_SMALL("4GV (Fourth Generation Vocoder)"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
         .id        = AV_CODEC_ID_DSD_LSBF,
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "dsd_lsbf",
@@ -2877,6 +2906,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "pcm_s32le_planar_deprecated",
         .long_name = NULL_IF_CONFIG_SMALL("PCM signed 32-bit little-endian planar (deprecated id)"),
+        .props     = AV_CODEC_PROP_LOSSLESS,
+    },
+    {
+        .id        = AV_CODEC_ID_PCM_S16BE_PLANAR_DEPRECATED,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "pcm_s16be_planar_deprecated",
+        .long_name = NULL_IF_CONFIG_SMALL("PCM signed 16-bit big-endian planar (deprecated id)"),
         .props     = AV_CODEC_PROP_LOSSLESS,
     },
     {

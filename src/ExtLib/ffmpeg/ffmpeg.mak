@@ -177,6 +177,7 @@ SRCS_LC = \
 	libavcodec/eac3_data.c \
 	libavcodec/eac3enc.c \
 	libavcodec/eac3dec.c \
+	libavcodec/elsdec.c \
 	libavcodec/error_resilience.c \
 	libavcodec/exif.c \
 	libavcodec/faandct.c \
@@ -368,6 +369,7 @@ SRCS_LC = \
 	libavcodec/shorten.c \
 	libavcodec/simple_idct.c \
 	libavcodec/sinewin.c \
+	libavcodec/sinewin_tablegen.c \
 	libavcodec/sipr.c \
 	libavcodec/sipr16k.c \
 	libavcodec/snow_dwt.c \

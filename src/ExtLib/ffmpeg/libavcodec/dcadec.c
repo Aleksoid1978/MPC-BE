@@ -229,6 +229,14 @@ static int dca_parse_audio_coding_header(DCAContext *s, int base_channel,
     }
 
     nchans = get_bits(&s->gb, 3) + 1;
+    if (xxch && nchans >= 3) {
+        av_log(s->avctx, AV_LOG_ERROR, "nchans %d is too large\n", nchans);
+        return AVERROR_INVALIDDATA;
+    } else if (nchans + base_channel > DCA_PRIM_CHANNELS_MAX) {
+        av_log(s->avctx, AV_LOG_ERROR, "channel sum %d + %d is too large\n", nchans, base_channel);
+        return AVERROR_INVALIDDATA;
+    }
+
     s->total_channels = nchans + base_channel;
     s->prim_channels  = s->total_channels;
 
@@ -429,6 +437,10 @@ static int dca_subframe_header(DCAContext *s, int base_channel, int block_index)
 
     if (!base_channel) {
         s->subsubframes[s->current_subframe]    = get_bits(&s->gb, 2) + 1;
+        if (block_index + s->subsubframes[s->current_subframe] > s->sample_blocks/8) {
+            s->subsubframes[s->current_subframe] = 1;
+            return AVERROR_INVALIDDATA;
+        }
         s->partial_samples[s->current_subframe] = get_bits(&s->gb, 3);
     }
 
@@ -1230,8 +1242,13 @@ int ff_dca_xbr_parse_frame(DCAContext *s)
     for(i = 0; i < num_chsets; i++) {
         n_xbr_ch[i] = get_bits(&s->gb, 3) + 1;
         k = get_bits(&s->gb, 2) + 5;
-        for(j = 0; j < n_xbr_ch[i]; j++)
+        for(j = 0; j < n_xbr_ch[i]; j++) {
             active_bands[i][j] = get_bits(&s->gb, k) + 1;
+            if (active_bands[i][j] > DCA_SUBBANDS) {
+                av_log(s->avctx, AV_LOG_ERROR, "too many active subbands (%d)\n", active_bands[i][j]);
+                return AVERROR_INVALIDDATA;
+            }
+        }
     }
 
     /* skip to the end of the header */
@@ -1273,23 +1290,34 @@ int ff_dca_xbr_parse_frame(DCAContext *s)
                 for(i = 0; i < n_xbr_ch[chset]; i++) {
                     const uint32_t *scale_table;
                     int nbits;
+                    int scale_table_size;
 
                     if (s->scalefactor_huffman[chan_base+i] == 6) {
                         scale_table = ff_dca_scale_factor_quant7;
+                        scale_table_size = FF_ARRAY_ELEMS(ff_dca_scale_factor_quant7);
                     } else {
                         scale_table = ff_dca_scale_factor_quant6;
+                        scale_table_size = FF_ARRAY_ELEMS(ff_dca_scale_factor_quant6);
                     }
 
                     nbits = anctemp[i];
 
                     for(j = 0; j < active_bands[chset][i]; j++) {
                         if(abits_high[i][j] > 0) {
-                            scale_table_high[i][j][0] =
-                                scale_table[get_bits(&s->gb, nbits)];
+                            int index = get_bits(&s->gb, nbits);
+                            if (index >= scale_table_size) {
+                                av_log(s->avctx, AV_LOG_ERROR, "scale table index %d invalid\n", index);
+                                return AVERROR_INVALIDDATA;
+                            }
+                            scale_table_high[i][j][0] = scale_table[index];
 
                             if(xbr_tmode && s->transition_mode[i][j]) {
-                                scale_table_high[i][j][1] =
-                                    scale_table[get_bits(&s->gb, nbits)];
+                                int index = get_bits(&s->gb, nbits);
+                                if (index >= scale_table_size) {
+                                    av_log(s->avctx, AV_LOG_ERROR, "scale table index %d invalid\n", index);
+                                    return AVERROR_INVALIDDATA;
+                                }
+                                scale_table_high[i][j][1] = scale_table[index];
                             }
                         }
                     }
@@ -1459,8 +1487,11 @@ static int dca_decode_frame(AVCodecContext *avctx, void *data,
     s->exss_ext_mask = 0;
     s->xch_present   = 0;
 
-    s->dca_buffer_size = avpriv_dca_convert_bitstream(buf, buf_size, s->dca_buffer,
-                                                  DCA_MAX_FRAME_SIZE + DCA_MAX_EXSS_HEADER_SIZE);
+    s->dca_buffer_size = AVERROR_INVALIDDATA;
+    for (i = 0; i < buf_size - 3 && s->dca_buffer_size == AVERROR_INVALIDDATA; i++)
+        s->dca_buffer_size = avpriv_dca_convert_bitstream(buf + i, buf_size - i, s->dca_buffer,
+                                                          DCA_MAX_FRAME_SIZE + DCA_MAX_EXSS_HEADER_SIZE);
+
     if (s->dca_buffer_size == AVERROR_INVALIDDATA) {
         av_log(avctx, AV_LOG_ERROR, "Not a valid DCA frame\n");
         return AVERROR_INVALIDDATA;
@@ -1638,11 +1669,18 @@ static int dca_decode_frame(AVCodecContext *avctx, void *data,
 
     /* If we have XXCH then the channel layout is managed differently */
     /* note that XLL will also have another way to do things */
+#if FF_API_REQUEST_CHANNELS
+FF_DISABLE_DEPRECATION_WARNINGS
     if (!(s->core_ext_mask & DCA_EXT_XXCH)
         || (s->core_ext_mask & DCA_EXT_XXCH && avctx->request_channels > 0
             && avctx->request_channels
             < num_core_channels + !!s->lfe + s->xxch_chset_nch[0]))
-    { /* xxx should also do MA extensions */
+    {
+FF_ENABLE_DEPRECATION_WARNINGS
+#else
+    if (!(s->core_ext_mask & DCA_EXT_XXCH)) {
+#endif
+        /* xxx should also do MA extensions */
         if (s->amode < 16) {
             avctx->channel_layout = ff_dca_core_channel_layout[s->amode];
 
@@ -1719,6 +1757,8 @@ FF_ENABLE_DEPRECATION_WARNINGS
         /* we only get here if an XXCH channel set can be added to the mix */
         channel_mask = s->xxch_core_spkmask;
 
+#if FF_API_REQUEST_CHANNELS
+FF_DISABLE_DEPRECATION_WARNINGS
         if (avctx->request_channels > 0
             && avctx->request_channels < s->prim_channels) {
             channels = num_core_channels + !!s->lfe;
@@ -1727,7 +1767,10 @@ FF_ENABLE_DEPRECATION_WARNINGS
                 channels += s->xxch_chset_nch[i];
                 channel_mask |= s->xxch_spk_masks[i];
             }
-        } else {
+FF_ENABLE_DEPRECATION_WARNINGS
+        } else
+#endif
+        {
             channels = s->prim_channels + !!s->lfe;
             for (i = 0; i < s->xxch_chset; i++) {
                 channel_mask |= s->xxch_spk_masks[i];
