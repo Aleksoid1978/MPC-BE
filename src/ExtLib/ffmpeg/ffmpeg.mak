@@ -93,8 +93,9 @@ SRCS_LC = \
 	libavcodec/aac_parser.c \
 	libavcodec/aacadtsdec.c \
 	libavcodec/aacdec.c \
-	libavcodec/aacps.c \
-	libavcodec/aacpsdsp.c \
+	libavcodec/aacps_float.c \
+	libavcodec/aacpsdsp_float.c \
+	libavcodec/aacps_tablegen.c \
 	libavcodec/aacsbr.c \
 	libavcodec/aactab.c \
 	libavcodec/ac3.c \

@@ -1,7 +1,6 @@
 /*
- * Header file for hardcoded AAC SBR windows
- *
- * Copyright (c) 2014 Reimar Döffinger <Reimar.Doeffinger@gmx.de>
+ * MPEG-4 Parametric Stereo decoding functions
+ * Copyright (c) 2010 Alex Converse <alex.converse@gmail.com>
  *
  * This file is part of FFmpeg.
  *
@@ -20,13 +19,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_AACSBR_TABLEGEN_H
-#define AVCODEC_AACSBR_TABLEGEN_H
+#define USE_FIXED 0
 
-#include "aacsbr_tablegen_common.h"
-
-#if CONFIG_HARDCODED_TABLES
-#include "libavcodec/aacsbr_tables.h"
-#endif /* CONFIG_HARDCODED_TABLES */
-
-#endif /* AVCODEC_AACSBR_TABLEGEN_H */
+#include "aacps.c"
