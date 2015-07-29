@@ -20,6 +20,7 @@
     <ClCompile>
       <AdditionalOptions>/w34706 /Zo /Zc:rvalueCast %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(ANALYZE)'=='true'">/wd4005 /wd6031 /wd6246 /wd6309 /wd6387 /wd28204 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(PlatformToolsetVersion)'=='140'">/wd4091 /wd4267 /wd4302 /wd4473 /wd4476 /wd4477 /wd4478 /wd4838 %(AdditionalOptions)</AdditionalOptions>
       <EnablePREfast Condition="'$(ANALYZE)'=='true'">true</EnablePREfast>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <ExceptionHandling>Sync</ExceptionHandling>
