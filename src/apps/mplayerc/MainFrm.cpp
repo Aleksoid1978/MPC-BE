@@ -15693,23 +15693,15 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 				pRTS->SetOverride(s.fUseDefaultSubtitlesStyle, s.subdefstyle);
 				pRTS->SetAlignment(s.fOverridePlacement, s.nHorPos, s.nVerPos);
 
-				if (m_pCAP) {
-					bool bKeepAspectRatio = s.fKeepAspectRatio;
+				if (m_pCAP && s.fKeepAspectRatio && pRTS->m_dstScreenSizeActual) {
 					CSize szAspectRatio = m_pCAP->GetVideoSize(true);
-					CSize szVideoFrame;
-					if (CComQIPtr<IMadVRInfo> pMVRI = m_pCAP) {
-						// Use IMadVRInfo to get size. See http://bugs.madshi.net/view.php?id=180
-						pMVRI->GetSize("originalVideoSize", &szVideoFrame);
-						bKeepAspectRatio = true;
-					} else {
-						szVideoFrame = m_pCAP->GetVideoSize(false);
-					}
 
-					pRTS->m_ePARCompensationType = CSimpleTextSubtitle::EPARCompensationType::EPCTAccurateSize_ISR;
-					if (szAspectRatio.cx && szAspectRatio.cy && szVideoFrame.cx && szVideoFrame.cy && bKeepAspectRatio) {
+					if (szAspectRatio.cx && szAspectRatio.cy && pRTS->m_dstScreenSize.cx && pRTS->m_dstScreenSize.cy) {
+						pRTS->m_ePARCompensationType = CSimpleTextSubtitle::EPARCompensationType::EPCTAccurateSize_ISR;
 						pRTS->m_dPARCompensation = ((double)szAspectRatio.cx / szAspectRatio.cy) /
-													((double)szVideoFrame.cx / szVideoFrame.cy);
+													((double)pRTS->m_dstScreenSize.cx / pRTS->m_dstScreenSize.cy);
 					} else {
+						pRTS->m_ePARCompensationType = CSimpleTextSubtitle::EPARCompensationType::EPCTDisabled;
 						pRTS->m_dPARCompensation = 1.0;
 					}
 				}

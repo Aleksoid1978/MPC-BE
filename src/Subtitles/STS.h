@@ -135,6 +135,7 @@ public:
 	CString m_path;
 
 	CSize m_dstScreenSize;
+	bool m_dstScreenSizeActual;
 	int m_defaultWrapStyle;
 	int m_collisions;
 	bool m_fScaledBAS;

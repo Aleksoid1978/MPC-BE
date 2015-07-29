@@ -1552,6 +1552,8 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 			}
 		} else if (entry == L"playresx") {
 			if (script_info) {
+				ret.m_dstScreenSizeActual = false;
+
 				try {
 					ret.m_dstScreenSize.cx = GetInt(pszBuff, nBuffLength);
 				} catch (...) {
@@ -1563,10 +1565,14 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 					ret.m_dstScreenSize.cy = (ret.m_dstScreenSize.cx == 1280)
 											 ? 1024
 											 : ret.m_dstScreenSize.cx * 3 / 4;
+				} else {
+					ret.m_dstScreenSizeActual = true;
 				}
 			}
 		} else if (entry == L"playresy") {
 			if (script_info) {
+				ret.m_dstScreenSizeActual = false;
+
 				try {
 					ret.m_dstScreenSize.cy = GetInt(pszBuff, nBuffLength);
 				} catch (...) {
@@ -1578,6 +1584,8 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 					ret.m_dstScreenSize.cx = (ret.m_dstScreenSize.cy == 1024)
 											 ? 1280
 											 : ret.m_dstScreenSize.cy * 4 / 3;
+				} else {
+					ret.m_dstScreenSizeActual = true;
 				}
 			}
 		} else if (entry == L"wrapstyle") {
@@ -1863,7 +1871,8 @@ static int nOpenFuncts = _countof(OpenFuncts);
 
 CSimpleTextSubtitle::CSimpleTextSubtitle()
 	: m_mode(TIME)
-	, m_dstScreenSize(CSize(0, 0))
+	, m_dstScreenSize({ 0, 0 })
+	, m_dstScreenSizeActual(false)
 	, m_defaultWrapStyle(0)
 	, m_collisions(0)
 	, m_fScaledBAS(false)
