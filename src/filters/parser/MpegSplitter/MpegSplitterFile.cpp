@@ -147,7 +147,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 
 	if (!m_bIsBD) {
 		REFERENCE_TIME rtMin	= _I64_MAX;
-		__int64 posMin			= 0;
+		__int64 posMin			= -1;
 		__int64 posMax			= posMin;
 
 		for (int type = stream_type::video; type <= stream_type::audio; type++) {
@@ -163,7 +163,8 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			}
 		}
 
-		if (rtMin) {
+		if (rtMin >= 0) {
+			const REFERENCE_TIME maxDelta = 30 * 60 * 10000000i64;
 			m_rtMin = m_rtMax = rtMin;
 			for (int type = stream_type::video; type <= stream_type::audio; type++) {
 				CStreamList& streams = m_streams[type];
@@ -173,7 +174,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 					SyncPoints& sps = m_SyncPoints[s];
 					for (size_t i = 1; i < sps.GetCount(); i++) {
 						if (sps[i].rt > m_rtMax && sps[i].fp > posMax
-								&& ((sps[i].rt - m_rtMax) < 30 * 60 * 10000000i64)) {
+								&& ((sps[i].rt - m_rtMax) < maxDelta)) {
 							m_rtMax	= sps[i].rt;
 							posMax	= sps[i].fp;
 						}
