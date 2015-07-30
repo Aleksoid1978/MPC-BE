@@ -606,19 +606,31 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 			str.Format(_T("dwControlFlags: 0x%08x"), vih2.dwControlFlags);
 			sl.AddTail(str);
 			if (vih2.dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
-				DXVA2_ExtendedFormat dxvaExtFormat = { 0 };
-				dxvaExtFormat.value = vih2.dwControlFlags;
-				str.Format(_T("  => VideoChromaSubsampling: %u"), dxvaExtFormat.VideoChromaSubsampling);
+				const LPCTSTR nominalrange[] = { L"Unknown", L"Normal 0-255", L"Wide 16-235", L"0-255", L"16-235", L"48-208" };
+				const LPCTSTR transfermatrix[] = { L"Unknown", L"BT.709", L"BT.601", L"SMPTE 240M" };
+				DXVA2_ExtendedFormat exfmt;
+				exfmt.value = vih2.dwControlFlags;
+
+				str.Format(_T("- VideoChromaSubsampling: %u"), exfmt.VideoChromaSubsampling);
 				sl.AddTail(str);
-				str.Format(_T("  => NominalRange:           %u"), dxvaExtFormat.NominalRange);
+
+				str.Format(_T("- NominalRange          : %u"), exfmt.NominalRange);
+				if (exfmt.NominalRange < _countof(nominalrange)) {
+					str.AppendFormat(L" (%s)", nominalrange[exfmt.NominalRange]);
+				}
 				sl.AddTail(str);
-				str.Format(_T("  => VideoTransferMatrix:    %u"), dxvaExtFormat.VideoTransferMatrix);
+
+				str.Format(_T("- VideoTransferMatrix   : %u"), exfmt.VideoTransferMatrix);
+				if (exfmt.VideoTransferMatrix < _countof(transfermatrix)) {
+					str.AppendFormat(L" (%s)", transfermatrix[exfmt.VideoTransferMatrix]);
+				}
 				sl.AddTail(str);
-				str.Format(_T("  => VideoLighting:          %u"), dxvaExtFormat.VideoLighting);
+
+				str.Format(_T("- VideoLighting         : %u"), exfmt.VideoLighting);
 				sl.AddTail(str);
-				str.Format(_T("  => VideoPrimaries:         %u"), dxvaExtFormat.VideoPrimaries);
+				str.Format(_T("- VideoPrimaries        : %u"), exfmt.VideoPrimaries);
 				sl.AddTail(str);
-				str.Format(_T("  => VideoTransferFunction:  %u"), dxvaExtFormat.VideoTransferFunction);
+				str.Format(_T("- VideoTransferFunction : %u"), exfmt.VideoTransferFunction);
 				sl.AddTail(str);
 			}
 			str.Format(_T("dwReserved2: 0x%08x"), vih2.dwReserved2);
