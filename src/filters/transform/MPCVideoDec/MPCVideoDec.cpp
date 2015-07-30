@@ -2630,7 +2630,12 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 		CComPtr<IMediaSample> pOut;
 		BYTE* pDataOut = NULL;
-		DXVA2_ExtendedFormat dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
+		DXVA2_ExtendedFormat dxvaExtFormat;
+		if (m_FormatConverter.GetOutPixFormat() == PixFmt_RGB32) { // RGB output
+			dxvaExtFormat.value = 0;
+		} else {
+			GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
+		}
 		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut, GetFrameDuration(), &dxvaExtFormat)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
 			Continue;
 		}
