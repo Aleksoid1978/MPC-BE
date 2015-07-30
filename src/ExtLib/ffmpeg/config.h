@@ -813,5 +813,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_H264_VDA_HWACCEL 0
 #define CONFIG_H264_VDPAU_HWACCEL 0
 #define CONFIG_HEVC_DXVA2_HWACCEL 0
+#define CONFIG_HEVC_D3D11VA_HWACCEL 0
+#define CONFIG_HEVC_VDPAU_HWACCEL 0
 
 #endif /* FFMPEG_CONFIG_H */

@@ -227,8 +227,10 @@ SRCS_LC = \
 	libavcodec/h264qpel.c \
 	libavcodec/hevc.c \
 	libavcodec/hevc_cabac.c \
+	libavcodec/hevc_data.c \
 	libavcodec/hevc_filter.c \
 	libavcodec/hevc_mvs.c \
+	libavcodec/hevc_parse.c \
 	libavcodec/hevc_parser.c \
 	libavcodec/hevc_ps.c \
 	libavcodec/hevc_refs.c \

@@ -43,11 +43,6 @@
 #include "rectangle.h"
 #include "thread.h"
 
-// ==> Start patch MPC
-#include <windows.h>
-#include <dxva.h>
-// ==> End patch MPC
-
 static const uint8_t rem6[QP_MAX_NUM + 1] = {
     0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2,
     3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5,
@@ -1153,6 +1148,9 @@ static enum AVPixelFormat non_j_pixfmt(enum AVPixelFormat a)
 }
 
 // ==> Start patch MPC
+#include <windows.h>
+#include <dxva.h>
+
 static void fill_dxva_slice_long(H264Context *h)
 {
     H264SliceContext *sl = &h->slice_ctx[0];

@@ -17,11 +17,10 @@
 * libavcodec/h264_slice.c
 * libavcodec/hevc.c
 * libavcodec/hevc.h
+* libavcodec/hevc_parse.c
 * libavcodec/hevc_parser.c
 * libavcodec/hevc_ps.c
 * libavcodec/hevc_refs.c
-* libavcodec/hevcdsp.c
-* libavcodec/hevcdsp.h
 * libavcodec/hevcpred.c
 * libavcodec/hevcpred.h
 * libavcodec/internal.h
