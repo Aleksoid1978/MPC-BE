@@ -54,8 +54,6 @@ LRESULT CFullscreenWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_COMMAND :
 			m_pMainFrame->PostMessage(message, wParam, lParam);
 			break;
-		case WM_NCACTIVATE :
-			return 0;
 	}
 
 	return CWnd::WindowProc(message, wParam, lParam);
