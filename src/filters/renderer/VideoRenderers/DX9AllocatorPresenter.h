@@ -32,6 +32,8 @@
 extern bool g_bNoDuration;
 extern bool g_bExternalSubtitleTime;
 
+class CFocusThread;
+
 namespace DSObjects
 {
 
@@ -300,6 +302,8 @@ namespace DSObjects
 
 		CCPUUsage				m_CPUUsage;
 		CGPUUsage				m_GPUUsage;
+
+		CFocusThread*			m_FocusThread;
 
 	public:
 		CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error);
