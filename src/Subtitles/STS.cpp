@@ -1871,7 +1871,6 @@ static int nOpenFuncts = _countof(OpenFuncts);
 
 CSimpleTextSubtitle::CSimpleTextSubtitle()
 	: m_mode(TIME)
-	, m_dstScreenSize({ 0, 0 })
 	, m_dstScreenSizeActual(false)
 	, m_defaultWrapStyle(0)
 	, m_collisions(0)
