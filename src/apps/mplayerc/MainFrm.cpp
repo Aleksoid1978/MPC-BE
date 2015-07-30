@@ -171,25 +171,20 @@ public:
 			SendMessage(WM_COMMAND, ID_PLAY_PLAY); \
 	} \
 
-static CString FormatStreamName(CString name, LCID lcid, int id)
+static CString FormatStreamName(CString name, LCID lcid)
 {
 	CString str;
-
-	CString lcname = CString(name).MakeLower();
-	if (lcname.Find(L" off") >= 0) {
-		str = ResStr(IDS_AG_DISABLED);
-	} else if (lcid == 0) {
-		str.Format(ResStr(IDS_AG_UNKNOWN), id);
-	} else {
+	if (lcid) {
 		int len = GetLocaleInfo(lcid, LOCALE_SENGLANGUAGE, str.GetBuffer(64), 64);
 		str.ReleaseBufferSetLength(max(len - 1, 0));
 	}
 
+	CString lcname = CString(name).MakeLower();
 	CString lcstr = CString(str).MakeLower();
 	if (str.IsEmpty() || lcname.Find(lcstr) >= 0) {
 		str = name;
 	} else if (!name.IsEmpty()) {
-		str = CString(name) + L" (" + str + L")";
+		str = name + L" (" + str + L")";
 	}
 
 	return str;
@@ -12959,7 +12954,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						continue;
 					}
 
-					CString str = FormatStreamName(name, lcid, i);
+					CString str = FormatStreamName(name, lcid);
 
 					Stream substream;
 					substream.Filter	= 2;
@@ -14370,7 +14365,7 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 							continue;
 						}
 
-						CString str = FormatStreamName(name, lcid, id - baseid);
+						CString str = FormatStreamName(name, lcid);
 
 						UINT flags = MF_BYCOMMAND | MF_STRING | (!fHideSubtitles ? MF_ENABLED : MF_DISABLED);
 						if (dwFlags && iSelectedLanguage == (nLangs - 1)) {
@@ -14449,7 +14444,7 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 						continue;
 					}
 
-					CString str = FormatStreamName(name, lcid, id - baseid);
+					CString str = FormatStreamName(name, lcid);
 
 					UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 					if (dwFlags) {
@@ -14793,7 +14788,7 @@ void CMainFrame::SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGr
 		}
 		dwPrevGroup = dwGroup;
 
-		CString str = FormatStreamName(name, lcid, id - baseid);
+		CString str = FormatStreamName(name, lcid);
 
 		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 		if (dwFlags) {
@@ -14901,7 +14896,7 @@ void CMainFrame::SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSe
 					}
 
 					dwPrevGroup = dwGroup;
-					CString str = FormatStreamName(name, lcid, id - baseid);
+					CString str = FormatStreamName(name, lcid);
 
 					UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 					if (dwFlags) {
