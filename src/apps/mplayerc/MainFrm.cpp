@@ -7568,14 +7568,16 @@ void CMainFrame::OnPlayPlay()
 		}
 	}
 
+	int OSD_Flag = OSD_FILENAME;
 	if (strOSD.IsEmpty()) {
+		OSD_Flag = OSD_ENABLE;
 		strOSD = ResStr(ID_PLAY_PLAY);
 		int i = strOSD.Find('\n');
 		if (i > 0) {
 			strOSD.Delete(i, strOSD.GetLength() - i);
 		}
 	}
-	if (AfxGetAppSettings().iShowOSD & OSD_FILENAME) {
+	if (AfxGetAppSettings().iShowOSD & OSD_Flag) {
 		m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
 	}
 }
