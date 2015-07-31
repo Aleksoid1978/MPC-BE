@@ -673,7 +673,8 @@ CMainFrame::CMainFrame() :
 	m_wndToolBar(this),
 	m_wndSeekBar(this),
 	miFPS(0.0),
-	m_bAudioOnly(true)
+	m_bAudioOnly(true),
+	m_nAeroOffset(IsWinTenOrLater() ? 7 : 0)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -1616,10 +1617,10 @@ void CMainFrame::OnEnterSizeMove()
 	}
 }
 
-BOOL CMainFrame::isSnapClose( int a, int b )
+BOOL CMainFrame::isSnapClose(int a, int b)
 {
 	snap_Margin = GetSystemMetrics(SM_CYCAPTION);
-	return (abs( a - b ) < snap_Margin);
+	return (abs(a - b) < snap_Margin);
 }
 
 void CMainFrame::OnMove(int x, int y)
@@ -1702,10 +1703,10 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 		OffsetRect(pRect, cur_pos.x - (pRect->left + snap_x), cur_pos.y - (pRect->top + snap_y));
 
 		if (isSnapClose(pRect->left, rcWork.left)) { // left screen snap
-			OffsetRect(pRect, rcWork.left - pRect->left, 0);
+			OffsetRect(pRect, rcWork.left - pRect->left - m_nAeroOffset, 0);
 			m_bWasSnapped = true;
 		} else if (isSnapClose(rcWork.right, pRect->right)) { // right screen snap
-			OffsetRect(pRect, rcWork.right - pRect->right, 0);
+			OffsetRect(pRect, rcWork.right - pRect->right + m_nAeroOffset, 0);
 			m_bWasSnapped = true;
 		}
 
@@ -1713,7 +1714,7 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 			OffsetRect(pRect, 0, rcWork.top - pRect->top);
 			m_bWasSnapped = true;
 		} else if (isSnapClose(rcWork.bottom, pRect->bottom)) { // bottom taskbar snap
-			OffsetRect(pRect, 0, rcWork.bottom - pRect->bottom);
+			OffsetRect(pRect, 0, rcWork.bottom - pRect->bottom + m_nAeroOffset);
 			m_bWasSnapped = true;
 		} else if (isSnapClose(pRect->bottom, rcMonitor.bottom)) { // bottom screen snap
 			OffsetRect(pRect, 0, rcMonitor.bottom - pRect->bottom);
@@ -1748,7 +1749,13 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 		if (nType == SIZE_MAXIMIZED && (s.iCaptionMenuMode == MODE_FRAMEONLY || s.iCaptionMenuMode == MODE_BORDERLESS)) {
 			MONITORINFO mi = { sizeof(mi) };
 			GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
-			const CRect wr(mi.rcWork);
+			//const CRect wr(mi.rcWork);
+			CRect wr(mi.rcWork);
+			if (s.iCaptionMenuMode == MODE_FRAMEONLY && IsWinTenOrLater()) {
+				wr.left -= m_nAeroOffset;
+				wr.right += m_nAeroOffset;
+				wr.bottom += m_nAeroOffset;
+			}
 			SetWindowPos(NULL, wr.left, wr.top, wr.Width(), wr.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
 		}
 	}
@@ -10849,8 +10856,8 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 			}
 		} else {	// center window
 			CPoint cp = r.CenterPoint();
-			r.left = cp.x - w/2;
-			r.top = cp.y - h/2;
+			r.left = cp.x - lround(w / 2);
+			r.top = cp.y - lround(h / 2);
 			m_bWasSnapped = false;
 		}
 	}
@@ -10865,10 +10872,32 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 		r.OffsetRect(mi.rcWork.left - r.left, 0);
 	}
 	if (r.bottom > mi.rcWork.bottom) {
-		r.OffsetRect(0, mi.rcWork.bottom-r.bottom);
+		r.OffsetRect(0, mi.rcWork.bottom - r.bottom);
 	}
 	if (r.top < mi.rcWork.top) {
-		r.OffsetRect(0, mi.rcWork.top-r.top);
+		r.OffsetRect(0, mi.rcWork.top - r.top);
+	}
+
+	if (IsWinTenOrLater()) {
+		const CRect tmp(r);
+		if (tmp.left == mi.rcWork.left) {
+			r.OffsetRect(-m_nAeroOffset, 0);
+			if (tmp.right == mi.rcWork.right) {
+				r.right += m_nAeroOffset;
+			}
+		}
+		if (tmp.right == mi.rcWork.right) {
+			r.OffsetRect(m_nAeroOffset, 0);
+			if (tmp.left == mi.rcWork.left) {
+				r.left -= m_nAeroOffset;
+			}
+		}
+		if (tmp.bottom == mi.rcWork.bottom) {
+			r.OffsetRect(0, m_nAeroOffset);
+			if (tmp.top == mi.rcWork.top) {
+				r.top -= m_nAeroOffset;
+			}
+		}
 	}
 
 	if ((m_bFullScreen || !s.HasFixedWindowSize()) && !IsD3DFullScreenMode()) {
