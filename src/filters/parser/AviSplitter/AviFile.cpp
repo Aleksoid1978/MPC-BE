@@ -34,6 +34,8 @@ CAviFile::CAviFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 	if (FAILED(hr)) {
 		return;
 	}
+
+	ZeroMemory(&m_vprp, sizeof(m_vprp));
 	m_isamv = false;
 	hr = Init();
 }
