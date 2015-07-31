@@ -297,7 +297,9 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					}
 					break;
 				case FCC('vprp'):
-					//if (S_OK != ReadAvi(m_vprp)) return E_FAIL;
+					if (S_OK != ReadAvi(m_vprp)) {
+						return E_FAIL;
+					}
 					break;
 				case FCC('idx1'):
 					ASSERT(m_idx1 == NULL);

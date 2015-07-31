@@ -45,7 +45,18 @@ public:
 	struct ODMLExtendedAVIHeader {
 		DWORD dwTotalFrames;
 	} m_dmlh;
-	//VideoPropHeader m_vprp;
+	struct VideoPropHeader {
+		WORD  VideoFormatToken;
+		DWORD VideoStandard;
+		DWORD dwVerticalRefreshRate;
+		DWORD dwHTotalInT;
+		DWORD dwVTotalInLines;
+		WORD  FrameAspectRatioNum;
+		WORD  FrameAspectRatioDen;
+		DWORD dwFrameWidthInPixels;
+		DWORD dwFrameHeightInLines;
+		DWORD nbFieldPerFrame;
+	} m_vprp = { 0 };
 	struct strm_t {
 		AVISTREAMHEADER strh;
 		CAtlArray<BYTE> strf;
