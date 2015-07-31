@@ -145,24 +145,31 @@ STDMETHODIMP CAviSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
-#define Parse(type)													\
-	if (s->cs.GetCount()) {											\
-		__int64 pos = m_pFile->GetPos();							\
-		for (size_t i = 0; i < s->cs.GetCount() - 1; i++) {			\
-			if (s->cs[i].orgsize) {									\
-				m_pFile->Seek(s->cs[i].filepos);					\
-				CMediaType mt2;										\
-				type h;												\
-				if (m_pFile->Read(h, s->cs[i].orgsize, &mt2)) {		\
-					VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt2.pbFormat;	\
-					pvih->AvgTimePerFrame = AvgTimePerFrame;		\
-					mts.InsertAt(0, mt2);							\
-				}													\
-				break;												\
-			}														\
-		}															\
-		m_pFile->Seek(pos);											\
-	}																\
+template<typename T>
+static void ParseHeader(T& var, CAutoPtr<CAviFile>& pFile, CAviFile::strm_t* s, CAtlArray<CMediaType>& mts, REFERENCE_TIME AvgTimePerFrame, CSize headerAspect)
+{
+	if (s->cs.GetCount()) {
+		__int64 pos = pFile->GetPos();
+		for (size_t i = 0; i < s->cs.GetCount() - 1; i++) {
+			if (s->cs[i].orgsize) {
+				pFile->Seek(s->cs[i].filepos);
+				CMediaType mt2;
+				if (pFile->Read(var, s->cs[i].orgsize, &mt2)) {
+					VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt2.pbFormat;
+					pvih->AvgTimePerFrame = AvgTimePerFrame;
+					if (headerAspect.cx && headerAspect.cy) {
+						VIDEOINFOHEADER2* pvih2 = (VIDEOINFOHEADER2*)mt2.pbFormat;
+						pvih2->dwPictAspectRatioX = headerAspect.cx;
+						pvih2->dwPictAspectRatioY = headerAspect.cy;
+					}
+					mts.InsertAt(0, mt2);
+				}
+				break;
+			}
+		}
+		pFile->Seek(pos);
+	}
+}
 
 HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
@@ -269,6 +276,13 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				// need calculate in double, because the (10000000ui64 * size * 8) can give overflow
 			}
 
+			CSize headerAspect;
+			if (m_pFile->m_vprp.dwFrameHeightInLines && m_pFile->m_vprp.dwFrameWidthInPixels
+					&& m_pFile->m_vprp.FrameAspectRatioDen && m_pFile->m_vprp.FrameAspectRatioNum) {
+				headerAspect = CSize(m_pFile->m_vprp.FrameAspectRatioDen, m_pFile->m_vprp.FrameAspectRatioNum);
+				ReduceDim(headerAspect);
+			}
+
 			// building a basic media type
 			mt.majortype = MEDIATYPE_Video;
 			switch (pbmi->biCompression) {
@@ -365,7 +379,10 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			// building a special media type
 			switch (pbmi->biCompression) {
 				case FCC('HM10'):
-					Parse(CBaseSplitterFileEx::hevchdr)
+					{
+						CBaseSplitterFileEx::hevchdr h;
+						ParseHeader(h, m_pFile, s, mts, AvgTimePerFrame, headerAspect);
+					}
 					break;
 				case FCC('mpg2'):
 				case FCC('MPG2'):
@@ -375,7 +392,10 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('M703'):
 				case FCC('M704'):
 				case FCC('M705'):
-					Parse(CBaseSplitterFileEx::seqhdr)
+					{
+						CBaseSplitterFileEx::seqhdr h;
+						ParseHeader(h, m_pFile, s, mts, AvgTimePerFrame, headerAspect);
+					}
 					break;
 				case FCC('H264'):
 				case FCC('h264'):
@@ -397,6 +417,9 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						CSize aspect(pbmi->biWidth, pbmi->biHeight);
 						ReduceDim(aspect);
+						if (headerAspect.cx && headerAspect.cy) {
+							aspect = headerAspect;
+						}
 
 						pbmi->biCompression = FCC('AVC1');
 						CMediaType mt2;
@@ -405,7 +428,8 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					}
 					if (mts.GetCount() == 1) {
-						Parse(CBaseSplitterFileEx::avchdr)
+						CBaseSplitterFileEx::avchdr h;
+						ParseHeader(h, m_pFile, s, mts, AvgTimePerFrame, headerAspect);
 					}
 					break;
 			}
