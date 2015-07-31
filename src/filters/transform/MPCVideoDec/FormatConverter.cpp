@@ -251,8 +251,12 @@ void  CFormatConverter::UpdateDetails()
 			} else if (m_FProps.colorrange == AVCOL_RANGE_JPEG) {
 				srcRange = dstRange = 1;
 			}
-			
- 			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, dstRange, brightness, contrast, saturation);
+
+			if (m_autocolorspace) {
+				m_colorspace = m_FProps.colorspace;
+			}
+
+			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, dstRange, brightness, contrast, saturation);
 		}
 	}
 }
@@ -365,7 +369,7 @@ void CFormatConverter::SetOptions(int preset, int standard, int rgblevels)
 	case 2  : // Auto
 	default :
 		m_autocolorspace = true;
-		m_colorspace = m_FProps.width > 768 ? SWS_CS_ITU709 : SWS_CS_ITU601;
+		m_colorspace = SWS_CS_DEFAULT;
 		break;
 	}
 
