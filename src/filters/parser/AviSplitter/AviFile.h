@@ -56,7 +56,7 @@ public:
 		DWORD dwFrameWidthInPixels;
 		DWORD dwFrameHeightInLines;
 		DWORD nbFieldPerFrame;
-	} m_vprp = { 0 };
+	} m_vprp;
 	struct strm_t {
 		AVISTREAMHEADER strh;
 		CAtlArray<BYTE> strf;
