@@ -722,10 +722,12 @@ public:
 	afx_msg void OnEnterSizeMove();
 	afx_msg void ClipRectToMonitor(LPRECT prc);
 	int snap_Margin, snap_x, snap_y;
-	BOOL isSnapClose( int a, int b );
+	BOOL isSnapClose(int a, int b);
 	BOOL m_bWndZoomed;
 	RECT rc_forceNP;
 	RECT rc_NP;
+
+	int m_nAeroOffset;
 
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
