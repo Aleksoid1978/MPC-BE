@@ -606,7 +606,7 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 			str.Format(_T("dwControlFlags: 0x%08x"), vih2.dwControlFlags);
 			sl.AddTail(str);
 			if (vih2.dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
-				const LPCTSTR nominalrange[] = { L"Unknown", L"Normal 0-255", L"Wide 16-235", L"0-255", L"16-235", L"48-208" };
+				const LPCTSTR nominalrange[] = { L"Unknown", L"0-255", L"16-235", L"48-208" };
 				const LPCTSTR transfermatrix[] = { L"Unknown", L"BT.709", L"BT.601", L"SMPTE 240M" };
 				DXVA2_ExtendedFormat exfmt;
 				exfmt.value = vih2.dwControlFlags;
