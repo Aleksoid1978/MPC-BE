@@ -245,18 +245,24 @@ void  CFormatConverter::UpdateDetails()
 		int srcRange, dstRange, brightness, contrast, saturation;
 		int ret = sws_getColorspaceDetails(m_pSwsContext, &inv_tbl, &srcRange, &tbl, &dstRange, &brightness, &contrast, &saturation);
 		if (ret >= 0) {
-			const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
-			if (pfdesc && m_out_pixfmt == PixFmt_RGB32 && !(av_pix_fmt_desc_get(m_FProps.avpixfmt)->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL))) {
-				dstRange = m_dstRGBRange;
-			} else if (m_FProps.colorrange == AVCOL_RANGE_JPEG) {
-				srcRange = dstRange = 1;
+			if (const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt)) {
+				bool rgb_input = pfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL);
+
+				if (!rgb_input && m_out_pixfmt == PixFmt_RGB32) {
+					// YUV->RGB
+					dstRange = m_dstRGBRange;
+				} else if (m_FProps.colorrange == AVCOL_RANGE_JPEG) {
+					// YUVJ->YUV
+					srcRange = dstRange = 1;
+				}
 			}
 
 			if (m_autocolorspace) {
 				m_colorspace = m_FProps.colorspace;
+				// SWS_CS_* does not fully comply with the AVCOL_SPC_*, but it is well handled in the libswscale.
 			}
 
-			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, dstRange, brightness, contrast, saturation);
+ 			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, dstRange, brightness, contrast, saturation);
 		}
 	}
 }
@@ -369,7 +375,7 @@ void CFormatConverter::SetOptions(int preset, int standard, int rgblevels)
 	case 2  : // Auto
 	default :
 		m_autocolorspace = true;
-		m_colorspace = SWS_CS_DEFAULT;
+		m_colorspace = SWS_CS_DEFAULT; // will be specified in the UpdateDetails().
 		break;
 	}
 
