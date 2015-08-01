@@ -606,6 +606,7 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 			str.Format(_T("dwControlFlags: 0x%08x"), vih2.dwControlFlags);
 			sl.AddTail(str);
 			if (vih2.dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
+				// http://msdn.microsoft.com/en-us/library/windows/desktop/ms698715%28v=vs.85%29.aspx
 				const LPCTSTR nominalrange[] = { L"Unknown", L"0-255", L"16-235", L"48-208" };
 				const LPCTSTR transfermatrix[] = { L"Unknown", L"BT.709", L"BT.601", L"SMPTE 240M" };
 				DXVA2_ExtendedFormat exfmt;
@@ -621,7 +622,10 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 				sl.AddTail(str);
 
 				str.Format(_T("- VideoTransferMatrix   : %u"), exfmt.VideoTransferMatrix);
-				if (exfmt.VideoTransferMatrix < _countof(transfermatrix)) {
+				if (exfmt.VideoTransferMatrix == DXVA2_VideoTransferMatrix_Unknown) {
+					str.AppendFormat(L" (Unknown, used %s)", labs(bih->biHeight) > 576 ? L"BT.709" : L"BT.601");
+				}
+				else if (exfmt.VideoTransferMatrix < _countof(transfermatrix)) {
 					str.AppendFormat(L" (%s)", transfermatrix[exfmt.VideoTransferMatrix]);
 				}
 				sl.AddTail(str);
