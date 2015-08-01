@@ -245,16 +245,15 @@ void  CFormatConverter::UpdateDetails()
 		int srcRange, dstRange, brightness, contrast, saturation;
 		int ret = sws_getColorspaceDetails(m_pSwsContext, &inv_tbl, &srcRange, &tbl, &dstRange, &brightness, &contrast, &saturation);
 		if (ret >= 0) {
-			if (const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt)) {
-				bool rgb_input = pfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL);
+			if (m_FProps.pftype == PFType_RGB || m_FProps.colorrange == AVCOL_RANGE_JPEG) {
+				srcRange = 1;
+			}
 
-				if (!rgb_input && m_out_pixfmt == PixFmt_RGB32) {
-					// YUV->RGB
-					dstRange = m_dstRGBRange;
-				} else if (m_FProps.colorrange == AVCOL_RANGE_JPEG) {
-					// YUVJ->YUV
-					srcRange = dstRange = 1;
-				}
+			if (m_out_pixfmt == PixFmt_RGB32) {
+				dstRange = m_dstRGBRange;
+			}
+			else if (m_FProps.colorrange == AVCOL_RANGE_JPEG) {
+				dstRange = 1;
 			}
 
 			if (m_autocolorspace) {
