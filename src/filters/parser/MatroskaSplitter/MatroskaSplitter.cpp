@@ -882,6 +882,17 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						wfex->SubFormat = MEDIASUBTYPE_PCM;
 					}
 					mts.Add(mt);
+				} else if (CodecID == "A_PCM/INT/BIG") {
+					switch (pTE->a.BitDepth) {
+					case 16: mt.subtype = MEDIASUBTYPE_PCM_TWOS; break;
+					case 24: mt.subtype = MEDIASUBTYPE_PCM_IN24; break;
+					case 32: mt.subtype = MEDIASUBTYPE_PCM_IN32; break;
+					default:
+						ASSERT(0);
+						break;
+					}
+					mt.SetSampleSize(wfe->nBlockAlign);
+					mts.Add(mt);
 				} else if (CodecID == "A_PCM/FLOAT/IEEE") {
 					mt.subtype = MEDIASUBTYPE_IEEE_FLOAT;
 					mt.SetSampleSize(wfe->nBlockAlign);

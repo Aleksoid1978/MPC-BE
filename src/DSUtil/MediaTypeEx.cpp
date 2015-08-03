@@ -395,12 +395,12 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 			guidnames[MEDIASUBTYPE_ALAC]			= L"ALAC";
 			guidnames[MEDIASUBTYPE_PCM_NONE]		= L"QT PCM";
 			guidnames[MEDIASUBTYPE_PCM_RAW]			= L"QT PCM";
-			guidnames[MEDIASUBTYPE_PCM_TWOS]		= L"QT PCM";
+			guidnames[MEDIASUBTYPE_PCM_TWOS]		= L"PCM";
 			guidnames[MEDIASUBTYPE_PCM_SOWT]		= L"QT PCM";
-			guidnames[MEDIASUBTYPE_PCM_IN24]		= L"QT PCM";
-			guidnames[MEDIASUBTYPE_PCM_IN32]		= L"QT PCM";
+			guidnames[MEDIASUBTYPE_PCM_IN24]		= L"PCM";
+			guidnames[MEDIASUBTYPE_PCM_IN32]		= L"PCM";
 			guidnames[MEDIASUBTYPE_PCM_FL32]		= L"QT PCM";
-			guidnames[MEDIASUBTYPE_PCM_FL32]		= L"QT PCM";
+			guidnames[MEDIASUBTYPE_PCM_FL64]		= L"QT PCM";
 			guidnames[MEDIASUBTYPE_IMA4]			= L"ADPCM";
 			guidnames[MEDIASUBTYPE_ADPCM_SWF]		= L"ADPCM";
 			guidnames[MEDIASUBTYPE_IMA_AMV]			= L"ADPCM";
