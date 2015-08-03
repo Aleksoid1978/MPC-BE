@@ -56,7 +56,7 @@ CPPageFormats::CPPageFormats()
 	, m_list(0)
 	, m_bInsufficientPrivileges(false)
 {
-	if (m_pAAR == NULL) {
+	if (!m_pAAR && !IsWinTenOrLater()) {
 		// Default manager (requires at least Vista)
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 									  NULL,
@@ -121,7 +121,7 @@ bool CPPageFormats::IsRegistered(CString ext)
 	BOOL    bIsDefault = FALSE;
 	CString strProgID = PROGID + ext;
 
-	if (m_pAAR == NULL) {
+	if (!m_pAAR && !IsWinTenOrLater()) {
 		// Default manager (requires at least Vista)
 		hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 							  NULL,
@@ -129,7 +129,7 @@ bool CPPageFormats::IsRegistered(CString ext)
 							  IID_PPV_ARGS(&m_pAAR));
 	}
 
-	if (m_pAAR) {
+	if (m_pAAR && !IsWinTenOrLater()) {
 		// The Vista way
 		hr = m_pAAR->QueryAppIsDefault(ext, AT_FILEEXTENSION, AL_EFFECTIVE, GetRegisteredAppName(), &bIsDefault);
 	} else {
@@ -139,7 +139,7 @@ bool CPPageFormats::IsRegistered(CString ext)
 		ULONG   len = _countof(buff);
 		memset(buff, 0, sizeof(buff));
 
-		if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext)) {
+		if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext, KEY_READ)) {
 			return false;
 		}
 
@@ -188,7 +188,7 @@ int GetIconIndex(CString ext)
 
 bool CPPageFormats::RegisterApp()
 {
-	if (m_pAAR == NULL) {
+	if (!m_pAAR) {
 		// Default manager (requiered at least Vista)
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 									  NULL,
@@ -337,6 +337,19 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 		key.RecurseDeleteKey(strProgID + _T("\\DefaultIcon"));
 	}
 
+	if (IsWinTenOrLater()) {
+		// delete [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ext\UserChoice]
+		LSTATUS status = RegDeleteKey(HKEY_CURRENT_USER, CString("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + ext + "\\UserChoice"));
+		UNREFERENCED_PARAMETER(status);
+
+		key.Close();
+		// write mpc-be to first entry of the [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ext\OpenWithList]
+		if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, CString(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + ext + L"\\OpenWithList"))) {
+			key.SetStringValue(L"a", PROGID L".exe");
+			key.Close();
+		}
+	}
+
 	if (!IsRegistered(ext)) {
 		SetFileAssociation(ext, strProgID, true);
 	}
@@ -350,7 +363,7 @@ bool CPPageFormats::UnRegisterExt(CString ext)
 	CString strProgID = PROGID + ext;
 
 	if (IsRegistered(ext)) {
-		SetFileAssociation (ext, strProgID, false);
+		SetFileAssociation(ext, strProgID, false);
 	}
 	key.Attach(HKEY_CLASSES_ROOT);
 	key.RecurseDeleteKey(strProgID);
@@ -692,7 +705,7 @@ BOOL CPPageFormats::OnInitDialog()
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
-BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool fRegister)
+BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool bRegister)
 {
 	CString extoldreg, extOldIcon;
 	CRegKey key;
@@ -701,7 +714,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 	ULONG   len = _countof(buff);
 	memset(buff, 0, sizeof(buff));
 
-	if (m_pAAR == NULL) {
+	if (!m_pAAR && !IsWinTenOrLater()) {
 		// Default manager (requiered at least Vista)
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 									  NULL,
@@ -710,18 +723,18 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 		UNREFERENCED_PARAMETER(hr);
 	}
 
-	if (m_pAAR) {
+	if (m_pAAR && !IsWinTenOrLater()) {
 		// The Vista way
 		CString strNewApp;
-		if (fRegister) {
+		if (bRegister) {
 			// Create non existing file type
 			if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strExt)) {
 				return false;
 			}
 
-			WCHAR*		pszCurrentAssociation;
+			WCHAR* pszCurrentAssociation;
 			// Save current application associated
-			if (SUCCEEDED (m_pAAR->QueryCurrentDefault(strExt, AT_FILEEXTENSION, AL_EFFECTIVE, &pszCurrentAssociation))) {
+			if (SUCCEEDED(m_pAAR->QueryCurrentDefault(strExt, AT_FILEEXTENSION, AL_EFFECTIVE, &pszCurrentAssociation))) {
 
 				if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID)) {
 					return false;
@@ -760,7 +773,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 		hr = m_pAAR->SetAppAsDefault(strNewApp, strExt, AT_FILEEXTENSION);
 	} else {
 		// The 2000/XP way
-		if (fRegister) {
+		if (bRegister) {
 			// Set new association
 			if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strExt)) {
 				return false;
@@ -819,7 +832,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool f
 
 	}
 
-	return SUCCEEDED (hr);
+	return SUCCEEDED(hr);
 }
 
 void GetUnRegisterExts(CString saved_ext, CString new_ext, CAtlList<CString>& UnRegisterExts)

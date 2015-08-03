@@ -25,8 +25,8 @@
 #include "PPageBase.h"
 #include "PlayerListCtrl.h"
 
-#define ShellExt	GetProgramPath() + L"MPCBEShellExt.dll"
-#define ShellExt64	GetProgramPath() + L"MPCBEShellExt64.dll"
+#define ShellExt   GetProgramPath() + L"MPCBEShellExt.dll"
+#define ShellExt64 GetProgramPath() + L"MPCBEShellExt64.dll"
 
 // CPPageFormats dialog
 
@@ -54,7 +54,7 @@ private:
 	bool IsAutoPlayRegistered(autoplay_t ap);
 
 	void SetListItemState(int nItem);
-	static BOOL SetFileAssociation(CString strExt, CString extfile, bool fRegister);
+	static BOOL SetFileAssociation(CString strExt, CString extfile, bool bRegister);
 	static CString GetOpenCommand();
 	static CString GetEnqueueCommand();
 
