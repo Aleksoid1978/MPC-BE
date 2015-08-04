@@ -67,7 +67,7 @@ BOOL CPPageFiltersPerformance::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	SetHandCursor(m_hWnd, IDC_PERFOMANCE_DEFAULT);
+	SetCursor(m_hWnd, IDC_PERFOMANCE_DEFAULT, IDC_HAND);
 
 	AppSettings& s = AfxGetAppSettings();
 

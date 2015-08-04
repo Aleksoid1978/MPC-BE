@@ -148,8 +148,8 @@ bool CMpeg2DecSettingsWnd::OnActivate()
 		pWnd->SetFont(&m_font, FALSE);
 	}
 
-	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-	SetClassLongPtr(GetDlgItem(IDC_PP_CHECK1)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetCursor(m_hWnd, IDC_ARROW);
+	SetCursor(m_hWnd, IDC_PP_CHECK1, IDC_HAND);
 
 	return true;
 }

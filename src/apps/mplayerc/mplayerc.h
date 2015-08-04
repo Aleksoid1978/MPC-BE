@@ -63,8 +63,6 @@ extern void SetDispMode(dispmode& dm, CString& DisplayName);
 extern void SetAudioRenderer(int AudioDevNo);
 extern void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue);
 
-extern void SetHandCursor(HWND m_hWnd, UINT nID);
-
 struct LanguageResource {
 	const UINT resourceID;
 	const LANGID localeID;

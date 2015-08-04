@@ -3377,3 +3377,13 @@ SIZE ReduceDim(double value)
 	fraction_t a = av_d2q(value, INT_MAX);
 	return { a.num, a.den };
 }
+
+void SetCursor(HWND m_hWnd, LPCTSTR lpCursorName)
+{
+	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(lpCursorName));
+}
+
+void SetCursor(HWND m_hWnd, UINT nID, LPCTSTR lpCursorName)
+{
+	SetCursor(::GetDlgItem(m_hWnd, nID), lpCursorName);
+}

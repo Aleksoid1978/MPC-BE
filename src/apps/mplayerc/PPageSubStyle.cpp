@@ -133,9 +133,9 @@ BOOL CPPageSubStyle::OnInitDialog()
 		GetDlgItem(IDC_RESET)->ShowWindow(SW_HIDE);
 	}
 
-	SetHandCursor(m_hWnd, IDC_BUTTON1);
-	SetHandCursor(m_hWnd, IDC_RESET);
-	SetHandCursor(m_hWnd, IDC_COMBO1);
+	SetCursor(m_hWnd, IDC_BUTTON1, IDC_HAND);
+	SetCursor(m_hWnd, IDC_RESET, IDC_HAND);
+	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 
 	m_spacing.SetRange(-10000, 10000);
 	m_angle.SetRange(0, 359);
