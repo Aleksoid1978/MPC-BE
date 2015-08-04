@@ -170,17 +170,21 @@ bool CPPageFormats::IsRegistered(CString ext)
 }
 
 typedef int (*GetIconIndexFunc)(LPCTSTR);
-int GetIconIndex(CString ext)
+static int GetIconIndex(LPCTSTR ext)
 {
-	int iconindex = -1;
-	GetIconIndexFunc _getIconIndexFunc;
-	HINSTANCE mpciconlib = LoadLibrary(_T("mpciconlib.dll"));
-	if (mpciconlib) {
-		_getIconIndexFunc = (GetIconIndexFunc) GetProcAddress(mpciconlib, "get_icon_index");
-		if (_getIconIndexFunc) {
-			iconindex = _getIconIndexFunc((LPCTSTR)ext);
+	static HINSTANCE mpciconlib = NULL;
+	static GetIconIndexFunc pGetIconIndexFunc = NULL;
+
+	if (!mpciconlib) {
+		mpciconlib = LoadLibrary(_T("mpciconlib.dll"));
+		if (mpciconlib) {
+			pGetIconIndexFunc = (GetIconIndexFunc)GetProcAddress(mpciconlib, "get_icon_index");
 		}
-		FreeLibrary(mpciconlib);
+	}
+	
+	int iconindex = -1;
+	if (pGetIconIndexFunc) {
+		iconindex = pGetIconIndexFunc(ext);
 	}
 
 	return iconindex;
