@@ -26,12 +26,18 @@ extern "C" {
 	void __mingw_raise_matherr(int typ, const char *name, double a1, double a2, double rslt) {}
 #if defined(_MSC_VER) & (_MSC_VER >= 1900) // 2015
 	unsigned int __cdecl _get_output_format(void) { return 1; }
+#ifdef _WIN64
+	FILE __iob[_IOB_ENTRIES] = {
+		*stdin, *stdout, *stderr
+	};
+	FILE* __cdecl __iob_func(void) { return __iob; }
+#endif
 #endif
 }
 
 #ifdef REGISTER_FILTER
-	void *__imp_time64				= _time64;
-	void *__imp__aligned_malloc		= _aligned_malloc;
-	void *__imp__aligned_realloc	= _aligned_realloc;
-	void *__imp__aligned_free		= _aligned_free;
+	void *__imp_time64           = _time64;
+	void *__imp__aligned_malloc  = _aligned_malloc;
+	void *__imp__aligned_realloc = _aligned_realloc;
+	void *__imp__aligned_free    = _aligned_free;
 #endif
