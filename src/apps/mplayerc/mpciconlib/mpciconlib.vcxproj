@@ -49,7 +49,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
-      <NoEntryPoint>true</NoEntryPoint>
+      <NoEntryPoint>false</NoEntryPoint>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <ResourceCompile>
@@ -61,7 +61,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
-      <NoEntryPoint>true</NoEntryPoint>
+      <NoEntryPoint>false</NoEntryPoint>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <ResourceCompile>

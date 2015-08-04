@@ -269,8 +269,3 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 
 	return iconindex;
 }
-
-int main()
-{
-	return 0;
-}
