@@ -58,7 +58,7 @@ BOOL CPPageFiltersPriority::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	SetHandCursor(m_hWnd, IDC_COMBO1);
+	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 
 	Init();
 

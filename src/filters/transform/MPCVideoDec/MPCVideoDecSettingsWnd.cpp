@@ -275,8 +275,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		UpdateStatusInfo();
 	}
 
-	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-	SetClassLongPtr(GetDlgItem(IDC_PP_THREAD_NUMBER)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetCursor(m_hWnd, IDC_ARROW);
+	SetCursor(m_hWnd, IDC_PP_THREAD_NUMBER, IDC_HAND);
 
 	EnableToolTips(TRUE);
 

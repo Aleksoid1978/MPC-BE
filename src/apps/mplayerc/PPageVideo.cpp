@@ -117,15 +117,15 @@ BOOL CPPageVideo::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	SetHandCursor(m_hWnd, IDC_VIDRND_COMBO);
-	SetHandCursor(m_hWnd, IDC_D3D9DEVICE_COMBO);
-	SetHandCursor(m_hWnd, IDC_DX_SURFACE);
-	SetHandCursor(m_hWnd, IDC_DX9RESIZER_COMBO);
-	SetHandCursor(m_hWnd, IDC_COMBO1);
-	SetHandCursor(m_hWnd, IDC_COMBO2);
-	SetHandCursor(m_hWnd, IDC_COMBO3);
-	SetHandCursor(m_hWnd, IDC_COMBO4);
-	SetHandCursor(m_hWnd, IDC_COMBO5);
+	SetCursor(m_hWnd, IDC_VIDRND_COMBO, IDC_HAND);
+	SetCursor(m_hWnd, IDC_D3D9DEVICE_COMBO, IDC_HAND);
+	SetCursor(m_hWnd, IDC_DX_SURFACE, IDC_HAND);
+	SetCursor(m_hWnd, IDC_DX9RESIZER_COMBO, IDC_HAND);
+	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
+	SetCursor(m_hWnd, IDC_COMBO2, IDC_HAND);
+	SetCursor(m_hWnd, IDC_COMBO3, IDC_HAND);
+	SetCursor(m_hWnd, IDC_COMBO4, IDC_HAND);
+	SetCursor(m_hWnd, IDC_COMBO5, IDC_HAND);
 
 	AppSettings& s = AfxGetAppSettings();
 

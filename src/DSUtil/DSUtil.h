@@ -345,3 +345,6 @@ namespace CStringUtils
 		}
 	};
 }
+
+extern void SetCursor(HWND m_hWnd, LPCTSTR lpCursorName);
+extern void SetCursor(HWND m_hWnd, UINT nID, LPCTSTR lpCursorName);

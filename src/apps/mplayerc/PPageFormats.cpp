@@ -629,7 +629,7 @@ BOOL CPPageFormats::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	SetHandCursor(m_hWnd, IDC_BUTTON1);
+	SetCursor(m_hWnd, IDC_BUTTON1, IDC_HAND);
 
 	m_bFileExtChanged = false;
 

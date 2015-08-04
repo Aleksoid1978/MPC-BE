@@ -164,8 +164,8 @@ bool CMpaDecSettingsWnd::OnActivate()
 		pWnd->SetFont(&m_font, FALSE);
 	}
 
-	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-	SetClassLongPtr(GetDlgItem(IDC_PP_CHECK_I16)->m_hWnd, GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetCursor(m_hWnd, IDC_ARROW);
+	SetCursor(m_hWnd, IDC_PP_CHECK_I16, IDC_HAND);
 
 	// subclass the edit control
 	OldControlProc = (WNDPROC)SetWindowLongPtr(m_edtStatus.m_hWnd, GWLP_WNDPROC, (LONG_PTR)ControlProc);

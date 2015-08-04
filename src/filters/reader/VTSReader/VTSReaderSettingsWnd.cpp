@@ -65,8 +65,8 @@ bool CVTSReaderSettingsWnd::OnActivate()
 		pWnd->SetFont(&m_font, FALSE);
 	}
 
-	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (LONG)AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-	SetClassLongPtr(m_cbEnableTitleSelection.m_hWnd, GCLP_HCURSOR, (LONG)AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetCursor(m_hWnd, IDC_ARROW);
+	SetCursor(m_cbEnableTitleSelection.m_hWnd, IDC_HAND);
 
 	SetDirty(false);
 

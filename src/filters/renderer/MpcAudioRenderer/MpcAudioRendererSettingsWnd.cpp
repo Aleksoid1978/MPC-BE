@@ -132,9 +132,9 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 
 	CorrectComboListWidth(m_cbSoundDevice);
 
-	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (LONG)AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-	SetClassLongPtr(GetDlgItem(IDC_PP_SOUND_DEVICE)->m_hWnd, GCLP_HCURSOR, (LONG)AfxGetApp()->LoadStandardCursor(IDC_HAND));
-	SetClassLongPtr(GetDlgItem(IDC_PP_SYNC_METHOD)->m_hWnd, GCLP_HCURSOR, (LONG)AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetCursor(m_hWnd, IDC_ARROW);
+	SetCursor(m_hWnd, IDC_PP_SOUND_DEVICE, IDC_HAND);
+	SetCursor(m_hWnd, IDC_PP_SYNC_METHOD, IDC_HAND);
 
 	OnClickedWasapiMode();
 

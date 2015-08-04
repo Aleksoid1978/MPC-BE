@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ * Copyright (C) 2012-2015 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  *
  * This file is part of MPC-BE.
  *
@@ -83,12 +83,12 @@ BOOL CConfigDlg::OnInitDialog()
 
 	SetWindowText((GetUserDefaultUILanguage() == 1049) ? CAPTION_RU : CAPTION_EN);
 
-	::SetWindowText(GetDlgItem(IDC_STATIC)->m_hWnd,		(GetUserDefaultUILanguage() == 1049) ? MPCBE_PATH_RU : MPCBE_PATH_EN);
-	::SetWindowText(GetDlgItem(IDCANCEL)->m_hWnd,		(GetUserDefaultUILanguage() == 1049) ? CANCEL_RU : CANCEL_EN);
+	::SetWindowText(GetDlgItem(IDC_STATIC)->m_hWnd, (GetUserDefaultUILanguage() == 1049) ? MPCBE_PATH_RU : MPCBE_PATH_EN);
+	::SetWindowText(GetDlgItem(IDCANCEL)->m_hWnd,   (GetUserDefaultUILanguage() == 1049) ? CANCEL_RU : CANCEL_EN);
 
-	SetClassLongPtr(GetDlgItem(IDOK)->m_hWnd,			GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
-	SetClassLongPtr(GetDlgItem(IDCANCEL)->m_hWnd,		GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
-	SetClassLongPtr(GetDlgItem(IDC_MPCCOMBO)->m_hWnd,	GCLP_HCURSOR, (long) AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtr(GetDlgItem(IDOK)->m_hWnd,         GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtr(GetDlgItem(IDCANCEL)->m_hWnd,     GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtr(GetDlgItem(IDC_MPCCOMBO)->m_hWnd, GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
 
 	CRegKey key;
 	TCHAR path_buff[MAX_PATH];

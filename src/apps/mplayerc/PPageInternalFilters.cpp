@@ -452,13 +452,13 @@ BOOL CPPageInternalFilters::OnInitDialog()
 
 	SendMessage (WM_NOTIFY, m_Tab.GetDlgCtrlID(), (LPARAM)&hdr);
 
-	SetHandCursor(m_hWnd, IDC_BUTTON1);
-	SetHandCursor(m_hWnd, IDC_BUTTON2);
-	SetHandCursor(m_hWnd, IDC_BUTTON3);
-	SetHandCursor(m_hWnd, IDC_BUTTON4);
-	SetHandCursor(m_hWnd, IDC_BUTTON5);
-	SetHandCursor(m_hWnd, IDC_BUTTON6);
-	SetHandCursor(m_hWnd, IDC_BUTTON7);
+	SetCursor(m_hWnd, IDC_BUTTON1, IDC_HAND);
+	SetCursor(m_hWnd, IDC_BUTTON2, IDC_HAND);
+	SetCursor(m_hWnd, IDC_BUTTON3, IDC_HAND);
+	SetCursor(m_hWnd, IDC_BUTTON4, IDC_HAND);
+	SetCursor(m_hWnd, IDC_BUTTON5, IDC_HAND);
+	SetCursor(m_hWnd, IDC_BUTTON6, IDC_HAND);
+	SetCursor(m_hWnd, IDC_BUTTON7, IDC_HAND);
 
 	UpdateData(FALSE);
 
