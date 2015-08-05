@@ -759,16 +759,16 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 
 HRESULT CEVRAllocatorPresenter::SetMediaType(IMFMediaType* pType)
 {
-	HRESULT			hr;
-	AM_MEDIA_TYPE*	pAMMedia = NULL;
-
 	CheckPointer(pType, E_POINTER);
+
+	HRESULT hr;
+	AM_MEDIA_TYPE* pAMMedia = NULL;
+
 	CHECK_HR(pType->GetRepresentation(FORMAT_VideoInfo2, (LPVOID*)&pAMMedia));
 
-	hr = InitializeDevice(pType);
-	if (SUCCEEDED(hr)) {
+	if (SUCCEEDED(hr == InitializeDevice(pType))) {
 		CString strTemp, strTemp1;
-		strTemp = GetMediaTypeName (pAMMedia->subtype);
+		strTemp = GetMediaTypeName(pAMMedia->subtype);
 		strTemp.Replace (L"MEDIASUBTYPE_", L"");
 		strTemp1 = GetMediaTypeFormatDesc(pType);
 		strTemp1.Replace (L"D3DFMT_", L"");
@@ -1396,23 +1396,22 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 	CAutoLock lock2(&m_ImageProcessingLock);
 	CAutoLock cRenderLock(&m_RenderLock);
 
-	if (m_bStreamChanged) {
-		DeleteSurfaces();
-		RemoveAllSamples();
-	}
-
 	// Retrieve the surface size and format
-	UINT32 Width;
-	UINT32 Height;
-	hr = MFGetAttributeSize(pMediaType, MF_MT_FRAME_SIZE, &Width, &Height);
+	UINT32 width;
+	UINT32 height;
+	hr = MFGetAttributeSize(pMediaType, MF_MT_FRAME_SIZE, &width, &height);
 
 	D3DFORMAT Format;
 	if (SUCCEEDED(hr)) {
-		m_nativeVideoSize = CSize(Width, Height);
+		CSize frameSize(width, height);
+		m_bStreamChanged |= m_nativeVideoSize != frameSize;
+		m_nativeVideoSize = frameSize;
 		hr = GetMediaTypeFourCC(pMediaType, (DWORD*)&Format);
 	}
 
 	if (m_bStreamChanged && SUCCEEDED(hr)) {
+		DeleteSurfaces();
+		RemoveAllSamples();
 		hr = AllocSurfaces();
 	}
 
