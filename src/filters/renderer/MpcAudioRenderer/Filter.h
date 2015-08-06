@@ -28,7 +28,7 @@ struct AVFilterContext;
 struct AVFrame;
 enum AVSampleFormat;
 
-class CFilter
+class CFilter final
 {
 	CCritSec		m_csFilter;
 

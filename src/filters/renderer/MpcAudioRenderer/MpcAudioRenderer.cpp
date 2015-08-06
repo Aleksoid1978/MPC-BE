@@ -164,7 +164,6 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_rtStartTime(0)
 	, m_rtNextSampleTime(0)
 	, m_nSampleNum(0)
-	, m_bEndOfStream(FALSE)
 	, m_bUseDefaultDevice(FALSE)
 	, m_eEndReceive(TRUE)
 	, m_eReinitialize(TRUE)
@@ -241,9 +240,19 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	m_hStopWaitingRenderer		= CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	HRESULT hr = S_OK;
+	m_pInputPin = DNew CMpcAudioRendererInputPin(this, &hr);
+	if (!m_pInputPin) {
+		hr = E_OUTOFMEMORY;
+	}
+	if (FAILED(hr)) {
+		if (phr) {
+			*phr = hr;
+		}
+		return;
+	}
+
 	// CBaseRenderer is using a lazy initialization for the CRendererPosPassThru - we need it always
-	CBasePin *pPin = GetPin(0);
-	m_pPosition = DNew CRendererPosPassThru(NAME("CRendererPosPassThru"), CBaseFilter::GetOwner(), &hr, pPin);
+	m_pPosition = DNew CRendererPosPassThru(NAME("CRendererPosPassThru"), CBaseFilter::GetOwner(), &hr, m_pInputPin);
 	if (m_pPosition == NULL) {
 		hr = E_OUTOFMEMORY;
 	} else if (FAILED(hr)) {
@@ -270,11 +279,9 @@ CMpcAudioRenderer::~CMpcAudioRenderer()
 {
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::~CMpcAudioRenderer()"));
 
-	{
-		CComPtr<IMMDeviceEnumerator> enumerator;
-		if (SUCCEEDED(enumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator)))) {
-			enumerator->UnregisterEndpointNotificationCallback(this);
-		}
+	CComPtr<IMMDeviceEnumerator> enumerator;
+	if (SUCCEEDED(enumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator)))) {
+		enumerator->UnregisterEndpointNotificationCallback(this);
 	}
 
 	StopRendererThread();
@@ -623,19 +630,10 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 {
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::Run()"));
 
-	HRESULT hr = NOERROR;
-
 	if (m_State == State_Running) {
-		return hr;
+		return NOERROR;
 	}
 
-	if (IsEndOfStream()) {
-		NotifyEvent(EC_COMPLETE, S_OK, 0);
-		// I don't know why, but requires double calling NotifyEvent(EC_COMPLETE, ...);
-		return NotifyEvent(EC_COMPLETE, S_OK, 0);
-	}
-
-	m_bEndOfStream = FALSE;
 	m_nSampleNum = 0;
 
 	m_filterState = State_Running;
@@ -1018,20 +1016,6 @@ HRESULT CMpcAudioRenderer::GetReferenceClockInterface(REFIID riid, void **ppv)
 
 	return GetReferenceClockInterface(riid, ppv);
 }
-
-HRESULT CMpcAudioRenderer::EndOfStream(void)
-{
-	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::EndOfStream()"));
-
-	if (m_hStopWaitingRenderer) {
-		SetEvent(m_hStopWaitingRenderer);
-	}
-
-	m_bEndOfStream = TRUE;
-
-	return CBaseRenderer::EndOfStream();
-}
-
 
 #pragma region
 // ==== WASAPI
@@ -2021,7 +2005,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 	}
 
 	DWORD bufferFlags = 0;
-	if (!pData || !WasapiBufLen || (m_filterState != State_Running && !m_bEndOfStream)) {
+	if (!pData || !WasapiBufLen || m_filterState != State_Running) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
 		if (m_filterState != State_Running) {
 			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - not running"));
@@ -2190,10 +2174,6 @@ void CMpcAudioRenderer::CheckBufferStatus()
 	{
 		CAutoLock cRenderLock(&m_csRender);
 		WasapiBufLen = m_WasapiQueue.GetSize() + (m_CurrentPacket ? m_CurrentPacket->GetCount() : 0);
-	}
-
-	if (m_bEndOfStream && !WasapiBufLen) {
-		m_bEndOfStream = FALSE;
 	}
 
 	if (WasapiBufLen < (nAvailableBytes * 10)) {
@@ -2547,10 +2527,8 @@ HRESULT	CMpcAudioRenderer::EndFlush()
 {
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::EndFlush()"));
 
-	if (!m_bEndOfStream) {
-		WasapiFlush();
-		m_Filter.Flush();
-	}
+	WasapiFlush();
+	m_Filter.Flush();
 
 	return CBaseRenderer::EndFlush();
 }
@@ -2565,4 +2543,18 @@ inline REFERENCE_TIME CMpcAudioRenderer::GetRefClockTime()
 	}
 
 	return rt;
+}
+
+CMpcAudioRendererInputPin::CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, HRESULT* phr)
+	: CRendererInputPin(pRenderer, phr, L"In")
+	, m_pRenderer(static_cast<CMpcAudioRenderer*>(pRenderer))
+{
+}
+
+STDMETHODIMP CMpcAudioRendererInputPin::EndOfStream()
+{
+	DbgLog((LOG_TRACE, 3, L"CMpcAudioRendererInputPin::EndOfStream()"));
+
+	m_pFilter->NotifyEvent(EC_COMPLETE, S_OK, (LONG_PTR)m_pFilter);
+	return S_OK;
 }
