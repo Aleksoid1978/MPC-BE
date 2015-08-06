@@ -100,8 +100,8 @@ public:
 	// === IBasicAudio
 	STDMETHODIMP put_Volume(long lVolume) override;
 	STDMETHODIMP get_Volume(long *plVolume) override;
-	STDMETHODIMP put_Balance(long lBalance) override { return E_NOTIMPL; }
-	STDMETHODIMP get_Balance(long *plBalance) override { return E_NOTIMPL; }
+	STDMETHODIMP put_Balance(long lBalance) override;
+	STDMETHODIMP get_Balance(long *plBalance) override;
 
 	// === IMediaSeeking
 	STDMETHODIMP GetCapabilities(DWORD* pCapabilities) override;
@@ -159,7 +159,9 @@ private:
 	CBaseReferenceClock*	m_pReferenceClock;
 	double					m_dRate;
 	long					m_lVolume;
+	long					m_lBalance;
 	double					m_dVolumeFactor;
+	double					m_dBalanceFactor;
 
 	CFilter					m_Filter;
 

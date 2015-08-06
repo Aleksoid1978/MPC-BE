@@ -139,7 +139,9 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_hTask(NULL)
 	, m_bIsAudioClientStarted(false)
 	, m_lVolume(DSBVOLUME_MAX)
-	, m_dVolumeFactor(0.0)
+	, m_lBalance(DSBPAN_CENTER)
+	, m_dVolumeFactor(1.0)
+	, m_dBalanceFactor(1.0)
 	, m_nThreadId(0)
 	, m_hRenderThread(NULL)
 	, m_bThreadPaused(FALSE)
@@ -669,17 +671,21 @@ STDMETHODIMP CMpcAudioRenderer::Pause()
 // === IBasicAudio
 STDMETHODIMP CMpcAudioRenderer::put_Volume(long lVolume)
 {
-	m_lVolume = lVolume;
-
-	if (m_lVolume <= DSBVOLUME_MIN) {
+	if (lVolume <= DSBVOLUME_MIN) {
 		m_lVolume = DSBVOLUME_MIN;
 		m_dVolumeFactor = 0.0;
 	}
-	else if (m_lVolume >= DSBVOLUME_MAX) {
+	else if (lVolume >= DSBVOLUME_MAX) {
 		m_lVolume = DSBVOLUME_MAX;
 		m_dVolumeFactor = 1.0;
-	} else {
+	}
+	else {
+		m_lVolume = lVolume;
 		m_dVolumeFactor = pow(10.0, m_lVolume / 2000.0);
+	}
+
+	if (m_lBalance > DSBPAN_LEFT && m_lBalance < DSBPAN_RIGHT) {
+		m_dBalanceFactor = m_dVolumeFactor * pow(10.0, labs(m_lBalance) / 2000.0);
 	}
 
 	return S_OK;
@@ -690,6 +696,31 @@ STDMETHODIMP CMpcAudioRenderer::get_Volume(long *plVolume)
 	*plVolume = m_lVolume;
 
 	return S_OK;
+}
+
+STDMETHODIMP CMpcAudioRenderer::put_Balance(long lBalance)
+{
+	if (lBalance <= DSBPAN_LEFT) {
+		m_lBalance = DSBPAN_LEFT;
+		m_dBalanceFactor = 0.0;
+	}
+	else if (lBalance >= DSBPAN_RIGHT) {
+		m_lBalance = DSBPAN_RIGHT;
+		m_dBalanceFactor = 0.0;
+	}
+	else {
+		m_lBalance = lBalance;
+		m_dBalanceFactor = m_dVolumeFactor * pow(10.0, labs(m_lBalance) / 2000.0);
+	}
+
+	return E_NOTIMPL;
+}
+
+STDMETHODIMP CMpcAudioRenderer::get_Balance(long *plBalance)
+{
+	*plBalance = m_lBalance;
+
+	return E_NOTIMPL;
 }
 
 // === IMediaSeeking
