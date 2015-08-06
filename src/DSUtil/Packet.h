@@ -54,4 +54,5 @@ public:
 	void RemoveAll();
 	size_t GetCount();
 	size_t GetSize();
+	REFERENCE_TIME GetDuration();
 };
