@@ -36,7 +36,8 @@
 // #define AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED	AUDCLNT_ERR(0x019)
 
 class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
-	CMpcAudioRenderer : public CBaseRenderer
+	CMpcAudioRenderer final
+	: public CBaseRenderer
 	, public IBasicAudio
 	, public IMediaSeeking
 	, public IMMNotificationClient
@@ -60,8 +61,6 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 
 	ULONGLONG			m_nSampleNum;
 
-	BOOL				m_bEndOfStream;
-
 	BOOL				m_bUseDefaultDevice;
 
 	CString				m_strDeviceId;
@@ -71,86 +70,85 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 
 public:
 	CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr);
-	virtual ~CMpcAudioRenderer();
+	~CMpcAudioRenderer();
 
-	HRESULT				Receive(IMediaSample* pSample);
-	HRESULT				CheckInputType(const CMediaType* mtIn);
-	virtual HRESULT		CheckMediaType(const CMediaType *pmt);
-	virtual HRESULT		SetMediaType(const CMediaType *pmt);
-	virtual HRESULT		DoRenderSample(IMediaSample *pMediaSample) {return E_NOTIMPL;}
+	HRESULT CheckInputType(const CMediaType* mtIn);
 
-	virtual HRESULT		BeginFlush();
-	virtual HRESULT		EndFlush();
+	HRESULT Receive(IMediaSample* pSample) override;
+	HRESULT CheckMediaType(const CMediaType *pmt) override;
+	HRESULT SetMediaType(const CMediaType *pmt) override;
+	HRESULT DoRenderSample(IMediaSample *pMediaSample) override { return E_NOTIMPL; }
 
-	HRESULT				EndOfStream(void);
+	HRESULT BeginFlush() override;
+	HRESULT EndFlush() override;
 
 	DECLARE_IUNKNOWN
 
-	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv);
+	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv) override;
 
 	// === IMediaFilter
-	STDMETHODIMP Run(REFERENCE_TIME rtStart);
-	STDMETHODIMP Stop();
-	STDMETHODIMP Pause();
+	STDMETHODIMP Run(REFERENCE_TIME rtStart) override;
+	STDMETHODIMP Stop() override;
+	STDMETHODIMP Pause() override;
 
 	// === IDispatch (pour IBasicAudio)
-	STDMETHODIMP GetTypeInfoCount(UINT * pctinfo) { return E_NOTIMPL; };
-	STDMETHODIMP GetTypeInfo(UINT itinfo, LCID lcid, ITypeInfo ** pptinfo) { return E_NOTIMPL; };
-	STDMETHODIMP GetIDsOfNames(REFIID riid, OLECHAR** rgszNames, UINT cNames, LCID lcid, DISPID* rgdispid) { return E_NOTIMPL; };
-	STDMETHODIMP Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pdispparams, VARIANT* pvarResult, EXCEPINFO* pexcepinfo, UINT* puArgErr) { return E_NOTIMPL; };
+	STDMETHODIMP GetTypeInfoCount(UINT * pctinfo) override { return E_NOTIMPL; };
+	STDMETHODIMP GetTypeInfo(UINT itinfo, LCID lcid, ITypeInfo ** pptinfo) override { return E_NOTIMPL; };
+	STDMETHODIMP GetIDsOfNames(REFIID riid, OLECHAR** rgszNames, UINT cNames, LCID lcid, DISPID* rgdispid) override { return E_NOTIMPL; };
+	STDMETHODIMP Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pdispparams, VARIANT* pvarResult, EXCEPINFO* pexcepinfo, UINT* puArgErr) override { return E_NOTIMPL; };
 
 	// === IBasicAudio
-	STDMETHODIMP put_Volume(long lVolume);
-	STDMETHODIMP get_Volume(long *plVolume);
-	STDMETHODIMP put_Balance(long lBalance) {return E_NOTIMPL;}
-	STDMETHODIMP get_Balance(long *plBalance) {return E_NOTIMPL;}
+	STDMETHODIMP put_Volume(long lVolume) override;
+	STDMETHODIMP get_Volume(long *plVolume) override;
+	STDMETHODIMP put_Balance(long lBalance) override { return E_NOTIMPL; }
+	STDMETHODIMP get_Balance(long *plBalance) override { return E_NOTIMPL; }
 
 	// === IMediaSeeking
-	STDMETHODIMP GetCapabilities(DWORD* pCapabilities);
-	STDMETHODIMP CheckCapabilities(DWORD* pCapabilities);
-	STDMETHODIMP IsFormatSupported(const GUID* pFormat);
-	STDMETHODIMP QueryPreferredFormat(GUID* pFormat);
-	STDMETHODIMP GetTimeFormat(GUID* pFormat);
-	STDMETHODIMP IsUsingTimeFormat(const GUID* pFormat);
-	STDMETHODIMP SetTimeFormat(const GUID* pFormat);
-	STDMETHODIMP GetDuration(LONGLONG* pDuration);
-	STDMETHODIMP GetStopPosition(LONGLONG* pStop);
-	STDMETHODIMP GetCurrentPosition(LONGLONG* pCurrent);
-	STDMETHODIMP ConvertTimeFormat(LONGLONG* pTarget, const GUID* pTargetFormat, LONGLONG Source, const GUID* pSourceFormat);
-	STDMETHODIMP SetPositions(LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags);
-	STDMETHODIMP GetPositions(LONGLONG* pCurrent, LONGLONG* pStop);
-	STDMETHODIMP GetAvailable(LONGLONG* pEarliest, LONGLONG* pLatest);
-	STDMETHODIMP SetRate(double dRate);
-	STDMETHODIMP GetRate(double* pdRate);
-	STDMETHODIMP GetPreroll(LONGLONG* pllPreroll);
+	STDMETHODIMP GetCapabilities(DWORD* pCapabilities) override;
+	STDMETHODIMP CheckCapabilities(DWORD* pCapabilities) override;
+	STDMETHODIMP IsFormatSupported(const GUID* pFormat) override;
+	STDMETHODIMP QueryPreferredFormat(GUID* pFormat) override;
+	STDMETHODIMP GetTimeFormat(GUID* pFormat) override;
+	STDMETHODIMP IsUsingTimeFormat(const GUID* pFormat) override;
+	STDMETHODIMP SetTimeFormat(const GUID* pFormat) override;
+	STDMETHODIMP GetDuration(LONGLONG* pDuration) override;
+	STDMETHODIMP GetStopPosition(LONGLONG* pStop) override;
+	STDMETHODIMP GetCurrentPosition(LONGLONG* pCurrent) override;
+	STDMETHODIMP ConvertTimeFormat(LONGLONG* pTarget, const GUID* pTargetFormat, LONGLONG Source, const GUID* pSourceFormat) override;
+	STDMETHODIMP SetPositions(LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags) override;
+	STDMETHODIMP GetPositions(LONGLONG* pCurrent, LONGLONG* pStop) override;
+	STDMETHODIMP GetAvailable(LONGLONG* pEarliest, LONGLONG* pLatest) override;
+	STDMETHODIMP SetRate(double dRate) override;
+	STDMETHODIMP GetRate(double* pdRate) override;
+	STDMETHODIMP GetPreroll(LONGLONG* pllPreroll) override;
 
 	// === IMMNotificationClient
-	STDMETHODIMP OnDeviceStateChanged(__in LPCWSTR pwstrDeviceId, __in DWORD dwNewState);
-	STDMETHODIMP OnDeviceAdded(__in LPCWSTR pwstrDeviceId) { return E_NOTIMPL; }
-	STDMETHODIMP OnDeviceRemoved(__in LPCWSTR pwstrDeviceId) { return E_NOTIMPL; }
-	STDMETHODIMP OnDefaultDeviceChanged(__in EDataFlow flow, __in ERole role, __in LPCWSTR pwstrDefaultDeviceId);
-	STDMETHODIMP OnPropertyValueChanged(__in LPCWSTR pwstrDeviceId, __in const PROPERTYKEY key) { return E_NOTIMPL; }
+	STDMETHODIMP OnDeviceStateChanged(__in LPCWSTR pwstrDeviceId, __in DWORD dwNewState) override;
+	STDMETHODIMP OnDeviceAdded(__in LPCWSTR pwstrDeviceId) override { return E_NOTIMPL; }
+	STDMETHODIMP OnDeviceRemoved(__in LPCWSTR pwstrDeviceId) override { return E_NOTIMPL; }
+	STDMETHODIMP OnDefaultDeviceChanged(__in EDataFlow flow, __in ERole role, __in LPCWSTR pwstrDefaultDeviceId) override;
+	STDMETHODIMP OnPropertyValueChanged(__in LPCWSTR pwstrDeviceId, __in const PROPERTYKEY key) override { return E_NOTIMPL; }
 
 	// === ISpecifyPropertyPages2
-	STDMETHODIMP GetPages(CAUUID* pPages);
-	STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage);
+	STDMETHODIMP GetPages(CAUUID* pPages) override;
+	STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage) override;
 
 	// === IMpcAudioRendererFilter
-	STDMETHODIMP					Apply();
-	STDMETHODIMP					SetWasapiMode(INT nValue);
-	STDMETHODIMP_(INT)				GetWasapiMode();
-	STDMETHODIMP					SetSoundDevice(CString nValue);
-	STDMETHODIMP_(CString)			GetSoundDevice();
-	STDMETHODIMP_(UINT)				GetMode();
-	STDMETHODIMP					GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut);
-	STDMETHODIMP					SetBitExactOutput(BOOL nValue);
-	STDMETHODIMP_(BOOL)				GetBitExactOutput();
-	STDMETHODIMP					SetSystemLayoutChannels(BOOL nValue);
-	STDMETHODIMP_(BOOL)				GetSystemLayoutChannels();
-	STDMETHODIMP_(BITSTREAM_MODE)	GetBitstreamMode();
-	STDMETHODIMP_(CString)			GetCurrentPlaybackDevice();
-	STDMETHODIMP					SetSyncMethod(INT nValue);
-	STDMETHODIMP_(INT)				GetSyncMethod();
+	STDMETHODIMP					Apply() override;
+	STDMETHODIMP					SetWasapiMode(INT nValue) override;
+	STDMETHODIMP_(INT)				GetWasapiMode() override;
+	STDMETHODIMP					SetSoundDevice(CString nValue) override;
+	STDMETHODIMP_(CString)			GetSoundDevice() override;
+	STDMETHODIMP_(UINT)				GetMode() override;
+	STDMETHODIMP					GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut) override;
+	STDMETHODIMP					SetBitExactOutput(BOOL nValue) override;
+	STDMETHODIMP_(BOOL)				GetBitExactOutput() override;
+	STDMETHODIMP					SetSystemLayoutChannels(BOOL nValue) override;
+	STDMETHODIMP_(BOOL)				GetSystemLayoutChannels() override;
+	STDMETHODIMP_(BITSTREAM_MODE)	GetBitstreamMode() override;
+	STDMETHODIMP_(CString)			GetCurrentPlaybackDevice() override;
+	STDMETHODIMP					SetSyncMethod(INT nValue) override;
+	STDMETHODIMP_(INT)				GetSyncMethod() override;
 
 	// CMpcAudioRenderer
 private:
@@ -250,18 +248,28 @@ private:
 	CSimpleArray<DWORD>		m_dwChannelMaskList;
 
 	struct AudioParams {
-		WORD	wBitsPerSample;
-		DWORD	nSamplesPerSec;
+		WORD  wBitsPerSample;
+		DWORD nSamplesPerSec;
 
-		struct AudioParams(WORD v1, DWORD v2) {
+		AudioParams(WORD v1, DWORD v2) {
 			wBitsPerSample = v1;
 			nSamplesPerSec = v2;
 		}
 
 		bool operator == (const struct AudioParams& ap) const {
-			return ((*this).wBitsPerSample == ap.wBitsPerSample
-					&& (*this).nSamplesPerSec == ap.nSamplesPerSec);
+			return (this->wBitsPerSample == ap.wBitsPerSample
+					&& this->nSamplesPerSec == ap.nSamplesPerSec);
 		}
 	};
 	CSimpleArray<AudioParams> m_AudioParamsList;
+};
+
+class CMpcAudioRendererInputPin final
+	: public CRendererInputPin
+{
+	CMpcAudioRenderer* m_pRenderer;
+public:
+	CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, HRESULT* phr);
+
+	STDMETHODIMP EndOfStream() override;
 };
