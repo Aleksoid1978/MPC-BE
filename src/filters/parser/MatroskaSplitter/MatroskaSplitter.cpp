@@ -1981,7 +1981,7 @@ STDMETHODIMP CMatroskaSplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENC
 				if (pCuePoint && pCuePoint->CueTrackPositions.GetCount()) {
 					CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetHead();
 					if (pCueTrackPositions->CueTrack == TrackNumber) {
-						pKFs[nKFsTmp++] = s.GetRefTime(pCuePoint->CueTime);
+						pKFs[nKFsTmp++] = s.GetRefTime(pCuePoint->CueTime) - m_pFile->m_rtOffset;
 					}
 				}
 			}
