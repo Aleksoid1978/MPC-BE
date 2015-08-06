@@ -267,7 +267,6 @@ private:
 class CMpcAudioRendererInputPin final
 	: public CRendererInputPin
 {
-	CMpcAudioRenderer* m_pRenderer;
 public:
 	CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, HRESULT* phr);
 
