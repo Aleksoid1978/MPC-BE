@@ -2547,7 +2547,6 @@ inline REFERENCE_TIME CMpcAudioRenderer::GetRefClockTime()
 
 CMpcAudioRendererInputPin::CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, HRESULT* phr)
 	: CRendererInputPin(pRenderer, phr, L"In")
-	, m_pRenderer(static_cast<CMpcAudioRenderer*>(pRenderer))
 {
 }
 
