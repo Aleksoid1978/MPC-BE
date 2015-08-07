@@ -82,6 +82,9 @@ public:
 	HRESULT BeginFlush() override;
 	HRESULT EndFlush() override;
 
+	size_t WasapiQueueSize();
+	void WaitFinish();
+
 	DECLARE_IUNKNOWN
 
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv) override;
@@ -171,7 +174,6 @@ private:
 	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCheckFormat = TRUE);
 	HRESULT					CheckAudioClient(WAVEFORMATEX *pWaveFormatEx = NULL);
 	HRESULT					DoRenderSampleWasapi(IMediaSample *pMediaSample);
-	HRESULT					GetBufferSize(WAVEFORMATEX *pWaveFormatEx, REFERENCE_TIME *pHnsBufferPeriod);
 
 	bool					IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const WAVEFORMATEX *pNewWaveFormatEx);
 	bool					CheckFormatChanged(WAVEFORMATEX *pWaveFormatEx, WAVEFORMATEX **ppNewWaveFormatEx);
@@ -269,6 +271,8 @@ private:
 class CMpcAudioRendererInputPin final
 	: public CRendererInputPin
 {
+	CMpcAudioRenderer* m_pRenderer;
+
 public:
 	CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, HRESULT* phr);
 

@@ -1092,10 +1092,8 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 		return S_FALSE;
 	}
 
-	if (m_pWaveFileFormat == NULL
-			|| m_pWaveFileFormatOutput == NULL) {
-		return S_FALSE;
-	}
+	CheckPointer(m_pWaveFileFormat, S_FALSE);
+	CheckPointer(m_pWaveFileFormatOutput, S_FALSE);
 
 	m_eEndReceive.Reset();
 
@@ -2029,25 +2027,21 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 		return hr;
 	}
 
-	size_t WasapiBufLen = 0;
-	{
-		CAutoLock cRenderLock(&m_csRender);
-		WasapiBufLen = m_WasapiQueue.GetSize() + (m_CurrentPacket ? m_CurrentPacket->GetCount() : 0);
-	}
+	size_t nWasapiQueueSize = WasapiQueueSize();
+	DWORD dwFlags = 0;
 
-	DWORD bufferFlags = 0;
-	if (!pData || !WasapiBufLen || m_filterState != State_Running) {
+	if (!pData || !nWasapiQueueSize || m_filterState != State_Running) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
 		if (m_filterState != State_Running) {
 			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - not running"));
-		} else if (!WasapiBufLen) {
+		} else if (!nWasapiQueueSize) {
 			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - data queue is empty"));
 		}
 #endif
-		bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
+		dwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
 	} else {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
-		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - requested: %u[%u], available: %u", nAvailableBytes, numFramesAvailable, WasapiBufLen));
+		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - requested: %u[%u], available: %u", nAvailableBytes, numFramesAvailable, nWasapiQueueSize));
 #endif
 		{
 			CAutoLock cRenderLock(&m_csRender);
@@ -2120,7 +2114,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 							rtSilenceDuration / 10000.0, nSilenceFrames, nSilenceBytes, rtRefClock, rtWaitRenderTime));
 #endif
 					if (nSilenceBytes == (nAvailableBytes - nWritenBytes)) {
-						bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
+						dwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
 						break;
 					} else {
 						memset(pData, 0, nSilenceBytes);
@@ -2142,11 +2136,11 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 
 					m_nSampleNum++;
 				}
-			} while (nWritenBytes < nAvailableBytes && bufferFlags != AUDCLNT_BUFFERFLAGS_SILENT);
+			} while (nWritenBytes < nAvailableBytes && dwFlags != AUDCLNT_BUFFERFLAGS_SILENT);
 
-			if (bufferFlags != AUDCLNT_BUFFERFLAGS_SILENT) {
+			if (dwFlags != AUDCLNT_BUFFERFLAGS_SILENT) {
 				if (!nWritenBytes) {
-					bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
+					dwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
 				} else if (nWritenBytes < nAvailableBytes) {
 					memset(&pData[nWritenBytes], 0, nAvailableBytes - nWritenBytes);
 				}
@@ -2154,7 +2148,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 		}
 
 		if (m_lVolume <= DSBVOLUME_MIN) {
-			bufferFlags = AUDCLNT_BUFFERFLAGS_SILENT;
+			dwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
 		} else if (m_lVolume < DSBVOLUME_MAX && !m_bIsBitstream) {
 			// Adjusting volume ...
 			WAVEFORMATEX* wfeOutput = (WAVEFORMATEX*)m_pWaveFileFormatOutput;
@@ -2184,7 +2178,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 		}
 	}
 
-	hr = m_pRenderClient->ReleaseBuffer(numFramesAvailable, bufferFlags);
+	hr = m_pRenderClient->ReleaseBuffer(numFramesAvailable, dwFlags);
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
 	if (FAILED(hr)) {
 		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - ReleaseBuffer() failed with size %ld (0x%08x)", numFramesAvailable, hr));
@@ -2201,50 +2195,42 @@ void CMpcAudioRenderer::CheckBufferStatus()
 	}
 
 	UINT32 nAvailableBytes = m_nFramesInBuffer * m_pWaveFileFormatOutput->nBlockAlign;
-	size_t WasapiBufLen = 0;
-	{
-		CAutoLock cRenderLock(&m_csRender);
-		WasapiBufLen = m_WasapiQueue.GetSize() + (m_CurrentPacket ? m_CurrentPacket->GetCount() : 0);
-	}
+	size_t nWasapiQueueSize = WasapiQueueSize();
 
-	if (WasapiBufLen < (nAvailableBytes * 10)) {
+	if (nWasapiQueueSize < (nAvailableBytes * 10)) {
 		SetEvent(m_hRendererNeedMoreData);
 	} else {
 		ResetEvent(m_hRendererNeedMoreData);
 	}
 }
 
-HRESULT CMpcAudioRenderer::GetBufferSize(WAVEFORMATEX *pWaveFormatEx, REFERENCE_TIME *pHnsBufferPeriod)
+static HRESULT CalcBitstreamBufferPeriod(WAVEFORMATEX *pWaveFormatEx, REFERENCE_TIME *pHnsBufferPeriod)
 {
-	CheckPointer(pWaveFormatEx, S_OK);
+	CheckPointer(pWaveFormatEx, E_FAIL);
 
 	UINT32 nBufferSize = 0;
 
-	if (pWaveFormatEx->cbSize < sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX)) {
-		if (pWaveFormatEx->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
-			nBufferSize = 6144;
-		} else {
-			return S_OK;
-		}
-	} else {
+	if (pWaveFormatEx->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
+		nBufferSize = 6144;
+	} else if (IsWaveFormatExtensible(pWaveFormatEx)) {
 		WAVEFORMATEXTENSIBLE *wfext = (WAVEFORMATEXTENSIBLE*)pWaveFormatEx;
 
 		if (wfext->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP) {
 			nBufferSize = 61440;
-		} else if (wfext->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD) {
+		}
+		else if (wfext->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD) {
 			nBufferSize = 32768;
-		} else if (wfext->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS) {
+		}
+		else if (wfext->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS) {
 			nBufferSize = 24576;
-		} else {
-			return S_OK;
 		}
 	}
 
-	*pHnsBufferPeriod = (REFERENCE_TIME)((REFERENCE_TIME)nBufferSize * 10000 * 8 / ((REFERENCE_TIME)pWaveFormatEx->nChannels * pWaveFormatEx->wBitsPerSample *
-						1.0 * pWaveFormatEx->nSamplesPerSec) /*+ 0.5*/);
-	*pHnsBufferPeriod *= 1000;
-
-	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetBufferSize() - set a %I64u period for a %u buffer size", *pHnsBufferPeriod, nBufferSize));
+	if (nBufferSize) {
+		*pHnsBufferPeriod = llMulDiv(nBufferSize << 3, UNITS, pWaveFormatEx->nChannels * pWaveFormatEx->wBitsPerSample * pWaveFormatEx->nSamplesPerSec, 0);
+		
+		DbgLog((LOG_TRACE, 3, L"CalcBitstreamBufferPeriod() - set period of %I64u hundred-nanoseconds for a %u buffer size", *pHnsBufferPeriod, nBufferSize));
+	}
 
 	return S_OK;
 }
@@ -2288,7 +2274,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCh
 		}
 	}
 
-	GetBufferSize(pWaveFormatEx, &m_hnsPeriod);
+	CalcBitstreamBufferPeriod(pWaveFormatEx, &m_hnsPeriod);
 
 	if (SUCCEEDED(hr)) {
 		hr = m_pAudioClient->Initialize((m_WASAPIMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(pWaveFormatEx)) ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED,
@@ -2319,14 +2305,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCh
 		}
 
 		// calculate the new aligned periodicity
-		m_hnsPeriod = // hns =
-			(REFERENCE_TIME)(
-				10000.0 * // (hns / ms) *
-				1000 * // (ms / s) *
-				m_nFramesInBuffer / // frames /
-				pWaveFormatEx->nSamplesPerSec  // (frames / s)
-				+ 0.5 // rounding
-			);
+		m_hnsPeriod = llMulDiv(m_nFramesInBuffer, UNITS, pWaveFormatEx->nSamplesPerSec, 0);
 
 		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::InitAudioClient() - Trying again with periodicity of %I64u hundred-nanoseconds, or %u frames.", m_hnsPeriod, m_nFramesInBuffer));
 		if (SUCCEEDED(hr)) {
@@ -2564,6 +2543,27 @@ HRESULT	CMpcAudioRenderer::EndFlush()
 	return CBaseRenderer::EndFlush();
 }
 
+size_t CMpcAudioRenderer::WasapiQueueSize()
+{
+	CAutoLock cRenderLock(&m_csRender);
+	return m_WasapiQueue.GetSize() + (m_CurrentPacket ? m_CurrentPacket->GetCount() : 0);
+}
+
+void CMpcAudioRenderer::WaitFinish()
+{
+	for (;;) {
+		if (m_filterState != State_Running) {
+			break;
+		}
+
+		if (!WasapiQueueSize()) {
+			break;
+		}
+
+		Sleep(m_hnsPeriod / 10000);
+	}
+}
+
 inline REFERENCE_TIME CMpcAudioRenderer::GetRefClockTime()
 {
 	REFERENCE_TIME rt = INVALID_TIME;
@@ -2578,6 +2578,7 @@ inline REFERENCE_TIME CMpcAudioRenderer::GetRefClockTime()
 
 CMpcAudioRendererInputPin::CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, HRESULT* phr)
 	: CRendererInputPin(pRenderer, phr, L"In")
+	, m_pRenderer(static_cast<CMpcAudioRenderer*>(pRenderer))
 {
 }
 
@@ -2585,6 +2586,7 @@ STDMETHODIMP CMpcAudioRendererInputPin::EndOfStream()
 {
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRendererInputPin::EndOfStream()"));
 
+	m_pRenderer->WaitFinish();
 	m_pFilter->NotifyEvent(EC_COMPLETE, S_OK, (LONG_PTR)m_pFilter);
 	return S_OK;
 }
