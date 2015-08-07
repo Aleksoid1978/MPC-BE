@@ -21,6 +21,8 @@
 #include "stdafx.h"
 #include <mmdeviceapi.h>
 #include <FunctionDiscoveryKeys_devpkey.h>
+#include <ks.h>
+#include <ksmedia.h>
 #include "MpcAudioRendererSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
@@ -385,11 +387,13 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 					sFormat.Format(L"%dbit %s", pWfxIn->wBitsPerSample, bIsFloat ? L"Float" : L"Integer");
 
 					CString sChannel;
-					switch (pWfxIn->nChannels) {
-						case 6:
+					switch (layout) {
+						case KSAUDIO_SPEAKER_5POINT1:
+						case KSAUDIO_SPEAKER_5POINT1_SURROUND:
 							sChannel = L"5.1";
 							break;
-						case 8:
+						case KSAUDIO_SPEAKER_7POINT1:
+						case KSAUDIO_SPEAKER_7POINT1_SURROUND:
 							sChannel = L"7.1";
 							break;
 						default:
