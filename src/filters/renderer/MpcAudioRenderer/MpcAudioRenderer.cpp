@@ -36,7 +36,7 @@
 #define OPT_REGKEY_AudRend			_T("Software\\MPC-BE Filters\\MPC Audio Renderer")
 #define OPT_SECTION_AudRend			_T("Filters\\MPC Audio Renderer")
 #define OPT_DeviceMode				_T("UseWasapi")
-#define OPT_AudioDevice				_T("SoundDevice")
+#define OPT_AudioDeviceId			_T("SoundDeviceId")
 #define OPT_UseBitExactOutput		_T("UseBitExactOutput")
 #define OPT_UseSystemLayoutChannels	_T("UseSystemLayoutChannels")
 #define OPT_SyncMethod				_T("SyncMethod")
@@ -85,26 +85,6 @@ STDAPI DllUnregisterServer()
 CFilterApp theApp;
 
 #endif
-
-static GUID lpSoundGUID = {0xdef00000, 0x9c6d, 0x47ed, {0xaa, 0xf1, 0x4d, 0xda, 0x8f, 0x2b, 0x5c, 0x03}}; //DSDEVID_DefaultPlayback from dsound.h
-
-bool CALLBACK DSEnumProc2(LPGUID lpGUID,
-						  LPCTSTR lpszDesc,
-						  LPCTSTR lpszDrvName,
-						  LPVOID lpContext )
-{
-	CString *pStr = (CString *)lpContext;
-	ASSERT ( pStr );
-	CString strGUID = *pStr;
-
-	if (lpGUID != NULL) { // NULL only for "Primary Sound Driver".
-		if (strGUID == lpszDesc) {
-			memcpy((VOID *)&lpSoundGUID, lpGUID, sizeof(GUID));
-		}
-	}
-
-	return TRUE;
-}
 
 static void DumpWaveFormatEx(WAVEFORMATEX* pwfx)
 {
@@ -187,8 +167,8 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		}
 		len = _countof(buff);
 		memset(buff, 0, sizeof(buff));
-		if (ERROR_SUCCESS == key.QueryStringValue(OPT_AudioDevice, buff, &len)) {
-			m_DeviceName = CString(buff);
+		if (ERROR_SUCCESS == key.QueryStringValue(OPT_AudioDeviceId, buff, &len)) {
+			m_DeviceId = CString(buff);
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_UseBitExactOutput, dw)) {
 			m_bUseBitExactOutput = !!dw;
@@ -202,7 +182,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	}
 #else
 	m_WASAPIMode				= (WASAPI_MODE)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, m_WASAPIMode);
-	m_DeviceName				= AfxGetApp()->GetProfileString(OPT_SECTION_AudRend, OPT_AudioDevice, m_DeviceName);
+	m_DeviceId					= AfxGetApp()->GetProfileString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
 	m_bUseBitExactOutput		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	m_bUseSystemLayoutChannels	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
 	m_SyncMethod				= (SYNC_METHOD)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_SyncMethod, m_SyncMethod);
@@ -886,14 +866,14 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_AudRend)) {
 		key.SetDWORDValue(OPT_DeviceMode, (DWORD)m_WASAPIMode);
-		key.SetStringValue(OPT_AudioDevice, m_DeviceName);
+		key.SetStringValue(OPT_AudioDeviceId, m_DeviceId);
 		key.SetDWORDValue(OPT_UseBitExactOutput, m_bUseBitExactOutput);
 		key.SetDWORDValue(OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
 		key.SetDWORDValue(OPT_SyncMethod, (DWORD)m_SyncMethod);
 	}
 #else
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, (int)m_WASAPIMode);
-	AfxGetApp()->WriteProfileString(OPT_SECTION_AudRend, OPT_AudioDevice, m_DeviceName);
+	AfxGetApp()->WriteProfileString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_SyncMethod, (int)m_SyncMethod);
@@ -919,22 +899,23 @@ STDMETHODIMP_(INT) CMpcAudioRenderer::GetWasapiMode()
 	return (INT)m_WASAPIMode;
 }
 
-STDMETHODIMP CMpcAudioRenderer::SetSoundDevice(CString nValue)
+STDMETHODIMP CMpcAudioRenderer::SetSoundDeviceId(CString pDeviceId)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_pAudioClient && m_DeviceName != nValue) {
+	if (m_pAudioClient && m_DeviceId != pDeviceId) {
+		m_strDeviceId.Empty();
 		SetEvent(m_hReinitializeEvent);
 	}
 
-	m_DeviceName = nValue;
+	m_DeviceId = pDeviceId;
 	return S_OK;
 }
 
-STDMETHODIMP_(CString) CMpcAudioRenderer::GetSoundDevice()
+STDMETHODIMP_(CString) CMpcAudioRenderer::GetSoundDeviceId()
 {
 	CAutoLock cAutoLock(&m_csProps);
-	return m_DeviceName;
+	return m_DeviceId;
 }
 
 STDMETHODIMP_(UINT) CMpcAudioRenderer::GetMode()
@@ -1532,7 +1513,7 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 
 HRESULT CMpcAudioRenderer::GetAudioDevice()
 {
-	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - Target end point: '%s'", m_DeviceName));
+	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - Target end point device Id: '%s'", m_DeviceId));
 
 	m_bUseDefaultDevice = FALSE;
 	m_strDeviceName.Empty();
@@ -1544,71 +1525,70 @@ HRESULT CMpcAudioRenderer::GetAudioDevice()
 		return hr;
 	}
 
-	IMMDeviceCollection* devices;
-	hr = enumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &devices);
-	if (hr != S_OK) {
-		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - enumerator->EnumAudioEndpoints() failed: (0x%08x)", hr));
-		return hr;
-	}
-
-	UINT count = 0;
-	hr = devices->GetCount(&count);
-	if (hr != S_OK) {
-		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->GetCount() failed: (0x%08x)", hr));
-		SAFE_RELEASE(devices);
-		return hr;
-	}
-
-	IPropertyStore* pProps = NULL;
-
-	for (UINT i = 0 ; i < count ; i++) {
-		LPWSTR pwszID = NULL;
-		IMMDevice *endpoint = NULL;
-		hr = devices->Item(i, &endpoint);
-		if (hr == S_OK) {
-			hr = endpoint->GetId(&pwszID);
-			if (hr == S_OK) {
-				if (endpoint->OpenPropertyStore(STGM_READ, &pProps) == S_OK) {
-					PROPVARIANT varName;
-					PropVariantInit(&varName);
-
-					// Found the configured audio endpoint
-					if ((pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK) && (m_DeviceName == varName.pwszVal)) {
-						DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->GetId() OK, num: (%d), pwszVal: '%s', pwszID: '%s'", i, varName.pwszVal, pwszID));
-
-						m_strDeviceName = varName.pwszVal;
-						if (m_strDeviceId.IsEmpty()) {
-							m_strDeviceId = pwszID;
-						}
-
-						enumerator->GetDevice(pwszID, &m_pMMDevice);
-						SAFE_RELEASE(devices);
-						m_pMMDevice = endpoint;
-						CoTaskMemFree(pwszID);
-						pwszID = NULL;
-						PropVariantClear(&varName);
-						SAFE_RELEASE(pProps);
-						return S_OK;
-					} else {
-						PropVariantClear(&varName);
-						SAFE_RELEASE(pProps);
-						SAFE_RELEASE(endpoint);
-						CoTaskMemFree(pwszID);
-						pwszID = NULL;
-					}
-				}
-			} else {
-				DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->GetId() failed: (0x%08x)", hr));
-			}
-		} else {
-			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->Item() failed: (0x%08x)", hr));
+	if (!m_DeviceId.IsEmpty()) {
+		CComPtr<IMMDeviceCollection> devices;
+		hr = enumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &devices);
+		if (hr != S_OK) {
+			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - enumerator->EnumAudioEndpoints() failed: (0x%08x)", hr));
+			return hr;
 		}
 
-		CoTaskMemFree(pwszID);
-		pwszID = NULL;
+		UINT count = 0;
+		hr = devices->GetCount(&count);
+		if (hr != S_OK) {
+			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->GetCount() failed: (0x%08x)", hr));
+			return hr;
+		}
+
+		IPropertyStore* pProps = NULL;
+
+		for (UINT i = 0; i < count; i++) {
+			LPWSTR pwszID = NULL;
+			IMMDevice *endpoint = NULL;
+			hr = devices->Item(i, &endpoint);
+			if (hr == S_OK) {
+				hr = endpoint->GetId(&pwszID);
+				if (hr == S_OK) {
+					if (endpoint->OpenPropertyStore(STGM_READ, &pProps) == S_OK) {
+						PROPVARIANT varName;
+						PropVariantInit(&varName);
+
+						// Found the configured audio endpoint
+						if ((pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK) && (m_DeviceId == CString(pwszID))) {
+							DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->GetId() OK, num: (%d), pwszVal: '%s', pwszID: '%s'", i, varName.pwszVal, pwszID));
+
+							m_strDeviceName = varName.pwszVal;
+							if (m_strDeviceId.IsEmpty()) {
+								m_strDeviceId = pwszID;
+							}
+
+							enumerator->GetDevice(pwszID, &m_pMMDevice);
+							m_pMMDevice = endpoint;
+							CoTaskMemFree(pwszID);
+							pwszID = NULL;
+							PropVariantClear(&varName);
+							SAFE_RELEASE(pProps);
+							return S_OK;
+						} else {
+							PropVariantClear(&varName);
+							SAFE_RELEASE(pProps);
+							SAFE_RELEASE(endpoint);
+							CoTaskMemFree(pwszID);
+							pwszID = NULL;
+						}
+					}
+				} else {
+					DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->GetId() failed: (0x%08x)", hr));
+				}
+			} else {
+				DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->Item() failed: (0x%08x)", hr));
+			}
+
+			CoTaskMemFree(pwszID);
+			pwszID = NULL;
+		}
 	}
 
-	SAFE_RELEASE(devices);
 	m_bUseDefaultDevice = TRUE;
 
 	hr = enumerator->GetDefaultAudioEndpoint(eRender, eConsole, &m_pMMDevice);

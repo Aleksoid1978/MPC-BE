@@ -140,8 +140,8 @@ public:
 	STDMETHODIMP					Apply() override;
 	STDMETHODIMP					SetWasapiMode(INT nValue) override;
 	STDMETHODIMP_(INT)				GetWasapiMode() override;
-	STDMETHODIMP					SetSoundDevice(CString nValue) override;
-	STDMETHODIMP_(CString)			GetSoundDevice() override;
+	STDMETHODIMP					SetSoundDeviceId(CString pDeviceId) override;
+	STDMETHODIMP_(CString)			GetSoundDeviceId() override;
 	STDMETHODIMP_(UINT)				GetMode() override;
 	STDMETHODIMP					GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut) override;
 	STDMETHODIMP					SetBitExactOutput(BOOL nValue) override;
@@ -198,7 +198,7 @@ private:
 	HMODULE					m_hModule;
 	HANDLE					m_hTask;
 	WASAPI_MODE				m_WASAPIMode;
-	CString					m_DeviceName;
+	CString					m_DeviceId;
 	IMMDevice				*m_pMMDevice;
 	IAudioClient			*m_pAudioClient;
 	IAudioRenderClient		*m_pRenderClient;
