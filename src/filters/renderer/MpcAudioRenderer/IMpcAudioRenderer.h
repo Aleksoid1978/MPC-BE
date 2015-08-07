@@ -48,8 +48,8 @@ public IUnknown {
 
 	STDMETHOD(SetWasapiMode(INT nValue)) PURE;
 	STDMETHOD_(INT, GetWasapiMode()) PURE;
-	STDMETHOD(SetSoundDevice(CString nValue)) PURE;
-	STDMETHOD_(CString, GetSoundDevice()) PURE;
+	STDMETHOD(SetSoundDeviceId(CString pDeviceId)) PURE;
+	STDMETHOD_(CString, GetSoundDeviceId()) PURE;
 	STDMETHOD_(UINT, GetMode()) PURE;
 	STDMETHOD(GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut)) PURE;
 	STDMETHOD(SetBitExactOutput(BOOL nValue)) PURE;

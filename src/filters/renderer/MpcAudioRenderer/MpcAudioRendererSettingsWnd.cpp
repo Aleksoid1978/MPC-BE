@@ -19,6 +19,8 @@
  */
 
 #include "stdafx.h"
+#include <mmdeviceapi.h>
+#include <FunctionDiscoveryKeys_devpkey.h>
 #include "MpcAudioRendererSettingsWnd.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
@@ -26,20 +28,14 @@
 bool CALLBACK DSEnumProc(LPGUID lpGUID,
 						 LPCTSTR lpszDesc,
 						 LPCTSTR lpszDrvName,
-						 LPVOID lpContext )
+						 LPVOID lpContext)
 {
 	CComboBox *pCombo = (CComboBox*)lpContext;
 	ASSERT(pCombo);
-	LPGUID lpTemp = NULL;
 
-	if (lpGUID != NULL) {// NULL only for "Primary Sound Driver".
-		if ((lpTemp = (LPGUID)malloc(sizeof(GUID))) == NULL) {
-			return TRUE;
-		}
-		memcpy(lpTemp, lpGUID, sizeof(GUID));
+	if (lpGUID == NULL) { // NULL only for "Primary Sound Driver".
+		pCombo->AddString(lpszDesc);
 	}
-	pCombo->AddString(lpszDesc);
-	free(lpTemp);
 
 	return TRUE;
 }
@@ -102,23 +98,75 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 
 	HMODULE hModule = LoadLibrary(L"dsound.dll");
 	if (hModule) {
-		HRESULT (__stdcall * pDirectSoundEnumerate)(__in LPDSENUMCALLBACKW pDSEnumCallback, __in_opt LPVOID pContext);
+		HRESULT(__stdcall * pDirectSoundEnumerate)(__in LPDSENUMCALLBACKW pDSEnumCallback, __in_opt LPVOID pContext);
 		(FARPROC &)pDirectSoundEnumerate = GetProcAddress(hModule, "DirectSoundEnumerateW");
 		if (pDirectSoundEnumerate) {
 			pDirectSoundEnumerate((LPDSENUMCALLBACK)DSEnumProc, (LPVOID)&m_cbSoundDevice);
 		}
-
 		FreeLibrary(hModule);
+	}
+
+	if (m_cbSoundDevice.GetCount() == 1) {
+		m_deviceIdList.Add(L"");
+	}
+
+	for (;;) {
+		CComPtr<IMMDeviceEnumerator> enumerator;
+		HRESULT hr = enumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator));
+		if (FAILED(hr)) {
+			break;
+		}
+		CComPtr<IMMDeviceCollection> devices;
+		if (FAILED(hr = enumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &devices))) {
+			break;
+		}
+
+		UINT count = 0;
+		if (FAILED(hr = devices->GetCount(&count))) {
+			break;
+		}
+
+		IMMDevice* endpoint = NULL;
+		IPropertyStore* pProps = NULL;
+		LPWSTR pwszID = NULL;
+
+		for (UINT i = 0; i < count; i++) {
+			if (SUCCEEDED(hr = devices->Item(i, &endpoint))
+					&& SUCCEEDED(endpoint->GetId(&pwszID))
+					&& SUCCEEDED(hr = endpoint->OpenPropertyStore(STGM_READ, &pProps))) {
+				PROPVARIANT varName;
+				PropVariantInit(&varName);
+				if (SUCCEEDED(hr = pProps->GetValue(PKEY_Device_FriendlyName, &varName))) {
+					m_deviceIdList.Add(pwszID);
+					m_cbSoundDevice.AddString(varName.pwszVal);
+
+					PropVariantClear(&varName);
+				}
+			}
+
+			SAFE_RELEASE(endpoint);
+			SAFE_RELEASE(pProps);
+			if (pwszID) {
+				CoTaskMemFree(pwszID);
+				pwszID = NULL;
+			}
+		}
+
+		break;
 	}
 
 	if (m_pMAR) {
 		if (m_cbSoundDevice.GetCount() > 0) {
-			int idx = m_cbSoundDevice.FindString(0, m_pMAR->GetSoundDevice());
-			if (idx < 0) {
-				m_cbSoundDevice.SetCurSel(0);
-			} else {
-				m_cbSoundDevice.SetCurSel(m_cbSoundDevice.FindString(0, m_pMAR->GetSoundDevice()));
+			int idx = 0;
+			CString soundDeviceId = m_pMAR->GetSoundDeviceId();
+			for (INT_PTR i = 0; i < m_deviceIdList.GetCount(); i++) {
+				if (m_deviceIdList[i] == soundDeviceId) {
+					idx = i;
+					break;
+				}
 			}
+
+			m_cbSoundDevice.SetCurSel(idx);
 		}
 		m_cbWasapiMode.SetCurSel(m_pMAR->GetWasapiMode());
 		m_cbUseBitExactOutput.SetCheck(m_pMAR->GetBitExactOutput());
@@ -154,11 +202,9 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 		m_pMAR->SetBitExactOutput(m_cbUseBitExactOutput.GetCheck());
 		m_pMAR->SetSystemLayoutChannels(m_cbUseSystemLayoutChannels.GetCheck());
 		m_pMAR->SetSyncMethod(m_cbSyncMethod.GetCurSel());
-		CString str;
 		int idx = m_cbSoundDevice.GetCurSel();
 		if (idx >= 0) {
-			m_cbSoundDevice.GetLBText(idx, str);
-			m_pMAR->SetSoundDevice(str);
+			m_pMAR->SetSoundDeviceId(m_deviceIdList[idx]);
 		}
 		m_pMAR->Apply();
 	}
