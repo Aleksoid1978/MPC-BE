@@ -108,6 +108,28 @@ void CDiskImage::Init()
 		//}
 	}
 #endif
+
+#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
+	// DAEMON Tools Lite
+	m_vcd_path.Empty();
+
+	CRegKey key;
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\VCDMount.exe"), KEY_READ)) {
+		ULONG nChars = 0;
+		if (ERROR_SUCCESS == key.QueryStringValue(NULL, NULL, &nChars)) {
+			if (ERROR_SUCCESS == key.QueryStringValue(NULL, m_vcd_path.GetBuffer(nChars), &nChars)) {
+				m_vcd_path.ReleaseBuffer(nChars);
+			}
+		}
+		key.Close();
+	}
+
+	if (::PathFileExists(m_vcd_path)) {
+		// simple check
+		m_DriveType = VCD;
+		return;
+	}
+#endif
 }
 
 bool CDiskImage::DriveAvailable()
@@ -123,6 +145,11 @@ const LPCTSTR CDiskImage::GetExts()
 #if ENABLE_DTLITE_SUPPORT
 	if (m_DriveType == DTLITE) {
 		return _T("*.iso;*.nrg;*.mdf;*.isz;*.ccd");
+	}
+#endif
+#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
+	if (m_DriveType == VCD) {
+		return _T("*.iso;*.ccd");
 	}
 #endif
 
@@ -145,6 +172,11 @@ bool CDiskImage::CheckExtension(LPCTSTR pathName)
 		return true;
 	}
 #endif
+#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
+	if (m_DriveType == VCD && (ext == L".iso" || ext == L".ccd" || ext == L".iso.wv")) {
+		return true;
+	}
+#endif
 
 	return false;
 }
@@ -161,6 +193,11 @@ TCHAR CDiskImage::MountDiskImage(LPCTSTR pathName)
 #if ENABLE_DTLITE_SUPPORT
 		if (m_DriveType == DTLITE) {
 			m_DriveLetter = MountDTLite(pathName);
+		}
+#endif
+#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
+		if (m_DriveType == VCD) {
+			m_DriveLetter = MountVCD(pathName);
 		}
 #endif
 	}
@@ -194,6 +231,21 @@ void CDiskImage::UnmountDiskImage()
 		if (ShellExecuteEx(&execinfo)) {
 			// do not wait for execution result
 			m_dtdrive = dt_none;
+		}
+	}
+#endif
+#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
+	if (m_DriveType == VCD) {
+		SHELLEXECUTEINFO execinfo;
+		memset(&execinfo, 0, sizeof(execinfo));
+		execinfo.lpFile = m_vcd_path;
+		execinfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+		execinfo.nShow = SW_HIDE;
+		execinfo.cbSize = sizeof(execinfo);
+		execinfo.lpParameters = L"/d=0 /u";
+
+		if (ShellExecuteEx(&execinfo)) {
+			// do not wait for execution result
 		}
 	}
 #endif
@@ -367,6 +419,58 @@ TCHAR CDiskImage::MountDTLite(LPCTSTR pathName)
 
 	ec = (DWORD)-1;
 	execinfo.lpParameters = parameters;
+	if (!ShellExecuteEx(&execinfo)) {
+		return 0;
+	}
+	WaitForSingleObject(execinfo.hProcess, INFINITE);
+	if (!GetExitCodeProcess(execinfo.hProcess, &ec) && ec != 0) {
+		return 0;
+	}
+
+	return letter;
+}
+#endif
+
+#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
+TCHAR CDiskImage::MountVCD(LPCTSTR pathName)
+{
+	TCHAR letter = 0;
+
+	DWORD VCD_drive = 0;
+	CRegKey key;
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\Elaborate Bytes\\VirtualCloneDrive"), KEY_READ)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("VCDDriveMask"), VCD_drive)) { // get all VCD drives
+			for (int i = 0; i < 26; i++) {
+				if (VCD_drive & (1 << i)) {
+					VCD_drive = (1 << i); // select the first drive
+					letter = 'A' + i;
+					break;
+				}
+			}
+		}
+		key.Close();
+	}
+	if (!VCD_drive) {
+		return 0;
+	}
+
+	DWORD drives = GetLogicalDrives();
+	if (!(drives & VCD_drive)) {
+		return 0;
+	}
+
+	SHELLEXECUTEINFO execinfo;
+	memset(&execinfo, 0, sizeof(execinfo));
+	execinfo.lpFile			= m_vcd_path;
+	execinfo.fMask			= SEE_MASK_NOCLOSEPROCESS;
+	execinfo.nShow			= SW_HIDE;
+	execinfo.cbSize			= sizeof(execinfo);
+
+	CString parameters;
+	parameters.Format(L"/d=0 \"%s\"", pathName);
+	execinfo.lpParameters = parameters;
+
+	DWORD ec = (DWORD)-1;
 	if (!ShellExecuteEx(&execinfo)) {
 		return 0;
 	}
