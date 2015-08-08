@@ -432,10 +432,12 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 
 					CString sChannel;
 					switch (pWfxOut->nChannels) {
-						case 6:
+						case KSAUDIO_SPEAKER_5POINT1:
+						case KSAUDIO_SPEAKER_5POINT1_SURROUND:
 							sChannel = L"5.1";
 							break;
-						case 8:
+						case KSAUDIO_SPEAKER_7POINT1:
+						case KSAUDIO_SPEAKER_7POINT1_SURROUND:
 							sChannel = L"7.1";
 							break;
 						default:
