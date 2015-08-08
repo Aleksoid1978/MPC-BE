@@ -23,11 +23,12 @@
 #include <VirtDisk.h>
 
 #define ENABLE_DTLITE_SUPPORT 1
+#define ENABLE_VIRTUALCLONEDRIVE_SUPPORT 1
 
 class CDiskImage
 {
 private:
-	enum DriveType {NONE, WIN8, DTLITE};
+	enum DriveType {NONE, WIN8, DTLITE, VCD};
 
 	DriveType	m_DriveType;
 	TCHAR		m_DriveLetter;
@@ -58,6 +59,9 @@ private:
 	dtdrive		m_dtdrive;
 	CString		m_dtlite_path;
 #endif
+#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
+	CString		m_vcd_path;
+#endif
 
 public:
 	CDiskImage();
@@ -77,5 +81,8 @@ private:
 	TCHAR MountWin8(LPCTSTR pathName);
 #if ENABLE_DTLITE_SUPPORT
 	TCHAR MountDTLite(LPCTSTR pathName);
+#endif
+#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
+	TCHAR MountVCD(LPCTSTR pathName);
 #endif
 };
