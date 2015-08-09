@@ -431,7 +431,7 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 					sFormat.Format(L"%dbit %s", pWfxOut->wBitsPerSample, bIsFloat ? L"Float" : L"Integer");
 
 					CString sChannel;
-					switch (pWfxOut->nChannels) {
+					switch (layout) {
 						case KSAUDIO_SPEAKER_5POINT1:
 						case KSAUDIO_SPEAKER_5POINT1_SURROUND:
 							sChannel = L"5.1";
