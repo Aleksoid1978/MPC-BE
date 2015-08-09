@@ -70,11 +70,11 @@ void CDiskImage::Init()
 		}
 	}
 
+	CRegKey key;
 #if ENABLE_DTLITE_SUPPORT
 	// DAEMON Tools Lite
 	m_dtlite_path.Empty();
 
-	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\DTLite.exe"), KEY_READ)) {
 		ULONG nChars = 0;
 		if (ERROR_SUCCESS == key.QueryStringValue(NULL, NULL, &nChars)) {
@@ -113,7 +113,6 @@ void CDiskImage::Init()
 	// DAEMON Tools Lite
 	m_vcd_path.Empty();
 
-	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\VCDMount.exe"), KEY_READ)) {
 		ULONG nChars = 0;
 		if (ERROR_SUCCESS == key.QueryStringValue(NULL, NULL, &nChars)) {
