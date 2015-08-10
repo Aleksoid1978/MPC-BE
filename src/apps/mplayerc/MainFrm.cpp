@@ -665,6 +665,7 @@ CMainFrame::CMainFrame() :
 	m_nMainFilterId(NULL),
 	m_hGraphThreadEventOpen(FALSE, TRUE),
 	m_hGraphThreadEventClose(FALSE, TRUE),
+	m_DwmGetWindowAttributeFnc(NULL),
 	m_DwmSetWindowAttributeFnc(NULL),
 	m_DwmSetIconicThumbnailFnc(NULL),
 	m_DwmSetIconicLivePreviewBitmapFnc(NULL),
@@ -673,8 +674,7 @@ CMainFrame::CMainFrame() :
 	m_wndToolBar(this),
 	m_wndSeekBar(this),
 	miFPS(0.0),
-	m_bAudioOnly(true),
-	m_nAeroOffset(IsWinTenOrLater() ? 7 : 0)
+	m_bAudioOnly(true)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -881,6 +881,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (IsWinSevenOrLater()) {
 		m_hDWMAPI = LoadLibrary(L"dwmapi.dll");
 		if (m_hDWMAPI) {
+			if (IsWinTenOrLater()) {
+				(FARPROC &)m_DwmGetWindowAttributeFnc		= GetProcAddress(m_hDWMAPI, "DwmGetWindowAttribute");
+			}
 			(FARPROC &)m_DwmSetWindowAttributeFnc			= GetProcAddress(m_hDWMAPI, "DwmSetWindowAttribute");
 			(FARPROC &)m_DwmSetIconicThumbnailFnc			= GetProcAddress(m_hDWMAPI, "DwmSetIconicThumbnail");
 			(FARPROC &)m_DwmSetIconicLivePreviewBitmapFnc	= GetProcAddress(m_hDWMAPI, "DwmSetIconicLivePreviewBitmap");
@@ -1697,16 +1700,20 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 
 		MONITORINFO mi = { sizeof(mi) };
 		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
-		RECT rcWork = mi.rcWork;
+		CRect rcWork(mi.rcWork);
+		if (IsWinTenOrLater()) {
+			rcWork.InflateRect(GetInvisibleBorderSize());
+		}
+
 		RECT rcMonitor = mi.rcMonitor;
 
 		OffsetRect(pRect, cur_pos.x - (pRect->left + snap_x), cur_pos.y - (pRect->top + snap_y));
 
 		if (isSnapClose(pRect->left, rcWork.left)) { // left screen snap
-			OffsetRect(pRect, rcWork.left - pRect->left - m_nAeroOffset, 0);
+			OffsetRect(pRect, rcWork.left - pRect->left, 0);
 			m_bWasSnapped = true;
 		} else if (isSnapClose(rcWork.right, pRect->right)) { // right screen snap
-			OffsetRect(pRect, rcWork.right - pRect->right + m_nAeroOffset, 0);
+			OffsetRect(pRect, rcWork.right - pRect->right, 0);
 			m_bWasSnapped = true;
 		}
 
@@ -1714,7 +1721,7 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 			OffsetRect(pRect, 0, rcWork.top - pRect->top);
 			m_bWasSnapped = true;
 		} else if (isSnapClose(rcWork.bottom, pRect->bottom)) { // bottom taskbar snap
-			OffsetRect(pRect, 0, rcWork.bottom - pRect->bottom + m_nAeroOffset);
+			OffsetRect(pRect, 0, rcWork.bottom - pRect->bottom);
 			m_bWasSnapped = true;
 		} else if (isSnapClose(pRect->bottom, rcMonitor.bottom)) { // bottom screen snap
 			OffsetRect(pRect, 0, rcMonitor.bottom - pRect->bottom);
@@ -1749,12 +1756,12 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 		if (nType == SIZE_MAXIMIZED && (s.iCaptionMenuMode == MODE_FRAMEONLY || s.iCaptionMenuMode == MODE_BORDERLESS)) {
 			MONITORINFO mi = { sizeof(mi) };
 			GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
-			//const CRect wr(mi.rcWork);
 			CRect wr(mi.rcWork);
 			if (s.iCaptionMenuMode == MODE_FRAMEONLY && IsWinTenOrLater()) {
-				wr.left -= m_nAeroOffset;
-				wr.right += m_nAeroOffset;
-				wr.bottom += m_nAeroOffset;
+				CRect invisibleBorders = GetInvisibleBorderSize();
+				// remove the thin edge for a better view when the window is maximized.
+				invisibleBorders.InflateRect(1, 0, 1, 1);
+				wr.InflateRect(invisibleBorders);
 			}
 			SetWindowPos(NULL, wr.left, wr.top, wr.Width(), wr.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
 		}
@@ -10835,25 +10842,30 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 	// Prevention of going beyond the scopes of screen
 	MONITORINFO mi = { sizeof(mi) };
 	GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
-	w = min(w, (mi.rcWork.right - mi.rcWork.left));
-	h = min(h, (mi.rcWork.bottom - mi.rcWork.top));
+	CRect rcWork(mi.rcWork);
+	if (IsWinTenOrLater()) {
+		rcWork.InflateRect(GetInvisibleBorderSize());
+	}
+
+	w = min(w, rcWork.Width());
+	h = min(h, rcWork.Height());
 
 	if (!s.fRememberWindowPos) {
 		bool isSnapped = false;
 
 		if (snap && s.fSnapToDesktopEdges && m_bWasSnapped) { // check if snapped to edges
-			isSnapped = (r.left == mi.rcWork.left) || (r.top == mi.rcWork.top)
-						|| (r.right == mi.rcWork.right) || (r.bottom == mi.rcWork.bottom);
+			isSnapped = (r.left == rcWork.left) || (r.top == rcWork.top)
+						|| (r.right == rcWork.right) || (r.bottom == rcWork.bottom);
 		}
 
 		if (isSnapped) { // prefer left, top snap to right, bottom snap
-			if (r.left == mi.rcWork.left) {}
-			else if (r.right == mi.rcWork.right) {
+			if (r.left == rcWork.left) {}
+			else if (r.right == rcWork.right) {
 				r.left = r.right - w;
 			}
 
-			if (r.top == mi.rcWork.top) {}
-			else if (r.bottom == mi.rcWork.bottom) {
+			if (r.top == rcWork.top) {}
+			else if (r.bottom == rcWork.bottom) {
 				r.top = r.bottom - h;
 			}
 		} else {	// center window
@@ -10867,39 +10879,17 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 	r.right = r.left + w;
 	r.bottom = r.top + h;
 
-	if (r.right > mi.rcWork.right) {
-		r.OffsetRect(mi.rcWork.right - r.right, 0);
+	if (r.right > rcWork.right) {
+		r.OffsetRect(rcWork.right - r.right, 0);
 	}
-	if (r.left < mi.rcWork.left) {
-		r.OffsetRect(mi.rcWork.left - r.left, 0);
+	if (r.left < rcWork.left) {
+		r.OffsetRect(rcWork.left - r.left, 0);
 	}
-	if (r.bottom > mi.rcWork.bottom) {
-		r.OffsetRect(0, mi.rcWork.bottom - r.bottom);
+	if (r.bottom > rcWork.bottom) {
+		r.OffsetRect(0, rcWork.bottom - r.bottom);
 	}
-	if (r.top < mi.rcWork.top) {
-		r.OffsetRect(0, mi.rcWork.top - r.top);
-	}
-
-	if (IsWinTenOrLater()) {
-		const CRect tmp(r);
-		if (tmp.left == mi.rcWork.left) {
-			r.OffsetRect(-m_nAeroOffset, 0);
-			if (tmp.right == mi.rcWork.right) {
-				r.right += m_nAeroOffset;
-			}
-		}
-		if (tmp.right == mi.rcWork.right) {
-			r.OffsetRect(m_nAeroOffset, 0);
-			if (tmp.left == mi.rcWork.left) {
-				r.left -= m_nAeroOffset;
-			}
-		}
-		if (tmp.bottom == mi.rcWork.bottom) {
-			r.OffsetRect(0, m_nAeroOffset);
-			if (tmp.top == mi.rcWork.top) {
-				r.top -= m_nAeroOffset;
-			}
-		}
+	if (r.top < rcWork.top) {
+		r.OffsetRect(0, rcWork.top - r.top);
 	}
 
 	if ((m_bFullScreen || !s.HasFixedWindowSize()) && !IsD3DFullScreenMode()) {
@@ -10922,6 +10912,22 @@ double CMainFrame::GetZoomAutoFitScale()
 	double sy = s.nAutoFitFactor / 100.0 * m_rcDesktop.Height() / arxy.cy;
 
 	return sx < sy ? sx : sy;
+}
+
+CRect CMainFrame::GetInvisibleBorderSize() const
+{
+	static CRect invisibleBorders;
+	if (invisibleBorders.IsRectNull()
+			&& IsWinTenOrLater()
+			&& m_DwmGetWindowAttributeFnc && SUCCEEDED(m_DwmGetWindowAttributeFnc(GetSafeHwnd(), DWMWA_EXTENDED_FRAME_BOUNDS, &invisibleBorders, sizeof(RECT)))) {
+		CRect windowRect;
+		GetWindowRect(&windowRect);
+
+		invisibleBorders.TopLeft() = invisibleBorders.TopLeft() - windowRect.TopLeft();
+		invisibleBorders.BottomRight() = windowRect.BottomRight() - invisibleBorders.BottomRight();
+	}
+
+	return invisibleBorders;
 }
 
 void CMainFrame::RepaintVideo()
