@@ -307,6 +307,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 	void RestoreDefaultWindowRect();
 	void ZoomVideoWindow(bool snap = true, double scale = -1);
 	double GetZoomAutoFitScale();
+	CRect GetInvisibleBorderSize() const;
 
 	void SetAlwaysOnTop(int i);
 
@@ -727,8 +728,6 @@ public:
 	RECT rc_forceNP;
 	RECT rc_NP;
 
-	int m_nAeroOffset;
-
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
@@ -1078,6 +1077,7 @@ public:
 	HRESULT		UpdateThumbnailClip();
 
 	HMODULE		m_hDWMAPI;
+	HRESULT		(__stdcall * m_DwmGetWindowAttributeFnc)(HWND hwnd, DWORD dwAttribute, __in  LPCVOID pvAttribute, DWORD cbAttribute);
 	HRESULT		(__stdcall * m_DwmSetWindowAttributeFnc)(HWND hwnd, DWORD dwAttribute, __in  LPCVOID pvAttribute, DWORD cbAttribute);
 	HRESULT		(__stdcall * m_DwmSetIconicThumbnailFnc)( __in  HWND hwnd, __in  HBITMAP hbmp, __in  DWORD dwSITFlags);
 	HRESULT		(__stdcall * m_DwmSetIconicLivePreviewBitmapFnc)(HWND hwnd, HBITMAP hbmp, __in_opt  POINT *pptClient, DWORD dwSITFlags);
