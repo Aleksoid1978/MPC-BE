@@ -15725,7 +15725,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 				pRTS->SetOverride(s.fUseDefaultSubtitlesStyle, s.subdefstyle);
 				pRTS->SetAlignment(s.fOverridePlacement, s.nHorPos, s.nVerPos);
 
-				if (m_pCAP && s.fKeepAspectRatio && pRTS->m_dstScreenSizeActual) {
+				if (m_pCAP && s.fKeepAspectRatio && pRTS->m_path.IsEmpty() && pRTS->m_dstScreenSizeActual) {
 					CSize szAspectRatio = m_pCAP->GetVideoSize(true);
 
 					if (szAspectRatio.cx && szAspectRatio.cy && pRTS->m_dstScreenSize.cx && pRTS->m_dstScreenSize.cy) {
