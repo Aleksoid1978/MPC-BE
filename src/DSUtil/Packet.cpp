@@ -73,5 +73,5 @@ size_t CPacketQueue::GetSize()
 REFERENCE_TIME CPacketQueue::GetDuration()
 {
 	CAutoLock cAutoLock(this);
-	return m_size ? (GetTail()->rtStop - GetHead()->rtStart) : 0;
+	return GetCount() ? (GetTail()->rtStop - GetHead()->rtStart) : 0;
 }
