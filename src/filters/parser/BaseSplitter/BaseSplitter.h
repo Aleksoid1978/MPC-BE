@@ -103,6 +103,8 @@ protected:
 
 	DWORD m_nFlag;
 
+	int m_MaxOutputQueueSeconds; // 1..10 seconds
+
 protected:
 	enum {CMD_EXIT, CMD_SEEK};
 	DWORD ThreadProc();
@@ -120,8 +122,6 @@ public:
 
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
-
-	bool IsAnyPinDrying(DWORD MaxQueuePackets);
 
 	HRESULT BreakConnect(PIN_DIRECTION dir, CBasePin* pPin);
 	HRESULT CompleteConnect(PIN_DIRECTION dir, CBasePin* pPin);
@@ -216,17 +216,7 @@ public:
 	STDMETHODIMP GetStatus(int i, int& samples, int& size);
 	STDMETHODIMP_(DWORD) GetPriority();
 
-protected:
-	DWORD m_MinQueueSize, m_MaxQueueSize;
-	DWORD m_MinQueuePackets, m_MaxQueuePackets;
-
 public:
-	DWORD GetMinQueueSize() { return m_MinQueueSize; }
-	DWORD GetMaxQueueSize() { return m_MaxQueueSize; }
-
-	DWORD GetMinQueuePackets() { return m_MinQueuePackets; }
-	DWORD GetMaxQueuePackets() { return m_MaxQueuePackets; }
-
 	DWORD GetFlag() { return m_nFlag; }
 
 protected:

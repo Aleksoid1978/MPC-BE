@@ -75,7 +75,7 @@ protected:
 	HRESULT ParseDTS(CAutoPtr<CPacket> p);
 
 public:
-	CBaseSplitterParserOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, double dFactor = 1.0);
+	CBaseSplitterParserOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 	virtual ~CBaseSplitterParserOutputPin();
 
 	HRESULT DeliverEndOfStream();

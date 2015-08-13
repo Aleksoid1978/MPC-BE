@@ -38,27 +38,13 @@ CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT*
 	, m_rtLastStop(INVALID_TIME)
 	, m_priority(THREAD_PRIORITY_NORMAL)
 	, m_nFlag(0)
+	, m_MaxOutputQueueSeconds(3)
 {
 	if (phr) {
 		*phr = S_OK;
 	}
 
 	m_pInput.Attach(DNew CBaseSplitterInputPin(NAME("CBaseSplitterInputPin"), this, this, phr));
-
-	MEMORYSTATUSEX msEx;
-	msEx.dwLength = sizeof(msEx);
-	::GlobalMemoryStatusEx(&msEx);
-	DWORDLONG halfMemMB = msEx.ullTotalPhys / 0x200000;
-
-	m_MinQueueSize = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MINQUEUESIZE, MINQUEUESIZE);
-	m_MaxQueueSize = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MAXQUEUESIZE, MAXQUEUESIZE);
-	m_MinQueueSize = CLAMP(m_MinQueueSize, 64, MINQUEUESIZE * 4) * KILOBYTE;
-	m_MaxQueueSize = CLAMP(m_MaxQueueSize, 10, min(512, halfMemMB)) * MEGABYTE;
-
-	m_MinQueuePackets = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MINQUEUEPACKETS, MINQUEUEPACKETS);
-	m_MaxQueuePackets = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MAXQUEUEPACKETS, MAXQUEUEPACKETS);
-	m_MinQueuePackets = CLAMP(m_MinQueuePackets, 10, MAXQUEUEPACKETS);
-	m_MaxQueuePackets = CLAMP(m_MaxQueuePackets, m_MinQueuePackets*2, MAXQUEUEPACKETS*10);
 }
 
 CBaseSplitterFilter::~CBaseSplitterFilter()
@@ -360,19 +346,6 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 	}
 
 	return hr;
-}
-
-bool CBaseSplitterFilter::IsAnyPinDrying(DWORD MaxQueuePackets)
-{
-	POSITION pos = m_pActivePins.GetHeadPosition();
-	while (pos) {
-		CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
-		if (!pPin->IsDiscontinuous() && (pPin->QueueCount() < m_MinQueuePackets || pPin->QueueSize() < m_MinQueueSize)) {
-			return true;
-		}
-	}
-
-	return false;
 }
 
 HRESULT CBaseSplitterFilter::BreakConnect(PIN_DIRECTION dir, CBasePin* pPin)

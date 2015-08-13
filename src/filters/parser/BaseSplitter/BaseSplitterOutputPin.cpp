@@ -31,7 +31,7 @@
 // CBaseSplitterOutputPin
 //
 
-CBaseSplitterOutputPin::CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, double dFactor/* = 1.0*/)
+CBaseSplitterOutputPin::CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseOutputPin(NAME("CBaseSplitterOutputPin"), pFilter, pLock, phr, GetMediaTypeDesc(mts, pName, pFilter))
 	, pSplitter(static_cast<CBaseSplitterFilter*>(m_pFilter))
 	, m_hrDeliver(S_OK) // just in case it were asked before the worker thread could be created and reset it
@@ -40,28 +40,21 @@ CBaseSplitterOutputPin::CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWS
 	, m_eEndFlush(TRUE)
 	, m_rtPrev(0)
 	, m_rtOffset(0)
-	, m_MinQueuePackets(max(10, pSplitter->GetMinQueuePackets() * (dFactor < 1.0 ? dFactor : 1)))
-	, m_MaxQueuePackets(max(m_MinQueuePackets * 2, pSplitter->GetMaxQueuePackets() * dFactor))
-	, m_MinQueueSize(pSplitter->GetMinQueueSize())
-	, m_MaxQueueSize(pSplitter->GetMaxQueueSize())
+	, m_maxQueueDuration(3 * 10000000)
+	, m_maxQueueCount(3 * 1200)
 {
 	m_mts.Copy(mts);
 	memset(&m_brs, 0, sizeof(m_brs));
 	m_brs.rtLastDeliverTime = INVALID_TIME;
 }
 
-CBaseSplitterOutputPin::CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, double dFactor/* = 1.0*/)
+CBaseSplitterOutputPin::CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseOutputPin(NAME("CBaseSplitterOutputPin"), pFilter, pLock, phr, pName)
 	, pSplitter(static_cast<CBaseSplitterFilter*>(m_pFilter))
 	, m_hrDeliver(S_OK) // just in case it were asked before the worker thread could be created and reset it
 	, m_fFlushing(false)
 	, m_fFlushed(false)
 	, m_eEndFlush(TRUE)
-	, m_MinQueuePackets(max(10, pSplitter->GetMinQueuePackets() * (dFactor < 1.0 ? dFactor : 1)))
-	, m_MaxQueuePackets(max(m_MinQueuePackets * 2, pSplitter->GetMaxQueuePackets() * dFactor))
-	, m_MinQueueSize(pSplitter->GetMinQueueSize())
-	, m_MaxQueueSize(pSplitter->GetMaxQueueSize())
-
 {
 	memset(&m_brs, 0, sizeof(m_brs));
 	m_brs.rtLastDeliverTime = INVALID_TIME;
@@ -217,6 +210,10 @@ HRESULT CBaseSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFEREN
 	if (!ThreadExists()) {
 		return S_FALSE;
 	}
+	if (pSplitter->m_MaxOutputQueueSeconds >= 1 && pSplitter->m_MaxOutputQueueSeconds <= 10) {
+		m_maxQueueDuration = pSplitter->m_MaxOutputQueueSeconds * 10000000;
+		m_maxQueueCount = pSplitter->m_MaxOutputQueueSeconds * 1200;
+	}
 	HRESULT hr = __super::DeliverNewSegment(tStart, tStop, dRate);
 	if (S_OK != hr) {
 		return hr;
@@ -246,10 +243,9 @@ HRESULT CBaseSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		return S_FALSE;
 	}
 
-	while (S_OK == m_hrDeliver
-			&& (m_queue.GetSize() > m_MaxQueueSize
-				|| m_queue.GetCount() > (m_MaxQueuePackets * 3 / 2)
-				|| (m_queue.GetCount() > m_MaxQueuePackets && !pSplitter->IsAnyPinDrying(m_MaxQueuePackets)))) {
+	while (S_OK == m_hrDeliver && (
+			m_queue.GetCount() >= 3 && m_queue.GetDuration() > m_maxQueueDuration ||
+			m_queue.GetCount() >= m_maxQueueCount)) {
 		Sleep(10);
 	}
 
@@ -627,22 +623,4 @@ STDMETHODIMP CBaseSplitterOutputPin::GetRate(double* pdRate)
 STDMETHODIMP CBaseSplitterOutputPin::GetPreroll(LONGLONG* pllPreroll)
 {
 	return pSplitter->GetPreroll(pllPreroll);
-}
-
-double CBaseSplitterOutputPin::CalcQueryFactor(const CMediaType* pmt)
-{
-	if (pmt->majortype == MEDIATYPE_Audio) {
-		double dFactor = 4.0;
-		if (pmt->subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
-			dFactor *= 5.0;
-		} else if (pmt->subtype == MEDIASUBTYPE_PCM || pmt->subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
-			dFactor *= 3.0;
-		} else if (pmt->subtype == MEDIASUBTYPE_DTS || pmt->subtype == MEDIASUBTYPE_DTS2) {
-			dFactor *= 2.0;
-		}
-
-		return dFactor;
-	}
-	
-	return 1.0;
 }

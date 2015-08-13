@@ -37,8 +37,8 @@
 // CBaseSplitterParserOutputPin
 //
 
-CBaseSplitterParserOutputPin::CBaseSplitterParserOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, double dFactor/* = 1.0*/)
-	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr, dFactor)
+CBaseSplitterParserOutputPin::CBaseSplitterParserOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
 	, m_bHasAccessUnitDelimiters(false)
 	, m_bFlushed(false)
 	, m_truehd_framelength(0)
