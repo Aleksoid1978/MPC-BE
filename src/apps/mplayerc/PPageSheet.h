@@ -90,7 +90,7 @@ private:
 	CPPageSubRend m_subMisc;
 	CPPageSubStyle m_substyle;
 	CPPageInternalFilters m_internalfilters;
-	CPPageFiltersPerformance m_filtersperformance;
+	//CPPageFiltersPerformance m_filtersperformance;
 	CPPageExternalFilters m_externalfilters;
 	CPPageFiltersPriority m_filterspriority;
 	CPPageMisc m_misc;

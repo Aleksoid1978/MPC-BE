@@ -514,7 +514,7 @@ void CAppSettings::SaveSettings()
 		return;
 	}
 
-	PerfomanceSettings.SaveSettings();
+	//PerfomanceSettings.SaveSettings();
 	FiltersPrioritySettings.SaveSettings();
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode);
@@ -976,7 +976,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 	CMPlayerCApp::SetLanguage(iLanguage);
 
-	PerfomanceSettings.LoadSettings();
+	//PerfomanceSettings.LoadSettings();
 	FiltersPrioritySettings.LoadSettings();
 
 	iCaptionMenuMode = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, MODE_SHOWCAPTIONMENU);
