@@ -903,6 +903,30 @@ CString CMpegSplitterFilter::FormatStreamName(CMpegSplitterFile::stream& s, CMpe
 	return str;
 }
 
+__int64 CMpegSplitterFilter::SeekBD(REFERENCE_TIME rt)
+{
+	if (m_Items.GetCount()) {
+		POSITION pos = m_Items.GetHeadPosition();
+		while (pos) {
+			CHdmvClipInfo::PlaylistItem* Item = m_Items.GetNext(pos);
+			if (rt >= Item->m_rtStartTime && rt <= (Item->m_rtStartTime + Item->Duration())) {
+				REFERENCE_TIME _rt = rt - Item->m_rtStartTime + Item->m_rtIn;
+				for (size_t idx = 0; idx < Item->m_sps.GetCount() - 1; idx++) {
+					if (_rt < Item->m_sps[idx].rt) {
+						if (idx > 0) {
+							idx--;
+						}
+
+						return Item->m_sps[idx].fp + Item->m_SizeIn;
+					}
+				}
+			}
+		}
+	}
+
+	return -1;
+}
+
 HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
