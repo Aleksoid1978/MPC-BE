@@ -44,6 +44,18 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	CAutoPtr<CMpegSplitterFile> m_pFile;
 	CComQIPtr<ITrackInfo> m_pTI;
 
+	REFERENCE_TIME m_rtPlaylistDuration;
+	REFERENCE_TIME m_rtMin, m_rtMax;
+
+	BOOL bIsStreamingSupport;
+
+	CAtlMap<DWORD, CAutoPtr<CPacket>> pPackets; 
+
+	CString m_AudioLanguageOrder, m_SubtitlesLanguageOrder;
+	bool m_ForcedSub, m_SubEmptyPin;
+	int m_AC3CoreOnly;
+	CCritSec m_csProps;
+
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 	void	ReadClipInfo(LPCOLESTR pszFileName);
 
@@ -61,18 +73,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 
 	CString FormatStreamName(CMpegSplitterFile::stream& s, CMpegSplitterFile::stream_type type);
 
-	REFERENCE_TIME m_rtPlaylistDuration;
-	REFERENCE_TIME m_rtMin, m_rtMax;
-
-	BOOL bIsStreamingSupport;
-
-	CAtlMap<DWORD, CAutoPtr<CPacket>> pPackets; 
-
-private:
-	CString m_AudioLanguageOrder, m_SubtitlesLanguageOrder;
-	bool m_ForcedSub, m_SubEmptyPin;
-	int m_AC3CoreOnly;
-	CCritSec m_csProps;
+	__int64 SeekBD(REFERENCE_TIME rt);
 
 public:
 	CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid = __uuidof(CMpegSplitterFilter));

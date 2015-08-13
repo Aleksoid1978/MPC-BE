@@ -64,9 +64,9 @@ class CBaseSplitterFilter
 	CAutoPtrList<CBaseSplitterOutputPin> m_pRetiredOutputs;
 
 	CComQIPtr<ISyncReader>		m_pSyncReader;
-	CHdmvClipInfo::CPlaylist	m_Items;
 
 protected:
+	CHdmvClipInfo::CPlaylist	m_Items;
 	CStringW m_fn;
 
 	CAutoPtr<CBaseSplitterInputPin> m_pInput;
@@ -228,8 +228,6 @@ public:
 	DWORD GetMaxQueuePackets() { return m_MaxQueuePackets; }
 
 	DWORD GetFlag() { return m_nFlag; }
-
-	__int64 SeekBD(REFERENCE_TIME rt);
 
 protected:
 	void SortOutputPin();
