@@ -1128,6 +1128,9 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			} else if (type == CMpegSplitterFile::stream_type::subpic) {
 				if (subpic_sel == stream_idx && (S_OK == AddOutputPin(s, pPinOut))) {
+					if (s.mt.subtype == MEDIASUBTYPE_HDMVSUB) {
+						m_MaxOutputQueueSeconds = 5; // hack
+					}
 					break;
 				}
 			} else if (S_OK == AddOutputPin(s, pPinOut)) {
@@ -1786,7 +1789,7 @@ CMpegSourceFilter::CMpegSourceFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& 
 //
 
 CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpegSplitterFile::stream_type type, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
-	: CBaseSplitterParserOutputPin(mts, pName, pFilter, pLock, phr, CalcQueryFactor(&mts[0]))
+	: CBaseSplitterParserOutputPin(mts, pName, pFilter, pLock, phr)
 	, m_type(type)
 {
 }

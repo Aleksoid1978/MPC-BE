@@ -72,8 +72,8 @@ private:
 		DWORD nAverageBitRate;
 	} m_brs;
 
-	DWORD m_MinQueuePackets, m_MaxQueuePackets;
-	DWORD m_MinQueueSize, m_MaxQueueSize;
+	REFERENCE_TIME m_maxQueueDuration;
+	size_t m_maxQueueCount;
 
 protected:
 	REFERENCE_TIME m_rtPrev, m_rtOffset;
@@ -104,8 +104,8 @@ protected:
 	STDMETHODIMP GetPreroll(LONGLONG* pllPreroll);
 
 public:
-	CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, double dFactor = 1.0);
-	CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr, double dFactor = 1.0);
+	CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+	CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 	virtual ~CBaseSplitterOutputPin();
 
 	DECLARE_IUNKNOWN;
@@ -156,6 +156,4 @@ public:
 	STDMETHODIMP_(DWORD) GetAverageBitRate() { return m_brs.nAverageBitRate; }
 
 	REFERENCE_TIME GetOffset() { return m_rtOffset; }
-
-	double CalcQueryFactor(const CMediaType* pmt);
 };

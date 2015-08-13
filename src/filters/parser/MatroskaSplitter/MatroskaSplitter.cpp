@@ -1034,6 +1034,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (mt.subtype != MEDIASUBTYPE_NULL) {
 						mts.Add(mt);
 						isSub = true;
+
+						if (mt.subtype == MEDIASUBTYPE_HDMVSUB) {
+							m_MaxOutputQueueSeconds = 5; // hack
+						}
 					}
 				}
 			}
@@ -2192,7 +2196,7 @@ STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetCalcDuration()
 //
 
 CMatroskaSplitterOutputPin::CMatroskaSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
-	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr, CalcQueryFactor(&mts[0]))
+	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
 {
 }
 
