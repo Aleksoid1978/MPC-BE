@@ -55,6 +55,8 @@ CBaseSplitterOutputPin::CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilt
 	, m_fFlushing(false)
 	, m_fFlushed(false)
 	, m_eEndFlush(TRUE)
+	, m_maxQueueDuration(3 * 10000000)
+	, m_maxQueueCount(3 * 1200)
 {
 	memset(&m_brs, 0, sizeof(m_brs));
 	m_brs.rtLastDeliverTime = INVALID_TIME;
