@@ -464,6 +464,10 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
 	}
 
+	if (m_RAWType == RAW_MPEG1 || m_RAWType == RAW_MPEG2 || m_RAWType == RAW_H264 || m_RAWType == RAW_VC1 || m_RAWType == RAW_HEVC) {
+		m_MaxOutputQueueMs = 200; // hack
+	}
+
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
 }
 

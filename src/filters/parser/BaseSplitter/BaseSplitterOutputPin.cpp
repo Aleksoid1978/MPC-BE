@@ -40,8 +40,8 @@ CBaseSplitterOutputPin::CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWS
 	, m_eEndFlush(TRUE)
 	, m_rtPrev(0)
 	, m_rtOffset(0)
-	, m_maxQueueDuration(3 * 10000000)
-	, m_maxQueueCount(3 * 1200)
+	, m_maxQueueDuration(3000 * 10000)
+	, m_maxQueueCount(3000 * 12 / 10)
 {
 	m_mts.Copy(mts);
 	memset(&m_brs, 0, sizeof(m_brs));
@@ -55,8 +55,8 @@ CBaseSplitterOutputPin::CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilt
 	, m_fFlushing(false)
 	, m_fFlushed(false)
 	, m_eEndFlush(TRUE)
-	, m_maxQueueDuration(3 * 10000000)
-	, m_maxQueueCount(3 * 1200)
+	, m_maxQueueDuration(3000 * 10000)
+	, m_maxQueueCount(3000 * 12 / 10)
 {
 	memset(&m_brs, 0, sizeof(m_brs));
 	m_brs.rtLastDeliverTime = INVALID_TIME;
@@ -212,9 +212,9 @@ HRESULT CBaseSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFEREN
 	if (!ThreadExists()) {
 		return S_FALSE;
 	}
-	if (pSplitter->m_MaxOutputQueueSeconds >= 1 && pSplitter->m_MaxOutputQueueSeconds <= 10) {
-		m_maxQueueDuration = pSplitter->m_MaxOutputQueueSeconds * 10000000;
-		m_maxQueueCount = pSplitter->m_MaxOutputQueueSeconds * 1200;
+	if (pSplitter->m_MaxOutputQueueMs >= 100 && pSplitter->m_MaxOutputQueueMs <= 10000) {
+		m_maxQueueDuration = pSplitter->m_MaxOutputQueueMs * 10000;
+		m_maxQueueCount = pSplitter->m_MaxOutputQueueMs * 12 / 10;
 	}
 	HRESULT hr = __super::DeliverNewSegment(tStart, tStop, dRate);
 	if (S_OK != hr) {

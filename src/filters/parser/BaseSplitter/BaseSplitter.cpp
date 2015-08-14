@@ -38,7 +38,7 @@ CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT*
 	, m_rtLastStop(INVALID_TIME)
 	, m_priority(THREAD_PRIORITY_NORMAL)
 	, m_nFlag(0)
-	, m_MaxOutputQueueSeconds(3)
+	, m_MaxOutputQueueMs(3000)
 {
 	if (phr) {
 		*phr = S_OK;

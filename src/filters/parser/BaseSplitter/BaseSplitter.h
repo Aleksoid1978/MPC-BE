@@ -103,7 +103,7 @@ protected:
 
 	DWORD m_nFlag;
 
-	int m_MaxOutputQueueSeconds; // 1..10 seconds
+	int m_MaxOutputQueueMs; // 100..10000 ms
 
 protected:
 	enum {CMD_EXIT, CMD_SEEK};

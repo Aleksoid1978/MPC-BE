@@ -1129,7 +1129,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			} else if (type == CMpegSplitterFile::stream_type::subpic) {
 				if (subpic_sel == stream_idx && (S_OK == AddOutputPin(s, pPinOut))) {
 					if (s.mt.subtype == MEDIASUBTYPE_HDMVSUB) {
-						m_MaxOutputQueueSeconds = 5; // hack
+						m_MaxOutputQueueMs = 5000; // hack
 					}
 					break;
 				}
