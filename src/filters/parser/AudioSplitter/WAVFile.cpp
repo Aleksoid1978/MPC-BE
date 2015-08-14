@@ -255,6 +255,9 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 			}
 			m_startpos	= pos;
 			m_length	= min(Chunk.size, m_pFile->GetLength() - m_startpos);
+			if (!m_pFile->IsRandomAccess()) {
+				goto stop;
+			}
 			break;
 		case FCC('LIST'):
 			ReadRIFFINFO(pos, Chunk.size);
@@ -289,6 +292,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 
 		m_pFile->Seek(pos + Chunk.size);
 	}
+	stop:
 
 	if (!m_startpos || !ProcessWAVEFORMATEX()) {
 		return E_FAIL;
@@ -324,9 +328,11 @@ int CWAVFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	if (m_pFile->GetPos() + m_nBlockAlign > m_endpos) {
 		return 0;
 	}
+
 	int size = min(m_blocksize, m_endpos - m_pFile->GetPos());
-	packet->SetCount(size);
-	m_pFile->ByteRead(packet->GetData(), size);
+	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
+		return 0;
+	}
 
 	__int64 len = m_pFile->GetPos() - m_startpos;
 	packet->rtStart	= SCALE64(m_rtduration, len, m_length);

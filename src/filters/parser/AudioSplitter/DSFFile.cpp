@@ -57,7 +57,7 @@ HRESULT CDSFFile::Open(CBaseSplitterFile* pFile)
 		return E_FAIL;
 	}
 	UINT64 id3pos = type64;
-	if (id3pos) {
+	if (id3pos && m_pFile->IsRandomAccess()) {
 		__int64 pos = m_pFile->GetPos();
 		m_pFile->Seek(id3pos);
 
@@ -221,9 +221,11 @@ int CDSFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	if (m_pFile->GetPos() + m_block_size > m_endpos) {
 		return 0;
 	}
+
 	int size = min(m_block_size, m_endpos - m_pFile->GetPos());
-	packet->SetCount(size);
-	m_pFile->ByteRead(packet->GetData(), size);
+	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
+		return 0;
+	}
 
 	__int64 len = m_pFile->GetPos() - m_startpos;
 	packet->rtStart	= SCALE64(m_rtduration, len, m_length);
