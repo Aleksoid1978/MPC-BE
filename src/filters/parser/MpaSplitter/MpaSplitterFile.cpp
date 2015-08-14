@@ -214,9 +214,9 @@ HRESULT CMpaSplitterFile::Init()
 	}
 
 	if (m_mode == mpa) {
-		m_coefficient = 10000000.0 * (GetTotal() - m_startpos) * m_mpahdr.FrameSamples / m_mpahdr.Samplerate;
+		m_coefficient = 10000000.0 * (GetLength() - m_startpos) * m_mpahdr.FrameSamples / m_mpahdr.Samplerate;
 	} else if (m_mode == mp4a) {
-		m_coefficient = 10000000.0 * (GetTotal() - m_startpos) * m_aachdr.FrameSamples / m_aachdr.Samplerate;
+		m_coefficient = 10000000.0 * (GetLength() - m_startpos) * m_aachdr.FrameSamples / m_aachdr.Samplerate;
 	}
 
 	Seek(m_startpos);
