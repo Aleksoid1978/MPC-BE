@@ -221,7 +221,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 			return E_OUTOFMEMORY;
 		}
 		memset(ape.seektable, 0, ape.seektablelength);
-		for (size_t i = 0; i < ape.seektablelength / sizeof(uint32_t) && m_pFile->GetAvailable() >= 4; i++) {
+		for (size_t i = 0; i < ape.seektablelength / sizeof(uint32_t) && m_pFile->GetRemaining() >= 4; i++) {
 			m_pFile->ByteRead((BYTE*)&ape.seektable[i], 4);
 		}
 		if (ape.fileversion < 3810) {
@@ -233,11 +233,11 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 				return E_OUTOFMEMORY;
 			}
 			memset(ape.bittable, 0, ape.totalframes);
-			for (size_t i = 0; i < ape.totalframes && m_pFile->GetAvailable(); i++) {
+			for (size_t i = 0; i < ape.totalframes && m_pFile->GetRemaining(); i++) {
 				m_pFile->ByteRead((BYTE*)&ape.bittable[i], 1);
 			}
 		}
-		if (!m_pFile->GetAvailable()) {
+		if (!m_pFile->GetRemaining()) {
 			DbgLog((LOG_TRACE, 3, L"CAPEFile::Open() : File truncated"));
 		}
 	}
@@ -315,42 +315,44 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	m_startpos = m_pFile->GetPos();
 	m_endpos   = file_size;
 
-	if (m_frames[ape.totalframes - 1].pos + 128 <= m_endpos) {
-		m_pFile->Seek(m_endpos - 128);
-		BYTE buf[128];
-		if (m_pFile->ByteRead(buf, 128) == S_OK
+	if (m_pFile->IsRandomAccess()) {
+		if (m_frames[ape.totalframes - 1].pos + 128 <= m_endpos) {
+			m_pFile->Seek(m_endpos - 128);
+			BYTE buf[128];
+			if (m_pFile->ByteRead(buf, 128) == S_OK
 				&& (memcmp(buf + 96, "APETAGEX", 8) || memcmp(buf + 120, "\0\0\0\0\0\0\0\0", 8))
 				&& memcmp(buf, "TAG", 3) == 0) {
-			// ignore ID3v1/1.1 tag
-			m_endpos -= 128;
+				// ignore ID3v1/1.1 tag
+				m_endpos -= 128;
+			}
 		}
-	}
 
-	if (m_frames[ape.totalframes-1].pos + APE_TAG_FOOTER_BYTES <= m_endpos) {
-		BYTE buf[APE_TAG_FOOTER_BYTES];
-		memset(buf, 0, sizeof(buf));
+		if (m_frames[ape.totalframes - 1].pos + APE_TAG_FOOTER_BYTES <= m_endpos) {
+			BYTE buf[APE_TAG_FOOTER_BYTES];
+			memset(buf, 0, sizeof(buf));
 
-		m_pFile->Seek(m_endpos - APE_TAG_FOOTER_BYTES);
-		if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
-			m_APETag = DNew CAPETag;
-			size_t tag_size = 0;
-			if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
-				tag_size = m_APETag->GetTagSize();
-				m_pFile->Seek(m_endpos - tag_size);
-				BYTE *p = DNew BYTE[tag_size];
-				if (m_pFile->ByteRead(p, tag_size) == S_OK) {
-					m_APETag->ReadTags(p, tag_size);
+			m_pFile->Seek(m_endpos - APE_TAG_FOOTER_BYTES);
+			if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
+				m_APETag = DNew CAPETag;
+				size_t tag_size = 0;
+				if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
+					tag_size = m_APETag->GetTagSize();
+					m_pFile->Seek(m_endpos - tag_size);
+					BYTE *p = DNew BYTE[tag_size];
+					if (m_pFile->ByteRead(p, tag_size) == S_OK) {
+						m_APETag->ReadTags(p, tag_size);
+					}
+
+					delete[] p;
 				}
 
-				delete [] p;
-			}
+				if (m_frames[ape.totalframes - 1].size > (int)tag_size) {
+					m_endpos -= tag_size;
+				}
 
-			if (m_frames[ape.totalframes - 1].size > (int)tag_size) {
-				m_endpos -= tag_size;
-			}
-
-			if (m_APETag->TagItems.IsEmpty()) {
-				SAFE_DELETE(m_APETag);
+				if (m_APETag->TagItems.IsEmpty()) {
+					SAFE_DELETE(m_APETag);
+				}
 			}
 		}
 	}

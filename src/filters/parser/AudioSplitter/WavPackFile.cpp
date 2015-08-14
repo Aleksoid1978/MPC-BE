@@ -279,66 +279,70 @@ HRESULT CWavPackFile::Open(CBaseSplitterFile* pFile)
 
 	m_startpos = wv_ctx.pos;
 	m_block_idx_start = wv_ctx.header.block_idx;
+	m_block_idx_end = wv_ctx.header.total_samples;
 
 	m_endpos = m_pFile->GetLength();
 
-	if (m_startpos + 128 <= m_endpos) {
-		m_pFile->Seek(m_endpos - 128);
-		BYTE buf[128];
-		if (m_pFile->ByteRead(buf, 128) == S_OK
+	if (m_pFile->IsRandomAccess()) {
+		if (m_startpos + 128 <= m_endpos) {
+			m_pFile->Seek(m_endpos - 128);
+			BYTE buf[128];
+			if (m_pFile->ByteRead(buf, 128) == S_OK
 				&& (memcmp(buf + 96, "APETAGEX", 8) || memcmp(buf + 120, "\0\0\0\0\0\0\0\0", 8))
 				&& memcmp(buf, "TAG", 3) == 0) {
-			// ignore ID3v1/1.1 tag
-			m_endpos -= 128;
+				// ignore ID3v1/1.1 tag
+				m_endpos -= 128;
+			}
 		}
-	}
 
-	if (m_startpos + WV_HEADER_SIZE + APE_TAG_FOOTER_BYTES < m_endpos) {
-		BYTE buf[APE_TAG_FOOTER_BYTES];
-		memset(buf, 0, sizeof(buf));
+		if (m_startpos + WV_HEADER_SIZE + APE_TAG_FOOTER_BYTES < m_endpos) {
+			BYTE buf[APE_TAG_FOOTER_BYTES];
+			memset(buf, 0, sizeof(buf));
 
-		m_pFile->Seek(m_endpos - APE_TAG_FOOTER_BYTES);
-		if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
-			m_APETag = DNew CAPETag;
-			size_t tag_size = 0;
-			if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
-				tag_size = m_APETag->GetTagSize();
-				m_pFile->Seek(m_endpos - tag_size);
-				BYTE *p = DNew BYTE[tag_size];
-				if (m_pFile->ByteRead(p, tag_size) == S_OK) {
-					m_APETag->ReadTags(p, tag_size);
+			m_pFile->Seek(m_endpos - APE_TAG_FOOTER_BYTES);
+			if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
+				m_APETag = DNew CAPETag;
+				size_t tag_size = 0;
+				if (m_APETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_APETag->GetTagSize()) {
+					tag_size = m_APETag->GetTagSize();
+					m_pFile->Seek(m_endpos - tag_size);
+					BYTE *p = DNew BYTE[tag_size];
+					if (m_pFile->ByteRead(p, tag_size) == S_OK) {
+						m_APETag->ReadTags(p, tag_size);
+					}
+					delete[] p;
 				}
-				delete [] p;
-			}
 
-			m_endpos -= tag_size;
+				m_endpos -= tag_size;
 
-			if (m_APETag->TagItems.IsEmpty()) {
-				SAFE_DELETE(m_APETag);
+				if (m_APETag->TagItems.IsEmpty()) {
+					SAFE_DELETE(m_APETag);
+				}
 			}
 		}
-	}
 
-	m_pFile->Seek(max(m_startpos + WV_HEADER_SIZE, m_endpos - WV_BLOCK_LIMIT));
+		m_pFile->Seek(max(m_startpos + WV_HEADER_SIZE, m_endpos - WV_BLOCK_LIMIT));
 
-	wv_header_t wv_header;
-	uint8_t block_header[WV_HEADER_SIZE];
-	__int64 pos = m_pFile->GetPos();
-	while (pos < m_endpos && pFile->ByteRead(block_header, WV_HEADER_SIZE) == S_OK) {
-		if (ff_wv_parse_header(&wv_header, block_header)) {
-			if (wv_header.samples && wv_header.final) {
-				m_block_idx_end = wv_header.block_idx + wv_header.samples;
+		wv_header_t wv_header;
+		uint8_t block_header[WV_HEADER_SIZE];
+		__int64 pos = m_pFile->GetPos();
+		while (pos < m_endpos && pFile->ByteRead(block_header, WV_HEADER_SIZE) == S_OK) {
+			if (ff_wv_parse_header(&wv_header, block_header)) {
+				if (wv_header.samples && wv_header.final) {
+					m_block_idx_end = wv_header.block_idx + wv_header.samples;
+				}
+				pos = m_pFile->GetPos() + wv_header.blocksize;
 			}
-			pos = m_pFile->GetPos() + wv_header.blocksize;
-		} else {
-			pos++;
+			else {
+				pos++;
+			}
+			m_pFile->Seek(pos);
 		}
-		m_pFile->Seek(pos);
-	}
 
-	if (m_block_idx_end == m_block_idx_start) {
-		m_block_idx_end = m_block_idx_start + wv_ctx.header.samples;
-		// TODO: make it more correct
+		if (m_block_idx_end == m_block_idx_start) {
+			m_block_idx_end = m_block_idx_start + wv_ctx.header.samples;
+			// TODO: make it more correct
+		}
 	}
 
 	if (m_block_idx_start >= m_block_idx_end) {

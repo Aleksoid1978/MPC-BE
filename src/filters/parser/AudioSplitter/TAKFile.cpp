@@ -437,9 +437,11 @@ int CTAKFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	if (m_pFile->GetPos() >= m_endpos) {
 		return 0;
 	}
+
 	int size = min(1024, m_endpos - m_pFile->GetPos());
-	packet->SetCount(size);
-	m_pFile->ByteRead(packet->GetData(), size);
+	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
+		return 0;
+	}
 
 	packet->rtStart	= rtStart;
 	packet->rtStop	= rtStart + m_nAvgBytesPerSec;

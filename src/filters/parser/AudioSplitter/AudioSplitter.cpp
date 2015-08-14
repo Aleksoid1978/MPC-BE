@@ -151,6 +151,10 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		return hr;
 	}
 
+	if (m_pFile->IsStreaming()) {
+		return E_FAIL;
+	}
+
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
