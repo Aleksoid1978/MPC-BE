@@ -2003,10 +2003,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_extensions.AddTail(_T(".mpg"));
 		pFGF->m_extensions.AddTail(_T(".m2v"));
 		pFGF->m_extensions.AddTail(_T(".mpv"));
-		// H.264/AVC1
+		// H.264/AVC
 		pFGF->m_chkbytes.AddTail(_T("0,5,,0000000109"));
+		pFGF->m_chkbytes.AddTail(_T("0,5,,0000000167"));
 		pFGF->m_extensions.AddTail(_T(".h264"));
 		pFGF->m_extensions.AddTail(_T(".264"));
+		pFGF->m_extensions.AddTail(_T(".avc"));
 		// VC-1
 		pFGF->m_chkbytes.AddTail(_T("0,4,,0000010F"));
 		pFGF->m_chkbytes.AddTail(_T("0,4,,0000010D"));

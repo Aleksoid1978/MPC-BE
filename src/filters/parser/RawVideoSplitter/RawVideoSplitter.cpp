@@ -55,7 +55,8 @@ STDAPI DllRegisterServer()
 	CAtlList<CString> chkbytes;
 	chkbytes.AddTail(_T("0,9,,595556344D50454732"));	// YUV4MPEG2
 	chkbytes.AddTail(_T("0,4,,000001B3"));				// MPEG1/2
-	chkbytes.AddTail(_T("0,5,,0000000109"));			// H.264/AVC1
+	chkbytes.AddTail(_T("0,5,,0000000109"));			// H.264/AVC
+	chkbytes.AddTail(_T("0,5,,0000000167"));			// H.264/AVC
 	chkbytes.AddTail(_T("0,4,,0000010F"));				// VC-1
 	chkbytes.AddTail(_T("0,4,,0000010D"));				// VC-1
 	chkbytes.AddTail(_T("0,5,,0000000140"));			// H.265/HEVC - vps
@@ -66,7 +67,7 @@ STDAPI DllRegisterServer()
 		MEDIASUBTYPE_NULL,
 		chkbytes,
 		_T(".mpeg"), _T(".mpg"), _T(".m2v"), _T(".mpv"),
-		_T(".h264"), _T(".264"),
+		_T(".h264"), _T(".264"), _T(".avc"),
 		_T(".vc1"),
 		_T(".h265"), _T(".265"), _T(".hm10"), _T(".hevc"),
 		NULL);
