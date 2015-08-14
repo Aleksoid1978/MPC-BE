@@ -61,7 +61,6 @@ public:
 	__int64 GetPos();
 	__int64 GetAvailable();
 	__int64 GetLength(bool fUpdate = false);
-	__int64 GetTotal();
 	__int64 GetRemaining(bool fAvail = false) {
 		return max(0, (fAvail ? GetAvailable() : GetLength()) - GetPos());
 	}

@@ -200,14 +200,6 @@ __int64 CBaseSplitterFile::GetLength(bool fUpdate)
 	return m_len;
 }
 
-__int64 CBaseSplitterFile::GetTotal()
-{
-	LONGLONG total = 0, available;
-	m_pAsyncReader->Length(&total, &available);
-
-	return total ? total : available;
-}
-
 void CBaseSplitterFile::Seek(__int64 pos)
 {
 	__int64 len = GetLength();
