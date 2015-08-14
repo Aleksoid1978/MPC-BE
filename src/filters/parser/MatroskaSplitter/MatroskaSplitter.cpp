@@ -1036,7 +1036,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						isSub = true;
 
 						if (mt.subtype == MEDIASUBTYPE_HDMVSUB) {
-							m_MaxOutputQueueSeconds = 5; // hack
+							m_MaxOutputQueueMs = 5000; // hack
 						}
 					}
 				}
