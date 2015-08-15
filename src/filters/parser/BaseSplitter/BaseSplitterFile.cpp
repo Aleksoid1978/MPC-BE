@@ -320,8 +320,8 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, __int64 len)
 	}
 
 	while (len > 0) {
-		__int64 tmplen = GetAvailable();
-		__int64 maxlen = min(tmplen - m_pos, m_cachetotal);
+		__int64 tmplen = m_available - m_pos;
+		__int64 maxlen = min(tmplen, m_cachetotal);
 		__int64 minlen = min(len, maxlen);
 		if (minlen <= 0) {
 			return S_FALSE;
