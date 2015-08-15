@@ -31,6 +31,7 @@
 #include <atlpath.h>
 
 #include "../../reader/VTSReader/VTSReader.h"
+#include "../apps/mplayerc/SettingsDefines.h"
 
 // option names
 #define OPT_REGKEY_MPEGSplit  _T("Software\\MPC-BE Filters\\MPEG Splitter")
