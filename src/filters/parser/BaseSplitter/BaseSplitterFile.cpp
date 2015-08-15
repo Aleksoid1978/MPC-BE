@@ -49,6 +49,7 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 
 	LONGLONG total = 0, available;
 	hr = m_pAsyncReader->Length(&total, &available);
+	m_lentick_actual = m_lentick_prev = GetTickCount();
 
 	m_fStreaming	= (total == 0 && available > 0);
 	m_fRandomAccess	= (total > 0 && total == available);
