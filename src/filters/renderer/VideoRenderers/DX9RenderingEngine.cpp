@@ -135,7 +135,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_ScreenSize(0, 0)
 	, m_nNbDXSurface(1)
 	, m_nCurSurface(0)
-	, m_CurrentAdapter(0)
+	, m_CurrentAdapter(UINT_MAX)
 	, m_D3D9VendorId(0)
 	, m_VideoBufferType(D3DFMT_X8R8G8B8)
 	, m_SurfaceType(D3DFMT_X8R8G8B8)
