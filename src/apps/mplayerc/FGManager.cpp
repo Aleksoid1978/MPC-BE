@@ -1995,31 +1995,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_RAWVIDEO] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CRawVideoSourceFilter>();
-		// YUV4MPEG2
-		pFGF->m_chkbytes.AddTail(_T("0,9,,595556344D50454732"));
-		// MPEG1/2
-		pFGF->m_chkbytes.AddTail(_T("0,4,,000001B3"));
-		pFGF->m_extensions.AddTail(_T(".mpeg"));
-		pFGF->m_extensions.AddTail(_T(".mpg"));
-		pFGF->m_extensions.AddTail(_T(".m2v"));
-		pFGF->m_extensions.AddTail(_T(".mpv"));
-		// H.264/AVC
-		pFGF->m_chkbytes.AddTail(_T("0,5,,0000000109"));
-		pFGF->m_chkbytes.AddTail(_T("0,5,,0000000167"));
-		pFGF->m_extensions.AddTail(_T(".h264"));
-		pFGF->m_extensions.AddTail(_T(".264"));
-		pFGF->m_extensions.AddTail(_T(".avc"));
-		// VC-1
-		pFGF->m_chkbytes.AddTail(_T("0,4,,0000010F"));
-		pFGF->m_chkbytes.AddTail(_T("0,4,,0000010D"));
-		pFGF->m_extensions.AddTail(_T(".vc1"));
-		// H.265/HEVC
-		pFGF->m_chkbytes.AddTail(_T("0,5,,0000000140"));
-		pFGF->m_chkbytes.AddTail(_T("0,5,,0000000146"));
-		pFGF->m_extensions.AddTail(_T(".h265"));
-		pFGF->m_extensions.AddTail(_T(".265"));
-		pFGF->m_extensions.AddTail(_T(".hm10"));
-		pFGF->m_extensions.AddTail(_T(".hevc"));
+		pFGF->m_chkbytes.AddTail(_T("0,9,,595556344D50454732"));	// YUV4MPEG2
+		pFGF->m_chkbytes.AddTail(_T("0,3,,000001"));				// MPEG1/2, VC-1
+		pFGF->m_chkbytes.AddTail(_T("0,4,,00000001"));				// H.264/AVC, H.265/HEVC
 		m_source.AddTail(pFGF);
 	}
 
