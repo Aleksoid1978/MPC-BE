@@ -39,6 +39,10 @@ class CBaseSplitterFile
 
 	bool    m_fStreaming     = false;
 	bool    m_fRandomAccess  = false;
+	// m_fRandomAccess == true  && m_fStreaming == false - complete file or stream of known size
+	// m_fRandomAccess == false && m_fStreaming == false - downloading stream of known size
+	// m_fRandomAccess == false && m_fStreaming == true  - downloading stream of unknown size
+	// m_fRandomAccess == true  && m_fStreaming == true  - local file whose size increases
 
 	DWORD   m_lentick_prev   = 0;
 	DWORD   m_lentick_actual = 0;
@@ -50,18 +54,11 @@ class CBaseSplitterFile
 	virtual HRESULT Read(BYTE* pData, int len); // use ByteRead
 	virtual void OnUpdateDuration() {};
 
-protected:
+	// thread to determine the local file whose size increases
 	DWORD ThreadProc();
 	static DWORD WINAPI StaticThreadProc(LPVOID lpParam);
 	HANDLE m_hThread;
 	CAMEvent m_evStop;
-
-	DWORD ThreadProc_Duration();
-	static DWORD WINAPI StaticThreadProc_Duration(LPVOID lpParam);
-	HANDLE m_hThread_Duration;
-	CAMEvent m_evStop_Duration;
-	CAMEvent m_evUpdate_Duration;
-	CAMEvent m_evUpdate_Duration_Set;
 
 public:
 	CBaseSplitterFile(IAsyncReader* pReader, HRESULT& hr, bool fRandomAccess = true, bool fStreaming = false, bool fStreamingDetect = false);
@@ -95,14 +92,4 @@ public:
 	void SetBreakHandle(HANDLE hBreak) {
 		m_hBreak = hBreak;
 	}
-
-	enum MODE {
-		Streaming,
-		RandomAccess,
-	};
-	void ForceMode(MODE mode);
-
-	void StartStreamingDetect();
-	void StopStreamingDetect();
-	void UpdateDuration();
 };
