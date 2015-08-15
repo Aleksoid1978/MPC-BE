@@ -29,10 +29,7 @@
 
 CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool fRandomAccess, bool fStreaming, bool fStreamingDetect)
 	: m_pAsyncReader(pAsyncReader)
-	, m_hBreak(NULL)
 	, m_hThread(NULL)
-	, m_hThread_Duration(NULL)
-	, m_evUpdate_Duration_Set(TRUE)
 {
 	if (!m_pAsyncReader) {
 		hr = E_UNEXPECTED;
@@ -57,7 +54,7 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 	m_len		= total;
 	m_available	= available;
 
-	if (!m_fStreaming && fStreamingDetect) {
+	if (m_fRandomAccess && !m_fStreaming && fStreamingDetect) {
 		m_evStop.Reset();
 		DWORD ThreadId = 0;
 		m_hThread = ::CreateThread(NULL, 0, StaticThreadProc, (LPVOID)this, CREATE_SUSPENDED, &ThreadId);
@@ -83,13 +80,6 @@ CBaseSplitterFile::~CBaseSplitterFile()
 			TerminateThread(m_hThread, 0xDEAD);
 		}
 	}
-
-	if (m_hThread_Duration != NULL) {
-		m_evStop_Duration.Set();
-		if (WaitForSingleObject(m_hThread_Duration, 1000) == WAIT_TIMEOUT) {
-			TerminateThread(m_hThread_Duration, 0xDEAD);
-		}
-	}
 }
 
 DWORD WINAPI CBaseSplitterFile::StaticThreadProc(LPVOID lpParam)
@@ -108,47 +98,16 @@ DWORD CBaseSplitterFile::ThreadProc()
 		} else {
 			LONGLONG total, available = 0;
 			m_pAsyncReader->Length(&total, &available);
-			UNREFERENCED_PARAMETER(total);
 
-			if (m_available && m_available < available) {
-				ForceMode(Streaming);
+			if (total == available && total > m_len) {
+				// local file whose size increases
+				m_fRandomAccess = true;
+				m_fStreaming = true;
+
 				return 0;
 			}
 
-			m_available = available;
-		}
-	}
-
-	return 0;
-}
-
-DWORD WINAPI CBaseSplitterFile::StaticThreadProc_Duration(LPVOID lpParam)
-{
-	return ((CBaseSplitterFile*)lpParam)->ThreadProc_Duration();
-}
-
-DWORD CBaseSplitterFile::ThreadProc_Duration()
-{
-	HANDLE hEvts[] = {m_evStop_Duration};
-	m_evUpdate_Duration_Set.Set();
-
-	for (;;) {
-		DWORD dwObject = WaitForMultipleObjects(_countof(hEvts), hEvts, FALSE, 1000);
-		if (dwObject == WAIT_OBJECT_0) {
-			return 0;
-		} else if (m_evUpdate_Duration_Set.Check()) {
-			LONGLONG total, available = 0;
-			m_pAsyncReader->Length(&total, &available);
-			UNREFERENCED_PARAMETER(total);
-
-			/*
-			Do not remove these lines - leave for the future
-			if (m_available && m_available < available) {
-				m_evUpdate_Duration.Set();
-			}
-			*/
-
-			m_len = m_available = available;
+			m_len = total;
 		}
 	}
 
@@ -175,7 +134,7 @@ __int64 CBaseSplitterFile::GetPos()
 
 HRESULT CBaseSplitterFile::UpdateLength()
 {
-	if (m_fRandomAccess) {
+	if (m_fRandomAccess && !m_fStreaming) {
 		return S_FALSE;
 	}
 
@@ -400,51 +359,4 @@ INT64 CBaseSplitterFile::SExpGolombRead()
 {
 	UINT64 k = UExpGolombRead();
 	return ((k & 1) ? 1 : -1) * ((k + 1) >> 1);
-}
-
-void CBaseSplitterFile::ForceMode(MODE mode) {
-	if (mode == Streaming) {
-		m_len = 0;
-
-		m_fStreaming	= true;
-		m_fRandomAccess	= false;
-	} else if (mode == RandomAccess) {
-		LONGLONG total = 0, available;
-		m_pAsyncReader->Length(&total, &available);
-		if (total < available) {
-			total = available;
-		}
-		m_len = total;
-
-		m_fStreaming	= false;
-		m_fRandomAccess	= true;
-	}
-}
-
-void CBaseSplitterFile::StartStreamingDetect()
-{
-	if (m_hThread_Duration == NULL) {
-		m_evStop_Duration.Reset();
-		DWORD ThreadId = 0;
-		m_hThread_Duration = ::CreateThread(NULL, 0, StaticThreadProc_Duration, (LPVOID)this, CREATE_SUSPENDED, &ThreadId);
-		UNREFERENCED_PARAMETER(ThreadId);
-		SetThreadPriority(m_hThread_Duration, THREAD_PRIORITY_BELOW_NORMAL);
-		ResumeThread(m_hThread_Duration);
-	}
-}
-
-void CBaseSplitterFile::StopStreamingDetect()
-{
-	if (m_hThread_Duration != NULL) {
-		m_evStop_Duration.Set();
-	}
-}
-
-void CBaseSplitterFile::UpdateDuration()
-{
-	if (m_evUpdate_Duration.Check()) {
-		m_evUpdate_Duration_Set.Reset();
-		OnUpdateDuration();
-		m_evUpdate_Duration_Set.Set();
-	}
 }
