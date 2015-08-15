@@ -26,23 +26,28 @@
 class CBaseSplitterFile
 {
 	CComPtr<IAsyncReader> m_pAsyncReader;
+	__int64 m_pos            = 0;
+	__int64 m_len            = 0;
+	__int64 m_available      = 0;
+
 	CAutoVectorPtr<BYTE> m_pCache;
-	__int64 m_cachepos, m_cachelen, m_cachetotal;
-	UINT64 m_bitbuff;
-	int m_bitlen;
+	__int64 m_cachepos       = 0;
+	int     m_cachelen       = 0;
+	int     m_cachetotal     = 0;
+	UINT64  m_bitbuff        = 0;
+	int     m_bitlen         = 0;
 
-	bool m_fStreaming, m_fRandomAccess;
-	__int64 m_pos, m_len;
-	__int64 m_available;
+	bool    m_fStreaming     = false;
+	bool    m_fRandomAccess  = false;
 
-	DWORD m_lentick_prev;
-	DWORD m_lentick_actual;
-	HANDLE m_hBreak;
+	DWORD   m_lentick_prev   = 0;
+	DWORD   m_lentick_actual = 0;
+	HANDLE  m_hBreak         = NULL;
 
 	HRESULT UpdateLength();
 	HRESULT WaitData(__int64 pos);
 
-	virtual HRESULT Read(BYTE* pData, __int64 len); // use ByteRead
+	virtual HRESULT Read(BYTE* pData, int len); // use ByteRead
 	virtual void OnUpdateDuration() {};
 
 protected:
@@ -62,7 +67,7 @@ public:
 	CBaseSplitterFile(IAsyncReader* pReader, HRESULT& hr, bool fRandomAccess = true, bool fStreaming = false, bool fStreamingDetect = false);
 	~CBaseSplitterFile();
 
-	bool SetCacheSize(size_t cachelen);
+	bool SetCacheSize(int cachelen);
 
 	__int64 GetPos();
 	__int64 GetAvailable();

@@ -29,14 +29,6 @@
 
 CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool fRandomAccess, bool fStreaming, bool fStreamingDetect)
 	: m_pAsyncReader(pAsyncReader)
-	, m_fStreaming(false)
-	, m_fRandomAccess(false)
-	, m_pos(0), m_len(0)
-	, m_bitbuff(0), m_bitlen(0)
-	, m_cachepos(0), m_cachelen(0)
-	, m_available(0)
-	, m_lentick_prev(0)
-	, m_lentick_actual(0)
 	, m_hBreak(NULL)
 	, m_hThread(NULL)
 	, m_hThread_Duration(NULL)
@@ -47,20 +39,23 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 		return;
 	}
 
-	LONGLONG total = 0, available;
+	LONGLONG total = 0, available = 0;
 	hr = m_pAsyncReader->Length(&total, &available);
+	if (FAILED(hr)) {
+		return;
+	}
 	m_lentick_actual = m_lentick_prev = GetTickCount();
 
 	m_fStreaming	= (total == 0 && available > 0);
 	m_fRandomAccess	= (total > 0 && total == available);
 
-	m_len		= total;
-	m_available	= available;
-
-	if (FAILED(hr) || (fRandomAccess && !m_fRandomAccess) || (!fStreaming && m_fStreaming) || m_len < 0) {
+	if ((fRandomAccess && !m_fRandomAccess) || (!fStreaming && m_fStreaming) || total < 0) {
 		hr = E_FAIL;
 		return;
 	}
+
+	m_len		= total;
+	m_available	= available;
 
 	if (!m_fStreaming && fStreamingDetect) {
 		m_evStop.Reset();
@@ -71,7 +66,7 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 		ResumeThread(m_hThread);
 	}
 
-	size_t cachelen = 64 * KILOBYTE; // TODO: specify when streaming
+	int cachelen = 64 * KILOBYTE; // TODO: specify when streaming
 	if (!SetCacheSize(cachelen)) {
 		hr = E_OUTOFMEMORY;
 		return;
@@ -160,7 +155,7 @@ DWORD CBaseSplitterFile::ThreadProc_Duration()
 	return 0;
 }
 
-bool CBaseSplitterFile::SetCacheSize(size_t cachelen)
+bool CBaseSplitterFile::SetCacheSize(int cachelen)
 {
 	m_pCache.Free();
 	m_cachetotal = 0;
@@ -276,7 +271,7 @@ void CBaseSplitterFile::Skip(__int64 offset)
 	}
 }
 
-HRESULT CBaseSplitterFile::Read(BYTE* pData, __int64 len)
+HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 {
 	CheckPointer(m_pAsyncReader, E_NOINTERFACE);
 
@@ -291,7 +286,7 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, __int64 len)
 	*/
 
 	if (m_cachetotal == 0 || !m_pCache) {
-		hr = m_pAsyncReader->SyncRead(m_pos, (long)len, pData);
+		hr = m_pAsyncReader->SyncRead(m_pos, len, pData);
 		m_pos += len;
 		return hr;
 	}
@@ -299,9 +294,9 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, __int64 len)
 	BYTE* pCache = m_pCache;
 
 	if (m_cachepos <= m_pos && m_pos < m_cachepos + m_cachelen) {
-		__int64 minlen = min(len, m_cachelen - (m_pos - m_cachepos));
+		int minlen = min(len, m_cachelen - (int)(m_pos - m_cachepos));
 
-		memcpy(pData, &pCache[m_pos - m_cachepos], (size_t)minlen);
+		memcpy(pData, &pCache[m_pos - m_cachepos], minlen);
 
 		len -= minlen;
 		m_pos += minlen;
@@ -309,7 +304,7 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, __int64 len)
 	}
 
 	while (len > m_cachetotal) {
-		hr = m_pAsyncReader->SyncRead(m_pos, (long)m_cachetotal, pData);
+		hr = m_pAsyncReader->SyncRead(m_pos, m_cachetotal, pData);
 		if (S_OK != hr) {
 			return hr;
 		}
@@ -321,13 +316,13 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, __int64 len)
 
 	while (len > 0) {
 		__int64 tmplen = m_available - m_pos;
-		__int64 maxlen = min(tmplen, m_cachetotal);
-		__int64 minlen = min(len, maxlen);
+		int maxlen = min(tmplen, m_cachetotal);
+		int minlen = min(len, maxlen);
 		if (minlen <= 0) {
 			return S_FALSE;
 		}
 
-		hr = m_pAsyncReader->SyncRead(m_pos, (long)maxlen, pCache);
+		hr = m_pAsyncReader->SyncRead(m_pos, maxlen, pCache);
 		if (S_OK != hr) {
 			return hr;
 		}
@@ -335,7 +330,7 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, __int64 len)
 		m_cachepos = m_pos;
 		m_cachelen = maxlen;
 
-		memcpy(pData, pCache, (size_t)minlen);
+		memcpy(pData, pCache, minlen);
 
 		len -= minlen;
 		m_pos += minlen;
@@ -389,7 +384,7 @@ void CBaseSplitterFile::BitFlush()
 HRESULT CBaseSplitterFile::ByteRead(BYTE* pData, __int64 len)
 {
 	Seek(GetPos());
-	return Read(pData, len);
+	return Read(pData, (int)len);
 }
 
 UINT64 CBaseSplitterFile::UExpGolombRead()
