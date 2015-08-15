@@ -180,8 +180,6 @@ HRESULT CMpaSplitterFile::Init()
 		return E_FAIL;
 	}
 
-	WaitAvailable(1500, 64 * KILOBYTE);
-
 	m_startpos = startpos;
 
 	if (m_mode == mpa) {

@@ -28,18 +28,23 @@ class CBaseSplitterFile
 	CComPtr<IAsyncReader> m_pAsyncReader;
 	CAutoVectorPtr<BYTE> m_pCache;
 	__int64 m_cachepos, m_cachelen, m_cachetotal;
+	UINT64 m_bitbuff;
+	int m_bitlen;
 
 	bool m_fStreaming, m_fRandomAccess;
 	__int64 m_pos, m_len;
 	__int64 m_available;
 
+	DWORD m_lentick_prev;
+	DWORD m_lentick_actual;
+
+	HRESULT UpdateLength();
+	HRESULT WaitData(__int64 pos);
+
 	virtual HRESULT Read(BYTE* pData, __int64 len); // use ByteRead
 	virtual void OnUpdateDuration() {};
 
 protected:
-	UINT64 m_bitbuff;
-	int m_bitlen;
-
 	DWORD ThreadProc();
 	static DWORD WINAPI StaticThreadProc(LPVOID lpParam);
 	HANDLE m_hThread;
@@ -60,9 +65,9 @@ public:
 
 	__int64 GetPos();
 	__int64 GetAvailable();
-	__int64 GetLength(bool fUpdate = false);
-	__int64 GetRemaining(bool fAvail = false) {
-		return max(0, (fAvail ? GetAvailable() : GetLength()) - GetPos());
+	__int64 GetLength();
+	__int64 GetRemaining() {
+		return GetLength() - GetPos();
 	}
 	virtual void Seek(__int64 pos);
 	void Skip(__int64 offset);
@@ -80,9 +85,6 @@ public:
 	bool IsRandomAccess()	const {
 		return m_fRandomAccess;
 	}
-
-	HRESULT HasMoreData(__int64 len = 1, DWORD ms = 1);
-	HRESULT WaitAvailable(DWORD dwMilliseconds = 1500, __int64 AvailBytes = 1, HANDLE hBreak = NULL);
 
 	enum MODE {
 		Streaming,

@@ -49,8 +49,6 @@ bool COggFile::Sync(HANDLE hBreak)
 {
 	__int64 start = GetPos();
 
-	WaitAvailable(1500, MAX_PAGE_SIZE);
-
 	DWORD dw;
 	for (__int64 i = 0, j = hBreak ? GetLength() - start : MAX_PAGE_SIZE;
 			i < j && S_OK == ByteRead((BYTE*)&dw, sizeof(dw))
