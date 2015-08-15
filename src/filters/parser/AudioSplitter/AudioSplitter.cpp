@@ -142,7 +142,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	HRESULT hr = E_FAIL;
 	m_pFile.Free();
 
-	m_pFile.Attach(DNew CBaseSplitterFile(pAsyncReader, hr));
+	m_pFile.Attach(DNew CBaseSplitterFile(pAsyncReader, hr, false));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
