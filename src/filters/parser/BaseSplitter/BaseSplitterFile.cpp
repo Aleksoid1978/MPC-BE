@@ -37,6 +37,7 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 	, m_available(0)
 	, m_lentick_prev(0)
 	, m_lentick_actual(0)
+	, m_hBreak(NULL)
 	, m_hThread(NULL)
 	, m_hThread_Duration(NULL)
 	, m_evUpdate_Duration_Set(TRUE)
@@ -234,6 +235,10 @@ HRESULT CBaseSplitterFile::WaitData(__int64 pos)
 			}
 		} else {
 			n = 0;
+		}
+
+		if (m_hBreak && WaitForSingleObject(m_hBreak, 0) == WAIT_OBJECT_0) {
+			return E_FAIL; // 
 		}
 	}
 

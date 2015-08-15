@@ -198,6 +198,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile.Free();
 		return hr;
 	}
+	m_pFile->SetBreakHandle(GetRequestHandle());
 
 	CMatroskaNode Root(m_pFile);
 	if (!m_pFile

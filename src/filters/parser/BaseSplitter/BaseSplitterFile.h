@@ -37,6 +37,7 @@ class CBaseSplitterFile
 
 	DWORD m_lentick_prev;
 	DWORD m_lentick_actual;
+	HANDLE m_hBreak;
 
 	HRESULT UpdateLength();
 	HRESULT WaitData(__int64 pos);
@@ -84,6 +85,10 @@ public:
 	}
 	bool IsRandomAccess()	const {
 		return m_fRandomAccess;
+	}
+
+	void SetBreakHandle(HANDLE hBreak) {
+		m_hBreak = hBreak;
 	}
 
 	enum MODE {

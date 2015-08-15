@@ -184,14 +184,15 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
-
-	if (!m_bBadInterleavedSuport && !m_pFile->IsInterleaved(!!(::GetKeyState(VK_SHIFT)&0x8000))) {
-		hr = E_FAIL;
-	}
-
 	if (FAILED(hr)) {
 		m_pFile.Free();
 		return hr;
+	}
+	m_pFile->SetBreakHandle(GetRequestHandle());
+
+	if (!m_bBadInterleavedSuport && !m_pFile->IsInterleaved(!!(::GetKeyState(VK_SHIFT)&0x8000))) {
+		m_pFile.Free();
+		hr = E_FAIL;
 	}
 
 	m_rtNewStart = m_rtCurrent = 0;

@@ -183,6 +183,7 @@ HRESULT COggSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile.Free();
 		return hres;
 	}
+	m_pFile->SetBreakHandle(GetRequestHandle());
 
 	m_rtDuration = m_rtNewStart = m_rtCurrent = m_rtNewStop = m_rtStop = 0;
 

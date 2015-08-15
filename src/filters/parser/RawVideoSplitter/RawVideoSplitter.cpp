@@ -149,8 +149,8 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	CheckPointer(pAsyncReader, E_POINTER);
 
 	HRESULT hr = E_FAIL;
-
 	m_pFile.Free();
+
 	m_pFile.Attach(DNew CBaseSplitterFileEx(pAsyncReader, hr));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
@@ -159,6 +159,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile.Free();
 		return hr;
 	}
+	m_pFile->SetBreakHandle(GetRequestHandle());
 
 	BYTE buf[256] = {0};
 	if (FAILED(m_pFile->ByteRead(buf, 255))) {

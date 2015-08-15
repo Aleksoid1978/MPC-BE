@@ -937,16 +937,16 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_pFile.Free();
 
 	ReadClipInfo(GetPartFilename(pAsyncReader));
-	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo, m_rtPlaylistDuration > 0, m_ForcedSub, m_AC3CoreOnly, m_SubEmptyPin));
 
+	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo, m_rtPlaylistDuration > 0, m_ForcedSub, m_AC3CoreOnly, m_SubEmptyPin));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
-
 	if (FAILED(hr)) {
 		m_pFile.Free();
 		return hr;
 	}
+	m_pFile->SetBreakHandle(GetRequestHandle());
 
 	if (m_rtMin && m_rtMax && m_rtMax > m_rtMin) {
 		m_pFile->m_rtMin = m_rtMin;

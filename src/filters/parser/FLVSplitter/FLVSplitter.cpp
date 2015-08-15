@@ -436,8 +436,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	CheckPointer(pAsyncReader, E_POINTER);
 
 	HRESULT hr = E_FAIL;
-
 	m_pFile.Free();
+
 	m_pFile.Attach(DNew CBaseSplitterFileEx(pAsyncReader, hr, false, true, true));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
@@ -446,6 +446,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile.Free();
 		return hr;
 	}
+	m_pFile->SetBreakHandle(GetRequestHandle());
 
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;

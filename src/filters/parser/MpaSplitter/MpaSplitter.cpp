@@ -123,6 +123,7 @@ HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile.Free();
 		return hr;
 	}
+	m_pFile->SetBreakHandle(GetRequestHandle());
 
 	CAtlArray<CMediaType> mts;
 	mts.Add(m_pFile->GetMediaType());
