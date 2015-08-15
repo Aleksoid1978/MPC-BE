@@ -217,6 +217,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile.Free();
 		return hr;
 	}
+	m_pFile->SetBreakHandle(GetRequestHandle());
 
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
@@ -1574,6 +1575,7 @@ HRESULT CMPEG4VideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile.Free();
 		return hr;
 	}
+	m_pFile->SetBreakHandle(GetRequestHandle());
 
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;

@@ -232,6 +232,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile.Free();
 		return hr;
 	}
+	m_pFile->SetBreakHandle(GetRequestHandle());
 
 	m_rtNewStart = m_rtCurrent = m_rtNewStop = 0;
 
