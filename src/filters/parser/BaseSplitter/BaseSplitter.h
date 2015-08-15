@@ -34,7 +34,6 @@
 #include "../../../DSUtil/DSMPropertyBag.h"
 #include "../../../DSUtil/FontInstaller.h"
 #include "../../../DSUtil/MediaDescription.h"
-#include "../apps/mplayerc/SettingsDefines.h"
 #include <vector>
 
 #define PACKET_PTS_DISCONTINUITY		0x0001
