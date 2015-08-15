@@ -49,8 +49,6 @@ HRESULT CMP4SplitterFile::Init()
 {
 	Seek(0);
 
-	WaitAvailable(2000, MEGABYTE/2);
-
 	delete (AP4_File*)m_pAp4File;
 
 	AP4_ByteStream* stream = DNew AP4_AsyncReaderStream(this);

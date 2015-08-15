@@ -184,7 +184,6 @@ bool CMpaSplitterFilter::DemuxLoop()
 	BOOL bFirst = TRUE;
 
 	while (SUCCEEDED(hr) && !CheckRequest(NULL) && (m_pFile->GetRemaining() > 9 || m_pFile->IsStreaming())) {
-		m_pFile->WaitAvailable(1500, DEF_SYNC_SIZE, GetRequestHandle());
 		if (!m_pFile->Sync(FrameSize, rtDuration, DEF_SYNC_SIZE, bFirst)) {
 			continue;
 		}

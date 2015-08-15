@@ -1334,10 +1334,6 @@ bool CMpegSplitterFilter::DemuxLoop()
 
 	HRESULT hr = S_OK;
 	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
-		if (m_pFile->IsStreaming()) {
-			m_pFile->WaitAvailable(2000, AvailBytes, GetRequestHandle());
-		}
-
 		hr = DemuxNextPacket(rtStartOffset);
 	}
 

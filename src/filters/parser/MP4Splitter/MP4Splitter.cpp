@@ -1365,7 +1365,7 @@ bool CMP4SplitterFilter::DemuxLoop()
 	m_pFile->Seek(0);
 	AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie();
 
-	while (SUCCEEDED(hr) && !CheckRequest(NULL) && (!m_pFile->IsStreaming() || SUCCEEDED(m_pFile->WaitAvailable()))) {
+	while (SUCCEEDED(hr) && !CheckRequest(NULL) && (!m_pFile->IsStreaming())) {
 
 		CAtlMap<DWORD, trackpos>::CPair* pPairNext = NULL;
 		REFERENCE_TIME rtNext = 0;

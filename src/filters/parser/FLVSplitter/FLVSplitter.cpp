@@ -304,11 +304,7 @@ bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, CAtlArray<AMF0
 
 bool CFLVSplitterFilter::ReadTag(Tag& t)
 {
-	if (FAILED(m_pFile->WaitAvailable(1000, 15))) {
-		//return false;
-	}
-
-	if (m_pFile->GetRemaining(true) < 15) {
+	if (m_pFile->GetRemaining() < 15) {
 		return false;
 	}
 
@@ -336,11 +332,7 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 
 bool CFLVSplitterFilter::ReadTag(AudioTag& at)
 {
-	if (FAILED(m_pFile->WaitAvailable(1000))) {
-		//return false;
-	}
-
-	if (!m_pFile->GetRemaining(true)) {
+	if (!m_pFile->GetRemaining()) {
 		return false;
 	}
 
@@ -354,11 +346,7 @@ bool CFLVSplitterFilter::ReadTag(AudioTag& at)
 
 bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 {
-	if (FAILED(m_pFile->WaitAvailable(1000))) {
-		//return false;
-	}
-
-	if (!m_pFile->GetRemaining(true)) {
+	if (!m_pFile->GetRemaining()) {
 		return false;
 	}
 
@@ -368,7 +356,7 @@ bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 	vt.tsOffset			= 0;
 
 	if (IsAVCCodec(vt.CodecID)) {
-		if (m_pFile->GetRemaining(true) < 3) {
+		if (m_pFile->GetRemaining() < 3) {
 			return false;
 		}
 
@@ -387,10 +375,6 @@ bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 #ifndef NOVIDEOTWEAK
 bool CFLVSplitterFilter::ReadTag(VideoTweak& vt)
 {
-	if (FAILED(m_pFile->WaitAvailable(1000))) {
-		//return false;
-	}
-
 	vt.x = (BYTE)m_pFile->BitRead(4);
 	vt.y = (BYTE)m_pFile->BitRead(4);
 
@@ -402,8 +386,8 @@ bool CFLVSplitterFilter::Sync(__int64& pos)
 {
 	m_pFile->Seek(pos);
 
-	while (m_pFile->GetRemaining(true) >= 15) {
-		__int64 limit = m_pFile->GetRemaining(true);
+	while (m_pFile->GetRemaining() >= 15) {
+		__int64 limit = m_pFile->GetRemaining();
 		while (true) {
 			BYTE b = (BYTE)m_pFile->BitRead(8);
 			if (IsValidTag(b)) {
@@ -696,7 +680,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						first_ts = current_ts = 0;
 						int frame_cnt = 0;
 
-						while ((frame_cnt < 30) && ReadTag(tag) && !CheckRequest(NULL) && m_pFile->GetRemaining(true)) {
+						while ((frame_cnt < 30) && ReadTag(tag) && !CheckRequest(NULL) && m_pFile->GetRemaining()) {
 							__int64 _next = m_pFile->GetPos() + tag.DataSize;
 							if ((tag.DataSize > 0) && (tag.TagType == FLV_VIDEODATA && ReadTag(vtag) && tag.TimeStamp > 0)) {
 
@@ -1245,12 +1229,8 @@ bool CFLVSplitterFilter::DemuxLoop()
 			break;
 		}
 
-		if (!m_pFile->GetRemaining(m_pFile->IsStreaming())) {
-			m_pFile->WaitAvailable(1500, t.DataSize);
-
-			if (!m_pFile->GetRemaining(m_pFile->IsStreaming())) {
-				break;
-			}
+		if (!m_pFile->GetRemaining()) {
+			break;
 		}
 
 		__int64 next = m_pFile->GetPos() + t.DataSize;
@@ -1281,8 +1261,6 @@ bool CFLVSplitterFilter::DemuxLoop()
 			if (dataSize <= 0) {
 				goto NextTag;
 			}
-
-			m_pFile->WaitAvailable(1500, dataSize);
 
 			p.Attach(DNew CPacket());
 			p->TrackNumber	= t.TagType;

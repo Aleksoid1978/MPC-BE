@@ -61,8 +61,6 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	WaitAvailable(3000, MEGABYTE);
-
 	Seek(0);
 	m_bIMKH_CCTV = (BitRead(32, true) == 'IMKH');
 
@@ -128,7 +126,6 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	Seek(0);
 	if (IsRandomAccess() || IsStreaming()) {
 
-		WaitAvailable(5000, MEGABYTE * 2);
 		SearchPrograms(0, min(GetLength(), IsStreaming() ? MEGABYTE : MEGABYTE * 5)); // max 5Mb for search a valid Program Map Table
 
 		__int64 pfp = 0;

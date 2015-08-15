@@ -35,6 +35,8 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 	, m_bitbuff(0), m_bitlen(0)
 	, m_cachepos(0), m_cachelen(0)
 	, m_available(0)
+	, m_lentick_prev(0)
+	, m_lentick_actual(0)
 	, m_hThread(NULL)
 	, m_hThread_Duration(NULL)
 	, m_evUpdate_Duration_Set(TRUE)
@@ -174,34 +176,89 @@ __int64 CBaseSplitterFile::GetPos()
 	return m_pos - (m_bitlen>>3);
 }
 
+HRESULT CBaseSplitterFile::UpdateLength()
+{
+	if (m_fRandomAccess) {
+		return S_FALSE;
+	}
+
+	// call the m_pAsyncReader->Length() is not more than 1 time per second
+	DWORD t = GetTickCount();
+	if (m_lentick_prev + 1000 < t || m_lentick_prev > t) {
+		m_lentick_prev = t;
+
+		__int64 total = 0;
+		__int64 available = 0;
+		HRESULT hr = m_pAsyncReader->Length(&total, &available);
+
+		if (m_available != available) {
+			m_lentick_actual = t;
+			m_available = available;
+		}
+
+		if (m_fStreaming) {
+			m_len = available;
+		} else {
+			m_len = total;
+			if (total == available) {
+				m_fRandomAccess = true;
+			}
+		}
+
+		return hr;
+	}
+	
+	return S_FALSE;
+}
+
+HRESULT CBaseSplitterFile::WaitData(__int64 pos)
+{
+	UpdateLength();
+
+	if (pos < m_available) {
+		return S_OK;
+	}
+	if (pos >= m_len || m_lentick_actual + 10000 < GetTickCount()) {
+		return E_FAIL;
+	}
+
+	int n = 0;
+	while (pos >= m_available) {
+		__int64 available = m_available;
+		Sleep(1000); // wait for 1 second until the data is loaded (TODO: specify size of the buffer when streaming)
+		UpdateLength();
+		
+		if (available == m_available) {
+			if (++n >= 10) {
+				return E_FAIL;
+			}
+		} else {
+			n = 0;
+		}
+	}
+
+	return S_OK;
+}
+
 __int64 CBaseSplitterFile::GetAvailable()
 {
-	if (!m_fRandomAccess) {
-		LONGLONG total;
-		m_pAsyncReader->Length(&total, &m_available);
-		UNREFERENCED_PARAMETER(total);
-	}
+	UpdateLength();
 
 	return m_available;
 }
 
-__int64 CBaseSplitterFile::GetLength(bool fUpdate)
+__int64 CBaseSplitterFile::GetLength()
 {
-	if (m_fStreaming) {
-		m_len = GetAvailable();
-	} else if (fUpdate) {
-		LONGLONG total = 0, available;
-		m_pAsyncReader->Length(&total, &available);
-		m_len = total;
-	}
+	UpdateLength();
 
 	return m_len;
 }
 
 void CBaseSplitterFile::Seek(__int64 pos)
 {
-	__int64 len = GetLength();
-	m_pos = min(max(pos, 0), len);
+	UpdateLength();
+
+	m_pos = min(max(0, pos), m_len);
 	BitFlush();
 }
 
@@ -217,12 +274,15 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, __int64 len)
 {
 	CheckPointer(m_pAsyncReader, E_NOINTERFACE);
 
+	HRESULT hr = WaitData(m_pos + len);
+	if (S_OK != hr) {
+		return hr;
+	}
+
 	/*
 	Do not remove these lines - leave for the future
 	UpdateDuration();
 	*/
-
-	HRESULT hr = S_OK;
 
 	if (m_cachetotal == 0 || !m_pCache) {
 		hr = m_pAsyncReader->SyncRead(m_pos, (long)len, pData);
@@ -339,48 +399,6 @@ INT64 CBaseSplitterFile::SExpGolombRead()
 {
 	UINT64 k = UExpGolombRead();
 	return ((k & 1) ? 1 : -1) * ((k + 1) >> 1);
-}
-
-HRESULT CBaseSplitterFile::HasMoreData(__int64 len, DWORD ms)
-{
-	__int64 available = GetLength() - GetPos();
-
-	if (!m_fStreaming) {
-		return available < 1 ? E_FAIL : S_OK;
-	}
-
-	if (available < len) {
-		if (ms > 0) {
-			Sleep(ms);
-		}
-		return S_FALSE;
-	}
-
-	return S_OK;
-}
-
-HRESULT CBaseSplitterFile::WaitAvailable(DWORD dwMilliseconds/* = 1500*/, __int64 AvailBytes/* = 1*/, HANDLE hBreak/* = NULL*/)
-{
-	if (m_fRandomAccess) {
-		return HasMoreData(AvailBytes, dwMilliseconds);
-	}
-
-	if (GetAvailable() < GetLength()) {
-		AvailBytes = min(AvailBytes, GetLength() - GetAvailable());
-	}
-
-	for (int i = 0; i < int(dwMilliseconds/100) && (!hBreak || WaitForSingleObject(hBreak, 0) != WAIT_OBJECT_0); i++) {
-		if (GetRemaining() >= AvailBytes) {
-			return S_OK;
-		}
-		Sleep(100);
-	}
-
-	if (GetRemaining() >= AvailBytes) {
-		return S_OK;
-	}
-
-	return E_FAIL;
 }
 
 void CBaseSplitterFile::ForceMode(MODE mode) {
