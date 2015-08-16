@@ -12826,9 +12826,11 @@ void CMainFrame::OpenSetupAudioStream()
 		}
 
 #ifdef DEBUG
-		DbgLog((LOG_TRACE, 3, L"Audio Track list :"));
-		for (size_t i = 0; i < MixAS.GetCount(); i++) {
-			DbgLog((LOG_TRACE, 3, L"	%s, type = %s", MixAS[i].Name, MixAS[i].Filter == 1 ? L"Splitter" : L"AudioSwitcher"));
+		if (!MixAS.IsEmpty()) {
+			DbgLog((LOG_TRACE, 3, L"Audio Track list :"));
+			for (size_t i = 0; i < MixAS.GetCount(); i++) {
+				DbgLog((LOG_TRACE, 3, L"	%s, type = %s", MixAS[i].Name, MixAS[i].Filter == 1 ? L"Splitter" : L"AudioSwitcher"));
+			}
 		}
 #endif
 
