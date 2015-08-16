@@ -44,8 +44,6 @@ class CBaseSplitterFile
 	// m_fRandomAccess == false && m_fStreaming == true  - downloading stream of unknown size
 	// m_fRandomAccess == true  && m_fStreaming == true  - local file whose size increases
 
-	DWORD   m_lentick_prev   = 0;
-	DWORD   m_lentick_actual = 0;
 	HANDLE  m_hBreak         = NULL;
 
 	void UpdateLength();

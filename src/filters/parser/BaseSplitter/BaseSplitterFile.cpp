@@ -41,7 +41,6 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 	if (FAILED(hr)) {
 		return;
 	}
-	m_lentick_actual = m_lentick_prev = GetTickCount();
 
 	m_fStreaming	= (total == 0 && available > 0);
 	m_fRandomAccess	= (total > 0 && total == available);
@@ -157,7 +156,7 @@ HRESULT CBaseSplitterFile::WaitData(__int64 pos)
 	if (pos <= m_available) {
 		return S_OK;
 	}
-	if (pos > m_len || m_lentick_actual + 10000 < GetTickCount()) {
+	if (pos > m_len) {
 		return E_FAIL;
 	}
 
