@@ -66,6 +66,8 @@ private:
 
 	DWORD ThreadProc();
 
+	DWORD RequestCmd = 0;
+	inline __int64 GetPacketsSize();
 	void CheckBuffer();
 
 public:

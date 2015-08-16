@@ -65,8 +65,8 @@ CFilterApp theApp;
 
 #endif
 
-#define MAXSTORESIZE	25*MEGABYTE	// The maximum size of a buffer for storing the received information
-#define MAXBUFSIZE		65536		// Max UDP Packet size is 64 Kbyte
+#define MAXSTORESIZE	10 * MEGABYTE	// The maximum size of a buffer for storing the received information
+#define MAXBUFSIZE		65536			// Max UDP Packet size is 64 Kbyte
 
 //
 // CUDPReader
@@ -449,7 +449,14 @@ HRESULT CUDPStream::SetPointer(LONGLONG llPos)
 	if (m_packets.IsEmpty() && llPos != 0
 			|| !m_packets.IsEmpty() && llPos < m_packets.GetHead()->m_start
 			|| !m_packets.IsEmpty() && llPos > m_packets.GetTail()->m_end) {
-		TRACE(_T("CUDPStream: SetPointer error - %lld, [%I64d -> %I64d]\n"), llPos, m_packets.GetHead()->m_start, m_packets.GetTail()->m_end);
+		//TRACE(_T("CUDPStream: SetPointer error - %lld, [%I64d -> %I64d]\n"), llPos, m_packets.GetHead()->m_start, m_packets.GetTail()->m_end);
+#ifdef _DEBUG
+		if (m_packets.IsEmpty()) {
+			DbgLog((LOG_TRACE, 3, L"CUDPStream: SetPointer error - %lld, buffer is empty", llPos));
+		} else {
+			DbgLog((LOG_TRACE, 3, L"CUDPStream: SetPointer error - %lld, [%I64d -> %I64d]", llPos, m_packets.GetHead()->m_start, m_packets.GetTail()->m_end));
+		}
+#endif
 		return E_FAIL;
 	}
 
@@ -524,15 +531,26 @@ void CUDPStream::Unlock()
 	m_csLock.Unlock();
 }
 
+inline __int64 CUDPStream::GetPacketsSize()
+{
+	CAutoLock cAutoLock(&m_csLock);
+
+	return m_packets.IsEmpty() ? 0 : m_packets.GetTail()->m_end - m_packets.GetHead()->m_start;
+}
+
 void CUDPStream::CheckBuffer()
 {
 	CAutoLock cAutoLock(&m_csLock);
 
-#define PacketsSize (m_packets.GetTail()->m_end - m_packets.GetHead()->m_start)
-	if (!m_packets.IsEmpty()) {
-		while (PacketsSize > MAXSTORESIZE) {
-			delete m_packets.RemoveHead();
+	if (RequestCmd != CMD_RUN) {
+		return;
+	}
+
+	while (GetPacketsSize() > MAXSTORESIZE) {
+		if (!m_packets.IsEmpty() && m_packets.GetHead()->m_start >= m_pos - 128 * KILOBYTE) {
+			break;
 		}
+		delete m_packets.RemoveHead();
 	}
 }
 
@@ -550,9 +568,9 @@ DWORD CUDPStream::ThreadProc()
 #endif
 
 	for (;;) {
-		DWORD cmd = GetRequest();
+		RequestCmd = GetRequest();
 
-		switch (cmd) {
+		switch (RequestCmd) {
 			default:
 			case CMD_EXIT:
 				Reply(S_OK);
@@ -573,7 +591,7 @@ DWORD CUDPStream::ThreadProc()
 				}
 			case CMD_RUN:
 				Reply(S_OK);
-				{
+				if (GetPacketsSize() < MAXSTORESIZE) {
 					char  buff[MAXBUFSIZE * 2];
 					int   buffsize = 0;
 					UINT  attempts = 0;
