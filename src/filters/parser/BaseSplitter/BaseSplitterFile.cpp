@@ -51,7 +51,7 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 		return;
 	}
 
-	m_len		= total;
+	m_len		= m_fStreaming ? available : total;
 	m_available	= available;
 
 	if (m_fRandomAccess && !m_fStreaming && fStreamingDetect) {
