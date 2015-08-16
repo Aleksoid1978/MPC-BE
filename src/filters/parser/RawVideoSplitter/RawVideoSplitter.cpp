@@ -415,7 +415,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				m_pFile->Seek(m_pFile->GetPos() - 4);
 
 				CBaseSplitterFileEx::vc1hdr h;
-				if (m_pFile->Read(h, min(KILOBYTE, m_pFile->GetAvailable()), &mt)) {
+				if (m_pFile->Read(h, min(KILOBYTE, m_pFile->GetRemaining()), &mt)) {
 					mts.Add(mt);
 					mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
 					mts.Add(mt);
