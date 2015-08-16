@@ -89,25 +89,21 @@ DWORD WINAPI CBaseSplitterFile::StaticThreadProc(LPVOID lpParam)
 
 DWORD CBaseSplitterFile::ThreadProc()
 {
-	HANDLE hEvts[] = {m_evStop};
+	HANDLE hEvts[] = { m_evStop };
 
-	for(int i = 0; i < 20; i++) {
+	for (int i = 0; i < 20; i++) {
 		DWORD dwObject = WaitForMultipleObjects(_countof(hEvts), hEvts, FALSE, 100);
 		if (dwObject == WAIT_OBJECT_0) {
 			return 0;
 		} else {
 			LONGLONG total, available = 0;
 			m_pAsyncReader->Length(&total, &available);
-
-			if (total == available && total > m_len) {
+			if (m_available && m_available < available) {
 				// local file whose size increases
-				m_fRandomAccess = true;
 				m_fStreaming = true;
 
 				return 0;
 			}
-
-			m_len = total;
 		}
 	}
 
@@ -238,11 +234,6 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 	if (S_OK != hr) {
 		return hr;
 	}
-
-	/*
-	Do not remove these lines - leave for the future
-	UpdateDuration();
-	*/
 
 	if (m_cachetotal == 0 || !m_pCache) {
 		hr = m_pAsyncReader->SyncRead(m_pos, len, pData);
