@@ -52,7 +52,6 @@ class CBaseSplitterFile
 	HRESULT WaitData(__int64 pos);
 
 	virtual HRESULT Read(BYTE* pData, int len); // use ByteRead
-	virtual void OnUpdateDuration() {};
 
 	// thread to determine the local file whose size increases
 	DWORD ThreadProc();
@@ -69,27 +68,21 @@ public:
 	__int64 GetPos();
 	__int64 GetAvailable();
 	__int64 GetLength();
-	__int64 GetRemaining() {
-		return GetLength() - GetPos();
-	}
+	__int64 GetRemaining() { return GetLength() - GetPos(); }
+
 	virtual void Seek(__int64 pos);
 	void Skip(__int64 offset);
 
 	UINT64 UExpGolombRead();
 	INT64 SExpGolombRead();
 
+	void BitByteAlign();
+	void BitFlush();
 	UINT64 BitRead(int nBits, bool fPeek = false);
-	void BitByteAlign(), BitFlush();
 	HRESULT ByteRead(BYTE* pData, __int64 len);
 
-	bool IsStreaming()		const {
-		return m_fStreaming;
-	}
-	bool IsRandomAccess()	const {
-		return m_fRandomAccess;
-	}
+	bool IsStreaming() const { return m_fStreaming; }
+	bool IsRandomAccess() const { return m_fRandomAccess; }
 
-	void SetBreakHandle(HANDLE hBreak) {
-		m_hBreak = hBreak;
-	}
+	void SetBreakHandle(HANDLE hBreak) { m_hBreak = hBreak; }
 };
