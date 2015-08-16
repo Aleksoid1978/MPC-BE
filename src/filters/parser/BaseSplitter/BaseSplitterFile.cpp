@@ -167,15 +167,15 @@ HRESULT CBaseSplitterFile::WaitData(__int64 pos)
 {
 	UpdateLength();
 
-	if (pos < m_available) {
+	if (pos <= m_available) {
 		return S_OK;
 	}
-	if (pos >= m_len || m_lentick_actual + 10000 < GetTickCount()) {
+	if (pos > m_len || m_lentick_actual + 10000 < GetTickCount()) {
 		return E_FAIL;
 	}
 
 	int n = 0;
-	while (pos >= m_available) {
+	while (pos > m_available) {
 		__int64 available = m_available;
 		Sleep(1000); // wait for 1 second until the data is loaded (TODO: specify size of the buffer when streaming)
 		UpdateLength();
