@@ -126,7 +126,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	Seek(0);
 	if (IsRandomAccess() || IsStreaming()) {
 
-		SearchPrograms(0, min(GetLength(), IsStreaming() ? MEGABYTE : MEGABYTE * 5)); // max 5Mb for search a valid Program Map Table
+		SearchPrograms(0, min(GetLength(), IsStreaming() ? MEGABYTE / 2 : MEGABYTE * 5)); // max 5Mb for search a valid Program Map Table
 
 		__int64 pfp = 0;
 		const int k = 20;
@@ -433,7 +433,7 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 	}
 
 	Seek(start);
-	stop = min(stop, GetLength());
+	stop = min(stop, GetAvailable());
 
 	while (GetPos() < stop) {
 		trhdr h;
@@ -449,11 +449,19 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop)
 {
 	Seek(start);
-	stop = min(stop, GetLength());
 
-	while (GetPos() < stop) {
-		BYTE b;
+	stop = min(stop, GetAvailable());
 
+	for (;;) {
+		if (IsStreaming()) {
+			stop = min(stop, GetAvailable());
+		}
+
+		if (GetPos() >= stop) {
+			break;
+		}
+
+		BYTE b = 0;
 		if (m_type == MPEG_TYPES::mpeg_ps) {
 			if (!NextMpegStartCode(b)) {
 				continue;
