@@ -128,39 +128,26 @@ __int64 CBaseSplitterFile::GetPos()
 	return m_pos - (m_bitlen>>3);
 }
 
-HRESULT CBaseSplitterFile::UpdateLength()
+void CBaseSplitterFile::UpdateLength()
 {
 	if (m_fRandomAccess && !m_fStreaming) {
-		return S_FALSE;
+		return;
 	}
 
-	// call the m_pAsyncReader->Length() is not more than 1 time per second
-	DWORD t = GetTickCount();
-	if (m_lentick_prev + 1000 < t || m_lentick_prev > t) {
-		m_lentick_prev = t;
+	__int64 total = 0;
+	__int64 available = 0;
+	HRESULT hr = m_pAsyncReader->Length(&total, &available);
 
-		__int64 total = 0;
-		__int64 available = 0;
-		HRESULT hr = m_pAsyncReader->Length(&total, &available);
+	m_available = available;
 
-		if (m_available != available) {
-			m_lentick_actual = t;
-			m_available = available;
+	if (m_fStreaming) {
+		m_len = available;
+	} else {
+		m_len = total;
+		if (total == available) {
+			m_fRandomAccess = true;
 		}
-
-		if (m_fStreaming) {
-			m_len = available;
-		} else {
-			m_len = total;
-			if (total == available) {
-				m_fRandomAccess = true;
-			}
-		}
-
-		return hr;
 	}
-	
-	return S_FALSE;
 }
 
 HRESULT CBaseSplitterFile::WaitData(__int64 pos)
