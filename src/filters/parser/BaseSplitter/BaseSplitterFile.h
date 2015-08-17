@@ -47,7 +47,7 @@ class CBaseSplitterFile
 	HANDLE  m_hBreak         = NULL;
 
 	void UpdateLength();
-	HRESULT WaitData(__int64 pos);
+	bool WaitData(__int64 pos);
 
 	HRESULT Read(BYTE* pData, int len);
 

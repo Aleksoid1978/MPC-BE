@@ -158,17 +158,8 @@ void CBaseSplitterFile::UpdateLength()
 	}
 }
 
-HRESULT CBaseSplitterFile::WaitData(__int64 pos)
+bool CBaseSplitterFile::WaitData(__int64 pos)
 {
-	UpdateLength();
-
-	if (pos <= m_available) {
-		return S_OK;
-	}
-	if (pos > m_len) {
-		return E_FAIL;
-	}
-
 	int n = 0;
 	while (pos > m_available) {
 		__int64 available = m_available;
@@ -177,18 +168,18 @@ HRESULT CBaseSplitterFile::WaitData(__int64 pos)
 		
 		if (available == m_available) {
 			if (++n >= 10) {
-				return E_FAIL;
+				return false;
 			}
 		} else {
 			n = 0;
 		}
 
 		if (m_hBreak && WaitForSingleObject(m_hBreak, 0) == WAIT_OBJECT_0) {
-			return E_FAIL; // 
+			return false;
 		}
 	}
 
-	return S_OK;
+	return true;
 }
 
 __int64 CBaseSplitterFile::GetAvailable()
@@ -225,11 +216,17 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 {
 	CheckPointer(m_pAsyncReader, E_NOINTERFACE);
 
-	HRESULT hr = WaitData(m_pos + len);
-	if (S_OK != hr) {
-		return hr;
+	UpdateLength();
+	__int64 new_pos = m_pos + len;
+
+	if (new_pos > m_len) {
+		return E_FAIL;
+	}
+	if (m_fmode == FM_FILE_DL && new_pos > m_available && !WaitData(new_pos)) {
+		return E_FAIL;
 	}
 
+	HRESULT hr = S_OK;
 	if (m_cachetotal == 0 || !m_pCache) {
 		hr = m_pAsyncReader->SyncRead(m_pos, len, pData);
 		m_pos += len;
