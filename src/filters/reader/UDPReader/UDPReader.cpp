@@ -469,29 +469,27 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 	DWORD len = dwBytesToRead;
 	BYTE* ptr = pbBuffer;
 
-	while (len > 0 && !m_packets.IsEmpty()) {
-		CAutoLock cAutoLock(&m_csLock);
-		POSITION pos = m_packets.GetHeadPosition();
-		while (pos && len > 0) {
-			packet_t* p = m_packets.GetNext(pos);
+	CAutoLock cAutoLock(&m_csLock);
+	POSITION pos = m_packets.GetHeadPosition();
+	while (pos && len > 0) {
+		packet_t* p = m_packets.GetNext(pos);
 
-			if (p->m_start <= m_pos && m_pos < p->m_end) {
-				DWORD size;
+		if (p->m_start <= m_pos && m_pos < p->m_end) {
+			DWORD size;
 
-				if (m_pos < p->m_start) {
-					ASSERT(0);
-					size = (DWORD)min(len, p->m_start - m_pos);
-					memset(ptr, 0, size);
-				} else {
-					size = (DWORD)min(len, p->m_end - m_pos);
-					memcpy(ptr, &p->m_buff[m_pos - p->m_start], size);
-				}
-
-				m_pos += size;
-
-				ptr += size;
-				len -= size;
+			if (m_pos < p->m_start) {
+				ASSERT(0);
+				size = (DWORD)min(len, p->m_start - m_pos);
+				memset(ptr, 0, size);
+			} else {
+				size = (DWORD)min(len, p->m_end - m_pos);
+				memcpy(ptr, &p->m_buff[m_pos - p->m_start], size);
 			}
+
+			m_pos += size;
+
+			ptr += size;
+			len -= size;
 		}
 	}
 
