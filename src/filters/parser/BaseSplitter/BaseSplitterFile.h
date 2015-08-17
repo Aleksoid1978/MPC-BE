@@ -23,6 +23,11 @@
 
 #include <atlcoll.h>
 
+#define FM_FILE     1 // complete file or stream of known size (local file, VTS Reader, File Source (Async.))
+#define FM_FILE_DL  2 // downloading stream of known size (File Source (URL) for files < 4 GB)
+#define FM_FILE_VAR 4 // local file whose size increases
+#define FM_STREAM   8 // downloading stream of unknown size
+
 class CBaseSplitterFile
 {
 	CComPtr<IAsyncReader> m_pAsyncReader;
@@ -37,19 +42,14 @@ class CBaseSplitterFile
 	UINT64  m_bitbuff        = 0;
 	int     m_bitlen         = 0;
 
-	bool    m_fStreaming     = false;
-	bool    m_fRandomAccess  = false;
-	// m_fRandomAccess == true  && m_fStreaming == false - complete file or stream of known size
-	// m_fRandomAccess == false && m_fStreaming == false - downloading stream of known size
-	// m_fRandomAccess == false && m_fStreaming == true  - downloading stream of unknown size
-	// m_fRandomAccess == true  && m_fStreaming == true  - local file whose size increases
+	int     m_fmode          = 0;
 
 	HANDLE  m_hBreak         = NULL;
 
 	void UpdateLength();
 	HRESULT WaitData(__int64 pos);
 
-	virtual HRESULT Read(BYTE* pData, int len); // use ByteRead
+	HRESULT Read(BYTE* pData, int len);
 
 	// thread to determine the local file whose size increases
 	DWORD ThreadProc();
@@ -58,7 +58,7 @@ class CBaseSplitterFile
 	CAMEvent m_evStop;
 
 public:
-	CBaseSplitterFile(IAsyncReader* pReader, HRESULT& hr, bool fRandomAccess = true, bool fStreaming = false, bool fStreamingDetect = false);
+	CBaseSplitterFile(IAsyncReader* pReader, HRESULT& hr, int fmode = FM_FILE);
 	~CBaseSplitterFile();
 
 	bool SetCacheSize(int cachelen);
@@ -79,8 +79,9 @@ public:
 	UINT64 BitRead(int nBits, bool fPeek = false);
 	HRESULT ByteRead(BYTE* pData, __int64 len);
 
-	bool IsStreaming() const { return m_fStreaming; }
-	bool IsRandomAccess() const { return m_fRandomAccess; }
+	bool IsStreaming() const { return m_fmode == FM_STREAM; }
+	bool IsRandomAccess() const { return m_fmode == FM_FILE || m_fmode == FM_FILE_VAR; }
+	bool IsVariableSize() const { return m_fmode == FM_FILE_VAR; }
 
 	void SetBreakHandle(HANDLE hBreak) { m_hBreak = hBreak; }
 };

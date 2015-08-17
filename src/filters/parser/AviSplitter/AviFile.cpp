@@ -29,7 +29,7 @@
 //
 
 CAviFile::CAviFile(IAsyncReader* pAsyncReader, HRESULT& hr)
-	: CBaseSplitterFileEx(pAsyncReader, hr)
+	: CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE)
 {
 	if (FAILED(hr)) {
 		return;

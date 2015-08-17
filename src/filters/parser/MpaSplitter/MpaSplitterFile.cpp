@@ -32,7 +32,7 @@
 #define MPA_HEADER_SIZE 4	// MPEG-Audio Header Size
 
 CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
-	: CBaseSplitterFileEx(pAsyncReader, hr, false, true, true)
+	: CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_STREAM)
 	, m_mode(none)
 	, m_rtDuration(0)
 	, m_startpos(0)

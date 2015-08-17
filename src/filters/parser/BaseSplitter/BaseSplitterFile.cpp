@@ -27,7 +27,7 @@
 // CBaseSplitterFile
 //
 
-CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bool fRandomAccess, bool fStreaming, bool fStreamingDetect)
+CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, int fmode)
 	: m_pAsyncReader(pAsyncReader)
 	, m_hThread(NULL)
 {
@@ -42,18 +42,26 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, bo
 		return;
 	}
 
-	m_fStreaming	= (total == 0 && available > 0);
-	m_fRandomAccess	= (total > 0 && total == available);
+	if (total > 0 && total == available) {
+		m_fmode = FM_FILE;
+	}
+	else if (total > 0 && available < total) {
+		m_fmode = FM_FILE_DL;
+	}
+	else if (total == 0 && available > 0) {
+		m_fmode = FM_STREAM;
+	}
 
-	if ((fRandomAccess && !m_fRandomAccess) || (!fStreaming && m_fStreaming) || total < 0) {
+	if (!m_fmode && (m_fmode & (fmode^FM_FILE_VAR))) {
 		hr = E_FAIL;
 		return;
 	}
 
-	m_len		= m_fStreaming ? available : total;
+	m_len		= m_fmode == FM_STREAM ? available : total;
 	m_available	= available;
 
-	if (m_fRandomAccess && !m_fStreaming && fStreamingDetect) {
+
+	if (m_fmode == FM_FILE && (fmode & FM_FILE_VAR)) {
 		m_evStop.Reset();
 		DWORD ThreadId = 0;
 		m_hThread = ::CreateThread(NULL, 0, StaticThreadProc, (LPVOID)this, CREATE_SUSPENDED, &ThreadId);
@@ -99,7 +107,7 @@ DWORD CBaseSplitterFile::ThreadProc()
 			m_pAsyncReader->Length(&total, &available);
 			if (m_available && m_available < available) {
 				// local file whose size increases
-				m_fStreaming = true;
+				m_fmode = FM_FILE_VAR;
 
 				return 0;
 			}
@@ -129,7 +137,7 @@ __int64 CBaseSplitterFile::GetPos()
 
 void CBaseSplitterFile::UpdateLength()
 {
-	if (m_fRandomAccess && !m_fStreaming) {
+	if (m_fmode == FM_FILE) {
 		return;
 	}
 
@@ -139,12 +147,13 @@ void CBaseSplitterFile::UpdateLength()
 
 	m_available = available;
 
-	if (m_fStreaming) {
+	if (m_fmode & (FM_FILE_VAR | FM_STREAM)) {
 		m_len = available;
-	} else {
+	}
+	else {
 		m_len = total;
 		if (total == available) {
-			m_fRandomAccess = true;
+			m_fmode = FM_FILE;
 		}
 	}
 }
