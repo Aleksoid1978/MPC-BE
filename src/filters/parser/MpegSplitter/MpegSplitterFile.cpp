@@ -80,8 +80,8 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	Seek(0);
 	if (m_type == MPEG_TYPES::mpeg_invalid) {
+		Seek(0);
 		int cnt = 0, limit = 4;
 		for (pvahdr h; cnt < limit && Read(h); cnt++) {
 			Seek(GetPos() + h.length);
@@ -91,8 +91,9 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	Seek(0);
+
 	if (m_type == MPEG_TYPES::mpeg_invalid) {
+		Seek(0);
 		int cnt = 0, limit = 4;
 
 		BYTE b;
@@ -123,10 +124,11 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		return E_FAIL;
 	}
 
-	Seek(0);
-	if (IsRandomAccess() || IsStreaming()) {
+	if (IsRandomAccess()) {
+		__int64 len = GetLength();
+		len = min(len, 5 * MEGABYTE);
 
-		SearchPrograms(0, min(GetLength(), IsStreaming() ? MEGABYTE / 2 : MEGABYTE * 5)); // max 5Mb for search a valid Program Map Table
+		SearchPrograms(0, len);
 
 		__int64 pfp = 0;
 		const int k = 20;
@@ -138,8 +140,25 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			SearchStreams(fp, nfp);
 			pfp = nfp;
 		}
-	} else {
-		SearchStreams(0, MEGABYTE / 2);
+	}
+	else if (IsStreaming()) {
+		__int64 len = GetAvailable();
+		int n = 0;
+		while (len < 512 * KILOBYTE && ++n < 10) { // wait 512 สม but no more 1 seconds
+			Sleep(100);
+			len = GetAvailable();
+		}
+		len = min(len, MEGABYTE); // limit just in case
+
+		SearchPrograms(0, len);
+		SearchStreams(0, len);
+	}
+	else { // downloading
+		__int64 len = GetLength();
+		len = min(len, 512 * KILOBYTE);
+
+		SearchPrograms(0, len);
+		SearchStreams(0, len);
 	}
 
 	if (!m_bIsBD) {
@@ -433,7 +452,6 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 	}
 
 	Seek(start);
-	stop = min(stop, GetAvailable());
 
 	while (GetPos() < stop) {
 		trhdr h;
@@ -450,13 +468,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop)
 {
 	Seek(start);
 
-	stop = min(stop, GetAvailable());
-
 	for (;;) {
-		if (IsStreaming()) {
-			stop = min(stop, GetAvailable());
-		}
-
 		if (GetPos() >= stop) {
 			break;
 		}
@@ -558,8 +570,6 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop)
 			Seek(pos + h.length);
 		}
 	}
-
-	return;
 }
 
 #define MPEG_AUDIO					(1ULL << 0)
