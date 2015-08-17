@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -65,8 +65,8 @@ CFilterApp theApp;
 
 #endif
 
-#define MAXSTORESIZE	10 * MEGABYTE	// The maximum size of a buffer for storing the received information
-#define MAXBUFSIZE		65536			// Max UDP Packet size is 64 Kbyte
+#define MAXSTORESIZE 10485760 // The maximum size of a buffer for storing the received information is 10 Mb
+#define MAXBUFSIZE   16384    // The maximum packet size is 16 Kb
 
 //
 // CUDPReader
@@ -140,8 +140,8 @@ STDMETHODIMP CUDPReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 	m_fn = pszFileName;
 
 	CMediaType mt;
-	mt.majortype	= MEDIATYPE_Stream;
-	mt.subtype		= m_stream.GetSubtype();
+	mt.majortype = MEDIATYPE_Stream;
+	mt.subtype = m_stream.GetSubtype();
 	m_mt = mt;
 
 	return S_OK;
@@ -449,12 +449,11 @@ HRESULT CUDPStream::SetPointer(LONGLONG llPos)
 	if (m_packets.IsEmpty() && llPos != 0
 			|| !m_packets.IsEmpty() && llPos < m_packets.GetHead()->m_start
 			|| !m_packets.IsEmpty() && llPos > m_packets.GetTail()->m_end) {
-		//TRACE(_T("CUDPStream: SetPointer error - %lld, [%I64d -> %I64d]\n"), llPos, m_packets.GetHead()->m_start, m_packets.GetTail()->m_end);
 #ifdef _DEBUG
 		if (m_packets.IsEmpty()) {
-			DbgLog((LOG_TRACE, 3, L"CUDPStream: SetPointer error - %lld, buffer is empty", llPos));
+			DbgLog((LOG_TRACE, 3, L"CUDPStream::SetPointer() error - %lld, buffer is empty", llPos));
 		} else {
-			DbgLog((LOG_TRACE, 3, L"CUDPStream: SetPointer error - %lld, [%I64d -> %I64d]", llPos, m_packets.GetHead()->m_start, m_packets.GetTail()->m_end));
+			DbgLog((LOG_TRACE, 3, L"CUDPStream::SetPointer() error - %lld, [%I64d -> %I64d]", llPos, m_packets.GetHead()->m_start, m_packets.GetTail()->m_end));
 		}
 #endif
 		return E_FAIL;
@@ -467,12 +466,11 @@ HRESULT CUDPStream::SetPointer(LONGLONG llPos)
 
 HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWORD pdwBytesRead)
 {
-	CAutoLock cAutoLock(&m_csLock);
-
 	DWORD len = dwBytesToRead;
 	BYTE* ptr = pbBuffer;
 
 	while (len > 0 && !m_packets.IsEmpty()) {
+		CAutoLock cAutoLock(&m_csLock);
 		POSITION pos = m_packets.GetHeadPosition();
 		while (pos && len > 0) {
 			packet_t* p = m_packets.GetNext(pos);
@@ -497,11 +495,11 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 		}
 	}
 
-	CheckBuffer();
-
 	if (pdwBytesRead) {
 		*pdwBytesRead = ptr - pbBuffer;
 	}
+
+	CheckBuffer();
 
 	return S_OK;
 }
@@ -546,12 +544,18 @@ void CUDPStream::CheckBuffer()
 		return;
 	}
 
-	while (GetPacketsSize() > MAXSTORESIZE) {
-		if (!m_packets.IsEmpty() && m_packets.GetHead()->m_start >= m_pos - 128 * KILOBYTE) {
-			break;
-		}
+	while (!m_packets.IsEmpty() && m_packets.GetHead()->m_start < m_pos - 256 * KILOBYTE) {
 		delete m_packets.RemoveHead();
 	}
+
+#ifdef _DEBUG
+	if (!m_packets.IsEmpty()) {
+		DbgLog((LOG_TRACE, 3, L"CUDPStream: CheckBuffer() : size = %I64d[%I64d -> %I64d], pos = %I64d, available = %I64d",
+			m_packets.GetTail()->m_end - m_packets.GetHead()->m_start, m_packets.GetHead()->m_start, m_packets.GetTail()->m_end,
+			m_pos, m_packets.GetTail()->m_end - m_pos));
+	}
+#endif
+
 }
 
 DWORD CUDPStream::ThreadProc()
@@ -582,61 +586,61 @@ DWORD CUDPStream::ThreadProc()
 #endif
 				return 0;
 			case CMD_STOP:
-			case CMD_PAUSE:
 				Reply(S_OK);
 				break;
 			case CMD_INIT:
 				if (m_protocol == PR_HTTP) {
 					m_HttpSocket.Attach(m_HttpSocketTread);
 				}
+			case CMD_PAUSE:
 			case CMD_RUN:
 				Reply(S_OK);
-				if (GetPacketsSize() < MAXSTORESIZE) {
-					char  buff[MAXBUFSIZE * 2];
-					int   buffsize = 0;
-					UINT  attempts = 0;
+				char  buff[MAXBUFSIZE * 2];
+				int   buffsize = 0;
+				UINT  attempts = 0;
 
-					do {
-						int len =  0;
+				do {
+					int len = 0;
 
-						if (m_protocol == PR_UDP) {
-							DWORD res = WSAWaitForMultipleEvents(1, m_WSAEvent, FALSE, 100, FALSE);
-							if (res == WSA_WAIT_EVENT_0) {
-								WSAResetEvent(m_WSAEvent[0]);
-								int fromlen = sizeof(m_addr);
-								len = recvfrom(m_UdpSocket, &buff[buffsize], MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
-								if (len <= 0) {
-									int err = WSAGetLastError();
-									if (err != WSAEWOULDBLOCK) {
-										attempts++;
-									}
-									continue;
-								}
-							} else {
-								attempts++;
-								continue;
-							}
-						}
-						else if (m_protocol == PR_HTTP) {
-							len = m_HttpSocket.Receive(&buff[buffsize], MAXBUFSIZE);
+					if (m_protocol == PR_UDP) {
+						DWORD res = WSAWaitForMultipleEvents(1, m_WSAEvent, FALSE, 100, FALSE);
+						if (res == WSA_WAIT_EVENT_0) {
+							WSAResetEvent(m_WSAEvent[0]);
+							int fromlen = sizeof(m_addr);
+							len = recvfrom(m_UdpSocket, &buff[buffsize], MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
 							if (len <= 0) {
-								attempts++;
+								int err = WSAGetLastError();
+								if (err != WSAEWOULDBLOCK) {
+									attempts++;
+								}
 								continue;
 							}
-							attempts = 0;
+						} else {
+							attempts++;
+							continue;
 						}
+					} else if (m_protocol == PR_HTTP) {
+						len = m_HttpSocket.Receive(&buff[buffsize], MAXBUFSIZE);
+						if (len <= 0) {
+							attempts++;
+							continue;
+						}
+						attempts = 0;
+					}
 
-						buffsize += len;
-						if (buffsize >= MAXBUFSIZE) {
+					buffsize += len;
+					if (buffsize >= MAXBUFSIZE) {
 #ifdef _DEBUG
-							if (dump) { fwrite(buff, buffsize, 1, dump); }
+						if (dump) { fwrite(buff, buffsize, 1, dump); }
 #endif
-							Append((BYTE*)buff, buffsize);
-							buffsize = 0;
-						}
-					} while (!CheckRequest(NULL) && attempts < 10);
-				}
+						Append((BYTE*)buff, buffsize);
+						buffsize = 0;
+					}
 
+					while (GetPacketsSize() > MAXSTORESIZE && !CheckRequest(NULL)) {
+						Sleep(1000);
+					}
+				} while (!CheckRequest(NULL) && attempts < 10);
 				break;
 		}
 	}
