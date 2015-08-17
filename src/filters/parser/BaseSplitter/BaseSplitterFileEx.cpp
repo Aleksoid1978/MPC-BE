@@ -38,10 +38,10 @@
 // CBaseSplitterFileEx
 //
 
-CBaseSplitterFileEx::CBaseSplitterFileEx(IAsyncReader* pReader, HRESULT& hr, bool fRandomAccess, bool fStreaming, bool fStreamingDetect)
-	: CBaseSplitterFile(pReader, hr, fRandomAccess, fStreaming, fStreamingDetect)
+CBaseSplitterFileEx::CBaseSplitterFileEx(IAsyncReader* pReader, HRESULT& hr, int fmode)
+	: CBaseSplitterFile(pReader, hr, fmode)
 	, m_tslen(0)
-	,m_rtPTSOffset(0)
+	, m_rtPTSOffset(0)
 {
 }
 

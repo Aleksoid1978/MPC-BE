@@ -438,7 +438,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	HRESULT hr = E_FAIL;
 	m_pFile.Free();
 
-	m_pFile.Attach(DNew CBaseSplitterFileEx(pAsyncReader, hr, false, true, true));
+	m_pFile.Attach(DNew CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_STREAM));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}

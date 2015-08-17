@@ -491,7 +491,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_ForcedSub(false)
 	, m_AC3CoreOnly(0)
 	, m_SubEmptyPin(false)
-	, m_bIsStreamingSupport(false)
 {
 #ifdef REGISTER_FILTER
 	CRegKey key;
@@ -1150,7 +1149,6 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	} else if (rt_IfoDuration) {
 		m_rtDuration = rt_IfoDuration;
 	} else if (m_pFile->IsRandomAccess() && m_pFile->m_rate) {
-		m_bIsStreamingSupport = true;
 		m_rtDuration = UNITS * m_pFile->GetLength() / m_pFile->m_rate;
 	}
 
@@ -1164,7 +1162,7 @@ STDMETHODIMP CMpegSplitterFilter::GetDuration(LONGLONG* pDuration)
 	CheckPointer(pDuration, E_POINTER);
 	CheckPointer(m_pFile, VFW_E_NOT_CONNECTED);
 
-	if (m_bIsStreamingSupport) {
+	if (m_pFile->IsVariableSize()) {
 		*pDuration = m_rtNewStop = m_rtStop = m_rtDuration = UNITS * m_pFile->GetLength() / m_pFile->m_rate;
 	} else {
 		*pDuration = m_rtDuration;

@@ -37,7 +37,7 @@ protected :
 	REFERENCE_TIME m_rtPTSOffset;
 
 public:
-	CBaseSplitterFileEx(IAsyncReader* pReader, HRESULT& hr, bool fRandomAccess = true, bool fStreaming = false, bool fStreamingDetect = false);
+	CBaseSplitterFileEx(IAsyncReader* pReader, HRESULT& hr, int fmode = FM_FILE);
 	virtual ~CBaseSplitterFileEx();
 
 	bool NextMpegStartCode(BYTE& b, __int64 len = 65536);
