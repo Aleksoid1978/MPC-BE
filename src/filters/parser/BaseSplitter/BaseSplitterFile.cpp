@@ -42,6 +42,15 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, in
 		return;
 	}
 
+	if (!available && (fmode & FM_STREAM)) {
+		DbgLog((LOG_TRACE, 3, L"BaseSplitter : no data available in streaming mode, wait and try again."));
+		Sleep(500);
+		hr = m_pAsyncReader->Length(&total, &available);
+		if (FAILED(hr)) {
+			return;
+		}
+	}
+
 	if (total > 0 && total == available) {
 		m_fmode = FM_FILE;
 	}
