@@ -34,7 +34,7 @@ class CBaseSplitterFile
 	__int64 m_pos            = 0;
 	__int64 m_len            = 0;
 	__int64 m_available      = 0;
-	bool    m_noconnåct      = false;
+	bool    m_noconnect      = false;
 
 	CAutoVectorPtr<BYTE> m_pCache;
 	__int64 m_cachepos       = 0;
