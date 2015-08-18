@@ -149,7 +149,7 @@ void CBaseSplitterFile::UpdateLength()
 	// TODO
 	//if (m_available != available) {
 	//	m_available = available;
-	//	m_noconnect = false;
+	//	m_bConnectionLost = false;
 	//}
 
 	if (m_fmode & (FM_FILE_VAR | FM_STREAM)) {
@@ -173,7 +173,7 @@ bool CBaseSplitterFile::WaitData(__int64 pos)
 		
 		if (available == m_available) {
 			if (++n >= 10) {
-				m_noconnect = true;
+				m_bConnectionLost = true;
 				DbgLog((LOG_TRACE, 3, L"BaseSplitter : no new data more than 10 seconds, most likely loss of connection."));
 				return false;
 			}
@@ -207,7 +207,7 @@ __int64 CBaseSplitterFile::GetRemaining()
 {
 	UpdateLength();
 
-	return m_noconnect ? 0 : m_len - GetPos();
+	return m_bConnectionLost ? 0 : m_len - GetPos();
 }
 
 void CBaseSplitterFile::Seek(__int64 pos)
@@ -233,7 +233,7 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 	UpdateLength();
 	__int64 new_pos = m_pos + len;
 
-	if (new_pos > m_len || m_noconnect) {
+	if (new_pos > m_len || m_bConnectionLost) {
 		return E_FAIL;
 	}
 	if (m_fmode == FM_FILE_DL && new_pos > m_available && !WaitData(new_pos)) {

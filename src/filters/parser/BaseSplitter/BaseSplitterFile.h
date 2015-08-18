@@ -31,21 +31,21 @@
 class CBaseSplitterFile
 {
 	CComPtr<IAsyncReader> m_pAsyncReader;
-	__int64 m_pos            = 0;
-	__int64 m_len            = 0;
-	__int64 m_available      = 0;
-	bool    m_noconnect      = false;
+	__int64 m_pos             = 0;
+	__int64 m_len             = 0;
+	__int64 m_available       = 0;
+	bool    m_bConnectionLost = false;
 
 	CAutoVectorPtr<BYTE> m_pCache;
-	__int64 m_cachepos       = 0;
-	int     m_cachelen       = 0;
-	int     m_cachetotal     = 0;
-	UINT64  m_bitbuff        = 0;
-	int     m_bitlen         = 0;
+	__int64 m_cachepos        = 0;
+	int     m_cachelen        = 0;
+	int     m_cachetotal      = 0;
+	UINT64  m_bitbuff         = 0;
+	int     m_bitlen          = 0;
 
-	int     m_fmode          = 0;
+	int     m_fmode           = 0;
 
-	HANDLE  m_hBreak         = NULL;
+	HANDLE  m_hBreak          = NULL;
 
 	void UpdateLength();
 	bool WaitData(__int64 pos);
