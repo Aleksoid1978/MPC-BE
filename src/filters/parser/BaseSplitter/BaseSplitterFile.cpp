@@ -132,7 +132,7 @@ bool CBaseSplitterFile::SetCacheSize(int cachelen)
 
 __int64 CBaseSplitterFile::GetPos()
 {
-	return m_pos - (m_bitlen>>3);
+	return m_pos - (m_bitlen >> 3);
 }
 
 void CBaseSplitterFile::UpdateLength()
@@ -154,8 +154,7 @@ void CBaseSplitterFile::UpdateLength()
 
 	if (m_fmode & (FM_FILE_VAR | FM_STREAM)) {
 		m_len = available;
-	}
-	else {
+	} else {
 		m_len = total;
 		if (total == available) {
 			m_fmode = FM_FILE;
@@ -173,8 +172,8 @@ bool CBaseSplitterFile::WaitData(__int64 pos)
 		
 		if (available == m_available) {
 			if (++n >= 10) {
-				m_bConnectionLost = true;
 				DbgLog((LOG_TRACE, 3, L"BaseSplitter : no new data more than 10 seconds, most likely loss of connection."));
+				m_bConnectionLost = true;
 				return false;
 			}
 		} else {
@@ -226,14 +225,36 @@ void CBaseSplitterFile::Skip(__int64 offset)
 	}
 }
 
+HRESULT CBaseSplitterFile::SyncRead(BYTE* pData, int& len)
+{
+	HRESULT hr = m_pAsyncReader->SyncRead(m_pos, len, pData);
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	if (hr == S_FALSE && IsStreaming()) {
+		int read = 0;
+		DbgLog((LOG_TRACE, 3, L"CBaseSplitterFile::SyncRead() - we reached the end of data (pos: %I64d), but the size of the data changes, trying reading manually", m_pos));
+		do {
+			hr = m_pAsyncReader->SyncRead(m_pos, 1, pData + read);
+		} while (hr == S_OK && (++read) < len);
+		DbgLog((LOG_TRACE, 3, L"	-> Read %d bytes", read));
+		
+		len = read;
+	}
+
+	return hr;
+}
+
 HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 {
 	CheckPointer(m_pAsyncReader, E_NOINTERFACE);
 
-	UpdateLength();
 	__int64 new_pos = m_pos + len;
-
-	if (new_pos > m_len || m_bConnectionLost) {
+	if (m_fmode == FM_FILE_VAR || m_fmode == FM_FILE_DL) {
+		UpdateLength();
+	}
+	if (!IsStreaming() && (new_pos > m_len || m_bConnectionLost)) {
 		return E_FAIL;
 	}
 	if (m_fmode == FM_FILE_DL && new_pos > m_available && !WaitData(new_pos)) {
@@ -242,7 +263,7 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 
 	HRESULT hr = S_OK;
 	if (m_cachetotal == 0 || !m_pCache) {
-		hr = m_pAsyncReader->SyncRead(m_pos, len, pData);
+		hr = SyncRead(pData, len);
 		m_pos += len;
 		return hr;
 	}
@@ -260,7 +281,7 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 	}
 
 	while (len > m_cachetotal) {
-		hr = m_pAsyncReader->SyncRead(m_pos, m_cachetotal, pData);
+		hr = SyncRead(pData, m_cachetotal);
 		if (S_OK != hr) {
 			return hr;
 		}
@@ -271,14 +292,14 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 	}
 
 	while (len > 0) {
-		__int64 tmplen = m_available - m_pos;
+		__int64 tmplen = IsStreaming() ? m_cachetotal: m_available - m_pos;
 		int maxlen = min(tmplen, m_cachetotal);
 		int minlen = min(len, maxlen);
 		if (minlen <= 0) {
 			return S_FALSE;
 		}
 
-		hr = m_pAsyncReader->SyncRead(m_pos, maxlen, pCache);
+		hr = SyncRead(pCache, maxlen);
 		if (S_OK != hr) {
 			return hr;
 		}

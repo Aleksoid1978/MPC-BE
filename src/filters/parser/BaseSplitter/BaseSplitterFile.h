@@ -51,6 +51,7 @@ class CBaseSplitterFile
 	bool WaitData(__int64 pos);
 
 	HRESULT Read(BYTE* pData, int len);
+	HRESULT SyncRead(BYTE* pData, int& len);
 
 	// thread to determine the local file whose size increases
 	DWORD ThreadProc();

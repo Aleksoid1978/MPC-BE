@@ -133,6 +133,9 @@ STDMETHODIMP CUDPReader::Run(REFERENCE_TIME tStart)
 
 STDMETHODIMP CUDPReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 {
+	// temporary disable
+	return E_FAIL;
+
 	if (!m_stream.Load(pszFileName)) {
 		return E_FAIL;
 	}
