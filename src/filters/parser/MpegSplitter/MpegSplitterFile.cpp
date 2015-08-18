@@ -144,7 +144,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	else if (IsStreaming()) {
 		__int64 len = GetAvailable();
 		int n = 0;
-		while (len < 512 * KILOBYTE && ++n < 10) { // wait 512 สม but no more 1 seconds
+		while (len < 512 * KILOBYTE && ++n < 10) { // wait 512 KB but no more 1 seconds
 			Sleep(100);
 			len = GetAvailable();
 		}
