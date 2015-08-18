@@ -1148,7 +1148,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_rtDuration = m_rtPlaylistDuration;
 	} else if (rt_IfoDuration) {
 		m_rtDuration = rt_IfoDuration;
-	} else if (m_pFile->IsRandomAccess() && m_pFile->m_rate) {
+	} else if (!m_pFile->IsStreaming() && m_pFile->m_rate) {
 		m_rtDuration = UNITS * m_pFile->GetLength() / m_pFile->m_rate;
 	}
 
