@@ -34,6 +34,7 @@ class CBaseSplitterFile
 	__int64 m_pos            = 0;
 	__int64 m_len            = 0;
 	__int64 m_available      = 0;
+	bool    m_noconnåct      = false;
 
 	CAutoVectorPtr<BYTE> m_pCache;
 	__int64 m_cachepos       = 0;
@@ -66,7 +67,7 @@ public:
 	__int64 GetPos();
 	__int64 GetAvailable();
 	__int64 GetLength();
-	__int64 GetRemaining() { return GetLength() - GetPos(); }
+	__int64 GetRemaining();
 
 	virtual void Seek(__int64 pos);
 	void Skip(__int64 offset);

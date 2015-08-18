@@ -146,6 +146,11 @@ void CBaseSplitterFile::UpdateLength()
 	HRESULT hr = m_pAsyncReader->Length(&total, &available);
 
 	m_available = available;
+	// TODO
+	//if (m_available != available) {
+	//	m_available = available;
+	//	m_noconnåct = false;
+	//}
 
 	if (m_fmode & (FM_FILE_VAR | FM_STREAM)) {
 		m_len = available;
@@ -168,6 +173,7 @@ bool CBaseSplitterFile::WaitData(__int64 pos)
 		
 		if (available == m_available) {
 			if (++n >= 10) {
+				m_noconnåct = true;
 				return false;
 			}
 		} else {
@@ -196,6 +202,13 @@ __int64 CBaseSplitterFile::GetLength()
 	return m_len;
 }
 
+__int64 CBaseSplitterFile::GetRemaining()
+{
+	UpdateLength();
+
+	return m_noconnåct ? 0 : m_len - GetPos();
+}
+
 void CBaseSplitterFile::Seek(__int64 pos)
 {
 	UpdateLength();
@@ -219,7 +232,7 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 	UpdateLength();
 	__int64 new_pos = m_pos + len;
 
-	if (new_pos > m_len) {
+	if (new_pos > m_len || m_noconnåct) {
 		return E_FAIL;
 	}
 	if (m_fmode == FM_FILE_DL && new_pos > m_available && !WaitData(new_pos)) {
