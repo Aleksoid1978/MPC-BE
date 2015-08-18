@@ -660,7 +660,7 @@ STDMETHODIMP CMpegSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 
 HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 {
-	if (m_pFile->IsRandomAccess() && !m_pFile->GetRemaining()) {
+	if (!m_pFile->IsStreaming() && !m_pFile->GetRemaining()) {
 		return E_FAIL;
 	}
 

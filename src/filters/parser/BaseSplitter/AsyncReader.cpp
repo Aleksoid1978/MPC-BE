@@ -28,26 +28,18 @@
 
 CAsyncFileReader::CAsyncFileReader(CString fn, HRESULT& hr)
 	: CUnknown(NAME("CAsyncFileReader"), NULL, &hr)
-	, m_len(ULONGLONG_ERROR)
 	, m_hBreakEvent(NULL)
 	, m_lOsError(0)
 {
 	hr = Open(fn) ? S_OK : E_FAIL;
-	if (SUCCEEDED(hr)) {
-		m_len = GetLength();
-	}
 }
 
 CAsyncFileReader::CAsyncFileReader(CHdmvClipInfo::CPlaylist& Items, HRESULT& hr)
 	: CUnknown(NAME("CAsyncFileReader"), NULL, &hr)
-	, m_len(ULONGLONG_ERROR)
 	, m_hBreakEvent(NULL)
 	, m_lOsError(0)
 {
 	hr = OpenFiles(Items) ? S_OK : E_FAIL;
-	if (SUCCEEDED(hr)) {
-		m_len = GetLength();
-	}
 }
 
 STDMETHODIMP CAsyncFileReader::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -91,11 +83,13 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 
 STDMETHODIMP CAsyncFileReader::Length(LONGLONG* pTotal, LONGLONG* pAvailable)
 {
+	const LONGLONG len = GetLength();
+
 	if (pTotal) {
-		*pTotal = m_len;
+		*pTotal = len;
 	}
 	if (pAvailable) {
-		*pAvailable = GetLength();
+		*pAvailable = len;
 	}
 	return S_OK;
 }

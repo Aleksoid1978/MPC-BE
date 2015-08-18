@@ -43,7 +43,6 @@ public IUnknown {
 class CAsyncFileReader : public CUnknown, public CMultiFiles, public IAsyncReader, public ISyncReader, public IFileHandle
 {
 protected:
-	ULONGLONG m_len;
 	HANDLE m_hBreakEvent;
 	LONG m_lOsError; // CFileException::m_lOsError
 

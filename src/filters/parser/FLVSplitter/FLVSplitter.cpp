@@ -304,7 +304,7 @@ bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, CAtlArray<AMF0
 
 bool CFLVSplitterFilter::ReadTag(Tag& t)
 {
-	if (m_pFile->GetRemaining() < 15) {
+	if (!m_pFile->IsStreaming() && m_pFile->GetRemaining() < 15) {
 		return false;
 	}
 
@@ -327,12 +327,12 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 		DbgLog((LOG_TRACE, 3, L"CFLVSplitterFilter::ReadTag() : Detect wrong TimeStamp offset, corrected [%d -> %d]",  (t.TimeStamp + m_TimeStampOffset), t.TimeStamp));
 	}
 
-	return m_pFile->IsRandomAccess() ? (m_pFile->GetRemaining() >= t.DataSize) : true;
+	return !m_pFile->IsStreaming() ? (m_pFile->GetRemaining() >= t.DataSize) : true;
 }
 
 bool CFLVSplitterFilter::ReadTag(AudioTag& at)
 {
-	if (!m_pFile->GetRemaining()) {
+	if (!m_pFile->IsStreaming() && !m_pFile->GetRemaining()) {
 		return false;
 	}
 
@@ -346,7 +346,7 @@ bool CFLVSplitterFilter::ReadTag(AudioTag& at)
 
 bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 {
-	if (!m_pFile->GetRemaining()) {
+	if (!m_pFile->IsStreaming() && !m_pFile->GetRemaining()) {
 		return false;
 	}
 
@@ -356,7 +356,7 @@ bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 	vt.tsOffset			= 0;
 
 	if (IsAVCCodec(vt.CodecID)) {
-		if (m_pFile->GetRemaining() < 3) {
+		if (!m_pFile->IsStreaming() && m_pFile->GetRemaining() < 3) {
 			return false;
 		}
 
@@ -1225,12 +1225,11 @@ bool CFLVSplitterFilter::DemuxLoop()
 	VideoTag vt = {};
 
 	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
-
-		if (!ReadTag(t) || !ValidateTag(t)) {
+		if (!m_pFile->IsStreaming() && !m_pFile->GetRemaining()) {
 			break;
 		}
 
-		if (!m_pFile->GetRemaining()) {
+		if (!ReadTag(t) || !ValidateTag(t)) {
 			break;
 		}
 
