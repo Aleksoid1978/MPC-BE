@@ -174,6 +174,7 @@ bool CBaseSplitterFile::WaitData(__int64 pos)
 		if (available == m_available) {
 			if (++n >= 10) {
 				m_noconnect = true;
+				DbgLog((LOG_TRACE, 3, L"BaseSplitter : no new data more than 10 seconds, most likely loss of connection."));
 				return false;
 			}
 		} else {

@@ -149,6 +149,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			len = GetAvailable();
 		}
 		len = min(len, MEGABYTE); // limit just in case
+		DbgLog((LOG_TRACE, 3, L"MpegSplitter : use %I64d bytes to search for tracks", len));
 
 		SearchPrograms(0, len);
 		SearchStreams(0, len);
