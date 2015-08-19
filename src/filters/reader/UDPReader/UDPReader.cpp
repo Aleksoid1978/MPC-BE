@@ -133,9 +133,6 @@ STDMETHODIMP CUDPReader::Run(REFERENCE_TIME tStart)
 
 STDMETHODIMP CUDPReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 {
-	// temporary disable
-	return E_FAIL;
-
 	if (!m_stream.Load(pszFileName)) {
 		return E_FAIL;
 	}
@@ -212,7 +209,7 @@ void CUDPStream::Clear()
 
 void CUDPStream::Append(BYTE* buff, int len)
 {
-	CAutoLock cAutoLock(&m_csLock);
+	CAutoLock cPacketLock(&m_csPacketsLock);
 
 	m_packets.AddTail(DNew packet_t(buff, m_len, m_len + len));
 	m_len += len;
@@ -451,7 +448,7 @@ HRESULT CUDPStream::SetPointer(LONGLONG llPos)
 
 	if (m_packets.IsEmpty() && llPos != 0
 			|| !m_packets.IsEmpty() && llPos < m_packets.GetHead()->m_start
-			|| !m_packets.IsEmpty() && llPos > m_packets.GetTail()->m_end) {
+			/*|| !m_packets.IsEmpty() && llPos > m_packets.GetTail()->m_end*/) {
 #ifdef _DEBUG
 		if (m_packets.IsEmpty()) {
 			DbgLog((LOG_TRACE, 3, L"CUDPStream::SetPointer() error - %lld, buffer is empty", llPos));
@@ -472,7 +469,17 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 	DWORD len = dwBytesToRead;
 	BYTE* ptr = pbBuffer;
 
+	if (!m_packets.IsEmpty()
+			&& m_pos + len > m_packets.GetTail()->m_end) {
+		while (!CheckRequest(NULL) && !m_packets.IsEmpty() && m_pos + len > m_packets.GetTail()->m_end) {
+			DbgLog((LOG_TRACE, 3, L"CUDPStream::Read() - wait %I64d bytes, %I64d -> %I64d", m_pos + len - m_packets.GetTail()->m_end, m_packets.GetTail()->m_end, m_pos + len));
+			Sleep(500);
+		}
+	}
+
 	CAutoLock cAutoLock(&m_csLock);
+	CAutoLock cPacketLock(&m_csPacketsLock);
+
 	POSITION pos = m_packets.GetHeadPosition();
 	while (pos && len > 0) {
 		packet_t* p = m_packets.GetNext(pos);
@@ -502,12 +509,13 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 
 	CheckBuffer();
 
-	return S_OK;
+	return len == dwBytesToRead ? E_FAIL : (len > 0 ? S_FALSE : S_OK);
 }
 
 LONGLONG CUDPStream::Size(LONGLONG* pSizeAvailable)
 {
 	CAutoLock cAutoLock(&m_csLock);
+
 	if (pSizeAvailable) {
 		*pSizeAvailable = m_len;
 	}
@@ -532,14 +540,14 @@ void CUDPStream::Unlock()
 
 inline __int64 CUDPStream::GetPacketsSize()
 {
-	CAutoLock cAutoLock(&m_csLock);
+	CAutoLock cPacketLock(&m_csPacketsLock);
 
 	return m_packets.IsEmpty() ? 0 : m_packets.GetTail()->m_end - m_packets.GetHead()->m_start;
 }
 
 void CUDPStream::CheckBuffer()
 {
-	CAutoLock cAutoLock(&m_csLock);
+	CAutoLock cPacketLock(&m_csPacketsLock);
 
 	if (RequestCmd != CMD_RUN) {
 		return;
@@ -556,7 +564,6 @@ void CUDPStream::CheckBuffer()
 			m_pos, m_packets.GetTail()->m_end - m_pos));
 	}
 #endif
-
 }
 
 DWORD CUDPStream::ThreadProc()
@@ -612,6 +619,7 @@ DWORD CUDPStream::ThreadProc()
 							if (len <= 0) {
 								int err = WSAGetLastError();
 								if (err != WSAEWOULDBLOCK) {
+									Sleep(50);
 									attempts++;
 								}
 								continue;
@@ -624,6 +632,7 @@ DWORD CUDPStream::ThreadProc()
 						len = m_HttpSocket.Receive(&buff[buffsize], MAXBUFSIZE);
 						if (len <= 0) {
 							attempts++;
+							Sleep(50);
 							continue;
 						}
 						attempts = 0;
