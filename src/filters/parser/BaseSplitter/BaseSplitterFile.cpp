@@ -61,7 +61,7 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, in
 		m_fmode = FM_STREAM;
 	}
 
-	if (!m_fmode && (m_fmode & (fmode^FM_FILE_VAR))) {
+	if (!(m_fmode & (fmode^FM_FILE_VAR))) {
 		hr = E_FAIL;
 		return;
 	}
