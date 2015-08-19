@@ -211,18 +211,6 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"목록 초기화"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
-6		"기본값"
-7		"최소 큐 패킷:"
-8		"최대 큐 패킷:"
-9		"최소 큐 크기:"
-10		"최대 큐 크기:"
-11		"캐시 크기:"
-12		"KB"
-13		"MB"
-14		"KB"
-END
-
 BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 5		"Source Filters"
 6		"AVI:"
@@ -1008,7 +996,6 @@ BEGIN MENU IDR_POPUPMAIN LINES 213
 END
 
 STRING IDC_BUTTON_EXT_SET		"이 버튼을 클릭하면 파일 형식 그룹이 MPC-BE 실제 파일에 연결됩니다. 새로 추가된 확장자는 보통 회색으로 표시되므로 이 대화상자를 닫기전에 확인하십시오."
-STRING IDC_CACH_SIZE		"파일 작업용 캐시크기(킬로바이트)"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"기본 상태가 다른 스타일을 상속합니다."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"서브픽쳐 버퍼가 0보다 클때 자막 애니메이션을 허용합니다. 이 옵션을 선택하면 CPU사용률이 증가할수있습니다. 자막이 깜박이거나 비정상적으로 출력되면 이 옵션을 해제하십시오."
@@ -1031,11 +1018,6 @@ STRING IDC_DSVMRLOADMIXER		"VMR 출력모드에서 VMR-9혼합모드에 체크�
 STRING IDC_DSVMRYUVMIXER		"렌더러의 호환성을 희생해서라도 성능 향상."
 STRING IDC_DX9RESIZER_COMBO		"그래픽카드에서 픽셸셰이더 2.0 (Pixel Shader 2.0) 를 지원하지 않으면 simple bilinear가 자동으로 선택됩니다."
 STRING IDC_FULLSCREEN_MONITOR_CHECK		"tearing을 줄여주지만 툴바가 안보이게 됩니다. 전체화면을 나가기 위해서는 Ctrl+C 를 누르세요"
-STRING IDC_MAXQUEUE_PACKETS		"데이타를 소스에서 읽기 멈출때 최대 패킷 수(데이타)\n\r큐의 수는 실제 출력 핀의 수와 같습니다"
-STRING IDC_MAXQUEUE_SIZE		"데이타를 소스에서 읽기 멈출때 큐(메가 바이트)의 최대 메모리 크기\n\r큐의 수는 실제 출력 핀의 수와 같습니다"
-STRING IDC_MINQUEUE_PACKETS		"재생을 시작할때 큐의 최소 패킷수(데이타)\n\r큐의 수는 실제 출력 핀의 수와 같습니다"
-STRING IDC_MINQUEUE_SIZE		"재생을 시작할때 큐의 최소 메모리 크기(킬로바이트)\n\r큐의 수는 실제 출력 핀의 수와 같습니다"
-STRING IDC_PERFOMANCE_DEFAULT		"대부분의 피씨에 최적화된 기본값으로 되돌림"
 STRING IDC_REGULARSURF		"재생할 비디오 표면을 표준 오프스크린으로 위치시킵니다."
 STRING IDC_TEXTURESURF2D		"비디오 표면을 텍스쳐처럼 처리하고 2D모드의 버퍼가 가득찰때까지 복사/늘리기를 반복합니다. 이 모드를 사용하기 위해서는 그래픽카드에서 ""32비트, RGBA, 비디오 해상도 크기의 텍스쳐"" 를 2가지 이상 동시에 처리할수 있어야 합니다."
 STRING IDC_TEXTURESURF3D		"비디오 표면을 텍스쳐처럼 처리하고 3D상태에서 두개의 삼각형을 렌더링합니다. 안티-앨리어싱이 활성화되었을 경우 속도가 느려집니다."
@@ -1049,7 +1031,6 @@ STRING IDD_PPAGECAPTURE		"재생::캡쳐장치"
 STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"재생::DVD-Video"
 STRING IDD_PPAGEEXTERNALFILTERS		"외장 필터"
-STRING IDD_PPAGEFILTERSPERFORMANCE		"내장 필터::성능"
 STRING IDD_PPAGEFILTERSPRIORITY		"외장 필터::우선순위"
 STRING IDD_PPAGEFORMATS		"플레이어::형식"
 STRING IDD_PPAGEFULLSCREEN		"Video::전체화면"

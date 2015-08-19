@@ -211,18 +211,6 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"Rétablir"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
-6		"Default"
-7		"Min Queue Packets:"
-8		"Max Queue Packets:"
-9		"Min Queue Size:"
-10		"Max Queue Size:"
-11		"Cache size:"
-12		"KB"
-13		"MB"
-14		"KB"
-END
-
 BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 5		"Source Filters"
 6		"AVI:"
@@ -1008,7 +996,6 @@ BEGIN MENU IDR_POPUPMAIN LINES 213
 END
 
 STRING IDC_BUTTON_EXT_SET		"Après avoir cliqué sur ce bouton, la case à cocher du groupe de format devra refléter l'actuelle association de fichier pour MPC-BE. Une extension nouvellement ajoutée est généralement grisée, il ne faut pas oublier de la sélectionner à nouveau avant de fermer cette boîte de dialogue !"
-STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Etat par défaut devient héréditaire à d'autres styles où il est encore mal défini"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Permet l'utilisation de sous-titres quand on utilise un tampon de subpicture supérieur à 0. La désactivation de cette option fera baisser l'utilisation du processeur. Aussi désactiver la si vous rencontrez des clignotements de sous-titres."
@@ -1031,11 +1018,6 @@ STRING IDC_DSVMRLOADMIXER		"Utiliser VMR en mode mixer, cela signifie que la plu
 STRING IDC_DSVMRYUVMIXER		"Improves performance at the cost of some compatability of the renderer."
 STRING IDC_DX9RESIZER_COMBO		"S'il n'y pas de support des Pixels Shaders 2.0, bilinéaire simple sera utilisé automatiquement."
 STRING IDC_FULLSCREEN_MONITOR_CHECK		"Reduces tearing but prevents the toolbar from being shown. To exit fullscreen in this mode press Ctrl+C."
-STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_REGULARSURF		"La surface Vidéo sera répartie comme une surface régulière hors-champ."
 STRING IDC_TEXTURESURF2D		"La surface vidéo sera répartie comme une texture, mais les fonctions 2D seront utilisées pour copier et l'étendre sur le backbuffer. Nécessite une carte vidéo qui peut allouer des surfaces 32 bits RGBA, non-pouvoir-des-deux textures moyenne et au moins dans la résolution de la vidéo."
 STRING IDC_TEXTURESURF3D		"La surface vidéo sera répartie comme une texture et dessinée comme deux triangles en 3d. Avoir l'antialiasing activé dans la configuration d'affichage pourra avoir un mauvais effet sur la vitesse de rendu."
@@ -1049,7 +1031,6 @@ STRING IDD_PPAGECAPTURE		"Lecture::Capture"
 STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"Lecture::DVD-Video"
 STRING IDD_PPAGEEXTERNALFILTERS		"Filtres externes"
-STRING IDD_PPAGEFILTERSPERFORMANCE		"Filtres internes::Performance"
 STRING IDD_PPAGEFILTERSPRIORITY		"Filtres externes::Priority"
 STRING IDD_PPAGEFORMATS		"Lecteur::Formats"
 STRING IDD_PPAGEFULLSCREEN		"Video::Plein écran"

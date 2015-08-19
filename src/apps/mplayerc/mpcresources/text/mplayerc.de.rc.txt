@@ -211,18 +211,6 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"&Zurücksetzen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
-6		"Standard"
-7		"Min. Queue Pakete:"
-8		"Max. Queue Pakete:"
-9		"Min. Queue Größe:"
-10		"Max. Queue Größe:"
-11		"Cache Größe:"
-12		"kB"
-13		"MB"
-14		"kB"
-END
-
 BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 5		"Quell-Filter"
 6		"AVI:"
@@ -1008,7 +996,6 @@ BEGIN MENU IDR_POPUPMAIN LINES 213
 END
 
 STRING IDC_BUTTON_EXT_SET		"Dieser Button bewirkt die Anzeige der momentan im System zugewiesenen Dateiendungen. Dies bedeutet, dass der Erweiterungen-Eintrag einen grauen Haken bekommt. Um die neu hinzugefügte Endung auch zu aktivieren, muss der graue Haken erneut angeklickt werden."
-STRING IDC_CACH_SIZE		"Cache-Größe für Datei-Operationen (in Kilobytes)"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Standardwert wird auch für andere Styles verwendet, für die noch nichts definiert wurde"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Erlaubt Untertitel-Animation bei einem Puffer größer als 0. Ein Deaktivieren dieser Option spart zudem ein wenig CPU-Zeit. Bei flimmernden Untertiteln diese Option ebenfalls deaktiveren."
@@ -1031,11 +1018,6 @@ STRING IDC_DSVMRLOADMIXER		"Versetzt VMR in den Mixer-Modus. Dies bedeutet, daß
 STRING IDC_DSVMRYUVMIXER		"Verbessert die Leistung auf Kosten der Kompatibilität gewisser Renderer."
 STRING IDC_DX9RESIZER_COMBO		"Sollte keine Pixel-Shader 2.0-Unterstützung vorhanden sein, wird automatisch Simple Bilinear benutzt."
 STRING IDC_FULLSCREEN_MONITOR_CHECK		"Verhindert Tearing aber auch die Anzeige der Steuerelemente. Drücken Sie Strg+C um den Direct3D-Vollbildmodus zu verlassen."
-STRING IDC_MAXQUEUE_PACKETS		"Die maximale Anzahl von Paketen (Daten) in der Warteschlange, wenn das Auslesen von Daten der Quelle stoppt.\n\rDie Anzahl der Warteschlangen ist gleich der Anzahl der aktiven Ausgangs-Pins."
-STRING IDC_MAXQUEUE_SIZE		"Die maximale Größe des Speichers in der Warteschlange (in Megabyte), wenn das Auslesen von Daten der Quelle stoppt.\n\rDie Anzahl der Warteschlangen ist gleich der Anzahl der aktiven Ausgangs-Pins."
-STRING IDC_MINQUEUE_PACKETS		"Die minimale Anzahl von Paketen (Daten) in der Warteschlange, wenn die Wiedergabe startet.\n\rDie Anzahl der Warteschlangen ist gleich der Anzahl der aktiven Ausgangs-Pins."
-STRING IDC_MINQUEUE_SIZE		"Die minimale Größe des Speichers in der Warteschlange (in Kilobyte), wenn die Wiedergabe startet.\n\rDie Anzahl der Warteschlangen ist gleich der Anzahl der aktiven Ausgangs-Pins."
-STRING IDC_PERFOMANCE_DEFAULT		"Auf die für die meisten PC's optimierten Standardeinstellungen zurücksetzen."
 STRING IDC_REGULARSURF		"Video-Oberfläche ist eine normale Offscreen-Oberfläche."
 STRING IDC_TEXTURESURF2D		"Video-Oberfläche ist eine Texture-Oberfläche, aber die 2D-Funktionen werden noch benutzt, um das Bild in den Backpuffer zu kopieren und zu strecken. Benötigt eine Grafikkarte die 32bit, RGBA, Nicht-2er-Potenz-Texturen unterstützt, und zwar mindestens in der Auflösung des Videos."
 STRING IDC_TEXTURESURF3D		"Video-Oberfläche ist eine Texture-Oberfläche und wird als zwei Dreiecke in 3D gezeichnet. In den Anzeigeeigenschaften aktiviertes Antialiasing kann einen bremsenden Effekt auf die Rendering-Geschwindigkeit haben."
@@ -1049,7 +1031,6 @@ STRING IDD_PPAGECAPTURE		"Wiedergabe::Aufnahme"
 STRING IDD_PPAGECOLOR		"Video::Farbkorrektur"
 STRING IDD_PPAGEDVD		"Wiedergabe::DVD-Video"
 STRING IDD_PPAGEEXTERNALFILTERS		"Externe Filter"
-STRING IDD_PPAGEFILTERSPERFORMANCE		"Interne Filter::Performance"
 STRING IDD_PPAGEFILTERSPRIORITY		"Externe Filter::Priorität"
 STRING IDD_PPAGEFORMATS		"Player::Formate"
 STRING IDD_PPAGEFULLSCREEN		"Video::Vollbild"

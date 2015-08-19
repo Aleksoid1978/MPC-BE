@@ -211,18 +211,6 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"Berrezarri Zerrenda"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
-6		"Berezkoa"
-7		"Gutx Lerro Pakete:"
-8		"Geh Lerro Pakete:"
-9		"Gutx Lerro Neurria:"
-10		"Geh Lerro Neurria:"
-11		"Katxe neurria:"
-12		"KB"
-13		"MB"
-14		"KB"
-END
-
 BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 5		"Iturburu Iragazkiak"
 6		"AVI:"
@@ -1008,7 +996,6 @@ BEGIN MENU IDR_POPUPMAIN LINES 213
 END
 
 STRING IDC_BUTTON_EXT_SET		"Botoi hau sakatu ondoren, hautatutako multzo heuskarri egoerak  MPC-BE-rentzat oraingo agiri elkarketa adieraziko du. Berriki gehitutako hedapen ba arrunt urdinabarrago ikusiko da, hortaz ez ahaztu hura berriro hautatzeaz elkarrizketa hau itxitakoan!"
-STRING IDC_CACH_SIZE		"Katxe neurria agiri eragiketarako (kilobyte-tan)"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Aukera hau ezgaitzeak azpidatziek keinuka egitea saihestuko du baina bideo aurkezleak zenbait bide frame jauzi egitea eragin dezake."
 STRING IDC_CHECK_RELATIVETO		"Berezko egoera beste estilo batzuetatik lortzen da oraindik zehaztugabe dagoenean."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Ahalbidetzen du azpidatzi animazioa 0 baino handiagoa den azpirudi buffer bat erabiltzerakoan. Aukera hau ezgaitzeak CPU erabilera gutxiago izango du. Ezgaitu ere azpidatziak keinuka ikusten badituzu."
@@ -1031,11 +1018,6 @@ STRING IDC_DSVMRLOADMIXER		"VMR nahastzaile modu barnean jartzen du, honek esana
 STRING IDC_DSVMRYUVMIXER		"Egintza hobetzen du aurkezlearen bateragarritasun ordain apur batekin."
 STRING IDC_DX9RESIZER_COMBO		"Pixel Itzal 2.0 sostengurik ez badago, bilinear arrunta erabiltzen da berezgaitasunez."
 STRING IDC_FULLSCREEN_MONITOR_CHECK		"Leiho-haustea murrizten du baina tresnabarra eraskustea saihesten du. Modu honetan ikusleiho-osotik irtetzeko sakatu Ktrl+C."
-STRING IDC_MAXQUEUE_PACKETS		"Pakete (datuak) zenbateko gehiena, iturburutik datuak irakurtzea gelditzerakoan\n\rLerro zenbatekoa irteera pin eragindu zenbatekoaren berdina da"
-STRING IDC_MAXQUEUE_SIZE		"Lerroko oroimen neurri gehiena (megabyte-tan), iturburutik datuak irakurtzea gelditzerakoan\n\rLerro zenbatekoa irteera pin eragindu zenbatekoaren berdina da"
-STRING IDC_MINQUEUE_PACKETS		"Pakete (datuak) zenbateko gutxiena lerroan, irakurketa hastean\n\rLerro zenbatekoa irteera pin eragindu zenbatekoaren berdina da"
-STRING IDC_MINQUEUE_SIZE		"Lerroko oroimen neurri gehiena (megabyte-tan), irakurketa hastean\n\rLerro zenbatekoa irteera pin eragindu zenbatekoaren berdina da"
-STRING IDC_PERFOMANCE_DEFAULT		"Berrezarri ezarpenak berezkoetan, hoberena dena PC gehienentzat"
 STRING IDC_REGULARSURF		"Bideo azalera ikusleiho-kanpoko azalera arrunt bat bezala izendatuko da."
 STRING IDC_TEXTURESURF2D		"Bideo azalera egitura bat bezala banatuko da baina oraindik 2d eginkizunak atzebufferrean kopiatzeko eta luzatzeko erabiliko dira. Behar du bideo txartel bat 32 bit izendatu ditzakena, RGBA, non-power-of-two neurritutako egiturak eta gutxienez bideoaren bereizmenean."
 STRING IDC_TEXTURESURF3D		"Bideo azalera egitura bat bezala banatuko da eta bi hiruki bezala marraztu 3d-an. Hertz-lehunketa gaitzeak erakuspen ezarpenetan eragin kaltegarria izan dezake aurkezpen abiaduran."
@@ -1049,7 +1031,6 @@ STRING IDD_PPAGECAPTURE		"Irakurketa::Harpena"
 STRING IDD_PPAGECOLOR		"Bideoa::Margo zuzenketa"
 STRING IDD_PPAGEDVD		"Irakurketa::DVD-Video"
 STRING IDD_PPAGEEXTERNALFILTERS		"Kanpoko Iragazkiak"
-STRING IDD_PPAGEFILTERSPERFORMANCE		"Barneko Iragazkiak::Egintza"
 STRING IDD_PPAGEFILTERSPRIORITY		"Kanpoko Iragazkiak::Lehentasuna"
 STRING IDD_PPAGEFORMATS		"Irakurgailua::Heuskarriak"
 STRING IDD_PPAGEFULLSCREEN		"Bideoa::Ikusleiho-osoa"

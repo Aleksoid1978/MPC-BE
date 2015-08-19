@@ -523,7 +523,6 @@
 #define IDD_NAVIGATION                  10057
 #define IDD_PPAGEINTERFACE              10058
 #define IDD_PPAGEYOUTUBE                10059
-#define IDD_PPAGEFILTERSPERFORMANCE     10060
 #define IDD_PPAGEFILTERSPRIORITY        10061
 #define IDD_TUNER_SCAN                  10062
 #define IDD_NAVIGATION_DLG              10063
@@ -704,12 +703,6 @@
 #define IDC_MIEDIT                      10737
 #define IDC_LISTCHANNELS                10738
 #define IDC_STATUSBAR                   10739
-#define IDC_MINQUEUE_PACKETS            10740
-#define IDC_MAXQUEUE_PACKETS            10741
-#define IDC_MINQUEUE_SIZE               10742
-#define IDC_MAXQUEUE_SIZE               10743
-#define IDC_CACH_SIZE                   10744
-#define IDC_PERFOMANCE_DEFAULT          10745
 #define IDC_BUTTON_MI_CLIPBOARD         10746
 #define IDC_BUTTON_CLRFONT              10747
 #define IDC_BUTTON_CLRGRAD1             10748

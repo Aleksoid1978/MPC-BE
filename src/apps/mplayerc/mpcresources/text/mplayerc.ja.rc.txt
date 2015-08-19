@@ -211,18 +211,6 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"リストをリセット"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
-6		"デフォルト"
-7		"最小キュー パケット:"
-8		"最大キュー パケット:"
-9		"最小キュー サイズ:"
-10		"最大キュー サイズ:"
-11		"キャッシュ サイズ:"
-12		"KB"
-13		"MB"
-14		"KB"
-END
-
 BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 5		"ソース フィルター"
 6		"AVI:"
@@ -1008,7 +996,6 @@ BEGIN MENU IDR_POPUPMAIN LINES 213
 END
 
 STRING IDC_BUTTON_EXT_SET		"このボタンをクリックすると MPC-BE の実際のファイルの関連付けが、関連付け設定のチェック状態に反映されます。\n新しく拡張子が追加されると大抵チェックボックスは灰色になるので、このダイアログを閉じる前に再びチェックすることを忘れないでください！"
-STRING IDC_CACH_SIZE		"ファイル操作用のキャッシュのサイズ (キロバイト単位)"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"このオプションを無効にすることで字幕のチラツキを防止できますが、ビデオ レンダラーが一部ビデオ フレームをスキップしてしまうかもしれません。"
 STRING IDC_CHECK_RELATIVETO		"未設定のスタイルにはデフォルト状態の設定が適用される"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"サブピクチャーバッファーを使用している時に字幕アニメーションを許可します。無効にすると CPU 使用率が下がります。字幕がチラつく場合も無効にしてください。"
@@ -1031,11 +1018,6 @@ STRING IDC_DSVMRLOADMIXER		"VMR をミキサー モードに設定すると、�
 STRING IDC_DSVMRYUVMIXER		"一部レンダラーとの互換性を犠牲にしてパフォーマンスを向上させます。"
 STRING IDC_DX9RESIZER_COMBO		"ピクセル シェーダー 2.0 に対応していなければ自動的に単純な線形補間が使用されます。"
 STRING IDC_FULLSCREEN_MONITOR_CHECK		"ティアリングを減らしますが、ツール バーが表示されなくなります。このモードでフルスクリーンを解除するには [Ctrl+C] を押してください。"
-STRING IDC_MAXQUEUE_PACKETS		"ソースからの読み込みを停止した際の最大パケット (データ) 数\n\rキューの数は活動中の出力ピンの数と同じです"
-STRING IDC_MAXQUEUE_SIZE		"ソースからの読み込みを停止した際のキューにおける最大メモリ サイズ (メガバイト単位)\n\rキューの数は活動中の出力ピンの数と同じです"
-STRING IDC_MINQUEUE_PACKETS		"再生中のキューにおける最小パケット (データ) 数\n\rキューの数は活動中の出力ピンの数と同じです"
-STRING IDC_MINQUEUE_SIZE		"再生中のキューにおける最小メモリ サイズ (キロバイト単位)\n\rキューの数は活動中の出力ピンの数と同じです"
-STRING IDC_PERFOMANCE_DEFAULT		"設定をデフォルトにリセットします、デフォルト設定は大抵のPCに対して最適化されています。"
 STRING IDC_REGULARSURF		"映像の表面を通常のオフスクリーン サーフェスとして割り当てます。"
 STRING IDC_TEXTURESURF2D		"映像の表面をテクスチャーとして割り当てますが、バックバッファーへのコピーと伸張には 2D 関数を使用します。32 ビット、RGBA、2 の累乗でないサイズのテクスチャーと、最低でも映像の解像度の確保が可能なビデオカードが必要です。"
 STRING IDC_TEXTURESURF3D		"映像の表面をテクスチャーとして割り当て、3D で2つの三角形として描画します。画面の設定でアンチエイリアスを有効にするとレンダリング速度に悪影響を与えるかもしれません。"
@@ -1049,7 +1031,6 @@ STRING IDD_PPAGECAPTURE		"再生::キャプチャー"
 STRING IDD_PPAGECOLOR		"映像::色補正"
 STRING IDD_PPAGEDVD		"再生::DVD ビデオ"
 STRING IDD_PPAGEEXTERNALFILTERS		"外部フィルター"
-STRING IDD_PPAGEFILTERSPERFORMANCE		"内部フィルター::パフォーマンス"
 STRING IDD_PPAGEFILTERSPRIORITY		"外部フィルター::優先"
 STRING IDD_PPAGEFORMATS		"プレーヤー::関連付け"
 STRING IDD_PPAGEFULLSCREEN		"映像::フルスクリーン"

@@ -178,7 +178,6 @@
     <ClCompile Include="PlayerFlyBar.cpp" />
     <ClCompile Include="PlayerYouTube.cpp" />
     <ClCompile Include="PPageColor.cpp" />
-    <ClCompile Include="PPageFiltersPerformance.cpp" />
     <ClCompile Include="PPageFiltersPriority.cpp" />
     <ClCompile Include="PPageInterface.cpp" />
     <ClCompile Include="PPageYouTube.cpp" />
@@ -292,7 +291,6 @@
     <ClInclude Include="PlayerFlyBar.h" />
     <ClInclude Include="PlayerYouTube.h" />
     <ClInclude Include="PPageColor.h" />
-    <ClInclude Include="PPageFiltersPerformance.h" />
     <ClInclude Include="PPageFiltersPriority.h" />
     <ClInclude Include="PPageInterface.h" />
     <ClInclude Include="PPageYouTube.h" />

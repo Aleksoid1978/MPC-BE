@@ -211,18 +211,6 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"Lista visszaállítása"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
-6		"Default"
-7		"Min Queue Packets:"
-8		"Max Queue Packets:"
-9		"Min Queue Size:"
-10		"Max Queue Size:"
-11		"Cache size:"
-12		"KB"
-13		"MB"
-14		"KB"
-END
-
 BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 5		"Source Filters"
 6		"AVI:"
@@ -1008,7 +996,6 @@ BEGIN MENU IDR_POPUPMAIN LINES 213
 END
 
 STRING IDC_BUTTON_EXT_SET		"Miután rákattint erre a gombra, a formátumcsoport bepipált állapota az MPC-BE való aktuális fájlhozzárendeléseket fogja tükrözni. Egy újonnan hozzáadott kiterjesztéssel rendszerint szürkítettre fog váltani, tehát mielőtt bezárja a párbeszédpanelt, ne felejtse el újra bepipálni azt a csoportot!"
-STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Az alapértelmezett pozíciót örökli a többi stílus, ahol ez még nincs meghatározva"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Lehetővé teszi a felirat animálását, ha az előreolvasott feliratképek száma nagyobb, mint nulla. A funkció tiltása csökkenti a CPU terheltségét. Akkor is tiltsa, ha villódzik a felirat."
@@ -1031,11 +1018,6 @@ STRING IDC_DSVMRLOADMIXER		"Keverő módba állítja a VMR átalakítót, ami az
 STRING IDC_DSVMRYUVMIXER		"Improves performance at the cost of some compatability of the renderer."
 STRING IDC_DX9RESIZER_COMBO		"Ha nincs Képpont árnyékoló (Pixel Shader) 2.0 támogatás, automatikusan a sima bilineáris lesz használva."
 STRING IDC_FULLSCREEN_MONITOR_CHECK		"Reduces tearing but prevents the toolbar from being shown. To exit fullscreen in this mode press Ctrl+C."
-STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_REGULARSURF		"A videó-felület normál képernyőn-kívüli (offscreen) felületként lesz lefoglalva."
 STRING IDC_TEXTURESURF2D		"A videó-felület textúraként lesz lefoglalva, de így is a 2D funkciók lesznek használva, hogy azt rámásoljuk és rányújtsuk a hátoldali-pufferre (backbuffer). Egy olyan videokártya szükséges hozzá, ami képes lefoglalni 32bites, RGBA és nem kettő hatványának megfelelő textúrákat legalább akkora méretben, mint maga a videó."
 STRING IDC_TEXTURESURF3D		"A videó-felület textúraként lesz lefoglalva és 3D-ben két háromszögként lesz megrajzolva. Ha a vonalsimítás (antialiasing) be van kapcsolva a képernyőbeállításoknál rossz hatással lehet az átalakítás sebességére."
@@ -1049,7 +1031,6 @@ STRING IDD_PPAGECAPTURE		"Lejátszás::Rögzítés"
 STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"Lejátszás::DVD-Video"
 STRING IDD_PPAGEEXTERNALFILTERS		"Külső szűrők"
-STRING IDD_PPAGEFILTERSPERFORMANCE		"Belső szűrők::Performance"
 STRING IDD_PPAGEFILTERSPRIORITY		"Külső szűrők::Priority"
 STRING IDD_PPAGEFORMATS		"Lejátszó::Formátumok"
 STRING IDD_PPAGEFULLSCREEN		"Video::Teljes Képernyő"
