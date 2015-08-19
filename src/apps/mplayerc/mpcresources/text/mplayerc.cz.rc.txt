@@ -211,18 +211,6 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"Výchozí"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
-6		"Default"
-7		"Min Queue Packets:"
-8		"Max Queue Packets:"
-9		"Min Queue Size:"
-10		"Max Queue Size:"
-11		"Cache size:"
-12		"KB"
-13		"MB"
-14		"KB"
-END
-
 BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 5		"Source Filters"
 6		"AVI:"
@@ -1008,7 +996,6 @@ BEGIN MENU IDR_POPUPMAIN LINES 213
 END
 
 STRING IDC_BUTTON_EXT_SET		"Stav zaškrtávacího políčka u skupin formátů určuje aktuální asociace MPC-BE. Nově přidaná přípona většinou zruší zaškrtnutí dané skupiny, proto ji před zavřením tohoto dialogu nezapomeňte znovu zaškrtnout!"
-STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Výchozí stav bude převzat ostatními styly ve kterých ještě nebyla tato volba nastavena."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Povolí animaci titulků při použití titulkové vyrovnávací paměti větší než 0. Zakázání této volby sníží zatížení procesoru. Také ji zakažte pokud dochází k blikání titulků."
@@ -1031,11 +1018,6 @@ STRING IDC_DSVMRLOADMIXER		"Přepne VMR do mixer režimu, to znamená, že vět�
 STRING IDC_DSVMRYUVMIXER		"Improves performance at the cost of some compatability of the renderer."
 STRING IDC_DX9RESIZER_COMBO		"Pokud není podporován Pixel Shader 2.0, automaticky se použije simple bilinear."
 STRING IDC_FULLSCREEN_MONITOR_CHECK		"Reduces tearing but prevents the toolbar from being shown. To exit fullscreen in this mode press Ctrl+C."
-STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_REGULARSURF		"Plocha videa bude vymezena jako běžná mimoobrazovková plocha."
 STRING IDC_TEXTURESURF2D		"Plocha videa bude vymezena jako textura ale pro její kopírování a roztahování do přípravné vyrovnávací paměti budou stále používány 2D funkce. Vyžaduje video kartu schopnou alokovat 32bitové, RGBA textury s rozměry stran neodpovídajícími druhým mocninám a o minimálně stejné velikosti jako má video."
 STRING IDC_TEXTURESURF3D		"Plocha videa bude vymezena jako textura a vykreslena v 3D režimu jako 2 trojúhelníky. Zapnuté vyhlazování hran může mít v tomto režimu velmi nepříznivý vliv na rychlost vykreslování."
@@ -1049,7 +1031,6 @@ STRING IDD_PPAGECAPTURE		"Přehrávání::Záznam"
 STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"Přehrávání::DVD-Video"
 STRING IDD_PPAGEEXTERNALFILTERS		"Externí filtry"
-STRING IDD_PPAGEFILTERSPERFORMANCE		"Interní filtry::Performance"
 STRING IDD_PPAGEFILTERSPRIORITY		"Externí filtry::Priority"
 STRING IDD_PPAGEFORMATS		"Přehrávač::Formáty"
 STRING IDD_PPAGEFULLSCREEN		"Video::Na celou obrazovku"

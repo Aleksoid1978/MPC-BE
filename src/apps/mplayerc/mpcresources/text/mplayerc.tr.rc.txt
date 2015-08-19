@@ -211,18 +211,6 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"Listeyi Sıfırla"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
-6		"Varsayılan"
-7		"En Küçük Kuyruk Paketi:"
-8		"En Büyük Kuyruk Paketi:"
-9		"En Küçük Kuyruk Boyutu:"
-10		"En Büyük Kuyruk Boyutu:"
-11		"Önbellek boyutu:"
-12		"KB"
-13		"MB"
-14		"KB"
-END
-
 BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 5		"Kaynak Süzgeçleri"
 6		"AVI:"
@@ -1008,7 +996,6 @@ BEGIN MENU IDR_POPUPMAIN LINES 213
 END
 
 STRING IDC_BUTTON_EXT_SET		"Bu tuşa tıkladıktan sonra, seçili olan grup biçimi MPC-BE'nin geçerli dosya ilişkilendirmesi seçeneği olarak ayarlanacaktır. Genellikle yeni eklenen uzantı gri renkle gösterilecektir, yani bu ekranı kapatmadan önce uzantıyı tekrar seçmeniz gerektiğini unutmayınız!"
-STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Varsayılan durum hala tanımsız olduğu için diğer biçimlerden etkileniyor"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"0'dan büyük bir görüntü tamponu kullanırken alt yazı animasyonlarına izin verir. Bu ayarı kapatmak işlemci kullanımını düşürecektir. Eğer alt yazılar parlak gösterilirse, yine ilgili ayarı kapatmanız önerilir."
@@ -1031,11 +1018,6 @@ STRING IDC_DSVMRLOADMIXER		"VMR kipini karıştırıcı olarak atar, böylece ö
 STRING IDC_DSVMRYUVMIXER		"Improves performance at the cost of some compatability of the renderer."
 STRING IDC_DX9RESIZER_COMBO		"Piksel Tonlama 2.0 desteği bulunmuyorsa, otomatik olarak basit çizgisellik kullanılacaktır."
 STRING IDC_FULLSCREEN_MONITOR_CHECK		"Reduces tearing but prevents the toolbar from being shown. To exit fullscreen in this mode press Ctrl+C."
-STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_REGULARSURF		"Video yüzeyi düzgün bir dış ekran olarak ayrılacaktır."
 STRING IDC_TEXTURESURF2D		"Video yüzeyi bir doku olarak ayrılacaktır, ancak hala 2d özellikleri arka tamponlamaya kopyalamak ve uzatılmakta kullanılacaktır. 32bit, RGBA, çift boyutlu doku ayırabilen ve en az, geçerli video çözünürlüğünü destekleyebilen bir ekran kartı gerektirir."
 STRING IDC_TEXTURESURF3D		"Video yüzeyi bir doku olarak ayrılacaktır ve 3d'de 2 üçgen olarak çizilecektir. Görünüm Ayarlarındaki keskinlik yumuşatmasının açık olması tarama hızında yavaşlık oluşturabilir."
@@ -1049,7 +1031,6 @@ STRING IDD_PPAGECAPTURE		"Yürütme::Yakalama"
 STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"Yürütme::DVD-Video"
 STRING IDD_PPAGEEXTERNALFILTERS		"Harici Süzgeçler"
-STRING IDD_PPAGEFILTERSPERFORMANCE		"Dahili Süzgeçler::Performance"
 STRING IDD_PPAGEFILTERSPRIORITY		"Harici Süzgeçler::Priority"
 STRING IDD_PPAGEFORMATS		"Oynatıcı::Biçimler"
 STRING IDD_PPAGEFULLSCREEN		"Video::Tam Ekran"

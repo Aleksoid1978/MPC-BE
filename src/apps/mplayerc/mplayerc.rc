@@ -736,30 +736,6 @@ BEGIN
     PUSHBUTTON      "Audio decoder\nconfiguration",IDC_BUTTON4,220,47,70,30,BS_MULTILINE
 END
 
-IDD_PPAGEFILTERSPERFORMANCE DIALOGEX 0, 0, 296, 241
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    GROUPBOX        "",IDC_STATIC,6,6,282,120
-    CONTROL         "Default",IDC_PERFOMANCE_DEFAULT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,7,60,8
-    LTEXT           "Min Queue Packets:",IDC_STATIC1,14,19,122,8
-    LTEXT           "Max Queue Packets:",IDC_STATIC2,14,39,122,8
-    LTEXT           "Min Queue Size:",IDC_STATIC3,14,69,122,8
-    LTEXT           "Max Queue Size:",IDC_STATIC4,14,89,122,8
-    LTEXT           "Cache size:",IDC_STATIC5,13,109,122,8
-    LTEXT           "KB",IDC_STATIC6,192,69,10,8
-    LTEXT           "MB",IDC_STATIC7,192,89,10,8
-    LTEXT           "KB",IDC_STATIC8,192,108,10,8
-    EDITTEXT        IDC_MINQUEUE_PACKETS,140,17,48,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
-    EDITTEXT        IDC_MAXQUEUE_PACKETS,140,37,48,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
-    EDITTEXT        IDC_MINQUEUE_SIZE,140,67,48,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,187,66,11,14
-    EDITTEXT        IDC_MAXQUEUE_SIZE,140,87,48,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "",IDC_SPIN3,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,187,86,11,14
-    EDITTEXT        IDC_CACH_SIZE,140,107,48,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "",IDC_SPIN4,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,187,106,11,14
-END
-
 IDD_PPAGEFILTERSPRIORITY DIALOGEX 0, 0, 296, 241
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -1280,10 +1256,6 @@ BEGIN
     END
 
     IDD_PPAGEINTERNALFILTERS, DIALOG
-    BEGIN
-    END
-
-    IDD_PPAGEFILTERSPERFORMANCE, DIALOG
     BEGIN
     END
 
@@ -2111,7 +2083,6 @@ BEGIN
     IDD_PPAGESUBRENDERING   "Subtitles::Rendering"
     IDD_PPAGESUBSTYLE       "Subtitles::Default Style"
     IDD_PPAGEINTERNALFILTERS "Internal Filters"
-    IDD_PPAGEFILTERSPERFORMANCE "Internal Filters::Performance"
     IDD_PPAGEEXTERNALFILTERS "External Filters"
     IDD_PPAGEFILTERSPRIORITY "External Filters::Priority"
     IDD_PPAGEMISC           "Miscellaneous"
@@ -3256,16 +3227,6 @@ BEGIN
     IDS_THUMB_IMAGE_QUALITY             "Quality"
     IDS_THUMB_QUALITY                   "Quality (%):"
     IDS_THUMB_LEVEL                     "Compression (1-9):"
-END
-
-STRINGTABLE
-BEGIN
-    IDC_PERFOMANCE_DEFAULT              "Reset settings to the default, which is optimized for most PC"
-    IDC_MINQUEUE_PACKETS                "The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
-    IDC_MAXQUEUE_PACKETS                "The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-    IDC_MINQUEUE_SIZE                   "The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
-    IDC_MAXQUEUE_SIZE                   "The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-    IDC_CACH_SIZE                       "Cache size for file operations (in kilobytes)"
 END
 
 STRINGTABLE

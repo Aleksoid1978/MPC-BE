@@ -35,7 +35,6 @@
 #include "PPageWebServer.h"
 #include "PPageInternalFilters.h"
 #include "PPageAudio.h"
-#include "PPageFiltersPerformance.h"
 #include "PPageFiltersPriority.h"
 #include "PPageExternalFilters.h"
 #include "PPageSubtitles.h"
@@ -90,7 +89,6 @@ private:
 	CPPageSubRend m_subMisc;
 	CPPageSubStyle m_substyle;
 	CPPageInternalFilters m_internalfilters;
-	//CPPageFiltersPerformance m_filtersperformance;
 	CPPageExternalFilters m_externalfilters;
 	CPPageFiltersPriority m_filterspriority;
 	CPPageMisc m_misc;

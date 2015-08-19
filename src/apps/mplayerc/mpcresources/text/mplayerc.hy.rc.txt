@@ -211,18 +211,6 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"Ետարկել"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
-6		"Default"
-7		"Min Queue Packets:"
-8		"Max Queue Packets:"
-9		"Min Queue Size:"
-10		"Max Queue Size:"
-11		"Cache size:"
-12		"KB"
-13		"MB"
-14		"KB"
-END
-
 BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 5		"Source Filters"
 6		"AVI:"
@@ -1008,7 +996,6 @@ BEGIN MENU IDR_POPUPMAIN LINES 213
 END
 
 STRING IDC_BUTTON_EXT_SET		"Այս կոճակը սեղմելուց հետո ցույց կտրվի MPC-BE-ի հետ ասոցացված տեսակների խմբերը։ Նոր ավելացումները երևում են մոխրագույն գույնով, ուստի մի մոռացեք նորից ստուգել դրանք պատուհանը փակելիս։"
-STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Ծրագրային վիճակը որոշվում է այնտեղ, որտեղ այն դեռ չի որոշվել"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Հնարավորություն է տալիս շարժապատկերել տողագրերը։"
@@ -1031,11 +1018,6 @@ STRING IDC_DSVMRLOADMIXER		"Փոխում է VMR -ը Խառնիչի եղանակ�
 STRING IDC_DSVMRYUVMIXER		"Improves performance at the cost of some compatability of the renderer."
 STRING IDC_DX9RESIZER_COMBO		"Փիքսելային շեյդերների տարբերակ 2.0-ն չաջակցելու դեպքում, կօգտագործվի պարզունակ մեթոդ։"
 STRING IDC_FULLSCREEN_MONITOR_CHECK		"Reduces tearing but prevents the toolbar from being shown. To exit fullscreen in this mode press Ctrl+C."
-STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_REGULARSURF		"Տեսանյութի մակերեսը առանձնացվում է որպես էկրանից դուրս։"
 STRING IDC_TEXTURESURF2D		"Տեսանյութի մակերեսը առանձնացվում է որպես արտապատկերում, բայց տեսանյութի պատճենման և ձգման համար օգտագործվում է 2D ֆունկցիան։ Պահանջում է տեսաքարտի առկայություն, որը կարող է կատարել 32bit RGBA արտապատկերումներ։"
 STRING IDC_TEXTURESURF3D		"Տեսանյութի մակերեսը առանձնացվում է որպես արտապատկերում և պատկերվում է որպես երկու եռանկյուն 3D-ով։"
@@ -1049,7 +1031,6 @@ STRING IDD_PPAGECAPTURE		"Վերարտադրում::տեսագրում"
 STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"Վերարտադրում::DVD-Video"
 STRING IDD_PPAGEEXTERNALFILTERS		"Արտաքին Ֆիլտրեր"
-STRING IDD_PPAGEFILTERSPERFORMANCE		"Ներդրված Ֆիլտրեր::Performance"
 STRING IDD_PPAGEFILTERSPRIORITY		"Արտաքին Ֆիլտրեր::Priority"
 STRING IDD_PPAGEFORMATS		"Վերարտադրիչը::Տեսակները"
 STRING IDD_PPAGEFULLSCREEN		"Video::Ամբողջ էկրանով"

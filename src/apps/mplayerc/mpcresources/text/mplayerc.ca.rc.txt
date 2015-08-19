@@ -211,18 +211,6 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"Reiniciar Llista"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
-6		"Default"
-7		"Min Queue Packets:"
-8		"Max Queue Packets:"
-9		"Min Queue Size:"
-10		"Max Queue Size:"
-11		"Cache size:"
-12		"KB"
-13		"MB"
-14		"KB"
-END
-
 BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 5		"Source Filters"
 6		"AVI:"
@@ -1008,7 +996,6 @@ BEGIN MENU IDR_POPUPMAIN LINES 213
 END
 
 STRING IDC_BUTTON_EXT_SET		"Després de fer clic aquet botó, l'estat de comprobació del formato del grupo reflexarà las associacions d'arxiu actuale pel MPC. Una extensión recent agregada es motrarà en gris, no oblidis de maracar-la de nou abans de tencar aquet cuadre de diàleg"
-STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"L'estat predeterminat s'hereda cap a altres estils encara indeterminats "
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Permet subtítols amb animació al utilitzar una memoria intermitja per sub-imágenes més grans que 0. Inhabilitant auquesta opció es minimitza l'ús de CPU. Inhabilitar també si els subtítols pipillejent."
@@ -1031,11 +1018,6 @@ STRING IDC_DSVMRLOADMIXER		"Posa el VMR en mode mezclador, això significa que l
 STRING IDC_DSVMRYUVMIXER		"Improves performance at the cost of some compatability of the renderer."
 STRING IDC_DX9RESIZER_COMBO		"Si no hi ha suport per Pixel Shader 2.0, s'usarà automàticament el rendimensionament bilineal sencill."
 STRING IDC_FULLSCREEN_MONITOR_CHECK		"Reduces tearing but prevents the toolbar from being shown. To exit fullscreen in this mode press Ctrl+C."
-STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_REGULARSURF		"La superfície de vídeo será asignada como una de regular fora de la de pantalla."
 STRING IDC_TEXTURESURF2D		"La superfície de vídeo serà asiganada como una textura pero encara les funciones 2D serán usadas per copiar i estirar-se sobre el backbuffer. Eequereix una tarjeta de vídeo que pugui aplicar RGBA de 32 bits, com a mínim textures de potència de dos en la resolució del vídeo."
 STRING IDC_TEXTURESURF3D		"La superfície del vídeo serà asiganada com una textura i dibuixada com dos triangles en 3D. L'activació del anti allissat pot afectar negativament en la velocitat de renderitzat."
@@ -1049,7 +1031,6 @@ STRING IDD_PPAGECAPTURE		"Reproducció::Captura"
 STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"Reproducció::DVD-Video"
 STRING IDD_PPAGEEXTERNALFILTERS		"Filtres Externs"
-STRING IDD_PPAGEFILTERSPERFORMANCE		"Filtres Interns::Performance"
 STRING IDD_PPAGEFILTERSPRIORITY		"Filtres Externs::Priority"
 STRING IDD_PPAGEFORMATS		"Reproductor::Formats"
 STRING IDD_PPAGEFULLSCREEN		"Video::Pantalla completa"

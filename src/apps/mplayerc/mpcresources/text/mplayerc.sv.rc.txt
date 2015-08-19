@@ -211,18 +211,6 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 19		"Återställ List"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFILTERSPERFORMANCE LINES 23
-6		"Default"
-7		"Min Queue Packets:"
-8		"Max Queue Packets:"
-9		"Min Queue Size:"
-10		"Max Queue Size:"
-11		"Cache size:"
-12		"KB"
-13		"MB"
-14		"KB"
-END
-
 BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 20
 5		"Source Filters"
 6		"AVI:"
@@ -1008,7 +996,6 @@ BEGIN MENU IDR_POPUPMAIN LINES 213
 END
 
 STRING IDC_BUTTON_EXT_SET		"När du klickat på denna knapp, den faktiska läget av format gruppen kommer att återspegla de faktiska fil associationen för MPC-BE. En nyligen till lagt anknytning brukar göra den grå, så glöm inte att kolla upp det igen innan du stänger dialogrutan!"
-STRING IDC_CACH_SIZE		"Cache size for file operations (in kilobytes)"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Standard läget blir ärvda till andra stilar där de fortfarande är odefinierade"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Tillåter undertext animering när man använder sub bild buffert större än 0. Inaktivering av detta alternativ sänker CPU användningen. Stäng också av om du upplever blinkande undertexter."
@@ -1031,11 +1018,6 @@ STRING IDC_DSVMRLOADMIXER		"Placerar VMR i mixerläget, detta innebär de flesta
 STRING IDC_DSVMRYUVMIXER		"Improves performance at the cost of some compatability of the renderer."
 STRING IDC_DX9RESIZER_COMBO		"Om det inte finns någon Pixel Shader 2.0 stöd, så används enkel bilinear automatiskt."
 STRING IDC_FULLSCREEN_MONITOR_CHECK		"Reduces tearing but prevents the toolbar from being shown. To exit fullscreen in this mode press Ctrl+C."
-STRING IDC_MAXQUEUE_PACKETS		"The maximum number of packets (data), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MAXQUEUE_SIZE		"The maximum size of memory in the queue (in megabytes), when stops reading the data from the source\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MINQUEUE_PACKETS		"The minimum number of packets (data) in the queue, when begins playing\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_MINQUEUE_SIZE		"The minimum size of memory in the queue (in kilobytes), when begins playing\n\rThe number of queues is equal the number of active output pins"
-STRING IDC_PERFOMANCE_DEFAULT		"Reset settings to the default, which is optimized for most PC"
 STRING IDC_REGULARSURF		"Video ytan kommer att allokeras som en regelbunden avskärm yta."
 STRING IDC_TEXTURESURF2D		"Video yta kommer att allokeras som en textur men fortfarande 2d-funktioner kommer att användas för att kopiera och sträcka den på bakbufferten. Kräver ett grafikkort som kan allokera 32bit, RGBA, icke-kraften-av-två stora texturer och åtminstone i samma upplösning av videon."
 STRING IDC_TEXTURESURF3D		"Video yta kommer att allokeras som en textur och dra två trianglar i 3d. Antialiasing påslagen i skärminställningar kan ha en dålig inverkan på renderings hastigheten."
@@ -1049,7 +1031,6 @@ STRING IDD_PPAGECAPTURE		"Uppspelning::Fånga"
 STRING IDD_PPAGECOLOR		"Video::Color correction"
 STRING IDD_PPAGEDVD		"Uppspelning::DVD-Video"
 STRING IDD_PPAGEEXTERNALFILTERS		"Externa Filter"
-STRING IDD_PPAGEFILTERSPERFORMANCE		"Interna Filter::Performance"
 STRING IDD_PPAGEFILTERSPRIORITY		"Externa Filter::Priority"
 STRING IDD_PPAGEFORMATS		"Spelare::Format"
 STRING IDD_PPAGEFULLSCREEN		"Video::Helskarm"

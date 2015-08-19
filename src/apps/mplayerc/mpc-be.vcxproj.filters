@@ -318,9 +318,6 @@
     <ClCompile Include="PPageYouTube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PPageFiltersPerformance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PPageFiltersPriority.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -657,9 +654,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PPageYouTube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PPageFiltersPerformance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PPageFiltersPriority.h">
