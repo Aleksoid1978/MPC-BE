@@ -31,6 +31,7 @@ class CUDPStream : public CAsyncStream, public CAMThread
 {
 private:
 	CCritSec m_csLock;
+	CCritSec m_csPacketsLock;
 
 	class packet_t
 	{
