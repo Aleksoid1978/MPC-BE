@@ -165,6 +165,10 @@ private:
 	long					m_lBalance;
 	double					m_dVolumeFactor;
 	double					m_dBalanceFactor;
+	DWORD					m_dwBalanceMask;
+
+	void					SetBalanceMask(DWORD output_layout);
+	void					ApplyVolumeBalance(BYTE* pData, UINT32 size);
 
 	CFilter					m_Filter;
 
