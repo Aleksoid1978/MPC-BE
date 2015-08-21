@@ -122,6 +122,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_lBalance(DSBPAN_CENTER)
 	, m_dVolumeFactor(1.0)
 	, m_dBalanceFactor(1.0)
+	, m_dwBalanceMask(0)
 	, m_nThreadId(0)
 	, m_hRenderThread(NULL)
 	, m_bThreadPaused(FALSE)
@@ -665,7 +666,7 @@ STDMETHODIMP CMpcAudioRenderer::put_Volume(long lVolume)
 	}
 
 	if (m_lBalance > DSBPAN_LEFT && m_lBalance < DSBPAN_RIGHT) {
-		m_dBalanceFactor = m_dVolumeFactor * pow(10.0, labs(m_lBalance) / 2000.0);
+		m_dBalanceFactor = m_dVolumeFactor * pow(10.0, -labs(m_lBalance) / 2000.0);
 	}
 
 	return S_OK;
@@ -690,17 +691,17 @@ STDMETHODIMP CMpcAudioRenderer::put_Balance(long lBalance)
 	}
 	else {
 		m_lBalance = lBalance;
-		m_dBalanceFactor = m_dVolumeFactor * pow(10.0, labs(m_lBalance) / 2000.0);
+		m_dBalanceFactor = m_dVolumeFactor * pow(10.0, -labs(m_lBalance) / 2000.0);
 	}
 
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 STDMETHODIMP CMpcAudioRenderer::get_Balance(long *plBalance)
 {
 	*plBalance = m_lBalance;
 
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 // === IMediaSeeking
@@ -1029,6 +1030,31 @@ HRESULT CMpcAudioRenderer::GetReferenceClockInterface(REFIID riid, void **ppv)
 	return GetReferenceClockInterface(riid, ppv);
 }
 
+void CMpcAudioRenderer::SetBalanceMask(DWORD output_layout)
+{
+	m_dwBalanceMask = 0;
+	DWORD quiet_layout = 0;
+
+	if (m_lBalance < DSBPAN_CENTER) { // left louder, right quieter
+		quiet_layout = SPEAKER_FRONT_RIGHT|SPEAKER_BACK_RIGHT|SPEAKER_FRONT_RIGHT_OF_CENTER|SPEAKER_SIDE_RIGHT|SPEAKER_TOP_FRONT_RIGHT|SPEAKER_TOP_BACK_RIGHT;
+	}
+	else if (m_lBalance > DSBPAN_CENTER) { // right louder, left quieter
+		quiet_layout = SPEAKER_FRONT_LEFT|SPEAKER_BACK_LEFT|SPEAKER_FRONT_LEFT_OF_CENTER|SPEAKER_SIDE_LEFT|SPEAKER_TOP_FRONT_LEFT|SPEAKER_TOP_BACK_LEFT;
+	}
+
+	unsigned channel_num = 0;
+	for (unsigned i = 0; i < 32; i++) {
+		DWORD ch = 1 << i;
+
+		if (ch & output_layout) {
+			if (ch & quiet_layout) {
+				m_dwBalanceMask |= 1 << channel_num;
+			}
+			channel_num++;
+		}
+	}
+}
+
 #pragma region
 // ==== WASAPI
 
@@ -1195,6 +1221,8 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 					return E_INVALIDARG;
 			}
 		}
+
+		SetBalanceMask(out_layout);
 	}
 
 	hr = pMediaSample->GetPointer(&pMediaBuffer);
@@ -2129,32 +2157,9 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 
 		if (m_lVolume <= DSBVOLUME_MIN) {
 			dwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
-		} else if (m_lVolume < DSBVOLUME_MAX && !m_bIsBitstream) {
-			// Adjusting volume ...
-			WAVEFORMATEX* wfeOutput = (WAVEFORMATEX*)m_pWaveFileFormatOutput;
-			SampleFormat sf = GetSampleFormat(wfeOutput);
-			size_t samples = nAvailableBytes / (wfeOutput->wBitsPerSample >> 3);
-
-			switch (sf) {
-				case SAMPLE_FMT_U8:
-					gain_uint8(m_dVolumeFactor, samples, (uint8_t*)pData);
-					break;
-				case SAMPLE_FMT_S16:
-					gain_int16(m_dVolumeFactor, samples, (int16_t*)pData);
-					break;
-				case SAMPLE_FMT_S24:
-					gain_int24(m_dVolumeFactor, samples, pData);
-					break;
-				case SAMPLE_FMT_S32:
-					gain_int32(m_dVolumeFactor, samples, (int32_t*)pData);
-					break;
-				case SAMPLE_FMT_FLT:
-					gain_float(m_dVolumeFactor, samples, (float*)pData);
-					break;
-				case SAMPLE_FMT_DBL:
-					gain_double(m_dVolumeFactor, samples, (double*)pData);
-					break;
-			}
+		}
+		else if (!m_bIsBitstream && (m_lVolume < DSBVOLUME_MAX || m_lBalance != DSBPAN_CENTER)) {
+			ApplyVolumeBalance(pData, nAvailableBytes);
 		}
 	}
 
@@ -2554,6 +2559,99 @@ inline REFERENCE_TIME CMpcAudioRenderer::GetRefClockTime()
 	}
 
 	return rt;
+}
+
+void CMpcAudioRenderer::ApplyVolumeBalance(BYTE* pData, UINT32 size)
+{
+	WAVEFORMATEX* wfeOutput = (WAVEFORMATEX*)m_pWaveFileFormatOutput;
+	SampleFormat sf = GetSampleFormat(wfeOutput);
+	size_t channels = wfeOutput->nChannels;
+	size_t allsamples = size / (wfeOutput->wBitsPerSample / 8);
+	size_t samples = allsamples / channels;
+
+	if (m_lBalance == DSBPAN_CENTER) {
+		switch (sf) {
+		case SAMPLE_FMT_U8:
+			gain_uint8(m_dVolumeFactor, allsamples, (uint8_t*)pData);
+			break;
+		case SAMPLE_FMT_S16:
+			gain_int16(m_dVolumeFactor, allsamples, (int16_t*)pData);
+			break;
+		case SAMPLE_FMT_S24:
+			gain_int24(m_dVolumeFactor, allsamples, pData);
+			break;
+		case SAMPLE_FMT_S32:
+			gain_int32(m_dVolumeFactor, allsamples, (int32_t*)pData);
+			break;
+		case SAMPLE_FMT_FLT:
+			gain_float(m_dVolumeFactor, allsamples, (float*)pData);
+			break;
+		case SAMPLE_FMT_DBL:
+			gain_double(m_dVolumeFactor, allsamples, (double*)pData);
+			break;
+		}
+	} else {
+		// volume and balance
+		// do not use limiter, because  m_dBalanceFactor and m_dVolumeFactor are always less than or equal to 1.0
+		switch (sf) {
+		case SAMPLE_FMT_U8: {
+			uint8_t* p = (uint8_t*)pData;
+			for (size_t i = 0; i < samples; i++) {
+				for (size_t ch = 0; ch < channels; ch++) {
+					int8_t sample = (int8_t)(*p ^ 0x80);
+					sample = (int8_t)((m_dwBalanceMask & (1 << ch) ? m_dBalanceFactor : m_dVolumeFactor) * sample);
+					*p++ = (uint8_t)sample ^ 0x80;
+				}
+			}
+			break; }
+		case SAMPLE_FMT_S16: {
+			int16_t* p = (int16_t*)pData;
+			for (size_t i = 0; i < samples; i++) {
+				for (size_t ch = 0; ch < channels; ch++) {
+					*p++ = (int16_t)((m_dwBalanceMask & (1 << ch) ? m_dBalanceFactor : m_dVolumeFactor) * *p);
+				}
+			}
+			break; }
+		case SAMPLE_FMT_S24: {
+			for (size_t i = 0; i < samples; i++) {
+				for (size_t ch = 0; ch < channels; ch++) {
+					int32_t sample = 0;
+					((BYTE*)(&sample))[1] = *(pData);
+					((BYTE*)(&sample))[2] = *(pData + 1);
+					((BYTE*)(&sample))[3] = *(pData + 2);
+					sample = (int32_t)((m_dwBalanceMask & (1 << ch) ? m_dBalanceFactor : m_dVolumeFactor) * sample);
+					*pData++ = ((BYTE*)(&sample))[1];
+					*pData++ = ((BYTE*)(&sample))[2];
+					*pData++ = ((BYTE*)(&sample))[3];
+				}
+			}
+			break; }
+		case SAMPLE_FMT_S32: {
+			int32_t* p = (int32_t*)pData;
+			for (size_t i = 0; i < samples; i++) {
+				for (size_t ch = 0; ch < channels; ch++) {
+					*p++ = (int32_t)((m_dwBalanceMask & (1 << ch) ? m_dBalanceFactor : m_dVolumeFactor) * *p);
+				}
+			}
+			break; }
+		case SAMPLE_FMT_FLT: {
+			float* p = (float*)pData;
+			for (size_t i = 0; i < samples; i++) {
+				for (size_t ch = 0; ch < channels; ch++) {
+					*p++ = (float)((m_dwBalanceMask & (1 << ch) ? m_dBalanceFactor : m_dVolumeFactor) * *p);
+				}
+			}
+			break; }
+		case SAMPLE_FMT_DBL: {
+			double* p = (double*)pData;
+			for (size_t i = 0; i < samples; i++) {
+				for (size_t ch = 0; ch < channels; ch++) {
+					*p++ = (m_dwBalanceMask & (1 << ch) ? m_dBalanceFactor : m_dVolumeFactor) * *p;
+				}
+			}
+			break; }
+		}
+	}
 }
 
 CMpcAudioRendererInputPin::CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, HRESULT* phr)
