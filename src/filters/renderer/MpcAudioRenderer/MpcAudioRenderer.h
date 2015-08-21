@@ -166,6 +166,7 @@ private:
 	double					m_dVolumeFactor;
 	double					m_dBalanceFactor;
 	DWORD					m_dwBalanceMask;
+	bool					m_bUpdateBalanceMask; // TODO: remove it
 
 	void					SetBalanceMask(DWORD output_layout);
 	void					ApplyVolumeBalance(BYTE* pData, UINT32 size);
