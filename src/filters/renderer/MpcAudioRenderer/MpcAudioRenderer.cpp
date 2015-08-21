@@ -123,6 +123,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_dVolumeFactor(1.0)
 	, m_dBalanceFactor(1.0)
 	, m_dwBalanceMask(0)
+	, m_bUpdateBalanceMask(true)
 	, m_nThreadId(0)
 	, m_hRenderThread(NULL)
 	, m_bThreadPaused(FALSE)
@@ -669,6 +670,8 @@ STDMETHODIMP CMpcAudioRenderer::put_Volume(long lVolume)
 		m_dBalanceFactor = m_dVolumeFactor * pow(10.0, -labs(m_lBalance) / 2000.0);
 	}
 
+	m_bUpdateBalanceMask = true;
+
 	return S_OK;
 }
 
@@ -693,6 +696,8 @@ STDMETHODIMP CMpcAudioRenderer::put_Balance(long lBalance)
 		m_lBalance = lBalance;
 		m_dBalanceFactor = m_dVolumeFactor * pow(10.0, -labs(m_lBalance) / 2000.0);
 	}
+
+	m_bUpdateBalanceMask = true;
 
 	return S_OK;
 }
@@ -1221,8 +1226,20 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 					return E_INVALIDARG;
 			}
 		}
+	}
+
+	if (m_bUpdateBalanceMask) {
+		WAVEFORMATEX* wfeOutput = (WAVEFORMATEX*)m_pWaveFileFormatOutput;
+		if (IsWaveFormatExtensible(wfeOutput)) {
+			WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)m_pWaveFileFormatOutput;
+			out_layout = wfex->dwChannelMask;
+		}
+		else {
+			out_layout = GetDefChannelMask(wfeOutput->nChannels);
+		}
 
 		SetBalanceMask(out_layout);
+		m_bUpdateBalanceMask = false;
 	}
 
 	hr = pMediaSample->GetPointer(&pMediaBuffer);
