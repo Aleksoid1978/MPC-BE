@@ -15268,7 +15268,7 @@ void CMainFrame::SetupFavoritesSubMenu()
 
 			// relative drive
 			if (sl.GetCount() > 1) { // Here to prevent crash if old favorites settings are present
-				sl.RemoveHead();
+				sl.RemoveHeadNoReturn();
 
 				BOOL bRelativeDrive = FALSE;
 				if (_stscanf_s(sl.GetHead(), _T("%d"), &bRelativeDrive) == 1) {

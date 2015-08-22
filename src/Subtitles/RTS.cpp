@@ -880,7 +880,7 @@ void CLine::Compact()
 
 		m_width -= w->m_width;
 		delete w;
-		RemoveHead();
+		RemoveHeadNoReturn();
 	}
 
 	pos = GetTailPosition();
@@ -892,7 +892,7 @@ void CLine::Compact()
 
 		m_width -= w->m_width;
 		delete w;
-		RemoveTail();
+		RemoveTailNoReturn();
 	}
 
 	if (IsEmpty()) {

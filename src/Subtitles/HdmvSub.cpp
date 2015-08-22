@@ -287,7 +287,7 @@ void CHdmvSub::CleanOld(REFERENCE_TIME rt)
 			TRACE_HDMVSUB(_T("CHdmvSub:HDMV remove object, size = %d, %s => %s, (rt = %s)\n"), pObject_old->GetRLEDataSize(),
 						   ReftimeToString (pObject_old->m_rtStart), ReftimeToString(pObject_old->m_rtStop),
 						   ReftimeToString(rt));
-			m_pObjects.RemoveHead();
+			m_pObjects.RemoveHeadNoReturn();
 			delete pObject_old;
 		} else {
 			break;
