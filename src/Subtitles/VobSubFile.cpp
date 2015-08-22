@@ -2435,7 +2435,7 @@ void CVobSubStream::Add(REFERENCE_TIME tStart, REFERENCE_TIME tStop, BYTE* pData
 
 	CAutoLock cAutoLock(&m_csSubPics);
 	while (m_subpics.GetCount() && m_subpics.GetTail()->tStart >= tStart) {
-		m_subpics.RemoveTail();
+		m_subpics.RemoveTailNoReturn();
 		m_img.iIdx = -1;
 	}
 

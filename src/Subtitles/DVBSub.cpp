@@ -337,7 +337,7 @@ void CDVBSub::CleanOld(REFERENCE_TIME rt)
 						ReftimeToString(pPage_old->rtStart), ReftimeToString(pPage_old->rtStop),
 						ReftimeToString(rt));
 		}
-		m_pages.RemoveHead();
+		m_pages.RemoveHeadNoReturn();
 		delete pPage_old;
 	}
 }

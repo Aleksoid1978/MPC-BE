@@ -1404,7 +1404,7 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 		CPacket* p = m_packets.GetHead();
 
 		if (p->GetCount() == 0) {
-			m_packets.RemoveHead();
+			m_packets.RemoveHeadNoReturn();
 			continue;
 		}
 
@@ -1426,7 +1426,7 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 
 			m_initpackets.AddTail(m_packets.RemoveHead());
 		} else {
-			m_packets.RemoveHead();
+			m_packets.RemoveHeadNoReturn();
 		}
 	}
 
@@ -1512,7 +1512,7 @@ HRESULT COggDiracOutputPin::UnpackInitPage(OggPage& page)
 			}
 		}
 
-		m_packets.RemoveHead();
+		m_packets.RemoveHeadNoReturn();
 	}
 
 	return hr;

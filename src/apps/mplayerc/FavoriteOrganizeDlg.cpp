@@ -46,7 +46,7 @@ void CFavoriteOrganizeDlg::SetupList(bool fSave)
 		for (int j = 0; j < m_list.GetItemCount(); j++) {
 			CAtlList<CString> args;
 			ExplodeEsc(m_sl[i].GetAt((POSITION)m_list.GetItemData(j)), args, _T(';'));
-			args.RemoveHead();
+			args.RemoveHeadNoReturn();
 			args.AddHead(m_list.GetItemText(j, 0));
 			sl.AddTail(ImplodeEsc(args, _T(';')));
 		}
