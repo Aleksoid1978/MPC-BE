@@ -100,7 +100,7 @@ CBaseSplitterFile::~CBaseSplitterFile()
 
 DWORD WINAPI CBaseSplitterFile::StaticThreadProc(LPVOID lpParam)
 {
-	return ((CBaseSplitterFile*)lpParam)->ThreadProc();
+	return static_cast<CBaseSplitterFile*>(lpParam)->ThreadProc();
 }
 
 DWORD CBaseSplitterFile::ThreadProc()

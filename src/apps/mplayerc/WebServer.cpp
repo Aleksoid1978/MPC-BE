@@ -177,7 +177,7 @@ CWebServer::~CWebServer()
 
 DWORD WINAPI CWebServer::StaticThreadProc(LPVOID lpParam)
 {
-	return ((CWebServer*)lpParam)->ThreadProc();
+	return static_cast<CWebServer*>(lpParam)->ThreadProc();
 }
 
 DWORD CWebServer::ThreadProc()
