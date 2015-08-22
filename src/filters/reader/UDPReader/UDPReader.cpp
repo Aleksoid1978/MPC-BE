@@ -214,7 +214,7 @@ void CUDPStream::Append(BYTE* buff, int len)
 {
 	CAutoLock cPacketLock(&m_csPacketsLock);
 
-	m_packets.AddTail(DNew packet_t(buff, m_len, m_len + len));
+	m_packets.AddTail(DNew packet_t(buff, m_len, len));
 	m_len += len;
 }
 
@@ -662,11 +662,11 @@ DWORD CUDPStream::ThreadProc()
 	return (DWORD)-1;
 }
 
-CUDPStream::packet_t::packet_t(BYTE* p, __int64 start, __int64 end)
+CUDPStream::packet_t::packet_t(BYTE* p, __int64 start, int size)
 	: m_start(start)
-	, m_end(end)
+	, m_end(start + size)
 {
-	size_t size = (size_t)(end - start);
-	m_buff      = DNew BYTE[size];
+	ASSERT(size > 0);
+	m_buff = DNew BYTE[size];
 	memcpy(m_buff, p, size);
 }
