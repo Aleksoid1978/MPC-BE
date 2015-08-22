@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,10 +45,11 @@ private:
 		}
 	};
 
+	enum {PR_NONE, PR_UDP, PR_HTTP};
+
 	CString		m_url_str;
 	CUrl		m_url;
 	int			m_protocol;
-	enum {PR_NONE, PR_UDP, PR_HTTP};
 
 	SOCKET		m_UdpSocket;
 	sockaddr_in	m_addr;
@@ -61,13 +62,13 @@ private:
 	CAtlList<packet_t*> m_packets;
 
 	GUID		m_subtype;
+	DWORD		m_RequestCmd;
 
 	void Clear();
 	void Append(BYTE* buff, int len);
 
 	DWORD ThreadProc();
 
-	DWORD RequestCmd = 0;
 	inline __int64 GetPacketsSize();
 	void CheckBuffer();
 
@@ -77,9 +78,9 @@ public:
 
 	enum {CMD_INIT, CMD_PAUSE, CMD_RUN, CMD_STOP, CMD_EXIT};
 
-
 	bool Load(const WCHAR* fnw);
 
+	// CAsyncStream
 	HRESULT SetPointer(LONGLONG llPos);
 	HRESULT Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWORD pdwBytesRead);
 	LONGLONG Size(LONGLONG* pSizeAvailable);
