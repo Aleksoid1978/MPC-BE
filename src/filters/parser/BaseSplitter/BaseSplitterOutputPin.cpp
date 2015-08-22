@@ -25,7 +25,6 @@
 #include "../../switcher/AudioSwitcher/AudioSwitcher.h"
 #include "BaseSplitterOutputPin.h"
 #include "BaseSplitter.h"
-#include "../../parser/MpegSplitter/MpegSplitter.h"
 
 //
 // CBaseSplitterOutputPin
