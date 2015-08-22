@@ -139,6 +139,15 @@ CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding)
 
 #define TAG_SIZE ((m_major == 2) ? 6 : 10)
 
+static void ReadLang(CGolombBuffer &gb, DWORD &size)
+{
+	// Language
+	CHAR lang[3] = { 0 };
+	gb.ReadBuffer((BYTE*)lang, 3);
+	UNREFERENCED_PARAMETER(lang);
+	size -= 3;
+}
+
 BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 {
 	CGolombBuffer gb(buf, len);
@@ -251,15 +260,15 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 				BYTE encoding = (BYTE)gbData.BitRead(8);
 				size--;
 
-				// Language
-				CHAR lang[3];
-				memset(&lang, 0 ,3);
-				gbData.ReadBuffer((BYTE*)lang, 3);
-				UNREFERENCED_PARAMETER(lang);
-				size -= 3;
+				ReadLang(gbData, size);
 
-				CString Desc = ReadField(gbData, size, encoding);
-				UNREFERENCED_PARAMETER(Desc);
+				if (gbData.BitRead(8, true) == 0) {
+					gbData.BitRead(8);
+					size--;
+				} else {
+					CString Desc = ReadField(gbData, size, encoding);
+					UNREFERENCED_PARAMETER(Desc);
+				}
 
 				CID3TagItem* item = DNew CID3TagItem(tag, ReadText(gbData, size, encoding));
 				TagItems.AddTail(item);
@@ -270,12 +279,7 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 				size--;
 
 				if (tag == 'COMM') {
-					// Language
-					CHAR lang[3];
-					memset(&lang, 0 ,3);
-					gbData.ReadBuffer((BYTE*)lang, 3);
-					UNREFERENCED_PARAMETER(lang);
-					size -= 3;
+					ReadLang(gbData, size);
 
 					if (gbData.BitRead(8, true) == 0) {
 						gbData.BitRead(8);
