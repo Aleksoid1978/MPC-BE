@@ -449,17 +449,15 @@ HRESULT CUDPStream::SetPointer(LONGLONG llPos)
 {
 	CAutoLock cAutoLock(&m_csLock);
 
-	if (m_packets.IsEmpty() && llPos != 0
-			|| !m_packets.IsEmpty() && llPos < m_packets.GetHead()->m_start
-			/*|| !m_packets.IsEmpty() && llPos > m_packets.GetTail()->m_end*/) {
-#ifdef _DEBUG
-		if (m_packets.IsEmpty()) {
-			DbgLog((LOG_TRACE, 3, L"CUDPStream::SetPointer() error - %lld, buffer is empty", llPos));
-		} else {
-			DbgLog((LOG_TRACE, 3, L"CUDPStream::SetPointer() error - %lld, [%I64d -> %I64d]", llPos, m_packets.GetHead()->m_start, m_packets.GetTail()->m_end));
-		}
-#endif
+	if (llPos < 0) {
 		return E_FAIL;
+	}
+
+	__int64 start = m_packets.IsEmpty() ? 0 : m_packets.GetHead()->m_start;
+
+	if (llPos < start) {
+		DbgLog((LOG_TRACE, 3, L"CUDPStream::SetPointer() warning! %lld misses in [%I64d - %I64d]", llPos, start, m_packets.GetTail()->m_end));
+		llPos = start; // hack. it works for MPEG-TS
 	}
 
 	m_pos = llPos;
@@ -559,14 +557,6 @@ void CUDPStream::CheckBuffer()
 	while (!m_packets.IsEmpty() && m_packets.GetHead()->m_start < m_pos - 256 * KILOBYTE) {
 		delete m_packets.RemoveHead();
 	}
-
-#ifdef _DEBUG
-	if (!m_packets.IsEmpty()) {
-		DbgLog((LOG_TRACE, 3, L"CUDPStream: CheckBuffer() : size = %I64d[%I64d -> %I64d], pos = %I64d, available = %I64d",
-			m_packets.GetTail()->m_end - m_packets.GetHead()->m_start, m_packets.GetHead()->m_start, m_packets.GetTail()->m_end,
-			m_pos, m_packets.GetTail()->m_end - m_pos));
-	}
-#endif
 }
 
 DWORD CUDPStream::ThreadProc()
