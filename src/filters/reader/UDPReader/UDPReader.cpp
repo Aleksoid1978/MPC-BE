@@ -154,8 +154,8 @@ STDMETHODIMP CUDPReader::GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt)
 	size_t nCount = m_fn.GetLength() + 1;
 	*ppszFileName = (LPOLESTR)CoTaskMemAlloc(nCount * sizeof(WCHAR));
 	CheckPointer(*ppszFileName, E_OUTOFMEMORY);
-
 	wcscpy_s(*ppszFileName, nCount, m_fn);
+
 	return S_OK;
 }
 
@@ -165,7 +165,10 @@ CUDPStream::CUDPStream()
 	: m_protocol(PR_NONE)
 	, m_UdpSocket(INVALID_SOCKET)
 	, m_HttpSocketTread(INVALID_SOCKET)
+	, m_pos(0)
+	, m_len(0)
 	, m_subtype(MEDIASUBTYPE_NULL)
+	, m_RequestCmd(0)
 {
 	m_WSAEvent[0] = NULL;
 }
@@ -390,7 +393,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 					} else if (value == "video/webm") {
 						m_subtype = MEDIASUBTYPE_Matroska;
 					} else if (value == "video/mp4" || value == "video/x-flv" || value == "video/3gpp") {
-						m_subtype = MEDIASUBTYPE_NULL;
+						m_subtype = MEDIASUBTYPE_MP4;
 					} else { // "text/html..." and other
 						 // not supported content-type
 						connected = FALSE;
@@ -549,7 +552,7 @@ void CUDPStream::CheckBuffer()
 {
 	CAutoLock cPacketLock(&m_csPacketsLock);
 
-	if (RequestCmd != CMD_RUN) {
+	if (m_RequestCmd != CMD_RUN) {
 		return;
 	}
 
@@ -580,9 +583,9 @@ DWORD CUDPStream::ThreadProc()
 #endif
 
 	for (;;) {
-		RequestCmd = GetRequest();
+		m_RequestCmd = GetRequest();
 
-		switch (RequestCmd) {
+		switch (m_RequestCmd) {
 			default:
 			case CMD_EXIT:
 				Reply(S_OK);
