@@ -39,7 +39,7 @@ private:
 		BYTE*   m_buff;
 		__int64 m_start, m_end;
 
-		packet_t(BYTE* p, __int64 start, __int64 end);
+		packet_t(BYTE* p, __int64 start, int size);
 		virtual ~packet_t() {
 			delete [] m_buff;
 		}
