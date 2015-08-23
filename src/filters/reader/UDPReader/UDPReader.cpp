@@ -375,15 +375,17 @@ bool CUDPStream::Load(const WCHAR* fnw)
 									m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
 								}
 							} else if (len > 6 && GETDWORD(&buf) == 0xBA010000) {
-								if ((buf[4]&0xc4) == 0x44) {
+								if ((buf[4] & 0xc4) == 0x44) {
 									m_subtype = MEDIASUBTYPE_MPEG2_PROGRAM;
-								} else if ((buf[4]&0xf1) == 0x21) {
+								} else if ((buf[4] & 0xf1) == 0x21) {
 									m_subtype = MEDIASUBTYPE_MPEG1System;
 								}
 							} else if (len > 4 && GETDWORD(&buf) == 'SggO') {
 								m_subtype = MEDIASUBTYPE_Ogg;
 							} else if (len > 4 && GETDWORD(&buf) == 0xA3DF451A) {
 								m_subtype = MEDIASUBTYPE_Matroska;
+							} else if (len > 4 && GETDWORD(&buf) == FCC('FLV\x1')) {
+								m_subtype = MEDIASUBTYPE_FLV;
 							}
 
 							Append(buf, len);
@@ -392,8 +394,10 @@ bool CUDPStream::Load(const WCHAR* fnw)
 						m_subtype = MEDIASUBTYPE_Ogg;
 					} else if (value == "video/webm") {
 						m_subtype = MEDIASUBTYPE_Matroska;
-					} else if (value == "video/mp4" || value == "video/x-flv" || value == "video/3gpp") {
+					} else if (value == "video/mp4" || value == "video/3gpp") {
 						m_subtype = MEDIASUBTYPE_MP4;
+					} else if (value == "video/x-flv") {
+						m_subtype = MEDIASUBTYPE_FLV;
 					} else { // "text/html..." and other
 						 // not supported content-type
 						connected = FALSE;
