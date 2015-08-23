@@ -605,7 +605,7 @@ DWORD CUDPStream::ThreadProc()
 				int   buffsize = 0;
 				UINT  attempts = 0;
 
-				do {
+				while (!CheckRequest(NULL) && attempts < 200) {
 					int len = 0;
 
 					if (m_protocol == PR_UDP) {
@@ -650,7 +650,7 @@ DWORD CUDPStream::ThreadProc()
 					while (GetPacketsSize() > MAXSTORESIZE && !CheckRequest(NULL)) {
 						Sleep(1000);
 					}
-				} while (!CheckRequest(NULL) && attempts < 200);
+				}
 				break;
 		}
 	}
