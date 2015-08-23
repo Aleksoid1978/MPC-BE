@@ -76,30 +76,56 @@ void CID3Tag::Clear()
 // 2 - UTF-16BE encoded Unicode without BOM
 // 3 - UTF-8 encoded Unicode
 
-CString CID3Tag::ReadText(CGolombBuffer& gb, DWORD &size, BYTE encoding)
+enum ID3v2Encoding {
+	ISO8859  = 0,
+	UTF16BOM = 1,
+	UTF16BE  = 2,
+	UTF8     = 3,
+};
+
+CString CID3Tag::ReadText(CGolombBuffer& gb, DWORD size, BYTE encoding)
 {
-	WORD bom = (WORD)gb.BitRead(16, true);
-
+	CString  str;
 	CStringA strA;
-	CString  strW;
 
-	if (encoding > 0 && size >= 2 && bom == 0xfffe) {
-		gb.BitRead(16);
-		size = (size - 2) / 2;
-		gb.ReadBuffer((BYTE*)strW.GetBufferSetLength(size), size * 2);
-		return strW.Trim();
-	} else if (encoding > 0 && size >= 2 && bom == 0xfeff) {
-		gb.BitRead(16);
-		size = (size - 2) / 2;
-		gb.ReadBuffer((BYTE*)strW.GetBufferSetLength(size), size * 2);
-		for (int i = 0, j = strW.GetLength(); i < j; i++) {
-			strW.SetAt(i, (strW[i] << 8) | (strW[i] >> 8));
-		}
-		return strW.Trim();
-	} else {
-		gb.ReadBuffer((BYTE*)strA.GetBufferSetLength(size), size);
-		return (encoding > 0 ? UTF8To16(strA) : CString(strA)).Trim();
+	BOOL bUTF16LE = FALSE;
+	BOOL bUTF16BE = FALSE;
+	switch (encoding) {
+		case ID3v2Encoding::ISO8859:
+		case ID3v2Encoding::UTF8:
+			gb.ReadBuffer((BYTE*)strA.GetBufferSetLength(size), size);
+			str = encoding == ID3v2Encoding::ISO8859 ? CString(strA) : UTF8To16(strA);
+			break;
+		case ID3v2Encoding::UTF16BOM:
+			if (size > 2) {
+				WORD bom = (WORD)gb.BitRead(16);
+				size -= 2;
+				if (bom == 0xfffe) {
+					bUTF16LE = TRUE;
+				}
+				else if (bom == 0xfeff) {
+					bUTF16BE = TRUE;
+				}
+			}
+			break;
+		case ID3v2Encoding::UTF16BE:
+			if (size >= 2) {
+				bUTF16BE = TRUE;
+			}
+			break;
 	}
+
+	if (bUTF16LE || bUTF16BE) {
+		size >> 1;
+		gb.ReadBuffer((BYTE*)str.GetBufferSetLength(size), size * 2);
+		if (bUTF16BE) {
+			for (int i = 0, j = str.GetLength(); i < j; i++) {
+				str.SetAt(i, (str[i] << 8) | (str[i] >> 8));
+			}
+		}
+	}
+
+	return str.Trim();
 }
 
 CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding)
