@@ -449,15 +449,16 @@ HRESULT CUDPStream::SetPointer(LONGLONG llPos)
 {
 	CAutoLock cAutoLock(&m_csLock);
 
-	if (llPos < 0) {
+	if (m_packets.IsEmpty() && llPos != 0
+			|| !m_packets.IsEmpty() && llPos < m_packets.GetHead()->m_start) {
+#ifdef _DEBUG
+		if (m_packets.IsEmpty()) {
+			DbgLog((LOG_TRACE, 3, L"CUDPStream::SetPointer() error - %lld, buffer is empty", llPos));
+		} else {
+			DbgLog((LOG_TRACE, 3, L"CUDPStream::SetPointer() error - %lld, [%I64d -> %I64d]", llPos, m_packets.GetHead()->m_start, m_packets.GetTail()->m_end));
+		}
+#endif
 		return E_FAIL;
-	}
-
-	__int64 start = m_packets.IsEmpty() ? 0 : m_packets.GetHead()->m_start;
-
-	if (llPos < start) {
-		DbgLog((LOG_TRACE, 3, L"CUDPStream::SetPointer() warning! %lld misses in [%I64d - %I64d]", llPos, start, m_packets.GetTail()->m_end));
-		llPos = start; // hack. it works for MPEG-TS
 	}
 
 	m_pos = llPos;
