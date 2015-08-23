@@ -130,15 +130,16 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 
 		SearchPrograms(0, len);
 
-		__int64 pfp = 0;
-		const int k = 20;
-		for (int i = 0; i <= k; i++) {
-			__int64 fp = i * GetLength() / k;
-			fp = min(GetLength() - MEGABYTE / 2, fp);
-			fp = max(pfp, fp);
-			__int64 nfp = fp + (pfp == 0 ? MEGABYTE * 10 : MEGABYTE / 4);
-			SearchStreams(fp, nfp);
-			pfp = nfp;
+		len = GetLength();
+		__int64 stop = min(10 * MEGABYTE, len);
+		SearchStreams(0, stop);
+
+		int num = min(20, (len - stop) / (512 * KILOBYTE));
+		__int64 step = (len - stop) / num;
+		for (int i = 0; i < num; i++) {
+			stop += step;
+			__int64 start = stop - 256 * KILOBYTE;
+			SearchStreams(start, stop);
 		}
 	}
 	else if (IsStreaming()) {
@@ -453,9 +454,6 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 	}
 
 	Seek(start);
-	if (!IsStreaming()) {
-		stop = min(stop, GetLength());
-	}
 
 	while (GetPos() < stop) {
 		trhdr h;
@@ -471,9 +469,6 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop)
 {
 	Seek(start);
-	if (!IsStreaming()) {
-		stop = min(stop, GetLength());
-	}
 
 	for (;;) {
 		if (GetPos() >= stop) {
