@@ -605,15 +605,14 @@ DWORD CUDPStream::ThreadProc()
 					int len = 0;
 
 					if (m_protocol == PR_UDP) {
-						DWORD res = WSAWaitForMultipleEvents(1, m_WSAEvent, FALSE, 100, FALSE);
+						DWORD res = WSAWaitForMultipleEvents(1, m_WSAEvent, FALSE, 50, FALSE);
 						if (res == WSA_WAIT_EVENT_0) {
 							WSAResetEvent(m_WSAEvent[0]);
 							int fromlen = sizeof(m_addr);
 							len = recvfrom(m_UdpSocket, &buff[buffsize], MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
 							if (len <= 0) {
-								int err = WSAGetLastError();
-								if (err != WSAEWOULDBLOCK) {
-									Sleep(50);
+								const int wsaLastError = WSAGetLastError();
+								if (wsaLastError != WSAEWOULDBLOCK) {
 									attempts++;
 								}
 								continue;
@@ -624,9 +623,12 @@ DWORD CUDPStream::ThreadProc()
 						}
 					} else if (m_protocol == PR_HTTP) {
 						len = m_HttpSocket.Receive(&buff[buffsize], MAXBUFSIZE);
-						if (len <= 0) {
+						if (len == 0) {
 							attempts++;
 							Sleep(50);
+							continue;
+						} else if (len == SOCKET_ERROR) {
+							attempts += 60;
 							continue;
 						}
 						attempts = 0;
@@ -644,7 +646,7 @@ DWORD CUDPStream::ThreadProc()
 					while (GetPacketsSize() > MAXSTORESIZE && !CheckRequest(NULL)) {
 						Sleep(1000);
 					}
-				} while (!CheckRequest(NULL) && attempts < 10);
+				} while (!CheckRequest(NULL) && attempts < 200);
 				break;
 		}
 	}
