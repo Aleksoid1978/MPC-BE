@@ -69,7 +69,7 @@ protected:
 	BYTE m_major;
 	BYTE m_flags;
 
-	CString ReadText(CGolombBuffer& gb, DWORD &size, BYTE encoding);
+	CString ReadText(CGolombBuffer& gb, DWORD size, BYTE encoding);
 	CString ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding);
 
 public:
