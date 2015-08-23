@@ -453,6 +453,9 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 	}
 
 	Seek(start);
+	if (!IsStreaming()) {
+		stop = min(stop, GetLength());
+	}
 
 	while (GetPos() < stop) {
 		trhdr h;
@@ -468,6 +471,9 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop)
 {
 	Seek(start);
+	if (!IsStreaming()) {
+		stop = min(stop, GetLength());
+	}
 
 	for (;;) {
 		if (GetPos() >= stop) {
