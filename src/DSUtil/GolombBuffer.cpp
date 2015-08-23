@@ -1,5 +1,5 @@
 ﻿/*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -66,6 +66,10 @@ CGolombBuffer::~CGolombBuffer()
 UINT64 CGolombBuffer::BitRead(int nBits, bool fPeek)
 {
 	//ASSERT(nBits >= 0 && nBits <= 64);
+	const INT64 tmp_bitbuff	= m_bitbuff;
+	const int tmp_nBitPos	= m_nBitPos;
+	const int tmp_bitlen	= m_bitlen;
+
 	while (m_bitlen < nBits) {
 		m_bitbuff <<= 8;
 
@@ -91,6 +95,10 @@ UINT64 CGolombBuffer::BitRead(int nBits, bool fPeek)
 	if (!fPeek) {
 		m_bitbuff	&= ((1ui64 << bitlen) - 1);
 		m_bitlen	= bitlen;
+	} else {
+		m_bitbuff	= tmp_bitbuff;
+		m_nBitPos	= tmp_nBitPos;
+		m_bitlen	= tmp_bitlen;
 	}
 
 	return ret;

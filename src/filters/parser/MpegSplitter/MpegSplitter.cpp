@@ -1197,6 +1197,10 @@ bool CMpegSplitterFilter::DemuxInit()
 
 void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
+	if (m_pFile->IsStreaming() || m_rtDuration <= 0) {
+		return;
+	}
+
 	CAtlList<CMpegSplitterFile::stream>* pMasterStream = m_pFile->GetMasterStream();
 	if (!pMasterStream) {
 		ASSERT(0);
@@ -1206,7 +1210,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	CMpegSplitterFile::stream& masterStream = pMasterStream->GetHead();
 	DWORD TrackNum = masterStream;
 
-	if (rt <= UNITS || m_rtDuration <= 0) {
+	if (rt <= UNITS) {
 		m_pFile->Seek(0);
 	} else {
 		__int64 pos = SeekBD(rt);

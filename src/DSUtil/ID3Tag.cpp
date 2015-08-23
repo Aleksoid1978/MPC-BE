@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ * (C) 2012-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -78,28 +78,27 @@ void CID3Tag::Clear()
 
 CString CID3Tag::ReadText(CGolombBuffer& gb, DWORD &size, BYTE encoding)
 {
-	WORD bom = (WORD)gb.BitRead(16);
-	gb.Seek(gb.GetPos() - 2);
+	WORD bom = (WORD)gb.BitRead(16, true);
 
-	CStringA	str;
-	CString		wstr;
+	CStringA strA;
+	CString  strW;
 
 	if (encoding > 0 && size >= 2 && bom == 0xfffe) {
 		gb.BitRead(16);
 		size = (size - 2) / 2;
-		gb.ReadBuffer((BYTE*)wstr.GetBufferSetLength(size), size*2);
-		return wstr.Trim();
+		gb.ReadBuffer((BYTE*)strW.GetBufferSetLength(size), size * 2);
+		return strW.Trim();
 	} else if (encoding > 0 && size >= 2 && bom == 0xfeff) {
 		gb.BitRead(16);
 		size = (size - 2) / 2;
-		gb.ReadBuffer((BYTE*)wstr.GetBufferSetLength(size), size * 2);
-		for (int i = 0, j = wstr.GetLength(); i < j; i++) {
-			wstr.SetAt(i, (wstr[i] << 8) | (wstr[i] >> 8));
+		gb.ReadBuffer((BYTE*)strW.GetBufferSetLength(size), size * 2);
+		for (int i = 0, j = strW.GetLength(); i < j; i++) {
+			strW.SetAt(i, (strW[i] << 8) | (strW[i] >> 8));
 		}
-		return wstr.Trim();
+		return strW.Trim();
 	} else {
-		gb.ReadBuffer((BYTE*)str.GetBufferSetLength(size), size);
-		return (encoding > 0 ? UTF8To16(str) : CStringW(str)).Trim();
+		gb.ReadBuffer((BYTE*)strA.GetBufferSetLength(size), size);
+		return (encoding > 0 ? UTF8To16(strA) : CString(strA)).Trim();
 	}
 }
 
@@ -110,7 +109,7 @@ CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding)
 
 	CString wstr;
 
-	if (encoding > 0) {
+	if (encoding == 1 || encoding == 2) {
 		while (size -= 2) {
 			fieldSize += 2;
 
@@ -262,13 +261,8 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 
 				ReadLang(gbData, size);
 
-				if (gbData.BitRead(8, true) == 0) {
-					gbData.BitRead(8);
-					size--;
-				} else {
-					CString Desc = ReadField(gbData, size, encoding);
-					UNREFERENCED_PARAMETER(Desc);
-				}
+				CString Desc = ReadField(gbData, size, encoding);
+				UNREFERENCED_PARAMETER(Desc);
 
 				CID3TagItem* item = DNew CID3TagItem(tag, ReadText(gbData, size, encoding));
 				TagItems.AddTail(item);
@@ -280,11 +274,6 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 
 				if (tag == 'COMM') {
 					ReadLang(gbData, size);
-
-					if (gbData.BitRead(8, true) == 0) {
-						gbData.BitRead(8);
-						size--;
-					}
 
 					DWORD bom_big = (DWORD)gbData.BitRead(32, true);
 					if (bom_big == 0xfffe0000 || bom_big == 0xfeff0000) {
