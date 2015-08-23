@@ -60,14 +60,10 @@ CID3Tag::~CID3Tag()
 void CID3Tag::Clear()
 {
 	CID3TagItem* item;
-	while (TagItems.GetCount() > 0) {
+	while (!TagItems.IsEmpty()) {
 		item = TagItems.RemoveHead();
-		if (item) {
-			delete item;
-		}
+		SAFE_DELETE(item);
 	}
-
-	Tags.RemoveAll();
 }
 
 // text encoding:
@@ -102,8 +98,7 @@ CString CID3Tag::ReadText(CGolombBuffer& gb, DWORD size, BYTE encoding)
 				size -= 2;
 				if (bom == 0xfffe) {
 					bUTF16LE = TRUE;
-				}
-				else if (bom == 0xfeff) {
+				} else if (bom == 0xfeff) {
 					bUTF16BE = TRUE;
 				}
 			}
@@ -116,7 +111,7 @@ CString CID3Tag::ReadText(CGolombBuffer& gb, DWORD size, BYTE encoding)
 	}
 
 	if (bUTF16LE || bUTF16BE) {
-		size >> 1;
+		size /= 2;
 		gb.ReadBuffer((BYTE*)str.GetBufferSetLength(size), size * 2);
 		if (bUTF16BE) {
 			for (int i = 0, j = str.GetLength(); i < j; i++) {
@@ -135,12 +130,11 @@ CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding)
 
 	CString wstr;
 
-	if (encoding == 1 || encoding == 2) {
+	if (encoding == UTF16BOM || encoding == UTF16BE) {
 		while (size -= 2) {
 			fieldSize += 2;
 
-			WORD w = (WORD)gb.BitRead(16);
-			if (w == 0) {
+			if ((WORD)gb.BitRead(16) == 0) {
 				break;
 			}
 		}
@@ -162,16 +156,21 @@ CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding)
 	return wstr;
 }
 
-#define TAG_SIZE ((m_major == 2) ? 6 : 10)
-
 static void ReadLang(CGolombBuffer &gb, DWORD &size)
 {
 	// Language
+	/*
 	CHAR lang[3] = { 0 };
 	gb.ReadBuffer((BYTE*)lang, 3);
 	UNREFERENCED_PARAMETER(lang);
+	*/
+	gb.SkipBytes(3);
 	size -= 3;
 }
+
+#define TAG_SIZE ((m_major == 2) ? 6 : 10)
+#define ID3v2_FLAG_DATALEN 0x0001
+#define ID3v2_FLAG_UNSYNCH 0x0002
 
 BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 {
@@ -206,8 +205,16 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			continue;
 		}
 
+		if (flags & ID3v2_FLAG_DATALEN) {
+			if (size < 4) {
+				break;
+			}
+			gb.SkipBytes(4);
+			size -= 4;
+		}
+
 		CAtlArray<BYTE>	pData;
-		BOOL bUnSync = m_flags & 0x80 || flags & 2;
+		BOOL bUnSync = m_flags & 0x80 || flags & ID3v2_FLAG_UNSYNCH;
 		if (bUnSync) {
 			DWORD dwSize = size;
 			while (dwSize) {
@@ -243,17 +250,15 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 				|| tag == '\0PIC' || tag == 'APIC'
 				|| tag == '\0ULT' || tag == 'USLT'
 				) {
+			BYTE encoding = (BYTE)gbData.BitRead(8);
+			size--;
 
 			if (tag == 'APIC' || tag == '\0PIC') {
 				TCHAR mime[64];
 				memset(&mime, 0 ,64);
-				BYTE encoding = (BYTE)gbData.BitRead(8);
-				size--;
 
 				int mime_len = 0;
-				while (size-- && (mime[mime_len++] = gbData.BitRead(8)) != 0) {
-					;
-				}
+				while (size-- && (mime[mime_len++] = gbData.BitRead(8)) != 0);
 
 				BYTE pic_type = (BYTE)gbData.BitRead(8);
 				size--;
@@ -280,32 +285,11 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 
 				CID3TagItem* item = DNew CID3TagItem(Data, mimeStr);
 				TagItems.AddTail(item);
-			} else if (tag == '\0ULT' || tag == 'USLT') {
-				// Text encoding
-				BYTE encoding = (BYTE)gbData.BitRead(8);
-				size--;
-
-				ReadLang(gbData, size);
-
-				CString Desc = ReadField(gbData, size, encoding);
-				UNREFERENCED_PARAMETER(Desc);
-
-				CID3TagItem* item = DNew CID3TagItem(tag, ReadText(gbData, size, encoding));
-				TagItems.AddTail(item);
 			} else {
-
-				// Text encoding
-				BYTE encoding = (BYTE)gbData.BitRead(8);
-				size--;
-
-				if (tag == 'COMM') {
+				if (tag == 'COMM' || tag == '\0ULT' || tag == 'USLT') {
 					ReadLang(gbData, size);
-
-					DWORD bom_big = (DWORD)gbData.BitRead(32, true);
-					if (bom_big == 0xfffe0000 || bom_big == 0xfeff0000) {
-						gbData.BitRead(32);
-						size -= 4;
-					}
+					CString Desc = ReadField(gbData, size, encoding);
+					UNREFERENCED_PARAMETER(Desc);
 				}
 
 				CID3TagItem* item = DNew CID3TagItem(tag, ReadText(gbData, size, encoding));
