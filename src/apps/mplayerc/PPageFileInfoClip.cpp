@@ -52,6 +52,14 @@ CPPageFileInfoClip::CPPageFileInfoClip(CString fn, IFilterGraph* pFG)
 			if (SUCCEEDED(pPB->Read(CComBSTR(_T("ALBUM")), &var, NULL))) {
 				m_album = var.bstrVal;
 			}
+
+			var.Clear();
+			if (SUCCEEDED(pPB->Read(CComBSTR(_T("LYRICS")), &var, NULL))) {
+				m_descText = var.bstrVal;
+				if (m_descText.Find('\n') && m_descText.Find(L"\r\n") == -1) {
+					m_descText.Replace(L"\n", L"\r\n");
+				}
+			}
 		}
 
 		if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
@@ -78,7 +86,7 @@ CPPageFileInfoClip::CPPageFileInfoClip(CString fn, IFilterGraph* pFG)
 			}
 			if (SUCCEEDED(pAMMC->get_Description(&bstr)) && bstr.Length()) {
 				m_descText = bstr.m_str;
-				m_descText.Replace(_T(";"), _T("\r\n"));
+				m_descText.Replace(L";", L"\r\n");
 				bstr.Empty();
 			}
 		}
