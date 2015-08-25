@@ -470,6 +470,10 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 
 void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop)
 {
+	avch.RemoveAll();
+	hevch.RemoveAll();
+	seqh.RemoveAll();
+
 	Seek(start);
 
 	for (;;) {
