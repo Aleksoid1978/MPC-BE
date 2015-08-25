@@ -135,11 +135,13 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		SearchStreams(0, stop);
 
 		int num = min(20, (len - stop) / (512 * KILOBYTE));
-		__int64 step = (len - stop) / num;
-		for (int i = 0; i < num; i++) {
-			stop += step;
-			__int64 start = stop - 256 * KILOBYTE;
-			SearchStreams(start, stop);
+		if (num > 0) {
+			__int64 step = (len - stop) / num;
+			for (int i = 0; i < num; i++) {
+				stop += step;
+				__int64 start = stop - 256 * KILOBYTE;
+				SearchStreams(start, stop);
+			}
 		}
 	}
 	else if (IsStreaming()) {
@@ -150,7 +152,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			len = GetAvailable();
 		}
 		len = min(len, 3 * MEGABYTE); // limit just in case
-		DbgLog((LOG_TRACE, 3, L"MpegSplitter : use %I64d bytes to search for tracks", len));
+		DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::Init() : streaming - use %I64d bytes to search for tracks", len));
 
 		SearchPrograms(0, len);
 		SearchStreams(0, len);
@@ -164,16 +166,16 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	}
 
 	if (!m_bIsBD) {
-		REFERENCE_TIME rtMin	= _I64_MAX;
-		__int64 posMin			= -1;
-		__int64 posMax			= posMin;
+		REFERENCE_TIME rtMin = _I64_MAX;
+		__int64 posMin       = -1;
+		__int64 posMax       = posMin;
 
 		for (int type = stream_type::video; type <= stream_type::audio; type++) {
-			CStreamList& streams = m_streams[type];
+			const CStreamList& streams = m_streams[type];
 			POSITION pos = streams.GetHeadPosition();
 			while (pos) {
-				stream& s = streams.GetNext(pos);
-				SyncPoints& sps = m_SyncPoints[s];
+				const stream& s = streams.GetNext(pos);
+				const SyncPoints& sps = m_SyncPoints[s];
 				if (sps.GetCount() > 1 && sps[0].rt < rtMin) {
 					rtMin = sps[0].rt;
 					posMin = posMax = sps[0].fp;
@@ -185,11 +187,11 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			const REFERENCE_TIME maxDelta = 30 * 60 * 10000000i64;
 			m_rtMin = m_rtMax = rtMin;
 			for (int type = stream_type::video; type <= stream_type::audio; type++) {
-				CStreamList& streams = m_streams[type];
+				const CStreamList& streams = m_streams[type];
 				POSITION pos = streams.GetHeadPosition();
 				while (pos) {
-					stream& s = streams.GetNext(pos);
-					SyncPoints& sps = m_SyncPoints[s];
+					const stream& s = streams.GetNext(pos);
+					const SyncPoints& sps = m_SyncPoints[s];
 					for (size_t i = 1; i < sps.GetCount(); i++) {
 						if (sps[i].rt > m_rtMax && sps[i].fp > posMax
 								&& ((sps[i].rt - m_rtMax) < maxDelta)) {
