@@ -43,6 +43,7 @@
 #include "rectangle.h"
 #include "thread.h"
 
+
 static const uint8_t rem6[QP_MAX_NUM + 1] = {
     0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2,
     3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5,
@@ -615,11 +616,14 @@ static int h264_frame_start(H264Context *h)
 
     if ((ret = alloc_picture(h, pic)) < 0)
         return ret;
-    if(!h->frame_recovered && !h->avctx->hwaccel &&
+    if(!h->frame_recovered && !h->avctx->hwaccel
        // ==> Start patch MPC
-       !h->avctx->using_dxva &&
+       && !h->avctx->using_dxva
        // ==> End patch MPC
-       !(h->avctx->codec->capabilities & AV_CODEC_CAP_HWACCEL_VDPAU))
+#if FF_API_CAP_VDPAU
+       && !(h->avctx->codec->capabilities & AV_CODEC_CAP_HWACCEL_VDPAU)
+#endif
+       )
         avpriv_color_frame(pic->f, c);
 
     h->cur_pic_ptr = pic;
@@ -874,6 +878,7 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
                      CONFIG_H264_D3D11VA_HWACCEL + \
                      CONFIG_H264_VAAPI_HWACCEL + \
                      (CONFIG_H264_VDA_HWACCEL * 2) + \
+                     CONFIG_H264_VIDEOTOOLBOX_HWACCEL + \
                      CONFIG_H264_VDPAU_HWACCEL)
     enum AVPixelFormat pix_fmts[HWACCEL_MAX + 2], *fmt = pix_fmts;
     const enum AVPixelFormat *choices = pix_fmts;
@@ -948,11 +953,14 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
             *fmt++ = AV_PIX_FMT_D3D11VA_VLD;
 #endif
 #if CONFIG_H264_VAAPI_HWACCEL
-            *fmt++ = AV_PIX_FMT_VAAPI_VLD;
+            *fmt++ = AV_PIX_FMT_VAAPI;
 #endif
 #if CONFIG_H264_VDA_HWACCEL
             *fmt++ = AV_PIX_FMT_VDA_VLD;
             *fmt++ = AV_PIX_FMT_VDA;
+#endif
+#if CONFIG_H264_VIDEOTOOLBOX_HWACCEL
+            *fmt++ = AV_PIX_FMT_VIDEOTOOLBOX;
 #endif
             if (h->avctx->codec->pix_fmts)
                 choices = h->avctx->codec->pix_fmts;
@@ -1060,6 +1068,7 @@ static int h264_slice_header_init(H264Context *h)
         goto fail;
     }
 
+#if FF_API_CAP_VDPAU
     if (h->avctx->codec &&
         h->avctx->codec->capabilities & AV_CODEC_CAP_HWACCEL_VDPAU &&
         (h->sps.bit_depth_luma != 8 || h->sps.chroma_format_idc > 1)) {
@@ -1068,6 +1077,7 @@ static int h264_slice_header_init(H264Context *h)
         ret = AVERROR_INVALIDDATA;
         goto fail;
     }
+#endif
 
     if (h->sps.bit_depth_luma < 8 || h->sps.bit_depth_luma > 14 ||
         h->sps.bit_depth_luma == 11 || h->sps.bit_depth_luma == 13
@@ -1259,15 +1269,19 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
         if (h->current_slice) {
             av_assert0(!h->setup_finished);
             if (h->cur_pic_ptr && FIELD_PICTURE(h) && h->first_field) {
-                ff_h264_field_end(h, h->slice_ctx, 1);
+                ret = ff_h264_field_end(h, h->slice_ctx, 1);
                 h->current_slice = 0;
+                if (ret < 0)
+                    return ret;
             } else if (h->cur_pic_ptr && !FIELD_PICTURE(h) && !h->first_field && h->nal_unit_type  == NAL_IDR_SLICE) {
                 av_log(h, AV_LOG_WARNING, "Broken frame packetizing\n");
-                ff_h264_field_end(h, h->slice_ctx, 1);
+                ret = ff_h264_field_end(h, h->slice_ctx, 1);
                 h->current_slice = 0;
                 ff_thread_report_progress(&h->cur_pic_ptr->tf, INT_MAX, 0);
                 ff_thread_report_progress(&h->cur_pic_ptr->tf, INT_MAX, 1);
                 h->cur_pic_ptr = NULL;
+                if (ret < 0)
+                    return ret;
             } else
                 return AVERROR_INVALIDDATA;
         }
@@ -1514,7 +1528,8 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
     last_mb_aff_frame  = h->mb_aff_frame;
     last_pic_structure = h->picture_structure;
     last_pic_droppable = h->droppable;
-    droppable          = h->nal_ref_idc == 0;
+
+    droppable = h->nal_ref_idc == 0;
     if (h->sps.frame_mbs_only_flag) {
         picture_structure = PICT_FRAME;
     } else {
@@ -2640,11 +2655,14 @@ int ff_h264_execute_decode_slices(H264Context *h, unsigned context_count)
 
     h->slice_ctx[0].next_slice_idx = INT_MAX;
 
-    if (h->avctx->hwaccel ||
+    if (h->avctx->hwaccel
         // ==> Start patch MPC
-        h->avctx->using_dxva ||
+        || h->avctx->using_dxva
         // ==> End patch MPC
-        h->avctx->codec->capabilities & AV_CODEC_CAP_HWACCEL_VDPAU)
+#if FF_API_CAP_VDPAU
+        || h->avctx->codec->capabilities & AV_CODEC_CAP_HWACCEL_VDPAU
+#endif
+        )
         return 0;
     if (context_count == 1) {
         int ret;

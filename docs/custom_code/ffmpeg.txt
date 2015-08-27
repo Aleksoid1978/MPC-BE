@@ -12,14 +12,13 @@
 * libavcodec/error_resilience.c
 * libavcodec/h264.c
 * libavcodec/h264.h
-* libavcodec/h264_refs.c
 * libavcodec/h264_ps.c
+* libavcodec/h264_refs.c
 * libavcodec/h264_slice.c
 * libavcodec/hevc.c
 * libavcodec/hevc.h
 * libavcodec/hevc_parse.c
 * libavcodec/hevc_parser.c
-* libavcodec/hevc_ps.c
 * libavcodec/hevc_refs.c
 * libavcodec/hevcpred.c
 * libavcodec/hevcpred.h
@@ -27,8 +26,8 @@
 *.libavcodec/libdcadec.c 
 * libavcodec/mpeg12dec.c
 * libavcodec/mpegaudio_parser.c
-* libavcodec/mpegvideo.c
 * libavcodec/mpegpicture.c
+* libavcodec/mpegvideo.c
 * libavcodec/options.c
 * libavcodec/utils.c
 * libavcodec/vc1.h
@@ -36,6 +35,7 @@
 * libavcodec/vorbis.c
 
 * libavfilter/allfilters.c 
+* libavfilter/avfilter.c
 
 * libavutil/common.h
 * libavutil/eval.c
