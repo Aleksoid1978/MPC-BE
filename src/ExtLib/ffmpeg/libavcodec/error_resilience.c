@@ -780,7 +780,9 @@ static int er_supported(ERContext *s)
        // ==> Start patch MPC
        s->avctx->using_dxva                                           ||
        // ==> End patch MPC
+#if FF_API_CAP_VDPAU
        s->avctx->codec->capabilities&AV_CODEC_CAP_HWACCEL_VDPAU          ||
+#endif
        !s->cur_pic.f                                                  ||
        s->cur_pic.field_picture
     )

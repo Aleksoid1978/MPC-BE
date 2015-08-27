@@ -940,13 +940,18 @@ static int decode_eld_specific_config(AACContext *ac, AVCodecContext *avctx,
 static int decode_audio_specific_config(AACContext *ac,
                                         AVCodecContext *avctx,
                                         MPEG4AudioConfig *m4ac,
-                                        const uint8_t *data, int bit_size,
+                                        const uint8_t *data, int64_t bit_size,
                                         int sync_extension)
 {
     GetBitContext gb;
     int i, ret;
 
-    ff_dlog(avctx, "audio specific config size %d\n", bit_size >> 3);
+    if (bit_size < 0 || bit_size > INT_MAX) {
+        av_log(avctx, AV_LOG_ERROR, "Audio specific config size is invalid\n");
+        return AVERROR_INVALIDDATA;
+    }
+
+    ff_dlog(avctx, "audio specific config size %d\n", (int)bit_size >> 3);
     for (i = 0; i < bit_size >> 3; i++)
         ff_dlog(avctx, "%02x ", data[i]);
     ff_dlog(avctx, "\n");
@@ -1076,7 +1081,7 @@ static av_cold int aac_decode_init(AVCodecContext *avctx)
     if (avctx->extradata_size > 0) {
         if ((ret = decode_audio_specific_config(ac, ac->avctx, &ac->oc[1].m4ac,
                                                 avctx->extradata,
-                                                avctx->extradata_size * 8,
+                                                avctx->extradata_size * 8LL,
                                                 1)) < 0)
             return ret;
     } else {
@@ -2750,7 +2755,8 @@ static void spectral_to_sample(AACContext *ac, int samples)
                     /* preparation for resampler */
                     for(j = 0; j<samples; j++){
                         che->ch[0].ret[j] = (int32_t)av_clipl_int32((int64_t)che->ch[0].ret[j]<<7)+0x8000;
-                        che->ch[1].ret[j] = (int32_t)av_clipl_int32((int64_t)che->ch[1].ret[j]<<7)+0x8000;
+                        if(type == TYPE_CPE)
+                            che->ch[1].ret[j] = (int32_t)av_clipl_int32((int64_t)che->ch[1].ret[j]<<7)+0x8000;
                     }
                 }
 #endif /* USE_FIXED */
@@ -3106,7 +3112,7 @@ static int aac_decode_frame(AVCodecContext *avctx, void *data,
         push_output_configuration(ac);
         if (decode_audio_specific_config(ac, ac->avctx, &ac->oc[1].m4ac,
                                          avctx->extradata,
-                                         avctx->extradata_size*8, 1) < 0) {
+                                         avctx->extradata_size*8LL, 1) < 0) {
             pop_output_configuration(ac);
             return AVERROR_INVALIDDATA;
         }
@@ -3121,7 +3127,7 @@ static int aac_decode_frame(AVCodecContext *avctx, void *data,
     if (INT_MAX / 8 <= buf_size)
         return AVERROR_INVALIDDATA;
 
-    if ((err = init_get_bits(&gb, buf, buf_size * 8)) < 0)
+    if ((err = init_get_bits8(&gb, buf, buf_size)) < 0)
         return err;
 
     switch (ac->oc[1].m4ac.object_type) {

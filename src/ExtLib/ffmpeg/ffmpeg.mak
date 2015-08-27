@@ -451,6 +451,7 @@ SRCS_LC = \
 	libavcodec/xiph.c \
 	libavcodec/xvididct.c \
 	\
+	libavcodec/x86/aacpsdsp_init.c \
 	libavcodec/x86/ac3dsp_init.c \
 	libavcodec/x86/audiodsp_init.c \
 	libavcodec/x86/blockdsp_init.c \
@@ -572,6 +573,7 @@ SRCS_LU = \
 	libavutil/pixdesc.c \
 	libavutil/random_seed.c \
 	libavutil/rational.c \
+	libavutil/reverse.c \
 	libavutil/samplefmt.c \
 	libavutil/sha.c \
 	libavutil/stereo3d.c \
@@ -598,14 +600,18 @@ SRCS_LR = \
 	libswresample/x86/resample_init.c
 
 SRCS_LS = \
+	libswscale/alphablend.c \
+	libswscale/hscale.c \
 	libswscale/hscale_fast_bilinear.c \
 	libswscale/input.c \
 	libswscale/options.c \
 	libswscale/output.c \
 	libswscale/rgb2rgb.c \
+	libswscale/slice.c \
 	libswscale/swscale.c \
 	libswscale/swscale_unscaled.c \
 	libswscale/utils.c \
+	libswscale/vscale.c \
 	libswscale/yuv2rgb.c \
 	\
 	libswscale/x86/hscale_fast_bilinear_simd.c \
@@ -615,6 +621,7 @@ SRCS_LS = \
 
 # Yasm objects
 SRCS_YASM_LC = \
+	libavcodec/x86/aacpsdsp.asm \
 	libavcodec/x86/ac3dsp.asm \
 	libavcodec/x86/audiodsp.asm \
 	libavcodec/x86/blockdsp.asm \

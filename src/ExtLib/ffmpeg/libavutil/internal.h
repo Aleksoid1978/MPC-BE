@@ -258,6 +258,12 @@ void avpriv_request_sample(void *avc,
 #define SIZE_SPECIFIER "zu"
 #endif
 
+#ifdef DEBUG
+#   define ff_dlog(ctx, ...) av_log(ctx, AV_LOG_DEBUG, __VA_ARGS__)
+#else
+#   define ff_dlog(ctx, ...) do { if (0) av_log(ctx, AV_LOG_DEBUG, __VA_ARGS__); } while (0)
+#endif
+
 /**
  * A wrapper for open() setting O_CLOEXEC.
  */
@@ -283,5 +289,7 @@ uint64_t ff_get_channel_layout(const char *name, int compat);
 #endif
 
 void ff_check_pixfmt_descriptors(void);
+
+extern const uint8_t ff_reverse[256];
 
 #endif /* AVUTIL_INTERNAL_H */
