@@ -3159,7 +3159,7 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 
 		if (m_closingmsg != aborted) {
 
-			if (OpenFileData *pFileData	= dynamic_cast<OpenFileData*>(pOMD.m_p)) {
+			if (OpenFileData *pFileData = dynamic_cast<OpenFileData*>(pOMD.m_p)) {
 				m_wndPlaylistBar.SetCurValid(false);
 
 				if (GetAsyncKeyState(VK_ESCAPE)) {
@@ -6328,7 +6328,7 @@ void CMainFrame::OnFileSaveSubtitle()
 	if (m_pCurrentSubStream) {
 		OpenMediaData *pOMD = m_wndPlaylistBar.GetCurOMD();
 		CString suggestedFileName("");
-		if (OpenFileData* p = dynamic_cast<OpenFileData*>(pOMD)) {
+		if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
 			// HACK: get the file name from the current playlist item
 			suggestedFileName = GetCurFileName();
 			if (IsLikelyPath(suggestedFileName)) {
@@ -11101,8 +11101,8 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	m_pGB_preview = NULL;
 
 	m_bUseSmartSeek	= s.fSmartSeek;
-	if (OpenFileData* p = dynamic_cast<OpenFileData*>(pOMD)) {
-		CString fn = p->fns.GetHead();
+	if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
+		CString fn = pFileData->fns.GetHead();
 		if (!fn.IsEmpty() && (fn.Find(_T("://")) >= 0)) { // disable SmartSeek for streaming data.
 			m_bUseSmartSeek = false;
 		}
@@ -11147,13 +11147,13 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 				m_pGB_preview = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_wndPreView.GetVideoHWND(), true);
 			}
 		}
-	} else if (OpenDVDData* p = dynamic_cast<OpenDVDData*>(pOMD)) {
+	} else if (OpenDVDData* pDVDData = dynamic_cast<OpenDVDData*>(pOMD)) {
 		m_pGB = DNew CFGManagerDVD(_T("CFGManagerDVD"), NULL, m_pVideoWnd->m_hWnd);
 
 		if (m_bUseSmartSeek && m_wndPreView) {
 			m_pGB_preview = DNew CFGManagerDVD(_T("CFGManagerDVD"), NULL, m_wndPreView.GetVideoHWND(), true);
 		}
-	} else if (OpenDeviceData* p = dynamic_cast<OpenDeviceData*>(pOMD)) {
+	} else if (OpenDeviceData* pDeviceData = dynamic_cast<OpenDeviceData*>(pOMD)) {
 		if (s.iDefaultCaptureDevice == 1) {
 			m_pGB = DNew CFGManagerBDA(_T("CFGManagerBDA"), NULL, m_pVideoWnd->m_hWnd);
 		} else {
@@ -13272,7 +13272,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	m_fValidDVDOpen	= false;
 
-	OpenFileData *pFileData		= dynamic_cast<OpenFileData*>(pOMD.m_p);
+	OpenFileData* pFileData		= dynamic_cast<OpenFileData*>(pOMD.m_p);
 	OpenDVDData* pDVDData		= dynamic_cast<OpenDVDData*>(pOMD.m_p);
 	OpenDeviceData* pDeviceData	= dynamic_cast<OpenDeviceData*>(pOMD.m_p);
 	ASSERT(pFileData || pDVDData || pDeviceData);
