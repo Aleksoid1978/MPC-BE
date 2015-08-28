@@ -11108,10 +11108,10 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		}
 	}
 
-	if (OpenFileData* p = dynamic_cast<OpenFileData*>(pOMD)) {
-		engine_t engine = s.GetRtspEngine(p->fns.GetHead());
+	if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
+		engine_t engine = s.GetRtspEngine(pFileData->fns.GetHead());
 
-		CStringA ct = GetContentType(p->fns.GetHead());
+		CStringA ct = GetContentType(pFileData->fns.GetHead());
 
 		if (ct == "video/x-ms-asf") {
 			// TODO: put something here to make the windows media source filter load later

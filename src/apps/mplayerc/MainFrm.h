@@ -103,9 +103,9 @@ public:
 class OpenFileData : public OpenMediaData
 {
 public:
-	OpenFileData() : rtStart(INVALID_TIME) {}
+	//OpenFileData() {}
 	CFileItemList fns;
-	REFERENCE_TIME rtStart;
+	REFERENCE_TIME rtStart = INVALID_TIME;
 };
 
 class OpenDVDData : public OpenMediaData
@@ -119,11 +119,11 @@ public:
 class OpenDeviceData : public OpenMediaData
 {
 public:
-	OpenDeviceData() {
-		vinput = vchannel = ainput = -1;
-	}
+	//OpenDeviceData() {}
 	CStringW DisplayName[2];
-	int vinput, vchannel, ainput;
+	int vinput = -1;
+	int vchannel = -1;
+	int ainput = -1;
 };
 
 class TunerScanData

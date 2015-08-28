@@ -42,7 +42,7 @@ extern "C" {
 
 /* not used
 static const WORD PCID_NVIDIA_4K[] = {
-	// http://us.download.nvidia.com/XFree86/Linux-x86_64/349.16/README/supportedchips.html
+	// http://us.download.nvidia.com/XFree86/Linux-x86_64/355.06/README/supportedchips.html
 	// http://pci-ids.ucw.cz/read/PC/10de
 	// VP5, Nvidia VDPAU Feature Set D: GF117, GF119, GK104, GK106, GK107, GK110, GK208.
 	0x0FC2, // GeForce GT 630 (GK107) (not officially supported or typo, 4k tested)
