@@ -40,7 +40,8 @@ extern "C" {
 	#include <ffmpeg/libavcodec/mpeg12.h>
 }
 
-static const WORD PCID_NVIDIA_VP567[] = {
+/* not used
+static const WORD PCID_NVIDIA_4K[] = {
 	// http://us.download.nvidia.com/XFree86/Linux-x86_64/349.16/README/supportedchips.html
 	// http://pci-ids.ucw.cz/read/PC/10de
 	// VP5, Nvidia VDPAU Feature Set D: GF117, GF119, GK104, GK106, GK107, GK110, GK208.
@@ -89,6 +90,8 @@ static const WORD PCID_NVIDIA_VP567[] = {
 	0x1027, // Tesla K40st
 	0x1028, // Tesla K20m
 	0x1029, // Tesla K40s
+	0x102A, // Tesla K40t
+	0x102D, // Tesla K80
 	0x103A, // Quadro K6000
 	0x103C, // Quadro K5200
 	0x1040, // GeForce GT 520 (GF119) (not officially supported or typo, 4k tested)
@@ -146,6 +149,7 @@ static const WORD PCID_NVIDIA_VP567[] = {
 	0x11C5, // GeForce GT 740
 	0x11C6, // GeForce GTX 650 Ti
 	0x11C8, // GeForce GTX 650
+	0x11CB, // GeForce GT 740
 	0x11E0, // GeForce GTX 770M
 	0x11E1, // GeForce GTX 765M
 	0x11E2, // GeForce GTX 765M
@@ -166,12 +170,14 @@ static const WORD PCID_NVIDIA_VP567[] = {
 	0x1295, // GeForce 710M
 	0x1296, // GeForce 825M
 	0x1299, // GeForce 920M
+	0x129A, // GeForce 910M
 	0x12B9, // Quadro K610M
 	0x12BA, // Quadro K510M
 
 	// VP6, Nvidia VDPAU Feature Set E: GM107, GM108, GM204.
 	0x1340, // GeForce 830M
 	0x1341, // GeForce 840M
+	0x1344, // GeForce 845M
 	0x1346, // GeForce 930M
 	0x1347, // GeForce 940M
 	0x1380, // GeForce GTX 750 Ti
@@ -181,8 +187,10 @@ static const WORD PCID_NVIDIA_VP567[] = {
 	0x1391, // GeForce GTX 850M
 	0x1392, // GeForce GTX 860M
 	0x1393, // GeForce 840M
+	0x1398, // GeForce 845M
 	0x139A, // GeForce GTX 950M
 	0x139B, // GeForce GTX 960M
+	0x139C, // GeForce 940M
 	0x13B3, // Quadro K2200M
 	0x13BA, // Quadro K2200
 	0x13BB, // Quadro K620
@@ -196,10 +204,15 @@ static const WORD PCID_NVIDIA_VP567[] = {
 	// VP7, Nvidia VDPAU Feature Set F: GM206.
 	0x1401, // GeForce GTX 960
 
-	// VP6, Nvidia VDPAU Feature Set E: GM200.
+	// VP6, Nvidia VDPAU Feature Set E: GM200, GM204
+	0x1617, // GeForce GTX 980M
+	0x1618, // GeForce GTX 970M
+	0x1619, // GeForce GTX 965M
 	0x17C2, // GeForce GTX TITAN X
+	0x17C8, // GeForce GTX 980 Ti
 	0x17F0, // Quadro M6000
 };
+*/
 
 static const WORD PCID_ATI_UVD [] = {
 	0x94C7, // ATI Radeon HD 2350
@@ -227,43 +240,54 @@ static const WORD PCID_ATI_UVD [] = {
 	0x950F, // ATI Radeon HD 3850 X2
 };
 
+static const WORD PCID_AMD_4K [] = { // not tested
+	// http://pci-ids.ucw.cz/read/PC/1002
+	// UVD 5
+	0x6939, // Radeon R9 285/380
+	// UVD 6
+	0x7300, // Radeon R9 FURY Series
+};
+
 static const WORD PCID_INTEL_4K [] = {
 	// IvyBridge
-	0x0152, // Intel HD Graphics 2500        (4k tested)
-	0x0156, // Intel HD Graphics 2500 Mobile
-	0x015A, // Intel HD Graphics P2500
-	0x0162, // Intel HD Graphics 4000        (fully tested)
-	0x0166, // Intel HD Graphics 4000 Mobile
-	0x016A, // Intel HD Graphics P4000
+	0x0152, // HD Graphics 2500        (4k tested)
+	0x0156, // HD Graphics 2500 Mobile
+	0x015A, // HD Graphics P2500
+	0x0162, // HD Graphics 4000        (fully tested)
+	0x0166, // HD Graphics 4000 Mobile
+	0x016A, // HD Graphics P4000
 	// Haswell
-	0x0402, // Intel HD Graphics
-	0x0406, // Intel HD Graphics Mobile
-	0x040A, // Intel HD Graphics
-	0x0412, // Intel HD Graphics 4600
-	0x0416, // Intel HD Graphics 4600 Mobile
-	0x041A, // Intel HD Graphics P4600/P4700
-	0x041E, // Intel HD Graphics 4400"
-	0x0A06, // Intel HD Graphics
-	0x0A0E, // Intel HD Graphics
-	0x0A16, // Intel HD Graphics Family
-	0x0A1E, // Intel HD Graphics Family
-	0x0A26, // Intel HD Graphics 5000
-	0x0A2E, // Intel Iris Graphics 5100
-	0x0D22, // Intel Iris Pro Graphics 5200
-	0x0D26, // Intel Iris Pro Graphics 5200
+	0x0402, // HD Graphics
+	0x0406, // HD Graphics Mobile
+	0x040A, // HD Graphics
+	0x0412, // HD Graphics 4600
+	0x0416, // HD Graphics 4600 Mobile
+	0x041A, // HD Graphics P4600/P4700
+	0x041E, // HD Graphics 4400"
+	0x0A06, // HD Graphics
+	0x0A0E, // HD Graphics
+	0x0A16, // HD Graphics Family
+	0x0A1E, // HD Graphics Family
+	0x0A26, // HD Graphics 5000
+	0x0A2E, // Iris Graphics 5100
+	0x0D22, // Iris Pro Graphics 5200
+	0x0D26, // Iris Pro Graphics 5200
 	// Atom Z3700 Series
-	0x0F31, // Intel HD Graphics
+	0x0F31, // HD Graphics
 	// Broadwell
-	0x1606, // Intel HD Graphics
-	0x160E, // Intel HD Graphics
-	0x1612, // Intel HD Graphics 5600
-	0x1616, // Intel HD Graphics 5500
-	0x161A, // Intel HD Graphics P5700
-	0x161E, // Intel HD Graphics 5300
-	0x1622, // Intel Iris Pro Graphics 6200
-	0x1626, // Intel HD Graphics 6000
-	0x162A, // Intel Iris Pro Graphics P6300
-	0x162B, // Intel Iris Graphics 6100
+	0x1606, // HD Graphics
+	0x160E, // HD Graphics
+	0x1612, // HD Graphics 5600
+	0x1616, // HD Graphics 5500
+	0x161A, // HD Graphics P5700
+	0x161E, // HD Graphics 5300
+	0x1622, // Iris Pro Graphics 6200
+	0x1626, // HD Graphics 6000
+	0x162A, // Iris Pro Graphics P6300
+	0x162B, // Iris Graphics 6100
+	// Skylake
+	0x1912, // HD Graphics 530
+	0x191B, // HD Graphics 530
 };
 
 static bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t count)
@@ -570,15 +594,11 @@ bool IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice)
 }
 
 #define CHECK_AVC_L52_SIZE(w, h) ((w) <= 4096 && (h) <= 4096 && (w) * (h) <= 36864 * 16 * 16)
+
 BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion)
 {
 	width = (width + 15) & ~15; // (width + 15) / 16 * 16;
 	height = (height + 15) & ~15; // (height + 15) / 16 * 16;
-
-	//if (nCodecId == AV_CODEC_ID_WMV3 && width <= 720) {
-	//	// fixes color problem for some wmv files (profile <= MP@ML)
-	//	return FALSE;
-	//}
 
 	if (nPCIVendor == PCIV_nVidia) {
 		if (IsWinVistaOrLater() && DriverVersionCheck(VideoDriverVersion, 9, 18, 13, 2018)) { // The video frame size is checked in the driver
@@ -588,28 +608,31 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 			// if (CheckPCID(nPCIDevice, PCID_NVIDIA_VP567, _countof(PCID_NVIDIA_VP567)) && width <= 4096 && height <= 4096 && width * height <= 4080 * 4080) {
 			// tested H.264 on VP5 (GT 610, GTX 660 Ti)
 			// 4080x4080 = 65025 macroblocks
-		} else if (width <= 2032 && height <= 2032 && width * height <= 8190 * 16 * 16) {
+		}
+		else if (width <= 2032 && height <= 2032 && width * height <= 8190 * 16 * 16) {
 			// tested H.264, VC-1 and MPEG-2 on VP4 (feature set C) (G210M, GT220)
 			return TRUE;
 		}
-	} else if (nPCIVendor == PCIV_ATI) {
-		if (width <= 2048 && height <= 2304 && width * height <= 2048 * 2048) {
+	}
+	else if (nPCIVendor == PCIV_ATI) {
+		// UVD 5, UVD 6
+		if (CheckPCID(nPCIDevice, PCID_AMD_4K, _countof(PCID_AMD_4K)) && CHECK_AVC_L52_SIZE(width, height)) {
+			// not tested
+			return TRUE;
+		}
+		else if (width <= 2048 && height <= 2304 && width * height <= 2048 * 2048) {
 			// tested H.264 on UVD 2.2 (HD5670, HD5770, HD5850)
 			// it may also work if width = 2064, but unstable
 			return TRUE;
 		}
-	} else if (nPCIVendor == PCIV_Intel && nPCIDevice == PCID_Intel_HD4000) {
+	}
+	else if (nPCIVendor == PCIV_Intel && CheckPCID(nPCIDevice, PCID_INTEL_4K, _countof(PCID_INTEL_4K))) {
 		if (width <= 4096 && height <= 4096) { // driver >= v.9.17.10.2867
-			// complete test was performed
+			// complete test was performed (HD 4000)
 			return TRUE;
 		}
-	} else if (nPCIVendor == PCIV_Intel && CheckPCID(nPCIDevice, PCID_INTEL_4K, _countof(PCID_INTEL_4K))) {
-		if (CHECK_AVC_L52_SIZE(width, height)) {
-			// tested some media files with AVC Livel 5.1
-			// complete test was NOT performed
-			return TRUE;
-		}
-	} else if (width <= 1920 && height <= 1088) {
+	}
+	else if (width <= 1920 && height <= 1088) {
 		return TRUE;
 	}
 
