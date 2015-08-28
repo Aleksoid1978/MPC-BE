@@ -35,7 +35,6 @@
 * libavcodec/vorbis.c
 
 * libavfilter/allfilters.c 
-* libavfilter/avfilter.c
 
 * libavutil/common.h
 * libavutil/eval.c
