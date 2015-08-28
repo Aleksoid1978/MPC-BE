@@ -92,7 +92,7 @@ public IAMLine21Decoder {};
 class OpenMediaData
 {
 public:
-	//	OpenMediaData() {}
+	//OpenMediaData() {}
 	virtual ~OpenMediaData() {} // one virtual funct is needed to enable rtti
 	CString title;
 	CSubtitleItemList subs;
@@ -111,7 +111,7 @@ public:
 class OpenDVDData : public OpenMediaData
 {
 public:
-	// OpenDVDData() {}
+	//OpenDVDData() {}
 	CString path;
 	CComPtr<IDvdState> pDvdState;
 };

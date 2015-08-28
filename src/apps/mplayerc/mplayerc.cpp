@@ -2281,13 +2281,13 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			return "";
 		}
 
-		CMPCSocket s;
-		if (!s.Create()) {
+		CMPCSocket socket;
+		if (!socket.Create()) {
 			return "";
 		}
-		s.SetTimeOut(3000, 3000);
-		if (s.Connect(url)) {
-			CStringA hdr = s.GetHeader();
+		socket.SetTimeOut(3000, 3000);
+		if (socket.Connect(url)) {
+			CStringA hdr = socket.GetHeader();
 
 			int ContentLength = 0;
 
@@ -2352,9 +2352,9 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 
 			while (body.GetLength() < nMinSize) {
 				CStringA str;
-				s.SetTimeOut(1500);
-				str.ReleaseBuffer(s.Receive(str.GetBuffer(nMinSize), nMinSize)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
-				s.KillTimeOut();
+				socket.SetTimeOut(1500);
+				str.ReleaseBuffer(socket.Receive(str.GetBuffer(nMinSize), nMinSize)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
+				socket.KillTimeOut();
 				if (str.IsEmpty()) {
 					break;
 				}
@@ -2391,9 +2391,9 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 
 				while (body.GetLength() < nMaxSize) { // should be enough for a playlist...
 					CStringA str;
-					s.SetTimeOut(1500);
-					str.ReleaseBuffer(s.Receive(str.GetBuffer(nMinSize), nMinSize)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
-					s.KillTimeOut();
+					socket.SetTimeOut(1500);
+					str.ReleaseBuffer(socket.Receive(str.GetBuffer(nMinSize), nMinSize)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
+					socket.KillTimeOut();
 					if (str.IsEmpty()) {
 						break;
 					}
