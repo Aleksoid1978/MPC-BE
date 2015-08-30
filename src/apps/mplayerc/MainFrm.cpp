@@ -7490,6 +7490,7 @@ void CMainFrame::OnPlayPlay()
 	if (m_eMediaLoadState == MLS_LOADED) {
 		if (GetPlaybackMode() == PM_FILE) {
 			if (m_bEndOfStream) {
+				m_bEndOfStream = false;
 				SendMessage(WM_COMMAND, ID_PLAY_STOP);
 				SendMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
 			}
@@ -7619,7 +7620,6 @@ void CMainFrame::OnPlayPauseI()
 		m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
 		m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_PAUSED), 3000);
 	}
-	m_bEndOfStream = false;	
 
 	SetPlayState(PS_PAUSE);
 }
@@ -7719,7 +7719,6 @@ void CMainFrame::OnPlayStop()
 		m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
 		m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_STOPPED), 3000);
 	}
-	m_bEndOfStream = false;
 
 	SetPlayState(PS_STOP);
 }
