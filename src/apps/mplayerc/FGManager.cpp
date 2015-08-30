@@ -1401,33 +1401,29 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 
 			// Disable MEDIATYPE_AUXLine21Data - prevent connect Line 21 Decoder
 			if (GetPinName(pPin)[0] == '~' && FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
-				if (clsid == CLSID_NvidiaVideoDecoder
-					|| clsid == CLSID_SonicCinemasterVideoDecoder) {
-
+				if (clsid == CLSID_NvidiaVideoDecoder || clsid == CLSID_SonicCinemasterVideoDecoder) {
 					continue;
 				}
-			}
 
-			/*
-			// Disable DVD subtitle mixing in EVR-CP and EVR-Sync for Microsoft DTV-DVD Video Decoder, it's corrupt DVD playback ...
-			if (clsid == CLSID_CMPEG2VidDecoderDS) {
-				if (s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM || s.iDSVideoRendererType == VIDRNDT_DS_SYNC) {
-					if (GetPinName(pPin)[0] == '~' && FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
+				if (clsid == __uuidof(CMpeg2DecFilter)) {
+					// HACK: block any Line21 connections, if Line 21 Decoder is blocked
+					// TODO: understand why lock in the filter does not work
+					bool bBlockLine21Decoder2 = false;
+					POSITION pos = m_override.GetHeadPosition();
+					while (pos) {
+						CFGFilter* pFGF = m_override.GetNext(pos);
+						if (pFGF->GetCLSID() == CLSID_Line21Decoder2) {
+							if (pFGF->GetMerit() == MERIT64_DO_NOT_USE) {
+								bBlockLine21Decoder2 = true;
+							}
+							break;
+						}
+					}
+					if (bBlockLine21Decoder2) {
 						continue;
 					}
 				}
 			}
-
-			// No multiple pin for Internal MPEG2 Software Decoder, Nvidia PureVideo Decoder, Sonic Cinemaster VideoDecoder
-			else if (clsid == __uuidof(CMpeg2DecFilter)
-					 || clsid == CLSID_NvidiaVideoDecoder
-					 || clsid == CLSID_SonicCinemasterVideoDecoder) {
-				if (GetPinName(pPin)[0] == '~' && FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
-					continue;
-				}
-				//TODO: enable multiple pins for the renderer, if the video decoder supports DXVA
-			}
-			*/
 
 			m_streampath.Append(pBF, pPin);
 			HRESULT hr = S_OK;
