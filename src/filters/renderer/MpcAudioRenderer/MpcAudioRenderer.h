@@ -278,8 +278,13 @@ class CMpcAudioRendererInputPin final
 {
 	CMpcAudioRenderer* m_pRenderer;
 
+	BOOL m_bEndOfStream;
+
 public:
 	CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, HRESULT* phr);
 
 	STDMETHODIMP EndOfStream() override;
+	STDMETHODIMP BeginFlush() override;
+
+	HRESULT Run(REFERENCE_TIME rtStart) override;
 };

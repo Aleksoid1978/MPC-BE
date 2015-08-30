@@ -2674,6 +2674,7 @@ void CMpcAudioRenderer::ApplyVolumeBalance(BYTE* pData, UINT32 size)
 CMpcAudioRendererInputPin::CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, HRESULT* phr)
 	: CRendererInputPin(pRenderer, phr, L"In")
 	, m_pRenderer(static_cast<CMpcAudioRenderer*>(pRenderer))
+	, m_bEndOfStream(FALSE)
 {
 }
 
@@ -2681,7 +2682,27 @@ STDMETHODIMP CMpcAudioRendererInputPin::EndOfStream()
 {
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRendererInputPin::EndOfStream()"));
 
+	m_bEndOfStream = TRUE;
 	m_pRenderer->WaitFinish();
 	m_pFilter->NotifyEvent(EC_COMPLETE, S_OK, (LONG_PTR)m_pFilter);
+	
+	return S_OK;
+}
+
+STDMETHODIMP CMpcAudioRendererInputPin::BeginFlush()
+{
+	HRESULT hr = CRendererInputPin::BeginFlush();
+
+	m_bEndOfStream = FALSE;
+
+	return hr;
+}
+
+HRESULT CMpcAudioRendererInputPin::Run(REFERENCE_TIME rtStart)
+{
+	if (m_bEndOfStream) {
+		m_pFilter->NotifyEvent(EC_COMPLETE, S_OK, (LONG_PTR)m_pFilter);
+	}
+
 	return S_OK;
 }
