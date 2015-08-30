@@ -1405,23 +1405,21 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 					continue;
 				}
 
-				if (clsid == __uuidof(CMpeg2DecFilter)) {
-					// HACK: block any Line21 connections, if Line 21 Decoder is blocked
-					// TODO: understand why lock in the filter does not work
-					bool bBlockLine21Decoder2 = false;
-					POSITION pos = m_override.GetHeadPosition();
-					while (pos) {
-						CFGFilter* pFGF = m_override.GetNext(pos);
-						if (pFGF->GetCLSID() == CLSID_Line21Decoder2) {
-							if (pFGF->GetMerit() == MERIT64_DO_NOT_USE) {
-								bBlockLine21Decoder2 = true;
-							}
-							break;
+				// HACK: block any Line21 connections, if Line 21 Decoder is blocked
+				// TODO: understand why lock in the filter does not work
+				bool bBlockLine21Decoder2 = false;
+				POSITION pos = m_override.GetHeadPosition();
+				while (pos) {
+					CFGFilter* pFGF = m_override.GetNext(pos);
+					if (pFGF->GetCLSID() == CLSID_Line21Decoder2) {
+						if (pFGF->GetMerit() == MERIT64_DO_NOT_USE) {
+							bBlockLine21Decoder2 = true;
 						}
+						break;
 					}
-					if (bBlockLine21Decoder2) {
-						continue;
-					}
+				}
+				if (bBlockLine21Decoder2) {
+					continue;
 				}
 			}
 
