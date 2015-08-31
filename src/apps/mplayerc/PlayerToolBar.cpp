@@ -32,7 +32,7 @@ IMPLEMENT_DYNAMIC(CPlayerToolBar, CToolBar)
 
 CPlayerToolBar::CPlayerToolBar(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
-	, fDisableImgListRemap(false)
+	, m_bDisableImgListRemap(false)
 	, m_pButtonsImages(NULL)
 	, m_hDXVAIcon(NULL)
 {
@@ -83,7 +83,7 @@ void CPlayerToolBar::SwitchTheme()
 	CToolBarCtrl& tb = GetToolBarCtrl();
 	m_nButtonHeight = 16;
 
-	if (m_iUseDarkTheme != (__int64)s.bUseDarkTheme) {
+	if (m_iUseDarkTheme != (int)s.bUseDarkTheme) {
 		VERIFY(LoadToolBar(IDB_PLAYERTOOLBAR));
 
 		ModifyStyleEx(WS_EX_LAYOUTRTL, WS_EX_NOINHERITLAYOUT);
@@ -110,7 +110,7 @@ void CPlayerToolBar::SwitchTheme()
 			SetButtonStyle(i, styles[i] | TBBS_DISABLED);
 		}
 
-		m_iUseDarkTheme = s.bUseDarkTheme;
+		m_iUseDarkTheme = (int)s.bUseDarkTheme;
 	}
 
 	if (s.bUseDarkTheme) {
@@ -205,24 +205,24 @@ void CPlayerToolBar::SwitchTheme()
 
 		m_nButtonHeight = bitmapBmp.bmHeight;
 		tb.SetImageList(m_pButtonsImages);
-		fDisableImgListRemap = true;
+		m_bDisableImgListRemap = true;
 
 		delete bmp;
 		DeleteObject(hBmp);
 	}
 
 	if (s.bUseDarkTheme) {
-		if (!fDisableImgListRemap) {
+		if (!m_bDisableImgListRemap) {
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 0);// 0 Remap Active
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 1);// 1 Remap Disabled
 		}
 	} else {
-		fDisableImgListRemap = true;
+		m_bDisableImgListRemap = true;
 
 		if (NULL == fp) {
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);// 2 Undo  Active
 
-			if (!fDisableImgListRemap) {
+			if (!m_bDisableImgListRemap) {
 				SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 3);// 3 Undo  Disabled
 			}
 		}
@@ -261,7 +261,7 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 	m_volctrl.SetRange(0, 100);
 
 	m_iUseDarkTheme = 2;
-	m_iMute = 0;
+	m_bMute = false;
 
 	SwitchTheme();
 
@@ -376,14 +376,14 @@ int CPlayerToolBar::GetVolume()
 {
 	int volume = m_volctrl.GetPos(), type = 0;
 
-	if (volume < 1 && !m_iMute) {
+	if (volume < 1 && !m_bMute) {
 		if (!IsMuted()) {
 			type++;
 		}
-		m_iMute = 1;
-	} else if (IsMuted() && volume > 0 && m_iMute) {
+		m_bMute = true;
+	} else if (IsMuted() && volume > 0 && m_bMute) {
 		type++;
-		m_iMute = 0;
+		m_bMute = false;
 	}
 
 	/*

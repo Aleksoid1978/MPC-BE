@@ -33,44 +33,41 @@ class CPlayerToolBar : public CToolBar
 	DECLARE_DYNAMIC(CPlayerToolBar)
 
 private:
-	CMainFrame* m_pMainFrame;
-
-	bool IsMuted();
-	void SetMute(bool fMute = true);
-	int getHitButtonIdx(CPoint point);
-
-	CMPCPngImage m_BackGroundbm;
+	CMainFrame*	m_pMainFrame;
 
 	int			m_iUseDarkTheme;
-	int			m_iMute;
-
-	CImageList*	m_pButtonsImages;
+	bool		m_bMute;
 	HICON		m_hDXVAIcon;
-
 	int			m_iDXVAIconWidth;
 	int			m_iDXVAIconHeight;
+	bool		m_bDisableImgListRemap;
 
+	CMPCPngImage m_BackGroundbm;
+	CImageList*	m_pButtonsImages;
+	CImageList	m_reImgListActive;
+	CImageList	m_reImgListDisabled;
 
 public:
+	int			m_nButtonHeight;
+	CVolumeCtrl	m_volctrl;
+
 	CPlayerToolBar(CMainFrame* pMainFrame);
 	virtual ~CPlayerToolBar();
 
-protected:
-	CImageList	m_reImgListActive;
-	CImageList	m_reImgListDisabled;
+private:
+	bool IsMuted();
+	void SetMute(bool fMute = true);
+	int getHitButtonIdx(CPoint point);
 	void CreateRemappedImgList(UINT bmID, int nRemapState, CImageList& reImgList);
+	void SwitchRemmapedImgList(UINT bmID, int nRemapState);
 
 public:
-	void SwitchRemmapedImgList(UINT bmID, int nRemapState);
 	void SwitchTheme();
-	bool fDisableImgListRemap;
+
 	int GetVolume();
 	int GetMinWidth();
 	void SetVolume(int volume);
 	__declspec(property(get=GetVolume, put=SetVolume)) int Volume;
-
-	int m_nButtonHeight;
-	CVolumeCtrl m_volctrl;
 
 	// Overrides
 	// ClassWizard generated virtual function overrides
