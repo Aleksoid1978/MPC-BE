@@ -2129,8 +2129,8 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					case PM_FILE:
 						g_bExternalSubtitleTime = false;
 
-						REFERENCE_TIME start, stop;
-						m_wndSeekBar.GetRange(start, stop);
+						REFERENCE_TIME stop;
+						m_wndSeekBar.GetRange(stop);
 						m_pMS->GetDuration(&rtDur);
 						if (rtDur != stop) {
 							// update segment stop time
@@ -2213,7 +2213,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				const GUID timeFormat = GetTimeFormat();
 				g_bNoDuration = ((timeFormat == TIME_FORMAT_MEDIA_TIME ) && rtDur < UNITS/2) || rtDur <= 0;
 				m_wndSeekBar.Enable(!g_bNoDuration);
-				m_wndSeekBar.SetRange(0, rtDur);
+				m_wndSeekBar.SetRange(rtDur);
 				m_wndSeekBar.SetPos(rtNow);
 				m_OSD.SetRange(0, rtDur);
 				m_OSD.SetPos(rtNow);
@@ -4138,7 +4138,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	SetEvent(m_hRefreshNotifyRenderThreadEvent);
 
 	m_wndSeekBar.Enable(false);
-	m_wndSeekBar.SetRange(0, 0);
+	m_wndSeekBar.SetRange(0);
 	m_wndSeekBar.SetPos(0);
 	m_wndInfoBar.RemoveAllLines();
 	m_wndStatsBar.RemoveAllLines();
@@ -6023,8 +6023,8 @@ CString CMainFrame::GetVidPos()
 {
 	CString posstr = _T("");
 	if ((GetPlaybackMode() == PM_FILE) || (GetPlaybackMode() == PM_DVD)) {
-		__int64 start, stop, pos;
-		m_wndSeekBar.GetRange(start, stop);
+		__int64 stop, pos;
+		m_wndSeekBar.GetRange(stop);
 		pos = m_wndSeekBar.GetPosReal();
 
 		DVD_HMSF_TIMECODE tcNow = RT2HMSF(pos);
@@ -7707,8 +7707,8 @@ void CMainFrame::OnPlayStop()
 		MoveVideoWindow();
 
 		if (m_eMediaLoadState == MLS_LOADED) {
-			__int64 start, stop;
-			m_wndSeekBar.GetRange(start, stop);
+			__int64 stop;
+			m_wndSeekBar.GetRange(stop);
 			if (GetPlaybackMode() != PM_CAPTURE) {
 				m_wndStatusBar.SetStatusTimer(m_wndSeekBar.GetPosReal(), stop, !!m_wndSubresyncBar.IsWindowVisible(), GetTimeFormat());
 			}
@@ -8016,8 +8016,8 @@ void CMainFrame::OnPlayGoto()
 		EndEnumFilters;
 	}
 
-	REFERENCE_TIME start, dur = -1;
-	m_wndSeekBar.GetRange(start, dur);
+	REFERENCE_TIME dur;
+	m_wndSeekBar.GetRange(dur);
 	CGoToDlg dlg(m_wndSeekBar.GetPos(), dur, atpf > 0 ? (1.0/atpf) : 0);
 	if (IDOK != dlg.DoModal() || dlg.m_time < 0) {
 		return;
@@ -9025,8 +9025,8 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 			m_pDVDI->GetNumberOfChapters(Location.TitleNum, &ulNumOfChapters);
 			CString strTitle;
 			strTitle.Format(IDS_AG_TITLE2, Location.TitleNum, ulNumOfTitles);
-			__int64 start, stop;
-			m_wndSeekBar.GetRange(start, stop);
+			__int64 stop;
+			m_wndSeekBar.GetRange(stop);
 
 			CString strOSD;
 			if (stop > 0) {
@@ -9415,8 +9415,8 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 			m_pDVDI->GetNumberOfChapters(Location.TitleNum, &ulNumOfChapters);
 			CString strTitle;
 			strTitle.Format(IDS_AG_TITLE2, Location.TitleNum, ulNumOfTitles);
-			__int64 start, stop;
-			m_wndSeekBar.GetRange(start, stop);
+			__int64 stop;
+			m_wndSeekBar.GetRange(stop);
 
 			CString strOSD;
 			if (stop > 0) {
@@ -15899,8 +15899,8 @@ REFERENCE_TIME CMainFrame::GetPos()
 
 REFERENCE_TIME CMainFrame::GetDur()
 {
-	__int64 start, stop;
-	m_wndSeekBar.GetRange(start, stop);
+	__int64 stop;
+	m_wndSeekBar.GetRange(stop);
 	return(m_eMediaLoadState == MLS_LOADED ? stop : 0);
 }
 
@@ -15965,10 +15965,9 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 	}
 
 	m_nStepForwardCount = 0;
-	__int64 start	= 0;
 	__int64 stop	= 0;
 	if (GetPlaybackMode() != PM_CAPTURE) {
-		m_wndSeekBar.GetRange(start, stop);
+		m_wndSeekBar.GetRange(stop);
 		if (rtPos > stop) {
 			rtPos = stop;
 		}
@@ -18190,9 +18189,9 @@ CString CMainFrame::FillMessage()
 				if (SUCCEEDED(pAMNS->get_BufferingProgress(&BufferingProgress)) && BufferingProgress > 0) {
 					msg.Format(ResStr(IDS_CONTROLS_BUFFERING), BufferingProgress);
 
-					__int64 start = 0, stop = 0;
-					m_wndSeekBar.GetRange(start, stop);
-					m_fLiveWM = (stop == start);
+					__int64 stop;
+					m_wndSeekBar.GetRange(stop);
+					m_fLiveWM = (stop == 0);
 				}
 				break;
 			}

@@ -29,7 +29,6 @@ IMPLEMENT_DYNAMIC(CPlayerSeekBar, CDialogBar)
 
 CPlayerSeekBar::CPlayerSeekBar(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
-	, m_start(0)
 	, m_stop(0)
 	, m_pos(0)
 	, m_posreal(0)
@@ -94,24 +93,21 @@ void CPlayerSeekBar::Enable(bool fEnable)
 	Invalidate();
 }
 
-void CPlayerSeekBar::GetRange(REFERENCE_TIME& start, REFERENCE_TIME& stop)
+void CPlayerSeekBar::GetRange(REFERENCE_TIME& stop)
 {
-	start = m_start;
 	stop = m_stop;
 }
 
-void CPlayerSeekBar::SetRange(REFERENCE_TIME start, REFERENCE_TIME stop)
+void CPlayerSeekBar::SetRange(REFERENCE_TIME stop)
 {
-	if (start < stop) {
-		m_start	= start;
-		m_stop	= stop;
+	if (stop > 0) {
+		m_stop = stop;
 	} else {
-		m_start	= 0;
-		m_stop	= 0;
+		m_stop = 0;
 	}
 
-	if (m_pos < m_start || m_pos >= m_stop) {
-		SetPos(m_start);
+	if (m_pos < 0 || m_pos >= m_stop) {
+		SetPos(0);
 	}
 }
 
@@ -151,7 +147,7 @@ void CPlayerSeekBar::SetPosInternal(REFERENCE_TIME pos)
 	}
 
 	CRect before = GetThumbRect();
-	m_pos = min(max(pos, m_start), m_stop);
+	m_pos = min(max(pos, 0), m_stop);
 	m_posreal = pos;
 	CRect after = GetThumbRect();
 
@@ -169,7 +165,7 @@ void CPlayerSeekBar::SetPosInternal2(REFERENCE_TIME pos)
 	}
 
 	CRect before = GetThumbRect();
-	m_pos2 = min(max(pos, m_start), m_stop);
+	m_pos2 = min(max(pos, 0), m_stop);
 	m_posreal2 = pos;
 	CRect after = GetThumbRect();
 
@@ -197,7 +193,7 @@ CRect CPlayerSeekBar::GetThumbRect()
 {
 	CRect r = GetChannelRect();
 
-	int x = r.left + (int)((m_start < m_stop) ? (REFERENCE_TIME)r.Width() * (m_pos - m_start) / (m_stop - m_start) : 0);
+	int x = r.left + (int)((m_stop > 0) ? (REFERENCE_TIME)r.Width() * m_pos / m_stop : 0);
 	int y = r.CenterPoint().y;
 
 	if (AfxGetAppSettings().bUseDarkTheme) {
@@ -214,7 +210,7 @@ CRect CPlayerSeekBar::GetInnerThumbRect()
 {
 	CRect r = GetThumbRect();
 
-	bool fEnabled = m_fEnabled && m_start < m_stop;
+	bool fEnabled = m_fEnabled && m_stop > 0;
 	r.DeflateRect(3, fEnabled ? 5 : 4, 3, fEnabled ? 5 : 4);
 
 	return r;
@@ -226,12 +222,12 @@ __int64 CPlayerSeekBar::CalculatePosition(CPoint point)
 	CRect r = GetChannelRect();
 
 	if (point.x < r.left) {
-		pos = m_start;
+		pos = 0;
 	} else if (point.x >= r.right) {
 		pos = m_stop;
-	} else if (m_start < m_stop) {
+	} else if (m_stop > 0) {
 		LONG w = r.right - r.left;
-		pos = m_start + ((m_stop - m_start) * (point.x - r.left) + (w / 2)) / w;
+		pos = (m_stop * (point.x - r.left) + (w / 2)) / w;
 	}
 
 	return pos;
@@ -289,7 +285,7 @@ void CPlayerSeekBar::OnPaint()
 
 	int R, G, B, R2, G2, B2;
 
-	bool fEnabled = m_fEnabled && m_start < m_stop;
+	bool fEnabled = m_fEnabled && m_stop > 0;
 
 	if (s.bUseDarkTheme) {
 		CRect rt;
@@ -414,7 +410,7 @@ void CPlayerSeekBar::OnPaint()
 							continue;
 						}
 
-						int x = r.left + (int)((m_start < m_stop) ? (REFERENCE_TIME)r.Width() * (rt - m_start) / (m_stop - m_start) : 0);
+						int x = r.left + (int)((m_stop > 0) ? (REFERENCE_TIME)r.Width() * rt / m_stop : 0);
 
 						// можно вместо рисования руками иконку как маркер подтянуть
 						// HICON appIcon = (HICON)::LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
@@ -631,7 +627,7 @@ void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
 void CPlayerSeekBar::UpdateTooltip(CPoint point)
 {
 	m_tooltipPos = CalculatePosition(point);
-	if (m_fEnabled && m_start < m_stop && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
+	if (m_fEnabled && m_stop > 0 && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
 		if (m_tooltipState == TOOLTIP_HIDDEN && m_tooltipPos != m_tooltipLastPos) {
 
 			TRACKMOUSEEVENT tme = { sizeof(TRACKMOUSEEVENT) };
@@ -707,7 +703,7 @@ BOOL CPlayerSeekBar::PreTranslateMessage(MSG* pMsg)
 	POINT ptWnd(pMsg->pt);
 	this->ScreenToClient(&ptWnd);
 
-	if (m_fEnabled && AfxGetAppSettings().fUseTimeTooltip && m_start < m_stop && (GetChannelRect() | GetThumbRect()).PtInRect(ptWnd)) {
+	if (m_fEnabled && AfxGetAppSettings().fUseTimeTooltip && m_stop > 0 && (GetChannelRect() | GetThumbRect()).PtInRect(ptWnd)) {
 		m_tooltip.RelayEvent(pMsg);
 	}
 
@@ -731,7 +727,7 @@ BOOL CPlayerSeekBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	}
 
 
-	if (m_fEnabled && m_start < m_stop && m_stop != 100) {
+	if (m_fEnabled && m_stop > 0 && m_stop != 100) {
 		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
 
 		return TRUE;
@@ -759,7 +755,7 @@ void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
 				GetCursorPos(&point);
 				ScreenToClient(&point);
 
-				if (m_fEnabled && m_start < m_stop && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
+				if (m_fEnabled && m_stop > 0 && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
 					m_tooltipTimer = SetTimer(m_tooltipTimer, m_pMainFrame->CanPreviewUse() ? 10 : AUTOPOP_DELAY, NULL);
 					m_tooltipPos = CalculatePosition(point);
 					UpdateToolTipText();
