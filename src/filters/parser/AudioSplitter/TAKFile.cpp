@@ -337,14 +337,15 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 			}
 			m_rtduration = m_samples * UNITS / m_samplerate;
 
-			if (m_extradata) {
-				m_extradata = (BYTE*)realloc(m_extradata, size);
-			} else {
-				m_extradata = (BYTE*)malloc(size);
+			BYTE* new_extradata = (BYTE*)realloc(m_extradata, size);
+			ASSERT(new_extradata);
+			if (new_extradata) {
+				m_extradata = new_extradata;
+				m_extrasize = size;
+				memcpy(m_extradata, buffer, m_extrasize);
 			}
-			memcpy(m_extradata, buffer, size);
-			m_extrasize = size;
-		} else if (type == TAK_METADATA_LAST_FRAME) {
+		}
+		else if (type == TAK_METADATA_LAST_FRAME) {
 			bLastFrame				= TRUE;
 			uint64_t LastFramePos	= *(uint64_t*)buffer & 0xFFFFFFFFFF;
 			uint64_t LastFrameSize	= *(uint32_t*)&buffer[4] >> 8;

@@ -1856,14 +1856,13 @@ static bool ParseAvc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 							static const UINT start_code_size = sizeof(start_code);
 
 							BYTE* new_extradata = (BYTE*)realloc(extradata, extrasize + Nalu.GetDataLength() + start_code_size);
+							ASSERT(new_extradata);
 							if (new_extradata) {
 								extradata = new_extradata;
 								memcpy(extradata + extrasize, start_code, start_code_size);
 								extrasize += start_code_size;
 								memcpy(extradata + extrasize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
 								extrasize += Nalu.GetDataLength();
-							} else {
-								ASSERT(0);
 							}
 					}
 				}
@@ -2010,14 +2009,13 @@ static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 							static const UINT start_code_size = sizeof(start_code);
 
 							BYTE* new_extradata = (BYTE*)realloc(extradata, extrasize + Nalu.GetDataLength() + start_code_size);
+							ASSERT(new_extradata);
 							if (new_extradata) {
 								extradata = new_extradata;
 								memcpy(extradata + extrasize, start_code, start_code_size);
 								extrasize += start_code_size;
 								memcpy(extradata + extrasize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
 								extrasize += Nalu.GetDataLength();
-							} else {
-								ASSERT(0);
 							}
 					}
 				}
