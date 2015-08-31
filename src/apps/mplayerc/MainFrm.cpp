@@ -9185,7 +9185,6 @@ void CMainFrame::OnNavigateSubpic(UINT nID)
 
 void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 {
-	bool bSplitterMenu = false;
 	int splsubcnt = 0;
 	int i = (int)id;
 
