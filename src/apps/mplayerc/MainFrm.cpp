@@ -2128,8 +2128,15 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				switch (GetPlaybackMode()) {
 					case PM_FILE:
 						g_bExternalSubtitleTime = false;
-						m_pMS->GetCurrentPosition(&rtNow);
+
+						REFERENCE_TIME start, stop;
+						m_wndSeekBar.GetRange(start, stop);
 						m_pMS->GetDuration(&rtDur);
+						if (rtDur != stop) {
+							// update segment stop time
+							m_pMS->SetPositions(NULL, AM_SEEKING_NoPositioning, &rtDur, AM_SEEKING_NoPositioning);
+						}
+						m_pMS->GetCurrentPosition(&rtNow);
 
 						// autosave subtitle sync after play
 						if ((m_nCurSubtitle >= 0) && (m_rtCurSubPos != rtNow)) {
