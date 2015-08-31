@@ -38,17 +38,26 @@ class CPlayerSeekBar : public CDialogBar
 private:
 	enum tooltip_state_t { TOOLTIP_HIDDEN, TOOLTIP_TRIGGERED, TOOLTIP_VISIBLE };
 
-	REFERENCE_TIME m_stop, m_pos, m_posreal, m_pos2, m_posreal2;
-	CPoint pt2;
-	CRgn m_CustomRgn;
-	bool m_fEnabled;
-	CToolTipCtrl m_tooltip;
-	TOOLINFO m_ti;
-	tooltip_state_t m_tooltipState;
-	REFERENCE_TIME m_tooltipPos, m_tooltipLastPos;
-	UINT_PTR m_tooltipTimer;
+	REFERENCE_TIME	m_stop				= 0;
+	REFERENCE_TIME	m_pos				= 0;
+	REFERENCE_TIME	m_posreal			= 0;
+	REFERENCE_TIME	m_pos2				= 0;
+	REFERENCE_TIME	m_posreal2			= 0;
+	bool			m_fEnabled			= false;
+	tooltip_state_t	m_tooltipState		= TOOLTIP_HIDDEN;
+	REFERENCE_TIME	m_tooltipPos		= 0;
+	REFERENCE_TIME	m_tooltipLastPos	= -1;
+	UINT_PTR		m_tooltipTimer		= 1;
 
-	CMPCPngImage m_BackGroundbm;
+	TOOLINFO		m_ti;
+	CToolTipCtrl	m_tooltip;
+	CMPCPngImage	m_BackGroundbm;
+	CCritSec		m_CBLock;
+	CComPtr<IDSMChapterBag> m_pChapterBag;
+	CString			m_strChap;
+	CRect			m_rLock;
+
+	CMainFrame*		m_pMainFrame;
 
 	void MoveThumb(CPoint point);
 	REFERENCE_TIME CalculatePosition(CPoint point);
@@ -56,18 +65,11 @@ private:
 
 	void MoveThumb2(CPoint point);
 	void SetPosInternal2(REFERENCE_TIME pos);
-
-	CCritSec m_CBLock;
-	CComPtr<IDSMChapterBag> m_pChapterBag;
-	CString strChap;
 	void UpdateTooltip(CPoint point);
 
 	CRect GetChannelRect();
 	CRect GetThumbRect();
 	CRect GetInnerThumbRect();
-	CRect r_Lock;
-
-	CMainFrame* m_pMainFrame;
 
 public:
 	CPlayerSeekBar(CMainFrame* pMainFrame);
