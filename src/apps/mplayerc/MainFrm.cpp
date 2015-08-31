@@ -5433,8 +5433,6 @@ static HRESULT CopyFiles(CString sourceFile, CString destFile)
 
 void CMainFrame::OnFileSaveAs()
 {
-	AppSettings& s = AfxGetAppSettings();
-
 	CString ext, ext_list, in = m_strUrl, out = in;
 
 	if (!m_youtubeFields.fname.IsEmpty()) {
@@ -6117,9 +6115,7 @@ void CMainFrame::OnFileSaveImage()
 
 void CMainFrame::OnFileSaveImageAuto()
 {
-	AppSettings& s = AfxGetAppSettings();
-
-	/* Check if a compatible renderer is being used */
+	// Check if a compatible renderer is being used
 	if (!IsRendererCompatibleWithSaveImage()) {
 		return;
 	}
@@ -8756,7 +8752,6 @@ void CMainFrame::OnAutoVolumeControl()
 
 void CMainFrame::OnUpdateNormalizeVolume(CCmdUI* pCmdUI)
 {
-	AppSettings& s = AfxGetAppSettings();
 	pCmdUI->Enable();
 }
 
@@ -9275,7 +9270,6 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 					}
 					splsubcnt++;
 
-					bSplitterMenu = true;
 					if (id == 0) {
 						pSS->Enable(m, AMSTREAMSELECTENABLE_ENABLE);
 						break;
@@ -11458,7 +11452,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		m_youtubeFields.Empty();
 
 		HRESULT hr = S_OK;
-		bool extimage = false;
 
 		CString local(fn);
 		local.MakeLower();
@@ -13184,8 +13177,6 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 		for (size_t i = 0; i < subarray.GetCount(); i++) {
 			if (subarray[i].Filter == 2) extcnt++;
 		}
-
-		int intsub = 0;
 
 		while (pos) {
 			pSubStream = m_pSubStreams.GetNext(pos);

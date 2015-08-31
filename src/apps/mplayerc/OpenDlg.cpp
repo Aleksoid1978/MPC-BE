@@ -233,7 +233,6 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 
 void COpenDlg::OnBnClickedOk()
 {
-	AppSettings& s = AfxGetAppSettings();
 	UpdateData();
 
 	m_fns.RemoveAll();

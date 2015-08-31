@@ -138,7 +138,7 @@ static HBITMAP OpenImageDIB(CString fn, CString out, ULONG quality, bool mode)
 
 		DWORD fs = ftell(fp);
 		rewind(fp);
-		BYTE *data = (BYTE*)malloc(fs), *pBuf = NULL;
+		BYTE *data = (BYTE*)malloc(fs);
 		fread(data, fs, 1, fp);
 		fclose(fp);
 
