@@ -133,10 +133,11 @@ bool CMPCPngImage::FileExists(CString& fn, bool bInclJPEG)
 
 BYTE* CMPCPngImage::BrightnessRGB(IMG_TYPE type, BYTE* lpBits, int width, int height, int bpp, int br, int rc, int gc, int bc)
 {
-	int k = bpp / 8, kbr = 100;
+	int k = bpp / 8;
 	int size = width * height * k;
 	double R, G, B;
 	/*
+	int kbr = 100;
 	double brn, rcn, gcn, bcn;
 
 	if (br >= 0 && rc >= 0 && gc >= 0 && bc >= 0) {

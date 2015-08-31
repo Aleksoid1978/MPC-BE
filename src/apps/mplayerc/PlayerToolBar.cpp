@@ -260,7 +260,7 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 	m_volctrl.Create(this);
 	m_volctrl.SetRange(0, 100);
 
-	m_iUseDarkTheme = 2;
+	m_iUseDarkTheme = 2; // needed for the first call SwitchTheme()
 	m_bMute = false;
 
 	SwitchTheme();
@@ -643,7 +643,7 @@ void CPlayerToolBar::OnInitialUpdate()
 		vr2.SetRect(r.right + br.right - 60, r.bottom - 25, r.right + br.right + 6, r.bottom);
 	}
 
-	if (m_iUseDarkTheme != (__int64)AfxGetAppSettings().bUseDarkTheme) {
+	if (m_iUseDarkTheme != (int)AfxGetAppSettings().bUseDarkTheme) {
 		SwitchTheme();
 	}
 

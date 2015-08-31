@@ -1562,8 +1562,6 @@ STDMETHODIMP CFGManager::ConnectFilter(IPin* pPinOut, IBaseFilter* pBF)
 		return VFW_E_INVALID_DIRECTION;
 	}
 
-	AppSettings& s = AfxGetAppSettings();
-
 	BeginEnumPins(pBF, pEP, pPin) {
 		if (S_OK == IsPinDirection(pPin, PINDIR_INPUT) && S_OK != IsPinConnected(pPin)) {
 			HRESULT hr = Connect(pPinOut, pPin);
@@ -1587,8 +1585,6 @@ STDMETHODIMP CFGManager::ConnectFilterDirect(IPin* pPinOut, IBaseFilter* pBF, co
 	if (S_OK != IsPinDirection(pPinOut, PINDIR_OUTPUT)) {
 		return VFW_E_INVALID_DIRECTION;
 	}
-
-	AppSettings& s = AfxGetAppSettings();
 
 	BeginEnumPins(pBF, pEP, pPin) {
 		if (S_OK == IsPinDirection(pPin, PINDIR_INPUT) && S_OK != IsPinConnected(pPin)) {
@@ -1788,7 +1784,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 {
 	AppSettings& s = AfxGetAppSettings();
 
-	bool		bOverrideBroadcom = false;
 	CFGFilter*	pFGF;
 
 	bool *src	= s.SrcFilters;
@@ -2833,8 +2828,6 @@ STDMETHODIMP CFGManagerPlayer::ConnectDirect(IPin* pPinOut, IPin* pPinIn, const 
 CFGManagerDVD::CFGManagerDVD(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
 	: CFGManagerPlayer(pName, pUnk, hWnd, IsPreview)
 {
-	AppSettings& s = AfxGetAppSettings();
-
 	// elecard's decoder isn't suited for dvd playback (atm)
 	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{F50B3F13-19C4-11CF-AA9A-02608C9BABA2}")), MERIT64_DO_NOT_USE));
 }
