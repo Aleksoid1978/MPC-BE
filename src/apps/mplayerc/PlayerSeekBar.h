@@ -38,7 +38,7 @@ class CPlayerSeekBar : public CDialogBar
 private:
 	enum tooltip_state_t { TOOLTIP_HIDDEN, TOOLTIP_TRIGGERED, TOOLTIP_VISIBLE };
 
-	REFERENCE_TIME m_start, m_stop, m_pos, m_posreal, m_pos2, m_posreal2;
+	REFERENCE_TIME m_stop, m_pos, m_posreal, m_pos2, m_posreal2;
 	CPoint pt2;
 	CRgn m_CustomRgn;
 	bool m_fEnabled;
@@ -75,8 +75,8 @@ public:
 
 	void Enable(bool fEnable);
 
-	void GetRange(REFERENCE_TIME& start, REFERENCE_TIME& stop);
-	void SetRange(REFERENCE_TIME start, REFERENCE_TIME stop);
+	void GetRange(REFERENCE_TIME& stop);
+	void SetRange(REFERENCE_TIME stop);
 	REFERENCE_TIME GetPos(), GetPosReal();
 	void SetPos(REFERENCE_TIME pos);
 
@@ -86,7 +86,7 @@ public:
 
 	void SetChapterBag(CComPtr<IDSMChapterBag>& pCB);
 
-	BOOL HasDuration() { return m_stop && m_start < m_stop; };
+	BOOL HasDuration() { return m_stop > 0; };
 
 	// Overrides
 	// ClassWizard generated virtual function overrides
