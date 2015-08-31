@@ -29,14 +29,6 @@ IMPLEMENT_DYNAMIC(CPlayerSeekBar, CDialogBar)
 
 CPlayerSeekBar::CPlayerSeekBar(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
-	, m_stop(0)
-	, m_pos(0)
-	, m_posreal(0)
-	, m_fEnabled(false)
-	, m_tooltipState(TOOLTIP_HIDDEN)
-	, m_tooltipLastPos(-1)
-	, m_tooltipTimer(1)
-	, r_Lock(0, 0, 0, 0)
 {
 }
 
@@ -336,10 +328,10 @@ void CPlayerSeekBar::OnPaint()
 		memdc.LineTo(rc.right + 2, rc.bottom - 1);
 
 		// buffer
-		r_Lock.SetRect(-1, -1, -1, -1);
+		m_rLock.SetRect(-1, -1, -1, -1);
 		int Progress;
 		if (m_pMainFrame->GetBufferingProgress(&Progress)) {
-			r_Lock = r;
+			m_rLock = r;
 			int r_right = ((REFERENCE_TIME)r.Width() / 100) * Progress;
 			ThemeRGB(45, 55, 60, R, G, B);
 				ThemeRGB(65, 70, 75, R2, G2, B2);
@@ -348,7 +340,7 @@ void CPlayerSeekBar::OnPaint()
 					{r_right, r.bottom - 3, R2 * 256, G2 * 256, B2 * 256, pa},
 				};
 				memdc.GradientFill(tvb, 2, gr, 1, GRADIENT_FILL_RECT_V);
-				r_Lock.left = r_right;
+				m_rLock.left = r_right;
 		}
 
 		if (fEnabled) {
@@ -392,7 +384,7 @@ void CPlayerSeekBar::OnPaint()
 			memdc.MoveTo(rc.left, rc.top);//active_top
 			memdc.LineTo(nposx, rc.top);
 
-			// рисуем маркеры глав
+			// draw chapter markers
 			if (s.fChapterMarker) {
 				CAutoLock lock(&m_CBLock);
 
@@ -412,7 +404,7 @@ void CPlayerSeekBar::OnPaint()
 
 						int x = r.left + (int)((m_stop > 0) ? (REFERENCE_TIME)r.Width() * rt / m_stop : 0);
 
-						// можно вместо рисования руками иконку как маркер подтянуть
+						// instead of drawing hands can be a marker icon
 						// HICON appIcon = (HICON)::LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 						// ::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0,0, 0, NULL, DI_NORMAL);
 						// ::DestroyIcon(appIcon);
@@ -430,7 +422,7 @@ void CPlayerSeekBar::OnPaint()
 			}
 		}
 
-		if (s.fFileNameOnSeekBar || !s.bStatusBarIsVisible || !strChap.IsEmpty()) {
+		if (s.fFileNameOnSeekBar || !s.bStatusBarIsVisible || !m_strChap.IsEmpty()) {
 			CFont font2;
 			ThemeRGB(135, 140, 145, R, G, B);
 			memdc.SetTextColor(RGB(R,G,B));
@@ -443,9 +435,9 @@ void CPlayerSeekBar::OnPaint()
 
 			LONG xt = s.bStatusBarIsVisible ? 0 : s.strTimeOnSeekBar.GetLength() <= 21 ? 150 : 160;
 
-			if (s.fFileNameOnSeekBar || !strChap.IsEmpty()) {
-				if (!strChap.IsEmpty() && fEnabled) {
-					str = strChap;
+			if (s.fFileNameOnSeekBar || !m_strChap.IsEmpty()) {
+				if (!m_strChap.IsEmpty() && fEnabled) {
+					str = m_strChap;
 				}
 
 				// draw filename || chapter name.
@@ -691,7 +683,7 @@ LRESULT CPlayerSeekBar::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	if (message == WM_MOUSELEAVE) {
 		HideToolTip();
 		m_pMainFrame->PreviewWindowHide();
-		strChap.Empty();
+		m_strChap.Empty();
 		Invalidate();
 	}
 
@@ -720,7 +712,7 @@ BOOL CPlayerSeekBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	CPoint p;
 	GetCursorPos(&p);
 	ScreenToClient(&p);
-	if (r_Lock.PtInRect(p)) {
+	if (m_rLock.PtInRect(p)) {
 		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
 
 		return TRUE;
@@ -863,7 +855,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 	{
 		CAutoLock lock(&m_CBLock);
 
-		strChap.Empty();
+		m_strChap.Empty();
 		if (AfxGetAppSettings().bUseDarkTheme
 				&& AfxGetAppSettings().fChapterMarker
 				&& m_pChapterBag && m_pChapterBag->ChapGetCount()) {
@@ -873,7 +865,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 			m_pChapterBag->ChapLookup(&rt, &chapterName);
 
 			if (chapterName.Length() > 0) {
-				strChap.Format(L"%s%s", ResStr(IDS_AG_CHAPTER2), chapterName);
+				m_strChap.Format(L"%s%s", ResStr(IDS_AG_CHAPTER2), chapterName);
 				Invalidate();
 			}
 		}
