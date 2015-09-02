@@ -442,7 +442,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	}
 
 	clock_t start = clock();
-	while (clock() - start < 5000 && m_len < MEGABYTE * 2) {
+	while (clock() - start < 1000 && m_len < 2 * MEGABYTE) {
 		Sleep(100);
 	}
 
