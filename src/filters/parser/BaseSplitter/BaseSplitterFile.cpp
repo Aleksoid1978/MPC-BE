@@ -107,8 +107,8 @@ DWORD CBaseSplitterFile::ThreadProc()
 {
 	HANDLE hEvts[] = { m_evStop };
 
-	for (int i = 0; i < 20; i++) {
-		DWORD dwObject = WaitForMultipleObjects(_countof(hEvts), hEvts, FALSE, 100);
+	for (int i = 0; i < 10; i++) {
+		DWORD dwObject = WaitForMultipleObjects(_countof(hEvts), hEvts, FALSE, 1000);
 		if (dwObject == WAIT_OBJECT_0) {
 			return 0;
 		} else {
