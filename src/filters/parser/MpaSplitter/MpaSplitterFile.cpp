@@ -59,11 +59,11 @@ HRESULT CMpaSplitterFile::Init()
 	Seek(0);
 
 	// some files can be determined as Mpeg Audio
-	if ((BitRead(24, true) == 0x000001)		||	// ?
-		(BitRead(32, true) == 'RIFF')		||	// skip AVI and WAV files
-		(BitRead(24, true) == 'AMV')		||	// skip MTV files (.amv .mtv)
-		(BitRead(32, true) == 0x47400010)	||
-		((BitRead(64, true) & 0x00000000FFFFFFFF) == 0x47400010)) {
+	if ((BitRead(24, true) == 0x000001)		||	// MPEG-PS? (0x000001BA)
+		(BitRead(32, true) == 'RIFF')		||	// RIFF files (AVI, WAV, AMV and other)
+		(BitRead(24, true) == 'AMV')		||	// MTV files (.mtv)
+		(BitRead(32, true) == 0x47400010)	||	// ?
+		((BitRead(64, true) & 0x00000000FFFFFFFF) == 0x47400010)) { // MPEG-TS
 		return E_FAIL;
 	}
 
