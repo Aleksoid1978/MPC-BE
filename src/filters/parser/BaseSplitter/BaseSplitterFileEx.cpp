@@ -775,7 +775,7 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 	h.Samplerate = freq[h.freq];
 	h.FrameSize = h.aac_frame_length - (h.fcrc == 0 ? 9 : 7);
 	h.FrameSamples = 1024; // ok?
-	h.rtDuration = 10000000i64 * h.FrameSamples / h.FrameSize;
+	h.rtDuration = 10000000i64 * h.FrameSamples / h.Samplerate;
 
 	if (pmt) {
 		WAVEFORMATEX* wfe		= (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + 5];
