@@ -107,12 +107,12 @@ void CPPageFormats::SetChecked(int iItem, int iChecked)
 
 CString CPPageFormats::GetEnqueueCommand()
 {
-	return _T("\"") + GetProgramPath(TRUE) + _T("\" /add \"%1\"");
+	return _T("\"") + GetProgramPath() + _T("\" /add \"%1\"");
 }
 
 CString CPPageFormats::GetOpenCommand()
 {
-	return _T("\"") + GetProgramPath(TRUE) + _T("\" \"%1\"");
+	return _T("\"") + GetProgramPath() + _T("\" \"%1\"");
 }
 
 bool CPPageFormats::IsRegistered(CString ext)
@@ -204,7 +204,7 @@ bool CPPageFormats::RegisterApp()
 	if (m_pAAR) {
 		CString AppIcon;
 
-		AppIcon = GetProgramPath(TRUE);
+		AppIcon = GetProgramPath();
 		AppIcon = "\""+AppIcon+"\"";
 		AppIcon += _T(",0");
 
@@ -297,13 +297,13 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 		CString AppIcon;
 
 		// first look for the icon
-		CString ext_icon = GetProgramPath();
+		CString ext_icon = GetProgramDir();
 		ext_icon.AppendFormat(_T("icons\\%s.ico"), CString(ext).TrimLeft(_T(".")));
 		if (::PathFileExists(ext_icon)) {
 			AppIcon.Format(_T("\"%s\",0"), ext_icon);
 		} else {
 			// then look for the iconlib
-			CString mpciconlib = GetProgramPath() + _T("mpciconlib.dll");
+			CString mpciconlib = GetProgramDir() + _T("mpciconlib.dll");
 			if (::PathFileExists(mpciconlib)) {
 				int icon_index = GetIconIndex(ext);
 				if (icon_index < 0) {
@@ -325,7 +325,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 
 		/* no icon was found for the file extension, so use MPC's icon */
 		if ((AppIcon.IsEmpty())) {
-			AppIcon = GetProgramPath(TRUE);
+			AppIcon = GetProgramPath();
 			AppIcon = "\""+AppIcon+"\"";
 			AppIcon += _T(",0");
 		}
@@ -419,7 +419,7 @@ bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
 		if (::PathFileExists(lpszLibrary)) {
 			CRegKey key;
 			if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
-				key.SetStringValue(_T("MpcPath"), GetProgramPath(TRUE));
+				key.SetStringValue(_T("MpcPath"), GetProgramPath());
 				key.Close();
 			}
 
@@ -439,7 +439,7 @@ bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
 		return false;
 	}
 
-	HRESULT hr = _dllConfigFunc(GetProgramPath(TRUE));
+	HRESULT hr = _dllConfigFunc(GetProgramPath());
 	if (FAILED(hr)) {
 		FreeLibrary(hDLL);
 		return false;
@@ -492,7 +492,7 @@ static struct {
 
 void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
 {
-	CString exe = GetProgramPath(TRUE);
+	CString exe = GetProgramPath();
 
 	int i = (int)ap;
 	if (i < 0 || i >= _countof(handlers)) {
@@ -545,7 +545,7 @@ bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 {
     ULONG len;
     TCHAR buff[_MAX_PATH];
-	CString exe = GetProgramPath(TRUE);
+	CString exe = GetProgramPath();
 
 	int i = (int)ap;
 	if (i < 0 || i >= _countof(handlers)) {
@@ -1125,7 +1125,7 @@ void CPPageFormats::OnBnRunAdmin()
 	CString strCmd;
 	strCmd.Format(_T("/adminoption %d"), IDD);
 
-	AfxGetMyApp()->RunAsAdministrator(GetProgramPath(TRUE), strCmd, true);
+	AfxGetMyApp()->RunAsAdministrator(GetProgramPath(), strCmd, true);
 
 	for (int i = 0; i < m_list.GetItemCount(); i++) {
 		SetListItemState(i);

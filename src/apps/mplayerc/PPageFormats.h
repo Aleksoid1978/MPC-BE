@@ -25,8 +25,8 @@
 #include "PPageBase.h"
 #include "PlayerListCtrl.h"
 
-#define ShellExt   GetProgramPath() + L"MPCBEShellExt.dll"
-#define ShellExt64 GetProgramPath() + L"MPCBEShellExt64.dll"
+#define ShellExt   GetProgramDir() + L"MPCBEShellExt.dll"
+#define ShellExt64 GetProgramDir() + L"MPCBEShellExt64.dll"
 
 // CPPageFormats dialog
 

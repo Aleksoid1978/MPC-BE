@@ -101,7 +101,7 @@ BOOL CAboutDlg::OnInitDialog()
 	m_FFmpegCompiler	= GetFFmpegCompiler();
 	m_libavcodecVersion	= GetlibavcodecVersion();
 
-	m_AuthorsPath = GetProgramPath() + _T("Authors.txt");
+	m_AuthorsPath = GetProgramDir() + _T("Authors.txt");
 
 	if (::PathFileExists(m_AuthorsPath)) {
 		m_Credits.Replace(_T("Authors.txt"), _T("<a>Authors.txt</a>"));

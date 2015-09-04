@@ -947,7 +947,7 @@ void CMainFrame::OnDestroy()
 	m_wndPreView.DestroyWindow();
 
 	if (AfxGetAppSettings().fReset) {
-		ShellExecute(NULL, _T("open"), GetProgramPath(TRUE), _T("/reset"), NULL, SW_SHOWNORMAL);
+		ShellExecute(NULL, _T("open"), GetProgramPath(), _T("/reset"), NULL, SW_SHOWNORMAL);
 	}
 
 	if (m_hNotifyRenderThread) {
@@ -4189,7 +4189,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	}
 	m_bNeedUnmountImage = TRUE;
 
-	SetCurrentDirectory(GetProgramPath()); // It is necessary to unlock the folder after opening files from explorer.
+	SetCurrentDirectory(GetProgramDir()); // It is necessary to unlock the folder after opening files from explorer.
 
 	SetThreadExecutionState(ES_CONTINUOUS);
 
@@ -9807,7 +9807,7 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	//       All you have to do then is plug in your 500 gb drive, full with movies and/or music, start MPC-BE (from the 500 gb drive) with a preloaded playlist and press play.
 	if (bRelativeDrive) {
 		// Get the drive MPC-BE is on and apply it to the path list
-		CPath exeDrive(GetProgramPath(TRUE));
+		CPath exeDrive(GetProgramPath());
 
 		if (exeDrive.StripToRoot()) {
 			POSITION pos = args.GetHeadPosition();

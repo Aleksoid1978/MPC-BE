@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2014 see Authors.txt
+ * (C) 2011-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,7 @@
 #include "FileHandle.h"
 
 //
-//	Returns the file portion from a path
+// Returns the file portion from a path
 //
 CString GetFileOnly(LPCTSTR Path)
 {
@@ -34,7 +34,7 @@ CString GetFileOnly(LPCTSTR Path)
 }
 
 //
-//	Returns the folder portion from a path
+// Returns the folder portion from a path
 //
 CString GetFolderOnly(LPCTSTR Path)
 {
@@ -46,7 +46,7 @@ CString GetFolderOnly(LPCTSTR Path)
 }
 
 //
-//	Adds a backslash to the end of a path if it is needed
+// Adds a backslash to the end of a path if it is needed
 //
 CString AddSlash(LPCTSTR Path)
 {
@@ -60,7 +60,7 @@ CString AddSlash(LPCTSTR Path)
 }
 
 //
-//	Removes a backslash from the end of a path if it is there
+// Removes a backslash from the end of a path if it is there
 //
 CString RemoveSlash(LPCTSTR Path)
 {
@@ -155,14 +155,17 @@ CString GetModulePath(HMODULE hModule)
 }
 
 //
-// Get Program Path
+// Get path of the executable file of the current process.
 //
-CString GetProgramPath(BOOL bIncludeExeName/* = FALSE*/)
+CString GetProgramPath()
 {
-	CString ret = GetModulePath(NULL);
-	if (!bIncludeExeName) {
-		ret = AddSlash(GetFolderOnly(ret));
-	}
+	return GetModulePath(NULL);
+}
 
-	return ret;
+//
+// Get program directory
+//
+CString GetProgramDir()
+{
+	return AddSlash(GetFolderOnly(GetModulePath(NULL)));
 }

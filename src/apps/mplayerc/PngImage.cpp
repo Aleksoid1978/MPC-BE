@@ -115,7 +115,7 @@ bool CMPCPngImage::LoadFromResource(UINT id) {
 
 bool CMPCPngImage::FileExists(CString& fn, bool bInclJPEG)
 {
-	CString path = GetProgramPath();
+	CString path = GetProgramDir();
 
 	if (::PathFileExists(path + fn + L".png")) {
 		fn = path + fn + L".png";
@@ -281,7 +281,7 @@ HBITMAP CMPCPngImage::TypeLoadImage(IMG_TYPE type, BYTE** pData, int* width, int
 
 HBITMAP CMPCPngImage::LoadExternalImage(CString fn, int resid, IMG_TYPE type, int br/* = -1*/, int rc/* = -1*/, int gc/* = -1*/, int bc/* = -1*/)
 {
-	CString path = GetProgramPath();
+	CString path = GetProgramDir();
 
 	BYTE* pData;
 	int width, height, bpp;
@@ -310,7 +310,7 @@ HBITMAP CMPCPngImage::LoadExternalImage(CString fn, int resid, IMG_TYPE type, in
 
 bool CMPCPngImage::LoadExternalGradient(CString fn)
 {
-	CString path = GetProgramPath();
+	CString path = GetProgramDir();
 
 	FILE* fp = NULL;
 	_tfopen_s(&fp, path + fn + L".png", L"rb");
