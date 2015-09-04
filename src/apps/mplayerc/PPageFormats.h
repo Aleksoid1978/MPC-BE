@@ -58,7 +58,7 @@ private:
 	static CString GetOpenCommand();
 	static CString GetEnqueueCommand();
 
-	static CComPtr<IApplicationAssociationRegistration>	m_pAAR;
+	static CComPtr<IApplicationAssociationRegistration> m_pAAR;
 
 	CAtlList<CString> m_lUnRegisterExts;
 

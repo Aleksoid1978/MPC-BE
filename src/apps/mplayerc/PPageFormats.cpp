@@ -56,7 +56,7 @@ CPPageFormats::CPPageFormats()
 	, m_list(0)
 	, m_bInsufficientPrivileges(false)
 {
-	if (!m_pAAR && !IsWinTenOrLater()) {
+	if (!m_pAAR && IsWinVistaOrLater() && !IsWinTenOrLater()) {
 		// Default manager (requires at least Vista)
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 									  NULL,
@@ -121,19 +121,11 @@ bool CPPageFormats::IsRegistered(CString ext)
 	BOOL    bIsDefault = FALSE;
 	CString strProgID = PROGID + ext;
 
-	if (!m_pAAR && !IsWinTenOrLater()) {
-		// Default manager (requires at least Vista)
-		hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
-							  NULL,
-							  CLSCTX_INPROC,
-							  IID_PPV_ARGS(&m_pAAR));
-	}
-
-	if (m_pAAR && !IsWinTenOrLater()) {
-		// The Vista way
+	if (m_pAAR) {
+		// The Vista/7/8 way
 		hr = m_pAAR->QueryAppIsDefault(ext, AT_FILEEXTENSION, AL_EFFECTIVE, GetRegisteredAppName(), &bIsDefault);
 	} else {
-		// The 2000/XP way
+		// The 2000/XP/10 way
 		CRegKey key;
 		TCHAR   buff[256];
 		ULONG   len = _countof(buff);
@@ -192,16 +184,7 @@ static int GetIconIndex(LPCTSTR ext)
 
 bool CPPageFormats::RegisterApp()
 {
-	if (!m_pAAR) {
-		// Default manager (requiered at least Vista)
-		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
-									  NULL,
-									  CLSCTX_INPROC,
-									  IID_PPV_ARGS(&m_pAAR));
-		UNREFERENCED_PARAMETER(hr);
-	}
-
-	if (m_pAAR) {
+	if (IsWinVistaOrLater()) {
 		CString AppIcon;
 
 		AppIcon = GetProgramPath();
@@ -718,17 +701,8 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 	ULONG   len = _countof(buff);
 	memset(buff, 0, sizeof(buff));
 
-	if (!m_pAAR && !IsWinTenOrLater()) {
-		// Default manager (requiered at least Vista)
-		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
-									  NULL,
-									  CLSCTX_INPROC,
-									  IID_PPV_ARGS(&m_pAAR));
-		UNREFERENCED_PARAMETER(hr);
-	}
-
-	if (m_pAAR && !IsWinTenOrLater()) {
-		// The Vista way
+	if (m_pAAR) {
+		// The Vista/7/8 way
 		CString strNewApp;
 		if (bRegister) {
 			// Create non existing file type
@@ -776,7 +750,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 
 		hr = m_pAAR->SetAppAsDefault(strNewApp, strExt, AT_FILEEXTENSION);
 	} else {
-		// The 2000/XP way
+		// The 2000/XP/10 way
 		if (bRegister) {
 			// Set new association
 			if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strExt)) {
@@ -833,7 +807,6 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 			}
 			key.SetStringValue(NULL, extoldreg);
 		}
-
 	}
 
 	return SUCCEEDED(hr);
