@@ -167,7 +167,7 @@ CString CPPageWebServer::GetCurWebRoot()
 	WebRoot.Replace('/', '\\');
 
 	CPath path;
-	path.Combine(GetProgramPath(), WebRoot);
+	path.Combine(GetProgramDir(), WebRoot);
 	return path.IsDirectory() ? (LPCTSTR)path : _T("");
 }
 
@@ -259,7 +259,7 @@ void CPPageWebServer::OnBnClickedButton1()
 	if (PickDir(dir)) {
 		CPath path;
 
-		if (path.RelativePathTo(GetProgramPath(), FILE_ATTRIBUTE_DIRECTORY, dir, FILE_ATTRIBUTE_DIRECTORY)) {
+		if (path.RelativePathTo(GetProgramDir(), FILE_ATTRIBUTE_DIRECTORY, dir, FILE_ATTRIBUTE_DIRECTORY)) {
 			dir = (LPCTSTR)path;
 		}
 

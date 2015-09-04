@@ -131,7 +131,7 @@ CWebServer::CWebServer(CMainFrame* pMainFrame, int nPort)
 	m_mimes[".png"] = "image/png";
 	m_mimes[".js"] = "text/javascript";
 
-	m_webroot = CPath(GetProgramPath());
+	m_webroot = CPath(GetProgramDir());
 
 	CString WebRoot = AfxGetAppSettings().strWebRoot;
 	WebRoot.Replace('/', '\\');

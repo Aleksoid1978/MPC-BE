@@ -1567,7 +1567,7 @@ void CAppSettings::LoadShaders()
 		path += _T("Shaders\\");
 		if (!::PathFileExists(path) && !AfxGetMyApp()->IsIniValid()) {
 			// profile does not contain "Shaders" folder. try to take shaders from program folder
-			path = GetProgramPath();
+			path = GetProgramDir();
 			path += _T("Shaders\\");
 			fShadersNeedSave = true;
 		}

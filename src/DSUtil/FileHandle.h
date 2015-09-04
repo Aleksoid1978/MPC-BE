@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2014 see Authors.txt
+ * (C) 2011-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,14 +20,15 @@
 
 #pragma once
 
-CString	GetFileOnly(LPCTSTR Path);
-CString	GetFolderOnly(LPCTSTR Path);
-CString	AddSlash(LPCTSTR Path);
-CString	RemoveSlash(LPCTSTR Path);
-CString	GetFileExt(LPCTSTR Path);
-CString	RenameFileExt(LPCTSTR Path, LPCTSTR Ext);
+CString GetFileOnly(LPCTSTR Path);
+CString GetFolderOnly(LPCTSTR Path);
+CString AddSlash(LPCTSTR Path);
+CString RemoveSlash(LPCTSTR Path);
+CString GetFileExt(LPCTSTR Path);
+CString RenameFileExt(LPCTSTR Path, LPCTSTR Ext);
 BOOL	GetTemporaryFilePath(CString strExtension, CString& strFileName);
 CString CompactPath(LPCTSTR Path, UINT cchMax);
 
 CString GetModulePath(HMODULE hModule);
-CString GetProgramPath(BOOL bIncludeExeName = FALSE);
+CString GetProgramPath();
+CString GetProgramDir();

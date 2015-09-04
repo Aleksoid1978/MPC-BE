@@ -871,7 +871,7 @@ bool CMPlayerCApp::StoreSettingsToRegistry()
 
 CString CMPlayerCApp::GetIniPath() const
 {
-	CString path = GetProgramPath(TRUE);
+	CString path = GetProgramPath();
 	path = path.Left(path.ReverseFind('.') + 1) + _T("ini");
 	return path;
 }
@@ -886,7 +886,7 @@ bool CMPlayerCApp::GetAppSavePath(CString& path)
 	path.Empty();
 
 	if (IsIniValid()) { // If settings ini file found, store stuff in the same folder as the exe file
-		path = GetProgramPath();
+		path = GetProgramDir();
 	} else {
 		HRESULT hr = SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, path.GetBuffer(_MAX_PATH));
 		path.ReleaseBuffer();
@@ -1430,7 +1430,7 @@ BOOL CMPlayerCApp::InitInstance()
 
 	if (m_s.nCLSwitches & (CLSW_REGEXTVID | CLSW_REGEXTAUD | CLSW_REGEXTPL)) { // register file types
 		if (IsWinVistaOrLater() && !IsUserAdmin()) {
-			AfxGetMyApp()->RunAsAdministrator(GetProgramPath(TRUE), m_lpCmdLine, false);
+			AfxGetMyApp()->RunAsAdministrator(GetProgramPath(), m_lpCmdLine, false);
 		} else {
 
 			CPPageFormats::RegisterApp();
@@ -1475,12 +1475,12 @@ BOOL CMPlayerCApp::InitInstance()
 
 	if ((m_s.nCLSwitches&CLSW_UNREGEXT)) { // unregistered file types
 		if (IsWinVistaOrLater() && !IsUserAdmin()) {
-			AfxGetMyApp()->RunAsAdministrator(GetProgramPath(TRUE), m_lpCmdLine, false);
+			AfxGetMyApp()->RunAsAdministrator(GetProgramPath(), m_lpCmdLine, false);
 		} else {
 			BOOL bIs64 = IsW64();
-			CPPageFormats::UnRegisterShellExt(GetProgramPath() + _T("MPCBEShellExt.dll"));
+			CPPageFormats::UnRegisterShellExt(GetProgramDir() + _T("MPCBEShellExt.dll"));
 			if (bIs64) {
-				CPPageFormats::UnRegisterShellExt(GetProgramPath() + _T("MPCBEShellExt64.dll"));
+				CPPageFormats::UnRegisterShellExt(GetProgramDir() + _T("MPCBEShellExt64.dll"));
 			}
 
 			CMediaFormats& mf = m_s.m_Formats;
@@ -1570,7 +1570,7 @@ BOOL CMPlayerCApp::InitInstance()
 
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
-		CString path = GetProgramPath(TRUE);
+		CString path = GetProgramPath();
 		key.SetStringValue(_T("ExePath"), path);
 	}
 
@@ -2534,7 +2534,7 @@ LRESULT CALLBACK RTLWindowsLayoutCbtFilterHook(int code, WPARAM wParam, LPARAM l
 
 CString CMPlayerCApp::GetSatelliteDll(int nLanguage)
 {
-	CString path = GetProgramPath();
+	CString path = GetProgramDir();
 
 	if (nLanguage < 0 || nLanguage >= languageResourcesCount || languageResources[nLanguage].resourceID == ID_LANGUAGE_ENGLISH) {
 		path.Empty();
