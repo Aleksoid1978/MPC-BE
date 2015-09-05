@@ -144,6 +144,7 @@ public:
 	int m_iHDMVSub;
 
 	HRESULT CheckMediaType(const CMediaType* pmt);
+	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 	HRESULT QueuePacket(CAutoPtr<CPacket> p);
 
 	STDMETHODIMP Connect(IPin* pReceivePin, const AM_MEDIA_TYPE* pmt);

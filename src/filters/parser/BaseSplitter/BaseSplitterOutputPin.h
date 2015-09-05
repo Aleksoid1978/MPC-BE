@@ -137,7 +137,7 @@ public:
 
 	HRESULT DeliverBeginFlush();
 	HRESULT DeliverEndFlush();
-	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
+	virtual HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 
 	size_t QueueCount();
 	size_t QueueSize();

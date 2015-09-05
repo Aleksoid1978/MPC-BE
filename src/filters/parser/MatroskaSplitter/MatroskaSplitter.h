@@ -68,6 +68,7 @@ public:
 
 	HRESULT DeliverEndFlush();
 	HRESULT DeliverEndOfStream();
+	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 	HRESULT QueuePacket(CAutoPtr<CPacket> p);
 };
 

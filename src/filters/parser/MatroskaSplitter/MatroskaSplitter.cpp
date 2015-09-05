@@ -2248,6 +2248,15 @@ HRESULT CMatroskaSplitterOutputPin::DeliverEndOfStream()
 	return __super::DeliverEndOfStream();
 }
 
+HRESULT CMatroskaSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
+{
+	if (m_iHDMVSub == 2) {
+		m_iHDMVSub = 1;
+	}
+
+	return __super::DeliverNewSegment(tStart, tStop, dRate);
+}
+
 HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 {
 	if (!ThreadExists()) {
