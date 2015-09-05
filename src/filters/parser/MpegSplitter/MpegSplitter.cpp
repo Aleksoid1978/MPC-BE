@@ -1833,8 +1833,17 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		return S_FALSE;
 	}
 
-	if (m_iHDMVSub == 1) {
-		m_iHDMVSub = 2;
+	if (m_iHDMVSub && p && p->GetCount() >= 3) {
+		int segtype = p->GetData()[0];
+		//int unitsize = p->GetData()[1] << 8 | p->GetData()[2];
+
+		if (segtype == 22) {
+			// this is first packet of HDMV sub
+			m_iHDMVSub = 1;
+		} else if (segtype == 21) {
+			// this is picture packet, need HDMV sub
+			m_iHDMVSub = 2; 
+		}
 	}
 
 	if (S_OK == m_hrDeliver && ((CMpegSplitterFilter*)pSplitter)->IsHDMVSubPinDrying()) {
