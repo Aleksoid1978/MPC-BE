@@ -554,6 +554,21 @@ void CMpegSplitterFilter::GetMediaTypes(CMpegSplitterFile::stream_type sType, CA
 	}
 }
 
+bool CMpegSplitterFilter::IsHDMVSubPinDrying()
+{
+	if (m_hasHDMVSubPin) {
+		POSITION pos = m_pActivePins.GetHeadPosition();
+		while (pos) {
+			CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
+			if (pPin->QueueCount() < 1 && ((CMpegSplitterOutputPin*)pPin)->m_bHDMVSub) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 STDMETHODIMP CMpegSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	CheckPointer(ppv, E_POINTER);
@@ -1129,7 +1144,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			} else if (type == CMpegSplitterFile::stream_type::subpic) {
 				if (subpic_sel == stream_idx && (S_OK == AddOutputPin(s, pPinOut))) {
 					if (s.mt.subtype == MEDIASUBTYPE_HDMVSUB) {
-						m_MaxOutputQueueMs = 5000; // hack
+						m_hasHDMVSubPin = true;
 					}
 					break;
 				}
@@ -1783,7 +1798,11 @@ CMpegSourceFilter::CMpegSourceFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& 
 CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpegSplitterFile::stream_type type, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterParserOutputPin(mts, pName, pFilter, pLock, phr)
 	, m_type(type)
+	, m_bHDMVSub(false)
 {
+	if (mts[0].subtype == MEDIASUBTYPE_HDMVSUB) {
+		m_bHDMVSub = true;
+	}
 }
 
 HRESULT CMpegSplitterOutputPin::CheckMediaType(const CMediaType* pmt)
@@ -1797,6 +1816,20 @@ HRESULT CMpegSplitterOutputPin::CheckMediaType(const CMediaType* pmt)
 	}
 
 	return E_INVALIDARG;
+}
+
+HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
+{
+	if (!ThreadExists()) {
+		return S_FALSE;
+	}
+
+	if (S_OK == m_hrDeliver && ((CMpegSplitterFilter*)pSplitter)->IsHDMVSubPinDrying()) {
+		m_queue.Add(p);
+		return m_hrDeliver;
+	}
+
+	return __super::QueuePacket(p);
 }
 
 STDMETHODIMP CMpegSplitterOutputPin::Connect(IPin* pReceivePin, const AM_MEDIA_TYPE* pmt)

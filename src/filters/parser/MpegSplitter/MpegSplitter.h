@@ -81,6 +81,9 @@ public:
 
 	void GetMediaTypes(CMpegSplitterFile::stream_type sType, CAtlArray<CMediaType>& mts);
 
+	bool m_hasHDMVSubPin;
+	bool IsHDMVSubPinDrying();
+
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 	STDMETHODIMP GetClassID(CLSID* pClsID);
@@ -138,7 +141,10 @@ class CMpegSplitterOutputPin : public CBaseSplitterParserOutputPin
 public:
 	CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpegSplitterFile::stream_type type, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 
+	bool m_bHDMVSub;
+
 	HRESULT CheckMediaType(const CMediaType* pmt);
+	HRESULT QueuePacket(CAutoPtr<CPacket> p);
 
 	STDMETHODIMP Connect(IPin* pReceivePin, const AM_MEDIA_TYPE* pmt);
 };
