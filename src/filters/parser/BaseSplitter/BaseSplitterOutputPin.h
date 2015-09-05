@@ -42,11 +42,11 @@ protected:
 	int m_nBuffers = 1;
 
 	CBaseSplitterFilter* pSplitter;
-private:
-	CPacketQueue m_queue;
 
+	CPacketQueue m_queue;
 	HRESULT m_hrDeliver;
 
+private:
 	bool m_fFlushing, m_fFlushed;
 	CAMEvent m_eEndFlush;
 
@@ -142,7 +142,7 @@ public:
 	size_t QueueCount();
 	size_t QueueSize();
 	HRESULT QueueEndOfStream();
-	HRESULT QueuePacket(CAutoPtr<CPacket> p);
+	virtual HRESULT QueuePacket(CAutoPtr<CPacket> p);
 
 	// returns true for everything which (the lack of) would not block other streams (subtitle streams, basically)
 	virtual bool IsDiscontinuous();

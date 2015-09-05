@@ -64,8 +64,11 @@ public:
 	CMatroskaSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 	virtual ~CMatroskaSplitterOutputPin();
 
+	bool m_bHDMVSub = false;
+
 	HRESULT DeliverEndFlush();
 	HRESULT DeliverEndOfStream();
+	HRESULT QueuePacket(CAutoPtr<CPacket> p);
 };
 
 class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
@@ -88,6 +91,7 @@ private:
 	CCritSec m_csProps;
 	bool m_bLoadEmbeddedFonts, m_bCalcDuration;
 
+
 protected:
 	CAutoPtr<MatroskaReader::CMatroskaFile> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
@@ -103,6 +107,9 @@ protected:
 public:
 	CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
 	virtual ~CMatroskaSplitterFilter();
+
+	bool m_hasHDMVSubPin;
+	bool IsHDMVSubPinDrying();
 
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
