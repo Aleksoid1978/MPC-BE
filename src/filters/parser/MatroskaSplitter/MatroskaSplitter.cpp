@@ -128,7 +128,7 @@ bool CMatroskaSplitterFilter::IsHDMVSubPinDrying()
 		POSITION pos = m_pActivePins.GetHeadPosition();
 		while (pos) {
 			CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
-			if (pPin->QueueCount() < 1 && ((CMatroskaSplitterOutputPin*)pPin)->m_bHDMVSub) {
+			if (pPin->QueueCount() < 1 && ((CMatroskaSplitterOutputPin*)pPin)->m_iHDMVSub == 2) {
 				return true;
 			}
 		}
@@ -2216,7 +2216,7 @@ CMatroskaSplitterOutputPin::CMatroskaSplitterOutputPin(CAtlArray<CMediaType>& mt
 	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
 {
 	if (mts[0].subtype == MEDIASUBTYPE_HDMVSUB) {
-		m_bHDMVSub = true;
+		m_iHDMVSub = 1;
 	}
 }
 
@@ -2252,6 +2252,10 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 {
 	if (!ThreadExists()) {
 		return S_FALSE;
+	}
+
+	if (m_iHDMVSub == 1) {
+		m_iHDMVSub = 2;
 	}
 
 	if (S_OK == m_hrDeliver && ((CMatroskaSplitterFilter*)pSplitter)->IsHDMVSubPinDrying()) {
