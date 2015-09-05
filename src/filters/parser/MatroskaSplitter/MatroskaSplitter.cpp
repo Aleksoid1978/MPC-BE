@@ -94,6 +94,7 @@ CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CMatroskaSplitterFilter"), pUnk, phr, __uuidof(this))
 	, m_bLoadEmbeddedFonts(true)
 	, m_bCalcDuration(false)
+	, m_hasHDMVSubPin(false)
 	, m_Seek_rt(INVALID_TIME)
 	, m_bSupportCueDuration(FALSE)
 {
@@ -119,6 +120,21 @@ CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 
 CMatroskaSplitterFilter::~CMatroskaSplitterFilter()
 {
+}
+
+bool CMatroskaSplitterFilter::IsHDMVSubPinDrying()
+{
+	if (m_hasHDMVSubPin) {
+		POSITION pos = m_pActivePins.GetHeadPosition();
+		while (pos) {
+			CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
+			if (pPin->QueueCount() < 1 && ((CMatroskaSplitterOutputPin*)pPin)->m_bHDMVSub) {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 STDMETHODIMP CMatroskaSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -1037,7 +1053,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						isSub = true;
 
 						if (mt.subtype == MEDIASUBTYPE_HDMVSUB) {
-							m_MaxOutputQueueMs = 5000; // hack
+							m_hasHDMVSubPin = true;
 						}
 					}
 				}
@@ -2199,6 +2215,9 @@ STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetCalcDuration()
 CMatroskaSplitterOutputPin::CMatroskaSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
 {
+	if (mts[0].subtype == MEDIASUBTYPE_HDMVSUB) {
+		m_bHDMVSub = true;
+	}
 }
 
 CMatroskaSplitterOutputPin::~CMatroskaSplitterOutputPin()
@@ -2227,6 +2246,20 @@ HRESULT CMatroskaSplitterOutputPin::DeliverEndOfStream()
 	}
 
 	return __super::DeliverEndOfStream();
+}
+
+HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
+{
+	if (!ThreadExists()) {
+		return S_FALSE;
+	}
+
+	if (S_OK == m_hrDeliver && ((CMatroskaSplitterFilter*)pSplitter)->IsHDMVSubPinDrying()) {
+		m_queue.Add(p);
+		return m_hrDeliver;
+	}
+
+	return __super::QueuePacket(p);
 }
 
 HRESULT CMatroskaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
