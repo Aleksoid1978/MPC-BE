@@ -64,7 +64,7 @@ public:
 	CMatroskaSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 	virtual ~CMatroskaSplitterOutputPin();
 
-	bool m_bHDMVSub = false;
+	int m_iHDMVSub = 0;
 
 	HRESULT DeliverEndFlush();
 	HRESULT DeliverEndOfStream();

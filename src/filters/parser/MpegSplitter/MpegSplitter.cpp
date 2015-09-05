@@ -560,7 +560,7 @@ bool CMpegSplitterFilter::IsHDMVSubPinDrying()
 		POSITION pos = m_pActivePins.GetHeadPosition();
 		while (pos) {
 			CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
-			if (pPin->QueueCount() < 1 && ((CMpegSplitterOutputPin*)pPin)->m_bHDMVSub) {
+			if (pPin->QueueCount() < 1 && ((CMpegSplitterOutputPin*)pPin)->m_iHDMVSub == 2) {
 				return true;
 			}
 		}
@@ -1798,10 +1798,10 @@ CMpegSourceFilter::CMpegSourceFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& 
 CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpegSplitterFile::stream_type type, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterParserOutputPin(mts, pName, pFilter, pLock, phr)
 	, m_type(type)
-	, m_bHDMVSub(false)
+	, m_iHDMVSub(0)
 {
 	if (mts[0].subtype == MEDIASUBTYPE_HDMVSUB) {
-		m_bHDMVSub = true;
+		m_iHDMVSub = 1;
 	}
 }
 
@@ -1822,6 +1822,10 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 {
 	if (!ThreadExists()) {
 		return S_FALSE;
+	}
+
+	if (m_iHDMVSub == 1) {
+		m_iHDMVSub = 2;
 	}
 
 	if (S_OK == m_hrDeliver && ((CMpegSplitterFilter*)pSplitter)->IsHDMVSubPinDrying()) {
