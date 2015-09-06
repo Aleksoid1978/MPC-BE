@@ -128,7 +128,7 @@ bool CMatroskaSplitterFilter::IsHDMVSubPinDrying()
 		POSITION pos = m_pActivePins.GetHeadPosition();
 		while (pos) {
 			CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
-			if (pPin->QueueCount() == 0 && ((CMatroskaSplitterOutputPin*)pPin)->m_HDMVSub == CHDMVSubStatus::hdmvsub_neednext) {
+			if (pPin->QueueCount() == 0 && ((CMatroskaSplitterOutputPin*)pPin)->NeedNextHDMVSub()) {
 				return true;
 			}
 		}
