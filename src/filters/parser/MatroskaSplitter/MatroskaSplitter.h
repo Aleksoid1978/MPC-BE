@@ -49,7 +49,9 @@ public:
 	CAutoPtr<MatroskaReader::BlockGroup> bg;
 };
 
-class CMatroskaSplitterOutputPin : public CBaseSplitterOutputPin
+class CMatroskaSplitterOutputPin
+	: public CBaseSplitterOutputPin
+	, public CHDMVSubStatus
 {
 	REFERENCE_TIME m_rtLastDuration = 0;
 	CAutoPtrList<CMatroskaPacket> m_packets;
@@ -63,8 +65,6 @@ protected:
 public:
 	CMatroskaSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 	virtual ~CMatroskaSplitterOutputPin();
-
-	int m_iHDMVSub = 0;
 
 	HRESULT DeliverEndFlush();
 	HRESULT DeliverEndOfStream();
