@@ -29,7 +29,6 @@
 #include "../../../DSUtil/AudioParser.h"
 #include <MMReg.h>
 #include <moreuuids.h>
-#include "../apps/mplayerc/SettingsDefines.h"
 
 #define MAXFRAMESIZE	((144 * 320000 / 8000) + 1)
 #define BUFFERS			2
@@ -603,15 +602,10 @@ UINT CShoutcastStream::SocketThreadProc()
 
 	REFERENCE_TIME m_rtSampleTime = 0;
 
-	DWORD MinQueuePackets = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MINQUEUEPACKETS, MINQUEUEPACKETS);
-	DWORD MaxQueuePackets = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MAXQUEUEPACKETS, MAXQUEUEPACKETS);
-	MinQueuePackets = CLAMP(MinQueuePackets, 10, MAXQUEUEPACKETS);
-	MaxQueuePackets = CLAMP(MaxQueuePackets, MinQueuePackets * 2, MAXQUEUEPACKETS * 10);
-
 	CAtlArray<BYTE> m_p;
 	while (!fExitThread) {
 		{
-			if (m_queue.GetCount() >= MaxQueuePackets) {
+			if (m_queue.GetCount() >= 125) {
 				// Buffer is full
 				Sleep(100);
 				continue;
