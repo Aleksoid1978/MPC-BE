@@ -1833,6 +1833,8 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		return S_FALSE;
 	}
 
+	bool force_packet = false;
+
 	if (m_iHDMVSub && p && p->GetCount() >= 3) {
 		int segtype = p->GetData()[0];
 		//int unitsize = p->GetData()[1] << 8 | p->GetData()[2];
@@ -1840,13 +1842,14 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		if (segtype == 22) {
 			// this is first packet of HDMV sub, set standart mode
 			m_iHDMVSub = 1;
+			force_packet = true; // but send this packet anyway
 		} else if (segtype == 21) {
 			// this is picture packet, force next HDMV sub
 			m_iHDMVSub = 2; 
 		}
 	}
 
-	if (S_OK == m_hrDeliver && ((CMpegSplitterFilter*)pSplitter)->IsHDMVSubPinDrying()) {
+	if (S_OK == m_hrDeliver && (force_packet || ((CMpegSplitterFilter*)pSplitter)->IsHDMVSubPinDrying())) {
 		m_queue.Add(p);
 		return m_hrDeliver;
 	}
