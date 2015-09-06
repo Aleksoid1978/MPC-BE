@@ -135,13 +135,13 @@ public:
 	CMpegSourceFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid = __uuidof(CMpegSourceFilter));
 };
 
-class CMpegSplitterOutputPin : public CBaseSplitterParserOutputPin
+class CMpegSplitterOutputPin
+	: public CBaseSplitterParserOutputPin
+	, public CHDMVSubStatus
 {
 	CMpegSplitterFile::stream_type m_type;
 public:
 	CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpegSplitterFile::stream_type type, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
-
-	int m_iHDMVSub;
 
 	HRESULT CheckMediaType(const CMediaType* pmt);
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);

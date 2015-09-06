@@ -157,3 +157,15 @@ public:
 
 	REFERENCE_TIME GetOffset() { return m_rtOffset; }
 };
+
+class CHDMVSubStatus
+{
+public:
+	enum hdmvsub_t {
+		not_hdmvsub = 0,
+		hdmvsub,
+		hdmvsub_neednext
+	};
+
+	hdmvsub_t m_HDMVSub = not_hdmvsub;
+};

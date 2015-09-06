@@ -560,7 +560,7 @@ bool CMpegSplitterFilter::IsHDMVSubPinDrying()
 		POSITION pos = m_pActivePins.GetHeadPosition();
 		while (pos) {
 			CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
-			if (pPin->QueueCount() < 1 && ((CMpegSplitterOutputPin*)pPin)->m_iHDMVSub == 2) {
+			if (pPin->QueueCount() == 0 && ((CMpegSplitterOutputPin*)pPin)->m_HDMVSub == CHDMVSubStatus::hdmvsub_neednext) {
 				return true;
 			}
 		}
@@ -1798,10 +1798,9 @@ CMpegSourceFilter::CMpegSourceFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& 
 CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpegSplitterFile::stream_type type, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterParserOutputPin(mts, pName, pFilter, pLock, phr)
 	, m_type(type)
-	, m_iHDMVSub(0)
 {
 	if (mts[0].subtype == MEDIASUBTYPE_HDMVSUB) {
-		m_iHDMVSub = 1;
+		m_HDMVSub = hdmvsub;
 	}
 }
 
@@ -1820,8 +1819,8 @@ HRESULT CMpegSplitterOutputPin::CheckMediaType(const CMediaType* pmt)
 
 HRESULT CMpegSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
-	if (m_iHDMVSub == 2) {
-		m_iHDMVSub = 1;
+	if (m_HDMVSub == hdmvsub_neednext) {
+		m_HDMVSub = hdmvsub;
 	}
 
 	return __super::DeliverNewSegment(tStart, tStop, dRate);
@@ -1835,17 +1834,17 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 
 	bool force_packet = false;
 
-	if (m_iHDMVSub && p && p->GetCount() >= 3) {
+	if (m_HDMVSub && p && p->GetCount() >= 3) {
 		int segtype = p->GetData()[0];
 		//int unitsize = p->GetData()[1] << 8 | p->GetData()[2];
 
 		if (segtype == 22) {
 			// this is first packet of HDMV sub, set standart mode
-			m_iHDMVSub = 1;
+			m_HDMVSub = hdmvsub;
 			force_packet = true; // but send this packet anyway
 		} else if (segtype == 21) {
 			// this is picture packet, force next HDMV sub
-			m_iHDMVSub = 2; 
+			m_HDMVSub = hdmvsub_neednext; 
 		}
 	}
 
