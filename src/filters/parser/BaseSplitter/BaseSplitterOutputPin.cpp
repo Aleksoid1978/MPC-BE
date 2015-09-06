@@ -33,14 +33,6 @@
 CBaseSplitterOutputPin::CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseOutputPin(NAME("CBaseSplitterOutputPin"), pFilter, pLock, phr, GetMediaTypeDesc(mts, pName, pFilter))
 	, pSplitter(static_cast<CBaseSplitterFilter*>(m_pFilter))
-	, m_hrDeliver(S_OK) // just in case it were asked before the worker thread could be created and reset it
-	, m_fFlushing(false)
-	, m_fFlushed(false)
-	, m_eEndFlush(TRUE)
-	, m_rtPrev(0)
-	, m_rtOffset(0)
-	, m_maxQueueDuration(3000 * 10000)
-	, m_maxQueueCount(3000 * 12 / 10)
 {
 	m_mts.Copy(mts);
 	memset(&m_brs, 0, sizeof(m_brs));
@@ -50,12 +42,6 @@ CBaseSplitterOutputPin::CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWS
 CBaseSplitterOutputPin::CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseOutputPin(NAME("CBaseSplitterOutputPin"), pFilter, pLock, phr, pName)
 	, pSplitter(static_cast<CBaseSplitterFilter*>(m_pFilter))
-	, m_hrDeliver(S_OK) // just in case it were asked before the worker thread could be created and reset it
-	, m_fFlushing(false)
-	, m_fFlushed(false)
-	, m_eEndFlush(TRUE)
-	, m_maxQueueDuration(3000 * 10000)
-	, m_maxQueueCount(3000 * 12 / 10)
 {
 	memset(&m_brs, 0, sizeof(m_brs));
 	m_brs.rtLastDeliverTime = INVALID_TIME;
@@ -97,8 +83,8 @@ HRESULT CBaseSplitterOutputPin::DecideBufferSize(IMemAllocator* pAlloc, ALLOCATO
 
 	HRESULT hr = NOERROR;
 
-	pProperties->cBuffers = max(pProperties->cBuffers, m_nBuffers);
-	pProperties->cbBuffer = max(m_mt.lSampleSize, 1);
+	pProperties->cBuffers = max(1, pProperties->cBuffers);
+	pProperties->cbBuffer = max(1, m_mt.lSampleSize);
 
 	// TODO: is this still needed ?
 	if (m_mt.subtype == MEDIASUBTYPE_Vorbis && m_mt.formattype == FORMAT_VorbisFormat) {

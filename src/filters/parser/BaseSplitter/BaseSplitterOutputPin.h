@@ -37,18 +37,16 @@ class CBaseSplitterOutputPin
 	, public IMediaSeeking
 	, public IBitRateInfo
 {
-protected:
-	CAtlArray<CMediaType> m_mts;
-	int m_nBuffers = 1;
-
-	CBaseSplitterFilter* pSplitter;
-
-	CPacketQueue m_queue;
-	HRESULT m_hrDeliver;
-
 private:
-	bool m_fFlushing, m_fFlushed;
-	CAMEvent m_eEndFlush;
+	bool			m_fFlushing			= false;
+	bool			m_fFlushed			= false;
+	CAMEvent		m_eEndFlush			= TRUE;
+
+	REFERENCE_TIME	m_maxQueueDuration	= 3000 * 10000;
+	size_t			m_maxQueueCount		= 3000 * 12 / 10;
+
+	REFERENCE_TIME	m_rtPrev			= 0;
+	REFERENCE_TIME	m_rtOffset			= 0;
 
 	enum {
 		CMD_EXIT
@@ -72,12 +70,13 @@ private:
 		DWORD nAverageBitRate;
 	} m_brs;
 
-	REFERENCE_TIME m_maxQueueDuration;
-	size_t m_maxQueueCount;
-
 protected:
-	REFERENCE_TIME m_rtPrev, m_rtOffset;
-	REFERENCE_TIME m_rtStart;
+	CBaseSplitterFilter* pSplitter;
+	CAtlArray<CMediaType> m_mts;
+	CPacketQueue m_queue;
+
+	HRESULT			m_hrDeliver	= S_OK;
+	REFERENCE_TIME	m_rtStart	= 0;
 
 	// override this if you need some second level stream specific demuxing (optional)
 	// the default implementation will send the sample as is
@@ -160,7 +159,7 @@ public:
 
 class CHDMVSubStatus
 {
-public:
+protected:
 	enum hdmvsub_t {
 		not_hdmvsub = 0,
 		hdmvsub,
@@ -168,4 +167,7 @@ public:
 	};
 
 	hdmvsub_t m_HDMVSub = not_hdmvsub;
+
+public:
+	bool NeedNextHDMVSub() { return m_HDMVSub == hdmvsub_neednext; }
 };

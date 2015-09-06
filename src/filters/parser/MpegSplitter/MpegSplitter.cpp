@@ -560,7 +560,7 @@ bool CMpegSplitterFilter::IsHDMVSubPinDrying()
 		POSITION pos = m_pActivePins.GetHeadPosition();
 		while (pos) {
 			CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
-			if (pPin->QueueCount() == 0 && ((CMpegSplitterOutputPin*)pPin)->m_HDMVSub == CHDMVSubStatus::hdmvsub_neednext) {
+			if (pPin->QueueCount() == 0 && ((CMpegSplitterOutputPin*)pPin)->NeedNextHDMVSub()) {
 				return true;
 			}
 		}
