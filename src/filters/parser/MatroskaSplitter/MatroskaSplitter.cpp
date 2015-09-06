@@ -2263,36 +2263,29 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		return S_FALSE;
 	}
 
-	if (m_iHDMVSub && p) {
-		bool bPRESENTATION_SEG = false;
-		bool bOBJECT = false;
+	bool force_packet = false;
 
+	if (m_iHDMVSub && p) {
 		CMatroskaPacket* mp = static_cast<CMatroskaPacket*>(p.m_p);
+
+		size_t size = 0;
 		POSITION pos = mp->bg->Block.BlockData.GetHeadPosition();
 		while (pos) {
-			CBinary* blockdata = mp->bg->Block.BlockData.GetNext(pos);
-			if (blockdata->GetCount() >= 3) {
-				int segtype = blockdata->GetData()[0];
-				//int unitsize = blockdata->GetData()[1] << 8 | blockdata->GetData()[2];
-
-				if (segtype == 22) {
-					bPRESENTATION_SEG = true;
-				} else if (segtype == 21) {
-					bOBJECT = true;
-				}
-			}
+			size += mp->bg->Block.BlockData.GetNext(pos)->GetCount();
 		}
 
-		if (bOBJECT) {
-			// this is picture packet, force next HDMV sub
-			m_iHDMVSub = 2;
-		} else if (bPRESENTATION_SEG) {
-			// this is first packet of HDMV sub, set standart mode
+		// simple check
+		if (size <= 30) {
+			// this is empty sub, set standart mode
 			m_iHDMVSub = 1;
+			force_packet = true; // but send this packet anyway
+		} else {
+			// this is sub with picture, force next HDMV sub
+			m_iHDMVSub = 2; 
 		}
 	}
 
-	if (S_OK == m_hrDeliver && ((CMatroskaSplitterFilter*)pSplitter)->IsHDMVSubPinDrying()) {
+	if (S_OK == m_hrDeliver && (force_packet || ((CMatroskaSplitterFilter*)pSplitter)->IsHDMVSubPinDrying())) {
 		m_queue.Add(p);
 		return m_hrDeliver;
 	}
