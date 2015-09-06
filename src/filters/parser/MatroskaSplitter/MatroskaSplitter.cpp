@@ -2263,8 +2263,33 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		return S_FALSE;
 	}
 
-	if (m_iHDMVSub == 1) {
-		m_iHDMVSub = 2;
+	if (m_iHDMVSub && p) {
+		bool bPRESENTATION_SEG = false;
+		bool bOBJECT = false;
+
+		CMatroskaPacket* mp = static_cast<CMatroskaPacket*>(p.m_p);
+		POSITION pos = mp->bg->Block.BlockData.GetHeadPosition();
+		while (pos) {
+			CBinary* blockdata = mp->bg->Block.BlockData.GetNext(pos);
+			if (blockdata->GetCount() >= 3) {
+				int segtype = blockdata->GetData()[0];
+				//int unitsize = blockdata->GetData()[1] << 8 | blockdata->GetData()[2];
+
+				if (segtype == 22) {
+					bPRESENTATION_SEG = true;
+				} else if (segtype == 21) {
+					bOBJECT = true;
+				}
+			}
+		}
+
+		if (bOBJECT) {
+			// this is picture packet, force next HDMV sub
+			m_iHDMVSub = 2;
+		} else if (bPRESENTATION_SEG) {
+			// this is first packet of HDMV sub, set standart mode
+			m_iHDMVSub = 1;
+		}
 	}
 
 	if (S_OK == m_hrDeliver && ((CMatroskaSplitterFilter*)pSplitter)->IsHDMVSubPinDrying()) {

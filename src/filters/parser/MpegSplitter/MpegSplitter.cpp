@@ -1838,10 +1838,10 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		//int unitsize = p->GetData()[1] << 8 | p->GetData()[2];
 
 		if (segtype == 22) {
-			// this is first packet of HDMV sub
+			// this is first packet of HDMV sub, set standart mode
 			m_iHDMVSub = 1;
 		} else if (segtype == 21) {
-			// this is picture packet, need HDMV sub
+			// this is picture packet, force next HDMV sub
 			m_iHDMVSub = 2; 
 		}
 	}
