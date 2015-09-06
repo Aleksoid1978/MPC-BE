@@ -299,13 +299,6 @@
 #define IDS_RS_YOUTUBE_PERCENT_MEM			_T("YoutubePercentMemory")
 #define IDS_RS_YOUTUBE_MB_MEM				_T("YoutubeMbMemory")
 
-#define IDS_R_PERFOMANCE					_T("\\Perfomance")
-#define IDS_RS_PERFOMANCE_CACHE_LENGTH		_T("CacheLen")
-#define IDS_RS_PERFOMANCE_MINQUEUESIZE		_T("MinQueueSize")
-#define IDS_RS_PERFOMANCE_MAXQUEUESIZE		_T("MaxQueueSize")
-#define IDS_RS_PERFOMANCE_MINQUEUEPACKETS	_T("MinQueuePackets")
-#define IDS_RS_PERFOMANCE_MAXQUEUEPACKETS	_T("MaxQueuePackets")
-
 #define IDS_R_FILTERS_PRIORITY				_T("\\Filters Priority")
 
 #define IDS_RS_LASTFILEINFOPAGE				_T("LastFileInfoPage")

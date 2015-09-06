@@ -417,69 +417,6 @@ public:
 	};
 };
 
-class CPerfomanceSettings {
-public:
-	void SetDefault() {
-		nCacheSize = DEFAULT_CACHE_LENGTH;
-
-		nMinQueueSize = MINQUEUESIZE;
-		nMaxQueueSize = MAXQUEUESIZE;
-
-		nMinQueuePackets = MINQUEUEPACKETS;
-		nMaxQueuePackets = MAXQUEUEPACKETS;
-
-		bDefault = TRUE;
-	};
-
-	void LoadSettings() {
-		MEMORYSTATUSEX msEx;
-		msEx.dwLength = sizeof(msEx);
-		::GlobalMemoryStatusEx(&msEx);
-		DWORDLONG halfMemMB = msEx.ullTotalPhys/0x200000;
-
-		nCacheSize = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_CACHE_LENGTH, DEFAULT_CACHE_LENGTH);
-		nCacheSize = CLAMP(nCacheSize, 16, 1024);
-
-		nMinQueueSize = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MINQUEUESIZE, MINQUEUESIZE);
-		nMaxQueueSize = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MAXQUEUESIZE, MAXQUEUESIZE);
-		nMinQueueSize = CLAMP(nMinQueueSize, 64, 1024);
-		nMaxQueueSize = CLAMP(nMaxQueueSize, 10, min(512, halfMemMB)); // hmm, nMinQueueSize > nMaxQueueSize
-
-		nMinQueuePackets = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MINQUEUEPACKETS, MINQUEUEPACKETS);
-		nMaxQueuePackets = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MAXQUEUEPACKETS, MAXQUEUEPACKETS);
-		nMinQueuePackets = CLAMP(nMinQueuePackets, 10, MAXQUEUEPACKETS);
-		nMaxQueuePackets = CLAMP(nMaxQueuePackets, nMinQueuePackets*2, MAXQUEUEPACKETS*10);
-
-		bDefault = (nCacheSize == DEFAULT_CACHE_LENGTH
-					&& nMinQueueSize == MINQUEUESIZE
-					&& nMaxQueueSize == MAXQUEUESIZE
-					&& nMinQueuePackets == MINQUEUEPACKETS
-					&& nMaxQueuePackets == MAXQUEUEPACKETS);
-	};
-
-	void SaveSettings() {
-		AfxGetApp()->WriteProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_CACHE_LENGTH, nCacheSize);
-		AfxGetApp()->WriteProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MINQUEUESIZE, nMinQueueSize);
-		AfxGetApp()->WriteProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MAXQUEUESIZE, nMaxQueueSize);
-		AfxGetApp()->WriteProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MINQUEUEPACKETS, nMinQueuePackets);
-		AfxGetApp()->WriteProfileInt(IDS_R_SETTINGS IDS_R_PERFOMANCE, IDS_RS_PERFOMANCE_MAXQUEUEPACKETS, nMaxQueuePackets);
-	};
-
-	void UpdateStatus() {
-		bDefault = (nCacheSize == DEFAULT_CACHE_LENGTH
-					&& nMinQueueSize == MINQUEUESIZE
-					&& nMaxQueueSize == MAXQUEUESIZE
-					&& nMinQueuePackets == MINQUEUEPACKETS
-					&& nMaxQueuePackets == MAXQUEUEPACKETS);
-	}
-
-	DWORD nCacheSize;
-	DWORD nMinQueueSize, nMaxQueueSize;
-	DWORD nMinQueuePackets, nMaxQueuePackets;
-
-	BOOL bDefault;
-};
-
 class CSubtitleItem
 {
 	CString m_fn;
@@ -943,7 +880,6 @@ private:
 	friend	void	CRenderersSettings::UpdateData(bool bSave);
 
 public:
-	CPerfomanceSettings			PerfomanceSettings;
 	CFiltersPrioritySettings	FiltersPrioritySettings;
 
 	CAtlList<CString>			slSubtitlePathsAddons;
