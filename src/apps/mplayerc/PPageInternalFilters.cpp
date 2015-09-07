@@ -354,10 +354,10 @@ void CPPageInternalFilters::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
+	DDX_Control(pDX, IDC_TAB1, m_Tab);
 	DDX_Control(pDX, IDC_LIST1, m_listSrc);
 	DDX_Control(pDX, IDC_LIST2, m_listVideo);
 	DDX_Control(pDX, IDC_LIST3, m_listAudio);
-	DDX_Control(pDX, IDC_TAB1, m_Tab);
 	DDX_Control(pDX, IDC_BUTTON5, m_btnAviCfg);
 	DDX_Control(pDX, IDC_BUTTON1, m_btnMpegCfg);
 	DDX_Control(pDX, IDC_BUTTON6, m_btnMatroskaCfg);
@@ -365,6 +365,8 @@ void CPPageInternalFilters::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BUTTON2, m_btnVideoCfg);
 	DDX_Control(pDX, IDC_BUTTON3, m_btnMPEG2Cfg);
 	DDX_Control(pDX, IDC_BUTTON4, m_btnAudioCfg);
+	DDX_Control(pDX, IDC_EDIT1, m_edtBufferDuration);
+	DDX_Control(pDX, IDC_SPIN1, m_spnBufferDuration);
 }
 
 BEGIN_MESSAGE_MAP(CPPageInternalFilters, CPPageBase)
@@ -426,6 +428,10 @@ BOOL CPPageInternalFilters::OnInitDialog()
 	m_listSrc.UpdateCheckState();
 	m_listVideo.UpdateCheckState();
 	m_listAudio.UpdateCheckState();
+
+	m_edtBufferDuration = CLAMP(s.iBufferDuration / 1000, 1, 10);
+	m_edtBufferDuration.SetRange(1, 10);
+	m_spnBufferDuration.SetRange(1, 10);
 
 	TC_ITEM tci;
 	memset(&tci, 0, sizeof(tci));
@@ -494,6 +500,8 @@ BOOL CPPageInternalFilters::OnApply()
 
 		list = (l == 1) ? &m_listVideo : &m_listAudio;
 	}
+
+	s.iBufferDuration = m_edtBufferDuration * 1000;
 
 	return __super::OnApply();
 }

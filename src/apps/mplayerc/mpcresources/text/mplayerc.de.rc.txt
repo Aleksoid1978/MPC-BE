@@ -291,7 +291,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Windows-Taskbarfunktionen verwenden (ab Windows 7)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 6		"Um anstelle eines internen Filters einen alternativen, externen Filter zu verwenden, die betreffenden Formate hier bitte deaktivieren."
 10		"AVI-Splitter\nEinstellungen"
 11		"MPEG-Splitter\nEinstellungen"
@@ -300,6 +300,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 14		"Video-Decoder\nEinstellungen"
 15		"MPEG-2- und\nDVD-Decoder\nEinstellungen"
 16		"Audio-Decoder\nEinstellungen"
+17		"Buffer length (s):"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12

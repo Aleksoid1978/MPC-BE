@@ -125,6 +125,19 @@ STDMETHODIMP CRawVideoSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
+STDMETHODIMP CRawVideoSplitterFilter::SetBufferDuration(int duration)
+{
+	if (m_RAWType == RAW_MPEG1 || m_RAWType == RAW_MPEG2 || m_RAWType == RAW_H264 || m_RAWType == RAW_VC1 || m_RAWType == RAW_HEVC) {
+		return E_ABORT; // hack
+	}
+	if (duration < 100 || duration > 10000) {
+		return E_INVALIDARG;
+	}
+
+	m_MaxOutputQueueMs = duration;
+	return S_OK;
+}
+
 bool CRawVideoSplitterFilter::ReadGOP(REFERENCE_TIME& rt)
 {
 	m_pFile->BitRead(1);

@@ -658,6 +658,7 @@ public:
 	bool			DXVAFilters[VDEC_DXVA_LAST];
 	bool			VideoFilters[VDEC_LAST];
 	bool			AudioFilters[ADEC_LAST];
+	int				iBufferDuration;
 
 	// Audio Switcher
 	bool			bAudioMixer;

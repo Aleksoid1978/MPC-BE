@@ -38,7 +38,7 @@ CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT*
 	, m_rtLastStop(INVALID_TIME)
 	, m_priority(THREAD_PRIORITY_NORMAL)
 	, m_nFlag(0)
-	, m_MaxOutputQueueMs(3000)
+	, m_MaxOutputQueueMs(DEFAULT_BUFFER_DURATION)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -73,6 +73,7 @@ STDMETHODIMP CBaseSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void*
 		QI2(IAMExtendedSeeking)
 		QI(IKeyFrameInfo)
 		QI(IBufferInfo)
+		QI(IBufferControl)
 		QI(IPropertyBag)
 		QI(IPropertyBag2)
 		QI(IDSMPropertyBag)
@@ -844,6 +845,18 @@ STDMETHODIMP CBaseSplitterFilter::GetStatus(int i, int& samples, int& size)
 STDMETHODIMP_(DWORD) CBaseSplitterFilter::GetPriority()
 {
 	return m_priority;
+}
+
+// IBufferControl
+
+STDMETHODIMP CBaseSplitterFilter::SetBufferDuration(int duration)
+{
+	if (duration < 100 || duration > 10000) {
+		return E_INVALIDARG;
+	}
+
+	m_MaxOutputQueueMs = duration;
+	return S_OK;
 }
 
 void CBaseSplitterFilter::SortOutputPin()

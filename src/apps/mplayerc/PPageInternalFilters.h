@@ -24,6 +24,7 @@
 #include <afxwin.h>
 #include "PPageBase.h"
 #include "afxcmn.h"
+#include "FloatEdit.h"
 
 enum {
 	SOURCE,
@@ -85,6 +86,9 @@ public:
 	CButton m_btnVideoCfg;
 	CButton m_btnMPEG2Cfg;
 	CButton m_btnAudioCfg;
+
+	CIntEdit m_edtBufferDuration;
+	CSpinButtonCtrl m_spnBufferDuration;
 
 	CTabCtrl m_Tab;
 

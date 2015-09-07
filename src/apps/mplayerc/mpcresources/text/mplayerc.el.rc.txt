@@ -291,7 +291,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Χρήση χαρακτηριστικών Γραμμής εργασίας των Windows 7"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 6		"Εάν θέλετε να χρησιμοποιήσετε την αυτόνομη έκδοση απ΄αυτά τα φίλτρα ή κάποια άλλη αντικατάσταση, απενεργοποιήστε τα εδώ. Στα φίλτρα γραμμένα με έντονη γραφή, μπορείτε με διπλό κλικ να εμφανίσετε τις σελίδες ιδιοτήτων τους."
 10		"AVI Splitter\nconfiguration"
 11		"MPEG Splitter\nconfiguration"
@@ -300,6 +300,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 14		"Video decoder\nconfiguration"
 15		"MPEG-2/DVD\ndecoder\nconfiguration"
 16		"Audio decoder\nconfiguration"
+17		"Buffer length (s):"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12

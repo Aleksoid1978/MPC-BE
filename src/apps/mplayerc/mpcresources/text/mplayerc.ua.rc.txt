@@ -291,7 +291,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Використовувати особливості панелі завдань Windows 7 (і пізніших)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 6		"Якщо ви хочете використовувати окремі версії цих фільтрів або інші замінники, вимкніть їх тут."
 10		"AVI-демультиплексор\n(налаштування)"
 11		"MPEG-демультиплексор\n(налаштування)"
@@ -300,6 +300,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 14		"Відеодекодер\n(налаштування)"
 15		"MPEG-2/DVD\nдекодер\n(налаштування)"
 16		"Аудіодекодер\n(налаштування)"
+17		"Buffer length (s):"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12

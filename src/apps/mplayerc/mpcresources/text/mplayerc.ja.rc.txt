@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"バージョン情報"
 7		"MPC-BE"
 8		"Copyright © 2002-2015 (Authors.txt ファイルを参照)"
@@ -291,7 +291,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Windows 7 (とそれ以降) のタスク バー機能を使用"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 6		"スタンドアロン版または代替フィルターを使用したい場合はここで無効にしてください。太字表示のフィルターはダブルクリックでプロパティ ページが表示されます。"
 10		"AVI スプリッター\n設定"
 11		"MPEG スプリッター\n設定"
@@ -300,6 +300,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 14		"ビデオ デコーダー\n設定"
 15		"MPEG-2/DVD\nデコーダー\n設定"
 16		"音声デコーダー\n設定"
+17		"Buffer length (s):"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12

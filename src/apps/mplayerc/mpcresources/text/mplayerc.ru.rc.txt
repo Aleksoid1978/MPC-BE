@@ -291,7 +291,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Использовать возможности таскбара Windows 7 (и выше)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 6		"Если вы хотите использовать отдельную версию этих фильтров или другую замену, отключите их здесь."
 10		"Настройка\nAVI сплиттера"
 11		"Настройка\nMPEG сплиттера"
@@ -300,6 +300,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 14		"Настройка\nвидео декодера"
 15		"Настройка\nMPEG-2/DVD\nдекодера"
 16		"Настройка\nаудио декодера"
+17		"Размер буфера (сек):"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12

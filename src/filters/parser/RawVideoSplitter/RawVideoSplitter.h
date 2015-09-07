@@ -60,6 +60,10 @@ public:
 	// CBaseFilter
 
 	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
+
+	// IBufferControl
+
+	STDMETHODIMP SetBufferDuration(int duration);
 };
 
 class __declspec(uuid("E32A3501-04A9-486B-898B-F5A4C8A4AAAC"))

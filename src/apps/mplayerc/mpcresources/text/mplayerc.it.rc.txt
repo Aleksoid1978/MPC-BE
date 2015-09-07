@@ -291,7 +291,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Utilizza la taskbar di Windows 7/8"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 6		"I tasti a lato permettono di accedere alle proprietà dei vari splitter/decoder.Se si vogliono utilizzare filtri,video e/o audio decoder esterni, magari contenuti in un codec pack, assicurati di avere prima disabilitato quelli interni, qui in lista."
 10		"AVI Splitter\nconfigurazione"
 11		"MPEG Splitter\nconfigurazione"
@@ -300,6 +300,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 14		"Video decoder\nconfigurazione"
 15		"MPEG-2/DVD\ndecoder\nconfigurazione"
 16		"Audio decoder\nconfigurazione"
+17		"Buffer length (s):"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
