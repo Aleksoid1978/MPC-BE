@@ -291,7 +291,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Folosește facilitățile barei de activități Windows 7"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 6		"Dacă doriți să folosiți versiunea autonomă a acestor filtre sau un înlocuitor, dezactivați-le aici. Pe filtrele scrise aldin (îngroșat) se poate da dublu-clic pentru a deschide paginile lor cu proprietăți."
 10		"AVI Splitter\nconfiguration"
 11		"MPEG Splitter\nconfiguration"
@@ -300,6 +300,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 14		"Video decoder\nconfiguration"
 15		"MPEG-2/DVD\ndecoder\nconfiguration"
 16		"Audio decoder\nconfiguration"
+17		"Buffer length (s):"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12

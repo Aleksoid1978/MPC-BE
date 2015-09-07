@@ -140,6 +140,7 @@
 #define IDS_RS_REMEMBERWINDOWSIZE			_T("RememberWindowSize")
 #define IDS_RS_PANSCANZOOM					_T("PanScanZoom")
 #define IDS_RS_AUDIOTIMESHIFT				_T("AudioTimeShift")
+#define IDS_RS_BUFFERDURATION				_T("BufferDuration")
 #define IDS_RS_SUBDELAYINTERVAL				_T("SubDelayInterval")
 #define IDS_RS_ENABLEAUDIOTIMESHIFT			_T("EnableAudioTimeShift")
 #define IDS_RS_LOGOFILE						_T("LogoFile")

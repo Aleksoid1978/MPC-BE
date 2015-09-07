@@ -59,6 +59,7 @@
 #include <moreuuids.h>
 #include <qnetwork.h>
 #include <psapi.h>
+#include <IBufferControl.h>
 
 #include "FGManager.h"
 #include "FGManagerBDA.h"
@@ -13528,6 +13529,17 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			}
 		}
 		EndEnumFilters;
+
+		{
+			CComQIPtr<IBufferControl> pBC;
+			BeginEnumFilters(m_pGB, pEF, pBF) {
+				if (pBC = pBF) {
+					pBC->SetBufferDuration(s.iBufferDuration);
+				}
+			}
+			EndEnumFilters;
+			pBC.Release();
+		}
 
 		OpenCustomizeGraph();
 		if (m_fOpeningAborted) {

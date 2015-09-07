@@ -291,7 +291,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Gebruik mogelijkheden van Windows 7 (en hoger)-taakbalk"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 6		"Als u een standalone-versie of een alternatief van deze filters wilt gebruiken, mag u de interne versie hier uitschakelen."
 10		"AVI-splitter\nconfiguratie"
 11		"MPEG-splitter\nconfiguratie"
@@ -300,6 +300,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 14		"Videodecoder\nconfiguratie"
 15		"MPEG-2/DVD-\ndecoder\nconfiguratie"
 16		"Audiodecoder\nconfiguratie"
+17		"Buffer length (s):"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12

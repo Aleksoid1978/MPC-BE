@@ -291,7 +291,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Erabili Windows 7 (eta berriagoa) Eginkizun-barra ezaugarriak"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 6		"Iragazki hauen bakarkako bertsioa edo beste ordezko bat erabiltzea nahi baduzu, ezgaitu itzazu hemen. Lodiz idatzitako iragazkiak klik-bikoitzez ireki daitezke beren ezaugarri orrialdeak ikusteko."
 10		"AVI banantzaile\nitxurapena"
 11		"MPEG banantzaile\nitxurapena"
@@ -300,6 +300,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 17
 14		"Bideo dekodeatzaile\nitxurapena"
 15		"MPEG-2/DVD\ndekodeatzaile\nitxurapena"
 16		"Audio dekodeatzaile\nitxurapena"
+17		"Buffer length (s):"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12

@@ -25,6 +25,7 @@
 #include <qnetwork.h>
 #include <IKeyFrameInfo.h>
 #include <IBufferInfo.h>
+#include <IBufferControl.h>
 #include <IBitRateInfo.h>
 #include "BaseSplitterFileEx.h"
 #include "BaseSplitterInputPin.h"
@@ -53,6 +54,7 @@ class CBaseSplitterFilter
 	, public IAMExtendedSeeking
 	, public IKeyFrameInfo
 	, public IBufferInfo
+	, public IBufferControl
 {
 	CCritSec m_csPinMap;
 	CAtlMap<DWORD, CBaseSplitterOutputPin*> m_pPinMap;
@@ -214,6 +216,10 @@ public:
 	STDMETHODIMP_(int) GetCount();
 	STDMETHODIMP GetStatus(int i, int& samples, int& size);
 	STDMETHODIMP_(DWORD) GetPriority();
+
+	// IBufferControl
+
+	STDMETHODIMP SetBufferDuration(int duration);
 
 public:
 	DWORD GetFlag() { return m_nFlag; }
