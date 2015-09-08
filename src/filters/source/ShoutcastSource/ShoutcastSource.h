@@ -152,14 +152,30 @@ public:
 
 class CShoutcastStream : public CSourceStream
 {
-
-	class CShoutCastPacket : public CPacket
+	class CShoutCastPacket : public CAtlArray < BYTE >
 	{
 	public:
 		CString title;
+		REFERENCE_TIME rtStart = INVALID_TIME;
+		REFERENCE_TIME rtStop = INVALID_TIME;
+		void SetData(const void* ptr, DWORD len) {
+			SetCount(len);
+			memcpy(GetData(), ptr, len);
+		}
 	};
 
-	class ShoutCastqueue : public CAutoPtrList<CShoutCastPacket>, public CCritSec {} m_queue;
+	class ShoutCastqueue
+		: public CAutoPtrList<CShoutCastPacket>
+		, public CCritSec
+	{
+	public:
+		REFERENCE_TIME GetDuration() {
+			CAutoLock cAutoLock(this);
+			return GetCount() ? (GetTail()->rtStop - GetHead()->rtStart) : 0;
+		}
+	};
+	
+	ShoutCastqueue m_queue;
 
 	class CShoutcastSocket : public CMPCSocket
 	{
