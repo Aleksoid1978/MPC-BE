@@ -38,7 +38,7 @@ CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT*
 	, m_rtLastStop(INVALID_TIME)
 	, m_priority(THREAD_PRIORITY_NORMAL)
 	, m_nFlag(0)
-	, m_MaxOutputQueueMs(DEFAULT_BUFFER_DURATION)
+	, m_iBufferDuration(DEFAULT_BUFFER_DURATION)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -855,7 +855,7 @@ STDMETHODIMP CBaseSplitterFilter::SetBufferDuration(int duration)
 		return E_INVALIDARG;
 	}
 
-	m_MaxOutputQueueMs = duration;
+	m_iBufferDuration = duration;
 	return S_OK;
 }
 
