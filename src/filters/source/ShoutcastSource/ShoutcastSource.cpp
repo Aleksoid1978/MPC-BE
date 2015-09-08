@@ -32,8 +32,8 @@
 
 #define MAXFRAMESIZE	((144 * 320000 / 8000) + 1)
 #define BUFFERS			2
-#define MINBUFFERLENGTH	1000000i64
-#define AVGBUFFERLENGTH	30000000i64
+#define MINBUFFERLENGTH	  1000000i64
+#define AVGBUFFERLENGTH	 30000000i64
 #define MAXBUFFERLENGTH	100000000i64
 
 #define MPA_FRAME_SIZE	4
@@ -400,7 +400,7 @@ LONGLONG CShoutcastStream::GetBufferFullness()
 	if (m_queue.IsEmpty()) {
 		return 0;
 	}
-	LONGLONG ret = 100i64*(m_queue.GetTail()->rtStart - m_queue.GetHead()->rtStart) / AVGBUFFERLENGTH;
+	LONGLONG ret = 100i64*(m_queue.GetDuration()) / AVGBUFFERLENGTH;
 	return min(ret, 100);
 }
 
@@ -452,7 +452,7 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 		// do we have to refill our buffer?
 		{
 			CAutoLock cAutoLock(&m_queue);
-			if (!m_queue.IsEmpty() && m_queue.GetHead()->rtStart < m_queue.GetTail()->rtStart - MINBUFFERLENGTH) {
+			if (m_queue.GetDuration() > MINBUFFERLENGTH) {
 				break;    // nope, that's great
 			}
 		}
@@ -468,7 +468,7 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 			Sleep(50);
 
 			CAutoLock cAutoLock(&m_queue);
-			if (!m_queue.IsEmpty() && m_queue.GetHead()->rtStart < m_queue.GetTail()->rtStart - AVGBUFFERLENGTH) {
+			if (m_queue.GetDuration() > AVGBUFFERLENGTH) {
 				break;    // this is enough
 			}
 		}
@@ -605,7 +605,7 @@ UINT CShoutcastStream::SocketThreadProc()
 	CAtlArray<BYTE> m_p;
 	while (!fExitThread) {
 		{
-			if (m_queue.GetCount() >= 125) {
+			if (m_queue.GetDuration() > MAXBUFFERLENGTH || m_queue.GetCount() >= 500) {
 				// Buffer is full
 				Sleep(100);
 				continue;
@@ -661,9 +661,10 @@ UINT CShoutcastStream::SocketThreadProc()
 
 						CAutoPtr<CShoutCastPacket> p2(DNew CShoutCastPacket());
 						p2->SetData(start, size);
-						p2->rtStop = (p2->rtStart = m_rtSampleTime) + (10000000i64 * size * 8/soc.m_bitrate);
-						p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
+						p2->rtStart = m_rtSampleTime;
+						p2->rtStop  = m_rtSampleTime + (10000000i64 * size * 8/soc.m_bitrate);
 						m_rtSampleTime = p2->rtStop;
+						p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
 
 						{
 							CAutoLock cAutoLock(&m_queue);
@@ -712,9 +713,10 @@ UINT CShoutcastStream::SocketThreadProc()
 
 						CAutoPtr<CShoutCastPacket> p2(DNew CShoutCastPacket());
 						p2->SetData(start + aframe.param1, size - aframe.param1);
-						p2->rtStop = (p2->rtStart = m_rtSampleTime) + (10000000i64 * size * 8/soc.m_bitrate);
-						p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
+						p2->rtStart = m_rtSampleTime;
+						p2->rtStop  = m_rtSampleTime + (10000000i64 * size * 8/soc.m_bitrate);
 						m_rtSampleTime = p2->rtStop;
+						p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
 
 						{
 							CAutoLock cAutoLock(&m_queue);
