@@ -134,7 +134,7 @@ STDMETHODIMP CRawVideoSplitterFilter::SetBufferDuration(int duration)
 		return E_INVALIDARG;
 	}
 
-	m_MaxOutputQueueMs = duration;
+	m_iBufferDuration = duration;
 	return S_OK;
 }
 
@@ -467,7 +467,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	if (m_RAWType == RAW_MPEG1 || m_RAWType == RAW_MPEG2 || m_RAWType == RAW_H264 || m_RAWType == RAW_VC1 || m_RAWType == RAW_HEVC) {
-		m_MaxOutputQueueMs = 200; // hack
+		m_iBufferDuration = 200; // hack. equivalent to 240 packets
 	}
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
