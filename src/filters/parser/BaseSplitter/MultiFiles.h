@@ -28,6 +28,22 @@ class CMultiFiles : public CObject
 {
 	DECLARE_DYNAMIC(CMultiFiles)
 
+	CAtlArray<LONGLONG>			m_FilesSize;
+	LONGLONG					m_llTotalLength;
+	CAtlArray<REFERENCE_TIME>	m_rtPtsOffsets;
+
+protected:
+	HANDLE						m_hFile;
+	CAtlArray<CString>			m_strFiles;
+	int							m_nCurPart;
+	REFERENCE_TIME*				m_pCurrentPTSOffset;
+
+private:
+	BOOL		OpenPart(int nPart);
+	void		ClosePart();
+	LONGLONG	GetAbsolutePosition(LONGLONG lOff, UINT nFrom);
+	void		Reset();
+
 public:
 	CMultiFiles();
 	virtual ~CMultiFiles();
@@ -39,18 +55,4 @@ public:
 	virtual ULONGLONG GetLength() const;
 	virtual UINT Read(BYTE* lpBuf, UINT nCount, DWORD& dwError);
 	virtual void Close();
-
-protected:
-	REFERENCE_TIME*				m_pCurrentPTSOffset;
-	CAtlArray<CString>			m_strFiles;
-	CAtlArray<ULONGLONG>		m_FilesSize;
-	CAtlArray<REFERENCE_TIME>	m_rtPtsOffsets;
-	HANDLE						m_hFile;
-	int							m_nCurPart;
-	ULONGLONG					m_llTotalLength;
-
-	BOOL						OpenPart(int nPart);
-	void						ClosePart();
-	ULONGLONG					GetAbsolutePosition(LONGLONG lOff, UINT nFrom);
-	void						Reset();
 };
