@@ -91,9 +91,9 @@ ULONGLONG CMultiFiles::Seek(LONGLONG lOff, UINT nFrom)
 
 		return llNewPos.QuadPart;
 	} else {
-		ULONGLONG	lAbsolutePos = GetAbsolutePosition(lOff, nFrom);
+		LONGLONG	lAbsolutePos = GetAbsolutePosition(lOff, nFrom);
 		int			nNewPart	 = 0;
-		ULONGLONG	llSum		 = 0;
+		LONGLONG	llSum		 = 0;
 
 		while (m_FilesSize[nNewPart] + llSum <= lAbsolutePos) {
 			llSum += m_FilesSize[nNewPart];
@@ -108,7 +108,7 @@ ULONGLONG CMultiFiles::Seek(LONGLONG lOff, UINT nFrom)
 	}
 }
 
-ULONGLONG CMultiFiles::GetAbsolutePosition(LONGLONG lOff, UINT nFrom)
+LONGLONG CMultiFiles::GetAbsolutePosition(LONGLONG lOff, UINT nFrom)
 {
 	LARGE_INTEGER llNoMove = {0, 0};
 	LARGE_INTEGER llCurPos;
@@ -122,7 +122,7 @@ ULONGLONG CMultiFiles::GetAbsolutePosition(LONGLONG lOff, UINT nFrom)
 		case FILE_END :
 			return m_llTotalLength - lOff;
 		default:
-			return 0;	// just used to quash "not all control paths return a value" warning
+			return 0; // just used to quash "not all control paths return a value" warning
 	}
 }
 
