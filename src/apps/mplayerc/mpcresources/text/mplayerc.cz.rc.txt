@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Exportovat"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 5		"Zvuk"
 6		"Hlasitost"
 7		"Min"
@@ -350,8 +350,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 36		"Zvuk:"
 38		"(Příklad: eng jap swe)"
 39		"Otevírání souborů"
-40		"Filtry načítat v samostatném podprocesu"
-42		"Vypisovat podrobné informace o chybějících kodecích"
+40		"When opening an audio file,"
+42		"Filtry načítat v samostatném podprocesu"
+44		"Vypisovat podrobné informace o chybějících kodecích"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
@@ -1245,6 +1246,9 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"use WASAPI, Shared mode"
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"use WASAPI, Exclusive mode, Bitstream"
 STRING IDS_AT_TOGGLE_SHADER		"Zapnout/Vypnout pixel shadery"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Povolit/Zakázat shadery pro obrazovku"
+STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"
+STRING IDS_AUDIOWINDOW_HIDE		"hide the video area"
+STRING IDS_AUDIOWINDOW_NONE		"do not change the window size"
 STRING IDS_AUDIO_GAIN		"Gain (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Level (%d):"
 STRING IDS_AUDIO_RELEASETIME		"Release time (%d):"

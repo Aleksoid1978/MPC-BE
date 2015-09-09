@@ -53,22 +53,28 @@ void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SLIDER2, m_balancectrl);
 	DDX_Slider(pDX, IDC_SLIDER1, m_nVolume);
 	DDX_Slider(pDX, IDC_SLIDER2, m_nBalance);
+
 	DDX_Radio(pDX, IDC_RADIO1, m_iLoopForever);
 	DDX_Control(pDX, IDC_EDIT1, m_loopnumctrl);
 	DDX_Text(pDX, IDC_EDIT1, m_nLoops);
 	DDX_Check(pDX, IDC_CHECK1, m_fRewind);
-	DDX_Check(pDX, IDC_CHECK7, m_fEnableWorkerThreadForOpening);
-	DDX_Check(pDX, IDC_CHECK6, m_fReportFailedPins);
-	DDX_Text(pDX, IDC_EDIT2, m_subtitlesLanguageOrder);
-	DDX_Text(pDX, IDC_EDIT3, m_audiosLanguageOrder);
+
 	DDX_CBIndex(pDX, IDC_COMBOVOLUME, m_nVolumeStep);
 	DDX_Control(pDX, IDC_COMBOVOLUME, m_nVolumeStepCtrl);
 	DDX_Control(pDX, IDC_COMBOSPEEDSTEP, m_nSpeedStepCtrl);
-	DDX_Check(pDX, IDC_CHECK4, m_fUseInternalSelectTrackLogic);
+
 	DDX_Control(pDX, IDC_CHECK5, m_chkRememberZoomLevel);
 	DDX_Control(pDX, IDC_COMBO1, m_cmbZoomLevel);
 	DDX_Text(pDX, IDC_EDIT4, m_nAutoFitFactor);
 	DDX_Control(pDX, IDC_SPIN1, m_spnAutoFitFactor);
+
+	DDX_Check(pDX, IDC_CHECK4, m_fUseInternalSelectTrackLogic);
+	DDX_Text(pDX, IDC_EDIT2, m_subtitlesLanguageOrder);
+	DDX_Text(pDX, IDC_EDIT3, m_audiosLanguageOrder);
+
+	DDX_Control(pDX, IDC_COMBO4, m_cbAudioWindowMode);
+	DDX_Check(pDX, IDC_CHECK7, m_fEnableWorkerThreadForOpening);
+	DDX_Check(pDX, IDC_CHECK6, m_fReportFailedPins);
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayback, CPPageBase)
@@ -102,29 +108,15 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_balancectrl.SetTicFreq(20);
 	m_nVolume = m_oldVolume = s.nVolume;
 	m_nBalance = s.nBalance;
-	m_iLoopForever = s.fLoopForever?1:0;
-	m_nLoops = s.nLoops;
-	m_fRewind = s.fRewind;
-	m_chkRememberZoomLevel.SetCheck(s.fRememberZoomLevel);
-	m_fEnableWorkerThreadForOpening = s.fEnableWorkerThreadForOpening;
-	m_fReportFailedPins = s.fReportFailedPins;
-	m_subtitlesLanguageOrder = s.strSubtitlesLanguageOrder;
-	m_audiosLanguageOrder = s.strAudiosLanguageOrder;
 
-	m_cmbZoomLevel.AddString(L"50%");
-	m_cmbZoomLevel.AddString(L"100%");
-	m_cmbZoomLevel.AddString(L"200%");
-	m_cmbZoomLevel.AddString(ResStr(IDS_ZOOM_AUTOFIT));
-	CorrectComboListWidth(m_cmbZoomLevel);
-	m_cmbZoomLevel.SetCurSel(s.iZoomLevel);
-	m_nAutoFitFactor = s.nAutoFitFactor;
-	m_spnAutoFitFactor.SetRange(20, 80);
+	m_iLoopForever	= s.fLoopForever ? 1 : 0;
+	m_nLoops		= s.nLoops;
+	m_fRewind		= s.fRewind;
 
 	for (int idx = 1; idx <= 10; idx++) {
 		CString str; str.Format(_T("%d"), idx);
 		m_nVolumeStepCtrl.AddString(str);
 	}
-
 	m_nVolumeStep = s.nVolumeStep - 1;
 
 	m_nSpeedStepCtrl.AddString(ResStr(IDS_AG_AUTO));
@@ -147,7 +139,28 @@ BOOL CPPagePlayback::OnInitDialog()
 		}
 	}
 
-	m_fUseInternalSelectTrackLogic = s.fUseInternalSelectTrackLogic;
+	m_chkRememberZoomLevel.SetCheck(s.fRememberZoomLevel);
+	m_cmbZoomLevel.AddString(L"50%");
+	m_cmbZoomLevel.AddString(L"100%");
+	m_cmbZoomLevel.AddString(L"200%");
+	m_cmbZoomLevel.AddString(ResStr(IDS_ZOOM_AUTOFIT));
+	CorrectComboListWidth(m_cmbZoomLevel);
+	m_cmbZoomLevel.SetCurSel(s.iZoomLevel);
+	m_nAutoFitFactor = s.nAutoFitFactor;
+	m_spnAutoFitFactor.SetRange(20, 80);
+
+	m_fUseInternalSelectTrackLogic	= s.fUseInternalSelectTrackLogic;
+	m_subtitlesLanguageOrder		= s.strSubtitlesLanguageOrder;
+	m_audiosLanguageOrder			= s.strAudiosLanguageOrder;
+
+	m_cbAudioWindowMode.AddString(ResStr(IDS_AUDIOWINDOW_NONE));
+	m_cbAudioWindowMode.AddString(ResStr(IDS_AUDIOWINDOW_COVER));
+	m_cbAudioWindowMode.AddString(ResStr(IDS_AUDIOWINDOW_HIDE));
+	m_cbAudioWindowMode.SetCurSel(s.nAudioWindowMode);
+
+	m_fEnableWorkerThreadForOpening = s.fEnableWorkerThreadForOpening;
+	m_fReportFailedPins = s.fReportFailedPins;
+
 
 	CorrectCWndWidth(GetDlgItem(IDC_CHECK4));
 
@@ -173,6 +186,7 @@ BOOL CPPagePlayback::OnApply()
 	s.iZoomLevel = m_cmbZoomLevel.GetCurSel();
 	s.fRememberZoomLevel = !!m_chkRememberZoomLevel.GetCheck();
 	s.nAutoFitFactor = m_nAutoFitFactor = min(max(20, m_nAutoFitFactor), 80);
+	s.nAudioWindowMode = m_cbAudioWindowMode.GetCurSel();
 	s.fEnableWorkerThreadForOpening = !!m_fEnableWorkerThreadForOpening;
 	s.fReportFailedPins = !!m_fReportFailedPins;
 	s.strSubtitlesLanguageOrder = m_subtitlesLanguageOrder;

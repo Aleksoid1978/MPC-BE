@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Export"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 5		"Àudio"
 6		"Vol."
 7		"Mín"
@@ -350,8 +350,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 36		"Àudio"
 38		"(Exemple: cat eng jap)"
 39		"Opcions d'apertura"
-40		"Ajuda en la construcció del Filter Graph"
-42		"Reportar conectors que no volen funcionar"
+40		"When opening an audio file,"
+42		"Ajuda en la construcció del Filter Graph"
+44		"Reportar conectors que no volen funcionar"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
@@ -1245,6 +1246,9 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"use WASAPI, Shared mode"
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"use WASAPI, Exclusive mode, Bitstream"
 STRING IDS_AT_TOGGLE_SHADER		"Communtar Pixel Shader"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Alternar px. shaders en l'espai de pantalla"
+STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"
+STRING IDS_AUDIOWINDOW_HIDE		"hide the video area"
+STRING IDS_AUDIOWINDOW_NONE		"do not change the window size"
 STRING IDS_AUDIO_GAIN		"Gain (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Level (%d):"
 STRING IDS_AUDIO_RELEASETIME		"Release time (%d):"

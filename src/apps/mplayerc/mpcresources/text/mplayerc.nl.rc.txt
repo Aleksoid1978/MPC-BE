@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Exporteren"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 5		"Audio"
 6		"Volume"
 7		"Min"
@@ -350,8 +350,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 36		"Audio"
 38		"(Bijv.: nl eng jap )"
 39		"Opties voor openen"
-40		"Filtergraph in aparte CPU-thread samenstellen"
-42		"Rapporteer pins die niet renderen"
+40		"When opening an audio file,"
+42		"Filtergraph in aparte CPU-thread samenstellen"
+44		"Rapporteer pins die niet renderen"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
@@ -1245,6 +1246,9 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"Gebruik WASAPI, gedeelde modus"
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"Gebruik WASAPI, exclusieve modus, bitstroom"
 STRING IDS_AT_TOGGLE_SHADER		"Pixel Shaders aan/uit"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Schakel tussen Screen Space Pixel Shaders"
+STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"
+STRING IDS_AUDIOWINDOW_HIDE		"hide the video area"
+STRING IDS_AUDIOWINDOW_NONE		"do not change the window size"
 STRING IDS_AUDIO_GAIN		"Versterking (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Niveau (%d):"
 STRING IDS_AUDIO_RELEASETIME		"Vrijgavetijd (%d):"

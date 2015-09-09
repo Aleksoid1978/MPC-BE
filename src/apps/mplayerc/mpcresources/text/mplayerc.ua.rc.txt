@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Експорт"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 5		"Аудіо"
 6		"Гучність"
 7		"Мін."
@@ -350,8 +350,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 36		"Аудіо"
 38		"(Наприклад: eng jap swe)"
 39		"Налаштування відкриття файлів"
-40		"Окремий потік для ланцюжка фільтрів"
-42		"Звіт про помилки рендерингу потоків"
+40		"When opening an audio file,"
+42		"Окремий потік для ланцюжка фільтрів"
+44		"Звіт про помилки рендерингу потоків"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
@@ -1245,6 +1246,9 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"Використовувати WASAPI, р�
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"Використовувати WASAPI, режими Exclusive, Bitstream"
 STRING IDS_AT_TOGGLE_SHADER		"Перемикання перед-масштабовних шейдерів"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Перемикання після-масштабовних шейдерів"
+STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"
+STRING IDS_AUDIOWINDOW_HIDE		"hide the video area"
+STRING IDS_AUDIOWINDOW_NONE		"do not change the window size"
 STRING IDS_AUDIO_GAIN		"Підсилення (%+.1f дБ):"
 STRING IDS_AUDIO_LEVEL		"Рівень (%d):"
 STRING IDS_AUDIO_RELEASETIME		"Час спаду (%d):"

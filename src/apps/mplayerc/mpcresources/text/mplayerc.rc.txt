@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Export"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 5		"Audio"
 6		"Volume"
 7		"Min"
@@ -350,8 +350,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 36		"Audio:"
 38		"(Example: eng jap swe)"
 39		"Open settings"
-40		"Use worker thread to construct the filter graph"
-42		"Report pins which fail to render"
+40		"When opening an audio file,"
+42		"Use worker thread to construct the filter graph"
+44		"Report pins which fail to render"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
@@ -1245,6 +1246,9 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"use WASAPI, Shared mode"
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"use WASAPI, Exclusive mode, Bitstream"
 STRING IDS_AT_TOGGLE_SHADER		"Toggle Pixel Shaders"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Toggle Screen Space Pixel Shaders"
+STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"
+STRING IDS_AUDIOWINDOW_HIDE		"hide the video area"
+STRING IDS_AUDIOWINDOW_NONE		"do not change the window size"
 STRING IDS_AUDIO_GAIN		"Gain (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Level (%d):"
 STRING IDS_AUDIO_RELEASETIME		"Release time (%d):"

@@ -585,9 +585,10 @@ public:
 	bool			fRememberZoomLevel;
 	int				iZoomLevel;
 	int				nAutoFitFactor;
+	bool			fUseInternalSelectTrackLogic;
 	CStringW		strSubtitlesLanguageOrder;
 	CStringW		strAudiosLanguageOrder;
-	bool			fUseInternalSelectTrackLogic;
+	int				nAudioWindowMode;
 	bool			fEnableWorkerThreadForOpening;
 	bool			fReportFailedPins;
 

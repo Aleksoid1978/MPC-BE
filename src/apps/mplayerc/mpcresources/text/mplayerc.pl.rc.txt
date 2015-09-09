@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Eksportuj"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 5		"Dźwięk"
 6		"Głośność"
 7		"Min."
@@ -350,8 +350,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 36		"audio:"
 38		"(Na przykład: eng jap swe)"
 39		"Otwieranie"
-40		"Osobny wątek programu do utworzenia grafu filtrów"
-42		"Powiadamianie o niepołączonych pinach grafu"
+40		"When opening an audio file,"
+42		"Osobny wątek programu do utworzenia grafu filtrów"
+44		"Powiadamianie o niepołączonych pinach grafu"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
@@ -1236,6 +1237,9 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"use WASAPI, Shared mode"
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"use WASAPI, Exclusive mode, Bitstream"
 STRING IDS_AT_TOGGLE_SHADER		"Przełącz widoczność cieniowania pikseli"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Przełącz cieniowanie pikseli przestrzeni ekranu"
+STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"
+STRING IDS_AUDIOWINDOW_HIDE		"hide the video area"
+STRING IDS_AUDIOWINDOW_NONE		"do not change the window size"
 STRING IDS_AUDIO_GAIN		"Gain (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Level (%d):"
 STRING IDS_AUDIO_RELEASETIME		"Release time (%d):"

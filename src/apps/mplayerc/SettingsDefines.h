@@ -144,6 +144,7 @@
 #define IDS_RS_SUBDELAYINTERVAL				_T("SubDelayInterval")
 #define IDS_RS_ENABLEAUDIOTIMESHIFT			_T("EnableAudioTimeShift")
 #define IDS_RS_LOGOFILE						_T("LogoFile")
+#define IDS_RS_AUDIOWINDOWMODE				_T("AudioWindowMode")
 #define IDS_RS_ENABLEWORKERTHREADFOROPENING	_T("EnableWorkerThreadForOpening")
 #define IDS_RS_PNSPRESETS					_T("PnSPresets")
 #define IDS_RS_AUTOLOADAUDIO				_T("AutoloadAudio")
