@@ -327,6 +327,7 @@ BEGIN_MESSAGE_MAP(CPPageInterface, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON_CLRDEFAULT, OnClickClrDefault)
 	ON_BN_CLICKED(IDC_CHECK8, OnUseTimeTooltipClicked)
 	ON_BN_CLICKED(IDC_CHECK_PRV, OnUsePreview)
+	ON_BN_CLICKED(IDC_CHECK_WIN7, OnUseWin7TaskBar)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnChngOSDCombo)
 	ON_CBN_SELCHANGE(IDC_COMBO2, OnChngOSDCombo)
 	ON_UPDATE_COMMAND_UI(IDC_SLIDER1, OnUpdateThemeBrightness)
@@ -576,6 +577,11 @@ void CPPageInterface::OnChngOSDCombo()
 		pFrame->m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - AfxGetAppSettings().nOSDTransparent, LWA_ALPHA | LWA_COLORKEY);
 	}
 
+	SetModified();
+}
+
+void CPPageInterface::OnUseWin7TaskBar()
+{
 	SetModified();
 }
 

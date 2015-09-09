@@ -112,6 +112,7 @@ public:
 	afx_msg void OnUseTimeTooltipClicked();
 	afx_msg void OnUsePreview();
 	afx_msg void OnChngOSDCombo();
+	afx_msg void OnUseWin7TaskBar();
 	afx_msg void OnUpdateThemeBrightness(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateThemeRed(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateThemeGreen(CCmdUI* pCmdUI);
