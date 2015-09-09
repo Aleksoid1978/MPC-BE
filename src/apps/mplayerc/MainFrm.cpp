@@ -1636,8 +1636,19 @@ void CMainFrame::OnMove(int x, int y)
 
 	WINDOWPLACEMENT wp;
 	GetWindowPlacement(&wp);
-	if (!m_bFirstFSAfterLaunchOnFullScreen && !m_bFullScreen && IsWindowVisible() && wp.flags != WPF_RESTORETOMAXIMIZED && wp.showCmd != SW_SHOWMINIMIZED) {
-		GetWindowRect(AfxGetAppSettings().rcLastWindowPos);
+	if (!m_bFirstFSAfterLaunchOnFullScreen && !m_bFullScreen
+			&& IsWindowVisible() && wp.flags != WPF_RESTORETOMAXIMIZED && wp.showCmd != SW_SHOWMINIMIZED) {
+
+		AppSettings& s = AfxGetAppSettings();
+		if (m_bAudioOnly && IsSomethingLoaded() && s.nAudioWindowMode == 2) {
+			CRect rc;
+			GetWindowRect(&rc);
+			s.rcLastWindowPos.left  = rc.left;
+			s.rcLastWindowPos.top   = rc.top;
+			s.rcLastWindowPos.right = rc.right;
+		} else {
+			GetWindowRect(s.rcLastWindowPos);
+		}
 	}
 
 	if (m_wndToolBar && ::IsWindow(m_wndToolBar.GetSafeHwnd())) {
@@ -1749,7 +1760,17 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 	AppSettings& s = AfxGetAppSettings();
 	if (!m_bFirstFSAfterLaunchOnFullScreen && IsWindowVisible() && !m_bFullScreen) {
 		if (nType != SIZE_MAXIMIZED && nType != SIZE_MINIMIZED) {
-			GetWindowRect(s.rcLastWindowPos);
+			AppSettings& s = AfxGetAppSettings();
+			if (m_bAudioOnly && IsSomethingLoaded() && s.nAudioWindowMode == 2) {
+				CRect rc;
+				GetWindowRect(&rc);
+				s.rcLastWindowPos.left = rc.left;
+				s.rcLastWindowPos.top = rc.top;
+				s.rcLastWindowPos.right = rc.right;
+			}
+			else {
+				GetWindowRect(s.rcLastWindowPos);
+			}
 		}
 		s.nLastWindowType = nType;
 
@@ -4030,7 +4051,14 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	if (m_bAudioOnly) {
-		SetAudioPicture();
+		SetAudioPicture(s.nAudioWindowMode != 2);
+
+		if (s.nAudioWindowMode == 2) {
+			CRect r;
+			GetWindowRect(&r);
+			r.bottom = r.top;
+			MoveWindow(&r);
+		}
 	}
 
 	{
@@ -10032,7 +10060,7 @@ static BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT l
 
 void CMainFrame::SetDefaultWindowRect(int iMonitor)
 {
-	AppSettings& s = AfxGetAppSettings();
+	const AppSettings& s = AfxGetAppSettings();
 
 	if (s.iCaptionMenuMode != MODE_SHOWCAPTIONMENU) {
 		if (s.iCaptionMenuMode == MODE_FRAMEONLY) {
@@ -18290,10 +18318,7 @@ CString GetCoverImgFromPath(CString fullfilename)
 
 HRESULT CMainFrame::SetAudioPicture(BOOL show)
 {
-	BOOL set = AfxGetAppSettings().fUseWin7TaskBar && m_bAudioOnly && IsSomethingLoaded();
-	if (!show) { // forcing off custom preview bitmap ...
-		set = show;
-	}
+	const AppSettings& s = AfxGetAppSettings();
 
 	if (m_ThumbCashedBitmap) {
 		::DeleteObject(m_ThumbCashedBitmap);
@@ -18303,73 +18328,66 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 
 	if (IsWinSevenOrLater() && m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
 		/* this is for custom draw in windows 7 preview */
+		const BOOL set = s.fUseWin7TaskBar && m_bAudioOnly && IsSomethingLoaded() && show;
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_HAS_ICONIC_BITMAP, &set, sizeof(set));
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &set, sizeof(set));
 	}
 
-	bool bLoadRes		= false;
-	m_bInternalImageRes	= false;
+	m_bInternalImageRes = false;
 	m_InternalImage.Destroy();
 	if (m_InternalImageSmall) {
 		m_InternalImageSmall.Detach();
 	}
 
-	bool extimage = false;
+	if (m_bAudioOnly && IsSomethingLoaded() && show) {
 
-	if (show && OpenImageCheck(m_strFnFull)) {
-		m_InternalImage.Attach(OpenImage(m_strFnFull));
-		bLoadRes = true;
-		extimage = true;
-	}
+		bool bLoadRes = false;
+		if (s.nAudioWindowMode == 1) {
+			// load image from DSMResource to show in preview & logo;
+			BeginEnumFilters(m_pGB, pEF, pBF) {
+				if (CComQIPtr<IDSMResourceBag> pRB = pBF)
+					if (pRB && CheckMainFilter(pBF) && pRB->ResGetCount() > 0) {
+						for (DWORD i = 0; i < pRB->ResGetCount() && bLoadRes == false; i++) {
+							CComBSTR name, desc, mime;
+							BYTE* pData = NULL;
+							DWORD len = 0;
+							if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, NULL))) {
+								if (CString(mime).Trim() == _T("image/jpeg")
+									|| CString(mime).Trim() == _T("image/jpg")
+									|| CString(mime).Trim() == _T("image/png")) {
 
-	if (extimage || (m_bAudioOnly && IsSomethingLoaded() && show)) {
+									HGLOBAL hBlock = ::GlobalAlloc(GMEM_MOVEABLE, len);
+									if (hBlock != NULL) {
+										LPVOID lpResBuffer = ::GlobalLock(hBlock);
+										ASSERT(lpResBuffer != NULL);
+										memcpy(lpResBuffer, pData, len);
 
-		// load image from DSMResource to show in preview & logo;
-		BeginEnumFilters(m_pGB, pEF, pBF) {
-			if (CComQIPtr<IDSMResourceBag> pRB = pBF)
-				if (pRB && CheckMainFilter(pBF) && pRB->ResGetCount() > 0) {
-					for (DWORD i = 0; i < pRB->ResGetCount(); i++) {
-						CComBSTR name, desc, mime;
-						BYTE* pData = NULL;
-						DWORD len = 0;
-						if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, NULL))) {
-							if (CString(mime).Trim() == _T("image/jpeg")
-								|| CString(mime).Trim() == _T("image/jpg")
-								|| CString(mime).Trim() == _T("image/png")) {
+										IStream* pStream = NULL;
+										if (SUCCEEDED(::CreateStreamOnHGlobal(hBlock, TRUE, &pStream))) {
+											m_InternalImage.Load(pStream);
+											pStream->Release();
+											bLoadRes = true;
+										}
 
-								HGLOBAL hBlock = ::GlobalAlloc(GMEM_MOVEABLE, len);
-								if (hBlock != NULL) {
-									IStream* pStream = NULL;
-									LPVOID lpResBuffer = ::GlobalLock(hBlock);
-									ASSERT (lpResBuffer != NULL);
-									memcpy(lpResBuffer, pData, len);
-
-									if (SUCCEEDED(::CreateStreamOnHGlobal(hBlock, TRUE, &pStream))) {
-										m_InternalImage.Load(pStream);
-										pStream->Release();
-										bLoadRes = true;
+										::GlobalUnlock(hBlock);
+										::GlobalFree(hBlock);
 									}
-
-									::GlobalUnlock(hBlock);
-									::GlobalFree(hBlock);
 								}
-
-								break;
+								CoTaskMemFree(pData);
 							}
-							CoTaskMemFree(pData);
 						}
 					}
-				}
-		}
-		EndEnumFilters;
+			}
+			EndEnumFilters;
 
-		if (!bLoadRes) {
-			// try to load image from file in the same dir that media file to show in preview & logo;
-			CString img_fname = GetCoverImgFromPath(m_strFnFull);
+			if (!bLoadRes) {
+				// try to load image from file in the same dir that media file to show in preview & logo;
+				CString img_fname = GetCoverImgFromPath(m_strFnFull);
 
-			if (!img_fname.IsEmpty()) {
-				if(SUCCEEDED(m_InternalImage.Load(img_fname))) {
-					bLoadRes = true;
+				if (!img_fname.IsEmpty()) {
+					if (SUCCEEDED(m_InternalImage.Load(img_fname))) {
+						bLoadRes = true;
+					}
 				}
 			}
 		}
@@ -18387,9 +18405,9 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 				} else {
 					// Resize image to improve speed of show TaskBar preview
 
-					int h	= min(abs(bm.bmHeight), nWidth);
-					int w	= MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
-					h		= MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
+					int h = min(abs(bm.bmHeight), nWidth);
+					int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
+					h     = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
 
 					CDC *screenDC = GetDC();
 					CDC *pMDC = DNew CDC;
