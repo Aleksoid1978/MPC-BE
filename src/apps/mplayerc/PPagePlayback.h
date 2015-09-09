@@ -39,22 +39,28 @@ public:
 
 	int			m_nVolume;
 	CSliderCtrl	m_volumectrl;
-	int			m_nVolumeStep;
-	CComboBox	m_nVolumeStepCtrl;
 	int			m_nBalance;
 	CSliderCtrl	m_balancectrl;
+
 	int			m_iLoopForever;
 	CEdit		m_loopnumctrl;
 	int			m_nLoops;
 	BOOL		m_fRewind;
+
+	int			m_nVolumeStep;
+	CComboBox	m_nVolumeStepCtrl;
 	CComboBox	m_nSpeedStepCtrl;
+
 	CButton		m_chkRememberZoomLevel;
 	CComboBox	m_cmbZoomLevel;
 	int			m_nAutoFitFactor;
 	CSpinButtonCtrl m_spnAutoFitFactor;
+
 	BOOL		m_fUseInternalSelectTrackLogic;
 	CString		m_subtitlesLanguageOrder;
 	CString		m_audiosLanguageOrder;
+
+	CComboBox	m_cbAudioWindowMode;
 	BOOL		m_fEnableWorkerThreadForOpening;
 	BOOL		m_fReportFailedPins;
 

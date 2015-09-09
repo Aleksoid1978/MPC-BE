@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Экспорт"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 5		"Аудио"
 6		"Громкость"
 7		"Тише"
@@ -350,8 +350,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 36		"Звук:"
 38		"(Например: eng rus jap)"
 39		"Настройки открытия файлов"
-40		"Рабочий поток для построения цепи фильтров"
-42		"Отчет об ошибках рендеринга потоков"
+40		"При открытии аудиофайла,"
+42		"Рабочий поток для построения цепи фильтров"
+44		"Отчет об ошибках рендеринга потоков"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
@@ -1245,6 +1246,9 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"используется WASAPI, Shared mo
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"используется WASAPI, Exclusive mode, Bitstream"
 STRING IDS_AT_TOGGLE_SHADER		"Вкл/Откл пиксельные шейдеры"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Вкл/Откл экранные шейдеры"
+STRING IDS_AUDIOWINDOW_COVER		"показывать обложки дисков"
+STRING IDS_AUDIOWINDOW_HIDE		"скрывать видеообласть"
+STRING IDS_AUDIOWINDOW_NONE		"не менять размер окна"
 STRING IDS_AUDIO_GAIN		"Усиление (%+.1f дБ):"
 STRING IDS_AUDIO_LEVEL		"Уровень (%d):"
 STRING IDS_AUDIO_RELEASETIME		"Время спада (%d):"

@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"내보내기"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 5		"오디오"
 6		"볼륨"
 7		"최소"
@@ -350,8 +350,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 36		"오디오언어"
 38		"(예: eng kor jap)"
 39		"열기 설정"
-40		"필터그래프를 생성하는 작업자 쓰레드 사용"
-42		"렌더링에 실패하면 핀 보고"
+40		"When opening an audio file,"
+42		"필터그래프를 생성하는 작업자 쓰레드 사용"
+44		"렌더링에 실패하면 핀 보고"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
@@ -1245,6 +1246,9 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"WASAPI 사용, 공유모드"
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"WASAPI 사용, 독점모드, Bitstream"
 STRING IDS_AT_TOGGLE_SHADER		"픽셸 셰이더 토글"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"화면 픽셀셰이더 토글"
+STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"
+STRING IDS_AUDIOWINDOW_HIDE		"hide the video area"
+STRING IDS_AUDIOWINDOW_NONE		"do not change the window size"
 STRING IDS_AUDIO_GAIN		"Gain (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Level (%d):"
 STRING IDS_AUDIO_RELEASETIME		"Release time (%d):"

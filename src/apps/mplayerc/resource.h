@@ -1112,6 +1112,9 @@
 #define IDS_APP_DESCRIPTION             33164
 #define IDS_MAINFRM_12                  33165
 #define IDS_MAINFRM_13                  33166
+#define IDS_AUDIOWINDOW_NONE            33180
+#define IDS_AUDIOWINDOW_COVER           33181
+#define IDS_AUDIOWINDOW_HIDE            33182
 #define IDS_D3DFS_WARNING               33190
 #define IDS_MAINFRM_139                 33191
 #define IDS_AG_TITLE2                   33192

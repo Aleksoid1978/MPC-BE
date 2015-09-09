@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Sichern..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 5		"Audio"
 6		"Lautstärke"
 7		"Min"
@@ -350,8 +350,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 36		"Audio:"
 38		"(Beispiel: eng jap swe)"
 39		"Aktionen beim Öffnen einer Datei"
-40		"Filter-Graph in separatem &Thread erstellen"
-42		"Fehlerhafte Pins im Graph &melden"
+40		"When opening an audio file,"
+42		"Filter-Graph in separatem &Thread erstellen"
+44		"Fehlerhafte Pins im Graph &melden"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
@@ -1245,6 +1246,9 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"WASAPI verwenden, Shared mode"
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"WASAPIverwenden, Exclusive Modus, Bitstream"
 STRING IDS_AT_TOGGLE_SHADER		"Pre-Resize Shader (Ein/Aus)"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Post-Resize Shader (Ein/Aus)"
+STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"
+STRING IDS_AUDIOWINDOW_HIDE		"hide the video area"
+STRING IDS_AUDIOWINDOW_NONE		"do not change the window size"
 STRING IDS_AUDIO_GAIN		"Verstärkung (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Level (%d):"
 STRING IDS_AUDIO_RELEASETIME		"Auslösezeit (%d):"

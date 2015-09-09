@@ -317,10 +317,12 @@ BEGIN
     LTEXT           "Audio:",IDC_STATIC,142,131,44,8
     EDITTEXT        IDC_EDIT3,190,129,94,13,ES_AUTOHSCROLL
     LTEXT           "(Example: eng jap swe)",IDC_STATIC,147,144,132,8
-    GROUPBOX        "Open settings",IDC_STATIC,5,159,286,36
+    GROUPBOX        "Open settings",IDC_STATIC,5,159,286,51
+    LTEXT           "When opening an audio file,",IDC_STATIC,10,171,99,8
+    COMBOBOX        IDC_COMBO4,113,169,120,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Use worker thread to construct the filter graph",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,171,276,8
-    CONTROL         "Report pins which fail to render",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,183,276,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,185,276,8
+    CONTROL         "Report pins which fail to render",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,197,276,8
 END
 
 IDD_PPAGESUBRENDERING DIALOGEX 0, 0, 296, 241
@@ -734,7 +736,7 @@ BEGIN
     PUSHBUTTON      "Video decoder\nconfiguration",IDC_BUTTON2,220,47,70,30,BS_MULTILINE
     PUSHBUTTON      "MPEG-2/DVD\ndecoder\nconfiguration",IDC_BUTTON3,220,82,70,30,BS_MULTILINE
     PUSHBUTTON      "Audio decoder\nconfiguration",IDC_BUTTON4,220,47,70,30,BS_MULTILINE
-    LTEXT           "Buffer length (s):",IDC_STATIC,221,209,68,8
+    LTEXT           "Buffer length (s):",IDC_STATIC,221,209,73,8
     EDITTEXT        IDC_EDIT1,227,221,46,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,272,221,11,13
 END
@@ -2677,6 +2679,13 @@ BEGIN
     IDS_UNKNOWN_SWITCH      "Unrecognized switch(es) found in command line string: \n\n"
     IDS_AG_SETTINGS         "Settings"
     IDS_ZOOM_AUTOFIT        "Auto fit"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AUDIOWINDOW_NONE    "do not change the window size"
+    IDS_AUDIOWINDOW_COVER   "display album art/cover pictures"
+    IDS_AUDIOWINDOW_HIDE    "hide the video area"
 END
 
 STRINGTABLE

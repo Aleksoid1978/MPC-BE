@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Esportatu"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 5		"Audioa"
 6		"Bolumena"
 7		"Gutx"
@@ -350,8 +350,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 36		"Audioa:"
 38		"(Azpidatziak: eng jap baq)"
 39		"Ireki ezarpenak"
-40		"Erabili langile hariak iragazki grafika eraikitzeko"
-42		"Jakinarazi aurkezlean huts egiten duten pin-ak"
+40		"When opening an audio file,"
+42		"Erabili langile hariak iragazki grafika eraikitzeko"
+44		"Jakinarazi aurkezlean huts egiten duten pin-ak"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
@@ -1245,6 +1246,9 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"erabili WASAPI, Elkarbanatu modua"
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"erabili WASAPI, Bakarka modua, Bitjarioa"
 STRING IDS_AT_TOGGLE_SHADER		"Aldatu Pixel Itzalak"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Aldatu Ikusleiho Tarte Pixel Itzalak"
+STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"
+STRING IDS_AUDIOWINDOW_HIDE		"hide the video area"
+STRING IDS_AUDIOWINDOW_NONE		"do not change the window size"
 STRING IDS_AUDIO_GAIN		"Irabazia (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Maila (%d):"
 STRING IDS_AUDIO_RELEASETIME		"Askatze denbora (%d):"

@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"导出"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 5		"音频"
 6		"音量"
 7		"小"
@@ -350,8 +350,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 36		"音轨:"
 38		"(例如: eng jap swe)"
 39		"打开设置"
-40		"使用工作线程来创建筛选器图表"
-42		"报告渲染失败的接口(pin)"
+40		"When opening an audio file,"
+42		"使用工作线程来创建筛选器图表"
+44		"报告渲染失败的接口(pin)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
@@ -1245,6 +1246,9 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"使用 WASAPI 共享模式"
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"使用 WASAPI 独占模式, 数据流"
 STRING IDS_AT_TOGGLE_SHADER		"切换像素着色器"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"切换屏幕空间像素着色器"
+STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"
+STRING IDS_AUDIOWINDOW_HIDE		"hide the video area"
+STRING IDS_AUDIOWINDOW_NONE		"do not change the window size"
 STRING IDS_AUDIO_GAIN		"增益 (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"音量水平 (%d):"
 STRING IDS_AUDIO_RELEASETIME		"释放时间 (%d):"

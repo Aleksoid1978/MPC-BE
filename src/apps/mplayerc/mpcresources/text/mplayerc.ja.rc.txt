@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"エクスポート"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 5		"音声"
 6		"音量"
 7		"低"
@@ -350,8 +350,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 36		"音声:"
 38		"(例: eng jap swe)"
 39		"開く設定"
-40		"フィルター グラフの構築にワーカー スレッドを使用する"
-42		"再生に失敗したピンを報告する"
+40		"When opening an audio file,"
+42		"フィルター グラフの構築にワーカー スレッドを使用する"
+44		"再生に失敗したピンを報告する"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
@@ -1245,6 +1246,9 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"WASAPI を使用、共有モード"
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"WASAPI を使用, 排他モード、ビットストリーム"
 STRING IDS_AT_TOGGLE_SHADER		"ピクセル シェーダー 切り替え"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"スクリーン空間 ピクセル シェーダーの切り替え"
+STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"
+STRING IDS_AUDIOWINDOW_HIDE		"hide the video area"
+STRING IDS_AUDIOWINDOW_NONE		"do not change the window size"
 STRING IDS_AUDIO_GAIN		"ゲイン (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"レベル (%d):"
 STRING IDS_AUDIO_RELEASETIME		"リリース タイム (%d):"

@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Εξαγωγή"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 5		"Ήχος"
 6		"Ένταση"
 7		"Ελάχ."
@@ -350,8 +350,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 43
 36		"Ήχος:"
 38		"(Παράδειγμα: ell eng fre)"
 39		"Ρυθμίσεις ανοίγματος"
-40		"Χρήση νήματος εργασίας για την κατασκευή του γραφήματος φίλτρου"
-42		"Αναφορά pin που απέτυχαν να αποδοθούν"
+40		"When opening an audio file,"
+42		"Χρήση νήματος εργασίας για την κατασκευή του γραφήματος φίλτρου"
+44		"Αναφορά pin που απέτυχαν να αποδοθούν"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
@@ -1248,6 +1249,9 @@ STRING IDS_ARS_WASAPI_MODE_STATUS_3		"use WASAPI, Shared mode"
 STRING IDS_ARS_WASAPI_MODE_STATUS_5		"use WASAPI, Exclusive mode, Bitstream"
 STRING IDS_AT_TOGGLE_SHADER		"Εναλλαγή Pixel Shaders"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Εναλλαγή Pixel Shaders επιφάνειας οθόνης"
+STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"
+STRING IDS_AUDIOWINDOW_HIDE		"hide the video area"
+STRING IDS_AUDIOWINDOW_NONE		"do not change the window size"
 STRING IDS_AUDIO_GAIN		"Gain (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Level (%d):"
 STRING IDS_AUDIO_RELEASETIME		"Release time (%d):"
