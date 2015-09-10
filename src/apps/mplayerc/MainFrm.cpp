@@ -4061,7 +4061,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		}
 	}
 
-	{
+	if (!(m_bAudioOnly && IsSomethingLoaded() && s.nAudioWindowMode == 2)) {
 		WINDOWPLACEMENT wp;
 		wp.length = sizeof(wp);
 		GetWindowPlacement(&wp);
