@@ -243,7 +243,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 24		"Audio-cd"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
+BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"Bestanden in volledig scherm openen"
 6		"Toon bedieningspaneel in volledig scherm voor"
 9		"sec(s)"
@@ -256,9 +256,11 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 21		"Verwijderen"
 22		"Omhoog"
 23		"Omlaag"
-24		"Wijzig weergavemodus in register (alleen in D3D-vol.-scherm wordt aanbevolen)"
-26		"Standaardmonitormodus toepassen bij verlaten van volledig scherm"
-28		"Herstel resolutie bij afsluiten"
+24		"Delay:"
+27		"s"
+28		"Wijzig weergavemodus in register (alleen in D3D-vol.-scherm wordt aanbevolen)"
+30		"Standaardmonitormodus toepassen bij verlaten van volledig scherm"
+32		"Herstel resolutie bij afsluiten"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44

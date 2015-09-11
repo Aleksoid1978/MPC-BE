@@ -243,7 +243,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 24		"音楽 CD"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
+BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"フルスクリーンでファイルを開く"
 6		"フルスクリーン時にコントロールを表示"
 9		"秒間"
@@ -256,9 +256,11 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 21		"削除"
 22		"上へ"
 23		"下へ"
-24		"レジストリでディスプレイ モードを変更 (D3DFS のみで推奨)"
-26		"フルスクリーンから抜けたらデフォルト モニター モードを適用"
-28		"プログラム終了時に解像度を元に戻す"
+24		"Delay:"
+27		"s"
+28		"レジストリでディスプレイ モードを変更 (D3DFS のみで推奨)"
+30		"フルスクリーンから抜けたらデフォルト モニター モードを適用"
+32		"プログラム終了時に解像度を元に戻す"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44

@@ -88,6 +88,7 @@
     </PreBuildEvent>
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\include;..\..\..\include\atl;..\..\filters\renderer\VideoRenderers;..\..\ExtLib;..\..\ExtLib\MediaInfo;..\..\ExtLib\ui;..\..\ExtLib\ZenLib;..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -109,6 +110,7 @@
     </PreBuildEvent>
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\include;..\..\..\include\atl;..\..\filters\renderer\VideoRenderers;..\..\ExtLib;..\..\ExtLib\MediaInfo;..\..\ExtLib\ui;..\..\ExtLib\ZenLib;..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -130,6 +132,7 @@
     </PreBuildEvent>
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\include;..\..\..\include\atl;..\..\filters\renderer\VideoRenderers;..\..\ExtLib;..\..\ExtLib\MediaInfo;..\..\ExtLib\ui;..\..\ExtLib\ZenLib;..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -150,6 +153,7 @@
     </PreBuildEvent>
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\include;..\..\..\include\atl;..\..\filters\renderer\VideoRenderers;..\..\ExtLib;..\..\ExtLib\MediaInfo;..\..\ExtLib\ui;..\..\ExtLib\ZenLib;..\..\AudioTools;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

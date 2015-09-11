@@ -243,7 +243,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 24		"CD Audio"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
+BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"Avvia i file a schermo intero"
 6		"Mostra i controlli a schermo intero per"
 9		"sec."
@@ -256,9 +256,11 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 21		"Elimina"
 22		"Sopra"
 23		"Sotto"
-24		"Modifica la modalità di visualizzazione nel Registro di sistema (solo per D3DFS)"
-26		"Applica la modalità schermo predefinita all'uscita dallo schermo intero"
-28		"Ripristina la risoluzione all'uscita"
+24		"Delay:"
+27		"s"
+28		"Modifica la modalità di visualizzazione nel Registro di sistema (solo per D3DFS)"
+30		"Applica la modalità schermo predefinita all'uscita dallo schermo intero"
+32		"Ripristina la risoluzione all'uscita"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44

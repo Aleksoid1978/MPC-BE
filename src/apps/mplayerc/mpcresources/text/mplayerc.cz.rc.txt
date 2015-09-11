@@ -243,7 +243,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 24		"Audio CD"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
+BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"Spouštět v režimu na celou obrazovku"
 6		"V režimu na celou obrazovku zobrazit tlačítka na:"
 9		"s"
@@ -256,9 +256,11 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 21		"Smazat"
 22		"Nahoru"
 23		"Dolů"
-24		"Change display mode in registry (recommended for D3DFS only)"
-26		"Po skončení režimu na celou obrazovku obnovit výchozí nastavení"
-28		"Po ukončení obnovit výchozí rozlišení"
+24		"Delay:"
+27		"s"
+28		"Change display mode in registry (recommended for D3DFS only)"
+30		"Po skončení režimu na celou obrazovku obnovit výchozí nastavení"
+32		"Po ukončení obnovit výchozí rozlišení"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44

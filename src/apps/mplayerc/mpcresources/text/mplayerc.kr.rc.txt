@@ -243,7 +243,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 24		"오디오 CD"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
+BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"전체화면으로 재생시작"
 6		"전체화면시 컨트롤 표시시간"
 9		"초 동안 컨트롤 표시"
@@ -256,9 +256,11 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 21		"삭제"
 22		"위로"
 23		"아래로"
-24		"레지스트리에서 출력모드 변경(D3DFS만 추천)"
-26		"전체화면 종료시 기본값 모니터 모드로 적용"
-28		"종료후에 해상도 복원"
+24		"Delay:"
+27		"s"
+28		"레지스트리에서 출력모드 변경(D3DFS만 추천)"
+30		"전체화면 종료시 기본값 모니터 모드로 적용"
+32		"종료후에 해상도 복원"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44

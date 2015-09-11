@@ -632,6 +632,7 @@ public:
 	bool			fRestoreResAfterExit;
 	dispmode		dm_def;
 	double			dFPS;
+	int				iDMChangeDelay;
 
 	// Sync Renderer Settings
 

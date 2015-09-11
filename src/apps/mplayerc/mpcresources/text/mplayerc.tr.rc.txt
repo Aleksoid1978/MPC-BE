@@ -243,7 +243,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 24		"Ses CD'si"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
+BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"Dosyaları tam ekranda çalıştır"
 6		"Kontrolleri tam ekranda gösterme süresi"
 9		"saniye"
@@ -256,9 +256,11 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 21		"Sil"
 22		"Yukarı"
 23		"Aşağı"
-24		"Kayıt defterinde görüntü kipini değiştir (yalnızca D3DFS için önerilir)"
-26		"Varsayılan monitör kipini tam ekrandan çıkışta uygula"
-28		"Çözünürlüğü çıkışta geri al"
+24		"Delay:"
+27		"s"
+28		"Kayıt defterinde görüntü kipini değiştir (yalnızca D3DFS için önerilir)"
+30		"Varsayılan monitör kipini tam ekrandan çıkışta uygula"
+32		"Çözünürlüğü çıkışta geri al"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44

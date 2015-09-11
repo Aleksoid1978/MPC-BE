@@ -243,7 +243,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 24		"Audio-CD"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
+BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"Dateien im V&ollbildmodus öffnen"
 6		"Steuerleiste im &Vollbildmodus anzeigen für"
 9		"Sek"
@@ -256,9 +256,11 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 21		"Entfernen"
 22		"Nach oben"
 23		"Nach unten"
-24		"Anzeigemodus in der Registry ändern (nur für Direct3D-Vollbildmodus empfohlen)"
-26		"Standard-Anzeigemodus nach Beenden des Vollbilds verwenden"
-28		"Ursprüngliche Bildschirmauflösung bei Programmende wiederherstellen"
+24		"Delay:"
+27		"s"
+28		"Anzeigemodus in der Registry ändern (nur für Direct3D-Vollbildmodus empfohlen)"
+30		"Standard-Anzeigemodus nach Beenden des Vollbilds verwenden"
+32		"Ursprüngliche Bildschirmauflösung bei Programmende wiederherstellen"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44

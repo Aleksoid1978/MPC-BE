@@ -243,7 +243,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 24		"音频 CD"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
+BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"在全屏幕模式中打开文件"
 6		"在全屏幕中显示控制栏"
 9		"秒"
@@ -256,9 +256,11 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 21		"删除"
 22		"向上"
 23		"向下"
-24		"在注册表中更改显示模式(推荐仅在 D3D 全屏模式中使用)"
-26		"退出全屏模式时恢复显示器默认工作模式"
-28		"退出后恢复默认分辨率"
+24		"Delay:"
+27		"s"
+28		"在注册表中更改显示模式(推荐仅在 D3D 全屏模式中使用)"
+30		"退出全屏模式时恢复显示器默认工作模式"
+32		"退出后恢复默认分辨率"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
