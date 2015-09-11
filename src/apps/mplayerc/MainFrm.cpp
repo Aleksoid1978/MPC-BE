@@ -2154,7 +2154,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 						REFERENCE_TIME stop;
 						m_wndSeekBar.GetRange(stop);
 						m_pMS->GetDuration(&rtDur);
-						if (rtDur != stop) {
+						if (llabs(stop - rtDur) > 10000000) {
 							// update segment stop time
 							m_pMS->SetPositions(NULL, AM_SEEKING_NoPositioning, &rtDur, AM_SEEKING_NoPositioning);
 						}
