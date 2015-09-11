@@ -60,17 +60,19 @@ void CPPageFullscreen::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 	DDX_Check(pDX, IDC_CHECK1, m_bLaunchFullScreen);
-	DDX_Check(pDX, IDC_CHECK2, m_bSetFullscreenRes);
-	DDX_Check(pDX, IDC_CHECK3, m_bSetDefault);
-	DDX_Check(pDX, IDC_CHECK7, m_bSetGlobal);
-	DDX_CBIndex(pDX, IDC_COMBO1, m_iMonitorType);
-	DDX_Control(pDX, IDC_COMBO1, m_iMonitorTypeCtrl);
-	DDX_Control(pDX, IDC_LIST1, m_list);
 	DDX_Check(pDX, IDC_CHECK4, m_bShowBarsWhenFullScreen);
-	DDX_Check(pDX, IDC_CHECK5, m_bExitFullScreenAtTheEnd);
-	DDX_Check(pDX, IDC_CHECK6, m_bExitFullScreenAtFocusLost);
 	DDX_Control(pDX, IDC_EDIT1, m_edtTimeOut);
 	DDX_Control(pDX, IDC_SPIN1, m_nTimeOutCtrl);
+	DDX_Check(pDX, IDC_CHECK5, m_bExitFullScreenAtTheEnd);
+	DDX_Check(pDX, IDC_CHECK6, m_bExitFullScreenAtFocusLost);
+	DDX_CBIndex(pDX, IDC_COMBO1, m_iMonitorType);
+	DDX_Control(pDX, IDC_COMBO1, m_iMonitorTypeCtrl);
+	DDX_Check(pDX, IDC_CHECK2, m_bSetFullscreenRes);
+	DDX_Control(pDX, IDC_LIST1, m_list);
+	DDX_Control(pDX, IDC_EDIT2, m_edDMChangeDelay);
+	DDX_Control(pDX, IDC_SPIN2, m_spnDMChangeDelay);
+	DDX_Check(pDX, IDC_CHECK7, m_bSetGlobal);
+	DDX_Check(pDX, IDC_CHECK3, m_bSetDefault);
 	DDX_Check(pDX, IDC_RESTORERESCHECK, m_bRestoreResAfterExit);
 }
 
@@ -103,6 +105,8 @@ BEGIN_MESSAGE_MAP(CPPageFullscreen, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON4, OnMoveDown)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON3, OnUpdateUp)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON4, OnUpdateDown)
+	ON_UPDATE_COMMAND_UI(IDC_EDIT2, OnUpdateFullscreenRes)
+	ON_UPDATE_COMMAND_UI(IDC_SPIN2, OnUpdateFullscreenRes)
 END_MESSAGE_MAP()
 
 // CPPagePlayer message handlers
@@ -127,6 +131,11 @@ BOOL CPPageFullscreen::OnInitDialog()
 	m_nTimeOutCtrl.SetRange(-1, 10);
 	m_bExitFullScreenAtTheEnd			= s.fExitFullScreenAtTheEnd;
 	m_bExitFullScreenAtFocusLost		= s.fExitFullScreenAtFocusLost;
+	m_edDMChangeDelay					= s.iDMChangeDelay;
+	m_edDMChangeDelay.SetRange(0, 9);
+	m_spnDMChangeDelay.SetRange(0, 9);
+
+
 	m_bRestoreResAfterExit				= s.fRestoreResAfterExit;
 
 	CString str;
@@ -309,6 +318,7 @@ BOOL CPPageFullscreen::OnApply()
 	s.fExitFullScreenAtTheEnd				= !!m_bExitFullScreenAtTheEnd;
 	s.fExitFullScreenAtFocusLost			= !!m_bExitFullScreenAtFocusLost;
 	s.fRestoreResAfterExit					= !!m_bRestoreResAfterExit;
+	s.iDMChangeDelay						= m_edDMChangeDelay;
 
 	return __super::OnApply();
 }

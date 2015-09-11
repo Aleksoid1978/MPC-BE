@@ -243,7 +243,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 24		"Audio CD"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
+BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"Բացել ֆայլերը ամբողջ էկրանով"
 6		"Կառավարման վահանակը Ամբողջ էկրանով վիճակում մնում է"
 9		"վայր."
@@ -256,9 +256,11 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 21		"Del"
 22		"Up"
 23		"Down"
-24		"Change display mode in registry (recommended for D3DFS only)"
-26		"Կիրառել 'Ըստ ծրագրայինի' եղանակը պատուհանի եղանակին անցնելիս"
-28		"Վերականգնել չափը՝ ծրագրիը փակելիս"
+24		"Delay:"
+27		"s"
+28		"Change display mode in registry (recommended for D3DFS only)"
+30		"Կիրառել 'Ըստ ծրագրայինի' եղանակը պատուհանի եղանակին անցնելիս"
+32		"Վերականգնել չափը՝ ծրագրիը փակելիս"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44

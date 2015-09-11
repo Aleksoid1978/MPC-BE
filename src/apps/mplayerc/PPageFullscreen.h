@@ -61,6 +61,9 @@ private:
 	BOOL m_bExitFullScreenAtTheEnd, m_bExitFullScreenAtFocusLost;
 	CIntEdit m_edtTimeOut;
 	CSpinButtonCtrl m_nTimeOutCtrl;
+	CIntEdit m_edDMChangeDelay;
+	CSpinButtonCtrl m_spnDMChangeDelay;
+
 	BOOL m_bRestoreResAfterExit;
 
 	void ReindexList();

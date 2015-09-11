@@ -243,7 +243,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 24		"Audio CD"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
+BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"Abiarazi agiriak ikusleiho-osoan"
 6		"Erakutsi aginteak ikusleiho-osoan"
 9		"seg"
@@ -256,9 +256,11 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 21		"Ezabatu"
 22		"Gora"
 23		"Behera"
-24		"Aldatu erakuspen modua erregistroan (gomendatua D3DFS-rako bakarrik)"
-26		"Ezarri berezko monitore modua ikusleiho-osotik irtetzerakoan"
-28		"Leheneratu bereizmena programatik irtetzerakoan"
+24		"Delay:"
+27		"s"
+28		"Aldatu erakuspen modua erregistroan (gomendatua D3DFS-rako bakarrik)"
+30		"Ezarri berezko monitore modua ikusleiho-osotik irtetzerakoan"
+32		"Leheneratu bereizmena programatik irtetzerakoan"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44

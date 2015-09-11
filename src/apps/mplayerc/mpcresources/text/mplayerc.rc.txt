@@ -243,7 +243,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 24		"Audio CD"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
+BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"Launch files in fullscreen"
 6		"Show controls in fullscreen for"
 9		"sec(s)"
@@ -256,9 +256,11 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 21		"Del"
 22		"Up"
 23		"Down"
-24		"Change display mode in registry (recommended for D3DFS only)"
-26		"Apply default monitor mode on fullscreen exit"
-28		"Restore resolution on program exit"
+24		"Delay:"
+27		"s"
+28		"Change display mode in registry (recommended for D3DFS only)"
+30		"Apply default monitor mode on fullscreen exit"
+32		"Restore resolution on program exit"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44

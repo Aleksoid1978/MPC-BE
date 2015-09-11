@@ -243,7 +243,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 24		"Audio CD"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
+BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"Spustiť súbory v celoobrazovkovom režime"
 6		"V celoobraz. rezime zobraziť ovládače na:"
 9		"sekúnd"
@@ -256,9 +256,11 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 21		"Vymazať"
 22		"Nahor"
 23		"Nadol"
-24		"Change display mode in registry (recommended for D3DFS only)"
-26		"Po ukončení celoobrazovkového režimu použiť predvolený režim pre monitor"
-28		"Po ukončení obnoviť pôvodné rozlíšenie"
+24		"Delay:"
+27		"s"
+28		"Change display mode in registry (recommended for D3DFS only)"
+30		"Po ukončení celoobrazovkového režimu použiť predvolený režim pre monitor"
+32		"Po ukončení obnoviť pôvodné rozlíšenie"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44

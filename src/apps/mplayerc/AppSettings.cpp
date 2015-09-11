@@ -541,10 +541,11 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOZOOM, fRememberZoomLevel);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLS, fShowBarsWhenFullScreen);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, nShowBarsWhenFullScreenTimeOut);
-	pApp->WriteProfileBinary(IDS_R_SETTINGS, IDS_RS_FULLSCREENRES, (BYTE*)&AutoChangeFullscrRes, sizeof(AutoChangeFullscrRes));
-	pApp->WriteProfileBinary(IDS_R_SETTINGS, _T("AccelTblColWidth"), (BYTE*)&AccelTblColWidth, sizeof(AccelTblColWidth));
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, fExitFullScreenAtTheEnd);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATFOCUSLOST, fExitFullScreenAtFocusLost);
+	pApp->WriteProfileBinary(IDS_R_SETTINGS, IDS_RS_FULLSCREENRES, (BYTE*)&AutoChangeFullscrRes, sizeof(AutoChangeFullscrRes));
+	pApp->WriteProfileBinary(IDS_R_SETTINGS, _T("AccelTblColWidth"), (BYTE*)&AccelTblColWidth, sizeof(AccelTblColWidth));
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, iDMChangeDelay);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_RESTORERESAFTEREXIT, fRestoreResAfterExit);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWPOS, fRememberWindowPos);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWSIZE, fRememberWindowSize);
@@ -627,7 +628,7 @@ void CAppSettings::SaveSettings()
 	// Multi-monitor code
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, CString(strFullScreenMonitor));
 	// DeviceID
-	pApp->WriteProfileString(IDS_R_SETTINGS, _T("FullScreenMonitorID"), CString(strFullScreenMonitorID));
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITORID, CString(strFullScreenMonitorID));
 
 	// Prevent Minimize when in Fullscreen mode on non default monitor
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_PREVENT_MINIMIZE, fPreventMinimize);
@@ -1039,7 +1040,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	//Multi-monitor code
 	strFullScreenMonitor = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR);
 	// DeviceID
-	strFullScreenMonitorID = pApp->GetProfileString(IDS_R_SETTINGS, _T("FullScreenMonitorID"));
+	strFullScreenMonitorID = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITORID);
+
+	iDMChangeDelay = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, 0);
 
 	// Prevent Minimize when in Fullscreen mode on non default monitor
 	fPreventMinimize = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_PREVENT_MINIMIZE, 0);

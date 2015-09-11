@@ -243,7 +243,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 24		"CDs Áudio"
 END
 
-BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
+BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"Abrir arquivos em tela cheia"
 6		"Mostrar controles na tela cheia por:"
 9		"seg(s)"
@@ -256,9 +256,11 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 30
 21		"Del"
 22		"Up"
 23		"Down"
-24		"Change display mode in registry (recommended for D3DFS only)"
-26		"Aplicar modo padrão do monitor ao sair da tela cheia"
-28		"Restaurar resolução ao sair"
+24		"Delay:"
+27		"s"
+28		"Change display mode in registry (recommended for D3DFS only)"
+30		"Aplicar modo padrão do monitor ao sair da tela cheia"
+32		"Restaurar resolução ao sair"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
