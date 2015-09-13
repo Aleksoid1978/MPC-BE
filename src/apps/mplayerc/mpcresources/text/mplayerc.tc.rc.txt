@@ -258,7 +258,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 23		"下移"
 24		"Delay:"
 27		"s"
-28		"於登錄檔修改顯示模式 (只建議於 Direct3D 全螢幕使用)"
+28		"Change display mode before starting playback"
 30		"離開全螢幕時套用預設顯示器模式"
 32		"離開後回復解析度"
 END

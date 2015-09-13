@@ -37,9 +37,10 @@ private:
 	CStringArray m_MonitorDisplayNames, m_MonitorDeviceName;
 
 	BOOL m_bLaunchFullScreen;
-	BOOL m_bSetFullscreenRes;
+
+	BOOL m_bEnableAutoMode;
+	BOOL m_bUseMediaInfo; // change display mode before starting playback
 	BOOL m_bSetDefault;
-	BOOL m_bSetGlobal;
 
 	AChFR m_AutoChangeFullscrRes;
 	CString m_f_hmonitor;
@@ -85,8 +86,6 @@ protected:
 public:
 	afx_msg void OnUpdateFullscreenRes(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateFullScrComboCtrl(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateRestoreResAfterExit(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateSetDefaultRes(CCmdUI* pCmdUI);
 	afx_msg void OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);

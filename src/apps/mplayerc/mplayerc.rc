@@ -1080,7 +1080,7 @@ BEGIN
     COMBOBOX        IDC_COMBO1,13,75,273,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "",IDC_STATIC,5,91,287,148
     CONTROL         "Use autochange fullscreen monitor mode",IDC_CHECK2,
-                    "Button",BS_AUTO3STATE | WS_TABSTOP,14,91,267,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,91,267,8
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,10,101,226,102
     PUSHBUTTON      "Add",IDC_BUTTON1,240,101,48,16
     PUSHBUTTON      "Del",IDC_BUTTON2,240,119,48,16
@@ -1090,7 +1090,7 @@ BEGIN
     EDITTEXT        IDC_EDIT2,240,191,24,12,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_HOTTRACK,254,192,10,8
     LTEXT           "s",IDC_STATIC,267,193,19,8
-    CONTROL         "Change display mode in registry (recommended for D3DFS only)",IDC_CHECK7,
+    CONTROL         "Change display mode before starting playback",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,205,271,8
     CONTROL         "Apply default monitor mode on fullscreen exit",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,216,270,8

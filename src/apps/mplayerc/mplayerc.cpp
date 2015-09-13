@@ -2070,7 +2070,7 @@ void SetDispMode(dispmode& dm, CString& DisplayName)
 		monitor.GetName(DisplayName1);
 	}
 
-	if (s.AutoChangeFullscrRes.bSetGlobal) {
+	if (!s.fRestoreResAfterExit) {
 		ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, CDS_UPDATEREGISTRY | CDS_NORESET, NULL);
 		ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
 	} else {

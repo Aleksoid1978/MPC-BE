@@ -1023,8 +1023,7 @@ void CMainFrame::OnClose()
 	s.WinLircClient.DisConnect();
 	s.UIceClient.DisConnect();
 
-	if (s.AutoChangeFullscrRes.bEnabled && s.AutoChangeFullscrRes.bSetGlobal
-			&& s.fRestoreResAfterExit) {
+	if (s.AutoChangeFullscrRes.bEnabled && s.fRestoreResAfterExit) {
 		SetDispMode(s.dm_def, s.strFullScreenMonitor);
 	}
 

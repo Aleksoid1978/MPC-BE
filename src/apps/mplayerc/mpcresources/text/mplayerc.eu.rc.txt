@@ -258,7 +258,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 23		"Behera"
 24		"Delay:"
 27		"s"
-28		"Aldatu erakuspen modua erregistroan (gomendatua D3DFS-rako bakarrik)"
+28		"Change display mode before starting playback"
 30		"Ezarri berezko monitore modua ikusleiho-osotik irtetzerakoan"
 32		"Leheneratu bereizmena programatik irtetzerakoan"
 END

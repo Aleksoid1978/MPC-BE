@@ -258,7 +258,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 23		"Down"
 24		"Delay:"
 27		"s"
-28		"Change display mode in registry (recommended for D3DFS only)"
+28		"Change display mode before starting playback"
 30		"Apply default monitor mode on fullscreen exit"
 32		"Restore resolution after exit"
 END

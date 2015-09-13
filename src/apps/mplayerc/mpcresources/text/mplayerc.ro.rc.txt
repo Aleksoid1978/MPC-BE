@@ -258,7 +258,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 23		"Jos"
 24		"Delay:"
 27		"s"
-28		"Change display mode in registry (recommended for D3DFS only)"
+28		"Change display mode before starting playback"
 30		"Aplică modul monitor implicit la ieșirea din modul pe tot ecranul"
 32		"Restaurează rezoluția la ieșirea din program"
 END

@@ -258,7 +258,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 23		"向下"
 24		"Delay:"
 27		"s"
-28		"在注册表中更改显示模式(推荐仅在 D3D 全屏模式中使用)"
+28		"Change display mode before starting playback"
 30		"退出全屏模式时恢复显示器默认工作模式"
 32		"退出后恢复默认分辨率"
 END

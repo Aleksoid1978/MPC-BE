@@ -258,7 +258,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 23		"下へ"
 24		"Delay:"
 27		"s"
-28		"レジストリでディスプレイ モードを変更 (D3DFS のみで推奨)"
+28		"Change display mode before starting playback"
 30		"フルスクリーンから抜けたらデフォルト モニター モードを適用"
 32		"プログラム終了時に解像度を元に戻す"
 END

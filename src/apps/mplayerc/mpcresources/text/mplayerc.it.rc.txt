@@ -258,7 +258,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 23		"Sotto"
 24		"Delay:"
 27		"s"
-28		"Modifica la modalità di visualizzazione nel Registro di sistema (solo per D3DFS)"
+28		"Change display mode before starting playback"
 30		"Applica la modalità schermo predefinita all'uscita dallo schermo intero"
 32		"Ripristina la risoluzione all'uscita"
 END
