@@ -40,9 +40,9 @@ IMPLEMENT_DYNAMIC(CPPageFullscreen, CPPageBase)
 CPPageFullscreen::CPPageFullscreen()
 	: CPPageBase(CPPageFullscreen::IDD, CPPageFullscreen::IDD)
 	, m_bLaunchFullScreen(FALSE)
-	, m_bSetFullscreenRes(FALSE)
+	, m_bEnableAutoMode(FALSE)
+	, m_bUseMediaInfo(FALSE)
 	, m_bSetDefault(FALSE)
-	, m_bSetGlobal(FALSE)
 	, m_bShowBarsWhenFullScreen(FALSE)
 	, m_bExitFullScreenAtTheEnd(FALSE)
 	, m_bExitFullScreenAtFocusLost(FALSE)
@@ -67,11 +67,11 @@ void CPPageFullscreen::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK6, m_bExitFullScreenAtFocusLost);
 	DDX_CBIndex(pDX, IDC_COMBO1, m_iMonitorType);
 	DDX_Control(pDX, IDC_COMBO1, m_iMonitorTypeCtrl);
-	DDX_Check(pDX, IDC_CHECK2, m_bSetFullscreenRes);
+	DDX_Check(pDX, IDC_CHECK2, m_bEnableAutoMode);
+	DDX_Check(pDX, IDC_CHECK7, m_bUseMediaInfo);
 	DDX_Control(pDX, IDC_LIST1, m_list);
 	DDX_Control(pDX, IDC_EDIT2, m_edDMChangeDelay);
 	DDX_Control(pDX, IDC_SPIN2, m_spnDMChangeDelay);
-	DDX_Check(pDX, IDC_CHECK7, m_bSetGlobal);
 	DDX_Check(pDX, IDC_CHECK3, m_bSetDefault);
 	DDX_Check(pDX, IDC_RESTORERESCHECK, m_bRestoreResAfterExit);
 }
@@ -83,30 +83,35 @@ BEGIN_MESSAGE_MAP(CPPageFullscreen, CPPageBase)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_LIST1, OnEndlabeleditList)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST1, OnCustomdrawList)
 	ON_CLBN_CHKCHANGE(IDC_LIST1, OnCheckChangeList)
+
 	ON_UPDATE_COMMAND_UI(IDC_LIST1, OnUpdateFullscreenRes)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK3, OnUpdateSetDefaultRes)
+	ON_UPDATE_COMMAND_UI(IDC_CHECK7, OnUpdateFullscreenRes)
+	ON_UPDATE_COMMAND_UI(IDC_CHECK3, OnUpdateFullscreenRes)
+	ON_UPDATE_COMMAND_UI(IDC_RESTORERESCHECK, OnUpdateFullscreenRes)
+	ON_UPDATE_COMMAND_UI(IDC_BUTTON1, OnUpdateFullscreenRes)
+	ON_UPDATE_COMMAND_UI(IDC_EDIT2, OnUpdateFullscreenRes)
+	ON_UPDATE_COMMAND_UI(IDC_SPIN2, OnUpdateFullscreenRes)
 
 	ON_COMMAND(IDC_CHECK2, OnUpdateSetFullscreenRes)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK4, OnUpdateShowBarsWhenFullScreen)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT1, OnUpdateShowBarsWhenFullScreenTimeOut)
 	ON_UPDATE_COMMAND_UI(IDC_COMBO1, OnUpdateFullScrComboCtrl)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK7, OnUpdateFullscreenRes)
+
 	ON_UPDATE_COMMAND_UI(IDC_STATIC1, OnUpdateStatic1)
 	ON_UPDATE_COMMAND_UI(IDC_STATIC2, OnUpdateStatic2)
 
 	ON_UPDATE_COMMAND_UI(IDC_SPIN1, OnUpdateTimeout)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT1, OnUpdateTimeout)
-	ON_UPDATE_COMMAND_UI(IDC_RESTORERESCHECK, OnUpdateRestoreResAfterExit)
+
 	ON_BN_CLICKED(IDC_BUTTON2, OnRemove)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON2, OnUpdateRemove)
 	ON_BN_CLICKED(IDC_BUTTON1, OnAdd)
-	ON_UPDATE_COMMAND_UI(IDC_BUTTON1, OnUpdateFullscreenRes)
+
 	ON_BN_CLICKED(IDC_BUTTON3, OnMoveUp)
 	ON_BN_CLICKED(IDC_BUTTON4, OnMoveDown)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON3, OnUpdateUp)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON4, OnUpdateDown)
-	ON_UPDATE_COMMAND_UI(IDC_EDIT2, OnUpdateFullscreenRes)
-	ON_UPDATE_COMMAND_UI(IDC_SPIN2, OnUpdateFullscreenRes)
+
 END_MESSAGE_MAP()
 
 // CPPagePlayer message handlers
@@ -122,7 +127,6 @@ BOOL CPPageFullscreen::OnInitDialog()
 	m_bLaunchFullScreen					= s.fLaunchfullscreen;
 	m_AutoChangeFullscrRes				= s.AutoChangeFullscrRes;
 	m_bSetDefault						= s.AutoChangeFullscrRes.bApplyDefault;
-	m_bSetGlobal						= s.AutoChangeFullscrRes.bSetGlobal;
 	m_f_hmonitor						= s.strFullScreenMonitor;
 	m_f_hmonitorID						= s.strFullScreenMonitorID;
 	m_bShowBarsWhenFullScreen			= s.fShowBarsWhenFullScreen;
@@ -253,7 +257,9 @@ void CPPageFullscreen::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 		*pResult = CDRF_NOTIFYSUBITEMDRAW;
 	} else if ( (CDDS_ITEMPREPAINT | CDDS_SUBITEM) == pLVCD->nmcd.dwDrawStage ) {
 		COLORREF crText, crBkgnd;
-		m_AutoChangeFullscrRes.bEnabled = m_bSetFullscreenRes;
+
+		m_AutoChangeFullscrRes.bEnabled = m_bEnableAutoMode ? m_bEnableAutoMode + m_bUseMediaInfo : 0;
+
 		if (m_AutoChangeFullscrRes.bEnabled == false) {
 			crText = RGB(128,128,128);
 			crBkgnd = RGB(240, 240, 240);
@@ -275,7 +281,9 @@ BOOL CPPageFullscreen::OnApply()
 	UpdateData();
 
 	AppSettings& s = AfxGetAppSettings();
-	m_AutoChangeFullscrRes.bEnabled = m_bSetFullscreenRes;
+
+	m_AutoChangeFullscrRes.bEnabled = m_bEnableAutoMode ? m_bEnableAutoMode + m_bUseMediaInfo : 0;
+
 	for (int nItem = 0; nItem < MaxFpsCount; nItem++) {
 		if (nItem < m_list.GetItemCount()) {
 			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].dmFSRes = m_dms[m_list.GetItemData(nItem)];
@@ -289,7 +297,6 @@ BOOL CPPageFullscreen::OnApply()
 	}
 
 	m_AutoChangeFullscrRes.bApplyDefault	= !!m_bSetDefault;
-	m_AutoChangeFullscrRes.bSetGlobal		= !!m_bSetGlobal;
 	s.AutoChangeFullscrRes					= m_AutoChangeFullscrRes;
 	s.fLaunchfullscreen						= !!m_bLaunchFullScreen;
 
@@ -404,22 +411,12 @@ void CPPageFullscreen::OnCheckChangeList()
 
 void CPPageFullscreen::OnUpdateFullscreenRes(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_bSetFullscreenRes);
+	pCmdUI->Enable(m_bEnableAutoMode);
 }
 
 void CPPageFullscreen::OnUpdateFullScrComboCtrl(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(!m_bSetFullscreenRes);
-}
-
-void CPPageFullscreen::OnUpdateRestoreResAfterExit(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(m_bSetFullscreenRes && m_bSetGlobal);
-}
-
-void CPPageFullscreen::OnUpdateSetDefaultRes(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(m_bSetFullscreenRes == TRUE);
+	pCmdUI->Enable(!m_bEnableAutoMode);
 }
 
 void CPPageFullscreen::OnUpdateSetFullscreenRes()
@@ -493,7 +490,8 @@ void CPPageFullscreen::ModesUpdate()
 
 	m_list.SetRedraw(FALSE);
 
-	m_bSetFullscreenRes = m_AutoChangeFullscrRes.bEnabled;
+	m_bEnableAutoMode = m_AutoChangeFullscrRes.bEnabled > 0;
+	m_bUseMediaInfo = m_AutoChangeFullscrRes.bEnabled == 0;
 
 	/*
 	CString strDevice = m_MonitorDeviceName[m_iMonitorType];
@@ -675,7 +673,7 @@ void CPPageFullscreen::OnUpdateRemove(CCmdUI* pCmdUI)
 {
 	POSITION pos = m_list.GetFirstSelectedItemPosition();
 	int nItem = pos ? m_list.GetNextSelectedItem(pos) : -1;
-	pCmdUI->Enable(m_bSetFullscreenRes && nItem > 0);
+	pCmdUI->Enable(m_bEnableAutoMode && nItem > 0);
 }
 
 void CPPageFullscreen::OnAdd()
@@ -772,14 +770,14 @@ void CPPageFullscreen::OnUpdateUp(CCmdUI* pCmdUI)
 {
 	POSITION pos = m_list.GetFirstSelectedItemPosition();
 	int nItem = pos ? m_list.GetNextSelectedItem(pos) : -1;
-	pCmdUI->Enable(m_bSetFullscreenRes && nItem > 1);
+	pCmdUI->Enable(m_bEnableAutoMode && nItem > 1);
 }
 
 void CPPageFullscreen::OnUpdateDown(CCmdUI* pCmdUI)
 {
 	POSITION pos = m_list.GetFirstSelectedItemPosition();
 	int nItem = pos ? m_list.GetNextSelectedItem(pos) : -1;
-	pCmdUI->Enable(m_bSetFullscreenRes && nItem > 0 && nItem < m_list.GetItemCount() - 1);
+	pCmdUI->Enable(m_bEnableAutoMode && nItem > 0 && nItem < m_list.GetItemCount() - 1);
 }
 
 void CPPageFullscreen::ReindexList()

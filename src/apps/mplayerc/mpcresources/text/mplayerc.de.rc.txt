@@ -258,7 +258,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 23		"Nach unten"
 24		"Delay:"
 27		"s"
-28		"Anzeigemodus in der Registry ändern (nur für Direct3D-Vollbildmodus empfohlen)"
+28		"Change display mode before starting playback"
 30		"Standard-Anzeigemodus nach Beenden des Vollbilds verwenden"
 32		"Ursprüngliche Bildschirmauflösung bei Programmende wiederherstellen"
 END

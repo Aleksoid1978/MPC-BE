@@ -244,7 +244,7 @@ struct AChFR { //AutoChangeFullscrRes
 	int bEnabled = 0;
 	fpsmode dmFullscreenRes[MaxFpsCount];
 	bool bApplyDefault = false;
-	bool bSetGlobal = false;
+	bool bSetGlobal = false; // not used
 };
 
 struct AccelTbl {

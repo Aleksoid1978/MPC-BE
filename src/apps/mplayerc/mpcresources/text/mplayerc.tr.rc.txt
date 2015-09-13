@@ -258,7 +258,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 23		"Aşağı"
 24		"Delay:"
 27		"s"
-28		"Kayıt defterinde görüntü kipini değiştir (yalnızca D3DFS için önerilir)"
+28		"Change display mode before starting playback"
 30		"Varsayılan monitör kipini tam ekrandan çıkışta uygula"
 32		"Çözünürlüğü çıkışta geri al"
 END

@@ -258,7 +258,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 23		"Omlaag"
 24		"Delay:"
 27		"s"
-28		"Wijzig weergavemodus in register (alleen in D3D-vol.-scherm wordt aanbevolen)"
+28		"Change display mode before starting playback"
 30		"Standaardmonitormodus toepassen bij verlaten van volledig scherm"
 32		"Herstel resolutie bij afsluiten"
 END
