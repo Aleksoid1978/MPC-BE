@@ -240,11 +240,12 @@ struct fpsmode {
 };
 
 #define MaxFpsCount 30
-struct AChFR { //AutoChangeFullscrRes
+struct AChFR {
 	int bEnabled = 0;
 	fpsmode dmFullscreenRes[MaxFpsCount];
 	bool bApplyDefault = false;
-	bool bSetGlobal = false; // not used
+	bool bRestoreResAfterExit = true;
+	int iDMChangeDelay = 0;
 };
 
 struct AccelTbl {
@@ -629,10 +630,8 @@ public:
 	CStringW		strFullScreenMonitorID;
 	AChFR			AutoChangeFullscrRes;
 	AccelTbl		AccelTblColWidth;
-	bool			fRestoreResAfterExit;
 	dispmode		dm_def;
 	double			dFPS;
-	int				iDMChangeDelay;
 
 	// Sync Renderer Settings
 
