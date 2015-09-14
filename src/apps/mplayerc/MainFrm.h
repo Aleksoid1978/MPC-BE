@@ -204,7 +204,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget
 		TIMER_STATS,
 		TIMER_LEFTCLICK,
 		TIMER_STATUSERASER,
-		TIMER_FLYBARWINDOWHIDER
+		TIMER_FLYBARWINDOWHIDER,
+		TIMER_DM_AUTOCHANGING
 	};
 
 	friend class CPPageFileInfoSheet;
@@ -486,7 +487,12 @@ public:
 
 	CControlBar* m_pLastBar;
 
+	static bool GetCurDispMode(dispmode& dm, CString& DisplayName);
+	static bool GetDispMode(int i, dispmode& dm, CString& DisplayName);
+
 protected:
+	void SetDispMode(dispmode& dm, CString& DisplayName);
+
 	bool			m_bUseSmartSeek;
 	MPC_LOADSTATE	m_eMediaLoadState;
 	bool			m_bClosingState;
