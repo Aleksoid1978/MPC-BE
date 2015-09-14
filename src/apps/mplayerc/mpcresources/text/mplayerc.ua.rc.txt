@@ -257,7 +257,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 22		"Догори"
 23		"Донизу"
 24		"Delay:"
-27		"s"
+27		"sec."
 28		"Change display mode before starting playback"
 30		"Застосовув. типовий режим монітора при виході з повноекр."
 32		"Відновлювати роздільну здатність після закриття програми"
@@ -293,7 +293,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Використовувати особливості панелі завдань Windows 7 (і пізніших)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
 6		"Якщо ви хочете використовувати окремі версії цих фільтрів або інші замінники, вимкніть їх тут."
 10		"AVI-демультиплексор\n(налаштування)"
 11		"MPEG-демультиплексор\n(налаштування)"
@@ -302,7 +302,8 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 14		"Відеодекодер\n(налаштування)"
 15		"MPEG-2/DVD\nдекодер\n(налаштування)"
 16		"Аудіодекодер\n(налаштування)"
-17		"Buffer length (s):"
+17		"Buffer length:"
+20		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12

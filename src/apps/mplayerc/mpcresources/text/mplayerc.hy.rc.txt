@@ -257,7 +257,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 22		"Up"
 23		"Down"
 24		"Delay:"
-27		"s"
+27		"sec."
 28		"Change display mode before starting playback"
 30		"Կիրառել 'Ըստ ծրագրայինի' եղանակը պատուհանի եղանակին անցնելիս"
 32		"Վերականգնել չափը՝ ծրագրիը փակելիս"
@@ -293,7 +293,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Use Windows 7 (and above) Taskbar features"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
 6		"If you would like to use the stand-alone version from these filters or a some other replacement, disable them here. Filters written in bold can be double-clicked to show their property pages."
 10		"AVI Splitter\nconfiguration"
 11		"MPEG Splitter\nconfiguration"
@@ -302,7 +302,8 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 14		"Video decoder\nconfiguration"
 15		"MPEG-2/DVD\ndecoder\nconfiguration"
 16		"Audio decoder\nconfiguration"
-17		"Buffer length (s):"
+17		"Buffer length:"
+20		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12

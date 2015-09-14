@@ -736,9 +736,10 @@ BEGIN
     PUSHBUTTON      "Video decoder\nconfiguration",IDC_BUTTON2,220,47,70,30,BS_MULTILINE
     PUSHBUTTON      "MPEG-2/DVD\ndecoder\nconfiguration",IDC_BUTTON3,220,82,70,30,BS_MULTILINE
     PUSHBUTTON      "Audio decoder\nconfiguration",IDC_BUTTON4,220,47,70,30,BS_MULTILINE
-    LTEXT           "Buffer length (s):",IDC_STATIC,221,209,73,8
-    EDITTEXT        IDC_EDIT1,227,221,46,13,ES_RIGHT | ES_AUTOHSCROLL
-    CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,272,221,11,13
+    LTEXT           "Buffer length:",IDC_STATIC,221,209,69,8
+    EDITTEXT        IDC_EDIT1,221,221,29,13,ES_RIGHT | ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,239,221,11,13
+    LTEXT           "sec.",IDC_STATIC,254,223,26,8
 END
 
 IDD_PPAGEFILTERSPRIORITY DIALOGEX 0, 0, 296, 241
@@ -1071,7 +1072,7 @@ BEGIN
     CONTROL         "Show controls in fullscreen for",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,15,275,8
     EDITTEXT        IDC_EDIT1,14,27,32,13,ES_CENTER | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,35,27,12,13
-    LTEXT           "sec(s)",IDC_STATIC1,51,29,30,8
+    LTEXT           "sec.",IDC_STATIC1,51,29,30,8
     LTEXT           "0: auto-hide; -1: don't hide",IDC_STATIC2,85,29,195,8
     CONTROL         "Exit fullscreen at the end of playback",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,43,276,8
@@ -1089,7 +1090,7 @@ BEGIN
     LTEXT           "Delay:",IDC_STATIC,242,179,46,8
     EDITTEXT        IDC_EDIT2,240,191,24,12,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_HOTTRACK,254,192,10,8
-    LTEXT           "s",IDC_STATIC,267,193,19,8
+    LTEXT           "sec.",IDC_STATIC,267,193,19,8
     CONTROL         "Change display mode before starting playback",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,205,271,8
     CONTROL         "Apply default monitor mode on fullscreen exit",IDC_CHECK3,

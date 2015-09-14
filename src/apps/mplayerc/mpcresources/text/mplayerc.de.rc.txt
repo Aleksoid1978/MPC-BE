@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Über MPC-BE"
 7		"MPC-BE"
 8		"Copyright © 2002-2015 MPC-BE Team, siehe Authors.txt Datei"
@@ -257,7 +257,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 22		"Nach oben"
 23		"Nach unten"
 24		"Verzögerung:"
-27		"s"
+27		"sek."
 28		"Anzeigemodus vor Start der Wiedergabe ändern"
 30		"Standard-Anzeigemodus nach Beenden des Vollbilds verwenden"
 32		"Ursprüngliche Bildschirmauflösung bei Programmende wiederherstellen"
@@ -293,7 +293,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Windows-Taskbarfunktionen verwenden (ab Windows 7)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
 6		"Um anstelle eines internen Filters einen alternativen, externen Filter zu verwenden, die betreffenden Formate hier bitte deaktivieren."
 10		"AVI-Splitter\nEinstellungen"
 11		"MPEG-Splitter\nEinstellungen"
@@ -302,7 +302,8 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 14		"Video-Decoder\nEinstellungen"
 15		"MPEG-2- und\nDVD-Decoder\nEinstellungen"
 16		"Audio-Decoder\nEinstellungen"
-17		"Pufferlänge (s):"
+17		"Pufferlänge:"
+20		"sek."
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
