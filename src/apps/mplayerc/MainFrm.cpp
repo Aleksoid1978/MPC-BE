@@ -1024,7 +1024,7 @@ void CMainFrame::OnClose()
 	s.UIceClient.DisConnect();
 
 	/*
-	if (s.AutoChangeFullscrRes.bEnabled && s.AutoChangeFullscrRes.bRestoreResAfterExit) {
+	if (s.AutoChangeFullscrRes.bEnabled && s.fRestoreResAfterExit) {
 		SetDispMode(s.dm_def, s.strFullScreenMonitor);
 	}
 	*/
@@ -10678,13 +10678,13 @@ void CMainFrame::SetDispMode(dispmode& dm, CString& DisplayName)
 	}
 
 	BOOL bPausedForAutochangeMonitorMode = FALSE;
-	if (m_eMediaLoadState == MLS_LOADED && GetMediaState() == State_Running && s.AutoChangeFullscrRes.iDMChangeDelay) {
+	if (m_eMediaLoadState == MLS_LOADED && GetMediaState() == State_Running && s.iDMChangeDelay) {
 		// pause if the mode is being changed during playback
 		OnPlayPause();
 		bPausedForAutochangeMonitorMode = TRUE;
 	}
 
-	if (!s.AutoChangeFullscrRes.bRestoreResAfterExit) {
+	if (!s.fRestoreResAfterExit) {
 		ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, CDS_UPDATEREGISTRY | CDS_NORESET, NULL);
 		ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
 	} else {
@@ -10692,7 +10692,7 @@ void CMainFrame::SetDispMode(dispmode& dm, CString& DisplayName)
 	}
 
 	if (bPausedForAutochangeMonitorMode) {
-		SetTimer(TIMER_DM_AUTOCHANGING, s.AutoChangeFullscrRes.iDMChangeDelay * 1000, NULL);
+		SetTimer(TIMER_DM_AUTOCHANGING, s.iDMChangeDelay * 1000, NULL);	
 	}
 }
 
