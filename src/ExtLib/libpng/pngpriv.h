@@ -1,12 +1,10 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.18 [July 23, 2015]
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
- *
- * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -40,17 +38,10 @@
 #define _POSIX_SOURCE 1 /* Just the POSIX 1003.1 and C89 APIs */
 
 #ifndef PNG_VERSION_INFO_ONLY
-/* Keep standard libraries at the top of this file */
-
 /* Standard library headers not required by png.h: */
 #  include <stdlib.h>
 #  include <string.h>
-
-/* For headers only required with some build configurations see the lines after
- * pnglibconf.h is included!
- */
-
-#endif /* VERSION_INFO_ONLY */
+#endif
 
 #define PNGLIB_BUILD /*libpng is being built, not used*/
 
@@ -95,36 +86,6 @@
 #  endif
 #endif
 
-#ifndef PNG_VERSION_INFO_ONLY
-/* Additional standard libaries required in certain cases, put only standard
- * ANSI-C89 headers here.  If not available, or non-functional, the problem
- * should be fixed by writing a wrapper for the header and the file on your
- * include path.
- */
-#if defined(PNG_sCAL_SUPPORTED) && defined(PNG_FLOATING_POINT_SUPPORTED)
-   /* png.c requires the following ANSI-C constants if the conversion of
-    * floating point to ASCII is implemented therein:
-    *
-    *  DBL_MIN_10_EXP Minimum negative integer such that 10^integer is a
-    *                 normalized (double) value.
-    *  DBL_DIG  Maximum number of decimal digits (can be set to any constant)
-    *  DBL_MIN  Smallest normalized fp number (can be set to an arbitrary value)
-    *  DBL_MAX  Maximum floating point number (can be set to an arbitrary value)
-    */
-#  include <float.h>
-#endif /* sCAL && FLOATING_POINT */
-
-#if defined(PNG_FLOATING_ARITHMETIC_SUPPORTED) ||\
-   defined(PNG_FLOATING_POINT_SUPPORTED)
-   /* ANSI-C90 math functions are required.  Full compliance with the standard
-    * is probably not a requirement, but the functions must exist and be
-    * declared in <math.h>
-    */
-#  include <math.h>
-#endif /* FLOATING_ARITHMETIC || FLOATING_POINT */
-
-#endif /* VERSION_INFO_ONLY */
-
 /* Compile time options.
  * =====================
  * In a multi-arch build the compiler may compile the code several times for the
@@ -156,8 +117,16 @@
     * PNG_ARM_NEON_OPT is set in CPPFLAGS (to >0) then arm/arm_init.c will fail
     * to compile with an appropriate #error if ALIGNED_MEMORY has been turned
     * off.
+    *
+    * Note that gcc-4.9 defines __ARM_NEON instead of the deprecated
+    * __ARM_NEON__, so we check both variants.
+    *
+    * To disable ARM_NEON optimizations entirely, and skip compiling the
+    * associated assembler code, pass --enable-arm-neon=no to configure
+    * or put -DPNG_ARM_NEON_OPT=0 in CPPFLAGS.
     */
-#  if defined(__ARM_NEON__) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
+#  if (defined(__ARM_NEON__) || defined(__ARM_NEON)) && \
+   defined(PNG_ALIGNED_MEMORY_SUPPORTED)
 #     define PNG_ARM_NEON_OPT 2
 #  else
 #     define PNG_ARM_NEON_OPT 0
@@ -185,7 +154,7 @@
     * libpng implementation list for incorporation in the next minor release.
     */
 #  ifndef PNG_ARM_NEON_IMPLEMENTATION
-#     ifdef __ARM_NEON__
+#     if defined(__ARM_NEON__) || defined(__ARM_NEON)
 #        if defined(__clang__)
             /* At present it is unknown by the libpng developers which versions
              * of clang support the intrinsics, however some or perhaps all
@@ -205,7 +174,7 @@
           */
 #        define PNG_ARM_NEON_IMPLEMENTATION 2
 #     endif /* __ARM_NEON__ */
-#  endif /* !defined PNG_ARM_NEON_IMPLEMENTATION */
+#  endif /* !PNG_ARM_NEON_IMPLEMENTATION */
 
 #  ifndef PNG_ARM_NEON_IMPLEMENTATION
       /* Use the intrinsics code by default. */
@@ -283,17 +252,18 @@
  * always be used to declare an extern data or function object in this file.
  */
 #ifndef PNG_INTERNAL_DATA
-#  define PNG_INTERNAL_DATA(type, name, array) extern type name array
+#  define PNG_INTERNAL_DATA(type, name, array) PNG_LINKAGE_DATA type name array
 #endif
 
 #ifndef PNG_INTERNAL_FUNCTION
 #  define PNG_INTERNAL_FUNCTION(type, name, args, attributes)\
-      extern PNG_FUNCTION(type, name, args, PNG_EMPTY attributes)
+      PNG_LINKAGE_FUNCTION PNG_FUNCTION(type, name, args, PNG_EMPTY attributes)
 #endif
 
 #ifndef PNG_INTERNAL_CALLBACK
 #  define PNG_INTERNAL_CALLBACK(type, name, args, attributes)\
-      extern PNG_FUNCTION(type, (PNGCBAPI name), args, PNG_EMPTY attributes)
+      PNG_LINKAGE_CALLBACK PNG_FUNCTION(type, (PNGCBAPI name), args,\
+         PNG_EMPTY attributes)
 #endif
 
 /* If floating or fixed point APIs are disabled they may still be compiled
@@ -324,9 +294,6 @@
 #  endif
 #endif
 
-/* Include png.h here to get the version info and other macros, pngstruct.h and
- * pnginfo.h are included later under the protection of !PNG_VERSION_INFO_ONLY
- */
 #include "png.h"
 
 /* pngconf.h does not set PNG_DLL_EXPORT unless it is required, so: */
@@ -334,59 +301,27 @@
 #  define PNG_DLL_EXPORT
 #endif
 
-/* asserts are turned off in release code, but are in even in release candidates
- * because often system builders only check future libpng releases when a
- * release candidate is available.
+/* This is a global switch to set the compilation for an installed system
+ * (a release build).  It can be set for testing debug builds to ensure that
+ * they will compile when the build type is switched to RC or STABLE, the
+ * default is just to use PNG_LIBPNG_BUILD_BASE_TYPE.  Set this in CPPFLAGS
+ * with either:
+ *
+ *   -DPNG_RELEASE_BUILD Turns on the release compile path
+ *   -DPNG_RELEASE_BUILD=0 Turns it off
+ * or in your pngusr.h with
+ *   #define PNG_RELEASE_BUILD=1 Turns on the release compile path
+ *   #define PNG_RELEASE_BUILD=0 Turns it off
  */
-#if PNG_LIBPNG_BUILD_BASE_TYPE == PNG_LIBPNG_BUILD_STABLE
-#  define NDEBUG
-#endif
-#ifndef PNG_VERSION_INFO_ONLY
-#  include <assert.h>
+#ifndef PNG_RELEASE_BUILD
+#  define PNG_RELEASE_BUILD (PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC)
 #endif
 
 /* SECURITY and SAFETY:
  *
- * By default libpng is built without any internal limits on image size,
- * individual heap (png_malloc) allocations or the total amount of memory used.
- * If PNG_SAFE_LIMITS_SUPPORTED is defined, however, the limits below are used
- * (unless individually overridden).  These limits are believed to be fairly
- * safe, but builders of secure systems should verify the values against the
- * real system capabilities.
- */
-#ifdef PNG_SAFE_LIMITS_SUPPORTED
-   /* 'safe' limits */
-#  ifndef PNG_USER_WIDTH_MAX
-#     define PNG_USER_WIDTH_MAX 1000000
-#  endif
-#  ifndef PNG_USER_HEIGHT_MAX
-#     define PNG_USER_HEIGHT_MAX 1000000
-#  endif
-#  ifndef PNG_USER_CHUNK_CACHE_MAX
-#     define PNG_USER_CHUNK_CACHE_MAX 128
-#  endif
-#  ifndef PNG_USER_CHUNK_MALLOC_MAX
-#     define PNG_USER_CHUNK_MALLOC_MAX 8000000
-#  endif
-#else
-   /* values for no limits */
-#  ifndef PNG_USER_WIDTH_MAX
-#     define PNG_USER_WIDTH_MAX 0x7fffffff
-#  endif
-#  ifndef PNG_USER_HEIGHT_MAX
-#     define PNG_USER_HEIGHT_MAX 0x7fffffff
-#  endif
-#  ifndef PNG_USER_CHUNK_CACHE_MAX
-#     define PNG_USER_CHUNK_CACHE_MAX 0
-#  endif
-#  ifndef PNG_USER_CHUNK_MALLOC_MAX
-#     define PNG_USER_CHUNK_MALLOC_MAX 0
-#  endif
-#endif
-
-/* Moved to pngpriv.h at libpng-1.5.0 */
-/* NOTE: some of these may have been used in external applications as
- * these definitions were exposed in pngconf.h prior to 1.5.
+ * libpng is built with support for internal limits on image dimensions and
+ * memory usage.  These are documented in scripts/pnglibconf.dfa of the
+ * source and recorded in the machine generated header file pnglibconf.h.
  */
 
 /* If you are running on a machine where you cannot allocate more
@@ -468,6 +403,67 @@
 #  define PNGFAPI /* PRIVATE */
 #endif
 
+#ifndef PNG_VERSION_INFO_ONLY
+/* Other defines specific to compilers can go here.  Try to keep
+ * them inside an appropriate ifdef/endif pair for portability.
+ */
+#if defined(PNG_FLOATING_POINT_SUPPORTED) ||\
+    defined(PNG_FLOATING_ARITHMETIC_SUPPORTED)
+   /* png.c requires the following ANSI-C constants if the conversion of
+    * floating point to ASCII is implemented therein:
+    *
+    *  DBL_DIG  Maximum number of decimal digits (can be set to any constant)
+    *  DBL_MIN  Smallest normalized fp number (can be set to an arbitrary value)
+    *  DBL_MAX  Maximum floating point number (can be set to an arbitrary value)
+    */
+#  include <float.h>
+
+#  if (defined(__MWERKS__) && defined(macintosh)) || defined(applec) || \
+    defined(THINK_C) || defined(__SC__) || defined(TARGET_OS_MAC)
+     /* We need to check that <math.h> hasn't already been included earlier
+      * as it seems it doesn't agree with <fp.h>, yet we should really use
+      * <fp.h> if possible.
+      */
+#    if !defined(__MATH_H__) && !defined(__MATH_H) && !defined(__cmath__)
+#      include <fp.h>
+#    endif
+#  else
+#    include <math.h>
+#  endif
+#  if defined(_AMIGA) && defined(__SASC) && defined(_M68881)
+     /* Amiga SAS/C: We must include builtin FPU functions when compiling using
+      * MATH=68881
+      */
+#    include <m68881.h>
+#  endif
+#endif
+
+/* This provides the non-ANSI (far) memory allocation routines. */
+#if defined(__TURBOC__) && defined(__MSDOS__)
+#  include <mem.h>
+#  include <alloc.h>
+#endif
+
+#if defined(WIN32) || defined(_Windows) || defined(_WINDOWS) || \
+    defined(_WIN32) || defined(__WIN32__)
+#  include <windows.h>  /* defines _WINDOWS_ macro */
+#endif
+#endif /* PNG_VERSION_INFO_ONLY */
+
+/* Moved here around 1.5.0beta36 from pngconf.h */
+/* Users may want to use these so they are not private.  Any library
+ * functions that are passed far data must be model-independent.
+ */
+
+/* Memory model/platform independent fns */
+#ifndef PNG_ABORT
+#  ifdef _WINDOWS_
+#    define PNG_ABORT() ExitProcess(0)
+#  else
+#    define PNG_ABORT() abort()
+#  endif
+#endif
+
 /* These macros may need to be architecture dependent. */
 #define PNG_ALIGN_NONE   0 /* do not use data alignment */
 #define PNG_ALIGN_ALWAYS 1 /* assume unaligned accesses are OK */
@@ -536,7 +532,7 @@
 #define PNG_HAVE_CHUNK_HEADER      0x100
 #define PNG_WROTE_tIME             0x200
 #define PNG_WROTE_INFO_BEFORE_PLTE 0x400
-                   /*              0x800 (unused) */
+#define PNG_BACKGROUND_IS_GRAY     0x800
 #define PNG_HAVE_PNG_SIGNATURE    0x1000
 #define PNG_HAVE_CHUNK_AFTER_IDAT 0x2000 /* Have another chunk after IDAT */
                    /*             0x4000 (unused) */
@@ -550,10 +546,10 @@
 #define PNG_SWAP_BYTES          0x0010
 #define PNG_INVERT_MONO         0x0020
 #define PNG_QUANTIZE            0x0040
-#define PNG_COMPOSE             0x0080 /* Was PNG_BACKGROUND */
-                       /*       0x0100 unused */
-#define PNG_EXPAND_16           0x0200 /* Added to libpng 1.5.2 */
-#define PNG_16_TO_8             0x0400 /* Becomes 'chop' in 1.5.4 */
+#define PNG_COMPOSE             0x0080     /* Was PNG_BACKGROUND */
+#define PNG_BACKGROUND_EXPAND   0x0100
+#define PNG_EXPAND_16           0x0200     /* Added to libpng 1.5.2 */
+#define PNG_16_TO_8             0x0400     /* Becomes 'chop' in 1.5.4 */
 #define PNG_RGBA                0x0800
 #define PNG_EXPAND              0x1000
 #define PNG_GAMMA               0x2000
@@ -579,10 +575,6 @@
 #define PNG_STRUCT_PNG   0x0001
 #define PNG_STRUCT_INFO  0x0002
 
-/* Scaling factor for filter heuristic weighting calculations */
-#define PNG_WEIGHT_FACTOR (1<<(PNG_WEIGHT_SHIFT))
-#define PNG_COST_FACTOR (1<<(PNG_COST_SHIFT))
-
 /* Flags for the png_ptr->flags rather than declaring a byte for each one */
 #define PNG_FLAG_ZLIB_CUSTOM_STRATEGY     0x0001
 #define PNG_FLAG_ZSTREAM_INITIALIZED      0x0002 /* Added to libpng-1.6.0 */
@@ -607,8 +599,8 @@
 #define PNG_FLAG_BENIGN_ERRORS_WARN     0x100000 /* Added to libpng-1.4.0 */
 #define PNG_FLAG_APP_WARNINGS_WARN      0x200000 /* Added to libpng-1.6.0 */
 #define PNG_FLAG_APP_ERRORS_WARN        0x400000 /* Added to libpng-1.6.0 */
-#define PNG_FLAG_BACKGROUND_IS_GRAY     0x800000
-#define PNG_FLAG_BACKGROUND_EXPAND     0x1000000
+                                  /*    0x800000    unused */
+                                  /*   0x1000000    unused */
                                   /*   0x2000000    unused */
                                   /*   0x4000000    unused */
                                   /*   0x8000000    unused */
@@ -630,16 +622,6 @@
 #define PNG_COLOR_DIST(c1, c2) (abs((int)((c1).red) - (int)((c2).red)) + \
    abs((int)((c1).green) - (int)((c2).green)) + \
    abs((int)((c1).blue) - (int)((c2).blue)))
-
-#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
-   defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
-/* See below for the definitions of the tables used in these macros */
-#define PNG_sRGB_FROM_LINEAR(linear) ((png_byte)((png_sRGB_base[(linear)>>15] +\
-   ((((linear)&0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8))
-   /* Given a value 'linear' in the range 0..255*65535 calculate the 8-bit sRGB
-    * encoded value with maximum error 0.646365.  Note that the input is not a
-    * 16-bit value; it has been multiplied by 255! */
-#endif /* PNG_SIMPLIFIED_READ/WRITE */
 
 /* Added to libpng-1.6.0: scale a 16-bit value in the range 0..65535 to 0..255
  * by dividing by 257 *with rounding*.  This macro is exact for the given range.
@@ -683,7 +665,7 @@
 /* The fixed point conversion performs range checking and evaluates
  * its argument multiple times, so must be used with care.  The
  * range checking uses the PNG specification values for a signed
- * 32 bit fixed point value except that the values are deliberately
+ * 32-bit fixed point value except that the values are deliberately
  * rounded-to-zero to an integral value - 21474 (21474.83 is roughly
  * (2^31-1) * 100000). 's' is a string that describes the value being
  * converted.
@@ -704,6 +686,100 @@
  * cplusplus test.
  */
 #endif
+
+/* Constants for known chunk types.  If you need to add a chunk, define the name
+ * here.  For historical reasons these constants have the form png_<name>; i.e.
+ * the prefix is lower case.  Please use decimal values as the parameters to
+ * match the ISO PNG specification and to avoid relying on the C locale
+ * interpretation of character values.
+ *
+ * Prior to 1.5.6 these constants were strings, as of 1.5.6 png_uint_32 values
+ * are computed and a new macro (PNG_STRING_FROM_CHUNK) added to allow a string
+ * to be generated if required.
+ *
+ * PNG_32b correctly produces a value shifted by up to 24 bits, even on
+ * architectures where (int) is only 16 bits.
+ */
+#define PNG_32b(b,s) ((png_uint_32)(b) << (s))
+#define PNG_U32(b1,b2,b3,b4) \
+   (PNG_32b(b1,24) | PNG_32b(b2,16) | PNG_32b(b3,8) | PNG_32b(b4,0))
+
+/* Constants for known chunk types.
+ *
+ * MAINTAINERS: If you need to add a chunk, define the name here.
+ * For historical reasons these constants have the form png_<name>; i.e.
+ * the prefix is lower case.  Please use decimal values as the parameters to
+ * match the ISO PNG specification and to avoid relying on the C locale
+ * interpretation of character values.  Please keep the list sorted.
+ *
+ * Notice that PNG_U32 is used to define a 32-bit value for the 4 byte chunk
+ * type.  In fact the specification does not express chunk types this way,
+ * however using a 32-bit value means that the chunk type can be read from the
+ * stream using exactly the same code as used for a 32-bit unsigned value and
+ * can be examined far more efficiently (using one arithmetic compare).
+ *
+ * Prior to 1.5.6 the chunk type constants were expressed as C strings.  The
+ * libpng API still uses strings for 'unknown' chunks and a macro,
+ * PNG_STRING_FROM_CHUNK, allows a string to be generated if required.  Notice
+ * that for portable code numeric values must still be used; the string "IHDR"
+ * is not portable and neither is PNG_U32('I', 'H', 'D', 'R').
+ *
+ * In 1.7.0 the definitions will be made public in png.h to avoid having to
+ * duplicate the same definitions in application code.
+ */
+#define png_IDAT PNG_U32( 73,  68,  65,  84)
+#define png_IEND PNG_U32( 73,  69,  78,  68)
+#define png_IHDR PNG_U32( 73,  72,  68,  82)
+#define png_PLTE PNG_U32( 80,  76,  84,  69)
+#define png_bKGD PNG_U32( 98,  75,  71,  68)
+#define png_cHRM PNG_U32( 99,  72,  82,  77)
+#define png_fRAc PNG_U32(102,  82,  65,  99) /* registered, not defined */
+#define png_gAMA PNG_U32(103,  65,  77,  65)
+#define png_gIFg PNG_U32(103,  73,  70, 103)
+#define png_gIFt PNG_U32(103,  73,  70, 116) /* deprecated */
+#define png_gIFx PNG_U32(103,  73,  70, 120)
+#define png_hIST PNG_U32(104,  73,  83,  84)
+#define png_iCCP PNG_U32(105,  67,  67,  80)
+#define png_iTXt PNG_U32(105,  84,  88, 116)
+#define png_oFFs PNG_U32(111,  70,  70, 115)
+#define png_pCAL PNG_U32(112,  67,  65,  76)
+#define png_pHYs PNG_U32(112,  72,  89, 115)
+#define png_sBIT PNG_U32(115,  66,  73,  84)
+#define png_sCAL PNG_U32(115,  67,  65,  76)
+#define png_sPLT PNG_U32(115,  80,  76,  84)
+#define png_sRGB PNG_U32(115,  82,  71,  66)
+#define png_sTER PNG_U32(115,  84,  69,  82)
+#define png_tEXt PNG_U32(116,  69,  88, 116)
+#define png_tIME PNG_U32(116,  73,  77,  69)
+#define png_tRNS PNG_U32(116,  82,  78,  83)
+#define png_zTXt PNG_U32(122,  84,  88, 116)
+
+/* The following will work on (signed char*) strings, whereas the get_uint_32
+ * macro will fail on top-bit-set values because of the sign extension.
+ */
+#define PNG_CHUNK_FROM_STRING(s)\
+   PNG_U32(0xff & (s)[0], 0xff & (s)[1], 0xff & (s)[2], 0xff & (s)[3])
+
+/* This uses (char), not (png_byte) to avoid warnings on systems where (char) is
+ * signed and the argument is a (char[])  This macro will fail miserably on
+ * systems where (char) is more than 8 bits.
+ */
+#define PNG_STRING_FROM_CHUNK(s,c)\
+   (void)(((char*)(s))[0]=(char)(((c)>>24) & 0xff), \
+   ((char*)(s))[1]=(char)(((c)>>16) & 0xff),\
+   ((char*)(s))[2]=(char)(((c)>>8) & 0xff), \
+   ((char*)(s))[3]=(char)((c & 0xff)))
+
+/* Do the same but terminate with a null character. */
+#define PNG_CSTRING_FROM_CHUNK(s,c)\
+   (void)(PNG_STRING_FROM_CHUNK(s,c), ((char*)(s))[4] = 0)
+
+/* Test on flag values as defined in the spec (section 5.4): */
+#define PNG_CHUNK_ANCILLARY(c)   (1 & ((c) >> 29))
+#define PNG_CHUNK_CRITICAL(c)     (!PNG_CHUNK_ANCILLARY(c))
+#define PNG_CHUNK_PRIVATE(c)      (1 & ((c) >> 21))
+#define PNG_CHUNK_RESERVED(c)     (1 & ((c) >> 13))
+#define PNG_CHUNK_SAFE_TO_COPY(c) (1 & ((c) >>  5))
 
 /* Gamma values (new at libpng-1.5.4): */
 #define PNG_GAMMA_MAC_OLD 151724  /* Assume '1.8' is really 2.2/1.45! */
@@ -730,13 +806,13 @@
     * zlib version number and because this affects handling of certain broken
     * PNG files the -I directives must match.
     *
-    * The most likely explanation is that you passed a -I in CFLAGS, this will
+    * The most likely explanation is that you passed a -I in CFLAGS. This will
     * not work; all the preprocessor directories and in particular all the -I
     * directives must be in CPPFLAGS.
     */
 #endif
 
-/* This is used for 16 bit gamma tables -- only the top level pointers are
+/* This is used for 16-bit gamma tables -- only the top level pointers are
  * const; this could be changed:
  */
 typedef const png_uint_16p * png_const_uint_16pp;
@@ -753,7 +829,14 @@ PNG_INTERNAL_DATA(const png_uint_16, png_sRGB_table, [256]);
 
 PNG_INTERNAL_DATA(const png_uint_16, png_sRGB_base, [512]);
 PNG_INTERNAL_DATA(const png_byte, png_sRGB_delta, [512]);
-#endif /* PNG_SIMPLIFIED_READ/WRITE */
+
+#define PNG_sRGB_FROM_LINEAR(linear) \
+  ((png_byte)(0xff & ((png_sRGB_base[(linear)>>15] \
+   + ((((linear) & 0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8)))
+   /* Given a value 'linear' in the range 0..255*65535 calculate the 8-bit sRGB
+    * encoded value with maximum error 0.646365.  Note that the input is not a
+    * 16-bit value; it has been multiplied by 255! */
+#endif /* SIMPLIFIED_READ/WRITE */
 
 
 /* Inhibit C++ name-mangling for libpng functions but not for system calls. */
@@ -779,16 +862,6 @@ PNG_INTERNAL_FUNCTION(void, png_zstream_error,(png_structrp png_ptr, int ret),
 PNG_INTERNAL_FUNCTION(void,png_free_buffer_list,(png_structrp png_ptr,
    png_compression_bufferp *list),PNG_EMPTY);
    /* Free the buffer list used by the compressed write code. */
-#endif
-
-#ifdef PNG_WRITE_FILTER_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_write_alloc_filter_row_buffers,
-   (png_structrp png_ptr, int filters),PNG_EMPTY);
-   /* Allocate pixel row buffers to cache filtered rows while testing candidate
-    * filters.
-    * TODO: avoid this, only one spare row buffer (at most) is required, this
-    * wastes a lot of memory for large images.
-    */
 #endif
 
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && \
@@ -827,7 +900,7 @@ PNG_INTERNAL_FUNCTION(png_voidp,png_malloc_array,(png_const_structrp png_ptr,
  * also memsets the new elements to 0 and copies the old elements.  The old
  * array is not freed or altered.
  */
-PNG_INTERNAL_FUNCTION(png_voidp,png_realloc_array,(png_structrp png_ptr,
+PNG_INTERNAL_FUNCTION(png_voidp,png_realloc_array,(png_const_structrp png_ptr,
    png_const_voidp array, int old_elements, int add_elements,
    size_t element_size),PNG_ALLOCATED);
 #endif /* text, sPLT or unknown chunks */
@@ -998,7 +1071,7 @@ PNG_INTERNAL_FUNCTION(void,png_write_tEXt,(png_structrp png_ptr,
 
 #ifdef PNG_WRITE_zTXt_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_write_zTXt,(png_structrp png_ptr, png_const_charp
-    key, png_const_charp text, png_size_t text_len, int compression),PNG_EMPTY);
+    key, png_const_charp text, int compression),PNG_EMPTY);
 #endif
 
 #ifdef PNG_WRITE_iTXt_SUPPORTED
@@ -1008,7 +1081,7 @@ PNG_INTERNAL_FUNCTION(void,png_write_iTXt,(png_structrp png_ptr,
 #endif
 
 #ifdef PNG_TEXT_SUPPORTED  /* Added at version 1.0.14 and 1.2.4 */
-PNG_INTERNAL_FUNCTION(int,png_set_text_2,(png_structrp png_ptr,
+PNG_INTERNAL_FUNCTION(int,png_set_text_2,(png_const_structrp png_ptr,
     png_inforp info_ptr, png_const_textp text_ptr, int num_text),PNG_EMPTY);
 #endif
 
@@ -1137,7 +1210,7 @@ PNG_INTERNAL_FUNCTION(void,png_read_finish_IDAT,(png_structrp png_ptr),
 PNG_INTERNAL_FUNCTION(void,png_read_finish_row,(png_structrp png_ptr),
    PNG_EMPTY);
    /* Finish a row while reading, dealing with interlacing passes, etc. */
-#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
+#endif /* SEQUENTIAL_READ */
 
 /* Initialize the row buffers, etc. */
 PNG_INTERNAL_FUNCTION(void,png_read_start_row,(png_structrp png_ptr),PNG_EMPTY);
@@ -1213,7 +1286,7 @@ PNG_INTERNAL_FUNCTION(void,png_handle_hIST,(png_structrp png_ptr,
 #ifdef PNG_READ_iCCP_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_handle_iCCP,(png_structrp png_ptr,
     png_inforp info_ptr, png_uint_32 length),PNG_EMPTY);
-#endif /* PNG_READ_iCCP_SUPPORTED */
+#endif /* READ_iCCP */
 
 #ifdef PNG_READ_iTXt_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_handle_iTXt,(png_structrp png_ptr,
@@ -1248,7 +1321,7 @@ PNG_INTERNAL_FUNCTION(void,png_handle_sCAL,(png_structrp png_ptr,
 #ifdef PNG_READ_sPLT_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_handle_sPLT,(png_structrp png_ptr,
     png_inforp info_ptr, png_uint_32 length),PNG_EMPTY);
-#endif /* PNG_READ_sPLT_SUPPORTED */
+#endif /* READ_sPLT */
 
 #ifdef PNG_READ_sRGB_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_handle_sRGB,(png_structrp png_ptr,
@@ -1316,10 +1389,6 @@ PNG_INTERNAL_FUNCTION(void,png_push_read_chunk,(png_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(void,png_push_read_sig,(png_structrp png_ptr,
     png_inforp info_ptr),PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void,png_push_check_crc,(png_structrp png_ptr),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_push_crc_skip,(png_structrp png_ptr,
-    png_uint_32 length),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_push_crc_finish,(png_structrp png_ptr),
-    PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void,png_push_save_buffer,(png_structrp png_ptr),
     PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void,png_push_restore_buffer,(png_structrp png_ptr,
@@ -1362,7 +1431,7 @@ PNG_INTERNAL_FUNCTION(void,png_push_read_iTXt,(png_structrp png_ptr,
     png_inforp info_ptr),PNG_EMPTY);
 #  endif
 
-#endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
+#endif /* PROGRESSIVE_READ */
 
 /* Added at libpng version 1.6.0 */
 #ifdef PNG_GAMMA_SUPPORTED
@@ -1762,7 +1831,7 @@ PNG_INTERNAL_FUNCTION(png_byte,png_gamma_8bit_correct,(unsigned int value,
    png_fixed_point gamma_value),PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void,png_destroy_gamma_table,(png_structrp png_ptr),
    PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_build_gamma_tables,(png_structrp png_ptr,
+PNG_INTERNAL_FUNCTION(void,png_build_gamma_table,(png_structrp png_ptr,
    int bit_depth),PNG_EMPTY);
 #endif
 
@@ -1828,7 +1897,7 @@ PNG_INTERNAL_FUNCTION(void, png_image_free, (png_imagep image), PNG_EMPTY);
  * the generic code is used.
  */
 #ifdef PNG_FILTER_OPTIMIZATIONS
-PNG_INTERNAL_FUNCTION(void, PNG_FILTER_OPTIMIZATIONS, (png_structrp png_ptr,
+PNG_INTERNAL_FUNCTION(void, PNG_FILTER_OPTIMIZATIONS, (png_structp png_ptr,
    unsigned int bpp), PNG_EMPTY);
    /* Just declare the optimization that will be used */
 #else

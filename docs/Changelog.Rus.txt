@@ -166,7 +166,8 @@ YouTube
 	MediaInfo 0.7.74+ svn rev.6843;
 	ZenLib 0.4.31+ svn rev.514;
 	speex-1.2beta2-293-gecc63b3;
-	openjpeg 2.1.0 git-f6843d5.
+	openjpeg 2.1.0 git-f6843d5;
+	libpng 1.6.19beta03 git-g33a97c5.
 
 
 1.4.4
