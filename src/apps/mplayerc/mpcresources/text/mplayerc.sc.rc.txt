@@ -257,7 +257,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 22		"向上"
 23		"向下"
 24		"Delay:"
-27		"s"
+27		"sec."
 28		"Change display mode before starting playback"
 30		"退出全屏模式时恢复显示器默认工作模式"
 32		"退出后恢复默认分辨率"
@@ -293,7 +293,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"使用 Windows 7（或更高版本）任务栏功能"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
 6		"如果您希望使用这些滤镜的独立版本或其它可替代品,请在此禁用它。"
 10		"AVI 分离器\n设置"
 11		"MPEG 分离器\n设置"
@@ -302,7 +302,8 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 14		"视频解码器\n设置"
 15		"MPEG-2/DVD\n解码器\n设置"
 16		"音频解码器\n设置"
-17		"Buffer length (s):"
+17		"Buffer length:"
+20		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12

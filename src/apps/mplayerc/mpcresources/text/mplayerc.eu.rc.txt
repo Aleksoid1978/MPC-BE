@@ -257,7 +257,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 22		"Gora"
 23		"Behera"
 24		"Delay:"
-27		"s"
+27		"sec."
 28		"Change display mode before starting playback"
 30		"Ezarri berezko monitore modua ikusleiho-osotik irtetzerakoan"
 32		"Leheneratu bereizmena programatik irtetzerakoan"
@@ -293,7 +293,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Erabili Windows 7 (eta berriagoa) Eginkizun-barra ezaugarriak"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
 6		"Iragazki hauen bakarkako bertsioa edo beste ordezko bat erabiltzea nahi baduzu, ezgaitu itzazu hemen. Lodiz idatzitako iragazkiak klik-bikoitzez ireki daitezke beren ezaugarri orrialdeak ikusteko."
 10		"AVI banantzaile\nitxurapena"
 11		"MPEG banantzaile\nitxurapena"
@@ -302,7 +302,8 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 14		"Bideo dekodeatzaile\nitxurapena"
 15		"MPEG-2/DVD\ndekodeatzaile\nitxurapena"
 16		"Audio dekodeatzaile\nitxurapena"
-17		"Buffer length (s):"
+17		"Buffer length:"
+20		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12

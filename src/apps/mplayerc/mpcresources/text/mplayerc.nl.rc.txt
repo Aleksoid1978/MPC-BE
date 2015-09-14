@@ -246,7 +246,7 @@ END
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 5		"Bestanden in volledig scherm openen"
 6		"Toon bedieningspaneel in volledig scherm voor"
-9		"sec(s)"
+9		"sec."
 10		" 0: autom. verbergen; -1: niet verbergen"
 11		"Na weergave, volledig scherm verlaten"
 13		"Bij focus verliezen, volledig scherm verlaten"
@@ -257,7 +257,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 22		"Omhoog"
 23		"Omlaag"
 24		"Delay:"
-27		"s"
+27		"sec."
 28		"Change display mode before starting playback"
 30		"Standaardmonitormodus toepassen bij verlaten van volledig scherm"
 32		"Herstel resolutie bij afsluiten"
@@ -293,7 +293,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Gebruik mogelijkheden van Windows 7 (en hoger)-taakbalk"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
 6		"Als u een standalone-versie of een alternatief van deze filters wilt gebruiken, mag u de interne versie hier uitschakelen."
 10		"AVI-splitter\nconfiguratie"
 11		"MPEG-splitter\nconfiguratie"
@@ -302,7 +302,8 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 14		"Videodecoder\nconfiguratie"
 15		"MPEG-2/DVD-\ndecoder\nconfiguratie"
 16		"Audiodecoder\nconfiguratie"
-17		"Buffer length (s):"
+17		"Buffer length:"
+20		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12

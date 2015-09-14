@@ -257,7 +257,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 22		"위로"
 23		"아래로"
 24		"Delay:"
-27		"s"
+27		"sec."
 28		"Change display mode before starting playback"
 30		"전체화면 종료시 기본값 모니터 모드로 적용"
 32		"종료후에 해상도 복원"
@@ -293,7 +293,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Windows 7(이상) 작업표시줄기능 사용"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
 6		"단독버젼 필터나 그외 대체 필터 사용시 여기서 해당항목을 언첵하세요."
 10		"AVI 스플리터\n설정"
 11		"MPEG 스플리터\n설정"
@@ -302,7 +302,8 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 14		"Video 디코더\n설정"
 15		"MPEG-2/DVD\n디코더\n설정"
 16		"Audio 디코더\n설정"
-17		"Buffer length (s):"
+17		"Buffer length:"
+20		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12

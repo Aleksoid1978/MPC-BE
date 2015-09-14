@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"バージョン情報"
 7		"MPC-BE"
 8		"Copyright © 2002-2015 (Authors.txt ファイルを参照)"
@@ -293,7 +293,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 43		"Windows 7 (とそれ以降) のタスク バー機能を使用"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
 6		"スタンドアロン版または代替フィルターを使用したい場合はここで無効にしてください。太字表示のフィルターはダブルクリックでプロパティ ページが表示されます。"
 10		"AVI スプリッター\n設定"
 11		"MPEG スプリッター\n設定"
@@ -302,7 +302,8 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 20
 14		"ビデオ デコーダー\n設定"
 15		"MPEG-2/DVD\nデコーダー\n設定"
 16		"音声デコーダー\n設定"
-17		"バッファー長 (秒):"
+17		"バッファー長:"
+20		"秒"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -1695,7 +1696,7 @@ STRING IDS_PPAGE_FS_CLN_FROM_FPS		"fps から"
 STRING IDS_PPAGE_FS_CLN_ON_OFF		"オン/オフ"
 STRING IDS_PPAGE_FS_CLN_TO_FPS		"fps まで"
 STRING IDS_PPAGE_FS_DEFAULT		"デフォルト"
-STRING IDS_PPAGE_FS_OTHER	.	"その他"
+STRING IDS_PPAGE_FS_OTHER		"その他"
 STRING IDS_PPAGE_OUTPUT_DXR		"Haali ビデオ レンダラー"
 STRING IDS_PPAGE_OUTPUT_EVR		"エンハンスド ビデオ レンダラー"
 STRING IDS_PPAGE_OUTPUT_EVR_CUSTOM		"エンハンスド ビデオ レンダラー (カスタム)"
