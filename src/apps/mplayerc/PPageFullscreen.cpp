@@ -136,11 +136,12 @@ BOOL CPPageFullscreen::OnInitDialog()
 	m_nTimeOutCtrl.SetRange(-1, 10);
 	m_bExitFullScreenAtTheEnd			= s.fExitFullScreenAtTheEnd;
 	m_bExitFullScreenAtFocusLost		= s.fExitFullScreenAtFocusLost;
-	m_edDMChangeDelay					= s.AutoChangeFullscrRes.iDMChangeDelay;
+	m_edDMChangeDelay					= s.iDMChangeDelay;
 	m_edDMChangeDelay.SetRange(0, 9);
 	m_spnDMChangeDelay.SetRange(0, 9);
 
-	m_bRestoreResAfterExit				= s.AutoChangeFullscrRes.bRestoreResAfterExit;
+
+	m_bRestoreResAfterExit				= s.fRestoreResAfterExit;
 
 	CString str;
 	m_iMonitorType = 0;
@@ -296,11 +297,9 @@ BOOL CPPageFullscreen::OnApply()
 		}
 	}
 
-	m_AutoChangeFullscrRes.bApplyDefault		= !!m_bSetDefault;
-	m_AutoChangeFullscrRes.bRestoreResAfterExit	= !!m_bRestoreResAfterExit;
-	m_AutoChangeFullscrRes.iDMChangeDelay		= m_edDMChangeDelay;
-	s.AutoChangeFullscrRes						= m_AutoChangeFullscrRes;
-	s.fLaunchfullscreen							= !!m_bLaunchFullScreen;
+	m_AutoChangeFullscrRes.bApplyDefault	= !!m_bSetDefault;
+	s.AutoChangeFullscrRes					= m_AutoChangeFullscrRes;
+	s.fLaunchfullscreen						= !!m_bLaunchFullScreen;
 
 	CString str;
 	CString strCurFSMonID;
@@ -319,13 +318,15 @@ BOOL CPPageFullscreen::OnApply()
 	if (m_AutoChangeFullscrRes.bEnabled == false && m_f_hmonitor == L"Current") {
 		m_f_hmonitor = L"Current";
 	}
-	s.strFullScreenMonitor				= m_f_hmonitor;
-	s.strFullScreenMonitorID			= m_f_hmonitorID;
+	s.strFullScreenMonitor					= m_f_hmonitor;
+	s.strFullScreenMonitorID				= m_f_hmonitorID;
 
-	s.fShowBarsWhenFullScreen			= !!m_bShowBarsWhenFullScreen;
-	s.nShowBarsWhenFullScreenTimeOut	= m_edtTimeOut;
-	s.fExitFullScreenAtTheEnd			= !!m_bExitFullScreenAtTheEnd;
-	s.fExitFullScreenAtFocusLost		= !!m_bExitFullScreenAtFocusLost;
+	s.fShowBarsWhenFullScreen				= !!m_bShowBarsWhenFullScreen;
+	s.nShowBarsWhenFullScreenTimeOut		= m_edtTimeOut;
+	s.fExitFullScreenAtTheEnd				= !!m_bExitFullScreenAtTheEnd;
+	s.fExitFullScreenAtFocusLost			= !!m_bExitFullScreenAtFocusLost;
+	s.fRestoreResAfterExit					= !!m_bRestoreResAfterExit;
+	s.iDMChangeDelay						= m_edDMChangeDelay;
 
 	return __super::OnApply();
 }
@@ -491,7 +492,7 @@ void CPPageFullscreen::ModesUpdate()
 	m_list.SetRedraw(FALSE);
 
 	m_bEnableAutoMode = m_AutoChangeFullscrRes.bEnabled > 0;
-	m_bUseMediaInfo = m_AutoChangeFullscrRes.bEnabled == 2;
+	m_bUseMediaInfo = m_AutoChangeFullscrRes.bEnabled == 0;
 
 	/*
 	CString strDevice = m_MonitorDeviceName[m_iMonitorType];
