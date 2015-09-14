@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include "MainFrm.h"
 #include "PPageFullscreen.h"
 #include "../../DSUtil/WinAPIUtils.h"
 #include "../../DSUtil/SysVersion.h"
@@ -515,7 +516,7 @@ void CPPageFullscreen::ModesUpdate()
 
 	dispmode dm;
 	for (int i = 0, m = 0, ModeExist = true;  ; i++) {
-		if (!GetDispMode(i, dm, m_f_hmonitor)) {
+		if (!CMainFrame::GetDispMode(i, dm, m_f_hmonitor)) {
 			break;
 		}
 		if (dm.bpp != 32 || dm.size.cx < 720 || dm.size.cy < 480) {
@@ -543,7 +544,7 @@ void CPPageFullscreen::ModesUpdate()
 	GetCurDispModeString(strCur);
 
 	dispmode dCurMod;
-	GetCurDispMode(dCurMod, m_f_hmonitor);
+	CMainFrame::GetCurDispMode(dCurMod, m_f_hmonitor);
 
 	int curModeIdx = m_dms.GetCount() - 1;
 	for (size_t i = 0; i < m_dms.GetCount(); i++) {
@@ -794,7 +795,7 @@ void CPPageFullscreen::ReindexList()
 void CPPageFullscreen::GetCurDispModeString(CString& strCur)
 {
 	dispmode dmod;
-	GetCurDispMode(dmod, m_f_hmonitor);
+	CMainFrame::GetCurDispMode(dmod, m_f_hmonitor);
 
 	strCur = FormatModeString(dmod);
 }

@@ -1023,9 +1023,11 @@ void CMainFrame::OnClose()
 	s.WinLircClient.DisConnect();
 	s.UIceClient.DisConnect();
 
+	/*
 	if (s.AutoChangeFullscrRes.bEnabled && s.fRestoreResAfterExit) {
 		SetDispMode(s.dm_def, s.strFullScreenMonitor);
 	}
+	*/
 
 	if (m_hDWMAPI) {
 		FreeLibrary(m_hDWMAPI);
@@ -2608,6 +2610,13 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 		case TIMER_STATUSERASER: {
 			KillTimer(TIMER_STATUSERASER);
 			m_playingmsg.Empty();
+		}
+		break;
+		case TIMER_DM_AUTOCHANGING: {
+			KillTimer(TIMER_DM_AUTOCHANGING);
+
+			ASSERT(GetMediaState() != State_Stopped);
+			OnPlayPlay();
 		}
 		break;
 	}
@@ -7935,6 +7944,7 @@ void CMainFrame::KillTimersStop()
 	KillTimer(TIMER_STREAMPOSPOLLER2);
 	KillTimer(TIMER_STREAMPOSPOLLER);
 	KillTimer(TIMER_STATS);
+	KillTimer(TIMER_DM_AUTOCHANGING);
 }
 
 static int rangebsearch(REFERENCE_TIME val, CAtlArray<REFERENCE_TIME>& rta)
@@ -10612,6 +10622,77 @@ void CMainFrame::AutoChangeMonitorMode()
 				return;
 			}
 		}
+	}
+}
+
+bool CMainFrame::GetCurDispMode(dispmode& dm, CString& DisplayName)
+{
+	return GetDispMode(ENUM_CURRENT_SETTINGS, dm, DisplayName);
+}
+
+bool CMainFrame::GetDispMode(int i, dispmode& dm, CString& DisplayName)
+{
+	DEVMODE devmode;
+	devmode.dmSize = sizeof(DEVMODE);
+	if (DisplayName == L"Current" || DisplayName.IsEmpty()) {
+		CMonitor monitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+		monitor.GetName(DisplayName);
+	}
+
+	dm.bValid = !!EnumDisplaySettings(DisplayName, i, &devmode);
+
+	if (dm.bValid) {
+		dm.size = CSize(devmode.dmPelsWidth, devmode.dmPelsHeight);
+		dm.bpp = devmode.dmBitsPerPel;
+		dm.freq = devmode.dmDisplayFrequency;
+		dm.dmDisplayFlags = devmode.dmDisplayFlags;
+	}
+
+	return dm.bValid;
+}
+
+void CMainFrame::SetDispMode(dispmode& dm, CString& DisplayName)
+{
+	const AppSettings& s = AfxGetAppSettings();
+
+	dispmode dm1;
+	if (!s.AutoChangeFullscrRes.bEnabled
+			|| !GetCurDispMode(dm1, DisplayName)
+			|| ((dm.size == dm1.size) && (dm.bpp == dm1.bpp) && (dm.freq == dm1.freq))) {
+		return;
+	}
+
+	DEVMODE dmScreenSettings;
+	memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
+	dmScreenSettings.dmSize = sizeof(dmScreenSettings);
+	dmScreenSettings.dmPelsWidth = dm.size.cx;
+	dmScreenSettings.dmPelsHeight = dm.size.cy;
+	dmScreenSettings.dmBitsPerPel = dm.bpp;
+	dmScreenSettings.dmDisplayFrequency = dm.freq;
+	dmScreenSettings.dmDisplayFlags = dm.dmDisplayFlags;
+	dmScreenSettings.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY | DM_DISPLAYFLAGS;
+	CString DisplayName1 = DisplayName;
+	if (DisplayName == _T("Current") || DisplayName.IsEmpty()) {
+		CMonitor monitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+		monitor.GetName(DisplayName1);
+	}
+
+	BOOL bPausedForAutochangeMonitorMode = FALSE;
+	if (m_eMediaLoadState == MLS_LOADED && GetMediaState() == State_Running && s.iDMChangeDelay) {
+		// pause if the mode is being changed during playback
+		OnPlayPause();
+		bPausedForAutochangeMonitorMode = TRUE;
+	}
+
+	if (!s.fRestoreResAfterExit) {
+		ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, CDS_UPDATEREGISTRY | CDS_NORESET, NULL);
+		ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
+	} else {
+		ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, CDS_FULLSCREEN, NULL);
+	}
+
+	if (bPausedForAutochangeMonitorMode) {
+		SetTimer(TIMER_DM_AUTOCHANGING, s.iDMChangeDelay * 1000, NULL);	
 	}
 }
 
@@ -13659,6 +13740,8 @@ void CMainFrame::CloseMediaPrivate()
 	DbgLog((LOG_TRACE, 3, L"CMainFrame::CloseMediaPrivate() : start"));
 
 	ASSERT(m_eMediaLoadState == MLS_CLOSING);
+
+	KillTimer(TIMER_DM_AUTOCHANGING);
 
 	m_strCurPlaybackLabel.Empty();
 	m_strFnFull.Empty();
