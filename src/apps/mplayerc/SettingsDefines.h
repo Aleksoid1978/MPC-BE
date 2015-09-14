@@ -116,8 +116,6 @@
 #define IDS_RS_FULLSCREENMONITOR			_T("FullScreenMonitor")
 #define IDS_RS_FULLSCREENMONITORID			_T("FullScreenMonitorID")
 #define IDS_RS_FULLSCREENRES				_T("FullscreenRes")
-#define IDS_RS_RESTORERESAFTEREXIT			_T("RestoreResAfterExit")
-#define IDS_RS_DISPLAYMODECHANGEDELAY		_T("DisplayModeChangeDelay")
 
 #define IDS_RS_SPCSIZE						_T("SPCSize")
 #define IDS_RS_SPMAXTEXRES					_T("SPMaxTexRes")
