@@ -10657,26 +10657,17 @@ void CMainFrame::SetDispMode(dispmode& dm, CString& DisplayName)
 {
 	const AppSettings& s = AfxGetAppSettings();
 
-	dispmode dm1;
+	dispmode currentdm;
 	if (!s.AutoChangeFullscrRes.bEnabled
-			|| !GetCurDispMode(dm1, DisplayName)
-			|| ((dm.size == dm1.size) && (dm.bpp == dm1.bpp) && (dm.freq == dm1.freq))) {
+			|| !GetCurDispMode(currentdm, DisplayName)
+			|| ((dm.size == currentdm.size) && (dm.bpp == currentdm.bpp) && (dm.freq == currentdm.freq))) {
 		return;
 	}
 
-	DEVMODE dmScreenSettings;
-	memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
-	dmScreenSettings.dmSize = sizeof(dmScreenSettings);
-	dmScreenSettings.dmPelsWidth = dm.size.cx;
-	dmScreenSettings.dmPelsHeight = dm.size.cy;
-	dmScreenSettings.dmBitsPerPel = dm.bpp;
-	dmScreenSettings.dmDisplayFrequency = dm.freq;
-	dmScreenSettings.dmDisplayFlags = dm.dmDisplayFlags;
-	dmScreenSettings.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY | DM_DISPLAYFLAGS;
-	CString DisplayName1 = DisplayName;
+	CString ChangeDisplayName = DisplayName;
 	if (DisplayName == _T("Current") || DisplayName.IsEmpty()) {
 		CMonitor monitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
-		monitor.GetName(DisplayName1);
+		monitor.GetName(ChangeDisplayName);
 	}
 
 	BOOL bPausedForAutochangeMonitorMode = FALSE;
@@ -10686,11 +10677,22 @@ void CMainFrame::SetDispMode(dispmode& dm, CString& DisplayName)
 		bPausedForAutochangeMonitorMode = TRUE;
 	}
 
-	if (!s.fRestoreResAfterExit) {
-		ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, CDS_UPDATEREGISTRY | CDS_NORESET, NULL);
-		ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
+	DEVMODE dmScreenSettings = { 0 };
+	dmScreenSettings.dmSize             = sizeof(dmScreenSettings);
+	dmScreenSettings.dmPelsWidth        = dm.size.cx;
+	dmScreenSettings.dmPelsHeight       = dm.size.cy;
+	dmScreenSettings.dmBitsPerPel       = dm.bpp;
+	dmScreenSettings.dmDisplayFrequency = dm.freq;
+	dmScreenSettings.dmDisplayFlags     = dm.dmDisplayFlags;
+	dmScreenSettings.dmFields           = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY | DM_DISPLAYFLAGS;
+
+	if (s.fRestoreResAfterExit) {
+		ChangeDisplaySettingsEx(ChangeDisplayName, &dmScreenSettings, NULL, CDS_FULLSCREEN, NULL);
 	} else {
-		ChangeDisplaySettingsEx(DisplayName1, &dmScreenSettings, NULL, CDS_FULLSCREEN, NULL);
+		LONG ret = ChangeDisplaySettingsEx(ChangeDisplayName, &dmScreenSettings, NULL, CDS_UPDATEREGISTRY | CDS_NORESET, NULL);
+		if (ret == DISP_CHANGE_SUCCESSFUL) {
+			ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
+		}
 	}
 
 	if (bPausedForAutochangeMonitorMode) {
