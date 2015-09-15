@@ -42,7 +42,7 @@ CPPageFullscreen::CPPageFullscreen()
 	: CPPageBase(CPPageFullscreen::IDD, CPPageFullscreen::IDD)
 	, m_bLaunchFullScreen(FALSE)
 	, m_bEnableAutoMode(FALSE)
-	, m_bUseMediaInfo(FALSE)
+	, m_bBeforePlayback(FALSE)
 	, m_bSetDefault(FALSE)
 	, m_bShowBarsWhenFullScreen(FALSE)
 	, m_bExitFullScreenAtTheEnd(FALSE)
@@ -69,7 +69,7 @@ void CPPageFullscreen::DoDataExchange(CDataExchange* pDX)
 	DDX_CBIndex(pDX, IDC_COMBO1, m_iMonitorType);
 	DDX_Control(pDX, IDC_COMBO1, m_iMonitorTypeCtrl);
 	DDX_Check(pDX, IDC_CHECK2, m_bEnableAutoMode);
-	DDX_Check(pDX, IDC_CHECK7, m_bUseMediaInfo);
+	DDX_Check(pDX, IDC_CHECK7, m_bBeforePlayback);
 	DDX_Control(pDX, IDC_LIST1, m_list);
 	DDX_Control(pDX, IDC_EDIT2, m_edDMChangeDelay);
 	DDX_Control(pDX, IDC_SPIN2, m_spnDMChangeDelay);
@@ -259,7 +259,7 @@ void CPPageFullscreen::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	} else if ( (CDDS_ITEMPREPAINT | CDDS_SUBITEM) == pLVCD->nmcd.dwDrawStage ) {
 		COLORREF crText, crBkgnd;
 
-		m_AutoChangeFullscrRes.bEnabled = m_bEnableAutoMode ? m_bEnableAutoMode + m_bUseMediaInfo : 0;
+		m_AutoChangeFullscrRes.bEnabled = m_bEnableAutoMode ? m_bEnableAutoMode + m_bBeforePlayback : 0;
 
 		if (m_AutoChangeFullscrRes.bEnabled == false) {
 			crText = RGB(128,128,128);
@@ -283,7 +283,7 @@ BOOL CPPageFullscreen::OnApply()
 
 	AppSettings& s = AfxGetAppSettings();
 
-	m_AutoChangeFullscrRes.bEnabled = m_bEnableAutoMode ? m_bEnableAutoMode + m_bUseMediaInfo : 0;
+	m_AutoChangeFullscrRes.bEnabled = m_bEnableAutoMode ? m_bEnableAutoMode + m_bBeforePlayback : 0;
 
 	for (int nItem = 0; nItem < MaxFpsCount; nItem++) {
 		if (nItem < m_list.GetItemCount()) {
@@ -492,7 +492,7 @@ void CPPageFullscreen::ModesUpdate()
 	m_list.SetRedraw(FALSE);
 
 	m_bEnableAutoMode = m_AutoChangeFullscrRes.bEnabled > 0;
-	m_bUseMediaInfo = m_AutoChangeFullscrRes.bEnabled == 0;
+	m_bBeforePlayback = m_AutoChangeFullscrRes.bEnabled == 2;
 
 	/*
 	CString strDevice = m_MonitorDeviceName[m_iMonitorType];

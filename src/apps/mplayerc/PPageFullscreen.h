@@ -39,7 +39,7 @@ private:
 	BOOL m_bLaunchFullScreen;
 
 	BOOL m_bEnableAutoMode;
-	BOOL m_bUseMediaInfo; // change display mode before starting playback
+	BOOL m_bBeforePlayback; // change display mode before starting playback
 	BOOL m_bSetDefault;
 
 	AChFR m_AutoChangeFullscrRes;
