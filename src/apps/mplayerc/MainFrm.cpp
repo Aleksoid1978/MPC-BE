@@ -4090,11 +4090,17 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		}
 	}
 
-	m_bfirstPlay	= true;
-	m_LastOpenFile	= m_lastOMD->title;
+	m_bfirstPlay   = true;
+	m_LastOpenFile = m_lastOMD->title;
 
 	if (!(s.nCLSwitches & CLSW_OPEN) && (s.nLoops > 0)) {
-		SendMessage(WM_COMMAND, ID_PLAY_PLAY);
+		if (s.AutoChangeFullscrRes.bEnabled == 1
+				&& (m_bFullScreen || IsD3DFullScreenMode())
+				&& s.iDMChangeDelay > 0) {
+			SetTimer(TIMER_DM_AUTOCHANGING, s.iDMChangeDelay * 1000, NULL);
+		} else {
+			SendMessage(WM_COMMAND, ID_PLAY_PLAY);
+		}
 	} else {
 		SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 	}
@@ -4102,10 +4108,6 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	SendNowPlayingToApi();
 
-	if (s.AutoChangeFullscrRes.bEnabled == 1
-			&& (m_bFullScreen || IsD3DFullScreenMode())) {
-		AutoChangeMonitorMode();
-	}
 	if (m_bFullScreen && s.fRememberZoomLevel) {
 		m_bFirstFSAfterLaunchOnFullScreen = true;
 	}
