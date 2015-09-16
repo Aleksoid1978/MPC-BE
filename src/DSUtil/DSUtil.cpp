@@ -235,7 +235,8 @@ bool IsAudioWaveRenderer(IBaseFilter* pBF)
 	pBF->GetClassID(&clsid);
 
 	return (clsid == CLSID_DSoundRender || clsid == CLSID_AudioRender ||
-			clsid == CLSID_ReClock || clsid == CLSID_MPAudioRenderer || clsid == CLSID_SanearAudioRenderer ||
+			clsid == CLSID_ReClock || clsid == CLSID_MPAudioRenderer ||
+			clsid == CLSID_SanearAudioRenderer || clsid == CLSID_SurodevASIORenderer ||
 			clsid == CLSID_MpcAudioRenderer || clsid == __uuidof(CNullAudioRenderer) || clsid == __uuidof(CNullUAudioRenderer));
 }
 
