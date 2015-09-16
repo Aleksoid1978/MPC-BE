@@ -7516,6 +7516,15 @@ void CMainFrame::OnUpdateViewOntop(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewOptions()
 {
+	if (IsD3DFullScreenMode()) {
+		const CMonitor monitorD3D  = CMonitors::GetNearestMonitor(m_pFullscreenWnd);
+		const CMonitor monitorMain = CMonitors::GetNearestMonitor(this);
+
+		if (monitorD3D == monitorMain) {
+			return;
+		}
+	}
+
 	ShowOptions();
 }
 
