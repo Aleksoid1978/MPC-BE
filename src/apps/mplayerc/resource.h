@@ -123,11 +123,12 @@
 #define ID_EDL_NEWCLIP                  849
 #define ID_ASPECTRATIO_START            850
 #define ID_ASPECTRATIO_SOURCE           850
-#define ID_ASPECTRATIO_4_3              851
-#define ID_ASPECTRATIO_5_4              852
-#define ID_ASPECTRATIO_16_9             853
-#define ID_ASPECTRATIO_235_100          854
-#define ID_ASPECTRATIO_185_100          855
+#define ID_ASPECTRATIO_1_1              851
+#define ID_ASPECTRATIO_4_3              852
+#define ID_ASPECTRATIO_5_4              853
+#define ID_ASPECTRATIO_16_9             854
+#define ID_ASPECTRATIO_235_100          855
+#define ID_ASPECTRATIO_185_100          856
 #define ID_ASPECTRATIO_END              858
 #define ID_ASPECTRATIO_NEXT             859
 #define ID_EDL_SAVE                     860
