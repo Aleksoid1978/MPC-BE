@@ -7451,8 +7451,7 @@ void CMainFrame::OnUpdateViewRotate(CCmdUI* pCmdUI)
 	pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly && m_pCAP);
 }
 
-// FIXME
-const static SIZE s_ar[] = {{0, 0}, {4, 3}, {5, 4}, {16, 9}, {235, 100}, {185, 100}};
+const static SIZE s_ar[] = { {0, 0}, {1, 1}, {4, 3}, {5, 4}, {16, 9}, {235, 100}, {185, 100} };
 
 void CMainFrame::OnViewAspectRatio(UINT nID)
 {
