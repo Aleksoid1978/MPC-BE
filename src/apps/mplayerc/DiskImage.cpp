@@ -482,9 +482,9 @@ TCHAR CDiskImage::MountVCD(LPCTSTR pathName)
 			// wait until Virtual CloneDrive initialized.
 			WIN32_FIND_DATA fd = {0};
 			HANDLE hFind;
-			CString s = CString(letter) + ":\*.*";
+			CString s = CString(letter) + _T(":\\*.*");
 			for (int i = 0; i < 100; i++) {
-				HANDLE hFind = FindFirstFile(s, &fd);
+				hFind = FindFirstFile(s, &fd);
 				if (hFind != INVALID_HANDLE_VALUE) {
 					FindClose(hFind);
 					break;
