@@ -22,9 +22,6 @@
 
 #include <VirtDisk.h>
 
-#define ENABLE_DTLITE_SUPPORT 1
-#define ENABLE_VIRTUALCLONEDRIVE_SUPPORT 1
-
 class CDiskImage
 {
 private:
@@ -33,6 +30,7 @@ private:
 	DriveType	m_DriveType;
 	TCHAR		m_DriveLetter;
 
+	// Windows 8 VirtualDisk
 	HMODULE		m_hVirtualDiskModule;
 	HRESULT		(__stdcall * m_OpenVirtualDiskFunc)(
 				__in     PVIRTUAL_STORAGE_TYPE         VirtualStorageType,
@@ -54,14 +52,13 @@ private:
 				__out_bcount(DiskPathSizeInBytes) PWSTR  DiskPath);
 	HANDLE		m_VHDHandle;
 
-#if ENABLE_DTLITE_SUPPORT
+	// DAEMON Tools Lite
 	enum dtdrive {dt_none, dt_dt, dt_scsi};
 	dtdrive		m_dtdrive;
 	CString		m_dtlite_path;
-#endif
-#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
+
+	// Virtual CloneDrive
 	CString		m_vcd_path;
-#endif
 
 public:
 	CDiskImage();
@@ -78,11 +75,12 @@ public:
 	TCHAR GetDriveLetter() { return m_DriveLetter; };
 
 private:
+	// Windows 8 VirtualDisk
 	TCHAR MountWin8(LPCTSTR pathName);
-#if ENABLE_DTLITE_SUPPORT
+
+	// DAEMON Tools Lite
 	TCHAR MountDTLite(LPCTSTR pathName);
-#endif
-#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
+
+	// Virtual CloneDrive
 	TCHAR MountVCD(LPCTSTR pathName);
-#endif
 };

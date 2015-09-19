@@ -25,17 +25,21 @@
 #include <WinIoCtl.h>
 #include "DiskImage.h"
 
+#define ENABLE_DTLITE 1
+#define ENABLE_VIRTUALCLONEDRIVE 1
+#define ENABLE_WIN8VIRTUALDISK 1
+
 CDiskImage::CDiskImage()
 	: m_DriveType(NONE)
 	, m_DriveLetter(0)
+	// Windows 8 VirtualDisk
 	, m_hVirtualDiskModule(NULL)
 	, m_OpenVirtualDiskFunc(NULL)
 	, m_AttachVirtualDiskFunc(NULL)
 	, m_GetVirtualDiskPhysicalPathFunc(NULL)
 	, m_VHDHandle(INVALID_HANDLE_VALUE)
-#if ENABLE_DTLITE_SUPPORT
+	// DAEMON Tools Lite
 	, m_dtdrive(dt_none)
-#endif
 {
 }
 
@@ -51,27 +55,9 @@ CDiskImage::~CDiskImage()
 
 void CDiskImage::Init()
 {
-	// Windows 8 Virtual Disks functions
-	if (IsWinEightOrLater()) {
-		m_hVirtualDiskModule = LoadLibrary(L"VirtDisk.dll");
-
-		if (m_hVirtualDiskModule) {
-			(FARPROC &)m_OpenVirtualDiskFunc			= GetProcAddress(m_hVirtualDiskModule, "OpenVirtualDisk");
-			(FARPROC &)m_AttachVirtualDiskFunc			= GetProcAddress(m_hVirtualDiskModule, "AttachVirtualDisk");
-			(FARPROC &)m_GetVirtualDiskPhysicalPathFunc	= GetProcAddress(m_hVirtualDiskModule, "GetVirtualDiskPhysicalPath");
-
-			if (m_OpenVirtualDiskFunc && m_AttachVirtualDiskFunc && m_GetVirtualDiskPhysicalPathFunc) {
-				m_DriveType = WIN8;
-				return;
-			}
-
-			FreeLibrary(m_hVirtualDiskModule);
-			m_hVirtualDiskModule = NULL;
-		}
-	}
-
 	CRegKey key;
-#if ENABLE_DTLITE_SUPPORT
+
+#if ENABLE_DTLITE
 	// DAEMON Tools Lite
 	m_dtlite_path.Empty();
 
@@ -109,8 +95,8 @@ void CDiskImage::Init()
 	}
 #endif
 
-#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
-	// DAEMON Tools Lite
+#if ENABLE_VIRTUALCLONEDRIVE
+	// Virtual CloneDrive
 	m_vcd_path.Empty();
 
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\VCDMount.exe"), KEY_READ)) {
@@ -129,6 +115,27 @@ void CDiskImage::Init()
 		return;
 	}
 #endif
+
+#if ENABLE_WIN8VIRTUALDISK
+	// Windows 8 VirtualDisk
+	if (IsWinEightOrLater()) {
+		m_hVirtualDiskModule = LoadLibrary(L"VirtDisk.dll");
+
+		if (m_hVirtualDiskModule) {
+			(FARPROC &)m_OpenVirtualDiskFunc			= GetProcAddress(m_hVirtualDiskModule, "OpenVirtualDisk");
+			(FARPROC &)m_AttachVirtualDiskFunc			= GetProcAddress(m_hVirtualDiskModule, "AttachVirtualDisk");
+			(FARPROC &)m_GetVirtualDiskPhysicalPathFunc	= GetProcAddress(m_hVirtualDiskModule, "GetVirtualDiskPhysicalPath");
+
+			if (m_OpenVirtualDiskFunc && m_AttachVirtualDiskFunc && m_GetVirtualDiskPhysicalPathFunc) {
+				m_DriveType = WIN8;
+				return;
+			}
+
+			FreeLibrary(m_hVirtualDiskModule);
+			m_hVirtualDiskModule = NULL;
+		}
+	}
+#endif
 }
 
 bool CDiskImage::DriveAvailable()
@@ -138,19 +145,20 @@ bool CDiskImage::DriveAvailable()
 
 const LPCTSTR CDiskImage::GetExts()
 {
-	if (m_DriveType == WIN8) {
-		return _T("*.iso");
-	}
-#if ENABLE_DTLITE_SUPPORT
+	// DAEMON Tools Lite
 	if (m_DriveType == DTLITE) {
 		return _T("*.iso;*.nrg;*.mdf;*.isz;*.ccd");
 	}
-#endif
-#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
+
+	// Virtual CloneDrive
 	if (m_DriveType == VCD) {
 		return _T("*.iso;*.ccd");
 	}
-#endif
+
+	// Windows 8 VirtualDisk
+	if (m_DriveType == WIN8) {
+		return _T("*.iso");
+	}
 
 	return NULL;
 }
@@ -163,19 +171,20 @@ bool CDiskImage::CheckExtension(LPCTSTR pathName)
 		ext = L".iso.wv";
 	}
 
-	if (m_DriveType == WIN8 && (ext == L".iso" || ext == L".iso.wv")) {
-		return true;
-	}
-#if ENABLE_DTLITE_SUPPORT
+	// DAEMON Tools Lite
 	if (m_DriveType == DTLITE && (ext == L".iso" || ext == L".nrg" || ext == L".mdf" || ext == L".isz" || ext == L".ccd" || ext == L".iso.wv")) {
 		return true;
 	}
-#endif
-#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
+
+	// Virtual CloneDrive
 	if (m_DriveType == VCD && (ext == L".iso" || ext == L".ccd" || ext == L".iso.wv")) {
 		return true;
 	}
-#endif
+
+	// Windows 8 VirtualDisk
+	if (m_DriveType == WIN8 && (ext == L".iso" || ext == L".iso.wv")) {
+		return true;
+	}
 
 	return false;
 }
@@ -186,19 +195,20 @@ TCHAR CDiskImage::MountDiskImage(LPCTSTR pathName)
 	m_DriveLetter = 0;
 
 	if (::PathFileExists(pathName)) {
-		if (m_DriveType == WIN8) {
-			m_DriveLetter = MountWin8(pathName);
-		}
-#if ENABLE_DTLITE_SUPPORT
+		// DAEMON Tools Lite
 		if (m_DriveType == DTLITE) {
 			m_DriveLetter = MountDTLite(pathName);
 		}
-#endif
-#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
+
+		// Virtual CloneDrive
 		if (m_DriveType == VCD) {
 			m_DriveLetter = MountVCD(pathName);
 		}
-#endif
+
+		// Windows 8 VirtualDisk
+		if (m_DriveType == WIN8) {
+			m_DriveLetter = MountWin8(pathName);
+		}
 	}
 
 	return m_DriveLetter;
@@ -206,11 +216,7 @@ TCHAR CDiskImage::MountDiskImage(LPCTSTR pathName)
 
 void CDiskImage::UnmountDiskImage()
 {
-	if (m_DriveType == WIN8) {
-		SAFE_CLOSE_HANDLE(m_VHDHandle);
-	}
-
-#if ENABLE_DTLITE_SUPPORT
+	// DAEMON Tools Lite
 	if (m_DriveType == DTLITE && m_dtdrive > dt_none) {
 		SHELLEXECUTEINFO execinfo;
 		memset(&execinfo, 0, sizeof(execinfo));
@@ -232,8 +238,8 @@ void CDiskImage::UnmountDiskImage()
 			m_dtdrive = dt_none;
 		}
 	}
-#endif
-#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
+
+	// Virtual CloneDrive
 	if (m_DriveType == VCD) {
 		SHELLEXECUTEINFO execinfo;
 		memset(&execinfo, 0, sizeof(execinfo));
@@ -247,7 +253,11 @@ void CDiskImage::UnmountDiskImage()
 			// do not wait for execution result
 		}
 	}
-#endif
+
+	// Windows 8 VirtualDisk
+	if (m_DriveType == WIN8) {
+		SAFE_CLOSE_HANDLE(m_VHDHandle);
+	}
 
 	m_DriveLetter = 0;
 }
@@ -374,7 +384,6 @@ TCHAR CDiskImage::MountWin8(LPCTSTR pathName)
 	return 0;
 }
 
-#if ENABLE_DTLITE_SUPPORT
 TCHAR CDiskImage::MountDTLite(LPCTSTR pathName)
 {
 	m_dtdrive = dt_none;
@@ -428,9 +437,7 @@ TCHAR CDiskImage::MountDTLite(LPCTSTR pathName)
 
 	return letter;
 }
-#endif
 
-#if ENABLE_VIRTUALCLONEDRIVE_SUPPORT
 TCHAR CDiskImage::MountVCD(LPCTSTR pathName)
 {
 	TCHAR letter = 0;
@@ -480,4 +487,3 @@ TCHAR CDiskImage::MountVCD(LPCTSTR pathName)
 
 	return letter;
 }
-#endif
