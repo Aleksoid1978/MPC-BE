@@ -424,18 +424,17 @@ TCHAR CDiskImage::MountDTLite(LPCTSTR pathName)
 		return 0;
 	}
 	TCHAR letter = 'A' + ec;
+	execinfo.lpParameters = parameters;
 
 	ec = (DWORD)-1;
-	execinfo.lpParameters = parameters;
-	if (!ShellExecuteEx(&execinfo)) {
-		return 0;
-	}
-	WaitForSingleObject(execinfo.hProcess, INFINITE);
-	if (!GetExitCodeProcess(execinfo.hProcess, &ec) && ec != 0) {
-		return 0;
+	if (ShellExecuteEx(&execinfo)) {
+		WaitForSingleObject(execinfo.hProcess, INFINITE);
+		if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec == 0) {
+			return letter;
+		}
 	}
 
-	return letter;
+	return 0;
 }
 
 TCHAR CDiskImage::MountVCD(LPCTSTR pathName)
@@ -477,13 +476,25 @@ TCHAR CDiskImage::MountVCD(LPCTSTR pathName)
 	execinfo.lpParameters = parameters;
 
 	DWORD ec = (DWORD)-1;
-	if (!ShellExecuteEx(&execinfo)) {
-		return 0;
-	}
-	WaitForSingleObject(execinfo.hProcess, INFINITE);
-	if (!GetExitCodeProcess(execinfo.hProcess, &ec) && ec != 0) {
-		return 0;
+	if (ShellExecuteEx(&execinfo)) {
+		WaitForSingleObject(execinfo.hProcess, INFINITE);
+		if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec == 0) {
+			// wait until Virtual CloneDrive initialized.
+			WIN32_FIND_DATA fd = {0};
+			HANDLE hFind;
+			CString s = CString(letter) + ":\*.*";
+			for (int i = 0; i < 100; i++) {
+				HANDLE hFind = FindFirstFile(s, &fd);
+				if (hFind != INVALID_HANDLE_VALUE) {
+					FindClose(hFind);
+					break;
+				}
+				Sleep(100);
+			}
+
+			return letter;
+		}
 	}
 
-	return letter;
+	return 0;
 }
