@@ -7,8 +7,169 @@ Legend:
 * Changed
 ! Fixed
 
-1.4.5 (beta)
+1.4.5
 ==============================
+ShoutcastSource
+Return AAC ADTS stream without a header according to the output subtype MEDIASUBTYPE_RAW_AAC1.
+
+FLACSource
+Writing metadata to extradata output format.
+
+VTSReader
+The option "Read All Program Chains (calculate duration)" was removed as invalid.
+Fixed calculation of the total duration.
+
+UDP / HTTP Reader
+Fixed function returns the data to the splitter, and now reader expects the missing data. This reduces the number of artifacts when watching IPTV.
+
+Splitters
+Removed the queue mechanism measured in number of packets and amount of data. Now the queue length is set in seconds.
+Improved handling of connection failure.
+Added function to change the buffer size from 1 to 10 seconds. The default is 3 seconds.
+
+AviSplitter
+Adds support for MJPEG stream with fourcc 'MSC2'.
+Added support for time delay stream (AVISTREAMHEADER :: dwStart).
+Added support for tag 'vprp' (VideoPropHeader) to obtain data on the aspect ratio.
+
+AudioSplitter
+Added the ability to work together with File Source (URL) in file downloading mode.
+
+MPEGSplitter
+Added support for MPEG-PS + G.711 A-law (such files created Hikvision CCTV cameras).
+Improved handling of MPEG-TS.
+Return AAC ADTS stream without a header according to the output subtype MEDIASUBTYPE_RAW_AAC1.
+Corrected calculation of the duration.
+Improved support for AAC-LATM.
+Removed option "alternative method of calculation of the duration."
+Improved seek accuracy when connected to VTSReader.
+Improved support for HEVC streams.
+Redesigned keyframe search algorithm.
+Added the ability to work together with File Source (URL) in file downloading and streaming mode.
+Optimized tracks search algorithm.
+Determine the change in file size in 10 seconds.
+Fixed and improved with PGS subtitles.
+
+MatroskaSplitter
+Corrected work with Theora video.
+Adjustment and optimization of the calculation of the frame rate in its absence.
+Improved work with VP9 video.
+Fixed and improved with PGS subtitles.
+
+MP4Splitter
+Fixed falling on some corrupted files.
+Added support for tag "Album".
+Added support for codec VC-1 and Windows Media Audio.
+Improved handling of fragmented files.
+
+MpaSplitter.
+Improved algorithm for calculating the duration of VBR streams without VBR header (now's the time in the status bar more stable).
+Fixed opening short of MP3-files.
+Fixed calculation of the duration of a single packet AAC ADTS.
+
+RawVideoSplitter
+Reduced memory consumption when working with H. 264 streams.
+
+RealMediaSplitter
+Fixed crash on some files.
+
+FLVSplitter
+Correctly open the files in which one of the tracks begins with a long delay
+
+MPCVideoDec:
+Improved handling of non-standard order B-frames.
+Fixed decoding of VP9 streams.
+Fill DXVA2_ExtendedFormat for YUV formats.
+Updated list of video cards that support decoding of 4k. Added AMD Radeon R9 285/380 AMD R9 FURY Series, the item has been added Intel HD Graphics and Intel Atom Z8000 Series.
+
+Mpeg2DecFilter
+The option "Send interlaced flag in output media type" is now enabled by default.
+Fixed with 2: 2 pulldown and 2: 3 pulldown.
+Corrected Weave deinterlacing methods work and Blend. Fixed Bob deinterlacing.
+Removed deinterlacing methods Field Shift and ELA as the outside.
+Fixed crash after playback of some animated DVD menus.
+The decoder is now draws subtitles in a DVD-only mode.
+Optimized DVD-menu rendering.
+
+MPC Audio Decoder.
+In status added layout of channels for multichannel sound.
+Use FLAC extradata to correctly specify the location of the channels.
+
+MPC Audio Renderer
+Fixed incorrect unregistering the filter.
+The default volume is 100%.
+In addition to synchronizing by timestamp added selection of the synchronization mode for the duration of the sound ("Sync video to audio"), which is enabled by default. If the video stream is missing, the sound is always synced in duration.
+Fixed Shared mode in case of receiving incorrect data from the driver.
+Added the ability to adjust the balance for PCM stream.
+
+VideoRenderers
+Fixed and optimized jitter calculations and the current frame rate.
+Added interpolation mode "DXVA2", which is available when select "8-bit Integer Surfaces".
+In statistics we have added information about the type of interpolation.
+
+VSFilter
+Fill DXVA2_ExtendedFormat for YUV formats.
+
+Subtitles
+Fixed a problem rendering the subtitles after use the code from MPC-HC (a74db2a6c1b2e710afbd35abbe0c7271c9651b06).
+Proportion adjustment for the internal subtitle rendering is only used for the built-in container stylized subtitles with the completed frame size, aspect ratio different from the aspect ratio of a video frame.
+Fixed support for fade in/out for VobSub subtitles.
+Fixed display of last segment for VobSub subtitles.
+
+YouTube
+Added support for google api V3 to retrieve information about the video.
+
+Player
+Fixed displaying the name of the video codec is shown in PinInfo.
+Added interface support IMadVRSubclassReplacement to submit events in madVR.
+Fixed the Chapter markers on the seek bar in DVD mode.
+Fixed Apply button in the settings window for different occasions.
+Fixed the order of selection options by using "Tab" in the setting window and dialog boxes.
+Fixed display of previews for the 10 and 16-bit video drivers on some Intel and Nvidia.
+In the settings panel "Frame synchronization" added the option "Enable frame time correction".
+Fixed opening additional files using File Source.
+Fixed with a list of "Favorites".
+Improved full-screen mode in Direct3D.
+When open the .ifo files using MediaInfo ignore information to vob-file menu (VTS_XX_0.VOB).
+The subtitle menu item "Insert" is now always active.
+Improved rotation with the flag in the media file. Now the video frame correctly fit the window.
+Fixed main window in the expanded mode.
+Fixed pressing the "Maximize / Restore" on FlayBar in full screen mode.
+Removed special commands to change the audio track and subtitles for the DVD (now used common commands for changing lanes).
+DVD toggle angle commands can now switch video streams in other formats.
+Fixed definition of the active monitor on some configurations.
+Added an .ismv extension to MP4 group.
+The standard list of folders with subtitles added to the folder ".\sub"
+Added shader Adaptive sharpen (author bacondither). Additional information - http://forum.doom9.org/showthread.php?t=172131
+Using the system copy dialog for the command "File->Save As...".
+Closed captions support is activated for the DVD mode using 2 MPC MPEG-Video Decoder.
+Added support for Windows 10.
+Added support Robust DirectShow audio renderer and Surodev ASIO Renderer.
+Added the ability to mount images using Virtual CloneDrive (http://www.slysoft.com/en/virtual-clonedrive.html).
+Fixed snapping to edge of the screen in Windows 10.
+Deleted settings panel Performance.
+Fixed reading ID3TagV2.
+If no description but the presence of ID3 tag 'LYRICS' (lyrics) derive its contents.
+Fixed problem with hovering OSD after hide and maximizing window if the OSD timeout ended when minimized.
+Fixed being able to re-start playback of the file after the end of play.
+Block all connections to MEDIATYPE_AUXLine21Data, if the Line 21 Decoder 2 was blocked for external filters, otherwise you can get the hang of the graph.
+Added an option to change the size of the splitter buffers from 1 to 10 seconds. Default 3 seconds.
+Added an option to change the window when playing audio files.
+Added option to delay play after changing screen resolution.
+
+Updated Dutch and Chinese (Traditional and Simplified) translation (by beter).
+Updated Japanese translation (by Socket774).
+Updated Ukrainian translation (by arestarh1986).
+Updated German translation (by Klaus1189).
+
+Updated libraries:
+	ffmpeg git-n2.8-dev-1844-g6455e4f
+	libdcadec;
+	MediaInfo 0.7.74+ svn rev.6843;
+	ZenLib 0.4.31+ svn rev.514;
+	speex-1.2beta2-293-gecc63b3;
+	openjpeg 2.1.0 git-f6843d5;
+	libpng 1.6.19beta03 git-g33a97c5.
 
 
 1.4.4
