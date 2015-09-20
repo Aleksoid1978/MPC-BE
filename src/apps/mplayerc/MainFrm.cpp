@@ -19057,6 +19057,16 @@ BOOL CMainFrame::OpenIso(CString pathName)
 				return TRUE;
 			}
 
+			if (::PathFileExists(CString(diskletter) + L":\\AUDIO_TS\\ATS_01_0.IFO")) {
+				CAtlList<CString> sl;
+				sl.AddTail(CString(diskletter) + L":\\AUDIO_TS\\ATS_01_0.IFO");
+				m_wndPlaylistBar.Open(sl, false);
+				OpenCurPlaylistItem(INVALID_TIME, FALSE);
+
+				AddRecent(pathName);
+				return TRUE;
+			}
+
 			if (pathName.Right(7).MakeLower() == L".iso.wv") {
 				WIN32_FIND_DATA fd;
 				HANDLE hFind = FindFirstFile(CString(diskletter) + L":\\*.wv", &fd);
