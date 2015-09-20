@@ -487,7 +487,7 @@ TCHAR CDiskImage::MountVCD(LPCTSTR pathName)
 				hFind = FindFirstFile(s, &fd);
 				if (hFind != INVALID_HANDLE_VALUE) {
 					FindClose(hFind);
-					Sleep(200); // Virtual CloneDrive need to give a little more time
+					Sleep(500); // sometimes Virtual CloneDrive need to give a little more time
 					break;
 				}
 				Sleep(100);
