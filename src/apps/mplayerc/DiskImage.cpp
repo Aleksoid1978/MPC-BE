@@ -86,7 +86,7 @@ void CDiskImage::Init()
 		//execinfo.cbSize = sizeof(execinfo);
 		//DWORD ec = 0;
 		//if (ShellExecuteEx(&execinfo)) {
-		//	DWORD gg = WaitForSingleObject(execinfo.hProcess, INFINITE);
+		//	WaitForSingleObject(execinfo.hProcess, INFINITE);
 		//	if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec != (DWORD)-1 && ec != 0) {
 		//		m_DriveType = DTLITE;
 		//		return;
@@ -192,22 +192,30 @@ bool CDiskImage::CheckExtension(LPCTSTR pathName)
 TCHAR CDiskImage::MountDiskImage(LPCTSTR pathName)
 {
 	UnmountDiskImage();
-	m_DriveLetter = 0;
 
 	if (::PathFileExists(pathName)) {
 		// DAEMON Tools Lite
 		if (m_DriveType == DTLITE) {
 			m_DriveLetter = MountDTLite(pathName);
 		}
-
 		// Virtual CloneDrive
-		if (m_DriveType == VCD) {
+		else if (m_DriveType == VCD) {
 			m_DriveLetter = MountVCD(pathName);
 		}
-
 		// Windows 8 VirtualDisk
-		if (m_DriveType == WIN8) {
+		else if (m_DriveType == WIN8) {
 			m_DriveLetter = MountWin8(pathName);
+		}
+
+		if (m_DriveLetter) {
+			// check for supported disc format
+			CString anyfiles = CString(m_DriveLetter) + _T(":\\*.*");
+			WIN32_FIND_DATA fd = { 0 };
+			HANDLE hFind = FindFirstFile(anyfiles, &fd);
+			if (hFind == INVALID_HANDLE_VALUE) {
+				FindClose(hFind);
+				UnmountDiskImage();
+			}
 		}
 	}
 
@@ -216,6 +224,10 @@ TCHAR CDiskImage::MountDiskImage(LPCTSTR pathName)
 
 void CDiskImage::UnmountDiskImage()
 {
+	if (m_DriveLetter == 0) {
+		return;
+	}
+
 	// DAEMON Tools Lite
 	if (m_DriveType == DTLITE && m_dtdrive > dt_none) {
 		SHELLEXECUTEINFO execinfo;
@@ -480,11 +492,11 @@ TCHAR CDiskImage::MountVCD(LPCTSTR pathName)
 		WaitForSingleObject(execinfo.hProcess, INFINITE);
 		if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec == 0) {
 			// wait until Virtual CloneDrive initialized.
+			CString anyfiles = CString(letter) + _T(":\\*.*");
 			WIN32_FIND_DATA fd = {0};
 			HANDLE hFind;
-			CString s = CString(letter) + _T(":\\*.*");
 			for (int i = 0; i < 100; i++) {
-				hFind = FindFirstFile(s, &fd);
+				hFind = FindFirstFile(anyfiles, &fd);
 				if (hFind != INVALID_HANDLE_VALUE) {
 					FindClose(hFind);
 					Sleep(500); // sometimes Virtual CloneDrive need to give a little more time
