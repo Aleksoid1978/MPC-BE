@@ -213,8 +213,9 @@ TCHAR CDiskImage::MountDiskImage(LPCTSTR pathName)
 			WIN32_FIND_DATA fd = { 0 };
 			HANDLE hFind = FindFirstFile(anyfiles, &fd);
 			if (hFind == INVALID_HANDLE_VALUE) {
-				FindClose(hFind);
 				UnmountDiskImage();
+			} else {
+				FindClose(hFind);
 			}
 		}
 	}
