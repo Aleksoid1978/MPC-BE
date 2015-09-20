@@ -250,7 +250,7 @@ void CDiskImage::UnmountDiskImage()
 		execinfo.lpParameters = L"/d=0 /u";
 
 		if (ShellExecuteEx(&execinfo)) {
-			// do not wait for execution result
+			WaitForSingleObject(execinfo.hProcess, INFINITE);
 		}
 	}
 
@@ -487,6 +487,7 @@ TCHAR CDiskImage::MountVCD(LPCTSTR pathName)
 				hFind = FindFirstFile(s, &fd);
 				if (hFind != INVALID_HANDLE_VALUE) {
 					FindClose(hFind);
+					Sleep(200); // Virtual CloneDrive need to give a little more time
 					break;
 				}
 				Sleep(100);
