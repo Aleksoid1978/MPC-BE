@@ -161,7 +161,7 @@ YouTube
 Обновлен немецкий перевод (автор Klaus1189).
 
 Обновлены библиотеки:
-	ffmpeg git-n2.8-dev-1844-g6455e4f
+	ffmpeg git-n2.8-dev-2658-g01770bf
 	libdcadec;
 	MediaInfo 0.7.74+ svn rev.6843;
 	ZenLib 0.4.31+ svn rev.514;

@@ -1886,7 +1886,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	if (m_pAVCtx->pix_fmt != AV_PIX_FMT_NONE) {
 		const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt);
 		if (av_pfdesc) {
-			int lumabits = av_pfdesc->comp->depth_minus1 + 1;
+			int lumabits = av_pfdesc->comp->depth;
 
 			const MPCPixelFormat* InOutList = NULL;
 

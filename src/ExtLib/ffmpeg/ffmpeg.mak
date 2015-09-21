@@ -504,6 +504,10 @@ SRCS_LC = \
 	libavcodec/x86/vp6dsp_init.c \
 	libavcodec/x86/vp8dsp_init.c \
 	libavcodec/x86/vp9dsp_init.c \
+	libavcodec/x86/vp9dsp_init_10bpp.c \
+	libavcodec/x86/vp9dsp_init_12bpp.c \
+	libavcodec/x86/vp9dsp_init_16bpp.c \
+	libavcodec/x86/vp9dsp_init_16bpp_template.c \
 	libavcodec/x86/xvididct_init.c
 
 SRCS_LF = \
@@ -511,7 +515,6 @@ SRCS_LF = \
 	libavfilter/af_biquads.c \
 	libavfilter/allfilters.c \
 	libavfilter/audio.c \
-	libavfilter/avcodec.c \
 	libavfilter/avfilter.c \
 	libavfilter/avfiltergraph.c \
 	libavfilter/buffer.c \
@@ -601,6 +604,7 @@ SRCS_LR = \
 
 SRCS_LS = \
 	libswscale/alphablend.c \
+	libswscale/gamma.c \
 	libswscale/hscale.c \
 	libswscale/hscale_fast_bilinear.c \
 	libswscale/input.c \
@@ -683,6 +687,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/vp9itxfm.asm \
 	libavcodec/x86/vp9lpf.asm \
 	libavcodec/x86/vp9mc.asm \
+	libavcodec/x86/vp9mc_16bpp.asm \
 	libavcodec/x86/xvididct.asm
 
 SRCS_YASM_LF = \

@@ -328,7 +328,7 @@ static void export_stream_params(AVCodecContext *avctx, const HEVCParamSets *ps,
 
 static int set_sps(HEVCContext *s, const HEVCSPS *sps, enum AVPixelFormat pix_fmt)
 {
-    #define HWACCEL_MAX (CONFIG_HEVC_DXVA2_HWACCEL + CONFIG_HEVC_D3D11VA_HWACCEL + CONFIG_HEVC_VDPAU_HWACCEL)
+    #define HWACCEL_MAX (CONFIG_HEVC_DXVA2_HWACCEL + CONFIG_HEVC_D3D11VA_HWACCEL + CONFIG_HEVC_VAAPI_HWACCEL + CONFIG_HEVC_VDPAU_HWACCEL)
     enum AVPixelFormat pix_fmts[HWACCEL_MAX + 2], *fmt = pix_fmts;
     int ret, i;
 
@@ -351,6 +351,9 @@ static int set_sps(HEVCContext *s, const HEVCSPS *sps, enum AVPixelFormat pix_fm
 #endif
 #if CONFIG_HEVC_D3D11VA_HWACCEL
         *fmt++ = AV_PIX_FMT_D3D11VA_VLD;
+#endif
+#if CONFIG_HEVC_VAAPI_HWACCEL
+        *fmt++ = AV_PIX_FMT_VAAPI;
 #endif
 #if CONFIG_HEVC_VDPAU_HWACCEL
         *fmt++ = AV_PIX_FMT_VDPAU;
@@ -809,6 +812,8 @@ static int hls_slice_header(HEVCContext *s)
     s->slice_initialized = 1;
     s->HEVClc->tu.cu_qp_offset_cb = 0;
     s->HEVClc->tu.cu_qp_offset_cr = 0;
+
+    s->no_rasl_output_flag = IS_IDR(s) || IS_BLA(s) || (s->nal_unit_type == NAL_CRA_NUT && s->last_eos);
 
     return 0;
 }
@@ -2611,11 +2616,6 @@ static int hevc_frame_start(HEVCContext *s)
     if (ret < 0)
         goto fail;
 
-    // ==> Start patch MPC
-    if (IS_IRAP(s))
-        s->NoRaslOutputFlag = 0;
-    // ==> End patch MPC
-
     if (!s->avctx->hwaccel &&
         // ==> Start patch MPC
         !s->avctx->using_dxva
@@ -2795,10 +2795,6 @@ static int decode_nal_units(HEVCContext *s, const uint8_t *buf, int length)
 
     s->ref = NULL;
     s->last_eos = s->eos;
-    // ==> Start patch MPC
-    if (s->last_eos)
-        s->NoRaslOutputFlag = 1;
-    // ==> End patch MPC
     s->eos = 0;
 
     /* split the input packet into NAL units, so we know the upper bound on the
@@ -2850,7 +2846,7 @@ static int verify_md5(HEVCContext *s, AVFrame *frame)
     if (!desc)
         return AVERROR(EINVAL);
 
-    pixel_shift = desc->comp[0].depth_minus1 > 7;
+    pixel_shift = desc->comp[0].depth > 8;
 
     av_log(s->avctx, AV_LOG_DEBUG, "Verifying checksum for frame with POC %d: ",
            s->poc);
@@ -3175,9 +3171,7 @@ static int hevc_update_thread_context(AVCodecContext *dst,
     s->pocTid0    = s0->pocTid0;
     s->max_ra     = s0->max_ra;
     s->eos        = s0->eos;
-    // ==> Start patch MPC
-    s->NoRaslOutputFlag = s0->NoRaslOutputFlag;
-    // ==> End patch MPC
+    s->no_rasl_output_flag = s0->no_rasl_output_flag;
 
     s->is_nalff        = s0->is_nalff;
     s->nal_length_size = s0->nal_length_size;
@@ -3282,9 +3276,7 @@ static av_cold int hevc_decode_init(AVCodecContext *avctx)
 
     s->enable_parallel_tiles = 0;
     s->picture_struct = 0;
-    // ==> Start patch MPC
-    s->NoRaslOutputFlag = 1;
-    // ==> End patch MPC
+    s->eos = 1;
 
     if(avctx->active_thread_type & FF_THREAD_SLICE)
         s->threads_number = avctx->thread_count;
@@ -3326,9 +3318,7 @@ static void hevc_decode_flush(AVCodecContext *avctx)
     HEVCContext *s = avctx->priv_data;
     ff_hevc_flush_dpb(s);
     s->max_ra = INT_MAX;
-    // ==> Start patch MPC
-    s->NoRaslOutputFlag = 1;
-    // ==> End patch MPC
+    s->eos = 1;
 }
 
 #define OFFSET(x) offsetof(HEVCContext, x)
