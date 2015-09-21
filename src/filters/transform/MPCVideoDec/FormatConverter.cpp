@@ -92,7 +92,7 @@ int GetLumaBits(AVPixelFormat av_pix_fmt)
 {
 	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
 
-	return (pfdesc ? pfdesc->comp->depth_minus1 + 1 : 0);
+	return (pfdesc ? pfdesc->comp->depth : 0);
 }
 
 MPCPixelFormat GetPixFormat(GUID& subtype)
@@ -135,7 +135,7 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 		return PFType_unspecified;
 	}
 
-	int lumabits = pfdesc->comp->depth_minus1 + 1;
+	int lumabits = pfdesc->comp->depth;
 
 	if (pfdesc->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL)) {
 		return PFType_RGB;
@@ -519,5 +519,5 @@ bool CFormatConverter::FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2)
 	return av_pfdesc_fmt1->log2_chroma_h != av_pfdesc_fmt2->log2_chroma_h
 			|| av_pfdesc_fmt1->log2_chroma_w != av_pfdesc_fmt2->log2_chroma_w
 			|| av_pfdesc_fmt1->nb_components != av_pfdesc_fmt2->nb_components
-			|| av_pfdesc_fmt1->comp->depth_minus1 != av_pfdesc_fmt2->comp->depth_minus1;
+			|| av_pfdesc_fmt1->comp->depth != av_pfdesc_fmt2->comp->depth;
 }

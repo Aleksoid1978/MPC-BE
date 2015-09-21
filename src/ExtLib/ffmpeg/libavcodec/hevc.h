@@ -871,9 +871,7 @@ typedef struct HEVCContext {
     int bs_height;
 
     int is_decoded;
-    // ==> Start patch MPC
-    int NoRaslOutputFlag;
-    // ==> End patch MPC
+    int no_rasl_output_flag;
 
     HEVCPredContext hpc;
     HEVCDSPContext hevcdsp;
