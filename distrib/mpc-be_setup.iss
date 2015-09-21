@@ -1,6 +1,5 @@
-﻿; $Id$
-;
-; (C) 2009-2014 see Authors.txt
+﻿;
+; (C) 2009-2015 see Authors.txt
 ;
 ; This file is part of MPC-BE.
 ;
@@ -24,7 +23,7 @@
 #define localize
 #define sse_required
 ; #define x64Build
-; #define VS2012
+; #define VS2015
 
 ; Don't forget to update the DirectX SDK number in "include\Version.h" (not updated so often)
 
@@ -49,12 +48,9 @@
 #define quick_launch     "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
 #define dx_sdk_number    str(DIRECTX_SDK_NUMBER)
 
-#define bin_dir        = "..\bin"
-#if defined(VS2012)
-  #define bin_dir      = "..\bin12"
-#endif
-#if defined(VS2013)
-  #define bin_dir      = "..\bin13"
+#define bin_dir        = "..\bin13"
+#if defined(VS2015)
+  #define bin_dir      = "..\bin15"
 #endif
 
 #define bindir_x64 = bin_dir + "\mpc-be_x64"
