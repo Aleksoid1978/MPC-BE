@@ -1475,7 +1475,6 @@ BEGIN
             POPUP "Override Aspect Ratio"
             BEGIN
                 MENUITEM "Default",                     ID_ASPECTRATIO_SOURCE
-                MENUITEM "1:1",                         ID_ASPECTRATIO_1_1
                 MENUITEM "4:3",                         ID_ASPECTRATIO_4_3
                 MENUITEM "5:4",                         ID_ASPECTRATIO_5_4
                 MENUITEM "16:9",                        ID_ASPECTRATIO_16_9
@@ -1644,7 +1643,6 @@ BEGIN
             POPUP "Override Aspect Ratio"
             BEGIN
                 MENUITEM "Default",                     ID_ASPECTRATIO_SOURCE
-                MENUITEM "1:1",                         ID_ASPECTRATIO_1_1
                 MENUITEM "4:3",                         ID_ASPECTRATIO_4_3
                 MENUITEM "5:4",                         ID_ASPECTRATIO_5_4
                 MENUITEM "16:9",                        ID_ASPECTRATIO_16_9
@@ -1858,7 +1856,6 @@ BEGIN
                 POPUP "Override Aspect Ratio"
                 BEGIN
                     MENUITEM "Default",                     ID_ASPECTRATIO_SOURCE
-                    MENUITEM "1:1",                         ID_ASPECTRATIO_1_1
                     MENUITEM "4:3",                         ID_ASPECTRATIO_4_3
                     MENUITEM "5:4",                         ID_ASPECTRATIO_5_4
                     MENUITEM "16:9",                        ID_ASPECTRATIO_16_9
