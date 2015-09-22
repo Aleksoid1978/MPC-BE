@@ -559,6 +559,11 @@ void CPPageInternalFilters::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_btnVideoCfg.ShowWindow(SW_HIDE);
 			m_btnMPEG2Cfg.ShowWindow(SW_HIDE);
 			m_btnAudioCfg.ShowWindow(SW_HIDE);
+
+			GetDlgItem(IDC_STATIC1)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_EDIT1)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_SPIN1)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_STATIC2)->ShowWindow(SW_SHOW);
 			break;
 		case VIDEO :
 			m_listSrc.ShowWindow(SW_HIDE);
@@ -572,6 +577,11 @@ void CPPageInternalFilters::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_btnVideoCfg.ShowWindow(SW_SHOW);
 			m_btnMPEG2Cfg.ShowWindow(SW_SHOW);
 			m_btnAudioCfg.ShowWindow(SW_HIDE);
+
+			GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_EDIT1)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_SPIN1)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_STATIC2)->ShowWindow(SW_HIDE);
 			break;
 		case AUDIO :
 			m_listSrc.ShowWindow(SW_HIDE);
@@ -585,6 +595,11 @@ void CPPageInternalFilters::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_btnVideoCfg.ShowWindow(SW_HIDE);
 			m_btnMPEG2Cfg.ShowWindow(SW_HIDE);
 			m_btnAudioCfg.ShowWindow(SW_SHOW);
+
+			GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_EDIT1)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_SPIN1)->ShowWindow(SW_HIDE);
+			GetDlgItem(IDC_STATIC2)->ShowWindow(SW_HIDE);
 			break;
 		default:
 			break;
