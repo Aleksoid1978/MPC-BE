@@ -106,7 +106,7 @@ public:
 
 	STDMETHODIMP SetType(SUBTITLE_TYPE subtitleType);
 	STDMETHODIMP GetType(SUBTITLE_TYPE* pSubtitleType);
-	
+
 	STDMETHODIMP_(bool) GetInverseAlpha() const;
 	STDMETHODIMP_(void) SetInverseAlpha(bool bInverted);
 };

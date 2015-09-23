@@ -272,7 +272,7 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 						m_ifoFile.Read(buf, 4);
 						duration = FormatTime(buf);
 					}
-					
+
 					DWORD firstVOBUStartSector = ReadDword(); // first VOBU start sector
 					m_ifoFile.Seek(8, CFile::current);
 					DWORD lastVOBUEndSector = ReadDword(); // last VOBU end sector

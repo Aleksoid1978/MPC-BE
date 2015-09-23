@@ -593,7 +593,7 @@ UINT CShoutcastStream::SocketThreadProc()
 
 		m_hSocket = m_socket.Detach();
 	}
-	
+
 	soc.Attach(m_hSocket);
 	soc = m_socket;
 
@@ -786,7 +786,7 @@ HRESULT CShoutcastStream::SetName(LPCWSTR pName)
 	m_pName = DNew WCHAR[len];
 	CheckPointer(m_pName, E_OUTOFMEMORY);
 	wcscpy_s(m_pName, len, pName);
-	
+
 	return S_OK;
 }
 

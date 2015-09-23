@@ -390,9 +390,9 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 
 					otherStreams.AddTail(L"Audio: " + str);
 				}
-			}		
+			}
 		}
-	
+
 		{
 			// DVD subtitles
 			ULONG ulStreamsAvailable, ulCurrentStream;

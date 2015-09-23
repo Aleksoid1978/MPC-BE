@@ -158,7 +158,7 @@ again:
 		if (!ReadFile(m_hFile, lpBuf, nCount - dwRead, &nNumberOfBytesRead, NULL)) {
 			DWORD dwLastError = GetLastError();
 			if (dwLastError != ERROR_SUCCESS) {
-				// TODO - select only the necessary error codes : ERROR_INVALID_HANDLE, ERROR_BAD_NETPATH, ERROR_DEV_NOT_EXIST, ERROR_FILE_INVALID ... 
+				// TODO - select only the necessary error codes : ERROR_INVALID_HANDLE, ERROR_BAD_NETPATH, ERROR_DEV_NOT_EXIST, ERROR_FILE_INVALID ...
 				nCurPart = m_nCurPart;
 				ClosePart();
 				if (OpenPart(nCurPart)) {

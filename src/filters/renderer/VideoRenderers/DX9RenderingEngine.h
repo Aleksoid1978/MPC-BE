@@ -111,7 +111,7 @@ namespace DSObjects
 		CComPtr<IDirect3DSurface9>	m_pVideoSurface[MAX_VIDEO_SURFACES];
 
 		bool						m_bColorManagement;
-		
+
 		int							m_nDX9Resizer;
 
 		CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError);

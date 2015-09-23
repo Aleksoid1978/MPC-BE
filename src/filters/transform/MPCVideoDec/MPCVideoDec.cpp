@@ -1670,7 +1670,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		BOOL bNotTrustSourceTimeStamp = (clsidInput == GUIDFromCString(L"{A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}"));
 
 		m_bCalculateStopTime = (m_nCodecId == AV_CODEC_ID_H264 ||
-								m_nCodecId == AV_CODEC_ID_DIRAC || 
+								m_nCodecId == AV_CODEC_ID_DIRAC ||
 								(m_nCodecId == AV_CODEC_ID_MPEG4 && pmt->formattype == FORMAT_MPEG2Video)
 								|| bNotTrustSourceTimeStamp);
 
@@ -2622,7 +2622,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 			rtStart = m_rtLastStop;
 			rtStop = INVALID_TIME;
 		}
-		
+
 		UpdateFrameTime(rtStart, rtStop);
 
 		if ((pIn && pIn->IsPreroll() == S_OK) || rtStart < 0) {
@@ -3628,7 +3628,7 @@ HRESULT CVideoDecOutputPin::InitAllocator(IMemAllocator **ppAlloc)
 	if (m_pVideoDecFilter->UseDXVA2()) {
 		return m_pVideoDecFilter->InitAllocator(ppAlloc);
 	}
-	
+
 	return __super::InitAllocator(ppAlloc);
 }
 

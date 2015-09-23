@@ -174,7 +174,7 @@ class CShoutcastStream : public CSourceStream
 			return GetCount() ? (GetTail()->rtStop - GetHead()->rtStart) : 0;
 		}
 	};
-	
+
 	ShoutCastqueue m_queue;
 
 	class CShoutcastSocket : public CMPCSocket

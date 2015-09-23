@@ -178,7 +178,7 @@ bool CBaseSplitterFile::WaitData(__int64 pos)
 		__int64 available = m_available;
 		Sleep(1000); // wait for 1 second until the data is loaded (TODO: specify size of the buffer when streaming)
 		UpdateLength();
-		
+
 		if (available == m_available) {
 			if (++n >= 10) {
 				DbgLog((LOG_TRACE, 3, L"BaseSplitter : no new data more than 10 seconds, most likely loss of connection."));
@@ -248,7 +248,7 @@ HRESULT CBaseSplitterFile::SyncRead(BYTE* pData, int& len)
 			hr = m_pAsyncReader->SyncRead(m_pos, 1, pData + read);
 		} while (hr == S_OK && (++read) < len);
 		DbgLog((LOG_TRACE, 3, L"	-> Read %d bytes", read));
-		
+
 		len = read;
 	}
 

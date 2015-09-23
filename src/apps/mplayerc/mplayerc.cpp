@@ -936,7 +936,7 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	}
 	// Ensure the shaders are properly saved
 	AfxGetAppSettings().fShadersNeedSave = true;
-	
+
 	// Save favorites to the new location
 	AfxGetAppSettings().SetFav(FAV_FILE, filesFav);
 	AfxGetAppSettings().SetFav(FAV_DVD, DVDsFav);
@@ -966,7 +966,7 @@ void CMPlayerCApp::ExportSettings()
 		if (ext.CompareNoCase(fileSaveDialog.GetFileExt()) != 0) {
 			savePath.Append(_T(".") + ext);
 		}
-		
+
 		bool success = false;
 		AfxGetAppSettings().SaveSettings();
 

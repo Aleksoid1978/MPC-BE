@@ -834,7 +834,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									}
 								}
 							}
-								
+
 							bIsParse = TRUE;
 							break;
 						}
@@ -2281,7 +2281,7 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 			force_packet = true; // but send this packet anyway
 		} else {
 			// this is sub with picture, force next HDMV sub
-			m_HDMVSub = hdmvsub_neednext; 
+			m_HDMVSub = hdmvsub_neednext;
 		}
 	}
 
@@ -2495,7 +2495,7 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 								sz = GETDWORD(idx);
 								break;
 						}
-						
+
 						idx += nbytes;
 						if (sz > size) {
 							break;
@@ -2507,7 +2507,7 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 						packet->TrackNumber		= tmp->TrackNumber;
 						packet->bDiscontinuity	= tmp->bDiscontinuity;
 						packet->bSyncPoint		= tmp->bSyncPoint;
-						
+
 						const BYTE* buf = packet->GetData();
 						if (buf[0] & 0x2) {
 							packet->rtStart		= rtStartTmp;

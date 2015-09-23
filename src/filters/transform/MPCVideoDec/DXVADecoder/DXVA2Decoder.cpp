@@ -107,7 +107,7 @@ HRESULT CDXVA2Decoder::AddExecuteBuffer(DWORD CompressedBufferType, UINT nSize, 
 	DWORD	dwNumMBs	= 0;
 	UINT	nDXVASize	= 0;
 	BYTE*	pDXVABuffer	= NULL;
-	
+
 	hr = m_pDirectXVideoDec->GetBuffer(CompressedBufferType, (void**)&pDXVABuffer, &nDXVASize);
 	ASSERT(nSize <= nDXVASize);
 
@@ -249,7 +249,7 @@ HRESULT CDXVA2Decoder::GetSapleWrapperData(AVFrame* pFrame, IMediaSample** pSamp
 	SampleWrapper* pSampleWrapper = (SampleWrapper*)pFrame->data[3];
 	if (pSampleWrapper) {
 		*pSample = pSampleWrapper->pSample;
-		
+
 		if (rtStart && rtStop) {
 			m_pFilter->GetFrameTimeStamp(pFrame, *rtStart, *rtStop);
 		}
@@ -263,7 +263,7 @@ HRESULT CDXVA2Decoder::GetSapleWrapperData(AVFrame* pFrame, IMediaSample** pSamp
 HRESULT CDXVA2Decoder::get_buffer_dxva(AVFrame *pic)
 {
 	HRESULT hr = S_OK;
-	
+
 	CComPtr<IMediaSample> pSample;
 	int nSurfaceIndex = -1;
 	CHECK_HR_FALSE (GetFreeSurfaceIndex(nSurfaceIndex, &pSample));

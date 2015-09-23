@@ -573,11 +573,11 @@ bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 					m_bMouseOverCloseButton	= false;
 					InvalidateVMROSD();
 				}
-				
+
 				if (m_rectCloseButton.PtInRect(point) || m_rectExitButton.PtInRect(point)) {
 					m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_HAND);
 				} else {
-					m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_ARROW);				
+					m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_ARROW);
 				}
 			}
 		} else if (m_bSeekBarVisible || m_bFlyBarVisible) {
@@ -593,7 +593,7 @@ void COSD::OnMouseLeave()
 	m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_ARROW);
 
 	const bool bHideBars = (m_pVMB && (m_bSeekBarVisible || m_bFlyBarVisible));
-	
+
 	m_bCursorMoving			= false;
 	m_bSeekBarVisible		= false;
 	m_bFlyBarVisible		= false;

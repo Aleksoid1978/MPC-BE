@@ -508,7 +508,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	m_ModeratedTimeSpeed			= 1.0;
 	m_ModeratedTimeSpeedDiff		= 0.0;
 	m_ModeratedTimeSpeedPrim		= 0;
-	
+
 	m_ClockTimeChangeHistoryPos		= 0;
 
 	m_pDirectDraw = NULL;
@@ -609,7 +609,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			m_d3dpp.FullScreen_RefreshRateInHz = m_refreshRate = d3ddmEx.RefreshRate;
 			m_d3dpp.BackBufferWidth = m_ScreenSize.cx;
 			m_d3dpp.BackBufferHeight = m_ScreenSize.cy;
-			
+
 			bTryToReset = bTryToReset && m_pD3DDevEx && SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&m_d3dpp, &d3ddmEx));
 
 			if (!bTryToReset) {
@@ -713,7 +713,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			DbgLog((LOG_TRACE, 3, L"	=> D3DERR_DEVICENOTRESET"));
 			hr = m_pD3DDev->Reset(&m_d3dpp);
 		}
-		
+
 		if (m_pD3DDevEx) {
 			m_pD3DDevEx->SetGPUThreadPriority(7);
 		}
@@ -1391,7 +1391,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	// Casimir666 : show OSD
 	if (m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_UPDATE) {
 		CAutoLock BitMapLock(&m_VMR9AlphaBitmapLock);
-		
+
 		m_pOSDTexture.Release();
 		m_pOSDSurface.Release();
 

@@ -233,7 +233,7 @@ HRESULT CDXVA1Decoder::BeginFrame(int nSurfaceIndex)
 		if (SUCCEEDED(hr)) {
 			hr = FindFreeDXVA1Buffer(m_dwBufferIndex);
 		}
-		
+
 		// For slow accelerator wait a little...
 		if (SUCCEEDED(hr)) {
 			break;
@@ -253,7 +253,7 @@ HRESULT CDXVA1Decoder::EndFrame(int nSurfaceIndex)
 	AMVAEndFrameInfo EndFrameInfo;
 	EndFrameInfo.dwSizeMiscData	= sizeof(dwDummy);
 	EndFrameInfo.pMiscData		= &dwDummy;
-	
+
 	hr = m_pAMVideoAccelerator->EndFrame(&EndFrameInfo);
 	ASSERT(SUCCEEDED(hr));
 
@@ -396,7 +396,7 @@ void CDXVA1Decoder::FreePictureSlot(int nSurfaceIndex)
 		m_pPictureStore[nSurfaceIndex].nCodecSpecific	= -1;
 		m_pPictureStore[nSurfaceIndex].rtStart			= INVALID_TIME;
 		m_pPictureStore[nSurfaceIndex].rtStop			= INVALID_TIME;
-		
+
 		m_nWaitingPics--;
 	}
 }

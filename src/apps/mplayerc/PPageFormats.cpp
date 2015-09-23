@@ -173,7 +173,7 @@ static int GetIconIndex(LPCTSTR ext)
 			pGetIconIndexFunc = (GetIconIndexFunc)GetProcAddress(mpciconlib, "get_icon_index");
 		}
 	}
-	
+
 	int iconindex = -1;
 	if (pGetIconIndexFunc) {
 		iconindex = pGetIconIndexFunc(ext);
