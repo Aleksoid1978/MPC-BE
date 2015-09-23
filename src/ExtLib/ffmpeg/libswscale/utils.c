@@ -855,11 +855,6 @@ int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4],
     if (need_reinit && (c->srcBpc == 8 || !isYUV(c->srcFormat)))
         ff_sws_init_range_convert(c);
 
-    // ==> Start patch MPC
-    if ((isYUV(c->dstFormat) || isGray(c->dstFormat)) && (isYUV(c->srcFormat) || isGray(c->srcFormat)))
-        return -1;
-    // ==> End patch MPC
-
     c->dstFormatBpp = av_get_bits_per_pixel(desc_dst);
     c->srcFormatBpp = av_get_bits_per_pixel(desc_src);
 
