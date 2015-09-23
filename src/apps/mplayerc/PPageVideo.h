@@ -45,7 +45,7 @@ private:
 	CButton   m_chk10bitOutput;
 	CButton   m_chkVMRMixerMode;
 	CButton   m_chkVMRMixerYUV;
-	
+
 	int m_iEvrBuffers;
 	CSpinButtonCtrl m_spnEvrBuffers;
 

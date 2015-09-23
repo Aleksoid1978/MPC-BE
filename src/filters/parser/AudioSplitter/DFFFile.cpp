@@ -328,7 +328,7 @@ HRESULT CDFFFile::Open(CBaseSplitterFile* pFile)
 	int max_blocks		= m_samplerate / 20; // 50 ms
 	m_max_blocksize		= m_block_size * max_blocks;
 	m_nAvgBytesPerSec	= m_samplerate * m_channels;
-	
+
 	m_length		-= m_length % m_block_size;
 	m_endpos		= m_startpos + m_length;
 	m_rtduration	= 10000000i64 * m_length / m_nAvgBytesPerSec;

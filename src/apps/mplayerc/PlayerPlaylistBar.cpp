@@ -1013,7 +1013,7 @@ static CString CombinePath(CPath p, CString fn)
 	if (fn.Find(':') >= 0 || fn.Find(_T("\\")) == 0) {
 		return fn;
 	}
-	
+
 	p.Append(CPath(fn));
 	CString out(p);
 	if (out.Find(L"://")) {
@@ -2265,7 +2265,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	};
 
 	AppSettings& s = AfxGetAppSettings();
-	auto pMainFrm = AfxGetMainFrame(); 
+	auto pMainFrm = AfxGetMainFrame();
 
 	m.AppendMenu(MF_STRING | (!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_OPEN, ResStr(IDS_PLAYLIST_OPEN));
 	m.AppendMenu(MF_STRING | MF_ENABLED, M_ADD, ResStr(IDS_PLAYLIST_ADD));

@@ -78,7 +78,7 @@ protected:
 
 	CCritSec m_csReceive;
 	CPaddedArray    m_buff;
-	
+
 	REFERENCE_TIME  m_rtStart;
 	double			m_dStartOffset;
 

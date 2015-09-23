@@ -109,7 +109,7 @@ void CDXVA1DecoderH264::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nS
 
 		memset(pDXVABuffer, 0, nDummy);
 		m_pSliceShort[m_nSlices - 1].SliceBytesInBuffer	+= nDummy;
-		nSize											+= nDummy;		
+		nSize											+= nDummy;
 	}
 }
 
@@ -138,8 +138,8 @@ HRESULT CDXVA1DecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	int				nPictStruct			= PICT_NONE;
 	CH264Nalu		Nalu;
 
-	CHECK_HR_FALSE (FFH264DecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize, rtStart, 
-					&nFramePOC, &nOutPOC, &rtOutStart, 
+	CHECK_HR_FALSE (FFH264DecodeFrame(m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize, rtStart,
+					&nFramePOC, &nOutPOC, &rtOutStart,
 					&SecondFieldOffset, &Sync, &m_nNALLength));
 
 	Nalu.SetBuffer(pDataIn, nSize, m_nNALLength);
@@ -201,7 +201,7 @@ HRESULT CDXVA1DecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	bool bAdded = false;
 	{
 		m_DXVAPicParams.StatusReportFeedbackNumber++;
-		
+
 		// Begin frame
 		CHECK_HR_FALSE (BeginFrame(nSurfaceIndex));
 		// Send picture parameters
@@ -221,7 +221,6 @@ HRESULT CDXVA1DecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 		CHECK_HR_FALSE (EndFrame(nSurfaceIndex));
 
 		if (SecondFieldOffset) {
-			
 			// Begin frame
 			CHECK_HR_FALSE (BeginFrame(nSurfaceIndex));
 			// Send picture parameters

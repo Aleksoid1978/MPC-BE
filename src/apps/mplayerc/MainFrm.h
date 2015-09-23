@@ -480,7 +480,7 @@ public:
 	bool IsInteractiveVideo() const {
 		return(m_fShockwaveGraph);
 	}
-	
+
 	bool IsD3DFullScreenMode() const;
 	bool CursorOnD3DFullScreenWindow() const;
 	void DestroyD3DWindow();
@@ -576,7 +576,7 @@ public:
 	void SetTrayTip(CString str);
 
 	CSize GetVideoSize();
-	
+
 	void ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasTo);
 	void ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo);
 

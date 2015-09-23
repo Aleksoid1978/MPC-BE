@@ -1046,7 +1046,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 							wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(size);
 							memcpy(wfe, pData, size);
-								
+
 							mt.subtype = FOURCCMap(wfe->wFormatTag);
 						} else if (db.GetDataSize() > 0) {
 							//always needed extra data for QDM2
@@ -1062,7 +1062,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							if (di && di->GetDataSize()) {
 								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(di->GetDataSize());
 								memcpy(wfe, di->GetData(), di->GetDataSize());
-								
+
 								mt.subtype = FOURCCMap(wfe->wFormatTag);
 								mts.InsertAt(0, mt);
 							}

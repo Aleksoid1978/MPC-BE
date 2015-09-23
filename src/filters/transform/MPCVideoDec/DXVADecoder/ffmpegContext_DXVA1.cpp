@@ -50,7 +50,7 @@ HRESULT FFH264DecodeFrame(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame,
 		avpkt.pts		= rtStart;
 		avpkt.flags		= AV_PKT_FLAG_KEY;
 		int used_bytes	= avcodec_decode_video2(pAVCtx, pFrame, &got_picture, &avpkt);
-		
+
 #if defined(_DEBUG) && 0
 		av_log(pAVCtx, AV_LOG_INFO, "FFH264DecodeFrame() : used_bytes - %d, got_picture - %d\n", used_bytes, got_picture);
 #endif

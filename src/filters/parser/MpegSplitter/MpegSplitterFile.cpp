@@ -259,7 +259,7 @@ BOOL CMpegSplitterFile::CheckKeyFrame(CAtlArray<BYTE>& pData, stream_codec codec
 		return FALSE;
 	} else if (codec == stream_codec::MPEG) {
 		BYTE id = 0;
-		
+
 		CGolombBuffer gb(pData.GetData(), pData.GetCount());
 		while (!gb.IsEOF()) {
 			if (!gb.NextMpegStartCode(id)) {
@@ -518,7 +518,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop)
 					SyncPoints& sps = m_SyncPoints[TrackNum];
 					sps.Add({h.pts, pos});
 				}
-				
+
 				Seek(pos + h.len);
 			}
 		} else if (m_type == MPEG_TYPES::mpeg_ts) {
@@ -1142,7 +1142,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 							rt_end = rt;
 							count++;
 						}
-						
+
 						Seek(nextPos);
 					}
 

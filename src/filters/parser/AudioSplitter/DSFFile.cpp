@@ -133,7 +133,7 @@ HRESULT CDSFFile::Open(CBaseSplitterFile* pFile)
 
 	UINT32 codec = type32;
 	switch(codec) {
-		case 1: 
+		case 1:
 			m_subtype = MEDIASUBTYPE_DSD1;
 			break;
 		case 8:
@@ -164,7 +164,7 @@ HRESULT CDSFFile::Open(CBaseSplitterFile* pFile)
 		return E_FAIL;
 	}
 	m_length = type64;
-	
+
 	m_length		-= m_length % m_block_size;
 	m_startpos		= m_pFile->GetPos();
 	m_endpos		= m_startpos + m_length;

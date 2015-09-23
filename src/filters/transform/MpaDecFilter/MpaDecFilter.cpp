@@ -597,7 +597,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 		if (m_rtStart != INVALID_TIME && rtStart != m_rtStart) {
 			m_bDiscontinuity = TRUE;
 		}
-		
+
 		m_rtStart = rtStart;
 		m_dStartOffset = 0.0;
 		m_bResync = false;

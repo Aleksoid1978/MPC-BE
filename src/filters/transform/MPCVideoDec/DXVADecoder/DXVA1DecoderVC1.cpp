@@ -138,7 +138,7 @@ void CDXVA1DecoderVC1::UpdatePictureParams(int nSurfaceIndex)
 {
 	DXVA_PictureParameters* DXVAPicParams	= &m_DXVA_Context.ctx_pic[m_nFieldNum].pp;
 
-	DXVAPicParams->wDecodedPictureIndex		= 
+	DXVAPicParams->wDecodedPictureIndex		=
 	DXVAPicParams->wDeblockedPictureIndex	= nSurfaceIndex;
 
 	// Manage reference picture list

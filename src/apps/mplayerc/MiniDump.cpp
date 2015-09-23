@@ -97,11 +97,11 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 	if (hDll != NULL) {
 		MINIDUMPWRITEDUMP pMiniDumpWriteDump = (MINIDUMPWRITEDUMP)::GetProcAddress(hDll, "MiniDumpWriteDump");
 		if (pMiniDumpWriteDump != NULL && AfxGetMyApp()->GetAppSavePath(strDumpPath)) {
-            // Check that the folder actually exists
-            if (!::PathFileExists(strDumpPath)) {
+			// Check that the folder actually exists
+			if (!::PathFileExists(strDumpPath)) {
 				VERIFY(CreateDirectory(strDumpPath, NULL));
-            }
-			
+			}
+
 			strDumpPath.AppendFormat(_T("%s.exe.%d.%d.%d.%d.dmp"), AfxGetApp()->m_pszExeName, MPC_VERSION_NUM_SVN);
 
 			HANDLE hFile = ::CreateFile(strDumpPath, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS,

@@ -1272,7 +1272,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 						if (rtmin <= rtPTS && rtPTS < rtmax) {
 							minseekpos = m_pFile->GetPos();
-							
+
 							if (stream.codec == CMpegSplitterFile::stream_codec::MPEG
 									|| stream.codec == CMpegSplitterFile::stream_codec::H264) {
 								REFERENCE_TIME rtLimit = CMpegSplitterFile::stream_codec::MPEG ? rt : rtmax;
@@ -1844,7 +1844,7 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 			force_packet = true; // but send this packet anyway
 		} else if (segtype == 21) {
 			// this is picture packet, force next HDMV sub
-			m_HDMVSub = hdmvsub_neednext; 
+			m_HDMVSub = hdmvsub_neednext;
 		}
 	}
 

@@ -1444,7 +1444,7 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 			WAVEFORMATEX *pFormat = NULL;
 			IPropertyStore *pProps = NULL;
 			PROPVARIANT varConfig;
-			
+
 			if (IsBitstream(pWaveFormatEx)) {
 				pFormat = pWaveFormatEx;
 			} else {
@@ -2087,7 +2087,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 				}
 
 				REFERENCE_TIME rtWaitRenderTime = INVALID_TIME;
-				
+
 				rtRefClock = GetRefClockTime();
 				if (m_bHasVideo
 						&& rtRefClock != INVALID_TIME) {
@@ -2230,7 +2230,7 @@ static HRESULT CalcBitstreamBufferPeriod(WAVEFORMATEX *pWaveFormatEx, REFERENCE_
 
 	if (nBufferSize) {
 		*pHnsBufferPeriod = llMulDiv(nBufferSize << 3, UNITS, pWaveFormatEx->nChannels * pWaveFormatEx->wBitsPerSample * pWaveFormatEx->nSamplesPerSec, 0);
-		
+
 		DbgLog((LOG_TRACE, 3, L"CalcBitstreamBufferPeriod() - set period of %I64u hundred-nanoseconds for a %u buffer size", *pHnsBufferPeriod, nBufferSize));
 	}
 
@@ -2685,7 +2685,7 @@ STDMETHODIMP CMpcAudioRendererInputPin::EndOfStream()
 	m_bEndOfStream = TRUE;
 	m_pRenderer->WaitFinish();
 	m_pFilter->NotifyEvent(EC_COMPLETE, S_OK, (LONG_PTR)m_pFilter);
-	
+
 	return S_OK;
 }
 

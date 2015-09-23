@@ -385,7 +385,6 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/*
 				}
 				gb.SkipBytes(metadata_size);
 			}
-			
 		}
 	}
 

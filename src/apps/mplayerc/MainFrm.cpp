@@ -1324,7 +1324,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	SendMessage(WM_GETMINMAXINFO, 0, (LPARAM)&mmi);
 	r |= CRect(r.TopLeft(), CSize(r.Width(), mmi.ptMinTrackSize.y));
 	MoveWindow(&r);
-	
+
 	FlyBarSetPos();
 	OSDBarSetPos();
 }
@@ -4762,7 +4762,7 @@ void CMainFrame::OnStreamSubOnOff()
 
 		return;
 	}
-	
+
 	if (GetPlaybackMode() == PM_DVD && m_pDVDI && m_pDVDC) {
 		ULONG ulStreamsAvailable, ulCurrentStream;
 		BOOL bIsDisabled;
@@ -5348,7 +5348,7 @@ void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 		m_wndPlaylistBar.DropFiles(slFiles);
 		return;
 	}
-	
+
 	BOOL bIsValidSubExtAll = TRUE;
 
 	POSITION pos = slFiles.GetHeadPosition();
@@ -5424,7 +5424,7 @@ void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 
 static HRESULT CopyFiles(CString sourceFile, CString destFile)
 {
-	#define FOF_UI_FLAGS FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR 
+	#define FOF_UI_FLAGS FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR
 
 	HRESULT hr = S_OK;
 
@@ -5432,22 +5432,22 @@ static HRESULT CopyFiles(CString sourceFile, CString destFile)
 		CComPtr<IShellItem> psiItem;
 		hr = afxGlobalData.ShellCreateItemFromParsingName(sourceFile, NULL, IID_PPV_ARGS(&psiItem));
 		EXIT_ON_ERROR(hr);
- 
+
 		CComPtr<IShellItem> psiDestinationFolder;
 		CString pszPath = AddSlash(GetFolderOnly(destFile));
 		hr = afxGlobalData.ShellCreateItemFromParsingName(pszPath, NULL, IID_PPV_ARGS(&psiDestinationFolder));
 		EXIT_ON_ERROR(hr);
- 
+
 		CComPtr<IFileOperation> pFileOperation;
-		hr = CoCreateInstance(CLSID_FileOperation, 
-							  NULL, 
-							  CLSCTX_INPROC_SERVER, 
+		hr = CoCreateInstance(CLSID_FileOperation,
+							  NULL,
+							  CLSCTX_INPROC_SERVER,
 							  IID_PPV_ARGS(&pFileOperation));
 		EXIT_ON_ERROR(hr);
- 
+
 		hr = pFileOperation->SetOperationFlags(FOF_UI_FLAGS | FOFX_NOMINIMIZEBOX);
 		EXIT_ON_ERROR(hr);
- 
+
 		CString pszCopyName = GetFileOnly(destFile);
 		hr = pFileOperation->CopyItem(psiItem, psiDestinationFolder, pszCopyName, NULL);
 		EXIT_ON_ERROR(hr);
@@ -5463,7 +5463,7 @@ static HRESULT CopyFiles(CString sourceFile, CString destFile)
 		SHFileOp.pFrom	= sourceFile;
 		SHFileOp.pTo	= destFile;
 		SHFileOp.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR;
-	
+
 		hr = (SHFileOperation(&SHFileOp) == 0) ? S_OK : E_FAIL;
 	}
 
@@ -8450,7 +8450,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 			m_pDVS->get_VobSubSettings(&fBuffer, &fOnlyShowForcedSubs, &fPolygonize);
 			fOnlyShowForcedSubs = !fOnlyShowForcedSubs;
 			m_pDVS->put_VobSubSettings(fBuffer, fOnlyShowForcedSubs, fPolygonize);
-			
+
 			return;
 		}
 
@@ -10170,7 +10170,7 @@ void CMainFrame::SetDefaultFullscreenState()
 			ToggleFullscreen(true, true);
 			m_bFirstFSAfterLaunchOnFullScreen = true;
 		}
-		
+
 		SetCursor(NULL);
 		s.nCLSwitches &= ~CLSW_FULLSCREEN;
 	}
@@ -10572,13 +10572,13 @@ void CMainFrame::AutoChangeMonitorMode()
 
 	// EnumDisplayDevice... s.strFullScreenMonitorID == sDeviceID ???
 	DISPLAY_DEVICE dd = { sizeof(dd) };
-	
+
 	DWORD dev = 0; // device index
 	BOOL bMonValid = FALSE;
 	CString sDeviceID, strMonName;
 	while (EnumDisplayDevices(0, dev, &dd, 0)) {
 		DISPLAY_DEVICE ddMon = { sizeof(ddMon) };
-		
+
 		DWORD devMon = 0;
 		while (EnumDisplayDevices(dd.DeviceName, devMon, &ddMon, 0)) {
 			if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE && !(ddMon.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
@@ -10704,7 +10704,7 @@ void CMainFrame::SetDispMode(dispmode& dm, CString& DisplayName)
 	}
 
 	if (bPausedForAutochangeMonitorMode) {
-		SetTimer(TIMER_DM_AUTOCHANGING, s.iDMChangeDelay * 1000, NULL);	
+		SetTimer(TIMER_DM_AUTOCHANGING, s.iDMChangeDelay * 1000, NULL);
 	}
 }
 
@@ -12023,7 +12023,7 @@ void CMainFrame::SetupChapters()
 			ULONG VTSN, TTN;
 			if (::PathFileExists(path) && CIfoFile::GetTitleInfo(path, loc.TitleNum, VTSN, TTN)) {
 				path.Format(L"%s\\VTS_%02lu_0.IFO", buff, VTSN);
-			
+
 				CAtlList<CString> files;
 				CIfoFile ifo;
 				CVobFile vob;
@@ -13543,7 +13543,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 				s.dFPS = miFPS;
 
 				AutoChangeMonitorMode();
-				
+
 				if (s.fLaunchfullscreen && !IsD3DFullScreenMode() && !m_bFullScreen && !m_bAudioOnly ) {
 					ToggleFullscreen(true, true);
 				}
@@ -13610,7 +13610,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRWC), FALSE); // might have IVMRMixerBitmap9, but not IVMRWindowlessControl9
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRMC9), TRUE);
 		m_pMVRSR = m_pCAP;
-		
+
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMB), TRUE);
 		m_pMVTO = m_pCAP;
 
@@ -15823,7 +15823,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 
 	{
 		CAutoLock cAutoLock(&m_csSubLock);
-		
+
 		if (pSubStream) {
 			CLSID clsid;
 			pSubStream->GetClassID(&clsid);
@@ -16675,7 +16675,7 @@ void CMainFrame::ShowOptions(int idPage)
 
 		m_wndView.LoadLogo();
 	}
-	
+
 	Invalidate();
 	m_wndStatusBar.Relayout();
 	m_wndPlaylistBar.Invalidate();
@@ -17044,7 +17044,7 @@ bool CMainFrame::CursorOnD3DFullScreenWindow() const
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -17186,7 +17186,7 @@ afx_msg void CMainFrame::OnSubtitleDelay(UINT nID)
 			m_pDVS->put_SubtitleTiming(SubtitleDelay, SubtitleSpeedMul, SubtitleSpeedDiv);
 			SetSubtitleDelay(SubtitleDelay);
 		}
-		
+
 		return;
 	}
 
