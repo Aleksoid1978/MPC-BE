@@ -41,8 +41,6 @@
 * libavutil/internal.h
 * libavutil/mathematics.h
 
-* libswscale/utils.c
-
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
 

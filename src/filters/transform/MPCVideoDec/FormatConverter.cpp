@@ -28,6 +28,7 @@
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 	#include <ffmpeg/libswscale/swscale.h>
+	#include <ffmpeg/libswscale/swscale_internal.h>
 	#include <ffmpeg/libavutil/pixdesc.h>
 }
 #pragma warning(pop)
@@ -260,8 +261,12 @@ void  CFormatConverter::UpdateDetails()
 				m_colorspace = m_FProps.colorspace;
 				// SWS_CS_* does not fully comply with the AVCOL_SPC_*, but it is well handled in the libswscale.
 			}
+			
+			if (isAnyRGB(m_pSwsContext->srcFormat) || isAnyRGB(m_pSwsContext->dstFormat)) {
+				inv_tbl = (int *)sws_getCoefficients(m_colorspace);
+			}
 
- 			ret = sws_setColorspaceDetails(m_pSwsContext, sws_getCoefficients(m_colorspace), srcRange, tbl, dstRange, brightness, contrast, saturation);
+ 			ret = sws_setColorspaceDetails(m_pSwsContext, inv_tbl, srcRange, tbl, dstRange, brightness, contrast, saturation);
 		}
 	}
 }
