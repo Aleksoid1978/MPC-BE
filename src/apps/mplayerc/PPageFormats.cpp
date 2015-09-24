@@ -235,6 +235,9 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 		if (ERROR_SUCCESS != key.SetStringValue(NULL, ResStr(IDS_ADD_TO_PLAYLIST))) {
 			return false;
 		}
+		if (ERROR_SUCCESS != key.SetStringValue(_T("Icon"), _T("\"") + GetProgramPath() + _T("\",0"))) {
+			return false;
+		}
 
 		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\enqueue\\command"))) {
 			return false;
@@ -254,6 +257,9 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 	}
 	if (SetContextFiles && !ShellExtExists()) {
 		if (ERROR_SUCCESS != key.SetStringValue(NULL, ResStr(IDS_OPEN_WITH_MPC))) {
+			return false;
+		}
+		if (ERROR_SUCCESS != key.SetStringValue(_T("Icon"), _T("\"") + GetProgramPath() + _T("\",0"))) {
 			return false;
 		}
 	} else {
@@ -932,6 +938,7 @@ BOOL CPPageFormats::OnApply()
 	if (m_fContextDir.GetCheck() && !ShellExtExists()) {
 		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, _T("Directory\\shell\\") PROGID _T(".enqueue"))) {
 			key.SetStringValue(NULL, ResStr(IDS_ADD_TO_PLAYLIST));
+			key.SetStringValue(_T("Icon"), _T("\"") + GetProgramPath() + _T("\",0"));
 		}
 
 		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, _T("Directory\\shell\\") PROGID _T(".enqueue\\command"))) {
@@ -940,6 +947,7 @@ BOOL CPPageFormats::OnApply()
 
 		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, _T("Directory\\shell\\") PROGID _T(".play"))) {
 			key.SetStringValue(NULL, ResStr(IDS_OPEN_WITH_MPC));
+			key.SetStringValue(_T("Icon"), _T("\"") + GetProgramPath() + _T("\",0"));
 		}
 
 		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, _T("Directory\\shell\\") PROGID _T(".play\\command"))) {
