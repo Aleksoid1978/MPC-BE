@@ -541,6 +541,7 @@ namespace HEVCParser {
 #define MAX_SPS_COUNT 32
 
 #define MAX_REFS 16
+#define MAX_DPB_SIZE 16
 #define MAX_SHORT_TERM_RPS_COUNT 64
 
 	struct ShortTermRPS {
@@ -746,10 +747,13 @@ namespace HEVCParser {
 		int start = sublayer_ordering_info ? 0 : sps_max_sub_layers_minus1;
 		for (int i = start; i <= sps_max_sub_layers_minus1; i++) {
 			uint32_t max_dec_pic_buffering_minus1 = gb.UExpGolombRead();
-			if (max_dec_pic_buffering_minus1 >= 16) {
+			if (max_dec_pic_buffering_minus1 >= MAX_DPB_SIZE) {
 				return false;
 			}
-			gb.UExpGolombRead(); // num_reorder_pics
+			uint32_t num_reorder_pics = gb.UExpGolombRead();
+			if (num_reorder_pics >= MAX_DPB_SIZE) {
+				return false;
+			}
 			gb.UExpGolombRead(); // max_latency_increase
 		}
 
@@ -804,12 +808,13 @@ namespace HEVCParser {
 		uint8_t pcm_enabled_flag = gb.BitRead(1);
 		if (pcm_enabled_flag) {
 			uint8_t bit_depth_minus1 = gb.BitRead(4);
-			gb.BitRead(4);	// bit_depth_chroma_minus1
-			gb.UExpGolombRead();		// log2_min_pcm_cb_size
-			gb.UExpGolombRead();		// log2_max_pcm_cb_size
+			gb.BitRead(4);       // bit_depth_chroma_minus1
+			gb.UExpGolombRead(); // log2_min_pcm_cb_size
+			gb.UExpGolombRead(); // log2_max_pcm_cb_size
 			if ((bit_depth_minus1 + 1u) > (bit_depth_luma_minus8 + 8u)) {
 				return false;
 			}
+			gb.BitRead(1);       // loop_filter_disable_flag
 		}
 
 		uint32_t nb_st_rps = gb.UExpGolombRead();
