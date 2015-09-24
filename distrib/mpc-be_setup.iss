@@ -46,7 +46,6 @@
 #define app_version      str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH)
 #define app_version_svn  str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_REV)
 #define quick_launch     "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
-#define dx_sdk_number    str(DIRECTX_SDK_NUMBER)
 
 #define bin_dir        = "..\bin13"
 #if defined(VS2015)
@@ -194,12 +193,12 @@ Name: pintotaskbar;             Description: {cm:PinToTaskBar};          GroupDe
 Name: reset_settings;           Description: {cm:tsk_ResetSettings};     GroupDescription: {cm:tsk_Other};       Flags: checkedonce unchecked; Check: SettingsExist()
 
 [Files]
-Source: "{#bindir}\{#mpcbe_exe}";                         DestDir: "{app}"; Flags: ignoreversion;                                   Components: main
-Source: "{#bindir}\mpciconlib.dll";                       DestDir: "{app}"; Flags: ignoreversion;                                   Components: mpciconlib
-Source: "{#dxdir}\D3DCompiler_{#DIRECTX_SDK_NUMBER}.dll"; DestDir: "{app}"; Flags: ignoreversion;                                   Components: main;          Check : not D3DX9DLLExists();
-Source: "{#dxdir}\d3dx9_{#DIRECTX_SDK_NUMBER}.dll";       DestDir: "{app}"; Flags: ignoreversion;                                   Components: main;          Check : not D3DX9DLLExists();
-Source: "{#bindir_x64}\MPCBEShellExt64.dll";              DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Components: mpcbeshellext; Check : IsWin64
-Source: "{#bindir_x86}\MPCBEShellExt.dll";                DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete; Components: mpcbeshellext;
+Source: "{#bindir}\{#mpcbe_exe}";            DestDir: "{app}"; Flags: ignoreversion;                                   Components: main
+Source: "{#bindir}\mpciconlib.dll";          DestDir: "{app}"; Flags: ignoreversion;                                   Components: mpciconlib
+Source: "{#dxdir}\D3DCompiler_43.dll";       DestDir: "{app}"; Flags: ignoreversion;                                   Components: main;          Check : not D3DX9DLLExists();
+Source: "{#dxdir}\d3dx9_43.dll";             DestDir: "{app}"; Flags: ignoreversion;                                   Components: main;          Check : not D3DX9DLLExists();
+Source: "{#bindir_x64}\MPCBEShellExt64.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete regserver noregerror; Components: mpcbeshellext; Check : IsWin64
+Source: "{#bindir_x86}\MPCBEShellExt.dll";   DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete regserver noregerror; Components: mpcbeshellext;
 #ifdef localize
 Source: "{#bindir}\Lang\mpcresources.??.dll";             DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 #endif
@@ -344,7 +343,7 @@ end;
 
 function D3DX9DLLExists(): Boolean;
 begin
-  if FileExists(ExpandConstant('{sys}\D3DX9_{#dx_sdk_number}.dll')) then
+  if FileExists(ExpandConstant('{sys}\D3DX9_43.dll')) then
     Result := True
   else
     Result := False;

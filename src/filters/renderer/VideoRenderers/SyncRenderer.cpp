@@ -108,9 +108,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 		(FARPROC &)m_pD3DXCreateFont = GetProcAddress(hDll, "D3DXCreateFontW");
 		(FARPROC &)m_pD3DXCreateSprite = GetProcAddress(hDll, "D3DXCreateSprite");
 	} else {
-		_Error += L"The installed DirectX End-User Runtime is outdated. Please download and install the ";
-		_Error += DIRECTX_SDK_DATE;
-		_Error += L" release or newer in order for MPC-BE to function properly.\n";
+		_Error += L"The installed DirectX End-User Runtime is outdated. Please download and install the June 2010 release or newer in order for MPC-BE to function properly.\n";
 	}
 
 	m_pDwmIsCompositionEnabled = NULL;

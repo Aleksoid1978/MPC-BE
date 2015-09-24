@@ -146,7 +146,7 @@ en.comp_mpciconlib=Icon Library
 en.comp_mpcresources=Translations
 en.comp_mpcbeshellext=Install the shell extension
 en.msg_DeleteSettings=Do you also want to delete MPC-BE settings?%n%nIf you plan on installing MPC-BE again then you do not have to delete them.
-en.msg_NoD3DX9DLL_found=The latest DirectX runtime is not installed!%n%nPlease download and install the latest DirectX runtime ({#DIRECTX_SDK_DATE}) regardless of your operating system.
+en.msg_NoD3DX9DLL_found=The latest DirectX runtime is not installed!%n%nPlease download and install the latest DirectX runtime June 2010 regardless of your operating system.
 en.msg_SetupIsRunningWarning=MPC-BE setup is already running!
 #if defined(sse_required)
 en.msg_simd_sse=This build of MPC-BE requires a CPU with SSE extension support.%n%nYour CPU does not have those capabilities.
@@ -186,7 +186,7 @@ br.comp_mpciconlib=Biblioteca de ícones
 br.comp_mpcresources=Traduções
 br.comp_mpcbeshellext=Install the shell extension
 br.msg_DeleteSettings=Gostaria de excluir as configurações do MPC-BE?%n%nSe você quiser instalar o MPC-BE novamente então não precisa excluí-las.
-br.msg_NoD3DX9DLL_found=A versão mais recente do DirectX não está instalada!%n%nPor favor baixe e instale a versão mais recente ({#DIRECTX_SDK_DATE}) adequado ao seu sistema operacional.
+br.msg_NoD3DX9DLL_found=A versão mais recente do DirectX não está instalada!%n%nPor favor baixe e instale a versão mais recente June 2010 adequado ao seu sistema operacional.
 br.msg_SetupIsRunningWarning=A instalação do MPC-BE ja está sendo executada!
 #if defined(sse_required)
 br.msg_simd_sse=Esta versão do MPC-BE necessita uma CPU com suporte a extensões SSE.%n%nSua CPU não tem esse suporte.
@@ -224,7 +224,7 @@ by.comp_mpciconlib=Бібліятэка значкоў
 by.comp_mpcresources=Пераклады
 by.comp_mpcbeshellext=Install the shell extension
 by.msg_DeleteSettings=Ці хочаце таксама выдаліць налады MPC-BE?%n%nКалі вы збіраецеся зноў усталяваць MPC-BE, тады іх можна пакінуць.
-by.msg_NoD3DX9DLL_found=Найноўшая бібліятэка DirectX не ўсталяваная!%n%nСцягніце і ўсталюйце яе (версія {#DIRECTX_SDK_DATE}), незалежна ад таго, якая ў вас аперацыйная сістэма.
+by.msg_NoD3DX9DLL_found=Найноўшая бібліятэка DirectX не ўсталяваная!%n%nСцягніце і ўсталюйце яе (версія June 2010), незалежна ад таго, якая ў вас аперацыйная сістэма.
 by.msg_SetupIsRunningWarning=Праграма ўсталявання MPC-BE ужо працуе!
 #if defined(sse_required)
 by.msg_simd_sse=Гэтая будова MPC-BE вымагае працэсар, здольны выконваць інструкцыі SSE.%n%nВаш працэсар гэтага не ўмее.
@@ -261,7 +261,7 @@ eu.langcode=eu
 eu.comp_mpciconlib=Ikur Liburutegia
 eu.comp_mpcresources=Itzulpenak
 eu.msg_DeleteSettings=MPC-BE ezarpenak kentzea ere nahi dituzu?%n%nMPC-BE berriro ezartzeko asmoa baduzu ez dituzu ezabatu behar.
-eu.msg_NoD3DX9DLL_found=Azken DirectX bertsioa ez dago ezarrita!%n%nMesedez jeitsi eta ezarri azken DirectX bertsioa ({#DIRECTX_SDK_DATE}) sistema eragileari kasu egin gabe.
+eu.msg_NoD3DX9DLL_found=Azken DirectX bertsioa ez dago ezarrita!%n%nMesedez jeitsi eta ezarri azken DirectX bertsioa June 2010 sistema eragileari kasu egin gabe.
 eu.msg_SetupIsRunningWarning=MPC-BE ezarpena jadanik ekinean dago!
 #if defined(sse_required)
 eu.msg_simd_sse=MPC-BE eraiketa honek SSE hedapen sostengua duen CPU bat behar du.%n%nZure CPU-ak ez ditu gaitasun hauek.
@@ -299,7 +299,7 @@ ca.comp_mpciconlib=Llibreria d'icones
 ca.comp_mpcresources=Traduccions
 ca.comp_mpcbeshellext=Install the shell extension
 ca.msg_DeleteSettings=Vols eliminar les preferències del MPC-BE?%n%nSi planeges instal.lar altre cop el MPC-BE no necessites eliminar-les.
-ca.msg_NoD3DX9DLL_found=No està instal.lada la darrera versió de DirectX!%n%nSisplau instal.lar la darrera versió DirectX runtime ({#DIRECTX_SDK_DATE}) independentment del sistema operatiu.
+ca.msg_NoD3DX9DLL_found=No està instal.lada la darrera versió de DirectX!%n%nSisplau instal.lar la darrera versió DirectX runtime June 2010 independentment del sistema operatiu.
 ca.msg_SetupIsRunningWarning=La instal.lació del MPC-BE ja se està executant!
 #if defined(sse_required)
 ca.msg_simd_sse=Aquesta versió de MPC-BE requereix una CPU amb suport d'extensions SSE.%n%nLa teva CPU no cumpleix aquestes característiques.
@@ -337,7 +337,7 @@ cz.comp_mpciconlib=Ikony typů souborů
 cz.comp_mpcresources=Jazykové soubory
 cz.comp_mpcbeshellext=Install the shell extension
 cz.msg_DeleteSettings=Chcete smazat také nastavení MPC-BE?%n%nPokud plánujete MPC-BE znovu nainstalovat, mazat je nemusíte.
-cz.msg_NoD3DX9DLL_found=Nainstalovaná verze DirectX není dostatečně aktuální!%n%nStáhněte a nainstalujte nejnovější aktualizaci DirectX ({#DIRECTX_SDK_DATE}).%n%nPozor, aktualizace je pro všechny verze DirectX, nejen pro DirectX 9!
+cz.msg_NoD3DX9DLL_found=Nainstalovaná verze DirectX není dostatečně aktuální!%n%nStáhněte a nainstalujte nejnovější aktualizaci DirectX June 2010.%n%nPozor, aktualizace je pro všechny verze DirectX, nejen pro DirectX 9!
 cz.msg_SetupIsRunningWarning=Instalátor MPC-BE je již spuštěn!
 #if defined(sse_required)
 cz.msg_simd_sse=Toto sestavení MPC-BE vyžaduje procesor s podporou rozšíření SSE.%n%nVáš procesor tato rozšíření nepodporuje.
@@ -375,7 +375,7 @@ de.comp_mpciconlib=Symbole für Mediendateien
 de.comp_mpcresources=Übersetzungen
 de.comp_mpcbeshellext=Install the shell extension
 de.msg_DeleteSettings=Wollen Sie auch die Einstellungen des MPC-BE löschen?%n%nWenn Sie den MPC-BE wieder installieren wollen, dann müssen Sie diese nicht unbedingt löschen.
-de.msg_NoD3DX9DLL_found=Die neueste DirectX-Runtime ist nicht installiert!%n%nBitte laden und installieren Sie die neueste DirectX-Runtime ({#DIRECTX_SDK_DATE}) unabhängig von Ihrem Betriebssystem.
+de.msg_NoD3DX9DLL_found=Die neueste DirectX-Runtime ist nicht installiert!%n%nBitte laden und installieren Sie die neueste DirectX-Runtime June 2010 unabhängig von Ihrem Betriebssystem.
 de.msg_SetupIsRunningWarning=MPC-BE Setup wird bereits ausgeführt!
 #if defined(sse_required)
 de.msg_simd_sse=Dieses MPC-BE-Build benötigt einen Prozessor mit SSE-Unterstützung.%n%nIhr Prozessor besitzt nicht diese Eigenschaft.
@@ -413,7 +413,7 @@ el.comp_mpciconlib=Βιβλιοθήκη Εικονιδίων
 el.comp_mpcresources=Μεταφράσεις
 el.comp_mpcbeshellext=Install the shell extension
 el.msg_DeleteSettings=Θέλετε να διαγράψετε τις ρυθμίσεις του MPC-BE;%n%nΑν σκοπεύετε να εγκαταστήσετε το MPC-BE πάλι τότε δεν χρειάζεται να τις διαγράψετε.
-el.msg_NoD3DX9DLL_found=The latest DirectX runtime is not installed!%n%nPlease download and install the latest DirectX runtime ({#DIRECTX_SDK_DATE}) regardless of your operating system.
+el.msg_NoD3DX9DLL_found=The latest DirectX runtime is not installed!%n%nPlease download and install the latest DirectX runtime June 2010 regardless of your operating system.
 el.msg_SetupIsRunningWarning=Η εγκατάσταση του MPC-BE εκτελείται ήδη!
 #if defined(sse_required)
 el.msg_simd_sse=Αυτή η έκδοση του MPC-BE απαιτεί επεξεργαστή CPU με υποστήριξη SSE.%n%nΟ επεξεργαστής σας δεν το υποστηρίζει.
@@ -451,7 +451,7 @@ es.comp_mpciconlib=Librería de iconos
 es.comp_mpcresources=Traducciones
 es.comp_mpcbeshellext=Install the shell extension
 es.msg_DeleteSettings=¿Quiere eliminar también las preferencias de MPC-BE?%n%nSi planea instalar de nuevo MPC-BE no necesita eliminarlas.
-es.msg_NoD3DX9DLL_found=¡No está instalada la última versión de DirectX!%n%nPor favor descargue e instale DirectX runtime ({#DIRECTX_SDK_DATE}) independientemente de su sistema operativo.
+es.msg_NoD3DX9DLL_found=¡No está instalada la última versión de DirectX!%n%nPor favor descargue e instale DirectX runtime June 2010 independientemente de su sistema operativo.
 es.msg_SetupIsRunningWarning=La instalación de MPC-BE ya se esta ejecutando!
 #if defined(sse_required)
 es.msg_simd_sse=Esta versión de MPC-BE requiere una CPU con soporte de extensiones SSE.%n%nSu CPU carece de esta característica.
@@ -489,7 +489,7 @@ fr.comp_mpciconlib=Bibliothèque d'icône
 fr.comp_mpcresources=Traductions
 fr.comp_mpcbeshellext=Install the shell extension
 fr.msg_DeleteSettings=Souhaitez-vous supprimer également les paramètres de MPC-BE?%n%nSi vous réinstallez MPC-BE, il est conseillé de ne pas les supprimer.
-fr.msg_NoD3DX9DLL_found=La dernière version des composants d'exécution DirectX n'est pas installée !%n%nCelle-ci est nécessaire quelque soit votre système d'exploitation, veuillez la télécharger et l'installer ({#DIRECTX_SDK_DATE}).
+fr.msg_NoD3DX9DLL_found=La dernière version des composants d'exécution DirectX n'est pas installée !%n%nCelle-ci est nécessaire quelque soit votre système d'exploitation, veuillez la télécharger et l'installer June 2010.
 fr.msg_SetupIsRunningWarning=L'installation de MPC-BE est déjà en cours d'exécution!
 #if defined(sse_required)
 fr.msg_simd_sse=Cette version de MPC-BE nécessite un CPU avec support des instructions SSE.%n%nVotre CPU n'a pas cette capacité.
@@ -527,7 +527,7 @@ he.comp_mpciconlib=ספריית אייקונים
 he.comp_mpcresources=תרגומים
 he.comp_mpcbeshellext=Install the shell extension
 he.msg_DeleteSettings=האם ברצונך גם למחוק את ההגדרות של MPC-BE?%n%nאם אתה מתכנן להתקין את MPC-BE בשנית, אינך חייב להסירן.
-he.msg_NoD3DX9DLL_found=סביבת הריצה של ה-DirectX הכי חדש אינה מותקנת.%n%nאנא הורד והתקן את סביבת הריצה הכי חדשה ({#DIRECTX_SDK_DATE}) בלי קשר למערכת ההפעלה שברשותך.
+he.msg_NoD3DX9DLL_found=סביבת הריצה של ה-DirectX הכי חדש אינה מותקנת.%n%nאנא הורד והתקן את סביבת הריצה הכי חדשה June 2010 בלי קשר למערכת ההפעלה שברשותך.
 he.msg_SetupIsRunningWarning=ההתקנה של MPC-BE כבר רצה!
 #if defined(sse_required)
 he.msg_simd_sse=גרסה זו של MPC-BE דורשת מעבד עם תמיכה בהרחבת SSE.%n%nהמעבד שברשותך אינו תומך בכך.
@@ -565,7 +565,7 @@ hu.comp_mpciconlib=Ikon Gyűjtemény
 hu.comp_mpcresources=Fordítások
 hu.comp_mpcbeshellext=Install the shell extension
 hu.msg_DeleteSettings=Az MPC-BE beállításokat is törölni szeretné?%n%nHa azt tervezi, hogy újratelepíti az MPC-BE-t, akkor nem kell törölnie őket.
-hu.msg_NoD3DX9DLL_found=A legújabb DirectX nincs telepítve!%n%nKérjük töltse le és telepítse a legújabb DirectX runtime ({#DIRECTX_SDK_DATE}) verziót függetlenül az operációs rendszerétől.
+hu.msg_NoD3DX9DLL_found=A legújabb DirectX nincs telepítve!%n%nKérjük töltse le és telepítse a legújabb DirectX runtime June 2010 verziót függetlenül az operációs rendszerétől.
 hu.msg_SetupIsRunningWarning=Az MPC-BE telepítő már fut!
 #if defined(sse_required)
 hu.msg_simd_sse=Az MPC-BE jelen változatához SSE támogatással bíró CPU-ra van szüksége.%n%nAz ön CPU-ja nem rendelkezik ilyen támogatással.
@@ -603,7 +603,7 @@ hy.comp_mpciconlib=Պատկերների գրադարան
 hy.comp_mpcresources=Թարգմանություններ
 hy.comp_mpcbeshellext=Install the shell extension
 hy.msg_DeleteSettings=Ջնջե՞լ MPC-BE-ի կարգավորումները։%n%nԵթե նախատեսում եք վերատեղակայել MPC-BE, ապա պետք է չէ դրանք ջնջել։.
-hy.msg_NoD3DX9DLL_found=Վերջին DirectX-ը տեղակայված չէ!%n%nԽնդրում ենք տեղակայել վերջին DirectX-ը({#DIRECTX_SDK_DATE})։
+hy.msg_NoD3DX9DLL_found=Վերջին DirectX-ը տեղակայված չէ!%n%nԽնդրում ենք տեղակայել վերջին DirectX-ըJune 2010։
 hy.msg_SetupIsRunningWarning=MPC-BE-ի տեղակայիչը արդեն բացված է!
 #if defined(sse_required)
 hy.msg_simd_sse=MPC-BE-ի այս տարբերակը պահանջում է CPU՝ SSE-ի աջակցմամբ։%n%nՁեր CPU-ն այն չի աջակցում։
@@ -641,7 +641,7 @@ it.comp_mpciconlib=Libreria icone
 it.comp_mpcresources=Traduzioni
 it.comp_mpcbeshellext=Install the shell extension
 it.msg_DeleteSettings=Vou eliminare anche le impostazioni di MPC-BE?%n%nSe pensi di reinstallare MPC-BE in seguito non dovresti eliminarle.
-it.msg_NoD3DX9DLL_found=La libreria di runtime DirectX più recente non è installata!%n%nScarica e installa la libreria di runtime DirectX più recente ({#DIRECTX_SDK_DATE}) indipendentemente dal tuo sistema operativo.
+it.msg_NoD3DX9DLL_found=La libreria di runtime DirectX più recente non è installata!%n%nScarica e installa la libreria di runtime DirectX più recente June 2010 indipendentemente dal tuo sistema operativo.
 it.msg_SetupIsRunningWarning=L'installazione di MPC-BE è già in corso!
 #if defined(sse_required)
 it.msg_simd_sse=Questa build di MPC-BE richiede una CPU con il supporto alle estensioni SSE.%n%nLa tua CPU non dispone di questa caratteristica.
@@ -674,7 +674,7 @@ ja.comp_mpciconlib=アイコン ライブラリー
 ja.comp_mpcresources=翻訳
 ja.comp_mpcbeshellext=Install the shell extension
 ja.msg_DeleteSettings=MPC-BE の設定を削除してもよろしいですか？%n%nMPC-BE を再度インストールする場合は、設定を削除する必要はありません。
-ja.msg_NoD3DX9DLL_found=最新の DirectX ランタイムはインストールされません！%n%nオペレーティングシステムにかかわらず最新の DirectX ランタイム ({#DIRECTX_SDK_DATE}) をダウンロードして、インストールしてください。
+ja.msg_NoD3DX9DLL_found=最新の DirectX ランタイムはインストールされません！%n%nオペレーティングシステムにかかわらず最新の DirectX ランタイム June 2010 をダウンロードして、インストールしてください。
 ja.msg_SetupIsRunningWarning=MPC-BE のインストーラーは既に実行されています！
 #if defined(sse_required)
 ja.msg_simd_sse=このバージョンの MPC-BE は CPU の SSE サポートが必要です。%n%nお使いの CPU はこの条件を満たしません。
@@ -712,7 +712,7 @@ kr.comp_mpciconlib=아이콘 라이브러리
 kr.comp_mpcresources=번역
 kr.comp_mpcbeshellext=쉘확장 설치
 kr.msg_DeleteSettings=MPC-BE 의 설정도 삭제하시겠습니까?%n%nMPC-BE 를 다시 설치할 계획이라면 설정들을 삭제할 필요가 없습니다.
-kr.msg_NoD3DX9DLL_found=최신 DirectX 런타임이 설치되어있지않습니다!%n%n사용하는 운영체제에 맞는 최신 DirectX 런타임 ({#DIRECTX_SDK_DATE}) 을 다운로드해서 설치하세요.
+kr.msg_NoD3DX9DLL_found=최신 DirectX 런타임이 설치되어있지않습니다!%n%n사용하는 운영체제에 맞는 최신 DirectX 런타임 June 2010 을 다운로드해서 설치하세요.
 kr.msg_SetupIsRunningWarning=MPC-BE 설치프로그램이 이미 실행중입니다!
 #if defined(sse_required)
 kr.msg_simd_sse=이 버전의 MPC-BE 는 SSE 기술을 지원하는 CPU가 필요합니다.%n%n이 컴퓨터의 CPU는 이 기술을 지원하지않습니다.
@@ -750,7 +750,7 @@ nl.comp_mpciconlib=Iconen voor mediabestanden
 nl.comp_mpcresources=Localisaties
 nl.comp_mpcbeshellext=Shellextensie installeren
 nl.msg_DeleteSettings=Wilt u ook de instellingen van MPC-BE verwijderen?%n%nAls u MPC-BE opnieuw gaat installeren is dit niet nodig.
-nl.msg_NoD3DX9DLL_found=De nieuwste DirectX-runtime is niet geinstalleerd!%n%nGraag de nieuwste DirectX-runtime ({#DIRECTX_SDK_DATE}) downloaden en installeren ongeacht uw Windowsversie.
+nl.msg_NoD3DX9DLL_found=De nieuwste DirectX-runtime is niet geinstalleerd!%n%nGraag de nieuwste DirectX-runtime June 2010 downloaden en installeren ongeacht uw Windowsversie.
 nl.msg_SetupIsRunningWarning=MPC-BE installatie is al gestart!
 #if defined(sse_required)
 nl.msg_simd_sse=Deze versie van MPC-BE heeft een processor nodig die SSE ondersteunt.%n%nUw processor ondersteunt dit niet.
@@ -788,7 +788,7 @@ pl.comp_mpciconlib=Ikony plików multimedialnych
 pl.comp_mpcresources=Tłumaczenia
 pl.comp_mpcbeshellext=Install the shell extension
 pl.msg_DeleteSettings=Czy chcesz usunąć ustawienia MPC-BE?%n%nJeśli planujesz ponownie zainstalować MPC-BE, wtedy nie trzeba ich usuwać.
-pl.msg_NoD3DX9DLL_found=Najnowszy DirectX runtime nie został zainstalowany!%n%nProszę pobrać i zainstalować najnowszy DirectX runtime ({#DIRECTX_SDK_DATE}) niezależnie od systemu operacyjnego.
+pl.msg_NoD3DX9DLL_found=Najnowszy DirectX runtime nie został zainstalowany!%n%nProszę pobrać i zainstalować najnowszy DirectX runtime June 2010 niezależnie od systemu operacyjnego.
 pl.msg_SetupIsRunningWarning=Instalator MPC-BE jest już uruchomiony!
 #if defined(sse_required)
 pl.msg_simd_sse=Ta kompilacja MPC-BE wymaga procesora z obsługą zestawu instrukcji SSE.%n%nTwój procesor ich nie obsługuje.
@@ -862,7 +862,7 @@ ru.comp_mpciconlib=Библиотека значков
 ru.comp_mpcresources=Локализации
 ru.comp_mpcbeshellext=Установить расширение оболочки
 ru.msg_DeleteSettings=Удалить также настроенные параметры MPC-BE?%n%nЕсли запланирована переустановка MPC-BE, эти параметры не нужно удалять.
-ru.msg_NoD3DX9DLL_found=Не установлена последняя версия системы DirectX!%n%nЗагрузите и установите последнюю версию DirectX ({#DIRECTX_SDK_DATE}) независимо от версии установленной операционной системы.
+ru.msg_NoD3DX9DLL_found=Не установлена последняя версия системы DirectX!%n%nЗагрузите и установите последнюю версию DirectX June 2010 независимо от версии установленной операционной системы.
 ru.msg_SetupIsRunningWarning=Программа установки MPC-BE уже запущена!
 #if defined(sse_required)
 ru.msg_simd_sse=Для этой сборки MPC-BE требуется процессор с поддержкой SSE-инструкций.%n%nВ данном процессоре они не поддерживаются.
@@ -900,7 +900,7 @@ sc.comp_mpciconlib=图标库
 sc.comp_mpcresources=翻译
 sc.comp_mpcbeshellext=安装 shell extension
 sc.msg_DeleteSettings=是否同时删除 MPC-BE 设置?%n%n如果您打算再次安装 MPC-BE 则无需删除。
-sc.msg_NoD3DX9DLL_found=还没安装最新版本的 DirectX 运行库!%n%n不论您所使用的作业系统请下载及更新至最新版本的 DirectX 运行库 ({#DIRECTX_SDK_DATE})。
+sc.msg_NoD3DX9DLL_found=还没安装最新版本的 DirectX 运行库!%n%n不论您所使用的作业系统请下载及更新至最新版本的 DirectX 运行库 June 2010。
 sc.msg_SetupIsRunningWarning=MPC-BE 安装程序已在运行中！
 #if defined(sse_required)
 sc.msg_simd_sse=这个编译版的 MPC-BE 需要一个支持 SSE 指令集的 CPU。%n%n但是您的 CPU 并不支持这个功能。
@@ -938,7 +938,7 @@ sv.comp_mpciconlib=Ikonbibliotek
 sv.comp_mpcbeshellext=Install the shell extension
 sv.comp_mpcresources=Översättningar
 sv.msg_DeleteSettings=Vill du också ta bort inställningarna för MPC-BE?%n%nOm du planerar att installera MPC-BE igen så behöver du inte ta bort dem.
-sv.msg_NoD3DX9DLL_found=Senaste DirectX har inte installerats!%n%nHämta ner och installera senaste DirectX ({#DIRECTX_SDK_DATE}) oavsett ditt operativsystem.
+sv.msg_NoD3DX9DLL_found=Senaste DirectX har inte installerats!%n%nHämta ner och installera senaste DirectX June 2010 oavsett ditt operativsystem.
 sv.msg_SetupIsRunningWarning=Konfigurering av MPC-BE pågår redan!
 #if defined(sse_required)
 sv.msg_simd_sse=Detta bygge av MPC-BE kräver en processor med stöd för SSE-tillägget.%n%nDin processor saknar detta stöd.
@@ -976,7 +976,7 @@ sk.comp_mpciconlib=Knižnica ikon
 sk.comp_mpcresources=Preklady
 sk.comp_mpcbeshellext=Install the shell extension
 sk.msg_DeleteSettings=Chcete vymazať aj nastavenia programu MPC-BE?%n%nAk plánujete opätovnú inštaláciu programu MPC-BE, tak nie je potrebné ich vymazávať.
-sk.msg_NoD3DX9DLL_found=Najnovšie rozhranie DirectX nie je nainštalované!%n%nProsím stiahnite a nainštalujte si ho ({#DIRECTX_SDK_DATE}) bez ohľadu na verziu operačného systému.
+sk.msg_NoD3DX9DLL_found=Najnovšie rozhranie DirectX nie je nainštalované!%n%nProsím stiahnite a nainštalujte si ho June 2010 bez ohľadu na verziu operačného systému.
 sk.msg_SetupIsRunningWarning=Inštalácia programu MPC-BE je už spustená!
 #if defined(sse_required)
 sk.msg_simd_sse=Toto zostavenie MPC-BE vyžaduje procesor s podporou inštrukcií SSE.%n%nVáš procesor ich nepodporuje.
@@ -1014,7 +1014,7 @@ tc.comp_mpciconlib=圖示庫
 tc.comp_mpcresources=翻譯
 tc.comp_mpcbeshellext=安裝 shell extension
 tc.msg_DeleteSettings=您是否也要刪除 MPC-BE 設定？%n%n如果您打算再次安裝 MPC-BE 則無需刪除。
-tc.msg_NoD3DX9DLL_found=未安裝最新版本的 DirectX Runtime！%n%n不論您使用的作業系統為何，請下載並更新至最新版本的 DirectX Runtime ({#DIRECTX_SDK_DATE})。
+tc.msg_NoD3DX9DLL_found=未安裝最新版本的 DirectX Runtime！%n%n不論您使用的作業系統為何，請下載並更新至最新版本的 DirectX Runtime June 2010。
 tc.msg_SetupIsRunningWarning=已在執行 MPC-BE 安裝程式！
 #if defined(sse_required)
 tc.msg_simd_sse=此版的 MPC-BE 需要有支援 SSE 延伸指令集的 CPU。%n%n您的 CPU 並未相容這些功能。
@@ -1052,7 +1052,7 @@ tr.comp_mpciconlib=Simge Kütüphanesi
 tr.comp_mpcresources=Çeviriler
 tr.comp_mpcbeshellext=Install the shell extension
 tr.msg_DeleteSettings=MPC-BE ayarlarını silmek istiyor musunuz?%n%nMPC-BE 'yi tekrar yüklemeyi planlıyorsanız, bu ayarları silmemeniz önerilir.
-tr.msg_NoD3DX9DLL_found=En son DirectX çalıştırılabilir paketi yüklü değil!%n%nLütfen en son DirectX paketini ({#DIRECTX_SDK_DATE}) innDirip kurunuz. İşletim sistemi sürümünüz, bu aşamada önemli değildir.
+tr.msg_NoD3DX9DLL_found=En son DirectX çalıştırılabilir paketi yüklü değil!%n%nLütfen en son DirectX paketini June 2010 innDirip kurunuz. İşletim sistemi sürümünüz, bu aşamada önemli değildir.
 tr.msg_SetupIsRunningWarning=MPC-BE kurulumu zaten çalışıyor.
 #if defined(sse_required)
 tr.msg_simd_sse=Bu MPC-BE sürümü, SSE eklentisi destekleyen bir işlemci gerektirmektedir.%n%nİşlemciniz bu özelliği desteklemiyor.
@@ -1090,7 +1090,7 @@ ua.comp_mpciconlib=Бібліотека іконок
 ua.comp_mpcresources=Локалізації
 ua.comp_mpcbeshellext=Install the shell extension
 ua.msg_DeleteSettings=Чи хочете ви видалити налаштування MPC-BE?%n%nЯкщо ви плануєте просто повторно встановити MPC-BE, то вам не потрібно їх видаляти.
-ua.msg_NoD3DX9DLL_found=Останню версію DirectX не встановлено!%n%nБудь ласка, завантажте і встановіть останню версію DirectX ({#DIRECTX_SDK_DATE}) відповідно до операційної системи, яку ви використовуєте.
+ua.msg_NoD3DX9DLL_found=Останню версію DirectX не встановлено!%n%nБудь ласка, завантажте і встановіть останню версію DirectX June 2010 відповідно до операційної системи, яку ви використовуєте.
 ua.msg_SetupIsRunningWarning=Встановлення MPC-BE вже запущено!
 #if defined(sse_required)
 ua.msg_simd_sse=Для використання даної версії MPC-BE необхідно, щоб ваш процесор підтримував SSE розширення.%n%nАле ваш процесор не підтримує їх.
