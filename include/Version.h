@@ -35,9 +35,9 @@
 
 #define MPC_VERSION_MAJOR       1
 #define MPC_VERSION_MINOR       4
-#define MPC_VERSION_PATCH       5
+#define MPC_VERSION_PATCH       6
 
-#define MPC_VERSION_STATUS      1
+#define MPC_VERSION_STATUS      0
 // MPC_VERSION_STATUS: 0 - beta; 1 - stable
 
 #define MPC_WND_CLASS_NAME      "MPC-BE"
