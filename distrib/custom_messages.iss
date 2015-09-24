@@ -378,9 +378,9 @@ de.msg_DeleteSettings=Wollen Sie auch die Einstellungen des MPC-BE löschen?%n%n
 de.msg_NoD3DX9DLL_found=Die neueste DirectX-Runtime ist nicht installiert!%n%nBitte laden und installieren Sie die neueste DirectX-Runtime June 2010 unabhängig von Ihrem Betriebssystem.
 de.msg_SetupIsRunningWarning=MPC-BE Setup wird bereits ausgeführt!
 #if defined(sse_required)
-de.msg_simd_sse=Dieses MPC-BE-Build benötigt einen Prozessor mit SSE-Unterstützung.%n%nIhr Prozessor besitzt nicht diese Eigenschaft.
+de.msg_simd_sse=Dieses MPC-BE-Build benötigt einen Prozessor mit SSE-Unterstützung.%n%nIhr Prozessor besitzt diese Eigenschaft nicht.
 #elif defined(sse2_required)
-de.msg_simd_sse2=Dieses MPC-BE-Build benötigt einen Prozessor mit SSE2-Unterstützung.%n%nIhr Prozessor besitzt nicht diese Eigenschaft.
+de.msg_simd_sse2=Dieses MPC-BE-Build benötigt einen Prozessor mit SSE2-Unterstützung.%n%nIhr Prozessor besitzt diese Eigenschaft nicht.
 #endif
 de.tsk_AllUsers=Für alle Benutzer
 de.tsk_CurrentUser=Für aktuellen Benutzer
@@ -389,21 +389,21 @@ de.tsk_ResetSettings=Einstellungen zurücksetzen
 de.types_DefaultInstallation=Standard Installation
 de.types_CustomInstallation=Benutzerdefinierte Installation
 de.ViewChangelog=Zeige Änderungsprotokoll
-de.AssociationFormatsAV=Configuring associations with video and audio files:
-de.AssociationFormats=Association with video and audio files
-de.AssociationVideo=Association with video files
-de.AssociationAudio=Association with audio files
-de.AssociationPlaylist=Association with playlists
-de.AutoPlayType=Auto play:
-de.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
-de.AssociationMPCPlayCDAudioS=Audio CD
-de.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
-de.AssociationMPCPlayDVDMovieS=DVD Movie
-de.AssociationMPCPlayMusicFilesF=Play Music
-de.AssociationMPCPlayMusicFilesS=Music Files
-de.AssociationMPCPlayVideoFilesF=Play Video
-de.AssociationMPCPlayVideoFilesS=Video Files
-de.PinToTaskBar=Pin to TaskBar
+de.AssociationFormatsAV=Verknüpfungen mit Video- und Audiodateien konfigurieren:
+de.AssociationFormats=Mit Video- und Audiodateien verknüpfen
+de.AssociationVideo=Mit Videodateien verknüpfen
+de.AssociationAudio=Mit Audiodateien verknüpfen
+de.AssociationPlaylist=Mit Playlisten verknüpfen
+de.AutoPlayType=AutoPlay:
+de.AssociationMPCPlayCDAudioOnArrivalF=Audio-CD wiedergeben
+de.AssociationMPCPlayCDAudioS=Audio-CD
+de.AssociationMPCPlayDVDMovieArrivalF=DVD-Video wiedergeben
+de.AssociationMPCPlayDVDMovieS=DVD-Video
+de.AssociationMPCPlayMusicFilesF=Audiodateien wiedergeben
+de.AssociationMPCPlayMusicFilesS=Audiodateien
+de.AssociationMPCPlayVideoFilesF=Videodateien wiedergeben
+de.AssociationMPCPlayVideoFilesS=Videodateien
+de.PinToTaskBar=An Taskleiste anheften
 
 
 ;Greek
