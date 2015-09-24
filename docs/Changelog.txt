@@ -156,6 +156,7 @@ Block all connections to MEDIATYPE_AUXLine21Data, if the Line 21 Decoder 2 was b
 Added an option to change the size of the splitter buffers from 1 to 10 seconds. Default 3 seconds.
 Added an option to change the window when playing audio files.
 Added option to delay play after changing screen resolution.
+Added icon for the Explorer context menu.
 
 Updated Dutch and Chinese (Traditional and Simplified) translation (by beter).
 Updated Japanese translation (by Socket774).
