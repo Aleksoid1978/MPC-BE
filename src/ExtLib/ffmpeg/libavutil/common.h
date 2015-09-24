@@ -26,13 +26,9 @@
 #ifndef AVUTIL_COMMON_H
 #define AVUTIL_COMMON_H
 
-// ==> Start patch MPC BE
-#ifdef __GNUC__
 #if defined(__cplusplus) && !defined(__STDC_CONSTANT_MACROS) && !defined(UINT64_C)
 #error missing -D__STDC_CONSTANT_MACROS / #define __STDC_CONSTANT_MACROS
 #endif
-#endif
-// ==> End patch MPC BE
 
 #include <errno.h>
 #include <inttypes.h>
@@ -88,19 +84,6 @@
 #define FFSWAP(type,a,b) do{type SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
 #define FF_ARRAY_ELEMS(a) (sizeof(a) / sizeof((a)[0]))
 #define FFALIGN(x, a) (((x)+(a)-1)&~((a)-1))
-
-// ==> Start patch MPC BE
-#ifdef __cplusplus
-    #ifndef UINT64_C
-        #define UINT64_C(x) (x ## ULL)
-    #endif
-#endif
-
-#ifdef _MSC_VER
-    #pragma warning(push)
-    #pragma warning(disable: 4244)
-#endif
-// ==> End patch MPC BE
 
 /* misc math functions */
 
@@ -464,12 +447,6 @@ static av_always_inline av_const int av_popcount64_c(uint64_t x)
 #ifdef HAVE_AV_CONFIG_H
 #    include "internal.h"
 #endif /* HAVE_AV_CONFIG_H */
-
-// ==> Start patch MPC BE
-#ifdef _MSC_VER
-    #pragma warning(pop)
-#endif
-// ==> End patch MPC BE
 
 #endif /* AVUTIL_COMMON_H */
 
