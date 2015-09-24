@@ -51,10 +51,6 @@
 #if defined(VS2015)
   #define bin_dir      = "..\bin15"
 #endif
-;#if defined(VS2015)
-;  #define bin_dir      = "..\bin15"
-;#endif
-
 
 #define bindir_x64 = bin_dir + "\mpc-be_x64"
 #define bindir_x86 = bin_dir + "\mpc-be_x86"
