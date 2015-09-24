@@ -329,6 +329,8 @@ IF /I "%COMPILER%" == "VS2012" (
   SET ISDefs=%ISDefs% /DVS2012
 ) ELSE IF /I "%COMPILER%" == "VS2013" (
   SET ISDefs=%ISDefs% /DVS2013
+) ELSE IF /I "%COMPILER%" == "VS2015" (
+  SET ISDefs=%ISDefs% /DVS2015
 )
 
 CALL :SubDetectInnoSetup
