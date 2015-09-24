@@ -29,8 +29,8 @@
 
 ; From now on you shouldn't need to change anything
 
-#if VER < EncodeVer(5,5,5)
-  #error Update your Inno Setup version (5.5.5 or newer)
+#if VER < EncodeVer(5,5,6)
+  #error Update your Inno Setup version (5.5.6 or newer)
 #endif
 
 #ifndef UNICODE
@@ -51,6 +51,10 @@
 #if defined(VS2015)
   #define bin_dir      = "..\bin15"
 #endif
+;#if defined(VS2015)
+;  #define bin_dir      = "..\bin15"
+;#endif
+
 
 #define bindir_x64 = bin_dir + "\mpc-be_x64"
 #define bindir_x86 = bin_dir + "\mpc-be_x86"
