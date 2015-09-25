@@ -25,11 +25,7 @@
 #include <math.h>
 #include "attributes.h"
 #include "rational.h"
-// ==> Start patch MPC
-#ifdef __GNUC__
 #include "intfloat.h"
-#endif
-// ==> End patch MPC
 
 #ifndef M_E
 #define M_E            2.7182818284590452354   /* e */

@@ -36,7 +36,6 @@
 * libavfilter/allfilters.c 
 
 * libavutil/eval.c
-* libavutil/mathematics.h
 * libavutil/time_av.c(time.c)
 * libavutil/time_av.h(time.h)
 ======
