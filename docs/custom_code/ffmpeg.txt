@@ -35,10 +35,12 @@
 
 * libavfilter/allfilters.c 
 
+* libavutil/eval.c
 * libavutil/file_open.c
 * libavutil/internal.h
 * libavutil/mathematics.h
-
+* libavutil/time_av.c(time.c)
+* libavutil/time_av.h(time.h)
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
 

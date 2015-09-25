@@ -34,7 +34,9 @@
 #include "internal.h"
 #include "log.h"
 #include "mathematics.h"
-#include "time.h"
+// ==> Start patch MPC
+#include "time_av.h"
+// ==> End patch MPC
 #include "avstring.h"
 #include "timer.h"
 
