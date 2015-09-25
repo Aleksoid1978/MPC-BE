@@ -581,7 +581,7 @@ SRCS_LU = \
 	libavutil/sha.c \
 	libavutil/stereo3d.c \
 	libavutil/threadmessage.c \
-	libavutil/time.c \
+	libavutil/time_av.c \
 	libavutil/timecode.c \
 	libavutil/utils.c \
 	\
