@@ -24,6 +24,8 @@
 #include "IMpcAudioRenderer.h"
 #include "resource.h"
 
+void GetActiveAudioDevices(CStringArray& deviceNameList, CStringArray& deviceIdList);
+
 class __declspec(uuid("1E53BA32-3BCC-4dff-9342-34E46BE3F5A5"))
 	CMpcAudioRendererSettingsWnd : public CInternalPropertyPageWnd
 {
@@ -62,8 +64,6 @@ public:
 	bool OnActivate();
 	void OnDeactivate();
 	bool OnApply();
-
-	HRESULT GetAvailableAudioDevices();
 
 	static LPCTSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION); }
 	static CSize GetWindowSize() { return CSize(340, 135); }
