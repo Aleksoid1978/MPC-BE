@@ -29,8 +29,6 @@
 #include <io.h>
 #endif
 
-// ==> Start patch MPC
-/*
 #if defined(_WIN32) && !defined(__MINGW32CE__)
 #undef open
 #undef lseek
@@ -39,23 +37,18 @@
 #include <windows.h>
 #include <share.h>
 #include <errno.h>
+#include "wchar_filename.h"
 
 static int win32_open(const char *filename_utf8, int oflag, int pmode)
 {
     int fd;
-    int num_chars;
     wchar_t *filename_w;
-*/
+
     /* convert UTF-8 to wide chars */
-/*    num_chars = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, filename_utf8, -1, NULL, 0);
-    if (num_chars <= 0)
-        goto fallback;
-    filename_w = av_mallocz_array(num_chars, sizeof(wchar_t));
-    if (!filename_w) {
-        errno = ENOMEM;
+    if (utf8towchar(filename_utf8, &filename_w))
         return -1;
-    }
-    MultiByteToWideChar(CP_UTF8, 0, filename_utf8, -1, filename_w, num_chars);
+    if (!filename_w)
+        goto fallback;
 
     fd = _wsopen(filename_w, oflag, SH_DENYNO, pmode);
     av_freep(&filename_w);
@@ -64,15 +57,11 @@ static int win32_open(const char *filename_utf8, int oflag, int pmode)
         return fd;
 
 fallback:
-*/
     /* filename may be in CP_ACP */
-/*
     return _sopen(filename_utf8, oflag, SH_DENYNO, pmode);
 }
 #define open win32_open
 #endif
-*/
-// ==> End patch MPC
 
 int avpriv_open(const char *filename, int flags, ...)
 {

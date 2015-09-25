@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include <io.h>
 
 extern "C" {
 	// hack to avoid error "unresolved external symbol" when linking
@@ -40,4 +41,7 @@ extern "C" {
 	void *__imp__aligned_malloc  = _aligned_malloc;
 	void *__imp__aligned_realloc = _aligned_realloc;
 	void *__imp__aligned_free    = _aligned_free;
+
+	void *__imp__sopen           = _sopen;
+	void *__imp__wsopen          = _wsopen;
 #endif
