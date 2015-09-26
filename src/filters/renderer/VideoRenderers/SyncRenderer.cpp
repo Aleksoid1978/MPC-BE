@@ -152,7 +152,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	if (s.m_AdvRendSets.iVMRDisableDesktopComposition) {
 		m_bDesktopCompositionDisabled = true;
 		if (m_pDwmEnableComposition) {
-			m_pDwmEnableComposition(0);
+			m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
 		}
 	} else {
 		m_bDesktopCompositionDisabled = false;
@@ -190,7 +190,7 @@ CBaseAP::~CBaseAP()
 	if (m_bDesktopCompositionDisabled) {
 		m_bDesktopCompositionDisabled = false;
 		if (m_pDwmEnableComposition) {
-			m_pDwmEnableComposition(1);
+			m_pDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 		}
 	}
 
@@ -384,14 +384,14 @@ bool CBaseAP::SettingsNeedResetDevice()
 			if (!m_bDesktopCompositionDisabled) {
 				m_bDesktopCompositionDisabled = true;
 				if (m_pDwmEnableComposition) {
-					m_pDwmEnableComposition(0);
+					m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
 				}
 			}
 		} else {
 			if (m_bDesktopCompositionDisabled) {
 				m_bDesktopCompositionDisabled = false;
 				if (m_pDwmEnableComposition) {
-					m_pDwmEnableComposition(1);
+					m_pDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 				}
 			}
 		}

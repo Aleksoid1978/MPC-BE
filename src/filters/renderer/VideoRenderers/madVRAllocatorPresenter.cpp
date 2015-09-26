@@ -42,6 +42,23 @@ CmadVRAllocatorPresenter::CmadVRAllocatorPresenter(HWND hWnd, HRESULT& hr, CStri
 		return;
 	}
 
+	m_pDwmIsCompositionEnabled = NULL;
+	m_pDwmEnableComposition = NULL;
+	m_hDWMAPI = LoadLibrary(L"dwmapi.dll");
+	if (m_hDWMAPI) {
+		(FARPROC &)m_pDwmIsCompositionEnabled = GetProcAddress(m_hDWMAPI, "DwmIsCompositionEnabled");
+		(FARPROC &)m_pDwmEnableComposition = GetProcAddress(m_hDWMAPI, "DwmEnableComposition");
+	}
+
+	if (GetRenderersSettings().m_AdvRendSets.iVMRDisableDesktopComposition) {
+		m_bDesktopCompositionDisabled = true;
+		if (m_pDwmEnableComposition) {
+			m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
+		}
+	} else {
+		m_bDesktopCompositionDisabled = false;
+	}
+
 	hr = S_OK;
 }
 
@@ -50,6 +67,13 @@ CmadVRAllocatorPresenter::~CmadVRAllocatorPresenter()
 	if (m_pSRCB) {
 		// nasty, but we have to let it know about our death somehow
 		((CSubRenderCallback*)(ISubRenderCallback2*)m_pSRCB)->SetDXRAP(NULL);
+	}
+
+	if (m_bDesktopCompositionDisabled) {
+		m_bDesktopCompositionDisabled = false;
+		if (m_pDwmEnableComposition) {
+			m_pDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
+		}
 	}
 
 	// the order is important here

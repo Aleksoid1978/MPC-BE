@@ -119,7 +119,16 @@ void CPPageSync::InitDialogPrivate()
 	}
 	OnAlterativeVSyncCheck();
 
-	m_chkDisableAero.EnableWindow(IsWinVista() || IsWinSeven() ? TRUE : FALSE);
+	if ((IsWinVista() || IsWinSeven()) &&
+			(s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS ||
+			s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
+			s.iDSVideoRendererType == VIDRNDT_DS_MADVR ||
+			s.iDSVideoRendererType == VIDRNDT_DS_SYNC)) {
+		m_chkDisableAero.EnableWindow(TRUE);
+	} else {
+		m_chkDisableAero.EnableWindow(FALSE);
+	}
+
 	m_chkEnableFrameTimeCorrection.EnableWindow(s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ? TRUE : FALSE);
 
 	if ((s.iDSVideoRendererType == VIDRNDT_DS_SYNC) && (pFrame->GetPlaybackMode() == PM_NONE)) {
