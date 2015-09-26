@@ -47,7 +47,7 @@ static void InitDSound()
 		hModuleDSound = LoadLibrary(L"dsound.dll");
 	}
 
-	if (!pDirectSoundEnumerate) {
+	if (hModuleDSound && !pDirectSoundEnumerate) {
 		(FARPROC &)pDirectSoundEnumerate = GetProcAddress(hModuleDSound, "DirectSoundEnumerateW");
 	}
 }

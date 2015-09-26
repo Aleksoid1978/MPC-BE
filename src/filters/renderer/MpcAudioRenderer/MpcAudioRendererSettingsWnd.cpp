@@ -93,7 +93,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	if (m_pMAR) {
 		if (m_cbSoundDevice.GetCount() > 0) {
 			int idx = 0;
-			CString soundDeviceId = m_pMAR->GetSoundDeviceId();
+			CString soundDeviceId = m_pMAR->GetDeviceId();
 			for (INT_PTR i = 0; i < m_deviceIdList.GetCount(); i++) {
 				if (m_deviceIdList[i] == soundDeviceId) {
 					idx = i;
@@ -139,7 +139,7 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 		m_pMAR->SetSyncMethod(m_cbSyncMethod.GetCurSel());
 		int idx = m_cbSoundDevice.GetCurSel();
 		if (idx >= 0) {
-			m_pMAR->SetSoundDeviceId(m_deviceIdList[idx]);
+			m_pMAR->SetDeviceId(m_deviceIdList[idx]);
 		}
 		m_pMAR->Apply();
 	}
@@ -389,7 +389,7 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 			}
 		}
 
-		m_CurrentDeviceText.SetWindowText(m_pMAR->GetCurrentPlaybackDevice());
+		m_CurrentDeviceText.SetWindowText(m_pMAR->GetCurrentDeviceName());
 	}
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
