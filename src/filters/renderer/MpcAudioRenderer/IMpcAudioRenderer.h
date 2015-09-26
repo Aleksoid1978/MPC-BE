@@ -48,8 +48,8 @@ public IUnknown {
 
 	STDMETHOD(SetWasapiMode(INT nValue)) PURE;
 	STDMETHOD_(INT, GetWasapiMode()) PURE;
-	STDMETHOD(SetSoundDeviceId(CString pDeviceId)) PURE;
-	STDMETHOD_(CString, GetSoundDeviceId()) PURE;
+	STDMETHOD(SetDeviceId(CString pDeviceId)) PURE;
+	STDMETHOD_(CString, GetDeviceId()) PURE;
 	STDMETHOD_(UINT, GetMode()) PURE;
 	STDMETHOD(GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut)) PURE;
 	STDMETHOD(SetBitExactOutput(BOOL nValue)) PURE;
@@ -57,7 +57,8 @@ public IUnknown {
 	STDMETHOD(SetSystemLayoutChannels(BOOL nValue)) PURE;
 	STDMETHOD_(BOOL, GetSystemLayoutChannels()) PURE;
 	STDMETHOD_(BITSTREAM_MODE, GetBitstreamMode()) PURE;
-	STDMETHOD_(CString, GetCurrentPlaybackDevice()) PURE;
+	STDMETHOD_(CString, GetCurrentDeviceName()) PURE;
+	STDMETHOD_(CString, GetCurrentDeviceId()) PURE;
 	STDMETHOD(SetSyncMethod(INT nValue)) PURE;
 	STDMETHOD_(INT, GetSyncMethod()) PURE;
 };

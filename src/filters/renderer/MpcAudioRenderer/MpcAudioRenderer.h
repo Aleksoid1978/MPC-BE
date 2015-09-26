@@ -63,8 +63,8 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 
 	BOOL				m_bUseDefaultDevice;
 
-	CString				m_strDeviceId;
-	CString				m_strDeviceName;
+	CString				m_strCurrentDeviceId;
+	CString				m_strCurrentDeviceName;
 
 	BOOL				m_bHasVideo;
 
@@ -140,8 +140,8 @@ public:
 	STDMETHODIMP					Apply() override;
 	STDMETHODIMP					SetWasapiMode(INT nValue) override;
 	STDMETHODIMP_(INT)				GetWasapiMode() override;
-	STDMETHODIMP					SetSoundDeviceId(CString pDeviceId) override;
-	STDMETHODIMP_(CString)			GetSoundDeviceId() override;
+	STDMETHODIMP					SetDeviceId(CString pDeviceId) override;
+	STDMETHODIMP_(CString)			GetDeviceId() override;
 	STDMETHODIMP_(UINT)				GetMode() override;
 	STDMETHODIMP					GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut) override;
 	STDMETHODIMP					SetBitExactOutput(BOOL nValue) override;
@@ -149,7 +149,8 @@ public:
 	STDMETHODIMP					SetSystemLayoutChannels(BOOL nValue) override;
 	STDMETHODIMP_(BOOL)				GetSystemLayoutChannels() override;
 	STDMETHODIMP_(BITSTREAM_MODE)	GetBitstreamMode() override;
-	STDMETHODIMP_(CString)			GetCurrentPlaybackDevice() override;
+	STDMETHODIMP_(CString)			GetCurrentDeviceName() override;
+	STDMETHODIMP_(CString)			GetCurrentDeviceId() override;
 	STDMETHODIMP					SetSyncMethod(INT nValue) override;
 	STDMETHODIMP_(INT)				GetSyncMethod() override;
 
