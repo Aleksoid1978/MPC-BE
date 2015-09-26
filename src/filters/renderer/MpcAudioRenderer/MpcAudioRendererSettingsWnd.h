@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2014 see Authors.txt
+ * (C) 2010-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,8 +23,6 @@
 #include "../../filters/InternalPropertyPage.h"
 #include "IMpcAudioRenderer.h"
 #include "resource.h"
-
-void GetActiveAudioDevices(CStringArray& deviceNameList, CStringArray& deviceIdList);
 
 class __declspec(uuid("1E53BA32-3BCC-4dff-9342-34E46BE3F5A5"))
 	CMpcAudioRendererSettingsWnd : public CInternalPropertyPageWnd
