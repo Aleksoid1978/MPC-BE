@@ -418,9 +418,11 @@ STDMETHODIMP CMpcAudioRenderer::NonDelegatingQueryInterface(REFIID riid, void **
 	} else if (riid == IID_IBasicAudio) {
 		return GetInterface(static_cast<IBasicAudio*>(this), ppv);
 	} else if (riid == IID_IMediaSeeking) {
-        return GetInterface(static_cast<IMediaSeeking*>(this), ppv);
+		return GetInterface(static_cast<IMediaSeeking*>(this), ppv);
 	} else if (riid == __uuidof(IMMNotificationClient)) {
 		return GetInterface(static_cast<IMMNotificationClient*>(this), ppv);
+	} else if (riid == __uuidof(IAMStreamSelect)) {
+		return GetInterface(static_cast<IAMStreamSelect*>(this), ppv);
 	} else if (riid == __uuidof(ISpecifyPropertyPages)) {
 		return GetInterface(static_cast<ISpecifyPropertyPages*>(this), ppv);
 	} else if (riid == __uuidof(ISpecifyPropertyPages2)) {
@@ -827,6 +829,90 @@ STDMETHODIMP CMpcAudioRenderer::OnDefaultDeviceChanged(EDataFlow flow, ERole rol
 
 	return S_OK;
 }
+
+// === IAMStreamSelect
+STDMETHODIMP CMpcAudioRenderer::Count(DWORD* pcStreams)
+{
+	if (!pcStreams) {
+		return E_POINTER;
+	}
+
+	return AudioDevices::GetActiveAudioDevicesCount(*(UINT*)pcStreams, FALSE);
+}
+
+
+STDMETHODIMP CMpcAudioRenderer::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD* pdwFlags, LCID* plcid, DWORD* pdwGroup, WCHAR** ppszName, IUnknown** ppObject, IUnknown** ppUnk)
+{
+	CStringArray deviceNameList;
+	CStringArray deviceIdList;
+
+	if (S_OK != AudioDevices::GetActiveAudioDevices(deviceNameList, deviceIdList, FALSE)
+			|| deviceNameList.IsEmpty()
+			|| deviceNameList.GetCount() != deviceIdList.GetCount()) {
+		return E_FAIL;
+	}
+
+	if (lIndex >= deviceNameList.GetCount()) {
+		return S_FALSE;
+	}
+
+	if (ppmt) {
+		*ppmt = NULL;
+	}
+	if (plcid) {
+		*plcid = 0;
+	}
+	if (pdwGroup) {
+		*pdwGroup = 0;
+	}
+	if (ppObject) {
+		*ppObject = NULL;
+	}
+	if (ppUnk) {
+		*ppUnk = NULL;
+	}
+
+	if (pdwFlags) {
+		if (deviceIdList[lIndex] == GetCurrentDeviceId()) {
+			*pdwFlags = AMSTREAMSELECTINFO_ENABLED;
+		} else {
+			*pdwFlags = 0;
+		}
+	}
+
+	if (ppszName) {
+		*ppszName = (WCHAR*)CoTaskMemAlloc((deviceNameList[lIndex].GetLength()+1)*sizeof(WCHAR));
+		if (*ppszName) {
+			wcscpy_s(*ppszName, deviceNameList[lIndex].GetLength()+1, deviceNameList[lIndex].GetBuffer());
+		}
+	}
+
+	return S_OK;
+}
+
+STDMETHODIMP CMpcAudioRenderer::Enable(long lIndex, DWORD dwFlags)
+{
+	if (dwFlags != AMSTREAMSELECTENABLE_ENABLE) {
+		return E_NOTIMPL;
+	}
+
+	CStringArray deviceNameList;
+	CStringArray deviceIdList;
+
+	if (S_OK != AudioDevices::GetActiveAudioDevices(deviceNameList, deviceIdList, FALSE)
+			|| deviceNameList.IsEmpty()
+			|| deviceNameList.GetCount() != deviceIdList.GetCount()) {
+		return E_FAIL;
+	}
+
+	if (lIndex >= deviceIdList.GetCount()) {
+		return E_INVALIDARG;
+	}
+
+
+	return SetDeviceId(deviceIdList[lIndex]);
+}
+
 
 // === ISpecifyPropertyPages2
 STDMETHODIMP CMpcAudioRenderer::GetPages(CAUUID* pPages)
