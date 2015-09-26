@@ -30,6 +30,7 @@
 #include "../../../DSUtil/AudioTools.h"
 #include "../../../DSUtil/SysVersion.h"
 #include "AudioHelper.h"
+#include "AudioDevice.h"
 #include "MpcAudioRenderer.h"
 
 // option names
@@ -909,9 +910,28 @@ STDMETHODIMP CMpcAudioRenderer::SetSoundDeviceId(CString pDeviceId)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_pAudioClient && m_DeviceId != pDeviceId) {
-		m_strDeviceId.Empty();
-		SetEvent(m_hReinitializeEvent);
+	if (m_pAudioClient) {
+		CString deviceIdSrc = m_DeviceId;
+		CString deviceIdDst = pDeviceId;
+
+		if (deviceIdSrc != deviceIdDst
+				&& (deviceIdSrc.IsEmpty() || deviceIdDst.IsEmpty())) {
+			CString deviceName;
+			CString deviceId;
+			AudioDevices::GetDefaultAudioDevice(deviceName, deviceId);
+
+			if (deviceIdSrc.IsEmpty()) {
+				deviceIdSrc = deviceId;
+			}
+			if (deviceIdDst.IsEmpty()) {
+				deviceIdDst = deviceId;
+			}
+		}
+
+		if (deviceIdSrc != deviceIdDst) {
+			m_strDeviceId.Empty();
+			SetEvent(m_hReinitializeEvent);
+		}
 	}
 
 	m_DeviceId = pDeviceId;

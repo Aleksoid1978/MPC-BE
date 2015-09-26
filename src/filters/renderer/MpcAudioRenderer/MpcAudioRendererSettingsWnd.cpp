@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2014 see Authors.txt
+ * (C) 2010-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,88 +24,9 @@
 #include <ks.h>
 #include <ksmedia.h>
 #include "MpcAudioRendererSettingsWnd.h"
+#include "AudioDevice.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
-
-static BOOL CALLBACK DSEnumCallback(LPGUID lpGUID,
-									LPCTSTR lpszDesc,
-									LPCTSTR lpszDrvName,
-									LPVOID lpContext)
-{
-	CStringArray* pArray = (CStringArray*)lpContext;
-	ASSERT(pArray);
-
-	if (lpGUID == NULL) { // add only "Primary Sound Driver"
-		pArray->Add(lpszDesc);
-	}
-
-	return TRUE;
-}
-
-void GetActiveAudioDevices(CStringArray& deviceNameList, CStringArray& deviceIdList)
-{
-	deviceNameList.RemoveAll();
-	deviceIdList.RemoveAll();
-
-	HMODULE hModule = LoadLibrary(L"dsound.dll");
-	if (hModule) {
-		HRESULT(__stdcall * pDirectSoundEnumerate)(__in LPDSENUMCALLBACKW pDSEnumCallback, __in_opt LPVOID pContext);
-		(FARPROC &)pDirectSoundEnumerate = GetProcAddress(hModule, "DirectSoundEnumerateW");
-		if (pDirectSoundEnumerate) {
-			pDirectSoundEnumerate((LPDSENUMCALLBACK)DSEnumCallback, (LPVOID)&deviceNameList);
-		}
-		FreeLibrary(hModule);
-
-		if (deviceNameList.GetCount() == 1) {
-			deviceIdList.Add(L"");
-		}
-	}
-
-	for (;;) {
-		CComPtr<IMMDeviceEnumerator> enumerator;
-		HRESULT hr = enumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator));
-		if (FAILED(hr)) {
-			break;
-		}
-		CComPtr<IMMDeviceCollection> devices;
-		if (FAILED(hr = enumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &devices))) {
-			break;
-		}
-
-		UINT count = 0;
-		if (FAILED(hr = devices->GetCount(&count))) {
-			break;
-		}
-
-		IMMDevice* endpoint = NULL;
-		IPropertyStore* pProps = NULL;
-		LPWSTR pwszID = NULL;
-
-		for (UINT i = 0; i < count; i++) {
-			if (SUCCEEDED(hr = devices->Item(i, &endpoint))
-					&& SUCCEEDED(endpoint->GetId(&pwszID))
-					&& SUCCEEDED(hr = endpoint->OpenPropertyStore(STGM_READ, &pProps))) {
-				PROPVARIANT varName;
-				PropVariantInit(&varName);
-				if (SUCCEEDED(hr = pProps->GetValue(PKEY_Device_FriendlyName, &varName))) {
-					deviceIdList.Add(pwszID);
-					deviceNameList.Add(varName.pwszVal);
-
-					PropVariantClear(&varName);
-				}
-			}
-
-			SAFE_RELEASE(endpoint);
-			SAFE_RELEASE(pProps);
-			if (pwszID) {
-				CoTaskMemFree(pwszID);
-				pwszID = NULL;
-			}
-		}
-
-		break;
-	}
-}
 
 CMpcAudioRendererSettingsWnd::CMpcAudioRendererSettingsWnd()
 {
@@ -164,7 +85,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	m_cbSyncMethod.AddString(ResStr(IDS_ARS_SYNC_BY_DURATION));
 
 	CStringArray deviceNameList;
-	GetActiveAudioDevices(deviceNameList, m_deviceIdList);
+	AudioDevices::GetActiveAudioDevices(deviceNameList, m_deviceIdList);
 	for (INT_PTR i = 0; i < deviceNameList.GetCount(); i++) {
 		m_cbSoundDevice.AddString(deviceNameList[i]);
 	}
