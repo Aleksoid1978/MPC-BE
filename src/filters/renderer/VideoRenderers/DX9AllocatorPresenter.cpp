@@ -127,7 +127,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	if (s.m_AdvRendSets.iVMRDisableDesktopComposition) {
 		m_bDesktopCompositionDisabled = true;
 		if (m_pDwmEnableComposition) {
-			m_pDwmEnableComposition(0);
+			m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
 		}
 	} else {
 		m_bDesktopCompositionDisabled = false;
@@ -141,7 +141,7 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 	if (m_bDesktopCompositionDisabled) {
 		m_bDesktopCompositionDisabled = false;
 		if (m_pDwmEnableComposition) {
-			m_pDwmEnableComposition(1);
+			m_pDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 		}
 	}
 
@@ -401,14 +401,14 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 			if (!m_bDesktopCompositionDisabled) {
 				m_bDesktopCompositionDisabled = true;
 				if (m_pDwmEnableComposition) {
-					m_pDwmEnableComposition(0);
+					m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
 				}
 			}
 		} else {
 			if (m_bDesktopCompositionDisabled) {
 				m_bDesktopCompositionDisabled = false;
 				if (m_pDwmEnableComposition) {
-					m_pDwmEnableComposition(1);
+					m_pDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 				}
 			}
 		}

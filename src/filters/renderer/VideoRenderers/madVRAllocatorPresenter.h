@@ -76,6 +76,12 @@ namespace DSObjects
 		CComPtr<ISubRenderCallback2> m_pSRCB;
 		CSize	m_ScreenSize;
 		bool	m_bIsFullscreen;
+		bool	m_bDesktopCompositionDisabled;
+
+		HMODULE m_hDWMAPI;
+
+		HRESULT (__stdcall * m_pDwmIsCompositionEnabled)(__out BOOL* pfEnabled);
+		HRESULT (__stdcall * m_pDwmEnableComposition)(UINT uCompositionAction);
 
 	public:
 		CmadVRAllocatorPresenter(HWND hWnd, HRESULT& hr, CString &_Error);
