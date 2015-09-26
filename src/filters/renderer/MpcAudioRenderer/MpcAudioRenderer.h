@@ -41,6 +41,7 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	, public IBasicAudio
 	, public IMediaSeeking
 	, public IMMNotificationClient
+	, public IAMStreamSelect
 	, public ISpecifyPropertyPages2
 	, public IMpcAudioRendererFilter
 {
@@ -131,6 +132,11 @@ public:
 	STDMETHODIMP OnDeviceRemoved(__in LPCWSTR pwstrDeviceId) override { return E_NOTIMPL; }
 	STDMETHODIMP OnDefaultDeviceChanged(__in EDataFlow flow, __in ERole role, __in LPCWSTR pwstrDefaultDeviceId) override;
 	STDMETHODIMP OnPropertyValueChanged(__in LPCWSTR pwstrDeviceId, __in const PROPERTYKEY key) override { return E_NOTIMPL; }
+
+	// === IAMStreamSelect
+	STDMETHODIMP Count(DWORD* pcStreams);
+	STDMETHODIMP Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD* pdwFlags, LCID* plcid, DWORD* pdwGroup, WCHAR** ppszName, IUnknown** ppObject, IUnknown** ppUnk);
+	STDMETHODIMP Enable(long lIndex, DWORD dwFlags);
 
 	// === ISpecifyPropertyPages2
 	STDMETHODIMP GetPages(CAUUID* pPages) override;
