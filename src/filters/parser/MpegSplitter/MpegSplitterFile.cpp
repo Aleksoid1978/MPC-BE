@@ -61,6 +61,21 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 	}
 
+	BYTE data[16];
+	Seek(0);
+	if (ByteRead(data, sizeof(data)) != S_OK) {
+		return E_FAIL;
+	}
+	DWORD id = *(DWORD*)data;
+
+	if (id == FCC('RIFF') && GETDWORD(data+8) != FCC('CDXA') // AVI, WAVE, AMV and other
+			|| id == 0xA3DF451A    // Matroska
+			|| id == FCC('Rar!')   // RAR
+			|| id == 0x04034B50    // ZIP
+			|| id == 0xAFBC7A37) { // 7-Zip
+		return E_FAIL;
+	}
+
 	Seek(0);
 	m_bIMKH_CCTV = (BitRead(32, true) == 'IMKH');
 
