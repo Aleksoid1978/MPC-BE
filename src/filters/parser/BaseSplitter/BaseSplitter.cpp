@@ -480,15 +480,15 @@ STDMETHODIMP CBaseSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 	if (FAILED(hr)
 			|| FAILED(hr = DeleteOutputs())
 			|| FAILED(hr = CreateOutputs(pAsyncReader))) {
-		m_fn = "";
+		m_fn.Empty();
 		return hr;
 	}
 
 	SortOutputPin();
 
 	if (BuildChapters(pszFileName, m_Items, Chapters)) {
-		POSITION pos	= Chapters.GetHeadPosition();
-		int	i			= 1;
+		POSITION pos = Chapters.GetHeadPosition();
+		int i = 1;
 		while (pos) {
 			CString str;
 			CHdmvClipInfo::PlaylistChapter& chap = Chapters.GetNext(pos);
