@@ -1966,19 +1966,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	// add CMpegSourceFilter last since it can parse the stream for a long time
 	if (src[SRC_MPEG] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CMpegSourceFilter>();
-		pFGF->m_chkbytes.AddTail(_T("0,16,FFFFFFFFF100010001800001FFFFFFFF,000001BA2100010001800001000001BB"));
-		pFGF->m_chkbytes.AddTail(_T("0,5,FFFFFFFFC0,000001BA40"));
-		pFGF->m_chkbytes.AddTail(_T("0,1,,47,188,1,,47,376,1,,47"));
-		pFGF->m_chkbytes.AddTail(_T("4,1,,47,196,1,,47,388,1,,47"));
-		pFGF->m_chkbytes.AddTail(_T("0,4,,54467263,1660,1,,47"));
-		pFGF->m_chkbytes.AddTail(_T("0,8,fffffc00ffe00000,4156000055000000"));
-		pFGF->m_chkbytes.AddTail(_T("0,8,,4D504C5330323030"));	// MPLS0200
-		pFGF->m_chkbytes.AddTail(_T("0,8,,4D504C5330313030"));	// MPLS0100
-		pFGF->m_chkbytes.AddTail(_T("0,4,,494D4B48"));			// IMKH
-		pFGF->m_extensions.AddTail(_T(".mpg"));
-		pFGF->m_extensions.AddTail(_T(".ts"));
-		pFGF->m_extensions.AddTail(_T(".m2ts"));
-		pFGF->m_extensions.AddTail(_T(".tp"));
 		m_source.AddTail(pFGF);
 	}
 
