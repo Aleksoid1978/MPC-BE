@@ -105,8 +105,6 @@ namespace DSObjects
 		STDMETHODIMP SetPixelShader2(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace);
 
 		// ISubPicAllocatorPresenter2
-		STDMETHODIMP_(bool) IsRendering() {
-			return false; // For testing
-		}
+		STDMETHODIMP_(bool) IsRendering();
 	};
 }
