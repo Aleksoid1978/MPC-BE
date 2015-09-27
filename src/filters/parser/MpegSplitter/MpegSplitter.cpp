@@ -645,6 +645,13 @@ void CMpegSplitterFilter::ReadClipInfo(LPCOLESTR pszFileName)
 
 STDMETHODIMP CMpegSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 {
+	CPath path(pszFileName);
+	const CString ext = path.GetExtension().MakeLower();
+
+	if (ext == L".iso" || ext == L".mdf") { // ignore the disk images without signature
+		return E_ABORT;
+	}
+
 	return __super::Load(pszFileName, pmt);
 }
 

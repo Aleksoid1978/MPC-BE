@@ -66,13 +66,22 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	if (ByteRead(data, sizeof(data)) != S_OK) {
 		return E_FAIL;
 	}
-	DWORD id = *(DWORD*)data;
+	DWORD id = GETDWORD(data);
+	DWORD id2 = GETDWORD(data + 4);
 
 	if (id == FCC('RIFF') && GETDWORD(data+8) != FCC('CDXA') // AVI, WAVE, AMV and other
-			|| id == 0xA3DF451A    // Matroska
-			|| id == FCC('Rar!')   // RAR
-			|| id == 0x04034B50    // ZIP
-			|| id == 0xAFBC7A37) { // 7-Zip
+			|| id == 0xA3DF451A         // Matroska
+			|| id2 == FCC('ftyp')       // MP4
+			|| id2 == FCC('moov')       // MOV
+			|| id2 == FCC('mdat')       // MOV
+			|| id2 == FCC('wide')       // MOV
+			|| id2 == FCC('skip')       // MOV
+			|| id2 == FCC('free')       // MOV
+			|| id2 == FCC('pnot')       // MOV
+			|| id == FCC('Rar!')        // RAR
+			|| id == 0x04034B50         // ZIP
+			|| id == 0xAFBC7A37         // 7-Zip
+			|| GETWORD(data) == 'ZM') { // EXE, DLL
 		return E_FAIL;
 	}
 
