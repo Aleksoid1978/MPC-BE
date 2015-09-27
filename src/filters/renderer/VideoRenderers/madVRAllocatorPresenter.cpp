@@ -274,3 +274,16 @@ STDMETHODIMP CmadVRAllocatorPresenter::SetPixelShader2(LPCSTR pSrcData, LPCSTR p
 	}
 	return hr;
 }
+
+// ISubPicAllocatorPresenter2
+
+STDMETHODIMP_(bool) CmadVRAllocatorPresenter::IsRendering()
+{
+	if (CComQIPtr<IMadVRInfo> pMVRI = m_pDXR) {
+		int playbackState;
+		if (SUCCEEDED(pMVRI->GetInt("playbackState", &playbackState))) {
+			return playbackState == State_Running;
+		}
+	}
+	return false;
+}
