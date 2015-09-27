@@ -10029,7 +10029,7 @@ void CMainFrame::OnHelpDocumentation()
 
 void CMainFrame::OnHelpToolbarImages()
 {
-	ShellExecute(m_hWnd, _T("open"), _T("http://dev.mpc-next.ru/index.php?board=44.0"), NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecute(m_hWnd, _T("open"), _T("http://sourceforge.net/projects/mpcbe/files/Toolbars/"), NULL, NULL, SW_SHOWDEFAULT);
 }
 
 /*
