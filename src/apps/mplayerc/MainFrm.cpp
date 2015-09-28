@@ -728,6 +728,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	} else {
 		m_wndPreView.ShowWindow(SW_HIDE);
+		m_wndPreView.SetRelativeSize(s.iSmartSeekSize);
 	}
 
 	// static bars
@@ -11219,7 +11220,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 	m_pGB_preview = NULL;
 
-	m_bUseSmartSeek	= s.fSmartSeek;
+	m_bUseSmartSeek = s.fSmartSeek;
 	if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
 		CString fn = pFileData->fns.GetHead();
 		if (!fn.IsEmpty() && (fn.Find(_T("://")) >= 0)) { // disable SmartSeek for streaming data.

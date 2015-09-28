@@ -59,6 +59,7 @@ public:
 	CSliderCtrl m_ThemeRedCtrl;
 	CSliderCtrl m_ThemeGreenCtrl;
 	CSliderCtrl m_ThemeBlueCtrl;
+	CIntEdit    m_edSmartSeekSize;
 	CSliderCtrl m_OSDTransparentCtrl;
 	CComboBox m_TimeTooltipPosition;
 	CComboBox m_FontType;

@@ -81,6 +81,7 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO1, m_FontType);
 	DDX_Control(pDX, IDC_COMBO2, m_FontSize);
 	DDX_Check(pDX, IDC_CHECK_PRV, m_fSmartSeek);
+	DDX_Control(pDX, IDC_EDIT1, m_edSmartSeekSize);
 	DDX_Check(pDX, IDC_CHECK_CHM, m_fChapterMarker);
 	DDX_Check(pDX, IDC_CHECK_FLYBAR, m_fFlybar);
 	DDX_Text(pDX, IDC_EDIT4, m_OSDBorder);
@@ -141,6 +142,8 @@ BOOL CPPageInterface::OnInitDialog()
 	m_OSD_Font	= s.strOSDFont;
 
 	m_fSmartSeek		= s.fSmartSeek;
+	m_edSmartSeekSize.SetRange(10, 30);
+	m_edSmartSeekSize	= s.iSmartSeekSize;
 	m_fChapterMarker	= s.fChapterMarker;
 	m_fFlybar			= s.fFlybar;
 	m_fFontShadow		= m_fFontShadow_Old	= s.fFontShadow;
@@ -226,6 +229,7 @@ BOOL CPPageInterface::OnApply()
 	m_FontType.GetLBText(m_FontType.GetCurSel(),s.strOSDFont);
 
 	s.fSmartSeek			= !!m_fSmartSeek;
+	s.iSmartSeekSize		= m_edSmartSeekSize;
 	s.fChapterMarker		= !!m_fChapterMarker;
 	s.fFlybar				= !!m_fFlybar;
 	s.fFontShadow			= !!m_fFontShadow;
@@ -241,6 +245,8 @@ BOOL CPPageInterface::OnApply()
 	pFrame->CreateThumbnailToolbar();
 	pFrame->UpdateThumbarButton();
 	pFrame->SetAudioPicture();
+
+	pFrame->m_wndPreView.SetRelativeSize(s.iSmartSeekSize);
 
 	pFrame->Invalidate();
 
@@ -598,6 +604,10 @@ void CPPageInterface::OnUsePreview()
 
 	GetDlgItem(IDC_CHECK8)->EnableWindow(!m_fSmartSeek);
 	GetDlgItem(IDC_COMBO3)->EnableWindow(!m_fSmartSeek && m_fUseTimeTooltip);
+
+	GetDlgItem(IDC_STATIC1)->EnableWindow(m_fSmartSeek);
+	GetDlgItem(IDC_EDIT1)->EnableWindow(m_fSmartSeek);
+	GetDlgItem(IDC_STATIC2)->EnableWindow(m_fSmartSeek);
 
 	SetModified();
 }

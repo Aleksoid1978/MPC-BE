@@ -22,14 +22,16 @@
 
 class CPreView : public CWnd
 {
+	int m_relativeSize = 15;
+
 public:
 	CPreView();
 	virtual ~CPreView();
 
 	DECLARE_DYNAMIC(CPreView)
-
 	virtual BOOL SetWindowText(LPCWSTR lpString);
 
+	void SetRelativeSize(int relativesize) { m_relativeSize = relativesize; }
 	void GetVideoRect(LPRECT lpRect);
 	HWND GetVideoHWND();
 	COLORREF RGBFill(int r1, int g1, int b1, int r2, int g2, int b2, int i, int k);
@@ -45,6 +47,7 @@ protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnPaint();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 
 	DECLARE_MESSAGE_MAP()
 };

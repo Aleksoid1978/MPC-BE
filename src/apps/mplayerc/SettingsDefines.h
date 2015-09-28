@@ -277,6 +277,7 @@
 
 #define IDS_RS_LCD_SUPPORT					_T("LcdSupport")
 #define IDS_RS_SMARTSEEK					_T("UseSmartSeek")
+#define IDS_RS_SMARTSEEK_SIZE				_T("SmartSeekSize")
 #define IDS_RS_CHAPTER_MARKER				_T("ChapterMarker")
 
 #define IDS_RS_REMAINING_TIME				_T("RemainingTime")
