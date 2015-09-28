@@ -340,6 +340,8 @@ public:
 		BYTE splicingpoint:1;
 		BYTE privatedata:1;
 		BYTE extension:1;
+
+		__int64 hdrpos;
 		// TODO: add more fields here when the flags above are set (they aren't very interesting...)
 	};
 
@@ -371,6 +373,8 @@ public:
 		BYTE prebytes:2;
 		WORD length;
 		REFERENCE_TIME pts;
+
+		__int64 hdrpos;
 	};
 
 	struct vc1hdr
@@ -433,7 +437,7 @@ public:
 	bool Read(cvdspuhdr& h, CMediaType* pmt = NULL);
 	bool Read(ps2audhdr& h, CMediaType* pmt = NULL);
 	bool Read(ps2subhdr& h, CMediaType* pmt = NULL);
-	__int64 Read(trhdr& h, bool fSync = true);
+	bool Read(trhdr& h, bool fSync = true);
 	bool Read(trsechdr& h);
 	bool Read(pvahdr& h, bool fSync = true);
 	bool Read(vc1hdr& h, int len, CMediaType* pmt = NULL);
