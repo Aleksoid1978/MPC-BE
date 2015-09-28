@@ -117,6 +117,8 @@ public:
 	REFERENCE_TIME m_rtMin;
 	REFERENCE_TIME m_rtMax;
 
+	__int64 m_posMin;
+
 	struct stream {
 		CMediaType mt;
 		std::vector<CMediaType> mts;

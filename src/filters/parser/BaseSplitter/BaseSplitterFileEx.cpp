@@ -1438,8 +1438,8 @@ bool CBaseSplitterFileEx::Read(trhdr& h, bool fSync)
 
 			BitRead(8);
 
-			if (i == m_tslen-1) {
-				return -1;
+			if (i == m_tslen - 1) {
+				return false;
 			}
 		}
 	}
