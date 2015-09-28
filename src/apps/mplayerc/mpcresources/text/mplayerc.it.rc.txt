@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Ripristina la risoluzione all'uscita"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
 6		"Attiva il tema 'dark' (default)"
 7		"Luminosità :"
 9		"Imposta il colore dell'indicatore del suono:"
@@ -278,19 +278,20 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 22		"Mostra tempo :"
 24		"Mostra nome file nella barra di ricerca"
 25		"Abilita l'anteprima video nella barra di ricerca"
-26		"Abilita i marcatori capitoli nella barra di ricerca"
-27		"Abilita la flybar"
-28		"OSD"
-29		"Font:"
-32		"F"
-33		"Sfondo:"
-34		"G1"
-35		"G2"
-36		"Transparenza:"
-38		"Spessore bordi:"
-41		"Ombra"
-42		"Anti-aliasing"
-43		"Utilizza la taskbar di Windows 7/8"
+26		"Size relative to screen width:"
+29		"Abilita i marcatori capitoli nella barra di ricerca"
+30		"Abilita la flybar"
+31		"OSD"
+32		"Font:"
+35		"F"
+36		"Sfondo:"
+37		"G1"
+38		"G2"
+39		"Transparenza:"
+41		"Spessore bordi:"
+44		"Ombra"
+45		"Anti-aliasing"
+46		"Utilizza la taskbar di Windows 7/8"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21

@@ -75,6 +75,7 @@ BEGIN_MESSAGE_MAP(CPreView, CWnd)
 	ON_WM_CREATE()
 	ON_WM_PAINT()
 	ON_WM_SIZE()
+	ON_WM_SHOWWINDOW()
 END_MESSAGE_MAP()
 
 // CPreView message handlers
@@ -299,4 +300,24 @@ void CPreView::OnSize(UINT nType, int cx, int cy)
 	v_rect.bottom -= (wb + 1);
 
 	m_view.SetWindowPos(NULL, v_rect.left, v_rect.top, v_rect.Width(), v_rect.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
+void CPreView::OnShowWindow(BOOL bShow, UINT nStatus)
+{
+	if (bShow) {
+		MONITORINFO mi = { sizeof(mi) };
+		GetMonitorInfo(MonitorFromWindow(GetParent()->m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+		CRect wr;
+		GetParent()->GetClientRect(wr);
+
+		int w = (mi.rcWork.right - mi.rcWork.left) * m_relativeSize / 100;
+		// the preview size should not be larger than half size of the main window, but not less than 160
+		w = max(160, min(w, wr.Width() / 2));
+
+		int h = w * 109 / 160;
+
+		SetWindowPos(NULL, 0, 0, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
+	}
+
+	__super::OnShowWindow(bShow, nStatus);
 }

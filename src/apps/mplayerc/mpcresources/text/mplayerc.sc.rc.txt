@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"退出后恢复默认分辨率"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
 6		"使用""黑色"" 主题(默认)"
 7		"亮度 :"
 9		"设置声音控制条颜色:"
@@ -278,19 +278,20 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 22		"使用时间工具提示:"
 24		"在进度条上显示文件名"
 25		"搜索时显示预览"
-26		"显示章节标记"
-27		"全屏模式时启用悬浮工具条"
-28		"屏幕显示"
-29		"字体:"
-32		"F"
-33		"背景:"
-34		"G1"
-35		"G2"
-36		"透明:"
-38		"边框大小:"
-41		"阴影"
-42		"抗锯齿"
-43		"使用 Windows 7（或更高版本）任务栏功能"
+26		"Size relative to screen width:"
+29		"显示章节标记"
+30		"全屏模式时启用悬浮工具条"
+31		"屏幕显示"
+32		"字体:"
+35		"F"
+36		"背景:"
+37		"G1"
+38		"G2"
+39		"透明:"
+41		"边框大小:"
+44		"阴影"
+45		"抗锯齿"
+46		"使用 Windows 7（或更高版本）任务栏功能"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21

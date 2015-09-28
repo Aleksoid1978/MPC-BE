@@ -675,6 +675,7 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LCD_SUPPORT, (int)fLCDSupport);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK, (int)fSmartSeek);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_SIZE, iSmartSeekSize);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, (int)fChapterMarker);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, (int)fFlybar);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, (int)fFlybarOnTop);
@@ -1436,6 +1437,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	fLCDSupport		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LCD_SUPPORT, FALSE);
 	fSmartSeek		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK, FALSE);
+	iSmartSeekSize	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_SIZE, 15);
+	iSmartSeekSize	= CLAMP(iSmartSeekSize, 10, 30);
 	fChapterMarker	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, FALSE);
 	fFlybar			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, TRUE);
 	fFlybarOnTop	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, FALSE);
