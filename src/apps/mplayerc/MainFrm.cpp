@@ -10805,51 +10805,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 
 		m_wndView.SetVideoRect(wr);
 
-		if (m_bUseSmartSeek && m_wndPreView) {
-			m_wndPreView.GetVideoRect(&wr2);
-			CRect vr2 = CRect(0,0,0,0);
-
-			CSize ws2 = wr2.Size();
-			int w2 = ws2.cx;
-			int h2 = ws2.cy;
-
-			CSize arxy = GetVideoSize();
-			{
-				int dh = ws2.cy;
-				int dw = MulDiv(dh, arxy.cx, arxy.cy);
-
-				int i = 0;
-				int minw = dw;
-				int maxw = dw;
-				if (ws2.cx < dw) {
-					minw = ws2.cx;
-				} else if (ws2.cx > dw) {
-					maxw = ws2.cx;
-				}
-
-				float scale = i / 3.0f;
-				w2 = minw + (maxw - minw) * scale;
-				h2 = MulDiv(w2, arxy.cy, arxy.cx);
-			}
-
-			CSize size2(
-				(int)(w2),
-				(int)(h2));
-
-			CPoint pos2(
-				(int)(m_PosX*(wr2.Width()*3 - w2) - wr2.Width()),
-				(int)(m_PosY*(wr2.Height()*3 - h2) - wr2.Height()));
-
-			vr2 = CRect(pos2, size2);
-
-			if (m_pMFVDC_preview) {
-				m_pMFVDC_preview->SetVideoPosition (NULL, wr2);
-			}
-
-			m_pBV_preview->SetDefaultSourcePosition();
-			m_pBV_preview->SetDestinationPosition(vr2.left, vr2.top, vr2.Width(), vr2.Height());
-			m_pVW_preview->SetWindowPosition(wr2.left, wr2.top, wr2.Width(), wr2.Height());
-		}
+		MovePreviewWindow();
 
 		if (bShowStats && vr.Height() > 0) {
 			CString info;
@@ -10858,6 +10814,49 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 		}
 	} else {
 		m_wndView.SetVideoRect();
+	}
+}
+
+void CMainFrame::MovePreviewWindow()
+{
+	if (m_bUseSmartSeek && m_wndPreView) {
+		CRect wr;
+		m_wndPreView.GetVideoRect(&wr);
+
+		CSize ws = wr.Size();
+		int w = ws.cx;
+		int h = ws.cy;
+
+		CSize arxy = GetVideoSize();
+		{
+			int dh = ws.cy;
+			int dw = MulDiv(dh, arxy.cx, arxy.cy);
+
+			int i = 0;
+			int minw = dw;
+			int maxw = dw;
+			if (ws.cx < dw) {
+				minw = ws.cx;
+			} else if (ws.cx > dw) {
+				maxw = ws.cx;
+			}
+
+			float scale = i / 3.0f;
+			w = minw + (maxw - minw) * scale;
+			h = MulDiv(w, arxy.cy, arxy.cx);
+		}
+
+		CPoint pos(m_PosX * (wr.Width() * 3 - w) - wr.Width(), m_PosY * (wr.Height() * 3 - h) - wr.Height());
+
+		CRect vr(pos, CSize(w, h));
+
+		if (m_pMFVDC_preview) {
+			m_pMFVDC_preview->SetVideoPosition (NULL, wr);
+		}
+
+		m_pBV_preview->SetDefaultSourcePosition();
+		m_pBV_preview->SetDestinationPosition(vr.left, vr.top, vr.Width(), vr.Height());
+		m_pVW_preview->SetWindowPosition(wr.left, wr.top, wr.Width(), wr.Height());
 	}
 }
 

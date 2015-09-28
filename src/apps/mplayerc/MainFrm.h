@@ -581,6 +581,8 @@ public:
 	void ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo);
 
 	void MoveVideoWindow(bool bShowStats = false, bool bForcedSetVideoRect = false);
+	void MovePreviewWindow();
+
 	void RepaintVideo();
 	void HideVideoWindow(bool fHide);
 
