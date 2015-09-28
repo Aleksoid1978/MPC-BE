@@ -44,6 +44,7 @@ CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CH
 	, m_bIMKH_CCTV(FALSE)
 	, m_rtMin(0)
 	, m_rtMax(0)
+	, m_posMin(0)
 {
 	memset(m_psm, 0, sizeof(m_psm));
 	if (SUCCEEDED(hr)) {
@@ -208,7 +209,10 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 
 		if (rtMin >= 0) {
-			const REFERENCE_TIME maxDelta = 30 * 60 * 10000000i64;
+			m_posMin = posMin;
+
+			const REFERENCE_TIME maxDelta      = 30 * 60 * 10000000i64; // 30 minutes
+			const REFERENCE_TIME maxStartDelta = 10 * 10000000i64;      // 10 seconds
 			m_rtMin = m_rtMax = rtMin;
 			for (int type = stream_type::video; type <= stream_type::audio; type++) {
 				const CStreamList& streams = m_streams[type];
@@ -221,6 +225,12 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 								&& ((sps[i].rt - m_rtMax) < maxDelta)) {
 							m_rtMax	= sps[i].rt;
 							posMax	= sps[i].fp;
+						}
+					}
+
+					for (size_t i = 0; i < sps.GetCount() && sps[i].fp < m_posMin; i++) {
+						if (llabs(rtMin - sps[i].rt) < maxStartDelta) {
+							m_posMin = sps[i].fp;
 						}
 					}
 				}
@@ -262,7 +272,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	Seek(0);
+	Seek(m_posMin);
 
 	return S_OK;
 }
