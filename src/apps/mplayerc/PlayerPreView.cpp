@@ -74,6 +74,7 @@ IMPLEMENT_DYNAMIC(CPreView, CWnd)
 BEGIN_MESSAGE_MAP(CPreView, CWnd)
 	ON_WM_CREATE()
 	ON_WM_PAINT()
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 // CPreView message handlers
@@ -102,12 +103,12 @@ int CPreView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	GetClientRect(rc);
 
 	v_rect = rc;
-	v_rect.left		= (wb+1);
-	v_rect.top		= (hc+1);
-	v_rect.right	-= (wb+1);
-	v_rect.bottom	-= (wb+1);
+	v_rect.left    = (wb + 1);
+	v_rect.top     = (hc + 1);
+	v_rect.right  -= (wb + 1);
+	v_rect.bottom -= (wb + 1);
 
-	if (!m_view.Create(NULL,_T(""), WS_CHILD | WS_VISIBLE, v_rect, this, NULL)) {
+	if (!m_view.Create(NULL, NULL, WS_CHILD | WS_VISIBLE, v_rect, this, 0)) {
 		return -1;
 	}
 
@@ -282,4 +283,20 @@ void CPreView::OnPaint()
 	mdc.SelectObject(pOldBm);
 	bm.DeleteObject();
 	mdc.DeleteDC();
+}
+
+void CPreView::OnSize(UINT nType, int cx, int cy)
+{
+	__super::OnSize(nType, cx, cy);
+
+	CRect rc;
+	GetClientRect(&rc);
+	
+	v_rect = rc;
+	v_rect.left    = (wb + 1);
+	v_rect.top     = (hc + 1);
+	v_rect.right  -= (wb + 1);
+	v_rect.bottom -= (wb + 1);
+
+	m_view.SetWindowPos(NULL, v_rect.left, v_rect.top, v_rect.Width(), v_rect.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
 }

@@ -810,6 +810,7 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 		}
 
 		m_pMainFrame->m_wndPreView.MoveWindow(point.x, point.y, r_width, r_height);
+		m_pMainFrame->MovePreviewWindow();
 	} else {
 		CSize size = m_tooltip.GetBubbleSize(&m_ti);
 		CRect r;
