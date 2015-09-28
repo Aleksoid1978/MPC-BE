@@ -1375,7 +1375,7 @@ bool CBaseSplitterFileEx::Read(ps2subhdr& h, CMediaType* pmt)
 	return true;
 }
 
-__int64 CBaseSplitterFileEx::Read(trhdr& h, bool fSync)
+bool CBaseSplitterFileEx::Read(trhdr& h, bool fSync)
 {
 	memset(&h, 0, sizeof(h));
 
@@ -1419,7 +1419,7 @@ __int64 CBaseSplitterFileEx::Read(trhdr& h, bool fSync)
 		Seek(pos);
 
 		if (m_tslen == 0) {
-			return -1;
+			return false;
 		}
 	}
 
@@ -1445,8 +1445,10 @@ __int64 CBaseSplitterFileEx::Read(trhdr& h, bool fSync)
 	}
 
 	if (BitRead(8, true) != 0x47) {
-		return -1;
+		return false;
 	}
+
+	h.hdrpos = GetPos();
 
 	h.next = GetPos() + m_tslen;
 
@@ -1495,11 +1497,11 @@ __int64 CBaseSplitterFileEx::Read(trhdr& h, bool fSync)
 
 		if (h.bytes < 0) {
 			ASSERT(0);
-			return -1;
+			return false;
 		}
 	}
 
-	return h.next - m_tslen;
+	return true;
 }
 
 bool CBaseSplitterFileEx::Read(trsechdr& h)
@@ -1543,6 +1545,8 @@ bool CBaseSplitterFileEx::Read(pvahdr& h, bool fSync)
 	if ((BitRead(64, true) & 0xfffffc00ffe00000i64) != 0x4156000055000000i64) {
 		return false;
 	}
+
+	h.hdrpos = GetPos();
 
 	h.sync = (WORD)BitRead(16);
 	h.streamid = (BYTE)BitRead(8);

@@ -726,7 +726,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 		}
 	} else if (m_pFile->m_type == MPEG_TYPES::mpeg_ts) {
 		CMpegSplitterFile::trhdr h;
-		if (m_pFile->Read(h) == -1) {
+		if (!m_pFile->Read(h)) {
 			return S_FALSE;
 		}
 
