@@ -22,7 +22,14 @@
 
 class CPreView : public CWnd
 {
+	const int m_caption = 20;
+	const int m_border = 5;
+
 	int m_relativeSize = 15;
+
+	CString	m_tooltipstr;
+	CWnd	m_view;
+	CRect	m_videorect;
 
 public:
 	CPreView();
@@ -34,14 +41,8 @@ public:
 	void SetRelativeSize(int relativesize) { m_relativeSize = relativesize; }
 	void GetVideoRect(LPRECT lpRect);
 	HWND GetVideoHWND();
-	COLORREF RGBFill(int r1, int g1, int b1, int r2, int g2, int b2, int i, int k);
 
 protected:
-	CString tooltipstr;
-	CWnd	m_view;
-	int wb;
-	int hc;
-	CRect v_rect;
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
