@@ -495,7 +495,7 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 			continue;
 		}
 
-		UpdatePrograms(h);
+		ReadPrograms(h);
 		Seek(h.next);
 	}
 }
@@ -1236,85 +1236,93 @@ CAtlList<CMpegSplitterFile::stream>* CMpegSplitterFile::GetMasterStream()
 		NULL;
 }
 
-void CMpegSplitterFile::UpdatePrograms(const trhdr& h)
+#define PAT_ID 0x00
+#define PMT_ID 0x02
+
+void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 {
-	CAutoLock cAutoLock(&m_csProps);
+	if (h.bytes <= 9) {
+		return;
+	}
 
-	if (h.payload && h.payloadstart && h.pid == 0) {
+	programData& ProgramData = m_ProgramData[h.pid];
+
+	if (h.payload && h.payloadstart) {
+		ProgramData.Clear();
+
 		trsechdr h2;
-		if (Read(h2) && h2.table_id == 0) {
-			CAtlMap<WORD, bool> newprograms;
+		if (Read(h2)) {
+			ProgramData.table_id       = h2.table_id;
+			ProgramData.section_length = h2.section_length;
 
-			int len = h2.section_length;
-			len -= 5+4;
+			const size_t packet_len = h.bytes - h2.hdr_size;
+			const size_t max_len    = min(packet_len, ProgramData.section_length);
 
-			for (int i = len/4; i > 0; i--) {
-				WORD program_number = (WORD)BitRead(16);
-				BYTE reserved = (BYTE)BitRead(3);
-				WORD pid = (WORD)BitRead(13);
-				UNREFERENCED_PARAMETER(reserved);
-				if (program_number != 0) {
-					m_programs[pid].program_number = program_number;
-					newprograms[program_number] = true;
-				}
-			}
-
-			POSITION pos = m_programs.GetStartPosition();
-			while (pos) {
-				const CPrograms::CPair* pPair = m_programs.GetNext(pos);
-
-				if (!newprograms.Lookup(pPair->m_value.program_number)) {
-					m_programs.RemoveKey(pPair->m_key);
-				}
-			}
+			ProgramData.pData.SetCount(max_len);
+			ByteRead(ProgramData.pData.GetData(), max_len);
 		}
-	} else if (CPrograms::CPair* pPair = m_programs.Lookup(h.pid)) {
-		if (h.payload && h.payloadstart) {
-			trsechdr h2;
-			if (Read(h2) && h2.table_id == 2) {
-				int len = h2.section_length;
-				len -= 5+4;
+	} else if (!ProgramData.pData.IsEmpty()) {
+		const size_t data_len = ProgramData.pData.GetCount();
+		const size_t max_len  = min((size_t)h.bytes, ProgramData.section_length - data_len);
 
-				if (len) {
-					BYTE* buffer = DNew BYTE[len];
-					ByteRead(buffer, len);
+		ProgramData.pData.SetCount(data_len + max_len);
+		ByteRead(ProgramData.pData.GetData() + data_len, max_len);
+	}
 
-					int max_len = h.bytes - 9;
-
-					if (len > max_len) {
-						memset(pPair->m_value.ts_buffer, 0, sizeof(pPair->m_value.ts_buffer));
-						pPair->m_value.ts_len_cur = max_len;
-						pPair->m_value.ts_len_packet = len;
-						memcpy(pPair->m_value.ts_buffer, buffer, max_len);
-					} else {
-						CGolombBuffer gb(buffer, len);
-						UpdatePrograms(gb, h.pid);
-					}
-
-					delete [] buffer;
-				}
-			}
-		} else {
-			if (pPair->m_value.ts_len_cur > 0) {
-				int len = pPair->m_value.ts_len_packet - pPair->m_value.ts_len_cur;
-				if (len > h.bytes) {
-					ByteRead(pPair->m_value.ts_buffer + pPair->m_value.ts_len_cur, h.bytes);
-					pPair->m_value.ts_len_cur += h.bytes;
-				} else {
-					ByteRead(pPair->m_value.ts_buffer + pPair->m_value.ts_len_cur, pPair->m_value.ts_len_packet - pPair->m_value.ts_len_cur);
-					CGolombBuffer gb(pPair->m_value.ts_buffer, pPair->m_value.ts_len_packet);
-					UpdatePrograms(gb, h.pid);
-				}
-			}
+	if (ProgramData.IsFull()) {
+		switch (ProgramData.table_id) {
+			case PAT_ID :
+				ReadPAT(ProgramData.pData);
+				break;
+			case PMT_ID :
+				ReadPMT(ProgramData.pData, h.pid);
+				break;
+			case 0xC8: // ATSC - Terrestrial Virtual Channel Table (TVCT)
+			case 0xC9: // ATSC - Cable Virtual Channel Table (CVCT) / Long-form Virtual Channel Table (L-VCT)
+			case 0xDA: // ATSC - Satellite VCT (SVCT)
+				ReadVCT(ProgramData.pData, ProgramData.table_id);
+				break;
 		}
+
+		ProgramData.Clear();
 	}
 }
 
-void CMpegSplitterFile::UpdatePrograms(CGolombBuffer& gb, WORD pid)
+void CMpegSplitterFile::ReadPAT(CAtlArray<BYTE>& pData)
+{
+	CGolombBuffer gb(pData.GetData(), pData.GetCount());
+	int len = gb.GetSize();
+
+	CAtlMap<WORD, bool> newprograms;
+
+	for (int i = len/4; i > 0; i--) {
+		WORD program_number = (WORD)gb.BitRead(16);
+		BYTE reserved = (BYTE)gb.BitRead(3);
+		WORD pid = (WORD)gb.BitRead(13);
+		UNREFERENCED_PARAMETER(reserved);
+		if (program_number != 0) {
+			m_programs[pid].program_number = program_number;
+			newprograms[program_number] = true;
+		}
+	}
+
+	POSITION pos = m_programs.GetStartPosition();
+	while (pos) {
+		const CPrograms::CPair* pPair = m_programs.GetNext(pos);
+
+		if (!newprograms.Lookup(pPair->m_value.program_number)) {
+			m_programs.RemoveKey(pPair->m_key);
+		}
+	}
+
+}
+
+void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 {
 	if (CPrograms::CPair* pPair = m_programs.Lookup(pid)) {
 		memset(pPair->m_value.streams, 0, sizeof(pPair->m_value.streams));
 
+		CGolombBuffer gb(pData.GetData(), pData.GetCount());
 		int len = gb.GetSize();
 
 		BYTE reserved1				= (BYTE)gb.BitRead(3);
@@ -1420,15 +1428,91 @@ void CMpegSplitterFile::UpdatePrograms(CGolombBuffer& gb, WORD pid)
 				}
 			}
 		}
-		pPair->m_value.ts_len_cur		= 0;
-		pPair->m_value.ts_len_packet	= 0;
+	}
+}
+
+void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
+{
+	CGolombBuffer gb(pData.GetData(), pData.GetCount());
+
+	gb.BitRead(8); // protocol_version
+	BYTE num_channels_in_section = (BYTE)gb.BitRead(8);
+	for (BYTE cnt = 0; cnt < num_channels_in_section; cnt++) {
+		// name stored in UTF16BE encoding
+		int nLength = table_id == 0xDA ? 8 : 7;
+		CString short_name;
+		gb.ReadBuffer((BYTE*)short_name.GetBufferSetLength(nLength), nLength * 2);
+		for (int i = 0, j = short_name.GetLength(); i < j; i++) {
+			short_name.SetAt(i, (short_name[i] << 8) | (short_name[i] >> 8));
+		}
+
+		gb.BitRead(4);  // reserved
+		gb.BitRead(10); // major_channel_number
+		gb.BitRead(10); // minor_channel_number
+
+		if (table_id == 0xDA) {
+			gb.BitRead(6);  // modulation_mode
+			gb.BitRead(32); // carrier_frequency
+			gb.BitRead(32); // carrier_symbol_rate
+			gb.BitRead(2);  // polarization
+			gb.BitRead(8);  // FEC_Inner
+		} else {
+			gb.BitRead(8);  // modulation_mode
+			gb.BitRead(32); // carrier_frequency
+		}
+
+		gb.BitRead(16); // channel_TSID
+
+		SHORT program_number = (SHORT)gb.BitRead(16);
+		if (program_number > 0 && program_number < 0x2000) {
+							
+			POSITION pos = m_programs.GetStartPosition();
+			while (pos) {
+				CPrograms::CPair* pPair = m_programs.GetNext(pos);
+				if (pPair->m_value.program_number == program_number) {
+					pPair->m_value.name = short_name;
+				}
+			}
+		}
+
+		gb.BitRead(2); // ETM_location
+		gb.BitRead(1); // reserved/access_controlled
+		gb.BitRead(1); // hidden
+
+		gb.BitRead(2); // path_select + out_of_band/reserved
+
+		gb.BitRead(1); // hide_guide
+		gb.BitRead(3); // reserved
+		gb.BitRead(6); // service_type
+
+		gb.BitRead(16); // source_id
+
+		if (table_id == 0xDA) {
+			gb.BitRead(8); // feed_id
+		}
+
+		gb.BitRead(6); // reserved
+		SHORT descriptors_size = (SHORT)gb.BitRead(10);
+		if (descriptors_size) {
+			for (SHORT i = 0; i < descriptors_size; i++) {
+				gb.BitRead(8);
+			}
+		}
+	}
+
+	gb.BitRead(6); // reserved
+	SHORT descriptors_size = (SHORT)gb.BitRead(10);
+	if (descriptors_size) {
+		for (SHORT i = 0; i < descriptors_size; i++) {
+			BitRead(8);
+		}
 	}
 }
 
 const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(WORD pid, int &iStream, const CHdmvClipInfo::Stream* &pClipInfo)
 {
-	iStream		= -1;
-	pClipInfo	= NULL;
+	iStream   = -1;
+	pClipInfo = NULL;
 
 	if (m_type == MPEG_TYPES::mpeg_ts) {
 		pClipInfo = m_ClipInfo.FindStream(pid);

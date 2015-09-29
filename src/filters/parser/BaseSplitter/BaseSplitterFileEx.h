@@ -358,6 +358,8 @@ public:
 		BYTE current_next_indicator:1;
 		BYTE section_number;
 		BYTE last_section_number;
+
+		BYTE hdr_size;
 	};
 
 	// http://multimedia.cx/mirror/av_format_v1.pdf

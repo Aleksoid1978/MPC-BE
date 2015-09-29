@@ -103,8 +103,6 @@ public:
 	BOOL CheckKeyFrame(CAtlArray<BYTE>& pData, stream_codec codec);
 	REFERENCE_TIME NextPTS(DWORD TrackNum, stream_codec codec, __int64& nextPos, BOOL bKeyFrameOnly = FALSE, REFERENCE_TIME rtLimit = _I64_MAX);
 
-	CCritSec m_csProps;
-
 	MPEG_TYPES m_type;
 
 	BOOL m_bPESPTSPresent;
@@ -234,21 +232,16 @@ public:
 
 	// program map table - mpeg-ts
 	struct program {
-		WORD program_number;
+		WORD program_number      = 0;
 		struct stream {
-			WORD			pid;
-			PES_STREAM_TYPE	type;
+			WORD			pid  = 0;
+			PES_STREAM_TYPE	type = PES_STREAM_TYPE::INVALID;
 
 		};
 		stream streams[64];
 
-		BYTE ts_buffer[1024];
-		WORD ts_len_cur, ts_len_packet;
-
-		struct program() {
-			memset(this, 0, sizeof(*this));
-		}
-
+		CString name;
+		
 		size_t streamCount(CStreamsList s) {
 			size_t cnt = 0;
 			for (size_t i = 0; i < _countof(streams); i++) {
@@ -301,9 +294,30 @@ public:
 		}
 	} m_programs;
 
+	struct programData {
+		WORD pid            = 0;
+		BYTE table_id       = 0;
+		WORD section_length = 0;
+		CAtlArray<BYTE> pData;
+
+		void Clear() {
+			pid             = 0;
+			table_id        = 0;
+			section_length  = 0;
+			pData.RemoveAll();
+		}
+
+		bool IsFull() { return !pData.IsEmpty() && pData.GetCount() == section_length; }
+	};
+
+	CAtlMap<WORD, programData> m_ProgramData;
+
 	void SearchPrograms(__int64 start, __int64 stop);
-	void UpdatePrograms(const trhdr& h);
-	void UpdatePrograms(CGolombBuffer& gb, WORD pid);
+	void ReadPrograms(const trhdr& h);
+	void ReadPAT(CAtlArray<BYTE>& pData);
+	void ReadPMT(CAtlArray<BYTE>& pData, WORD pid);
+	void ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id);
+
 	const program* FindProgram(WORD pid, int &iStream, const CHdmvClipInfo::Stream* &pClipInfo);
 
 	// program stream map - mpeg-ps
