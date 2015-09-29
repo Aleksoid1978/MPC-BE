@@ -187,6 +187,10 @@ BOOL CPPageInterface::OnInitDialog()
 	GetDlgItem(IDC_CHECK8)->EnableWindow(!m_fSmartSeek);
 	GetDlgItem(IDC_COMBO3)->EnableWindow(!m_fSmartSeek && m_fUseTimeTooltip);
 
+	GetDlgItem(IDC_STATIC1)->EnableWindow(m_fSmartSeek);
+	GetDlgItem(IDC_EDIT1)->EnableWindow(m_fSmartSeek);
+	GetDlgItem(IDC_STATIC2)->EnableWindow(m_fSmartSeek);
+
 	UpdateData(FALSE);
 
 	return TRUE;
