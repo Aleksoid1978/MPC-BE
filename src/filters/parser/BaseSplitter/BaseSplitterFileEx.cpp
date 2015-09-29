@@ -1509,22 +1509,32 @@ bool CBaseSplitterFileEx::Read(trsechdr& h)
 	memset(&h, 0, sizeof(h));
 
 	BYTE pointer_field = (BYTE)BitRead(8);
+	h.hdr_size++;
 	while (pointer_field-- > 0) {
 		BitRead(8);
+		h.hdr_size++;
 	}
-	h.table_id                 = (BYTE)BitRead(8);
-	h.section_syntax_indicator = (WORD)BitRead(1);
-	h.zero                     = (WORD)BitRead(1);
-	h.reserved1                = (WORD)BitRead(2);
-	h.section_length           = (WORD)BitRead(12);
-	h.transport_stream_id      = (WORD)BitRead(16);
-	h.reserved2                = (BYTE)BitRead(2);
-	h.version_number           = (BYTE)BitRead(5);
-	h.current_next_indicator   = (BYTE)BitRead(1);
-	h.section_number           = (BYTE)BitRead(8);
-	h.last_section_number      = (BYTE)BitRead(8);
+	h.table_id                   = (BYTE)BitRead(8);
+	h.section_syntax_indicator   = (WORD)BitRead(1);
+	h.zero                       = (WORD)BitRead(1);
+	h.reserved1                  = (WORD)BitRead(2);
+	h.section_length             = (WORD)BitRead(12);
+	h.hdr_size += 3;
+	if (h.section_syntax_indicator) {
+		h.transport_stream_id    = (WORD)BitRead(16);
+		h.reserved2              = (BYTE)BitRead(2);
+		h.version_number         = (BYTE)BitRead(5);
+		h.current_next_indicator = (BYTE)BitRead(1);
+		h.section_number         = (BYTE)BitRead(8);
+		h.last_section_number    = (BYTE)BitRead(8);
+		h.hdr_size += 5;
+	}
 
-	return h.section_syntax_indicator == 1 && h.zero == 0;
+	if (h.table_id <= 0x06) {
+		return h.section_syntax_indicator == 1;
+	}
+
+	return h.section_length && h.section_length > h.hdr_size;
 }
 
 bool CBaseSplitterFileEx::Read(pvahdr& h, bool fSync)

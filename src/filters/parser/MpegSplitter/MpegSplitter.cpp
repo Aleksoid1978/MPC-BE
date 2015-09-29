@@ -1583,14 +1583,18 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 					}
 					if (ppszName) {
 						CString str;
-						str.Format(_T("Program - %d"), p->program_number);
+						if (p->name.IsEmpty()) {
+							str.Format(_T("Program - %d"), p->program_number);
+						} else {
+							str = p->name;
+						}
 
 						*ppszName = (WCHAR*)CoTaskMemAlloc((str.GetLength() + 1) * sizeof(WCHAR));
 						if (*ppszName == NULL) {
 							return E_OUTOFMEMORY;
 						}
 
-						wcscpy_s(*ppszName, str.GetLength()+1, str);
+						wcscpy_s(*ppszName, str.GetLength() + 1, str);
 					}
 					return S_OK;
 				}
