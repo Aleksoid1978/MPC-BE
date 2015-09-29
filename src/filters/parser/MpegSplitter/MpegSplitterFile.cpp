@@ -1217,9 +1217,8 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 void CMpegSplitterFile::AddHdmvPGStream(WORD pid, const char* language_code)
 {
 	stream s;
-
-	s.pid		= pid;
-	s.pesid		= 0xbd;
+	s.pid   = pid;
+	s.pesid = 0xbd;
 
 	hdmvsubhdr h;
 	if (!m_streams[stream_type::subpic].Find(s) && Read(h, &s.mt, language_code)) {
@@ -1230,9 +1229,9 @@ void CMpegSplitterFile::AddHdmvPGStream(WORD pid, const char* language_code)
 CAtlList<CMpegSplitterFile::stream>* CMpegSplitterFile::GetMasterStream()
 {
 	return
-		!m_streams[stream_type::video].IsEmpty()	? &m_streams[stream_type::video]  :
-		!m_streams[stream_type::audio].IsEmpty()	? &m_streams[stream_type::audio]  :
-		!m_streams[stream_type::subpic].IsEmpty()	? &m_streams[stream_type::subpic] :
+		!m_streams[stream_type::video].IsEmpty()  ? &m_streams[stream_type::video]  :
+		!m_streams[stream_type::audio].IsEmpty()  ? &m_streams[stream_type::audio]  :
+		!m_streams[stream_type::subpic].IsEmpty() ? &m_streams[stream_type::subpic] :
 		NULL;
 }
 
@@ -1246,17 +1245,36 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 	}
 
 	programData& ProgramData = m_ProgramData[h.pid];
+	if (ProgramData.bFinished) {
+		return;
+	}
 
 	if (h.payload && h.payloadstart) {
-		ProgramData.Clear();
-
 		trsechdr h2;
 		if (Read(h2)) {
+			switch (h2.table_id) {
+				case PAT_ID :
+					if (!m_programs.IsEmpty()) {
+						return;
+					}
+					break;
+				case PMT_ID :
+				case 0xC8 :
+				case 0xC9 :
+				case 0xDA :
+					if (m_programs.IsEmpty()) {
+						return;
+					}
+					break;
+				default:
+					return;
+			}
+
 			ProgramData.table_id       = h2.table_id;
 			ProgramData.section_length = h2.section_length;
 
-			const size_t packet_len = h.bytes - h2.hdr_size;
-			const size_t max_len    = min(packet_len, ProgramData.section_length);
+			const size_t packet_len    = h.bytes - h2.hdr_size;
+			const size_t max_len       = min(packet_len, ProgramData.section_length);
 
 			ProgramData.pData.SetCount(max_len);
 			ByteRead(ProgramData.pData.GetData(), max_len);
@@ -1277,14 +1295,14 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 			case PMT_ID :
 				ReadPMT(ProgramData.pData, h.pid);
 				break;
-			case 0xC8: // ATSC - Terrestrial Virtual Channel Table (TVCT)
-			case 0xC9: // ATSC - Cable Virtual Channel Table (CVCT) / Long-form Virtual Channel Table (L-VCT)
-			case 0xDA: // ATSC - Satellite VCT (SVCT)
+			case 0xC8 : // ATSC - Terrestrial Virtual Channel Table (TVCT)
+			case 0xC9 : // ATSC - Cable Virtual Channel Table (CVCT) / Long-form Virtual Channel Table (L-VCT)
+			case 0xDA : // ATSC - Satellite VCT (SVCT)
 				ReadVCT(ProgramData.pData, ProgramData.table_id);
 				break;
 		}
 
-		ProgramData.Clear();
+		ProgramData.Finish();
 	}
 }
 
@@ -1293,8 +1311,6 @@ void CMpegSplitterFile::ReadPAT(CAtlArray<BYTE>& pData)
 	CGolombBuffer gb(pData.GetData(), pData.GetCount());
 	int len = gb.GetSize();
 
-	CAtlMap<WORD, bool> newprograms;
-
 	for (int i = len/4; i > 0; i--) {
 		WORD program_number = (WORD)gb.BitRead(16);
 		BYTE reserved = (BYTE)gb.BitRead(3);
@@ -1302,19 +1318,8 @@ void CMpegSplitterFile::ReadPAT(CAtlArray<BYTE>& pData)
 		UNREFERENCED_PARAMETER(reserved);
 		if (program_number != 0) {
 			m_programs[pid].program_number = program_number;
-			newprograms[program_number] = true;
 		}
 	}
-
-	POSITION pos = m_programs.GetStartPosition();
-	while (pos) {
-		const CPrograms::CPair* pPair = m_programs.GetNext(pos);
-
-		if (!newprograms.Lookup(pPair->m_value.program_number)) {
-			m_programs.RemoveKey(pPair->m_key);
-		}
-	}
-
 }
 
 void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
@@ -1494,17 +1499,7 @@ void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 		gb.BitRead(6); // reserved
 		SHORT descriptors_size = (SHORT)gb.BitRead(10);
 		if (descriptors_size) {
-			for (SHORT i = 0; i < descriptors_size; i++) {
-				gb.BitRead(8);
-			}
-		}
-	}
-
-	gb.BitRead(6); // reserved
-	SHORT descriptors_size = (SHORT)gb.BitRead(10);
-	if (descriptors_size) {
-		for (SHORT i = 0; i < descriptors_size; i++) {
-			BitRead(8);
+			gb.SkipBytes(descriptors_size);
 		}
 	}
 }

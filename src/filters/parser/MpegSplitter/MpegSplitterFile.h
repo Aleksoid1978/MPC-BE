@@ -295,15 +295,15 @@ public:
 	} m_programs;
 
 	struct programData {
-		WORD pid            = 0;
 		BYTE table_id       = 0;
 		WORD section_length = 0;
+		bool bFinished      = false;
 		CAtlArray<BYTE> pData;
 
-		void Clear() {
-			pid             = 0;
+		void Finish() {
 			table_id        = 0;
 			section_length  = 0;
+			bFinished       = true;
 			pData.RemoveAll();
 		}
 
