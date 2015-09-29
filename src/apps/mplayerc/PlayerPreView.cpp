@@ -21,6 +21,18 @@
 #include "stdafx.h"
 #include "PlayerPreView.h"
 
+COLORREF RGBFill(int r1, int g1, int b1, int r2, int g2, int b2, int i, int k)
+{
+	int r, g, b;
+
+	r = r1 + (i * (r2 - r1) / k);
+	g = g1 + (i * (g2 - g1) / k);
+	b = b1 + (i * (b2 - b1) / k);
+
+	return RGB(r, g, b);
+}
+
+
 // CPrevView
 
 CPreView::CPreView()
@@ -33,13 +45,13 @@ CPreView::~CPreView()
 
 BOOL CPreView::SetWindowText(LPCWSTR lpString)
 {
-	tooltipstr = lpString;
+	m_tooltipstr = lpString;
 
 	CRect r;
 	GetClientRect(r);
 
 	CRect rt = r;
-	rt.bottom = hc;
+	rt.bottom = m_caption;
 	rt.left += 10;
 	rt.right -= 10;
 
@@ -56,17 +68,6 @@ void CPreView::GetVideoRect(LPRECT lpRect)
 HWND CPreView::GetVideoHWND()
 {
 	return m_view.GetSafeHwnd();
-}
-
-COLORREF CPreView::RGBFill(int r1, int g1, int b1, int r2, int g2, int b2, int i, int k)
-{
-	int r, g, b;
-
-	r = r1 + (i * (r2 - r1) / k);
-	g = g1 + (i * (g2 - g1) / k);
-	b = b1 + (i * (b2 - b1) / k);
-
-	return RGB(r, g, b);
 }
 
 IMPLEMENT_DYNAMIC(CPreView, CWnd)
@@ -97,19 +98,16 @@ int CPreView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 
-	wb = 5;
-	hc = 20;
-
 	CRect rc;
 	GetClientRect(rc);
 
-	v_rect = rc;
-	v_rect.left    = (wb + 1);
-	v_rect.top     = (hc + 1);
-	v_rect.right  -= (wb + 1);
-	v_rect.bottom -= (wb + 1);
+	m_videorect = rc;
+	m_videorect.left    = (m_border + 1);
+	m_videorect.top     = (m_caption + 1);
+	m_videorect.right  -= (m_border + 1);
+	m_videorect.bottom -= (m_border + 1);
 
-	if (!m_view.Create(NULL, NULL, WS_CHILD | WS_VISIBLE, v_rect, this, 0)) {
+	if (!m_view.Create(NULL, NULL, WS_CHILD | WS_VISIBLE, m_videorect, this, 0)) {
 		return -1;
 	}
 
@@ -173,8 +171,8 @@ void CPreView::OnPaint()
 		b1 = b2 = GetBValue(shadow);
 	}
 	k = rcBar.Width();
-	for(i=rcBar.left+wb;i<k-wb;i++) {
-		mdc.FillSolidRect(i,hc,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i=rcBar.left+m_border;i<k-m_border;i++) {
+		mdc.FillSolidRect(i,m_caption,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.bUseDarkTheme) {
@@ -186,8 +184,8 @@ void CPreView::OnPaint()
 		b1 = b2 = GetBValue(light);
 	}
 	k = rcBar.Width();
-	for(i=rcBar.left+wb;i<k-wb;i++) {
-		mdc.FillSolidRect(i,rcBar.bottom-wb-1,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i=rcBar.left+m_border;i<k-m_border;i++) {
+		mdc.FillSolidRect(i,rcBar.bottom-m_border-1,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.bUseDarkTheme) {
@@ -225,8 +223,8 @@ void CPreView::OnPaint()
 		b1 = b2 = GetBValue(shadow);
 	}
 	k = rcBar.Height();
-	for(i=hc;i<k-wb;i++) {
-		mdc.FillSolidRect(wb,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i=m_caption;i<k-m_border;i++) {
+		mdc.FillSolidRect(m_border,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.bUseDarkTheme) {
@@ -238,8 +236,8 @@ void CPreView::OnPaint()
 		b1 = b2 = GetBValue(light);
 	}
 	k = rcBar.Height();
-	for(i=hc;i<k-wb;i++) {
-		mdc.FillSolidRect(rcBar.right-wb-1,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i=m_caption;i<k-m_border;i++) {
+		mdc.FillSolidRect(rcBar.right-m_border-1,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.bUseDarkTheme) {
@@ -275,10 +273,10 @@ void CPreView::OnPaint()
 	mdc.SelectObject(&font);
 	CRect rtime = rcBar;
 	rtime.top = 0;
-	rtime.bottom = hc;
-	mdc.DrawText(tooltipstr, tooltipstr.GetLength(), &rtime, DT_CENTER|DT_VCENTER|DT_SINGLELINE);
+	rtime.bottom = m_caption;
+	mdc.DrawText(m_tooltipstr, m_tooltipstr.GetLength(), &rtime, DT_CENTER|DT_VCENTER|DT_SINGLELINE);
 
-	dc.ExcludeClipRect(v_rect);
+	dc.ExcludeClipRect(m_videorect);
 	dc.BitBlt(0, 0, rcBar.Width(), rcBar.Height(), &mdc, 0, 0, SRCCOPY);
 
 	mdc.SelectObject(pOldBm);
@@ -293,13 +291,13 @@ void CPreView::OnSize(UINT nType, int cx, int cy)
 	CRect rc;
 	GetClientRect(&rc);
 	
-	v_rect = rc;
-	v_rect.left    = (wb + 1);
-	v_rect.top     = (hc + 1);
-	v_rect.right  -= (wb + 1);
-	v_rect.bottom -= (wb + 1);
+	m_videorect = rc;
+	m_videorect.left    = (m_border + 1);
+	m_videorect.top     = (m_caption + 1);
+	m_videorect.right  -= (m_border + 1);
+	m_videorect.bottom -= (m_border + 1);
 
-	m_view.SetWindowPos(NULL, v_rect.left, v_rect.top, v_rect.Width(), v_rect.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
+	m_view.SetWindowPos(NULL, m_videorect.left, m_videorect.top, m_videorect.Width(), m_videorect.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
 void CPreView::OnShowWindow(BOOL bShow, UINT nStatus)
