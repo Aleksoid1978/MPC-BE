@@ -304,7 +304,7 @@ void CPreView::OnShowWindow(BOOL bShow, UINT nStatus)
 {
 	if (bShow) {
 		MONITORINFO mi = { sizeof(mi) };
-		GetMonitorInfo(MonitorFromWindow(GetParent()->m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+		GetMonitorInfo(MonitorFromWindow(GetParent()->GetSafeHwnd(), MONITOR_DEFAULTTONEAREST), &mi);
 		CRect wr;
 		GetParent()->GetClientRect(wr);
 
@@ -312,7 +312,9 @@ void CPreView::OnShowWindow(BOOL bShow, UINT nStatus)
 		// the preview size should not be larger than half size of the main window, but not less than 160
 		w = max(160, min(w, wr.Width() / 2));
 
-		int h = w * 109 / 160;
+		int h = (w - ((m_border + 1) * 2)) * 9 / 16;
+		h += (m_caption + 1);
+		h += (m_border + 1);
 
 		SetWindowPos(NULL, 0, 0, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
 	}
