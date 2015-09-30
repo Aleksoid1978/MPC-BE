@@ -1235,9 +1235,6 @@ CAtlList<CMpegSplitterFile::stream>* CMpegSplitterFile::GetMasterStream()
 		NULL;
 }
 
-#define PAT_ID 0x00
-#define PMT_ID 0x02
-
 void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 {
 	if (h.bytes <= 9) {
@@ -1253,17 +1250,17 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 		trsechdr h2;
 		if (Read(h2)) {
 			switch (h2.table_id) {
-				case PAT_ID :
+				case DVB_SI::SI_PAT:
 					if (!m_programs.IsEmpty()) {
 						return;
 					}
 					break;
-				case PMT_ID :
-				case 0x42 :
-				case 0x46 :
-				case 0xC8 :
-				case 0xC9 :
-				case 0xDA :
+				case DVB_SI::SI_PMT:
+				case DVB_SI::SI_SDT:
+				case 0x46:
+				case 0xC8:
+				case 0xC9:
+				case 0xDA:
 					if (m_programs.IsEmpty()) {
 						return;
 					}
@@ -1291,19 +1288,19 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 
 	if (ProgramData.IsFull()) {
 		switch (ProgramData.table_id) {
-			case PAT_ID :
+			case DVB_SI::SI_PAT:
 				ReadPAT(ProgramData.pData);
 				break;
-			case PMT_ID :
+			case DVB_SI::SI_PMT:
 				ReadPMT(ProgramData.pData, h.pid);
 				break;
-			case 0x42 : // DVB - service_description_section - actual_transport_stream
-			case 0x46 : // DVB - service_description_section - other_transport_stream
+			case DVB_SI::SI_SDT: // DVB - service_description_section - actual_transport_stream
+			case 0x46:           // DVB - service_description_section - other_transport_stream
 				ReadSDS(ProgramData.pData, ProgramData.table_id);
 				break;
-			case 0xC8 : // ATSC - Terrestrial Virtual Channel Table (TVCT)
-			case 0xC9 : // ATSC - Cable Virtual Channel Table (CVCT) / Long-form Virtual Channel Table (L-VCT)
-			case 0xDA : // ATSC - Satellite VCT (SVCT)
+			case 0xC8: // ATSC - Terrestrial Virtual Channel Table (TVCT)
+			case 0xC9: // ATSC - Cable Virtual Channel Table (CVCT) / Long-form Virtual Channel Table (L-VCT)
+			case 0xDA: // ATSC - Satellite VCT (SVCT)
 				ReadVCT(ProgramData.pData, ProgramData.table_id);
 				break;
 		}
@@ -1442,6 +1439,97 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 	}
 }
 
+CString ConvertDVBString(const BYTE* pBuffer, int nLength)
+{
+	static const UINT16 codepages[0x20] = {
+		28591, // 00 - ISO 8859-1 Latin I
+		28595, // 01 - ISO 8859-5 Cyrillic
+		28596, // 02 - ISO 8859-6 Arabic
+		28597, // 03 - ISO 8859-7 Greek
+		28598, // 04 - ISO 8859-8 Hebrew
+		28599, // 05 - ISO 8859-9 Latin 5
+		28591, // 06 - ??? - ISO/IEC 8859-10 - Latin alphabet No. 6
+		28591, // 07 - ??? - ISO/IEC 8859-11 - Latin/Thai (draft only)
+		28591, // 08 - reserved
+		28603, // 09 - ISO 8859-13 - Estonian
+		28591, // 0a - ??? - ISO/IEC 8859-14 - Latin alphabet No. 8 (Celtic)
+		28605, // 0b - ISO 8859-15 Latin 9
+		28591, // 0c - reserved
+		28591, // 0d - reserved
+		28591, // 0e - reserved
+		28591, // 0f - reserved
+		0,      // 10 - See codepages10 array
+		28591, // 11 - ??? - ISO/IEC 10646 - Basic Multilingual Plane (BMP)
+		28591, // 12 - ??? - KSX1001-2004 - Korean Character Set
+		20936, // 13 - Chinese Simplified (GB2312-80)
+		950,   // 14 - Chinese Traditional (Big5)
+		28591, // 15 - ??? - UTF-8 encoding of ISO/IEC 10646 - Basic Multilingual Plane (BMP)
+		28591, // 16 - reserved
+		28591, // 17 - reserved
+		28591, // 18 - reserved
+		28591, // 19 - reserved
+		28591, // 1a - reserved
+		28591, // 1b - reserved
+		28591, // 1c - reserved
+		28591, // 1d - reserved
+		28591, // 1e - reserved
+		28591  // 1f - TODO!
+	};
+
+	static const UINT16 codepages10[0x10] = {
+		28591, // 00 - reserved
+		28591, // 01 - ISO 8859-1 Western European
+		28592, // 02 - ISO 8859-2 Central European
+		28593, // 03 - ISO 8859-3 Latin 3
+		28594, // 04 - ISO 8859-4 Baltic
+		28595, // 05 - ISO 8859-5 Cyrillic
+		28596, // 06 - ISO 8859-6 Arabic
+		28597, // 07 - ISO 8859-7 Greek
+		28598, // 08 - ISO 8859-8 Hebrew
+		28599, // 09 - ISO 8859-9 Turkish
+		28591, // 0a - ??? - ISO/IEC 8859-10
+		28591, // 0b - ??? - ISO/IEC 8859-11
+		28591, // 0c - ??? - ISO/IEC 8859-12
+		28603, // 0d - ISO 8859-13 Estonian
+		28591, // 0e - ??? - ISO/IEC 8859-14
+		28605, // 0f - ISO 8859-15 Latin 9
+
+		// 0x10 to 0xFF - reserved for future use
+	};
+
+	CString strResult;
+	if (nLength > 0) {
+		UINT cp = CP_ACP;
+
+		if (pBuffer[0] == 0x10) {
+			pBuffer++;
+			nLength--;
+			if (pBuffer[0] == 0x00) {
+				cp = codepages10[pBuffer[1]];
+			} else { // if (pBuffer[0] > 0x00)
+				// reserved for future use, use default codepage
+				cp = codepages[0];
+			}
+			pBuffer += 2;
+			nLength -= 2;
+		} else if (pBuffer[0] < 0x20) {
+			cp = codepages[pBuffer[0]];
+			pBuffer++;
+			nLength--;
+		} else { // No code page indication, use the default
+			cp = codepages[0];
+		}
+
+		int nDestSize = MultiByteToWideChar(cp, MB_PRECOMPOSED, (LPCSTR)pBuffer, nLength, NULL, 0);
+		if (nDestSize > 0) {
+			MultiByteToWideChar(cp, MB_PRECOMPOSED, (LPCSTR)pBuffer, nLength, strResult.GetBuffer(nLength), nDestSize);
+			strResult.ReleaseBuffer(nDestSize);
+		}
+	}
+
+	return strResult;
+}
+
 void CMpegSplitterFile::ReadSDS(CAtlArray<BYTE>& pData, BYTE table_id)
 {
 	if (pData.GetCount() < 3) {
@@ -1472,7 +1560,7 @@ void CMpegSplitterFile::ReadSDS(CAtlArray<BYTE>& pData, BYTE table_id)
 			descriptors_size -= descriptor_len;
 
 			switch (descriptor_tag) {
-				case 0x48: {
+				case MPEG2_DESCRIPTOR::DT_SERVICE: {
 						gb.ReadByte(); // service_type
 						BYTE service_provider_name_length = gb.ReadByte();
 						descriptor_len--;
@@ -1488,25 +1576,16 @@ void CMpegSplitterFile::ReadSDS(CAtlArray<BYTE>& pData, BYTE table_id)
 							return;
 						}
 
-						// TODO - determine the correct code page and do the proper conversion
-						BYTE codepage = (BYTE)gb.BitRead(8, true);
-						if (codepage < 0x20) {
-							gb.BitRead(8);
-							service_name_length--;
-							if (codepage == 0x10) {
-								WORD codepage_2 = (WORD)gb.BitRead(8);
-								service_name_length -= 2;
-							}
-						}
-						CStringA service_name;
-						gb.ReadBuffer((BYTE*)service_name.GetBufferSetLength(service_name_length), service_name_length);
+						BYTE pBuffer[256] = { 0 };
+						gb.ReadBuffer(pBuffer, service_name_length);
+						const CString service_name = ConvertDVBString(pBuffer, service_name_length);
 
 						if (!service_name.IsEmpty()) {
 							POSITION pos = m_programs.GetStartPosition();
 							while (pos) {
 								CPrograms::CPair* pPair = m_programs.GetNext(pos);
 								if (pPair->m_value.program_number == program_number) {
-									pPair->m_value.name = CString(service_name);
+									pPair->m_value.name = service_name;
 									break;
 								}
 							}
