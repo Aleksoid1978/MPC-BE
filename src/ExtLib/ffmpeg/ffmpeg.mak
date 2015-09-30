@@ -35,7 +35,7 @@ CFLAGS	= -I. -I.. -Ilibavcodec -Ilibavutil -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(S
 		-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 \
 		-fomit-frame-pointer -std=gnu99 \
 		-fno-common -mthreads
-YASMFLAGS = -I. -Ilibavutil/x86 -Pconfig.asm
+YASMFLAGS = -I. -Pconfig.asm
 
 ifeq ($(64BIT),yes)
 	FFMPEG_PREFIX = x86_64-w64-mingw32-
@@ -658,6 +658,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/hevc_mc.asm \
 	libavcodec/x86/hevc_res_add.asm \
 	libavcodec/x86/hevc_sao.asm \
+	libavcodec/x86/hevc_sao_10bit.asm \
 	libavcodec/x86/hpeldsp.asm \
 	libavcodec/x86/huffyuvdsp.asm \
 	libavcodec/x86/idctdsp.asm \
