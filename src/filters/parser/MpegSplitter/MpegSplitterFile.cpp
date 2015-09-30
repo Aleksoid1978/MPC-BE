@@ -1259,6 +1259,8 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 					}
 					break;
 				case PMT_ID :
+				case 0x42 :
+				case 0x46 :
 				case 0xC8 :
 				case 0xC9 :
 				case 0xDA :
@@ -1294,6 +1296,10 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 				break;
 			case PMT_ID :
 				ReadPMT(ProgramData.pData, h.pid);
+				break;
+			case 0x42 : // DVB - service_description_section - actual_transport_stream
+			case 0x46 : // DVB - service_description_section - other_transport_stream
+				ReadSDS(ProgramData.pData, ProgramData.table_id);
 				break;
 			case 0xC8 : // ATSC - Terrestrial Virtual Channel Table (TVCT)
 			case 0xC9 : // ATSC - Cable Virtual Channel Table (CVCT) / Long-form Virtual Channel Table (L-VCT)
@@ -1436,6 +1442,84 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 	}
 }
 
+void CMpegSplitterFile::ReadSDS(CAtlArray<BYTE>& pData, BYTE table_id)
+{
+	if (pData.GetCount() < 3) {
+		return;
+	}
+
+	CGolombBuffer gb(pData.GetData(), pData.GetCount());
+
+	gb.BitRead(16); // original_network_id
+	gb.BitRead(8);  // reserved_future_use
+
+	while (gb.RemainingSize() >= 5) {
+		WORD program_number = (WORD)gb.BitRead(16);
+		gb.BitRead(6); // reserved_future_use
+		gb.BitRead(1); // EIT_schedule_flag
+		gb.BitRead(1); // EIT_present_following_flag
+		gb.BitRead(3); // running_status
+		gb.BitRead(1); // free_CA_mode
+		int descriptors_size = (int)gb.BitRead(12);
+
+		while (descriptors_size >= 2) {
+			BYTE descriptor_tag = gb.ReadByte();
+			BYTE descriptor_len = gb.ReadByte();
+			descriptors_size -= 2;
+			if (descriptor_len > descriptors_size) {
+				return;
+			}
+			descriptors_size -= descriptor_len;
+
+			switch (descriptor_tag) {
+				case 0x48: {
+						gb.ReadByte(); // service_type
+						BYTE service_provider_name_length = gb.ReadByte();
+						descriptor_len--;
+						if (service_provider_name_length >= descriptor_len) {
+							return;
+						}
+						gb.SkipBytes(service_provider_name_length);
+						descriptor_len -= service_provider_name_length;
+
+						BYTE service_name_length = gb.ReadByte();
+						descriptor_len--;
+						if (service_name_length > descriptor_len) {
+							return;
+						}
+
+						// TODO - determine the correct code page and do the proper conversion
+						BYTE codepage = (BYTE)gb.BitRead(8, true);
+						if (codepage < 0x20) {
+							gb.BitRead(8);
+							service_name_length--;
+							if (codepage == 0x10) {
+								WORD codepage_2 = (WORD)gb.BitRead(8);
+								service_name_length -= 2;
+							}
+						}
+						CStringA service_name;
+						gb.ReadBuffer((BYTE*)service_name.GetBufferSetLength(service_name_length), service_name_length);
+
+						if (!service_name.IsEmpty()) {
+							POSITION pos = m_programs.GetStartPosition();
+							while (pos) {
+								CPrograms::CPair* pPair = m_programs.GetNext(pos);
+								if (pPair->m_value.program_number == program_number) {
+									pPair->m_value.name = CString(service_name);
+									break;
+								}
+							}
+						}
+					}
+					break;
+				default:
+					gb.SkipBytes(descriptor_len);
+			}
+		}
+	}
+}
+
 void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 {
 	CGolombBuffer gb(pData.GetData(), pData.GetCount());
@@ -1468,7 +1552,7 @@ void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 
 		gb.BitRead(16); // channel_TSID
 
-		SHORT program_number = (SHORT)gb.BitRead(16);
+		WORD program_number = (WORD)gb.BitRead(16);
 		if (program_number > 0 && program_number < 0x2000) {
 							
 			POSITION pos = m_programs.GetStartPosition();
@@ -1476,6 +1560,7 @@ void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 				CPrograms::CPair* pPair = m_programs.GetNext(pos);
 				if (pPair->m_value.program_number == program_number) {
 					pPair->m_value.name = short_name;
+					break;
 				}
 			}
 		}
