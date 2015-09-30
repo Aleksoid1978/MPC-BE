@@ -100,5 +100,8 @@
     <ClCompile Include="precomp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\cmsalpha.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

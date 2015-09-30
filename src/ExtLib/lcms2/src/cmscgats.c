@@ -48,7 +48,7 @@
 // Symbols
 typedef enum {
 
-        SNONE,
+        SUNDEFINED,
         SINUM,      // Integer
         SDNUM,      // Real
         SIDENT,     // Identifier
@@ -521,7 +521,7 @@ SYMBOL BinSrchKey(const char *id)
         else l = x + 1;
     }
 
-    return SNONE;
+    return SUNDEFINED;
 }
 
 
@@ -706,7 +706,7 @@ void InSymbol(cmsIT8* it8)
 
 
             key = BinSrchKey(it8->id);
-            if (key == SNONE) it8->sy = SIDENT;
+            if (key == SUNDEFINED) it8->sy = SIDENT;
             else it8->sy = key;
 
         }
@@ -1297,7 +1297,7 @@ cmsHANDLE  CMSEXPORT cmsIT8Alloc(cmsContext ContextID)
     it8->ValidKeywords = NULL;
     it8->ValidSampleID = NULL;
 
-    it8 -> sy = SNONE;
+    it8 -> sy = SUNDEFINED;
     it8 -> ch = ' ';
     it8 -> Source = NULL;
     it8 -> inum = 0;
@@ -2516,8 +2516,10 @@ int LocateSample(cmsIT8* it8, const char* cSample)
     for (i=0; i < t->nSamples; i++) {
 
         fld = GetDataFormat(it8, i);
+        if (fld != NULL) {
         if (cmsstrcasecmp(fld, cSample) == 0)
             return i;
+    }
     }
 
     return -1;

@@ -679,6 +679,7 @@ typedef struct {
                 cmsFloat64Number Contrast;
                 cmsFloat64Number Hue;
                 cmsFloat64Number Saturation;
+                cmsBool          lAdjustWP;
                 cmsCIEXYZ WPsrc, WPdest;
 
 } BCHSWADJUSTS, *LPBCHSWADJUSTS;
@@ -708,9 +709,10 @@ int bchswSampler(register const cmsUInt16Number In[], register cmsUInt16Number O
     cmsLCh2Lab(&LabOut, &LChOut);
 
     // Move white point in Lab
-
-    cmsLab2XYZ(&bchsw ->WPsrc,  &XYZ, &LabOut);
-    cmsXYZ2Lab(&bchsw ->WPdest, &LabOut, &XYZ);
+    if (bchsw->lAdjustWP) {
+           cmsLab2XYZ(&bchsw->WPsrc, &XYZ, &LabOut);
+           cmsXYZ2Lab(&bchsw->WPdest, &LabOut, &XYZ);
+    }
 
     // Back to encoded
 
@@ -744,17 +746,22 @@ cmsHPROFILE CMSEXPORT cmsCreateBCHSWabstractProfileTHR(cmsContext ContextID,
     bchsw.Contrast   = Contrast;
     bchsw.Hue        = Hue;
     bchsw.Saturation = Saturation;
+    if (TempSrc == TempDest) {
 
-    cmsWhitePointFromTemp(&WhitePnt, TempSrc );
-    cmsxyY2XYZ(&bchsw.WPsrc, &WhitePnt);
-
-    cmsWhitePointFromTemp(&WhitePnt, TempDest);
-    cmsxyY2XYZ(&bchsw.WPdest, &WhitePnt);
+           bchsw.lAdjustWP = FALSE;
+    }
+    else {
+           bchsw.lAdjustWP = TRUE;
+           cmsWhitePointFromTemp(&WhitePnt, TempSrc);
+           cmsxyY2XYZ(&bchsw.WPsrc, &WhitePnt);
+           cmsWhitePointFromTemp(&WhitePnt, TempDest);
+           cmsxyY2XYZ(&bchsw.WPdest, &WhitePnt);
+     
+    }
 
     hICC = cmsCreateProfilePlaceholder(ContextID);
     if (!hICC)                          // can't allocate
         return NULL;
-
 
     cmsSetDeviceClass(hICC,      cmsSigAbstractClass);
     cmsSetColorSpace(hICC,       cmsSigLabData);

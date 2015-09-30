@@ -1,7 +1,7 @@
 
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2014 Marti Maria Saguer
+//  Copyright (c) 1998-2015 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -57,7 +57,15 @@
 #define _cmsALIGNLONG(x) (((x)+(sizeof(cmsUInt32Number)-1)) & ~(sizeof(cmsUInt32Number)-1))
 
 // Alignment to memory pointer
-#define _cmsALIGNMEM(x)  (((x)+(sizeof(void *) - 1)) & ~(sizeof(void *) - 1))
+
+// (Ultra)SPARC with gcc requires ptr alignment of 8 bytes
+// even though sizeof(void *) is only four: for greatest flexibility
+// allow the build to specify ptr alignment.
+#ifndef CMS_PTR_ALIGNMENT
+# define CMS_PTR_ALIGNMENT sizeof(void *)
+#endif
+
+#define _cmsALIGNMEM(x)  (((x)+(CMS_PTR_ALIGNMENT - 1)) & ~(CMS_PTR_ALIGNMENT - 1))
 
 // Maximum encodeable values in floating point
 #define MAX_ENCODEABLE_XYZ  (1.0 + 32767.0/32768.0)
@@ -194,11 +202,17 @@ cmsINLINE cmsUInt16Number _cmsQuickSaturateWord(cmsFloat64Number d)
 // Microsoft felt that it was necessary to keep it set at -1 for an unlocked critical
 // section, even when they changed the underlying algorithm to be more scalable. 
 // The final parts of the critical section object are unimportant, and can be set 
-// to zero for their defaults. This yields an initialization macro:
+// to zero for their defaults. This yields to an initialization macro:
 
 typedef CRITICAL_SECTION _cmsMutex;
 
 #define CMS_MUTEX_INITIALIZER {(PRTL_CRITICAL_SECTION_DEBUG) -1,-1,0,0,0,0}
+
+#ifdef _MSC_VER
+#    if (_MSC_VER >= 1800)
+#          pragma warning(disable : 26135)
+#    endif
+#endif
 
 cmsINLINE int _cmsLockPrimitive(_cmsMutex *m)
 {
@@ -284,38 +298,38 @@ typedef int _cmsMutex;
 
 cmsINLINE int _cmsLockPrimitive(_cmsMutex *m)
 {
-	return 0;
     cmsUNUSED_PARAMETER(m);
+	return 0;
 }
 
 cmsINLINE int _cmsUnlockPrimitive(_cmsMutex *m)
 {
-	return 0;
     cmsUNUSED_PARAMETER(m);
+	return 0;
 }
 	
 cmsINLINE int _cmsInitMutexPrimitive(_cmsMutex *m)
 {
-	return 0;
     cmsUNUSED_PARAMETER(m);
+	return 0;
 }
 
 cmsINLINE int _cmsDestroyMutexPrimitive(_cmsMutex *m)
 {
-	return 0;
     cmsUNUSED_PARAMETER(m);
+	return 0;
 }
 
 cmsINLINE int _cmsEnterCriticalSectionPrimitive(_cmsMutex *m)
 {
-	return 0;
     cmsUNUSED_PARAMETER(m);
+	return 0;
 }
 
 cmsINLINE int _cmsLeaveCriticalSectionPrimitive(_cmsMutex *m)
 {
-	return 0;
     cmsUNUSED_PARAMETER(m);
+	return 0;
 }
 #endif
 
@@ -823,6 +837,8 @@ cmsStage*        _cmsStageNormalizeFromLabFloat(cmsContext ContextID);
 cmsStage*        _cmsStageNormalizeFromXyzFloat(cmsContext ContextID);
 cmsStage*        _cmsStageNormalizeToLabFloat(cmsContext ContextID);
 cmsStage*        _cmsStageNormalizeToXyzFloat(cmsContext ContextID);
+cmsStage*        _cmsStageClipNegatives(cmsContext ContextID, int nChannels);
+
 
 // For curve set only
 cmsToneCurve**     _cmsStageGetPtrToCurveSet(const cmsStage* mpe);
@@ -951,7 +967,7 @@ typedef struct _cmstransform_struct {
     cmsUInt32Number InputFormat, OutputFormat; // Keep formats for further reference
 
     // Points to transform code
-    _cmsTransformFn xform;
+    _cmsTransform2Fn xform;
 
     // Formatters, cannot be embedded into LUT because cache
     cmsFormatter16 FromInput;
@@ -997,9 +1013,20 @@ typedef struct _cmstransform_struct {
     void* UserData;
     _cmsFreeUserDataFn FreeUserData;
 
+    // A way to provide backwards compatibility with full xform plugins
+    _cmsTransformFn OldXform;
+
 } _cmsTRANSFORM;
 
-// --------------------------------------------------------------------------------------------------
+// Copies extra channels from input to output if the original flags in the transform structure
+// instructs to do so. This function is called on all standard transform functions.
+void _cmsHandleExtraChannels(_cmsTRANSFORM* p, const void* in,
+                             void* out, 
+                             cmsUInt32Number PixelsPerLine,
+                             cmsUInt32Number LineCount,
+                             const cmsStride* Stride);
+
+// -----------------------------------------------------------------------------------------------------------------------
 
 cmsHTRANSFORM _cmsChain2Lab(cmsContext             ContextID,
                             cmsUInt32Number        nProfiles,

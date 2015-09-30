@@ -310,8 +310,8 @@ Error:
 cmsPipeline* _cmsReadInputLUT(cmsHPROFILE hProfile, int Intent)
 {
     cmsTagTypeSignature OriginalType;
-    cmsTagSignature tag16    = Device2PCS16[Intent];
-    cmsTagSignature tagFloat = Device2PCSFloat[Intent];
+    cmsTagSignature tag16;
+    cmsTagSignature tagFloat;
     cmsContext ContextID = cmsGetProfileContextID(hProfile);
 
     // On named color, take the appropiate tag
@@ -339,6 +339,9 @@ cmsPipeline* _cmsReadInputLUT(cmsHPROFILE hProfile, int Intent)
     // This is an attempt to reuse this funtion to retrieve the matrix-shaper as pipeline no
     // matter other LUT are present and have precedence. Intent = -1 means just this.
     if (Intent != -1) {
+
+        tag16 = Device2PCS16[Intent];
+        tagFloat = Device2PCSFloat[Intent];
 
         if (cmsIsTag(hProfile, tagFloat)) {  // Float tag takes precedence
 
@@ -582,12 +585,15 @@ Error:
 cmsPipeline* _cmsReadOutputLUT(cmsHPROFILE hProfile, int Intent)
 {
     cmsTagTypeSignature OriginalType;
-    cmsTagSignature tag16    = PCS2Device16[Intent];
-    cmsTagSignature tagFloat = PCS2DeviceFloat[Intent];
-    cmsContext ContextID     = cmsGetProfileContextID(hProfile);
+    cmsTagSignature tag16;
+    cmsTagSignature tagFloat;
+    cmsContext ContextID  = cmsGetProfileContextID(hProfile);
 
 
     if (Intent != -1) {
+
+        tag16 = PCS2Device16[Intent];
+        tagFloat = PCS2DeviceFloat[Intent];
 
         if (cmsIsTag(hProfile, tagFloat)) {  // Float tag takes precedence
 

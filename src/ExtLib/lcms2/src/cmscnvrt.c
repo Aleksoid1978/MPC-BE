@@ -269,6 +269,8 @@ cmsBool  ComputeAbsoluteIntent(cmsFloat64Number AdaptationState,
 {
     cmsMAT3 Scale, m1, m2, m3, m4;
 
+    // TODO: Follow Marc Mahy's recommendation to check if CHAD is same by using M1*M2 == M2*M1. If so, do nothing.
+
     // Adaptation state
     if (AdaptationState == 1.0) {
 
@@ -288,7 +290,7 @@ cmsBool  ComputeAbsoluteIntent(cmsFloat64Number AdaptationState,
 
 
         if (AdaptationState == 0.0) {
-
+        
             m1 = *ChromaticAdaptationMatrixOut;
             _cmsMAT3per(&m2, &m1, &Scale);
             // m2 holds CHAD from output white to D50 times abs. col. scaling
@@ -530,7 +532,7 @@ cmsPipeline* DefaultICCintents(cmsContext       ContextID,
     cmsHPROFILE hProfile;
     cmsMAT3 m;
     cmsVEC3 off;
-    cmsColorSpaceSignature ColorSpaceIn, ColorSpaceOut, CurrentColorSpace;
+    cmsColorSpaceSignature ColorSpaceIn, ColorSpaceOut = cmsSigLabData, CurrentColorSpace;
     cmsProfileClassSignature ClassSig;
     cmsUInt32Number  i, Intent;
 
@@ -630,6 +632,22 @@ cmsPipeline* DefaultICCintents(cmsContext       ContextID,
 
         // Update current space
         CurrentColorSpace = ColorSpaceOut;
+    }
+
+    // Check for non-negatives clip
+    if (dwFlags & cmsFLAGS_NONEGATIVES) {
+
+           if (ColorSpaceOut == cmsSigGrayData ||
+                  ColorSpaceOut == cmsSigRgbData ||
+                  ColorSpaceOut == cmsSigCmykData) {
+
+                  cmsStage* clip = _cmsStageClipNegatives(Result->ContextID, cmsChannelsOf(ColorSpaceOut));
+                  if (clip == NULL) goto Error;
+
+                  if (!cmsPipelineInsertStage(Result, cmsAT_END, clip))
+                         goto Error;
+           }
+
     }
 
     return Result;

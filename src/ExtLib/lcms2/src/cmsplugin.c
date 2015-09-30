@@ -215,22 +215,6 @@ cmsBool CMSEXPORT  _cmsRead15Fixed16Number(cmsIOHANDLER* io, cmsFloat64Number* n
 }
 
 
-// Jun-21-2000: Some profiles (those that comes with W2K) comes
-// with the media white (media black?) x 100. Add a sanity check
-
-static
-void NormalizeXYZ(cmsCIEXYZ* Dest)
-{
-    while (Dest -> X > 2. &&
-           Dest -> Y > 2. &&
-           Dest -> Z > 2.) {
-
-               Dest -> X /= 10.;
-               Dest -> Y /= 10.;
-               Dest -> Z /= 10.;
-       }
-}
-
 cmsBool CMSEXPORT  _cmsReadXYZNumber(cmsIOHANDLER* io, cmsCIEXYZ* XYZ)
 {
     cmsEncodedXYZNumber xyz;
@@ -244,8 +228,6 @@ cmsBool CMSEXPORT  _cmsReadXYZNumber(cmsIOHANDLER* io, cmsCIEXYZ* XYZ)
         XYZ->X = _cms15Fixed16toDouble(_cmsAdjustEndianess32(xyz.X));
         XYZ->Y = _cms15Fixed16toDouble(_cmsAdjustEndianess32(xyz.Y));
         XYZ->Z = _cms15Fixed16toDouble(_cmsAdjustEndianess32(xyz.Z));
-
-        NormalizeXYZ(XYZ);
     }
     return TRUE;
 }
@@ -683,15 +665,21 @@ struct _cmsContext_struct* _cmsGetContext(cmsContext ContextID)
 
 
 // Internal: get the memory area associanted with each context client
-// Returns the block assigned to the specific zone. 
+// Returns the block assigned to the specific zone. Never return NULL.
 void* _cmsContextGetClientChunk(cmsContext ContextID, _cmsMemoryClient mc)
 {
     struct _cmsContext_struct* ctx;
     void *ptr;
 
-    if (mc < 0 || mc >= MemoryClientMax) {
-        cmsSignalError(ContextID, cmsERROR_RANGE, "Bad context client");
-        return NULL;
+    if ((int) mc < 0 || mc >= MemoryClientMax) {
+        
+           cmsSignalError(ContextID, cmsERROR_INTERNAL, "Bad context client -- possible corruption");
+
+           // This is catastrophic. Should never reach here
+           _cmsAssert(0);
+
+           // Reverts to global context
+           return globalContext.chunks[UserPtr];
     }
     
     ctx = _cmsGetContext(ContextID);

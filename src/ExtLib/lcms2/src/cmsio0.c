@@ -453,6 +453,14 @@ cmsBool CMSEXPORT cmsCloseIOhandler(cmsIOHANDLER* io)
 
 // -------------------------------------------------------------------------------------------------------
 
+cmsIOHANDLER* CMSEXPORT cmsGetProfileIOhandler(cmsHPROFILE hProfile)
+{
+	_cmsICCPROFILE* Icc = (_cmsICCPROFILE*)hProfile;
+
+	if (Icc == NULL) return NULL;
+	return Icc->IOhandler;
+}
+
 // Creates an empty structure holding all required parameters
 cmsHPROFILE CMSEXPORT cmsCreateProfilePlaceholder(cmsContext ContextID)
 {
@@ -799,7 +807,7 @@ cmsBool _cmsWriteHeader(_cmsICCPROFILE* Icc, cmsUInt32Number UsedSpace)
 
     // Get true count
     for (i=0;  i < Icc -> TagCount; i++) {
-        if (Icc ->TagNames[i] != 0)
+        if (Icc ->TagNames[i] != (cmsTagSignature) 0)
             Count++;
     }
 
@@ -808,7 +816,7 @@ cmsBool _cmsWriteHeader(_cmsICCPROFILE* Icc, cmsUInt32Number UsedSpace)
 
     for (i=0; i < Icc -> TagCount; i++) {
 
-        if (Icc ->TagNames[i] == 0) continue;   // It is just a placeholder
+        if (Icc ->TagNames[i] == (cmsTagSignature) 0) continue;   // It is just a placeholder
 
         Tag.sig    = (cmsTagSignature) _cmsAdjustEndianess32((cmsInt32Number) Icc -> TagNames[i]);
         Tag.offset = _cmsAdjustEndianess32((cmsInt32Number) Icc -> TagOffsets[i]);
@@ -1158,7 +1166,7 @@ cmsBool SaveTags(_cmsICCPROFILE* Icc, _cmsICCPROFILE* FileOrig)
 
     for (i=0; i < Icc -> TagCount; i++) {
 
-        if (Icc ->TagNames[i] == 0) continue;
+        if (Icc ->TagNames[i] == (cmsTagSignature) 0) continue;
 
         // Linked tags are not written
         if (Icc ->TagLinked[i] != (cmsTagSignature) 0) continue;
@@ -1820,7 +1828,7 @@ Error:
 
 // Similar to the anterior. This function allows to write directly to the ICC profile any data, without
 // checking anything. As a rule, mixing Raw with cooked doesn't work, so writting a tag as raw and then reading
-// it as cooked without serializing does result into an error. If that is wha you want, you will need to dump
+// it as cooked without serializing does result into an error. If that is what you want, you will need to dump
 // the profile to memry or disk and then reopen it.
 cmsBool CMSEXPORT cmsWriteRawTag(cmsHPROFILE hProfile, cmsTagSignature sig, const void* data, cmsUInt32Number Size)
 {
@@ -1844,6 +1852,11 @@ cmsBool CMSEXPORT cmsWriteRawTag(cmsHPROFILE hProfile, cmsTagSignature sig, cons
     Icc ->TagSizes[i] = Size;
 
     _cmsUnlockMutex(Icc->ContextID, Icc ->UsrMutex);
+
+    if (Icc->TagPtrs[i] == NULL) {           
+           Icc->TagNames[i] = (cmsTagSignature) 0;
+           return FALSE;
+    }
     return TRUE;
 }
 
