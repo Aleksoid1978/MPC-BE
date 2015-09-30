@@ -1689,10 +1689,7 @@ cmsBool Write8bitTables(cmsContext ContextID, cmsIOHANDLER* io, cmsUInt32Number 
                 else
                     for (j=0; j < 256; j++) {
 
-                        if (Tables != NULL)
-                            val = (cmsUInt8Number) FROM_16_TO_8(Tables->TheCurves[i]->Table16[j]);
-                        else
-                            val = (cmsUInt8Number) j;
+                        val = (cmsUInt8Number) FROM_16_TO_8(Tables->TheCurves[i]->Table16[j]);
 
                         if (!_cmsWriteUInt8Number(io, val)) return FALSE;
                     }
@@ -3853,7 +3850,7 @@ cmsBool Type_ViewingConditions_Write(struct _cms_typehandler_struct* self, cmsIO
 static
 void* Type_ViewingConditions_Dup(struct _cms_typehandler_struct* self, const void *Ptr, cmsUInt32Number n)
 {
-   return _cmsDupMem(self ->ContextID, Ptr, sizeof(cmsScreening));
+   return _cmsDupMem(self->ContextID, Ptr, sizeof(cmsICCViewingConditions));
 
    cmsUNUSED_PARAMETER(n);
 }
@@ -5451,7 +5448,7 @@ static _cmsTagLinkedList SupportedTags[] = {
     { cmsSigScreeningTag,           { 1, 1, { cmsSigScreeningType},          NULL }, &SupportedTags[59]},
     { cmsSigVcgtTag,                { 1, 1, { cmsSigVcgtType},               NULL }, &SupportedTags[60]},
     { cmsSigMetaTag,                { 1, 1, { cmsSigDictType},               NULL }, &SupportedTags[61]},
-    { cmsSigProfileSequenceIdTag,   { 1, 1, { cmsSigProfileSequenceIdType},  NULL },  &SupportedTags[62]},
+    { cmsSigProfileSequenceIdTag,   { 1, 1, { cmsSigProfileSequenceIdType},  NULL }, &SupportedTags[62]},
     { cmsSigProfileDescriptionMLTag,{ 1, 1, { cmsSigMultiLocalizedUnicodeType}, NULL}, NULL}
 
 

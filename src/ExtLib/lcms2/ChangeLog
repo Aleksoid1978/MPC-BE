@@ -141,3 +141,31 @@ Added pthread dependency. From now lcms supports multithreading
 -----------------------
 2.6 Featured release
 -----------------------
+
+Fixed a possible segmentation fault in a non-happy path
+Fixed a macro clash on SNONE. 
+Added a safety check on named color lists
+Added a function to retrieve the iohandler of a given profile object
+Remove unused vcproj files
+Some maintenance fixes
+utils/jpgicc/iccjpeg.c: Fix check if unsigned variable 'total_length'… …
+Add missing comma in CGATS parser    
+Remove dead code.
+Move unused var suppresor before the `return` statements.
+Added a flag  to clip negative values in unbounded transforms (only gray, rgb, cmyk)
+Added a global optimization that merges consecutive matrices in pipelines. Fixes loss of precision in some transforms
+New project for mac
+Added license for iccjpeg.c
+Added a project for VS2013
+Fixed wrong handling of extra channels in some formatters.
+Added an option in transicc for working in bounded mode
+Added a version retrieval function 
+
+-----------------------
+2.7 Maintenance release
+-----------------------
+
+Fixed a bug in transicc for named color profiles
+added an extra _ to _stdcall to make it more portable
+Big amount of functionality contributed/Sponsored  by Alien Skin Software: TransformStride, copyAlpha, performance plug-ins. Fixes some warnings as well.
+Fix a bug that prevented to read luminance tag

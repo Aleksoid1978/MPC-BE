@@ -218,7 +218,8 @@ cmsBool ClosestLineToLine(cmsVEC3* r, const cmsLine* line1, const cmsLine* line2
 {
     cmsFloat64Number a, b, c, d, e, D;
     cmsFloat64Number sc, sN, sD;
-    cmsFloat64Number tc, tN, tD;
+    //cmsFloat64Number tc; // left for future use
+    cmsFloat64Number tN, tD;
     cmsVEC3 w0;
 
     _cmsVEC3minus(&w0, &line1 ->a, &line2 ->a);
@@ -286,7 +287,7 @@ cmsBool ClosestLineToLine(cmsVEC3* r, const cmsLine* line1, const cmsLine* line2
     }
     // finally do the division to get sc and tc
     sc = (fabs(sN) < MATRIX_DET_TOLERANCE ? 0.0 : sN / sD);
-    tc = (fabs(tN) < MATRIX_DET_TOLERANCE ? 0.0 : tN / tD);
+    //tc = (fabs(tN) < MATRIX_DET_TOLERANCE ? 0.0 : tN / tD); // left for future use.
 
     GetPointOfLine(r, line1, sc);
     return TRUE;
