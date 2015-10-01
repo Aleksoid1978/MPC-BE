@@ -10806,8 +10806,6 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 
 		m_wndView.SetVideoRect(wr);
 
-		MovePreviewWindow();
-
 		if (bShowStats && vr.Height() > 0) {
 			CString info;
 			info.Format(_T("Pos %.2f %.2f, Zoom %.2f %.2f, AR %.2f"), m_PosX, m_PosY, m_ZoomX, m_ZoomY, (float)vr.Width()/vr.Height());
@@ -10818,7 +10816,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 	}
 }
 
-void CMainFrame::MovePreviewWindow()
+void CMainFrame::SetPreviewVideoPosition()
 {
 	if (m_bUseSmartSeek && m_wndPreView) {
 		CRect wr;
@@ -10852,7 +10850,7 @@ void CMainFrame::MovePreviewWindow()
 		CRect vr(pos, CSize(w, h));
 
 		if (m_pMFVDC_preview) {
-			m_pMFVDC_preview->SetVideoPosition (NULL, wr);
+			m_pMFVDC_preview->SetVideoPosition(NULL, wr);
 		}
 
 		m_pBV_preview->SetDefaultSourcePosition();
