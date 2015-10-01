@@ -818,15 +818,8 @@ static void decode_postinit(H264Context *h, int setup_finished)
         if (h->sps.pic_struct_present_flag) {
             /* Use picture timing SEI information. Even if it is a
              * information of a past frame, better than nothing. */
-            // ==> Start patch MPC
-            /*
             if (h->sei_pic_struct == SEI_PIC_STRUCT_TOP_BOTTOM ||
                 h->sei_pic_struct == SEI_PIC_STRUCT_TOP_BOTTOM_TOP)
-            */
-            if (h->sei_pic_struct != SEI_PIC_STRUCT_BOTTOM_TOP &&
-                h->sei_pic_struct != SEI_PIC_STRUCT_BOTTOM_TOP_BOTTOM &&
-                h->picture_structure != PICT_BOTTOM_FIELD)
-            // ==> End patch MPC
                 cur->f->top_field_first = 1;
             else
                 cur->f->top_field_first = 0;
