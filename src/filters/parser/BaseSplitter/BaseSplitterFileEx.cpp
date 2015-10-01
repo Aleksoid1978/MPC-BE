@@ -1508,12 +1508,11 @@ bool CBaseSplitterFileEx::Read(trsechdr& h)
 {
 	memset(&h, 0, sizeof(h));
 
-	BYTE pointer_field = (BYTE)BitRead(8);
+	BYTE pointer_field           = (BYTE)BitRead(8);
 	h.hdr_size++;
-	while (pointer_field-- > 0) {
-		BitRead(8);
-		h.hdr_size++;
-	}
+	Skip(pointer_field);
+	h.hdr_size += pointer_field;
+	
 	h.table_id                   = (BYTE)BitRead(8);
 	h.section_syntax_indicator   = (WORD)BitRead(1);
 	h.zero                       = (WORD)BitRead(1);
@@ -1531,10 +1530,10 @@ bool CBaseSplitterFileEx::Read(trsechdr& h)
 	}
 
 	if (h.table_id <= 0x06) {
-		return h.section_syntax_indicator == 1;
+		return h.section_syntax_indicator == 1 && h.last_section_number == 0;
 	}
 
-	return h.section_length && h.section_length > h.hdr_size;
+	return h.last_section_number == 0 && h.section_length && h.section_length > h.hdr_size;
 }
 
 bool CBaseSplitterFileEx::Read(pvahdr& h, bool fSync)

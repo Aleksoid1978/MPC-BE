@@ -1258,7 +1258,7 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 				case DVB_SI::SI_PMT:
 				case DVB_SI::SI_SDT:
 				case 0x46:
-				//case 0xC8:
+				case 0xC8:
 				case 0xC9:
 				case 0xDA:
 					if (m_programs.IsEmpty()) {
@@ -1298,7 +1298,7 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 			case 0x46:           // DVB - service_description_section - other_transport_stream
 				ReadSDS(ProgramData.pData, ProgramData.table_id);
 				break;
-			//case 0xC8: // ATSC - Terrestrial Virtual Channel Table (TVCT)
+			case 0xC8: // ATSC - Terrestrial Virtual Channel Table (TVCT)
 			case 0xC9: // ATSC - Cable Virtual Channel Table (CVCT) / Long-form Virtual Channel Table (L-VCT)
 			case 0xDA: // ATSC - Satellite VCT (SVCT)
 				ReadVCT(ProgramData.pData, ProgramData.table_id);
