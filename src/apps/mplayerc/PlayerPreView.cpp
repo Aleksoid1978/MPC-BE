@@ -19,9 +19,10 @@
  */
 
 #include "stdafx.h"
+#include "MainFrm.h"
 #include "PlayerPreView.h"
 
-COLORREF RGBFill(int r1, int g1, int b1, int r2, int g2, int b2, int i, int k)
+static COLORREF RGBFill(int r1, int g1, int b1, int r2, int g2, int b2, int i, int k)
 {
 	int r, g, b;
 
@@ -75,7 +76,6 @@ IMPLEMENT_DYNAMIC(CPreView, CWnd)
 BEGIN_MESSAGE_MAP(CPreView, CWnd)
 	ON_WM_CREATE()
 	ON_WM_PAINT()
-	ON_WM_SIZE()
 	ON_WM_SHOWWINDOW()
 END_MESSAGE_MAP()
 
@@ -101,11 +101,10 @@ int CPreView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CRect rc;
 	GetClientRect(rc);
 
-	m_videorect = rc;
-	m_videorect.left    = (m_border + 1);
-	m_videorect.top     = (m_caption + 1);
-	m_videorect.right  -= (m_border + 1);
-	m_videorect.bottom -= (m_border + 1);
+	m_videorect.left   = (m_border + 1);
+	m_videorect.top    = (m_caption + 1);
+	m_videorect.right  = rc.right  - (m_border + 1);
+	m_videorect.bottom = rc.bottom - (m_border + 1);
 
 	if (!m_view.Create(NULL, NULL, WS_CHILD | WS_VISIBLE, m_videorect, this, 0)) {
 		return -1;
@@ -284,27 +283,12 @@ void CPreView::OnPaint()
 	mdc.DeleteDC();
 }
 
-void CPreView::OnSize(UINT nType, int cx, int cy)
-{
-	__super::OnSize(nType, cx, cy);
-
-	CRect rc;
-	GetClientRect(&rc);
-	
-	m_videorect = rc;
-	m_videorect.left    = (m_border + 1);
-	m_videorect.top     = (m_caption + 1);
-	m_videorect.right  -= (m_border + 1);
-	m_videorect.bottom -= (m_border + 1);
-
-	m_view.SetWindowPos(NULL, m_videorect.left, m_videorect.top, m_videorect.Width(), m_videorect.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
-}
-
 void CPreView::OnShowWindow(BOOL bShow, UINT nStatus)
 {
 	if (bShow) {
 		MONITORINFO mi = { sizeof(mi) };
 		GetMonitorInfo(MonitorFromWindow(GetParent()->GetSafeHwnd(), MONITOR_DEFAULTTONEAREST), &mi);
+		
 		CRect wr;
 		GetParent()->GetClientRect(wr);
 
@@ -316,7 +300,22 @@ void CPreView::OnShowWindow(BOOL bShow, UINT nStatus)
 		h += (m_caption + 1);
 		h += (m_border + 1);
 
-		SetWindowPos(NULL, 0, 0, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
+		CRect rc;
+		GetClientRect(&rc);
+		if (rc.Width() != w || rc.Height() != h) {
+			SetWindowPos(NULL, 0, 0, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
+
+			GetClientRect(&rc);
+			m_videorect.right  = rc.right  - (m_border + 1);
+			m_videorect.bottom = rc.bottom - (m_border + 1);
+			
+			m_view.SetWindowPos(NULL, 0, 0, m_videorect.Width(), m_videorect.Height(), SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+		}
+
+		auto pFrame = AfxGetMainFrame();
+		if (pFrame) {
+			pFrame->SetPreviewVideoPosition();
+		}
 	}
 
 	__super::OnShowWindow(bShow, nStatus);
