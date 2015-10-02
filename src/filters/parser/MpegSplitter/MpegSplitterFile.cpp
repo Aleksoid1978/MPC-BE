@@ -781,10 +781,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 
 			if (!m_streams[stream_type::audio].Find(s)) {
 				if (Read(h, len, &s.mt)) {
+					m_aacValid[s].Handle(h);
 					if (m_aacValid[s].IsValid()) {
 						type = stream_type::audio;
-					} else {
-						m_aacValid[s].Handle(h);
 					}
 				}
 			}
@@ -800,10 +799,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			latm_aachdr h = { 0 };
 
 			if (Read(h, len, &s.mt)) {
+				m_aaclatmValid[s].Handle(h);
 				if (m_aaclatmValid[s].IsValid()) {
 					type = stream_type::audio;
-				} else {
-					m_aaclatmValid[s].Handle(h);
 				}
 			}
 		}
@@ -814,10 +812,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			aachdr h = { 0 };
 
 			if (Read(h, len, &s.mt)) {
+				m_aacValid[s].Handle(h);
 				if (m_aacValid[s].IsValid()) {
 					type = stream_type::audio;
-				} else {
-					m_aacValid[s].Handle(h);
 				}
 			}
 		}
@@ -828,10 +825,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			mpahdr h = { 0 };
 
 			if (Read(h, len, &s.mt, false, true)) {
+				m_mpaValid[s].Handle(h);
 				if (m_mpaValid[s].IsValid()) {
 					type = stream_type::audio;
-				} else {
-					m_mpaValid[s].Handle(h);
 				}
 			}
 		}
@@ -842,10 +838,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			ac3hdr h = { 0 };
 
 			if (Read(h, len, &s.mt)) {
+				m_ac3Valid[s].Handle(h);
 				if (m_ac3Valid[s].IsValid()) {
 					type = stream_type::audio;
-				} else {
-					m_ac3Valid[s].Handle(h);
 				}
 			}
 		}
@@ -880,10 +875,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 					latm_aachdr h = { 0 };
 
 					if (Read(h, len, &s.mt)) {
+						m_aaclatmValid[s].Handle(h);
 						if (m_aaclatmValid[s].IsValid()) {
 							type = stream_type::audio;
-						} else {
-							m_aaclatmValid[s].Handle(h);
 						}
 					}
 				}
@@ -1004,10 +998,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				ac3hdr h = { 0 };
 				if (!m_streams[stream_type::audio].Find(s)) {
 					if (Read(h, len, &s.mt)) {
+						m_ac3Valid[s].Handle(h);
 						if (m_ac3Valid[s].IsValid()) {
 							type = stream_type::audio;
-						} else {
-							m_ac3Valid[s].Handle(h);
 						}
 					}
 				}
