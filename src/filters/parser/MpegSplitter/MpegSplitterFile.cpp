@@ -1255,12 +1255,20 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 						return;
 					}
 					break;
-				case DVB_SI::SI_PMT:
 				case DVB_SI::SI_SDT:
 				case 0x46:
+					if (m_programs.IsEmpty() || h.pid != MPEG2_PID::PID_SDT) {
+						return;
+					}
+					break;
 				case 0xC8:
 				case 0xC9:
 				case 0xDA:
+					if (m_programs.IsEmpty() || h.pid != MPEG2_PID::PID_VCT) {
+						return;
+					}
+					break;
+				case DVB_SI::SI_PMT:
 					if (m_programs.IsEmpty()) {
 						return;
 					}
@@ -1294,9 +1302,9 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 			case DVB_SI::SI_PMT:
 				ReadPMT(ProgramData.pData, h.pid);
 				break;
-			case DVB_SI::SI_SDT: // DVB - service_description_section - actual_transport_stream
-			case 0x46:           // DVB - service_description_section - other_transport_stream
-				ReadSDS(ProgramData.pData, ProgramData.table_id);
+			case DVB_SI::SI_SDT: // DVB - Service Description Table - actual_transport_stream
+			case 0x46:           // DVB - Service Description Table - other_transport_stream
+				ReadSDT(ProgramData.pData, ProgramData.table_id);
 				break;
 			case 0xC8: // ATSC - Terrestrial Virtual Channel Table (TVCT)
 			case 0xC9: // ATSC - Cable Virtual Channel Table (CVCT) / Long-form Virtual Channel Table (L-VCT)
@@ -1530,7 +1538,7 @@ CString ConvertDVBString(const BYTE* pBuffer, int nLength)
 	return strResult;
 }
 
-void CMpegSplitterFile::ReadSDS(CAtlArray<BYTE>& pData, BYTE table_id)
+void CMpegSplitterFile::ReadSDT(CAtlArray<BYTE>& pData, BYTE table_id)
 {
 	if (pData.GetCount() < 3) {
 		return;

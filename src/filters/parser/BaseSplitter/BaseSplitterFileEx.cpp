@@ -1530,10 +1530,10 @@ bool CBaseSplitterFileEx::Read(trsechdr& h)
 	}
 
 	if (h.table_id <= 0x06) {
-		return h.section_syntax_indicator == 1 && h.last_section_number == 0;
+		return h.section_syntax_indicator == 1;
 	}
 
-	return h.last_section_number == 0 && h.section_length && h.section_length > h.hdr_size;
+	return h.section_length && h.section_length > h.hdr_size;
 }
 
 bool CBaseSplitterFileEx::Read(pvahdr& h, bool fSync)
