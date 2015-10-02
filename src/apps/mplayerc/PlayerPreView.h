@@ -22,9 +22,14 @@
 
 class CPreView : public CWnd
 {
-	const int m_caption = 20;
+	int m_dpiX = 96;
+	int m_dpiY = 96;
+	int ScaleX(int x) { return x * m_dpiX / 96; }
+	int ScaleY(int y) { return y * m_dpiY / 96; }
+
 	const int m_border = 5;
 
+	int m_caption = 20;
 	int m_relativeSize = 15;
 
 	CString	m_tooltipstr;

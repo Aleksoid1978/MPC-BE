@@ -48,15 +48,14 @@ BOOL CPreView::SetWindowText(LPCWSTR lpString)
 {
 	m_tooltipstr = lpString;
 
-	CRect r;
-	GetClientRect(r);
+	CRect rect;
+	GetClientRect(rect);
 
-	CRect rt = r;
-	rt.bottom = m_caption;
-	rt.left += 10;
-	rt.right -= 10;
+	rect.bottom = m_caption;
+	rect.left += 10;
+	rect.right -= 10;
 
-	InvalidateRect(rt);
+	InvalidateRect(rect);
 
 	return ::SetWindowText(m_hWnd, lpString);
 }
@@ -98,6 +97,15 @@ int CPreView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 
+	HDC hdc = ::GetDC(NULL);
+	if (hdc) {
+		m_dpiX = ::GetDeviceCaps(hdc, LOGPIXELSX);
+		m_dpiY = ::GetDeviceCaps(hdc, LOGPIXELSY);
+		::ReleaseDC(NULL, hdc);
+	}
+
+	m_caption = ScaleY(20);
+
 	CRect rc;
 	GetClientRect(rc);
 
@@ -117,7 +125,7 @@ void CPreView::OnPaint()
 {
 	CPaintDC dc(this);
 
-	CRect rcClient, rcBar;
+	CRect rcBar;
 	GetClientRect(rcBar);
 
 	CDC mdc;
@@ -265,7 +273,7 @@ void CPreView::OnPaint()
 
 	mdc.SetTextColor(RGB(r1,g1,b1));
 
-	font.CreateFont(13, 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET,
+	font.CreateFont(ScaleY(13), 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET,
 									OUT_RASTER_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH | FF_MODERN,
 									_T("Tahoma"));
 
