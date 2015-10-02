@@ -63,7 +63,7 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 			}
 			memcpy(&m_val, &val, sizeof(val));
 		}
-		BOOL IsValid() { return m_nValidStream >= validCount; }
+		BOOL IsValid() const { return m_nValidStream >= validCount; }
 	};
 
 	CAtlMap<DWORD, CValidStream<latm_aachdr, 3>>	m_aaclatmValid;
