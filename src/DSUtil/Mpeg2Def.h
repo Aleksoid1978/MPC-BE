@@ -87,6 +87,7 @@ enum MPEG2_PID {
 	PID_SFN		= 0x015,	// SFN/MIP synchronisation
 	PID_DIT		= 0x01e,
 	PID_SIT		= 0x01f,
+	PID_VCT		= 0x1ffb,	// Virtual Channel Table
 	PID_NULL	= 0x1fff	// Null packet
 };
 
