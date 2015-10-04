@@ -1824,8 +1824,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_chkbytes.AddTail(_T("4,4,,736b6970")); // '....skip'
 		pFGF->m_chkbytes.AddTail(_T("4,4,,66726565")); // '....free'
 		pFGF->m_chkbytes.AddTail(_T("4,4,,706e6f74")); // '....pnot'
-
-		pFGF->m_chkbytes.AddTail(_T("3,3,,000001")); // raw mpeg4 video
 		pFGF->m_extensions.AddTail(_T(".mov"));
 		m_source.AddTail(pFGF);
 	}

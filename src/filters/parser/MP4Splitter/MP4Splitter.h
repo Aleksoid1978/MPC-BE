@@ -68,34 +68,6 @@ public:
 	CMP4SourceFilter(LPUNKNOWN pUnk, HRESULT* phr);
 };
 
-// for raw mpeg4 elementary streams:
-
-class __declspec(uuid("D3D9D58B-45B5-48AB-B199-B8C40560AEC7"))
-	CMPEG4VideoSplitterFilter : public CBaseSplitterFilter
-{
-	__int64 m_seqhdrsize;
-	int NextStartCode();
-	void SkipUserData();
-
-protected:
-	CAutoPtr<CBaseSplitterFileEx> m_pFile;
-	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
-
-	bool DemuxInit();
-	void DemuxSeek(REFERENCE_TIME rt);
-	bool DemuxLoop();
-
-public:
-	CMPEG4VideoSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
-};
-
-class __declspec(uuid("E2B98EEA-EE55-4E9B-A8C1-6E5288DF785A"))
-	CMPEG4VideoSourceFilter : public CMPEG4VideoSplitterFilter
-{
-public:
-	CMPEG4VideoSourceFilter(LPUNKNOWN pUnk, HRESULT* phr);
-};
-
 class CMP4SplitterOutputPin : public CBaseSplitterOutputPin, protected CCritSec
 {
 public:
