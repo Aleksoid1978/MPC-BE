@@ -93,10 +93,6 @@ static const BYTE SYNC_MPEG4[4]		= {0x00, 0x00, 0x01, 0xB0};
 
 CRawVideoSplitterFilter::CRawVideoSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CRawVideoSplitterFilter"), pUnk, phr, __uuidof(this))
-	, m_RAWType(RAW_NONE)
-	, m_startpos(0)
-	, m_framesize(0)
-	, m_AvgTimePerFrame(0)
 {
 }
 
@@ -286,6 +282,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		m_startpos  = firstframepos;
+		m_AvgTimePerFrame = 10000000i64 * fpsden / fpsnum;
 		m_framesize = width * height * bpp >> 3;
 
 		mt.majortype  = MEDIATYPE_Video;
@@ -303,7 +300,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		vih2->bmiHeader.biSizeImage   = m_framesize;
 		//vih2->rcSource = vih2->rcTarget = CRect(0, 0, width, height);
 		//vih2->dwBitRate      = m_framesize * 8 * fpsnum / fpsden;
-		vih2->AvgTimePerFrame  = 10000000i64 * fpsden / fpsnum;
+		vih2->AvgTimePerFrame  = m_AvgTimePerFrame;
 		// always tell DirectShow it's interlaced (progressive flags set in IMediaSample struct)
 		vih2->dwInterlaceFlags = AMINTERLACE_IsInterlaced | AMINTERLACE_DisplayModeBobOrWeave;
 
@@ -313,7 +310,6 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		vih2->dwPictAspectRatioX = sar_x;
 		vih2->dwPictAspectRatioY = sar_y;
 
-		m_AvgTimePerFrame = vih2->AvgTimePerFrame;
 		m_rtDuration      = (m_pFile->GetLength() - m_startpos) / (sizeof(FRAME_) + m_framesize) * 10000000i64 * fpsden / fpsnum;
 		mt.SetSampleSize(m_framesize);
 
@@ -680,6 +676,8 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mts.Add(mt);
 			mt.subtype = FOURCCMap(mvih->hdr.bmiHeader.biCompression = 'V4PM');
 			mts.Add(mt);
+
+			m_startpos = seqhdrsize;
 
 			m_RAWType = RAW_MPEG4;
 			pName = L"MPEG-4 Visual Video Output";
