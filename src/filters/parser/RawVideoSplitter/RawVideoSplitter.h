@@ -37,11 +37,11 @@ class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 		RAW_HEVC,
 		RAW_Y4M,
 		RAW_MPEG4,
-	} m_RAWType;
+	} m_RAWType = RAW_NONE;
 
-	__int64 m_startpos;
-	int     m_framesize;
-	REFERENCE_TIME m_AvgTimePerFrame;
+	__int64			m_startpos			= 0;
+	REFERENCE_TIME	m_AvgTimePerFrame	= 0;
+	int				m_framesize			= 0; // for YUV4MPEG2 only
 
 protected:
 	CAutoPtr<CBaseSplitterFileEx> m_pFile;
