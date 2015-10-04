@@ -35,7 +35,8 @@ class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 		RAW_H264,
 		RAW_VC1,
 		RAW_HEVC,
-		RAW_Y4M
+		RAW_Y4M,
+		RAW_MPEG4,
 	} m_RAWType;
 
 	__int64 m_startpos;
