@@ -462,7 +462,6 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		DWORD height = 0;
 		BYTE parx = 1;
 		BYTE pary = 1;
-		REFERENCE_TIME atpf = 400000;
 		__int64 seqhdrsize = 0;
 
 		BYTE id;
@@ -624,7 +623,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						WORD fixed_vop_time_increment = m_pFile->BitRead(bits);
 
 						if (fixed_vop_time_increment) {
-							atpf = UNITS * fixed_vop_time_increment / vop_time_increment_resolution;
+							m_AvgTimePerFrame = UNITS * fixed_vop_time_increment / vop_time_increment_resolution;
 						}
 					}
 
@@ -655,32 +654,35 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		if (width && height) {
+			if (m_AvgTimePerFrame < 50000) {
+				m_AvgTimePerFrame = 400000;
+			};
 
-		mt.majortype = MEDIATYPE_Video;
-		mt.subtype = FOURCCMap('v4pm');
-		mt.formattype = FORMAT_MPEG2Video;
+			mt.majortype = MEDIATYPE_Video;
+			mt.subtype = FOURCCMap('v4pm');
+			mt.formattype = FORMAT_MPEG2Video;
 
-		MPEG2VIDEOINFO* mvih = (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + seqhdrsize);
-		memset(mvih, 0, mt.FormatLength());
-		mvih->hdr.bmiHeader.biSize = sizeof(mvih->hdr.bmiHeader);
-		mvih->hdr.bmiHeader.biWidth = width;
-		mvih->hdr.bmiHeader.biHeight = height;
-		mvih->hdr.bmiHeader.biCompression = 'v4pm';
-		mvih->hdr.bmiHeader.biPlanes = 1;
-		mvih->hdr.bmiHeader.biBitCount = 24;
-		mvih->hdr.bmiHeader.biSizeImage = DIBSIZE(mvih->hdr.bmiHeader);
-		mvih->hdr.AvgTimePerFrame = atpf;
-		mvih->hdr.dwPictAspectRatioX = width*parx;
-		mvih->hdr.dwPictAspectRatioY = height*pary;
-		mvih->cbSequenceHeader = seqhdrsize;
-		m_pFile->Seek(0);
-		m_pFile->ByteRead((BYTE*)mvih->dwSequenceHeader, seqhdrsize);
-		mts.Add(mt);
-		mt.subtype = FOURCCMap(mvih->hdr.bmiHeader.biCompression = 'V4PM');
-		mts.Add(mt);
+			MPEG2VIDEOINFO* mvih = (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + seqhdrsize);
+			memset(mvih, 0, mt.FormatLength());
+			mvih->hdr.bmiHeader.biSize = sizeof(mvih->hdr.bmiHeader);
+			mvih->hdr.bmiHeader.biWidth = width;
+			mvih->hdr.bmiHeader.biHeight = height;
+			mvih->hdr.bmiHeader.biCompression = 'v4pm';
+			mvih->hdr.bmiHeader.biPlanes = 1;
+			mvih->hdr.bmiHeader.biBitCount = 24;
+			mvih->hdr.bmiHeader.biSizeImage = DIBSIZE(mvih->hdr.bmiHeader);
+			mvih->hdr.AvgTimePerFrame = m_AvgTimePerFrame;
+			mvih->hdr.dwPictAspectRatioX = width*parx;
+			mvih->hdr.dwPictAspectRatioY = height*pary;
+			mvih->cbSequenceHeader = seqhdrsize;
+			m_pFile->Seek(0);
+			m_pFile->ByteRead((BYTE*)mvih->dwSequenceHeader, seqhdrsize);
+			mts.Add(mt);
+			mt.subtype = FOURCCMap(mvih->hdr.bmiHeader.biCompression = 'V4PM');
+			mts.Add(mt);
 
-		m_RAWType = RAW_MPEG4;
-		pName = L"MPEG-4 Visual Video Output";
+			m_RAWType = RAW_MPEG4;
+			pName = L"MPEG-4 Visual Video Output";
 		}
 	}
 
@@ -739,13 +741,9 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 	HRESULT hr = S_OK;
 
 	REFERENCE_TIME rt = 0;
-	REFERENCE_TIME atpf = ((MPEG2VIDEOINFO*)GetOutputPin(0)->CurrentMediaType().Format())->hdr.AvgTimePerFrame;
-
+	CAutoPtr<CPacket> mpeg4packet;
 
 	while (SUCCEEDED(hr) && !CheckRequest(NULL) && m_pFile->GetRemaining()) {
-		CAutoPtr<CPacket> p(DNew CPacket());
-		p->TrackNumber	= 0;
-		p->bSyncPoint	= FALSE;
 
 		if (m_RAWType == RAW_Y4M) {
 			if (m_pFile->GetRemaining() < m_framesize + (int)sizeof(FRAME_)) {
@@ -757,6 +755,10 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 				ASSERT(0);
 			}
 			__int64 framenum = (m_pFile->GetPos() - m_startpos) / (sizeof(FRAME_) + m_framesize);
+
+			CAutoPtr<CPacket> p(DNew CPacket());
+			p->TrackNumber	= 0;
+			p->bSyncPoint	= FALSE;
 
 			p->SetCount(m_framesize);
 			m_pFile->ByteRead(p->GetData(), m_framesize);
@@ -772,41 +774,46 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 			for (int i = 0; i < 65536; ++i) { // don't call CheckRequest so often
 				bool eof = !m_pFile->GetRemaining();
 
-				if (p && !p->IsEmpty() && (m_pFile->BitRead(32, true) == 0x000001b6 || eof)) {
-					hr = DeliverPacket(p);
+				if (mpeg4packet && !mpeg4packet->IsEmpty() && (m_pFile->BitRead(32, true) == 0x000001b6 || eof)) {
+					hr = DeliverPacket(mpeg4packet);
 				}
 
 				if (eof) {
 					break;
 				}
 
-				if (!p) {
-					p.Attach(DNew CPacket());
-					p->SetCount(0, 1024);
-					p->TrackNumber = 0;
-					p->rtStart = rt;
-					p->rtStop = rt + atpf;
-					p->bSyncPoint = FALSE;
-					rt += atpf;
+				if (!mpeg4packet) {
+					mpeg4packet.Attach(DNew CPacket());
+					mpeg4packet->SetCount(0, 1024);
+					mpeg4packet->TrackNumber = 0;
+					mpeg4packet->rtStart = rt;
+					mpeg4packet->rtStop = rt + m_AvgTimePerFrame;
+					mpeg4packet->bSyncPoint = FALSE;
+					rt += m_AvgTimePerFrame;
 					// rt = INVALID_TIME;
 				}
 
 				BYTE b;
 				m_pFile->ByteRead(&b, 1);
-				p->Add(b);
+				mpeg4packet->Add(b);
 			}
 			continue;
 		}
 
-		size_t size		= min(64 * KILOBYTE, m_pFile->GetRemaining());
 
-		p->SetCount(size);
-		m_pFile->ByteRead(p->GetData(), size);
+		if (size_t size = min(64 * KILOBYTE, m_pFile->GetRemaining())) {
+			CAutoPtr<CPacket> p(DNew CPacket());
+			p->TrackNumber = 0;
+			p->bSyncPoint = FALSE;
 
-		p->rtStart		= INVALID_TIME;
-		p->rtStop		= INVALID_TIME;
+			p->SetCount(size);
+			m_pFile->ByteRead(p->GetData(), size);
 
-		hr = DeliverPacket(p);
+			p->rtStart = INVALID_TIME;
+			p->rtStop = INVALID_TIME;
+
+			hr = DeliverPacket(p);
+		}
 	}
 
 	return true;
