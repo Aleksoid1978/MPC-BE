@@ -353,17 +353,17 @@ namespace AVCParser {
 			}
 
 			gb.BitRead(1);						// pic_struct_present_flag
-			if (gb.BitRead(1)) {				// bitstream_restriction_flag
+			if (!gb.IsEOF() && gb.BitRead(1)) {	// bitstream_restriction_flag
 				gb.BitRead(1);					// motion_vectors_over_pic_boundaries_flag
 				gb.UExpGolombRead();			// max_bytes_per_pic_denom
 				gb.UExpGolombRead();			// max_bits_per_mb_denom
 				gb.UExpGolombRead();			// log2_max_mv_length_horizontal
 				gb.UExpGolombRead();			// log2_max_mv_length_vertical
-				UINT64 num_reorder_frames = gb.UExpGolombRead(); // num_reorder_frames
-				gb.UExpGolombRead();			// max_dec_frame_buffering
 
-				if (gb.GetSize() < gb.GetPos()) {
-					num_reorder_frames = 0;
+				UINT64 num_reorder_frames = 0;
+				if (!gb.IsEOF()) {
+					num_reorder_frames = gb.UExpGolombRead(); // num_reorder_frames
+					gb.UExpGolombRead();		// max_dec_frame_buffering
 				}
 				if (num_reorder_frames > 16U) {
 					goto error;
@@ -371,8 +371,9 @@ namespace AVCParser {
 			}
 		}
 
-		if (params.profile == H264_PROFILE_MULTIVIEW_HIGH ||
-			params.profile == H264_PROFILE_STEREO_HIGH) {
+		if (!gb.IsEOF() &&
+				(params.profile == H264_PROFILE_MULTIVIEW_HIGH ||
+				 params.profile == H264_PROFILE_STEREO_HIGH)) {
 			UINT8 bit_equal_to_one = gb.BitRead(1);	// bit_equal_to_one
 			if (!bit_equal_to_one) {
 				goto error;
