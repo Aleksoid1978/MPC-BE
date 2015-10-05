@@ -338,7 +338,6 @@ HRESULT CBaseSplitterParserOutputPin::ParseAACLATM(CAutoPtr<CPacket> p)
 	return S_OK;
 }
 
-#define AVC_NAL_AUD 9
 HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bConvertToAVCC)
 {
 	BOOL bTimeStampExists = FALSE;
@@ -498,11 +497,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 			const BYTE* pData = pPacket->GetData();
 
 			BYTE nut = pData[4] & 0x1f;
-			if (nut == AVC_NAL_AUD) {
+			if (nut == NALU_TYPE_AUD) {
 				m_bHasAccessUnitDelimiters = true;
 			}
 
-			if (nut == AVC_NAL_AUD || (!m_bHasAccessUnitDelimiters && (pPacket->rtStart != INVALID_TIME || !bTimeStampExists))) {
+			if (nut == NALU_TYPE_AUD || (!m_bHasAccessUnitDelimiters && (pPacket->rtStart != INVALID_TIME || !bTimeStampExists))) {
 				if (pPacket->rtStart == INVALID_TIME && rtStart != INVALID_TIME) {
 					pPacket->rtStart	= rtStart;
 					pPacket->rtStop		= rtStop;
