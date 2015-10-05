@@ -784,6 +784,10 @@ void CPlayerSeekBar::HideToolTip()
 void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 {
 	if (m_pMainFrame->CanPreviewUse()) {
+		if (!m_pMainFrame->m_wndPreView.IsWindowVisible()) {
+			m_pMainFrame->m_wndPreView.SetWindowSize();
+		}
+
 		CRect Rect;
 		m_pMainFrame->m_wndPreView.GetWindowRect(Rect);
 		int r_width  = Rect.Width();
@@ -809,6 +813,10 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 		}
 
 		m_pMainFrame->m_wndPreView.MoveWindow(point.x, point.y, r_width, r_height);
+
+		if (!m_pMainFrame->m_wndPreView.IsWindowVisible()) {
+			OnTimer(m_tooltipTimer);
+		}
 	} else {
 		CSize size = m_tooltip.GetBubbleSize(&m_ti);
 		CRect r;

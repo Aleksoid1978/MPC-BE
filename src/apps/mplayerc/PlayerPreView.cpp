@@ -294,32 +294,6 @@ void CPreView::OnPaint()
 void CPreView::OnShowWindow(BOOL bShow, UINT nStatus)
 {
 	if (bShow) {
-		MONITORINFO mi = { sizeof(mi) };
-		GetMonitorInfo(MonitorFromWindow(GetParent()->GetSafeHwnd(), MONITOR_DEFAULTTONEAREST), &mi);
-		
-		CRect wr;
-		GetParent()->GetClientRect(wr);
-
-		int w = (mi.rcWork.right - mi.rcWork.left) * m_relativeSize / 100;
-		// the preview size should not be larger than half size of the main window, but not less than 160
-		w = max(160, min(w, wr.Width() / 2));
-
-		int h = (w - ((m_border + 1) * 2)) * 9 / 16;
-		h += (m_caption + 1);
-		h += (m_border + 1);
-
-		CRect rc;
-		GetClientRect(&rc);
-		if (rc.Width() != w || rc.Height() != h) {
-			SetWindowPos(NULL, 0, 0, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
-
-			GetClientRect(&rc);
-			m_videorect.right  = rc.right  - (m_border + 1);
-			m_videorect.bottom = rc.bottom - (m_border + 1);
-			
-			m_view.SetWindowPos(NULL, 0, 0, m_videorect.Width(), m_videorect.Height(), SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
-		}
-
 		auto pFrame = AfxGetMainFrame();
 		if (pFrame) {
 			pFrame->SetPreviewVideoPosition();
@@ -327,4 +301,33 @@ void CPreView::OnShowWindow(BOOL bShow, UINT nStatus)
 	}
 
 	__super::OnShowWindow(bShow, nStatus);
+}
+
+void CPreView::SetWindowSize()
+{
+	MONITORINFO mi = { sizeof(mi) };
+	GetMonitorInfo(MonitorFromWindow(GetParent()->GetSafeHwnd(), MONITOR_DEFAULTTONEAREST), &mi);
+
+	CRect wr;
+	GetParent()->GetClientRect(wr);
+
+	int w = (mi.rcWork.right - mi.rcWork.left) * m_relativeSize / 100;
+	// the preview size should not be larger than half size of the main window, but not less than 160
+	w = max(160, min(w, wr.Width() / 2));
+
+	int h = (w - ((m_border + 1) * 2)) * 9 / 16;
+	h += (m_caption + 1);
+	h += (m_border + 1);
+
+	CRect rc;
+	GetClientRect(&rc);
+	if (rc.Width() != w || rc.Height() != h) {
+		SetWindowPos(NULL, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+
+		GetClientRect(&rc);
+		m_videorect.right = rc.right - (m_border + 1);
+		m_videorect.bottom = rc.bottom - (m_border + 1);
+
+		m_view.SetWindowPos(NULL, 0, 0, m_videorect.Width(), m_videorect.Height(), SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+	}
 }
