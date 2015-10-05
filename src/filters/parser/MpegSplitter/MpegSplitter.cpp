@@ -696,17 +696,17 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 		if (b == 0xba) { // program stream header
 			CMpegSplitterFile::pshdr h;
-			if (!m_pFile->Read(h)) {
+			if (!m_pFile->ReadPS(h)) {
 				return S_FALSE;
 			}
 		} else if (b == 0xbb) { // program stream system header
 			CMpegSplitterFile::pssyshdr h;
-			if (!m_pFile->Read(h)) {
+			if (!m_pFile->ReadPSS(h)) {
 				return S_FALSE;
 			}
 		} else if ((b >= 0xbd && b < 0xf0) || (b == 0xfd)) { // pes packet
 			CMpegSplitterFile::peshdr peshdr;
-			if (!m_pFile->Read(peshdr, b) || !peshdr.len) {
+			if (!m_pFile->ReadPES(peshdr, b) || !peshdr.len) {
 				return S_FALSE;
 			}
 
@@ -726,7 +726,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 		}
 	} else if (m_pFile->m_type == MPEG_TYPES::mpeg_ts) {
 		CMpegSplitterFile::trhdr h;
-		if (!m_pFile->Read(h)) {
+		if (!m_pFile->ReadTR(h)) {
 			return S_FALSE;
 		}
 
@@ -738,7 +738,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				CMpegSplitterFile::peshdr peshdr;
 				if (h.payloadstart) {
 					if (m_pFile->NextMpegStartCode(b, 4)) { // pes packet
-						if (m_pFile->Read(peshdr, b)) {
+						if (m_pFile->ReadPES(peshdr, b)) {
 							if (peshdr.type == CMpegSplitterFile::mpeg2 && peshdr.scrambling) {
 								ASSERT(0);
 								return E_FAIL;
@@ -760,7 +760,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 		m_pFile->Seek(h.next);
 	} else if (m_pFile->m_type == MPEG_TYPES::mpeg_pva) {
 		CMpegSplitterFile::pvahdr pvahdr;
-		if (!m_pFile->Read(pvahdr)) {
+		if (!m_pFile->ReadPVA(pvahdr)) {
 			return S_FALSE;
 		}
 
