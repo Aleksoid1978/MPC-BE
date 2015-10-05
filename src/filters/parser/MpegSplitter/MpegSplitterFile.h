@@ -80,7 +80,115 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	typedef CAtlArray<SyncPoint> SyncPoints;
 	CAtlMap<DWORD, SyncPoints> m_SyncPoints;
 
+	int m_tslen = 0; // transport stream packet length (188 or 192 bytes, auto-detected)
+
 public:
+	struct pshdr {
+		mpeg_t type;
+		UINT64 scr, bitrate;
+	};
+
+	struct pssyshdr {
+		DWORD rate_bound;
+		BYTE video_bound, audio_bound;
+		bool fixed_rate, csps;
+		bool sys_video_loc_flag, sys_audio_loc_flag;
+	};
+
+	struct peshdr {
+		WORD len;
+
+		BYTE type:2, fpts:1, fdts:1;
+		REFERENCE_TIME pts, dts;
+
+		// mpeg1 stuff
+		UINT64 std_buff_size;
+
+		// mpeg2 stuff
+		BYTE scrambling:2, priority:1, alignment:1, copyright:1, original:1;
+		BYTE escr:1, esrate:1, dsmtrickmode:1, morecopyright:1, crc:1, extension:1;
+		BYTE hdrlen;
+
+		BYTE id_ext;
+
+		struct peshdr() {
+			memset(this, 0, sizeof(*this));
+		}
+	};
+
+	// http://multimedia.cx/mirror/av_format_v1.pdf
+	struct pvahdr
+	{
+		WORD sync; // 'VA'
+		BYTE streamid; // 1 - video, 2 - audio
+		BYTE counter;
+		BYTE res1; // 0x55
+		BYTE res2:3;
+		BYTE fpts:1;
+		BYTE postbytes:2;
+		BYTE prebytes:2;
+		WORD length;
+		REFERENCE_TIME pts;
+
+		__int64 hdrpos;
+	};
+
+	struct trhdr
+	{
+		__int64 PCR;
+		__int64 next;
+		int bytes;
+		WORD pid:13;
+		BYTE sync; // 0x47
+		BYTE error:1;
+		BYTE payloadstart:1;
+		BYTE transportpriority:1;
+		BYTE scrambling:2;
+		BYTE adapfield:1;
+		BYTE payload:1;
+		BYTE counter:4;
+		// if adapfield set
+		BYTE length;
+		BYTE discontinuity:1;
+		BYTE randomaccess:1;
+		BYTE priority:1;
+		BYTE fPCR:1;
+		BYTE OPCR:1;
+		BYTE splicingpoint:1;
+		BYTE privatedata:1;
+		BYTE extension:1;
+
+		__int64 hdrpos;
+		// TODO: add more fields here when the flags above are set (they aren't very interesting...)
+	};
+
+	struct psihdr
+	{
+		BYTE section_syntax_indicator:1;
+		BYTE zero:1;
+		BYTE reserved1:2;
+		int section_length:12;
+		WORD transport_stream_id;
+		BYTE table_id;
+		BYTE reserved2:2;
+		BYTE version_number:5;
+		BYTE current_next_indicator:1;
+		BYTE section_number;
+		BYTE last_section_number;
+
+		BYTE hdr_size;
+	};
+
+	bool ReadPS(pshdr& h);              // program stream header
+	bool ReadPSS(pssyshdr& h);          // program stream system header
+	
+	bool ReadPES(peshdr& h, BYTE code); // packetized elementary stream
+
+	bool ReadPVA(pvahdr& h, bool fSync = true);
+
+	bool ReadTR(trhdr& h, bool fSync = true);
+	bool ReadPSI(psihdr& h);
+
 	enum stream_codec {
 		NONE,
 		H264,
