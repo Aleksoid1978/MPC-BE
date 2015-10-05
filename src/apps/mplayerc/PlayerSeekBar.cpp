@@ -788,31 +788,31 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 			m_pMainFrame->m_wndPreView.SetWindowSize();
 		}
 
-		CRect Rect;
-		m_pMainFrame->m_wndPreView.GetWindowRect(Rect);
-		int r_width  = Rect.Width();
-		int r_height = Rect.Height();
+		CRect rc;
+		m_pMainFrame->m_wndPreView.GetWindowRect(&rc);
+		const int r_width  = rc.Width();
+		const int r_height = rc.Height();
 
 		MONITORINFO mi = { sizeof(mi) };
 		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 
-		CPoint p1(point);
 		point.x -= r_width / 2 - 2;
 		point.y = GetChannelRect().TopLeft().y - (r_height + 13);
 		ClientToScreen(&point);
 		point.x = max(mi.rcWork.left + 5, min(point.x, mi.rcWork.right - r_width - 5));
 
 		if (point.y <= 5) {
-			CRect r = mi.rcWork;
+			const CRect r = mi.rcWork;
 			if (!r.PtInRect(point)) {
-				p1.y = GetChannelRect().TopLeft().y + 30;
-				ClientToScreen(&p1);
+				CPoint p(point);
+				p.y = GetChannelRect().TopLeft().y + 30;
+				ClientToScreen(&p);
 
-				point.y = p1.y;
+				point.y = p.y;
 			}
 		}
 
-		m_pMainFrame->m_wndPreView.MoveWindow(point.x, point.y, r_width, r_height);
+		m_pMainFrame->m_wndPreView.SetWindowPos(NULL, point.x, point.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 
 		if (!m_pMainFrame->m_wndPreView.IsWindowVisible()) {
 			OnTimer(m_tooltipTimer);
