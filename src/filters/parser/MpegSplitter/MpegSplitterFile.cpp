@@ -1270,14 +1270,20 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 					return;
 			}
 
-			ProgramData.table_id       = h2.table_id;
-			ProgramData.section_length = h2.section_length;
+			if (h2.section_syntax_indicator == 1) {
+				h2.section_length -= 4; // Reserving size of CRC32
+			}
 
-			const size_t packet_len    = h.bytes - h2.hdr_size;
-			const size_t max_len       = min(packet_len, ProgramData.section_length);
+			const int packet_len = h.bytes - h2.hdr_size;
+			const int max_len    = min(packet_len, h2.section_length);
 
-			ProgramData.pData.SetCount(max_len);
-			ByteRead(ProgramData.pData.GetData(), max_len);
+			if (max_len > 0) {
+				ProgramData.table_id       = h2.table_id;
+				ProgramData.section_length = h2.section_length;
+
+				ProgramData.pData.SetCount(max_len);
+				ByteRead(ProgramData.pData.GetData(), max_len);
+			}
 		}
 	} else if (!ProgramData.pData.IsEmpty()) {
 		const size_t data_len = ProgramData.pData.GetCount();

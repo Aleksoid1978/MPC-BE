@@ -347,10 +347,10 @@ public:
 
 	struct trsechdr
 	{
-		WORD section_syntax_indicator:1;
-		WORD zero:1;
-		WORD reserved1:2;
-		WORD section_length:12;
+		BYTE section_syntax_indicator:1;
+		BYTE zero:1;
+		BYTE reserved1:2;
+		int section_length:12;
 		WORD transport_stream_id;
 		BYTE table_id;
 		BYTE reserved2:2;
