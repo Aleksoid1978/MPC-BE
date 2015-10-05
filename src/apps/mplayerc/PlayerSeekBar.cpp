@@ -132,7 +132,7 @@ void CPlayerSeekBar::SetPos(REFERENCE_TIME pos)
 
 void CPlayerSeekBar::SetPosInternal(REFERENCE_TIME pos)
 {
-	AppSettings& s = AfxGetAppSettings();
+	const AppSettings& s = AfxGetAppSettings();
 
 	if (m_pos == pos) {
 		return;
@@ -150,7 +150,7 @@ void CPlayerSeekBar::SetPosInternal(REFERENCE_TIME pos)
 
 void CPlayerSeekBar::SetPosInternal2(REFERENCE_TIME pos)
 {
-	AppSettings& s = AfxGetAppSettings();
+	const AppSettings& s = AfxGetAppSettings();
 
 	if (m_pos2 == pos) {
 		return;
@@ -252,18 +252,17 @@ void CPlayerSeekBar::MoveThumb2(CPoint point)
 }
 
 BEGIN_MESSAGE_MAP(CPlayerSeekBar, CDialogBar)
-	//{{AFX_MSG_MAP(CPlayerSeekBar)
 	ON_WM_PAINT()
 	ON_WM_SIZE()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
+	ON_WM_MOUSELEAVE()
 	ON_WM_ERASEBKGND()
 	ON_WM_SETCURSOR()
 	ON_WM_TIMER()
 	ON_WM_RBUTTONDOWN()
 	ON_WM_MBUTTONDOWN()
-	//}}AFX_MSG_MAP
 	ON_COMMAND_EX(ID_PLAY_STOP, OnPlayStop)
 END_MESSAGE_MAP()
 
@@ -273,7 +272,7 @@ void CPlayerSeekBar::OnPaint()
 {
 	CPaintDC dc(this);
 
-	AppSettings& s = AfxGetAppSettings();
+	const AppSettings& s = AfxGetAppSettings();
 
 	int R, G, B, R2, G2, B2;
 
@@ -646,7 +645,7 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 
 void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 {
-	AppSettings& s = AfxGetAppSettings();
+	const AppSettings& s = AfxGetAppSettings();
 
 	CWnd* w = GetCapture();
 
@@ -675,19 +674,16 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 	} else {
 		m_pMainFrame->PreviewWindowHide();
 	}
+
 	CDialogBar::OnMouseMove(nFlags, point);
 }
 
-LRESULT CPlayerSeekBar::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+void CPlayerSeekBar::OnMouseLeave()
 {
-	if (message == WM_MOUSELEAVE) {
-		HideToolTip();
-		m_pMainFrame->PreviewWindowHide();
-		m_strChap.Empty();
-		Invalidate();
-	}
-
-	return CWnd::WindowProc(message, wParam, lParam);
+	HideToolTip();
+	m_pMainFrame->PreviewWindowHide();
+	m_strChap.Empty();
+	Invalidate();
 }
 
 BOOL CPlayerSeekBar::PreTranslateMessage(MSG* pMsg)
@@ -813,10 +809,6 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
 		}
 
 		m_pMainFrame->m_wndPreView.SetWindowPos(NULL, point.x, point.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
-
-		if (!m_pMainFrame->m_wndPreView.IsWindowVisible()) {
-			OnTimer(m_tooltipTimer);
-		}
 	} else {
 		CSize size = m_tooltip.GetBubbleSize(&m_ti);
 		CRect r;

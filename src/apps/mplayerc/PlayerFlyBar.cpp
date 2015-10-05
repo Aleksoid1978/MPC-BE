@@ -116,17 +116,6 @@ BOOL CFlyBar::PreTranslateMessage(MSG* pMsg)
 	return CWnd::PreTranslateMessage(pMsg);
 }
 
-LRESULT CFlyBar::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	if (message == WM_MOUSELEAVE) {
-		CPoint point;
-		GetCursorPos(&point);
-		UpdateWnd(point);
-	}
-
-	return CWnd::WindowProc(message, wParam, lParam);
-}
-
 BOOL CFlyBar::PreCreateWindow(CREATESTRUCT& cs)
 {
 	if (!CWnd::PreCreateWindow(cs)) {
@@ -233,6 +222,13 @@ void CFlyBar::OnMouseMove(UINT nFlags, CPoint point)
 	//CWnd::OnMouseMove(nFlags, point);
 }
 
+void CFlyBar::OnMouseLeave()
+{
+	CPoint point;
+	GetCursorPos(&point);
+	UpdateWnd(point);
+}
+
 void CFlyBar::UpdateWnd(CPoint point)
 {
 	ClientToScreen(&point);
@@ -313,7 +309,7 @@ void CFlyBar::DrawWnd()
 {
 	CClientDC dc(this);
 	if (IsWindowVisible()) {
-		AppSettings& s = AfxGetAppSettings();
+		const AppSettings& s = AfxGetAppSettings();
 
 		CRect rcBar;
 		GetClientRect(&rcBar);

@@ -90,30 +90,24 @@ public:
 
 	BOOL HasDuration() { return m_stop > 0; };
 
-	// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CPlayerSeekBar)
 	virtual BOOL Create(CWnd* pParentWnd);
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	//}}AFX_VIRTUAL
 
-	// Generated message map functions
+	BOOL OnPlayStop(UINT nID);
+
 protected:
-	//{{AFX_MSG(CPlayerSeekBar)
+	DECLARE_MESSAGE_MAP()
+
 	afx_msg void OnPaint();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-	afx_msg LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	afx_msg void OnMouseLeave();
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnMButtonDown(UINT nFlags, CPoint point);
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg BOOL OnPlayStop(UINT nID);
 };

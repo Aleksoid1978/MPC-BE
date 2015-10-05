@@ -55,14 +55,15 @@ private:
 	void DrawWnd();
 
 protected:
+	DECLARE_MESSAGE_MAP()
+
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
-	afx_msg LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnMouseLeave();
 	afx_msg void OnPaint();
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
-	DECLARE_MESSAGE_MAP()
 };
