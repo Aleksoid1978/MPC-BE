@@ -47,6 +47,8 @@ public:
 	void GetVideoRect(LPRECT lpRect);
 	HWND GetVideoHWND();
 
+	void SetWindowSize();
+
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 
