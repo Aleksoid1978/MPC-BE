@@ -480,6 +480,9 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt,
 			}
 			gb.ReadBuffer((BYTE*)&vi->bSequenceHeader[0] + shlen, shextlen);
 			pmt->SetFormat((BYTE*)vi, len);
+			pmt->SetTemporalCompression(TRUE);
+			pmt->SetVariableSize();
+
 			delete [] vi;
 		}
 		else if (type == mpeg2) {
@@ -510,6 +513,9 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt,
 			}
 			gb.ReadBuffer((BYTE*)&vi->dwSequenceHeader[0] + shlen, shextlen);
 			pmt->SetFormat((BYTE*)vi, len);
+			pmt->SetTemporalCompression(TRUE);
+			pmt->SetVariableSize();
+
 			delete [] vi;
 		} else {
 			return false;
@@ -1724,6 +1730,9 @@ bool CBaseSplitterFileEx::Read(vc1hdr& h, int len, CMediaType* pmt)
 		Seek(extrapos);
 		ByteRead(p, extralen);
 		pmt->SetFormat((BYTE*)vi, vi_len);
+		pmt->SetTemporalCompression(TRUE);
+		pmt->SetVariableSize();
+
 		delete [] vi;
 	}
 
@@ -1765,6 +1774,9 @@ bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 			pvih->bmiHeader.biBitCount		= 12;
 			pvih->bmiHeader.biCompression	= pmt->subtype.Data1;
 			pvih->bmiHeader.biSizeImage		= DIBSIZE(pvih->bmiHeader);
+
+			pmt->SetTemporalCompression(TRUE);
+			pmt->SetVariableSize();
 		}
 
 		return true;
@@ -1882,7 +1894,9 @@ static bool ParseAvc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 			}
 
 			CreateMPEG2VISimple(pmt, &bmi, params.AvgTimePerFrame, aspect, extradata, extrasize, params.profile, params.level, 4);
-			pmt->SetSampleSize(bmi.biWidth * bmi.biHeight * 4);
+			pmt->SetTemporalCompression(TRUE);
+			pmt->SetVariableSize();
+
 			free(extradata);
 		}
 
@@ -1990,17 +2004,15 @@ static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 				int vps_present = 0;
 				int sps_present = 0;
 				int pps_present = 0;
-				int aud_present = 0;
 
 				Nalu.SetBuffer(pData.GetData(), pData.GetCount());
-				while (!(vps_present && sps_present && pps_present && aud_present)
+				while (!(vps_present && sps_present && pps_present)
 					   && Nalu.ReadNext()) {
 					nalu_type = Nalu.GetType();
 					switch (nalu_type) {
 						case NALU_TYPE_HEVC_VPS:
 						case NALU_TYPE_HEVC_SPS:
 						case NALU_TYPE_HEVC_PPS:
-						case NALU_TYPE_HEVC_AUD:
 							if (nalu_type == NALU_TYPE_HEVC_VPS) {
 								if (vps_present) continue;
 								vps_present++;
@@ -2013,9 +2025,6 @@ static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 							} else if (nalu_type == NALU_TYPE_HEVC_PPS) {
 								if (pps_present) continue;
 								pps_present++;
-							} else if (nalu_type == NALU_TYPE_HEVC_AUD) {
-								if (aud_present) continue;
-								aud_present++;
 							}
 
 							static const BYTE start_code[3] = { 0, 0, 1 };
@@ -2042,7 +2051,9 @@ static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 			}
 
 			CreateMPEG2VISimple(pmt, &bmi, AvgTimePerFrame, aspect, extradata, extrasize, params.profile, params.level, params.nal_length_size);
-			pmt->SetSampleSize(bmi.biWidth * bmi.biHeight * 4);
+			pmt->SetTemporalCompression(TRUE);
+			pmt->SetVariableSize();
+
 			free(extradata);
 		}
 
