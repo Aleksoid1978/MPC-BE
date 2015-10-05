@@ -1744,40 +1744,44 @@ bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 		return false;
 	}
 
-	if (BitRead(32, true) == 'BBCD') {
-		BYTE buffer[1024];
-		ByteRead(buffer, min(len, 1024));
-		if (buffer[4] != pc_seq_header) {
-			return false;
+	if (BitRead(32) == 'BBCD' && BitRead(8) == pc_seq_header) {
+		len -= 5;
+		DWORD unit_size = (DWORD)BitRead(32, true) - 5;
+		if (unit_size <= len) {
+			Skip(8);
+			unit_size -= 8;
+			CAtlArray<BYTE> pData;
+			pData.SetCount(unit_size);
+			if (S_OK == ByteRead(pData.GetData(), unit_size)) {
+				vc_params_t params;
+				if (!ParseDiracHeader(pData.GetData(), unit_size, params)) {
+					return false;
+				}
+
+				if (pmt) {
+					pmt->majortype					= MEDIATYPE_Video;
+					pmt->formattype					= FORMAT_VideoInfo;
+					pmt->subtype					= FOURCCMap(FCC('drac'));
+
+					VIDEOINFOHEADER* pvih			= (VIDEOINFOHEADER*)pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
+					memset(pmt->Format(), 0, pmt->FormatLength());
+
+					pvih->AvgTimePerFrame			= params.AvgTimePerFrame;
+					pvih->bmiHeader.biSize			= sizeof(pvih->bmiHeader);
+					pvih->bmiHeader.biWidth			= params.width;
+					pvih->bmiHeader.biHeight		= params.height;
+					pvih->bmiHeader.biPlanes		= 1;
+					pvih->bmiHeader.biBitCount		= 12;
+					pvih->bmiHeader.biCompression	= pmt->subtype.Data1;
+					pvih->bmiHeader.biSizeImage		= DIBSIZE(pvih->bmiHeader);
+
+					pmt->SetTemporalCompression(TRUE);
+					pmt->SetVariableSize();
+				}
+
+				return true;
+			}
 		}
-
-		vc_params_t params;
-		if (!ParseDiracHeader(buffer + 13, len - 13, params)) {
-			return false;
-		}
-
-		if (pmt) {
-			pmt->majortype					= MEDIATYPE_Video;
-			pmt->formattype					= FORMAT_VideoInfo;
-			pmt->subtype					= FOURCCMap(FCC('drac'));
-
-			VIDEOINFOHEADER* pvih			= (VIDEOINFOHEADER*)pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
-			memset(pmt->Format(), 0, pmt->FormatLength());
-
-			pvih->AvgTimePerFrame			= params.AvgTimePerFrame;
-			pvih->bmiHeader.biSize			= sizeof(pvih->bmiHeader);
-			pvih->bmiHeader.biWidth			= params.width;
-			pvih->bmiHeader.biHeight		= params.height;
-			pvih->bmiHeader.biPlanes		= 1;
-			pvih->bmiHeader.biBitCount		= 12;
-			pvih->bmiHeader.biCompression	= pmt->subtype.Data1;
-			pvih->bmiHeader.biSizeImage		= DIBSIZE(pvih->bmiHeader);
-
-			pmt->SetTemporalCompression(TRUE);
-			pmt->SetVariableSize();
-		}
-
-		return true;
 	}
 
 	return false;
