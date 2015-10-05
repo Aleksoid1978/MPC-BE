@@ -1532,6 +1532,8 @@ bool CBaseSplitterFileEx::Read(trsechdr& h)
 		h.current_next_indicator = (BYTE)BitRead(1);
 		h.section_number         = (BYTE)BitRead(8);
 		h.last_section_number    = (BYTE)BitRead(8);
+
+		h.section_length -= 5;
 		h.hdr_size += 5;
 	}
 
