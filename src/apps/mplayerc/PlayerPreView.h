@@ -20,13 +20,10 @@
 
 #pragma once
 
-class CPreView : public CWnd
-{
-	int m_dpiX = 96;
-	int m_dpiY = 96;
-	int ScaleX(int x) { return x * m_dpiX / 96; }
-	int ScaleY(int y) { return y * m_dpiY / 96; }
+#include <HighDPI.h>
 
+class CPreView : public CWnd, public CDPI
+{
 	const int m_border = 5;
 
 	int m_caption = 20;

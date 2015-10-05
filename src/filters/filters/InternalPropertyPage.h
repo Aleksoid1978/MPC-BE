@@ -23,9 +23,7 @@
 
 #include <atlcoll.h>
 #include <afxcmn.h>
-
-#define IPP_FONTSIZE 13
-#define IPP_SCALE(size) ((size) * m_fontheight / IPP_FONTSIZE)
+#include <HighDPI.h>
 
 interface __declspec(uuid("03481710-D73E-4674-839F-03EDE2D60ED8"))
 ISpecifyPropertyPages2 :
@@ -33,7 +31,7 @@ public ISpecifyPropertyPages {
 	STDMETHOD (CreatePage) (const GUID& guid, IPropertyPage** ppPage) PURE;
 };
 
-class CInternalPropertyPageWnd : public CWnd
+class CInternalPropertyPageWnd : public CWnd, public CDPI
 {
 	bool m_fDirty;
 	CComPtr<IPropertyPageSite> m_pPageSite;

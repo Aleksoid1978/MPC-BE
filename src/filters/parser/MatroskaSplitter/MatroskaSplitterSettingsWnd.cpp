@@ -51,14 +51,13 @@ void CMatroskaSplitterSettingsWnd::OnDisconnect()
 
 bool CMatroskaSplitterSettingsWnd::OnActivate()
 {
-	ASSERT(IPP_FONTSIZE == 13);
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 	CPoint p(10, 10);
 
-	m_cbLoadEmbeddedFonts.Create(ResStr(IDS_MKVSPLT_LOAD_EMBEDDED_FONTS), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(290), m_fontheight)), this, IDC_STATIC);
-	p.y += IPP_SCALE(20);
+	m_cbLoadEmbeddedFonts.Create(ResStr(IDS_MKVSPLT_LOAD_EMBEDDED_FONTS), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(290), m_fontheight)), this, IDC_STATIC);
+	p.y += ScaleY(20);
 
-	m_cbCalcDuration.Create(ResStr(IDS_MKVSPLT_CALC_DURATION), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(290), m_fontheight)), this, IDC_STATIC);
+	m_cbCalcDuration.Create(ResStr(IDS_MKVSPLT_CALC_DURATION), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(290), m_fontheight)), this, IDC_STATIC);
 
 	if (m_pMSF) {
 		m_cbLoadEmbeddedFonts.SetCheck(m_pMSF->GetLoadEmbeddedFonts());

@@ -83,19 +83,18 @@ void CMPCVideoDecSettingsWnd::UpdateStatusInfo()
 
 bool CMPCVideoDecSettingsWnd::OnActivate()
 {
-	ASSERT(IPP_FONTSIZE == 13);
-	const int h16 = IPP_SCALE(16);
-	const int h20 = IPP_SCALE(20);
-	const int h25 = IPP_SCALE(25);
+	const int h16 = ScaleY(16);
+	const int h20 = ScaleY(20);
+	const int h25 = ScaleY(25);
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 
-	int label_w = IPP_SCALE(225);
-	int combo_w = IPP_SCALE(110);
+	int label_w = ScaleX(225);
+	int combo_w = ScaleX(110);
 	int width_s = label_w + combo_w;
 
 	////////// Video settings //////////
 	CPoint p(10, 10);
-	m_grpDecoder.Create(ResStr(IDS_VDF_SETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(115))), this, (UINT)IDC_STATIC);
+	m_grpDecoder.Create(ResStr(IDS_VDF_SETTINGS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(115))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// Decoding threads
@@ -135,8 +134,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 
 	////////// DXVA settings //////////
-	p.y = 10 + IPP_SCALE(115) + 5;
-	m_grpDXVA.Create(ResStr(IDS_VDF_DXVA_SETTING), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(65))), this, (UINT)IDC_STATIC);
+	p.y = 10 + ScaleY(115) + 5;
+	m_grpDXVA.Create(ResStr(IDS_VDF_DXVA_SETTING), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(65))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// DXVA Compatibility check
@@ -154,10 +153,10 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	////////// Status //////////
-	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5;
-	int w1 = IPP_SCALE(122);
+	p.y = 10 + ScaleY(115) + 5 + ScaleY(65) + 5;
+	int w1 = ScaleX(122);
 	int w2 = width_s - w1;
-	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(85))), this, (UINT)IDC_STATIC);
+	m_grpStatus.Create(ResStr(IDS_VDF_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(85))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_txtInputFormat.Create(ResStr(IDS_VDF_STATUS_INPUT), WS_VISIBLE | WS_CHILD, CRect(p, CSize(w1, m_fontheight)), this, (UINT)IDC_STATIC);
 	m_edtInputFormat.Create(WS_CHILD | WS_VISIBLE | ES_READONLY, CRect(p + CPoint(w1, 0), CSize(w2, m_fontheight)), this, 0);
@@ -173,39 +172,39 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	////////// Format conversion //////////
 	p = CPoint(10 + width_s + 15, 10);
-	combo_w = IPP_SCALE(85);
-	label_w = IPP_SCALE(185);
+	combo_w = ScaleX(85);
+	label_w = ScaleX(185);
 	width_s = label_w + combo_w;
-	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, IPP_SCALE(220))), this, (UINT)IDC_STATIC);
+	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(220))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// Software output formats
 	m_txtSwOutputFormats.Create(ResStr(IDS_VDF_COLOR_OUTPUT_FORMATS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	m_txt8bit.Create(_T("8-bit"), WS_VISIBLE|WS_CHILD, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(45), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_txt10bit.Create(_T("10-bit"), WS_VISIBLE|WS_CHILD, CRect(p + CSize(IPP_SCALE(170), 0), CSize(IPP_SCALE(45), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_txt16bit.Create(_T("16-bit"), WS_VISIBLE|WS_CHILD, CRect(p + CSize(IPP_SCALE(225), 0), CSize(IPP_SCALE(45), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txt8bit.Create(_T("8-bit"), WS_VISIBLE|WS_CHILD, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(45), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txt10bit.Create(_T("10-bit"), WS_VISIBLE|WS_CHILD, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txt16bit.Create(_T("16-bit"), WS_VISIBLE|WS_CHILD, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	m_txt420.Create(_T("4:2:0 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(60), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbFormat[PixFmt_NV12].Create(_T("NV12"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(47), m_fontheight)), this, IDC_PP_SW_NV12);
-	m_cbFormat[PixFmt_YV12].Create(_T("YV12"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(115), 0), CSize(IPP_SCALE(47), m_fontheight)), this, IDC_PP_SW_YV12);
-	m_cbFormat[PixFmt_P010].Create(_T("P010"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(170), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_P010);
-	m_cbFormat[PixFmt_P016].Create(_T("P016"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(225), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_P016);
+	m_txt420.Create(_T("4:2:0 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbFormat[PixFmt_NV12].Create(_T("NV12"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_NV12);
+	m_cbFormat[PixFmt_YV12].Create(_T("YV12"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(115), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_YV12);
+	m_cbFormat[PixFmt_P010].Create(_T("P010"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P010);
+	m_cbFormat[PixFmt_P016].Create(_T("P016"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P016);
 	p.y += h20;
-	m_txt422.Create(_T("4:2:2 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(60), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbFormat[PixFmt_YUY2].Create(_T("YUY2"), dwStyle | BS_3STATE, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(50), m_fontheight)), this, IDC_PP_SW_YUY2);
-	m_cbFormat[PixFmt_YV16].Create(_T("YV16"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(115), 0), CSize(IPP_SCALE(47), m_fontheight)), this, IDC_PP_SW_YV16);
-	m_cbFormat[PixFmt_P210].Create(_T("P210"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(170), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_P210);
-	m_cbFormat[PixFmt_P216].Create(_T("P216"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(225), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_P216);
+	m_txt422.Create(_T("4:2:2 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbFormat[PixFmt_YUY2].Create(_T("YUY2"), dwStyle | BS_3STATE, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(50), m_fontheight)), this, IDC_PP_SW_YUY2);
+	m_cbFormat[PixFmt_YV16].Create(_T("YV16"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(115), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_YV16);
+	m_cbFormat[PixFmt_P210].Create(_T("P210"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P210);
+	m_cbFormat[PixFmt_P216].Create(_T("P216"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P216);
 	p.y += h20;
-	m_txt444.Create(_T("4:4:4 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(60), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbFormat[PixFmt_AYUV].Create(_T("AYUV"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(51), m_fontheight)), this, IDC_PP_SW_AYUV);
-	m_cbFormat[PixFmt_YV24].Create(_T("YV24"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(115), 0), CSize(IPP_SCALE(47), m_fontheight)), this, IDC_PP_SW_YV24);
-	m_cbFormat[PixFmt_Y410].Create(_T("Y410"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(170), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_Y410);
-	m_cbFormat[PixFmt_Y416].Create(_T("Y416"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(225), 0), CSize(IPP_SCALE(45), m_fontheight)), this, IDC_PP_SW_Y416);
+	m_txt444.Create(_T("4:4:4 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbFormat[PixFmt_AYUV].Create(_T("AYUV"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(51), m_fontheight)), this, IDC_PP_SW_AYUV);
+	m_cbFormat[PixFmt_YV24].Create(_T("YV24"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(115), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_YV24);
+	m_cbFormat[PixFmt_Y410].Create(_T("Y410"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_Y410);
+	m_cbFormat[PixFmt_Y416].Create(_T("Y416"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_Y416);
 	p.y += h20;
-	m_txtRGB.Create(_T("RGB:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(IPP_SCALE(60), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbFormat[PixFmt_RGB32].Create(_T("RGB32"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(IPP_SCALE(60), 0), CSize(IPP_SCALE(56), m_fontheight)), this, IDC_PP_SW_RGB32);
+	m_txtRGB.Create(_T("RGB:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbFormat[PixFmt_RGB32].Create(_T("RGB32"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(56), m_fontheight)), this, IDC_PP_SW_RGB32);
 	p.y += h25;
 
 	// Preset
@@ -231,8 +230,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwRGBLevels.AddString(_T("PC (0-255)"));
 	m_cbSwRGBLevels.AddString(_T("TV (16-235)"));
 
-	p.y = 10 + IPP_SCALE(115) + 5 + IPP_SCALE(65) + 5 + IPP_SCALE(85) - m_fontheight;
-	int btn_w = IPP_SCALE(75);
+	p.y = 10 + ScaleY(115) + 5 + ScaleY(65) + 5 + ScaleY(85) - m_fontheight;
+	int btn_w = ScaleX(75);
 	m_btnReset.Create(ResStr(IDS_FILTER_RESET_SETTINGS), dwStyle|BS_MULTILINE, CRect(p + CPoint(0, - (m_fontheight + 6)), CSize(btn_w, m_fontheight*2 + 6)), this, IDC_PP_RESET);
 	m_txtMPCVersion.Create(_T(""), WS_VISIBLE|WS_CHILD|ES_RIGHT, CRect(p + CPoint(btn_w, - 3), CSize(width_s - btn_w, m_fontheight)), this, (UINT)IDC_STATIC);
 

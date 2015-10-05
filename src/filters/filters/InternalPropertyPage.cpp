@@ -24,6 +24,8 @@
 #include "../../DSUtil/DSUtil.h"
 #include "../../apps/mplayerc/mplayerc.h"
 
+#define IPP_FONTSIZE 13
+
 //
 // CInternalPropertyPageWnd
 //
@@ -71,14 +73,7 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 			}
 		}
 
-		hDC = ::GetDC(0);
-		HFONT hFontOld = (HFONT)::SelectObject(hDC, m_font.m_hObject);
-		CSize size;
-		::GetTextExtentPoint32(hDC, _T("x"), 1, &size);
-		::SelectObject(hDC, hFontOld);
-		::ReleaseDC(0, hDC);
-
-		m_fontheight = size.cy;
+		m_fontheight = ScaleY(IPP_FONTSIZE);
 	}
 
 	LPCTSTR wc = AfxRegisterWndClass(CS_VREDRAW|CS_HREDRAW|CS_DBLCLKS, 0, (HBRUSH)(COLOR_BTNFACE + 1));

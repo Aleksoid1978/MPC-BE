@@ -97,13 +97,6 @@ int CPreView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 
-	HDC hdc = ::GetDC(NULL);
-	if (hdc) {
-		m_dpiX = ::GetDeviceCaps(hdc, LOGPIXELSX);
-		m_dpiY = ::GetDeviceCaps(hdc, LOGPIXELSY);
-		::ReleaseDC(NULL, hdc);
-	}
-
 	m_caption = ScaleY(20);
 
 	CRect rc;
