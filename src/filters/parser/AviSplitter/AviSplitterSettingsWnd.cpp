@@ -51,14 +51,13 @@ void CAviSplitterSettingsWnd::OnDisconnect()
 
 bool CAviSplitterSettingsWnd::OnActivate()
 {
-	ASSERT(IPP_FONTSIZE == 13);
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 	CPoint p(10, 10);
 
-	m_cbBadInterleavedSuport.Create (ResStr(IDS_AVISPLITTER_NON_INTERLEAVED), dwStyle|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(270), m_fontheight)), this, IDC_PP_INTERLEAVED_SUPPORT);
-	p.y += IPP_SCALE(20);
+	m_cbBadInterleavedSuport.Create (ResStr(IDS_AVISPLITTER_NON_INTERLEAVED), dwStyle|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(ScaleX(270), m_fontheight)), this, IDC_PP_INTERLEAVED_SUPPORT);
+	p.y += ScaleY(20);
 
-	m_cbSetReindex.Create (ResStr(IDS_AVISPLITTER_REINDEX_BROKEN), dwStyle|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(IPP_SCALE(270), m_fontheight)), this, IDC_PP_SET_REINDEX);
+	m_cbSetReindex.Create (ResStr(IDS_AVISPLITTER_REINDEX_BROKEN), dwStyle|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(ScaleX(270), m_fontheight)), this, IDC_PP_SET_REINDEX);
 
 	if (m_pMSF) {
 		m_cbBadInterleavedSuport.SetCheck(m_pMSF->GetBadInterleavedSuport());

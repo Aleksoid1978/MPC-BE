@@ -51,11 +51,10 @@ void CVTSReaderSettingsWnd::OnDisconnect()
 
 bool CVTSReaderSettingsWnd::OnActivate()
 {
-	ASSERT(IPP_FONTSIZE == 13);
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 	CPoint p(10, 10);
 
-	m_cbEnableTitleSelection.Create(ResStr(IDS_VTSREADER_LOAD_PGC), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_DISABLED, CRect(p, CSize(IPP_SCALE(300), m_fontheight)), this, IDC_STATIC);
+	m_cbEnableTitleSelection.Create(ResStr(IDS_VTSREADER_LOAD_PGC), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_DISABLED, CRect(p, CSize(ScaleX(300), m_fontheight)), this, IDC_STATIC);
 
 	if (m_pMSF) {
 		m_cbEnableTitleSelection.SetCheck(m_pMSF->GetEnableTitleSelection());
