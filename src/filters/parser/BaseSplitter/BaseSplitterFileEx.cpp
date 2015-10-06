@@ -33,7 +33,6 @@
 
 CBaseSplitterFileEx::CBaseSplitterFileEx(IAsyncReader* pReader, HRESULT& hr, int fmode)
 	: CBaseSplitterFile(pReader, hr, fmode)
-	, m_rtPTSOffset(0)
 {
 }
 

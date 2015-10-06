@@ -32,13 +32,8 @@
 	#define DEBUG_ASSERT __noop
 #endif
 
-class CGolombBuffer;
-
 class CBaseSplitterFileEx : public CBaseSplitterFile
 {
-protected :
-	REFERENCE_TIME m_rtPTSOffset;
-
 public:
 	CBaseSplitterFileEx(IAsyncReader* pReader, HRESULT& hr, int fmode = FM_FILE);
 	virtual ~CBaseSplitterFileEx();
