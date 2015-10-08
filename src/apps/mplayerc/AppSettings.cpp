@@ -59,7 +59,6 @@ CAppSettings::CAppSettings()
 	, fShowDebugInfo(false)
 	, fShadersNeedSave(false)
 	, fReset(false)
-	, scalefont(1.0)
 	, bSubSaveExternalStyleFile(false)
 {
 	// Internal source filters

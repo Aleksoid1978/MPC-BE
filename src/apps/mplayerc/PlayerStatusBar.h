@@ -26,7 +26,7 @@
 
 // CPlayerStatusBar
 
-class CPlayerStatusBar : public CDialogBar
+class CPlayerStatusBar : public CDialogBar, public CDPI
 {
 	DECLARE_DYNAMIC(CPlayerStatusBar)
 

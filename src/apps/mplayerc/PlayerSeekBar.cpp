@@ -426,7 +426,7 @@ void CPlayerSeekBar::OnPaint()
 			ThemeRGB(135, 140, 145, R, G, B);
 			memdc.SetTextColor(RGB(R,G,B));
 
-			font2.CreateFont(int(13 * s.scalefont), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+			font2.CreateFont(ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
  					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE, _T("Tahoma"));
 
 			CFont* oldfont2 = memdc.SelectObject(&font2);

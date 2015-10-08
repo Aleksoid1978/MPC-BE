@@ -701,10 +701,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	AppSettings& s = AfxGetAppSettings();
 
-	HDC hdc = ::GetDC(NULL);
-	s.scalefont = 1.0 * GetDeviceCaps(hdc, LOGPIXELSY) / 96.0;
-	::ReleaseDC(0, hdc);
-
 	// create a Main View Window
 	if (!m_wndView.Create(NULL, NULL, AFX_WS_DEFAULT_VIEW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
 						  CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST, NULL)) {
