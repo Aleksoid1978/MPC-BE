@@ -26,6 +26,9 @@ public:
         pRect->bottom = ScaleY(pRect->bottom);
     }
 
+    // Convert a point size (1/72 of an inch) to raw pixels.
+    int PointsToPixels(int pt) { return MulDiv(pt, _dpiY, 72); }
+
 private:
     void _Init()
     {

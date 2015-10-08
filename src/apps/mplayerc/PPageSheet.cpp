@@ -31,13 +31,7 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd
 	, m_audio(pFG)
 	, m_bLockPage(false)
 {
-	int tree_width = 210;
-	HDC hdc = ::GetDC(NULL);
-	if (hdc) {
-		tree_width = MulDiv(tree_width, GetDeviceCaps(hdc, LOGPIXELSX), 96);
-		::ReleaseDC(NULL, hdc);
-	}
-	SetTreeWidth(tree_width);
+	SetTreeWidth(ScaleX(210));
 
 	AddPage(&m_player);
 	AddPage(&m_formats);

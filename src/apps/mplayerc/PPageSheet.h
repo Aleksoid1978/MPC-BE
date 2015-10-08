@@ -44,6 +44,7 @@
 #include "PPageMisc.h"
 #include "PPageCapture.h"
 #include <TreePropSheet/TreePropSheet.h>
+#include <HighDPI.h>
 
 
 // CTreePropSheetTreeCtrl
@@ -63,7 +64,7 @@ protected:
 
 // CPPageSheet
 
-class CPPageSheet : public TreePropSheet::CTreePropSheet
+class CPPageSheet : public TreePropSheet::CTreePropSheet, public CDPI
 {
 	DECLARE_DYNAMIC(CPPageSheet)
 
