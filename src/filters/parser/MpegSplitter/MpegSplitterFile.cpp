@@ -201,7 +201,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			while (pos) {
 				const stream& s = streams.GetNext(pos);
 				const SyncPoints& sps = m_SyncPoints[s];
-				if (sps.GetCount() > 1 && sps[0].rt < rtMin) {
+				if (sps.GetCount() && sps[0].rt < rtMin) {
 					rtMin = sps[0].rt;
 					posMin = posMax = sps[0].fp;
 				}
@@ -243,6 +243,12 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 	}
 
+	POSITION pos = m_SyncPoints.GetStartPosition();
+	while (pos) {
+		CAtlMap<DWORD, SyncPoints>::CPair* pPair = m_SyncPoints.GetNext(pos);
+		m_StreamsValidate[pPair->m_key] = pPair->m_value.GetCount() > 1;
+	}
+
 	m_bOpeningCompleted = TRUE;
 
 	if (m_SubEmptyPin) {
@@ -264,9 +270,9 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			if (m_streams[stream_type::video].GetCount()) {
 				stream s;
 				s.pid = NO_SUBTITLE_PID;
-				s.mt.majortype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.majortype		: MEDIATYPE_Video;
-				s.mt.subtype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.subtype		: MEDIASUBTYPE_DVD_SUBPICTURE;
-				s.mt.formattype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.formattype	: FORMAT_None;
+				s.mt.majortype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.majortype  : MEDIATYPE_Video;
+				s.mt.subtype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.subtype    : MEDIASUBTYPE_DVD_SUBPICTURE;
+				s.mt.formattype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.formattype : FORMAT_None;
 				m_streams[stream_type::subpic].AddTail(s);
 			}
 		}
@@ -1244,7 +1250,7 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 		if (ReadPSI(h2)) {
 			switch (h2.table_id) {
 				case DVB_SI::SI_PAT:
-					if (!m_programs.IsEmpty()) {
+					if (!m_programs.IsEmpty() || h.pid != MPEG2_PID::PID_PAT) {
 						return;
 					}
 					break;
