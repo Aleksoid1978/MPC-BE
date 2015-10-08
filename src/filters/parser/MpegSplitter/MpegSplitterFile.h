@@ -437,4 +437,6 @@ public:
 	CAtlMap<DWORD, CStringA> m_pPMT_Lang;
 
 	bool GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type);
+
+	CAtlMap<DWORD, BOOL> m_StreamsValidate;
 };

@@ -655,30 +655,41 @@ STDMETHODIMP CMpegSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 	return __super::Load(pszFileName, pmt);
 }
 
-#define HandlePacket(h, nBytes)																\
-	if (nBytes > 0) {																		\
-		BOOL bPacketStart = !!h.fpts;														\
-		CAutoPtr<CPacket>& p = pPackets[TrackNumber];										\
-		if (bPacketStart && p) {															\
-			if (p->bSyncPoint) {															\
-				hr = DeliverPacket(p);														\
-			}																				\
-			p.Free();																		\
-		}																					\
-		\
-		if (!p) {																			\
-			p.Attach(DNew CPacket());														\
-			p->TrackNumber	= TrackNumber;													\
-			p->bSyncPoint	= bPacketStart;													\
-			p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;				\
-			p->rtStop		= (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;	\
-		}																					\
-		\
-		size_t oldSize = p->GetCount();														\
-		size_t newSize = p->GetCount() + nBytes;											\
-		p->SetCount(newSize, max(1024, newSize));											\
-		m_pFile->ByteRead(p->GetData() + oldSize, nBytes);									\
-	}																						\
+#define HandlePacket(h, nBytes, validStream)													\
+	if (nBytes > 0) {																			\
+		if (validStream) {																		\
+			BOOL bPacketStart = !!h.fpts;														\
+			CAutoPtr<CPacket>& p = pPackets[TrackNumber];										\
+			if (bPacketStart && p) {															\
+				if (p->bSyncPoint) {															\
+					hr = DeliverPacket(p);														\
+				}																				\
+				p.Free();																		\
+			}																					\
+			\
+			if (!p) {																			\
+				p.Attach(DNew CPacket());														\
+				p->TrackNumber	= TrackNumber;													\
+				p->bSyncPoint	= bPacketStart;													\
+				p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;				\
+				p->rtStop		= (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;	\
+			}																					\
+			\
+			size_t oldSize = p->GetCount();														\
+			size_t newSize = p->GetCount() + nBytes;											\
+			p->SetCount(newSize, max(1024, newSize));											\
+			m_pFile->ByteRead(p->GetData() + oldSize, nBytes);									\
+		} else {																				\
+			CAutoPtr<CPacket> p(DNew CPacket());												\
+			p->TrackNumber	= TrackNumber;														\
+			p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;					\
+			p->rtStop		= (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;		\
+			p->bSyncPoint	= !!h.fpts && (p->rtStart != INVALID_TIME);							\
+			p->SetCount(nBytes);																\
+			m_pFile->ByteRead(p->GetData(), nBytes);											\
+			hr = DeliverPacket(p);																\
+		}																						\
+	}																							\
 
 HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 {
@@ -719,8 +730,8 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 			DWORD TrackNumber = m_pFile->AddStream(0, b, peshdr.id_ext, peshdr.len);
 			if (GetOutputPin(TrackNumber)) {
-				__int64 nBytes = peshdr.len - (m_pFile->GetPos() - pos);
-				HandlePacket(peshdr, nBytes);
+				const __int64 nBytes = peshdr.len - (m_pFile->GetPos() - pos);
+				HandlePacket(peshdr, nBytes, m_pFile->m_StreamsValidate[TrackNumber]);
 			}
 			m_pFile->Seek(pos + peshdr.len);
 		}
@@ -751,8 +762,8 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				}
 
 				if (h.bytes > (m_pFile->GetPos() - pos)) {
-					__int64 nBytes = h.bytes - (m_pFile->GetPos() - pos);
-					HandlePacket(peshdr, nBytes);
+					const __int64 nBytes = h.bytes - (m_pFile->GetPos() - pos);
+					HandlePacket(peshdr, nBytes, m_pFile->m_StreamsValidate[TrackNumber]);
 				}
 			}
 		}
@@ -768,7 +779,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 		DWORD TrackNumber = pvahdr.streamid;
 		if (GetOutputPin(TrackNumber)) {
-			HandlePacket(pvahdr, pvahdr.length);
+			HandlePacket(pvahdr, pvahdr.length, m_pFile->m_StreamsValidate[TrackNumber]);
 		}
 
 		m_pFile->Seek(pos + pvahdr.length);
