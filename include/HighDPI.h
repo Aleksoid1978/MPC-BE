@@ -16,6 +16,8 @@ public:
     // Convert between raw pixels and relative pixels.
     int ScaleX(int x) { return MulDiv(x, _dpiX, 96); }
     int ScaleY(int y) { return MulDiv(y, _dpiY, 96); }
+    int UnscaleX(int x) { return MulDiv(x, 96, _dpiX); }
+    int UnscaleY(int y) { return MulDiv(y, 96, _dpiY); }
 
     // Scale rectangle from raw pixels to relative pixels.
     void ScaleRect(__inout RECT *pRect)
