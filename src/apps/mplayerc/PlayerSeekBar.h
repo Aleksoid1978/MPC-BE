@@ -23,6 +23,7 @@
 
 #include "PngImage.h"
 #include "../../DSUtil/DSMPropertyBag.h"
+#include <HighDPI.h>
 
 #define SHOW_DELAY 200
 #define AUTOPOP_DELAY 1000
@@ -31,7 +32,7 @@
 
 class CMainFrame;
 
-class CPlayerSeekBar : public CDialogBar
+class CPlayerSeekBar : public CDialogBar, public CDPI
 {
 	DECLARE_DYNAMIC(CPlayerSeekBar)
 

@@ -21,9 +21,11 @@
 
 #pragma once
 
+#include <HighDPI.h>
+
 // CStatusLabel
 
-class CStatusLabel : public CStatic
+class CStatusLabel : public CStatic, public CDPI
 {
 	DECLARE_DYNAMIC(CStatusLabel)
 
