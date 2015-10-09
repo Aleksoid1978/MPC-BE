@@ -120,40 +120,31 @@ CString CID3Tag::ReadText(CGolombBuffer& gb, DWORD size, BYTE encoding)
 		}
 	}
 
+	str.Remove(0x00);
 	return str.Trim();
 }
 
 CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding)
 {
-	DWORD fieldSize	= 0;
-	DWORD pos		= gb.GetPos();
+	int pos = gb.GetPos();
 
-	CString wstr;
-
-	if (encoding == UTF16BOM || encoding == UTF16BE) {
-		while (size -= 2) {
-			fieldSize += 2;
-
-			if ((WORD)gb.BitRead(16) == 0) {
-				break;
-			}
-		}
-	} else {
-		while (size--) {
-			fieldSize++;
-
-			if (gb.BitRead(8) == 0) {
-				break;
-			}
+	DWORD fieldSize = 0;
+	const DWORD fieldseparatorSize = (encoding == ID3v2Encoding::ISO8859 || encoding == ID3v2Encoding::UTF8)? 1 : 2;
+	while (size >= fieldseparatorSize) {
+		size      -= fieldseparatorSize;
+		fieldSize += fieldseparatorSize;
+		if (gb.BitRead(8 * fieldseparatorSize) == 0) {
+			break;
 		}
 	}
 
+	CString str;
 	if (fieldSize) {
 		gb.Seek(pos);
-		wstr = ReadText(gb, fieldSize, encoding);
+		str = ReadText(gb, fieldSize, encoding);
 	};
 
-	return wstr;
+	return str;
 }
 
 static void ReadLang(CGolombBuffer &gb, DWORD &size)
@@ -292,8 +283,26 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 					UNREFERENCED_PARAMETER(Desc);
 				}
 
-				CID3TagItem* item = DNew CID3TagItem(tag, ReadText(gbData, size, encoding));
-				TagItems.AddTail(item);
+				CString text;
+				if (((char*)&tag)[3] == 'T') {
+					while (size) {
+						CString field = ReadField(gbData, size, encoding);
+						if (!field.IsEmpty()) {
+							if (text.IsEmpty()) {
+								text = field;
+							} else {
+								text.AppendFormat(L"; %s", field);
+							}
+						}
+					}
+				} else {
+					text = ReadText(gbData, size, encoding);
+				}
+
+				if (!text.IsEmpty()) {
+					CID3TagItem* item = DNew CID3TagItem(tag, text);
+					TagItems.AddTail(item);
+				}
 			}
 		}
 	}
