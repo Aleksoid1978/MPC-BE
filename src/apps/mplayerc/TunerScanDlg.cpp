@@ -39,7 +39,7 @@ CTunerScanDlg::CTunerScanDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CTunerScanDlg::IDD, pParent)
 	, m_bInProgress(false)
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_ulFrequencyStart = s.iBDAScanFreqStart;
 	m_ulFrequencyEnd = s.iBDAScanFreqEnd;
@@ -107,7 +107,7 @@ END_MESSAGE_MAP()
 
 void CTunerScanDlg::OnBnClickedSave()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	s.m_DVBChannels.RemoveAll();
 
 	for (int i = 0; i < m_ChannelList.GetItemCount(); i++) {
@@ -231,7 +231,7 @@ void CTunerScanDlg::SetProgress (bool bState)
 
 void CTunerScanDlg::SaveScanSettings()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	s.iBDAScanFreqStart = m_ulFrequencyStart;
 	s.iBDAScanFreqEnd = m_ulFrequencyEnd;

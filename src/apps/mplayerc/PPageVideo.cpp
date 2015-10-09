@@ -127,7 +127,7 @@ BOOL CPPageVideo::OnInitDialog()
 	SetCursor(m_hWnd, IDC_COMBO4, IDC_HAND);
 	SetCursor(m_hWnd, IDC_COMBO5, IDC_HAND);
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	CRenderersSettings& rs = s.m_RenderersSettings;
 	m_iVideoRendererType	= s.iDSVideoRendererType;
@@ -348,7 +348,7 @@ BOOL CPPageVideo::OnApply()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& rs = s.m_RenderersSettings;
 
 	s.iDSVideoRendererType	= m_iVideoRendererType = m_iVideoRendererType_store = m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel());

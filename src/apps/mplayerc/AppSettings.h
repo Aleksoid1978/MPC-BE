@@ -29,7 +29,7 @@
 #include "DVBChannel.h"
 #include <afxsock.h>
 
-// flags for AppSettings::nCS
+// flags for CAppSettings::nCS
 #define CS_NONE			0
 #define CS_SEEKBAR		(1 << 0)
 #define CS_TOOLBAR		(1 << 1)

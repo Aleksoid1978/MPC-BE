@@ -33,7 +33,7 @@ CStatusLabel::CStatusLabel(bool fRightAlign, bool fAddEllipses)
 
 	m_font.m_hObject = NULL;
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (s.bUseDarkTheme) {
 		int size = IsWinVistaOrLater() ? 13 : 14;
@@ -80,7 +80,7 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	GetClientRect(&r);
 	CFont* old = dc.SelectObject(&m_font);
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (s.bUseDarkTheme) {
 		ThemeRGB(165, 170, 175, R, G, B);

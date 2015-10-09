@@ -83,7 +83,7 @@ BOOL CPPageSync::OnSetActive()
 
 void CPPageSync::InitDialogPrivate()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& rs = s.m_RenderersSettings;
 	CRenderersSettings::CAdvRendererSettings& ars = s.m_RenderersSettings.m_AdvRendSets;
 
@@ -190,7 +190,7 @@ BOOL CPPageSync::OnApply()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings::CAdvRendererSettings& ars = s.m_RenderersSettings.m_AdvRendSets;
 
 	ars.iVMR9VSync						= !!m_chkVMR9VSync.GetCheck();
@@ -224,7 +224,7 @@ END_MESSAGE_MAP()
 
 void CPPageSync::OnAlterativeVSyncCheck()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& rs = s.m_RenderersSettings;
 
 	if (m_chkVMR9AlterativeVSync.GetCheck() == BST_CHECKED &&

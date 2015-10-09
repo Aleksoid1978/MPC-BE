@@ -307,7 +307,7 @@ void CPlaylistItem::AutoLoadFiles()
 	CString BDLabel, empty;
 	AfxGetMainFrame()->MakeBDLabel(fn, empty, &BDLabel);
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (s.fAutoloadAudio) {
 		CAtlArray<CString> paths;
@@ -936,7 +936,7 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CSubtitleItemList
 		return;
 	}
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	ResolveLinkFiles(fns);
 
@@ -1887,7 +1887,7 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>(pNMHDR);
 	*pResult = CDRF_DODEFAULT;
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	int R, G, B;
 
@@ -1940,7 +1940,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 		return;
 	}
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	int R, G, B;
 
@@ -2264,7 +2264,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		M_SHUFFLE, M_HIDEFULLSCREEN
 	};
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	auto pMainFrm = AfxGetMainFrame();
 
 	m.AppendMenu(MF_STRING | (!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_OPEN, ResStr(IDS_PLAYLIST_OPEN));

@@ -96,7 +96,7 @@ BOOL CPPageAudio::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_AudioRendererDisplayNames.Add(_T(""));
 	m_iAudioRendererTypeCtrl.SetRedraw(FALSE);
@@ -241,7 +241,7 @@ BOOL CPPageAudio::OnApply()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	s.strAudioRendererDisplayName       = m_AudioRendererDisplayNames[m_iAudioRendererType];
 	s.strSecondAudioRendererDisplayName = m_iSecAudioRendererType == -1 ? L"" : m_AudioRendererDisplayNames[m_iSecAudioRendererType];

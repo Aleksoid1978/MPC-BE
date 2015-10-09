@@ -127,7 +127,7 @@ BOOL CFavoriteOrganizeDlg::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_tab.InsertItem(0, ResStr(IDS_FAVFILES));
 	m_tab.InsertItem(1, ResStr(IDS_FAVDVDS));
@@ -408,7 +408,7 @@ void CFavoriteOrganizeDlg::OnBnClickedOk()
 {
 	SetupList(true);
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	s.SetFav(FAV_FILE, m_sl[0]);
 	s.SetFav(FAV_DVD, m_sl[1]);

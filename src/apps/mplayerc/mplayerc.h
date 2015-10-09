@@ -154,7 +154,6 @@ public:
 
 #define AfxGetMyApp()		static_cast<CMPlayerCApp*>(AfxGetApp())
 #define AfxGetAppSettings()	static_cast<CMPlayerCApp*>(AfxGetApp())->m_s
-#define AppSettings			CAppSettings
 #define AfxGetMainFrame()	dynamic_cast<CMainFrame*>(AfxGetMainWnd())
 
 class CDebugMonitor : public CWinDebugMonitor

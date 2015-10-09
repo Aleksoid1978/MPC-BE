@@ -64,7 +64,7 @@ BOOL CPPageColor::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	CreateToolTip();
 
@@ -111,7 +111,7 @@ BOOL CPPageColor::OnApply()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	s.iBrightness		= m_iBrightness;
 	s.iContrast			= m_iContrast;
@@ -179,7 +179,7 @@ void CPPageColor::OnBnClickedReset()
 
 void CPPageColor::OnCancel()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	((CMainFrame*)AfxGetMyApp()->GetMainWnd())->SetColorControl(ProcAmp_All, s.iBrightness, s.iContrast, s.iHue, s.iSaturation);
 

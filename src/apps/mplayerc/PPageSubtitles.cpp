@@ -61,7 +61,7 @@ BOOL CPPageSubtitles::OnInitDialog()
 
 	SetCursor(m_hWnd, IDC_COMBO2, IDC_HAND);
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	UpdateSubRenderersList(s.iSubtitleRenderer);
 
@@ -89,7 +89,7 @@ BOOL CPPageSubtitles::OnApply()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	s.iSubtitleRenderer				= m_cbSubtitleRenderer.GetCurSel();
 	s.fPrioritizeExternalSubtitles	= !!m_fPrioritizeExternalSubtitles;
@@ -110,7 +110,7 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 		m_cbSubtitleRenderer.DeleteString(i);
 	}
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	CString str;
 
 	m_cbSubtitleRenderer.AddString(ResStr(IDS_SUB_NOT_USE)); // SUBRNDT_NONE

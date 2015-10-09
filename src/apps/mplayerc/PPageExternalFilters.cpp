@@ -292,7 +292,7 @@ BOOL CPPageExternalFilters::OnInitDialog()
 
 	DragAcceptFiles(TRUE);
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_pFilters.RemoveAll();
 
@@ -332,7 +332,7 @@ BOOL CPPageExternalFilters::OnApply()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	s.m_filters.RemoveAll();
 

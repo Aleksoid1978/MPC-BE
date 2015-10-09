@@ -107,7 +107,7 @@ BOOL CPPageInterface::OnInitDialog()
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_bUseDarkTheme	= s.bUseDarkTheme;
 	m_nThemeBrightness		= m_nThemeBrightness_Old	= s.nThemeBrightness;
@@ -200,7 +200,7 @@ BOOL CPPageInterface::OnApply()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	s.clrFaceABGR			= m_clrFaceABGR;
 	s.clrOutlineABGR		= m_clrOutlineABGR;
@@ -274,7 +274,7 @@ BOOL CPPageInterface::OnApply()
 
 void CPPageInterface::OnCancel()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	s.nThemeBrightness	= m_nThemeBrightness_Old;
 	s.nThemeRed			= m_nThemeRed_Old;
@@ -299,7 +299,7 @@ void CPPageInterface::ApplyOSDTransparent()
 {
 	auto pFrame	= AfxGetMainFrame();
 	if (pFrame->m_OSD) {
-		AppSettings& s = AfxGetAppSettings();
+		CAppSettings& s = AfxGetAppSettings();
 
 		pFrame->m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - s.nOSDTransparent, LWA_ALPHA | LWA_COLORKEY);
 		pFrame->m_OSD.ClearMessage();
@@ -361,7 +361,7 @@ void CPPageInterface::OnUpdateCheck3(CCmdUI* pCmdUI)
 
 void CPPageInterface::OnCheckShadow()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	UpdateData();
 	BOOL fFontShadow = s.fFontShadow;
@@ -373,7 +373,7 @@ void CPPageInterface::OnCheckShadow()
 
 void CPPageInterface::OnCheckAA()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	UpdateData();
 	BOOL fFontAA = s.fFontAA;
@@ -385,7 +385,7 @@ void CPPageInterface::OnCheckAA()
 
 void CPPageInterface::OnUpdateOSDBorder(CCmdUI* pCmdUI)
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (s.nOSDBorder != m_OSDBorder) {
 		UpdateData();
@@ -399,7 +399,7 @@ void CPPageInterface::OnUpdateOSDBorder(CCmdUI* pCmdUI)
 
 void CPPageInterface::OnClickClrDefault()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_clrFaceABGR = 0x00ffffff;
 	m_clrOutlineABGR = 0x00868686;
@@ -482,7 +482,7 @@ void CPPageInterface::OnClickClrFont()
 		COLORREF clrFontABGR = m_clrFontABGR;
 		m_clrFontABGR = clrpicker.GetColor();
 		if (clrFontABGR != clrpicker.GetColor()) {
-			AppSettings& s = AfxGetAppSettings();
+			CAppSettings& s = AfxGetAppSettings();
 			s.clrFontABGR = m_clrFontABGR;
 			OnChngOSDCombo();
 			UpdateData(FALSE);
@@ -500,7 +500,7 @@ void CPPageInterface::OnClickClrGrad1()
 		COLORREF clrGrad1ABGR = m_clrGrad1ABGR;
 		m_clrGrad1ABGR = clrpicker.GetColor();
 		if (clrGrad1ABGR != clrpicker.GetColor()) {
-			AppSettings& s = AfxGetAppSettings();
+			CAppSettings& s = AfxGetAppSettings();
 			s.clrGrad1ABGR = m_clrGrad1ABGR;
 			OnChngOSDCombo();
 			UpdateData(FALSE);
@@ -518,7 +518,7 @@ void CPPageInterface::OnClickClrGrad2()
 		COLORREF clrGrad2ABGR = m_clrGrad2ABGR;
 		m_clrGrad2ABGR = clrpicker.GetColor();
 		if (clrGrad2ABGR != clrpicker.GetColor()) {
-			AppSettings& s = AfxGetAppSettings();
+			CAppSettings& s = AfxGetAppSettings();
 			s.clrGrad2ABGR = m_clrGrad2ABGR;
 			OnChngOSDCombo();
 			UpdateData(FALSE);
@@ -618,7 +618,7 @@ void CPPageInterface::OnUsePreview()
 
 void CPPageInterface::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (*pScrollBar == m_ThemeBrightnessCtrl) {
 		UpdateData();

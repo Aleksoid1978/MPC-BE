@@ -142,7 +142,7 @@ void CRegFilterChooserDlg::OnBnClickedOk()
 
 void CRegFilterChooserDlg::OnBnClickedButton1()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	CFileDialog dlg(TRUE, NULL, NULL,
 					OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_NOCHANGEDIR,

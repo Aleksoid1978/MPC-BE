@@ -118,7 +118,7 @@ BOOL CPPageSubRend::OnInitDialog()
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_fOverridePlacement = s.fOverridePlacement;
 	m_edtHorPos = s.nHorPos;
@@ -150,7 +150,7 @@ BOOL CPPageSubRend::OnApply()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (s.fOverridePlacement != !!m_fOverridePlacement
 			|| s.nHorPos != m_edtHorPos

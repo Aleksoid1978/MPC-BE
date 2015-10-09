@@ -172,7 +172,7 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 
 		int nMaxWidth = 0;
 
-		AppSettings& sApp = AfxGetAppSettings();
+		CAppSettings& sApp = AfxGetAppSettings();
 		const YOUTUBE_PROFILES* youtubeSets = getProfile(sApp.iYoutubeTag);
 		if (youtubeSets->iTag == 0) {
 			youtubeSets = getProfile(22);

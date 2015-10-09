@@ -135,7 +135,7 @@ HRESULT COSD::Create(CWnd* pWnd)
 		return E_FAIL;
 	}
 
-	const AppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 	SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - s.nOSDTransparent, LWA_ALPHA | LWA_COLORKEY);
 	if (s.iShowOSD & OSD_ENABLE) {
 		Start(pWnd);
@@ -1043,7 +1043,7 @@ void COSD::SetChapterBag(CComPtr<IDSMChapterBag>& pCB)
 
 void COSD::GradientFill(CDC* pDc, CRect* rc)
 {
-	const AppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
 	int R, G, B, R1, G1, B1, R_, G_, B_, R1_, G1_, B1_;
 	R	= GetRValue(s.clrGrad1ABGR);

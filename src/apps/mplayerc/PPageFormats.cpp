@@ -652,7 +652,7 @@ BOOL CPPageFormats::OnInitDialog()
 	m_list.SetItemState(0, LVIS_SELECTED, LVIS_SELECTED);
 	m_exts = mf[(int)m_list.GetItemData(0)].GetExtsWithPeriod();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	UpdateData(FALSE);
 
@@ -854,7 +854,7 @@ BOOL CPPageFormats::OnApply()
 
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	CMediaFormats& mf = s.m_Formats;
 
 	{
@@ -1112,7 +1112,7 @@ void CPPageFormats::OnBnRunAdmin()
 		SetListItemState(i);
 	}
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	s.LoadSettings(true);
 
 	m_fContextFiles.SetCheck(s.bSetContextFiles);

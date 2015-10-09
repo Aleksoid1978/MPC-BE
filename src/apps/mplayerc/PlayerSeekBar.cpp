@@ -132,7 +132,7 @@ void CPlayerSeekBar::SetPos(REFERENCE_TIME pos)
 
 void CPlayerSeekBar::SetPosInternal(REFERENCE_TIME pos)
 {
-	const AppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
 	if (m_pos == pos) {
 		return;
@@ -150,7 +150,7 @@ void CPlayerSeekBar::SetPosInternal(REFERENCE_TIME pos)
 
 void CPlayerSeekBar::SetPosInternal2(REFERENCE_TIME pos)
 {
-	const AppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
 	if (m_pos2 == pos) {
 		return;
@@ -272,7 +272,7 @@ void CPlayerSeekBar::OnPaint()
 {
 	CPaintDC dc(this);
 
-	const AppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
 	int R, G, B, R2, G2, B2;
 
@@ -593,7 +593,7 @@ void CPlayerSeekBar::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (!s.bStatusBarIsVisible) {
 		CRect rc = GetChannelRect();
@@ -645,7 +645,7 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 
 void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 {
-	const AppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
 	CWnd* w = GetCapture();
 

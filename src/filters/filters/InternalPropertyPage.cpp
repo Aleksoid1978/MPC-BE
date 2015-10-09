@@ -341,7 +341,7 @@ CAtlMap<CLSID, CString> CPinInfoWnd::m_CachedRegistryFilters;
 
 CPinInfoWnd::CPinInfoWnd()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	POSITION pos = s.m_filters.GetHeadPosition();
 	while (pos) {
 		CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_filters.GetNext(pos)));
