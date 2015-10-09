@@ -345,7 +345,7 @@ bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype)
 WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen, bool bCheckMouse)
 {
 	WORD assignTo = 0;
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	POSITION pos = s.wmcmds.GetHeadPosition();
 	while (pos && !assignTo) {
@@ -1232,7 +1232,7 @@ HANDLE WINAPI Mine_CreateFileW(LPCWSTR p1, DWORD p2, DWORD p3, LPSECURITY_ATTRIB
 			hFile = Real_CreateFileW(strFakeFile, p2, p3, p4, p5, p6, p7);
 
 			if (hFile != INVALID_HANDLE_VALUE) {
-				AppSettings& s = AfxGetAppSettings();
+				CAppSettings& s = AfxGetAppSettings();
 				POSITION pos = s.slTMPFilesList.Find(CString(strFakeFile).MakeUpper());
 				if (!pos) {
 					s.slTMPFilesList.AddTail(CString(strFakeFile).MakeUpper());
@@ -2517,7 +2517,7 @@ int CMPlayerCApp::GetDefLanguage()
 
 void CMPlayerCApp::SetLanguage(int nLanguage)
 {
-	AppSettings&	s = AfxGetAppSettings();
+	CAppSettings&	s = AfxGetAppSettings();
 	HMODULE			hMod = NULL;
 	CString			strSatellite;
 
@@ -2628,7 +2628,7 @@ CRenderersSettings& GetRenderersSettings()
 
 void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue)
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	int iThemeBrightness = s.nThemeBrightness;
 	int iThemeRed = s.nThemeRed;

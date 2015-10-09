@@ -71,7 +71,7 @@ BOOL CPPageFiltersPriority::OnApply()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	s.FiltersPrioritySettings.SetDefault();
 	if (POSITION pos = (POSITION)m_AVI.GetItemDataPtr(m_AVI.GetCurSel())) {
@@ -101,7 +101,7 @@ BOOL CPPageFiltersPriority::OnApply()
 
 void CPPageFiltersPriority::Init()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_AVI.ResetContent();
 	m_AVI.AddString(ResStr(IDS_AG_DEFAULT_L));

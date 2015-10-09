@@ -78,7 +78,7 @@ CPlayerToolBar::~CPlayerToolBar()
 
 void CPlayerToolBar::SwitchTheme()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	CToolBarCtrl& tb = GetToolBarCtrl();
 	m_nButtonHeight = 16;
@@ -280,7 +280,7 @@ BOOL CPlayerToolBar::PreCreateWindow(CREATESTRUCT& cs)
 
 void CPlayerToolBar::CreateRemappedImgList(UINT bmID, int nRemapState, CImageList& reImgList)
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	CBitmap bm;
 
 	COLORMAP cmActive[] = {
@@ -441,7 +441,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMTBCUSTOMDRAW pTBCD	= reinterpret_cast<LPNMTBCUSTOMDRAW>(pNMHDR);
 	LRESULT lr				= CDRF_DODEFAULT;
 
-	AppSettings& s	= AfxGetAppSettings();
+	CAppSettings& s	= AfxGetAppSettings();
 	bool bGPU		= (m_pMainFrame->GetMediaState() != -1) && (GetDXVAStatus() != 0);
 
 	int R, G, B, R2, G2, B2;

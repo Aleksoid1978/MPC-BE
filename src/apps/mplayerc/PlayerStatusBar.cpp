@@ -81,7 +81,7 @@ int CPlayerStatusBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CPlayerStatusBar::Relayout()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (!s.bUseDarkTheme) {
 		m_type.ShowWindow(/*SW_SHOW*/SW_HIDE);
@@ -287,7 +287,7 @@ END_MESSAGE_MAP()
 
 BOOL CPlayerStatusBar::OnEraseBkgnd(CDC* pDC)
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	CRect r;
 
 	if (!s.bUseDarkTheme) {
@@ -330,7 +330,7 @@ void CPlayerStatusBar::OnPaint()
 		Relayout();
 	}
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	CRect r;
 
 	if (!s.bUseDarkTheme) {
@@ -430,7 +430,7 @@ void CPlayerStatusBar::OnSize(UINT nType, int cx, int cy)
 
 void CPlayerStatusBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	auto pFrame = AfxGetMainFrame();
 

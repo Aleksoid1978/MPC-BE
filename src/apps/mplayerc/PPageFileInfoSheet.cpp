@@ -63,7 +63,7 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWn
 
 CPPageFileInfoSheet::~CPPageFileInfoSheet()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	s.iDlgPropX = m_rWnd.Width() - m_nMinCX;
 	s.iDlgPropY = m_rWnd.Height() - m_nMinCY;
@@ -83,7 +83,7 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 {
 	BOOL bResult = CPropertySheet::OnInitDialog();
 
-	const AppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
 	m_fn.TrimRight('/');
 	int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));

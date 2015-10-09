@@ -98,7 +98,7 @@ BOOL CPPagePlayback::OnInitDialog()
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_volumectrl.SetRange(0, 100);
 	m_volumectrl.SetTicFreq(10);
@@ -176,7 +176,7 @@ BOOL CPPagePlayback::OnApply()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	s.nVolume = m_oldVolume = m_nVolume;
 	s.nBalance = m_nBalance;
@@ -315,7 +315,7 @@ BOOL CPPagePlayback::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 
 void CPPagePlayback::OnCancel()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (m_nVolume != m_oldVolume) {
 		AfxGetMainFrame()->m_wndToolBar.Volume = m_oldVolume;    //not very nice solution

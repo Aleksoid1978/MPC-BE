@@ -103,7 +103,7 @@ BOOL CPPagePlayer::OnInitDialog()
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_iMultipleInst				= s.iMultipleInst;
 	m_iTitleBarTextStyle		= s.iTitleBarTextStyle;
@@ -151,7 +151,7 @@ BOOL CPPagePlayer::OnApply()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	auto pFrame = AfxGetMainFrame();
 
 	s.iMultipleInst = m_iMultipleInst;

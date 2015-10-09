@@ -53,7 +53,7 @@ public:
 		, m_bIsPreview(IsPreview)
 		, m_merit(merit) {
 
-		AppSettings& s = AfxGetAppSettings();
+		CAppSettings& s = AfxGetAppSettings();
 
 		// Get supported MEDIASUBTYPE_ from decoder
 		CAtlList<SUPPORTED_FORMATS> fmts;
@@ -90,7 +90,7 @@ public:
 		bool dxva_filters[VDEC_DXVA_LAST];
 		bool video_filters[VDEC_LAST];
 
-		AppSettings& s = AfxGetAppSettings();
+		CAppSettings& s = AfxGetAppSettings();
 
 		memcpy(&dxva_filters, &s.DXVAFilters, sizeof(s.DXVAFilters));
 		memcpy(&video_filters, &s.VideoFilters, sizeof(s.VideoFilters));
@@ -369,7 +369,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 	{
 		// Filters Priority
-		AppSettings& s = AfxGetAppSettings();
+		CAppSettings& s = AfxGetAppSettings();
 		CMediaFormatCategory* mfc = AfxGetAppSettings().m_Formats.FindMediaByExt(ext);
 		if (mfc) {
 			CString type = mfc->GetLabel();
@@ -540,7 +540,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		CloseHandle(hFile);
 	}
 
-	AppSettings& s	= AfxGetAppSettings();
+	CAppSettings& s	= AfxGetAppSettings();
 	bool *src		= s.SrcFilters;
 	if (ext == _T(".mpc") && src[SRC_MUSEPACK]) { // hack for internal Splitter without Source - add File Source (Async) with high merit
 		CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_ABOVE_DSHOW - 1);
@@ -1380,7 +1380,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 
 	int nTotal = 0, nRendered = 0;
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	BeginEnumPins(pBF, pEP, pPin) {
 		if (S_OK == IsPinDirection(pPin, PINDIR_OUTPUT) && S_OK != IsPinConnected(pPin)) {
@@ -1782,7 +1782,7 @@ STDMETHODIMP CFGManager::RenderAudioFile(LPCWSTR lpcwstrFileName)
 CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
 	: CFGManager(pName, pUnk, hWnd, IsPreview)
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	CFGFilter*	pFGF;
 
@@ -2619,7 +2619,7 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 		return hr;
 	}
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (GetCLSID(pBF) == CLSID_DMOWrapperFilter) {
 		if (CComQIPtr<IPropertyBag> pPB = pBF) {
@@ -2650,7 +2650,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	DbgLog((LOG_TRACE, 3, L"--> CFGManagerPlayer::CFGManagerPlayer on thread: %d", GetCurrentThreadId()));
 	CFGFilter* pFGF;
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (m_pFM) {
 		CComPtr<IEnumMoniker> pEM;

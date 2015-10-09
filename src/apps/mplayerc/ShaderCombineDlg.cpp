@@ -73,7 +73,7 @@ BOOL CShaderCombineDlg::OnInitDialog()
 	//AddAnchor(IDOK, TOP_RIGHT);
 	//AddAnchor(IDCANCEL, TOP_RIGHT);
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	// remember the initial state
 	auto pFrame = AfxGetMainFrame();

@@ -266,7 +266,7 @@ void CSubtitleDlDlg::OnOK()
 
 	while (pos) {
 		const isdb_subtitle& sub = m_selsubs.GetNext(pos);
-		AppSettings& s = AfxGetAppSettings();
+		CAppSettings& s = AfxGetAppSettings();
 		CInternetSession is;
 		CStringA url = "http://" + s.strISDb + "/dl.php?";
 		CStringA args, ticket, str;

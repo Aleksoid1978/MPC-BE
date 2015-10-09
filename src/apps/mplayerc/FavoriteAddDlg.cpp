@@ -56,7 +56,7 @@ BOOL CFavoriteAddDlg::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	POSITION pos = m_shortnames.GetHeadPosition();
 	while (pos) {
@@ -100,7 +100,7 @@ void CFavoriteAddDlg::OnOK()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	s.bFavRememberPos = !!m_bRememberPos;
 	s.bFavRelativeDrive = !!m_bRelativeDrive;

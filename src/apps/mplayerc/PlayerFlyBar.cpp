@@ -202,7 +202,7 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 		pFrame->ToggleFullscreen(true, true);
 		Invalidate();
 	} else if (r_LockIcon.PtInRect(p)) {
-		AppSettings& s = AfxGetAppSettings();
+		CAppSettings& s = AfxGetAppSettings();
 		s.fFlybarOnTop = !s.fFlybarOnTop;
 		UpdateWnd(point);
 	}
@@ -309,7 +309,7 @@ void CFlyBar::DrawWnd()
 {
 	CClientDC dc(this);
 	if (IsWindowVisible()) {
-		const AppSettings& s = AfxGetAppSettings();
+		const CAppSettings& s = AfxGetAppSettings();
 
 		CRect rcBar;
 		GetClientRect(&rcBar);

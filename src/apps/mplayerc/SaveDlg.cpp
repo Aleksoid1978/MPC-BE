@@ -75,7 +75,7 @@ BOOL CSaveDlg::OnInitDialog()
 {
 	CCmdUIDialog::OnInitDialog();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	CString str, in = m_name, out = m_out;
 

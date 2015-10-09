@@ -40,7 +40,7 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 {
 	VERIFY(CSliderCtrl::Create(WS_CHILD | WS_VISIBLE | TBS_NOTICKS | TBS_HORZ | TBS_TOOLTIPS, CRect(0,0,0,0), pParentWnd, IDC_SLIDER1));
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (m_BackGroundbm.FileExists(CString(L"background"))) {
 		m_BackGroundbm.LoadExternalGradient(L"background");
@@ -106,7 +106,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	LRESULT lr = CDRF_DODEFAULT;
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	int R, G, B, R2, G2, B2;
 

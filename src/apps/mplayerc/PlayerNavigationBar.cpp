@@ -222,7 +222,7 @@ void CPlayerNavigationDialog::SetupAudioSwitcherSubMenu(CDVBChannel* pChannel)
 {
 	bool bFound = (pChannel != NULL);
 	int nCurrentChannel;
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (!bFound) {
 		nCurrentChannel = s.nDVBLastChannel;
@@ -255,7 +255,7 @@ void CPlayerNavigationDialog::SetupAudioSwitcherSubMenu(CDVBChannel* pChannel)
 
 void CPlayerNavigationDialog::UpdateElementList()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (s.iDefaultCaptureDevice == 1) {
 		m_ChannelList.ResetContent();
@@ -309,7 +309,7 @@ void CPlayerNavigationDialog::OnSelChangeComboAudio()
 {
 	UINT nID;
 	CWnd* TempWnd;
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 	CDVBChannel*	 pChannel = s.FindChannelByPref(s.nDVBLastChannel);
 
 	nID = m_ComboAudio.GetCurSel() + ID_NAVIGATE_AUDIO_SUBITEM_START;

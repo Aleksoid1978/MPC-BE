@@ -76,7 +76,7 @@ BOOL COpenDlg::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	CRecentFileList& MRU = s.MRU;
 	MRU.ReadList();
@@ -161,7 +161,7 @@ void COpenDlg::OnBnClickedBrowsebutton()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	CString filter;
 	CAtlArray<CString> mask;
@@ -210,7 +210,7 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	CString filter;
 	CAtlArray<CString> mask;

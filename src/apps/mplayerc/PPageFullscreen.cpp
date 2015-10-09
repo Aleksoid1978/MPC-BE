@@ -123,7 +123,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_bLaunchFullScreen					= s.fLaunchfullscreen;
 	m_AutoChangeFullscrRes				= s.AutoChangeFullscrRes;
@@ -281,7 +281,7 @@ BOOL CPPageFullscreen::OnApply()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_AutoChangeFullscrRes.bEnabled = m_bEnableAutoMode ? m_bEnableAutoMode + m_bBeforePlayback : 0;
 
@@ -487,7 +487,7 @@ void CPPageFullscreen::OnUpdateTimeout(CCmdUI* pCmdUI)
 
 void CPPageFullscreen::ModesUpdate()
 {
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_list.SetRedraw(FALSE);
 

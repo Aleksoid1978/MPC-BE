@@ -65,7 +65,7 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_iYoutubeFormatCtrl.Clear();
 
@@ -141,7 +141,7 @@ BOOL CPPageYoutube::OnApply()
 {
 	UpdateData();
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	s.iYoutubeTag			= m_iYoutubeFormatCtrl.GetItemData(m_iYoutubeFormatCtrl.GetCurSel());
 	s.bYoutubeLoadPlaylist	= !!m_chkYoutubeLoadPlaylist.GetCheck();

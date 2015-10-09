@@ -134,7 +134,7 @@ void CPreView::OnPaint()
 	COLORREF light = RGB(255,255,255);
 	COLORREF shadow = GetSysColor(COLOR_BTNSHADOW);
 
-	AppSettings& s = AfxGetAppSettings();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (s.bUseDarkTheme) {
 		ThemeRGB(95, 100, 105, r1, g1, b1);
