@@ -875,10 +875,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CStringW strFS = s.strFullScreenMonitor;
 	GetCurDispMode(s.dm_def, strFS);
 
-	if (IsWinSevenOrLater()) {
+	if (IsWin7orLater()) {
 		m_hDWMAPI = LoadLibrary(L"dwmapi.dll");
 		if (m_hDWMAPI) {
-			if (IsWinTenOrLater()) {
+			if (IsWin10orLater()) {
 				(FARPROC &)m_DwmGetWindowAttributeFnc		= GetProcAddress(m_hDWMAPI, "DwmGetWindowAttribute");
 			}
 			(FARPROC &)m_DwmSetWindowAttributeFnc			= GetProcAddress(m_hDWMAPI, "DwmSetWindowAttribute");
@@ -889,7 +889,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 	// Windows 8 - if app is not pinned on the taskbar, it's not receive "TaskbarButtonCreated" message. Bug ???
-	if (IsWinEightOrLater()) {
+	if (IsWin8orLater()) {
 		CreateThumbnailToolbar();
 	}
 
@@ -1710,7 +1710,7 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 		MONITORINFO mi = { sizeof(mi) };
 		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 		CRect rcWork(mi.rcWork);
-		if (IsWinTenOrLater()) {
+		if (IsWin10orLater()) {
 			rcWork.InflateRect(GetInvisibleBorderSize());
 		}
 
@@ -1776,7 +1776,7 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 			MONITORINFO mi = { sizeof(mi) };
 			GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 			CRect wr(mi.rcWork);
-			if (s.iCaptionMenuMode == MODE_FRAMEONLY && IsWinTenOrLater()) {
+			if (s.iCaptionMenuMode == MODE_FRAMEONLY && IsWin10orLater()) {
 				CRect invisibleBorders = GetInvisibleBorderSize();
 				// remove the thin edge for a better view when the window is maximized.
 				invisibleBorders.InflateRect(1, 0, 1, 1);
@@ -6579,7 +6579,7 @@ void CMainFrame::OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI)
 					   s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS ||
 					   s.iDSVideoRendererType == VIDRNDT_DS_SYNC) &&
 					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D &&
-					  (IsWinVista() || IsWinSeven()));
+					  (IsWinVista() || IsWin7()));
 
 	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(r.m_AdvRendSets.iVMRDisableDesktopComposition);
@@ -10956,7 +10956,7 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 	MONITORINFO mi = { sizeof(mi) };
 	GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 	CRect rcWork(mi.rcWork);
-	if (IsWinTenOrLater()) {
+	if (IsWin10orLater()) {
 		rcWork.InflateRect(GetInvisibleBorderSize());
 	}
 
@@ -11031,7 +11031,7 @@ CRect CMainFrame::GetInvisibleBorderSize() const
 {
 	static CRect invisibleBorders;
 	if (invisibleBorders.IsRectNull()
-			&& IsWinTenOrLater()
+			&& IsWin10orLater()
 			&& m_DwmGetWindowAttributeFnc && SUCCEEDED(m_DwmGetWindowAttributeFnc(GetSafeHwnd(), DWMWA_EXTENDED_FRAME_BOUNDS, &invisibleBorders, sizeof(RECT)))) {
 		CRect windowRect;
 		GetWindowRect(&windowRect);
@@ -17742,7 +17742,7 @@ void CMainFrame::OnFileOpenDirectory()
 
 HRESULT CMainFrame::CreateThumbnailToolbar()
 {
-	if (!IsWinSevenOrLater() || !AfxGetAppSettings().fUseWin7TaskBar) {
+	if (!IsWin7orLater() || !AfxGetAppSettings().fUseWin7TaskBar) {
 		return E_FAIL;
 	}
 
@@ -18413,7 +18413,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 	}
 	m_ThumbCashedSize.SetSize(0, 0);
 
-	if (IsWinSevenOrLater() && m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
+	if (IsWin7orLater() && m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
 		/* this is for custom draw in windows 7 preview */
 		const BOOL set = s.fUseWin7TaskBar && m_bAudioOnly && IsSomethingLoaded() && show;
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_HAS_ICONIC_BITMAP, &set, sizeof(set));

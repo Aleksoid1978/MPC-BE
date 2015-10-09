@@ -56,7 +56,7 @@ CPPageFormats::CPPageFormats()
 	, m_list(0)
 	, m_bInsufficientPrivileges(false)
 {
-	if (!m_pAAR && IsWinVistaOrLater() && !IsWinTenOrLater()) {
+	if (!m_pAAR && IsWinVistaOrLater() && !IsWin10orLater()) {
 		// Default manager (requires at least Vista)
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 									  NULL,
@@ -330,7 +330,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 		key.RecurseDeleteKey(strProgID + _T("\\DefaultIcon"));
 	}
 
-	if (IsWinTenOrLater()) {
+	if (IsWin10orLater()) {
 		// delete [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ext\UserChoice]
 		LSTATUS status = RegDeleteKey(HKEY_CURRENT_USER, CString("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + ext + "\\UserChoice"));
 		UNREFERENCED_PARAMETER(status);
@@ -971,7 +971,7 @@ BOOL CPPageFormats::OnApply()
 	s.bSetContextDir		= !!m_fContextDir.GetCheck();
 	s.fAssociatedWithIcons	= !!m_fAssociatedWithIcons.GetCheck();
 
-	if (m_bFileExtChanged && IsWinEightOrLater() && !IsWinTenOrLater()) {
+	if (m_bFileExtChanged && IsWin8orLater() && !IsWin10orLater()) {
 		HRESULT hr = RegisterUI();
 		UNREFERENCED_PARAMETER(hr);
 	}

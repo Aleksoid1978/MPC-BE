@@ -118,7 +118,7 @@ void CDiskImage::Init()
 
 #if ENABLE_WIN8VIRTUALDISK
 	// Windows 8 VirtualDisk
-	if (IsWinEightOrLater()) {
+	if (IsWin8orLater()) {
 		m_hVirtualDiskModule = LoadLibrary(L"VirtDisk.dll");
 
 		if (m_hVirtualDiskModule) {

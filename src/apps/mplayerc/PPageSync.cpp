@@ -119,7 +119,7 @@ void CPPageSync::InitDialogPrivate()
 	}
 	OnAlterativeVSyncCheck();
 
-	if ((IsWinVista() || IsWinSeven()) &&
+	if ((IsWinVista() || IsWin7()) &&
 			(s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS ||
 			s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
 			s.iDSVideoRendererType == VIDRNDT_DS_MADVR ||

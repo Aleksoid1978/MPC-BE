@@ -131,7 +131,7 @@ BOOL CPPageInterface::OnInitDialog()
 	m_clrGrad1ABGR			= m_clrGrad1ABGR_Old		= s.clrGrad1ABGR;
 	m_clrGrad2ABGR			= m_clrGrad2ABGR_Old		= s.clrGrad2ABGR;
 	m_fUseWin7TaskBar		= s.fUseWin7TaskBar;
-	GetDlgItem(IDC_CHECK_WIN7)->EnableWindow(IsWinSevenOrLater());
+	GetDlgItem(IDC_CHECK_WIN7)->EnableWindow(IsWin7orLater());
 
 	m_fUseTimeTooltip = s.fUseTimeTooltip;
 	m_TimeTooltipPosition.AddString(ResStr(IDS_TIME_TOOLTIP_ABOVE));
