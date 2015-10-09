@@ -41,7 +41,7 @@ BOOL IsWinXP()
 	return (GetSysVersion() == 0x0501);
 }
 
-BOOL IsWinXPOrLater()
+BOOL IsWinXPorLater()
 {
 	return (GetSysVersion() >= 0x0501);
 }
@@ -56,32 +56,32 @@ BOOL IsWinVistaOrLater()
 	return (GetSysVersion() >= 0x0600);
 }
 
-BOOL IsWinSeven()
+BOOL IsWin7()
 {
 	return (GetSysVersion() == 0x0601);
 }
 
-BOOL IsWinSevenOrLater()
+BOOL IsWin7orLater()
 {
 	return (GetSysVersion() >= 0x0601);
 }
 
-BOOL IsWinEight()
+BOOL IsWin8()
 {
 	return (GetSysVersion() == 0x0602);
 }
 
-BOOL IsWinEightOrLater()
+BOOL IsWin8orLater()
 {
 	return (GetSysVersion() >= 0x0602);
 }
 
-BOOL IsWinTen()
+BOOL IsWin10()
 {
 	return (GetSysVersion() == 0x0A00);
 }
 
-BOOL IsWinTenOrLater()
+BOOL IsWin10orLater()
 {
 	return (GetSysVersion() >= 0x0A00);
 }

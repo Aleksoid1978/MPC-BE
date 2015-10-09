@@ -21,15 +21,15 @@
 #pragma once
 
 BOOL IsWinXP();
-BOOL IsWinXPOrLater();
+BOOL IsWinXPorLater();
 BOOL IsWinVista();
 BOOL IsWinVistaOrLater();
-BOOL IsWinSeven();
-BOOL IsWinSevenOrLater();
-BOOL IsWinEight();
-BOOL IsWinEightOrLater();
-BOOL IsWinTen();
-BOOL IsWinTenOrLater();
+BOOL IsWin7();
+BOOL IsWin7orLater();
+BOOL IsWin8();
+BOOL IsWin8orLater();
+BOOL IsWin10();
+BOOL IsWin10orLater();
 
 BOOL IsWow64();
 BOOL IsW64();
