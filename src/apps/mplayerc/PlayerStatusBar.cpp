@@ -35,6 +35,7 @@ CPlayerStatusBar::CPlayerStatusBar()
 	, m_time_rect(-1, -1, -1, -1)
 	, m_time_rect2(-1, -1, -1, -1)
 {
+	UseCurentMonitorDPI(m_hWnd);
 }
 
 CPlayerStatusBar::~CPlayerStatusBar()

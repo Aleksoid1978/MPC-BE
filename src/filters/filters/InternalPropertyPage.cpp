@@ -34,6 +34,7 @@ CInternalPropertyPageWnd::CInternalPropertyPageWnd()
 	: m_fDirty(false)
 	, m_fontheight(IPP_FONTSIZE)
 {
+	UseCurentMonitorDPI(m_hWnd);
 }
 
 BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRect, CWnd* pParentWnd)

@@ -30,6 +30,7 @@ IMPLEMENT_DYNAMIC(CPlayerSeekBar, CDialogBar)
 CPlayerSeekBar::CPlayerSeekBar(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
 {
+	UseCurentMonitorDPI(m_hWnd);
 }
 
 CPlayerSeekBar::~CPlayerSeekBar()

@@ -30,6 +30,7 @@ CStatusLabel::CStatusLabel(bool fRightAlign, bool fAddEllipses)
 	: m_fRightAlign(fRightAlign)
 	, m_fAddEllipses(fAddEllipses)
 {
+	UseCurentMonitorDPI(m_hWnd);
 
 	m_font.m_hObject = NULL;
 

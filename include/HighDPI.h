@@ -3,11 +3,39 @@
 
 #pragma once
 
+namespace
+{
+    typedef enum MONITOR_DPI_TYPE {
+        MDT_EFFECTIVE_DPI = 0,
+        MDT_ANGULAR_DPI = 1,
+        MDT_RAW_DPI = 2,
+        MDT_DEFAULT = MDT_EFFECTIVE_DPI
+    } MONITOR_DPI_TYPE;
+
+    typedef HRESULT (WINAPI *tpGetDpiForMonitor)(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, UINT* dpiX, UINT* dpiY);
+}
+
 // Definition: relative pixel = 1 pixel at 96 DPI and scaled based on actual DPI.
 class CDPI
 {
+private:
+    int _dpiX = 96;
+    int _dpiY = 96;
+
+private:
+    void _Init()
+    {
+        HDC hdc = GetDC(NULL);
+        if (hdc)
+        {
+            _dpiX = GetDeviceCaps(hdc, LOGPIXELSX);
+            _dpiY = GetDeviceCaps(hdc, LOGPIXELSY);
+            ReleaseDC(NULL, hdc);
+        }
+    }
+
 public:
-    CDPI() : _dpiX(96), _dpiY(96) { _Init(); }
+    CDPI() { _Init(); }
 
     // Get screen DPI.
     int GetDPIX() { return _dpiX; }
@@ -31,19 +59,25 @@ public:
     // Convert a point size (1/72 of an inch) to raw pixels.
     int PointsToPixels(int pt) { return MulDiv(pt, _dpiY, 72); }
 
-private:
-    void _Init()
+    void UseCurentMonitorDPI(HWND hWindow)
     {
-        HDC hdc = GetDC(NULL);
-        if (hdc)
-        {
-            _dpiX = GetDeviceCaps(hdc, LOGPIXELSX);
-            _dpiY = GetDeviceCaps(hdc, LOGPIXELSY);
-            ReleaseDC(NULL, hdc);
+        OSVERSIONINFO osvi;
+        ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+        osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+        GetVersionEx(&osvi);
+
+        if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion >= 3 || osvi.dwMajorVersion > 6) {
+            static HMODULE m_hShellScalingAPI = LoadLibrary(L"Shcore.dll");
+            if (m_hShellScalingAPI) {
+                static tpGetDpiForMonitor GetDpiForMonitor = (tpGetDpiForMonitor)GetProcAddress(m_hShellScalingAPI, "GetDpiForMonitor");
+                if (GetDpiForMonitor) {
+                    UINT dpix, dpiy;
+                    if (S_OK == GetDpiForMonitor(MonitorFromWindow(hWindow, MONITOR_DEFAULTTONULL), MDT_EFFECTIVE_DPI, &dpix, &dpiy)) {
+                        _dpiX = dpix;
+                        _dpiY = dpiy;
+                    }
+                }
+            }
         }
     }
-
-private:
-    int _dpiX;
-    int _dpiY;
 };
