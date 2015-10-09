@@ -31,6 +31,8 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd
 	, m_audio(pFG)
 	, m_bLockPage(false)
 {
+	UseCurentMonitorDPI(m_hWnd);
+
 	SetTreeWidth(ScaleX(210));
 
 	AddPage(&m_player);
