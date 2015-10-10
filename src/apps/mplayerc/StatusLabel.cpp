@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "StatusLabel.h"
+#include "MainFrm.h"
 #include "../../DSUtil/SysVersion.h"
 
 // CStatusLabel
@@ -30,8 +31,6 @@ CStatusLabel::CStatusLabel(bool fRightAlign, bool fAddEllipses)
 	: m_fRightAlign(fRightAlign)
 	, m_fAddEllipses(fAddEllipses)
 {
-	UseCurentMonitorDPI(m_hWnd);
-
 	m_font.m_hObject = NULL;
 
 	CAppSettings& s = AfxGetAppSettings();
@@ -39,13 +38,13 @@ CStatusLabel::CStatusLabel(bool fRightAlign, bool fAddEllipses)
 	if (s.bUseDarkTheme) {
 		int size = IsWinVistaOrLater() ? 13 : 14;
 		CString face = IsWinVistaOrLater() ? _T("Tahoma") : _T("Microsoft Sans Serif");
-		m_font.CreateFont(ScaleY(size), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+		m_font.CreateFont(AfxGetMainFrame()->ScaleY(size), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
  					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE,
 					  face);
 	} else {
 		int size = IsWinVistaOrLater() ? 16 : 14;
 		CString face = IsWinVistaOrLater() ? _T("Segoe UI") : _T("Microsoft Sans Serif");
-		m_font.CreateFont(ScaleY(size), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+		m_font.CreateFont(AfxGetMainFrame()->ScaleY(size), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
  					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE,
  					  face);
 	}

@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "PPageSheet.h"
+#include "MainFrm.h"
 
 // CPPageSheet
 
@@ -31,9 +32,7 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd
 	, m_audio(pFG)
 	, m_bLockPage(false)
 {
-	UseCurentMonitorDPI(m_hWnd);
-
-	SetTreeWidth(ScaleX(210));
+	SetTreeWidth(AfxGetMainFrame()->ScaleX(210));
 
 	AddPage(&m_player);
 	AddPage(&m_formats);

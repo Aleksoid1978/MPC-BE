@@ -35,7 +35,6 @@ CPlayerStatusBar::CPlayerStatusBar()
 	, m_time_rect(-1, -1, -1, -1)
 	, m_time_rect2(-1, -1, -1, -1)
 {
-	UseCurentMonitorDPI(m_hWnd);
 }
 
 CPlayerStatusBar::~CPlayerStatusBar()
@@ -388,7 +387,7 @@ void CPlayerStatusBar::OnPaint()
 		ThemeRGB(165, 170, 175, R, G, B);
 		memdc.SetTextColor(RGB(R,G,B));
 
-		font2.CreateFont(ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+		font2.CreateFont(AfxGetMainFrame()->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
  					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE, _T("Tahoma"));
 
 		memdc.SelectObject(&font2);

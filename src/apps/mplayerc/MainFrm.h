@@ -51,6 +51,7 @@
 #include <IChapterInfo.h>
 #include <IKeyFrameInfo.h>
 #include <IBufferInfo.h>
+#include <HighDPI.h>
 
 #include "WebServer.h"
 #include <d3d9.h>
@@ -194,7 +195,7 @@ public:
 
 interface ISubClock;
 
-class CMainFrame : public CFrameWnd, public CDropTarget
+class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 {
 	enum {
 		TIMER_STREAMPOSPOLLER = 1,

@@ -696,6 +696,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 
+	UseCurentMonitorDPI(m_hWnd);
+
 	m_popupMenu.LoadMenu(IDR_POPUP);
 	m_popupMainMenu.LoadMenu(IDR_POPUPMAIN);
 
