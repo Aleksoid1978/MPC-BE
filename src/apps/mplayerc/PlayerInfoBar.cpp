@@ -42,15 +42,15 @@ void CPlayerInfoBar::SetLine(CString label, CString info)
 		return;
 	}
 
-	for (size_t idx = 0; idx < m_label.GetCount(); idx++) {
+	for (size_t idx = 0; idx < m_labels.GetCount(); idx++) {
 		CString tmp;
-		m_label[idx]->GetWindowText(tmp);
+		m_labels[idx]->GetWindowText(tmp);
 
 		if (label == tmp) {
-			m_info[idx]->GetWindowText(tmp);
+			m_infos[idx]->GetWindowText(tmp);
 
 			if (info != tmp) {
-				m_info[idx]->SetWindowText(info);
+				m_infos[idx]->SetWindowText(info);
 			}
 
 			return;
@@ -59,11 +59,11 @@ void CPlayerInfoBar::SetLine(CString label, CString info)
 
 	CAutoPtr<CStatusLabel> l(DNew CStatusLabel(true, false));
 	l->Create(label, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS|SS_OWNERDRAW, CRect(0,0,0,0), this);
-	m_label.Add(l);
+	m_labels.Add(l);
 
 	CAutoPtr<CStatusLabel> i(DNew CStatusLabel(false, true));
 	i->Create(info, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS|SS_OWNERDRAW, CRect(0,0,0,0), this);
-	m_info.Add(i);
+	m_infos.Add(i);
 
 	Relayout();
 }
@@ -72,12 +72,12 @@ void CPlayerInfoBar::GetLine(CString label, CString& info)
 {
 	info.Empty();
 
-	for (size_t idx = 0; idx < m_label.GetCount(); idx++) {
+	for (size_t idx = 0; idx < m_labels.GetCount(); idx++) {
 		CString tmp;
-		m_label[idx]->GetWindowText(tmp);
+		m_labels[idx]->GetWindowText(tmp);
 
 		if (label == tmp) {
-			m_info[idx]->GetWindowText(tmp);
+			m_infos[idx]->GetWindowText(tmp);
 			info = tmp;
 
 			return;
@@ -87,13 +87,13 @@ void CPlayerInfoBar::GetLine(CString label, CString& info)
 
 void CPlayerInfoBar::RemoveLine(CString label)
 {
-	for (size_t i = 0; i < m_label.GetCount(); i++) {
+	for (size_t i = 0; i < m_labels.GetCount(); i++) {
 		CString tmp;
-		m_label[i]->GetWindowText(tmp);
+		m_labels[i]->GetWindowText(tmp);
 
 		if (label == tmp) {
-			m_label.RemoveAt(i);
-			m_info.RemoveAt(i);
+			m_labels.RemoveAt(i);
+			m_infos.RemoveAt(i);
 
 			break;
 		}
@@ -104,8 +104,8 @@ void CPlayerInfoBar::RemoveLine(CString label)
 
 void CPlayerInfoBar::RemoveAllLines()
 {
-	m_label.RemoveAll();
-	m_info.RemoveAll();
+	m_labels.RemoveAll();
+	m_infos.RemoveAll();
 
 	Relayout();
 }
@@ -132,7 +132,7 @@ CSize CPlayerInfoBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
 	CRect r;
 	GetParent()->GetClientRect(&r);
 
-	r.bottom = r.top + m_label.GetCount() * 17 + (m_label.GetCount() ? 4 : 0);
+	r.bottom = r.top + m_labels.GetCount() * AfxGetMainFrame()->ScaleY(17) + (m_labels.GetCount() ? 4 : 0);
 
 	return r.Size();
 }
@@ -142,19 +142,21 @@ void CPlayerInfoBar::Relayout()
 	CRect r;
 	GetParent()->GetClientRect(&r);
 
-	int w = m_nFirstColWidth, h = 17, y = 2;
+	int w = m_nFirstColWidth;
+	int h = AfxGetMainFrame()->ScaleY(17);
+	int y = 2;
 
-	for (size_t i = 0; i < m_label.GetCount(); i++) {
-		CDC* pDC = m_label[i]->GetDC();
+	for (size_t i = 0; i < m_labels.GetCount(); i++) {
+		CDC* pDC = m_labels[i]->GetDC();
 		CString str;
-		m_label[i]->GetWindowText(str);
+		m_labels[i]->GetWindowText(str);
 		w = max(w, pDC->GetTextExtent(str).cx);
-		m_label[i]->ReleaseDC(pDC);
+		m_labels[i]->ReleaseDC(pDC);
 	}
 
-	for (size_t i = 0; i < m_label.GetCount(); i++, y += h) {
-		m_label[i]->MoveWindow(1, y, w - 10, h);
-		m_info[i]->MoveWindow(w + 10, y, r.Width()-(w+10)-1, h);
+	for (size_t i = 0; i < m_labels.GetCount(); i++, y += h) {
+		m_labels[i]->MoveWindow(1, y, w - 10, h);
+		m_infos[i]->MoveWindow(w + 10, y, r.Width()-(w+10)-1, h);
 	}
 }
 

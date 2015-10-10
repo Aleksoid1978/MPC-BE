@@ -31,8 +31,8 @@ class CPlayerInfoBar : public CDialogBar
 	DECLARE_DYNAMIC(CPlayerInfoBar)
 
 private:
-	CAutoPtrArray<CStatusLabel> m_label;
-	CAutoPtrArray<CStatusLabel> m_info;
+	CAutoPtrArray<CStatusLabel> m_labels;
+	CAutoPtrArray<CStatusLabel> m_infos;
 
 	int m_nFirstColWidth;
 
