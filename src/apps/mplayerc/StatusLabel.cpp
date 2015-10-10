@@ -32,26 +32,33 @@ CStatusLabel::CStatusLabel(bool fRightAlign, bool fAddEllipses)
 	, m_fAddEllipses(fAddEllipses)
 {
 	m_font.m_hObject = NULL;
+}
 
-	CAppSettings& s = AfxGetAppSettings();
+CStatusLabel::~CStatusLabel()
+{
+}
 
-	if (s.bUseDarkTheme) {
+BOOL CStatusLabel::Create(LPCTSTR lpszText, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID)
+{
+	if (!__super::Create(lpszText, dwStyle, rect, pParentWnd, nID)) {
+		return FALSE;
+	}
+
+	if (AfxGetAppSettings().bUseDarkTheme) {
 		int size = IsWinVistaOrLater() ? 13 : 14;
 		CString face = IsWinVistaOrLater() ? _T("Tahoma") : _T("Microsoft Sans Serif");
 		m_font.CreateFont(AfxGetMainFrame()->ScaleY(size), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
- 					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE,
+					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE,
 					  face);
 	} else {
 		int size = IsWinVistaOrLater() ? 16 : 14;
 		CString face = IsWinVistaOrLater() ? _T("Segoe UI") : _T("Microsoft Sans Serif");
 		m_font.CreateFont(AfxGetMainFrame()->ScaleY(size), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
- 					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE,
- 					  face);
+					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE,
+					  face);
 	}
-}
 
-CStatusLabel::~CStatusLabel()
-{
+	return TRUE;
 }
 
 BEGIN_MESSAGE_MAP(CStatusLabel, CStatic)

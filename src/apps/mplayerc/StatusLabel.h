@@ -35,6 +35,8 @@ public:
 	CStatusLabel(bool fRightAlign, bool fAddEllipses);
 	virtual ~CStatusLabel();
 
+	BOOL Create(LPCTSTR lpszText, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID = 0xffff);
+
 	CFont& GetFont() {return m_font;}
 
 	void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
