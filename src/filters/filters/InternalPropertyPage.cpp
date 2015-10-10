@@ -34,7 +34,7 @@ CInternalPropertyPageWnd::CInternalPropertyPageWnd()
 	: m_fDirty(false)
 	, m_fontheight(IPP_FONTSIZE)
 {
-	UseCurentMonitorDPI(m_hWnd);
+
 }
 
 BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRect, CWnd* pParentWnd)
@@ -73,8 +73,6 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 				return FALSE;
 			}
 		}
-
-		m_fontheight = ScaleY(IPP_FONTSIZE);
 	}
 
 	LPCTSTR wc = AfxRegisterWndClass(CS_VREDRAW|CS_HREDRAW|CS_DBLCLKS, 0, (HBRUSH)(COLOR_BTNFACE + 1));
@@ -82,6 +80,9 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 		return FALSE;
 	}
 
+	UseCurentMonitorDPI(m_hWnd);
+
+	m_fontheight = ScaleY(IPP_FONTSIZE);
 	SetFont(&m_font);
 
 	return TRUE;

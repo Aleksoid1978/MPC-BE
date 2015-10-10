@@ -20,9 +20,7 @@
 
 #pragma once
 
-#include <HighDPI.h>
-
-class CPreView : public CWnd, public CDPI
+class CPreView : public CWnd
 {
 	const int m_border = 5;
 
