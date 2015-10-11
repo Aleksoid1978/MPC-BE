@@ -218,6 +218,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_SIZING()
 	ON_MESSAGE_VOID(WM_DISPLAYCHANGE, OnDisplayChange)
 
+	ON_MESSAGE(0x02E0, OnDpiChanged)
+
 	ON_WM_SYSCOMMAND()
 	ON_WM_ACTIVATEAPP()
 	ON_MESSAGE(WM_APPCOMMAND, OnAppCommand)
@@ -1919,6 +1921,17 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 	}
 
 	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnDisplayChange() : end"));
+}
+
+LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+#if 0
+	OverrideDPI(LOWORD(wParam), HIWORD(wParam));
+	//m_eventc.FireEvent(MpcEvent::DPI_CHANGED);
+	MoveWindow(reinterpret_cast<RECT*>(lParam));
+	RecalcLayout();
+#endif
+	return 0;
 }
 
 void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
