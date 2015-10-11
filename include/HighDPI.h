@@ -81,7 +81,7 @@ protected:
 
 			if (pGetDpiForMonitor) {
 				UINT dpix, dpiy;
-				if (S_OK == pGetDpiForMonitor(MonitorFromWindow(hWindow, MONITOR_DEFAULTTONULL), MDT_EFFECTIVE_DPI, &dpix, &dpiy)) {
+				if (S_OK == pGetDpiForMonitor(MonitorFromWindow(hWindow, MONITOR_DEFAULTTONEAREST), MDT_EFFECTIVE_DPI, &dpix, &dpiy)) {
 					_dpiX = dpix;
 					_dpiY = dpiy;
 				}
