@@ -27,6 +27,7 @@
 #include <psapi.h>
 #include <string>
 #include <atlimage.h>
+#include "MainFrm.h"
 
 
 // CPPageFormats dialog
@@ -631,8 +632,13 @@ BOOL CPPageFormats::OnInitDialog()
 	m_list.InsertColumn(COL_CATEGORY, _T("Category"), LVCFMT_LEFT);
 
 	CImage onoff;
-	onoff.LoadFromResource(AfxGetInstanceHandle(), IDB_ONOFF);
-	m_onoff.Create(12, 12, ILC_COLOR4 | ILC_MASK, 0, 3);
+	if (AfxGetMainFrame()->GetDPIY() < 144) {
+		onoff.LoadFromResource(AfxGetInstanceHandle(), IDB_ONOFF_96);
+		m_onoff.Create(12, 12, ILC_COLOR4 | ILC_MASK, 0, 3);
+	} else {
+		onoff.LoadFromResource(AfxGetInstanceHandle(), IDB_ONOFF_144);
+		m_onoff.Create(18, 18, ILC_COLOR4 | ILC_MASK, 0, 3);
+	}
 	m_onoff.Add(CBitmap::FromHandle(onoff), 0xffffff);
 	m_list.SetImageList(&m_onoff, LVSIL_SMALL);
 

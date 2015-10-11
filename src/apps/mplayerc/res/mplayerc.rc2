@@ -110,7 +110,8 @@ IDR_TB_STOP                      ICON                    "res\\tb_stop_16.ico"
 // Bitmap
 //
 
-IDB_ONOFF                        BITMAP                  "res\\onoff.bmp"
+IDB_ONOFF_96                     BITMAP                  "res\\onoff_96.bmp"
+IDB_ONOFF_144                    BITMAP                  "res\\onoff_144.bmp"
 IDB_MONO                         BITMAP                  "res\\mono.bmp"
 IDB_STEREO                       BITMAP                  "res\\stereo.bmp"
 IDB_NOAUDIO                      BITMAP                  "res\\noaudio.bmp"
