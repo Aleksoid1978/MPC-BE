@@ -708,6 +708,8 @@ public:
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
 	afx_msg void OnDisplayChange();
 
+	LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
+
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnActivateApp(BOOL bActive, DWORD dwThreadID);
 	afx_msg LRESULT OnAppCommand(WPARAM wParam, LPARAM lParam);

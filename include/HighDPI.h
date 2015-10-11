@@ -59,6 +59,7 @@ public:
     // Convert a point size (1/72 of an inch) to raw pixels.
     int PointsToPixels(int pt) { return MulDiv(pt, _dpiY, 72); }
 
+protected:
     void UseCurentMonitorDPI(HWND hWindow)
     {
         OSVERSIONINFO osvi;
@@ -79,5 +80,11 @@ public:
                 }
             }
         }
+    }
+
+    void OverrideDPI(int dpix, int dpiy)
+    {
+        _dpiX = dpix;
+        _dpiY = dpiy;
     }
 };
