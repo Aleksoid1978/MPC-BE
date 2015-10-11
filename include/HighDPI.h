@@ -62,30 +62,30 @@ public:
 protected:
     void UseCurentMonitorDPI(HWND hWindow)
     {
-		static OSVERSIONINFO osvi = { sizeof(osvi) };
-		if (osvi.dwMajorVersion == 0) {
-			GetVersionEx(&osvi);
-		}
+        static OSVERSIONINFO osvi = { sizeof(osvi) };
+        if (osvi.dwMajorVersion == 0) {
+            GetVersionEx(&osvi);
+        }
 
         if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion >= 3 || osvi.dwMajorVersion > 6) {
-			static HMODULE m_hShellScalingAPI = NULL;
-			static tpGetDpiForMonitor pGetDpiForMonitor = NULL;
+            static HMODULE m_hShellScalingAPI = NULL;
+            static tpGetDpiForMonitor pGetDpiForMonitor = NULL;
 
-			if (!m_hShellScalingAPI) {
-				m_hShellScalingAPI = LoadLibrary(L"Shcore.dll");
-			}
+            if (!m_hShellScalingAPI) {
+                m_hShellScalingAPI = LoadLibrary(L"Shcore.dll");
+            }
 
-			if (m_hShellScalingAPI && !pGetDpiForMonitor) {
-				pGetDpiForMonitor = (tpGetDpiForMonitor)GetProcAddress(m_hShellScalingAPI, "GetDpiForMonitor");
-			}
+            if (m_hShellScalingAPI && !pGetDpiForMonitor) {
+                pGetDpiForMonitor = (tpGetDpiForMonitor)GetProcAddress(m_hShellScalingAPI, "GetDpiForMonitor");
+            }
 
-			if (pGetDpiForMonitor) {
-				UINT dpix, dpiy;
-				if (S_OK == pGetDpiForMonitor(MonitorFromWindow(hWindow, MONITOR_DEFAULTTONEAREST), MDT_EFFECTIVE_DPI, &dpix, &dpiy)) {
-					_dpiX = dpix;
-					_dpiY = dpiy;
-				}
-			}
+            if (pGetDpiForMonitor) {
+                UINT dpix, dpiy;
+                if (S_OK == pGetDpiForMonitor(MonitorFromWindow(hWindow, MONITOR_DEFAULTTONEAREST), MDT_EFFECTIVE_DPI, &dpix, &dpiy)) {
+                    _dpiX = dpix;
+                    _dpiY = dpiy;
+                }
+            }
         }
     }
 
