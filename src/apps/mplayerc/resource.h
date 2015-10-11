@@ -14,9 +14,10 @@
 #define IDB_NOAUDIO                     202
 #define IDB_MONO                        203
 #define IDB_STEREO                      204
-#define IDB_ONOFF                       205
-#define IDF_LOGO0                       206
-#define IDF_LOGO1                       207
+#define IDB_ONOFF_96                    205
+#define IDB_ONOFF_144                   206
+#define IDF_LOGO0                       207
+#define IDF_LOGO1                       208
 #define IDB_STREAMTYPES                 215
 #define IDI_DVD                         302
 #define IDI_AUDIOCD                     303
