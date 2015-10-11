@@ -1925,12 +1925,10 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 
 LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 {
-#if 0
 	OverrideDPI(LOWORD(wParam), HIWORD(wParam));
-	//m_eventc.FireEvent(MpcEvent::DPI_CHANGED);
 	MoveWindow(reinterpret_cast<RECT*>(lParam));
 	RecalcLayout();
-#endif
+
 	return 0;
 }
 
