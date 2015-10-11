@@ -45,6 +45,13 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 
 	m_pPageSite = pPageSite;
 
+	LPCTSTR wc = AfxRegisterWndClass(CS_VREDRAW|CS_HREDRAW|CS_DBLCLKS, 0, (HBRUSH)(COLOR_BTNFACE + 1));
+	if (!CreateEx(0, wc, _T("CInternalPropertyPageWnd"), WS_CHILDWINDOW, *pRect, pParentWnd, 0)) {
+		return FALSE;
+	}
+
+	UseCurentMonitorDPI(m_hWnd);
+
 	if (!m_font.m_hObject) {
 		CString face;
 		WORD height;
@@ -57,7 +64,7 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 		memset(&lf, 0, sizeof(lf));
 		_tcscpy_s(lf.lfFaceName, face);
 		HDC hDC = ::GetDC(0);
-		lf.lfHeight = -MulDiv(height, GetDeviceCaps(hDC, LOGPIXELSY), 72);
+		lf.lfHeight = -PointsToPixels(height);
 		::ReleaseDC(0, hDC);
 		lf.lfWeight = FW_NORMAL;
 		lf.lfCharSet = DEFAULT_CHARSET;
@@ -74,13 +81,6 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 			}
 		}
 	}
-
-	LPCTSTR wc = AfxRegisterWndClass(CS_VREDRAW|CS_HREDRAW|CS_DBLCLKS, 0, (HBRUSH)(COLOR_BTNFACE + 1));
-	if (!CreateEx(0, wc, _T("CInternalPropertyPageWnd"), WS_CHILDWINDOW, *pRect, pParentWnd, 0)) {
-		return FALSE;
-	}
-
-	UseCurentMonitorDPI(m_hWnd);
 
 	m_fontheight = ScaleY(IPP_FONTSIZE);
 	SetFont(&m_font);
