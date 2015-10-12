@@ -94,6 +94,8 @@ public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
+	virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz) override;
+
 	BOOL OnPlayStop(UINT nID);
 
 protected:

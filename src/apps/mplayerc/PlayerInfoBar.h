@@ -49,9 +49,11 @@ public:
 	void RemoveLine(CString label);
 	void RemoveAllLines();
 
+	void ScaleFont();
+
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz);
+	virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz) override;
 
 public:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);

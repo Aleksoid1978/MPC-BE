@@ -685,19 +685,59 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 		CRect(0,0,100,100), this, IDC_PLAYLIST);
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
-	m_list.InsertColumn(COL_NAME, _T("Name"), LVCFMT_LEFT, 380);
+	m_list.InsertColumn(COL_NAME, _T("Name"), LVCFMT_LEFT);
+	m_list.InsertColumn(COL_TIME, _T("Time"), LVCFMT_RIGHT);
 
-	CDC* pDC = m_list.GetDC();
-	CFont* old = pDC->SelectObject(GetFont());
-	m_nTimeColWidth = pDC->GetTextExtent(_T("000:00:00")).cx + 5;
-	pDC->SelectObject(old);
-	m_list.ReleaseDC(pDC);
-	m_list.InsertColumn(COL_TIME, _T("Time"), LVCFMT_RIGHT, m_nTimeColWidth);
+	ScaleFontInternal();
 
 	m_fakeImageList.Create(1, 16, ILC_COLOR4, 10, 10);
 	m_list.SetImageList(&m_fakeImageList, LVSIL_SMALL);
 
 	return TRUE;
+}
+
+static void GetNonClientMetrics(NONCLIENTMETRICS* ncm)
+{
+	ZeroMemory(ncm, sizeof(NONCLIENTMETRICS));
+	ncm->cbSize = sizeof(NONCLIENTMETRICS);
+	if (!IsWinVistaOrLater()) {
+		ncm->cbSize -= sizeof(ncm->iPaddedBorderWidth);
+	}
+	VERIFY(SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm->cbSize, ncm, 0));
+}
+
+static void GetMessageFont(LOGFONT* lf)
+{
+	NONCLIENTMETRICS ncm;
+	GetNonClientMetrics(&ncm);
+	*lf = ncm.lfMessageFont;
+	ASSERT(lf->lfHeight);
+}
+
+void CPlayerPlaylistBar::ScaleFontInternal()
+{
+	LOGFONT lf = { 0 };
+	GetMessageFont(&lf);
+	lf.lfHeight = AfxGetMainFrame()->ScaleY(lf.lfHeight);
+
+	m_font.DeleteObject();
+	if (m_font.CreateFontIndirect(&lf)) {
+		m_list.SetFont(&m_font);
+	}
+
+	CDC* pDC = m_list.GetDC();
+	CFont* old = pDC->SelectObject(GetFont());
+	m_nTimeColWidth = pDC->GetTextExtent(_T("000:00:00")).cx + AfxGetMainFrame()->ScaleX(5);
+	pDC->SelectObject(old);
+	m_list.ReleaseDC(pDC);
+
+	m_list.SetColumnWidth(COL_TIME, m_nTimeColWidth);
+}
+
+void CPlayerPlaylistBar::ScaleFont()
+{
+	ScaleFontInternal();
+	ResizeListColumn();
 }
 
 BOOL CPlayerPlaylistBar::PreCreateWindow(CREATESTRUCT& cs)
@@ -1773,6 +1813,7 @@ BEGIN_MESSAGE_MAP(CPlayerPlaylistBar, CSizingControlBarG)
 	ON_NOTIFY(LVN_KEYDOWN, IDC_PLAYLIST, OnLvnKeyDown)
 	ON_NOTIFY(NM_DBLCLK, IDC_PLAYLIST, OnNMDblclkList)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_PLAYLIST, OnCustomdrawList)
+	ON_WM_MEASUREITEM()
 	ON_WM_DRAWITEM()
 	ON_COMMAND_EX(ID_PLAY_PLAY, OnPlayPlay)
 	ON_NOTIFY(LVN_BEGINDRAG, IDC_PLAYLIST, OnBeginDrag)
@@ -1932,6 +1973,15 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 
 		*pResult = CDRF_SKIPDEFAULT;
 	}*/
+}
+
+void CPlayerPlaylistBar::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct)
+{
+	__super::OnMeasureItem(nIDCtl, lpMeasureItemStruct);
+	if (m_itemHeight == 0) {
+		m_itemHeight = lpMeasureItemStruct->itemHeight;
+	}
+	lpMeasureItemStruct->itemHeight = AfxGetMainFrame()->ScaleY(m_itemHeight);
 }
 
 void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)

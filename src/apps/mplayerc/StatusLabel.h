@@ -38,6 +38,7 @@ public:
 	BOOL Create(LPCTSTR lpszText, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID = 0xffff);
 
 	CFont& GetFont() {return m_font;}
+	void ScaleFont();
 
 	void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
 

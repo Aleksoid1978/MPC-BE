@@ -78,6 +78,15 @@ BOOL CPlayerSeekBar::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
+CSize CPlayerSeekBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
+{
+	CSize ret = __super::CalcFixedLayout(bStretch, bHorz);
+	ret.cy = max(ret.cy, 20);
+	ret.cy = m_pMainFrame->ScaleY(ret.cy);
+	
+	return ret;
+}
+
 void CPlayerSeekBar::Enable(bool fEnable)
 {
 	m_fEnabled = fEnable;

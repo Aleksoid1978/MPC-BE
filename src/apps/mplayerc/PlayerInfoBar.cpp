@@ -110,6 +110,16 @@ void CPlayerInfoBar::RemoveAllLines()
 	Relayout();
 }
 
+void CPlayerInfoBar::ScaleFont()
+{
+	for (size_t i = 0; i < m_labels.GetCount(); i++) {
+		m_labels[i]->ScaleFont();
+	}
+	for (size_t i = 0; i < m_infos.GetCount(); i++) {
+		m_infos[i]->ScaleFont();
+	}
+}
+
 BOOL CPlayerInfoBar::Create(CWnd* pParentWnd)
 {
 	return CDialogBar::Create(pParentWnd, IDD_PLAYERINFOBAR, WS_CHILD | WS_VISIBLE | CBRS_ALIGN_BOTTOM, IDD_PLAYERINFOBAR);
@@ -132,7 +142,7 @@ CSize CPlayerInfoBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
 	CRect r;
 	GetParent()->GetClientRect(&r);
 
-	r.bottom = r.top + m_labels.GetCount() * AfxGetMainFrame()->ScaleY(17) + (m_labels.GetCount() ? 4 : 0);
+	r.bottom = r.top + m_labels.GetCount() * AfxGetMainFrame()->ScaleY(17) + (m_labels.GetCount() ? AfxGetMainFrame()->ScaleY(2) * 2 : 0);
 
 	return r.Size();
 }
@@ -142,9 +152,9 @@ void CPlayerInfoBar::Relayout()
 	CRect r;
 	GetParent()->GetClientRect(&r);
 
-	int w = m_nFirstColWidth;
+	int w = AfxGetMainFrame()->ScaleY(m_nFirstColWidth);
 	int h = AfxGetMainFrame()->ScaleY(17);
-	int y = 2;
+	int y = AfxGetMainFrame()->ScaleY(2);
 
 	for (size_t i = 0; i < m_labels.GetCount(); i++) {
 		CDC* pDC = m_labels[i]->GetDC();
@@ -154,9 +164,10 @@ void CPlayerInfoBar::Relayout()
 		m_labels[i]->ReleaseDC(pDC);
 	}
 
+	const int sep = AfxGetMainFrame()->ScaleX(10);
 	for (size_t i = 0; i < m_labels.GetCount(); i++, y += h) {
-		m_labels[i]->MoveWindow(1, y, w - 10, h);
-		m_infos[i]->MoveWindow(w + 10, y, r.Width()-(w+10)-1, h);
+		m_labels[i]->MoveWindow(1, y, w - sep, h);
+		m_infos[i]->MoveWindow(w + sep, y, r.Width() - w - sep - 1, h);
 	}
 }
 
