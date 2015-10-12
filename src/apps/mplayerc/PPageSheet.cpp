@@ -32,7 +32,9 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd
 	, m_audio(pFG)
 	, m_bLockPage(false)
 {
-	SetTreeWidth(AfxGetMainFrame()->ScaleX(210));
+	const auto pFrame = AfxGetMainFrame();
+	int nWidth = pFrame ? pFrame->ScaleX(210) : ScaleX(210);
+	SetTreeWidth(nWidth);
 
 	AddPage(&m_player);
 	AddPage(&m_formats);
