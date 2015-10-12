@@ -24,12 +24,19 @@
 #include "MainFrm.h"
 #include "FullscreenWnd.h"
 
-#define SEEKBAR_HEIGHT			60
-#define SLIDER_BAR_HEIGHT		10
-#define SLIDER_CURSOR_HEIGHT	30
-#define SLIDER_CURSOR_WIDTH		15
-#define SLIDER_CHAP_WIDTH		4
-#define SLIDER_CHAP_HEIGHT		10
+#define SEEKBAR_HEIGHT             60
+#define SLIDER_BAR_HEIGHT          10
+#define SLIDER_CURSOR_HEIGHT       30
+#define SLIDER_CURSOR_WIDTH        15
+#define SLIDER_CHAP_HEIGHT         10
+#define SLIDER_CHAP_WIDTH          4
+
+#define SEEKBAR_HEIGHT_SCALE       ScaleY(SEEKBAR_HEIGHT)
+#define SLIDER_BAR_HEIGHT_SCALE    ScaleY(SLIDER_BAR_HEIGHT)
+#define SLIDER_CURSOR_HEIGHT_SCALE ScaleY(SLIDER_CURSOR_HEIGHT)
+#define SLIDER_CURSOR_WIDTH_SCALE  ScaleX(SLIDER_CURSOR_WIDTH)
+#define SLIDER_CHAP_HEIGHT_SCALE   ScaleY(SLIDER_CHAP_HEIGHT)
+#define SLIDER_CHAP_WIDTH_SCALE    ScaleX(SLIDER_CHAP_WIDTH)
 
 COSD::COSD(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
@@ -252,9 +259,9 @@ void COSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 	m_pWnd		= pWnd;
 	m_OSDType	= OSD_TYPE_BITMAP;
 
-	Reset();
-
 	UseCurentMonitorDPI(pWnd->GetSafeHwnd());
+
+	Reset();
 
 	UpdateBitmap();
 }
@@ -307,8 +314,8 @@ void COSD::CalcRect()
 
 		m_rectSeekBar.left			= m_rectWnd.left		+ 10;
 		m_rectSeekBar.right			= m_rectWnd.right		- 10;
-		m_rectSeekBar.top			= m_rectWnd.bottom		- SEEKBAR_HEIGHT;
-		m_rectSeekBar.bottom		= m_rectSeekBar.top		+ SEEKBAR_HEIGHT;
+		m_rectSeekBar.top			= m_rectWnd.bottom		- SEEKBAR_HEIGHT_SCALE;
+		m_rectSeekBar.bottom		= m_rectSeekBar.top		+ SEEKBAR_HEIGHT_SCALE;
 
 		m_rectFlyBar.left			= m_rectWnd.left;
 		m_rectFlyBar.right			= m_rectWnd.right;
@@ -348,18 +355,18 @@ void COSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos)
 {
 	m_rectBar.left		= rect->left  + 10;
 	m_rectBar.right		= rect->right - 10;
-	m_rectBar.top		= rect->top   + (rect->Height() - SLIDER_BAR_HEIGHT) / 2;
-	m_rectBar.bottom	= m_rectBar.top + SLIDER_BAR_HEIGHT;
+	m_rectBar.top		= rect->top   + (rect->Height() - SLIDER_BAR_HEIGHT_SCALE) / 2;
+	m_rectBar.bottom	= m_rectBar.top + SLIDER_BAR_HEIGHT_SCALE;
 
 	if (llMax == llMin) {
 		m_rectCursor.left	= m_rectBar.left;
 	} else {
-		m_rectCursor.left	= m_rectBar.left + (long)((m_rectBar.Width() - SLIDER_CURSOR_WIDTH) * llPos / (llMax-llMin));
+		m_rectCursor.left	= m_rectBar.left + (long)((m_rectBar.Width() - SLIDER_CURSOR_WIDTH_SCALE) * llPos / (llMax-llMin));
 	}
 
-	m_rectCursor.right		= m_rectCursor.left + SLIDER_CURSOR_WIDTH;
-	m_rectCursor.top		= rect->top   + (rect->Height() - SLIDER_CURSOR_HEIGHT) / 2;
-	m_rectCursor.bottom		= m_rectCursor.top + SLIDER_CURSOR_HEIGHT;
+	m_rectCursor.right		= m_rectCursor.left + SLIDER_CURSOR_WIDTH_SCALE;
+	m_rectCursor.top		= rect->top   + (rect->Height() - SLIDER_CURSOR_HEIGHT_SCALE) / 2;
+	m_rectCursor.bottom		= m_rectCursor.top + SLIDER_CURSOR_HEIGHT_SCALE;
 
 	DrawRect(rect, &m_brushBack, &m_penBorder);
 	DrawRect(&m_rectBar, &m_brushBar);
@@ -377,10 +384,10 @@ void COSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos)
 					}
 
 					CRect r;
-					r.left		= m_rectBar.left + (LONG)pos - SLIDER_CHAP_WIDTH / 2;
-					r.top		= rect->top + (rect->Height() - SLIDER_CHAP_HEIGHT) / 2;
-					r.right		= r.left + SLIDER_CHAP_WIDTH;
-					r.bottom	= r.top + SLIDER_CHAP_HEIGHT;
+					r.left		= m_rectBar.left + (LONG)pos - SLIDER_CHAP_WIDTH_SCALE / 2;
+					r.top		= rect->top + (rect->Height() - SLIDER_CHAP_HEIGHT_SCALE) / 2;
+					r.right		= r.left + SLIDER_CHAP_WIDTH_SCALE;
+					r.bottom	= r.top + SLIDER_CHAP_HEIGHT_SCALE;
 
 					DrawRect(&r, &m_brushChapter);
 				}
@@ -526,7 +533,7 @@ void COSD::InvalidateVMROSD()
 
 void COSD::UpdateSeekBarPos(CPoint point)
 {
-	m_llSeekPos = (point.x - m_rectBar.left) * (m_llSeekMax - m_llSeekMin) / (m_rectBar.Width() - SLIDER_CURSOR_WIDTH);
+	m_llSeekPos = (point.x - m_rectBar.left) * (m_llSeekMax - m_llSeekMin) / (m_rectBar.Width() - SLIDER_CURSOR_WIDTH_SCALE);
 	m_llSeekPos = max (m_llSeekPos, m_llSeekMin);
 	m_llSeekPos = min (m_llSeekPos, m_llSeekMax);
 
