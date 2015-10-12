@@ -254,6 +254,8 @@ void COSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 
 	Reset();
 
+	UseCurentMonitorDPI(pWnd->GetSafeHwnd());
+
 	UpdateBitmap();
 }
 
@@ -754,7 +756,7 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 		LOGFONT lf;
 		ZeroMemory(&lf, sizeof(lf));
 		lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-		lf.lfHeight			= m_pMainFrame->ScaleY(m_FontSize) * 10;
+		lf.lfHeight			= ScaleY(m_FontSize) * 10;
 		lf.lfQuality		= s.fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
 		wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font.GetBuffer(0));
 
