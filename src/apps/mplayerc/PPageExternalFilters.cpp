@@ -296,6 +296,7 @@ BOOL CPPageExternalFilters::OnInitDialog()
 
 	m_pFilters.RemoveAll();
 
+	m_filters.SetItemHeight(0, ScaleY(13)+3);
 	POSITION pos = s.m_filters.GetHeadPosition();
 	while (pos) {
 		CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_filters.GetNext(pos)));

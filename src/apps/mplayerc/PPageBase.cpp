@@ -105,3 +105,8 @@ BOOL CPPageBase::OnApply()
 
 	return __super::OnApply();
 }
+
+int CPPageBase::ScaleY(int y)
+{
+	return AfxGetMainFrame()->ScaleY(y);
+}

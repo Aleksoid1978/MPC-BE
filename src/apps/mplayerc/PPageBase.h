@@ -44,6 +44,8 @@ protected:
 	virtual BOOL OnSetActive();
 	virtual BOOL OnApply();
 
+	int ScaleY(int y);
+
 	DECLARE_MESSAGE_MAP()
 
 public:
