@@ -22,6 +22,7 @@
 #pragma once
 
 #include <afxwin.h>
+#include "HighDPI.h"
 #include "PPageBase.h"
 #include "PlayerListCtrl.h"
 
@@ -30,7 +31,7 @@
 
 // CPPageFormats dialog
 
-class CPPageFormats : public CPPageBase
+class CPPageFormats : public CPPageBase, public CDPI
 {
 	DECLARE_DYNAMIC(CPPageFormats)
 

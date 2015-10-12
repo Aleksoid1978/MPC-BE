@@ -631,8 +631,11 @@ BOOL CPPageFormats::OnInitDialog()
 
 	m_list.InsertColumn(COL_CATEGORY, _T("Category"), LVCFMT_LEFT);
 
+	const auto pFrame = AfxGetMainFrame();
+	int dpiY = pFrame ? pFrame->GetDPIY() : GetDPIY();
+
 	CImage onoff;
-	if (AfxGetMainFrame()->GetDPIY() < 144) {
+	if (dpiY < 144) {
 		onoff.LoadFromResource(AfxGetInstanceHandle(), IDB_ONOFF_96);
 		m_onoff.Create(12, 12, ILC_COLOR4 | ILC_MASK, 0, 3);
 	} else {
