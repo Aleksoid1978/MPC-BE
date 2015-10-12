@@ -25,6 +25,7 @@
 #include <evr9.h>
 #include <vmr9.h>
 #include <mvrInterfaces.h>
+#include "HighDPI.h"
 #include "PngImage.h"
 #include "..\..\DSUtil\DSMPropertyBag.h"
 //#include <Gdiplus.h>
@@ -59,7 +60,7 @@ enum OSD_TYPE {
 
 class CMainFrame;
 
-class COSD : public CWnd
+class COSD : public CWnd, public CDPI
 {
 public:
 	COSD(CMainFrame* pMainFrame);
