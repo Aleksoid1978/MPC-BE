@@ -187,6 +187,13 @@ private :
 	// Gdiplus::GdiplusStartupInput m_gdiplusStartupInput;
 	// ULONG_PTR m_gdiplusToken;
 
+	int SeekBarHeight      = 0;
+	int SliderBarHeight    = 0;
+	int SliderCursorHeight = 0;
+	int SliderCursorWidth  = 0 ;
+	int SliderChapHeight   = 0;
+	int SliderChapWidth    = 0;
+
 protected:
 	BOOL PreCreateWindow(CREATESTRUCT& cs);
 	BOOL PreTranslateMessage(MSG* pMsg);
