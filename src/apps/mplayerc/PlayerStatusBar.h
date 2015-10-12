@@ -60,6 +60,7 @@ public:
 
 	virtual BOOL Create(CWnd* pParentWnd);
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz);
 
 	DECLARE_MESSAGE_MAP()
 

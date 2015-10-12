@@ -1926,6 +1926,10 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 {
 	OverrideDPI(LOWORD(wParam), HIWORD(wParam));
+	m_wndInfoBar.ScaleFont();
+	m_wndStatsBar.ScaleFont();
+	m_wndPlaylistBar.ScaleFont();
+
 	MoveWindow(reinterpret_cast<RECT*>(lParam));
 	RecalcLayout();
 

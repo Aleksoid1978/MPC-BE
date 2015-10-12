@@ -56,6 +56,14 @@ BOOL CPlayerStatusBar::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
+CSize CPlayerStatusBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
+{
+	CSize ret = __super::CalcFixedLayout(bStretch, bHorz);
+	ret.cy = max(ret.cy, 24);
+	ret.cy = AfxGetMainFrame()->ScaleY(ret.cy);
+	return ret;
+}
+
 int CPlayerStatusBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CDialogBar::OnCreate(lpCreateStruct) == -1) {
