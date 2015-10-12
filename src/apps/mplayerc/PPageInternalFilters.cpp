@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include "MainFrm.h"
 #include "PPageInternalFilters.h"
 #include "ComPropertyPage.h"
 #include "../../filters/filters.h"
@@ -393,6 +394,10 @@ BOOL CPPageInternalFilters::OnInitDialog()
 	__super::OnInitDialog();
 
 	CAppSettings& s = AfxGetAppSettings();
+
+	m_listSrc.SetItemHeight(0, AfxGetMainFrame()->ScaleY(13)+3);
+	m_listVideo.SetItemHeight(0, AfxGetMainFrame()->ScaleY(13)+3);
+	m_listAudio.SetItemHeight(0, AfxGetMainFrame()->ScaleY(13)+3);
 
 	for (int i = 0; i < _countof(s_filters)-1; i++) {
 		CPPageInternalFiltersListBox* l;
