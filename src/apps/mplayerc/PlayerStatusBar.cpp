@@ -59,8 +59,7 @@ BOOL CPlayerStatusBar::PreCreateWindow(CREATESTRUCT& cs)
 CSize CPlayerStatusBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
 {
 	CSize ret = __super::CalcFixedLayout(bStretch, bHorz);
-	ret.cy = max(ret.cy, 24);
-	ret.cy = AfxGetMainFrame()->ScaleY(ret.cy);
+	ret.cy = AfxGetMainFrame()->ScaleY(13)+11; // 24
 	return ret;
 }
 
@@ -352,8 +351,8 @@ void CPlayerStatusBar::OnPaint()
 			dc.BitBlt(r.right-bm.bmWidth-1, (r.Height() - bm.bmHeight)/2, bm.bmWidth, bm.bmHeight, &memdc, 0, 0, SRCCOPY);
 		}
 	} else {
- 		CDC memdc;
- 		GetClientRect(&r);
+		CDC memdc;
+		GetClientRect(&r);
 		CBitmap m_bmPaint;
 		memdc.CreateCompatibleDC(&dc);
 		m_bmPaint.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
@@ -396,7 +395,7 @@ void CPlayerStatusBar::OnPaint()
 		memdc.SetTextColor(RGB(R,G,B));
 
 		font2.CreateFont(AfxGetMainFrame()->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
- 					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE, _T("Tahoma"));
+					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE, _T("Tahoma"));
 
 		memdc.SelectObject(&font2);
 		CString str;

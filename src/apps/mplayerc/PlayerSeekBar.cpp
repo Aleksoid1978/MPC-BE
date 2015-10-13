@@ -81,9 +81,7 @@ BOOL CPlayerSeekBar::PreCreateWindow(CREATESTRUCT& cs)
 CSize CPlayerSeekBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
 {
 	CSize ret = __super::CalcFixedLayout(bStretch, bHorz);
-	ret.cy = max(ret.cy, 20);
-	ret.cy = m_pMainFrame->ScaleY(ret.cy);
-	
+	ret.cy = m_pMainFrame->ScaleY(13)+7; // 20
 	return ret;
 }
 
@@ -425,7 +423,7 @@ void CPlayerSeekBar::OnPaint()
 						memdc.LineTo(x, rc2.bottom - 2);
 						memdc.MoveTo(x - 1, rc2.bottom - 2);
 						memdc.LineTo(x + 2, rc2.bottom - 2);
- 					}
+					}
 				}
 			}
 		}
@@ -436,7 +434,7 @@ void CPlayerSeekBar::OnPaint()
 			memdc.SetTextColor(RGB(R,G,B));
 
 			font2.CreateFont(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
- 					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE, _T("Tahoma"));
+					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE, _T("Tahoma"));
 
 			CFont* oldfont2 = memdc.SelectObject(&font2);
 			SetBkMode(memdc, TRANSPARENT);
