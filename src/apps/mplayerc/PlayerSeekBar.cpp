@@ -81,7 +81,7 @@ BOOL CPlayerSeekBar::PreCreateWindow(CREATESTRUCT& cs)
 CSize CPlayerSeekBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
 {
 	CSize ret = __super::CalcFixedLayout(bStretch, bHorz);
-	ret.cy = m_pMainFrame->ScaleY(20);
+	ret.cy = m_pMainFrame->ScaleSystemToOverrideY(ret.cy);
 	return ret;
 }
 

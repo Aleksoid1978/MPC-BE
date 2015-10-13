@@ -62,6 +62,8 @@ public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz);
 
+	void ScaleFont();
+
 	DECLARE_MESSAGE_MAP()
 
 protected:
