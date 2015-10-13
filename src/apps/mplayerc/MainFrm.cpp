@@ -1929,6 +1929,7 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 	m_wndInfoBar.ScaleFont();
 	m_wndStatsBar.ScaleFont();
 	m_wndPlaylistBar.ScaleFont();
+	m_wndStatusBar.ScaleFont();
 
 	MoveWindow(reinterpret_cast<RECT*>(lParam));
 	RecalcLayout();

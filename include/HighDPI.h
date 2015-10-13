@@ -1,5 +1,24 @@
-// CDPI class is based on an example from the article "Writing DPI-Aware Win32 Applications".
-// http://download.microsoft.com/download/1/f/e/1fe476f5-2b7a-4af1-a0ed-768454a0b5b1/Writing%20DPI%20Aware%20Applications.pdf
+/*
+ * (C) 2015 see Authors.txt
+ *
+ * This file is part of MPC-BE.
+ *
+ * MPC-BE is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MPC-BE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * CDPI class is based on an example from the article "Writing DPI-Aware Win32 Applications".
+ * http://download.microsoft.com/download/1/f/e/1fe476f5-2b7a-4af1-a0ed-768454a0b5b1/Writing%20DPI%20Aware%20Applications.pdf
+ */
 
 #pragma once
 
@@ -19,36 +38,40 @@ namespace
 class CDPI
 {
 private:
-    int _dpiX = 96;
-    int _dpiY = 96;
+    int m_dpiX  = 96;
+    int m_dpiY  = 96;
+    int m_sdpiX = 96;
+    int m_sdpiY = 96;
 
 private:
-    void _Init()
+    void Init()
     {
         HDC hdc = GetDC(NULL);
-        if (hdc)
-        {
-            _dpiX = GetDeviceCaps(hdc, LOGPIXELSX);
-            _dpiY = GetDeviceCaps(hdc, LOGPIXELSY);
+        if (hdc) {
+            m_dpiX = m_sdpiX = GetDeviceCaps(hdc, LOGPIXELSX);
+            m_dpiY = m_sdpiY = GetDeviceCaps(hdc, LOGPIXELSY);
             ReleaseDC(NULL, hdc);
         }
     }
 
 public:
-    CDPI() { _Init(); }
+    CDPI() { Init(); }
 
     // Get screen DPI.
-    int GetDPIX() { return _dpiX; }
-    int GetDPIY() { return _dpiY; }
+    int GetDPIX() const { return m_dpiX; }
+    int GetDPIY() const { return m_dpiY; }
 
     // Convert between raw pixels and relative pixels.
-    int ScaleX(int x) { return MulDiv(x, _dpiX, 96); }
-    int ScaleY(int y) { return MulDiv(y, _dpiY, 96); }
-    int UnscaleX(int x) { return MulDiv(x, 96, _dpiX); }
-    int UnscaleY(int y) { return MulDiv(y, 96, _dpiY); }
+    inline int ScaleX(int x) const { return MulDiv(x, m_dpiX, 96); }
+    inline int ScaleY(int y) const { return MulDiv(y, m_dpiY, 96); }
+    inline int UnscaleX(int x) const { return MulDiv(x, 96, m_dpiX); }
+    inline int UnscaleY(int y) const { return MulDiv(y, 96, m_dpiY); }
+
+    inline int ScaleSystemToOverrideX(int x) const { return MulDiv(x, m_dpiX, m_sdpiX); }
+    inline int ScaleSystemToOverrideY(int y) const { return MulDiv(y, m_dpiY, m_sdpiY); }
 
     // Scale rectangle from raw pixels to relative pixels.
-    void ScaleRect(__inout RECT *pRect)
+    inline void ScaleRect(__inout RECT *pRect)
     {
         pRect->left = ScaleX(pRect->left);
         pRect->right = ScaleX(pRect->right);
@@ -57,7 +80,7 @@ public:
     }
 
     // Convert a point size (1/72 of an inch) to raw pixels.
-    int PointsToPixels(int pt) { return MulDiv(pt, _dpiY, 72); }
+    inline int PointsToPixels(int pt) const { return MulDiv(pt, m_dpiY, 72); }
 
 protected:
     void UseCurentMonitorDPI(HWND hWindow)
@@ -82,8 +105,8 @@ protected:
             if (pGetDpiForMonitor) {
                 UINT dpix, dpiy;
                 if (S_OK == pGetDpiForMonitor(MonitorFromWindow(hWindow, MONITOR_DEFAULTTONEAREST), MDT_EFFECTIVE_DPI, &dpix, &dpiy)) {
-                    _dpiX = dpix;
-                    _dpiY = dpiy;
+                    m_dpiX = dpix;
+                    m_dpiY = dpiy;
                 }
             }
         }
@@ -91,7 +114,7 @@ protected:
 
     void OverrideDPI(int dpix, int dpiy)
     {
-        _dpiX = dpix;
-        _dpiY = dpiy;
+        m_dpiX = dpix;
+        m_dpiY = dpiy;
     }
 };
