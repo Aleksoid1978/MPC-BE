@@ -63,9 +63,7 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 		LOGFONT lf;
 		memset(&lf, 0, sizeof(lf));
 		_tcscpy_s(lf.lfFaceName, face);
-		HDC hDC = ::GetDC(0);
 		lf.lfHeight = -PointsToPixels(height);
-		::ReleaseDC(0, hDC);
 		lf.lfWeight = FW_NORMAL;
 		lf.lfCharSet = DEFAULT_CHARSET;
 		if (!m_font.CreateFontIndirect(&lf)) {

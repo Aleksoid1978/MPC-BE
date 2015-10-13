@@ -394,9 +394,9 @@ BOOL CPPageInternalFilters::OnInitDialog()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m_listSrc.SetItemHeight(0, ScaleY(13)+3);
-	m_listVideo.SetItemHeight(0, ScaleY(13)+3);
-	m_listAudio.SetItemHeight(0, ScaleY(13)+3);
+	m_listSrc.SetItemHeight(0, ScaleY(13)+3);   // 16 without scale
+	m_listVideo.SetItemHeight(0, ScaleY(13)+3); // 16 without scale
+	m_listAudio.SetItemHeight(0, ScaleY(13)+3); // 16 without scale
 
 	for (int i = 0; i < _countof(s_filters)-1; i++) {
 		CPPageInternalFiltersListBox* l;
