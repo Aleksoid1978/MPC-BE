@@ -67,8 +67,8 @@ public:
     inline int UnscaleX(int x) const { return MulDiv(x, 96, m_dpiX); }
     inline int UnscaleY(int y) const { return MulDiv(y, 96, m_dpiY); }
 
-    inline int ScaleSystemToOverrideX(int x) const { return MulDiv(x, m_dpiX, m_sdpiX); }
-    inline int ScaleSystemToOverrideY(int y) const { return MulDiv(y, m_dpiY, m_sdpiY); }
+    inline int ScaleSystemToMonitorX(int x) const { return MulDiv(x, m_dpiX, m_sdpiX); }
+    inline int ScaleSystemToMonitorY(int y) const { return MulDiv(y, m_dpiY, m_sdpiY); }
 
     // Scale rectangle from raw pixels to relative pixels.
     inline void ScaleRect(__inout RECT *pRect)

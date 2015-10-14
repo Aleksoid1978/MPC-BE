@@ -718,7 +718,7 @@ void CPlayerPlaylistBar::ScaleFontInternal()
 {
 	LOGFONT lf = { 0 };
 	GetMessageFont(&lf);
-	lf.lfHeight = AfxGetMainFrame()->ScaleSystemToOverrideY(lf.lfHeight);
+	lf.lfHeight = AfxGetMainFrame()->ScaleSystemToMonitorY(lf.lfHeight);
 
 	m_font.DeleteObject();
 	if (m_font.CreateFontIndirect(&lf)) {

@@ -59,7 +59,7 @@ BOOL CPlayerStatusBar::PreCreateWindow(CREATESTRUCT& cs)
 CSize CPlayerStatusBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
 {
 	CSize ret = __super::CalcFixedLayout(bStretch, bHorz);
-	ret.cy = AfxGetMainFrame()->ScaleSystemToOverrideY(ret.cy);
+	ret.cy = AfxGetMainFrame()->ScaleSystemToMonitorY(ret.cy);
 	return ret;
 }
 
