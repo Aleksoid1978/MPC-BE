@@ -27,7 +27,7 @@
 #include <psapi.h>
 #include <string>
 #include <atlimage.h>
-#include "MainFrm.h"
+#include <HighDPI.h>
 
 
 // CPPageFormats dialog
@@ -631,8 +631,16 @@ BOOL CPPageFormats::OnInitDialog()
 
 	m_list.InsertColumn(COL_CATEGORY, _T("Category"), LVCFMT_LEFT);
 
-	const auto pFrame = AfxGetMainFrame();
-	int dpiY = pFrame ? pFrame->GetDPIY() : GetDPIY();
+	int dpiY = 96;
+
+	if (CDPI* pDpi = dynamic_cast<CDPI*>(AfxGetMainWnd())) {
+		dpiY = pDpi->GetDPIY();
+	} else {
+		// this panel can be created without the main window.
+		pDpi = DNew CDPI();
+		dpiY = pDpi->GetDPIY();
+		delete pDpi;
+	}
 
 	CImage onoff;
 	if (dpiY < 144) {
