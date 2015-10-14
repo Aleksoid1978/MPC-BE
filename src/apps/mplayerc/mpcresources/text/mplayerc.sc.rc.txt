@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"关于"
 7		"MPC-BE"
 8		"版权所有 © 2002-2015 请查看 Authors.txt"
@@ -278,7 +278,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
 22		"使用时间工具提示:"
 24		"在进度条上显示文件名"
 25		"搜索时显示预览"
-26		"Size relative to screen width:"
+26		"相对于屏幕宽度的缩略图大小："
 29		"显示章节标记"
 30		"全屏模式时启用悬浮工具条"
 31		"屏幕显示"

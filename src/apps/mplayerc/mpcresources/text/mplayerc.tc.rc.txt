@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"關於"
 7		"MPC-BE"
 8		"Copyright © 2002-2015 詳見 Authors.txt 檔案"
@@ -278,7 +278,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
 22		"使用時間工具提示:"
 24		"搜尋列顯示檔案名稱"
 25		"搜尋列顯示預覽縮圖"
-26		"Size relative to screen width:"
+26		"相對於螢幕寬度的縮圖大小："
 29		"搜尋列顯示章節標籤"
 30		"使用浮動工具列 (flybar)"
 31		"OSD"
