@@ -459,6 +459,8 @@ void CPPageAudio::OnTimeShiftCheck()
 		m_edtTimeShift.EnableWindow(FALSE);
 		m_spnTimeShift.EnableWindow(FALSE);
 	}
+
+	SetModified();
 }
 
 void CPPageAudio::OnBnClickedSoundProcessingDefault()
