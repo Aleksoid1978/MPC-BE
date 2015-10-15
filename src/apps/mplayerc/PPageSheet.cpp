@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include "PPageSheet.h"
-#include "MainFrm.h"
+#include <HighDPI.h>
 
 // CPPageSheet
 
@@ -32,8 +32,17 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd
 	, m_audio(pFG)
 	, m_bLockPage(false)
 {
-	const auto pFrame = AfxGetMainFrame();
-	int nWidth = pFrame ? pFrame->ScaleX(210) : ScaleX(210);
+	int nWidth = 210;
+
+	if (CDPI* pDpi = dynamic_cast<CDPI*>(AfxGetMainWnd())) {
+		nWidth = pDpi->ScaleX(nWidth);
+	} else {
+		// this panel can be created without the main window.
+		pDpi = DNew CDPI();
+		nWidth = pDpi->ScaleX(nWidth);
+		delete pDpi;
+	}
+
 	SetTreeWidth(nWidth);
 
 	AddPage(&m_player);
