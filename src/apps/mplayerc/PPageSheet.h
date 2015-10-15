@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "HighDPI.h"
 #include "PPagePlayer.h"
 #include "PPageFormats.h"
 #include "PPageAccelTbl.h"
@@ -63,7 +62,7 @@ protected:
 
 // CPPageSheet
 
-class CPPageSheet : public TreePropSheet::CTreePropSheet, public CDPI
+class CPPageSheet : public TreePropSheet::CTreePropSheet
 {
 	DECLARE_DYNAMIC(CPPageSheet)
 
