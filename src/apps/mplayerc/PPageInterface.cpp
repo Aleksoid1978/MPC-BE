@@ -297,7 +297,7 @@ void CPPageInterface::OnCancel()
 
 void CPPageInterface::ApplyOSDTransparent()
 {
-	auto pFrame	= AfxGetMainFrame();
+	auto pFrame = AfxGetMainFrame();
 	if (pFrame->m_OSD) {
 		CAppSettings& s = AfxGetAppSettings();
 
@@ -308,7 +308,7 @@ void CPPageInterface::ApplyOSDTransparent()
 
 void CPPageInterface::OnThemeChange()
 {
-    auto pFrame		= AfxGetMainFrame();
+	auto pFrame		= AfxGetMainFrame();
 	HWND wndToolBar	= AfxGetMainFrame()->m_hWnd_toolbar;
 
 	if (::IsWindow(wndToolBar)) {
