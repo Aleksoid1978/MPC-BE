@@ -99,7 +99,7 @@ void CPPageBase::OnDestroy()
 
 BOOL CPPageBase::OnApply()
 {
-	if (auto pMainFrame = AfxGetMainFrame()) {
+	if (auto pMainFrame = AfxFindMainFrame()) {
 		pMainFrame->PostMessage(WM_SAVESETTINGS);
 	}
 

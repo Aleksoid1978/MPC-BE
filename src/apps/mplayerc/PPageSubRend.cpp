@@ -169,7 +169,7 @@ BOOL CPPageSubRend::OnApply()
 		s.m_RenderersSettings.bSPAllowDropSubPic = !!m_bbSPAllowDropSubPic;
 		s.m_RenderersSettings.bSPCAllowAnimationWhenBuffering = !!m_bSPCAllowAnimationWhenBuffering;
 
-		if (auto pFrame = AfxGetMainFrame()) {
+		if (auto pFrame = AfxFindMainFrame()) {
 			pFrame->UpdateSubtitle();
 		}
 	}

@@ -250,7 +250,7 @@ void CFavoriteOrganizeDlg::OnLvnEndlabeleditList2(NMHDR* pNMHDR, LRESULT* pResul
 
 void CFavoriteOrganizeDlg::PlayFavorite(int nItem)
 {
-	if (auto pFrame = AfxGetMainFrame()) {
+	if (auto pFrame = AfxFindMainFrame()) {
 		switch (m_tab.GetCurSel()) {
 			case 0: // Files
 				pFrame->PlayFavoriteFile(m_sl[0].GetAt((POSITION)m_list.GetItemData(nItem)));

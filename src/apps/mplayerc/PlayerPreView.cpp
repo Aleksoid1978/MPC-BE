@@ -287,8 +287,7 @@ void CPreView::OnPaint()
 void CPreView::OnShowWindow(BOOL bShow, UINT nStatus)
 {
 	if (bShow) {
-		auto pFrame = AfxGetMainFrame();
-		if (pFrame) {
+		if (auto pFrame = AfxFindMainFrame()) {
 			pFrame->SetPreviewVideoPosition();
 		}
 	}
