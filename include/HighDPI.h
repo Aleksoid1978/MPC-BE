@@ -64,8 +64,11 @@ public:
     // Convert between raw pixels and relative pixels.
     inline int ScaleX(int x) const { return MulDiv(x, m_dpiX, 96); }
     inline int ScaleY(int y) const { return MulDiv(y, m_dpiY, 96); }
-    inline int UnscaleX(int x) const { return MulDiv(x, 96, m_dpiX); }
-    inline int UnscaleY(int y) const { return MulDiv(y, 96, m_dpiY); }
+    inline int ScaleFloorX(int x) const { return x * m_dpiX / 96; }
+    inline int ScaleFloorY(int y) const { return y * m_dpiY / 96; }
+
+	inline int TransposeXtoY(int x) const { return MulDiv(x, m_dpiY, m_dpiX); }
+	inline int TransposeYtoX(int y) const { return MulDiv(y, m_dpiX, m_dpiY); }
 
     inline int ScaleSystemToMonitorX(int x) const { return MulDiv(x, m_dpiX, m_sdpiX); }
     inline int ScaleSystemToMonitorY(int y) const { return MulDiv(y, m_dpiY, m_sdpiY); }

@@ -181,8 +181,11 @@ CRect CPlayerSeekBar::GetChannelRect()
 	if (AfxGetAppSettings().bUseDarkTheme) {
 		//r.DeflateRect(1,1,1,1);
 	} else {
-		r.DeflateRect(8, 9, 9, 0);
-		r.bottom = r.top + 5;
+		int dx = m_pMainFrame->ScaleFloorX(8);
+		int dy1 = m_pMainFrame->ScaleFloorY(7) + 2;
+		int dy2 = m_pMainFrame->ScaleFloorY(5) + 1;
+
+		r.DeflateRect(dx, dy1, dx, dy2);
 	}
 
 	return r;
@@ -196,10 +199,12 @@ CRect CPlayerSeekBar::GetThumbRect()
 	int y = r.CenterPoint().y;
 
 	if (AfxGetAppSettings().bUseDarkTheme) {
-		 r.SetRect(x, y - 2, x + 3, y + 3);
+		r.SetRect(x, y - 2, x + 3, y + 3);
 	} else {
-		r.SetRect(x, y, x, y);
-		r.InflateRect(6, 7, 7, 8);
+		int dx = m_pMainFrame->ScaleFloorY(7);
+		int dy = m_pMainFrame->ScaleFloorY(5);
+
+		r.SetRect(x + 1 - dx, r.top - dy, x + dx, r.bottom + dy);
 	}
 
 	return r;
@@ -209,8 +214,13 @@ CRect CPlayerSeekBar::GetInnerThumbRect()
 {
 	CRect r = GetThumbRect();
 
-	bool fEnabled = m_fEnabled && m_stop > 0;
-	r.DeflateRect(3, fEnabled ? 5 : 4, 3, fEnabled ? 5 : 4);
+	int dx = m_pMainFrame->ScaleFloorX(4) - 1;
+	int dy = m_pMainFrame->ScaleFloorY(5);
+	if (!m_fEnabled || m_stop <= 0) {
+		dy -= 1;
+	}
+
+	r.DeflateRect(dx, dy, dx, dy);
 
 	return r;
 }
@@ -489,8 +499,9 @@ void CPlayerSeekBar::OnPaint()
 
 		// thumb
 		{
-			CRect r = GetThumbRect(), r2 = GetInnerThumbRect();
-			CRect rt = r, rit = r2;
+			CRect r(GetThumbRect());
+			CRect ri(GetInnerThumbRect());
+			CRect rt = r, rit = ri;
 
 			dc.Draw3dRect(&r, light, 0);
 			r.DeflateRect(0, 0, 1, 1);
@@ -519,7 +530,7 @@ void CPlayerSeekBar::OnPaint()
 				dc.SetPixel(r.CenterPoint().x, r.bottom, 0);
 			}
 
-			dc.SetPixel(r.CenterPoint().x + 5, r.top - 4, bkg);
+			//dc.SetPixel(r.CenterPoint().x + 5, r.top - 4, bkg); //?
 
 			{
 				CRgn rgn1, rgn2;
