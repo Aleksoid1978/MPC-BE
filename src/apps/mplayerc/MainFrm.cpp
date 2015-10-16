@@ -4059,6 +4059,13 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	m_nCurSubtitle		= -1;
 	m_lSubtitleShift	= 0;
+	
+	if (m_pDVS) {
+		int SubtitleDelay, SubtitleSpeedMul, SubtitleSpeedDiv;
+		if (SUCCEEDED(m_pDVS->get_SubtitleTiming(&SubtitleDelay, &SubtitleSpeedMul, &SubtitleSpeedDiv))) {
+			m_pDVS->put_SubtitleTiming(0, SubtitleSpeedMul, SubtitleSpeedDiv);
+		}
+	}
 	if (m_pCAP) {
 		m_pCAP->SetSubtitleDelay(0);
 	}
