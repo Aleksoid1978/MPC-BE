@@ -237,7 +237,7 @@ HRESULT CBaseSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		const auto duration = m_queue.GetDuration();
 
 		if (duration < m_maxQueueDuration && count < m_maxQueueCount // the buffer is not full
-				|| pSplitter->IsSomePinDrying() // some pins should not be empty
+				|| duration < 60*10000000 && count < 60*1200 && pSplitter->IsSomePinDrying() // some pins should not be empty, but to a certain limit
 				) {
 			break;
 		}
