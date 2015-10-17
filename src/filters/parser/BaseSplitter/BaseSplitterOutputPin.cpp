@@ -232,9 +232,16 @@ HRESULT CBaseSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 
 	CBaseSplitterFilter *pSplitter = static_cast<CBaseSplitterFilter*>(m_pFilter);
 
-	while (S_OK == m_hrDeliver &&
-			(m_queue.GetCount() >= 3 && m_queue.GetDuration() > m_maxQueueDuration || m_queue.GetCount() >= m_maxQueueCount) &&
-			!pSplitter->IsSomePinDrying()) {
+	while (S_OK == m_hrDeliver) {
+		const auto count = m_queue.GetCount();
+		const auto duration = m_queue.GetDuration();
+
+		if (duration < m_maxQueueDuration && count < m_maxQueueCount // the buffer is not full
+				|| pSplitter->IsSomePinDrying() // some pins should not be empty
+				) {
+			break;
+		}
+
 		Sleep(10);
 	}
 
