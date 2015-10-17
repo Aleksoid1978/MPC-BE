@@ -230,9 +230,11 @@ HRESULT CBaseSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		return S_FALSE;
 	}
 
-	while (S_OK == m_hrDeliver && (
-			m_queue.GetCount() >= 3 && m_queue.GetDuration() > m_maxQueueDuration ||
-			m_queue.GetCount() >= m_maxQueueCount)) {
+	CBaseSplitterFilter *pSplitter = static_cast<CBaseSplitterFilter*>(m_pFilter);
+
+	while (S_OK == m_hrDeliver &&
+			(m_queue.GetCount() >= 3 && m_queue.GetDuration() > m_maxQueueDuration || m_queue.GetCount() >= m_maxQueueCount) &&
+			!pSplitter->IsSomePinDrying()) {
 		Sleep(10);
 	}
 

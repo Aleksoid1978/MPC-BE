@@ -121,6 +121,8 @@ public:
 	CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid);
 	virtual ~CBaseSplitterFilter();
 
+	bool IsSomePinDrying();
+
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
