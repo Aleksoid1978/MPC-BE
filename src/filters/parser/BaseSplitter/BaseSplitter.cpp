@@ -55,6 +55,19 @@ CBaseSplitterFilter::~CBaseSplitterFilter()
 	CAMThread::Close();
 }
 
+bool CBaseSplitterFilter::IsSomePinDrying()
+{
+	POSITION pos = m_pActivePins.GetHeadPosition();
+	while (pos) {
+		CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
+		if (!pPin->IsDiscontinuous() && pPin->QueueCount() == 0) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 STDMETHODIMP CBaseSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	CheckPointer(ppv, E_POINTER);
