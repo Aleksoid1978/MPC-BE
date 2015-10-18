@@ -1830,14 +1830,29 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 						break;
 					}
 				}
-			} else if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO) {
+			}
+			else if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO) {
 				if (!MPEG2CheckCompatibility(m_pAVCtx)) {
 					break;
 				}
-			} else if ((m_nCodecId == AV_CODEC_ID_WMV3 || m_nCodecId == AV_CODEC_ID_VC1) && m_pAVCtx->profile == FF_PROFILE_VC1_COMPLEX) {
-				break;
-			} else if (m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile > FF_PROFILE_HEVC_MAIN_10) {
-				break;
+			}
+			else if (m_nCodecId == AV_CODEC_ID_WMV3 || m_nCodecId == AV_CODEC_ID_VC1) {
+				if (m_pAVCtx->profile == FF_PROFILE_VC1_COMPLEX) {
+					break;
+				}
+			}
+			else if (m_nCodecId == AV_CODEC_ID_HEVC) {
+				if (m_pAVCtx->profile > FF_PROFILE_HEVC_MAIN_10) {
+					break;
+				}
+				if (const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)) {
+					int depth = pfdesc->comp->depth;
+					if (depth != 8 && depth != 10) {
+						break;
+					}
+				} else {
+					break;
+				}
 			}
 
 			m_bDXVACompatible = true;
