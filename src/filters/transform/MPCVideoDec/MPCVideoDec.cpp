@@ -1845,12 +1845,11 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 				if (m_pAVCtx->profile > FF_PROFILE_HEVC_MAIN_10) {
 					break;
 				}
-				if (const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)) {
-					int depth = pfdesc->comp->depth;
-					if (depth != 8 && depth != 10) {
-						break;
-					}
-				} else {
+
+				// additional checks for older versions of x265
+				int depth = GetLumaBits(m_pAVCtx->pix_fmt);
+				CString chroma = GetChromaSubsamplingStr(m_pAVCtx->pix_fmt);
+				if (depth != 8 && depth != 10 || chroma != _T("4:2:0")) {
 					break;
 				}
 			}
