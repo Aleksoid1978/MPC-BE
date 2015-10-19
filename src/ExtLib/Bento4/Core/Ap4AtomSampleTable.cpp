@@ -43,6 +43,7 @@
 #include "Ap4Sample.h"
 #include "Ap4SampleEntry.h"
 #include "Ap4Atom.h"
+#include "Ap4Utils.h"
 
 /*----------------------------------------------------------------------
 |       AP4_AtomSampleTable::AP4_AtomSampleTable
@@ -266,18 +267,20 @@ AP4_AtomSampleTable::SetSampleSize(AP4_Ordinal sample, AP4_Size size)
 }
 
 /*----------------------------------------------------------------------
-|       AP4_AtomSampleTable::GetSample
+|       AP4_AtomSampleTable::GetSampleIndexForTimeStamp
 +---------------------------------------------------------------------*/
 AP4_Result 
-AP4_AtomSampleTable::GetSampleIndexForTimeStamp(AP4_TimeStamp ts, 
+AP4_AtomSampleTable::GetSampleIndexForTimeStamp(AP4_TimeStamp ts,
                                                 AP4_Ordinal& index)
 {
-    return m_SttsAtom ? m_SttsAtom->GetSampleIndexForTimeStamp(ts, index) 
+    AP4_SI64 si_ts = ts;
+    si_ts = MAX(0, si_ts - m_tsDelay);
+    return m_SttsAtom ? m_SttsAtom->GetSampleIndexForTimeStamp(si_ts, index) 
                       : AP4_FAILURE;
 }
 
 /*----------------------------------------------------------------------
-|       AP4_AtomSampleTable::SetTimeShift
+|       AP4_AtomSampleTable::SetTimeDelay
 +---------------------------------------------------------------------*/
 AP4_Result
 AP4_AtomSampleTable::SetTimeDelay(AP4_SI64 tsDelay)
