@@ -25,6 +25,7 @@
 #define YOUTUBE_MP_URL	"://www.youtube.com/"
 #define YOUTUBE_PL_URL	_T("youtube.com/playlist?")
 #define YOUTUBE_URL		_T("youtube.com/watch?")
+#define YOUTUBE_URL_V	_T("youtube.com/v/")
 #define YOUTU_BE_URL	_T("youtu.be/")
 
 #define ENABLE_YOUTUBE_3D	0

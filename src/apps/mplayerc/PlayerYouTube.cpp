@@ -116,7 +116,7 @@ bool PlayerYouTubeCheck(CString url)
 	CString tmp_fn(url);
 	tmp_fn.MakeLower();
 
-	if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1) {
+	if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTUBE_URL_V) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1) {
 		return true;
 	}
 
@@ -196,6 +196,8 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 			if (link.Find(YOUTU_BE_URL) != -1) {
 				link.Replace(YOUTU_BE_URL, YOUTUBE_URL);
 				link.Replace(_T("watch?"), _T("watch?v="));
+			} else if (link.Find(YOUTUBE_URL_V) != -1) {
+				link.Replace(_T("v/"), _T("watch?v="));
 			}
 
 			videoId = RegExpParse(link, L"v={[-a-zA-Z0-9_]+}");
