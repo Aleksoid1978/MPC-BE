@@ -1777,7 +1777,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	FFGetFrameProps(m_pAVCtx, m_pFrame, m_nOutputWidth, m_nOutputHeight);
 	m_PixelFormat = m_pAVCtx->pix_fmt;
 
-	m_bHEVC10bit = (m_nCodecId == AV_CODEC_ID_HEVC && (m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10 || GetPixFmtType(m_PixelFormat) == PFType_YUV420Px));
+	const int depth = GetLumaBits(m_pAVCtx->pix_fmt);
+	m_bHEVC10bit = (m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10 && depth == 10);
 
 	if (bChangeType && IsDXVASupported()) {
 		do {
@@ -1847,7 +1848,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 				}
 
 				// additional checks for older versions of x265
-				int depth = GetLumaBits(m_pAVCtx->pix_fmt);
 				CString chroma = GetChromaSubsamplingStr(m_pAVCtx->pix_fmt);
 				if (depth != 8 && depth != 10 || chroma != _T("4:2:0")) {
 					break;
