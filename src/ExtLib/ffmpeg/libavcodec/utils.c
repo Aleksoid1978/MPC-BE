@@ -409,7 +409,7 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
         break;
     }
 
-    if (s->codec_id == AV_CODEC_ID_IFF_ILBM || s->codec_id == AV_CODEC_ID_IFF_BYTERUN1) {
+    if (s->codec_id == AV_CODEC_ID_IFF_ILBM) {
         w_align = FFMAX(w_align, 8);
     }
 
@@ -1146,7 +1146,7 @@ int attribute_align_arg ff_codec_open2_recursive(AVCodecContext *avctx, const AV
     int ret = 0;
 
     // ==> Start patch MPC
-    ff_unlock_avcodec(avctx);
+    ff_unlock_avcodec(avctx, codec);
     // ==> End patch MPC
 
     ret = avcodec_open2(avctx, codec, options);
@@ -1309,7 +1309,7 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
 
     if (CONFIG_FRAME_THREAD_ENCODER) {
         // ==> Start patch MPC
-        ff_unlock_avcodec(avctx); //we will instanciate a few encoders thus kick the counter to prevent false detection of a problem
+        ff_unlock_avcodec(avctx, codec); //we will instanciate a few encoders thus kick the counter to prevent false detection of a problem
         // ==> End patch MPC
         ret = ff_frame_thread_encoder_init(avctx, options ? *options : NULL);
         ff_lock_avcodec(avctx, codec);
@@ -1558,7 +1558,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
 end:
     // ==> Start patch MPC
-    ff_unlock_avcodec(avctx);
+    ff_unlock_avcodec(avctx, codec);
     // ==> End patch MPC
     if (options) {
         av_dict_free(options);
@@ -3075,6 +3075,7 @@ int av_get_audio_frame_duration(AVCodecContext *avctx, int frame_bytes)
             switch (id) {
             case AV_CODEC_ID_ADPCM_AFC:
                 return frame_bytes / (9 * ch) * 16;
+            case AV_CODEC_ID_ADPCM_PSX:
             case AV_CODEC_ID_ADPCM_DTK:
                 return frame_bytes / (16 * ch) * 28;
             case AV_CODEC_ID_ADPCM_4XM:
@@ -3279,13 +3280,15 @@ int av_lockmgr_register(int (*cb)(void **mutex, enum AVLockOp op))
 // ==> Start patch MPC
 int ff_lock_avcodec(AVCodecContext *log_ctx, const AVCodec *codec)
 {
+    if (codec->caps_internal & FF_CODEC_CAP_INIT_THREADSAFE || !codec->init)
+        return 0;
+
     if (lockmgr_cb) {
         if ((*lockmgr_cb)(&codec_mutex, AV_LOCK_OBTAIN))
             return -1;
     }
 
-    if (avpriv_atomic_int_add_and_fetch(&log_ctx->entangled_thread_counter, 1) != 1 &&
-        !(codec->caps_internal & FF_CODEC_CAP_INIT_THREADSAFE)) {
+    if (avpriv_atomic_int_add_and_fetch(&log_ctx->entangled_thread_counter, 1) != 1) {
         av_log(log_ctx, AV_LOG_ERROR,
                "Insufficient thread locking. At least %d threads are "
                "calling avcodec_open2() at the same time right now.\n",
@@ -3293,7 +3296,7 @@ int ff_lock_avcodec(AVCodecContext *log_ctx, const AVCodec *codec)
         if (!lockmgr_cb)
             av_log(log_ctx, AV_LOG_ERROR, "No lock manager is set, please see av_lockmgr_register()\n");
         log_ctx->ff_avcodec_locked = 1;
-        ff_unlock_avcodec(log_ctx);
+        ff_unlock_avcodec(log_ctx, codec);
         return AVERROR(EINVAL);
     }
     av_assert0(!log_ctx->ff_avcodec_locked);
@@ -3303,8 +3306,11 @@ int ff_lock_avcodec(AVCodecContext *log_ctx, const AVCodec *codec)
 // ==> End patch MPC
 
 // ==> Start patch MPC
-int ff_unlock_avcodec(AVCodecContext *log_ctx)
+int ff_unlock_avcodec(AVCodecContext *log_ctx, const AVCodec *codec)
 {
+    if (codec->caps_internal & FF_CODEC_CAP_INIT_THREADSAFE || !codec->init)
+        return 0;
+
     av_assert0(log_ctx->ff_avcodec_locked);
     log_ctx->ff_avcodec_locked = 0;
     avpriv_atomic_int_add_and_fetch(&log_ctx->entangled_thread_counter, -1);

@@ -161,6 +161,7 @@ typedef struct PredictorState {
 typedef struct LongTermPrediction {
     int8_t present;
     int16_t lag;
+    int coef_idx;
     INTFLOAT coef;
     int8_t used[MAX_LTP_LONG_SFB];
 } LongTermPrediction;
@@ -252,6 +253,7 @@ typedef struct SingleChannelElement {
     INTFLOAT sf[120];                               ///< scalefactors
     int sf_idx[128];                                ///< scalefactor indices (used by encoder)
     uint8_t zeroes[128];                            ///< band is not coded (used by encoder)
+    uint8_t can_pns[128];                           ///< band is allowed to PNS (informative)
     float  is_ener[128];                            ///< Intensity stereo pos (used by encoder)
     float pns_ener[128];                            ///< Noise energy values (used by encoder)
     DECLARE_ALIGNED(32, INTFLOAT, pcoeffs)[1024];   ///< coefficients for IMDCT, pristine
@@ -259,6 +261,7 @@ typedef struct SingleChannelElement {
     DECLARE_ALIGNED(32, INTFLOAT, saved)[1536];     ///< overlap
     DECLARE_ALIGNED(32, INTFLOAT, ret_buf)[2048];   ///< PCM output buffer
     DECLARE_ALIGNED(16, INTFLOAT, ltp_state)[3072]; ///< time signal for LTP
+    DECLARE_ALIGNED(32, AAC_FLOAT, lcoeffs)[1024];  ///< MDCT of LTP coefficients (used by encoder)
     DECLARE_ALIGNED(32, AAC_FLOAT, prcoeffs)[1024]; ///< Main prediction coefs (used by encoder)
     PredictorState predictor_state[MAX_PREDICTORS];
     INTFLOAT *ret;                                  ///< PCM output
