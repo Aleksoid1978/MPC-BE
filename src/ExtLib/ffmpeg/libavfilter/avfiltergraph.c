@@ -317,18 +317,15 @@ static int filter_query_formats(AVFilterContext *ctx)
         sanitize_channel_layouts(ctx, ctx->outputs[i]->in_channel_layouts);
 
     formats = ff_all_formats(type);
-    if (!formats)
-        return AVERROR(ENOMEM);
-    ff_set_common_formats(ctx, formats);
+    if ((ret = ff_set_common_formats(ctx, formats)) < 0)
+        return ret;
     if (type == AVMEDIA_TYPE_AUDIO) {
         samplerates = ff_all_samplerates();
-        if (!samplerates)
-            return AVERROR(ENOMEM);
-        ff_set_common_samplerates(ctx, samplerates);
+        if ((ret = ff_set_common_samplerates(ctx, samplerates)) < 0)
+            return ret;
         chlayouts = ff_all_channel_layouts();
-        if (!chlayouts)
-            return AVERROR(ENOMEM);
-        ff_set_common_channel_layouts(ctx, chlayouts);
+        if ((ret = ff_set_common_channel_layouts(ctx, chlayouts)) < 0)
+            return ret;
     }
     return 0;
 }
@@ -728,7 +725,7 @@ static int pick_format(AVFilterLink *link, AVFilterLink *ref)
     return 0;
 }
 
-#define REDUCE_FORMATS(fmt_type, list_type, list, var, nb, add_format) \
+#define REDUCE_FORMATS(fmt_type, list_type, list, var, nb, add_format, unref_format) \
 do {                                                                   \
     for (i = 0; i < filter->nb_inputs; i++) {                          \
         AVFilterLink *link = filter->inputs[i];                        \
@@ -748,7 +745,8 @@ do {                                                                   \
             fmts = out_link->in_ ## list;                              \
                                                                        \
             if (!out_link->in_ ## list->nb) {                          \
-                add_format(&out_link->in_ ##list, fmt);                \
+                if ((ret = add_format(&out_link->in_ ##list, fmt)) < 0)\
+                    return ret;                                        \
                 ret = 1;                                               \
                 break;                                                 \
             }                                                          \
@@ -769,9 +767,9 @@ static int reduce_formats_on_filter(AVFilterContext *filter)
     int i, j, k, ret = 0;
 
     REDUCE_FORMATS(int,      AVFilterFormats,        formats,         formats,
-                   nb_formats, ff_add_format);
+                   nb_formats, ff_add_format, ff_formats_unref);
     REDUCE_FORMATS(int,      AVFilterFormats,        samplerates,     formats,
-                   nb_formats, ff_add_format);
+                   nb_formats, ff_add_format, ff_formats_unref);
 
     /* reduce channel layouts */
     for (i = 0; i < filter->nb_inputs; i++) {
@@ -795,7 +793,8 @@ static int reduce_formats_on_filter(AVFilterContext *filter)
                 (!FF_LAYOUT2COUNT(fmt) || fmts->all_counts)) {
                 /* Turn the infinite list into a singleton */
                 fmts->all_layouts = fmts->all_counts  = 0;
-                ff_add_channel_layout(&outlink->in_channel_layouts, fmt);
+                if (ff_add_channel_layout(&outlink->in_channel_layouts, fmt) < 0)
+                    ret = 1;
                 break;
             }
 
@@ -813,16 +812,21 @@ static int reduce_formats_on_filter(AVFilterContext *filter)
     return ret;
 }
 
-static void reduce_formats(AVFilterGraph *graph)
+static int reduce_formats(AVFilterGraph *graph)
 {
-    int i, reduced;
+    int i, reduced, ret;
 
     do {
         reduced = 0;
 
-        for (i = 0; i < graph->nb_filters; i++)
-            reduced |= reduce_formats_on_filter(graph->filters[i]);
+        for (i = 0; i < graph->nb_filters; i++) {
+            if ((ret = reduce_formats_on_filter(graph->filters[i])) < 0)
+                return ret;
+            reduced |= ret;
+        }
     } while (reduced);
+
+    return 0;
 }
 
 static void swap_samplerates_on_filter(AVFilterContext *filter)
@@ -1140,7 +1144,8 @@ static int graph_config_formats(AVFilterGraph *graph, AVClass *log_ctx)
     /* Once everything is merged, it's possible that we'll still have
      * multiple valid media format choices. We try to minimize the amount
      * of format conversion inside filters */
-    reduce_formats(graph);
+    if ((ret = reduce_formats(graph)) < 0)
+        return ret;
 
     /* for audio filters, ensure the best format, sample rate and channel layout
      * is selected */

@@ -25,6 +25,9 @@
 
 #include "libavcodec/vp9dsp.h"
 
+// hack to force-expand BPC
+#define cat(a, bpp, b) a##bpp##b
+
 #define decl_fpel_func(avg, sz, bpp, opt) \
 void ff_vp9_##avg##sz##bpp##_##opt(uint8_t *dst, ptrdiff_t dst_stride, \
                                    const uint8_t *src, ptrdiff_t src_stride, \
@@ -40,6 +43,30 @@ decl_mc_func(put, sz, h, opt, type, fsz, bpp); \
 decl_mc_func(avg, sz, h, opt, type, fsz, bpp); \
 decl_mc_func(put, sz, v, opt, type, fsz, bpp); \
 decl_mc_func(avg, sz, v, opt, type, fsz, bpp)
+
+#define decl_ipred_fn(type, sz, bpp, opt) \
+void ff_vp9_ipred_##type##_##sz##x##sz##_##bpp##_##opt(uint8_t *dst, \
+                                                       ptrdiff_t stride, \
+                                                       const uint8_t *l, \
+                                                       const uint8_t *a)
+
+#define decl_ipred_fns(type, bpp, opt4, opt8_16_32) \
+decl_ipred_fn(type,  4, bpp, opt4); \
+decl_ipred_fn(type,  8, bpp, opt8_16_32); \
+decl_ipred_fn(type, 16, bpp, opt8_16_32); \
+decl_ipred_fn(type, 32, bpp, opt8_16_32)
+
+#define decl_itxfm_func(typea, typeb, size, bpp, opt) \
+void cat(ff_vp9_##typea##_##typeb##_##size##x##size##_add_, bpp, _##opt)(uint8_t *dst, \
+                                                                         ptrdiff_t stride, \
+                                                                         int16_t *block, \
+                                                                         int eob)
+
+#define decl_itxfm_funcs(size, bpp, opt) \
+decl_itxfm_func(idct,  idct,  size, bpp, opt); \
+decl_itxfm_func(iadst, idct,  size, bpp, opt); \
+decl_itxfm_func(idct,  iadst, size, bpp, opt); \
+decl_itxfm_func(iadst, iadst, size, bpp, opt)
 
 #define mc_rep_func(avg, sz, hsz, hszb, dir, opt, type, f_sz, bpp) \
 static av_always_inline void \
@@ -142,8 +169,21 @@ filters_8tap_2d_fn(op, 4, align, bpp, bytes, opt4, f_opt)
     init_subpel3_8to64(idx, type, bpp, opt); \
     init_subpel2(4, idx,  4, type, bpp, opt)
 
-void ff_vp9dsp_init_10bpp_x86(VP9DSPContext *dsp);
-void ff_vp9dsp_init_12bpp_x86(VP9DSPContext *dsp);
+#define init_ipred_func(type, enum, sz, bpp, opt) \
+    dsp->intra_pred[TX_##sz##X##sz][enum##_PRED] = \
+        cat(ff_vp9_ipred_##type##_##sz##x##sz##_, bpp, _##opt)
+
+#define init_8_16_32_ipred_funcs(type, enum, bpp, opt) \
+    init_ipred_func(type, enum,  8, bpp, opt); \
+    init_ipred_func(type, enum, 16, bpp, opt); \
+    init_ipred_func(type, enum, 32, bpp, opt)
+
+#define init_ipred_funcs(type, enum, bpp, opt) \
+    init_ipred_func(type, enum,  4, bpp, opt); \
+    init_8_16_32_ipred_funcs(type, enum, bpp, opt)
+
+void ff_vp9dsp_init_10bpp_x86(VP9DSPContext *dsp, int bitexact);
+void ff_vp9dsp_init_12bpp_x86(VP9DSPContext *dsp, int bitexact);
 void ff_vp9dsp_init_16bpp_x86(VP9DSPContext *dsp);
 
 #endif /* AVCODEC_X86_VP9DSP_INIT_H */

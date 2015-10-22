@@ -102,7 +102,6 @@ SRCS_LC = \
 	libavcodec/ac3_parser.c \
 	libavcodec/ac3dec.c \
 	libavcodec/ac3dec_data.c \
-	libavcodec/ac3dec_fixed.c \
 	libavcodec/ac3dec_float.c \
 	libavcodec/ac3dsp.c \
 	libavcodec/ac3enc.c \
@@ -119,6 +118,7 @@ SRCS_LC = \
 	libavcodec/adxdec.c \
 	libavcodec/alac.c \
 	libavcodec/alac_data.c \
+	libavcodec/alacdsp.c \
 	libavcodec/allcodecs.c \
 	libavcodec/alsdec.c \
 	libavcodec/amrnbdec.c \
@@ -158,7 +158,7 @@ SRCS_LC = \
 	libavcodec/dcadec.c \
 	libavcodec/dcadsp.c \
 	libavcodec/dct.c \
-	libavcodec/dct32_template.c \
+	libavcodec/dct32_fixed.c \
 	libavcodec/dct32_float.c \
 	libavcodec/dirac.c \
 	libavcodec/dirac_arith.c \
@@ -183,7 +183,6 @@ SRCS_LC = \
 	libavcodec/faandct.c \
 	libavcodec/faanidct.c \
 	libavcodec/fdctdsp.c \
-	libavcodec/fft_template.c \
 	libavcodec/fft_fixed.c \
 	libavcodec/fft_fixed_32.c \
 	libavcodec/fft_float.c \
@@ -194,7 +193,6 @@ SRCS_LC = \
 	libavcodec/flacdata.c \
 	libavcodec/flacdec.c \
 	libavcodec/flacdsp.c \
-	libavcodec/flacdsp_template.c \
 	libavcodec/flashsv.c \
 	libavcodec/flvdec.c \
 	libavcodec/fmtconvert.c \
@@ -270,7 +268,6 @@ SRCS_LC = \
 	libavcodec/lossless_videodsp.c \
 	libavcodec/lsp.c \
 	libavcodec/mathtables.c \
-	libavcodec/mdct_template.c \
 	libavcodec/me_cmp.c \
 	libavcodec/mdct_fixed.c \
 	libavcodec/mdct_fixed_32.c \
@@ -300,12 +297,12 @@ SRCS_LC = \
 	libavcodec/mpegaudio_parser.c \
 	libavcodec/mpegaudiodata.c \
 	libavcodec/mpegaudiodec_fixed.c \
-	libavcodec/mpegaudiodsp_data.c \
 	libavcodec/mpegaudiodec_float.c \
 	libavcodec/mpegaudiodecheader.c \
 	libavcodec/mpegaudiodsp.c \
+	libavcodec/mpegaudiodsp_data.c \
+	libavcodec/mpegaudiodsp_fixed.c \
 	libavcodec/mpegaudiodsp_float.c \
-	libavcodec/mpegaudiodsp_template.c \
 	libavcodec/mpegpicture.c \
 	libavcodec/mpegutils.c \
 	libavcodec/mpegvideo.c \
@@ -386,6 +383,7 @@ SRCS_LC = \
 	libavcodec/tak.c \
 	libavcodec/tak_parser.c \
 	libavcodec/takdec.c \
+	libavcodec/takdsp.c \
 	libavcodec/tiff.c \
 	libavcodec/tiff_common.c \
 	libavcodec/tiff_data.c \
@@ -453,6 +451,7 @@ SRCS_LC = \
 	\
 	libavcodec/x86/aacpsdsp_init.c \
 	libavcodec/x86/ac3dsp_init.c \
+	libavcodec/x86/alacdsp_init.c \
 	libavcodec/x86/audiodsp_init.c \
 	libavcodec/x86/blockdsp_init.c \
 	libavcodec/x86/bswapdsp_init.c \
@@ -494,6 +493,7 @@ SRCS_LC = \
 	libavcodec/x86/sbrdsp_init.c \
 	libavcodec/x86/simple_idct.c \
 	libavcodec/x86/snowdsp.c \
+	libavcodec/x86/takdsp_init.c \
 	libavcodec/x86/ttadsp_init.c \
 	libavcodec/x86/v210-init.c \
 	libavcodec/x86/vc1dsp_init.c \
@@ -507,7 +507,6 @@ SRCS_LC = \
 	libavcodec/x86/vp9dsp_init_10bpp.c \
 	libavcodec/x86/vp9dsp_init_12bpp.c \
 	libavcodec/x86/vp9dsp_init_16bpp.c \
-	libavcodec/x86/vp9dsp_init_16bpp_template.c \
 	libavcodec/x86/xvididct_init.c
 
 SRCS_LF = \
@@ -517,7 +516,6 @@ SRCS_LF = \
 	libavfilter/audio.c \
 	libavfilter/avfilter.c \
 	libavfilter/avfiltergraph.c \
-	libavfilter/buffer.c \
 	libavfilter/buffersink.c \
 	libavfilter/buffersrc.c \
 	libavfilter/formats.c \
@@ -628,12 +626,12 @@ SRCS_LS = \
 SRCS_YASM_LC = \
 	libavcodec/x86/aacpsdsp.asm \
 	libavcodec/x86/ac3dsp.asm \
+	libavcodec/x86/alacdsp.asm \
 	libavcodec/x86/audiodsp.asm \
 	libavcodec/x86/blockdsp.asm \
 	libavcodec/x86/bswapdsp.asm \
 	libavcodec/x86/dcadsp.asm \
 	libavcodec/x86/dct32.asm \
-	libavcodec/x86/deinterlace.asm \
 	libavcodec/x86/diracdsp_yasm.asm \
 	libavcodec/x86/dwt_yasm.asm \
 	libavcodec/x86/fft.asm \
@@ -676,6 +674,8 @@ SRCS_YASM_LC = \
 	libavcodec/x86/rv34dsp.asm \
 	libavcodec/x86/rv40dsp.asm \
 	libavcodec/x86/sbrdsp.asm \
+	libavcodec/x86/simple_idct10.asm \
+	libavcodec/x86/takdsp.asm \
 	libavcodec/x86/ttadsp.asm \
 	libavcodec/x86/v210.asm \
 	libavcodec/x86/vc1dsp.asm \
@@ -686,8 +686,11 @@ SRCS_YASM_LC = \
 	libavcodec/x86/vp8dsp.asm \
 	libavcodec/x86/vp8dsp_loopfilter.asm \
 	libavcodec/x86/vp9intrapred.asm \
+	libavcodec/x86/vp9intrapred_16bpp.asm \
 	libavcodec/x86/vp9itxfm.asm \
+	libavcodec/x86/vp9itxfm_16bpp.asm \
 	libavcodec/x86/vp9lpf.asm \
+	libavcodec/x86/vp9lpf_16bpp.asm \
 	libavcodec/x86/vp9mc.asm \
 	libavcodec/x86/vp9mc_16bpp.asm \
 	libavcodec/x86/xvididct.asm

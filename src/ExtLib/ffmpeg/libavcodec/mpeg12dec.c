@@ -1146,6 +1146,7 @@ static int mpeg_decode_mb(MpegEncContext *s, int16_t block[12][64])
 // }
 // ==> End patch MPC
 
+#if HAVE_THREADS
 static int mpeg_decode_update_thread_context(AVCodecContext *avctx,
                                              const AVCodecContext *avctx_from)
 {
@@ -1170,6 +1171,7 @@ static int mpeg_decode_update_thread_context(AVCodecContext *avctx,
 
     return 0;
 }
+#endif
 
 static void quant_matrix_rebuild(uint16_t *matrix, const uint8_t *old_perm,
                                  const uint8_t *new_perm)
@@ -2847,6 +2849,7 @@ static av_cold int mpeg_decode_init(AVCodecContext *avctx)
     ff_mpeg12_common_init(&s->mpeg_enc_ctx);
     ff_mpeg12_init_vlcs();
 
+    s2->chroma_format              = 1;
     s->mpeg_enc_ctx_allocated      = 0;
     s->mpeg_enc_ctx.picture_number = 0;
     s->repeat_field                = 0;
