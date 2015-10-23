@@ -247,9 +247,9 @@ char const shader_resizer_catmull4[] =
 char const shader_resizer_downscaling[] =
 "#if Ml\n"
 "#define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))\n"
-"#define MAXSTEPS 16\n"
+"#define MAXSTEPS 10\n"
 "#else\n"
-"#define MAXSTEPS 9\n"
+"#define MAXSTEPS 9\n" // max limit 9
 "#endif\n"
 
 "sampler s0 : register(s0);"
