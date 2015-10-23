@@ -580,7 +580,7 @@ void File_Teletext::Data_Parse()
             Element_Info1(Y);
             if (Y<26)
             {
-                Element_Info1(Streams[(X<<8)|PageNumber].CC_Displayed_Values[Y].c_str());
+                Element_Info1(Ztring().From_Unicode(Streams[(X<<8)|PageNumber].CC_Displayed_Values[Y]));
                 if (Y==0)
                 {
                     if (C[4])

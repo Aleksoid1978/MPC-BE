@@ -28,6 +28,9 @@
  chapters stream1; ροή κεφαλαίων
  chapters stream2; ροές κεφαλαίων
  chapters stream3; ροές κεφαλαίων
+ character1;
+ character2;
+ character3;
  day1; μέρα
  day2; μέρες
  day3; μέρες
@@ -37,12 +40,12 @@
  file1; αρχείο
  file2; αρχεία
  file3; αρχεία
- frame1;
- frame2;
- frame3;
  fps1; fps
  fps2; fps
  fps3; fps
+ frame1;
+ frame2;
+ frame3;
  GB; GB
  Gb; Gb
  Gbps; Gbps
@@ -141,6 +144,8 @@
  year3; χρόνια
 , ;, 
 : ;: 
+3D;
+3DType;
 About;Πληροφορίες
 About_Hint;Πως θα επικοινωνήσετε μαζί μου και θα βρείτε νεότερη έκδoση
 Accompaniment;Συνοδεία
@@ -172,7 +177,12 @@ Audio_Codec_List;Κωδικοποιητές ήχου
 Audio_No;Χωρίς ήχο
 Audio1;Πρώτη ροή ήχου
 Audio2;Δεύτερη ροή ήχου
+AudioComments;
 AudioCount;Αριθμός των ροών ήχου
+AudioDescriptionPresent;
+AudioDescriptionType;
+AudioLoudnessStandard;
+AudioTrackLayout;
 Author;Author
 BarCode;BarCode
 Basic;Βασική
@@ -180,13 +190,13 @@ Basic_Note;Σημείωση : για περισσότερες πληροφορί
 BitDepth;
 BitDepth_Stored;
 BitRate;Ρυθμός μετάδοσης δεδομένων
+BitRate_Encoded;
 BitRate_Maximum;
 BitRate_Minimum;
 BitRate_Mode;Bit rate mode
 BitRate_Mode_CBR;
 BitRate_Mode_VBR;
 BitRate_Nominal;
-BitRate_Encoded;
 Bits-(Pixel*Frame);Bits/(Εικονοστοιχείο*Πλαίσιο)
 BufferSize;
 Cancel;Άκυρο
@@ -211,44 +221,53 @@ Chroma;Χρώμα
 ChromaSubsampling;
 Close;Κλείσιμο
 Close all before open;Κλείστε όλα τα ανοιχτά αρχεία πριν το άνοιγμα νέων
+ClosedCaptionsLanguage;
+ClosedCaptionsPresent;
+ClosedCaptionsType;
 Codec;Συμπιεστής
 Codec_Description;
 Codec_Info;Λεπτομέρειες του συμπιεστή
-Codec_Settings;Ρυθμίσεις συμπιεστή
-Codec_Settings_PacketBitStream;
-Codec_Settings_BVOP;
-Codec_Settings_QPel;
-Codec_Settings_GMC;
-Codec_Settings_Matrix;
-Codec_Settings_Floor;
-Codec_Settings_CABAC;
-Codec_Settings_Firm;
-Codec_Settings_Endianness;
-Codec_Settings_Sign;
-Codec_Settings_Law;
-Codec_Settings_ITU;
 Codec_Profile;Προφίλ συμπιεστή
+Codec_Settings;Ρυθμίσεις συμπιεστή
+Codec_Settings_BVOP;
+Codec_Settings_CABAC;
+Codec_Settings_Endianness;
+Codec_Settings_Firm;
+Codec_Settings_Floor;
+Codec_Settings_GMC;
+Codec_Settings_ITU;
+Codec_Settings_Law;
+Codec_Settings_Matrix;
+Codec_Settings_PacketBitStream;
+Codec_Settings_QPel;
+Codec_Settings_Sign;
 Codec_Url;Σύνδεσμος συμπιεστή (url)
 CodecID;
 CodecID_Description;
+CoDirector;
 Collection;Συλλογή
 Colorimetry;
 ColorSpace;
 colour_primaries;
+colour_range;
 Comment;Σχόλιο
 CommissionedBy;Commissioned by
 Compilation;
 CompleteName;Πλήρες όνομα
+CompletionDate;
 Composer;Composer
 Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;
 Conductor;Conductor
+ContactEmail;
+ContactTelephoneNumber;
 Container and general information;Container και γενικές πληροφορίες
 ContentType;Είδος περιεχόμενου
 CoProducer;Συμπαραγωγός
 Copyright;Πνευματικά Δικαιώματα
+CopyrightYear;
 CostumeDesigner;Costume designer
 Count;Αριθμός
 Country;Χώρα
@@ -274,8 +293,10 @@ Dimensions;
 Director;Director
 DirectorOfPhotography;Director of photography
 DisplayAspectRatio;Λόγος εικόνας
+DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;
 DistributedBy;Distributed by
+Distributor;
 Donate;Δωρεές
 DotsPerInch;
 Duration;
@@ -291,6 +312,7 @@ Encoded_Library_Settings;Ρυθμίσεις κωδικοποιητή
 Encoded_Original;Original
 EncodedBy;Κωδικοποιημένο από
 EPG_Positions;
+EpisodeTitleNumber;
 Error_File;Παρουσιάστηκε σφάλμα κατά το διάβασμα του αρχείου
 ExecutiveProducer;Executive producer
 Exit;Έξοδος
@@ -324,39 +346,44 @@ Format_Description;
 Format_Info;
 Format_Profile;
 Format_Settings;
-Format_Settings_PacketBitStream;
 Format_Settings_BVOP;
-Format_Settings_QPel;
+Format_Settings_CABAC;
+Format_Settings_Emphasis;
+Format_Settings_Endianness;
+Format_Settings_Firm;
+Format_Settings_Floor;
+Format_Settings_FrameMode;
 Format_Settings_GMC;
+Format_Settings_GOP;
+Format_Settings_ITU;
+Format_Settings_Law;
 Format_Settings_Matrix;
 Format_Settings_Matrix_Custom;
 Format_Settings_Matrix_Default;
-Format_Settings_Floor;
-Format_Settings_CABAC;
-Format_Settings_Firm;
-Format_Settings_Endianness;
-Format_Settings_RefFrames;
-Format_Settings_Sign;
-Format_Settings_Law;
-Format_Settings_ITU;
-Format_Settings_SBR;
+Format_Settings_Mode;
+Format_Settings_ModeExtension;
+Format_Settings_PacketBitStream;
+Format_Settings_PictureStructure;
 Format_Settings_PS;
 Format_Settings_Pulldown;
-Format_Settings_Mode;
-Format_Settings_FrameMode;
-Format_Settings_Emphasis;
-Format_Settings_ModeExtension;
-Format_Settings_GOP;
-Format_Version;
+Format_Settings_QPel;
+Format_Settings_RefFrames;
+Format_Settings_SBR;
+Format_Settings_Sign;
+Format_Settings_Wrapping;
 Format_Url;
+Format_Version;
+FpaManufacturer;
+FpaPass;
+FpaVersion;
 FrameCount;
 FrameRate;Ρυθμός ανανέωσης πλαισίου
+FrameRate_Maximum;Μέγιστος ρυθμός ανανέωσης πλαισίου
+FrameRate_Minimum;Ελάχιστος ρυθμός ανανέωσης πλαισίου
 FrameRate_Mode;
 FrameRate_Mode_CFR;
 FrameRate_Mode_VFR;
-FrameRate_Minimum;Ελάχιστος ρυθμός ανανέωσης πλαισίου
 FrameRate_Nominal;
-FrameRate_Maximum;Μέγιστος ρυθμός ανανέωσης πλαισίου
 FrameRate_Original;
 General;Γενικά
 Genre;Genre
@@ -554,9 +581,14 @@ Genre_190;
 Genre_191;
 Go to WebSite;Επίσκεψη του δυκτιακού τόπου
 Grouping;
+Gop_OpenClosed;
+Gop_OpenClosed_Open;
+Gop_OpenClosed_Closed;
+Gop_OpenClosed_FirstFrame;Групаванне
 h;h
 Header file;Δημιουργήστε αρχείο κεφαλίδας
 Height;Ύψος
+Height_CleanAperture;
 Height_Original;
 Help;Βοήθεια
 Hint;
@@ -566,22 +598,23 @@ How many text streams?;Πόσες ρόες κειμένου?
 How many video streams?;Πόσες ροές video?
 HTML;HTML
 ID;ID
+IdentClockStart;
 Image;Εικόνα
 Image stream(s);Ροές εικόνας
 Image_Codec_List;Συμπιεστές εικόνας
 ImageCount;Αριθμός των ροών εικόνας
 Info;
 Instruments;Όργανα
-Interlacement;Interlacement
-Interlaced_Interlaced;Διαπλεκόμενη σάρωση
-Interlaced_TFF;Top Field First
 Interlaced_BFF;Bottom Field First
+Interlaced_Interlaced;Διαπλεκόμενη σάρωση
 Interlaced_PPF;Συνεχής σάρωση
 Interlaced_Progressive;Συνεχής σάρωση
-Interleaved;
+Interlaced_TFF;Top Field First
+Interlacement;Interlacement
 Interleave_Duration;
 Interleave_Preload;
 Interleave_VideoFrames;
+Interleaved;
 InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
@@ -592,7 +625,6 @@ Known formats;Γνωστές μορφοποιήσεις
 Known parameters;Γνωστοί παράμετροι
 Label;Ετικέτα
 Language;Γλώσσα
-Language_More;
 Language_aa;Afar
 Language_ab;Abkhazian
 Language_ae;Avestan
@@ -703,6 +735,7 @@ Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
 Language_mo;Moldavian
+Language_More;
 Language_mr;Marathi
 Language_ms;Malay
 Language_mt;Maltese
@@ -789,19 +822,23 @@ LawRating;Law rating
 LCCN;LCCN
 Library;Muxing library
 Lightness;
+LineUpStart;
 List;
-Lyrics;
 Lyricist;Lyricist
+Lyrics;
 Mastered_Date;Mastered date
 MasteredBy;Mastered by
+Matrix_Channel(s);
+Matrix_ChannelPositions;
 matrix_coefficients;
+Matrix_Format;
 MediaInfo_About;Παρέχει λεπτομερείς πληροφορίες\r\nγια αρχεία πολυμέσων:\r\nMatroska, OGG (συμπεριλαμβάνεται OGM)\r\nMPEG1 (συμπεριλαμβάνεται VCD)\r\nMPEG2 (συμπεριλαμβάνεται DVD και SVCD)\r\nMPEG4 (συμπεριλαμβάνεται Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (συμπεριλαμβάνεται WMV, WMA)\r\nMicrosoft RIFF (συμπεριλαμβάνεται AVI, WAV)\r\nΜορφοποιήσεις ήχου (AC3, DTS, AAC, AU, AIFF...)
 Menu;Μενού
 Menu stream(s);Ροές μενού
 Menu_Codec_List;Συμπιεστές μενού
+Menu_Hint;Περισσότερες πιθανότητες
 Menu_No;Χωρίς μενού
 MenuCount;Αριθμός των ροών μενού
-Menu_Hint;Περισσότερες πιθανότητες
 MenuID;
 mn;mn
 Mood;Mood
@@ -819,8 +856,8 @@ NetworkName;
 New;Νέο
 Newest version;Έλεγχος για νεότερη έκδοση (προϋποθέτει ύπαρξη σύνδεσης στο Διαδύκτιο)
 NewVersion_Menu;
-NewVersion_Question_Title;
 NewVersion_Question_Content;
+NewVersion_Question_Title;
 No;Όχι
 Not yet;
 NumColors;
@@ -863,13 +900,19 @@ OpenCandy_33;
 OpenCandy_34;
 OpenCandy_35;
 OpenCandy_36;
+OpenCaptionsLanguage;
+OpenCaptionsPresent;
+OpenCaptionsType;
 Options;Επιλογές
 Options_Hint;Προτιμήσεις
 Original;Original
 OriginalNetworkName;
 OriginalSourceForm;
 OriginalSourceMedium;
+Originator;
 Other;Άλλος
+OtherIdentifier;
+OtherIdentifierType;
 Output;Έξοδος
 Output format;Μορφοποίηση εξόδου
 OverallBitRate;Συνολικό BitRate
@@ -879,10 +922,14 @@ OverallBitRate_Mode;
 OverallBitRate_Nominal;
 Part;Μέρος
 Part_Count;Συνολικός αριθμός
+PartNumber;
+PartTotal;
 Performer;Performer
 Period;Περίοδος
 Phone;Τηλέφωνο
+PictureRatio;
 PixelAspectRatio;Λόγος εικονοστοιχείου
+PixelAspectRatio_CleanAperture;
 PixelAspectRatio_Original;Λόγος εικονοστοιχείου
 PlayCounter;PlayCounter
 Played_Count;
@@ -892,9 +939,15 @@ PlayTime;Διάρκεια
 Position;Θέση
 Position_Total;
 Preferences;Επιλογές/Προτιμήσεις
+PrimaryAudioLanguage;
 Producer;Παραγωγός
 ProductionDesigner;ProductionDesigner
+ProductionNumber;
 ProductionStudio;ProductionStudio
+ProductPlacement;
+ProgrammeHasText;
+ProgrammeTextLanguage;
+ProgrammeTitle;
 Publisher;Εκδώτης
 Purchased_Date;Ημερομηνία αγοράς
 Quote character;Quote character
@@ -908,22 +961,25 @@ ReplayGain_Gain;
 ReplayGain_Peak;
 Resolution;Ανάλυση
 s;s
+SamplingCount;
 SamplingRate;Συχνότητα δειγματοληψίας
 Save;Αποθήκευση
-ScanType;
-ScanType_Original;
-ScanType_StoreMethod;
 ScanOrder;
 ScanOrder_Original;
 ScanOrder_Stored;
 ScanOrder_StoredDisplayedInverted;
 ScanOrder_StoreMethod;
+ScanType;
+ScanType_Original;
+ScanType_StoreMethod;
 ScreenplayBy;Screenplay by
 Season;Season
+SecondaryAudioLanguage;
 see below;δείτε παρακάτω
 Send HeaderFile;
 Separator_Columns;διαχωριστής στηλών
 Separator_Lines;διαχωριστής γραμμών
+SeriesTitle;
 ServiceChannel;
 ServiceName;
 ServiceProvider;
@@ -937,10 +993,13 @@ Sheet (Complete);Φύλλο (Πλήρες)
 Shell extension;Shell extension (in explorer right click there will be a Media Info option)
 Shell extension, folder;
 Shell InfoTip;Shell InfoTip (in explorer, move the mouse on file, info will be displayed)
+ShimName;
+ShimVersion;
 Show menu;Εμφάνιση μενού
 Show toolbar;Εμφάνιση εργαλειοθήκης
+SigningPresent;
+SignLanguage;
 Sort;Ταξινόμηση κατά
-SamplingCount;
 SoundEngineer;Sound engineer
 Source;
 Source_Duration;
@@ -974,6 +1033,7 @@ Tagged_Application;
 Tagged_Date;Tagged date
 Technician;Τεχνικός
 TermsOfUse;Όροι χρήσης
+TertiaryAudioLanguage;
 Text;Κείμενο
 Text - Custom;Κείμενο - Προσαρμοσμένο
 Text (HTML);Κείμενο (HTML)
@@ -985,17 +1045,21 @@ Text1;Πρώτη ροή κειμένου
 Text2;Δεύτερη ροή κειμένου
 Text3;Τρίτη ροή κειμένου
 TextCount;Αριθμός ροών κειμένου
+TextlessElementsExist;
 ThanksTo;Ευχαριστώ τους
 Thousands separator;Διαχωριστής χιλιάδων
-Title;Τίτλος
-Title_More;Τίτλος, περισσότερες πληροφορίες
 TimeCode;
 TimeCode_FirstFrame;
 TimeCode_Settings;
 TimeCode_Source;
+TimeCode_Striped;
 TimeStamp;
 TimeZone;
+Title;Τίτλος
+Title_More;Τίτλος, περισσότερες πληροφορίες
 Total;Total
+TotalNumberOfParts;
+TotalProgrammeDuration;
 Track;Track name
 Track_Count;Track count
 transfer_characteristics;
@@ -1013,6 +1077,7 @@ Video_Delay;Καθηστέριση video
 Video_No;Χωρίς video
 Video0_Delay;Καθηστέριση video
 Video1;Πρώτη ροή video
+VideoComments;
 VideoCount;Αριθμός των ροών video
 View;Προβολή
 View_Hint;Αλλάζει τον τρόπο προβολής πληροφοριών
@@ -1028,6 +1093,7 @@ WebSite_Url;http://MediaArea.net/MediaInfo
 WebSite_Video;Πήγαινε στην ιστοσελίδα αυτού του συμπιεστή video
 WebSite_Video_More;Πήγαινε στην ιστοσελίδα (%Url%) to find this video codec
 Width;Πλάτος
+Width_CleanAperture;
 Width_Original;
 WriteMe;Επικοινωνία μαζί μου
 WriteToTranslator;Επικοινωνία με τον μεταφραστή
@@ -1036,5 +1102,5 @@ Written_Location;Τοποθεσία καταγραφής
 WrittenBy;Γραμμένο από
 Yes;Ναι
 Your system;Το σύστημά σας
-ZZ_Automatic_Percent;73
-ZZ_AutomaticLanguage_Percent;81
+ZZ_Automatic_Percent;69
+ZZ_AutomaticLanguage_Percent;77

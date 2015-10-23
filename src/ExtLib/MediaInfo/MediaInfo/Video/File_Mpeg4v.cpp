@@ -650,6 +650,7 @@ bool File_Mpeg4v::Demux_UnpacketizeContainer_Test()
             if (Config->Demux_EventWasSent)
                 return false;
             File_Mpeg4v* MI=new File_Mpeg4v;
+            Element_Code=(int64u)-1;
             Open_Buffer_Init(MI);
             Open_Buffer_Continue(MI, Buffer, Buffer_Size);
             bool IsOk=MI->Status[IsAccepted];

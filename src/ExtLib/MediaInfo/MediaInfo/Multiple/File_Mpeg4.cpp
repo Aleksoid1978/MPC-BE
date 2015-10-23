@@ -1885,6 +1885,7 @@ bool File_Mpeg4::BookMark_Needed()
         while (Element_Level>0)
             Element_End0();
         Element_Begin1("Second pass");
+        Element_ThisIsAList();
 
         mdat_Pos_Temp=&mdat_Pos[0];
         #if MEDIAINFO_MD5

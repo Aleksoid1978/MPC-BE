@@ -21,6 +21,7 @@
     #include <MediaInfo/Multiple/File_Ancillary.h>
 #endif //defined(MEDIAINFO_ANCILLARY_YES)
 #include "MediaInfo/MediaInfo_Internal.h"
+#include "MediaInfo/TimeCode.h"
 #include <vector>
 #include <set>
 //---------------------------------------------------------------------------
@@ -76,6 +77,7 @@ protected :
     void Streams_Finish_Track_ForTimeCode (const int128u TrackUID, bool IsSourcePackage);
     void Streams_Finish_Track_ForAS11 (const int128u TrackUID);
     void Streams_Finish_Essence (int32u EssenceUID, int128u TrackUID);
+    void Streams_Finish_Essence_FillID (int32u EssenceUID, int128u TrackUID);
     void Streams_Finish_Descriptor (const int128u DescriptorUID, const int128u PackageUID);
     void Streams_Finish_Locator (const int128u DescriptorUID, const int128u LocatorUID);
     void Streams_Finish_Component (const int128u ComponentUID, float64 EditRate, int32u TrackID, int64u Origin);
@@ -133,7 +135,7 @@ protected :
     void LensUnitMetadata();
     void CameraUnitMetadata();
     void UserDefinedAcquisitionMetadata();
-    void Filler53();
+    void DMFiller();
     void Sequence();
     void SourceClip();
     void TimecodeComponent();
@@ -1070,18 +1072,21 @@ protected :
         inline void Locators_CleanUp() {}
         inline void Locators_Test() {}
     #endif //defined(MEDIAINFO_REFERENCES_YES)
+    void NextRandomIndexMetadata();
     void TryToFinish();
 
     //Temp
     int128u EssenceContainer_FromPartitionMetadata;
     int64u PartitionMetadata_PreviousPartition;
     int64u PartitionMetadata_FooterPartition;
+    int64u RandomIndexMetadatas_MaxOffset;
     mxftimecode MxfTimeCodeForDelay;
     mxftimecode MxfTimeCodeMaterial;
     float64 DTS_Delay; //In seconds
     bool   StreamPos_StartAtOne; //information about the base of StreamPos (0 or 1, 1 is found in 1 file)
-    string SDTI_TimeCode_StartTimecode;
-    int64u SDTI_TimeCode_StartTimecode_ms;
+    TimeCode            SDTI_TimeCode_StartTimecode;
+    size_t              SDTI_TimeCode_RepetitionCount;
+    TimeCode            SDTI_TimeCode_Previous;
     int64u SDTI_SizePerFrame;
     bool   SDTI_IsPresent; //Used to test if SDTI packet is used for Index StreamOffset calculation
     bool   SDTI_IsInIndexStreamOffset; //Used to test if SDTI packet is used for Index StreamOffset calculation
@@ -1089,6 +1094,7 @@ protected :
     int64u SystemScheme1_TimeCodeArray_StartTimecode_ms;
     int64u SystemScheme1_FrameRateFromDescriptor;
     bool   Essences_FirstEssence_Parsed;
+    bool   MayHaveCaptionsInStream;
     bool   StereoscopicPictureSubDescriptor_IsPresent;
     bool   UserDefinedAcquisitionMetadata_UdamSetIdentifier_IsSony;
     int32u Essences_UsedForFrameCount;

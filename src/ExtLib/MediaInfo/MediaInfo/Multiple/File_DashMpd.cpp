@@ -374,7 +374,10 @@ void template_generic::Decode()
                     Ztring Index; Index.From_Number(Index_Pos_Temp);
                     if (Index.size()<Index_Size)
                         Index.insert(0, Index_Size-Index.size(), __T('0'));
-                    Media_Name_Temp.insert(Index_Pos, Index);
+                    if (Index_Pos!=(size_t)-1)
+                        Media_Name_Temp.insert(Index_Pos, Index);
+                    else
+                        Media_Name_Temp.insert(Time_Pos, Index);
 
                     Ztring File_Name;
                     if (!SourceDir.empty())

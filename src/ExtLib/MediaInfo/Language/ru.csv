@@ -28,6 +28,9 @@
  chapters stream1; поток разделов
  chapters stream2; потока разделов
  chapters stream3; потоков разделов
+ character1; герой
+ character2; героя
+ character3; героев
  day1; день
  day2; дня
  day3; дней
@@ -37,12 +40,12 @@
  file1; файл
  file2; файла
  file3; файлов
- frame1; кадр
- frame2; кадра
- frame3; кадров
  fps1; кадр/сек
  fps2; кадра/сек
  fps3; кадров/сек
+ frame1; кадр
+ frame2; кадра
+ frame3; кадров
  GB; ГБ
  Gb; Гб
  Gbps; Гбит/сек
@@ -141,6 +144,8 @@
  year3; лет
 , ;, 
 : ;: 
+3D;3D
+3DType;Тип 3D
 About;О программе
 About_Hint;Как связаться со мной и найти последнюю версию программы
 Accompaniment;Сопровождение
@@ -172,21 +177,26 @@ Audio_Codec_List;Аудиокодеки
 Audio_No;Нет аудио
 Audio1;Первый аудиопоток
 Audio2;Второй аудиопоток
-AudioCount;Кол-во аудиопотоков
+AudioComments;Голосовой комментарий
+AudioCount;Количество аудиопотоков
+AudioDescriptionPresent;Наличие голосового описания
+AudioDescriptionType;Тип голосового описания
+AudioLoudnessStandard;Стандарт громкости аудио
+AudioTrackLayout;Макет аудиодорожки
 Author;Автор
-BarCode;Штрихкод
+BarCode;Штрих-код
 Basic;Кратко
 Basic_Note;Примечание: для дополнительной информации выберите другую закладку (таблица, дерево,...)
 BitDepth;Битовая глубина
-BitDepth_Stored;
+BitDepth_Stored;Сохранённая битовая глубина
 BitRate;Битрейт
+BitRate_Encoded;Закодированный битрейт
 BitRate_Maximum;Максимальный битрейт
 BitRate_Minimum;Минимальный битрейт
 BitRate_Mode;Вид битрейта
 BitRate_Mode_CBR;Постоянный
 BitRate_Mode_VBR;Переменный
 BitRate_Nominal;Номинальный битрейт
-BitRate_Encoded;Закодированный битрейт
 Bits-(Pixel*Frame);Бит/(Пиксели*Кадры)
 BufferSize;Размер буфера
 Cancel;Отмена
@@ -197,7 +207,7 @@ Chapters;Разделы
 Chapters stream(s);Потоки разделов
 Chapters_Codec_List;Кодеки разделов
 Chapters_No;Нет разделов
-ChaptersCount;Кол-во разделов
+ChaptersCount;Количество разделов
 CheckNewVersion;Проверить наличие новой версии
 Choose custom;Выбрать
 Choose custom sheet;Выбрать таблицу
@@ -211,46 +221,55 @@ Chroma;Цветность
 ChromaSubsampling;Субдискретизация насыщенности
 Close;Закрыть
 Close all before open;Закрывать всё перед открытием новых файлов
+ClosedCaptionsLanguage;Язык субтитров
+ClosedCaptionsPresent;Наличие субтитров
+ClosedCaptionsType;Тип субтитров
 Codec;Кодек
 Codec_Description;Описание кодека
 Codec_Info;Подробно о кодеке
-Codec_Settings;Настройки кодека
-Codec_Settings_PacketBitStream;Параметр пакетного потока данных кодека
-Codec_Settings_BVOP;Параметр BVOP кодека
-Codec_Settings_QPel;Параметр QPel кодека
-Codec_Settings_GMC;Параметр GMC кодека
-Codec_Settings_Matrix;Параметр матрицы кодека
-Codec_Settings_Floor;Параметр Floor кодека
-Codec_Settings_CABAC;Параметр CABAC кодека
-Codec_Settings_Firm;Параметр Firm кодека
-Codec_Settings_Endianness;Параметр Endianness кодека
-Codec_Settings_Sign;Параметр Sign кодека
-Codec_Settings_Law;Параметр Law кодека
-Codec_Settings_ITU;Параметр ITU кодека
 Codec_Profile;Профиль кодека
+Codec_Settings;Настройки кодека
+Codec_Settings_BVOP;Параметр BVOP кодека
+Codec_Settings_CABAC;Параметр CABAC кодека
+Codec_Settings_Endianness;Параметр Endianness кодека
+Codec_Settings_Firm;Параметр Firm кодека
+Codec_Settings_Floor;Параметр Floor кодека
+Codec_Settings_GMC;Параметр GMC кодека
+Codec_Settings_ITU;Параметр ITU кодека
+Codec_Settings_Law;Параметр Law кодека
+Codec_Settings_Matrix;Параметр матрицы кодека
+Codec_Settings_PacketBitStream;Параметр пакетного потока данных кодека
+Codec_Settings_QPel;Параметр QPel кодека
+Codec_Settings_Sign;Параметр Sign кодека
 Codec_Url;Ссылка на кодек
 CodecID;Идентификатор кодека
 CodecID_Description;Описание кодека
+CoDirector;Содиректор
 Collection;Коллекция
 Colorimetry;Колориметрия
 ColorSpace;Цветовое пространство
 colour_primaries;Основные цвета
+colour_range;Цветовой диапазон
 Comment;Примечание
 CommissionedBy;Поручитель
 Compilation;Компиляция
 CompleteName;Полное имя
+CompletionDate;Дата завершения
 Composer;Композитор
 Compression_Mode;Метод сжатия
 Compression_Mode_Lossless;Без потерь
 Compression_Mode_Lossy;С потерями
 Compression_Ratio;Степень сжатия
 Conductor;Дирижёр
+ContactEmail;Контактный почтовый адрес
+ContactTelephoneNumber;Контактный телефон
 Container and general information;Общая информация
 ContentType;Тип содержимого
 CoProducer;Сопродюсер
-Copyright;Правообладатель
+Copyright;Авторское право
+CopyrightYear;Дата авторского права
 CostumeDesigner;Художник по костюмам
-Count;Кол-во
+Count;Количество
 Country;Страна
 Cover;Обложка
 Cover_Datas;Данные обложки
@@ -274,14 +293,16 @@ Dimensions;Размеры
 Director;Режиссёр
 DirectorOfPhotography;Оператор
 DisplayAspectRatio;Соотношение сторон
+DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Соотношение сторон в оригинале
 DistributedBy;Распространитель
-Donate;Внести пожертвование
+Distributor;Распространитель
+Donate;Сделать пожертвование
 DotsPerInch;Точек на дюйм
 Duration;Продолжительность
 Duration_End;Время окончания
 Duration_Start;Время начала
-Edit;Изменение
+Edit;Править
 EditedBy;Изменено
 EMail;Почта
 Encoded_Application;Программа кодирования
@@ -291,6 +312,7 @@ Encoded_Library_Settings;Настройки программы
 Encoded_Original;Источник оригинала
 EncodedBy;Кодирование произвёл
 EPG_Positions;Позиции EPG (внутренние)
+EpisodeTitleNumber;Номер заголовка эпизода
 Error_File;Ошибка в файле
 ExecutiveProducer;Исполнительный продюсер
 Exit;Выход
@@ -324,39 +346,44 @@ Format_Description;Описание формата
 Format_Info;Подробно о формате
 Format_Profile;Профиль формата
 Format_Settings;Настройки формата
-Format_Settings_PacketBitStream;Параметр пакетного потока данных формата
 Format_Settings_BVOP;Параметр BVOP формата
-Format_Settings_QPel;Параметр QPel формата
+Format_Settings_CABAC;Параметр CABAC формата
+Format_Settings_Emphasis;Акцент
+Format_Settings_Endianness;Параметр Endianness формата
+Format_Settings_Firm;Параметр Firm формата
+Format_Settings_Floor;Параметр Floor формата
+Format_Settings_FrameMode;Режим кадров
 Format_Settings_GMC;Параметр GMC формата
+Format_Settings_GOP;Параметр GOP формата
+Format_Settings_ITU;Параметр ITU формата
+Format_Settings_Law;Параметр Law формата
 Format_Settings_Matrix;Параметр матрицы формата
 Format_Settings_Matrix_Custom;Выборочная
 Format_Settings_Matrix_Default;По умолчанию
-Format_Settings_Floor;Параметр Floor формата
-Format_Settings_CABAC;Параметр CABAC формата
-Format_Settings_Firm;Параметр Firm формата
-Format_Settings_Endianness;Параметр Endianness формата
-Format_Settings_RefFrames;Параметр ReFrames формата
-Format_Settings_Sign;Параметр Sign формата
-Format_Settings_Law;Параметр Law формата
-Format_Settings_ITU;Параметр ITU формата
-Format_Settings_SBR;Параметр SBR формата
+Format_Settings_Mode;Режим
+Format_Settings_ModeExtension;Расширение режима
+Format_Settings_PacketBitStream;Параметр пакетного потока данных формата
+Format_Settings_PictureStructure;Структура изображения
 Format_Settings_PS;Параметр PS формата
 Format_Settings_Pulldown;Параметр Pulldownd формата
-Format_Settings_Mode;Режим
-Format_Settings_FrameMode;Режим кадров
-Format_Settings_Emphasis;Акцент
-Format_Settings_ModeExtension;Расширение режима
-Format_Settings_GOP;Параметр GOP формата
-Format_Version;Версия формата
+Format_Settings_QPel;Параметр QPel формата
+Format_Settings_RefFrames;Параметр ReFrames формата
+Format_Settings_SBR;Параметр SBR формата
+Format_Settings_Sign;Параметр Sign формата
+Format_Settings_Wrapping;Режим переноса
 Format_Url;Ссылка на формат
+Format_Version;Версия формата
+FpaManufacturer;Производитель FPA
+FpaPass;Пароль FPA
+FpaVersion;Версия FPA
 FrameCount;Счётчик кадров
 FrameRate;Частота кадров
+FrameRate_Maximum;Максимальная частота кадров
+FrameRate_Minimum;Минимальная частота кадров
 FrameRate_Mode;Режим частоты кадров
 FrameRate_Mode_CFR;Постоянный
 FrameRate_Mode_VFR;Переменный
-FrameRate_Minimum;Минимальная частота кадров
 FrameRate_Nominal;Номинальная частота кадров
-FrameRate_Maximum;Максимальная частота кадров
 FrameRate_Original;Частота кадров в оригинале
 General;Общее
 Genre;Жанр
@@ -400,7 +427,7 @@ Genre_036;Game
 Genre_037;Sound Clip
 Genre_038;Gospel
 Genre_039;Noise
-Genre_040;AlternRock
+Genre_040;Alt. Rock
 Genre_041;Bass
 Genre_042;Soul
 Genre_043;Punk
@@ -419,7 +446,7 @@ Genre_055;Dream
 Genre_056;Southern Rock
 Genre_057;Comedy
 Genre_058;Cult
-Genre_059;Gangsta
+Genre_059;Gangsta Rap
 Genre_060;Top 40
 Genre_061;Christian Rap
 Genre_062;Pop/Funk
@@ -427,7 +454,7 @@ Genre_063;Jungle
 Genre_064;Native American
 Genre_065;Cabaret
 Genre_066;New Wave
-Genre_067;Psychadelic
+Genre_067;Psychedelic
 Genre_068;Rave
 Genre_069;Showtunes
 Genre_070;Trailer
@@ -444,8 +471,8 @@ Genre_080;Folk
 Genre_081;Folk-Rock
 Genre_082;National Folk
 Genre_083;Swing
-Genre_084;Fast Fusion
-Genre_085;Bebob
+Genre_084;Fast-Fusion
+Genre_085;Bebop
 Genre_086;Latin
 Genre_087;Revival
 Genre_088;Celtic
@@ -483,7 +510,7 @@ Genre_119;Freestyle
 Genre_120;Duet
 Genre_121;Punk Rock
 Genre_122;Drum Solo
-Genre_123;A capella
+Genre_123;A Cappella
 Genre_124;Euro-House
 Genre_125;Dance Hall
 Genre_126;Goa
@@ -493,7 +520,7 @@ Genre_129;Hardcore
 Genre_130;Terror
 Genre_131;Indie
 Genre_132;Britpop
-Genre_133;Negerpunk
+Genre_133;Afro-Punk
 Genre_134;Polsk Punk
 Genre_135;Beat
 Genre_136;Christian Gangsta Rap
@@ -504,7 +531,7 @@ Genre_140;Contemporary Christian
 Genre_141;Christian Rock
 Genre_142;Merengue
 Genre_143;Salsa
-Genre_144;Trash Metal
+Genre_144;Thrash Metal
 Genre_145;Anime
 Genre_146;JPop
 Genre_147;Synthpop
@@ -554,34 +581,40 @@ Genre_190;Garage Rock
 Genre_191;Psybient
 Go to WebSite;Перейти на сайт программы
 Grouping;Группирование
+Gop_OpenClosed;GOP, открыто/закрыто
+Gop_OpenClosed_Open;Открыто
+Gop_OpenClosed_Closed;Закрыто
+Gop_OpenClosed_FirstFrame;GOP, открыто/закрыто на первом кадре
 h; ч.
 Header file;Создать заголовок
 Height;Высота
+Height_CleanAperture;
 Height_Original;Высота оригинала
 Help;Помощь
 Hint;Подсказка
-How many audio streams?;Количество аудиопотоков?
-How many chapters streams?;Количество потоков разделов?
-How many text streams?;Количество текстовых потоков?
-How many video streams?;Количество видеопотоков?
+How many audio streams?;Сколько аудиопотоков?
+How many chapters streams?;Сколько потоков разделов?
+How many text streams?;Сколько текстовых потоков?
+How many video streams?;Сколько видеопотоков?
 HTML;HTML
 ID;Идентификатор
+IdentClockStart;Начало идентификации
 Image;Изображения
 Image stream(s);Потоки изображений
 Image_Codec_List;Кодеки изображений
-ImageCount;Кол-во потоков изображений
+ImageCount;Количество потоков изображений
 Info;Информация
 Instruments;Инструменты
-Interlacement;Переплетение
-Interlaced_Interlaced;Чересстрочная
-Interlaced_TFF;Верхнее поле первое
 Interlaced_BFF;Нижнее поле первое
+Interlaced_Interlaced;Чересстрочная
 Interlaced_PPF;Прогрессивная
 Interlaced_Progressive;Прогрессивная
-Interleaved;Чередующаяся
+Interlaced_TFF;Верхнее поле первое
+Interlacement;Переплетение
 Interleave_Duration;Продолжительность промежутка
 Interleave_Preload;Время предзагрузки промежутка
 Interleave_VideoFrames;Продолжительность промежутка
+Interleaved;Чередующаяся
 InternetMediaType;Интернет-тип носителя
 IRCA;IRCA
 ISBN;ISBN
@@ -592,7 +625,6 @@ Known formats;Известные форматы
 Known parameters;Известные параметры
 Label;Метка
 Language;Язык
-Language_More;Язык, дополнительно
 Language_aa;Afar
 Language_ab;Abkhazian
 Language_ae;Avestan
@@ -703,6 +735,7 @@ Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
 Language_mo;Moldavian
+Language_More;Язык, дополнительно
 Language_mr;Marathi
 Language_ms;Malay
 Language_mt;Maltese
@@ -785,23 +818,27 @@ Language_zh;Chinese
 Language_zh-cn;Chinese (China)
 Language_zh-tw;Chinese (Taiwan)
 Language_zu;Zulu
-LawRating;Ограничения прав
+LawRating;Ограничение по возрасту
 LCCN;LCCN
 Library;Библиотека смешивания
 Lightness;Якрость
+LineUpStart;Начало построения
 List;Список
-Lyrics;Текст песен
 Lyricist;Поэт-песенник
+Lyrics;Текст песен
 Mastered_Date;Дата мастеринга
 MasteredBy;Мастеринг произвёл
+Matrix_Channel(s);Канал(ы) кодирования матрицы
+Matrix_ChannelPositions;Позиции каналов кодирования матрицы
 matrix_coefficients;Коэффициенты матрицы
+Matrix_Format;Формат кодирования матрицы
 MediaInfo_About;Отображает детальную информацию\r\nо мультимедиа-файлах Matroska, OGG (включая OGM)\r\nMPEG1 (включая VCD), MPEG2 (включая DVD и SVCD), MPEG4 (включая iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (включая WMV, WMA)\r\nMicrosoft RIFF (включая AVI, WAV, DivX)\r\nзвуковых форматах (AC3, DTS, SSC, AU, AIFF)
 Menu;Меню
 Menu stream(s);Меню потоков
 Menu_Codec_List;Меню кодеков
-Menu_No;Нет меню
-MenuCount;Кол-во потоков меню
 Menu_Hint;Дополнительные возможности
+Menu_No;Нет меню
+MenuCount;Количество потоков меню
 MenuID;Идентификатор меню
 mn; м.
 Mood;Настроение
@@ -819,8 +856,8 @@ NetworkName;Название сети
 New;Новый
 Newest version;Проверять на обновление (требуется подключение к интернету)
 NewVersion_Menu;Доступна новая версия
-NewVersion_Question_Title;Выпущена новая версия!
 NewVersion_Question_Content;Доступна новая версия %Version%, хотите скачать её?
+NewVersion_Question_Title;Выпущена новая версия!
 No;Нет
 Not yet;Ещё нет
 NumColors;Количество цветов
@@ -863,13 +900,19 @@ OpenCandy_33;Не устанавливать
 OpenCandy_34;Выберите параметры установки
 OpenCandy_35;______ рекомендуемая программа
 OpenCandy_36;Ваша текущая установка не будет прерываться
+OpenCaptionsLanguage;Язык титров
+OpenCaptionsPresent;Наличие титров
+OpenCaptionsType;Тип титров
 Options;Параметры
 Options_Hint;Настройки программы
 Original;Оригинал
 OriginalNetworkName;Оригинальное название сети
 OriginalSourceForm;Формат оригинала
 OriginalSourceMedium;Носитель оригинала
+Originator;Инициатор
 Other;Прочее
+OtherIdentifier;Другой идентификатор
+OtherIdentifierType;Тип другого идентификатора
 Output;Вывод
 Output format;Формат вывода
 OverallBitRate;Общий поток
@@ -878,11 +921,15 @@ OverallBitRate_Minimum;Минимальный общий битрейт
 OverallBitRate_Mode;Режим общего битрейта
 OverallBitRate_Nominal;Номинальный общий битрейт
 Part;Часть
-Part_Count;Кол-во частей
+Part_Count;Количество частей
+PartNumber;Номер части
+PartTotal;Всего частей
 Performer;Исполнитель
 Period;Период
 Phone;Телефон
+PictureRatio;Изображение радио
 PixelAspectRatio;Пропорции пикселя
+PixelAspectRatio_CleanAperture;
 PixelAspectRatio_Original;Пропорции пикселя в оригинале
 PlayCounter;Счётчик воспроизведения
 Played_Count;Воспроизведено раз
@@ -892,14 +939,20 @@ PlayTime;Длительность
 Position;Положение
 Position_Total;Всего
 Preferences;Настройки
+PrimaryAudioLanguage;Основной язык аудио
 Producer;Продюсер
 ProductionDesigner;Художник-постановщик
+ProductionNumber;Номер постановки
 ProductionStudio;Студия-производитель
+ProductPlacement;Размещение постановки
+ProgrammeHasText;Текст в программе
+ProgrammeTextLanguage;Язык текста в программе
+ProgrammeTitle;Заголовок программы
 Publisher;Издатель
 Purchased_Date;Дата покупки
 Quote character;Символ кавычек
 RadioStation;Радиостанция
-Rating;Рейтинг
+Rating;Оценка
 Recorded_Date;Дата записи
 Recorded_Location;Место записи
 Released_Date;Дата выпуска
@@ -908,28 +961,31 @@ ReplayGain_Gain;Нормализатор звука
 ReplayGain_Peak;Пик нормализатор звука
 Resolution;Разрешение
 s; с.
+SamplingCount;Количество образцов
 SamplingRate;Частота
 Save;Сохранить
-ScanType;Тип развёртки
-ScanType_Original;Тип развёртки в оригинале
-ScanType_StoreMethod;
 ScanOrder;Порядок развёртки
 ScanOrder_Original;Порядок развёртки в оригинале
 ScanOrder_Stored;Сохранённый порядок развёртки
 ScanOrder_StoredDisplayedInverted;Порядок развёртки, сохранённый в обратном порядке
-ScanOrder_StoreMethod;
+ScanOrder_StoreMethod;Метод сохранения порядка развёртки
+ScanType;Тип развёртки
+ScanType_Original;Тип развёртки в оригинале
+ScanType_StoreMethod;Метод сохранения типа развёртки
 ScreenplayBy;Сценарист
 Season;Сезон
+SecondaryAudioLanguage;Второй язык аудио
 see below;см. ниже
-Send HeaderFile;Отправить заголовок этого файла на http://sourceforge.net/projects/mediainfo/ (Раздел ошибок)
+Send HeaderFile;Отправьте мне заголовок этого файла на http://sourceforge.net/projects/mediainfo/ (Раздел ошибок)
 Separator_Columns;Разделитель столбцов
 Separator_Lines;Разделитель строк
+SeriesTitle;Заголовок серий
 ServiceChannel;Номер канала сервиса
 ServiceName;Название сервиса
 ServiceProvider;Поставщик сервиса
 ServiceType;Тип сервиса
 Set;Установка
-Set_Count;Кол-во установок
+Set_Count;Количество установок
 Setup;Настройка
 Sharpness;Резкость
 Sheet;Таблица
@@ -937,10 +993,13 @@ Sheet (Complete);Таблица (полная)
 Shell extension;Расширение Проводника (пункт в меню по правой кнопке)
 Shell extension, folder;Расширение Проводника для папок
 Shell InfoTip;Всплывающая подсказка в Проводнике
+ShimName;Название прокладки
+ShimVersion;Версия прокладки
 Show menu;Показывать меню
 Show toolbar;Показывать панель
+SigningPresent;Наличие подписи
+SignLanguage;Язык подписи
 Sort;Сортировать по
-SamplingCount;Количество образцов
 SoundEngineer;Звукорежиссёр
 Source;Оригинал
 Source_Duration;Продолжительность оригинала
@@ -949,13 +1008,13 @@ Source_SamplingCount;Количество примеров оригинала
 Source_StreamSize;Размер потока оригинала
 Source_StreamSize_Encoded;Закодированный размер потока оригинала
 Standard;Стандарт вещания
-StoreMethod_InterleavedFields;
-StoreMethod_SeparatedFields;
-StoreMethod_SeparatedFields_1;
-StoreMethod_SeparatedFields_2;
+StoreMethod_InterleavedFields;Чередующиеся поля
+StoreMethod_SeparatedFields;Раздельные поля
+StoreMethod_SeparatedFields_1;Раздельные поля (1-ое поле в блоке)
+StoreMethod_SeparatedFields_2;Раздельные поля (2-ое поле в блоке)
 Stream;Поток
 Stream_MoreInfo;Дополнительная информация о потоке
-StreamCount;Кол-во потоков такого типа
+StreamCount;Количество потоков такого типа
 StreamID;Идентификатор потока
 StreamKind;Тип потока
 StreamKindID;Идентификатор типа потока
@@ -974,6 +1033,7 @@ Tagged_Application;Пометившая программа
 Tagged_Date;Дата пометки
 Technician;Техник
 TermsOfUse;Условия использования
+TertiaryAudioLanguage;Третий язык аудио
 Text;Текст
 Text - Custom;Текст - выборочно
 Text (HTML);Текст (HTML)
@@ -984,20 +1044,24 @@ Text_No;Нет текста
 Text1;Первый текстовый поток
 Text2;Второй текстовый поток
 Text3;Третий текстовый поток
-TextCount;Кол-во текстовых потоков
+TextCount;Количество текстовых потоков
+TextlessElementsExist;Наличие безтекствовых элементов
 ThanksTo;Благодарности
 Thousands separator;Разделитель тысяч
-Title;Заголовок
-Title_More;Заголовок, дополнительно
 TimeCode;Временной код
 TimeCode_FirstFrame;Временной код первого кадра
 TimeCode_Settings;Параметры временного кода
 TimeCode_Source;Оригинал временного кода
+TimeCode_Striped;Временной код, чередующийся
 TimeStamp;Временная метка
 TimeZone;Часовой пояс
+Title;Заголовок
+Title_More;Заголовок, дополнительно
 Total;Всего
+TotalNumberOfParts;Общее количество частей
+TotalProgrammeDuration;Общая продолжительность программы
 Track;Трек
-Track_Count;Кол-во треков
+Track_Count;Количество треков
 transfer_characteristics;Характеристики трансфера
 Translator;Переводчик
 Tree;Дерево
@@ -1013,7 +1077,8 @@ Video_Delay;Задержка видео
 Video_No;Нет видео
 Video0_Delay;Задержка видео
 Video1;Первый видеопоток
-VideoCount;Кол-во видеопотоков
+VideoComments;Видео комментарии
+VideoCount;Количество видеопотоков
 View;Вид
 View_Hint;Измените отношение к просмотру информации
 Warning : more streams in the files;Внимание: в файлах есть ещё потоки
@@ -1028,6 +1093,7 @@ WebSite_Url;http://MediaArea.net/MediaInfo
 WebSite_Video;Сайт видеокодека
 WebSite_Video_More;Перейти на сайт (%Url%) для поиска этого видеокодека
 Width;Ширина
+Width_CleanAperture;
 Width_Original;Ширина оригинала
 WriteMe;Написать автору
 WriteToTranslator;Написать переводчику

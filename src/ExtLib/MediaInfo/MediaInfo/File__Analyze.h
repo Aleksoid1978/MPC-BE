@@ -298,27 +298,27 @@ protected :
 
     //Elements - Info
     void Element_Info (const Ztring &Parameter);
-    inline void Element_Info (const char*   Parameter) {Element_Info(Ztring().From_UTF8(Parameter));}
-    inline void Element_Info (const char*   Parameter, const char*   Measure)      {Element_Info(Ztring().From_UTF8(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int8s         Parameter, const char*   Measure=NULL) {Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int8u         Parameter, const char*   Measure=NULL) {Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int16s        Parameter, const char*   Measure=NULL) {Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int16u        Parameter, const char*   Measure=NULL) {Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int32s        Parameter, const char*   Measure=NULL) {Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int32u        Parameter, const char*   Measure=NULL) {Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int64s        Parameter, const char*   Measure=NULL) {Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int64u        Parameter, const char*   Measure=NULL) {Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int128u       Parameter, const char*   Measure=NULL) {Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (const char*   Parameter) {if (Config_Trace_Level) return; Element_Info(Ztring().From_UTF8(Parameter));}
+    inline void Element_Info (const char*   Parameter, const char*   Measure)      {if (Config_Trace_Level) return; Element_Info(Ztring().From_UTF8(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int8s         Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int8u         Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int16s        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int16u        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int32s        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int32u        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int64s        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int64u        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int128u       Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
     #ifdef SIZE_T_IS_LONG
     inline void Element_Info (size_t        Parameter, const char*   Measure=NULL) {Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
     #endif //SIZE_T_IS_LONG
-    inline void Element_Info (float32       Parameter, int8u AfterComma=3, const char*   Measure=NULL) {Element_Info(Ztring::ToZtring(Parameter, AfterComma)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (float64       Parameter, int8u AfterComma=3, const char*   Measure=NULL) {Element_Info(Ztring::ToZtring(Parameter, AfterComma)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (float32       Parameter, int8u AfterComma=3, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter, AfterComma)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (float64       Parameter, int8u AfterComma=3, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter, AfterComma)+Ztring().From_UTF8(Measure));}
     #define Element_Info1(_A) Element_Info(_A)
     #define Element_Info2(_A,_B) Element_Info(_A, _B)
     #define Element_Info3(_A,_B,_C) Element_Info(_A, _B, _C)
     #define Element_Info1C(_CONDITION,_A) if (_CONDITION) Element_Info(_A)
-    inline void Element_Info_From_Milliseconds (int64u Parameter)                  {Element_Info(Ztring().Duration_From_Milliseconds(Parameter));}
+    inline void Element_Info_From_Milliseconds (int64u Parameter)                  {if (Config_Trace_Level) return; Element_Info(Ztring().Duration_From_Milliseconds(Parameter));}
 
     //Elements - End
     inline void Element_End () {Element_End_Common_Flush();}
@@ -939,6 +939,7 @@ public :
     //***************************************************************************
 
     void Trusted_IsNot (const char* Reason);
+    bool Trusted_Get   () {return !Element[Element_Level].UnTrusted;}
 
     //***************************************************************************
     // Stream filling
@@ -1163,7 +1164,7 @@ protected :
     bool FileHeader_Begin_XML(tinyxml2::XMLDocument &Document);
     bool Synchronize_0x000001();
 public:
-    void TestContinuousFileNames(size_t CountOfFiles=24, Ztring FileExtension=Ztring());
+    void TestContinuousFileNames(size_t CountOfFiles=24, Ztring FileExtension=Ztring(), bool SkipComputeDelay=false);
 
 private :
 

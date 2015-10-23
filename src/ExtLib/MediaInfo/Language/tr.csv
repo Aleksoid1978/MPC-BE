@@ -28,6 +28,9 @@
  chapters stream1; bölüm akışı
  chapters stream2; bölüm akışı
  chapters stream3; bölüm akışı
+ character1;
+ character2;
+ character3;
  day1; gün
  day2; gün
  day3; gün
@@ -37,12 +40,12 @@
  file1; dosya
  file2; dosya
  file3; dosya
- frame1; kare
- frame2; kare
- frame3; kare
  fps1; kare/s
  fps2; kare/s
  fps3; kare/s
+ frame1; kare
+ frame2; kare
+ frame3; kare
  GB; GB
  Gb; Gb
  Gbps; Gbps
@@ -141,6 +144,8 @@
  year3; yıl
 , ;, 
 : ;: 
+3D;
+3DType;
 About;Hakkında
 About_Hint;Son sürümü bulmak ve benle nasıl bağlantı kurmanız için
 Accompaniment;Refakat
@@ -172,7 +177,12 @@ Audio_Codec_List;Ses kodekleri
 Audio_No;Ses yok
 Audio1;Birinci ses
 Audio2;İkinci ses
+AudioComments;
 AudioCount;Ses sayısı
+AudioDescriptionPresent;
+AudioDescriptionType;
+AudioLoudnessStandard;
+AudioTrackLayout;
 Author;Hazırlayan
 BarCode;BarKod
 Basic;Temel
@@ -180,13 +190,13 @@ Basic_Note;Not : Bu dosya hakkında daha fazla bilgi için farklı görünüm se
 BitDepth;Bit yoğunluğu
 BitDepth_Stored;
 BitRate;Bit oranı
+BitRate_Encoded;Kodlanmış bit oranı
 BitRate_Maximum;En fazla bit oranı
 BitRate_Minimum;En az bit oranı
 BitRate_Mode;Bit oranı modu
 BitRate_Mode_CBR;Sabit
 BitRate_Mode_VBR;Değişken
 BitRate_Nominal;Düşük bit oranı
-BitRate_Encoded;Kodlanmış bit oranı
 Bits-(Pixel*Frame);Bit/(Piksel*Kare)
 BufferSize;Arabellek boyutu
 Cancel;İptal
@@ -211,44 +221,53 @@ Chroma;Krom
 ChromaSubsampling;Krom altörnekleme
 Close;Kapat
 Close all before open;Açmadan önce tümünü kapat
+ClosedCaptionsLanguage;
+ClosedCaptionsPresent;
+ClosedCaptionsType;
 Codec;Kodek
 Codec_Description;Kodek açıklaması
 Codec_Info;Kodek için ayrıntılar
-Codec_Settings;Kodek ayarları
-Codec_Settings_PacketBitStream;Kodek ayarları, Paket bit akışı
-Codec_Settings_BVOP;Kodek ayarları, BVOP
-Codec_Settings_QPel;Kodek ayarları, QPel
-Codec_Settings_GMC;Kodek ayarları, GMC
-Codec_Settings_Matrix;Kodek ayarları, Matrix
-Codec_Settings_Floor;Kodek ayarları, Floor
-Codec_Settings_CABAC;Kodek ayarları, CABAC
-Codec_Settings_Firm;Kodek ayarları, Firm
-Codec_Settings_Endianness;Kodek ayarları, Endianness
-Codec_Settings_Sign;Kodek ayarları, Sign
-Codec_Settings_Law;Kodek ayarları, Law
-Codec_Settings_ITU;Kodek ayarları, ITU
 Codec_Profile;Kodek profili
+Codec_Settings;Kodek ayarları
+Codec_Settings_BVOP;Kodek ayarları, BVOP
+Codec_Settings_CABAC;Kodek ayarları, CABAC
+Codec_Settings_Endianness;Kodek ayarları, Endianness
+Codec_Settings_Firm;Kodek ayarları, Firm
+Codec_Settings_Floor;Kodek ayarları, Floor
+Codec_Settings_GMC;Kodek ayarları, GMC
+Codec_Settings_ITU;Kodek ayarları, ITU
+Codec_Settings_Law;Kodek ayarları, Law
+Codec_Settings_Matrix;Kodek ayarları, Matrix
+Codec_Settings_PacketBitStream;Kodek ayarları, Paket bit akışı
+Codec_Settings_QPel;Kodek ayarları, QPel
+Codec_Settings_Sign;Kodek ayarları, Sign
 Codec_Url;Kodek için web bağlantısı
 CodecID;Kodek ID
 CodecID_Description;Kodek açıklaması
+CoDirector;
 Collection;Koleksiyon
 Colorimetry;Renkölçüm
 ColorSpace;Renk alanı
 colour_primaries;Renk öncelikleri
+colour_range;
 Comment;Yorum
 CommissionedBy;Görevlendiren
 Compilation;Derleme
 CompleteName;Tam isim
+CompletionDate;
 Composer;Besteci
 Compression_Mode;Sıkıştırma kipi
 Compression_Mode_Lossless;Kayıpsız
 Compression_Mode_Lossy;Kayıplı
 Compression_Ratio;Sıkıştırma oranı
 Conductor;Orkestra şefi
+ContactEmail;
+ContactTelephoneNumber;
 Container and general information;Kalıp ve genel bilgi
 ContentType;İçerik Türü
 CoProducer;Yardımcı yapımcı
 Copyright;Telif Hakkı
+CopyrightYear;
 CostumeDesigner;Kıyafet tasarımcısı
 Count;Sayım
 Country;Ülke
@@ -274,8 +293,10 @@ Dimensions;Boyutlar
 Director;Yönetmen
 DirectorOfPhotography;Fotoğrafçılık yönetmeni
 DisplayAspectRatio;Görüntü en-boy oranı
+DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Orijinal görüntü en-boy oranı
 DistributedBy;Dağıtan
+Distributor;
 Donate;Bağış
 DotsPerInch;İnç başına nokta
 Duration;Süre
@@ -291,6 +312,7 @@ Encoded_Library_Settings;Kodlama ayarları
 Encoded_Original;Orijinal
 EncodedBy;Kodlayan
 EPG_Positions;EPG konumu (dahili)
+EpisodeTitleNumber;
 Error_File;Dosya okunurken hata
 ExecutiveProducer;İdari yapımcı
 Exit;Çıkış
@@ -324,39 +346,44 @@ Format_Description;Biçim açıklaması
 Format_Info;Biçim için ayrıntılar
 Format_Profile;Biçim profili
 Format_Settings;Biçim ayarları
-Format_Settings_PacketBitStream;Biçim ayarları, Paket bit akışı
 Format_Settings_BVOP;Biçim ayarları, BVOP
-Format_Settings_QPel;Biçim ayarları, QPel
+Format_Settings_CABAC;Biçim ayarları, CABAC
+Format_Settings_Emphasis;Vurgu
+Format_Settings_Endianness;Biçim ayarları, Endianess
+Format_Settings_Firm;Biçim ayarları, Firm
+Format_Settings_Floor;Biçim ayarları, Floor
+Format_Settings_FrameMode;Kare kipi
 Format_Settings_GMC;Biçim ayarları, GMC
+Format_Settings_GOP;Biçim ayarları, GOP
+Format_Settings_ITU;Biçim ayarları, ITU
+Format_Settings_Law;Biçim ayarları, Law
 Format_Settings_Matrix;Biçim ayarları, Matrix
 Format_Settings_Matrix_Custom;Özel
 Format_Settings_Matrix_Default;Varsayılan
-Format_Settings_Floor;Biçim ayarları, Floor
-Format_Settings_CABAC;Biçim ayarları, CABAC
-Format_Settings_Firm;Biçim ayarları, Firm
-Format_Settings_Endianness;Biçim ayarları, Endianess
-Format_Settings_RefFrames;Biçim ayarları, ReFrames
-Format_Settings_Sign;Biçim ayarları, Sign
-Format_Settings_Law;Biçim ayarları, Law
-Format_Settings_ITU;Biçim ayarları, ITU
-Format_Settings_SBR;Biçim ayarları, SBR
+Format_Settings_Mode;Kip
+Format_Settings_ModeExtension;Kip uzantısı
+Format_Settings_PacketBitStream;Biçim ayarları, Paket bit akışı
+Format_Settings_PictureStructure;
 Format_Settings_PS;Biçim ayarları, PS
 Format_Settings_Pulldown;Biçim ayarları, Pulldown
-Format_Settings_Mode;Kip
-Format_Settings_FrameMode;Kare kipi
-Format_Settings_Emphasis;Vurgu
-Format_Settings_ModeExtension;Kip uzantısı
-Format_Settings_GOP;Biçim ayarları, GOP
-Format_Version;Biçim sürümü
+Format_Settings_QPel;Biçim ayarları, QPel
+Format_Settings_RefFrames;Biçim ayarları, ReFrames
+Format_Settings_SBR;Biçim ayarları, SBR
+Format_Settings_Sign;Biçim ayarları, Sign
+Format_Settings_Wrapping;
 Format_Url;Biçim için web bağlantısı
+Format_Version;Biçim sürümü
+FpaManufacturer;
+FpaPass;
+FpaVersion;
 FrameCount;Kare sayısı
 FrameRate;Kare hızı
+FrameRate_Maximum;En fazla kare hızı
+FrameRate_Minimum;En az kare hızı
 FrameRate_Mode;Kare hız modu
 FrameRate_Mode_CFR;Sabit
 FrameRate_Mode_VFR;Değişken
-FrameRate_Minimum;En az kare hızı
 FrameRate_Nominal;Düşük kare hızı
-FrameRate_Maximum;En fazla kare hızı
 FrameRate_Original;Orijinal kare hızı
 General;Genel
 Genre;Tarz
@@ -553,10 +580,15 @@ Genre_189;Dubstep
 Genre_190;Garage Rock
 Genre_191;Psybient
 Go to WebSite;Web sitesine git
-Grouping;Gruplama
+Grouping;
+Gop_OpenClosed;
+Gop_OpenClosed_Open;
+Gop_OpenClosed_Closed;
+Gop_OpenClosed_FirstFrame;
 h;s
 Header file;Üst bilgi dosyası oluştur
 Height;Yükseklik
+Height_CleanAperture;
 Height_Original;Orijinal yükseklik
 Help;Yardım
 Hint;İpucu
@@ -566,22 +598,23 @@ How many text streams?;Kaç tane yazı akışı?
 How many video streams?;Kaç tane görüntü akışı?
 HTML;HTML
 ID;ID
+IdentClockStart;
 Image;İmaj
 Image stream(s);İmaj akışı
 Image_Codec_List;Kodek İmajı
 ImageCount;İmaj akışı sayısı
 Info;Bilgi
 Instruments;Enstrüman
-Interlacement;Karıştırma
-Interlaced_Interlaced;Karışık
-Interlaced_TFF;En Üst Alanın İlki
 Interlaced_BFF;En Alt Alanın İlki
+Interlaced_Interlaced;Karışık
 Interlaced_PPF;Aşamalı
 Interlaced_Progressive;Aşamalı
-Interleaved;Boşluklu
+Interlaced_TFF;En Üst Alanın İlki
+Interlacement;Karıştırma
 Interleave_Duration;Boşluk, süre
 Interleave_Preload;Boşluk, önyükleme süresi
 Interleave_VideoFrames;Boşluk, süre
+Interleaved;Boşluklu
 InternetMediaType;Internet medya türü
 IRCA;IRCA
 ISBN;ISBN
@@ -592,7 +625,6 @@ Known formats;Bilinen biçimler
 Known parameters;Bilinen parametreler
 Label;Etiket
 Language;Dil
-Language_More;Dil, daha fazla bilgi
 Language_aa;Afar
 Language_ab;Abkhazian
 Language_ae;Avestan
@@ -703,6 +735,7 @@ Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
 Language_mo;Moldavian
+Language_More;Dil, daha fazla bilgi
 Language_mr;Marathi
 Language_ms;Malay
 Language_mt;Maltese
@@ -789,19 +822,23 @@ LawRating;Kanun oranı
 LCCN;LCCN
 Library;Çoklama kütüphanesi
 Lightness;Canlılık
+LineUpStart;
 List;Liste
-Lyrics;Şarkı Sözleri
 Lyricist;Söz yazarı
+Lyrics;Şarkı Sözleri
 Mastered_Date;Sahip olma tarihi
 MasteredBy;Sahibi
+Matrix_Channel(s);
+Matrix_ChannelPositions;
 matrix_coefficients;Matriks katsayısı
+Matrix_Format;
 MediaInfo_About;Çok ayrıntılı bilgi sağlanan çokluortam\r\ndosyaları:\r\nMatroska, OGG (OGM dahil)\r\nMPEG1 (VCD dahil)\r\nMPEG2 (DVD ve SVCD dahil)\r\nMPEG4 (Itunes M4A dahil)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA dahil)\r\nMicrosoft RIFF (AVI, WAV dahil)\r\nSadece-ses biçimleri (AC3, DTS, AAC, AU, AIFF...)
 Menu;Menü
 Menu stream(s);Menü akışları
 Menu_Codec_List;Menü kodekleri
+Menu_Hint;Daha fazla olasılık
 Menu_No;Menü yok
 MenuCount;Meni sayısı
-Menu_Hint;Daha fazla olasılık
 MenuID;Menü ID
 mn;dk
 Mood;Mizaç
@@ -819,8 +856,8 @@ NetworkName;Ağ adı
 New;Yeni
 Newest version;Yeni sürümleri kontrol et (Internet bağlantısı gerekir)
 NewVersion_Menu;Yeni bir sürüm mevcut
-NewVersion_Question_Title;Yeni bir sürüm yayımlandı!
 NewVersion_Question_Content;Yeni sürüm (s%Version%) mevcut, indirmek istiyor musunuz?
+NewVersion_Question_Title;Yeni bir sürüm yayımlandı!
 No;Hayır
 Not yet;Henüz değil
 NumColors;Renk sayısı
@@ -863,13 +900,19 @@ OpenCandy_33;Kurma
 OpenCandy_34;Lütfen kurma seçeneği seçin
 OpenCandy_35;______ recommends this software
 OpenCandy_36;Your current installation will not be interrupted
+OpenCaptionsLanguage;
+OpenCaptionsPresent;
+OpenCaptionsType;
 Options;Seçenekler
 Options_Hint;Tercihler
 Original;Orijinal
 OriginalNetworkName;Orijinal ağ adı
 OriginalSourceForm;Orijinal kaynak biçimi
 OriginalSourceMedium;Orijinal kaynak ortamı
+Originator;
 Other;Diğer
+OtherIdentifier;
+OtherIdentifierType;
 Output;Çıktı
 Output format;Çıktı biçimi
 OverallBitRate;Kapsamlı bit oranı
@@ -879,10 +922,14 @@ OverallBitRate_Mode;Kapsamlı bit oranı modu
 OverallBitRate_Nominal;Düşük kapsamlı bit oranı
 Part;Parça
 Part_Count;Toplam sayı
+PartNumber;
+PartTotal;
 Performer;Sanatçı
 Period;Dönem
 Phone;Telefon
+PictureRatio;
 PixelAspectRatio;Piksel oranı
+PixelAspectRatio_CleanAperture;
 PixelAspectRatio_Original;Piksel oranı
 PlayCounter;Oynatma Sayacı
 Played_Count;Oynatma süresi
@@ -892,9 +939,15 @@ PlayTime;Oynatma Süresi
 Position;Konum
 Position_Total;Toplam
 Preferences;Tercihler
+PrimaryAudioLanguage;
 Producer;Yapımcı
 ProductionDesigner;Üretim tasarımcısı
+ProductionNumber;
 ProductionStudio;Üretim sütüdyosu
+ProductPlacement;
+ProgrammeHasText;
+ProgrammeTextLanguage;
+ProgrammeTitle;
 Publisher;Yayıncı
 Purchased_Date;Satın alma tarihi
 Quote character;Alıntı bölümü
@@ -908,22 +961,25 @@ ReplayGain_Gain;Tekrar oynatma kazancı
 ReplayGain_Peak;Tekrar oynatma kazancı ucu
 Resolution;Çözünürlük
 s;s
+SamplingCount;Örnek sayısı
 SamplingRate;Örnekleme oranı
 Save;Kaydet
-ScanType;Tarama türü
-ScanType_Original;Orijinal tarama türü
-ScanType_StoreMethod;
 ScanOrder;Tarama sırası
 ScanOrder_Original;Orijinal tarama sırası
 ScanOrder_Stored;
 ScanOrder_StoredDisplayedInverted;
 ScanOrder_StoreMethod;
+ScanType;Tarama türü
+ScanType_Original;Orijinal tarama türü
+ScanType_StoreMethod;
 ScreenplayBy;Senaryo
 Season;Sezon
+SecondaryAudioLanguage;
 see below;aşağı bakın
 Send HeaderFile;Lütfen Header dosyasını buraya gönderin : http://sourceforge.net/projects/mediainfo/ (Bug bölümü)
 Separator_Columns;Sütun ayırıcı
 Separator_Lines;Satır ayırıcı
+SeriesTitle;
 ServiceChannel;Hizmet kanal numarası
 ServiceName;Hizmet adı
 ServiceProvider;Hizmet sağlayıcısı
@@ -937,10 +993,13 @@ Sheet (Complete);Sayfa (Tam)
 Shell extension;Sistem uzantısı (gezginde sağ tuş tıklamada Media Info seçeneği olacak...)
 Shell extension, folder;Klasörler içinde
 Shell InfoTip;Sistem Bilgisi İpucu (gezginde, fareyi dosya üzerine taşıyın, bilgi görüntülenecek)
+ShimName;
+ShimVersion;
 Show menu;Menü göster
 Show toolbar;Araç çubuğu göster
+SigningPresent;
+SignLanguage;
 Sort;Sıralayan
-SamplingCount;Örnek sayısı
 SoundEngineer;Ses teknisyeni
 Source;Kaynak
 Source_Duration;Kaynak süresi
@@ -974,6 +1033,7 @@ Tagged_Application;Etiketleme uygulaması
 Tagged_Date;Etiketleme tarihi
 Technician;Teknisyen
 TermsOfUse;Kullanım şarları
+TertiaryAudioLanguage;
 Text;Metin
 Text - Custom;Metin - Özel
 Text (HTML);Metin (HTML)
@@ -985,17 +1045,21 @@ Text1;Birinci altyazı
 Text2;İkinci altyazı
 Text3;Üçüncü altyazı
 TextCount;Altyazı sayısı
+TextlessElementsExist;
 ThanksTo;Teşekkürler
 Thousands separator;Binlik basamak ayırıcı
-Title;Başlık
-Title_More;Başlık, daha fazla bilgi
 TimeCode;Zaman kodu
 TimeCode_FirstFrame;İlk karenin zaman kodu
 TimeCode_Settings;Zaman kodu ayarları
 TimeCode_Source;Zaman kodu kaynağı
+TimeCode_Striped;
 TimeStamp;Zaman damgası
 TimeZone;Saat dilimi
+Title;Başlık
+Title_More;Başlık, daha fazla bilgi
 Total;Toplam
+TotalNumberOfParts;
+TotalProgrammeDuration;
 Track;Parça adı
 Track_Count;Parça sayısı
 transfer_characteristics;Aktarım nitelikleri
@@ -1013,6 +1077,7 @@ Video_Delay;Görüntü gecikmesi
 Video_No;Görüntü yok
 Video0_Delay;Görüntü0 gecikmesi
 Video1;Birinci hareketli görüntü
+VideoComments;
 VideoCount;Hareketli görüntü sayısı
 View;Görünüm
 View_Hint;Görünüm bilgilerinin anlamını değiştirir
@@ -1028,6 +1093,7 @@ WebSite_Url;http://MediaArea.net/MediaInfo
 WebSite_Video;Bu görüntü kodek'inin web sitesine git
 WebSite_Video_More;Bu görüntü kodek'ini bulmak için (%Url%) web sitesine git
 Width;Genişlik
+Width_CleanAperture;
 Width_Original;Orijinal genişlik
 WriteMe;Bana yazın
 WriteToTranslator;Çevirmene yazın
@@ -1036,5 +1102,5 @@ Written_Location;Yazıldığı yer
 WrittenBy;Yazan
 Yes;Evet
 Your system;Sisteminiz
-ZZ_Automatic_Percent;99
-ZZ_AutomaticLanguage_Percent;99
+ZZ_Automatic_Percent;93
+ZZ_AutomaticLanguage_Percent;93

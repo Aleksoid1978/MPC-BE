@@ -28,6 +28,9 @@
  chapters stream1; fejezetsáv
  chapters stream2; fejezetsáv
  chapters stream3; fejezetsáv
+ character1;
+ character2;
+ character3;
  day1; nap
  day2; nap
  day3; nap
@@ -37,12 +40,12 @@
  file1; fájl
  file2; fájl
  file3; fájl
- frame1; képkocka
- frame2; képkocka
- frame3; képkocka
  fps1; fps
  fps2; fps
  fps3; fps
+ frame1; képkocka
+ frame2; képkocka
+ frame3; képkocka
  GB; GB
  Gb; Gb
  Gbps; Gbps
@@ -141,6 +144,8 @@
  year3; év
 , ;,
 : ;:
+3D;
+3DType;
 About;Névjegy
 About_Hint;Hogyan léphet velem kapcsolatba, illetve a legfrissebb változat lelőhelye
 Accompaniment;Kíséret
@@ -172,7 +177,12 @@ Audio_Codec_List;Hangkódekek
 Audio_No;Nincs hang
 Audio1;Első hangsáv
 Audio2;Második hangsáv
+AudioComments;
 AudioCount;Hangsávok száma
+AudioDescriptionPresent;
+AudioDescriptionType;
+AudioLoudnessStandard;
+AudioTrackLayout;
 Author;Szerző
 BarCode;Vonalkód
 Basic;Egyszerű
@@ -180,13 +190,13 @@ Basic_Note;Megjegyzés: a többi nézet (Táblázat, Fa ...) bővebb adatokat mu
 BitDepth;
 BitDepth_Stored;
 BitRate;Adatsebesség
+BitRate_Encoded;
 BitRate_Maximum;Legnagyobb adatsebesség
 BitRate_Minimum;Legkisebb adatsebesség
 BitRate_Mode;Adatsebesség mód
 BitRate_Mode_CBR;állandó
 BitRate_Mode_VBR;változó
 BitRate_Nominal;Névleges adatsebesség
-BitRate_Encoded;
 Bits-(Pixel*Frame);Bit/(képpont*képkocka)
 BufferSize;
 Cancel;Mégsem
@@ -211,44 +221,53 @@ Chroma;Szín
 ChromaSubsampling;
 Close;Bezárás
 Close all before open;Mindent bezár megnyitás előtt
+ClosedCaptionsLanguage;
+ClosedCaptionsPresent;
+ClosedCaptionsType;
 Codec;kódek
 Codec_Description;Kódek leírás
 Codec_Info;A kódek részletei
-Codec_Settings;Kódek beállításai
-Codec_Settings_PacketBitStream;Codec settings, Packet bitstream
-Codec_Settings_BVOP;Kódek beállításai, BVOP
-Codec_Settings_QPel;Kódek beállításai, QPel
-Codec_Settings_GMC;Kódek beállításai, GMC
-Codec_Settings_Matrix;Kódek beállításai, Matrix
-Codec_Settings_Floor;Kódek beállításai, Floor
-Codec_Settings_CABAC;Kódek beállításai, CABAC
-Codec_Settings_Firm;Kódek beállításai, Firm
-Codec_Settings_Endianness;Kódek beállításai, Endianness
-Codec_Settings_Sign;Kódek beállításai, Sign
-Codec_Settings_Law;Kódek beállításai, Law
-Codec_Settings_ITU;Kódek beállításai, ITU
 Codec_Profile;Kódek profil
+Codec_Settings;Kódek beállításai
+Codec_Settings_BVOP;Kódek beállításai, BVOP
+Codec_Settings_CABAC;Kódek beállításai, CABAC
+Codec_Settings_Endianness;Kódek beállításai, Endianness
+Codec_Settings_Firm;Kódek beállításai, Firm
+Codec_Settings_Floor;Kódek beállításai, Floor
+Codec_Settings_GMC;Kódek beállításai, GMC
+Codec_Settings_ITU;Kódek beállításai, ITU
+Codec_Settings_Law;Kódek beállításai, Law
+Codec_Settings_Matrix;Kódek beállításai, Matrix
+Codec_Settings_PacketBitStream;Codec settings, Packet bitstream
+Codec_Settings_QPel;Kódek beállításai, QPel
+Codec_Settings_Sign;Kódek beállításai, Sign
 Codec_Url;Kódek weblapja
 CodecID;Kódek azonosító
 CodecID_Description;Kódek leírás
+CoDirector;
 Collection;Gyűjtemény
 Colorimetry;Színkódolás
 ColorSpace;
 colour_primaries;
+colour_range;
 Comment;Megjegyzés
 CommissionedBy;Megbízó
 Compilation;
 CompleteName;Teljes név
+CompletionDate;
 Composer;Zeneszerző
 Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;Tömörítési arány
 Conductor;Vezényel
+ContactEmail;
+ContactTelephoneNumber;
 Container and general information;Gyűjtő és általános adatok
 ContentType;Tartalom típusa
 CoProducer;Gyártó
 Copyright;Jogok
+CopyrightYear;
 CostumeDesigner;Jelmeztervező
 Count;Számláló
 Country;Ország
@@ -274,8 +293,10 @@ Dimensions;Méretek
 Director;Rendező
 DirectorOfPhotography;Fényképezte
 DisplayAspectRatio;Képarány
+DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Eredeti képarány
 DistributedBy;Terjesztő
+Distributor;
 Donate;Adomány
 DotsPerInch;
 Duration;Időtartam
@@ -291,6 +312,7 @@ Encoded_Library_Settings;Kódoló könyvtár beállításai
 Encoded_Original;Eredeti
 EncodedBy;Kódolta
 EPG_Positions;
+EpisodeTitleNumber;
 Error_File;Fájlolvasási hiba
 ExecutiveProducer;Gyártó
 Exit;Kilépés
@@ -324,39 +346,44 @@ Format_Description;Formátum leírás
 Format_Info;A kódek részletei
 Format_Profile;Formátum profil
 Format_Settings;Formátum beállítások
-Format_Settings_PacketBitStream;Formátum beállítások, Packet bitstream
 Format_Settings_BVOP;Formátum beállítások, BVOP
-Format_Settings_QPel;Formátum beállítások, QPel
+Format_Settings_CABAC;Formátum beállítások, CABAC
+Format_Settings_Emphasis;
+Format_Settings_Endianness;Formátum beállítások, Endianness
+Format_Settings_Firm;Formátum beállítások, Firm
+Format_Settings_Floor;Formátum beállítások, Floor
+Format_Settings_FrameMode;
 Format_Settings_GMC;Formátum beállítások, GMC
+Format_Settings_GOP;
+Format_Settings_ITU;Formátum beállítások, ITU
+Format_Settings_Law;Formátum beállítások, Law
 Format_Settings_Matrix;Formátum beállítások, mátrix
 Format_Settings_Matrix_Custom;egyedi
 Format_Settings_Matrix_Default;alapérték
-Format_Settings_Floor;Formátum beállítások, Floor
-Format_Settings_CABAC;Formátum beállítások, CABAC
-Format_Settings_Firm;Formátum beállítások, Firm
-Format_Settings_Endianness;Formátum beállítások, Endianness
-Format_Settings_RefFrames;Formátum beállítások, ReFrames
-Format_Settings_Sign;Formátum beállítások, Sign
-Format_Settings_Law;Formátum beállítások, Law
-Format_Settings_ITU;Formátum beállítások, ITU
-Format_Settings_SBR;Formátum beállítások, SBR
+Format_Settings_Mode;
+Format_Settings_ModeExtension;
+Format_Settings_PacketBitStream;Formátum beállítások, Packet bitstream
+Format_Settings_PictureStructure;
 Format_Settings_PS;Formátum beállítások, PS
 Format_Settings_Pulldown;Formátum beállítások, Pulldown
-Format_Settings_Mode;
-Format_Settings_FrameMode;
-Format_Settings_Emphasis;
-Format_Settings_ModeExtension;
-Format_Settings_GOP;
-Format_Version;Formátum változat
+Format_Settings_QPel;Formátum beállítások, QPel
+Format_Settings_RefFrames;Formátum beállítások, ReFrames
+Format_Settings_SBR;Formátum beállítások, SBR
+Format_Settings_Sign;Formátum beállítások, Sign
+Format_Settings_Wrapping;
 Format_Url;Formátum weblapja
+Format_Version;Formátum változat
+FpaManufacturer;
+FpaPass;
+FpaVersion;
 FrameCount;Képkockaszám
 FrameRate;Képkockasebesség
+FrameRate_Maximum;Legnagyobb képkockasebesség
+FrameRate_Minimum;Legkisebb képkockasebesség
 FrameRate_Mode;Képkockasebességi mód
 FrameRate_Mode_CFR;állandó
 FrameRate_Mode_VFR;változó
-FrameRate_Minimum;Legkisebb képkockasebesség
 FrameRate_Nominal;Névleges képkockasebesség
-FrameRate_Maximum;Legnagyobb képkockasebesség
 FrameRate_Original;Eredeti képkockasebesség
 General;Általános
 Genre;Műfaj
@@ -554,9 +581,14 @@ Genre_190;
 Genre_191;
 Go to WebSite;A weblap meglátogatása
 Grouping;
+Gop_OpenClosed;
+Gop_OpenClosed_Open;
+Gop_OpenClosed_Closed;
+Gop_OpenClosed_FirstFrame;
 h; óra
 Header file;Fejléc fájl létrehozása
 Height;Magasság
+Height_CleanAperture;
 Height_Original;
 Help;Súgó
 Hint;Tipp
@@ -566,22 +598,23 @@ How many text streams?;Hány szövegsáv?
 How many video streams?;Hány képsáv?
 HTML;HTML
 ID;Sáv száma
+IdentClockStart;
 Image;Állókép
 Image stream(s);Állóképsávok
 Image_Codec_List;Állóképkódekek
 ImageCount;Állóképsávok száma
 Info;adatok
 Instruments;Hangszerek
-Interlacement;Sorváltás
-Interlaced_Interlaced;váltottsoros
-Interlaced_TFF;felső mezővel kezdődő
 Interlaced_BFF;alsó mezővel kezdődő
+Interlaced_Interlaced;váltottsoros
 Interlaced_PPF;folytonos
 Interlaced_Progressive;folytonos
-Interleaved;
+Interlaced_TFF;felső mezővel kezdődő
+Interlacement;Sorváltás
 Interleave_Duration;Átfedés hossza
 Interleave_Preload;Átfedés előolvasási hossz
 Interleave_VideoFrames;Átfedés képkockák
+Interleaved;
 InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
@@ -592,7 +625,6 @@ Known formats;Ismert formátumok
 Known parameters;Ismert paraméterek
 Label;Címke
 Language;Nyelv
-Language_More;Nyelv, további adatok
 Language_aa;afar
 Language_ab;abház
 Language_ae;
@@ -703,6 +735,7 @@ Language_mk;macedón
 Language_ml;malajziai
 Language_mn;mongol
 Language_mo;moldáv
+Language_More;Nyelv, további adatok
 Language_mr;marathi
 Language_ms;maláj
 Language_mt;máltai
@@ -789,19 +822,23 @@ LawRating;Korhatár
 LCCN;LCCN
 Library;Keverőkönyvtár
 Lightness;Fényesség
+LineUpStart;
 List;Lista
-Lyrics;Dalszöveg
 Lyricist;Szövegíró
+Lyrics;Dalszöveg
 Mastered_Date;Mesterpéldány kelte
 MasteredBy;Mesterpéldány
+Matrix_Channel(s);
+Matrix_ChannelPositions;
 matrix_coefficients;
+Matrix_Format;
 MediaInfo_About;Igen részletes adatok az alábbi\r\nmultimédia fájlokról:\r\nMatroska, OGG (OGM is)\r\nMPEG1 (VCD is)\r\nMPEG2 (DVD és SVCD is)\r\nMPEG4 (Itunes M4A is)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA is)\r\nMicrosoft RIFF (AVI, WAV is)\r\nCsak hangot tartalmazó fájlok (AC3, DTS, AAC, AU, AIFF...)
 Menu;Menü
 Menu stream(s);Menüsáv
 Menu_Codec_List;Menükódek lista
+Menu_Hint;További lehetőségek
 Menu_No;Menüszám
 MenuCount;Menüsávok száma
-Menu_Hint;További lehetőségek
 MenuID;Menü azonosító
 mn; perc
 Mood;Hangnem
@@ -819,8 +856,8 @@ NetworkName;
 New;Új
 Newest version;Frissítés keresése (internet kapcsolat szükséges)
 NewVersion_Menu;Elérhető egy újabb változat.
-NewVersion_Question_Title;Új változat jelent meg!
 NewVersion_Question_Content;Elérhető egy újabb (v%Version%) változat. Kívánja letölteni?
+NewVersion_Question_Title;Új változat jelent meg!
 No;nem
 Not yet;Még nincs
 NumColors;Színek száma
@@ -863,13 +900,19 @@ OpenCandy_33;
 OpenCandy_34;
 OpenCandy_35;
 OpenCandy_36;
+OpenCaptionsLanguage;
+OpenCaptionsPresent;
+OpenCaptionsType;
 Options;Beállítások
 Options_Hint;Beállítások
 Original;Eredeti
 OriginalNetworkName;
 OriginalSourceForm;Eredeti forrás formátuma
 OriginalSourceMedium;Eredeti adathordozója
+Originator;
 Other;Egyéb
+OtherIdentifier;
+OtherIdentifierType;
 Output;Kimenet
 Output format;Kimeneti formátum
 OverallBitRate;Teljes adatsebesség
@@ -879,10 +922,14 @@ OverallBitRate_Mode;Teljes adatsebesség
 OverallBitRate_Nominal;Névleges adatsebesség
 Part;Rész
 Part_Count;Részek száma
+PartNumber;
+PartTotal;
 Performer;Előadó
 Period;Korszak
 Phone;Telefon
+PictureRatio;
 PixelAspectRatio;Képpont arány
+PixelAspectRatio_CleanAperture;
 PixelAspectRatio_Original;Képpont arány
 PlayCounter;Lejátszás számláló
 Played_Count;Lejátszások száma
@@ -892,9 +939,15 @@ PlayTime;Játékidő
 Position;Helyzet
 Position_Total;
 Preferences;Beállítások
+PrimaryAudioLanguage;
 Producer;Gyártó
 ProductionDesigner;Tervező
+ProductionNumber;
 ProductionStudio;Gyártó stúdió
+ProductPlacement;
+ProgrammeHasText;
+ProgrammeTextLanguage;
+ProgrammeTitle;
 Publisher;Kiadó
 Purchased_Date;Vásárlás dátuma
 Quote character;Idézőjel karakter
@@ -908,22 +961,25 @@ ReplayGain_Gain;Visszajátszás erősítése
 ReplayGain_Peak;Visszajátszás csúcserősítése
 Resolution;Felbontás
 s; mp
+SamplingCount;
 SamplingRate;Mintavételezési gyakoriság
 Save;Mentés
-ScanType;Sorváltás típusa
-ScanType_Original;
-ScanType_StoreMethod;
 ScanOrder;Sorváltási sorrend
 ScanOrder_Original;
 ScanOrder_Stored;
 ScanOrder_StoredDisplayedInverted;
 ScanOrder_StoreMethod;
+ScanType;Sorváltás típusa
+ScanType_Original;
+ScanType_StoreMethod;
 ScreenplayBy;Forgatókönyvíró
 Season;Évad
+SecondaryAudioLanguage;
 see below;lásd alant
 Send HeaderFile;Kérem, küdje el a fejléc fájlt ide: http://sourceforge.net/projects/mediainfo/ (Bug section)
 Separator_Columns;Oszlop elválasztó
 Separator_Lines;Sor elválasztó
+SeriesTitle;
 ServiceChannel;Szolgáltatás csatornája
 ServiceName;Szolgáltatás neve
 ServiceProvider;Szolgáltató
@@ -937,10 +993,13 @@ Sheet (Complete);Táblázat (teljes)
 Shell extension;Rendszerhéj-kiterjesztés (az Intézőben a helyzetérzékeny menüben Media Info menüpont...)
 Shell extension, folder;
 Shell InfoTip;Rendszerhéj tipp (ha az egérmutató az Intézőben a fájl fölé visszük, adatokat láthatunk)
+ShimName;
+ShimVersion;
 Show menu;Menü mutatása
 Show toolbar;Eszköztár mutatása
+SigningPresent;
+SignLanguage;
 Sort;Sorba rendezte
-SamplingCount;
 SoundEngineer;Hangmérnök
 Source;
 Source_Duration;
@@ -974,6 +1033,7 @@ Tagged_Application;Jelölő alkalmazás
 Tagged_Date;Jelölés dátuma
 Technician;Technikus
 TermsOfUse;Felhasználási feltételek
+TertiaryAudioLanguage;
 Text;Szöveg
 Text - Custom;Szöveg - egyedi
 Text (HTML);Text (HTML)
@@ -985,17 +1045,21 @@ Text1;Első szövegsáv
 Text2;Második szövegsáv
 Text3;Harmadik szövegsáv
 TextCount;Szövegsávok száma
+TextlessElementsExist;
 ThanksTo;Köszönetnyilvánítás
 Thousands separator;Ezres elválasztó jel
-Title;Cím
-Title_More;Cím, több adat
 TimeCode;
 TimeCode_FirstFrame;
 TimeCode_Settings;
 TimeCode_Source;
+TimeCode_Striped;
 TimeStamp;
 TimeZone;
+Title;Cím
+Title_More;Cím, több adat
 Total;Összesen
+TotalNumberOfParts;
+TotalProgrammeDuration;
 Track;Sáv
 Track_Count;Sávok száma
 transfer_characteristics;
@@ -1013,6 +1077,7 @@ Video_Delay;Videó késleltetés
 Video_No;Nincs kép
 Video0_Delay;Video0 késleltetés
 Video1;Első képsáv
+VideoComments;
 VideoCount;Képsávok száma
 View;Nézet
 View_Hint;Megtekintési adatok megváltoztatása
@@ -1028,6 +1093,7 @@ WebSite_Url;http://MediaArea.net/MediaInfo
 WebSite_Video;A képkódek weblapjának meglátogatása
 WebSite_Video_More;Látogassa meg a képkódek weblapját (%Url%)
 Width;Szélesség
+Width_CleanAperture;
 Width_Original;
 WriteMe;Írjon
 WriteToTranslator;Írjon a fordítónak
@@ -1036,5 +1102,5 @@ Written_Location;Írás helye
 WrittenBy;Írta
 Yes;igen
 Your system;Rendszer
-ZZ_Automatic_Percent;82
-ZZ_AutomaticLanguage_Percent;93
+ZZ_Automatic_Percent;78
+ZZ_AutomaticLanguage_Percent;87

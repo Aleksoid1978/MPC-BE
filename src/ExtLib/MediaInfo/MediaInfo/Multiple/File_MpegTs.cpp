@@ -324,7 +324,7 @@ void File_MpegTs::Streams_Accept()
                 Config->File_IgnoreSequenceFilesCount_Set(false);
         #endif //MEDIAINFO_ADVANCED
 
-        TestContinuousFileNames();
+        TestContinuousFileNames(24, Ztring(), true);
     }
 }
 
@@ -461,6 +461,39 @@ void File_MpegTs::Streams_Update_Programs()
                     int16u elementary_PID=Program->second.elementary_PIDs[Pos];
                     if (PerStream_AlwaysParse || Complete_Stream->Streams[elementary_PID]->IsRegistered)
                     {
+                        if (!Complete_Stream->Streams[elementary_PID]->Teletexts.empty())
+                        {
+                            for (std::map<int16u, complete_stream::stream::teletext>::iterator Teletext=Complete_Stream->Streams[elementary_PID]->Teletexts.begin(); Teletext!=Complete_Stream->Streams[elementary_PID]->Teletexts.end(); ++Teletext)
+                            {
+                                Ztring Format;
+                                Ztring Language;
+                                if (Teletext->second.StreamKind!=Stream_Max)
+                                {
+                                    StreamKinds+=Ztring::ToZtring(Teletext->second.StreamKind);
+                                    StreamPoss+=Ztring::ToZtring(Teletext->second.StreamPos);
+                                    Format=Retrieve(Teletext->second.StreamKind, Teletext->second.StreamPos, "Format");
+                                    Language=Retrieve(Teletext->second.StreamKind, Teletext->second.StreamPos, "Language");
+                                }
+                                Formats+=Format+__T(" / ");
+                                Codecs+=Format+__T(" / ");
+                                StreamKinds+=__T(" / ");
+                                StreamPoss+=__T(" / ");
+                                elementary_PIDs+=Ztring::ToZtring(elementary_PID)+__T('-')+Ztring::ToZtring(Teletext->first)+__T(" / ");
+                                Languages+=Language+__T(" / ");
+                                Ztring List_String=Decimal_Hexa(elementary_PID)+__T('-')+Ztring::ToZtring(Teletext->first);
+                                List_String+=__T(" (");
+                                List_String+=Format;
+                                if (!Language.empty())
+                                {
+                                    List_String+=__T(", ");
+                                    List_String+=Language;
+                                }
+                                List_String+=__T(")");
+                                elementary_PIDs_String+=List_String+__T(" / ");
+                            }
+                        }
+                        else
+                        {
                         Ztring Format=Retrieve(Complete_Stream->Streams[elementary_PID]->StreamKind, Complete_Stream->Streams[elementary_PID]->StreamPos, Fill_Parameter(Complete_Stream->Streams[elementary_PID]->StreamKind, Generic_Format));
                         if (Format.empty())
                             Format=Mpeg_Psi_stream_type_Format(Complete_Stream->Streams[elementary_PID]->stream_type, Program->second.registration_format_identifier);
@@ -494,6 +527,7 @@ void File_MpegTs::Streams_Update_Programs()
                         }
                         List_String+=__T(")");
                         elementary_PIDs_String+=List_String+__T(" / ");
+                        }
 
                         if (Complete_Stream->Streams[elementary_PID]->IsPCR)
                         {
@@ -912,6 +946,8 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
                     Fill(StreamKind_Last, StreamPos_Last, Info->first.c_str(), Info->second);
             }
             Teletext->second.Infos.clear();
+            Teletext->second.StreamKind=StreamKind_Last;
+            Teletext->second.StreamPos=StreamPos_Last;
         }
     }
 
@@ -1926,9 +1962,30 @@ void File_MpegTs::Read_Buffer_AfterParsing()
             //
             if (!(Buffer_TotalBytes-Buffer_TotalBytes_FirstSynched>=MpegTs_JumpTo_Begin && Config->ParseSpeed<0.8))
             {
-                //We are already parsing 16 seconds (for all PCRs), we don't hope to have more info
                 MpegTs_JumpTo_Begin=File_Offset+Buffer_Offset-Buffer_TotalBytes_FirstSynched;
                 MpegTs_JumpTo_End=MpegTs_JumpTo_Begin;
+
+                //Avoid too short duration of the end. e.g. with quick pass, MpegTs_JumpTo_End may have content only for 2 frames which is not enough for catching an I-frame at the end of the file. Forcing to 2 seconds
+                if (Config->ParseSpeed < 0.5)
+                {
+                    complete_stream::streams::iterator It_End=Complete_Stream->Streams.end();
+                    for (complete_stream::streams::iterator It=Complete_Stream->Streams.begin(); It!=It_End; It++)
+                    {
+                        complete_stream::stream* &Stream=*It;
+
+                        if (Stream && Stream->Kind==complete_stream::stream::pes && Stream->TimeStamp_Start!=(int64u)-1 && Stream->TimeStamp_End!=(int64u)-1)
+                        {
+                            int64u Duration=Stream->TimeStamp_End-Stream->TimeStamp_Start;
+                            if (Duration<27000000*2) // 2 seconds
+                            {
+                                int64u Ratio=(27000000*2)/Duration;
+                                MpegTs_JumpTo_End*=Ratio;
+                                break; //Using the first PES found
+                            }
+                        }
+                    }
+                }
+
                 if (MpegTs_JumpTo_Begin+MpegTs_JumpTo_End>=File_Size)
                 {
                     if (MpegTs_JumpTo_Begin+MpegTs_JumpTo_End>File_Size)
@@ -2250,8 +2307,8 @@ void File_MpegTs::Header_Parse()
             if (transport_scrambling_control>0)
                 Complete_Stream->Streams[pid]->Scrambled_Count++;
         }
-        else if (Element_Offset<TS_Size)
-            Skip_XX(TS_Size-Element_Offset,                         "Junk");
+        else if (Element_Offset+TSP_Size<TS_Size)
+            Skip_XX(TS_Size-Element_Offset-TSP_Size,            "Junk");
 
         //Filling
         Header_Fill_Code(pid, __T("0x")+Ztring().From_CC2(pid));
@@ -2758,7 +2815,7 @@ void File_MpegTs::Data_Parse()
     Frame_Count++;
 
     //TSP specific
-    if (TSP_Size && Element_Size>TSP_Size)
+    if (TSP_Size)
         Element_Size-=TSP_Size;
 
     #if MEDIAINFO_DUPLICATE
@@ -2784,10 +2841,14 @@ void File_MpegTs::Data_Parse()
         }
 
     //TSP specific
-    if (TSP_Size && Element_Size>TSP_Size)
+    if (TSP_Size)
     {
         Element_Size+=TSP_Size;
-        Skip_B4(                                                "TSP"); //TSP supplement
+        switch(TSP_Size)
+        {
+            case 16: Skip_B16(                                  "TSP"); break; //TSP supplement
+            default: Skip_XX(TSP_Size,                          "TSP");
+        }
     }
 }
 
@@ -3190,7 +3251,7 @@ void File_MpegTs::PSI()
 
                         //Moving other StreamPos
                         for (size_t Pos2=Pos+1; Pos2<Complete_Stream->StreamPos_ToRemove[StreamKind].size(); Pos2++)
-                            Complete_Stream->StreamPos_ToRemove[StreamKind][Pos]--;
+                            Complete_Stream->StreamPos_ToRemove[StreamKind][Pos2]--;
 
                         //Informing that the menu must be recalculated - TODO: only the related programs
                         if (StreamKind!=Stream_Menu)

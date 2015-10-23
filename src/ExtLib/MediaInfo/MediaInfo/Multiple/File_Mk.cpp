@@ -3390,6 +3390,8 @@ void File_Mk::CodecID_Manage()
     else if (Format==__T("FFV1"))
     {
         Stream[TrackNumber].Parser=new File_Ffv1;
+        ((File_Ffv1*)Stream[TrackNumber].Parser)->Width=Retrieve(Stream_Video, StreamPos_Last, Video_Width).To_int64u();
+        ((File_Ffv1*)Stream[TrackNumber].Parser)->Height=Retrieve(Stream_Video, StreamPos_Last, Video_Height).To_int64u();
     }
     #endif
     #if defined(MEDIAINFO_HUFFYUV_YES)

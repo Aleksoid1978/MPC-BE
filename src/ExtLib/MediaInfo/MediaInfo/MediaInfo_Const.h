@@ -94,6 +94,7 @@ enum infooptions_t
     InfoOption_Reserved,            ///<
     InfoOption_ShowInSupported,     ///< Internal use only (info : Must be showed in Info_Capacities() )
     InfoOption_TypeOfValue,         ///< Value return by a standard Get() can be : T (Text), I (Integer, warning up to 64 bits), F (Float), D (Date), B (Binary datas coded Base64) (Numbers are in Base 10)
+    InfoOption_ShowInXml,           ///<
     InfoOption_Max
 };
 

@@ -28,10 +28,12 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Video/File_Ffv1.h"
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "ZenLib/BitStream.h"
 //---------------------------------------------------------------------------
 
 #include <algorithm>
+#include <math.h>
 using namespace std;
 
 //---------------------------------------------------------------------------
@@ -43,6 +45,9 @@ namespace MediaInfoLib
 //***************************************************************************
 
 extern int32u Psi_CRC_32_Table[256];
+const int32u Slice::Context::N0 = 128;
+const int32s Slice::Context::Cmax = 127;
+const int32s Slice::Context::Cmin = -128;
 
 //***************************************************************************
 // RangeCoder
@@ -81,7 +86,7 @@ void RangeCoder::AssignStateTransitions (const state_transitions new_state_trans
 }
 
 //---------------------------------------------------------------------------
-bool RangeCoder::get_rac(int8u States[])
+bool RangeCoder::get_rac(int8u* States)
 {
     //Here is some black magic... But it works. TODO: better understanding of the algorithm and maybe optimization
     int16u Mask2=(int16u)((((int32u)Mask) * (*States)) >> 8);
@@ -116,7 +121,7 @@ bool RangeCoder::get_rac(int8u States[])
 }
 
 //---------------------------------------------------------------------------
-int32u RangeCoder::get_symbol_u(states &States)
+int32u RangeCoder::get_symbol_u(int8u* States)
 {
     if (get_rac(States))
         return 0;
@@ -141,7 +146,7 @@ int32u RangeCoder::get_symbol_u(states &States)
 }
 
 //---------------------------------------------------------------------------
-int32s RangeCoder::get_symbol_s(states &States)
+int32s RangeCoder::get_symbol_s(int8u* States)
 {
     if (get_rac(States))
         return 0;
@@ -150,7 +155,7 @@ int32s RangeCoder::get_symbol_s(states &States)
     while (get_rac(States+1+min(e, (int8u)9))) // 1..10
         e++;
 
-    int8u a=1;
+    int32u a=1;
     if (e)
     {
         int8u i = e;
@@ -226,6 +231,59 @@ const state_transitions Ffv1_default_state_transition =
     241,242,243,244,245,246,247,248,248,  0,  0,  0,  0,  0,  0,  0,
 };
 
+// Coming from FFv1 spec.
+const int8u log2_run[41]={
+    0 , 0, 0, 0, 1, 1, 1, 1,
+    2 , 2, 2, 2, 3, 3, 3, 3,
+    4 , 4, 5, 5, 6, 6, 7, 7,
+    8 , 9,10,11,12,13,14,15,
+    16,17,18,19,20,21,22,23,
+    24,
+};
+
+//***************************************************************************
+// Slice
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void Slice::contexts_clean()
+{
+    for (size_t i = 0; i < MAX_PLANES; i++)
+    {
+        if (contexts[i])
+            delete[] contexts[i];
+    }
+}
+
+//---------------------------------------------------------------------------
+void Slice::contexts_init(int32u plane_count, int32u quant_table_index[MAX_PLANES], int32u context_count[MAX_QUANT_TABLES])
+{
+    contexts_clean();
+
+    for (size_t i = 0; i < MAX_PLANES; ++i)
+    {
+        if (i >= plane_count)
+        {
+            contexts[i] = NULL;
+            continue;
+        }
+        int32u idx = quant_table_index[i];
+        contexts[i] = new Context [context_count[idx]];
+        for (size_t j = 0; j < context_count[idx]; j++)
+        {
+            Context *c = &contexts[i][j];
+
+            c->N = 1;
+            //c->A = (alpha + 32) / 64; // alpha == alphabet size (256)
+            //if (c->A < 2)
+            //    c->A = 2;
+            c->A = 4;
+            c->C = 0;
+            c->B = c->C;
+        }
+    }
+}
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -238,16 +296,45 @@ File_Ffv1::File_Ffv1()
     ParserName=__T("FFV1");
     IsRawStream=true;
 
+    //use Ffv1_default_state_transition by default
+    memcpy(state_transitions_table, Ffv1_default_state_transition,
+           sizeof(Ffv1_default_state_transition));
+    
+    //Input
+    Width = (int32u)-1;
+    Height = (int32u)-1;
+
     //Temp
+    for (size_t i=0; i < MAX_QUANT_TABLES; ++i)
+        plane_states[i] = NULL;
     ConfigurationRecordIsPresent=false;
     RC=NULL;
     version=0;
+    num_h_slices = 1;
+    num_v_slices = 1;
+    slices = NULL;
 }
 
 //---------------------------------------------------------------------------
 File_Ffv1::~File_Ffv1()
 {
     //Temp
+    if (slices)
+    {
+        for (size_t y = 0; y < num_v_slices; ++y)
+            for (size_t x = 0; x < num_h_slices; ++x)
+                plane_states_clean(slices[x + y * num_h_slices].plane_states);
+        delete[] slices;
+    }
+    for (size_t i = 0; i < MAX_QUANT_TABLES; ++i)
+    {
+        if (!plane_states[i])
+            continue;
+        for (size_t j = 0; j < context_count[i]; ++j)
+            delete[] plane_states[i][j];
+        delete[] plane_states[i];
+        plane_states[i] = NULL;
+    }
     delete RC; //RC=NULL
 }
 
@@ -272,11 +359,9 @@ void File_Ffv1::Get_RB (states &States, bool &Info, const char* Name)
 {
     Info=RC->get_rac(States);
 
+    Element_Offset=RC->Buffer_Cur-Buffer;
     if (Trace_Activated)
-    {
-        Element_Offset=RC->Buffer_Cur-Buffer;
         Param(Name, Info);
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -298,16 +383,23 @@ void File_Ffv1::Get_RS (states &States, int32s &Info, const char* Name)
 }
 
 //---------------------------------------------------------------------------
+void File_Ffv1::Get_RS (int8u* &States, int32s &Info, const char* Name)
+{
+    Info=RC->get_symbol_s(States);
+
+    Element_Offset=RC->Buffer_Cur-Buffer;
+    if (Trace_Activated)
+        Param(Name, Info);
+}
+
+//---------------------------------------------------------------------------
 void File_Ffv1::Skip_RC (states &States, const char* Name)
 {
+    int8u Info=RC->get_rac(States);
+
+    Element_Offset=RC->Buffer_Cur-Buffer;
     if (Trace_Activated)
-    {
-        int8u Info=RC->get_rac(States);
-        Element_Offset=RC->Buffer_Cur-Buffer;
         Param(Name, Info);
-    }
-    else
-        RC->get_rac(States);
 }
 
 //---------------------------------------------------------------------------
@@ -348,6 +440,12 @@ void File_Ffv1::Get_RS_ (states &States, int32s &Info)
 }
 
 //---------------------------------------------------------------------------
+void File_Ffv1::Get_RS_ (int8u* &States, int32s &Info)
+{
+    Info=RC->get_symbol_s(States);
+}
+
+//---------------------------------------------------------------------------
 void File_Ffv1::Skip_RC_ (states &States)
 {
     RC->get_rac(States);
@@ -375,16 +473,8 @@ void File_Ffv1::Skip_RS_ (states &States)
 void File_Ffv1::Read_Buffer_OutOfBand()
 {
     ConfigurationRecordIsPresent=true;
-    
-    int32u CRC_32=0;
-    const int8u* CRC_32_Buffer=Buffer+Buffer_Offset+(size_t)Element_Offset;
-    const int8u* CRC_32_Buffer_End=CRC_32_Buffer+(size_t)Element_Size;
 
-    while(CRC_32_Buffer<CRC_32_Buffer_End)
-    {
-        CRC_32=(CRC_32<<8) ^ Psi_CRC_32_Table[(CRC_32>>24)^(*CRC_32_Buffer)];
-        CRC_32_Buffer++;
-    }
+    int32u CRC_32=CRC_Compute((size_t)Element_Size);
 
     if (Buffer_Size < 4 || CRC_32)
     {
@@ -415,7 +505,6 @@ void File_Ffv1::Read_Buffer_Continue()
     states States;
     memset(States, 128, states_size);
 
-    bool keyframe;
     Get_RB (States, keyframe,                                   "keyframe");
 
     if (!ConfigurationRecordIsPresent)
@@ -423,47 +512,85 @@ void File_Ffv1::Read_Buffer_Continue()
 
     if (version>2)
     {
+        int32u tail = 3;
+        tail += error_correction == 1 ? 5 : 0;
+
         int64u Slices_BufferPos=Element_Size;
         vector<int32u> Slices_BufferSizes;
         while (Slices_BufferPos)
         {
-            int32u Size = BigEndian2int24u(Buffer + Buffer_Offset + (size_t)Slices_BufferPos - 8);
+            int32u Size = BigEndian2int24u(Buffer + Buffer_Offset + (size_t)Slices_BufferPos - tail);
+            Size += tail;
+
+            if (Slices_BufferPos < Size)
+                Slices_BufferPos = Size;
+            Slices_BufferPos-=Size;
+
             Slices_BufferSizes.insert(Slices_BufferSizes.begin(), Size);
-            Slices_BufferPos-=8+Size;
         }
 
         Element_Offset=0;
         for (size_t Pos = 0; Pos < Slices_BufferSizes.size(); Pos++)
         {
             Element_Begin1("Slice");
-            int64u End=Element_Offset+Slices_BufferSizes[Pos];
-        
+            int64u End=Element_Offset+Slices_BufferSizes[Pos]-tail;
+            int32u crc_left=0;
+
+            if (error_correction == 1)
+                crc_left=CRC_Compute(Slices_BufferSizes[Pos]);
+
             if (Pos)
             {
-                delete RC; RC = new RangeCoder(Buffer+Buffer_Offset+(size_t)Element_Offset, Slices_BufferSizes[Pos], custom_state_transitions); //Ffv1_default_state_transition);
+                delete RC; RC = new RangeCoder(Buffer+Buffer_Offset+(size_t)Element_Offset, Slices_BufferSizes[Pos], state_transitions_table);
             }
             else // ac=2
-                RC->AssignStateTransitions(custom_state_transitions);
+                RC->AssignStateTransitions(state_transitions_table);
 
-            //slice(States); // Not yet fully implemented
-        
-            Skip_XX(End-Element_Offset,                             "Slice data");
+            #if MEDIAINFO_TRACE
+                if (Trace_Activated) // Parse slice only if trace feature is activated
+                {
+                    int64u Start=Element_Offset;
+                    Trace_Activated=false;
+
+                    slice(States);
+
+                    Trace_Activated=true;
+                    int64u SliceRealSize=Element_Offset-Start;
+                    Element_Offset=Start;
+                    Skip_XX(SliceRealSize,                          "slice_data");
+                    if (Trusted_Get())
+                        Param_Info1("OK");
+                    else
+                        Param_Info1("NOK");
+                }
+            #endif //MEDIAINFO_TRACE
+
+            if (Element_Offset!=End)
+                Skip_XX(End-Element_Offset,                         "Other data");
             Skip_B3(                                                "slice_size");
-            Skip_B1(                                                "error_status");
-            Skip_B4(                                                "crc_parity");
+            if (error_correction == 1)
+            {
+                Skip_B1(                                                "error_status");
+                Skip_B4(                                                "crc_parity");
+                if (!crc_left)
+                    Param_Info1("OK");
+                else
+                    Param_Info1("NOK");
+            }
             Element_End0();
-
-            break; //TEMP
         }
     }
-
-    Skip_XX(Element_Size-Element_Offset,                            "Other data"); // Not yet fully implemented
 
     FILLING_BEGIN();
         Frame_Count++;
     FILLING_END();
 
-    Finish();
+    delete RC;
+    RC = NULL;
+
+    Fill();
+    if (Config->ParseSpeed<1.0)
+        Finish();
 }
 
 //***************************************************************************
@@ -476,8 +603,9 @@ void File_Ffv1::FrameHeader()
     //Parsing
     states States;
     memset(States, 128, states_size);
-    int32u micro_version=0, coder_type, colorspace_type, bits_per_raw_sample=8, chroma_h_shift, chroma_v_shift, num_h_slices_minus1=0, num_v_slices_minus1=0, ec, intra;
-    bool chroma_planes, alpha_plane;
+    int32u coder_type, colorspace_type, bits_per_raw_sample=8, num_h_slices_minus1=0, num_v_slices_minus1=0, intra;
+
+    micro_version = 0;
     Get_RU (States, version,                                    "version");
     if (( ConfigurationRecordIsPresent && version<=1)
      || (!ConfigurationRecordIsPresent && version> 1))
@@ -488,6 +616,7 @@ void File_Ffv1::FrameHeader()
     if (version>2)
         Get_RU (States, micro_version,                          "micro_version");
     Get_RU (States, coder_type,                                 "coder_type");
+    this->coder_type = coder_type;
     if (coder_type == 2) //Range coder with custom state transition table
     {
         Element_Begin1("state_transition_deltas");
@@ -495,33 +624,42 @@ void File_Ffv1::FrameHeader()
         {
             int32s state_transition_delta;
             Get_RS (States, state_transition_delta,             "state_transition_delta");
-            custom_state_transitions[i]=state_transition_delta+RC->one_state[i];
-            Param_Info1(custom_state_transitions[i]);
+            state_transitions_table[i]=state_transition_delta+RC->one_state[i];
+            Param_Info1(state_transitions_table[i]);
         }
         Element_End0();
     }
     Get_RU (States, colorspace_type,                            "colorspace_type");
+    this->colorspace_type = colorspace_type;
     if (version)
     {
         Get_RU (States, bits_per_raw_sample,                    "bits_per_raw_sample");
         if (bits_per_raw_sample==0)
             bits_per_raw_sample=8; //I don't know the reason, 8-bit is coded 0 and 10-bit coded 10 (not 2?).
+        this->bits_per_sample = bits_per_raw_sample;
     }
     Get_RB (States, chroma_planes,                              "chroma_planes");
     Get_RU (States, chroma_h_shift,                             "log2(h_chroma_subsample)");
     Get_RU (States, chroma_v_shift,                             "log2(v_chroma_subsample)");
     Get_RB (States, alpha_plane,                                "alpha_plane");
-    plane_count=1+(chroma_planes?0:1)+(alpha_plane?0:1); //Warning: chroma is considered as 1 plane
     if (version>1)
     {
         Get_RU (States, num_h_slices_minus1,                    "num_h_slices_minus1");
         Get_RU (States, num_v_slices_minus1,                    "num_v_slices_minus1");
-    }
-    int32u quant_table_count;
-    if (version>1)
+        num_h_slices = num_h_slices_minus1 + 1;
+        num_v_slices = num_v_slices_minus1 + 1;
         Get_RU (States, quant_table_count,                      "quant_table_count");
+    }
     else
         quant_table_count=1;
+
+    if (!slices)
+    {
+        size_t nb_slices = (num_h_slices_minus1 + 1) * (num_v_slices_minus1 + 1);
+        slices = new Slice[nb_slices];
+        current_slice = &slices[0];
+    }
+
     for (size_t i = 0; i < quant_table_count; i++)
         read_quant_tables(i);
     memset(quant_tables+quant_table_count, 0x00, (MAX_QUANT_TABLES-quant_table_count)*MAX_CONTEXT_INPUTS*256*sizeof(int16s));
@@ -531,23 +669,38 @@ void File_Ffv1::FrameHeader()
         Element_Begin1("initial_state");
         bool present;
         Get_RB (States, present,                                "present");
-        if (present)
-            for (size_t j = 0; j < context_count[i]; j++)
+
+        if (coder_type)
+            plane_states[i] = new int8u* [context_count[i]];
+
+        for (size_t j = 0; j < context_count[i]; j++)
+        {
+            if (coder_type)
+                plane_states[i][j] = new int8u [states_size];
+            if (present)
             {
                 Element_Begin1("initial_state");
-                    for (size_t k = 0; k < states_size; k++)
-                    {
-                        int32s value;
-                        Get_RS (States, value,                  "value");
-                    }
+                for (size_t k = 0; k < states_size; k++)
+                {
+                    int32s value;
+                    Get_RS (States, value,                  "value");
+                    if (coder_type)
+                        plane_states[i][j][k] = value;
+                }
                 Element_End0();
             }
+            else if (coder_type)
+            {
+                for (size_t k = 0; k < states_size; k++)
+                    plane_states[i][j][k] = 128;
+            }
+        }
         Element_End0();
     }
 
     if (version > 2)
     {
-        Get_RU (States, ec,                                     "ec");
+        Get_RU (States, error_correction,                       "ec");
         if (micro_version)
             Get_RU (States, intra,                              "intra");
     }
@@ -572,7 +725,7 @@ void File_Ffv1::FrameHeader()
             }
             if (version > 2)
             {
-                if (ec)
+                if (error_correction)
                     Fill(Stream_Video, 0, "ErrorDetectionType", "Per slice");
                 if (micro_version && intra)
                     Fill(Stream_Video, 0, Video_Format_Settings_GOP, "N=1");
@@ -626,27 +779,58 @@ void File_Ffv1::slice(states &States)
 
     }
 
-    if (!true) //fs->ac
+    if (!coder_type)
     {
-        if (true) //f->version == 3 && f->micro_version > 1 || f->version > 3
+        if ((version == 3 && micro_version > 1) || version > 3)
         {
             states States;
             memset(States, 129, states_size);
             Skip_RC(States,                                     "?");
+
+            if ((version > 2 || (!current_slice->x && !current_slice->y)))
+                Element_Offset--;
+            else
+                Element_Offset=0;
+            BS_Begin();
         }
     }
 
-    Slice.w=720/2;
-    Slice.h=608/2;
-    Slice.sample_buffer=new int16s[(Slice.w + 6) * 3 * MAX_PLANES];
-
-    if (true) //colorspace == 0
+    if (keyframe)
     {
-        if (true) //bits_per_raw_sample >8
-        {
-            plane(quant_tables[quant_table_index[0]]); //TODO 0
-        }
+        int8u plane_count=1+(alpha_plane?1:0);
+        if (version < 4 || chroma_planes) // Warning: chroma is considered as 1 plane
+            plane_count+=1;
+        if (!coder_type)
+            current_slice->contexts_init(plane_count, quant_table_index, context_count);
+        else
+            copy_plane_states_to_slice(plane_count);
     }
+    current_slice->sample_buffer_new((current_slice->w + 6) * 3 * MAX_PLANES);
+
+    if (colorspace_type == 0)
+    {
+        // YCbCr
+        plane(0); // Y
+        if (chroma_planes)
+        {
+            int32u w = current_slice->w;
+            int32u h = current_slice->h;
+
+            current_slice->w = current_slice->w >> chroma_h_shift;
+            current_slice->h = current_slice->h >> chroma_v_shift;
+            plane(1); // Cb
+            plane(1); // Cr
+            current_slice->w = w;
+            current_slice->h = h;
+        }
+        if (alpha_plane)
+            plane(2); // Alpha
+    }
+    else if (colorspace_type == 1)
+        rgb();
+
+    if (!coder_type && ((version == 3 && micro_version > 1) || version > 3))
+        BS_End();
 }
 
 //---------------------------------------------------------------------------
@@ -659,10 +843,20 @@ void File_Ffv1::slice_header(states &States)
     Get_RU (States, slice_y,                                "slice_y");
     Get_RU (States, slice_width,                            "slice_width_minus1");
     Get_RU (States, slice_height,                           "slice_height_minus1");
+
+    current_slice = &slices[slice_x + slice_y * num_h_slices];
+
+    current_slice->w = (slice_width + 1) * (Width / num_h_slices);
+    current_slice->h = (slice_height + 1) * (Height / num_v_slices);
+    current_slice->x = slice_x * current_slice->w;
+    current_slice->y = slice_y * current_slice->h;
+
+
+    int8u plane_count=1+(alpha_plane?1:0);
+    if (version < 4 || chroma_planes) // Warning: chroma is considered as 1 plane
+        plane_count += 1;
     for (int8u i = 0; i < plane_count; i++)
-    {
         Get_RU (States, quant_table_index[i],               "quant_table_index");
-    }
     Skip_RU(States,                                         "picture_structure");
     Skip_RU(States,                                         "sample_aspect_ratio num");
     Skip_RU(States,                                         "sample_aspect_ratio den");
@@ -671,67 +865,82 @@ void File_Ffv1::slice_header(states &States)
         //TODO
     }
 
-    RC->AssignStateTransitions(custom_state_transitions);
+    RC->AssignStateTransitions(state_transitions_table);
 }
 
 //---------------------------------------------------------------------------
-void File_Ffv1::plane(int16s quant_table[MAX_CONTEXT_INPUTS][256])
+void File_Ffv1::plane(int32u pos)
 {
     Element_Begin1("Plane");
 
-    int x, y;
     int16s *sample[2];
-    sample[0] = Slice.sample_buffer + 3;
-    sample[1] = Slice.sample_buffer + Slice.w + 6 + 3;
+    sample[0] = current_slice->sample_buffer + 3;
+    sample[1] = current_slice->sample_buffer + current_slice->w + 6 + 3;
 
-    memset(Slice.sample_buffer, 0, 2 * (Slice.w + 6) * sizeof(*Slice.sample_buffer));
-
-    states States[MAX_CONTEXT_INPUTS];
-    memset(States, 128, states_size*MAX_CONTEXT_INPUTS);
+    memset(current_slice->sample_buffer, 0, 2 * (current_slice->w + 6) * sizeof(*current_slice->sample_buffer));
  
-    for (size_t y = 0; y < 0/*h*/; y++)
+    current_slice->run_index = 0;
+
+    for (size_t y = 0; y < current_slice->h; y++)
     {
-        int16s *temp = sample[0]; // FIXME: try a normal buffer
+        Element_Begin1("Line");
+        Element_Info1(y);
+
+        int16s *temp = sample[0];
 
         sample[0] = sample[1];
         sample[1] = temp;
 
         sample[1][-1] = sample[0][0];
-        sample[0][Slice.w]  = sample[0][Slice.w - 1];
+        sample[0][current_slice->w]  = sample[0][current_slice->w - 1];
 
-        //if (s->avctx->bits_per_raw_sample <= 8)
+        if (bits_per_sample <= 8)
+            bits_max = 8;
+        else
+            bits_max = bits_per_sample;
+
+        line(pos, sample);
+        Element_End0();
+    }
+
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Ffv1::rgb()
+{
+    Element_Begin1("rgb");
+
+    int16s *sample[4][2];
+
+    current_slice->run_index = 0;
+
+    for (int x = 0; x < 4; x++) {
+        sample[x][0] = current_slice->sample_buffer +  x * 2      * (current_slice->w + 6) + 3;
+        sample[x][1] = current_slice->sample_buffer + (x * 2 + 1) * (current_slice->w + 6) + 3;
+    }
+    memset(current_slice->sample_buffer, 0, 8 * (current_slice->w + 6) * sizeof(*current_slice->sample_buffer));
+
+    for (size_t y = 0; y < current_slice->h; y++)
+    {
+        Element_Begin1("Line");
+        Element_Info1(y);
+
+        for (size_t c = 0; c < (unsigned)(3 + alpha_plane); c++)
         {
-            /*
-            decode_line(s, w, sample, plane_index, 8);
-            for (x = 0; x < w; x++)
-                src[x + stride * y] = sample[1][x];
-                */
-        }
-        //else
-        {
-            Element_Begin1("Line");
-            Element_Info1(y);
+            // Copy for next lines: 4.3 context
+            int16s *temp = sample[c][0];
 
-            //decode_line(s, w, sample, plane_index, s->avctx->bits_per_raw_sample);
-            line(States, quant_table, sample);
-            
-            /*
-            if (s->packed_at_lsb)
-            {
-                for (x = 0; x < w; x++) {
-                    ((uint16s*)(src + stride*y))[x] = sample[1][x];
-                }
-            }
-            else
-            {
-                for (x = 0; x < w; x++) {
-                    ((uint16s*)(src + stride*y))[x] = sample[1][x] << (16 - s->avctx->bits_per_raw_sample);
-                }
-            }
-            */
+            sample[c][0] = sample[c][1];
+            sample[c][1] = temp;
 
-            Element_End0();
+            sample[c][1][-1]= sample[c][0][0  ];
+            sample[c][0][current_slice->w]= sample[c][0][current_slice->w - 1];
+            bits_max = bits_per_sample + 1;
+            line((c + 1) / 2, sample[c]);
         }
+
+        Element_End0();
     }
 
     Element_End0();
@@ -760,73 +969,112 @@ static inline int get_context(int16s quant_table[MAX_CONTEXT_INPUTS][256], int16
              + quant_table[2][(T - RT) & 0xFF];
 }
 
-/* median of 3 */
-static inline int mid_pred(int a, int b, int c)
+//---------------------------------------------------------------------------
+int32s File_Ffv1::line_range_coder(int32s pos, int32s context)
 {
-#if 0
-    int t= (a-b)&((a-b)>>31);
-    a-=t;
-    b+=t;
-    b-= (b-c)&((b-c)>>31);
-    b+= (a-b)&((a-b)>>31);
+    int32s u;
 
-    return b;
-#else
-    if(a>b){
-        if(c>b){
-            if(c>a) b=a;
-            else    b=c;
+    Get_RS(current_slice->plane_states[pos][context], u, "symbol");
+    return u;
+}
+
+
+//---------------------------------------------------------------------------
+int32s File_Ffv1::line_adaptive_symbol_by_symbol(size_t x, int32s pos, int32s context)
+{
+    int32s u;
+
+    // New symbol, go to "run mode"
+    if (context == 0 && current_slice->run_mode == RUN_MODE_STOP)
+        current_slice->run_mode = RUN_MODE_PROCESSING;
+
+    // If not running, get the symbol
+    if (current_slice->run_mode == RUN_MODE_STOP)
+    {
+        u = get_symbol_with_bias_correlation(&current_slice->contexts[pos][context]);
+        #if MEDIAINFO_TRACE
+        Param("symbol", u);
+        #endif //MEDIAINFO_TRACE
+        return u;
+    }
+
+    if (current_slice->run_segment_length == 0 && current_slice->run_mode == RUN_MODE_PROCESSING) // Same symbol length
+    {
+        bool hits;
+        Get_SB (hits,                                           "hits/miss");
+        //if (bsf.GetB()) // "hits"
+        if (hits) // "hits"
+        {
+            current_slice->run_segment_length = 1 << log2_run[current_slice->run_index];
+            if (x + current_slice->run_segment_length <= current_slice->w) //Do not go further as the end of line
+                ++current_slice->run_index;
         }
-    }else{
-        if(b>c){
-            if(c>a) b=c;
-            else    b=a;
+        else // "miss"
+        {
+            //current_slice->run_segment_length = bsf.Get4(log2_run[current_slice->run_index]);
+            int32u run_segment_length;
+            Get_S4 (log2_run[current_slice->run_index], run_segment_length,  "run_segment_length");
+            current_slice->run_segment_length=(int32s)run_segment_length;
+            if (current_slice->run_index)
+                --current_slice->run_index;
+            current_slice->run_mode = RUN_MODE_INTERRUPTED;
         }
     }
-    return b;
-#endif
-}
 
-static inline int predict(int16s *src, int16s *last)
-{
-    const int LT = last[-1];
-    const int T  = last[0];
-    const int L  = src[-1];
-
-    return mid_pred(L, L + T - LT, T);
-}
-
-        static int A=0;
-//---------------------------------------------------------------------------
-void File_Ffv1::line(states States[MAX_CONTEXT_INPUTS], int16s quant_table[MAX_CONTEXT_INPUTS][256], int16s *sample[2])
-{
-    for (size_t x = 0; x < Slice.w; x++)
+    current_slice->run_segment_length--;
+    if (current_slice->run_segment_length < 0) // we passed the length of same symbol, time to get the new symbol
     {
-        int context, sign;
+        u = get_symbol_with_bias_correlation(&current_slice->contexts[pos][context]);
+        #if MEDIAINFO_TRACE
+        Param("symbol", u);
+        #endif //MEDIAINFO_TRACE
+        if (u >= 0) // GR(u - 1, ...)
+            u++;
 
-        context = get_context(quant_table, sample[1] + x, sample[0] + x, sample[1] + x);
+        // Time for the new symbol length run
+        current_slice->run_mode_init();
+        current_slice->run_segment_length = 0;
+    } else // same symbol as previous pixel, no difference, waiting
+        u = 0;
+    return u;
+}
+
+//---------------------------------------------------------------------------
+void File_Ffv1::line(int pos, int16s *sample[2])
+{
+    // TODO: slice_coding_mode (version 4)
+
+    if (!coder_type)
+    {
+        current_slice->run_segment_length = 0;
+        current_slice->run_mode_init();
+    }
+
+    for (size_t x = 0; x < current_slice->w; x++)
+    {
+        int32s context;
+
+        context = get_context(quant_tables[quant_table_index[pos]], sample[1] + x, sample[0] + x, sample[1] + x);
+
+        bool negative = false;
+        // Step 7
         if (context < 0)
         {
             context = -context;
-            sign    = 1;
+            negative = true;
         }
-        else
-            sign = 0;
-        if (context>5)
-            int b=0;
-        
-        int32s diff;
-        Get_RS(States[context], diff, "diff"); Element_Info1(diff);
-        if (sign)
-            diff = -diff;
 
-        A++;
-        if (A<360)
-            sample[1][x] = (predict(sample[1] + x, sample[0] + x) + diff) &
-                       ((1 << 8) - 1); //bits
+        int32s u;
+        if (coder_type)
+            u = line_range_coder(pos, context);
         else
-            int b=0;
+            u = line_adaptive_symbol_by_symbol(x, pos, context);
 
+        // Step 7
+        if (negative)
+            u = -u;
+
+        sample[1][x] = (predict(sample[1] + x, sample[0] + x) + u) & ((1 << bits_max) -1);
     }
 }
 
@@ -835,7 +1083,7 @@ void File_Ffv1::read_quant_tables(int i)
 {
     Element_Begin1("quant_table");
 
-    int scale = 1;
+    int32u scale = 1;
 
     for (int j = 0; j < 5; j++)
     {
@@ -875,7 +1123,7 @@ void File_Ffv1::read_quant_table(int i, int j, size_t scale)
             return;
         }
 
-        for (int a=0; a<=len_minus1; a++)
+        for (size_t a=0; a<=len_minus1; a++)
         {
             quant_tables[i][j][k] = scale * v;
             k++;
@@ -891,6 +1139,209 @@ void File_Ffv1::read_quant_table(int i, int j, size_t scale)
     len_count[i][j]=v;
 
     Element_End0();
+}
+
+//***************************************************************************
+// Helpers
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+int32u File_Ffv1::CRC_Compute(size_t Size)
+{
+    int32u CRC_32=0;
+    const int8u* CRC_32_Buffer=Buffer+Buffer_Offset+(size_t)Element_Offset;
+    const int8u* CRC_32_Buffer_End=CRC_32_Buffer+Size;
+
+    while(CRC_32_Buffer<CRC_32_Buffer_End)
+    {
+        CRC_32=(CRC_32<<8) ^ Psi_CRC_32_Table[(CRC_32>>24)^(*CRC_32_Buffer)];
+        CRC_32_Buffer++;
+    }
+    return CRC_32;
+}
+
+//---------------------------------------------------------------------------
+int32s File_Ffv1::get_median_number(int32s one, int32s two, int32s three)
+{
+    if (one > two)
+    {
+        // one > two > three
+        if (two > three)
+            return two;
+
+        // three > one > two
+        if (three > one)
+            return one;
+        // one > three > two
+        return three;
+    }
+
+    // three > two > one
+    if (three > two)
+        return two;
+
+    // two > one && two > three
+
+    // two > three > one
+    if (three > one)
+        return three;
+    return one;
+}
+
+//---------------------------------------------------------------------------
+int32s File_Ffv1::predict(int16s *current, int16s *current_top)
+{
+    int32s LeftTop = current_top[-1];
+    int32s Top = current_top[0];
+    int32s Left = current[-1];
+
+    return get_median_number(Left, Left + Top - LeftTop, Top);
+}
+
+//---------------------------------------------------------------------------
+int32s File_Ffv1::golomb_rice_decode(int k)
+{
+    int32u q = 0;
+    int32u v;
+
+    //while (bsf.Remain() > 0 && q < PREFIX_MAX && !bsf.GetB())
+    while (Data_BS_Remain() > 0 && q < PREFIX_MAX)
+    {
+        bool Temp;
+        Get_SB(Temp,                                            "golomb_rice_prefix_0");
+        if (Temp)
+            break;
+
+        ++q;
+    }
+
+    if (q == PREFIX_MAX) // ESC
+    {
+        //v = bsf.Get4(bits_max) + 11;
+        Get_S4(bits_max, v,                                     "escaped_value_minus_11");
+        v+=11;
+    }
+    else
+    {
+        //int32u remain = bsf.Get8(k); // Read k bits
+        int32u remain;
+        Get_S4(k, remain,                                       "golomb_rice_remain");
+        int32u mul = q << k; // q * pow(2, k)
+
+        v = mul | remain;
+    }
+
+    // unsigned to signed
+    int32s code = (v >> 1) ^ -(v & 1);
+    return code;
+}
+
+//---------------------------------------------------------------------------
+int32s File_Ffv1::get_symbol_with_bias_correlation(Slice::Context *context)
+{
+    int k = 0;
+    // Step 8: compute the Golomb parameter k
+    for (k = 0; (context->N << k) < context->A; ++k);
+
+    // Step 10: Decode Golomb code (using limitation PREFIX_MAX == 12)
+    int32s code = golomb_rice_decode(k);
+
+    // Step 9: Mapping
+    int32s M = 2 * context->B + context->N;
+    code = code ^ (M >> 31);
+
+    // Step 11
+    context->B += code;
+    context->A += code >= 0 ? code : -code;
+
+    code += context->C;
+
+    update_correlation_value_and_shift(context);
+
+    // Step 7 (TODO better way)
+    bool neg = code & (1 << (bits_max - 1)); // check if the number is negative
+    code = code & ((1 << (bits_max - 1)) - 1); // Keep only the n bits
+    if (neg)
+        code = - 1 - (~code & ((1 << (bits_max - 1)) - 1)); // 0xFFFFFFFF - positive value on n bits
+
+    return code;
+}
+
+//---------------------------------------------------------------------------
+void File_Ffv1::update_correlation_value_and_shift(Slice::Context *c)
+{
+    if (!c)
+        return;
+
+    // Step 11: Resets
+    if (c->N == c->N0)
+    {
+         // divide by 2, if >= 0 : ROUND, otherwise, CEIL
+        c->N >>= 1;
+        c->A >>= 1;
+        c->B >>= 1;
+    }
+    ++c->N; // context meets
+
+    // Step 12: Bias computation procedure
+    // Keep B in (-N;0]
+    if (c->B <= -c->N) {
+        if (c->C > c->Cmin)
+            --c->C;
+
+        c->B = c->B + c->N;
+        if (c->B <= -c->N)
+            c->B = -c->N + 1;
+    } else if (c->B > 0) {
+        if (c->C < c->Cmax)
+            ++c->C;
+
+        c->B = c->B - c->N;
+        if (c->B > 0)
+            c->B = 0;
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_Ffv1::copy_plane_states_to_slice(int8u plane_count)
+{
+    if (!coder_type)
+        return;
+
+    for (size_t i = 0; i < plane_count; i++)
+    {
+        int32u idx = quant_table_index[i];
+        if (!current_slice->plane_states[i])
+        {
+            current_slice->plane_states[i] = new int8u* [context_count[idx] + 1];
+            memset(current_slice->plane_states[i], 0, (context_count[idx] + 1) * sizeof(int8u*));
+        }
+        for (size_t j = 0; j < context_count[idx]; j++)
+        {
+            if (!current_slice->plane_states[i][j])
+                current_slice->plane_states[i][j] = new int8u [states_size];
+            for (size_t k = 0; k < states_size; k++)
+            {
+                current_slice->plane_states[i][j][k] = plane_states[idx][j][k];
+            }
+        }
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_Ffv1::plane_states_clean(states_context_plane states[MAX_QUANT_TABLES])
+{
+    if (!coder_type)
+        return;
+
+    for (size_t i = 0; states[i] && i < MAX_QUANT_TABLES; ++i)
+    {
+        for (size_t j = 0; states[i][j]; ++j)
+            delete[] states[i][j];
+
+        delete[] states[i];
+        states[i] = NULL;
+    }
 }
 
 } //NameSpace

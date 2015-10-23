@@ -121,7 +121,9 @@ void File_SmpteSt0302::Streams_Fill()
 
     for (size_t Pos=0; Pos<Count_Get(Stream_Audio); Pos++)
         if (Retrieve(Stream_Audio, Pos, Audio_MuxingMode).empty()) //TODO: put "SMPTE ST 302" in this field, the current name is there only for legacy
-            Fill(Stream_Audio, 0, Audio_MuxingMode, "SMPTE ST 302");
+            Fill(Stream_Audio, Pos, Audio_MuxingMode, "SMPTE ST 302");
+        else
+            Fill(Stream_Audio, Pos, Audio_MuxingMode, __T("SMPTE ST 302 / ")+Retrieve(Stream_Audio, Pos, Audio_MuxingMode), true);
 
     if (Count_Get(Stream_Audio)==1)
     {

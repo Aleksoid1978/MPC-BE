@@ -963,6 +963,7 @@ public :
 
     void Trusted_IsNot (const char*)                                            {Trusted_IsNot();}
     void Trusted_IsNot ();
+    bool Trusted_Get   () {return !Element[Element_Level].UnTrusted;}
 
     //***************************************************************************
     // Stream filling
@@ -1193,7 +1194,7 @@ protected :
     bool FileHeader_Begin_XML(tinyxml2::XMLDocument &Document);
     bool Synchronize_0x000001();
 public:
-    void TestContinuousFileNames(size_t CountOfFiles=24, Ztring FileExtension=Ztring());
+    void TestContinuousFileNames(size_t CountOfFiles=24, Ztring FileExtension=Ztring(), bool SkipComputeDelay=false);
 
 private :
 

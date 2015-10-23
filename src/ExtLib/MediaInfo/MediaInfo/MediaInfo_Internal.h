@@ -152,9 +152,9 @@ public :
     #endif //!defined(MEDIAINFO_READER_NO)
     MediaInfo_Config_MediaInfo Config;
 
-    Ztring Xml_Name_Escape(const Ztring &Name);
-    Ztring Xml_Content_Escape(const Ztring &Content, size_t &Modified);
-    Ztring &Xml_Content_Escape_Modifying(Ztring &Content, size_t &Modified);
+    static Ztring Xml_Name_Escape(const Ztring &Name);
+    static Ztring Xml_Content_Escape(const Ztring &Content, size_t &Modified);
+    static Ztring &Xml_Content_Escape_Modifying(Ztring &Content, size_t &Modified);
 
 private :
     //Threading

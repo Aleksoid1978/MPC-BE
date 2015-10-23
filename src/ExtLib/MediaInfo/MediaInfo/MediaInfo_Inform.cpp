@@ -61,16 +61,14 @@ Ztring MediaInfo_Internal::Inform()
     CS.Leave();
 
     #if MEDIAINFO_TRACE
-        if (MediaInfoLib::Config.Trace_Level_Get() || MediaInfoLib::Config.Inform_Get()==__T("Details"))
+        if (MediaInfoLib::Config.Inform_Get()!=__T("MAXML") && (MediaInfoLib::Config.Trace_Level_Get() || MediaInfoLib::Config.Inform_Get()==__T("Details")))
         {
             if (!Details.empty())
-            {
-                Ztring Content=Details;
-
                 return Details;
-            }
             else if (Info)
                 return Info->Details_Get();
+            else
+                return Ztring();
         }
     #endif //MEDIAINFO_TRACE
 
@@ -210,15 +208,28 @@ Ztring MediaInfo_Internal::Inform()
     Ztring Retour;
     bool HTML=false;
     bool XML=false;
+    bool XML_0_7_78=false;
     bool CSV=false;
     if (MediaInfoLib::Config.Inform_Get()==__T("HTML"))
         HTML=true;
     if (MediaInfoLib::Config.Inform_Get()==__T("XML"))
         XML=true;
+    if (MediaInfoLib::Config.Inform_Get()==__T("MAXML"))
+    {
+        XML=true;
+        XML_0_7_78=true;
+    }
     if (MediaInfoLib::Config.Inform_Get()==__T("CSV"))
         CSV=true;
 
     if (HTML) Retour+=__T("<html>\n\n<head>\n<META http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /></head>\n<body>\n");
+    if (XML_0_7_78)
+    {
+        size_t Modified;
+        Retour+=__T("<media ref=\"")+MediaInfo_Internal::Xml_Content_Escape(Get(Stream_General, 0, General_CompleteName), Modified)+__T("\">\n");
+        Retour+=__T("<MediaInfo version=\"0.1\">\n");
+    }
+    else
     if (XML)  Retour+=__T("<File>\n");
 
     for (size_t StreamKind=(size_t)Stream_General; StreamKind<Stream_Max; StreamKind++)
@@ -262,7 +273,7 @@ Ztring MediaInfo_Internal::Inform()
     }
 
     if (HTML) Retour+=__T("\n</body>\n</html>\n");
-    if (XML)  Retour+=__T("</File>\n");
+    if (XML_0_7_78)  Retour+=__T("</MediaInfo>\n");
 
     Retour.FindAndReplace(__T("\\r\\n"), __T("\n"), 0, Ztring_Recursive);
     Retour.FindAndReplace(__T("\\r"), __T("\n"), 0, Ztring_Recursive);
@@ -281,6 +292,25 @@ Ztring MediaInfo_Internal::Inform()
     Retour.FindAndReplace(__T("|SC7|"), __T(")"), 0, Ztring_Recursive);
     Retour.FindAndReplace(__T("|SC8|"), __T(")"), 0, Ztring_Recursive);
     Retour.FindAndReplace(__T("|SC9|"), __T("),"), 0, Ztring_Recursive);
+
+    #if MEDIAINFO_TRACE
+        if (XML_0_7_78)
+        {
+            if (MediaInfoLib::Config.Trace_Level_Get() || MediaInfoLib::Config.Inform_Get()==__T("Details"))
+            {
+                Retour+=__T("<MediaTrace version=\"0.1\">\n");
+                if (!Details.empty())
+                    Retour+=Details;
+                else if (Info)
+                    Retour+=Info->Details_Get();
+                Retour+=__T("\n");
+                Retour+=__T("</MediaTrace>\n");
+            }
+        }
+    #endif //MEDIAINFO_TRACE
+
+    if (XML_0_7_78)  Retour+=__T("</media>\n");
+    else if (XML)  Retour+=__T("</File>\n");
 
     return Retour;
 
@@ -313,6 +343,9 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
         #endif //defined(MEDIAINFO_HTML_YES)
         #if defined(MEDIAINFO_XML_YES)
         bool XML=MediaInfoLib::Config.Inform_Get()==__T("XML")?true:false;
+        bool XML_0_7_78=MediaInfoLib::Config.Inform_Get()==__T("MAXML")?true:false;
+        if (XML_0_7_78)
+            XML=true;
         #endif //defined(MEDIAINFO_XML_YES)
         #if defined(MEDIAINFO_CSV_YES)
         bool CSV=MediaInfoLib::Config.Inform_Get()==__T("CSV")?true:false;
@@ -338,10 +371,19 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
             //Pour chaque champ
             //Ztring A=Get((stream_t)4, 2, 0, Info_Measure_Text); // TODO Bug sinon? voir Ztring
             Ztring A=Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Measure_Text); // TODO Bug sinon? voir Ztring
-            if ((MediaInfoLib::Config.Complete_Get() || Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Options)[InfoOption_ShowInInform]==__T('Y')) && !Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Text).empty())
+            bool Shouldshow=false;
+            if (XML_0_7_78)
+            {
+                Ztring Options=Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Options);
+                if (InfoOption_ShowInXml<Options.size() && Options[InfoOption_ShowInXml]==__T('Y'))
+                    Shouldshow=true;
+            }
+            else if ((MediaInfoLib::Config.Complete_Get() || Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Options)[InfoOption_ShowInInform]==__T('Y')))
+                Shouldshow=true;
+            if (Shouldshow && !Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Text).empty())
             {
                 Ztring Nom=Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Name_Text);
-                if (Nom.empty())
+                if (Nom.empty() || XML_0_7_78)
                     Nom=Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Name); //Texte n'existe pas
                 #if defined(MEDIAINFO_TEXT_YES) && (defined(MEDIAINFO_HTML_YES) || defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_CSV_YES))
                 if (Text)
@@ -683,6 +725,9 @@ Ztring &MediaInfo_Internal::Xml_Content_Escape_Modifying (Ztring &Content, size_
                             Content[Pos]=__T('&');
                             Content.insert(Pos+1, __T("gt;"));
                             Pos+=3;
+                            break;
+            case __T('\r'):
+            case __T('\n'):
                             break;
             default:
                         if (Content[Pos]<0x20)

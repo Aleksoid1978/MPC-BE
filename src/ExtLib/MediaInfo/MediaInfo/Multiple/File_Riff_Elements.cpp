@@ -1762,6 +1762,8 @@ void File_Riff::AVI__hdlr_strl_strf_vids()
     else if (MediaInfoLib::Config.CodecID_Get(Stream_Video, InfoCodecID_Format_Riff, Ztring().From_CC4(Compression), InfoCodecID_Format)==__T("FFV1"))
     {
         File_Ffv1* Parser=new File_Ffv1;
+        Parser->Width=Width;
+        Parser->Height=Height;
         Stream[Stream_ID].Parsers.push_back(Parser);
     }
     #endif

@@ -62,6 +62,16 @@ TimeCode::TimeCode (int64s Frames_, int8u FramesPerSecond_, bool DropFrame_, boo
     MustUseSecondField(MustUseSecondField_),
     IsSecondField(IsSecondField_)
 {
+    if (!FramesPerSecond_)
+    {
+        Frames  = 0;
+        Seconds = 0;
+        Minutes = 0;
+        Hours   = 0;
+        IsNegative = true; //Forcing a weird display
+        return;
+    }
+
     if (Frames_<0)
     {
         IsNegative=true;
@@ -183,6 +193,9 @@ void TimeCode::MinusOne()
 //---------------------------------------------------------------------------
 string TimeCode::ToString()
 {
+    if (!FramesPerSecond)
+        return string();
+
     string TC;
     if (IsNegative)
         TC+='-';
@@ -195,8 +208,8 @@ string TimeCode::ToString()
     TC+=('0'+Seconds/10);
     TC+=('0'+Seconds%10);
     TC+=DropFrame?';':':';
-    TC+=('0'+Frames/10);
-    TC+=('0'+Frames%10);
+    TC+=('0'+(Frames*(MustUseSecondField?2:1)+(IsSecondField?1:0))/10);
+    TC+=('0'+(Frames*(MustUseSecondField?2:1)+(IsSecondField?1:0))%10);
 
     return TC;
 }
@@ -219,7 +232,24 @@ int64s TimeCode::ToFrames()
           + (int64s(Minutes)%10)*2;
     }
 
+    TC*=(MustUseSecondField?2:1);
+    TC+=(IsSecondField?1:0);
+
     return IsNegative?-TC:TC;
+}
+
+//---------------------------------------------------------------------------
+int64s TimeCode::ToMilliseconds()
+{
+    if (!FramesPerSecond)
+        return 0;
+
+    int64s MS=(int64s(Hours)     *3600
+             + int64s(Minutes)   *  60
+             + int64s(Seconds)        )*1000
+             + float64_int64s((float64(Frames*(MustUseSecondField?2:1)+(IsSecondField?1:0)))*1000/(FramesPerSecond*(MustUseSecondField?2:1)));
+
+    return IsNegative?-MS:MS;
 }
 
 //***************************************************************************

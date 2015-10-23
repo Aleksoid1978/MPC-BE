@@ -1848,6 +1848,8 @@ void File_Ac3::Core_Frame()
             Element_End0();
         }
     }
+    else
+        Skip_XX(Element_Size-Element_Offset,                        "Unknown");
 
     FILLING_BEGIN();
         if (bsid>0x10)
