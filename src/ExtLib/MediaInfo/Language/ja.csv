@@ -28,6 +28,9 @@
  chapters stream1; チャプターストリーム
  chapters stream2; チャプターストリーム
  chapters stream3; チャプターストリーム
+ character1;
+ character2;
+ character3;
  day1; 日
  day2; 日
  day3; 日
@@ -37,12 +40,12 @@
  file1; ファイル
  file2; ファイル
  file3; ファイル
- frame1; フレーム
- frame2; フレーム
- frame3; フレーム
  fps1; fps
  fps2; fps
  fps3; fps
+ frame1; フレーム
+ frame2; フレーム
+ frame3; フレーム
  GB; GB
  Gb; Gb
  Gbps; Gbps
@@ -141,6 +144,8 @@
  year3; 年
 , ;, 
 : ;: 
+3D;
+3DType;
 About;バージョン情報
 About_Hint;連絡方法と最新版チェック
 Accompaniment;演奏者
@@ -172,7 +177,12 @@ Audio_Codec_List;音声コーデックリスト
 Audio_No;音声なし
 Audio1;プライマリ音声
 Audio2;セカンダリ音声
+AudioComments;
 AudioCount;音声数
+AudioDescriptionPresent;
+AudioDescriptionType;
+AudioLoudnessStandard;
+AudioTrackLayout;
 Author;製作者
 BarCode;バーコード
 Basic;基本
@@ -180,13 +190,13 @@ Basic_Note;メモ : ファイルについてのさらなる情報は別のビュ
 BitDepth;
 BitDepth_Stored;
 BitRate;ビットレート
+BitRate_Encoded;
 BitRate_Maximum;最大
 BitRate_Minimum;最小
 BitRate_Mode;ビットレートモード
 BitRate_Mode_CBR;CBR モード
 BitRate_Mode_VBR;VBR モード
 BitRate_Nominal;ノミナル
-BitRate_Encoded;
 Bits-(Pixel*Frame);ビット/(ピクセル*フレーム)
 BufferSize;
 Cancel;キャンセル
@@ -211,44 +221,53 @@ Chroma;クローマ
 ChromaSubsampling;
 Close;閉じる
 Close all before open;すべて閉じて開く
+ClosedCaptionsLanguage;
+ClosedCaptionsPresent;
+ClosedCaptionsType;
 Codec;コーデック
 Codec_Description;コーデックの説明
 Codec_Info;コーデックの詳細
-Codec_Settings;コーデックの設定
-Codec_Settings_PacketBitStream;パケットビットストリーム
-Codec_Settings_BVOP;BVOP
-Codec_Settings_QPel;QPel
-Codec_Settings_GMC;GMC
-Codec_Settings_Matrix;Matrix
-Codec_Settings_Floor;Floor
-Codec_Settings_CABAC;CABAC
-Codec_Settings_Firm;Firm
-Codec_Settings_Endianness;Endianness
-Codec_Settings_Sign;Sign
-Codec_Settings_Law;Law
-Codec_Settings_ITU;ITU
 Codec_Profile;コーデックのプロファイル
+Codec_Settings;コーデックの設定
+Codec_Settings_BVOP;BVOP
+Codec_Settings_CABAC;CABAC
+Codec_Settings_Endianness;Endianness
+Codec_Settings_Firm;Firm
+Codec_Settings_Floor;Floor
+Codec_Settings_GMC;GMC
+Codec_Settings_ITU;ITU
+Codec_Settings_Law;Law
+Codec_Settings_Matrix;Matrix
+Codec_Settings_PacketBitStream;パケットビットストリーム
+Codec_Settings_QPel;QPel
+Codec_Settings_Sign;Sign
 Codec_Url;コーデックの URL
 CodecID;コーデック ID
 CodecID_Description;コーデック ID の説明
+CoDirector;
 Collection;コレクション
 Colorimetry;カラーリメトリ
 ColorSpace;
 colour_primaries;
+colour_range;
 Comment;コメント
 CommissionedBy;コミッショナー
 Compilation;
 CompleteName;完全名称
+CompletionDate;
 Composer;コンポーザ
 Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;圧縮解像度
 Conductor;コンダクター
+ContactEmail;
+ContactTelephoneNumber;
 Container and general information;コンテナと全般情報
 ContentType;コンテンツタイプ
 CoProducer;Co プロデューサ
 Copyright;著作
+CopyrightYear;
 CostumeDesigner;衣装デザイナー
 Count;数
 Country;国
@@ -274,8 +293,10 @@ Dimensions;ディメンション
 Director;ディレクター
 DirectorOfPhotography;フォトディレクター
 DisplayAspectRatio;解像度
+DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;元解像度
 DistributedBy;ディストリビュート by
+Distributor;
 Donate;寄付
 DotsPerInch;ドット/インチ
 Duration;ながさ
@@ -291,6 +312,7 @@ Encoded_Library_Settings;エンコードライブラリの設定
 Encoded_Original;オリジナル
 EncodedBy;エンコード者
 EPG_Positions;EPG 位置
+EpisodeTitleNumber;
 Error_File;ファイル読み込みエラー
 ExecutiveProducer;製作総指揮
 Exit;終了
@@ -324,39 +346,44 @@ Format_Description;詳細
 Format_Info;情報
 Format_Profile;プロファイル
 Format_Settings;設定
-Format_Settings_PacketBitStream;パケットビットストリーム
 Format_Settings_BVOP;BVOP
-Format_Settings_QPel;QPel
+Format_Settings_CABAC;CABAC
+Format_Settings_Emphasis;
+Format_Settings_Endianness;Endianness
+Format_Settings_Firm;Firm
+Format_Settings_Floor;Floor
+Format_Settings_FrameMode;
 Format_Settings_GMC;GMC
+Format_Settings_GOP;
+Format_Settings_ITU;ITU
+Format_Settings_Law;Law
 Format_Settings_Matrix;Matrix 形式の設定
 Format_Settings_Matrix_Custom;カスタム Matrix 形式の設定
 Format_Settings_Matrix_Default;既定の Matrix 形式設定
-Format_Settings_Floor;Floor
-Format_Settings_CABAC;CABAC
-Format_Settings_Firm;Firm
-Format_Settings_Endianness;Endianness
-Format_Settings_RefFrames;RefFrames
-Format_Settings_Sign;Sign
-Format_Settings_Law;Law
-Format_Settings_ITU;ITU
-Format_Settings_SBR;SBR
+Format_Settings_Mode;
+Format_Settings_ModeExtension;
+Format_Settings_PacketBitStream;パケットビットストリーム
+Format_Settings_PictureStructure;
 Format_Settings_PS;PS
 Format_Settings_Pulldown;プルダウン
-Format_Settings_Mode;
-Format_Settings_FrameMode;
-Format_Settings_Emphasis;
-Format_Settings_ModeExtension;
-Format_Settings_GOP;
-Format_Version;バージョン
+Format_Settings_QPel;QPel
+Format_Settings_RefFrames;RefFrames
+Format_Settings_SBR;SBR
+Format_Settings_Sign;Sign
+Format_Settings_Wrapping;
 Format_Url;Url フォーマット
+Format_Version;バージョン
+FpaManufacturer;
+FpaPass;
+FpaVersion;
 FrameCount;フレーム数
 FrameRate;フレームレート
+FrameRate_Maximum;最大
+FrameRate_Minimum;最小
 FrameRate_Mode;モード
 FrameRate_Mode_CFR;CFR モード
 FrameRate_Mode_VFR;VFR モード
-FrameRate_Minimum;最小
 FrameRate_Nominal;通常
-FrameRate_Maximum;最大
 FrameRate_Original;オリジナル
 General;全般
 Genre;ジャンル
@@ -554,9 +581,14 @@ Genre_190;
 Genre_191;
 Go to WebSite;Web サイトへ移動
 Grouping;
+Gop_OpenClosed;
+Gop_OpenClosed_Open;
+Gop_OpenClosed_Closed;
+Gop_OpenClosed_FirstFrame;
 h;時
 Header file;ヘッダーファイルを作成
 Height;高さ
+Height_CleanAperture;
 Height_Original;
 Help;ヘルプ
 Hint;ヒント
@@ -566,22 +598,23 @@ How many text streams?;テキストストリームの数？
 How many video streams?;ビデオストリームの数？
 HTML;HTML
 ID;ID
+IdentClockStart;
 Image;イメージ
 Image stream(s);イメージストリーム
 Image_Codec_List;コーデックのイメージ
 ImageCount;イメージストリームの数
 Info;情報
 Instruments;インストゥルメンツ
-Interlacement;インターレスメンツ
-Interlaced_Interlaced;インターレース
-Interlaced_TFF;トップファースト(TFF)
 Interlaced_BFF;ボトムファースト(BFF)
+Interlaced_Interlaced;インターレース
 Interlaced_PPF;プログレシッブ(PPF)
 Interlaced_Progressive;プログレシッブ(PPF)
-Interleaved;
+Interlaced_TFF;トップファースト(TFF)
+Interlacement;インターレスメンツ
 Interleave_Duration;ドゥレイション
 Interleave_Preload;プリロード
 Interleave_VideoFrames;ビデオフレーム
+Interleaved;
 InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
@@ -592,7 +625,6 @@ Known formats;使用可能なフォーマット
 Known parameters;使用可能なパラメータ
 Label;ラベル
 Language;言語
-Language_More;さらに
 Language_aa;Afar
 Language_ab;Abkhazian
 Language_ae;Avestan
@@ -703,6 +735,7 @@ Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
 Language_mo;Moldavian
+Language_More;さらに
 Language_mr;Marathi
 Language_ms;Malay
 Language_mt;Maltese
@@ -789,19 +822,23 @@ LawRating;レイティング
 LCCN;LCCN
 Library;ライブラリ
 Lightness;明るさ
+LineUpStart;
 List;リスト
-Lyrics;歌詞
 Lyricist;作詞
+Lyrics;歌詞
 Mastered_Date;マスタリング日
 MasteredBy;マスタリング by
+Matrix_Channel(s);
+Matrix_ChannelPositions;
 matrix_coefficients;
+Matrix_Format;
 MediaInfo_About; 詳細情報提供者 \r\n マルチメディア ファイル:\r\n Matroska, OGG ( OGM を含む)\r\n MPEG1 ( VCD を含む)\r\n MPEG2 ( DVD , SVCD を含む)\r\n MPEG4 (iTunes の M4A を含む)\r\n Quicktime\r\n RealMedia\r\n WindowsMedia ( WMV , WMA を含む)\r\n Microsoft RIFF ( AVI , WAV を含む)\r\n 音声のみ (AC3 , DTS , AAC , AU , AIFF ...)
 Menu;メニュー
 Menu stream(s);メニューストリーム
 Menu_Codec_List;メニューコーデック
+Menu_Hint;ヒント
 Menu_No;メニュー番号
 MenuCount;メニューストリーム数
-Menu_Hint;ヒント
 MenuID;ID
 mn;分
 Mood;ムード
@@ -819,8 +856,8 @@ NetworkName;ネットワーク名
 New;新規
 Newest version;新バージョンチェック（要インターネット接続）
 NewVersion_Menu;新バージョンメニュー
-NewVersion_Question_Title;新バージョン確認 タイトル
 NewVersion_Question_Content;新バージョン確認 コンテンツ
+NewVersion_Question_Title;新バージョン確認 タイトル
 No;いいえ
 Not yet;準備中です
 NumColors;色
@@ -863,13 +900,19 @@ OpenCandy_33;オープンキャンディ
 OpenCandy_34;オープンキャンディ
 OpenCandy_35;オープンキャンディ
 OpenCandy_36;オープンキャンディ
+OpenCaptionsLanguage;
+OpenCaptionsPresent;
+OpenCaptionsType;
 Options;オプション
 Options_Hint;詳細設定
 Original;オリジナル
 OriginalNetworkName;オリジナル ネットワーク名
 OriginalSourceForm;オリジナル ソース フォーム
 OriginalSourceMedium;中間ソース フォーム
+Originator;
 Other;その他
+OtherIdentifier;
+OtherIdentifierType;
 Output;出力
 Output format;出力フォーマット
 OverallBitRate;オーバルビットレート
@@ -879,10 +922,14 @@ OverallBitRate_Mode;OBR モード
 OverallBitRate_Nominal;OBR ノミナル
 Part;パート
 Part_Count;合計
+PartNumber;
+PartTotal;
 Performer;パフォーマー
 Period;ピリオド
 Phone;電話
+PictureRatio;
 PixelAspectRatio;ピクセル比
+PixelAspectRatio_CleanAperture;
 PixelAspectRatio_Original;ピクセル比
 PlayCounter;再生数カウンター
 Played_Count;再生数
@@ -892,9 +939,15 @@ PlayTime;再生時間
 Position;ポジション
 Position_Total;合計
 Preferences;設定
+PrimaryAudioLanguage;
 Producer;プロデューサー
 ProductionDesigner;プロダクション
+ProductionNumber;
 ProductionStudio;スタジオ
+ProductPlacement;
+ProgrammeHasText;
+ProgrammeTextLanguage;
+ProgrammeTitle;
 Publisher;発行者
 Purchased_Date;購入日
 Quote character;クオート
@@ -908,22 +961,25 @@ ReplayGain_Gain;リプレイゲイン ゲイン
 ReplayGain_Peak;リプレイ ゲイン ピーク
 Resolution;解像度
 s;秒
+SamplingCount;
 SamplingRate;サンプルレート
 Save;保存
-ScanType;スキャンの種類
-ScanType_Original;
-ScanType_StoreMethod;
 ScanOrder;スキャンの並び
 ScanOrder_Original;
 ScanOrder_Stored;
 ScanOrder_StoredDisplayedInverted;
 ScanOrder_StoreMethod;
+ScanType;スキャンの種類
+ScanType_Original;
+ScanType_StoreMethod;
 ScreenplayBy;監督
 Season;シーズン
+SecondaryAudioLanguage;
 see below;以下詳細
 Send HeaderFile;可能ならヘッダファイルを送信してください: http://sourceforge.net/projects/mediainfo/ (バグセクション)
 Separator_Columns;列の区切り
 Separator_Lines;区切り線
+SeriesTitle;
 ServiceChannel;チャンネル
 ServiceName;名前
 ServiceProvider;プロバイダ
@@ -937,10 +993,13 @@ Sheet (Complete);シート (完成)
 Shell extension;シェルに統合 （右クリックメニューに登録)
 Shell extension, folder;シェルに統合 （フォルダー）
 Shell InfoTip;シェルでインフォチップ （対応ファイル上でツールチップを表示）
+ShimName;
+ShimVersion;
 Show menu;メニューを表示する
 Show toolbar;ツール バーを表示する
+SigningPresent;
+SignLanguage;
 Sort;並び替え
-SamplingCount;
 SoundEngineer;サウンドエンジニア
 Source;
 Source_Duration;
@@ -974,6 +1033,7 @@ Tagged_Application;タギングツール
 Tagged_Date;タグ付け日
 Technician;テクニシャン
 TermsOfUse;使用許諾
+TertiaryAudioLanguage;
 Text;テキスト
 Text - Custom;テキスト - カスタム
 Text (HTML);テキスト (HTML)
@@ -985,17 +1045,21 @@ Text1;プライマリテキストストリーム
 Text2;セカンダリテキストストリーム
 Text3;サードテキストストリーム
 TextCount;テキストストリーム数
+TextlessElementsExist;
 ThanksTo;謝辞
 Thousands separator;区切り
-Title;タイトル
-Title_More;タイトルと詳細情報
 TimeCode;
 TimeCode_FirstFrame;
 TimeCode_Settings;
 TimeCode_Source;
+TimeCode_Striped;
 TimeStamp;
 TimeZone;タイムゾーン
+Title;タイトル
+Title_More;タイトルと詳細情報
 Total;計
+TotalNumberOfParts;
+TotalProgrammeDuration;
 Track;トラック名
 Track_Count;トラック数
 transfer_characteristics;
@@ -1013,6 +1077,7 @@ Video_Delay;ビデオ ディレイ
 Video_No;ビデオ番号
 Video0_Delay;ビデオ 0 ディレイ
 Video1;ビデオ 1
+VideoComments;
 VideoCount;ビデオストリーム数
 View;表示
 View_Hint;ヒントを表示する
@@ -1028,6 +1093,7 @@ WebSite_Url;http://MediaArea.net/MediaInfo
 WebSite_Video;このビデオコーデックについて
 WebSite_Video_More; (%Url%) へ移動してこのビデオコーデックを探す
 Width;幅
+Width_CleanAperture;
 Width_Original;
 WriteMe;メール送信
 WriteToTranslator;翻訳者
@@ -1036,5 +1102,5 @@ Written_Location;作成場所
 WrittenBy;著者
 Yes;はい
 Your system;システム情報
-ZZ_Automatic_Percent;90
-ZZ_AutomaticLanguage_Percent;94
+ZZ_Automatic_Percent;84
+ZZ_AutomaticLanguage_Percent;88

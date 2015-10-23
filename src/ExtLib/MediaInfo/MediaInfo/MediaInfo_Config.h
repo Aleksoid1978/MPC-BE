@@ -79,6 +79,9 @@ public :
           void      ReadByHuman_Set (bool NewValue);
           bool      ReadByHuman_Get ();
 
+          void      Legacy_Set (bool NewValue);
+          bool      Legacy_Get ();
+
           void      LegacyStreamDisplay_Set (bool Value);
           bool      LegacyStreamDisplay_Get ();
 
@@ -94,6 +97,9 @@ public :
           void      Trace_Level_Set (const ZtringListList &NewDetailsLevel);
           float32   Trace_Level_Get ();
           std::bitset<32> Trace_Layers_Get ();
+
+          void      Compat_Set (int64u NewValue);
+          int64u    Compat_Get ();
 
           void      Trace_TimeSection_OnlyFirstOccurrence_Set (bool Value);
           bool      Trace_TimeSection_OnlyFirstOccurrence_Get ();
@@ -224,6 +230,9 @@ public :
           void     Event_Send(const int8u* Data_Content, size_t Data_Size, const Ztring &File_Name);
           void     Log_Send(int8u Type, int8u Severity, int32u MessageCode, const Ztring &Message);
           void     Log_Send(int8u Type, int8u Severity, int32u MessageCode, const char* Message) {return Log_Send(Type, Severity, MessageCode, Ztring().From_Local(Message));}
+    #else //MEDIAINFO_EVENTS
+          inline void Log_Send(int8u Type, int8u Severity, int32u MessageCode, const Ztring &Message) {}
+          inline void Log_Send(int8u Type, int8u Severity, int32u MessageCode, const char* Message) {}
     #endif //MEDIAINFO_EVENTS
 
     #if defined(MEDIAINFO_LIBCURL_YES)
@@ -282,11 +291,13 @@ private :
     float32         ParseSpeed;
     float32         Verbosity;
     float32         Trace_Level;
+    int64u          Compat;
     bool            Trace_TimeSection_OnlyFirstOccurrence;
     std::bitset<32> Trace_Layers; //0-7: Container, 8: Stream
     std::map<Ztring, bool> Trace_Modificators; //If we want to add/remove some details
     bool            Language_Raw;
     bool            ReadByHuman;
+    bool            Legacy;
     bool            LegacyStreamDisplay;
     bool            SkipBinaryData;
     int8u           Demux;

@@ -28,6 +28,9 @@
  chapters stream1;flux capitole
  chapters stream2;fluxuri capitole
  chapters stream3;fluxuri capitole
+ character1;
+ character2;
+ character3;
  day1;zi
  day2;zile
  day3;zile
@@ -37,12 +40,12 @@
  file1;fisier
  file2;fisiere
  file3;fisiere
- frame1;
- frame2;
- frame3;
  fps1;pfs
  fps2;pfs
  fps3;pfs
+ frame1;
+ frame2;
+ frame3;
  GB;GB
  Gb;Gb
  Gbps;
@@ -141,6 +144,8 @@
  year3;ani
 , ;
 : ;
+3D;
+3DType;
 About;Despre
 About_Hint;Sfaturi
 Accompaniment;Acompaniament
@@ -172,7 +177,12 @@ Audio_Codec_List;Codecuri audio
 Audio_No;Fara sunet
 Audio1;Primul flux audio
 Audio2;Al doilea flux audia
+AudioComments;
 AudioCount;Numarul de fluxuri audio
+AudioDescriptionPresent;
+AudioDescriptionType;
+AudioLoudnessStandard;
+AudioTrackLayout;
 Author;Autor
 BarCode;Cod de bare
 Basic;Principal
@@ -180,13 +190,13 @@ Basic_Note;Nota: pentru mai multe informatii despre acest fisier, tebuie sa sele
 BitDepth;
 BitDepth_Stored;
 BitRate;
+BitRate_Encoded;
 BitRate_Maximum;
 BitRate_Minimum;
 BitRate_Mode;
 BitRate_Mode_CBR;
 BitRate_Mode_VBR;
 BitRate_Nominal;
-BitRate_Encoded;
 Bits-(Pixel*Frame);
 BufferSize;
 Cancel;Anulare
@@ -211,44 +221,53 @@ Chroma;
 ChromaSubsampling;
 Close;Inchideti
 Close all before open;Inchideti tot inainte de a deschide
+ClosedCaptionsLanguage;
+ClosedCaptionsPresent;
+ClosedCaptionsType;
 Codec;Codec
 Codec_Description;
 Codec_Info;Detalii despre codec
-Codec_Settings;Setari codec
-Codec_Settings_PacketBitStream;
-Codec_Settings_BVOP;
-Codec_Settings_QPel;
-Codec_Settings_GMC;
-Codec_Settings_Matrix;
-Codec_Settings_Floor;
-Codec_Settings_CABAC;
-Codec_Settings_Firm;
-Codec_Settings_Endianness;
-Codec_Settings_Sign;
-Codec_Settings_Law;
-Codec_Settings_ITU;
 Codec_Profile;Profil codec
+Codec_Settings;Setari codec
+Codec_Settings_BVOP;
+Codec_Settings_CABAC;
+Codec_Settings_Endianness;
+Codec_Settings_Firm;
+Codec_Settings_Floor;
+Codec_Settings_GMC;
+Codec_Settings_ITU;
+Codec_Settings_Law;
+Codec_Settings_Matrix;
+Codec_Settings_PacketBitStream;
+Codec_Settings_QPel;
+Codec_Settings_Sign;
 Codec_Url;Legatira web pentru codec
 CodecID;
 CodecID_Description;
+CoDirector;
 Collection;Colectie
 Colorimetry;
 ColorSpace;
 colour_primaries;
+colour_range;
 Comment;Comentariu
 CommissionedBy;
 Compilation;
 CompleteName;Nume complet
+CompletionDate;
 Composer;Compositor
 Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;
 Conductor;
+ContactEmail;
+ContactTelephoneNumber;
 Container and general information;Container si informatii generale
 ContentType;Tip continut
 CoProducer;Coproducator
 Copyright;Drept autor
+CopyrightYear;
 CostumeDesigner;Costume
 Count;
 Country;Tara
@@ -274,8 +293,10 @@ Dimensions;
 Director;Director
 DirectorOfPhotography;Director de film
 DisplayAspectRatio;Raport imagine
+DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;
 DistributedBy;Distribuit de
+Distributor;
 Donate;Donatii
 DotsPerInch;
 Duration;
@@ -291,6 +312,7 @@ Encoded_Library_Settings;Setari codare
 Encoded_Original;Original
 EncodedBy;Codificat de
 EPG_Positions;
+EpisodeTitleNumber;
 Error_File;Eroare la citirea fisierului
 ExecutiveProducer;Director executiv
 Exit;Iesire
@@ -324,39 +346,44 @@ Format_Description;
 Format_Info;
 Format_Profile;
 Format_Settings;
-Format_Settings_PacketBitStream;
 Format_Settings_BVOP;
-Format_Settings_QPel;
+Format_Settings_CABAC;
+Format_Settings_Emphasis;
+Format_Settings_Endianness;
+Format_Settings_Firm;
+Format_Settings_Floor;
+Format_Settings_FrameMode;
 Format_Settings_GMC;
+Format_Settings_GOP;
+Format_Settings_ITU;
+Format_Settings_Law;
 Format_Settings_Matrix;
 Format_Settings_Matrix_Custom;
 Format_Settings_Matrix_Default;
-Format_Settings_Floor;
-Format_Settings_CABAC;
-Format_Settings_Firm;
-Format_Settings_Endianness;
-Format_Settings_RefFrames;
-Format_Settings_Sign;
-Format_Settings_Law;
-Format_Settings_ITU;
-Format_Settings_SBR;
+Format_Settings_Mode;
+Format_Settings_ModeExtension;
+Format_Settings_PacketBitStream;
+Format_Settings_PictureStructure;
 Format_Settings_PS;
 Format_Settings_Pulldown;
-Format_Settings_Mode;
-Format_Settings_FrameMode;
-Format_Settings_Emphasis;
-Format_Settings_ModeExtension;
-Format_Settings_GOP;
-Format_Version;
+Format_Settings_QPel;
+Format_Settings_RefFrames;
+Format_Settings_SBR;
+Format_Settings_Sign;
+Format_Settings_Wrapping;
 Format_Url;
+Format_Version;
+FpaManufacturer;
+FpaPass;
+FpaVersion;
 FrameCount;
 FrameRate;Frecventa cadre
+FrameRate_Maximum;
+FrameRate_Minimum;
 FrameRate_Mode;
 FrameRate_Mode_CFR;
 FrameRate_Mode_VFR;
-FrameRate_Minimum;
 FrameRate_Nominal;
-FrameRate_Maximum;
 FrameRate_Original;
 General;Generale
 Genre;Gen
@@ -554,9 +581,14 @@ Genre_190;
 Genre_191;
 Go to WebSite;
 Grouping;
+Gop_OpenClosed;
+Gop_OpenClosed_Open;
+Gop_OpenClosed_Closed;
+Gop_OpenClosed_FirstFrame;Grouping
 h;h
 Header file;Generare header fisier
 Height;Inaltime
+Height_CleanAperture;
 Height_Original;
 Help;Ajutor
 Hint;
@@ -566,22 +598,23 @@ How many text streams?;Cate fluxuri text?
 How many video streams?;Cate fluxuri video?
 HTML;HTML
 ID;ID
+IdentClockStart;
 Image;Imagine
 Image stream(s);Fluxuri imagine
 Image_Codec_List;Codecuri imagine
 ImageCount;Numarul de fluxuri imagine
 Info;
 Instruments;Instrumente
-Interlacement;
-Interlaced_Interlaced;
-Interlaced_TFF;
 Interlaced_BFF;
+Interlaced_Interlaced;
 Interlaced_PPF;
 Interlaced_Progressive;
-Interleaved;
+Interlaced_TFF;
+Interlacement;
 Interleave_Duration;
 Interleave_Preload;
 Interleave_VideoFrames;
+Interleaved;
 InternetMediaType;
 IRCA;
 ISBN;
@@ -592,7 +625,6 @@ Known formats;Formate cunoscute
 Known parameters;Parametrii cunoscuti
 Label;Eticheta
 Language;Traducere
-Language_More;
 Language_aa;
 Language_ab;
 Language_ae;
@@ -703,6 +735,7 @@ Language_mk;
 Language_ml;
 Language_mn;
 Language_mo;
+Language_More;
 Language_mr;
 Language_ms;
 Language_mt;
@@ -789,19 +822,23 @@ LawRating;
 LCCN;
 Library;Biblioteca muxing
 Lightness;
+LineUpStart;
 List;
-Lyrics;
 Lyricist;Textier
+Lyrics;
 Mastered_Date;Data realizarii
 MasteredBy;Realizat de
+Matrix_Channel(s);
+Matrix_ChannelPositions;
 matrix_coefficients;
+Matrix_Format;
 MediaInfo_About;Furnizeaza informatii foarte detaliate\r\n despre un fisier multimedia
 Menu;Meniu
 Menu stream(s);
 Menu_Codec_List;
+Menu_Hint;Mai multe posibilitati
 Menu_No;
 MenuCount;
-Menu_Hint;Mai multe posibilitati
 MenuID;
 mn;mn
 Mood;Mod
@@ -819,8 +856,8 @@ NetworkName;
 New;Nou
 Newest version;Verificati existenta unei versiuni noi (necesita conexiune Internet)
 NewVersion_Menu;
-NewVersion_Question_Title;
 NewVersion_Question_Content;
+NewVersion_Question_Title;
 No;Nu
 Not yet;
 NumColors;
@@ -863,13 +900,19 @@ OpenCandy_33;
 OpenCandy_34;
 OpenCandy_35;
 OpenCandy_36;
+OpenCaptionsLanguage;
+OpenCaptionsPresent;
+OpenCaptionsType;
 Options;Optiuni
 Options_Hint;Preferinte
 Original;Original
 OriginalNetworkName;
 OriginalSourceForm;
 OriginalSourceMedium;
+Originator;
 Other;Altele
+OtherIdentifier;
+OtherIdentifierType;
 Output;Iesire
 Output format;Format iesire
 OverallBitRate;BitRate general
@@ -879,10 +922,14 @@ OverallBitRate_Mode;
 OverallBitRate_Nominal;
 Part;Parte
 Part_Count;
+PartNumber;
+PartTotal;
 Performer;Cantaret
 Period;Perioada
 Phone;Telefon
+PictureRatio;
 PixelAspectRatio;Dimensiune pixel
+PixelAspectRatio_CleanAperture;
 PixelAspectRatio_Original;Dimensiune pixel
 PlayCounter;Numar redari
 Played_Count;
@@ -892,9 +939,15 @@ PlayTime;Durata redare
 Position;Pozitie
 Position_Total;
 Preferences;Preferinte
+PrimaryAudioLanguage;
 Producer;Producator
 ProductionDesigner;Director productie
+ProductionNumber;
 ProductionStudio;Director studio
+ProductPlacement;
+ProgrammeHasText;
+ProgrammeTextLanguage;
+ProgrammeTitle;
 Publisher;
 Purchased_Date;Data achizitionarii
 Quote character;Citate
@@ -908,22 +961,25 @@ ReplayGain_Gain;
 ReplayGain_Peak;
 Resolution;Rezolutie
 s;s
+SamplingCount;
 SamplingRate;
 Save;Salveaza
-ScanType;
-ScanType_Original;
-ScanType_StoreMethod;
 ScanOrder;
 ScanOrder_Original;
 ScanOrder_Stored;
 ScanOrder_StoredDisplayedInverted;
 ScanOrder_StoreMethod;
+ScanType;
+ScanType_Original;
+ScanType_StoreMethod;
 ScreenplayBy;Scenariu de
 Season;Sezon
+SecondaryAudioLanguage;
 see below;vezi mai jos
 Send HeaderFile;
 Separator_Columns;separator coloane
 Separator_Lines;separator linii
+SeriesTitle;
 ServiceChannel;
 ServiceName;
 ServiceProvider;
@@ -937,10 +993,13 @@ Sheet (Complete);Afisare (completa)
 Shell extension; Extenise (in explorer executati click dreapta)
 Shell extension, folder;
 Shell InfoTip;
+ShimName;
+ShimVersion;
 Show menu;Afisare meniu
 Show toolbar;Afisare toolbar
+SigningPresent;
+SignLanguage;
 Sort;Sortat de
-SamplingCount;
 SoundEngineer;Inginer de sunet
 Source;
 Source_Duration;
@@ -974,6 +1033,7 @@ Tagged_Application;
 Tagged_Date;Data marcarii
 Technician;Tehnician
 TermsOfUse;Condifiile de utilizare
+TertiaryAudioLanguage;
 Text;Text
 Text - Custom;Text - particularizat
 Text (HTML);Text (HTLM)
@@ -985,17 +1045,21 @@ Text1;Frimul flux text
 Text2;Al doilea flux text
 Text3;Al treilea flux text
 TextCount;Numar fluxuri text
+TextlessElementsExist;
 ThanksTo;Multumita
 Thousands separator;Separator mii
-Title;Titlu
-Title_More;Titlu, mai multe informatii
 TimeCode;
 TimeCode_FirstFrame;
 TimeCode_Settings;
 TimeCode_Source;
+TimeCode_Striped;
 TimeStamp;
 TimeZone;
+Title;Titlu
+Title_More;Titlu, mai multe informatii
 Total;Total
+TotalNumberOfParts;
+TotalProgrammeDuration;
 Track;Nume pista
 Track_Count;Numar piste
 transfer_characteristics;
@@ -1013,6 +1077,7 @@ Video_Delay;Intrziere video
 Video_No;Fara video
 Video0_Delay;Intrziere video
 Video1;Primul flux video
+VideoComments;
 VideoCount;Numarul de fluxuri video
 View;Vizualizare
 View_Hint;Modificati modul de vizualizare a informatiilor
@@ -1028,6 +1093,7 @@ WebSite_Url;
 WebSite_Video;Accesati site-ul web al acestui codec video
 WebSite_Video_More;Accesati site-ul web (%Url%) pentru a gasii acest codec video
 Width;Latime
+Width_CleanAperture;
 Width_Original;
 WriteMe;Scrieti-mi
 WriteToTranslator;Scrieti-i traducatorului
@@ -1036,5 +1102,5 @@ Written_Location;Locul mesajului
 WrittenBy;Scris de
 Yes;Da
 Your system;Sistemul dvs
-ZZ_Automatic_Percent;32
-ZZ_AutomaticLanguage_Percent;72
+ZZ_Automatic_Percent;30
+ZZ_AutomaticLanguage_Percent;68

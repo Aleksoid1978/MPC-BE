@@ -28,6 +28,9 @@
  chapters stream1; բաժինների հոսքը
  chapters stream2; բաժինների հոսքը
  chapters stream3; բաժինների հոսքը
+ character1;
+ character2;
+ character3;
  day1; օր.
  day2; օր.
  day3; օր.
@@ -37,12 +40,12 @@
  file1; ֆայլ
  file2; ֆայլեր
  file3; ֆայլեր
- frame1; կադր
- frame2; կադրեր
- frame3; կադրեր
  fps1; կադր/վայր.
  fps2; կադր/վայր.
  fps3; կադր/վայր.
+ frame1; կադր
+ frame2; կադրեր
+ frame3; կադրեր
  GB; ԳԲ
  Gb; Գբիթ
  Gbps; Գբիթ/վայր.
@@ -141,6 +144,8 @@
  year3; տարի
 , ;, 
 : ;: 
+3D;
+3DType;
 About;Ծրագրի մասին
 About_Hint;Կապնվել ծրագրի հեղինակի հետ կամ բացել ծրագրի կայքը
 Accompaniment;Ուղեկցումը
@@ -172,7 +177,12 @@ Audio_Codec_List;Ձայնի կոդավորիչները
 Audio_No;Չկա ձայն
 Audio1;Առաջին ձայնը
 Audio2;Երկրորդ ձայնը
+AudioComments;
 AudioCount;Ձայների քանակը
+AudioDescriptionPresent;
+AudioDescriptionType;
+AudioLoudnessStandard;
+AudioTrackLayout;
 Author;Հեղինակը
 BarCode;Կոդը
 Basic;Կարճ
@@ -180,13 +190,13 @@ Basic_Note;Ուշադր. լրացուցիչ տեղեկությունների հ�
 BitDepth;Բիթայնությունը
 BitDepth_Stored;
 BitRate;Բիթրեյթը
+BitRate_Encoded;
 BitRate_Maximum;Առավելագույն բիթրեյթը
 BitRate_Minimum;Նվազագույն բիթրեյթը
 BitRate_Mode;Բիթրեյթի տեսակը
 BitRate_Mode_CBR;Մշտական
 BitRate_Mode_VBR;Փոփոխական
 BitRate_Nominal;Նոմինալ բիթրեյթը
-BitRate_Encoded;
 Bits-(Pixel*Frame);Բիթ/(Փիքսել*Կադր)
 BufferSize;Պահոցի չափը
 Cancel;Մերժել
@@ -211,44 +221,53 @@ Chroma;Գույնայնությունը
 ChromaSubsampling;Գույների ընտրություն
 Close;Փակել
 Close all before open;Բացելուց առաջ փակել բոլորը
+ClosedCaptionsLanguage;
+ClosedCaptionsPresent;
+ClosedCaptionsType;
 Codec;Կոդավորիչը
 Codec_Description;Կոդավորիչի նկարագր-ը
 Codec_Info;Մանրամասներ կոդավորիչի մասին
-Codec_Settings;Կոդավորիչի կարգավորումները
-Codec_Settings_PacketBitStream;Կոդավորիչի տվյալների փաթեթային հոսքի ցուցիչներ
-Codec_Settings_BVOP;BVOP կոդավորիչի ցուցիչը
-Codec_Settings_QPel;QPel կոդավորիչի ցուցիչը
-Codec_Settings_GMC;GMC կոդավորիչի ցուցիչը
-Codec_Settings_Matrix;Կոդավորիչի կետացանցի ցուցիչը
-Codec_Settings_Floor;Floor կոդավորիչի ցուցիչը
-Codec_Settings_CABAC;CABAC կոդավորիչի ցուցիչը
-Codec_Settings_Firm;Firm կոդավորիչի ցուցիչը
-Codec_Settings_Endianness;Endianness կոդավորիչի ցուցիչը
-Codec_Settings_Sign;Sign կոդավորիչի ցուցիչը
-Codec_Settings_Law;Law կոդավորիչի ցուցիչը
-Codec_Settings_ITU;ITU կոդավորիչի ցուցիչը
 Codec_Profile;Կոդավորիչի պրոֆիլը
+Codec_Settings;Կոդավորիչի կարգավորումները
+Codec_Settings_BVOP;BVOP կոդավորիչի ցուցիչը
+Codec_Settings_CABAC;CABAC կոդավորիչի ցուցիչը
+Codec_Settings_Endianness;Endianness կոդավորիչի ցուցիչը
+Codec_Settings_Firm;Firm կոդավորիչի ցուցիչը
+Codec_Settings_Floor;Floor կոդավորիչի ցուցիչը
+Codec_Settings_GMC;GMC կոդավորիչի ցուցիչը
+Codec_Settings_ITU;ITU կոդավորիչի ցուցիչը
+Codec_Settings_Law;Law կոդավորիչի ցուցիչը
+Codec_Settings_Matrix;Կոդավորիչի կետացանցի ցուցիչը
+Codec_Settings_PacketBitStream;Կոդավորիչի տվյալների փաթեթային հոսքի ցուցիչներ
+Codec_Settings_QPel;QPel կոդավորիչի ցուցիչը
+Codec_Settings_Sign;Sign կոդավորիչի ցուցիչը
 Codec_Url;Կոդավորիչի հղումը
 CodecID;Կոդավորիչի ID-ին
 CodecID_Description;Կոդավորիչի նկարագրությունը
+CoDirector;
 Collection;Հավաքածուն
 Colorimetry;Գույնայնությունը
 ColorSpace;Գույնային տարածքը
 colour_primaries;Հիմնական գույները
+colour_range;
 Comment;Մեկնաբանություն
 CommissionedBy;Երաշխավորող
 Compilation;
 CompleteName;Ամբողջական անունը
+CompletionDate;
 Composer;Կոմպոզիտորը
 Compression_Mode;Սեղման եղանակը
 Compression_Mode_Lossless;Առանց կորստի
 Compression_Mode_Lossy;Կորստով
 Compression_Ratio;Սեղման աստիճանը
 Conductor;Դիրիժորը
+ContactEmail;
+ContactTelephoneNumber;
 Container and general information;Ընդհանուր տեղեկությունը
 ContentType;Պարունակության տեսակը
 CoProducer;Համառեժիսոր
 Copyright;Հեղ. իրավունքը
+CopyrightYear;
 CostumeDesigner;Հագուստի դիզայնը
 Count;Քանակը
 Country;Երկիրը
@@ -274,8 +293,10 @@ Dimensions;Չափերը
 Director;Ռեժիսորը
 DirectorOfPhotography;Օպերատորը
 DisplayAspectRatio;Կողմերի հարաբերականությունը
+DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Կողմերի հարաբեր-ը օրիգինալում
 DistributedBy;Տարածողը
+Distributor;
 Donate;Օժանդակություն
 DotsPerInch;Կետեր դյույմի վրա
 Duration;Տևողությունը
@@ -291,6 +312,7 @@ Encoded_Library_Settings;Ծրագրի կարգավորումները
 Encoded_Original;Օրիգինալի աղբյուրը
 EncodedBy;Կոդավորիչը
 EPG_Positions;EPG-ի դիրքը (ներքին)
+EpisodeTitleNumber;
 Error_File;Սխալ ֆայլում
 ExecutiveProducer;Ռեժիսորի օգնականը
 Exit;Ելք
@@ -324,39 +346,44 @@ Format_Description;Տեսակի նկարագրությունը
 Format_Info;Մանրամասն տեսակի մասին
 Format_Profile;Տեսակի պրոֆիլը
 Format_Settings;Տեսակի կարգավորումները
-Format_Settings_PacketBitStream;Տեսակի տվյալների փաթեթային հոսքի ցուցիչներ
 Format_Settings_BVOP;BVOP տեսակի ցուցիչները
-Format_Settings_QPel;QPel տեսակի ցուցիչները
+Format_Settings_CABAC;CABAC տեսակի ցուցիչները
+Format_Settings_Emphasis;Ակցենտը
+Format_Settings_Endianness;Endianness տեսակի ցուցիչները
+Format_Settings_Firm;irm տեսակի ցուցիչները
+Format_Settings_Floor;Floor տեսակի ցուցիչները
+Format_Settings_FrameMode;Կադրի եղանակը
 Format_Settings_GMC;GMC տեսակի ցուցիչները
+Format_Settings_GOP;GOP տեսակի ցուցիչներ
+Format_Settings_ITU;ITU տեսակի ցուցիչները
+Format_Settings_Law;Law տեսակի ցուցիչները
 Format_Settings_Matrix;Տեսակի կետացանցի ցուցիչները
 Format_Settings_Matrix_Custom;Ընտրովի
 Format_Settings_Matrix_Default;Ծրագրային
-Format_Settings_Floor;Floor տեսակի ցուցիչները
-Format_Settings_CABAC;CABAC տեսակի ցուցիչները
-Format_Settings_Firm;irm տեսակի ցուցիչները
-Format_Settings_Endianness;Endianness տեսակի ցուցիչները
-Format_Settings_RefFrames;ReFrames տեսակի ցուցիչները
-Format_Settings_Sign;Sign տեսակի ցուցիչները
-Format_Settings_Law;Law տեսակի ցուցիչները
-Format_Settings_ITU;ITU տեսակի ցուցիչները
-Format_Settings_SBR;SBR տեսակի ցուցիչները
+Format_Settings_Mode;Եղանակը
+Format_Settings_ModeExtension;Ընդլայնված եղանակը
+Format_Settings_PacketBitStream;Տեսակի տվյալների փաթեթային հոսքի ցուցիչներ
+Format_Settings_PictureStructure;
 Format_Settings_PS;PS տեսակի ցուցիչները
 Format_Settings_Pulldown;Ընտրել տեսակի կարգավորումը
-Format_Settings_Mode;Եղանակը
-Format_Settings_FrameMode;Կադրի եղանակը
-Format_Settings_Emphasis;Ակցենտը
-Format_Settings_ModeExtension;Ընդլայնված եղանակը
-Format_Settings_GOP;GOP տեսակի ցուցիչներ
-Format_Version;Տեսակի տարբերակը
+Format_Settings_QPel;QPel տեսակի ցուցիչները
+Format_Settings_RefFrames;ReFrames տեսակի ցուցիչները
+Format_Settings_SBR;SBR տեսակի ցուցիչները
+Format_Settings_Sign;Sign տեսակի ցուցիչները
+Format_Settings_Wrapping;
 Format_Url;Տեսակի հղումը
+Format_Version;Տեսակի տարբերակը
+FpaManufacturer;
+FpaPass;
+FpaVersion;
 FrameCount;Կադրերի հաշվիչ
 FrameRate;Կադրերի հաճախականությունը
+FrameRate_Maximum;Կադրերի առավելագույն հաճախ-ը
+FrameRate_Minimum;Կադրերի նվազագույն հաճախ-ը
 FrameRate_Mode;Կադրերի հաճախականության եղանակը
 FrameRate_Mode_CFR;Մշտական
 FrameRate_Mode_VFR;Փոփոխական
-FrameRate_Minimum;Կադրերի նվազագույն հաճախ-ը
 FrameRate_Nominal;Կադրերի պայմանական հաճախ-ը
-FrameRate_Maximum;Կադրերի առավելագույն հաճախ-ը
 FrameRate_Original;Կադրերի հաճախ-ը օրիգինալում
 General;Ընդհանուր
 Genre;Ժանրը
@@ -554,9 +581,14 @@ Genre_190;
 Genre_191;
 Go to WebSite;Բացել կայքը
 Grouping;
+Gop_OpenClosed;
+Gop_OpenClosed_Open;
+Gop_OpenClosed_Closed;
+Gop_OpenClosed_FirstFrame;
 h; ժ.
 Header file;Ստեղծել գլխագիրը
 Height;Բարձր-ը
+Height_CleanAperture;
 Height_Original;Օրիգինալի բարձր-ը
 Help;Օգնություն
 Hint;Հուշում
@@ -566,22 +598,23 @@ How many text streams?;Տեքստային հոսքերի քանակը.
 How many video streams?;Տեսանյութերի հոսքերի քանակը.
 HTML;HTML
 ID;ID-ին
+IdentClockStart;
 Image;Պատկերը
 Image stream(s);Պատկերների հոսքերը
 Image_Codec_List;Պատկերների կոդավորիչները
 ImageCount;Պատկերների հոսքերի քանակը
 Info;Տեղեկություն
 Instruments;Գործիքներ
-Interlacement;Միահյուսում
-Interlaced_Interlaced;Միահյուսված
-Interlaced_TFF;Առաջինը վերին դաշտը
 Interlaced_BFF;Առաջինը ներքին դաշտը
+Interlaced_Interlaced;Միահյուսված
 Interlaced_PPF;Առաջադեմ
 Interlaced_Progressive;Առաջադեմ
-Interleaved;Միահյուսվող
+Interlaced_TFF;Առաջինը վերին դաշտը
+Interlacement;Միահյուսում
 Interleave_Duration;Միահյուսման տևողությունը
 Interleave_Preload;Միահյուսման ժամանակը
 Interleave_VideoFrames;Միահյուսման շարունակականությունը
+Interleaved;Միահյուսվող
 InternetMediaType;Կրիչի ինտերնետային տեսակ
 IRCA;IRCA
 ISBN;ISBN
@@ -592,7 +625,6 @@ Known formats;Հայտնի տեսակները
 Known parameters;Հայտնի ցուցիչները
 Label;Նիշը
 Language;Լեզուն
-Language_More;Լեզուն, լրացուցիչ
 Language_aa;Afar
 Language_ab;Abkhazian
 Language_ae;Avestan
@@ -703,6 +735,7 @@ Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
 Language_mo;Moldavian
+Language_More;Լեզուն, լրացուցիչ
 Language_mr;Marathi
 Language_ms;Malay
 Language_mt;Maltese
@@ -789,19 +822,23 @@ LawRating;Իրավունքների սահ-ում
 LCCN;LCCN
 Library;Շտեմարանը
 Lightness;Պայծառությունը
+LineUpStart;
 List;Ցանկը
-Lyrics;Երգերի տեքստը
 Lyricist;Երգի տեքստը
+Lyrics;Երգերի տեքստը
 Mastered_Date;Օրիգինալի ամսաթիվը
 MasteredBy;Օրիգինալը՝
+Matrix_Channel(s);
+Matrix_ChannelPositions;
 matrix_coefficients;Կետացանցի գործակիցը
+Matrix_Format;
 MediaInfo_About;Ցուցադրում է մանրամասն տեղեկություններ\r\nմուլտիմեդիային ֆայլեր Matroska-ի, OGG-ի (ներառյալ OGM)\r\nMPEG1-ի (ներառյալ VCD), MPEG2-ի (ներառյալ DVD և SVCD), MPEG4-ի (ներառյալ iTunes M4A)\r\nQuicktime-ի\r\nRealMedia-ի\r\nWindowsMedia-ի (ներառյալ WMV, WMA)\r\nMicrosoft RIFF-ի (ներառյալ AVI, WAV, DivX)\r\nձայնային ֆայլերի (AC3, DTS, SSC, AU, AIFF) վերաբերյալ
 Menu;Ընտրացանկը
 Menu stream(s);Հոսքերի ընտրացանկը
 Menu_Codec_List;Կոդավորիչների ընտրացանկը
+Menu_Hint;Լրացուցիչ հնարավորություններ
 Menu_No;Չկա Ընտրացանկ
 MenuCount;Ընտրացանկի հոսքերի ք-ը
-Menu_Hint;Լրացուցիչ հնարավորություններ
 MenuID;Ընտրացանկի ID-ին
 mn; ր.
 Mood;Կարգավորված
@@ -819,8 +856,8 @@ NetworkName;Ցանցի անունը
 New;Նոր
 Newest version;Ստուգել նոր տարբերակը
 NewVersion_Menu;Հասանելի է նոր տարբերակը
-NewVersion_Question_Title;Հասանելի է նոր տարբերակ!
 NewVersion_Question_Content;Հասանելի է նոր %Version% տարբերակը, բեռնե՞լ այն։
+NewVersion_Question_Title;Հասանելի է նոր տարբերակ!
 No;Ոչ
 Not yet;Դեռ չկա
 NumColors;Գույների քանակը
@@ -863,13 +900,19 @@ OpenCandy_33;Չտեղակայել
 OpenCandy_34;Ընտրեք տեղակայման ցուցիչները
 OpenCandy_35;______-ի երաշխավորած ծրագիրը
 OpenCandy_36;Ընթացիկ տեղակայումը չի ընդհատվի
+OpenCaptionsLanguage;
+OpenCaptionsPresent;
+OpenCaptionsType;
 Options;Ընտրանքներ
 Options_Hint;Ծրագրի կարգավորումները
 Original;Բնօրինակը
 OriginalNetworkName;Ցանցի հիմնական անունը
 OriginalSourceForm;Օրիգինալի ֆայլը
 OriginalSourceMedium;Օրիգինալի կրիչը
+Originator;
 Other;Այլ
+OtherIdentifier;
+OtherIdentifierType;
 Output;Արտածում
 Output format;Արտածման տեսակը
 OverallBitRate;Ընդհանուր հոսքը
@@ -879,10 +922,14 @@ OverallBitRate_Mode;Բիթրեյթի ընդ. եղանակը
 OverallBitRate_Nominal;Բիթրեյթի պայմ. եղանակը
 Part;Մաս
 Part_Count;Ժամերի ք-ը.
+PartNumber;
+PartTotal;
 Performer;Կատարողը
 Period;Շրջանը
 Phone;Հեռախոս
+PictureRatio;
 PixelAspectRatio;Փիքսելների համամասնությունը
+PixelAspectRatio_CleanAperture;
 PixelAspectRatio_Original;Փիքսելների հարաբեր-ը օրիգինալում
 PlayCounter;Վերարտադրման հաշվիչ
 Played_Count;Վերարտադրվել է մեկ անգամ
@@ -892,9 +939,15 @@ PlayTime;Տևողությունը
 Position;Դիրքը
 Position_Total;Ընդամենը
 Preferences;Կարգավորումներ
+PrimaryAudioLanguage;
 Producer;Պրոդյուսերը
 ProductionDesigner;Դիզայնի մշակողը
+ProductionNumber;
 ProductionStudio;Դիզայնի ստուդիան
+ProductPlacement;
+ProgrammeHasText;
+ProgrammeTextLanguage;
+ProgrammeTitle;
 Publisher;Թողարկողը
 Purchased_Date;Գնման ամսաթիվը
 Quote character;Չակերտների նշանը
@@ -908,22 +961,25 @@ ReplayGain_Gain;Ձայնի կարգավորիչ
 ReplayGain_Peak;Ձայնի կարգավորման գագաթը
 Resolution;Լուծաչափը
 s; վայր.
+SamplingCount;Նմուշների քանակը
 SamplingRate;Հաճախականությունը
 Save;Պահպանել
-ScanType;Ստուգման տեսակը
-ScanType_Original;
-ScanType_StoreMethod;
 ScanOrder;Ստուգման հերթը
 ScanOrder_Original;
 ScanOrder_Stored;
 ScanOrder_StoredDisplayedInverted;
 ScanOrder_StoreMethod;
+ScanType;Ստուգման տեսակը
+ScanType_Original;
+ScanType_StoreMethod;
 ScreenplayBy;Սցենարը՝
 Season;Խաղաշրջանը
+SecondaryAudioLanguage;
 see below;նայեք ներքև
 Send HeaderFile;Ուղարկեք այս ֆայլի գլխագիրը http://sourceforge.net/projects/mediainfo/ (Սխալների բաժին)
 Separator_Columns;Սյուների բաժանիչ
 Separator_Lines;Տողերի բաժանիչ
+SeriesTitle;
 ServiceChannel;Ծառայության ալիքի համարը
 ServiceName;Ծառայության անունը
 ServiceProvider;Ծառայության մատակարարը
@@ -937,10 +993,13 @@ Sheet (Complete);Աղյուսակը (ամբողջական)
 Shell extension;Ինտեգրել Explorer-ում
 Shell extension, folder;Ինտեգրել թղթապանակների Explorer-ում
 Shell InfoTip;Ցուցադրել հուշում Explorer-ում
+ShimName;
+ShimVersion;
 Show menu;Ցուցադրել ընտրացանկը
 Show toolbar;Ցուցադրել վահանակը
+SigningPresent;
+SignLanguage;
 Sort;Դասավորել ըստ
-SamplingCount;Նմուշների քանակը
 SoundEngineer;Ձայն. ռեժիսորը
 Source;
 Source_Duration;
@@ -974,6 +1033,7 @@ Tagged_Application;Նշված ծրագիրը
 Tagged_Date;Նշման ամսաթիվը
 Technician;Տեխնիկը
 TermsOfUse;Օգտագ. կանոնները
+TertiaryAudioLanguage;
 Text;Տեքստ
 Text - Custom;Տեքստ - Ընտրովի
 Text (HTML);Տեքստ (HTML)
@@ -985,17 +1045,21 @@ Text1;Առաջին տեքստային հոսքը
 Text2;Երկրորդ տեքստային հոսքը
 Text3;Երրորդ տեքստային հոսքը
 TextCount;Տեքստային հոսքը ք-ը
+TextlessElementsExist;
 ThanksTo;Շնորհակալ ենք
 Thousands separator;Հազարյակի բաժանիչը
-Title;Անունը
-Title_More;Անունը, լրացուցիչ
 TimeCode;
 TimeCode_FirstFrame;
 TimeCode_Settings;
 TimeCode_Source;
+TimeCode_Striped;
 TimeStamp;
 TimeZone;Ժամային գոտին
+Title;Անունը
+Title_More;Անունը, լրացուցիչ
 Total;Ընդամենը
+TotalNumberOfParts;
+TotalProgrammeDuration;
 Track;Շավիղը
 Track_Count;Շավիղների ք-ը
 transfer_characteristics;Փոխանցման բնութագրումը
@@ -1013,6 +1077,7 @@ Video_Delay;Տեսանյութի դադարը
 Video_No;Չկա տեսանյութ
 Video0_Delay;Տեսանյութի դադարը
 Video1;Առաջին տեսահոսքը
+VideoComments;
 VideoCount;Տեսահոսքերի ք-ը
 View;Տեսքը
 View_Hint;Պատկերման եղանակը
@@ -1028,6 +1093,7 @@ WebSite_Url;http://MediaArea.net/MediaInfo
 WebSite_Video;Տեսակոդավորիչի կայքը
 WebSite_Video_More;Բացել (%Url%) կայքը՝ այս տեսակոդավորիչի մանրամասների համար
 Width;Լայն-ը
+Width_CleanAperture;
 Width_Original;Օրիգինալի լայն-ը
 WriteMe;Նամակ հեղինակին
 WriteToTranslator;Նամակ թարգմանչին
@@ -1036,5 +1102,5 @@ Written_Location;Գրելու տեղը
 WrittenBy;Գրվել է՝
 Yes;Այո
 Your system;Ձեր համակարգը
-ZZ_Automatic_Percent;92
-ZZ_AutomaticLanguage_Percent;97
+ZZ_Automatic_Percent;87
+ZZ_AutomaticLanguage_Percent;91

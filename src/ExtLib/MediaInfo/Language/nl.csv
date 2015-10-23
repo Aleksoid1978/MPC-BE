@@ -28,6 +28,9 @@
  chapters stream1; hoofdstukkenstroom
  chapters stream2; hoofdstukkenstromen
  chapters stream3; hoofdstukkenstromen
+ character1;
+ character2;
+ character3;
  day1; dag
  day2; dagen
  day3; dagen
@@ -37,12 +40,12 @@
  file1; bestand
  file2; bestanden
  file3; bestanden
- frame1; frame
- frame2; frames
- frame3; frames
  fps1; fps
  fps2; fps
  fps3; fps
+ frame1; frame
+ frame2; frames
+ frame3; frames
  GB; GB
  Gb; Gb
  Gbps; Gbps
@@ -141,6 +144,8 @@
  year3; jaren
 , ;, 
 : ;: 
+3D;
+3DType;
 About;Info
 About_Hint;Hoe neemt u contact met mij op en vindt u de nieuwste versie
 Accompaniment;Begeleiding
@@ -172,7 +177,12 @@ Audio_Codec_List;Audiocodecs
 Audio_No;Geen audio
 Audio1;Eerste audiostroom
 Audio2;Tweede audiostroom
+AudioComments;
 AudioCount;Telling van audiostromen
+AudioDescriptionPresent;
+AudioDescriptionType;
+AudioLoudnessStandard;
+AudioTrackLayout;
 Author;Auteur
 BarCode;Streepjescode
 Basic;Elementair
@@ -180,13 +190,13 @@ Basic_Note;Let op : voor meer informatie over dit bestand, moet u een ander beel
 BitDepth;
 BitDepth_Stored;
 BitRate;Bitrate
+BitRate_Encoded;
 BitRate_Maximum;Maximale bitrate
 BitRate_Minimum;Minimale bitrate
 BitRate_Mode;Bitrate-modus
 BitRate_Mode_CBR;Constant
 BitRate_Mode_VBR;Variabel
 BitRate_Nominal;Nominale bitrate
-BitRate_Encoded;
 Bits-(Pixel*Frame);Bits/(Pixel*Frame)
 BufferSize;
 Cancel;Annuleren
@@ -211,44 +221,53 @@ Chroma;Chroma
 ChromaSubsampling;
 Close;Sluiten
 Close all before open;Sluit alle alvorens te openen
+ClosedCaptionsLanguage;
+ClosedCaptionsPresent;
+ClosedCaptionsType;
 Codec;Codec
 Codec_Description;Codecbeschrijving
 Codec_Info;Details voor codec
-Codec_Settings;Codec-instellingen
-Codec_Settings_PacketBitStream;Codec-instellingen, Packet bitstream
-Codec_Settings_BVOP;Codec-instellingen, BVOP
-Codec_Settings_QPel;Codec-instellingen, QPel
-Codec_Settings_GMC;Codec-instellingen, GMC
-Codec_Settings_Matrix;Codec-instellingen, Matrix
-Codec_Settings_Floor;Codec-instellingen, Floor
-Codec_Settings_CABAC;Codec-instellingen, CABAC
-Codec_Settings_Firm;Codec-instellingen, Firm
-Codec_Settings_Endianness;Codec-instellingen, Endianness
-Codec_Settings_Sign;Codec-instellingen, Sign
-Codec_Settings_Law;Codec-instellingen, Law
-Codec_Settings_ITU;Codec-instellingen, ITU
 Codec_Profile;Codecprofiel
+Codec_Settings;Codec-instellingen
+Codec_Settings_BVOP;Codec-instellingen, BVOP
+Codec_Settings_CABAC;Codec-instellingen, CABAC
+Codec_Settings_Endianness;Codec-instellingen, Endianness
+Codec_Settings_Firm;Codec-instellingen, Firm
+Codec_Settings_Floor;Codec-instellingen, Floor
+Codec_Settings_GMC;Codec-instellingen, GMC
+Codec_Settings_ITU;Codec-instellingen, ITU
+Codec_Settings_Law;Codec-instellingen, Law
+Codec_Settings_Matrix;Codec-instellingen, Matrix
+Codec_Settings_PacketBitStream;Codec-instellingen, Packet bitstream
+Codec_Settings_QPel;Codec-instellingen, QPel
+Codec_Settings_Sign;Codec-instellingen, Sign
 Codec_Url;Weblink voor codec
 CodecID;Codec-ID
 CodecID_Description; Beschrijving van de codec
+CoDirector;
 Collection;Collectie
 Colorimetry; Colorimetrie
 ColorSpace;
 colour_primaries;
+colour_range;
 Comment;Commentaar
 CommissionedBy;In opdracht van
 Compilation;
 CompleteName;Volledige naam
+CompletionDate;
 Composer;Componist
 Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;Compressieverhouding
 Conductor;Dirigent
+ContactEmail;
+ContactTelephoneNumber;
 Container and general information;Container en algemene informatie
 ContentType;Inhoudstype
 CoProducer;Coproducent
 Copyright;Auteursrecht
+CopyrightYear;
 CostumeDesigner;Kostuumontwerper
 Count;Telling
 Country;Land
@@ -274,8 +293,10 @@ Dimensions;Afmetingen
 Director;Regisseur
 DirectorOfPhotography;Cinematograaf
 DisplayAspectRatio;Beeldverhouding
+DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Originele beeldverhouding
 DistributedBy;Gedistribueerd door
+Distributor;
 Donate;Doneren
 DotsPerInch;Punten per inch
 Duration;Duur
@@ -291,6 +312,7 @@ Encoded_Library_Settings;Instellingen codering
 Encoded_Original;Origineel
 EncodedBy;Gecodeerd door
 EPG_Positions;
+EpisodeTitleNumber;
 Error_File;Fout tijdens lezen bestand
 ExecutiveProducer;Uitvoerend producent
 Exit;Afsluiten
@@ -324,39 +346,44 @@ Format_Description;Formaatbeschrijving
 Format_Info;Details over formaat
 Format_Profile;Formaatprofiel
 Format_Settings;Formaatinstellingen
-Format_Settings_PacketBitStream;Formaatinstellingen, Packet bitstream
 Format_Settings_BVOP;Formaatinstellingen, BVOP
-Format_Settings_QPel;Formaatinstellingen, Qpel
+Format_Settings_CABAC;Formaatinstellingen, CABAC
+Format_Settings_Emphasis;
+Format_Settings_Endianness;Formaatinstellingen, Endianness
+Format_Settings_Firm;Formaatinstellingen, Firm
+Format_Settings_Floor;Formaatinstellingen, Floor
+Format_Settings_FrameMode;
 Format_Settings_GMC;Formaatinstellingen, GMC
+Format_Settings_GOP;
+Format_Settings_ITU;Formaatinstellingen, ITU
+Format_Settings_Law;Formaatinstellingen, Law
 Format_Settings_Matrix;Formaatinstellingen, Matrix
 Format_Settings_Matrix_Custom;Aangepast
 Format_Settings_Matrix_Default;Standaard
-Format_Settings_Floor;Formaatinstellingen, Floor
-Format_Settings_CABAC;Formaatinstellingen, CABAC
-Format_Settings_Firm;Formaatinstellingen, Firm
-Format_Settings_Endianness;Formaatinstellingen, Endianness
-Format_Settings_RefFrames;Formaatinstellingen, ReFrames
-Format_Settings_Sign;Formaatinstellingen, Sign
-Format_Settings_Law;Formaatinstellingen, Law
-Format_Settings_ITU;Formaatinstellingen, ITU
-Format_Settings_SBR;Formaatinstellingen, SBR
+Format_Settings_Mode;
+Format_Settings_ModeExtension;
+Format_Settings_PacketBitStream;Formaatinstellingen, Packet bitstream
+Format_Settings_PictureStructure;
 Format_Settings_PS;Formaatinstellingen, PS
 Format_Settings_Pulldown;Formaatinstellingen, Pulldown
-Format_Settings_Mode;
-Format_Settings_FrameMode;
-Format_Settings_Emphasis;
-Format_Settings_ModeExtension;
-Format_Settings_GOP;
-Format_Version;Formaatversie
+Format_Settings_QPel;Formaatinstellingen, Qpel
+Format_Settings_RefFrames;Formaatinstellingen, ReFrames
+Format_Settings_SBR;Formaatinstellingen, SBR
+Format_Settings_Sign;Formaatinstellingen, Sign
+Format_Settings_Wrapping;
 Format_Url;Weblink voor formaat
+Format_Version;Formaatversie
+FpaManufacturer;
+FpaPass;
+FpaVersion;
 FrameCount;Framecount
 FrameRate;Framerate
+FrameRate_Maximum;Maximale framrate
+FrameRate_Minimum;Minimale framrate
 FrameRate_Mode;Frameratemodus
 FrameRate_Mode_CFR;Constant
 FrameRate_Mode_VFR;Variabel
-FrameRate_Minimum;Minimale framrate
 FrameRate_Nominal;Nominale framrate
-FrameRate_Maximum;Maximale framrate
 FrameRate_Original;Originele framerate
 General;Algemeen
 Genre;Muziekstijl
@@ -554,9 +581,14 @@ Genre_190;
 Genre_191;
 Go to WebSite;Ga naar website
 Grouping;
+Gop_OpenClosed;
+Gop_OpenClosed_Open;
+Gop_OpenClosed_Closed;
+Gop_OpenClosed_FirstFrame;Grouping
 h;h
 Header file;Headerbestand maken
 Height;Hoogte
+Height_CleanAperture;
 Height_Original;
 Help;Help
 Hint;Hint
@@ -566,22 +598,23 @@ How many text streams?;Hoeveel tekststromen?
 How many video streams?;Hoeveel videostromen?
 HTML;HTML
 ID;ID
+IdentClockStart;
 Image;Video
 Image stream(s);Videostromen
 Image_Codec_List;Videocodecs
 ImageCount;Telling van videostromen
 Info;Info
 Instruments;Instrumenten
-Interlacement;Interlacement
-Interlaced_Interlaced;Interlaced
-Interlaced_TFF;Bovenste Veld Eerst
 Interlaced_BFF;Onderste Veld Eerst
+Interlaced_Interlaced;Interlaced
 Interlaced_PPF;Progressief
 Interlaced_Progressive;Progressief
-Interleaved;
+Interlaced_TFF;Bovenste Veld Eerst
+Interlacement;Interlacement
 Interleave_Duration;Interleave, duur
 Interleave_Preload;Interleave, preloadduur
 Interleave_VideoFrames;Interleave, duur
+Interleaved;
 InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
@@ -592,7 +625,6 @@ Known formats;Bekende formaten
 Known parameters;Bekende parameters
 Label;Label
 Language;Taal
-Language_More;Taal, meer info
 Language_aa;Afar
 Language_ab;Abchazisch
 Language_ae;Avestaans
@@ -703,6 +735,7 @@ Language_mk;Macedonisch
 Language_ml;Malayalam
 Language_mn;Mongools
 Language_mo;Moldavisch
+Language_More;Taal, meer info
 Language_mr;Marathi
 Language_ms;Maleis
 Language_mt;Maltees
@@ -789,19 +822,23 @@ LawRating;Wettelijke rating
 LCCN;LCCN
 Library;Muxingbibliotheek
 Lightness;Helderheid
+LineUpStart;
 List;Lijst
-Lyrics;Tekst
 Lyricist;Tekstschrijver
+Lyrics;Tekst
 Mastered_Date;Datum van master
 MasteredBy;Gemastered door
+Matrix_Channel(s);
+Matrix_ChannelPositions;
 matrix_coefficients;
+Matrix_Format;
 MediaInfo_About;Levert zeer gedetailleerde informatie\r\nover multimediabestanden:\r\nMatroska, OGG (inclusief OGM)\r\nMPEG1 (inclusief VCD)\r\nMPEG2 (inclusief DVD en SVCD)\r\nMPEG4 (inclusief Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (inclusief WMV, WMA)\r\nMicrosoft RIFF (inclusief AVI, WAV)\r\nGeluidsformaten (AC3, DTS, AAC, AU, AIFF...)
 Menu;Menu
 Menu stream(s);Menustromen
 Menu_Codec_List;Menucodecs
+Menu_Hint;Meer mogelijkheden
 Menu_No;Geen menu
 MenuCount;Telling van menustromen
-Menu_Hint;Meer mogelijkheden
 MenuID;Menu-ID
 mn;mn
 Mood;Stemming
@@ -819,8 +856,8 @@ NetworkName;
 New;Nieuw
 Newest version;Controleer op nieuwe versies (vereist internetverbinding)
 NewVersion_Menu;
-NewVersion_Question_Title;
 NewVersion_Question_Content;
+NewVersion_Question_Title;
 No;Nee
 Not yet;Nog niet
 NumColors;Aantal kleuren
@@ -863,13 +900,19 @@ OpenCandy_33;Niet Installeren
 OpenCandy_34;Kies een installatieoptie
 OpenCandy_35;______ beveelt deze software aan
 OpenCandy_36;Uw huidige installatie zal niet worden onderbroken
+OpenCaptionsLanguage;
+OpenCaptionsPresent;
+OpenCaptionsType;
 Options;Opties
 Options_Hint;Voorkeuren
 Original;Origineel
 OriginalNetworkName;
 OriginalSourceForm;Originele bronvorm
 OriginalSourceMedium;Originele bronmedium
+Originator;
 Other;Ander
+OtherIdentifier;
+OtherIdentifierType;
 Output;Uitvoer
 Output format;Uitvoerformaat
 OverallBitRate;Totale bitrate
@@ -879,10 +922,14 @@ OverallBitRate_Mode;Totale bitratemodus
 OverallBitRate_Nominal;Nominale Totale bitrate
 Part;Deel
 Part_Count;Totale telling
+PartNumber;
+PartTotal;
 Performer;Artiest
 Period;Periode
 Phone;Telefoon
+PictureRatio;
 PixelAspectRatio;Pixelverhouding
+PixelAspectRatio_CleanAperture;
 PixelAspectRatio_Original;Originele pixelverhouding
 PlayCounter;Teller
 Played_Count; Keren gespeeld
@@ -892,9 +939,15 @@ PlayTime;Speeltijd
 Position;Positie
 Position_Total;Totaal
 Preferences;Voorkeuren
+PrimaryAudioLanguage;
 Producer;Producent
 ProductionDesigner;Productieontwerper
+ProductionNumber;
 ProductionStudio;Productiestudio
+ProductPlacement;
+ProgrammeHasText;
+ProgrammeTextLanguage;
+ProgrammeTitle;
 Publisher;Uitgever
 Purchased_Date;Aankoopdatum
 Quote character;Aanhalingsteken
@@ -908,22 +961,25 @@ ReplayGain_Gain;Replay gain
 ReplayGain_Peak;Replay gain piek
 Resolution;Resolutie
 s;s
+SamplingCount;
 SamplingRate;Samplerate
 Save;Opslaan
-ScanType;Scansoort
-ScanType_Original;
-ScanType_StoreMethod;
 ScanOrder;Scanvolgorde
 ScanOrder_Original;
 ScanOrder_Stored;
 ScanOrder_StoredDisplayedInverted;
 ScanOrder_StoreMethod;
+ScanType;Scansoort
+ScanType_Original;
+ScanType_StoreMethod;
 ScreenplayBy;Draaiboek door
 Season;Seizoen
+SecondaryAudioLanguage;
 see below;zie onder
 Send HeaderFile;A.u.b het Header-bestand hierheen sturen : http://sourceforge.net/projects/mediainfo/ (Bug-sectie)
 Separator_Columns;scheidingsteken kolommen
 Separator_Lines;scheidingsteken regels
+SeriesTitle;
 ServiceChannel;Servicekanaalnummer
 ServiceName;Servicenaam
 ServiceProvider;Serviceprovider
@@ -937,10 +993,13 @@ Sheet (Complete);Blad (Compleet)
 Shell extension;Shell-extensie (in explorer-rechtsklikmenu zal een Media Info optie te zien zijn...)
 Shell extension, folder;
 Shell InfoTip;Shell InfoTip (houd in explorer de muiscursor boven een bestand, info wordt getoond)
+ShimName;
+ShimVersion;
 Show menu;Menu tonen
 Show toolbar;Werkbalk tonen
+SigningPresent;
+SignLanguage;
 Sort;Gesorteerd op
-SamplingCount;
 SoundEngineer;Geluidstechnicus
 Source;
 Source_Duration;
@@ -974,6 +1033,7 @@ Tagged_Application;Tagapplicatie
 Tagged_Date;Tagdatum
 Technician;Technicus
 TermsOfUse;Gebruiksvoorwaarden
+TertiaryAudioLanguage;
 Text;Tekst
 Text - Custom;Tekst - Aangepast
 Text (HTML);Tekst (HTML)
@@ -985,17 +1045,21 @@ Text1;Eerste tekststroom
 Text2;Tweede teksstroom
 Text3;Derde tekststroom
 TextCount;Telling van tekststromen
+TextlessElementsExist;
 ThanksTo;Dank aan
 Thousands separator;Scheidingsteken duizendtallen
-Title;Titel
-Title_More;Titel, meer info
 TimeCode;
 TimeCode_FirstFrame;
 TimeCode_Settings;
 TimeCode_Source;
+TimeCode_Striped;
 TimeStamp;
 TimeZone;
+Title;Titel
+Title_More;Titel, meer info
 Total;Totaal
+TotalNumberOfParts;
+TotalProgrammeDuration;
 Track;Tracknaam
 Track_Count;Tracktelling
 transfer_characteristics;
@@ -1013,6 +1077,7 @@ Video_Delay;Video vertraging
 Video_No;Geen video
 Video0_Delay;Video0 vertraging
 Video1;Eerste videostroom
+VideoComments;
 VideoCount;Telling van videostromen
 View;Beeld
 View_Hint;Verander de weergave van informatie
@@ -1028,6 +1093,7 @@ WebSite_Url;http://MediaArea.net/MediaInfo
 WebSite_Video;Ga naar de website van deze videocodec
 WebSite_Video_More;Ga naar de website (%Url%) om deze videocodec te vinden
 Width;Breedte
+Width_CleanAperture;
 Width_Original;
 WriteMe;Schrijf mij
 WriteToTranslator;Schrijf naar vertaler
@@ -1036,5 +1102,5 @@ Written_Location;Locatie van schrijven
 WrittenBy;Geschreven door
 Yes;Ja
 Your system;Uw systeem
-ZZ_Automatic_Percent;89
-ZZ_AutomaticLanguage_Percent;93
+ZZ_Automatic_Percent;83
+ZZ_AutomaticLanguage_Percent;87

@@ -95,6 +95,21 @@ private :
     void Header_Parse();
     void Data_Parse();
 
+    //Unknown content
+    struct streaminfo
+    {
+        stream_t StreamKind;
+        std::map<string, Ztring> Infos;
+
+        streaminfo()
+            : StreamKind(Stream_Other)
+        {}
+    };
+    typedef std::map<string,  streaminfo> perid;
+
+    std::vector<std::vector<perid> > Unknown;
+    bool TestAndPrepare(const string* Unique=NULL);
+
     //Temp
     int8u DataID;
     int8u SecondaryDataID;
@@ -104,4 +119,3 @@ private :
 } //NameSpace
 
 #endif
-

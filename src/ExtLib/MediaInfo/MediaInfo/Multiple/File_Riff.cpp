@@ -586,7 +586,7 @@ void File_Riff::Read_Buffer_Init()
     #if MEDIAINFO_DEMUX
          Demux_UnpacketizeContainer=Config->Demux_Unpacketize_Get();
          Demux_Rate=Config->Demux_Rate_Get();
-         if (Demux_Rate==0)
+         if (Demux_UnpacketizeContainer && Demux_Rate==0)
              Demux_Rate=25; //Default value
     #endif //MEDIAINFO_DEMUX
 
@@ -724,8 +724,10 @@ bool File_Riff::Header_Begin()
             return false;
 
         // Fake header
-        Element_Begin0();
-        Element_Begin0();
+        Element_Begin1("...Continued"); //TODO: better method
+        Element_ThisIsAList();
+        Element_Begin1("...Continued");
+        Element_ThisIsAList();
         if (Buffer_DataToParse_End)
             Header_Fill_Size(Buffer_DataToParse_End-(File_Offset+Buffer_Offset));
         else

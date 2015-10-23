@@ -23,6 +23,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Reader/Reader_Directory.h"
 #include "ZenLib/Dir.h"
+#include "ZenLib/FileName.h"
 using namespace ZenLib;
 //---------------------------------------------------------------------------
 
@@ -198,7 +199,8 @@ void Reader_Directory::Xdcam_Directory_Cleanup(ZtringList &List)
     for (size_t File_Pos=0; File_Pos<List.size(); File_Pos++)
     {
         size_t Xdcam_Pos=List[File_Pos].find(ToSearch);
-        if (Xdcam_Pos!=string::npos && Xdcam_Pos!=0 && Xdcam_Pos+1+4+1+12==List[File_Pos].size())
+        FileName Xdcam_FileName(List[File_Pos]);
+        if (Xdcam_Pos!=string::npos && Xdcam_Pos!=0 && (Xdcam_FileName.Extension_Get()==__T("XML")) && Xdcam_Pos+1+4+1+Xdcam_FileName.Name_Get().size()+4==List[File_Pos].size())
         {
             //This is a XDCAM CLIP
             Ztring Path_Begin=List[File_Pos];

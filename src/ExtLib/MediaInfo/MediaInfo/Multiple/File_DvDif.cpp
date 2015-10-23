@@ -744,11 +744,11 @@ void File_DvDif::Synched_Test_Reset()
 void File_DvDif::Synched_Init()
 {
     //FrameInfo
-    if (FrameInfo.DTS==(int64u)-1)
+    if (!IsSub && FrameInfo.DTS==(int64u)-1)
         FrameInfo.DTS=0; //No DTS in container
-    if (FrameInfo.PTS==(int64u)-1)
+    if (!IsSub && FrameInfo.PTS==(int64u)-1)
         FrameInfo.PTS=0; //No PTS in container
-    if (Frame_Count_NotParsedIncluded==(int64u)-1)
+    if (!IsSub && Frame_Count_NotParsedIncluded==(int64u)-1)
         Frame_Count_NotParsedIncluded=0; //No Frame_Count_NotParsedIncluded in the container
 }
 

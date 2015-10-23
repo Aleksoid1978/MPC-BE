@@ -497,6 +497,10 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
     Fill(Stream_Video, 0, Video_Codec_Profile, Profile);
     Fill(Stream_Video, StreamPos_Last, Video_Width, Width);
     Fill(Stream_Video, StreamPos_Last, Video_Height, Height);
+    if ((*seq_parameter_set_Item)->frame_crop_left_offset || (*seq_parameter_set_Item)->frame_crop_right_offset)
+        Fill(Stream_Video, StreamPos_Last, Video_Stored_Width, ((*seq_parameter_set_Item)->pic_width_in_mbs_minus1       +1)*16);
+    if ((*seq_parameter_set_Item)->frame_crop_top_offset || (*seq_parameter_set_Item)->frame_crop_bottom_offset)
+        Fill(Stream_Video, StreamPos_Last, Video_Stored_Height, ((*seq_parameter_set_Item)->pic_height_in_map_units_minus1+1)*16*(2-(*seq_parameter_set_Item)->frame_mbs_only_flag));
     Fill(Stream_Video, 0, Video_PixelAspectRatio, PixelAspectRatio, 3, true);
     Fill(Stream_Video, 0, Video_DisplayAspectRatio, Width*PixelAspectRatio/Height, 3, true); //More precise
     if (FrameRate_Divider==2)
@@ -980,6 +984,7 @@ bool File_Avc::Demux_UnpacketizeContainer_Test()
         if (Config->Demux_EventWasSent)
             return false;
         File_Avc* MI=new File_Avc;
+        Element_Code=(int64u)-1;
         Open_Buffer_Init(MI);
         Open_Buffer_Continue(MI, Buffer, Buffer_Size);
         bool IsOk=MI->Status[IsAccepted];
@@ -2452,7 +2457,7 @@ void File_Avc::sei_message_pic_timing(int32u /*payloadSize*/, int32u seq_paramet
                     TimeStamp+=__T('.');
                     TimeStamp+=Ztring::ToZtring(Milliseconds);
                 }
-                Param_Info1(TimeStamp);
+                Element_Info1(TimeStamp);
             TEST_SB_END();
             Element_End0();
         }

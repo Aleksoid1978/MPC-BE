@@ -100,7 +100,7 @@ void File__Analyze::Streams_Finish_Global()
 }
 
 //---------------------------------------------------------------------------
-void File__Analyze::TestContinuousFileNames(size_t CountOfFiles, Ztring FileExtension)
+void File__Analyze::TestContinuousFileNames(size_t CountOfFiles, Ztring FileExtension, bool SkipComputeDelay)
 {
     if (IsSub || !Config->File_TestContinuousFileNames_Get())
         return;
@@ -230,7 +230,8 @@ void File__Analyze::TestContinuousFileNames(size_t CountOfFiles, Ztring FileExte
         float64 Demux_Rate=Config->Demux_Rate_Get();
         if (!Demux_Rate)
             Demux_Rate=24;
-        Fill(Stream_Video, 0, Video_Delay, float64_int64s(Frame_Count_NotParsedIncluded*1000/Demux_Rate));
+        if (!SkipComputeDelay)
+            Fill(Stream_Video, 0, Video_Delay, float64_int64s(Frame_Count_NotParsedIncluded*1000/Demux_Rate));
     #endif //MEDIAINFO_DEMUX
 
     #if MEDIAINFO_ADVANCED
@@ -440,6 +441,11 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
       || Retrieve(Stream_Video, Pos, Video_Format)==__T("DPX")
       || Retrieve(Stream_Video, Pos, Video_Format)==__T("EXR")))
             Fill(Stream_Video, Pos, Video_ScanType, "Progressive");
+
+    //Useless chroma subsampling
+    if (Retrieve(Stream_Video, Pos, Video_ColorSpace)==__T("RGB")
+     && Retrieve(Stream_Video, Pos, Video_ChromaSubsampling)==__T("4:4:4"))
+        Clear(Stream_Video, Pos, Video_ChromaSubsampling);
 
     //Commercial name
     #if defined(MEDIAINFO_VC3_YES)

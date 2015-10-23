@@ -30,6 +30,7 @@
 #include "ZenLib/Translation.h"
 #include "ZenLib/InfoMap.h"
 using namespace ZenLib;
+using namespace std;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -298,6 +299,8 @@ public :
     bool          File_MpegTs_RealTime_Get ();
     void          File_Mxf_TimeCodeFromMaterialPackage_Set (bool NewValue);
     bool          File_Mxf_TimeCodeFromMaterialPackage_Get ();
+    void          File_Mxf_ParseIndex_Set (bool NewValue);
+    bool          File_Mxf_ParseIndex_Get ();
     void          File_Bdmv_ParseTargetedFile_Set (bool NewValue);
     bool          File_Bdmv_ParseTargetedFile_Get ();
     #if defined(MEDIAINFO_DVDIF_YES)
@@ -498,6 +501,7 @@ private :
     bool                    File_MpegTs_Atsc_transport_stream_id_Trust;
     bool                    File_MpegTs_RealTime;
     bool                    File_Mxf_TimeCodeFromMaterialPackage;
+    bool                    File_Mxf_ParseIndex;
     bool                    File_Bdmv_ParseTargetedFile;
     #if defined(MEDIAINFO_DVDIF_YES)
     bool                    File_DvDif_DisableAudioIfIsInContainer;

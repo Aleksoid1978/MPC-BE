@@ -28,6 +28,9 @@
  chapters stream1; 章節串流
  chapters stream2; 章節串流
  chapters stream3; 章節串流
+ character1;
+ character2;
+ character3;
  day1; 日
  day2; 日
  day3; 日
@@ -37,12 +40,12 @@
  file1; 檔案
  file2; 檔案
  file3; 檔案
- frame1; 影格
- frame2; 影格
- frame3; 影格
  fps1; fps
  fps2; fps
  fps3; fps
+ frame1; 影格
+ frame2; 影格
+ frame3; 影格
  GB; GB
  Gb; Gb
  Gbps; Gbps
@@ -141,6 +144,8 @@
  year3; 年
 , ;, 
 : ;: 
+3D;
+3DType;
 About;關於
 About_Hint;如何聯絡作者以及尋找最新版
 Accompaniment;伴奏
@@ -172,7 +177,12 @@ Audio_Codec_List;音訊編解碼器
 Audio_No;無音訊
 Audio1;第一音訊串流
 Audio2;第二音訊串流
+AudioComments;
 AudioCount;音訊串流數
+AudioDescriptionPresent;
+AudioDescriptionType;
+AudioLoudnessStandard;
+AudioTrackLayout;
 Author;作者
 BarCode;條碼
 Basic;基本
@@ -180,13 +190,13 @@ Basic_Note;注意: 想知道更多關於此檔案的資訊, 您得選擇不同�
 BitDepth;
 BitDepth_Stored;
 BitRate;流量
+BitRate_Encoded;
 BitRate_Maximum;最大流量
 BitRate_Minimum;最小流量
 BitRate_Mode;流量模式
 BitRate_Mode_CBR;常數式
 BitRate_Mode_VBR;可變式
 BitRate_Nominal;正常流量
-BitRate_Encoded;
 Bits-(Pixel*Frame);位元/(像素*影格)
 BufferSize;
 Cancel;取消
@@ -211,44 +221,53 @@ Chroma;彩度
 ChromaSubsampling;
 Close;關閉
 Close all before open;開啟前關閉其它檔案
+ClosedCaptionsLanguage;
+ClosedCaptionsPresent;
+ClosedCaptionsType;
 Codec;編解碼器
 Codec_Description;編解碼器描述
 Codec_Info;編解碼器詳細資訊
-Codec_Settings;編解碼器設定
-Codec_Settings_PacketBitStream;編解碼器設定, Packet bitstream
-Codec_Settings_BVOP;編解碼器設定, BVOP
-Codec_Settings_QPel;編解碼器設定, QPel
-Codec_Settings_GMC;編解碼器設定, GMC
-Codec_Settings_Matrix;編解碼器設定, Matrix
-Codec_Settings_Floor;編解碼器設定, Floor
-Codec_Settings_CABAC;編解碼器設定, CABAC
-Codec_Settings_Firm;編解碼器設定, Firm
-Codec_Settings_Endianness;編解碼器設定, Endianness
-Codec_Settings_Sign;編解碼器設定, Sign
-Codec_Settings_Law;編解碼器設定, Law
-Codec_Settings_ITU;編解碼器設定, ITU
 Codec_Profile;編解碼器設定
+Codec_Settings;編解碼器設定
+Codec_Settings_BVOP;編解碼器設定, BVOP
+Codec_Settings_CABAC;編解碼器設定, CABAC
+Codec_Settings_Endianness;編解碼器設定, Endianness
+Codec_Settings_Firm;編解碼器設定, Firm
+Codec_Settings_Floor;編解碼器設定, Floor
+Codec_Settings_GMC;編解碼器設定, GMC
+Codec_Settings_ITU;編解碼器設定, ITU
+Codec_Settings_Law;編解碼器設定, Law
+Codec_Settings_Matrix;編解碼器設定, Matrix
+Codec_Settings_PacketBitStream;編解碼器設定, Packet bitstream
+Codec_Settings_QPel;編解碼器設定, QPel
+Codec_Settings_Sign;編解碼器設定, Sign
 Codec_Url;編解碼器的網址
 CodecID;編解碼器識別字
 CodecID_Description;編解碼器描述
+CoDirector;
 Collection;收藏
 Colorimetry;比色法
 ColorSpace;
 colour_primaries;色彩原色
+colour_range;
 Comment;註釋
 CommissionedBy;委託
 Compilation;
 CompleteName;完整檔名
+CompletionDate;
 Composer;作曲者
 Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;壓縮比
 Conductor;指揮
+ContactEmail;
+ContactTelephoneNumber;
 Container and general information;容器格式與一般訊息
 ContentType;內容型態
 CoProducer;製作協力
 Copyright;著作權
+CopyrightYear;
 CostumeDesigner;服裝設計
 Count;所有種類
 Country;國家
@@ -274,8 +293,10 @@ Dimensions;維度
 Director;導演
 DirectorOfPhotography;攝影導演
 DisplayAspectRatio;顯示長寬比例
+DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;原始顯示長寬比例
 DistributedBy;發布者
+Distributor;
 Donate;贊助
 DotsPerInch;每吋點數 (DPI)
 Duration;時間長度
@@ -291,6 +312,7 @@ Encoded_Library_Settings;編碼設定
 Encoded_Original;來源
 EncodedBy;編碼者
 EPG_Positions;EPG 電子節目表位置 (內部)
+EpisodeTitleNumber;
 Error_File;讀取檔案錯誤
 ExecutiveProducer;監製
 Exit;離開
@@ -324,39 +346,44 @@ Format_Description;格式敘述
 Format_Info;格式詳細資訊
 Format_Profile;格式類型
 Format_Settings;格式設定
-Format_Settings_PacketBitStream;格式設定, Packet Bitstream
 Format_Settings_BVOP;格式設定, BVOP
-Format_Settings_QPel;格式設定, QPel
+Format_Settings_CABAC;格式設定, CABAC
+Format_Settings_Emphasis;
+Format_Settings_Endianness;格式設定, Endianness
+Format_Settings_Firm;格式設定, Firm
+Format_Settings_Floor;格式設定, Floor
+Format_Settings_FrameMode;
 Format_Settings_GMC;格式設定, GMC
+Format_Settings_GOP;
+Format_Settings_ITU;格式設定, ITU
+Format_Settings_Law;格式設定, Law
 Format_Settings_Matrix;格式設定, Matrix
 Format_Settings_Matrix_Custom;自訂
 Format_Settings_Matrix_Default;預設
-Format_Settings_Floor;格式設定, Floor
-Format_Settings_CABAC;格式設定, CABAC
-Format_Settings_Firm;格式設定, Firm
-Format_Settings_Endianness;格式設定, Endianness
-Format_Settings_RefFrames;格式設定, RefFrames
-Format_Settings_Sign;格式設定, Sign
-Format_Settings_Law;格式設定, Law
-Format_Settings_ITU;格式設定, ITU
-Format_Settings_SBR;格式設定, SBR
+Format_Settings_Mode;
+Format_Settings_ModeExtension;
+Format_Settings_PacketBitStream;格式設定, Packet Bitstream
+Format_Settings_PictureStructure;
 Format_Settings_PS;格式設定, PS
 Format_Settings_Pulldown;格式設定, Pulldown
-Format_Settings_Mode;
-Format_Settings_FrameMode;
-Format_Settings_Emphasis;
-Format_Settings_ModeExtension;
-Format_Settings_GOP;
-Format_Version;格式版本
+Format_Settings_QPel;格式設定, QPel
+Format_Settings_RefFrames;格式設定, RefFrames
+Format_Settings_SBR;格式設定, SBR
+Format_Settings_Sign;格式設定, Sign
+Format_Settings_Wrapping;
 Format_Url;該格式的網址
+Format_Version;格式版本
+FpaManufacturer;
+FpaPass;
+FpaVersion;
 FrameCount;影格數
 FrameRate;影格頻率
+FrameRate_Maximum;最大影格頻率
+FrameRate_Minimum;最小影格頻率
 FrameRate_Mode;影格頻率模式
 FrameRate_Mode_CFR;常數式
 FrameRate_Mode_VFR;可變式
-FrameRate_Minimum;最小影格頻率
 FrameRate_Nominal;正常影格頻率
-FrameRate_Maximum;最大影格頻率
 FrameRate_Original;原始影格頻率
 General;一般
 Genre;類型
@@ -554,9 +581,14 @@ Genre_190;
 Genre_191;
 Go to WebSite;前往網站
 Grouping;
+Gop_OpenClosed;
+Gop_OpenClosed_Open;
+Gop_OpenClosed_Closed;
+Gop_OpenClosed_FirstFrame;
 h;時
 Header file;建立標頭檔案
 Height;畫面高度
+Height_CleanAperture;
 Height_Original;
 Help;說明
 Hint;提示
@@ -566,22 +598,23 @@ How many text streams?;有多少字幕串流?
 How many video streams?;有多少視訊串流?
 HTML;網頁
 ID;識別字
+IdentClockStart;
 Image;圖片
 Image stream(s);圖片串流
 Image_Codec_List;圖片編解碼器
 ImageCount;圖片串流數
 Info;相關資訊
 Instruments;樂器
-Interlacement;交錯
-Interlaced_Interlaced;有交錯
-Interlaced_TFF;前場優先
 Interlaced_BFF;後場優先
+Interlaced_Interlaced;有交錯
 Interlaced_PPF;漸進式
 Interlaced_Progressive;漸進式
-Interleaved;
+Interlaced_TFF;前場優先
+Interlacement;交錯
 Interleave_Duration;交錯訊號, 持續時間
 Interleave_Preload;交錯訊號, 預先載入時間
 Interleave_VideoFrames;交錯訊號, 持續時間
+Interleaved;
 InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
@@ -592,7 +625,6 @@ Known formats;已知格式
 Known parameters;已知參數
 Label;標籤
 Language;語系
-Language_More;語系, 詳細資訊
 Language_aa;伊索匹亞語 (Afar)
 Language_ab;阿布哈茲語 (Abkhazian)
 Language_ae;古波斯語 (Avestan)
@@ -703,6 +735,7 @@ Language_mk;馬其頓語 (Macedonian)
 Language_ml;馬拉雅拉姆語 (Malayalam)
 Language_mn;蒙古語 (Mongolian)
 Language_mo;摩達維亞語 (Moldavian)
+Language_More;語系, 詳細資訊
 Language_mr;馬拉塔語 (Marathi)
 Language_ms;馬來語 (Malay)
 Language_mt;馬爾他語 (Maltese)
@@ -789,19 +822,23 @@ LawRating;分級
 LCCN;LCCN
 Library;合成函式庫
 Lightness;亮度
+LineUpStart;
 List;清單
-Lyrics;歌詞
 Lyricist;作詞者
+Lyrics;歌詞
 Mastered_Date;後製日期
 MasteredBy;後製者
+Matrix_Channel(s);
+Matrix_ChannelPositions;
 matrix_coefficients;矩陣係數
+Matrix_Format;
 MediaInfo_About;支援非常詳盡的多媒體檔案資訊:\r\nMatroska, OGG (包含 OGM)\r\nMPEG-1 (包含 VCD)\r\nMPEG-2 (包含 DVD, SVCD)\r\nMPEG-4 (包含 iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (包含 WMV, WMA)\r\nMicrosoft RIFF (包含 AVI, WAV)\r\n純聲音格式 (AC3, DTS, AAC, AU, AIFF...)
 Menu;選單
 Menu stream(s);選單串流
 Menu_Codec_List;選單編解碼器
+Menu_Hint;更多可能
 Menu_No;無選單
 MenuCount;選單串流數
-Menu_Hint;更多可能
 MenuID;選單ID
 mn;分
 Mood;情緒
@@ -819,8 +856,8 @@ NetworkName;網路名稱
 New;新增
 Newest version;檢查最新的版本 (需要網路連線)
 NewVersion_Menu;有新版本
-NewVersion_Question_Title;有新版本發布!
 NewVersion_Question_Content;有新版本 (v%Version%) 了, 您想下載嗎?
+NewVersion_Question_Title;有新版本發布!
 No;否
 Not yet;還沒好
 NumColors;色彩數
@@ -863,13 +900,19 @@ OpenCandy_33;不要安裝
 OpenCandy_34;請選擇安裝選項
 OpenCandy_35;______ 推薦此軟體
 OpenCandy_36;您當前的安裝無法中斷
+OpenCaptionsLanguage;
+OpenCaptionsPresent;
+OpenCaptionsType;
 Options;選項
 Options_Hint;偏好設定
 Original;來源
 OriginalNetworkName;來源網路名稱
 OriginalSourceForm;來源格式
 OriginalSourceMedium;來源媒介
+Originator;
 Other;其它
+OtherIdentifier;
+OtherIdentifierType;
 Output;輸出
 Output format;輸出格式
 OverallBitRate;整體流量
@@ -879,10 +922,14 @@ OverallBitRate_Mode;整體流量模式
 OverallBitRate_Nominal;正常整體流量
 Part;部分
 Part_Count;總數
+PartNumber;
+PartTotal;
 Performer;演出者
 Period;時期
 Phone;電話
+PictureRatio;
 PixelAspectRatio;像素長寬比例
+PixelAspectRatio_CleanAperture;
 PixelAspectRatio_Original;原始像素長寬比例
 PlayCounter;播放計數器
 Played_Count;已播放數
@@ -892,9 +939,15 @@ PlayTime;播放長度
 Position;順序
 Position_Total;總數
 Preferences;偏好設定
+PrimaryAudioLanguage;
 Producer;製作
 ProductionDesigner;美術指導
+ProductionNumber;
 ProductionStudio;製作中心
+ProductPlacement;
+ProgrammeHasText;
+ProgrammeTextLanguage;
+ProgrammeTitle;
 Publisher;發布者
 Purchased_Date;購買日期
 Quote character;引號字元
@@ -908,22 +961,25 @@ ReplayGain_Gain;播放增益
 ReplayGain_Peak;播放增益尖峰值
 Resolution;顏色深度
 s;秒
+SamplingCount;
 SamplingRate;取樣率
 Save;儲存
-ScanType;掃描型態
-ScanType_Original;
-ScanType_StoreMethod;
 ScanOrder;掃描順序
 ScanOrder_Original;
 ScanOrder_Stored;
 ScanOrder_StoredDisplayedInverted;
 ScanOrder_StoreMethod;
+ScanType;掃描型態
+ScanType_Original;
+ScanType_StoreMethod;
 ScreenplayBy;編劇
 Season;季期
+SecondaryAudioLanguage;
 see below;詳見下述
 Send HeaderFile;請將標頭檔寄到這給我: http://sourceforge.net/projects/mediainfo/ (Bug section)
 Separator_Columns;換列字元
 Separator_Lines;換行字元
+SeriesTitle;
 ServiceChannel;服務頻道
 ServiceName;服務名稱
 ServiceProvider;服務提供者
@@ -937,10 +993,13 @@ Sheet (Complete);表格 (完整)
 Shell extension;快顯功能表 (在檔案總管裡, 按右鍵會出現 MediaInfo 的選項)
 Shell extension, folder;也對資料夾使用
 Shell InfoTip;資訊提示 (在檔案總管裡, 將滑鼠移到檔案上會顯示相關訊息)
+ShimName;
+ShimVersion;
 Show menu;顯示選單
 Show toolbar;顯示工具列
+SigningPresent;
+SignLanguage;
 Sort;排序
-SamplingCount;
 SoundEngineer;音響工程師
 Source;
 Source_Duration;
@@ -974,6 +1033,7 @@ Tagged_Application;標記程式
 Tagged_Date;標記日期
 Technician;技師
 TermsOfUse;使用條款
+TertiaryAudioLanguage;
 Text;文字
 Text - Custom;文字 - 自訂
 Text (HTML);文字 (網頁)
@@ -985,17 +1045,21 @@ Text1;第一字幕串流
 Text2;第二字幕串流
 Text3;第三字幕串流
 TextCount;字幕串流數
+TextlessElementsExist;
 ThanksTo;感謝
 Thousands separator;千位分隔符號
-Title;標題
-Title_More;標題, 詳細資訊
 TimeCode;
 TimeCode_FirstFrame;
 TimeCode_Settings;
 TimeCode_Source;
+TimeCode_Striped;
 TimeStamp;
 TimeZone;時區
+Title;標題
+Title_More;標題, 詳細資訊
 Total;總和
+TotalNumberOfParts;
+TotalProgrammeDuration;
 Track;音軌
 Track_Count;音軌數
 transfer_characteristics;傳輸特性
@@ -1013,6 +1077,7 @@ Video_Delay;視訊延遲
 Video_No;無視訊
 Video0_Delay;視訊0延遲
 Video1;第一視訊串流
+VideoComments;
 VideoCount;視訊串流數
 View;檢視
 View_Hint;改變檢視資訊的方法
@@ -1028,6 +1093,7 @@ WebSite_Url;http://MediaArea.net/MediaInfo/zh-TW
 WebSite_Video;前往此視訊編解碼器的網站
 WebSite_Video_More;前往網站 (%Url%) 找尋此視訊編解碼器
 Width;畫面寬度
+Width_CleanAperture;
 Width_Original;
 WriteMe;寫信給作者
 WriteToTranslator;寫信給譯者
@@ -1036,5 +1102,5 @@ Written_Location;撰寫地點
 WrittenBy;撰寫人
 Yes;是
 Your system;您的系統
-ZZ_Automatic_Percent;90
-ZZ_AutomaticLanguage_Percent;95
+ZZ_Automatic_Percent;85
+ZZ_AutomaticLanguage_Percent;89

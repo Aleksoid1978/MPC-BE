@@ -1592,6 +1592,23 @@ void File__ReferenceFilesHelper::Read_Buffer_Unsynched()
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_SEEK
+Ztring Duration_Milliseconds2String(int64u DurationM)
+{
+    Ztring DurationS;
+    DurationS+=L'0'+(Char)(DurationM/(10*60*60*1000)); DurationM%=10*60*60*1000;
+    DurationS+=L'0'+(Char)(DurationM/(   60*60*1000)); DurationM%=   60*60*1000;
+    DurationS+=L':';
+    DurationS+=L'0'+(Char)(DurationM/(   10*60*1000)); DurationM%=   10*60*1000;
+    DurationS+=L'0'+(Char)(DurationM/(      60*1000)); DurationM%=      60*1000;
+    DurationS+=L':';
+    DurationS+=L'0'+(Char)(DurationM/(      10*1000)); DurationM%=      10*1000;
+    DurationS+=L'0'+(Char)(DurationM/(         1000)); DurationM%=         1000;
+    DurationS+=L'.';
+    DurationS+=L'0'+(Char)(DurationM/(          100)); DurationM%=          100;
+    DurationS+=L'0'+(Char)(DurationM/(           10)); DurationM%=           10;
+    DurationS+=L'0'+(Char)(DurationM);
+    return DurationS;
+}
 size_t File__ReferenceFilesHelper::Seek (size_t Method, int64u Value, int64u ID)
 {
     for (Sequences_Current=0; Sequences_Current<Sequences.size(); Sequences_Current++)
@@ -1630,20 +1647,8 @@ size_t File__ReferenceFilesHelper::Seek (size_t Method, int64u Value, int64u ID)
                             float64 DurationF=Duration;
                             DurationF*=Value;
                             DurationF/=MI->Config->File_Size;
-                            size_t DurationM=(size_t)(DurationF*1000);
-                            Ztring DurationS;
-                            DurationS+=L'0'+(Char)(DurationM/(10*60*60*1000)); DurationM%=10*60*60*1000;
-                            DurationS+=L'0'+(Char)(DurationM/(   60*60*1000)); DurationM%=   60*60*1000;
-                            DurationS+=L':';
-                            DurationS+=L'0'+(Char)(DurationM/(   10*60*1000)); DurationM%=   10*60*1000;
-                            DurationS+=L'0'+(Char)(DurationM/(      60*1000)); DurationM%=      60*1000;
-                            DurationS+=L':';
-                            DurationS+=L'0'+(Char)(DurationM/(      10*1000)); DurationM%=      10*1000;
-                            DurationS+=L'0'+(Char)(DurationM/(         1000)); DurationM%=         1000;
-                            DurationS+=L'.';
-                            DurationS+=L'0'+(Char)(DurationM/(          100)); DurationM%=          100;
-                            DurationS+=L'0'+(Char)(DurationM/(           10)); DurationM%=           10;
-                            DurationS+=L'0'+(Char)(DurationM);
+                            DurationF*=1000;
+                            int64u DurationM=(int64u)DurationF;
 
                             CountOfReferencesToParse=Sequences.size();
                             bool HasProblem=false;
@@ -1655,6 +1660,10 @@ size_t File__ReferenceFilesHelper::Seek (size_t Method, int64u Value, int64u ID)
                                     if (Sequences[Sequences_Current]->Resources.size()<=1 || DurationM<Sequences[Sequences_Current]->Resources[1]->Demux_Offset_DTS)
                                     {
                                         Sequences[Sequences_Current]->Resources_Current=0;
+                                        int64u DurationFTemp=DurationF;
+                                        if (Sequences[Sequences_Current]->MI->Config.Demux_Offset_DTS_FromStream!=(int64u)-1)
+                                            DurationFTemp+=Sequences[Sequences_Current]->MI->Config.Demux_Offset_DTS_FromStream/1000000; // From nanoseconds to milliseconds
+                                        Ztring DurationS=Duration_Milliseconds2String((int64u)DurationFTemp);
                                         Result=Sequences[Sequences_Current]->MI->Option(__T("File_Seek"), DurationS);
                                     }
                                     else
@@ -1663,6 +1672,10 @@ size_t File__ReferenceFilesHelper::Seek (size_t Method, int64u Value, int64u ID)
                                         while (Resources_Current_Temp<Sequences[Sequences_Current]->Resources.size() && DurationM>=Sequences[Sequences_Current]->Resources[Resources_Current_Temp]->Demux_Offset_DTS)
                                             Resources_Current_Temp++;
                                         Resources_Current_Temp--;
+                                        int64u DurationFTemp=DurationF;
+                                        if (Sequences[Sequences_Current]->Resources[Resources_Current_Temp]->MI->Config.Demux_Offset_DTS_FromStream!=(int64u)-1)
+                                            DurationFTemp+=Sequences[Sequences_Current]->Resources[Resources_Current_Temp]->MI->Config.Demux_Offset_DTS_FromStream/1000000; // From nanoseconds to milliseconds
+                                        Ztring DurationS=Duration_Milliseconds2String((int64u)DurationFTemp);
                                         Result=Sequences[Sequences_Current]->Resources[Resources_Current_Temp]->MI->Option(__T("File_Seek"), DurationS);
                                         if (Result.empty())
                                             Sequences[Sequences_Current]->Resources_Current=Resources_Current_Temp;
@@ -1700,28 +1713,28 @@ size_t File__ReferenceFilesHelper::Seek (size_t Method, int64u Value, int64u ID)
         case 1  :
                     #if MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
                     {
-                        //Time percentage
-                        int64u Duration=MI->Get(Stream_General, 0, General_Duration).To_int64u();
-                        Ztring DurationS;
-                        if (Duration)
+                        //Init
+                        if (!Duration)
                         {
-                            Duration*=Value;
-                            Duration/=10000;
-                            DurationS+=L'0'+(Char)(Duration/(10*60*60*1000)); Duration%=10*60*60*1000;
-                            DurationS+=L'0'+(Char)(Duration/(   60*60*1000)); Duration%=   60*60*1000;
-                            DurationS+=L':';
-                            DurationS+=L'0'+(Char)(Duration/(   10*60*1000)); Duration%=   10*60*1000;
-                            DurationS+=L'0'+(Char)(Duration/(      60*1000)); Duration%=      60*1000;
-                            DurationS+=L':';
-                            DurationS+=L'0'+(Char)(Duration/(      10*1000)); Duration%=      10*1000;
-                            DurationS+=L'0'+(Char)(Duration/(         1000)); Duration%=         1000;
-                            DurationS+=L'.';
-                            DurationS+=L'0'+(Char)(Duration/(          100)); Duration%=          100;
-                            DurationS+=L'0'+(Char)(Duration/(           10)); Duration%=           10;
-                            DurationS+=L'0'+(Char)(Duration);
+                            MediaInfo_Internal MI2;
+                            MI2.Option(__T("File_KeepInfo"), __T("1"));
+                            Ztring ParseSpeed_Save=MI2.Option(__T("ParseSpeed_Get"), __T(""));
+                            Ztring Demux_Save=MI2.Option(__T("Demux_Get"), __T(""));
+                            MI2.Option(__T("ParseSpeed"), __T("0"));
+                            MI2.Option(__T("Demux"), Ztring());
+                            size_t MiOpenResult=MI2.Open(MI->File_Name);
+                            MI2.Option(__T("ParseSpeed"), ParseSpeed_Save); //This is a global value, need to reset it. TODO: local value
+                            MI2.Option(__T("Demux"), Demux_Save); //This is a global value, need to reset it. TODO: local value
+                            if (!MiOpenResult)
+                                return (size_t)-1;
+                            Duration=MI2.Get(Stream_General, 0, General_Duration).To_float64()/1000;
                         }
-                        else
-                            DurationS=Ztring::ToZtring(((float64)Value)/100)+__T('%');
+
+                        //Time percentage
+                        float64 DurationF=Duration;
+                        DurationF*=Value;
+                        DurationF/=10; // divided by 10000 for 0.01 percentage then x1000 for milliseconds
+                        int64u DurationM=(int64u)DurationF;
 
                         CountOfReferencesToParse=Sequences.size();
                         bool HasProblem=false;
@@ -1730,9 +1743,13 @@ size_t File__ReferenceFilesHelper::Seek (size_t Method, int64u Value, int64u ID)
                             if (Sequences[Sequences_Current]->MI)
                             {
                                 Ztring Result;
-                                if (Sequences[Sequences_Current]->Resources.empty() || Duration<Sequences[Sequences_Current]->Resources[1]->Demux_Offset_DTS)
+                                if (Sequences[Sequences_Current]->Resources.size()<2 || Duration<Sequences[Sequences_Current]->Resources[1]->Demux_Offset_DTS)
                                 {
                                     Sequences[Sequences_Current]->Resources_Current=0;
+                                    int64u DurationFTemp=DurationF;
+                                    if (Sequences[Sequences_Current]->MI->Config.Demux_Offset_DTS_FromStream!=(int64u)-1)
+                                        DurationFTemp+=Sequences[Sequences_Current]->MI->Config.Demux_Offset_DTS_FromStream/1000000; // From nanoseconds to milliseconds
+                                    Ztring DurationS=Duration_Milliseconds2String((int64u)DurationFTemp);
                                     Result=Sequences[Sequences_Current]->MI->Option(__T("File_Seek"), DurationS);
                                 }
                                 else
@@ -1741,6 +1758,10 @@ size_t File__ReferenceFilesHelper::Seek (size_t Method, int64u Value, int64u ID)
                                     while (Resources_Current_Temp<Sequences[Sequences_Current]->Resources.size() && Duration>=Sequences[Sequences_Current]->Resources[Resources_Current_Temp]->Demux_Offset_DTS)
                                         Resources_Current_Temp++;
                                     Resources_Current_Temp--;
+                                    int64u DurationFTemp=DurationF;
+                                    if (Sequences[Sequences_Current]->Resources[Resources_Current_Temp]->MI->Config.Demux_Offset_DTS_FromStream!=(int64u)-1)
+                                        DurationFTemp+=Sequences[Sequences_Current]->Resources[Resources_Current_Temp]->MI->Config.Demux_Offset_DTS_FromStream/1000000; // From nanoseconds to milliseconds
+                                    Ztring DurationS=Duration_Milliseconds2String((int64u)DurationFTemp);
                                     Result=Sequences[Sequences_Current]->Resources[Resources_Current_Temp]->MI->Option(__T("File_Seek"), DurationS);
                                     if (Result.empty())
                                         Sequences[Sequences_Current]->Resources_Current=Resources_Current_Temp;
@@ -1761,7 +1782,6 @@ size_t File__ReferenceFilesHelper::Seek (size_t Method, int64u Value, int64u ID)
                     #if MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
                     {
                         CountOfReferencesToParse=Sequences.size();
-                        Ztring Time; Time.Duration_From_Milliseconds(Value/1000000);
                         for (Sequences_Current=0; Sequences_Current<Sequences.size(); Sequences_Current++)
                         {
                             if (Sequences[Sequences_Current]->MI)
@@ -1770,6 +1790,10 @@ size_t File__ReferenceFilesHelper::Seek (size_t Method, int64u Value, int64u ID)
                                 if (Sequences[Sequences_Current]->Resources.size()<2 || Value<Sequences[Sequences_Current]->Resources[1]->Demux_Offset_DTS)
                                 {
                                     Sequences[Sequences_Current]->Resources_Current=0;
+                                    int64u ValueTemp=Value;
+                                    if (Sequences[Sequences_Current]->MI->Config.Demux_Offset_DTS_FromStream!=(int64u)-1)
+                                        ValueTemp+=Sequences[Sequences_Current]->MI->Config.Demux_Offset_DTS_FromStream;
+                                    Ztring Time; Time.Duration_From_Milliseconds(ValueTemp/1000000);
                                     Result=Sequences[Sequences_Current]->MI->Option(__T("File_Seek"), Time);
                                 }
                                 else
@@ -1778,6 +1802,10 @@ size_t File__ReferenceFilesHelper::Seek (size_t Method, int64u Value, int64u ID)
                                     while (Resources_Current_Temp<Sequences[Sequences_Current]->Resources.size() && Value>=Sequences[Sequences_Current]->Resources[Resources_Current_Temp]->Demux_Offset_DTS)
                                         Resources_Current_Temp++;
                                     Resources_Current_Temp--;
+                                    int64u ValueTemp=Value;
+                                    if (Sequences[Sequences_Current]->Resources[Resources_Current_Temp]->MI->Config.Demux_Offset_DTS_FromStream!=(int64u)-1)
+                                        ValueTemp+=Sequences[Sequences_Current]->Resources[Resources_Current_Temp]->MI->Config.Demux_Offset_DTS_FromStream;
+                                    Ztring Time; Time.Duration_From_Milliseconds(ValueTemp/1000000);
                                     Result=Sequences[Sequences_Current]->Resources[Resources_Current_Temp]->MI->Option(__T("File_Seek"), Time);
                                     if (Result.empty())
                                         Sequences[Sequences_Current]->Resources_Current=Resources_Current_Temp;

@@ -28,6 +28,9 @@
  chapters stream1; strumień rozdziałów
  chapters stream2; strumienie rozdziałów
  chapters stream3; strumieni rozdziałów
+ character1;
+ character2;
+ character3;
  day1; dzień
  day2; dni
  day3; dni
@@ -37,12 +40,12 @@
  file1; plik
  file2; pliki
  file3; plików
- frame1; klatka
- frame2; klatki
- frame3; klatek
  fps1; kl/s
  fps2; kl/s
  fps3; kl/s
+ frame1; klatka
+ frame2; klatki
+ frame3; klatek
  GB; GB
  Gb; Gb
  Gbps; Gb/s
@@ -141,6 +144,8 @@
  year3; lat
 , ;, 
 : ;: 
+3D;
+3DType;
 About;O programie
 About_Hint;Kontakt i informacje o nowych wersjach
 Accompaniment;Akompaniament
@@ -172,7 +177,12 @@ Audio_Codec_List;Kodeki audio
 Audio_No;Brak audio
 Audio1;Pierwszy strumień audio
 Audio2;Drugi strumień audio
+AudioComments;
 AudioCount;Liczba strumieni audio
+AudioDescriptionPresent;
+AudioDescriptionType;
+AudioLoudnessStandard;
+AudioTrackLayout;
 Author;Autor
 BarCode;Kod kreskowy
 Basic;Podstawowy
@@ -180,13 +190,13 @@ Basic_Note;Uwaga: Aby uzyskać więcej informacji musisz wybrać inny widok (Kar
 BitDepth;
 BitDepth_Stored;
 BitRate;Przepływność bitów
+BitRate_Encoded;
 BitRate_Maximum;Przwpływność maksymalna
 BitRate_Minimum;Przepływność minimalna
 BitRate_Mode;Rodzaj przepływności
 BitRate_Mode_CBR;Stała
 BitRate_Mode_VBR;Zmienna
 BitRate_Nominal;Nominalna przepływaność
-BitRate_Encoded;
 Bits-(Pixel*Frame);bity/(piksele*ramki)
 BufferSize;
 Cancel;Anuluj
@@ -211,44 +221,53 @@ Chroma;Chrominancja
 ChromaSubsampling;
 Close;Zamknij
 Close all before open;Zamykaj wszystko przed otwarciem pliku
+ClosedCaptionsLanguage;
+ClosedCaptionsPresent;
+ClosedCaptionsType;
 Codec;Kodek
 Codec_Description;Opis kodeka
 Codec_Info;Szczegóły kodeka
-Codec_Settings;Ustawienia kodeka
-Codec_Settings_PacketBitStream;Ustawienia kodeka, pakietowy strumień bitów
-Codec_Settings_BVOP;Ustawienia kodeka, BVOP
-Codec_Settings_QPel;Ustawienia kodeka, QPel
-Codec_Settings_GMC;Ustawienia kodeka, GMC
-Codec_Settings_Matrix;Ustawienia kodeka, matyca
-Codec_Settings_Floor;Ustawienia kodeka, poziom
-Codec_Settings_CABAC;Ustawienia kodeka, CABAC
-Codec_Settings_Firm;Ustawienia kodeka, firma
-Codec_Settings_Endianness;Ustawienia kodeka, bez endiana
-Codec_Settings_Sign;Ustawienia kodeka, znak
-Codec_Settings_Law;Ustawienia kodeka, prawo
-Codec_Settings_ITU;Ustawienia kodeka, ITU
 Codec_Profile;Profil kodeka
+Codec_Settings;Ustawienia kodeka
+Codec_Settings_BVOP;Ustawienia kodeka, BVOP
+Codec_Settings_CABAC;Ustawienia kodeka, CABAC
+Codec_Settings_Endianness;Ustawienia kodeka, bez endiana
+Codec_Settings_Firm;Ustawienia kodeka, firma
+Codec_Settings_Floor;Ustawienia kodeka, poziom
+Codec_Settings_GMC;Ustawienia kodeka, GMC
+Codec_Settings_ITU;Ustawienia kodeka, ITU
+Codec_Settings_Law;Ustawienia kodeka, prawo
+Codec_Settings_Matrix;Ustawienia kodeka, matyca
+Codec_Settings_PacketBitStream;Ustawienia kodeka, pakietowy strumień bitów
+Codec_Settings_QPel;Ustawienia kodeka, QPel
+Codec_Settings_Sign;Ustawienia kodeka, znak
 Codec_Url;Adres sieciowy kodeka
 CodecID;ID kodeka
 CodecID_Description;Opis kodeka
+CoDirector;
 Collection;Kolekcja
 Colorimetry;Kolorymetria
 ColorSpace;
 colour_primaries;
+colour_range;
 Comment;Komentarz
 CommissionedBy;Powierzony przez
 Compilation;
 CompleteName;Pełna ścieżka
+CompletionDate;
 Composer;Kompozytor
 Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;Stopień kompresji
 Conductor;Dyrygent
+ContactEmail;
+ContactTelephoneNumber;
 Container and general information;Zawartość i informacje ogólne
 ContentType;Rodzaj zawartosci
 CoProducer;Koproducent
 Copyright;Prawa autorskie
+CopyrightYear;
 CostumeDesigner;Kostiumy
 Count;Liczba
 Country;Kraj
@@ -274,8 +293,10 @@ Dimensions;Wymiary
 Director;Reżyser
 DirectorOfPhotography;Zdjęcia
 DisplayAspectRatio;Proporcje obrazu
+DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Oryginalne proporcje obrazu
 DistributedBy;Rozpowszechnianie
+Distributor;
 Donate;Donacja
 DotsPerInch;punktów na cal
 Duration;Czas trwania
@@ -291,6 +312,7 @@ Encoded_Library_Settings;Ustawienia kodowania
 Encoded_Original;Oryginalny
 EncodedBy;Kodowane przez
 EPG_Positions;Pozycje EPG (wewnętrzne)
+EpisodeTitleNumber;
 Error_File;Błąd przy odczycie pliku
 ExecutiveProducer;Kierownik produkcji
 Exit;Wyjście
@@ -324,39 +346,44 @@ Format_Description;Opis formatu
 Format_Info;Szczegóły formatu
 Format_Profile;Profil formatu
 Format_Settings;Ustawienia formatu
-Format_Settings_PacketBitStream;Ustawienia formatu, pakietowy strumień bitów
 Format_Settings_BVOP;Ustawienia formatu, BVOP
-Format_Settings_QPel;Ustawienia formatu, QPel
+Format_Settings_CABAC;Ustawienia formatu, CABAC
+Format_Settings_Emphasis;
+Format_Settings_Endianness;Ustawienia formatu, bez endiana
+Format_Settings_Firm;Ustawienia formatu, firma
+Format_Settings_Floor;Ustawienia formatu, poziom
+Format_Settings_FrameMode;
 Format_Settings_GMC;Ustawienia formatu, GMC
+Format_Settings_GOP;
+Format_Settings_ITU;Ustawienia formatu, ITU
+Format_Settings_Law;Ustawienia formatu, prawo
 Format_Settings_Matrix;Ustawienia formatu, matryca
 Format_Settings_Matrix_Custom;Własny
 Format_Settings_Matrix_Default;Domyślny
-Format_Settings_Floor;Ustawienia formatu, poziom
-Format_Settings_CABAC;Ustawienia formatu, CABAC
-Format_Settings_Firm;Ustawienia formatu, firma
-Format_Settings_Endianness;Ustawienia formatu, bez endiana
-Format_Settings_RefFrames;Ustawienia formatu, poklatkowy
-Format_Settings_Sign;Ustawienia formatu, znak
-Format_Settings_Law;Ustawienia formatu, prawo
-Format_Settings_ITU;Ustawienia formatu, ITU
-Format_Settings_SBR;Ustawienia formatu, SBR
+Format_Settings_Mode;
+Format_Settings_ModeExtension;
+Format_Settings_PacketBitStream;Ustawienia formatu, pakietowy strumień bitów
+Format_Settings_PictureStructure;
 Format_Settings_PS;Ustawienia formatu, PS
 Format_Settings_Pulldown;Ustawienia formatu, rozwijany
-Format_Settings_Mode;
-Format_Settings_FrameMode;
-Format_Settings_Emphasis;
-Format_Settings_ModeExtension;
-Format_Settings_GOP;
-Format_Version;Wersja formatu
+Format_Settings_QPel;Ustawienia formatu, QPel
+Format_Settings_RefFrames;Ustawienia formatu, poklatkowy
+Format_Settings_SBR;Ustawienia formatu, SBR
+Format_Settings_Sign;Ustawienia formatu, znak
+Format_Settings_Wrapping;
 Format_Url;Adres sieciowy formatu
+Format_Version;Wersja formatu
+FpaManufacturer;
+FpaPass;
+FpaVersion;
 FrameCount;Liczba klatek
 FrameRate;Szybkość wyświetlania klatek
+FrameRate_Maximum;Maksymalna szybkość wyświetlania klatek
+FrameRate_Minimum;Minimalna szybkość wyświetlania klatek
 FrameRate_Mode;Tryb wyświetlania klatek
 FrameRate_Mode_CFR;Stały
 FrameRate_Mode_VFR;Zmienny
-FrameRate_Minimum;Minimalna szybkość wyświetlania klatek
 FrameRate_Nominal;Nominalna szybkość wyświetlania klatek
-FrameRate_Maximum;Maksymalna szybkość wyświetlania klatek
 FrameRate_Original;Oryginalna szybkość wyświetlania klatek
 General;Ogólne
 Genre;Rodzaj
@@ -554,9 +581,14 @@ Genre_190;
 Genre_191;
 Go to WebSite;Odwiedź stronę programu
 Grouping;
+Gop_OpenClosed;
+Gop_OpenClosed_Open;
+Gop_OpenClosed_Closed;
+Gop_OpenClosed_FirstFrame;
 h;h
 Header file;Utwórz plik nagłówka
 Height;Wysokość
+Height_CleanAperture;
 Height_Original;
 Help;Pomoc
 Hint;Wskazówka
@@ -566,22 +598,23 @@ How many text streams?;Ile strumieni napisów?
 How many video streams?;Ile strumieni wideo?
 HTML;HTML
 ID;ID
+IdentClockStart;
 Image;Obraz
 Image stream(s);Strumienie obrazu
 Image_Codec_List;Kodeki obrazowe
 ImageCount;Strumieni obrazu
 Info;Informacja
 Instruments;Instrumenty
-Interlacement;Przeplatanie
-Interlaced_Interlaced;Z przeplotem
-Interlaced_TFF;Górne pole wpierw
 Interlaced_BFF;Dolne pole wpierw
+Interlaced_Interlaced;Z przeplotem
 Interlaced_PPF;Progresywny
 Interlaced_Progressive;Progresywny
-Interleaved;
+Interlaced_TFF;Górne pole wpierw
+Interlacement;Przeplatanie
 Interleave_Duration;Przeplot, czas trwania
 Interleave_Preload;Przeplot, czas wczytywania
 Interleave_VideoFrames;Przeplot, czas trwania
+Interleaved;
 InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
@@ -592,7 +625,6 @@ Known formats;Znane formaty
 Known parameters;Znane parametry
 Label;Wytwórnia
 Language;Język
-Language_More;Język, więcej informacji
 Language_aa;
 Language_ab;Abhaski
 Language_ae;
@@ -703,6 +735,7 @@ Language_mk;Macedoński
 Language_ml;
 Language_mn;Mongolski
 Language_mo;
+Language_More;Język, więcej informacji
 Language_mr;
 Language_ms;
 Language_mt;
@@ -789,19 +822,23 @@ LawRating;Nisko oceniany
 LCCN;LCCN
 Library;Bibloteka multipleksująca
 Lightness;Jasność
+LineUpStart;
 List;Lista
-Lyrics;Słowa
 Lyricist;Autor słów
+Lyrics;Słowa
 Mastered_Date;Data nagrania
 MasteredBy;Nagrane przez
+Matrix_Channel(s);
+Matrix_ChannelPositions;
 matrix_coefficients;
+Matrix_Format;
 MediaInfo_About;Dostarcza bardzo szczegółowe informacje\r\no pliku multimedialnym:\r\nMatroska, OGG (wraz z OGM)\r\nMPEG1 (wraz z VCD)\r\nMPEG2 (wraz z DVD i SVCD)\r\nMPEG4 (wraz z iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (wraz z  WMV, WMA)\r\nMicrosoft RIFF (wraz z AVI, WAV)\r\nFormaty dźwiekowe (AC3, DTS, AAC, AU, AIFF...)
 Menu;Menu
 Menu stream(s);Strumienie menu
 Menu_Codec_List;Kodeki menu
+Menu_Hint;Więcej możliwosci
 Menu_No;Brak menu
 MenuCount;Liczba strumieni menu
-Menu_Hint;Więcej możliwosci
 MenuID;ID menu
 mn; min.
 Mood;Nastrój
@@ -819,8 +856,8 @@ NetworkName;Nazwa sieciowa
 New;Nowy
 Newest version;Sprawdź czy są nowe wersje (wmagane jest połączenie z siecią)
 NewVersion_Menu;Dostępna jest nowa wersja
-NewVersion_Question_Title;Ukończona została nowa wersja!
 NewVersion_Question_Content;Dostępna jest nowa wersja programu (v%Version%). Chcesz ją pobrać?
+NewVersion_Question_Title;Ukończona została nowa wersja!
 No;Nie
 Not yet;Jeszcze nie ma
 NumColors;Liczba kolorów
@@ -863,13 +900,19 @@ OpenCandy_33;Nie instaluj
 OpenCandy_34;Proszę określić opcje instalacji
 OpenCandy_35;               poleca to oprogramowanie
 OpenCandy_36;Bieżąca instalacja nie będzie przerwana
+OpenCaptionsLanguage;
+OpenCaptionsPresent;
+OpenCaptionsType;
 Options;Opcje
 Options_Hint;Preferencje
 Original;Oryginalny
 OriginalNetworkName;Oryginalna nazwa sieciowa
 OriginalSourceForm;Forma źródła oryginału
 OriginalSourceMedium;Nośnik źródła oryginału
+Originator;
 Other;Inny
+OtherIdentifier;
+OtherIdentifierType;
 Output;Wyjście
 Output format;Wyjściowy format
 OverallBitRate;Całkowita przepływność bitów
@@ -879,10 +922,14 @@ OverallBitRate_Mode;Rodzaj całkowitej przepływności bitów
 OverallBitRate_Nominal;Nominalna całkowita przepływność bitów
 Part;Część
 Part_Count;Ogółem
+PartNumber;
+PartTotal;
 Performer;Wykonawca
 Period;Okres
 Phone;Telefon
+PictureRatio;
 PixelAspectRatio;Proporcje pikseli
+PixelAspectRatio_CleanAperture;
 PixelAspectRatio_Original;Oryginalne proporcje pikseli
 PlayCounter;Licznik odtwarzania
 Played_Count;Odtwarzany razy
@@ -892,9 +939,15 @@ PlayTime;Czas trwania
 Position;Numer
 Position_Total;Nagrań
 Preferences;Preferencje
+PrimaryAudioLanguage;
 Producer;Producent
 ProductionDesigner;Dekoracje
+ProductionNumber;
 ProductionStudio;Studio
+ProductPlacement;
+ProgrammeHasText;
+ProgrammeTextLanguage;
+ProgrammeTitle;
 Publisher;Wydawca
 Purchased_Date;Data zakupu
 Quote character;Cudzysłów
@@ -908,22 +961,25 @@ ReplayGain_Gain;Wzmocnienie
 ReplayGain_Peak;Współczynnik wzmocnienia
 Resolution;Rozdzielczość
 s;s
+SamplingCount;
 SamplingRate;Częstotliwość próbkowania
 Save;Zapisz
-ScanType;Rodzaj skanu
-ScanType_Original;
-ScanType_StoreMethod;
 ScanOrder;Kolejność skanu
 ScanOrder_Original;
 ScanOrder_Stored;
 ScanOrder_StoredDisplayedInverted;
 ScanOrder_StoreMethod;
+ScanType;Rodzaj skanu
+ScanType_Original;
+ScanType_StoreMethod;
 ScreenplayBy;Scenariusz
 Season;Seria
+SecondaryAudioLanguage;
 see below;zobacz poniżej
 Send HeaderFile;Proszę przesłać plik nagłówka pod adres:http://sourceforge.net/projects/mediainfo/ (sekcja błędów)
 Separator_Columns;Separator kolumn
 Separator_Lines;Separator wierszy
+SeriesTitle;
 ServiceChannel;Numer kanału usługowego
 ServiceName;Nazwa usługi
 ServiceProvider;Dostawca usługi
@@ -937,10 +993,13 @@ Sheet (Complete);Karta (komplet)
 Shell extension;Rozszerzenie powłoki (menu kontekstowe w eksploratorze)
 Shell extension, folder;Także dla folderów
 Shell InfoTip;Informacje powłoki (w eksploratorze najedź kursorem na plik, wyświetlą się informacje)
+ShimName;
+ShimVersion;
 Show menu;Pokaż menu
 Show toolbar;Pokaż pasek narzędzi
+SigningPresent;
+SignLanguage;
 Sort;Sortowane po
-SamplingCount;
 SoundEngineer;Inżynier dźwięku
 Source;
 Source_Duration;
@@ -974,6 +1033,7 @@ Tagged_Application;Znakująca aplikacja
 Tagged_Date;Znakowana data
 Technician;Technik
 TermsOfUse;Zasady korzystania
+TertiaryAudioLanguage;
 Text;Tekst
 Text - Custom;Tekst - własny
 Text (HTML);Tekst (HTML)
@@ -985,17 +1045,21 @@ Text1;Pierwszy strumień napisów
 Text2;Drugi strumień napisów
 Text3;Trzeci strumień napisów
 TextCount;Strumieni napisów
+TextlessElementsExist;
 ThanksTo;Podziękowania dla
 Thousands separator;Separator tysiecy
-Title;Tytuł
-Title_More;Tytuł, wiecej informacji
 TimeCode;
 TimeCode_FirstFrame;
 TimeCode_Settings;
 TimeCode_Source;
+TimeCode_Striped;
 TimeStamp;
 TimeZone;Strefa czasowa
+Title;Tytuł
+Title_More;Tytuł, wiecej informacji
 Total;Łącznie
+TotalNumberOfParts;
+TotalProgrammeDuration;
 Track;Tytuł nagrania
 Track_Count;Liczba nagrań
 transfer_characteristics;
@@ -1013,6 +1077,7 @@ Video_Delay;Opóźnienie wideo
 Video_No;Brak wideo
 Video0_Delay;Opóźnienie wideo 0
 Video1;Pierwszy strumień wideo
+VideoComments;
 VideoCount;Strumieni wideo
 View;Widok
 View_Hint;Zmienia sposób wyświetlania informacji
@@ -1028,6 +1093,7 @@ WebSite_Url;http://MediaArea.net/MediaInfo
 WebSite_Video;Odwiedź witrynę tego kodeka wideo
 WebSite_Video_More;Odwiedź witrynę (%Url%) aby poszukać kodeka wideo
 Width;Szerokość
+Width_CleanAperture;
 Width_Original;
 WriteMe;Napisz do mnie
 WriteToTranslator;Napisz do tłumacza
@@ -1036,5 +1102,5 @@ Written_Location;Lokalizacja
 WrittenBy;Napisał
 Yes;Tak
 Your system;System
-ZZ_Automatic_Percent;80
-ZZ_AutomaticLanguage_Percent;94
+ZZ_Automatic_Percent;75
+ZZ_AutomaticLanguage_Percent;89

@@ -81,6 +81,7 @@ public:
     void MinusOne();
     string ToString();
     int64s ToFrames();
+    int64s ToMilliseconds();
 
 public:
     int8u Hours;

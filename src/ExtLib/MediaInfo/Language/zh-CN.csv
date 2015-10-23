@@ -28,6 +28,9 @@
  chapters stream1;段落流
  chapters stream2;个段落流
  chapters stream3;个段落流
+ character1;
+ character2;
+ character3;
  day1;天
  day2;天
  day3;天
@@ -37,12 +40,12 @@
  file1;文件
  file2;个文件
  file3;个文件
- frame1; frame
- frame2; frames
- frame3; frames
  fps1; fps
  fps2; fps
  fps3; fps
+ frame1; frame
+ frame2; frames
+ frame3; frames
  GB; GB
  Gb; Gb
  Gbps; Gbps
@@ -141,6 +144,8 @@
  year3;年
 , ;, 
 : ;: 
+3D;
+3DType;
 About;关于
 About_Hint;联系作者以及获得最新版
 Accompaniment;伴奏
@@ -172,7 +177,12 @@ Audio_Codec_List;音频编解码器
 Audio_No;没有音频
 Audio1;音频1
 Audio2;音频2
+AudioComments;
 AudioCount;音频总数
+AudioDescriptionPresent;
+AudioDescriptionType;
+AudioLoudnessStandard;
+AudioTrackLayout;
 Author;作者
 BarCode;条形码
 Basic;基本
@@ -180,13 +190,13 @@ Basic_Note;注意: 要了解更多关于此文件的信息, 请选择不同的�
 BitDepth;位深度
 BitDepth_Stored;
 BitRate;码率
+BitRate_Encoded;
 BitRate_Maximum;最大码率
 BitRate_Minimum;最小码率
 BitRate_Mode;码率模式
 BitRate_Mode_CBR;CBR
 BitRate_Mode_VBR;VBR
 BitRate_Nominal;额定码率
-BitRate_Encoded;
 Bits-(Pixel*Frame);bits/(pixel*frame)(数据密度)
 BufferSize;缓冲大小
 Cancel;取消
@@ -211,44 +221,53 @@ Chroma;色度
 ChromaSubsampling;色度抽样
 Close;关闭
 Close all before open;打开新文件前关闭其他文件
+ClosedCaptionsLanguage;
+ClosedCaptionsPresent;
+ClosedCaptionsType;
 Codec;编解码器
 Codec_Description;编解码器描述
 Codec_Info;编解码器信息
-Codec_Settings;编解码器设置
-Codec_Settings_PacketBitStream;编码设置, Packet bitstream
-Codec_Settings_BVOP;编码设置, BVOP
-Codec_Settings_QPel;编码设置, QPel
-Codec_Settings_GMC;编码设置, GMC
-Codec_Settings_Matrix;编码设置, Matrix
-Codec_Settings_Floor;编码设置, Floor
-Codec_Settings_CABAC;编码设置, CABAC
-Codec_Settings_Firm;编码设置, Firm
-Codec_Settings_Endianness;编码设置, Endianness
-Codec_Settings_Sign;编码设置, Sign
-Codec_Settings_Law;编码设置, Law
-Codec_Settings_ITU;编码设置, ITU
 Codec_Profile;编码设置简介
+Codec_Settings;编解码器设置
+Codec_Settings_BVOP;编码设置, BVOP
+Codec_Settings_CABAC;编码设置, CABAC
+Codec_Settings_Endianness;编码设置, Endianness
+Codec_Settings_Firm;编码设置, Firm
+Codec_Settings_Floor;编码设置, Floor
+Codec_Settings_GMC;编码设置, GMC
+Codec_Settings_ITU;编码设置, ITU
+Codec_Settings_Law;编码设置, Law
+Codec_Settings_Matrix;编码设置, Matrix
+Codec_Settings_PacketBitStream;编码设置, Packet bitstream
+Codec_Settings_QPel;编码设置, QPel
+Codec_Settings_Sign;编码设置, Sign
 Codec_Url;编码设置网址
 CodecID;编码设置ID
 CodecID_Description;编码描述
+CoDirector;
 Collection;收集
 Colorimetry;比色法
 ColorSpace;色彩空间
 colour_primaries;颜色初选
+colour_range;
 Comment;评论
 CommissionedBy;评论人
 Compilation;
 CompleteName;完整名称
+CompletionDate;
 Composer;作曲
 Compression_Mode;压缩模式
 Compression_Mode_Lossless;无损
 Compression_Mode_Lossy;有损压缩
 Compression_Ratio;压缩比
 Conductor;指挥
+ContactEmail;
+ContactTelephoneNumber;
 Container and general information;文件格式和一般信息
 ContentType;内容类型
 CoProducer;联合制片人
 Copyright;版权
+CopyrightYear;
 CostumeDesigner;服装设计
 Count;数量
 Country;国家(地区)
@@ -274,8 +293,10 @@ Dimensions;规模
 Director;导演
 DirectorOfPhotography;摄影导演
 DisplayAspectRatio;画面比例
+DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;原始高宽比
 DistributedBy;发行
+Distributor;
 Donate;赞助
 DotsPerInch;点/英寸(DPI)
 Duration;长度
@@ -291,6 +312,7 @@ Encoded_Library_Settings;编码设置
 Encoded_Original;编码源
 EncodedBy;编码
 EPG_Positions;EPG位置(内部)
+EpisodeTitleNumber;
 Error_File;读文件时出错
 ExecutiveProducer;监制
 Exit;退出
@@ -324,39 +346,44 @@ Format_Description;格式描述
 Format_Info;格式详情
 Format_Profile;格式简介
 Format_Settings;格式设置
-Format_Settings_PacketBitStream;格式设置, Packet bitstream
 Format_Settings_BVOP;格式设置, BVOP
-Format_Settings_QPel;格式设置, QPel
+Format_Settings_CABAC;格式设置, CABAC
+Format_Settings_Emphasis;加强
+Format_Settings_Endianness;格式设置, Endianness
+Format_Settings_Firm;格式设置, Firm
+Format_Settings_Floor;格式设置, Floor
+Format_Settings_FrameMode;帧模式
 Format_Settings_GMC;格式设置, GMC
+Format_Settings_GOP;格式设置, GOP
+Format_Settings_ITU;格式设置, ITU
+Format_Settings_Law;格式设置, Law
 Format_Settings_Matrix;格式设置, Matrix
 Format_Settings_Matrix_Custom;自定义
 Format_Settings_Matrix_Default;默认
-Format_Settings_Floor;格式设置, Floor
-Format_Settings_CABAC;格式设置, CABAC
-Format_Settings_Firm;格式设置, Firm
-Format_Settings_Endianness;格式设置, Endianness
-Format_Settings_RefFrames;格式设置, ReFrames
-Format_Settings_Sign;格式设置, Sign
-Format_Settings_Law;格式设置, Law
-Format_Settings_ITU;格式设置, ITU
-Format_Settings_SBR;格式设置, SBR
+Format_Settings_Mode;模式
+Format_Settings_ModeExtension;扩展模式
+Format_Settings_PacketBitStream;格式设置, Packet bitstream
+Format_Settings_PictureStructure;
 Format_Settings_PS;格式设置, PS
 Format_Settings_Pulldown;格式设置, Pulldown
-Format_Settings_Mode;模式
-Format_Settings_FrameMode;帧模式
-Format_Settings_Emphasis;加强
-Format_Settings_ModeExtension;扩展模式
-Format_Settings_GOP;格式设置, GOP
-Format_Version;格式版本
+Format_Settings_QPel;格式设置, QPel
+Format_Settings_RefFrames;格式设置, ReFrames
+Format_Settings_SBR;格式设置, SBR
+Format_Settings_Sign;格式设置, Sign
+Format_Settings_Wrapping;
 Format_Url;编解码器网址
+Format_Version;格式版本
+FpaManufacturer;
+FpaPass;
+FpaVersion;
 FrameCount;总帧数
 FrameRate;帧率
+FrameRate_Maximum;最大帧率
+FrameRate_Minimum;最小帧率
 FrameRate_Mode;帧率模式
 FrameRate_Mode_CFR;恒定
 FrameRate_Mode_VFR;可变
-FrameRate_Minimum;最小帧率
 FrameRate_Nominal;额定帧率
-FrameRate_Maximum;最大帧率
 FrameRate_Original;原始帧率
 General;概要
 Genre;风格
@@ -554,9 +581,14 @@ Genre_190;
 Genre_191;
 Go to WebSite;访问网站
 Grouping;
+Gop_OpenClosed;
+Gop_OpenClosed_Open;
+Gop_OpenClosed_Closed;
+Gop_OpenClosed_FirstFrame;
 h;小时
 Header file;创建头文件
 Height;画面高度
+Height_CleanAperture;
 Height_Original;原始高度
 Help;帮助
 Hint;提示信息
@@ -566,22 +598,23 @@ How many text streams?;有多少个字幕?
 How many video streams?;有多少视频?
 HTML;网页
 ID;ID
+IdentClockStart;
 Image;图像
 Image stream(s);图像流
 Image_Codec_List;图像编解码器列表
 ImageCount;图像数
 Info;信息
 Instruments;乐器
-Interlacement;隔行扫描模式
-Interlaced_Interlaced;隔行扫描
-Interlaced_TFF;奇数场(前场TFF)优先
 Interlaced_BFF;偶数场(后场BFF)优先
+Interlaced_Interlaced;隔行扫描
 Interlaced_PPF;逐行扫描
 Interlaced_Progressive;逐行扫描
-Interleaved;交错
+Interlaced_TFF;奇数场(前场TFF)优先
+Interlacement;隔行扫描模式
 Interleave_Duration;交错间隔时间
 Interleave_Preload;音频预读时间
 Interleave_VideoFrames;交错帧间隔
+Interleaved;交错
 InternetMediaType;因特网媒体类型
 IRCA;IRCA
 ISBN;ISBN
@@ -592,7 +625,6 @@ Known formats;已知格式
 Known parameters;已知参数
 Label;标签
 Language;语言
-Language_More;语言, 详情
 Language_aa;Afar
 Language_ab;Abkhazian
 Language_ae;Avestan
@@ -703,6 +735,7 @@ Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
 Language_mo;Moldavian
+Language_More;语言, 详情
 Language_mr;Marathi
 Language_ms;Malay
 Language_mt;Maltese
@@ -789,19 +822,23 @@ LawRating;分级
 LCCN;LCCN
 Library;合成函数库
 Lightness;高亮
+LineUpStart;
 List;列表
-Lyrics;歌词
 Lyricist;作词
+Lyrics;歌词
 Mastered_Date;母带完成日期
 MasteredBy;母带制做
+Matrix_Channel(s);
+Matrix_ChannelPositions;
 matrix_coefficients;矩阵系数
+Matrix_Format;
 MediaInfo_About;支持多种格式的多媒体文件:\r\nMatroska, OGG (包括 OGM)\r\nMPEG-1 (包括 VCD)\r\nMPEG-2 (包括 DVD, SVCD)\r\nMPEG-4 (包括 iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (包括 WMV, WMA)\r\nMicrosoft RIFF (包括 AVI, WAV)\r\n纯声音格式 (AC3, DTS, AAC, AU, AIFF...)
 Menu;菜单
 Menu stream(s);菜单
 Menu_Codec_List;菜单编解码器
+Menu_Hint;更多选择
 Menu_No;没有菜单
 MenuCount;菜单数
-Menu_Hint;更多选择
 MenuID;菜单ID
 mn;分
 Mood;情绪
@@ -819,8 +856,8 @@ NetworkName;网络名称
 New;新建
 Newest version;查找更新(需要网络连接)
 NewVersion_Menu;有新版本可用
-NewVersion_Question_Title;新版本已发布!
 NewVersion_Question_Content;新版本 (v%Version%) 可用, 是否下载？
+NewVersion_Question_Title;新版本已发布!
 No;否
 Not yet;尚无
 NumColors;色深
@@ -863,13 +900,19 @@ OpenCandy_33;不安装
 OpenCandy_34;请选择一个安装选项
 OpenCandy_35;______ 推荐使用软件
 OpenCandy_36;您当前的配置将不会被阻止
+OpenCaptionsLanguage;
+OpenCaptionsPresent;
+OpenCaptionsType;
 Options;选项
 Options_Hint;参数设定
 Original;源
 OriginalNetworkName;源网络名称
 OriginalSourceForm;资源来源
 OriginalSourceMedium;资源媒介
+Originator;
 Other;其它
+OtherIdentifier;
+OtherIdentifierType;
 Output;输出
 Output format;输出格式
 OverallBitRate;平均混合码率
@@ -879,10 +922,14 @@ OverallBitRate_Mode;混合码率模式
 OverallBitRate_Nominal;额定混合码率
 Part;部分
 Part_Count;总计
+PartNumber;
+PartTotal;
 Performer;艺术家
 Period;时代
 Phone;电话
+PictureRatio;
 PixelAspectRatio;画面比例(像素)
+PixelAspectRatio_CleanAperture;
 PixelAspectRatio_Original;画面比例(像素)
 PlayCounter;播放计数器
 Played_Count;已播放时间
@@ -892,9 +939,15 @@ PlayTime;播放时间
 Position;位置
 Position_Total;总计
 Preferences;参数设置
+PrimaryAudioLanguage;
 Producer;制片人
 ProductionDesigner;制做设计师
+ProductionNumber;
 ProductionStudio;制做机构
+ProductPlacement;
+ProgrammeHasText;
+ProgrammeTextLanguage;
+ProgrammeTitle;
 Publisher;发行
 Purchased_Date;购买日期
 Quote character;引用符号
@@ -908,22 +961,25 @@ ReplayGain_Gain;回放增益
 ReplayGain_Peak;回放增益峰值
 Resolution;分辨率
 s;秒
+SamplingCount;样本计数
 SamplingRate;采样率
 Save;保存
-ScanType;扫描方式
-ScanType_Original;
-ScanType_StoreMethod;
 ScanOrder;扫描顺序
 ScanOrder_Original;
 ScanOrder_Stored;
 ScanOrder_StoredDisplayedInverted;
 ScanOrder_StoreMethod;
+ScanType;扫描方式
+ScanType_Original;
+ScanType_StoreMethod;
 ScreenplayBy;编剧
 Season;季
+SecondaryAudioLanguage;
 see below;请看下面列出的内容
 Send HeaderFile;发送头文件: http://sourceforge.net/projects/mediainfo/
 Separator_Columns;列分隔符
 Separator_Lines;换行符
+SeriesTitle;
 ServiceChannel;服务频道号码
 ServiceName;服务名
 ServiceProvider;服务提供
@@ -937,10 +993,13 @@ Sheet (Complete);表格(完整)
 Shell extension;[资源管理器]右键菜单 (为多媒体文件的右键菜单添加 MediaInfo 选项)
 Shell extension, folder;包含文件夹右键
 Shell InfoTip;[资源管理器]气泡提示 (将鼠标移到文件图标上会显示相关信息)
+ShimName;
+ShimVersion;
 Show menu;显示菜单
 Show toolbar;显示工具栏
+SigningPresent;
+SignLanguage;
 Sort;排序
-SamplingCount;样本计数
 SoundEngineer;录音师
 Source;
 Source_Duration;
@@ -974,6 +1033,7 @@ Tagged_Application;标记软件
 Tagged_Date;标记日期
 Technician;技术员
 TermsOfUse;使用方法
+TertiaryAudioLanguage;
 Text;文本
 Text - Custom;文本-自定义
 Text (HTML);文本(HTML)
@@ -985,17 +1045,21 @@ Text1;字幕1
 Text2;字幕2
 Text3;字幕3
 TextCount;字幕总数
+TextlessElementsExist;
 ThanksTo;感谢
 Thousands separator;数字分隔符
-Title;标题
-Title_More;更多标题
 TimeCode;
 TimeCode_FirstFrame;
 TimeCode_Settings;
 TimeCode_Source;
+TimeCode_Striped;
 TimeStamp;
 TimeZone;时区
+Title;标题
+Title_More;更多标题
 Total;总计
+TotalNumberOfParts;
+TotalProgrammeDuration;
 Track;音轨
 Track_Count;音轨数
 transfer_characteristics;传输特质
@@ -1013,6 +1077,7 @@ Video_Delay;视频延迟
 Video_No;没有视频
 Video0_Delay;视频延迟
 Video1;视频1
+VideoComments;
 VideoCount;视频总数
 View;查看
 View_Hint;改变查看方示
@@ -1028,6 +1093,7 @@ WebSite_Url;网址http://MediaArea.net/MediaInfo
 WebSite_Video;访问此视频编解码器的网页
 WebSite_Video_More;更多视频编解码器的网页(%Url%)
 Width;画面宽度
+Width_CleanAperture;
 Width_Original;原始宽度
 WriteMe;给作者写信
 WriteToTranslator;给译者写信
@@ -1036,5 +1102,5 @@ Written_Location;写入地点
 WrittenBy;作者
 Yes;是
 Your system;您的系统
-ZZ_Automatic_Percent;92
-ZZ_AutomaticLanguage_Percent;97
+ZZ_Automatic_Percent;87
+ZZ_AutomaticLanguage_Percent;91

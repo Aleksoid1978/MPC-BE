@@ -233,6 +233,10 @@ void File_Hevc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator se
     Fill(Stream_Video, 0, Video_Codec_Profile, Profile);
     Fill(Stream_Video, StreamPos_Last, Video_Width, Width);
     Fill(Stream_Video, StreamPos_Last, Video_Height, Height);
+    if ((*seq_parameter_set_Item)->conf_win_left_offset || (*seq_parameter_set_Item)->conf_win_right_offset)
+        Fill(Stream_Video, StreamPos_Last, Video_Stored_Width, (*seq_parameter_set_Item)->pic_width_in_luma_samples);
+    if ((*seq_parameter_set_Item)->conf_win_top_offset || (*seq_parameter_set_Item)->conf_win_bottom_offset)
+        Fill(Stream_Video, StreamPos_Last, Video_Stored_Height, (*seq_parameter_set_Item)->pic_height_in_luma_samples);
 
     Fill(Stream_Video, 0, Video_ColorSpace, "YUV");
     Fill(Stream_Video, 0, Video_Colorimetry, Hevc_chroma_format_idc((*seq_parameter_set_Item)->chroma_format_idc));
@@ -581,16 +585,55 @@ bool File_Hevc::Demux_UnpacketizeContainer_Test()
                 }
 
                 zero_byte=Buffer[Demux_Offset+2]==0x00;
-                if (Demux_IntermediateItemFound)
+                int8u nal_unit_type=Buffer[Demux_Offset+(zero_byte?4:3)]>>1;
+                bool Next;
+                switch (nal_unit_type)
                 {
-                    if (!(((Buffer[Demux_Offset+(zero_byte?4:3)]&0x40)==0 && (Buffer[Demux_Offset+(zero_byte?6:5)]&0x80)!=0x80)
-                        || (Buffer[Demux_Offset+(zero_byte?4:3)]&0x7E)==(38<<1)))
-                        break;
+                    case  0 :
+                    case  1 :
+                    case  2 :
+                    case  3 :
+                    case  4 :
+                    case  5 :
+                    case  6 :
+                    case  7 :
+                    case  8 :
+                    case  9 :
+                    case 16 :
+                    case 17 :
+                    case 18 :
+                    case 19 :
+                    case 20 :
+                    case 21 :
+                                if (Demux_IntermediateItemFound)
+                                {
+                                    if (Buffer[Demux_Offset+(zero_byte?6:5)]&0x80)
+                                        Next=true;
+                                    else
+                                        Next=false;
+                                }
+                                else
+                                {
+                                    Next=false;
+                                    Demux_IntermediateItemFound=true;
+                                }
+                              break;
+                    case 32 :
+                    case 33 :
+                    case 34 :
+                    case 35 :
+                              if (Demux_IntermediateItemFound)
+                                  Next=true;
+                              else
+                                  Next=false;
+                              break;
+                    default : Next=false;
                 }
-                else
+
+                if (Next)
                 {
-                    if ((Buffer[Demux_Offset+(zero_byte?4:3)]&0x40)==0 && (Buffer[Demux_Offset+(zero_byte?6:5)]&0x80)==0x80)
-                        Demux_IntermediateItemFound=true;
+                    Demux_IntermediateItemFound=false;
+                    break;
                 }
 
                 Demux_Offset++;
@@ -624,6 +667,7 @@ bool File_Hevc::Demux_UnpacketizeContainer_Test()
         if (Config->Demux_EventWasSent)
             return false;
         File_Hevc* MI=new File_Hevc;
+        Element_Code=(int64u)-1;
         Open_Buffer_Init(MI);
         Open_Buffer_Continue(MI, Buffer, Buffer_Size);
         bool IsOk=MI->Status[IsAccepted];

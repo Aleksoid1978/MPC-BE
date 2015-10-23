@@ -56,6 +56,14 @@ private :
     //Buffer - Global
     void Read_Buffer_Continue();
 
+    //Buffer - Synchro
+    bool Synchronize();
+    bool Synched_Test();
+
+    //Buffer - Per element
+    void Header_Parse();
+    void Data_Parse();
+
     //Elements
     void cdp_header();
     void time_code_section();

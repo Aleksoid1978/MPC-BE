@@ -28,6 +28,9 @@
  chapters stream1; flux chapitres
  chapters stream2; flux chapitres
  chapters stream3; flux chapitres
+ character1;
+ character2;
+ character3;
  day1; jour
  day2; jours
  day3; jours
@@ -37,12 +40,12 @@
  file1; fichier
  file2; fichiers
  file3; fichiers
- frame1; image
- frame2; images
- frame3; images
  fps1; Im/s
  fps2; Im/s
  fps3; Im/s
+ frame1; image
+ frame2; images
+ frame3; images
  GB; Go
  Gb; Gb
  Gbps; Gbps
@@ -141,6 +144,8 @@
  year3; années
 , ;, 
 : ; : 
+3D;
+3DType;
 About;À propos
 About_Hint;Comment me contacter et trouver la dernière version
 Accompaniment;Accompagnement
@@ -172,7 +177,12 @@ Audio_Codec_List;Codecs Audio
 Audio_No;Pas d'audio
 Audio1;Première piste Audio
 Audio2;Deuxième piste Audio
+AudioComments;
 AudioCount;Nombre de pistes audio
+AudioDescriptionPresent;
+AudioDescriptionType;
+AudioLoudnessStandard;
+AudioTrackLayout;
 Author;Auteur / Réalisateur
 BarCode;Code-barre
 Basic;Basique
@@ -180,13 +190,13 @@ Basic_Note;Note : pour plus d'informations sur ce fichier, vous devez utiliser u
 BitDepth;Profondeur des couleurs
 BitDepth_Stored;Profondeur stockée des couleurs
 BitRate;Débit
+BitRate_Encoded;débit encodé
 BitRate_Maximum;Débit maximum
 BitRate_Minimum;Débit minimum
 BitRate_Mode;Type de débit
 BitRate_Mode_CBR;Constant
 BitRate_Mode_VBR;Variable
 BitRate_Nominal;Débit nominal
-BitRate_Encoded;débit encodé
 Bits-(Pixel*Frame);Bits/(Pixel*Image)
 BufferSize;Taille du buffer
 Cancel;Annuler
@@ -211,44 +221,53 @@ Chroma;Chrominance
 ChromaSubsampling;Sous-échantillonnage de la chrominance
 Close;Fermer
 Close all before open;Tout fermer avant d'ouvrir
+ClosedCaptionsLanguage;
+ClosedCaptionsPresent;
+ClosedCaptionsType;
 Codec;Codec
 Codec_Description;Description du codec
 Codec_Info;Infos sur le Codec
-Codec_Settings;Paramètres du codec
-Codec_Settings_PacketBitStream;Paramètres du codec, Packet bitstream
-Codec_Settings_BVOP;Paramètres du codec, BVOP
-Codec_Settings_QPel;Paramètres du codec, QPel
-Codec_Settings_GMC;Paramètres du codec, GMC
-Codec_Settings_Matrix;Paramètres du codec, Matrice
-Codec_Settings_Floor;Paramètres du codec, Seuil
-Codec_Settings_CABAC;Paramètres du codec, CABAC
-Codec_Settings_Firm;Paramètres du codec, Entreprise
-Codec_Settings_Endianness;Paramètres du codec, Endianness
-Codec_Settings_Sign;Paramètres du codec, Signe
-Codec_Settings_Law;Paramètres du codec, Law
-Codec_Settings_ITU;Paramètres du codec, ITU
 Codec_Profile;Profile du codec
+Codec_Settings;Paramètres du codec
+Codec_Settings_BVOP;Paramètres du codec, BVOP
+Codec_Settings_CABAC;Paramètres du codec, CABAC
+Codec_Settings_Endianness;Paramètres du codec, Endianness
+Codec_Settings_Firm;Paramètres du codec, Entreprise
+Codec_Settings_Floor;Paramètres du codec, Seuil
+Codec_Settings_GMC;Paramètres du codec, GMC
+Codec_Settings_ITU;Paramètres du codec, ITU
+Codec_Settings_Law;Paramètres du codec, Law
+Codec_Settings_Matrix;Paramètres du codec, Matrice
+Codec_Settings_PacketBitStream;Paramètres du codec, Packet bitstream
+Codec_Settings_QPel;Paramètres du codec, QPel
+Codec_Settings_Sign;Paramètres du codec, Signe
 Codec_Url;Lien Internet sur le codec
 CodecID;Identifiant du codec
 CodecID_Description;Description du codec
+CoDirector;codirecteur
 Collection;Collection
 Colorimetry;Colorimétrie
 ColorSpace;Espace de couleurs
 colour_primaries;Coordonnées de chromaticité
+colour_range;Gamme de couleurs
 Comment;Commentaire
 CommissionedBy;Commanditaire
 Compilation;Compilation
 CompleteName;Nom complet
+CompletionDate;
 Composer;Compositeur
 Compression_Mode;Mode de compression
 Compression_Mode_Lossless;Sans perte
 Compression_Mode_Lossy;Avec perte
 Compression_Ratio;Taux de compression
 Conductor;Chef d'orchestre
+ContactEmail;
+ContactTelephoneNumber;
 Container and general information;Conteneur et informations générales
 ContentType;Type de contenu
 CoProducer;Coproducteur
 Copyright;Copyright
+CopyrightYear;
 CostumeDesigner;Responsable des costumes
 Count;Nombre
 Country;Pays
@@ -274,8 +293,10 @@ Dimensions;Dimensions
 Director;Réalisateur
 DirectorOfPhotography;Responsable de la photographie
 DisplayAspectRatio;Format à l'écran
+DisplayAspectRatio_CleanAperture;Format à l'écran, Clean Aperture
 DisplayAspectRatio_Original;Format à l'écran d'origine
 DistributedBy;Distribué par
+Distributor;
 Donate;Faire un don
 DotsPerInch;Point par pouce
 Duration;Durée
@@ -291,6 +312,7 @@ Encoded_Library_Settings;Paramètres d'encodage
 Encoded_Original;Support original
 EncodedBy;Encodé par
 EPG_Positions;Positions de l'EPG (interne)
+EpisodeTitleNumber;
 Error_File;Erreur lors de la lecture du fichier
 ExecutiveProducer;Producteur éxécutif
 Exit;Quitter
@@ -324,39 +346,44 @@ Format_Description;Description du format
 Format_Info;Infos sur le format
 Format_Profile;Profil du format
 Format_Settings;Paramètres du format
-Format_Settings_PacketBitStream;Paramètres du format, Packet bitstream
 Format_Settings_BVOP;Paramètres du format, BVOP
-Format_Settings_QPel;Paramètres du format, QPel
+Format_Settings_CABAC;Paramètres du format, CABAC
+Format_Settings_Emphasis;Emphase
+Format_Settings_Endianness;Paramètres du format, Endianness
+Format_Settings_Firm;Paramètres du format, Entreprise
+Format_Settings_Floor;Paramètres du format, Seuil
+Format_Settings_FrameMode;Type de répétition
 Format_Settings_GMC;Paramètres du format, GMC
+Format_Settings_GOP;Paramètres du format, GOP
+Format_Settings_ITU;Paramètres du format, ITU
+Format_Settings_Law;Paramètres du format, Law
 Format_Settings_Matrix;Paramètres du format, Matrice
 Format_Settings_Matrix_Custom;Personnalisée
 Format_Settings_Matrix_Default;Par défaut
-Format_Settings_Floor;Paramètres du format, Seuil
-Format_Settings_CABAC;Paramètres du format, CABAC
-Format_Settings_Firm;Paramètres du format, Entreprise
-Format_Settings_Endianness;Paramètres du format, Endianness
-Format_Settings_RefFrames;Paramètres du format, RefFrames
-Format_Settings_Sign;Paramètres du format, Signe
-Format_Settings_Law;Paramètres du format, Law
-Format_Settings_ITU;Paramètres du format, ITU
-Format_Settings_SBR;Paramètres du format, SBR
+Format_Settings_Mode;Paramètres du format, Mode
+Format_Settings_ModeExtension;Extension du mode
+Format_Settings_PacketBitStream;Paramètres du format, Packet bitstream
+Format_Settings_PictureStructure;Paramètres du format, structure de l'image
 Format_Settings_PS;Paramètres du format, PS
 Format_Settings_Pulldown;Paramètres du format, Pulldown
-Format_Settings_Mode;Paramètres du format, Mode
-Format_Settings_FrameMode;Type de répétition
-Format_Settings_Emphasis;Emphase
-Format_Settings_ModeExtension;Extension du mode
-Format_Settings_GOP;Paramètres du format, GOP
-Format_Version;Version du format
+Format_Settings_QPel;Paramètres du format, QPel
+Format_Settings_RefFrames;Paramètres du format, RefFrames
+Format_Settings_SBR;Paramètres du format, SBR
+Format_Settings_Sign;Paramètres du format, Signe
+Format_Settings_Wrapping;Paramètres du format, mode d'empaquetage
 Format_Url;Lien Internet sur le format
+Format_Version;Version du format
+FpaManufacturer;
+FpaPass;
+FpaVersion;
 FrameCount;Nombre d'images
 FrameRate;Images par seconde
+FrameRate_Maximum;Images/s maxi
+FrameRate_Minimum;Images/s mini
 FrameRate_Mode;Type d'images/s
 FrameRate_Mode_CFR;Constant
 FrameRate_Mode_VFR;Variable
-FrameRate_Minimum;Images/s mini
 FrameRate_Nominal;Images/s nominal
-FrameRate_Maximum;Images/s maxi
 FrameRate_Original;Images/s d'origine
 General;Général
 Genre;Genre
@@ -553,10 +580,15 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;Aller sur le site Web
-Grouping;Grouping
+Grouping;Groupement
+Gop_OpenClosed;GOP, ouvert/fermé
+Gop_OpenClosed_Open;Ouvert
+Gop_OpenClosed_Closed;Fermé
+Gop_OpenClosed_FirstFrame;GOP, ouvert/fermé de la première imageGrouping
 h;h
 Header file;Créer un fichier Header
 Height;Hauteur
+Height_CleanAperture;Hauteur, Clean Aperture
 Height_Original;Largeur originale
 Help;Aide
 Hint;Suggestion
@@ -566,22 +598,23 @@ How many text streams?;Combien de flux texte?
 How many video streams?;Combien de flux vidéo?
 HTML;HTML
 ID;ID
+IdentClockStart;
 Image;Image
 Image stream(s);Piste(s) image
 Image_Codec_List;Codecs Image
 ImageCount;Nombre de pistes image
 Info;Info
 Instruments;Instruments
-Interlacement;Entrelacement
-Interlaced_Interlaced;Entrelacé
-Interlaced_TFF;Ligne du haut d'abord
 Interlaced_BFF;Ligne du bas d'abord
+Interlaced_Interlaced;Entrelacé
 Interlaced_PPF;Progressif
 Interlaced_Progressive;Progressif
-Interleaved;Imbrication
+Interlaced_TFF;Ligne du haut d'abord
+Interlacement;Entrelacement
 Interleave_Duration;Imbrication, durée
 Interleave_Preload;Imbrication, d. de pré-chargement
 Interleave_VideoFrames;Imbrication, durée
+Interleaved;Imbrication
 InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
@@ -592,7 +625,6 @@ Known formats;Formats connus
 Known parameters;Paramètres connus
 Label;Label
 Language;Langue
-Language_More;Langue, plus d'info
 Language_aa;Afar
 Language_ab;Abkhaze
 Language_ae;Avestique
@@ -703,6 +735,7 @@ Language_mk;Macédonien
 Language_ml;Malayalam
 Language_mn;Mongol
 Language_mo;Moldave
+Language_More;Langue, plus d'info
 Language_mr;Marathe
 Language_ms;Malais
 Language_mt;Maltais
@@ -789,19 +822,23 @@ LawRating;Classé
 LCCN;LCCN
 Library;Bibliotheque utilisée
 Lightness;Luminosité
+LineUpStart;
 List;Liste
-Lyrics;Paroles
 Lyricist;Parolier
+Lyrics;Paroles
 Mastered_Date;Date de création
 MasteredBy;Créé par
+Matrix_Channel(s);Encodage matriciel, canaux
+Matrix_ChannelPositions;Encodage matriciel, position des cannaux
 matrix_coefficients;Coefficients de la matrice
+Matrix_Format;Encodage matriciel, format
 MediaInfo_About;MediaInfo fournit des informations techniques et les tags à propos de vos fichiers video et audio.\r\nExcepté l'interface graphique du Mac App Store, c'est un logiciel libre, ce qui signifie qu'il est gratuit pour l'utilisateur final et que les développeurs on la liberté de l'étudier, l'améliorer et le redistribuer (licence BSD)
 Menu;Menu
 Menu stream(s);Piste(s) menu
 Menu_Codec_List;Codecs Menu
+Menu_Hint;Plus de possibilités
 Menu_No;Pas de menu
 MenuCount;Nombre de pistes menu
-Menu_Hint;Plus de possibilités
 MenuID;ID de menu
 mn;mn
 Mood;Humeur
@@ -819,8 +856,8 @@ NetworkName;Nom du réseau
 New;Nouveau
 Newest version;Vérifier s'il y a une nouvelle version
 NewVersion_Menu;Une nouvelle version est disponible
-NewVersion_Question_Title;Une nouvelle version est sortie!
 NewVersion_Question_Content;Une nouvelle version (v%Version%) est disponible, souhaitez-vous la télécharger?
+NewVersion_Question_Title;Une nouvelle version est sortie!
 No;Non
 Not yet;Pas encore
 NumColors;Nombre de couleurs
@@ -863,13 +900,19 @@ OpenCandy_33;Ne pas installer
 OpenCandy_34;Veuillez sélectionner une option d'installation
 OpenCandy_35;______ recommande ce logiciel
 OpenCandy_36;Votre installation en cours ne sera pas interrompue
+OpenCaptionsLanguage;
+OpenCaptionsPresent;
+OpenCaptionsType;
 Options;Options
 Options_Hint;Préférences
 Original;Original
 OriginalNetworkName;Nom d'origine du réseau
 OriginalSourceForm;Format d'origine
 OriginalSourceMedium;Support d'origine
+Originator;
 Other;Autre
+OtherIdentifier;
+OtherIdentifierType;
 Output;Sortie
 Output format;Format de sortie
 OverallBitRate;Débit global moyen
@@ -879,10 +922,14 @@ OverallBitRate_Mode;Type de débit global
 OverallBitRate_Nominal;Débit global nominal
 Part;Partie
 Part_Count;Nombre de parties
+PartNumber;
+PartTotal;
 Performer;Interprète
 Period;Période
 Phone;Téléphone
+PictureRatio;
 PixelAspectRatio;Taille du pixel
+PixelAspectRatio_CleanAperture;Taille du pixel, Clean Aperture
 PixelAspectRatio_Original;Taille originale du pixel
 PlayCounter;Compteur de lecture
 Played_Count;Nombre de lectures
@@ -892,9 +939,15 @@ PlayTime;Durée
 Position;Position
 Position_Total;Total
 Preferences;Préférences
+PrimaryAudioLanguage;
 Producer;Producteur
 ProductionDesigner;Directeur artistique
+ProductionNumber;
 ProductionStudio;Studio de production
+ProductPlacement;
+ProgrammeHasText;
+ProgrammeTextLanguage;
+ProgrammeTitle;
 Publisher;Publicateur
 Purchased_Date;Date d'achat
 Quote character;Caractère de citation
@@ -908,22 +961,25 @@ ReplayGain_Gain;Gain en lecture
 ReplayGain_Peak;Crête de gain en lecture
 Resolution;Résolution
 s;s
+SamplingCount;Nombre d'échantillons
 SamplingRate;Echantillonnage
 Save;Sauvegarder
-ScanType;Type de balayage
-ScanType_Original;Type de balayage original
-ScanType_StoreMethod;Ordre de balayage, mode d'enregistrement
 ScanOrder;Ordre de balayage
 ScanOrder_Original;Ordre original de balayage
 ScanOrder_Stored;Ordre stocké de balayage
 ScanOrder_StoredDisplayedInverted;Ordre de balayage invversé entre affiché/stocké
 ScanOrder_StoreMethod;Ordre de balayage, mode d'enregistrement
+ScanType;Type de balayage
+ScanType_Original;Type de balayage original
+ScanType_StoreMethod;Ordre de balayage, mode d'enregistrement
 ScreenplayBy;Joué par
 Season;Saison
+SecondaryAudioLanguage;
 see below;voir ci-dessous
 Send HeaderFile;SVP envoyez-moi le fichier Header ici : http://sourceforge.net/projects/mediainfo/ (partie Bugs)
 Separator_Columns;Séparateur de colonnes
 Separator_Lines;Séparateur de lignes
+SeriesTitle;
 ServiceChannel;Numéro du service
 ServiceName;Nom du service
 ServiceProvider;Fournisseur du service
@@ -937,10 +993,13 @@ Sheet (Complete);Tableau (Complet)
 Shell extension;Extension Shell (clic droit sur le fichier, il y aura un menu 'Media Info')
 Shell extension, folder;Pour les répertoires aussi
 Shell InfoTip;Extension bulle d'aide (passez la souris sur un fichier, il y aura toutes les infos)
+ShimName;
+ShimVersion;
 Show menu;Montrer le menu
 Show toolbar;Montrer la barre d'outils
+SigningPresent;
+SignLanguage;
 Sort;Trié par
-SamplingCount;Nombre d'échantillons
 SoundEngineer;Ingénieur du son
 Source;Source
 Source_Duration;Durée de la source duration
@@ -974,6 +1033,7 @@ Tagged_Application;Application de marquage
 Tagged_Date;Date de marquage
 Technician;Technicien
 TermsOfUse;Conditions d'utilisation
+TertiaryAudioLanguage;
 Text;Texte
 Text - Custom;Personnalisé
 Text (HTML);Texte (HTML)
@@ -985,17 +1045,21 @@ Text1;Première piste Texte
 Text2;Deuxième piste Texte
 Text3;Troisième piste Texte
 TextCount;Nombre de pistes texte
+TextlessElementsExist;
 ThanksTo;Remerciements
 Thousands separator;Séparateur de milliers
-Title;Titre
-Title_More;Titre, plus d'info
 TimeCode;Time code
 TimeCode_FirstFrame;Time code de la première image
 TimeCode_Settings;Paramètres du time code
 TimeCode_Source;Source du time code
+TimeCode_Striped;time code, calculé
 TimeStamp;Time stamp
 TimeZone;Fuseau horaire
+Title;Titre
+Title_More;Titre, plus d'info
 Total;Total
+TotalNumberOfParts;
+TotalProgrammeDuration;
 Track;Piste
 Track_Count;Nombre de pistes
 transfer_characteristics;Caractéristiques du transfert
@@ -1013,6 +1077,7 @@ Video_Delay;Délai par rapport Vidéo
 Video_No;Pas de vidéo
 Video0_Delay;Délai par rapport Vidéo0
 Video1;Première piste Vidéo
+VideoComments;
 VideoCount;Nombre de pistes vidéo
 View;Vue
 View_Hint;Change la façon de voir les informations
@@ -1028,6 +1093,7 @@ WebSite_Url;http://MediaArea.net/MediaInfo/
 WebSite_Video;Aller sur le site web du codec vidéo
 WebSite_Video_More;Aller sur le site web (%Url%) du codec vidéo
 Width;Largeur
+Width_CleanAperture;Largeur, Clean Aperture
 Width_Original;Largeur
 WriteMe;écrire à l'auteur
 WriteToTranslator;Écrire au traducteur
@@ -1036,5 +1102,5 @@ Written_Location;Lieu d'écriture
 WrittenBy;Écrit par
 Yes;Oui
 Your system;Votre système
-ZZ_Automatic_Percent;95
-ZZ_AutomaticLanguage_Percent;99
+ZZ_Automatic_Percent;91
+ZZ_AutomaticLanguage_Percent;95

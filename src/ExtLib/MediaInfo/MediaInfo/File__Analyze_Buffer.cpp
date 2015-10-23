@@ -2036,7 +2036,7 @@ void File__Analyze::Get_Flags (int64u Flags, size_t Order, bool &Info, const cha
         Info=false;
 
     Element_Begin0();
-    if (Trace_Activated) Param(Name, Info?"Yes":"No");
+    if (Trace_Activated && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_XML) Param(Name, Info?"Yes":"No");
     Element_End0();
 }
 
@@ -2046,7 +2046,7 @@ void File__Analyze::Get_Flags (int64u ValueToPut, int8u &Info, const char* Name)
     Info=(int8u)ValueToPut;
 
     Element_Begin0();
-    if (Trace_Activated) Param(Name, Info);
+    if (Trace_Activated && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_XML) Param(Name, Info);
     Element_End0();
 }
 
@@ -2062,7 +2062,7 @@ void File__Analyze::Skip_Flags(int64u Flags, size_t Order, const char* Name)
 void File__Analyze::Skip_Flags(int64u ValueToPut, const char* Name)
 {
     Element_Begin0();
-    if (Trace_Activated) Param(Name, ValueToPut);
+    if (Trace_Activated && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_XML) Param(Name, ValueToPut);
     Element_End0();
 }
 
@@ -2091,11 +2091,16 @@ void File__Analyze::Get_S1(int8u Bits, int8u &Info, const char* Name)
 {
     INTEGRITY_INT(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
     Info=BS->Get1(Bits);
-    if (Trace_Activated)
-    {
-        Param(Name, Info);
-        Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
-    }
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, Info);
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+    #endif //MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
@@ -2103,7 +2108,16 @@ void File__Analyze::Get_S2(int8u Bits, int16u &Info, const char* Name)
 {
     INTEGRITY_INT(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
     Info=BS->Get2(Bits);
-    if (Trace_Activated) Param(Name, Info);
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, Info);
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+    #endif //MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
@@ -2111,7 +2125,16 @@ void File__Analyze::Get_S3(int8u Bits, int32u &Info, const char* Name)
 {
     INTEGRITY_INT(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
     Info=BS->Get4(Bits);
-    if (Trace_Activated) Param(Name, Info);
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, Info);
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+    #endif //MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
@@ -2119,7 +2142,16 @@ void File__Analyze::Get_S4(int8u Bits, int32u &Info, const char* Name)
 {
     INTEGRITY_INT(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
     Info=BS->Get4(Bits);
-    if (Trace_Activated) Param(Name, Info);
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, Info);
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+    #endif //MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
@@ -2127,7 +2159,16 @@ void File__Analyze::Get_S5(int8u Bits, int64u &Info, const char* Name)
 {
     INTEGRITY_INT(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
     Info=BS->Get8(Bits);
-    if (Trace_Activated) Param(Name, Info);
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, Info);
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+    #endif //MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
@@ -2135,7 +2176,16 @@ void File__Analyze::Get_S6(int8u Bits, int64u &Info, const char* Name)
 {
     INTEGRITY_INT(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
     Info=BS->Get8(Bits);
-    if (Trace_Activated) Param(Name, Info);
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, Info);
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+    #endif //MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
@@ -2143,7 +2193,16 @@ void File__Analyze::Get_S7(int8u Bits, int64u &Info, const char* Name)
 {
     INTEGRITY_INT(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
     Info=BS->Get8(Bits);
-    if (Trace_Activated) Param(Name, Info);
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, Info);
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+    #endif //MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
@@ -2151,7 +2210,16 @@ void File__Analyze::Get_S8(int8u Bits, int64u &Info, const char* Name)
 {
     INTEGRITY_INT(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
     Info=BS->Get8(Bits);
-    if (Trace_Activated) Param(Name, Info);
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, Info);
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+    #endif //MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
@@ -2256,12 +2324,17 @@ void File__Analyze::Skip_SB(              const char* Name)
 void File__Analyze::Skip_S1(int8u Bits, const char* Name)
 {
     INTEGRITY(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
-    if (Trace_Activated)
-    {
-        Param(Name, BS->Get1(Bits));
-        Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
-    }
-    else
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, BS->Get1(Bits));
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+        else
+    #endif //MEDIAINFO_TRACE
         BS->Skip(Bits);
 }
 
@@ -2269,9 +2342,17 @@ void File__Analyze::Skip_S1(int8u Bits, const char* Name)
 void File__Analyze::Skip_S2(int8u Bits, const char* Name)
 {
     INTEGRITY(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
-    if (Trace_Activated)
-        Param(Name, BS->Get2(Bits));
-    else
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, BS->Get2(Bits));
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+        else
+    #endif //MEDIAINFO_TRACE
         BS->Skip(Bits);
 }
 
@@ -2279,9 +2360,17 @@ void File__Analyze::Skip_S2(int8u Bits, const char* Name)
 void File__Analyze::Skip_S3(int8u Bits, const char* Name)
 {
     INTEGRITY(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
-    if (Trace_Activated)
-        Param(Name, BS->Get4(Bits));
-    else
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, BS->Get4(Bits));
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+        else
+    #endif //MEDIAINFO_TRACE
         BS->Skip(Bits);
 }
 
@@ -2289,9 +2378,17 @@ void File__Analyze::Skip_S3(int8u Bits, const char* Name)
 void File__Analyze::Skip_S4(int8u Bits, const char* Name)
 {
     INTEGRITY(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
-    if (Trace_Activated)
-        Param(Name, BS->Get4(Bits));
-    else
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, BS->Get4(Bits));
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+        else
+    #endif //MEDIAINFO_TRACE
         BS->Skip(Bits);
 }
 
@@ -2299,9 +2396,17 @@ void File__Analyze::Skip_S4(int8u Bits, const char* Name)
 void File__Analyze::Skip_S5(int8u Bits, const char* Name)
 {
     INTEGRITY(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
-    if (Trace_Activated)
-        Param(Name, BS->Get8(Bits));
-    else
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, BS->Get8(Bits));
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+        else
+    #endif //MEDIAINFO_TRACE
         BS->Skip(Bits);
 }
 
@@ -2309,9 +2414,17 @@ void File__Analyze::Skip_S5(int8u Bits, const char* Name)
 void File__Analyze::Skip_S6(int8u Bits, const char* Name)
 {
     INTEGRITY(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
-    if (Trace_Activated)
-        Param(Name, BS->Get8(Bits));
-    else
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, BS->Get8(Bits));
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+        else
+    #endif //MEDIAINFO_TRACE
         BS->Skip(Bits);
 }
 
@@ -2319,9 +2432,17 @@ void File__Analyze::Skip_S6(int8u Bits, const char* Name)
 void File__Analyze::Skip_S7(int8u Bits, const char* Name)
 {
     INTEGRITY(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
-    if (Trace_Activated)
-        Param(Name, BS->Get8(Bits));
-    else
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, BS->Get8(Bits));
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+        else
+    #endif //MEDIAINFO_TRACE
         BS->Skip(Bits);
 }
 
@@ -2329,9 +2450,17 @@ void File__Analyze::Skip_S7(int8u Bits, const char* Name)
 void File__Analyze::Skip_S8(int8u Bits, const char* Name)
 {
     INTEGRITY(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
-    if (Trace_Activated)
-        Param(Name, BS->Get8(Bits));
-    else
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param(Name, BS->Get8(Bits));
+            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
+                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        }
+        else
+    #endif //MEDIAINFO_TRACE
         BS->Skip(Bits);
 }
 
@@ -2410,8 +2539,8 @@ void File__Analyze::Get_T1(size_t Bits, int8u &Info, const char* Name)
     Info=BT->Get1(Bits);
     if (Trace_Activated)
     {
-        Param(Name, Info);
         Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        Param(Name, Info);
     }
 }
 
@@ -2515,8 +2644,8 @@ void File__Analyze::Skip_T1(size_t Bits, const char* Name)
     INTEGRITY(Bits<=BT->Remain(), "Size is wrong", BT->Offset_Get())
     if (Trace_Activated)
     {
-        Param(Name, BT->Get1(Bits));
         Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+        Param(Name, BT->Get1(Bits));
     }
     else
         BT->Skip1(Bits);

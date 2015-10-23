@@ -125,7 +125,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.74");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.78");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -216,10 +216,12 @@ void MediaInfo_Config::Init()
     ParseSpeed=(float32)0.5;
     Verbosity=(float32)0.5;
     Trace_Level=(float32)0.0;
+    Compat=70778;
     Trace_TimeSection_OnlyFirstOccurrence=false;
     Trace_Format=Trace_Format_Tree;
     Language_Raw=false;
     ReadByHuman=true;
+    Legacy=true;
     LegacyStreamDisplay=true;
     SkipBinaryData=false;
     Demux=0;
@@ -412,6 +414,15 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     {
         return ReadByHuman_Get()?__T("1"):__T("0");
     }
+    else if (Option_Lower==__T("legacy"))
+    {
+        Legacy_Set(Value.To_int8u()?true:false);
+        return Ztring();
+    }
+    else if (Option_Lower==__T("legacy_get"))
+    {
+        return Legacy_Get()?__T("1"):__T("0");
+    }
     else if (Option_Lower==__T("legacystreamdisplay"))
     {
         LegacyStreamDisplay_Set(Value.To_int8u()?true:false);
@@ -577,7 +588,9 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     else if (Option_Lower==__T("trace_level"))
     {
         Trace_Level_Set(Value);
-        if (Inform_Get()==__T("XML"))
+        if (Inform_Get()==__T("MAXML"))
+            Trace_Format_Set(Trace_Format_XML); // All must be XML
+        if (Inform_Get()==__T("XML") || Inform_Get()==__T("MAXML"))
         {
             Inform_Set(Ztring());
             Trace_Format_Set(Trace_Format_XML); // TODO: better coherency in options
@@ -613,7 +626,7 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
         CriticalSectionLocker CSL(CS);
         if (NewValue_Lower==__T("csv"))
             Trace_Format_Set(Trace_Format_CSV);
-        else if (NewValue_Lower==__T("xml"))
+        else if (NewValue_Lower==__T("xml") || NewValue_Lower==__T("MAXML"))
             Trace_Format_Set(Trace_Format_XML);
         else
             Trace_Format_Set(Trace_Format_Tree);
@@ -1111,6 +1124,19 @@ bool MediaInfo_Config::ReadByHuman_Get ()
 }
 
 //---------------------------------------------------------------------------
+void MediaInfo_Config::Legacy_Set (bool NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    Legacy=NewValue;
+}
+
+bool MediaInfo_Config::Legacy_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return Legacy;
+}
+
+//---------------------------------------------------------------------------
 void MediaInfo_Config::LegacyStreamDisplay_Set (bool NewValue)
 {
     CriticalSectionLocker CSL(CS);
@@ -1169,6 +1195,19 @@ float32 MediaInfo_Config::Trace_Level_Get ()
 {
     CriticalSectionLocker CSL(CS);
     return Trace_Level;
+}
+
+//---------------------------------------------------------------------------
+void MediaInfo_Config::Compat_Set (int64u NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    Compat=NewValue;
+}
+
+int64u MediaInfo_Config::Compat_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return Compat;
 }
 
 std::bitset<32> MediaInfo_Config::Trace_Layers_Get ()
@@ -1560,7 +1599,10 @@ void MediaInfo_Config::Inform_Set (const ZtringListList &NewValue)
     }
     else
     {
-        Trace_Format_Set(Trace_Format_Tree); // TODO: better coherency in options
+        if (NewValue.Read(0, 0)==__T("MAXML"))
+            Trace_Format_Set(Trace_Format_XML); //All must be XML
+        else
+            Trace_Format_Set(Trace_Format_Tree); // TODO: better coherency in options
 
         CriticalSectionLocker CSL(CS);
 

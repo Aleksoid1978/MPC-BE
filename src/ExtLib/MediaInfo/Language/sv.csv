@@ -1,24 +1,24 @@
   Language_ISO639;sv
-  Author_Email;mike@comhem.se
-  Author_Name;Yonder
-  Author_OldNames;Ursprunglig översättare
+  Author_Email;eson57@gmail.com
+  Author_Name;Åke Engelbrektson
+  Author_OldNames;Yonder
   Language_Name;Svenska
   Config_Text_ColumnSize;40
-  Config_Text_Separator; : 
-  Config_Text_NumberTag; #
+  Config_Text_Separator;: 
+  Config_Text_NumberTag;#
   Config_Text_FloatSeparator;,
   Config_Text_ThousandsSeparator; 
  audio stream1; ljudström
  audio stream2; ljudströmmar
  audio stream3; ljudströmmar
  bit1; bit
- bit2; bits
- bit3; bits
+ bit2; bit
+ bit3; bit
  bps; bps
  Bps; Bps
  Byte1; Byte
- Byte2; Bytes
- Byte3; Bytes
+ Byte2; Byte
+ Byte3; Byte
  channel1; kanal
  channel2; kanaler
  channel3; kanaler
@@ -28,38 +28,41 @@
  chapters stream1; kapitelström
  chapters stream2; kapitelströmmar
  chapters stream3; kapitelströmmar
+ character1;tecken
+ character2;tecken
+ character3;tecken
  day1; dag
  day2; dagar
  day3; dagar
- dB1;
- dB2;
- dB3;
+ dB1; dB
+ dB2; dB
+ dB3; dB
  file1; fil
  file2; filer
  file3; filer
- frame1;
- frame2;
- frame3;
  fps1; fps
  fps2; fps
  fps3; fps
+ frame1; bildruta
+ frame2; bildrutor
+ frame3; bildrutor
  GB; GB
  Gb; Gb
  Gbps; Gbps
  GBps; GBps
  GHz; GHz
  GiB; GiB
- GibiByte1; GibiBytes
- GibiByte2; GibiBytes
- GibiByte3; GibiBytes
+ GibiByte1; GibiByte
+ GibiByte2; GibiByte
+ GibiByte3; GibiByte
  GiBps; GiBps
  GigaBit1; GigaBit
- GigaBit2; GigaBits
- GigaBit3; GigaBits
+ GigaBit2; GigaBit
+ GigaBit3; GigaBit
  GigaByte1; GigaByte
- GigaByte2; GigaBytes
- GigaByte3; GigaBytes
- hour1; timme
+ GigaByte2; GigaByte
+ GigaByte3; GigaByte
+ hour1; timma
  hour2; timmar
  hour3; timmar
  Hz; Hz
@@ -73,41 +76,41 @@
  KHz; KHz
  KiB; KiB
  KibiBit1; KibiBit
- KibiBit2; KibiBits
- KibiBit3; KibiBits
+ KibiBit2; KibiBit
+ KibiBit3; KibiBit
  KibiByte1; KibiByte
- KibiByte2; KibiBytes
- KibiByte3; KibiBytes
+ KibiByte2; KibiByte
+ KibiByte3; KibiByte
  KiBps; KiBps
  KiloBit1; KiloBit
- KiloBit2; KiloBits
- KiloBit3; KiloBits
+ KiloBit2; KiloBit
+ KiloBit3; KiloBit
  KiloByte1; KiloByte
- KiloByte2; KiloBytes
- KiloByte3; KiloBytes
+ KiloByte2; KiloByte
+ KiloByte3; KiloByte
  MB; MB
  Mb; Mb
  Mbps; Mbps
- MBps; MebiBytes
+ MBps; MebiByte
  MebiBit1; MebiBit
- MebiBit2; MebiBits
- MebiBit3; MebiBits
+ MebiBit2; MebiBit
+ MebiBit3; MebiBit
  MebiByte1; MebiByte
- MebiByte2; MebiBytes
- MebiByte3; MebiBytes
+ MebiByte2; MebiByte
+ MebiByte3; MebiByte
  MegaBit1; MegaBit
- MegaBit2; MegaBits
- MegaBit3; MegaBits
+ MegaBit2; MegaBit
+ MegaBit3; MegaBit
  MegaByte1; MegaByte
- MegaByte2; MegaBytes
- MegaByte3; MegaBytes
+ MegaByte2; MegaByte
+ MegaByte3; MegaByte
  MHz; MHz
  MiB; MiB
  Mib; Mib
  MiBps; MiBps
- millisecond1; milisekund
- millisecond2; milisekunder
- millisecond3; milisekunder
+ millisecond1; millisekund
+ millisecond2; millisekunder
+ millisecond3; millisekunder
  minute1; minut
  minute2; minuter
  minute3; minuter
@@ -123,918 +126,981 @@
  text stream1; textström
  text stream2; textströmmar
  text stream3; textströmmar
- video frames1;
- video frames2;
- video frames3;
+ video frames1; bildruta
+ video frames2; bildrutor
+ video frames3; bildrutor
  video stream1; videoström
  video stream2; videoströmmar
  video stream3; videoströmmar
- warppoint0;
- warppoint1;
- warppoint2;
- warppoint3;
+ warppoint0; Inga varppunkter
+ warppoint1; varppunkt
+ warppoint2; varppunkter
+ warppoint3; varppunkter
  week1; vecka
  week2; veckor
  week3; veckor
  year1; år
  year2; år
  year3; år
-, ; ,
-: ; :
-About; Om
-About_Hint; Kontakt - och versionsinformation
-Accompaniment; Ackompanjemang
-ActiveFormatDescription;
-ActiveFormatDescription_MuxingMode;
-Actor; Skådespelare
-Actor_Character; Roll
-Added_Date;
-Address; Adress
-Advanced; Avancerat
-Advanced mode; Avancerat läge
-Album; Album
-Album_ReplayGain_Gain;
-Album_ReplayGain_Peak;
-Alignment;
-Alignment_Aligned;
-Alignment_Split;
-All; Alla
-Archival_Location; arkiveringsplats
-Arranger; Arrangör
-ArtDirector; ArtDirector
-AspectRatio; Bildförhållande
-AssistantDirector; Assisterande regissör
-at; hos
-At least one file; (Du måste öppna minst en fil)
-Audio; Audio
-Audio stream(s); Ljudströmmar
-Audio_Codec_List; Ljudcodecs
-Audio_No; Inget ljud
-Audio1; Första ljudströmmen
-Audio2; Andra ljudströmmen
-AudioCount; Antalet Ljudströmmar
-Author; Författare
-BarCode; Streckkod
-Basic; Enkel
-Basic_Note; OBS: För mer information om den här filen, måste du välja en annan vy (Tabell, Träd...)
-BitDepth;
-BitDepth_Stored;
-BitRate; Bitrate
-BitRate_Maximum;
-BitRate_Minimum;
-BitRate_Mode; Bitrateläge
-BitRate_Mode_CBR;
-BitRate_Mode_VBR;
-BitRate_Nominal;
-BitRate_Encoded;
-Bits-(Pixel*Frame); Bits/(Pixel*Frame)
-BufferSize;
-Cancel; Ångra
-Channel(s); Kanal(er)
-ChannelPositions; Kanalplatser
-Chapter(s); Kanal(er)
-Chapters; Kapitel
-Chapters stream(s); Kapitelströmm(ar)
-Chapters_Codec_List; Kapitelcodecs
-Chapters_No; Inga kapitel
-ChaptersCount; Antal kapitelcodecs
-CheckNewVersion; Sök efter ny version
-Choose custom; Välj anpassad
-Choose custom sheet; Välj önskad anpassad tabell
-Choose custom text; Välj önskat anpassat textformat
-Choose export format; Välj önskat anpassat exportformat
-Choose file(s); Välj filer att öppna
-Choose filename; Välj önskat filmnamn
-Choose language; Välj önskat språk
-Choregrapher; Koreograf
-Chroma;
-ChromaSubsampling;
-Close; Stäng
-Close all before open; Stäng alla före öppna
-Codec; Codec
-Codec_Description;
-Codec_Info; Codecdetaljer
-Codec_Settings; Codecinställningar
-Codec_Settings_PacketBitStream;
-Codec_Settings_BVOP;
-Codec_Settings_QPel;
-Codec_Settings_GMC;
-Codec_Settings_Matrix;
-Codec_Settings_Floor;
-Codec_Settings_CABAC;
-Codec_Settings_Firm;
-Codec_Settings_Endianness;
-Codec_Settings_Sign;
-Codec_Settings_Law;
-Codec_Settings_ITU;
-Codec_Profile; Codecprofil
-Codec_Url; Länk till codec
-CodecID;
-CodecID_Description;
-Collection; Samling
-Colorimetry;
-ColorSpace;
-colour_primaries;
-Comment; Kommentar
-CommissionedBy; Kommissionerad av
-Compilation;
-CompleteName; Fullständigt namn
-Composer; Kompositör
-Compression_Mode;
-Compression_Mode_Lossless;
-Compression_Mode_Lossy;
-Compression_Ratio;
-Conductor; Dirigent
-Container and general information; Behållare och allmän information
-ContentType; Innehållstyp
-CoProducer; Medproducent
-Copyright; Copyright
-CostumeDesigner; Kostymdesigner
-Count; Antal
-Country; Land
-Cover; Omslag
-Cover_Datas; Omslagsinformation
-Cover_Description;
-Cover_Mime;
-Cover_Type;
-Cropped;
-Custom; Anpassad
-Customize; Anpassa
-Date; Datum
-Debug; Debug
-Decimal point; Decimalpunkt
-Delay; Fördröjning
-Delay_Source;
-Delay_Source_Container;
-Delay_Source_Stream;
-Delete; Radera
-Description; Beskrivning
-Digitized_Date; Digitaliserat datum
-Dimensions;
-Director; Regissör
-DirectorOfPhotography; Chefkameraman
-DisplayAspectRatio; Bildförhållande
-DisplayAspectRatio_Original;
-DistributedBy; Distribuerad av
-Donate; Donera
-DotsPerInch;
-Duration;
-Duration_End;
-Duration_Start;
-Edit; Redigera
-EditedBy; Redigerad av
-EMail; E-Mail
-Encoded_Application; Skrivande applikation
-Encoded_Date; Kodningsdatum
-Encoded_Library; Skrivande bibliotek
-Encoded_Library_Settings; Kodningsinställningar
-Encoded_Original; Original
-EncodedBy; Kodad av
-EPG_Positions;
-Error_File; Fel under läsning av fil
-ExecutiveProducer; Verkställande producent
-Exit; Stäng
-Exit_Hint; Stäng programmet
-Export; Exportera
-Export_Hint; Exportera i ett anpassat format
-Extensions; Normalt använda filändelser
-Family;
-Fax; Fax
-File; Fil
-File size; Filstorlek
-File_Append; Lägg till till existerande fil (Varning : se till att du har använder samma parametrar!)
-File_Created_Date;
-File_Created_Date_Local;
-File_Hint; Välj en fil att betrakta
-File_Modified_Date;
-File_Modified_Date_Local;
-FileExtension; Filändelse
-FileName; Filnamn
-FileSize; Filstorlek
-Folder; Folder
-Folder (R); Mapp (R)
-Folder (R)_Hint; Välj en mapp att betrakta (med alla undermappar rekursivt)
-Folder (Recursively); Mapp (rekursivt)
-Folder_Hint; Välj en mapp att betrakta
-FolderName; Mappnamn
-Format; Format
-Format_Commercial;
-Format_Commercial_IfAny;
-Format_Description;
-Format_Info;
-Format_Profile;
-Format_Settings;
-Format_Settings_PacketBitStream;
-Format_Settings_BVOP;
-Format_Settings_QPel;
-Format_Settings_GMC;
-Format_Settings_Matrix;
-Format_Settings_Matrix_Custom;
-Format_Settings_Matrix_Default;
-Format_Settings_Floor;
-Format_Settings_CABAC;
-Format_Settings_Firm;
-Format_Settings_Endianness;
-Format_Settings_RefFrames;
-Format_Settings_Sign;
-Format_Settings_Law;
-Format_Settings_ITU;
-Format_Settings_SBR;
-Format_Settings_PS;
-Format_Settings_Pulldown;
-Format_Settings_Mode;
-Format_Settings_FrameMode;
-Format_Settings_Emphasis;
-Format_Settings_ModeExtension;
-Format_Settings_GOP;
-Format_Version;
-Format_Url;
-FrameCount;
-FrameRate; Bildhastighet (Frame rate)
-FrameRate_Mode;
-FrameRate_Mode_CFR;
-FrameRate_Mode_VFR;
-FrameRate_Minimum;
-FrameRate_Nominal;
-FrameRate_Maximum;
-FrameRate_Original;
-General; Allmänt
-Genre; Genre
-Genre_000; Blues
-Genre_001; Classic Rock
-Genre_002; Country
-Genre_003; Dance
-Genre_004; Disco
-Genre_005; Funk
-Genre_006; Grunge
-Genre_007; Hip-Hop
-Genre_008; Jazz
-Genre_009; Metal
-Genre_010; New Age
-Genre_011; Oldies
-Genre_012; Other
-Genre_013; Pop
-Genre_014; R&B
-Genre_015; Rap
-Genre_016; Reggae
-Genre_017; Rock
-Genre_018; Techno
-Genre_019; Industrial
-Genre_020; Alternative
-Genre_021; Ska
-Genre_022; Death Metal
-Genre_023; Pranks
-Genre_024; Soundtrack
-Genre_025; Euro-Techno
-Genre_026; Ambient
-Genre_027; Trip-Hop
-Genre_028; Vocal
-Genre_029; Jazz+Funk
-Genre_030; Fusion
-Genre_031; Trance
-Genre_032; Classical
-Genre_033; Instrumental
-Genre_034; Acid
-Genre_035; House
-Genre_036; Game
-Genre_037; Sound Clip
-Genre_038; Gospel
-Genre_039; Noise
-Genre_040; AlternRock
-Genre_041; Bass
-Genre_042; Soul
-Genre_043; Punk
-Genre_044; Space
-Genre_045; Meditative
-Genre_046; Instrumental Pop
-Genre_047; Instrumental Rock
-Genre_048; Ethnic
-Genre_049; Gothic
-Genre_050; Darkwave
-Genre_051; Techno-Industrial
-Genre_052; Electronic
-Genre_053; Pop-Folk
-Genre_054; Eurodance
-Genre_055; Dream
-Genre_056; Southern Rock
-Genre_057; Comedy
-Genre_058; Cult
-Genre_059; Gangsta
-Genre_060; Top 40
-Genre_061; Christian Rap
-Genre_062; Pop/Funk
-Genre_063; Jungle
-Genre_064; Native American
-Genre_065; Cabaret
-Genre_066; New Wave
-Genre_067; Psychadelic
-Genre_068; Rave
-Genre_069; Showtunes
-Genre_070; Trailer
-Genre_071; Lo-Fi
-Genre_072; Tribal
-Genre_073; Acid Punk
-Genre_074; Acid Jazz
-Genre_075; Polka
-Genre_076; Retro
-Genre_077; Musical
-Genre_078; Rock & Roll
-Genre_079; Hard Rock
-Genre_080; Folk
-Genre_081; Folk-Rock
-Genre_082; National Folk
-Genre_083; Swing
-Genre_084; Fast Fusion
-Genre_085; Bebob
-Genre_086; Latin
-Genre_087; Revival
-Genre_088; Celtic
-Genre_089; Bluegrass
-Genre_090; Avantgarde
-Genre_091; Gothic Rock
-Genre_092; Progressive Rock
-Genre_093; Psychedelic Rock
-Genre_094; Symphonic Rock
-Genre_095; Slow Rock
-Genre_096; Big Band
-Genre_097; Chorus
-Genre_098; Easy Listening
-Genre_099; Acoustic
-Genre_100; Humour
-Genre_101; Speech
-Genre_102; Chanson
-Genre_103; Opera
-Genre_104; Chamber Music
-Genre_105; Sonata
-Genre_106; Symphony
-Genre_107; Booty Bass
-Genre_108; Primus
-Genre_109; Porn Groove
-Genre_110; Satire
-Genre_111; Slow Jam
-Genre_112; Club
-Genre_113; Tango
-Genre_114; Samba
-Genre_115; Folklore
-Genre_116; Ballad
-Genre_117; Power Ballad
-Genre_118; Rhythmic Soul
-Genre_119; Freestyle
-Genre_120; Duet
-Genre_121; Punk Rock
-Genre_122; Drum Solo
-Genre_123; A capella
-Genre_124; Euro-House
-Genre_125; Dance Hall
-Genre_126; Goa
-Genre_127; Drum & Bass
-Genre_128; Club-House
-Genre_129; Hardcore
-Genre_130; Terror
-Genre_131; Indie
-Genre_132; Britpop
-Genre_133; Negerpunk
-Genre_134; Polsk Punk
-Genre_135; Beat
-Genre_136; Christian Gangsta Rap
-Genre_137; Heavy Metal
-Genre_138; Black Metal
-Genre_139; Crossover
-Genre_140; Contemporary Christian
-Genre_141; Christian Rock
-Genre_142; Merengue
-Genre_143; Salsa
-Genre_144; Trash Metal
-Genre_145; Anime
-Genre_146; JPop
-Genre_147; Synthpop
-Genre_148;
-Genre_149;
-Genre_150;
-Genre_151;
-Genre_152;
-Genre_153;
-Genre_154;
-Genre_155;
-Genre_156;
-Genre_157;
-Genre_158;
-Genre_159;
-Genre_160;
-Genre_161;
-Genre_162;
-Genre_163;
-Genre_164;
-Genre_165;
-Genre_166;
-Genre_167;
-Genre_168;
-Genre_169;
-Genre_170;
-Genre_171;
-Genre_172;
-Genre_173;
-Genre_174;
-Genre_175;
-Genre_176;
-Genre_177;
-Genre_178;
-Genre_179;
-Genre_180;
-Genre_181;
-Genre_182;
-Genre_183;
-Genre_184;
-Genre_185;
-Genre_186;
-Genre_187;
-Genre_188;
-Genre_189;
-Genre_190;
-Genre_191;
-Go to WebSite; Besök hemsida
-Grouping;
-h; h
-Header file; Skapa headerfil
-Height; Höjd
-Height_Original;
-Help; Hjälp
-Hint;
-How many audio streams?; Hur många ljudströmmar?
-How many chapters streams?;
-How many text streams?;
-How many video streams?;
-HTML; HTML
-ID; ID
-Image; Bild
-Image stream(s); Bildströmmar
-Image_Codec_List; Bildcodecs
-ImageCount; Antal bildströmmar
-Info;
-Instruments; Instrument
-Interlacement;
-Interlaced_Interlaced;
-Interlaced_TFF;
-Interlaced_BFF;
-Interlaced_PPF;
-Interlaced_Progressive;
-Interleaved;
-Interleave_Duration;
-Interleave_Preload;
-Interleave_VideoFrames;
-InternetMediaType;
-IRCA; IRCA
-ISBN; ISBN
-ISRC; ISRC
-Keywords; Nyckelord
-Known codecs; Kända codecs
-Known formats; Kända format
-Known parameters; Kända parametrar
-Label; Etikett
-Language; Språk
-Language_More;
-Language_aa; Afar
-Language_ab; Abkhazian
-Language_ae; Avestan
-Language_af; Afrikaans
-Language_ak; Akan
-Language_am; Amharic
-Language_an; Aragonese
-Language_ar; Arabic
-Language_as; Assamese
-Language_av; Avaric
-Language_ay; Aymara
-Language_az; Azerbaijani
-Language_ba; Bashkir
-Language_be; Belarusian
-Language_bg; Bulgariska
-Language_bh; Bihari
-Language_bi; Bislama
-Language_bm; Bambara
-Language_bn; Bengali
-Language_bo; Tibetan
-Language_br; Breton
-Language_bs; Bosniska
-Language_ca; Catalan
-Language_ce; Chechen
-Language_ch; Chamorro
-Language_co; Corsican
-Language_cr; Cree
-Language_cs; Tjeckiska
-Language_cu; Slave
-Language_cv; Chuvash
-Language_cy; Welsh
-Language_da; Danska
-Language_de; Tyska
-Language_dv; Divehi
-Language_dz; Dzongkha
-Language_ee; Ewe
-Language_el; Grekiska
-Language_en; Engelska
-Language_en-gb;
-Language_en-us;
-Language_eo; Esperanto
-Language_es; Spanska
-Language_et; Estniska
-Language_eu; Basque
-Language_fa; Persiska
-Language_ff; Fulah
-Language_fi; Finska
-Language_fj; Fijian
-Language_fo; Faroese
-Language_fr; Franska
-Language_fy; Frisian
-Language_ga; Irländska
-Language_gd; Gaelic
-Language_gl; Galician
-Language_gn; Guarani
-Language_gu; Gujarati
-Language_gv; Manx
-Language_ha; Hausa
-Language_he; Hebrew
-Language_hi; Hindi
-Language_ho; Hiri Motu
-Language_hr; Kroatiska
-Language_ht; Haitian
-Language_hu; Ungerska
-Language_hy; Armenian
-Language_hz; Herero
-Language_ia; Auxiliary Language Association
-Language_id; Indonesiska
-Language_ie; Interlingue
-Language_ig; Igbo
-Language_ii; Sichuan Yi
-Language_ik; Inupiaq
-Language_Info; Språkinformation
-Language_io; Ido
-Language_is; Isländska
-Language_it; Italienska
-Language_iu; Inuktitut
-Language_ja; Japanska
-Language_jv; Javanese
-Language_ka; Georgian
-Language_kg; Kongo
-Language_ki; Kikuyu
-Language_kj; Kuanyama
-Language_kk; Kazakh
-Language_kl; Kalaallisut
-Language_km; Khmer
-Language_kn; Kannada
-Language_ko; Koreanska
-Language_kr; Kanuri
-Language_ks; Kashmiri
-Language_ku; Kurdish
-Language_kv; Komi
-Language_kw; Cornish
-Language_ky; Kirghiz
-Language_la; Latinska
-Language_lb; Luxembourgish
-Language_lg; Ganda
-Language_li; Limburgish
-Language_ln; Lingala
-Language_lo; Lao
-Language_lt; Lithuanian
-Language_lu; Luba-Katanga
-Language_lv; Latvian
-Language_mg; Malagasy
-Language_mh; Marshallese
-Language_mi; Maori
-Language_mk; Macedonian
-Language_ml; Malayalam
-Language_mn; Mongolian
-Language_mo; Moldavian
-Language_mr; Marathi
-Language_ms; Malay
-Language_mt; Maltese
-Language_mul; Multipla språk
-Language_my; Burmese
-Language_na; Nauru
-Language_nb; Norska Bokmal
-Language_nd; Ndebele
-Language_ne; Nepali
-Language_ng; Ndonga
-Language_nl; Nederländska
-Language_nn; Norska Bokmal
-Language_no; Norska
-Language_nr; Ndebele
-Language_nv; Navaho
-Language_ny; Nyanja
-Language_oc; Occitan
-Language_oj; Ojibwa
-Language_om; Oromo
-Language_or; Oriya
-Language_os; Ossetic
-Language_pa; Panjabi
-Language_pi; Pali
-Language_pl; Polska
-Language_ps; Pushto
-Language_pt; Portugisiska
-Language_pt-br;
-Language_qu; Quechua
-Language_rm; Raeto-Romance
-Language_rn; Rundi
-Language_ro; Romäniska
-Language_ru; Ryska
-Language_rw; Kinyarwanda
-Language_sa; Sanskrit
-Language_sc; Sardinian
-Language_sd; Sindhi
-Language_se; Northern Sami
-Language_sg; Sango
-Language_si; Sinhala
-Language_sk; Slovak
-Language_sl; Slovenska
-Language_sm; Samoan
-Language_sn; Shona
-Language_so; Somali
-Language_sq; Albanska
-Language_sr; Serbiska
-Language_ss; Swati
-Language_st; Sotho
-Language_su; Sundanese
-Language_sv; Svenska
-Language_sw; Swahili
-Language_ta; Tamil
-Language_te; Telugu
-Language_tg; Tajik
-Language_th; Thai
-Language_ti; Tigrinya
-Language_tk; Turkmen
-Language_tl; Tagalog
-Language_tn; Tswana
-Language_to; Tonga
-Language_tr; Turkiska
-Language_ts; Tsonga
-Language_tt; Tatar
-Language_tw; Twi
-Language_ty; Tahitian
-Language_ug; Uighur
-Language_uk; Ukrainska
-Language_ur; Urdu
-Language_uz; Uzbek
-Language_ve; Venda
-Language_vi; Vietnamesiska
-Language_vo; Volapuk
-Language_wa; Walloon
-Language_wo; Wolof
-Language_xh; Xhosa
-Language_yi; Yiddish
-Language_yo; Yoruba
-Language_za; Zhuang
-Language_zh; Chinese
-Language_zh-cn;
-Language_zh-tw;
-Language_zu; Zulu
-LawRating; Åldersgräns
-LCCN; LCCN
-Library; Muxningsbibliotek
-Lightness;
-List;
-Lyrics;
-Lyricist; Texter från
-Mastered_Date; Masterdatum
-MasteredBy; Mastrad av
-matrix_coefficients;
-MediaInfo_About;Ger mycket detaljerad information\r\nom en multimediafil:\r\nMatroska, OGG (inklusive OGM)\r\nMPEG1 (inklusive VCD)\r\nMPEG2 (inklusive DVD and SVCD)\r\nMPEG4 (inklusive Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (inklusive WMV, WMA)\r\nMicrosoft RIFF (inklusive AVI, WAV)\r\nLjud-endast format (AC3, DTS, AAC, AU, AIFF...)
-Menu; Meny
-Menu stream(s);
-Menu_Codec_List;
-Menu_No;
-MenuCount;
-Menu_Hint; Mer möjligheter
-MenuID;
+, ;,
+: ;:
+3D;3D
+3DType;3D-typ
+About;Om
+About_Hint;Kontakt - och versionsinformation
+Accompaniment;Ackompanjemang
+ActiveFormatDescription;Aktiv formatbeskrivning
+ActiveFormatDescription_MuxingMode;Aktiv formatbeskrivning, mux-läge
+Actor;Skådespelare
+Actor_Character;Roll
+Added_Date;Tillagd
+Address;Adress
+Advanced;Avancerat
+Advanced mode;Avancerat läge
+Album;Album
+Album_ReplayGain_Gain;Uppspelningsförstärkning för album
+Album_ReplayGain_Peak;Förstärkningstopp för album
+Alignment;Justering
+Alignment_Aligned;Justerad efter interfoliering
+Alignment_Split;Uppdelad över interfoliering
+All;Alla
+Archival_Location;Arkiveringsplats
+Arranger;Arrangör
+ArtDirector;Formgivare
+AspectRatio;Bildförhållande
+AssistantDirector;Assisterande regissör
+at;hos
+At least one file;(Du måste öppna minst en fil)
+Audio;Ljud
+Audio stream(s);Ljudströmmar
+Audio_Codec_List;Ljudavkodare
+Audio_No;Inget ljud
+Audio1;Första ljudströmmen
+Audio2;Andra ljudströmmen
+AudioComments;Ljudkommentarer
+AudioCount;Antal ljudströmmar
+AudioDescriptionPresent;Aktuell ljudbeskrivning
+AudioDescriptionType;Ljudbeskrivningstyp
+AudioLoudnessStandard;Ljudstyrkestandard
+AudioTrackLayout;Ljudspårslayout
+Author;Författare
+BarCode;Streckkod
+Basic;Enkel
+Basic_Note;OBS! För mer information om den här filen, måste du välja en annan vy (Lista, Träd...)
+BitDepth;Bitdjup
+BitDepth_Stored;Lagrat 
+BitRate;Dataflöde
+BitRate_Encoded;Kodat dataflöde
+BitRate_Maximum;Max. dataflöde
+BitRate_Minimum;Min. dataflöde
+BitRate_Mode;Dataflödesläge
+BitRate_Mode_CBR;Konstant
+BitRate_Mode_VBR;Variabelt
+BitRate_Nominal;Nominellt dataflöde
+Bits-(Pixel*Frame);Bitar/(Pixlar*bildruta)
+BufferSize;Buffertstorlek
+Cancel;Avbryt
+Channel(s);Kanal(er)
+ChannelPositions;Kanalpositioner
+Chapter(s);Kapitel
+Chapters;Kapitel
+Chapters stream(s);Kapitelströmm(ar)
+Chapters_Codec_List;Kapitelkodekar
+Chapters_No;Inga kapitel
+ChaptersCount;Antal kapitelströmmar
+CheckNewVersion;Sök efter ny version
+Choose custom;Anpassa
+Choose custom sheet;Välj en anpassad formatmall
+Choose custom text;Välj anpassad text
+Choose export format;Välj ett anpassat exportformat
+Choose file(s);Välj filer att öppna
+Choose filename;Välj önskat filnamn
+Choose language;Välj önskat språk
+Choregrapher;Koreograf
+Chroma;Kroma
+ChromaSubsampling;Kroma-delsampling
+Close;Stäng
+Close all before open;Stäng alla före öppna
+ClosedCaptionsLanguage;Undertextspråk
+ClosedCaptionsPresent;Tillgängliga undertexter
+ClosedCaptionsType;Undertexttyp
+Codec;Kodek
+Codec_Description;Kodekbeskrivning
+Codec_Info;Kodekdetaljer
+Codec_Profile;Kodekprofil
+Codec_Settings;Kodekinställningar
+Codec_Settings_BVOP;Kodekinställningar, BVOP
+Codec_Settings_CABAC;Kodekinställningar, CABAC
+Codec_Settings_Endianness;Kodekinställningar, Endianness
+Codec_Settings_Firm;Kodekinställningar, Firm
+Codec_Settings_Floor;Kodekinställningar, Floor
+Codec_Settings_GMC;Kodekinställningar, GMC
+Codec_Settings_ITU;Kodekinställningar, ITU
+Codec_Settings_Law;Kodekinställningar, Law
+Codec_Settings_Matrix;Kodekinställningar, Matrix
+Codec_Settings_PacketBitStream;Kodekinställningar, Packet bitstream
+Codec_Settings_QPel;Kodekinställningar, QPel
+Codec_Settings_Sign;Kodekinställningar, Sign
+Codec_Url;Webblänk till kodek
+CodecID;Kodek-ID
+CodecID_Description;Kodekbeskrivning
+CoDirector;Medregisör
+Collection;Samling
+Colorimetry;Kolorimetri
+ColorSpace;Färgrymd
+colour_primaries;Primärfärger
+colour_range;Färgskala
+Comment;Kommentar
+CommissionedBy;På uppdrag av
+Compilation;Kompilering
+CompleteName;Fullständigt namn
+CompletionDate;Färdigställd
+Composer;Kompositör
+Compression_Mode;Komprimeringsläge
+Compression_Mode_Lossless;Förlustfri
+Compression_Mode_Lossy;Förstörande
+Compression_Ratio;Komprimeringsförhållande
+Conductor;Dirigent
+ContactEmail;E-postkontakt
+ContactTelephoneNumber;Telefonkontakt
+Container and general information;Behållare och allmän information
+ContentType;Innehållstyp
+CoProducer;Medproducent
+Copyright;Copyright
+CopyrightYear;Copyright-år
+CostumeDesigner;Kostymdesigner
+Count;Antal
+Country;Land
+Cover;Omslag
+Cover_Datas;Omslagsinformation
+Cover_Description;Omslagsbeskrivning
+Cover_Mime;Omslagsformat
+Cover_Type;Omslagstyp
+Cropped;Beskärningsstorlek
+Custom;Anpassad
+Customize;Anpassa
+Date;Datum
+Debug;Felsök
+Decimal point;Decimalpunkt
+Delay;Fördröjning
+Delay_Source;Fördröjning, orig.
+Delay_Source_Container;Behållare
+Delay_Source_Stream;Raw ström
+Delete;Tabort
+Description;Beskrivning
+Digitized_Date;Digitaliseringsdatum
+Dimensions;Dimensioner
+Director;Regissör
+DirectorOfPhotography;Kamerachef
+DisplayAspectRatio;Skärmbildförhållande
+DisplayAspectRatio_CleanAperture;
+DisplayAspectRatio_Original;Ursprungligt skärmbildförhållande
+DistributedBy;Distribuerad av
+Distributor;Distributör
+Donate;Donera
+DotsPerInch;Punkter per inch
+Duration;Varaktighet
+Duration_End;Sluttid
+Duration_Start;Starttid
+Edit;Redigera
+EditedBy;Redigerad av
+EMail;E-post
+Encoded_Application;Skrivande program
+Encoded_Date;Kodningsdatum
+Encoded_Library;Skrivande bibliotek
+Encoded_Library_Settings;Kodningsinställningar
+Encoded_Original;Ursprungligt stöd
+EncodedBy;Kodad av
+EPG_Positions;EPG-positioner (interna)
+EpisodeTitleNumber;Episodnummer
+Error_File;Fel vid inläsning av fil
+ExecutiveProducer;Verkställande producent
+Exit;Avsluta
+Exit_Hint;Stäng programmet
+Export;Exportera
+Export_Hint;Exportera i ett anpassat format
+Extensions;Vanliga filändelser
+Family;Familj
+Fax;Fax
+File;Fil
+File size;Filstorlek
+File_Append;Lägg till i den befintliga filen (Varning! Använd samma parametrar!)
+File_Created_Date;Skapad
+File_Created_Date_Local;Skapad (lokalt)
+File_Hint;Välj en multimediafil
+File_Modified_Date;Senast ändrad
+File_Modified_Date_Local;Senast ändrad (lokalt)
+FileExtension;Filändelse
+FileName;Filnamn
+FileSize;Filstorlek
+Folder;Mapp
+Folder (R);Mapp (R)
+Folder (R)_Hint;Välj en mapp (med alla undermappar rekursivt)
+Folder (Recursively);Mapp (rekursivt)
+Folder_Hint;Välj en mapp
+FolderName;Mappnamn
+Format;Format
+Format_Commercial;Kommersiellt namn
+Format_Commercial_IfAny;Kommersiellt namn
+Format_Description;Formatbeskrivning
+Format_Info;Formatdetaljer
+Format_Profile;Formatprofil
+Format_Settings;Formatinställningar
+Format_Settings_BVOP;Formatinställningar, BVOP
+Format_Settings_CABAC;Formatinställningar, CABAC
+Format_Settings_Emphasis;Betoning
+Format_Settings_Endianness;Formatinställningar, Endianness
+Format_Settings_Firm;Formatinställningar, Firm
+Format_Settings_Floor;Formatinställningar, Floor
+Format_Settings_FrameMode;Bildruteläge
+Format_Settings_GMC;Formatinställningar, GMC
+Format_Settings_GOP;Formatinställningar, GOP
+Format_Settings_ITU;Formatinställningar, ITU
+Format_Settings_Law;Formatinställningar, LAW
+Format_Settings_Matrix;Formatinställningar, Matrix
+Format_Settings_Matrix_Custom;Anpassa
+Format_Settings_Matrix_Default;Standard
+Format_Settings_Mode;Läge
+Format_Settings_ModeExtension;Lägestillägg
+Format_Settings_PacketBitStream;Formatinställningar, Bitströmpaket
+Format_Settings_PictureStructure;Formatinställningar, Bildstruktur
+Format_Settings_PS;Formatinställningar, PS
+Format_Settings_Pulldown;Formatinställningar, Pulldown
+Format_Settings_QPel;Formatinställningar, QPel
+Format_Settings_RefFrames;Formatinställningar, ReFrames
+Format_Settings_SBR;Formatinställningar, SBR
+Format_Settings_Sign;Formatinställningar, Sign
+Format_Settings_Wrapping;Formatinställningar, Omslagsläge
+Format_Url;Webblänk för format
+Format_Version;Formatversion
+FpaManufacturer;FPA Tillverkare
+FpaPass;FPA Pass
+FpaVersion;FPA Version
+FrameCount;Antal bildrutor
+FrameRate;Bildfrekvens
+FrameRate_Maximum;Max. bildfrekvens
+FrameRate_Minimum;Min. bildfrekvens
+FrameRate_Mode;Bildfrekvensläge
+FrameRate_Mode_CFR;Konstant
+FrameRate_Mode_VFR;Variabelt
+FrameRate_Nominal;Nominell bildfrekvens
+FrameRate_Original;Ursprunglig bildfrekvens
+General;Allmänt
+Genre;Genre
+Genre_000;Blues
+Genre_001;Klassisk rock
+Genre_002;Country
+Genre_003;Dance
+Genre_004;Disco
+Genre_005;Funk
+Genre_006;Grunge
+Genre_007;Hip-Hop
+Genre_008;Jazz
+Genre_009;Metal
+Genre_010;New Age
+Genre_011;Oldies
+Genre_012;Annat
+Genre_013;Pop
+Genre_014;R&B
+Genre_015;Rap
+Genre_016;Reggae
+Genre_017;Rock
+Genre_018;Techno
+Genre_019;Industrial
+Genre_020;Alternative
+Genre_021;Ska
+Genre_022;Death Metal
+Genre_023;Pranks
+Genre_024;Soundtrack
+Genre_025;Euro-Techno
+Genre_026;Ambient
+Genre_027;Trip-Hop
+Genre_028;Vocal
+Genre_029;Jazz+Funk
+Genre_030;Fusion
+Genre_031;Trance
+Genre_032;Klassiskt
+Genre_033;Instrumental
+Genre_034;Acid
+Genre_035;House
+Genre_036;Game
+Genre_037;Sound Clip
+Genre_038;Gospel
+Genre_039;Noise
+Genre_040;Alt. Rock
+Genre_041;Bass
+Genre_042;Soul
+Genre_043;Punk
+Genre_044;Space
+Genre_045;Meditative
+Genre_046;Instrumental Pop
+Genre_047;Instrumental Rock
+Genre_048;Ethnic
+Genre_049;Gothic
+Genre_050;Darkwave
+Genre_051;Techno-Industrial
+Genre_052;Electronic
+Genre_053;Pop-Folk
+Genre_054;Eurodance
+Genre_055;Dream
+Genre_056;Sydstatsrock
+Genre_057;Comedy
+Genre_058;Cult
+Genre_059;Gangsta
+Genre_060;Top 40
+Genre_061;Kristen Rap
+Genre_062;Pop/Funk
+Genre_063;Jungle
+Genre_064;Native American
+Genre_065;Cabaret
+Genre_066;New Wave
+Genre_067;Psychadelic
+Genre_068;Rave
+Genre_069;Showtunes
+Genre_070;Trailer
+Genre_071;Lo-Fi
+Genre_072;Tribal
+Genre_073;Acid Punk
+Genre_074;Acid Jazz
+Genre_075;Polka
+Genre_076;Retro
+Genre_077;Musical
+Genre_078;Rock & Roll
+Genre_079;Hard Rock
+Genre_080;Folk
+Genre_081;Folkrock
+Genre_082;National Folk
+Genre_083;Swing
+Genre_084;Fast Fusion
+Genre_085;Bebob
+Genre_086;Latin
+Genre_087;Revival
+Genre_088;Celtic
+Genre_089;Bluegrass
+Genre_090;Avantgarde
+Genre_091;Gothic Rock
+Genre_092;Progressive Rock
+Genre_093;Psychedelic Rock
+Genre_094;Symphonic Rock
+Genre_095;Slow Rock
+Genre_096;Big Band
+Genre_097;Chorus
+Genre_098;Easy Listening
+Genre_099;Acoustic
+Genre_100;Humour
+Genre_101;Speech
+Genre_102;Chanson
+Genre_103;Opera
+Genre_104;Chamber Music
+Genre_105;Sonata
+Genre_106;Symphony
+Genre_107;Booty Bass
+Genre_108;Primus
+Genre_109;Porn Groove
+Genre_110;Satire
+Genre_111;Slow Jam
+Genre_112;Club
+Genre_113;Tango
+Genre_114;Samba
+Genre_115;Folklore
+Genre_116;Ballad
+Genre_117;Power Ballad
+Genre_118;Rhythmic Soul
+Genre_119;Freestyle
+Genre_120;Duet
+Genre_121;Punk Rock
+Genre_122;Drum Solo
+Genre_123;A capella
+Genre_124;Euro-House
+Genre_125;Dance Hall
+Genre_126;Goa
+Genre_127;Drum & Bass
+Genre_128;Club-House
+Genre_129;Hardcore
+Genre_130;Terror
+Genre_131;Indie
+Genre_132;Britpop
+Genre_133;Afropunk
+Genre_134;Polsk Punk
+Genre_135;Beat
+Genre_136;Christian Gangsta Rap
+Genre_137;Heavy Metal
+Genre_138;Black Metal
+Genre_139;Crossover
+Genre_140;Contemporary Christian
+Genre_141;Christian Rock
+Genre_142;Merengue
+Genre_143;Salsa
+Genre_144;Trash Metal
+Genre_145;Anime
+Genre_146;JPop
+Genre_147;Syntpop
+Genre_148;Abstrakt
+Genre_149;Konstrock
+Genre_150;Barock
+Genre_151;Bhangra
+Genre_152;Big Beat
+Genre_153;Breakbeat
+Genre_154;Chillout
+Genre_155;Nertempo
+Genre_156;Dubb
+Genre_157;EBM
+Genre_158;Eklektisk
+Genre_159;Elektro
+Genre_160;Electroclash
+Genre_161;Emo
+Genre_162;Experimentell
+Genre_163;Garage
+Genre_164;Global
+Genre_165;IDM
+Genre_166;Illbient
+Genre_167;Industri-goth
+Genre_168;Jam Band
+Genre_169;Krautrock
+Genre_170;Leftfield
+Genre_171;Lounge
+Genre_172;Math Rock
+Genre_173;Nyromantik
+Genre_174;Nu-Breakz
+Genre_175;Postpunk
+Genre_176;Postrock
+Genre_177;Psytrance
+Genre_178;Shoegaze
+Genre_179;Rymdrock
+Genre_180;Trop Rock
+Genre_181;Världsmusik
+Genre_182;Nyklassisk
+Genre_183;Ljudbok
+Genre_184;Radioteater
+Genre_185;Neue Deutsche Welle
+Genre_186;Podcast
+Genre_187;Indie rock
+Genre_188;G-funk
+Genre_189;Dubstep
+Genre_190;Garagerock
+Genre_191;Psybient
+Go to WebSite;Besök hemsidan
+Grouping;Gruppering
+Gop_OpenClosed;GOP, Öppen/Stängd
+Gop_OpenClosed_Open;Öppen
+Gop_OpenClosed_Closed;Stängd
+Gop_OpenClosed_FirstFrame;GOP, Öppen/Stängd av första bildrutan
+h;h
+Header file;Skapa en header-fil
+Height;Höjd
+Height_CleanAperture;
+Height_Original;Ursprunglig höjd
+Help;Hjälp
+Hint;Tips
+How many audio streams?;Hur många ljudströmmar?
+How many chapters streams?;Hur många kapitelströmmar
+How many text streams?;Hur många textströmmar
+How many video streams?;Hur många videoströmmar
+HTML;HTML
+ID;ID
+IdentClockStart;
+Image;Bild
+Image stream(s);Bildströmmar
+Image_Codec_List;Bildcodecs
+ImageCount;Antal bildströmmar
+Info;Info
+Instruments;Instrument
+Interlaced_BFF;Bottenfält först
+Interlaced_Interlaced;Sammanflätning
+Interlaced_PPF;Progressiv
+Interlaced_Progressive;Progressiv
+Interlaced_TFF;Toppfält först
+Interlacement;Sammanflätning
+Interleave_Duration;Interfoliera, varaktighet
+Interleave_Preload;Interfoliera, förladdad varaktighet
+Interleave_VideoFrames;Interfoliera, varaktighet
+Interleaved;Interfolierad
+InternetMediaType;Internetmediatyp
+IRCA;IRCA
+ISBN;ISBN
+ISRC;ISRC
+Keywords;Nyckelord
+Known codecs;Kända kodekar
+Known formats;Kända format
+Known parameters;Kända parametrar
+Label;Etikett
+Language;Språk
+Language_aa;Afar
+Language_ab;Abkhazian
+Language_ae;Avestan
+Language_af;Afrikaans
+Language_ak;Akan
+Language_am;Amharic
+Language_an;Aragonese
+Language_ar;Arabic
+Language_as;Assamese
+Language_av;Avaric
+Language_ay;Aymara
+Language_az;Azerbaijani
+Language_ba;Bashkir
+Language_be;Belarusian
+Language_bg;Bulgariska
+Language_bh;Bihari
+Language_bi;Bislama
+Language_bm;Bambara
+Language_bn;Bengali
+Language_bo;Tibetan
+Language_br;Breton
+Language_bs;Bosniska
+Language_ca;Catalan
+Language_ce;Chechen
+Language_ch;Chamorro
+Language_co;Corsican
+Language_cr;Cree
+Language_cs;Tjeckiska
+Language_cu;Slave
+Language_cv;Chuvash
+Language_cy;Welsh
+Language_da;Danska
+Language_de;Tyska
+Language_dv;Divehi
+Language_dz;Dzongkha
+Language_ee;Ewe
+Language_el;Grekiska
+Language_en;Engelska
+Language_en-gb;Engelska (GB)
+Language_en-us;Engelska (USA)
+Language_eo;Esperanto
+Language_es;Spanska
+Language_et;Estniska
+Language_eu;Baskiska
+Language_fa;Persiska
+Language_ff;Fulah
+Language_fi;Finska
+Language_fj;Fijian
+Language_fo;Faroese
+Language_fr;Franska
+Language_fy;Frisian
+Language_ga;Irländska
+Language_gd;Gaelic
+Language_gl;Galician
+Language_gn;Guarani
+Language_gu;Gujarati
+Language_gv;Manx
+Language_ha;Hausa
+Language_he;Hebrew
+Language_hi;Hindi
+Language_ho;Hiri Motu
+Language_hr;Kroatiska
+Language_ht;Haitian
+Language_hu;Ungerska
+Language_hy;Armenian
+Language_hz;Herero
+Language_ia;Behjälplig språkassociation
+Language_id;Indonesiska
+Language_ie;Interlingue
+Language_ig;Igbo
+Language_ii;Sichuan Yi
+Language_ik;Inupiaq
+Language_Info;Språkinformation
+Language_io;Ido
+Language_is;Isländska
+Language_it;Italienska
+Language_iu;Inuktitut
+Language_ja;Japanska
+Language_jv;Javanese
+Language_ka;Georgian
+Language_kg;Kongo
+Language_ki;Kikuyu
+Language_kj;Kuanyama
+Language_kk;Kazakh
+Language_kl;Kalaallisut
+Language_km;Khmer
+Language_kn;Kannada
+Language_ko;Koreanska
+Language_kr;Kanuri
+Language_ks;Kashmiri
+Language_ku;Kurdish
+Language_kv;Komi
+Language_kw;Cornish
+Language_ky;Kirghiz
+Language_la;Latinska
+Language_lb;Luxembourgish
+Language_lg;Ganda
+Language_li;Limburgish
+Language_ln;Lingala
+Language_lo;Lao
+Language_lt;Lithuanian
+Language_lu;Luba-Katanga
+Language_lv;Latvian
+Language_mg;Malagasy
+Language_mh;Marshallese
+Language_mi;Maori
+Language_mk;Macedonian
+Language_ml;Malayalam
+Language_mn;Mongolian
+Language_mo;Moldavian
+Language_More;Språk, mer info
+Language_mr;Marathi
+Language_ms;Malay
+Language_mt;Maltese
+Language_mul;Multipla språk
+Language_my;Burmese
+Language_na;Nauru
+Language_nb;Norska Bokmal
+Language_nd;Ndebele
+Language_ne;Nepali
+Language_ng;Ndonga
+Language_nl;Nederländska
+Language_nn;Norska Bokmal
+Language_no;Norska
+Language_nr;Ndebele
+Language_nv;Navaho
+Language_ny;Nyanja
+Language_oc;Occitan
+Language_oj;Ojibwa
+Language_om;Oromo
+Language_or;Oriya
+Language_os;Ossetic
+Language_pa;Panjabi
+Language_pi;Pali
+Language_pl;Polska
+Language_ps;Pushto
+Language_pt;Portugisiska
+Language_pt-br;Portugisiska (Brasilien)
+Language_qu;Quechua
+Language_rm;Raeto-Romance
+Language_rn;Rundi
+Language_ro;Romäniska
+Language_ru;Ryska
+Language_rw;Kinyarwanda
+Language_sa;Sanskrit
+Language_sc;Sardinian
+Language_sd;Sindhi
+Language_se;Northern Sami
+Language_sg;Sango
+Language_si;Sinhala
+Language_sk;Slovak
+Language_sl;Slovenska
+Language_sm;Samoan
+Language_sn;Shona
+Language_so;Somali
+Language_sq;Albanska
+Language_sr;Serbiska
+Language_ss;Swati
+Language_st;Sotho
+Language_su;Sundanese
+Language_sv;Svenska
+Language_sw;Swahili
+Language_ta;Tamil
+Language_te;Telugu
+Language_tg;Tajik
+Language_th;Thai
+Language_ti;Tigrinya
+Language_tk;Turkmen
+Language_tl;Tagalog
+Language_tn;Tswana
+Language_to;Tonga
+Language_tr;Turkiska
+Language_ts;Tsonga
+Language_tt;Tatar
+Language_tw;Twi
+Language_ty;Tahitian
+Language_ug;Uighur
+Language_uk;Ukrainska
+Language_ur;Urdu
+Language_uz;Uzbek
+Language_ve;Venda
+Language_vi;Vietnamesiska
+Language_vo;Volapuk
+Language_wa;Walloon
+Language_wo;Wolof
+Language_xh;Xhosa
+Language_yi;Yiddish
+Language_yo;Yoruba
+Language_za;Zhuang
+Language_zh;Kinesiska
+Language_zh-cn;Kinesiska (Kina)
+Language_zh-tw;Kinesiska (Taiwan)
+Language_zu;Zulu
+LawRating;Åldersgräns
+LCCN;LCCN
+Library;Muxningsbibliotek
+Lightness;Ljus
+LineUpStart;
+List;Lista
+Lyricist;Texter från
+Lyrics;Texter
+Mastered_Date;Master-datum
+MasteredBy;Mastrad av
+Matrix_Channel(s);Matriskodning
+Matrix_ChannelPositions;Matriskodning, kanalpositioner
+matrix_coefficients;Matriskoefficienter
+Matrix_Format;Matriskodning, format
+MediaInfo_About;MediaInfo tillhandahåller enkel tillgång till teknisk information, och tagginformation, om video- och ljudfiler.\r\nFörutom Mac App Stores grafiska användargränsnitt, är mjukvaran öppen källkod. Det innebär att den är kostnadsfri för slutanvändaren och att andra utvecklare tillåts studera, förbättra och återdistribuera programmet (BSD-licens).
+Menu;Meny
+Menu stream(s);Menyströmmar
+Menu_Codec_List;Menykodekar
+Menu_Hint;Fler möjligheter
+Menu_No;Ingen meny
+MenuCount;Antal menyströmmar
+MenuID;Meny-ID
 mn; min
-Mood; Humör
-More; Mer
-Movie; filmnamn
+Mood;Läge
+More;Mer
+Movie;Filmnamn
 ms; ms
-MSDI; MSDI
-MusicBy;
-MuxingMode;
-MuxingMode_MoreInfo;
-MuxingMode_PackedBitstream;
-Name; Namn
-Nationality; Nationalitet
-NetworkName;
-New; Ny
-Newest version; Sök efter nyare version (kräver Internetanslutning)
-NewVersion_Menu;
-NewVersion_Question_Title;
-NewVersion_Question_Content;
-No; Nej
-Not yet;
-NumColors;
-OK; OK
-One output file per input file; En utdatafil per indatafil
-Open; Öppna
-OpenCandy_01;
-OpenCandy_02;
-OpenCandy_03;
-OpenCandy_04;
-OpenCandy_05;
-OpenCandy_06;
-OpenCandy_07;
-OpenCandy_08;
-OpenCandy_09;
-OpenCandy_10;
-OpenCandy_11;
-OpenCandy_12;
-OpenCandy_13;
-OpenCandy_14;
-OpenCandy_15;
-OpenCandy_16;
-OpenCandy_17;
-OpenCandy_18;
-OpenCandy_19;
-OpenCandy_20;
-OpenCandy_21;
-OpenCandy_22;
-OpenCandy_23;
-OpenCandy_24;
-OpenCandy_25;
-OpenCandy_26;
-OpenCandy_27;
-OpenCandy_28;
-OpenCandy_29;
-OpenCandy_30;
-OpenCandy_31;
-OpenCandy_32;
-OpenCandy_33;
-OpenCandy_34;
-OpenCandy_35;
-OpenCandy_36;
-Options; Alternativ
-Options_Hint; Inställningar
-Original; Original
-OriginalNetworkName;
-OriginalSourceForm;
-OriginalSourceMedium;
-Other; Övrigt
-Output; Utdata
-Output format; Utdataformat
-OverallBitRate; Generell Bitrate
-OverallBitRate_Maximum;
-OverallBitRate_Minimum;
-OverallBitRate_Mode;
-OverallBitRate_Nominal;
-Part; Del
-Part_Count; Antal delar
-Performer; Framträdare
-Period; Period
-Phone; Telefon
-PixelAspectRatio; Pixelförhållande
-PixelAspectRatio_Original; Pixelförhållande
-PlayCounter; Spelräknare
-Played_Count;
-Played_First_Date;
-Played_Last_Date;
-PlayTime; Speltid
-Position; Position
-Position_Total;
-Preferences; Inställningar
-Producer; Producent
-ProductionDesigner; Produktionsdesigner
-ProductionStudio; Produktionsstudio
-Publisher; Utgivare
-Purchased_Date; Inköpsdatum
-Quote character; Citationstecken
-RadioStation; Radiokanal
-Rating; Betyg
-Recorded_Date; Inspelningsdatum
-Recorded_Location; Inspelningsort
-Released_Date; Releasedatum
-RemixedBy; Remixad av
-ReplayGain_Gain;
-ReplayGain_Peak;
-Resolution; Upplösning
-s; s
-SamplingRate; Samplingstakt
-Save; Spara
-ScanType;
-ScanType_Original;
-ScanType_StoreMethod;
-ScanOrder;
-ScanOrder_Original;
-ScanOrder_Stored;
-ScanOrder_StoredDisplayedInverted;
-ScanOrder_StoreMethod;
-ScreenplayBy; Framträdande av
-Season; Säsong
-see below; se nedan
-Send HeaderFile;
-Separator_Columns; columnseparator
-Separator_Lines; linjeseparator
-ServiceChannel;
-ServiceName;
-ServiceProvider;
-ServiceType;
-Set; Set
-Set_Count; Antal set
-Setup; Ställ in
-Sharpness;
-Sheet; Tabell
-Sheet (Complete); Tabell (Komplett)
-Shell extension; Shell extension (högerklicka i explorer så kommer ett Media Info alternativ...)
-Shell extension, folder;
-Shell InfoTip;
-Show menu; Visa meny
-Show toolbar; Visa verktygsfält
-Sort; Sorterad av
-SamplingCount;
-SoundEngineer; Ljudingenjör
-Source;
-Source_Duration;
-Source_FrameCount;
-Source_SamplingCount;
-Source_StreamSize;
-Source_StreamSize_Encoded;
-Standard;
-StoreMethod_InterleavedFields;
-StoreMethod_SeparatedFields;
-StoreMethod_SeparatedFields_1;
-StoreMethod_SeparatedFields_2;
-Stream; Ström
-Stream_MoreInfo; Mer information om strömmen
-StreamCount; Antal strömmar av den här typen
-StreamID; Ström-ID
-StreamKind; Strömtyp
-StreamKindID;
-StreamKindPos;
-StreamSize;
-StreamSize_Encoded;
-StreamSize_Proportion;
-Subject; Innehåll
-SubTrack; Underspår
-Summary; Sammanfattning
-Supported formats; Stödda format
-Supported?; Stött?
-Synopsis; Sammanfattning
-SystemId; Id
-Tagged_Application;
-Tagged_Date; Taggingdatum
-Technician; Tekniker
-TermsOfUse; Användarvillkor
-Text; Text
-Text - Custom; Text - Anpassad
-Text (HTML); Text (HTML)
-Text stream(s); Text strömm(ar)
-Text streams; Text strömmar
-Text_Codec_List; Text codecs
-Text_No; Ingen text
-Text1; Första textströmmen
-Text2; Andra textströmmen
-Text3; Trejde textströmmen
-TextCount; Antal textströmmar
-ThanksTo; Tack till
-Thousands separator; Tusentalsseparator
-Title; titel
-Title_More; Title, mer info
-TimeCode;
-TimeCode_FirstFrame;
-TimeCode_Settings;
-TimeCode_Source;
-TimeStamp;
-TimeZone;
-Total; Totalt
-Track; Spårnamn
-Track_Count; Antal spår
-transfer_characteristics;
-Translator; Översättare
-Tree; Träd
-Tree & Text; Träd & Text
-Type;
-UniqueID;
-Unknown; Okänd
-Url; Url
-Video; Video
-Video stream(s); Videoströmm(ar)
-Video_Codec_List; Videocodecs
-Video_Delay; Video fördröjning
-Video_No; Ingen video
-Video0_Delay; Video0 fördröjning
-Video1; Första videoströmmen
-VideoCount; Antal videoströmmar
-View; Vy
-View_Hint; Ändra hur informationen skall visas
-Warning : more streams in the files; Varning : det finns fler strömmar i filerna!
-Web; Web
-WebSite_Audio; Gå till hemsidan för detta audiocodec
-WebSite_Audio_More; Gå till denna sida (%Url%) för att hitta passande audiocodec
-WebSite_General; Gå till hemsidan till en spelare som klarar detta codec
-WebSite_General_More; Gå till denna sida (%Url%) för att hitta passande spelare
-WebSite_Text; Gå till hemsidan för detta textcodec
-WebSite_Text_More; Gå till denna sida (%Url%) för att hitta passande textcodec
-WebSite_Url; http://MediaArea.net/MediaInfo
-WebSite_Video; Gå till hemsidan för detta videocodec
-WebSite_Video_More; Gå till denna sida (%Url%) för att hitta passande videocodec
-Width; Bredd
-Width_Original;
-WriteMe; Maila mig
-WriteToTranslator; Maila översättaren
-Written_Date; Datum
-Written_Location; Ort
-WrittenBy; Skrivet av
-Yes; Ja
-Your system; Ditt system
-ZZ_Automatic_Percent;71
-ZZ_AutomaticLanguage_Percent;80
+MSDI;MSDI
+MusicBy;Musik av
+MuxingMode;Muxningsläge
+MuxingMode_MoreInfo;Muxningsläge, mer info
+MuxingMode_PackedBitstream;Paketerad bitström
+Name;Namn
+Nationality;Nationalitet
+NetworkName;Nätverksnamn
+New;Ny
+Newest version;Sök efter nyare version (kräver Internetanslutning)
+NewVersion_Menu;Ny version finns tillgänglig
+NewVersion_Question_Content;En ny version (v%Version%) finns tillgänglig. Vill du ladda ner den?
+NewVersion_Question_Title;En ny version har släppts!
+No;Nej
+Not yet;Inte än
+NumColors;Antal färger
+OK;OK
+One output file per input file;En utdatafil per indatafil
+Open;Öppna
+OpenCandy_01;Laddar ner________
+OpenCandy_02;__% klart
+OpenCandy_03;Internetanslutningen bröts
+OpenCandy_04;________ nedladdning klar
+OpenCandy_05;Klicka för att installera ________
+OpenCandy_06;"Vill du verkligen avbryta installationen?\r\nVälj ""Nej"" om du vill skjuta upp installationen till senare.\r\nNotera: Du kan välja ""Avsluta"", om du vill fördröja installationen till efter nästa omstart."
+OpenCandy_07;Nedladdningen av _________ har pausats.\r\nKlicka på meddelandefältsikonen för att fortsätta.
+OpenCandy_08;Ett allvarligt fel har uppstått. Installationen av _________ kommer att avbrytas.
+OpenCandy_09;Pausa nedladdningen
+OpenCandy_10;Avbryt installationen
+OpenCandy_11;Återuppta nedladdningen
+OpenCandy_12;Avsluta installeraren
+OpenCandy_13;___________ - Rekommenderas av ___________
+OpenCandy_14;Laddar ner ___________
+OpenCandy_15;___________, programmet som rekommenderas av ___________, laddas nu ner på din begäran. Vi meddelar när det är klart att installeras.
+OpenCandy_16;___________ är klart för installation
+OpenCandy_17;"___________ är nu nerladdat. Klicka på ""Installera"" för att fortsätta."
+OpenCandy_18;___________ av ___________ nedladdat
+OpenCandy_19;Levererat av OpenCandy
+OpenCandy_20;Läs mer på OpenCandy.com
+OpenCandy_21;Installera
+OpenCandy_22;Installation av ___________
+OpenCandy_23;Detta kommer att avbryta installationen av ___________\r\nVill du verkligen avbryta?
+OpenCandy_24;Pausa
+OpenCandy_25;"Nedladdningen har pausats. Klicka på ""Fortsätt"" när du är färdig att fortsätta."
+OpenCandy_26;Fortsätt
+OpenCandy_27;Installera nu
+OpenCandy_28;Pausa nedladdningen
+OpenCandy_29;Återuppta nedladdningen
+OpenCandy_30;Avbryt installationen
+OpenCandy_31;Välj ett installationsalternativ
+OpenCandy_32;Installera 
+OpenCandy_33;Installera inte
+OpenCandy_34;Välj en installation
+OpenCandy_35;______ rekommenderar detta program
+OpenCandy_36;Din nuvarande installation kommer inte att störas.
+OpenCaptionsLanguage;Öppet textspråk
+OpenCaptionsPresent;Aktuella öppna texter
+OpenCaptionsType;Öppen texttyp
+Options;Alternativ
+Options_Hint;Inställningar
+Original;Original
+OriginalNetworkName;Ursprungligt nätverksnam
+OriginalSourceForm;Ursprunglig källform
+OriginalSourceMedium;Ursprungligt källmedium
+Originator;Upphovsman
+Other;Annat
+OtherIdentifier;Annan identifierare
+OtherIdentifierType;Annan identifieringstyp
+Output;Utdata
+Output format;Utdataformat
+OverallBitRate;Sammanlagt dataflöde
+OverallBitRate_Maximum;Max. sammanlagt dataflöde
+OverallBitRate_Minimum;Min. sammanlagt dataflöde
+OverallBitRate_Mode;Sammanlagt dataflödesläge
+OverallBitRate_Nominal;Nominellt sammanlagt dataflöde
+Part;Del
+Part_Count;Totalt antal
+PartNumber;Delnummer
+PartTotal;Antal delar
+Performer;Artist
+Period;Period
+Phone;Telefon
+PictureRatio;Bildförhållande
+PixelAspectRatio;Pixelförhållande
+PixelAspectRatio_CleanAperture;
+PixelAspectRatio_Original;Ursprungligt pixelförhållande
+PlayCounter;Spelräknare
+Played_Count;Spelad
+Played_First_Date;Spelades först
+Played_Last_Date;Spelades senast
+PlayTime;Speltid
+Position;Position
+Position_Total;Totalt
+Preferences;Inställningar
+PrimaryAudioLanguage;Primärt ljudspråk
+Producer;Producent
+ProductionDesigner;Produktionsdesigner
+ProductionNumber;Produktionsnummer
+ProductionStudio;Produktionsstudio
+ProductPlacement;Produktplacering
+ProgrammeHasText;Programmet har text
+ProgrammeTextLanguage;Textspråk
+ProgrammeTitle;Programtitel
+Publisher;Utgivare
+Purchased_Date;Inköpsdatum
+Quote character;Citationstecken
+RadioStation;Radiokanal
+Rating;Betyg
+Recorded_Date;Inspelningsdatum
+Recorded_Location;Inspelningsort
+Released_Date;Publiceringsdatum
+RemixedBy;Remix av
+ReplayGain_Gain;Replay gain
+ReplayGain_Peak;Replay gain peak
+Resolution;Upplösning
+s; sek
+SamplingCount;Antal samplingar
+SamplingRate;Samplingsfrekvens
+Save;Spara
+ScanOrder;Skannordning
+ScanOrder_Original;Ursprunglig skannordning
+ScanOrder_Stored;Lagrad skannordning
+ScanOrder_StoredDisplayedInverted;Skannordning, inverterad lagrings-/visningsordning
+ScanOrder_StoreMethod;Skanningsordning, lagringsmetod
+ScanType;Skanningstyp
+ScanType_Original;Ursprunglig skanningstyp
+ScanType_StoreMethod;Skanningsordning, lagringsmetod
+ScreenplayBy;Framträdande av
+Season;Säsong
+SecondaryAudioLanguage;Sekundärt ljudspråk
+see below;Se nedan
+Send HeaderFile;Skicka header-filen här: http://sourceforge.net/projects/mediainfo/ (Tickets>Bugs)
+Separator_Columns;Kolumnseparator
+Separator_Lines;Linjeseparator
+SeriesTitle;Seriestitel
+ServiceChannel;Kanalnummer
+ServiceName;Tjänstnamn
+ServiceProvider;Tjänstleverantör
+ServiceType;Tjänsttyp
+Set;Uppsättning
+Set_Count;Antal uppsättningar
+Setup;Inställningar
+Sharpness;Skärpa
+Sheet;Lista
+Sheet (Complete);Lista (Komplett)
+Shell extension;Kontextmeny (Högerklicka i på en fil i Utforskaren, så visas ett MediaInfo-alternativ)
+Shell extension, folder;Även för mappar
+Shell InfoTip;Knappbeskrivning (Hovra över en fil i Utforskaren, så visas information)
+ShimName;Shim-namn
+ShimVersion;Shim-version
+Show menu;Visa meny
+Show toolbar;Visa verktygsfält
+SigningPresent;Signaturer
+SignLanguage;Signaturspråk
+Sort;Sorterad av
+SoundEngineer;Ljudingenjör
+Source;Källa
+Source_Duration;Källans varaktighet
+Source_FrameCount;Källans bildfrekvens
+Source_SamplingCount;Källans samplingsfrekvens
+Source_StreamSize;Källans strömstorlek
+Source_StreamSize_Encoded;Källans kodade strömstorlek
+Standard;Standard
+StoreMethod_InterleavedFields;Interfolierade fält
+StoreMethod_SeparatedFields;Separerade fält
+StoreMethod_SeparatedFields_1;Separerade fält (1 fält per block)
+StoreMethod_SeparatedFields_2;Separerade fält (2 fält per block)
+Stream;Ström
+Stream_MoreInfo;Mer information om strömmen
+StreamCount;Antal strömmar av den här typen
+StreamID;Ström-ID
+StreamKind;Strömtyp
+StreamKindID;Strömidentifierare
+StreamKindPos;Strömidentifierare
+StreamSize;Strömstorlek
+StreamSize_Encoded;Kodad strömstorlek
+StreamSize_Proportion;Strömproportioner
+Subject;Ämne
+SubTrack;Underspår
+Summary;Sammanfattning
+Supported formats;Format som stöds
+Supported?;Stöd?
+Synopsis;Sammandrag
+SystemId;Id
+Tagged_Application;Taggningsprogram
+Tagged_Date;Taggingsdatum
+Technician;Tekniker
+TermsOfUse;Användarvillkor
+TertiaryAudioLanguage;Tertiärt ljudspråk
+Text;Text
+Text - Custom;Text - Anpassad
+Text (HTML);Text (HTML)
+Text stream(s);Text strömm(ar)
+Text streams;Text strömmar
+Text_Codec_List;Textkodekar
+Text_No;Ingen text
+Text1;Första textströmmen
+Text2;Andra textströmmen
+Text3;Trejde textströmmen
+TextCount;Antal textströmmar
+TextlessElementsExist;Textlösa element förekommer
+ThanksTo;Tack till
+Thousands separator;Tusentalseparator
+TimeCode;Tidskod
+TimeCode_FirstFrame;Tidskod för första bildrutan
+TimeCode_Settings;Tidskodinställningar
+TimeCode_Source;Tidskodskälla
+TimeCode_Striped;Tidskod, förinspelad
+TimeStamp;Tidsstämpel
+TimeZone;Tidszon
+Title;Ttitel
+Title_More;Title, mer info
+Total;Totalt
+TotalNumberOfParts;Totalt antal delar
+TotalProgrammeDuration;Totalt programvaraktighet
+Track;Spårnamn
+Track_Count;Antal spår
+transfer_characteristics;Överföringsegenskaper
+Translator;Översättare
+Tree;Träd
+Tree & Text;Träd & Text
+Type;Typ
+UniqueID;Unikt ID
+Unknown;Okänd
+Url;URL
+Video;Video
+Video stream(s);Videoströmm(ar)
+Video_Codec_List;Videokodekar
+Video_Delay;Fördröjning relativt video
+Video_No;Ingen video
+Video0_Delay;Video0-fördröjning
+Video1;Första videoströmmen
+VideoComments;Videokommentarer
+VideoCount;Antal videoströmmar
+View;Visa
+View_Hint;Ändra hur informationen skall visas
+Warning : more streams in the files;Varning! Det finns fler strömmar i filerna!
+Web;Webb
+WebSite_Audio;Gå till hemsidan för denna ljudkodek
+WebSite_Audio_More;Gå till webbsidan (%Url%) för att hitta denna ljudkodek
+WebSite_General;Gå till webbsidan för en spelare till denna fil
+WebSite_General_More;Gå till denna sida (%Url%) för att hitta passande spelare
+WebSite_Text;Gå till webbsidan för denna textkodek
+WebSite_Text_More;Gå till denna sida (%Url%) för att hitta denna textkodek
+WebSite_Url;http://MediaArea.net/MediaInfo
+WebSite_Video;Gå till webbsidan för denna videokodec
+WebSite_Video_More;Gå till webbsidan (%Url%) för att hitta denna videokodek
+Width;Bredd
+Width_CleanAperture;
+Width_Original;Ursprunglig bredd
+WriteMe;Kontakta utvecklaren
+WriteToTranslator;Kontakta översättaren
+Written_Date;Datum
+Written_Location;Ort
+WrittenBy;Skrivet av
+Yes;Ja
+Your system;Ditt system
+ZZ_Automatic_Percent;99
+ZZ_AutomaticLanguage_Percent;99

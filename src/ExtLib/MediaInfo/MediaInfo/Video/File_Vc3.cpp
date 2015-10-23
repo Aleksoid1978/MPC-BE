@@ -255,7 +255,7 @@ const char* Vc3_CLR_FromCID (int32u CompressionID)
 const char* Vc3_SSC[2]=
 {
     "4:2:2",
-    "", // 4:4:4
+    "4:4:4",
 };
 
 //---------------------------------------------------------------------------
@@ -339,7 +339,8 @@ void File_Vc3::Streams_Fill()
             Fill(Stream_Video, 0, Video_BitDepth, Vc3_SBD_FromCID(CID));
         Fill(Stream_Video, 0, Video_ScanType, Vc3_SST_FromCID(CID));
         Fill(Stream_Video, 0, Video_ColorSpace, Vc3_CLR_FromCID(CID));
-        Fill(Stream_Video, 0, Video_ChromaSubsampling, Vc3_SSC_FromCID(CID));
+        if (!strcmp(Vc3_CLR_FromCID(CID), "YUV")) // YUV
+            Fill(Stream_Video, 0, Video_ChromaSubsampling, Vc3_SSC_FromCID(CID));
     }
     else
     {
@@ -347,8 +348,9 @@ void File_Vc3::Streams_Fill()
         Fill(Stream_Video, 0, Video_Height, ALPF*(SST?2:1));
         Fill(Stream_Video, 0, Video_BitDepth, Vc3_SBD(SBD));
         Fill(Stream_Video, 0, Video_ScanType, Vc3_SST[SST]);
-        Fill(Stream_Video, 0, Video_ColorSpace, Vc3_CLR[SSC]);
-        Fill(Stream_Video, 0, Video_ChromaSubsampling, Vc3_SSC[CLR]);
+        Fill(Stream_Video, 0, Video_ColorSpace, Vc3_CLR[CLR]);
+        if (CLR==0) // YUV
+            Fill(Stream_Video, 0, Video_ChromaSubsampling, Vc3_SSC[SSC]);
     }
     if (FFC_FirstFrame!=(int8u)-1)
         Fill(Stream_Video, 0, Video_ScanOrder, Vc3_FFC_ScanOrder[FFC_FirstFrame]);

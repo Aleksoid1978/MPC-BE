@@ -1920,6 +1920,7 @@ bool File_Mpegv::Demux_UnpacketizeContainer_Test()
             if (Config->Demux_EventWasSent)
                 return false;
             File_Mpegv* MI=new File_Mpegv;
+            Element_Code=(int64u)-1;
             Open_Buffer_Init(MI);
             Open_Buffer_Continue(MI, Buffer, Buffer_Size);
             bool IsOk=MI->Status[IsAccepted];

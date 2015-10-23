@@ -306,6 +306,8 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
         case Stream_Video:
                             switch (Parameter)
                             {
+                                case Video_Width:   if (IsRawStream) Fill(Stream_Video, StreamPos, Video_Sampled_Width, Value); break;
+                                case Video_Height:  if (IsRawStream) Fill(Stream_Video, StreamPos, Video_Sampled_Height, Value); break;
                                 case Video_DisplayAspectRatio:  DisplayAspectRatio_Fill(Value, Stream_Video, StreamPos, Video_Width, Video_Height, Video_PixelAspectRatio, Video_DisplayAspectRatio); break;
                                 case Video_PixelAspectRatio:    PixelAspectRatio_Fill(Value, Stream_Video, StreamPos, Video_Width, Video_Height, Video_PixelAspectRatio, Video_DisplayAspectRatio);   break;
                                 case Video_DisplayAspectRatio_CleanAperture:  DisplayAspectRatio_Fill(Value, Stream_Video, StreamPos, Video_Width_CleanAperture, Video_Height_CleanAperture, Video_PixelAspectRatio_CleanAperture, Video_DisplayAspectRatio_CleanAperture); break;
@@ -418,7 +420,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
             (*Stream)[Stream_General][0](General_Codec_Settings)=Value;
 
         //Codec
-        if (Parameter==Fill_Parameter(StreamKind, Generic_Codec))
+        if (Parameter==Fill_Parameter(StreamKind, Generic_Codec) && MediaInfoLib::Config.Legacy_Get())
         {
             const Ztring &C1=MediaInfoLib::Config.Codec_Get(Retrieve(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Codec)), InfoCodec_Name, (stream_t)StreamKind);
             if (C1.empty())

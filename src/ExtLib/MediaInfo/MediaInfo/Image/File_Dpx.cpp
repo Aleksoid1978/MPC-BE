@@ -300,6 +300,66 @@ enum Elements
 };
 
 //***************************************************************************
+// Helpers
+//***************************************************************************
+
+//
+string DPX_DateTime2Iso(const string &FromDpx)
+{
+    if (FromDpx.size()<20
+     || FromDpx[ 0]<'0' || FromDpx[ 0]>'9'
+     || FromDpx[ 1]<'0' || FromDpx[ 1]>'9'
+     || FromDpx[ 2]<'0' || FromDpx[ 2]>'9'
+     || FromDpx[ 3]<'0' || FromDpx[ 3]>'9'
+     || FromDpx[ 4] != ':'
+     || FromDpx[ 5]<'0' || FromDpx[ 5]>'9'
+     || FromDpx[ 6]<'0' || FromDpx[ 6]>'9'
+     || FromDpx[ 7] != ':'
+     || FromDpx[ 8]<'0' || FromDpx[ 8]>'9'
+     || FromDpx[ 9]<'0' || FromDpx[ 9]>'9'
+     || FromDpx[10] != ':'
+     || FromDpx[11]<'0' || FromDpx[11]>'9'
+     || FromDpx[12]<'0' || FromDpx[12]>'9'
+     || FromDpx[13] != ':'
+     || FromDpx[14]<'0' || FromDpx[14]>'9'
+     || FromDpx[15]<'0' || FromDpx[15]>'9'
+     || FromDpx[16] != ':'
+     || FromDpx[17]<'0' || FromDpx[17]>'9'
+     || FromDpx[18]<'0' || FromDpx[18]>'9'
+     )
+        return FromDpx; //Invalid, returning the value in the file
+
+    // Date/Time
+    string ToReturn(FromDpx.substr(0, 19));
+    ToReturn[ 4]='-';
+    ToReturn[ 7]='-';
+    ToReturn[10]='T'; // Note: should be 'T' (ISO 8601), TODO: change to 'T' during next API change
+
+    // Time zone
+    if (FromDpx.size()>20)
+    {
+        size_t Offset;
+        if (FromDpx[19]==':') // Note: Cineon and DPX v1 header date/time format is with ":LTZ", DPX v2 date/time format is "LTZ", but both are atually seen in any version. Always testing both.
+            Offset=20;
+        else
+            Offset=19;
+
+        size_t Max=FromDpx.find('\0');
+        if (Max==(size_t)-1)
+            Max=FromDpx.size();
+
+        ToReturn+=FromDpx.substr(Offset, Max-Offset);
+                
+        if (ToReturn.size()>22)
+            ToReturn.insert(ToReturn.begin(), ':'); //Hours/Minutes offset sepearator added
+        else if (ToReturn.size()==22 && (ToReturn[19]=='+' || ToReturn[19]=='-'))
+            ToReturn+=":00"; // Minutes offset, default
+    }
+
+    return ToReturn; 
+}
+
+//***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
 
@@ -473,7 +533,7 @@ void File_Dpx::GenericSectionHeader_Cineon()
 
     //Parsing
     Element_Begin1("File information");
-    Ztring CreationDate, CreationTime;
+    string CreationDate, CreationTime;
     string Version;
     int32u Size_Header, Size_Total, Size_Generic, Size_Industry, Size_User;
     Skip_B4(                                                    "Magic number");
@@ -484,8 +544,8 @@ void File_Dpx::GenericSectionHeader_Cineon()
     Get_X4 (Size_Total,                                         "Total image file size");
     Get_String(8, Version,                                      "Version number of header format");
     Skip_UTF8  (100,                                            "FileName");
-    Get_UTF8   (12,  CreationDate,                              "Creation Date");
-    Get_UTF8   (12,  CreationTime,                              "Creation Time");
+    Get_String (12,  CreationDate,                              "Creation Date");
+    Get_String (12,  CreationTime,                              "Creation Time");
     Skip_XX(36,                                                 "Reserved for future use");
     Element_End0();
 
@@ -525,8 +585,8 @@ void File_Dpx::GenericSectionHeader_Cineon()
     Skip_B4(                                                    "X offset");
     Skip_B4(                                                    "Y offset");
     Skip_UTF8  (100,                                            "FileName");
-    Get_UTF8   (12,  CreationDate,                              "Creation Date");
-    Get_UTF8   (12,  CreationTime,                              "Creation Time");
+    Get_String (12,  CreationDate,                              "Creation Date");
+    Get_String (12,  CreationTime,                              "Creation Time");
     Skip_UTF8(64,                                               "Input device");
     Skip_UTF8(32,                                               "Input device model number");
     Skip_UTF8(32,                                               "Input device serial number");
@@ -556,8 +616,8 @@ void File_Dpx::GenericSectionHeader_Cineon()
         //Filling meta
         if (Frame_Count==0)
         {
-            Fill(Stream_General, 0, General_Encoded_Date, CreationDate+__T(' ')+CreationTime); //ToDo: transform it in UTC
-            Fill(StreamKind_Last, StreamPos_Last, "Encoded_Date", CreationDate+__T(' ')+CreationTime); //ToDo: transform it in UTC
+            Fill(Stream_General, 0, General_Encoded_Date, DPX_DateTime2Iso(CreationDate+':'+CreationTime));
+            Fill(StreamKind_Last, StreamPos_Last, "Encoded_Date", DPX_DateTime2Iso(CreationDate+':'+CreationTime));
             Fill(StreamKind_Last, StreamPos_Last, "Format", "Cineom");
             if (Version.size()>2 && Version[0]=='V' && Version[1]>='0' && Version[2]<='9')
                 Version.insert(1, "ersion ");
@@ -687,8 +747,8 @@ void File_Dpx::GenericSectionHeader_Dpx()
         //Filling meta
         if (Frame_Count==0)
         {
-            Fill(Stream_General, 0, General_Encoded_Date, CreationDate); //ToDo: transform it in UTC
-            Fill(StreamKind_Last, StreamPos_Last, "Encoded_Date", CreationDate); //ToDo: transform it in UTC
+            Fill(Stream_General, 0, General_Encoded_Date, DPX_DateTime2Iso(CreationDate));
+            Fill(StreamKind_Last, StreamPos_Last, "Encoded_Date", DPX_DateTime2Iso(CreationDate));
             Fill(Stream_General, 0, General_Encoded_Library, Creator);
             Fill(StreamKind_Last, StreamPos_Last, "Encoded_Library", Creator);
             Fill(Stream_General, 0, "Project", Project); //ToDo: map to a MediaInfo field (which one?)

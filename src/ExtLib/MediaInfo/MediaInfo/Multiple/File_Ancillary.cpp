@@ -272,15 +272,20 @@ File_Ancillary::~File_Ancillary()
 //---------------------------------------------------------------------------
 void File_Ancillary::Streams_Finish()
 {
+    Clear();
+    Stream_Prepare(Stream_General);
+    Fill(Stream_General, 0, General_Format, "Ancillary");
+
     #if defined(MEDIAINFO_CDP_YES)
         if (Cdp_Parser && !Cdp_Parser->Status[IsFinished] && Cdp_Parser->Status[IsAccepted])
         {
+            size_t StreamPos_Base=Count_Get(Stream_Text);
             Finish(Cdp_Parser);
             for (size_t StreamPos=0; StreamPos<Cdp_Parser->Count_Get(Stream_Text); StreamPos++)
             {
-                Merge(*Cdp_Parser, Stream_Text, StreamPos, StreamPos);
+                Merge(*Cdp_Parser, Stream_Text, StreamPos, StreamPos_Base+StreamPos);
                 Ztring MuxingMode=Cdp_Parser->Retrieve(Stream_Text, StreamPos, "MuxingMode");
-                Fill(Stream_Text, StreamPos, "MuxingMode", __T("Ancillary data / ")+MuxingMode, true);
+                Fill(Stream_Text, StreamPos_Last, "MuxingMode", __T("Ancillary data / ")+MuxingMode, true);
             }
 
             Ztring LawRating=Cdp_Parser->Retrieve(Stream_General, 0, General_LawRating);
@@ -295,12 +300,13 @@ void File_Ancillary::Streams_Finish()
     #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
         if (AribStdB34B37_Parser && !AribStdB34B37_Parser->Status[IsFinished] && AribStdB34B37_Parser->Status[IsAccepted])
         {
+            size_t StreamPos_Base=Count_Get(Stream_Text);
             Finish(AribStdB34B37_Parser);
             for (size_t StreamPos=0; StreamPos<AribStdB34B37_Parser->Count_Get(Stream_Text); StreamPos++)
             {
-                Merge(*AribStdB34B37_Parser, Stream_Text, StreamPos, StreamPos);
+                Merge(*AribStdB34B37_Parser, Stream_Text, StreamPos, StreamPos_Base+StreamPos);
                 Ztring MuxingMode=AribStdB34B37_Parser->Retrieve(Stream_Text, StreamPos, "MuxingMode");
-                Fill(Stream_Text, StreamPos, "MuxingMode", __T("Ancillary data / ")+MuxingMode, true);
+                Fill(Stream_Text,StreamPos_Last, "MuxingMode", __T("Ancillary data / ")+MuxingMode, true);
             }
         }
     #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
@@ -308,12 +314,13 @@ void File_Ancillary::Streams_Finish()
     #if defined(MEDIAINFO_SDP_YES)
         if (Sdp_Parser && !Sdp_Parser->Status[IsFinished] && Sdp_Parser->Status[IsAccepted])
         {
+            size_t StreamPos_Base=Count_Get(Stream_Text);
             Finish(Sdp_Parser);
             for (size_t StreamPos=0; StreamPos<Sdp_Parser->Count_Get(Stream_Text); StreamPos++)
             {
-                Merge(*Sdp_Parser, Stream_Text, StreamPos, StreamPos);
+                Merge(*Sdp_Parser, Stream_Text, StreamPos, StreamPos_Base+StreamPos);
                 Ztring MuxingMode=Sdp_Parser->Retrieve(Stream_General, 0, General_Format);
-                Fill(Stream_Text, StreamPos, "MuxingMode", __T("Ancillary data / OP-47 / ")+MuxingMode, true);
+                Fill(Stream_Text, StreamPos_Last, "MuxingMode", __T("Ancillary data / OP-47 / ")+MuxingMode, true);
             }
         }
     #endif //defined(MEDIAINFO_SDP_YES)
@@ -321,15 +328,26 @@ void File_Ancillary::Streams_Finish()
     #if defined(MEDIAINFO_MXF_YES)
         if (Rdd18_Parser && !Rdd18_Parser->Status[IsFinished] && Rdd18_Parser->Status[IsAccepted])
         {
+            size_t StreamPos_Base=Count_Get(Stream_Other);
             Finish(Rdd18_Parser);
             for (size_t StreamPos=0; StreamPos<Rdd18_Parser->Count_Get(Stream_Other); StreamPos++)
             {
-                Merge(*Rdd18_Parser, Stream_Other, StreamPos, StreamPos);
+                Merge(*Rdd18_Parser, Stream_Other, StreamPos, StreamPos_Base+StreamPos);
                 Fill(Stream_Other, StreamPos_Last, Other_Format, "Acquisition Metadata", Unlimited, true, true);
                 Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / RDD 18");
             }
         }
     #endif //defined(MEDIAINFO_MXF_YES)
+
+    //Unsupported streams
+    for (DataID = 0; DataID<Unknown.size(); DataID++)
+        for (SecondaryDataID = 0; SecondaryDataID<Unknown[DataID].size(); SecondaryDataID++)
+            for (perid::iterator Stream = Unknown[DataID][SecondaryDataID].begin(); Stream!=Unknown[DataID][SecondaryDataID].end(); Stream++)
+            {
+                Stream_Prepare(Stream->second.StreamKind);
+                for (std::map<string, Ztring>::iterator Info=Stream->second.Infos.begin(); Info!=Stream->second.Infos.end(); Info++)
+                    Fill(Stream->second.StreamKind, StreamPos_Last, Info->first.c_str(), Info->second);
+            }
 }
 
 //***************************************************************************
@@ -345,11 +363,25 @@ bool File_Ancillary::Synchronize()
                                          ||  Buffer[Buffer_Offset+ 2]!=0xFF))
         Buffer_Offset++;
 
+    //Parsing last bytes if needed
+    if (Buffer_Offset+6>Buffer_Size)
+    {
+        if (Buffer_Offset+5==Buffer_Size && CC3(Buffer+Buffer_Offset)!=0x00FFFF)
+            Buffer_Offset++;
+        if (Buffer_Offset+4==Buffer_Size && CC3(Buffer+Buffer_Offset)!=0x00FFFF)
+            Buffer_Offset++;
+        if (Buffer_Offset+3==Buffer_Size && CC3(Buffer+Buffer_Offset)!=0x00FFFF)
+            Buffer_Offset++;
+        if (Buffer_Offset+2==Buffer_Size && CC2(Buffer+Buffer_Offset)!=0x00FF)
+            Buffer_Offset++;
+        if (Buffer_Offset+1==Buffer_Size && CC1(Buffer+Buffer_Offset)!=0x00)
+            Buffer_Offset++;
+        return false;
+    }
+
     if (!Status[IsAccepted])
     {
         Accept();
-
-        Fill(Stream_General, 0, General_Format, "Ancillary");
     }
 
     //Synched is OK
@@ -359,15 +391,17 @@ bool File_Ancillary::Synchronize()
 //---------------------------------------------------------------------------
 bool File_Ancillary::Synched_Test()
 {
-    Synchronize(); //This is not always in synch directly, there may be some garbage
-
     //Must have enough buffer for having header
     if (Buffer_Offset+6>Buffer_Size)
         return false;
 
     //Quick test of synchro
     if (CC3(Buffer+Buffer_Offset)!=0x00FFFF)
+    {
         Synched=false;
+        if (IsSub)
+            Buffer_Offset=Buffer_Size; // We don't trust the rest of the stream, we never saw real data when sync is lost and there are lot of false-positives if we sync only on 0x00FFFF
+    }
 
     //We continue
     return true;
@@ -380,21 +414,21 @@ bool File_Ancillary::Synched_Test()
 //---------------------------------------------------------------------------
 void File_Ancillary::Read_Buffer_Continue()
 {
-    if (!Cdp_Data.empty() && AspectRatio && FrameRate)
-    {
-        ((File_Cdp*)Cdp_Parser)->AspectRatio=AspectRatio;
-        for (size_t Pos=0; Pos<Cdp_Data.size(); Pos++)
-        {
-            if (Cdp_Parser->PTS_DTS_Needed)
-                Cdp_Parser->FrameInfo.DTS=FrameInfo.DTS-(Cdp_Data.size()-Pos)*FrameInfo.DUR;
-            Open_Buffer_Continue(Cdp_Parser, Cdp_Data[Pos]->Data, Cdp_Data[Pos]->Size);
-            delete Cdp_Data[Pos]; //Cdp_Data[0]=NULL;
-        }
-        Cdp_Data.clear();
-    }
-
     if (Element_Size==0)
     {
+        if (!Cdp_Data.empty() && AspectRatio && FrameRate)
+        {
+            ((File_Cdp*)Cdp_Parser)->AspectRatio=AspectRatio;
+            for (size_t Pos=0; Pos<Cdp_Data.size(); Pos++)
+            {
+                if (Cdp_Parser->PTS_DTS_Needed)
+                    Cdp_Parser->FrameInfo.DTS=FrameInfo.DTS-(Cdp_Data.size()-Pos)*FrameInfo.DUR;
+                Open_Buffer_Continue(Cdp_Parser, Cdp_Data[Pos]->Data, Cdp_Data[Pos]->Size);
+                delete Cdp_Data[Pos]; //Cdp_Data[0]=NULL;
+            }
+            Cdp_Data.clear();
+        }
+
         #if defined(MEDIAINFO_AFDBARDATA_YES)
             //Keeping only one, TODO: parse it without video stream
             for (size_t Pos=1; Pos<AfdBarData_Data.size(); Pos++)
@@ -523,18 +557,16 @@ void File_Ancillary::Data_Parse()
                         switch (SecondaryDataID)
                         {
                             case 0x0C : // (from SMPTE ST 353)
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "MPEG-2 Recoding Information");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE ST 353");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="MPEG-2 Recoding Information";
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE ST 353";
                                         }
                                         break;
                             default   :
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]=Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID);
                                         }
                         }
                         break;
@@ -542,36 +574,32 @@ void File_Ancillary::Data_Parse()
                         switch (SecondaryDataID)
                         {
                             case 0x01 : // (from SMPTE ST 305)
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "SDTI");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE ST 305");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="SDTI";
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE ST 305";
                                         }
                                         break;
                             case 0x02 : // (from SMPTE ST 348)
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "SDTI");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE ST 348");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="SDTI";
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE ST 348";
                                         }
                                         break;
                             case 0x04 :
                             case 0x05 :
                             case 0x06 : // (from SMPTE ST 427)
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "Link Encryption Key");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE ST 427");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="Link Encryption Key";
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE ST 427";
                                         }
                                         break;
                             default   :
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]=Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID);
                                         }
                         }
                         break;
@@ -579,11 +607,10 @@ void File_Ancillary::Data_Parse()
                         switch (SecondaryDataID)
                         {
                             case 0x01 : //SMPTE ST 352
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "Payload identifier");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE ST 352");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="Payload identifier";
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE ST 352";
                                         }
                                         break;
                             case 0x05 : //Bar Data (from SMPTE 2016-3), saving data for future use
@@ -598,34 +625,30 @@ void File_Ancillary::Data_Parse()
                                         #endif //MEDIAINFO_AFDBARDATA_YES
                                         break;
                             case 0x06 : //SMPTE ST 2016
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "Pan-Scan Information");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE ST 2016");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="Pan-Scan Information";
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE ST 2016";
                                         }
                                         break;
                             case 0x07 : //SMPTE ST 2010
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "ANSI/SCTE 104 Messages");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE ST 2010");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="ANSI/SCTE 104 Messages";
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE ST 2010";
                                         }
                                         break;
                             case 0x08 : //SMPTE ST 2031
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "DVB/SCTE VBI Data");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE ST 2031");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="DVB/SCTE VBI Data";
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE ST 2031";
                                         }
                                         break;
                             default   :
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]=Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID);
                                         }
                         }
                         break;
@@ -633,14 +656,6 @@ void File_Ancillary::Data_Parse()
                         switch (SecondaryDataID)
                         {
                             case 0x02 : //OP-47 SDP, also RDD 8
-                                        /*
-                                        if (Count_Get(Stream_Text)==0)
-                                        {
-                                            Stream_Prepare(Stream_Text);
-                                            Fill(Stream_Text, StreamPos_Last, Text_Format, "Teletext Subtitle");
-                                            Fill(Stream_Text, StreamPos_Last, Text_MuxingMode, "Ancillary data / OP-47 / SDP");
-                                        }
-                                        */
                                         #if defined(MEDIAINFO_SDP_YES)
                                         if (Sdp_Parser==NULL)
                                         {
@@ -656,10 +671,9 @@ void File_Ancillary::Data_Parse()
                                         #endif //defined(MEDIAINFO_SDP_YES)
                                         break;
                             case 0x03 : //OP-47 Multipacket, also RDD 8
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / OP-47 / Multipacket");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / OP-47 / Multipacket";
                                         }
                                         break;
                             case 0x05 : //RDD 18
@@ -672,22 +686,11 @@ void File_Ancillary::Data_Parse()
                                         if (!Rdd18_Parser->Status[IsFinished])
                                             Open_Buffer_Continue(Rdd18_Parser, Payload+1, (size_t)DataCount-1);
                                         #endif //defined(MEDIAINFO_MXF_YES)
-
-                                        /*
-                                        if (Count_Get(Stream_Other)==0)
-                                        {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "Acquisition Metadata");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / RDD 18");
-                                            Merge(*Parser, Stream_Other, 0, StreamPos_Last);
-                                        }
-                                        */
                                         break;
                             default   :
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]=Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID);
                                         }
                         }
                         break;
@@ -695,24 +698,22 @@ void File_Ancillary::Data_Parse()
                         switch (SecondaryDataID)
                         {
                             case 0x44 : //SMPTE RP 223
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
                                             switch (DataCount)
                                             {
-                                                case 0x19: Fill(Stream_Other, StreamPos_Last, Other_Format, "ISAN"); break;
+                                                case 0x19: Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="ISAN"; break;
                                                 case 0x20:
-                                                case 0x40: Fill(Stream_Other, StreamPos_Last, Other_Format, "UMID"); break;
+                                                case 0x40: Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="UMID"; break;
                                             }
 
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE RP 223");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE RP 223";
                                         }
                                         break;
                             default   :
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]=Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID);
                                         }
                         }
                         break;
@@ -728,18 +729,18 @@ void File_Ancillary::Data_Parse()
                             case 0x07 : //Channel pair 11/12
                             case 0x08 : //Channel pair 13/14
                             case 0x09 : //Channel pair 15/16
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "Audio Metadata");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE ST 2020");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="Audio Metadata";
+                                            if (SecondaryDataID>1)
+                                                Unknown[DataID][SecondaryDataID][string()].Infos["Format_Settings"]=__T("Channel pair ")+Ztring::ToZtring((SecondaryDataID-1)*2-1)+__T('/')+Ztring::ToZtring((SecondaryDataID-1)*2);
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE ST 2020";
                                         }
                                         break;
                             default   :
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]=Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID);
                                         }
                         }
                         break;
@@ -747,18 +748,16 @@ void File_Ancillary::Data_Parse()
                         switch (SecondaryDataID)
                         {
                             case 0x01 : // (from SMPTE ST 2051)
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "Two-Frame Marker");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE ST 2051");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="Two-Frame Marker";
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE ST 2051";
                                         }
                                         break;
                             default   :
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]=Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID);
                                         }
                         }
                         break;
@@ -766,18 +765,16 @@ void File_Ancillary::Data_Parse()
                         switch (SecondaryDataID)
                         {
                             case 0x01: //RDD 8
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "WSS"); //TODO: inject it in the video stream when a sample is available
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / RDD 8");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="WSS"; //TODO: inject it in the video stream when a sample is available
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / RDD 8";
                                         }
                                         break;
                             default   :
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]=Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID);
                                         }
                         }
                         break;
@@ -801,10 +798,9 @@ void File_Ancillary::Data_Parse()
                             #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
                         }
                         else
-                            if (Count_Get(Stream_Other)==0)
+                            if (TestAndPrepare())
                             {
-                                Stream_Prepare(Stream_Other);
-                                Fill(Stream_Other, StreamPos_Last, Other_Format, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+                                Unknown[DataID][SecondaryDataID][string()].Infos["Format"]=Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID);
                             }
                         break;
             case 0x60 :
@@ -819,42 +815,26 @@ void File_Ancillary::Data_Parse()
                                         Open_Buffer_Init(&Parser);
                                         Open_Buffer_Continue(&Parser, Payload, (size_t)DataCount);
 
-                                        bool Exists=false;
-                                        if (LineNumber!=(int32u)-1)
-                                            for (size_t Pos=0; Pos<Count_Get(Stream_Other); Pos++)
-                                            {
-                                                if (__T("Line")+Ztring::ToZtring(LineNumber)==Retrieve(Stream_Other, Pos, Other_ID)
-                                                 && ((!LineNumber_IsSecondField && Retrieve(Stream_Other, Pos, "IsSecondField").empty()) || (LineNumber_IsSecondField && !Retrieve(Stream_Other, Pos, "IsSecondField").empty()))
-                                                 && Parser.Settings==Retrieve(Stream_Other, Pos, Other_TimeCode_Settings).To_UTF8())
-                                                    Exists=true;
-                                            }
-                                        else
-                                            for (size_t Pos=0; Pos<Count_Get(Stream_Other); Pos++)
-                                            {
-                                                if (Parser.Settings==Retrieve(Stream_Other, Pos, Other_TimeCode_Settings).To_UTF8())
-                                                    Exists=true;
-                                            }
-                                        if (!Exists)
+                                        string Unique=Ztring().From_Number(LineNumber).To_UTF8()+(LineNumber_IsSecondField?"IsSecondField":"")+Parser.Settings;
+                                        if (TestAndPrepare(&Unique))
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Type, "Time code");
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "SMPTE ATC");
-                                            Fill(Stream_Other, StreamPos_Last, Other_TimeCode_FirstFrame, Parser.TimeCode_FirstFrame);
-                                            Fill(Stream_Other, StreamPos_Last, Other_TimeCode_Settings, Parser.Settings);
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE RP 188");
+                                            Unknown[DataID][SecondaryDataID][Unique].Infos["Type"]="Time code";
+                                            Unknown[DataID][SecondaryDataID][Unique].Infos["Format"]="SMPTE ATC";
+                                            Unknown[DataID][SecondaryDataID][Unique].Infos["TimeCode_FirstFrame"].From_UTF8(Parser.TimeCode_FirstFrame.c_str());
+                                            Unknown[DataID][SecondaryDataID][Unique].Infos["TimeCode_Settings"].From_UTF8(Parser.Settings.c_str());
+                                            Unknown[DataID][SecondaryDataID][Unique].Infos["MuxingMode"]="Ancillary data / SMPTE RP 188";
                                             if (LineNumber!=(int32u)-1)
-                                                Fill(Stream_Other, StreamPos_Last, Other_ID, __T("Line")+Ztring::ToZtring(LineNumber));
+                                                Unknown[DataID][SecondaryDataID][Unique].Infos["ID"]=__T("Line")+Ztring::ToZtring(LineNumber);
                                             if (LineNumber_IsSecondField)
-                                                Fill(Stream_Other, StreamPos_Last, "IsSecondField", "Yes");
+                                                Unknown[DataID][SecondaryDataID][Unique].Infos["IsSecondField"]="Yes";
                                         }
                                         }
                                         #endif //defined(MEDIAINFO_TIMECODE_YES)
                                         break;
                             default   :
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]=Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID);
                                         }
                         }
                         break;
@@ -893,18 +873,17 @@ void File_Ancillary::Data_Parse()
                                         #endif //MEDIAINFO_CDP_YES
                                         break;
                             case 0x02 : //CEA-608 (from SMPTE 334-1)
-                                        if (Count_Get(Stream_Text)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Text);
-                                            Fill(Stream_Text, StreamPos_Last, Text_Format, "CEA-608");
-                                            Fill(Stream_Text, StreamPos_Last, Text_MuxingMode, "Ancillary data / SMPTE 334");
+                                            Unknown[DataID][SecondaryDataID][string()].StreamKind=Stream_Text;
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="CEA-608";
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE 334";
                                         }
                                         break;
                             default   :
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]=Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID);
                                         }
                         }
                         break;
@@ -912,34 +891,30 @@ void File_Ancillary::Data_Parse()
                         switch (SecondaryDataID)
                         {
                             case 0x01 : //Program description (from SMPTE 334-1),
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "Program description");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE ST 334");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="Program description";
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE ST 334";
                                         }
                                         break;
                             case 0x02 : //Data broadcast (from SMPTE 334-1)
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "Data broadcast");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE ST 334");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="Data broadcast";
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE ST 334";
                                         }
                                         break;
                             case 0x03 : //VBI data (from SMPTE 334-1)
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "VBI data");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE ST 334");
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="VBI data";
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE ST 334";
                                         }
                                         break;
                             default   :
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]=Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID);
                                         }
                         }
                         break;
@@ -949,69 +924,79 @@ void File_Ancillary::Data_Parse()
                             case 0x64 : // (from SMPTE RP 196)
                                         // LTC in HANC space
                                         {
-                                        bool Exists=false;
-                                        if (LineNumber!=(int32u)-1)
-                                            for (size_t Pos=0; Pos<Count_Get(Stream_Other); Pos++)
-                                            {
-                                                if (__T("Line")+Ztring::ToZtring(LineNumber)==Retrieve(Stream_Other, Pos, Other_ID))
-                                                    Exists=true;
-                                            }
-                                        else
-                                            if (Count_Get(Stream_Other)!=0)
-                                                Exists=true;
-                                        if (!Exists)
+                                        string Unique=Ztring().From_Number(LineNumber).To_UTF8();
+                                        if (TestAndPrepare(&Unique))
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Type, "Time code");
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "LTC");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE RP 196");
+                                            Unknown[DataID][SecondaryDataID][Unique].Infos["Type"]="Time code";
+                                            Unknown[DataID][SecondaryDataID][Unique].Infos["Format"]="LTC";
+                                            Unknown[DataID][SecondaryDataID][Unique].Infos["MuxingMode"]="Ancillary data / SMPTE RP 196";
                                             if (LineNumber!=(int32u)-1)
-                                                Fill(Stream_Other, StreamPos_Last, Other_ID, __T("Line")+Ztring::ToZtring(LineNumber));
+                                                Unknown[DataID][SecondaryDataID][Unique].Infos["ID"]=__T("Line")+Ztring::ToZtring(LineNumber);
                                         }
                                         }
                                         break;
                             case 0x7F : // (from SMPTE RP 196)
                                         // VITC in HANC space
                                         {
-                                        bool Exists=false;
-                                        if (LineNumber!=(int32u)-1)
-                                            for (size_t Pos=0; Pos<Count_Get(Stream_Other); Pos++)
-                                            {
-                                                if (__T("Line")+Ztring::ToZtring(LineNumber)==Retrieve(Stream_Other, Pos, Other_ID))
-                                                    Exists=true;
-                                            }
-                                        else
-                                            if (Count_Get(Stream_Other)!=0)
-                                                Exists=true;
-                                        if (!Exists)
+                                        string Unique=Ztring().From_Number(LineNumber).To_UTF8();
+                                        if (TestAndPrepare(&Unique))
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Type, "Time code");
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, "VITC");
-                                            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Ancillary data / SMPTE RP 196");
+                                            Unknown[DataID][SecondaryDataID][Unique].Infos["Type"]="Time code";
+                                            Unknown[DataID][SecondaryDataID][Unique].Infos["Format"]="VITC";
+                                            Unknown[DataID][SecondaryDataID][Unique].Infos["MuxingMode"]="Ancillary data / SMPTE RP 196";
                                             if (LineNumber!=(int32u)-1)
-                                                Fill(Stream_Other, StreamPos_Last, Other_ID, __T("Line")+Ztring::ToZtring(LineNumber));
+                                                Unknown[DataID][SecondaryDataID][Unique].Infos["ID"]=__T("Line")+Ztring::ToZtring(LineNumber);
                                         }
                                         }
                                         break;
                             default   :
-                                        if (Count_Get(Stream_Other)==0)
+                                        if (TestAndPrepare())
                                         {
-                                            Stream_Prepare(Stream_Other);
-                                            Fill(Stream_Other, StreamPos_Last, Other_Format, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]=Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID);
                                         }
                         }
                         break;
+            case 0x00 : // Undefined format
+            case 0x80 : // Marked for deletion
+            case 0x84 : // End marker
+            case 0x88 : // Start marker
+                        break;
             default   :
-                        if (Count_Get(Stream_Other)==0)
+                        if (TestAndPrepare())
                         {
-                            Stream_Prepare(Stream_Other);
-                            Fill(Stream_Other, StreamPos_Last, Other_Format, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+                            Unknown[DataID][(DataID<0x80?SecondaryDataID:0)][string()].Infos["Format"]=Ztring().From_CC1(DataID)+((DataID<0x80)?(__T('-')+Ztring().From_CC1(SecondaryDataID)):Ztring());
                         }
         }
     FILLING_END();
 
     delete[] Payload; //Payload=NULL
+}
+
+//***************************************************************************
+// Presence
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+bool File_Ancillary::TestAndPrepare(const string* Unique)
+{
+    if (DataID>=Unknown.size())
+        Unknown.resize(DataID+1);
+    int8u RealSecondaryDataID=(DataID<0x80?SecondaryDataID:0);
+    if (RealSecondaryDataID>=Unknown[DataID].size())
+        Unknown[DataID].resize(RealSecondaryDataID+1);
+    if (Unique)
+    {
+        perid::iterator Item = Unknown[DataID][RealSecondaryDataID].find(*Unique);
+        if (Item!=Unknown[DataID][RealSecondaryDataID].end())
+            return false;
+    }
+    else
+    {
+        if (!Unknown[DataID][RealSecondaryDataID].empty())
+            return false;
+    }
+
+    return true;
 }
 
 //***************************************************************************
@@ -1021,4 +1006,3 @@ void File_Ancillary::Data_Parse()
 } //NameSpace
 
 #endif //MEDIAINFO_ANCILLARY_YES
-

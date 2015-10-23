@@ -83,6 +83,7 @@ File_Cdp::File_Cdp()
 {
     //Config
     PTS_DTS_Needed=true;
+    MustSynchronize=true;
 
     //In
     AspectRatio=0;
@@ -214,8 +215,140 @@ void File_Cdp::Read_Buffer_Unsynched()
 }
 
 //***************************************************************************
-// Buffer - Global
+// Buffer - Synchro
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+bool File_Cdp::Synchronize()
+{
+    //Synchronizing
+    while (Buffer_Offset+3<=Buffer_Size)
+    {
+        while (Buffer_Offset+3<=Buffer_Size && (Buffer[Buffer_Offset  ]!=0x96
+                                             || Buffer[Buffer_Offset+1]!=0x69))
+        {
+            Buffer_Offset++;
+            while (Buffer_Offset<Buffer_Size && Buffer[Buffer_Offset]!=0x96)
+                Buffer_Offset++;
+        }
+
+        if (Buffer_Offset+3>Buffer_Size)
+            break;
+
+        //CRC
+        int8u CRC=0;
+        int8u cdp_length=Buffer[Buffer_Offset+2];
+
+        //Must have enough buffer for having header
+        if (Buffer_Offset+cdp_length>Buffer_Size)
+            return false;
+
+        const int8u* Buffer_Temp=Buffer+Buffer_Offset;
+        const int8u* Buffer_End=Buffer+Buffer_Offset+cdp_length;
+        while (Buffer_Temp<Buffer_End)
+            CRC+=*(Buffer_Temp++);
+        if (!CRC)
+            break;
+
+        Buffer_Offset++;
+    }
+
+    //Parsing last bytes if needed
+    if (Buffer_Offset+3>Buffer_Size)
+    {
+        if (Buffer_Offset+3==Buffer_Size && CC2(Buffer+Buffer_Offset)!=0x9669)
+            Buffer_Offset++;
+        if (Buffer_Offset+2==Buffer_Size && CC2(Buffer+Buffer_Offset)!=0x9669)
+            Buffer_Offset++;
+        if (Buffer_Offset+1==Buffer_Size && CC1(Buffer+Buffer_Offset)!=0x96)
+            Buffer_Offset++;
+        return false;
+    }
+
+    //Synched is OK
+    return true;
+}
+
+//---------------------------------------------------------------------------
+bool File_Cdp::Synched_Test()
+{
+    //Must have enough buffer for having header
+    if (Buffer_Offset+3>Buffer_Size)
+        return false;
+
+    //Quick test of synchro
+    if (Buffer[Buffer_Offset  ]!=0x96
+     || Buffer[Buffer_Offset+1]!=0x69)
+        Synched=false;
+
+    if (Synched)
+    {
+        //CRC
+        int8u CRC=0;
+        int8u cdp_length=Buffer[Buffer_Offset+2];
+
+        //Must have enough buffer for having header
+        if (Buffer_Offset+cdp_length>Buffer_Size)
+            return false;
+
+        const int8u* Buffer_Temp=Buffer+Buffer_Offset;
+        const int8u* Buffer_End=Buffer+Buffer_Offset+cdp_length;
+        while (Buffer_Temp<Buffer_End)
+            CRC+=*(Buffer_Temp++);
+        if (CRC)
+            Synched=false;
+    }
+
+    //We continue
+    return true;
+}
+
+//***************************************************************************
+// Buffer - Per element
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_Cdp::Header_Parse()
+{
+    //Parsing
+    int32u cdp_identifier_length; // For trace feature, we don't want to parse with classic Get() and cdp_identifier was already tested during Sync test
+    Peek_B3(cdp_identifier_length);
+
+    Header_Fill_Code(0, "CDP packet");
+    Header_Fill_Size(cdp_identifier_length&0xFF);
+}
+
+//---------------------------------------------------------------------------
+void File_Cdp::Data_Parse()
+{
+    if (!Status[IsAccepted])
+        Accept("CDP");
+
+    cdp_header();
+    while(Element_Offset<Element_Size)
+    {
+        int8u section_id;
+        Peek_L1(section_id);
+        switch (section_id)
+        {
+            case 0x71 : time_code_section(); break;
+            case 0x72 : ccdata_section(); break;
+            case 0x73 : ccsvcinfo_section(); break;
+            case 0x74 : cdp_footer(); break;
+            case 0xFF : Skip_B1("Padding?"); break;
+            default   : if (section_id>=0x75 && section_id<=0xEF)
+                            future_section();
+                        else
+                            Skip_XX(Element_Size-Element_Offset, "Unknown");
+        }
+    }
+
+    FILLING_BEGIN();
+        Frame_Count++;
+        if (!IsSub && Config->ParseSpeed<1.0 && Frame_Count>=300)
+            Finish();
+    FILLING_END();
+}
 
 //---------------------------------------------------------------------------
 void File_Cdp::Read_Buffer_Continue()
@@ -236,35 +369,6 @@ void File_Cdp::Read_Buffer_Continue()
                 return;
             }
         FILLING_END();
-    }
-
-    //CRC
-    int8u CRC=0;
-    for (size_t Pos=WithAppleHeader?8:0; Pos<Buffer_Size; Pos++)
-        CRC+=Buffer[Pos];
-    if (CRC)
-    {
-        Skip_XX(Element_Size-Element_Offset,                    "Invalid data (CRC fails)");
-        return;
-    }
-
-    cdp_header();
-    while(Element_Offset<Element_Size)
-    {
-        int8u section_id;
-        Peek_L1(section_id);
-        switch (section_id)
-        {
-            case 0x71 : time_code_section(); break;
-            case 0x72 : ccdata_section(); break;
-            case 0x73 : ccsvcinfo_section(); break;
-            case 0x74 : cdp_footer(); break;
-            case 0xFF : Skip_B1("Padding?"); break;
-            default   : if (section_id>=0x75 && section_id<=0xEF)
-                            future_section();
-                        else
-                            Skip_XX(Element_Size-Element_Offset, "Unknown");
-        }
     }
 }
 
@@ -296,17 +400,6 @@ void File_Cdp::cdp_header()
     Element_End0();
 
     FILLING_BEGIN();
-        if (!Status[IsAccepted])
-        {
-            if (cdp_identifier!=0x9669)
-            {
-                Reject("CDP");
-                return;
-            }
-
-            Accept("CDP");
-        }
-
         //cdp_length
         if (cdp_length>cdp_length_Max)
             cdp_length_Max=cdp_length;

@@ -28,6 +28,9 @@
  chapters stream1; струмень падзелаў
  chapters stream2; струмені падзелаў
  chapters stream3; струмені падзелаў
+ character1;
+ character2;
+ character3;
  day1; дзень
  day2; дзён
  day3; дзён
@@ -37,12 +40,12 @@
  file1; файл
  file2; файлы
  file3; файлы
- frame1; кадр
- frame2; кадры
- frame3; кадраў
  fps1; кадр/сек
  fps2; кадр/сек
  fps3; кадр/сек
+ frame1; кадр
+ frame2; кадры
+ frame3; кадраў
  GB; Гбайт
  Gb; Гбіт
  Gbps; Гбіт/сек
@@ -141,6 +144,8 @@
  year3; гадоў
 , ;, 
 : ;: 
+3D;
+3DType;
 About;Пра праграму
 About_Hint;Як звязацца са мной і знайсці апошнюю версію праграмы
 Accompaniment;Суправаджэнне
@@ -172,7 +177,12 @@ Audio_Codec_List;Аўдыёкодэкі
 Audio_No;Няма аўдыёструменя
 Audio1;Першы аўдыёструмень
 Audio2;Другі аўдыёструмень
+AudioComments;
 AudioCount;Коль-ць аўдыёструменяў
+AudioDescriptionPresent;
+AudioDescriptionType;
+AudioLoudnessStandard;
+AudioTrackLayout;
 Author;Аўтар
 BarCode;Штрыхкод
 Basic;Каротка
@@ -180,13 +190,13 @@ Basic_Note;Падказка: для дадатковай інфармацыі а
 BitDepth;
 BitDepth_Stored;
 BitRate;Бітрэйт
+BitRate_Encoded;
 BitRate_Maximum;Максімальны бітрэйт
 BitRate_Minimum;Мінімальны бітрэйт
 BitRate_Mode;Рэжым разліку бітрэйту
 BitRate_Mode_CBR;Сталы
 BitRate_Mode_VBR;Пераменны
 BitRate_Nominal;Намінальны бітрэйт
-BitRate_Encoded;
 Bits-(Pixel*Frame);Біт/(Пікселі*Кадры)
 BufferSize;Памер буфера
 Cancel;Адмена
@@ -211,44 +221,53 @@ Chroma;Каляровасць
 ChromaSubsampling;
 Close;Зачыніць
 Close all before open;Закрыць усё перад адкрыццём
+ClosedCaptionsLanguage;
+ClosedCaptionsPresent;
+ClosedCaptionsType;
 Codec;Кодэк
 Codec_Description;Апісанне кодэка
 Codec_Info;Падрабязна аб кодэку
-Codec_Settings;Налады кодэка
-Codec_Settings_PacketBitStream;Налада пакетнага струменя дадзеных кодэка
-Codec_Settings_BVOP;Налада BVOP кодэка
-Codec_Settings_QPel;Налада QPel кодэка
-Codec_Settings_GMC;Налада GMC кодэка
-Codec_Settings_Matrix;Налада матрыцы кодэка
-Codec_Settings_Floor;Налада Floor кодэка
-Codec_Settings_CABAC;Налада CABAC кодэка
-Codec_Settings_Firm;Налада Firm кодэка
-Codec_Settings_Endianness;Налада Endianness кодэка
-Codec_Settings_Sign;Налада Sign кодэка
-Codec_Settings_Law;Налада Law кодэка
-Codec_Settings_ITU;Налада ITU кодэка
 Codec_Profile;Прафайл кодэка
+Codec_Settings;Налады кодэка
+Codec_Settings_BVOP;Налада BVOP кодэка
+Codec_Settings_CABAC;Налада CABAC кодэка
+Codec_Settings_Endianness;Налада Endianness кодэка
+Codec_Settings_Firm;Налада Firm кодэка
+Codec_Settings_Floor;Налада Floor кодэка
+Codec_Settings_GMC;Налада GMC кодэка
+Codec_Settings_ITU;Налада ITU кодэка
+Codec_Settings_Law;Налада Law кодэка
+Codec_Settings_Matrix;Налада матрыцы кодэка
+Codec_Settings_PacketBitStream;Налада пакетнага струменя дадзеных кодэка
+Codec_Settings_QPel;Налада QPel кодэка
+Codec_Settings_Sign;Налада Sign кодэка
 Codec_Url;Спасылка на кодэк
 CodecID;Ідэнтыфікатар кодэка
 CodecID_Description;Апісанне кодэка
+CoDirector;
 Collection;Калекцыя
 Colorimetry;Каларыметрыя
 ColorSpace;
 colour_primaries;Асноўныя колеры
+colour_range;
 Comment;Каментар
 CommissionedBy;Даручальнік
 Compilation;Кампіляцыя
 CompleteName;Поўнае імя
+CompletionDate;
 Composer;Кампазітар
 Compression_Mode;Метад сціску
 Compression_Mode_Lossless;Без страт
 Compression_Mode_Lossy;Са стратамі
 Compression_Ratio;Ступень сціску
 Conductor;Дырыжор
+ContactEmail;
+ContactTelephoneNumber;
 Container and general information;Агульная інфармацыя
 ContentType;Тып змесціва
 CoProducer;Сапрадзюсар
 Copyright;Праваўладальнік
+CopyrightYear;
 CostumeDesigner;Дызайн гарнітураў
 Count;Кольк-ць
 Country;Краіна
@@ -274,8 +293,10 @@ Dimensions;Памеры
 Director;Рэжысёр
 DirectorOfPhotography;Аператар
 DisplayAspectRatio;Суадносіны кадра
+DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Арыгінальныя суадносіны бакоў
 DistributedBy;Распаўсюджвальнік
+Distributor;
 Donate;Ахвяраваць
 DotsPerInch;Кропак на дзюйм
 Duration;Працягласць
@@ -291,6 +312,7 @@ Encoded_Library_Settings;Налады праграмы
 Encoded_Original;Першапачаткова кадавана
 EncodedBy;Кадаваў
 EPG_Positions;EPG пазіцыіі (унутр)
+EpisodeTitleNumber;
 Error_File;Памылка ў файле
 ExecutiveProducer;Выканаўчы прадзюсар
 Exit;Выхад
@@ -324,39 +346,44 @@ Format_Description;Апісанне фармату
 Format_Info;Падрабязна аб фармаце
 Format_Profile;Прафайл фармату
 Format_Settings;Налады фармату
-Format_Settings_PacketBitStream;Налада пакетнага струменя дадзеных фармату
 Format_Settings_BVOP;Налада BVOP фармату
-Format_Settings_QPel;Налада QPel фармату
+Format_Settings_CABAC;Налада CABAC фармату
+Format_Settings_Emphasis;Выразнасць
+Format_Settings_Endianness;Налада Endianness фармату
+Format_Settings_Firm;Налада Firm фармату
+Format_Settings_Floor;Налада Floor фармату
+Format_Settings_FrameMode;Рэжым кадраў
 Format_Settings_GMC;Налада GMC фармату
+Format_Settings_GOP;
+Format_Settings_ITU;Налада ITU фармату
+Format_Settings_Law;Налада Law фармату
 Format_Settings_Matrix;Налада матрыцы фармату
 Format_Settings_Matrix_Custom;Выбарковая
 Format_Settings_Matrix_Default;Стандартная
-Format_Settings_Floor;Налада Floor фармату
-Format_Settings_CABAC;Налада CABAC фармату
-Format_Settings_Firm;Налада Firm фармату
-Format_Settings_Endianness;Налада Endianness фармату
-Format_Settings_RefFrames;Налада ReFrames фармату
-Format_Settings_Sign;Налада Sign фармату
-Format_Settings_Law;Налада Law фармату
-Format_Settings_ITU;Налада ITU фармату
-Format_Settings_SBR;Налада SBR фармату
+Format_Settings_Mode;Рэжым
+Format_Settings_ModeExtension;
+Format_Settings_PacketBitStream;Налада пакетнага струменя дадзеных фармату
+Format_Settings_PictureStructure;
 Format_Settings_PS;Налада PS фармату
 Format_Settings_Pulldown;Абраць налады фармату
-Format_Settings_Mode;Рэжым
-Format_Settings_FrameMode;Рэжым кадраў
-Format_Settings_Emphasis;Выразнасць
-Format_Settings_ModeExtension;
-Format_Settings_GOP;
-Format_Version;Версія фармату
+Format_Settings_QPel;Налада QPel фармату
+Format_Settings_RefFrames;Налада ReFrames фармату
+Format_Settings_SBR;Налада SBR фармату
+Format_Settings_Sign;Налада Sign фармату
+Format_Settings_Wrapping;
 Format_Url;Спасылка на фармат
+Format_Version;Версія фармату
+FpaManufacturer;
+FpaPass;
+FpaVersion;
 FrameCount;Лічыльнік кадраў
 FrameRate;Частата кадраў
+FrameRate_Maximum;Максімальная частата кадраў
+FrameRate_Minimum;Мінімальная частата кадраў
 FrameRate_Mode;Рэжым частаты кадраў
 FrameRate_Mode_CFR;Сталы
 FrameRate_Mode_VFR;Пераменны
-FrameRate_Minimum;Мінімальная частата кадраў
 FrameRate_Nominal;Намінальная частата кадраў
-FrameRate_Maximum;Максімальная частата кадраў
 FrameRate_Original;Першасная частата кадраў
 General;Агульнае
 Genre;Жанр
@@ -553,10 +580,15 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;Перайсці на сайт
-Grouping;Групаванне
+Grouping;
+Gop_OpenClosed;
+Gop_OpenClosed_Open;
+Gop_OpenClosed_Closed;
+Gop_OpenClosed_FirstFrame;
 h;г.
 Header file;Стварыць загаловак
 Height;Вышыня
+Height_CleanAperture;
 Height_Original;
 Help;Дапамога
 Hint;Падказка
@@ -566,22 +598,23 @@ How many text streams?;Колькасць тэкставых струменяў?
 How many video streams?;Колькасць відэаструменяў?
 HTML;HTML
 ID;Ідэнтыфікатар
+IdentClockStart;
 Image;Малюнкі
 Image stream(s);Струмень(і) малюнкаў
 Image_Codec_List;Кодэкі малюнкаў
 ImageCount;Коль-ць струменяў малюнкаў
 Info;Інфармацыя
 Instruments;Прылады
-Interlacement;Перапляценне
-Interlaced_Interlaced;Празрадковая
-Interlaced_TFF;Верхняе поле першае
 Interlaced_BFF;Ніжняе поле першае
+Interlaced_Interlaced;Празрадковая
 Interlaced_PPF;Прагрэсіўная
 Interlaced_Progressive;Прагрэсіўная
-Interleaved;Якая чаргуецца
+Interlaced_TFF;Верхняе поле першае
+Interlacement;Перапляценне
 Interleave_Duration;Працягласць прамежку
 Interleave_Preload;Час перадзагрузкі прамежку
 Interleave_VideoFrames;Працягласць прамежку
+Interleaved;Якая чаргуецца
 InternetMediaType;Інтэрнэт-тып носьбіта
 IRCA;IRCA
 ISBN;ISBN
@@ -592,7 +625,6 @@ Known formats;Вядомыя фарматы
 Known parameters;Вядомыя параметры
 Label;Пазнака
 Language;Мова
-Language_More;Яшчэ мовы
 Language_aa;Afar
 Language_ab;Abkhazian
 Language_ae;Avestan
@@ -703,6 +735,7 @@ Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
 Language_mo;Moldavian
+Language_More;Яшчэ мовы
 Language_mr;Marathi
 Language_ms;Malay
 Language_mt;Maltese
@@ -789,19 +822,23 @@ LawRating;Абмежаванне правоў
 LCCN;LCCN
 Library;Бібліятэка
 Lightness;Яркасць
+LineUpStart;
 List;Спіс
-Lyrics;Тэкст песен
 Lyricist;Паэт-песеннік
+Lyrics;Тэкст песен
 Mastered_Date;Дата майстарынгу
 MasteredBy;Майстарынг
+Matrix_Channel(s);
+Matrix_ChannelPositions;
 matrix_coefficients;Каэфіцыенты матрыцы
+Matrix_Format;
 MediaInfo_About;Адлюстроўвае дэталёвую інфармацыю\r\nпра мультымедыя-файлы Matroska, OGG (уключаючы OGM)\r\nMPEG1 (уключаючы VCD), MPEG2 (уключаючы DVD і SVCD), MPEG4 (уключаючы iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (уключаючы WMV, WMA)\r\nMicrosoft RIFF (уключаючы AVI, WAV, DivX)\r\nгукавыя фарматы (AC3, DTS, SSC, AU, AIFF)
 Menu;Меню
 Menu stream(s);Меню струменяў
 Menu_Codec_List;Меню кодэкаў
+Menu_Hint;Дадатковыя магчымасці
 Menu_No;Няма меню
 MenuCount;Коль-ць струменяў меню
-Menu_Hint;Дадатковыя магчымасці
 MenuID;Ідэнтыфікатар меню
 mn;хв.
 Mood;Настрой
@@ -819,8 +856,8 @@ NetworkName;Сеткавае імя
 New;Новы
 Newest version;Праверыць на абнаўленне (патрабуецца падлучэнне да інтэрнэту)
 NewVersion_Menu;Даступная новая версія
-NewVersion_Question_Title;Новая версія выпушчана!
 NewVersion_Question_Content;Даступная новая версія (v%Version%, жадаеце запампаваць?
+NewVersion_Question_Title;Новая версія выпушчана!
 No;Не
 Not yet;Яшчэ няма
 NumColors;Колькасць колераў
@@ -863,13 +900,19 @@ OpenCandy_33;Не ўсталёўваць
 OpenCandy_34;Абярыце параметры ўсталёўкі
 OpenCandy_35;______ рэкамендуюць гэтую праграму
 OpenCandy_36;Ваша бягучая ўсталеўка не будзе перапынена
+OpenCaptionsLanguage;
+OpenCaptionsPresent;
+OpenCaptionsType;
 Options;Параметры
 Options_Hint;Налады праграмы
 Original;Арыгінал
 OriginalNetworkName;Арыгінальнае сеткавае імя
 OriginalSourceForm;Фармат арыгінала
 OriginalSourceMedium;Носьбіт арыгінала
+Originator;
 Other;Іншае
+OtherIdentifier;
+OtherIdentifierType;
 Output;Выхад
 Output format;Фармат вываду
 OverallBitRate;Агульны струмень
@@ -879,10 +922,14 @@ OverallBitRate_Mode;Рэжым агульнага бітрэйту
 OverallBitRate_Nominal;Намінальны агульны бітрэйт
 Part;Частка
 Part_Count;Коль-ць частак
+PartNumber;
+PartTotal;
 Performer;Выканаўца
 Period;Перыяд
 Phone;Тэлефон
+PictureRatio;
 PixelAspectRatio;Суадносіны пікселяў
+PixelAspectRatio_CleanAperture;
 PixelAspectRatio_Original;Суадносіны пікселяў
 PlayCounter;Лічыльнік прайгравання
 Played_Count;Разоў прайгравалася
@@ -892,9 +939,15 @@ PlayTime;Працягласць
 Position;Пазіцыя
 Position_Total;Усяго
 Preferences;Налады
+PrimaryAudioLanguage;
 Producer;Прадзюсар
 ProductionDesigner;Распрацоўнік афармлення
+ProductionNumber;
 ProductionStudio;Студыя афармлення
+ProductPlacement;
+ProgrammeHasText;
+ProgrammeTextLanguage;
+ProgrammeTitle;
 Publisher;Апублікавана
 Purchased_Date;Дата куплі
 Quote character;Знак двукоссяў
@@ -908,22 +961,25 @@ ReplayGain_Gain;Нармалізатар гука
 ReplayGain_Peak;Пік нармалізатара гука
 Resolution;Вырашальнасць (Resolution)
 s;с
+SamplingCount;Колькасць узораў
 SamplingRate;Частата
 Save;Захаваць
-ScanType;Тып разгорткі
-ScanType_Original;
-ScanType_StoreMethod;
 ScanOrder;Парадак разгорткі
 ScanOrder_Original;
 ScanOrder_Stored;
 ScanOrder_StoredDisplayedInverted;
 ScanOrder_StoreMethod;
+ScanType;Тып разгорткі
+ScanType_Original;
+ScanType_StoreMethod;
 ScreenplayBy;Сцэнарыст
 Season;Сезон
+SecondaryAudioLanguage;
 see below;гл. ніжэй
 Send HeaderFile;Адправіць загаловак гэтага файла на http://sourceforge.net/projects/mediainfo/ (Падзел памылак)
 Separator_Columns;Падзельнік слупкоў
 Separator_Lines;Падзельнік радкоў
+SeriesTitle;
 ServiceChannel;Нумар канала сэрвіса
 ServiceName;Назва сэрвіса
 ServiceProvider;Пастаўшчык сэрвіса
@@ -937,10 +993,13 @@ Sheet (Complete);Табліца (поўная)
 Shell extension;Пашырэнне правадыра (пункт у меню па правай кнопцы)
 Shell extension, folder;Для папак таксама
 Shell InfoTip;Паказваць меню
+ShimName;
+ShimVersion;
 Show menu;Паказваць меню
 Show toolbar;Паказваць панэль
+SigningPresent;
+SignLanguage;
 Sort;Сартаваць па
-SamplingCount;Колькасць узораў
 SoundEngineer;Гукарэжысёр
 Source;
 Source_Duration;
@@ -974,6 +1033,7 @@ Tagged_Application;Праграма, якая пазначыла
 Tagged_Date;Дата адзнакі
 Technician;Тэхнік
 TermsOfUse;Умовы выкарыстання
+TertiaryAudioLanguage;
 Text;Тэкст
 Text - Custom;Тэкст - Выбаркова
 Text (HTML);Тэкст (HTML)
@@ -985,17 +1045,21 @@ Text1;Першы тэкставы струмень
 Text2;Другі тэкставы струмень
 Text3;Трэці тэкставы струмень
 TextCount;Коль-ць тэкставых струменяў
+TextlessElementsExist;
 ThanksTo;Падзякі
 Thousands separator;Падзельнік тысяч
-Title;Загаловак
-Title_More;Загаловак
 TimeCode;
 TimeCode_FirstFrame;
 TimeCode_Settings;
 TimeCode_Source;
+TimeCode_Striped;
 TimeStamp;
 TimeZone;Гадзінная зона
+Title;Загаловак
+Title_More;Загаловак
 Total;Усяго
+TotalNumberOfParts;
+TotalProgrammeDuration;
 Track;Сцежка
 Track_Count;Коль-ць дарожак
 transfer_characteristics;Характарыстыкі трансферу
@@ -1013,6 +1077,7 @@ Video_Delay;Затрымка відэа
 Video_No;Няма відэаструменя
 Video0_Delay;Затрымка відэа
 Video1;Першы відэаструмень
+VideoComments;
 VideoCount;Коль-ць відэаструменяў
 View;Прагляд
 View_Hint;Прагляд
@@ -1028,6 +1093,7 @@ WebSite_Url;http://MediaArea.net/MediaInfo
 WebSite_Video;Сайт відэакодэка
 WebSite_Video_More;Перайсці на сайт (%Url%) праглядніка для гэтага відэакодэка
 Width;Шырыня
+Width_CleanAperture;
 Width_Original;
 WriteMe;Напісаць мне
 WriteToTranslator;Напісаць перакладчыку
@@ -1036,5 +1102,5 @@ Written_Location;Месца напісання
 WrittenBy;Напісаў
 Yes;Так
 Your system;Ваша сістэма
-ZZ_Automatic_Percent;92
-ZZ_AutomaticLanguage_Percent;96
+ZZ_Automatic_Percent;86
+ZZ_AutomaticLanguage_Percent;90
