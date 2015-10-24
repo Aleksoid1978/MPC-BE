@@ -415,13 +415,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		}
 
 		m_nDX9Resizer = iDX9Resizer;
-
 		screenSpacePassCount++; // currently all resizers are 1-pass
-#if ENABLE_2PASS_RESIZE
-		if (iDX9Resizer >= RESIZER_SHADER_BICUBIC06 && iDX9Resizer != RESIZER_SHADER_SMOOTHERSTEP && srcRect.Size() != destRect.Size()) {
-			screenSpacePassCount++;
-		}
-#endif
 
 		// Custom screen space pixel shaders
 		bCustomScreenSpacePixelShaders = !m_pCustomScreenSpacePixelShaders.IsEmpty();
