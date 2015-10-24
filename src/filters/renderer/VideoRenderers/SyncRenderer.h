@@ -69,12 +69,12 @@ extern bool g_bExternalSubtitleTime;
 
 enum {
 	shader_smootherstep,
-	shader_bicubic06,
-	shader_bicubic08,
-	shader_bicubic10,
 	shader_bspline4,
 	shader_mitchell4,
 	shader_catmull4,
+	shader_bicubic06,
+	shader_bicubic08,
+	shader_bicubic10,
 	shader_downscaling,
 	shader_count
 };

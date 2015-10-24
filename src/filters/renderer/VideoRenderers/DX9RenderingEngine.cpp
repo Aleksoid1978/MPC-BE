@@ -204,21 +204,21 @@ void CDX9RenderingEngine::InitRenderingEngine()
 		switch (GetRenderersSettings().iDX9Resizer) {
 		case RESIZER_SHADER_SMOOTHERSTEP: hr = InitShaderResizer(shader_smootherstep); break;
 #if ENABLE_2PASS_RESIZE
-		case RESIZER_SHADER_BICUBIC06: hr = InitShaderResizer(shader_bicubic06_x); break;
-		case RESIZER_SHADER_BICUBIC08: hr = InitShaderResizer(shader_bicubic08_x); break;
-		case RESIZER_SHADER_BICUBIC10: hr = InitShaderResizer(shader_bicubic10_x); break;
 		case RESIZER_SHADER_BSPLINE4:  hr = InitShaderResizer(shader_bspline4_x);  break;
 		case RESIZER_SHADER_MITCHELL4: hr = InitShaderResizer(shader_mitchell4_x); break;
 		case RESIZER_SHADER_CATMULL4:  hr = InitShaderResizer(shader_catmull4_x);  break;
+		case RESIZER_SHADER_BICUBIC06: hr = InitShaderResizer(shader_bicubic06_x); break;
+		case RESIZER_SHADER_BICUBIC08: hr = InitShaderResizer(shader_bicubic08_x); break;
+		case RESIZER_SHADER_BICUBIC10: hr = InitShaderResizer(shader_bicubic10_x); break;
 		case RESIZER_SHADER_LANCZOS2:  hr = InitShaderResizer(shader_lanczos2_x);  break;
 		case RESIZER_SHADER_LANCZOS3:  hr = InitShaderResizer(shader_lanczos3_x);  break;
 #else
-		case RESIZER_SHADER_BICUBIC06: hr = InitShaderResizer(shader_bicubic06); break;
-		case RESIZER_SHADER_BICUBIC08: hr = InitShaderResizer(shader_bicubic08); break;
-		case RESIZER_SHADER_BICUBIC10: hr = InitShaderResizer(shader_bicubic10); break;
 		case RESIZER_SHADER_BSPLINE4:  hr = InitShaderResizer(shader_bspline4);  break;
 		case RESIZER_SHADER_MITCHELL4: hr = InitShaderResizer(shader_mitchell4); break;
 		case RESIZER_SHADER_CATMULL4:  hr = InitShaderResizer(shader_catmull4);  break;
+		case RESIZER_SHADER_BICUBIC06: hr = InitShaderResizer(shader_bicubic06); break;
+		case RESIZER_SHADER_BICUBIC08: hr = InitShaderResizer(shader_bicubic08); break;
+		case RESIZER_SHADER_BICUBIC10: hr = InitShaderResizer(shader_bicubic10); break;
 #endif
 		}
 	}
@@ -392,21 +392,21 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			break;
 		case RESIZER_SHADER_SMOOTHERSTEP: hr = InitShaderResizer(shader_smootherstep); break;
 #if ENABLE_2PASS_RESIZE
-		case RESIZER_SHADER_BICUBIC06: hr = InitShaderResizer(shader_bicubic06_x); break;
-		case RESIZER_SHADER_BICUBIC08: hr = InitShaderResizer(shader_bicubic08_x); break;
-		case RESIZER_SHADER_BICUBIC10: hr = InitShaderResizer(shader_bicubic10_x); break;
 		case RESIZER_SHADER_BSPLINE4:  hr = InitShaderResizer(shader_bspline4_x);  break;
 		case RESIZER_SHADER_MITCHELL4: hr = InitShaderResizer(shader_mitchell4_x); break;
 		case RESIZER_SHADER_CATMULL4:  hr = InitShaderResizer(shader_catmull4_x);  break;
+		case RESIZER_SHADER_BICUBIC06: hr = InitShaderResizer(shader_bicubic06_x); break;
+		case RESIZER_SHADER_BICUBIC08: hr = InitShaderResizer(shader_bicubic08_x); break;
+		case RESIZER_SHADER_BICUBIC10: hr = InitShaderResizer(shader_bicubic10_x); break;
 		case RESIZER_SHADER_LANCZOS2:  hr = InitShaderResizer(shader_lanczos2_x);  break;
 		case RESIZER_SHADER_LANCZOS3:  hr = InitShaderResizer(shader_lanczos3_x);  break;
 #else
-		case RESIZER_SHADER_BICUBIC06: hr = InitShaderResizer(shader_bicubic06); break;
-		case RESIZER_SHADER_BICUBIC08: hr = InitShaderResizer(shader_bicubic08); break;
-		case RESIZER_SHADER_BICUBIC10: hr = InitShaderResizer(shader_bicubic10); break;
 		case RESIZER_SHADER_BSPLINE4:  hr = InitShaderResizer(shader_bspline4);  break;
 		case RESIZER_SHADER_MITCHELL4: hr = InitShaderResizer(shader_mitchell4); break;
 		case RESIZER_SHADER_CATMULL4:  hr = InitShaderResizer(shader_catmull4);  break;
+		case RESIZER_SHADER_BICUBIC06: hr = InitShaderResizer(shader_bicubic06); break;
+		case RESIZER_SHADER_BICUBIC08: hr = InitShaderResizer(shader_bicubic08); break;
+		case RESIZER_SHADER_BICUBIC10: hr = InitShaderResizer(shader_bicubic10); break;
 #endif
 		}
 
@@ -530,21 +530,21 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		case RESIZER_BILINEAR: hr = TextureResize(pVideoTexture, dst, srcRect, D3DTEXF_LINEAR); break;
 		case RESIZER_SHADER_SMOOTHERSTEP: hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_smootherstep); break;
 #if ENABLE_2PASS_RESIZE
-		case RESIZER_SHADER_BICUBIC06: hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic06_x); break;
-		case RESIZER_SHADER_BICUBIC08: hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic08_x); break;
-		case RESIZER_SHADER_BICUBIC10: hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic10_x); break;
 		case RESIZER_SHADER_BSPLINE4:  hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bspline4_x);  break;
 		case RESIZER_SHADER_MITCHELL4: hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_mitchell4_x); break;
 		case RESIZER_SHADER_CATMULL4:  hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_catmull4_x);  break;
+		case RESIZER_SHADER_BICUBIC06: hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic06_x); break;
+		case RESIZER_SHADER_BICUBIC08: hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic08_x); break;
+		case RESIZER_SHADER_BICUBIC10: hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic10_x); break;
 		case RESIZER_SHADER_LANCZOS2:  hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_lanczos2_x);  break;
 		case RESIZER_SHADER_LANCZOS3:  hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_lanczos3_x);  break;
 #else
-		case RESIZER_SHADER_BICUBIC06: hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_bicubic06); break;
-		case RESIZER_SHADER_BICUBIC08: hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_bicubic08); break;
-		case RESIZER_SHADER_BICUBIC10: hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_bicubic10); break;
 		case RESIZER_SHADER_BSPLINE4:  hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_bspline4);  break;
 		case RESIZER_SHADER_MITCHELL4: hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_mitchell4); break;
 		case RESIZER_SHADER_CATMULL4:  hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_catmull4);  break;
+		case RESIZER_SHADER_BICUBIC06: hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_bicubic06); break;
+		case RESIZER_SHADER_BICUBIC08: hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_bicubic08); break;
+		case RESIZER_SHADER_BICUBIC10: hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_bicubic10); break;
 #endif
 		}
 	} else {
@@ -1006,6 +1006,24 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 		pSrcData = shader_resizer_smootherstep;
 		break;
 #if ENABLE_2PASS_RESIZE
+	case shader_bspline4_y:
+		iShader--;
+	case shader_bspline4_x:
+		pSrcData = shader_resizer_bspline4_2pass;
+		twopass = true;
+		break;
+	case shader_mitchell4_y:
+		iShader--;
+	case shader_mitchell4_x:
+		pSrcData = shader_resizer_mitchell4_2pass;
+		twopass = true;
+		break;
+	case shader_catmull4_y:
+		iShader--;
+	case shader_catmull4_x:
+		pSrcData = shader_resizer_catmull4_2pass;
+		twopass = true;
+		break;
 	case shader_bicubic06_y:
 		iShader--;
 	case shader_bicubic06_x:
@@ -1027,24 +1045,6 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 		ShaderMacros[1] = { "A", "-1.0" };
 		twopass = true;
 		break;
-	case shader_bspline4_y:
-		iShader--;
-	case shader_bspline4_x:
-		pSrcData = shader_resizer_bspline4_2pass;
-		twopass = true;
-		break;
-	case shader_mitchell4_y:
-		iShader--;
-	case shader_mitchell4_x:
-		pSrcData = shader_resizer_mitchell4_2pass;
-		twopass = true;
-		break;
-	case shader_catmull4_y:
-		iShader--;
-	case shader_catmull4_x:
-		pSrcData = shader_resizer_catmull4_2pass;
-		twopass = true;
-		break;
 	case shader_lanczos2_y:
 		iShader--;
 	case shader_lanczos2_x:
@@ -1058,6 +1058,15 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 		twopass = true;
 		break;
 #else
+	case shader_bspline4:
+		pSrcData = shader_resizer_bspline4;
+		break;
+	case shader_mitchell4:
+		pSrcData = shader_resizer_mitchell4;
+		break;
+	case shader_catmull4:
+		pSrcData = shader_resizer_catmull4;
+		break;
 	case shader_bicubic06:
 		pSrcData = shader_resizer_bicubic;
 		ShaderMacros[1] = { "A", "-0.6" };
@@ -1069,15 +1078,6 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 	case shader_bicubic10:
 		pSrcData = shader_resizer_bicubic;
 		ShaderMacros[1] = { "A", "-1.0" };
-		break;
-	case shader_bspline4:
-		pSrcData = shader_resizer_bspline4;
-		break;
-	case shader_mitchell4:
-		pSrcData = shader_resizer_mitchell4;
-		break;
-	case shader_catmull4:
-		pSrcData = shader_resizer_catmull4;
 		break;
 #endif
 	}
