@@ -1976,7 +1976,7 @@ void File_MpegTs::Read_Buffer_AfterParsing()
                         if (Stream && Stream->Kind==complete_stream::stream::pes && Stream->TimeStamp_Start!=(int64u)-1 && Stream->TimeStamp_End!=(int64u)-1)
                         {
                             int64u Duration=Stream->TimeStamp_End-Stream->TimeStamp_Start;
-                            if (Duration<27000000*2) // 2 seconds
+                            if (Duration!=0 && Duration<27000000*2) // 2 seconds // mpc-be patch
                             {
                                 int64u Ratio=(27000000*2)/Duration;
                                 MpegTs_JumpTo_End*=Ratio;
