@@ -676,7 +676,7 @@ CMainFrame::CMainFrame() :
 	m_OSD(this),
 	m_wndToolBar(this),
 	m_wndSeekBar(this),
-	miFPS(0.0),
+	m_dMediaInfoFPS(0.0),
 	m_bAudioOnly(true)
 {
 	m_Lcd.SetVolumeRange(0, 100);
@@ -1023,11 +1023,9 @@ void CMainFrame::OnClose()
 	s.WinLircClient.DisConnect();
 	s.UIceClient.DisConnect();
 
-	/*
 	if (s.AutoChangeFullscrRes.bEnabled && s.fRestoreResAfterExit) {
-		SetDispMode(s.dm_def, s.strFullScreenMonitor);
+		SetDispMode(s.dm_def, s.strFullScreenMonitor, TRUE);
 	}
-	*/
 
 	if (m_hDWMAPI) {
 		FreeLibrary(m_hDWMAPI);
@@ -10405,7 +10403,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	bool fAudioOnly = m_bAudioOnly;
 	m_bAudioOnly = true;
 
-	m_bFullScreen		= !m_bFullScreen;
+	m_bFullScreen = !m_bFullScreen;
 
 	ModifyStyle(dwRemove, dwAdd, SWP_NOZORDER);
 	ModifyStyleEx(dwRemoveEx, dwAddEx, SWP_NOZORDER);
@@ -10543,7 +10541,7 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 			}
 
 			if (s.AutoChangeFullscrRes.bEnabled == 1 && s.AutoChangeFullscrRes.bApplyDefault && s.AutoChangeFullscrRes.dmFullscreenRes[0].bChecked == 1) {
-				SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[0].dmFSRes, s.strFullScreenMonitor);
+				SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[0].dmFSRes, s.strFullScreenMonitor, TRUE);
 			}
 
 			if (s.iShowOSD & OSD_ENABLE) {
@@ -10622,23 +10620,19 @@ void CMainFrame::AutoChangeMonitorMode()
 		dev++;
  	}
 
-	CString strCurFS = mf_hmonitor;
-	dispmode dmCur;
-	GetCurDispMode(dmCur, strCurFS);
-
 	// Set Display Mode
 	if (s.AutoChangeFullscrRes.bEnabled && bMonValid == TRUE) {
-		double MediaFPS = 0.0;
-		if (miFPS > 0.9) {
-			MediaFPS = miFPS;
+		double dFPS = 0.0;
+		if (m_dMediaInfoFPS > 0.9) {
+			dFPS = m_dMediaInfoFPS;
 		} else {
 			const REFERENCE_TIME rtAvgTimePerFrame = std::llround(GetAvgTimePerFrame(FALSE) * 10000000i64);
 			if (rtAvgTimePerFrame > 0) {
-				MediaFPS = 10000000.0 / rtAvgTimePerFrame;
+				dFPS = 10000000.0 / rtAvgTimePerFrame;
 			}
 		}
 
-		if (MediaFPS == 0.0) {
+		if (dFPS == 0.0) {
 			return;
 		}
 
@@ -10646,10 +10640,10 @@ void CMainFrame::AutoChangeMonitorMode()
 			const fpsmode* fsmode = &s.AutoChangeFullscrRes.dmFullscreenRes[rs];
 			if (fsmode->bValid
 					&& fsmode->bChecked
-					&& MediaFPS >= fsmode->vfr_from
-					&& MediaFPS <= fsmode->vfr_to) {
+					&& dFPS >= fsmode->vfr_from
+					&& dFPS <= fsmode->vfr_to) {
 
-				SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes, mf_hmonitor);
+				SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes, mf_hmonitor, IsD3DFS);
 				return;
 			}
 		}
@@ -10682,7 +10676,7 @@ bool CMainFrame::GetDispMode(int i, dispmode& dm, CString& DisplayName)
 	return dm.bValid;
 }
 
-void CMainFrame::SetDispMode(dispmode& dm, CString& DisplayName)
+void CMainFrame::SetDispMode(dispmode& dm, CString& DisplayName, BOOL bForceRegistryMode/* = FALSE*/)
 {
 	const CAppSettings& s = AfxGetAppSettings();
 
@@ -10715,7 +10709,7 @@ void CMainFrame::SetDispMode(dispmode& dm, CString& DisplayName)
 	dmScreenSettings.dmDisplayFlags     = dm.dmDisplayFlags;
 	dmScreenSettings.dmFields           = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY | DM_DISPLAYFLAGS;
 
-	if (s.fRestoreResAfterExit) {
+	if (s.fRestoreResAfterExit && !bForceRegistryMode) {
 		ChangeDisplaySettingsEx(ChangeDisplayName, &dmScreenSettings, NULL, CDS_FULLSCREEN, NULL);
 	} else {
 		LONG ret = ChangeDisplaySettingsEx(ChangeDisplayName, &dmScreenSettings, NULL, CDS_UPDATEREGISTRY | CDS_NORESET, NULL);
@@ -13476,8 +13470,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			mi_fn = fn;
 		}
 
-		miFPS	= 0.0;
-		s.dFPS	= 0.0;
+		m_dMediaInfoFPS	= 0.0;
 
 		if ((s.AutoChangeFullscrRes.bEnabled == 1 && (IsD3DFullScreenMode() || s.fLaunchfullscreen))
 				|| s.AutoChangeFullscrRes.bEnabled == 2) {
@@ -13543,12 +13536,12 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 						// double fps for Interlaced video.
 						nFactor = 2.0;
 					}
-					miFPS = _wtof(strFPS);
-					if (miFPS < 30.0 && nFactor > 1.0) {
-						miFPS *= nFactor;
+					m_dMediaInfoFPS = _wtof(strFPS);
+					if (m_dMediaInfoFPS < 30.0 && nFactor > 1.0) {
+						m_dMediaInfoFPS *= nFactor;
 					}
 
-					if (miFPS > 0.9) {
+					if (m_dMediaInfoFPS > 0.9) {
 						break;
 					}
 
@@ -13558,7 +13551,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 						break;
 					}
 				}
-				s.dFPS = miFPS;
 
 				AutoChangeMonitorMode();
 

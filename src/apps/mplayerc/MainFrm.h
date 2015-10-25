@@ -492,7 +492,7 @@ public:
 	static bool GetDispMode(int i, dispmode& dm, CString& DisplayName);
 
 protected:
-	void SetDispMode(dispmode& dm, CString& DisplayName);
+	void SetDispMode(dispmode& dm, CString& DisplayName, BOOL bForceRegistryMode = FALSE);
 
 	bool			m_bUseSmartSeek;
 	MPC_LOADSTATE	m_eMediaLoadState;
@@ -541,7 +541,7 @@ protected:
 	void OpenSetupCaptureBar();
 	void OpenSetupWindowTitle(CString fn);
 	void AutoChangeMonitorMode();
-	double miFPS;
+	double m_dMediaInfoFPS;
 
 	bool GraphEventComplete();
 
