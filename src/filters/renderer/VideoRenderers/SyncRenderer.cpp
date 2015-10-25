@@ -56,8 +56,6 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error),
 	m_ScreenSize(0, 0),
 	m_nDXSurface(1),
-	m_nVMR9Surfaces(0),
-	m_iVMR9Surface(0),
 	m_nCurSurface(0),
 	m_bSnapToVSync(false),
 	m_bInterlaced(0),
@@ -628,10 +626,11 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	}
 
 	m_pPSC.Attach(DNew CPixelShaderCompiler(m_pD3DDev, true));
-	m_filter = D3DTEXF_NONE;
 
 	if (m_caps.StretchRectFilterCaps&D3DPTFILTERCAPS_MINFLINEAR && m_caps.StretchRectFilterCaps&D3DPTFILTERCAPS_MAGFLINEAR) {
 		m_filter = D3DTEXF_LINEAR;
+	} else {
+		m_filter = D3DTEXF_NONE;
 	}
 
 	InitMaxSubtitleTextureSize(GetRenderersSettings().nSPMaxTexRes, m_ScreenSize);

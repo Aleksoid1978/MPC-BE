@@ -37,33 +37,33 @@ extern bool g_bExternalSubtitleTime;
 // the display frequency in one of the video - display synchronization modes.
 // Powerstrip can also through a CGenlock object give very accurate timing data
 // (given) that the gfx board is supported by PS.
-#define UM_SETCUSTOMTIMING (WM_USER+200)
-#define UM_SETREFRESHRATE (WM_USER+201)
-#define UM_SETPOLARITY (WM_USER+202)
-#define UM_REMOTECONTROL (WM_USER+210)
-#define UM_SETGAMMARAMP (WM_USER+203)
-#define UM_CREATERESOLUTION (WM_USER+204)
-#define UM_GETTIMING (WM_USER+205)
-#define UM_SETCUSTOMTIMINGFAST (WM_USER+211) // Sets timing without writing to file. Faster
+#define UM_SETCUSTOMTIMING		(WM_USER+200)
+#define UM_SETREFRESHRATE		(WM_USER+201)
+#define UM_SETPOLARITY			(WM_USER+202)
+#define UM_REMOTECONTROL		(WM_USER+210)
+#define UM_SETGAMMARAMP			(WM_USER+203)
+#define UM_CREATERESOLUTION		(WM_USER+204)
+#define UM_GETTIMING			(WM_USER+205)
+#define UM_SETCUSTOMTIMINGFAST	(WM_USER+211) // Sets timing without writing to file. Faster
 
-#define PositiveHorizontalPolarity 0x00
-#define PositiveVerticalPolarity 0x00
-#define NegativeHorizontalPolarity 0x02
-#define NegativeVerticalPolarity 0x04
-#define HideTrayIcon 0x00
-#define ShowTrayIcon 0x01
-#define ClosePowerStrip 0x63
+#define PositiveHorizontalPolarity	0x00
+#define PositiveVerticalPolarity	0x00
+#define NegativeHorizontalPolarity	0x02
+#define NegativeVerticalPolarity	0x04
+#define HideTrayIcon				0x00
+#define ShowTrayIcon				0x01
+#define ClosePowerStrip				0x63
 
-#define HACTIVE 0
-#define HFRONTPORCH 1
-#define HSYNCWIDTH 2
-#define HBACKPORCH 3
-#define VACTIVE 4
-#define VFRONTPORCH 5
-#define VSYNCWIDTH 6
-#define VBACKPORCH 7
-#define PIXELCLOCK 8
-#define UNKNOWN 9
+#define HACTIVE		0
+#define HFRONTPORCH	1
+#define HSYNCWIDTH	2
+#define HBACKPORCH	3
+#define VACTIVE		4
+#define VFRONTPORCH	5
+#define VSYNCWIDTH	6
+#define VBACKPORCH	7
+#define PIXELCLOCK	8
+#define UNKNOWN		9
 
 #define MAX_FIFO_SIZE 1024
 
@@ -127,20 +127,30 @@ namespace GothSync
 		HRESULT (__stdcall * m_pDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**);
 
 		CCritSec m_allocatorLock;
-		CComPtr<IDirect3D9Ex> m_pD3DEx;
-		CComPtr<IDirect3D9> m_pD3D;
-		CComPtr<IDirect3DDevice9Ex> m_pD3DDevEx;
-		CComPtr<IDirect3DDevice9> m_pD3DDev;
+		CComPtr<IDirect3D9>			m_pD3D;
+		CComPtr<IDirect3D9Ex>		m_pD3DEx;
+		CComPtr<IDirect3DDevice9>	m_pD3DDev;
+		CComPtr<IDirect3DDevice9Ex>	m_pD3DDevEx;
 
-		CComPtr<IDirect3DTexture9> m_pVideoTexture[MAX_PICTURE_SLOTS];
-		CComPtr<IDirect3DSurface9> m_pVideoSurface[MAX_PICTURE_SLOTS];
-		CComPtr<IDirect3DTexture9> m_pOSDTexture;
-		CComPtr<IDirect3DSurface9> m_pOSDSurface;
-		CComPtr<ID3DXLine> m_pLine;
-		CComPtr<ID3DXFont> m_pFont;
-		CComPtr<ID3DXSprite> m_pSprite;
-		CSyncRenderer *m_pOuterEVR;
+		UINT						m_CurrentAdapter;
+		D3DCAPS9					m_caps;
+		D3DFORMAT					m_SurfaceType;
+		D3DFORMAT					m_BackbufferType;
+		D3DFORMAT					m_DisplayType;
+		D3DTEXTUREFILTERTYPE		m_filter;
+		D3DPRESENT_PARAMETERS		pp;
 
+		CComPtr<IDirect3DTexture9>	m_pVideoTexture[MAX_PICTURE_SLOTS];
+		CComPtr<IDirect3DSurface9>	m_pVideoSurface[MAX_PICTURE_SLOTS];
+		CComPtr<IDirect3DTexture9>	m_pOSDTexture;
+		CComPtr<IDirect3DSurface9>	m_pOSDSurface;
+		CComPtr<IDirect3DTexture9>	m_pScreenSizeTemporaryTexture[2];
+		CComPtr<ID3DXLine>			m_pLine;
+		CComPtr<ID3DXFont>			m_pFont;
+		CComPtr<ID3DXSprite>		m_pSprite;
+		CSyncRenderer*				m_pOuterEVR;
+
+		// Shaders
 		class CExternalPixelShader
 		{
 		public:
@@ -156,19 +166,11 @@ namespace GothSync
 			}
 		};
 
-		CAutoPtr<CPixelShaderCompiler> m_pPSC;
-		CAtlList<CExternalPixelShader> m_pPixelShaders;
-		CAtlList<CExternalPixelShader> m_pPixelShadersScreenSpace;
-		CComPtr<IDirect3DPixelShader9> m_pResizerPixelShader[shader_count];
-		CComPtr<IDirect3DTexture9> m_pScreenSizeTemporaryTexture[2];
-
-		D3DFORMAT m_SurfaceType;
-		D3DFORMAT m_BackbufferType;
-		D3DFORMAT m_DisplayType;
-		D3DTEXTUREFILTERTYPE m_filter;
-		D3DCAPS9 m_caps;
-		D3DPRESENT_PARAMETERS pp;
 		LPCSTR m_ShaderProfile;
+		CAutoPtr<CPixelShaderCompiler>	m_pPSC;
+		CAtlList<CExternalPixelShader>	m_pPixelShaders;
+		CAtlList<CExternalPixelShader>	m_pPixelShadersScreenSpace;
+		CComPtr<IDirect3DPixelShader9>	m_pResizerPixelShader[shader_count];
 
 		bool SettingsNeedResetDevice();
 		void SendResetRequest();
@@ -178,7 +180,6 @@ namespace GothSync
 
 		HANDLE m_hEvtQuit; // Stop rendering thread event
 		LONGLONG m_LastAdapterCheck;
-		UINT m_CurrentAdapter;
 		UINT GetAdapter(IDirect3D9 *pD3D);
 
 		HRESULT InitShaderResizer(int iShader);
@@ -215,9 +216,9 @@ namespace GothSync
 			DWORD Filter,
 			D3DCOLOR ColorKey);
 
-		typedef HRESULT (WINAPI* D3DXCreateLinePtr)
-		(LPDIRECT3DDEVICE9 pDevice,
-		 LPD3DXLINE* ppLine);
+		typedef HRESULT (WINAPI* D3DXCreateLinePtr)(
+			LPDIRECT3DDEVICE9 pDevice,
+			LPD3DXLINE* ppLine);
 
 		typedef HRESULT (WINAPI* D3DXCreateFontPtr)(
 			LPDIRECT3DDEVICE9 pDevice,
@@ -233,6 +234,10 @@ namespace GothSync
 			LPCWSTR pFaceName,
 			LPD3DXFONT* ppFont);
 
+		typedef HRESULT (WINAPI* D3DXCreateSpritePtr)(
+			LPDIRECT3DDEVICE9 pDevice,
+			LPD3DXSPRITE *ppSprite);
+
 		HRESULT AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9* pTexture);
 
 		virtual void OnResetDevice() {};
@@ -246,11 +251,9 @@ namespace GothSync
 		D3DXLoadSurfaceFromMemoryPtr m_pD3DXLoadSurfaceFromMemory;
 		D3DXCreateLinePtr m_pD3DXCreateLine;
 		D3DXCreateFontPtr m_pD3DXCreateFont;
-		HRESULT (__stdcall *m_pD3DXCreateSprite)(LPDIRECT3DDEVICE9 pDevice, LPD3DXSPRITE * ppSprite);
+		D3DXCreateSpritePtr m_pD3DXCreateSprite;
 
 		int m_nDXSurface; // Total number of DX Surfaces
-		int m_nVMR9Surfaces;
-		int m_iVMR9Surface;
 		int m_nCurSurface; // Surface currently displayed
 		long m_nUsedBuffer;
 
