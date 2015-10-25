@@ -1949,7 +1949,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 
 			// swap NV12 and YV12 for the Intel GPU.
 			MPCPixelFormat IntelOutList[PixFmt_count];
-			if (1 || m_nPCIVendor == PCIV_Intel) {
+			if (m_nPCIVendor == PCIV_Intel) {
 				memcpy(IntelOutList, OutList, sizeof(IntelOutList));
 				for (int i = 1; i < PixFmt_count; i++) {
 					if (IntelOutList[i-1] == PixFmt_NV12 && IntelOutList[i] == PixFmt_YV12) {
