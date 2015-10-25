@@ -1902,53 +1902,67 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		if (av_pfdesc) {
 			int lumabits = av_pfdesc->comp->depth;
 
-			const MPCPixelFormat* InOutList = NULL;
+			const MPCPixelFormat* OutList = NULL;
 
 			if (av_pfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL)) {
-				InOutList = RGB_8;
+				OutList = RGB_8;
 			}
 			else if (av_pfdesc->nb_components >= 3) {
 				if (av_pfdesc->log2_chroma_w == 1 && av_pfdesc->log2_chroma_h == 1) { // 4:2:0
 					if (lumabits <= 8) {
-						InOutList = YUV420_8;
+						OutList = YUV420_8;
 					}
 					else if (lumabits <= 10) {
-						InOutList = YUV420_10;
+						OutList = YUV420_10;
 					}
 					else {
-						InOutList = YUV420_16;
+						OutList = YUV420_16;
 					}
 				}
 				else if (av_pfdesc->log2_chroma_w == 1 && av_pfdesc->log2_chroma_h == 0) { // 4:2:2
 					if (lumabits <= 8) {
-						InOutList = YUV422_8;
+						OutList = YUV422_8;
 					}
 					else if (lumabits <= 10) {
-						InOutList = YUV422_10;
+						OutList = YUV422_10;
 					}
 					else {
-						InOutList = YUV422_16;
+						OutList = YUV422_16;
 					}
 				}
 				else if (av_pfdesc->log2_chroma_w == 0 && av_pfdesc->log2_chroma_h == 0) { // 4:4:4
 					if (lumabits <= 8) {
-						InOutList = YUV444_8;
+						OutList = YUV444_8;
 					}
 					else if (lumabits <= 10) {
-						InOutList = YUV444_10;
+						OutList = YUV444_10;
 					}
 					else {
-						InOutList = YUV444_16;
+						OutList = YUV444_16;
 					}
 				}
 			}
 
-			if (InOutList == NULL) {
-				InOutList = YUV420_8;
+			if (OutList == NULL) {
+				OutList = YUV420_8;
+			}
+
+			// swap NV12 and YV12 for the Intel GPU.
+			MPCPixelFormat IntelOutList[PixFmt_count];
+			if (1 || m_nPCIVendor == PCIV_Intel) {
+				memcpy(IntelOutList, OutList, sizeof(IntelOutList));
+				for (int i = 1; i < PixFmt_count; i++) {
+					if (IntelOutList[i-1] == PixFmt_NV12 && IntelOutList[i] == PixFmt_YV12) {
+						IntelOutList[i-1] = PixFmt_YV12;
+						IntelOutList[i] = PixFmt_NV12;
+						OutList = IntelOutList;
+						break;
+					}
+				}
 			}
 
 			for (int i = 0; i < PixFmt_count; i++) {
-				int index = InOutList[i];
+				int index = OutList[i];
 				if (m_fPixFmts[index]) {
 					nSwIndex[nSwCount++] = index;
 				}
