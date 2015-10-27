@@ -428,6 +428,8 @@ const AP4_Atom::Type AP4_ATOM_TYPE_FFV1 = AP4_ATOM_TYPE('F','F','V','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_DVC1 = AP4_ATOM_TYPE('d','v','c','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_OVC1 = AP4_ATOM_TYPE('o','v','c','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_VC1  = AP4_ATOM_TYPE('v','c','-','1');
+// WMV1
+const AP4_Atom::Type AP4_ATOM_TYPE_WMV1 = AP4_ATOM_TYPE('W','M','V','1');
 
 // fragmented atom ...
 const AP4_Atom::Type AP4_ATOM_TYPE_MVEX = AP4_ATOM_TYPE('m','v','e','x');
