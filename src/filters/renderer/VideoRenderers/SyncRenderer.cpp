@@ -249,30 +249,14 @@ HRESULT CBaseAP::TextureBlt(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<texcoords> v[
 
 	DWORD FVF = 0;
 	switch (texcoords) {
-		case 1:
-			FVF = D3DFVF_TEX1;
-			break;
-		case 2:
-			FVF = D3DFVF_TEX2;
-			break;
-		case 3:
-			FVF = D3DFVF_TEX3;
-			break;
-		case 4:
-			FVF = D3DFVF_TEX4;
-			break;
-		case 5:
-			FVF = D3DFVF_TEX5;
-			break;
-		case 6:
-			FVF = D3DFVF_TEX6;
-			break;
-		case 7:
-			FVF = D3DFVF_TEX7;
-			break;
-		case 8:
-			FVF = D3DFVF_TEX8;
-			break;
+		case 1: FVF = D3DFVF_TEX1; break;
+		case 2: FVF = D3DFVF_TEX2; break;
+		case 3: FVF = D3DFVF_TEX3; break;
+		case 4: FVF = D3DFVF_TEX4; break;
+		case 5: FVF = D3DFVF_TEX5; break;
+		case 6: FVF = D3DFVF_TEX6; break;
+		case 7: FVF = D3DFVF_TEX7; break;
+		case 8: FVF = D3DFVF_TEX8; break;
 		default:
 			return E_FAIL;
 	}
