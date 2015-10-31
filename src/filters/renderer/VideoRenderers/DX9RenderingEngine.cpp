@@ -199,9 +199,8 @@ void CDX9RenderingEngine::InitRenderingEngine()
 	// Initialize the pixel shader compiler
 	m_pPSC.Attach(DNew CPixelShaderCompiler(m_pD3DDev, true));
 
-	if (GetRenderersSettings().iDX9Resizer > RESIZER_BILINEAR) {
-		HRESULT hr = S_OK;
-		switch (GetRenderersSettings().iDX9Resizer) {
+	HRESULT hr = S_OK;
+	switch (GetRenderersSettings().iDX9Resizer) {
 		case RESIZER_SHADER_SMOOTHERSTEP: hr = InitShaderResizer(shader_smootherstep); break;
 #if ENABLE_2PASS_RESIZE
 		case RESIZER_SHADER_BSPLINE4:  hr = InitShaderResizer(shader_bspline4_x);  break;
@@ -220,7 +219,6 @@ void CDX9RenderingEngine::InitRenderingEngine()
 		case RESIZER_SHADER_BICUBIC08: hr = InitShaderResizer(shader_bicubic08); break;
 		case RESIZER_SHADER_BICUBIC10: hr = InitShaderResizer(shader_bicubic10); break;
 #endif
-		}
 	}
 }
 

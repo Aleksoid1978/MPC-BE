@@ -114,6 +114,7 @@ namespace GothSync
 	class CSyncRenderer;
 
 	// Base allocator-presenter
+
 	class CBaseAP:
 		public CSubPicAllocatorPresenterImpl
 	{
@@ -316,7 +317,7 @@ namespace GothSync
 
 		int m_bInterlaced;
 		double m_TextScale;
-		CString	 m_strStatsMsg[10];
+		CString m_strStatsMsg[10];
 
 		CGenlock *m_pGenlock; // The video - display synchronizer class
 		CComPtr<IReferenceClock> m_pRefClock; // The reference clock. Used in Paint()
@@ -349,6 +350,8 @@ namespace GothSync
 		STDMETHODIMP_(bool) ResetDevice();
 		STDMETHODIMP_(bool) DisplayChange();
 	};
+
+	// Sync allocator-presenter
 
 	class CSyncAP:
 		public CBaseAP,
@@ -561,6 +564,8 @@ namespace GothSync
 		PTR_AvRevertMmThreadCharacteristics pfAvRevertMmThreadCharacteristics;
 	};
 
+	// Sync renderer
+
 	class CSyncRenderer:
 		public CUnknown,
 		public IVMRffdshow9,
@@ -601,6 +606,8 @@ namespace GothSync
 		DECLARE_IUNKNOWN;
 		virtual HRESULT STDMETHODCALLTYPE NonDelegatingQueryInterface(REFIID riid, void** ppvObject);
 	};
+
+	// CGenlock
 
 	class CGenlock
 	{
