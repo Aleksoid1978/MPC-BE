@@ -127,45 +127,11 @@ namespace GothSync
 		HMODULE m_hD3D9;
 		HRESULT (__stdcall * m_pDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**);
 
-		HRESULT (__stdcall * m_pD3DXLoadSurfaceFromMemory)(
-			LPDIRECT3DSURFACE9 pDestSurface,
-			CONST PALETTEENTRY* pDestPalette,
-			CONST RECT* pDestRect,
-			LPCVOID pSrcMemory,
-			D3DFORMAT SrcFormat,
-			UINT SrcPitch,
-			CONST PALETTEENTRY*	pSrcPalette,
-			CONST RECT* pSrcRect,
-			DWORD Filter,
-			D3DCOLOR ColorKey);
-		HRESULT (__stdcall * m_pD3DXCreateLine)(
-			LPDIRECT3DDEVICE9 pDevice,
-			LPD3DXLINE* ppLine);
-		HRESULT (__stdcall * m_pD3DXCreateFont)(
-			LPDIRECT3DDEVICE9 pDevice,
-			int Height,
-			UINT Width,
-			UINT Weight,
-			UINT MipLevels,
-			bool Italic,
-			DWORD CharSet,
-			DWORD OutputPrecision,
-			DWORD Quality,
-			DWORD PitchAndFamily,
-			LPCWSTR pFaceName,
-			LPD3DXFONT* ppFont);
-		HRESULT (__stdcall * m_pD3DXCreateSprite)(
-			LPDIRECT3DDEVICE9 pDevice,
-			LPD3DXSPRITE *ppSprite);
-
 		CCritSec m_allocatorLock;
 		CComPtr<IDirect3D9>			m_pD3D;
 		CComPtr<IDirect3D9Ex>		m_pD3DEx;
 		CComPtr<IDirect3DDevice9>	m_pD3DDev;
 		CComPtr<IDirect3DDevice9Ex>	m_pD3DDevEx;
-
-		IDirectXVideoDecoderService *decoder_service;
-		IDirectXVideoDecoder        *decoder;
 
 		UINT						m_CurrentAdapter;
 		D3DCAPS9					m_caps;
@@ -239,6 +205,40 @@ namespace GothSync
 		HRESULT TextureResize(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &SrcRect, D3DTEXTUREFILTERTYPE filter);
 		HRESULT TextureResizeShader(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, int iShader);
 
+		typedef HRESULT (WINAPI * D3DXLoadSurfaceFromMemoryPtr)(
+			LPDIRECT3DSURFACE9 pDestSurface,
+			CONST PALETTEENTRY* pDestPalette,
+			CONST RECT* pDestRect,
+			LPCVOID pSrcMemory,
+			D3DFORMAT SrcFormat,
+			UINT SrcPitch,
+			CONST PALETTEENTRY*	pSrcPalette,
+			CONST RECT* pSrcRect,
+			DWORD Filter,
+			D3DCOLOR ColorKey);
+
+		typedef HRESULT (WINAPI* D3DXCreateLinePtr)(
+			LPDIRECT3DDEVICE9 pDevice,
+			LPD3DXLINE* ppLine);
+
+		typedef HRESULT (WINAPI* D3DXCreateFontPtr)(
+			LPDIRECT3DDEVICE9 pDevice,
+			int Height,
+			UINT Width,
+			UINT Weight,
+			UINT MipLevels,
+			bool Italic,
+			DWORD CharSet,
+			DWORD OutputPrecision,
+			DWORD Quality,
+			DWORD PitchAndFamily,
+			LPCWSTR pFaceName,
+			LPD3DXFONT* ppFont);
+
+		typedef HRESULT (WINAPI* D3DXCreateSpritePtr)(
+			LPDIRECT3DDEVICE9 pDevice,
+			LPD3DXSPRITE *ppSprite);
+
 		HRESULT AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9* pTexture);
 
 		virtual void OnResetDevice() {};
@@ -248,6 +248,11 @@ namespace GothSync
 		CAutoVectorPtr<BYTE> m_VMR9AlphaBitmapData;
 		CRect m_VMR9AlphaBitmapRect;
 		int m_VMR9AlphaBitmapWidthBytes;
+
+		D3DXLoadSurfaceFromMemoryPtr m_pD3DXLoadSurfaceFromMemory;
+		D3DXCreateLinePtr m_pD3DXCreateLine;
+		D3DXCreateFontPtr m_pD3DXCreateFont;
+		D3DXCreateSpritePtr m_pD3DXCreateSprite;
 
 		int m_nDXSurface; // Total number of DX Surfaces
 		int m_nCurSurface; // Surface currently displayed
