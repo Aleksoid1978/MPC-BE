@@ -2085,51 +2085,6 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error): CBa
 
 	// Init DXVA manager
 	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
-    if (FAILED(hr)) {
-		ASSERT(0);
-    }
-
-    hr = m_pD3DManager->ResetDevice(m_pD3DDev, m_nResetToken);
-    if (FAILED(hr)) {
-        ASSERT(0);
-    }
-
-	HANDLE hDevice;
-    hr = m_pD3DManager->OpenDeviceHandle(&hDevice);
-    if (FAILED(hr)) {
-        ASSERT(0);
-    }
-
-	hr = m_pD3DManager->GetVideoService(hDevice, IID_IDirectXVideoDecoderService, (VOID**)&decoder_service);
-    if (FAILED(hr)) {
-        ASSERT(0);
-    }
-
-	UINT cDecoderGuids = 0;
-	GUID* pDecoderGuids = NULL;
-	hr = decoder_service->GetDecoderDeviceGuids(&cDecoderGuids, &pDecoderGuids);
-    if (FAILED(hr)) {
-        ASSERT(0);
-    }
-
-
-	CString msg;
-	for (UINT i = 0; i < cDecoderGuids; i++) {
-		UINT cFormats = 0;
-		D3DFORMAT* pFormats = NULL;
-		hr = decoder_service->GetDecoderRenderTargets(pDecoderGuids[i], &cFormats, &pFormats);
-		if (FAILED(hr)) {
-			ASSERT(0);
-		}
-
-		msg.AppendFormat(L"Decoder: %s", GetDXVAMode(&pDecoderGuids[i]));
-		for (UINT j = 0; j < cFormats; j++) {
-			msg.AppendFormat(L", %s", GetD3DFormatStr(pFormats[j]));
-		}
-		msg.Append(L".\n");
-	}
-	DbgLog((LOG_TRACE, 3, msg));
-
 	if (SUCCEEDED (hr)) {
 		hr = m_pD3DManager->ResetDevice(m_pD3DDev, m_nResetToken);
 		if (!SUCCEEDED (hr)) {
