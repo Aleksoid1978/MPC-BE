@@ -105,8 +105,6 @@ STDMETHODIMP CVMR9AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		return E_FAIL;
 	}
 
-	CRenderersSettings& s = GetRenderersSettings();
-
 	if (FAILED(hr = pConfig->SetRenderingMode(VMR9Mode_Renderless))) {
 		return hr;
 	}
