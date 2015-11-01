@@ -6621,20 +6621,20 @@ void CMainFrame::OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewVSync()
 {
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.iVMR9VSync = !s.m_AdvRendSets.iVMR9VSync;
-	s.UpdateData(true);
+	CRenderersSettings& rs = GetRenderersSettings();
+	rs.m_AdvRendSets.iVMR9VSync = !rs.m_AdvRendSets.iVMR9VSync;
+	rs.UpdateData(true);
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 s.m_AdvRendSets.iVMR9VSync ? ResStr(IDS_OSD_RS_VSYNC_ON) : ResStr(IDS_OSD_RS_VSYNC_OFF));
+						 rs.m_AdvRendSets.iVMR9VSync ? ResStr(IDS_OSD_RS_VSYNC_ON) : ResStr(IDS_OSD_RS_VSYNC_OFF));
 }
 
 void CMainFrame::OnViewVSyncAccurate()
 {
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.iVMR9VSyncAccurate = !s.m_AdvRendSets.iVMR9VSyncAccurate;
-	s.UpdateData(true);
+	CRenderersSettings& rs = GetRenderersSettings();
+	rs.m_AdvRendSets.iVMR9VSyncAccurate = !rs.m_AdvRendSets.iVMR9VSyncAccurate;
+	rs.UpdateData(true);
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 s.m_AdvRendSets.iVMR9VSyncAccurate ? ResStr(IDS_OSD_RS_ACCURATE_VSYNC_ON) : ResStr(IDS_OSD_RS_ACCURATE_VSYNC_OFF));
+						 rs.m_AdvRendSets.iVMR9VSyncAccurate ? ResStr(IDS_OSD_RS_ACCURATE_VSYNC_ON) : ResStr(IDS_OSD_RS_ACCURATE_VSYNC_OFF));
 }
 
 void CMainFrame::OnViewD3DFullScreen()
@@ -6648,27 +6648,27 @@ void CMainFrame::OnViewD3DFullScreen()
 
 void CMainFrame::OnViewDisableDesktopComposition()
 {
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.iVMRDisableDesktopComposition = !s.m_AdvRendSets.iVMRDisableDesktopComposition;
-	s.UpdateData(true);
+	CRenderersSettings& rs = GetRenderersSettings();
+	rs.m_AdvRendSets.iVMRDisableDesktopComposition = !rs.m_AdvRendSets.iVMRDisableDesktopComposition;
+	rs.UpdateData(true);
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 s.m_AdvRendSets.iVMRDisableDesktopComposition ? ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_ON) : ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_OFF));
+						 rs.m_AdvRendSets.iVMRDisableDesktopComposition ? ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_ON) : ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_OFF));
 }
 
 void CMainFrame::OnViewAlternativeVSync()
 {
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.fVMR9AlterativeVSync = !s.m_AdvRendSets.fVMR9AlterativeVSync;
-	s.UpdateData(true);
+	CRenderersSettings& rs = GetRenderersSettings();
+	rs.m_AdvRendSets.fVMR9AlterativeVSync = !rs.m_AdvRendSets.fVMR9AlterativeVSync;
+	rs.UpdateData(true);
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 s.m_AdvRendSets.fVMR9AlterativeVSync ? ResStr(IDS_OSD_RS_ALT_VSYNC_ON) : ResStr(IDS_OSD_RS_ALT_VSYNC_OFF));
+						 rs.m_AdvRendSets.fVMR9AlterativeVSync ? ResStr(IDS_OSD_RS_ALT_VSYNC_ON) : ResStr(IDS_OSD_RS_ALT_VSYNC_OFF));
 }
 
 void CMainFrame::OnViewResetDefault()
 {
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.SetDefault();
-	s.UpdateData(true);
+	CRenderersSettings& rs = GetRenderersSettings();
+	rs.m_AdvRendSets.SetDefault();
+	rs.UpdateData(true);
 	m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_OSD_RS_RESET_DEFAULT));
 }
 
@@ -6683,11 +6683,11 @@ void CMainFrame::OnUpdateViewReset(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewEnableFrameTimeCorrection()
 {
-	CRenderersSettings& s = AfxGetAppSettings().m_RenderersSettings;
-	s.m_AdvRendSets.iEVREnableFrameTimeCorrection = !s.m_AdvRendSets.iEVREnableFrameTimeCorrection;
-	s.UpdateData(true);
+	CRenderersSettings& rs = GetRenderersSettings();
+	rs.m_AdvRendSets.iEVREnableFrameTimeCorrection = !rs.m_AdvRendSets.iEVREnableFrameTimeCorrection;
+	rs.UpdateData(true);
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 s.m_AdvRendSets.iEVREnableFrameTimeCorrection ? ResStr(IDS_OSD_RS_FT_CORRECTION_ON) : ResStr(IDS_OSD_RS_FT_CORRECTION_OFF));
+						 rs.m_AdvRendSets.iEVREnableFrameTimeCorrection ? ResStr(IDS_OSD_RS_FT_CORRECTION_ON) : ResStr(IDS_OSD_RS_FT_CORRECTION_OFF));
 }
 
 void CMainFrame::OnViewVSyncOffsetIncrease()

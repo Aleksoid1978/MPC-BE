@@ -116,13 +116,13 @@ void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, cons
 		if (m_pSubPicQueue->LookupSubPic(m_rtNow, !IsRendering(), pSubPic)) {
 			CRect rcSubs(windowRect);
 
-			CRenderersSettings& s = GetRenderersSettings();
-			if (s.bSideBySide) {
+			CRenderersSettings& rs = GetRenderersSettings();
+			if (rs.bSideBySide) {
 				CRect rcTemp(windowRect);
 				rcTemp.right -= rcTemp.Width() / 2;
 				AlphaBlt(rcTemp, videoRect, pSubPic, pTarget);
 				rcSubs.left += rcSubs.Width() / 2;
-			} else if (s.bTopAndBottom) {
+			} else if (rs.bTopAndBottom) {
 				CRect rcTemp(windowRect);
 				rcTemp.bottom -= rcTemp.Height() / 2;
 				AlphaBlt(rcTemp, videoRect, pSubPic, pTarget);
@@ -137,8 +137,8 @@ void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, cons
 void CSubPicAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget)
 {
 	CRect rcSource, rcDest;
-	CRenderersSettings& s = GetRenderersSettings();
-	if (SUCCEEDED(pSubPic->GetSourceAndDest(windowRect, videoRect, s.bPositionRelative, s.nShiftPos, rcSource, rcDest))) {
+	CRenderersSettings& rs = GetRenderersSettings();
+	if (SUCCEEDED(pSubPic->GetSourceAndDest(windowRect, videoRect, rs.bPositionRelative, rs.nShiftPos, rcSource, rcDest))) {
 		pSubPic->AlphaBlt(rcSource, rcDest, pTarget);
 	}
 }
