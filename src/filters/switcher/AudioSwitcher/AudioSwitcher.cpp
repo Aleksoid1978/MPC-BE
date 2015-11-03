@@ -376,8 +376,24 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt)
 
 		DWORD samplerate = wfe->nSamplesPerSec;
 		if (samplerate > 192000) {
-			while (samplerate > 96000) {
-				samplerate >>= 1;
+			CLSID clsid;
+
+			IPin *pTmp = NULL;
+			HRESULT hr = GetOutputPin()->ConnectedTo(&pTmp);
+			if (SUCCEEDED(hr)) {
+				clsid = GetCLSID(pTmp);
+			} else {
+				clsid = GUID_NULL;
+			}
+			if (pTmp) {
+				pTmp->Release();
+				pTmp = NULL;
+			}
+
+			if (clsid != CLSID_MpcAudioRenderer && clsid != CLSID_SanearAudioRenderer) {
+				while (samplerate > 96000) {
+					samplerate >>= 1;
+				}
 			}
 		}
 
