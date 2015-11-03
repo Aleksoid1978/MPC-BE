@@ -1570,7 +1570,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 			DbgLog((LOG_TRACE, 3, L"	=> Enumerating supported DXVA2 modes:"));
 			for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
 				CString msg;
-				msg.Format(L"		%s", GetDXVAMode(&pDecoderGuids[iGuid]));
+				msg.Format(L"		%s", GetGUIDString(pDecoderGuids[iGuid]));
 				if (IsSupportedDecoderMode(&pDecoderGuids[iGuid])) {
 					msg.Append(L" - supported");
 					supported = TRUE;
@@ -1583,7 +1583,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 				while (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[idx] != GUID_NULL && guidDecoder == GUID_NULL) {
 					for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
 						if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[idx] == pDecoderGuids[iGuid]) {
-							DbgLog((LOG_TRACE, 3, L"	=> Attempt : %s", GetDXVAMode(&pDecoderGuids[iGuid])));
+							DbgLog((LOG_TRACE, 3, L"	=> Attempt : %s", GetGUIDString(pDecoderGuids[iGuid])));
 
 							// Find a configuration that we support.
 							if (FAILED(hr = FindDXVA2DecoderConfiguration(m_pDecoderService, pDecoderGuids[iGuid], &config, &bFoundDXVA2Configuration))) {
@@ -1593,7 +1593,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 							if (bFoundDXVA2Configuration) {
 								// Found a good configuration. Save the GUID.
 								guidDecoder = pDecoderGuids[iGuid];
-								DbgLog((LOG_TRACE, 3, L"	=> Use : %s", GetDXVAMode(&guidDecoder)));
+								DbgLog((LOG_TRACE, 3, L"	=> Use : %s", GetGUIDString(guidDecoder)));
 								break;
 							}
 						}
