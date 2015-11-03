@@ -219,7 +219,7 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("dsm"),         ResStr(IDS_MFMT_DSM),         _T("dsm dsv dsa dss")));
 		ADDFMT((_T("ivf"),         ResStr(IDS_MFMT_IVF),         _T("ivf")));
 		ADDFMT((_T("swf"),         ResStr(IDS_MFMT_SWF),         _T("swf"), TVideo, _T("ShockWave ActiveX control")));
-		ADDFMT((_T("other"),       ResStr(IDS_MFMT_OTHER),       _T("divx amv wtv dvr-ms")));
+		ADDFMT((_T("other"),       ResStr(IDS_MFMT_OTHER),       _T("divx amv wtv dvr-ms mxf")));
 		ADDFMT((_T("raw video"),   ResStr(IDS_MFMT_RAW_VIDEO),   _T("h264 264 vc1 h265 265 hm10 hevc")));
 		// audio files
 		ADDFMT((_T("ac3dts"),      ResStr(IDS_MFMT_AC3),         _T("ac3 dts dtshd"), TAudio));
