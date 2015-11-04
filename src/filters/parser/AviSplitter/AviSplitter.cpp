@@ -446,6 +446,10 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				continue;
 			}
 
+			if (pwfe->wFormatTag == 0x706D) {
+				pwfe->wFormatTag = WAVE_FORMAT_RAW_AAC1;
+			}
+
 			mt.majortype = MEDIATYPE_Audio;
 			if (m_pFile->m_isamv) {
 				mt.subtype = FOURCCMap(MAKEFOURCC('A','M','V','A'));
@@ -469,6 +473,11 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 			if (!pwfe->nChannels) {
 				pwfe->nChannels = 2;
+			}
+
+			if (pwfe->wFormatTag == WAVE_FORMAT_RAW_AAC1) {
+				WAVEFORMATEX* pwfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 5);
+				pwfe->cbSize = MakeAACInitData((BYTE*)(pwfe + 1), 0, pwfe->nSamplesPerSec, pwfe->nChannels);
 			}
 
 			mt.SetSampleSize(s->strh.dwSuggestedBufferSize > 0
