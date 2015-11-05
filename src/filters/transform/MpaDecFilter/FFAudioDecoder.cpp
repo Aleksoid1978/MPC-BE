@@ -96,6 +96,7 @@ static const struct {
 	{ &MEDIASUBTYPE_DTS2,              AV_CODEC_ID_DTS },
 	// FLAC
 	{ &MEDIASUBTYPE_FLAC_FRAMED,       AV_CODEC_ID_FLAC },
+	{ &MEDIASUBTYPE_FLAC,              AV_CODEC_ID_FLAC },
 	// QDM2
 	{ &MEDIASUBTYPE_QDM2,              AV_CODEC_ID_QDM2 },
 	// WavPack4
