@@ -23,7 +23,11 @@
 
 #include <atlcoll.h>
 #include <afxcmn.h>
+
+#pragma warning(push)
+#pragma warning(disable: 4996)
 #include <HighDPI.h>
+#pragma warning(pop)
 
 interface __declspec(uuid("03481710-D73E-4674-839F-03EDE2D60ED8"))
 ISpecifyPropertyPages2 :
