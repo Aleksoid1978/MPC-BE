@@ -31,6 +31,8 @@ extern "C" {
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/ff_log.h"
 
+#include "../../Lock.h"
+
 // CFFAudioEncoder
 
 CAC3Encoder::CAC3Encoder()
@@ -59,7 +61,9 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 	m_pAVCtx->channel_layout = channel_layout;
 	m_pAVCtx->channels       = av_popcount(channel_layout);
 
+	avcodec_lock;
 	ret = avcodec_open2(m_pAVCtx, m_pAVCodec, NULL);
+	avcodec_unlock;
 	if (ret < 0) {
 		DbgLog((LOG_TRACE, 3, L"CAC3Encoder::Init() : avcodec_open2() failed"));
 		return false;

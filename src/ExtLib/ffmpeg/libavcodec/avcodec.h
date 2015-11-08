@@ -3278,11 +3278,8 @@ typedef struct AVCodecContext {
 #define FF_CODEC_PROPERTY_CLOSED_CAPTIONS 0x00000002
 
     // ==> Start patch MPC
-    int          using_dxva;
-    void         *dxva_context;
-
-    int volatile entangled_thread_counter;
-    volatile int ff_avcodec_locked;
+    int  using_dxva;
+    void *dxva_context;
     // ==> End patch MPC
 } AVCodecContext;
 

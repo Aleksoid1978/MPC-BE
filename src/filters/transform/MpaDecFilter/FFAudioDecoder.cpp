@@ -30,10 +30,11 @@ extern "C" {
 #pragma warning(default: 4005 4244)
 
 #include "moreuuids.h"
-#include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/ff_log.h"
 #include "../../../DSUtil/GolombBuffer.h"
+#include "../../Lock.h"
 
 static const struct {
 	const CLSID* clsMinorType;
@@ -342,11 +343,13 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/*
 			}
 		}
 
+		avcodec_lock;
 		if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL) >= 0) {
 			m_pFrame = av_frame_alloc();
 			CheckPointer(m_pFrame, false);
 			bRet = true;
 		}
+		avcodec_unlock;
 
 		if (bRet && nCodecId == AV_CODEC_ID_FLAC && m_pAVCtx->extradata_size > (4+4+34) && GETDWORD(m_pAVCtx->extradata) == FCC('fLaC')) {
 			BYTE metadata_last, metadata_type;
