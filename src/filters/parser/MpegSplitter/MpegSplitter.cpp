@@ -1879,10 +1879,6 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		if (p && p->GetCount() >= 6) {
 			BYTE* pos = p->GetData();
 			BYTE* end = pos + p->GetCount();
-			
-			if (GETDWORD(pos) == 0xBD010000) {
-				ASSERT(0);
-			}
 
 			while (pos + 6 < end) {
 				if (*pos++ == 0x0F) {
@@ -1891,15 +1887,14 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 					int seglength = _byteswap_ushort(GETWORD(pos));
 					pos += 2 + seglength;
 
-
-					if (segtype == 0x14) {
+					if (segtype == 0x14) { // first "display" segment
+						force_packet = m_bNeedNextSubtitle;
 						m_bNeedNextSubtitle = false;
 					}
-					else if (segtype == 0x13) {
+					else if (segtype == 0x13) { // "object" segment
 						m_bNeedNextSubtitle = true;
 					}
 				}
-
 			}
 		}
 	}
