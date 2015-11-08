@@ -554,13 +554,13 @@ void CMpegSplitterFilter::GetMediaTypes(CMpegSplitterFile::stream_type sType, CA
 	}
 }
 
-bool CMpegSplitterFilter::IsHDMVSubPinDrying()
+bool CMpegSplitterFilter::IsHdmvDvbSubPinDrying()
 {
 	if (m_hasHDMVSubPin) {
 		POSITION pos = m_pActivePins.GetHeadPosition();
 		while (pos) {
 			CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
-			if (pPin->QueueCount() == 0 && ((CMpegSplitterOutputPin*)pPin)->NeedNextHDMVSub()) {
+			if (pPin->QueueCount() == 0 && ((CMpegSplitterOutputPin*)pPin)->NeedNextSubtitle()) {
 				return true;
 			}
 		}
@@ -1822,7 +1822,10 @@ CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpeg
 	, m_type(type)
 {
 	if (mts[0].subtype == MEDIASUBTYPE_HDMVSUB) {
-		m_HDMVSub = hdmvsub;
+		m_SubtitleType = hdmvsub;
+	}
+	else if (mts[0].subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
+		m_SubtitleType = dvbsub;
 	}
 }
 
@@ -1841,8 +1844,8 @@ HRESULT CMpegSplitterOutputPin::CheckMediaType(const CMediaType* pmt)
 
 HRESULT CMpegSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
-	if (m_HDMVSub == hdmvsub_neednext) {
-		m_HDMVSub = hdmvsub;
+	if (m_SubtitleType) {
+		m_bNeedNextSubtitle = false;
 	}
 
 	return __super::DeliverNewSegment(tStart, tStop, dRate);
@@ -1856,21 +1859,27 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 
 	bool force_packet = false;
 
-	if (m_HDMVSub && p && p->GetCount() >= 3) {
-		int segtype = p->GetData()[0];
-		//int unitsize = p->GetData()[1] << 8 | p->GetData()[2];
+	if (m_SubtitleType == hdmvsub) {
+		if (p && p->GetCount() >= 3) {
+			int segtype = p->GetData()[0];
+			//int unitsize = p->GetData()[1] << 8 | p->GetData()[2];
 
-		if (segtype == 22) {
-			// this is first packet of HDMV sub, set standart mode
-			m_HDMVSub = hdmvsub;
-			force_packet = true; // but send this packet anyway
-		} else if (segtype == 21) {
-			// this is picture packet, force next HDMV sub
-			m_HDMVSub = hdmvsub_neednext;
+			if (segtype == 22) {
+				// this is first packet of HDMV sub, set standart mode
+				m_bNeedNextSubtitle = false;
+				force_packet = true; // but send this packet anyway
+			}
+			else if (segtype == 21) {
+				// this is picture packet, force next HDMV sub
+				m_bNeedNextSubtitle = true;
+			}
 		}
 	}
+	else if (m_SubtitleType == dvbsub) {
+		m_bNeedNextSubtitle = true; // TODO
+	}
 
-	if (S_OK == m_hrDeliver && (force_packet || ((CMpegSplitterFilter*)pSplitter)->IsHDMVSubPinDrying())) {
+	if (S_OK == m_hrDeliver && (force_packet || ((CMpegSplitterFilter*)pSplitter)->IsHdmvDvbSubPinDrying())) {
 		m_queue.Add(p);
 		return m_hrDeliver;
 	}

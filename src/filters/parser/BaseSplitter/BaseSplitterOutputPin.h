@@ -159,17 +159,18 @@ public:
 	REFERENCE_TIME GetOffset() { return m_rtOffset; }
 };
 
-class CHDMVSubStatus
+class CSubtitleStatus
 {
 protected:
-	enum hdmvsub_t {
-		not_hdmvsub = 0,
+	enum subtitletype_t {
+		not_hdmv_dvbsub = 0,
 		hdmvsub,
-		hdmvsub_neednext
+		dvbsub,
 	};
 
-	hdmvsub_t m_HDMVSub = not_hdmvsub;
+	subtitletype_t m_SubtitleType = not_hdmv_dvbsub;
+	bool m_bNeedNextSubtitle = false;
 
 public:
-	bool NeedNextHDMVSub() { return m_HDMVSub == hdmvsub_neednext; }
+	bool NeedNextSubtitle() { return m_bNeedNextSubtitle; }
 };
