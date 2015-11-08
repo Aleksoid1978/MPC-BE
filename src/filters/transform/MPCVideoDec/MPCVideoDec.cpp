@@ -36,6 +36,7 @@
 #include "../../../DSUtil/SysVersion.h"
 #include "../../../DSUtil/WinAPIUtils.h"
 #include "../../parser/MpegSplitter/MpegSplitter.h"
+#include "../../Lock.h"
 #include <moreuuids.h>
 
 #include "Version.h"
@@ -1770,7 +1771,10 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		UNREFERENCED_PARAMETER(hout);
 	}
 
-	if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL) < 0) {
+	avcodec_lock;
+	int ret = avcodec_open2(m_pAVCtx, m_pAVCodec, NULL);
+	avcodec_unlock;
+	if (ret < 0) {
 		return VFW_E_INVALIDMEDIATYPE;
 	}
 
@@ -2775,7 +2779,10 @@ HRESULT CMPCVideoDecFilter::ReopenVideo()
 
 		SetThreadCount();
 
-		if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL) < 0) {
+		avcodec_lock;
+		int ret = avcodec_open2(m_pAVCtx, m_pAVCodec, NULL);
+		avcodec_unlock;
+		if (ret < 0) {
 			return VFW_E_INVALIDMEDIATYPE;
 		}
 	}
