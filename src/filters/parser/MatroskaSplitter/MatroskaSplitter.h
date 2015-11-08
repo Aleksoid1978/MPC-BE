@@ -51,7 +51,7 @@ public:
 
 class CMatroskaSplitterOutputPin
 	: public CBaseSplitterOutputPin
-	, public CHDMVSubStatus
+	, public CSubtitleStatus
 {
 	REFERENCE_TIME m_rtLastDuration = 0;
 	CAutoPtrList<CMatroskaPacket> m_packets;

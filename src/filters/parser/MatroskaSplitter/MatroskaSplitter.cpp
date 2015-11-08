@@ -128,7 +128,7 @@ bool CMatroskaSplitterFilter::IsHDMVSubPinDrying()
 		POSITION pos = m_pActivePins.GetHeadPosition();
 		while (pos) {
 			CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
-			if (pPin->QueueCount() == 0 && ((CMatroskaSplitterOutputPin*)pPin)->NeedNextHDMVSub()) {
+			if (pPin->QueueCount() == 0 && ((CMatroskaSplitterOutputPin*)pPin)->NeedNextSubtitle()) {
 				return true;
 			}
 		}
@@ -2216,7 +2216,7 @@ CMatroskaSplitterOutputPin::CMatroskaSplitterOutputPin(CAtlArray<CMediaType>& mt
 	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
 {
 	if (mts[0].subtype == MEDIASUBTYPE_HDMVSUB) {
-		m_HDMVSub = hdmvsub;
+		m_SubtitleType = hdmvsub;
 	}
 }
 
@@ -2250,8 +2250,8 @@ HRESULT CMatroskaSplitterOutputPin::DeliverEndOfStream()
 
 HRESULT CMatroskaSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
-	if (m_HDMVSub == hdmvsub_neednext) {
-		m_HDMVSub = hdmvsub;
+	if (m_SubtitleType) {
+		m_bNeedNextSubtitle = false;
 	}
 
 	return __super::DeliverNewSegment(tStart, tStop, dRate);
@@ -2265,7 +2265,7 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 
 	bool force_packet = false;
 
-	if (m_HDMVSub && p) {
+	if (m_SubtitleType == hdmvsub && p) {
 		CMatroskaPacket* mp = static_cast<CMatroskaPacket*>(p.m_p);
 
 		size_t size = 0;
@@ -2277,11 +2277,11 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		// simple check
 		if (size <= 30) {
 			// this is empty sub, set standart mode
-			m_HDMVSub = hdmvsub;
+			m_bNeedNextSubtitle = false;
 			force_packet = true; // but send this packet anyway
 		} else {
 			// this is sub with picture, force next HDMV sub
-			m_HDMVSub = hdmvsub_neednext;
+			m_bNeedNextSubtitle = true;
 		}
 	}
 
