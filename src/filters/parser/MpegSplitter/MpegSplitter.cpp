@@ -556,7 +556,7 @@ void CMpegSplitterFilter::GetMediaTypes(CMpegSplitterFile::stream_type sType, CA
 
 bool CMpegSplitterFilter::IsHdmvDvbSubPinDrying()
 {
-	if (m_hasHDMVSubPin) {
+	if (m_hasHdmvDvbSubPin) {
 		POSITION pos = m_pActivePins.GetHeadPosition();
 		while (pos) {
 			CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
@@ -1161,8 +1161,8 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			} else if (type == CMpegSplitterFile::stream_type::subpic) {
 				if (subpic_sel == stream_idx && (S_OK == AddOutputPin(s, pPinOut))) {
-					if (s.mt.subtype == MEDIASUBTYPE_HDMVSUB) {
-						m_hasHDMVSubPin = true;
+					if (s.mt.subtype == MEDIASUBTYPE_HDMVSUB || s.mt.subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
+						m_hasHdmvDvbSubPin = true;
 					}
 					break;
 				}
@@ -1876,7 +1876,32 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		}
 	}
 	else if (m_SubtitleType == dvbsub) {
-		m_bNeedNextSubtitle = true; // TODO
+		if (p && p->GetCount() >= 6) {
+			BYTE* pos = p->GetData();
+			BYTE* end = pos + p->GetCount();
+			
+			if (GETDWORD(pos) == 0xBD010000) {
+				ASSERT(0);
+			}
+
+			while (pos + 6 < end) {
+				if (*pos++ == 0x0F) {
+					int segtype = *pos++;
+					pos += 2;
+					int seglength = _byteswap_ushort(GETWORD(pos));
+					pos += 2 + seglength;
+
+
+					if (segtype == 0x14) {
+						m_bNeedNextSubtitle = false;
+					}
+					else if (segtype == 0x13) {
+						m_bNeedNextSubtitle = true;
+					}
+				}
+
+			}
+		}
 	}
 
 	if (S_OK == m_hrDeliver && (force_packet || ((CMpegSplitterFilter*)pSplitter)->IsHdmvDvbSubPinDrying())) {

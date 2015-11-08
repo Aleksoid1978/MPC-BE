@@ -81,7 +81,7 @@ public:
 
 	void GetMediaTypes(CMpegSplitterFile::stream_type sType, CAtlArray<CMediaType>& mts);
 
-	bool m_hasHDMVSubPin;
+	bool m_hasHdmvDvbSubPin;
 	bool IsHdmvDvbSubPinDrying();
 
 	DECLARE_IUNKNOWN
