@@ -66,4 +66,6 @@ public:
 	BOOL IsOutputPresent() const { return !m_output.empty(); }
 	void GetOutput(std::vector<TeletextData>& output);
 	void EraseOutput();
+
+	BOOL ProcessRemainingData();
 };
