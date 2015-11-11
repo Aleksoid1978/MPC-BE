@@ -1049,25 +1049,42 @@ HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
 
 HRESULT CBaseSplitterParserOutputPin::ParseTeletext(CAutoPtr<CPacket> p)
 {
-	if (!p || p->GetCount() <= 6) {
+	if (!m_p) {
+		InitPacket(p);
+	}
+
+	if (!m_p) {
 		return S_OK;
 	}
 
 	HRESULT hr = S_OK;
+	std::vector<TeletextData> output;
 
-	m_teletext.ProcessData(p->GetData(), p->GetCount(), p->rtStart);
-	if (m_teletext.IsOutputPresent()) {
-		std::vector<TeletextData> output;
-		m_teletext.GetOutput(output);
-		m_teletext.EraseOutput();
+	if (m_bEndOfStream) {
+		if (m_teletext.ProcessRemainingData()) {
+			m_teletext.GetOutput(output);
+			m_teletext.EraseOutput();
+		}
+	} else {
+		if (!p || p->GetCount() <= 6) {
+			return S_OK;
+		}
 
+		m_teletext.ProcessData(p->GetData(), p->GetCount(), p->rtStart);
+		if (m_teletext.IsOutputPresent()) {
+			m_teletext.GetOutput(output);
+			m_teletext.EraseOutput();
+		}	
+	}
+
+	if (!output.empty()) {
 		for (size_t i = 0; i < output.size(); i++) {
 			TeletextData tData = output[i];
 
 			CStringA strA = UTF16To8(tData.str);
 
 			CAutoPtr<CPacket> p2(DNew CPacket());
-			p2->TrackNumber	= p->TrackNumber;
+			p2->TrackNumber	= m_p->TrackNumber;
 			p2->rtStart		= tData.rtStart;
 			p2->rtStop		= tData.rtStop;
 			p2->bSyncPoint	= TRUE;
