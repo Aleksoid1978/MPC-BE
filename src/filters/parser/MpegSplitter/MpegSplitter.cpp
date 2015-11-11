@@ -491,6 +491,7 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_rtPlaylistDuration(0)
 	, m_rtMin(0)
 	, m_rtMax(0)
+	, m_rtGlobalPCRTimeStamp(INVALID_TIME)
 	, m_ForcedSub(false)
 	, m_AC3CoreOnly(0)
 	, m_SubEmptyPin(false)
@@ -658,41 +659,55 @@ STDMETHODIMP CMpegSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 	return __super::Load(pszFileName, pmt);
 }
 
-#define HandlePacket(h, nBytes, validStream)													\
-	if (nBytes > 0) {																			\
-		if (validStream) {																		\
-			BOOL bPacketStart = !!h.fpts;														\
-			CAutoPtr<CPacket>& p = pPackets[TrackNumber];										\
-			if (bPacketStart && p) {															\
-				if (p->bSyncPoint) {															\
-					hr = DeliverPacket(p);														\
-				}																				\
-				p.Free();																		\
-			}																					\
-			\
-			if (!p) {																			\
-				p.Attach(DNew CPacket());														\
-				p->TrackNumber	= TrackNumber;													\
-				p->bSyncPoint	= bPacketStart;													\
-				p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;				\
-				p->rtStop		= (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;	\
-			}																					\
-			\
-			size_t oldSize = p->GetCount();														\
-			size_t newSize = p->GetCount() + nBytes;											\
-			p->SetCount(newSize, max(1024, newSize));											\
-			m_pFile->ByteRead(p->GetData() + oldSize, nBytes);									\
-		} else {																				\
-			CAutoPtr<CPacket> p(DNew CPacket());												\
-			p->TrackNumber	= TrackNumber;														\
-			p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;					\
-			p->rtStop		= (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;		\
-			p->bSyncPoint	= !!h.fpts && (p->rtStart != INVALID_TIME);							\
-			p->SetCount(nBytes);																\
-			m_pFile->ByteRead(p->GetData(), nBytes);											\
-			hr = DeliverPacket(p);																\
-		}																						\
-	}																							\
+template<typename T>
+inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(DWORD TrackNumber, __int64 nBytes, T& h, REFERENCE_TIME rtStartOffset, BOOL bStreamUsePTS)
+{
+	HRESULT hr = S_OK;
+
+	if (nBytes > 0) {
+		if (bStreamUsePTS) {
+			BOOL bPacketStart = !!h.fpts;
+			CAutoPtr<CPacket>& p = pPackets[TrackNumber];
+			if (bPacketStart && p) {
+				if (p->bSyncPoint) {
+					hr = DeliverPacket(p);
+				}
+				p.Free();
+			}
+			
+			if (!p) {
+				p.Attach(DNew CPacket());
+				p->TrackNumber	= TrackNumber;
+				p->bSyncPoint	= bPacketStart;
+				p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;
+				p->rtStop		= (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;
+			}
+			
+			size_t oldSize = p->GetCount();
+			size_t newSize = p->GetCount() + nBytes;
+			p->SetCount(newSize, max(1024, newSize));
+			m_pFile->ByteRead(p->GetData() + oldSize, nBytes);
+		} else {
+			REFERENCE_TIME rtStart = INVALID_TIME;
+			if (h.fpts) {
+				rtStart = h.pts - rtStartOffset;
+			} else if (m_rtGlobalPCRTimeStamp != INVALID_TIME) {
+				rtStart = m_rtGlobalPCRTimeStamp - rtStartOffset;
+			}
+
+			CAutoPtr<CPacket> p(DNew CPacket());
+			p->TrackNumber	= TrackNumber;
+			p->rtStart		= rtStart;
+			p->rtStop		= (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;
+			p->bSyncPoint	= p->rtStart != INVALID_TIME;
+			p->SetCount(nBytes);
+			m_pFile->ByteRead(p->GetData(), nBytes);
+			hr = DeliverPacket(p);
+		}
+	}
+
+	return hr;
+}
 
 HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 {
@@ -700,7 +715,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 		return E_FAIL;
 	}
 
-	HRESULT hr;
+	HRESULT hr = S_OK;
 	BYTE b;
 
 	if (m_pFile->m_type == MPEG_TYPES::mpeg_ps) {
@@ -734,7 +749,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			DWORD TrackNumber = m_pFile->AddStream(0, b, peshdr.id_ext, peshdr.len);
 			if (GetOutputPin(TrackNumber)) {
 				const __int64 nBytes = peshdr.len - (m_pFile->GetPos() - pos);
-				HandlePacket(peshdr, nBytes, m_pFile->m_StreamsValidate[TrackNumber]);
+				hr = HandleMPEGPacket(TrackNumber, nBytes, peshdr, rtStartOffset, m_pFile->m_StreamsUsePTS[TrackNumber]);
 			}
 			m_pFile->Seek(pos + peshdr.len);
 		}
@@ -742,6 +757,10 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 		CMpegSplitterFile::trhdr h;
 		if (!m_pFile->ReadTR(h)) {
 			return S_FALSE;
+		}
+
+		if (h.fPCR) {
+			m_rtGlobalPCRTimeStamp = h.PCR;
 		}
 
 		__int64 pos = m_pFile->GetPos();
@@ -766,7 +785,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 				if (h.bytes > (m_pFile->GetPos() - pos)) {
 					const __int64 nBytes = h.bytes - (m_pFile->GetPos() - pos);
-					HandlePacket(peshdr, nBytes, m_pFile->m_StreamsValidate[TrackNumber]);
+					hr = HandleMPEGPacket(TrackNumber, nBytes, peshdr, rtStartOffset, m_pFile->m_StreamsUsePTS[TrackNumber]);
 				}
 			}
 		}
@@ -782,13 +801,13 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 		DWORD TrackNumber = pvahdr.streamid;
 		if (GetOutputPin(TrackNumber)) {
-			HandlePacket(pvahdr, pvahdr.length, m_pFile->m_StreamsValidate[TrackNumber]);
+			hr = HandleMPEGPacket(TrackNumber, pvahdr.length, pvahdr, rtStartOffset, m_pFile->m_StreamsUsePTS[TrackNumber]);
 		}
 
 		m_pFile->Seek(pos + pvahdr.length);
 	}
 
-	return S_OK;
+	return hr;
 }
 
 #define ReadBEdw(var) \
@@ -1358,6 +1377,7 @@ bool CMpegSplitterFilter::DemuxLoop()
 	}
 
 	REFERENCE_TIME rtStartOffset = m_rtStartOffset ? m_rtStartOffset : m_pFile->m_rtMin;
+	m_rtGlobalPCRTimeStamp = INVALID_TIME;
 
 	const CMpegSplitterFile::stream st = pMasterStream->GetHead();
 	BOOL bMainIsVideo	= (st.mt.majortype == MEDIATYPE_Video);

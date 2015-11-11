@@ -47,6 +47,8 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	REFERENCE_TIME m_rtPlaylistDuration;
 	REFERENCE_TIME m_rtMin, m_rtMax;
 
+	REFERENCE_TIME m_rtGlobalPCRTimeStamp;
+
 	CAtlMap<DWORD, CAutoPtr<CPacket>> pPackets;
 
 	CString m_AudioLanguageOrder, m_SubtitlesLanguageOrder;
@@ -65,6 +67,8 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	bool BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& files);
 	bool BuildChapters(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& PlaylistItems, CHdmvClipInfo::CPlaylistChapter& Items);
 
+	template<typename T>
+	HRESULT HandleMPEGPacket(DWORD TrackNumber, __int64 nBytes, T& h, REFERENCE_TIME rtStartOffset, BOOL bStreamUsePTS);
 	HRESULT DemuxNextPacket(REFERENCE_TIME rtStartOffset);
 
 	void HandleStream(CMpegSplitterFile::stream& s, CString fName, DWORD dwPictAspectRatioX, DWORD dwPictAspectRatioY, CStringA& palette);
@@ -115,9 +119,6 @@ public:
 
 	STDMETHODIMP SetSubtitlesLanguageOrder(WCHAR *nValue);
 	STDMETHODIMP_(WCHAR *) GetSubtitlesLanguageOrder();
-
-	STDMETHODIMP SetVC1_GuidFlag(int nValue);
-	STDMETHODIMP_(int) GetVC1_GuidFlag();
 
 	STDMETHODIMP SetTrueHD(int nValue);
 	STDMETHODIMP_(int) GetTrueHD();
