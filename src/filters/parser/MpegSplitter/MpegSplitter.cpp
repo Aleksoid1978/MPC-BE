@@ -411,9 +411,12 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 	} else if (pMediaType->majortype == MEDIATYPE_Subtitle) {
 		MajorType = "Subtitle";
 
-		if ((pPresentationDesc == NULL)
-				&& (pesStreamType == PES_PRIVATE || pMediaType->subtype == MEDIASUBTYPE_DVB_SUBTITLES)) {
-			pPresentationDesc = L"DVB";
+		if (pPresentationDesc == NULL) {
+			if (pMediaType->subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
+				pPresentationDesc = L"DVB";
+			} else if (pMediaType->subtype == MEDIASUBTYPE_UTF8) {
+				pPresentationDesc = L"Teletext";
+			}
 		}
 
 		if (pPresentationDesc) {

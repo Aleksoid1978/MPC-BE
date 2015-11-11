@@ -70,6 +70,8 @@ HRESULT CBaseSplitterParserOutputPin::Flush()
 
 	InitAudioParams();
 
+	m_teletext.Flush();
+
 	return S_OK;
 }
 
@@ -219,6 +221,9 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 	} else if (m_mt.subtype == MEDIASUBTYPE_DTS) {
 		// DTS
 		return ParseDTS(p);
+	} else if (m_mt.subtype == MEDIASUBTYPE_UTF8) {
+		// Teletext -> UTF8
+		return ParseTeletext(p);
 	} else {
 		m_p.Free();
 		m_pl.RemoveAll();
@@ -1040,6 +1045,39 @@ HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
 	ENDDATA;
 
 	return S_OK;
+}
+
+HRESULT CBaseSplitterParserOutputPin::ParseTeletext(CAutoPtr<CPacket> p)
+{
+	if (!p || p->GetCount() <= 6) {
+		return S_OK;
+	}
+
+	HRESULT hr = S_OK;
+
+	m_teletext.ProcessData(p->GetData(), p->GetCount(), p->rtStart);
+	if (m_teletext.IsOutputPresent()) {
+		std::vector<TeletextData> output;
+		m_teletext.GetOutput(output);
+		m_teletext.EraseOutput();
+
+		for (size_t i = 0; i < output.size(); i++) {
+			TeletextData tData = output[i];
+
+			CStringA strA = UTF16To8(tData.str);
+
+			CAutoPtr<CPacket> p2(DNew CPacket());
+			p2->TrackNumber	= p->TrackNumber;
+			p2->rtStart		= tData.rtStart;
+			p2->rtStop		= tData.rtStop;
+			p2->bSyncPoint	= TRUE;
+			p2->SetData((VOID*)(LPCSTR)strA, strA.GetLength());
+
+			hr = __super::DeliverPacket(p2);
+		}
+	}
+
+	return hr;
 }
 
 HRESULT CBaseSplitterParserOutputPin::DeliverEndOfStream()

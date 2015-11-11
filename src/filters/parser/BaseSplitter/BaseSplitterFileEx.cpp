@@ -1316,12 +1316,30 @@ bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 
 bool CBaseSplitterFileEx::Read(dvbsub& h, int len, CMediaType* pmt, bool bSimpleAdd)
 {
-	if ((BitRead(32, true) & 0xFFFFFF00) == 0x20000f00 || bSimpleAdd) {
+	if (bSimpleAdd || (len > 4 && (BitRead(32, true) & 0xFFFFFF00) == 0x20000f00)) {
 		if (pmt) {
 			static const SUBTITLEINFO SubFormat = { 0, "", L"" };
 
 			pmt->majortype	= MEDIATYPE_Subtitle;
 			pmt->subtype	= MEDIASUBTYPE_DVB_SUBTITLES;
+			pmt->formattype	= FORMAT_None;
+			pmt->SetFormat((BYTE*)&SubFormat, sizeof(SUBTITLEINFO));
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+bool CBaseSplitterFileEx::Read(teletextsub& h, int len, CMediaType* pmt, bool bSimpleAdd)
+{
+	if (bSimpleAdd || (len > 4 && (BitRead(32, true) & 0xFFFFFF00) == 0x10022C00)) {
+		if (pmt) {
+			static const SUBTITLEINFO SubFormat = { 0, "", L"" };
+
+			pmt->majortype	= MEDIATYPE_Subtitle;
+			pmt->subtype	= MEDIASUBTYPE_UTF8;
 			pmt->formattype	= FORMAT_None;
 			pmt->SetFormat((BYTE*)&SubFormat, sizeof(SUBTITLEINFO));
 		}

@@ -631,8 +631,9 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop)
 #define HEVC_VIDEO					(1ULL << 9)
 #define PGS_SUB						(1ULL << 10)
 #define DVB_SUB						(1ULL << 11)
+#define TELETEXT_SUB				(1ULL << 12)
 
-#define PES_STREAM_TYPE_ANY			(MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB)
+#define PES_STREAM_TYPE_ANY			(MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB)
 
 static const struct StreamType {
 	PES_STREAM_TYPE pes_stream_type;
@@ -674,7 +675,10 @@ static const struct StreamType {
 	// PGS Subtitle
 	{ PRESENTATION_GRAPHICS_STREAM,			PGS_SUB		},
 	// DVB Subtitle
-	{ PES_PRIVATE,							DVB_SUB		}
+	{ PES_PRIVATE,							DVB_SUB		},
+	// Teletext Subtitle
+	{ PES_PRIVATE,							TELETEXT_SUB}
+
 };
 
 DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, BOOL bAddStream/* = TRUE*/)
@@ -926,6 +930,15 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				}
 
 				// DVB subtitles
+				if (type == stream_type::unknown && pesid == 0xbd && (stream_type & DVB_SUB)) {
+					Seek(start);
+					teletextsub h;
+					if (Read(h, len, &s.mt)) {
+						type = stream_type::subpic;
+					}
+				}
+
+				// Teletext subtitles
 				if (type == stream_type::unknown && (stream_type & DVB_SUB)) {
 					Seek(start);
 					dvbsub h;
@@ -1382,6 +1395,7 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 			}
 
 			BOOL DVB_SUBTITLE = FALSE;
+			BOOL TELETEXT_SUBTITLE = FALSE;
 			if (ES_info_length > 2) {
 				int	info_length = ES_info_length;
 				for (;;) {
@@ -1393,10 +1407,15 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 					char ch[4] = { 0 };
 
 					switch (descriptor_tag) {
-						case 0x59: // Subtitling descriptor
-							DVB_SUBTITLE = TRUE;
-						case 0x0a: // ISO 639 language descriptor
 						case 0x56: // Teletext descriptor
+						case 0x59: // Subtitling descriptor
+						case 0x0a: // ISO 639 language descriptor
+							if (descriptor_tag == 0x56) {
+								TELETEXT_SUBTITLE = TRUE;
+							} else if (descriptor_tag == 0x59) {
+								DVB_SUBTITLE = TRUE;
+							}
+
 							gb.ReadBuffer((BYTE *)ch, 3);
 							ch[3] = 0;
 							for (BYTE i = 3; i < descriptor_length; i++) {
@@ -1422,7 +1441,9 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 			}
 
 			if (m_ForcedSub) {
-				if (stream_type == PRESENTATION_GRAPHICS_STREAM || DVB_SUBTITLE) {
+				if (stream_type == PRESENTATION_GRAPHICS_STREAM
+						|| DVB_SUBTITLE
+						|| TELETEXT_SUBTITLE) {
 					stream s;
 					s.pid = pid;
 
@@ -1439,8 +1460,13 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 							if (Read(hdr, &s.mt, NULL)) {
 								m_streams[stream_type::subpic].Insert(s, subpic);
 							}
-						} else {
+						} else if (DVB_SUBTITLE) {
 							CMpegSplitterFile::dvbsub hdr;
+							if (Read(hdr, 0, &s.mt, true)) {
+								m_streams[stream_type::subpic].Insert(s, subpic);
+							}
+						} else if (TELETEXT_SUBTITLE) {
+							CMpegSplitterFile::teletextsub hdr;
 							if (Read(hdr, 0, &s.mt, true)) {
 								m_streams[stream_type::subpic].Insert(s, subpic);
 							}
