@@ -243,10 +243,14 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	POSITION pos = m_SyncPoints.GetStartPosition();
-	while (pos) {
-		CAtlMap<DWORD, SyncPoints>::CPair* pPair = m_SyncPoints.GetNext(pos);
-		m_StreamsValidate[pPair->m_key] = pPair->m_value.GetCount() > 1;
+	for (int type = stream_type::video; type <= stream_type::subpic; type++) {
+		const CStreamList& streams = m_streams[type];
+		POSITION pos = streams.GetHeadPosition();
+		while (pos) {
+			const stream& s = streams.GetNext(pos);
+			const SyncPoints& sps = m_SyncPoints[s];
+			m_StreamsUsePTS[s] = sps.GetCount() > 1;
+		}
 	}
 
 	m_bOpeningCompleted = TRUE;

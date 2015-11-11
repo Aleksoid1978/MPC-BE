@@ -438,5 +438,5 @@ public:
 
 	bool GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type);
 
-	CAtlMap<DWORD, BOOL> m_StreamsValidate;
+	CAtlMap<DWORD, BOOL> m_StreamsUsePTS;
 };
