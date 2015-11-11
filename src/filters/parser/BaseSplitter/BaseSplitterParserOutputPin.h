@@ -23,6 +23,7 @@
 
 #include "../../../DSUtil/Packet.h"
 #include "BaseSplitterOutputPin.h"
+#include "Teletext.h"
 
 struct MpegParseContext {
 	bool	bFrameStartFound = FALSE;
@@ -40,6 +41,7 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 	CAutoPtr<CPacket>			m_p;
 	CAutoPtrList<CH264Packet>	m_pl;
 	MpegParseContext			m_ParseContext;
+	CTeletext					m_teletext;
 
 	bool	m_bHasAccessUnitDelimiters;
 	bool	m_bFlushed;
@@ -73,6 +75,7 @@ protected:
 	HRESULT ParseVobSub(CAutoPtr<CPacket> p);
 	HRESULT ParseAdxADPCM(CAutoPtr<CPacket> p);
 	HRESULT ParseDTS(CAutoPtr<CPacket> p);
+	HRESULT ParseTeletext(CAutoPtr<CPacket> p);
 
 public:
 	CBaseSplitterParserOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);

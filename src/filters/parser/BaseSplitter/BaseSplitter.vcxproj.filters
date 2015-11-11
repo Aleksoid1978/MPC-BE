@@ -38,6 +38,9 @@
     <ClCompile Include="BaseSplitterParserOutputPin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Teletext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AsyncReader.h">
@@ -65,6 +68,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BaseSplitterParserOutputPin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Teletext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
