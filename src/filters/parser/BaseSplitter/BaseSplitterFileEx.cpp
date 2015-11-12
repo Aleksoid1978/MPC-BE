@@ -1334,7 +1334,12 @@ bool CBaseSplitterFileEx::Read(dvbsub& h, int len, CMediaType* pmt, bool bSimple
 
 bool CBaseSplitterFileEx::Read(teletextsub& h, int len, CMediaType* pmt, bool bSimpleAdd)
 {
-	if (bSimpleAdd || (len > 4 && (BitRead(32, true) & 0xFFFFFF00) == 0x10022C00)) {
+	DWORD sync = 0;
+	if (!bSimpleAdd && len > 4) {
+		sync = BitRead(32, true) & 0xFFFFFF00;
+	}
+	if (bSimpleAdd
+			|| sync == 0x10022C00 || sync == 0x10032C00) {
 		if (pmt) {
 			static const SUBTITLEINFO SubFormat = { 0, "", L"" };
 
