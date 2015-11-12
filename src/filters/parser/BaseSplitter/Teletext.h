@@ -51,7 +51,7 @@ class CTeletext
 	} m_page_buffer = { 0 };
 
 	BOOL m_bReceivingData = FALSE;
-	USHORT m_nSuitablePage = 0;
+	uint16_t m_nSuitablePage = 0;
 
 	std::vector<TeletextData> m_output;
 

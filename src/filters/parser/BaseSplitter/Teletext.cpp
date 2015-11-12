@@ -223,7 +223,7 @@ static uint8_t unham_8_4(uint8_t a)
 {
 	uint8_t r = UNHAM_8_4[a];
 	if (r == 0xff) {
-		DbgLog((LOG_TRACE, 3, L"Unrecoverable data error; UNHAM8/4(%02x)", a));
+		DbgLog((LOG_TRACE, 3, L"unham_8_4() - Unrecoverable data error; UNHAM8/4(%02x)", a));
 	}
 	return (r & 0x0f);
 }
@@ -233,7 +233,7 @@ static uint16_t telx_to_ucs2(uint8_t c)
 {
 	if (PARITY_8[c] == 0)
 	{
-		DbgLog((LOG_TRACE, 3, L"Unrecoverable data error; PARITY(%02x)", c));
+		DbgLog((LOG_TRACE, 3, L"telx_to_ucs2() - Unrecoverable data error; PARITY(%02x)", c));
 		return 0x20;
 	}
 
@@ -266,7 +266,7 @@ static void remap_g0_charset(uint8_t c)
 	if (c != primary_charset.current) {
 		uint8_t m = G0_LATIN_NATIONAL_SUBSETS_MAP[c];
 		if (m == 0xff) {
-			DbgLog((LOG_TRACE, 3, L"G0 Latin National Subset ID 0x%1x.%1x is not implemented", (c >> 3), (c & 0x7)));
+			DbgLog((LOG_TRACE, 3, L"remap_g0_charset() - G0 Latin National Subset ID 0x%1x.%1x is not implemented", (c >> 3), (c & 0x7)));
 		} else {
 			for (uint8_t j = 0; j < 13; j++) {
 				G0[LATIN][G0_LATIN_NATIONAL_SUBSETS_POSITIONS[j]] = G0_LATIN_NATIONAL_SUBSETS[m].characters[j];
@@ -400,19 +400,18 @@ void CTeletext::ProcessTeletextPage()
 void CTeletext::ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE_TIME rtStart)
 {
 	// variable names conform to ETS 300 706, chapter 7.1.2
-	uint8_t address, m, y, designation_code;
+	uint8_t address, m, line;
 	address = (unham_8_4(packet->address[1]) << 4) | unham_8_4(packet->address[0]);
 	m = address & 0x7;
 	if (m == 0) m = 8;
-	y = (address >> 3) & 0x1f;
-	designation_code = (y > 25) ? unham_8_4(packet->data[0]) : 0x00;
+	line = (address >> 3) & 0x1f;
 
-	if (y == 0) {
+	if (line == 0) {
 		uint8_t i = (unham_8_4(packet->data[1]) << 4) | unham_8_4(packet->data[0]);
 		uint8_t flag_subtitle = (unham_8_4(packet->data[5]) & 0x08) >> 3;
 
 		// Page number and control bits
-		USHORT page_number = (m << 8) | (unham_8_4(packet->data[1]) << 4) | unham_8_4(packet->data[0]);
+		uint16_t page_number = (m << 8) | i;
 		uint8_t charset = ((unham_8_4(packet->data[7]) & 0x08) | (unham_8_4(packet->data[7]) & 0x04) | (unham_8_4(packet->data[7]) & 0x02)) >> 1;
 
 		if ((m_nSuitablePage == 0) && (flag_subtitle == YES) && (i < 0xff)) {
@@ -422,6 +421,7 @@ void CTeletext::ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE
 
 		// Page transmission is terminated, however now we are waiting for our new page
 		if (page_number != m_nSuitablePage) {
+			m_bReceivingData = NO;
 			return;
 		}
 
@@ -433,18 +433,20 @@ void CTeletext::ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE
 
 		m_page_buffer.rtStart = rtStart;
 		m_page_buffer.rtStop = rtStart + 1;
-		ZeroMemory(m_page_buffer.text, sizeof(m_page_buffer.text));
+
+		if ((packet->data[3] & 0x80) == 0x80) {
+			// erase page
+			ZeroMemory(m_page_buffer.text, sizeof(m_page_buffer.text));
+		}
 		m_page_buffer.tainted = NO;
 		m_bReceivingData = YES;
 		primary_charset.g0_x28 = UNDEF;
 
 		uint8_t c = (primary_charset.g0_m29 != UNDEF) ? primary_charset.g0_m29 : charset;
 		remap_g0_charset(c);
-	} else if ((m == MAGAZINE(m_nSuitablePage)) && (y >= 1) && (y <= 23) && (m_bReceivingData == YES)) {
+	} else if ((m == MAGAZINE(m_nSuitablePage)) && (line >= 1) && (line <= 23) && (m_bReceivingData == YES)) {
 		for (uint8_t i = 0; i < 40; i++) {
-			if (m_page_buffer.text[y][i] == 0x00) {
-				m_page_buffer.text[y][i] = telx_to_ucs2(packet->data[i]);
-			}
+			m_page_buffer.text[line][i] = telx_to_ucs2(packet->data[i]);
 		}
 		m_page_buffer.tainted = YES;
 	}
@@ -482,7 +484,7 @@ void CTeletext::ProcessData(uint8_t* buffer, uint16_t size, REFERENCE_TIME rtSta
 void CTeletext::Flush()
 {
 	ZeroMemory(&m_page_buffer, sizeof(m_page_buffer));
-	m_bReceivingData = FALSE;
+	m_bReceivingData = NO;
 
 	EraseOutput();
 }
