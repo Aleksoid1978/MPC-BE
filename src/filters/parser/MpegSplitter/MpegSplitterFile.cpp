@@ -696,9 +696,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 	}
 
 	stream s;
-	s.pid	= pid;
-	s.pesid	= pesid;
-	s.ps1id	= ps1id;
+	s.pid   = pid;
+	s.pesid = pesid;
+	s.ps1id = ps1id;
 
 	if (m_bOpeningCompleted && m_type == MPEG_TYPES::mpeg_ts) {
 		if (m_ClipInfo.IsHdmv()) {
@@ -712,8 +712,8 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		}
 	}
 
-	const __int64 start		= GetPos();
-	enum stream_type type	= stream_type::unknown;
+	const __int64 start   = GetPos();
+	enum stream_type type = stream_type::unknown;
 
 	ULONGLONG stream_type = PES_STREAM_TYPE_ANY;
 	PES_STREAM_TYPE pes_stream_type = INVALID;
@@ -934,18 +934,18 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				}
 
 				// DVB subtitles
-				if (type == stream_type::unknown && pesid == 0xbd && (stream_type & DVB_SUB)) {
+				if (type == stream_type::unknown && (stream_type & DVB_SUB)) {
 					Seek(start);
-					teletextsub h;
+					dvbsub h;
 					if (Read(h, len, &s.mt)) {
 						type = stream_type::subpic;
 					}
 				}
 
 				// Teletext subtitles
-				if (type == stream_type::unknown && (stream_type & DVB_SUB)) {
+				if (type == stream_type::unknown && pesid == 0xbd && (stream_type & TELETEXT_SUB)) {
 					Seek(start);
-					dvbsub h;
+					teletextsub h;
 					if (Read(h, len, &s.mt)) {
 						type = stream_type::subpic;
 					}
