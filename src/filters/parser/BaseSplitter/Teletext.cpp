@@ -427,8 +427,7 @@ void CTeletext::ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE
 
 		// Now we have the begining of page transmission; if there is page_buffer pending, process it
 		if (m_page_buffer.tainted == YES) {
-			// it would be nice, if subtitle hides on previous video frame, so we contract 40 ms (1 frame @25 fps)
-			m_page_buffer.rtStop = rtStart - 40 * 10000i64;
+			m_page_buffer.rtStop = rtStart;
 			ProcessTeletextPage();
 		}
 
