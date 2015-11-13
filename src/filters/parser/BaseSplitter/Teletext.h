@@ -23,6 +23,7 @@
 #pragma once
 
 #include <vector>
+#include <stdint.h>
 #include "../../../DSUtil/DSUtil.h"
 
 struct TeletextData {
@@ -47,8 +48,8 @@ class CTeletext
 		REFERENCE_TIME rtStart;
 		REFERENCE_TIME rtStop;
 		uint16_t text[25][40]; // 25 lines x 40 cols (1 screen/page) of wide chars
-		uint8_t tainted;       // TRUE = text variable contains any data
-	} m_page_buffer = { 0 };
+		uint8_t tainted;       // 1 = text variable contains any data
+	} m_page_buffer;
 
 	BOOL m_bReceivingData = FALSE;
 	uint16_t m_nSuitablePage = 0;
@@ -58,7 +59,7 @@ class CTeletext
 	void ProcessTeletextPage();
 	void ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE_TIME rtStart);
 public:
-	CTeletext() {}
+	CTeletext();
 
 	void ProcessData(uint8_t* buffer, uint16_t size, REFERENCE_TIME rtStart);
 	void Flush();

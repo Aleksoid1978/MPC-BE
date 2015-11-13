@@ -460,6 +460,11 @@ enum data_unit {
 	DATA_UNIT_CLOSED_CAPTIONS = 0xc5
 };
 
+CTeletext::CTeletext()
+{
+	ZeroMemory(&m_page_buffer, sizeof(m_page_buffer));
+}
+
 void CTeletext::ProcessData(uint8_t* buffer, uint16_t size, REFERENCE_TIME rtStart)
 {
 	if (size > 6) {
