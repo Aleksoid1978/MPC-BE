@@ -1355,6 +1355,85 @@ void CMpegSplitterFile::ReadPAT(CAtlArray<BYTE>& pData)
 	}
 }
 
+static const char und[4] = "und";
+
+// ISO 639 language descriptor
+static void Descriptor_0A(CGolombBuffer& gb, CString& ISO_639_language_code)
+{
+	char ch[4] = { 0 };
+	gb.ReadBuffer((BYTE *)ch, 3); // ISO 639 language code
+	gb.BitRead(8);                // audio type
+
+	if (strncmp(ch, und, 3)) {
+		ISO_639_language_code = CString(ch);
+	}
+}
+
+// Teletext descriptor
+static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, CString& ISO_639_language_code)
+{
+#ifdef _DEBUG
+	// for future use
+	CAtlMap<USHORT, CString> teletexts;
+#endif
+
+	const int section_len = 5;
+	int pos = 0;
+	while (pos <= descriptor_length - section_len) {
+		char ch[4] = { 0 };
+		gb.ReadBuffer((BYTE *)ch, 3); // ISO 639 language code
+		BYTE teletext_type            = gb.BitRead(5);
+		BYTE teletext_magazine_number = gb.BitRead(3);
+		BYTE teletext_page_number_1   = gb.BitRead(4);
+		BYTE teletext_page_number_2   = gb.BitRead(4);
+
+		if (teletext_type == 0x02 || teletext_type == 0x05) {
+			if (ISO_639_language_code.IsEmpty() && strncmp(ch, und, 3)) {
+				ISO_639_language_code = CString(ch);
+			}
+
+#ifdef _DEBUG
+			if (teletext_magazine_number == 0) teletext_magazine_number = 8;
+			USHORT page = (teletext_magazine_number << 8) | (teletext_page_number_1 << 4) | teletext_page_number_2;
+			teletexts[page] = CString(ch);
+#endif
+		}
+
+		pos += section_len;
+	}
+
+#ifdef _DEBUG
+	if (!teletexts.IsEmpty()) {
+		DbgLog((LOG_TRACE, 3, L"ReadPMT() : found %u teletext pages", teletexts.GetCount()));
+		POSITION pos = teletexts.GetStartPosition();
+		while (pos) {
+			CAtlMap<USHORT, CString>::CPair* pPair = teletexts.GetNext(pos);
+			DbgLog((LOG_TRACE, 3, L"	=> %03x - '%s'", pPair->m_key, pPair->m_value));
+		}
+	}
+#endif
+}
+
+// Subtitling descriptor
+static void Descriptor_59(CGolombBuffer& gb, int descriptor_length, CString& ISO_639_language_code)
+{
+	const int section_len = 8;
+	int pos = 0;
+	while (pos <= descriptor_length - section_len) {
+		char ch[4] = { 0 };
+		gb.ReadBuffer((BYTE *)ch, 3); // ISO 639 language code
+		gb.BitRead(8);                // subtitling type
+		gb.BitRead(16);               // composition pageid
+		gb.BitRead(16);               // ancillary page id
+
+		if (ISO_639_language_code.IsEmpty() && strncmp(ch, und, 3)) {
+			ISO_639_language_code = CString(ch);
+		}
+
+		pos += section_len;
+	}
+}
+
 void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 {
 	if (CPrograms::CPair* pPair = m_programs.Lookup(pid)) {
@@ -1406,35 +1485,33 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 					BYTE descriptor_tag		= (BYTE)gb.BitRead(8);
 					BYTE descriptor_length	= (BYTE)gb.BitRead(8);
 					info_length			   -= (2 + descriptor_length);
-					if (info_length < 0)
+					if (info_length < 0) {
 						break;
-					char ch[4] = { 0 };
+					}
 
+					CString ISO_639_language_code;
 					switch (descriptor_tag) {
-						case 0x56: // Teletext descriptor
-						case 0x59: // Subtitling descriptor
 						case 0x0a: // ISO 639 language descriptor
-							if (descriptor_tag == 0x56) {
-								TELETEXT_SUBTITLE = TRUE;
-							} else if (descriptor_tag == 0x59) {
-								DVB_SUBTITLE = TRUE;
-							}
-
-							gb.ReadBuffer((BYTE *)ch, 3);
-							ch[3] = 0;
-							for (BYTE i = 3; i < descriptor_length; i++) {
-								gb.BitRead(8);
-							}
-							if (!(ch[0] == 'u' && ch[1] == 'n' && ch[2] == 'd')) {
-								m_pPMT_Lang[pid] = CString(ch);
-							}
+							Descriptor_0A(gb, ISO_639_language_code);
+							break;
+						case 0x56: // Teletext descriptor
+							TELETEXT_SUBTITLE = TRUE;
+							Descriptor_56(gb, descriptor_length, ISO_639_language_code);
+							break;
+						case 0x59: // Subtitling descriptor
+							DVB_SUBTITLE = TRUE;
+							Descriptor_59(gb, descriptor_length, ISO_639_language_code);
 							break;
 						default:
 							gb.SkipBytes(descriptor_length);
 							break;
 					}
+
+					if (!ISO_639_language_code.IsEmpty()) {
+						m_pPMT_Lang[pid] = ISO_639_language_code;
+					}
 					if (info_length <= 2) {
-						if (info_length) {
+						if (info_length > 0) {
 							gb.SkipBytes(info_length);
 						}
 						break;
