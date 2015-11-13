@@ -431,7 +431,7 @@ void CTeletext::ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE
 			ProcessTeletextPage();
 		}
 
-		m_page_buffer.rtStart = rtStart;
+		m_page_buffer.rtStart = rtStart == INVALID_TIME ? 0 : rtStart;
 		m_page_buffer.rtStop = rtStart + 1;
 
 		if ((packet->data[3] & 0x80) == 0x80) {
