@@ -150,13 +150,9 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	}
 
 	if (IsRandomAccess()) {
-		__int64 len = GetLength();
-		len = min(len, 5 * MEGABYTE);
-
-		SearchPrograms(0, len);
-
-		len = GetLength();
+		__int64 const len = GetLength();
 		__int64 stop = min(10 * MEGABYTE, len);
+		SearchPrograms(0, stop);
 		SearchStreams(0, stop);
 
 		int num = min(20, (len - stop) / (512 * KILOBYTE));
@@ -165,6 +161,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			for (int i = 0; i < num; i++) {
 				stop += step;
 				__int64 start = stop - 256 * KILOBYTE;
+				SearchPrograms(start, stop);
 				SearchStreams(start, stop);
 			}
 		}
@@ -493,9 +490,11 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 
 void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 {
-	if (m_type != MPEG_TYPES::mpeg_ts) {
+	if (m_type != MPEG_TYPES::mpeg_ts || m_bIsBD) {
 		return;
 	}
+
+	m_ProgramData.RemoveAll();
 
 	Seek(start);
 
@@ -1259,7 +1258,8 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 
 	programData& ProgramData = m_ProgramData[h.pid];
 	if (ProgramData.bFinished) {
-		return;
+		// disable the check, because the program's data may change
+		// return;
 	}
 
 	if (h.payload && h.payloadstart) {
@@ -1815,20 +1815,24 @@ const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(WORD pid, int &
 bool CMpegSplitterFile::GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type)
 {
 	if (ISVALIDPID(pid)) {
-		int iProgram;
-		const CHdmvClipInfo::Stream *pClipInfo;
-		const program* pProgram = FindProgram(pid, iProgram, pClipInfo);
-		if (pProgram) {
-			stream_type = pProgram->streams[iProgram].type;
-
+		if (m_type == MPEG_TYPES::mpeg_ts) {
+			int iProgram;
+			const CHdmvClipInfo::Stream *pClipInfo;
+			const program* pProgram = FindProgram(pid, iProgram, pClipInfo);
+			if (pClipInfo) {
+				stream_type = pClipInfo->m_Type;
+			} else if (pProgram) {
+				stream_type = pProgram->streams[iProgram].type;
+			}
+			
 			if (stream_type != INVALID) {
 				return true;
 			}
-		}
-
-		if (pid < _countof(m_psm) && m_psm[pid] != 0) {
-			stream_type = m_psm[pid];
-			return true;
+		} else if (m_type == MPEG_TYPES::mpeg_ps) {
+			if (pid < _countof(m_psm) && m_psm[pid] != INVALID) {
+				stream_type = m_psm[pid];
+				return true;
+			}
 		}
 	}
 
