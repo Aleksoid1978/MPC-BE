@@ -2907,6 +2907,7 @@ void File__Analyze::Param_Info (const Ztring &Text)
         return;
 
     //Filling
+    size_t End=Element[Element_Level].ToShow.Details.size();
     switch (Config_Trace_Format)
     {
         case MediaInfo_Config::Trace_Format_Tree        :
@@ -2916,32 +2917,49 @@ void File__Analyze::Param_Info (const Ztring &Text)
                                                                 size_t Start=Element[Element_Level].ToShow.Details.rfind(EOL);
                                                                 if (Start==(size_t)-1)
                                                                     Start=0;
+                                                                End=Element[Element_Level].ToShow.Details.find(__T('>'), Start);
+                                                                if (End==(size_t)-1)
+                                                                    End=Element[Element_Level].ToShow.Details.size();
                                                                 
                                                                      if (Element[Element_Level].ToShow.Details.find(__T(" info7=\""), Start)!=string::npos)
-                                                                    Element[Element_Level].ToShow.Details+=__T(" info8=\"");
+                                                                    Element[Element_Level].ToShow.Details.insert(End, __T(" info8=\""));
                                                                 else if (Element[Element_Level].ToShow.Details.find(__T(" info6=\""), Start)!=string::npos)
-                                                                    Element[Element_Level].ToShow.Details+=__T(" info7=\"");
+                                                                    Element[Element_Level].ToShow.Details.insert(End, __T(" info7=\""));
                                                                 else if (Element[Element_Level].ToShow.Details.find(__T(" info5=\""), Start)!=string::npos)
-                                                                    Element[Element_Level].ToShow.Details+=__T(" info6=\"");
+                                                                    Element[Element_Level].ToShow.Details.insert(End, __T(" info6=\""));
                                                                 else if (Element[Element_Level].ToShow.Details.find(__T(" info4=\""), Start)!=string::npos)
-                                                                    Element[Element_Level].ToShow.Details+=__T(" info5=\"");
+                                                                    Element[Element_Level].ToShow.Details.insert(End, __T(" info5=\""));
                                                                 else if (Element[Element_Level].ToShow.Details.find(__T(" info3=\""), Start)!=string::npos)
-                                                                    Element[Element_Level].ToShow.Details+=__T(" info4=\"");
+                                                                    Element[Element_Level].ToShow.Details.insert(End, __T(" info4=\""));
                                                                 else if (Element[Element_Level].ToShow.Details.find(__T(" info2=\""), Start)!=string::npos)
-                                                                    Element[Element_Level].ToShow.Details+=__T(" info3=\"");
+                                                                    Element[Element_Level].ToShow.Details.insert(End, __T(" info3=\""));
                                                                 else if (Element[Element_Level].ToShow.Details.find(__T(" info=\""), Start)!=string::npos)
-                                                                    Element[Element_Level].ToShow.Details+=__T(" info2=\"");
+                                                                    Element[Element_Level].ToShow.Details.insert(End, __T(" info2=\""));
                                                                 else                
-                                                                    Element[Element_Level].ToShow.Details+=__T(" info=\"");
+                                                                    Element[Element_Level].ToShow.Details.insert(End, __T(" info=\""));
+                                                                End=Element[Element_Level].ToShow.Details.find(__T('>'), Start);
+                                                                if (End==(size_t)-1)
+                                                                    End=Element[Element_Level].ToShow.Details.size();
                                                             }
                                                             break;
         default                                         : ;
     }
     size_t Modified;
-    Element[Element_Level].ToShow.Details+=MediaInfo_Internal::Xml_Content_Escape(Text, Modified);
+    Element[Element_Level].ToShow.Details.insert(End, MediaInfo_Internal::Xml_Content_Escape(Text, Modified));
     switch (Config_Trace_Format)
     {
-        case MediaInfo_Config::Trace_Format_XML         : Element[Element_Level].ToShow.Details+=__T("\""); break;
+        case MediaInfo_Config::Trace_Format_XML         :
+                                                            {
+                                                                size_t Start=Element[Element_Level].ToShow.Details.rfind(EOL);
+                                                                if (Start==(size_t)-1)
+                                                                    Start=0;
+                                                                End=Element[Element_Level].ToShow.Details.find(__T('>'), Start);
+                                                                if (End==(size_t)-1)
+                                                                    End=Element[Element_Level].ToShow.Details.size();
+            
+                                                                Element[Element_Level].ToShow.Details.insert(End, __T("\"")); break;
+                                                            }
+                                                            break;
         default                                         : ;
     }
 }

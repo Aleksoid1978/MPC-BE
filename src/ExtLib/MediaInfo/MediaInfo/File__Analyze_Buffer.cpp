@@ -2094,11 +2094,8 @@ void File__Analyze::Get_S1(int8u Bits, int8u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, Info);
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
 }
@@ -2111,11 +2108,8 @@ void File__Analyze::Get_S2(int8u Bits, int16u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, Info);
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
 }
@@ -2128,11 +2122,8 @@ void File__Analyze::Get_S3(int8u Bits, int32u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, Info);
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
 }
@@ -2145,11 +2136,8 @@ void File__Analyze::Get_S4(int8u Bits, int32u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, Info);
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
 }
@@ -2162,11 +2150,8 @@ void File__Analyze::Get_S5(int8u Bits, int64u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, Info);
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
 }
@@ -2179,11 +2164,8 @@ void File__Analyze::Get_S6(int8u Bits, int64u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, Info);
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
 }
@@ -2196,11 +2178,8 @@ void File__Analyze::Get_S7(int8u Bits, int64u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, Info);
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
 }
@@ -2213,11 +2192,8 @@ void File__Analyze::Get_S8(int8u Bits, int64u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, Info);
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
 }
@@ -2327,11 +2303,8 @@ void File__Analyze::Skip_S1(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, BS->Get1(Bits));
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
     #endif //MEDIAINFO_TRACE
@@ -2345,11 +2318,8 @@ void File__Analyze::Skip_S2(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, BS->Get2(Bits));
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
     #endif //MEDIAINFO_TRACE
@@ -2363,11 +2333,8 @@ void File__Analyze::Skip_S3(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, BS->Get4(Bits));
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
     #endif //MEDIAINFO_TRACE
@@ -2381,11 +2348,8 @@ void File__Analyze::Skip_S4(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, BS->Get4(Bits));
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
     #endif //MEDIAINFO_TRACE
@@ -2399,11 +2363,8 @@ void File__Analyze::Skip_S5(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, BS->Get8(Bits));
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
     #endif //MEDIAINFO_TRACE
@@ -2417,11 +2378,8 @@ void File__Analyze::Skip_S6(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, BS->Get8(Bits));
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
     #endif //MEDIAINFO_TRACE
@@ -2435,11 +2393,8 @@ void File__Analyze::Skip_S7(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, BS->Get8(Bits));
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
     #endif //MEDIAINFO_TRACE
@@ -2453,11 +2408,8 @@ void File__Analyze::Skip_S8(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            if (Config_Trace_Format==MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
             Param(Name, BS->Get8(Bits));
-            if (Config_Trace_Format!=MediaInfo_Config::Trace_Format_XML)
-                Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
+            Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
     #endif //MEDIAINFO_TRACE

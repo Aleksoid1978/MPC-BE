@@ -351,6 +351,12 @@ void File_Aac::raw_data_block()
         Element_Begin0();
         id_syn_ele_Previous=id_syn_ele;
         Get_S1 (3, id_syn_ele,                                  "id_syn_ele"); Param_Info1(Aac_id_syn_ele[id_syn_ele]); Element_Name(Aac_id_syn_ele[id_syn_ele]);
+        
+        #if MEDIAINFO_TRACE
+            bool Trace_Activated_Save=Trace_Activated;
+            Trace_Activated=false; //It is too big, disabling trace for now for full AAC parsing
+        #endif MEDIAINFO_TRACE
+        
         switch (id_syn_ele)
         {
             case 0x00 : single_channel_element();           break; //ID_SCE
@@ -363,6 +369,11 @@ void File_Aac::raw_data_block()
             case 0x07 :                                     break; //ID_END
             default   :                                          ; //Can not happen
         }
+        
+        #if MEDIAINFO_TRACE
+            Trace_Activated=Trace_Activated_Save;
+        #endif MEDIAINFO_TRACE
+
         Element_End0();
     }
     while(Element_IsOK() && Data_BS_Remain() && id_syn_ele!=0x07); //ID_END

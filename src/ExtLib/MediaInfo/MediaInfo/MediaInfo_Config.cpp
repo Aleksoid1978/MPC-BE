@@ -125,7 +125,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.78");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.79");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -571,6 +571,8 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     }
     else if (Option_Lower==__T("details")) //Legacy for trace_level
     {
+        if (Value == __T("0"))
+            Trace_Level=0;
         return MediaInfo_Config::Option(__T("Trace_Level"), Value);
     }
     else if (Option_Lower==__T("details_get")) //Legacy for trace_level
@@ -839,6 +841,22 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     else if (Option_Lower==__T("mpegts_forcestreamdisplay_get"))
     {
         return MpegTs_ForceStreamDisplay_Get()?__T("1"):__T("0");
+    }
+    else if (Option_Lower==__T("maxml_streamkinds"))
+    {
+        #if MEDIAINFO_ADVANCED
+            return MAXML_StreamKinds_Get();
+        #else // MEDIAINFO_ADVANCED
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED
+    }
+    else if (Option_Lower==__T("maxml_fields"))
+    {
+        #if MEDIAINFO_ADVANCED
+            return MAXML_Fields_Get(Value);
+        #else // MEDIAINFO_ADVANCED
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED
     }
     else if (Option_Lower==__T("custommapping"))
     {
@@ -2190,6 +2208,77 @@ bool MediaInfo_Config::MpegTs_ForceStreamDisplay_Get ()
     CriticalSectionLocker CSL(CS);
     return MpegTs_ForceStreamDisplay;
 }
+
+#if MEDIAINFO_ADVANCED
+Ztring MediaInfo_Config::MAXML_StreamKinds_Get ()
+{
+    ZtringList List;
+    CriticalSectionLocker CSL(CS);
+    for (size_t StreamKind=0; StreamKind<Stream_Max; StreamKind++)
+    {
+        if (Info[StreamKind].empty())
+        {
+            switch (StreamKind)
+            {
+                case Stream_General :   MediaInfo_Config_General(Info[Stream_General]);   Language_Set(Stream_General); break;
+                case Stream_Video :     MediaInfo_Config_Video(Info[Stream_Video]);       Language_Set(Stream_Video); break;
+                case Stream_Audio :     MediaInfo_Config_Audio(Info[Stream_Audio]);       Language_Set(Stream_Audio); break;
+                case Stream_Text :      MediaInfo_Config_Text(Info[Stream_Text]);         Language_Set(Stream_Text); break;
+                case Stream_Other :     MediaInfo_Config_Other(Info[Stream_Other]);       Language_Set(Stream_Other); break;
+                case Stream_Image :     MediaInfo_Config_Image(Info[Stream_Image]);       Language_Set(Stream_Image); break;
+                case Stream_Menu :      MediaInfo_Config_Menu(Info[Stream_Menu]);         Language_Set(Stream_Menu); break;
+                default:;
+            }
+        }
+        List.push_back(Info[StreamKind](__T("StreamKind"), Info_Name, Info_Text));
+    }
+
+    List.Separator_Set(0, __T(","));
+    return List.Read();
+}
+#endif // MEDIAINFO_ADVANCED
+
+#if MEDIAINFO_ADVANCED
+extern Ztring Xml_Name_Escape_0_7_78 (const Ztring &Name);
+Ztring MediaInfo_Config::MAXML_Fields_Get (const Ztring &StreamKind_String)
+{
+    CriticalSectionLocker CSL(CS);
+
+    size_t StreamKind=Stream_General;
+    for (; StreamKind<Stream_Max; StreamKind++)
+    {
+        if (Info[StreamKind].empty())
+        {
+            switch (StreamKind)
+            {
+                case Stream_General :   MediaInfo_Config_General(Info[Stream_General]);   Language_Set(Stream_General); break;
+                case Stream_Video :     MediaInfo_Config_Video(Info[Stream_Video]);       Language_Set(Stream_Video); break;
+                case Stream_Audio :     MediaInfo_Config_Audio(Info[Stream_Audio]);       Language_Set(Stream_Audio); break;
+                case Stream_Text :      MediaInfo_Config_Text(Info[Stream_Text]);         Language_Set(Stream_Text); break;
+                case Stream_Other :     MediaInfo_Config_Other(Info[Stream_Other]);       Language_Set(Stream_Other); break;
+                case Stream_Image :     MediaInfo_Config_Image(Info[Stream_Image]);       Language_Set(Stream_Image); break;
+                case Stream_Menu :      MediaInfo_Config_Menu(Info[Stream_Menu]);         Language_Set(Stream_Menu); break;
+                default:;
+            }
+        }
+        if (StreamKind_String==Info[StreamKind](__T("StreamKind"), Info_Name, Info_Text))
+            break;
+    }
+
+    if (StreamKind>=Stream_Max)
+        return Ztring();
+
+    ZtringList List;
+    for (size_t FieldPos = 0; FieldPos < Info[StreamKind].size(); FieldPos++)
+        if (Info_Options < Info[StreamKind][FieldPos].size()
+         && InfoOption_ShowInXml < Info[StreamKind][FieldPos][Info_Options].size()
+         && Info[StreamKind][FieldPos][Info_Options][InfoOption_ShowInXml]==__T('Y'))
+            List.push_back(Xml_Name_Escape_0_7_78(Info[StreamKind][FieldPos][Info_Name]));
+
+    List.Separator_Set(0, __T(","));
+    return List.Read();
+}
+#endif // MEDIAINFO_ADVANCED
 
 //***************************************************************************
 // SubFile
