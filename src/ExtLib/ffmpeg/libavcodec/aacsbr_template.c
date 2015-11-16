@@ -32,6 +32,8 @@
  * @author Zoran Basaric ( zoran.basaric@imgtec.com )
  */
 
+#include "libavutil/qsort.h"
+
 av_cold void AAC_RENAME(ff_aac_sbr_init)(void)
 {
     static const struct {
@@ -138,8 +140,8 @@ static void sbr_make_f_tablelim(SpectralBandReplication *sbr)
             memcpy(sbr->f_tablelim + sbr->n[0] + 1, patch_borders + 1,
                    (sbr->num_patches - 1) * sizeof(patch_borders[0]));
 
-        qsort(sbr->f_tablelim, sbr->num_patches + sbr->n[0],
-              sizeof(sbr->f_tablelim[0]),
+        AV_QSORT(sbr->f_tablelim, sbr->num_patches + sbr->n[0],
+              uint16_t,
               qsort_comparison_function_int16);
 
         sbr->n_lim = sbr->n[0] + sbr->num_patches - 1;
@@ -296,7 +298,7 @@ static int sbr_make_f_master(AACContext *ac, SpectralBandReplication *sbr,
     if (spectrum->bs_stop_freq < 14) {
         sbr->k[2] = stop_min;
         make_bands(stop_dk, stop_min, 64, 13);
-        qsort(stop_dk, 13, sizeof(stop_dk[0]), qsort_comparison_function_int16);
+        AV_QSORT(stop_dk, 13, int16_t, qsort_comparison_function_int16);
         for (k = 0; k < spectrum->bs_stop_freq; k++)
             sbr->k[2] += stop_dk[k];
     } else if (spectrum->bs_stop_freq == 14) {
@@ -389,7 +391,7 @@ static int sbr_make_f_master(AACContext *ac, SpectralBandReplication *sbr,
 
         make_bands(vk0+1, sbr->k[0], sbr->k[1], num_bands_0);
 
-        qsort(vk0 + 1, num_bands_0, sizeof(vk0[1]), qsort_comparison_function_int16);
+        AV_QSORT(vk0 + 1, num_bands_0, int16_t, qsort_comparison_function_int16);
         vdk0_max = vk0[num_bands_0];
 
         vk0[0] = sbr->k[0];
@@ -430,13 +432,13 @@ static int sbr_make_f_master(AACContext *ac, SpectralBandReplication *sbr,
 
             if (vdk1_min < vdk0_max) {
                 int change;
-                qsort(vk1 + 1, num_bands_1, sizeof(vk1[1]), qsort_comparison_function_int16);
+                AV_QSORT(vk1 + 1, num_bands_1, int16_t, qsort_comparison_function_int16);
                 change = FFMIN(vdk0_max - vk1[1], (vk1[num_bands_1] - vk1[1]) >> 1);
                 vk1[1]           += change;
                 vk1[num_bands_1] -= change;
             }
 
-            qsort(vk1 + 1, num_bands_1, sizeof(vk1[1]), qsort_comparison_function_int16);
+            AV_QSORT(vk1 + 1, num_bands_1, int16_t, qsort_comparison_function_int16);
 
             vk1[0] = sbr->k[1];
             for (k = 1; k <= num_bands_1; k++) {
@@ -1412,7 +1414,7 @@ static void sbr_env_estimate(AAC_FLOAT (*e_curr)[48], INTFLOAT X_high[64][40][2]
 
             for (p = 0; p < sbr->n[ch_data->bs_freq_res[e + 1]]; p++) {
 #if USE_FIXED
-                SoftFloat sum = { 0, 0 };
+                SoftFloat sum = FLOAT_0;
                 const SoftFloat den = av_int2sf(0x20000000 / (env_size * (table[p + 1] - table[p])), 29);
                 for (k = table[p]; k < table[p + 1]; k++) {
                     sum = av_add_sf(sum, sbr->dsp.sum_square(X_high[k] + ilb, iub - ilb));

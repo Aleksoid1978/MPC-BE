@@ -39,9 +39,9 @@
 #include <windows.h>
 #include <process.h>
 
-/* MinGW requires the intrinsics header for the pthread_once fallback code */
 #if _WIN32_WINNT < 0x0600 && defined(__MINGW32__)
-#include <intrin.h>
+#undef MemoryBarrier
+#define MemoryBarrier __sync_synchronize
 #endif
 
 #include "libavutil/attributes.h"
@@ -77,7 +77,10 @@ typedef struct pthread_cond_t {
 
 static av_unused unsigned __stdcall attribute_align_arg win32thread_worker(void *arg)
 {
+    // ==> Start patch MPC
+    // pthread_t *h = arg;
     pthread_t *h = (pthread_t *)arg;
+    // ==> End patch MPC
     h->ret = h->func(h->arg);
     return 0;
 }

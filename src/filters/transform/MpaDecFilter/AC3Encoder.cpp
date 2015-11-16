@@ -126,14 +126,14 @@ HRESULT CAC3Encoder::Encode(CAtlArray<float>& BuffIn, CAtlArray<BYTE>& BuffOut)
 
 	ret = avcodec_encode_audio2(m_pAVCtx, &avpkt, m_pFrame, &got_packet);
 	if (ret < 0) {
-		av_free_packet(&avpkt);
+		av_packet_unref(&avpkt);
 		return E_FAIL;
 	}
 	if (got_packet) {
 		BuffOut.SetCount(avpkt.size);
 		memcpy(BuffOut.GetData(), avpkt.data, avpkt.size);
 	}
-	av_free_packet(&avpkt);
+	av_packet_unref(&avpkt);
 
 	size_t old_size  = BuffIn.GetCount() * sizeof(float);
 	size_t new_size  = BuffIn.GetCount() * sizeof(float) - m_framesize;
