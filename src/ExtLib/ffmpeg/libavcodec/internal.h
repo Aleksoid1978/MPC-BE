@@ -53,6 +53,11 @@
  * from the input AVPacket.
  */
 #define FF_CODEC_CAP_SETS_PKT_DTS           (1 << 2)
+/**
+ * The decoder extracts and fills its parameters even if the frame is
+ * skiped due to the skip_frame setting.
+ */
+#define FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM  (1 << 3)
 
 #ifdef TRACE
 #   define ff_tlog(ctx, ...) av_log(ctx, AV_LOG_TRACE, __VA_ARGS__)
@@ -178,7 +183,7 @@ unsigned int avpriv_toupper4(unsigned int x);
 int ff_init_buffer_info(AVCodecContext *s, AVFrame *frame);
 
 
-void avpriv_color_frame(AVFrame *frame, const int color[4]);
+void ff_color_frame(AVFrame *frame, const int color[4]);
 
 extern volatile int ff_avcodec_locked;
 int ff_lock_avcodec(AVCodecContext *log_ctx, const AVCodec *codec);

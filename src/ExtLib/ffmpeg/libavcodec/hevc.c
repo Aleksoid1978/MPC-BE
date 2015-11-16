@@ -2515,7 +2515,7 @@ static int hls_slice_data_wpp(HEVCContext *s, const HEVCNAL *nal)
     }
 
     if (s->ps.pps->entropy_coding_sync_enabled_flag)
-        s->avctx->execute2(s->avctx, (void *) hls_decode_entry_wpp, arg, ret, s->sh.num_entry_point_offsets + 1);
+        s->avctx->execute2(s->avctx, hls_decode_entry_wpp, arg, ret, s->sh.num_entry_point_offsets + 1);
 
     for (i = 0; i <= s->sh.num_entry_point_offsets; i++)
         res += ret[i];
@@ -2568,6 +2568,17 @@ static int set_side_data(HEVCContext *s)
         av_display_rotation_set((int32_t *)rotation->data, angle);
         av_display_matrix_flip((int32_t *)rotation->data,
                                s->sei_hflip, s->sei_vflip);
+    }
+
+    if (s->a53_caption) {
+        AVFrameSideData* sd = av_frame_new_side_data(out,
+                                                     AV_FRAME_DATA_A53_CC,
+                                                     s->a53_caption_size);
+        if (sd)
+            memcpy(sd->data, s->a53_caption, s->a53_caption_size);
+        av_freep(&s->a53_caption);
+        s->a53_caption_size = 0;
+        s->avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
     }
 
     return 0;

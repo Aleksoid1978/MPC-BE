@@ -11,7 +11,7 @@ Legend:
 ==============================
 
 Updated libraries:
-	ffmpeg git-n2.9-dev-1278-g18e8fac;
+	ffmpeg git-n2.9-dev-1796-g0eb7de1;
 	libdcadec git-57012a4;
 	Little-CMS 2.7 beta git-0ebca931;
 	MediaInfo 0.7.78.
