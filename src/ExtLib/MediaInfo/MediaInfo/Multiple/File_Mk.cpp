@@ -985,7 +985,7 @@ void File_Mk::Ebml()
 //---------------------------------------------------------------------------
 void File_Mk::Ebml_Version()
 {
-    Element_Name("Version");
+    Element_Name("EBMLVersion");
 
     //Parsing
     UInteger_Info();
@@ -994,7 +994,7 @@ void File_Mk::Ebml_Version()
 //---------------------------------------------------------------------------
 void File_Mk::Ebml_ReadVersion()
 {
-    Element_Name("ReadVersion");
+    Element_Name("EBMLReadVersion");
 
     //Parsing
     UInteger_Info();
@@ -1003,7 +1003,7 @@ void File_Mk::Ebml_ReadVersion()
 //---------------------------------------------------------------------------
 void File_Mk::Ebml_MaxIDLength()
 {
-    Element_Name("MaxIDLength");
+    Element_Name("EBMLMaxIDLength");
 
     //Parsing
     UInteger_Info();
@@ -1012,7 +1012,7 @@ void File_Mk::Ebml_MaxIDLength()
 //---------------------------------------------------------------------------
 void File_Mk::Ebml_MaxSizeLength()
 {
-    Element_Name("MaxSizeLength");
+    Element_Name("EBMLMaxSizeLength");
 
     //Parsing
     UInteger_Info();
@@ -1608,9 +1608,8 @@ void File_Mk::Segment_Cluster_BlockGroup_Block()
                             Demux_Level=Demux_Level_old;
                         #endif //MEDIAINFO_DEMUX
                         Open_Buffer_Continue(Stream[TrackNumber].Parser, (size_t)Laces[Pos]);
-                        if (Stream[TrackNumber].Parser->Status[IsFilled]
-                         || Stream[TrackNumber].Parser->Status[IsFinished]
-                         || Stream[TrackNumber].PacketCount>=300)
+                        if (Stream[TrackNumber].Parser->Status[IsFinished]
+                         || (Stream[TrackNumber].PacketCount>=300 && MediaInfoLib::Config.ParseSpeed_Get()<1))
                             Stream[TrackNumber].Searching_Payload=false;
                     }
                     else

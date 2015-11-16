@@ -213,6 +213,11 @@ public :
           bool      MpegTs_VbrDetection_GiveUp_Get ();
     #endif //MEDIAINFO_ADVANCED
 
+    #if MEDIAINFO_ADVANCED
+          Ztring      MAXML_StreamKinds_Get ();
+          Ztring      MAXML_Fields_Get (const Ztring &StreamKind);
+    #endif //MEDIAINFO_ADVANCED
+
     ZtringListList  SubFile_Config_Get ();
 
     void            CustomMapping_Set (const Ztring &Value);

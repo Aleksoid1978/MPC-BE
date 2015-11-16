@@ -914,7 +914,7 @@ extern "C"
         #define MEDIAINFODLL_NAME  "libcurl.dll"
     #endif //_UNICODE
 #elif defined(__APPLE__) && defined(__MACH__)
-    #define MEDIAINFODLL_NAME  "libcurl.0.dylib"
+    #define MEDIAINFODLL_NAME  "libcurl.4.dylib"
     #define __stdcall
 #else
     #define MEDIAINFODLL_NAME  "libcurl.so.0"

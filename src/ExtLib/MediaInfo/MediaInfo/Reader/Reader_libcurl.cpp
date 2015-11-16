@@ -499,7 +499,7 @@ size_t Reader_libcurl::Format_Test_PerParser(MediaInfo_Internal* MI, const Strin
     if (!File_URL.Protocol.empty())
     {
         // Amazon S3 specific credentials
-        if (File_URL.Protocol=="http" || File_URL.Protocol=="https")
+        if ((File_URL.Protocol=="http" || File_URL.Protocol=="https") && !File_URL.User.empty() && !File_URL.Password.empty())
         {
             //Exploding the path
             const string Amazon_AWS_Host(".amazonaws.com");
@@ -601,7 +601,18 @@ size_t Reader_libcurl::Format_Test_PerParser(MediaInfo_Internal* MI, const Strin
 
             if (!Curl_Data->Ssh_IgnoreSecurity)
             {
+                #if !defined(MEDIAINFO_LIBCURL_DLL_RUNTIME)
+                    #if LIBCURL_VERSION_NUM >= 0x071306
+                        #define MEDIAINFO_LIBCURL_CURLOPT_SSH_KNOWNHOSTS
+                    #endif
+                #else
+                    #define MEDIAINFO_LIBCURL_CURLOPT_SSH_KNOWNHOSTS
+                #endif
+                #ifdef MEDIAINFO_LIBCURL_CURLOPT_SSH_KNOWNHOSTS
                 CURLcode Result=curl_easy_setopt(Curl_Data->Curl, CURLOPT_SSH_KNOWNHOSTS, Curl_Data->Ssh_KnownHostsFileName.c_str());
+                #else //MEDIAINFO_LIBCURL_CURLOPT_SSH_KNOWNHOSTS
+                const CURLcode Result=CURLE_UNKNOWN_TELNET_OPTION;
+                #endif //MEDIAINFO_LIBCURL_CURLOPT_SSH_KNOWNHOSTS
                 if (Result)
                 {
                     #if MEDIAINFO_EVENTS
