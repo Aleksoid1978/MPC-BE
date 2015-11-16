@@ -30,7 +30,7 @@ LIB_LIBSWSCALE = $(OBJ_DIR)libswscale.a
 TARGET_LIB	 = $(TARGET_LIB_DIR)/ffmpeg.lib
 
 # Compiler and yasm flags
-CFLAGS	= -I. -I.. -Ilibavcodec -Ilibavutil -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(SPEEX_DIR)\
+CFLAGS	= -I. -I.. -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(SPEEX_DIR)\
 		-DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 		-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 \
 		-fomit-frame-pointer -std=gnu99 \
@@ -579,7 +579,7 @@ SRCS_LU = \
 	libavutil/sha.c \
 	libavutil/stereo3d.c \
 	libavutil/threadmessage.c \
-	libavutil/time_av.c \
+	libavutil/time.c \
 	libavutil/timecode.c \
 	libavutil/utils.c \
 	\
