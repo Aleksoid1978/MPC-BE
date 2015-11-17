@@ -18341,6 +18341,10 @@ CString CMainFrame::FillMessage()
 			msg.Format(ResStr(IDS_CONTROLS_BUFFERING), c * 100 / t);
 		}
 
+		if (!msg.IsEmpty() && State_Stopped == GetMediaState()) {
+			OnTimer(TIMER_STREAMPOSPOLLER);
+		}
+
 		if (m_fUpdateInfoBar) {
 			OpenSetupInfoBar();
 			OpenSetupWindowTitle(m_strFnFull);
