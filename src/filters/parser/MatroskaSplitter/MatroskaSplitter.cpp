@@ -1259,7 +1259,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				} else if (SimpleTag->TagName == _T("COPYRIGHT")) {
 					DelProperty(L"CPYR");
 					SetProperty(L"CPYR", SimpleTag->TagString);
-				} else if (SimpleTag->TagName == _T("COMMENT")) {
+				} else if (SimpleTag->TagName == _T("COMMENT") || SimpleTag->TagName == _T("DESCRIPTION")) {
 					DelProperty(L"DESC");
 					SetProperty(L"DESC", SimpleTag->TagString);
 				}
