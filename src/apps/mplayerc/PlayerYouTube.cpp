@@ -152,6 +152,23 @@ static CString RegExpParse(CString szIn, CString szRE)
 	return L"";
 }
 
+static void InternetReadData(HINTERNET& f, char** pData, DWORD& dataSize)
+{
+	char buffer[4096] = { 0 };
+	const DWORD dwNumberOfBytesToRead = _countof(buffer); 
+	DWORD dwBytesRead = 0;
+	do {
+		if (InternetReadFile(f, (LPVOID)buffer, dwNumberOfBytesToRead, &dwBytesRead) == FALSE) {
+			break;
+		}
+
+		*pData = (char*)realloc(*pData, dataSize + dwBytesRead + 1);
+		memcpy(*pData + dataSize, buffer, dwBytesRead);
+		dataSize += dwBytesRead;
+		(*pData)[dataSize] = 0;
+	} while (dwBytesRead);
+}
+
 CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* subs)
 {
 	if (PlayerYouTubeCheck(url)) {
@@ -370,19 +387,7 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 					if (f) {
 						char* data = NULL;
 						DWORD dataSize = 0;
-
-						char buffer[4096] = { 0 };
-						DWORD dwBytesRead = 0;
-						do {
-							if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == FALSE) {
-								break;
-							}
-
-							data = (char*)realloc(data, dataSize + dwBytesRead + 1);
-							memcpy(data + dataSize, buffer, dwBytesRead);
-							dataSize += dwBytesRead;
-							data[dataSize] = 0;
-						} while (dwBytesRead);
+						InternetReadData(f, &data, dataSize);
 						InternetCloseHandle(f);
 
 						if (dataSize) {
@@ -450,19 +455,7 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 					if (f) {
 						char* data = NULL;
 						DWORD dataSize = 0;
-
-						char buffer[1024] = { 0 };
-						DWORD dwBytesRead = 0;
-						do {
-							if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == FALSE) {
-								break;
-							}
-
-							data = (char*)realloc(data, dataSize + dwBytesRead + 1);
-							memcpy(data + dataSize, buffer, dwBytesRead);
-							dataSize += dwBytesRead;
-							data[dataSize] = 0;
-						} while (dwBytesRead);
+						InternetReadData(f, &data, dataSize);
 						InternetCloseHandle(f);
 
 						if (dataSize) {
