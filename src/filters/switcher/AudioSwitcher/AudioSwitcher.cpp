@@ -468,7 +468,7 @@ STDMETHODIMP CAudioSwitcherFilter::SetAutoVolumeControl(bool bAutoVolumeControl,
 {
 	m_bAutoVolumeControl	= bAutoVolumeControl;
 	m_bNormBoost			= bNormBoost;
-	m_iNormLevel				= min(max(0, iNormLevel), 100);
+	m_iNormLevel			= min(max(0, iNormLevel), 100);
 	m_iNormRealeaseTime		= min(max(5, iNormRealeaseTime), 10);
 
 	m_AudioNormalizer.SetParam(m_iNormLevel, bNormBoost, m_iNormRealeaseTime);

@@ -332,12 +332,12 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 		Explode(strA, linesA, ',');
 
 		POSITION posLine = linesA.GetHeadPosition();
-		while (posLine) {
+		while (posLine && final_url.IsEmpty()) {
 			CStringA &lineA = linesA.GetNext(posLine);
 
 			int itag = 0;
 			CStringA url;
-			CString ext;
+			CStringA signature;
 
 			CAtlList<CStringA> paramsA;
 			Explode(lineA, paramsA, '&');
@@ -354,6 +354,8 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 					// "quality", "fallback_host", "url", "itag", "type", "s"
 					if (paramHeader == "url") {
 						url = UrlDecode(UrlDecode(paramValue));
+					} else if (paramHeader == "s") {
+						signature = paramValue;
 					} else if (paramHeader == "itag") {
 						if (sscanf_s(paramValue, "%d", &itag) != 1) {
 							itag = 0;
@@ -365,6 +367,34 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 			if (itag) {
 				if (SelectBestProfile(final_itag, final_ext, itag, youtubeSets)) {
 					final_url = url;
+					if (!signature.IsEmpty()) {
+						// todo - write a proper implementation using an external .js file
+						auto lM = [](CStringA& a, int b) {
+							a.Delete(0, b);
+						};
+						auto JY = [](CStringA& a, int b) {
+							const CHAR c = a[0];
+							b %= a.GetLength();
+							a.SetAt(0, a[b]);
+							a.SetAt(b, c);
+						};
+						auto LB = [](CStringA& a) {
+							CHAR c;
+							const int len = a.GetLength();
+    
+							for (int i = 0; i < len / 2; ++i){
+								c = a[i];
+								a.SetAt(i, a[len - i - 1]);
+								a.SetAt(len - i - 1, c);
+							}
+						};
+
+						lM(signature, 1);
+						JY(signature, 31);
+						LB(signature);
+
+						final_url.AppendFormat(L"&signature=%s", CString(signature));
+					}
 				}
 			}
 		}
