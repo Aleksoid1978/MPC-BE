@@ -1336,7 +1336,7 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 		AP4_Track* track = movie->GetTrack(pPair->m_key);
 
-		if (track->HasIndex()) {
+		if (track->HasIndex() && track->GetIndexEntries().ItemCount() > 1) {
 			if (AP4_FAILED(track->GetIndexForRefTime(rt, pPair->m_value.index, pPair->m_value.ts))) {
 				continue;
 			}
