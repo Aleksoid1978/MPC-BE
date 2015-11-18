@@ -197,6 +197,8 @@ extern void				ReduceDim(LONG& num, LONG& den);
 extern void				ReduceDim(SIZE &dim);
 extern SIZE				ReduceDim(double value);
 
+extern inline const LONGLONG GetPerfCounter();
+
 enum FRAME_TYPE {
 	PICT_NONE,
 	PICT_TOP_FIELD,

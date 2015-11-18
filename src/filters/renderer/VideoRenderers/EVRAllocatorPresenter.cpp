@@ -1010,9 +1010,9 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 		pSample->GetUINT32(GUID_SURFACE_INDEX, &dwSurface);
 
 		{
-			llClockBefore = GetRenderersData()->GetPerfCounter();
+			llClockBefore = GetPerfCounter();
 			hr = m_pMixer->ProcessOutput(0 , 1, &Buffer, &dwStatus);
-			llClockAfter = GetRenderersData()->GetPerfCounter();
+			llClockAfter = GetPerfCounter();
 		}
 
 		if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT) {
@@ -1833,7 +1833,7 @@ void CEVRAllocatorPresenter::RenderThread()
 
 	int NextSleepTime = 1;
 	while (!bQuit) {
-		LONGLONG	llPerf = GetRenderersData()->GetPerfCounter();
+		LONGLONG	llPerf = GetPerfCounter();
 		UNREFERENCED_PARAMETER(llPerf);
 		if (!rs.m_AdvRendSets.iVMR9VSyncAccurate && NextSleepTime == 0) {
 			NextSleepTime = 1;
@@ -1885,7 +1885,7 @@ void CEVRAllocatorPresenter::RenderThread()
 				//			if (WaitForMultipleObjects(_countof(hEvtsBuff), hEvtsBuff, FALSE, INFINITE) == WAIT_OBJECT_0+2)
 				{
 					CComPtr<IMFSample> pMFSample;
-					LONGLONG	llPerf = GetRenderersData()->GetPerfCounter();
+					LONGLONG	llPerf = GetPerfCounter();
 					UNREFERENCED_PARAMETER(llPerf);
 					int nSamplesLeft = 0;
 					if (SUCCEEDED(GetScheduledSample(&pMFSample, nSamplesLeft))) {
@@ -1924,7 +1924,7 @@ void CEVRAllocatorPresenter::RenderThread()
 								bStepForward = true;
 							*/
 						} else if (m_nRenderState == Started) {
-							LONGLONG CurrentCounter = GetRenderersData()->GetPerfCounter();
+							LONGLONG CurrentCounter = GetPerfCounter();
 							// Calculate wake up timer
 							if (!m_bSignaledStarvation) {
 								llClockTime = GetClockTime(CurrentCounter);
@@ -2221,14 +2221,14 @@ void CEVRAllocatorPresenter::VSyncThread()
 						int ScanlineStart = ScanLine;
 						bool bTakenLock;
 						WaitForVBlankRange(ScanlineStart, 5, true, true, false, bTakenLock);
-						LONGLONG TimeStart = pApp->GetPerfCounter();
+						LONGLONG TimeStart = GetPerfCounter();
 
 						WaitForVBlankRange(ScanLineMiddle, 5, true, true, false, bTakenLock);
-						LONGLONG TimeMiddle = pApp->GetPerfCounter();
+						LONGLONG TimeMiddle = GetPerfCounter();
 
 						int ScanlineEnd = ScanLine;
 						WaitForVBlankRange(ScanlineEnd, 5, true, true, false, bTakenLock);
-						LONGLONG TimeEnd = pApp->GetPerfCounter();
+						LONGLONG TimeEnd = GetPerfCounter();
 
 						double nSeconds = double(TimeEnd - TimeStart) / 10000000.0;
 						LONGLONG DiffMiddle = TimeMiddle - TimeStart;
