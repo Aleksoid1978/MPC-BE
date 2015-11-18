@@ -1225,6 +1225,15 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 		return S_FALSE;
 	}
 
+	REFERENCE_TIME rtStart, rtStop;
+	if (FAILED(pMediaSample->GetTime(&rtStart, &rtStop))) {
+		rtStart = rtStop = INVALID_TIME;
+	}
+
+	if (rtStart < 0 && rtStart != INVALID_TIME) {
+		return S_FALSE;
+	}
+
 	HRESULT	hr					= S_OK;
 	BYTE *pMediaBuffer			= NULL;
 	BYTE *pInputBufferPointer	= NULL;
@@ -1460,11 +1469,6 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 
 	{
 		CAutoLock cRenderLock(&m_csRender);
-
-		REFERENCE_TIME rtStart, rtStop;
-		if (FAILED(pMediaSample->GetTime(&rtStart, &rtStop))) {
-			rtStart = rtStop = INVALID_TIME;
-		}
 
 		CAutoPtr<CPacket> p(DNew CPacket());
 		p->rtStart	= rtStart;
