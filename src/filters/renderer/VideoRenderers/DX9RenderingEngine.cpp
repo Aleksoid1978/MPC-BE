@@ -260,7 +260,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 	// Free previously allocated temporary video textures, because the native video size might have been changed!
 	NULL_PTR_ARRAY(m_pFrameTextures);
 
-	if (settings.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE2D) {
+	if (settings.iAPSurfaceType == VIDRNDT_AP_TEXTURE2D) {
 		if (FAILED(hr = m_pD3DDev->CreateTexture(
 			m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
 			D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
@@ -277,7 +277,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 
 		m_RenderingPath = RENDERING_PATH_STRETCHRECT;
 	}
-	else if (settings.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
+	else if (settings.iAPSurfaceType == VIDRNDT_AP_TEXTURE3D) {
 		m_VideoBufferFmt = m_SurfaceFmt;
 		if (m_D3D9VendorId == PCIV_Intel) {
 			if (m_bIsEVR) {

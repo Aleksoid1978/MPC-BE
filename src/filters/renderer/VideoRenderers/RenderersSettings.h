@@ -138,7 +138,7 @@ public:
 
 	CAdvRendererSettings m_AdvRendSets;
 
-	int			iAPSurfaceUsage;
+	int			iAPSurfaceType;
 	int			iDX9Resizer;
 	bool		fVMRMixerMode;
 	bool		fVMRMixerYUV;

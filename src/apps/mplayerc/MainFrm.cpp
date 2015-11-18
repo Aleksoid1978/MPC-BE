@@ -6538,7 +6538,7 @@ void CMainFrame::OnUpdateViewTearingTest(CCmdUI* pCmdUI)
 	bool supported = (s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
 					  s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS ||
 					  s.iDSVideoRendererType == VIDRNDT_DS_SYNC) &&
-					 r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D;
+					 r.iAPSurfaceType == VIDRNDT_AP_TEXTURE3D;
 
 	pCmdUI->Enable(supported && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
 	pCmdUI->SetCheck(AfxGetMyApp()->m_Renderers.m_fTearingTest);
@@ -6556,7 +6556,7 @@ void CMainFrame::OnUpdateViewDisplayStats(CCmdUI* pCmdUI)
 	bool supported = (s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
 					  s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS ||
 					  s.iDSVideoRendererType == VIDRNDT_DS_SYNC) &&
-					 r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D;
+					 r.iAPSurfaceType == VIDRNDT_AP_TEXTURE3D;
 
 	pCmdUI->Enable(supported && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
 	pCmdUI->SetCheck(supported && (AfxGetMyApp()->m_Renderers.m_fDisplayStats));
@@ -6588,7 +6588,7 @@ void CMainFrame::OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI)
 	bool supported = ((s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
 					   s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS ||
 					   s.iDSVideoRendererType == VIDRNDT_DS_SYNC) &&
-					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
+					  r.iAPSurfaceType == VIDRNDT_AP_TEXTURE3D);
 
 	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(s.fD3DFullscreen);
@@ -6601,7 +6601,7 @@ void CMainFrame::OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI)
 	bool supported = ((s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
 					   s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS ||
 					   s.iDSVideoRendererType == VIDRNDT_DS_SYNC) &&
-					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D &&
+					  r.iAPSurfaceType == VIDRNDT_AP_TEXTURE3D &&
 					  (IsWinVista() || IsWin7()));
 
 	pCmdUI->Enable(supported);
@@ -6613,7 +6613,7 @@ void CMainFrame::OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI)
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& r = s.m_RenderersSettings;
 	bool supported = ((s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM) &&
-					  r.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D);
+					  r.iAPSurfaceType == VIDRNDT_AP_TEXTURE3D);
 
 	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(r.m_AdvRendSets.iEVREnableFrameTimeCorrection);
