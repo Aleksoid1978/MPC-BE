@@ -141,7 +141,7 @@ BOOL CPPageVideo::OnInitDialog()
 	m_cbAPSurfaceUsage.AddString(ResStr(IDS_PPAGE_OUTPUT_SURF_OFFSCREEN));
 	m_cbAPSurfaceUsage.AddString(ResStr(IDS_PPAGE_OUTPUT_SURF_2D));
 	m_cbAPSurfaceUsage.AddString(ResStr(IDS_PPAGE_OUTPUT_SURF_3D));
-	m_cbAPSurfaceUsage.SetCurSel(rs.iAPSurfaceUsage);
+	m_cbAPSurfaceUsage.SetCurSel(rs.iAPSurfaceType);
 
 	m_cbEVROutputRange.AddString(L"0-255");
 	m_cbEVROutputRange.AddString(L"16-235");
@@ -352,7 +352,7 @@ BOOL CPPageVideo::OnApply()
 	CRenderersSettings& rs = s.m_RenderersSettings;
 
 	s.iDSVideoRendererType	= m_iVideoRendererType = m_iVideoRendererType_store = m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel());
-	rs.iAPSurfaceUsage		= m_cbAPSurfaceUsage.GetCurSel();
+	rs.iAPSurfaceType		= m_cbAPSurfaceUsage.GetCurSel();
 	rs.iDX9Resizer			= (int)m_cbDX9Resizer.GetItemData(m_cbDX9Resizer.GetCurSel());
 	rs.fVMRMixerMode		= !!m_chkVMRMixerMode.GetCheck();
 	rs.fVMRMixerYUV			= !!m_chkVMRMixerYUV.GetCheck();

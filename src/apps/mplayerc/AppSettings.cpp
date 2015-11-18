@@ -1662,7 +1662,7 @@ void CAppSettings::SaveRenderers()
 	CRenderersSettings& rs = m_RenderersSettings;
 	CRenderersSettings::CAdvRendererSettings& ars = rs.m_AdvRendSets;
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, rs.iAPSurfaceUsage);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, rs.iAPSurfaceType);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, rs.iDX9Resizer);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, rs.fVMRMixerMode);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, rs.fVMRMixerYUV);
@@ -1719,7 +1719,7 @@ void CAppSettings::LoadRenderers()
 	CRenderersSettings& rs = m_RenderersSettings;
 	CRenderersSettings::CAdvRendererSettings& ars = rs.m_AdvRendSets;
 
-	rs.iAPSurfaceUsage = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, (IsWinVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D));
+	rs.iAPSurfaceType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, (IsWinVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D));
 	rs.iDX9Resizer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, 1);
 	rs.fVMRMixerMode = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, IsWinVistaOrLater() ? TRUE : FALSE);
 	rs.fVMRMixerYUV = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, IsWinVistaOrLater() ? TRUE : FALSE);
