@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include "../../../AudioTools/AudioHelper.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "StreamSwitcher.h"
 
@@ -464,9 +465,7 @@ void CStreamSwitcherInputPin::Block(bool fBlock)
 
 HRESULT CStreamSwitcherInputPin::InitializeOutputSample(IMediaSample* pInSample, IMediaSample** ppOutSample)
 {
-	if (!pInSample || !ppOutSample) {
-		return E_POINTER;
-	}
+	CheckPointer(ppOutSample, E_POINTER);
 
 	CStreamSwitcherOutputPin* pOut = (static_cast<CStreamSwitcherFilter*>(m_pFilter))->GetOutputPin();
 	ASSERT(pOut->GetConnected());
@@ -522,9 +521,11 @@ HRESULT CStreamSwitcherInputPin::InitializeOutputSample(IMediaSample* pInSample,
 			m_bSampleSkipped = FALSE;
 		}
 
-		LONGLONG MediaStart, MediaEnd;
-		if (pInSample->GetMediaTime(&MediaStart, &MediaEnd) == NOERROR) {
-			pOutSample->SetMediaTime(&MediaStart, &MediaEnd);
+		if (pInSample) {
+			LONGLONG MediaStart, MediaEnd;
+			if (pInSample->GetMediaTime(&MediaStart, &MediaEnd) == NOERROR) {
+				pOutSample->SetMediaTime(&MediaStart, &MediaEnd);
+			}
 		}
 	}
 
@@ -922,7 +923,25 @@ STDMETHODIMP CStreamSwitcherInputPin::NewSegment(REFERENCE_TIME tStart, REFERENC
 		return VFW_E_NOT_CONNECTED;
 	}
 
-	return pSSF->DeliverNewSegment(tStart, tStop, dRate);
+	HRESULT hr = pSSF->DeliverNewSegment(tStart, tStop, dRate);
+	if (hr == S_OK) {
+		// hack - create and send an "empty" packet to make sure that the playback started is 100%
+		const WAVEFORMATEX* out_wfe = (WAVEFORMATEX*)pOut->CurrentMediaType().pbFormat;
+		const SampleFormat out_sampleformat = GetSampleFormat(out_wfe);
+		if (out_sampleformat != SAMPLE_FMT_NONE) {
+			CComPtr<IMediaSample> pOutSample;
+			if (SUCCEEDED(InitializeOutputSample(NULL, &pOutSample))
+					&& SUCCEEDED(pOutSample->SetActualDataLength(0))) {
+				REFERENCE_TIME rtStart = 0, rtStop = 0;
+				pOutSample->SetTime(&rtStart, &rtStop);
+
+				HRESULT hr2 = pOut->Deliver(pOutSample);
+				UNREFERENCED_PARAMETER(hr2);
+			}
+		}
+	}
+
+	return hr;
 }
 
 //
