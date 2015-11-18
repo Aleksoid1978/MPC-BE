@@ -25,9 +25,9 @@
 #include <version.h>
 #include <dx/d3dx9.h>
 
-void CRenderersSettings::UpdateData(bool fSave)
+void CRenderersSettings::SaveRenderers()
 {
-	AfxGetAppSettings().UpdateRenderersData(fSave);
+	AfxGetAppSettings().SaveRenderers();
 }
 
 void CRenderersSettings::CAdvRendererSettings::SetDefault()

@@ -6623,7 +6623,7 @@ void CMainFrame::OnViewVSync()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	rs.m_AdvRendSets.iVMR9VSync = !rs.m_AdvRendSets.iVMR9VSync;
-	rs.UpdateData(true);
+	rs.SaveRenderers();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 rs.m_AdvRendSets.iVMR9VSync ? ResStr(IDS_OSD_RS_VSYNC_ON) : ResStr(IDS_OSD_RS_VSYNC_OFF));
 }
@@ -6632,7 +6632,7 @@ void CMainFrame::OnViewVSyncAccurate()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	rs.m_AdvRendSets.iVMR9VSyncAccurate = !rs.m_AdvRendSets.iVMR9VSyncAccurate;
-	rs.UpdateData(true);
+	rs.SaveRenderers();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 rs.m_AdvRendSets.iVMR9VSyncAccurate ? ResStr(IDS_OSD_RS_ACCURATE_VSYNC_ON) : ResStr(IDS_OSD_RS_ACCURATE_VSYNC_OFF));
 }
@@ -6650,7 +6650,7 @@ void CMainFrame::OnViewDisableDesktopComposition()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	rs.m_AdvRendSets.iVMRDisableDesktopComposition = !rs.m_AdvRendSets.iVMRDisableDesktopComposition;
-	rs.UpdateData(true);
+	rs.SaveRenderers();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 rs.m_AdvRendSets.iVMRDisableDesktopComposition ? ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_ON) : ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_OFF));
 }
@@ -6659,7 +6659,7 @@ void CMainFrame::OnViewAlternativeVSync()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	rs.m_AdvRendSets.fVMR9AlterativeVSync = !rs.m_AdvRendSets.fVMR9AlterativeVSync;
-	rs.UpdateData(true);
+	rs.SaveRenderers();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 rs.m_AdvRendSets.fVMR9AlterativeVSync ? ResStr(IDS_OSD_RS_ALT_VSYNC_ON) : ResStr(IDS_OSD_RS_ALT_VSYNC_OFF));
 }
@@ -6668,7 +6668,7 @@ void CMainFrame::OnViewResetDefault()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	rs.m_AdvRendSets.SetDefault();
-	rs.UpdateData(true);
+	rs.SaveRenderers();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_OSD_RS_RESET_DEFAULT));
 }
 
@@ -6685,7 +6685,7 @@ void CMainFrame::OnViewEnableFrameTimeCorrection()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	rs.m_AdvRendSets.iEVREnableFrameTimeCorrection = !rs.m_AdvRendSets.iEVREnableFrameTimeCorrection;
-	rs.UpdateData(true);
+	rs.SaveRenderers();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 rs.m_AdvRendSets.iEVREnableFrameTimeCorrection ? ResStr(IDS_OSD_RS_FT_CORRECTION_ON) : ResStr(IDS_OSD_RS_FT_CORRECTION_OFF));
 }
@@ -6693,32 +6693,32 @@ void CMainFrame::OnViewEnableFrameTimeCorrection()
 void CMainFrame::OnViewVSyncOffsetIncrease()
 {
 	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& r = s.m_RenderersSettings;
+	CRenderersSettings& rs = s.m_RenderersSettings;
 	CString strOSD;
 	if (s.iDSVideoRendererType == VIDRNDT_DS_SYNC) {
-		r.m_AdvRendSets.fTargetSyncOffset = r.m_AdvRendSets.fTargetSyncOffset - 0.5; // Yeah, it should be a "-"
-		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), r.m_AdvRendSets.fTargetSyncOffset);
+		rs.m_AdvRendSets.fTargetSyncOffset = rs.m_AdvRendSets.fTargetSyncOffset - 0.5; // Yeah, it should be a "-"
+		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), rs.m_AdvRendSets.fTargetSyncOffset);
 	} else {
-		++r.m_AdvRendSets.iVMR9VSyncOffset;
-		strOSD.Format(ResStr(IDS_OSD_RS_VSYNC_OFFSET), r.m_AdvRendSets.iVMR9VSyncOffset);
+		++rs.m_AdvRendSets.iVMR9VSyncOffset;
+		strOSD.Format(ResStr(IDS_OSD_RS_VSYNC_OFFSET), rs.m_AdvRendSets.iVMR9VSyncOffset);
 	}
-	r.UpdateData(true);
+	rs.SaveRenderers();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT, strOSD);
 }
 
 void CMainFrame::OnViewVSyncOffsetDecrease()
 {
 	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& r = s.m_RenderersSettings;
+	CRenderersSettings& rs = s.m_RenderersSettings;
 	CString strOSD;
 	if (s.iDSVideoRendererType == VIDRNDT_DS_SYNC) {
-		r.m_AdvRendSets.fTargetSyncOffset = r.m_AdvRendSets.fTargetSyncOffset + 0.5;
-		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), r.m_AdvRendSets.fTargetSyncOffset);
+		rs.m_AdvRendSets.fTargetSyncOffset = rs.m_AdvRendSets.fTargetSyncOffset + 0.5;
+		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), rs.m_AdvRendSets.fTargetSyncOffset);
 	} else {
-		--r.m_AdvRendSets.iVMR9VSyncOffset;
-		strOSD.Format(ResStr(IDS_OSD_RS_VSYNC_OFFSET), r.m_AdvRendSets.iVMR9VSyncOffset);
+		--rs.m_AdvRendSets.iVMR9VSyncOffset;
+		strOSD.Format(ResStr(IDS_OSD_RS_VSYNC_OFFSET), rs.m_AdvRendSets.iVMR9VSyncOffset);
 	}
-	r.UpdateData(true);
+	rs.SaveRenderers();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT, strOSD);
 }
 

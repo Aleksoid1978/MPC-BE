@@ -878,8 +878,9 @@ public:
 	engine_t		GetRtspEngine(CString path);
 
 private:
-	void			UpdateRenderersData(bool fSave);
-	friend	void	CRenderersSettings::UpdateData(bool bSave);
+	void			SaveRenderers();
+	friend void		CRenderersSettings::SaveRenderers();
+	void			LoadRenderers();
 
 public:
 	CFiltersPrioritySettings	FiltersPrioritySettings;
