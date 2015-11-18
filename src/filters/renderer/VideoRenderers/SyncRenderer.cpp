@@ -666,7 +666,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	if (m_pD3DXCreateLine) {
 		m_pD3DXCreateLine (m_pD3DDev, &m_pLine);
 	}
-	m_LastAdapterCheck = GetRenderersData()->GetPerfCounter();
+	m_LastAdapterCheck = GetPerfCounter();
 	return S_OK;
 }
 
@@ -1494,7 +1494,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	}
 
 	if (rs.fResetDevice) {
-		LONGLONG time = GetRenderersData()->GetPerfCounter();
+		LONGLONG time = GetPerfCounter();
 		if (time > m_LastAdapterCheck + 20000000) { // check every 2 sec.
 			m_LastAdapterCheck = time;
 #ifdef _DEBUG
@@ -1881,7 +1881,7 @@ void CBaseAP::EstimateRefreshTimings()
 			m_pD3DDev->GetRasterStatus(0, &rasterStatus);
 		}
 		m_pD3DDev->GetRasterStatus(0, &rasterStatus);
-		LONGLONG startTime = pApp->GetPerfCounter();
+		LONGLONG startTime = GetPerfCounter();
 		UINT startLine = rasterStatus.ScanLine;
 		LONGLONG endTime = 0;
 		LONGLONG time = 0;
@@ -1891,7 +1891,7 @@ void CBaseAP::EstimateRefreshTimings()
 		while (!done) { // Estimate time for one scan line
 			m_pD3DDev->GetRasterStatus(0, &rasterStatus);
 			line = rasterStatus.ScanLine;
-			time = pApp->GetPerfCounter();
+			time = GetPerfCounter();
 			if (line > 0) {
 				endLine = line;
 				endTime = time;
@@ -1907,7 +1907,7 @@ void CBaseAP::EstimateRefreshTimings()
 			m_pD3DDev->GetRasterStatus(0, &rasterStatus);
 		}
 		// Now we're at the start of a vsync
-		startTime = pApp->GetPerfCounter();
+		startTime = GetPerfCounter();
 		UINT i;
 		for (i = 1; i <= 50; i++) {
 			m_pD3DDev->GetRasterStatus(0, &rasterStatus);
@@ -1919,7 +1919,7 @@ void CBaseAP::EstimateRefreshTimings()
 			}
 			// Now we're at the next vsync
 		}
-		endTime = pApp->GetPerfCounter();
+		endTime = GetPerfCounter();
 		m_dEstRefreshCycle = (endTime - startTime) / ((i - 1) * 10000.0);
 	}
 }
@@ -2758,9 +2758,9 @@ bool CSyncAP::GetSampleFromMixer()
 		Buffer.pSample = pSample;
 		pSample->GetUINT32(GUID_SURFACE_INDEX, &dwSurface);
 		{
-			llClockBefore = GetRenderersData()->GetPerfCounter();
+			llClockBefore = GetPerfCounter();
 			hr = m_pMixer->ProcessOutput(0 , 1, &Buffer, &dwStatus);
-			llClockAfter = GetRenderersData()->GetPerfCounter();
+			llClockAfter = GetPerfCounter();
 		}
 
 		if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT) { // There are no samples left in the mixer

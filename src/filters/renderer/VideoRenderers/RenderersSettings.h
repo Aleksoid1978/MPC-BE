@@ -172,7 +172,6 @@ public:
 	bool		m_bFP16Support;
 	bool		m_b10bitSupport;
 
-	LONGLONG	GetPerfCounter();
 	HINSTANCE	GetD3X9Dll();
 	HINSTANCE	GetD3DCompilerDll();
 };

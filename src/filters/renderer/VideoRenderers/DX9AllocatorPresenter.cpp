@@ -736,7 +736,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		return hr;
 	}
 
-	m_LastAdapterCheck = GetRenderersData()->GetPerfCounter();
+	m_LastAdapterCheck = GetPerfCounter();
 
 	m_MonitorName.Empty();
 	m_nMonitorHorRes = m_nMonitorVerRes = 0;
@@ -990,7 +990,7 @@ bool CDX9AllocatorPresenter::GetVBlank(int &_ScanLine, int &_bInVBlank, bool _bM
 {
 	LONGLONG llPerf = 0;
 	if (_bMeasureTime) {
-		llPerf = GetRenderersData()->GetPerfCounter();
+		llPerf = GetPerfCounter();
 	}
 
 	int ScanLine = 0;
@@ -1033,7 +1033,7 @@ bool CDX9AllocatorPresenter::GetVBlank(int &_ScanLine, int &_bInVBlank, bool _bM
 	}
 
 	if (_bMeasureTime) {
-		LONGLONG Time = GetRenderersData()->GetPerfCounter() - llPerf;
+		LONGLONG Time = GetPerfCounter() - llPerf;
 		if (Time > 5000000) { // 0.5 sec
 			TRACE("GetVBlank too long (%f sec)\n", Time / 10000000.0);
 		}
@@ -1053,7 +1053,7 @@ bool CDX9AllocatorPresenter::WaitForVBlankRange(int &_RasterStart, int _RasterSi
 	int InVBlank = 0;
 	LONGLONG llPerf = 0;
 	if (_bMeasure) {
-		llPerf = GetRenderersData()->GetPerfCounter();
+		llPerf = GetPerfCounter();
 	}
 	GetVBlank(ScanLine, InVBlank, _bMeasure);
 	if (_bMeasure) {
@@ -1183,7 +1183,7 @@ bool CDX9AllocatorPresenter::WaitForVBlankRange(int &_RasterStart, int _RasterSi
 		if (((ScanLineDiffLock >= 0 && ScanLineDiffLock <= D3DDevLockRange) || (LastLineDiffLock < 0 && ScanLineDiffLock > 0))) {
 			if (!_bTakenLock && _bMeasure) {
 				_bTakenLock = true;
-				llPerfLock = GetRenderersData()->GetPerfCounter();
+				llPerfLock = GetPerfCounter();
 				LockD3DDevice();
 			}
 		}
@@ -1206,10 +1206,10 @@ bool CDX9AllocatorPresenter::WaitForVBlankRange(int &_RasterStart, int _RasterSi
 	_RasterStart = ScanLine;
 	if (_bMeasure) {
 		m_VBlankEndWait = ScanLine;
-		m_VBlankWaitTime = GetRenderersData()->GetPerfCounter() - llPerf;
+		m_VBlankWaitTime = GetPerfCounter() - llPerf;
 
 		if (_bTakenLock) {
-			m_VBlankLockTime = GetRenderersData()->GetPerfCounter() - llPerfLock;
+			m_VBlankLockTime = GetPerfCounter() - llPerfLock;
 		} else {
 			m_VBlankLockTime = 0;
 		}
@@ -1321,7 +1321,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 	CRenderersData * pApp = GetRenderersData();
 
-	LONGLONG StartPaint = pApp->GetPerfCounter();
+	LONGLONG StartPaint = GetPerfCounter();
 	CAutoLock cRenderLock(&m_RenderLock);
 
 	if (m_windowRect.right <= m_windowRect.left || m_windowRect.bottom <= m_windowRect.top
@@ -1453,21 +1453,21 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	if (rs.m_AdvRendSets.iVMRFlushGPUBeforeVSync && pEventQuery) {
-		LONGLONG llPerf = pApp->GetPerfCounter();
+		LONGLONG llPerf = GetPerfCounter();
 		BOOL Data;
 		//Sleep(5);
-		LONGLONG FlushStartTime = pApp->GetPerfCounter();
+		LONGLONG FlushStartTime = GetPerfCounter();
 		while (S_FALSE == pEventQuery->GetData( &Data, sizeof(Data), D3DGETDATA_FLUSH )) {
 			if (!rs.m_AdvRendSets.iVMRFlushGPUWait) {
 				break;
 			}
 			Sleep(1);
-			if (pApp->GetPerfCounter() - FlushStartTime > 500000) {
+			if (GetPerfCounter() - FlushStartTime > 500000) {
 				break;    // timeout after 50 ms
 			}
 		}
 		if (rs.m_AdvRendSets.iVMRFlushGPUWait) {
-			m_WaitForGPUTime = pApp->GetPerfCounter() - llPerf;
+			m_WaitForGPUTime = GetPerfCounter() - llPerf;
 		} else {
 			m_WaitForGPUTime = 0;
 		}
@@ -1476,7 +1476,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	if (fAll) {
-		m_PaintTime = (GetRenderersData()->GetPerfCounter() - StartPaint);
+		m_PaintTime = (GetPerfCounter() - StartPaint);
 		m_PaintTimeMin = min(m_PaintTimeMin, m_PaintTime);
 		m_PaintTimeMax = max(m_PaintTimeMax, m_PaintTime);
 	}
@@ -1488,7 +1488,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		bool bTest = WaitForVBlank(bWaited, bTakenLock);
 		ASSERT(bTest == bDoVSyncInPresent);
 		if (!bDoVSyncInPresent) {
-			LONGLONG Time = pApp->GetPerfCounter();
+			LONGLONG Time = GetPerfCounter();
 			OnVBlankFinished(fAll, Time);
 			if (!m_bIsEVR || m_OrderedPaint) {
 				CalculateJitter(Time);
@@ -1503,7 +1503,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		CComPtr<IDirect3DQuery9> pEventQuery;
 		m_pD3DDev->CreateQuery(D3DQUERYTYPE_EVENT, &pEventQuery);
 
-		LONGLONG llPerf = pApp->GetPerfCounter();
+		LONGLONG llPerf = GetPerfCounter();
 		if (m_pD3DDevEx) {
 			if (m_bIsFullscreen) {
 				hr = m_pD3DDevEx->PresentEx(NULL, NULL, NULL, NULL, NULL);
@@ -1525,12 +1525,12 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		BOOL Data;
 
 		if (rs.m_AdvRendSets.iVMRFlushGPUAfterPresent && pEventQuery) {
-			LONGLONG FlushStartTime = pApp->GetPerfCounter();
+			LONGLONG FlushStartTime = GetPerfCounter();
 			while (S_FALSE == pEventQuery->GetData( &Data, sizeof(Data), D3DGETDATA_FLUSH )) {
 				if (!rs.m_AdvRendSets.iVMRFlushGPUWait) {
 					break;
 				}
-				if (pApp->GetPerfCounter() - FlushStartTime > 500000) {
+				if (GetPerfCounter() - FlushStartTime > 500000) {
 					break;    // timeout after 50 ms
 				}
 			}
@@ -1550,11 +1550,11 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			}
 		}
 
-		m_VBlankStartMeasureTime = pApp->GetPerfCounter();
+		m_VBlankStartMeasureTime = GetPerfCounter();
 		m_VBlankStartMeasure = ScanLine;
 
 		if (fAll && bDoVSyncInPresent) {
-			m_PresentWaitTime = (pApp->GetPerfCounter() - llPerf) + PresentWaitTime;
+			m_PresentWaitTime = (GetPerfCounter() - llPerf) + PresentWaitTime;
 			m_PresentWaitTimeMin = min(m_PresentWaitTimeMin, m_PresentWaitTime);
 			m_PresentWaitTimeMax = max(m_PresentWaitTimeMax, m_PresentWaitTime);
 		} else {
@@ -1565,7 +1565,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	if (bDoVSyncInPresent) {
-		LONGLONG Time = pApp->GetPerfCounter();
+		LONGLONG Time = GetPerfCounter();
 		if (!m_bIsEVR || m_OrderedPaint) {
 			CalculateJitter(Time);
 		}
@@ -1622,7 +1622,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		}
 
 		if (rs.fResetDevice) {
-			LONGLONG time = GetRenderersData()->GetPerfCounter();
+			LONGLONG time = GetPerfCounter();
 			if (time > m_LastAdapterCheck + 20000000) { // check every 2 sec.
 				m_LastAdapterCheck = time;
 #ifdef _DEBUG
@@ -1751,7 +1751,7 @@ void CDX9AllocatorPresenter::DrawText(const RECT &rc, const CString &strText, in
 void CDX9AllocatorPresenter::ResetStats()
 {
 	CRenderersData *pApp = GetRenderersData();
-	LONGLONG Time = pApp->GetPerfCounter();
+	LONGLONG Time = GetPerfCounter();
 
 	m_PaintTime = 0;
 	m_PaintTimeMin = 0;
