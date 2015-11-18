@@ -82,8 +82,8 @@ namespace DSObjects
 		UINT						m_CurrentAdapter;
 		D3DCAPS9					m_Caps;
 		LPCSTR						m_ShaderProfile;
-		D3DFORMAT					m_BackbufferType;
-		D3DFORMAT					m_DisplayType;
+		D3DFORMAT					m_BackbufferFmt;
+		D3DFORMAT					m_DisplayFmt;
 		CSize						m_ScreenSize;
 		int							m_nNbDXSurface;					// Total number of DX Surfaces
 		int							m_nCurSurface;					// Surface currently displayed
@@ -105,8 +105,8 @@ namespace DSObjects
 		// Variables initialized/managed by this class but can be accessed by the allocator-presenter
 		bool						m_bD3DX;
 		RenderingPath				m_RenderingPath;
-		D3DFORMAT					m_VideoBufferType;
-		D3DFORMAT					m_SurfaceType;
+		D3DFORMAT					m_VideoBufferFmt;
+		D3DFORMAT					m_SurfaceFmt;
 		CComPtr<IDirect3DTexture9>	m_pVideoTexture[MAX_VIDEO_SURFACES];
 		CComPtr<IDirect3DSurface9>	m_pVideoSurface[MAX_VIDEO_SURFACES];
 

@@ -563,16 +563,16 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 
 	// set surface formats
-	m_SurfaceType = D3DFMT_X8R8G8B8;
+	m_SurfaceFmt = D3DFMT_X8R8G8B8;
 	switch (rs.m_AdvRendSets.iDX9SurfaceFormat) {
 		case D3DFMT_A2R10G10B10:
 			if (m_bIsEVR && renderersData->m_b10bitSupport) {
-				m_SurfaceType = D3DFMT_A2R10G10B10;
+				m_SurfaceFmt = D3DFMT_A2R10G10B10;
 			}
 		case D3DFMT_A16B16G16R16F:
 		case D3DFMT_A32B32G32R32F:
 			if (renderersData->m_bFP16Support) {
-				m_SurfaceType = (D3DFORMAT)rs.m_AdvRendSets.iDX9SurfaceFormat;
+				m_SurfaceFmt = (D3DFORMAT)rs.m_AdvRendSets.iDX9SurfaceFormat;
 			}
 	}
 
@@ -622,8 +622,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			m_D3DDevExError = FAILED(hr) ? GetWindowsErrorMessage(hr, m_hD3D9) : L"";
 			if (m_pD3DDevEx) {
 				m_pD3DDev = m_pD3DDevEx;
-				m_BackbufferType = m_d3dpp.BackBufferFormat;
-				m_DisplayType = d3ddmEx.Format;
+				m_BackbufferFmt = m_d3dpp.BackBufferFormat;
+				m_DisplayFmt = d3ddmEx.Format;
 			}
 		}
 		if (bTryToReset && m_pD3DDev && !m_pD3DDevEx) {
@@ -643,8 +643,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 					m_CurrentAdapter, D3DDEVTYPE_HAL, m_FocusThread->GetFocusWindow(),
 					GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_NOWINDOWCHANGES, //D3DCREATE_MANAGED
 					&m_d3dpp, &m_pD3DDev);
-			m_DisplayType = d3ddm.Format;
-			m_BackbufferType = m_d3dpp.BackBufferFormat;
+			m_DisplayFmt = d3ddm.Format;
+			m_BackbufferFmt = m_d3dpp.BackBufferFormat;
 		}
 	} else {
 		m_d3dpp.Windowed = TRUE;
@@ -678,7 +678,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			}
 			if (m_pD3DDevEx) {
 				m_pD3DDev = m_pD3DDevEx;
-				m_DisplayType = d3ddmEx.Format;
+				m_DisplayFmt = d3ddmEx.Format;
 			}
 		}
 		if (bTryToReset && m_pD3DDev && !m_pD3DDevEx) {
@@ -697,9 +697,9 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 					m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
 					GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED, //D3DCREATE_MANAGED
 					&m_d3dpp, &m_pD3DDev);
-			m_DisplayType = d3ddm.Format;
+			m_DisplayFmt = d3ddm.Format;
 		}
-		m_BackbufferType = m_d3dpp.BackBufferFormat;
+		m_BackbufferFmt = m_d3dpp.BackBufferFormat;
 	}
 
 	if (m_pD3DDev) {
@@ -1932,7 +1932,7 @@ void CDX9AllocatorPresenter::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
-			strText.Format(L"Formats      : VideoBuffer %s, Surface %s, Backbuffer %s, Display %s. Device %s", GetD3DFormatStr(m_VideoBufferType), GetD3DFormatStr(m_SurfaceType), GetD3DFormatStr(m_BackbufferType), GetD3DFormatStr(m_DisplayType), m_pD3DDevEx ? L"D3DDevEx" : L"D3DDev");
+			strText.Format(L"Formats      : VideoBuffer %s, Surface %s, Backbuffer %s, Display %s. Device %s", GetD3DFormatStr(m_VideoBufferFmt), GetD3DFormatStr(m_SurfaceFmt), GetD3DFormatStr(m_BackbufferFmt), GetD3DFormatStr(m_DisplayFmt), m_pD3DDevEx ? L"D3DDevEx" : L"D3DDev");
 			if (m_D3DDevExError.GetLength()) {
 				strText.AppendFormat(L". D3DExError: %s", m_D3DDevExError);
 			}
@@ -2232,7 +2232,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 	D3DLOCKED_RECT r;
 	CComPtr<IDirect3DSurface9> pSurface;
-	if (m_VideoBufferType != D3DFMT_X8R8G8B8) {
+	if (m_VideoBufferFmt != D3DFMT_X8R8G8B8) {
 		CComPtr<IDirect3DSurface9> fSurface = m_pVideoSurface[m_nCurSurface];
 		if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(desc.Width, desc.Height, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &fSurface, NULL))
 				|| FAILED(hr = m_pD3DXLoadSurfaceFromSurface(fSurface, NULL, NULL, m_pVideoSurface[m_nCurSurface], NULL, NULL, D3DX_DEFAULT, 0))) {

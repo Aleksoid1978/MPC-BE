@@ -135,9 +135,9 @@ namespace GothSync
 
 		UINT						m_CurrentAdapter;
 		D3DCAPS9					m_caps;
-		D3DFORMAT					m_SurfaceType;
-		D3DFORMAT					m_BackbufferType;
-		D3DFORMAT					m_DisplayType;
+		D3DFORMAT					m_SurfaceFmt;
+		D3DFORMAT					m_BackbufferFmt;
+		D3DFORMAT					m_DisplayFmt;
 		D3DTEXTUREFILTERTYPE		m_filter;
 		D3DPRESENT_PARAMETERS		pp;
 

@@ -137,8 +137,8 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_nCurSurface(0)
 	, m_CurrentAdapter(UINT_MAX)
 	, m_D3D9VendorId(0)
-	, m_VideoBufferType(D3DFMT_X8R8G8B8)
-	, m_SurfaceType(D3DFMT_X8R8G8B8)
+	, m_VideoBufferFmt(D3DFMT_X8R8G8B8)
+	, m_SurfaceFmt(D3DFMT_X8R8G8B8)
 	, m_bColorManagement(false)
 	, m_nDX9Resizer(RESIZER_UNKNOWN)
 {
@@ -263,7 +263,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 	if (settings.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE2D) {
 		if (FAILED(hr = m_pD3DDev->CreateTexture(
 			m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
-			D3DUSAGE_RENDERTARGET, m_SurfaceType,
+			D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
 			D3DPOOL_DEFAULT, &m_pVideoTexture[0], NULL))) {
 			return hr;
 		}
@@ -278,19 +278,19 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 		m_RenderingPath = RENDERING_PATH_STRETCHRECT;
 	}
 	else if (settings.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
-		m_VideoBufferType = m_SurfaceType;
+		m_VideoBufferFmt = m_SurfaceFmt;
 		if (m_D3D9VendorId == PCIV_Intel) {
 			if (m_bIsEVR) {
-				m_VideoBufferType = D3DFMT_X8R8G8B8;
-			} else if (m_SurfaceType == D3DFMT_A32B32G32R32F && settings.fVMRMixerMode && settings.fVMRMixerYUV) {
-				m_VideoBufferType = D3DFMT_A16B16G16R16F;
+				m_VideoBufferFmt = D3DFMT_X8R8G8B8;
+			} else if (m_SurfaceFmt == D3DFMT_A32B32G32R32F && settings.fVMRMixerMode && settings.fVMRMixerYUV) {
+				m_VideoBufferFmt = D3DFMT_A16B16G16R16F;
 			}
 		}
 		// TODO: show that surface in the statistics
 		for (int i = 0; i < m_nNbDXSurface; i++) {
 			if (FAILED(hr = m_pD3DDev->CreateTexture(
 								m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
-								D3DUSAGE_RENDERTARGET, m_VideoBufferType,
+								D3DUSAGE_RENDERTARGET, m_VideoBufferFmt,
 								D3DPOOL_DEFAULT, &m_pVideoTexture[i], NULL))) {
 				return hr;
 			}
@@ -305,7 +305,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 	else {
 		if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(
 							m_nativeVideoSize.cx, m_nativeVideoSize.cy,
-							m_SurfaceType,
+							m_SurfaceFmt,
 							D3DPOOL_DEFAULT, &m_pVideoSurface[m_nCurSurface], NULL))) {
 			return hr;
 		}
@@ -701,7 +701,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 		return FALSE;
 	}
 	for (i = 0; i < count; i++) {
-		if (formats[i] == m_BackbufferType) {
+		if (formats[i] == m_BackbufferFmt) {
 			break;
 		}
 	}
@@ -712,7 +712,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 	}
 
 	// Query video processor capabilities.
-	hr = m_pDXVAVPS->GetVideoProcessorCaps(guid, &m_VideoDesc, m_BackbufferType, &m_VPCaps);
+	hr = m_pDXVAVPS->GetVideoProcessorCaps(guid, &m_VideoDesc, m_BackbufferFmt, &m_VPCaps);
 	if (FAILED(hr)) {
 		TRACE("GetVideoProcessorCaps failed with error 0x%x.\n", hr);
 		return FALSE;
@@ -743,7 +743,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 		if (m_VPCaps.ProcAmpControlCaps & (1 << i)) {
 			hr = m_pDXVAVPS->GetProcAmpRange(guid,
 											 &m_VideoDesc,
-											 m_BackbufferType,
+											 m_BackbufferFmt,
 											 1 << i,
 											 &range);
 			if (FAILED(hr)) {
@@ -760,7 +760,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 		for (i = 0; i < ARRAYSIZE(m_NFilterValues); i++) {
 			hr = m_pDXVAVPS->GetFilterPropertyRange(guid,
 													&m_VideoDesc,
-													m_BackbufferType,
+													m_BackbufferFmt,
 													DXVA2_NoiseFilterLumaLevel + i,
 													&range);
 			if (FAILED(hr)) {
@@ -777,7 +777,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 		for (i = 0; i < ARRAYSIZE(m_DFilterValues); i++) {
 			hr = m_pDXVAVPS->GetFilterPropertyRange(guid,
 													&m_VideoDesc,
-													m_BackbufferType,
+													m_BackbufferFmt,
 													DXVA2_DetailFilterLumaLevel + i,
 													&range);
 			if (FAILED(hr)) {
@@ -790,7 +790,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 	}
 
 	// Finally create a video processor device.
-	hr = m_pDXVAVPS->CreateVideoProcessor(guid, &m_VideoDesc, m_BackbufferType, 0, &m_pDXVAVPD);
+	hr = m_pDXVAVPS->CreateVideoProcessor(guid, &m_VideoDesc, m_BackbufferFmt, 0, &m_pDXVAVPD);
 	if (FAILED(hr)) {
 		TRACE("CreateVideoProcessor failed with error 0x%x.\n", hr);
 		return FALSE;
@@ -924,7 +924,7 @@ HRESULT CDX9RenderingEngine::InitVideoTextures(size_t count)
 	for (size_t i = 0; i < count; i++) {
 		if (m_pFrameTextures[i] == NULL) {
 			hr = m_pD3DDev->CreateTexture(
-					 m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1, D3DUSAGE_RENDERTARGET, m_SurfaceType,
+					 m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1, D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
 					 D3DPOOL_DEFAULT, &m_pFrameTextures[i], NULL);
 
 			if (FAILED(hr)) {
@@ -957,7 +957,7 @@ HRESULT CDX9RenderingEngine::InitScreenSpaceTextures(size_t count)
 	for (size_t i = 0; i < count; i++) {
 		if (m_pScreenSpaceTextures[i] == NULL) {
 			hr = m_pD3DDev->CreateTexture(
-					m_ScreenSpaceTexWidth, m_ScreenSpaceTexHeight, 1, D3DUSAGE_RENDERTARGET, m_SurfaceType,
+					m_ScreenSpaceTexWidth, m_ScreenSpaceTexHeight, 1, D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
 					D3DPOOL_DEFAULT, &m_pScreenSpaceTextures[i], NULL);
 
 			if (FAILED(hr)) {
@@ -1211,7 +1211,7 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 	if (!m_pResizeTexture) {
 		hr = m_pD3DDev->CreateTexture(
 					texWidth, TexHeight, 1, D3DUSAGE_RENDERTARGET,
-					m_SurfaceType == D3DFMT_A32B32G32R32F ? D3DFMT_A32B32G32R32F : D3DFMT_A16B16G16R16F, // use only float textures here
+					m_SurfaceFmt == D3DFMT_A32B32G32R32F ? D3DFMT_A32B32G32R32F : D3DFMT_A16B16G16R16F, // use only float textures here
 					D3DPOOL_DEFAULT, &m_pResizeTexture, NULL);
 		if (FAILED(hr)) {
 			m_pResizeTexture = NULL;
@@ -1351,7 +1351,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	m_RenderingIntent = renderingIntent;
 
 	// Check whether the final pass is required
-	m_bFinalPass = bColorManagement || m_SurfaceType == D3DFMT_A16B16G16R16F || m_SurfaceType == D3DFMT_A32B32G32R32F || m_SurfaceType == D3DFMT_A2R10G10B10 && m_DisplayType != D3DFMT_A2R10G10B10;
+	m_bFinalPass = bColorManagement || m_SurfaceFmt == D3DFMT_A16B16G16R16F || m_SurfaceFmt == D3DFMT_A32B32G32R32F || m_SurfaceFmt == D3DFMT_A2R10G10B10 && m_DisplayFmt != D3DFMT_A2R10G10B10;
 
 	if (!m_bFinalPass) {
 		return S_OK;
@@ -1501,7 +1501,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	size_t i = 0;
 
 	ShaderMacros[i++] = { "Ml", m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "1" : "0" };
-	ShaderMacros[i++] = { "QUANTIZATION", m_DisplayType == D3DFMT_A2R10G10B10 ? "1023.0" : "255.0"}; // 10-bit or 8-bit
+	ShaderMacros[i++] = { "QUANTIZATION", m_DisplayFmt == D3DFMT_A2R10G10B10 ? "1023.0" : "255.0"}; // 10-bit or 8-bit
 	ShaderMacros[i++] = { "LUT3D_ENABLED", bColorManagement ? "1": "0" };
 
 	if (bColorManagement) {

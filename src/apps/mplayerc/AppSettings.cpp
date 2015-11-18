@@ -1659,14 +1659,13 @@ engine_t CAppSettings::GetRtspEngine(CString path)
 void CAppSettings::SaveRenderers()
 {
 	CWinApp* pApp = AfxGetApp();
-	CRenderersSettings& r = m_RenderersSettings;
-	CRenderersSettings::CAdvRendererSettings& ars = r.m_AdvRendSets;
+	CRenderersSettings& rs = m_RenderersSettings;
+	CRenderersSettings::CAdvRendererSettings& ars = rs.m_AdvRendSets;
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, r.iAPSurfaceUsage);
-	// pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRSYNCFIX, fVMRSyncFix);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, r.iDX9Resizer);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, r.fVMRMixerMode);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, r.fVMRMixerYUV);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, rs.iAPSurfaceUsage);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, rs.iDX9Resizer);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, rs.fVMRMixerMode);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, rs.fVMRMixerYUV);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRAlternateVSync"), ars.fVMR9AlterativeVSync);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRVSyncOffset"), ars.iVMR9VSyncOffset);
@@ -1698,33 +1697,32 @@ void CAppSettings::SaveRenderers()
 	pApp->WriteProfileBinary(IDS_R_SETTINGS, _T("TargetSyncOffset"), (LPBYTE)&(ars.fTargetSyncOffset), sizeof(ars.fTargetSyncOffset));
 	pApp->WriteProfileBinary(IDS_R_SETTINGS, _T("ControlLimit"), (LPBYTE)&(ars.fControlLimit), sizeof(ars.fControlLimit));
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), r.fResetDevice);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), rs.fResetDevice);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, r.nSPCSize);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, r.nSPMaxTexRes);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWDROPSUBPIC, r.bSPAllowDropSubPic);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, r.bSPCAllowAnimationWhenBuffering);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, rs.nSPCSize);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, rs.nSPMaxTexRes);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWDROPSUBPIC, rs.bSPAllowDropSubPic);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, rs.bSPCAllowAnimationWhenBuffering);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, r.iEvrBuffers);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, rs.iEvrBuffers);
 
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE, r.D3D9RenderDevice);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE, rs.D3D9RenderDevice);
 
 	// Stereoscopic Subtitles
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"StereoDisabled", r.bStereoDisabled);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"SideBySide", r.bSideBySide);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"TopAndBottom", r.bTopAndBottom);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, L"StereoDisabled", rs.bStereoDisabled);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, L"SideBySide", rs.bSideBySide);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, L"TopAndBottom", rs.bTopAndBottom);
 }
 void CAppSettings::LoadRenderers()
 {
 	CWinApp* pApp = AfxGetApp();
-	CRenderersSettings& r = m_RenderersSettings;
-	CRenderersSettings::CAdvRendererSettings& ars = r.m_AdvRendSets;
+	CRenderersSettings& rs = m_RenderersSettings;
+	CRenderersSettings::CAdvRendererSettings& ars = rs.m_AdvRendSets;
 
-	r.iAPSurfaceUsage = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, (IsWinVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D));
-	//fVMRSyncFix = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRSYNCFIX, FALSE);
-	r.iDX9Resizer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, 1);
-	r.fVMRMixerMode = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, IsWinVistaOrLater() ? TRUE : FALSE);
-	r.fVMRMixerYUV = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, IsWinVistaOrLater() ? TRUE : FALSE);
+	rs.iAPSurfaceUsage = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, (IsWinVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D));
+	rs.iDX9Resizer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, 1);
+	rs.fVMRMixerMode = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, IsWinVistaOrLater() ? TRUE : FALSE);
+	rs.fVMRMixerYUV = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, IsWinVistaOrLater() ? TRUE : FALSE);
 
 	CRenderersSettings::CAdvRendererSettings DefaultSettings;
 	ars.fVMR9AlterativeVSync = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRAlternateVSync"), DefaultSettings.fVMR9AlterativeVSync);
@@ -1769,22 +1767,22 @@ void CAppSettings::LoadRenderers()
 		delete[] dPtr;
 	}
 
-	r.fResetDevice = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), TRUE);
+	rs.fResetDevice = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), TRUE);
 
-	r.nSPCSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, RS_SPCSIZE_DEF);
-	r.nSPMaxTexRes = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, 1280);
-	r.bSPAllowDropSubPic = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWDROPSUBPIC, TRUE);
-	r.bSPCAllowAnimationWhenBuffering = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, TRUE);
+	rs.nSPCSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, RS_SPCSIZE_DEF);
+	rs.nSPMaxTexRes = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, 1280);
+	rs.bSPAllowDropSubPic = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWDROPSUBPIC, TRUE);
+	rs.bSPCAllowAnimationWhenBuffering = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, TRUE);
 
-	r.iEvrBuffers = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, RS_EVRBUFFERS_DEF);
-	r.D3D9RenderDevice = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE);
+	rs.iEvrBuffers = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, RS_EVRBUFFERS_DEF);
+	rs.D3D9RenderDevice = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE);
 
 	// Stereoscopic Subtitles
-	r.bStereoDisabled = pApp->GetProfileInt(IDS_R_SETTINGS, L"StereoDisabled", TRUE);
-	r.bSideBySide = pApp->GetProfileInt(IDS_R_SETTINGS, L"SideBySide", FALSE);
-	r.bTopAndBottom = pApp->GetProfileInt(IDS_R_SETTINGS, L"TopAndBottom", FALSE);
+	rs.bStereoDisabled = pApp->GetProfileInt(IDS_R_SETTINGS, L"StereoDisabled", TRUE);
+	rs.bSideBySide = pApp->GetProfileInt(IDS_R_SETTINGS, L"SideBySide", FALSE);
+	rs.bTopAndBottom = pApp->GetProfileInt(IDS_R_SETTINGS, L"TopAndBottom", FALSE);
 
-	r.bPositionRelative = false;
+	rs.bPositionRelative = false;
 }
 
 void CAppSettings::SaveCurrentFilePosition()

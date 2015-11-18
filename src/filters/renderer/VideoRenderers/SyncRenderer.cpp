@@ -508,8 +508,8 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 
 			if (m_pD3DDevEx) {
 				m_pD3DDev = m_pD3DDevEx;
-				m_BackbufferType = pp.BackBufferFormat;
-				m_DisplayType = DisplayMode.Format;
+				m_BackbufferFmt = pp.BackBufferFormat;
+				m_DisplayFmt = DisplayMode.Format;
 			}
 		} else {
 			bTryToReset = bTryToReset &&  m_pD3DDev && SUCCEEDED(hr = m_pD3DDev->Reset(&pp));
@@ -524,8 +524,8 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 			}
 			DEBUG_ONLY(_tprintf_s(_T("Created full-screen device\n")));
 			if (m_pD3DDev) {
-				m_BackbufferType = pp.BackBufferFormat;
-				m_DisplayType = d3ddm.Format;
+				m_BackbufferFmt = pp.BackBufferFormat;
+				m_DisplayFmt = d3ddm.Format;
 			}
 		}
 	} else { // Windowed
@@ -536,8 +536,8 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		pp.BackBufferCount = 1;
 		pp.BackBufferWidth = d3ddm.Width;
 		pp.BackBufferHeight = d3ddm.Height;
-		m_BackbufferType = d3ddm.Format;
-		m_DisplayType = d3ddm.Format;
+		m_BackbufferFmt = d3ddm.Format;
+		m_DisplayFmt = d3ddm.Format;
 		m_bHighColorResolution = rs.m_AdvRendSets.b10BitOutput;
 		if (m_bHighColorResolution) {
 			if (FAILED(m_pD3D->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3ddm.Format, D3DFMT_A2R10G10B10, false))) {
@@ -547,7 +547,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		}
 
 		if (m_bHighColorResolution) {
-			m_BackbufferType = D3DFMT_A2R10G10B10;
+			m_BackbufferFmt = D3DFMT_A2R10G10B10;
 			pp.BackBufferFormat = D3DFMT_A2R10G10B10;
 		}
 		if (bCompositionEnabled) {
@@ -684,7 +684,7 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 
 	m_pScreenSizeTemporaryTexture[0] = NULL;
 	m_pScreenSizeTemporaryTexture[1] = NULL;
-	m_SurfaceType = Format;
+	m_SurfaceFmt = Format;
 
 	HRESULT hr;
 	if (rs.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE2D || rs.iAPSurfaceUsage == VIDRNDT_AP_TEXTURE3D) {
