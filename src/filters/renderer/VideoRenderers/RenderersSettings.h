@@ -151,7 +151,8 @@ public:
 	bool		bSPAllowDropSubPic;
 
 	CString		D3D9RenderDevice;
-	void		UpdateData(bool fSave);
+	void		SaveRenderers();
+	void		LoadRenderers();
 };
 
 class CRenderersData
