@@ -3756,8 +3756,9 @@ Version 1.5.7beta04 [November 17, 2011]
 
 Version 1.5.7beta05 [November 25, 2011]
   Removed "zTXt" from warning in generic chunk decompression function.
-  Validate time settings passed to pngset() and png_convert_to_rfc1123()
-    (Frank Busse).
+  Validate time settings passed to png_set_tIME() and png_convert_to_rfc1123()
+    (Frank Busse). Note: This prevented CVE-2015-7981 from affecting
+    libpng-1.5.7 and later.
   Added MINGW support to CMakeLists.txt
   Reject invalid compression flag or method when reading the iTXt chunk.
   Backed out 'simplified' API changes. The API seems too complex and there
@@ -4440,8 +4441,7 @@ Version 1.6.1beta05 [March 1, 2013]
 Version 1.6.1beta06 [March 4, 2013]
   Better documentation of unknown handling API interactions.
   Corrected Android builds and corrected libpng.vers with symbol
-    prefixing.  It also makes those tests
-    compile and link on Android.
+    prefixing.  It also makes those tests compile and link on Android.
   Added an API png_set_option() to set optimization options externally,
     providing an alternative and general solution for the non-portable
     run-time tests used by the ARM Neon code, using the PNG_ARM_NEON option.
@@ -5146,7 +5146,9 @@ Version 1.6.17beta01 [January 29, 2015]
   Added testing of png_set_packing() to pngvalid.c
   Regenerated configure scripts in the *.tar distributions with libtool-2.4.4
   Implement previously untested cases of libpng transforms in pngvalid.c
-  Fixed byte order in 2-byte filler, in png_do_read_filler().
+  Fixed byte order in png_do_read_filler() with 16-bit input. Previously
+    the high and low bytes of the filler, from png_set_filler() or from
+    png_set_add_alpha(), were read in the wrong order.
   Made the check for out-of-range values in png_set_tRNS() detect
     values that are exactly 2^bit_depth, and work on 16-bit platforms.
   Merged some parts of libpng-1.6.17beta01 and libpng-1.7.0beta47.
@@ -5346,8 +5348,75 @@ Version 1.6.19beta02 [August 19, 2015]
     in ANSI-C (unlike 0x80000000 in the signed case) the checking that
     occurs later can catch them (John Bowler).
 
-Version 1.6.19beta03 [August 21, 2015]
+Version 1.6.19beta03 [September 26, 2015]
   Fixed png_save_int_32 when int is not 2's complement (John Bowler).
+  Updated libpng16 with all the recent test changes from libpng17,
+    including changes to pngvalid.c to ensure that the original,
+    distributed, version of contrib/visupng/cexcept.h can be used
+    (John Bowler).
+  pngvalid contains the correction to the use of SAVE/STORE_
+    UNKNOWN_CHUNKS; a bug revealed by changes in libpng 1.7. More
+    tests contain the --strict option to detect warnings and the
+    pngvalid-standard test has been corrected so that it does not
+    turn on progressive-read. There is a separate test which does
+    that. (John Bowler)
+  Also made some signed/unsigned fixes.
+  Make pngstest error limits version specific. Splitting the machine
+    generated error structs out to a file allows the values to be updated
+    without changing pngstest.c itself. Since libpng 1.6 and 1.7 have
+    slightly different error limits this simplifies maintenance. The
+    makepngs.sh script has also been updated to more accurately reflect
+    current problems in libpng 1.7 (John Bowler).
+  Incorporated new test PNG files into make check.  tests/pngstest-*
+    are changed so that the new test files are divided into 8 groups by
+    gamma and alpha channel.  These tests have considerably better code
+    and pixel-value coverage than contrib/pngsuite; however,coverage is
+    still incomplete (John Bowler).
+  Removed the '--strict' in 1.6 because of the double-gamma-correction
+    warning, updated pngstest-errors.h for the errors detected with the
+    new contrib/testspngs PNG test files (John Bowler).
+
+Version 1.6.19beta04 [October 15, 2015]
+  Worked around rgb-to-gray issues in libpng 1.6.  The previous
+    attempts to ignore the errors in the code aren't quite enough to
+    deal with the 'channel selection' encoding added to libpng 1.7; abort.
+    pngvalid.c is changed to drop this encoding in prior versions.
+  Fixed 'pow' macros in pngvalid.c. It is legal for 'pow' to be a
+    macro, therefore the argument list cannot contain preprocessing
+    directives.  Make sure pow is a function where this happens. This is
+    a minimal safe fix, the issue only arises in non-performance-critical
+    code (bug report by Curtis Leach, fix by John Bowler).
+  Added sPLT support to pngtest.c
+
+Version 1.6.19rc01 [October 23, 2015]
+  No changes.
+
+Version 1.6.19rc02 [October 31, 2015]
+  Prevent setting or writing over-length PLTE chunk (Cosmin Truta).
+  Silently truncate over-length PLTE chunk while reading.
+  Libpng incorrectly calculated the output rowbytes when the application
+    decreased either the number of channels or the bit depth (or both) in
+    a user transform.  This was safe; libpng overallocated buffer space
+   (potentially by quite a lot; up to 4 times the amount required) but,
+   from 1.5.4 on, resulted in a png_error (John Bowler).
+
+Version 1.6.19rc03 [November 3, 2015]
+  Fixed some inconsequential cut-and-paste typos in png_set_cHRM_XYZ_fixed().
+  Clarified COPYRIGHT information to state explicitly that versions
+    are derived from previous versions.
+  Removed much of the long list of previous versions from png.h and
+    libpng.3.
+
+Version 1.6.19rc04 [November 5, 2015]
+  Fixed new bug with CRC error after reading an over-length palette
+    (bug report by Cosmin Truta) (CVE-2015-8126).
+
+Version 1.6.19 [November 12, 2015]
+  Cleaned up coding style in png_handle_PLTE().
+
+Version 1.6.20beta01 [(PENDING RELEASE)]
+  Avoid potential pointer overflow/underflow in png_handle_sPLT()
+    and png_handle_pCAL() (Bug report by John Regehr).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
