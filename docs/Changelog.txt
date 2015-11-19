@@ -13,6 +13,7 @@ Legend:
 Updated libraries:
 	ffmpeg git-n2.9-dev-1796-g0eb7de1;
 	libdcadec git-57012a4;
+	libpng 1.6.20beta01 git-gc4b2282;
 	Little-CMS 2.7 beta git-0ebca931;
 	MediaInfo 0.7.79.
 

@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.6.18 [July 23, 2015]
+ * Last changed in libpng 1.6.19 [November 12, 2015]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -2097,10 +2097,10 @@ png_read_transform_info(png_structrp png_ptr, png_inforp info_ptr)
 defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
    if ((png_ptr->transformations & PNG_USER_TRANSFORM) != 0)
    {
-      if (info_ptr->bit_depth < png_ptr->user_transform_depth)
+      if (png_ptr->user_transform_depth != 0)
          info_ptr->bit_depth = png_ptr->user_transform_depth;
 
-      if (info_ptr->channels < png_ptr->user_transform_channels)
+      if (png_ptr->user_transform_channels != 0)
          info_ptr->channels = png_ptr->user_transform_channels;
    }
 #endif

@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.6.18 [July 23, 2015]
+ * Last changed in libpng 1.6.19 [November 12, 2015]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -206,7 +206,7 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
       png_write_PLTE(png_ptr, info_ptr->palette,
           (png_uint_32)info_ptr->num_palette);
 
-   else if ((info_ptr->color_type == PNG_COLOR_TYPE_PALETTE) !=0)
+   else if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       png_error(png_ptr, "Valid palette required for paletted images");
 
 #ifdef PNG_WRITE_tRNS_SUPPORTED

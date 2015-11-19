@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.19beta03, August 19, 2015
+ * libpng version 1.6.20beta01, November 13, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,235 +12,9 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.19beta03, August 19, 2015: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.20beta01, November 13, 2015:
+ *     Glenn Randers-Pehrson.
  *   See also "Contributing Authors", below.
- *
- * Note about libpng version numbers:
- *
- *   Due to various miscommunications, unforeseen code incompatibilities
- *   and occasional factors outside the authors' control, version numbering
- *   on the library has not always been consistent and straightforward.
- *   The following table summarizes matters since version 0.89c, which was
- *   the first widely used release:
- *
- *    source                 png.h  png.h  shared-lib
- *    version                string   int  version
- *    -------                ------ -----  ----------
- *    0.89c "1.0 beta 3"     0.89      89  1.0.89
- *    0.90  "1.0 beta 4"     0.90      90  0.90  [should have been 2.0.90]
- *    0.95  "1.0 beta 5"     0.95      95  0.95  [should have been 2.0.95]
- *    0.96  "1.0 beta 6"     0.96      96  0.96  [should have been 2.0.96]
- *    0.97b "1.00.97 beta 7" 1.00.97   97  1.0.1 [should have been 2.0.97]
- *    0.97c                  0.97      97  2.0.97
- *    0.98                   0.98      98  2.0.98
- *    0.99                   0.99      98  2.0.99
- *    0.99a-m                0.99      99  2.0.99
- *    1.00                   1.00     100  2.1.0 [100 should be 10000]
- *    1.0.0      (from here on, the   100  2.1.0 [100 should be 10000]
- *    1.0.1       png.h string is   10001  2.1.0
- *    1.0.1a-e    identical to the  10002  from here on, the shared library
- *    1.0.2       source version)   10002  is 2.V where V is the source code
- *    1.0.2a-b                      10003  version, except as noted.
- *    1.0.3                         10003
- *    1.0.3a-d                      10004
- *    1.0.4                         10004
- *    1.0.4a-f                      10005
- *    1.0.5 (+ 2 patches)           10005
- *    1.0.5a-d                      10006
- *    1.0.5e-r                      10100 (not source compatible)
- *    1.0.5s-v                      10006 (not binary compatible)
- *    1.0.6 (+ 3 patches)           10006 (still binary incompatible)
- *    1.0.6d-f                      10007 (still binary incompatible)
- *    1.0.6g                        10007
- *    1.0.6h                        10007  10.6h (testing xy.z so-numbering)
- *    1.0.6i                        10007  10.6i
- *    1.0.6j                        10007  2.1.0.6j (incompatible with 1.0.0)
- *    1.0.7beta11-14        DLLNUM  10007  2.1.0.7beta11-14 (binary compatible)
- *    1.0.7beta15-18           1    10007  2.1.0.7beta15-18 (binary compatible)
- *    1.0.7rc1-2               1    10007  2.1.0.7rc1-2 (binary compatible)
- *    1.0.7                    1    10007  (still compatible)
- *    1.0.8beta1-4             1    10008  2.1.0.8beta1-4
- *    1.0.8rc1                 1    10008  2.1.0.8rc1
- *    1.0.8                    1    10008  2.1.0.8
- *    1.0.9beta1-6             1    10009  2.1.0.9beta1-6
- *    1.0.9rc1                 1    10009  2.1.0.9rc1
- *    1.0.9beta7-10            1    10009  2.1.0.9beta7-10
- *    1.0.9rc2                 1    10009  2.1.0.9rc2
- *    1.0.9                    1    10009  2.1.0.9
- *    1.0.10beta1              1    10010  2.1.0.10beta1
- *    1.0.10rc1                1    10010  2.1.0.10rc1
- *    1.0.10                   1    10010  2.1.0.10
- *    1.0.11beta1-3            1    10011  2.1.0.11beta1-3
- *    1.0.11rc1                1    10011  2.1.0.11rc1
- *    1.0.11                   1    10011  2.1.0.11
- *    1.0.12beta1-2            2    10012  2.1.0.12beta1-2
- *    1.0.12rc1                2    10012  2.1.0.12rc1
- *    1.0.12                   2    10012  2.1.0.12
- *    1.1.0a-f                 -    10100  2.1.1.0a-f (branch abandoned)
- *    1.2.0beta1-2             2    10200  2.1.2.0beta1-2
- *    1.2.0beta3-5             3    10200  3.1.2.0beta3-5
- *    1.2.0rc1                 3    10200  3.1.2.0rc1
- *    1.2.0                    3    10200  3.1.2.0
- *    1.2.1beta1-4             3    10201  3.1.2.1beta1-4
- *    1.2.1rc1-2               3    10201  3.1.2.1rc1-2
- *    1.2.1                    3    10201  3.1.2.1
- *    1.2.2beta1-6            12    10202  12.so.0.1.2.2beta1-6
- *    1.0.13beta1             10    10013  10.so.0.1.0.13beta1
- *    1.0.13rc1               10    10013  10.so.0.1.0.13rc1
- *    1.2.2rc1                12    10202  12.so.0.1.2.2rc1
- *    1.0.13                  10    10013  10.so.0.1.0.13
- *    1.2.2                   12    10202  12.so.0.1.2.2
- *    1.2.3rc1-6              12    10203  12.so.0.1.2.3rc1-6
- *    1.2.3                   12    10203  12.so.0.1.2.3
- *    1.2.4beta1-3            13    10204  12.so.0.1.2.4beta1-3
- *    1.0.14rc1               13    10014  10.so.0.1.0.14rc1
- *    1.2.4rc1                13    10204  12.so.0.1.2.4rc1
- *    1.0.14                  10    10014  10.so.0.1.0.14
- *    1.2.4                   13    10204  12.so.0.1.2.4
- *    1.2.5beta1-2            13    10205  12.so.0.1.2.5beta1-2
- *    1.0.15rc1-3             10    10015  10.so.0.1.0.15rc1-3
- *    1.2.5rc1-3              13    10205  12.so.0.1.2.5rc1-3
- *    1.0.15                  10    10015  10.so.0.1.0.15
- *    1.2.5                   13    10205  12.so.0.1.2.5
- *    1.2.6beta1-4            13    10206  12.so.0.1.2.6beta1-4
- *    1.0.16                  10    10016  10.so.0.1.0.16
- *    1.2.6                   13    10206  12.so.0.1.2.6
- *    1.2.7beta1-2            13    10207  12.so.0.1.2.7beta1-2
- *    1.0.17rc1               10    10017  12.so.0.1.0.17rc1
- *    1.2.7rc1                13    10207  12.so.0.1.2.7rc1
- *    1.0.17                  10    10017  12.so.0.1.0.17
- *    1.2.7                   13    10207  12.so.0.1.2.7
- *    1.2.8beta1-5            13    10208  12.so.0.1.2.8beta1-5
- *    1.0.18rc1-5             10    10018  12.so.0.1.0.18rc1-5
- *    1.2.8rc1-5              13    10208  12.so.0.1.2.8rc1-5
- *    1.0.18                  10    10018  12.so.0.1.0.18
- *    1.2.8                   13    10208  12.so.0.1.2.8
- *    1.2.9beta1-3            13    10209  12.so.0.1.2.9beta1-3
- *    1.2.9beta4-11           13    10209  12.so.0.9[.0]
- *    1.2.9rc1                13    10209  12.so.0.9[.0]
- *    1.2.9                   13    10209  12.so.0.9[.0]
- *    1.2.10beta1-7           13    10210  12.so.0.10[.0]
- *    1.2.10rc1-2             13    10210  12.so.0.10[.0]
- *    1.2.10                  13    10210  12.so.0.10[.0]
- *    1.4.0beta1-5            14    10400  14.so.0.0[.0]
- *    1.2.11beta1-4           13    10211  12.so.0.11[.0]
- *    1.4.0beta7-8            14    10400  14.so.0.0[.0]
- *    1.2.11                  13    10211  12.so.0.11[.0]
- *    1.2.12                  13    10212  12.so.0.12[.0]
- *    1.4.0beta9-14           14    10400  14.so.0.0[.0]
- *    1.2.13                  13    10213  12.so.0.13[.0]
- *    1.4.0beta15-36          14    10400  14.so.0.0[.0]
- *    1.4.0beta37-87          14    10400  14.so.14.0[.0]
- *    1.4.0rc01               14    10400  14.so.14.0[.0]
- *    1.4.0beta88-109         14    10400  14.so.14.0[.0]
- *    1.4.0rc02-08            14    10400  14.so.14.0[.0]
- *    1.4.0                   14    10400  14.so.14.0[.0]
- *    1.4.1beta01-03          14    10401  14.so.14.1[.0]
- *    1.4.1rc01               14    10401  14.so.14.1[.0]
- *    1.4.1beta04-12          14    10401  14.so.14.1[.0]
- *    1.4.1                   14    10401  14.so.14.1[.0]
- *    1.4.2                   14    10402  14.so.14.2[.0]
- *    1.4.3                   14    10403  14.so.14.3[.0]
- *    1.4.4                   14    10404  14.so.14.4[.0]
- *    1.5.0beta01-58          15    10500  15.so.15.0[.0]
- *    1.5.0rc01-07            15    10500  15.so.15.0[.0]
- *    1.5.0                   15    10500  15.so.15.0[.0]
- *    1.5.1beta01-11          15    10501  15.so.15.1[.0]
- *    1.5.1rc01-02            15    10501  15.so.15.1[.0]
- *    1.5.1                   15    10501  15.so.15.1[.0]
- *    1.5.2beta01-03          15    10502  15.so.15.2[.0]
- *    1.5.2rc01-03            15    10502  15.so.15.2[.0]
- *    1.5.2                   15    10502  15.so.15.2[.0]
- *    1.5.3beta01-10          15    10503  15.so.15.3[.0]
- *    1.5.3rc01-02            15    10503  15.so.15.3[.0]
- *    1.5.3beta11             15    10503  15.so.15.3[.0]
- *    1.5.3 [omitted]
- *    1.5.4beta01-08          15    10504  15.so.15.4[.0]
- *    1.5.4rc01               15    10504  15.so.15.4[.0]
- *    1.5.4                   15    10504  15.so.15.4[.0]
- *    1.5.5beta01-08          15    10505  15.so.15.5[.0]
- *    1.5.5rc01               15    10505  15.so.15.5[.0]
- *    1.5.5                   15    10505  15.so.15.5[.0]
- *    1.5.6beta01-07          15    10506  15.so.15.6[.0]
- *    1.5.6rc01-03            15    10506  15.so.15.6[.0]
- *    1.5.6                   15    10506  15.so.15.6[.0]
- *    1.5.7beta01-05          15    10507  15.so.15.7[.0]
- *    1.5.7rc01-03            15    10507  15.so.15.7[.0]
- *    1.5.7                   15    10507  15.so.15.7[.0]
- *    1.6.0beta01-40          16    10600  16.so.16.0[.0]
- *    1.6.0rc01-08            16    10600  16.so.16.0[.0]
- *    1.6.0                   16    10600  16.so.16.0[.0]
- *    1.6.1beta01-09          16    10601  16.so.16.1[.0]
- *    1.6.1rc01               16    10601  16.so.16.1[.0]
- *    1.6.1                   16    10601  16.so.16.1[.0]
- *    1.6.2beta01             16    10602  16.so.16.2[.0]
- *    1.6.2rc01-06            16    10602  16.so.16.2[.0]
- *    1.6.2                   16    10602  16.so.16.2[.0]
- *    1.6.3beta01-11          16    10603  16.so.16.3[.0]
- *    1.6.3rc01               16    10603  16.so.16.3[.0]
- *    1.6.3                   16    10603  16.so.16.3[.0]
- *    1.6.4beta01-02          16    10604  16.so.16.4[.0]
- *    1.6.4rc01               16    10604  16.so.16.4[.0]
- *    1.6.4                   16    10604  16.so.16.4[.0]
- *    1.6.5                   16    10605  16.so.16.5[.0]
- *    1.6.6                   16    10606  16.so.16.6[.0]
- *    1.6.7beta01-04          16    10607  16.so.16.7[.0]
- *    1.6.7rc01-03            16    10607  16.so.16.7[.0]
- *    1.6.7                   16    10607  16.so.16.7[.0]
- *    1.6.8beta01-02          16    10608  16.so.16.8[.0]
- *    1.6.8rc01-02            16    10608  16.so.16.8[.0]
- *    1.6.8                   16    10608  16.so.16.8[.0]
- *    1.6.9beta01-04          16    10609  16.so.16.9[.0]
- *    1.6.9rc01-02            16    10609  16.so.16.9[.0]
- *    1.6.9                   16    10609  16.so.16.9[.0]
- *    1.6.10beta01-03         16    10610  16.so.16.10[.0]
- *    1.6.10rc01-03           16    10610  16.so.16.10[.0]
- *    1.6.10                  16    10610  16.so.16.10[.0]
- *    1.6.11beta01-06         16    10611  16.so.16.11[.0]
- *    1.6.11rc01-02           16    10611  16.so.16.11[.0]
- *    1.6.11                  16    10611  16.so.16.11[.0]
- *    1.6.12rc01-03           16    10612  16.so.16.12[.0]
- *    1.6.12                  16    10612  16.so.16.12[.0]
- *    1.6.13beta01-04         16    10613  16.so.16.13[.0]
- *    1.6.13rc01-02           16    10613  16.so.16.13[.0]
- *    1.6.13                  16    10613  16.so.16.13[.0]
- *    1.6.14beta01-07         16    10614  16.so.16.14[.0]
- *    1.6.14rc01-02           16    10614  16.so.16.14[.0]
- *    1.6.14                  16    10614  16.so.16.14[.0]
- *    1.6.15beta01-08         16    10615  16.so.16.15[.0]
- *    1.6.15rc01-03           16    10615  16.so.16.15[.0]
- *    1.6.15                  16    10615  16.so.16.15[.0]
- *    1.6.16beta01-03         16    10616  16.so.16.16[.0]
- *    1.6.16rc01-02           16    10616  16.so.16.16[.0]
- *    1.6.16                  16    10616  16.so.16.16[.0]
- *    1.6.17beta01-06         16    10617  16.so.16.17[.0]
- *    1.6.17rc01-06           16    10617  16.so.16.17[.0]
- *    1.6.17                  16    10617  16.so.16.17[.0]
- *    1.6.18beta01-09         16    10618  16.so.16.18[.0]
- *    1.6.18rc01-03           16    10618  16.so.16.18[.0]
- *    1.6.18                  16    10618  16.so.16.18[.0]
- *    1.6.19beta01-03         16    10619  16.so.16.19[.0]
- *
- *   Henceforth the source version will match the shared-library major
- *   and minor numbers; the shared-library major version number will be
- *   used for changes in backward compatibility, as it is intended.  The
- *   PNG_LIBPNG_VER macro, which is not used within libpng but is available
- *   for applications, is an unsigned integer of the form xyyzz corresponding
- *   to the source version x.y.z (leading zeros in y and z).  Beta versions
- *   were given the previous public release number plus a letter, until
- *   version 1.0.6j; from then on they were given the upcoming public
- *   release number plus "betaNN" or "rcNN".
- *
- *   Binary incompatibility exists only when applications make direct access
- *   to the info_ptr or png_ptr members through png.h, and the compiled
- *   application is loaded with a different version of the library.
- *
- *   DLLNUM will change each time there are forward or backward changes
- *   in binary compatibility (e.g., when a new feature is added).
- *
- * See libpng-manual.txt or libpng.3 for more information.  The PNG
- * specification is available as a W3C Recommendation and as an ISO
- * Specification, <http://www.w3.org/TR/2003/REC-PNG-20031110/
  */
 
 /*
@@ -251,12 +25,14 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000, through 1.6.19beta03, August 19, 2015, are
- * Copyright (c) 2000-2002, 2004, 2006-2015 Glenn Randers-Pehrson, and are
- * distributed according to the same disclaimer and license as libpng-1.0.6
- * with the following individuals added to the list of Contributing Authors:
+ * libpng versions 1.0.7, July 1, 2000, through 1.6.20beta01, November 13, 2015, are
+ * Copyright (c) 2000-2002, 2004, 2006-2015 Glenn Randers-Pehrson, are
+ * derived from libpng-1.0.6, and are distributed according to the same
+ * disclaimer and license as libpng-1.0.6 with the following individuals
+ * added to the list of Contributing Authors:
  *
  *    Simon-Pierre Cadieux
+ *    Eric S. Raymond
  *    Mans Rullgard
  *    Cosmin Truta
  *    Gilles Vollant
@@ -272,19 +48,20 @@
  *    the user.
  *
  * libpng versions 0.97, January 1998, through 1.0.6, March 20, 2000, are
- * Copyright (c) 1998-2000 Glenn Randers-Pehrson, and are distributed according
- * to the same disclaimer and license as libpng-0.96, with the following
- * individuals added to the list of Contributing Authors:
+ * Copyright (c) 1998-2000 Glenn Randers-Pehrson, are derived from
+ * libpng-0.96, and are distributed according to the same disclaimer and
+ * license as libpng-0.96, with the following individuals added to the list
+ * of Contributing Authors:
  *
  *    Tom Lane
  *    Glenn Randers-Pehrson
- *    Eric S. Raymond
  *    Willem van Schaik
  *
  * libpng versions 0.89, June 1996, through 0.96, May 1997, are
- * Copyright (c) 1996-1997 Andreas Dilger, and are
- * distributed according to the same disclaimer and license as libpng-0.88,
- * with the following individuals added to the list of Contributing Authors:
+ * Copyright (c) 1996-1997 Andreas Dilger, are derived from libpng-0.88,
+ * and are distributed according to the same disclaimer and license as
+ * libpng-0.88, with the following individuals added to the list of
+ * Contributing Authors:
  *
  *    John Bowler
  *    Kevin Bracey
@@ -330,6 +107,8 @@
  * supporting the PNG file format in commercial products.  If you use this
  * source code in a product, acknowledgment is not required but would be
  * appreciated.
+ *
+ * END OF COPYRIGHT NOTICE, DISCLAIMER, and LICENSE.
  */
 
 /*
@@ -356,17 +135,92 @@
  * Thanks to Frank J. T. Wojcik for helping with the documentation.
  */
 
+/* Note about libpng version numbers:
+ *
+ *    Due to various miscommunications, unforeseen code incompatibilities
+ *    and occasional factors outside the authors' control, version numbering
+ *    on the library has not always been consistent and straightforward.
+ *    The following table summarizes matters since version 0.89c, which was
+ *    the first widely used release:
+ *
+ *    source                 png.h  png.h  shared-lib
+ *    version                string   int  version
+ *    -------                ------ -----  ----------
+ *    0.89c "1.0 beta 3"     0.89      89  1.0.89
+ *    0.90  "1.0 beta 4"     0.90      90  0.90  [should have been 2.0.90]
+ *    0.95  "1.0 beta 5"     0.95      95  0.95  [should have been 2.0.95]
+ *    0.96  "1.0 beta 6"     0.96      96  0.96  [should have been 2.0.96]
+ *    0.97b "1.00.97 beta 7" 1.00.97   97  1.0.1 [should have been 2.0.97]
+ *    0.97c                  0.97      97  2.0.97
+ *    0.98                   0.98      98  2.0.98
+ *    0.99                   0.99      98  2.0.99
+ *    0.99a-m                0.99      99  2.0.99
+ *    1.00                   1.00     100  2.1.0 [100 should be 10000]
+ *    1.0.0      (from here on, the   100  2.1.0 [100 should be 10000]
+ *    1.0.1       png.h string is   10001  2.1.0
+ *    1.0.1a-e    identical to the  10002  from here on, the shared library
+ *    1.0.2       source version)   10002  is 2.V where V is the source code
+ *    1.0.2a-b                      10003  version, except as noted.
+ *    1.0.3                         10003
+ *    1.0.3a-d                      10004
+ *    1.0.4                         10004
+ *    1.0.4a-f                      10005
+ *    1.0.5 (+ 2 patches)           10005
+ *    1.0.5a-d                      10006
+ *    1.0.5e-r                      10100 (not source compatible)
+ *    1.0.5s-v                      10006 (not binary compatible)
+ *    1.0.6 (+ 3 patches)           10006 (still binary incompatible)
+ *    1.0.6d-f                      10007 (still binary incompatible)
+ *    1.0.6g                        10007
+ *    1.0.6h                        10007  10.6h (testing xy.z so-numbering)
+ *    1.0.6i                        10007  10.6i
+ *    1.0.6j                        10007  2.1.0.6j (incompatible with 1.0.0)
+ *    1.0.7beta11-14        DLLNUM  10007  2.1.0.7beta11-14 (binary compatible)
+ *    1.0.7beta15-18           1    10007  2.1.0.7beta15-18 (binary compatible)
+ *    1.0.7rc1-2               1    10007  2.1.0.7rc1-2 (binary compatible)
+ *    1.0.7                    1    10007  (still compatible)
+ *    ...
+ *    1.0.19                  10    10019  10.so.0.19[.0]
+ *    ...
+ *    1.2.53                  13    10253  12.so.0.53[.0]
+ *    ...
+ *    1.5.23                  15    10523  15.so.15.23[.0]
+ *    ...
+ *    1.6.19                  16    10619  16.so.16.19[.0]
+ *
+ *    Henceforth the source version will match the shared-library major
+ *    and minor numbers; the shared-library major version number will be
+ *    used for changes in backward compatibility, as it is intended.  The
+ *    PNG_LIBPNG_VER macro, which is not used within libpng but is available
+ *    for applications, is an unsigned integer of the form xyyzz corresponding
+ *    to the source version x.y.z (leading zeros in y and z).  Beta versions
+ *    were given the previous public release number plus a letter, until
+ *    version 1.0.6j; from then on they were given the upcoming public
+ *    release number plus "betaNN" or "rcNN".
+ *
+ *    Binary incompatibility exists only when applications make direct access
+ *    to the info_ptr or png_ptr members through png.h, and the compiled
+ *    application is loaded with a different version of the library.
+ *
+ *    DLLNUM will change each time there are forward or backward changes
+ *    in binary compatibility (e.g., when a new feature is added).
+ *
+ * See libpng.txt or libpng.3 for more information.  The PNG specification
+ * is available as a W3C Recommendation and as an ISO Specification,
+ * <http://www.w3.org/TR/2003/REC-PNG-20031110/
+ */
+
 /*
  * Y2K compliance in libpng:
  * =========================
  *
- *    August 19, 2015
+ *    November 13, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.6.19beta03 are Y2K compliant.  It is my belief that
+ *    upward through 1.6.20beta01 are Y2K compliant.  It is my belief that
  *    earlier versions were also Y2K compliant.
  *
  *    Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -428,9 +282,9 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.6.19beta03"
+#define PNG_LIBPNG_VER_STRING "1.6.20beta01"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.19beta03 - August 19, 2015\n"
+     " libpng version 1.6.20beta01 - November 13, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -438,13 +292,13 @@
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
 #define PNG_LIBPNG_VER_MAJOR   1
 #define PNG_LIBPNG_VER_MINOR   6
-#define PNG_LIBPNG_VER_RELEASE 19
+#define PNG_LIBPNG_VER_RELEASE 20
 
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero:
  */
 
-#define PNG_LIBPNG_VER_BUILD  03
+#define PNG_LIBPNG_VER_BUILD  01
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -469,7 +323,7 @@
  * version 1.0.0 was mis-numbered 100 instead of 10000).  From
  * version 1.0.1 it's    xxyyzz, where x=major, y=minor, z=release
  */
-#define PNG_LIBPNG_VER 10619 /* 1.6.19 */
+#define PNG_LIBPNG_VER 10620 /* 1.6.20 */
 
 /* Library configuration: these options cannot be changed after
  * the library has been built.
@@ -579,7 +433,7 @@ extern "C" {
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_6_19beta03;
+typedef char* png_libpng_version_1_6_20beta01;
 
 /* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
  *
@@ -1393,13 +1247,13 @@ PNG_EXPORT(38, void, png_set_invert_alpha, (png_structrp png_ptr));
 #endif
 
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
-/* Add a filler byte to 8-bit Gray or 24-bit RGB images. */
+/* Add a filler byte to 8-bit or 16-bit Gray or 24-bit or 48-bit RGB images. */
 PNG_EXPORT(39, void, png_set_filler, (png_structrp png_ptr, png_uint_32 filler,
     int flags));
 /* The values of the PNG_FILLER_ defines should NOT be changed */
 #  define PNG_FILLER_BEFORE 0
 #  define PNG_FILLER_AFTER 1
-/* Add an alpha byte to 8-bit Gray or 24-bit RGB images. */
+/* Add an alpha byte to 8-bit or 16-bit Gray or 24-bit or 48-bit RGB images. */
 PNG_EXPORT(40, void, png_set_add_alpha, (png_structrp png_ptr,
     png_uint_32 filler, int flags));
 #endif /* READ_FILLER || WRITE_FILLER */
