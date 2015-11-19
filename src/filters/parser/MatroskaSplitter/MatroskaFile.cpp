@@ -1344,7 +1344,7 @@ HRESULT CLength::Parse(CMatroskaNode* pMN)
 
 	//int nMoreBytesTmp = nMoreBytes;
 
-	QWORD UnknownSize = (1i64 << (7 * (nMoreBytes + 1))) - 1;
+	const QWORD UnknownSize = (1i64 << (7 * (nMoreBytes + 1))) - 1;
 
 	while (nMoreBytes-- > 0) {
 		m_val <<= 8;
@@ -1355,8 +1355,8 @@ HRESULT CLength::Parse(CMatroskaNode* pMN)
 	}
 
 	if (m_val == UnknownSize) {
-		m_val = pMN->GetLength() - pMN->GetPos();
-		TRACE(_T("CLength: Unspecified chunk size at %I64d (corrected to %I64d)\n"), pMN->GetPos(), m_val);
+		DbgLog((LOG_TRACE, 3, L"CLength::Parse() : Unspecified chunk size 0x%016I64x at %I64u", m_val, pMN->GetPos()));
+		m_val = UINT64_MAX;
 	}
 
 	if (m_fSigned) {
@@ -1467,6 +1467,7 @@ CMatroskaNode::CMatroskaNode(CMatroskaNode* pParent)
 	Parse();
 }
 
+#define MAXFAILEDCOUNT (20 * 1024 * 1024)
 HRESULT CMatroskaNode::Parse()
 {
 	m_filepos = GetPos();
@@ -1475,6 +1476,33 @@ HRESULT CMatroskaNode::Parse()
 	}
 
 	m_start = GetPos();
+
+	if (m_len == UINT64_MAX) {
+		// find next Node with the same id
+		CID id;
+		bool bFound = false;
+		int failedCount = 0;
+		QWORD pos = 0;
+		for (;failedCount < MAXFAILEDCOUNT && GetPos() < (m_pParent->m_start + m_pParent->m_len); failedCount++) {
+			pos = GetPos();
+			if (SUCCEEDED(id.Parse(this))
+					&& id == m_id) {
+				CLength len;
+				if (SUCCEEDED(len.Parse(this))) {
+					bFound = true;
+					break;
+				}
+			}
+		}
+
+		if (bFound) {
+			SeekTo(m_start);
+			m_len.Set(pos - m_start);
+		} else {
+			return E_FAIL;
+		}
+	}
+
 	return S_OK;
 }
 
@@ -1501,7 +1529,7 @@ bool CMatroskaNode::Next(bool fSame)
 
 	for (;;) {
 		if (/*m_pParent->m_id == MATROSKA_ID_SEGMENT && */m_len > m_pParent->m_len) {
-			TRACE(_T("CMatroskaNode::Next() : skip invalid element : len = %I64d, parent element len = %I64d\n"), __int64(m_len), __int64(m_pParent->m_len));
+			DbgLog((LOG_TRACE, 3, L"CMatroskaNode::Next() : skip invalid element : len = %I64u, parent element len = %I64u", (UINT64)m_len, (UINT64)m_pParent->m_len));
 			SeekTo(m_start + 1);
 		} else if (m_start + m_len >= m_pParent->m_start + m_pParent->m_len) {
 			break;
@@ -1519,6 +1547,7 @@ bool CMatroskaNode::Next(bool fSame)
 			return true;
 		}
 	}
+
 	return false;
 }
 
@@ -1616,8 +1645,15 @@ bool CMatroskaNode::NextBlock()
 
 	CID id = m_id;
 
-	while (m_start + m_len < m_pParent->m_start + m_pParent->m_len) {
-		SeekTo(m_start + m_len);
+	for (;;) {
+		if (m_len > m_pParent->m_len) {
+			DbgLog((LOG_TRACE, 3, L"CMatroskaNode::NextBlock() : skip invalid element : len = %I64u, parent element len = %I64u", (UINT64)m_len, (UINT64)m_pParent->m_len));
+			SeekTo(m_start + 1);
+		} else if (m_start + m_len >= m_pParent->m_start + m_pParent->m_len) {
+			break;
+		} else {
+			SeekTo(m_start + m_len);
+		}
 
 		if (FAILED(Parse())) {
 			if (!Resync()) {
@@ -1633,7 +1669,6 @@ bool CMatroskaNode::NextBlock()
 	return false;
 }
 
-#define MAXFAILEDCOUNT (20 * 1024 * 1024)
 bool CMatroskaNode::Resync()
 {
 	if (m_pParent->m_id == MATROSKA_ID_SEGMENT) {
