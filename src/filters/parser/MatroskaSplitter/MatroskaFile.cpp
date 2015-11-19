@@ -1480,25 +1480,24 @@ HRESULT CMatroskaNode::Parse()
 	if (m_len == UINT64_MAX) {
 		// find next Node with the same id
 		CID id;
-		bool bFound = false;
-		int failedCount = 0;
-		QWORD pos = 0;
-		for (;failedCount < MAXFAILEDCOUNT && GetPos() < (m_pParent->m_start + m_pParent->m_len); failedCount++) {
-			pos = GetPos();
+		QWORD byteCount = 0;
+		while (byteCount < MAXFAILEDCOUNT && GetPos() < (m_pParent->m_start + m_pParent->m_len)) {
+			SeekTo(m_start + byteCount);
 			if (SUCCEEDED(id.Parse(this))
 					&& id == m_id) {
 				CLength len;
 				if (SUCCEEDED(len.Parse(this))) {
-					bFound = true;
+					SeekTo(m_start);
+					m_len.Set(byteCount);
+
 					break;
 				}
 			}
+
+			byteCount++;
 		}
 
-		if (bFound) {
-			SeekTo(m_start);
-			m_len.Set(pos - m_start);
-		} else {
+		if (m_len == UINT64_MAX) {
 			return E_FAIL;
 		}
 	}
