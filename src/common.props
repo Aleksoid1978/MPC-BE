@@ -67,7 +67,6 @@
     </ResourceCompile>
     <Link>
       <ImageHasSafeExceptionHandlers Condition="'$(Platform)'=='Win32'">false</ImageHasSafeExceptionHandlers>
-      <GenerateDebugInformation Condition="'$(PlatformToolsetVersion)'=='140'">DebugFastLink</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='Release Filter'">
