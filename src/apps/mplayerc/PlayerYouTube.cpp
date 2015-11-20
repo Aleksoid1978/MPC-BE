@@ -37,18 +37,39 @@
 
 static const CString GOOGLE_API_KEY = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
 
-const YOUTUBE_PROFILES* getProfile(int iTag) {
-	for (int i = 0; i < _countof(youtubeProfiles); i++)
-		if (iTag == youtubeProfiles[i].iTag) {
-			return &youtubeProfiles[i];
+enum youtubeProfiles {
+	UNKNOWN_PROFILE = -1,
+	AUDIO_PROFILE,
+	VIDEO_PROFILE
+};
+
+const YOUTUBE_PROFILES* getProfile(int iTag, youtubeProfiles type) {
+	YOUTUBE_PROFILES* profiles = NULL;
+	int count = 0;
+
+	switch (type) {
+		case youtubeProfiles::AUDIO_PROFILE:
+			profiles = (YOUTUBE_PROFILES*)youtubeAudioProfiles;
+			count = _countof(youtubeAudioProfiles);
+			break;
+		case youtubeProfiles::VIDEO_PROFILE:
+			profiles = (YOUTUBE_PROFILES*)youtubeVideoProfiles;
+			count = _countof(youtubeVideoProfiles);
+			break;
+	}
+
+	for (int i = 0; i < count; i++) {
+		if (iTag == profiles[i].iTag) {
+			return &profiles[i];
+		}
 	}
 
 	return &youtubeProfileEmpty;
 }
 
-bool SelectBestProfile(int &itag_final, CString &ext_final, int itag_current, const YOUTUBE_PROFILES* sets)
+bool SelectBestProfile(int &itag_final, CString &ext_final, int itag_current, const YOUTUBE_PROFILES* sets, youtubeProfiles type)
 {
-	const YOUTUBE_PROFILES* current = getProfile(itag_current);
+	const YOUTUBE_PROFILES* current = getProfile(itag_current, type);
 
 	if (current->iTag <= 0
 			|| current->quality > sets->quality) {
@@ -56,7 +77,7 @@ bool SelectBestProfile(int &itag_final, CString &ext_final, int itag_current, co
 	}
 
 	if (itag_final != 0) {
-		const YOUTUBE_PROFILES* fin = getProfile(itag_final);
+		const YOUTUBE_PROFILES* fin = getProfile(itag_final, type);
 		if (current->quality < fin->quality) {
 			return false;
 		}
@@ -185,12 +206,6 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 		int hlsvp_start = 0;
 		int hlsvp_len = 0;
 
-		CAppSettings& sApp = AfxGetAppSettings();
-		const YOUTUBE_PROFILES* youtubeSets = getProfile(sApp.iYoutubeTag);
-		if (youtubeSets->iTag == 0) {
-			youtubeSets = getProfile(22);
-		}
-
 		CString videoId;
 
 		HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
@@ -309,9 +324,21 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 		delete [] tmp;
 		strA.Replace("\\u0026", "&");
 
-		CString final_url;
-		CString final_ext;
-		int final_itag = 0;
+		const CAppSettings& sApp = AfxGetAppSettings();
+		const YOUTUBE_PROFILES* youtubeVideoSets = getProfile(sApp.iYoutubeTag, youtubeProfiles::VIDEO_PROFILE);
+		if (youtubeVideoSets->iTag == 0) {
+			youtubeVideoSets = getProfile(22, youtubeProfiles::VIDEO_PROFILE);
+		}
+
+		CString final_video_url;
+		CString final_video_ext;
+		int final_video_itag = 0;
+
+		const YOUTUBE_PROFILES* youtubeAudioSets = getProfile(251, youtubeProfiles::AUDIO_PROFILE);
+
+		CString final_audio_url;
+		CString final_audio_ext;
+		int final_audio_itag = 0;
 
 		CAtlList<CStringA> linesA;
 		Explode(strA, linesA, ',');
@@ -350,8 +377,7 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 			}
 
 			if (itag) {
-				if (SelectBestProfile(final_itag, final_ext, itag, youtubeSets)) {
-					final_url = url;
+				auto SignatureDecode = [&](CString& final_url) {
 					if (!signature.IsEmpty()) {
 						// todo - write a proper implementation using an external .js file
 						auto lM = [](CStringA& a, int b) {
@@ -380,18 +406,26 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 
 						final_url.AppendFormat(L"&signature=%s", CString(signature));
 					}
+				};
+
+				if (SelectBestProfile(final_video_itag, final_video_ext, itag, youtubeVideoSets, youtubeProfiles::VIDEO_PROFILE)) {
+					final_video_url = url;
+					SignatureDecode(final_video_url);
+				} else if (SelectBestProfile(final_audio_itag, final_audio_ext, itag, youtubeAudioSets, youtubeProfiles::AUDIO_PROFILE)) {
+					final_audio_url = url;
+					SignatureDecode(final_audio_url);
 				}
 			}
 		}
 
 		if (y_fields) {
 			y_fields->title = FixHtmlSymbols(Title);
-			y_fields->fname = y_fields->title + final_ext;
+			y_fields->fname = y_fields->title + final_video_ext;
 			FixFilename(y_fields->fname);
 		}
 
-		if (!final_url.IsEmpty()) {
-			final_url.Replace(L"http://", L"https://");
+		if (!final_video_url.IsEmpty()) {
+			final_video_url.Replace(L"http://", L"https://");
 
 			if (!videoId.IsEmpty() && y_fields) {
 				HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
@@ -415,7 +449,7 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 									CStringA sTitle = snippet["title"].asCString();
 									if (!sTitle.IsEmpty()) {
 										y_fields->title = FixHtmlSymbols(UTF8To16(sTitle));
-										y_fields->fname = y_fields->title + final_ext;
+										y_fields->fname = y_fields->title + final_video_ext;
 										FixFilename(y_fields->fname);
 									}
 								}
@@ -521,7 +555,7 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 				}
 			}
 
-			return final_url;
+			return final_video_url;
 		}
 	}
 

@@ -54,7 +54,7 @@ struct YOUTUBE_PROFILES {
 	LPCTSTR		ext;
 };
 
-static const YOUTUBE_PROFILES youtubeProfiles[] = {
+static const YOUTUBE_PROFILES youtubeVideoProfiles[] = {
 	{22,	y_mp4,				 720,	_T("mp4") },
 	{18,	y_mp4,				 360,	_T("mp4") },
 	{43,	y_webm,				 360,	_T("webm")},
@@ -87,12 +87,18 @@ static const YOUTUBE_PROFILES youtubeProfiles[] = {
 	{266,	y_dash_mp4_video,	2160,	_T("mp4") }, // h264, 30fps
 	{299,	y_dash_mp4_video,	1080,	_T("mp4") }, // h264, 60fps
 	{298,	y_dash_mp4_video,	 720,	_T("mp4") }, // h264, 60fps
-	// audio
+#endif
+};
+
+static const YOUTUBE_PROFILES youtubeAudioProfiles[] = {
+	{251,	y_webm_audio,		 256,	_T("webm")},
+	{250,	y_webm_audio,		  64,	_T("webm")},
+	{249,	y_webm_audio,		  48,	_T("webm")},
+	{172,	y_webm_audio,		 192,	_T("webm")},
+	{171,	y_webm_audio,		 128,	_T("webm")},
+#if ENABLE_YOUTUBE_DASH
 	{141,	y_dash_mp4_audio,	 256,	_T("m4a") },
 	{140,	y_dash_mp4_audio,	 128,	_T("m4a") },
-#endif
-#if 0
-	{171,	y_webm_audio,		128,	_T("webm")}
 #endif
 };
 

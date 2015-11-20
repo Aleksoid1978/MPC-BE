@@ -69,9 +69,9 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	m_iYoutubeFormatCtrl.Clear();
 
-	for (size_t i = 0; i < _countof(youtubeProfiles); i++) {
+	for (size_t i = 0; i < _countof(youtubeVideoProfiles); i++) {
 		CString fmt;
-		switch (youtubeProfiles[i].type) {
+		switch (youtubeVideoProfiles[i].type) {
 		case y_mp4:
 			fmt = L"MP4";
 			break;
@@ -106,10 +106,10 @@ BOOL CPPageYoutube::OnInitDialog()
 		default:
 			continue;
 		}
-		fmt.AppendFormat(_T("@%dp"), youtubeProfiles[i].quality);
+		fmt.AppendFormat(_T("@%dp"), youtubeVideoProfiles[i].quality);
 
 		m_iYoutubeFormatCtrl.AddString(fmt);
-		m_iYoutubeFormatCtrl.SetItemData(i, youtubeProfiles[i].iTag);
+		m_iYoutubeFormatCtrl.SetItemData(i, youtubeVideoProfiles[i].iTag);
 	}
 
 	int j = 0;
