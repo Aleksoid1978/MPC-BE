@@ -92,12 +92,15 @@ BOOL CPPageYoutube::OnInitDialog()
 			fmt = L"3D WebM";
 			break;
 #endif
+		case y_webm_video:
+			fmt = L"WebM(video)";
+			break;
+		case y_webm_video_60fps:
+			fmt = L"WebM(video) 60fps";
+			break;
 #if ENABLE_YOUTUBE_DASH
 		case y_dash_mp4_video:
 			fmt = L"DASH MP4";
-			break;
-		case y_dash_webm_video:
-			fmt = L"DASH WebM";
 			break;
 #endif
 		default:

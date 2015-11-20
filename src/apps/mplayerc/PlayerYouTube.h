@@ -42,8 +42,9 @@ enum ytype {
 	y_apple_live,
 	y_dash_mp4_video,
 	y_dash_mp4_audio,
-	y_dash_webm_video,
-	y_dash_webm_audio,
+	y_webm_video,
+	y_webm_video_60fps,
+	y_webm_audio,
 };
 
 struct YOUTUBE_PROFILES {
@@ -60,6 +61,14 @@ static const YOUTUBE_PROFILES youtubeProfiles[] = {
 	{5,		y_flv,				 240,	_T("flv") },
 	{36,	y_3gp,				 240,	_T("3gp") },
 	{17,	y_3gp,				 144,	_T("3gp") },
+	// VP9, 60fps
+	{315,	y_webm_video_60fps,	2160,	_T("webm")},
+	{308,	y_webm_video_60fps,	1440,	_T("webm")},
+	{303,	y_webm_video_60fps,	1080,	_T("webm")},
+	// VP9
+	{313,	y_webm_video,		2160,	_T("webm")},
+	{271,	y_webm_video,		1440,	_T("webm")},
+	{248,	y_webm_video,		1080,	_T("webm")},
 #if ENABLE_YOUTUBE_3D
 	{84,	y_3d_mp4,			 720,	_T("mp4") },
 	{83,	y_3d_mp4,			 480,	_T("mp4") },
@@ -78,22 +87,12 @@ static const YOUTUBE_PROFILES youtubeProfiles[] = {
 	{266,	y_dash_mp4_video,	2160,	_T("mp4") }, // h264, 30fps
 	{299,	y_dash_mp4_video,	1080,	_T("mp4") }, // h264, 60fps
 	{298,	y_dash_mp4_video,	 720,	_T("mp4") }, // h264, 60fps
-	//
-	{272,	y_dash_webm_video,	2160,	_T("webm")},
-	{248,	y_dash_webm_video,	1080,	_T("webm")},
-	{247,	y_dash_webm_video,	 720,	_T("webm")},
-	{244,	y_dash_webm_video,	 480,	_T("webm")},
-	{243,	y_dash_webm_video,	 360,	_T("webm")},
-	{242,	y_dash_webm_video,	 240,	_T("webm")},
-	// VP9, 60fps
-	{315,	y_dash_webm_video,	2160,	_T("webm")}, // VP9, 60fps
-	{308,	y_dash_webm_video,	1440,	_T("webm")}, // VP9, 60fps
-	{303,	y_dash_webm_video,	1080,	_T("webm")}, // VP9, 60fps
-	{302,	y_dash_webm_video,	 720,	_T("webm")}, // VP9, 60fps
 	// audio
 	{141,	y_dash_mp4_audio,	 256,	_T("m4a") },
 	{140,	y_dash_mp4_audio,	 128,	_T("m4a") },
-	{171,	y_dash_webm_audio,	 128,	_T("webm")},
+#endif
+#if 0
+	{171,	y_webm_audio,		128,	_T("webm")}
 #endif
 };
 
