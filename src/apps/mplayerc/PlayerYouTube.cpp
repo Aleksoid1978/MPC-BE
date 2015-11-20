@@ -27,7 +27,6 @@
 #define MATCH_STREAM_MAP_START		"\"url_encoded_fmt_stream_map\":\""
 #define MATCH_ADAPTIVE_FMTS_START	"\"adaptive_fmts\":\""
 #define MATCH_WIDTH_START			"meta property=\"og:video:width\" content=\""
-#define MATCH_DASHMPD_START			"\"dashmpd\":\"http:\\/\\/www.youtube.com\\/api\\/manifest\\/dash\\/"
 #define MATCH_HLSVP_START			"\"hlsvp\":\""
 #define MATCH_END					"\""
 
@@ -52,7 +51,6 @@ bool SelectBestProfile(int &itag_final, CString &ext_final, int itag_current, co
 	const YOUTUBE_PROFILES* current = getProfile(itag_current);
 
 	if (current->iTag <= 0
-			|| current->type != sets->type
 			|| current->quality > sets->quality) {
 		return false;
 	}
@@ -187,22 +185,11 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 		int hlsvp_start = 0;
 		int hlsvp_len = 0;
 
-		int nMaxWidth = 0;
-
 		CAppSettings& sApp = AfxGetAppSettings();
 		const YOUTUBE_PROFILES* youtubeSets = getProfile(sApp.iYoutubeTag);
 		if (youtubeSets->iTag == 0) {
 			youtubeSets = getProfile(22);
 		}
-
-#if 0
-		BOOL bIsFullHD = FALSE;
-		if (sApp.laylisiYoutubeTag == 37) {
-			// Full HD resolution, format .MP4
-			match_itag	= FALSE;
-			bIsFullHD	= TRUE;
-		}
-#endif
 
 		CString videoId;
 
@@ -268,9 +255,7 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 
 					// optimization - to not download the entire page
 					if (stream_map_len && adaptive_fmts_len) {
-						if (nMaxWidth != 1920) {
-							break;
-						}
+						break;
 					}
 
 					if (hlsvp_len) {
@@ -332,7 +317,7 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS* y_fields, CSubtitleItemList* 
 		Explode(strA, linesA, ',');
 
 		POSITION posLine = linesA.GetHeadPosition();
-		while (posLine && final_url.IsEmpty()) {
+		while (posLine) {
 			CStringA &lineA = linesA.GetNext(posLine);
 
 			int itag = 0;
