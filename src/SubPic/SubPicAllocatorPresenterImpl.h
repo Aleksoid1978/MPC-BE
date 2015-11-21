@@ -57,7 +57,7 @@ protected:
 	bool m_bDeviceResetRequested;
 	bool m_bPendingResetDevice;
 
-	void InitMaxSubtitleTextureSize(int maxSize, CSize desktopSize);
+	void InitMaxSubtitleTextureSize(int maxWidth, CSize desktopSize);
 	void AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, SubPicDesc* pTarget = NULL);
 	void AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget);
 
