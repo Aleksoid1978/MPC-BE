@@ -563,6 +563,7 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 	bool fForkedSomewhere = false;
 
 	CStringW fileName;
+	CStringW splitterPinName;
 	CStringW pinName;
 
 	IPin* pPin = (IPin*)this;
@@ -573,8 +574,39 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 		pBF = GetFilterFromPin(pPin);
 	}
 	while (pPin && pBF) {
-		if (IsSplitter(pBF)) {
+		BOOL bHaveStream = FALSE;
+		BeginEnumMediaTypes(pPin, pEMT, pmt) {
+			if (pmt->majortype == MEDIATYPE_Stream) {
+				bHaveStream = TRUE;
+				break;
+			}
+		}
+		EndEnumMediaTypes(pmt)
+
+		if (!bHaveStream) {
 			pinName = GetPinName(pPin);
+
+			if (CComQIPtr<IAMStreamSelect> pSSF = pBF) {
+				DWORD cStreams = 0;
+				hr = pSSF->Count(&cStreams);
+				if (SUCCEEDED(hr) && cStreams == 1) {
+					AM_MEDIA_TYPE* pmt = NULL;
+					WCHAR* pszName = NULL;
+					hr = pSSF->Info(0, &pmt, NULL, NULL, NULL, &pszName, NULL, NULL);
+					if (SUCCEEDED(hr) && pmt && pmt->majortype == MEDIATYPE_Audio) {
+						pinName = pszName;
+					}
+
+					DeleteMediaType(pmt);
+					if (pszName) {
+						CoTaskMemFree(pszName);
+					}
+				}
+			}
+		}
+
+		if (IsSplitter(pBF)) {
+			splitterPinName = !bHaveStream ? pinName : GetPinName(pPin);
 		}
 
 		CLSID clsid = GetCLSID(pBF);
@@ -600,13 +632,13 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 						fileName = fn;
 					}
 				} else {
-					fileName = L"Audio";
+					fileName = pinName.IsEmpty() ? L"Audio" : pinName;
 				}
 
 				// Haali & LAVFSplitter return only one "Audio" pin name, cause CMainFrame::OnInitMenuPopup lookup find the wrong popmenu,
 				// add space at the end to prevent this, internal filter never return "Audio" only.
-				if (!pinName.IsEmpty()) {
-					fileName = pinName + L" ";
+				if (!splitterPinName.IsEmpty()) {
+					fileName = splitterPinName + L" ";
 				}
 
 				WCHAR* pName = DNew WCHAR[fileName.GetLength() + 1];
