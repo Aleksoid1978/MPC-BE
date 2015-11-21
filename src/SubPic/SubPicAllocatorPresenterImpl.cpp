@@ -72,9 +72,9 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::NonDelegatingQueryInterface(REFIID r
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
-void CSubPicAllocatorPresenterImpl::InitMaxSubtitleTextureSize(int maxSize, CSize desktopSize)
+void CSubPicAllocatorPresenterImpl::InitMaxSubtitleTextureSize(int maxWidth, CSize desktopSize)
 {
-	switch (maxSize) {
+	switch (maxWidth) {
 		case 0:
 			m_maxSubtitleTextureSize = desktopSize;
 			break;
