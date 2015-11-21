@@ -925,18 +925,20 @@ STDMETHODIMP CStreamSwitcherInputPin::NewSegment(REFERENCE_TIME tStart, REFERENC
 
 	HRESULT hr = pSSF->DeliverNewSegment(tStart, tStop, dRate);
 	if (hr == S_OK) {
-		// hack - create and send an "empty" packet to make sure that the playback started is 100%
-		const WAVEFORMATEX* out_wfe = (WAVEFORMATEX*)pOut->CurrentMediaType().pbFormat;
-		const SampleFormat out_sampleformat = GetSampleFormat(out_wfe);
-		if (out_sampleformat != SAMPLE_FMT_NONE) {
-			CComPtr<IMediaSample> pOutSample;
-			if (SUCCEEDED(InitializeOutputSample(NULL, &pOutSample))
-					&& SUCCEEDED(pOutSample->SetActualDataLength(0))) {
-				REFERENCE_TIME rtStart = 0, rtStop = 0;
-				pOutSample->SetTime(&rtStart, &rtStop);
+		const CLSID clsid = GetCLSID(pOut->GetConnected());
+		if (clsid != CLSID_ReClock) {
+			// hack - create and send an "empty" packet to make sure that the playback started is 100%
+			const WAVEFORMATEX* out_wfe = (WAVEFORMATEX*)pOut->CurrentMediaType().pbFormat;
+			const SampleFormat out_sampleformat = GetSampleFormat(out_wfe);
+			if (out_sampleformat != SAMPLE_FMT_NONE) {
+				CComPtr<IMediaSample> pOutSample;
+				if (SUCCEEDED(InitializeOutputSample(NULL, &pOutSample))
+						&& SUCCEEDED(pOutSample->SetActualDataLength(0))) {
+					REFERENCE_TIME rtStart = 0, rtStop = 0;
+					pOutSample->SetTime(&rtStart, &rtStop);
 
-				HRESULT hr2 = pOut->Deliver(pOutSample);
-				UNREFERENCED_PARAMETER(hr2);
+					pOut->Deliver(pOutSample);
+				}
 			}
 		}
 	}
