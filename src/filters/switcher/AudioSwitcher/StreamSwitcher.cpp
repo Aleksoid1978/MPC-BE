@@ -593,10 +593,14 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 				fileName = pszName;
 				CoTaskMemFree(pszName);
 
-				fileName.Replace('\\', '/');
-				CStringW fn = fileName.Mid(fileName.ReverseFind('/')+1);
-				if (!fn.IsEmpty()) {
-					fileName = fn;
+				if (!::PathIsURL(fileName)) {
+					fileName.Replace('\\', '/');
+					CStringW fn = fileName.Mid(fileName.ReverseFind('/') + 1);
+					if (!fn.IsEmpty()) {
+						fileName = fn;
+					}
+				} else {
+					fileName = L"Audio";
 				}
 
 				// Haali & LAVFSplitter return only one "Audio" pin name, cause CMainFrame::OnInitMenuPopup lookup find the wrong popmenu,
@@ -605,12 +609,10 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 					fileName = pinName + L" ";
 				}
 
-				WCHAR* pName = DNew WCHAR[fileName.GetLength()+1];
+				WCHAR* pName = DNew WCHAR[fileName.GetLength() + 1];
 				if (pName) {
 					wcscpy_s(pName, fileName.GetLength() + 1, fileName);
-					if (m_pName) {
-						delete [] m_pName;
-					}
+					SAFE_DELETE_ARRAY(m_pName);
 					m_pName = pName;
 				}
 			}
