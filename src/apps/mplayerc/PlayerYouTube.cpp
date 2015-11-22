@@ -297,109 +297,11 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& 
 
 		CAtlArray<youtubeFuncType> JSFuncs;
 		CAtlArray<int> JSFuncArgs;
+		BOOL bJSParsed = FALSE;
 		CString JSUrl = UTF8To16(GetEntry(data, MATCH_JS_START, MATCH_END));
 		if (!JSUrl.IsEmpty()) {
 			JSUrl.Replace(L"\\/", L"/");
 			JSUrl = L"https:" + JSUrl;
-
-			f = InternetOpenUrl(s, JSUrl, NULL, 0, INTERNET_OPEN_FALGS, 0);
-			if (f) {
-				char* data = NULL;
-				DWORD dataSize = 0;
-				InternetReadData(f, &data, dataSize);
-				InternetCloseHandle(f);
-				if (dataSize) {
-					const CStringA funcName = GetEntry(data, "\"signature\",", "(");
-					if (!funcName.IsEmpty()) {
-						const CStringA varfunc = "var " + funcName + "=function(a){";
-						const CStringA funcBody = GetEntry(data, varfunc, "};");
-						if (!funcBody.IsEmpty()) {
-							CStringA funcGroup;
-							CAtlList<CStringA> funcList;
-							CAtlList<CStringA> funcCodeList;
-
-							CAtlList<CStringA> code;
-							Explode(funcBody, code, ';');
-
-							POSITION pos = code.GetHeadPosition();
-							while (pos) {
-								const CStringA &line = code.GetNext(pos);
-
-								if (line.Find("split") >= 0 || line.Find("return") >= 0) {
-									continue;
-								}
-
-								funcList.AddTail(line);
-
-								if (funcGroup.IsEmpty()) {
-									int k = line.Find('.');
-									if (k > 0) {
-										funcGroup = line.Left(k);
-									}
-								}
-							}
-
-							if (!funcGroup.IsEmpty()) {
-								CStringA tmp = "var " + funcGroup + "={";
-								tmp = GetEntry(data, tmp, "};");
-								if (!tmp.IsEmpty()) {
-									Explode(tmp, funcCodeList, "},");
-								}
-							}
-
-							if (!funcList.IsEmpty() && !funcCodeList.IsEmpty()) {
-								funcGroup += '.';
-
-								POSITION pos = funcList.GetHeadPosition();
-								while (pos) {
-									const CStringA& func = funcList.GetNext(pos);
-
-									int funcArg = 0;
-									CStringA funcArgs = GetEntry(func, "(", ")");
-									CAtlList<CStringA> args;
-									Explode(funcArgs, args, ',');
-									if (args.GetCount() >= 1) {
-										CStringA& arg = args.GetTail();
-										int value = 0;
-										if (sscanf_s(arg, "%d", &value) == 1) {
-											funcArg = value;
-										}
-									}
-
-									CStringA funcName = GetEntry(func, funcGroup, "(");
-									funcName += ":function";
-
-									youtubeFuncType funcType = youtubeFuncType::funcNONE;
-
-									POSITION pos2 = funcCodeList.GetHeadPosition();
-									while (pos2) {
-										const CStringA& funcCode = funcCodeList.GetNext(pos2);
-										if (funcCode.Find(funcName) >= 0) {
-											if (funcCode.Find("splice") > 0) {
-												funcType = youtubeFuncType::funcDELETE;
-											}
-											else if (funcCode.Find("reverse") > 0) {
-												funcType = youtubeFuncType::funcREVERSE;
-											}
-											else if (funcCode.Find(".length]") > 0) {
-												funcType = youtubeFuncType::funcSWAP;
-											}
-											break;
-										}
-									}
-
-									if (funcType != youtubeFuncType::funcNONE) {
-										JSFuncs.Add(funcType);
-										JSFuncArgs.Add(funcArg);
-									}
-								}
-							}
-						}
-					}
-
-					free(data);
-				}
-			}
 		}
 
 		char *tmp = DNew char[stream_map_len + adaptive_fmts_len + 2];
@@ -467,7 +369,111 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& 
 
 			if (itag) {
 				auto SignatureDecode = [&](CString& final_url) {
-					if (!signature.IsEmpty() && !JSFuncs.IsEmpty()) {
+					if (!signature.IsEmpty() && !JSUrl.IsEmpty()) {
+						if (!bJSParsed) {
+							bJSParsed = TRUE;
+							f = InternetOpenUrl(s, JSUrl, NULL, 0, INTERNET_OPEN_FALGS, 0);
+							if (f) {
+								char* data = NULL;
+								DWORD dataSize = 0;
+								InternetReadData(f, &data, dataSize);
+								InternetCloseHandle(f);
+								if (dataSize) {
+									const CStringA funcName = GetEntry(data, "\"signature\",", "(");
+									if (!funcName.IsEmpty()) {
+										const CStringA varfunc = "var " + funcName + "=function(a){";
+										const CStringA funcBody = GetEntry(data, varfunc, "};");
+										if (!funcBody.IsEmpty()) {
+											CStringA funcGroup;
+											CAtlList<CStringA> funcList;
+											CAtlList<CStringA> funcCodeList;
+
+											CAtlList<CStringA> code;
+											Explode(funcBody, code, ';');
+
+											POSITION pos = code.GetHeadPosition();
+											while (pos) {
+												const CStringA &line = code.GetNext(pos);
+
+												if (line.Find("split") >= 0 || line.Find("return") >= 0) {
+													continue;
+												}
+
+												funcList.AddTail(line);
+
+												if (funcGroup.IsEmpty()) {
+													int k = line.Find('.');
+													if (k > 0) {
+														funcGroup = line.Left(k);
+													}
+												}
+											}
+
+											if (!funcGroup.IsEmpty()) {
+												CStringA tmp = "var " + funcGroup + "={";
+												tmp = GetEntry(data, tmp, "};");
+												if (!tmp.IsEmpty()) {
+													Explode(tmp, funcCodeList, "},");
+												}
+											}
+
+											if (!funcList.IsEmpty() && !funcCodeList.IsEmpty()) {
+												funcGroup += '.';
+
+												POSITION pos = funcList.GetHeadPosition();
+												while (pos) {
+													const CStringA& func = funcList.GetNext(pos);
+
+													int funcArg = 0;
+													CStringA funcArgs = GetEntry(func, "(", ")");
+													CAtlList<CStringA> args;
+													Explode(funcArgs, args, ',');
+													if (args.GetCount() >= 1) {
+														CStringA& arg = args.GetTail();
+														int value = 0;
+														if (sscanf_s(arg, "%d", &value) == 1) {
+															funcArg = value;
+														}
+													}
+
+													CStringA funcName = GetEntry(func, funcGroup, "(");
+													funcName += ":function";
+
+													youtubeFuncType funcType = youtubeFuncType::funcNONE;
+
+													POSITION pos2 = funcCodeList.GetHeadPosition();
+													while (pos2) {
+														const CStringA& funcCode = funcCodeList.GetNext(pos2);
+														if (funcCode.Find(funcName) >= 0) {
+															if (funcCode.Find("splice") > 0) {
+																funcType = youtubeFuncType::funcDELETE;
+															}
+															else if (funcCode.Find("reverse") > 0) {
+																funcType = youtubeFuncType::funcREVERSE;
+															}
+															else if (funcCode.Find(".length]") > 0) {
+																funcType = youtubeFuncType::funcSWAP;
+															}
+															break;
+														}
+													}
+
+													if (funcType != youtubeFuncType::funcNONE) {
+														JSFuncs.Add(funcType);
+														JSFuncArgs.Add(funcArg);
+													}
+												}
+											}
+										}
+									}
+
+									free(data);
+								}
+							}
+						}
+					}
+
+					if (!JSFuncs.IsEmpty()) {
 						auto Delete = [](CStringA& a, int b) {
 							a.Delete(0, b);
 						};
