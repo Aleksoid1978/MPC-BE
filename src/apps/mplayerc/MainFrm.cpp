@@ -11613,7 +11613,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		} else {
 			CString tmpName = m_strUrl = fn;
 			if (PlayerYouTubeCheck(fn)) {
-				tmpName = PlayerYouTube(fn, &m_youtubeFields, &pOFD->subs);
+				tmpName = PlayerYouTube(fn, m_youtubeFields, pOFD->subs);
 				m_strUrl = tmpName;
 
 				if (s.iYoutubeSource == 0 && CString(tmpName).MakeLower().Find(L".m3u8") == -1) {
