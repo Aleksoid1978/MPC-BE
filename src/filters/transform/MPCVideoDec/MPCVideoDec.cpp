@@ -2350,6 +2350,10 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 {
 	DXVA2_ExtendedFormat fmt = { 0 };
 
+	if (m_FormatConverter.GetOutPixFormat() == PixFmt_RGB32) {
+		return fmt;
+	}
+
 	// Color Primaries
 	switch(ctx->color_primaries) {
 		case AVCOL_PRI_BT709:
@@ -2668,12 +2672,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 		CComPtr<IMediaSample> pOut;
 		BYTE* pDataOut = NULL;
-		DXVA2_ExtendedFormat dxvaExtFormat;
-		if (m_FormatConverter.GetOutPixFormat() == PixFmt_RGB32) { // RGB output
-			dxvaExtFormat.value = 0;
-		} else {
-			dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
-		}
+		DXVA2_ExtendedFormat dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
 		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut, GetFrameDuration(), &dxvaExtFormat)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
 			Continue;
 		}
