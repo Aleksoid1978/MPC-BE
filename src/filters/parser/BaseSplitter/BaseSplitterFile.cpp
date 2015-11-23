@@ -29,7 +29,6 @@
 
 CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, int fmode)
 	: m_pAsyncReader(pAsyncReader)
-	, m_hThread(NULL)
 {
 	if (!m_pAsyncReader) {
 		hr = E_UNEXPECTED;
@@ -69,20 +68,18 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, in
 	m_len		= m_fmode == FM_STREAM ? available : total;
 	m_available	= available;
 
-
-	if (m_fmode == FM_FILE && (fmode & FM_FILE_VAR)) {
-		m_evStop.Reset();
-		DWORD ThreadId = 0;
-		m_hThread = ::CreateThread(NULL, 0, StaticThreadProc, (LPVOID)this, CREATE_SUSPENDED, &ThreadId);
-		UNREFERENCED_PARAMETER(ThreadId);
-		SetThreadPriority(m_hThread, THREAD_PRIORITY_BELOW_NORMAL);
-		ResumeThread(m_hThread);
-	}
-
 	int cachelen = 64 * KILOBYTE; // TODO: specify when streaming
 	if (!SetCacheSize(cachelen)) {
 		hr = E_OUTOFMEMORY;
 		return;
+	}
+
+	if (m_fmode == FM_FILE_DL
+			|| m_fmode == FM_STREAM
+			|| (m_fmode == FM_FILE && (fmode & FM_FILE_VAR))) {
+		m_evStopThreadLength.Reset();
+		m_ThreadLength = std::thread([this] { ThreadUpdateLength(); });
+		::SetThreadPriority(m_ThreadLength.native_handle(), THREAD_PRIORITY_LOWEST);
 	}
 
 	hr = S_OK;
@@ -90,40 +87,45 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, in
 
 CBaseSplitterFile::~CBaseSplitterFile()
 {
-	if (m_hThread != NULL) {
-		m_evStop.Set();
-		if (WaitForSingleObject(m_hThread, 500) == WAIT_TIMEOUT) {
-			TerminateThread(m_hThread, 0xDEAD);
-		}
+	if (m_ThreadLength.joinable()) {
+		m_evStopThreadLength.Set();
+		m_ThreadLength.join();
 	}
 }
 
-DWORD WINAPI CBaseSplitterFile::StaticThreadProc(LPVOID lpParam)
+void CBaseSplitterFile::ThreadUpdateLength()
 {
-	return static_cast<CBaseSplitterFile*>(lpParam)->ThreadProc();
-}
+	HANDLE hEvts[] = { m_evStopThreadLength };
 
-DWORD CBaseSplitterFile::ThreadProc()
-{
-	HANDLE hEvts[] = { m_evStop };
-
-	for (int i = 0; i < 10; i++) {
-		DWORD dwObject = WaitForMultipleObjects(_countof(hEvts), hEvts, FALSE, 1000);
-		if (dwObject == WAIT_OBJECT_0) {
-			return 0;
+	int count = 0;
+	for (;;) {
+		DWORD dwObject = WaitForMultipleObjects(1, hEvts, FALSE, 1000);
+		if (dwObject == WAIT_OBJECT_0
+				|| (m_fmode == FM_FILE && count >= 10)) {
+			return;
 		} else {
 			LONGLONG total, available = 0;
 			m_pAsyncReader->Length(&total, &available);
-			if (m_available && m_available < available) {
-				// local file whose size increases
-				m_fmode = FM_FILE_VAR;
-
-				return 0;
+			if (m_fmode & (FM_FILE_VAR | FM_STREAM)) {
+				m_len = available;
+			} else if (m_fmode == FM_FILE) {
+				if (m_available && m_available < available) {
+					m_fmode = FM_FILE_VAR;
+				}
+				count++;
+			} else {
+				m_len = total;
+				if (total == available) {
+					m_fmode = FM_FILE;
+					return;
+				}
 			}
+
+			m_available = available;
 		}
 	}
 
-	return 0;
+	return;
 }
 
 bool CBaseSplitterFile::SetCacheSize(int cachelen)
@@ -144,40 +146,12 @@ __int64 CBaseSplitterFile::GetPos()
 	return m_pos - (m_bitlen >> 3);
 }
 
-void CBaseSplitterFile::UpdateLength()
-{
-	if (m_fmode == FM_FILE) {
-		return;
-	}
-
-	__int64 total = 0;
-	__int64 available = 0;
-	HRESULT hr = m_pAsyncReader->Length(&total, &available);
-
-	m_available = available;
-	// TODO
-	//if (m_available != available) {
-	//	m_available = available;
-	//	m_bConnectionLost = false;
-	//}
-
-	if (m_fmode & (FM_FILE_VAR | FM_STREAM)) {
-		m_len = available;
-	} else {
-		m_len = total;
-		if (total == available) {
-			m_fmode = FM_FILE;
-		}
-	}
-}
-
 bool CBaseSplitterFile::WaitData(__int64 pos)
 {
 	int n = 0;
 	while (pos > m_available) {
 		__int64 available = m_available;
 		Sleep(1000); // wait for 1 second until the data is loaded (TODO: specify size of the buffer when streaming)
-		UpdateLength();
 
 		if (available == m_available) {
 			if (++n >= 10) {
@@ -199,29 +173,21 @@ bool CBaseSplitterFile::WaitData(__int64 pos)
 
 __int64 CBaseSplitterFile::GetAvailable()
 {
-	UpdateLength();
-
 	return m_available;
 }
 
 __int64 CBaseSplitterFile::GetLength()
 {
-	UpdateLength();
-
 	return m_len;
 }
 
 __int64 CBaseSplitterFile::GetRemaining()
 {
-	UpdateLength();
-
 	return m_bConnectionLost ? 0 : m_len - GetPos();
 }
 
 void CBaseSplitterFile::Seek(__int64 pos)
 {
-	UpdateLength();
-
 	m_pos = min(max(0, pos), m_len);
 	BitFlush();
 }
@@ -260,9 +226,6 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 	CheckPointer(m_pAsyncReader, E_NOINTERFACE);
 
 	__int64 new_pos = m_pos + len;
-	if (m_fmode == FM_FILE_VAR || m_fmode == FM_FILE_DL) {
-		UpdateLength();
-	}
 	if (!IsStreaming() && (new_pos > m_len || m_bConnectionLost)) {
 		return E_FAIL;
 	}

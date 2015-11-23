@@ -22,6 +22,7 @@
 #pragma once
 
 #include <atlcoll.h>
+#include <thread>
 
 #define FM_FILE     1 // complete file or stream of known size (local file, VTS Reader, File Source (Async.))
 #define FM_FILE_DL  2 // downloading stream of known size (File Source (URL) for files < 4 GB)
@@ -47,17 +48,15 @@ class CBaseSplitterFile
 
 	HANDLE  m_hBreak          = NULL;
 
-	void UpdateLength();
 	bool WaitData(__int64 pos);
 
 	HRESULT Read(BYTE* pData, int len);
 	HRESULT SyncRead(BYTE* pData, int& len);
 
-	// thread to determine the local file whose size increases
-	DWORD ThreadProc();
-	static DWORD WINAPI StaticThreadProc(LPVOID lpParam);
-	HANDLE m_hThread;
-	CAMEvent m_evStop;
+	// thread to update the length of the stream
+	CAMEvent m_evStopThreadLength;
+	std::thread m_ThreadLength;
+	void ThreadUpdateLength();
 
 public:
 	CBaseSplitterFile(IAsyncReader* pReader, HRESULT& hr, int fmode = FM_FILE);
