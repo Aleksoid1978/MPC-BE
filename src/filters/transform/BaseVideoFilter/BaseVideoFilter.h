@@ -76,8 +76,6 @@ protected:
 	virtual bool IsVideoInterlaced() { return true; }
 	virtual void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats) PURE;
 
-	bool ConnectionWhitelistedForExtendedFormat(CLSID clsid);
-
 public:
 	CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, REFCLSID clsid, long cBuffers = 1);
 	virtual ~CBaseVideoFilter();

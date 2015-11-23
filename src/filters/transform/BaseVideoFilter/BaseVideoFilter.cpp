@@ -181,32 +181,6 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, 
 	return S_OK;
 }
 
-// Checks if the filter connected to the output pin possibly works with
-// extended format control flags. Returns true if it is the case,
-// false otherwise.
-bool CBaseVideoFilter::ConnectionWhitelistedForExtendedFormat(CLSID clsid)
-{
-	bool ret = false;
-
-	// The white list
-	static const CLSID whitelist[] = {
-		CLSID_VideoMixingRenderer,
-		CLSID_VideoMixingRenderer9,
-		CLSID_EnhancedVideoRenderer,
-		CLSID_madVR
-	};
-
-	// Check if the CLSID matches to anything on the white list
-	for (int i = 0; i < _countof(whitelist); ++i) {
-		if (clsid == whitelist[i]) {
-			ret = true;
-			break;
-		}
-	}
-
-	return ret;
-}
-
 HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool bForce, REFERENCE_TIME AvgTimePerFrame, DXVA2_ExtendedFormat* dxvaExtFormat, int RealWidth, int RealHeight)
 {
 	CMediaType& mt = m_pOutput->CurrentMediaType();
@@ -219,7 +193,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		}
 	}
 
-	bool extformatsupport = ConnectionWhitelistedForExtendedFormat(m_RenderClsid);
+	bool extformatsupport = (m_RenderClsid == CLSID_EnhancedVideoRenderer || m_RenderClsid == CLSID_madVR);
 
 	bool bNeedReconnect = bForce;
 	{
