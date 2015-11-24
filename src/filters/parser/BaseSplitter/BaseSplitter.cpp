@@ -595,6 +595,11 @@ STDMETHODIMP CBaseSplitterFilter::SetTimeFormat(const GUID* pFormat)
 STDMETHODIMP CBaseSplitterFilter::GetDuration(LONGLONG* pDuration)
 {
 	CheckPointer(pDuration, E_POINTER);
+
+	if (m_rtDuration <= 0) {
+		return E_FAIL;
+	}
+
 	*pDuration = m_rtDuration;
 	return S_OK;
 }

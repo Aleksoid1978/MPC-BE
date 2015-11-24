@@ -1217,12 +1217,19 @@ STDMETHODIMP CMpegSplitterFilter::GetDuration(LONGLONG* pDuration)
 	CheckPointer(pDuration, E_POINTER);
 	CheckPointer(m_pFile, VFW_E_NOT_CONNECTED);
 
+	REFERENCE_TIME rtDuration;
+
 	if (m_pFile->IsVariableSize()) {
-		*pDuration = m_rtNewStop = m_rtStop = m_rtDuration = UNITS * m_pFile->GetLength() / m_pFile->m_rate;
+		rtDuration = m_rtNewStop = m_rtStop = m_rtDuration = UNITS * m_pFile->GetLength() / m_pFile->m_rate;
 	} else {
-		*pDuration = m_rtDuration;
+		rtDuration = m_rtDuration;
 	}
 
+	if (rtDuration <= 0) {
+		return E_FAIL;
+	}
+
+	*pDuration = rtDuration;
 	return S_OK;
 }
 
