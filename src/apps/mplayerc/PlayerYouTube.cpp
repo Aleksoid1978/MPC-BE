@@ -196,7 +196,7 @@ enum youtubeFuncType {
 	funcSWAP
 };
 
-CString PlayerYouTube(CString url, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& subs)
+bool PlayerYouTube(CString url, CAtlList<CString>& urls, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& subs)
 {
 	if (PlayerYouTubeCheck(url)) {
 		char* data = NULL;
@@ -238,7 +238,7 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& 
 				InternetCloseHandle(s);
 			}
 
-			return url;
+			return false;
 		}
 
 		// url_encoded_fmt_stream_map
@@ -266,17 +266,10 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& 
 		}
 
 		if (!stream_map_len && !hlsvp_len) {
-			if (strstr(data, YOUTUBE_MP_URL)) {
-				// This is looks like Youtube page, but this page doesn't contains necessary information about video, so may be you have to register on google.com to view it.
-				url.Empty();
-			}
-
-			InternetCloseHandle(s);
 			free(data);
-			return url;
+			InternetCloseHandle(s);
+			return false;
 		}
-
-		CString Title = UTF8To16(GetEntry(data, "<title>", "</title>"));
 
 		if (hlsvp_len) {
 			char *tmp = DNew char[hlsvp_len + 1];
@@ -287,12 +280,14 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& 
 			CStringA strA = CStringA(tmp);
 			delete [] tmp;
 
-			CString url = UrlDecode(UrlDecode(strA));
+			url = UrlDecode(UrlDecode(strA));
 			url.Replace(L"\\/", L"/");
 
 			InternetCloseHandle(s);
 
-			return url;
+			urls.AddHead(url);
+
+			return true;
 		}
 
 		CAtlArray<youtubeFuncType> JSFuncs;
@@ -303,6 +298,8 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& 
 			JSUrl.Replace(L"\\/", L"/");
 			JSUrl = L"https:" + JSUrl;
 		}
+
+		const CString Title = UTF8To16(GetEntry(data, "<title>", "</title>"));
 
 		char *tmp = DNew char[stream_map_len + adaptive_fmts_len + 2];
 		memcpy(tmp, data + stream_map_start, stream_map_len);
@@ -528,6 +525,10 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& 
 		y_fields.fname = y_fields.title + final_video_ext;
 		FixFilename(y_fields.fname);
 
+		if (!final_audio_url.IsEmpty()) {
+			final_audio_url.Replace(L"http://", L"https://");
+		}
+
 		if (!final_video_url.IsEmpty()) {
 			final_video_url.Replace(L"http://", L"https://");
 
@@ -653,11 +654,22 @@ CString PlayerYouTube(CString url, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& 
 
 			InternetCloseHandle(s);
 
-			return final_video_url;
+			if (!final_video_url.IsEmpty()) {
+				urls.AddHead(final_video_url);
+
+				if (!final_audio_url.IsEmpty()) {
+					const YOUTUBE_PROFILES* current = getProfile(final_video_itag, youtubeProfiles::VIDEO_PROFILE);
+					if (current->quality >= 1080) {
+						urls.AddTail(final_audio_url);
+					}
+				}
+			}
+
+			return !urls.IsEmpty();
 		}
 	}
 
-	return url;
+	return false;
 }
 
 bool PlayerYouTubePlaylist(CString url, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay)

@@ -136,7 +136,7 @@ static DWORD strpos(char* h, char* n)
 
 bool PlayerYouTubeCheck(CString url);
 bool PlayerYouTubePlaylistCheck(CString url);
-CString PlayerYouTube(CString url, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& subs);
+bool PlayerYouTube(CString url, CAtlList<CString>& urls, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& subs);
 
 struct YoutubePlaylistItem {
 	CString url, title;

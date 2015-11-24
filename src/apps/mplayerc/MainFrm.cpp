@@ -11569,6 +11569,55 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	CAppSettings& s = AfxGetAppSettings();
 
 	bool bFirst = true;
+	m_youtubeFields.Empty();
+
+	CString youtubeUrl;
+	if (pOFD->fns.GetCount() == 1) {
+		CString fn = (CString)pOFD->fns.GetHead();
+		if (PlayerYouTubeCheck(fn)) {
+			youtubeUrl = fn;
+			CAtlList<CString> urls;
+			if (PlayerYouTube(fn, urls, m_youtubeFields, pOFD->subs)) {
+				pOFD->fns.RemoveAll();
+				POSITION pos = urls.GetHeadPosition();
+				while (pos) {
+					pOFD->fns.AddTail(urls.GetNext(pos));
+				}
+
+				if (pOFD->fns.GetCount() == 1) {
+					fn = (CString)pOFD->fns.GetHead();
+					if (s.iYoutubeSource == 0
+							&& CString(fn).MakeLower().Find(L".m3u8") == -1
+							&& !m_youtubeFields.fname.IsEmpty()) {
+						
+						m_fYoutubeThreadWork = TH_START;
+						m_YoutubeFile = fn;
+						m_YoutubeThread = AfxBeginThread(::YoutubeThreadProc, static_cast<LPVOID>(this), THREAD_PRIORITY_ABOVE_NORMAL);
+						while (m_fYoutubeThreadWork == TH_START && !m_fOpeningAborted) {
+							Sleep(50);
+						}
+						if (m_fOpeningAborted) {
+							m_fYoutubeThreadWork = TH_ERROR;
+							fn.Empty();
+							m_YoutubeFile.Empty();
+						}
+
+						if (m_fYoutubeThreadWork != TH_ERROR && ::PathFileExists(m_YoutubeFile)) {
+							fn = m_YoutubeFile;
+						} else {
+							fn.Empty();
+							m_YoutubeFile.Empty();
+						}
+
+						pOFD->fns.RemoveHeadNoReturn();
+						pOFD->fns.AddHead(fn);
+					}
+				}
+			}
+		}
+	}
+
+	m_strUrl.Empty();
 
 	POSITION pos = pOFD->fns.GetHeadPosition();
 	while (pos) {
@@ -11580,93 +11629,44 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			break;
 		}
 
-		m_strUrl.Empty();
-		m_youtubeFields.Empty();
-
 		HRESULT hr = S_OK;
 
-		CString local(fn);
-		local.MakeLower();
-		bool validateUrl = true;
+		CString tmp(fn);
+		tmp.MakeLower();
 
-		if (!PlayerYouTubeCheck(fn)) {
-			if (local.Find(_T("http://")) == 0 || local.Find(_T("www.")) == 0) {
-				// validate url before try to opening
-				if (local.Find(_T("www.")) == 0) {
-					local = _T("http://") + local;
+		if (tmp.Find(_T("http://")) == 0 || tmp.Find(_T("www.")) == 0) {
+			// validate http url before opening
+			if (tmp.Find(_T("www.")) == 0) {
+				tmp = _T("http://") + tmp;
+			}
+
+			CMPCSocket socket;
+			if (socket.Create()) {
+				socket.SetTimeOut(3000);
+				if (!socket.Connect(tmp, TRUE)) {
+					hr = VFW_E_NOT_FOUND;
 				}
 
-				CMPCSocket socket;
-				if (socket.Create()) {
-					socket.SetTimeOut(3000);
-					if (!socket.Connect(local, TRUE)) {
-						validateUrl = false;
-					}
-
-					socket.Close();
-				}
+				socket.Close();
 			}
 		}
 
-		if (!validateUrl) {
-			hr = VFW_E_NOT_FOUND;
-		} else {
-			CString tmpName = m_strUrl = fn;
-			if (PlayerYouTubeCheck(fn)) {
-				tmpName = PlayerYouTube(fn, m_youtubeFields, pOFD->subs);
-				m_strUrl = tmpName;
-
-				if (s.iYoutubeSource == 0 && CString(tmpName).MakeLower().Find(L".m3u8") == -1) {
-					if (!m_youtubeFields.fname.IsEmpty() && ::PathIsURL(tmpName)) {
-						m_fYoutubeThreadWork = TH_START;
-						m_YoutubeFile = tmpName;
-						m_YoutubeThread = AfxBeginThread(::YoutubeThreadProc, static_cast<LPVOID>(this), THREAD_PRIORITY_ABOVE_NORMAL);
-						while (m_fYoutubeThreadWork == TH_START && !m_fOpeningAborted) {
-							Sleep(50);
-						}
-						if (m_fOpeningAborted) {
-							m_fYoutubeThreadWork = TH_ERROR;
-							hr = E_ABORT;
-						}
-
-						if (m_fYoutubeThreadWork != TH_ERROR && ::PathFileExists(m_YoutubeFile)) {
-							tmpName = m_YoutubeFile;
-						} else {
-							tmpName.Empty();
-						}
-					}
-				}
-
-				if (CString(tmpName).MakeLower().Find(L".m3u8") > 0) {
-					CAtlList<CString> fns;
-					fns.AddTail(tmpName);
-					m_wndPlaylistBar.Open(fns, false);
-					m_wndPlaylistBar.SetFirstSelected();
-					m_strUrl = tmpName = m_wndPlaylistBar.GetCurFileName();
-				}
+		if (SUCCEEDED(hr)) {
+			TCHAR path[MAX_PATH] = {0};
+			BOOL bIsDirSet       = FALSE;
+			if (!::PathIsURL(fn) && ::GetCurrentDirectory(sizeof(path), path)) {
+				bIsDirSet = ::SetCurrentDirectory(GetFolderOnly(fn));
 			}
 
-			if (SUCCEEDED(hr)) {
-				TCHAR path[MAX_PATH]	= {0};
-				BOOL bIsDirSet			= FALSE;
-				if (!::PathIsURL(tmpName) && GetCurrentDirectory(sizeof(path), path)) {
-					bIsDirSet = SetCurrentDirectory(GetFolderOnly(tmpName));
-				}
-
-				if (bFirst) {
-					hr = m_pGB->RenderFile(tmpName, NULL);
-				} else if (CComQIPtr<IGraphBuilderAudio> pGBA = m_pGB) {
-					hr = pGBA->RenderAudioFile(tmpName);
-				}
-
-				if (bIsDirSet) {
-					SetCurrentDirectory(path);
-				}
+			if (bFirst) {
+				hr = m_pGB->RenderFile(fn, NULL);
+			} else if (CComQIPtr<IGraphBuilderAudio> pGBA = m_pGB) {
+				hr = pGBA->RenderAudioFile(fn);
 			}
-		}
 
-		if (m_strUrl.IsEmpty()) {
-			m_strUrl = fn;
+			if (bIsDirSet) {
+				::SetCurrentDirectory(path);
+			}
 		}
 
 		if (FAILED(hr)) {
@@ -11722,14 +11722,23 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 
+		if (!youtubeUrl.IsEmpty()) {
+			fn = youtubeUrl;
+		}
+
+		if (m_strUrl.IsEmpty()) {
+			m_strUrl = fn;
+		}
+
 		if ((CString(fn).MakeLower().Find(_T("://"))) < 0 && bFirst) {
 			if (s.fKeepHistory && s.fRememberFilePos && !s.NewFile(fn)) {
-				REFERENCE_TIME	rtPos = s.CurrentFilePosition()->llPosition;
+				REFERENCE_TIME rtPos = s.CurrentFilePosition()->llPosition;
 				if (m_pMS) {
 					m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
 				}
 			}
 		}
+
 		QueryPerformanceCounter(&m_LastSaveTime);
 
 		if (m_bUseSmartSeek && bFirst) {
