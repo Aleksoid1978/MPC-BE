@@ -38,7 +38,7 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWn
 	, m_clip(fn, pMainFrame->m_pGB)
 	, m_details(fn, pMainFrame->m_pGB, pMainFrame->m_pCAP, pMainFrame->m_pDVDI)
 	, m_res(fn, pMainFrame->m_pGB)
-	, m_mi(fn)
+	, m_mi(!pMainFrame->m_YoutubeFile.IsEmpty() ? pMainFrame->m_YoutubeFile : fn)
 	, m_fn(fn)
 	, m_bNeedInit(TRUE)
 	, m_nMinCX(0)
@@ -56,7 +56,9 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWn
 	}
 	EndEnumFilters;
 
-	if (m_fn.Find(_T("://")) < 0) {
+	const CString miFName = !pMainFrame->m_YoutubeFile.IsEmpty() ? pMainFrame->m_YoutubeFile : fn;
+
+	if (miFName.Find(_T("://")) == -1) {
 		AddPage(&m_mi);
 	}
 }
@@ -152,10 +154,9 @@ void CPPageFileInfoSheet::OnSaveAs()
 						 _T("Text Files (*.txt)|*.txt|All Files (*.*)|*.*||"), NULL);
 
 	if (filedlg.DoModal() == IDOK) {
-		TCHAR bom = (TCHAR)0xFEFF;
 		CFile mFile;
-
 		if (mFile.Open(filedlg.GetPathName(), CFile::modeCreate | CFile::modeWrite)) {
+			const TCHAR bom = 0xFEFF;
 			mFile.Write(&bom, sizeof(TCHAR));
 			mFile.Write(LPCTSTR(m_mi.MI_Text), m_mi.MI_Text.GetLength() * sizeof(TCHAR));
 			mFile.Close();
