@@ -281,7 +281,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	CComQIPtr<IDirectVobSub>		m_pDVS;
 
-	void EnableAutoVolumeControl(bool enable);
+	bool							m_bMainIsMPEGSplitter;
+
 	void SetBalance(int balance);
 
 	// subtitles
