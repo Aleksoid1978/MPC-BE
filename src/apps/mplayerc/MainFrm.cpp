@@ -677,7 +677,8 @@ CMainFrame::CMainFrame() :
 	m_wndToolBar(this),
 	m_wndSeekBar(this),
 	m_dMediaInfoFPS(0.0),
-	m_bAudioOnly(true)
+	m_bAudioOnly(true),
+	m_bMainIsMPEGSplitter(false)
 {
 	m_Lcd.SetVolumeRange(0, 100);
 	m_LastSaveTime.QuadPart = 0;
@@ -2164,13 +2165,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					case PM_FILE:
 						g_bExternalSubtitleTime = false;
 
-						REFERENCE_TIME stop;
-						m_wndSeekBar.GetRange(stop);
 						m_pMS->GetDuration(&rtDur);
-						if (llabs(stop - rtDur) > 10000000) {
-							// update segment stop time
-							m_pMS->SetPositions(NULL, AM_SEEKING_NoPositioning, &rtDur, AM_SEEKING_NoPositioning);
-						}
 						m_pMS->GetCurrentPosition(&rtNow);
 
 						// autosave subtitle sync after play
@@ -3109,10 +3104,13 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				REFERENCE_TIME rtDur = 0;
 				m_pMS->GetDuration(&rtDur);
 				m_wndPlaylistBar.SetCurTime(rtDur);
-				OnTimer(TIMER_STREAMPOSPOLLER);
-				OnTimer(TIMER_STREAMPOSPOLLER2);
-				SetupChapters();
-				LoadKeyFrames();
+
+				if (!m_bMainIsMPEGSplitter) {
+					//OnTimer(TIMER_STREAMPOSPOLLER);
+					//OnTimer(TIMER_STREAMPOSPOLLER2);
+					SetupChapters();
+					LoadKeyFrames();
+				}
 			}
 			break;
 			case EC_BG_AUDIO_CHANGED:
@@ -11825,6 +11823,13 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				if (!m_pMainSourceFilter) {
 					m_pMainSourceFilter = FindFilter(L"{D8980E15-E1F6-4916-A10F-D7EB4E9E10B8}", m_pGB); // AV Source
 				}
+
+				if (m_pMainSourceFilter) {
+					const CLSID clsid = GetCLSID(m_pMainSourceFilter);
+					if (clsid == __uuidof(CMpegSourceFilter) || clsid == __uuidof(CMpegSplitterFilter)) {
+						m_bMainIsMPEGSplitter = true;
+					}
+				}
 			}
 
 			if (fi.GetChapterCount()) {
@@ -13894,6 +13899,8 @@ void CMainFrame::CloseMediaPrivate()
 
 	m_VidDispName.Empty();
 	m_AudDispName.Empty();
+
+	m_bMainIsMPEGSplitter = false;
 
 	DbgLog((LOG_TRACE, 3, L"CMainFrame::CloseMediaPrivate() : end"));
 }

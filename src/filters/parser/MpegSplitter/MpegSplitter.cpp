@@ -492,6 +492,7 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_rtMin(0)
 	, m_rtMax(0)
 	, m_rtGlobalPCRTimeStamp(INVALID_TIME)
+	, m_length(0)
 	, m_ForcedSub(false)
 	, m_AC3CoreOnly(0)
 	, m_SubEmptyPin(false)
@@ -1199,6 +1200,8 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
+	m_length = m_pFile->GetLength();
+
 	if (m_rtPlaylistDuration) {
 		m_rtDuration = m_rtPlaylistDuration;
 	} else if (rt_IfoDuration) {
@@ -1214,23 +1217,19 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 STDMETHODIMP CMpegSplitterFilter::GetDuration(LONGLONG* pDuration)
 {
-	CheckPointer(pDuration, E_POINTER);
 	CheckPointer(m_pFile, VFW_E_NOT_CONNECTED);
 
-	REFERENCE_TIME rtDuration;
+	if (m_pFile->IsVariableSize() && m_length != m_pFile->GetLength()) {
+		const REFERENCE_TIME rtDuration = UNITS * m_pFile->GetLength() / m_pFile->m_rate;
+		if (llabs(rtDuration - m_rtDuration) >= UNITS) {
+			m_rtNewStop = m_rtStop = m_rtDuration = rtDuration;
+			NotifyEvent(EC_LENGTH_CHANGED, 0, 0);
+		}
 
-	if (m_pFile->IsVariableSize()) {
-		rtDuration = m_rtNewStop = m_rtStop = m_rtDuration = UNITS * m_pFile->GetLength() / m_pFile->m_rate;
-	} else {
-		rtDuration = m_rtDuration;
+		m_length = m_pFile->GetLength();
 	}
 
-	if (rtDuration <= 0) {
-		return E_FAIL;
-	}
-
-	*pDuration = rtDuration;
-	return S_OK;
+	return __super::GetDuration(pDuration);
 }
 
 bool CMpegSplitterFilter::DemuxInit()

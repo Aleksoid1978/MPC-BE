@@ -49,6 +49,8 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 
 	REFERENCE_TIME m_rtGlobalPCRTimeStamp;
 
+	__int64 m_length;
+
 	CAtlMap<DWORD, CAutoPtr<CPacket>> pPackets;
 
 	CString m_AudioLanguageOrder, m_SubtitlesLanguageOrder;
