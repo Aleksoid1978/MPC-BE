@@ -203,17 +203,17 @@ HRESULT CDXVA2Decoder::DeliverDXVAFrame()
 		AM_MEDIA_TYPE *sendmt = CreateMediaType(&mt);
 		BITMAPINFOHEADER *pBMI = NULL;
 		if (sendmt->formattype == FORMAT_VideoInfo) {
-			VIDEOINFOHEADER *vih	= (VIDEOINFOHEADER *)sendmt->pbFormat;
-			pBMI					= &vih->bmiHeader;
-			SetRect(&vih->rcSource, 0, 0, 0, 0);
+			VIDEOINFOHEADER *vih   = (VIDEOINFOHEADER *)sendmt->pbFormat;
+			pBMI                   = &vih->bmiHeader;
 		} else if (sendmt->formattype == FORMAT_VideoInfo2) {
-			VIDEOINFOHEADER2 *vih2	= (VIDEOINFOHEADER2 *)sendmt->pbFormat;
-			pBMI					= &vih2->bmiHeader;
-			SetRect(&vih2->rcSource, 0, 0, 0, 0);
+			VIDEOINFOHEADER2 *vih2 = (VIDEOINFOHEADER2 *)sendmt->pbFormat;
+			pBMI                   = &vih2->bmiHeader;
+		} else {
+			return E_FAIL;
 		}
 
-		biWidth		= pBMI->biWidth;
-		biHeight	= abs(pBMI->biHeight);
+		biWidth  = pBMI->biWidth;
+		biHeight = abs(pBMI->biHeight);
 		pSample->SetMediaType(sendmt);
 		DeleteMediaType(sendmt);
 		m_pFilter->SetSendMediaType(false);
