@@ -48,6 +48,8 @@ protected:
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 
+	virtual BOOL OnSetActive();
+
 	void UpdateSubRenderersList(int select);
 
 	DECLARE_MESSAGE_MAP()
