@@ -655,6 +655,8 @@ void CPPageVideo::OnDSRendererChange()
 			m_wndToolTip.UpdateTipText(L"", &m_cbVideoRenderer);
 	}
 
+	AfxGetAppSettings().iSelectedDSVideoRendererType = CurrentVR;
+
 	SetModified();
 }
 

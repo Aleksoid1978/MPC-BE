@@ -110,16 +110,20 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 		m_cbSubtitleRenderer.DeleteString(i);
 	}
 
-	const CAppSettings& s = AfxGetAppSettings();
-	CString str;
+	CAppSettings& s = AfxGetAppSettings();
 
 	m_cbSubtitleRenderer.AddString(ResStr(IDS_SUB_NOT_USE)); // SUBRNDT_NONE
 
-	str = ResStr(IDS_SUB_USE_INTERNAL);
+	CString str = ResStr(IDS_SUB_USE_INTERNAL);
+	int iDSVideoRendererType = s.iDSVideoRendererType;
+	if (s.iSelectedDSVideoRendererType != -1) {
+		s.iDSVideoRendererType = s.iSelectedDSVideoRendererType;
+	}
 	if (!s.IsISRSelect()) {
 		str += L" " + ResStr(IDS_REND_NOT_AVAILABLE);
 	}
 	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_ISR
+	s.iDSVideoRendererType = iDSVideoRendererType;
 
 	str = L"VSFilter/xy-VSFilter";
 	if (!IsCLSIDRegistered(CLSID_VSFilter_autoloading)) {
@@ -205,7 +209,7 @@ void CPPageSubtitles::OnUpdateISRSelect(CCmdUI* pCmdUI)
 BOOL CPPageSubtitles::OnSetActive()
 {
 	const CAppSettings& s = AfxGetAppSettings();
-	UpdateSubRenderersList(s.iSubtitleRenderer);
+	UpdateSubRenderersList(m_cbSubtitleRenderer.GetCurSel());
 
 	return CPPageBase::OnSetActive();
 }
