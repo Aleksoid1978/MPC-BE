@@ -16683,6 +16683,7 @@ bool CMainFrame::StopCapture()
 void CMainFrame::ShowOptions(int idPage)
 {
 	CAppSettings& s = AfxGetAppSettings();
+	s.iSelectedDSVideoRendererType = -1;
 
 	CPPageSheet options(ResStr(IDS_OPTIONS_CAPTION), m_pGB, GetModalParent(), idPage);
 
