@@ -130,7 +130,7 @@ BOOL CPPageVideo::OnInitDialog()
 	CAppSettings& s = AfxGetAppSettings();
 
 	CRenderersSettings& rs = s.m_RenderersSettings;
-	m_iVideoRendererType	= s.iDSVideoRendererType;
+	m_iVideoRendererType   = s.iDSVideoRendererType;
 
 	m_chkD3DFullscreen.SetCheck(s.fD3DFullscreen);
 	m_chk10bitOutput.EnableWindow(s.fD3DFullscreen);
