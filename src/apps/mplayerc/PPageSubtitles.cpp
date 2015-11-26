@@ -61,7 +61,7 @@ BOOL CPPageSubtitles::OnInitDialog()
 
 	SetCursor(m_hWnd, IDC_COMBO2, IDC_HAND);
 
-	CAppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
 	UpdateSubRenderersList(s.iSubtitleRenderer);
 
@@ -110,7 +110,7 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 		m_cbSubtitleRenderer.DeleteString(i);
 	}
 
-	CAppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 	CString str;
 
 	m_cbSubtitleRenderer.AddString(ResStr(IDS_SUB_NOT_USE)); // SUBRNDT_NONE
@@ -200,4 +200,12 @@ void CPPageSubtitles::OnSubRendModified()
 void CPPageSubtitles::OnUpdateISRSelect(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(m_cbSubtitleRenderer.GetCurSel() == SUBRNDT_ISR);
+}
+
+BOOL CPPageSubtitles::OnSetActive()
+{
+	const CAppSettings& s = AfxGetAppSettings();
+	UpdateSubRenderersList(s.iSubtitleRenderer);
+
+	return CPPageBase::OnSetActive();
 }
