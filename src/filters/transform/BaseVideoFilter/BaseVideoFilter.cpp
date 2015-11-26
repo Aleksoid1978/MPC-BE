@@ -279,10 +279,14 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 			DbgLog((LOG_TRACE, 3, L"	=> FPS   : %I64d => %I64d", nAvgTimePerFrame, AvgTimePerFrame));
 		}
 
+		const bool bVideoSizeChanged = (m_w != m_wout || m_h != m_hout);
+
 		BITMAPINFOHEADER* pBMI	= NULL;
 		if (mt.formattype == FORMAT_VideoInfo) {
 			VIDEOINFOHEADER* vih		= (VIDEOINFOHEADER*)mt.Format();
-			vih->rcSource				= vih->rcTarget = vih_rect;
+			if (bVideoSizeChanged) {
+				vih->rcSource			= vih->rcTarget = vih_rect;
+			}
 			vih->AvgTimePerFrame		= AvgTimePerFrame;
 
 			pBMI						= &vih->bmiHeader;
@@ -290,14 +294,14 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 			pBMI->biYPelsPerMeter		= m_h * m_arx;
 		} else if (mt.formattype == FORMAT_VideoInfo2) {
 			VIDEOINFOHEADER2* vih2	= (VIDEOINFOHEADER2*)mt.Format();
-
-			DbgLog((LOG_TRACE, 3, L"	=> FLAGS : 0x%0.8x -> 0x%0.8x", vih2->dwControlFlags, (extformatsupport && dxvaExtFormat) ? dxvaExtFormat->value : vih2->dwControlFlags));
-
-			vih2->rcSource				= vih2->rcTarget = vih_rect;
+			if (bVideoSizeChanged) {
+				vih2->rcSource			= vih2->rcTarget = vih_rect;
+			}
 			vih2->AvgTimePerFrame		= AvgTimePerFrame;
 			vih2->dwPictAspectRatioX	= m_arx;
 			vih2->dwPictAspectRatioY	= m_ary;
 
+			DbgLog((LOG_TRACE, 3, L"	=> FLAGS : 0x%0.8x -> 0x%0.8x", vih2->dwControlFlags, (extformatsupport && dxvaExtFormat) ? dxvaExtFormat->value : vih2->dwControlFlags));
 			if (extformatsupport && dxvaExtFormat) {
 				vih2->dwControlFlags	= dxvaExtFormat->value;
 			}
