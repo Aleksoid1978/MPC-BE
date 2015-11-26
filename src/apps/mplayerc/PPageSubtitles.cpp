@@ -106,9 +106,7 @@ BOOL CPPageSubtitles::OnApply()
 
 void CPPageSubtitles::UpdateSubRenderersList(int select)
 {
-	for (int i = m_cbSubtitleRenderer.GetCount() - 1; i >= 0; i--) {
-		m_cbSubtitleRenderer.DeleteString(i);
-	}
+	m_cbSubtitleRenderer.ResetContent();
 
 	CAppSettings& s = AfxGetAppSettings();
 
@@ -123,7 +121,6 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 		str += L" " + ResStr(IDS_REND_NOT_AVAILABLE);
 	}
 	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_ISR
-	s.iDSVideoRendererType = iDSVideoRendererType;
 
 	str = L"VSFilter/xy-VSFilter";
 	if (!IsCLSIDRegistered(CLSID_VSFilter_autoloading)) {
@@ -134,12 +131,19 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 	str = L"XySubFilter";
 	if (!IsCLSIDRegistered(CLSID_XySubFilter_AutoLoader)) {
 		str += L" " + ResStr(IDS_REND_NOT_INSTALLED);
+	} else if (!(s.iDSVideoRendererType == VIDRNDT_DS_MADVR
+			|| s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM
+			|| s.iDSVideoRendererType == VIDRNDT_DS_SYNC
+			|| s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS)) {
+		str += L" " + ResStr(IDS_REND_NOT_AVAILABLE);
 	}
 	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_XYSUBFILTER
 
 	if (m_cbSubtitleRenderer.SetCurSel(select) == CB_ERR) {
 		m_cbSubtitleRenderer.SetCurSel(1);
 	}
+
+	s.iDSVideoRendererType = iDSVideoRendererType;
 }
 
 BEGIN_MESSAGE_MAP(CPPageSubtitles, CPPageBase)
@@ -208,7 +212,6 @@ void CPPageSubtitles::OnUpdateISRSelect(CCmdUI* pCmdUI)
 
 BOOL CPPageSubtitles::OnSetActive()
 {
-	const CAppSettings& s = AfxGetAppSettings();
 	UpdateSubRenderersList(m_cbSubtitleRenderer.GetCurSel());
 
 	return CPPageBase::OnSetActive();
