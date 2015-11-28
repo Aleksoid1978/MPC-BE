@@ -378,9 +378,7 @@ BOOL CPPageVideo::OnApply()
 
 void CPPageVideo::UpdateSurfaceFormatList(int select)
 {
-	for (int i = m_cbDX9SurfaceFormat.GetCount() - 1; i >= 0; i--) {
-		m_cbDX9SurfaceFormat.DeleteString(i);
-	}
+	m_cbDX9SurfaceFormat.ResetContent();
 
 	int videoRenderer = m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel());
 
@@ -403,9 +401,7 @@ void CPPageVideo::UpdateSurfaceFormatList(int select)
 
 void CPPageVideo::UpdateResizerList(int select)
 {
-	for (int i = m_cbDX9Resizer.GetCount() - 1; i >= 0; i--) {
-		m_cbDX9Resizer.DeleteString(i);
-	}
+	m_cbDX9Resizer.ResetContent();
 
 	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Nearest neighbor"), RESIZER_NEAREST);
 	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Bilinear"), RESIZER_BILINEAR);
