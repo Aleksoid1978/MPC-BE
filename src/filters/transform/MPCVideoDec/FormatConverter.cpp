@@ -309,8 +309,8 @@ void CFormatConverter::SetConvertFunc()
 				m_RequiredAlignment = 8;
 			}
 			break;
-#if (0) // crash on AVI with NV12 video.
 		case PixFmt_NV12:
+#if (0) // crash on AVI with NV12 video.
 			if (m_FProps.pftype == PFType_YUV420) {
 				pConvertFn = &CFormatConverter::convert_yuv420_nv12;
 				m_RequiredAlignment = 32;
