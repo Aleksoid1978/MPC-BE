@@ -436,6 +436,7 @@
 	#define HAVE_EXP2 1
 	#define HAVE_EXP2F 1
 	#define HAVE_EXPF 1
+	#define HAVE_HYPOT 1
 	#define HAVE_LLRINT 1
 	#define HAVE_LRINT 1
 	#define HAVE_LRINTF 1
@@ -448,6 +449,7 @@
 	#define HAVE_EXP2 0
 	#define HAVE_EXP2F 0
 	#define HAVE_EXPF 0
+	#define HAVE_HYPOT 0
 	#define HAVE_LLRINT 0
 	#define HAVE_LRINT 0
 	#define HAVE_LRINTF 0
