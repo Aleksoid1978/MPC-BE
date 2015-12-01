@@ -25,7 +25,8 @@
 extern "C" char *GetFFmpegCompiler();
 extern "C" char *GetlibavcodecVersion();
 
-CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
+CAboutDlg::CAboutDlg()
+	: CDialog(CAboutDlg::IDD)
 {
 	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 }
@@ -59,9 +60,13 @@ BOOL CAboutDlg::OnInitDialog()
 		#error Compiler is not supported!
 #endif
 #elif defined(_MSC_VER)
-#if (_MSC_VER == 1900)		// 2015
-	m_MPCCompiler = _T("MSVC 2015");
-#elif (_MSC_VER == 1800)	// 2013
+#if (_MSC_VER == 1900)
+	#if (_MSC_FULL_VER == 190023506)
+		m_MPCCompiler = _T("MSVC 2015.1");
+	#else
+		m_MPCCompiler = _T("MSVC 2015");
+	#endif
+#elif (_MSC_VER == 1800)
 	#if (_MSC_FULL_VER == 180040629)
 		m_MPCCompiler = _T("MSVC 2013.5");
 	#elif (_MSC_FULL_VER == 180031101)
@@ -121,9 +126,6 @@ BOOL CAboutDlg::OnInitDialog()
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CAboutDlg)
-	//}}AFX_DATA_MAP
-
 	DDX_Text(pDX, IDC_STATIC1, m_appname);
 	DDX_Text(pDX, IDC_VERSION_NUMBER, m_strVersionNumber);
 	DDX_Text(pDX, IDC_MPC_COMPILER, m_MPCCompiler);
@@ -133,9 +135,6 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
-	//{{AFX_MSG_MAP(CAboutDlg)
-	// No message handlers
-	//}}AFX_MSG_MAP
 	ON_NOTIFY(NM_CLICK, IDC_SOURCEFORGE_LINK, OnHomepage)
 	ON_NOTIFY(NM_CLICK, IDC_AUTHORS_LINK, OnAuthors)
 END_MESSAGE_MAP()
