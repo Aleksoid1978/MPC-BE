@@ -522,8 +522,24 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
     }
     else if ((*seq_parameter_set_Item)->frame_mbs_only_flag || (Structure_Frame>0 && Structure_Field==0)) //No interlaced frame
     {
-        Fill(Stream_Video, 0, Video_ScanType, "Progressive");
-        Fill(Stream_Video, 0, Video_Interlacement, "PPF");
+        switch ((*seq_parameter_set_Item)->pic_struct_FirstDetected)
+        {
+            case  3 :
+                        Fill(Stream_Video, 0, Video_ScanType, "Interlaced");
+                        Fill(Stream_Video, 0, Video_Interlacement, "TFF");
+                        Fill(Stream_Video, 0, Video_Format_Settings_PictureStructure, "Frame");
+                        Fill(Stream_Video, 0, Video_ScanType_StoreMethod, "InterleavedFields");
+                        break;
+            case  4 :
+                        Fill(Stream_Video, 0, Video_ScanType, "Interlaced");
+                        Fill(Stream_Video, 0, Video_Interlacement, "BFF");
+                        Fill(Stream_Video, 0, Video_Format_Settings_PictureStructure, "Frame");
+                        Fill(Stream_Video, 0, Video_ScanType_StoreMethod, "InterleavedFields");
+                        break;
+            default :
+                        Fill(Stream_Video, 0, Video_ScanType, "Progressive");
+                        Fill(Stream_Video, 0, Video_Interlacement, "PPF");
+        }
     }
     else if (Structure_Field>0)
     {
@@ -549,18 +565,29 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
     { //Legacy
         string Result=ScanOrder_Detect(ScanOrders);
         if (!Result.empty())
+        {
             Fill(Stream_Video, 0, Video_Interlacement, Result, true, true);
+            Fill(Stream_Video, 0, Video_ScanType_StoreMethod, "SeparatedFields", Unlimited, true, true);
+        }
         else
         {
             switch ((*seq_parameter_set_Item)->pic_struct_FirstDetected)
             {
                 case  1 :
-                case  3 :
                             Fill(Stream_Video, 0, Video_ScanOrder, (string) "TFF");
+                            Fill(Stream_Video, 0, Video_ScanType_StoreMethod, "SeparatedFields", Unlimited, true, true);
                             break;
                 case  2 :
+                            Fill(Stream_Video, 0, Video_ScanOrder, (string) "BFF");
+                            Fill(Stream_Video, 0, Video_ScanType_StoreMethod, "SeparatedFields", Unlimited, true, true);
+                            break;
+                case  3 :
+                            Fill(Stream_Video, 0, Video_ScanOrder, (string) "TFF");
+                            Fill(Stream_Video, 0, Video_ScanType_StoreMethod, "InterleavedFields", Unlimited, true, true);
+                            break;
                 case  4 :
                             Fill(Stream_Video, 0, Video_ScanOrder, (string) "BFF");
+                            Fill(Stream_Video, 0, Video_ScanType_StoreMethod, "InterleavedFields", Unlimited, true, true);
                             break;
                 default : ;
             }

@@ -299,7 +299,7 @@ File_Ffv1::File_Ffv1()
     //use Ffv1_default_state_transition by default
     memcpy(state_transitions_table, Ffv1_default_state_transition,
            sizeof(Ffv1_default_state_transition));
-    
+
     //Input
     Width = (int32u)-1;
     Height = (int32u)-1;
@@ -709,7 +709,7 @@ void File_Ffv1::FrameHeader()
         if (Frame_Count==0)
         {
             Accept();
-        
+
             Ztring Version=__T("Version ")+Ztring::ToZtring(version);
             if (version>2)
             {
@@ -831,6 +831,14 @@ void File_Ffv1::slice(states &States)
 
     if (!coder_type && ((version == 3 && micro_version > 1) || version > 3))
         BS_End();
+
+    if (coder_type && version > 2)
+    {
+        int8u s = 129;
+        RC->get_rac(&s);
+        Element_Offset=RC->Buffer_Cur-Buffer;
+        Element_Offset--;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -878,7 +886,7 @@ void File_Ffv1::plane(int32u pos)
     sample[1] = current_slice->sample_buffer + current_slice->w + 6 + 3;
 
     memset(current_slice->sample_buffer, 0, 2 * (current_slice->w + 6) * sizeof(*current_slice->sample_buffer));
- 
+
     current_slice->run_index = 0;
 
     for (size_t y = 0; y < current_slice->h; y++)
@@ -1334,7 +1342,7 @@ void File_Ffv1::plane_states_clean(states_context_plane states[MAX_QUANT_TABLES]
     if (!coder_type)
         return;
 
-    for (size_t i = 0; states[i] && i < MAX_QUANT_TABLES; ++i)
+    for (size_t i = 0; i < MAX_QUANT_TABLES && states[i]; ++i)
     {
         for (size_t j = 0; states[i][j]; ++j)
             delete[] states[i][j];

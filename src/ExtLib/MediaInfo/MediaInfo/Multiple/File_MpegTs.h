@@ -106,6 +106,7 @@ private :
     #endif
     int64u MpegTs_JumpTo_Begin;
     int64u MpegTs_JumpTo_End;
+    int64u MpegTs_ScanUpTo;
     int64u Begin_MaxDuration; //in 27 MHz
     int64u Buffer_TotalBytes_LastSynched;
     bool   ForceStreamDisplay;

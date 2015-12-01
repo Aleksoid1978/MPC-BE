@@ -137,6 +137,7 @@ private :
     bool   HD_NoRestart;
     bool   HD_ExtraParity;
     bool   HD_IsVBR;
+    bool   HD_HasAtmos;
     bool   Core_IsPresent;
     bool   HD_IsPresent;
     bool   dynrnge_Exists;

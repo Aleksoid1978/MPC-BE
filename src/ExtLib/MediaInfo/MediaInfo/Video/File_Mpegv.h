@@ -246,7 +246,7 @@ private :
     int64u SizeToAnalyse_End; //Total size of a chunk to analyse, it may be changed by the parser
     int64u Frame_Count_LastIFrame;
     int32u bit_rate_value;
-    float32 FrameRate;
+    float64 FrameRate;
     int16u horizontal_size_value;
     int16u vertical_size_value;
     int16u bit_rate_extension;

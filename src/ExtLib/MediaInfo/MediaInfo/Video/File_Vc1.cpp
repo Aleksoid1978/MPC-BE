@@ -93,29 +93,29 @@ const float32 Vc1_PixelAspectRatio[]=
 };
 
 //---------------------------------------------------------------------------
-float32 Vc1_FrameRate_enr(int8u Code)
+int32u Vc1_FrameRate_enr(int8u Code)
 {
     switch (Code)
     {
-        case 0x01 : return (float32)24000;
-        case 0x02 : return (float32)25000;
-        case 0x03 : return (float32)30000;
-        case 0x04 : return (float32)50000;
-        case 0x05 : return (float32)60000;
-        case 0x06 : return (float32)48000;
-        case 0x07 : return (float32)72000;
-        default   : return (float32)0;
+        case 0x01 : return 24000;
+        case 0x02 : return 25000;
+        case 0x03 : return 30000;
+        case 0x04 : return 50000;
+        case 0x05 : return 60000;
+        case 0x06 : return 48000;
+        case 0x07 : return 72000;
+        default   : return 0;
     }
 }
 
 //---------------------------------------------------------------------------
-float32 Vc1_FrameRate_dr(int8u Code)
+int16u Vc1_FrameRate_dr(int8u Code)
 {
     switch (Code)
     {
-        case 0x01 : return (float32)1000;
-        case 0x02 : return (float32)1001;
-        default   : return (float32)0;
+        case 0x01 : return 1000;
+        case 0x02 : return 1001;
+        default   : return 0;
     }
 }
 
@@ -1158,9 +1158,9 @@ void File_Vc1::SequenceHeader()
         if (framerate_present)
         {
             if (framerate_form)
-                FrameRate=((float32)(framerateexp+1))/(float32)32;
+                FrameRate=((float64)(framerateexp+1))/(float32)64;
             else if (Vc1_FrameRate_dr(frameratecode_dr))
-                FrameRate=Vc1_FrameRate_enr(frameratecode_enr)/Vc1_FrameRate_dr(frameratecode_dr);
+                FrameRate=((float64)Vc1_FrameRate_enr(frameratecode_enr))/Vc1_FrameRate_dr(frameratecode_dr);
         }
 
         if (From_WMV3)

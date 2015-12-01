@@ -144,7 +144,7 @@ private :
     size_t BitRate;
     int8u  start_code;
     bool   EntryPoint_Parsed;
-    float32 FrameRate;
+    float64 FrameRate;
     size_t RefFramesCount;
 
     //Error controls

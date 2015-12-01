@@ -1161,6 +1161,52 @@ Ztring EbuCore_Transform_Text(Ztring &ToReturn, MediaInfo_Internal &MI, size_t S
 }
 
 //---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata(Ztring &ToReturn, MediaInfo_Internal &MI, size_t StreamPos, Export_EbuCore::version Version)
+{
+    ToReturn+=__T("\t\t\t<!-- (Proof of concept, for feedback only)\n");
+
+    ToReturn+=__T("\t\t\t<ebucore:acquisitionDataFormat>\n");
+    for (size_t i = MediaInfoLib::Config.Info_Get(Stream_Other).size(); i < MI.Count_Get(Stream_Other, StreamPos); ++i)
+    {
+        Ztring Name=MI.Get(Stream_Other, StreamPos, i, Info_Name);
+        Ztring totalFrameCount=MI.Get(Stream_Other, StreamPos, Other_FrameCount);
+        if (Name.size()>7 && Name.find(__T("_Values"), 7) == Name.size() - 7)
+        {
+            ZtringList Values;
+            Values.Separator_Set(0, __T(" / "));
+            Values.Write(MI.Get(Stream_Other, StreamPos, i));
+            ZtringList FrameCounts;
+            FrameCounts.Separator_Set(0, __T(" / "));
+            FrameCounts.Write(MI.Get(Stream_Other, StreamPos, i+1)); // _FrameCounts is afters _Values
+            Name.resize(Name.size() - 7);
+            if (Values.size() == FrameCounts.size())
+            {
+                ToReturn+=__T("\t\t\t\t<acquisitionParameter name=\"");
+                ToReturn+=Name;
+                ToReturn+=__T("\"");
+                if (!totalFrameCount.empty())
+                    ToReturn+=__T(" totalDuration=\"")+totalFrameCount+__T("\"");
+                ToReturn+=__T(">\n");
+                for (size_t Pos = 0; Pos < Values.size(); Pos++)
+                {
+                    ToReturn+=__T("\t\t\t\t\t<value");
+                    if (FrameCounts[Pos]!=__T("1"))
+                        ToReturn+=__T(" duration=\"")+FrameCounts[Pos]+__T("\"");
+                    ToReturn+=__T(">");
+                    ToReturn += Values[Pos];
+                    ToReturn+=__T("</value>\n");
+                }
+                ToReturn+=__T("\t\t\t\t</acquisitionParameter>\n");
+            }
+        }
+    }
+
+    ToReturn+=__T("\t\t\t</ebucore:acquisitionDataFormat>\n");
+
+    ToReturn+=__T("\t\t\t-->\n");
+}
+
+//---------------------------------------------------------------------------
 Ztring EbuCore_Transform_TimeCode(Ztring &ToReturn, MediaInfo_Internal &MI, size_t StreamPos, bool Is1_5)
 {
     if (Is1_5)
@@ -1499,6 +1545,10 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version)
     for (size_t Pos=0; Pos<MI.Count_Get(Stream_Other); Pos++)
         if (MI.Get(Stream_Other, Pos, Other_Type)==__T("Metadata"))
             EbuCore_Transform_Metadata(ToReturn, MI, Pos, Version==Version_1_5);
+
+    for (size_t Pos=0; Pos<MI.Count_Get(Stream_Other); Pos++)
+        if (MI.Get(Stream_Other, Pos, Other_Format)==__T("Acquisition Metadata"))
+            EbuCore_Transform_AcquisitionMetadata(ToReturn, MI, Pos, Version);
 
     //format - technicalAttributeString - LineUpStart
     bool startDone=false;

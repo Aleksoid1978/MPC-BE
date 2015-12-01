@@ -21,7 +21,7 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-#if defined(MEDIAINFO_MPEG4V_YES) || defined(MEDIAINFO_MPEG4_YES)
+#if defined(MEDIAINFO_MPEG4V_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MXF_YES)
 //---------------------------------------------------------------------------
 
 #if MEDIAINFO_EVENTS

@@ -92,6 +92,7 @@ private :
     std::bitset<16> C;
     int8u   PageNumber;
     int16u  SubCode;
+    int8u   CharacterSubset;
     int64u  End;
 
     //Ancillary

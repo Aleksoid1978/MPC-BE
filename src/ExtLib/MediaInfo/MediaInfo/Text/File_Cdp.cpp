@@ -22,12 +22,10 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Text/File_Cdp.h"
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #if defined(MEDIAINFO_EIA608_YES)
     #include "MediaInfo/Text/File_Eia608.h"
 #endif
-#if MEDIAINFO_ADVANCED
-    #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
-#endif //MEDIAINFO_ADVANCED
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Events.h"
 #endif //MEDIAINFO_EVENTS
@@ -324,23 +322,35 @@ void File_Cdp::Data_Parse()
     if (!Status[IsAccepted])
         Accept("CDP");
 
-    cdp_header();
     while(Element_Offset<Element_Size)
     {
-        int8u section_id;
-        Peek_L1(section_id);
-        switch (section_id)
+        if (!IsSub)
+            Element_Begin1("CDP");
+
+        cdp_header();
+        int64u End=cdp_length;
+        if (End>Element_Size)
+            End=Element_Size;
+        while(Element_Offset<End)
         {
-            case 0x71 : time_code_section(); break;
-            case 0x72 : ccdata_section(); break;
-            case 0x73 : ccsvcinfo_section(); break;
-            case 0x74 : cdp_footer(); break;
-            case 0xFF : Skip_B1("Padding?"); break;
-            default   : if (section_id>=0x75 && section_id<=0xEF)
-                            future_section();
-                        else
-                            Skip_XX(Element_Size-Element_Offset, "Unknown");
+            int8u section_id;
+            Peek_L1(section_id);
+            switch (section_id)
+            {
+                case 0x71 : time_code_section(); break;
+                case 0x72 : ccdata_section(); break;
+                case 0x73 : ccsvcinfo_section(); break;
+                case 0x74 : cdp_footer(); break;
+                case 0xFF : Skip_B1("Padding?"); break;
+                default   : if (section_id>=0x75 && section_id<=0xEF)
+                                future_section();
+                            else
+                                Skip_XX(Element_Size-Element_Offset, "Unknown");
+            }
         }
+
+        if (!IsSub)
+            Element_End1("CDP");
     }
 
     FILLING_BEGIN();
@@ -381,7 +391,6 @@ void File_Cdp::cdp_header()
 {
     Element_Begin1("cdp_header");
     int16u cdp_identifier;
-    int8u cdp_length;
     Get_B2 (   cdp_identifier,                                  "cdp_identifier");
     Get_B1 (   cdp_length,                                      "cdp_length");
     BS_Begin();

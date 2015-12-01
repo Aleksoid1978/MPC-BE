@@ -223,6 +223,7 @@ private :
     {
         std::vector<int64u>     TimeCodes;
         int64u                  TimeCode_Start;
+        int64u                  TrackUID;
         File__Analyze*          Parser;
         stream_t                StreamKind;
         size_t                  StreamPos;
@@ -245,6 +246,7 @@ private :
         stream()
         {
             TimeCode_Start=(int64u)-1;
+            TrackUID=(int64u)-1;
             Parser=NULL;
             StreamKind=Stream_Max;
             StreamPos=0;
@@ -307,6 +309,10 @@ private :
     bool    Info_AlreadyParsed;
     bool    Tracks_AlreadyParsed;
     bool    Cluster_AlreadyParsed;
+    typedef std::map<Ztring, Ztring> tagspertrack;
+    typedef std::map<int64u, tagspertrack> tags;
+    tags    Segment_Tags_Tag_Items;
+    int64u  Segment_Tags_Tag_Targets_TrackUID_Value;
 
     //Chapters
     struct chapterdisplay
@@ -336,7 +342,6 @@ private :
     int64u              Segment_Offset_End;
     std::vector<int64u> Segment_Seeks;
     size_t              Segment_Seeks_Pos;
-    int64u              Segment_Tag_TrackUID;
     std::vector<Ztring> Segment_Tag_SimpleTag_TagNames;
     int64u Segment_Cluster_BlockGroup_BlockDuration_Value;
     int64u Segment_Cluster_BlockGroup_BlockDuration_TrackNumber;

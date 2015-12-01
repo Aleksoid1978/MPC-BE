@@ -151,6 +151,12 @@ void File_Scte20::Streams_Finish()
 //---------------------------------------------------------------------------
 void File_Scte20::Read_Buffer_Init()
 {
+    //Global information
+    #if defined(MEDIAINFO_EIA608_YES)
+        Config->File_Scte20_IsPresent=true;
+    #endif //defined(MEDIAINFO_EIA608_YES)
+
+    //Configuration
     Eia608_DisplayEmptyStream=Config->File_Eia608_DisplayEmptyStream_Get();
 }
 

@@ -25,6 +25,9 @@
 #ifdef MEDIAINFO_MPEG4_YES
     #include "MediaInfo/Multiple/File_Mpeg4_Descriptors.h"
 #endif
+#if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+    #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+#endif //defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
 #include <cmath>
 using namespace std;
 using namespace ZenLib;
@@ -854,7 +857,7 @@ const char* Mpeg_Descriptors_MPEG_4_audio_profile_and_level(int8u MPEG_4_audio_p
 }
 
 //---------------------------------------------------------------------------
-extern const float32 Mpegv_frame_rate[]; //In Video/File_Mpegv.cpp
+extern const float64 Mpegv_frame_rate[]; //In Video/File_Mpegv.cpp
 extern const char*  Mpegv_Colorimetry_format[]; //In Video/File_Mpegv.cpp
 extern const char*  Mpegv_profile_and_level_indication_profile[]; //In Video/File_Mpegv.cpp
 extern const char*  Mpegv_profile_and_level_indication_level[]; //In Video/File_Mpegv.cpp
@@ -2817,6 +2820,9 @@ void File_Mpeg_Descriptors::Descriptor_81()
 void File_Mpeg_Descriptors::Descriptor_86()
 {
     #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+        //Global information
+        Config->File_DtvccTransport_Descriptor_IsPresent=true;
+
         if (event_id_IsValid)
         {
             delete Complete_Stream->Sources[table_id_extension].ATSC_EPG_Blocks[Complete_Stream->Streams[pid]->table_type].Events[event_id].ServiceDescriptors;

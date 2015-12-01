@@ -98,9 +98,49 @@ private :
     bool   BigEndian;
     bool   ES;
     bool   Core_Exists;
+    enum   presence
+    {
+        presence_Core_Core,
+        presence_Core_XXCh,
+        presence_Core_X96,
+        presence_Core_XCh,
+        presence_Extended_Core,
+        presence_Extended_XBR,
+        presence_Extended_XXCh,
+        presence_Extended_X96,
+        presence_Extended_LBR,
+        presence_Extended_XLL,
+        presence_Extended_XLL_X,
+        presence_Max
+    };
+    std::bitset<presence_Max> Presence;
+    enum   data
+    {
+        Profiles,
+        Channels,
+        ChannelPositions,
+        ChannelPositions2,
+        ChannelLayout,
+        BitDepth,
+        SamplingRate,
+        BitRate,
+        BitRate_Mode,
+        Compression_Mode,
+        data_Max,
+    };
+    ZtringList Data[data_Max];
+    int8u  Core_Core_AMODE;
+    int8u  Core_Core_LFF;
+    int8u  Core_XCh_AMODE;
+    int8u  Core_XXCh_nuNumChSetsInXXCh;
+    size_t Extension_XLL_X_No;
+    size_t Extension_XLL_X_Yes;
 
     //Helpers
     float64 BitRate_Get(bool WithHD=false);
+    void    Streams_Fill_Extension();
+    void    Streams_Fill_Core_ES();
+    void    Streams_Fill_Core();
 };
 
 } //NameSpace

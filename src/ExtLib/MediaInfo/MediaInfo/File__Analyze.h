@@ -298,27 +298,27 @@ protected :
 
     //Elements - Info
     void Element_Info (const Ztring &Parameter);
-    inline void Element_Info (const char*   Parameter) {if (Config_Trace_Level) return; Element_Info(Ztring().From_UTF8(Parameter));}
-    inline void Element_Info (const char*   Parameter, const char*   Measure)      {if (Config_Trace_Level) return; Element_Info(Ztring().From_UTF8(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int8s         Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int8u         Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int16s        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int16u        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int32s        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int32u        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int64s        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int64u        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (int128u       Parameter, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (const char*   Parameter) {if (Config_Trace_Level<1) return; Element_Info(Ztring().From_UTF8(Parameter));}
+    inline void Element_Info (const char*   Parameter, const char*   Measure)      {if (Config_Trace_Level<1) return; Element_Info(Ztring().From_UTF8(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int8s         Parameter, const char*   Measure=NULL) {if (Config_Trace_Level<1) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int8u         Parameter, const char*   Measure=NULL) {if (Config_Trace_Level<1) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int16s        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level<1) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int16u        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level<1) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int32s        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level<1) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int32u        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level<1) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int64s        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level<1) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int64u        Parameter, const char*   Measure=NULL) {if (Config_Trace_Level<1) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (int128u       Parameter, const char*   Measure=NULL) {if (Config_Trace_Level<1) return; Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
     #ifdef SIZE_T_IS_LONG
     inline void Element_Info (size_t        Parameter, const char*   Measure=NULL) {Element_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
     #endif //SIZE_T_IS_LONG
-    inline void Element_Info (float32       Parameter, int8u AfterComma=3, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter, AfterComma)+Ztring().From_UTF8(Measure));}
-    inline void Element_Info (float64       Parameter, int8u AfterComma=3, const char*   Measure=NULL) {if (Config_Trace_Level) return; Element_Info(Ztring::ToZtring(Parameter, AfterComma)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (float32       Parameter, int8u AfterComma=3, const char*   Measure=NULL) {if (Config_Trace_Level<1) return; Element_Info(Ztring::ToZtring(Parameter, AfterComma)+Ztring().From_UTF8(Measure));}
+    inline void Element_Info (float64       Parameter, int8u AfterComma=3, const char*   Measure=NULL) {if (Config_Trace_Level<1) return; Element_Info(Ztring::ToZtring(Parameter, AfterComma)+Ztring().From_UTF8(Measure));}
     #define Element_Info1(_A) Element_Info(_A)
     #define Element_Info2(_A,_B) Element_Info(_A, _B)
     #define Element_Info3(_A,_B,_C) Element_Info(_A, _B, _C)
     #define Element_Info1C(_CONDITION,_A) if (_CONDITION) Element_Info(_A)
-    inline void Element_Info_From_Milliseconds (int64u Parameter)                  {if (Config_Trace_Level) return; Element_Info(Ztring().Duration_From_Milliseconds(Parameter));}
+    inline void Element_Info_From_Milliseconds (int64u Parameter)                  {if (Config_Trace_Level<1) return; Element_Info(Ztring().Duration_From_Milliseconds(Parameter));}
 
     //Elements - End
     inline void Element_End () {Element_End_Common_Flush();}
@@ -962,9 +962,9 @@ public :
     inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, int32s         Value, int8u Radix=10, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, Ztring::ToZtring(Value, Radix).MakeUpperCase(), Replace);}
     inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, int64u         Value, int8u Radix=10, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, Ztring::ToZtring(Value, Radix).MakeUpperCase(), Replace);}
     inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, int64s         Value, int8u Radix=10, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, Ztring::ToZtring(Value, Radix).MakeUpperCase(), Replace);}
-    inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, float32        Value, int8u AfterComma=3, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, Ztring::ToZtring(Value, AfterComma), Replace);}
-    inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, float64        Value, int8u AfterComma=3, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, Ztring::ToZtring(Value, AfterComma), Replace);}
-    inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, float80        Value, int8u AfterComma=3, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, Ztring::ToZtring(Value, AfterComma), Replace);}
+    inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, float32        Value, int8u AfterComma=3, bool Replace=false);
+    inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, float64        Value, int8u AfterComma=3, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, (float32)Value, AfterComma, Replace);}
+    inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, float80        Value, int8u AfterComma=3, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, (float32)Value, AfterComma, Replace);}
     #ifdef SIZE_T_IS_LONG
     inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, size_t         Value, int8u Radix=10, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, Ztring::ToZtring(Value, Radix).MakeUpperCase(), Replace);}
     #endif //SIZE_T_IS_LONG
@@ -1271,6 +1271,19 @@ public :
     //Configuration
     bool MustSynchronize;
     bool CA_system_ID_MustSkipSlices;
+    bool FillAllMergedStreams;
+    class streamidentity
+    {
+    public:
+        stream_t StreamKind;
+        size_t   StreamPos;
+
+        streamidentity(stream_t StreamKind_, size_t StreamPos_)
+            : StreamKind(StreamKind_)
+            , StreamPos(StreamPos_)
+        {}
+    };
+    std::vector<streamidentity> MergedStreams_Last;
 
     //Demux
     enum contenttype

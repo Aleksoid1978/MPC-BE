@@ -96,6 +96,7 @@ private :
 
     //Temp
     int8u cdp_frame_rate;
+    int8u cdp_length;
 
     //Helpers
     void  CreateStream(int8u Parser_Pos);

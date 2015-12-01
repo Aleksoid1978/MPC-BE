@@ -127,6 +127,8 @@ void File_Aac::Streams_Fill()
         case Mode_ADTS    : File__Tags_Helper::Streams_Fill(); break;
         default           : ;
     }
+
+    Fill(Stream_Audio, StreamPos_Last, Audio_SamplesPerFrame, frame_length);
 }
 
 //---------------------------------------------------------------------------

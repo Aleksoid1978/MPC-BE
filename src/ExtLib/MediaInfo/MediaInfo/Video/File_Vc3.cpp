@@ -302,7 +302,7 @@ File_Vc3::File_Vc3()
     #if defined(MEDIAINFO_CDP_YES)
         Cdp_Parser=NULL;
     #endif //defined(MEDIAINFO_CDP_YES)
-    
+
     //Temp
     FFC_FirstFrame=(int8u)-1;
 }

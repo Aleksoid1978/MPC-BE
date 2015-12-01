@@ -1446,7 +1446,6 @@ Ztring Export_Fims::Transform(MediaInfo_Internal &MI, version Version)
     }
 
     //format - technicalAttribute formatLabel=\"string\" - LineUpStart
-    bool startDone=false;
     if (As11_UkDpp_Pos!=(size_t)-1 && !MI.Get(Stream_Other, As11_UkDpp_Pos, __T("LineUpStart")).empty())
     {
         ToReturn+=__T("\t\t\t<!-- Not valid in XSD\n");
@@ -1454,7 +1453,6 @@ Ztring Export_Fims::Transform(MediaInfo_Internal &MI, version Version)
         ToReturn+=__T("\t\t\t\t<ebucore:timecode>")+MI.Get(Stream_Other, As11_UkDpp_Pos, __T("LineUpStart"))+__T("</ebucore:timecode>\n");
         ToReturn+=__T("\t\t\t</ebucore:start>\n");
         ToReturn+=__T("\t\t\t-->\n");
-        startDone=true;
     }
 
     //format - technicalAttribute formatLabel=\"string\" - IdentClockStart
@@ -1508,7 +1506,7 @@ Ztring Export_Fims::Transform(MediaInfo_Internal &MI, version Version)
     {
         if (Version<Version_1_2)
             ToReturn+=__T("\t\t\t<!-- Not valid in XSD\n");
-        
+
         //format - technicalAttribute formatLabel=\"string\" - AudioLoudnessStandard
         if (!MI.Get(Stream_Other, As11_UkDpp_Pos, __T("AudioLoudnessStandard")).empty())
         {

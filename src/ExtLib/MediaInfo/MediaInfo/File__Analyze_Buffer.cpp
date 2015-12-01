@@ -177,10 +177,10 @@ void File__Analyze::Get_B4(int32u &Info, const char* Name)
     {
         switch (Config_Trace_Format)
         {
-            case MediaInfo_Config::Trace_Format_XML         : 
+            case MediaInfo_Config::Trace_Format_XML         :
                                                                 Param(Name, Ztring::ToZtring(Info));
                                                                 break;
-            default                                         : 
+            default                                         :
                                                                 {
                                                                 Ztring Pos1; Pos1.From_Number(Info, 16);
                                                                 Ztring Temp;
@@ -427,10 +427,10 @@ void File__Analyze::Skip_B4(const char* Name)
         int32u Info=BigEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
         switch (Config_Trace_Format)
         {
-            case MediaInfo_Config::Trace_Format_XML         : 
+            case MediaInfo_Config::Trace_Format_XML         :
                                                                 Param(Name, Ztring::ToZtring(Info));
                                                                 break;
-            default                                         : 
+            default                                         :
                                                                 {
                                                                 Ztring Pos1; Pos1.From_Number(Info, 16);
                                                                 Ztring Temp;

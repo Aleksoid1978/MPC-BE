@@ -104,7 +104,7 @@ const char* Lxf_PictureType[4]=
 };
 
 //---------------------------------------------------------------------------
-extern const float32 Mpegv_frame_rate[]; //In Video/File_Mpegv.cpp
+extern const float64 Mpegv_frame_rate[]; //In Video/File_Mpegv.cpp
 
 //***************************************************************************
 // Constructor/Destructor

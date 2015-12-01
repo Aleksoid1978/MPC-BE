@@ -22,6 +22,98 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Setup.h"
+#include <ZenLib/Ztring.h>
+#include <string>
+using namespace std;
+using namespace ZenLib;
+//---------------------------------------------------------------------------
+
+//***************************************************************************
+// Infos
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+#if defined(MEDIAINFO_RIFF_YES) || defined(MEDIAINFO_MK_YES)
+//---------------------------------------------------------------------------
+
+namespace MediaInfoLib
+{
+
+//---------------------------------------------------------------------------
+std::string ExtensibleWave_ChannelMask (int32u ChannelMask)
+{
+    std::string Text;
+    if ((ChannelMask&0x0007)!=0x0000)
+        Text+="Front:";
+    if (ChannelMask&0x0001)
+        Text+=" L";
+    if (ChannelMask&0x0004)
+        Text+=" C";
+    if (ChannelMask&0x0002)
+        Text+=" R";
+
+    if ((ChannelMask&0x0600)!=0x0000)
+        Text+=", Side:";
+    if (ChannelMask&0x0200)
+        Text+=" L";
+    if (ChannelMask&0x0400)
+        Text+=" R";
+
+    if ((ChannelMask&0x0130)!=0x0000)
+        Text+=", Back:";
+    if (ChannelMask&0x0010)
+        Text+=" L";
+    if (ChannelMask&0x0100)
+        Text+=" C";
+    if (ChannelMask&0x0020)
+        Text+=" R";
+
+    if ((ChannelMask&0x0008)!=0x0000)
+        Text+=", LFE";
+
+    return Text;
+}
+
+//---------------------------------------------------------------------------
+std::string ExtensibleWave_ChannelMask2 (int32u ChannelMask)
+{
+    std::string Text;
+    int8u Count=0;
+    if (ChannelMask&0x0001)
+        Count++;
+    if (ChannelMask&0x0004)
+        Count++;
+    if (ChannelMask&0x0002)
+        Count++;
+    Text+=Ztring::ToZtring(Count).To_UTF8();
+    Count=0;
+
+    if (ChannelMask&0x0200)
+        Count++;
+    if (ChannelMask&0x0400)
+        Count++;
+    Text+="/"+Ztring::ToZtring(Count).To_UTF8();
+    Count=0;
+
+    if (ChannelMask&0x0010)
+        Count++;
+    if (ChannelMask&0x0100)
+        Count++;
+    if (ChannelMask&0x0020)
+        Count++;
+    Text+="/"+Ztring::ToZtring(Count).To_UTF8();
+    Count=0;
+
+    if (ChannelMask&0x0008)
+        Text+=".1";
+
+    return Text;
+}
+
+}
+
+//---------------------------------------------------------------------------
+#endif
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -112,81 +204,6 @@ using namespace std;
 
 namespace MediaInfoLib
 {
-
-//***************************************************************************
-// Infos
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-std::string ExtensibleWave_ChannelMask (int32u ChannelMask)
-{
-    std::string Text;
-    if ((ChannelMask&0x0007)!=0x0000)
-        Text+="Front:";
-    if (ChannelMask&0x0001)
-        Text+=" L";
-    if (ChannelMask&0x0004)
-        Text+=" C";
-    if (ChannelMask&0x0002)
-        Text+=" R";
-
-    if ((ChannelMask&0x0600)!=0x0000)
-        Text+=", Side:";
-    if (ChannelMask&0x0200)
-        Text+=" L";
-    if (ChannelMask&0x0400)
-        Text+=" R";
-
-    if ((ChannelMask&0x0130)!=0x0000)
-        Text+=", Back:";
-    if (ChannelMask&0x0010)
-        Text+=" L";
-    if (ChannelMask&0x0100)
-        Text+=" C";
-    if (ChannelMask&0x0020)
-        Text+=" R";
-
-    if ((ChannelMask&0x0008)!=0x0000)
-        Text+=", LFE";
-
-    return Text;
-}
-
-//---------------------------------------------------------------------------
-std::string ExtensibleWave_ChannelMask2 (int32u ChannelMask)
-{
-    std::string Text;
-    int8u Count=0;
-    if (ChannelMask&0x0001)
-        Count++;
-    if (ChannelMask&0x0004)
-        Count++;
-    if (ChannelMask&0x0002)
-        Count++;
-    Text+=Ztring::ToZtring(Count).To_UTF8();
-    Count=0;
-
-    if (ChannelMask&0x0200)
-        Count++;
-    if (ChannelMask&0x0400)
-        Count++;
-    Text+="/"+Ztring::ToZtring(Count).To_UTF8();
-    Count=0;
-
-    if (ChannelMask&0x0010)
-        Count++;
-    if (ChannelMask&0x0100)
-        Count++;
-    if (ChannelMask&0x0020)
-        Count++;
-    Text+="/"+Ztring::ToZtring(Count).To_UTF8();
-    Count=0;
-
-    if (ChannelMask&0x0008)
-        Text+=".1";
-
-    return Text;
-}
 
 //***************************************************************************
 // Const
@@ -2950,7 +2967,7 @@ void File_Riff::CDDA_fmt_()
         Fill(Stream_Audio, 0, Audio_BitDepth, 16);
         Fill(Stream_Audio, 0, Audio_Channel_s_, 2);
         Fill(Stream_Audio, 0, Audio_SamplingRate, 44100);
-        Fill(Stream_Audio, 0, Audio_FrameRate, 75);
+        Fill(Stream_Audio, 0, Audio_FrameRate, (float)75);
         Fill(Stream_Audio, 0, Audio_BitRate, 1411200);
         Fill(Stream_Audio, 0, Audio_Compression_Mode, "Lossless");
         Fill(Stream_Audio, 0, Audio_FrameCount, TDuration);

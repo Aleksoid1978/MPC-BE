@@ -35,6 +35,8 @@ namespace MediaInfoLib
 
 //---------------------------------------------------------------------------
 extern const char* Id3v2_PictureType(int8u Type); //In Tag/File_Id3v2.cpp
+extern std::string ExtensibleWave_ChannelMask (int32u ChannelMask); //In Multiple/File_Riff_Elements.cpp
+extern std::string ExtensibleWave_ChannelMask2 (int32u ChannelMask); //In Multiple/File_Riff_Elements.cpp
 
 //***************************************************************************
 // Constructor/Destructor
@@ -138,6 +140,24 @@ void File_Flac::Data_Parse()
         if (!IsSub)
             Fill(Stream_Audio, 0, Audio_StreamSize, File_Size-(File_Offset+Buffer_Offset+Element_Size));
 
+    if (Retrieve(Stream_Audio, 0, Audio_ChannelPositions).empty() && Retrieve(Stream_Audio, 0, Audio_ChannelPositions_String2).empty())
+    {
+        int32u t = 0;
+        int32s c = Retrieve(Stream_Audio, 0, Audio_Channel_s_).To_int32s();
+        if (c==1) t=4;
+        else if (c==2) t=3;
+        else if (c==3) t=7;
+        else if (c==4) t=1539;
+        else if (c==5) t=1543;
+        else if (c==6) t=1551;
+        else if (c==7) t=1807;
+        else if (c==8) t=1599;
+        if (t) {
+            Fill(Stream_Audio, 0, Audio_ChannelPositions, ExtensibleWave_ChannelMask(t));
+            Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, ExtensibleWave_ChannelMask2(t));
+        }
+    }
+
         //No more need data
         File__Tags_Helper::Finish("Flac");
     }
@@ -207,6 +227,16 @@ void File_Flac::VORBIS_COMMENT()
         Open_Buffer_Init(&VorbisCom);
         Open_Buffer_Continue(&VorbisCom);
         File__Analyze::Finish(&VorbisCom);
+
+        //Specific case: bit depth
+        if (!VorbisCom.Retrieve(Stream_Audio, 0, Audio_BitDepth).empty() && VorbisCom.Retrieve(Stream_Audio, 0, Audio_BitDepth).To_int64u()<Retrieve(Stream_Audio, 0, Audio_BitDepth).To_int64u())
+        {
+            //Bit depth information from tags is the real value, the one from Flac is the count of bits stored
+            Fill(Stream_Audio, 0, Audio_BitDepth_Stored, Retrieve(Stream_Audio, 0, Audio_BitDepth));
+            Fill(Stream_Audio, 0, Audio_BitDepth, VorbisCom.Retrieve(Stream_Audio, 0, Audio_BitDepth), true);
+            VorbisCom.Clear(Stream_Audio, 0, Audio_BitDepth);
+        }
+
         Merge(VorbisCom, Stream_General,  0, 0);
         Merge(VorbisCom, Stream_Audio,    0, 0);
         Merge(VorbisCom, Stream_Menu,     0, 0);

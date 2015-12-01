@@ -4331,7 +4331,6 @@ File__Analyze* File_MpegPs::ChooseParser_Mpeg4v()
     //Filling
     #if defined(MEDIAINFO_MPEG4V_YES)
         File_Mpeg4v* Parser=new File_Mpeg4v;
-        Parser->Frame_Count_Valid=1;
         #if MEDIAINFO_DEMUX
             if (Config->Demux_Unpacketize_Get())
             {
@@ -4409,7 +4408,6 @@ File__Analyze* File_MpegPs::ChooseParser_VC1()
     //Filling
     #if defined(MEDIAINFO_VC1_YES)
         File_Vc1* Parser=new File_Vc1;
-        Parser->Frame_Count_Valid=30;
         #if MEDIAINFO_DEMUX
             if (Config->Demux_Unpacketize_Get())
             {
@@ -4436,7 +4434,6 @@ File__Analyze* File_MpegPs::ChooseParser_Dirac()
     //Filling
     #if defined(MEDIAINFO_DIRAC_YES)
         File__Analyze* Parser=new File_Dirac;
-        ((File_Dirac*)Parser)->Frame_Count_Valid=1;
     #else
         //Filling
         File__Analyze* Parser=new File_Unknown();
@@ -4454,7 +4451,6 @@ File__Analyze* File_MpegPs::ChooseParser_Mpega()
     //Filling
     #if defined(MEDIAINFO_MPEGA_YES)
         File_Mpega* Parser=new File_Mpega;
-        Parser->Frame_Count_Valid=1;
         #if MEDIAINFO_DEMUX
             if (Config->Demux_Unpacketize_Get())
             {
@@ -4544,7 +4540,6 @@ File__Analyze* File_MpegPs::ChooseParser_AC3()
     //Filling
     #if defined(MEDIAINFO_AC3_YES)
         File_Ac3* Parser=new File_Ac3();
-        Parser->Frame_Count_Valid=2; //2 frames to be sure
         #if MEDIAINFO_DEMUX
             if (Config->Demux_Unpacketize_Get())
             {
@@ -4571,7 +4566,6 @@ File__Analyze* File_MpegPs::ChooseParser_DTS()
     //Filling
     #if defined(MEDIAINFO_DTS_YES)
         File__Analyze* Parser=new File_Dts();
-        ((File_Dts*)Parser)->Frame_Count_Valid=2;
         #if MEDIAINFO_DEMUX
             if (Config->Demux_Unpacketize_Get())
             {

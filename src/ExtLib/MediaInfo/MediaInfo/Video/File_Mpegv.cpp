@@ -110,24 +110,24 @@ namespace MediaInfoLib
 using namespace ZenLib;
 
 //---------------------------------------------------------------------------
-extern const float32 Mpegv_frame_rate[16]=
+extern const float64 Mpegv_frame_rate[16]=
 {
-    (float32) 0,
-    (float32)24000/(float32)1001,
-    (float32)24,
-    (float32)25,
-    (float32)30000/(float32)1001,
-    (float32)30,
-    (float32)50,
-    (float32)60000/(float32)1001,
-    (float32)60,
-    (float32) 0,
-    (float32) 0,
-    (float32) 0,
-    (float32) 0,
-    (float32) 0,
-    (float32) 0,
-    (float32) 0,
+    (float64) 0,
+    (float64)24000/(float64)1001,
+    (float64)24,
+    (float64)25,
+    (float64)30000/(float64)1001,
+    (float64)30,
+    (float64)50,
+    (float64)60000/(float64)1001,
+    (float64)60,
+    (float64) 0,
+    (float64) 0,
+    (float64) 0,
+    (float64) 0,
+    (float64) 0,
+    (float64) 0,
+    (float64) 0,
 };
 
 //---------------------------------------------------------------------------
@@ -1256,7 +1256,8 @@ void File_Mpegv::Streams_Fill()
     }
 
     //FrameRate
-    Fill(Stream_Video, StreamPos_Last, Video_FrameRate, (float)(Mpegv_frame_rate[frame_rate_code] * (frame_rate_extension_n + 1)) / (float)(frame_rate_extension_d + 1));
+    if (Mpegv_frame_rate[frame_rate_code])
+        Fill(Stream_Video, StreamPos_Last, Video_FrameRate, Mpegv_frame_rate[frame_rate_code] * (frame_rate_extension_n + 1) / (frame_rate_extension_d + 1));
 
     //BitRate
     if (vbv_delay==0xFFFF || (MPEG_Version==1 && bit_rate_value==0x3FFFF))
@@ -2570,7 +2571,7 @@ void File_Mpegv::slice_start()
                 if ((*Ancillary)==NULL)
                     (*Ancillary)=new File_Ancillary();
                 (*Ancillary)->AspectRatio=MPEG_Version==1?Mpegv_aspect_ratio1[aspect_ratio_information]:Mpegv_aspect_ratio2[aspect_ratio_information];
-                (*Ancillary)->FrameRate=((float)(Mpegv_frame_rate[frame_rate_code] * (frame_rate_extension_n + 1)) / (float)(frame_rate_extension_d + 1));
+                (*Ancillary)->FrameRate=FrameRate;
                 if ((*Ancillary)->PTS_DTS_Needed)
                     (*Ancillary)->FrameInfo.DTS=FrameInfo.DTS;
                 if ((*Ancillary)->Status[IsAccepted]) //In order to test if there is a parser using ancillary data
@@ -3714,7 +3715,10 @@ void File_Mpegv::extension_start()
 
                     FILLING_BEGIN();
                         if (frame_rate_extension_d)
-                            FrameRate=(float)frame_rate_extension_n/frame_rate_extension_d;
+                        {
+                            FrameRate*=frame_rate_extension_n+1;
+                            FrameRate/=frame_rate_extension_d+1;
+                        }
                         #if MEDIAINFO_MACROBLOCKS
                             if (Macroblocks_Parse)
                                 block_count=Mpegv_block_count[chroma_format];
