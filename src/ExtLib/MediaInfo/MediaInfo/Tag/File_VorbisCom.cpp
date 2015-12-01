@@ -270,7 +270,7 @@ void File_VorbisCom::Data_Parse()
         else if (Key==__T("TRACK_COMMENT"))          Fill(StreamKind_Multiple, 0, "Comment", Value);
         else if (Key==__T("TRACKNUMBER"))            Fill(StreamKind_Multiple, 0, "Track/Position", Value);
         else if (Key==__T("TRACKTOTAL"))             Fill(StreamKind_Multiple, 0, "Track/Position_Total", Value);
-        else if (Key==__T("VERSION"))                Fill(StreamKind_Common,   0, "Track/More", Value);
+        else if (Key==__T("VERSION"))                Fill(StreamKind_Common,   0, "Track_More", Value);
         else if (Key==__T("BPM"))                    Fill(StreamKind_Common,   0, "BPM", Value);
         else if (Key==__T("WAVEFORMATEXTENSIBLE_CHANNEL_MASK"))
         {
@@ -294,6 +294,15 @@ void File_VorbisCom::Data_Parse()
                 Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, ExtensibleWave_ChannelMask2(ValueI));
             }
         }
+        else if (Key==__T("VALID_BITS"))
+        {
+            if (Value.To_int64u())
+            {
+                // Not related to bit depth, only a detected value, see http://forum.doom9.org/showthread.php?t=125966&page=680 // Fill(Stream_Audio, 0, Audio_BitDepth, Value);
+                Fill(Stream_Audio, 0, Audio_BitDepth_Detected, Value);
+            }
+        }
+        else if (Key==__T("HDCD"))                   { if (Value != __T("0")) { Fill(Stream_Audio, 0, "HDCD", "Yes"); } }
         else if (Key==__T("YEAR"))                   {if (Value!=Retrieve(StreamKind_Common,   0, "Recorded_Date")) Fill(StreamKind_Common,   0, "Recorded_Date", Value);}
         else if (Key.find(__T("COVERART"))==0)
         {

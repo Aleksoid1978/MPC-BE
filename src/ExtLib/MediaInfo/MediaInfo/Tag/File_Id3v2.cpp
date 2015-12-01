@@ -1380,7 +1380,7 @@ void File_Id3v2::Fill_Name()
         case Elements::TSS  : break;
         case Elements::TT1  : Fill(Stream_General, 0, "Grouping", Element_Value); break;
         case Elements::TT2  : Fill(Stream_General, 0, "Track", Element_Value); break;
-        case Elements::TT3  : Fill(Stream_General, 0, "Track/More", Element_Value); break;
+        case Elements::TT3  : Fill(Stream_General, 0, "Track_More", Element_Value); break;
         case Elements::TXT  : Fill(Stream_General, 0, "Lyricist", Element_Value); break;
         case Elements::TXX  : Fill(Stream_General, 0, Element_Values(0).To_UTF8().c_str(), Element_Values(1)); break;
         case Elements::TYE  : Year=Element_Value; break;

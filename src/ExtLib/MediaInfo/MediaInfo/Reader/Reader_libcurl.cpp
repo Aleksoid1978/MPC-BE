@@ -509,7 +509,7 @@ size_t Reader_libcurl::Format_Test_PerParser(MediaInfo_Internal* MI, const Strin
             {
                 string Amazon_S3_Bucket;
                 string Amazon_S3_CanonicalizedResource;
-                
+
                 string Amazon_S3_Host(File_URL.Host, 0, File_URL.Host.size()-Amazon_AWS_Host_Size);
                 size_t Amazon_S3_Host_Pos=Amazon_S3_Host.find('.');
                 if (Amazon_S3_Host_Pos!=(size_t)-1)

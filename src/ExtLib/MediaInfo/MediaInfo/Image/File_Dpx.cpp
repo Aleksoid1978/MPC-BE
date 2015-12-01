@@ -349,14 +349,14 @@ string DPX_DateTime2Iso(const string &FromDpx)
             Max=FromDpx.size();
 
         ToReturn+=FromDpx.substr(Offset, Max-Offset);
-                
+
         if (ToReturn.size()>22)
             ToReturn.insert(ToReturn.begin(), ':'); //Hours/Minutes offset sepearator added
         else if (ToReturn.size()==22 && (ToReturn[19]=='+' || ToReturn[19]=='-'))
             ToReturn+=":00"; // Minutes offset, default
     }
 
-    return ToReturn; 
+    return ToReturn;
 }
 
 //***************************************************************************

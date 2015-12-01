@@ -121,6 +121,7 @@ File__Analyze::File__Analyze ()
     MustUseAlternativeParser=false;
     MustSynchronize=false;
     CA_system_ID_MustSkipSlices=false;
+    FillAllMergedStreams=false;
 
     //Buffer
     #if MEDIAINFO_SEEK
@@ -971,7 +972,7 @@ void File__Analyze::Open_Buffer_Continue (File__Analyze* Sub, const int8u* ToAdd
                 size_t Details_gt_Pos=Element[Element_Level].ToShow.Details.rfind(__T(">"));
                 if (Details_lt_Pos!=string::npos && (Details_lt_Pos+1>=Element[Element_Level].ToShow.Details.size() || Details_gt_Pos==string::npos || (Details_lt_Pos>Details_gt_Pos && Element[Element_Level].ToShow.Details[Details_lt_Pos+1]!=__T('/')))) //else there is content like "</data> />"
                     Element[Element_Level].ToShow.Details+=__T(">")+Element[Element_Level].ToShow.Value+__T("</data>");
-                
+
                 //Line separator
                 if (!Element[Element_Level].ToShow.Details.empty())
                     Element[Element_Level].ToShow.Details+=Config_LineSeparator;
@@ -1159,7 +1160,7 @@ void File__Analyze::Open_Buffer_Unsynch ()
     }
 
     //if (Synched)
-    if (!MustSynchronize || (MustSynchronize && File_Offset_FirstSynched!=(int64u)-1)) //Synched at least once
+    if (!MustSynchronize || File_Offset_FirstSynched!=(int64u)-1) //Synched at least once
     {
         Synched=false;
         UnSynched_IsNotJunk=true;
@@ -2296,7 +2297,7 @@ Ztring Log_Offset (int64u OffsetToShow, MediaInfo_Config::trace_Format Config_Tr
     switch (Config_Trace_Format)
     {
         case MediaInfo_Config::Trace_Format_XML        : break;
-        default                                         : 
+        default                                         :
             if (OffsetToShow==(int64u)-1)
                 return __T("         ");
             int64u Offset=OffsetToShow%0x100000000ULL; //Only 32 bits
@@ -2461,7 +2462,7 @@ void File__Analyze::Element_Info(const Ztring &Parameter)
     {
         case MediaInfo_Config::Trace_Format_Tree        :
         case MediaInfo_Config::Trace_Format_CSV         : Element[Element_Level].ToShow.Info+=__T(" - "); break;
-        case MediaInfo_Config::Trace_Format_XML         : 
+        case MediaInfo_Config::Trace_Format_XML         :
                                                             {
                                                                      if (Element[Element_Level].ToShow.Info.find(__T(" info7=\""))!=string::npos)
                                                                     Element[Element_Level].ToShow.Info+=__T(" info8=\"");
@@ -2477,7 +2478,7 @@ void File__Analyze::Element_Info(const Ztring &Parameter)
                                                                     Element[Element_Level].ToShow.Info+=__T(" info3=\"");
                                                                 else if (Element[Element_Level].ToShow.Info.find(__T(" info=\""))!=string::npos)
                                                                     Element[Element_Level].ToShow.Info+=__T(" info2=\"");
-                                                                else                
+                                                                else
                                                                     Element[Element_Level].ToShow.Info+=__T(" info=\"");
                                                             }
                                                             break;
@@ -2568,7 +2569,7 @@ void File__Analyze::Element_End_Common_Flush_Details()
                 //
                 switch (Config_Trace_Format)
                 {
-                    case MediaInfo_Config::Trace_Format_XML         : 
+                    case MediaInfo_Config::Trace_Format_XML         :
                                                                         {
                                                                         size_t Details_lt_Pos=Element[Element_Level].ToShow.Details.rfind(__T("<"));
                                                                         size_t Details_gt_Pos=Element[Element_Level].ToShow.Details.rfind(__T(">"));
@@ -2606,7 +2607,7 @@ void File__Analyze::Element_End_Common_Flush_Details()
             {
                 switch (Config_Trace_Format)
                 {
-                    case MediaInfo_Config::Trace_Format_XML         : 
+                    case MediaInfo_Config::Trace_Format_XML         :
                                                                         {
                                                                         size_t Start=Element[Element_Level].ToShow.Details.rfind(EOL);
                                                                         if (Start==(size_t)-1)
@@ -2736,7 +2737,7 @@ void File__Analyze::Param(const Ztring& Parameter, const Ztring& Value)
     {
         switch (Config_Trace_Format)
         {
-            case MediaInfo_Config::Trace_Format_XML         : 
+            case MediaInfo_Config::Trace_Format_XML         :
                                                                 {
                                                                 size_t Details_lt_Pos=Element[Element_Level].ToShow.Details.rfind(__T("<"));
                                                                 size_t Details_gt_Pos=Element[Element_Level].ToShow.Details.rfind(__T(">"));
@@ -2758,7 +2759,7 @@ void File__Analyze::Param(const Ztring& Parameter, const Ztring& Value)
                     break;
         default                                         : ;
     }
-                                                          
+
     //Show Offset
     if (Config_Trace_Level>0.7)
     {
@@ -2912,7 +2913,7 @@ void File__Analyze::Param_Info (const Ztring &Text)
     {
         case MediaInfo_Config::Trace_Format_Tree        :
         case MediaInfo_Config::Trace_Format_CSV         : Element[Element_Level].ToShow.Details+=__T(" - "); break;
-        case MediaInfo_Config::Trace_Format_XML         : 
+        case MediaInfo_Config::Trace_Format_XML         :
                                                             {
                                                                 size_t Start=Element[Element_Level].ToShow.Details.rfind(EOL);
                                                                 if (Start==(size_t)-1)
@@ -2920,7 +2921,7 @@ void File__Analyze::Param_Info (const Ztring &Text)
                                                                 End=Element[Element_Level].ToShow.Details.find(__T('>'), Start);
                                                                 if (End==(size_t)-1)
                                                                     End=Element[Element_Level].ToShow.Details.size();
-                                                                
+
                                                                      if (Element[Element_Level].ToShow.Details.find(__T(" info7=\""), Start)!=string::npos)
                                                                     Element[Element_Level].ToShow.Details.insert(End, __T(" info8=\""));
                                                                 else if (Element[Element_Level].ToShow.Details.find(__T(" info6=\""), Start)!=string::npos)
@@ -2935,7 +2936,7 @@ void File__Analyze::Param_Info (const Ztring &Text)
                                                                     Element[Element_Level].ToShow.Details.insert(End, __T(" info3=\""));
                                                                 else if (Element[Element_Level].ToShow.Details.find(__T(" info=\""), Start)!=string::npos)
                                                                     Element[Element_Level].ToShow.Details.insert(End, __T(" info2=\""));
-                                                                else                
+                                                                else
                                                                     Element[Element_Level].ToShow.Details.insert(End, __T(" info=\""));
                                                                 End=Element[Element_Level].ToShow.Details.find(__T('>'), Start);
                                                                 if (End==(size_t)-1)
@@ -2956,7 +2957,7 @@ void File__Analyze::Param_Info (const Ztring &Text)
                                                                 End=Element[Element_Level].ToShow.Details.find(__T('>'), Start);
                                                                 if (End==(size_t)-1)
                                                                     End=Element[Element_Level].ToShow.Details.size();
-            
+
                                                                 Element[Element_Level].ToShow.Details.insert(End, __T("\"")); break;
                                                             }
                                                             break;
@@ -3476,7 +3477,11 @@ void File__Analyze::GoToFromEnd (int64u GoToFromEnd, const char* ParserName)
     if (File_Size==(int64u)-1)
     {
         #if MEDIAINFO_SEEK
-            if (Config->File_IgnoreSequenceFileSize_Get() && GoToFromEnd)
+            if (
+                #if MEDIAINFO_ADVANCED
+                Config->File_IgnoreSequenceFileSize_Get() &&
+                #endif //MEDIAINFO_ADVANCED
+                GoToFromEnd)
             {
                 File_GoTo=Config->File_Names.size()-1;
                 File_Offset=(int64u)-1;

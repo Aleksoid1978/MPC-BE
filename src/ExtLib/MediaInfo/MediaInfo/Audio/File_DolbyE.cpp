@@ -554,7 +554,7 @@ const char*  DolbyE_ChannelLayout_PerProgram(int8u ProgramConfiguration, int8u P
     }
 };
 
-extern const float32 Mpegv_frame_rate[16];
+extern const float64 Mpegv_frame_rate[16];
 
 const bool Mpegv_frame_rate_type[16]=
 {false, false, false, false, false, false, true, true, true, false, false, false, false, false, false, false};

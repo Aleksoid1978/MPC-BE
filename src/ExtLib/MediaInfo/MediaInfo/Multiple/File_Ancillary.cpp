@@ -221,6 +221,9 @@ File_Ancillary::File_Ancillary()
 {
     //Configuration
     ParserName=__T("Ancillary");
+    #if MEDIAINFO_EVENTS
+        StreamIDs_Width[0]=4;
+    #endif //MEDIAINFO_EVENTS
     PTS_DTS_Needed=true;
 
     //In
@@ -342,10 +345,10 @@ void File_Ancillary::Streams_Finish()
     //Unsupported streams
     for (DataID = 0; DataID<Unknown.size(); DataID++)
         for (SecondaryDataID = 0; SecondaryDataID<Unknown[DataID].size(); SecondaryDataID++)
-            for (perid::iterator Stream = Unknown[DataID][SecondaryDataID].begin(); Stream!=Unknown[DataID][SecondaryDataID].end(); Stream++)
+            for (perid::iterator Stream = Unknown[DataID][SecondaryDataID].begin(); Stream!=Unknown[DataID][SecondaryDataID].end(); ++Stream)
             {
                 Stream_Prepare(Stream->second.StreamKind);
-                for (std::map<string, Ztring>::iterator Info=Stream->second.Infos.begin(); Info!=Stream->second.Infos.end(); Info++)
+                for (std::map<string, Ztring>::iterator Info=Stream->second.Infos.begin(); Info!=Stream->second.Infos.end(); ++Info)
                     Fill(Stream->second.StreamKind, StreamPos_Last, Info->first.c_str(), Info->second);
             }
 }
@@ -416,18 +419,20 @@ void File_Ancillary::Read_Buffer_Continue()
 {
     if (Element_Size==0)
     {
-        if (!Cdp_Data.empty() && AspectRatio && FrameRate)
-        {
-            ((File_Cdp*)Cdp_Parser)->AspectRatio=AspectRatio;
-            for (size_t Pos=0; Pos<Cdp_Data.size(); Pos++)
+        #if defined(MEDIAINFO_CDP_YES)
+            if (!Cdp_Data.empty() && AspectRatio && FrameRate)
             {
-                if (Cdp_Parser->PTS_DTS_Needed)
-                    Cdp_Parser->FrameInfo.DTS=FrameInfo.DTS-(Cdp_Data.size()-Pos)*FrameInfo.DUR;
-                Open_Buffer_Continue(Cdp_Parser, Cdp_Data[Pos]->Data, Cdp_Data[Pos]->Size);
-                delete Cdp_Data[Pos]; //Cdp_Data[0]=NULL;
+                ((File_Cdp*)Cdp_Parser)->AspectRatio=AspectRatio;
+                for (size_t Pos=0; Pos<Cdp_Data.size(); Pos++)
+                {
+                    if (Cdp_Parser->PTS_DTS_Needed)
+                        Cdp_Parser->FrameInfo.DTS=FrameInfo.DTS-(Cdp_Data.size()-Pos)*FrameInfo.DUR;
+                    Open_Buffer_Continue(Cdp_Parser, Cdp_Data[Pos]->Data, Cdp_Data[Pos]->Size);
+                    delete Cdp_Data[Pos]; //Cdp_Data[0]=NULL;
+                }
+                Cdp_Data.clear();
             }
-            Cdp_Data.clear();
-        }
+        #endif //defined(MEDIAINFO_CDP_YES)
 
         #if defined(MEDIAINFO_AFDBARDATA_YES)
             //Keeping only one, TODO: parse it without video stream
@@ -666,6 +671,7 @@ void File_Ancillary::Data_Parse()
                                         {
                                             if (Sdp_Parser->PTS_DTS_Needed)
                                                 Sdp_Parser->FrameInfo=FrameInfo;
+                                            Demux(Payload, (size_t)DataCount, ContentType_MainStream);
                                             Open_Buffer_Continue(Sdp_Parser, Payload, (size_t)DataCount);
                                         }
                                         #endif //defined(MEDIAINFO_SDP_YES)
@@ -684,7 +690,10 @@ void File_Ancillary::Data_Parse()
                                             Open_Buffer_Init(Rdd18_Parser);
                                         }
                                         if (!Rdd18_Parser->Status[IsFinished])
+                                        {
+                                            Rdd18_Parser->Frame_Count=Frame_Count;
                                             Open_Buffer_Continue(Rdd18_Parser, Payload+1, (size_t)DataCount-1);
+                                        }
                                         #endif //defined(MEDIAINFO_MXF_YES)
                                         break;
                             default   :

@@ -354,6 +354,13 @@ public :
     bool          File_IsGrowing;
     bool          File_IsNotGrowingAnymore;
     bool          File_IsImageSequence;
+    #if defined(MEDIAINFO_EIA608_YES)
+    bool          File_Scte20_IsPresent;
+    #endif //defined(MEDIAINFO_EIA608_YES)
+    #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+    bool          File_DtvccTransport_Stream_IsPresent;
+    bool          File_DtvccTransport_Descriptor_IsPresent;
+    #endif //defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
     int64u        File_Current_Offset;
     int64u        File_Current_Size;
     int64u        File_IgnoreEditsBefore;

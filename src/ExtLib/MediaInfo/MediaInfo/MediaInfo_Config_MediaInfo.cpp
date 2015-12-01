@@ -245,6 +245,13 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     File_IsGrowing=false;
     File_IsNotGrowingAnymore=false;
     File_IsImageSequence=false;
+    #if defined(MEDIAINFO_EIA608_YES)
+    File_Scte20_IsPresent=false;
+    #endif //defined(MEDIAINFO_EIA608_YES)
+    #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+    File_DtvccTransport_Stream_IsPresent=false;
+    File_DtvccTransport_Descriptor_IsPresent=false;
+    #endif //defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
     File_Current_Offset=0;
     File_Current_Size=(int64u)-1;
     File_IgnoreEditsBefore=0;
@@ -398,12 +405,12 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     }
     else if (Option_Lower==__T("file_ignoresequencefilescount"))
     {
-        #if MEDIAINFO_MD5
+        #if MEDIAINFO_ADVANCED
             File_IgnoreSequenceFilesCount_Set(!(Value==__T("0") || Value.empty()));
             return Ztring();
-        #else //MEDIAINFO_MD5
+        #else //MEDIAINFO_ADVANCED
             return __T("Disabled due to compilation options");
-        #endif //MEDIAINFO_MD5
+        #endif //MEDIAINFO_ADVANCED
     }
     else if (Option_Lower==__T("file_sequencefilesskipframes") || Option_Lower==__T("file_sequencefileskipframes"))
     {
@@ -416,21 +423,21 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     }
     else if (Option_Lower==__T("file_defaultframerate"))
     {
-        #if MEDIAINFO_MD5
+        #if MEDIAINFO_ADVANCED
             File_DefaultFrameRate_Set(Ztring(Value).To_float64());
             return Ztring();
-        #else //MEDIAINFO_MD5
+        #else //MEDIAINFO_ADVANCED
             return __T("File_DefaultFrameRate is disabled due to compilation options");
-        #endif //MEDIAINFO_MD5
+        #endif //MEDIAINFO_ADVANCED
     }
     else if (Option_Lower==__T("file_source_list"))
     {
-        #if MEDIAINFO_MD5
+        #if MEDIAINFO_ADVANCED
             File_Source_List_Set(!(Value==__T("0") || Value.empty()));
             return Ztring();
-        #else //MEDIAINFO_MD5
-            return __T("MD5 is disabled due to compilation options");
-        #endif //MEDIAINFO_MD5
+        #else //MEDIAINFO_ADVANCED
+            return __T("File_Source_List_Set is disabled due to compilation options");
+        #endif //MEDIAINFO_ADVANCED
     }
     else if (Option_Lower==__T("file_riskybitrateestimation"))
     {

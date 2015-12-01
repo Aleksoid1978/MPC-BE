@@ -700,6 +700,7 @@ File_Ac3::File_Ac3()
     HD_MajorSync_Parsed=false;
     Core_IsPresent=false;
     HD_IsPresent=false;
+    HD_HasAtmos=false;
     dynrnge_Exists=false;
     TimeStamp_IsPresent=false;
     TimeStamp_IsParsing=false;
@@ -724,12 +725,24 @@ void File_Ac3::Streams_Fill()
 
         if (HD_StreamType==0xBA) //TrueHD
         {
+            if (HD_HasAtmos)
+            {
+
+                Fill(Stream_General, 0, General_Format, "Atmos");
+                Fill(Stream_Audio, 0, Audio_Format, "Atmos");
+                Fill(Stream_Audio, 0, Audio_Codec, "Atmos");
+                Fill(Stream_Audio, 0, Audio_Channel_s_, "Object Based");
+                Fill(Stream_Audio, 0, Audio_ChannelPositions, "Object Based");
+                Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, "Object Based");
+            }
             Fill(Stream_General, 0, General_Format, "TrueHD");
             Fill(Stream_Audio, 0, Audio_Format, "TrueHD");
-
             Fill(Stream_Audio, 0, Audio_Codec, "TrueHD");
             Fill(Stream_Audio, 0, Audio_BitRate_Mode, "VBR");
-            Fill(Stream_Audio, 0, Audio_SamplingRate, AC3_HD_SamplingRate(HD_SamplingRate1));
+            Ztring Sampling;
+            Sampling.From_Number(AC3_HD_SamplingRate(HD_SamplingRate1));
+            if (HD_HasAtmos) Sampling.insert(0, __T(" / "));
+            Fill(Stream_Audio, 0, Audio_SamplingRate, Sampling);
             Fill(Stream_Audio, 0, Audio_Channel_s_, AC3_TrueHD_Channels(HD_Channels2));
             Fill(Stream_Audio, 0, Audio_ChannelPositions, AC3_TrueHD_Channels_Positions(HD_Channels2));
             Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, AC3_TrueHD_Channels_Positions2(HD_Channels2));
@@ -963,6 +976,21 @@ void File_Ac3::Streams_Fill()
         if (TimeStamp_DropFrame_IsValid)
             Fill(Stream_Audio, 0, Audio_Delay_Settings, TimeStamp_DropFrame_Content?"drop_frame_flag=1":"drop_frame_flag=0");
     }
+
+    //Samples per frame
+    int16u SamplesPerFrame;
+    if (bsid_Max<=0x08)
+        SamplesPerFrame=1536;
+    else if (bsid_Max<=0x09)
+        SamplesPerFrame=768; // Unofficial hack for low sample rate (e.g. 22.05 kHz)
+    else if (bsid_Max>0x0A && bsid_Max<=0x10)
+        SamplesPerFrame=256;
+    else if (HD_MajorSync_Parsed && (HD_StreamType==0xBA || HD_StreamType==0xBB)) // TrueHD or MLP
+        SamplesPerFrame=40;
+    else
+        SamplesPerFrame=0;
+    if (SamplesPerFrame)
+        Fill(Stream_Audio, 0, Audio_SamplesPerFrame, SamplesPerFrame);
 }
 
 //---------------------------------------------------------------------------
@@ -2001,9 +2029,32 @@ void File_Ac3::HD()
         Skip_B1(                                                "Unknown");
         Skip_B1(                                                "Unknown");
         Skip_B1(                                                "Unknown");
-        Skip_B1(                                                "Unknown");
-        Skip_B1(                                                "Unknown");
-        Skip_B1(                                                "Unknown");
+        BS_Begin();
+        Skip_S1( 7,                                             "Unknown");
+        bool HasExtend;
+        Get_SB (    HasExtend,                                  "Has Extend");
+        BS_End();
+        if (HasExtend)
+        {
+            unsigned char Extend = 0;
+            unsigned char Unknown = 0;
+            bool HasContent = false;
+            BS_Begin();
+            Get_S1( 4, Extend,                                  "Extend Header");
+            Get_S1( 4, Unknown,                                 "Unknown");
+            if (Unknown)
+                HasContent = true;
+            BS_End();
+            for (Extend = (Extend * 2) + 1; Extend > 0; Extend--)
+            {
+                Get_B1(Unknown,                                 "Unknown");
+                if (Unknown)
+                    HasContent = true;
+            }
+            if (HasContent)
+                HD_HasAtmos=true; //Currently only Atmos is known as having data here
+        }
+
         Element_End0();
 
         FILLING_BEGIN();

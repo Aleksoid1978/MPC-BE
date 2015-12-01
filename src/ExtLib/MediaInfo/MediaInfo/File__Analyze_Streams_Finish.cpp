@@ -596,6 +596,48 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
             Fill(Stream_Audio, 0, Audio_FrameCount, Frame_Count_NotParsedIncluded);
     }
 
+    //FrameRate same as SampleRate
+    if (Retrieve(Stream_Audio, Pos, Audio_SamplingRate).To_float64() == Retrieve(Stream_Audio, Pos, Audio_FrameRate).To_float64())
+        Clear(Stream_Audio, Pos, Audio_FrameRate);
+
+    //SamplingRate
+    if (Retrieve(Stream_Audio, Pos, Audio_SamplingRate).empty())
+    {
+        float64 BitDepth=Retrieve(Stream_Audio, Pos, Audio_BitDepth).To_float64();
+        float64 Channels=Retrieve(Stream_Audio, Pos, Audio_Channel_s_).To_float64();
+        float64 BitRate=Retrieve(Stream_Audio, Pos, Audio_BitRate).To_float64();
+        if (BitDepth && Channels && BitRate)
+            Fill(Stream_Audio, Pos, Audio_SamplingRate, BitRate/Channels/BitDepth, 0);
+    }
+
+    //SamplesPerFrames
+    if (Retrieve(Stream_Audio, Pos, Audio_SamplesPerFrame).empty())
+    {
+        float64 FrameRate=Retrieve(Stream_Audio, Pos, Audio_FrameRate).To_float64();
+        float64 SamplingRate=0;
+        ZtringList SamplingRates;
+        SamplingRates.Separator_Set(0, " / ");
+        SamplingRates.Write(Retrieve(Stream_Audio, Pos, Audio_SamplingRate));
+        for (size_t i=0; i<SamplingRates.size(); ++i)
+        {
+            SamplingRate = SamplingRates[i].To_float64();
+            if (SamplingRate)
+                break; // Using the first valid one
+        }
+        if (FrameRate && SamplingRate && FrameRate!=SamplingRate)
+        {
+            float64 SamplesPerFrameF=SamplingRate/FrameRate;
+            Ztring SamplesPerFrame;
+            if (SamplesPerFrameF>1601 && SamplesPerFrameF<1602)
+                SamplesPerFrame = __T("1601.6"); // Usually this is 29.970 fps PCM. TODO: check if it is OK in all cases
+            else if (SamplesPerFrameF>800 && SamplesPerFrameF<801)
+                SamplesPerFrame = __T("800.8"); // Usually this is 59.940 fps PCM. TODO: check if it is OK in all cases
+            else
+                SamplesPerFrame.From_Number(SamplesPerFrameF, 0);
+            Fill(Stream_Audio, Pos, Audio_SamplesPerFrame, SamplesPerFrame);
+        }
+    }
+
     //Duration
     if (Retrieve(Stream_Audio, Pos, Audio_Duration).empty() && Retrieve(Stream_Audio, Pos, Audio_SamplingRate).To_int64u()!=0)
     {
@@ -623,8 +665,16 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
 }
 
 //---------------------------------------------------------------------------
-void File__Analyze::Streams_Finish_StreamOnly_Text(size_t UNUSED(Pos))
+void File__Analyze::Streams_Finish_StreamOnly_Text(size_t Pos)
 {
+    //FrameRate from FrameCount and Duration
+    if (Retrieve(Stream_Text, Pos, Text_FrameRate).empty())
+    {
+        int64u FrameCount=Retrieve(Stream_Text, Pos, Text_FrameCount).To_int64u();
+        float64 Duration=Retrieve(Stream_Text, Pos, Text_Duration).To_float64()/1000;
+        if (FrameCount && Duration)
+           Fill(Stream_Text, Pos, Text_FrameRate, FrameCount/Duration, 3);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -919,7 +969,7 @@ void File__Analyze::Streams_Finish_InterStreams()
     }
 
     //FrameCount if General not filled
-    if (Retrieve(Stream_General, 0, General_FrameCount).empty() && Count_Get(Stream_Video))
+    if (Retrieve(Stream_General, 0, General_FrameCount).empty() && Count_Get(Stream_Video) && Retrieve(Stream_General, 0, "IsTruncated").empty())
     {
         Ztring FrameCount=Retrieve(Stream_Video, 0, Video_FrameCount);
         bool IsOk=true;
@@ -978,6 +1028,20 @@ void File__Analyze::Streams_Finish_HumanReadable_PerStream(stream_t StreamKind, 
          && Retrieve(StreamKind, StreamPos, Video_FrameRate_Minimum).To_int32u()==24
          && Retrieve(StreamKind, StreamPos, Video_FrameRate_Maximum).To_int32u()==30)
             Fill(Stream_Video, StreamPos_Last, Video_FrameRate_String, MediaInfoLib::Config.Language_Get(Retrieve(StreamKind, StreamPos, Video_FrameRate)+__T(" (24/30)"), __T(" fps")), true);
+
+        //Special cases - Frame rate
+        if (StreamKind==Stream_Video
+         && Parameter==Video_FrameRate
+         && !Retrieve(StreamKind, StreamPos, Video_FrameRate).empty()
+         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Num).empty()
+         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Den).empty())
+            Fill(Stream_Video, StreamPos, Video_FrameRate_String, MediaInfoLib::Config.Language_Get(Retrieve(StreamKind, StreamPos, Video_FrameRate)+__T(" (")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Num)+__T("/")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Den)+__T(")"), __T(" fps")), true);
+        if (StreamKind==Stream_Video
+         && Parameter==Video_FrameRate_Original
+         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original).empty()
+         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Num).empty()
+         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den).empty())
+            Fill(Stream_Video, StreamPos, Video_FrameRate_Original_String, MediaInfoLib::Config.Language_Get(Retrieve(StreamKind, StreamPos, Video_FrameRate_Original)+__T(" (")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Num)+__T("/")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den)+__T(")"), __T(" fps")), true);
     }
 
     //BitRate_Mode / OverallBitRate_Mode

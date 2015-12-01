@@ -66,6 +66,7 @@
     #include "MediaInfo/Audio/File_Mpega.h"
 #endif
 #if MEDIAINFO_DEMUX
+    #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
     #include "base64.h"
 #endif //MEDIAINFO_DEMUX
 //---------------------------------------------------------------------------

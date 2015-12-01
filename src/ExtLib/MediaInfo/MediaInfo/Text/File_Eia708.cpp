@@ -126,7 +126,7 @@ void File_Eia708::Streams_Finish()
 //---------------------------------------------------------------------------
 bool File_Eia708::Synchronize()
 {
-    if (cc_type!=3)
+    if (IsSub && cc_type!=3)
         return false; //Waiting for sync from underlying layer
 
     if (!Status[IsAccepted])
@@ -909,7 +909,12 @@ void File_Eia708::DSW()
 //HideWindows
 void File_Eia708::HDW()
 {
-    Param_Info1("HideWindows");
+    #if MEDIAINFO_TRACE
+        Param_Info1("HideWindows");
+        Element_Level--;
+        Element_Info1("HideWindows");
+        Element_Level++;
+    #endif //MEDIAINFO_TRACE
 
     int8u Save_WindowID=Streams[service_number]->WindowID;
     bool  Save_StandAloneCommand=StandAloneCommand;
@@ -969,7 +974,12 @@ void File_Eia708::HDW()
 //ToggleWindows
 void File_Eia708::TGW()
 {
-    Param_Info1("ToggleWindows");
+    #if MEDIAINFO_TRACE
+        Param_Info1("ToggleWindows");
+        Element_Level--;
+        Element_Info1("ToggleWindows");
+        Element_Level++;
+    #endif //MEDIAINFO_TRACE
 
     int8u Save_WindowID=Streams[service_number]->WindowID;
     bool  Save_StandAloneCommand=StandAloneCommand;
@@ -1025,7 +1035,12 @@ void File_Eia708::TGW()
 //DeleteWindows
 void File_Eia708::DLW()
 {
-    Param_Info1("DeleteWindows");
+    #if MEDIAINFO_TRACE
+        Param_Info1("DeleteWindows");
+        Element_Level--;
+        Element_Info1("DeleteWindows");
+        Element_Level++;
+    #endif //MEDIAINFO_TRACE
 
     int8u Save_WindowID=Streams[service_number]->WindowID;
     bool  Save_StandAloneCommand=StandAloneCommand;
@@ -1046,7 +1061,10 @@ void File_Eia708::DLW()
 
         //Bug in some files
         if (IsSet && WindowID==1 && Streams[service_number]->Windows[0]!=NULL && Streams[service_number]->Windows[1]==NULL) //Mix between Windows 0 and 1
+        {
             Bug_WindowOffset=true;
+            //Fill(Stream_Text, 0, "Bug", "WindowID_Bug", Unlimited, true, true);
+        }
         if (!IsSet && WindowID==0 && Bug_WindowOffset)
             IsSet=true;
 
@@ -1122,7 +1140,13 @@ void File_Eia708::RST()
 //Set Pen Attributes
 void File_Eia708::SPA()
 {
-    Param_Info1("Set Pen Attributes");
+    #if MEDIAINFO_TRACE
+        Param_Info1("Set Pen Attributes");
+        Element_Level--;
+        Element_Info1("Set Pen Attributes");
+        Element_Level++;
+    #endif //MEDIAINFO_TRACE
+
     Element_Begin1("Set Pen Attributes");
     BS_Begin();
     Skip_S1(4,                                                  "text tag");
@@ -1140,7 +1164,13 @@ void File_Eia708::SPA()
 //Set Pen Color
 void File_Eia708::SPC()
 {
-    Param_Info1("Set Pen Color");
+    #if MEDIAINFO_TRACE
+        Param_Info1("Set Pen Color");
+        Element_Level--;
+        Element_Info1("Set Pen Color");
+        Element_Level++;
+    #endif //MEDIAINFO_TRACE
+
     Element_Begin1("Set Pen Color");
     BS_Begin();
     Skip_S1(2,                                                  "foreground opacity");
@@ -1164,7 +1194,13 @@ void File_Eia708::SPC()
 //SetPenLocation
 void File_Eia708::SPL()
 {
-    Param_Info1("SetPenLocation");
+    #if MEDIAINFO_TRACE
+        Param_Info1("SetPenLocation");
+        Element_Level--;
+        Element_Info1("SetPenLocation");
+        Element_Level++;
+    #endif //MEDIAINFO_TRACE
+
     Element_Begin1("SetPenLocation");
     int8u row, column;
     BS_Begin();
@@ -1203,7 +1239,13 @@ void File_Eia708::SPL()
 //SetWindowAttributes
 void File_Eia708::SWA()
 {
-    Param_Info1("SetWindowAttributes");
+    #if MEDIAINFO_TRACE
+        Param_Info1("SetWindowAttributes");
+        Element_Level--;
+        Element_Info1("SetWindowAttributes");
+        Element_Level++;
+    #endif //MEDIAINFO_TRACE
+
     Element_Begin1("SetWindowAttributes");
     BS_Begin();
     Skip_S1(2,                                                  "fill opacity");
@@ -1235,7 +1277,13 @@ void File_Eia708::SWA()
 //DefineWindow
 void File_Eia708::DFx(int8u WindowID)
 {
-    Param_Info1("DefineWindow"); Param_Info1(WindowID);
+    #if MEDIAINFO_TRACE
+        Param_Info1("DefineWindow"); Param_Info1(WindowID);
+        Element_Level--;
+        Element_Info1("DefineWindow");
+        Element_Level++;
+    #endif //MEDIAINFO_TRACE
+
     Element_Begin1("DefineWindow");
     int8u anchor_vertical, anchor_horizontal, anchor_point, row_count, column_count;
     bool visible, relative_positioning;
@@ -1355,6 +1403,10 @@ void File_Eia708::DFx(int8u WindowID)
 //---------------------------------------------------------------------------
 void File_Eia708::Character_Fill(wchar_t Character)
 {
+    Element_Level-=1;
+    Element_Info1(Ztring().From_Unicode(&Character, 1));
+    Element_Level+=1;
+
     Param_Info1(Ztring().From_Unicode(&Character, 1)); //(Character) after new ZenLib release
 
     int8u WindowID=Streams[service_number]->WindowID;

@@ -292,24 +292,25 @@ void File_Mpeg4::Streams_Finish()
     if (Retrieve(Stream_General, 0, General_Format)==__T("Final Cut EIA-608"))
     {
         for (streams::iterator Stream=Streams.begin(); Stream!=Streams.end(); ++Stream)
-        {
-            Stream->second.Parsers[0]->Finish();
-            if (Stream->second.Parsers[0]->Count_Get(Stream_Text))
+            for (size_t Pos=0; Pos<Streams[(int32u)Element_Code].Parsers.size(); Pos++)
             {
-                Stream_Prepare(Stream_Text);
-                Fill(Stream_Text, StreamPos_Last, Text_ID, Stream->first==1?"608-1":"608-2");
-                Fill(Stream_Text, StreamPos_Last, "MuxingMode", __T("Final Cut"), Unlimited);
-                Merge(*Stream->second.Parsers[0], Stream_Text, 0, StreamPos_Last);
-            }
+                Stream->second.Parsers[Pos]->Finish();
+                if (Stream->second.Parsers[Pos]->Count_Get(Stream_Text))
+                {
+                    Stream_Prepare(Stream_Text);
+                    Fill(Stream_Text, StreamPos_Last, Text_ID, Stream->first==1?"608-1":"608-2");
+                    Fill(Stream_Text, StreamPos_Last, "MuxingMode", __T("Final Cut"), Unlimited);
+                    Merge(*Stream->second.Parsers[Pos], Stream_Text, 0, StreamPos_Last);
+                }
 
-            //Law rating
-            Ztring LawRating=Stream->second.Parsers[0]->Retrieve(Stream_General, 0, General_LawRating);
-            if (!LawRating.empty())
-                Fill(Stream_General, 0, General_LawRating, LawRating, true);
-            Ztring Title=Stream->second.Parsers[0]->Retrieve(Stream_General, 0, General_Title);
-            if (!Title.empty() && Retrieve(Stream_General, 0, General_Title).empty())
-                Fill(Stream_General, 0, General_Title, Title);
-        }
+                //Law rating
+                Ztring LawRating=Stream->second.Parsers[Pos]->Retrieve(Stream_General, 0, General_LawRating);
+                if (!LawRating.empty())
+                    Fill(Stream_General, 0, General_LawRating, LawRating, true);
+                Ztring Title=Stream->second.Parsers[Pos]->Retrieve(Stream_General, 0, General_Title);
+                if (!Title.empty() && Retrieve(Stream_General, 0, General_Title).empty())
+                    Fill(Stream_General, 0, General_Title, Title);
+            }
 
         return;
     }
@@ -338,6 +339,220 @@ void File_Mpeg4::Streams_Finish()
 
         //if (Temp->second.stsz_StreamSize)
         //    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), Temp->second.stsz_StreamSize);
+
+        //flags and references
+        if (StreamKind_Last != Stream_Menu)
+        {
+            Ztring TempString;
+            std::vector<int32u>::iterator TrackID;
+            if (StreamKind_Last == Stream_Text)
+            {
+                std::vector<int32u> TrackIDs = Temp->second.SubtitleFor;
+                for (TrackID = Temp->second.Forced.begin(); TrackID != Temp->second.Forced.end(); ++TrackID)
+                {
+                    for (std::vector<int32u>::iterator TrackID2 = Streams[*TrackID].SubtitleFor.begin(); TrackID2 != Streams[*TrackID].SubtitleFor.end(); ++TrackID2)
+                    {
+                        TrackIDs.push_back(*TrackID2);
+                    }
+                }
+                for (TrackID = Temp->second.ForcedFor.begin(); TrackID != Temp->second.ForcedFor.end(); ++TrackID)
+                {
+                    for (std::vector<int32u>::iterator TrackID2 = Streams[*TrackID].SubtitleFor.begin(); TrackID2 != Streams[*TrackID].SubtitleFor.end(); ++TrackID2)
+                    {
+                        TrackIDs.push_back(*TrackID2);
+                    }
+                }
+                sort (TrackIDs.begin(), TrackIDs.end());
+                TrackIDs.erase( unique(TrackIDs.begin(), TrackIDs.end()), TrackIDs.end());
+                for (std::vector<int32u>::iterator TrackID = TrackIDs.begin(); TrackID != TrackIDs.end(); ++TrackID)
+                {
+                    if (TempString.size()) TempString.append(__T(","));
+                    TempString.append(Ztring().From_Number(*TrackID));
+                }
+                if (TempString.size())
+                {
+                    Fill(StreamKind_Last, StreamPos_Last, "Subtitles For", TempString.To_Local().c_str());
+                    TempString.clear();
+                }
+            }
+            if (Temp->second.IsExcluded)
+                Fill(StreamKind_Last, StreamPos_Last, "Default", "Excluded");
+            else
+            {
+                if (Temp->second.IsEnabled)
+                {
+                    if (!Retrieve(StreamKind_Last, StreamPos_Last, "AlternateGroup").empty()) // Redundant information if there is not alternate group
+                        Fill(StreamKind_Last, StreamPos_Last, "Default", "Yes");
+                }
+                else
+                {
+                    for (TrackID = Temp->second.FallBackTo.begin(); TrackID != Temp->second.FallBackTo.end(); ++TrackID)
+                    {
+                        if (Streams[*TrackID].IsEnabled)
+                        {
+                            if (TempString.size()) TempString.append(__T(" ,"));
+                            else TempString=__T("Inherited From: ");
+                            TempString.append(Ztring().From_Number(*TrackID));
+                        }
+                    }
+                    for (TrackID = Temp->second.FallBackFrom.begin(); TrackID != Temp->second.FallBackFrom.end(); ++TrackID)
+                    {
+                        if (Streams[*TrackID].IsEnabled)
+                        {
+                            if (TempString.size()) TempString.append(__T(" ,"));
+                            else TempString=__T("Inherited From: ");
+                            TempString.append(Ztring().From_Number(*TrackID));
+                        }
+                    }
+                    Fill(StreamKind_Last, StreamPos_Last, "Default", TempString.size()?TempString.To_Local().c_str():"No");
+                    TempString.clear();
+                }
+            }
+            if (StreamKind_Last == Stream_Text)
+            {
+                if (Temp->second.HasForcedSamples)
+                {
+                    if (Temp->second.AllForcedSamples)
+                        Fill(StreamKind_Last, StreamPos_Last, "Forced", "Yes");
+                    else
+                        Fill(StreamKind_Last, StreamPos_Last, "Forced", "Mixed");
+                    if (Temp->second.ForcedFor.size())
+                    {
+                        for (TrackID = Temp->second.ForcedFor.begin(); TrackID != Temp->second.ForcedFor.end(); ++TrackID)
+                        {
+                            if (TempString.size()) TempString.append(__T(","));
+                            TempString.append(Ztring().From_Number(*TrackID));
+                        }
+                        Fill(StreamKind_Last, StreamPos_Last, "Full Alternative", TempString.To_Local().c_str());
+                        TempString.clear();
+                    }
+                }
+                else
+                    Fill(StreamKind_Last, StreamPos_Last, "Forced", "No");
+                if (Temp->second.Forced.size())
+                {
+                    for (TrackID = Temp->second.Forced.begin(); TrackID != Temp->second.Forced.end(); ++TrackID)
+                    {
+                        if (TempString.size()) TempString.append(__T(","));
+                        TempString.append(Ztring().From_Number(*TrackID));
+                    }
+                    if (TempString.size()) Fill(StreamKind_Last, StreamPos_Last, "Forced Alternative", TempString.To_Local().c_str());
+                    TempString.clear();
+                }
+            }
+            if (StreamKind_Last == Stream_Audio)
+            {
+                if (Temp->second.FallBackTo.size())
+                {
+                    for (TrackID = Temp->second.FallBackTo.begin(); TrackID != Temp->second.FallBackTo.end(); ++TrackID)
+                    {
+                        if (TempString.size()) TempString.append(__T(","));
+                        TempString.append(Ztring().From_Number(*TrackID));
+                    }
+                    if (TempString.size())
+                    {
+                        Fill(StreamKind_Last, StreamPos_Last, "Fallback To", TempString.To_Local().c_str());
+                        TempString.clear();
+                    }
+                }
+                if (Temp->second.FallBackFrom.size())
+                {
+                    for (TrackID = Temp->second.FallBackFrom.begin(); TrackID != Temp->second.FallBackFrom.end(); ++TrackID)
+                    {
+                        if (TempString.size()) TempString.append(__T(","));
+                        TempString.append(Ztring().From_Number(*TrackID));
+                    }
+                    if (TempString.size())
+                    {
+                        Fill(StreamKind_Last, StreamPos_Last, "Fallback From", TempString.To_Local().c_str());
+                        TempString.clear();
+                    }
+                }
+                if (Temp->second.Subtitle.size())
+                {
+                    std::vector<int32u> TrackIDs = Temp->second.Subtitle;
+                    for (TrackID = Temp->second.Subtitle.begin(); TrackID != Temp->second.Subtitle.end(); ++TrackID)
+                    {
+                        std::vector<int32u>::iterator TrackID2;
+                        for (TrackID2 = Streams[*TrackID].Forced.begin(); TrackID2 != Streams[*TrackID].Forced.end(); ++TrackID2)
+                        {
+                            TrackIDs.push_back(*TrackID2);
+                        }
+                        for (TrackID2 = Streams[*TrackID].ForcedFor.begin(); TrackID2 != Streams[*TrackID].ForcedFor.end(); ++TrackID2)
+                        {
+                            TrackIDs.push_back(*TrackID2);
+                        }
+                    }
+                    sort (TrackIDs.begin(), TrackIDs.end());
+                    TrackIDs.erase( unique(TrackIDs.begin(), TrackIDs.end()), TrackIDs.end());
+                    for (std::vector<int32u>::iterator TrackID = TrackIDs.begin(); TrackID != TrackIDs.end(); ++TrackID)
+                    {
+                        if (TempString.size()) TempString.append(__T(","));
+                        TempString.append(Ztring().From_Number(*TrackID));
+                    }
+                    if (TempString.size())
+                    {
+                        Fill(StreamKind_Last, StreamPos_Last, "Subtitles", TempString.To_Local().c_str());
+                        TempString.clear();
+                    }
+                }
+            }
+            if (Temp->second.CC.size())
+            {
+                    for (TrackID = Temp->second.CC.begin(); TrackID != Temp->second.CC.end(); ++TrackID)
+                    {
+                        if (TempString.size()) TempString.append(__T(","));
+                        TempString.append(Ztring().From_Number(*TrackID));
+                    }
+                    if (TempString.size())
+                    {
+                        Fill(StreamKind_Last, StreamPos_Last, "Closed Captions", TempString.To_Local().c_str());
+                        TempString.clear();
+                    }
+            }
+            else if (Temp->second.CCFor.size())
+            {
+                    for (TrackID = Temp->second.CCFor.begin(); TrackID != Temp->second.CCFor.end(); ++TrackID)
+                    {
+                        if (TempString.size()) TempString.append(__T(","));
+                        TempString.append(Ztring().From_Number(*TrackID));
+                    }
+                    if (TempString.size())
+                    {
+                        Fill(StreamKind_Last, StreamPos_Last, "Closed Captions For", TempString.To_Local().c_str());
+                        TempString.clear();
+                    }
+            }
+            if (Temp->second.Chapters.size())
+            {
+                for (TrackID = Temp->second.Chapters.begin(); TrackID != Temp->second.Chapters.end(); ++TrackID)
+                {
+                    if (TempString.size()) TempString.append(__T(","));
+                    TempString.append(Ztring().From_Number(*TrackID));
+                }
+                if (TempString.size())
+                {
+                    Fill(StreamKind_Last, StreamPos_Last, "Menus", TempString.To_Local().c_str());
+                    TempString.clear();
+                }
+            }
+        }
+
+        if (Temp->second.ChaptersFor.size())
+        {
+            Ztring TempString;
+            std::vector<int32u>::iterator TrackID;
+            for (TrackID = Temp->second.ChaptersFor.begin(); TrackID != Temp->second.ChaptersFor.end(); ++TrackID)
+            {
+                if (TempString.size()) TempString.append(__T(","));
+                TempString.append(Ztring().From_Number(*TrackID));
+            }
+            if (TempString.size())
+            {
+                Fill(StreamKind_Last, StreamPos_Last, "Menu For", TempString.To_Local().c_str());
+                TempString.clear();
+            }
+        }
 
         //Edit lists coherencies
         if (Temp->second.edts.size()>1 && Temp->second.edts[0].Duration==Temp->second.tkhd_Duration)
@@ -1591,6 +1806,10 @@ void File_Mpeg4::Header_Parse()
             (*File_Buffer_Size_Hint_Pointer)=Buffer_Size_Target;
         }
     }
+
+    //Incoherencies
+    if (Element_Level<=2 && File_Offset+Buffer_Offset+Size>File_Size)
+        Fill(Stream_General, 0, "IsTruncated", "Yes");
 }
 
 //---------------------------------------------------------------------------
@@ -1940,7 +2159,7 @@ File_Mpeg4::method File_Mpeg4::Metadata_Get(std::string &Parameter, int64u Meta)
         case Elements::moov_meta___cmt : Parameter="Comment"; Method=Method_String; break;
         case Elements::moov_meta___cpy : Parameter="Copyright"; Method=Method_String; break;
         case Elements::moov_meta___day : Parameter="Recorded_Date"; Method=Method_String; break;
-        case Elements::moov_meta___des : Parameter="Title/More"; Method=Method_String; break;
+        case Elements::moov_meta___des : Parameter="Title_More"; Method=Method_String; break;
         case Elements::moov_meta___dir : Parameter="Director"; Method=Method_String; break;
         case Elements::moov_meta___dis : Parameter="TermsOfUse"; Method=Method_String; break;
         case Elements::moov_meta___edl : Parameter="Tagged_Date"; Method=Method_String; break;
@@ -1949,7 +2168,7 @@ File_Mpeg4::method File_Mpeg4::Metadata_Get(std::string &Parameter, int64u Meta)
         case Elements::moov_meta___gen : Parameter="Genre"; Method=Method_String; break;
         case Elements::moov_meta___grp : Parameter="Grouping"; Method=Method_String; break;
         case Elements::moov_meta___hos : Parameter="HostComputer"; Method=Method_String; break;
-        case Elements::moov_meta___inf : Parameter="Title/More"; Method=Method_String; break;
+        case Elements::moov_meta___inf : Parameter="Title_More"; Method=Method_String; break;
         case Elements::moov_meta___key : Parameter="Keywords"; Method=Method_String; break;
         case Elements::moov_meta___lyr : Parameter="Lyrics"; Method=Method_String; break;
         case Elements::moov_meta___mak : Parameter="Make"; Method=Method_String; break;
@@ -1982,7 +2201,7 @@ File_Mpeg4::method File_Mpeg4::Metadata_Get(std::string &Parameter, int64u Meta)
         case Elements::moov_meta__cprt : Parameter="Copyright"; Method=Method_String2; break;
         case Elements::moov_meta__desc : Parameter="Description"; Method=Method_String; break;
         case Elements::moov_meta__disk : Parameter="Part"; Method=Method_Binary; break;
-        case Elements::moov_meta__dscp : Parameter="Title/More"; Method=Method_String2; break;
+        case Elements::moov_meta__dscp : Parameter="Title_More"; Method=Method_String2; break;
         case Elements::moov_meta__egid : Parameter="EpisodeGlobalUniqueID"; Method=Method_Binary; break;
         case Elements::moov_meta__flvr : Parameter="Flavour"; Method=Method_Binary; break;
         case Elements::moov_meta__gnre : Parameter="Genre"; Method=Method_String2; break;

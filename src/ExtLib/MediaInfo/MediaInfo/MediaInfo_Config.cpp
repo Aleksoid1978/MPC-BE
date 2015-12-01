@@ -125,7 +125,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.79");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.80");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -1491,7 +1491,13 @@ Ztring MediaInfo_Config::Language_Get (const Ztring &Value)
     CriticalSectionLocker CSL(CS);
 
     if (Value.find(__T(" / "))==string::npos)
-        return Language.Get(Value);
+    {
+        if (Value.size()<7 || Value.find(__T("/String"))+7!=Value.size())
+            return Language.Get(Value);
+        Ztring Temp(Value);
+        Temp.resize(Value.size()-7);
+        return Language.Get(Temp);
+    }
 
     ZtringList List;
     List.Separator_Set(0, __T(" / "));
@@ -1508,8 +1514,8 @@ Ztring MediaInfo_Config::Language_Get (const Ztring &Value)
 Ztring MediaInfo_Config::Language_Get (const Ztring &Count, const Ztring &Value, bool ValueIsAlwaysSame)
 {
     //Integrity
-    if (Count.empty())
-        return EmptyString_Get();
+    if (Count.empty() || Count.find_first_not_of(__T("0123456789.+-/*() "))!=string::npos)
+        return Count;
 
     //Different Plurals are available or not?
     if (Language_Get(Value+__T("1")).empty())

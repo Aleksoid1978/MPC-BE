@@ -1832,13 +1832,24 @@ string Mxf_CameraUnitMetadata_GammaforCDL(int8u Value)
 
 //---------------------------------------------------------------------------
 // EBU Tech 3349
+string Mxf_CameraUnitMetadata_NeutralDensityFilterWheelSetting(int16u Value)
+{
+    switch(Value)
+    {
+        case 0x01 : return "Clear";
+        default   : return Ztring::ToZtring(Value).To_UTF8();
+    }
+};
+
+//---------------------------------------------------------------------------
+// EBU Tech 3349
 string Mxf_CameraUnitMetadata_ImageSensorReadoutMode(int8u Value)
 {
     switch(Value)
     {
         case 0x00 : return "Interlaced field";
         case 0x01 : return "Interlaced frame";
-        case 0x02 : return "Progressive frame ";
+        case 0x02 : return "Progressive frame";
         case 0xFF : return "Undefined";
         default   : return Ztring::ToZtring(Value).To_UTF8();
     }
@@ -1860,6 +1871,72 @@ string Mxf_CameraUnitMetadata_CaptureGammaEquation(int128u Value)
                         ValueS.insert(0, 16-ValueS.size(), __T('0'));
                     return ValueS.To_UTF8();
                     }
+    }
+};
+
+//---------------------------------------------------------------------------
+// CameraUnitMetadata
+string Mxf_AcquisitionMetadata_ElementName(int16u Value, bool IsSony=false)
+{
+    if (IsSony)
+        switch (Value)
+        {
+            case 0xE101: return "EffectiveMarkerCoverage";
+            case 0xE102: return "EffectiveMarkerAspectRatio";
+            case 0xE103: return "CameraProcessDiscriminationCode";
+            case 0xE104: return "RotaryShutterMode";
+            case 0xE109: return "MonitoringDescriptions";
+            case 0xE10B: return "MonitoringBaseCurve";
+          //case 0xE201: return "CookeProtocol_BinaryMetadata"; //Not used
+            case 0xE202: return "CookeProtocol_UserMetadata";
+            case 0xE203: return "CookeProtocol_CalibrationType";
+            default:     ;
+        }
+
+    switch (Value)
+    {
+        case 0x3210: return "CaptureGammaEquation";
+        case 0x8007: return "LensAttributes";
+        case 0x8103: return "NeutralDensityFilterWheelSetting";
+        case 0x8106: return "CaptureFrameRate";
+        case 0x8107: return "ImageSensorReadoutMode";
+        case 0x8108: return "ShutterSpeed_Angle";
+        case 0x810B: return "ISOSensitivity";
+        case 0x810E: return "WhiteBalance";
+        case 0x8114: return "CameraAttributes";
+        case 0x8115: return "ExposureIndexofPhotoMeter";
+        case 0x8116: return "GammaforCDL";
+        case 0x8117: return "ASCCDLV1_2";
+        default:     return Ztring(Ztring::ToZtring(Value, 16)).To_UTF8();
+    }
+}
+
+//---------------------------------------------------------------------------
+// CameraUnitMetadata - Sony E201 (Values are internal MI)
+const size_t Mxf_AcquisitionMetadata_Sony_E201_ElementCount = 11;
+const char* Mxf_AcquisitionMetadata_Sony_E201_ElementName[Mxf_AcquisitionMetadata_Sony_E201_ElementCount] =
+{
+    "FocusDistance",
+    "ApertureValue",
+    "ApertureScale",
+    "EffectiveFocaleLength",
+    "HyperfocalDistance",
+    "NearFocusDistance",
+    "FarFocusDistance",
+    "HorizontalFieldOfView",
+    "EntrancePupilPosition",
+    "NormalizedZoomValue",
+    "LensSerialNumber",
+};
+
+//---------------------------------------------------------------------------
+// EBU Tech 3349
+string Mxf_AcquisitionMetadata_Sony_CameraProcessDiscriminationCode(int16u Value)
+{
+    switch (Value)
+    {
+        case 0x0102: return "F65 HD Mode released in April 2012";
+        default:     return Ztring(Ztring::ToZtring(Value, 16)).To_UTF8();
     }
 };
 
@@ -1914,6 +1991,7 @@ File_Mxf::File_Mxf()
     IsParsingEnd=false;
     IsCheckingRandomAccessTable=false;
     IsCheckingFooterPartitionAddress=false;
+    IsSearchingFooterPartitionAddress=false;
     FooterPartitionAddress_Jumped=false;
     PartitionPack_Parsed=false;
     IdIsAlwaysSame_Offset=0;
@@ -2151,6 +2229,8 @@ void File_Mxf::Streams_Finish()
     #if MEDIAINFO_ADVANCED
         if (Footer_Position!=(int64u)-1)
             Fill(Stream_General, 0, General_FooterSize, File_Size-Footer_Position);
+        else
+            Fill(Stream_General, 0, "IsTruncated", "Yes", Unlimited, true, true);
     #endif //MEDIAINFO_ADVANCED
 
     //Commercial names
@@ -2235,6 +2315,81 @@ void File_Mxf::Streams_Finish()
         Fill(Stream_General, 0, "PrimaryPackage", "Material Package");
         (*Stream_More)[Stream_General][0](Ztring().From_Local("PrimaryPackage"), Info_Options)=__T("N NT");
     }
+
+    //CameraUnitMetadata
+    if (!AcquisitionMetadataLists.empty())
+        for (size_t Pos = 0; Pos < AcquisitionMetadataLists.size(); Pos++)
+        {
+            if (UserDefinedAcquisitionMetadata_UdamSetIdentifier_IsSony && Pos==0xE201 && !AcquisitionMetadata_Sony_E201_Lists.empty())
+            {
+                for (size_t i=0; i<Mxf_AcquisitionMetadata_Sony_E201_ElementCount; ++i)
+                    if (AcquisitionMetadata_Sony_E201_Lists[i] && !AcquisitionMetadata_Sony_E201_Lists[i]->empty())
+                    {
+                        string ElementName(Mxf_AcquisitionMetadata_Sony_E201_ElementName[i]);
+                        string ElementName_FirstFrame(ElementName+"_FirstFrame");
+                        string ElementName_Values(ElementName+"_Values");
+                        string ElementName_FrameCounts(ElementName+"_FrameCounts");
+                        Fill(Stream_Other, 0, ElementName_FirstFrame.c_str(), (*AcquisitionMetadata_Sony_E201_Lists[i])[0].Value);
+                        switch (i)
+                        {
+                            case  0 : //FocusDistance
+                            case  4 : //HyperfocalDistance
+                            case  5 : //NearFocusDistance
+                            case  6 : //FarFocusDistance
+                            case  8 : //EntrancePupilPosition
+                                (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FirstFrame.c_str()), Info_Options)=__T("N NT");
+                                if (AcquisitionMetadataLists[0xE203] && !AcquisitionMetadataLists[0xE203]->empty()) //Calibration Type
+                                    Fill(Stream_Other, 0, (ElementName_FirstFrame+"/String").c_str(), (*AcquisitionMetadata_Sony_E201_Lists[i])[0].Value+' '+(*AcquisitionMetadataLists[0xE203])[0].Value);
+                                break;
+                            case  3 : //EffectiveFocaleLength
+                                (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FirstFrame.c_str()), Info_Options)=__T("N NT");
+                                Fill(Stream_Other, 0, (ElementName_FirstFrame+"/String").c_str(), (*AcquisitionMetadata_Sony_E201_Lists[i])[0].Value+" mm");
+                                break;
+                            case  7 : //HorizontalFieldOfView
+                                (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FirstFrame.c_str()), Info_Options)=__T("N NT");
+                                Fill(Stream_Other, 0, (ElementName_FirstFrame+"/String").c_str(), (*AcquisitionMetadata_Sony_E201_Lists[i])[0].Value+"\xc2\xB0");
+                                break;
+                            default : ;
+                        }
+                        for (size_t List_Pos=0; List_Pos<AcquisitionMetadata_Sony_E201_Lists[i]->size(); List_Pos++)
+                        {
+                            Fill(Stream_Other, 0, ElementName_Values.c_str(), (*AcquisitionMetadata_Sony_E201_Lists[i])[List_Pos].Value);
+                            Fill(Stream_Other, 0, ElementName_FrameCounts.c_str(), (*AcquisitionMetadata_Sony_E201_Lists[i])[List_Pos].FrameCount);
+                        }
+                        (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_Values.c_str()), Info_Options)=__T("N NT");
+                        (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FrameCounts.c_str()), Info_Options)=__T("N NT");
+                    }
+            }
+            else if (AcquisitionMetadataLists[Pos] && !AcquisitionMetadataLists[Pos]->empty())
+            {
+                string ElementName(Mxf_AcquisitionMetadata_ElementName((int16u)Pos, UserDefinedAcquisitionMetadata_UdamSetIdentifier_IsSony));
+                string ElementName_FirstFrame(ElementName+"_FirstFrame");
+                string ElementName_Values(ElementName+"_Values");
+                string ElementName_FrameCounts(ElementName+"_FrameCounts");
+                Fill(Stream_Other, 0, ElementName_FirstFrame.c_str(), (*AcquisitionMetadataLists[Pos])[0].Value);
+                switch (Pos)
+                {
+                    case 0x8108 : //ShutterSpeed_Angle
+                        (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FirstFrame.c_str()), Info_Options)=__T("N NT");
+                        Fill(Stream_Other, 0, (ElementName_FirstFrame+"/String").c_str(), (*AcquisitionMetadataLists[Pos])[0].Value+"\xc2\xB0");
+                        break;
+                    case 0x810E : //WhiteBalance
+                        (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FirstFrame.c_str()), Info_Options)=__T("N NT");
+                        Fill(Stream_Other, 0, (ElementName_FirstFrame+"/String").c_str(), (*AcquisitionMetadataLists[Pos])[0].Value+" K");
+                        break;
+                    default : ;
+                }
+                if (UserDefinedAcquisitionMetadata_UdamSetIdentifier_IsSony && Pos==0xE203) // Calibration Type, not for display
+                    (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FirstFrame.c_str()), Info_Options)=__T("N NT");
+                for (size_t List_Pos=0; List_Pos<AcquisitionMetadataLists[Pos]->size(); List_Pos++)
+                {
+                    Fill(Stream_Other, 0, ElementName_Values.c_str(), (*AcquisitionMetadataLists[Pos])[List_Pos].Value);
+                    Fill(Stream_Other, 0, ElementName_FrameCounts.c_str(), (*AcquisitionMetadataLists[Pos])[List_Pos].FrameCount);
+                }
+                (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_Values.c_str()), Info_Options)=__T("N NT");
+                (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FrameCounts.c_str()), Info_Options)=__T("N NT");
+            }
+        }
 }
 
 //---------------------------------------------------------------------------
@@ -2606,7 +2761,10 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
                     break;
                 }
 
+        MergedStreams_Last.clear(); //TODO: better way to do this
+
         Merge(*(*Parser), StreamKind_Last, 0, StreamPos_Last);
+        MergedStreams_Last.push_back(streamidentity(StreamKind_Last, StreamPos_Last));
 
         Ztring LawRating=(*Parser)->Retrieve(Stream_General, 0, General_LawRating);
         if (!LawRating.empty())
@@ -2628,6 +2786,7 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
         {
             Stream_Prepare(StreamKind_Last);
             Merge(*(*Parser), StreamKind_Last, StreamPos, StreamPos_Last);
+            MergedStreams_Last.push_back(streamidentity(StreamKind_Last, StreamPos_Last));
         }
 
         if (StreamKind_Last!=Stream_Other && (*Parser)->Count_Get(Stream_Other))
@@ -3437,11 +3596,15 @@ void File_Mxf::Streams_Finish_Component(const int128u ComponentUID, float64 Edit
                     break;
                 }
 
+        FillAllMergedStreams=true;
+
         if (Retrieve(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_FrameCount)).empty())
             Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_FrameCount), FrameCount);
 
         if (Retrieve(StreamKind_Last, StreamPos_Last, "FrameRate").empty())
             Fill(StreamKind_Last, StreamPos_Last, "FrameRate", EditRate);
+
+        FillAllMergedStreams=false;
     }
 }
 
@@ -3868,27 +4031,128 @@ void File_Mxf::Read_Buffer_Continue()
         }
     }
 
-    if ((IsCheckingRandomAccessTable || IsCheckingFooterPartitionAddress) && File_Offset+Buffer_Offset+16<File_Size)
+    if (IsSearchingFooterPartitionAddress)
     {
-        if (Buffer_Offset+16>Buffer_Size)
+        if (File_Offset+Buffer_Size<File_Size)
         {
             Element_WaitForMoreData();
             return;
         }
-        if (CC4(Buffer+Buffer_Offset)!=0x060E2B34 || CC3(Buffer+Buffer_Offset+4)!=0x020501 || CC3(Buffer+Buffer_Offset+8)!=0x0D0102 || CC1(Buffer+Buffer_Offset+12)!=0x01)
+
+        IsSearchingFooterPartitionAddress=false;
+        Buffer_Offset=Buffer_Size; //Default is end of file (not found)
+
+        const int8u* B_Cur06=Buffer+Buffer_Size-16;
+        while (B_Cur06>=Buffer)
         {
-            if (IsCheckingRandomAccessTable || (IsCheckingFooterPartitionAddress && FooterPartitionAddress_Jumped))
-                TryToFinish(); //No footer
-            else if (IsCheckingFooterPartitionAddress)
+            while (B_Cur06>=Buffer)
             {
-                IsParsingEnd=true;
-                GoToFromEnd(4); //For random access table
-                FooterPartitionAddress_Jumped=true;
-                Open_Buffer_Unsynch();
+                if (*B_Cur06==0x06)
+                    break;
+                B_Cur06--;
+            }
+            if (B_Cur06<Buffer)
+                break;
+
+            const int8u* B_Cur=B_Cur06;
+            if (*(B_Cur++)==0x06
+             && *(B_Cur++)==0x0E
+             && *(B_Cur++)==0x2B
+             && *(B_Cur++)==0x34
+             && *(B_Cur++)==0x02
+             && *(B_Cur++)==0x05
+             && *(B_Cur++)==0x01
+             && *(B_Cur++)==0x01
+             && *(B_Cur++)==0x0D
+             && *(B_Cur++)==0x01
+             && *(B_Cur++)==0x02
+             && *(B_Cur++)==0x01
+             && *(B_Cur++)==0x01
+             && *(B_Cur++)==0x04)
+            {
+                IsCheckingFooterPartitionAddress=true;
+                Buffer_Offset=B_Cur06-Buffer;
+                break;
+            }
+
+            B_Cur06--;
+        }
+
+        if (B_Cur06<Buffer)
+        {
+            TryToFinish();
+            return;
+        }
+    }
+
+    if (IsCheckingFooterPartitionAddress)
+    {
+        if (Buffer_Offset+17>Buffer_Size)
+        {
+            Element_WaitForMoreData();
+            return;
+        }
+
+        IsCheckingFooterPartitionAddress=false;
+
+        const int8u* B_Cur=Buffer+Buffer_Offset;
+        if (*(B_Cur++)==0x06
+         && *(B_Cur++)==0x0E
+         && *(B_Cur++)==0x2B
+         && *(B_Cur++)==0x34
+         && *(B_Cur++)==0x02
+         && *(B_Cur++)==0x05
+         && *(B_Cur++)==0x01
+         && *(B_Cur++)==0x01
+         && *(B_Cur++)==0x0D
+         && *(B_Cur++)==0x01
+         && *(B_Cur++)==0x02
+         && *(B_Cur++)==0x01
+         && *(B_Cur++)==0x01
+         && *(B_Cur++)==0x04)
+        {
+            int64u Size=*(B_Cur++);
+            if (Size >= 0x80)
+            {
+                Size&=0x7F;
+                if (17+Size>Buffer_Size)
+                {
+                    if (File_Offset+17+Size<File_Size)
+                    {
+                        Element_WaitForMoreData();
+                        return;
+                    }
+
+                    Fill(Stream_General, 0, "IsTruncated", "Yes", Unlimited, true, true);
+                }
             }
         }
+        else
+        {
+            GoToFromEnd(4); //For random access table because it is invalid footer
+            return;
+        }
+    }
+
+    if (IsCheckingRandomAccessTable)
+    {
+        if (17>Buffer_Size)
+        {
+            Element_WaitForMoreData();
+            return;
+        }
         IsCheckingRandomAccessTable=false;
-        IsCheckingFooterPartitionAddress=false;
+        if (CC4(Buffer+Buffer_Offset)!=0x060E2B34 || CC3(Buffer+Buffer_Offset+4)!=0x020501 || CC3(Buffer+Buffer_Offset+8)!=0x0D0102 || CC1(Buffer+Buffer_Offset+12)!=0x01) // Checker if it is a Partition
+        {
+            if (File_Size>=64*1024)
+            {
+                IsSearchingFooterPartitionAddress=true;
+                GoToFromEnd(64*1024); // Wrong offset, searching from end of file
+            }
+            else
+                TryToFinish();
+            return;
+        }
     }
 
     if (Config->ParseSpeed<1.0 && File_Offset+Buffer_Offset+4==File_Size)
@@ -3898,7 +4162,19 @@ void File_Mxf::Read_Buffer_Continue()
         if (Length>=16+4 && Length<File_Size/2)
         {
             GoToFromEnd(Length); //For random access table
+            IsCheckingRandomAccessTable=true;
             Open_Buffer_Unsynch();
+        }
+        else
+        {
+            if (File_Size>=64*1024)
+            {
+                IsSearchingFooterPartitionAddress=true;
+                GoToFromEnd(64*1024); // Wrong offset, searching from end of file
+            }
+            else
+                TryToFinish();
+            return;
         }
     }
 }
@@ -5003,15 +5279,6 @@ void File_Mxf::Header_Parse()
         }
     #endif //MEDIAINFO_NEXTPACKET && MEDIAINFO_DEMUX
 
-    #if MEDIAINFO_DEMUX || MEDIAINFO_SEEK
-        if (IsParsingEnd && PartitionPack_Parsed && !Partitions.empty() && Partitions[Partitions.size()-1].StreamOffset+Partitions[Partitions.size()-1].PartitionPackByteCount+Partitions[Partitions.size()-1].HeaderByteCount+Partitions[Partitions.size()-1].IndexByteCount==File_Offset+Buffer_Offset
-         && !(Code_Compare1==Elements::RandomIndexMetadata1 && Code_Compare2==Elements::RandomIndexMetadata2 && Code_Compare3==Elements::RandomIndexMetadata3 && Code_Compare4==Elements::RandomIndexMetadata4))
-        {
-            NextRandomIndexMetadata();
-            return;
-        }
-    #endif //MEDIAINFO_DEMUX || MEDIAINFO_SEEK
-
     if (Buffer_Offset+Element_Offset+Length>(size_t)-1 || Buffer_Offset+(size_t)(Element_Offset+Length)>Buffer_Size) //Not complete
     {
         if (Length>File_Size/2) //Divided by 2 for testing if this is a big chunk = Clip based and not frames.
@@ -5395,7 +5662,7 @@ void File_Mxf::Data_Parse()
                 if (Descriptor==SingleDescriptor || (Descriptor->second.LinkedTrackID==Essence->second.TrackID && Descriptor->second.LinkedTrackID!=(int32u)-1))
                 {
                     DescriptorFound=true;
-                    
+
                     Essence->second.StreamPos_Initial=Essence->second.StreamPos=Code_Compare4&0x000000FF;
 
                     if (Descriptor->second.StreamKind==Stream_Audio && Descriptor->second.Infos.find("Format_Settings_Endianness")==Descriptor->second.Infos.end())
@@ -5599,6 +5866,8 @@ void File_Mxf::Data_Parse()
                             Parsing_Size=Element_Size-Element_Offset; // There is a problem
                         if (Parsing_Size>Array_Size)
                             Parsing_Size=Array_Size; // There is a problem
+                        (*Parser)->Frame_Count=Frame_Count;
+                        (*Parser)->Frame_Count_NotParsedIncluded=Frame_Count_NotParsedIncluded;
                         Open_Buffer_Continue((*Parser), Buffer+Buffer_Offset+(size_t)(Element_Offset), Parsing_Size);
                         if ((Code_Compare4&0xFF00FF00)==0x17000100 && LineNumber==21 && (*Parser)->Count_Get(Stream_Text)==0)
                         {
@@ -5612,6 +5881,8 @@ void File_Mxf::Data_Parse()
                             Skip_XX(Array_Size-Parsing_Size,    "Padding");
                         Element_End0();
                     }
+                    if (IsSub)
+                        Frame_Count++;
                 }
             }
             else
@@ -5794,10 +6065,18 @@ void File_Mxf::Data_Parse()
         Fill();
 
         IsParsingEnd=true;
-        if (PartitionMetadata_FooterPartition!=(int64u)-1)
+        if (PartitionMetadata_FooterPartition!=(int64u)-1 && PartitionMetadata_FooterPartition>File_Offset+Buffer_Offset+(size_t)Element_Size)
         {
-            GoTo(PartitionMetadata_FooterPartition);
-            IsCheckingFooterPartitionAddress=true;
+            if (PartitionMetadata_FooterPartition+17<=File_Size)
+            {
+                GoTo(PartitionMetadata_FooterPartition);
+                IsCheckingFooterPartitionAddress=true;
+            }
+            else
+            {
+                GoToFromEnd(4); //For random access table
+                FooterPartitionAddress_Jumped=true;
+            }
         }
         else
         {
@@ -6591,6 +6870,12 @@ void File_Mxf::RGBAEssenceDescriptor()
 //---------------------------------------------------------------------------
 void File_Mxf::RandomIndexMetadata()
 {
+    if (RandomIndexMetadatas_AlreadyParsed)
+    {
+        Skip_XX(Element_Size,                                   "(Already parsed)");
+        return;
+    }
+
     //Parsing
     while (Element_Offset+4<Element_Size)
     {
@@ -6611,7 +6896,6 @@ void File_Mxf::RandomIndexMetadata()
         if (MediaInfoLib::Config.ParseSpeed_Get()<1.0 && !RandomIndexMetadatas_AlreadyParsed && !RandomIndexMetadatas.empty() && Config->File_Mxf_ParseIndex_Get())
         {
             IsParsingEnd=true;
-            IsCheckingRandomAccessTable=true;
             GoTo(RandomIndexMetadatas[0].ByteOffset);
             RandomIndexMetadatas.erase(RandomIndexMetadatas.begin());
             Open_Buffer_Unsynch();
@@ -7598,7 +7882,11 @@ void File_Mxf::LensUnitMetadata()
 void File_Mxf::CameraUnitMetadata()
 {
     if (Count_Get(Stream_Other)==0)
+    {
         Stream_Prepare(Stream_Other);
+
+        AcquisitionMetadataLists.resize(0x10000);
+    }
 
     switch(Code2)
     {
@@ -7622,7 +7910,12 @@ void File_Mxf::CameraUnitMetadata()
 void File_Mxf::UserDefinedAcquisitionMetadata()
 {
     if (Count_Get(Stream_Other)==0)
+    {
         Stream_Prepare(Stream_Other);
+
+        AcquisitionMetadataLists.resize(0x10000);
+        AcquisitionMetadata_Sony_CalibrationType = (int8u)-1;
+    }
 
     switch(Code2)
     {
@@ -7637,10 +7930,10 @@ void File_Mxf::UserDefinedAcquisitionMetadata()
                         ELEMENT(E103, UserDefinedAcquisitionMetadata_Sony_E103, "Camera Process Discrimination Code")
                         ELEMENT(E104, UserDefinedAcquisitionMetadata_Sony_E104, "Rotary Shutter Mode")
                         ELEMENT(E109, UserDefinedAcquisitionMetadata_Sony_E109, "Monitoring Descriptions")
-                        ELEMENT(E10B, UserDefinedAcquisitionMetadata_Sony_E10B, "E10B")
-                        ELEMENT(E201, UserDefinedAcquisitionMetadata_Sony_E201, "E201")
-                        ELEMENT(E202, UserDefinedAcquisitionMetadata_Sony_E202, "E202")
-                        ELEMENT(E203, UserDefinedAcquisitionMetadata_Sony_E203, "E203")
+                        ELEMENT(E10B, UserDefinedAcquisitionMetadata_Sony_E10B, "Monitoring Base Curve")
+                        ELEMENT(E201, UserDefinedAcquisitionMetadata_Sony_E201, "Cooke Protocol Binary Metadata")
+                        ELEMENT(E202, UserDefinedAcquisitionMetadata_Sony_E202, "Cooke Protocol User Metadata")
+                        ELEMENT(E203, UserDefinedAcquisitionMetadata_Sony_E203, "Cooke Protocol Calibration Type")
                         default:
                                     GenerationInterchangeObject();
                     }
@@ -7762,8 +8055,8 @@ void File_Mxf::SDTI_SystemMetadataPack() //SMPTE 385M + 326M
 
         //TimeCode
         TimeCode TimeCode_Current(  Hours_Tens  *10+Hours_Units,
-                                    Minutes_Tens*10+Minutes_Units, 
-                                    Seconds_Tens*10+Seconds_Units, 
+                                    Minutes_Tens*10+Minutes_Units,
+                                    Seconds_Tens*10+Seconds_Units,
                                     Frames_Tens *10+Frames_Units,
                                     FrameRate/(RepetitionMaxCount+1),
                                     DropFrame,
@@ -8433,7 +8726,13 @@ void File_Mxf::GenericPackage_PackageUID()
 void File_Mxf::GenericPackage_Name()
 {
     //Parsing
-    Info_UTF16B(Length2, Data,                                  "Data"); Element_Info1(Data);
+    Ztring Data;
+    Get_UTF16B(Length2, Data,                                   "Data"); Element_Info1(Data);
+
+    FILLING_BEGIN();
+        if (!Partitions_IsFooter && Data!=Retrieve(Stream_General, 0, General_PackageName))
+            Fill(Stream_General, 0, General_PackageName, Data);
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -9812,6 +10111,32 @@ void File_Mxf::PartitionMetadata()
             if (Footer_Position==(int64u)-1)
                 Footer_Position=File_Offset+Buffer_Offset-Header_Size;
         #endif //MEDIAINFO_ADVANCED
+
+        #if MEDIAINFO_ADVANCED
+            //IsTruncated
+            bool IsTruncated;
+            if (!Trusted_Get())
+                IsTruncated=true;
+            else
+            {
+                int32u KAGSize_Corrected=KAGSize;
+                if (!KAGSize || KAGSize>=File_Size) // Checking incoherent behaviors
+                    KAGSize_Corrected=1;
+                int64u Element_Size_WithPadding=Element_Offset;
+                if (Element_Size_WithPadding%KAGSize_Corrected)
+                {
+                    Element_Size_WithPadding-=Element_Size_WithPadding%KAGSize_Corrected;
+                    Element_Size_WithPadding+=KAGSize_Corrected;
+                }
+
+                if (File_Offset+Buffer_Offset+Element_Size_WithPadding+HeaderByteCount+IndexByteCount > File_Size)
+                    IsTruncated=true;
+                else
+                    IsTruncated=false;
+            }
+            if (IsTruncated)
+                Fill(Stream_General, 0, "IsTruncated", "Yes", Unlimited, true, true);
+        #endif //MEDIAINFO_ADVANCED
     }
 
     PartitionPack_AlreadyParsed.insert(File_Offset+Buffer_Offset-Header_Size);
@@ -9993,7 +10318,7 @@ void File_Mxf::RGBAEssenceDescriptor_AlphaMinRef()
 void File_Mxf::Sequence_StructuralComponents()
 {
     Components[InstanceUID].StructuralComponents.clear();
-    
+
     //Parsing
     //Vector
     int32u Count, Length;
@@ -10539,8 +10864,7 @@ void File_Mxf::CameraUnitMetadata_CaptureGammaEquation()
     Get_UUID(Value,                                             "Value");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "CaptureGammaEquation").empty())
-            Fill(Stream_Other, 0, "CaptureGammaEquation", Mxf_CameraUnitMetadata_CaptureGammaEquation(Value));
+        AcquisitionMetadata_Add(Code2, Mxf_CameraUnitMetadata_CaptureGammaEquation(Value));
     FILLING_END();
 }
 
@@ -10550,11 +10874,10 @@ void File_Mxf::CameraUnitMetadata_NeutralDensityFilterWheelSetting()
 {
     //Parsing
     int16u Value;
-    Get_B2(Value,                                               "Value");
+    Get_B2(Value,                                               "Value"); Element_Info1(Mxf_CameraUnitMetadata_NeutralDensityFilterWheelSetting(Value).c_str());
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "NeutralDensityFilterWheelSetting").empty())
-            Fill(Stream_Other, 0, "NeutralDensityFilterWheelSetting", Value);
+        AcquisitionMetadata_Add(Code2, Mxf_CameraUnitMetadata_NeutralDensityFilterWheelSetting(Value));
     FILLING_END();
 }
 
@@ -10567,8 +10890,7 @@ void File_Mxf::CameraUnitMetadata_CaptureFrameRate()
     Get_Rational(Value);
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "CaptureFrameRate").empty())
-            Fill(Stream_Other, 0, "CaptureFrameRate", Value);
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value).To_UTF8());
     FILLING_END();
 }
 
@@ -10581,8 +10903,7 @@ void File_Mxf::CameraUnitMetadata_ImageSensorReadoutMode()
     Get_B1(Value,                                               "Value");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "ImageSensorReadoutMode").empty())
-            Fill(Stream_Other, 0, "ImageSensorReadoutMode", Mxf_CameraUnitMetadata_ImageSensorReadoutMode(Value));
+        AcquisitionMetadata_Add(Code2, Mxf_CameraUnitMetadata_ImageSensorReadoutMode(Value));
     FILLING_END();
 }
 
@@ -10595,8 +10916,7 @@ void File_Mxf::CameraUnitMetadata_ShutterSpeed_Angle()
     Get_B4(Value,                                               "Value");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "ShutterSpeed_Angle").empty())
-            Fill(Stream_Other, 0, "ShutterSpeed_Angle", ((float)Value)/60, 1);
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(((float)Value) / 60, 1).To_UTF8());
     FILLING_END();
 }
 
@@ -10609,8 +10929,7 @@ void File_Mxf::CameraUnitMetadata_ISOSensitivity()
     Get_B2(Value,                                               "Value");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "ISOSensitivity").empty())
-            Fill(Stream_Other, 0, "ISOSensitivity", Value);
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value).To_UTF8());
     FILLING_END();
 }
 
@@ -10623,8 +10942,7 @@ void File_Mxf::CameraUnitMetadata_WhiteBalance()
     Get_B2(Value,                                               "Value");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "WhiteBalance").empty())
-            Fill(Stream_Other, 0, "WhiteBalance", Value);
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value).To_UTF8());
     FILLING_END();
 }
 
@@ -10637,8 +10955,7 @@ void File_Mxf::CameraUnitMetadata_CameraAttributes()
     Get_UTF8(Length2, Value,                                    "Value");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "CameraAttributes").empty())
-            Fill(Stream_Other, 0, "CameraAttributes", Value);
+        AcquisitionMetadata_Add(Code2, Value.To_UTF8());
     FILLING_END();
 }
 
@@ -10651,8 +10968,7 @@ void File_Mxf::CameraUnitMetadata_ExposureIndexofPhotoMeter()
     Get_B2(Value,                                               "Value");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "ExposureIndexofPhotoMeter").empty())
-            Fill(Stream_Other, 0, "ExposureIndexofPhotoMeter", Value);
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value).To_UTF8());
     FILLING_END();
 }
 
@@ -10665,8 +10981,7 @@ void File_Mxf::CameraUnitMetadata_GammaforCDL()
     Get_B1(Value,                                               "Value");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "GammaforCDL").empty())
-            Fill(Stream_Other, 0, "GammaforCDL", Mxf_CameraUnitMetadata_GammaforCDL(Value));
+        AcquisitionMetadata_Add(Code2, Mxf_CameraUnitMetadata_GammaforCDL(Value));
     FILLING_END();
 }
 
@@ -10697,11 +11012,8 @@ void File_Mxf::CameraUnitMetadata_ASCCDLV1_2()
     Get_BF2(sat,                                                "sat");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "ASCCDLV1_2").empty())
-        {
-            Ztring ValueS=__T("sR=")+Ztring::ToZtring(sR, 1)+__T(" sG=")+Ztring::ToZtring(sG, 1)+__T(" sB=")+Ztring::ToZtring(sB, 1)+__T(" oR=")+Ztring::ToZtring(oR, 1)+__T(" oG=")+Ztring::ToZtring(oG, 1)+__T(" oB=")+Ztring::ToZtring(oB, 1)+__T(" pR=")+Ztring::ToZtring(pR, 1)+__T(" pG=")+Ztring::ToZtring(pG, 1)+__T(" pB=")+Ztring::ToZtring(pB, 1)+__T(" sat=")+Ztring::ToZtring(sat, 1);
-            Fill(Stream_Other, 0, "ASCCDLV1_2", ValueS);
-        }
+        Ztring ValueS=__T("sR=")+Ztring::ToZtring(sR, 1)+__T(" sG=")+Ztring::ToZtring(sG, 1)+__T(" sB=")+Ztring::ToZtring(sB, 1)+__T(" oR=")+Ztring::ToZtring(oR, 1)+__T(" oG=")+Ztring::ToZtring(oG, 1)+__T(" oB=")+Ztring::ToZtring(oB, 1)+__T(" pR=")+Ztring::ToZtring(pR, 1)+__T(" pG=")+Ztring::ToZtring(pG, 1)+__T(" pB=")+Ztring::ToZtring(pB, 1)+__T(" sat=")+Ztring::ToZtring(sat, 1);
+        AcquisitionMetadata_Add(Code2, ValueS.To_UTF8());
     FILLING_END();
 }
 
@@ -10728,8 +11040,7 @@ void File_Mxf::UserDefinedAcquisitionMetadata_Sony_8007()
     Get_UTF8(Length2, Value,                                    "Value");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "LensAttributes").empty())
-            Fill(Stream_Other, 0, "LensAttributes", Value);
+        AcquisitionMetadata_Add(Code2, Value.To_UTF8());
     FILLING_END();
 }
 
@@ -10743,8 +11054,7 @@ void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E101()
     Get_B4 (Height,                                             "Height");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "EffectiveMarkerCoverage").empty())
-            Fill(Stream_Other, 0, "EffectiveMarkerCoverage", Ztring::ToZtring(Width)+__T("x")+Ztring::ToZtring(Height));
+        AcquisitionMetadata_Add(Code2, Ztring(Ztring::ToZtring(Width)+__T("x")+Ztring::ToZtring(Height)).To_UTF8());
     FILLING_END();
 }
 
@@ -10758,8 +11068,7 @@ void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E102()
     Get_B4 (Height,                                             "Height");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "EffectiveMarkerAspectRatio").empty())
-            Fill(Stream_Other, 0, "EffectiveMarkerAspectRatio", Ztring::ToZtring(Width)+__T(":")+Ztring::ToZtring(Height));
+        AcquisitionMetadata_Add(Code2, Ztring(Ztring::ToZtring(Width)+__T("x")+Ztring::ToZtring(Height)).To_UTF8());
     FILLING_END();
 }
 
@@ -10772,8 +11081,7 @@ void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E103()
     Get_B2(Value,                                               "Value");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "CameraProcessDiscriminationCode").empty())
-            Fill(Stream_Other, 0, "CameraProcessDiscriminationCode", Value, 16);
+        AcquisitionMetadata_Add(Code2, Mxf_AcquisitionMetadata_Sony_CameraProcessDiscriminationCode(Value));
     FILLING_END();
 }
 
@@ -10786,8 +11094,7 @@ void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E104()
     Get_B1(Value,                                               "Value");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "RotaryShutterMode").empty())
-            Fill(Stream_Other, 0, "RotaryShutterMode", Value?"Yes":"No");
+        AcquisitionMetadata_Add(Code2, Value?"On":"Off");
     FILLING_END();
 }
 
@@ -10800,8 +11107,7 @@ void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E109()
     Get_UTF8(Length2, Value,                                    "Value");
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Other, 0, "MonitoringDescriptions").empty())
-            Fill(Stream_Other, 0, "MonitoringDescriptions", Value);
+        AcquisitionMetadata_Add(Code2, Value.To_UTF8());
     FILLING_END();
 }
 
@@ -10810,15 +11116,260 @@ void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E109()
 void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E10B()
 {
     //Parsing
-    Skip_UUID(                                                  "Value");
+    int128u Value;
+    Get_UUID(Value,                                             "Value");
+
+    FILLING_BEGIN();
+        Ztring ValueS;
+        ValueS.From_Number(Value.lo, 16);
+        if (ValueS.size()<16)
+            ValueS.insert(0, 16-ValueS.size(), __T('0'));
+        AcquisitionMetadata_Add(Code2, ValueS.To_UTF8());
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
 //
 void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E201()
 {
+    if (AcquisitionMetadata_Sony_E201_Lists.empty())
+        AcquisitionMetadata_Sony_E201_Lists.resize(Mxf_AcquisitionMetadata_Sony_E201_ElementCount);
+
     //Parsing
-    Skip_XX(Length2,                                            "Value");
+    Ztring  FocusDistance, ApertureValue, ApertureScale, HyperfocalDistance, NearFocusDistance, FarFocusDistance, EntrancePupilPosition;
+    string  LensSerialNumber;
+    int16u  EffectiveFocaleLength, HorizontalFieldOfView, NormalizedZoomValue;
+    if (Length2<27)
+    {
+        Skip_XX(Length2,                                        "Unknown");
+        return;
+    }
+    int64u End=Element_Offset+Length2;
+    Skip_C1(                                                    "Tag");
+    BS_Begin();
+    Element_Begin1("Focus Distance");
+    {
+        int8u B1, B2, B3, B4;
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B1,                                          "1");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B2,                                          "2");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B3,                                          "3");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B4,                                          "4");
+        int32u Value=(B1<<18)|(B2<<12)|(B3<<6)|B4;
+        if (Value==0xFFFFFF)
+            FocusDistance=__T("Infinite");
+        else
+            switch (AcquisitionMetadata_Sony_CalibrationType)
+            {
+                case 1 : FocusDistance=Ztring::ToZtring(((float)Value)/10, 1); break;
+                default: FocusDistance=Ztring::ToZtring(Value); break;
+            }
+        Element_Info1(FocusDistance);
+    }
+    Element_End0();
+    Element_Begin1("Aperture Value");
+    {
+        int8u B1, B2;
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B1,                                          "1");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B2,                                          "2");
+        int16u Value=(B1<<6)|B2;
+        ApertureValue.From_Number(((float)Value)/100, 2);
+        Element_Info1(ApertureValue);
+    }
+    Element_End0();
+    Element_Begin1("Aperture Scale");
+    {
+        int8u B1, B2, Fraction;
+        Mark_1();
+        Get_S1 (7, B2,                                          "Integer 2");
+        Mark_1();
+        Get_S1 (1, B1,                                          "Integer 1");
+        Mark_0();
+        Mark_0();
+        Get_S1 (4, Fraction,                                    "Fraction");
+        int8u Value=((B1<<7)|B2);
+        ApertureScale=__T("T ")+Ztring::ToZtring(((float)Value)/10, 2)+__T(" + ")+Ztring::ToZtring(Fraction)+__T("/10");
+        Element_Info1(ApertureScale);
+    }
+    Element_End0();
+    Element_Begin1("Effective Focale Length");
+    {
+        int8u B1, B2;
+        Mark_0();
+        Mark_1();
+        Mark_0();
+        Mark_0();
+        Get_S1 (4, B1,                                          "1");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B2,                                          "2");
+        EffectiveFocaleLength=(B1<<6)|B2;
+        Element_Info2(EffectiveFocaleLength, "mm");
+    }
+    Element_End0();
+    Element_Begin1("Hyperfocal Distance");
+    {
+        int8u B1, B2, B3, B4;
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B1,                                          "1");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B2,                                          "2");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B3,                                          "3");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B4,                                          "4");
+        int32u Value=(B1<<18)|(B2<<12)|(B3<<6)|B4;
+        if (Value==0xFFFFFF)
+            HyperfocalDistance=__T("Infinite");
+        else
+            switch (AcquisitionMetadata_Sony_CalibrationType)
+            {
+                case 1 : HyperfocalDistance=Ztring::ToZtring(((float)Value)/10, 1); break;
+                default: HyperfocalDistance=Ztring::ToZtring(Value);
+            }
+        Element_Info1(HyperfocalDistance);
+    }
+    Element_End0();
+    Element_Begin1("Near Focus Distance");
+    {
+        int8u B1, B2, B3, B4;
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B1,                                          "1");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B2,                                          "2");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B3,                                          "3");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B4,                                          "4");
+        int32u Value=(B1<<18)|(B2<<12)|(B3<<6)|B4;
+        if (Value==0xFFFFFF)
+            NearFocusDistance=__T("Infinite");
+        else
+            switch (AcquisitionMetadata_Sony_CalibrationType)
+            {
+                case 1 : NearFocusDistance=Ztring::ToZtring(((float)Value)/10, 1); break;
+                default: NearFocusDistance=Ztring::ToZtring(Value);
+            }
+        Element_Info1(NearFocusDistance);
+    }
+    Element_End0();
+    Element_Begin1("Far Focus Distance");
+    {
+        int8u B1, B2, B3, B4;
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B1,                                          "1");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B2,                                          "2");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B3,                                          "3");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B4,                                          "4");
+        int32u Value=(B1<<18)|(B2<<12)|(B3<<6)|B4;
+        if (Value==0xFFFFFF)
+            FarFocusDistance=__T("Infinite");
+        else
+            switch (AcquisitionMetadata_Sony_CalibrationType)
+            {
+                case 1 : FarFocusDistance=Ztring::ToZtring(((float)Value)/10, 1); break;
+                default: FarFocusDistance=Ztring::ToZtring(Value);
+            }
+        Element_Info1(FarFocusDistance);
+    }
+    Element_End0();
+    Element_Begin1("Horizontal Field of View");
+    {
+        int8u B1, B2;
+        Mark_0();
+        Mark_1();
+        Mark_0();
+        Get_S1 (5, B1,                                          "1");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B2,                                          "2");
+        HorizontalFieldOfView=(B1<<6)|B2;
+        Element_Info1(Ztring::ToZtring(((float)HorizontalFieldOfView)/10, 1));
+    }
+    Element_End0();
+    Element_Begin1("Entrance Pupil Position");
+    {
+        int8u   B1, B2;
+        bool    Minus;
+        Mark_0();
+        Mark_1();
+        Get_SB (Minus,                                          "Minus");
+        Mark_0();
+        Get_S1 (4, B1,                                          "1");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B2,                                          "2");
+        int32u Value=(B1<<6)|B2;
+        switch (AcquisitionMetadata_Sony_CalibrationType)
+        {
+            case 1 : EntrancePupilPosition=Ztring::ToZtring(((float)Value)/10, 1); break;
+            default: EntrancePupilPosition=Ztring::ToZtring(Value);
+        }
+        Element_Info1(EntrancePupilPosition);
+    }
+    Element_End0();
+    Element_Begin1("Normalized Zoom Value");
+    {
+        int8u B1, B2;
+        Mark_0();
+        Mark_1();
+        Mark_0();
+        Mark_0();
+        Get_S1 (4, B1,                                          "1");
+        Mark_0();
+        Mark_1();
+        Get_S1 (6, B2,                                          "2");
+        NormalizedZoomValue=(B1<<6)|B2;
+        Element_Info1(Ztring::ToZtring(((float)NormalizedZoomValue)/1000, 3));
+    }
+    Element_End0();
+    BS_End();
+    Skip_C1(                                                    "S");
+    Get_String(9, LensSerialNumber,                             "Lens Serial Number");
+    if (Element_Offset+2<End)
+        Skip_XX(End-2-Element_Offset,                           "Unknown");
+    Skip_C2(                                                    "Termination");
+
+    FILLING_BEGIN();
+        // Values are internal MI
+        AcquisitionMetadata_Sony_E201_Add(0, FocusDistance.To_UTF8());
+        AcquisitionMetadata_Sony_E201_Add(1, ApertureValue.To_UTF8());
+        AcquisitionMetadata_Sony_E201_Add(2, ApertureScale.To_UTF8());
+        AcquisitionMetadata_Sony_E201_Add(3, Ztring::ToZtring(EffectiveFocaleLength).To_UTF8());
+        AcquisitionMetadata_Sony_E201_Add(4, HyperfocalDistance.To_UTF8());
+        AcquisitionMetadata_Sony_E201_Add(5, NearFocusDistance.To_UTF8());
+        AcquisitionMetadata_Sony_E201_Add(6, FarFocusDistance.To_UTF8());
+        AcquisitionMetadata_Sony_E201_Add(7, Ztring::ToZtring(((float)HorizontalFieldOfView)/10, 1).To_UTF8());
+        AcquisitionMetadata_Sony_E201_Add(8, EntrancePupilPosition.To_UTF8());
+        AcquisitionMetadata_Sony_E201_Add(9, Ztring::ToZtring(((float)NormalizedZoomValue)/1000, 3).To_UTF8());
+        AcquisitionMetadata_Sony_E201_Add(10, LensSerialNumber);
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -10828,6 +11379,10 @@ void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E202()
     //Parsing
     Ztring Value;
     Get_UTF8(Length2, Value,                                    "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Value.To_UTF8());
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -10835,7 +11390,16 @@ void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E202()
 void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E203()
 {
     //Parsing
-    Skip_B1(                                                    "Value");
+    Get_B1(AcquisitionMetadata_Sony_CalibrationType,            "Value");
+
+    FILLING_BEGIN();
+        switch(AcquisitionMetadata_Sony_CalibrationType)
+        {
+            case 0 : AcquisitionMetadata_Add(Code2, "mm"); break;
+            case 1 : AcquisitionMetadata_Add(Code2, "in"); break;
+            default : AcquisitionMetadata_Add(Code2, Ztring::ToZtring(AcquisitionMetadata_Sony_CalibrationType).To_UTF8());
+        }
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -11559,7 +12123,7 @@ void File_Mxf::Get_Rational(float64 &Value)
     Get_B4 (N,                                                  "Numerator");
     Get_B4 (D,                                                  "Denominator");
     if (D)
-        Value=((float32)N)/D;
+        Value=((float64)N)/D;
     else
         Value=0; //Error
 }
@@ -15563,7 +16127,7 @@ void File_Mxf::Locators_Test()
 void File_Mxf::NextRandomIndexMetadata()
 {
     //We have the necessary for indexes, jumping to next index
-    Skip_XX(Element_Size,                               "Data");
+    Skip_XX(Element_Size-Element_Offset,                        "Data");
     if (RandomIndexMetadatas.empty())
     {
         if (!RandomIndexMetadatas_AlreadyParsed)

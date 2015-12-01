@@ -75,7 +75,7 @@ private :
     #if defined(MEDIAINFO_CDP_YES)
         File__Analyze*  Cdp_Parser;
     #endif //defined(MEDIAINFO_CDP_YES)
-    
+
     //Temp
     int32u  CID;
     bool    CRCF;

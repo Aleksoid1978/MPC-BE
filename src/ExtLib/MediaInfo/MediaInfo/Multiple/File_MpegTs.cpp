@@ -282,6 +282,7 @@ File_MpegTs::File_MpegTs()
     //Data
     MpegTs_JumpTo_Begin=MediaInfoLib::Config.MpegTs_MaximumOffset_Get();
     MpegTs_JumpTo_End=MediaInfoLib::Config.MpegTs_MaximumOffset_Get()/4;
+    MpegTs_ScanUpTo=(int64u)-1;
     Searching_TimeStamp_Start=true;
     Complete_Stream=NULL;
     Begin_MaxDuration=MediaInfoLib::Config.ParseSpeed_Get()>=0.8?(int64u)-1:MediaInfoLib::Config.MpegTs_MaximumScanDuration_Get()*27/1000;
@@ -1969,14 +1970,14 @@ void File_MpegTs::Read_Buffer_AfterParsing()
                 if (Config->ParseSpeed < 0.5)
                 {
                     complete_stream::streams::iterator It_End=Complete_Stream->Streams.end();
-                    for (complete_stream::streams::iterator It=Complete_Stream->Streams.begin(); It!=It_End; It++)
+                    for (complete_stream::streams::iterator It=Complete_Stream->Streams.begin(); It!=It_End; ++It)
                     {
                         complete_stream::stream* &Stream=*It;
 
-                        if (Stream && Stream->Kind==complete_stream::stream::pes && Stream->TimeStamp_Start!=(int64u)-1 && Stream->TimeStamp_End!=(int64u)-1)
+                        if (Stream && Stream->Kind==complete_stream::stream::pes && Stream->TimeStamp_Start!=(int64u)-1)
                         {
                             int64u Duration=Stream->TimeStamp_End-Stream->TimeStamp_Start;
-                            if (Duration!=0 && Duration<27000000*2) // 2 seconds // mpc-be patch
+                            if (Duration>0 && Duration<27000000*2) // 2 seconds // mpc-be patch
                             {
                                 int64u Ratio=(27000000*2)/Duration;
                                 MpegTs_JumpTo_End*=Ratio;
@@ -2003,17 +2004,36 @@ void File_MpegTs::Read_Buffer_AfterParsing()
             #if MEDIAINFO_ADVANCED
              && (!Config->File_IgnoreSequenceFileSize_Get() || Config->File_Names_Pos!=Config->File_Names.size()) // TODO: temporary disabling theses options for MPEG-TS (see above), because it does not work as expected
             #endif //MEDIAINFO_ADVANCED
+             && MpegTs_ScanUpTo == (int64u)-1
              && File_Offset+Buffer_Size<File_Size-MpegTs_JumpTo_End && MpegTs_JumpTo_End)
             {
                 #if !defined(MEDIAINFO_MPEGTS_PCR_YES) && !defined(MEDIAINFO_MPEGTS_PESTIMESTAMP_YES)
                     GoToFromEnd(47); //TODO: Should be changed later (when Finalize stuff will be split)
                 #else //!defined(MEDIAINFO_MPEGTS_PCR_YES) && !defined(MEDIAINFO_MPEGTS_PESTIMESTAMP_YES)
-                    GoToFromEnd(MpegTs_JumpTo_End);
+                    #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+                        if (File_Offset+Buffer_Size<File_Size/2-MpegTs_JumpTo_Begin && File_Size/2+MpegTs_JumpTo_Begin<File_Size-MpegTs_JumpTo_End && ((Config->File_DtvccTransport_Stream_IsPresent && !Config->File_DtvccTransport_Descriptor_IsPresent)
+                        #if defined(MEDIAINFO_EIA608_YES)
+                            || Config->File_Scte20_IsPresent
+                        #endif //defined(MEDIAINFO_EIA608_YES)
+                            ))
+                        {
+                            MpegTs_ScanUpTo=File_Size/2+MpegTs_JumpTo_Begin;
+                            GoTo(File_Size/2-MpegTs_JumpTo_Begin);
+                        }
+                    #endif //defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+                    else
+                        GoToFromEnd(MpegTs_JumpTo_End);
                     Searching_TimeStamp_Start=false;
                 #endif //!defined(MEDIAINFO_MPEGTS_PCR_YES) && !defined(MEDIAINFO_MPEGTS_PESTIMESTAMP_YES)
                 Open_Buffer_Unsynch();
             }
         }
+    }
+
+    if (MpegTs_ScanUpTo != (int64u)-1 && File_Offset+Buffer_Size>=MpegTs_ScanUpTo)
+    {
+        MpegTs_ScanUpTo = (int64u)-1;
+        GoToFromEnd(MpegTs_JumpTo_End);
     }
 }
 

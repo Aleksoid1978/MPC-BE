@@ -330,6 +330,7 @@ void File_Teletext::Header_Parse()
     if (Y==0)
     {
         C.reset();
+        CharacterSubset=0;
 
         Element_Begin1("Page header");
         int8u PU=0, PT=0;
@@ -479,10 +480,16 @@ void File_Teletext::Header_Parse()
             C[11]=true;
         Skip_TB(                                                "Hamming 8/4");
         Get_TB (B,                                              "C12 - Character Subset");
+        if (B)
+            CharacterSubset |= (1<<2);
         Skip_TB(                                                "Hamming 8/4");
         Get_TB (B,                                              "C13 - Character Subset");
+        if (B)
+            CharacterSubset |= (1<<1);
         Skip_TB(                                                "Hamming 8/4");
         Get_TB (B,                                              "C14 - Character Subset");
+        if (B)
+            CharacterSubset |= (1<<0);
         Element_End0();
 
         SubCode=(S4<<12)|(S3<<8)|(S2<<4)|S1;
@@ -562,7 +569,70 @@ void File_Teletext::Data_Parse()
             Param_Info1(Ztring().From_Local((const char*)&byte, 1));
             if (byte!=Stream.CC_Displayed_Values[Y][PosX] && (!C[7] || Y)) // C[7] is "Suppress Header", to be tested when Y==0
             {
-                Stream.CC_Displayed_Values[Y][PosX]=byte;
+                Char Uni;
+                switch (CharacterSubset)
+                {
+                    case 0x00:  //English
+                                switch(byte)
+                                {
+                                    case 0x23: Uni = __T('\0xA3'); break;
+                                    case 0x24: Uni = __T('$'); break;
+                                    case 0x40: Uni = __T('@'); break;
+                                    case 0x5B: Uni = __T('\x2190'); break;
+                                    case 0x5C: Uni = __T('\xBD'); break;
+                                    case 0x5D: Uni = __T('\x2192'); break;
+                                    case 0x5E: Uni = __T('\x2191'); break;
+                                    case 0x5F: Uni = __T('#'); break;
+                                    case 0x60: Uni = __T('-'); break;
+                                    case 0x7B: Uni = __T('\xBC'); break;
+                                    case 0x7C: Uni = __T('|'); break;
+                                    case 0x7D: Uni = __T('\xBE'); break;
+                                    case 0x7E: Uni = __T('\xF7'); break;
+                                    default: Uni=byte;
+                                }
+                                break;
+                    case 0x04:  //French
+                                switch(byte)
+                                {
+                                    case 0x23: Uni = __T('\xE9'); break;
+                                    case 0x24: Uni = __T('\xEF'); break;
+                                    case 0x40: Uni = __T('\xE0'); break;
+                                    case 0x5B: Uni = __T('\xEB'); break;
+                                    case 0x5C: Uni = __T('\xEA'); break;
+                                    case 0x5D: Uni = __T('\xF9'); break;
+                                    case 0x5E: Uni = __T('\xEE'); break;
+                                    case 0x5F: Uni = __T('#'); break;
+                                    case 0x60: Uni = __T('\xE8'); break;
+                                    case 0x7B: Uni = __T('\xE2'); break;
+                                    case 0x7C: Uni = __T('\xF4'); break;
+                                    case 0x7D: Uni = __T('\xFB'); break;
+                                    case 0x7E: Uni = __T('\xE7'); break;
+                                    default: Uni=byte;
+                                }
+                                break;
+                    case 0x05:  //Portuguese/Spanish
+                                switch(byte)
+                                {
+                                    case 0x23: Uni = __T('\xE7'); break;
+                                    case 0x24: Uni = __T('$'); break;
+                                    case 0x40: Uni = __T('\xA1'); break;
+                                    case 0x5B: Uni = __T('\xE1'); break;
+                                    case 0x5C: Uni = __T('\xE9'); break;
+                                    case 0x5D: Uni = __T('\xED'); break;
+                                    case 0x5E: Uni = __T('\xF3'); break;
+                                    case 0x5F: Uni = __T('\xFA'); break;
+                                    case 0x60: Uni = __T('\xBF'); break;
+                                    case 0x7B: Uni = __T('\xFC'); break;
+                                    case 0x7C: Uni = __T('\xF1'); break;
+                                    case 0x7D: Uni = __T('\xE8'); break;
+                                    case 0x7E: Uni = __T('\xE0'); break;
+                                    default: Uni=byte;
+                                }
+                                break;
+                    default: Uni=byte;
+                }
+
+                Stream.CC_Displayed_Values[Y][PosX]=Uni;
                 Stream_HasChanged=(X<<8)|PageNumber;
             }
         }

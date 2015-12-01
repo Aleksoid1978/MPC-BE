@@ -331,7 +331,7 @@ void File_Wvpk::Data_Parse()
                 Get_L4 (total_samples,                              "total_samples");
                 Get_L4 (block_index,                                "block_index");
             }
-            if (!FromMKV || (FromMKV && Element_Offset==0))
+            if (!FromMKV || Element_Offset==0)
                 Get_L4 (block_samples,                              "block_samples");
             if (block_samples!=0) //empty frames have other values empty
             {

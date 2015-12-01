@@ -224,8 +224,8 @@ void File_Sdp::Data_Parse()
     {
         if (FieldLines[Pos])
         {
-            Element_Code=FieldLines[Pos];
-            stream &Stream=Streams[FieldLines[Pos]];
+            Element_Code=(int64u)-1;
+            stream &Stream=Streams[0];
             if (Stream.Parser==NULL)
             {
                 Stream.Parser=new File_Teletext();

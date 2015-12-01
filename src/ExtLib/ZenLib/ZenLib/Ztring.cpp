@@ -157,7 +157,11 @@ Ztring EmptyZtring;
 //---------------------------------------------------------------------------
 #if defined(STREAM_MISSING)
     #if defined (_UNICODE)
-        #define _tnprintf snwprintf
+        #if defined (MACOS) || defined (MACOSX)
+            #define _tnprintf swprintf
+        #else
+            #define _tnprintf snwprintf
+        #endif
     #else
         #define _tnprintf snprintf
     #endif
