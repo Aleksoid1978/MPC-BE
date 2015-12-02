@@ -330,7 +330,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Արտածել"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 5		"Ձայնը"
 6		"Բարձրությունը"
 7		"Min"
@@ -355,8 +355,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 38		"(Օրինակ՝ eng jap swe)"
 39		"Ֆայլերի բացման կարգավորում"
 40		"When opening an audio file,"
-42		"Ֆիլտրերի շարքի կառուցման հոսք"
-44		"Հաշվետվություն՝ ցուցադրման հոսքերի սխալների համար"
+42		"Add similar files to playlist"
+43		"Ֆիլտրերի շարքի կառուցման հոսք"
+45		"Հաշվետվություն՝ ցուցադրման հոսքերի սխալների համար"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39

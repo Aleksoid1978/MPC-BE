@@ -330,7 +330,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"エクスポート"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 5		"音声"
 6		"音量"
 7		"低"
@@ -355,8 +355,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 38		"(例: eng jap swe)"
 39		"開く設定"
 40		"音楽ファイル再生時に、"
-42		"フィルター グラフの構築にワーカー スレッドを使用する"
-44		"再生に失敗したピンを報告する"
+42		"Add similar files to playlist"
+43		"フィルター グラフの構築にワーカー スレッドを使用する"
+45		"再生に失敗したピンを報告する"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39

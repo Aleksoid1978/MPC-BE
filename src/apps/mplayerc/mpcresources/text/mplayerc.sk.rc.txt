@@ -330,7 +330,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Export"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 5		"Zvuk"
 6		"Hlasitosť"
 7		"Min"
@@ -355,8 +355,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 38		"(príklad: eng jap swe)"
 39		"Nastavenia otvárania súborov"
 40		"When opening an audio file,"
-42		"Pri vytváraní grafu filtra otvoriť iné vlákno"
-44		"Zaznamenať piny, ktoré sa nevykreslia"
+42		"Add similar files to playlist"
+43		"Pri vytváraní grafu filtra otvoriť iné vlákno"
+45		"Zaznamenať piny, ktoré sa nevykreslia"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39

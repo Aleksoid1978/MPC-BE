@@ -330,7 +330,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Экспарт"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 5		"Аўдыё"
 6		"Гучнасць"
 7		"Min"
@@ -355,8 +355,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 38		"(Напрыклад: eng jap swe)"
 39		"Налады адкрыцця файлаў"
 40		"When opening an audio file,"
-42		"Прац. струмень для пабудовы ланцуга фільтраў"
-44		"Справазд. аб памылках рэндэрынгу струменяў"
+42		"Add similar files to playlist"
+43		"Прац. струмень для пабудовы ланцуга фільтраў"
+45		"Справазд. аб памылках рэндэрынгу струменяў"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39

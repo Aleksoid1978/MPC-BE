@@ -330,7 +330,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Exportovat"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 5		"Zvuk"
 6		"Hlasitost"
 7		"Min"
@@ -355,8 +355,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 38		"(Příklad: eng jap swe)"
 39		"Otevírání souborů"
 40		"When opening an audio file,"
-42		"Filtry načítat v samostatném podprocesu"
-44		"Vypisovat podrobné informace o chybějících kodecích"
+42		"Add similar files to playlist"
+43		"Filtry načítat v samostatném podprocesu"
+45		"Vypisovat podrobné informace o chybějících kodecích"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39

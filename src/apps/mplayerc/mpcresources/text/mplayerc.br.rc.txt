@@ -330,7 +330,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Export"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 5		"Áudio"
 6		"Volume"
 7		"Min"
@@ -355,8 +355,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 38		"(Exemplo: eng jap swe)"
 39		"Opções de abertura"
 40		"When opening an audio file,"
-42		"Usar processo funcional para construir filtro gráfico"
-44		"Reportar conectores que não queiram funcionar"
+42		"Add similar files to playlist"
+43		"Usar processo funcional para construir filtro gráfico"
+45		"Reportar conectores que não queiram funcionar"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39

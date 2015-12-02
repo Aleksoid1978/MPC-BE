@@ -330,7 +330,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Sichern..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 5		"Audio"
 6		"Lautstärke"
 7		"Min"
@@ -355,8 +355,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 38		"(Beispiel: eng jap swe)"
 39		"Aktionen beim Öffnen einer Datei"
 40		"Beim Öffnen einer Audiodatei,"
-42		"Filter-Graph in separatem &Thread erstellen"
-44		"Fehlerhafte Pins im Graph &melden"
+42		"Add similar files to playlist"
+43		"Filter-Graph in separatem &Thread erstellen"
+45		"Fehlerhafte Pins im Graph &melden"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39

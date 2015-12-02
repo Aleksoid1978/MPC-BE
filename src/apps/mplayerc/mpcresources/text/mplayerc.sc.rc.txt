@@ -330,7 +330,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"导出"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 5		"音频"
 6		"音量"
 7		"小"
@@ -355,8 +355,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 38		"(例如: eng jap swe)"
 39		"打开设置"
 40		"开启音频文件时，"
-42		"使用工作线程来创建筛选器图表"
-44		"报告渲染失败的接口(pin)"
+42		"Add similar files to playlist"
+43		"使用工作线程来创建筛选器图表"
+45		"报告渲染失败的接口(pin)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
