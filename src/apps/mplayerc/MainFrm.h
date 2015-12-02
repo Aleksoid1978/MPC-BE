@@ -1230,4 +1230,6 @@ protected:
 	REFTIME		GetAvgTimePerFrame(BOOL bUsePCAP = TRUE) const;
 
 	BOOL		OpenYoutubePlaylist(CString url);
+
+	BOOL		AddSimilarFiles(CAtlList<CString>& fns);
 };
