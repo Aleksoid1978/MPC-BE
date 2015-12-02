@@ -43,6 +43,7 @@
 #include "KeyProvider.h"
 
 #include "../../DSUtil/DSMPropertyBag.h"
+#include "../../DSUtil/FontInstaller.h"
 #include "../../SubPic/ISubPic.h"
 
 #include "BaseGraph.h"
@@ -284,6 +285,10 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	bool							m_bMainIsMPEGSplitter;
 
 	void SetBalance(int balance);
+
+	// external fonts
+
+	CFontInstaller m_FontInstaller;
 
 	// subtitles
 
