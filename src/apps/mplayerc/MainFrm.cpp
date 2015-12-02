@@ -13577,6 +13577,30 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		break;
 	}
 
+	// load fonts from 'fonts' folder
+	if (pFileData) {
+		const CString path =  GetFolderOnly(pFileData->fns.GetHead()) + L"\\fonts\\";
+
+		if (::PathIsDirectory(path)) {
+			WIN32_FIND_DATA fd = { 0 };
+			HANDLE hFind = FindFirstFile(path + L"*.ttf", &fd);
+			if (hFind != INVALID_HANDLE_VALUE) {
+				do {
+					m_FontInstaller.InstallFontFile(path + fd.cFileName);
+				} while (FindNextFile(hFind, &fd));
+				FindClose(hFind);
+			}
+
+			hFind = FindFirstFile(path + L"*.otf", &fd);
+			if (hFind != INVALID_HANDLE_VALUE) {
+				do {
+					m_FontInstaller.InstallFontFile(path + fd.cFileName);
+				} while (FindNextFile(hFind, &fd));
+				FindClose(hFind);
+			}
+		}
+	}
+
 	CString err, aborted(ResStr(IDS_AG_ABORTED));
 
 	m_fUpdateInfoBar = false;
@@ -13901,6 +13925,8 @@ void CMainFrame::CloseMediaPrivate()
 	m_AudDispName.Empty();
 
 	m_bMainIsMPEGSplitter = false;
+
+	m_FontInstaller.UninstallFonts();
 
 	DbgLog((LOG_TRACE, 3, L"CMainFrame::CloseMediaPrivate() : end"));
 }
