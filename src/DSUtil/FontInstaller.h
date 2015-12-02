@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <atlcoll.h>
-
 class CFontInstaller
 {
 	HANDLE (WINAPI *pAddFontMemResourceEx)(PVOID,DWORD,PVOID,DWORD*);
@@ -33,14 +31,15 @@ class CFontInstaller
 
 	CAtlList<HANDLE> m_fonts;
 	CAtlList<CString> m_files;
-	bool InstallFontFile(const void* pData, UINT len);
+	CAtlList<CString> m_tempfiles;
 
 public:
 	CFontInstaller();
 	virtual ~CFontInstaller();
 
-	bool InstallFont(const CAtlArray<BYTE>& data);
-	bool InstallFont(const void* pData, UINT len);
 	bool InstallFontMemory(const void* pData, UINT len);
+	bool InstallFontFile(LPCTSTR filename);
+	bool InstallFontTempFile(const void* pData, UINT len);
+
 	void UninstallFonts();
 };

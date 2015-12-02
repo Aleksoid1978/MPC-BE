@@ -1338,7 +1338,6 @@ void CMatroskaSplitterFilter::InstallFonts()
 					m_pFile->Seek(pF->FileDataPos);
 
 					if (SUCCEEDED(m_pFile->ByteRead(pData, pF->FileDataLen))) {
-						//m_fontinst.InstallFont(pData, (UINT)pF->FileDataLen);
 						m_fontinst.InstallFontMemory(pData, (UINT)pF->FileDataLen);
 					}
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,16 +41,6 @@ CFontInstaller::~CFontInstaller()
 	UninstallFonts();
 }
 
-bool CFontInstaller::InstallFont(const CAtlArray<BYTE>& data)
-{
-	return InstallFont(data.GetData(), (UINT)data.GetCount());
-}
-
-bool CFontInstaller::InstallFont(const void* pData, UINT len)
-{
-	return InstallFontFile(pData, len) || InstallFontMemory(pData, len);
-}
-
 void CFontInstaller::UninstallFonts()
 {
 	if (pRemoveFontMemResourceEx) {
@@ -66,12 +56,18 @@ void CFontInstaller::UninstallFonts()
 		while (pos) {
 			CString fn = m_files.GetNext(pos);
 			pRemoveFontResourceEx(fn, FR_PRIVATE, 0);
+		}
+		m_files.RemoveAll();
+
+		pos = m_tempfiles.GetHeadPosition();
+		while (pos) {
+			CString fn = m_tempfiles.GetNext(pos);
+			pRemoveFontResourceEx(fn, FR_PRIVATE, 0);
 			if (!DeleteFile(fn) && pMoveFileEx) {
 				pMoveFileEx(fn, NULL, MOVEFILE_DELAY_UNTIL_REBOOT);
 			}
 		}
-
-		m_files.RemoveAll();
+		m_tempfiles.RemoveAll();
 	}
 }
 
@@ -89,7 +85,17 @@ bool CFontInstaller::InstallFontMemory(const void* pData, UINT len)
 	return hFont && nFonts > 0;
 }
 
-bool CFontInstaller::InstallFontFile(const void* pData, UINT len)
+bool CFontInstaller::InstallFontFile(LPCTSTR filename)
+{
+	if (pAddFontResourceEx && pAddFontResourceEx(filename, FR_PRIVATE, 0) > 0) {
+		m_files.AddTail(filename);
+		return true;
+	}
+
+	return false;
+}
+
+bool CFontInstaller::InstallFontTempFile(const void* pData, UINT len)
 {
 	if (!pAddFontResourceEx) {
 		return false;
@@ -106,7 +112,7 @@ bool CFontInstaller::InstallFontFile(const void* pData, UINT len)
 		f.Close();
 
 		if (pAddFontResourceEx(fn, FR_PRIVATE, 0) > 0) {
-			m_files.AddTail(fn);
+			m_tempfiles.AddTail(fn);
 			return true;
 		}
 	}
