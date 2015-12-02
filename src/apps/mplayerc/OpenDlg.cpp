@@ -238,7 +238,7 @@ void COpenDlg::OnBnClickedOk()
 	m_fns.RemoveAll();
 	m_fns.AddTail(m_path);
 
-	if (m_mrucombo2.IsWindowEnabled()) {
+	if (m_mrucombo2.IsWindowEnabled() && !m_path2.IsEmpty()) {
 		m_fns.AddTail(m_path2);
 
 		if (::PathFileExists(m_path2)) {
