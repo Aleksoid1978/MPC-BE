@@ -330,7 +330,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Eksportuj"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 5		"Dźwięk"
 6		"Głośność"
 7		"Min."
@@ -355,8 +355,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 38		"(Na przykład: eng jap swe)"
 39		"Otwieranie"
 40		"When opening an audio file,"
-42		"Osobny wątek programu do utworzenia grafu filtrów"
-44		"Powiadamianie o niepołączonych pinach grafu"
+42		"Add similar files to playlist"
+43		"Osobny wątek programu do utworzenia grafu filtrów"
+45		"Powiadamianie o niepołączonych pinach grafu"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39

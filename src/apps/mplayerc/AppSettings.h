@@ -589,6 +589,7 @@ public:
 	CStringW		strSubtitlesLanguageOrder;
 	CStringW		strAudiosLanguageOrder;
 	int				nAudioWindowMode;
+	bool			bAddSimilarFiles;
 	bool			fEnableWorkerThreadForOpening;
 	bool			fReportFailedPins;
 

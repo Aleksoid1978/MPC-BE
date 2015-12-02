@@ -330,7 +330,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Ver"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 5		"Ses"
 6		"Ses"
 7		"Alçak"
@@ -355,8 +355,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 38		"(Örnek: tur eng jap)"
 39		"Açık Ayarlar"
 40		"When opening an audio file,"
-42		"Süzgeç grafiği kurulumu için oynatıcı önceliğini kullan"
-44		"Çevrilemeyen ilişkilendirmeleri rapor et"
+42		"Add similar files to playlist"
+43		"Süzgeç grafiği kurulumu için oynatıcı önceliğini kullan"
+45		"Çevrilemeyen ilişkilendirmeleri rapor et"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39

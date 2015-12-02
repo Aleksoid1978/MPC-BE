@@ -330,7 +330,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"Esporta"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 5		"Audio"
 6		"Volume"
 7		"Min"
@@ -355,8 +355,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 38		"(Esempio: ita eng)"
 39		"Impostazioni all'apertura"
 40		"When opening an audio file,"
-42		"Usa il worker thread per costruire il grafico filtri"
-44		"Mostra i pin che falliscono il rendering"
+42		"Add similar files to playlist"
+43		"Usa il worker thread per costruire il grafico filtri"
+45		"Mostra i pin che falliscono il rendering"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39

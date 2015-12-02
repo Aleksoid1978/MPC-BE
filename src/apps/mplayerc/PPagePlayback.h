@@ -61,6 +61,7 @@ public:
 	CString		m_audiosLanguageOrder;
 
 	CComboBox	m_cbAudioWindowMode;
+	BOOL		m_bAddSimilarFiles;
 	BOOL		m_fEnableWorkerThreadForOpening;
 	BOOL		m_fReportFailedPins;
 

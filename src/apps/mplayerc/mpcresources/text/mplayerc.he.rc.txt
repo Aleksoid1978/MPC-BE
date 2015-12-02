@@ -330,7 +330,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
 26		"יצוא"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 5		"שמע"
 6		"עצמת קול"
 7		"מינימום"
@@ -355,8 +355,9 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 45
 38		"(דוגמה: eng jap swe)"
 39		"פתח הגדרות"
 40		"When opening an audio file,"
-42		"השתמש בתהליך נפרד בכדי לבנות את גרף הפילטרים"
-44		"דווח על תקעים שלא מתנגנים"
+42		"Add similar files to playlist"
+43		"השתמש בתהליך נפרד בכדי לבנות את גרף הפילטרים"
+45		"דווח על תקעים שלא מתנגנים"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39

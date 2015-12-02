@@ -34,6 +34,7 @@ CPPagePlayback::CPPagePlayback()
 	, m_nAutoFitFactor(50)
 	, m_nVolume(0)
 	, m_nBalance(0)
+	, m_bAddSimilarFiles(FALSE)
 	, m_fEnableWorkerThreadForOpening(FALSE)
 	, m_fReportFailedPins(FALSE)
 	, m_nVolumeStep(1)
@@ -73,6 +74,7 @@ void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT3, m_audiosLanguageOrder);
 
 	DDX_Control(pDX, IDC_COMBO4, m_cbAudioWindowMode);
+	DDX_Check(pDX, IDC_CHECK3, m_bAddSimilarFiles);
 	DDX_Check(pDX, IDC_CHECK7, m_fEnableWorkerThreadForOpening);
 	DDX_Check(pDX, IDC_CHECK6, m_fReportFailedPins);
 }
@@ -158,6 +160,7 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_cbAudioWindowMode.AddString(ResStr(IDS_AUDIOWINDOW_HIDE));
 	m_cbAudioWindowMode.SetCurSel(s.nAudioWindowMode);
 
+	m_bAddSimilarFiles = s.bAddSimilarFiles;
 	m_fEnableWorkerThreadForOpening = s.fEnableWorkerThreadForOpening;
 	m_fReportFailedPins = s.fReportFailedPins;
 
@@ -187,6 +190,7 @@ BOOL CPPagePlayback::OnApply()
 	s.fRememberZoomLevel = !!m_chkRememberZoomLevel.GetCheck();
 	s.nAutoFitFactor = m_nAutoFitFactor = min(max(20, m_nAutoFitFactor), 80);
 	s.nAudioWindowMode = m_cbAudioWindowMode.GetCurSel();
+	s.bAddSimilarFiles = !!m_bAddSimilarFiles;
 	s.fEnableWorkerThreadForOpening = !!m_fEnableWorkerThreadForOpening;
 	s.fReportFailedPins = !!m_fReportFailedPins;
 	s.strSubtitlesLanguageOrder = m_subtitlesLanguageOrder;
