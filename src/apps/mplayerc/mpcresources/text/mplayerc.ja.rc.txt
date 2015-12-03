@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"バージョン情報"
 7		"MPC-BE"
 8		"Copyright © 2002-2015 (Authors.txt ファイルを参照)"
@@ -355,7 +355,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 38		"(例: eng jap swe)"
 39		"開く設定"
 40		"音楽ファイル再生時に、"
-42		"Add similar files to playlist"
+42		"類似ファイルをプレイリストに追加する"
 43		"フィルター グラフの構築にワーカー スレッドを使用する"
 45		"再生に失敗したピンを報告する"
 END
@@ -1475,7 +1475,7 @@ STRING IDS_MAINFRM_98		"キャプチャー フィルターはありません"
 STRING IDS_MAINFRM_99		"キャプチャー グラフ ビルダー オブジェクトを作成することができません"
 STRING IDS_MAINFRM_DIR_CHECK		"サブフォルダーを含める"
 STRING IDS_MAINFRM_DIR_TITLE		"ディレクトリを選択してください"
-STRING IDS_MAINFRM_PPOFFSCR		"リサイズ後のピクセル シェーダー オン"
+STRING IDS_MAINFRM_PPOFFSCR		"リサイズ後のピクセル シェーダー オフ"
 STRING IDS_MAINFRM_PPONSCR		"リサイズ後のピクセル シェーダー オン"
 STRING IDS_MB_SHOW_EDL_EDITOR		"EDL エディターを起動しますか？"
 STRING IDS_MENU_VIDEO_ANGLE		"ビデオ アングル(&L)"
