@@ -158,6 +158,8 @@ HRESULT CMpaSplitterFile::Init()
 				startpos = savepos;
 				break;
 			}
+
+			m_mode = none;
 		}
 	}
 
