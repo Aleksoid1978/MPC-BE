@@ -2563,7 +2563,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    if (filter_to_do == PNG_FILTER_SUB)
    /* It's the only filter so no testing is needed */
    {
-      (void) png_setup_sub_row(png_ptr, bpp, row_bytes, mins); 
+      (void) png_setup_sub_row(png_ptr, bpp, row_bytes, mins);
       best_row = png_ptr->try_row;
    }
 
@@ -2572,7 +2572,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       png_size_t sum;
       png_size_t lmins = mins;
 
-      sum = png_setup_sub_row(png_ptr, bpp, row_bytes, lmins); 
+      sum = png_setup_sub_row(png_ptr, bpp, row_bytes, lmins);
 
       if (sum < mins)
       {
@@ -2598,7 +2598,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       png_size_t sum;
       png_size_t lmins = mins;
 
-      sum = png_setup_up_row(png_ptr, row_bytes, lmins); 
+      sum = png_setup_up_row(png_ptr, row_bytes, lmins);
 
       if (sum < mins)
       {

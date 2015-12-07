@@ -5414,9 +5414,37 @@ Version 1.6.19rc04 [November 5, 2015]
 Version 1.6.19 [November 12, 2015]
   Cleaned up coding style in png_handle_PLTE().
 
-Version 1.6.20beta01 [(PENDING RELEASE)]
-  Avoid potential pointer overflow/underflow in png_handle_sPLT()
-    and png_handle_pCAL() (Bug report by John Regehr).
+Version 1.6.20beta01 [November 20, 2015]
+  Avoid potential pointer overflow/underflow in png_handle_sPLT() and
+    png_handle_pCAL() (Bug report by John Regehr).
+
+Version 1.6.20beta02 [November 23, 2015]
+  Fixed incorrect implementation of png_set_PLTE() that uses png_ptr
+    not info_ptr, that left png_set_PLTE() open to the CVE-2015-8126
+    vulnerability.
+
+Version 1.6.20beta03 [November 24, 2015]
+  Backported tests from libpng-1.7.0beta69.
+
+Version 1.6.20rc01 [November 26, 2015]
+  Fixed an error in handling of bad zlib CMINFO field in pngfix, found by
+    American Fuzzy Lop, reported by Brian Carpenter.  inflate() doesn't
+    immediately fault a bad CMINFO field; instead a 'too far back' error
+    happens later (at least some times).  pngfix failed to limit CMINFO to
+    the allowed values but then assumed that window_bits was in range,
+    triggering an assert. The bug is mostly harmless; the PNG file cannot
+    be fixed.
+
+Version 1.6.20rc02 [November 29, 2015]
+  In libpng 1.6 zlib initialization was changed to use the window size
+    in the zlib stream, not a fixed value. This causes some invalid images,
+    where CINFO is too large, to display 'correctly' if the rest of the
+    data is valid.  This provides a workaround for zlib versions where the
+    error arises (ones that support the API change to use the window size
+    in the stream).
+
+Version 1.6.20 [December 3, 2015]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

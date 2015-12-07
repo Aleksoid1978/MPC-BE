@@ -133,7 +133,7 @@ png_process_some_data(png_structrp png_ptr, png_inforp info_ptr)
 void /* PRIVATE */
 png_push_read_sig(png_structrp png_ptr, png_inforp info_ptr)
 {
-   png_size_t num_checked = png_ptr->sig_bytes, /* SAFE, does not exceed 8 */ 
+   png_size_t num_checked = png_ptr->sig_bytes, /* SAFE, does not exceed 8 */
        num_to_check = 8 - num_checked;
 
    if (png_ptr->buffer_size < num_to_check)
@@ -662,7 +662,7 @@ png_process_IDAT_data(png_structrp png_ptr, png_bytep buffer,
        * change the current behavior (see comments in inflate.c
        * for why this doesn't happen at present with zlib 1.2.5).
        */
-      ret = inflate(&png_ptr->zstream, Z_SYNC_FLUSH);
+      ret = PNG_INFLATE(png_ptr, Z_SYNC_FLUSH);
 
       /* Check for any failure before proceeding. */
       if (ret != Z_OK && ret != Z_STREAM_END)
