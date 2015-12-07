@@ -14,7 +14,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_20beta01 Your_png_h_is_not_version_1_6_20beta01;
+typedef png_libpng_version_1_6_20 Your_png_h_is_not_version_1_6_20;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -775,13 +775,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-      "libpng version 1.6.20beta01 - November 13, 2015" PNG_STRING_NEWLINE \
+      "libpng version 1.6.20 - December 3, 2015" PNG_STRING_NEWLINE \
       "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
       "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
       "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
       PNG_STRING_NEWLINE;
 #  else
-   return "libpng version 1.6.20beta01 - November 13, 2015\
+   return "libpng version 1.6.20 - December 3, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2343,7 +2343,7 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
           * Fall through to "no match".
           */
          png_chunk_report(png_ptr,
-             "Not recognizing known sRGB profile that has been edited", 
+             "Not recognizing known sRGB profile that has been edited",
              PNG_CHUNK_WARNING);
          break;
 # endif

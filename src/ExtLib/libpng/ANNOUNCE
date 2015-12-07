@@ -1,33 +1,47 @@
-Libpng 1.6.20beta01 - November 17, 2015
+Libpng 1.6.20 - December 3, 2015
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.20beta01.tar.xz (LZMA-compressed, recommended)
-   1.6.20beta01.tar.gz
+   libpng-1.6.20.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.20.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1620b01.7z  (LZMA-compressed, recommended)
-   lp1620b01.zip
+   /scratch/glennrp/Libpng16/lpng1620.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng16/lpng1620.zip
 
 Other information:
 
-   1.6.20beta01-README.txt
-   1.6.20beta01-LICENSE.txt
-   libpng-1.6.20beta01-*.asc (armored detached GPG signatures)
+   libpng-1.6.20-README.txt
+   libpng-1.6.20-LICENSE.txt
+   libpng-1.6.20-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.19):
-
-Version 1.6.20beta01 [(PENDING RELEASE)]
   Avoid potential pointer overflow/underflow in png_handle_sPLT() and
     png_handle_pCAL() (Bug report by John Regehr).
+  Fixed incorrect implementation of png_set_PLTE() that uses png_ptr
+    not info_ptr, that left png_set_PLTE() open to the CVE-2015-8126
+    vulnerability.
+  Backported tests from libpng-1.7.0beta69.
+  Fixed an error in handling of bad zlib CMINFO field in pngfix, found by
+    American Fuzzy Lop, reported by Brian Carpenter.  inflate() doesn't
+    immediately fault a bad CMINFO field; instead a 'too far back' error
+    happens later (at least some times).  pngfix failed to limit CMINFO to
+    the allowed values but then assumed that window_bits was in range,
+    triggering an assert. The bug is mostly harmless; the PNG file cannot
+    be fixed.
+  In libpng 1.6 zlib initialization was changed to use the window size
+    in the zlib stream, not a fixed value. This causes some invalid images,
+    where CINFO is too large, to display 'correctly' if the rest of the
+    data is valid.  This provides a workaround for zlib versions where the
+    error arises (ones that support the API change to use the window size
+    in the stream).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -11,7 +11,7 @@
 Обновлены библиотеки:
 	ffmpeg git-n2.9-dev-2066-ga814f1d;
 	libdcadec git-v0.1.0-9-g6cc57db;
-	libpng 1.6.20beta01 git-gc4b2282;
+	libpng-1.6.20-signed;
 	Little-CMS 2.7 beta git-0ebca931;
 	MediaInfo git-v0.7.80-5-gbb1ea54;
 	ZenLib git-v0.4.32-11-gf36cf81.
