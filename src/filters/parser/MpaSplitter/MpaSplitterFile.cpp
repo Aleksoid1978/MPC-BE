@@ -132,7 +132,9 @@ HRESULT CMpaSplitterFile::Init()
 	int searchlen		= 0;
 	__int64 startpos	= 0;
 
-	__int64 endDataPos = min(endpos - MPA_HEADER_SIZE, MEGABYTE + m_startpos);
+	const __int64 limit = IsRandomAccess() ? MEGABYTE : 64 * KILOBYTE;
+
+	__int64 endDataPos = min(endpos - MPA_HEADER_SIZE, limit + m_startpos);
 	while (m_mode == none && endDataPos > (GetPos() + MPA_HEADER_SIZE)) {
 		searchlen = (int)min(endDataPos - GetPos(), 512);
 
