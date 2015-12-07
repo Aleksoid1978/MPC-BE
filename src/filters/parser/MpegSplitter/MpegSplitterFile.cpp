@@ -1360,11 +1360,11 @@ static const char und[4] = "und";
 // ISO 639 language descriptor
 static void Descriptor_0A(CGolombBuffer& gb, CString& ISO_639_language_code)
 {
-	char ch[4] = { 0 };
+	const char ch[4] = { 0 };
 	gb.ReadBuffer((BYTE *)ch, 3); // ISO 639 language code
 	gb.BitRead(8);                // audio type
 
-	if (strncmp(ch, und, 3)) {
+	if (ch[0] && strncmp(ch, und, 3)) {
 		ISO_639_language_code = CString(ch);
 	}
 }
@@ -1380,7 +1380,7 @@ static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, CString& ISO
 	const int section_len = 5;
 	int pos = 0;
 	while (pos <= descriptor_length - section_len) {
-		char ch[4] = { 0 };
+		const char ch[4] = { 0 };
 		gb.ReadBuffer((BYTE *)ch, 3); // ISO 639 language code
 		BYTE teletext_type            = gb.BitRead(5);
 		BYTE teletext_magazine_number = gb.BitRead(3);
@@ -1388,7 +1388,7 @@ static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, CString& ISO
 		BYTE teletext_page_number_2   = gb.BitRead(4);
 
 		if (teletext_type == 0x02 || teletext_type == 0x05) {
-			if (ISO_639_language_code.IsEmpty() && strncmp(ch, und, 3)) {
+			if (ISO_639_language_code.IsEmpty() && ch[0] && strncmp(ch, und, 3)) {
 				ISO_639_language_code = CString(ch);
 			}
 
@@ -1420,13 +1420,13 @@ static void Descriptor_59(CGolombBuffer& gb, int descriptor_length, CString& ISO
 	const int section_len = 8;
 	int pos = 0;
 	while (pos <= descriptor_length - section_len) {
-		char ch[4] = { 0 };
+		const char ch[4] = { 0 };
 		gb.ReadBuffer((BYTE *)ch, 3); // ISO 639 language code
 		gb.BitRead(8);                // subtitling type
 		gb.BitRead(16);               // composition pageid
 		gb.BitRead(16);               // ancillary page id
 
-		if (ISO_639_language_code.IsEmpty() && strncmp(ch, und, 3)) {
+		if (ISO_639_language_code.IsEmpty() && ch[0] && strncmp(ch, und, 3)) {
 			ISO_639_language_code = CString(ch);
 		}
 
@@ -1482,9 +1482,9 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 			if (ES_info_length > 2) {
 				int	info_length = ES_info_length;
 				for (;;) {
-					BYTE descriptor_tag		= (BYTE)gb.BitRead(8);
-					BYTE descriptor_length	= (BYTE)gb.BitRead(8);
-					info_length			   -= (2 + descriptor_length);
+					BYTE descriptor_tag    = (BYTE)gb.BitRead(8);
+					BYTE descriptor_length = (BYTE)gb.BitRead(8);
+					info_length           -= (2 + descriptor_length);
 					if (info_length < 0) {
 						break;
 					}
@@ -1719,6 +1719,36 @@ void CMpegSplitterFile::ReadSDT(CAtlArray<BYTE>& pData, BYTE table_id)
 	}
 }
 
+// ATSC - service location
+static void Descriptor_A1(CGolombBuffer& gb, int descriptor_length, CAtlMap<WORD, CString>& ISO_639_languages)
+{
+	BYTE reserved        = (BYTE)gb.BitRead(3);
+	WORD PCR_PID         = (WORD)gb.BitRead(13);
+	BYTE number_elements = (BYTE)gb.BitRead(8);
+	UNREFERENCED_PARAMETER(reserved);
+	UNREFERENCED_PARAMETER(PCR_PID);
+
+	descriptor_length -= 3;
+
+	for (BYTE cnt = 0; cnt < number_elements && descriptor_length >= 6; cnt++) {
+		gb.BitRead(8);                   // stream_type
+		gb.BitRead(3);                   // reserved
+		
+		WORD pid = (WORD)gb.BitRead(13); // elementary_PID
+		const char ch[4] = { 0 };
+		gb.ReadBuffer((BYTE *)ch, 3);    // ISO 639 language code
+		if (ch[0] && strncmp(ch, und, 3)) {
+			ISO_639_languages[pid] = CString(ch);
+		}
+
+		descriptor_length -= 6;
+	}
+
+	if (descriptor_length > 0) {
+		gb.SkipBytes(descriptor_length);
+	}
+}
+
 void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 {
 	CGolombBuffer gb(pData.GetData(), pData.GetCount());
@@ -1781,9 +1811,38 @@ void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 		}
 
 		gb.BitRead(6); // reserved
-		SHORT descriptors_size = (SHORT)gb.BitRead(10);
+		int descriptors_size = (int)gb.BitRead(10);
 		if (descriptors_size) {
-			gb.SkipBytes(descriptors_size);
+			while (descriptors_size > 0) {
+				BYTE descriptor_tag    = (BYTE)gb.BitRead(8);
+				BYTE descriptor_length = (BYTE)gb.BitRead(8);
+				descriptors_size      -= (2 + descriptor_length);
+				if (descriptors_size < 0) {
+					break;
+				}
+
+				CAtlMap<WORD, CString> ISO_639_languages;
+
+				switch (descriptor_tag) {
+					case 0xA1: // ATSC - service location
+						Descriptor_A1(gb, descriptor_length, ISO_639_languages);
+						break;
+					default:
+						gb.SkipBytes(descriptor_length);
+						break;
+				}
+
+				if (!ISO_639_languages.IsEmpty()) {
+					POSITION pos = ISO_639_languages.GetStartPosition();
+					while (pos) {
+						CAtlMap<USHORT, CString>::CPair* pPair = ISO_639_languages.GetNext(pos);
+						const WORD& pid = pPair->m_key;
+						if (m_pPMT_Lang[pid].IsEmpty()) {
+							m_pPMT_Lang[pid] = pPair->m_value;
+						}
+					}
+				}
+			}
 		}
 	}
 }
