@@ -407,7 +407,7 @@ void CPPageVideo::UpdateResizerList(int select)
 	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Bilinear"), RESIZER_BILINEAR);
 
 #if DXVAVP
-	if ((D3DFORMAT)m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel()) == D3DFMT_X8R8G8B8) {
+	if (IsWinVistaOrLater() && (D3DFORMAT)m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel()) == D3DFMT_X8R8G8B8) {
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"DXVA2"), RESIZER_DXVA2);
 	}
 #endif
