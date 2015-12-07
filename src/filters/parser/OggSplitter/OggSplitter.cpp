@@ -425,6 +425,7 @@ start:
 		tagmap[L"COPYRIGHT"]	= L"CPYR";
 		tagmap[L"DESCRIPTION"]	= L"DESC";
 		tagmap[L"ENCODER"]		= L"DESC";
+		tagmap[L"ALBUM"]		= L"ALBUM";
 
 		POSITION pos2 = tagmap.GetStartPosition();
 		while (pos2) {
