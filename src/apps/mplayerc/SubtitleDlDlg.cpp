@@ -21,16 +21,22 @@
 
 #include "stdafx.h"
 #include <afxwin.h>
+#include "SubtitleDlDlg.h"
 #include "MainFrm.h"
 #include "../../filters/transform/VSFilter/IDirectVobSub.h"
-#include "SubtitleDlDlg.h"
+#include "../../DSUtil/DSUtil.h"
 
 #define UWM_PARSE	(WM_USER + 100)
 #define UWM_FAILED	(WM_USER + 101)
 
-CSubtitleDlDlg::CSubtitleDlDlg(CWnd* pParent, const CStringA& url)
-	: CResizableDialog(CSubtitleDlDlg::IDD, pParent),
-	  m_url(url), ps(m_list.GetSafeHwnd(), 0, TRUE), m_status()
+CSubtitleDlDlg::CSubtitleDlDlg(CWnd* pParent, const CStringA& url, const CString& filename)
+	: CResizableDialog(CSubtitleDlDlg::IDD, pParent)
+	, m_ps(&m_list, 0, TRUE)
+	, m_defps(&m_list, filename)
+	, m_pTA(NULL)
+	, m_url(url)
+	, m_bReplaceSubs(false)
+	, m_status()
 {
 }
 
@@ -42,8 +48,117 @@ CSubtitleDlDlg::~CSubtitleDlDlg()
 void CSubtitleDlDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
-
 	DDX_Control(pDX, IDC_LIST1, m_list);
+}
+
+size_t CSubtitleDlDlg::StrMatch(LPCTSTR a, LPCTSTR b)
+{
+	size_t count = 0;
+
+	for (; *a && *b; a++, b++, count++) {
+		if (_totlower(*a) != _totlower(*b)) {
+			break;
+		}
+	}
+
+	return count;
+}
+
+CString CSubtitleDlDlg::LangCodeToName(LPCSTR code)
+{
+	// accept only three-letter language codes
+	size_t codeLen = strlen(code);
+	if (codeLen != 3) {
+		return _T("");
+	}
+
+	CString name = ISO6392ToLanguage(code);
+	if (!name.IsEmpty()) {
+		// workaround for ISO6392ToLanguage function behavior
+		// for unknown language code it returns the code parameter back
+		if (code != name) {
+			return name;
+		}
+	}
+
+	// support abbreviations loosely based on first letters of language name
+
+	// this list is limited to upload-enabled languages
+	// retrieved with:
+	// wget -q -O- http://www.opensubtitles.org/addons/export_languages.php | \
+	// awk 'NR > 1 { if ($(NF-1) == "1") print ("\"" $(NF-2)  "\",")}'
+	static LPCSTR ltable[] = {
+		"Albanian",  "Arabic",    "Armenian",  "Basque",     "Bengali",       "Bosnian",    "Breton",    "Bulgarian",
+		"Burmese",   "Catalan",   "Chinese",   "Czech",      "Danish",        "Dutch",      "English",   "Esperanto",
+		"Estonian",  "Finnish",   "French",    "Georgian",   "German",        "Galician",   "Greek",     "Hebrew",
+		"Hindi",     "Croatian",  "Hungarian", "Icelandic",  "Indonesian",    "Italian",    "Japanese",  "Kazakh",
+		"Khmer",     "Korean",    "Latvian",   "Lithuanian", "Luxembourgish", "Macedonian", "Malayalam", "Malay",
+		"Mongolian", "Norwegian", "Occitan",   "Persian",    "Polish",        "Portuguese", "Russian",   "Serbian",
+		"Sinhalese", "Slovak",    "Slovenian", "Spanish",    "Swahili",       "Swedish",    "Syriac",    "Telugu",
+		"Tagalog",   "Thai",      "Turkish",   "Ukrainian",  "Urdu",          "Vietnamese", "Romanian",  "Brazilian",
+	};
+
+	for (size_t i = 0; i < _countof(ltable); ++i) {
+		CString name2 = ltable[i];
+		if (StrMatch(name2, CString(code)) == codeLen) {
+			return name2;
+		}
+	}
+	return _T("");
+}
+
+int CALLBACK CSubtitleDlDlg::DefSortCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+{
+	PDEFPARAMSORT defps = reinterpret_cast<PDEFPARAMSORT>(lParamSort);
+	int nLeft = (int)lParam1, nRight = (int)lParam2;
+
+	// sort by language first
+	isdb_subtitle* lSub = (isdb_subtitle*)defps->m_list->GetItemData(nLeft);
+	isdb_subtitle* rSub = (isdb_subtitle*)defps->m_list->GetItemData(nRight);
+	CString left  = defps->m_list->GetItemText(nLeft, COL_LANGUAGE);
+	CString right = defps->m_list->GetItemText(nRight, COL_LANGUAGE);
+	// user-provided sort order
+	int lpos, rpos;
+	if (!defps->m_langPos.Lookup(CString(lSub->iso639_2), lpos) && !defps->m_langPos.Lookup(left, lpos)) {
+		lpos = INT_MAX;
+	}
+	if (!defps->m_langPos.Lookup(CString(rSub->iso639_2), rpos) && !defps->m_langPos.Lookup(right, rpos)) {
+		rpos = INT_MAX;
+	}
+	if (lpos < rpos) {
+		return -1;
+	} else if (lpos > rpos) {
+		return 1;
+	} else if (lpos == INT_MAX && rpos == INT_MAX) {
+		// lexicographical order
+		int res = _tcscmp(left, right);
+		if (res != 0) {
+			return res;
+		}
+	}
+
+	// sort by filename
+	left  = defps->m_list->GetItemText(nLeft, COL_FILENAME);
+	right = defps->m_list->GetItemText(nRight, COL_FILENAME);
+	size_t lmatch = StrMatch(defps->m_filename, left);
+	size_t rmatch = StrMatch(defps->m_filename, right);
+
+	// sort by matching character number
+	if (lmatch > rmatch) {
+		return -1;
+	} else if (lmatch < rmatch) {
+		return 1;
+	}
+
+	// prefer shorter names
+	int llen = left.GetLength();
+	int rlen = right.GetLength();
+	if (llen < rlen) {
+		return -1;
+	} else if (llen > rlen) {
+		return 1;
+	}
+	return 0;
 }
 
 void CSubtitleDlDlg::LoadList()
@@ -62,6 +177,9 @@ void CSubtitleDlDlg::LoadList()
 		m_list.SetItemText(iItem, COL_TITLES, m.titles);
 		m_list.SetCheck(iItem, m.checked);
 	}
+
+	// sort by language and filename
+	m_list.SortItemsEx(DefSortCompare, (DWORD_PTR)&m_defps);
 
 	m_list.SetRedraw(TRUE);
 	m_list.Invalidate();
@@ -89,7 +207,7 @@ bool CSubtitleDlDlg::Parse()
 			m_pTA->ticket = value;
 		} else if (param == "movie") {
 			m.reset();
-			Explode(value, m.titles, '|');
+			Explode(value.Trim(" |"), m.titles, '|');
 		} else if (param == "subtitle") {
 			sub.reset();
 			sub.id = atoi(value);
@@ -119,19 +237,18 @@ bool CSubtitleDlDlg::Parse()
 	}
 
 	pos = m_pTA->raw_movies.GetHeadPosition();
-
 	while (pos) {
-		isdb_movie& m = m_pTA->raw_movies.GetNext(pos);
+		isdb_movie& raw_movie = m_pTA->raw_movies.GetNext(pos);
 		isdb_movie_parsed p;
 
-		CStringA titlesA = Implode(m.titles, '|');
+		CStringA titlesA = Implode(raw_movie.titles, '|');
 		titlesA.Replace("|", ", ");
 		p.titles = UTF8To16(titlesA);
 		p.checked = false;
 
-		POSITION pos2 = m.subs.GetHeadPosition();
+		POSITION pos2 = raw_movie.subs.GetHeadPosition();
 		while (pos2) {
-			const isdb_subtitle& s = m.subs.GetNext(pos2);
+			const isdb_subtitle& s = raw_movie.subs.GetNext(pos2);
 			p.name = UTF8To16(s.name);
 			p.language = s.language;
 			p.format = s.format;
@@ -143,7 +260,7 @@ bool CSubtitleDlDlg::Parse()
 	}
 
 	bool ret = true;
-	if (m_parsed_movies.GetCount() == 0) {
+	if (m_parsed_movies.IsEmpty()) {
 		ret = false;
 	}
 
@@ -155,7 +272,8 @@ void CSubtitleDlDlg::SetStatus(const CString& status)
 	m_status.SetText(status, 0, 0);
 }
 
-UINT CSubtitleDlDlg::RunThread(LPVOID pParam) {
+UINT CSubtitleDlDlg::RunThread(LPVOID pParam)
+{
 	PTHREADSTRUCT pTA = reinterpret_cast<PTHREADSTRUCT>(pParam);
 
 	if (!OpenUrl(pTA->is, CString(pTA->url), pTA->raw_list)) {
@@ -171,16 +289,11 @@ UINT CSubtitleDlDlg::RunThread(LPVOID pParam) {
 int CALLBACK CSubtitleDlDlg::SortCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 {
 	PPARAMSORT ps = reinterpret_cast<PPARAMSORT>(lParamSort);
-	TCHAR left[256] = _T(""), right[256] = _T("");
 
-	ListView_GetItemText(ps->m_hWnd, lParam1, ps->m_colIndex, left, sizeof(left));
-	ListView_GetItemText(ps->m_hWnd, lParam2, ps->m_colIndex, right, sizeof(right));
+	CString left  = ps->m_list->GetItemText((int)lParam1, ps->m_colIndex);
+	CString right = ps->m_list->GetItemText((int)lParam2, ps->m_colIndex);
 
-	if (ps->m_ascending) {
-		return _tcscmp(left, right);
-	} else {
-		return _tcscmp(right, left);
-	}
+	return ps->m_ascending ? left.Compare(right) : right.Compare(left);
 }
 
 BOOL CSubtitleDlDlg::OnInitDialog()
@@ -192,11 +305,11 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 	int n, curPos = 0;
 	CArray<int> columnWidth;
 
-	CString strColumnWidth = AfxGetApp()->GetProfileString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH, _T(""));
+	CString strColumnWidth = AfxGetApp()->GetProfileString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH);
 	CString token = strColumnWidth.Tokenize(_T(","), curPos);
 
 	while (!token.IsEmpty()) {
-		if (_stscanf_s(token, L"%i", &n) == 1) {
+		if (_stscanf_s(token, L"%d", &n) == 1) {
 			columnWidth.Add(n);
 			token = strColumnWidth.Tokenize(_T(","), curPos);
 		} else {
@@ -232,6 +345,27 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 	SetMinTrackSize(s);
 	EnableSaveRestore(IDS_R_DLG_SUBTITLEDL);
 
+	// set language sorting order
+	const CAppSettings& settings = AfxGetAppSettings();
+	CString order = settings.strSubtitlesLanguageOrder;
+	// fill language->position map
+	int listPos = 0;
+	int tPos = 0;
+	CString langCode = order.Tokenize(_T(",; "), tPos);
+	while (tPos != -1) {
+		int pos;
+		CString langCodeISO6391 = ISO6392To6391(CStringA(langCode));
+		if (!langCodeISO6391.IsEmpty() && !m_defps.m_langPos.Lookup(langCodeISO6391, pos)) {
+			m_defps.m_langPos[langCodeISO6391] = listPos;
+		}
+		CString langName = LangCodeToName(CStringA(langCode));
+		if (!langName.IsEmpty() && !m_defps.m_langPos.Lookup(langName, pos)) {
+			m_defps.m_langPos[langName] = listPos;
+		}
+		langCode = order.Tokenize(_T(",; "), tPos);
+		listPos++;
+	}
+
 	m_pTA = DNew THREADSTRUCT;
 	m_pTA->url = m_url;
 	m_pTA->hWND = GetSafeHwnd();
@@ -240,6 +374,17 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 	AfxBeginThread(RunThread, static_cast<LPVOID>(m_pTA));
 
 	return TRUE;
+}
+
+BOOL CSubtitleDlDlg::PreTranslateMessage(MSG* pMsg)
+{
+	// Inhibit default handling for the Enter key when the list has the focus and an item is selected.
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN
+			&& pMsg->hwnd == m_list.GetSafeHwnd() && m_list.GetSelectedCount() > 0) {
+		return FALSE;
+	}
+
+	return __super::PreTranslateMessage(pMsg);
 }
 
 void CSubtitleDlDlg::OnOK()
@@ -252,11 +397,11 @@ void CSubtitleDlDlg::OnOK()
 		}
 	}
 
-	m_fReplaceSubs = IsDlgButtonChecked(IDC_CHECK1) == BST_CHECKED;
+	m_bReplaceSubs = IsDlgButtonChecked(IDC_CHECK1) == BST_CHECKED;
 
 	auto pFrame = AfxGetMainFrame();
 
-	if (m_fReplaceSubs) {
+	if (m_bReplaceSubs) {
 		pFrame->m_pSubStreams.RemoveAll();
 	}
 
@@ -269,8 +414,9 @@ void CSubtitleDlDlg::OnOK()
 		CAppSettings& s = AfxGetAppSettings();
 		CInternetSession is;
 		CStringA url = "http://" + s.strISDb + "/dl.php?";
-		CStringA args, ticket, str;
-		args.Format("id=%d&ticket=%s", sub.id, UrlEncode(ticket));
+		CStringA ticket = UrlEncode(m_pTA->ticket);
+		CStringA args, str;
+		args.Format("id=%d&ticket=%s", sub.id, ticket);
 		url.Append(args);
 
 		if (OpenUrl(is, CString(url), str)) {
@@ -307,7 +453,6 @@ void CSubtitleDlDlg::OnOK()
 			if (pRTS && pRTS->Open((BYTE*)(LPCSTR)str, str.GetLength(), DEFAULT_CHARSET, CString(sub.name)) && pRTS->GetStreamCount() > 0) {
 				CComPtr<ISubStream> pSubStream = pRTS.Detach();
 				pFrame->m_pSubStreams.AddTail(pSubStream);
-
 				if (!pSubStreamToSet) {
 					pSubStreamToSet = pSubStream;
 				}
@@ -326,7 +471,6 @@ void CSubtitleDlDlg::OnOK()
 void CSubtitleDlDlg::OnUpdateOk(CCmdUI* pCmdUI)
 {
 	bool fEnable = false;
-
 	for (int i = 0; !fEnable && i < m_list.GetItemCount(); ++i) {
 		fEnable = !!m_list.GetCheck(i);
 	}
@@ -348,8 +492,7 @@ void CSubtitleDlDlg::OnParse()
 		CString msg;
 		msg.Format(ResStr(IDS_SUBDL_DLG_SUBS_AVAIL), m_list.GetItemCount());
 		SetStatus(msg);
-	}
-	else {
+	} else {
 		SetStatus(ResStr(IDS_SUBDL_DLG_NOT_FOUND));
 	}
 }
@@ -359,17 +502,16 @@ void CSubtitleDlDlg::OnColumnClick(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMHEADER phdr = reinterpret_cast<LPNMHEADER>(pNMHDR);
 	*pResult = 0;
 
-	if (phdr->iItem == ps.m_colIndex) {
-		ps.m_ascending = !ps.m_ascending;
+	if (phdr->iItem == m_ps.m_colIndex) {
+		m_ps.m_ascending = !m_ps.m_ascending;
 	} else {
-		ps.m_ascending = TRUE;
+		m_ps.m_ascending = true;
 	}
 
-	ps.m_colIndex = phdr->iItem;
-	ps.m_hWnd = m_list.GetSafeHwnd();
+	m_ps.m_colIndex = phdr->iItem;
 
 	SetRedraw(FALSE);
-	ListView_SortItemsEx(m_list.GetSafeHwnd(), SortCompare, &ps);
+	m_list.SortItemsEx(SortCompare, (DWORD_PTR)&m_ps);
 	SetRedraw(TRUE);
 	m_list.Invalidate();
 	m_list.UpdateWindow();
@@ -388,13 +530,11 @@ void CSubtitleDlDlg::OnDestroy()
 
 	const CHeaderCtrl& pHC = *m_list.GetHeaderCtrl();
 	CString strColumnWidth;
-	int w;
 
 	for (int i = 0; i < pHC.GetItemCount(); ++i) {
-		w = m_list.GetColumnWidth(i);
+		int w = m_list.GetColumnWidth(i);
 		strColumnWidth.AppendFormat(L"%d,", w);
 	}
-
 	AfxGetApp()->WriteProfileString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH, strColumnWidth);
 
 	__super::OnDestroy();
@@ -407,6 +547,18 @@ BOOL CSubtitleDlDlg::OnEraseBkgnd(CDC* pDC)
 	return TRUE;
 }
 
+void CSubtitleDlDlg::DownloadSelectedSubtitles()
+{
+	POSITION pos = m_list.GetFirstSelectedItemPosition();
+	while (pos) {
+		int nItem = m_list.GetNextSelectedItem(pos);
+		if (nItem >= 0 && nItem < m_list.GetItemCount()) {
+			ListView_SetCheckState(m_list.GetSafeHwnd(), nItem, TRUE);
+		}
+	}
+	OnOK();
+}
+
 BEGIN_MESSAGE_MAP(CSubtitleDlDlg, CResizableDialog)
 	ON_WM_ERASEBKGND()
 	ON_WM_SIZE()
@@ -415,4 +567,44 @@ BEGIN_MESSAGE_MAP(CSubtitleDlDlg, CResizableDialog)
 	ON_UPDATE_COMMAND_UI(IDOK, OnUpdateOk)
 	ON_NOTIFY(HDN_ITEMCLICK, 0, OnColumnClick)
 	ON_WM_DESTROY()
+	ON_NOTIFY(NM_DBLCLK, IDC_LIST1, OnDoubleClickSubtitle)
+	ON_NOTIFY(LVN_KEYDOWN, IDC_LIST1, OnKeyPressedSubtitle)
 END_MESSAGE_MAP()
+
+void CSubtitleDlDlg::OnDoubleClickSubtitle(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMITEMACTIVATE pItemActivate = (LPNMITEMACTIVATE)(pNMHDR);
+
+	if (pItemActivate->iItem >= 0) {
+		DownloadSelectedSubtitles();
+	}
+}
+
+void CSubtitleDlDlg::OnKeyPressedSubtitle(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LV_KEYDOWN* pLVKeyDow = (LV_KEYDOWN*)pNMHDR;
+
+	if (pLVKeyDow->wVKey == VK_RETURN) {
+		DownloadSelectedSubtitles();
+		*pResult = TRUE;
+	}
+}
+
+bool CSubtitleDlDlg::OpenUrl(CInternetSession& is, CString url, CStringA& str)
+{
+	str.Empty();
+
+	try {
+		CAutoPtr<CStdioFile> f(is.OpenURL(url, 1, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT));
+
+		char buff[1024];
+		for (int len; (len = f->Read(buff, sizeof(buff))) > 0; str += CStringA(buff, len));
+
+		f->Close(); // must close it because the destructor doesn't seem to do it and we will get an exception when "is" is destroying
+	} catch (CInternetException* ie) {
+		ie->Delete();
+		return false;
+	}
+
+	return true;
+}
