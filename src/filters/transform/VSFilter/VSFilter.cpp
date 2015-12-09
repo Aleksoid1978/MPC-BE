@@ -49,7 +49,7 @@ BOOL CVSFilterApp::InitInstance()
 
 	DllEntryPoint(AfxGetInstanceHandle(), DLL_PROCESS_ATTACH, 0); // "DllMain" of the dshow baseclasses
 
-	STARTUPINFO si;
+	STARTUPINFO si = { sizeof(si) };
 	GetStartupInfo(&si);
 	m_AppName = CString(si.lpTitle);
 	m_AppName.Replace('\\', '/');
