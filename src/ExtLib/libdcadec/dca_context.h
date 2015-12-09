@@ -29,20 +29,18 @@
     (((major) << 24) | ((minor) << 12) | (patch) | 0U)
 
 /**
- * Version of libdcadec. Major number gets bumped at each API change that
+ * Version of libdcadec API. Major number gets bumped at each API change that
  * breaks backward compatibility. Minor number gets bumped at each API change
  * that remains compatible. Patch is reserved for non-API related changes.
- *
- * THE LIBRARY IS NOT YET RELEASED, DON'T CHECK THESE NUMBERS YET.
  */
-#define DCADEC_VERSION_MAJOR 0
-#define DCADEC_VERSION_MINOR 0
-#define DCADEC_VERSION_PATCH 0
+#define DCADEC_API_VERSION_MAJOR    0
+#define DCADEC_API_VERSION_MINOR    1
+#define DCADEC_API_VERSION_PATCH    0
 
-#define DCADEC_VERSION  \
-    DCADEC_VERSION_CODE(DCADEC_VERSION_MAJOR, \
-                        DCADEC_VERSION_MINOR, \
-                        DCADEC_VERSION_PATCH)
+#define DCADEC_API_VERSION \
+    DCADEC_VERSION_CODE(DCADEC_API_VERSION_MAJOR, \
+                        DCADEC_API_VERSION_MINOR, \
+                        DCADEC_API_VERSION_PATCH)
 /**@}*/
 
 /**@{*/
@@ -83,6 +81,18 @@
 /**@}*/
 
 /**@{*/
+#define DCADEC_WCOREAUXFAILED   1   /**< Failed to parse core auxiliary data */
+#define DCADEC_WCOREEXTFAILED   2   /**< Failed to parse core extension */
+#define DCADEC_WEXSSFAILED      3   /**< Failed to parse EXSS */
+#define DCADEC_WXLLFAILED       4   /**< Failed to parse XLL */
+#define DCADEC_WXLLSYNCERR      5   /**< XLL synchronization error */
+#define DCADEC_WXLLBANDERR      6   /**< XLL frequency band error */
+#define DCADEC_WXLLCONFERR      7   /**< XLL configuration error */
+#define DCADEC_WXLLCLIPPED      8   /**< Clipping detected in XLL output */
+#define DCADEC_WXLLLOSSY        9   /**< XLL output not lossless */
+/**@}*/
+
+/**@{*/
 /** Decode DTS core only without extensions */
 #define DCADEC_FLAG_CORE_ONLY           0x01
 
@@ -96,16 +106,19 @@
  */
 #define DCADEC_FLAG_CORE_SYNTH_X96      0x04
 
-/** Reserved flag, don't use */
-#define DCADEC_FLAG_CORE_RESERVED       0x08
+/** Use IIR filter for floating point DTS core LFE channel interpolation */
+#define DCADEC_FLAG_CORE_LFE_IIR        0x08
 
-/* Use FIR filter for floating point DTS core LFE channel interpolation */
+/** Use FIR filter for floating point DTS core LFE channel interpolation */
 #define DCADEC_FLAG_CORE_LFE_FIR        0x10
 
-/** Extract embedded 2.0 downmix if present, otherwise extract 5.1 downmix */
+/**
+ * Extract embedded 2.0 downmix if present (or perform 5.1 to 2.0 downmix if
+ * custom downmixing coefficients are present), otherwise extract 5.1 downmix.
+ */
 #define DCADEC_FLAG_KEEP_DMIX_2CH       0x20
 
-/** Extract embedded 5.1 downmix */
+/** Extract embedded 5.1 downmix (always present for 6.1 and 7.1 content) */
 #define DCADEC_FLAG_KEEP_DMIX_6CH       0x40
 
 /** Output native DTS channel layout, not WAVEFORMATEXTENSIBLE layout */
@@ -113,6 +126,9 @@
 
 /** Don't conceal errors */
 #define DCADEC_FLAG_STRICT              0x100
+
+/** Don't clip returned PCM samples to output bit depth */
+#define DCADEC_FLAG_DONT_CLIP           0x200
 /**@}*/
 
 /**@{*/
@@ -134,6 +150,14 @@
 
 /**< Audio processed for headphone playback */
 #define DCADEC_MATRIX_ENCODING_HEADPHONE    2
+/**@}*/
+
+/**@{*/
+#define DCADEC_LOG_ERROR    0
+#define DCADEC_LOG_WARNING  1
+#define DCADEC_LOG_INFO     2
+#define DCADEC_LOG_VERBOSE  3
+#define DCADEC_LOG_DEBUG    4
 /**@}*/
 
 /**
@@ -171,6 +195,9 @@ struct dcadec_exss_info {
     int matrix_encoding;    /**< Matrix encoding type */
 };
 
+typedef void (*dcadec_log_cb)(int level, const char *file, int line,
+                              const char *message, void *cbarg);
+
 /**
  * Parse DTS packet. Packet data must be already converted into 16-bit
  * big-endian format. Caller must have already established byte stream
@@ -184,7 +211,8 @@ struct dcadec_exss_info {
  *
  * @param size  Size in bytes of packet data. Size should not include padding.
  *
- * @return      0 on success, negative error code on failure.
+ * @return      0 or positive warning code on success, negative error code on
+ *              failure.
  */
 DCADEC_API int dcadec_context_parse(struct dcadec_context *dca, uint8_t *data, size_t size);
 
@@ -235,8 +263,8 @@ DCADEC_API void dcadec_context_free_exss_info(struct dcadec_exss_info *info);
  * @param dca       Pointer to decoder context.
  *
  * @param samples   Filled with address of array of pointers to planes
- *                  containing PCM data for active channels. This data is only
- *                  valid until the next call to any libdcadec function.
+ *                  containing PCM data for active channels. This data is valid
+ *                  until the next call to dcadec_context_parse() or _destroy().
  *                  Returned array is tightly packed, there are no gaps for
  *                  missing channels. Use channel_mask to determine total number
  *                  of channels and size of returned array. By default channels
@@ -261,7 +289,13 @@ DCADEC_API void dcadec_context_free_exss_info(struct dcadec_exss_info *info);
  *                          This can be different from encoded profile since
  *                          certain extensions may be not decoded.
  *
- * @return                  0 on success, negative error code on failure.
+ * @return                  0 or positive warning code on success, negative
+ *                          error code on failure. Return value of 0 indicates
+ *                          that no errors affecting audio integrity were
+ *                          detected. When profile indicates Master Audio,
+ *                          positive return value indicates that audio has not
+ *                          been losslessly reconstructed for at least some part
+ *                          of this frame.
  */
 DCADEC_API int dcadec_context_filter(struct dcadec_context *dca, int ***samples,
                                      int *nsamples, int *channel_mask,
@@ -294,18 +328,33 @@ DCADEC_API struct dcadec_context *dcadec_context_create(int flags);
 DCADEC_API void dcadec_context_destroy(struct dcadec_context *dca);
 
 /**
- * Convert negative libdcadec error code into string.
+ * Set or clear logging callback for decoder context.
  *
- * @param errnum    Error code returned by libdcadec function.
+ * @param dca       Pointer to decoder context.
  *
- * @return          Constant string describing error code.
+ * @param log_cb    Pointer to logging callback function. Pass NULL to disable
+ *                  logging.
+ *
+ * @param log_cbarg Opaque pointer that will be passed through to callback
+ *                  function.
+ */
+DCADEC_API void dcadec_context_set_log_cb(struct dcadec_context *dca,
+                                          dcadec_log_cb log_cb,
+                                          void *log_cbarg);
+
+/**
+ * Convert negative libdcadec error code or positive warning code into string.
+ *
+ * @param errnum    Error or warning code returned by libdcadec function.
+ *
+ * @return          Constant string describing error or warning code.
  */
 DCADEC_API const char *dcadec_strerror(int errnum);
 
 /**
- * Get libdcadec version.
+ * Get libdcadec API version.
  *
- * @return  Version code of the currently running libdcadec.
+ * @return  API version code of the currently running libdcadec.
  */
 DCADEC_API unsigned int dcadec_version(void);
 

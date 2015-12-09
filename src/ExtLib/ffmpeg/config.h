@@ -202,6 +202,7 @@
 #define HAVE_MIPS32R2 0
 #define HAVE_MIPS32R5 0
 #define HAVE_MIPS64R6 0
+#define HAVE_MIPSDSP 0
 #define HAVE_MIPSDSPR1 0
 #define HAVE_MIPSDSPR2 0
 #define HAVE_MSA 0
@@ -867,5 +868,8 @@ Note: when adding a new codec, you have to:
 #define CONFIG_VC1_VAAPI_HWACCEL 0
 #define CONFIG_VC1_VDPAU_HWACCEL 0
 #define CONFIG_VC1_QSV_HWACCEL 0
+
+#define CONFIG_VP9_D3D11VA_HWACCEL 0
+#define CONFIG_VP9_DXVA2_HWACCEL 0
 
 #endif /* FFMPEG_CONFIG_H */

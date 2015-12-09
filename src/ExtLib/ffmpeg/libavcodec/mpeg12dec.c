@@ -2523,14 +2523,16 @@ static int decode_chunks(AVCodecContext *avctx, AVFrame *picture,
 #endif
                 // ==> Start patch MPC
                 if (picture) {
-                    ret = slice_end(avctx, picture);
-                    if (ret < 0)
-                        return ret;
-                    else if (ret) {
-                        // FIXME: merge with the stuff in mpeg_decode_slice
-                        if (s2->last_picture_ptr || s2->low_delay)
-                            *got_output = 1;
-                    }
+                // ==> End patch MPC
+                ret = slice_end(avctx, picture);
+                if (ret < 0)
+                    return ret;
+                else if (ret) {
+                    // FIXME: merge with the stuff in mpeg_decode_slice
+                    if (s2->last_picture_ptr || s2->low_delay)
+                        *got_output = 1;
+                }
+                // ==> Start patch MPC
                 }
                 // ==> End patch MPC
             }

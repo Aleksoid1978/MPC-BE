@@ -238,9 +238,7 @@ static av_always_inline int64_t ff_samples_to_time_base(AVCodecContext *avctx,
     if(samples == AV_NOPTS_VALUE)
         return AV_NOPTS_VALUE;
     // ==> Start patch MPC
-    AVRational cq;
-    cq.num = 1;
-    cq.den = avctx->sample_rate;
+    AVRational cq = { 1, avctx->sample_rate };
     return av_rescale_q(samples, cq,
                         avctx->time_base);
     // ==> End patch MPC
