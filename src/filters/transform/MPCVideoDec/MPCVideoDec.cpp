@@ -3595,12 +3595,27 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 		case INFO_InputFormat:
 			if (m_pAVCtx) {
 				infostr = m_pAVCtx->codec_descriptor->name;;
-				if (const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)) {
-					if (pfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL)) {
-						infostr.AppendFormat(_T(", %d-bit"), GetLumaBits(m_pAVCtx->pix_fmt));
+				if (const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)) {
+					if (desc->flags & AV_PIX_FMT_FLAG_PAL) {
+						infostr.Append(_T(", palettized RGB"));
 					}
-					else {
-						infostr.AppendFormat(_T(", %d-bit %s"), GetLumaBits(m_pAVCtx->pix_fmt), GetChromaSubsamplingStr(m_pAVCtx->pix_fmt));
+					else if (desc->nb_components == 1 || desc->nb_components == 2) {
+						infostr.AppendFormat(_T(", Gray %d-bit"), GetLumaBits(m_pAVCtx->pix_fmt));
+					}
+					else if (desc->name && !strncmp(desc->name, "yuvj", 4)) {
+						infostr.AppendFormat(_T(", YUVJ %d-bit %s"), GetLumaBits(m_pAVCtx->pix_fmt), GetChromaSubsamplingStr(m_pAVCtx->pix_fmt));
+					}
+					else if(desc->flags & AV_PIX_FMT_FLAG_RGB) {
+						int bidepth = 0;
+						for (int i = 0; i < desc->nb_components; i++) {
+							bidepth += desc->comp[i].depth;
+						}
+						infostr.AppendFormat(_T(", RGB%d"), bidepth);
+					}
+					else if (desc->nb_components == 0) {
+						// unknown
+					} else {
+						infostr.AppendFormat(_T(", YUV %d-bit %s"), GetLumaBits(m_pAVCtx->pix_fmt), GetChromaSubsamplingStr(m_pAVCtx->pix_fmt));
 					}
 				}
 			}
