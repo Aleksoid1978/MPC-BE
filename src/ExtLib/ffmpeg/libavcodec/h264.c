@@ -1585,8 +1585,6 @@ again:
                 // "recovered".
                 if (h->nal_unit_type == NAL_IDR_SLICE)
                     h->frame_recovered |= FRAME_RECOVERED_IDR;
-                h->frame_recovered |= 3*!!(avctx->flags2 & AV_CODEC_FLAG2_SHOW_ALL);
-                h->frame_recovered |= 3*!!(avctx->flags & AV_CODEC_FLAG_OUTPUT_CORRUPT);
 #if 1
                 h->cur_pic_ptr->recovered |= h->frame_recovered;
 #else
@@ -1934,7 +1932,8 @@ static int h264_decode_frame(AVCodecContext *avctx, void *data,
 
         /* Wait for second field. */
         *got_frame = 0;
-        if (h->next_output_pic && (
+        if (h->next_output_pic && ((avctx->flags & AV_CODEC_FLAG_OUTPUT_CORRUPT) ||
+                                   (avctx->flags2 & AV_CODEC_FLAG2_SHOW_ALL) ||
                                    h->next_output_pic->recovered)) {
             if (!h->next_output_pic->recovered)
                 h->next_output_pic->f->flags |= AV_FRAME_FLAG_CORRUPT;
@@ -2033,7 +2032,7 @@ static av_cold int h264_decode_end(AVCodecContext *avctx)
 static const AVOption h264_options[] = {
     {"is_avc", "is avc", offsetof(H264Context, is_avc), AV_OPT_TYPE_BOOL, {.i64 = 0}, 0, 1, 0},
     {"nal_length_size", "nal_length_size", offsetof(H264Context, nal_length_size), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 4, 0},
-    { "enable_er", "Enable error resilience on damaged frames (unsafe)", OFFSET(enable_er), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 1, VD },
+    { "enable_er", "Enable error resilience on damaged frames (unsafe)", OFFSET(enable_er), AV_OPT_TYPE_BOOL, { .i64 = -1 }, -1, 1, VD },
     { NULL },
 };
 

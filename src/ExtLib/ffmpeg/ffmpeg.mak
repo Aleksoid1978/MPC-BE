@@ -560,6 +560,7 @@ SRCS_LU = \
 	libavutil/float_dsp.c \
 	libavutil/frame.c \
 	libavutil/imgutils.c \
+	libavutil/integer.c \
 	libavutil/intmath.c \
 	libavutil/lfg.c \
 	libavutil/lls.c \

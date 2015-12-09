@@ -75,16 +75,14 @@ int ff_vorbis_len2vlc(uint8_t *bits, uint32_t *codes, unsigned num)
     for (i = 0; i < bits[p]; ++i)
         exit_at_level[i+1] = 1 << i;
 
-#ifdef DEBUG
 // ==> Start patch MPC
-    /*
+#if DEBUG && 0
+// ==> End patch MPC
     av_log(NULL, AV_LOG_INFO, " %u. of %u code len %d code %d - ", p, num, bits[p], codes[p]);
     init_get_bits(&gb, (uint8_t *)&codes[p], bits[p]);
     for (i = 0; i < bits[p]; ++i)
         av_log(NULL, AV_LOG_INFO, "%s", get_bits1(&gb) ? "1" : "0");
     av_log(NULL, AV_LOG_INFO, "\n");
-    */
-// ==> End patch MPC
 #endif
 
     ++p;
@@ -112,16 +110,14 @@ int ff_vorbis_len2vlc(uint8_t *bits, uint32_t *codes, unsigned num)
             exit_at_level[j] = code + (1 << (j - 1));
         codes[p] = code;
 
-#ifdef DEBUG
 // ==> Start patch MPC
-    /*
+#if DEBUG && 0
+// ==> End patch MPC
         av_log(NULL, AV_LOG_INFO, " %d. code len %d code %d - ", p, bits[p], codes[p]);
         init_get_bits(&gb, (uint8_t *)&codes[p], bits[p]);
         for (i = 0; i < bits[p]; ++i)
             av_log(NULL, AV_LOG_INFO, "%s", get_bits1(&gb) ? "1" : "0");
         av_log(NULL, AV_LOG_INFO, "\n");
-    */
-// ==> End patch MPC
 #endif
 
     }

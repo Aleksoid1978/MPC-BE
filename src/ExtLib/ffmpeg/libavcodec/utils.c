@@ -41,6 +41,7 @@
 #include "libavutil/imgutils.h"
 #include "libavutil/samplefmt.h"
 #include "libavutil/dict.h"
+#include "libavutil/thread.h"
 #include "avcodec.h"
 #include "libavutil/opt.h"
 #include "me_cmp.h"
@@ -57,14 +58,6 @@
 #include <float.h>
 #if CONFIG_ICONV
 # include <iconv.h>
-#endif
-
-#if HAVE_PTHREADS
-#include <pthread.h>
-#elif HAVE_W32THREADS
-#include "compat/w32pthreads.h"
-#elif HAVE_OS2THREADS
-#include "compat/os2threads.h"
 #endif
 
 #include "libavutil/ffversion.h"
@@ -1141,7 +1134,7 @@ static int64_t get_bit_rate(AVCodecContext *ctx)
         break;
     case AVMEDIA_TYPE_AUDIO:
         bits_per_sample = av_get_bits_per_sample(ctx->codec_id);
-        bit_rate = bits_per_sample ? ctx->sample_rate * ctx->channels * bits_per_sample : ctx->bit_rate;
+        bit_rate = bits_per_sample ? ctx->sample_rate * (int64_t)ctx->channels * bits_per_sample : ctx->bit_rate;
         break;
     default:
         bit_rate = 0;
