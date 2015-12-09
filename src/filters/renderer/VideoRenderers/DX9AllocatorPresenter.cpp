@@ -1949,14 +1949,6 @@ void CDX9AllocatorPresenter::DrawStats()
 				DrawText(rc, strText, 1);
 				OffsetRect(&rc, 0, TextHeight);
 			}
-		} else {
-			if (rs.m_AdvRendSets.iVMR9VSync) {
-				strText.Format(L"Refresh rate : %.05f Hz", m_DetectedRefreshRate);
-			} else {
-				strText.Format(L"Refresh rate : %3u Hz", m_refreshRate);
-			}
-			DrawText(rc, strText, 1);
-			OffsetRect(&rc, 0, TextHeight);
 		}
 
 		if (m_bSyncStatsAvailable) {
