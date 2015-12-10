@@ -19322,9 +19322,9 @@ BOOL CMainFrame::AddSimilarFiles(CAtlList<CString>& fns)
 			}
 		}
 		
-		const std::wregex replace_spec(LR"([\.\\\/\(\)\[\]\{\}\?])", std::wregex::icase);
+		const std::wregex replace_spec(LR"([\.\(\)\[\]\{\}\+])", std::wregex::icase);
 		std::wstring regExp = std::regex_replace((LPCTSTR)name, replace_spec, L"\\$&");
-			
+
 		const std::wregex replace_digit(L"\\d+", std::wregex::icase);
 		regExp = std::regex_replace(regExp, replace_digit, L"\\d+");
 
