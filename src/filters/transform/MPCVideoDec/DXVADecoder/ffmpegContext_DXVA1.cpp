@@ -296,29 +296,3 @@ BOOL FFH264IsRefFrameInUse(int nFrameNum, struct AVCodecContext* pAVCtx)
 
 	return FALSE;
 }
-
-void FF264UpdateRefFrameSliceLong(DXVA_PicParams_H264* pDXVAPicParams, DXVA_Slice_H264_Long* pSlice, struct AVCodecContext* pAVCtx)
-{
-	const H264Context*		h	= (H264Context*)pAVCtx->priv_data;
-	const H264SliceContext*	sl	= &h->slice_ctx[0];
-
-	for (unsigned i = 0; i < _countof(pSlice->RefPicList[0]); i++) {
-		pSlice->RefPicList[0][i].bPicEntry = 255;
-		pSlice->RefPicList[1][i].bPicEntry = 255;
-	}
-
-	for (unsigned list = 0; list < 2; list++) {
-		for (unsigned i = 0; i < _countof(pSlice->RefPicList[list]); i++) {
-			if (list < sl->list_count && i < sl->ref_count[list]) {
-				const H264Picture *r = sl->ref_list[list][i].parent;
-				pSlice->RefPicList[list][i].Index7Bits		= FFH264FindRefFrameIndex(r->frame_num, pDXVAPicParams);
-				pSlice->RefPicList[list][i].AssociatedFlag	= (r->reference == PICT_BOTTOM_FIELD);
-			}
-		}
-	}
-}
-
-void FFH264SetDxvaSliceLong(struct AVCodecContext* pAVCtx, void* pSliceLong)
-{
-	((H264Context*)pAVCtx->priv_data)->dxva_slice_long = pSliceLong;
-}
