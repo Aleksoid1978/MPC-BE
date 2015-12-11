@@ -508,9 +508,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 
 			if (nut == NALU_TYPE_AUD || (!m_bHasAccessUnitDelimiters && (pPacket->rtStart != INVALID_TIME || !bTimeStampExists))) {
 				if (pPacket->rtStart == INVALID_TIME && rtStart != INVALID_TIME) {
-					pPacket->rtStart	= rtStart;
-					pPacket->rtStop		= rtStop;
+					pPacket->rtStart = rtStart;
+					pPacket->rtStop  = rtStop;
 				}
+				rtStart = INVALID_TIME;
+				rtStop  = INVALID_TIME;
 
 				BOOL bSliceExist = FALSE;
 				CAutoPtr<CH264Packet> pl = m_pl.RemoveHead();
