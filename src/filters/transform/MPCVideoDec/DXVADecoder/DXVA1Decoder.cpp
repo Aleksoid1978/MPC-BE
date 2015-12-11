@@ -107,8 +107,8 @@ HRESULT CDXVA1Decoder::ConfigureDXVA1()
 		m_DXVA2Config.ConfigIntraResidUnsigned		= m_DXVA1Config.bConfigIntraResidUnsigned;
 		m_DXVA2Config.ConfigResidDiffAccelerator	= m_DXVA1Config.bConfigResidDiffAccelerator;
 
-		m_dxva_context.cfg = &m_DXVA2Config;
-		m_dxva_context.longslice = (m_DXVA1Config.bConfigBitstreamRaw != 2);
+		m_dxva_context.cfg       = &m_DXVA2Config;
+		m_dxva_context.longslice = false;
 
 		if (SUCCEEDED(hr)) {
 			writeDXVA_QueryOrReplyFunc(&m_DXVA1Config.dwFunction, DXVA_QUERYORREPLYFUNCFLAG_DECODER_LOCK_QUERY, DXVA_PICTURE_DECODING_FUNCTION);
