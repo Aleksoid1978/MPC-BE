@@ -76,6 +76,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ISOLATION_AWARE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -90,6 +91,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ISOLATION_AWARE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -104,6 +106,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ISOLATION_AWARE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -118,6 +121,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ISOLATION_AWARE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
