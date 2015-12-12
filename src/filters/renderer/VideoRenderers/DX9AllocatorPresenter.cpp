@@ -2152,48 +2152,61 @@ void CDX9AllocatorPresenter::DrawStats()
 	if (m_pLine && bDetailedStats) {
 		D3DXVECTOR2 Points[NB_JITTER];
 
-		float ScaleX = min(1.0f, max(0.4f, 1.4f * m_windowRect.Width() / m_rcMonitor.Width()));
-		float ScaleY = min(1.0f, max(0.4f, 1.4f * m_windowRect.Height() / m_rcMonitor.Height()));
-		int DrawWidth = 625 * ScaleX + 50 * ScaleX;
-		int DrawHeight = 250 * ScaleY;
-		int Alpha = 80;
-		int StartX = m_windowRect.Width() - (DrawWidth + 20);
-		int StartY = m_windowRect.Height() - (DrawHeight + 20);
+		const int defwidth  = 810;
+		const int defheight = 300;
 
-		DrawRect(RGB(0,0,0), Alpha, CRect(StartX, StartY, StartX + DrawWidth, StartY + DrawHeight));
-		// === Jitter Graduation
-		m_pLine->SetWidth(2.5f * ScaleX);	// Width
-		m_pLine->SetAntialias(1);
-		//m_pLine->SetGLLines(1);
+		float ScaleX = m_windowRect.Width() / 1920.0f;
+		float ScaleY = m_windowRect.Height() / 1080.0f;
+
+		const float DrawWidth = defwidth * ScaleX;
+		const float DrawHeight = defheight * ScaleY;
+		const float StartX = m_windowRect.Width() - (DrawWidth + 20 * ScaleX);
+		const float StartY = m_windowRect.Height() - (DrawHeight + 20 * ScaleX);
+		const float StepX = DrawWidth / NB_JITTER;
+		const float StepY = DrawHeight / 24.0f;
+
+		const DWORD Alpha = 80;
+		DrawRect(RGB(0, 0, 0), Alpha, CRect(StartX, StartY, StartX + DrawWidth, StartY + DrawHeight));
+		
+		m_pLine->SetWidth(2.5f * ScaleX);
+		m_pLine->SetAntialias(TRUE);
 		m_pLine->Begin();
 
-		for (int i = 10; i < 250 * ScaleY; i += 10 * ScaleY) {
-			Points[0].x = (FLOAT)(StartX);
-			Points[0].y = (FLOAT)(StartY + i);
-			Points[1].x = (FLOAT)(StartX + ((i - 10) % 40 ? 50 * ScaleX : 625 * ScaleX));
-			Points[1].y = (FLOAT)(StartY + i);
-			if (i == 130) {
-				Points[1].x += 50 * ScaleX;
-			}
+		// draw grid lines
+		for (int i = 1; i < 24; ++i) {
+			Points[0].x = StartX;
+			Points[0].y = StartY + i * StepY;
+			Points[1].y = Points[0].y;
 
+			float lineLength;
+			if ((i - 1) % 4) {
+				lineLength = 0.07f;
+			} else if (i == 13) {
+				lineLength = 1.0f;
+			} else {
+				lineLength = 0.93f;
+			}
+			Points[1].x = StartX + DrawWidth * lineLength;
 			m_pLine->Draw(Points, 2, D3DCOLOR_XRGB(100, 100, 255));
 		}
 
-		// === Jitter curve
+		// draw jitter curve
 		if (m_rtTimePerFrame) {
 			for (int i = 0; i < NB_JITTER; i++) {
 				int index = (m_nNextJitter + 1 + i) % NB_JITTER;
-				int Jitter = m_pJitter[index] - m_iJitterMean;
-				Points[i].x  = (FLOAT)(StartX + (i * 5 * ScaleX + 5));
-				Points[i].y  = (FLOAT)(StartY + ((Jitter * ScaleY) / 5000 + 125 * ScaleY));
+				float jitter = float(m_pJitter[index] - m_iJitterMean);
+				
+				Points[i].x = StartX + i * StepX;
+				Points[i].y = StartY + (jitter * ScaleY / 2000.0f + DrawHeight / 2.0f);
 			}
 			m_pLine->Draw(Points, NB_JITTER, D3DCOLOR_XRGB(255, 100, 100));
 
 			if (m_bSyncStatsAvailable) {
+				// draw sync offset
 				for (int i = 0; i < NB_JITTER; i++) {
 					int index = (m_nNextSyncOffset + 1 + i) % NB_JITTER;
-					Points[i].x  = (FLOAT)(StartX + (i * 5 * ScaleX + 5));
-					Points[i].y  = (FLOAT)(StartY + ((m_pllSyncOffset[index] * ScaleY) / 5000 + 125 * ScaleY));
+					Points[i].x = StartX + i * StepX;
+					Points[i].y = StartY + (m_pllSyncOffset[index] * ScaleY / 2000.0f + DrawHeight / 2.0f);
 				}
 				m_pLine->Draw(Points, NB_JITTER, D3DCOLOR_XRGB(100, 200, 100));
 			}
