@@ -167,6 +167,10 @@ static HRESULT STDMETHODCALLTYPE ReceiveConnectionMine(IPinC* This, /* [in] */ I
 	if (pmt) {
 		// Force the renderer to always reject the P010(except the DXVA) and P016 pixel format
 		if (pmt->subtype == MEDIASUBTYPE_P010) {
+			if (GetCLSID((IPin*)pConnector) == GUID_LAVVideoDecoder) {
+				return ReceiveConnectionOrg(This, pConnector, pmt);
+			}
+
 			if (pmt->pbFormat) {
 				VIDEOINFOHEADER2& vih2 = *(VIDEOINFOHEADER2*)pmt->pbFormat;
 				BITMAPINFOHEADER* bih = &vih2.bmiHeader;
