@@ -147,12 +147,8 @@ public:
 	void OnDeactivate();
 	bool OnApply();
 
-	static LPCTSTR GetWindowTitle() {
-		return L"Pin Info";
-	}
-	static CSize GetWindowSize() {
-		return CSize(500, 300);
-	}
+	static LPCTSTR GetWindowTitle() { return L"Pin Info"; }
+	static CSize GetWindowSize() { return CSize(0, 0); }
 
 	DECLARE_MESSAGE_MAP()
 

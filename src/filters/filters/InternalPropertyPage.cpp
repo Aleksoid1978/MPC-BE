@@ -397,10 +397,16 @@ bool CPinInfoWnd::OnActivate()
 {
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 
-	CPoint p(10, 10);
+	CPoint p(ScaleX(10), ScaleY(10));
 
-	m_pin_static.Create(L"Pin:", dwStyle, CRect(p + CPoint(0, 3), CSize(30, m_fontheight)), this);
-	m_pin_combo.Create(dwStyle | CBS_DROPDOWNLIST, CRect(p + CPoint(30, 0), CSize(450, 200)), this, IDC_PP_COMBO1);
+	m_pin_static.Create(L"Pin:",
+						dwStyle,
+						CRect(p + CPoint(0, ScaleY(3)), CSize(ScaleX(30), m_fontheight)),
+						this);
+	m_pin_combo.Create(dwStyle | CBS_DROPDOWNLIST,
+					   CRect(p + CPoint(ScaleX(30), 0), CSize(ScaleX(500), ScaleY(200))),
+					   this,
+					   IDC_PP_COMBO1);
 	BeginEnumPins(m_pBF, pEP, pPin) {
 		CPinInfo pi;
 		if (FAILED(pPin->QueryPinInfo(&pi))) {
@@ -408,7 +414,7 @@ bool CPinInfoWnd::OnActivate()
 		}
 		CString str = CString(pi.achName);
 		if (!str.Find(L"Apple")) {
-			str.Delete(0,1);
+			str.Delete(0, 1);
 		}
 		CString dir = L"[?] ";
 		if (pi.dir == PINDIR_INPUT) {
@@ -421,13 +427,13 @@ bool CPinInfoWnd::OnActivate()
 	EndEnumPins
 	m_pin_combo.SetCurSel(0);
 
-	p.y += m_fontheight + 20;
+	p.y += m_fontheight + ScaleX(20);
 
 	m_info_edit.CreateEx(WS_EX_CLIENTEDGE,
 						 L"EDIT",
 						 L"",
 						 dwStyle | WS_BORDER | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY,
-						 CRect(p, CSize(480, m_fontheight*20)),
+						 CRect(p, CSize(ScaleX(530), m_fontheight * 23)),
 						 this,
 						 IDC_PP_EDIT1);
 	m_info_edit.SetLimitText(60000);
