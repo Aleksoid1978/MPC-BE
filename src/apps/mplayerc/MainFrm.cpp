@@ -1756,6 +1756,7 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 	if (m_OSD && IsD3DFullScreenMode()) {
 		m_OSD.OnSize(nType, cx, cy);
 	}
+
 	if (nType == SIZE_RESTORED && m_fTrayIcon) {
 		ShowWindow(SW_SHOW);
 	}
@@ -1795,6 +1796,25 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 	if (nType != SIZE_MINIMIZED) {
 		FlyBarSetPos();
 		OSDBarSetPos();
+	}
+
+	if (nType == SIZE_MINIMIZED
+			&& m_eMediaLoadState == MLS_LOADED
+			&& s.bPauseMinimizedVideo
+			&& !IsD3DFullScreenMode()) {
+		OAFilterState fs = GetMediaState();
+		if (fs == State_Running) {
+			m_bWasPausedOnMinimizedVideo = true;
+			SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
+		}
+	}
+
+	if ((nType == SIZE_RESTORED || nType == SIZE_MAXIMIZED)
+			&& m_bWasPausedOnMinimizedVideo) {
+		if (m_eMediaLoadState == MLS_LOADED) {
+			SendMessage(WM_COMMAND, ID_PLAY_PLAY);
+		}
+		m_bWasPausedOnMinimizedVideo = false;
 	}
 }
 
@@ -13448,6 +13468,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	m_PlaybackRate = 1.0;
 
 	ClearDXVAState();
+
+	m_bWasPausedOnMinimizedVideo = false;
 
 #ifdef _DEBUG
 	if (pFileData) {
