@@ -313,21 +313,22 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"浏览..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 5		"步进距离(小, 中, 大每毫秒)"
 9		"默认"
 10		"快速搜索(以关键帧)"
 11		"在播放列表中仅有一个项目时禁用 ""向前/后跳转"" 后打开文件中的下一个/上一个文件"
 13		"在非默认显示器上全屏时防止播放器被最小化"
-15		"开启罗技 LCD 支持(实验性)"
-17		"使用小型存储器转储 (MiniDump)"
-18		"检查更新"
-19		"启用自动更新检查"
-20		"更新检查间隔:"
-23		"天"
-24		"设置管理"
-25		"重置"
-26		"导出"
+15		"Pause the video playback when minimized"
+17		"开启罗技 LCD 支持(实验性)"
+19		"使用小型存储器转储 (MiniDump)"
+20		"检查更新"
+21		"启用自动更新检查"
+22		"更新检查间隔:"
+25		"天"
+26		"设置管理"
+27		"重置"
+28		"导出"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46

@@ -313,21 +313,22 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Öffnen..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 5		"Sprungintervalle (kurz, mittel, weit in ms)"
 9		"Standard"
 10		"Schnellen Suchlauf verwenden (Keyframes)"
 11		"Bei nur einer Datei in der Wiedergabeliste keine Dateien im Ordner durch ""Vorwärts/Rückwärts springen"" öffnen"
 13		"Minimieren des Fensters auf sekundärem Anzeigegerät bei Vollbild verhindern"
-15		"LCD-Unterstützung für Logitech-Tastaturen aktivieren (experimentell)"
-17		"MiniDumps aktivieren"
-18		"Programm-Update"
-19		"Automatische Update-Prüfung aktivieren"
-20		"Nach Programm-Update alle"
-23		"Tag(e) suchen"
-24		"Programmeinstellungen verwalten"
-25		"Zurücksetzen"
-26		"Sichern..."
+15		"Pause the video playback when minimized"
+17		"LCD-Unterstützung für Logitech-Tastaturen aktivieren (experimentell)"
+19		"MiniDumps aktivieren"
+20		"Programm-Update"
+21		"Automatische Update-Prüfung aktivieren"
+22		"Nach Programm-Update alle"
+25		"Tag(e) suchen"
+26		"Programmeinstellungen verwalten"
+27		"Zurücksetzen"
+28		"Sichern..."
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46

@@ -236,6 +236,7 @@
 #define IDS_RS_ENABLEEDLEDITOR				_T("EnableEDLEditor")
 #define IDS_RS_SHADERLISTSCREENSPACE		_T("ShaderListScreenSpace")
 #define IDS_RS_MPC_PREVENT_MINIMIZE			_T("PreventMinimize")
+#define IDS_RS_PAUSEMINIMIZEDVIDEO			_T("PauseMinimizedVideo")
 #define IDS_RS_MPC_WIN7TASKBAR				_T("UseWin7TaskBar")
 #define IDS_RS_MPC_EXIT_AFTER_PB			_T("ExitAfterPlayBack")
 #define IDS_RS_MPC_NEXT_AFTER_PB			_T("SearchInDirAfterPlayBack")

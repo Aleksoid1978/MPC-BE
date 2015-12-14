@@ -313,21 +313,22 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Browse..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 5		"Jump distances (small, medium, large in ms)"
 9		"Default"
 10		"Fast seek (on keyframe)"
 11		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
 13		"Prevent from MINIMIZE when Fullscreen on non default monitor"
-15		"Enable Logitech LCD support (experimental)"
-17		"Enable MiniDump"
-18		"Update check"
-19		"Enable automatic update check"
-20		"Delay between each check:"
-23		"day(s)"
-24		"Settings management"
-25		"Reset"
-26		"Export"
+15		"Pause the video playback when minimized"
+17		"Enable Logitech LCD support (experimental)"
+19		"Enable MiniDump"
+20		"Update check"
+21		"Enable automatic update check"
+22		"Delay between each check:"
+25		"day(s)"
+26		"Settings management"
+27		"Reset"
+28		"Export"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46

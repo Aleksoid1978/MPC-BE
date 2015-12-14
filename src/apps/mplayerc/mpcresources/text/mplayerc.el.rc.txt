@@ -313,21 +313,22 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Εύρεση..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 5		"Αποστάσεις μεταπήδησης (μικρή, μεσαία, μεγάλη σε ms)"
 9		"Προεπιλογή"
 10		"Γρήγορη αναζήτηση (σε βασικό καρέ)"
 11		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
 13		"Αποτροπή ελαχιστοποίησης στην προβολή πλήρους οθόνης σε μη προεπιλεγμένη οθόνη"
-15		"Ενεργοποίηση υποστήριξης Logitech LCD (πειραματικά)"
-17		"Enable MiniDump"
-18		"Update check"
-19		"Enable automatic update check"
-20		"Delay between each check:"
-23		"day(s)"
-24		"Διαχείριση ρυθμίσεων"
-25		"Επαναφορά"
-26		"Εξαγωγή"
+15		"Pause the video playback when minimized"
+17		"Ενεργοποίηση υποστήριξης Logitech LCD (πειραματικά)"
+19		"Enable MiniDump"
+20		"Update check"
+21		"Enable automatic update check"
+22		"Delay between each check:"
+25		"day(s)"
+26		"Διαχείριση ρυθμίσεων"
+27		"Επαναφορά"
+28		"Εξαγωγή"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46

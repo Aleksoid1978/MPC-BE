@@ -313,21 +313,22 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Răsfoire..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 5		"Intervale de sărire (mic, mediu, mare în ms)"
 9		"Implicit"
 10		"Căutare rapidă (la cadru cheie)"
 11		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
 13		"Prevină minimizarea playerului din ecran complet pe un monitor care nu este implicit"
-15		"Activează suportul LCD pentru tastaturi Logitech (experimental)"
-17		"Enable MiniDump"
-18		"Update check"
-19		"Enable automatic update check"
-20		"Delay between each check:"
-23		"day(s)"
-24		"Administrare setări"
-25		"Resetează"
-26		"Exportă"
+15		"Pause the video playback when minimized"
+17		"Activează suportul LCD pentru tastaturi Logitech (experimental)"
+19		"Enable MiniDump"
+20		"Update check"
+21		"Enable automatic update check"
+22		"Delay between each check:"
+25		"day(s)"
+26		"Administrare setări"
+27		"Resetează"
+28		"Exportă"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46

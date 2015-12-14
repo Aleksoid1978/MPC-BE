@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"バージョン情報"
 7		"MPC-BE"
 8		"Copyright © 2002-2015 (Authors.txt ファイルを参照)"
@@ -313,21 +313,22 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"参照..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 5		"ジャンプ間隔 (小、中、大:ミリ秒単位)"
 9		"デフォルト"
 10		"高速シーク (キーフレーム上)"
 11		"プレイリスト登録が1個の時は「フォルダー内検索」の「前へ/次へ」を使用しない"
 13		"非デフォルトモニター上でフルスクリーンにした時に 最小化 を防ぐ"
-15		"Logitech LCD サポートを有効にする (実験的)"
-17		"MiniDump を有効にする"
-18		"更新の確認"
-19		"更新を自動で確認する"
-20		"確認する間隔:"
-23		"日"
-24		"設定の管理"
-25		"リセット"
-26		"エクスポート"
+15		"Pause the video playback when minimized"
+17		"Logitech LCD サポートを有効にする (実験的)"
+19		"MiniDump を有効にする"
+20		"更新の確認"
+21		"更新を自動で確認する"
+22		"確認する間隔:"
+25		"日"
+26		"設定の管理"
+27		"リセット"
+28		"エクスポート"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46

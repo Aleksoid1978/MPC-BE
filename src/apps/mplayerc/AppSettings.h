@@ -732,6 +732,7 @@ public:
 	int				nJumpDistL;
 	bool			fDontUseSearchInFolder;
 	bool			fPreventMinimize;
+	bool			bPauseMinimizedVideo;
 	bool			fLCDSupport;
 	bool			fFastSeek;
 	bool			fMiniDump;

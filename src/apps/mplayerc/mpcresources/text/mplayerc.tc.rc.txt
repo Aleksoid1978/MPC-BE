@@ -313,21 +313,22 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"瀏覽..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 5		"跳躍距離 (小、中、大，以毫秒作單位)"
 9		"預設值"
 10		"快速搜尋 (於關鍵影格)"
 11		"播放清單只有一個項目時，不要於「上一段/下一段」按鈕連結其它位於同一資料夾的檔案"
 13		"避免於非預設顯示器全螢幕時最小化"
-15		"啟用 Logitech LCD 支援 (實驗性)"
-17		"啟用小型記憶體傾印 (MiniDump)"
-18		"檢查更新"
-19		"啟用更新檢查"
-20		"檢查間隔:"
-23		"日"
-24		"設定管理"
-25		"重設"
-26		"匯出"
+15		"Pause the video playback when minimized"
+17		"啟用 Logitech LCD 支援 (實驗性)"
+19		"啟用小型記憶體傾印 (MiniDump)"
+20		"檢查更新"
+21		"啟用更新檢查"
+22		"檢查間隔:"
+25		"日"
+26		"設定管理"
+27		"重設"
+28		"匯出"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
