@@ -23,6 +23,7 @@
 #include "MainFrm.h"
 #include "PlayerStatusBar.h"
 #include "OpenImage.h"
+#include "../../DSUtil/SysVersion.h"
 
 // CPlayerStatusBar
 
@@ -35,6 +36,7 @@ CPlayerStatusBar::CPlayerStatusBar()
 	, m_time_rect(-1, -1, -1, -1)
 	, m_time_rect2(-1, -1, -1, -1)
 {
+	m_font.m_hObject = NULL;
 }
 
 CPlayerStatusBar::~CPlayerStatusBar()
@@ -43,7 +45,13 @@ CPlayerStatusBar::~CPlayerStatusBar()
 
 BOOL CPlayerStatusBar::Create(CWnd* pParentWnd)
 {
-	return CDialogBar::Create(pParentWnd, IDD_PLAYERSTATUSBAR, WS_CHILD | WS_VISIBLE | CBRS_ALIGN_BOTTOM, IDD_PLAYERSTATUSBAR);
+	if (!__super::Create(pParentWnd, IDD_PLAYERSTATUSBAR, WS_CHILD | WS_VISIBLE | CBRS_ALIGN_BOTTOM, IDD_PLAYERSTATUSBAR)) {
+		return FALSE;
+	}
+
+	ScaleFontInternal();
+
+	return TRUE;
 }
 
 BOOL CPlayerStatusBar::PreCreateWindow(CREATESTRUCT& cs)
@@ -67,6 +75,19 @@ void CPlayerStatusBar::ScaleFont()
 {
 	m_status.ScaleFont();
 	m_time.ScaleFont();
+
+	ScaleFontInternal();
+}
+
+void CPlayerStatusBar::ScaleFontInternal()
+{
+	m_font.DeleteObject();
+
+	int size = IsWinVistaOrLater() ? 13 : 14;
+	CString face = IsWinVistaOrLater() ? L"Tahoma" : L"Microsoft Sans Serif";
+	m_font.CreateFont(AfxGetMainFrame()->ScaleY(size), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
+					  face);
 }
 
 int CPlayerStatusBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -387,7 +408,7 @@ void CPlayerStatusBar::OnPaint()
 
 		memdc.SetBkMode(TRANSPARENT);
 
-		CPen penPlayed1(PS_SOLID, 0, RGB(0, 0, 0));
+		CPen penPlayed1(PS_SOLID, 0, COLORREF(0));
 		memdc.SelectObject(&penPlayed1);
 		memdc.MoveTo(r.left, r.top + 1);
 		memdc.LineTo(r.right, r.top + 1);
@@ -404,34 +425,26 @@ void CPlayerStatusBar::OnPaint()
 		memdc.SetTextColor(RGB(R, G, B));
 
 		// texts
-		CFont font2;
-		font2.CreateFont(AfxGetMainFrame()->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
-						 OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Tahoma");
-
-		CFont* pOld = dc.SelectObject(&font2);
-		const LONG textHeight = dc.GetTextExtent(L"x").cy;
-		dc.SelectObject(pOld);
-
-		const LONG xOffset = 6;
-		const LONG yOffset = llround((r.Height() - textHeight) / 2.0f);
-
-		memdc.SelectObject(&font2);
+		memdc.SelectObject(&m_font);
+		
 		CString str = GetStatusTimer();
 		int strlen = str.GetLength();
 
 		s.strTimeOnSeekBar = str;
 
+		const LONG textHeight = memdc.GetTextExtent(L"x").cy;
+		const LONG xOffset = 6;
+		const LONG yOffset = llround((r.Height() - textHeight) / 2.0f);
+
 		m_time_rect2.SetRectEmpty();
 		if (strlen > 0) {
-			CFont* pOld = dc.SelectObject(&font2);
-			const CSize textSize = dc.GetTextExtent(str);
-			dc.SelectObject(pOld);
+			const LONG textWidth = memdc.GetTextExtent(str).cx;
 
 			CRect rt = r;
 			m_time_rect2        = rt;
 			m_time_rect2.right  = rt.right;
 			m_time_rect2.top    = rt.top;
-			m_time_rect2.left   = rt.right - textSize.cx;
+			m_time_rect2.left   = rt.right - textWidth;
 			m_time_rect2.bottom = rt.bottom;
 
 			rt.right  = r.right - xOffset;
