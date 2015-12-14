@@ -432,9 +432,8 @@ void CPlayerStatusBar::OnPaint()
 
 		s.strTimeOnSeekBar = str;
 
-		const LONG textHeight = memdc.GetTextExtent(L"x").cy;
 		const LONG xOffset = 6;
-		const LONG yOffset = llround((r.Height() - textHeight) / 2.0f);
+		const LONG yOffset = 3;
 
 		m_time_rect2.SetRectEmpty();
 		if (strlen > 0) {
@@ -447,9 +446,8 @@ void CPlayerStatusBar::OnPaint()
 			m_time_rect2.left   = rt.right - textWidth;
 			m_time_rect2.bottom = rt.bottom;
 
-			rt.right  = r.right - xOffset;
-			rt.top    = r.top + yOffset;
-			rt.bottom = rt.top + textHeight;
+			rt.right -= xOffset;
+			rt.top   += yOffset;
 
 			memdc.DrawText(str, strlen, &rt, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
 		}
@@ -459,9 +457,8 @@ void CPlayerStatusBar::OnPaint()
 
 		if (strlen > 0) {
 			CRect rt = r;
-			rt.left   = r.left + xOffset;
-			rt.top    = r.top + yOffset;
-			rt.bottom = rt.top + textHeight;
+			rt.left += xOffset;
+			rt.top  += yOffset;
 			
 			memdc.DrawText(str, strlen, &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
 		}
