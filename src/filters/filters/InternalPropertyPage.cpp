@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,7 +24,7 @@
 #include "../../DSUtil/DSUtil.h"
 #include "../../apps/mplayerc/mplayerc.h"
 
-#define IPP_FONTSIZE 13
+#define DEFAULT_FONTSIZE 13
 
 //
 // CInternalPropertyPageWnd
@@ -32,7 +32,7 @@
 
 CInternalPropertyPageWnd::CInternalPropertyPageWnd()
 	: m_fDirty(false)
-	, m_fontheight(IPP_FONTSIZE)
+	, m_fontheight(DEFAULT_FONTSIZE)
 {
 
 }
@@ -45,8 +45,8 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 
 	m_pPageSite = pPageSite;
 
-	LPCTSTR wc = AfxRegisterWndClass(CS_VREDRAW|CS_HREDRAW|CS_DBLCLKS, 0, (HBRUSH)(COLOR_BTNFACE + 1));
-	if (!CreateEx(0, wc, _T("CInternalPropertyPageWnd"), WS_CHILDWINDOW, *pRect, pParentWnd, 0)) {
+	LPCTSTR wc = AfxRegisterWndClass(CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS, 0, (HBRUSH)(COLOR_BTNFACE + 1));
+	if (!CreateEx(0, wc, L"CInternalPropertyPageWnd", WS_CHILDWINDOW, *pRect, pParentWnd, 0)) {
 		return FALSE;
 	}
 
@@ -60,8 +60,7 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 			return FALSE;
 		}
 
-		LOGFONT lf;
-		memset(&lf, 0, sizeof(lf));
+		LOGFONT lf = { 0 };
 		_tcscpy_s(lf.lfFaceName, face);
 		lf.lfHeight = -PointsToPixels(height);
 		lf.lfWeight = FW_NORMAL;
@@ -71,16 +70,24 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 		}
 
 		lf.lfHeight -= -1;
-		_tcscpy_s(lf.lfFaceName, _T("Lucida Console"));
+		_tcscpy_s(lf.lfFaceName, L"Lucida Console");
 		if (!m_monospacefont.CreateFontIndirect(&lf)) {
-			_tcscpy_s(lf.lfFaceName, _T("Courier New"));
+			_tcscpy_s(lf.lfFaceName, L"Courier New");
 			if (!m_monospacefont.CreateFontIndirect(&lf)) {
 				return FALSE;
 			}
 		}
+
+		HDC hDC = ::GetDC(NULL);
+		HFONT hFontOld = (HFONT)SelectObject(hDC, m_font.m_hObject);
+		CSize size;
+		GetTextExtentPoint32(hDC, L"x", 1, &size);
+		SelectObject(hDC, hFontOld);
+		::ReleaseDC(NULL, hDC);
+
+		m_fontheight = size.cy;
 	}
 
-	m_fontheight = ScaleY(IPP_FONTSIZE);
 	SetFont(&m_font);
 
 	return TRUE;
@@ -110,7 +117,7 @@ END_MESSAGE_MAP()
 //
 
 CInternalPropertyPage::CInternalPropertyPage(LPUNKNOWN lpunk, HRESULT* phr)
-	: CUnknown(_T("CInternalPropertyPage"), lpunk)
+	: CUnknown(L"CInternalPropertyPage", lpunk)
 	, m_pWnd(NULL)
 {
 	if (phr) {
