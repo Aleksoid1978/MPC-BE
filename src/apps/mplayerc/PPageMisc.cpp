@@ -33,6 +33,7 @@ CPPageMisc::CPPageMisc()
 	, m_fFastSeek(FALSE)
 	, m_fDontUseSearchInFolder(FALSE)
 	, m_fPreventMinimize(FALSE)
+	, m_bPauseMinimizedVideo(FALSE)
 	, m_fLCDSupport(FALSE)
 	, m_fMiniDump(FALSE)
 	, m_nUpdaterDelay(7)
@@ -51,6 +52,7 @@ void CPPageMisc::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT2, m_nJumpDistM);
 	DDX_Text(pDX, IDC_EDIT3, m_nJumpDistL);
 	DDX_Check(pDX, IDC_CHECK6, m_fPreventMinimize);
+	DDX_Check(pDX, IDC_CHECK4, m_bPauseMinimizedVideo);
 	DDX_Check(pDX, IDC_CHECK7, m_fDontUseSearchInFolder);
 	DDX_Check(pDX, IDC_CHECK1, m_fFastSeek);
 	DDX_Check(pDX, IDC_CHECK_LCD, m_fLCDSupport);
@@ -86,6 +88,7 @@ BOOL CPPageMisc::OnInitDialog()
 	m_nJumpDistM = s.nJumpDistM;
 	m_nJumpDistL = s.nJumpDistL;
 	m_fPreventMinimize = s.fPreventMinimize;
+	m_bPauseMinimizedVideo = s.bPauseMinimizedVideo;
 	m_fDontUseSearchInFolder = s.fDontUseSearchInFolder;
 	m_fFastSeek = s.fFastSeek;
 	m_fLCDSupport = s.fLCDSupport;
@@ -110,6 +113,7 @@ BOOL CPPageMisc::OnApply()
 	s.nJumpDistM = m_nJumpDistM;
 	s.nJumpDistL = m_nJumpDistL;
 	s.fPreventMinimize = !!m_fPreventMinimize;
+	s.bPauseMinimizedVideo = !!m_bPauseMinimizedVideo;
 	s.fDontUseSearchInFolder = !!m_fDontUseSearchInFolder;
 	s.fFastSeek = !!m_fFastSeek;
 	s.fLCDSupport = !!m_fLCDSupport;

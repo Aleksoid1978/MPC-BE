@@ -313,21 +313,22 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Bilatu..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 27
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 5		"Jauzi hurruntasunak (txikia, ertaina, handia sm-tan)"
 9		"Berezkoa"
 10		"Bilaketa azkarra (giltzaframean)"
 11		"Ez erabili 'bilatu agiritegian' 'Jauzi atzera/aurrera' aginduetan irakur-zerrendan gai bakarra dagoenean"
 13		"Saihestu TXIKIENTZEA Ikusleiho-osoan ez berezko monitorean"
-15		"Gaitu Logitech LCD sostengua (esperimentala)"
-17		"Gaitu MiniDump"
-18		"Eguneraketa egiaztapena"
-19		"Gaitu berezgaitasunezko eguneraketa egiaztapena"
-20		"Egiaztapen bakoitzaren arteko aldea:"
-23		"egun"
-24		"Ezarpen kudeaketa"
-25		"Berrezarri"
-26		"Esportatu"
+15		"Pause the video playback when minimized"
+17		"Gaitu Logitech LCD sostengua (esperimentala)"
+19		"Gaitu MiniDump"
+20		"Eguneraketa egiaztapena"
+21		"Gaitu berezgaitasunezko eguneraketa egiaztapena"
+22		"Egiaztapen bakoitzaren arteko aldea:"
+25		"egun"
+26		"Ezarpen kudeaketa"
+27		"Berrezarri"
+28		"Esportatu"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
