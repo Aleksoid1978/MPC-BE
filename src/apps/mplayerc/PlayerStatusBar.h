@@ -40,6 +40,8 @@ class CPlayerStatusBar : public CDialogBar
 	CRect m_time_rect;
 	CRect m_time_rect2;
 
+	CFont m_font;
+
 	void Relayout();
 
 public:
@@ -73,6 +75,8 @@ protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
+
+	void ScaleFontInternal();
 
 public:
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
