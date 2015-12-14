@@ -82,10 +82,10 @@ int CPlayerStatusBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CRect r;
 	r.SetRectEmpty();
 
-	m_type.Create(_T(""), WS_CHILD | WS_VISIBLE | SS_ICON, r, this, IDC_STATIC1);
-	m_status.Create(_T(""), WS_CHILD | WS_VISIBLE | SS_OWNERDRAW, r, this, IDC_PLAYERSTATUS);
+	m_type.Create(L"", WS_CHILD | WS_VISIBLE | SS_ICON, r, this, IDC_STATIC1);
+	m_status.Create(L"", WS_CHILD | WS_VISIBLE | SS_OWNERDRAW, r, this, IDC_PLAYERSTATUS);
 	m_status.SetWindowPos(&m_time, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
-	m_time.Create(_T(""), WS_CHILD | WS_VISIBLE | SS_OWNERDRAW, r, this, IDC_PLAYERTIME);
+	m_time.Create(L"", WS_CHILD | WS_VISIBLE | SS_OWNERDRAW, r, this, IDC_PLAYERTIME);
 
 	Relayout();
 
@@ -146,8 +146,8 @@ void CPlayerStatusBar::Relayout()
 
 void CPlayerStatusBar::Clear()
 {
-	m_status.SetWindowText(_T(""));
-	m_time.SetWindowText(_T(""));
+	m_status.SetWindowText(L"");
+	m_time.SetWindowText(L"");
 
 	SetStatusBitmap(0);
 
@@ -239,39 +239,39 @@ void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur
 
 #if 0
 		if (tcDur.bHours > 0 || (rtNow >= rtDur && tcNow.bHours > 0)) {
-			posstr.Format(_T("%02u:%02u:%02u"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
-			rstr.Format(_T("%02u:%02u:%02u"), tcRt.bHours, tcRt.bMinutes, tcRt.bSeconds);
+			posstr.Format(L"%02u:%02u:%02u", tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
+			rstr.Format(L"%02u:%02u:%02u", tcRt.bHours, tcRt.bMinutes, tcRt.bSeconds);
 		} else {
-			posstr.Format(_T("%02u:%02u"), tcNow.bMinutes, tcNow.bSeconds);
-			rstr.Format(_T("%02u:%02u"), tcRt.bMinutes, tcRt.bSeconds);
+			posstr.Format(L"%02u:%02u", tcNow.bMinutes, tcNow.bSeconds);
+			rstr.Format(L"%02u:%02u", tcRt.bMinutes, tcRt.bSeconds);
 		}
 
 		if (tcDur.bHours > 0) {
-			durstr.Format(_T("%02u:%02u:%02u"), tcDur.bHours, tcDur.bMinutes, tcDur.bSeconds);
+			durstr.Format(L"%02u:%02u:%02u", tcDur.bHours, tcDur.bMinutes, tcDur.bSeconds);
 		} else {
-			durstr.Format(_T("%02u:%02u"), tcDur.bMinutes, tcDur.bSeconds);
+			durstr.Format(L"%02u:%02u", tcDur.bMinutes, tcDur.bSeconds);
 		}
 #else
-		posstr.Format(_T("%02u:%02u:%02u"), tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
-		rstr.Format(_T("%02u:%02u:%02u"), tcRt.bHours, tcRt.bMinutes, tcRt.bSeconds);
-		durstr.Format(_T("%02u:%02u:%02u"), tcDur.bHours, tcDur.bMinutes, tcDur.bSeconds);
+		posstr.Format(L"%02u:%02u:%02u", tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
+		rstr.Format(L"%02u:%02u:%02u", tcRt.bHours, tcRt.bMinutes, tcRt.bSeconds);
+		durstr.Format(L"%02u:%02u:%02u", tcDur.bHours, tcDur.bMinutes, tcDur.bSeconds);
 #endif
 
 		if (fHighPrecision) {
-			posstr.AppendFormat(_T(".%03d"), (rtNow / 10000) % 1000);
-			durstr.AppendFormat(_T(".%03d"), (rtDur / 10000) % 1000);
-			rstr.AppendFormat(_T(".%03d"), ((rtDur - rtNow) / 10000) % 1000);
+			posstr.AppendFormat(L".%03d", (rtNow / 10000) % 1000);
+			durstr.AppendFormat(L".%03d", (rtDur / 10000) % 1000);
+			rstr.AppendFormat(L".%03d", ((rtDur - rtNow) / 10000) % 1000);
 		}
 	} else if (timeFormat == TIME_FORMAT_FRAME) {
-		posstr.Format(_T("%I64d"), rtNow);
-		durstr.Format(_T("%I64d"), rtDur);
-		rstr.Format(_T("%I64d"), rtDur - rtNow);
+		posstr.Format(L"%I64d", rtNow);
+		durstr.Format(L"%I64d", rtDur);
+		rstr.Format(L"%I64d", rtDur - rtNow);
 	}
 
 	if (!AfxGetAppSettings().fRemainingTime) {
-		str = ((rtDur <= 0) || (rtDur < rtNow)) ? posstr : posstr + _T(" / ") + durstr;
+		str = ((rtDur <= 0) || (rtDur < rtNow)) ? posstr : posstr + L" / " + durstr;
 	} else {
-		str = ((rtDur <= 0) || (rtDur < rtNow)) ? posstr : _T("- ") + rstr + _T(" / ") + durstr;
+		str = ((rtDur <= 0) || (rtDur < rtNow)) ? posstr : L"- " + rstr + L" / " + durstr;
 	}
 
 	SetStatusTimer(str);
@@ -337,14 +337,12 @@ BOOL CPlayerStatusBar::OnEraseBkgnd(CDC* pDC)
 void CPlayerStatusBar::OnPaint()
 {
 	CPaintDC dc(this);
-	int R, G, B, R2, G2, B2;
 
 	if (GetSafeHwnd()) {
 		Relayout();
 	}
 
 	CAppSettings& s = AfxGetAppSettings();
-	CRect r;
 
 	if (!s.bUseDarkTheme) {
 		if (m_bm.m_hObject) {
@@ -353,18 +351,24 @@ void CPlayerStatusBar::OnPaint()
 			CDC memdc;
 			memdc.CreateCompatibleDC(&dc);
 			memdc.SelectObject(&m_bm);
+
+			CRect r;
 			GetClientRect(&r);
-			dc.BitBlt(r.right-bm.bmWidth-1, (r.Height() - bm.bmHeight)/2, bm.bmWidth, bm.bmHeight, &memdc, 0, 0, SRCCOPY);
+			dc.BitBlt(r.right - bm.bmWidth - 1, (r.Height() - bm.bmHeight) / 2, bm.bmWidth, bm.bmHeight, &memdc, 0, 0, SRCCOPY);
 		}
 	} else {
-		CDC memdc;
+		CRect r;
 		GetClientRect(&r);
-		CBitmap m_bmPaint;
+		
+		CDC memdc;
 		memdc.CreateCompatibleDC(&dc);
+
+		CBitmap m_bmPaint;
 		m_bmPaint.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
 		memdc.SelectObject(&m_bmPaint);
 
-		//background
+		// background
+		int R, G, B, R2, G2, B2;
 
 		GRADIENT_RECT gr[1] = {{0, 1}};
 
@@ -375,58 +379,79 @@ void CPlayerStatusBar::OnPaint()
 			ThemeRGB(30, 35, 40, R, G, B);
 			ThemeRGB(0, 5, 10, R2, G2, B2);
 			TRIVERTEX tv[2] = {
-				{r.left, r.top, R*256, G*256, B*256, 255*256},
-				{r.right, r.bottom, R2*256, G2*256, B2*256, 255*256},
+				{r.left, r.top, R * 256, G * 256, B * 256, 255 * 256},
+				{r.right, r.bottom, R2 * 256, G2 * 256, B2 * 256, 255 * 256},
 			};
 			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 		}
 
 		memdc.SetBkMode(TRANSPARENT);
 
-		CPen penPlayed1(PS_SOLID,0,RGB(0,0,0));
+		CPen penPlayed1(PS_SOLID, 0, RGB(0, 0, 0));
 		memdc.SelectObject(&penPlayed1);
-		memdc.MoveTo(r.left, r.top +1);
-		memdc.LineTo(r.right, r.top +1);
-		memdc.MoveTo(r.left, r.top +2);
-		memdc.LineTo(r.right, r.top +2);
+		memdc.MoveTo(r.left, r.top + 1);
+		memdc.LineTo(r.right, r.top + 1);
+		memdc.MoveTo(r.left, r.top + 2);
+		memdc.LineTo(r.right, r.top + 2);
 
 		ThemeRGB(50, 55, 60, R, G, B);
-		CPen penPlayed2(PS_SOLID,0,RGB(R,G,B));
+		CPen penPlayed2(PS_SOLID, 0, RGB(R, G, B));
 		memdc.SelectObject(&penPlayed2);
-		memdc.MoveTo(r.left, r.top +3);
-		memdc.LineTo(r.right, r.top +3);
+		memdc.MoveTo(r.left, r.top + 3);
+		memdc.LineTo(r.right, r.top + 3);
 
-		CFont font2;
 		ThemeRGB(165, 170, 175, R, G, B);
-		memdc.SetTextColor(RGB(R,G,B));
+		memdc.SetTextColor(RGB(R, G, B));
 
+		// texts
+		CFont font2;
 		font2.CreateFont(AfxGetMainFrame()->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
-					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE, _T("Tahoma"));
+						 OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Tahoma");
+
+		CFont* pOld = dc.SelectObject(&font2);
+		const LONG textHeight = dc.GetTextExtent(L"x").cy;
+		dc.SelectObject(pOld);
+
+		const LONG xOffset = 6;
+		const LONG yOffset = llround((r.Height() - textHeight) / 2.0f);
 
 		memdc.SelectObject(&font2);
-		CString str;
-		str = GetStatusTimer();
+		CString str = GetStatusTimer();
+		int strlen = str.GetLength();
+
 		s.strTimeOnSeekBar = str;
 
-		CRect rt = r;
-		m_time_rect2		= rt;
-		m_time_rect2.right	= rt.right;
-		m_time_rect2.top	= rt.top;
-		m_time_rect2.left	= rt.right - 120;
-		m_time_rect2.bottom	= rt.bottom;
+		m_time_rect2.SetRectEmpty();
+		if (strlen > 0) {
+			CFont* pOld = dc.SelectObject(&font2);
+			const CSize textSize = dc.GetTextExtent(str);
+			dc.SelectObject(pOld);
 
-		rt.right	= r.right - 6;
-		rt.top		= r.top + 4;
-		memdc.DrawText(str, str.GetLength(), &rt, DT_RIGHT|DT_VCENTER|DT_SINGLELINE);
+			CRect rt = r;
+			m_time_rect2        = rt;
+			m_time_rect2.right  = rt.right;
+			m_time_rect2.top    = rt.top;
+			m_time_rect2.left   = rt.right - textSize.cx;
+			m_time_rect2.bottom = rt.bottom;
 
-		CString str2;
-		str2 = GetStatusMessage();
+			rt.right  = r.right - xOffset;
+			rt.top    = r.top + yOffset;
+			rt.bottom = rt.top + textHeight;
 
-		CRect rs	= r;
-		rs.left		= r.left + 7;
-		rs.top		= r.top + 3;
+			memdc.DrawText(str, strlen, &rt, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
+		}
 
-		memdc.DrawText(str2, str2.GetLength(), &rs, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
+		str = GetStatusMessage();
+		strlen = str.GetLength();
+
+		if (strlen > 0) {
+			CRect rt = r;
+			rt.left   = r.left + xOffset;
+			rt.top    = r.top + yOffset;
+			rt.bottom = rt.top + textHeight;
+			
+			memdc.DrawText(str, strlen, &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+		}
 
 		dc.BitBlt(r.left, r.top, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
 	}
