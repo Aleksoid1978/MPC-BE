@@ -435,6 +435,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	ULONG m_lCurrentChapter;
 	ULONG m_lChapterStartTime;
 
+	bool m_bWasPausedOnMinimizedVideo = false;
+
 public:
 	void StartWebServer(int nPort);
 	void StopWebServer();
