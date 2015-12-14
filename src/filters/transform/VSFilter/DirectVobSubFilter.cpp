@@ -1298,7 +1298,7 @@ STDMETHODIMP CDirectVobSubFilter::put_Placement(bool fOverridePlacement, int xpe
 	HRESULT hr = CDirectVobSub::put_Placement(fOverridePlacement, xperc, yperc);
 
 	if (hr == NOERROR) {
-		UpdateSubtitle(true);
+		UpdateSubtitle();
 	}
 
 	return hr;
@@ -1321,7 +1321,7 @@ STDMETHODIMP CDirectVobSubFilter::put_TextSettings(void* lf, int lflen, COLORREF
 	HRESULT hr = CDirectVobSub::put_TextSettings(lf, lflen, color, fShadow, fOutline, fAdvancedRenderer);
 
 	if (hr == NOERROR) {
-		//		UpdateSubtitle(true);
+		//		UpdateSubtitle();
 		InvalidateSubtitle();
 	}
 
@@ -1391,7 +1391,7 @@ STDMETHODIMP CDirectVobSubFilter::put_TextSettings(STSStyle* pDefStyle)
 	HRESULT hr = CDirectVobSub::put_TextSettings(pDefStyle);
 
 	if (hr == NOERROR) {
-		UpdateSubtitle(true);
+		UpdateSubtitle();
 	}
 
 	return hr;
@@ -1402,7 +1402,7 @@ STDMETHODIMP CDirectVobSubFilter::put_AspectRatioSettings(CSimpleTextSubtitle::E
 	HRESULT hr = CDirectVobSub::put_AspectRatioSettings(ePARCompensationType);
 
 	if (hr == NOERROR) {
-		UpdateSubtitle(true);
+		UpdateSubtitle(false);
 	}
 
 	return hr;
