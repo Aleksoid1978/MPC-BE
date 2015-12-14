@@ -566,11 +566,12 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 
 	if (formattype == FORMAT_VideoInfo || formattype == FORMAT_VideoInfo2
 			|| formattype == FORMAT_MPEGVideo || formattype == FORMAT_MPEG2_VIDEO) {
+		
 		fmtsize =
-			formattype == FORMAT_VideoInfo ? sizeof(VIDEOINFOHEADER) :
-			formattype == FORMAT_VideoInfo2 ? sizeof(VIDEOINFOHEADER2) :
-			formattype == FORMAT_MPEGVideo ? sizeof(MPEG1VIDEOINFO)-1 :
-			formattype == FORMAT_MPEG2_VIDEO ? sizeof(MPEG2VIDEOINFO)-4 :
+			formattype == FORMAT_VideoInfo   ? sizeof(VIDEOINFOHEADER)    :
+			formattype == FORMAT_VideoInfo2  ? sizeof(VIDEOINFOHEADER2)   :
+			formattype == FORMAT_MPEGVideo   ? sizeof(MPEG1VIDEOINFO) - 1 :
+			formattype == FORMAT_MPEG2_VIDEO ? sizeof(MPEG2VIDEOINFO) - 4 :
 			0;
 
 		VIDEOINFOHEADER& vih = *(VIDEOINFOHEADER*)pbFormat;
@@ -698,8 +699,6 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 		sl.AddTail(str);
 		str.Format(_T("biClrImportant: %u"), bih->biClrImportant);
 		sl.AddTail(str);
-
-		sl.AddTail(_T(""));
 	} else if (formattype == FORMAT_WaveFormatEx || formattype == FORMAT_WaveFormatExFFMPEG) {
 		WAVEFORMATEX *pWfe = NULL;
 		if (formattype == FORMAT_WaveFormatExFFMPEG) {
@@ -735,10 +734,10 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 		str.Format(_T("cbSize: %u (extra bytes)"), wfe.cbSize);
 		sl.AddTail(str);
 
-		sl.AddTail(_T(""));
-
 		if (wfe.wFormatTag != WAVE_FORMAT_PCM && wfe.cbSize > 0 && formattype == FORMAT_WaveFormatEx) {
 			if (wfe.wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe.cbSize == sizeof(WAVEFORMATEXTENSIBLE)-sizeof(WAVEFORMATEX)) {
+				sl.AddTail(_T(""));
+
 				fmtsize = sizeof(WAVEFORMATEXTENSIBLE);
 
 				WAVEFORMATEXTENSIBLE& wfex = *(WAVEFORMATEXTENSIBLE*)pbFormat;
@@ -754,9 +753,9 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 				sl.AddTail(str);
 				str.Format(_T("SubFormat: %s"), CStringFromGUID(wfex.SubFormat));
 				sl.AddTail(str);
-
-				sl.AddTail(_T(""));
 			} else if (wfe.wFormatTag == WAVE_FORMAT_DOLBY_AC3 && wfe.cbSize == sizeof(DOLBYAC3WAVEFORMAT)-sizeof(WAVEFORMATEX)) {
+				sl.AddTail(_T(""));
+
 				fmtsize = sizeof(DOLBYAC3WAVEFORMAT);
 
 				DOLBYAC3WAVEFORMAT& ac3wf = *(DOLBYAC3WAVEFORMAT*)pbFormat;
@@ -772,8 +771,6 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 				sl.AddTail(str);
 				str.Format(_T("nAuxBitsCode: %u"), ac3wf.nAuxBitsCode);
 				sl.AddTail(str);
-
-				sl.AddTail(_T(""));
 			}
 		}
 	} else if (formattype == FORMAT_VorbisFormat) {
@@ -794,8 +791,6 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 		sl.AddTail(str);
 		str.Format(_T("fQuality: %.3f"), vf.fQuality);
 		sl.AddTail(str);
-
-		sl.AddTail(_T(""));
 	} else if (formattype == FORMAT_VorbisFormat2) {
 		fmtsize = sizeof(VORBISFORMAT2);
 
@@ -810,8 +805,6 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 		sl.AddTail(str);
 		str.Format(_T("HeaderSize: {%u, %u, %u}"), vf.HeaderSize[0], vf.HeaderSize[1], vf.HeaderSize[2]);
 		sl.AddTail(str);
-
-		sl.AddTail(_T(""));
 	} else if (formattype == FORMAT_SubtitleInfo) {
 		fmtsize = sizeof(SUBTITLEINFO);
 
@@ -824,11 +817,11 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 		sl.AddTail(str);
 		str.Format(_T("TrackName: %s"), CString(si.TrackName, _countof(si.TrackName) - 1));
 		sl.AddTail(str);
-
-		sl.AddTail(_T(""));
 	}
 
 	if (fmtsize < cbFormat) { // extra and unknown data
+		sl.AddTail(_T(""));
+
 		ULONG extrasize = cbFormat - fmtsize;
 		str.Format(_T("Extradata: %u"), extrasize);
 		sl.AddTail(str);
@@ -855,7 +848,6 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 
 			sl.AddTail(str);
 		}
-		sl.AddTail(_T(""));
 	}
 }
 
