@@ -150,17 +150,19 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	}
 
 	if (IsRandomAccess()) {
-		__int64 const len = GetLength();
+		const __int64 len = GetLength();
 		__int64 stop = min(10 * MEGABYTE, len);
 		SearchPrograms(0, stop);
 		SearchStreams(0, stop);
 
-		int num = min(20, (len - stop) / (512 * KILOBYTE));
+		const int step_size = 512 * KILOBYTE;
+
+		int num = min(20, (len - stop) / step_size);
 		if (num > 0) {
 			__int64 step = (len - stop) / num;
 			for (int i = 0; i < num; i++) {
 				stop += step;
-				__int64 start = stop - 256 * KILOBYTE;
+				const __int64 start = stop - min(step_size, step);
 				SearchPrograms(start, stop);
 				SearchStreams(start, stop);
 			}
