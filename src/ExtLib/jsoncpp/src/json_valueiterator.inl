@@ -77,24 +77,42 @@ void ValueIteratorBase::copy(const SelfType& other) {
 
 Value ValueIteratorBase::key() const {
   const Value::CZString czstring = (*current_).first;
-  if (czstring.c_str()) {
+  if (czstring.data()) {
     if (czstring.isStaticString())
-      return Value(StaticString(czstring.c_str()));
-    return Value(czstring.c_str());
+      return Value(StaticString(czstring.data()));
+    return Value(czstring.data(), czstring.data() + czstring.length());
   }
   return Value(czstring.index());
 }
 
 UInt ValueIteratorBase::index() const {
   const Value::CZString czstring = (*current_).first;
-  if (!czstring.c_str())
+  if (!czstring.data())
     return czstring.index();
   return Value::UInt(-1);
 }
 
-const char* ValueIteratorBase::memberName() const {
-  const char* name = (*current_).first.c_str();
-  return name ? name : "";
+std::string ValueIteratorBase::name() const {
+  char const* keey;
+  char const* end;
+  keey = memberName(&end);
+  if (!keey) return std::string();
+  return std::string(keey, end);
+}
+
+char const* ValueIteratorBase::memberName() const {
+  const char* cname = (*current_).first.data();
+  return cname ? cname : "";
+}
+
+char const* ValueIteratorBase::memberName(char const** end) const {
+  const char* cname = (*current_).first.data();
+  if (!cname) {
+    *end = NULL;
+    return NULL;
+  }
+  *end = cname + (*current_).first.length();
+  return cname;
 }
 
 // //////////////////////////////////////////////////////////////////
@@ -110,6 +128,9 @@ ValueConstIterator::ValueConstIterator() {}
 ValueConstIterator::ValueConstIterator(
     const Value::ObjectValues::iterator& current)
     : ValueIteratorBase(current) {}
+
+ValueConstIterator::ValueConstIterator(ValueIterator const& other)
+    : ValueIteratorBase(other) {}
 
 ValueConstIterator& ValueConstIterator::
 operator=(const ValueIteratorBase& other) {
@@ -131,7 +152,9 @@ ValueIterator::ValueIterator(const Value::ObjectValues::iterator& current)
     : ValueIteratorBase(current) {}
 
 ValueIterator::ValueIterator(const ValueConstIterator& other)
-    : ValueIteratorBase(other) {}
+    : ValueIteratorBase(other) {
+  throwRuntimeError("ConstIterator to Iterator should never be allowed.");
+}
 
 ValueIterator::ValueIterator(const ValueIterator& other)
     : ValueIteratorBase(other) {}

@@ -46,7 +46,7 @@ public:
   /** Write Value into document as configured in sub-class.
       Do not take ownership of sout, but maintain a reference during function.
       \pre sout != NULL
-      \return zero on success
+      \return zero on success (For now, we always return zero, so check the stream instead.)
       \throw std::exception possibly, depending on configuration
    */
   virtual int write(Value const& root, std::ostream* sout) = 0;
@@ -66,7 +66,7 @@ public:
 /** \brief Write into stringstream, then return string, for convenience.
  * A StreamWriter will be created from the factory, used, and then deleted.
  */
-std::string writeString(StreamWriter::Factory const& factory, Value const& root);
+std::string JSON_API writeString(StreamWriter::Factory const& factory, Value const& root);
 
 
 /** \brief Build a StreamWriter implementation.
@@ -76,8 +76,8 @@ Usage:
   using namespace Json;
   Value value = ...;
   StreamWriterBuilder builder;
-  builder.settings_["commentStyle"] = "None";
-  builder.settings_["indentation"] = "   ";  // or whatever you like
+  builder["commentStyle"] = "None";
+  builder["indentation"] = "   ";  // or whatever you like
   std::unique_ptr<Json::StreamWriter> writer(
       builder.newStreamWriter());
   writer->write(value, &std::cout);
@@ -99,6 +99,10 @@ public:
         Strictly speaking, this is not valid JSON. But when the output is being
         fed to a browser's Javascript, it makes for smaller output and the
         browser can handle the output just fine.
+    - "useSpecialFloats": false or true
+      - If true, outputs non-finite floating point values in the following way:
+        NaN values as "NaN", positive infinity as "Infinity", and negative infinity
+        as "-Infinity".
 
     You can examine 'settings_` yourself
     to see the defaults. You can also write and read them just like any
@@ -108,17 +112,21 @@ public:
   Json::Value settings_;
 
   StreamWriterBuilder();
-  virtual ~StreamWriterBuilder();
+  ~StreamWriterBuilder() override;
 
   /**
    * \throw std::exception if something goes wrong (e.g. invalid settings)
    */
-  virtual StreamWriter* newStreamWriter() const;
+  StreamWriter* newStreamWriter() const override;
 
   /** \return true if 'settings' are legal and consistent;
    *   otherwise, indicate bad settings via 'invalid'.
    */
   bool validate(Json::Value* invalid) const;
+  /** A simple way to update a specific setting.
+   */
+  Value& operator[](std::string key);
+
   /** Called by ctor, but you can use this to reset settings_.
    * \pre 'settings' != NULL (but Json::null is fine)
    * \remark Defaults:
@@ -128,7 +136,7 @@ public:
 };
 
 /** \brief Abstract class for writers.
- * \deprecated Use StreamWriter.
+ * \deprecated Use StreamWriter. (And really, this is an implementation detail.)
  */
 class JSON_API Writer {
 public:
@@ -147,9 +155,10 @@ public:
  * \deprecated Use StreamWriterBuilder.
  */
 class JSON_API FastWriter : public Writer {
+
 public:
   FastWriter();
-  virtual ~FastWriter() {}
+  ~FastWriter() override {}
 
   void enableYAMLCompatibility();
 
@@ -163,7 +172,7 @@ public:
   void omitEndingLineFeed();
 
 public: // overridden from Writer
-  virtual std::string write(const Value& root);
+  std::string write(const Value& root) override;
 
 private:
   void writeValue(const Value& value);
@@ -201,14 +210,14 @@ private:
 class JSON_API StyledWriter : public Writer {
 public:
   StyledWriter();
-  virtual ~StyledWriter() {}
+  ~StyledWriter() override {}
 
 public: // overridden from Writer
   /** \brief Serialize a Value in <a HREF="http://www.json.org">JSON</a> format.
    * \param root Value to serialize.
    * \return String containing the JSON document that represents the root value.
    */
-  virtual std::string write(const Value& root);
+  std::string write(const Value& root) override;
 
 private:
   void writeValue(const Value& value);

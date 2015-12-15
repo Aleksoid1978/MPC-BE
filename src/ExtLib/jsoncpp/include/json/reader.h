@@ -110,7 +110,7 @@ public:
    *         during parsing.
    * \deprecated Use getFormattedErrorMessages() instead (typo fix).
    */
-  JSONCPP_DEPRECATED("Use getFormattedErrorMessages instead")
+  JSONCPP_DEPRECATED("Use getFormattedErrorMessages() instead.")
   std::string getFormatedErrorMessages() const;
 
   /** \brief Returns a user friendly string that list errors in the parsed
@@ -268,8 +268,9 @@ public:
       char const* beginDoc, char const* endDoc,
       Value* root, std::string* errs) = 0;
 
-  class Factory {
+  class JSON_API Factory {
   public:
+    virtual ~Factory() {}
     /** \brief Allocate a CharReader via operator new().
      * \throw std::exception if something goes wrong (e.g. invalid settings)
      */
@@ -279,13 +280,11 @@ public:
 
 /** \brief Build a CharReader implementation.
 
-  \deprecated This is experimental and will be altered before the next release.
-
 Usage:
 \code
   using namespace Json;
   CharReaderBuilder builder;
-  builder.settings_["collectComments"] = false;
+  builder["collectComments"] = false;
   Value value;
   std::string errs;
   bool ok = parseFromStream(builder, std::cin, &value, &errs);
@@ -320,6 +319,11 @@ public:
     - `"failIfExtra": false or true`
       - If true, `parse()` returns false when extra non-whitespace trails
         the JSON value in the input string.
+    - `"rejectDupKeys": false or true`
+      - If true, `parse()` returns false when a key is duplicated within an object.
+    - `"allowSpecialFloats": false or true`
+      - If true, special float values (NaNs and infinities) are allowed 
+        and their values are lossfree restorable.
 
     You can examine 'settings_` yourself
     to see the defaults. You can also write and read them just like any
@@ -329,24 +333,29 @@ public:
   Json::Value settings_;
 
   CharReaderBuilder();
-  virtual ~CharReaderBuilder();
+  ~CharReaderBuilder() override;
 
-  virtual CharReader* newCharReader() const;
+  CharReader* newCharReader() const override;
 
   /** \return true if 'settings' are legal and consistent;
    *   otherwise, indicate bad settings via 'invalid'.
    */
   bool validate(Json::Value* invalid) const;
+
+  /** A simple way to update a specific setting.
+   */
+  Value& operator[](std::string key);
+
   /** Called by ctor, but you can use this to reset settings_.
    * \pre 'settings' != NULL (but Json::null is fine)
    * \remark Defaults:
-   * \snippet src/lib_json/json_reader.cpp CharReaderBuilderStrictMode
+   * \snippet src/lib_json/json_reader.cpp CharReaderBuilderDefaults
    */
   static void setDefaults(Json::Value* settings);
   /** Same as old Features::strictMode().
    * \pre 'settings' != NULL (but Json::null is fine)
    * \remark Defaults:
-   * \snippet src/lib_json/json_reader.cpp CharReaderBuilderDefaults
+   * \snippet src/lib_json/json_reader.cpp CharReaderBuilderStrictMode
    */
   static void strictMode(Json::Value* settings);
 };
@@ -355,7 +364,7 @@ public:
   * Someday we might have a real StreamReader, but for now this
   * is convenient.
   */
-bool parseFromStream(
+bool JSON_API parseFromStream(
     CharReader::Factory const&,
     std::istream&,
     Value* root, std::string* errs);
