@@ -12,6 +12,7 @@ Legend:
 
 Updated libraries:
 	ffmpeg git-n2.9-dev-2278-g5b0da69;
+	jsoncpp git-1.0.0-436-g9234cbb;
 	libdcadec git-v0.1.0-19-g0fb1fa4;
 	libpng-1.6.20-signed;
 	Little-CMS 2.7 beta git-0ebca931;

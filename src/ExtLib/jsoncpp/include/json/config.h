@@ -56,21 +56,58 @@
 // Storages, and 64 bits integer support is disabled.
 // #define JSON_NO_INT64 1
 
-#if defined(_MSC_VER) && _MSC_VER <= 1200 // MSVC 6
-// Microsoft Visual Studio 6 only support conversion from __int64 to double
-// (no conversion from unsigned __int64).
-#define JSON_USE_INT64_DOUBLE_CONVERSION 1
-// Disable warning 4786 for VS6 caused by STL (identifier was truncated to '255'
-// characters in the debug information)
-// All projects I've ever seen with VS6 were using this globally (not bothering
-// with pragma push/pop).
-#pragma warning(disable : 4786)
-#endif // if defined(_MSC_VER)  &&  _MSC_VER < 1200 // MSVC 6
+#if defined(_MSC_VER) // MSVC
+#  if _MSC_VER <= 1200 // MSVC 6
+    // Microsoft Visual Studio 6 only support conversion from __int64 to double
+    // (no conversion from unsigned __int64).
+#    define JSON_USE_INT64_DOUBLE_CONVERSION 1
+    // Disable warning 4786 for VS6 caused by STL (identifier was truncated to '255'
+    // characters in the debug information)
+    // All projects I've ever seen with VS6 were using this globally (not bothering
+    // with pragma push/pop).
+#    pragma warning(disable : 4786)
+#  endif // MSVC 6
 
-#if defined(_MSC_VER) && _MSC_VER >= 1500 // MSVC 2008
-/// Indicates that the following function is deprecated.
-#define JSONCPP_DEPRECATED(message) __declspec(deprecated(message))
+#  if _MSC_VER >= 1500 // MSVC 2008
+    /// Indicates that the following function is deprecated.
+#    define JSONCPP_DEPRECATED(message) __declspec(deprecated(message))
+#  endif
+
+#endif // defined(_MSC_VER)
+
+
+#ifndef JSON_HAS_RVALUE_REFERENCES
+
+#if defined(_MSC_VER) && _MSC_VER >= 1600 // MSVC >= 2010
+#define JSON_HAS_RVALUE_REFERENCES 1
+#endif // MSVC >= 2010
+
+#ifdef __clang__
+#if __has_feature(cxx_rvalue_references)
+#define JSON_HAS_RVALUE_REFERENCES 1
+#endif  // has_feature
+
+#elif defined __GNUC__ // not clang (gcc comes later since clang emulates gcc)
+#if defined(__GXX_EXPERIMENTAL_CXX0X__) || (__cplusplus >= 201103L)
+#define JSON_HAS_RVALUE_REFERENCES 1
+#endif  // GXX_EXPERIMENTAL
+
+#endif // __clang__ || __GNUC__
+
+#endif // not defined JSON_HAS_RVALUE_REFERENCES
+
+#ifndef JSON_HAS_RVALUE_REFERENCES
+#define JSON_HAS_RVALUE_REFERENCES 0
 #endif
+
+#ifdef __clang__
+#elif defined __GNUC__ // not clang (gcc comes later since clang emulates gcc)
+#  if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
+#    define JSONCPP_DEPRECATED(message)  __attribute__ ((deprecated(message)))
+#  elif (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1))
+#    define JSONCPP_DEPRECATED(message)  __attribute__((__deprecated__))
+#  endif  // GNUC version
+#endif // __clang__ || __GNUC__
 
 #if !defined(JSONCPP_DEPRECATED)
 #define JSONCPP_DEPRECATED(message)
