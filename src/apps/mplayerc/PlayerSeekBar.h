@@ -91,15 +91,14 @@ public:
 	BOOL HasDuration() { return m_stop > 0; };
 
 	virtual BOOL Create(CWnd* pParentWnd);
-	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-
 	virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz) override;
 
 	BOOL OnPlayStop(UINT nID);
 
 protected:
-	DECLARE_MESSAGE_MAP()
+	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	virtual ULONG GetGestureStatus(CPoint) { return 0; };
 
 	afx_msg void OnPaint();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
@@ -112,4 +111,6 @@ protected:
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnMButtonDown(UINT nFlags, CPoint point);
+
+	DECLARE_MESSAGE_MAP()
 };
