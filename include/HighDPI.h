@@ -94,22 +94,15 @@ protected:
         }
 
         if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion >= 3 || osvi.dwMajorVersion > 6) {
-            static HMODULE m_hShellScalingAPI = NULL;
-            static tpGetDpiForMonitor pGetDpiForMonitor = NULL;
-
-            if (!m_hShellScalingAPI) {
-                m_hShellScalingAPI = LoadLibrary(L"Shcore.dll");
-            }
-
-            if (m_hShellScalingAPI && !pGetDpiForMonitor) {
-                pGetDpiForMonitor = (tpGetDpiForMonitor)GetProcAddress(m_hShellScalingAPI, "GetDpiForMonitor");
-            }
-
-            if (pGetDpiForMonitor) {
-                UINT dpix, dpiy;
-                if (S_OK == pGetDpiForMonitor(MonitorFromWindow(hWindow, MONITOR_DEFAULTTONEAREST), MDT_EFFECTIVE_DPI, &dpix, &dpiy)) {
-                    m_dpiX = dpix;
-                    m_dpiY = dpiy;
+            static HMODULE hShcore = LoadLibrary(L"Shcore.dll");
+            if (hShcore) {
+                static tpGetDpiForMonitor pGetDpiForMonitor = (tpGetDpiForMonitor)GetProcAddress(hShcore, "GetDpiForMonitor");
+                if (pGetDpiForMonitor) {
+                    UINT dpix, dpiy;
+                    if (S_OK == pGetDpiForMonitor(MonitorFromWindow(hWindow, MONITOR_DEFAULTTONEAREST), MDT_EFFECTIVE_DPI, &dpix, &dpiy)) {
+                        m_dpiX = dpix;
+                        m_dpiY = dpiy;
+                    }
                 }
             }
         }
