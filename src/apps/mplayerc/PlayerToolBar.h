@@ -69,17 +69,12 @@ public:
 	void SetVolume(int volume);
 	__declspec(property(get=GetVolume, put=SetVolume)) int Volume;
 
-	// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CPlayerToolBar)
 	virtual BOOL Create(CWnd* pParentWnd);
-	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	//}}AFX_VIRTUAL
-
-	// Generated message map functions
 
 protected:
-	//{{AFX_MSG(CPlayerToolBar)
+	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	virtual ULONG GetGestureStatus(CPoint) { return 0; };
+
 	afx_msg void OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnInitialUpdate();
@@ -89,7 +84,6 @@ protected:
 	afx_msg BOOL OnPause(UINT nID);
 	afx_msg BOOL OnPlay(UINT nID);
 	afx_msg BOOL OnStop(UINT nID);
-	afx_msg BOOL OnClose(UINT nID);
 
 	afx_msg BOOL OnVolumeUp(UINT nID);
 	afx_msg BOOL OnVolumeDown(UINT nID);
@@ -99,6 +93,6 @@ protected:
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-	//}}AFX_MSG
+
 	DECLARE_MESSAGE_MAP()
 };
