@@ -245,6 +245,25 @@ static av_always_inline int64_t ff_samples_to_time_base(AVCodecContext *avctx,
 }
 
 /**
+ * 2^(x) for integer x
+ * @return correctly rounded float
+ */
+static av_always_inline float ff_exp2fi(int x) {
+    /* Normal range */
+    if (-126 <= x && x <= 128)
+        return av_int2float(x+127 << 23);
+    /* Too large */
+    else if (x > 128)
+        return INFINITY;
+    /* Subnormal numbers */
+    else if (x > -150)
+        return av_int2float(1 << (x+149));
+    /* Negligibly small */
+    else
+        return 0;
+}
+
+/**
  * Get a buffer for a frame. This is a wrapper around
  * AVCodecContext.get_buffer() and should be used instead calling get_buffer()
  * directly.
@@ -306,6 +325,11 @@ int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt);
  * Set various frame properties from the codec context / packet data.
  */
 int ff_decode_frame_props(AVCodecContext *avctx, AVFrame *frame);
+
+/**
+ * Add a CPB properties side data to an encoding context.
+ */
+AVCPBProperties *ff_add_cpb_side_data(AVCodecContext *avctx);
 
 int ff_side_data_set_encoder_stats(AVPacket *pkt, int quality, int64_t *error, int error_count, int pict_type);
 
