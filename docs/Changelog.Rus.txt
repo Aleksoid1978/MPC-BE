@@ -9,7 +9,7 @@
 ==============================
 
 Обновлены библиотеки:
-	ffmpeg git-n2.9-dev-2278-g5b0da69;
+	ffmpeg git-n2.9-dev-2465-g752ab40;
 	jsoncpp git-1.0.0-436-g9234cbb;
 	libdcadec git-v0.1.0-19-g0fb1fa4;
 	libpng-1.6.20-signed;
