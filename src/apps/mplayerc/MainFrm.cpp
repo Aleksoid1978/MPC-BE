@@ -710,7 +710,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// create a Main View Window
 	if (!m_wndView.Create(NULL, NULL, AFX_WS_DEFAULT_VIEW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-						  CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST, NULL)) {
+						  CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST)) {
 		TRACE(_T("Failed to create Main View Window\n"));
 		return -1;
 	}
@@ -724,7 +724,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CreateOSDBar();
 
 	// Create Preview Window
-	if (!m_wndPreView.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 160, 109), this, 0, NULL)) {
+	if (!m_wndPreView.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 160, 109), this, 0)) {
 		TRACE(_T("Failed to create Preview Window\n"));
 		m_wndView.DestroyWindow();
 		return -1;
@@ -1330,6 +1330,150 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	OSDBarSetPos();
 }
 
+static const bool IsMoveX(LONG x1, LONG x2, LONG y1, LONG y2)
+{
+	return (labs(x1 - x2) > 3 * labs(y1 - y2));
+}
+
+static const bool IsMoveY(LONG x1, LONG x2, LONG y1, LONG y2)
+{
+	return (labs(y1 - y2) > 3 * labs(x1 - x2));
+}
+
+BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTOUCHINPUT pInput)
+{
+	if (m_bFullScreen) {
+		if ((pInput->dwFlags & TOUCHEVENTF_DOWN) == TOUCHEVENTF_DOWN) {
+			if (!m_touchScreen.moving) {
+				m_touchScreen.Add(pInput->dwID, pt.x, pt.y);
+			}
+		} else if ((pInput->dwFlags & TOUCHEVENTF_MOVE) == TOUCHEVENTF_MOVE) {
+			const int index = m_touchScreen.FindById(pInput->dwID);
+			if (index != -1) {
+				touchPoint& point = m_touchScreen.point[index];
+				if (labs(point.x_start - pt.x) > 5
+						|| labs(point.y_start - pt.y) > 5) {
+					m_touchScreen.moving = true;
+				}
+
+				if (m_touchScreen.moving && m_touchScreen.Count() == 1) {
+					if (IsMoveX(pt.y, point.y_start, pt.x, point.x_start)) {
+						CRect rc;
+						m_wndView.GetWindowRect(&rc);
+
+						const int height  = rc.Height();
+						const int diff    = pt.y - point.y_start;
+						const int percent = 100 * diff / height;
+
+						if (abs(percent) >= 1) {
+							int pos = m_wndToolBar.m_volctrl.GetPos();
+							pos += (-percent);
+							m_wndToolBar.m_volctrl.SetPosInternal(pos);
+
+							point.x_start = pt.x;
+							point.y_start = pt.y;
+						}
+					} else if (m_eMediaLoadState == MLS_LOADED
+							&& IsMoveX(pt.x, point.x_start, pt.y, point.y_start)
+							&& AfxGetAppSettings().iShowOSD & OSD_SEEKTIME) {
+
+						REFERENCE_TIME stop;
+						m_wndSeekBar.GetRange(stop);
+						if (stop > 0) {
+							CRect rc;
+							m_wndView.GetWindowRect(&rc);
+
+							const int widht   = rc.Width();
+							const int diff    = pt.x - point.x_start;
+							const int percent = 100 * diff / widht;
+
+							if (abs(percent) >= 1) {
+								const REFERENCE_TIME rtDiff = stop * percent / 100;
+								if (abs(rtDiff) >= UNITS) {
+									const REFERENCE_TIME rtPos = m_wndSeekBar.GetPos();
+									REFERENCE_TIME rtNewPos = rtPos + rtDiff;
+									rtNewPos = CLAMP(rtNewPos, 0, stop);
+									const bool bHighPrecision = !!m_wndSubresyncBar.IsWindowVisible();
+									
+									m_wndStatusBar.SetStatusTimer(rtNewPos, stop, bHighPrecision, GetTimeFormat());
+									m_OSD.DisplayMessage(OSD_TOPLEFT, m_wndStatusBar.GetStatusTimer(), 1000);
+									m_wndStatusBar.SetStatusTimer(rtPos, stop, bHighPrecision, GetTimeFormat());
+								}
+							}
+						}			
+					}
+				}
+			}
+		} else if ((pInput->dwFlags & TOUCHEVENTF_UP) == TOUCHEVENTF_UP) {
+			const int index = m_touchScreen.Down(pInput->dwID, pt.x, pt.y);
+			if (index != -1 && m_touchScreen.Count() == m_touchScreen.CountEnd()) {
+				if (m_eMediaLoadState == MLS_LOADED) {
+					if (m_touchScreen.moving && m_touchScreen.Count() == 1) {
+						touchPoint& point = m_touchScreen.point[index];
+						if (IsMoveX(point.x_end, point.x_start, point.y_end, point.y_start)) {
+							REFERENCE_TIME stop;
+							m_wndSeekBar.GetRange(stop);
+							if (stop > 0) {
+								CRect rc;
+								m_wndView.GetWindowRect(&rc);
+
+								const int widht   = rc.Width();
+								const int diff    = point.x_end - point.x_start;
+								const int percent = 100 * diff / widht;
+
+								if (abs(percent) >= 1) {
+									const REFERENCE_TIME rtDiff = stop * percent / 100;
+									if (abs(rtDiff) >= UNITS) {
+										SeekTo(m_wndSeekBar.GetPos() + rtDiff);
+									}
+								}
+							}
+						}
+					} else if (m_touchScreen.Count() == 2) {
+						if (!m_touchScreen.moving) {
+							PostMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
+						} else {
+							touchPoint points[2];
+							int index = 0;
+							for (int i = 0; i < _countof(m_touchScreen.point); i++) {
+								if (m_touchScreen.point[i].dwID != DWORD_MAX && m_touchScreen.point[i].x_end != 0) {
+									points[index++] = m_touchScreen.point[i];
+								}
+							}
+
+							if (IsMoveY(points[0].x_end, points[0].x_start, points[0].y_end, points[0].y_start)
+									&& IsMoveY(points[1].x_end, points[1].x_start, points[1].y_end, points[1].y_start)) {
+								if (points[0].y_end > points[0].y_start
+										&& points[1].y_end > points[1].y_start) {
+									PostMessage(WM_COMMAND, ID_STREAM_AUDIO_NEXT);
+								} else if (points[0].y_end < points[0].y_start
+										&& points[1].y_end < points[1].y_start) {
+									PostMessage(WM_COMMAND, ID_STREAM_AUDIO_PREV);
+								}
+							} else if (IsMoveX(points[0].x_end, points[0].x_start, points[0].y_end, points[0].y_start)
+									&& IsMoveX(points[1].x_end, points[1].x_start, points[1].y_end, points[1].y_start)) {
+								if (points[0].x_end > points[0].x_start
+										&& points[1].x_end > points[1].x_start) {
+									PostMessage(WM_COMMAND, ID_NAVIGATE_SKIPFORWARD);
+								} else if (points[0].x_end < points[0].x_start
+										&& points[1].x_end < points[1].x_start) {
+									PostMessage(WM_COMMAND, ID_NAVIGATE_SKIPBACK);
+								}
+							}
+						}
+					}
+				}
+				
+				m_touchScreen.Empty();
+			}
+		}
+	} else {
+		m_touchScreen.Empty();
+	}
+
+	return TRUE;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame diagnostics
 
@@ -1925,18 +2069,19 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 	}
 
 	GetDesktopWindow()->GetWindowRect(&m_rcDesktop);
-	if (IsD3DFullScreenMode()) {
-		MONITORINFO MonitorInfo = { sizeof(MonitorInfo) };
+	if (m_bFullScreen || IsD3DFullScreenMode()) {
+		CWnd* cwnd = m_bFullScreen ? this : static_cast<CWnd*>(m_pFullscreenWnd);
 
-		HMONITOR hMonitor = MonitorFromWindow(m_pFullscreenWnd->m_hWnd, 0);
+		MONITORINFO MonitorInfo = { sizeof(MonitorInfo) };
+		HMONITOR hMonitor = MonitorFromWindow(cwnd->m_hWnd, 0);
 		if (GetMonitorInfo(hMonitor, &MonitorInfo)) {
 			CRect MonitorRect = CRect(MonitorInfo.rcMonitor);
-			m_pFullscreenWnd->SetWindowPos(NULL,
-										   MonitorRect.left,
-										   MonitorRect.top,
-										   MonitorRect.Width(),
-										   MonitorRect.Height(),
-										   SWP_NOZORDER);
+			cwnd->SetWindowPos(NULL,
+							   MonitorRect.left,
+							   MonitorRect.top,
+							   MonitorRect.Width(),
+							   MonitorRect.Height(),
+							   SWP_NOZORDER);
 			MoveVideoWindow();
 		}
 	}

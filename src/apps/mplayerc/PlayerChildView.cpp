@@ -27,13 +27,29 @@
 // CChildView
 
 CChildView::CChildView()
-	: m_lastlmdowntime(0)
 {
 	LoadLogo();
 }
 
 CChildView::~CChildView()
 {
+}
+
+int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CWnd::OnCreate(lpCreateStruct) == -1) {
+		return -1;
+	}
+
+	int digitizerStatus = GetSystemMetrics(SM_DIGITIZER);
+	if ((digitizerStatus & (NID_READY + NID_MULTI_INPUT))) {
+		DbgLog((LOG_TRACE, 3, L"CChildView::OnCreate() : touch is ready for input + support multiple inputs"));
+		if (!RegisterTouchWindow()) {
+			DbgLog((LOG_TRACE, 3, L"CChildView::OnCreate() : RegisterTouchWindow() failed"));
+		}
+	}
+
+	return 0;
 }
 
 BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
@@ -48,54 +64,30 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
+BOOL CChildView::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTOUCHINPUT pInput)
+{
+	if (auto pFrame = AfxGetMainFrame()) {
+		return pFrame->OnTouchInput(pt, nInputNumber, nInputsCount, pInput);
+	}
+
+	return FALSE;
+}
+
 BOOL CChildView::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message >= WM_MOUSEFIRST && pMsg->message <= WM_MYMOUSELAST) {
 		CWnd* pParent = GetParent();
-		CPoint p(pMsg->lParam);
-		::MapWindowPoints(pMsg->hwnd, pParent->m_hWnd, &p, 1);
+		CPoint point(pMsg->lParam);
+		::MapWindowPoints(pMsg->hwnd, pParent->m_hWnd, &point, 1);
 
-		bool fDblClick = false;
-
-		bool fInteractiveVideo = AfxGetMainFrame()->IsInteractiveVideo();
-		/*
-					if (fInteractiveVideo)
-					{
-						if (pMsg->message == WM_LBUTTONDOWN)
-						{
-							if ((pMsg->time - m_lastlmdowntime) <= GetDoubleClickTime()
-							&& abs(pMsg->pt.x - m_lastlmdownpoint.x) <= GetSystemMetrics(SM_CXDOUBLECLK)
-							&& abs(pMsg->pt.y - m_lastlmdownpoint.y) <= GetSystemMetrics(SM_CYDOUBLECLK))
-							{
-								fDblClick = true;
-								m_lastlmdowntime = 0;
-								m_lastlmdownpoint.SetPoint(0, 0);
-							}
-							else
-							{
-								m_lastlmdowntime = pMsg->time;
-								m_lastlmdownpoint = pMsg->pt;
-							}
-						}
-						else if (pMsg->message == WM_LBUTTONDBLCLK)
-						{
-							m_lastlmdowntime = pMsg->time;
-							m_lastlmdownpoint = pMsg->pt;
-						}
-					}
-		*/
-		if ((pMsg->message == WM_LBUTTONDOWN || pMsg->message == WM_LBUTTONUP || pMsg->message == WM_MOUSEMOVE)
-				&& fInteractiveVideo) {
+		const bool fInteractiveVideo = AfxGetMainFrame()->IsInteractiveVideo();
+		if (fInteractiveVideo &&
+				(pMsg->message == WM_LBUTTONDOWN || pMsg->message == WM_LBUTTONUP || pMsg->message == WM_MOUSEMOVE)) {
 			if (pMsg->message == WM_MOUSEMOVE) {
-				pParent->PostMessage(pMsg->message, pMsg->wParam, MAKELPARAM(p.x, p.y));
-			}
-
-			if (fDblClick) {
-				pParent->PostMessage(WM_LBUTTONDOWN, pMsg->wParam, MAKELPARAM(p.x, p.y));
-				pParent->PostMessage(WM_LBUTTONDBLCLK, pMsg->wParam, MAKELPARAM(p.x, p.y));
+				VERIFY(pParent->PostMessage(pMsg->message, pMsg->wParam, MAKELPARAM(point.x, point.y)));
 			}
 		} else {
-			pParent->PostMessage(pMsg->message, pMsg->wParam, MAKELPARAM(p.x, p.y));
+			VERIFY(pParent->PostMessage(pMsg->message, pMsg->wParam, MAKELPARAM(point.x, point.y)));
 			return TRUE;
 		}
 	}
@@ -153,15 +145,13 @@ CSize CChildView::GetLogoSize() const
 IMPLEMENT_DYNAMIC(CChildView, CWnd)
 
 BEGIN_MESSAGE_MAP(CChildView, CWnd)
-	//{{AFX_MSG_MAP(CChildView)
 	ON_WM_PAINT()
 	ON_WM_ERASEBKGND()
 	ON_WM_SIZE()
 	ON_WM_SETCURSOR()
-	//}}AFX_MSG_MAP
-	//	ON_WM_NCHITTEST()
 	ON_WM_NCHITTEST()
 	ON_WM_NCLBUTTONDOWN()
+	ON_WM_CREATE()
 END_MESSAGE_MAP()
 
 // CChildView message handlers

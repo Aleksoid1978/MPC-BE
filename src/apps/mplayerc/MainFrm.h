@@ -567,6 +567,111 @@ protected:
 	bool	m_bfirstPlay;
 	DWORD	m_dwLastRun;
 
+	struct touchPoint {
+		LONG  x_start = 0;
+		LONG  y_start = 0;
+		LONG  x_end   = 0;
+		LONG  y_end   = 0;
+		DWORD dwID    = DWORD_MAX;
+	};
+
+	struct touchScreen {
+		#define MAXTOUCHPOINTS 10
+
+		touchPoint point[MAXTOUCHPOINTS];
+		bool moving = false;
+
+		int FindById(const DWORD dwID) const {
+			for (int i = 0; i < MAXTOUCHPOINTS; i++) {
+				if (point[i].dwID == dwID) {
+					return i;
+				}
+			}
+
+			return -1;
+		}
+
+		const int Add(const DWORD dwID, const LONG x, const LONG y) {
+			if (FindById(dwID) == -1) {
+				for (int i = 0; i < MAXTOUCHPOINTS; i++) {
+					if (point[i].dwID == DWORD_MAX) {
+						point[i].dwID    = dwID;
+						point[i].x_start = x;
+						point[i].y_start = y;
+						
+						return i;
+					}
+				}
+			}
+			
+			return -1;
+		}
+
+		const int Down(const DWORD dwID, const LONG x, const LONG y) {
+			const int index = FindById(dwID);
+			if (index != -1) {
+				point[index].x_end = x;
+				point[index].y_end = y;
+			}
+
+			return index;
+		}
+
+		const int Count() {
+			int cnt = 0;
+			for (int i = 0; i < MAXTOUCHPOINTS; i++) {
+				if (point[i].dwID != DWORD_MAX) {
+					cnt++;
+				}
+			}
+
+			return cnt;
+		}
+
+		const int CountEnd() {
+			int cnt = 0;
+			for (int i = 0; i < MAXTOUCHPOINTS; i++) {
+				if (point[i].dwID != DWORD_MAX && point[i].x_end != 0) {
+					cnt++;
+				}
+			}
+
+			return cnt;
+		}
+
+		const bool Delete(const DWORD dwID) {
+			const int index = FindById(dwID);
+			return Delete(index);
+		}
+
+		const bool Delete(const int index) {
+			if (index >= 0 && index < MAXTOUCHPOINTS
+					&& point[index].dwID != DWORD_MAX) {
+				point[index].x_start = 0;
+				point[index].y_start = 0;
+				point[index].x_end   = 0;
+				point[index].y_end   = 0;
+				point[index].dwID    = DWORD_MAX;
+
+				return true;
+			}
+			return false;
+		}
+
+		void Empty() {
+			for (int i = 0; i < MAXTOUCHPOINTS; i++) {
+				point[i].x_start = 0;
+				point[i].y_start = 0;
+				point[i].x_end   = 0;
+				point[i].y_end   = 0;
+				point[i].dwID    = DWORD_MAX;
+			}
+
+			moving = false;
+		}
+	};
+	touchScreen m_touchScreen;
+
 public:
 	BOOL OpenCurPlaylistItem(REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
 	void OpenMedia(CAutoPtr<OpenMediaData> pOMD);
@@ -641,6 +746,8 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO* pHandlerInfo);
 	virtual void RecalcLayout(BOOL bNotify = TRUE);
+
+	BOOL OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTOUCHINPUT pInput);
 
 	// Dvb capture
 	void DisplayCurrentChannelOSD();

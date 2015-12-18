@@ -27,15 +27,14 @@ class CChildView : public CWnd
 {
 	CRect m_vrect;
 
-	DWORD	m_lastlmdowntime;
-	CPoint	m_lastlmdownpoint;
-
-	CCritSec		m_csLogo;
-	CMPCPngImage	m_logo;
+	CCritSec     m_csLogo;
+	CMPCPngImage m_logo;
 
 public:
 	CChildView();
 	virtual ~CChildView();
+
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 
 	DECLARE_DYNAMIC(CChildView)
 
@@ -52,6 +51,8 @@ protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual ULONG GetGestureStatus(CPoint) { return 0; };
+
+	virtual BOOL OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTOUCHINPUT pInput);
 
 	afx_msg void OnPaint();
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
