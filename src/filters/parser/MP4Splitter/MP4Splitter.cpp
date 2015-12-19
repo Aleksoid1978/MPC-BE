@@ -487,26 +487,37 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					memcpy(wfe + 1, di->GetData(), di->GetDataSize());
 
+					AP4_UI08 Mpeg4AudioObjectType = 0;
+
 					switch (audio_desc->GetObjectTypeId()) {
 						case AP4_MPEG4_AUDIO_OTI:
+							if (di->GetDataSize() >= 1) {
+								Mpeg4AudioObjectType = di->GetData()[0] >> 3;
+								if (Mpeg4AudioObjectType == 31) {
+									if (di->GetDataSize() < 2) {
+										Mpeg4AudioObjectType = 0;
+									} else {
+										Mpeg4AudioObjectType = 32 + (((di->GetData()[0] & 0x07) << 3) |
+																	 ((di->GetData()[1] & 0xE0) >> 5));
+									}
+								}
+							}
 						case AP4_MPEG2_AAC_AUDIO_MAIN_OTI:
 						case AP4_MPEG2_AAC_AUDIO_LC_OTI:
 						case AP4_MPEG2_AAC_AUDIO_SSRP_OTI:
-							if (di->GetDataSize() > 10) {
-								if (GETDWORD(di->GetData()+3) == 0x00534c41 ||
-										GETDWORD(di->GetData()+6) == 0x00534c41) { // 'ALS\0' sync word
-									wfe->wFormatTag = WAVE_FORMAT_UNKNOWN;
-									mt.subtype = FOURCCMap(MAKEFOURCC('A','L','S',' ')); // create our own GUID - {20534C41-0000-0010-8000-00AA00389B71}
-									mts.Add(mt);
-									break;
-								}
+							if (Mpeg4AudioObjectType == 36) { // ALS Lossless Coding
+								wfe->wFormatTag = WAVE_FORMAT_UNKNOWN;
+								mt.subtype = MEDIASUBTYPE_ALS;
+								mts.Add(mt);
+								break;
 							}
+
 							mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
 							if (wfe->cbSize >= 2) {
 								WORD Channels = (((BYTE*)(wfe+1))[1]>>3) & 0xf;
 								if (Channels) {
-									wfe->nChannels		= Channels;
-									wfe->nBlockAlign	= (WORD)((wfe->nChannels * wfe->wBitsPerSample) / 8);
+									wfe->nChannels   = Channels;
+									wfe->nBlockAlign = (WORD)((wfe->nChannels * wfe->wBitsPerSample) / 8);
 								}
 							}
 							mts.Add(mt);
