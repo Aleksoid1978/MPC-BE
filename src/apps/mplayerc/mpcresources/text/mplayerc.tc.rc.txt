@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"關於"
 7		"MPC-BE"
 8		"Copyright © 2002-2015 詳見 Authors.txt 檔案"
@@ -319,7 +319,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 10		"快速搜尋 (於關鍵影格)"
 11		"播放清單只有一個項目時，不要於「上一段/下一段」按鈕連結其它位於同一資料夾的檔案"
 13		"避免於非預設顯示器全螢幕時最小化"
-15		"Pause the video playback when minimized"
+15		"最小化時暫停播放"
 17		"啟用 Logitech LCD 支援 (實驗性)"
 19		"啟用小型記憶體傾印 (MiniDump)"
 20		"檢查更新"
@@ -356,7 +356,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 38		"(範例: eng jap swe)"
 39		"開啟設定"
 40		"開啟音訊檔案時，"
-42		"Add similar files to playlist"
+42		"於播放清單加入相似檔案"
 43		"使用工作執行緒建立篩選器圖 (Filter Graph)"
 45		"回報繪製失敗的 Pin"
 END

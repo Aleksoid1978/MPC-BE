@@ -319,7 +319,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 10		"Snel zoeken (op keyframe)"
 11		"Zoek NIET op andere bestanden in dezelfde map bij het gebruik van ""Vorige/Volgende"" als er alleen een item in afspeellijst staat."
 13		"Minimaliseren vermijden in geval van volledig scherm op niet-primair scherm"
-15		"Pause the video playback when minimized"
+15		"Weergave pauseren als het venster geminimaliseerd is"
 17		"Activeer Logitech LCD-ondersteuning (experimenteel)"
 19		"Activeer MiniDump"
 20		"Op updates controleren"
@@ -356,7 +356,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 38		"(Bijv.: nl eng jap )"
 39		"Opties voor openen"
 40		"Wanneer een audio-bestand is geopend,"
-42		"Add similar files to playlist"
+42		"Dergelijke bestanden aan afspeellijst toevoegen"
 43		"Filtergraph in aparte CPU-thread samenstellen"
 45		"Rapporteer pins die niet renderen"
 END
@@ -388,7 +388,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
 34		"Beperk vensterverhouding bij herschalen"
 35		"Aan bureaubladrand aanpassen"
 36		"Instellingen in de map van MPC-BE opslaan"
-37		"Schijf openen""-menu uitschakelen"
+37		"Menu ""Schijf openen"" uitschakelen"
 38		"Procesprioriteit ""hoger dan normaal"""
 END
 

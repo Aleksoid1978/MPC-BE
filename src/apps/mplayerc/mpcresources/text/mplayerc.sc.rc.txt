@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"关于"
 7		"MPC-BE"
 8		"版权所有 © 2002-2015 请查看 Authors.txt"
@@ -319,7 +319,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 10		"快速搜索(以关键帧)"
 11		"在播放列表中仅有一个项目时禁用 ""向前/后跳转"" 后打开文件中的下一个/上一个文件"
 13		"在非默认显示器上全屏时防止播放器被最小化"
-15		"Pause the video playback when minimized"
+15		"最小化时暂停播放"
 17		"开启罗技 LCD 支持(实验性)"
 19		"使用小型存储器转储 (MiniDump)"
 20		"检查更新"
@@ -356,7 +356,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 38		"(例如: eng jap swe)"
 39		"打开设置"
 40		"开启音频文件时，"
-42		"Add similar files to playlist"
+42		"于播放列表加入相似文件"
 43		"使用工作线程来创建筛选器图表"
 45		"报告渲染失败的接口(pin)"
 END
