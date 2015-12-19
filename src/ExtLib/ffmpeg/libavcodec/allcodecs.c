@@ -97,6 +97,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (G2M, g2m);
     REGISTER_DECODER (H263, h263);
     REGISTER_DECODER (H264, h264);
+    REGISTER_DECODER (HQ_HQA, hq_hqa);
     REGISTER_DECODER (HEVC, hevc);
     REGISTER_DECODER (HUFFYUV, huffyuv);
     REGISTER_DECODER (INDEO3, indeo3);
