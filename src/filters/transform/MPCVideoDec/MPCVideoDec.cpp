@@ -92,7 +92,7 @@ vcodecs[] = {
 	{_T("dv"),			CODEC_DV		},
 	{_T("lossless"),	CODEC_LOSSLESS	},
 	{_T("prores"),		CODEC_PRORES	},
-	{_T("cllc"),		CODEC_CLLC		},
+	{_T("canopus"),		CODEC_CANOPUS	},
 	{_T("screc"),		CODEC_SCREC		},
 	{_T("indeo"),		CODEC_INDEO		},
 	{_T("h263"),		CODEC_H263		},
@@ -416,8 +416,9 @@ FFMPEG_CODECS ffCodecs[] = {
 	// PNG
 	{ &MEDIASUBTYPE_PNG, AV_CODEC_ID_PNG, NULL, VDEC_PNG, -1 },
 
-	// Canopus Lossless
+	// Canopus
 	{ &MEDIASUBTYPE_CLLC, AV_CODEC_ID_CLLC, NULL, VDEC_CANOPUS, -1 },
+	{ &MEDIASUBTYPE_CUVC, AV_CODEC_ID_HQ_HQA, NULL, VDEC_CANOPUS, -1 },
 
 	// HEVC
 	{ &MEDIASUBTYPE_HEVC, AV_CODEC_ID_HEVC, &DXVA_HEVC, VDEC_HEVC, VDEC_DXVA_HEVC },
@@ -727,8 +728,9 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	// PNG
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_PNG },
 
-	// Canopus Lossless
+	// Canopus
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_CLLC },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_CUVC },
 
 	// HEVC
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HEVC },
@@ -1351,7 +1353,8 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 					bCodecActivated = (m_nActiveCodecs & CODEC_PNG) != 0;
 					break;
 				case AV_CODEC_ID_CLLC :
-					bCodecActivated = (m_nActiveCodecs & CODEC_CLLC) != 0;
+				case AV_CODEC_ID_HQ_HQA :
+					bCodecActivated = (m_nActiveCodecs & CODEC_CANOPUS) != 0;
 					break;
 				case AV_CODEC_ID_V210 :
 				case AV_CODEC_ID_V410 :
