@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,70 +39,23 @@ CFullscreenWnd::~CFullscreenWnd()
 {
 }
 
-BEGIN_MESSAGE_MAP(CFullscreenWnd, CWnd)
-	ON_WM_LBUTTONDOWN()
-	ON_WM_LBUTTONUP()
-	ON_WM_MOUSEMOVE()
-	ON_WM_MOUSELEAVE()
-	ON_WM_ERASEBKGND()
-	ON_WM_SETCURSOR()
-END_MESSAGE_MAP()
-
-LRESULT CFullscreenWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message) {
-		case WM_COMMAND :
-			m_pMainFrame->PostMessage(message, wParam, lParam);
-			break;
-	}
-
-	return CWnd::WindowProc(message, wParam, lParam);
-}
-
-BOOL CFullscreenWnd::PreTranslateMessage(MSG* pMsg)
-{
-	switch (pMsg->message) {
-		case WM_SYSKEYDOWN :
-		case WM_SYSKEYUP :
-		case WM_SYSCHAR :
-		case WM_SYSCOMMAND :
-
-		case WM_KEYDOWN :
-		case WM_KEYUP :
-		case WM_CHAR :
-
-		case WM_LBUTTONDBLCLK :
-		case WM_MBUTTONDOWN :
-		case WM_MBUTTONUP :
-		case WM_MBUTTONDBLCLK :
-		case WM_RBUTTONDOWN :
-		case WM_RBUTTONUP :
-		case WM_RBUTTONDBLCLK :
-		case WM_XBUTTONDOWN :
-
-		case WM_MOUSEWHEEL :
-
-			m_pMainFrame->PostMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
-			return TRUE;
-	}
-
-	return CWnd::PreTranslateMessage(pMsg);
-}
-
-BOOL CFullscreenWnd::PreCreateWindow(CREATESTRUCT& cs)
-{
-	if (!CWnd::PreCreateWindow(cs)) {
-		return FALSE;
-	}
-
-	cs.style &= ~WS_BORDER;
-	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_NOCLOSE,
-									   m_hCursor, HBRUSH(COLOR_WINDOW + 1));
-
-	return TRUE;
-}
-
 // CFullscreenWnd message handlers
+
+int CFullscreenWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CWnd::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	int digitizerStatus = GetSystemMetrics(SM_DIGITIZER);
+	if ((digitizerStatus & (NID_READY + NID_MULTI_INPUT))) {
+		DbgLog((LOG_TRACE, 3, L"CFullscreenWnd::OnCreate() : touch is ready for input + support multiple inputs"));
+		if (!RegisterTouchWindow()) {
+			DbgLog((LOG_TRACE, 3, L"CFullscreenWnd::OnCreate() : RegisterTouchWindow() failed"));
+		}
+	}
+
+	return 0;
+}
 
 void CFullscreenWnd::OnLButtonDown(UINT nFlags, CPoint point)
 {
@@ -177,6 +130,7 @@ BOOL CFullscreenWnd::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	return FALSE;
 }
 
+
 void CFullscreenWnd::ShowCursor(bool bVisible)
 {
 	if (m_bCursorVisible != bVisible) {
@@ -195,4 +149,73 @@ void CFullscreenWnd::SetCursor(LPCWSTR lpCursorName)
 bool CFullscreenWnd::IsWindow() const
 {
 	return !!m_hWnd;
+}
+
+BEGIN_MESSAGE_MAP(CFullscreenWnd, CWnd)
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
+	ON_WM_MOUSEMOVE()
+	ON_WM_MOUSELEAVE()
+	ON_WM_ERASEBKGND()
+	ON_WM_SETCURSOR()
+	ON_WM_CREATE()
+END_MESSAGE_MAP()
+
+BOOL CFullscreenWnd::PreTranslateMessage(MSG* pMsg)
+{
+	switch (pMsg->message) {
+		case WM_SYSKEYDOWN :
+		case WM_SYSKEYUP :
+		case WM_SYSCHAR :
+		case WM_SYSCOMMAND :
+
+		case WM_KEYDOWN :
+		case WM_KEYUP :
+		case WM_CHAR :
+
+		case WM_LBUTTONDBLCLK :
+		case WM_MBUTTONDOWN :
+		case WM_MBUTTONUP :
+		case WM_MBUTTONDBLCLK :
+		case WM_RBUTTONDOWN :
+		case WM_RBUTTONUP :
+		case WM_RBUTTONDBLCLK :
+		case WM_XBUTTONDOWN :
+
+		case WM_MOUSEWHEEL :
+
+			m_pMainFrame->PostMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
+			return TRUE;
+	}
+
+	return CWnd::PreTranslateMessage(pMsg);
+}
+
+BOOL CFullscreenWnd::PreCreateWindow(CREATESTRUCT& cs)
+{
+	if (!CWnd::PreCreateWindow(cs)) {
+		return FALSE;
+	}
+
+	cs.style &= ~WS_BORDER;
+	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_NOCLOSE,
+									   m_hCursor, HBRUSH(COLOR_WINDOW + 1));
+
+	return TRUE;
+}
+
+LRESULT CFullscreenWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+		case WM_COMMAND :
+			m_pMainFrame->PostMessage(message, wParam, lParam);
+			break;
+	}
+
+	return CWnd::WindowProc(message, wParam, lParam);
+}
+
+BOOL CFullscreenWnd::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTOUCHINPUT pInput)
+{
+	return m_pMainFrame->OnTouchInput(pt, nInputNumber, nInputsCount, pInput);
 }
