@@ -68,7 +68,7 @@ static filter_t s_filters[] = {
 	{_T("Apple ProRes"),			VIDEO_DECODER, VDEC_PRORES,			0},
 	{_T("Avid DNxHD"),				VIDEO_DECODER, VDEC_DNXHD,			0},
 	{_T("Bink Video"),				VIDEO_DECODER, VDEC_BINK,			0},
-	{_T("Canopus Lossless"),		VIDEO_DECODER, VDEC_CANOPUS,		0},
+	{_T("Canopus Lossless/HQ"),		VIDEO_DECODER, VDEC_CANOPUS,		0},
 	{_T("Cinepak"),					VIDEO_DECODER, VDEC_CINEPAK,		0},
 	{_T("Dirac"),					VIDEO_DECODER, VDEC_DIRAC,			0},
 	{_T("DivX"),					VIDEO_DECODER, VDEC_DIVX,			0},
