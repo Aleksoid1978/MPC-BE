@@ -1342,7 +1342,7 @@ static const bool IsMoveY(LONG x1, LONG x2, LONG y1, LONG y2)
 
 BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTOUCHINPUT pInput)
 {
-	if (m_bFullScreen) {
+	if (m_bFullScreen || IsD3DFullScreenMode()) {
 		if ((pInput->dwFlags & TOUCHEVENTF_DOWN) == TOUCHEVENTF_DOWN) {
 			if (!m_touchScreen.moving) {
 				m_touchScreen.Add(pInput->dwID, pt.x, pt.y);

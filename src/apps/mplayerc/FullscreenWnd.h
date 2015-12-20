@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,6 +31,16 @@ public:
 	CFullscreenWnd(CMainFrame* pMainFrame);
 	virtual ~CFullscreenWnd();
 
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnMouseLeave();
+
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
+
 	void ShowCursor(bool bVisible);
 	void SetCursor(LPCWSTR lpCursorName);
 	bool IsWindow() const;
@@ -42,17 +52,10 @@ protected:
 	BOOL PreTranslateMessage(MSG* pMsg);
 	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 
+	virtual BOOL OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTOUCHINPUT pInput);
+
 	CMainFrame*	m_pMainFrame;
 	HCURSOR		m_hCursor;
 	bool		m_bCursorVisible;
 	bool		m_bTrackingMouseLeave;
-
-public:
-	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-	afx_msg void OnMouseLeave();
-
-	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
-	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 };
