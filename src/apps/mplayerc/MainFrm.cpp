@@ -11958,7 +11958,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 
-		if (s.fKeepHistory && pOFD->bAddRecent) {
+		if (s.fKeepHistory && pOFD->bAddRecent && fn.Find(L"pipe:") == -1) {
 			CRecentFileList* pMRU = bFirst ? &s.MRU : &s.MRUDub;
 			pMRU->ReadList();
 			pMRU->Add(fn);
