@@ -11785,8 +11785,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 				if (pOFD->fns.GetCount() == 1) {
 					fn = (CString)pOFD->fns.GetHead();
+					CString tmp(fn); tmp.MakeLower();
 					if (s.iYoutubeSource == 0
-							&& CString(fn).MakeLower().Find(L".m3u8") == -1
+							&& tmp.Find(L".m3u8") == -1
 							&& !m_youtubeFields.fname.IsEmpty()) {
 						
 						m_fYoutubeThreadWork = TH_START;
@@ -11810,6 +11811,12 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 						pOFD->fns.RemoveHeadNoReturn();
 						pOFD->fns.AddHead(fn);
+					} else if (tmp.Find(L".m3u8") > 0) {
+						CAtlList<CString> fns;
+						fns.AddTail(fn);
+						m_wndPlaylistBar.Open(fns, false);
+						m_wndPlaylistBar.SetFirstSelected();
+						fn = m_wndPlaylistBar.GetCurFileName();
 					}
 				}
 			}
