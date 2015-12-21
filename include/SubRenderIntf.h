@@ -1,9 +1,10 @@
 // ***************************************************************
-//  SubRenderIntf.h           version: 1.0.8  -  date: 2014-03-06
+//  SubRenderIntf.h           version: 1.0.9  -  date: 2015-10-10
 //  -------------------------------------------------------------
-//  Copyright (C) 2011-2014, BSD license
+//  Copyright (C) 2011-2015, BSD license
 // ***************************************************************
 
+// 2015-10-10 1.0.9 added some optional information fields
 // 2014-03-06 1.0.8 added ISubRenderConsumer2::Clear() interface/method
 // 2014-03-05 1.0.7 auto-loading is now the provider's own responsibility
 // 2013-07-01 1.0.6 added support for TV level subtitle transport
@@ -216,28 +217,33 @@ interface ISubRenderOptions : public IUnknown
   // "field" must be zero terminated
 
   // mandatory fields for consumers:
-  // "name",                LPWSTR,    info,   read only,  get name / description of the consumer
-  // "version",             LPWSTR,    info,   read only,  get version number of the consumer
-  // "originalVideoSize",   SIZE,      info,   read only,  size of the video before scaling and AR adjustments
-  // "arAdjustedVideoSize", SIZE,      info,   read only,  size of the video after AR adjustments
-  // "videoOutputRect",     RECT,      info,   read only,  final pos/size of the video after all scaling operations
-  // "subtitleTargetRect",  RECT,      info,   read only,  consumer wish for where to place the subtitles
-  // "frameRate",           ULONGLONG, info,   read only,  frame rate of the video after deinterlacing (REFERENCE_TIME)
-  // "refreshRate",         double,    info,   read only,  display refresh rate (0, if unknown)
+  // "name",                 LPWSTR,    info,   read only,  get name / description of the consumer
+  // "version",              LPWSTR,    info,   read only,  get version number of the consumer
+  // "originalVideoSize",    SIZE,      info,   read only,  size of the video before scaling and AR adjustments
+  // "arAdjustedVideoSize",  SIZE,      info,   read only,  size of the video after AR adjustments
+  // "videoOutputRect",      RECT,      info,   read only,  final pos/size of the video after all scaling operations
+  // "subtitleTargetRect",   RECT,      info,   read only,  consumer wish for where to place the subtitles
+  // "frameRate",            ULONGLONG, info,   read only,  frame rate of the video after deinterlacing (REFERENCE_TIME)
+  // "refreshRate",          double,    info,   read only,  display refresh rate (0, if unknown)
 
   // mandatory fields for providers:
-  // "name",                LPWSTR,    info,   read only,  get name / description of the provider
-  // "version",             LPWSTR,    info,   read only,  get version number of the provider
-  // "yuvMatrix",           LPWSTR,    info,   read only,  RGB Subtitles: "None" (fullrange); YCbCr Subtitles: "Levels.Matrix", Levels: TV|PC, Matrix: 601|709|240M|FCC|2020
-  // "combineBitmaps",      bool,      option, write/read, must the provider combine all bitmaps into one? (default: false)
+  // "name",                 LPWSTR,    info,   read only,  get name / description of the provider
+  // "version",              LPWSTR,    info,   read only,  get version number of the provider
+  // "yuvMatrix",            LPWSTR,    info,   read only,  RGB Subtitles: "None" (fullrange); YCbCr Subtitles: "Levels.Matrix", Levels: TV|PC, Matrix: 601|709|240M|FCC|2020
+  // "combineBitmaps",       bool,      option, write/read, must the provider combine all bitmaps into one? (default: false)
 
   // optional fields for consumers:
-  // "displayModeSize",     SIZE,      info,   read only,  display mode width/height
-  // "yuvMatrix",           LPWSTR,    info,   read only,  RGB Video: "None" (fullrange); YCbCr Video: "Levels.Matrix", Levels: TV|PC, Matrix: 601|709|240M|FCC|2020
-  // "supportedLevels",     int,       info,   read only,  0: PC only (default); 1: PC+TV, no preference; 2: PC+TV, PC preferred; 3: PC+TV, TV preferred
+  // "videoCropRect",        RECT,      info,   read only,  crops "originalVideoSize" down, e.g. because of detected black bars
+  // croppedVideoOutputRect, RECT,      info,   read only,  final pos/size of the "videoCropRect", after all scaling operations
+  // fullscreenRect,         RECT,      info,   read only,  for fullscreen drawing, this is the rect you want to stay in (left/top can be non-zero!)
+  // "displayModeSize",      SIZE,      info,   read only,  display mode width/height
+  // "yuvMatrix",            LPWSTR,    info,   read only,  RGB Video: "None" (fullrange); YCbCr Video: "Levels.Matrix", Levels: TV|PC, Matrix: 601|709|240M|FCC|2020
+  // "supportedLevels",      int,       info,   read only,  0: PC only (default); 1: PC+TV, no preference; 2: PC+TV, PC preferred; 3: PC+TV, TV preferred
 
   // optional fields for providers:
-  // "outputLevels",        LPWSTR,    info,   read only,  are subtitles rendered/output in RGB "PC" (default) or "TV" levels?
+  // "outputLevels",         LPWSTR,    info,   read only,  are subtitles rendered/output in RGB "PC" (default) or "TV" levels?
+  // "isBitmap",             bool,      info,   read only,  are the subtitles bitmap based or text based?
+  // "isMovable",            bool,      info,   read only,  can the subtitles be repositioned safely?
 };
 
 // ---------------------------------------------------------------------------
