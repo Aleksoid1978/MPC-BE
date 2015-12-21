@@ -1408,25 +1408,43 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 			const int index = m_touchScreen.Down(pInput->dwID, pt.x, pt.y);
 			if (index != -1 && m_touchScreen.Count() == m_touchScreen.CountEnd()) {
 				if (m_eMediaLoadState == MLS_LOADED) {
-					if (m_touchScreen.moving && m_touchScreen.Count() == 1) {
+					if (m_touchScreen.Count() == 1) {
 						touchPoint& point = m_touchScreen.point[index];
-						if (IsMoveX(point.x_end, point.x_start, point.y_end, point.y_start)) {
-							REFERENCE_TIME stop;
-							m_wndSeekBar.GetRange(stop);
-							if (stop > 0) {
-								CRect rc;
-								m_wndView.GetWindowRect(&rc);
+						if (m_touchScreen.moving) {
+							if (IsMoveX(point.x_end, point.x_start, point.y_end, point.y_start)) {
+								REFERENCE_TIME stop;
+								m_wndSeekBar.GetRange(stop);
+								if (stop > 0) {
+									CRect rc;
+									m_wndView.GetWindowRect(&rc);
 
-								const int widht   = rc.Width();
-								const int diff    = point.x_end - point.x_start;
-								const int percent = 100 * diff / widht;
+									const int widht   = rc.Width();
+									const int diff    = point.x_end - point.x_start;
+									const int percent = 100 * diff / widht;
 
-								if (abs(percent) >= 1) {
-									const REFERENCE_TIME rtDiff = stop * percent / 100;
-									if (abs(rtDiff) >= UNITS) {
-										SeekTo(m_wndSeekBar.GetPos() + rtDiff);
+									if (abs(percent) >= 1) {
+										const REFERENCE_TIME rtDiff = stop * percent / 100;
+										if (abs(rtDiff) >= UNITS) {
+											SeekTo(m_wndSeekBar.GetPos() + rtDiff);
+										}
 									}
 								}
+							}
+						} else {
+							CRect rc;
+							m_wndView.GetWindowRect(&rc);
+							
+							const int percent = 100 * point.x_end / rc.Width();
+							if (percent <= 10) {
+								MSG msg;
+								while (PeekMessage(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDBLCLK, PM_REMOVE));
+
+								PostMessage(WM_COMMAND, ID_PLAY_SEEKBACKWARDMED);
+							} else if (percent >= 90) {
+								MSG msg;
+								while (PeekMessage(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDBLCLK, PM_REMOVE));
+
+								PostMessage(WM_COMMAND, ID_PLAY_SEEKFORWARDMED);
 							}
 						}
 					} else if (m_touchScreen.Count() == 2) {
