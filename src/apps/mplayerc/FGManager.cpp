@@ -1794,20 +1794,20 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	// Source filters
 
 	if (src[SRC_SHOUTCAST] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CShoutcastSource>();
+		pFGF = DNew CFGFilterInternal<CShoutcastSource>(ShoutcastSourceName);
 		pFGF->m_protocols.AddTail(_T("http"));
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_UDP] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CUDPReader>();
+		pFGF = DNew CFGFilterInternal<CUDPReader>(UDPReaderName);
 		pFGF->m_protocols.AddTail(_T("udp"));
 		pFGF->m_protocols.AddTail(_T("http"));
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_AVI] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CAviSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CAviSourceFilter>(AviSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564920")); // 'RIFF....AVI '
 		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564958")); // 'RIFF....AVIX'
 		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,414D5620")); // 'RIFF....AMV '
@@ -1815,7 +1815,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	if (src[SRC_MP4] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CMP4SourceFilter>();
+		pFGF = DNew CFGFilterInternal<CMP4SourceFilter>(MP4SourceName);
 		// mov, mp4
 		pFGF->m_chkbytes.AddTail(_T("4,4,,66747970")); // '....ftyp'
 		pFGF->m_chkbytes.AddTail(_T("4,4,,6d6f6f76")); // '....moov'
@@ -1829,37 +1829,37 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	if (src[SRC_FLV] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CFLVSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CFLVSourceFilter>(FlvSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,464C5601")); // FLV (v1)
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_MATROSKA] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CMatroskaSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CMatroskaSourceFilter>(MatroskaSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,1A45DFA3"));
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_REAL] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CRealMediaSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CRealMediaSourceFilter>(RMSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,2E524D46"));
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_ROQ] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CRoQSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CRoQSourceFilter>(RoQSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,8,,8410FFFFFFFF1E00"));
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_DSM] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CDSMSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CDSMSourceFilter>(DSMSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,44534D53"));
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_FLIC] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CFLICSource>();
+		pFGF = DNew CFGFilterInternal<CFLICSource>(FlicSourceName);
 		pFGF->m_chkbytes.AddTail(_T("4,2,,11AF"));
 		pFGF->m_chkbytes.AddTail(_T("4,2,,12AF"));
 		pFGF->m_extensions.AddTail(_T(".fli"));
@@ -1868,39 +1868,39 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	if (src[SRC_FLAC] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CFLACSource>();
+		pFGF = DNew CFGFilterInternal<CFLACSource>(FlacSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,664C6143"));
 		pFGF->m_extensions.AddTail(_T(".flac"));
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_CDDA] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CCDDAReader>();
+		pFGF = DNew CFGFilterInternal<CCDDAReader>(CCDDAReaderName);
 		pFGF->m_extensions.AddTail(_T(".cda"));
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_CDXA] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CCDXAReader>();
+		pFGF = DNew CFGFilterInternal<CCDXAReader>(CCDXAReaderName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,43445841"));
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_VTS] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CVTSReader>();
+		pFGF = DNew CFGFilterInternal<CVTSReader>(VTSReaderName);
 		pFGF->m_chkbytes.AddTail(_T("0,12,,445644564944454F2D565453"));
 		pFGF->m_chkbytes.AddTail(_T("0,12,,445644415544494F2D415453"));
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_OGG] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<COggSourceFilter>();
+		pFGF = DNew CFGFilterInternal<COggSourceFilter>(OggSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,4F676753"));
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_MPA] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CMpaSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CMpaSourceFilter>(MpaSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,2,FFE0,FFE0"));
 		pFGF->m_chkbytes.AddTail(_T("0,10,FFFFFF00000080808080,49443300000000000000"));
 		pFGF->m_extensions.AddTail(_T(".mp3"));
@@ -1909,7 +1909,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	if (src[SRC_DTSAC3] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CDTSAC3Source>();
+		pFGF = DNew CFGFilterInternal<CDTSAC3Source>(DTSAC3SourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,7FFE8001"));               // DTS
 		pFGF->m_chkbytes.AddTail(_T("0,4,,fE7f0180"));               // DTS LE
 		pFGF->m_chkbytes.AddTail(_T("0,2,,0B77"));                   // AC3, E-AC3
@@ -1923,39 +1923,39 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	if (src[SRC_APE] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,4D414320"));               // 'MAC '
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_TAK] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,7442614B"));               // 'tBaK'
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_TTA] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,54544131"));               // 'TTA1'
 		pFGF->m_chkbytes.AddTail(_T("0,3,,494433"));                 // 'ID3'
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_WAVPACK] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,7776706B"));               // 'wvpk'
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_WAV] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,57415645")); // 'RIFF....WAVE'
 		pFGF->m_chkbytes.AddTail(_T("0,16,,726966662E91CF11A5D628DB04C10000,24,16,,77617665F3ACD3118CD100C04F8EDB8A")); // Wave64
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_DSD] && !IsPreview) {
-		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,12,,445344201C00000000000000")); // 'DSD..."
 		pFGF->m_chkbytes.AddTail(_T("0,4,,46524D38,12,4,,44534420")); // 'FRM8........DSD '
 		m_source.AddTail(pFGF);
@@ -1963,12 +1963,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	// add CMpegSourceFilter last since it can parse the stream for a long time
 	if (src[SRC_MPEG] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CMpegSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CMpegSourceFilter>(MpegSourceName);
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_RAWVIDEO] || IsPreview) {
-		pFGF = DNew CFGFilterInternal<CRawVideoSourceFilter>();
+		pFGF = DNew CFGFilterInternal<CRawVideoSourceFilter>(RawVideoSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,9,,595556344D50454732"));	// YUV4MPEG2
 		pFGF->m_chkbytes.AddTail(_T("0,3,,000001"));				// MPEG1/2, VC-1
 		pFGF->m_chkbytes.AddTail(_T("0,4,,00000001"));				// H.264/AVC, H.265/HEVC
