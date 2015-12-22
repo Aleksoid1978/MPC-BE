@@ -83,6 +83,6 @@ AP4_Result AP4_AsyncReaderStream::Tell(AP4_Offset& offset)
 
 AP4_Result AP4_AsyncReaderStream::GetSize(AP4_Size& size)
 {
-	size = (AP4_Size)m_pFile->GetLength();
+	size = m_pFile->IsStreaming() ? (AP4_Size)m_pFile->GetAvailable() : (AP4_Size)m_pFile->GetLength();
 	return AP4_SUCCESS;
 }
