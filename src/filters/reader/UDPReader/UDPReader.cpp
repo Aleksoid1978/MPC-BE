@@ -69,8 +69,8 @@ CFilterApp theApp;
 
 #endif
 
-#define MAXSTORESIZE 10485760 // The maximum size of a buffer for storing the received information is 10 Mb
-#define MAXBUFSIZE   16384    // The maximum packet size is 16 Kb
+#define MAXSTORESIZE  2 * MEGABYTE // The maximum size of a buffer for storing the received information is 2 Mb
+#define MAXBUFSIZE   16 * KILOBYTE // The maximum packet size is 16 Kb
 
 //
 // CUDPReader
@@ -472,7 +472,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	}
 
 	clock_t start = clock();
-	while (clock() - start < 1000 && m_len < MEGABYTE) {
+	while (clock() - start < 1000 && m_len < 512 * KILOBYTE) {
 		Sleep(100);
 	}
 
@@ -697,7 +697,7 @@ DWORD CUDPStream::ThreadProc()
 					}
 
 					while (GetPacketsSize() > MAXSTORESIZE && !CheckRequest(NULL)) {
-						Sleep(1000);
+						Sleep(200);
 					}
 				}
 				break;
