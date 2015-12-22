@@ -509,6 +509,8 @@ CString GetGUIDString(const GUID& guid)
 		ADDENTRY(DXVA_ModeHEVC_VLD_Main);
 		ADDENTRY(DXVA_ModeHEVC_VLD_Main10);
 
+		ADDENTRY(DXVA_VP9_VLD_Profile0);
+
 		ADDENTRY(DXVA_NoEncrypt);
 	}
 

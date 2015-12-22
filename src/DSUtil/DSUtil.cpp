@@ -2650,7 +2650,8 @@ static const struct {
 	{&DXVA2_VideoProcBobDevice,			_T("Bob deinterlacing")},
 	{&DXVA2_VideoProcSoftwareDevice,	_T("Software processing")},
 	{&DXVA_ModeHEVC_VLD_Main,			_T("H.265, bitstream decoder, Main")},
-	{&DXVA_ModeHEVC_VLD_Main10,			_T("H.265, bitstream decoder, Main10")}
+	{&DXVA_ModeHEVC_VLD_Main10,			_T("H.265, bitstream decoder, Main10")},
+	{&DXVA_VP9_VLD_Profile0,			_T("VP9, bitstream decoder, profile 0")}
 };
 
 CString GetDXVAMode(const GUID* guidDecoder)
