@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -188,7 +188,12 @@ __int64 CBaseSplitterFile::GetRemaining()
 
 void CBaseSplitterFile::Seek(__int64 pos)
 {
-	m_pos = min(max(0, pos), m_len);
+	if (IsStreaming()) {
+		m_pos = pos;
+	} else {
+		m_pos = CLAMP(pos, 0, m_len);
+	}
+
 	BitFlush();
 }
 
@@ -208,10 +213,12 @@ HRESULT CBaseSplitterFile::SyncRead(BYTE* pData, int& len)
 	}
 
 	if (hr == S_FALSE && IsStreaming()) {
-		int read = 0;
 		DbgLog((LOG_TRACE, 3, L"CBaseSplitterFile::SyncRead() - we reached the end of data (pos: %I64d), but the size of the data changes, trying reading manually", m_pos));
+
+		int read = 0;
+		__int64 pos = m_pos;
 		do {
-			hr = m_pAsyncReader->SyncRead(m_pos, 1, pData + read);
+			hr = m_pAsyncReader->SyncRead(pos++, 1, pData + read);
 		} while (hr == S_OK && (++read) < len);
 		DbgLog((LOG_TRACE, 3, L"	-> Read %d bytes", read));
 
