@@ -289,6 +289,10 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	CString protocol = fn.Left(fn.Find(':')+1).TrimRight(':').MakeLower();
 	CString ext = CPath(fn).GetExtension().MakeLower();
 
+	if (fn.Find(L"pipe:") == 0) {
+		protocol = L"pipe";
+	}
+
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 
 	if ((protocol.GetLength() <= 1 || protocol == L"file") && (ext.Compare(_T(".cda")) != 0)) {
@@ -1803,6 +1807,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF = DNew CFGFilterInternal<CUDPReader>(UDPReaderName);
 		pFGF->m_protocols.AddTail(_T("udp"));
 		pFGF->m_protocols.AddTail(_T("http"));
+		m_source.AddTail(pFGF);
+	}
+	
+	if (src[SRC_STDINPUT] && !IsPreview) {
+		pFGF = DNew CFGFilterInternal<CUDPReader>(STDInReaderName);
+		pFGF->m_protocols.AddTail(_T("pipe"));
 		m_source.AddTail(pFGF);
 	}
 

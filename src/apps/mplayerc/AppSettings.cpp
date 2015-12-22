@@ -84,6 +84,7 @@ CAppSettings::CAppSettings()
 	SrcFiltersKeys[SRC_REAL]				= _T("src_real");
 	SrcFiltersKeys[SRC_ROQ]					= _T("src_roq");
 	SrcFiltersKeys[SRC_SHOUTCAST]			= _T("src_shoutcast");
+	SrcFiltersKeys[SRC_STDINPUT]			= _T("src_stdinput");
 	SrcFiltersKeys[SRC_TAK]					= _T("src_tak");
 	SrcFiltersKeys[SRC_TTA]					= _T("src_tta");
 	SrcFiltersKeys[SRC_WAV]					= _T("src_wav");

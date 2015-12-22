@@ -24,6 +24,10 @@
 #include <moreuuids.h>
 #include "../../../DSUtil/DSUtil.h"
 
+#include <fcntl.h>
+#include <io.h>
+#include <iostream>
+
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
@@ -102,7 +106,7 @@ STDMETHODIMP CUDPReader::QueryFilterInfo(FILTER_INFO* pInfo)
 	CheckPointer(pInfo, E_POINTER);
 	ValidateReadWritePtr(pInfo, sizeof(FILTER_INFO));
 
-	wcscpy_s(pInfo->achName, UDPReaderName);
+	wcscpy_s(pInfo->achName, m_stream.GetProtocol() == CUDPStream::protocol::PR_PIPE ? STDInReaderName : UDPReaderName);
 	pInfo->pGraph = m_pGraph;
 	if (m_pGraph) {
 		m_pGraph->AddRef();
@@ -169,6 +173,7 @@ CUDPStream::CUDPStream()
 	, m_len(0)
 	, m_subtype(MEDIASUBTYPE_NULL)
 	, m_RequestCmd(0)
+	, m_EventComplete(TRUE)
 {
 	m_WSAEvent[0] = NULL;
 }
@@ -218,18 +223,55 @@ void CUDPStream::Append(BYTE* buff, int len)
 	m_len += len;
 }
 
+static void GetType(BYTE* buf, int size, GUID& subtype)
+{
+	if (size >= 188 && buf[0] == 0x47) {
+		BOOL bIsMPEGTS = TRUE;
+		// verify MPEG Stream
+		for (int i = 188; i < size; i += 188) {
+			if (buf[i] != 0x47) {
+				bIsMPEGTS = FALSE;
+				break;
+			}
+		}
+
+		if (bIsMPEGTS) {
+			subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
+		}
+	} else if (size > 6 && GETDWORD(buf) == 0xBA010000) {
+		if ((buf[4] & 0xc4) == 0x44) {
+			subtype = MEDIASUBTYPE_MPEG2_PROGRAM;
+		} else if ((buf[4] & 0xf1) == 0x21) {
+			subtype = MEDIASUBTYPE_MPEG1System;
+		}
+	} else if (size > 4 && GETDWORD(buf) == 'SggO') {
+		subtype = MEDIASUBTYPE_Ogg;
+	} else if (size > 4 && GETDWORD(buf) == 0xA3DF451A) {
+		subtype = MEDIASUBTYPE_Matroska;
+	} else if (size > 4 && GETDWORD(buf) == FCC('FLV\x1')) {
+		subtype = MEDIASUBTYPE_FLV;
+	} else if (size > 8 && GETDWORD(buf + 4) == FCC('ftyp')) {
+		subtype = MEDIASUBTYPE_MP4;
+	}
+}
+
 bool CUDPStream::Load(const WCHAR* fnw)
 {
 	Clear();
 
 	m_url_str = CString(fnw);
+	CString str_protocol;
 
-	if (!m_url.CrackUrl(m_url_str)) {
-		return false;
+	if (m_url_str.Find(L"pipe:") == 0) {
+		str_protocol = L"pipe";
+	} else {
+		if (!m_url.CrackUrl(m_url_str)) {
+			return false;
+		}
+
+		str_protocol = m_url.GetSchemeName();
+		str_protocol.MakeLower();
 	}
-
-	CString str_protocol = m_url.GetSchemeName();
-	str_protocol.MakeLower();
 
 	if (str_protocol == L"udp") {
 		m_protocol = PR_UDP;
@@ -330,7 +372,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			connected = m_HttpSocket.Connect(m_url);
 			if (connected) {
 				hdr = m_HttpSocket.GetHeader();
-				DbgLog((LOG_TRACE, 3, "\nCUDPStream::Load() - HTTP hdr:\n%s", hdr));
+				DbgLog((LOG_TRACE, 3, "CUDPStream::Load() - HTTP hdr:\n%s", hdr));
 
 				connected = !hdr.IsEmpty();
 				hdr.MakeLower();
@@ -361,33 +403,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 						BYTE buf[1024];
 						int len = m_HttpSocket.Receive((LPVOID)&buf, sizeof(buf));
 						if (len) {
-							if (len >= 188 && buf[0] == 0x47) {
-								BOOL bIsMPEGTS = TRUE;
-								// verify MPEG Stream
-								for (int i = 188; i < len; i += 188) {
-									if (buf[i] != 0x47) {
-										bIsMPEGTS = FALSE;
-										break;
-									}
-								}
-
-								if (bIsMPEGTS) {
-									m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
-								}
-							} else if (len > 6 && GETDWORD(&buf) == 0xBA010000) {
-								if ((buf[4] & 0xc4) == 0x44) {
-									m_subtype = MEDIASUBTYPE_MPEG2_PROGRAM;
-								} else if ((buf[4] & 0xf1) == 0x21) {
-									m_subtype = MEDIASUBTYPE_MPEG1System;
-								}
-							} else if (len > 4 && GETDWORD(&buf) == 'SggO') {
-								m_subtype = MEDIASUBTYPE_Ogg;
-							} else if (len > 4 && GETDWORD(&buf) == 0xA3DF451A) {
-								m_subtype = MEDIASUBTYPE_Matroska;
-							} else if (len > 4 && GETDWORD(&buf) == FCC('FLV\x1')) {
-								m_subtype = MEDIASUBTYPE_FLV;
-							}
-
+							GetType(buf, len, m_subtype);
 							Append(buf, len);
 						}
 					} else if (value == "application/x-ogg" || value == "application/ogg" || value == "audio/ogg") {
@@ -431,6 +447,20 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		}
 
 		m_HttpSocketTread = m_HttpSocket.Detach();
+	} else if (str_protocol == L"pipe") {
+		if (_setmode(_fileno(stdin), _O_BINARY) == -1) {
+			return false;
+		}
+
+		m_protocol = PR_PIPE;
+
+		BYTE buf[1024] = { 0 };
+		std::cin.read((char*)buf, sizeof(buf));
+		std::streamsize len = std::cin.gcount();
+		if (len) {
+			GetType(buf, len, m_subtype);
+			Append(buf, len);
+		}
 	} else {
 		return false; // not supported protocol
 	}
@@ -442,7 +472,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	}
 
 	clock_t start = clock();
-	while (clock() - start < 1000 && m_len < 2 * MEGABYTE) {
+	while (clock() - start < 1000 && m_len < MEGABYTE) {
 		Sleep(100);
 	}
 
@@ -459,7 +489,7 @@ HRESULT CUDPStream::SetPointer(LONGLONG llPos)
 
 	m_pos = llPos;
 
-	__int64 start = m_packets.IsEmpty() ? 0 : m_packets.GetHead()->m_start;
+	const __int64 start = m_packets.IsEmpty() ? 0 : m_packets.GetHead()->m_start;
 	if (llPos < start) {
 		DbgLog((LOG_TRACE, 3, L"CUDPStream::SetPointer() warning! %lld misses in [%I64d - %I64d]", llPos, start, m_packets.GetTail()->m_end));
 		return S_FALSE;
@@ -475,10 +505,12 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 
 	if (!m_packets.IsEmpty()
 			&& m_pos + len > m_packets.GetTail()->m_end) {
-		while (!CheckRequest(NULL) && !m_packets.IsEmpty() && m_pos + len > m_packets.GetTail()->m_end) {
+		while (!m_EventComplete.Check() && !m_packets.IsEmpty() && m_pos + len > m_packets.GetTail()->m_end) {
 			DbgLog((LOG_TRACE, 3, L"CUDPStream::Read() - wait %I64d bytes, %I64d -> %I64d", m_pos + len - m_packets.GetTail()->m_end, m_packets.GetTail()->m_end, m_pos + len));
 			Sleep(500);
 		}
+
+		m_EventComplete.Reset();
 	}
 
 	CAutoLock cAutoLock(&m_csLock);
@@ -581,6 +613,7 @@ DWORD CUDPStream::ThreadProc()
 		switch (m_RequestCmd) {
 			default:
 			case CMD_EXIT:
+				m_EventComplete.Set();
 				Reply(S_OK);
 				if (m_protocol == PR_HTTP) {
 					m_HttpSocketTread = m_HttpSocket.Detach();
@@ -590,6 +623,7 @@ DWORD CUDPStream::ThreadProc()
 #endif
 				return 0;
 			case CMD_STOP:
+				m_EventComplete.Set();
 				Reply(S_OK);
 				break;
 			case CMD_INIT:
@@ -634,6 +668,23 @@ DWORD CUDPStream::ThreadProc()
 							continue;
 						}
 						attempts = 0;
+					} else if (m_protocol == PR_PIPE) {
+						std::cin.read(&buff[buffsize], MAXBUFSIZE);
+						if (std::cin.fail() || std::cin.bad()) {
+							std::cin.clear();
+							len = 0;
+							attempts += 60;
+							continue;
+						} else if (std::cin.eof()) {
+							break;
+						} else {
+							len = std::cin.gcount();
+							if (len == 0) {
+								attempts++;
+								Sleep(50);
+								continue;
+							}
+						}
 					}
 
 					buffsize += len;
