@@ -507,7 +507,7 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 			&& m_pos + len > m_packets.GetTail()->m_end) {
 		while (!m_EventComplete.Check() && !m_packets.IsEmpty() && m_pos + len > m_packets.GetTail()->m_end) {
 			DbgLog((LOG_TRACE, 3, L"CUDPStream::Read() - wait %I64d bytes, %I64d -> %I64d", m_pos + len - m_packets.GetTail()->m_end, m_packets.GetTail()->m_end, m_pos + len));
-			Sleep(500);
+			Sleep(100);
 		}
 
 		m_EventComplete.Reset();
@@ -697,7 +697,7 @@ DWORD CUDPStream::ThreadProc()
 					}
 
 					while (GetPacketsSize() > MAXSTORESIZE && !CheckRequest(NULL)) {
-						Sleep(200);
+						Sleep(100);
 					}
 				}
 				break;
