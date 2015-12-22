@@ -1340,6 +1340,10 @@ bool CMP4SplitterFilter::DemuxInit()
 
 void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
+	if (m_pFile->IsStreaming() || m_rtDuration <= 0) {
+		return;
+	}
+
 	AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie();
 
 	POSITION pos = m_trackpos.GetStartPosition();
@@ -1372,7 +1376,7 @@ bool CMP4SplitterFilter::DemuxLoop()
 	m_pFile->Seek(0);
 	AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie();
 
-	while (SUCCEEDED(hr) && !CheckRequest(NULL) && (!m_pFile->IsStreaming())) {
+	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
 
 		CAtlMap<DWORD, trackpos>::CPair* pPairNext = NULL;
 		REFERENCE_TIME rtNext = 0;

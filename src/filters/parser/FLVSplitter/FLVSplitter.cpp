@@ -1040,6 +1040,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtDuration = metaDataDuration;
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
+	m_pFile->Seek(m_DataOffset);
+
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
 }
 
@@ -1071,6 +1073,8 @@ bool CFLVSplitterFilter::DemuxInit()
 				m_pFile->Seek(next);
 			}
 		}
+
+		m_pFile->Seek(m_DataOffset);
 	}
 
 	return true;
@@ -1078,7 +1082,11 @@ bool CFLVSplitterFilter::DemuxInit()
 
 void CFLVSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
-	if (!m_rtDuration || rt <= 0) {
+	if (m_pFile->IsStreaming() || m_rtDuration <= 0) {
+		return;
+	}
+
+	if (rt <= 0) {
 		m_pFile->Seek(m_DataOffset);
 	} else if (!m_IgnorePrevSizes) {
 		NormalSeek(rt);
