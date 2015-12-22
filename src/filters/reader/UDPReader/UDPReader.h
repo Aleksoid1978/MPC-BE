@@ -25,10 +25,19 @@
 #include <AsyncReader/asyncrdr.h>
 #include "../../../DSUtil/MPCSocket.h"
 
-#define UDPReaderName L"MPC UDP/HTTP Reader"
+#define UDPReaderName   L"MPC UDP/HTTP Reader"
+#define STDInReaderName L"MPC Std input Reader"
 
 class CUDPStream : public CAsyncStream, public CAMThread
 {
+public:
+	enum protocol {
+		PR_NONE,
+		PR_UDP,
+		PR_HTTP,
+		PR_PIPE
+	};
+
 private:
 	CCritSec m_csLock;
 	CCritSec m_csPacketsLock;
@@ -45,11 +54,9 @@ private:
 		}
 	};
 
-	enum {PR_NONE, PR_UDP, PR_HTTP};
-
 	CString		m_url_str;
 	CUrl		m_url;
-	int			m_protocol;
+	protocol	m_protocol;
 
 	SOCKET		m_UdpSocket;
 	sockaddr_in	m_addr;
@@ -63,6 +70,8 @@ private:
 
 	GUID		m_subtype;
 	DWORD		m_RequestCmd;
+
+	CAMEvent	m_EventComplete;
 
 	void Clear();
 	void Append(BYTE* buff, int len);
@@ -88,7 +97,8 @@ public:
 	void Lock();
 	void Unlock();
 
-	GUID GetSubtype() { return m_subtype; }
+	GUID GetSubtype() const { return m_subtype; }
+	protocol GetProtocol() const { return m_protocol; }
 };
 
 class __declspec(uuid("0E4221A9-9718-48D5-A5CF-4493DAD4A015"))

@@ -50,6 +50,7 @@ static filter_t s_filters[] = {
 	{_T("RealMedia"),				SOURCE_FILTER, SRC_REAL,			0},
 	{_T("RoQ"),						SOURCE_FILTER, SRC_ROQ,				IDS_SRC_ROQ},
 	{_T("SHOUTcast"),				SOURCE_FILTER, SRC_SHOUTCAST,		0},
+	{_T("Std input"),				SOURCE_FILTER, SRC_STDINPUT,		0},
 	{_T("TAK"),						SOURCE_FILTER, SRC_TAK,				0},
 	{_T("TTA"),						SOURCE_FILTER, SRC_TTA,				0},
 	{_T("WAV/Wave64"),				SOURCE_FILTER, SRC_WAV,				0},
