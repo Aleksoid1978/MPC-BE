@@ -685,6 +685,14 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							__int64 _next = m_pFile->GetPos() + tag.DataSize;
 							if ((tag.DataSize > 0) && (tag.TagType == FLV_VIDEODATA && ReadTag(vtag) && tag.TimeStamp > 0)) {
 
+								if (IsAVCCodec(vtag.CodecID)) {
+									if (vtag.AVCPacketType != 1) {
+										continue;
+									}
+
+									t.TimeStamp += vtag.tsOffset;
+								}
+
 								if (tag.TimeStamp != current_ts) {
 									frame_cnt++;
 								}
