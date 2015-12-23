@@ -63,6 +63,7 @@ static filter_t s_filters[] = {
 	{_T("MPEG-2 Video (DXVA)"),		DXVA_DECODER,  VDEC_DXVA_MPEG2,		0},
 	{_T("VC-1 (DXVA)"),				DXVA_DECODER,  VDEC_DXVA_VC1,		0},
 	{_T("WMV3 (DXVA)"),				DXVA_DECODER,  VDEC_DXVA_WMV3,		0},
+	{_T("VP9 (DXVA)"),				DXVA_DECODER,  VDEC_DXVA_VP9,		0},
 
 		// Video Decoder
 	{_T("AMV Video"),				VIDEO_DECODER, VDEC_AMV,			0},

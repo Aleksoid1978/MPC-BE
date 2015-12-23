@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2015 see Authors.txt
+ * (C) 2015 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -18,22 +18,17 @@
  *
  */
 
-#include <dxva.h>
+#ifndef _MSC_VER
+#include <windows.h>
+#endif
 
-#define MAX_SLICE 1024
-typedef struct DXVA_MPEG2_Picture_Context {
-    DXVA_PictureParameters     pp;
-    DXVA_QmatrixData           qm;
-    unsigned                   slice_count;
-    DXVA_SliceInfo             slice[MAX_SLICE];
+#include "compat/windows/dxva_vpx.h"
 
-    const uint8_t              *bitstream;
-    unsigned                   bitstream_size;
-    int                        frame_start;
-} DXVA_MPEG2_Picture_Context;
-typedef struct DXVA_MPEG2_Context {
-    unsigned                   frame_count;
-    DXVA_MPEG2_Picture_Context ctx_pic[2];	
-} DXVA_MPEG2_Context;
+typedef struct DXVA_VP9_Picture_Context {
+    DXVA_PicParams_VP9    pp;
+    DXVA_Slice_VPx_Short  slice;
+    const uint8_t         *bitstream;
+    unsigned              bitstream_size;
+} DXVA_VP9_Picture_Context;
 
-void mpeg2_getcurframe(struct AVCodecContext* avctx, AVFrame** frame);
+void vp9_getcurframe(struct AVCodecContext* avctx, AVFrame** frame);

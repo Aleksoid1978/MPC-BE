@@ -75,6 +75,9 @@
     <ClCompile Include="DXVADecoder\DXVA1DecoderMPEG2.cpp">
       <Filter>Source Files\DXVADecoder</Filter>
     </ClCompile>
+    <ClCompile Include="DXVADecoder\DXVA2DecoderVP9.cpp">
+      <Filter>Source Files\DXVADecoder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CpuId.h">
@@ -144,6 +147,9 @@
       <Filter>Header Files\DXVADecoder</Filter>
     </ClInclude>
     <ClInclude Include="DXVADecoder\DXVA1DecoderMPEG2.h">
+      <Filter>Header Files\DXVADecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoder\DXVA2DecoderVP9.h">
       <Filter>Header Files\DXVADecoder</Filter>
     </ClInclude>
   </ItemGroup>

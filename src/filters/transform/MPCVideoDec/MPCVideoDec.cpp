@@ -113,7 +113,8 @@ vcodecs[] = {
 	{_T("hevc_dxva"),	CODEC_HEVC_DXVA	},
 	{_T("mpeg2_dxva"),	CODEC_MPEG2_DXVA},
 	{_T("vc1_dxva"),	CODEC_VC1_DXVA	},
-	{_T("wmv3_dxva"),	CODEC_WMV3_DXVA	}
+	{_T("wmv3_dxva"),	CODEC_WMV3_DXVA	},
+	{_T("vp9_dxva"),	CODEC_VP9_DXVA	}
 };
 #endif
 
@@ -161,7 +162,7 @@ DXVA_PARAMS DXVA_H264 = {
 DXVA_PARAMS DXVA_HEVC = {
 	16,		// PicEntryNumber - DXVA1
 	24,		// PicEntryNumber - DXVA2
-	2,		// PreferedConfigBitstream
+	1,		// PreferedConfigBitstream
 	{ &DXVA_ModeHEVC_VLD_Main10, &DXVA_ModeHEVC_VLD_Main, &GUID_NULL },
 	{ 0 }
 };
@@ -182,6 +183,15 @@ DXVA_PARAMS DXVA_VC1 = {
 	1,		// PreferedConfigBitstream
 	{ &DXVA2_ModeVC1_D2010, &DXVA2_ModeVC1_D, &GUID_NULL },
 	{ DXVA_RESTRICTED_MODE_VC1_D, 0 }
+};
+
+// DXVA modes supported for VP9
+DXVA_PARAMS DXVA_VP9 = {
+	16,		// PicEntryNumber - DXVA1
+	24,		// PicEntryNumber - DXVA2
+	1,		// PreferedConfigBitstream
+	{ &DXVA_VP9_VLD_Profile0, &GUID_NULL },
+	{ 0 }
 };
 
 
@@ -219,7 +229,7 @@ FFMPEG_CODECS ffCodecs[] = {
 	{ &MEDIASUBTYPE_VP80, AV_CODEC_ID_VP8, NULL, VDEC_VP789, -1 },
 
 	// VP9
-	{ &MEDIASUBTYPE_VP90, AV_CODEC_ID_VP9, NULL, VDEC_VP789, -1 },
+	{ &MEDIASUBTYPE_VP90, AV_CODEC_ID_VP9, &DXVA_VP9, VDEC_VP789, VDEC_DXVA_VP9 },
 
 	// Xvid
 	{ &MEDIASUBTYPE_XVID, AV_CODEC_ID_MPEG4, NULL, VDEC_XVID, -1 },
@@ -1308,8 +1318,12 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 					break;
 				case AV_CODEC_ID_VP7  :
 				case AV_CODEC_ID_VP8  :
-				case AV_CODEC_ID_VP9  :
 					bCodecActivated = (m_nActiveCodecs & CODEC_VP89) != 0;
+					break;
+				case AV_CODEC_ID_VP9  :
+					m_bUseDXVA		= (m_nActiveCodecs & CODEC_VP9_DXVA) != 0;
+					m_bUseFFmpeg	= (m_nActiveCodecs & CODEC_VP89) != 0;
+					bCodecActivated	= m_bUseDXVA || m_bUseFFmpeg;
 					break;
 				case AV_CODEC_ID_MJPEG  :
 				case AV_CODEC_ID_MJPEGB :

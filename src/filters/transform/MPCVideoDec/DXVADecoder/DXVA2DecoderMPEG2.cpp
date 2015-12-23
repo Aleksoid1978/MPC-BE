@@ -22,7 +22,6 @@
 #include "DXVA2DecoderMPEG2.h"
 #include "../MPCVideoDec.h"
 #include "../FfmpegContext.h"
-#include <ffmpeg/libavcodec/avcodec.h>
 
 CDXVA2DecoderMPEG2::CDXVA2DecoderMPEG2(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config)
 	: CDXVA2Decoder(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config, 4)

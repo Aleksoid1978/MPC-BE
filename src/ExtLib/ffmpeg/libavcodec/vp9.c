@@ -3950,6 +3950,10 @@ static av_cold int vp9_decode_free(AVCodecContext *ctx)
 }
 
 
+// ==> Start patch MPC
+#include "dxva_vp9.c"
+// ==> End patch MPC
+
 static int vp9_decode_frame(AVCodecContext *ctx, void *frame,
                             int *got_frame, AVPacket *pkt)
 {
@@ -3962,6 +3966,14 @@ static int vp9_decode_frame(AVCodecContext *ctx, void *frame,
     ptrdiff_t yoff, uvoff, ls_y, ls_uv;
     AVFrame *f;
     int bytesperpixel;
+
+    // ==> Start patch MPC
+    if (ctx->using_dxva && ctx->dxva_context) {
+        dxva_context* dxva_ctx = (dxva_context*)ctx->dxva_context;
+        DXVA_VP9_Picture_Context* ctx_pic = (DXVA_VP9_Picture_Context*)dxva_ctx->dxva_decoder_context;
+        memset(ctx_pic, 0, sizeof(*ctx_pic));
+    }
+    // ==> End patch MPC
 
     if ((res = decode_frame_header(ctx, data, size, &ref)) < 0) {
         return res;
@@ -4040,6 +4052,20 @@ static int vp9_decode_frame(AVCodecContext *ctx, void *frame,
             return res;
         goto finish;
     }
+
+    // ==> Start patch MPC
+    if (ctx->using_dxva && ctx->dxva_context) {
+        dxva_context* dxva_ctx = (dxva_context*)ctx->dxva_context;
+        DXVA_VP9_Picture_Context* ctx_pic = (DXVA_VP9_Picture_Context*)dxva_ctx->dxva_decoder_context;
+        if (ctx_pic) {
+            res = dxva_start_frame(ctx, ctx_pic);
+            if (res < 0)
+                return res;
+            dxva_decode_slice(ctx, ctx_pic, pkt->data, pkt->size);
+            goto finish;
+        }
+    }
+    // ==> End patch MPC
 
     // main tile decode loop
     bytesperpixel = s->bytesperpixel;

@@ -35,9 +35,12 @@ extern "C" {
 #define new newFFMPEG
 	#include <ffmpeg/libavcodec/h264.h>
 #undef new
-	#include <ffmpeg/libavcodec/hevc.h>
-	#include <ffmpeg/libavcodec/vc1.h>
-	#include <ffmpeg/libavcodec/mpeg12.h>
+	
+	#include <ffmpeg/libavcodec/dxva_h264.h>
+	#include <ffmpeg/libavcodec/dxva_hevc.h>
+	#include <ffmpeg/libavcodec/dxva_mpeg2.h>
+	#include <ffmpeg/libavcodec/dxva_vc1.h>
+	#include <ffmpeg/libavcodec/dxva_vp9.h>
 }
 
 /* not used
@@ -458,29 +461,20 @@ HRESULT FFGetCurFrame(struct AVCodecContext* pAVCtx, AVFrame** ppFrameOut)
 	*ppFrameOut = NULL;
 	switch (pAVCtx->codec_id) {
 		case AV_CODEC_ID_H264:
-			{
-				H264Context* h		= (H264Context*)pAVCtx->priv_data;
-				*ppFrameOut			= h->cur_pic.f;
-			}
+			h264_getcurframe(pAVCtx, ppFrameOut);
 			break;
 		case AV_CODEC_ID_HEVC:
-			{
-				HEVCContext *h		= (HEVCContext*)pAVCtx->priv_data;
-				*ppFrameOut			= h->ref ? h->ref->frame : NULL;
-			}
+			hevc_getcurframe(pAVCtx, ppFrameOut);
+			break;
+		case AV_CODEC_ID_MPEG2VIDEO:
+			mpeg2_getcurframe(pAVCtx, ppFrameOut);
 			break;
 		case AV_CODEC_ID_VC1:
 		case AV_CODEC_ID_WMV3:
-			{
-				VC1Context* v		= (VC1Context*)pAVCtx->priv_data;
-				*ppFrameOut			= v->s.current_picture_ptr->f;
-			}
+			vc1_getcurframe(pAVCtx, ppFrameOut);
 			break;
-		case AV_CODEC_ID_MPEG2VIDEO:
-			{
-				MpegEncContext *s	= (MpegEncContext*)pAVCtx->priv_data;
-				*ppFrameOut			= s->current_picture.f;
-			}
+		case AV_CODEC_ID_VP9:
+			vp9_getcurframe(pAVCtx, ppFrameOut);
 			break;
 		default:
 			return E_FAIL;
