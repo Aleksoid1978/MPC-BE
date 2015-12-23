@@ -41,7 +41,7 @@ enum PCI_Vendors {
 
 // === H264 functions
 int		FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
-										 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible);
+								 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible);
 
 // === Mpeg2 functions
 int		MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
@@ -52,4 +52,5 @@ UINT	FFGetMBCount(struct AVCodecContext* pAVCtx);
 void	FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height);
 
 bool	IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
-BOOL	DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion);
+BOOL	DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height,
+						   DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion);

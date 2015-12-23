@@ -26,6 +26,7 @@
 #include "DXVA2DecoderHEVC.h"
 #include "DXVA2DecoderVC1.h"
 #include "DXVA2DecoderMPEG2.h"
+#include "DXVA2DecoderVP9.h"
 #include "../MPCVideoDec.h"
 #include "../DXVAAllocator.h"
 #include "../FfmpegContext.h"
@@ -71,6 +72,8 @@ CDXVA2Decoder* CDXVA2Decoder::CreateDXVA2Decoder(CMPCVideoDecFilter* pFilter, ID
 		pDecoder = DNew CDXVA2DecoderHEVC(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
 	} else if (*guidDecoder == DXVA2_ModeMPEG2_VLD) {
 		pDecoder = DNew CDXVA2DecoderMPEG2(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
+	} else if (*guidDecoder == DXVA_VP9_VLD_Profile0) {
+		pDecoder = DNew CDXVA2DecoderVP9(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
 	} else {
 		ASSERT(FALSE); // Unknown decoder !!
 	}

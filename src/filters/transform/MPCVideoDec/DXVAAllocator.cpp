@@ -101,7 +101,9 @@ CVideoDecDXVAAllocator::~CVideoDecDXVAAllocator()
 {
 	DbgLog((LOG_TRACE, 3, L"CVideoDecDXVAAllocator::~CVideoDecDXVAAllocator()"));
 
-	m_pVideoDecFilter->FlushDXVADecoder();
+	if (m_pVideoDecFilter) {
+		m_pVideoDecFilter->ffmpegCleanup();
+	}
 	Free();
 	if (m_pVideoDecFilter && m_pVideoDecFilter->m_pDXVA2Allocator == this) {
 		m_pVideoDecFilter->m_pDXVA2Allocator = NULL;

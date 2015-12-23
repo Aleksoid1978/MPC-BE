@@ -97,6 +97,7 @@ CAppSettings::CAppSettings()
 	DXVAFiltersKeys[VDEC_DXVA_MPEG2]		= _T("vdec_dxva_mpeg2");
 	DXVAFiltersKeys[VDEC_DXVA_VC1]			= _T("vdec_dxva_vc1");
 	DXVAFiltersKeys[VDEC_DXVA_WMV3]			= _T("vdec_dxva_wmv3");
+	DXVAFiltersKeys[VDEC_DXVA_VP9]			= _T("vdec_dxva_vp9");
 
 	// Internal video decoders
 	VideoFiltersKeys[VDEC_AMV]				= _T("vdec_amv");

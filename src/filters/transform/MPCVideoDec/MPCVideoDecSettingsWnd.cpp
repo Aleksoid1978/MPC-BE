@@ -472,6 +472,7 @@ static const struct {
 	{CODEC_MPEG2_DXVA,	_T("MPEG-2 (DXVA)")},
 	{CODEC_VC1_DXVA,	_T("VC-1 (DXVA)")},
 	{CODEC_WMV3_DXVA,	_T("WMV3 (DXVA)")},
+	{CODEC_VP9_DXVA,	_T("VP9 (DXVA)")},
 	{CODEC_AMVV,		_T("AMV video")},
 	{CODEC_PRORES,		_T("Apple ProRes")},
 	{CODEC_DNXHD,		_T("Avid DNxHD")},

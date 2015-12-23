@@ -239,6 +239,7 @@
     <ClCompile Include="DXVADecoder\DXVA2DecoderHEVC.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2DecoderMPEG2.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2DecoderVC1.cpp" />
+    <ClCompile Include="DXVADecoder\DXVA2DecoderVP9.cpp" />
     <ClCompile Include="DXVADecoder\ffmpegContext_DXVA1.cpp">
       <WarningLevel>Level1</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -267,6 +268,7 @@
     <ClInclude Include="DXVADecoder\DXVA2DecoderHEVC.h" />
     <ClInclude Include="DXVADecoder\DXVA2DecoderMPEG2.h" />
     <ClInclude Include="DXVADecoder\DXVA2DecoderVC1.h" />
+    <ClInclude Include="DXVADecoder\DXVA2DecoderVP9.h" />
     <ClInclude Include="DXVADecoder\DXVADecoder.h" />
     <ClInclude Include="DXVADecoder\ffmpegContext_DXVA1.h" />
     <ClInclude Include="DXVADecoder\stdafx.h" />

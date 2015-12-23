@@ -18,21 +18,18 @@
  *
  */
 
-#ifndef _MSC_VER
-#include <windows.h>
-#endif
+#pragma once
 
-#include "compat/windows/dxva_hevc.h"
+#include "DXVA2Decoder.h"
+#include <ffmpeg/libavcodec/dxva_vp9.h>
 
-#define MAX_HEVC_SLICES 256
+class CDXVA2DecoderVP9 : public CDXVA2Decoder
+{
+	DXVA_VP9_Picture_Context	m_DXVA_VP9_Picture_Context;
 
-typedef struct DXVA_HEVC_Picture_Context {
-    DXVA_PicParams_HEVC   pp;
-    DXVA_Qmatrix_HEVC     qm;
-    unsigned              slice_count;
-    DXVA_Slice_HEVC_Short slice_short[MAX_HEVC_SLICES];
-    const uint8_t         *bitstream;
-    unsigned              bitstream_size;
-} DXVA_HEVC_Picture_Context;
+public:
+	CDXVA2DecoderVP9(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config);
 
-void hevc_getcurframe(struct AVCodecContext* avctx, AVFrame** frame);
+	virtual HRESULT				CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDXVASize = UINT_MAX);
+	virtual HRESULT				ProcessDXVAFrame(IMediaSample* pSample);
+};

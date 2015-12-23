@@ -22,6 +22,12 @@
 #include "dxva_internal.h"
 #include "dxva_h264.h"
 
+void h264_getcurframe(struct AVCodecContext* avctx, AVFrame** frame)
+{
+    const H264Context *h = avctx->priv_data;
+    *frame               = h->cur_pic.f;
+}
+
 static void fill_picture_entry(DXVA_PicEntry_H264 *pic,
                                unsigned index, unsigned flag)
 {
@@ -303,7 +309,7 @@ static int dxva_decode_slice(AVCodecContext *avctx,
     const dxva_context* ctx    = (dxva_context*)avctx->dxva_context;
     unsigned position;
 
-    if (ctx_pic->slice_count >= MAX_SLICES)
+    if (ctx_pic->slice_count >= MAX_H264_SLICES)
         return -1;
 
     if (!ctx_pic->bitstream)

@@ -21,6 +21,12 @@
 #include "dxva_internal.h"
 #include "dxva_hevc.h"
 
+void hevc_getcurframe(struct AVCodecContext* avctx, AVFrame** frame)
+{
+    const HEVCContext *h = avctx->priv_data;
+    *frame               = h->ref ? h->ref->frame : NULL;
+}
+
 static void fill_picture_entry(DXVA_PicEntry_HEVC *pic,
                                unsigned index, unsigned flag)
 {
@@ -248,7 +254,7 @@ static int dxva_decode_slice(AVCodecContext *avctx,
     
     unsigned position;
 
-    if (ctx_pic->slice_count >= MAX_SLICES)
+    if (ctx_pic->slice_count >= MAX_HEVC_SLICES)
         return -1;
 
     if (!ctx_pic->bitstream)

@@ -22,6 +22,12 @@
 #include "dxva_internal.h"
 #include "dxva_mpeg2.h"
 
+void mpeg2_getcurframe(struct AVCodecContext* avctx, AVFrame** frame)
+{
+    const MpegEncContext *s = avctx->priv_data;
+    *frame                  = s->current_picture.f;
+}
+
 static void fill_picture_parameters(AVCodecContext *avctx,
                                     const struct MpegEncContext *s,
                                     DXVA_PictureParameters *pp)

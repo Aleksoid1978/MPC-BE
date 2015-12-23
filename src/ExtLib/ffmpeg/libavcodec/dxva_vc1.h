@@ -30,3 +30,5 @@ typedef struct DXVA_VC1_Context {
     unsigned                 frame_count;
     DXVA_VC1_Picture_Context ctx_pic[2];	
 } DXVA_VC1_Context;
+
+void vc1_getcurframe(struct AVCodecContext* avctx, AVFrame** frame);
