@@ -108,14 +108,9 @@ enum NALUnitType {
     NAL_IDR_N_LP   = 20,
     NAL_CRA_NUT    = 21,
     NAL_VPS        = 32,
-    // ==> Start patch MPC
-    // NAL_SPS        = 33,
-    // NAL_PPS        = 34,
-    // NAL_AUD        = 35,
-    NAL_SPS_HEVC   = 33,
-    NAL_PPS_HEVC   = 34,
-    NAL_AUD_HEVC   = 35,
-    // ==> End patch MPC
+    NAL_SPS        = 33,
+    NAL_PPS        = 34,
+    NAL_AUD        = 35,
     NAL_EOS_NUT    = 36,
     NAL_EOB_NUT    = 37,
     NAL_FD_NUT     = 38,

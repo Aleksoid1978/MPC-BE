@@ -2678,13 +2678,13 @@ static int decode_nal_unit(HEVCContext *s, const HEVCNAL *nal)
         if (ret < 0)
             goto fail;
         break;
-    case NAL_SPS_HEVC:
+    case NAL_SPS:
         ret = ff_hevc_decode_nal_sps(gb, s->avctx, &s->ps,
                                      s->apply_defdispwin);
         if (ret < 0)
             goto fail;
         break;
-    case NAL_PPS_HEVC:
+    case NAL_PPS:
         ret = ff_hevc_decode_nal_pps(gb, s->avctx, &s->ps);
         if (ret < 0)
             goto fail;
@@ -2800,7 +2800,7 @@ static int decode_nal_unit(HEVCContext *s, const HEVCNAL *nal)
         s->seq_decode = (s->seq_decode + 1) & 0xff;
         s->max_ra     = INT_MAX;
         break;
-    case NAL_AUD_HEVC:
+    case NAL_AUD:
     case NAL_FD_NUT:
         break;
     default:
