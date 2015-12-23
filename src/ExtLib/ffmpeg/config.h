@@ -568,6 +568,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_H264_VDPAU_DECODER 0
 #define CONFIG_HEVC_DECODER 1
 #define CONFIG_HQ_HQA_DECODER 1
+#define CONFIG_HQX_DECODER 1
 #define CONFIG_HUFFYUV_DECODER 1
 #define CONFIG_IAC_DECODER 1
 #define CONFIG_IMC_DECODER 0
