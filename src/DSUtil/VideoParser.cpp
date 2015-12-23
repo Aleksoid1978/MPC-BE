@@ -331,7 +331,8 @@ namespace AVCParser {
 				UINT32 time_scale = gb.BitRead(32);
 				BYTE fixed_frame_rate_flag = gb.BitRead(1);
 
-				if (num_units_in_tick && time_scale) {
+				if (fixed_frame_rate_flag
+						&& num_units_in_tick && time_scale) {
 					params.AvgTimePerFrame = (REFERENCE_TIME)(10000000.0 * num_units_in_tick * 2 / time_scale);
 				}
 			}
