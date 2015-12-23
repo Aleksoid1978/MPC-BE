@@ -166,14 +166,9 @@ static const char *nal_unit_name(int nal_type)
     case NAL_IDR_N_LP   : return "IDR_N_LP";
     case NAL_CRA_NUT    : return "CRA_NUT";
     case NAL_VPS        : return "VPS";
-// ==> Start patch MPC
-    //case NAL_SPS        : return "SPS";
-    //case NAL_PPS        : return "PPS";
-    //case NAL_AUD        : return "AUD";
-    case NAL_SPS_HEVC   : return "SPS";
-    case NAL_PPS_HEVC   : return "PPS";
-    case NAL_AUD_HEVC   : return "AUD";
-// ==> End patch MPC
+    case NAL_SPS        : return "SPS";
+    case NAL_PPS        : return "PPS";
+    case NAL_AUD        : return "AUD";
     case NAL_EOS_NUT    : return "EOS_NUT";
     case NAL_EOB_NUT    : return "EOB_NUT";
     case NAL_FD_NUT     : return "FD_NUT";

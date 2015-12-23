@@ -98,8 +98,8 @@ static int parse_nal_units(AVCodecParserContext *s, const uint8_t *buf,
         /* ignore everything except parameter sets and VCL NALUs */
         switch (nal->type) {
         case NAL_VPS: ff_hevc_decode_nal_vps(&nal->gb, avctx, &ctx->ps);    break;
-        case NAL_SPS_HEVC: ff_hevc_decode_nal_sps(&nal->gb, avctx, &ctx->ps, 1); break;
-        case NAL_PPS_HEVC: ff_hevc_decode_nal_pps(&nal->gb, avctx, &ctx->ps);    break;
+        case NAL_SPS: ff_hevc_decode_nal_sps(&nal->gb, avctx, &ctx->ps, 1); break;
+        case NAL_PPS: ff_hevc_decode_nal_pps(&nal->gb, avctx, &ctx->ps);    break;
         case NAL_TRAIL_R:
         case NAL_TRAIL_N:
         case NAL_TSA_N:
@@ -149,7 +149,7 @@ static int hevc_find_frame_end(AVCodecParserContext *s, const uint8_t *buf,
 
         nut = (pc->state64 >> 2 * 8 + 1) & 0x3F;
         // Beginning of access unit
-        if ((nut >= NAL_VPS && nut <= NAL_AUD_HEVC) || nut == NAL_SEI_PREFIX ||
+        if ((nut >= NAL_VPS && nut <= NAL_AUD) || nut == NAL_SEI_PREFIX ||
             (nut >= 41 && nut <= 44) || (nut >= 48 && nut <= 55)) {
             if (pc->frame_start_found) {
                 pc->frame_start_found = 0;
@@ -251,10 +251,10 @@ static inline int parse_nal_units(AVCodecParserContext *s, const uint8_t *buf,
         case NAL_VPS:
             ff_hevc_decode_nal_vps(gb, avctx, ps);
             break;
-        case NAL_SPS_HEVC:
+        case NAL_SPS:
             ff_hevc_decode_nal_sps(gb, avctx, ps, 1);
             break;
-        case NAL_PPS_HEVC:
+        case NAL_PPS:
             ff_hevc_decode_nal_pps(gb, avctx, ps);
             break;
         case NAL_SEI_PREFIX:
@@ -426,12 +426,12 @@ static int hevc_split(AVCodecContext *avctx, const uint8_t *buf, int buf_size)
         nut = (state >> 1) & 0x3F;
         if (nut == NAL_VPS)
             has_vps = 1;
-        else if (nut == NAL_SPS_HEVC)
+        else if (nut == NAL_SPS)
             has_sps = 1;
-        else if (nut == NAL_PPS_HEVC)
+        else if (nut == NAL_PPS)
             has_pps = 1;
         else if ((nut != NAL_SEI_PREFIX || has_pps) &&
-                  nut != NAL_AUD_HEVC) {
+                  nut != NAL_AUD) {
             if (has_vps && has_sps) {
                 while (ptr - 4 > buf && ptr[-5] == 0)
                     ptr--;
