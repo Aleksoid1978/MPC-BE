@@ -1,13 +1,17 @@
-﻿Part A: Preparing the Visual Studio 2013 environment
+﻿Part A: Preparing the Visual Studio 2013/2015 environment
 
-Visual Studio 2013
-  1. Install Visual C++ 2013, part of Visual Studio 2013 with Update 4 (Express won't work, other editions work fine) -> http://www.visualstudio.com/downloads/download-visual-studio-vs .
+ Visual Studio 2013
+  1. Install Visual C++ 2013, part of Visual Studio 2013 with Update 5 (Express won't work, other editions work fine).
+ Visual Studio 2015
+  1. Install Visual C++ 2015, part of Visual Studio 2015 with Update 1 (any edition will work fine).
+
+  Download URL: http://www.visualstudio.com/downloads/download-visual-studio-vs
 
 Part B: Preparing the GCC environment
  NOTES:
   * If you installed the MSYS/MinGW package in an other directory you will have to use that path in the following steps.
 
- 1. Download and extract MSYS_MinGW-w64_GCC_520_x86-x64.7z to "C:\MSYS" -> http://mpc-be.org/MSYS/MSYS_MinGW-w64_GCC_520_x86-x64.7z
+ 1. Download and extract MSYS_MinGW-w64_GCC_530_x86-x64.7z to "C:\MSYS" -> http://mpc-be.org/MSYS/MSYS_MinGW-w64_GCC_530_x86-x64.7z
  2. Add the following environment variables (in System Properties->Advanced->Environment Variables):
 
     Variable    Value
