@@ -357,7 +357,6 @@ bool CDVSMainPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 						AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 						CStyleEditorDialog dlg(_T("Default"), &m_defStyle, CWnd::FromHandle(m_hwnd));
-
 						if (dlg.DoModal() == IDOK) {
 							BOOL bStyleChanged = FALSE;
 							if (dlg.m_stss != m_defStyle) {
