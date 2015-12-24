@@ -222,7 +222,7 @@ void CStyleEditorDialog::OnBnClickedButton1()
 	LOGFONT lf;
 	lf <<= m_stss;
 
-	CFontDialog dlg(&lf, CF_SCREENFONTS|CF_INITTOLOGFONTSTRUCT|CF_FORCEFONTEXIST|CF_SCALABLEONLY|CF_EFFECTS);
+	CFontDialog dlg(&lf, CF_SCREENFONTS | CF_INITTOLOGFONTSTRUCT | CF_FORCEFONTEXIST | CF_SCALABLEONLY | CF_EFFECTS, NULL, this);
 	if (dlg.DoModal() == IDOK) {
 		CString str(lf.lfFaceName);
 		if (str.GetLength() > 16) {

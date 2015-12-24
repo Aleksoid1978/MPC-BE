@@ -774,7 +774,7 @@ STDMETHODIMP CDirectVobSub::put_TextSettings(STSStyle* pDefStyle)
 
 	CAutoLock cAutoLock(&m_propsLock);
 
-	if (!memcmp(&m_defStyle, pDefStyle, sizeof(m_defStyle))) {
+	if (m_defStyle == *pDefStyle) {
 		return S_FALSE;
 	}
 
