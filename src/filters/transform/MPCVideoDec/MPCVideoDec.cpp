@@ -1877,6 +1877,11 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 					break;
 				}
 			}
+			else if (m_nCodecId == AV_CODEC_ID_VP9) {
+				if (m_pAVCtx->profile > FF_PROFILE_VP9_0) {
+					break;
+				}
+			}
 
 			m_bDXVACompatible = true;
 		} while (false);
@@ -3667,12 +3672,21 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 	return infostr;
 }
 
+#define H264_CHECK_PROFILE(profile) \
+	(((profile) & ~FF_PROFILE_H264_CONSTRAINED) <= FF_PROFILE_H264_HIGH)
+
 int CMPCVideoDecFilter::av_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
-	CMPCVideoDecFilter* pFilter = (CMPCVideoDecFilter*)c->opaque;
+	CMPCVideoDecFilter* pFilter = static_cast<CMPCVideoDecFilter*>(c->opaque);
 
 	int ret = avcodec_default_get_buffer2(c, pic, flags);
 	if (ret == 0 && pFilter->m_pDXVADecoder) {
+		if ((c->codec_id == AV_CODEC_ID_H264 && !H264_CHECK_PROFILE(c->profile)) ||
+			(c->codec_id == AV_CODEC_ID_HEVC && c->profile > FF_PROFILE_HEVC_MAIN_10) ||
+			(c->codec_id == AV_CODEC_ID_VP9  && c->profile > FF_PROFILE_VP9_0)) {
+			return -1;
+		}
+
 		(static_cast<CDXVA2Decoder*>(pFilter->m_pDXVADecoder))->get_buffer_dxva(pic);
 	}
 
