@@ -2153,50 +2153,68 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 {
 	__super::OnActivateApp(bActive, dwThreadID);
 
-	if (AfxGetAppSettings().iOnTop || !AfxGetAppSettings().fExitFullScreenAtFocusLost) {
-		return;
-	}
-
-	MONITORINFO mi = { sizeof(mi) };
-	GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
-
-	if (!bActive && (mi.dwFlags & MONITORINFOF_PRIMARY) && m_bFullScreen && m_eMediaLoadState == MLS_LOADED) {
-		bool fExitFullscreen = true;
-
-		if (CWnd* pWnd = GetForegroundWindow()) {
-			HMONITOR hMonitor1 = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
-			HMONITOR hMonitor2 = MonitorFromWindow(pWnd->m_hWnd, MONITOR_DEFAULTTONEAREST);
-			CMonitors monitors;
-			if (hMonitor1 && hMonitor2 && hMonitor1 != hMonitor2) {
-				fExitFullscreen = false;
+	if (m_bFullScreen) {
+		if (bActive) {
+			SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+		} else {
+			const CAppSettings& s = AfxGetAppSettings();
+			const int i = s.iOnTop;
+			bool bTopMost = false;
+			if (i == 0) {
+				bTopMost = false;
+			} else if (i == 1) {
+				bTopMost = true;
+			} else if (i == 2) {
+				bTopMost = (GetMediaState() == State_Running) ? true : false;
+			} else {
+				bTopMost = (GetMediaState() == State_Running && !m_bAudioOnly) ? true : false;
 			}
 
-			CString title;
-			pWnd->GetWindowText(title);
+			if (bTopMost) {
+				return;
+			}
 
-			CString module;
-
-			DWORD pid;
-			GetWindowThreadProcessId(pWnd->m_hWnd, &pid);
-
-			if (HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid)) {
-				HMODULE hMod;
-				DWORD cbNeeded;
-
-				if (EnumProcessModules(hProcess, &hMod, sizeof(hMod), &cbNeeded)) {
-					module.ReleaseBufferSetLength(GetModuleFileNameEx(hProcess, hMod, module.GetBuffer(_MAX_PATH), _MAX_PATH));
+			if (CWnd* pActiveWnd = GetForegroundWindow()) {
+				bool bExitFullscreen = s.fExitFullScreenAtFocusLost;
+				if (bExitFullscreen) {
+					HMONITOR hMonitor1 = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
+					HMONITOR hMonitor2 = MonitorFromWindow(pActiveWnd->m_hWnd, MONITOR_DEFAULTTONEAREST);
+					if (hMonitor1 && hMonitor2 && hMonitor1 != hMonitor2) {
+						bExitFullscreen = false;
+					}
 				}
 
-				CloseHandle(hProcess);
+				CString title;
+				pActiveWnd->GetWindowText(title);
+
+				CString module;
+
+				DWORD pid;
+				GetWindowThreadProcessId(pActiveWnd->m_hWnd, &pid);
+
+				if (HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid)) {
+					HMODULE hModule;
+					DWORD cbNeeded;
+
+					if (EnumProcessModules(hProcess, &hModule, sizeof(hModule), &cbNeeded)) {
+						module.ReleaseBufferSetLength(GetModuleFileNameEx(hProcess, hModule, module.GetBuffer(MAX_PATH), MAX_PATH));
+					}
+
+					CloseHandle(hProcess);
+				}
+
+				if (!title.IsEmpty() && !module.IsEmpty()) {
+					CString str;
+					str.Format(ResStr(IDS_MAINFRM_2), GetFileOnly(module).MakeLower(), title);
+					SendStatusMessage(str, 5000);
+				}
+
+				if (bExitFullscreen) {
+					ToggleFullscreen(true, true);
+				} else {
+					SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+				}
 			}
-
-			CString str;
-			str.Format(ResStr(IDS_MAINFRM_2), GetFileOnly(module).MakeLower(), title);
-			SendStatusMessage(str, 5000);
-		}
-
-		if (fExitFullscreen) {
-			OnViewFullscreen();
 		}
 	}
 }
