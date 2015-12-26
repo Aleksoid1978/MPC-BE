@@ -142,6 +142,12 @@ CPPageFileInfoDetails::CPPageFileInfoDetails(CString fn, IFilterGraph* pFG, ISub
 				} else if (CComQIPtr<IVMRWindowlessControl9> pWC = pBF) {
 					pWC->GetNativeVideoSize(&wh.cx, &wh.cy, &arxy.cx, &arxy.cy);
 					break;
+				} else if (CComQIPtr<IMFGetService> pMFGS = pBF) {
+					CComPtr<IMFVideoDisplayControl> pMFVDC;
+					if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_RENDER_SERVICE, IID_PPV_ARGS(&pMFVDC)))) {
+						pMFVDC->GetNativeVideoSize(&wh, &arxy);
+						break;
+					}
 				}
 			}
 			EndEnumFilters;
