@@ -177,8 +177,7 @@ void CStyleEditorDialog::UpdateControlData(bool fSave)
 
 void CStyleEditorDialog::AskColor(int i)
 {
-	CColorDialog dlg(m_stss.colors[i]);
-	dlg.m_cc.Flags |= CC_FULLOPEN;
+	CColorDialog dlg(m_stss.colors[i], CC_FULLOPEN, this);
 	if (dlg.DoModal() == IDOK) {
 		m_stss.colors[i] = dlg.m_cc.rgbResult;
 		m_color[i].Invalidate();
