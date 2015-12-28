@@ -67,6 +67,7 @@ public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 	afx_msg void HScroll(UINT nSBCode, UINT nPos);
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint point);
 
 	virtual void Invalidate(BOOL bErase = TRUE) { m_bItemRedraw = true; CSliderCtrl::Invalidate(bErase); }
 };
