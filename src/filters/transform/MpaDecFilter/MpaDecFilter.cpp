@@ -351,7 +351,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_truehd_samplerate(0)
 	, m_truehd_framelength(0)
 	, m_bHasVideo(TRUE)
-	, m_bDoAdditionalCheck(FALSE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -374,7 +373,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		return;
 	}
 
-	memset(&m_bBitstreamSupported, 0, sizeof(m_bBitstreamSupported));
+	memset(&m_bBitstreamSupported, FALSE, sizeof(m_bBitstreamSupported));
 
 //	m_DDstats.Reset();
 
@@ -2130,21 +2129,19 @@ HRESULT CMpaDecFilter::StartStreaming()
 
 	m_ps2_state.reset();
 
-	if (!m_bDoAdditionalCheck) {
-		m_bDoAdditionalCheck = TRUE;
-		memset(&m_bBitstreamSupported, FALSE, sizeof(m_bBitstreamSupported));
+	memset(&m_bBitstreamSupported, FALSE, sizeof(m_bBitstreamSupported));
 
-		CComPtr<IPin> pPin = m_pOutput;
-		CComPtr<IPin> pPinRenderer;
-		for (CComPtr<IBaseFilter> pBF = this; pBF = GetDownStreamFilter(pBF, pPin); pPin = GetFirstPin(pBF, PINDIR_OUTPUT)) {
-			if (IsAudioWaveRenderer(pBF) && SUCCEEDED(pPin->ConnectedTo(&pPinRenderer)) && pPinRenderer) {
-				break;
-			}
+	CComPtr<IPin> pPin = m_pOutput;
+	CComPtr<IPin> pPinRenderer;
+	for (CComPtr<IBaseFilter> pBF = this; pBF = GetDownStreamFilter(pBF, pPin); pPin = GetFirstPin(pBF, PINDIR_OUTPUT)) {
+		if (IsAudioWaveRenderer(pBF) && SUCCEEDED(pPin->ConnectedTo(&pPinRenderer)) && pPinRenderer) {
+			break;
 		}
+	}
 
-		if (pPinRenderer) {
-			CMediaType mtOutput;
-			m_pOutput->ConnectionMediaType(&mtOutput);
+	if (pPinRenderer) {
+		CMediaType mtOutput;
+		if (S_OK == m_pOutput->ConnectionMediaType(&mtOutput)) {
 
 			CMediaType mt;
 			mt = CreateMediaTypeSPDIF();
@@ -2163,9 +2160,9 @@ HRESULT CMpaDecFilter::StartStreaming()
 
 			pPinRenderer->QueryAccept(&mtOutput);
 		}
-
-		m_bHasVideo = HasMediaType(m_pInput, MEDIATYPE_Video) || HasMediaType(m_pInput, MEDIASUBTYPE_MPEG2_VIDEO);
 	}
+
+	m_bHasVideo = HasMediaType(m_pInput, MEDIATYPE_Video) || HasMediaType(m_pInput, MEDIASUBTYPE_MPEG2_VIDEO);
 
 	return S_OK;
 }
