@@ -91,6 +91,7 @@ BEGIN_MESSAGE_MAP(CVolumeCtrl, CSliderCtrl)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_SETFOCUS()
 	ON_WM_HSCROLL_REFLECT()
+	ON_WM_MOUSEWHEEL()
 	ON_WM_SETCURSOR()
 	ON_NOTIFY_EX(TTN_NEEDTEXT, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
@@ -354,21 +355,25 @@ void CVolumeCtrl::OnSetFocus(CWnd* pOldWnd)
 
 void CVolumeCtrl::HScroll(UINT nSBCode, UINT nPos)
 {
-	int nVolMin, nVolMax;
-	GetRange(nVolMin, nVolMax);
-	int nVol = min(max(nVolMin, (int)nSBCode), nVolMax);
-
-	CRect r;
-	GetClientRect(&r);
-	InvalidateRect(&r);
-	UpdateWindow();
-
 	AfxGetAppSettings().nVolume = GetPos();
 	CFrameWnd* pFrame = GetParentFrame();
 
 	if (pFrame && pFrame != GetParent()) {
 		pFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)nPos, nSBCode), (LPARAM)m_hWnd);
 	}
+}
+
+BOOL CVolumeCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
+{
+	if (zDelta > 0) {
+		IncreaseVolume();
+	} else if (zDelta < 0) {
+		DecreaseVolume();
+	} else {
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 BOOL CVolumeCtrl::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
