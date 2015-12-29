@@ -249,7 +249,7 @@ HRESULT CDXVA2Decoder::GetSapleWrapperData(AVFrame* pFrame, IMediaSample** pSamp
 {
 	CheckPointer(pFrame, E_FAIL);
 
-	SampleWrapper* pSampleWrapper = (SampleWrapper*)pFrame->data[3];
+	SampleWrapper* pSampleWrapper = (SampleWrapper*)pFrame->data[0];
 	if (pSampleWrapper) {
 		*pSample = pSampleWrapper->pSample;
 
@@ -271,12 +271,17 @@ int CDXVA2Decoder::get_buffer_dxva(AVFrame *pic)
 		return -1;
 	}
 
-	SampleWrapper* pSampleWrapper	= DNew SampleWrapper();
-	pSampleWrapper->pSample			= pSample;
+	SampleWrapper* pSampleWrapper = DNew SampleWrapper();
+	pSampleWrapper->pSample       = pSample;
 
-	pic->data[3]	= (uint8_t *)pSampleWrapper;
-	pic->data[4]	= (uint8_t *)nSurfaceIndex;
-	pic->buf[3]		= av_buffer_create(NULL, 0, release_buffer_dxva, pSampleWrapper, 0);
+	ZeroMemory(pic->data, sizeof(pic->data));
+	ZeroMemory(pic->linesize, sizeof(pic->linesize));
+	ZeroMemory(pic->buf, sizeof(pic->buf));
+
+	pic->data[0] = (uint8_t *)pSampleWrapper;
+	pic->data[4] = (uint8_t *)nSurfaceIndex;
+ 
+	pic->buf[0]  = av_buffer_create(NULL, 0, release_buffer_dxva, pSampleWrapper, 0);
 
 	return 0;
 }
