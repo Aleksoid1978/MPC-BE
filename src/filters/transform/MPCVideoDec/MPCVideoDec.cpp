@@ -3674,14 +3674,11 @@ int CMPCVideoDecFilter::av_get_buffer(struct AVCodecContext *c, AVFrame *pic, in
 			(c->codec_id == AV_CODEC_ID_VP9  && c->profile > FF_PROFILE_VP9_0)) {
 			return -1;
 		}
-	}
-	
-	int ret = avcodec_default_get_buffer2(c, pic, flags);
-	if (ret == 0 && pFilter->m_pDXVADecoder) {
-		ret = (static_cast<CDXVA2Decoder*>(pFilter->m_pDXVADecoder))->get_buffer_dxva(pic);
+
+		return (static_cast<CDXVA2Decoder*>(pFilter->m_pDXVADecoder))->get_buffer_dxva(pic);
 	}
 
-	return ret;
+	return avcodec_default_get_buffer2(c, pic, flags);
 }
 
 enum AVPixelFormat CMPCVideoDecFilter::av_get_format(struct AVCodecContext *c, const enum AVPixelFormat * pix_fmts)
