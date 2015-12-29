@@ -49,7 +49,7 @@ int		MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
 // === Common functions
 HRESULT	FFGetCurFrame(struct AVCodecContext* pAVCtx, AVFrame** ppFrameOut);
 UINT	FFGetMBCount(struct AVCodecContext* pAVCtx);
-void	FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height);
+void	FFGetFrameProps(struct AVCodecContext* pAVCtx);
 
 bool	IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
 BOOL	DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height,

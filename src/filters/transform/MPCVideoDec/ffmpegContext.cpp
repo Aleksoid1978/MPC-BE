@@ -505,87 +505,65 @@ UINT FFGetMBCount(struct AVCodecContext* pAVCtx)
 	return MBCount;
 }
 
-void FFGetFrameProps(struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int& width, int& height)
+void FFGetFrameProps(struct AVCodecContext* pAVCtx)
 {
-	switch (pAVCtx->codec_id) {
-	case AV_CODEC_ID_H264:
-		{
-			H264Context* h	= (H264Context*)pAVCtx->priv_data;
-			SPS* cur_sps	= &h->sps;
-			if (cur_sps) {
-				width		= cur_sps->mb_width * 16;
-				height		= cur_sps->mb_height * (2 - cur_sps->frame_mbs_only_flag) * 16;
-			}
-		}
-		break;
-	case AV_CODEC_ID_MPEG1VIDEO:
-	case AV_CODEC_ID_MPEG2VIDEO:
-		{
-			const MpegEncContext* s = (MpegEncContext*)pAVCtx->priv_data;
-
-			width					= FFALIGN(s->width, 16);
-			height					= FFALIGN(s->height, 16);
-			if (!s->progressive_sequence) {
-				height = int((s->height + 31) / 32 * 2) * 16;
-			}
-
-			if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
-				if(s->chroma_format < 2) {
-					pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
-				} else if(s->chroma_format == 2) {
-					pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
-				} else {
-					pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;
-				}
-			}
-		}
-		break;
-	case AV_CODEC_ID_LAGARITH:
-		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE && pAVCtx->extradata_size >= 4) {
-			switch (*(DWORD*)pAVCtx->extradata) {
-			case 0:
-				if (pAVCtx->bits_per_coded_sample == 32) {
-					pAVCtx->pix_fmt = AV_PIX_FMT_RGBA;
-				} else if (pAVCtx->bits_per_coded_sample == 24) {
-					pAVCtx->pix_fmt = AV_PIX_FMT_RGB24;
+	if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
+		switch (pAVCtx->codec_id) {
+			case AV_CODEC_ID_MPEG1VIDEO:
+			case AV_CODEC_ID_MPEG2VIDEO:
+				{
+					const MpegEncContext* s = (MpegEncContext*)pAVCtx->priv_data;
+					if(s->chroma_format < 2) {
+						pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+					} else if(s->chroma_format == 2) {
+						pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
+					} else {
+						pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;
+					}
 				}
 				break;
-			case 1:
-				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
+			case AV_CODEC_ID_LAGARITH:
+				if (pAVCtx->extradata_size >= 4) {
+					switch (*(DWORD*)pAVCtx->extradata) {
+					case 0:
+						if (pAVCtx->bits_per_coded_sample == 32) {
+							pAVCtx->pix_fmt = AV_PIX_FMT_RGBA;
+						} else if (pAVCtx->bits_per_coded_sample == 24) {
+							pAVCtx->pix_fmt = AV_PIX_FMT_RGB24;
+						}
+						break;
+					case 1:
+						pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
+						break;
+					case 2:
+						pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+						break;
+					}
+				}
 				break;
-			case 2:
-				pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+			case AV_CODEC_ID_PRORES:
+				if (pAVCtx->extradata_size >= 8) {
+					switch (*(DWORD*)(pAVCtx->extradata + 4)) {
+					case 'hcpa': // Apple ProRes 422 High Quality
+					case 'ncpa': // Apple ProRes 422 Standard Definition
+					case 'scpa': // Apple ProRes 422 LT
+					case 'ocpa': // Apple ProRes 422 Proxy
+						pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10LE;
+						break;
+					case 'h4pa': // Apple ProRes 4444
+						pAVCtx->pix_fmt = pAVCtx->bits_per_coded_sample == 32 ? AV_PIX_FMT_YUVA444P10LE : AV_PIX_FMT_YUV444P10LE;
+						break;
+					}
+				}
 				break;
-			}
-		}
-		break;
-	case AV_CODEC_ID_PRORES:
-		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE && pAVCtx->extradata_size >= 8) {
-			switch (*(DWORD*)(pAVCtx->extradata + 4)) {
-			case 'hcpa': // Apple ProRes 422 High Quality
-			case 'ncpa': // Apple ProRes 422 Standard Definition
-			case 'scpa': // Apple ProRes 422 LT
-			case 'ocpa': // Apple ProRes 422 Proxy
-				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10LE;
+			case AV_CODEC_ID_MJPEG:
+			case AV_CODEC_ID_DNXHD:
+				av_log(pAVCtx, AV_LOG_INFO, "WARNING! : pAVCtx->pix_fmt == AV_PIX_FMT_NONE\n");
+				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; // bad hack
 				break;
-			case 'h4pa': // Apple ProRes 4444
-				pAVCtx->pix_fmt = pAVCtx->bits_per_coded_sample == 32 ? AV_PIX_FMT_YUVA444P10LE : AV_PIX_FMT_YUV444P10LE;
-				break;
-			}
-		}
-		break;
-	case AV_CODEC_ID_MJPEG:
-	case AV_CODEC_ID_DNXHD:
-		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
-			av_log(pAVCtx, AV_LOG_INFO, "WARNING! : pAVCtx->pix_fmt == AV_PIX_FMT_NONE\n");
-			pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; // bad hack
-		}
-		break;
-	case AV_CODEC_ID_HEVC: // TODO
-	default:
-		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
-			av_log(pAVCtx, AV_LOG_INFO, "WARNING! : pAVCtx->pix_fmt == AV_PIX_FMT_NONE\n");
-			pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; // bad hack
+			default:
+				av_log(pAVCtx, AV_LOG_INFO, "WARNING! : pAVCtx->pix_fmt == AV_PIX_FMT_NONE\n");
+				pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; // bad hack
 		}
 	}
 }
