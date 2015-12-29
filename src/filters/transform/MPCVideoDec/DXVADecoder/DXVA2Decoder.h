@@ -43,7 +43,7 @@ public :
 
 	virtual HRESULT					DeliverFrame(int got_picture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
-	HRESULT							get_buffer_dxva(struct AVFrame *pic);
+	int								get_buffer_dxva(struct AVFrame *pic);
 	static void						release_buffer_dxva(void *opaque, uint8_t *data);
 
 protected :
