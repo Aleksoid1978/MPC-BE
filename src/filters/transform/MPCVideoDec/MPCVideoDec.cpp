@@ -948,8 +948,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nFFBufferSize(0)
 	, m_pFFBuffer2(NULL)
 	, m_nFFBufferSize2(0)
-	, m_nOutputWidth(0)
-	, m_nOutputHeight(0)
 	, m_nARX(0)
 	, m_nARY(0)
 	, m_bUseDXVA(true)
@@ -1194,20 +1192,12 @@ int CMPCVideoDecFilter::PictHeight()
 
 int CMPCVideoDecFilter::PictWidthRounded()
 {
-	// Picture height should be rounded to 16 for DXVA
-	if (!m_nOutputWidth || m_nOutputWidth < m_pAVCtx->coded_width) {
-		m_nOutputWidth = m_pAVCtx->coded_width;
-	}
-	return ((m_nOutputWidth + 15) & ~15); // rounding to 16
+	return FFALIGN(m_pAVCtx->coded_width, m_nAlign);
 }
 
 int CMPCVideoDecFilter::PictHeightRounded()
 {
-	// Picture height should be rounded to 16 for DXVA
-	if (!m_nOutputHeight || m_nOutputHeight < m_pAVCtx->coded_height) {
-		m_nOutputHeight = m_pAVCtx->coded_height;
-	}
-	return ((m_nOutputHeight + 15) & ~15); // rounding to 16
+	return FFALIGN(m_pAVCtx->coded_height, m_nAlign);
 }
 
 static bool IsFFMPEGEnabled(FFMPEG_CODECS ffcodec, const bool FFmpegFilters[VDEC_LAST])
@@ -1774,6 +1764,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 	if (m_pAVCtx->using_dxva) {
 		if (IsWinVistaOrLater()) {
+			m_pAVCtx->get_format	= av_get_format;
 			m_pAVCtx->get_buffer2	= av_get_buffer;
 		} else if (m_nCodecId == AV_CODEC_ID_H264) {
 			// for DXVA1 decoder ...
@@ -1798,8 +1789,18 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		return VFW_E_INVALIDMEDIATYPE;
 	}
 
-	FFGetFrameProps(m_pAVCtx, m_pFrame, m_nOutputWidth, m_nOutputHeight);
+	FFGetFrameProps(m_pAVCtx);
 	m_PixelFormat = m_pAVCtx->pix_fmt;
+
+	m_nAlign = 16;
+	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO) {
+		m_nAlign <<= 1;
+	} else if (m_nCodecId == AV_CODEC_ID_HEVC) {
+		m_nAlign = 128;
+	}
+
+	m_nSurfaceWidth  = m_pAVCtx->coded_width;
+	m_nSurfaceHeight = m_pAVCtx->coded_height;
 
 	const int depth = GetLumaBits(m_pAVCtx->pix_fmt);
 	m_bHEVC10bit = (m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10 && depth == 10);
@@ -2852,9 +2853,6 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 		m_nPosB						= 1 - m_nPosB;
 	}
 
-	int nWidth	= PictWidthRounded();
-	int nHeight	= PictHeightRounded();
-
 	switch (m_nDecoderMode) {
 		case MODE_DXVA2 :
 			CheckPointer(m_pDXVA2Allocator, E_UNEXPECTED);
@@ -2868,14 +2866,6 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 	}
 
 	hr = Decode(pIn, pDataIn, nSize, rtStart, rtStop);
-
-	if (m_nDecoderMode == MODE_DXVA2
-			&& (nWidth != PictWidthRounded() || nHeight != PictHeightRounded())) {
-		avcodec_flush_buffers(m_pAVCtx);
-		FindDecoderConfiguration();
-		RecommitAllocator();
-		ReconnectOutput(PictWidth(), PictHeight());
-	}
 
 	m_bDecodingStart = TRUE;
 
@@ -3684,11 +3674,33 @@ int CMPCVideoDecFilter::av_get_buffer(struct AVCodecContext *c, AVFrame *pic, in
 			(c->codec_id == AV_CODEC_ID_VP9  && c->profile > FF_PROFILE_VP9_0)) {
 			return -1;
 		}
-
-		return (static_cast<CDXVA2Decoder*>(pFilter->m_pDXVADecoder))->get_buffer_dxva(pic);
+	}
+	
+	int ret = avcodec_default_get_buffer2(c, pic, flags);
+	if (ret == 0 && pFilter->m_pDXVADecoder) {
+		ret = (static_cast<CDXVA2Decoder*>(pFilter->m_pDXVADecoder))->get_buffer_dxva(pic);
 	}
 
-	return avcodec_default_get_buffer2(c, pic, flags);
+	return ret;
+}
+
+enum AVPixelFormat CMPCVideoDecFilter::av_get_format(struct AVCodecContext *c, const enum AVPixelFormat * pix_fmts)
+{
+	CMPCVideoDecFilter* pFilter = static_cast<CMPCVideoDecFilter*>(c->opaque);
+	if (pFilter->m_pDXVADecoder) {
+		if (pFilter->m_nSurfaceWidth != c->coded_width
+				|| pFilter->m_nSurfaceHeight != c->coded_height) {
+			avcodec_flush_buffers(c);
+			if (SUCCEEDED(pFilter->FindDecoderConfiguration())) {
+				pFilter->RecommitAllocator();
+			}
+
+			pFilter->m_nSurfaceWidth  = c->coded_width;
+			pFilter->m_nSurfaceHeight = c->coded_height;
+		}
+	}
+
+	return avcodec_default_get_format(c, pix_fmts);
 }
 
 CVideoDecOutputPin::CVideoDecOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName)

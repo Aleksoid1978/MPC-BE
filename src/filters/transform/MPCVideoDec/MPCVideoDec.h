@@ -95,8 +95,6 @@ protected:
 
 	bool									m_bWaitKeyFrame;
 
-	int										m_nOutputWidth;
-	int										m_nOutputHeight;
 	int										m_nARX, m_nARY;
 
 	// Buffer management for truncated stream (store stream chunks & reference time sent by splitter)
@@ -171,7 +169,12 @@ protected:
 
 	HRESULT			InitDecoder(const CMediaType *pmt);
 
-	static int		av_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
+	int				m_nAlign = 16;
+	int				m_nSurfaceWidth  = 0;
+	int				m_nSurfaceHeight = 0;
+
+	static int					av_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
+	static enum AVPixelFormat	av_get_format(struct AVCodecContext *s, const enum AVPixelFormat * pix_fmts);
 
 public:
 	CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr);
