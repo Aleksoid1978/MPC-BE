@@ -129,10 +129,6 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					InvalidateRect(&r);
 					CDC memdc;
 
-					int nHeight = ((CMainFrame*)AfxGetMainWnd())->m_wndToolBar.m_nButtonHeight;
-					int nBMedian = nHeight - 3 - 0.5 * nHeight - 8;
-					int height = r.Height() + nBMedian + 4;
-
 					if (m_BackGroundbm.IsExtGradiendLoading()) {
 						ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
 						m_BackGroundbm.PaintExternalGradient(&dc, r, 22, s.nThemeBrightness, R, G, B);
@@ -140,8 +136,8 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 						ThemeRGB(50, 55, 60, R, G, B);
 						ThemeRGB(20, 25, 30, R2, G2, B2);
 						TRIVERTEX tv[2] = {
-							{r.left, r.top - nBMedian, R*256, G*256, B*256, 255*256},
-							{r.Width(), height, R2*256, G2*256, B2*256, 255*256},
+							{ r.left, r.top, R * 256, G * 256, B * 256, 255 * 256 },
+							{ r.Width(), r.Height(), R2 * 256, G2 * 256, B2 * 256, 255 * 256 },
 						};
 						dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 					}
@@ -179,9 +175,9 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 				if (s.bUseDarkTheme && m_bmUnderCtrl.GetSafeHandle() != NULL) {
 					CDC dc;
 					dc.Attach(pNMCD->hdc);
-					CRect r;
-					GetClientRect(&r);
-					InvalidateRect(&r);
+					CRect rc;
+					GetClientRect(&rc);
+					InvalidateRect(&rc);
 					CDC memdc;
 					memdc.CreateCompatibleDC(&dc);
 
@@ -196,65 +192,75 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					m_nThemeGreen		= s.nThemeGreen;
 					m_nThemeBlue		= s.nThemeBlue;
 
-					int pa = 255 * 256;
-					unsigned p1 = s.clrOutlineABGR, p2 = s.clrFaceABGR;
+					const COLORREF p1 = s.clrOutlineABGR, p2 = s.clrFaceABGR;
 					int nVolume = GetPos();
 
 					if (nVolume <= GetPageSize()) {
 						nVolume = 0;
 					}
 
-					int nVolPos = r.left + (nVolume * 0.43) + 4;
+					const CRect DeflateRect(4, 2 + 1, 9, 6 + 5);
+
+					CRect r_volume(rc);
+					r_volume.DeflateRect(&DeflateRect);
+					const int width_volume = r_volume.Width() - 9;
+					const int nVolPos = rc.left + (nVolume * width_volume / 100) + 4;
 
 					if (m_Volumebm.IsExtGradiendLoading()) {
-						m_Volumebm.PaintExternalGradient(&dc, r, 0);
+						m_Volumebm.PaintExternalGradient(&dc, rc, 0);
 					} else {
-						int ir1 = p1 * 256;
-						int ig1 = (p1 >> 8) * 256;
-						int ib1 = (p1 >> 16) * 256;
-						int ir2 = p2 * 256;
-						int ig2 = (p2 >> 8) * 256;
-						int ib2 = (p2 >> 16) * 256;
+						const COLOR16 ir1 = (p1 * 256);
+						const COLOR16 ig1 = (p1 >> 8) * 256;
+						const COLOR16 ib1 = (p1 >> 16) * 256;
+						const COLOR16 ir2 = (p2 * 256);
+						const COLOR16 ig2 = (p2 >> 8) * 256;
+						const COLOR16 ib2 = (p2 >> 16) * 256;
+						const COLOR16 pa  = (255 * 256);
 
 						TRIVERTEX tv[2] = {
-							{0, 0, ir1, ig1, ib1, pa},
-							{50, 1, ir2, ig2, ib2, pa},
+							{rc.left, rc.top, ir1, ig1, ib1, pa},
+							{r_volume.Width(), 1, ir2, ig2, ib2, pa},
 						};
 						dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
 					}
 
-					unsigned p3 = nVolPos > 30 ? dc.GetPixel(nVolPos, 0) : dc.GetPixel(30, 0);
+					const COLORREF p3 = nVolPos > 30 ? dc.GetPixel(nVolPos, 0) : dc.GetPixel(30, 0);
 					CPen penLeft(p2 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p3);
 
-					dc.BitBlt(0, 0, r.Width(), r.Height(), &memdc, 0, 0, SRCCOPY);
+					dc.BitBlt(0, 0, rc.Width(), rc.Height(), &memdc, 0, 0, SRCCOPY);
 
 					DeleteObject(memdc.SelectObject(bmOld));
 					memdc.DeleteDC();
 
-					r.DeflateRect(4, 2, 9, 6);
-					CopyRect(&pNMCD->rc, &r);
+					rc.DeflateRect(&DeflateRect);
+					CopyRect(&pNMCD->rc, &rc);
 
 					CPen penRight(p1 == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, p1);
 					CPen *penOld = dc.SelectObject(&penRight);
 
 					int nposx, nposy;
-					for (int i = 4; i <= 44; i += 4) {
+					const int width = rc.Width() - 9;
+					const int step = width / 10;
 
-						nposx = r.left + i;
-						nposy = r.bottom - (r.Height() * i) / (r.Width() + 6);
+					int i = 4;
+					while (i <= width) {
+						nposx = rc.left + i;
+						nposy = rc.bottom - (rc.Height() * i) / (rc.Width() + 6);
 
 						i < nVolPos ? dc.SelectObject(penLeft) : dc.SelectObject(penRight);
 
-						dc.MoveTo(nposx, nposy);			//top_left
-						dc.LineTo(nposx + 2, nposy);		//top_right
-						dc.LineTo(nposx + 2, r.bottom);		//bottom_right
-						dc.LineTo(nposx, r.bottom);			//bottom_left
-						dc.LineTo(nposx, nposy);			//top_left
+						dc.MoveTo(nposx, nposy);			// top_left
+						dc.LineTo(nposx + 2, nposy);		// top_right
+						dc.LineTo(nposx + 2, rc.bottom);	// bottom_right
+						dc.LineTo(nposx, rc.bottom);		// bottom_left
+						dc.LineTo(nposx, nposy);			// top_left
 
 						if (!s.fMute) {
-							dc.MoveTo(nposx + 1, nposy - 1);	//top_middle
-							dc.LineTo(nposx + 1, r.bottom + 2);	//bottom_middle
+							dc.MoveTo(nposx + 1, nposy - 1);		// top_middle
+							dc.LineTo(nposx + 1, rc.bottom + 2);	// bottom_middle
 						}
+
+						i += step;
 					}
 
 					dc.SelectObject(penOld);
