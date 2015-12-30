@@ -92,7 +92,7 @@ public:
 	}
 	bool hasbits(int cnt) {
 		int pos = m_pos+cnt;
-		return(pos >= 0 && pos < m_len);
+		return(pos >= 0 && pos <= m_len);
 	}
 	unsigned int showbits(int cnt) { // a bit unclean, but works and can read backwards too! :P
 		if (!hasbits(cnt)) {
@@ -258,7 +258,7 @@ start:
 				}
 			} else if (type == 3 && !memcmp(p, "vorbis", 6)) {
 				if (COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-					pOggPin->AddComment(p + 6, page.GetCount() - 6 - 1);
+					pOggPin->AddComment(page.GetData() + 7, page.GetCount() - 7);
 				}
 			} else if (type == 0x7F && page.GetCount() > 12 && GETDWORD(p + 8) == FCC('fLaC')) {	// Flac
 				if (PinNotExist) {
@@ -294,7 +294,7 @@ start:
 				}
 			} else if (!memcmp(page.GetData(), "OpusTags", 8) && page.GetCount() > 8) {
 				if (COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-					pOggPin->AddComment(page.GetData() + 8, page.GetCount() - 8 - 1);
+					pOggPin->AddComment(page.GetData() + 8, page.GetCount() - 8);
 				}
 			} else if (!memcmp(page.GetData(), "Speex   ", 8) && page.GetCount() > 8) {
 				if (PinNotExist) {
@@ -332,7 +332,7 @@ start:
 					case 0x02:
 						if (p[5] == 0x20) {
 							if (COggVP8OutputPin* pOggPin = dynamic_cast<COggVP8OutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-								pOggPin->AddComment(page.GetData() + 7, page.GetCount() - 7 - 1);
+								pOggPin->AddComment(page.GetData() + 7, page.GetCount() - 7);
 							}
 						}
 						break;
@@ -656,7 +656,7 @@ void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 {
 	bitstream bs(p, len);
 
-	bs.getbits(bs.getbits(32)*8);
+	bs.getbits(bs.getbits(32) * 8);
 	for (int n = bs.getbits(32); n-- > 0; ) {
 		CStringA str;
 		for (int cnt = bs.getbits(32); cnt-- > 0; ) {
@@ -664,24 +664,24 @@ void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 		}
 
 		int sepPos = str.Find('=');
-		if (sepPos <= 0 || sepPos == str.GetLength()-1) {
+		if (sepPos <= 0 || sepPos == str.GetLength() - 1) {
 			continue;
 		}
 
-		CStringA TagKey		= str.Left(sepPos);
-		CStringA TagValue	= str.Mid(sepPos + 1);
+		CStringA TagKey   = str.Left(sepPos);
+		CStringA TagValue = str.Mid(sepPos + 1);
 
 		CAutoPtr<CComment> pComment(DNew CComment(UTF8To16(TagKey), UTF8To16(TagValue)));
 
 		if (pComment->m_key == L"LANGUAGE") {
-			CString lang = ISO6392ToLanguage(TagValue), iso6392 = LanguageToISO6392(CString(pComment->m_value));
+			CString lang = ISO6392ToLanguage(TagValue), iso6392 = LanguageToISO6392(pComment->m_value);
 
 			if (pComment->m_value.GetLength() == 3 && !lang.IsEmpty()) {
-				SetName(CStringW(lang));
+				SetName(lang);
 				SetProperty(L"LANG", pComment->m_value);
 			} else if (!iso6392.IsEmpty()) {
 				SetName(pComment->m_value);
-				SetProperty(L"LANG", CStringW(iso6392));
+				SetProperty(L"LANG", iso6392);
 			} else {
 				SetName(pComment->m_value);
 				SetProperty(L"NAME", pComment->m_value);
