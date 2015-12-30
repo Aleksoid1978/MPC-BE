@@ -138,6 +138,7 @@ COggSplitterFilter::COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_bitstream_serial_number_start(0)
 	, m_bitstream_serial_number_last(0)
 	, bIsTheoraPresent(FALSE)
+	, bIsVP8Present(FALSE)
 {
 	m_nFlag |= PACKET_PTS_DISCONTINUITY;
 	m_nFlag |= PACKET_PTS_VALIDATE_POSITIVE;
@@ -313,6 +314,28 @@ start:
 					pPinOut.Attach(DNew COggKateOutputPin((OggStreamHeader*)p, name, this, this, &hr));
 					// TODO
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
+				}
+			} else if (type == 0x4F && !memcmp(p, "VP80", 4)) {
+				switch (p[4]) {
+					case 0x01:
+						if (PinNotExist
+								&& page.GetCount() >= 26
+								&& p[5] == 0x01) {
+							name.Format(L"VP8 %d", streamId++);
+							CAutoPtr<CBaseSplitterOutputPin> pPinOut;
+							pPinOut.Attach(DNew COggVP8OutputPin(page.GetData(), page.GetCount(), name, this, this, &hr));
+							AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
+
+							bIsVP8Present = TRUE;
+						}
+						break;
+					case 0x02:
+						if (p[5] == 0x20) {
+							if (COggVP8OutputPin* pOggPin = dynamic_cast<COggVP8OutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
+								pOggPin->AddComment(page.GetData() + 7, page.GetCount() - 7 - 1);
+							}
+						}
+						break;
 				}
 			} else if (!(type&1) && !streamMoreInit.GetCount()) {
 				break;
@@ -504,7 +527,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		__int64 seekpos		= CalcPos(rt);
 		__int64 minseekpos	= _I64_MIN;
 
-		REFERENCE_TIME rtmax = rt - UNITS * (bIsTheoraPresent || (m_bitstream_serial_number_Video != DWORD_MAX) ? 2 : 0);
+		REFERENCE_TIME rtmax = rt - UNITS * (bIsTheoraPresent || bIsVP8Present || (m_bitstream_serial_number_Video != DWORD_MAX) ? 2 : 0);
 		REFERENCE_TIME rtmin = rtmax - UNITS / 2;
 
 		__int64 curpos = seekpos;
@@ -525,8 +548,11 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 						continue;
 					}
 
-					COggTheoraOutputPin* pOggPinTh = dynamic_cast<COggTheoraOutputPin*>(pOggPin);
-					if (bIsTheoraPresent && !pOggPinTh) {
+					if (bIsTheoraPresent && !dynamic_cast<COggTheoraOutputPin*>(pOggPin)) {
+						continue;
+					}
+
+					if (bIsVP8Present && !dynamic_cast<COggVP8OutputPin*>(pOggPin)) {
 						continue;
 					}
 
@@ -1745,6 +1771,89 @@ HRESULT COggSpeexOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int 
 	p->bSyncPoint	= TRUE;
 	p->rtStart		= m_rtLast;
 	p->rtStop		= m_rtLast + 1; // TODO : find packet duration !
+	p->SetData(pData, len);
+
+	return S_OK;
+}
+
+//
+// COggVP8OutputPin
+//
+
+COggVP8OutputPin::COggVP8OutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+	: COggSplitterOutputPin(pName, pFilter, pLock, phr)
+	, m_rtAvgTimePerFrame(0)
+{
+	CGolombBuffer gb(h + 8, nCount - 8); // skip VP8 header
+
+	int width  = gb.BitRead(16);
+	int height = gb.BitRead(16);
+	int nARnum = gb.BitRead(24);
+	int nARden = gb.BitRead(24);
+	CSize Aspect(width, height);
+	if (nARnum && nARden) {
+		Aspect.cx *= nARnum;
+		Aspect.cy *= nARden;
+	}
+	ReduceDim(Aspect);
+	int nFpsNum = gb.BitRead(32);
+	int nFpsDen = gb.BitRead(32);
+	if (nFpsNum) {
+		m_rtAvgTimePerFrame = (REFERENCE_TIME)(10000000.0 * nFpsDen / nFpsNum);
+	}
+
+	CMediaType mt;
+	mt.majortype					= MEDIATYPE_Video;
+	mt.subtype						= FOURCCMap(FCC('VP80'));
+	mt.formattype					= FORMAT_VIDEOINFO2;
+
+	VIDEOINFOHEADER2* vih2			= (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
+	memset(mt.Format(), 0, mt.FormatLength());
+
+	vih2->AvgTimePerFrame			= m_rtAvgTimePerFrame;
+	vih2->dwPictAspectRatioX		= Aspect.cx;
+	vih2->dwPictAspectRatioY		= Aspect.cy;
+	vih2->bmiHeader.biSize			= sizeof(vih2->bmiHeader);
+	vih2->bmiHeader.biWidth			= width;
+	vih2->bmiHeader.biHeight		= height;
+	vih2->bmiHeader.biCompression	= mt.subtype.Data1;
+	vih2->bmiHeader.biPlanes		= 1;
+	vih2->bmiHeader.biBitCount		= 24;
+	vih2->bmiHeader.biSizeImage		= DIBSIZE(vih2->bmiHeader);
+
+	mt.bFixedSizeSamples = 0;
+	m_mts.Add(mt);
+	
+	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
+
+	*phr = S_OK;
+}
+
+REFERENCE_TIME COggVP8OutputPin::GetRefTime(__int64 granule_position)
+{
+	return (granule_position >> 32) * m_rtAvgTimePerFrame;
+}
+
+HRESULT COggVP8OutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len)
+{
+	CheckPointer(pData, E_FAIL);
+
+	if (pData[0] == 0x4F) {
+		return E_FAIL; // skip VP8 header
+	}
+
+	bool bKeyFrame = !(*pData & 1);
+	if (!m_fSetKeyFrame) {
+		m_fSetKeyFrame = bKeyFrame;
+	}
+	if (!m_fSetKeyFrame) {
+		DbgLog((LOG_TRACE, 3, L"COggVP8OutputPin::UnpackPacket() : KeyFrame not found !!!"));
+		return E_FAIL; // waiting for a key frame after seeking
+	}
+
+	p->rtStart		= m_rtLast;
+	p->rtStop		= m_rtLast == INVALID_TIME ? m_rtLast : (m_rtLast + (m_rtAvgTimePerFrame > 0 ? m_rtAvgTimePerFrame : 1));
+	p->bSyncPoint	= (p->rtStart != INVALID_TIME);
 	p->SetData(pData, len);
 
 	return S_OK;

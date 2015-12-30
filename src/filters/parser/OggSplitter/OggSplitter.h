@@ -222,6 +222,17 @@ public:
 	COggSpeexOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 };
 
+class COggVP8OutputPin : public COggSplitterOutputPin
+{
+	REFERENCE_TIME m_rtAvgTimePerFrame;
+
+	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
+	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
+
+public:
+	COggVP8OutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+};
+
 class __declspec(uuid("9FF48807-E133-40AA-826F-9B2959E5232D"))
 	COggSplitterFilter : public CBaseSplitterFilter
 {
@@ -237,6 +248,7 @@ protected:
 	DWORD m_bitstream_serial_number_Video = DWORD_MAX;
 
 	BOOL bIsTheoraPresent;
+	BOOL bIsVP8Present;
 
 public:
 	COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
