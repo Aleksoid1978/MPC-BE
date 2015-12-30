@@ -47,6 +47,8 @@ private:
 	CImageList	m_reImgListActive;
 	CImageList	m_reImgListDisabled;
 
+	int			m_nWidthIncrease = 0;
+
 public:
 	int			m_nButtonHeight;
 	CVolumeCtrl	m_volctrl;

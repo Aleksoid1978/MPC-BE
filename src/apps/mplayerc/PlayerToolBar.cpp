@@ -250,8 +250,8 @@ void CPlayerToolBar::SwitchTheme()
 BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 {
 	VERIFY(__super::CreateEx(pParentWnd,
-			TBSTYLE_FLAT | TBSTYLE_TRANSPARENT | TBSTYLE_AUTOSIZE | TBSTYLE_CUSTOMERASE,
-			WS_CHILD | WS_VISIBLE | CBRS_ALIGN_BOTTOM | CBRS_TOOLTIPS));
+		   TBSTYLE_FLAT | TBSTYLE_TRANSPARENT | TBSTYLE_AUTOSIZE | TBSTYLE_CUSTOMERASE,
+		   WS_CHILD | WS_VISIBLE | CBRS_ALIGN_BOTTOM | CBRS_TOOLTIPS));
 
 	if (m_BackGroundbm.FileExists(CString(L"background"))) {
 		m_BackGroundbm.LoadExternalGradient(L"background");
@@ -404,7 +404,7 @@ int CPlayerToolBar::GetVolume()
 
 int CPlayerToolBar::GetMinWidth()
 {
-	return m_nButtonHeight * 12 + 155;
+	return m_nButtonHeight * 12 + 155 + m_nWidthIncrease;
 }
 
 void CPlayerToolBar::SetVolume(int volume)
@@ -631,16 +631,23 @@ void CPlayerToolBar::OnInitialUpdate()
 		return;
 	}
 
+	m_nWidthIncrease = 0;
+
 	CRect r, br, vr2;
 
 	GetClientRect(&r);
 	br = GetBorders();
 
+	const int offset_right = 6;
+	int offset = 60;
 	if (AfxGetAppSettings().bUseDarkTheme) {
-		int nBMedian = r.bottom - 3 - 0.5 * m_nButtonHeight;
-		vr2.SetRect(r.right + br.right - 60, nBMedian - 14, r.right + br.right + 6, nBMedian + 10);
+		if (r.Height() > 30) {
+			offset = (60 + offset_right) * r.Height() / 30 - offset_right;
+			m_nWidthIncrease = offset - 60;
+		}
+		vr2.SetRect(r.right + br.right - offset, r.top, r.right + br.right + offset_right, r.bottom);
 	} else {
-		vr2.SetRect(r.right + br.right - 60, r.bottom - 25, r.right + br.right + 6, r.bottom);
+		vr2.SetRect(r.right + br.right - offset, r.bottom - 25, r.right + br.right + offset_right, r.bottom);
 	}
 
 	if (m_iUseDarkTheme != (int)AfxGetAppSettings().bUseDarkTheme) {
