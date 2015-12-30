@@ -90,14 +90,10 @@ HRESULT CDXVA2Decoder::DeliverFrame(int got_picture, REFERENCE_TIME rtStart, REF
 	CheckPointer(pFrame, S_FALSE);
 
 	IMediaSample* pSample;
-	CHECK_HR_FALSE (GetSapleWrapperData(pFrame, &pSample, NULL, NULL));
+	CHECK_HR_FALSE (GetSampleWrapperData(pFrame, &pSample, NULL, NULL));
 
 	hr = ProcessDXVAFrame(pSample);
-	if (hr != S_OK) {
-		return hr;
-	}
-
-	if (got_picture) {
+	if (hr == S_OK && got_picture) {
 		hr = DeliverDXVAFrame();
 	}
 
@@ -181,7 +177,7 @@ HRESULT CDXVA2Decoder::DeliverDXVAFrame()
 	AVFrame* pFrame = m_pFilter->GetFrame();
 	IMediaSample* pSample;
 	REFERENCE_TIME rtStop, rtStart;
-	CHECK_HR_FALSE (GetSapleWrapperData(pFrame, &pSample, &rtStart, &rtStop));
+	CHECK_HR_FALSE (GetSampleWrapperData(pFrame, &pSample, &rtStart, &rtStop));
 
 	m_pFilter->UpdateFrameTime(rtStart, rtStop);
 
@@ -245,7 +241,7 @@ HRESULT CDXVA2Decoder::GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** pp
 	return hr;
 }
 
-HRESULT CDXVA2Decoder::GetSapleWrapperData(AVFrame* pFrame, IMediaSample** pSample, REFERENCE_TIME* rtStart, REFERENCE_TIME* rtStop)
+HRESULT CDXVA2Decoder::GetSampleWrapperData(AVFrame* pFrame, IMediaSample** pSample, REFERENCE_TIME* rtStart, REFERENCE_TIME* rtStop)
 {
 	CheckPointer(pFrame, E_FAIL);
 
