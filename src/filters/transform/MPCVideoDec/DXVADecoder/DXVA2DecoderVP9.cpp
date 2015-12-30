@@ -67,6 +67,8 @@ HRESULT CDXVA2DecoderVP9::ProcessDXVAFrame(IMediaSample* pSample)
 		// Decode frame
 		CHECK_HR_FRAME (Execute());
 		CHECK_HR_FALSE (EndFrame());
+
+		ZeroMemory(&m_DXVA_VP9_Picture_Context, sizeof(m_DXVA_VP9_Picture_Context));
 	}
 
 	return hr;

@@ -57,7 +57,7 @@ protected :
 	HRESULT							DeliverDXVAFrame();
 	HRESULT							GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppSampleToDeliver);
 
-	HRESULT							GetSapleWrapperData(AVFrame* pFrame, IMediaSample** pSample, REFERENCE_TIME* rtStart, REFERENCE_TIME* rtStop);
+	HRESULT							GetSampleWrapperData(AVFrame* pFrame, IMediaSample** pSample, REFERENCE_TIME* rtStart, REFERENCE_TIME* rtStop);
 
 	GUID							m_guidDecoder;
 	CMPCVideoDecFilter*				m_pFilter;
