@@ -222,6 +222,10 @@ start:
 					pPinOut.Attach(DNew COggTheoraOutputPin(page, name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 					streamMoreInit[page.m_hdr.bitstream_serial_number] = TRUE;
+				} else if (type == 0x81) {
+					if (COggTheoraOutputPin* pOggPin = dynamic_cast<COggTheoraOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
+						pOggPin->AddComment(page.GetData() + 7, page.GetCount() - 7);
+					}
 				}
 			} else if (type == 1 && (page.m_hdr.header_type_flag & OggPageHeader::first)) {
 				if (PinNotExist) {
