@@ -267,6 +267,12 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					fourcc_2	= FCC('I444'); // for madVR
 					bpp			= 24;
 				}
+				// 10-bit
+				else if (str == "420p10") {
+					fourcc		= MAKEFOURCC('Y', '3', 11 , 10 );
+					bpp			= 24;
+					mt.subtype	= MEDIASUBTYPE_LAV_RAWVIDEO;
+				}
 				else { // unsuppurted colour space
 					fourcc		= 0;
 					bpp			= 0;
@@ -314,7 +320,9 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		mt.SetSampleSize(m_framesize);
 
 		vih2->bmiHeader.biCompression = fourcc;
-		mt.subtype = FOURCCMap(fourcc);
+		if (mt.subtype != MEDIASUBTYPE_LAV_RAWVIDEO) {
+			mt.subtype = FOURCCMap(fourcc);
+		}
 		mts.Add(mt);
 
 		if (fourcc_2) {
