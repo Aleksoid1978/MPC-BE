@@ -1,36 +1,21 @@
 ﻿MPC-BE – универсальный проигрыватель аудио и видеофайлов для операционной системы Windows. Этот проект имеет свою независимую разработку на базе оригинального кода «Media Player Classic» (Gabest) и «Media Player Classic - Home Cinema» (Casimir666). 
-MPC-BE имеет внушительный набор аудио-видео фильтров, который позволяет ему воспроизводить практически все существующие форматы медиафайлов.
--------------------
 
 
-Поддерживаемые Операционные Системы:
------------------------------
-* Windows XP SP2, Windows Vista, Windows 7, Windows 8, Windows 8.1 32bit/64bit
-
-
-Системные Требования:
+Системные требования:
 ---------------------
 * Процессор с поддержкой SSE
-* Рекомендуется наличие DirectX 9.0c runtime (июнь 2010 года).
-  Веб-инсталлятор:  http://www.microsoft.com/download/en/details.aspx?id=35
-  Полный пакет:     http://www.microsoft.com/download/en/details.aspx?id=8109
+* Windows XP SP2, Vista, 7, 8, 8.1, 10 32-bit/64-bit
 
+////////////////////////////////////////////////////////////////////////////// 
 
 MPC-BE is a free and open source audio and video player for Windows.
 MPC-BE is based on the original Guliverkli project and "Media Player Classic Home Cinema" project, contains additional features and bug fixes.
 
 
-Supported Operating Systems:
------------------------------
-* Windows XP SP2, Windows Vista, Windows 7, Windows 8, Windows 8.1 32bit/64bit
-
-
-System Requirements:
+System requirements:
 ---------------------
 * An SSE capable CPU
-* Recommended to have DirectX 9.0c runtime.
-  Web installer:  http://www.microsoft.com/download/en/details.aspx?id=35
-  Full:           http://www.microsoft.com/download/en/details.aspx?id=8109
+* Windows XP SP2, Vista, 7, 8, 8.1, 10 32-bit/64-bit
 
 
 Links:

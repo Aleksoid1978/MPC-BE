@@ -1,16 +1,17 @@
-﻿Based on the original version (C) 2002-2006 by Gabest (e-mail unknown)
+﻿Project based on the original version (C) 2002-2006 by Gabest (e-mail unknown)
 On the basis of the source code of the "Media Player Classic Home Cinema", Casimir666 (casimir666@users.sourceforge.net).
 The GUI on the basis of the original patch Bobdynlan (bobdynlan@users.sourceforge.net), with the adaptation of Leo1000 (leothousan@users.sourceforge.net).
 
 Active: (with SVN commit rights)
 --------
 aleksoid (Admin, Senior Software Engineer, Forum moderator, Code) - Aleksoid1978@mail.ru, Russia
+Angel (Admin) - Russia
 arestarh1986 (Documentation) - Ukraine
 Dimbat (Design) - zingerus@mail.ru, Russia
 judelaw (Code) - judelaw@mpc-next.ru, Ukraine
 kinjalka (Code) - Russia
 szl/alexins (Software Engineer Technologist) - mpcbe@outlook.com, icq:6531931, Republic of Slovenia
-v0lt (Admin, Forum moderator, Code)
+v0lt (Admin, Forum moderator, Code) - Russia
 u_shell (Documentacion translator) - Russia
 
 Inactive:
