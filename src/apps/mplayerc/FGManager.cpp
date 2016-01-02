@@ -2480,6 +2480,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_YV12);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_YV16);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_YV24);
+	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_LAV_RAWVIDEO);
 	m_transform.AddTail(pFGF);
 
 	// Keep MPEG decoder after DXVA/ffmpeg decoder !
