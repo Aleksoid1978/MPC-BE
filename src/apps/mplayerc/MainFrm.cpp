@@ -341,7 +341,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_VIEW_PRESETS_COMPACT, OnViewCompact)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_PRESETS_COMPACT, OnUpdateViewCompact)
 	ON_COMMAND(ID_VIEW_PRESETS_NORMAL, OnViewNormal)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_PRESETS_NORMAL, OnUpdateViewNormal)
 	ON_COMMAND(ID_VIEW_FULLSCREEN, OnViewFullscreen)
 	ON_COMMAND(ID_VIEW_FULLSCREEN_SECONDARY, OnViewFullscreenSecondary)
 	ON_COMMAND(ID_VIEW_FULLSCREEN, OnViewFullscreen)
@@ -7291,7 +7290,7 @@ void CMainFrame::OnUpdateViewShaderEditor(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewMinimal()
 {
-	while (AfxGetAppSettings().iCaptionMenuMode!=MODE_BORDERLESS) {
+	while (AfxGetAppSettings().iCaptionMenuMode != MODE_BORDERLESS) {
 		SendMessage(WM_COMMAND, ID_VIEW_CAPTIONMENU);
 	}
 	ShowControls(CS_NONE);
@@ -7303,10 +7302,10 @@ void CMainFrame::OnUpdateViewMinimal(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewCompact()
 {
-	while (AfxGetAppSettings().iCaptionMenuMode!=MODE_FRAMEONLY) {
+	while (AfxGetAppSettings().iCaptionMenuMode != MODE_FRAMEONLY) {
 		SendMessage(WM_COMMAND, ID_VIEW_CAPTIONMENU);
 	}
-	ShowControls(CS_SEEKBAR|CS_TOOLBAR);
+	ShowControls(CS_SEEKBAR | CS_TOOLBAR);
 }
 
 void CMainFrame::OnUpdateViewCompact(CCmdUI* pCmdUI)
@@ -7315,17 +7314,13 @@ void CMainFrame::OnUpdateViewCompact(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewNormal()
 {
-	while (AfxGetAppSettings().iCaptionMenuMode!=MODE_SHOWCAPTIONMENU) {
+	while (AfxGetAppSettings().iCaptionMenuMode != MODE_SHOWCAPTIONMENU) {
 		SendMessage(WM_COMMAND, ID_VIEW_CAPTIONMENU);
 	}
-	ShowControls(CS_SEEKBAR|CS_TOOLBAR|CS_STATUSBAR);
+	ShowControls(CS_SEEKBAR | CS_TOOLBAR | CS_STATUSBAR);
 }
 
-void CMainFrame::OnUpdateViewNormal(CCmdUI* pCmdUI)
-{
-}
-
-#define IsD3DFS (IsD3DFullScreenMode() || (m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly && !m_bFullScreen && (m_pD3DFS && (s.fD3DFullscreen || (s.nCLSwitches & CLSW_D3DFULLSCREEN)))))
+#define IsD3DFS (IsD3DFullScreenMode() || (s.IsD3DFullscreen() && !(m_eMediaLoadState == MLS_LOADED && m_bAudioOnly) && !m_bFullScreen))
 void CMainFrame::OnViewFullscreen()
 {
 	const CAppSettings& s = AfxGetAppSettings();
