@@ -232,8 +232,7 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt,
 			pmt->SetVariableSize();
 
 			delete [] vi;
-		}
-		else if (type == mpeg2) {
+		} else if (type == mpeg2) {
 			pmt->subtype					= MEDIASUBTYPE_MPEG2_VIDEO;
 			pmt->formattype					= FORMAT_MPEG2_VIDEO;
 			int len							= FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + int(shlen + shextlen);
@@ -265,8 +264,6 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt,
 			pmt->SetVariableSize();
 
 			delete [] vi;
-		} else {
-			return false;
 		}
 	}
 
@@ -288,21 +285,19 @@ bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt/* = NULL*/, b
 	int bitrate = 0;
 
 	for (;;) {
-		if (find_sync) {
-			for (; len >= 4 && BitRead(syncbits, true) != (1 << syncbits) - 1; len--) {
-				BitRead(8);
-			}
-		} else {
-			if (BitRead(syncbits, true) != (1 << syncbits) - 1) {
-				return false;
-			}
+		if (!find_sync && (BitRead(syncbits, true) != (1 << syncbits) - 1)) {
+			return false;
+		}
+
+		for (; len >= 4 && BitRead(syncbits, true) != (1 << syncbits) - 1; len--) {
+			BitRead(8);
 		}
 
 		if (len < 4) {
 			return false;
 		}
 
-		__int64 pos = GetPos();
+		const __int64 pos = GetPos();
 
 		h.sync = BitRead(11);
 		h.version = BitRead(2);
@@ -488,41 +483,47 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 {
 	memset(&h, 0, sizeof(h));
 
-	if (!find_sync && (BitRead(12, true) != 0xfff)) {
-		return false;
-	}
+	for (;;) {
+		if (!find_sync && (BitRead(12, true) != 0xfff)) {
+			return false;
+		}
 
-	for (; len >= 7 && BitRead(12, true) != 0xfff; len--) {
-		BitRead(8);
-	}
+		for (; len >= 7 && BitRead(12, true) != 0xfff; len--) {
+			BitRead(8);
+		}
 
-	if (len < 7) {
-		return false;
-	}
+		if (len < 7) {
+			return false;
+		}
 
-	h.sync = BitRead(12);
-	h.version = BitRead(1);
-	h.layer = BitRead(2);
-	h.fcrc = BitRead(1);
-	h.profile = BitRead(2);
-	h.freq = BitRead(4);
-	h.privatebit = BitRead(1);
-	h.channels = BitRead(3);
-	h.original = BitRead(1);
-	h.home = BitRead(1);
+		const __int64 pos = GetPos();
 
-	h.copyright_id_bit = BitRead(1);
-	h.copyright_id_start = BitRead(1);
-	h.aac_frame_length = BitRead(13);
-	h.adts_buffer_fullness = BitRead(11);
-	h.no_raw_data_blocks_in_frame = BitRead(2);
+		h.sync = BitRead(12);
+		h.version = BitRead(1);
+		h.layer = BitRead(2);
+		h.fcrc = BitRead(1);
+		h.profile = BitRead(2);
+		h.freq = BitRead(4);
+		h.privatebit = BitRead(1);
+		h.channels = BitRead(3);
+		h.original = BitRead(1);
+		h.home = BitRead(1);
 
-	if (h.fcrc == 0) {
-		h.crc = (WORD)BitRead(16);
-	}
+		h.copyright_id_bit = BitRead(1);
+		h.copyright_id_start = BitRead(1);
+		h.aac_frame_length = BitRead(13);
+		h.adts_buffer_fullness = BitRead(11);
+		h.no_raw_data_blocks_in_frame = BitRead(2);
 
-	if (h.layer != 0 || h.freq > 12 || h.aac_frame_length <= (h.fcrc == 0 ? 9 : 7) || h.channels < 1) {
-		return false;
+		if (h.fcrc == 0) {
+			h.crc = (WORD)BitRead(16);
+		}
+
+		if (h.layer != 0 || h.freq > 12 || h.aac_frame_length <= (h.fcrc == 0 ? 9 : 7) || h.channels < 1) {
+			AGAIN_OR_EXIT
+		}
+
+		break;
 	}
 
 	static int freq[] = {96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350};
