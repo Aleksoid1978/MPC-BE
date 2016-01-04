@@ -165,7 +165,7 @@ HRESULT CMpaSplitterFile::Init()
 		}
 	}
 
-	searchlen = (int)min(GetAvailable(), 512);
+	searchlen = (int)min(GetAvailable(), KILOBYTE);
 	Seek(m_startpos);
 
 	if (m_mode == none && Read(m_aachdr, searchlen, &m_mt)) {
