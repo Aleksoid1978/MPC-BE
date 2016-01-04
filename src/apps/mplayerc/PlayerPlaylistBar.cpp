@@ -265,20 +265,40 @@ static void StringToPaths(const CString& curentdir, const CString& str, CAtlArra
 		if (s.GetLength() == 0) {
 			continue;
 		}
-		CPath path = curentdir;
-		path.Append(s);
-		path.Canonicalize();
-		path.AddBackslash();
-
-		size_t index = 0;
-		size_t count = paths.GetCount();
-		for (; index < count; index++) {
-			if (path.m_strPath.CompareNoCase(paths[index]) == 0) {
-				break;
-			}
+		int bs = s.ReverseFind('\\');
+		int a = s.Find('*');
+		if (a >= 0 && a < bs) {
+			continue; // the asterisk can only be in the last folder
 		}
-		if (index == count) {
-			paths.Add(path);
+
+		CPath path = curentdir + s;
+		path.Canonicalize();
+
+		WIN32_FIND_DATA fd = { 0 };
+		HANDLE hFind = FindFirstFile(path, &fd);
+		if (hFind == INVALID_HANDLE_VALUE) {
+			continue;
+		} else {
+			CPath parentdir = path + L"\\..";
+			parentdir.Canonicalize();
+
+			do {
+				if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && wcscmp(fd.cFileName, L".") && wcscmp(fd.cFileName, L"..")) {
+					CString folder = parentdir + '\\' + fd.cFileName + '\\';
+
+					size_t index = 0;
+					size_t count = paths.GetCount();
+					for (; index < count; index++) {
+						if (folder.CompareNoCase(paths[index]) == 0) {
+							break;
+						}
+					}
+					if (index == count) {
+						paths.Add(folder);
+					}
+				}
+			} while (FindNextFile(hFind, &fd));
+			FindClose(hFind);
 		}
 	} while (pos > 0);
 }
