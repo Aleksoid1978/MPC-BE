@@ -2544,7 +2544,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 			avpkt.pts	= rtStartIn;
 			avpkt.dts	= rtStopIn;
 			if (rtStartIn != INVALID_TIME && rtStopIn != INVALID_TIME) {
-				avpkt.duration = (int)(rtStopIn - rtStartIn);
+				avpkt.duration = rtStopIn - rtStartIn;
 			} else {
 				avpkt.duration = 0;
 			}
@@ -2617,7 +2617,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 					avpkt.pts		= rtStart;
 					avpkt.dts		= rtStop;
 					if (rtStart != INVALID_TIME && rtStop != INVALID_TIME) {
-						avpkt.duration = (int)(rtStop - rtStart);
+						avpkt.duration = rtStop - rtStart;
 					} else {
 						avpkt.duration = 0;
 					}
@@ -2693,11 +2693,6 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 		if ((pIn && pIn->IsPreroll() == S_OK) || rtStart < 0) {
 			Continue;
-		}
-
-		if (m_pAVCtx->frame_number == 1 && m_FormatConverter.FormatChanged(&m_PixelFormat, (AVPixelFormat*)&m_pFrame->format)) {
-			ChangeOutputMediaFormat(2);
-			m_PixelFormat = (AVPixelFormat)m_pFrame->format;
 		}
 
 		CComPtr<IMediaSample> pOut;
