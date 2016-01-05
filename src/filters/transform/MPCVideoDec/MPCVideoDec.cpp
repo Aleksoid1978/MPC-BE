@@ -2802,6 +2802,9 @@ HRESULT CMPCVideoDecFilter::ReopenVideo()
 		m_bUseDXVA = false;
 		avcodec_close(m_pAVCtx);
 		m_pAVCtx->using_dxva = false;
+		m_pAVCtx->get_format = avcodec_default_get_format;
+		m_pAVCtx->get_buffer2 = avcodec_default_get_buffer2;
+		
 		if (m_nCodecId == AV_CODEC_ID_H264) {
 			m_pAVCtx->flags2 &= ~CODEC_FLAG2_SHOW_ALL;
 		}
