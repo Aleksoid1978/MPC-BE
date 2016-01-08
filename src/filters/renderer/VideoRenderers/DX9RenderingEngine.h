@@ -80,6 +80,7 @@ namespace DSObjects
 		CComPtr<IDirect3DDevice9>	m_pD3DDev;
 		CComPtr<IDirect3DDevice9Ex>	m_pD3DDevEx;
 		UINT						m_CurrentAdapter;
+		UINT						m_AdapterCount;
 		D3DCAPS9					m_Caps;
 		LPCSTR						m_ShaderProfile;
 		D3DFORMAT					m_BackbufferFmt;
