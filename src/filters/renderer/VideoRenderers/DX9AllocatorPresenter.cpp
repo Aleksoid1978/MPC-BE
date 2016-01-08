@@ -521,6 +521,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		return E_UNEXPECTED;
 	}
 
+	m_AdapterCount = m_pD3D->GetAdapterCount();
+
 	UINT currentAdapter = GetAdapter(m_pD3D);
 	bool bTryToReset = (currentAdapter == m_CurrentAdapter);
 
@@ -1721,6 +1723,33 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 {
 	DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::DisplayChange()"));
+
+	CComPtr<IDirect3D9>   pD3D;
+	CComPtr<IDirect3D9Ex> pD3DEx;
+
+	if (m_pDirect3DCreate9Ex) {
+		m_pDirect3DCreate9Ex(D3D_SDK_VERSION, &pD3DEx);
+		if (!pD3DEx) {
+			m_pDirect3DCreate9Ex(D3D9b_SDK_VERSION, &pD3DEx);
+		}
+	}
+	if (!pD3DEx) {
+		pD3D.Attach(Direct3DCreate9(D3D_SDK_VERSION));
+		if (!pD3D) {
+			pD3D.Attach(Direct3DCreate9(D3D9b_SDK_VERSION));
+		}
+	} else {
+		pD3D = pD3DEx;
+	}
+
+	if (pD3D) {
+		const UINT adapterCount = pD3D->GetAdapterCount();
+		if (adapterCount != m_AdapterCount) {
+			m_AdapterCount = adapterCount;
+			m_pD3DEx = pD3DEx;
+			m_pD3D = pD3D;
+		}
+	}
 
 	if (FAILED(ResetD3D9Device())) {
 		DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::DisplayChange() - ResetD3D9Device() FAILED, send reset request"));

@@ -136,6 +136,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_nNbDXSurface(1)
 	, m_nCurSurface(0)
 	, m_CurrentAdapter(UINT_MAX)
+	, m_AdapterCount(0)
 	, m_D3D9VendorId(0)
 	, m_VideoBufferFmt(D3DFMT_X8R8G8B8)
 	, m_SurfaceFmt(D3DFMT_X8R8G8B8)
