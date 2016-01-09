@@ -611,7 +611,7 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 			if (vih2.dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
 				// http://msdn.microsoft.com/en-us/library/windows/desktop/ms698715%28v=vs.85%29.aspx
 				const LPCTSTR nominalrange[] = { L"Unknown", L"0-255", L"16-235", L"48-208" };
-				const LPCTSTR transfermatrix[] = { L"Unknown", L"BT.709", L"BT.601", L"SMPTE 240M" };
+				const LPCTSTR transfermatrix[] = { L"Unknown", L"BT.709", L"BT.601", L"SMPTE 240M", L"BT.2020" };
 				DXVA2_ExtendedFormat exfmt;
 				exfmt.value = vih2.dwControlFlags;
 
