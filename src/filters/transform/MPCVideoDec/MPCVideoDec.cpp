@@ -1176,6 +1176,39 @@ void CMPCVideoDecFilter::GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtSt
 	}
 }
 
+bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame)
+{
+	CheckPointer(pSample, false);
+	CheckPointer(pFrame, false);
+
+	CComPtr<IMediaSideData>pMediaSideData;
+	if (SUCCEEDED(pSample->QueryInterface(&pMediaSideData))) {
+		AVFrameSideData* sdHDR = av_frame_get_side_data(pFrame, AV_FRAME_DATA_HDR_MASTERING_INFO);
+		if (sdHDR) {
+			if (sdHDR->size == 24) {
+				MediaSideDataHDR hdr = { 0 };
+				CGolombBuffer gb(sdHDR->data, sdHDR->size);
+				for (int i = 0; i < 3; i++) {
+					hdr.display_primaries_x[i] = gb.BitRead(16) * 0.00002;
+					hdr.display_primaries_y[i] = gb.BitRead(16) * 0.00002;
+				}
+				hdr.white_point_x = gb.BitRead(16) * 0.00002;
+				hdr.white_point_y = gb.BitRead(16) * 0.00002;
+				hdr.max_display_mastering_luminance = gb.BitRead(32) * 0.0001;
+				hdr.min_display_mastering_luminance = gb.BitRead(32) * 0.0001;
+
+				pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)&hdr, sizeof(hdr));
+
+				return true;
+			} else {
+				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR data of an unexpected size (%d)", sdHDR->size));
+			}
+		}
+	}
+
+	return false;
+}
+
 void CMPCVideoDecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& RealWidth, int& RealHeight)
 {
 	RealWidth	= PictWidth();
@@ -2747,6 +2780,8 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 		pOut->SetTime(&rtStart, &rtStop);
 		pOut->SetMediaTime(NULL, NULL);
 		SetTypeSpecificFlags(pOut);
+
+		AddFrameSideData(pOut, m_pFrame);
 
 		av_frame_unref(m_pFrame);
 

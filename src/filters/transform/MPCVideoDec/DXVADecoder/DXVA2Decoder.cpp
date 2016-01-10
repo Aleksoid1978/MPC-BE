@@ -219,6 +219,8 @@ HRESULT CDXVA2Decoder::DeliverDXVAFrame()
 		bSizeChanged = true;
 	}
 
+	m_pFilter->AddFrameSideData(pSample, pFrame);
+
 	hr = m_pFilter->GetOutputPin()->Deliver(pSample);
 
 	if (bSizeChanged && biHeight) {
