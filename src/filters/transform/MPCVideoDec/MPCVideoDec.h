@@ -32,6 +32,8 @@
 #include "FormatConverter.h"
 #include "../../../apps/mplayerc/FilterEnum.h"
 
+#include <IMediaSideData.h>
+
 #define MPCVideoDecName L"MPC Video Decoder"
 #define MPCVideoConvName L"MPC Video Converter"
 
@@ -189,6 +191,7 @@ public:
 	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	void			GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	bool			IsAVI();
+	bool			AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame);
 
 	// === Overriden DirectShow functions
 	HRESULT			SetMediaType(PIN_DIRECTION direction, const CMediaType *pmt);
