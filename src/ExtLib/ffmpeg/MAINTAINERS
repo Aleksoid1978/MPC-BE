@@ -71,6 +71,7 @@ Internal Interfaces:
   libavutil/common.h                    Michael Niedermayer
 
 Other:
+  aes_ctr.c, aes_ctr.h                  Eran Kornblau
   bprint                                Nicolas George
   bswap.h
   des                                   Reimar Doeffinger
@@ -303,7 +304,6 @@ Codecs:
 Hardware acceleration:
   crystalhd.c                           Philip Langdale
   dxva2*                                Hendrik Leppkes, Laurent Aimar
-  libstagefright.cpp                    Mohamed Naufal
   vaapi*                                Gwenole Beauchesne
   vda*                                  Sebastien Zwickert
   vdpau*                                Philip Langdale, Carl Eugen Hoyos
@@ -458,6 +458,7 @@ Muxers/Demuxers:
   mm.c                                  Peter Ross
   mov.c                                 Michael Niedermayer, Baptiste Coudurier
   movenc.c                              Baptiste Coudurier, Matthieu Bouron
+  movenccenc.c                          Eran Kornblau
   mpc.c                                 Kostya Shishkov
   mpeg.c                                Michael Niedermayer
   mpegenc.c                             Michael Niedermayer

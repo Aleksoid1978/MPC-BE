@@ -343,6 +343,7 @@ SRCS_LC = \
 	libavcodec/png.c \
 	libavcodec/pngdec.c \
 	libavcodec/pngdsp.c \
+	libavcodec/profiles.c \
 	libavcodec/pthread.c \
 	libavcodec/pthread_frame.c \
 	libavcodec/pthread_slice.c \

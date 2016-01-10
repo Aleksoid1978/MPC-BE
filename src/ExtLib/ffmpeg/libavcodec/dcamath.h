@@ -16,35 +16,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/**
- * @file
- * @ingroup lavu
- * Utility Preprocessor macros
- */
+#include "libavutil/common.h"
 
-#ifndef AVUTIL_MACROS_H
-#define AVUTIL_MACROS_H
 
-/**
- * @addtogroup preproc_misc Preprocessor String Macros
- *
- * String manipulation macros
- *
- * @{
- */
+// clip a signed integer into the (-2^23), (2^23-1) range
+static inline int dca_clip23(int a)
+{
+    return av_clip_intp2(a, 23);
+}
 
-#define AV_STRINGIFY(s)         AV_TOSTRING(s)
-#define AV_TOSTRING(s) #s
+static inline int32_t dca_norm(int64_t a, int bits)
+{
+    if (bits > 0)
+        return (int32_t)((a + (INT64_C(1) << (bits - 1))) >> bits);
+    else
+        return (int32_t)a;
+}
 
-#define AV_GLUE(a, b) a ## b
-#define AV_JOIN(a, b) AV_GLUE(a, b)
-
-/**
- * @}
- */
-
-#define AV_PRAGMA(s) _Pragma(#s)
-
-#define FFALIGN(x, a) (((x)+(a)-1)&~((a)-1))
-
-#endif /* AVUTIL_MACROS_H */
+static inline int64_t dca_round(int64_t a, int bits)
+{
+    if (bits > 0)
+        return (a + (INT64_C(1) << (bits - 1))) & ~((INT64_C(1) << bits) - 1);
+    else
+        return a;
+}

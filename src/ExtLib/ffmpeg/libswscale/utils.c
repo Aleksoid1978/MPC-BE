@@ -1202,6 +1202,12 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
                srcW, srcH, dstW, dstH);
         return AVERROR(EINVAL);
     }
+    if (flags & SWS_FAST_BILINEAR) {
+        if (srcW < 8 || dstW < 8) {
+            flags ^= SWS_FAST_BILINEAR | SWS_BILINEAR;
+            c->flags = flags;
+        }
+    }
 
     if (!dstFilter)
         dstFilter = &dummyFilter;
@@ -1802,6 +1808,9 @@ fail: // FIXME replace things by appropriate error codes
         int tmpW = sqrt(srcW * (int64_t)dstW);
         int tmpH = sqrt(srcH * (int64_t)dstH);
         enum AVPixelFormat tmpFormat = AV_PIX_FMT_YUV420P;
+
+        if (isALPHA(srcFormat))
+            tmpFormat = AV_PIX_FMT_YUVA420P;
 
         if (srcW*(int64_t)srcH <= 4LL*dstW*dstH)
             return AVERROR(EINVAL);
