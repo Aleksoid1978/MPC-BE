@@ -184,16 +184,16 @@ static void h264_initialise_ref_list(H264Context *h, H264SliceContext *sl)
 #ifdef TRACE
     for (i = 0; i < sl->ref_count[0]; i++) {
         ff_tlog(h->avctx, "List0: %s fn:%d 0x%p\n",
-                (sl->ref_list[0][i].long_ref ? "LT" : "ST"),
+                (sl->ref_list[0][i].parent ? (sl->ref_list[0][i].parent->long_ref ? "LT" : "ST") : "??"),
                 sl->ref_list[0][i].pic_id,
-                sl->ref_list[0][i].f->data[0]);
+                sl->ref_list[0][i].data[0]);
     }
     if (sl->slice_type_nos == AV_PICTURE_TYPE_B) {
         for (i = 0; i < sl->ref_count[1]; i++) {
             ff_tlog(h->avctx, "List1: %s fn:%d 0x%p\n",
-                    (sl->ref_list[1][i].long_ref ? "LT" : "ST"),
+                    (sl->ref_list[1][i].parent ? (sl->ref_list[1][i].parent->long_ref ? "LT" : "ST") : "??"),
                     sl->ref_list[1][i].pic_id,
-                    sl->ref_list[1][i].f->data[0]);
+                    sl->ref_list[1][i].data[0]);
         }
     }
 #endif
@@ -208,6 +208,8 @@ static void h264_initialise_ref_list(H264Context *h, H264SliceContext *sl)
             }
         }
     }
+    for (i = 0; i < sl->list_count; i++)
+        h->default_ref[i] = sl->ref_list[i][0];
 }
 
 static void print_short_term(H264Context *h);
@@ -266,7 +268,7 @@ int ff_h264_decode_ref_pic_list_reordering(H264Context *h, H264SliceContext *sl)
                 switch (modification_of_pic_nums_idc) {
                 case 0:
                 case 1: {
-                    const unsigned int abs_diff_pic_num = get_ue_golomb(&sl->gb) + 1;
+                    const unsigned int abs_diff_pic_num = get_ue_golomb_long(&sl->gb) + 1;
                     int frame_num;
 
                     if (abs_diff_pic_num > h->max_pic_num) {
@@ -301,7 +303,7 @@ int ff_h264_decode_ref_pic_list_reordering(H264Context *h, H264SliceContext *sl)
 
                     long_idx = pic_num_extract(h, pic_id, &pic_structure);
 
-                    if (long_idx > 31) {
+                    if (long_idx > 31U) {
                         av_log(h->avctx, AV_LOG_ERROR,
                                "long_term_pic_idx overflow\n");
                         return AVERROR_INVALIDDATA;
@@ -351,10 +353,14 @@ int ff_h264_decode_ref_pic_list_reordering(H264Context *h, H264SliceContext *sl)
             if (   !sl->ref_list[list][index].parent
                 || (!FIELD_PICTURE(h) && (sl->ref_list[list][index].reference&3) != 3)) {
                 int i;
-                av_log(h->avctx, AV_LOG_ERROR, "Missing reference picture\n");
+                av_log(h->avctx, AV_LOG_ERROR, "Missing reference picture, default is %d\n", h->default_ref[list].poc);
                 for (i = 0; i < FF_ARRAY_ELEMS(h->last_pocs); i++)
                     h->last_pocs[i] = INT_MIN;
-                return -1;
+                if (h->default_ref[list].parent
+                    && !(!FIELD_PICTURE(h) && (h->default_ref[list].reference&3) != 3))
+                    sl->ref_list[list][index] = h->default_ref[list];
+                else
+                    return -1;
             }
             av_assert0(av_buffer_get_ref_count(sl->ref_list[list][index].parent->f->buf[0]) > 0);
         }
@@ -524,6 +530,7 @@ void ff_h264_remove_all_refs(H264Context *h)
     }
     h->short_ref_count = 0;
 
+    memset(h->default_ref, 0, sizeof(h->default_ref));
     for (i = 0; i < h->nb_slice_ctx; i++) {
         H264SliceContext *sl = &h->slice_ctx[i];
         sl->list_count = sl->ref_count[0] = sl->ref_count[1] = 0;
@@ -843,7 +850,7 @@ int ff_h264_decode_ref_pic_marking(H264Context *h, GetBitContext *gb,
                 mmco[i].opcode = opcode;
                 if (opcode == MMCO_SHORT2UNUSED || opcode == MMCO_SHORT2LONG) {
                     mmco[i].short_pic_num =
-                        (h->curr_pic_num - get_ue_golomb(gb) - 1) &
+                        (h->curr_pic_num - get_ue_golomb_long(gb) - 1) &
                             (h->max_pic_num - 1);
 #if 0
                     if (mmco[i].short_pic_num >= h->short_ref_count ||

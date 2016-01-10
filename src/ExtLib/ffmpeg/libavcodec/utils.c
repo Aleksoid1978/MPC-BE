@@ -1168,6 +1168,7 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
 {
     int ret = 0;
     AVDictionary *tmp = NULL;
+    const AVPixFmtDescriptor *pixdesc;
 
     if (avcodec_is_open(avctx))
         return 0;
@@ -1453,6 +1454,13 @@ FF_ENABLE_DEPRECATION_WARNINGS
             goto free_and_end;
         }
         if(avctx->codec_type == AVMEDIA_TYPE_VIDEO) {
+            pixdesc = av_pix_fmt_desc_get(avctx->pix_fmt);
+            if (    avctx->bits_per_raw_sample < 0
+                || (avctx->bits_per_raw_sample > 8 && pixdesc->comp[0].depth <= 8)) {
+                av_log(avctx, AV_LOG_WARNING, "Specified bit depth %d not possible with the specified pixel formats depth %d\n",
+                    avctx->bits_per_raw_sample, pixdesc->comp[0].depth);
+                avctx->bits_per_raw_sample = pixdesc->comp[0].depth;
+            }
             if (avctx->width <= 0 || avctx->height <= 0) {
                 av_log(avctx, AV_LOG_ERROR, "dimensions not set\n");
                 ret = AVERROR(EINVAL);
@@ -2441,7 +2449,7 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
         } else {
             avctx->internal->pkt = &pkt_recoded;
 
-            if (avctx->pkt_timebase.den && avpkt->pts != AV_NOPTS_VALUE)
+            if (avctx->pkt_timebase.num && avpkt->pts != AV_NOPTS_VALUE)
                 sub->pts = av_rescale_q(avpkt->pts,
                                         avctx->pkt_timebase, AV_TIME_BASE_Q);
             ret = avctx->codec->decode(avctx, sub, got_sub_ptr, &pkt_recoded);
@@ -2675,7 +2683,6 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
     const char *codec_type;
     const char *codec_name;
     const char *profile = NULL;
-    const AVCodec *p;
     int64_t bitrate;
     int new_line = 0;
     AVRational display_aspect_ratio;
@@ -2685,15 +2692,7 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
         return;
     codec_type = av_get_media_type_string(enc->codec_type);
     codec_name = avcodec_get_name(enc->codec_id);
-    if (enc->profile != FF_PROFILE_UNKNOWN) {
-        if (enc->codec)
-            p = enc->codec;
-        else
-            p = encode ? avcodec_find_encoder(enc->codec_id) :
-                        avcodec_find_decoder(enc->codec_id);
-        if (p)
-            profile = av_get_profile_name(p, enc->profile);
-    }
+    profile = avcodec_profile_name(enc->codec_id, enc->profile);
 
     snprintf(buf, buf_size, "%s: %s", codec_type ? codec_type : "unknown",
              codec_name);
@@ -2862,6 +2861,21 @@ const char *av_get_profile_name(const AVCodec *codec, int profile)
         return NULL;
 
     for (p = codec->profiles; p->profile != FF_PROFILE_UNKNOWN; p++)
+        if (p->profile == profile)
+            return p->name;
+
+    return NULL;
+}
+
+const char *avcodec_profile_name(enum AVCodecID codec_id, int profile)
+{
+    const AVCodecDescriptor *desc = avcodec_descriptor_get(codec_id);
+    const AVProfile *p;
+
+    if (profile == FF_PROFILE_UNKNOWN || !desc || !desc->profiles)
+        return NULL;
+
+    for (p = desc->profiles; p->profile != FF_PROFILE_UNKNOWN; p++)
         if (p->profile == profile)
             return p->name;
 

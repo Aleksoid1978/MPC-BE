@@ -451,6 +451,10 @@ static int output_configure(AACContext *ac,
         int type =         layout_map[i][0];
         int id =           layout_map[i][1];
         id_map[type][id] = type_counts[type]++;
+        if (id_map[type][id] >= MAX_ELEM_ID) {
+            avpriv_request_sample(ac->avctx, "Remapped id too large\n");
+            return AVERROR_PATCHWELCOME;
+        }
     }
     // Try to sniff a reasonable channel order, otherwise output the
     // channels in the order the PCE declared them.
@@ -3231,16 +3235,4 @@ static const AVClass aac_decoder_class = {
     .item_name  = av_default_item_name,
     .option     = options,
     .version    = LIBAVUTIL_VERSION_INT,
-};
-
-static const AVProfile profiles[] = {
-    { FF_PROFILE_AAC_MAIN,  "Main"     },
-    { FF_PROFILE_AAC_LOW,   "LC"       },
-    { FF_PROFILE_AAC_SSR,   "SSR"      },
-    { FF_PROFILE_AAC_LTP,   "LTP"      },
-    { FF_PROFILE_AAC_HE,    "HE-AAC"   },
-    { FF_PROFILE_AAC_HE_V2, "HE-AACv2" },
-    { FF_PROFILE_AAC_LD,    "LD"       },
-    { FF_PROFILE_AAC_ELD,   "ELD"      },
-    { FF_PROFILE_UNKNOWN },
 };

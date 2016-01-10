@@ -1,4 +1,5 @@
 /*
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -16,35 +17,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/**
- * @file
- * @ingroup lavu
- * Utility Preprocessor macros
- */
+#ifndef AVCODEC_PROFILES_H
+#define AVCODEC_PROFILES_H
 
-#ifndef AVUTIL_MACROS_H
-#define AVUTIL_MACROS_H
+#include "avcodec.h"
 
-/**
- * @addtogroup preproc_misc Preprocessor String Macros
- *
- * String manipulation macros
- *
- * @{
- */
+extern const AVProfile ff_aac_profiles[];
+extern const AVProfile ff_dca_profiles[];
+extern const AVProfile ff_h264_profiles[];
+extern const AVProfile ff_hevc_profiles[];
+extern const AVProfile ff_jpeg2000_profiles[];
+extern const AVProfile ff_mpeg2_video_profiles[];
+extern const AVProfile ff_mpeg4_video_profiles[];
+extern const AVProfile ff_vc1_profiles[];
+extern const AVProfile ff_vp9_profiles[];
 
-#define AV_STRINGIFY(s)         AV_TOSTRING(s)
-#define AV_TOSTRING(s) #s
-
-#define AV_GLUE(a, b) a ## b
-#define AV_JOIN(a, b) AV_GLUE(a, b)
-
-/**
- * @}
- */
-
-#define AV_PRAGMA(s) _Pragma(#s)
-
-#define FFALIGN(x, a) (((x)+(a)-1)&~((a)-1))
-
-#endif /* AVUTIL_MACROS_H */
+#endif
