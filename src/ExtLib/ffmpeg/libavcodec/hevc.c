@@ -2594,6 +2594,18 @@ static int set_side_data(HEVCContext *s)
         s->avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
     }
 
+    // ==> Start patch MPC
+    if (s->sei_mastering_display_info) {
+        AVFrameSideData* sd = av_frame_new_side_data(out,
+                                                     AV_FRAME_DATA_HDR_MASTERING_INFO,
+                                                     s->sei_mastering_display_info_size);
+        if (sd)
+            memcpy(sd->data, s->sei_mastering_display_info, s->sei_mastering_display_info_size);
+        av_freep(&s->sei_mastering_display_info);
+        s->sei_mastering_display_info_size = 0;
+    }
+    // ==> End patch MPC
+
     return 0;
 }
 

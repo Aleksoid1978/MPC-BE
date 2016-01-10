@@ -112,6 +112,13 @@ enum AVFrameSideDataType {
      * enum AVAudioServiceType defined in avcodec.h.
      */
     AV_FRAME_DATA_AUDIO_SERVICE_TYPE,
+
+    // ==> Start patch MPC
+    /**
+     * HDR Mastering Display Information, see HEVC spec
+     */
+    AV_FRAME_DATA_HDR_MASTERING_INFO,
+    // ==> End patch MPC
 };
 
 enum AVActiveFormatDescription {
