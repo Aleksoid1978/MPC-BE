@@ -260,6 +260,24 @@ static int active_parameter_sets(HEVCContext *s)
     return 0;
 }
 
+// ==> Start patch MPC
+static int decode_nal_sei_mastering_display_info(HEVCContext *s, int size)
+{
+    GetBitContext *gb = &s->HEVClc->gb;
+    int i, ret;
+
+    ret = av_reallocp(&s->sei_mastering_display_info, size);
+    if (ret < 0)
+        return ret;
+
+    s->sei_mastering_display_info_size = size;
+    for (i = 0; i < size; i++)
+        s->sei_mastering_display_info[i] = get_bits(gb, 8);
+
+    return 0;
+}
+// ==> End patch MPC
+
 static int decode_nal_sei_prefix(HEVCContext *s, int type, int size)
 {
     GetBitContext *gb = &s->HEVClc->gb;
@@ -284,6 +302,10 @@ static int decode_nal_sei_prefix(HEVCContext *s, int type, int size)
         return 0;
     case SEI_TYPE_USER_DATA_REGISTERED_ITU_T_T35:
         return decode_nal_sei_user_data_registered_itu_t_t35(s, size);
+    // ==> Start patch MPC
+    case SEI_TYPE_MASTERING_DISPLAY_INFO:
+        return decode_nal_sei_mastering_display_info(s, size);
+    // ==> End patch MPC
     default:
         av_log(s->avctx, AV_LOG_DEBUG, "Skipped PREFIX SEI %d\n", type);
         skip_bits_long(gb, 8 * size);

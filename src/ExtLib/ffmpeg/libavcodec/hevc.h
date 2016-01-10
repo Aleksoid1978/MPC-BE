@@ -941,6 +941,10 @@ typedef struct HEVCContext {
     uint8_t* a53_caption;
     int a53_caption_size;
 
+    // ==> Start patch MPC
+    uint8_t* sei_mastering_display_info;
+    int sei_mastering_display_info_size;
+    // ==> End patch MPC
 } HEVCContext;
 
 int ff_hevc_decode_short_term_rps(GetBitContext *gb, AVCodecContext *avctx,

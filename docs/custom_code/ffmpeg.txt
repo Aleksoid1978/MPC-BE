@@ -17,7 +17,9 @@
 * libavcodec/h264_ps.c
 * libavcodec/h264_slice.c
 * libavcodec/hevc.c
+* libavcodec/hevc.h
 * libavcodec/hevc_refs.c
+* libavcodec/hevc_sei.c
 * libavcodec/hevcpred.c
 * libavcodec/hevcpred.h
 * libavcodec/internal.h
@@ -34,6 +36,8 @@
 * libavcodec/vp9.c
 
 * libavfilter/allfilters.c 
+
+* libavutil/frame.h
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
 
