@@ -55,7 +55,7 @@ bool CVolumeCtrl::Create(CWnd* pParentWnd)
 	SetPageSize(s.nVolumeStep);
 	SetLineSize(0);
 
-	m_nUseDarkTheme		= s.bUseDarkTheme + 1;
+	m_nUseDarkTheme		= (int)s.bUseDarkTheme + 1;
 
 	m_nThemeBrightness	= s.nThemeBrightness;
 	m_nThemeRed			= s.nThemeRed;

@@ -38,8 +38,6 @@ private:
 	CMPCPngImage m_BackGroundbm;
 	CMPCPngImage m_Volumebm;
 
-	int		m_nUseDarkTheme;
-
 	int		m_nThemeBrightness;
 	int		m_nThemeRed;
 	int		m_nThemeGreen;
@@ -54,6 +52,8 @@ public:
 	void IncreaseVolume(), DecreaseVolume();
 
 	void SetPosInternal(int pos);
+
+	int m_nUseDarkTheme;
 
 protected:
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);

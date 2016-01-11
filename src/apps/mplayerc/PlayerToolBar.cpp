@@ -35,34 +35,9 @@ CPlayerToolBar::CPlayerToolBar(CMainFrame* pMainFrame)
 	, m_bDisableImgListRemap(false)
 	, m_pButtonsImages(NULL)
 	, m_hDXVAIcon(NULL)
+	, m_nDXVAIconWidth(0)
+	, m_nDXVAIconHeight(0)
 {
-	HBITMAP hBmp = CMPCPngImage::LoadExternalImage(L"gpu", IDB_DXVA_ON, IMG_TYPE::UNDEF);
-	BITMAP bm = { 0 };
-	::GetObject(hBmp, sizeof(bm), &bm);
-
-	if (CMPCPngImage::FileExists(CString(L"gpu")) && (bm.bmHeight > 32 || bm.bmWidth > 32)) {
-		hBmp = CMPCPngImage::LoadExternalImage(L"", IDB_DXVA_ON, IMG_TYPE::UNDEF);
-		::GetObject(hBmp, sizeof(bm), &bm);
-	}
-
-	if (bm.bmWidth <= 32 && bm.bmHeight <= 32) {
-		CBitmap *bmp = DNew CBitmap();
-		bmp->Attach(hBmp);
-
-		CImageList *pButtonDXVA = DNew CImageList();
-		pButtonDXVA->Create(bm.bmWidth, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
-		pButtonDXVA->Add(bmp, static_cast<CBitmap*>(NULL));
-
-		m_hDXVAIcon = pButtonDXVA->ExtractIcon(0);
-
-		delete pButtonDXVA;
-		delete bmp;
-	}
-
-	m_iDXVAIconWidth	= bm.bmWidth;
-	m_iDXVAIconHeight	= bm.bmHeight;
-
-	DeleteObject(hBmp);
 }
 
 CPlayerToolBar::~CPlayerToolBar()
@@ -83,7 +58,7 @@ void CPlayerToolBar::SwitchTheme()
 	CToolBarCtrl& tb = GetToolBarCtrl();
 	m_nButtonHeight = 16;
 
-	if (m_iUseDarkTheme != (int)s.bUseDarkTheme) {
+	if (m_nUseDarkTheme != (int)s.bUseDarkTheme) {
 		VERIFY(LoadToolBar(IDB_PLAYERTOOLBAR));
 
 		ModifyStyleEx(WS_EX_LAYOUTRTL, WS_EX_NOINHERITLAYOUT);
@@ -110,7 +85,7 @@ void CPlayerToolBar::SwitchTheme()
 			SetButtonStyle(i, styles[i] | TBBS_DISABLED);
 		}
 
-		m_iUseDarkTheme = (int)s.bUseDarkTheme;
+		m_nUseDarkTheme = (int)s.bUseDarkTheme;
 	}
 
 	if (s.bUseDarkTheme) {
@@ -155,6 +130,35 @@ void CPlayerToolBar::SwitchTheme()
 		tb.SetIndent(0);
 	}
 
+	const int dpiScalePercent = m_pMainFrame->GetDPIScalePercent();
+	int imageDpiScalePercent = 100;
+	if (dpiScalePercent >= 200) {
+		imageDpiScalePercent = 200;
+	} else if (dpiScalePercent >= 175) {
+		imageDpiScalePercent = 175;
+	} else if (dpiScalePercent >= 150) {
+		imageDpiScalePercent = 150;
+	} else if (dpiScalePercent >= 125) {
+		imageDpiScalePercent = 125;
+	}
+
+	int resid = IDB_PLAYERTOOLBAR_PNG;
+	switch (imageDpiScalePercent) {
+		case 125:
+			resid = IDB_PLAYERTOOLBAR_PNG_125;
+			break;
+		case 150:
+			resid = IDB_PLAYERTOOLBAR_PNG_150;
+			break;
+		case 175:
+			resid = IDB_PLAYERTOOLBAR_PNG_175;
+			break;
+		case 200:
+			resid = IDB_PLAYERTOOLBAR_PNG_200;
+			break;
+	}
+
+	// load toolbar image
 	HBITMAP hBmp = NULL;
 	bool fp = CMPCPngImage::FileExists(CString(L"toolbar"));
 	if (s.bUseDarkTheme && !fp) {
@@ -165,7 +169,7 @@ void CPlayerToolBar::SwitchTheme()
 		g = (col >> 8) & 0xFF;
 		b = col >> 16;
 		*/
-		hBmp = CMPCPngImage::LoadExternalImage(L"toolbar", IDB_PLAYERTOOLBAR_PNG, IMG_TYPE::PNG, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
+		hBmp = CMPCPngImage::LoadExternalImage(L"toolbar", resid, IMG_TYPE::PNG, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
 	} else if (fp) {
 		hBmp = CMPCPngImage::LoadExternalImage(L"toolbar", 0, IMG_TYPE::UNDEF);
 	}
@@ -176,7 +180,7 @@ void CPlayerToolBar::SwitchTheme()
 
 		if (fp && bitmapBmp.bmWidth != bitmapBmp.bmHeight * 15) {
 			if (s.bUseDarkTheme) {
-				hBmp = CMPCPngImage::LoadExternalImage(L"", IDB_PLAYERTOOLBAR_PNG, IMG_TYPE::PNG, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
+				hBmp = CMPCPngImage::LoadExternalImage(L"", resid, IMG_TYPE::PNG, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
 				::GetObject(hBmp, sizeof(bitmapBmp), &bitmapBmp);
 			} else {
 				DeleteObject(hBmp);
@@ -209,6 +213,99 @@ void CPlayerToolBar::SwitchTheme()
 
 		delete bmp;
 		DeleteObject(hBmp);
+	}
+
+	// load GPU/DXVA indicator
+	if (s.bUseDarkTheme) {
+		if (m_hDXVAIcon) {
+			DestroyIcon(m_hDXVAIcon);
+			m_hDXVAIcon = NULL;
+		}
+		m_nDXVAIconWidth = m_nDXVAIconHeight = 0;
+
+		switch (imageDpiScalePercent) {
+			case 125:
+				resid = IDB_DXVA_INDICATOR_125;
+				break;
+			case 150:
+				resid = IDB_DXVA_INDICATOR_150;
+				break;
+			case 175:
+				resid = IDB_DXVA_INDICATOR_175;
+				break;
+			case 200:
+				resid = IDB_DXVA_INDICATOR_200;
+				break;
+			default:
+				resid = IDB_DXVA_INDICATOR;
+				break;
+		}
+
+		hBmp = NULL;
+		fp = CMPCPngImage::FileExists(CString(L"gpu"));
+		BITMAP bm = { 0 };
+		if (fp) {
+			hBmp = CMPCPngImage::LoadExternalImage(L"gpu", 0, IMG_TYPE::UNDEF);
+			if (hBmp) {
+				::GetObject(hBmp, sizeof(bm), &bm);
+			}
+		}
+		if (!hBmp || bm.bmHeight >= m_nButtonHeight) {
+			hBmp = CMPCPngImage::LoadExternalImage(L"", resid, IMG_TYPE::PNG);
+			if (hBmp) {
+				::GetObject(hBmp, sizeof(bm), &bm);
+				if (bm.bmHeight >= m_nButtonHeight) {
+					DeleteObject(hBmp);
+					hBmp = NULL;
+
+					const int resids[] = {
+						IDB_DXVA_INDICATOR_200,
+						IDB_DXVA_INDICATOR_175,
+						IDB_DXVA_INDICATOR_150,
+						IDB_DXVA_INDICATOR_125
+					};
+					for (int i = 0; i < _countof(resids); i++) {
+						const int _resid = resids[i];
+						if (_resid < resid) {
+							hBmp = CMPCPngImage::LoadExternalImage(L"", _resid, IMG_TYPE::PNG);
+							if (hBmp) {
+								::GetObject(hBmp, sizeof(bm), &bm);
+								if (bm.bmHeight < m_nButtonHeight) {
+									break;
+								}
+
+								DeleteObject(hBmp);
+								hBmp = NULL;
+							}
+						}
+					}
+
+					if (!hBmp) {
+						hBmp = CMPCPngImage::LoadExternalImage(L"", IDB_DXVA_INDICATOR, IMG_TYPE::PNG);
+					}
+				}
+			}
+		}
+		if (hBmp) {
+			::GetObject(hBmp, sizeof(bm), &bm);
+
+			CBitmap *bmp = DNew CBitmap();
+			bmp->Attach(hBmp);
+
+			CImageList *pButtonDXVA = DNew CImageList();
+			pButtonDXVA->Create(bm.bmWidth, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
+			pButtonDXVA->Add(bmp, static_cast<CBitmap*>(NULL));
+
+			m_hDXVAIcon = pButtonDXVA->ExtractIcon(0);
+
+			delete pButtonDXVA;
+			delete bmp;
+
+			m_nDXVAIconWidth  = bm.bmWidth;
+			m_nDXVAIconHeight = bm.bmHeight;
+
+			DeleteObject(hBmp);
+		}
 	}
 
 	if (s.bUseDarkTheme) {
@@ -260,7 +357,7 @@ BOOL CPlayerToolBar::Create(CWnd* pParentWnd)
 	m_volctrl.Create(this);
 	m_volctrl.SetRange(0, 100);
 
-	m_iUseDarkTheme = 2; // needed for the first call SwitchTheme()
+	m_nUseDarkTheme = 2; // needed for the first call SwitchTheme()
 	m_bMute = false;
 
 	SwitchTheme();
@@ -412,6 +509,18 @@ void CPlayerToolBar::SetVolume(int volume)
 	m_volctrl.SetPosInternal(volume);
 }
 
+void CPlayerToolBar::ScaleToolbar()
+{
+	if (AfxGetAppSettings().bUseDarkTheme) {
+		m_volctrl.m_nUseDarkTheme = 1;
+
+		m_nUseDarkTheme = 2;
+		SwitchTheme();
+
+		OnInitialUpdate();
+	}
+}
+
 BEGIN_MESSAGE_MAP(CPlayerToolBar, CToolBar)
 	ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnCustomDraw)
 	ON_WM_SIZE()
@@ -472,8 +581,8 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 					ThemeRGB(50, 55, 60, R, G, B);
 					ThemeRGB(20, 25, 30, R2, G2, B2);
 					TRIVERTEX tv[2] = {
-						{r.left, r.top, R*256, G*256, B*256, 255*256},
-						{r.right, r.bottom, R2*256, G2*256, B2*256, 255*256},
+						{r.left, r.top, R * 256, G * 256, B * 256, 255 * 256},
+						{r.right, r.bottom, R2 * 256, G2 * 256, B2 * 256, 255 * 256},
 					};
 					dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 				}
@@ -501,7 +610,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			CRect r;
 			CopyRect(&r,&pTBCD->nmcd.rc);
 
-			CRect rGlassLike(0,0,8,8);
+			CRect rGlassLike(0, 0, 8, 8);
 			int nW = rGlassLike.Width(), nH = rGlassLike.Height();
 			CDC memdc;
 			memdc.CreateCompatibleDC(&dc);
@@ -510,7 +619,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			bmOld = memdc.SelectObject(&bmGlassLike);
 
 			TRIVERTEX tv[2] = {
-				{0, 0, 255*256, 255*256, 255*256, 255*256},
+				{0, 0, 255 * 256, 255 * 256, 255 * 256, 255 * 256},
 				{nW, nH, 0, 0, 0, 0},
 			};
 			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
@@ -521,7 +630,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			bf.BlendOp				= AC_SRC_OVER;
 			bf.SourceConstantAlpha	= 90;
 
-			CPen penFrHot(PS_SOLID,0,0x00e9e9e9);//clr_resFace
+			CPen penFrHot(PS_SOLID, 0, 0x00e9e9e9);//clr_resFace
 			CPen *penSaved		= dc.SelectObject(&penFrHot);
 			CBrush *brushSaved	= (CBrush*)dc.SelectStockObject(NULL_BRUSH);
 
@@ -549,8 +658,8 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 					ThemeRGB(50, 55, 60, R, G, B);
 					ThemeRGB(20, 25, 30, R2, G2, B2);
 					TRIVERTEX tv[2] = {
-						{r.left, r.top, R*256, G*256, B*256, 255*256},
-						{r.right, r.bottom, R2*256, G2*256, B2*256, 255*256},
+						{r.left, r.top, R * 256, G * 256, B * 256, 255 * 256},
+						{r.right, r.bottom, R2 * 256, G2 * 256, B2 * 256, 255 * 256},
 					};
 					dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
 				}
@@ -562,7 +671,9 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 			GetItemRect(12, &r12);
 
 			if (bGPU && m_hDXVAIcon) {
-				if (r10.right < r12.left - m_iDXVAIconWidth) DrawIconEx(dc.m_hDC, r12.left - 8 - m_iDXVAIconWidth, r.CenterPoint().y - (m_iDXVAIconHeight/2+1), m_hDXVAIcon, 0, 0, 0, NULL, DI_NORMAL);
+				if (r10.right < r12.left - m_nDXVAIconWidth) {
+					DrawIconEx(dc.m_hDC, r12.left - 8 - m_nDXVAIconWidth, r.CenterPoint().y - (m_nDXVAIconHeight / 2 + 1), m_hDXVAIcon, 0, 0, 0, NULL, DI_NORMAL);
+				}
 			}
 
 			dc.SelectObject(&penSaved);
@@ -650,7 +761,7 @@ void CPlayerToolBar::OnInitialUpdate()
 		vr2.SetRect(r.right + br.right - offset, r.bottom - 25, r.right + br.right + offset_right, r.bottom);
 	}
 
-	if (m_iUseDarkTheme != (int)AfxGetAppSettings().bUseDarkTheme) {
+	if (m_nUseDarkTheme != (int)AfxGetAppSettings().bUseDarkTheme) {
 		SwitchTheme();
 	}
 

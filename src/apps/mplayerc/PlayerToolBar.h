@@ -35,11 +35,13 @@ class CPlayerToolBar : public CToolBar
 private:
 	CMainFrame*	m_pMainFrame;
 
-	int			m_iUseDarkTheme;
+	int			m_nUseDarkTheme;
 	bool		m_bMute;
+	
 	HICON		m_hDXVAIcon;
-	int			m_iDXVAIconWidth;
-	int			m_iDXVAIconHeight;
+	LONG		m_nDXVAIconWidth;
+	LONG		m_nDXVAIconHeight;
+	
 	bool		m_bDisableImgListRemap;
 
 	CMPCPngImage m_BackGroundbm;
@@ -50,20 +52,14 @@ private:
 	int			m_nWidthIncrease = 0;
 
 public:
-	int			m_nButtonHeight;
+	LONG		m_nButtonHeight;
 	CVolumeCtrl	m_volctrl;
 
 	CPlayerToolBar(CMainFrame* pMainFrame);
 	virtual ~CPlayerToolBar();
 
-private:
-	bool IsMuted();
-	void SetMute(bool fMute = true);
-	int getHitButtonIdx(CPoint point);
-	void CreateRemappedImgList(UINT bmID, int nRemapState, CImageList& reImgList);
-	void SwitchRemmapedImgList(UINT bmID, int nRemapState);
+	virtual BOOL Create(CWnd* pParentWnd);
 
-public:
 	void SwitchTheme();
 
 	int GetVolume();
@@ -71,7 +67,14 @@ public:
 	void SetVolume(int volume);
 	__declspec(property(get=GetVolume, put=SetVolume)) int Volume;
 
-	virtual BOOL Create(CWnd* pParentWnd);
+	void ScaleToolbar();
+
+private:
+	bool IsMuted();
+	void SetMute(bool fMute = true);
+	int getHitButtonIdx(CPoint point);
+	void CreateRemappedImgList(UINT bmID, int nRemapState, CImageList& reImgList);
+	void SwitchRemmapedImgList(UINT bmID, int nRemapState);
 
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);

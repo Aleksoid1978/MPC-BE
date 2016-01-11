@@ -61,6 +61,8 @@ public:
     int GetDPIX() const { return m_dpiX; }
     int GetDPIY() const { return m_dpiY; }
 
+    int GetDPIScalePercent() const { return 100 * m_dpiX / 96; }
+
     // Convert between raw pixels and relative pixels.
     inline int ScaleX(int x) const { return MulDiv(x, m_dpiX, 96); }
     inline int ScaleY(int y) const { return MulDiv(y, m_dpiY, 96); }
