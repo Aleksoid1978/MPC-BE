@@ -505,7 +505,7 @@ void* CLUTElemDup(cmsStage* mpe)
                 goto Error;
         } else {
             NewElem ->Tab.T = (cmsUInt16Number*) _cmsDupMem(mpe ->ContextID, Data ->Tab.T, Data ->nEntries * sizeof (cmsUInt16Number));
-            if (NewElem ->Tab.TFloat == NULL)
+            if (NewElem ->Tab.T == NULL)
                 goto Error;
         }
     }

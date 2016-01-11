@@ -249,7 +249,7 @@ void FloatXFORM(_cmsTRANSFORM* p,
     cmsUInt8Number* output;
     cmsFloat32Number fIn[cmsMAXCHANNELS], fOut[cmsMAXCHANNELS];
     cmsFloat32Number OutOfGamut;
-    cmsUInt32Number i, j, strideIn, strideOut;
+    cmsUInt32Number i, j, c, strideIn, strideOut;
 
     _cmsHandleExtraChannels(p, in, out, PixelsPerLine, LineCount, Stride);
 
@@ -258,44 +258,44 @@ void FloatXFORM(_cmsTRANSFORM* p,
 
     for (i = 0; i < LineCount; i++) {
 
-           accum = (cmsUInt8Number*)in + strideIn;
-           output = (cmsUInt8Number*)out + strideOut;
+        accum = (cmsUInt8Number*)in + strideIn;
+        output = (cmsUInt8Number*)out + strideOut;
 
-           for (j = 0; j < PixelsPerLine; j++) {
+        for (j = 0; j < PixelsPerLine; j++) {
 
-                  accum = p->FromInputFloat(p, fIn, accum, Stride->BytesPerPlaneIn);
+            accum = p->FromInputFloat(p, fIn, accum, Stride->BytesPerPlaneIn);
 
-        // Any gamut chack to do?
-        if (p ->GamutCheck != NULL) {
+            // Any gamut chack to do?
+            if (p->GamutCheck != NULL) {
 
-            // Evaluate gamut marker.
-            cmsPipelineEvalFloat( fIn, &OutOfGamut, p ->GamutCheck);
+                // Evaluate gamut marker.
+                cmsPipelineEvalFloat(fIn, &OutOfGamut, p->GamutCheck);
 
-            // Is current color out of gamut?
-            if (OutOfGamut > 0.0) {
+                // Is current color out of gamut?
+                if (OutOfGamut > 0.0) {
 
-                // Certainly, out of gamut
-                for (j=0; j < cmsMAXCHANNELS; j++)
-                    fOut[j] = -1.0;
+                    // Certainly, out of gamut
+                    for (c = 0; c < cmsMAXCHANNELS; c++)
+                        fOut[c] = -1.0;
 
+                }
+                else {
+                    // No, proceed normally
+                    cmsPipelineEvalFloat(fIn, fOut, p->Lut);
+                }
             }
             else {
-                // No, proceed normally
-                cmsPipelineEvalFloat(fIn, fOut, p -> Lut);
+
+                // No gamut check at all
+                cmsPipelineEvalFloat(fIn, fOut, p->Lut);
             }
-        }
-        else {
 
-            // No gamut check at all
-            cmsPipelineEvalFloat(fIn, fOut, p -> Lut);
+
+            output = p->ToOutputFloat(p, fOut, output, Stride->BytesPerPlaneOut);
         }
 
-
-                  output = p->ToOutputFloat(p, fOut, output, Stride->BytesPerPlaneOut);
-    }
-
-           strideIn += Stride->BytesPerLineIn;
-           strideOut += Stride->BytesPerLineOut;
+        strideIn += Stride->BytesPerLineIn;
+        strideOut += Stride->BytesPerLineOut;
     }
 
 }
@@ -1300,7 +1300,6 @@ cmsBool CMSEXPORT cmsChangeBuffersFormat(cmsHTRANSFORM hTransform,
                                          cmsUInt32Number InputFormat,
                                          cmsUInt32Number OutputFormat)
 {
-
     _cmsTRANSFORM* xform = (_cmsTRANSFORM*) hTransform;
     cmsFormatter16 FromInput, ToOutput;
 

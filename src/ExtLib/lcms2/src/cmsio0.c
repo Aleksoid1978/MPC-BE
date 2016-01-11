@@ -1299,12 +1299,16 @@ cmsUInt32Number CMSEXPORT cmsSaveProfileToIOhandler(cmsHPROFILE hProfile, cmsIOH
     cmsContext ContextID;
 
     _cmsAssert(hProfile != NULL);
-
+    
+    if (!_cmsLockMutex(Icc->ContextID, Icc->UsrMutex)) return 0;
     memmove(&Keep, Icc, sizeof(_cmsICCPROFILE));
 
     ContextID = cmsGetProfileContextID(hProfile);
     PrevIO = Icc ->IOhandler = cmsOpenIOhandlerFromNULL(ContextID);
-    if (PrevIO == NULL) return 0;
+    if (PrevIO == NULL) {
+        _cmsUnlockMutex(Icc->ContextID, Icc->UsrMutex);
+        return 0;
+    }
 
     // Pass #1 does compute offsets
 
@@ -1324,7 +1328,10 @@ cmsUInt32Number CMSEXPORT cmsSaveProfileToIOhandler(cmsHPROFILE hProfile, cmsIOH
     }
 
     memmove(Icc, &Keep, sizeof(_cmsICCPROFILE));
-    if (!cmsCloseIOhandler(PrevIO)) return 0;
+    if (!cmsCloseIOhandler(PrevIO)) 
+        UsedSpace = 0; // As a error marker
+
+    _cmsUnlockMutex(Icc->ContextID, Icc->UsrMutex);
 
     return UsedSpace;
 
@@ -1332,6 +1339,8 @@ cmsUInt32Number CMSEXPORT cmsSaveProfileToIOhandler(cmsHPROFILE hProfile, cmsIOH
 Error:
     cmsCloseIOhandler(PrevIO);
     memmove(Icc, &Keep, sizeof(_cmsICCPROFILE));
+    _cmsUnlockMutex(Icc->ContextID, Icc->UsrMutex);
+
     return 0;
 }
 
