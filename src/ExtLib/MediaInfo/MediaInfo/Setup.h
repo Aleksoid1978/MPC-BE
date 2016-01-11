@@ -113,6 +113,12 @@
     #if !defined (MEDIAINFO_MD5_NO) && !defined (MEDIAINFO_MD5_YES)
         #define MEDIAINFO_MD5_NO
     #endif
+    #if !defined (MEDIAINFO_SHA1_NO) && !defined (MEDIAINFO_SHA1_YES)
+        #define MEDIAINFO_SHA1_NO
+    #endif
+    #if !defined (MEDIAINFO_SHA2_NO) && !defined (MEDIAINFO_SHA2_YES)
+        #define MEDIAINFO_SHA2_NO
+    #endif
     #if !defined (MEDIAINFO_AES_NO) && !defined (MEDIAINFO_AES_YES)
         #define MEDIAINFO_AES_NO
     #endif
@@ -231,6 +237,26 @@
         #define MEDIAINFO_MD5 0
     #else
         #define MEDIAINFO_MD5 1
+    #endif
+#endif
+#if !defined(MEDIAINFO_SHA1)
+    #if defined(MEDIAINFO_SHA1_NO) && defined(MEDIAINFO_SHA1_YES)
+        #undef MEDIAINFO_SHA1_NO //MEDIAINFO_SHA1_YES has priority
+    #endif
+    #if defined(MEDIAINFO_SHA1_NO)
+        #define MEDIAINFO_SHA1 0
+    #else
+        #define MEDIAINFO_SHA1 1
+    #endif
+#endif
+#if !defined(MEDIAINFO_SHA2)
+    #if defined(MEDIAINFO_SHA2_NO) && defined(MEDIAINFO_SHA2_YES)
+        #undef MEDIAINFO_SHA2_NO //MEDIAINFO_SHA2_YES has priority
+    #endif
+    #if defined(MEDIAINFO_SHA2_NO)
+        #define MEDIAINFO_SHA2 0
+    #else
+        #define MEDIAINFO_SHA2 1
     #endif
 #endif
 #if !defined(MEDIAINFO_DEMUX)

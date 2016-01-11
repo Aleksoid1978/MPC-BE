@@ -50,9 +50,9 @@ public:
     bool                            IsFinished()                                    {return !Enabled || Resources_Current>=Resources.size();}
     size_t                          State;
     bool                            IsCircular;
-    #if MEDIAINFO_ADVANCED || MEDIAINFO_MD5
+    #if MEDIAINFO_ADVANCED || MEDIAINFO_HASH
         bool                        List_Compute_Done;
-    #endif //MEDIAINFO_ADVANCED || MEDIAINFO_MD5
+    #endif //MEDIAINFO_ADVANCED || MEDIAINFO_HASH
 
     //Config
     rfh_common*                     Package;

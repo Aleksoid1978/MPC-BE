@@ -96,9 +96,9 @@ private :
     void   FileSize_Compute();
     void   CountOfReferences_ForReadSize_Run();
     MediaInfo_Internal* MI_Create();
-    #if MEDIAINFO_ADVANCED || MEDIAINFO_MD5
+    #if MEDIAINFO_ADVANCED || MEDIAINFO_HASH
         void   List_Compute();
-    #endif //MEDIAINFO_ADVANCED || MEDIAINFO_MD5
+    #endif //MEDIAINFO_ADVANCED || MEDIAINFO_HASH
     #if MEDIAINFO_EVENTS
     void SubFile_Start();
     int64u                          StreamID_Previous;

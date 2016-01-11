@@ -261,6 +261,7 @@ private :
     void moov_udta_meta_ilst_xxxx_data();
     void moov_udta_meta_ilst_xxxx_mean();
     void moov_udta_meta_ilst_xxxx_name();
+    void moov_udta_meta_uuid();
     void moov_udta_ndrm();
     void moov_udta_nsav();
     void moov_udta_rtng();

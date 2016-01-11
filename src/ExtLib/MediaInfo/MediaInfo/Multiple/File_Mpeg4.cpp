@@ -1826,8 +1826,8 @@ struct Mpeg4_muxing
 };
 bool File_Mpeg4::BookMark_Needed()
 {
-    #if MEDIAINFO_MD5
-        if (!mdat_MustParse && !mdat_Pos_NormalParsing && Config->File_Md5_Get() && FirstMdatPos<FirstMoovPos)
+    #if MEDIAINFO_HASH
+        if (!mdat_MustParse && !mdat_Pos_NormalParsing && Config->File_Hash_Get().to_ulong() && FirstMdatPos<FirstMoovPos)
         {
             Element_Show();
             while (Element_Level>0)
@@ -1837,7 +1837,7 @@ bool File_Mpeg4::BookMark_Needed()
             IsSecondPass=true;
             return false;
         }
-    #endif //MEDIAINFO_MD5
+    #endif //MEDIAINFO_HASH
 
     if (!mdat_MustParse)
         return false;
@@ -2107,14 +2107,14 @@ bool File_Mpeg4::BookMark_Needed()
         Element_ThisIsAList();
 
         mdat_Pos_Temp=&mdat_Pos[0];
-        #if MEDIAINFO_MD5
-            if (Config->File_Md5_Get())
+        #if MEDIAINFO_HASH
+            if (Config->File_Hash_Get().to_ulong())
             {
                 GoTo(0);
-                Md5_ParseUpTo=mdat_Pos_Temp->Offset;
+                Hash_ParseUpTo=mdat_Pos_Temp->Offset;
             }
             else
-        #endif //MEDIAINFO_MD5
+        #endif //MEDIAINFO_HASH
                 GoTo(mdat_Pos_Temp->Offset);
         IsParsing_mdat=true;
         mdat_Pos_NormalParsing=true;

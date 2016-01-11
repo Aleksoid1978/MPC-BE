@@ -43,9 +43,9 @@ sequence::sequence()
     //Out
     State=0;
     IsCircular=false;
-    #if MEDIAINFO_ADVANCED || MEDIAINFO_MD5
+    #if MEDIAINFO_ADVANCED || MEDIAINFO_HASH
         List_Compute_Done=false;
-    #endif //MEDIAINFO_ADVANCED || MEDIAINFO_MD5
+    #endif //MEDIAINFO_ADVANCED || MEDIAINFO_HASH
 
     //Config
     Package=NULL;
@@ -63,9 +63,9 @@ sequence::sequence()
     FileSize=(int64u)-1;
     IsMain=false;
     FileSize_IsPresent=false;
-    #if MEDIAINFO_ADVANCED || MEDIAINFO_MD5
+    #if MEDIAINFO_ADVANCED || MEDIAINFO_HASH
         List_Compute_Done=false;
-    #endif //MEDIAINFO_ADVANCED || MEDIAINFO_MD5
+    #endif //MEDIAINFO_ADVANCED || MEDIAINFO_HASH
     MI=NULL;
 }
 

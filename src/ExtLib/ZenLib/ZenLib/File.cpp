@@ -360,12 +360,12 @@ bool File::Create (const Ztring &File_Name_, bool OverWrite)
                 default                  : mode=0                            ; break;
             }*/
             ios_base::openmode access;
-            switch (OverWrite)
-            {
-                case false        : if (Exists(File_Name))
-                                        return false;
-                default           : access=ios_base::binary|ios_base::in|ios_base::out|ios_base::trunc; break;
-            }
+
+            if (!OverWrite && Exists(File_Name))
+                return false;
+
+            access=ios_base::binary|ios_base::in|ios_base::out|ios_base::trunc;
+
             #ifdef UNICODE
                 File_Handle=new fstream(File_Name.To_Local().c_str(), access);
             #else
@@ -374,11 +374,14 @@ bool File::Create (const Ztring &File_Name_, bool OverWrite)
             return ((fstream*)File_Handle)->is_open();
         #elif defined WINDOWS
             DWORD dwDesiredAccess, dwShareMode, dwCreationDisposition;
-            switch (OverWrite)
-            {
-                case false        : dwDesiredAccess=GENERIC_WRITE; dwShareMode=0;                dwCreationDisposition=CREATE_NEW;    break;
-                default           : dwDesiredAccess=GENERIC_WRITE; dwShareMode=0;                dwCreationDisposition=CREATE_ALWAYS; break;
+            if (OverWrite) {
+                dwDesiredAccess=GENERIC_WRITE;
+                dwCreationDisposition=CREATE_ALWAYS;
+            } else {
+                dwDesiredAccess=GENERIC_WRITE;
+                dwCreationDisposition=CREATE_NEW;
             }
+            dwShareMode=0;
 
             #ifdef UNICODE
                 File_Handle=CreateFileW(File_Name.c_str(), dwDesiredAccess, dwShareMode, NULL, dwCreationDisposition, 0, NULL);

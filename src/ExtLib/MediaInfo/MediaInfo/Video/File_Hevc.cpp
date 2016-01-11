@@ -66,11 +66,7 @@ const int8u Hevc_SubHeightC[]=
 //---------------------------------------------------------------------------
 const char* Hevc_tier_flag(bool tier_flag)
 {
-    switch (tier_flag)
-    {
-        case   true  : return "High";
-        default      : return "Main";
-    }
+    return tier_flag ? "High" : "Main";
 }
 
 //---------------------------------------------------------------------------

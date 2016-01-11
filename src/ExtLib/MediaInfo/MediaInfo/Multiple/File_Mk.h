@@ -242,6 +242,10 @@ private :
         std::map<std::string, Ztring> Infos;
         int64u                  TrackDefaultDuration;
         std::map<int64u, int64u> Segment_Cluster_BlockGroup_BlockDuration_Counts;
+        int64u                  PixelCropBottom;
+        int64u                  PixelCropLeft;
+        int64u                  PixelCropRight;
+        int64u                  PixelCropTop;
 
         stream()
         {
@@ -263,6 +267,10 @@ private :
             ContentCompSettings_Buffer_Size=0;
             ContentCompSettings_Buffer=NULL;
             TrackDefaultDuration=0;
+            PixelCropBottom=0;
+            PixelCropLeft=0;
+            PixelCropRight=0;
+            PixelCropTop=0;
         }
 
         ~stream()
@@ -313,6 +321,8 @@ private :
     typedef std::map<int64u, tagspertrack> tags;
     tags    Segment_Tags_Tag_Items;
     int64u  Segment_Tags_Tag_Targets_TrackUID_Value;
+    bool    CurrentAttachmentIsCover;
+    bool    CoverIsSetFromAttachment;
 
     //Chapters
     struct chapterdisplay

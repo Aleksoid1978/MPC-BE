@@ -84,7 +84,13 @@ void File_TimedText::Data_Parse()
                 {
                     Stream_Prepare(Stream_Text);
                 }
-            Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Format), "Timed Text");
+            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Format), "Timed Text");
+            
+            #ifdef MEDIAINFO_MPEG4_YES
+                if (IsChapter)
+                    Fill(StreamKind_Last, StreamPos_Last, Menu_Chapters_Pos_Begin, Count_Get(StreamKind_Last, StreamPos_Last), 10, true);
+            #endif //MEDIAINFO_MPEG4_YES
+
         }
         #ifdef MEDIAINFO_MPEG4_YES
             if (IsChapter)
@@ -98,7 +104,10 @@ void File_TimedText::Data_Parse()
 
         #ifdef MEDIAINFO_MPEG4_YES
             if (IsChapter && FrameInfo.DTS!=(int64u)-1 && Buffer_Offset==2)
-                Fill(Stream_Menu, 0, Ztring().Duration_From_Milliseconds(FrameInfo.DTS/1000000).To_UTF8().c_str(), Value);
+            {
+                Fill(Stream_Menu, StreamPos_Last, Ztring().Duration_From_Milliseconds(FrameInfo.DTS/1000000).To_UTF8().c_str(), Value);
+                Fill(Stream_Menu, StreamPos_Last, Menu_Chapters_Pos_End, Count_Get(Stream_Menu, StreamPos_Last), 10, true);
+            }
         #endif //MEDIAINFO_MPEG4_YES
     FILLING_END();
 

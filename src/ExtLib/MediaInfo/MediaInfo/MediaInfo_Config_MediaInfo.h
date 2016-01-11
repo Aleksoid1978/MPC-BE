@@ -21,6 +21,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/MediaInfo_Internal_Const.h"
+#include "MediaInfo/HashWrapper.h" //For MEDIAINFO_HASH
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Config.h"
     #include "MediaInfo/MediaInfo_Events.h"
@@ -150,6 +151,10 @@ public :
         #endif //MEDIAINFO_ADVANCED
     #endif //MEDIAINFO_DEMUX
 
+    #if MEDIAINFO_HASH
+        void         File_Hash_Set (HashWrapper::HashFunctions Funtions);
+        HashWrapper::HashFunctions File_Hash_Get ();
+    #endif //MEDIAINFO_HASH
     #if MEDIAINFO_MD5
         void          File_Md5_Set (bool NewValue);
         bool          File_Md5_Get ();
@@ -410,6 +415,9 @@ private :
             bool                File_Demux_Unpacketize_StreamLayoutChange_Skip;
         #endif //MEDIAINFO_DEMUX
     #endif //MEDIAINFO_ADVANCED
+    #if MEDIAINFO_HASH
+        HashWrapper::HashFunctions Hash_Functions;
+    #endif //MEDIAINFO_HASH
     #if MEDIAINFO_MD5
         bool                File_Md5;
     #endif //MEDIAINFO_MD5

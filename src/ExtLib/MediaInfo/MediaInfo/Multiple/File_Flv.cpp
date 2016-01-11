@@ -849,7 +849,7 @@ void File_Flv::Data_Parse()
                             {
                                 Searching_Duration=false;
                                 Open_Buffer_Unsynch(); //There is a problem, trying to sync
-                                PreviousTagSize=65536;
+                                PreviousTagSize=1024*1024;
                             }
                             GoTo(File_Size-PreviousTagSize-8, "FLV");
                             return;
@@ -865,7 +865,7 @@ void File_Flv::Data_Parse()
     {
         if ((((Count_Get(Stream_Video)==0 || Stream[Stream_Video].TimeStamp!=(int32u)-1)
            && (Count_Get(Stream_Audio)==0 || Stream[Stream_Audio].TimeStamp!=(int32u)-1))
-          || (File_Size>65536*2 && File_Offset+Buffer_Offset-Header_Size-PreviousTagSize-4<File_Size-65536))
+          || (File_Size>1024*1024*2 && File_Offset+Buffer_Offset-Header_Size-PreviousTagSize-4<File_Size-1024*1024))
          && Config->ParseSpeed<1)
             Finish();
         else if (Element_Code==0xFA) //RM metadata have a malformed PreviousTagSize, always
@@ -873,13 +873,13 @@ void File_Flv::Data_Parse()
             //Trying to sync
             Searching_Duration=false;
             Open_Buffer_Unsynch(); //There is a problem, trying to sync
-            GoToFromEnd(Header_Size+Element_Size+65536);
+            GoToFromEnd(Header_Size+Element_Size+1024*1024);
             return;
         }
         else
             GoTo(File_Offset+Buffer_Offset-Header_Size-PreviousTagSize-4);
     }
-    else if (!video_stream_Count && !audio_stream_Count && video_stream_FrameRate_Detected && File_Offset+65536*2<File_Size && MediaInfoLib::Config.ParseSpeed_Get()<1) //All streams are parsed
+    else if (!Status[IsFilled] && !video_stream_Count && !audio_stream_Count && video_stream_FrameRate_Detected && File_Offset+1024*1024*2<File_Size && MediaInfoLib::Config.ParseSpeed_Get()<1) //All streams are parsed
     {
         Fill();
 

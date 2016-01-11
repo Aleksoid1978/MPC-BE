@@ -4296,7 +4296,6 @@ File__Analyze* File_MpegPs::ChooseParser_Mpegv()
     //Filling
     #if defined(MEDIAINFO_MPEGV_YES)
         File_Mpegv* Parser=new File_Mpegv;
-        Parser->MPEG_Version=MPEG_Version;
         Parser->ShouldContinueParsing=true;
         #if MEDIAINFO_DEMUX
             if (Config->Demux_Unpacketize_Get())

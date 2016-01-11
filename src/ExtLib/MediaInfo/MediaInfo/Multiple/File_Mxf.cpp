@@ -78,6 +78,7 @@
 #endif //defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/Format/Http/Http_Utils.h"
 #include <cfloat>
+#include <cmath>
 #if MEDIAINFO_SEEK
     #include <algorithm>
 #endif //MEDIAINFO_SEEK
@@ -1861,8 +1862,53 @@ string Mxf_CameraUnitMetadata_CaptureGammaEquation(int128u Value)
 {
     switch(Value.lo)
     {
+        case 0x0401010101010000LL : return "BT.470";                            // Directly from SMPTE registry
         case 0x0401010101020000LL : return "BT.709";
         case 0x0401010101030000LL : return "SMPTE ST 240";
+        case 0x0401010101040000LL : return "SMPTE ST 274";                      // Directly from SMPTE registry
+        case 0x0401010101050000LL : return "BT.1361";                           // Directly from SMPTE registry
+        case 0x0401010101060000LL : return "SceneLinear";                       // Directly from SMPTE registry
+        case 0x0E06040101010101LL : return "DVW-709 Like";                      // 0x0E06x values are read from SR Viewer program
+        case 0x0E06040101010102LL : return "E10/E30STD for J EK";
+        case 0x0E06040101010103LL : return "E10/E30STD for UC";
+        case 0x0E06040101010106LL : return "BBC Initial50";
+        case 0x0E06040101010107LL : return "SD CamCorder STD";
+        case 0x0E06040101010108LL : return "BVW-400 Like";
+        case 0x0E06040101010109LL : return "Ikegami";
+        case 0x0E0604010101017FLL : return "reproduced unknown label";
+        case 0x0E06040101010201LL : return "HG3250G36";
+        case 0x0E06040101010202LL : return "HG4600G30";
+        case 0x0E06040101010203LL : return "HG3259G40";
+        case 0x0E06040101010204LL : return "HG4609G33";
+        case 0x0E06040101010205LL : return "HG8000G36";
+        case 0x0E06040101010206LL : return "HG8000G30";
+        case 0x0E06040101010207LL : return "HG8009G40";
+        case 0x0E06040101010208LL : return "HG8009G33";
+        case 0x0E06040101010301LL : return "CINE1 of EX1/EX3";
+        case 0x0E06040101010302LL : return "CINE2 of EX1/EX3";
+        case 0x0E06040101010303LL : return "CINE3 of EX1/EX3";
+        case 0x0E06040101010304LL : return "CINE4 of EX1/EX3";
+        case 0x0E06040101010305LL : return "Kodak 5248 film like";
+        case 0x0E06040101010306LL : return "Kodak 5245 film like";
+        case 0x0E06040101010307LL : return "Kodak 5293 film like";
+        case 0x0E06040101010308LL : return "Kodak 5296 film like";
+        case 0x0E06040101010309LL : return "Average of Film of MSW-900";
+        case 0x0E06040101010401LL : return "User defined curve1";
+        case 0x0E06040101010402LL : return "User defined curve2";
+        case 0x0E06040101010403LL : return "User defined curve3";
+        case 0x0E06040101010404LL : return "User defined curve4";
+        case 0x0E06040101010405LL : return "User defined curve5";
+        case 0x0E06040101010406LL : return "User defined curve6";
+        case 0x0E06040101010407LL : return "User defined curve7";
+        case 0x0E06040101010408LL : return "User defined curve8";
+        case 0x0E06040101010501LL : return "S-Log";
+        case 0x0E06040101010502LL : return "FS-Log";
+        case 0x0E06040101010503LL : return "R709 180%";
+        case 0x0E06040101010504LL : return "R709 800%";
+        case 0x0E06040101010506LL : return "Cine-Log";
+        case 0x0E06040101010507LL : return "ASC-CDL";
+                                            
+
         default   :
                     {
                     Ztring ValueS;
@@ -1875,6 +1921,72 @@ string Mxf_CameraUnitMetadata_CaptureGammaEquation(int128u Value)
 };
 
 //---------------------------------------------------------------------------
+// RDD 18
+string Mxf_CameraUnitMetadata_AutoExposureMode(int128u Value)
+{
+    switch(Value.lo)
+    {
+        case 0x0510010101010000LL : return "Manual";
+        case 0x0510010101020000LL : return "Full Auto";
+        case 0x0510010101030000LL : return "Gain Priority Auto";
+        case 0x0510010101040000LL : return "Iris Priority Auto";
+        case 0x0510010101050000LL : return "Shutter Priority Auto";
+        default   :
+                    {
+                    Ztring ValueS;
+                    ValueS.From_Number(Value.lo, 16);
+                    if (ValueS.size()<16)
+                        ValueS.insert(0, 16-ValueS.size(), __T('0'));
+                    return ValueS.To_UTF8();
+                    }
+    }
+}
+
+//---------------------------------------------------------------------------
+// RDD 18
+string Mxf_CameraUnitMetadata_AutoFocusSensingAreaSetting(int8u Value)
+{
+    switch(Value)
+    {
+        case 0x00 : return "Manual";
+        case 0x01 : return "Center Sensitive Auto";
+        case 0x02 : return "Full Screen Sensing Auto";
+        case 0x03 : return "Multi Spot Sensing Auto";
+        case 0x04 : return "Single Spot Sensing Auto";
+        default   : return Ztring::ToZtring(Value).To_UTF8();
+    }
+}
+
+//---------------------------------------------------------------------------
+// RDD 18
+string Mxf_CameraUnitMetadata_ColorCorrectionFilterWheelSetting(int8u Value)
+{
+    switch(Value)
+    {
+        case 0x00 : return "Cross effect";
+        case 0x01 : return "Color Compensation 3200 K";
+        case 0x02 : return "Color Compensation 4300 K";
+        case 0x03 : return "Color Compensation 6300 K";
+        case 0x04 : return "Color Compensation 5600 K";
+        default   : return Ztring::ToZtring(Value).To_UTF8();
+    }
+}
+
+//---------------------------------------------------------------------------
+// RDD 18
+string Mxf_CameraUnitMetadata_AutoWhiteBalanceMode(int8u Value)
+{
+    switch(Value)
+    {
+        case 0x00 : return "Preset";
+        case 0x01 : return "Automatic";
+        case 0x02 : return "Hold";
+        case 0x03 : return "One Push";
+        default   : return Ztring::ToZtring(Value).To_UTF8();
+    }
+}
+
+//---------------------------------------------------------------------------
 // CameraUnitMetadata
 string Mxf_AcquisitionMetadata_ElementName(int16u Value, bool IsSony=false)
 {
@@ -1885,6 +1997,9 @@ string Mxf_AcquisitionMetadata_ElementName(int16u Value, bool IsSony=false)
             case 0xE102: return "EffectiveMarkerAspectRatio";
             case 0xE103: return "CameraProcessDiscriminationCode";
             case 0xE104: return "RotaryShutterMode";
+            case 0xE105: return "RawBlackCodeValue";
+            case 0xE106: return "RawGrayCodeValue";
+            case 0xE107: return "RawWhiteCodeValue";
             case 0xE109: return "MonitoringDescriptions";
             case 0xE10B: return "MonitoringBaseCurve";
           //case 0xE201: return "CookeProtocol_BinaryMetadata"; //Not used
@@ -1893,20 +2008,41 @@ string Mxf_AcquisitionMetadata_ElementName(int16u Value, bool IsSony=false)
             default:     ;
         }
 
-    switch (Value)
+    switch (Value) // From EBU Tech 3349
     {
         case 0x3210: return "CaptureGammaEquation";
+        case 0x8000: return "IrisFNumber";
+        case 0x8001: return "FocusPositionFromImagePlane";
+        case 0x8002: return "FocusPositionFromFrontLensVertex";
+        case 0x8003: return "MacroSetting";
+        case 0x8004: return "LensZoom35mmStillCameraEquivalent";
+        case 0x8005: return "LensZoomActualFocalLength";
+        case 0x8006: return "OpticalExtenderMagnification";
         case 0x8007: return "LensAttributes";
+        case 0x8100: return "AutoExposureMode";
+        case 0x8101: return "AutoFocusSensingAreaSetting";
+        case 0x8102: return "ColorCorrectionFilterWheelSetting";
         case 0x8103: return "NeutralDensityFilterWheelSetting";
+        case 0x8104: return "ImageSensorDimensionEffectiveWidth";
+        case 0x8105: return "ImageSensorDimensionEffectiveHeight";
         case 0x8106: return "CaptureFrameRate";
         case 0x8107: return "ImageSensorReadoutMode";
         case 0x8108: return "ShutterSpeed_Angle";
+        case 0x8109: return "ShutterSpeed_Time";
+        case 0x810A: return "CameraMasterGainAdjustment";
         case 0x810B: return "ISOSensitivity";
+        case 0x810C: return "ElectricalExtenderMagnification";
+        case 0x810D: return "AutoWhiteBalanceMode";
         case 0x810E: return "WhiteBalance";
+        case 0x810F: return "CameraMasterBlackLevel";
+        case 0x8110: return "CameraKneePoint";
+        case 0x8111: return "CameraKneeSlope";
+        case 0x8112: return "CameraLuminanceDynamicRange";
+        case 0x8113: return "CameraSettingFileURI";
         case 0x8114: return "CameraAttributes";
         case 0x8115: return "ExposureIndexofPhotoMeter";
-        case 0x8116: return "GammaforCDL";
-        case 0x8117: return "ASCCDLV1_2";
+        case 0x8116: return "GammaForCDL";
+        case 0x8117: return "ASC_CDL_V12";
         default:     return Ztring(Ztring::ToZtring(Value, 16)).To_UTF8();
     }
 }
@@ -1930,15 +2066,35 @@ const char* Mxf_AcquisitionMetadata_Sony_E201_ElementName[Mxf_AcquisitionMetadat
 };
 
 //---------------------------------------------------------------------------
-// EBU Tech 3349
+// Read from SR Viewer program
 string Mxf_AcquisitionMetadata_Sony_CameraProcessDiscriminationCode(int16u Value)
 {
     switch (Value)
     {
+        case 0x0101: return "F65 RAW Mode released in December 2011";
         case 0x0102: return "F65 HD Mode released in April 2012";
+        case 0x0103: return "F65 RAW High Frame Rate Mode released in July 2012";
         default:     return Ztring(Ztring::ToZtring(Value, 16)).To_UTF8();
     }
 };
+
+//---------------------------------------------------------------------------
+// Read from SR Viewer program
+string Mxf_AcquisitionMetadata_Sony_MonitoringBaseCurve(int128u Value)
+{
+    switch(Value.lo)
+    {
+        case 0x0E06040101010508LL : return "S-Log2";
+        default   :
+                    {
+                    Ztring ValueS;
+                    ValueS.From_Number(Value.lo, 16);
+                    if (ValueS.size()<16)
+                        ValueS.insert(0, 16-ValueS.size(), __T('0'));
+                    return ValueS.To_UTF8();
+                    }
+    }
+}
 
 //---------------------------------------------------------------------------
 extern const char* Mpegv_profile_and_level_indication_profile[];
@@ -1999,7 +2155,6 @@ File_Mxf::File_Mxf()
     PartitionMetadata_FooterPartition=(int64u)-1;
     RandomIndexMetadatas_MaxOffset=(int64u)-1;
     DTS_Delay=0;
-    StreamPos_StartAtOne=true;
     SDTI_TimeCode_RepetitionCount=0;
     SDTI_SizePerFrame=0;
     SDTI_IsPresent=false;
@@ -2369,9 +2524,41 @@ void File_Mxf::Streams_Finish()
                 Fill(Stream_Other, 0, ElementName_FirstFrame.c_str(), (*AcquisitionMetadataLists[Pos])[0].Value);
                 switch (Pos)
                 {
+                    case 0x8001 : //FocusPosition_ImagePlane
+                    case 0x8002 : //FocusPosition_FrontLensVertex
+                    case 0x8004 : //LensZoom_35mmStillCameraEquivalent
+                    case 0x8005 : //LensZoom_ActualFocalLength
+                        (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FirstFrame.c_str()), Info_Options)=__T("N NT");
+                        Fill(Stream_Other, 0, (ElementName_FirstFrame+"/String").c_str(), (*AcquisitionMetadataLists[Pos])[0].Value+" m");
+                        break;
+                    case 0x8006 : //OpticalExtenderMagnification
+                    case 0x810C : //ElectricalExtenderMagnification
+                    case 0x810F : //CameraMasterBlackLevel
+                    case 0x8110 : //CameraKneePoint
+                    case 0x8112 : //CameraLuminanceDynamicRange
+                        (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FirstFrame.c_str()), Info_Options)=__T("N NT");
+                        Fill(Stream_Other, 0, (ElementName_FirstFrame+"/String").c_str(), (*AcquisitionMetadataLists[Pos])[0].Value+"%");
+                        break;
+                    case 0x8104 : //ImagerDimension_EffectiveWidth
+                    case 0x8105 : //ImagerDimension_EffectiveHeight
+                        (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FirstFrame.c_str()), Info_Options)=__T("N NT");
+                        Fill(Stream_Other, 0, (ElementName_FirstFrame+"/String").c_str(), (*AcquisitionMetadataLists[Pos])[0].Value+" mm");
+                        break;
+                    case 0x8106 : //CaptureFrameRate
+                        (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FirstFrame.c_str()), Info_Options)=__T("N NT");
+                        Fill(Stream_Other, 0, (ElementName_FirstFrame+"/String").c_str(), (*AcquisitionMetadataLists[Pos])[0].Value+" fps");
+                        break;
                     case 0x8108 : //ShutterSpeed_Angle
                         (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FirstFrame.c_str()), Info_Options)=__T("N NT");
                         Fill(Stream_Other, 0, (ElementName_FirstFrame+"/String").c_str(), (*AcquisitionMetadataLists[Pos])[0].Value+"\xc2\xB0");
+                        break;
+                    case 0x8109 : //ShutterSpeed_Time
+                        (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FirstFrame.c_str()), Info_Options)=__T("N NT");
+                        Fill(Stream_Other, 0, (ElementName_FirstFrame+"/String").c_str(), (*AcquisitionMetadataLists[Pos])[0].Value+" s");
+                        break;
+                    case 0x810A : //CameraMasterGainAdjustment
+                        (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FirstFrame.c_str()), Info_Options)=__T("N NT");
+                        Fill(Stream_Other, 0, (ElementName_FirstFrame+"/String").c_str(), (*AcquisitionMetadataLists[Pos])[0].Value+" dB");
                         break;
                     case 0x810E : //WhiteBalance
                         (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FirstFrame.c_str()), Info_Options)=__T("N NT");
@@ -2834,10 +3021,10 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
                 }
                 Merge(*(*Parser), Stream_Audio, Audio_Pos, StreamPos_Last);
                 if (Retrieve(Stream_Audio, Pos, Audio_MuxingMode).empty())
-                    Fill(Stream_Audio, Pos, Audio_MuxingMode, Retrieve(Stream_Video, Essence->second.StreamPos-(StreamPos_StartAtOne?1:0), Video_Format), true);
+                    Fill(Stream_Audio, Pos, Audio_MuxingMode, Retrieve(Stream_Video, Essence->second.StreamPos-(StreamPos_StartAtZero[Essence->second.StreamKind]?0:1), Video_Format), true);
                 else
-                    Fill(Stream_Audio, Pos, Audio_MuxingMode, Retrieve(Stream_Video, Essence->second.StreamPos-(StreamPos_StartAtOne?1:0), Video_Format)+__T(" / ")+Retrieve(Stream_Audio, Pos, Audio_MuxingMode), true);
-                Fill(Stream_Audio, Pos, Audio_Duration, Retrieve(Stream_Video, Essence->second.StreamPos-(StreamPos_StartAtOne?1:0), Video_Duration));
+                    Fill(Stream_Audio, Pos, Audio_MuxingMode, Retrieve(Stream_Video, Essence->second.StreamPos-(StreamPos_StartAtZero[Essence->second.StreamKind]?0:1), Video_Format)+__T(" / ")+Retrieve(Stream_Audio, Pos, Audio_MuxingMode), true);
+                Fill(Stream_Audio, Pos, Audio_Duration, Retrieve(Stream_Video, Essence->second.StreamPos-(StreamPos_StartAtZero[Essence->second.StreamKind]?0:1), Video_Duration));
                 Fill(Stream_Audio, Pos, Audio_StreamSize_Encoded, 0); //Included in the DV stream size
                 Ztring ID=Retrieve(Stream_Audio, Pos, Audio_ID);
                 Fill(Stream_Audio, Pos, Audio_ID, Retrieve(Stream_Video, Count_Get(Stream_Video)-1, Video_ID)+__T("-")+ID, true);
@@ -2846,7 +3033,7 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
             }
 
             StreamKind_Last=Stream_Video;
-            StreamPos_Last=Essence->second.StreamPos-(StreamPos_StartAtOne?1:0);
+            StreamPos_Last=Essence->second.StreamPos-(StreamPos_StartAtZero[Essence->second.StreamKind]?0:1);
         }
     #endif
 
@@ -2911,7 +3098,7 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
             Fill(Stream_General, 0, General_Title, Title);
 
         StreamKind_Last=Stream_Video;
-        StreamPos_Last=Essence->second.StreamPos-(StreamPos_StartAtOne?1:0);
+        StreamPos_Last=Essence->second.StreamPos-(StreamPos_StartAtZero[Essence->second.StreamKind]?0:1);
     }
 
     //Stream size
@@ -3168,7 +3355,8 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
 
         if (Descriptor->second.Width!=(int32u)-1 && Retrieve(Stream_Video, StreamPos_Last, Video_Width).empty())
             Fill(Stream_Video, StreamPos_Last, Video_Width, Descriptor->second.Width, 10, true);
-        if (Descriptor->second.Width_Display!=(int32u)-1 && Descriptor->second.Width_Display!=Retrieve(Stream_Video, StreamPos_Last, Video_Width).To_int32u())
+        if (Descriptor->second.Width_Display!=(int32u)-1 && Descriptor->second.Width_Display!=Retrieve(Stream_Video, StreamPos_Last, Video_Width).To_int32u()
+         && !(Retrieve(Stream_Video, StreamPos_Last, Video_Format) == __T("DV") && Descriptor->second.Width_Display == 1920 && (Retrieve(Stream_Video, StreamPos_Last, Video_Width) == __T("1280") || Retrieve(Stream_Video, StreamPos_Last, Video_Width) == __T("1440")))) // Exception: DVCPRO HD is really 1440 but lot of containers fill the width value with the marketing width 1920, we ignore it
         {
             Fill(Stream_Video, StreamPos_Last, Video_Width_Original, Retrieve(Stream_Video, StreamPos_Last, Video_Width), true);
             if (Retrieve(Stream_Video, StreamPos_Last, Video_PixelAspectRatio_Original).empty())
@@ -3210,7 +3398,7 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
                 Fill(Stream_Video, StreamPos_Last, Video_MultiView_Count, 2, 10, true);
             }
             for (essences::iterator Essence=Essences.begin(); Essence!=Essences.end(); ++Essence)
-                if (Essence->second.StreamKind==Stream_Video && Essence->second.StreamPos-(StreamPos_StartAtOne?1:0)==StreamPos_Last)
+                if (Essence->second.StreamKind==Stream_Video && Essence->second.StreamPos-(StreamPos_StartAtZero[Essence->second.StreamKind]?0:1)==StreamPos_Last)
                 {
                     if (Essence->second.Field_Count_InThisBlock_1 && !Essence->second.Field_Count_InThisBlock_2)
                         SampleRate/=2;
@@ -3589,7 +3777,7 @@ void File_Mxf::Streams_Finish_Component(const int128u ComponentUID, float64 Edit
         // Hack, TODO: find a correct method for detecting fiel/frame differene
         if (StreamKind_Last==Stream_Video)
             for (essences::iterator Essence=Essences.begin(); Essence!=Essences.end(); ++Essence)
-                if (Essence->second.StreamKind==Stream_Video && Essence->second.StreamPos-(StreamPos_StartAtOne?1:0)==StreamPos_Last)
+                if (Essence->second.StreamKind==Stream_Video && Essence->second.StreamPos-(StreamPos_StartAtZero[Essence->second.StreamKind]?0:1)==StreamPos_Last)
                 {
                     if (Essence->second.Field_Count_InThisBlock_1 && !Essence->second.Field_Count_InThisBlock_2)
                         FrameCount/=2;
@@ -5653,9 +5841,6 @@ void File_Mxf::Data_Parse()
                 Essence->second.TrackID_WasLookedFor=true;
             }
 
-            if ((Code_Compare4&0x000000FF)==0x00000000)
-                StreamPos_StartAtOne=false;
-
             //Searching the corresponding Descriptor
             bool DescriptorFound=false;
             for (descriptors::iterator Descriptor=Descriptors.begin(); Descriptor!=Descriptors.end(); ++Descriptor)
@@ -5742,6 +5927,9 @@ void File_Mxf::Data_Parse()
                             Streams_Count--;
                 }
             }
+
+            if ((Code_Compare4&0x000000FF)==0x00000000)
+                StreamPos_StartAtZero.set(Essence->second.StreamKind);
 
             //Stream size is sometime easy to find
             if ((Buffer_End?(Buffer_End-Buffer_Begin):Element_TotalSize_Get())>=File_Size*0.98) //let imagine: if element size is 98% of file size, this is the only one element in the file
@@ -7871,11 +8059,26 @@ void File_Mxf::SubDescriptors()
 //---------------------------------------------------------------------------
 void File_Mxf::LensUnitMetadata()
 {
-    //switch(Code2)
-    //{
-    //    default:
+    if (Count_Get(Stream_Other)==0)
+    {
+        Stream_Prepare(Stream_Other);
+
+        AcquisitionMetadataLists.resize(0x10000);
+    }
+
+    switch(Code2)
+    {
+        ELEMENT(8000, LensUnitMetadata_IrisFNumber,                         "Iris (F)")
+        ELEMENT(8001, LensUnitMetadata_FocusPositionFromImagePlane,         "Focus Position (Image Plane)")
+        ELEMENT(8002, LensUnitMetadata_FocusPositionFromFrontLensVertex,    "Focus Position (Front Lens Vertex)")
+        ELEMENT(8003, LensUnitMetadata_MacroSetting,                        "Macro Setting")
+        ELEMENT(8004, LensUnitMetadata_LensZoom35mmStillCameraEquivalent,   "LensZoom (35mm Still Camera Equivalent")
+        ELEMENT(8005, LensUnitMetadata_LensZoomActualFocalLength,           "LensZoom (Actual Focal Length)")
+        ELEMENT(8006, LensUnitMetadata_OpticalExtenderMagnification,        "Optical Extender Magnification")
+        ELEMENT(8007, LensUnitMetadata_LensAttributes,                      "Lens Attributes")
+        default:
                     GenerationInterchangeObject();
-    //}
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -7890,17 +8093,31 @@ void File_Mxf::CameraUnitMetadata()
 
     switch(Code2)
     {
-        ELEMENT(3210, CameraUnitMetadata_CaptureGammaEquation,  "Capture Gamma Equation")
-        ELEMENT(8103, CameraUnitMetadata_NeutralDensityFilterWheelSetting, "Neutral Density Filter Wheel Setting")
-        ELEMENT(8106, CameraUnitMetadata_CaptureFrameRate,      "Capture Frame Rate")
-        ELEMENT(8107, CameraUnitMetadata_ImageSensorReadoutMode,"Image Sensor Readout Mode")
-        ELEMENT(8108, CameraUnitMetadata_ShutterSpeed_Angle,    "Shutter Speed (Angle)")
-        ELEMENT(810B, CameraUnitMetadata_ISOSensitivity,        "ISO Sensitivity")
-        ELEMENT(810E, CameraUnitMetadata_WhiteBalance,          "White Balance")
-        ELEMENT(8114, CameraUnitMetadata_CameraAttributes,      "Camera Attributes")
-        ELEMENT(8115, CameraUnitMetadata_ExposureIndexofPhotoMeter,"Exposure Index of Photo Meter")
-        ELEMENT(8116, CameraUnitMetadata_GammaforCDL,           "Gamma for CDL")
-        ELEMENT(8117, CameraUnitMetadata_ASCCDLV1_2,            "ASC CDL V1.2")
+        ELEMENT(3210, CameraUnitMetadata_CaptureGammaEquation,              "Capture Gamma Equation")
+        ELEMENT(8100, CameraUnitMetadata_AutoExposureMode,                  "AutoExposure Mode")
+        ELEMENT(8101, CameraUnitMetadata_AutoFocusSensingAreaSetting,       "Auto Focus Sensing Area Setting")
+        ELEMENT(8102, CameraUnitMetadata_ColorCorrectionFilterWheelSetting, "Color Correction Filter Wheel Setting")
+        ELEMENT(8103, CameraUnitMetadata_NeutralDensityFilterWheelSetting,  "Neutral Density Filter Wheel Setting")
+        ELEMENT(8104, CameraUnitMetadata_ImageSensorDimensionEffectiveWidth,"Imager Dimension (Effective Width)")
+        ELEMENT(8105, CameraUnitMetadata_ImageSensorDimensionEffectiveHeight,"Imager Dimension (Effective Height)")
+        ELEMENT(8106, CameraUnitMetadata_CaptureFrameRate,                  "Capture Frame Rate")
+        ELEMENT(8107, CameraUnitMetadata_ImageSensorReadoutMode,            "Image Sensor Readout Mode")
+        ELEMENT(8108, CameraUnitMetadata_ShutterSpeed_Angle,                "Shutter Speed (Angle)")
+        ELEMENT(8109, CameraUnitMetadata_ShutterSpeed_Time,                 "Shutter Speed (Time)")
+        ELEMENT(810A, CameraUnitMetadata_CameraMasterGainAdjustment,        "Camera Master Gain Adjustment")
+        ELEMENT(810B, CameraUnitMetadata_ISOSensitivity,                    "ISO Sensitivity")
+        ELEMENT(810C, CameraUnitMetadata_ElectricalExtenderMagnification,   "Electrical Extender Magnification")
+        ELEMENT(810D, CameraUnitMetadata_AutoWhiteBalanceMode,              "Auto White Balance Mode")
+        ELEMENT(810E, CameraUnitMetadata_WhiteBalance,                      "White Balance")
+        ELEMENT(810F, CameraUnitMetadata_CameraMasterBlackLevel,            "Camera Master BlackLevel")
+        ELEMENT(8110, CameraUnitMetadata_CameraKneePoint,                   "Camera Knee Point")
+        ELEMENT(8111, CameraUnitMetadata_CameraKneeSlope,                   "Camera Knee Slope")
+        ELEMENT(8112, CameraUnitMetadata_CameraLuminanceDynamicRange,       "Camera Luminance Dynamic Range")
+        ELEMENT(8113, CameraUnitMetadata_CameraSettingFileURI,              "Camera Setting File URI")
+        ELEMENT(8114, CameraUnitMetadata_CameraAttributes,                  "Camera Attributes")
+        ELEMENT(8115, CameraUnitMetadata_ExposureIndexofPhotoMeter,         "Exposure Index of Photo Meter")
+        ELEMENT(8116, CameraUnitMetadata_GammaForCDL,                       "Gamma for CDL")
+        ELEMENT(8117, CameraUnitMetadata_ASC_CDL_V12,                        "ASC CDL V1.2")
         default:
                     GenerationInterchangeObject();
     }
@@ -7924,11 +8141,14 @@ void File_Mxf::UserDefinedAcquisitionMetadata()
                 if (UserDefinedAcquisitionMetadata_UdamSetIdentifier_IsSony)
                     switch(Code2)
                     {
-                        ELEMENT(8007, UserDefinedAcquisitionMetadata_Sony_8007, "Lens Attributes")
+                        ELEMENT(8007, LensUnitMetadata_LensAttributes,          "Lens Attributes")
                         ELEMENT(E101, UserDefinedAcquisitionMetadata_Sony_E101, "Effective Marker Coverage")
                         ELEMENT(E102, UserDefinedAcquisitionMetadata_Sony_E102, "Effective Marker Aspect Ratio")
                         ELEMENT(E103, UserDefinedAcquisitionMetadata_Sony_E103, "Camera Process Discrimination Code")
                         ELEMENT(E104, UserDefinedAcquisitionMetadata_Sony_E104, "Rotary Shutter Mode")
+                        ELEMENT(E105, UserDefinedAcquisitionMetadata_Sony_E105, "Raw Black Code Value")
+                        ELEMENT(E106, UserDefinedAcquisitionMetadata_Sony_E106, "Raw Gray Code Value")
+                        ELEMENT(E107, UserDefinedAcquisitionMetadata_Sony_E107, "Raw White Code Value")
                         ELEMENT(E109, UserDefinedAcquisitionMetadata_Sony_E109, "Monitoring Descriptions")
                         ELEMENT(E10B, UserDefinedAcquisitionMetadata_Sony_E10B, "Monitoring Base Curve")
                         ELEMENT(E201, UserDefinedAcquisitionMetadata_Sony_E201, "Cooke Protocol Binary Metadata")
@@ -10056,9 +10276,9 @@ void File_Mxf::PartitionMetadata()
                         if (Config->ParseSpeed>=1.0)
                         {
                             Config->File_IsGrowing=true;
-                            #if MEDIAINFO_MD5
-                                delete MD5; MD5=NULL;
-                            #endif //MEDIAINFO_MD5
+                            #if MEDIAINFO_HASH
+                                delete Hash; Hash=NULL;
+                            #endif //MEDIAINFO_HASH
                         }
                         break;
             case 0x02 : Fill(Stream_General, 0, General_Format_Settings, "Closed / Incomplete", Unlimited, true, true);
@@ -10067,9 +10287,9 @@ void File_Mxf::PartitionMetadata()
                         if (Config->ParseSpeed>=1.0)
                         {
                             Config->File_IsGrowing=true;
-                            #if MEDIAINFO_MD5
-                                delete MD5; MD5=NULL;
-                            #endif //MEDIAINFO_MD5
+                            #if MEDIAINFO_HASH
+                                delete Hash; Hash=NULL;
+                            #endif //MEDIAINFO_HASH
                         }
                         break;
             case 0x04 : Fill(Stream_General, 0, General_Format_Settings, "Closed / Complete"  , Unlimited, true, true);
@@ -10857,6 +11077,110 @@ void File_Mxf::WaveAudioDescriptor_ChannelAssignment()
 
 //---------------------------------------------------------------------------
 //
+void File_Mxf::LensUnitMetadata_IrisFNumber()
+{
+    //Parsing
+    int16u Value;
+    Get_B2(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(0x100000*(1-(log(Value)-log(2.0))/8), 0).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::LensUnitMetadata_FocusPositionFromImagePlane()
+{
+    //Parsing
+    float32 Value;
+    Get_BF2(Value,                                              "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value, 3).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::LensUnitMetadata_FocusPositionFromFrontLensVertex()
+{
+    //Parsing
+    float32 Value;
+    Get_BF2(Value,                                              "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value, 3).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::LensUnitMetadata_MacroSetting()
+{
+    //Parsing
+    int8u Value;
+    Get_B1(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Value?"On":"Off");
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::LensUnitMetadata_LensZoom35mmStillCameraEquivalent()
+{
+    //Parsing
+    float32 Value;
+    Get_BF2(Value,                                              "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value, 3).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::LensUnitMetadata_LensZoomActualFocalLength()
+{
+    //Parsing
+    float32 Value;
+    Get_BF2(Value,                                              "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value, 3).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::LensUnitMetadata_OpticalExtenderMagnification()
+{
+    //Parsing
+    int16u Value;
+    Get_B2(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::LensUnitMetadata_LensAttributes()
+{
+    //Parsing
+    Ztring Value;
+    Get_UTF8(Length2, Value,                                    "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Value.To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
 void File_Mxf::CameraUnitMetadata_CaptureGammaEquation()
 {
     //Parsing
@@ -10870,6 +11194,45 @@ void File_Mxf::CameraUnitMetadata_CaptureGammaEquation()
 
 //---------------------------------------------------------------------------
 //
+void File_Mxf::CameraUnitMetadata_AutoExposureMode()
+{
+    //Parsing
+    int128u Value;
+    Get_UUID(Value,                                             "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Mxf_CameraUnitMetadata_AutoExposureMode(Value));
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::CameraUnitMetadata_AutoFocusSensingAreaSetting()
+{
+    //Parsing
+    int8u Value;
+    Get_B1(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Mxf_CameraUnitMetadata_AutoFocusSensingAreaSetting(Value));
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::CameraUnitMetadata_ColorCorrectionFilterWheelSetting()
+{
+    //Parsing
+    int8u Value;
+    Get_B1(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Mxf_CameraUnitMetadata_ColorCorrectionFilterWheelSetting(Value));
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
 void File_Mxf::CameraUnitMetadata_NeutralDensityFilterWheelSetting()
 {
     //Parsing
@@ -10877,7 +11240,37 @@ void File_Mxf::CameraUnitMetadata_NeutralDensityFilterWheelSetting()
     Get_B2(Value,                                               "Value"); Element_Info1(Mxf_CameraUnitMetadata_NeutralDensityFilterWheelSetting(Value).c_str());
 
     FILLING_BEGIN();
-        AcquisitionMetadata_Add(Code2, Mxf_CameraUnitMetadata_NeutralDensityFilterWheelSetting(Value));
+        if (Value==1)
+            AcquisitionMetadata_Add(Code2, "Clear");
+        else
+            AcquisitionMetadata_Add(Code2, "1/"+Ztring::ToZtring(Value).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::CameraUnitMetadata_ImageSensorDimensionEffectiveWidth()
+{
+    //Parsing
+    int16u Value;
+    Get_B2(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(((float64)Value)/1000, 3).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::CameraUnitMetadata_ImageSensorDimensionEffectiveHeight()
+{
+    //Parsing
+    //Parsing
+    int16u Value;
+    Get_B2(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(((float64)Value)/1000, 3).To_UTF8());
     FILLING_END();
 }
 
@@ -10922,6 +11315,33 @@ void File_Mxf::CameraUnitMetadata_ShutterSpeed_Angle()
 
 //---------------------------------------------------------------------------
 //
+void File_Mxf::CameraUnitMetadata_ShutterSpeed_Time()
+{
+    //Parsing
+    int32u Num, Den;
+    Get_B4(Num,                                                 "Num");
+    Get_B4(Den,                                                 "Den");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Num).To_UTF8()+'/'+Ztring::ToZtring(Den).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::CameraUnitMetadata_CameraMasterGainAdjustment()
+{
+    //Parsing
+    int16u Value;
+    Get_B2(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(((float64)Value)/100, 2).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
 void File_Mxf::CameraUnitMetadata_ISOSensitivity()
 {
     //Parsing
@@ -10935,6 +11355,32 @@ void File_Mxf::CameraUnitMetadata_ISOSensitivity()
 
 //---------------------------------------------------------------------------
 //
+void File_Mxf::CameraUnitMetadata_ElectricalExtenderMagnification()
+{
+    //Parsing
+    int16u Value;
+    Get_B2(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::CameraUnitMetadata_AutoWhiteBalanceMode()
+{
+    //Parsing
+    int8u Value;
+    Get_B1(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Mxf_CameraUnitMetadata_AutoWhiteBalanceMode(Value));
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
 void File_Mxf::CameraUnitMetadata_WhiteBalance()
 {
     //Parsing
@@ -10943,6 +11389,71 @@ void File_Mxf::CameraUnitMetadata_WhiteBalance()
 
     FILLING_BEGIN();
         AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::CameraUnitMetadata_CameraMasterBlackLevel()
+{
+    //Parsing
+    int16u Value;
+    Get_B2(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(((float64)Value)/10, 1).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::CameraUnitMetadata_CameraKneePoint()
+{
+    //Parsing
+    int16u Value;
+    Get_B2(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(((float64)Value)/10, 1).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::CameraUnitMetadata_CameraKneeSlope()
+{
+    //Parsing
+    float64 Value;
+    Get_Rational(Value);
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value, 3).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::CameraUnitMetadata_CameraLuminanceDynamicRange()
+{
+    //Parsing
+    int16u Value;
+    Get_B2(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(((float64)Value)/10, 1).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::CameraUnitMetadata_CameraSettingFileURI()
+{
+    //Parsing
+    Ztring Value;
+    Get_UTF8(Length2, Value,                                    "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Value.To_UTF8());
     FILLING_END();
 }
 
@@ -10974,7 +11485,7 @@ void File_Mxf::CameraUnitMetadata_ExposureIndexofPhotoMeter()
 
 //---------------------------------------------------------------------------
 //
-void File_Mxf::CameraUnitMetadata_GammaforCDL()
+void File_Mxf::CameraUnitMetadata_GammaForCDL()
 {
     //Parsing
     int8u Value;
@@ -10987,7 +11498,7 @@ void File_Mxf::CameraUnitMetadata_GammaforCDL()
 
 //---------------------------------------------------------------------------
 //
-void File_Mxf::CameraUnitMetadata_ASCCDLV1_2()
+void File_Mxf::CameraUnitMetadata_ASC_CDL_V12()
 {
     //Parsing
     //Vector
@@ -11026,21 +11537,9 @@ void File_Mxf::UserDefinedAcquisitionMetadata_UdamSetIdentifier()
     Get_UUID(Value,                                             "Value");
 
     FILLING_BEGIN();
-        if (Value.hi==0x966908004678031CLL && Value.lo==0x20500000F0C01181LL)
+        if ((Value.hi==0x966908004678031CLL && Value.lo==0x20500000F0C01181LL)
+         || (Value.hi==0x966908004678031CLL && Value.lo==0x20500002F0C01181LL)) //Found Sony metadata with 00 or 02, what is the difference?
             UserDefinedAcquisitionMetadata_UdamSetIdentifier_IsSony=true;
-    FILLING_END();
-}
-
-//---------------------------------------------------------------------------
-//
-void File_Mxf::UserDefinedAcquisitionMetadata_Sony_8007()
-{
-    //Parsing
-    Ztring Value;
-    Get_UTF8(Length2, Value,                                    "Value");
-
-    FILLING_BEGIN();
-        AcquisitionMetadata_Add(Code2, Value.To_UTF8());
     FILLING_END();
 }
 
@@ -11100,6 +11599,45 @@ void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E104()
 
 //---------------------------------------------------------------------------
 //
+void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E105()
+{
+    //Parsing
+    int16u Value;
+    Get_B2(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E106()
+{
+    //Parsing
+    int16u Value;
+    Get_B2(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E107()
+{
+    //Parsing
+    int16u Value;
+    Get_B2(Value,                                               "Value");
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(Value).To_UTF8());
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
 void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E109()
 {
     //Parsing
@@ -11124,7 +11662,7 @@ void File_Mxf::UserDefinedAcquisitionMetadata_Sony_E10B()
         ValueS.From_Number(Value.lo, 16);
         if (ValueS.size()<16)
             ValueS.insert(0, 16-ValueS.size(), __T('0'));
-        AcquisitionMetadata_Add(Code2, ValueS.To_UTF8());
+        AcquisitionMetadata_Add(Code2, Mxf_AcquisitionMetadata_Sony_MonitoringBaseCurve(Value));
     FILLING_END();
 }
 
@@ -15749,14 +16287,16 @@ void File_Mxf::ChooseParser_Alaw(const essences::iterator &Essence, const descri
 void File_Mxf::ChooseParser_ChannelGrouping(const essences::iterator &Essence, const descriptors::iterator &Descriptor)
 {
     Essence->second.StreamKind=Stream_Audio;
+    if ((Essence->first&0x000000FF)==0x00000000)
+        StreamPos_StartAtZero.set(Essence->second.StreamKind); // Need to do it here because we use StreamPos_StartAtZero immediately
 
     #if defined(MEDIAINFO_SMPTEST0337_YES)
 
     //Creating the parser
-    if (!((Essence->second.StreamPos-(StreamPos_StartAtOne?1:0))%2 && Essences[Essence->first-1].Parsers.size()<=1))
+    if (!((Essence->second.StreamPos-(StreamPos_StartAtZero[Essence->second.StreamKind]?0:1))%2 && Essences[Essence->first-1].Parsers.size()<=1))
     {
         File_ChannelGrouping* Parser;
-        if ((Essence->second.StreamPos-(StreamPos_StartAtOne?1:0))%2) //If the first half-stream was already rejected, don't try this one
+        if ((Essence->second.StreamPos-(StreamPos_StartAtZero[Essence->second.StreamKind]?0:1))%2) //If the first half-stream was already rejected, don't try this one
         {
             essences::iterator FirstChannel=Essences.find(Essence->first-1);
             if (FirstChannel==Essences.end() || !FirstChannel->second.IsChannelGrouping)
