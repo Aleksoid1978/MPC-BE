@@ -169,3 +169,7 @@ Fixed a bug in transicc for named color profiles
 added an extra _ to _stdcall to make it more portable
 Big amount of functionality contributed/Sponsored  by Alien Skin Software: TransformStride, copyAlpha, performance plug-ins. Fixes some warnings as well.
 Fix a bug that prevented to read luminance tag
+Added some extra checks to the tools and examples.
+Fixed misalignment problems on Alpha. The compiler does not align strings, and accessing begin of string as a uint16 makes code to fail.
+Fixed a bug in optimizer that made some formats (i.e, bits planar) unavailable
+Improved detection of cases where RGB8 optimizer does not apply

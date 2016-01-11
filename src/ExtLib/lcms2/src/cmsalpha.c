@@ -289,8 +289,10 @@ void ComputeIncrementsForChunky(cmsUInt32Number Format,
        int pixelSize = channelSize * total_chans;
        
 	   // Sanity check
-	   if (total_chans <= 0)
+	   if (total_chans <= 0 || total_chans >= cmsMAXCHANNELS)
 		   return;
+
+        memset(channels, 0, sizeof(channels));
 
        // Separation is independent of starting point and only depends on channel size
        for (i = 0; i < extra; i++)
@@ -308,7 +310,7 @@ void ComputeIncrementsForChunky(cmsUInt32Number Format,
        }
 
        // Handle swap first (ROL of positions), example CMYK -> KCMY | 0123 -> 3012
-       if (T_SWAPFIRST(Format)) {
+       if (T_SWAPFIRST(Format) && total_chans > 1) {
               
               cmsUInt32Number tmp = channels[0];
               for (i = 0; i < total_chans-1; i++)
@@ -343,6 +345,12 @@ void ComputeIncrementsForPlanar(cmsUInt32Number Format,
        int i;
        int channelSize = trueBytesSize(Format);
       
+       // Sanity check
+       if (total_chans <= 0 || total_chans >= cmsMAXCHANNELS)
+           return;
+
+       memset(channels, 0, sizeof(channels));
+
        // Separation is independent of starting point and only depends on channel size
        for (i = 0; i < extra; i++)
               ComponentPointerIncrements[i] = channelSize;
@@ -359,7 +367,7 @@ void ComputeIncrementsForPlanar(cmsUInt32Number Format,
        }
 
        // Handle swap first (ROL of positions), example CMYK -> KCMY | 0123 -> 3012
-       if (T_SWAPFIRST(Format)) {
+       if (T_SWAPFIRST(Format) && total_chans > 0) {
 
               cmsUInt32Number tmp = channels[0];
               for (i = 0; i < total_chans - 1; i++)

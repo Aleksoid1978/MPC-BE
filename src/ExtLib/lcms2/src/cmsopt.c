@@ -1011,8 +1011,8 @@ cmsBool IsDegenerated(const cmsToneCurve* g)
     }
 
     if (Zeros == 1 && Poles == 1) return FALSE;  // For linear tables
-    if (Zeros > (nEntries / 4)) return TRUE;  // Degenerated, mostly zeros
-    if (Poles > (nEntries / 4)) return TRUE;  // Degenerated, mostly poles
+    if (Zeros > (nEntries / 20)) return TRUE;  // Degenerated, many zeros
+    if (Poles > (nEntries / 20)) return TRUE;  // Degenerated, many poles
 
     return FALSE;
 }
@@ -1041,10 +1041,12 @@ cmsBool OptimizeByComputingLinearization(cmsPipeline** Lut, cmsUInt32Number Inte
     // This is a loosy optimization! does not apply in floating-point cases
     if (_cmsFormatterIsFloat(*InputFormat) || _cmsFormatterIsFloat(*OutputFormat)) return FALSE;
 
-    // Only on RGB
+    // Only on chunky RGB
     if (T_COLORSPACE(*InputFormat)  != PT_RGB) return FALSE;
-    if (T_COLORSPACE(*OutputFormat) != PT_RGB) return FALSE;
+    if (T_PLANAR(*InputFormat)) return FALSE;
 
+    if (T_COLORSPACE(*OutputFormat) != PT_RGB) return FALSE;
+    if (T_PLANAR(*OutputFormat)) return FALSE;
 
     // On 16 bits, user has to specify the feature
     if (!_cmsFormatterIs8bit(*InputFormat)) {
@@ -1067,6 +1069,22 @@ cmsBool OptimizeByComputingLinearization(cmsPipeline** Lut, cmsUInt32Number Inte
     // Empty gamma containers
     memset(Trans, 0, sizeof(Trans));
     memset(TransReverse, 0, sizeof(TransReverse));
+
+    // If the last stage of the original lut are curves, and those curves are
+    // degenerated, it is likely the transform is squeezing and clipping
+    // the output from previous CLUT. We cannot optimize this case     
+    {
+        cmsStage* last = cmsPipelineGetPtrToLastStage(OriginalLut);
+
+        if (cmsStageType(last) == cmsSigCurveSetElemType) {
+
+            _cmsStageToneCurvesData* Data = (_cmsStageToneCurvesData*)cmsStageData(last);
+            for (i = 0; i < Data->nCurves; i++) {
+                if (IsDegenerated(Data->TheCurves[i]))
+                    goto Error;
+            }
+        }
+    }
 
     for (t = 0; t < OriginalLut ->InputChannels; t++) {
         Trans[t] = cmsBuildTabulatedToneCurve16(OriginalLut ->ContextID, PRELINEARIZATION_POINTS, NULL);

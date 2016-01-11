@@ -15,7 +15,7 @@ Updated libraries:
 	jsoncpp git-1.0.0-436-g9234cbb;
 	libdcadec git-v0.1.0-72-g3a8b58e;
 	libpng-1.6.20-signed;
-	Little-CMS 2.7 beta git-0ebca931;
+	Little-CMS git-2.7-40-ga06d11e;
 	MediaInfo git-v0.7.81-7b130f48;
 	ZenLib git-v0.4.32-11-gf36cf81.
 
