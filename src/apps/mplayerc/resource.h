@@ -9,7 +9,6 @@
 #define IDB_W7_AUDIO                    197
 #define IDB_W7_TOOLBAR                  198
 #define IDB_MEDIAINFO_LANGUAGE          199
-#define IDB_PLAYERTOOLBAR_PNG           200
 #define IDB_PLAYERTOOLBAR               201
 #define IDB_NOAUDIO                     202
 #define IDB_MONO                        203
@@ -19,6 +18,13 @@
 #define IDF_LOGO0                       207
 #define IDF_LOGO1                       208
 #define IDB_STREAMTYPES                 215
+
+#define IDB_PLAYERTOOLBAR_PNG           250
+#define IDB_PLAYERTOOLBAR_PNG_125       251
+#define IDB_PLAYERTOOLBAR_PNG_150       252
+#define IDB_PLAYERTOOLBAR_PNG_175       253
+#define IDB_PLAYERTOOLBAR_PNG_200       254
+
 #define IDI_DVD                         302
 #define IDI_AUDIOCD                     303
 #define IDI_UNKNOWN                     304
@@ -68,7 +74,13 @@
 #define IDR_TB_PLAY                     540
 #define IDR_TB_PAUSE                    541
 #define IDR_TB_STOP                     542
-#define IDB_DXVA_ON                     543
+
+#define IDB_DXVA_INDICATOR              550
+#define IDB_DXVA_INDICATOR_125          551
+#define IDB_DXVA_INDICATOR_150          552
+#define IDB_DXVA_INDICATOR_175          553
+#define IDB_DXVA_INDICATOR_200          554
+
 #define IDF_SHADER_EMPTY                700
 #define IDF_SHADER_FINAL                701
 // commands
