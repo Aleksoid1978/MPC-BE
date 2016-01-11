@@ -91,9 +91,7 @@
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include <cstring>
 #include <algorithm>
-#if MEDIAINFO_DEMUX
-    #include "base64.h"
-#endif //MEDIAINFO_DEMUX
+#include "base64.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -153,6 +151,117 @@ const char* Mk_StereoMode_v2(int64u StereoMode)
     }
 }
 
+//---------------------------------------------------------------------------
+const char* Mk_OriginalSourceMedium_From_Source_ID (const Ztring &Value)
+{
+    if (Value.size()==6 && Value[0] == __T('0') && Value[1] == __T('0'))
+        return "Blu-ray";
+    if (Value.size()==6 && Value[0] == __T('0') && Value[1] == __T('1'))
+        return "DVD-Video";
+    return "";
+}
+
+//---------------------------------------------------------------------------
+Ztring Mk_ID_From_Source_ID (const Ztring &Value)
+{
+    if (Value.size()==6 && Value[0] == __T('0') && Value[1] == __T('0'))
+    {
+        // Blu-ray
+        int16u ValueI=0;
+        for (size_t Pos=2; Pos<Value.size(); Pos++)
+        {
+            ValueI*=16;
+            if (Value[Pos]>=__T('0') && Value[Pos]<=__T('9'))
+                ValueI+=Value[Pos]-__T('0');
+            else if (Value[Pos]>=__T('A') && Value[Pos]<=__T('F'))
+                ValueI+=10+Value[Pos]-__T('A');
+            else if (Value[Pos]>=__T('a') && Value[Pos]<=__T('f'))
+                ValueI+=10+Value[Pos]-__T('a');
+            else
+                return Value;
+        }
+        return Ztring::ToZtring(ValueI);
+    }
+
+    if (Value.size()==6 && Value[0] == __T('0') && Value[1] == __T('1'))
+    {
+        // DVD-Video
+        int16u ValueI=0;
+        for (size_t Pos=2; Pos<Value.size(); Pos++)
+        {
+            ValueI*=16;
+            if (Value[Pos]>=__T('0') && Value[Pos]<=__T('9'))
+                ValueI+=Value[Pos]-__T('0');
+            else if (Value[Pos]>=__T('A') && Value[Pos]<=__T('F'))
+                ValueI+=10+Value[Pos]-__T('A');
+            else if (Value[Pos]>=__T('a') && Value[Pos]<=__T('f'))
+                ValueI+=10+Value[Pos]-__T('a');
+            else
+                return Value;
+        }
+        int8u ID1 = ValueI&0xFF;
+        int8u ID2 = 0;
+        ValueI-=ID1;
+        if (ValueI)
+            ID2=ValueI>>8;
+
+        return Ztring::ToZtring(ID1) + (ID2?(__T('-') + Ztring::ToZtring(ID2)):Ztring());
+    }
+
+    return Value;
+}
+
+//---------------------------------------------------------------------------
+Ztring Mk_ID_String_From_Source_ID (const Ztring &Value)
+{
+    if (Value.size()==6 && Value[0] == __T('0') && Value[1] == __T('0'))
+    {
+        // Blu-ray
+        int16u ValueI=0;
+        for (size_t Pos=2; Pos<Value.size(); Pos++)
+        {
+            ValueI*=16;
+            if (Value[Pos]>=__T('0') && Value[Pos]<=__T('9'))
+                ValueI+=Value[Pos]-__T('0');
+            else if (Value[Pos]>=__T('A') && Value[Pos]<=__T('F'))
+                ValueI+=10+Value[Pos]-__T('A');
+            else if (Value[Pos]>=__T('a') && Value[Pos]<=__T('f'))
+                ValueI+=10+Value[Pos]-__T('a');
+            else
+                return Value;
+        }
+
+        return Ztring::ToZtring(ValueI) + __T(" (0x") + Ztring::ToZtring(ValueI, 16) + __T(")");
+    }
+
+    if (Value.size()==6 && Value[0] == __T('0') && Value[1] == __T('1'))
+    {
+        // DVD-Video
+        int16u ValueI=0;
+        for (size_t Pos=2; Pos<Value.size(); Pos++)
+        {
+            ValueI*=16;
+            if (Value[Pos]>=__T('0') && Value[Pos]<=__T('9'))
+                ValueI+=Value[Pos]-__T('0');
+            else if (Value[Pos]>=__T('A') && Value[Pos]<=__T('F'))
+                ValueI+=10+Value[Pos]-__T('A');
+            else if (Value[Pos]>=__T('a') && Value[Pos]<=__T('f'))
+                ValueI+=10+Value[Pos]-__T('a');
+            else
+                return Value;
+        }
+        int8u ID1 = ValueI&0xFF;
+        int8u ID2 = 0;
+        ValueI-=ID1;
+        if (ValueI)
+            ID2=ValueI>>8;
+
+        return Ztring::ToZtring(ID1) + __T(" (0x") + Ztring::ToZtring(ID1, 16) + __T(")") + (ID2?(__T('-') + Ztring::ToZtring(ID2) + __T(" (0x") + Ztring::ToZtring(ID2, 16) + __T(")")):Ztring());
+    }
+
+    return Value;
+}
+
 //***************************************************************************
 // Infos
 //***************************************************************************
@@ -188,6 +297,8 @@ File_Mk::File_Mk()
     Info_AlreadyParsed=false;
     Tracks_AlreadyParsed=false;
     Cluster_AlreadyParsed=false;
+    CurrentAttachmentIsCover=false;
+    CoverIsSetFromAttachment=false;
 
     //Helpers
     CodecPrivate=NULL;
@@ -323,9 +434,34 @@ void File_Mk::Streams_Finish()
                             else if (TempTag==__T("NUMBER_OF_BYTES"))
                             {
                                 if (Tags_Verified)
-                                    { Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), TagValue, true); Set=true; }
+                                {
+                                    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), TagValue, true);
+                                    Set=true;
+                                }
                                 else
                                     TempTag="StreamSize";
+                            }
+                            else if (TempTag==__T("NUMBER_OF_BYTES_UNCOMPRESSED"))
+                            {
+                                if (Tags_Verified)
+                                {
+                                    Fill(StreamKind_Last, StreamPos_Last, "StreamSize_Demuxed", TagValue, true);
+                                    Set=true;
+                                }
+                                else
+                                    TempTag="Stream Size (Uncompressed)";
+                            }
+                            else if (TempTag==__T("SOURCE_ID"))
+                            {
+                                if (Tags_Verified)
+                                {
+                                    Fill(StreamKind_Last, StreamPos_Last, "OriginalSourceMedium_ID", Mk_ID_From_Source_ID(TagValue), true);
+                                    Fill(StreamKind_Last, StreamPos_Last, "OriginalSourceMedium_ID/String", Mk_ID_String_From_Source_ID(TagValue), true);
+                                    Fill(Stream_General, 0, General_OriginalSourceMedium, Mk_OriginalSourceMedium_From_Source_ID(TagValue), Unlimited, true, true);
+                                    Set=true;
+                                }
+                                else
+                                    TempTag="OriginalSourceMedium_ID";
                             }
                             if (!Set)
                             {
@@ -350,20 +486,24 @@ void File_Mk::Streams_Finish()
                     // Checking 1.001 frame rates, Statistics_Duration is has often only a 1 ms precision so we test between -1ms and +1ms
                     float64 Duration_1001 = Statistics_FrameCount / float64_int64s(FrameRate_FromTags) * 1.001000;
                     float64 Duration_1000 = Statistics_FrameCount / float64_int64s(FrameRate_FromTags) * 1.001001;
+                    bool CanBe1001 = false;
+                    bool CanBe1000 = false;
+                    if (abs((Duration_1000 - Duration_1001) * 10000) >= 15)
+                    {
+                        Ztring DurationS; DurationS.From_Number(Statistics_Duration, 3);
+                        Ztring DurationS_1001; DurationS_1001.From_Number(Duration_1001, 3);
+                        Ztring DurationS_1000; DurationS_1000.From_Number(Duration_1000, 3);
 
-                    Ztring DurationS; DurationS.From_Number(Statistics_Duration, 3);
-                    Ztring DurationS_1001; DurationS_1001.From_Number(Duration_1001, 3);
-                    Ztring DurationS_1000; DurationS_1000.From_Number(Duration_1000, 3);
-
-                    bool CanBe1001=DurationS==DurationS_1001?true:false;
-                    bool CanBe1000=DurationS==DurationS_1000?true:false;
-                    if (CanBe1001 && !CanBe1000)
-                        FrameRate_FromTags = float64_int64s(FrameRate_FromTags) / 1.001;
-                    if (CanBe1000 && !CanBe1001)
-                        FrameRate_FromTags = float64_int64s(FrameRate_FromTags) / 1.001001;
+                        CanBe1001=DurationS==DurationS_1001?true:false;
+                        CanBe1000=DurationS==DurationS_1000?true:false;
+                        if (CanBe1001 && !CanBe1000)
+                            FrameRate_FromTags = float64_int64s(FrameRate_FromTags) / 1.001;
+                        if (CanBe1000 && !CanBe1001)
+                            FrameRate_FromTags = float64_int64s(FrameRate_FromTags) / 1.001001;
+                    }
 
                     // Duration from tags not reliable, checking TrackDefaultDuration
-                    if (!CanBe1000 && !CanBe1001)
+                    if (CanBe1000 == CanBe1001)
                     {
                         float64 Duration_Default=((float64)1000000000)/Temp->second.TrackDefaultDuration;
                         if (float64_int64s(Duration_Default) - Duration_Default*1.001000 > -0.000002
@@ -560,6 +700,20 @@ void File_Mk::Streams_Finish()
             {
                 Fill(Stream_Video, StreamPos_Last, Video_FrameRate_Original, Retrieve(Stream_Video, StreamPos_Last, Video_FrameRate));
                 Clear(Stream_Video, StreamPos_Last, Video_FrameRate);
+            }
+
+            //Crop
+            if (Temp->second.PixelCropLeft || Temp->second.PixelCropRight)
+            {
+                Fill(Stream_Video, StreamPos_Last, Video_Width_Original, Retrieve(Stream_Video, StreamPos_Last, Video_Width), true);
+                Fill(Stream_Video, StreamPos_Last, Video_Width, Retrieve(Stream_Video, StreamPos_Last, Video_Width).To_int64u()-Temp->second.PixelCropLeft-Temp->second.PixelCropRight, 10, true);
+                Fill(Stream_Video, StreamPos_Last, Video_Width_Offset, Temp->second.PixelCropLeft, 10, true);
+            }
+            if (Temp->second.PixelCropTop || Temp->second.PixelCropBottom)
+            {
+                Fill(Stream_Video, StreamPos_Last, Video_Height_Original, Retrieve(Stream_Video, StreamPos_Last, Video_Height), true);
+                Fill(Stream_Video, StreamPos_Last, Video_Height, Retrieve(Stream_Video, StreamPos_Last, Video_Height).To_int64u()-Temp->second.PixelCropTop-Temp->second.PixelCropBottom, 10, true);
+                Fill(Stream_Video, StreamPos_Last, Video_Height_Offset, Temp->second.PixelCropTop, 10, true);
             }
         }
 
@@ -1299,6 +1453,24 @@ void File_Mk::Segment_Attachements_AttachedFile_FileData()
     Element_Name("FileData");
 
     //Parsing
+    if (!CoverIsSetFromAttachment && CurrentAttachmentIsCover && Element_Size<=8*1024*1024) //TODO: option for setting the acceptable maximum size of the attachment
+    {
+        if (!Element_IsComplete_Get())
+        {
+            Element_WaitForMoreData();
+            return;
+        }
+
+        std::string Data_Raw;
+        Peek_String(Element_TotalSize_Get(), Data_Raw);
+        std::string Data_Base64(Base64::encode(Data_Raw));
+
+        //Filling
+        Fill(Stream_General, 0, General_Cover_Data, Data_Base64);
+        Fill(Stream_General, 0, General_Cover, "Yes");
+        CoverIsSetFromAttachment=true;
+    }
+    
     Skip_XX(Element_TotalSize_Get(),                            "Data");
 }
 
@@ -1319,7 +1491,11 @@ void File_Mk::Segment_Attachements_AttachedFile_FileName()
     //Parsing
     Ztring Data=UTF8_Get();
 
-    Fill(Stream_General, 0, "Attachements", Data);
+    Fill(Stream_General, 0, "Attachments", Data);
+    
+    //Cover is in the first file which name contains "cover"
+    if (!CoverIsSetFromAttachment && Data.MakeLowerCase().find(__T("cover")) != string::npos)
+        CurrentAttachmentIsCover=true;
 }
 
 //---------------------------------------------------------------------------
@@ -1672,8 +1848,10 @@ void File_Mk::Segment_Cluster_BlockGroup_Block()
     if (Stream[TrackNumber].Searching_Payload || Stream[TrackNumber].Searching_TimeStamps || Stream[TrackNumber].Searching_TimeStamp_Start)
     {
         //Parsing
-        int16u TimeCode;
-        Get_B2 (TimeCode,                                       "TimeCode");
+        int16u TimeCodeU;
+        Get_B2 (TimeCodeU,                                      "TimeCode"); // Should be signed, but we don't have signed integer reader
+        int16s TimeCode = (int16s)TimeCodeU;
+        Element_Info1(TimeCodeU);
 
         FILLING_BEGIN();
             if (Segment_Cluster_TimeCode_Value+TimeCode<Stream[TrackNumber].TimeCode_Start) //Does not work well: Stream[TrackNumber].Searching_TimeStamp_Start)
@@ -1781,6 +1959,9 @@ void File_Mk::Segment_Cluster_BlockGroup_Block()
 
                     if (Stream[TrackNumber].Searching_Payload)
                     {
+                        Element_Begin1("Data");
+                        Element_Parser(Stream[TrackNumber].Parser->ParserName.To_UTF8().c_str());
+
                         Element_Code=TrackNumber;
 
                         //Content compression
@@ -1804,6 +1985,8 @@ void File_Mk::Segment_Cluster_BlockGroup_Block()
                         if (Stream[TrackNumber].Parser->Status[IsFinished]
                          || (Stream[TrackNumber].PacketCount>=300 && MediaInfoLib::Config.ParseSpeed_Get()<1))
                             Stream[TrackNumber].Searching_Payload=false;
+
+                        Element_End0();
                     }
                     else
                         Skip_XX(Laces[Pos],                         "Data");
@@ -2365,7 +2548,6 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_TagString()
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("MAJOR_BRAND")) return; //QuickTime techinical info, useless
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("MINOR_VERSION")) return; //QuickTime techinical info, useless
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("PART_NUMBER")) Segment_Tag_SimpleTag_TagNames[0]=__T("Track/Position");
-    if (Segment_Tag_SimpleTag_TagNames[0]==__T("ORIGINAL") && Segment_Tag_SimpleTag_TagNames.size()==2 && Segment_Tag_SimpleTag_TagNames[1]==__T("URL")) return; //Useless
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("ORIGINAL_MEDIA_TYPE")) Segment_Tag_SimpleTag_TagNames[0]=__T("OriginalSourceForm");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("SAMPLE") && Segment_Tag_SimpleTag_TagNames.size()==2 && Segment_Tag_SimpleTag_TagNames[1]==__T("PART_NUMBER")) return; //Useless
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("SAMPLE") && Segment_Tag_SimpleTag_TagNames.size()==2 && Segment_Tag_SimpleTag_TagNames[1]==__T("TITLE")) {Segment_Tag_SimpleTag_TagNames.resize(1); Segment_Tag_SimpleTag_TagNames[0]=__T("Title_More");}
@@ -2373,10 +2555,11 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_TagString()
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("TERMS_OF_USE")) Segment_Tag_SimpleTag_TagNames[0]=__T("TermsOfUse");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("TITLE")) Segment_Tag_SimpleTag_TagNames[0]=__T("Title");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("TOTAL_PARTS")) Segment_Tag_SimpleTag_TagNames[0]=__T("Track/Position_Total");
-    for (size_t Pos=1; Pos<Segment_Tag_SimpleTag_TagNames.size(); Pos++)
+    for (size_t Pos=0; Pos<Segment_Tag_SimpleTag_TagNames.size(); Pos++)
     {
         if (Segment_Tag_SimpleTag_TagNames[Pos]==__T("BARCODE")) Segment_Tag_SimpleTag_TagNames[Pos]=__T("BarCode");
         if (Segment_Tag_SimpleTag_TagNames[Pos]==__T("COMMENT")) Segment_Tag_SimpleTag_TagNames[Pos]=__T("Comment");
+        if (Segment_Tag_SimpleTag_TagNames[Pos]==__T("ORIGINAL")) Segment_Tag_SimpleTag_TagNames[Pos]=__T("Original");
         if (Segment_Tag_SimpleTag_TagNames[Pos]==__T("URL")) Segment_Tag_SimpleTag_TagNames[Pos]=__T("Url");
     }
 
@@ -3176,7 +3359,12 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_PixelCropBottom()
     Element_Name("PixelCropBottom");
 
     //Parsing
-    UInteger_Info();
+    int64u UInteger=UInteger_Get();
+    
+    //Filling
+    FILLING_BEGIN();
+        Stream[TrackNumber].PixelCropBottom=UInteger;
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -3185,7 +3373,12 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_PixelCropLeft()
     Element_Name("PixelCropLeft");
 
     //Parsing
-    UInteger_Info();
+    int64u UInteger=UInteger_Get();
+    
+    //Filling
+    FILLING_BEGIN();
+        Stream[TrackNumber].PixelCropLeft=UInteger;
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -3194,7 +3387,12 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_PixelCropRight()
     Element_Name("PixelCropRight");
 
     //Parsing
-    UInteger_Info();
+    int64u UInteger=UInteger_Get();
+    
+    //Filling
+    FILLING_BEGIN();
+        Stream[TrackNumber].PixelCropRight=UInteger;
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -3203,7 +3401,12 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_PixelCropTop()
     Element_Name("PixelCropTop");
 
     //Parsing
-    UInteger_Info();
+    int64u UInteger=UInteger_Get();
+    
+    //Filling
+    FILLING_BEGIN();
+        Stream[TrackNumber].PixelCropTop=UInteger;
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------

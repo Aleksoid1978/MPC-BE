@@ -695,6 +695,9 @@
     <ClInclude Include="MediaInfo\Export\Export_Fims.h">
       <Filter>Header Files\Export</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\HashWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1326,6 +1329,9 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Export\Export_Fims.cpp">
       <Filter>Source Files\Export</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\HashWrapper.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

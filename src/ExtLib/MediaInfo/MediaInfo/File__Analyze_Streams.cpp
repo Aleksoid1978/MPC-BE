@@ -368,6 +368,9 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
                                 case Image_PixelAspectRatio_Original:    PixelAspectRatio_Fill(Value, Stream_Image, StreamPos, Image_Width_Original, Image_Height_Original, Image_PixelAspectRatio_Original, Image_DisplayAspectRatio_Original);   break;
                             }
                             break;
+        default:
+                            // TODO;
+                            break;
     }
 
     //Commercial name
@@ -1289,7 +1292,8 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
         Ztring PixelAspectRatio_Original=Retrieve(Stream_Video, StreamPos_To, Video_PixelAspectRatio);
         Ztring DisplayAspectRatio_Original=Retrieve(Stream_Video, StreamPos_To, Video_DisplayAspectRatio);
 
-        if (!Width_Temp.empty() && Width_Temp!=Retrieve(Stream_Video, StreamPos_To, Video_Width))
+        if (!Width_Temp.empty() && Width_Temp!=Retrieve(Stream_Video, StreamPos_To, Video_Width)
+            && !(Retrieve(Stream_Video, StreamPos_To, Video_Format) == __T("DV") && Width_Temp == __T("1920") && (Retrieve(Stream_Video, StreamPos_Last, Video_Width) == __T("1280") || Retrieve(Stream_Video, StreamPos_Last, Video_Width) == __T("1440")))) // Exception: DVCPRO HD is really 1440 but lot of containers fill the width value with the marketing width 1920, we ignore it
         {
             Fill(Stream_Video, StreamPos_To, Video_Width_Original, (*Stream)[Stream_Video][StreamPos_To][Video_Width], true);
             Fill(Stream_Video, StreamPos_To, Video_Width, Width_Temp, true);
@@ -1434,7 +1438,7 @@ void File__Analyze::Video_FrameRate_Rounding(size_t Pos, video Parameter)
     float64 FrameRate_Sav=FrameRate;
 
          if (FrameRate> 9.990 && FrameRate<=10.010) FrameRate=10.000;
-    else if (FrameRate>11.984 && FrameRate<=11.094) FrameRate=11.988;
+    else if (FrameRate>11.984 && FrameRate<=11.994) FrameRate=11.988;
     else if (FrameRate>11.994 && FrameRate<=12.010) FrameRate=12.000;
     else if (FrameRate>14.980 && FrameRate<=14.990) FrameRate=14.985;
     else if (FrameRate>14.990 && FrameRate<=15.010) FrameRate=15.000;

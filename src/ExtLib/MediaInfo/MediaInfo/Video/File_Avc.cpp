@@ -121,7 +121,7 @@ extern const float32 Avc_PixelAspectRatio[Avc_PixelAspectRatio_Size]=
 };
 
 //---------------------------------------------------------------------------
-extern const char* Avc_video_format[]=
+const char* Avc_video_format[]=
 {
     "Component",
     "PAL",
@@ -134,7 +134,7 @@ extern const char* Avc_video_format[]=
 };
 
 //---------------------------------------------------------------------------
-extern const char* Avc_video_full_range[]=
+const char* Avc_video_full_range[]=
 {
     "Limited",
     "Full",

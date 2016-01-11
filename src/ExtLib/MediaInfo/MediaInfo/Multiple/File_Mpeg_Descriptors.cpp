@@ -1631,31 +1631,30 @@ void File_Mpeg_Descriptors::Descriptor_05()
         switch (table_id)
         {
             case 0x02 : //program_map_section
-                        switch (elementary_PID_IsValid)
+                        if (elementary_PID_IsValid)
                         {
-                            case false : //Per program
-                                        Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[table_id_extension].registration_format_identifier=format_identifier;
-                                        break;
-                            case true : //Per PES
-                                        Complete_Stream->Streams[elementary_PID]->registration_format_identifier=format_identifier;
-                                        Complete_Stream->Streams[elementary_PID]->Infos["format_identifier"]=Ztring().From_CC4(format_identifier);
-                                        if (Complete_Stream->Streams[elementary_PID]->Infos["format_identifier"].size()!=4)
-                                        {
-                                            Ztring Temp; Temp.From_Number(format_identifier, 16);
-                                            if (Temp.size()<8)
-                                                Temp.insert(0, 8-Temp.size(), __T('0'));
-                                            Complete_Stream->Streams[elementary_PID]->Infos["format_identifier"]=__T("0x")+Temp;
-                                        }
-                                        Complete_Stream->Streams[elementary_PID]->Infos_Option["format_identifier"]=__T("N NT");
-                                        if (format_identifier==Elements::KLVA)
-                                        {
-                                            Complete_Stream->Streams[elementary_PID]->Infos["Format"]=__T("KLV");
-                                            Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[table_id_extension].HasNotDisplayableStreams=true;
-                                        }
-                                        //Coherency
-                                        if (stream_type==0x81 && Complete_Stream->Streams[elementary_PID]->registration_format_identifier==Elements::BSSD)
-                                            Complete_Stream->Streams[elementary_PID]->registration_format_identifier=0x00000000; //Reseting it, this combinaision is not possible but a stream has it
-                                        break;
+                            //Per PES
+                            Complete_Stream->Streams[elementary_PID]->registration_format_identifier=format_identifier;
+                            Complete_Stream->Streams[elementary_PID]->Infos["format_identifier"]=Ztring().From_CC4(format_identifier);
+                            if (Complete_Stream->Streams[elementary_PID]->Infos["format_identifier"].size()!=4)
+                            {
+                                Ztring Temp; Temp.From_Number(format_identifier, 16);
+                                if (Temp.size()<8)
+                                    Temp.insert(0, 8-Temp.size(), __T('0'));
+                                Complete_Stream->Streams[elementary_PID]->Infos["format_identifier"]=__T("0x")+Temp;
+                            }
+                            Complete_Stream->Streams[elementary_PID]->Infos_Option["format_identifier"]=__T("N NT");
+                            if (format_identifier==Elements::KLVA)
+                            {
+                                Complete_Stream->Streams[elementary_PID]->Infos["Format"]=__T("KLV");
+                                Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[table_id_extension].HasNotDisplayableStreams=true;
+                            }
+                            //Coherency
+                            if (stream_type==0x81 && Complete_Stream->Streams[elementary_PID]->registration_format_identifier==Elements::BSSD)
+                                Complete_Stream->Streams[elementary_PID]->registration_format_identifier=0x00000000; //Reseting it, this combinaision is not possible but a stream has it
+                        } else {
+                            //Per program
+                            Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[table_id_extension].registration_format_identifier=format_identifier;
                         }
                         break;
             default    : ;
@@ -1664,14 +1663,14 @@ void File_Mpeg_Descriptors::Descriptor_05()
         switch (table_id)
         {
             case 0x02 : //program_map_section
-                        switch (elementary_PID_IsValid)
+                        if (elementary_PID_IsValid)
                         {
-                            case false : //Per program
-                                        break;
-                            case true : //Per PES
-                                        Complete_Stream->Streams[elementary_PID]->Infos["format_identifier"]=__T("(INVALID)");
-                                        Complete_Stream->Streams[elementary_PID]->Infos_Option["format_identifier"]=__T("N NT");
-                                        break;
+                            //Per PES
+                            Complete_Stream->Streams[elementary_PID]->Infos["format_identifier"]=__T("(INVALID)");
+                            Complete_Stream->Streams[elementary_PID]->Infos_Option["format_identifier"]=__T("N NT");
+                        } else {
+                            //Per program
+                            //do nothing
                         }
                         break;
             default    : ;

@@ -21,12 +21,7 @@
 #if MEDIAINFO_AES
     #include <aescpp.h>
 #endif //MEDIAINFO_AES
-#if MEDIAINFO_MD5
-    extern "C"
-    {
-        #include <md5.h>
-    }
-#endif //MEDIAINFO_MD5
+#include "MediaInfo/HashWrapper.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -319,6 +314,7 @@ protected :
     #define Element_Info3(_A,_B,_C) Element_Info(_A, _B, _C)
     #define Element_Info1C(_CONDITION,_A) if (_CONDITION) Element_Info(_A)
     inline void Element_Info_From_Milliseconds (int64u Parameter)                  {if (Config_Trace_Level<1) return; Element_Info(Ztring().Duration_From_Milliseconds(Parameter));}
+    void Element_Parser (const Ztring &Name);
 
     //Elements - End
     inline void Element_End () {Element_End_Common_Flush();}
@@ -962,7 +958,7 @@ public :
     inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, int32s         Value, int8u Radix=10, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, Ztring::ToZtring(Value, Radix).MakeUpperCase(), Replace);}
     inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, int64u         Value, int8u Radix=10, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, Ztring::ToZtring(Value, Radix).MakeUpperCase(), Replace);}
     inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, int64s         Value, int8u Radix=10, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, Ztring::ToZtring(Value, Radix).MakeUpperCase(), Replace);}
-    inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, float32        Value, int8u AfterComma=3, bool Replace=false);
+    void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, float32        Value, int8u AfterComma=3, bool Replace=false);
     inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, float64        Value, int8u AfterComma=3, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, (float32)Value, AfterComma, Replace);}
     inline void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, float80        Value, int8u AfterComma=3, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, (float32)Value, AfterComma, Replace);}
     #ifdef SIZE_T_IS_LONG
@@ -1318,11 +1314,11 @@ public :
         size_t      AES_Decrypted_Size;
     #endif //MEDIAINFO_AES
 
-    //MD5
-    #if MEDIAINFO_MD5
-        struct MD5Context*  MD5;
-        int64u              Md5_ParseUpTo;
-    #endif //MEDIAINFO_MD5
+    //Hash
+    #if MEDIAINFO_HASH
+        HashWrapper*        Hash;
+        int64u              Hash_ParseUpTo;
+    #endif //MEDIAINFO_HASH
 
     #if MEDIAINFO_SEEK
     private:

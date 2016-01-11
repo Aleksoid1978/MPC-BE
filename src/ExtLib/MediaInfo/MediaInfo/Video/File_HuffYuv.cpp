@@ -67,14 +67,14 @@ const char* HuffYUV_ChromaSubsampling (int16u BitCount)
 const string HuffYUV_ColorSpace(bool rgb, bool chroma, bool alpha)
 {
     string ToReturn;
-    switch (rgb)
+
+    if (rgb)
     {
-        case false :
-                    ToReturn=chroma?"YUV":"Y";
-                    break;
-        case true  :
-                    ToReturn="RGB";
-                    break;
+        ToReturn="RGB";
+    }
+    else
+    {
+        ToReturn=chroma?"YUV":"Y";
     }
 
     if (alpha)

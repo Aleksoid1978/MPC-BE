@@ -24,6 +24,8 @@
 #include "MediaInfo/TimeCode.h"
 #include <vector>
 #include <set>
+#include <bitset>
+using namespace std;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -410,23 +412,48 @@ protected :
     void WaveAudioDescriptor_PeakEnvelopeTimestamp();           //3D30
     void WaveAudioDescriptor_PeakEnvelopeData();                //3D31
     void WaveAudioDescriptor_ChannelAssignment();               //3D31
+    void LensUnitMetadata_IrisFNumber();                        //8000
+    void LensUnitMetadata_FocusPositionFromImagePlane();        //8001
+    void LensUnitMetadata_FocusPositionFromFrontLensVertex();   //8002
+    void LensUnitMetadata_MacroSetting();                       //8003
+    void LensUnitMetadata_LensZoom35mmStillCameraEquivalent();  //8004
+    void LensUnitMetadata_LensZoomActualFocalLength();          //8005
+    void LensUnitMetadata_OpticalExtenderMagnification();       //8006
+    void LensUnitMetadata_LensAttributes();                     //8007
     void CameraUnitMetadata_CaptureGammaEquation();             //3210
+    void CameraUnitMetadata_AutoExposureMode();                 //8100
+    void CameraUnitMetadata_AutoFocusSensingAreaSetting();      //8101
+    void CameraUnitMetadata_ColorCorrectionFilterWheelSetting();//8102
     void CameraUnitMetadata_NeutralDensityFilterWheelSetting(); //8103
+    void CameraUnitMetadata_ImageSensorDimensionEffectiveWidth();//8104
+    void CameraUnitMetadata_ImageSensorDimensionEffectiveHeight();//8105
     void CameraUnitMetadata_CaptureFrameRate();                 //8106
     void CameraUnitMetadata_ImageSensorReadoutMode();           //8107
     void CameraUnitMetadata_ShutterSpeed_Angle();               //8108
+    void CameraUnitMetadata_ShutterSpeed_Time();                //8109
+    void CameraUnitMetadata_CameraMasterGainAdjustment();       //810A
     void CameraUnitMetadata_ISOSensitivity();                   //810B
+    void CameraUnitMetadata_ElectricalExtenderMagnification();  //810C
+    void CameraUnitMetadata_AutoWhiteBalanceMode();             //810D
     void CameraUnitMetadata_WhiteBalance();                     //800E
+    void CameraUnitMetadata_CameraMasterBlackLevel();           //810F
+    void CameraUnitMetadata_CameraKneePoint();                  //8110
+    void CameraUnitMetadata_CameraKneeSlope();                  //8111
+    void CameraUnitMetadata_CameraLuminanceDynamicRange();      //8112
+    void CameraUnitMetadata_CameraSettingFileURI();             //8113
     void CameraUnitMetadata_CameraAttributes();                 //8114
     void CameraUnitMetadata_ExposureIndexofPhotoMeter();        //8115
-    void CameraUnitMetadata_GammaforCDL();                      //8116
-    void CameraUnitMetadata_ASCCDLV1_2();                       //8117
+    void CameraUnitMetadata_GammaForCDL();                      //8116
+    void CameraUnitMetadata_ASC_CDL_V12();                      //8117
     void UserDefinedAcquisitionMetadata_UdamSetIdentifier();    //E000
     void UserDefinedAcquisitionMetadata_Sony_8007();
     void UserDefinedAcquisitionMetadata_Sony_E101();
     void UserDefinedAcquisitionMetadata_Sony_E102();
     void UserDefinedAcquisitionMetadata_Sony_E103();
     void UserDefinedAcquisitionMetadata_Sony_E104();
+    void UserDefinedAcquisitionMetadata_Sony_E105();
+    void UserDefinedAcquisitionMetadata_Sony_E106();
+    void UserDefinedAcquisitionMetadata_Sony_E107();
     void UserDefinedAcquisitionMetadata_Sony_E109();
     void UserDefinedAcquisitionMetadata_Sony_E10B();
     void UserDefinedAcquisitionMetadata_Sony_E201();
@@ -700,6 +727,7 @@ protected :
     };
     typedef std::map<int32u, essence> essences; //Key is TrackNumber
     essences Essences;
+    bitset<Stream_Max+1> StreamPos_StartAtZero; //information about the base of StreamPos (0 or 1, 1 is found in 1 file) TODO: per Essence code (last 4 bytes of the Essence header 0xTTXXTTXX)
 
     //Descriptor
     struct descriptor
@@ -1084,7 +1112,6 @@ protected :
     mxftimecode MxfTimeCodeForDelay;
     mxftimecode MxfTimeCodeMaterial;
     float64 DTS_Delay; //In seconds
-    bool   StreamPos_StartAtOne; //information about the base of StreamPos (0 or 1, 1 is found in 1 file)
     TimeCode            SDTI_TimeCode_StartTimecode;
     size_t              SDTI_TimeCode_RepetitionCount;
     TimeCode            SDTI_TimeCode_Previous;

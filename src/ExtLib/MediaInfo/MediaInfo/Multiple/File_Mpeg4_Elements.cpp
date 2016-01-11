@@ -808,6 +808,7 @@ namespace Elements
     const int64u moov_udta_meta_ilst_xxxx_data=0x64617461;
     const int64u moov_udta_meta_ilst_xxxx_mean=0x6D65616E;
     const int64u moov_udta_meta_ilst_xxxx_name=0x6E616D65;
+    const int64u moov_udta_meta_uuid=0x75756964;
     const int64u moov_udta_ndrm=0x6E64726D;
     const int64u moov_udta_nsav=0x6E736176;
     const int64u moov_udta_ptv =0x70747620;
@@ -1163,6 +1164,7 @@ void File_Mpeg4::Data_Parse()
                         ATOM (moov_udta_meta_ilst_xxxx_name);
                         ATOM_END
                     LIST_DEFAULT_ALONE_END
+                ATOM(moov_udta_meta_uuid)
                 ATOM_END
             ATOM(moov_udta_ndrm)
             ATOM(moov_udta_nsav)
@@ -1348,14 +1350,14 @@ void File_Mpeg4::free()
         if (Trace_Activated)
             Param("Data", Ztring("(")+Ztring::ToZtring(Element_TotalSize_Get())+Ztring(" bytes)"));
     #endif //MEDIAINFO_TRACE
-    #if MEDIAINFO_MD5
-        if (MD5==NULL || (!IsSecondPass && FirstMdatPos<FirstMoovPos))
-    #endif //MEDIAINFO_MD5
+    #if MEDIAINFO_HASH
+        if (!Hash || (!IsSecondPass && FirstMdatPos<FirstMoovPos))
+    #endif //MEDIAINFO_HASH
             GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Not using Skip_XX() because we want to skip data we don't have, and Skip_XX() does a test on size of buffer
-    #if MEDIAINFO_MD5
+    #if MEDIAINFO_HASH
         else
             Element_Offset=Element_TotalSize_Get();
-    #endif //MEDIAINFO_MD5
+    #endif //MEDIAINFO_HASH
 
     //ISM
     if (moof_traf_base_data_offset==(int64u)-1 && !data_offset_present)
@@ -1625,14 +1627,14 @@ void File_Mpeg4::mdat()
         if (Trace_Activated)
             Param("Data", Ztring("(")+Ztring::ToZtring(Element_TotalSize_Get())+Ztring(" bytes)"));
     #endif //MEDIAINFO_TRACE
-    #if MEDIAINFO_MD5
-        if (MD5==NULL || (!IsSecondPass && FirstMdatPos<FirstMoovPos))
-    #endif //MEDIAINFO_MD5
+    #if MEDIAINFO_HASH
+        if (!Hash || (!IsSecondPass && FirstMdatPos<FirstMoovPos))
+    #endif //MEDIAINFO_HASH
             GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Not using Skip_XX() because we want to skip data we don't have, and Skip_XX() does a test on size of buffer
-    #if MEDIAINFO_MD5
+    #if MEDIAINFO_HASH
         else
             Element_Offset=Element_TotalSize_Get();
-    #endif //MEDIAINFO_MD5
+    #endif //MEDIAINFO_HASH
 
     //ISM
     if (moof_traf_base_data_offset==(int64u)-1 && !data_offset_present)
@@ -1860,11 +1862,11 @@ void File_Mpeg4::mdat_StreamJump()
     {
         if (!Status[IsAccepted])
             Data_Accept("MPEG-4");
-        #if MEDIAINFO_MD5
-            if (Config->File_Md5_Get() && ((IsSecondPass && mdat_Pos_NormalParsing) || FirstMoovPos<FirstMdatPos))
-                Md5_ParseUpTo=ToJump;
+        #if MEDIAINFO_HASH
+            if (Config->File_Hash_Get().to_ulong() && ((IsSecondPass && mdat_Pos_NormalParsing) || FirstMoovPos<FirstMdatPos))
+                Hash_ParseUpTo=ToJump;
             else
-        #endif //MEDIAINFO_MD5
+        #endif //MEDIAINFO_HASH
                 Data_GoTo(ToJump, "MPEG-4"); //Not just after
     }
 }
@@ -1945,14 +1947,14 @@ void File_Mpeg4::moof()
             if (Trace_Activated)
                 Param("Data", Ztring("(")+Ztring::ToZtring(Element_TotalSize_Get())+Ztring(" bytes)"));
         #endif //MEDIAINFO_TRACE
-        #if MEDIAINFO_MD5
-            if (MD5==NULL || (!IsSecondPass && FirstMdatPos<FirstMoovPos))
-        #endif //MEDIAINFO_MD5
+        #if MEDIAINFO_HASH
+            if (!Hash || (!IsSecondPass && FirstMdatPos<FirstMoovPos))
+        #endif //MEDIAINFO_HASH
                 GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Not using Skip_XX() because we want to skip data we don't have, and Skip_XX() does a test on size of buffer
-        #if MEDIAINFO_MD5
+        #if MEDIAINFO_HASH
             else
                 Element_Offset=Element_TotalSize_Get();
-        #endif //MEDIAINFO_MD5
+        #endif //MEDIAINFO_HASH
         return;
     }
 
@@ -2126,14 +2128,14 @@ void File_Mpeg4::moov()
             if (Trace_Activated)
                 Param("Data", Ztring("(")+Ztring::ToZtring(Element_TotalSize_Get())+Ztring(" bytes)"));
         #endif //MEDIAINFO_TRACE
-        #if MEDIAINFO_MD5
-            if (MD5==NULL || (!IsSecondPass && FirstMdatPos<FirstMoovPos))
-        #endif //MEDIAINFO_MD5
+        #if MEDIAINFO_HASH
+            if (!Hash || (!IsSecondPass && FirstMdatPos<FirstMoovPos))
+        #endif //MEDIAINFO_HASH
                 GoTo(File_Offset+Buffer_Offset+Element_TotalSize_Get()); //Not using Skip_XX() because we want to skip data we don't have, and Skip_XX() does a test on size of buffer
-        #if MEDIAINFO_MD5
+        #if MEDIAINFO_HASH
             else
                 Element_Offset=Element_TotalSize_Get();
-        #endif //MEDIAINFO_MD5
+        #endif //MEDIAINFO_HASH
         return;
     }
 
@@ -6867,6 +6869,43 @@ void File_Mpeg4::moov_udta_meta_ilst_xxxx_mean()
 void File_Mpeg4::moov_udta_meta_ilst_xxxx_name()
 {
     moov_meta_ilst_xxxx_name();
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::moov_udta_meta_uuid()
+{
+    int128u uuid;
+    Get_UUID(uuid,                                              "uuid");
+    if (uuid.hi == 0x7C92A0DB249B5CA3LL && uuid.lo == 0x900807802D903119LL) // AtomicParsley imdb
+    {
+        int32u FourCC;
+        Get_B4(FourCC,                                          "4CC");
+        if (FourCC == 0x696D6462) // "imdb"
+        {
+            int32u Type;
+            Get_B4(Type,                                        "Type");
+            if (Type == 1) // UTF-8 text?
+            {
+                if (Element_Offset+4<=Element_Size)
+                {
+                    Peek_B4(Type);
+                    if (!Type)
+                        Skip_B4(                                "Zeroes?");
+                }
+
+                Ztring Value;
+                Get_UTF8(Element_Size-Element_Offset, Value,    "Value");
+
+                Fill(Stream_General, 0, "IMDb", Value);
+            }
+            else
+                Skip_XX(Element_Size-Element_Offset,            "Unknown");
+        }
+        else
+            Skip_XX(Element_Size-Element_Offset,                "Unknown");
+    }
+    else
+        Skip_XX(Element_Size-Element_Offset,                    "Unknown");
 }
 
 //---------------------------------------------------------------------------

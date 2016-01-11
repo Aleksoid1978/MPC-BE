@@ -479,6 +479,58 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
             return __T("MD5 is disabled due to compilation options");
         #endif //MEDIAINFO_MD5
     }
+    else if (Option_Lower==__T("file_hash"))
+    {
+        #if MEDIAINFO_HASH
+            ZtringList List;
+            List.Separator_Set(0, __T(","));
+            List.Write(Value);
+            ZtringList ToReturn;
+            ToReturn.Separator_Set(0, __T(","));
+            HashWrapper::HashFunctions Functions;
+            for (size_t i=0; i<List.size(); ++i)
+            {
+                Ztring Value(List[i]);
+                Value.MakeLowerCase();
+                bool Found=false;
+                for (size_t j=0; j<HashWrapper::HashFunction_Max; ++j)
+                {
+                    Ztring Name;
+                    Name.From_UTF8(HashWrapper::Name((HashWrapper::HashFunction)j));
+                    Name.MakeLowerCase();
+                    if (Value==Name)
+                    {
+                        Functions.set(j);
+                        Found=true;
+                    }
+                }
+
+                if (!Found)
+                    ToReturn.push_back(List[i]);
+            }
+            File_Hash_Set(Functions);
+            if (ToReturn.empty())
+                return Ztring();
+            else
+                return ToReturn.Read()+__T(" hash functions are unknown or disabled due to compilation options");
+        #else //MEDIAINFO_HASH
+            return __T("Hash functions are disabled due to compilation options");
+        #endif //MEDIAINFO_HASH
+    }
+    else if (Option_Lower==__T("file_hash_get"))
+    {
+        #if MEDIAINFO_HASH
+            ZtringList List;
+            HashWrapper::HashFunctions Functions=File_Hash_Get();
+            for (size_t i=0; i<HashWrapper::HashFunction_Max; ++i)
+                if (Functions[i])
+                    List.push_back(Ztring().From_UTF8(HashWrapper::Name((HashWrapper::HashFunction)i)));
+            List.Separator_Set(0, __T(","));
+            return List.Read();
+        #else //MEDIAINFO_HASH
+            return __T("Hash functions are disabled due to compilation options");
+        #endif //MEDIAINFO_HASH
+    }
     else if (Option_Lower==__T("file_checksidecarfiles"))
     {
         #if defined(MEDIAINFO_REFERENCES_YES)
@@ -1269,14 +1321,34 @@ void MediaInfo_Config_MediaInfo::File_Md5_Set (bool NewValue)
 {
     CriticalSectionLocker CSL(CS);
     File_Md5=NewValue;
+    Hash_Functions.set(HashWrapper::MD5, NewValue);
 }
 
 bool MediaInfo_Config_MediaInfo::File_Md5_Get ()
 {
     CriticalSectionLocker CSL(CS);
-    return File_Md5;
+    return Hash_Functions[HashWrapper::MD5];
 }
 #endif //MEDIAINFO_MD5
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_HASH
+void MediaInfo_Config_MediaInfo::File_Hash_Set (HashWrapper::HashFunctions Funtions)
+{
+    CriticalSectionLocker CSL(CS);
+    Hash_Functions=Funtions;
+    
+    //Legacy
+    if (File_Md5)
+        Hash_Functions.set(HashWrapper::MD5);
+}
+
+HashWrapper::HashFunctions MediaInfo_Config_MediaInfo::File_Hash_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return Hash_Functions;
+}
+#endif //MEDIAINFO_HASH
 
 //---------------------------------------------------------------------------
 #if defined(MEDIAINFO_REFERENCES_YES)

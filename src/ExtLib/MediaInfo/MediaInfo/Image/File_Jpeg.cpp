@@ -1002,42 +1002,51 @@ void File_Jpeg::APP0()
 }
 
 //---------------------------------------------------------------------------
+// From OpenDML AVI File Format Extensions
 void File_Jpeg::APP0_AVI1()
 {
     Element_Info1("AVI1");
 
     //Parsing
+    bool UnknownInterlacement_IsDetected=false;
     int8u  FieldOrder=(int8u)-1;
-    if (Element_Size==16-4)
+    Get_B1 (FieldOrder,                                         "Polarity");
+    if (Element_Size>=14)
     {
-        Get_B1 (FieldOrder,                                     "Polarity");
-        Skip_XX(7,                                              "Zeroes");
-    }
-    if (Element_Size==18-4)
-    {
-        int32u FieldSizeLessPadding;
-        Get_B1 (FieldOrder,                                     "Field Order");
-        Skip_B1(                                                "Zero");
-        Skip_B4(                                                "FieldSize");
+        int32u FieldSize, FieldSizeLessPadding;
+        Skip_B1(                                                "Reserved");
+        Get_B4 (FieldSize,                                      "FieldSize");
         Get_B4 (FieldSizeLessPadding,                           "FieldSizeLessPadding");
 
         //Coherency
-        if (FieldOrder==0 && IsSub && FieldSizeLessPadding!=Buffer_Size)
-            FieldOrder=(int8u)-1; //Not coherant
+        if (FieldOrder==0 && IsSub && FieldSize && FieldSize!=Buffer_Size)
+        {
+            if (FieldSizeLessPadding>1 && FieldSizeLessPadding<=Buffer_Size && Buffer[FieldSizeLessPadding-2]==0xFF && Buffer[FieldSizeLessPadding-1]==0xD9  //EOI
+             &&                           FieldSize+1         < Buffer_Size && Buffer[FieldSize]             ==0xFF && Buffer[FieldSize+1]           ==0xD8) //SOI
+                UnknownInterlacement_IsDetected=true;
+        }
     }
+    Skip_XX(Element_Size-Element_Offset,                        "Unknown");
 
     FILLING_BEGIN();
         if (Frame_Count==0 && Field_Count==0)
         {
             Accept();
 
+            if (UnknownInterlacement_IsDetected)
+            {
+                Fill(Stream_Video, 0, Video_ScanType, "Interlaced");
+                Interlaced=true;
+            }
+            else
+            {
             switch (FieldOrder)
             {
                 case 0x00 : Fill(Stream_Video, 0, Video_Interlacement, "PPF"); Fill(Stream_Video, 0, Video_ScanType, "Progressive"); break;
                 case 0x01 : Fill(Stream_Video, 0, Video_Interlacement, "TFF"); Fill(Stream_Video, 0, Video_ScanType, "Interlaced"); Fill(Stream_Video, 0, Video_ScanOrder, "TFF"); Interlaced=true; break;
                 case 0x02 : Fill(Stream_Video, 0, Video_Interlacement, "BFF"); Fill(Stream_Video, 0, Video_ScanType, "Interlaced"); Fill(Stream_Video, 0, Video_ScanOrder, "BFF"); Interlaced=true; break;
-                case 0xFF : Fill(Stream_Video, 0, Video_ScanType, "Interlaced"); Interlaced=true; break;
                 default   : ;
+            }
             }
         }
     FILLING_END();

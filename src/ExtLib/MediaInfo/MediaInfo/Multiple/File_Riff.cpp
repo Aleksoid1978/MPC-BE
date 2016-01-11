@@ -989,14 +989,14 @@ bool File_Riff::BookMark_Needed()
     Stream_Structure_Temp=Stream_Structure.begin();
     if (!Stream_Structure.empty())
     {
-        #if MEDIAINFO_MD5
-            if (Config->File_Md5_Get())
+        #if MEDIAINFO_HASH
+            if (Config->File_Hash_Get().to_ulong())
             {
                 GoTo(0);
-                Md5_ParseUpTo=Stream_Structure_Temp->first;
+                Hash_ParseUpTo=Stream_Structure_Temp->first;
             }
             else
-        #endif //MEDIAINFO_MD5
+        #endif //MEDIAINFO_HASH
                 GoTo(Stream_Structure_Temp->first);
     }
     NeedOldIndex=false;
