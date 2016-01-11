@@ -80,7 +80,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		return;
 	}
 
-	HINSTANCE hDll = GetRenderersData()->GetD3X9Dll();
+	HINSTANCE hDll = GetD3X9Dll();
 	if (hDll) {
 		(FARPROC&)m_pD3DXLoadSurfaceFromMemory	= GetProcAddress(hDll, "D3DXLoadSurfaceFromMemory");
 		(FARPROC&)m_pD3DXLoadSurfaceFromSurface = GetProcAddress(hDll, "D3DXLoadSurfaceFromSurface");

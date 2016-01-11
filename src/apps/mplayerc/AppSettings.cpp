@@ -374,9 +374,9 @@ CAppSettings::~CAppSettings()
 
 bool CAppSettings::IsD3DFullscreen() const
 {
-	if (iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS
-			|| iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM
-			|| iDSVideoRendererType == VIDRNDT_DS_SYNC) {
+	if (iDSVideoRendererType == VIDRNDT_VMR9RENDERLESS
+			|| iDSVideoRendererType == VIDRNDT_EVR_CUSTOM
+			|| iDSVideoRendererType == VIDRNDT_SYNC) {
 		return fD3DFullscreen || (nCLSwitches & CLSW_D3DFULLSCREEN);
 	}
 
@@ -1010,7 +1010,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	if (nSpeedStep != 10 && nSpeedStep != 20 && nSpeedStep != 25 && nSpeedStep != 50 && nSpeedStep != 100) {
 		nSpeedStep = 0;
 	}
-	iDSVideoRendererType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DSVIDEORENDERERTYPE, (IsWinVistaOrLater() ? (CMPlayerCApp::HasEVR() ? VIDRNDT_DS_EVR_CUSTOM : VIDRNDT_DS_DEFAULT) : VIDRNDT_DS_VMR7WINDOWED) );
+	iDSVideoRendererType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DSVIDEORENDERERTYPE, (IsWinVistaOrLater() ? (CMPlayerCApp::HasEVR() ? VIDRNDT_EVR_CUSTOM : VIDRNDT_DEFAULT) : VIDRNDT_VMR7WINDOWED) );
 
 	LoadRenderers();
 
@@ -1728,7 +1728,7 @@ void CAppSettings::LoadRenderers()
 	CRenderersSettings& rs = m_RenderersSettings;
 	CRenderersSettings::CAdvRendererSettings& ars = rs.m_AdvRendSets;
 
-	rs.iAPSurfaceType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, (IsWinVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D));
+	rs.iAPSurfaceType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, (IsWinVistaOrLater() ? SURFACE_TEXTURE3D : SURFACE_TEXTURE2D));
 	rs.iDX9Resizer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, 1);
 	rs.fVMRMixerMode = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, IsWinVistaOrLater() ? TRUE : FALSE);
 	rs.fVMRMixerYUV = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, IsWinVistaOrLater() ? TRUE : FALSE);
@@ -2147,12 +2147,12 @@ CDVBChannel* CAppSettings::FindChannelByPref(int nPrefNumber)
 
 bool CAppSettings::IsISRSelect() const
 {
-	return (iDSVideoRendererType == VIDRNDT_DS_VMR7RENDERLESS ||
-			iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS ||
-			iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM ||
-			iDSVideoRendererType == VIDRNDT_DS_DXR ||
-			iDSVideoRendererType == VIDRNDT_DS_SYNC ||
-			iDSVideoRendererType == VIDRNDT_DS_MADVR);
+	return (iDSVideoRendererType == VIDRNDT_VMR7RENDERLESS ||
+			iDSVideoRendererType == VIDRNDT_VMR9RENDERLESS ||
+			iDSVideoRendererType == VIDRNDT_EVR_CUSTOM ||
+			iDSVideoRendererType == VIDRNDT_DXR ||
+			iDSVideoRendererType == VIDRNDT_SYNC ||
+			iDSVideoRendererType == VIDRNDT_MADVR);
 }
 
 bool CAppSettings::IsISRAutoLoadEnabled() const

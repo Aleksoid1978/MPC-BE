@@ -39,9 +39,9 @@ enum {
 };
 
 enum {
-	VIDRNDT_AP_SURFACE,
-	VIDRNDT_AP_TEXTURE2D,
-	VIDRNDT_AP_TEXTURE3D,
+	SURFACE_OFFSCREEN,
+	SURFACE_TEXTURE2D,
+	SURFACE_TEXTURE3D,
 };
 
 enum :int {
@@ -172,12 +172,11 @@ public:
 	// Hardware feature support
 	bool		m_bFP16Support;
 	bool		m_b10bitSupport;
-
-	HINSTANCE	GetD3X9Dll();
-	HINSTANCE	GetD3DCompilerDll();
 };
 
 extern CRenderersData*		GetRenderersData();
 extern CRenderersSettings&	GetRenderersSettings();
 
 extern bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
+
+HINSTANCE GetD3X9Dll();

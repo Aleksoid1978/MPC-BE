@@ -131,10 +131,10 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 	str = L"XySubFilter";
 	if (!IsCLSIDRegistered(CLSID_XySubFilter_AutoLoader)) {
 		str += L" " + ResStr(IDS_REND_NOT_INSTALLED);
-	} else if (!(s.iDSVideoRendererType == VIDRNDT_DS_MADVR
-			|| s.iDSVideoRendererType == VIDRNDT_DS_EVR_CUSTOM
-			|| s.iDSVideoRendererType == VIDRNDT_DS_SYNC
-			|| s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS)) {
+	} else if (!(s.iDSVideoRendererType == VIDRNDT_MADVR
+			|| s.iDSVideoRendererType == VIDRNDT_EVR_CUSTOM
+			|| s.iDSVideoRendererType == VIDRNDT_SYNC
+			|| s.iDSVideoRendererType == VIDRNDT_VMR9RENDERLESS)) {
 		str += L" " + ResStr(IDS_REND_NOT_AVAILABLE);
 	}
 	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_XYSUBFILTER

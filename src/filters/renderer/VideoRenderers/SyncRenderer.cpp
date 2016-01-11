@@ -99,7 +99,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	m_pD3DXCreateLine = NULL;
 	m_pD3DXCreateFont = NULL;
 	m_pD3DXCreateSprite = NULL;
-	hDll = GetRenderersData()->GetD3X9Dll();
+	hDll = GetD3X9Dll();
 	if (hDll) {
 		(FARPROC &)m_pD3DXLoadSurfaceFromMemory = GetProcAddress(hDll, "D3DXLoadSurfaceFromMemory");
 		(FARPROC &)m_pD3DXCreateLine = GetProcAddress(hDll, "D3DXCreateLine");
@@ -687,8 +687,8 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 	m_SurfaceFmt = Format;
 
 	HRESULT hr;
-	if (rs.iAPSurfaceType == VIDRNDT_AP_TEXTURE2D || rs.iAPSurfaceType == VIDRNDT_AP_TEXTURE3D) {
-		int nTexturesNeeded = rs.iAPSurfaceType == VIDRNDT_AP_TEXTURE3D ? m_nDXSurface+2 : 1;
+	if (rs.iAPSurfaceType == SURFACE_TEXTURE2D || rs.iAPSurfaceType == SURFACE_TEXTURE3D) {
+		int nTexturesNeeded = rs.iAPSurfaceType == SURFACE_TEXTURE3D ? m_nDXSurface+2 : 1;
 
 		for (int i = 0; i < nTexturesNeeded; i++) {
 			if (FAILED(hr = m_pD3DDev->CreateTexture(
@@ -700,7 +700,7 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 				return hr;
 			}
 		}
-		if (rs.iAPSurfaceType == VIDRNDT_AP_TEXTURE2D) {
+		if (rs.iAPSurfaceType == SURFACE_TEXTURE2D) {
 			for (int i = 0; i < m_nDXSurface+2; i++) {
 				m_pVideoTexture[i] = NULL;
 			}
@@ -2095,7 +2095,7 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error): CBa
 	}
 
 	// Bufferize frame only with 3D texture
-	if (rs.iAPSurfaceType == VIDRNDT_AP_TEXTURE3D) {
+	if (rs.iAPSurfaceType == SURFACE_TEXTURE3D) {
 		m_nDXSurface = max(min (rs.iEvrBuffers, MAX_PICTURE_SLOTS-2), 4);
 	} else {
 		m_nDXSurface = 1;

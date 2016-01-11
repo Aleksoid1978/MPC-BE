@@ -31,15 +31,15 @@
 static bool IsRenderTypeAvailable(UINT VideoRendererType, HWND hwnd)
 {
 	switch (VideoRendererType) {
-		case VIDRNDT_DS_EVR:
-		case VIDRNDT_DS_EVR_CUSTOM:
-		case VIDRNDT_DS_SYNC:
+		case VIDRNDT_EVR:
+		case VIDRNDT_EVR_CUSTOM:
+		case VIDRNDT_SYNC:
 			return IsCLSIDRegistered(CLSID_EnhancedVideoRenderer);
-		case VIDRNDT_DS_DXR:
+		case VIDRNDT_DXR:
 			return IsCLSIDRegistered(CLSID_DXR);
-		case VIDRNDT_DS_MADVR:
+		case VIDRNDT_MADVR:
 			return IsCLSIDRegistered(CLSID_madVR);
-		case VIDRNDT_DS_VMR7RENDERLESS:
+		case VIDRNDT_VMR7RENDERLESS:
 			#ifdef _WIN64
 			return false;
 			#endif
@@ -59,8 +59,8 @@ static bool IsRenderTypeAvailable(UINT VideoRendererType, HWND hwnd)
 IMPLEMENT_DYNAMIC(CPPageVideo, CPPageBase)
 CPPageVideo::CPPageVideo()
 	: CPPageBase(CPPageVideo::IDD, CPPageVideo::IDD)
-	, m_iVideoRendererType(VIDRNDT_DS_DEFAULT)
-	, m_iVideoRendererType_store(VIDRNDT_DS_DEFAULT)
+	, m_iVideoRendererType(VIDRNDT_DEFAULT)
+	, m_iVideoRendererType_store(VIDRNDT_DEFAULT)
 	, m_bResetDevice(FALSE)
 	, m_iEvrBuffers(RS_EVRBUFFERS_DEF)
 	, m_bD3D9RenderDevice(FALSE)
@@ -194,46 +194,46 @@ BOOL CPPageVideo::OnInitDialog()
 		CString sName;
 
 		switch (nID) {
-			case VIDRNDT_DS_DEFAULT:
+			case VIDRNDT_DEFAULT:
 				sName = ResStr(IDS_PPAGE_OUTPUT_SYS_DEF);
 				break;
-			case VIDRNDT_DS_OVERLAYMIXER:
+			case VIDRNDT_OVERLAYMIXER:
 				if (!IsWinXP()) {
 					return;
 				}
 				sName = ResStr(IDS_PPAGE_OUTPUT_OVERLAYMIXER);
 				break;
-			case VIDRNDT_DS_VMR7WINDOWED:
+			case VIDRNDT_VMR7WINDOWED:
 				sName = ResStr(IDS_PPAGE_OUTPUT_VMR7WINDOWED);
 				break;
-			case VIDRNDT_DS_VMR9WINDOWED:
+			case VIDRNDT_VMR9WINDOWED:
 				sName = ResStr(IDS_PPAGE_OUTPUT_VMR9WINDOWED);
 				break;
-			case VIDRNDT_DS_VMR7RENDERLESS:
+			case VIDRNDT_VMR7RENDERLESS:
 				sName = ResStr(IDS_PPAGE_OUTPUT_VMR7RENDERLESS);
 				break;
-			case VIDRNDT_DS_VMR9RENDERLESS:
+			case VIDRNDT_VMR9RENDERLESS:
 				sName = ResStr(IDS_PPAGE_OUTPUT_VMR9RENDERLESS);
 				break;
-			case VIDRNDT_DS_DXR:
+			case VIDRNDT_DXR:
 				sName = ResStr(IDS_PPAGE_OUTPUT_DXR);
 				break;
-			case VIDRNDT_DS_NULL_COMP:
+			case VIDRNDT_NULL_COMP:
 				sName = ResStr(IDS_PPAGE_OUTPUT_NULL_COMP);
 				break;
-			case VIDRNDT_DS_NULL_UNCOMP:
+			case VIDRNDT_NULL_UNCOMP:
 				sName = ResStr(IDS_PPAGE_OUTPUT_NULL_UNCOMP);
 				break;
-			case VIDRNDT_DS_EVR:
+			case VIDRNDT_EVR:
 				sName = ResStr(IDS_PPAGE_OUTPUT_EVR);
 				break;
-			case VIDRNDT_DS_EVR_CUSTOM:
+			case VIDRNDT_EVR_CUSTOM:
 				sName = ResStr(IDS_PPAGE_OUTPUT_EVR_CUSTOM);
 				break;
-			case VIDRNDT_DS_MADVR:
+			case VIDRNDT_MADVR:
 				sName = ResStr(IDS_PPAGE_OUTPUT_MADVR);
 				break;
-			case VIDRNDT_DS_SYNC:
+			case VIDRNDT_SYNC:
 				sName = ResStr(IDS_PPAGE_OUTPUT_SYNC);
 				break;
 			default:
@@ -251,19 +251,19 @@ BOOL CPPageVideo::OnInitDialog()
 
 	CComboBox& m_iDSVRTC = m_cbVideoRenderer;
 	m_iDSVRTC.SetRedraw(FALSE);
-	addRenderer(VIDRNDT_DS_DEFAULT);
-	addRenderer(VIDRNDT_DS_OVERLAYMIXER);
-	addRenderer(VIDRNDT_DS_VMR7WINDOWED);
-	addRenderer(VIDRNDT_DS_VMR9WINDOWED);
-	addRenderer(VIDRNDT_DS_VMR7RENDERLESS);
-	addRenderer(VIDRNDT_DS_VMR9RENDERLESS);
-	addRenderer(VIDRNDT_DS_EVR);
-	addRenderer(VIDRNDT_DS_EVR_CUSTOM);
-	addRenderer(VIDRNDT_DS_SYNC);
-	addRenderer(VIDRNDT_DS_DXR);
-	addRenderer(VIDRNDT_DS_MADVR);
-	addRenderer(VIDRNDT_DS_NULL_COMP);
-	addRenderer(VIDRNDT_DS_NULL_UNCOMP);
+	addRenderer(VIDRNDT_DEFAULT);
+	addRenderer(VIDRNDT_OVERLAYMIXER);
+	addRenderer(VIDRNDT_VMR7WINDOWED);
+	addRenderer(VIDRNDT_VMR9WINDOWED);
+	addRenderer(VIDRNDT_VMR7RENDERLESS);
+	addRenderer(VIDRNDT_VMR9RENDERLESS);
+	addRenderer(VIDRNDT_EVR);
+	addRenderer(VIDRNDT_EVR_CUSTOM);
+	addRenderer(VIDRNDT_SYNC);
+	addRenderer(VIDRNDT_DXR);
+	addRenderer(VIDRNDT_MADVR);
+	addRenderer(VIDRNDT_NULL_COMP);
+	addRenderer(VIDRNDT_NULL_UNCOMP);
 
 	for (int i = 0; i < m_iDSVRTC.GetCount(); ++i) {
 		if (m_iVideoRendererType == m_iDSVRTC.GetItemData(i)) {
@@ -297,8 +297,8 @@ BOOL CPPageVideo::OnInitDialog()
 	m_cbD3D9RenderDevice.EnableWindow(FALSE);
 
 	switch (m_iVideoRendererType) {
-		case VIDRNDT_DS_VMR9RENDERLESS:
-		case VIDRNDT_DS_EVR_CUSTOM:
+		case VIDRNDT_VMR9RENDERLESS:
+		case VIDRNDT_EVR_CUSTOM:
 			if (m_cbD3D9RenderDevice.GetCount() > 1) {
 					GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
 					m_cbD3D9RenderDevice.EnableWindow(FALSE);
@@ -384,7 +384,7 @@ void CPPageVideo::UpdateSurfaceFormatList(int select)
 
 	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"8-bit Integer Surfaces"), D3DFMT_X8R8G8B8);
 
-	if ((videoRenderer == VIDRNDT_DS_VMR9RENDERLESS || videoRenderer == VIDRNDT_DS_EVR_CUSTOM) && m_cbAPSurfaceUsage.GetCurSel() == VIDRNDT_AP_TEXTURE3D) {
+	if ((videoRenderer == VIDRNDT_VMR9RENDERLESS || videoRenderer == VIDRNDT_EVR_CUSTOM) && m_cbAPSurfaceUsage.GetCurSel() == SURFACE_TEXTURE3D) {
 		m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"10-bit Integer Surfaces"), D3DFMT_A2R10G10B10);
 		m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"16-bit Floating Point Surfaces"), D3DFMT_A16B16G16R16F);
 		m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"32-bit Floating Point Surfaces"), D3DFMT_A32B32G32R32F);
@@ -412,7 +412,7 @@ void CPPageVideo::UpdateResizerList(int select)
 	}
 #endif
 
-	if (m_cbAPSurfaceUsage.GetCurSel() == VIDRNDT_AP_TEXTURE3D) {
+	if (m_cbAPSurfaceUsage.GetCurSel() == SURFACE_TEXTURE3D) {
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Perlin Smootherstep (PS 2.0)"), RESIZER_SHADER_SMOOTHERSTEP);
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"B-spline4 (PS 2.0)"), RESIZER_SHADER_BSPLINE4);
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Mitchell-Netravali spline4 (PS 2.0)"), RESIZER_SHADER_MITCHELL4);
@@ -438,10 +438,10 @@ void CPPageVideo::UpdateResizerList(int select)
 void CPPageVideo::OnUpdateMixerYUV(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_DSVMRLOADMIXER)
-					&& (m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel()) == VIDRNDT_DS_VMR7WINDOWED
-						|| m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel()) == VIDRNDT_DS_VMR9WINDOWED
-						|| m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel()) == VIDRNDT_DS_VMR7RENDERLESS
-						|| m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel()) == VIDRNDT_DS_VMR9RENDERLESS));
+					&& (m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel()) == VIDRNDT_VMR7WINDOWED
+						|| m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel()) == VIDRNDT_VMR9WINDOWED
+						|| m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel()) == VIDRNDT_VMR7RENDERLESS
+						|| m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel()) == VIDRNDT_VMR9RENDERLESS));
 }
 
 void CPPageVideo::OnSurfaceChange()
@@ -449,13 +449,13 @@ void CPPageVideo::OnSurfaceChange()
 	UpdateData();
 
 	switch (m_cbAPSurfaceUsage.GetCurSel()) {
-		case VIDRNDT_AP_SURFACE:
+		case SURFACE_OFFSCREEN:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_REGULARSURF), &m_cbAPSurfaceUsage);
 			break;
-		case VIDRNDT_AP_TEXTURE2D:
+		case SURFACE_TEXTURE2D:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_TEXTURESURF2D), &m_cbAPSurfaceUsage);
 			break;
-		case VIDRNDT_AP_TEXTURE3D:
+		case SURFACE_TEXTURE3D:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_TEXTURESURF3D), &m_cbAPSurfaceUsage);
 			break;
 	}
@@ -514,25 +514,25 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_STATIC9)->ShowWindow(SW_HIDE);
 
 	switch (CurrentVR) {
-		case VIDRNDT_DS_DEFAULT:
+		case VIDRNDT_DEFAULT:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYSDEF), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_DS_OVERLAYMIXER:
+		case VIDRNDT_OVERLAYMIXER:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSOVERLAYMIXER), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_DS_VMR7WINDOWED:
+		case VIDRNDT_VMR7WINDOWED:
 			m_chkVMRMixerMode.EnableWindow(TRUE);
 			m_chkVMRMixerYUV.EnableWindow(TRUE);
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR7WIN), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_DS_VMR9WINDOWED:
+		case VIDRNDT_VMR9WINDOWED:
 			m_chkVMRMixerMode.EnableWindow(TRUE);
 			m_chkVMRMixerYUV.EnableWindow(TRUE);
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9WIN), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_DS_VMR7RENDERLESS:
+		case VIDRNDT_VMR7RENDERLESS:
 			GetDlgItem(IDC_STATIC1)->EnableWindow(TRUE);
 			m_cbAPSurfaceUsage.EnableWindow(TRUE);
 			m_chkVMRMixerMode.EnableWindow(TRUE);
@@ -540,7 +540,7 @@ void CPPageVideo::OnDSRendererChange()
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR7REN), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_DS_VMR9RENDERLESS:
+		case VIDRNDT_VMR9RENDERLESS:
 			if (m_cbD3D9RenderDevice.GetCount() > 1) {
 				GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
 				m_cbD3D9RenderDevice.EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE));
@@ -557,7 +557,7 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
 			GetDlgItem(IDC_CHECK1)->EnableWindow(m_chkD3DFullscreen.GetCheck() == BST_CHECKED);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
-			if (m_cbAPSurfaceUsage.GetCurSel() == VIDRNDT_AP_TEXTURE3D) {
+			if (m_cbAPSurfaceUsage.GetCurSel() == SURFACE_TEXTURE3D) {
 				D3DFORMAT surfmt = (D3DFORMAT)m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel());
 				if (surfmt == D3DFMT_A16B16G16R16F || surfmt == D3DFMT_A32B32G32R32F) {
 					// Color Managment
@@ -574,10 +574,10 @@ void CPPageVideo::OnDSRendererChange()
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9REN), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_DS_EVR:
+		case VIDRNDT_EVR:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_DS_EVR_CUSTOM:
+		case VIDRNDT_EVR_CUSTOM:
 			if (m_cbD3D9RenderDevice.GetCount() > 1) {
 				GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
 				m_cbD3D9RenderDevice.EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE));
@@ -617,7 +617,7 @@ void CPPageVideo::OnDSRendererChange()
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR_CUSTOM), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_DS_SYNC:
+		case VIDRNDT_SYNC:
 			GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
 			m_spnEvrBuffers.EnableWindow(TRUE);
@@ -635,16 +635,16 @@ void CPPageVideo::OnDSRendererChange()
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYNC), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_DS_DXR:
+		case VIDRNDT_DXR:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSDXR), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_DS_NULL_COMP:
+		case VIDRNDT_NULL_COMP:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_COMP), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_DS_NULL_UNCOMP:
+		case VIDRNDT_NULL_UNCOMP:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_UNCOMP), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_DS_MADVR:
+		case VIDRNDT_MADVR:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSMADVR), &m_cbVideoRenderer);
 			break;
 		default:
@@ -684,7 +684,7 @@ void CPPageVideo::OnSurfaceFormatChange()
 	D3DFORMAT surfmt = (D3DFORMAT)m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel());
 	UINT CurrentVR = m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel());
 
-	if ((CurrentVR == VIDRNDT_DS_VMR9RENDERLESS || CurrentVR == VIDRNDT_DS_EVR_CUSTOM) && (surfmt == D3DFMT_A16B16G16R16F || surfmt == D3DFMT_A32B32G32R32F)) {
+	if ((CurrentVR == VIDRNDT_VMR9RENDERLESS || CurrentVR == VIDRNDT_EVR_CUSTOM) && (surfmt == D3DFMT_A16B16G16R16F || surfmt == D3DFMT_A32B32G32R32F)) {
 		// Color Managment
 		m_chkColorManagment.ShowWindow(SW_SHOW);
 		m_cbCMInputType.ShowWindow(SW_SHOW);
@@ -742,14 +742,14 @@ void CPPageVideo::OnBnClickedDefault()
 
 	UpdateData(FALSE);
 
-	m_cbAPSurfaceUsage.SetCurSel(IsWinVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D);
+	m_cbAPSurfaceUsage.SetCurSel(IsWinVistaOrLater() ? SURFACE_TEXTURE3D : SURFACE_TEXTURE2D);
 	m_cbEVROutputRange.SetCurSel(0);
 	m_chkVMRMixerMode.SetCheck(IsWinVistaOrLater() ? BST_CHECKED : BST_UNCHECKED);
 	m_chkVMRMixerYUV.SetCheck(IsWinVistaOrLater() ? BST_CHECKED : BST_UNCHECKED);
 
 	m_chkD3DFullscreen.SetCheck(BST_UNCHECKED);
 	m_chk10bitOutput.SetCheck(BST_UNCHECKED);
-	m_cbAPSurfaceUsage.SetCurSel(IsWinVistaOrLater() ? VIDRNDT_AP_TEXTURE3D : VIDRNDT_AP_TEXTURE2D);
+	m_cbAPSurfaceUsage.SetCurSel(IsWinVistaOrLater() ? SURFACE_TEXTURE3D : SURFACE_TEXTURE2D);
 
 	UpdateSurfaceFormatList(D3DFMT_X8R8G8B8);
 	UpdateResizerList(RESIZER_BILINEAR);
