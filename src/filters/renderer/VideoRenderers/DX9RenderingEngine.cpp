@@ -143,7 +143,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_bColorManagement(false)
 	, m_nDX9Resizer(RESIZER_UNKNOWN)
 {
-	HINSTANCE hDll = GetRenderersData()->GetD3X9Dll();
+	HINSTANCE hDll = GetD3X9Dll();
 	m_bD3DX = hDll != NULL;
 
 	if (m_bD3DX) {
@@ -261,7 +261,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 	// Free previously allocated temporary video textures, because the native video size might have been changed!
 	NULL_PTR_ARRAY(m_pFrameTextures);
 
-	if (settings.iAPSurfaceType == VIDRNDT_AP_TEXTURE2D) {
+	if (settings.iAPSurfaceType == SURFACE_TEXTURE2D) {
 		if (FAILED(hr = m_pD3DDev->CreateTexture(
 			m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
 			D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
@@ -278,7 +278,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 
 		m_RenderingPath = RENDERING_PATH_STRETCHRECT;
 	}
-	else if (settings.iAPSurfaceType == VIDRNDT_AP_TEXTURE3D) {
+	else if (settings.iAPSurfaceType == SURFACE_TEXTURE3D) {
 		m_VideoBufferFmt = m_SurfaceFmt;
 		if (m_D3D9VendorId == PCIV_Intel) {
 			if (m_bIsEVR) {
