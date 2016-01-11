@@ -2231,17 +2231,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pReceivePin)
 {
 	if (direction == PINDIR_OUTPUT) {
-		DetectVideoCard_EVR(pReceivePin);
-
-		BOOL bNonDXVA = FALSE;
-		if (m_bHEVC10bit) {
-			const CLSID renderClsid = GetCLSID(pReceivePin);
-			if (renderClsid == CLSID_madVR) {
-				bNonDXVA = TRUE;
-			}
-		}
-
-		if (!bNonDXVA && IsDXVASupported()) {
+		if (IsDXVASupported()) {
 			if (m_nDecoderMode == MODE_DXVA1) {
 				(static_cast<CDXVA1Decoder*>(m_pDXVADecoder))->ConfigureDXVA1();
 			} else if (SUCCEEDED(ConfigureDXVA2(pReceivePin)) && SUCCEEDED(SetEVRForDXVA2(pReceivePin))) {
@@ -2263,6 +2253,8 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				ChangeOutputMediaFormat(2);
 			}
 		}
+
+		DetectVideoCard_EVR(pReceivePin);
 		
 		CLSID ClsidSourceFilter = GetCLSID(m_pInput->GetConnected());
 		if ((ClsidSourceFilter == __uuidof(CMpegSourceFilter)) || (ClsidSourceFilter == __uuidof(CMpegSplitterFilter))) {
