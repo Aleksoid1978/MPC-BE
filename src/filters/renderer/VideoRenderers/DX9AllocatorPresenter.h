@@ -24,6 +24,7 @@
 #include "DX9RenderingEngine.h"
 #include "CPUUsage.h"
 #include "GPUUsage.h"
+#include "MemUsage.h"
 
 #define VMRBITMAP_UPDATE			0x80000000
 
@@ -302,6 +303,7 @@ namespace DSObjects
 
 		CCPUUsage				m_CPUUsage;
 		CGPUUsage				m_GPUUsage;
+		CMemUsage				m_MemUsage;
 
 		CFocusThread*			m_FocusThread;
 

@@ -2172,6 +2172,12 @@ void CDX9AllocatorPresenter::DrawStats()
 				DrawText(rc, strText, 1);
 				OffsetRect(&rc, 0, TextHeight);
 			}
+
+			if (m_MemUsage.GetUsage() > 0.0) {
+				strText.Format(L"Mem Usage    : %5.01f Mb", m_MemUsage.GetUsage());
+				DrawText(rc, strText, 1);
+				OffsetRect(&rc, 0, TextHeight);
+			}
 		}
 
 		m_pSprite->End();
@@ -2184,8 +2190,8 @@ void CDX9AllocatorPresenter::DrawStats()
 		const int defwidth  = 810;
 		const int defheight = 300;
 
-		float ScaleX = m_windowRect.Width() / 1920.0f;
-		float ScaleY = m_windowRect.Height() / 1080.0f;
+		const float ScaleX = m_windowRect.Width() / 1920.0f;
+		const float ScaleY = m_windowRect.Height() / 1080.0f;
 
 		const float DrawWidth = defwidth * ScaleX;
 		const float DrawHeight = defheight * ScaleY;
