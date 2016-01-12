@@ -234,10 +234,20 @@ bool IsAudioWaveRenderer(IBaseFilter* pBF)
 	memcpy(&clsid, &GUID_NULL, sizeof(clsid));
 	pBF->GetClassID(&clsid);
 
-	return (clsid == CLSID_DSoundRender || clsid == CLSID_AudioRender ||
-			clsid == CLSID_ReClock || clsid == CLSID_MPAudioRenderer ||
-			clsid == CLSID_SanearAudioRenderer || clsid == CLSID_SurodevASIORenderer ||
-			clsid == CLSID_MpcAudioRenderer || clsid == __uuidof(CNullAudioRenderer) || clsid == __uuidof(CNullUAudioRenderer));
+	return (// system
+			clsid == CLSID_DSoundRender ||
+			clsid == CLSID_AudioRender ||
+			// internal
+			clsid == CLSID_MpcAudioRenderer ||
+			clsid == __uuidof(CNullAudioRenderer) ||
+			clsid == __uuidof(CNullUAudioRenderer) ||
+			// external
+			clsid == CLSID_ReClock ||
+			clsid == CLSID_SanearAudioRenderer ||
+			clsid == GUIDFromCString(_T("{EC9ED6FC-7B03-4cb6-8C01-4EABE109F26B")) ||  // MediaPortal Audio Renderer
+			clsid == GUIDFromCString(_T("{50063380-2B2F-4855-9A1E-40FCA344C7AC}")) || // Surodev ASIO Renderer
+			clsid == GUIDFromCString(_T("{8DE31E85-10FC-4088-8861-E0EC8E70744A}"))    // MultiChannel ASIO Renderer
+	);
 }
 
 IBaseFilter* GetUpStreamFilter(IBaseFilter* pBF, IPin* pInputPin)
