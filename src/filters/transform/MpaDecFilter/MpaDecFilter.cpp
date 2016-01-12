@@ -351,7 +351,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_truehd_samplerate(0)
 	, m_truehd_framelength(0)
 	, m_bHasVideo(TRUE)
-	, m_dRate(1.0)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -512,8 +511,6 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	m_truehd_framelength = 0;
 	m_bResync = true;
 	m_rtStart = 0; // LOOKATTHIS // reset internal timer?
-
-	m_dRate = dRate > 0.0 ? dRate : 1.0;
 
 	return __super::NewSegment(tStart, tStop, dRate);
 }
@@ -1962,10 +1959,10 @@ void CMpaDecFilter::CalculateDuration(int samples, int sample_rate, REFERENCE_TI
 	if (bIsTrueHDBitstream) {
 		// Delivery Timestamps
 		// TrueHD frame size, 24 * 0.83333ms
-		rtStart = m_rtStart, m_rtStart = rtStop = m_rtStart + (REFERENCE_TIME)(200000 / m_dRate);
+		rtStart = m_rtStart, m_rtStart = rtStop = m_rtStart + 200000;
 	} else {
 		// Length of the sample
-		double dDuration = (double)samples / sample_rate * 10000000.0 / m_dRate;
+		double dDuration = (double)samples / sample_rate * 10000000.0;
 		m_dStartOffset += fmod(dDuration, 1.0);
 
 		// Delivery Timestamps
