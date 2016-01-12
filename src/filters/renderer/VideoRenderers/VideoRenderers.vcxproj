@@ -108,6 +108,7 @@
     <ClCompile Include="IPinHook.cpp" />
     <ClCompile Include="MacrovisionKicker.cpp" />
     <ClCompile Include="madVRAllocatorPresenter.cpp" />
+    <ClCompile Include="MemUsage.cpp" />
     <ClCompile Include="OuterEVR.cpp" />
     <ClCompile Include="OuterVMR.cpp" />
     <ClCompile Include="PixelShaderCompiler.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="IPinHook.h" />
     <ClInclude Include="MacrovisionKicker.h" />
     <ClInclude Include="madVRAllocatorPresenter.h" />
+    <ClInclude Include="MemUsage.h" />
     <ClInclude Include="OuterEVR.h" />
     <ClInclude Include="OuterVMR.h" />
     <ClInclude Include="PixelShaderCompiler.h" />
