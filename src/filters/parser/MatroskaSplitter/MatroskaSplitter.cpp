@@ -375,8 +375,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					ReduceDim(aspect);
 					CreateMPEG2VIfromAVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 
-					if (!bHasVideo)
+					if (!bHasVideo) {
 						mts.Add(mt);
+
+						if (SUCCEEDED(CreateMPEG2VIfromMVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount()))) {
+							mts.InsertAt(0, mt);
+						}
+					}
 					bHasVideo = true;
 				} else if (CodecID.Left(12) == "V_MPEG4/ISO/") {
 					BITMAPINFOHEADER pbmi;

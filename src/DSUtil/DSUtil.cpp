@@ -3127,7 +3127,50 @@ HRESULT CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_T
 	mt->subtype = FOURCCMap(pm2vi->hdr.bmiHeader.biCompression);
 	mt->SetSampleSize(pbmi->biWidth * pbmi-> biHeight * 4);
 
+	if (pm2vi->cbSequenceHeader < extralen) {
+		mt->ReallocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + pm2vi->cbSequenceHeader);
+	}
+
 	return hr;
+}
+
+HRESULT CreateMPEG2VIfromMVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize aspect, BYTE* extra, size_t extralen)
+{
+	// code from LAV Source ... thanks to it's author
+	if (extralen > 8 && extra && extra[0] == 1) {
+		// Find "mvcC" atom
+		DWORD state = 0;
+		size_t i = 0;
+		for (; i < extralen - 4; i++) {
+			state = (state << 8) | extra[i];
+			if (state == 'mvcC') {
+				break;
+			}
+		}
+
+		if (i == extralen || i < 8) {
+			return E_FAIL;
+		}
+
+		// Update pointers to the start of the mvcC atom
+		extra = extra + i - 7;
+		extralen = extralen - i + 7;
+		DWORD atomSize = GETDWORD(extra); atomSize = FCC(atomSize);
+
+		// verify size atom and actual size
+		if ((atomSize + 4) > extralen || extralen < 14) {
+			return E_FAIL;
+		}
+
+		// Skip atom headers
+		extra += 8;
+		extralen -= 8;
+
+		pbmi->biCompression = FCC('MVC1');
+		return CreateMPEG2VIfromAVC(mt, pbmi, AvgTimePerFrame, aspect, extra, extralen);
+	}
+
+	return E_FAIL;
 }
 
 HRESULT CreateMPEG2VISimple(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize aspect, BYTE* extra, size_t extralen, DWORD dwProfile/* = 0*/, DWORD dwLevel/* = 0*/, DWORD dwFlags/* = 0*/)
