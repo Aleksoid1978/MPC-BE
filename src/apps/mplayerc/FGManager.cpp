@@ -1389,10 +1389,10 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 	BeginEnumPins(pBF, pEP, pPin) {
 		if (S_OK == IsPinDirection(pPin, PINDIR_OUTPUT) && S_OK != IsPinConnected(pPin)) {
 			if (GetPinName(pPin)[0] == '~'
-					&& s.iDSVideoRendererType != VIDRNDT_EVR_CUSTOM
-					&& s.iDSVideoRendererType != VIDRNDT_EVR
-					&& s.iDSVideoRendererType != VIDRNDT_SYNC
-					&& s.iDSVideoRendererType != VIDRNDT_VMR9WINDOWED) {
+					&& s.iVideoRenderer != VIDRNDT_EVR_CUSTOM
+					&& s.iVideoRenderer != VIDRNDT_EVR
+					&& s.iVideoRenderer != VIDRNDT_SYNC
+					&& s.iVideoRenderer != VIDRNDT_VMR9WINDOWED) {
 
 				// Disable MEDIATYPE_AUXLine21Data - prevent connect Line 21 Decoder
 				if (FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
@@ -2570,10 +2570,10 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		case SUBRNDT_XYSUBFILTER:
 			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VSFilter, MERIT64_DO_NOT_USE));
 			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VSFilter_autoloading, MERIT64_DO_NOT_USE));
-			if (s.iDSVideoRendererType == VIDRNDT_MADVR
-					|| s.iDSVideoRendererType == VIDRNDT_EVR_CUSTOM
-					|| s.iDSVideoRendererType == VIDRNDT_SYNC
-					|| s.iDSVideoRendererType == VIDRNDT_VMR9RENDERLESS) {
+			if (s.iVideoRenderer == VIDRNDT_MADVR
+					|| s.iVideoRenderer == VIDRNDT_EVR_CUSTOM
+					|| s.iVideoRenderer == VIDRNDT_SYNC
+					|| s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS) {
 				m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_ABOVE_DSHOW));
 			} else {
 				// Prevent XySubFilter from connecting while renderer is not compatible
@@ -2723,7 +2723,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	// Renderers
 	if (!m_bIsPreview) {
-		switch (s.iDSVideoRendererType) {
+		switch (s.iVideoRenderer) {
 			case VIDRNDT_OVERLAYMIXER:
 				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_OverlayMixer, L"Overlay Mixer", m_vrmerit));
 				break;

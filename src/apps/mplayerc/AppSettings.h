@@ -606,8 +606,8 @@ public:
 
 	// Output
 	CRenderersSettings m_RenderersSettings;
-	int				iDSVideoRendererType;
-	int				iSelectedDSVideoRendererType;
+	int				iVideoRenderer;
+	int				iSelectedVideoRenderer;
 
 	bool			fDualAudioOutput;
 	CString			strAudioRendererDisplayName;

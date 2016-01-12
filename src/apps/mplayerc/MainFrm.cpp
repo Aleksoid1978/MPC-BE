@@ -2490,7 +2490,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					m_wndStatusBar.SetStatusTimer(str);
 				} else {
 					CString str_temp;
-					bool bmadvr = (AfxGetAppSettings().iDSVideoRendererType == VIDRNDT_MADVR);
+					bool bmadvr = (AfxGetAppSettings().iVideoRenderer == VIDRNDT_MADVR);
 
 					if (m_bOSDLocalTime) {
 						str_temp = GetSystemLocalTime();
@@ -4298,7 +4298,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		// Workaround to avoid MadVR freezing when switching channels in PM_CAPTURE mode:
 		if (IsWindowVisible() && s.fRememberZoomLevel
 				&& !(m_bFullScreen || wp.showCmd == SW_SHOWMAXIMIZED || wp.showCmd == SW_SHOWMINIMIZED)
-				&& GetPlaybackMode() == PM_CAPTURE && s.iDSVideoRendererType == VIDRNDT_MADVR) {
+				&& GetPlaybackMode() == PM_CAPTURE && s.iVideoRenderer == VIDRNDT_MADVR) {
 			ShowWindow(SW_MAXIMIZE);
 			wp.showCmd = SW_SHOWMAXIMIZED;
 		}
@@ -6258,11 +6258,11 @@ BOOL CMainFrame::IsRendererCompatibleWithSaveImage()
 	if (m_fShockwaveGraph) {
 		AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_SHOCKWAVE), MB_ICONEXCLAMATION | MB_OK);
 		result = FALSE;
-	} else if (s.iDSVideoRendererType == VIDRNDT_OVERLAYMIXER) {
+	} else if (s.iVideoRenderer == VIDRNDT_OVERLAYMIXER) {
 		AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_OVERLAY), MB_ICONEXCLAMATION | MB_OK);
 		result = FALSE;
 	// the latest madVR build v0.84.0 now supports screenshots.
-	} else if (s.iDSVideoRendererType == VIDRNDT_MADVR) {
+	} else if (s.iVideoRenderer == VIDRNDT_MADVR) {
 		CRegKey key;
 		CString clsid = _T("{E1A8B82A-32CE-4B0D-BE0D-AA68C772E423}");
 
@@ -6753,9 +6753,9 @@ void CMainFrame::OnUpdateViewTearingTest(CCmdUI* pCmdUI)
 {
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = (s.iDSVideoRendererType == VIDRNDT_EVR_CUSTOM ||
-					  s.iDSVideoRendererType == VIDRNDT_VMR9RENDERLESS ||
-					  s.iDSVideoRendererType == VIDRNDT_SYNC) &&
+	bool supported = (s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
+					  s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS ||
+					  s.iVideoRenderer == VIDRNDT_SYNC) &&
 					 r.iAPSurfaceType == SURFACE_TEXTURE3D;
 
 	pCmdUI->Enable(supported && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
@@ -6771,9 +6771,9 @@ void CMainFrame::OnUpdateViewDisplayStats(CCmdUI* pCmdUI)
 {
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = (s.iDSVideoRendererType == VIDRNDT_EVR_CUSTOM ||
-					  s.iDSVideoRendererType == VIDRNDT_VMR9RENDERLESS ||
-					  s.iDSVideoRendererType == VIDRNDT_SYNC) &&
+	bool supported = (s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
+					  s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS ||
+					  s.iVideoRenderer == VIDRNDT_SYNC) &&
 					 r.iAPSurfaceType == SURFACE_TEXTURE3D;
 
 	pCmdUI->Enable(supported && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
@@ -6803,9 +6803,9 @@ void CMainFrame::OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI)
 {
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = ((s.iDSVideoRendererType == VIDRNDT_EVR_CUSTOM ||
-					   s.iDSVideoRendererType == VIDRNDT_VMR9RENDERLESS ||
-					   s.iDSVideoRendererType == VIDRNDT_SYNC) &&
+	bool supported = ((s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
+					   s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS ||
+					   s.iVideoRenderer == VIDRNDT_SYNC) &&
 					  r.iAPSurfaceType == SURFACE_TEXTURE3D);
 
 	pCmdUI->Enable(supported);
@@ -6816,9 +6816,9 @@ void CMainFrame::OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI)
 {
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = ((s.iDSVideoRendererType == VIDRNDT_EVR_CUSTOM ||
-					   s.iDSVideoRendererType == VIDRNDT_VMR9RENDERLESS ||
-					   s.iDSVideoRendererType == VIDRNDT_SYNC) &&
+	bool supported = ((s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
+					   s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS ||
+					   s.iVideoRenderer == VIDRNDT_SYNC) &&
 					  r.iAPSurfaceType == SURFACE_TEXTURE3D &&
 					  (IsWinVista() || IsWin7()));
 
@@ -6830,7 +6830,7 @@ void CMainFrame::OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI)
 {
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& r = s.m_RenderersSettings;
-	bool supported = ((s.iDSVideoRendererType == VIDRNDT_EVR_CUSTOM) &&
+	bool supported = ((s.iVideoRenderer == VIDRNDT_EVR_CUSTOM) &&
 					  r.iAPSurfaceType == SURFACE_TEXTURE3D);
 
 	pCmdUI->Enable(supported);
@@ -6893,9 +6893,9 @@ void CMainFrame::OnViewResetDefault()
 void CMainFrame::OnUpdateViewReset(CCmdUI* pCmdUI)
 {
 	CAppSettings& s = AfxGetAppSettings();
-	bool supported = s.iDSVideoRendererType == VIDRNDT_EVR_CUSTOM ||
-					 s.iDSVideoRendererType == VIDRNDT_VMR9RENDERLESS ||
-					 s.iDSVideoRendererType == VIDRNDT_SYNC;
+	bool supported = s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
+					 s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS ||
+					 s.iVideoRenderer == VIDRNDT_SYNC;
 	pCmdUI->Enable(supported);
 }
 
@@ -6913,7 +6913,7 @@ void CMainFrame::OnViewVSyncOffsetIncrease()
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& rs = s.m_RenderersSettings;
 	CString strOSD;
-	if (s.iDSVideoRendererType == VIDRNDT_SYNC) {
+	if (s.iVideoRenderer == VIDRNDT_SYNC) {
 		rs.m_AdvRendSets.fTargetSyncOffset = rs.m_AdvRendSets.fTargetSyncOffset - 0.5; // Yeah, it should be a "-"
 		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), rs.m_AdvRendSets.fTargetSyncOffset);
 	} else {
@@ -6929,7 +6929,7 @@ void CMainFrame::OnViewVSyncOffsetDecrease()
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& rs = s.m_RenderersSettings;
 	CString strOSD;
-	if (s.iDSVideoRendererType == VIDRNDT_SYNC) {
+	if (s.iVideoRenderer == VIDRNDT_SYNC) {
 		rs.m_AdvRendSets.fTargetSyncOffset = rs.m_AdvRendSets.fTargetSyncOffset + 0.5;
 		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), rs.m_AdvRendSets.fTargetSyncOffset);
 	} else {
@@ -12547,7 +12547,7 @@ void CMainFrame::OpenCustomizeGraph()
 
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& r = s.m_RenderersSettings;
-	if (r.m_AdvRendSets.bSynchronizeVideo && s.iDSVideoRendererType == VIDRNDT_SYNC) {
+	if (r.m_AdvRendSets.bSynchronizeVideo && s.iVideoRenderer == VIDRNDT_SYNC) {
 		HRESULT hr;
 		m_pRefClock = DNew CSyncClockFilter(NULL, &hr);
 		CStringW name;
@@ -16934,7 +16934,7 @@ bool CMainFrame::StopCapture()
 void CMainFrame::ShowOptions(int idPage)
 {
 	CAppSettings& s = AfxGetAppSettings();
-	s.iSelectedDSVideoRendererType = -1;
+	s.iSelectedVideoRenderer = -1;
 
 	CPPageSheet options(ResStr(IDS_OPTIONS_CAPTION), m_pGB, GetModalParent(), idPage);
 

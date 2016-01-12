@@ -102,7 +102,7 @@ void CPPageSync::InitDialogPrivate()
 	m_chkVMRFlushGPUAfterPresent.SetCheck(ars.iVMRFlushGPUAfterPresent);
 	m_chkVMRFlushGPUWait.SetCheck(ars.iVMRFlushGPUWait);
 
-	if ((s.iDSVideoRendererType == VIDRNDT_EVR_CUSTOM || s.iDSVideoRendererType == VIDRNDT_VMR9RENDERLESS) && rs.iAPSurfaceType == SURFACE_TEXTURE3D) {
+	if ((s.iVideoRenderer == VIDRNDT_EVR_CUSTOM || s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS) && rs.iAPSurfaceType == SURFACE_TEXTURE3D) {
 		m_chkVMR9VSync.EnableWindow(TRUE);
 		m_chkVMR9VSyncAccurate.EnableWindow(TRUE);
 		m_chkVMR9AlterativeVSync.EnableWindow(TRUE);
@@ -120,18 +120,18 @@ void CPPageSync::InitDialogPrivate()
 	OnAlterativeVSyncCheck();
 
 	if ((IsWinVista() || IsWin7()) &&
-			(s.iDSVideoRendererType == VIDRNDT_VMR9RENDERLESS ||
-			s.iDSVideoRendererType == VIDRNDT_EVR_CUSTOM ||
-			s.iDSVideoRendererType == VIDRNDT_MADVR ||
-			s.iDSVideoRendererType == VIDRNDT_SYNC)) {
+			(s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS ||
+			s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
+			s.iVideoRenderer == VIDRNDT_MADVR ||
+			s.iVideoRenderer == VIDRNDT_SYNC)) {
 		m_chkDisableAero.EnableWindow(TRUE);
 	} else {
 		m_chkDisableAero.EnableWindow(FALSE);
 	}
 
-	m_chkEnableFrameTimeCorrection.EnableWindow(s.iDSVideoRendererType == VIDRNDT_EVR_CUSTOM ? TRUE : FALSE);
+	m_chkEnableFrameTimeCorrection.EnableWindow(s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ? TRUE : FALSE);
 
-	if ((s.iDSVideoRendererType == VIDRNDT_SYNC) && (pFrame->GetPlaybackMode() == PM_NONE)) {
+	if ((s.iVideoRenderer == VIDRNDT_SYNC) && (pFrame->GetPlaybackMode() == PM_NONE)) {
 		GetDlgItem(IDC_SYNCVIDEO)->EnableWindow(TRUE);
 		GetDlgItem(IDC_SYNCDISPLAY)->EnableWindow(TRUE);
 		GetDlgItem(IDC_SYNCNEAREST)->EnableWindow(TRUE);
@@ -228,7 +228,7 @@ void CPPageSync::OnAlterativeVSyncCheck()
 	CRenderersSettings& rs = s.m_RenderersSettings;
 
 	if (m_chkVMR9AlterativeVSync.GetCheck() == BST_CHECKED &&
-			(s.iDSVideoRendererType == VIDRNDT_EVR_CUSTOM || s.iDSVideoRendererType == VIDRNDT_VMR9RENDERLESS) &&
+			(s.iVideoRenderer == VIDRNDT_EVR_CUSTOM || s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS) &&
 			rs.iAPSurfaceType == SURFACE_TEXTURE3D) {
 		GetDlgItem(IDC_STATIC1)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT1)->EnableWindow(TRUE);
