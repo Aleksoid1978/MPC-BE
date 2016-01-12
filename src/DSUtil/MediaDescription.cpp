@@ -75,13 +75,13 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				bIsAVC = true;
 				Infos.AddTail(L"AVC (H.264)");
 				bAdd = TRUE;
-			} else if (pInfo->hdr.bmiHeader.biCompression == FCC('AMVC')) {
+			} else if (pInfo->hdr.bmiHeader.biCompression == FCC('AMVC') || pInfo->hdr.bmiHeader.biCompression == FCC('MVC1')) {
 				bIsAVC = true;
-				Infos.AddTail(L"MVC (Full)");
+				Infos.AddTail(L"MVC Full (H.264)");
 				bAdd = TRUE;
 			} else if (pInfo->hdr.bmiHeader.biCompression == FCC('EMVC')) {
 				bIsAVC = true;
-				Infos.AddTail(L"MVC (Subset)");
+				Infos.AddTail(L"MVC Subset (H.264)");
 				bAdd = TRUE;
 			} else if (pInfo->hdr.bmiHeader.biCompression == 0) {
 				Infos.AddTail(L"MPEG2");
@@ -122,11 +122,11 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 						case 122:
 							Infos.AddTail(L"High 4:2:2 Profile");
 							break;
-						case 244:
-							Infos.AddTail(L"High 4:4:4 Profile");
-							break;
 						case 128:
 							Infos.AddTail(L"Stereo High Profile");
+							break;
+						case 244:
+							Infos.AddTail(L"High 4:4:4 Profile");
 							break;
 						default:
 							Infos.AddTail(FormatString(L"Profile %d", pInfo->dwProfile));
