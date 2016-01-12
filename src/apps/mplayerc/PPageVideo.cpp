@@ -130,7 +130,7 @@ BOOL CPPageVideo::OnInitDialog()
 	CAppSettings& s = AfxGetAppSettings();
 
 	CRenderersSettings& rs = s.m_RenderersSettings;
-	m_iVideoRendererType   = s.iDSVideoRendererType;
+	m_iVideoRendererType   = s.iVideoRenderer;
 
 	m_chkD3DFullscreen.SetCheck(s.fD3DFullscreen);
 	m_chk10bitOutput.EnableWindow(s.fD3DFullscreen);
@@ -351,7 +351,7 @@ BOOL CPPageVideo::OnApply()
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& rs = s.m_RenderersSettings;
 
-	s.iDSVideoRendererType	= m_iVideoRendererType = m_iVideoRendererType_store = m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel());
+	s.iVideoRenderer	= m_iVideoRendererType = m_iVideoRendererType_store = m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel());
 	rs.iAPSurfaceType		= m_cbAPSurfaceUsage.GetCurSel();
 	rs.iDX9Resizer			= (int)m_cbDX9Resizer.GetItemData(m_cbDX9Resizer.GetCurSel());
 	rs.fVMRMixerMode		= !!m_chkVMRMixerMode.GetCheck();
@@ -651,7 +651,7 @@ void CPPageVideo::OnDSRendererChange()
 			m_wndToolTip.UpdateTipText(L"", &m_cbVideoRenderer);
 	}
 
-	AfxGetAppSettings().iSelectedDSVideoRendererType = CurrentVR;
+	AfxGetAppSettings().iSelectedVideoRenderer = CurrentVR;
 
 	SetModified();
 }
