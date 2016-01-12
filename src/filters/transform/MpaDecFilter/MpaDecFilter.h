@@ -98,6 +98,8 @@ protected:
 
 	BOOL			m_bHasVideo;
 
+	double			m_dRate;
+
 	enum BitstreamType {
 		SPDIF,
 		EAC3,
