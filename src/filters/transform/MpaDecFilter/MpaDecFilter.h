@@ -96,7 +96,12 @@ protected:
 
 	CFFAudioDecoder m_FFAudioDec;
 
+	BOOL			m_bNeedCheck;
 	BOOL			m_bHasVideo;
+
+	double			m_dRate;
+
+	BOOL			m_bFlushing;
 
 	enum BitstreamType {
 		SPDIF,
@@ -161,10 +166,9 @@ public:
 	HRESULT DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PROPERTIES* pProperties);
 	HRESULT GetMediaType(int iPosition, CMediaType* pMediaType);
 
-	HRESULT StartStreaming();
-	HRESULT StopStreaming();
-
 	HRESULT SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt);
+
+	HRESULT BreakConnect(PIN_DIRECTION dir);
 
 	// ISpecifyPropertyPages2
 
