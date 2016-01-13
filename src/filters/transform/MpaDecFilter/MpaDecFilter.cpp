@@ -350,7 +350,10 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_hdmisize(0)
 	, m_truehd_samplerate(0)
 	, m_truehd_framelength(0)
+	, m_bNeedCheck(TRUE)
 	, m_bHasVideo(TRUE)
+	, m_dRate(1.0)
+	, m_bFlushing(FALSE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -457,7 +460,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 CMpaDecFilter::~CMpaDecFilter()
 {
-	StopStreaming();
+	m_FFAudioDec.StreamFinish();
 }
 
 STDMETHODIMP CMpaDecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -486,6 +489,7 @@ HRESULT CMpaDecFilter::EndOfStream()
 
 HRESULT CMpaDecFilter::BeginFlush()
 {
+	m_bFlushing = TRUE;
 	return __super::BeginFlush();
 }
 
@@ -498,7 +502,10 @@ HRESULT CMpaDecFilter::EndFlush()
 	m_Mixer.FlushBuffers();
 	m_encbuff.RemoveAll();
 #endif
-	return __super::EndFlush();
+
+	HRESULT hr = __super::EndFlush();
+	m_bFlushing = FALSE;
+	return hr;
 }
 
 HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
@@ -512,12 +519,51 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	m_bResync = true;
 	m_rtStart = 0; // LOOKATTHIS // reset internal timer?
 
+	m_dRate = dRate > 0.0 ? dRate : 1.0;
+
 	return __super::NewSegment(tStart, tStop, dRate);
 }
 
 HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 {
 	CAutoLock cAutoLock(&m_csReceive);
+
+	if (m_bNeedCheck) {
+		m_bNeedCheck = FALSE;
+
+		memset(&m_bBitstreamSupported, FALSE, sizeof(m_bBitstreamSupported));
+
+		CComPtr<IPin> pPinRenderer;
+		CComPtr<IPin> pPin = m_pOutput;
+		for (CComPtr<IBaseFilter> pBF = this; pBF = GetDownStreamFilter(pBF, pPin); pPin = GetFirstPin(pBF, PINDIR_OUTPUT)) {
+			if (IsAudioWaveRenderer(pBF) && SUCCEEDED(pPin->ConnectedTo(&pPinRenderer)) && pPinRenderer) {
+				break;
+			}
+		}
+	
+		if (pPinRenderer) {
+			CMediaType& mtOutput = m_pOutput->CurrentMediaType();
+			
+			CMediaType mt;
+			mt = CreateMediaTypeSPDIF();
+			m_bBitstreamSupported[SPDIF]		= pPinRenderer->QueryAccept(&mt) == S_OK;
+
+			if (IsWinVistaOrLater()) {
+				mt = CreateMediaTypeHDMI(IEC61937_EAC3);
+				m_bBitstreamSupported[EAC3]		= pPinRenderer->QueryAccept(&mt) == S_OK;
+
+				mt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
+				m_bBitstreamSupported[TRUEHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
+
+				mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
+				m_bBitstreamSupported[DTSHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
+			}
+
+			pPinRenderer->QueryAccept(&mtOutput);
+		}
+
+		m_bHasVideo = HasMediaType(m_pInput, MEDIATYPE_Video) || HasMediaType(m_pInput, MEDIASUBTYPE_MPEG2_VIDEO);	
+	}
 
 	HRESULT hr;
 
@@ -1546,6 +1592,10 @@ HRESULT CMpaDecFilter::GetDeliveryBuffer(IMediaSample** pSample, BYTE** pData)
 
 HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask)
 {
+	if (m_bFlushing) {
+		return S_FALSE;
+	}
+
 	if (dwChannelMask == 0) {
 		dwChannelMask = GetDefChannelMask(nChannels);
 	}
@@ -1959,10 +2009,10 @@ void CMpaDecFilter::CalculateDuration(int samples, int sample_rate, REFERENCE_TI
 	if (bIsTrueHDBitstream) {
 		// Delivery Timestamps
 		// TrueHD frame size, 24 * 0.83333ms
-		rtStart = m_rtStart, m_rtStart = rtStop = m_rtStart + 200000;
+		rtStart = m_rtStart, m_rtStart = rtStop = m_rtStart + (REFERENCE_TIME)(200000 / m_dRate);
 	} else {
 		// Length of the sample
-		double dDuration = (double)samples / sample_rate * 10000000.0;
+		double dDuration = (double)samples / sample_rate * 10000000.0 / m_dRate;
 		m_dStartOffset += fmod(dDuration, 1.0);
 
 		// Delivery Timestamps
@@ -2120,60 +2170,6 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	return S_OK;
 }
 
-HRESULT CMpaDecFilter::StartStreaming()
-{
-	HRESULT hr = __super::StartStreaming();
-	if (FAILED(hr)) {
-		return hr;
-	}
-
-	m_ps2_state.reset();
-
-	memset(&m_bBitstreamSupported, FALSE, sizeof(m_bBitstreamSupported));
-
-	CComPtr<IPin> pPin = m_pOutput;
-	CComPtr<IPin> pPinRenderer;
-	for (CComPtr<IBaseFilter> pBF = this; pBF = GetDownStreamFilter(pBF, pPin); pPin = GetFirstPin(pBF, PINDIR_OUTPUT)) {
-		if (IsAudioWaveRenderer(pBF) && SUCCEEDED(pPin->ConnectedTo(&pPinRenderer)) && pPinRenderer) {
-			break;
-		}
-	}
-
-	if (pPinRenderer) {
-		CMediaType mtOutput;
-		if (S_OK == m_pOutput->ConnectionMediaType(&mtOutput)) {
-
-			CMediaType mt;
-			mt = CreateMediaTypeSPDIF();
-			m_bBitstreamSupported[SPDIF]		= pPinRenderer->QueryAccept(&mt) == S_OK;
-
-			if (IsWinVistaOrLater()) {
-				mt = CreateMediaTypeHDMI(IEC61937_EAC3);
-				m_bBitstreamSupported[EAC3]		= pPinRenderer->QueryAccept(&mt) == S_OK;
-
-				mt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
-				m_bBitstreamSupported[TRUEHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
-
-				mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
-				m_bBitstreamSupported[DTSHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
-			}
-
-			pPinRenderer->QueryAccept(&mtOutput);
-		}
-	}
-
-	m_bHasVideo = HasMediaType(m_pInput, MEDIATYPE_Video) || HasMediaType(m_pInput, MEDIASUBTYPE_MPEG2_VIDEO);
-
-	return S_OK;
-}
-
-HRESULT CMpaDecFilter::StopStreaming()
-{
-	m_FFAudioDec.StreamFinish();
-
-	return __super::StopStreaming();
-}
-
 HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 {
 	if (dir == PINDIR_INPUT) {
@@ -2192,6 +2188,18 @@ HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 	}
 
 	return __super::SetMediaType(dir, pmt);
+}
+
+HRESULT CMpaDecFilter::BreakConnect(PIN_DIRECTION dir)
+{
+	DbgLog((LOG_TRACE, 3, L"CMpaDecFilter::BreakConnect()"));
+
+	if (dir == PINDIR_INPUT) {
+		m_FFAudioDec.StreamFinish();
+		m_bNeedCheck = TRUE;
+	}
+
+	return __super::BreakConnect(dir);
 }
 
 // IMpaDecFilter
