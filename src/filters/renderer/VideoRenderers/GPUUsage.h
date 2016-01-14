@@ -38,27 +38,50 @@ class CGPUUsage
 	typedef int (*ADL_OVERDRIVE6_CAPABILITIES_GET)(int iAdapterIndex, ADLOD6Capabilities *lpODCapabilities);
 	typedef int	(*ADL_OVERDRIVE6_CURRENTSTATUS_GET)(int iAdapterIndex, ADLOD6CurrentStatus *lpCurrentStatus);
 
-	#define NVAPI_MAX_PHYSICAL_GPUS		64
-	#define NVAPI_MAX_USAGES_PER_GPU	34
+	#define OK                         0
+	#define NVAPI_MAX_PHYSICAL_GPUS   64
+	#define NVAPI_MAX_USAGES_PER_GPU  33
+	#define NVAPI_MAX_PSTATES_PER_GPU  8
+	struct gpuUsages {
+		UINT version;
+		UINT usage[NVAPI_MAX_USAGES_PER_GPU];
+	};
+
+	#define NVAPI_DOMAIN_GPU 0
+	#define NVAPI_DOMAIN_VID 2
+	struct gpuPStates {
+		UINT version;
+		UINT flag;
+		struct {
+			UINT present:1;
+			UINT percent;
+		} pstates[NVAPI_MAX_PSTATES_PER_GPU];
+	};
+
 	typedef int *(*NvAPI_QueryInterface_t)(unsigned int offset);
 	typedef int (*NvAPI_Initialize_t)();
 	typedef int (*NvAPI_EnumPhysicalGPUs_t)(int **handles, int *count);
-	typedef int (*NvAPI_GPU_GetUsages_t)(int *handle, unsigned int *usages);
+	typedef int (*NvAPI_GPU_GetUsages_t)(int *handle, gpuUsages *gpuUsages);
+	typedef int (*NvAPI_GPU_GetPStates_t)(int *handle, gpuPStates *gpuPStates);
 
 public:
-	enum GPUType { ATI_GPU, NVIDIA_GPU, UNKNOWN_GPU };
+	enum GPUType {
+		ATI_GPU,
+		NVIDIA_GPU,
+		UNKNOWN_GPU
+	};
 
 	CGPUUsage();
 	~CGPUUsage();
 	HRESULT Init(CString DeviceName);
 
-	const short		GetUsage();
+	const DWORD		GetUsage();
 	const GPUType	GetType() { return m_GPUType; }
 
 private:
 	bool EnoughTimePassed();
 
-	short m_nGPUUsage;
+	DWORD m_nGPUUsage;
 	DWORD m_dwLastRun;
 
 	GPUType m_GPUType;
@@ -66,21 +89,23 @@ private:
 	volatile LONG m_lRunCount;
 
 	struct {
-		HMODULE								hAtiADL;
-		int									iAdapterId;
-		ADL_MAIN_CONTROL_DESTROY			ADL_Main_Control_Destroy;
-		ADL_OVERDRIVE5_CURRENTACTIVITY_GET	ADL_Overdrive5_CurrentActivity_Get;
-		ADL_OVERDRIVE6_CURRENTSTATUS_GET	ADL_Overdrive6_CurrentStatus_Get;
+		HMODULE                            hAtiADL;
+		int                                iAdapterId;
+		int                                iOverdriveVersion;
 
-		int									iOverdriveVersion;
+		ADL_MAIN_CONTROL_DESTROY           ADL_Main_Control_Destroy;
+		ADL_OVERDRIVE5_CURRENTACTIVITY_GET ADL_Overdrive5_CurrentActivity_Get;
+		ADL_OVERDRIVE6_CURRENTSTATUS_GET   ADL_Overdrive6_CurrentStatus_Get;
 	} ATIData;
 
 	struct {
-		HMODULE								hNVApi;
-		int									*gpuHandles[NVAPI_MAX_PHYSICAL_GPUS];
-		unsigned int						gpuUsages[NVAPI_MAX_USAGES_PER_GPU];
-		NvAPI_GPU_GetUsages_t				NvAPI_GPU_GetUsages;
+		HMODULE                hNVApi;
+		int*                   gpuHandles[NVAPI_MAX_PHYSICAL_GPUS];
+		gpuUsages              gpuUsages;
+		gpuPStates             gpuPStates;
 
+		NvAPI_GPU_GetUsages_t  NvAPI_GPU_GetUsages;
+		NvAPI_GPU_GetPStates_t NvAPI_GPU_GetPStates;
 	} NVData;
 
 	void Clean();
