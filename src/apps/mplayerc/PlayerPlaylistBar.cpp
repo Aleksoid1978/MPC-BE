@@ -274,6 +274,11 @@ static void StringToPaths(const CString& curentdir, const CString& str, CAtlArra
 		CPath path = curentdir + s;
 		path.Canonicalize();
 
+		if (path.IsRoot() && path.FileExists()) {
+			paths.Add(path);
+			continue;
+		}
+
 		WIN32_FIND_DATA fd = { 0 };
 		HANDLE hFind = FindFirstFile(path, &fd);
 		if (hFind == INVALID_HANDLE_VALUE) {
