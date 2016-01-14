@@ -8693,9 +8693,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 			m_pCAP->Invalidate();
 		}
 	} else if (i == -3) {
-		s.m_RenderersSettings.bStereoDisabled	= TRUE;
-		s.m_RenderersSettings.bSideBySide		= FALSE;
-		s.m_RenderersSettings.bTopAndBottom		= FALSE;
+		s.m_RenderersSettings.iSubpicStereoMode = SUBPIC_STEREO_NONE;
 
 		if (m_pCAP) {
 			m_pCAP->Invalidate();
@@ -8705,9 +8703,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
 		m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 3000);
 	} else if (i == -2) {
-		s.m_RenderersSettings.bStereoDisabled	= FALSE;
-		s.m_RenderersSettings.bSideBySide		= TRUE;
-		s.m_RenderersSettings.bTopAndBottom		= FALSE;
+		s.m_RenderersSettings.iSubpicStereoMode = SUBPIC_STEREO_SIDEBYSIDE;
 
 		if (m_pCAP) {
 			m_pCAP->Invalidate();
@@ -8717,9 +8713,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
 		m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 3000);
 	} else if (i == -1) {
-		s.m_RenderersSettings.bStereoDisabled	= FALSE;
-		s.m_RenderersSettings.bSideBySide		= FALSE;
-		s.m_RenderersSettings.bTopAndBottom		= TRUE;
+		s.m_RenderersSettings.iSubpicStereoMode = SUBPIC_STEREO_TOPANDBOTTOM;
 
 		if (m_pCAP) {
 			m_pCAP->Invalidate();
@@ -8825,21 +8819,21 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 		pCmdUI->SetCheck(s.fForcedSubtitles);
 		pCmdUI->Enable(s.fEnableSubtitles && m_pCAP && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
 	} else if (i == -3) {
-		if (s.m_RenderersSettings.bStereoDisabled) {
+		if (s.m_RenderersSettings.iSubpicStereoMode == SUBPIC_STEREO_NONE) {
 			CheckMenuRadioItem(ID_SUBTITLES_SUBITEM_START + 7, ID_SUBTITLES_SUBITEM_START + 9, pCmdUI->m_nID);
 		}
 		pCmdUI->Enable(TRUE);
 		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !m_pDVS && !m_bAudioOnly && GetPlaybackMode() != PM_DVD;
 		//pCmdUI->Enable(bEnabled);
 	} else if (i == -2) {
-		if (s.m_RenderersSettings.bSideBySide) {
+		if (s.m_RenderersSettings.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE) {
 			CheckMenuRadioItem(ID_SUBTITLES_SUBITEM_START + 7, ID_SUBTITLES_SUBITEM_START + 9, pCmdUI->m_nID);
 		}
 		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !m_pDVS && !m_bAudioOnly && GetPlaybackMode() != PM_DVD;
 		//pCmdUI->Enable(bEnabled);
 		pCmdUI->Enable(TRUE);
 	} else if (i == -1) {
-		if (s.m_RenderersSettings.bTopAndBottom) {
+		if (s.m_RenderersSettings.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM) {
 			CheckMenuRadioItem(ID_SUBTITLES_SUBITEM_START + 7, ID_SUBTITLES_SUBITEM_START + 9, pCmdUI->m_nID);
 		}
 		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !m_pDVS && !m_bAudioOnly && GetPlaybackMode() != PM_DVD;
@@ -10278,20 +10272,20 @@ void CMainFrame::OnSubtitlePos(UINT nID)
 		CAppSettings& s = AfxGetAppSettings();
 		switch (nID) {
 			case ID_SUB_POS_UP:
-				s.m_RenderersSettings.nShiftPos.y--;
+				s.m_RenderersSettings.SubpicShiftPos.y--;
 				break;
 			case ID_SUB_POS_DOWN:
-				s.m_RenderersSettings.nShiftPos.y++;
+				s.m_RenderersSettings.SubpicShiftPos.y++;
 				break;
 			case ID_SUB_POS_LEFT:
-				s.m_RenderersSettings.nShiftPos.x--;
+				s.m_RenderersSettings.SubpicShiftPos.x--;
 				break;
 			case ID_SUB_POS_RIGHT:
-				s.m_RenderersSettings.nShiftPos.x++;
+				s.m_RenderersSettings.SubpicShiftPos.x++;
 				break;
 			case ID_SUB_POS_RESTORE:
-				s.m_RenderersSettings.nShiftPos.x = 0;
-				s.m_RenderersSettings.nShiftPos.y = 0;
+				s.m_RenderersSettings.SubpicShiftPos.x = 0;
+				s.m_RenderersSettings.SubpicShiftPos.y = 0;
 				break;
 		}
 
@@ -16095,8 +16089,8 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.m_RenderersSettings.bPositionRelative	= 0;
-	s.m_RenderersSettings.nShiftPos = {0, 0};
+	s.m_RenderersSettings.bSubpicPosRelative	= 0;
+	s.m_RenderersSettings.SubpicShiftPos = {0, 0};
 
 	{
 		CAutoLock cAutoLock(&m_csSubLock);
@@ -16149,7 +16143,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 
 				pRTS->Deinit();
 			} else if (clsid == __uuidof(CRenderedHdmvSubtitle) || clsid == __uuidof(CSupSubFile)) {
-				s.m_RenderersSettings.bPositionRelative	= s.subdefstyle.relativeTo;
+				s.m_RenderersSettings.bSubpicPosRelative	= s.subdefstyle.relativeTo;
 			}
 		}
 
@@ -16255,7 +16249,7 @@ void CMainFrame::UpdateSubDefaultStyle()
 			m_pCAP->Paint(false);
 		}
 	} else if (dynamic_cast<CRenderedHdmvSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
-		s.m_RenderersSettings.bPositionRelative	= s.subdefstyle.relativeTo;
+		s.m_RenderersSettings.bSubpicPosRelative	= s.subdefstyle.relativeTo;
 		InvalidateSubtitle();
 		if (GetMediaState() != State_Running) {
 			m_pCAP->Paint(false);

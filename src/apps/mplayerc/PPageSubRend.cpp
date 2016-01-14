@@ -127,14 +127,14 @@ BOOL CPPageSubRend::OnInitDialog()
 	m_edtVerPos = s.nVerPos;
 	m_edtVerPos.SetRange(-10,110);
 	m_nVerPosCtrl.SetRange(110,-10);
-	m_nSPCSize = s.m_RenderersSettings.nSPCSize;
+	m_nSPCSize = s.m_RenderersSettings.nSubpicCount;
 	m_nSPCSizeCtrl.SetRange(RS_SPCSIZE_MIN, RS_SPCSIZE_MAX);
 	for (int i = 0; i < _countof(s_maxTexRes); i++) {
 		m_spmaxres.AddString(s_maxTexRes[i].name);
 	}
-	m_spmaxres.SetCurSel(TexWidth2Index(s.m_RenderersSettings.nSPMaxTexRes));
-	m_bSPCAllowAnimationWhenBuffering = s.m_RenderersSettings.bSPCAllowAnimationWhenBuffering;
-	m_bbSPAllowDropSubPic = s.m_RenderersSettings.bSPAllowDropSubPic;
+	m_spmaxres.SetCurSel(TexWidth2Index(s.m_RenderersSettings.iSubpicMaxTexWidth));
+	m_bSPCAllowAnimationWhenBuffering = s.m_RenderersSettings.bSubpicAnimationWhenBuffering;
+	m_bbSPAllowDropSubPic = s.m_RenderersSettings.bSubpicAllowDrop;
 	m_nSubDelayInterval = s.nSubDelayInterval;
 
 	CorrectCWndWidth(GetDlgItem(IDC_CHECK3));
@@ -155,19 +155,19 @@ BOOL CPPageSubRend::OnApply()
 	if (s.fOverridePlacement != !!m_fOverridePlacement
 			|| s.nHorPos != m_edtHorPos
 			|| s.nVerPos != m_edtVerPos
-			|| s.m_RenderersSettings.nSPCSize != m_nSPCSize
+			|| s.m_RenderersSettings.nSubpicCount != m_nSPCSize
 			|| s.nSubDelayInterval != m_nSubDelayInterval
-			|| s.m_RenderersSettings.nSPMaxTexRes != TexIndex2Width(m_spmaxres.GetCurSel())
-			|| s.m_RenderersSettings.bSPAllowDropSubPic != !!m_bbSPAllowDropSubPic
-			|| s.m_RenderersSettings.bSPCAllowAnimationWhenBuffering != !!m_bSPCAllowAnimationWhenBuffering) {
+			|| s.m_RenderersSettings.iSubpicMaxTexWidth != TexIndex2Width(m_spmaxres.GetCurSel())
+			|| s.m_RenderersSettings.bSubpicAllowDrop != !!m_bbSPAllowDropSubPic
+			|| s.m_RenderersSettings.bSubpicAnimationWhenBuffering != !!m_bSPCAllowAnimationWhenBuffering) {
 		s.fOverridePlacement = !!m_fOverridePlacement;
 		s.nHorPos = m_edtHorPos;
 		s.nVerPos = m_edtVerPos;
-		s.m_RenderersSettings.nSPCSize = m_nSPCSize;
+		s.m_RenderersSettings.nSubpicCount = m_nSPCSize;
 		s.nSubDelayInterval = m_nSubDelayInterval;
-		s.m_RenderersSettings.nSPMaxTexRes = TexIndex2Width(m_spmaxres.GetCurSel());
-		s.m_RenderersSettings.bSPAllowDropSubPic = !!m_bbSPAllowDropSubPic;
-		s.m_RenderersSettings.bSPCAllowAnimationWhenBuffering = !!m_bSPCAllowAnimationWhenBuffering;
+		s.m_RenderersSettings.iSubpicMaxTexWidth = TexIndex2Width(m_spmaxres.GetCurSel());
+		s.m_RenderersSettings.bSubpicAllowDrop = !!m_bbSPAllowDropSubPic;
+		s.m_RenderersSettings.bSubpicAnimationWhenBuffering = !!m_bSPCAllowAnimationWhenBuffering;
 
 		if (auto pFrame = AfxFindMainFrame()) {
 			pFrame->UpdateSubtitle();

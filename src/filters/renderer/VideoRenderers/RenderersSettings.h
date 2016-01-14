@@ -82,6 +82,12 @@ enum ColorRenderingIntent {
 	COLOR_RENDERING_INTENT_ABSOLUTE_COLORIMETRIC,
 };
 
+enum {
+	SUBPIC_STEREO_NONE,
+	SUBPIC_STEREO_SIDEBYSIDE,
+	SUBPIC_STEREO_TOPANDBOTTOM,
+};
+
 class CRenderersSettings
 {
 
@@ -89,15 +95,11 @@ public:
 	bool fResetDevice;
 
 	// Subtitle position settings
-	int bPositionRelative;
+	int bSubpicPosRelative;
+	CPoint SubpicShiftPos;
 
 	// Stereoscopic Subtitles
-	BOOL bStereoDisabled;
-	BOOL bSideBySide;
-	BOOL bTopAndBottom;
-
-	// Subtitle position
-	CPoint nShiftPos;
+	int iSubpicStereoMode;
 
 	class CAdvRendererSettings
 	{
@@ -145,10 +147,10 @@ public:
 
 	int			iEvrBuffers;
 
-	int			nSPCSize;
-	int			nSPMaxTexRes;
-	bool		bSPCAllowAnimationWhenBuffering;
-	bool		bSPAllowDropSubPic;
+	int			nSubpicCount;
+	int			iSubpicMaxTexWidth;
+	bool		bSubpicAnimationWhenBuffering;
+	bool		bSubpicAllowDrop;
 
 	CString		D3D9RenderDevice;
 	void		SaveRenderers();

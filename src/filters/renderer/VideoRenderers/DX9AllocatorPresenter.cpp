@@ -833,7 +833,7 @@ HRESULT CDX9AllocatorPresenter::InitializeISR(CString &_Error)
 		m_pSubPicQueue->GetSubPicProvider(&pSubPicProvider);
 	}
 
-	InitMaxSubtitleTextureSize(GetRenderersSettings().nSPMaxTexRes, m_ScreenSize);
+	InitMaxSubtitleTextureSize(GetRenderersSettings().iSubpicMaxTexWidth, m_ScreenSize);
 
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(m_pD3DDev);
@@ -848,9 +848,9 @@ HRESULT CDX9AllocatorPresenter::InitializeISR(CString &_Error)
 	HRESULT hr = S_OK;
 	if (!m_pSubPicQueue) {
 		CAutoLock cAutoLock(this);
-		m_pSubPicQueue = GetRenderersSettings().nSPCSize > 0
-						 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSPCSize, !GetRenderersSettings().bSPCAllowAnimationWhenBuffering, GetRenderersSettings().bSPAllowDropSubPic, m_pAllocator, &hr)
-						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSPCAllowAnimationWhenBuffering, m_pAllocator, &hr);
+		m_pSubPicQueue = GetRenderersSettings().nSubpicCount > 0
+						 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSubpicCount, !GetRenderersSettings().bSubpicAnimationWhenBuffering, GetRenderersSettings().bSubpicAllowDrop, m_pAllocator, &hr)
+						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSubpicAnimationWhenBuffering, m_pAllocator, &hr);
 	} else {
 		m_pSubPicQueue->Invalidate();
 	}
@@ -1424,12 +1424,12 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 	if (m_pOSDTexture) {
 		CRect rcDst(rDstPri);
-		if (rs.bSideBySide) {
+		if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE) {
 			CRect rcTemp(rcDst);
 			rcTemp.right -= rcTemp.Width() / 2;
 			AlphaBlt(rSrcPri, rcTemp, m_pOSDTexture);
 			rcDst.left += rcDst.Width() / 2;
-		} else if (rs.bTopAndBottom) {
+		} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM) {
 			CRect rcTemp(rcDst);
 			rcTemp.bottom -= rcTemp.Height() / 2;
 			AlphaBlt(rSrcPri, rcTemp, m_pOSDTexture);

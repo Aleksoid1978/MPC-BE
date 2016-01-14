@@ -97,7 +97,7 @@ public:
 	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget) PURE;
 
 	STDMETHODIMP SetVirtualTextureSize(const SIZE pSize, const POINT pTopLeft);
-	STDMETHODIMP GetSourceAndDest(RECT rcWindow, RECT rcVideo, BOOL bPositionRelative, CPoint nShiftPos, RECT* pRcSource, RECT* pRcDest) const;
+	STDMETHODIMP GetSourceAndDest(RECT rcWindow, RECT rcVideo, BOOL bSubpicPosRelative, CPoint SubpicShiftPos, RECT* pRcSource, RECT* pRcDest) const;
 
 	STDMETHODIMP_(REFERENCE_TIME) GetSegmentStart();
 	STDMETHODIMP_(REFERENCE_TIME) GetSegmentStop();

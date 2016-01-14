@@ -117,12 +117,12 @@ void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, cons
 			CRect rcSubs(windowRect);
 
 			CRenderersSettings& rs = GetRenderersSettings();
-			if (rs.bSideBySide) {
+			if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE) {
 				CRect rcTemp(windowRect);
 				rcTemp.right -= rcTemp.Width() / 2;
 				AlphaBlt(rcTemp, videoRect, pSubPic, pTarget);
 				rcSubs.left += rcSubs.Width() / 2;
-			} else if (rs.bTopAndBottom) {
+			} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM) {
 				CRect rcTemp(windowRect);
 				rcTemp.bottom -= rcTemp.Height() / 2;
 				AlphaBlt(rcTemp, videoRect, pSubPic, pTarget);
@@ -138,7 +138,7 @@ void CSubPicAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const CRec
 {
 	CRect rcSource, rcDest;
 	CRenderersSettings& rs = GetRenderersSettings();
-	if (SUCCEEDED(pSubPic->GetSourceAndDest(windowRect, videoRect, rs.bPositionRelative, rs.nShiftPos, rcSource, rcDest))) {
+	if (SUCCEEDED(pSubPic->GetSourceAndDest(windowRect, videoRect, rs.bSubpicPosRelative, rs.SubpicShiftPos, rcSource, rcDest))) {
 		pSubPic->AlphaBlt(rcSource, rcDest, pTarget);
 	}
 }
