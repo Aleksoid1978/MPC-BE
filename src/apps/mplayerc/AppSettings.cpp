@@ -1708,19 +1708,15 @@ void CAppSettings::SaveRenderers()
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), rs.fResetDevice);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, rs.nSPCSize);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, rs.nSPMaxTexRes);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWDROPSUBPIC, rs.bSPAllowDropSubPic);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, rs.bSPCAllowAnimationWhenBuffering);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, rs.nSubpicCount);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, rs.iSubpicMaxTexWidth);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWDROPSUBPIC, rs.bSubpicAllowDrop);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, rs.bSubpicAnimationWhenBuffering);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("SubpicStereoMode"), rs.iSubpicStereoMode);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, rs.iEvrBuffers);
 
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE, rs.D3D9RenderDevice);
-
-	// Stereoscopic Subtitles
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"StereoDisabled", rs.bStereoDisabled);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"SideBySide", rs.bSideBySide);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"TopAndBottom", rs.bTopAndBottom);
 }
 void CAppSettings::LoadRenderers()
 {
@@ -1778,20 +1774,16 @@ void CAppSettings::LoadRenderers()
 
 	rs.fResetDevice = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), TRUE);
 
-	rs.nSPCSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, RS_SPCSIZE_DEF);
-	rs.nSPMaxTexRes = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, 1280);
-	rs.bSPAllowDropSubPic = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWDROPSUBPIC, TRUE);
-	rs.bSPCAllowAnimationWhenBuffering = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, TRUE);
+	rs.nSubpicCount = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, RS_SPCSIZE_DEF);
+	rs.iSubpicMaxTexWidth = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, 1280);
+	rs.bSubpicAllowDrop = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWDROPSUBPIC, TRUE);
+	rs.bSubpicAnimationWhenBuffering = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, TRUE);
+	rs.iSubpicStereoMode = pApp->GetProfileInt(IDS_R_SETTINGS, _T("SubpicStereoMode"), 0);
 
 	rs.iEvrBuffers = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, RS_EVRBUFFERS_DEF);
 	rs.D3D9RenderDevice = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE);
 
-	// Stereoscopic Subtitles
-	rs.bStereoDisabled = pApp->GetProfileInt(IDS_R_SETTINGS, L"StereoDisabled", TRUE);
-	rs.bSideBySide = pApp->GetProfileInt(IDS_R_SETTINGS, L"SideBySide", FALSE);
-	rs.bTopAndBottom = pApp->GetProfileInt(IDS_R_SETTINGS, L"TopAndBottom", FALSE);
-
-	rs.bPositionRelative = false;
+	rs.bSubpicPosRelative = false;
 }
 
 void CAppSettings::SaveCurrentFilePosition()
