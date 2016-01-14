@@ -2009,17 +2009,19 @@ void CMpaDecFilter::CalculateDuration(int samples, int sample_rate, REFERENCE_TI
 	if (bIsTrueHDBitstream) {
 		// Delivery Timestamps
 		// TrueHD frame size, 24 * 0.83333ms
-		rtStart = m_rtStart, m_rtStart = rtStop = m_rtStart + (REFERENCE_TIME)(200000 / m_dRate);
+		const REFERENCE_TIME duration = 200000i64;
+		rtStart = m_rtStart, rtStop = m_rtStart + duration;
+		m_rtStart += (REFERENCE_TIME)(duration / m_dRate);
 	} else {
 		// Length of the sample
-		double dDuration = (double)samples / sample_rate * 10000000.0 / m_dRate;
+		const double dDuration = (double)samples / sample_rate * 10000000.0;
 		m_dStartOffset += fmod(dDuration, 1.0);
 
 		// Delivery Timestamps
 		rtStart = m_rtStart, rtStop = m_rtStart + (REFERENCE_TIME)(dDuration + 0.5);
 
 		// Compute next start time
-		m_rtStart += (REFERENCE_TIME)dDuration;
+		m_rtStart += (REFERENCE_TIME)(dDuration / m_dRate);
 		// If the offset reaches one (100ns), add it to the next frame
 		if (m_dStartOffset > 0.5) {
 			m_rtStart++;
