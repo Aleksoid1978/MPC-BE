@@ -2174,7 +2174,7 @@ void CDX9AllocatorPresenter::DrawStats()
 				}
 
 				if (size_t mem_usage = m_MemUsage.GetUsage()) {
-					strText.AppendFormat(L", Memory:%5.01f MB", mem_usage / 1048576.0);
+					strText.AppendFormat(L", Memory:%6.01f MB", mem_usage / 1048576.0);
 				}
 
 				DrawText(rc, strText, 1);
