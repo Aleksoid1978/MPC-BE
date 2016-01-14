@@ -2162,29 +2162,25 @@ void CDX9AllocatorPresenter::DrawStats()
 			}
 
 			{
-				strText.Format(L"CPU Usage    : %2d%%", m_CPUUsage.GetUsage());
-				DrawText(rc, strText, 1);
-				OffsetRect(&rc, 0, TextHeight);
-			}
+				strText.Format(L"Performance  : CPU:%3d%%", m_CPUUsage.GetUsage());
 
-			if (m_GPUUsage.GetType() != CGPUUsage::UNKNOWN_GPU) {
-				const DWORD getUsage = m_GPUUsage.GetUsage();
-				strText.Format(L"GPU Usage    : %2d%%", getUsage & 0xFFFF);
-				DrawText(rc, strText, 1);
-				OffsetRect(&rc, 0, TextHeight);
+				if (m_GPUUsage.GetType() != CGPUUsage::UNKNOWN_GPU) {
+					const DWORD gpu_usage = m_GPUUsage.GetUsage();
+					strText.AppendFormat(L", GPU:%3d%%", gpu_usage & 0xFFFF);
 
-				if (m_GPUUsage.GetType() == CGPUUsage::NVIDIA_GPU) {
-					strText.Format(L"VID Usage    : %2d%%", getUsage >> 16);
-					DrawText(rc, strText, 1);
-					OffsetRect(&rc, 0, TextHeight);
+					if (m_GPUUsage.GetType() == CGPUUsage::NVIDIA_GPU) {
+						strText.AppendFormat(L", Video Engine:%3d%%", gpu_usage >> 16);
+					}
 				}
-			}
 
-			if (m_MemUsage.GetUsage() > 0.0) {
-				strText.Format(L"Mem Usage    : %5.01f Mb", m_MemUsage.GetUsage());
+				if (size_t mem_usage = m_MemUsage.GetUsage()) {
+					strText.AppendFormat(L", Memory:%5.01f MB", mem_usage / 1048576.0);
+				}
+
 				DrawText(rc, strText, 1);
 				OffsetRect(&rc, 0, TextHeight);
 			}
+
 		}
 
 		m_pSprite->End();
