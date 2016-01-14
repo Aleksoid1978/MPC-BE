@@ -22,29 +22,29 @@
 #include <Psapi.h>
 #include "MemUsage.h"
 
-const float CMemUsage::GetUsage()
+const size_t CMemUsage::GetUsage()
 {
-	float fMemUsage = m_fMemUsage;
+	size_t szMemUsage = m_szMemUsage;
 	if (::InterlockedIncrement(&m_lRunCount) == 1) {
 
 		if (!EnoughTimePassed()) {
 			::InterlockedDecrement(&m_lRunCount);
-			return fMemUsage;
+			return szMemUsage;
 		}
 
 		PROCESS_MEMORY_COUNTERS pmc = { 0 };
 		if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)) && pmc.WorkingSetSize > 0) {
-			m_fMemUsage = pmc.WorkingSetSize / 1024.0f / 1024.0f;
+			m_szMemUsage = pmc.WorkingSetSize;
 		
 		}
 
 		m_dwLastRun	= GetTickCount();
-		fMemUsage = m_fMemUsage;
+		szMemUsage = m_szMemUsage;
 	}
 
 	::InterlockedDecrement(&m_lRunCount);
 
-	return fMemUsage;
+	return szMemUsage;
 }
 
 const bool CMemUsage::EnoughTimePassed()

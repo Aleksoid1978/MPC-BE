@@ -25,11 +25,11 @@ class CMemUsage
 public:
 	CMemUsage() { GetUsage(); };
 
-	const float GetUsage();
+	const size_t GetUsage();
 private:
 	const bool EnoughTimePassed();
 
-	float m_fMemUsage = 0.0f;
+	size_t m_szMemUsage = 0;
 	DWORD m_dwLastRun = 0;
 
 	volatile LONG m_lRunCount = 0;
