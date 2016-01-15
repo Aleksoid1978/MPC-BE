@@ -81,12 +81,30 @@ HRESULT CMatroskaFile::Init()
 		return E_FAIL;
 	}
 
-	CAutoPtr<CMatroskaNode> pSegment, pCluster;
-	if ((pSegment = Root.Child(MATROSKA_ID_SEGMENT))
-			&& (pCluster = pSegment->Child(MATROSKA_ID_CLUSTER))) {
-		Cluster c0;
-		c0.ParseTimeCode(pCluster);
-		m_rtOffset = m_segment.GetRefTime(c0.TimeCode);
+	const auto& s = m_segment;
+
+	BOOL bCanPlayback = FALSE;
+	POSITION pos = s.Tracks.GetHeadPosition();
+	while (pos && !bCanPlayback) {
+		Track* pT = s.Tracks.GetNext(pos);
+
+		POSITION pos2 = pT->TrackEntries.GetHeadPosition();
+		while (pos2 && !bCanPlayback) {
+			TrackEntry* pTE = pT->TrackEntries.GetNext(pos2);
+			if (pTE->TrackType == TrackEntry::TypeVideo || pTE->TrackType == TrackEntry::TypeAudio) {
+				bCanPlayback = TRUE;
+			}
+		}
+	}
+
+	if (bCanPlayback) {
+		CAutoPtr<CMatroskaNode> pSegment, pCluster;
+		if ((pSegment = Root.Child(MATROSKA_ID_SEGMENT))
+				&& (pCluster = pSegment->Child(MATROSKA_ID_CLUSTER))) {
+			Cluster c0;
+			c0.ParseTimeCode(pCluster);
+			m_rtOffset = m_segment.GetRefTime(c0.TimeCode);
+		}
 	}
 
 	return S_OK;
