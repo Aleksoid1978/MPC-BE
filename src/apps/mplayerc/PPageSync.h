@@ -46,7 +46,7 @@ public:
 	CButton m_chkVMRFlushGPUAfterPresent;
 	CButton m_chkVMRFlushGPUWait;
 
-	BOOL m_bSynchronizeVideo;
+	BOOL m_bSynchronizeVideo; // TODO: make radio butons
 	BOOL m_bSynchronizeDisplay;
 	BOOL m_bSynchronizeNearest;
 

@@ -499,7 +499,7 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 	}
 
 	CRenderersSettings& rs = GetRenderersSettings();
-	if (rs.fVMRMixerMode) {
+	if (rs.bVMRMixerMode) {
 		// VMR9
 		if (CComQIPtr<IVMRFilterConfig9> pConfig = *ppBF) {
 			pConfig->SetNumberOfStreams(m_clsid == CLSID_VMR9AllocatorPresenter ? 1 : 4);
@@ -511,7 +511,7 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 				// See http://msdn.microsoft.com/en-us/library/dd390928(VS.85).aspx
 				dwPrefs |= MixerPref9_NonSquareMixing;
 				dwPrefs |= MixerPref9_NoDecimation;
-				if (rs.fVMRMixerYUV) {
+				if (rs.bVMRMixerYUV) {
 					dwPrefs &= ~MixerPref9_RenderTargetMask;
 					dwPrefs |= MixerPref9_RenderTargetYUV;
 				}
@@ -527,7 +527,7 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 				pVMRMC->GetMixingPrefs(&dwPrefs);
 
 				dwPrefs |= MixerPref_NoDecimation;
-				if (rs.fVMRMixerYUV) {
+				if (rs.bVMRMixerYUV) {
 					dwPrefs &= ~MixerPref_RenderTargetMask;
 					dwPrefs |= MixerPref_RenderTargetYUV;
 				}

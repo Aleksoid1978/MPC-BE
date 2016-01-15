@@ -178,8 +178,8 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	}
 
 	// Bufferize frame only with 3D texture!
-	if (rs.iAPSurfaceType == SURFACE_TEXTURE3D) {
-		m_nNbDXSurface = CLAMP(rs.iEvrBuffers, 4, MAX_VIDEO_SURFACES);
+	if (rs.iSurfaceType == SURFACE_TEXTURE3D) {
+		m_nNbDXSurface = CLAMP(rs.nEVRBuffers, 4, MAX_VIDEO_SURFACES);
 	} else {
 		m_nNbDXSurface = 1;
 	}
@@ -1835,7 +1835,7 @@ void CEVRAllocatorPresenter::RenderThread()
 	while (!bQuit) {
 		LONGLONG	llPerf = GetPerfCounter();
 		UNREFERENCED_PARAMETER(llPerf);
-		if (!rs.m_AdvRendSets.iVMR9VSyncAccurate && NextSleepTime == 0) {
+		if (!rs.m_AdvRendSets.bVSyncAccurate && NextSleepTime == 0) {
 			NextSleepTime = 1;
 		}
 		dwObject = WaitForMultipleObjects(_countof(hEvts), hEvts, FALSE, max(NextSleepTime < 0 ? 1 : NextSleepTime, 0));
@@ -1945,7 +1945,7 @@ void CEVRAllocatorPresenter::RenderThread()
 							} else {
 								LONGLONG TimePerFrame = (LONGLONG)(GetFrameTime() * 10000000.0);
 								LONGLONG DrawTime = m_PaintTime * 9 / 10 - 20000; // 2 ms offset (= m_PaintTime * 0.9 - 20000)
-								//if (!s.iVMR9VSync)
+								//if (!s.bVSync)
 								DrawTime = 0;
 
 								LONGLONG SyncOffset = 0;
@@ -1970,7 +1970,7 @@ void CEVRAllocatorPresenter::RenderThread()
 									DetectedScanlineTime = DetectedRefreshTime / double(m_ScreenSize.cy);
 								}
 
-								if (rs.m_AdvRendSets.iVMR9VSync) {
+								if (rs.m_AdvRendSets.bVSync) {
 									bVSyncCorrection = true;
 									double TargetVSyncPos = GetVBlackPos();
 									double RefreshLines = DetectedScanlinesPerFrame;
@@ -2195,7 +2195,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 				break;
 			case WAIT_TIMEOUT : {
 				// Do our stuff
-				if (m_pD3DDev && rs.m_AdvRendSets.iVMR9VSync) {
+				if (m_pD3DDev && rs.m_AdvRendSets.bVSync) {
 					if (m_nRenderState == Started) {
 						int VSyncPos = GetVBlackPos();
 						int WaitRange = max(m_ScreenSize.cy / 40, 5);
@@ -2566,7 +2566,7 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 
 			if (m_DetectedFrameTime != 0.0
 					//&& PredictedDiff > MIN_FRAME_TIME
-					&& m_DetectedLock && rs.m_AdvRendSets.iEVREnableFrameTimeCorrection) {
+					&& m_DetectedLock && rs.m_AdvRendSets.bEVRFrameTimeCorrection) {
 				double CurrentTime = Time / 10000000.0;
 				double LastTime = m_LastScheduledSampleTimeFP;
 				double PredictedTime = LastTime + m_DetectedFrameTime;

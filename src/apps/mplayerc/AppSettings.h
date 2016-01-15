@@ -96,7 +96,7 @@ enum {
 }; // flags for Caption & Menu Mode
 
 enum {
-	VIDRNDT_DEFAULT,
+	VIDRNDT_SYSDEFAULT,
 	VIDRNDT_OLDRENDERER, // obsolete
 	VIDRNDT_OVERLAYMIXER,
 	VIDRNDT_VMR7WINDOWED,

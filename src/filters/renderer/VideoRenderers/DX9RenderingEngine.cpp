@@ -201,7 +201,7 @@ void CDX9RenderingEngine::InitRenderingEngine()
 	m_pPSC.Attach(DNew CPixelShaderCompiler(m_pD3DDev, true));
 
 	HRESULT hr = S_OK;
-	switch (GetRenderersSettings().iDX9Resizer) {
+	switch (GetRenderersSettings().iResizer) {
 		case RESIZER_SHADER_SMOOTHERSTEP: hr = InitShaderResizer(shader_smootherstep); break;
 #if ENABLE_2PASS_RESIZE
 		case RESIZER_SHADER_BSPLINE4:  hr = InitShaderResizer(shader_bspline4_x);  break;
@@ -261,7 +261,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 	// Free previously allocated temporary video textures, because the native video size might have been changed!
 	NULL_PTR_ARRAY(m_pFrameTextures);
 
-	if (settings.iAPSurfaceType == SURFACE_TEXTURE2D) {
+	if (settings.iSurfaceType == SURFACE_TEXTURE2D) {
 		if (FAILED(hr = m_pD3DDev->CreateTexture(
 			m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
 			D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
@@ -278,12 +278,12 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 
 		m_RenderingPath = RENDERING_PATH_STRETCHRECT;
 	}
-	else if (settings.iAPSurfaceType == SURFACE_TEXTURE3D) {
+	else if (settings.iSurfaceType == SURFACE_TEXTURE3D) {
 		m_VideoBufferFmt = m_SurfaceFmt;
 		if (m_D3D9VendorId == PCIV_Intel) {
 			if (m_bIsEVR) {
 				m_VideoBufferFmt = D3DFMT_X8R8G8B8;
-			} else if (m_SurfaceFmt == D3DFMT_A32B32G32R32F && settings.fVMRMixerMode && settings.fVMRMixerYUV) {
+			} else if (m_SurfaceFmt == D3DFMT_A32B32G32R32F && settings.bVMRMixerMode && settings.bVMRMixerYUV) {
 				m_VideoBufferFmt = D3DFMT_A16B16G16R16F;
 			}
 		}
@@ -336,7 +336,7 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 	m_nDX9Resizer = RESIZER_UNKNOWN;
 
 #if DXVAVP
-	if (GetRenderersSettings().iDX9Resizer == RESIZER_DXVA2) {
+	if (GetRenderersSettings().iResizer == RESIZER_DXVA2) {
 		if (S_OK == RenderVideoDXVA(pRenderTarget, srcRect, destRect)) {
 			return S_OK;
 		}
@@ -367,7 +367,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	bool bFinalPass;
 
 	int screenSpacePassCount = 0;
-	DWORD iDX9Resizer = settings.iDX9Resizer;
+	DWORD iResizer = settings.iResizer;
 
 	if (m_bD3DX) {
 		// Final pass. Must be initialized first!
@@ -384,7 +384,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 
 		// Resizers
 		hr = E_FAIL;
-		switch (iDX9Resizer) {
+		switch (iResizer) {
 		case RESIZER_NEAREST:
 		case RESIZER_BILINEAR:
 			hr = S_OK;
@@ -410,10 +410,10 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		}
 
 		if (FAILED(hr)) {
-			iDX9Resizer = RESIZER_BILINEAR;
+			iResizer = RESIZER_BILINEAR;
 		}
 
-		m_nDX9Resizer = iDX9Resizer;
+		m_nDX9Resizer = iResizer;
 		screenSpacePassCount++; // currently all resizers are 1-pass
 
 		// Custom screen space pixel shaders
@@ -432,8 +432,8 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		}
 	} else {
 		bCustomPixelShaders = false;
-		if (iDX9Resizer != RESIZER_NEAREST) {
-			iDX9Resizer = RESIZER_BILINEAR;
+		if (iResizer != RESIZER_NEAREST) {
+			iResizer = RESIZER_BILINEAR;
 		}
 		bCustomScreenSpacePixelShaders = false;
 		bFinalPass = false;
@@ -524,7 +524,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	}
 
 	if (srcRect.Size() != destRect.Size()) {
-		switch (iDX9Resizer) {
+		switch (iResizer) {
 		case RESIZER_NEAREST:  hr = TextureResize(pVideoTexture, dst, srcRect, D3DTEXF_POINT);  break;
 		case RESIZER_BILINEAR: hr = TextureResize(pVideoTexture, dst, srcRect, D3DTEXF_LINEAR); break;
 		case RESIZER_SHADER_SMOOTHERSTEP: hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_smootherstep); break;
@@ -616,7 +616,7 @@ HRESULT CDX9RenderingEngine::RenderVideoStretchRectPath(IDirect3DSurface9* pRend
 		return S_OK;
 	}
 
-	D3DTEXTUREFILTERTYPE filter = GetRenderersSettings().iDX9Resizer == RESIZER_NEAREST ? D3DTEXF_POINT : D3DTEXF_LINEAR;
+	D3DTEXTUREFILTERTYPE filter = GetRenderersSettings().iResizer == RESIZER_NEAREST ? D3DTEXF_POINT : D3DTEXF_LINEAR;
 
 	m_nDX9Resizer = (filter == D3DTEXF_POINT) ? RESIZER_NEAREST : RESIZER_BILINEAR;
 
@@ -1312,10 +1312,10 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	CRenderersData* data = GetRenderersData();
 
 	// Check whether the final pass must be initialized
-	bool bColorManagement = settings.m_AdvRendSets.iVMR9ColorManagementEnable;
-	VideoSystem inputVideoSystem = static_cast<VideoSystem>(settings.m_AdvRendSets.iVMR9ColorManagementInput);
-	AmbientLight ambientLight = static_cast<AmbientLight>(settings.m_AdvRendSets.iVMR9ColorManagementAmbientLight);
-	ColorRenderingIntent renderingIntent = static_cast<ColorRenderingIntent>(settings.m_AdvRendSets.iVMR9ColorManagementIntent);
+	bool bColorManagement = settings.m_AdvRendSets.bColorManagementEnable;
+	VideoSystem inputVideoSystem = static_cast<VideoSystem>(settings.m_AdvRendSets.iColorManagementInput);
+	AmbientLight ambientLight = static_cast<AmbientLight>(settings.m_AdvRendSets.iColorManagementAmbientLight);
+	ColorRenderingIntent renderingIntent = static_cast<ColorRenderingIntent>(settings.m_AdvRendSets.iColorManagementIntent);
 
 	bool bInitRequired = false;
 
