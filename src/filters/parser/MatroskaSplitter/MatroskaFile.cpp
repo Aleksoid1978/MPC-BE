@@ -61,7 +61,6 @@ static void bswap(BYTE* s, int len)
 
 CMatroskaFile::CMatroskaFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 	: CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL)
-	, m_rtOffset(0)
 {
 	if (FAILED(hr)) {
 		return;
@@ -79,14 +78,6 @@ HRESULT CMatroskaFile::Init()
 	CMatroskaNode Root(this);
 	if (FAILED(Parse(&Root))) {
 		return E_FAIL;
-	}
-
-	CAutoPtr<CMatroskaNode> pSegment, pCluster;
-	if ((pSegment = Root.Child(MATROSKA_ID_SEGMENT))
-			&& (pCluster = pSegment->Child(MATROSKA_ID_CLUSTER))) {
-		Cluster c0;
-		c0.ParseTimeCode(pCluster);
-		m_rtOffset = m_segment.GetRefTime(c0.TimeCode);
 	}
 
 	return S_OK;

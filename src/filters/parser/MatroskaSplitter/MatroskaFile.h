@@ -619,7 +619,6 @@ namespace MatroskaReader
 
 		EBML m_ebml;
 		Segment m_segment;
-		REFERENCE_TIME m_rtOffset;
 
 		HRESULT Parse(CMatroskaNode* pMN);
 	};
