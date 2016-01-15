@@ -932,6 +932,7 @@ public:
 	afx_msg void OnFileClosePlaylist();
 	afx_msg void OnFileCloseMedia(); // no menu item
 	afx_msg void OnUpdateFileClose(CCmdUI* pCmdUI);
+	afx_msg void OnRepeatForever();
 
 	afx_msg void OnViewCaptionmenu();
 	afx_msg void OnViewNavigation();

@@ -241,6 +241,7 @@
 #define ID_STREAM_SUB_ONOFF             956
 #define ID_STREAM_VIDEO_NEXT            961
 #define ID_STREAM_VIDEO_PREV            962
+#define ID_REPEAT_FOREVER               967
 #define ID_VIEW_ZOOM_AUTOFIT            968
 #define ID_FILE_OPENQUICK               969
 #define ID_VOLUME_GAIN_INC              970
@@ -988,6 +989,9 @@
 #define IDS_MPLAYERC_86                 32963
 #define IDS_AG_NEXT_VIDEO               32968
 #define IDS_AG_PREV_VIDEO               32969
+#define IDS_REPEAT_FOREVER              32970
+#define IDS_REPEAT_FOREVER_OFF          32971
+#define IDS_REPEAT_FOREVER_ON           32972
 #define IDS_MPLAYERC_98                 32975
 #define IDS_MPLAYERC_99                 32976
 #define IDS_MPLAYERC_100                32977
