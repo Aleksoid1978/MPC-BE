@@ -50,7 +50,7 @@ CmadVRAllocatorPresenter::CmadVRAllocatorPresenter(HWND hWnd, HRESULT& hr, CStri
 		(FARPROC &)m_pDwmEnableComposition = GetProcAddress(m_hDWMAPI, "DwmEnableComposition");
 	}
 
-	if (GetRenderersSettings().m_AdvRendSets.iVMRDisableDesktopComposition) {
+	if (GetRenderersSettings().m_AdvRendSets.bDisableDesktopComposition) {
 		m_bDesktopCompositionDisabled = true;
 		if (m_pDwmEnableComposition) {
 			m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);

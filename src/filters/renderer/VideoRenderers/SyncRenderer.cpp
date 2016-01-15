@@ -147,7 +147,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	ZeroMemory(&m_VMR9AlphaBitmap, sizeof(m_VMR9AlphaBitmap));
 
 	CRenderersSettings& rs = GetRenderersSettings();
-	if (rs.m_AdvRendSets.iVMRDisableDesktopComposition) {
+	if (rs.m_AdvRendSets.bDisableDesktopComposition) {
 		m_bDesktopCompositionDisabled = true;
 		if (m_pDwmEnableComposition) {
 			m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
@@ -156,7 +156,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 		m_bDesktopCompositionDisabled = false;
 	}
 
-	m_pGenlock = DNew CGenlock(rs.m_AdvRendSets.fTargetSyncOffset, rs.m_AdvRendSets.fControlLimit, rs.m_AdvRendSets.iLineDelta, rs.m_AdvRendSets.iColumnDelta, rs.m_AdvRendSets.fCycleDelta, 0); // Must be done before CreateDXDevice
+	m_pGenlock = DNew CGenlock(rs.m_AdvRendSets.dTargetSyncOffset, rs.m_AdvRendSets.dControlLimit, rs.m_AdvRendSets.iLineDelta, rs.m_AdvRendSets.iColumnDelta, rs.m_AdvRendSets.dCycleDelta, 0); // Must be done before CreateDXDevice
 	hr = CreateDXDevice(_Error);
 
 	// Define the shader profile.
@@ -362,7 +362,7 @@ bool CBaseAP::SettingsNeedResetDevice()
 
 	bool bRet = false;
 	if (!m_bIsFullscreen) {
-		if (Current.iVMRDisableDesktopComposition) {
+		if (Current.bDisableDesktopComposition) {
 			if (!m_bDesktopCompositionDisabled) {
 				m_bDesktopCompositionDisabled = true;
 				if (m_pDwmEnableComposition) {
@@ -379,7 +379,7 @@ bool CBaseAP::SettingsNeedResetDevice()
 		}
 	}
 	bRet = bRet || New.b10BitOutput != Current.b10BitOutput;
-	bRet = bRet || New.iDX9SurfaceFormat != Current.iDX9SurfaceFormat;
+	bRet = bRet || New.iSurfaceFormat != Current.iSurfaceFormat;
 	m_LastRendererSettings = rs.m_AdvRendSets;
 	return bRet;
 }
@@ -687,8 +687,8 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 	m_SurfaceFmt = Format;
 
 	HRESULT hr;
-	if (rs.iAPSurfaceType == SURFACE_TEXTURE2D || rs.iAPSurfaceType == SURFACE_TEXTURE3D) {
-		int nTexturesNeeded = rs.iAPSurfaceType == SURFACE_TEXTURE3D ? m_nDXSurface+2 : 1;
+	if (rs.iSurfaceType == SURFACE_TEXTURE2D || rs.iSurfaceType == SURFACE_TEXTURE3D) {
+		int nTexturesNeeded = rs.iSurfaceType == SURFACE_TEXTURE3D ? m_nDXSurface+2 : 1;
 
 		for (int i = 0; i < nTexturesNeeded; i++) {
 			if (FAILED(hr = m_pD3DDev->CreateTexture(
@@ -700,7 +700,7 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 				return hr;
 			}
 		}
-		if (rs.iAPSurfaceType == SURFACE_TEXTURE2D) {
+		if (rs.iSurfaceType == SURFACE_TEXTURE2D) {
 			for (int i = 0; i < m_nDXSurface+2; i++) {
 				m_pVideoTexture[i] = NULL;
 			}
@@ -1241,10 +1241,10 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			Transform(rDstVid, dst);
 
 			// Resizers
-			DWORD iDX9Resizer = rs.iDX9Resizer;
+			DWORD iResizer = rs.iResizer;
 			hr = E_FAIL;
 
-			switch (iDX9Resizer) {
+			switch (iResizer) {
 			case RESIZER_NEAREST:
 			case RESIZER_BILINEAR:
 				hr = S_OK;
@@ -1259,7 +1259,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			}
 
 			if (FAILED(hr)) {
-				iDX9Resizer = RESIZER_BILINEAR;
+				iResizer = RESIZER_BILINEAR;
 			}
 
 			bool bScreenSpacePixelShaders = !m_pPixelShadersScreenSpace.IsEmpty();
@@ -1298,7 +1298,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			}
 
 			if (rSrcVid.Size() != rDstVid.Size()) {
-				switch (iDX9Resizer) {
+				switch (iResizer) {
 				case RESIZER_NEAREST:  hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT);  break;
 				case RESIZER_BILINEAR: hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_LINEAR); break;
 				case RESIZER_SHADER_SMOOTHERSTEP: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_smootherstep); break;
@@ -1440,9 +1440,9 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 		frameCycle = 0.0;    // Happens when searching.
 	}
 
-	if (rs.m_AdvRendSets.bSynchronizeVideo) {
+	if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
 		m_pGenlock->ControlClock(dSyncOffset, frameCycle);
-	} else if (rs.m_AdvRendSets.bSynchronizeDisplay) {
+	} else if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_DISPLAY) {
 		m_pGenlock->ControlDisplay(dSyncOffset, frameCycle);
 	} else {
 		m_pGenlock->UpdateStats(dSyncOffset, frameCycle);    // No sync or sync to nearest neighbor
@@ -1473,12 +1473,12 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 		pApp->m_bResetStats = false;
 	}
 
-	bool fResetDevice = m_bPendingResetDevice;
+	bool bResetDevice = m_bPendingResetDevice;
 	if (hr == D3DERR_DEVICELOST && m_pD3DDev->TestCooperativeLevel() == D3DERR_DEVICENOTRESET || hr == S_PRESENT_MODE_CHANGED) {
-		fResetDevice = true;
+		bResetDevice = true;
 	}
 	if (SettingsNeedResetDevice()) {
-		fResetDevice = true;
+		bResetDevice = true;
 	}
 
 	BOOL bCompositionEnabled = false;
@@ -1489,11 +1489,11 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 		if (m_bIsFullscreen) {
 			m_bCompositionEnabled = (bCompositionEnabled != 0);
 		} else {
-			fResetDevice = true;
+			bResetDevice = true;
 		}
 	}
 
-	if (rs.fResetDevice) {
+	if (rs.bResetDevice) {
 		LONGLONG time = GetPerfCounter();
 		if (time > m_LastAdapterCheck + 20000000) { // check every 2 sec.
 			m_LastAdapterCheck = time;
@@ -1504,7 +1504,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			}
 #endif
 			if (m_CurrentAdapter != GetAdapter(m_pD3D)) {
-				fResetDevice = true;
+				bResetDevice = true;
 			}
 #ifdef _DEBUG
 			else {
@@ -1514,7 +1514,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 		}
 	}
 
-	if (fResetDevice) {
+	if (bResetDevice) {
 		m_bPendingResetDevice = true;
 		SendResetRequest();
 	}
@@ -1688,8 +1688,8 @@ void CBaseAP::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
-			if (rs.m_AdvRendSets.bSynchronizeDisplay || rs.m_AdvRendSets.bSynchronizeVideo) {
-				if (rs.m_AdvRendSets.bSynchronizeDisplay && !m_pGenlock->PowerstripRunning()) {
+			if (rs.m_AdvRendSets.iSynchronizeMode != SYNCHRONIZE_NEAREST) {
+				if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_DISPLAY && !m_pGenlock->PowerstripRunning()) {
 					strText = L"Sync error   : PowerStrip is not running. No display sync is possible.";
 					DrawText(rc, strText, 1);
 					OffsetRect(&rc, 0, TextHeight);
@@ -1701,7 +1701,7 @@ void CBaseAP::DrawStats()
 			}
 		}
 
-		strText.Format(L"Sync offset  : Average %3.1f ms [%.1f ms, %.1f ms]   Target %3.1f ms", m_pGenlock->syncOffsetAvg, m_pGenlock->minSyncOffset, m_pGenlock->maxSyncOffset, rs.m_AdvRendSets.fTargetSyncOffset);
+		strText.Format(L"Sync offset  : Average %3.1f ms [%.1f ms, %.1f ms]   Target %3.1f ms", m_pGenlock->syncOffsetAvg, m_pGenlock->minSyncOffset, m_pGenlock->maxSyncOffset, rs.m_AdvRendSets.dTargetSyncOffset);
 		DrawText(rc, strText, 1);
 		OffsetRect(&rc, 0, TextHeight);
 
@@ -1710,14 +1710,14 @@ void CBaseAP::DrawStats()
 		OffsetRect(&rc, 0, TextHeight);
 
 		if (pApp->m_fDisplayStats == 1) {
-			if (m_pAudioStats && rs.m_AdvRendSets.bSynchronizeVideo) {
+			if (m_pAudioStats && rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
 				strText.Format(L"Audio lag   : %3d ms [%d ms, %d ms] | %s", m_lAudioLag, m_lAudioLagMin, m_lAudioLagMax, (m_lAudioSlaveMode == 4) ? _T("Audio renderer is matching rate (for analog sound output)") : _T("Audio renderer is not matching rate"));
 				DrawText(rc, strText, 1);
 				OffsetRect(&rc, 0, TextHeight);
 			}
 
 			strText.Format(L"Sample time  : waiting %3d ms", m_lNextSampleWait);
-			if (rs.m_AdvRendSets.bSynchronizeNearest) {
+			if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_NEAREST) {
 				CString temp;
 				temp.Format(L"  paint time correction: %3d ms  Hysteresis: %d", m_lShiftToNearest, m_llHysteresis /10000);
 				strText += temp;
@@ -1734,16 +1734,14 @@ void CBaseAP::DrawStats()
 			if (m_bIsFullscreen) {
 				strText += "D3DFS ";
 			}
-			if (rs.m_AdvRendSets.iVMRDisableDesktopComposition) {
+			if (rs.m_AdvRendSets.bDisableDesktopComposition) {
 				strText += "DisDC ";
 			}
-			if (rs.m_AdvRendSets.bSynchronizeVideo) {
+			if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
 				strText += "SyncVideo ";
-			}
-			if (rs.m_AdvRendSets.bSynchronizeDisplay) {
+			} else if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_DISPLAY) {
 				strText += "SyncDisplay ";
-			}
-			if (rs.m_AdvRendSets.bSynchronizeNearest) {
+			} else if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_NEAREST) {
 				strText += "SyncNearest ";
 			}
 			if (m_bHighColorResolution) {
@@ -2095,8 +2093,8 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error): CBa
 	}
 
 	// Bufferize frame only with 3D texture
-	if (rs.iAPSurfaceType == SURFACE_TEXTURE3D) {
-		m_nDXSurface = max(min (rs.iEvrBuffers, MAX_PICTURE_SLOTS-2), 4);
+	if (rs.iSurfaceType == SURFACE_TEXTURE3D) {
+		m_nDXSurface = max(min (rs.nEVRBuffers, MAX_PICTURE_SLOTS-2), 4);
 	} else {
 		m_nDXSurface = 1;
 	}
@@ -3216,7 +3214,7 @@ void CSyncAP::RenderThread()
 		LONG lDisplayCycle4 = (LONG)(GetDisplayCycle() / 4.0);
 
 		CRenderersSettings& rs = GetRenderersSettings();
-		dTargetSyncOffset = rs.m_AdvRendSets.fTargetSyncOffset;
+		dTargetSyncOffset = rs.m_AdvRendSets.dTargetSyncOffset;
 
 		if ((m_nRenderState == Started || !m_bPrerolled) && !pNewSample) { // If either streaming or the pre-roll sample and no sample yet fetched
 			if (SUCCEEDED(GetScheduledSample(&pNewSample, nSamplesLeft))) { // Get the next sample
@@ -3234,7 +3232,7 @@ void CSyncAP::RenderThread()
 						m_lNextSampleWait = (LONG)((m_llSampleTime - llRefClockTime) / 10000); // Time left until sample is due, in ms
 						if (m_bStepping) {
 							m_lNextSampleWait = 0;
-						} else if (rs.m_AdvRendSets.bSynchronizeNearest) { // Present at the closest "safe" occasion at dTargetSyncOffset ms before vsync to avoid tearing
+						} else if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_NEAREST) { // Present at the closest "safe" occasion at dTargetSyncOffset ms before vsync to avoid tearing
 							if (m_lNextSampleWait < -lDisplayCycle) { // We have to allow slightly negative numbers at this stage. Otherwise we get "choking" when frame rate > refresh rate
 								SetEvent(m_hEvtSkip);
 								m_bEvtSkip = true;
@@ -3999,9 +3997,9 @@ HRESULT CGenlock::ControlDisplay(double syncOffset, double frameCycle)
 	ATOM setTiming;
 
 	CRenderersSettings& rs = GetRenderersSettings();
-	targetSyncOffset = rs.m_AdvRendSets.fTargetSyncOffset;
-	lowSyncOffset = targetSyncOffset - rs.m_AdvRendSets.fControlLimit;
-	highSyncOffset = targetSyncOffset + rs.m_AdvRendSets.fControlLimit;
+	targetSyncOffset = rs.m_AdvRendSets.dTargetSyncOffset;
+	lowSyncOffset = targetSyncOffset - rs.m_AdvRendSets.dControlLimit;
+	highSyncOffset = targetSyncOffset + rs.m_AdvRendSets.dControlLimit;
 
 	syncOffsetAvg = syncOffsetFifo->Average(syncOffset);
 	minSyncOffset = min(minSyncOffset, syncOffset);
@@ -4061,9 +4059,9 @@ HRESULT CGenlock::ControlDisplay(double syncOffset, double frameCycle)
 HRESULT CGenlock::ControlClock(double syncOffset, double frameCycle)
 {
 	CRenderersSettings& rs = GetRenderersSettings();
-	targetSyncOffset = rs.m_AdvRendSets.fTargetSyncOffset;
-	lowSyncOffset = targetSyncOffset - rs.m_AdvRendSets.fControlLimit;
-	highSyncOffset = targetSyncOffset + rs.m_AdvRendSets.fControlLimit;
+	targetSyncOffset = rs.m_AdvRendSets.dTargetSyncOffset;
+	lowSyncOffset = targetSyncOffset - rs.m_AdvRendSets.dControlLimit;
+	highSyncOffset = targetSyncOffset + rs.m_AdvRendSets.dControlLimit;
 
 	syncOffsetAvg = syncOffsetFifo->Average(syncOffset);
 	minSyncOffset = min(minSyncOffset, syncOffset);

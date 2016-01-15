@@ -59,8 +59,8 @@ static bool IsRenderTypeAvailable(UINT VideoRendererType, HWND hwnd)
 IMPLEMENT_DYNAMIC(CPPageVideo, CPPageBase)
 CPPageVideo::CPPageVideo()
 	: CPPageBase(CPPageVideo::IDD, CPPageVideo::IDD)
-	, m_iVideoRendererType(VIDRNDT_DEFAULT)
-	, m_iVideoRendererType_store(VIDRNDT_DEFAULT)
+	, m_iVideoRendererType(VIDRNDT_SYSDEFAULT)
+	, m_iVideoRendererType_store(VIDRNDT_SYSDEFAULT)
 	, m_bResetDevice(FALSE)
 	, m_iEvrBuffers(RS_EVRBUFFERS_DEF)
 	, m_bD3D9RenderDevice(FALSE)
@@ -135,22 +135,22 @@ BOOL CPPageVideo::OnInitDialog()
 	m_chkD3DFullscreen.SetCheck(s.fD3DFullscreen);
 	m_chk10bitOutput.EnableWindow(s.fD3DFullscreen);
 	m_chk10bitOutput.SetCheck(rs.m_AdvRendSets.b10BitOutput);
-	m_chkVMRMixerMode.SetCheck(rs.fVMRMixerMode);
-	m_chkVMRMixerYUV.SetCheck(rs.fVMRMixerYUV);
+	m_chkVMRMixerMode.SetCheck(rs.bVMRMixerMode);
+	m_chkVMRMixerYUV.SetCheck(rs.bVMRMixerYUV);
 
 	m_cbAPSurfaceUsage.AddString(ResStr(IDS_PPAGE_OUTPUT_SURF_OFFSCREEN));
 	m_cbAPSurfaceUsage.AddString(ResStr(IDS_PPAGE_OUTPUT_SURF_2D));
 	m_cbAPSurfaceUsage.AddString(ResStr(IDS_PPAGE_OUTPUT_SURF_3D));
-	m_cbAPSurfaceUsage.SetCurSel(rs.iAPSurfaceType);
+	m_cbAPSurfaceUsage.SetCurSel(rs.iSurfaceType);
 
 	m_cbEVROutputRange.AddString(L"0-255");
 	m_cbEVROutputRange.AddString(L"16-235");
 	m_cbEVROutputRange.SetCurSel(rs.m_AdvRendSets.iEVROutputRange);
 
-	m_iEvrBuffers = rs.iEvrBuffers;
+	m_iEvrBuffers = rs.nEVRBuffers;
 	m_spnEvrBuffers.SetRange(RS_EVRBUFFERS_MIN, RS_EVRBUFFERS_MAX);
 
-	m_bResetDevice = s.m_RenderersSettings.fResetDevice;
+	m_bResetDevice = s.m_RenderersSettings.bResetDevice;
 
 	IDirect3D9* pD3D = Direct3DCreate9(D3D_SDK_VERSION);
 	if (pD3D) {
@@ -178,7 +178,7 @@ BOOL CPPageVideo::OnInitDialog()
 					if (!bExists) {
 						m_cbD3D9RenderDevice.AddString(d3ddevice_str);
 						m_D3D9GUIDNames.Add(cstrGUID);
-						if (rs.D3D9RenderDevice == cstrGUID) {
+						if (rs.sD3DRenderDevice == cstrGUID) {
 							m_iD3D9RenderDevice = m_cbD3D9RenderDevice.GetCount() - 1;
 						}
 					}
@@ -194,7 +194,7 @@ BOOL CPPageVideo::OnInitDialog()
 		CString sName;
 
 		switch (nID) {
-			case VIDRNDT_DEFAULT:
+			case VIDRNDT_SYSDEFAULT:
 				sName = ResStr(IDS_PPAGE_OUTPUT_SYS_DEF);
 				break;
 			case VIDRNDT_OVERLAYMIXER:
@@ -251,7 +251,7 @@ BOOL CPPageVideo::OnInitDialog()
 
 	CComboBox& m_iDSVRTC = m_cbVideoRenderer;
 	m_iDSVRTC.SetRedraw(FALSE);
-	addRenderer(VIDRNDT_DEFAULT);
+	addRenderer(VIDRNDT_SYSDEFAULT);
 	addRenderer(VIDRNDT_OVERLAYMIXER);
 	addRenderer(VIDRNDT_VMR7WINDOWED);
 	addRenderer(VIDRNDT_VMR9WINDOWED);
@@ -288,9 +288,9 @@ BOOL CPPageVideo::OnInitDialog()
 	m_wndToolTip.AddTool(&m_cbAPSurfaceUsage, L"");
 
 	OnDSRendererChange();
-	UpdateSurfaceFormatList(rs.m_AdvRendSets.iDX9SurfaceFormat);
+	UpdateSurfaceFormatList(rs.m_AdvRendSets.iSurfaceFormat);
 	OnSurfaceChange();
-	UpdateResizerList(rs.iDX9Resizer);
+	UpdateResizerList(rs.iResizer);
 
 	CheckDlgButton(IDC_D3D9DEVICE, BST_UNCHECKED);
 	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
@@ -316,21 +316,21 @@ BOOL CPPageVideo::OnInitDialog()
 
 	// Color Managment
 	CorrectCWndWidth(&m_chkColorManagment);
-	m_chkColorManagment.SetCheck(rs.m_AdvRendSets.iVMR9ColorManagementEnable != 0);
+	m_chkColorManagment.SetCheck(rs.m_AdvRendSets.bColorManagementEnable);
 	m_cbCMInputType.AddString(ResStr(IDS_CM_INPUT_AUTO));
 	m_cbCMInputType.AddString(L"HDTV");
 	m_cbCMInputType.AddString(L"SDTV NTSC");
 	m_cbCMInputType.AddString(L"SDTV PAL");
-	m_cbCMInputType.SetCurSel(rs.m_AdvRendSets.iVMR9ColorManagementInput);
+	m_cbCMInputType.SetCurSel(rs.m_AdvRendSets.iColorManagementInput);
 	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_BRIGHT));
 	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_DIM));
 	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_DARK));
-	m_cbCMAmbientLight.SetCurSel(rs.m_AdvRendSets.iVMR9ColorManagementAmbientLight);
+	m_cbCMAmbientLight.SetCurSel(rs.m_AdvRendSets.iColorManagementAmbientLight);
 	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_PERCEPTUAL));
 	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_RELATIVECM));
 	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_SATURATION));
 	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_ABSOLUTECM));
-	m_cbCMRenderingIntent.SetCurSel(rs.m_AdvRendSets.iVMR9ColorManagementIntent);
+	m_cbCMRenderingIntent.SetCurSel(rs.m_AdvRendSets.iColorManagementIntent);
 	CorrectComboListWidth(m_cbCMInputType);
 	CorrectComboListWidth(m_cbCMAmbientLight);
 	CorrectComboListWidth(m_cbCMRenderingIntent);
@@ -352,26 +352,26 @@ BOOL CPPageVideo::OnApply()
 	CRenderersSettings& rs = s.m_RenderersSettings;
 
 	s.iVideoRenderer	= m_iVideoRendererType = m_iVideoRendererType_store = m_cbVideoRenderer.GetItemData(m_cbVideoRenderer.GetCurSel());
-	rs.iAPSurfaceType		= m_cbAPSurfaceUsage.GetCurSel();
-	rs.iDX9Resizer			= (int)m_cbDX9Resizer.GetItemData(m_cbDX9Resizer.GetCurSel());
-	rs.fVMRMixerMode		= !!m_chkVMRMixerMode.GetCheck();
-	rs.fVMRMixerYUV			= !!m_chkVMRMixerYUV.GetCheck();
+	rs.iSurfaceType		= m_cbAPSurfaceUsage.GetCurSel();
+	rs.iResizer			= (int)m_cbDX9Resizer.GetItemData(m_cbDX9Resizer.GetCurSel());
+	rs.bVMRMixerMode		= !!m_chkVMRMixerMode.GetCheck();
+	rs.bVMRMixerYUV			= !!m_chkVMRMixerYUV.GetCheck();
 	s.fD3DFullscreen		= !!m_chkD3DFullscreen.GetCheck();
-	rs.fResetDevice			= !!m_bResetDevice;
+	rs.bResetDevice			= !!m_bResetDevice;
 
-	rs.m_AdvRendSets.iDX9SurfaceFormat		= m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel());
+	rs.m_AdvRendSets.iSurfaceFormat		= m_cbDX9SurfaceFormat.GetItemData(m_cbDX9SurfaceFormat.GetCurSel());
 	rs.m_AdvRendSets.b10BitOutput			= !!m_chk10bitOutput.GetCheck();
 	rs.m_AdvRendSets.iEVROutputRange		= m_cbEVROutputRange.GetCurSel();
 
-	rs.iEvrBuffers = m_iEvrBuffers;
+	rs.nEVRBuffers = m_iEvrBuffers;
 
-	rs.D3D9RenderDevice = m_bD3D9RenderDevice ? m_D3D9GUIDNames[m_iD3D9RenderDevice] : L"";
+	rs.sD3DRenderDevice = m_bD3D9RenderDevice ? m_D3D9GUIDNames[m_iD3D9RenderDevice] : L"";
 
 	// Color Managment
-	rs.m_AdvRendSets.iVMR9ColorManagementEnable = !!m_chkColorManagment.GetCheck();
-	rs.m_AdvRendSets.iVMR9ColorManagementInput = m_cbCMInputType.GetCurSel();
-	rs.m_AdvRendSets.iVMR9ColorManagementAmbientLight = m_cbCMAmbientLight.GetCurSel();
-	rs.m_AdvRendSets.iVMR9ColorManagementIntent = m_cbCMRenderingIntent.GetCurSel();
+	rs.m_AdvRendSets.bColorManagementEnable = !!m_chkColorManagment.GetCheck();
+	rs.m_AdvRendSets.iColorManagementInput = m_cbCMInputType.GetCurSel();
+	rs.m_AdvRendSets.iColorManagementAmbientLight = m_cbCMAmbientLight.GetCurSel();
+	rs.m_AdvRendSets.iColorManagementIntent = m_cbCMRenderingIntent.GetCurSel();
 
 	return __super::OnApply();
 }
@@ -514,7 +514,7 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_STATIC9)->ShowWindow(SW_HIDE);
 
 	switch (CurrentVR) {
-		case VIDRNDT_DEFAULT:
+		case VIDRNDT_SYSDEFAULT:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYSDEF), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_OVERLAYMIXER:

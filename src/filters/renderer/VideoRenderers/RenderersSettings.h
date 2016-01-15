@@ -83,6 +83,12 @@ enum ColorRenderingIntent {
 };
 
 enum {
+	SYNCHRONIZE_NEAREST,
+	SYNCHRONIZE_VIDEO,
+	SYNCHRONIZE_DISPLAY,
+};
+
+enum {
 	SUBPIC_STEREO_NONE,
 	SUBPIC_STEREO_SIDEBYSIDE,
 	SUBPIC_STEREO_TOPANDBOTTOM,
@@ -92,7 +98,7 @@ class CRenderersSettings
 {
 
 public:
-	bool fResetDevice;
+	bool bResetDevice;
 
 	// Subtitle position settings
 	int bSubpicPosRelative;
@@ -106,55 +112,53 @@ public:
 	public:
 		CAdvRendererSettings() {SetDefault();}
 
-		bool   fVMR9AlterativeVSync;
-		int    iVMR9VSyncOffset;
-		bool   iVMR9VSyncAccurate;
-		bool   iVMR9VSync;
-		bool   iVMR9ColorManagementEnable;
-		int    iVMR9ColorManagementInput;
-		int    iVMR9ColorManagementAmbientLight;
-		int    iVMR9ColorManagementIntent;
-		bool   iVMRDisableDesktopComposition;
-		int    iVMRFlushGPUBeforeVSync;
-		int    iVMRFlushGPUAfterPresent;
-		int    iVMRFlushGPUWait;
-		int    iDX9SurfaceFormat;
-		bool   b10BitOutput;
+		bool	bAlterativeVSync;
+		int		iVSyncOffset;
+		bool	bVSyncAccurate;
+		bool	bVSync;
+		bool	bColorManagementEnable;
+		int		iColorManagementInput;
+		int		iColorManagementAmbientLight;
+		int		iColorManagementIntent;
+		bool	bDisableDesktopComposition;
+		bool	bFlushGPUBeforeVSync;
+		bool	bFlushGPUAfterPresent;
+		bool	bFlushGPUWait;
+		int		iSurfaceFormat;
+		bool	b10BitOutput;
 
 		// EVR
-		bool   iEVREnableFrameTimeCorrection;
-		int    iEVROutputRange;
+		bool	bEVRFrameTimeCorrection;
+		int		iEVROutputRange;
 
 		// SyncRenderer settings
-		int    bSynchronizeVideo;
-		int    bSynchronizeDisplay;
-		int    bSynchronizeNearest;
-		int    iLineDelta;
-		int    iColumnDelta;
-		double fCycleDelta;
-		double fTargetSyncOffset;
-		double fControlLimit;
+		int		iSynchronizeMode;
+		int		iLineDelta;
+		int		iColumnDelta;
+		double	dCycleDelta;
+		double	dTargetSyncOffset;
+		double	dControlLimit;
 
 		void SetDefault();
 	};
 
 	CAdvRendererSettings m_AdvRendSets;
 
-	int			iAPSurfaceType;
-	int			iDX9Resizer;
-	bool		fVMRMixerMode;
-	bool		fVMRMixerYUV;
+	int		iSurfaceType;
+	int		iResizer;
+	bool	bVMRMixerMode;
+	bool	bVMRMixerYUV;
 
-	int			iEvrBuffers;
+	int		nEVRBuffers;
 
-	int			nSubpicCount;
-	int			iSubpicMaxTexWidth;
-	bool		bSubpicAnimationWhenBuffering;
-	bool		bSubpicAllowDrop;
+	int		nSubpicCount;
+	int		iSubpicMaxTexWidth;
+	bool	bSubpicAnimationWhenBuffering;
+	bool	bSubpicAllowDrop;
 
-	CString		D3D9RenderDevice;
-	void		SaveRenderers();
-	void		LoadRenderers();
+	CString	sD3DRenderDevice;
+	void	SaveRenderers();
+	void	LoadRenderers();
 };
 
 class CRenderersData

@@ -1010,7 +1010,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	if (nSpeedStep != 10 && nSpeedStep != 20 && nSpeedStep != 25 && nSpeedStep != 50 && nSpeedStep != 100) {
 		nSpeedStep = 0;
 	}
-	iVideoRenderer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DSVIDEORENDERERTYPE, (IsWinVistaOrLater() ? (CMPlayerCApp::HasEVR() ? VIDRNDT_EVR_CUSTOM : VIDRNDT_DEFAULT) : VIDRNDT_VMR7WINDOWED) );
+	iVideoRenderer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DSVIDEORENDERERTYPE, (IsWinVistaOrLater() ? (CMPlayerCApp::HasEVR() ? VIDRNDT_EVR_CUSTOM : VIDRNDT_SYSDEFAULT) : VIDRNDT_VMR7WINDOWED) );
 
 	LoadRenderers();
 
@@ -1671,42 +1671,40 @@ void CAppSettings::SaveRenderers()
 	CRenderersSettings& rs = m_RenderersSettings;
 	CRenderersSettings::CAdvRendererSettings& ars = rs.m_AdvRendSets;
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, rs.iAPSurfaceType);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, rs.iDX9Resizer);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, rs.fVMRMixerMode);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, rs.fVMRMixerYUV);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, rs.iSurfaceType);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, rs.iResizer);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, rs.bVMRMixerMode);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, rs.bVMRMixerYUV);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRAlternateVSync"), ars.fVMR9AlterativeVSync);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRVSyncOffset"), ars.iVMR9VSyncOffset);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRVSyncAccurate2"), ars.iVMR9VSyncAccurate);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRVSync"), ars.iVMR9VSync);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRDisableDesktopComposition"), ars.iVMRDisableDesktopComposition);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRAlternateVSync"), ars.bAlterativeVSync);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRVSyncOffset"), ars.iVSyncOffset);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRVSyncAccurate2"), ars.bVSyncAccurate);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRVSync"), ars.bVSync);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRDisableDesktopComposition"), ars.bDisableDesktopComposition);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_10BITOUTPUT, ars.b10BitOutput);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_SURFACEFORMAT, ars.iDX9SurfaceFormat);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_SURFACEFORMAT, ars.iSurfaceFormat);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementEnable"), ars.iVMR9ColorManagementEnable);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementInput"), ars.iVMR9ColorManagementInput);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementAmbientLight"), ars.iVMR9ColorManagementAmbientLight);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementIntent"), ars.iVMR9ColorManagementIntent);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementEnable"), ars.bColorManagementEnable);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementInput"), ars.iColorManagementInput);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementAmbientLight"), ars.iColorManagementAmbientLight);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementIntent"), ars.iColorManagementIntent);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("EVROutputRange"), ars.iEVROutputRange);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("EVREnableFrameTimeCorrection"), ars.iEVREnableFrameTimeCorrection);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("EVREnableFrameTimeCorrection"), ars.bEVRFrameTimeCorrection);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRFlushGPUBeforeVSync"), ars.iVMRFlushGPUBeforeVSync);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRFlushGPUAfterPresent"), ars.iVMRFlushGPUAfterPresent);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRFlushGPUWait"), ars.iVMRFlushGPUWait);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRFlushGPUBeforeVSync"), ars.bFlushGPUBeforeVSync);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRFlushGPUAfterPresent"), ars.bFlushGPUAfterPresent);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("VMRFlushGPUWait"), ars.bFlushGPUWait);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("SynchronizeClock"), ars.bSynchronizeVideo);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("SynchronizeDisplay"), ars.bSynchronizeDisplay);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("SynchronizeNearest"), ars.bSynchronizeNearest);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("SynchronizeMode"), ars.iSynchronizeMode);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("LineDelta"), ars.iLineDelta);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ColumnDelta"), ars.iColumnDelta);
 
-	pApp->WriteProfileBinary(IDS_R_SETTINGS, _T("CycleDelta"), (LPBYTE)&(ars.fCycleDelta), sizeof(ars.fCycleDelta));
-	pApp->WriteProfileBinary(IDS_R_SETTINGS, _T("TargetSyncOffset"), (LPBYTE)&(ars.fTargetSyncOffset), sizeof(ars.fTargetSyncOffset));
-	pApp->WriteProfileBinary(IDS_R_SETTINGS, _T("ControlLimit"), (LPBYTE)&(ars.fControlLimit), sizeof(ars.fControlLimit));
+	pApp->WriteProfileBinary(IDS_R_SETTINGS, _T("CycleDelta"), (LPBYTE)&(ars.dCycleDelta), sizeof(ars.dCycleDelta));
+	pApp->WriteProfileBinary(IDS_R_SETTINGS, _T("TargetSyncOffset"), (LPBYTE)&(ars.dTargetSyncOffset), sizeof(ars.dTargetSyncOffset));
+	pApp->WriteProfileBinary(IDS_R_SETTINGS, _T("ControlLimit"), (LPBYTE)&(ars.dControlLimit), sizeof(ars.dControlLimit));
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), rs.fResetDevice);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), rs.bResetDevice);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, rs.nSubpicCount);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, rs.iSubpicMaxTexWidth);
@@ -1714,9 +1712,9 @@ void CAppSettings::SaveRenderers()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, rs.bSubpicAnimationWhenBuffering);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, _T("SubpicStereoMode"), rs.iSubpicStereoMode);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, rs.iEvrBuffers);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, rs.nEVRBuffers);
 
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE, rs.D3D9RenderDevice);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE, rs.sD3DRenderDevice);
 }
 void CAppSettings::LoadRenderers()
 {
@@ -1724,55 +1722,53 @@ void CAppSettings::LoadRenderers()
 	CRenderersSettings& rs = m_RenderersSettings;
 	CRenderersSettings::CAdvRendererSettings& ars = rs.m_AdvRendSets;
 
-	rs.iAPSurfaceType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, (IsWinVistaOrLater() ? SURFACE_TEXTURE3D : SURFACE_TEXTURE2D));
-	rs.iDX9Resizer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, 1);
-	rs.fVMRMixerMode = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, IsWinVistaOrLater() ? TRUE : FALSE);
-	rs.fVMRMixerYUV = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, IsWinVistaOrLater() ? TRUE : FALSE);
+	rs.iSurfaceType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, (IsWinVistaOrLater() ? SURFACE_TEXTURE3D : SURFACE_TEXTURE2D));
+	rs.iResizer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, 1);
+	rs.bVMRMixerMode = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, IsWinVistaOrLater() ? TRUE : FALSE);
+	rs.bVMRMixerYUV = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, IsWinVistaOrLater() ? TRUE : FALSE);
 
 	CRenderersSettings::CAdvRendererSettings DefaultSettings;
-	ars.fVMR9AlterativeVSync = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRAlternateVSync"), DefaultSettings.fVMR9AlterativeVSync);
-	ars.iVMR9VSyncOffset = pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRVSyncOffset"), DefaultSettings.iVMR9VSyncOffset);
-	ars.iVMR9VSyncAccurate = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRVSyncAccurate2"), DefaultSettings.iVMR9VSyncAccurate);
-	ars.iEVREnableFrameTimeCorrection = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("EVREnableFrameTimeCorrection"), DefaultSettings.iEVREnableFrameTimeCorrection);
-	ars.iVMR9VSync = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRVSync"), DefaultSettings.iVMR9VSync);
-	ars.iVMRDisableDesktopComposition = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRDisableDesktopComposition"), DefaultSettings.iVMRDisableDesktopComposition);
+	ars.bAlterativeVSync = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRAlternateVSync"), DefaultSettings.bAlterativeVSync);
+	ars.iVSyncOffset = pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRVSyncOffset"), DefaultSettings.iVSyncOffset);
+	ars.bVSyncAccurate = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRVSyncAccurate2"), DefaultSettings.bVSyncAccurate);
+	ars.bEVRFrameTimeCorrection = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("EVREnableFrameTimeCorrection"), DefaultSettings.bEVRFrameTimeCorrection);
+	ars.bVSync = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRVSync"), DefaultSettings.bVSync);
+	ars.bDisableDesktopComposition = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRDisableDesktopComposition"), DefaultSettings.bDisableDesktopComposition);
 	ars.b10BitOutput = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_10BITOUTPUT, FALSE);
-	ars.iDX9SurfaceFormat = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_SURFACEFORMAT, D3DFMT_X8R8G8B8);
+	ars.iSurfaceFormat = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_SURFACEFORMAT, D3DFMT_X8R8G8B8);
 
-	ars.iVMR9ColorManagementEnable = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementEnable"), DefaultSettings.iVMR9ColorManagementEnable);
-	ars.iVMR9ColorManagementInput = pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementInput"), DefaultSettings.iVMR9ColorManagementInput);
-	ars.iVMR9ColorManagementAmbientLight = pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementAmbientLight"), DefaultSettings.iVMR9ColorManagementAmbientLight);
-	ars.iVMR9ColorManagementIntent = pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementIntent"), DefaultSettings.iVMR9ColorManagementIntent);
+	ars.bColorManagementEnable = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementEnable"), DefaultSettings.bColorManagementEnable);
+	ars.iColorManagementInput = pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementInput"), DefaultSettings.iColorManagementInput);
+	ars.iColorManagementAmbientLight = pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementAmbientLight"), DefaultSettings.iColorManagementAmbientLight);
+	ars.iColorManagementIntent = pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRColorManagementIntent"), DefaultSettings.iColorManagementIntent);
 
 	ars.iEVROutputRange = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("EVROutputRange"), DefaultSettings.iEVROutputRange);
 
-	ars.iVMRFlushGPUBeforeVSync = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRFlushGPUBeforeVSync"), DefaultSettings.iVMRFlushGPUBeforeVSync);
-	ars.iVMRFlushGPUAfterPresent = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRFlushGPUAfterPresent"), DefaultSettings.iVMRFlushGPUAfterPresent);
-	ars.iVMRFlushGPUWait = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRFlushGPUWait"), DefaultSettings.iVMRFlushGPUWait);
+	ars.bFlushGPUBeforeVSync = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRFlushGPUBeforeVSync"), DefaultSettings.bFlushGPUBeforeVSync);
+	ars.bFlushGPUAfterPresent = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRFlushGPUAfterPresent"), DefaultSettings.bFlushGPUAfterPresent);
+	ars.bFlushGPUWait = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRFlushGPUWait"), DefaultSettings.bFlushGPUWait);
 
-	ars.bSynchronizeVideo = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("SynchronizeClock"), DefaultSettings.bSynchronizeVideo);
-	ars.bSynchronizeDisplay = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("SynchronizeDisplay"), DefaultSettings.bSynchronizeDisplay);
-	ars.bSynchronizeNearest = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("SynchronizeNearest"), DefaultSettings.bSynchronizeNearest);
+	ars.iSynchronizeMode = pApp->GetProfileInt(IDS_R_SETTINGS, _T("SynchronizeMode"), SYNCHRONIZE_NEAREST);
 	ars.iLineDelta = pApp->GetProfileInt(IDS_R_SETTINGS, _T("LineDelta"), DefaultSettings.iLineDelta);
 	ars.iColumnDelta = pApp->GetProfileInt(IDS_R_SETTINGS, _T("ColumnDelta"), DefaultSettings.iColumnDelta);
 
 	double *dPtr;
 	UINT dSize;
 	if (pApp->GetProfileBinary(IDS_R_SETTINGS, _T("CycleDelta"), (LPBYTE*)&dPtr, &dSize)) {
-		ars.fCycleDelta = *dPtr;
+		ars.dCycleDelta = *dPtr;
 		delete[] dPtr;
 	}
 
 	if (pApp->GetProfileBinary(IDS_R_SETTINGS, _T("TargetSyncOffset"), (LPBYTE*)&dPtr, &dSize)) {
-		ars.fTargetSyncOffset = *dPtr;
+		ars.dTargetSyncOffset = *dPtr;
 		delete[] dPtr;
 	}
 	if (pApp->GetProfileBinary(IDS_R_SETTINGS, _T("ControlLimit"), (LPBYTE*)&dPtr, &dSize)) {
-		ars.fControlLimit = *dPtr;
+		ars.dControlLimit = *dPtr;
 		delete[] dPtr;
 	}
 
-	rs.fResetDevice = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), TRUE);
+	rs.bResetDevice = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), TRUE);
 
 	rs.nSubpicCount = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, RS_SPCSIZE_DEF);
 	rs.iSubpicMaxTexWidth = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, 1280);
@@ -1780,8 +1776,8 @@ void CAppSettings::LoadRenderers()
 	rs.bSubpicAnimationWhenBuffering = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPALLOWANIMATION, TRUE);
 	rs.iSubpicStereoMode = pApp->GetProfileInt(IDS_R_SETTINGS, _T("SubpicStereoMode"), 0);
 
-	rs.iEvrBuffers = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, RS_EVRBUFFERS_DEF);
-	rs.D3D9RenderDevice = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE);
+	rs.nEVRBuffers = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EVR_BUFFERS, RS_EVRBUFFERS_DEF);
+	rs.sD3DRenderDevice = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_D3D9RENDERDEVICE);
 
 	rs.bSubpicPosRelative = false;
 }
