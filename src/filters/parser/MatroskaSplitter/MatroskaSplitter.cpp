@@ -1314,7 +1314,7 @@ void CMatroskaSplitterFilter::SetupChapters(LPCSTR lng, ChapterAtom* parent, int
 
 			name = tabs + (!name.IsEmpty() ? name : first);
 
-			ChapAppend(ca->ChapterTimeStart / 100, name);
+			ChapAppend(ca->ChapterTimeStart / 100 - m_pFile->m_rtOffset, name);
 
 			if (!ca->ChapterAtoms.IsEmpty() && level < 5) {
 				// level < 5 - hard limit for the number of levels
@@ -1434,7 +1434,7 @@ bool CMatroskaSplitterFilter::DemuxInit()
 			Cluster c;
 			c.ParseTimeCode(m_pCluster);
 
-			m_pFile->m_segment.SegmentInfo.Duration.Set((float)c.TimeCode / 10000);
+			m_pFile->m_segment.SegmentInfo.Duration.Set((float)c.TimeCode - m_pFile->m_rtOffset / 10000);
 
 			CAutoPtr<CuePoint> pCuePoint(DNew CuePoint());
 			CAutoPtr<CueTrackPosition> pCueTrackPosition(DNew CueTrackPosition());
@@ -1509,6 +1509,8 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	m_Seek_rt = INVALID_TIME;
 
 	if (rt > 0) {
+		rt += m_pFile->m_rtOffset;
+
 		QWORD lastCueClusterPosition = ULONGLONG_MAX;
 
 		Segment& s = m_pFile->m_segment;
@@ -1664,6 +1666,9 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	\
 	p->rtStart = m_pFile->m_segment.GetRefTime((REFERENCE_TIME)c.TimeCode + p->bg->Block.TimeCode);	\
 	p->rtStop = p->rtStart + duration;																\
+	\
+	p->rtStart -= m_pFile->m_rtOffset;																\
+	p->rtStop -= m_pFile->m_rtOffset;																\
 	\
 	p->TrackType = pTE->TrackType;																	\
 
@@ -2001,7 +2006,7 @@ STDMETHODIMP CMatroskaSplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENC
 				if (pCuePoint && pCuePoint->CueTrackPositions.GetCount()) {
 					CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetHead();
 					if (pCueTrackPositions->CueTrack == TrackNumber) {
-						pKFs[nKFsTmp++] = s.GetRefTime(pCuePoint->CueTime);
+						pKFs[nKFsTmp++] = s.GetRefTime(pCuePoint->CueTime) - m_pFile->m_rtOffset;
 					}
 				}
 			}
