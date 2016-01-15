@@ -2166,15 +2166,15 @@ void CDX9AllocatorPresenter::DrawStats()
 
 				if (m_GPUUsage.GetType() != CGPUUsage::UNKNOWN_GPU) {
 					const DWORD gpu_usage = m_GPUUsage.GetUsage();
-					strText.AppendFormat(L", GPU:%3d%%", gpu_usage & 0xFFFF);
+					strText.AppendFormat(L", GPU:%3u%%", gpu_usage & 0xFFFF);
 
 					if (m_GPUUsage.GetType() == CGPUUsage::NVIDIA_GPU) {
-						strText.AppendFormat(L", Video Engine:%3d%%", gpu_usage >> 16);
+						strText.AppendFormat(L", Video Engine:%3u%%", gpu_usage >> 16);
 					}
 				}
 
 				if (size_t mem_usage = m_MemUsage.GetUsage()) {
-					strText.AppendFormat(L", Memory:%6.01f MB", mem_usage / 1048576.0);
+					strText.AppendFormat(L", Memory:%4u MB", mem_usage / 1048576);
 				}
 
 				DrawText(rc, strText, 1);
