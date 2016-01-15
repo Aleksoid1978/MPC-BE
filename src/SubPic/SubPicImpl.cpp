@@ -114,7 +114,7 @@ STDMETHODIMP CSubPicImpl::GetDirtyRect(RECT* pDirtyRect)
 	return pDirtyRect ? *pDirtyRect = m_rcDirty, S_OK : E_POINTER;
 }
 
-STDMETHODIMP CSubPicImpl::GetSourceAndDest(RECT rcWindow, RECT rcVideo, BOOL bSubpicPosRelative, CPoint SubpicShiftPos, RECT* pRcSource, RECT* pRcDest) const
+STDMETHODIMP CSubPicImpl::GetSourceAndDest(RECT rcWindow, RECT rcVideo, BOOL bPositionRelative, CPoint ShiftPos, RECT* pRcSource, RECT* pRcDest) const
 {
 	CheckPointer(pRcSource, E_POINTER);
 	CheckPointer(pRcDest, E_POINTER);
@@ -123,7 +123,7 @@ STDMETHODIMP CSubPicImpl::GetSourceAndDest(RECT rcWindow, RECT rcVideo, BOOL bSu
 		CPoint offset(0, 0);
 		double scaleX = 1.0, scaleY = 1.0;
 
-		const CRect rcTarget = bSubpicPosRelative || m_eSubtitleType == SUBTITLE_TYPE::ST_VOBSUB || m_eSubtitleType == SUBTITLE_TYPE::ST_XSUB || m_eSubtitleType == SUBTITLE_TYPE::ST_XYSUBPIC ? rcVideo : rcWindow;
+		const CRect rcTarget = bPositionRelative || m_eSubtitleType == SUBTITLE_TYPE::ST_VOBSUB || m_eSubtitleType == SUBTITLE_TYPE::ST_XSUB || m_eSubtitleType == SUBTITLE_TYPE::ST_XYSUBPIC ? rcVideo : rcWindow;
 		const CSize szTarget = rcTarget.Size();
 		const bool bNeedSpecialCase = (m_eSubtitleType == SUBTITLE_TYPE::ST_HDMV || m_eSubtitleType == SUBTITLE_TYPE::ST_DVB || m_eSubtitleType == SUBTITLE_TYPE::ST_XYSUBPIC) && m_virtualTextureSize.cx > 720;
 		if (bNeedSpecialCase) {
@@ -160,7 +160,7 @@ STDMETHODIMP CSubPicImpl::GetSourceAndDest(RECT rcWindow, RECT rcVideo, BOOL bSu
 			rcTemp.OffsetRect(offset);
 		}
 
-		rcTemp.OffsetRect(SubpicShiftPos);
+		rcTemp.OffsetRect(ShiftPos);
 		*pRcDest = rcTemp;
 
 		return S_OK;
