@@ -314,6 +314,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_FILE_CLOSEPLAYLIST, OnUpdateFileClose)
 	ON_COMMAND(ID_FILE_CLOSEMEDIA, OnFileCloseMedia)
 	ON_UPDATE_COMMAND_UI(ID_FILE_CLOSEMEDIA, OnUpdateFileClose)
+	ON_COMMAND(ID_REPEAT_FOREVER, OnRepeatForever)
 
 	ON_COMMAND(ID_VIEW_CAPTIONMENU, OnViewCaptionmenu)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_CAPTIONMENU, OnUpdateViewCaptionmenu)
@@ -6747,6 +6748,15 @@ void CMainFrame::OnUpdateFileProperties(CCmdUI* pCmdUI)
 void CMainFrame::OnFileCloseMedia()
 {
 	CloseMedia();
+}
+
+void CMainFrame::OnRepeatForever()
+{
+	CAppSettings& s = AfxGetAppSettings();
+	s.fLoopForever = !s.fLoopForever;
+
+	m_OSD.DisplayMessage(OSD_TOPLEFT,
+						 s.fLoopForever ? ResStr(IDS_REPEAT_FOREVER_ON) : ResStr(IDS_REPEAT_FOREVER_OFF));
 }
 
 void CMainFrame::OnUpdateViewTearingTest(CCmdUI* pCmdUI)

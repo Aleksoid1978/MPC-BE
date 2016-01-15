@@ -2475,6 +2475,9 @@ BEGIN
     IDS_MPLAYERC_86         "Reload Subtitles"
     IDS_AG_NEXT_VIDEO       "Next Video/DVD Angle"
     IDS_AG_PREV_VIDEO       "Prev Video/DVD Angle"
+    IDS_REPEAT_FOREVER      "Repeat forever"
+    IDS_REPEAT_FOREVER_OFF  "Repeat forever: Off"
+    IDS_REPEAT_FOREVER_ON   "Repeat forever: On"
     IDS_MPLAYERC_98         "OSD: Remaining Time"
 END
 
