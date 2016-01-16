@@ -46,10 +46,7 @@ public:
 	CButton m_chkVMRFlushGPUAfterPresent;
 	CButton m_chkVMRFlushGPUWait;
 
-	BOOL m_bSynchronizeVideo; // TODO: make radio butons
-	BOOL m_bSynchronizeDisplay;
-	BOOL m_bSynchronizeNearest;
-
+	int m_iSyncMode;
 	int m_iLineDelta;
 	int m_iColumnDelta;
 	CFloatEdit m_edtCycleDelta;
@@ -67,9 +64,6 @@ protected:
 
 public:
 	afx_msg void OnAlterativeVSyncCheck();
-	afx_msg void OnBnClickedSyncVideo();
-	afx_msg void OnBnClickedSyncDisplay();
-	afx_msg void OnBnClickedSyncNearest();
 
 private:
 	void InitDialogPrivate();
