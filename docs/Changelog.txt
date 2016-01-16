@@ -17,6 +17,7 @@ Updated libraries:
 	libpng-1.6.21-signed-1-g5031c77;
 	Little-CMS git-2.7-40-ga06d11e;
 	MediaInfo git-v0.7.81-2-g7725069;
+	Speex-1.2rc2-9-g9172c7e;
 	ZenLib git-v0.4.32-22-gfc1828f.
 
 1.4.5
