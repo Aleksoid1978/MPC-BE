@@ -2732,7 +2732,7 @@ void File_Mk::Segment_Tracks_TrackEntry_Audio_SamplingFrequency()
         Fill(Stream_Audio, StreamPos_Last, Audio_SamplingRate, Float, 0, true);
         #ifdef MEDIAINFO_AAC_YES
             if (Retrieve(Stream_Audio, StreamPos_Last, Audio_CodecID).find(__T("A_AAC/"))==0)
-                ((File_Aac*)Stream[TrackNumber].Parser)->AudioSpecificConfig_OutOfBand((int32u)float64_int64s(Float));
+                ((File_Aac*)Stream[TrackNumber].Parser)->AudioSpecificConfig_OutOfBand(float64_int64s(Float));
         #endif //MEDIAINFO_AAC_YES
     FILLING_END();
 }
@@ -3912,7 +3912,7 @@ void File_Mk::CodecID_Manage()
             Fill(Stream_Audio, StreamPos_Last, Audio_Format_Settings_SBR, SBR?"Yes":"No");
         if (PS!=2)
             Fill(Stream_Audio, StreamPos_Last, Audio_Format_Settings_PS, PS?"Yes":"No");
-        int32u sampling_frequency=Retrieve(Stream_Audio, StreamPos_Last, Audio_SamplingRate).To_int32u();
+        int64s sampling_frequency=Retrieve(Stream_Audio, StreamPos_Last, Audio_SamplingRate).To_int64s();
 
         Stream[TrackNumber].Parser=new File_Aac;
         ((File_Aac*)Stream[TrackNumber].Parser)->Mode=File_Aac::Mode_AudioSpecificConfig;

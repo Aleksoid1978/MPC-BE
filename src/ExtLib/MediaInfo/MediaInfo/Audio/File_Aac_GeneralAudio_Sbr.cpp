@@ -36,7 +36,7 @@ namespace MediaInfoLib
 extern const char* Aac_audioObjectType(int8u audioObjectType);
 
 //---------------------------------------------------------------------------
-int8u Aac_AudioSpecificConfig_sampling_frequency_index(const int32u sampling_frequency);
+int8u Aac_AudioSpecificConfig_sampling_frequency_index(const int64s sampling_frequency);
 
 //---------------------------------------------------------------------------
 // Master frequency band table
@@ -321,8 +321,8 @@ void File_Aac::sbr_extension_data(size_t End, int8u id_aac, bool crc_flag)
             Infos["Format_Profile"]=__T("HE-AAC");
             Ztring SamplingRate=Infos["SamplingRate"];
             if (SamplingRate.empty())
-                SamplingRate.From_Number(sampling_frequency);
-            Infos["SamplingRate"].From_Number((extension_sampling_frequency_index==(int8u)-1)?(sampling_frequency*2):extension_sampling_frequency, 10);
+                SamplingRate.From_Number(Frequency_b);
+            Infos["SamplingRate"].From_Number((extension_sampling_frequency_index==(int8u)-1)?(Frequency_b*2):extension_sampling_frequency, 10);
             if (MediaInfoLib::Config.LegacyStreamDisplay_Get())
             {
                 Infos["Format_Profile"]+=__T(" / LC");
@@ -347,7 +347,7 @@ void File_Aac::sbr_extension_data(size_t End, int8u id_aac, bool crc_flag)
         {
             if (extension_sampling_frequency_index==(int8u)-1)
             {
-                extension_sampling_frequency=sampling_frequency*2;
+                extension_sampling_frequency=(int32u)(Frequency_b*2);
                 extension_sampling_frequency_index=Aac_AudioSpecificConfig_sampling_frequency_index(extension_sampling_frequency);
             }
 

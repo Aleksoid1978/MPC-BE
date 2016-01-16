@@ -1540,7 +1540,7 @@ bool File_Dts::FrameSynchPoint_Test()
                    | ( Buffer[Buffer_Offset+8]      << 3)
                    | ( Buffer[Buffer_Offset+9]      >> 5);
             else
-                Size=((Buffer[Buffer_Offset+6]&0x1F)<<13)
+                Size=((Buffer[Buffer_Offset+6]&0x1F)<<11)
                    | ( Buffer[Buffer_Offset+7]      << 3)
                    | ( Buffer[Buffer_Offset+8]      >> 5);
             Size++;

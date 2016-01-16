@@ -2020,8 +2020,8 @@ void File_MpegTs::Read_Buffer_AfterParsing()
                             MpegTs_ScanUpTo=File_Size/2+MpegTs_JumpTo_Begin;
                             GoTo(File_Size/2-MpegTs_JumpTo_Begin);
                         }
+                        else
                     #endif //defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
-                    else
                         GoToFromEnd(MpegTs_JumpTo_End);
                     Searching_TimeStamp_Start=false;
                 #endif //!defined(MEDIAINFO_MPEGTS_PCR_YES) && !defined(MEDIAINFO_MPEGTS_PESTIMESTAMP_YES)
@@ -2034,6 +2034,7 @@ void File_MpegTs::Read_Buffer_AfterParsing()
     {
         MpegTs_ScanUpTo = (int64u)-1;
         GoToFromEnd(MpegTs_JumpTo_End);
+        Open_Buffer_Unsynch();
     }
 }
 

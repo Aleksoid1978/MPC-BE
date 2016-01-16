@@ -82,7 +82,7 @@ public :
         Mode_LATM,
     };
     mode   Mode;
-    void   AudioSpecificConfig_OutOfBand(int32u sampling_frequency, int8u audioObjectType=(int8u)-1, bool sbrData=false, bool psData=false, bool sbrPresentFlag=false, bool psPresentFlag=false);
+    void   AudioSpecificConfig_OutOfBand(int64s sampling_frequency, int8u audioObjectType=(int8u)-1, bool sbrData=false, bool psData=false, bool sbrPresentFlag=false, bool psPresentFlag=false);
 
     //Constructor/Destructor
     File_Aac();
@@ -181,7 +181,6 @@ protected :
     int8u   channelConfiguration;
     int16u  frame_length;
     int8u   sampling_frequency_index;
-    int32u  sampling_frequency;
     int8u   extension_sampling_frequency_index;
     int32u  extension_sampling_frequency;
     bool    aacScalefactorDataResilienceFlag;

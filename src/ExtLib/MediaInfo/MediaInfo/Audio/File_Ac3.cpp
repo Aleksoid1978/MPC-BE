@@ -856,7 +856,7 @@ void File_Ac3::Streams_Fill()
 
                 }
 
-                if (fscod!=2)
+                if (fscod!=3)
                     Fill(Stream_Audio, 0, Audio_SamplingRate, AC3_SamplingRate[fscod]);
                 else
                     Fill(Stream_Audio, 0, Audio_SamplingRate, AC3_SamplingRate2[fscod2]);
@@ -1639,8 +1639,6 @@ void File_Ac3::Data_Parse()
     switch (Element_Code)
     {
         case 0 :
-                    Element_Info1C((FrameInfo.PTS!=(int64u)-1), __T("PTS ")+Ztring().Duration_From_Milliseconds(float64_int64s(((float64)FrameInfo.PTS)/1000000)));
-                    Element_Info1(Frame_Count);
                     Core();
                     break;
         case 1 :
@@ -1682,39 +1680,31 @@ void File_Ac3::Core()
         return; //Waiting for the first sync frame
 
     FILLING_BEGIN();
+        if (bsid>0x10)
+            return; //Not supported
+
         //Counting
         if (Frame_Count==0)
         {
             Core_IsPresent=true;
             PTS_Begin=FrameInfo.PTS;
         }
-        Frame_Count++;
-        Frame_Count_InThisBlock++;
-        if (Frame_Count_NotParsedIncluded!=(int64u)-1)
-            Frame_Count_NotParsedIncluded++;
-        if (bsid<=0x08)
-            FrameInfo.DUR=32000000;
-        else if (bsid<=0x09)
-            FrameInfo.DUR=16000000; // Unofficial hack for low sample rate (e.g. 22.05 kHz)
-        else if (bsid>0x0A && bsid<=0x10)
+        if (bsid==0x09)
+            Frequency_b=AC3_SamplingRate2[fscod]; // Unofficial hack for low sample rate (e.g. 22.05 kHz)
+        else
+        {
+            if (fscod!=3)
+                Frequency_b=AC3_SamplingRate[fscod];
+            else
+                Frequency_b=AC3_SamplingRate2[fscod2];
+        }
+        if (bsid>0x0A)
         {
             int64u numblks = numblkscod == 3 ? 6 : numblkscod + 1;
-            FrameInfo.DUR=32000000*numblks/6;
+            TS_Add(numblks*256);
         }
-        if (fscod && AC3_SamplingRate[fscod])
-        {
-            FrameInfo.DUR*=48000;
-            FrameInfo.DUR/=AC3_SamplingRate[fscod];
-        }
-        if (fscod==3 && AC3_SamplingRate2[fscod2])
-        {
-            FrameInfo.DUR*=48000;
-            FrameInfo.DUR/=AC3_SamplingRate2[fscod2];
-        }
-        if (FrameInfo.DTS!=(int64u)-1)
-            FrameInfo.DTS+=FrameInfo.DUR;
-        if (FrameInfo.PTS!=(int64u)-1)
-            FrameInfo.PTS=FrameInfo.DTS;
+        else
+            TS_Add(1536);
 
         if (File_Offset+Buffer_Offset+Element_Size==File_Size)
             Frame_Count_Valid=Frame_Count; //Finish frames in case of there are less than Frame_Count_Valid frames

@@ -11084,7 +11084,7 @@ void File_Mxf::LensUnitMetadata_IrisFNumber()
     Get_B2(Value,                                               "Value");
 
     FILLING_BEGIN();
-        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(0x100000*(1-(log(Value)-log(2.0))/8), 0).To_UTF8());
+        AcquisitionMetadata_Add(Code2, Ztring::ToZtring(0x100000*(1-(log(float(Value))-log(2.0))/8), 0).To_UTF8());
     FILLING_END();
 }
 

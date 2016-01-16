@@ -47,7 +47,7 @@ void File_Aac::ps_data(size_t End)
                 Infos["Format_Profile"]+=__T(" / HE-AAC / LC");
                 Infos["Channel(s)"]+=__T(" / ")+Channels+__T(" / ")+Channels;
                 Infos["ChannelPositions"]+=__T(" / ")+ChannelPositions+__T(" / ")+ChannelPositions;
-                Infos["SamplingRate"]=Ztring().From_Number((extension_sampling_frequency_index==(int8u)-1)?(sampling_frequency*2):extension_sampling_frequency, 10)+__T(" / ")+SamplingRate;
+                Infos["SamplingRate"]=Ztring().From_Number((extension_sampling_frequency_index==(int8u)-1)?(Frequency_b*2):extension_sampling_frequency, 10)+__T(" / ")+SamplingRate;
             }
             Infos["Format_Settings_PS"]=__T("Yes (Implicit)");
             Ztring Codec=Retrieve(Stream_Audio, StreamPos_Last, Audio_Codec);

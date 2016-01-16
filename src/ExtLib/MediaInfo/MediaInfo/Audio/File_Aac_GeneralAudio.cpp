@@ -291,7 +291,7 @@ void File_Aac::program_config_element()
         {
             Infos["Format_Profile"]=__T("HE-AAC");
             Ztring SamplingRate=Infos["SamplingRate"];
-            Infos["SamplingRate"].From_Number((extension_sampling_frequency_index==(int8u)-1)?(sampling_frequency*2):extension_sampling_frequency, 10);
+            Infos["SamplingRate"].From_Number((extension_sampling_frequency_index==(int8u)-1)?(Frequency_b*2):extension_sampling_frequency, 10);
             if (MediaInfoLib::Config.LegacyStreamDisplay_Get())
             {
                 Infos["Format_Profile"]+=__T(" / LC");
@@ -314,7 +314,7 @@ void File_Aac::program_config_element()
                 Infos["Format_Profile"]+=__T(" / HE-AAC / LC");
                 Infos["Channel(s)"]+=__T(" / ")+Channels+__T(" / ")+Channels;
                 Infos["ChannelPositions"]+=__T(" / ")+ChannelPositions+__T(" / ")+ChannelPositions;
-                Infos["SamplingRate"]=Ztring().From_Number((extension_sampling_frequency_index==(int8u)-1)?(sampling_frequency*2):extension_sampling_frequency, 10)+__T(" / ")+SamplingRate;
+                Infos["SamplingRate"]=Ztring().From_Number((extension_sampling_frequency_index==(int8u)-1)?(Frequency_b*2):extension_sampling_frequency, 10)+__T(" / ")+SamplingRate;
             }
             Infos["Format_Settings_PS"]=__T("Yes (Implicit)");
             Ztring Codec=Retrieve(Stream_Audio, StreamPos_Last, Audio_Codec);
@@ -380,19 +380,6 @@ void File_Aac::raw_data_block()
     if (Element_IsOK() && Data_BS_Remain()%8)
         Skip_S1(Data_BS_Remain()%8,                             "byte_alignment");
     Element_End0();
-
-    if (sampling_frequency)
-    {
-        #if MEDIAINFO_TRACE
-            if (FrameInfo.PTS!=(int64u)-1)
-                Element_Info1(__T("PTS ")+Ztring().Duration_From_Milliseconds(float64_int64s(((float64)FrameInfo.PTS)/1000000)));
-            if (FrameInfo.DTS!=(int64u)-1)
-                Element_Info1(__T("DTS ")+Ztring().Duration_From_Milliseconds(float64_int64s(((float64)FrameInfo.DTS)/1000000)));
-        #endif //MEDIAINFO_TRACE
-        FrameInfo.DUR=float64_int64s(((float64)frame_length)*1000000000/sampling_frequency);
-        FrameInfo.DTS+=FrameInfo.DUR;
-        FrameInfo.PTS=FrameInfo.DTS;
-    }
 }
 
 //---------------------------------------------------------------------------

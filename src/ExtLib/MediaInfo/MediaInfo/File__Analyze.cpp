@@ -98,6 +98,12 @@ File__Analyze::File__Analyze ()
     PTS_End=0;
     DTS_Begin=(int64u)-1;
     DTS_End=0;
+    Frequency_c=0;
+    Frequency_b=0;
+    #if MEDIAINFO_ADVANCED2
+    PTSb=NoTs;
+    DTSb=NoTs;
+    #endif //MEDIAINFO_ADVANCED2
     Offsets_Pos=(size_t)-1;
     OriginalBuffer=NULL;
     OriginalBuffer_Size=0;
@@ -923,6 +929,10 @@ void File__Analyze::Open_Buffer_Continue (File__Analyze* Sub, const int8u* ToAdd
         Sub->OriginalBuffer_Size+=(size_t)(Element_Size-Element_Offset);
     }
 
+    #if MEDIAINFO_ADVANCED2
+        if (Frequency_c)
+            Sub->Frequency_c=Frequency_c;
+    #endif //MEDIAINFO_ADVANCED2
     if (Sub->FrameInfo.DTS!=(int64u)-1)
         Sub->FrameInfo.Buffer_Offset_End=Sub->Buffer_Offset+Sub->Buffer_Size+ToAdd_Size;
     else if (Sub->FrameInfo_Previous.DTS!=(int64u)-1)
@@ -1168,6 +1178,11 @@ void File__Analyze::Open_Buffer_Unsynch ()
         FrameInfo.DTS=0;
         Frame_Count_NotParsedIncluded=0;
     }
+
+    #if MEDIAINFO_ADVANCED2
+    PTSb=NoTs;
+    DTSb=NoTs;
+    #endif //MEDIAINFO_ADVANCED2
 }
 
 //---------------------------------------------------------------------------
@@ -1627,6 +1642,223 @@ bool File__Analyze::FileHeader_Begin_XML(XMLDocument &Document)
     }
 
     return true;
+}
+
+//***************************************************************************
+// Timestamps
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File__Analyze::TS_Clear(ts_type Type)
+{
+    if (Type&TS_PTS)
+        FrameInfo.PTS=(int64u)-1;
+    if (Type&TS_DTS)
+        FrameInfo.DTS=(int64u)-1;
+
+#if MEDIAINFO_ADVANCED2
+    if (Type&TS_PTS)
+        FrameInfo.PTSc=NoTs;
+    if (Type&TS_DTS)
+        FrameInfo.DTSc=NoTs;
+#endif //MEDIAINFO_ADVANCED2
+}
+
+int64s gcd(int64s a, int64s b)
+{
+  return b ? gcd(b, a%b) : a;
+}
+
+//---------------------------------------------------------------------------
+void File__Analyze::TS_Set(int64s Ticks, ts_type Type)
+{
+    if (IsRawStream)
+    {
+        if (!Frequency_b)
+            return;
+
+        int64s divisor = gcd(1000000000, Frequency_b);
+        if (Type&TS_PTS)
+            FrameInfo.PTS=Ticks*(1000000000/divisor)/(Frequency_b/divisor);
+        if (Type&TS_DTS)
+            FrameInfo.DTS=Ticks*(1000000000/divisor)/(Frequency_b/divisor);
+    }
+    else
+    {
+        if (!Frequency_c)
+            return;
+
+        int64s divisor = gcd(1000000000, Frequency_c);
+        if (Type&TS_PTS)
+            FrameInfo.PTS=Ticks*(1000000000/divisor)/(Frequency_c/divisor);
+        if (Type&TS_DTS)
+            FrameInfo.DTS=Ticks*(1000000000/divisor)/(Frequency_c/divisor);
+    }
+
+#if MEDIAINFO_ADVANCED2
+    if (IsRawStream)
+    {
+        if (!Frequency_b)
+            return;
+
+        if (Type&TS_PTS)
+            PTSb=Ticks;
+        if (Type&TS_DTS)
+            DTSb=Ticks;
+        if (Frequency_c)
+        {
+            if (Type&TS_PTS)
+                PTSb*=Frequency_c;
+            if (Type&TS_DTS)
+                DTSb*=Frequency_c;
+        }
+    }
+    else
+    {
+        if (!Frequency_c)
+            return;
+
+        if (Type&TS_PTS)
+            FrameInfo.PTSc=Ticks;
+        if (Type&TS_DTS)
+            FrameInfo.DTSc=Ticks;
+    }
+
+    FrameInfo.Frame_Count_AfterLastTimeStamp=0;
+#endif //MEDIAINFO_ADVANCED2
+}
+
+//---------------------------------------------------------------------------
+void File__Analyze::TS_Set(File__Analyze* Parser, ts_type Type)
+{
+    if (Type&TS_PTS && FrameInfo.PTS!=(int64u)-1)
+        Parser->FrameInfo.PTS=FrameInfo.PTS;
+    if (Type&TS_DTS && FrameInfo.DTS!=(int64u)-1)
+        Parser->FrameInfo.DTS=FrameInfo.DTS;
+
+#if MEDIAINFO_ADVANCED2
+    if (Type&TS_PTS && FrameInfo.PTSc!=NoTs)
+        Parser->FrameInfo.PTSc=FrameInfo.PTSc;
+    if (Type&TS_DTS && FrameInfo.DTSc!=NoTs)
+        Parser->FrameInfo.DTSc=FrameInfo.DTSc;
+
+    if (!FrameInfo.Frame_Count_AfterLastTimeStamp)
+        Parser->FrameInfo.Frame_Count_AfterLastTimeStamp=0;
+#endif //MEDIAINFO_ADVANCED2
+}
+
+//---------------------------------------------------------------------------
+void File__Analyze::TS_Ajust(int64s Ticks)
+{
+#if MEDIAINFO_ADVANCED2
+    if (IsRawStream)
+    {
+        if (PTSb==NoTs)
+        {
+            if (FrameInfo.DTSc!=NoTs)
+                PTSb=FrameInfo.DTSc*Frequency_b+Ticks*FrameInfo.Frame_Count_AfterLastTimeStamp*(Frequency_c?Frequency_c:1); // Relying on DTS only, ajustment is done by the function itself
+            else
+                PTSb=-Ticks*FrameInfo.Frame_Count_AfterLastTimeStamp*(Frequency_c?Frequency_c:1);
+        }
+
+        if (PTSb!=NoTs)
+            PTSb+=Ticks*(Frequency_c?Frequency_c:1);
+    }
+    else
+    {
+        if (PTSb!=NoTs)
+            PTSb+=Ticks;
+    }
+#endif //MEDIAINFO_ADVANCED2
+}
+
+//---------------------------------------------------------------------------
+void File__Analyze::TS_Add(int64s Ticks, ts_type Type)
+{
+    if (IsRawStream)
+    {
+        //Coherency test
+        if (!Frequency_b)
+        {
+            #if MEDIAINFO_ADVANCED2
+            FrameInfo.Frame_Count_AfterLastTimeStamp++;
+            #endif //MEDIAINFO_ADVANCED2
+            return;
+        }
+
+        #if MEDIAINFO_ADVANCED2
+        //Filling first TS if not set somewhere else
+        if (Type&TS_PTS && PTSb==NoTs)
+        {
+            if (FrameInfo.PTSc!=NoTs)
+                PTSb=FrameInfo.PTSc*Frequency_b+Ticks*FrameInfo.Frame_Count_AfterLastTimeStamp*(Frequency_c?Frequency_c:1);
+            else
+                PTSb=-Ticks*FrameInfo.Frame_Count_AfterLastTimeStamp*(Frequency_c?Frequency_c:1);
+        }
+        if (Type&TS_DTS && DTSb==NoTs)
+        {
+            if (FrameInfo.DTSc!=NoTs)
+                DTSb=FrameInfo.DTSc*Frequency_b+Ticks*FrameInfo.Frame_Count_AfterLastTimeStamp*(Frequency_c?Frequency_c:1);
+            else
+                DTSb=-Ticks*FrameInfo.Frame_Count_AfterLastTimeStamp*(Frequency_c?Frequency_c:1);
+        }
+
+        //Coherency test
+        if (Type&TS_PTS && PTSb!=NoTs && FrameInfo.PTSc!=NoTs)
+        {
+            if (!FrameInfo.Frame_Count_AfterLastTimeStamp && PTSb != FrameInfo.PTSc*Frequency_b && (FrameInfo.PTSc*Frequency_b-PTSb<=-Frequency_b || FrameInfo.PTSc*Frequency_b-PTSb>=Frequency_b))
+            {
+                PTSb=FrameInfo.PTSc*Frequency_b;
+            }
+        }
+        if (Type&TS_DTS && DTSb!=NoTs && FrameInfo.DTSc!=NoTs)
+        {
+            if (!FrameInfo.Frame_Count_AfterLastTimeStamp && DTSb != FrameInfo.DTSc*Frequency_b && (FrameInfo.DTSc*Frequency_b-DTSb<=-Frequency_b || FrameInfo.DTSc*Frequency_b-DTSb>=Frequency_b))
+            {
+                DTSb=FrameInfo.DTSc*Frequency_b;
+            }
+        }
+        #endif //MEDIAINFO_ADVANCED2
+    }
+    
+    //Trace
+    #if MEDIAINFO_ADVANCED2
+    Element_Info1(Ztring::ToZtring(Frame_Count));
+    Element_Info1C((DTSb!=NoTs && DTSb!=PTSb), __T("DTS ")+Ztring().Duration_From_Milliseconds(float64_int64s(((float64)DTSb)*1000/(Frequency_c?Frequency_c:1)/Frequency_b)));
+    Element_Info1C((PTSb!=NoTs), __T("PTS ")+Ztring().Duration_From_Milliseconds(float64_int64s(((float64)PTSb)*1000/(Frequency_c?Frequency_c:1)/Frequency_b)));
+    #else //MEDIAINFO_ADVANCED2
+    Element_Info1C((FrameInfo.DTS!=(int64u)-1 && FrameInfo.PTS!=(int64u)-1), __T("DTS ")+Ztring().Duration_From_Milliseconds(float64_int64s(((float64)FrameInfo.DTS)/1000000)));
+    Element_Info1C((FrameInfo.PTS!=(int64u)-1), __T("PTS ")+Ztring().Duration_From_Milliseconds(float64_int64s(((float64)FrameInfo.PTS)/1000000)));
+    Element_Info1(Frame_Count);
+    #endif //MEDIAINFO_ADVANCED2
+
+    //Adding timestamp
+    FrameInfo.DUR=Ticks*1000000000/Frequency_b;
+    if (Type&TS_PTS && FrameInfo.PTS!=(int64u)-1 && Frequency_b)
+        FrameInfo.PTS+=FrameInfo.DUR;
+    if (Type&TS_DTS && FrameInfo.DTS!=(int64u)-1 && Frequency_b)
+        FrameInfo.DTS+=FrameInfo.DUR;
+    #if MEDIAINFO_ADVANCED2
+    if (IsRawStream)
+    {
+        if (Type&TS_PTS && PTSb!=NoTs)
+            PTSb+=Ticks*(Frequency_c?Frequency_c:1);
+        if (Type&TS_DTS && DTSb!=NoTs)
+            DTSb+=Ticks*(Frequency_c?Frequency_c:1);
+    }
+    else
+    {
+        if (Type&TS_PTS && PTSb!=NoTs)
+            PTSb+=Ticks;
+        if (Type&TS_DTS && DTSb!=NoTs)
+            DTSb+=Ticks;
+    }
+    FrameInfo.Frame_Count_AfterLastTimeStamp++;
+    #endif //MEDIAINFO_ADVANCED2
+    Frame_Count++;
+    Frame_Count_InThisBlock++;
+    if (Frame_Count_NotParsedIncluded!=(int64u)-1)
+        Frame_Count_NotParsedIncluded++;
 }
 
 //***************************************************************************

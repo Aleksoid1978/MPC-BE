@@ -108,6 +108,9 @@ void File_SmpteSt0302::Streams_Accept()
     // Init
     for (size_t Pos=0; Pos<Parsers.size(); Pos++)
         Open_Buffer_Init(Parsers[Pos]);
+
+    //Time stamps
+    Frequency_b=48000;
 }
 
 //---------------------------------------------------------------------------
@@ -280,12 +283,8 @@ void File_SmpteSt0302::Read_Buffer_Continue()
 
     delete[] Info;
 
-    FrameInfo.DTS+=FrameInfo.DUR;
-
     //Filling
-    Frame_Count++;
-    if (Frame_Count_NotParsedIncluded!=(int64u)-1)
-        Frame_Count_NotParsedIncluded++;
+    TS_Add(audio_packet_size/((1+number_channels)*(5+bits_per_sample)));
     if (Parsers.size()>1 && Frame_Count>=2)
     {
         for (size_t Pos=0; Pos<Parsers.size()-1; Pos++)

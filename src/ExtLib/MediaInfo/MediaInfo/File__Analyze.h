@@ -98,6 +98,25 @@ public :
     #endif //MEDIAINFO_DEMUX
     Ztring  File_Name_WithoutDemux;
     bool   PTS_DTS_Needed;
+    enum ts_type
+    {
+        TS_NONE=0,
+        TS_PTS=1,
+        TS_DTS=2,
+        TS_ALL=TS_PTS|TS_DTS,
+    };
+    void   TS_Clear(ts_type Type=TS_ALL);
+    void   TS_Set(int64s Ticks, ts_type Type=TS_ALL);
+    void   TS_Set(File__Analyze* Parser, ts_type Type=TS_ALL);
+    void   TS_Add(int64s Ticks, ts_type Type=TS_ALL);
+    void   TS_Ajust(int64s Ticks);
+    int64s Frequency_c; //Frequency of the timestamp of the container (e.g. 90000 for MPEG-PS)
+    int64s Frequency_b; //Frequency of the timestamp of the bitstream (e.g. 48000 for AC-3)
+    #if MEDIAINFO_ADVANCED2
+    static const int64s NoTs=0x8000000000000000LL;
+    int64s PTSb; //In 1/Frequency_b if sub, in 1/(Frequency_c*Frequency_b) if in a container
+    int64s DTSb; //In 1/Frequency_b if sub, in 1/(Frequency_c*Frequency_b) if in a container
+    #endif //MEDIAINFO_ADVANCED2
     struct frame_info
     {
         int64u Buffer_Offset_End;
@@ -105,6 +124,11 @@ public :
         int64u PTS; //In nanoseconds
         int64u DTS; //In nanoseconds
         int64u DUR; //In nanoseconds
+        #if MEDIAINFO_ADVANCED2
+        int64s PTSc; //In 1/Frequency_c
+        int64s DTSc; //In 1/Frequency_c
+        int64u Frame_Count_AfterLastTimeStamp;
+        #endif //MEDIAINFO_ADVANCED2
 
         frame_info()
         {
@@ -113,6 +137,11 @@ public :
             PTS=(int64u)-1;
             DTS=(int64u)-1;
             DUR=(int64u)-1;
+            #if MEDIAINFO_ADVANCED2
+            PTSc=NoTs;
+            DTSc=NoTs;
+            Frame_Count_AfterLastTimeStamp=0;
+            #endif //MEDIAINFO_ADVANCED2
         }
     };
     frame_info FrameInfo;

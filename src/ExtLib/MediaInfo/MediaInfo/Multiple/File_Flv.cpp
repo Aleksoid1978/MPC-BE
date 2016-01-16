@@ -739,6 +739,15 @@ bool File_Flv::Synched_Test()
      && Buffer[Buffer_Offset+3]<PreviousTagSize_Add11
      && File_Offset+Buffer_Offset>9)
     {
+        if (Searching_Duration)
+        {
+            //Error during parsing, stopping
+            Finish();
+            Searching_Duration=false;
+            GoTo(File_Size);
+            return true;
+        }
+
         Synched=false;
         return true;
     }

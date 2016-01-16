@@ -4145,7 +4145,8 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
 {
     Element_Name("Audio");
 
-    int32u SampleRate, Channels, SampleSize, Flags=0;
+    int64s SampleRate;
+    int32u Channels, SampleSize, Flags=0;
     int16u Version, ID;
     Get_B2 (Version,                                            "Version");
     Skip_B2(                                                    "Revision level");
@@ -4187,7 +4188,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
         Skip_B4(                                                "Bytes per packet");
         Skip_B4(                                                "Frames per packet");
 
-        SampleRate=(int32u)SampleRateF64;
+        SampleRate=float64_int64s(SampleRateF64);
     }
     else
     {
@@ -4344,7 +4345,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
             //PCM parser
             File_Pcm* Parser=new File_Pcm;
             Parser->Channels=(int8u)Channels;
-            Parser->SamplingRate=SampleRate;
+            Parser->SamplingRate=(int32u)SampleRate;
             Parser->BitDepth=(int8u)SampleSize;
             #if MEDIAINFO_DEMUX
                 if (Config->Demux_Unpacketize_Get())

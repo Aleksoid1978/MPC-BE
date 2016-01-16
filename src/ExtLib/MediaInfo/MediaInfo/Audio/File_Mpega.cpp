@@ -963,10 +963,6 @@ void File_Mpega::Data_Parse()
         Frame_Count_Valid=Frame_Count; //Finish MPEG Audio frames in case of there are less than Frame_Count_Valid frames
     if (Frame_Count==0 && Frame_Count_NotParsedIncluded==0)
         PTS_Begin=FrameInfo.PTS;
-    Frame_Count++;
-    Frame_Count_InThisBlock++;
-    if (Frame_Count_NotParsedIncluded!=(int64u)-1)
-        Frame_Count_NotParsedIncluded++;
     LastSync_Offset=File_Offset+Buffer_Offset+Element_Size;
     {
         int16u Samples;
@@ -976,11 +972,9 @@ void File_Mpega::Data_Parse()
             Samples=576;
         else
             Samples=1152;
-        FrameInfo.DUR=float64_int64s(((float64)1)/Mpega_SamplingRate[ID][sampling_frequency]*Samples*1000000000);
-        if (FrameInfo.DTS!=(int64u)-1)
-            FrameInfo.DTS+=FrameInfo.DUR;
-        if (FrameInfo.PTS!=(int64u)-1)
-            FrameInfo.PTS=FrameInfo.DTS;
+
+        Frequency_b=Mpega_SamplingRate[ID][sampling_frequency];
+        TS_Add(Samples);
     }
 
     //LAME
