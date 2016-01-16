@@ -77,11 +77,13 @@ void CGPUUsage::Clean()
 	NVData.gpuPStates.version					= sizeof(gpuPStates) | 0x10000;
 	NVData.NvAPI_GPU_GetPStates					= NULL;
 	
+	NVData.gpuSelected							= -1;
+
 	NVData.hNVApi								= NULL;
 }
 
 
-HRESULT CGPUUsage::Init(CString DeviceName)
+HRESULT CGPUUsage::Init(CString DeviceName, CString Device)
 {
 	Clean();
 
@@ -189,7 +191,7 @@ HRESULT CGPUUsage::Init(CString DeviceName)
 		}
 	}
 
-	if (m_GPUType == UNKNOWN_GPU) {
+	if (m_GPUType == UNKNOWN_GPU && Device.Find(L"NVIDIA") == 0) {
 		// NVApi
 		NVData.hNVApi = LoadLibrary(L"nvapi64.dll");
 		if (NVData.hNVApi == NULL) {
@@ -197,18 +199,21 @@ HRESULT CGPUUsage::Init(CString DeviceName)
 		}
 
 		if (NVData.hNVApi) {
-			NvAPI_QueryInterface_t		NvAPI_QueryInterface	= (NvAPI_QueryInterface_t)GetProcAddress(NVData.hNVApi, "nvapi_QueryInterface");
-			NvAPI_Initialize_t			NvAPI_Initialize		= NULL;
-			NvAPI_EnumPhysicalGPUs_t	NvAPI_EnumPhysicalGPUs	= NULL;
+			NvAPI_QueryInterface_t   NvAPI_QueryInterface   = (NvAPI_QueryInterface_t)GetProcAddress(NVData.hNVApi, "nvapi_QueryInterface");
+			NvAPI_Initialize_t       NvAPI_Initialize       = NULL;
+			NvAPI_EnumPhysicalGPUs_t NvAPI_EnumPhysicalGPUs = NULL;
+			NvAPI_GPU_GetFullName_t  NvAPI_GPU_GetFullName  = NULL;
 			if (NvAPI_QueryInterface) {
-				NvAPI_Initialize			= (NvAPI_Initialize_t)(NvAPI_QueryInterface)(0x0150E828);
-				NvAPI_EnumPhysicalGPUs		= (NvAPI_EnumPhysicalGPUs_t)(NvAPI_QueryInterface)(0xE5AC921F);
-				NVData.NvAPI_GPU_GetUsages	= (NvAPI_GPU_GetUsages_t)(NvAPI_QueryInterface)(0x189A1FDF);
-				NVData.NvAPI_GPU_GetPStates	= (NvAPI_GPU_GetPStates_t)(NvAPI_QueryInterface)(0x60DED2ED);
+				NvAPI_Initialize            = (NvAPI_Initialize_t)(NvAPI_QueryInterface)(0x0150E828);
+				NvAPI_EnumPhysicalGPUs      = (NvAPI_EnumPhysicalGPUs_t)(NvAPI_QueryInterface)(0xE5AC921F);
+				NvAPI_GPU_GetFullName       = (NvAPI_GPU_GetFullName_t)(NvAPI_QueryInterface)(0xCEEE8E9F);
+				NVData.NvAPI_GPU_GetUsages  = (NvAPI_GPU_GetUsages_t)(NvAPI_QueryInterface)(0x189A1FDF);
+				NVData.NvAPI_GPU_GetPStates = (NvAPI_GPU_GetPStates_t)(NvAPI_QueryInterface)(0x60DED2ED);
 			}
 			if (NULL == NvAPI_QueryInterface ||
 					NULL == NvAPI_Initialize ||
 					NULL == NvAPI_EnumPhysicalGPUs ||
+					NULL == NvAPI_GPU_GetFullName ||
 					NULL == NVData.NvAPI_GPU_GetUsages) {
 				Clean();
 			}
@@ -219,6 +224,21 @@ HRESULT CGPUUsage::Init(CString DeviceName)
 				} else {
 					int gpuCount = 0;
 					if (NvAPI_EnumPhysicalGPUs(NVData.gpuHandles, &gpuCount) != OK || !gpuCount) {
+						Clean();
+					}
+
+					for (int i = 0; i < gpuCount; i++) {
+						NvAPI_ShortString gpuName = { 0 };
+						if (NvAPI_GPU_GetFullName(NVData.gpuHandles[i], gpuName) == OK) {
+							CString nvidiaGpuName = L"NVIDIA " + CString(gpuName);
+							if (Device == nvidiaGpuName) {
+								NVData.gpuSelected = i;
+								break;
+							}
+						}
+					}
+					
+					if (NVData.gpuSelected == -1) {
 						Clean();
 					}
 				}
@@ -256,14 +276,15 @@ const DWORD CGPUUsage::GetUsage()
 				}
 			}
 		} else if (m_GPUType == NVIDIA_GPU) {
+			const int idx = NVData.gpuSelected;
 			if (NVData.NvAPI_GPU_GetPStates) {
-				if (NVData.NvAPI_GPU_GetPStates(NVData.gpuHandles[0], &NVData.gpuPStates) == OK) {
+				if (NVData.NvAPI_GPU_GetPStates(NVData.gpuHandles[idx], &NVData.gpuPStates) == OK) {
 					UINT state_gpu = NVData.gpuPStates.pstates[NVAPI_DOMAIN_GPU].present ? NVData.gpuPStates.pstates[NVAPI_DOMAIN_GPU].percent : 0;
 					UINT state_vid = NVData.gpuPStates.pstates[NVAPI_DOMAIN_VID].present ? NVData.gpuPStates.pstates[NVAPI_DOMAIN_VID].percent : 0;
 					m_nGPUUsage = state_vid << 16 | state_gpu;
 				}
 			} else {
-				if (NVData.NvAPI_GPU_GetUsages(NVData.gpuHandles[0], &NVData.gpuUsages) == OK) {
+				if (NVData.NvAPI_GPU_GetUsages(NVData.gpuHandles[idx], &NVData.gpuUsages) == OK) {
 					m_nGPUUsage = NVData.gpuUsages.usage[10] << 16 | NVData.gpuUsages.usage[2];
 				}
 			}

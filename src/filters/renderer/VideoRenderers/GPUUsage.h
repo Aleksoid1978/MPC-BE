@@ -58,11 +58,14 @@ class CGPUUsage
 		} pstates[NVAPI_MAX_PSTATES_PER_GPU];
 	};
 
+	typedef char NvAPI_ShortString[64];
+	
 	typedef int *(*NvAPI_QueryInterface_t)(unsigned int offset);
 	typedef int (*NvAPI_Initialize_t)();
 	typedef int (*NvAPI_EnumPhysicalGPUs_t)(int **handles, int *count);
 	typedef int (*NvAPI_GPU_GetUsages_t)(int *handle, gpuUsages *gpuUsages);
 	typedef int (*NvAPI_GPU_GetPStates_t)(int *handle, gpuPStates *gpuPStates);
+	typedef int (*NvAPI_GPU_GetFullName_t)(int *handle, NvAPI_ShortString gpuName);
 
 public:
 	enum GPUType {
@@ -73,7 +76,7 @@ public:
 
 	CGPUUsage();
 	~CGPUUsage();
-	HRESULT Init(CString DeviceName);
+	HRESULT Init(CString DeviceName, CString Device);
 
 	const DWORD		GetUsage();
 	const GPUType	GetType() { return m_GPUType; }
@@ -103,6 +106,7 @@ private:
 		int*                   gpuHandles[NVAPI_MAX_PHYSICAL_GPUS];
 		gpuUsages              gpuUsages;
 		gpuPStates             gpuPStates;
+		int                    gpuSelected;
 
 		NvAPI_GPU_GetUsages_t  NvAPI_GPU_GetUsages;
 		NvAPI_GPU_GetPStates_t NvAPI_GPU_GetPStates;
