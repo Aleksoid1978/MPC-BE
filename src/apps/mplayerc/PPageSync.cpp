@@ -141,21 +141,16 @@ void CPPageSync::InitDialogPrivate()
 		GetDlgItem(IDC_RADIO2)->EnableWindow(TRUE);
 		GetDlgItem(IDC_RADIO3)->EnableWindow(TRUE);
 		GetDlgItem(IDC_TARGETSYNCOFFSET)->EnableWindow(TRUE);
-		GetDlgItem(IDC_CYCLEDELTA)->EnableWindow(TRUE);
-		GetDlgItem(IDC_LINEDELTA)->EnableWindow(TRUE);
-		GetDlgItem(IDC_COLUMNDELTA)->EnableWindow(TRUE);
 		GetDlgItem(IDC_CONTROLLIMIT)->EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC4)->EnableWindow(TRUE);
-		GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
-		GetDlgItem(IDC_STATIC6)->EnableWindow(TRUE);
-		GetDlgItem(IDC_STATIC7)->EnableWindow(TRUE);
-		GetDlgItem(IDC_STATIC8)->EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC9)->EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC10)->EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC11)->EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC12)->EnableWindow(TRUE);
+
+		OnSyncModeClicked(m_iSyncMode == 0 ? IDC_RADIO1 : m_iSyncMode == 1 ? IDC_RADIO2 : IDC_RADIO3);
 	} else {
 		GetDlgItem(IDC_RADIO1)->EnableWindow(FALSE);
 		GetDlgItem(IDC_RADIO2)->EnableWindow(FALSE);
@@ -213,6 +208,7 @@ BOOL CPPageSync::OnApply()
 
 BEGIN_MESSAGE_MAP(CPPageSync, CPPageBase)
 	ON_BN_CLICKED(IDC_CHECK3, OnAlterativeVSyncCheck)
+	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO1, IDC_RADIO3, OnSyncModeClicked)
 END_MESSAGE_MAP()
 
 void CPPageSync::OnAlterativeVSyncCheck()
@@ -232,4 +228,29 @@ void CPPageSync::OnAlterativeVSyncCheck()
 		m_spnVMR9VSyncOffset.EnableWindow(FALSE);
 	}
 	SetModified();
+}
+
+void CPPageSync::OnSyncModeClicked(UINT nID)
+{
+	if (nID == IDC_RADIO1) {
+		GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
+		GetDlgItem(IDC_CYCLEDELTA)->EnableWindow(TRUE);
+	} else {
+		GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
+		GetDlgItem(IDC_CYCLEDELTA)->EnableWindow(FALSE);
+	}
+
+	if (nID == IDC_RADIO2) {
+		GetDlgItem(IDC_STATIC6)->EnableWindow(TRUE);
+		GetDlgItem(IDC_LINEDELTA)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC7)->EnableWindow(TRUE);
+		GetDlgItem(IDC_COLUMNDELTA)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC8)->EnableWindow(TRUE);
+	} else {
+		GetDlgItem(IDC_STATIC6)->EnableWindow(FALSE);
+		GetDlgItem(IDC_LINEDELTA)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC7)->EnableWindow(FALSE);
+		GetDlgItem(IDC_COLUMNDELTA)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC8)->EnableWindow(FALSE);
+	}
 }

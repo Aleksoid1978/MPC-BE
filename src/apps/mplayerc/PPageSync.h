@@ -64,6 +64,7 @@ protected:
 
 public:
 	afx_msg void OnAlterativeVSyncCheck();
+	afx_msg void OnSyncModeClicked(UINT nID);
 
 private:
 	void InitDialogPrivate();
