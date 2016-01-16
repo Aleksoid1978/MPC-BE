@@ -28,9 +28,7 @@ IMPLEMENT_DYNAMIC(CPPageSync, CPPageBase)
 
 CPPageSync::CPPageSync()
 	: CPPageBase(CPPageSync::IDD, CPPageSync::IDD)
-	, m_bSynchronizeVideo(0)
-	, m_bSynchronizeDisplay(0)
-	, m_bSynchronizeNearest(0)
+	, m_iSyncMode(0)
 	, m_iLineDelta(0)
 	, m_iColumnDelta(0)
 {
@@ -55,9 +53,7 @@ void CPPageSync::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK6, m_chkVMRFlushGPUAfterPresent);
 	DDX_Control(pDX, IDC_CHECK7, m_chkVMRFlushGPUWait);
 
-	DDX_Check(pDX, IDC_SYNCVIDEO, m_bSynchronizeVideo);
-	DDX_Check(pDX, IDC_SYNCDISPLAY, m_bSynchronizeDisplay);
-	DDX_Check(pDX, IDC_SYNCNEAREST, m_bSynchronizeNearest);
+	DDX_Radio(pDX, IDC_RADIO1, m_iSyncMode);
 	DDX_Control(pDX, IDC_CYCLEDELTA, m_edtCycleDelta);
 	DDX_Text(pDX, IDC_LINEDELTA, m_iLineDelta);
 	DDX_Text(pDX, IDC_COLUMNDELTA, m_iColumnDelta);
@@ -131,10 +127,19 @@ void CPPageSync::InitDialogPrivate()
 
 	m_chkEnableFrameTimeCorrection.EnableWindow(s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ? TRUE : FALSE);
 
+	m_iSyncMode = ars.iSynchronizeMode == SYNCHRONIZE_VIDEO ? 0
+				: ars.iSynchronizeMode == SYNCHRONIZE_DISPLAY ? 1
+				: 2;
+	m_iLineDelta = ars.iLineDelta;
+	m_iColumnDelta = ars.iColumnDelta;
+	m_edtCycleDelta = ars.dCycleDelta;
+	m_edtTargetSyncOffset = ars.dTargetSyncOffset;
+	m_edtControlLimit = ars.dControlLimit;
+
 	if ((s.iVideoRenderer == VIDRNDT_SYNC) && (pFrame->GetPlaybackMode() == PM_NONE)) {
-		GetDlgItem(IDC_SYNCVIDEO)->EnableWindow(TRUE);
-		GetDlgItem(IDC_SYNCDISPLAY)->EnableWindow(TRUE);
-		GetDlgItem(IDC_SYNCNEAREST)->EnableWindow(TRUE);
+		GetDlgItem(IDC_RADIO1)->EnableWindow(TRUE);
+		GetDlgItem(IDC_RADIO2)->EnableWindow(TRUE);
+		GetDlgItem(IDC_RADIO3)->EnableWindow(TRUE);
 		GetDlgItem(IDC_TARGETSYNCOFFSET)->EnableWindow(TRUE);
 		GetDlgItem(IDC_CYCLEDELTA)->EnableWindow(TRUE);
 		GetDlgItem(IDC_LINEDELTA)->EnableWindow(TRUE);
@@ -152,9 +157,9 @@ void CPPageSync::InitDialogPrivate()
 		GetDlgItem(IDC_STATIC11)->EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC12)->EnableWindow(TRUE);
 	} else {
-		GetDlgItem(IDC_SYNCVIDEO)->EnableWindow(FALSE);
-		GetDlgItem(IDC_SYNCDISPLAY)->EnableWindow(FALSE);
-		GetDlgItem(IDC_SYNCNEAREST)->EnableWindow(FALSE);
+		GetDlgItem(IDC_RADIO1)->EnableWindow(FALSE);
+		GetDlgItem(IDC_RADIO2)->EnableWindow(FALSE);
+		GetDlgItem(IDC_RADIO3)->EnableWindow(FALSE);
 		GetDlgItem(IDC_TARGETSYNCOFFSET)->EnableWindow(FALSE);
 		GetDlgItem(IDC_CYCLEDELTA)->EnableWindow(FALSE);
 		GetDlgItem(IDC_LINEDELTA)->EnableWindow(FALSE);
@@ -172,15 +177,6 @@ void CPPageSync::InitDialogPrivate()
 		GetDlgItem(IDC_STATIC11)->EnableWindow(FALSE);
 		GetDlgItem(IDC_STATIC12)->EnableWindow(FALSE);
 	}
-
-	m_bSynchronizeVideo = ars.iSynchronizeMode == SYNCHRONIZE_VIDEO;;
-	m_bSynchronizeDisplay = ars.iSynchronizeMode == SYNCHRONIZE_DISPLAY;
-	m_bSynchronizeNearest = ars.iSynchronizeMode == SYNCHRONIZE_NEAREST;
-	m_iLineDelta = ars.iLineDelta;
-	m_iColumnDelta = ars.iColumnDelta;
-	m_edtCycleDelta = ars.dCycleDelta;
-	m_edtTargetSyncOffset = ars.dTargetSyncOffset;
-	m_edtControlLimit = ars.dControlLimit;
 
 	UpdateData(FALSE);
 	SetModified(FALSE);
@@ -203,8 +199,8 @@ BOOL CPPageSync::OnApply()
 	ars.bFlushGPUAfterPresent		= !!m_chkVMRFlushGPUAfterPresent.GetCheck();
 	ars.bFlushGPUWait				= !!m_chkVMRFlushGPUWait.GetCheck();
 
-	ars.iSynchronizeMode	= m_bSynchronizeVideo ? SYNCHRONIZE_VIDEO
-							: m_bSynchronizeDisplay ? SYNCHRONIZE_DISPLAY
+	ars.iSynchronizeMode	= m_iSyncMode == 0 ? SYNCHRONIZE_VIDEO
+							: m_iSyncMode == 1 ? SYNCHRONIZE_DISPLAY
 							: SYNCHRONIZE_NEAREST;
 	ars.iLineDelta			= m_iLineDelta;
 	ars.iColumnDelta		= m_iColumnDelta;
@@ -217,9 +213,6 @@ BOOL CPPageSync::OnApply()
 
 BEGIN_MESSAGE_MAP(CPPageSync, CPPageBase)
 	ON_BN_CLICKED(IDC_CHECK3, OnAlterativeVSyncCheck)
-	ON_BN_CLICKED(IDC_SYNCVIDEO, OnBnClickedSyncVideo)
-	ON_BN_CLICKED(IDC_SYNCDISPLAY, OnBnClickedSyncDisplay)
-	ON_BN_CLICKED(IDC_SYNCNEAREST, OnBnClickedSyncNearest)
 END_MESSAGE_MAP()
 
 void CPPageSync::OnAlterativeVSyncCheck()
@@ -238,47 +231,5 @@ void CPPageSync::OnAlterativeVSyncCheck()
 		GetDlgItem(IDC_EDIT1)->EnableWindow(FALSE);
 		m_spnVMR9VSyncOffset.EnableWindow(FALSE);
 	}
-	SetModified();
-}
-
-void CPPageSync::OnBnClickedSyncVideo()
-{
-	m_bSynchronizeVideo = !m_bSynchronizeVideo;
-
-	if (m_bSynchronizeVideo) {
-		m_bSynchronizeDisplay = FALSE;
-		m_bSynchronizeNearest = FALSE;
-	}
-
-	UpdateData(FALSE);
-
-	SetModified();
-}
-
-void CPPageSync::OnBnClickedSyncDisplay()
-{
-	m_bSynchronizeDisplay = !m_bSynchronizeDisplay;
-
-	if (m_bSynchronizeDisplay) {
-		m_bSynchronizeVideo = FALSE;
-		m_bSynchronizeNearest = FALSE;
-	}
-
-	UpdateData(FALSE);
-
-	SetModified();
-}
-
-void CPPageSync::OnBnClickedSyncNearest()
-{
-	m_bSynchronizeNearest = !m_bSynchronizeNearest;
-
-	if (m_bSynchronizeNearest) {
-		m_bSynchronizeVideo = FALSE;
-		m_bSynchronizeDisplay = FALSE;
-	}
-
-	UpdateData(FALSE);
-
 	SetModified();
 }
