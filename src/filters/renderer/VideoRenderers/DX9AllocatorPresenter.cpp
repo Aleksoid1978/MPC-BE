@@ -531,7 +531,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		m_pD3DDevEx = NULL;
 		m_CurrentAdapter = currentAdapter;
 
-		m_GPUUsage.Init(m_D3D9DeviceName);
+		m_GPUUsage.Init(m_D3D9DeviceName, m_D3D9Device);
 	}
 
 	HRESULT hr = S_OK;
@@ -883,18 +883,23 @@ UINT CDX9AllocatorPresenter::GetAdapter(IDirect3D9* pD3D)
 
 	m_D3D9Device.Empty();
 	m_D3D9DeviceName.Empty();
+	m_D3D9VendorId = 0;
 
-	CRenderersSettings& rs = GetRenderersSettings();
+	const CRenderersSettings& rs = GetRenderersSettings();
 	if (pD3D->GetAdapterCount() > 1 && rs.sD3DRenderDevice.GetLength() > 0) {
-		TCHAR		strGUID[50];
+		TCHAR strGUID[50] = { 0 };
 		D3DADAPTER_IDENTIFIER9 adapterIdentifier;
 
 		for (UINT adp = 0, num_adp = pD3D->GetAdapterCount(); adp < num_adp; ++adp) {
 			if (pD3D->GetAdapterIdentifier(adp, 0, &adapterIdentifier) == S_OK) {
 				if ((::StringFromGUID2(adapterIdentifier.DeviceIdentifier, strGUID, 50) > 0) && (rs.sD3DRenderDevice == strGUID)) {
-					m_D3D9Device		= adapterIdentifier.Description;
-					m_D3D9DeviceName	= adapterIdentifier.DeviceName;
-					m_D3D9VendorId		= adapterIdentifier.VendorId;
+					m_D3D9Device     = adapterIdentifier.Description;
+					m_D3D9DeviceName = adapterIdentifier.DeviceName;
+					m_D3D9VendorId   = adapterIdentifier.VendorId;
+
+					m_D3D9Device.Trim();
+					m_D3D9DeviceName.Trim();
+					
 					return adp;
 				}
 			}
@@ -909,12 +914,15 @@ UINT CDX9AllocatorPresenter::GetAdapter(IDirect3D9* pD3D)
 	for (UINT adp = 0, num_adp = pD3D->GetAdapterCount(); adp < num_adp; ++adp) {
 		HMONITOR hAdpMon = pD3D->GetAdapterMonitor(adp);
 		if (hAdpMon == hMonitor) {
-				D3DADAPTER_IDENTIFIER9 adapterIdentifier;
-				if (pD3D->GetAdapterIdentifier(adp, 0, &adapterIdentifier) == S_OK) {
-					m_D3D9Device		= adapterIdentifier.Description;
-					m_D3D9DeviceName	= adapterIdentifier.DeviceName;
-					m_D3D9VendorId		= adapterIdentifier.VendorId;
-				}
+			D3DADAPTER_IDENTIFIER9 adapterIdentifier;
+			if (pD3D->GetAdapterIdentifier(adp, 0, &adapterIdentifier) == S_OK) {
+				m_D3D9Device     = adapterIdentifier.Description;
+				m_D3D9DeviceName = adapterIdentifier.DeviceName;
+				m_D3D9VendorId   = adapterIdentifier.VendorId;
+
+				m_D3D9Device.Trim();
+				m_D3D9DeviceName.Trim();
+			}
 			return adp;
 		}
 	}
