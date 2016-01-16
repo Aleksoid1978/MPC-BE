@@ -893,6 +893,9 @@ void File_MpegPs::Synched_Init()
         Streams[0xFE].Searching_TimeStamp_Start=true;    //extension_stream?
         Streams[0xFE].Searching_TimeStamp_End=true;      //extension_stream?
     }
+
+    //
+    Frequency_c=90000;
 }
 
 //***************************************************************************
@@ -1576,7 +1579,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG1(int8u stream_id)
         #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
             if (!FromAribStdB24B37)
         #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                FrameInfo.DTS=FrameInfo.PTS=FrameInfo.PTS*1000000/90; //In ns
+                TS_Set(FrameInfo.PTS);
         HasTimeStamps=true;
         Element_End0();
     }
@@ -1626,7 +1629,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG1(int8u stream_id)
         #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
             if (!FromAribStdB24B37)
         #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                FrameInfo.PTS=FrameInfo.PTS*1000000/90; //In ns
+                TS_Set(FrameInfo.PTS, TS_PTS);
         Element_End0();
 
         Element_Begin1("DTS");
@@ -1670,7 +1673,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG1(int8u stream_id)
         #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
             if (!FromAribStdB24B37)
         #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                FrameInfo.DTS=FrameInfo.DTS*1000000/90; //In ns
+                TS_Set(FrameInfo.DTS, TS_DTS);
         Element_End0();
     }
     else
@@ -1835,7 +1838,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
         #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
             if (!FromAribStdB24B37)
         #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                FrameInfo.DTS=FrameInfo.PTS=FrameInfo.PTS*1000000/90; //In ns
+                TS_Set(FrameInfo.PTS);
         HasTimeStamps=true;
     }
     else if (PTS_DTS_flags==0x3)
@@ -1918,7 +1921,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
         #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
             if (!FromAribStdB24B37)
         #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                FrameInfo.PTS=FrameInfo.PTS*1000000/90; //In ns
+                TS_Set(FrameInfo.PTS, TS_PTS);
 
         #if MEDIAINFO_TRACE
         if (Trace_Activated)
@@ -1992,7 +1995,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
         #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
             if (!FromAribStdB24B37)
         #endif //defined(MEDIAINFO_ARIBSTDB24B37_YES)
-                FrameInfo.DTS=FrameInfo.DTS*1000000/90; //In ns
+                TS_Set(FrameInfo.DTS, TS_DTS);
         HasTimeStamps=true;
     }
     else if (!FromTS)
@@ -3964,10 +3967,7 @@ void File_MpegPs::xxx_stream_Parse(ps_stream &Temp, int8u &stream_Count)
             {
                 if (FrameInfo.PCR!=(int64u)-1)
                     Temp.Parsers[Pos]->FrameInfo.PCR=FrameInfo.PCR;
-                if (FrameInfo.PTS!=(int64u)-1)
-                    Temp.Parsers[Pos]->FrameInfo.PTS=FrameInfo.PTS;
-                if (FrameInfo.DTS!=(int64u)-1)
-                    Temp.Parsers[Pos]->FrameInfo.DTS=FrameInfo.DTS;
+                TS_Set(Temp.Parsers[Pos]);
             }
 
             #if MEDIAINFO_TRACE
@@ -4028,8 +4028,7 @@ void File_MpegPs::xxx_stream_Parse(ps_stream &Temp, int8u &stream_Count)
             }
         }
     //FrameInfo.PCR=(int64u)-1;
-    FrameInfo.DTS=(int64u)-1;
-    FrameInfo.PTS=(int64u)-1;
+    TS_Clear();
     Element_Show();
 
     #if MEDIAINFO_EVENTS

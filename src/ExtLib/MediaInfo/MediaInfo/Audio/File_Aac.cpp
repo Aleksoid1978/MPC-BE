@@ -59,7 +59,6 @@ File_Aac::File_Aac()
     channelConfiguration=(int8u)-1;
     frame_length=1024;
     sampling_frequency_index=(int8u)-1;
-    sampling_frequency=(int32u)-1;
     extension_sampling_frequency_index=(int8u)-1;
     extension_sampling_frequency=(int32u)-1;
     aacSpectralDataResilienceFlag=false;
@@ -145,7 +144,7 @@ void File_Aac::Streams_Update()
                 case Mode_ADTS    :
                 case Mode_LATM    : if (Config->File_RiskyBitRateEstimation_Get() && !adts_buffer_fullness_Is7FF)
                                     {
-                                        int64u BitRate=(sampling_frequency/1024);
+                                        int64u BitRate=(Frequency_b/1024);
                                         BitRate*=aac_frame_length_Total*8;
                                         BitRate/=Frame_Count;
 
@@ -682,14 +681,6 @@ void File_Aac::Data_Parse()
     if (FrameSize_Max<Header_Size+Element_Size)
         FrameSize_Max=Header_Size+Element_Size;
 
-    if (Frame_Count>Frame_Count_Valid)
-    {
-        Skip_XX(Element_Size,                                   "Data");
-        FrameInfo.DTS+=float64_int64s(((float64)frame_length)*1000000000/sampling_frequency);
-        FrameInfo.PTS=FrameInfo.DTS;
-        return; //Parsing completely only the 1st frame
-    }
-
     switch (Mode)
     {
         case Mode_ADTS        : Data_Parse_ADTS(); break;
@@ -701,13 +692,6 @@ void File_Aac::Data_Parse()
         //Counting
         if (File_Offset+Buffer_Offset+Element_Size==File_Size)
             Frame_Count_Valid=Frame_Count; //Finish frames in case of there are less than Frame_Count_Valid frames
-        if (CanFill)
-        {
-            Frame_Count++;
-            if (Frame_Count_NotParsedIncluded!=(int64u)-1)
-                Frame_Count_NotParsedIncluded++;
-            Element_Info1(Ztring::ToZtring(Frame_Count));
-        }
 
         #if MEDIAINFO_ADVANCED
             switch(Mode)
@@ -741,6 +725,8 @@ void File_Aac::Data_Parse()
             }
 
         }
+
+        TS_Add(frame_length);
     FILLING_END();
 }
 

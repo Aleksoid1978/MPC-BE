@@ -431,7 +431,7 @@ void File_Aac::ALSSpecificConfig()
         //Forcing default confignuration (something weird in the example I have)
         channelConfiguration=0;
         sampling_frequency_index=(int8u)-1;
-        sampling_frequency=samp_freq;
+        Frequency_b=samp_freq;
     FILLING_END();
 }
 

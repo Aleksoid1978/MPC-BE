@@ -231,7 +231,7 @@ const char* Aac_ChannelLayout[]=
     "C L R Ls Rs Lrs Rrs LFE",
 };
 
-int8u Aac_AudioSpecificConfig_sampling_frequency_index(const int32u sampling_frequency)
+int8u Aac_AudioSpecificConfig_sampling_frequency_index(const int64s sampling_frequency)
 {
     if (sampling_frequency>=92017) return 0;
     if (sampling_frequency>=75132) return 1;
@@ -257,11 +257,13 @@ void File_Aac::AudioSpecificConfig (size_t End)
     Get_S1 (4, sampling_frequency_index,                        "samplingFrequencyIndex"); Param_Info1(Aac_sampling_frequency[sampling_frequency_index]);
     if (sampling_frequency_index==0xF)
     {
-        Get_S3 (24, sampling_frequency,                         "samplingFrequency");
-        sampling_frequency_index=Aac_AudioSpecificConfig_sampling_frequency_index(sampling_frequency);
+        int32u samplingFrequency;
+        Get_S3 (24, samplingFrequency,                          "samplingFrequency");
+        Frequency_b=samplingFrequency;
+        sampling_frequency_index=Aac_AudioSpecificConfig_sampling_frequency_index(Frequency_b);
     }
     else
-        sampling_frequency=Aac_sampling_frequency[sampling_frequency_index];
+        Frequency_b=Aac_sampling_frequency[sampling_frequency_index];
     Get_S1 (4, channelConfiguration,                            "channelConfiguration"); Param_Info1(Aac_ChannelConfiguration[channelConfiguration]);
     if (audioObjectType==5 || audioObjectType==29)
     {
@@ -471,17 +473,17 @@ void File_Aac::AudioSpecificConfig (size_t End)
     }
 
     FILLING_BEGIN();
-        AudioSpecificConfig_OutOfBand (sampling_frequency, audioObjectType, sbrData, psData, sbrPresentFlag, psPresentFlag);
+        AudioSpecificConfig_OutOfBand (Frequency_b, audioObjectType, sbrData, psData, sbrPresentFlag, psPresentFlag);
     FILLING_END();
 }
 
 //---------------------------------------------------------------------------
-void File_Aac::AudioSpecificConfig_OutOfBand (int32u sampling_frequency_, int8u audioObjectType_, bool sbrData, bool psData, bool sbrPresentFlag, bool psPresentFlag)
+void File_Aac::AudioSpecificConfig_OutOfBand (int64s sampling_frequency_, int8u audioObjectType_, bool sbrData, bool psData, bool sbrPresentFlag, bool psPresentFlag)
 {
-    if (sampling_frequency==(int32u)-1 && sampling_frequency_) //Only if not yet set
+    if (!Frequency_b && sampling_frequency_) //Only if not yet set
     {
-        sampling_frequency=sampling_frequency_;
-        sampling_frequency_index=Aac_AudioSpecificConfig_sampling_frequency_index(sampling_frequency);
+        Frequency_b=sampling_frequency_;
+        sampling_frequency_index=Aac_AudioSpecificConfig_sampling_frequency_index((int32u)Frequency_b);
     }
 
     if (audioObjectType_==(int8u)-1)
@@ -512,8 +514,8 @@ void File_Aac::AudioSpecificConfig_OutOfBand (int32u sampling_frequency_, int8u 
     else
         audioObjectType=audioObjectType_;
 
-    if (sampling_frequency)
-        Infos["SamplingRate"].From_Number(sampling_frequency);
+    if (Frequency_b)
+        Infos["SamplingRate"].From_Number(Frequency_b);
     Infos["Format"].From_Local(Aac_Format(audioObjectType));
     Infos["Format_Profile"].From_Local(Aac_Format_Profile(audioObjectType));
     Infos["Codec"].From_Local(Aac_audioObjectType(audioObjectType));
@@ -529,7 +531,7 @@ void File_Aac::AudioSpecificConfig_OutOfBand (int32u sampling_frequency_, int8u 
     {
         Infos["Format_Profile"]=__T("HE-AAC");
         Ztring SamplingRate_Previous=Infos["SamplingRate"];
-        int32u SamplingRate=(extension_sampling_frequency_index==(int8u)-1)?(sampling_frequency*2):extension_sampling_frequency;
+        int32u SamplingRate=(extension_sampling_frequency_index==(int8u)-1)?(((int32u)Frequency_b)*2):extension_sampling_frequency;
         if (SamplingRate)
         {
             Infos["SamplingRate"].From_Number(SamplingRate, 10);
@@ -558,7 +560,7 @@ void File_Aac::AudioSpecificConfig_OutOfBand (int32u sampling_frequency_, int8u 
             Infos["Format_Profile"]+=__T(" / HE-AAC / LC");
             Infos["Channel(s)"]+=__T(" / ")+Channels+__T(" / ")+Channels;
             Infos["ChannelPositions"]+=__T(" / ")+ChannelPositions+__T(" / ")+ChannelPositions;
-            int32u SamplingRate=(extension_sampling_frequency_index==(int8u)-1)?(sampling_frequency*2):extension_sampling_frequency;
+            int32u SamplingRate=(extension_sampling_frequency_index==(int8u)-1)?(((int32u)Frequency_b)*2):extension_sampling_frequency;
             if (SamplingRate)
                 Infos["SamplingRate"]=Ztring().From_Number(SamplingRate, 10)+__T(" / ")+SamplingRate_Previous;
         }
@@ -1083,7 +1085,7 @@ void File_Aac::adts_fixed_header()
     Get_SB (    protection_absent,                              "protection_absent");
     Get_S1 ( 2, audioObjectType,                                "profile_ObjectType"); audioObjectType++; Param_Info1(Aac_audioObjectType(audioObjectType));
     Get_S1 ( 4, sampling_frequency_index,                       "sampling_frequency_index"); Param_Info2(Aac_sampling_frequency[sampling_frequency_index], " Hz");
-    sampling_frequency=Aac_sampling_frequency[sampling_frequency_index];
+    Frequency_b=Aac_sampling_frequency[sampling_frequency_index];
     Skip_SB(                                                    "private");
     Get_S1 ( 3, channelConfiguration,                           "channel_configuration");
     Skip_SB(                                                    "original");
