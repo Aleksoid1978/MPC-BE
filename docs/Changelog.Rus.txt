@@ -16,7 +16,7 @@
 	Little-CMS git-2.7-40-ga06d11e;
 	MediaInfo git-v0.7.81-17-g8b497cf;
 	Speex-1.2rc2-9-g9172c7e;
-	ZenLib git-v0.4.32-22-gfc1828f.
+	ZenLib git-v0.4.32-24-g8df5da0.
 
 1.4.5
 ==============================
