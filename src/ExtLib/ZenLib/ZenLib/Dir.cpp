@@ -356,6 +356,14 @@ bool Dir::Exists(const Ztring &File_Name)
 //---------------------------------------------------------------------------
 bool Dir::Create(const Ztring &File_Name)
 {
+    Ztring Parent=FileName::Path_Get(File_Name);
+
+    if (Parent.length() && !Exists(Parent))
+    {
+        if (!Create(Parent))
+            return false;
+    }
+
     #ifdef ZENLIB_USEWX
         return wxFileName::Mkdir(File_Name.c_str());
     #else //ZENLIB_USEWX
