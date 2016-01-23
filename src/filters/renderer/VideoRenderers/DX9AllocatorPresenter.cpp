@@ -1965,14 +1965,21 @@ void CDX9AllocatorPresenter::DrawStats()
 				}
 			}
 
-
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
-			strText.Format(L"Formats      : VideoBuffer %s, Surface %s, Backbuffer %s, Display %s. Device %s", GetD3DFormatStr(m_VideoBufferFmt), GetD3DFormatStr(m_SurfaceFmt), GetD3DFormatStr(m_BackbufferFmt), GetD3DFormatStr(m_DisplayFmt), m_pD3DDevEx ? L"D3DDevEx" : L"D3DDev");
-			if (m_D3DDevExError.GetLength()) {
-				strText.AppendFormat(L". D3DExError: %s", m_D3DDevExError);
-			}
+			strText = L"Formats      | Input  | Mixer    | VideoBuffer   | Surface       | Backbuffer/Display |";
+			DrawText(rc, strText, 1);
+			OffsetRect(&rc, 0, TextHeight);
+
+			ASSERT(m_BackbufferFmt == m_DisplayFmt);
+
+			strText.Format(L"             | %-6s | %-8s | %-13s | %-13s | %-18s |"
+				, m_InputVCodec
+				, m_strStatsMsg[1]
+				, GetD3DFormatStr(m_VideoBufferFmt)
+				, GetD3DFormatStr(m_SurfaceFmt)
+				, GetD3DFormatStr(m_BackbufferFmt));
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
@@ -2154,19 +2161,6 @@ void CDX9AllocatorPresenter::DrawStats()
 				strText = L"Decoder      : " + m_Decoder;
 				DrawText(rc, strText, 1);
 				OffsetRect(&rc, 0, TextHeight);
-			}
-
-			if (!m_InputVCodec.IsEmpty()) {
-				strText = L"Input Type   : " + m_InputVCodec;
-				DrawText(rc, strText, 1);
-				OffsetRect(&rc, 0, TextHeight);
-			}
-
-			for (int i = 0; i < 6; i++) {
-				if (m_strStatsMsg[i][0]) {
-					DrawText(rc, m_strStatsMsg[i], 1);
-					OffsetRect(&rc, 0, TextHeight);
-				}
 			}
 
 			{
