@@ -1968,7 +1968,7 @@ void CDX9AllocatorPresenter::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
-			strText = L"Formats      | Input  | Mixer    | VideoBuffer   | Surface       | Backbuffer/Display |";
+			strText = L"Formats      | Input  | Mixer       | VideoBuffer   | Surface       | Backbuffer/Display |";
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
