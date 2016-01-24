@@ -1974,7 +1974,7 @@ void CDX9AllocatorPresenter::DrawStats()
 
 			ASSERT(m_BackbufferFmt == m_DisplayFmt);
 
-			strText.Format(L"             | %-6s | %-8s | %-13s | %-13s | %-18s |"
+			strText.Format(L"             | %-6s | %-11s | %-13s | %-13s | %-18s |"
 				, m_InputVCodec
 				, m_strStatsMsg[1]
 				, GetD3DFormatStr(m_VideoBufferFmt)

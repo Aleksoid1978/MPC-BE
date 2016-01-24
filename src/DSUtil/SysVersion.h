@@ -28,6 +28,7 @@ BOOL IsWin7();
 BOOL IsWin7orLater();
 BOOL IsWin8();
 BOOL IsWin8orLater();
+BOOL IsWin81orLater();
 BOOL IsWin10();
 BOOL IsWin10orLater();
 
