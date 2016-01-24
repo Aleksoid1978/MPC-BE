@@ -29,8 +29,8 @@
 
 ; From now on you shouldn't need to change anything
 
-#if VER < EncodeVer(5,5,6)
-  #error Update your Inno Setup version (5.5.6 or newer)
+#if VER < EncodeVer(5,5,8)
+  #error Update your Inno Setup version (5.5.8 or newer)
 #endif
 
 #ifndef UNICODE
