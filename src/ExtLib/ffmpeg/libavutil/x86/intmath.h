@@ -99,7 +99,7 @@ static av_always_inline av_const unsigned av_mod_uintp2_bmi2(unsigned a, unsigne
 
 #endif /* __BMI2__ */
 
-#if defined(__SSE2__)
+#if defined(__SSE2__) && !defined(__INTEL_COMPILER)
 
 #define av_clipd av_clipd_sse2
 static av_always_inline av_const double av_clipd_sse2(double a, double amin, double amax)
@@ -109,13 +109,13 @@ static av_always_inline av_const double av_clipd_sse2(double a, double amin, dou
 #endif
     __asm__ ("minsd %2, %0 \n\t"
              "maxsd %1, %0 \n\t"
-             : "+x"(a) : "xm"(amin), "xm"(amax));
+             : "+&x"(a) : "xm"(amin), "xm"(amax));
     return a;
 }
 
 #endif /* __SSE2__ */
 
-#if defined(__SSE__)
+#if defined(__SSE__) && !defined(__INTEL_COMPILER)
 
 #define av_clipf av_clipf_sse
 static av_always_inline av_const float av_clipf_sse(float a, float amin, float amax)
@@ -125,7 +125,7 @@ static av_always_inline av_const float av_clipf_sse(float a, float amin, float a
 #endif
     __asm__ ("minss %2, %0 \n\t"
              "maxss %1, %0 \n\t"
-             : "+x"(a) : "xm"(amin), "xm"(amax));
+             : "+&x"(a) : "xm"(amin), "xm"(amax));
     return a;
 }
 

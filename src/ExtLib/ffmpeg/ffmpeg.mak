@@ -593,6 +593,7 @@ SRCS_LU = \
 	libavutil/utils.c \
 	\
 	libavutil/x86/cpu.c \
+	libavutil/x86/fixed_dsp_init.c \
 	libavutil/x86/float_dsp_init.c \
 	libavutil/x86/lls_init.c
 
@@ -718,6 +719,7 @@ SRCS_YASM_LBR = \
 SRCS_YASM_LU = \
 	libavutil/x86/cpuid.asm \
 	libavutil/x86/emms.asm \
+	libavutil/x86/fixed_dsp.asm \
 	libavutil/x86/float_dsp.asm \
 	libavutil/x86/lls.asm
 
