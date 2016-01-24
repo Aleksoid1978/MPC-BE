@@ -211,7 +211,7 @@ static av_always_inline av_const int32_t av_clipl_int32_c(int64_t a)
  */
 static av_always_inline av_const int av_clip_intp2_c(int a, int p)
 {
-    if ((a + (1 << p)) & ~((2 << p) - 1))
+    if (((unsigned)a + (1 << p)) & ~((2 << p) - 1))
         return (a >> 31) ^ ((1 << p) - 1);
     else
         return a;
@@ -356,13 +356,13 @@ static av_always_inline av_const int av_parity_c(uint32_t v)
  * to prevent undefined results.
  */
 #define GET_UTF8(val, GET_BYTE, ERROR)\
-    val= GET_BYTE;\
+    val= (GET_BYTE);\
     {\
         uint32_t top = (val & 128) >> 1;\
         if ((val & 0xc0) == 0x80 || val >= 0xFE)\
             ERROR\
         while (val & top) {\
-            int tmp= GET_BYTE - 128;\
+            int tmp= (GET_BYTE) - 128;\
             if(tmp>>6)\
                 ERROR\
             val= (val<<6) + tmp;\
