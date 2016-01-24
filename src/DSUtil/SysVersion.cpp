@@ -76,6 +76,11 @@ BOOL IsWin8orLater()
 	return (GetSysVersion() >= 0x0602);
 }
 
+BOOL IsWin81orLater()
+{
+	return (GetSysVersion() >= 0x0603);
+}
+
 BOOL IsWin10()
 {
 	return (GetSysVersion() == 0x0A00);
