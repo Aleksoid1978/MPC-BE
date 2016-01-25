@@ -2597,7 +2597,7 @@ void UnRegisterSourceFilter(const GUID& subtype)
 static const struct {
 	const GUID*   Guid;
 	const LPCTSTR Description;
-} DXVADecoder[] = {
+} s_DXVADecoder[] = {
 	{&GUID_NULL,						_T("Unknown")},
 	{&GUID_NULL,						_T("Not using DXVA")},
 	{&DXVA_Intel_H264_ClearVideo,		_T("H.264 bitstream decoder, ClearVideo")},  // Intel ClearVideo H264 bitstream decoder
@@ -2633,7 +2633,7 @@ static const struct {
 	{&DXVA_ModeVC1_B,					_T("VC-1 B, motion compensation")},
 	{&DXVA_ModeVC1_C,					_T("VC-1 C, IDCT")},
 	{&DXVA_ModeVC1_D,					_T("VC-1 D, bitstream decoder")},
-	{&DXVA2_ModeVC1_D2010,				_T("VC-1 D, bitstream decoder (2010)")},
+	{&DXVA_ModeVC1_D2010,				_T("VC-1 D, bitstream decoder (2010)")},
 	{&DXVA_NoEncrypt,					_T("No encryption")},
 	{&DXVA2_ModeMPEG2_MoComp,			_T("MPEG-2 motion compensation")},
 	{&DXVA2_ModeMPEG2_IDCT,				_T("MPEG-2 IDCT")},
@@ -2644,8 +2644,8 @@ static const struct {
 	{&DXVA2_ModeH264_C,					_T("H.264 C, IDCT, no FGT")},
 	{&DXVA2_ModeH264_D,					_T("H.264 D, IDCT, FGT")},
 	{&DXVA2_ModeH264_E,					_T("H.264 E, bitstream decoder, no FGT")},
-	{&DXVA2_ModeH264_Flash,				_T("H.264 Flash, bitstream decoder, FGT")},
 	{&DXVA2_ModeH264_F,					_T("H.264 F, bitstream decoder, FGT")},
+	{&DXVA_ModeH264_Flash,				_T("H.264 Flash, bitstream decoder")},
 	{&DXVA2_ModeWMV8_A,					_T("WMV8 A, post processing")},
 	{&DXVA2_ModeWMV8_B,					_T("WMV8 B, motion compensation")},
 	{&DXVA2_ModeWMV9_A,					_T("WMV9 A, post processing")},
@@ -2656,9 +2656,6 @@ static const struct {
 	{&DXVA2_ModeVC1_C,					_T("VC-1 C, IDCT")},
 	{&DXVA2_ModeVC1_D,					_T("VC-1 D, bitstream decoder")},
 	{&DXVA2_NoEncrypt,					_T("No encryption")},
-	{&DXVA2_VideoProcProgressiveDevice,	_T("Progressive scan")},
-	{&DXVA2_VideoProcBobDevice,			_T("Bob deinterlacing")},
-	{&DXVA2_VideoProcSoftwareDevice,	_T("Software processing")},
 	{&DXVA_ModeHEVC_VLD_Main,			_T("H.265, bitstream decoder, Main")},
 	{&DXVA_ModeHEVC_VLD_Main10,			_T("H.265, bitstream decoder, Main10")},
 	{&DXVA_VP9_VLD_Profile0,			_T("VP9, bitstream decoder, profile 0")}
@@ -2668,8 +2665,8 @@ CString GetDXVAMode(const GUID* guidDecoder)
 {
 	size_t nPos = 0;
 
-	for (size_t i = 1; i < _countof(DXVADecoder); i++) {
-		if (*guidDecoder == *DXVADecoder[i].Guid) {
+	for (size_t i = 1; i < _countof(s_DXVADecoder); i++) {
+		if (*guidDecoder == *s_DXVADecoder[i].Guid) {
 			nPos = i;
 			break;
 		}
@@ -2679,7 +2676,7 @@ CString GetDXVAMode(const GUID* guidDecoder)
 		return CStringFromGUID(*guidDecoder);
 	}
 
-	return DXVADecoder[nPos].Description;
+	return s_DXVADecoder[nPos].Description;
 }
 
 // hour, minute, second, millisec
