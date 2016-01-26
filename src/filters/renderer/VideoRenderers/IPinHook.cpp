@@ -136,7 +136,7 @@ int GetDXVAStatus()
 void ClearDXVAState()
 {
 	g_guidDXVADecoder = GUID_NULL;
-	g_nDXVAVersion = 0;
+	g_nDXVAVersion    = 0;
 }
 
 LPCTSTR FindD3DFormat(const D3DFORMAT Format)
@@ -850,8 +850,8 @@ static HRESULT STDMETHODCALLTYPE GetCompBufferInfoMine(IAMVideoAcceleratorC * Th
 	LOG(_T("\nGetCompBufferInfo"));
 
 	if (pGuid) {
-		g_guidDXVADecoder	= *pGuid;
-		g_nDXVAVersion		= 1;
+		g_guidDXVADecoder = *pGuid;
+		g_nDXVAVersion    = 1;
 
 #ifdef _DEBUG
 		LOG(_T("[in] *pGuid = %s"), CStringFromGUID(*pGuid));
@@ -1104,8 +1104,8 @@ static HRESULT STDMETHODCALLTYPE DisplayFrameMine(IAMVideoAcceleratorC * This, D
 
 void HookAMVideoAccelerator(IAMVideoAcceleratorC* pAMVideoAcceleratorC)
 {
-	g_guidDXVADecoder	= GUID_NULL;
-	g_nDXVAVersion		= 0;
+	g_guidDXVADecoder = GUID_NULL;
+	g_nDXVAVersion    = 0;
 
 	BOOL res;
 	DWORD flOldProtect = 0;
@@ -1562,8 +1562,8 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(IDirectXVideoDecoderServ
 {
 	//	DebugBreak();
 	//	((DXVA2_VideoDesc*)pVideoDesc)->Format = (D3DFORMAT)0x3231564E;
-	g_guidDXVADecoder	= Guid;
-	g_nDXVAVersion		= 2;
+	g_guidDXVADecoder = Guid;
+	g_nDXVAVersion    = 2;
 
 
 #ifdef _DEBUG
@@ -1575,7 +1575,8 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(IDirectXVideoDecoderServ
 	HRESULT hr = CreateVideoDecoderOrg(pThis, Guid, pVideoDesc, pConfig, ppDecoderRenderTargets, NumRenderTargets, ppDecode);
 
 	if (FAILED (hr)) {
-		g_guidDXVADecoder	= GUID_NULL;
+		g_guidDXVADecoder = GUID_NULL;
+		g_nDXVAVersion    = 2;
 	}
 #ifdef _DEBUG
 	else {
