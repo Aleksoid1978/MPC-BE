@@ -28,6 +28,7 @@
 
 #include "IPinHook.h"
 #include "AllocatorCommon.h"
+#include "../../../DSUtil/SysVersion.h"
 
 #define DXVA_LOGFILE_A 0 // set to 1 for logging DXVA data to a file
 #define LOG_BITSTREAM  0 // set to 1 for logging DXVA bistream data to a file
@@ -167,7 +168,7 @@ static HRESULT STDMETHODCALLTYPE ReceiveConnectionMine(IPinC* This, /* [in] */ I
 	if (pmt) {
 		// Force the renderer to always reject the P010(except the DXVA) and P016 pixel format
 		if (pmt->subtype == MEDIASUBTYPE_P010) {
-			if (GetCLSID((IPin*)pConnector) == GUID_LAVVideoDecoder) {
+			if (IsWin10orLater()) {
 				return ReceiveConnectionOrg(This, pConnector, pmt);
 			}
 
