@@ -250,7 +250,7 @@ static void fill_slice_long(AVCodecContext *avctx, DXVA_Slice_H264_Long *slice,
                 else
                     index = get_refpic_index(pp, (unsigned)r->f->data[4]);
                 fill_picture_entry(&slice->RefPicList[list][i], index,
-                                   r->reference == PICT_BOTTOM_FIELD);
+                                   sl->ref_list[list][i].reference == PICT_BOTTOM_FIELD);
                 for (plane = 0; plane < 3; plane++) {
                     int w, o;
                     if (plane == 0 && sl->luma_weight_flag[list]) {
