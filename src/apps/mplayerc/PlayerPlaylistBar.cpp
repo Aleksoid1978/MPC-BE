@@ -980,18 +980,22 @@ void CPlayerPlaylistBar::ResolveLinkFiles(CAtlList<CString> &fns)
 	pSL.CoCreateInstance(CLSID_ShellLink);
 	CComQIPtr<IPersistFile> pPF = pSL;
 
-	POSITION pos = fns.GetHeadPosition();
-	while (pSL && pPF && pos) {
-		CString& fn = fns.GetNext(pos);
-		TCHAR buff[MAX_PATH];
-		if (CPath(fn).GetExtension().MakeLower() != _T(".lnk")
-				|| FAILED(pPF->Load(CStringW(fn), STGM_READ))
-				|| FAILED(pSL->Resolve(NULL, SLR_ANY_MATCH | SLR_NO_UI))
-				|| FAILED(pSL->GetPath(buff, _countof(buff), NULL, 0))) {
-			continue;
+	if (pSL && pPF) {
+		POSITION pos = fns.GetHeadPosition();
+		while (pos) {
+			CString& fn = fns.GetNext(pos);
+			if (CPath(fn).GetExtension().MakeLower() == L".lnk") {
+				TCHAR buff[MAX_PATH] = { 0 };
+				if (SUCCEEDED(pPF->Load(fn, STGM_READ))
+						&& SUCCEEDED(pSL->Resolve(NULL, SLR_ANY_MATCH | SLR_NO_UI))
+						&& SUCCEEDED(pSL->GetPath(buff, _countof(buff), NULL, 0))) {
+					CString fnResolved(buff);
+					if (!fnResolved.IsEmpty()) {
+						fn = fnResolved;
+					}
+				}
+			}
 		}
-
-		fn = buff;
 	}
 }
 
