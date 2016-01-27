@@ -290,7 +290,6 @@ namespace DSObjects
 		CString					m_D3D9DeviceName;
 
 		CString					m_Decoder;
-		CString					m_InputVCodec;
 
 		void					FillAddingField(CComPtr<IPin> pPin, CMediaType* mt);
 
