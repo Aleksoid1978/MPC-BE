@@ -1975,7 +1975,7 @@ void CDX9AllocatorPresenter::DrawStats()
 			ASSERT(m_BackbufferFmt == m_DisplayFmt);
 
 			strText.Format(L"             | %-6s | %-11s | %-13s | %-13s | %-18s |"
-				, m_InputVCodec
+				, m_strStatsMsg[0]
 				, m_strStatsMsg[1]
 				, GetD3DFormatStr(m_VideoBufferFmt)
 				, GetD3DFormatStr(m_SurfaceFmt)
@@ -2350,10 +2350,18 @@ void CDX9AllocatorPresenter::FillAddingField(CComPtr<IPin> pPin, CMediaType* mt)
 {
 	ExtractAvgTimePerFrame(mt, m_rtTimePerFrame);
 
-	BITMAPINFOHEADER bih;
-	if (ExtractBIH(mt, &bih)) {
-		m_InputVCodec = GetGUIDString(mt->subtype);
-		m_InputVCodec.Replace(L"MEDIASUBTYPE_", L"");
+	CString subtypestr = GetGUIDString(mt->subtype);
+	if (subtypestr.Left(13) == "MEDIASUBTYPE_") {
+		m_strStatsMsg[0] = subtypestr.Mid(13);
+	} else {
+		BITMAPINFOHEADER bih;
+		if (ExtractBIH(mt, &bih)) {
+			m_strStatsMsg[0].Format(L"%C%C%C%C",
+				((char*)&bih.biCompression)[3],
+				((char*)&bih.biCompression)[2],
+				((char*)&bih.biCompression)[1],
+				((char*)&bih.biCompression)[0]);
+		}
 	}
 
 	m_Decoder.Empty();
