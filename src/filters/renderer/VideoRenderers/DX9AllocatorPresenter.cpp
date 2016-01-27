@@ -2357,10 +2357,10 @@ void CDX9AllocatorPresenter::FillAddingField(CComPtr<IPin> pPin, CMediaType* mt)
 		BITMAPINFOHEADER bih;
 		if (ExtractBIH(mt, &bih)) {
 			m_strStatsMsg[0].Format(L"%C%C%C%C",
-				((char*)&bih.biCompression)[3],
-				((char*)&bih.biCompression)[2],
+				((char*)&bih.biCompression)[0],
 				((char*)&bih.biCompression)[1],
-				((char*)&bih.biCompression)[0]);
+				((char*)&bih.biCompression)[2],
+				((char*)&bih.biCompression)[3]);
 		}
 	}
 
