@@ -566,6 +566,9 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 					}
 				}
 				break;
+			case AV_CODEC_ID_PNG:
+				pAVCtx->pix_fmt = AV_PIX_FMT_RGBA;
+				break;
 			case AV_CODEC_ID_MJPEG:
 			case AV_CODEC_ID_DNXHD:
 				av_log(pAVCtx, AV_LOG_INFO, "WARNING! : pAVCtx->pix_fmt == AV_PIX_FMT_NONE\n");
