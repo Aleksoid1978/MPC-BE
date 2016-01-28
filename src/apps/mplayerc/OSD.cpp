@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -124,12 +124,16 @@ COSD::~COSD()
 
 HRESULT COSD::Create(CWnd* pWnd)
 {
-	DWORD dwStyleEx	= WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_LAYERED;
-	DWORD dwStyle	= WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+	DWORD dwStyle	= WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+	DWORD dwStyleEx	= WS_EX_TRANSPARENT | WS_EX_LAYERED;
+
 	if (IsWin8orLater()) {
-		dwStyleEx	= WS_EX_TRANSPARENT | WS_EX_LAYERED;
-		dwStyle		= WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+		dwStyle		|= WS_CHILD;
+	} else {
+		dwStyle		|= WS_POPUP;
+		dwStyleEx	|= WS_EX_TOPMOST;
 	}
+
 	if (!CreateEx(dwStyleEx, AfxRegisterWndClass(0), NULL, dwStyle, CRect(0, 0, 0, 0), pWnd, 0, NULL)) {
 		DbgLog((LOG_TRACE, 3, L"Failed to create OSD Window"));
 		return E_FAIL;
