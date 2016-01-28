@@ -1579,7 +1579,7 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(IDirectXVideoDecoderServ
 
 	if (FAILED (hr)) {
 		g_guidDXVADecoder = GUID_NULL;
-		g_nDXVAVersion    = 2;
+		g_nDXVAVersion    = 0;
 	}
 #ifdef _DEBUG
 	else {
