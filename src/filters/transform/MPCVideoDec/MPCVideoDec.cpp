@@ -2228,14 +2228,66 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 	m_pAVCtx->extradata_size	= (int)extralen;
 }
 
+#define DXVA2_MAX_SURFACES 64
 HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pReceivePin)
 {
 	if (direction == PINDIR_OUTPUT) {
 		if (IsDXVASupported()) {
 			if (m_nDecoderMode == MODE_DXVA1) {
 				(static_cast<CDXVA1Decoder*>(m_pDXVADecoder))->ConfigureDXVA1();
-			} else if (SUCCEEDED(ConfigureDXVA2(pReceivePin)) && SUCCEEDED(SetEVRForDXVA2(pReceivePin))) {
-				m_nDecoderMode = MODE_DXVA2;
+			} else if (SUCCEEDED(ConfigureDXVA2(pReceivePin))) {
+				HRESULT hr = E_FAIL;
+				for (;;) {
+					CComPtr<IDirectXVideoDecoderService> pDXVA2Service;
+					hr = m_pDeviceManager->GetVideoService(m_hDevice, IID_PPV_ARGS(&pDXVA2Service));
+					if (FAILED(hr)) {
+						DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::CompleteConnect() : IDirect3DDeviceManager9::GetVideoService() - FAILED (0x%08x)", hr));
+						break;
+					}
+					if (!pDXVA2Service) {
+						break;
+					}
+
+					UINT numSurfaces = max(m_DXVA2Config.ConfigMinRenderTargetBuffCount, 1);
+					LPDIRECT3DSURFACE9 pSurfaces[DXVA2_MAX_SURFACES] = { 0 };
+					if (pSurfaces) {
+						hr = pDXVA2Service->CreateSurface(
+								PictWidthRounded(),
+								PictHeightRounded(),
+								numSurfaces,
+								m_VideoDesc.Format,
+								D3DPOOL_DEFAULT,
+								0,
+								DXVA2_VideoDecoderRenderTarget,
+								pSurfaces,
+								NULL);
+						if (FAILED(hr)) {
+							DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoderService::CreateSurface() - FAILED (0x%08x)", hr));
+							break;
+						}
+
+						CComPtr<IDirectXVideoDecoder> pDirectXVideoDec;
+						hr = m_pDecoderService->CreateVideoDecoder(m_DXVADecoderGUID, &m_VideoDesc, &m_DXVA2Config, pSurfaces, numSurfaces, &pDirectXVideoDec);
+						if (FAILED(hr)) {
+							DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoder::CreateVideoDecoder() - FAILED (0x%08x)", hr));
+						}
+
+						for (UINT i = 0; i < DXVA2_MAX_SURFACES; i++) {
+							SAFE_RELEASE(pSurfaces[i]);
+						}
+					}
+
+					if (SUCCEEDED(hr) && SUCCEEDED(SetEVRForDXVA2(pReceivePin))) {
+						m_nDecoderMode = MODE_DXVA2;
+					}
+
+					break;
+				}
+
+				if (FAILED(hr)) {
+					m_DXVADecoderGUID = GUID_NULL;
+					ZeroMemory(&m_DXVA2Config, sizeof(m_DXVA2Config));
+				}
 			}
 		}
 
@@ -3157,6 +3209,11 @@ HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3D
 		}
 	}
 
+	if (FAILED(hr)) {
+		m_DXVADecoderGUID = GUID_NULL;
+		ZeroMemory(&m_DXVA2Config, sizeof(m_DXVA2Config));
+	}
+
 	return hr;
 }
 
@@ -3484,7 +3541,7 @@ STDMETHODIMP_(MPC_DEINTERLACING_FLAGS) CMPCVideoDecFilter::GetDeinterlacing()
 
 STDMETHODIMP_(GUID*) CMPCVideoDecFilter::GetDXVADecoderGuid()
 {
-	return m_pGraph ? &m_DXVADecoderGUID : NULL;
+	return m_pGraph && m_pDXVADecoder ? &m_DXVADecoderGUID : NULL;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::SetActiveCodecs(ULONGLONG nValue)
