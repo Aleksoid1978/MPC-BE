@@ -1826,7 +1826,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		return VFW_E_INVALIDMEDIATYPE;
 	}
 
-	FFGetFrameProps(m_pAVCtx);
+	FillAVCodecProps(m_pAVCtx);
 	m_PixelFormat = m_pAVCtx->pix_fmt;
 
 	m_nAlign = 16;

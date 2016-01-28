@@ -505,15 +505,38 @@ UINT FFGetMBCount(struct AVCodecContext* pAVCtx)
 	return MBCount;
 }
 
-void FFGetFrameProps(struct AVCodecContext* pAVCtx)
+void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 {
+	// fill "Bitstream height" properties
+	switch (pAVCtx->codec_id) {
+		case AV_CODEC_ID_H264:
+			{
+				const H264Context* h = (H264Context*)pAVCtx->priv_data;
+				const SPS* sps       = &h->sps;
+				if (sps) {
+					pAVCtx->coded_height = sps->mb_height * (2 - sps->frame_mbs_only_flag) * 16;
+				}
+			}
+			break;
+		case AV_CODEC_ID_MPEG1VIDEO:
+		case AV_CODEC_ID_MPEG2VIDEO:
+			{
+				const MpegEncContext* s = (MpegEncContext*)pAVCtx->priv_data;
+				if (!s->progressive_sequence) {
+					pAVCtx->coded_height = int((s->height + 31) / 32 * 2) * 16;
+				}
+			}
+			break;
+	}
+
+	// fill "Pixel format" properties
 	if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
 		switch (pAVCtx->codec_id) {
 			case AV_CODEC_ID_MPEG1VIDEO:
 			case AV_CODEC_ID_MPEG2VIDEO:
 				{
 					const MpegEncContext* s = (MpegEncContext*)pAVCtx->priv_data;
-					if(s->chroma_format < 2) {
+					if (s->chroma_format < 2) {
 						pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
 					} else if(s->chroma_format == 2) {
 						pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
