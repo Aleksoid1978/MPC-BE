@@ -610,8 +610,14 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 			sl.AddTail(str);
 			if (vih2.dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
 				// http://msdn.microsoft.com/en-us/library/windows/desktop/ms698715%28v=vs.85%29.aspx
-				const LPCTSTR nominalrange[] = { L"Unknown", L"0-255", L"16-235", L"48-208" };
-				const LPCTSTR transfermatrix[] = { L"Unknown", L"BT.709", L"BT.601", L"SMPTE 240M", L"BT.2020" };
+				const LPCSTR nominalrange[] = { "unknown", "0-255", "16-235", "48-208" };
+				const LPCSTR transfermatrix[] = { "unknown", "BT.709", "BT.601", "SMPTE 240M", "BT.2020", NULL, NULL, "YCgCo" };
+				const LPCSTR lighting[] = { "unknown", "bright", "office", "dim", "dark" };
+				const LPCSTR primaries[] = { "unknown", "Reserved", "BT.709", "BT.470-4 System M", "BT.470-4 System B,G",
+					"SMPTE 170M", "SMPTE 240M", "EBU Tech. 3213", "SMPTE", "BT.2020" };
+				const LPCSTR transfunc[] = { "unknown", "Linear RGB", "1.8 gamma", "2.0 gamma", "2.2 gamma", "BT.709", "SMPTE 240M",
+					"sRGB", "2.8 gamma", "Log100", "Log316", "Symmetric BT.709", NULL, NULL, NULL, NULL, "SMPTE ST 2084" };
+
 				DXVA2_ExtendedFormat exfmt;
 				exfmt.value = vih2.dwControlFlags;
 
@@ -620,24 +626,35 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 
 				str.Format(_T("- NominalRange          : %u"), exfmt.NominalRange);
 				if (exfmt.NominalRange < _countof(nominalrange)) {
-					str.AppendFormat(L" (%s)", nominalrange[exfmt.NominalRange]);
+					str.AppendFormat(L" (%hS)", nominalrange[exfmt.NominalRange]);
 				}
 				sl.AddTail(str);
 
 				str.Format(_T("- VideoTransferMatrix   : %u"), exfmt.VideoTransferMatrix);
 				if (exfmt.VideoTransferMatrix == DXVA2_VideoTransferMatrix_Unknown) {
-					str.AppendFormat(L" (Unknown, used %s)", labs(bih->biHeight) > 576 ? L"BT.709" : L"BT.601");
+					str.AppendFormat(L" (unknown, used %hS)", labs(bih->biHeight) > 576 ? "BT.709" : "BT.601");
 				}
-				else if (exfmt.VideoTransferMatrix < _countof(transfermatrix)) {
-					str.AppendFormat(L" (%s)", transfermatrix[exfmt.VideoTransferMatrix]);
+				else if (exfmt.VideoTransferMatrix < _countof(transfermatrix) && transfermatrix[exfmt.VideoTransferMatrix]) {
+					str.AppendFormat(L" (%hS)", transfermatrix[exfmt.VideoTransferMatrix]);
 				}
 				sl.AddTail(str);
 
 				str.Format(_T("- VideoLighting         : %u"), exfmt.VideoLighting);
+				if (exfmt.VideoLighting < _countof(lighting)) {
+					str.AppendFormat(L" (%hS)", lighting[exfmt.VideoLighting]);
+				}
 				sl.AddTail(str);
+
 				str.Format(_T("- VideoPrimaries        : %u"), exfmt.VideoPrimaries);
+				if (exfmt.VideoPrimaries < _countof(primaries)) {
+					str.AppendFormat(L" (%hS)", primaries[exfmt.VideoPrimaries]);
+				}
 				sl.AddTail(str);
+
 				str.Format(_T("- VideoTransferFunction : %u"), exfmt.VideoTransferFunction);
+				if (exfmt.VideoTransferFunction < _countof(transfunc) && transfunc[exfmt.VideoTransferFunction]) {
+					str.AppendFormat(L" (%hS)", transfunc[exfmt.VideoTransferFunction]);
+				}
 				sl.AddTail(str);
 			}
 			str.Format(_T("dwReserved2: 0x%08x"), vih2.dwReserved2);
