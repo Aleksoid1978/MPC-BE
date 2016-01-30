@@ -2791,7 +2791,11 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 		CComPtr<IMediaSample> pOut;
 		BYTE* pDataOut = NULL;
-		DXVA2_ExtendedFormat dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
+		DXVA2_ExtendedFormat dxvaExtFormat = {0};
+		if (IsWinVistaOrLater()) { // bad hack for Windows XP and EVR Custom
+			dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
+		}
+
 		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut, GetFrameDuration(), &dxvaExtFormat)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
 			Continue;
 		}
