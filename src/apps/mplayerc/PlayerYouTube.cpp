@@ -378,7 +378,7 @@ bool PlayerYouTube(CString url, CAtlList<CString>& urls, YOUTUBE_FIELDS& y_field
 								if (dataSize) {
 									const CStringA funcName = GetEntry(data, "\"signature\",", "(");
 									if (!funcName.IsEmpty()) {
-										const CStringA varfunc = "var " + funcName + "=function(a){";
+										const CStringA varfunc = funcName + "=function(a){";
 										const CStringA funcBody = GetEntry(data, varfunc, "};");
 										if (!funcBody.IsEmpty()) {
 											CStringA funcGroup;
