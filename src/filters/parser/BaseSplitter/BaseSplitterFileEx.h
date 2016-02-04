@@ -322,6 +322,9 @@ public:
 	struct pcm_law_hdr {
 	};
 
+	struct opus_ts_hdr {
+	};
+
 #pragma pack(pop)
 
 	bool Read(seqhdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
@@ -351,4 +354,5 @@ public:
 	bool Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt = NULL);
 	bool Read(adx_adpcm_hdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* pmt = NULL);
+	bool Read(opus_ts_hdr& h, int len, CAtlArray<BYTE>& extradata, CMediaType* pmt = NULL);
 };

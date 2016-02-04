@@ -1730,3 +1730,43 @@ bool CBaseSplitterFileEx::Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* 
 
 	return true;
 }
+
+bool CBaseSplitterFileEx::Read(opus_ts_hdr& h, int len, CAtlArray<BYTE>& extradata, CMediaType* pmt/* = NULL*/)
+{
+	if (len < 2 || extradata.GetCount() != 30) {
+		return false;
+	}
+
+	if ((BitRead(16) & 0xFFE0) != 0x7FE0) {
+		return false;
+	}
+
+	if (pmt) {
+		BYTE* buf = extradata.GetData();
+		const size_t nCount = extradata.GetCount();
+		CGolombBuffer Buffer(buf + 8, nCount - 8); // skip "OpusHead"
+
+		Buffer.ReadByte();
+		const BYTE channels = Buffer.ReadByte();
+		Buffer.SkipBytes(2);
+		Buffer.SkipBytes(4);
+		Buffer.SkipBytes(2);
+
+		pmt->majortype       = MEDIATYPE_Audio;
+		pmt->subtype         = MEDIASUBTYPE_OPUS;
+		pmt->formattype      = FORMAT_WaveFormatEx;
+
+		WAVEFORMATEX* wfe    = (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX) + nCount);
+		memset(wfe, 0, sizeof(WAVEFORMATEX));
+		wfe->wFormatTag      = WAVE_FORMAT_OPUS;
+		wfe->nChannels       = channels;
+		wfe->nSamplesPerSec  = 48000;
+		wfe->wBitsPerSample  = 16;
+		wfe->nBlockAlign     = 1;
+		wfe->nAvgBytesPerSec = 0;
+		wfe->cbSize          = nCount;
+		memcpy((BYTE*)(wfe + 1), buf, nCount);
+	}
+	
+	return true;
+}
