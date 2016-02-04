@@ -380,6 +380,10 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 					break;
 					case WAVE_FORMAT_ALAW:
 						Infos.AddTail(L"A-law PCM");
+						break;
+					case WAVE_FORMAT_OPUS:
+						Infos.AddTail(L"Opus");
+						break;
 				}
 			}
 

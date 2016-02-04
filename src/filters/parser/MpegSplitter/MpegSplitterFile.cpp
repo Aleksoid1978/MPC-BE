@@ -637,8 +637,9 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop)
 #define PGS_SUB						(1ULL << 10)
 #define DVB_SUB						(1ULL << 11)
 #define TELETEXT_SUB				(1ULL << 12)
+#define OPUS_AUDIO					(1ULL << 13)
 
-#define PES_STREAM_TYPE_ANY			(MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB)
+#define PES_STREAM_TYPE_ANY			(MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | OPUS_AUDIO)
 
 static const struct StreamType {
 	PES_STREAM_TYPE pes_stream_type;
@@ -664,6 +665,8 @@ static const struct StreamType {
 	{ PES_PRIVATE,							DTS_AUDIO	},
 	// LPCM Audio
 	{ AUDIO_STREAM_LPCM,					LPCM_AUDIO	},
+	// Opus Audio
+	{ PES_PRIVATE,							OPUS_AUDIO },
 	// MPEG2 Video
 	{ VIDEO_STREAM_MPEG2,					MPEG2_VIDEO	},
 	{ VIDEO_STREAM_MPEG2_ADDITIONAL_VIEW,	MPEG2_VIDEO	},
@@ -683,7 +686,6 @@ static const struct StreamType {
 	{ PES_PRIVATE,							DVB_SUB		},
 	// Teletext Subtitle
 	{ PES_PRIVATE,							TELETEXT_SUB}
-
 };
 
 DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, BOOL bAddStream/* = TRUE*/)
@@ -911,6 +913,15 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 					dtshdr h;
 					if (Read(h, len, &s.mt, false)) {
 						s.dts.bDTSCore = true;
+						type = stream_type::audio;
+					}
+				}
+
+				// OPUS
+				if (type == stream_type::unknown && (stream_type & OPUS_AUDIO)) {
+					Seek(start);
+					opus_ts_hdr h;
+					if (Read(h, len, m_pPMT_ExtraData[pid], &s.mt)) {
 						type = stream_type::audio;
 					}
 				}
@@ -1436,6 +1447,31 @@ static void Descriptor_59(CGolombBuffer& gb, int descriptor_length, CString& ISO
 	}
 }
 
+static const BYTE opus_default_extradata[30] = {
+	'O', 'p', 'u', 's', 'H', 'e', 'a', 'd',
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
+
+static const BYTE opus_coupled_stream_cnt[9] = {
+	1, 0, 1, 1, 2, 2, 2, 3, 3
+};
+
+static const BYTE opus_stream_cnt[9] = {
+	1, 1, 1, 2, 2, 3, 4, 4, 5,
+};
+
+static const BYTE opus_channel_map[8][8] = {
+	{ 0 },
+	{ 0,1 },
+	{ 0,2,1 },
+	{ 0,1,2,3 },
+	{ 0,4,1,2,3 },
+	{ 0,4,1,2,3,5 },
+	{ 0,4,1,2,3,5,6 },
+	{ 0,6,1,2,3,4,5,7 },
+};
+
 void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 {
 	if (CPrograms::CPair* pPair = m_programs.Lookup(pid)) {
@@ -1503,6 +1539,28 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 						case 0x59: // Subtitling descriptor
 							DVB_SUBTITLE = TRUE;
 							Descriptor_59(gb, descriptor_length, ISO_639_language_code);
+							break;
+						case 0x7f: // DVB extension descriptor
+							{
+								BYTE ext_desc_tag = gb.BitRead(8);
+								if (ext_desc_tag == 0x80) {
+									int channel_config_code = gb.BitRead(8);
+									if (channel_config_code >= 0 && channel_config_code <= 0x8) {
+										CAtlArray<BYTE>& extradata = m_pPMT_ExtraData[pid];
+										if (extradata.GetCount() != sizeof(opus_default_extradata)) {
+											extradata.SetCount(sizeof(opus_default_extradata));
+											memcpy(extradata.GetData(), &opus_default_extradata, sizeof(opus_default_extradata));
+
+											BYTE channels = 0;
+											extradata[9]  = channels = channel_config_code ? channel_config_code : 2;
+											extradata[18] = channel_config_code ? (channels > 2) : 255;
+											extradata[19] = opus_stream_cnt[channel_config_code];
+											extradata[20] = opus_coupled_stream_cnt[channel_config_code];
+											memcpy(&extradata[21], opus_channel_map[channels - 1], channels);
+										}
+									}
+								}
+							}
 							break;
 						default:
 							gb.SkipBytes(descriptor_length);

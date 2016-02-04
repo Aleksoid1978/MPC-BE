@@ -435,6 +435,7 @@ public:
 	void UpdatePSM();
 
 	CAtlMap<DWORD, CStringA> m_pPMT_Lang;
+	CAtlMap<DWORD, CAtlArray<BYTE>> m_pPMT_ExtraData;
 
 	bool GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type);
 
