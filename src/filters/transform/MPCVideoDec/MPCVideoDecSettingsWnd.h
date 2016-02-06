@@ -44,8 +44,6 @@ enum {
 	IDC_PP_SW_P216,
 	IDC_PP_SW_Y416,
 	IDC_PP_SW_RGB32,
-	IDC_PP_SWPRESET,
-	IDC_PP_SWSTANDARD,
 	IDC_PP_SWRGBLEVELS,
 	IDC_PP_RESET,
 };
@@ -89,8 +87,6 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CStatic     m_txt444;
 	CStatic     m_txtRGB;
 	CButton		m_cbFormat[PixFmt_count];
-	CStatic     m_txtSwPreset;
-	CComboBox   m_cbSwPreset;
 	CStatic     m_txtSwRGBLevels;
 	CComboBox   m_cbSwRGBLevels;
 

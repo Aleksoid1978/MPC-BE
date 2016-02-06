@@ -59,7 +59,6 @@ protected:
 	int										m_nDXVACheckCompatibility;
 	int										m_nDXVA_SD;
 	bool									m_fPixFmts[PixFmt_count];
-	int										m_nSwPreset;
 	int										m_nSwRGBLevels;
 	//
 
@@ -229,8 +228,6 @@ public:
 	STDMETHODIMP SetSwRefresh(int nValue);
 	STDMETHODIMP SetSwPixelFormat(MPCPixelFormat pf, bool enable);
 	STDMETHODIMP_(bool) GetSwPixelFormat(MPCPixelFormat pf);
-	STDMETHODIMP SetSwPreset(int nValue);
-	STDMETHODIMP_(int) GetSwPreset();
 	STDMETHODIMP SetSwRGBLevels(int nValue);
 	STDMETHODIMP_(int) GetSwRGBLevels();
 

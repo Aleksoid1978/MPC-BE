@@ -124,8 +124,6 @@ public IUnknown {
 	STDMETHOD(SetSwRefresh(int nValue)) PURE;
 	STDMETHOD(SetSwPixelFormat(MPCPixelFormat pf, bool enable)) PURE;
 	STDMETHOD_(bool, GetSwPixelFormat(MPCPixelFormat pf)) PURE;
-	STDMETHOD(SetSwPreset(int nValue)) PURE;
-	STDMETHOD_(int, GetSwPreset()) PURE;
 	STDMETHOD(SetSwRGBLevels(int nValue)) PURE;
 	STDMETHOD_(int, GetSwRGBLevels()) PURE;
 
