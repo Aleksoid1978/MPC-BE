@@ -1316,11 +1316,8 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					__int64 nextPos;
 					for (;;) {
 						REFERENCE_TIME rtPTS = m_pFile->NextPTS(TrackNum, stream.codec, nextPos);
-						if (rtPTS == INVALID_TIME) {
-							break;
-						}
-
-						if (rtmin <= rtPTS && rtPTS < rtmax) {
+						if (rtPTS != INVALID_TIME
+								&& rtmin <= rtPTS && rtPTS < rtmax) {
 							minseekpos = m_pFile->GetPos();
 
 							if (stream.codec == CMpegSplitterFile::stream_codec::MPEG
@@ -1339,7 +1336,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 							break;
 						}
 
-						REFERENCE_TIME dt = rtPTS - rtmax;
+						REFERENCE_TIME dt = rtPTS == INVALID_TIME ? rtPTS : rtPTS - rtmax;
 						if (rtPTS < 0) {
 							dt = 20 * UNITS / div;
 						}
