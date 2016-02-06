@@ -175,7 +175,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	combo_w = ScaleX(85);
 	label_w = ScaleX(185);
 	width_s = label_w + combo_w;
-	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(195))), this, (UINT)IDC_STATIC);
+	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(170))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// Software output formats
@@ -205,15 +205,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h20;
 	m_txtRGB.Create(_T("RGB:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbFormat[PixFmt_RGB32].Create(_T("RGB32"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(56), m_fontheight)), this, IDC_PP_SW_RGB32);
-	p.y += h25;
-
-	// Preset
-	m_txtSwPreset.Create(ResStr(IDS_VDF_COLOR_PRESET), WS_VISIBLE|WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbSwPreset.Create (dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p + CSize(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_SWPRESET);
-	m_cbSwPreset.AddString(_T("Fastest"));
-	m_cbSwPreset.AddString(_T("Fast"));
-	m_cbSwPreset.AddString(_T("Normal"));
-	m_cbSwPreset.AddString(_T("Full"));
 	p.y += h25;
 
 	// Output levels
@@ -253,7 +244,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 			}
 		}
 
-		m_cbSwPreset.SetCurSel(m_pMDF->GetSwPreset());
 		m_cbSwRGBLevels.SetCurSel(m_pMDF->GetSwRGBLevels());
 
 		if (m_cbFormat[PixFmt_RGB32].GetCheck() == BST_UNCHECKED) {
@@ -301,8 +291,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		// === New swscaler options
 		int refresh = 0; // no refresh
 
-		if (m_cbSwPreset.GetCurSel() != m_pMDF->GetSwPreset()
-				|| m_cbSwRGBLevels.GetCurSel() != m_pMDF->GetSwRGBLevels()) {
+		if (m_cbSwRGBLevels.GetCurSel() != m_pMDF->GetSwRGBLevels()) {
 			refresh = 1; // soft refresh - signal new swscaler colorspace details
 		}
 
@@ -320,7 +309,6 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		}
 
 		if (refresh >= 1) {
-			m_pMDF->SetSwPreset(m_cbSwPreset.GetCurSel());
 			m_pMDF->SetSwRGBLevels(m_cbSwRGBLevels.GetCurSel());
 		}
 
@@ -377,7 +365,6 @@ void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 			m_cbFormat[i].SetCheck(BST_CHECKED);
 		}
 	}
-	m_cbSwPreset.SetCurSel(2);
 	m_cbSwRGBLevels.SetCurSel(0);
 	m_cbSwRGBLevels.EnableWindow(TRUE);
 }
@@ -399,12 +386,6 @@ BOOL CMPCVideoDecSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT *
 		switch (nID) {
 		case IDC_PP_AR:
 			strTipText = ResStr(IDS_VDF_TT_AR);
-			break;
-		case IDC_PP_SWPRESET:
-			strTipText = ResStr(IDS_VDF_TT_PRESET);
-			break;
-		case IDC_PP_SWSTANDARD:
-			strTipText = ResStr(IDS_VDF_TT_STANDARD);
 			break;
 		case IDC_PP_SWRGBLEVELS:
 			strTipText = ResStr(IDS_VDF_TT_RGB_LEVELS);
