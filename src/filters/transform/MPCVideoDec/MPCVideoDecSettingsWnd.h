@@ -91,8 +91,6 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CButton		m_cbFormat[PixFmt_count];
 	CStatic     m_txtSwPreset;
 	CComboBox   m_cbSwPreset;
-	CStatic     m_txtSwStandard;
-	CComboBox   m_cbSwStandard;
 	CStatic     m_txtSwRGBLevels;
 	CComboBox   m_cbSwRGBLevels;
 
