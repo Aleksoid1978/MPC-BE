@@ -175,7 +175,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	combo_w = ScaleX(85);
 	label_w = ScaleX(185);
 	width_s = label_w + combo_w;
-	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(220))), this, (UINT)IDC_STATIC);
+	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(195))), this, (UINT)IDC_STATIC);
 	p.y += h20;
 
 	// Software output formats
@@ -216,14 +216,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbSwPreset.AddString(_T("Full"));
 	p.y += h25;
 
-	// Standard (ITU-R Recommendation)
-	m_txtSwStandard.Create(ResStr(IDS_VDF_COLOR_STANDARD), WS_VISIBLE|WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbSwStandard.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p + CSize(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_SWSTANDARD);
-	m_cbSwStandard.AddString(_T("SD (BT.601)"));
-	m_cbSwStandard.AddString(_T("HD (BT.709)"));
-	m_cbSwStandard.AddString(ResStr(IDS_VDF_AUTO));
-	p.y += h25;
-
 	// Output levels
 	m_txtSwRGBLevels.Create(ResStr(IDS_VDF_COLOR_RGB_LEVELS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbSwRGBLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p + CSize(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_SWRGBLEVELS);
@@ -262,7 +254,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		}
 
 		m_cbSwPreset.SetCurSel(m_pMDF->GetSwPreset());
-		m_cbSwStandard.SetCurSel(m_pMDF->GetSwStandard());
 		m_cbSwRGBLevels.SetCurSel(m_pMDF->GetSwRGBLevels());
 
 		if (m_cbFormat[PixFmt_RGB32].GetCheck() == BST_UNCHECKED) {
@@ -311,7 +302,6 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		int refresh = 0; // no refresh
 
 		if (m_cbSwPreset.GetCurSel() != m_pMDF->GetSwPreset()
-				|| m_cbSwStandard.GetCurSel() != m_pMDF->GetSwStandard()
 				|| m_cbSwRGBLevels.GetCurSel() != m_pMDF->GetSwRGBLevels()) {
 			refresh = 1; // soft refresh - signal new swscaler colorspace details
 		}
@@ -331,7 +321,6 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 
 		if (refresh >= 1) {
 			m_pMDF->SetSwPreset(m_cbSwPreset.GetCurSel());
-			m_pMDF->SetSwStandard(m_cbSwStandard.GetCurSel());
 			m_pMDF->SetSwRGBLevels(m_cbSwRGBLevels.GetCurSel());
 		}
 
@@ -389,7 +378,6 @@ void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 		}
 	}
 	m_cbSwPreset.SetCurSel(2);
-	m_cbSwStandard.SetCurSel(2);
 	m_cbSwRGBLevels.SetCurSel(0);
 	m_cbSwRGBLevels.EnableWindow(TRUE);
 }
