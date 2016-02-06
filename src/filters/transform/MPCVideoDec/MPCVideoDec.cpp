@@ -1075,7 +1075,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 	avcodec_register_all();
 	av_log_set_callback(ff_log);
-	m_FormatConverter.SetOptions(m_nSwPreset, 2, m_nSwRGBLevels);
+	m_FormatConverter.SetOptions(m_nSwPreset, m_nSwRGBLevels);
 
 	HWND hWnd = NULL;
 	EnumWindows(EnumFindProcessWnd, (LPARAM)&hWnd);
@@ -2846,7 +2846,7 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 
 	// change swscaler colorspace details
 	if (nType >= 1) {
-		m_FormatConverter.SetOptions(m_nSwPreset, 2, m_nSwRGBLevels);
+		m_FormatConverter.SetOptions(m_nSwPreset, m_nSwRGBLevels);
 	}
 
 	// change output media format

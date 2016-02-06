@@ -257,10 +257,8 @@ void  CFormatConverter::UpdateDetails()
 				dstRange = 1;
 			}
 
-			if (m_autocolorspace) {
-				m_colorspace = m_FProps.colorspace;
-				// SWS_CS_* does not fully comply with the AVCOL_SPC_*, but it is well handled in the libswscale.
-			}
+			m_colorspace = m_FProps.colorspace;
+			// SWS_CS_* does not fully comply with the AVCOL_SPC_*, but it is well handled in the libswscale.
 
 			if (isAnyRGB(m_pSwsContext->srcFormat) || isAnyRGB(m_pSwsContext->dstFormat)) {
 				inv_tbl = (int *)sws_getCoefficients(m_colorspace);
@@ -365,24 +363,8 @@ void CFormatConverter::UpdateOutput2(DWORD biCompression, LONG biWidth, LONG biH
 	UpdateOutput(GetPixFormat(biCompression), biWidth, abs(biHeight));
 }
 
-void CFormatConverter::SetOptions(int preset, int standard, int rgblevels)
+void CFormatConverter::SetOptions(int preset, int rgblevels)
 {
-	switch (standard) {
-	case 0  : // SD(BT.601)
-		m_autocolorspace = false;
-		m_colorspace = SWS_CS_ITU601;
-		break;
-	case 1  : // HD(BT.709)
-		m_autocolorspace = false;
-		m_colorspace = SWS_CS_ITU709;
-		break;
-	case 2  : // Auto
-	default :
-		m_autocolorspace = true;
-		m_colorspace = SWS_CS_DEFAULT; // will be specified in the UpdateDetails().
-		break;
-	}
-
 	m_dstRGBRange = rgblevels == 1 ? 0 : 1;
 
 	int swsFlags = 0;
