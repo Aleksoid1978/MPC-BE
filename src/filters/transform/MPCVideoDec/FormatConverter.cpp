@@ -170,7 +170,6 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 CFormatConverter::CFormatConverter()
 	: m_pSwsContext(NULL)
 	, m_out_pixfmt(PixFmt_None)
-	, m_swsFlags(SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INP)
 	, m_colorspace(SWS_CS_DEFAULT)
 	, m_dstRGBRange(0)
 	, m_dstStride(0)
@@ -224,7 +223,7 @@ bool CFormatConverter::Init()
 						m_FProps.width,
 						m_FProps.height,
 						swof.av_pix_fmt,
-						m_swsFlags | SWS_PRINT_INFO,
+						SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INP | SWS_PRINT_INFO,
 						NULL,
 						NULL,
 						NULL);
@@ -363,35 +362,11 @@ void CFormatConverter::UpdateOutput2(DWORD biCompression, LONG biWidth, LONG biH
 	UpdateOutput(GetPixFormat(biCompression), biWidth, abs(biHeight));
 }
 
-void CFormatConverter::SetOptions(int preset, int rgblevels)
+void CFormatConverter::SetOptions(int rgblevels)
 {
 	m_dstRGBRange = rgblevels == 1 ? 0 : 1;
 
-	int swsFlags = 0;
-	switch (preset) {
-	case 0  : // "Fastest"
-		swsFlags = SWS_FAST_BILINEAR/* | SWS_ACCURATE_RND*/;
-		// SWS_FAST_BILINEAR or SWS_POINT disable dither and enable low-quality yv12_to_yuy2 conversion.
-		// any interpolation type has no effect.
-		break;
-	case 1  : // "Fast"
-		swsFlags = SWS_BILINEAR | SWS_ACCURATE_RND;
-		break;
-	case 2  :// "Normal"
-	default :
-		swsFlags = SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INP;
-		break;
-	case 3  : // "Full"
-		swsFlags = SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INP | SWS_FULL_CHR_H_INT;
-		break;
-	}
-
-	if (swsFlags != m_swsFlags) {
-		Cleanup();
-		m_swsFlags = swsFlags;
-	} else {
-		UpdateDetails();
-	}
+	UpdateDetails();
 }
 
 int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
