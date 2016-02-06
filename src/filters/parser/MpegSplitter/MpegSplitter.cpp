@@ -569,7 +569,7 @@ bool CMpegSplitterFilter::IsHdmvDvbSubPinDrying()
 		POSITION pos = m_pActivePins.GetHeadPosition();
 		while (pos) {
 			CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
-			if (pPin->QueueCount() == 0 && ((CMpegSplitterOutputPin*)pPin)->NeedNextSubtitle()) {
+			if (((CMpegSplitterOutputPin*)pPin)->NeedNextSubtitle()) {
 				return true;
 			}
 		}
@@ -1893,6 +1893,8 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		if (p && p->GetCount() >= 3) {
 			int segtype = p->GetData()[0];
 			//int unitsize = p->GetData()[1] << 8 | p->GetData()[2];
+			//if (segtype == 22) LOG2FILE(L"");
+			//LOG2FILE(L"segtype %3d, unitsize %5d, time %4.3f", segtype, unitsize, p->rtStart/10000000.0);
 
 			if (segtype == 22) {
 				// this is first packet of HDMV sub, set standart mode
