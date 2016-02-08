@@ -49,14 +49,14 @@
  * @file
  * Reference: libavcodec/amrwbdec.c
  */
-#ifndef AVCODEC_AMRWBDEC_MIPS_H
-#define AVCODEC_AMRWBDEC_MIPS_H
+#ifndef AVCODEC_MIPS_AMRWBDEC_MIPS_H
+#define AVCODEC_MIPS_AMRWBDEC_MIPS_H
 #include "config.h"
 
 #if HAVE_MIPSFPU && HAVE_INLINE_ASM
-void hb_fir_filter_mips(float *out, const float fir_coef[],
+void ff_hb_fir_filter_mips(float *out, const float fir_coef[],
                           float mem[], const float *in);
-#define hb_fir_filter hb_fir_filter_mips
+#define hb_fir_filter ff_hb_fir_filter_mips
 #endif
 
-#endif /* AVCODEC_AMRWBDEC_MIPS_H  */
+#endif /* AVCODEC_MIPS_AMRWBDEC_MIPS_H  */

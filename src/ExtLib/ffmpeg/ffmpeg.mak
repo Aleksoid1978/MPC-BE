@@ -151,10 +151,12 @@ SRCS_LC = \
 	libavcodec/cook.c \
 	libavcodec/cscd.c \
 	libavcodec/dca.c \
+	libavcodec/dca_core.c \
 	libavcodec/dca_exss.c \
 	libavcodec/dca_parser.c \
 	libavcodec/dca_xll.c \
 	libavcodec/dcadata.c \
+	libavcodec/dcadct.c \
 	libavcodec/dcadec.c \
 	libavcodec/dcadsp.c \
 	libavcodec/dct.c \
@@ -165,6 +167,7 @@ SRCS_LC = \
 	libavcodec/dirac_dwt.c \
 	libavcodec/diracdec.c \
 	libavcodec/diracdsp.c \
+	libavcodec/diractab.c \
 	libavcodec/dnxhd_parser.c \
 	libavcodec/dnxhddata.c \
 	libavcodec/dnxhddec.c \
@@ -267,7 +270,6 @@ SRCS_LC = \
 	libavcodec/lagarith.c \
 	libavcodec/lagarithrac.c \
 	libavcodec/latm_parser.c \
-	libavcodec/libdcadec.c \
 	libavcodec/libopenjpegdec.c \
 	libavcodec/libspeexdec.c \
 	libavcodec/lossless_audiodsp.c \
@@ -465,8 +467,8 @@ SRCS_LC = \
 	libavcodec/x86/constants.c \
 	libavcodec/x86/dcadsp_init.c \
 	libavcodec/x86/dct_init.c \
-	libavcodec/x86/dirac_dwt.c \
-	libavcodec/x86/diracdsp_mmx.c \
+	libavcodec/x86/dirac_dwt_init.c \
+	libavcodec/x86/diracdsp_init.c \
 	libavcodec/x86/fdct.c \
 	libavcodec/x86/fdctdsp_init.c \
 	libavcodec/x86/fft_init.c \
@@ -500,6 +502,7 @@ SRCS_LC = \
 	libavcodec/x86/sbrdsp_init.c \
 	libavcodec/x86/simple_idct.c \
 	libavcodec/x86/snowdsp.c \
+	libavcodec/x86/synth_filter_init.c \
 	libavcodec/x86/takdsp_init.c \
 	libavcodec/x86/ttadsp_init.c \
 	libavcodec/x86/v210-init.c \
@@ -642,8 +645,8 @@ SRCS_YASM_LC = \
 	libavcodec/x86/bswapdsp.asm \
 	libavcodec/x86/dcadsp.asm \
 	libavcodec/x86/dct32.asm \
-	libavcodec/x86/diracdsp_yasm.asm \
-	libavcodec/x86/dwt_yasm.asm \
+	libavcodec/x86/dirac_dwt.asm \
+	libavcodec/x86/diracdsp.asm \
 	libavcodec/x86/fft.asm \
 	libavcodec/x86/flacdsp.asm \
 	libavcodec/x86/fmtconvert.asm \
@@ -685,6 +688,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/rv40dsp.asm \
 	libavcodec/x86/sbrdsp.asm \
 	libavcodec/x86/simple_idct10.asm \
+	libavcodec/x86/synth_filter.asm \
 	libavcodec/x86/takdsp.asm \
 	libavcodec/x86/ttadsp.asm \
 	libavcodec/x86/v210.asm \

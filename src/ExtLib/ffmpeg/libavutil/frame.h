@@ -117,6 +117,11 @@ enum AVFrameSideDataType {
      * mastering display color volume.
      */
     AV_FRAME_DATA_MASTERING_DISPLAY_METADATA,
+   /**
+     * The GOP timecode in 25 bit timecode format. Data format is 64-bit integer.
+     * This is set on the first frame of a GOP that has a temporal reference of 0.
+     */
+    AV_FRAME_DATA_GOP_TIMECODE,
 
     // ==> Start patch MPC
     /**
