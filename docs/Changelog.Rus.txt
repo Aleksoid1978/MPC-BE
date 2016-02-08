@@ -13,7 +13,7 @@
 	jsoncpp git-1.0.0-436-g9234cbb;
 	libpng-1.6.21-signed-1-g5031c77;
 	Little-CMS git-2.7-41-g0a78f85;
-	MediaInfo git-v0.7.81-17-g8b497cf;
+	MediaInfo git-v0.7.82-10-ge7423fe;
 	Speex-1.2rc2-9-g9172c7e;
 	ZenLib git-v0.4.32-24-g8df5da0.
 

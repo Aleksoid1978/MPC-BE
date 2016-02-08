@@ -1155,6 +1155,10 @@ void File_MpegTs::Streams_Update_Duration_Update()
         int64u  TimeStamp_HasProblems=0;
     #endif // MEDIAINFO_ADVANCED
 
+    int64u Duration_Count=0;
+    int64u Duration_Max=0;
+    int64u Duration_Sum=0;
+    int64u Bytes_Sum=0;
     for (std::map<int16u, int16u>::iterator PCR_PID=Complete_Stream->PCR_PIDs.begin(); PCR_PID!=Complete_Stream->PCR_PIDs.end(); ++PCR_PID)
     {
         complete_stream::streams::iterator Stream=Complete_Stream->Streams.begin()+PCR_PID->first;
@@ -1182,11 +1186,11 @@ void File_MpegTs::Streams_Update_Duration_Update()
                 }
                 Bytes=(*Stream)->TimeStamp_End_Offset-(*Stream)->TimeStamp_Start_Offset;
 
-                if (Duration && Bytes)
-                {
-                    Fill(Stream_General, 0, General_Duration, ((float64)Duration)/27000, 6, true);
-                    Fill(Stream_General, 0, General_OverallBitRate, Bytes*8/(((float64)Duration)/27000000), 0, true);
-                }
+                if (Duration>Duration_Max)
+                    Duration_Max=Duration;
+                Duration_Count++;
+                Duration_Sum+=Duration;
+                Bytes_Sum+=Bytes;
 
                 (*Stream)->TimeStamp_End_IsUpdated=false;
                 (*Stream)->IsPCR_Duration=(float64)Duration;
@@ -1229,6 +1233,19 @@ void File_MpegTs::Streams_Update_Duration_Update()
                 }
             #endif // MEDIAINFO_ADVANCED
         }
+    }
+
+    if (Duration_Max)
+        Fill(Stream_General, 0, General_Duration, ((float64)Duration_Max) / 27000, 6, true);
+    if (Duration_Count && Duration_Sum && Bytes_Sum)
+    {
+        //Filling Duration and bitrate with an average of content from all streams with PCR
+        //Min and Max are based on a a 1 byte precision in the computed byte count + +/- 500 ns tolerance for hte PCR vale
+        Fill(Stream_General, 0, General_OverallBitRate, Bytes_Sum * 8 / (((float64)Duration_Sum) / 27000000), 0, true);
+        Fill(Stream_General, 0, "OverallBitRate_Precision_Min", (Bytes_Sum - Duration_Count) * 8 / (((float64)(Duration_Sum + 13500 * Duration_Count)) / 27000000), 0, true);
+        (*Stream_More)[Stream_General][0](Ztring().From_Local("OverallBitRate_Precision_Min"), Info_Options) = __T("N NT");
+        Fill(Stream_General, 0, "OverallBitRate_Precision_Max", (Bytes_Sum + Duration_Count) * 8 / (((float64)(Duration_Sum - 13500 * Duration_Count)) / 27000000), 0, true);
+        (*Stream_More)[Stream_General][0](Ztring().From_Local("OverallBitRate_Precision_Max"), Info_Options) = __T("N NT");
     }
 
     if (IsVbr)

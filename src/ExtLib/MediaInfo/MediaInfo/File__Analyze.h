@@ -1205,7 +1205,7 @@ private :
     BitStream*      BT;             //For conversion from bytes to bitstream
 public : //TO CHANGE
     int64u Header_Size;             //Size of the header of the current element
-    const Ztring &Details_Get() {return Element[0].ToShow.Details;} //Direct access to details
+    Ztring &Details_Get(size_t Level=0) {return Element[Level].ToShow.Details;} //Direct access to details
     void   Details_Clear();
 protected :
     bool Trace_DoNotSave;

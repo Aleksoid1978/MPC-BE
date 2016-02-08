@@ -306,6 +306,7 @@ private :
     int64u   TrackType;
 
     //Temp
+    int8u   InvalidByteMax;
     int64u  Format_Version;
     int64u  TimecodeScale;
     float64 Duration;
@@ -314,15 +315,24 @@ private :
     int64u  TrackVideoDisplayHeight;
     int32u  AvgBytesPerSec;
     int64u  Segment_Cluster_TimeCode_Value;
-    bool    Info_AlreadyParsed;
-    bool    Tracks_AlreadyParsed;
-    bool    Cluster_AlreadyParsed;
+    size_t  Segment_Info_Count;
+    size_t  Segment_Tracks_Count;
+    size_t  Segment_Cluster_Count;
     typedef std::map<Ztring, Ztring> tagspertrack;
     typedef std::map<int64u, tagspertrack> tags;
     tags    Segment_Tags_Tag_Items;
     int64u  Segment_Tags_Tag_Targets_TrackUID_Value;
     bool    CurrentAttachmentIsCover;
     bool    CoverIsSetFromAttachment;
+    struct crc32
+    {
+        int64u  Pos;
+        int64u  From;
+        int64u  UpTo;
+        int32u  Computed;
+        int32u  Expected;
+    };
+    std::vector<crc32> CRC32Compute;
 
     //Chapters
     struct chapterdisplay
@@ -355,6 +365,13 @@ private :
     std::vector<Ztring> Segment_Tag_SimpleTag_TagNames;
     int64u Segment_Cluster_BlockGroup_BlockDuration_Value;
     int64u Segment_Cluster_BlockGroup_BlockDuration_TrackNumber;
+
+    //Helpers
+    void JumpTo(int64u GoTo);
+    void TestMultipleInstances(size_t* Instances=NULL);
+    void CRC32_Check();
+    void CRC32_Compute(int32u &CRC32, int32u Init, const int8u* Buffer_Begin, const int8u* Buffer_End);
+    void CRC32_Compute(int32u &CRC32, const int8u* Buffer_Begin, const int8u* Buffer_End);
 };
 
 } //NameSpace

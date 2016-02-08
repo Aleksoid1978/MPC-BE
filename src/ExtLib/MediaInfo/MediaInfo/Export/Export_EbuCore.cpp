@@ -1659,6 +1659,15 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version)
     if (!MI.Get(Stream_General, 0, General_ID).empty())
         ToReturn+=__T(" containerFormatId=\"")+MI.Get(Stream_General, 0, General_ID)+__T("\"");
     ToReturn+=__T(">\n");
+    if (Version >= Version_1_6)
+    {
+        ToReturn += __T("\t\t\t\t<ebucore:containerEncoding");
+        if (!MI.Get(Stream_General, 0, General_Format).empty())
+            ToReturn += __T(" formatLabel=\"") + MI.Get(Stream_General, 0, General_Format) + __T("\"");
+        //if (Version>=Version_1_6 && !MI.Get(Stream_General, 0, General_Format_Profile).empty())
+        //    ToReturn+=__T(" containeFormatProfile=\"")+MI.Get(Stream_General, 0, General_Format_Profile)+__T("\"");
+        ToReturn += __T("/>\n");
+    }
     if (!MI.Get(Stream_General, 0, General_CodecID).empty() || (!MI.Get(Stream_General, 0, General_Format_Commercial_IfAny).empty()))
     {
         ToReturn+=__T("\t\t\t\t<ebucore:codec>\n");
@@ -1671,15 +1680,6 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version)
         if (!MI.Get(Stream_General, 0, General_Format_Commercial_IfAny).empty())
             ToReturn+=__T("\t\t\t\t\t<ebucore:name>")+MI.Get(Stream_General, 0, General_Format_Commercial_IfAny)+__T("</ebucore:name>\n");
         ToReturn+=__T("\t\t\t\t</ebucore:codec>\n");
-    }
-    if (Version>=Version_1_6)
-    {
-        ToReturn+=__T("\t\t\t\t<ebucore:containerEncoding");
-        if (!MI.Get(Stream_General, 0, General_Format).empty())
-            ToReturn+=__T(" formatLabel=\"")+MI.Get(Stream_General, 0, General_Format)+__T("\"");
-        //if (Version>=Version_1_6 && !MI.Get(Stream_General, 0, General_Format_Profile).empty())
-        //    ToReturn+=__T(" containeFormatProfile=\"")+MI.Get(Stream_General, 0, General_Format_Profile)+__T("\"");
-        ToReturn+=__T("/>\n");
     }
     //format - containerFormat - technicalAttributeString - AS11ShimName
     if (As11_Core_Pos!=(size_t)-1 && !MI.Get(Stream_Other, As11_Core_Pos, __T("ShimName")).empty())

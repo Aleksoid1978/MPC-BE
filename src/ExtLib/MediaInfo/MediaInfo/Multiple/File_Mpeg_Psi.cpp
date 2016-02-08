@@ -533,6 +533,20 @@ const char* Mpeg_Psi_atsc_service_type(int8u service_type)
 }
 
 //---------------------------------------------------------------------------
+string Mpeg_Psi_atsc_modulation_mode(int8u modulation_mode)
+{
+    switch (modulation_mode)
+    {
+        case 0x01 : return "Analog";
+        case 0x02 : return "SCTE_mode_1";
+        case 0x03 : return "SCTE_mode_2";
+        case 0x04 : return "ATSC (8 VSB)";
+        case 0x05 : return "ATSC (16 VSB)";
+        default   : return Ztring::ToZtring(modulation_mode).To_UTF8();
+    }
+}
+
+//---------------------------------------------------------------------------
 const char* Mpeg_Psi_table_id_extension(int8u table_id)
 {
     switch (table_id)
@@ -1816,7 +1830,7 @@ void File_Mpeg_Psi::Table_C9()
     for (int8u Pos=0; Pos<num_channels_in_section; Pos++)
     {
         int16u major_channel_number, minor_channel_number, source_id;
-        int8u service_type;
+        int8u service_type, modulation_mode;
         Element_Begin0();
         Get_UTF16B(table_id==0xDA?16:14, short_name,            "short_name"); //8 chars for satellite, else 7 chars
         BS_Begin();
@@ -1825,7 +1839,7 @@ void File_Mpeg_Psi::Table_C9()
         Get_S2 (10, minor_channel_number,                       "minor_channel_number");
         if (table_id==0xDA) //Satellite
         {
-            Skip_S1( 6,                                         "modulation_mode");
+            Get_S1 ( 6, modulation_mode,                        "modulation_mode");
             Skip_S4(32,                                         "carrier_frequency");
             Skip_S4(32,                                         "carrier_symbol_rate");
             Skip_S1( 2,                                         "polarization");
@@ -1835,7 +1849,7 @@ void File_Mpeg_Psi::Table_C9()
         else //Terrestrial and Cable
         {
             BS_End();
-            Skip_B1(                                            "modulation_mode");
+            Get_B1 (modulation_mode,                            "modulation_mode");
             Skip_B4(                                            "carrier_frequency");
         }
         Skip_B2(                                                "channel_TSID");
@@ -1885,6 +1899,8 @@ void File_Mpeg_Psi::Table_C9()
                 Complete_Stream->Transport_Streams[table_id_extension].Programs[program_number].source_id=source_id;
                 Complete_Stream->Transport_Streams[table_id_extension].Programs[program_number].source_id_IsValid=true;
             }
+            if (modulation_mode)
+                Complete_Stream->Transport_Streams[table_id_extension].Programs[program_number].Infos["ModulationMode"].From_UTF8(Mpeg_Psi_atsc_modulation_mode(modulation_mode).c_str());
         FILLING_END();
 
         //Descriptors
