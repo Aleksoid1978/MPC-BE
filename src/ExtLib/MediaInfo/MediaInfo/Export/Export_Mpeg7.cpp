@@ -39,6 +39,26 @@ extern MediaInfo_Config Config;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+Ztring Mpeg7_XML_Encode(const Ztring& Data)
+{
+    Ztring Result;
+    wstring::size_type Pos;
+    for (Pos = 0; Pos<Data.size(); Pos++)
+    {
+        switch (Data[Pos])
+        {
+        case __T('"'): Result += __T("&quot;"); break;
+        case __T('&'): Result += __T("&amp;"); break;
+        case __T('\''): Result += __T("&apos;"); break;
+        case __T('<'): Result += __T("&lt;"); break;
+        case __T('>'): Result += __T("&lg;"); break;
+        default: Result += Data[Pos];
+        }
+    }
+    return Result;
+}
+
+//---------------------------------------------------------------------------
 const Char* Mpeg7_Type(MediaInfo_Internal &MI) //TO ADAPT
 {
     if (MI.Count_Get(Stream_Image))
@@ -1249,17 +1269,17 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
         ToReturn+=__T("\t\t<mpeg7:CreationInformation>\n");
         ToReturn+=__T("\t\t\t<mpeg7:Creation>\n");
         if (!MI.Get(Stream_General, 0, General_Movie).empty())
-            ToReturn+=__T("\t\t\t\t<mpeg7:Title type=\"songTitle\">")+MI.Get(Stream_General, 0, General_Movie)+__T("</mpeg7:Title>\n");
+            ToReturn+=__T("\t\t\t\t<mpeg7:Title type=\"songTitle\">")+Mpeg7_XML_Encode(MI.Get(Stream_General, 0, General_Movie))+__T("</mpeg7:Title>\n");
         if (!MI.Get(Stream_General, 0, General_Track).empty())
-            ToReturn+=__T("\t\t\t\t<mpeg7:Title type=\"songTitle\">")+MI.Get(Stream_General, 0, General_Title)+__T("</mpeg7:Title>\n");
+            ToReturn+=__T("\t\t\t\t<mpeg7:Title type=\"songTitle\">")+Mpeg7_XML_Encode(MI.Get(Stream_General, 0, General_Title))+__T("</mpeg7:Title>\n");
         if (!MI.Get(Stream_General, 0, General_Album).empty())
-            ToReturn+=__T("\t\t\t\t<mpeg7:Title type=\"albumTitle\">")+MI.Get(Stream_General, 0, General_Album)+__T("</mpeg7:Title>\n");
+            ToReturn+=__T("\t\t\t\t<mpeg7:Title type=\"albumTitle\">")+Mpeg7_XML_Encode(MI.Get(Stream_General, 0, General_Album))+__T("</mpeg7:Title>\n");
         if (!MI.Get(Stream_General, 0, General_WrittenBy).empty())
         {
             ToReturn+=__T("\t\t\t\t<mpeg7:Creator>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Role href=\"urn:mpeg:mpeg7:cs:RoleCS:2001:AUTHOR\"/>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Agent xsi:type=\"PersonGroupType\">\n");
-            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+MI.Get(Stream_General, 0, General_WrittenBy)+__T("</mpeg7:Name>\n");
+            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+Mpeg7_XML_Encode(MI.Get(Stream_General, 0, General_WrittenBy))+__T("</mpeg7:Name>\n");
             ToReturn+=__T("\t\t\t\t\t</mpeg7:Agent>\n");
             ToReturn+=__T("\t\t\t\t</mpeg7:Creator>\n");
         }
@@ -1268,7 +1288,7 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
             ToReturn+=__T("\t\t\t\t<mpeg7:Creator>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Role href=\"urn:mpeg:mpeg7:cs:RoleCS:2001:PERFORMER\"/>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Agent xsi:type=\"PersonGroupType\">\n");
-            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+MI.Get(Stream_General, 0, General_Performer)+__T("</mpeg7:Name>\n");
+            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+Mpeg7_XML_Encode(MI.Get(Stream_General, 0, General_Performer))+__T("</mpeg7:Name>\n");
             ToReturn+=__T("\t\t\t\t\t</mpeg7:Agent>\n");
             ToReturn+=__T("\t\t\t\t</mpeg7:Creator>\n");
         }
@@ -1277,7 +1297,7 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
             ToReturn+=__T("\t\t\t\t<mpeg7:Creator>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Role href=\"urn:mpeg:mpeg7:cs:RoleCS:2001:EXECUTIVE-PRODUCER\"/>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Agent xsi:type=\"PersonGroupType\">\n");
-            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+MI.Get(Stream_General, 0, General_ExecutiveProducer)+__T("</mpeg7:Name>\n");
+            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+Mpeg7_XML_Encode(MI.Get(Stream_General, 0, General_ExecutiveProducer))+__T("</mpeg7:Name>\n");
             ToReturn+=__T("\t\t\t\t\t</mpeg7:Agent>\n");
             ToReturn+=__T("\t\t\t\t</mpeg7:Creator>\n");
         }
@@ -1286,7 +1306,7 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
             ToReturn+=__T("\t\t\t\t<mpeg7:Creator>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Role href=\"urn:mpeg:mpeg7:cs:RoleCS:2001:PRODUCER\"/>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Agent xsi:type=\"PersonGroupType\">\n");
-            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+MI.Get(Stream_General, 0, General_Producer)+__T("</mpeg7:Name>\n");
+            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+Mpeg7_XML_Encode(MI.Get(Stream_General, 0, General_Producer))+__T("</mpeg7:Name>\n");
             ToReturn+=__T("\t\t\t\t\t</mpeg7:Agent>\n");
             ToReturn+=__T("\t\t\t\t</mpeg7:Creator>\n");
         }
@@ -1295,7 +1315,7 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
             ToReturn+=__T("\t\t\t\t<mpeg7:Creator>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Role href=\"urn:mpeg:mpeg7:cs:RoleCS:2001:PRODUCER\"/>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Agent xsi:type=\"PersonGroupType\">\n");
-            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+MI.Get(Stream_General, 0, General_Director)+__T("</mpeg7:Name>\n");
+            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+Mpeg7_XML_Encode(MI.Get(Stream_General, 0, General_Director))+__T("</mpeg7:Name>\n");
             ToReturn+=__T("\t\t\t\t\t</mpeg7:Agent>\n");
             ToReturn+=__T("\t\t\t\t</mpeg7:Creator>\n");
         }
@@ -1304,7 +1324,7 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
             ToReturn+=__T("\t\t\t\t<mpeg7:Creator>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Role href=\"urn:mpeg:mpeg7:cs:RoleCS:2001:COMPOSER\"/>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Agent xsi:type=\"PersonGroupType\">\n");
-            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+MI.Get(Stream_General, 0, General_Composer)+__T("</mpeg7:Name>\n");
+            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+Mpeg7_XML_Encode(MI.Get(Stream_General, 0, General_Composer))+__T("</mpeg7:Name>\n");
             ToReturn+=__T("\t\t\t\t\t</mpeg7:Agent>\n");
             ToReturn+=__T("\t\t\t\t</mpeg7:Creator>\n");
         }
@@ -1313,7 +1333,7 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
             ToReturn+=__T("\t\t\t\t<mpeg7:Creator>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Role href=\"urn:mpeg:mpeg7:cs:RoleCS:2001:COSTUME-SUPERVISOR\"/>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Agent xsi:type=\"PersonGroupType\">\n");
-            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+MI.Get(Stream_General, 0, General_CostumeDesigner)+__T("</mpeg7:Name>\n");
+            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+Mpeg7_XML_Encode(MI.Get(Stream_General, 0, General_CostumeDesigner))+__T("</mpeg7:Name>\n");
             ToReturn+=__T("\t\t\t\t\t</mpeg7:Agent>\n");
             ToReturn+=__T("\t\t\t\t</mpeg7:Creator>\n");
         }
@@ -1322,7 +1342,7 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
             ToReturn+=__T("\t\t\t\t<mpeg7:Creator>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Role href=\"urn:mpeg:mpeg7:cs:RoleCS:2001:PRODUCTION-DESIGNER\"/>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Agent xsi:type=\"PersonGroupType\">\n");
-            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+MI.Get(Stream_General, 0, General_ProductionDesigner)+__T("</mpeg7:Name>\n");
+            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+Mpeg7_XML_Encode(MI.Get(Stream_General, 0, General_ProductionDesigner))+__T("</mpeg7:Name>\n");
             ToReturn+=__T("\t\t\t\t\t</mpeg7:Agent>\n");
             ToReturn+=__T("\t\t\t\t</mpeg7:Creator>\n");
         }
@@ -1331,7 +1351,7 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
             ToReturn+=__T("\t\t\t\t<mpeg7:Creator>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Role href=\"urn:mpeg:mpeg7:cs:RoleCS:2001:PUBLISHER\"/>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Agent xsi:type=\"PersonGroupType\">\n");
-            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+MI.Get(Stream_General, 0, General_Publisher)+__T("</mpeg7:Name>\n");
+            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+Mpeg7_XML_Encode(MI.Get(Stream_General, 0, General_Publisher))+__T("</mpeg7:Name>\n");
             ToReturn+=__T("\t\t\t\t\t</mpeg7:Agent>\n");
             ToReturn+=__T("\t\t\t\t</mpeg7:Creator>\n");
         }
@@ -1340,7 +1360,7 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
             ToReturn+=__T("\t\t\t\t<mpeg7:Creator>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Role href=\"urn:mpeg:mpeg7:cs:RoleCS:2001:DISTRIBUTOR\"/>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Agent xsi:type=\"PersonGroupType\">\n");
-            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+MI.Get(Stream_General, 0, General_DistributedBy)+__T("</mpeg7:Name>\n");
+            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+Mpeg7_XML_Encode(MI.Get(Stream_General, 0, General_DistributedBy))+__T("</mpeg7:Name>\n");
             ToReturn+=__T("\t\t\t\t\t</mpeg7:Agent>\n");
             ToReturn+=__T("\t\t\t\t</mpeg7:Creator>\n");
         }
@@ -1348,7 +1368,7 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
         {
             ToReturn+=__T("\t\t\t\t<mpeg7:CreationTool>\n");
             ToReturn+=__T("\t\t\t\t\t<mpeg7:Tool>\n");
-            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+MI.Get(Stream_General, 0, General_Encoded_Library)+__T("</mpeg7:Name>\n");
+            ToReturn+=__T("\t\t\t\t\t\t<mpeg7:Name>")+Mpeg7_XML_Encode(MI.Get(Stream_General, 0, General_Encoded_Library))+__T("</mpeg7:Name>\n");
             ToReturn+=__T("\t\t\t\t\t</mpeg7:Tool>\n");
             ToReturn+=__T("\t\t\t\t</mpeg7:CreationTool>\n");
         }

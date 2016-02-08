@@ -577,7 +577,7 @@ void File_Mpeg4v::Streams_Finish()
     {
         int32u Duration=(Time_End_Seconds-Time_Begin_Seconds)*1000+Time_End_MilliSeconds-Time_Begin_MilliSeconds;
         if (fixed_vop_time_increment && vop_time_increment_resolution)
-            Duration+=(float32_int32s)(((float)1000)/(((float)vop_time_increment_resolution)/fixed_vop_time_increment));
+            Duration+=float32_int32s(((float)1000)/(((float)vop_time_increment_resolution)/fixed_vop_time_increment));
         Fill(Stream_Video, 0, Video_Duration, Duration);
     }
 

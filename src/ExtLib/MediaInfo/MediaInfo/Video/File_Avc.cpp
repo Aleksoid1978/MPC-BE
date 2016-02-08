@@ -1929,6 +1929,7 @@ void File_Avc::slice_header()
                     Element_Info1(__T("Offset of ")+Ztring::ToZtring(ToInsert));
                     TemporalReferences.insert(TemporalReferences.begin()+Base, ToInsert, NULL);
                     TemporalReferences_Offset+=ToInsert;
+                    TemporalReferences_Offset_pic_order_cnt_lsb_Last += ToInsert;
                     TemporalReferences_Max+=ToInsert;
                     TemporalReferences_pic_order_cnt_Min=pic_order_cnt;
                 }
@@ -1951,6 +1952,7 @@ void File_Avc::slice_header()
                 {
                     TemporalReferences_Offset+=TemporalReferences_Reserved;
                     pic_order_cnt-=TemporalReferences_Reserved;
+                    TemporalReferences_pic_order_cnt_Min-=TemporalReferences_Reserved/2;
                     switch ((*seq_parameter_set_Item)->pic_order_cnt_type)
                     {
                         case 0 :
@@ -1962,8 +1964,6 @@ void File_Avc::slice_header()
                         default:;
                     }
                 }
-                else if (Offset && Offset<=2) //Only I-frames
-                    TemporalReferences_Offset+=2;
                 while (TemporalReferences_Offset+pic_order_cnt>=3*TemporalReferences_Reserved)
                 {
                     for (size_t Pos=0; Pos<TemporalReferences_Reserved; Pos++)
@@ -1996,6 +1996,10 @@ void File_Avc::slice_header()
                         TemporalReferences_Max-=TemporalReferences_Reserved;
                     else
                         TemporalReferences_Max=0;
+                    if (TemporalReferences_Reserved<TemporalReferences_Offset_pic_order_cnt_lsb_Last)
+                        TemporalReferences_Offset_pic_order_cnt_lsb_Last-=TemporalReferences_Reserved;
+                    else
+                        TemporalReferences_Offset_pic_order_cnt_lsb_Last=0;
                 }
             }
 

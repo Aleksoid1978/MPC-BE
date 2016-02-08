@@ -2862,7 +2862,7 @@ void File__Analyze::Element_End_Common_Flush_Details()
                 {
                     case MediaInfo_Config::Trace_Format_XML         :
                                                                         {
-                                                                        size_t Start=Element[Element_Level].ToShow.Details.rfind(EOL);
+                                                                        size_t Start=Element[Element_Level].ToShow.Details.rfind(Config_LineSeparator);
                                                                         if (Start==(size_t)-1)
                                                                             Start=0;
 
@@ -3168,7 +3168,7 @@ void File__Analyze::Param_Info (const Ztring &Text)
         case MediaInfo_Config::Trace_Format_CSV         : Element[Element_Level].ToShow.Details+=__T(" - "); break;
         case MediaInfo_Config::Trace_Format_XML         :
                                                             {
-                                                                size_t Start=Element[Element_Level].ToShow.Details.rfind(EOL);
+                                                                size_t Start=Element[Element_Level].ToShow.Details.rfind(Config_LineSeparator);
                                                                 if (Start==(size_t)-1)
                                                                     Start=0;
                                                                 End=Element[Element_Level].ToShow.Details.find(__T('>'), Start);
@@ -3204,7 +3204,7 @@ void File__Analyze::Param_Info (const Ztring &Text)
     {
         case MediaInfo_Config::Trace_Format_XML         :
                                                             {
-                                                                size_t Start=Element[Element_Level].ToShow.Details.rfind(EOL);
+                                                                size_t Start=Element[Element_Level].ToShow.Details.rfind(Config_LineSeparator);
                                                                 if (Start==(size_t)-1)
                                                                     Start=0;
                                                                 End=Element[Element_Level].ToShow.Details.find(__T('>'), Start);
