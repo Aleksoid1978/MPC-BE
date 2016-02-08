@@ -37,19 +37,9 @@
 #include "mpegvideoencdsp.h"
 #include "dirac_dwt.h"
 #include "dirac.h"
+#include "diractab.h"
 #include "diracdsp.h"
 #include "videodsp.h"
-
-/**
- * The spec limits the number of wavelet decompositions to 4 for both
- * level 1 (VC-2) and 128 (long-gop default).
- * 5 decompositions is the maximum before >16-bit buffers are needed.
- * Schroedinger allows this for DD 9,7 and 13,7 wavelets only, limiting
- * the others to 4 decompositions (or 3 for the fidelity filter).
- *
- * We use this instead of MAX_DECOMPOSITIONS to save some memory.
- */
-#define MAX_DWT_LEVELS 5
 
 /**
  * The spec limits this to 3 for frame coding, but in practice can be as high as 6
@@ -111,16 +101,11 @@ typedef struct SubBand {
 } SubBand;
 
 typedef struct Plane {
+    DWTPlane idwt;
+
     int width;
     int height;
     ptrdiff_t stride;
-
-    int idwt_width;
-    int idwt_height;
-    int idwt_stride;
-    uint8_t *idwt_buf;
-    uint8_t *idwt_buf_base;
-    uint8_t *idwt_tmp;
 
     /* block length */
     uint8_t xblen;
@@ -243,73 +228,6 @@ enum dirac_subband {
     subband_nb,
 };
 
-static const uint8_t default_qmat[][4][4] = {
-    { { 5,  3,  3,  0}, { 0,  4,  4,  1}, { 0,  5,  5,  2}, { 0,  6,  6,  3} },
-    { { 4,  2,  2,  0}, { 0,  4,  4,  2}, { 0,  5,  5,  3}, { 0,  7,  7,  5} },
-    { { 5,  3,  3,  0}, { 0,  4,  4,  1}, { 0,  5,  5,  2}, { 0,  6,  6,  3} },
-    { { 8,  4,  4,  0}, { 0,  4,  4,  0}, { 0,  4,  4,  0}, { 0,  4,  4,  0} },
-    { { 8,  4,  4,  0}, { 0,  4,  4,  0}, { 0,  4,  4,  0}, { 0,  4,  4,  0} },
-    { { 0,  4,  4,  8}, { 0,  8,  8, 12}, { 0, 13, 13, 17}, { 0, 17, 17, 21} },
-    { { 3,  1,  1,  0}, { 0,  4,  4,  2}, { 0,  6,  6,  5}, { 0,  9,  9,  7} },
-};
-
-static const int32_t qscale_tab[116] = {
-         4,         5,         6,         7,         8,        10,        11,        13,
-        16,        19,        23,        27,        32,        38,        45,        54,
-        64,        76,        91,       108,       128,       152,       181,       215,
-       256,       304,       362,       431,       512,       609,       724,       861,
-      1024,      1218,      1448,      1722,      2048,      2435,      2896,      3444,
-      4096,      4871,      5793,      6889,      8192,      9742,     11585,     13777,
-     16384,     19484,     23170,     27554,     32768,     38968,     46341,     55109,
-     65536,     77936,     92682,    110218,    131072,    155872,    185364,    220436,
-    262144,    311744,    370728,    440872,    524288,    623487,    741455,    881744,
-   1048576,   1246974,   1482910,   1763488,   2097152,   2493948,   2965821,   3526975,
-   4194304,   4987896,   5931642,   7053950,   8388608,   9975792,  11863283,  14107901,
-  16777216,  19951585,  23726566,  28215802,  33554432,  39903169,  47453133,  56431603,
-  67108864,  79806339,  94906266, 112863206, 134217728, 159612677, 189812531, 225726413,
- 268435456, 319225354, 379625062, 451452825, 536870912, 638450708, 759250125, 902905651,
-1073741824,1276901417,1518500250,1805811301,/*2147483648,2553802834,3037000500,3611622603,
-4294967296*/
-};
-
-static const int32_t qoffset_intra_tab[120] = {
-        1,         2,         3,         4,         4,         5,         6,         7,
-        8,        10,        12,        14,        16,        19,        23,        27,
-       32,        38,        46,        54,        64,        76,        91,       108,
-      128,       152,       181,       216,       256,       305,       362,       431,
-      512,       609,       724,       861,      1024,      1218,      1448,      1722,
-     2048,      2436,      2897,      3445,      4096,      4871,      5793,      6889,
-     8192,      9742,     11585,     13777,     16384,     19484,     23171,     27555,
-    32768,     38968,     46341,     55109,     65536,     77936,     92682,    110218,
-   131072,    155872,    185364,    220436,    262144,    311744,    370728,    440872,
-   524288,    623487,    741455,    881744,   1048576,   1246974,   1482911,   1763488,
-  2097152,   2493948,   2965821,   3526975,   4194304,   4987896,   5931642,   7053951,
-  8388608,   9975793,  11863283,  14107901,  16777216,  19951585,  23726567,  28215802,
- 33554432,  39903170,  47453133,  56431603,  67108864,  79806339,  94906266, 112863207,
-134217728, 159612677, 189812531, 225726413, 268435456, 319225354, 379625063, 451452826,
-536870912, 638450709, 759250125, 902905651,1073741824,1276901417,1518500250,1805811302,
-/*2147483648, 2553802834, 3037000500, 3611622603, 4294967296,*/
-};
-
-static const int qoffset_inter_tab[122] = {
-        1,         2,         2,         3,         3,         4,         4,         5,
-        6,         7,         9,        10,        12,        14,        17,        20,
-       24,        29,        34,        41,        48,        57,        68,        81,
-       96,       114,       136,       162,       192,       228,       272,       323,
-      384,       457,       543,       646,       768,       913,      1086,      1292,
-     1536,      1827,      2172,      2583,      3072,      3653,      4344,      5166,
-     6144,      7307,      8689,     10333,     12288,     14613,     17378,     20666,
-    24576,     29226,     34756,     41332,     49152,     58452,     69512,     82664,
-    98304,    116904,    139023,    165327,    196608,    233808,    278046,    330654,
-   393216,    467615,    556091,    661308,    786432,    935231,   1112183,   1322616,
-  1572864,   1870461,   2224366,   2645231,   3145728,   3740922,   4448731,   5290463,
-  6291456,   7481844,   8897462,  10580926,  12582912,  14963688,  17794925,  21161851,
- 25165824,  29927377,  35589850,  42323702,  50331648,  59854754,  71179699,  84647405,
-100663296, 119709508, 142359398, 169294809, 201326592, 239419016, 284718797, 338589619,
-402653184, 478838031, 569437594, 677179238, 805306368, 957676063,1138875188,1354358476,
-1610612736, 1915352125, /*2277750375, 2708716952, 3221225472, 3830704250,*/
-};
-
 /* magic number division by 3 from schroedinger */
 static inline int divide3(int x)
 {
@@ -367,10 +285,10 @@ static int alloc_sequence_buffers(DiracContext *s)
         w = FFALIGN(CALC_PADDING(w, MAX_DWT_LEVELS), 8); /* FIXME: Should this be 16 for SSE??? */
         h = top_padding + CALC_PADDING(h, MAX_DWT_LEVELS) + max_yblen/2;
 
-        s->plane[i].idwt_buf_base = av_mallocz_array((w+max_xblen), h * (2 << s->pshift));
-        s->plane[i].idwt_tmp      = av_malloc_array((w+16), 2 << s->pshift);
-        s->plane[i].idwt_buf      = s->plane[i].idwt_buf_base + (top_padding*w)*(2 << s->pshift);
-        if (!s->plane[i].idwt_buf_base || !s->plane[i].idwt_tmp)
+        s->plane[i].idwt.buf_base = av_mallocz_array((w+max_xblen), h * (2 << s->pshift));
+        s->plane[i].idwt.tmp      = av_malloc_array((w+16), 2 << s->pshift);
+        s->plane[i].idwt.buf      = s->plane[i].idwt.buf_base + (top_padding*w)*(2 << s->pshift);
+        if (!s->plane[i].idwt.buf_base || !s->plane[i].idwt.tmp)
             return AVERROR(ENOMEM);
     }
 
@@ -431,8 +349,8 @@ static void free_sequence_buffers(DiracContext *s)
     memset(s->delay_frames, 0, sizeof(s->delay_frames));
 
     for (i = 0; i < 3; i++) {
-        av_freep(&s->plane[i].idwt_buf_base);
-        av_freep(&s->plane[i].idwt_tmp);
+        av_freep(&s->plane[i].idwt.buf_base);
+        av_freep(&s->plane[i].idwt.tmp);
     }
 
     s->buffer_stride = 0;
@@ -615,12 +533,12 @@ static inline void codeblock(DiracContext *s, SubBand *b,
         return;
     }
 
-    qfactor = qscale_tab[b->quant];
+    qfactor = ff_dirac_qscale_tab[b->quant];
     /* TODO: context pointer? */
     if (!s->num_refs)
-        qoffset = qoffset_intra_tab[b->quant] + 2;
+        qoffset = ff_dirac_qoffset_intra_tab[b->quant] + 2;
     else
-        qoffset = qoffset_inter_tab[b->quant] + 2;
+        qoffset = ff_dirac_qoffset_inter_tab[b->quant] + 2;
 
     buf = b->ibuf + top * b->stride;
     if (is_arith) {
@@ -803,8 +721,8 @@ static void decode_subband(DiracContext *s, GetBitContext *gb, int quant,
         av_log(s->avctx, AV_LOG_ERROR, "Unsupported quant %d\n", quant);
         return;
     }
-    qfactor = qscale_tab[quant & 0x7f];
-    qoffset = qoffset_intra_tab[quant & 0x7f] + 2;
+    qfactor = ff_dirac_qscale_tab[quant & 0x7f];
+    qoffset = ff_dirac_qoffset_intra_tab[quant & 0x7f] + 2;
     /* we have to constantly check for overread since the spec explicitly
        requires this, with the meaning that all remaining coeffs are set to 0 */
     if (get_bits_count(gb) >= bits_end)
@@ -1016,9 +934,9 @@ static void init_planes(DiracContext *s)
 
         p->width       = s->seq.width  >> (i ? s->chroma_x_shift : 0);
         p->height      = s->seq.height >> (i ? s->chroma_y_shift : 0);
-        p->idwt_width  = w = CALC_PADDING(p->width , s->wavelet_depth);
-        p->idwt_height = h = CALC_PADDING(p->height, s->wavelet_depth);
-        p->idwt_stride = FFALIGN(p->idwt_width, 8) << (1 + s->pshift);
+        p->idwt.width  = w = CALC_PADDING(p->width , s->wavelet_depth);
+        p->idwt.height = h = CALC_PADDING(p->height, s->wavelet_depth);
+        p->idwt.stride = FFALIGN(p->idwt.width, 8) << (1 + s->pshift);
 
         for (level = s->wavelet_depth-1; level >= 0; level--) {
             w = w>>1;
@@ -1027,9 +945,9 @@ static void init_planes(DiracContext *s)
                 SubBand *b = &p->band[level][orientation];
 
                 b->pshift = s->pshift;
-                b->ibuf   = p->idwt_buf;
+                b->ibuf   = p->idwt.buf;
                 b->level  = level;
-                b->stride = p->idwt_stride << (s->wavelet_depth - level);
+                b->stride = p->idwt.stride << (s->wavelet_depth - level);
                 b->width  = w;
                 b->height = h;
                 b->orientation = orientation;
@@ -1253,7 +1171,7 @@ static int dirac_unpack_idwt_params(DiracContext *s)
             /* default quantization matrix */
             for (level = 0; level < s->wavelet_depth; level++)
                 for (i = 0; i < 4; i++) {
-                    s->lowdelay.quant[level][i] = default_qmat[s->wavelet_idx][level][i];
+                    s->lowdelay.quant[level][i] = ff_dirac_default_qmat[s->wavelet_idx][level][i];
                     /* haar with no shift differs for different depths */
                     if (s->wavelet_idx == 3)
                         s->lowdelay.quant[level][i] += 4*(s->wavelet_depth-1 - level);
@@ -1811,7 +1729,7 @@ static int dirac_decode_frame_internal(DiracContext *s)
         /* [DIRAC_STD] 13.5.1 low_delay_transform_data() */
         for (comp = 0; comp < 3; comp++) {
             Plane *p = &s->plane[comp];
-            memset(p->idwt_buf, 0, p->idwt_stride * p->idwt_height);
+            memset(p->idwt.buf, 0, p->idwt.stride * p->idwt.height);
         }
         if (!s->zero_res) {
             if ((ret = decode_lowdelay(s)) < 0)
@@ -1829,11 +1747,11 @@ static int dirac_decode_frame_internal(DiracContext *s)
 
         if (!s->zero_res && !s->low_delay)
         {
-            memset(p->idwt_buf, 0, p->idwt_stride * p->idwt_height);
+            memset(p->idwt.buf, 0, p->idwt.stride * p->idwt.height);
             decode_component(s, comp); /* [DIRAC_STD] 13.4.1 core_transform_data() */
         }
-        ret = ff_spatial_idwt_init2(&d, p->idwt_buf, p->idwt_width, p->idwt_height, p->idwt_stride,
-                                    s->wavelet_idx+2, s->wavelet_depth, p->idwt_tmp, s->bit_depth);
+        ret = ff_spatial_idwt_init(&d, &p->idwt, s->wavelet_idx+2,
+                                   s->wavelet_depth, s->bit_depth);
         if (ret < 0)
             return ret;
 
@@ -1843,8 +1761,8 @@ static int dirac_decode_frame_internal(DiracContext *s)
                 ff_spatial_idwt_slice2(&d, y+16); /* decode */
                 s->diracdsp.put_signed_rect_clamped[idx](frame + y*p->stride,
                                                          p->stride,
-                                                         p->idwt_buf + y*p->idwt_stride,
-                                                         p->idwt_stride, p->width, 16);
+                                                         p->idwt.buf + y*p->idwt.stride,
+                                                         p->idwt.stride, p->width, 16);
             }
         } else { /* inter */
             int rowheight = p->ybsep*p->stride;
@@ -1881,9 +1799,9 @@ static int dirac_decode_frame_internal(DiracContext *s)
                 mctmp += (start - dsty)*p->stride + p->xoffset;
                 ff_spatial_idwt_slice2(&d, start + h); /* decode */
                 /* NOTE: add_rect_clamped hasn't been templated hence the shifts.
-                 * idwt_stride is passed as pixels, not in bytes as in the rest of the decoder */
+                 * idwt.stride is passed as pixels, not in bytes as in the rest of the decoder */
                 s->diracdsp.add_rect_clamped(frame + start*p->stride, mctmp, p->stride,
-                                             (int16_t*)(p->idwt_buf) + start*(p->idwt_stride >> 1), (p->idwt_stride >> 1), p->width, h);
+                                             (int16_t*)(p->idwt.buf) + start*(p->idwt.stride >> 1), (p->idwt.stride >> 1), p->width, h);
 
                 dsty += p->ybsep;
             }

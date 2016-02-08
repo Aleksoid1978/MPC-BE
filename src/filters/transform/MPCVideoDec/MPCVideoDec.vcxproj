@@ -129,7 +129,7 @@
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;d3d9.lib;Winmm.lib;vfw32.lib;Version.lib;;libspeex.a;libdcadec.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;d3d9.lib;Winmm.lib;vfw32.lib;Version.lib;;libspeex.a;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;$(WindowsSdkDir)Lib\winv6.3\um\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>MPCVideoDec.def</ModuleDefinitionFile>
       <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
@@ -144,7 +144,7 @@
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;d3d9.lib;Winmm.lib;vfw32.lib;Version.lib;;libspeex.a;libdcadec.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;d3d9.lib;Winmm.lib;vfw32.lib;Version.lib;;libspeex.a;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib64;$(WindowsSdkDir)Lib\winv6.3\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>MPCVideoDec.def</ModuleDefinitionFile>
       <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
@@ -159,7 +159,7 @@
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;d3d9.lib;Winmm.lib;vfw32.lib;Version.lib;;libspeex.a;libdcadec.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;d3d9.lib;Winmm.lib;vfw32.lib;Version.lib;;libspeex.a;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;$(WindowsSdkDir)Lib\winv6.3\um\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>MPCVideoDec.def</ModuleDefinitionFile>
       <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
@@ -174,7 +174,7 @@
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib\ffmpeg;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;d3d9.lib;Winmm.lib;vfw32.lib;Version.lib;;libspeex.a;libdcadec.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;d3d9.lib;Winmm.lib;vfw32.lib;Version.lib;;libspeex.a;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib64;$(WindowsSdkDir)Lib\winv6.3\um\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>MPCVideoDec.def</ModuleDefinitionFile>
       <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
