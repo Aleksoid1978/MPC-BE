@@ -270,6 +270,7 @@ cmsBool  ComputeAbsoluteIntent(cmsFloat64Number AdaptationState,
     cmsMAT3 Scale, m1, m2, m3, m4;
 
     // TODO: Follow Marc Mahy's recommendation to check if CHAD is same by using M1*M2 == M2*M1. If so, do nothing.
+    // TODO: Add support for ArgyllArts tag
 
     // Adaptation state
     if (AdaptationState == 1.0) {
