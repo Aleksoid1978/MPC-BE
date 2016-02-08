@@ -382,7 +382,8 @@ typedef enum {
     cmsSigViewingCondDescTag                = 0x76756564,  // 'vued'
     cmsSigViewingConditionsTag              = 0x76696577,  // 'view'
     cmsSigVcgtTag                           = 0x76636774,  // 'vcgt'
-    cmsSigMetaTag                           = 0x6D657461   // 'meta'
+    cmsSigMetaTag                           = 0x6D657461,  // 'meta'
+    cmsSigArgyllArtsTag                     = 0x61727473   // 'arts'
 
 } cmsTagSignature;
 
