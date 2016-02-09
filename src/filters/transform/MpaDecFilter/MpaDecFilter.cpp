@@ -1832,7 +1832,7 @@ HRESULT CMpaDecFilter::AC3Encode(BYTE* pBuff, int size, SampleFormat sfmt, DWORD
 	CAtlArray<BYTE> output;
 
 	while (m_AC3Enc.Encode(m_encbuff, output) == S_OK) {
-		DeliverBitstream(output.GetData(), output.GetCount(), IEC61937_AC3, nSamplesPerSec, 1536);
+		DeliverBitstream(output.GetData(), output.GetCount(), IEC61937_AC3, new_samplerate, 1536);
 	}
 
 	return S_OK;
