@@ -551,7 +551,11 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 	sl.AddTail(_T("AM_MEDIA_TYPE: "));
 	str.Format(_T("majortype: %s %s"), GetGUIDString(majortype), major);
 	sl.AddTail(str);
-	str.Format(_T("subtype: %s %s"), GetGUIDString(subtype), sub);
+	if (majortype == MEDIATYPE_Video && subtype == MEDIASUBTYPE_PCM) {
+		str.Format(_T("subtype: MEDIASUBTYPE_RLE8 %s"), sub); // cosmetic hack
+	} else {
+		str.Format(_T("subtype: %s %s"), GetGUIDString(subtype), sub);
+	}
 	sl.AddTail(str);
 	str.Format(_T("formattype: %s %s"), GetGUIDString(formattype), format);
 	sl.AddTail(str);
