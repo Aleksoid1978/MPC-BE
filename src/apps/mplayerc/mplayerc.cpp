@@ -1463,9 +1463,8 @@ BOOL CMPlayerCApp::InitInstance()
 				CPPageFormats::RegisterShellExt(ShellExt64);
 			}
 
-			if (IsWin8orLater() && !IsWin10orLater()) {
-				HRESULT hr = CPPageFormats::RegisterUI();
-				UNREFERENCED_PARAMETER(hr);
+			if (IsWin8orLater()) {
+				CPPageFormats::RegisterUI();
 			}
 
 			SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
@@ -1494,9 +1493,8 @@ BOOL CMPlayerCApp::InitInstance()
 				}
 			}
 
-			if (IsWin8orLater() && !IsWin10orLater()) {
-				HRESULT hr = CPPageFormats::RegisterUI();
-				UNREFERENCED_PARAMETER(hr);
+			if (IsWin8orLater()) {
+				CPPageFormats::RegisterUI();
 			}
 
 			SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
