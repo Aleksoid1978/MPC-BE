@@ -120,7 +120,7 @@ bool CPPageFormats::IsRegistered(CString ext)
 {
 	HRESULT hr;
 	BOOL    bIsDefault = FALSE;
-	CString strProgID = PROGID + ext;
+	CString strProgID  = PROGID + ext;
 
 	if (m_pAAR) {
 		// The Vista/7/8 way
@@ -128,9 +128,8 @@ bool CPPageFormats::IsRegistered(CString ext)
 	} else {
 		// The 2000/XP/10 way
 		CRegKey key;
-		TCHAR   buff[256];
+		TCHAR   buff[_MAX_PATH] = { 0 };
 		ULONG   len = _countof(buff);
-		memset(buff, 0, sizeof(buff));
 
 		if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext, KEY_READ)) {
 			return false;
@@ -146,7 +145,7 @@ bool CPPageFormats::IsRegistered(CString ext)
 	// Check if association is for this instance of MPC
 	if (bIsDefault) {
 		CRegKey key;
-		TCHAR   buff[_MAX_PATH];
+		TCHAR   buff[_MAX_PATH] = { 0 };
 		ULONG   len = _countof(buff);
 
 		bIsDefault = FALSE;
@@ -156,7 +155,19 @@ bool CPPageFormats::IsRegistered(CString ext)
 				bIsDefault = (strCommand.CompareNoCase(CString(buff)) == 0);
 			}
 		}
+	}
 
+	if (bIsDefault && IsWin10orLater()) {
+		CRegKey key;
+		TCHAR   buff[_MAX_PATH] = { 0 };
+		ULONG   len = _countof(buff);
+
+		bIsDefault = FALSE;
+		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, CString(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + ext + L"\\UserChoice"), KEY_READ)) {
+			if (ERROR_SUCCESS == key.QueryStringValue(L"ProgId", buff, &len)) {
+				bIsDefault = (strProgID.CompareNoCase(CString(buff)) == 0);
+			}
+		}
 	}
 
 	return !!bIsDefault;
@@ -322,21 +333,9 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 			return false;
 		}
 	} else {
+		key.Close();
 		key.Attach(HKEY_CLASSES_ROOT);
 		key.RecurseDeleteKey(strProgID + _T("\\DefaultIcon"));
-	}
-
-	if (IsWin10orLater()) {
-		// delete [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ext\UserChoice]
-		LSTATUS status = RegDeleteKey(HKEY_CURRENT_USER, CString("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + ext + "\\UserChoice"));
-		UNREFERENCED_PARAMETER(status);
-
-		key.Close();
-		// write mpc-be to first entry of the [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ext\OpenWithList]
-		if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, CString(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + ext + L"\\OpenWithList"))) {
-			key.SetStringValue(L"a", PROGID L".exe");
-			key.Close();
-		}
 	}
 
 	if (!IsRegistered(ext)) {
@@ -354,24 +353,42 @@ bool CPPageFormats::UnRegisterExt(CString ext)
 	if (IsRegistered(ext)) {
 		SetFileAssociation(ext, strProgID, false);
 	}
+	
 	key.Attach(HKEY_CLASSES_ROOT);
 	key.RecurseDeleteKey(strProgID);
+
+	LSTATUS status = RegDeleteKey(HKEY_LOCAL_MACHINE, CString(GetRegisteredKey()) + L"\\FileAssociations\\" + ext);
+	UNREFERENCED_PARAMETER(status);
 
 	return true;
 }
 
 HRESULT CPPageFormats::RegisterUI()
 {
-	IApplicationAssociationRegistrationUI *pUI = NULL;
+	HRESULT hr = E_FAIL;
 
-	HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI,
-					NULL,
-					CLSCTX_INPROC,
-					IID_PPV_ARGS(&pUI));
+	if (IsWin10orLater()) {
+		IOpenControlPanel* pCP = NULL;
+		hr = CoCreateInstance(CLSID_OpenControlPanel,
+							  NULL,
+							  CLSCTX_INPROC,
+							  IID_PPV_ARGS(&pCP));
 
-	if (SUCCEEDED(hr) && pUI) {
-		hr = pUI->LaunchAdvancedAssociationUI(CPPageFormats::GetRegisteredAppName());
-		pUI->Release();
+		if (SUCCEEDED(hr) && pCP) {
+			hr = pCP->Open(L"Microsoft.DefaultPrograms", L"pageDefaultProgram", NULL);
+			pCP->Release();
+		}	
+	} else if (IsWin8orLater()) {
+		IApplicationAssociationRegistrationUI* pUI = NULL;
+		hr = CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI,
+							  NULL,
+							  CLSCTX_INPROC,
+							  IID_PPV_ARGS(&pUI));
+
+		if (SUCCEEDED(hr) && pUI) {
+			hr = pUI->LaunchAdvancedAssociationUI(CPPageFormats::GetRegisteredAppName());
+			pUI->Release();
+		}
 	}
 
 	return hr;
@@ -405,7 +422,6 @@ bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
 			CRegKey key;
 			if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
 				key.SetStringValue(_T("MpcPath"), GetProgramPath());
-				key.Close();
 			}
 
 			CString strParameters;
@@ -417,8 +433,8 @@ bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
 		return false;
 	}
 
-	_DllConfigFunc _dllConfigFunc			= (_DllConfigFunc)GetProcAddress(hDLL, "DllConfig");
-	_DllRegisterServer _dllRegisterServer	= (_DllRegisterServer)GetProcAddress(hDLL, "DllRegisterServer");
+	_DllConfigFunc _dllConfigFunc         = (_DllConfigFunc)GetProcAddress(hDLL, "DllConfig");
+	_DllRegisterServer _dllRegisterServer = (_DllRegisterServer)GetProcAddress(hDLL, "DllRegisterServer");
 	if (_dllConfigFunc == NULL || _dllRegisterServer == NULL) {
 		FreeLibrary(hDLL);
 		return false;
@@ -515,23 +531,17 @@ void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
 			return;
 		}
 		key.SetStringValue(CString(CStringA("MPCBEPlay") + handlers[i].verb + "OnArrival"), _T(""));
-		key.Close();
 	} else {
 		if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE,
 										CString(CStringA("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers\\EventHandlers\\Play") + handlers[i].verb + "OnArrival"))) {
 			return;
 		}
 		key.DeleteValue(CString(CStringA("MPCBEPlay") + handlers[i].verb + "OnArrival"));
-		key.Close();
 	}
 }
 
 bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 {
-    ULONG len;
-    TCHAR buff[_MAX_PATH];
-	CString exe = GetProgramPath();
-
 	int i = (int)ap;
 	if (i < 0 || i >= _countof(handlers)) {
 		return false;
@@ -544,7 +554,12 @@ bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 								  KEY_READ)) {
 		return false;
 	}
-	len = _countof(buff);
+
+	TCHAR buff[_MAX_PATH] = { 0 };
+	ULONG len = _countof(buff);
+
+	CString exe = GetProgramPath();
+	
 	if (ERROR_SUCCESS != key.QueryStringValue(
 				CString(_T("MPCBEPlay")) + handlers[i].verb + _T("OnArrival"),
 				buff, &len)) {
@@ -564,7 +579,6 @@ bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 	if (_tcsnicmp(_T("\"") + exe, buff, exe.GetLength() + 1)) {
 		return false;
 	}
-	key.Close();
 
 	return true;
 }
@@ -583,13 +597,16 @@ void CPPageFormats::SetListItemState(int nItem)
 	int cnt = 0;
 
 	POSITION pos = exts.GetHeadPosition();
-	while (pos) if (IsRegistered(exts.GetNext(pos))) {
+	while (pos) {
+		if (IsRegistered(exts.GetNext(pos))) {
 			cnt++;
 		}
+	}
 
 	if (cnt != 0) {
 		cnt = (cnt == (int)exts.GetCount() ? 1 : 2);
 	}
+
 	SetChecked(nItem, cnt);
 }
 
@@ -715,9 +732,8 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 	CString extoldreg, extOldIcon;
 	CRegKey key;
 	HRESULT hr = S_OK;
-	TCHAR   buff[256];
+	TCHAR   buff[_MAX_PATH] = { 0 };
 	ULONG   len = _countof(buff);
-	memset(buff, 0, sizeof(buff));
 
 	if (m_pAAR) {
 		// The Vista/7/8 way
@@ -775,8 +791,6 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 				return false;
 			}
 
-			len = _countof(buff);
-			memset(buff, 0, sizeof(buff));
 			if (ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && !CString(buff).Trim().IsEmpty()) {
 				extoldreg = buff;
 			}
@@ -810,8 +824,6 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 			*/
 		} else {
 			// Get previous association
-			len = _countof(buff);
-			memset(buff, 0, sizeof(buff));
 			if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID)) {
 				return false;
 			}
@@ -930,8 +942,6 @@ BOOL CPPageFormats::OnApply()
 
 			key.SetDWORDValue(L"ShowFiles", !!m_fContextFiles.GetCheck());
 			key.SetDWORDValue(L"ShowDir", !!m_fContextDir.GetCheck());
-
-			key.Close();
 		}
 
 		BOOL bIs64 = IsW64();
@@ -983,12 +993,11 @@ BOOL CPPageFormats::OnApply()
 	s.bSetContextDir		= !!m_fContextDir.GetCheck();
 	s.fAssociatedWithIcons	= !!m_fAssociatedWithIcons.GetCheck();
 
-	if (m_bFileExtChanged && IsWin8orLater() && !IsWin10orLater()) {
-		HRESULT hr = RegisterUI();
-		UNREFERENCED_PARAMETER(hr);
-	}
-
 	if (m_bFileExtChanged) {
+		if (IsWin8orLater()) {
+			RegisterUI();
+		}
+
 		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 	}
 
