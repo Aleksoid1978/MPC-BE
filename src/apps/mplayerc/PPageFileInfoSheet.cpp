@@ -259,7 +259,9 @@ void CPPageFileInfoSheet::OnSize(UINT nType, int cx, int cy)
 
 	::EndDeferWindowPos(hDWP);
 
-	GetWindowRect(&m_rWnd);
+	if (nType != SIZE_MAXIMIZED) {
+		GetWindowRect(&m_rWnd);
+	}
 }
 
 void CPPageFileInfoSheet::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
