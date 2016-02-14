@@ -356,10 +356,12 @@ bool CPPageFormats::UnRegisterExt(CString ext)
 	
 	key.Attach(HKEY_CLASSES_ROOT);
 	key.RecurseDeleteKey(strProgID);
+	key.Close();
 
-	LSTATUS status = RegDeleteKey(HKEY_LOCAL_MACHINE, CString(GetRegisteredKey()) + L"\\FileAssociations\\" + ext);
-	UNREFERENCED_PARAMETER(status);
-
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, CString(GetRegisteredKey()) + L"\\FileAssociations")) {
+		key.DeleteValue(ext);
+	}
+	
 	return true;
 }
 
