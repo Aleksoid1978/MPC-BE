@@ -69,7 +69,7 @@ public:
 	enum {COL_CATEGORY};
 
 	static bool		RegisterApp();
-	static bool		IsRegistered(CString ext);
+	static bool		IsRegistered(CString ext, bool bCheckProgId = false);
 	static bool		RegisterExt(CString ext, CString strLabel, filetype_t filetype, bool SetContextFiles = false, bool setAssociatedWithIcon = true);
 	static bool		UnRegisterExt(CString ext);
 	static HRESULT	RegisterUI();

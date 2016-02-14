@@ -116,15 +116,14 @@ CString CPPageFormats::GetOpenCommand()
 	return _T("\"") + GetProgramPath() + _T("\" \"%1\"");
 }
 
-bool CPPageFormats::IsRegistered(CString ext)
+bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 {
-	HRESULT hr;
 	BOOL    bIsDefault = FALSE;
 	CString strProgID  = PROGID + ext;
 
 	if (m_pAAR) {
 		// The Vista/7/8 way
-		hr = m_pAAR->QueryAppIsDefault(ext, AT_FILEEXTENSION, AL_EFFECTIVE, GetRegisteredAppName(), &bIsDefault);
+		m_pAAR->QueryAppIsDefault(ext, AT_FILEEXTENSION, AL_EFFECTIVE, GetRegisteredAppName(), &bIsDefault);
 	} else {
 		// The 2000/XP/10 way
 		CRegKey key;
@@ -157,12 +156,11 @@ bool CPPageFormats::IsRegistered(CString ext)
 		}
 	}
 
-	if (bIsDefault && IsWin10orLater()) {
+	if (bIsDefault && IsWin10orLater() && bCheckProgId) {
 		CRegKey key;
 		TCHAR   buff[_MAX_PATH] = { 0 };
 		ULONG   len = _countof(buff);
 
-		bIsDefault = FALSE;
 		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, CString(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + ext + L"\\UserChoice"), KEY_READ)) {
 			if (ERROR_SUCCESS == key.QueryStringValue(L"ProgId", buff, &len)) {
 				bIsDefault = (strProgID.CompareNoCase(CString(buff)) == 0);
@@ -616,7 +614,7 @@ void CPPageFormats::SetListItemState(int nItem)
 
 	POSITION pos = exts.GetHeadPosition();
 	while (pos) {
-		if (IsRegistered(exts.GetNext(pos))) {
+		if (IsRegistered(exts.GetNext(pos), true)) {
 			cnt++;
 		}
 	}
