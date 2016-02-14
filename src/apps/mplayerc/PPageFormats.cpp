@@ -365,6 +365,22 @@ bool CPPageFormats::UnRegisterExt(CString ext)
 
 HRESULT CPPageFormats::RegisterUI()
 {
+	int nRegisteredExtCount = 0;
+	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
+	for (size_t i = 0; i < mf.GetCount(); i++) {
+		int j = 0;
+		const CString str = mf[i].GetExtsWithPeriod();
+		for (CString ext = str.Tokenize(L" ", j); !ext.IsEmpty(); ext = str.Tokenize(L" ", j)) {
+			if (IsRegistered(ext)) {
+				nRegisteredExtCount++;
+			}
+		}
+	}
+
+	if (nRegisteredExtCount == 0) {
+		return S_FALSE;
+	}
+
 	HRESULT hr = E_FAIL;
 
 	if (IsWin10orLater()) {
@@ -377,7 +393,7 @@ HRESULT CPPageFormats::RegisterUI()
 		if (SUCCEEDED(hr) && pCP) {
 			hr = pCP->Open(L"Microsoft.DefaultPrograms", L"pageDefaultProgram", NULL);
 			pCP->Release();
-		}	
+		}
 	} else if (IsWin8orLater()) {
 		IApplicationAssociationRegistrationUI* pUI = NULL;
 		hr = CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI,
