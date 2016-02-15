@@ -5,6 +5,7 @@
 
 #ifndef JSON_CONFIG_H_INCLUDED
 #define JSON_CONFIG_H_INCLUDED
+#include <stddef.h>
 
 /// If defined, indicates that json library is embedded in CppTL library.
 //# define JSON_IN_CPPTL 1
@@ -112,6 +113,10 @@
 #if !defined(JSONCPP_DEPRECATED)
 #define JSONCPP_DEPRECATED(message)
 #endif // if !defined(JSONCPP_DEPRECATED)
+
+#if __GNUC__ >= 6
+#  define JSON_USE_INT64_DOUBLE_CONVERSION 1
+#endif
 
 namespace Json {
 typedef int Int;

@@ -55,6 +55,9 @@ const LargestUInt Value::maxLargestUInt = LargestUInt(-1);
 #if !defined(JSON_USE_INT64_DOUBLE_CONVERSION)
 template <typename T, typename U>
 static inline bool InRange(double d, T min, U max) {
+  // The casts can lose precision, but we are looking only for
+  // an approximate range. Might fail on edge cases though. ~cdunn
+  //return d >= static_cast<double>(min) && d <= static_cast<double>(max);
   return d >= min && d <= max;
 }
 #else  // if !defined(JSON_USE_INT64_DOUBLE_CONVERSION)
@@ -228,7 +231,7 @@ Value::CZString::CZString(const CZString& other)
     : cstr_(other.storage_.policy_ != noDuplication && other.cstr_ != 0
                 ? duplicateStringValue(other.cstr_, other.storage_.length_)
                 : other.cstr_) {
-  storage_.policy_ = (other.cstr_
+  storage_.policy_ = static_cast<unsigned>(other.cstr_
                  ? (static_cast<DuplicationPolicy>(other.storage_.policy_) == noDuplication
                      ? noDuplication : duplicate)
                  : static_cast<DuplicationPolicy>(other.storage_.policy_));
@@ -781,7 +784,8 @@ float Value::asFloat() const {
 #if !defined(JSON_USE_INT64_DOUBLE_CONVERSION)
     return static_cast<float>(value_.uint_);
 #else  // if !defined(JSON_USE_INT64_DOUBLE_CONVERSION)
-    return integerToDouble(value_.uint_);
+    // This can fail (silently?) if the value is bigger than MAX_FLOAT.
+    return static_cast<float>(integerToDouble(value_.uint_));
 #endif // if !defined(JSON_USE_INT64_DOUBLE_CONVERSION)
   case realValue:
     return static_cast<float>(value_.real_);
@@ -1332,13 +1336,13 @@ std::string Value::getComment(CommentPlacement placement) const {
   return "";
 }
 
-void Value::setOffsetStart(size_t start) { start_ = start; }
+void Value::setOffsetStart(ptrdiff_t start) { start_ = start; }
 
-void Value::setOffsetLimit(size_t limit) { limit_ = limit; }
+void Value::setOffsetLimit(ptrdiff_t limit) { limit_ = limit; }
 
-size_t Value::getOffsetStart() const { return start_; }
+ptrdiff_t Value::getOffsetStart() const { return start_; }
 
-size_t Value::getOffsetLimit() const { return limit_; }
+ptrdiff_t Value::getOffsetLimit() const { return limit_; }
 
 std::string Value::toStyledString() const {
   StyledWriter writer;
