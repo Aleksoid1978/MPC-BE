@@ -238,14 +238,14 @@ static bool ParseVorbisTag(const CString field_name, const CString vorbisTag, CS
 	return true;
 }
 
-bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/* = NULL*/)
+bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CMediaType* mediaType)
 {
 	if (nCodecId == AV_CODEC_ID_NONE) {
 		return false;
 	}
 
-	if (pInput) {
-		m_pCurrentMediaType = &pInput->CurrentMediaType();
+	if (mediaType) {
+		m_pCurrentMediaType = mediaType;
 	}
 
 	if (!m_pCurrentMediaType) {
@@ -293,12 +293,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/*
 			m_pAVCtx->flags				|= AV_CODEC_FLAG_TRUNCATED;
 		}
 
-		//if (stereodownmix &&
-		//		(nCodecId == AV_CODEC_ID_AC3
-		//		|| nCodecId == AV_CODEC_ID_EAC3
-		//		|| nCodecId == AV_CODEC_ID_TRUEHD
-		//		|| nCodecId == AV_CODEC_ID_DTS)) {
-		//	m_pAVCtx->request_channels = 2;
+		//if (stereodownmix) { // works to AC3, TrueHD, DTS
 		//	m_pAVCtx->request_channel_layout = AV_CH_LAYOUT_STEREO;
 		//}
 
@@ -317,7 +312,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CTransformInputPin* pInput/*
 				uint8_t* extra = (uint8_t*)av_mallocz(extralen + AV_INPUT_BUFFER_PADDING_SIZE);
 				getExtraData((BYTE*)format, &format_type, formatlen, extra, NULL);
 
-				if (extra[0] == '.' && extra[1] == 'r' && extra[2] == 'a' && extra[3] == 0xfd) {
+				if (extralen >= 4 && GETDWORD(extra) == MAKEFOURCC('.', 'r', 'a', 0xfd)) {
 					HRESULT hr = ParseRealAudioHeader(extra, extralen);
 					av_freep(&extra);
 					if (FAILED(hr)) {
@@ -465,7 +460,7 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 
 		if (used_bytes < 0) {
 			DbgLog((LOG_TRACE, 3, L"CFFAudioDecoder::Decode() : avcodec_decode_audio4() failed"));
-			Init(nCodecId);
+			Init(nCodecId, NULL);
 
 			av_frame_unref(m_pFrame);
 			return E_FAIL;
