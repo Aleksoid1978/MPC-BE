@@ -182,7 +182,7 @@ public:
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP			NonDelegatingQueryInterface(REFIID riid, void** ppv);
-	virtual void			GetOutputSize(int& w, int& h, int& arx, int& ary, int& RealWidth, int& RealHeight);
+	virtual void			GetOutputSize(int& w, int& h, int& arx, int& ary, int& vsfilter);
 	CTransformOutputPin*	GetOutputPin() { return m_pOutput; };
 
 	REFERENCE_TIME	GetFrameDuration();
@@ -248,8 +248,8 @@ public:
 	int							GetPicEntryNumber();
 	int							PictWidth();
 	int							PictHeight();
-	int							PictWidthRounded();
-	int							PictHeightRounded();
+	int							PictWidthAligned();
+	int							PictHeightAligned();
 
 	DXVA2_ExtendedFormat		GetDXVA2ExtendedFormat(AVCodecContext *ctx, AVFrame *frame);
 

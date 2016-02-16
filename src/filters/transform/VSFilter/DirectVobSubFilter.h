@@ -79,7 +79,7 @@ class __declspec(uuid("93A22E7A-5091-45ef-BA61-6DA26156A5D0"))
 
 protected:
 	void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
-	void GetOutputSize(int& w, int& h, int& arx, int& ary, int& RealWidth, int& RealHeight, int& vsfilter);
+	void GetOutputSize(int& w, int& h, int& arx, int& ary, int& vsfilter);
 	HRESULT Transform(IMediaSample* pIn);
 
 public:

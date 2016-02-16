@@ -160,7 +160,7 @@ void CDirectVobSubFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** 
 	*ppFormats	= m_pVideoOutputFormat;
 }
 
-void CDirectVobSubFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& RealWidth, int& RealHeight, int& vsfilter)
+void CDirectVobSubFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& vsfilter)
 {
 	CSize s(w, h), os = s;
 	AdjustFrameSize(s);

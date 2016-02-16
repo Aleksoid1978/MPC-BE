@@ -576,7 +576,6 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		iPosition = iPosition*2;
 	}
 
-	//
 	GetOutputFormats (nFormatCount, &fmts);
 	if (iPosition < 0) {
 		return E_INVALIDARG;
@@ -586,16 +585,13 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	}
 
 	pmt->majortype = MEDIATYPE_Video;
-	pmt->subtype = *fmts[iPosition/2].subtype;
+	pmt->subtype   = *fmts[iPosition/2].subtype;
 
 	int w = m_win, h = m_hin, arx = m_arxin, ary = m_aryin;
-	int RealWidth  = -1;
-	int RealHeight = -1;
 	int vsfilter = 0;
-	GetOutputSize(w, h, arx, ary, RealWidth, RealHeight, vsfilter);
+	GetOutputSize(w, h, arx, ary, vsfilter);
 
-	BITMAPINFOHEADER bihOut;
-	memset(&bihOut, 0, sizeof(bihOut));
+	BITMAPINFOHEADER bihOut = { 0 };
 	bihOut.biSize        = sizeof(bihOut);
 	bihOut.biWidth       = w;
 	bihOut.biHeight      = h;
@@ -634,7 +630,7 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 
 	if (!vsfilter) {
 		// copy source and target rectangles from input pin
-		CMediaType&		pmtInput	= m_pInput->CurrentMediaType();
+		CMediaType&      pmtInput = m_pInput->CurrentMediaType();
 		VIDEOINFOHEADER* vih      = (VIDEOINFOHEADER*)pmt->Format();
 		VIDEOINFOHEADER* vihInput = (VIDEOINFOHEADER*)pmtInput.Format();
 
@@ -645,13 +641,6 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		} else {
 			vih->rcSource.right  = vih->rcTarget.right  = m_win;
 			vih->rcSource.bottom = vih->rcTarget.bottom = m_hin;
-		}
-
-		if (RealWidth > 0 && vih->rcSource.right > RealWidth) {
-			vih->rcSource.right = RealWidth;
-		}
-		if (RealHeight > 0 && vih->rcSource.bottom > RealHeight) {
-			vih->rcSource.bottom = RealHeight;
 		}
 	}
 
@@ -667,10 +656,8 @@ HRESULT CBaseVideoFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType* pmt)
 		m_hin = m_h;
 		m_arxin = m_arx;
 		m_aryin = m_ary;
-		int RealWidth = -1;
-		int RealHeight = -1;
 		int vsfilter = 0;
-		GetOutputSize(m_w, m_h, m_arx, m_ary, RealWidth, RealHeight, vsfilter);
+		GetOutputSize(m_w, m_h, m_arx, m_ary, vsfilter);
 
 		DWORD a = m_arx, b = m_ary;
 		while (a) {

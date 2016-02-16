@@ -1197,12 +1197,10 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 	return false;
 }
 
-void CMPCVideoDecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& RealWidth, int& RealHeight)
+void CMPCVideoDecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& vsfilter)
 {
-	RealWidth	= PictWidth();
-	RealHeight	= PictHeight();
-	w			= PictWidthRounded();
-	h			= PictHeightRounded();
+	w = PictWidth();
+	h = PictHeight();
 }
 
 int CMPCVideoDecFilter::PictWidth()
@@ -1215,12 +1213,12 @@ int CMPCVideoDecFilter::PictHeight()
 	return m_pAVCtx->height;
 }
 
-int CMPCVideoDecFilter::PictWidthRounded()
+int CMPCVideoDecFilter::PictWidthAligned()
 {
 	return FFALIGN(m_pAVCtx->coded_width, m_nAlign);
 }
 
-int CMPCVideoDecFilter::PictHeightRounded()
+int CMPCVideoDecFilter::PictHeightAligned()
 {
 	return FFALIGN(m_pAVCtx->coded_height, m_nAlign);
 }
@@ -1524,7 +1522,7 @@ bool CMPCVideoDecFilter::IsAVI()
 	if (!fname.IsEmpty() && ::PathFileExists(fname)) {
 		CFile f;
 		CFileException fileException;
-		if (!f.Open(fname, CFile::modeRead|CFile::typeBinary|CFile::shareDenyNone, &fileException)) {
+		if (!f.Open(fname, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone, &fileException)) {
 			DbgLog((LOG_TRACE, 3, _T("CMPCVideoDecFilter::IsAVI() : Can't open file '%s', error = %u"), fname, fileException.m_cause));
 			return false;
 		}
@@ -1538,8 +1536,6 @@ bool CMPCVideoDecFilter::IsAVI()
 			DbgLog((LOG_TRACE, 3, _T("CMPCVideoDecFilter::IsAVI() : '%s' is a valid AVI file"), fname));
 			return true;
 		}
-
-		DbgLog((LOG_TRACE, 3, _T("CMPCVideoDecFilter::IsAVI() : '%s' is not valid AVI file"), fname));
 	}
 
 	m_fSYNC = -1; // set non-zero value to avoid recheck of the file
@@ -1839,7 +1835,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			}
 
 			if (m_nCodecId == AV_CODEC_ID_H264) {
-				if (m_nDXVA_SD && PictWidthRounded() < 1280) { // check "Disable DXVA for SD" option
+				if (m_nDXVA_SD && PictWidthAligned() < 1280) { // check "Disable DXVA for SD" option
 					break;
 				}
 
@@ -1858,7 +1854,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 				} else if (m_nPCIVendor == PCIV_Intel && !IsWinVistaOrLater()) {
 					break; // Disable support H.264 DXVA on Intel in WinXP ...
 				}
-				int nCompat = FFH264CheckCompatibility(PictWidthRounded(), PictHeightRounded(), m_pAVCtx, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, IsAtiDXVACompatible);
+				int nCompat = FFH264CheckCompatibility(PictWidthAligned(), PictHeightAligned(), m_pAVCtx, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, IsAtiDXVACompatible);
 
 				if ((nCompat & DXVA_PROFILE_HIGHER_THAN_HIGH) || (nCompat & DXVA_HIGH_BIT)) { // DXVA unsupported
 					break;
@@ -1933,7 +1929,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			}
 		} else if (m_nDecoderMode == MODE_DXVA1) {
 			if (IsDXVASupported()) {
-				ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, true, GetFrameDuration(), NULL, PictWidth(), PictHeight());
+				ReconnectOutput(PictWidthAligned(), PictHeightAligned(), true, true, GetFrameDuration(), NULL, PictWidth(), PictHeight());
 				if (m_pDXVADecoder) {
 					(static_cast<CDXVA1Decoder*>(m_pDXVADecoder))->ConfigureDXVA1();
 				}
@@ -2240,8 +2236,8 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 					LPDIRECT3DSURFACE9 pSurfaces[DXVA2_MAX_SURFACES] = { 0 };
 					if (pSurfaces) {
 						hr = pDXVA2Service->CreateSurface(
-								PictWidthRounded(),
-								PictHeightRounded(),
+								PictWidthAligned(),
+								PictHeightAligned(),
 								numSurfaces,
 								m_VideoDesc.Format,
 								D3DPOOL_DEFAULT,
@@ -2950,7 +2946,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 			CheckPointer(m_pDXVADecoder, E_UNEXPECTED);
 
 			// stupid DXVA1 - size for the output MediaType should be the same that size of DXVA surface
-			if (m_nDecoderMode == MODE_DXVA1 && ReconnectOutput(PictWidthRounded(), PictHeightRounded(), true, false, GetFrameDuration(), NULL, PictWidth(), PictHeight()) == S_OK) {
+			if (m_nDecoderMode == MODE_DXVA1 && ReconnectOutput(PictWidthAligned(), PictHeightAligned(), true, false, GetFrameDuration(), NULL, PictWidth(), PictHeight()) == S_OK) {
 				(static_cast<CDXVA1Decoder*>(m_pDXVADecoder))->ConfigureDXVA1();
 			}
 	}
@@ -3015,10 +3011,10 @@ void CMPCVideoDecFilter::FlushDXVADecoder()	{
 void CMPCVideoDecFilter::FillInVideoDescription(DXVA2_VideoDesc *pDesc, D3DFORMAT Format/* = D3DFMT_A8R8G8B8*/)
 {
 	memset(pDesc, 0, sizeof(DXVA2_VideoDesc));
-	pDesc->SampleWidth			= PictWidthRounded();
-	pDesc->SampleHeight			= PictHeightRounded();
-	pDesc->Format				= Format;
-	pDesc->UABProtectionLevel	= 1;
+	pDesc->SampleWidth        = PictWidthAligned();
+	pDesc->SampleHeight       = PictHeightAligned();
+	pDesc->Format             = Format;
+	pDesc->UABProtectionLevel = 1;
 }
 
 BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID* mode)
@@ -3838,8 +3834,8 @@ STDMETHODIMP CVideoDecOutputPin::GetCreateVideoAcceleratorData(const GUID *pGuid
 
 	if (pAMVideoAccelerator) {
 		memcpy(&UncompInfo.ddUncompPixelFormat, &m_ddUncompPixelFormat, sizeof(DDPIXELFORMAT));
-		UncompInfo.dwUncompWidth		= m_pVideoDecFilter->PictWidthRounded();
-		UncompInfo.dwUncompHeight		= m_pVideoDecFilter->PictHeightRounded();
+		UncompInfo.dwUncompWidth		= m_pVideoDecFilter->PictWidthAligned();
+		UncompInfo.dwUncompHeight		= m_pVideoDecFilter->PictHeightAligned();
 		hr = pAMVideoAccelerator->GetCompBufferInfo(&m_GuidDecoderDXVA1, &UncompInfo, &dwNumTypesCompBuffers, CompInfo);
 
 		if (SUCCEEDED(hr)) {
