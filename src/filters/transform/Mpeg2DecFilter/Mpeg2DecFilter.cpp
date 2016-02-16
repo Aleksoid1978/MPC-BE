@@ -390,10 +390,12 @@ STDMETHODIMP CMpeg2DecFilter::Apply()
 	return S_OK;
 }
 
-void CMpeg2DecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int &RealWidth, int &RealHeight)
+void CMpeg2DecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& vsfilter)
 {
-	w = m_dec->m_info.m_sequence->picture_width;
-	h = m_dec->m_info.m_sequence->picture_height;
+	if (m_dec && m_dec->m_info.m_sequence) {
+		w = m_dec->m_info.m_sequence->picture_width;
+		h = m_dec->m_info.m_sequence->picture_height;
+	}
 }
 
 STDMETHODIMP CMpeg2DecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)

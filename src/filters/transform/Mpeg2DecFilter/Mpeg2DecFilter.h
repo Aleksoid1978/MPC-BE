@@ -110,7 +110,7 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478"))
 protected:
 	void InputTypeChanged();
 
-	virtual void GetOutputSize(int& w, int& h, int& arx, int& ary, int &RealWidth, int &RealHeight);
+	virtual void GetOutputSize(int& w, int& h, int& arx, int& ary, int& vsfilter);
 	virtual HRESULT Transform(IMediaSample* pIn);
 	virtual bool IsVideoInterlaced() { return IsInterlacedEnabled(); }
 	virtual void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);

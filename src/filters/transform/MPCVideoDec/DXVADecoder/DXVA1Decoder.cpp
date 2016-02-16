@@ -116,8 +116,8 @@ HRESULT CDXVA1Decoder::ConfigureDXVA1()
 
 			AMVAUncompDataInfo	DataInfo;
 			DWORD				dwNum = COMP_BUFFER_COUNT;
-			DataInfo.dwUncompWidth	= m_pFilter->PictWidthRounded();
-			DataInfo.dwUncompHeight	= m_pFilter->PictHeightRounded();
+			DataInfo.dwUncompWidth	= m_pFilter->PictWidthAligned();
+			DataInfo.dwUncompHeight	= m_pFilter->PictHeightAligned();
 			memcpy(&DataInfo.ddUncompPixelFormat, m_pFilter->GetDXVA1PixelFormat(), sizeof(DDPIXELFORMAT));
 			hr = m_pAMVideoAccelerator->GetCompBufferInfo(m_pFilter->GetDXVADecoderGuid(), &DataInfo, &dwNum, m_ComBufferInfo);
 		}
