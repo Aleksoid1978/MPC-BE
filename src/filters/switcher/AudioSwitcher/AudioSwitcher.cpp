@@ -32,6 +32,7 @@
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioTools.h"
 #include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/SysVersion.h"
 #include "../../../AudioTools/AudioHelper.h"
 #include "../../../ExtLib/ffmpeg/libavutil/channel_layout.h"
 
@@ -375,20 +376,14 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt)
 		}
 
 		DWORD samplerate = wfe->nSamplesPerSec;
-		if (samplerate > 192000) {
-			CLSID clsid;
+		const DWORD limitsamplerate = IsWinVistaOrLater() ? 192000 : 96000;
+		if (samplerate > limitsamplerate) {
+			CLSID clsid = GUID_NULL;
 
-			IPin *pTmp = NULL;
-			HRESULT hr = GetOutputPin()->ConnectedTo(&pTmp);
-			if (SUCCEEDED(hr)) {
-				clsid = GetCLSID(pTmp);
-			} else {
-				clsid = GUID_NULL;
-			}
-			if (pTmp) {
-				pTmp->Release();
-				pTmp = NULL;
-			}
+			CComPtr<IPin> pPinTo;
+			if (SUCCEEDED(GetOutputPin()->ConnectedTo(&pPinTo)) && pPinTo) {
+				clsid = GetCLSID(pPinTo);
+			};
 
 			if (clsid != CLSID_MpcAudioRenderer && clsid != CLSID_SanearAudioRenderer) {
 				while (samplerate > 96000) {
