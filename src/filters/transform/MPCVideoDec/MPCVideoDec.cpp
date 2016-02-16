@@ -2234,31 +2234,29 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 
 					UINT numSurfaces = max(m_DXVA2Config.ConfigMinRenderTargetBuffCount, 1);
 					LPDIRECT3DSURFACE9 pSurfaces[DXVA2_MAX_SURFACES] = { 0 };
-					if (pSurfaces) {
-						hr = pDXVA2Service->CreateSurface(
-								PictWidthAligned(),
-								PictHeightAligned(),
-								numSurfaces,
-								m_VideoDesc.Format,
-								D3DPOOL_DEFAULT,
-								0,
-								DXVA2_VideoDecoderRenderTarget,
-								pSurfaces,
-								NULL);
-						if (FAILED(hr)) {
-							DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoderService::CreateSurface() - FAILED (0x%08x)", hr));
-							break;
-						}
+					hr = pDXVA2Service->CreateSurface(
+							PictWidthAligned(),
+							PictHeightAligned(),
+							numSurfaces,
+							m_VideoDesc.Format,
+							D3DPOOL_DEFAULT,
+							0,
+							DXVA2_VideoDecoderRenderTarget,
+							pSurfaces,
+							NULL);
+					if (FAILED(hr)) {
+						DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoderService::CreateSurface() - FAILED (0x%08x)", hr));
+						break;
+					}
 
-						CComPtr<IDirectXVideoDecoder> pDirectXVideoDec;
-						hr = m_pDecoderService->CreateVideoDecoder(m_DXVADecoderGUID, &m_VideoDesc, &m_DXVA2Config, pSurfaces, numSurfaces, &pDirectXVideoDec);
-						if (FAILED(hr)) {
-							DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoder::CreateVideoDecoder() - FAILED (0x%08x)", hr));
-						}
+					CComPtr<IDirectXVideoDecoder> pDirectXVideoDec;
+					hr = m_pDecoderService->CreateVideoDecoder(m_DXVADecoderGUID, &m_VideoDesc, &m_DXVA2Config, pSurfaces, numSurfaces, &pDirectXVideoDec);
+					if (FAILED(hr)) {
+						DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoder::CreateVideoDecoder() - FAILED (0x%08x)", hr));
+					}
 
-						for (UINT i = 0; i < DXVA2_MAX_SURFACES; i++) {
-							SAFE_RELEASE(pSurfaces[i]);
-						}
+					for (UINT i = 0; i < DXVA2_MAX_SURFACES; i++) {
+						SAFE_RELEASE(pSurfaces[i]);
 					}
 
 					if (SUCCEEDED(hr) && SUCCEEDED(SetEVRForDXVA2(pReceivePin))) {
