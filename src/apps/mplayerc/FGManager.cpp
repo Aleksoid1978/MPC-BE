@@ -1932,6 +1932,13 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.AddTail(pFGF);
 	}
 
+	if (src[SRC_AMR] && !IsPreview) {
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
+		pFGF->m_chkbytes.AddTail(_T("0,6,,2321414D520A"));           // '#!AMR\n'
+		pFGF->m_chkbytes.AddTail(_T("0,9,,2321414D522D57420A"));     // '#!AMR-WB\n'
+		m_source.AddTail(pFGF);
+	}
+
 	if (src[SRC_APE] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,4,,4D414320"));               // 'MAC '
