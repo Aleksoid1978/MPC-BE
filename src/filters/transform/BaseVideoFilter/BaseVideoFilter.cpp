@@ -154,7 +154,7 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, 
 
 	HRESULT hr;
 
-	if (FAILED(hr = ReconnectOutput(w, h, true, false, AvgTimePerFrame, dxvaExtFlags))) {
+	if (FAILED(hr = ReconnectOutput(w, h, false, AvgTimePerFrame, dxvaExtFlags))) {
 		return hr;
 	}
 
@@ -181,7 +181,7 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, 
 	return S_OK;
 }
 
-HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool bForce, REFERENCE_TIME AvgTimePerFrame, DXVA2_ExtendedFormat* dxvaExtFormat, int RealWidth, int RealHeight)
+HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* = false*/, REFERENCE_TIME AvgTimePerFrame/* = 0*/, DXVA2_ExtendedFormat* dxvaExtFormat/* = NULL*/)
 {
 	CMediaType& mt = m_pOutput->CurrentMediaType();
 
@@ -207,10 +207,10 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 	int w_org = m_w;
 	int h_org = m_h;
 
-	if (w != m_w || h != m_h) {
+	if (width != m_w || height != m_h) {
 		bNeedReconnect = true;
-		m_w = w;
-		m_h = h;
+		m_w = width;
+		m_h = height;
 	}
 
 	REFERENCE_TIME nAvgTimePerFrame = 0;
@@ -266,7 +266,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 		}
 		BOOL m_bOverlayMixer = (clsid == CLSID_OverlayMixer);
 
-		CRect vih_rect(0, 0, RealWidth > 0 ? RealWidth : m_w, RealHeight > 0 ? RealHeight : m_h);
+		CRect vih_rect(0, 0, m_w, m_h);
 
 		DbgLog((LOG_TRACE, 3, L"CBaseVideoFilter::ReconnectOutput() : Performing reconnect"));
 		if (m_w != vih_rect.Width() || m_h != vih_rect.Height()) {
@@ -281,7 +281,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 
 		const bool bVideoSizeChanged = (m_w != m_wout || m_h != m_hout);
 
-		BITMAPINFOHEADER* pBMI	= NULL;
+		BITMAPINFOHEADER* pBMI = NULL;
 		if (mt.formattype == FORMAT_VideoInfo) {
 			VIDEOINFOHEADER* vih		= (VIDEOINFOHEADER*)mt.Format();
 			if (bVideoSizeChanged) {
@@ -311,9 +311,9 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 			return E_FAIL;	//should never be here? prevent null pointer refs for bmi
 		}
 
-		pBMI->biWidth		= m_w;
-		pBMI->biHeight		= m_h;
-		pBMI->biSizeImage	= DIBSIZE(*pBMI);
+		pBMI->biWidth     = m_w;
+		pBMI->biHeight    = m_h;
+		pBMI->biSizeImage = DIBSIZE(*pBMI);
 
 		HRESULT hrQA = m_pOutput->GetConnected()->QueryAccept(&mt);
 		ASSERT(SUCCEEDED(hrQA)); // should better not fail, after all "mt" is the current media type, just with a different resolution
@@ -327,27 +327,25 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 			for (;;) {
 				hr = m_pOutput->GetConnected()->ReceiveConnection(m_pOutput, &mt);
 				if (SUCCEEDED(hr)) {
-					if (bSendSample) {
-						CComPtr<IMediaSample> pOut;
-						if (SUCCEEDED(hr = m_pOutput->GetDeliveryBuffer(&pOut, NULL, NULL, 0))) {
-							AM_MEDIA_TYPE* pmt;
-							if (SUCCEEDED(pOut->GetMediaType(&pmt)) && pmt) {
-								CMediaType mt = *pmt;
-								m_pOutput->SetMediaType(&mt);
-								DeleteMediaType(pmt);
-							} else {
-								if (m_bOverlayMixer) {
-									// stupid overlay mixer won't let us know the new pitch...
-									long size = pOut->GetSize();
-									pBMI->biWidth = size ? (size / abs(pBMI->biHeight) * 8 / pBMI->biBitCount) : pBMI->biWidth;
-								}
-								m_pOutput->SetMediaType(&mt);
-							}
+					CComPtr<IMediaSample> pOut;
+					if (SUCCEEDED(hr = m_pOutput->GetDeliveryBuffer(&pOut, NULL, NULL, 0))) {
+						AM_MEDIA_TYPE* pmt;
+						if (SUCCEEDED(pOut->GetMediaType(&pmt)) && pmt) {
+							CMediaType mt = *pmt;
+							m_pOutput->SetMediaType(&mt);
+							DeleteMediaType(pmt);
 						} else {
-							m_w = w_org;
-							m_h = h_org;
-							return E_FAIL;
+							if (m_bOverlayMixer) {
+								// stupid overlay mixer won't let us know the new pitch...
+								long size = pOut->GetSize();
+								pBMI->biWidth = size ? (size / abs(pBMI->biHeight) * 8 / pBMI->biBitCount) : pBMI->biWidth;
+							}
+							m_pOutput->SetMediaType(&mt);
 						}
+					} else {
+						m_w = w_org;
+						m_h = h_org;
+						return E_FAIL;
 					}
 				} else if (hr == VFW_E_BUFFERS_OUTSTANDING && tryTimeout >= 0) {
 					if (tryTimeout > 0) {
@@ -369,10 +367,10 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int w, int h, bool bSendSample, bool b
 			}
 		}
 
-		m_wout		= m_w;
-		m_hout		= m_h;
-		m_arxout	= m_arx;
-		m_aryout	= m_ary;
+		m_wout   = m_w;
+		m_hout   = m_h;
+		m_arxout = m_arx;
+		m_aryout = m_ary;
 
 		// some renderers don't send this
 		if (m_nDecoderMode != MODE_DXVA2) {
