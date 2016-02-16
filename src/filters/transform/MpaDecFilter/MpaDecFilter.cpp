@@ -895,7 +895,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 	BEGINDATA
 
 	if (ffCodecId == AV_CODEC_ID_NONE) {
-		m_FFAudioDec.Init(nCodecId, m_pInput);
+		m_FFAudioDec.Init(nCodecId, &m_pInput->CurrentMediaType());
 		m_FFAudioDec.SetDRC(GetDynamicRangeControl());
 	}
 
@@ -2181,7 +2181,7 @@ HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 
 		enum AVCodecID nCodecId = FindCodec(pmt->subtype);
 		if (nCodecId != AV_CODEC_ID_NONE) {
-			if (m_FFAudioDec.Init(nCodecId, m_pInput)) {
+			if (m_FFAudioDec.Init(nCodecId, &m_pInput->CurrentMediaType())) {
 				m_FFAudioDec.SetDRC(GetDynamicRangeControl());
 			} else {
 				return VFW_E_TYPE_NOT_ACCEPTED;
