@@ -531,7 +531,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	if (m_bNeedCheck) {
 		m_bNeedCheck = FALSE;
 
-		memset(&m_bBitstreamSupported, FALSE, sizeof(m_bBitstreamSupported));
+		memset(&m_bBitstreamSupported, TRUE, sizeof(m_bBitstreamSupported));
 
 		CComPtr<IPin> pPinRenderer;
 		CComPtr<IPin> pPin = m_pOutput;
@@ -542,24 +542,26 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 		}
 	
 		if (pPinRenderer) {
-			CMediaType& mtOutput = m_pOutput->CurrentMediaType();
-			
-			CMediaType mt;
-			mt = CreateMediaTypeSPDIF();
-			m_bBitstreamSupported[SPDIF]		= pPinRenderer->QueryAccept(&mt) == S_OK;
+			CMediaType mtRenderer;
+			if (SUCCEEDED(pPinRenderer->ConnectionMediaType(&mtRenderer)) && mtRenderer.pbFormat) {
+				memset(&m_bBitstreamSupported, FALSE, sizeof(m_bBitstreamSupported));
 
-			if (IsWinVistaOrLater()) {
-				mt = CreateMediaTypeHDMI(IEC61937_EAC3);
-				m_bBitstreamSupported[EAC3]		= pPinRenderer->QueryAccept(&mt) == S_OK;
+				CMediaType mt = CreateMediaTypeSPDIF();
+				m_bBitstreamSupported[SPDIF]		= pPinRenderer->QueryAccept(&mt) == S_OK;
 
-				mt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
-				m_bBitstreamSupported[TRUEHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
+				if (IsWinVistaOrLater()) {
+					mt = CreateMediaTypeHDMI(IEC61937_EAC3);
+					m_bBitstreamSupported[EAC3]		= pPinRenderer->QueryAccept(&mt) == S_OK;
 
-				mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
-				m_bBitstreamSupported[DTSHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
+					mt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
+					m_bBitstreamSupported[TRUEHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
+
+					mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
+					m_bBitstreamSupported[DTSHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
+				}
+
+				pPinRenderer->QueryAccept(&mtRenderer);
 			}
-
-			pPinRenderer->QueryAccept(&mtOutput);
 		}
 
 		m_bHasVideo = HasMediaType(m_pInput, MEDIATYPE_Video) || HasMediaType(m_pInput, MEDIASUBTYPE_MPEG2_VIDEO);	

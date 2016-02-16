@@ -230,8 +230,7 @@ bool IsAudioWaveRenderer(IBaseFilter* pBF)
 		EndEnumPins
 	}
 
-	CLSID clsid;
-	memcpy(&clsid, &GUID_NULL, sizeof(clsid));
+	CLSID clsid = GUID_NULL;
 	pBF->GetClassID(&clsid);
 
 	return (// system
