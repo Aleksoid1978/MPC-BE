@@ -337,11 +337,11 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 			}
 			m_rtduration = m_samples * UNITS / m_samplerate;
 
-			BYTE* new_extradata = (BYTE*)realloc(m_extradata, size);
+			BYTE* new_extradata = (BYTE*)realloc(m_extradata, size - 3);
 			ASSERT(new_extradata);
 			if (new_extradata) {
 				m_extradata = new_extradata;
-				m_extrasize = size;
+				m_extrasize = size - 3;
 				memcpy(m_extradata, buffer, m_extrasize);
 			}
 		}
