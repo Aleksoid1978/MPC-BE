@@ -1475,7 +1475,7 @@ static const BYTE opus_channel_map[8][8] = {
 void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 {
 	if (CPrograms::CPair* pPair = m_programs.Lookup(pid)) {
-		memset(pPair->m_value.streams, 0, sizeof(pPair->m_value.streams));
+		program* pr = &pPair->m_value;
 
 		CGolombBuffer gb(pData.GetData(), pData.GetCount());
 		int len = gb.GetSize();
@@ -1496,18 +1496,21 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 			gb.SkipBytes(program_info_length);
 		}
 
-		for (int i = 0; i < _countof(pPair->m_value.streams) && len >= 5; i++) {
-			BYTE stream_type	= (BYTE)gb.BitRead(8);
-			BYTE nreserved1		= (BYTE)gb.BitRead(3);
-			WORD pid			= (WORD)gb.BitRead(13);
-			BYTE nreserved2		= (BYTE)gb.BitRead(4);
-			WORD ES_info_length	= (WORD)gb.BitRead(12);
+		for (;;) {
+			PES_STREAM_TYPE stream_type = (PES_STREAM_TYPE)gb.BitRead(8);
+			BYTE nreserved1             = (BYTE)gb.BitRead(3);
+			WORD pid                    = (WORD)gb.BitRead(13);
+			BYTE nreserved2             = (BYTE)gb.BitRead(4);
+			WORD ES_info_length         = (WORD)gb.BitRead(12);
 			UNREFERENCED_PARAMETER(nreserved1);
 			UNREFERENCED_PARAMETER(nreserved2);
 
-			if (!m_programs.FindProgram(pid)) {
-				pPair->m_value.streams[i].pid	= pid;
-				pPair->m_value.streams[i].type	= (PES_STREAM_TYPE)stream_type;
+			if (stream_type != PES_STREAM_TYPE::INVALID && !pr->streamFind(pid)) {
+				program::stream s;
+				s.pid  = pid;
+				s.type = stream_type;
+
+				pr->streams.push_back(s);
 			}
 
 			len -= (5 + ES_info_length);
@@ -1918,12 +1921,8 @@ const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(WORD pid, int &
 		POSITION pos = m_programs.GetStartPosition();
 		while (pos) {
 			program* p = &m_programs.GetNextValue(pos);
-
-			for (int i = 0; i < _countof(p->streams); i++) {
-				if (p->streams[i].pid == pid) {
-					iStream = i;
-					return p;
-				}
+			if (p->streamFind(pid, &iStream)) {
+				return p;
 			}
 		}
 	}
