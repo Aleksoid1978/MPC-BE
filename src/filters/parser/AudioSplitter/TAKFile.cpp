@@ -367,6 +367,8 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 
 	m_pFile->Seek(m_startpos);
 
+	m_nAvgBytesPerSec = UNITS * m_framelen / m_samplerate;
+
 	return S_OK;
 }
 
@@ -429,7 +431,7 @@ REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 
 	m_pFile->Seek(CurFrmPos);
 
-	rt = CurFrmNum < 0 ? m_rtduration : (10000000i64 * CurFrmNum * m_framelen / m_samplerate);
+	rt = CurFrmNum < 0 ? m_rtduration : CurFrmNum * m_nAvgBytesPerSec;
 	return rt;
 }
 
