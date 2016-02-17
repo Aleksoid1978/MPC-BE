@@ -137,7 +137,9 @@ bool CAudioFile::SetMediaType(CMediaType& mt)
 	wfe->cbSize				= m_extrasize;
 	memcpy(wfe + 1, m_extradata, m_extrasize);
 
-	m_nAvgBytesPerSec		= wfe->nAvgBytesPerSec;
+	if (!m_nAvgBytesPerSec) {
+		m_nAvgBytesPerSec	= wfe->nAvgBytesPerSec;
+	}
 
 	return true;
 }
