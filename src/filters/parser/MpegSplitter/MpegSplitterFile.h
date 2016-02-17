@@ -347,16 +347,16 @@ public:
 			PES_STREAM_TYPE	type = PES_STREAM_TYPE::INVALID;
 
 		};
-		stream streams[64];
+		std::vector<stream> streams;
 
 		CString name;
 		
 		size_t streamCount(CStreamsList s) {
 			size_t cnt = 0;
-			for (size_t i = 0; i < _countof(streams); i++) {
-				if (streams[i].pid) {
+			for (auto stream = streams.begin(); stream != streams.end(); stream++) {
+				if (stream->pid) {
 					for (int type = stream_type::video; type < stream_type::unknown; type++) {
-						if (s[type].FindStream(streams[i].pid)) {
+						if (s[type].FindStream(stream->pid)) {
 							cnt++;
 							break;
 						}
@@ -365,6 +365,19 @@ public:
 			}
 
 			return cnt;
+		}
+
+		bool streamFind(WORD pid, int* iStream = NULL) {
+			for (size_t i = 0; i < streams.size(); i++) {
+				if (streams[i].pid == pid) {
+					if (iStream) {
+						*iStream = i;
+					}
+					return true;
+				}
+			}
+
+			return false;
 		}
 	};
 
@@ -392,8 +405,8 @@ public:
 			POSITION pos = GetStartPosition();
 			while (pos) {
 				program* p = &GetNextValue(pos);
-				for (size_t i = 0; i < _countof(p->streams); i++) {
-					if (p->streams[i].pid == pid) {
+				for (auto stream = p->streams.begin(); stream != p->streams.end(); stream++) {
+					if (stream->pid == pid) {
 						return p;
 					}
 				}

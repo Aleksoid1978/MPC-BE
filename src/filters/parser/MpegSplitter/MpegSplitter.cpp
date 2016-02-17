@@ -1469,14 +1469,14 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 					continue;
 				}
 				if (j == lIndex) {
-					for (size_t i = 0; i < _countof(p->streams); i++) {
-						if (p->streams[i].pid) {
+					for (auto stream = p->streams.begin(); stream != p->streams.end(); stream++) {
+						if (stream->pid) {
 							long index = m_pFile->m_programs.GetValidCount();
 							for (int type = CMpegSplitterFile::stream_type::video; type < _countof(m_pFile->m_streams); type++) {
 								POSITION pos2 = m_pFile->m_streams[type].GetHeadPosition();
 								while (pos2) {
 									CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos2);
-									if (s.pid == p->streams[i].pid) {
+									if (s.pid == stream->pid) {
 										Enable(index, dwFlags);
 									}
 									index++;
@@ -1603,8 +1603,8 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 					if (pdwFlags) {
 						*pdwFlags = 0;
 
-						for (size_t i = 0; i < _countof(p->streams); i++) {
-							if (p->streams[i].pid == pidEnabled) {
+						for (auto stream = p->streams.begin(); stream != p->streams.end(); stream++) {
+							if (stream->pid == pidEnabled) {
 								*pdwFlags = AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE;
 								break;
 							}
