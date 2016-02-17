@@ -200,11 +200,13 @@ CFFAudioDecoder::CFFAudioDecoder()
 	, m_pAVCtx(NULL)
 	, m_pParser(NULL)
 	, m_pFrame(NULL)
-	, m_pCurrentMediaType(NULL)
 	, m_bIgnoreJitterChecking(false)
 	, m_bNeedSyncpoint(false)
 {
 	memset(&m_raData, 0, sizeof(m_raData));
+
+	avcodec_register_all();
+	av_log_set_callback(ff_log);
 }
 
 static bool flac_parse_block_header(CGolombBuffer& gb, BYTE& last, BYTE& type, DWORD& size) {
@@ -219,8 +221,6 @@ static bool flac_parse_block_header(CGolombBuffer& gb, BYTE& last, BYTE& type, D
 
 	return true;
 }
-
-#define FLAC_METADATA_TYPE_VORBIS_COMMENT 4
 
 static bool ParseVorbisTag(const CString field_name, const CString vorbisTag, CString& tagValue) {
 	tagValue.Empty();
@@ -238,56 +238,93 @@ static bool ParseVorbisTag(const CString field_name, const CString vorbisTag, CS
 	return true;
 }
 
-bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CMediaType* mediaType)
+bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 {
-	if (nCodecId == AV_CODEC_ID_NONE) {
-		return false;
+	AVCodecID codec_id	= AV_CODEC_ID_NONE;
+	int samplerate		= 0;
+	int channels		= 0;
+	int bitdeph			= 0;
+	int block_align		= 0;
+	int64_t bitrate		= 0;
+	BYTE* extradata		= NULL;
+	unsigned extralen	= 0;
+
+	if (codecID == AV_CODEC_ID_NONE || mediaType == NULL) {
+		if (m_pAVCodec == NULL || m_pAVCtx == NULL || m_pAVCtx->codec_id == AV_CODEC_ID_NONE) {
+			return false;
+		}
+
+		// use the previous info
+		codec_id	= m_pAVCtx->codec_id;
+		samplerate	= m_pAVCtx->sample_rate;
+		channels	= m_pAVCtx->channels;
+		bitdeph		= m_pAVCtx->bits_per_coded_sample;
+		block_align	= m_pAVCtx->block_align;
+		bitrate		= m_pAVCtx->bit_rate;
+		if (m_pAVCtx->extradata && m_pAVCtx->extradata_size > 0) {
+			extralen = m_pAVCtx->extradata_size;
+			extradata = (uint8_t*)av_mallocz(extralen + AV_INPUT_BUFFER_PADDING_SIZE);
+			memcpy(extradata, m_pAVCtx->extradata, extralen);
+		}
 	}
+	else {
+		codec_id = codecID;
+		if (mediaType->formattype == FORMAT_WaveFormatEx) {
+			WAVEFORMATEX *wfex = (WAVEFORMATEX *)mediaType->Format();
+			samplerate	= wfex->nSamplesPerSec;
+			channels	= wfex->nChannels;
+			bitdeph		= wfex->wBitsPerSample;
+			block_align	= wfex->nBlockAlign;
+			bitrate		= wfex->nAvgBytesPerSec * 8;
+		}
+		else if (mediaType->formattype == FORMAT_VorbisFormat2) {
+			VORBISFORMAT2 *vf2 = (VORBISFORMAT2 *)mediaType->Format();
+			samplerate	= vf2->SamplesPerSec;
+			channels	= vf2->Channels;
+			bitdeph		= vf2->BitsPerSample;
+		}
+		else {
+			return false;
+		}
 
-	if (mediaType) {
-		m_pCurrentMediaType = mediaType;
+		// fix incorect info
+		if (codec_id == AV_CODEC_ID_AMR_NB) {
+			channels = 1;
+			samplerate  = 8000;
+		}
+		else if (codec_id == AV_CODEC_ID_AMR_WB) {
+			channels = 1;
+			samplerate = 16000;
+		}
+
+		getExtraData(mediaType->Format(), &mediaType->formattype, mediaType->cbFormat, NULL, &extralen);
+		if (extralen) {
+			extradata = (uint8_t*)av_mallocz(extralen + AV_INPUT_BUFFER_PADDING_SIZE);
+			getExtraData(mediaType->Format(), &mediaType->formattype, mediaType->cbFormat, extradata, NULL);
+		}
 	}
-
-	if (!m_pCurrentMediaType) {
-		return false;
-	}
-
-	bool bRet = false;
-
-	avcodec_register_all();
-	av_log_set_callback(ff_log);
 
 	if (m_pAVCodec) {
 		StreamFinish();
 	}
 
-	m_pAVCodec = avcodec_find_decoder(nCodecId);
-	if (m_pAVCodec) {
-		DWORD nSamples, nBytesPerSec;
-		WORD nChannels, nBitsPerSample, nBlockAlign;
-		audioFormatTypeHandler((BYTE*)m_pCurrentMediaType->Format(), m_pCurrentMediaType->FormatType(), &nSamples, &nChannels, &nBitsPerSample, &nBlockAlign, &nBytesPerSec);
+	bool bRet = false;
 
-		if (nCodecId == AV_CODEC_ID_AMR_NB) {
-			nChannels = 1;
-			nSamples  = 8000;
-		}
-		if (nCodecId == AV_CODEC_ID_AMR_WB) {
-			nChannels = 1;
-			nSamples  = 16000;
-		}
+	m_pAVCodec = avcodec_find_decoder(codec_id);
+	if (m_pAVCodec) {
 
 		m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
 		CheckPointer(m_pAVCtx, false);
 
-		m_pAVCtx->sample_rate			= nSamples;
-		m_pAVCtx->channels				= nChannels;
-		m_pAVCtx->bit_rate				= nBytesPerSec << 3;
-		m_pAVCtx->bits_per_coded_sample	= nBitsPerSample;
-		m_pAVCtx->block_align			= nBlockAlign;
+		m_pAVCtx->codec_id				= codec_id;
+		m_pAVCtx->sample_rate			= samplerate;
+		m_pAVCtx->channels				= channels;
+		m_pAVCtx->bits_per_coded_sample	= bitdeph;
+		m_pAVCtx->block_align			= block_align;
+		m_pAVCtx->bit_rate				= bitrate;
 		m_pAVCtx->err_recognition		= AV_EF_CAREFUL;
 		m_pAVCtx->thread_count			= 1;
 		m_pAVCtx->thread_type			= 0;
-		m_pAVCtx->codec_id				= nCodecId;
 		m_pAVCtx->refcounted_frames		= 1;
 		if (m_pAVCodec->capabilities & AV_CODEC_CAP_TRUNCATED) {
 			m_pAVCtx->flags				|= AV_CODEC_FLAG_TRUNCATED;
@@ -297,28 +334,20 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CMediaType* mediaType)
 		//	m_pAVCtx->request_channel_layout = AV_CH_LAYOUT_STEREO;
 		//}
 
-		m_pParser = av_parser_init(nCodecId);
-
-		const void* format = m_pCurrentMediaType->Format();
-		GUID format_type = m_pCurrentMediaType->formattype;
-		DWORD formatlen = m_pCurrentMediaType->cbFormat;
-		unsigned extralen = 0;
-		getExtraData((BYTE*)format, &format_type, formatlen, NULL, &extralen);
+		m_pParser = av_parser_init(codec_id);
 
 		memset(&m_raData, 0, sizeof(m_raData));
 
-		if (extralen) {
-			if (nCodecId == AV_CODEC_ID_COOK || nCodecId == AV_CODEC_ID_ATRAC3 || nCodecId == AV_CODEC_ID_SIPR) {
-				uint8_t* extra = (uint8_t*)av_mallocz(extralen + AV_INPUT_BUFFER_PADDING_SIZE);
-				getExtraData((BYTE*)format, &format_type, formatlen, extra, NULL);
-
-				if (extralen >= 4 && GETDWORD(extra) == MAKEFOURCC('.', 'r', 'a', 0xfd)) {
-					HRESULT hr = ParseRealAudioHeader(extra, extralen);
-					av_freep(&extra);
+		if (extradata && extralen) {
+			if (codec_id == AV_CODEC_ID_COOK || codec_id == AV_CODEC_ID_ATRAC3 || codec_id == AV_CODEC_ID_SIPR) {
+				if (extralen >= 4 && GETDWORD(extradata) == MAKEFOURCC('.', 'r', 'a', 0xfd)) {
+					HRESULT hr = ParseRealAudioHeader(extradata, extralen);
+					av_freep(&extradata);
+					extralen = 0;
 					if (FAILED(hr)) {
 						return false;
 					}
-					if (nCodecId == AV_CODEC_ID_SIPR) {
+					if (codec_id == AV_CODEC_ID_SIPR) {
 						if (m_raData.flavor > 3) {
 							DbgLog((LOG_TRACE, 3, L"CFFAudioDecoder::Init() : Invalid SIPR flavor (%d)", m_raData.flavor));
 							return false;
@@ -329,12 +358,11 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CMediaType* mediaType)
 				} else {
 					// Try without any processing?
 					m_pAVCtx->extradata_size = extralen;
-					m_pAVCtx->extradata      = extra;
+					m_pAVCtx->extradata      = extradata;
 				}
 			} else {
 				m_pAVCtx->extradata_size = extralen;
-				m_pAVCtx->extradata      = (uint8_t*)av_mallocz(m_pAVCtx->extradata_size + AV_INPUT_BUFFER_PADDING_SIZE);
-				getExtraData((BYTE*)format, &format_type, formatlen, (BYTE*)m_pAVCtx->extradata, NULL);
+				m_pAVCtx->extradata      = extradata;
 			}
 		}
 
@@ -346,13 +374,13 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CMediaType* mediaType)
 		}
 		avcodec_unlock;
 
-		if (bRet && nCodecId == AV_CODEC_ID_FLAC && m_pAVCtx->extradata_size > (4+4+34) && GETDWORD(m_pAVCtx->extradata) == FCC('fLaC')) {
+		if (bRet && m_pAVCtx->codec_id == AV_CODEC_ID_FLAC && m_pAVCtx->extradata_size > (4+4+34) && GETDWORD(m_pAVCtx->extradata) == FCC('fLaC')) {
 			BYTE metadata_last, metadata_type;
 			DWORD metadata_size;
 			CGolombBuffer gb(m_pAVCtx->extradata + 4, m_pAVCtx->extradata_size - 4);
 
 			while (flac_parse_block_header(gb, metadata_last, metadata_type, metadata_size)) {
-				if (metadata_type == FLAC_METADATA_TYPE_VORBIS_COMMENT) {
+				if (metadata_type == 4) { // FLAC_METADATA_TYPE_VORBIS_COMMENT
 					int vendor_length = gb.ReadDwordLE();
 					if (gb.RemainingSize() >= vendor_length) {
 						gb.SkipBytes(vendor_length);
@@ -391,10 +419,10 @@ bool CFFAudioDecoder::Init(enum AVCodecID nCodecId, CMediaType* mediaType)
 		StreamFinish();
 	}
 
-	m_bIgnoreJitterChecking = (nCodecId == AV_CODEC_ID_COOK
-							   || nCodecId == AV_CODEC_ID_ATRAC3
-							   || nCodecId == AV_CODEC_ID_SIPR
-							   || nCodecId == AV_CODEC_ID_BINKAUDIO_DCT);
+	m_bIgnoreJitterChecking = (codec_id == AV_CODEC_ID_COOK
+							|| codec_id == AV_CODEC_ID_ATRAC3
+							|| codec_id == AV_CODEC_ID_SIPR
+							|| codec_id == AV_CODEC_ID_BINKAUDIO_DCT);
 
 	m_bNeedSyncpoint = (m_raData.deint_id != 0);
 
