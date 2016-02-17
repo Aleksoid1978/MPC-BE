@@ -53,15 +53,13 @@ protected:
 
 	HRESULT ParseRealAudioHeader(const BYTE* extra, const int extralen);
 
-	CMediaType* m_pCurrentMediaType;
-
 	bool m_bIgnoreJitterChecking;
 	bool m_bNeedSyncpoint;
 
 public:
 	CFFAudioDecoder();
 
-	bool    Init(enum AVCodecID nCodecId, CMediaType* mediaType);
+	bool    Init(enum AVCodecID codecID, CMediaType* mediaType);
 	void    SetDRC(bool fDRC);
 
 	HRESULT RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOut);
