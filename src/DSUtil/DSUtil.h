@@ -180,7 +180,6 @@ extern void				CorrectComboListWidth(CComboBox& pComboBox);
 extern void				CorrectCWndWidth(CWnd* pWnd);
 
 extern void				getExtraData(const BYTE *format, const GUID *formattype, const size_t formatlen, BYTE *extra, unsigned int *extralen);
-extern void				audioFormatTypeHandler(const BYTE *format, const GUID *formattype, DWORD *pnSamples, WORD *pnChannels, WORD *pnBitsPerSample, WORD *pnBlockAlign, DWORD *pnBytesPerSec);
 
 extern int				MakeAACInitData(BYTE* pData, int profile, int freq, int channels);
 extern bool				MakeMPEG2MediaType(CMediaType& mt, BYTE* seqhdr, DWORD len, int w, int h);
