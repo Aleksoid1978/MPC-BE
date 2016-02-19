@@ -548,7 +548,7 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 
 void CMpegSplitterFilter::GetMediaTypes(CMpegSplitterFile::stream_type sType, CAtlArray<CMediaType>& mts)
 {
-	for (int type = CMpegSplitterFile::stream_type::video; type < _countof(m_pFile->m_streams); type++) {
+	for (int type = CMpegSplitterFile::stream_type::video; type <= CMpegSplitterFile::stream_type::subpic; type++) {
 		if (type == sType) {
 			POSITION pos = m_pFile->m_streams[type].GetHeadPosition();
 			while (pos) {
@@ -623,10 +623,10 @@ STDMETHODIMP CMpegSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 void CMpegSplitterFilter::ReadClipInfo(LPCOLESTR pszFileName)
 {
 	if (wcslen(pszFileName) > 0) {
-		WCHAR Drive[_MAX_DRIVE];
-		WCHAR Dir[_MAX_PATH];
-		WCHAR Filename[_MAX_PATH];
-		WCHAR Ext[_MAX_EXT];
+		WCHAR Drive[_MAX_DRIVE] = { 0 };
+		WCHAR Dir[_MAX_PATH] = { 0 };
+		WCHAR Filename[_MAX_PATH] = { 0 };
+		WCHAR Ext[_MAX_EXT] = { 0 };
 
 		if (_wsplitpath_s(pszFileName, Drive, _countof(Drive), Dir, _countof(Dir), Filename, _countof(Filename), Ext, _countof(Ext)) == 0) {
 			CString	strClipInfo;
@@ -662,6 +662,39 @@ STDMETHODIMP CMpegSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 	}
 
 	return __super::Load(pszFileName, pmt);
+}
+
+HRESULT CMpegSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
+{
+	const DWORD TrackNumber = p->TrackNumber;
+
+	if (m_bUseMVCExtension) {
+		if (TrackNumber == m_dwMVCExtensionTrackNumber) {
+			m_MVCExtensionQueue.AddTail(p);
+		} else if (TrackNumber == m_dwMasterH264TrackNumber) {
+			while (!m_MVCExtensionQueue.IsEmpty()) {
+				CAutoPtr<CPacket>& pMVCExtensionPacket = m_MVCExtensionQueue.GetHead();
+				if (pMVCExtensionPacket->rtStart == p->rtStart) {
+					p->Append(*pMVCExtensionPacket);
+					m_MVCExtensionQueue.RemoveHeadNoReturn();
+
+					return __super::DeliverPacket(p);
+				} else if (pMVCExtensionPacket->rtStart < p->rtStart) {
+					DbgLog((LOG_TRACE, 3, L"CMpegSplitterFilter::DeliverPacket() : Dropping MVC extension %I64d, base is %I64d", pMVCExtensionPacket->rtStart, p->rtStart));
+					m_MVCExtensionQueue.RemoveHeadNoReturn();
+				} else {
+					DbgLog((LOG_TRACE, 3, L"CMpegSplitterFilter::DeliverPacket() : Dropping base %I64d, next MVC extension is %I64d", p->rtStart, pMVCExtensionPacket->rtStart));
+					break;
+				}
+			}						
+		} else {
+			return __super::DeliverPacket(p);
+		}
+
+		return S_OK;
+	}
+
+	return __super::DeliverPacket(p);
 }
 
 template<typename T>
@@ -772,7 +805,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 		if (h.payload && ISVALIDPID(h.pid)) {
 			DWORD TrackNumber = h.pid;
-			if (GetOutputPin(TrackNumber)) {
+			if (GetOutputPin(TrackNumber) || TrackNumber == m_dwMVCExtensionTrackNumber) {
 				CMpegSplitterFile::peshdr peshdr;
 				if (h.payloadstart) {
 					if (m_pFile->NextMpegStartCode(b, 4)) { // pes packet
@@ -928,8 +961,20 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 		s.mts.push_back(mt);
 	}
 
-	if (mt.subtype == MEDIASUBTYPE_H264 && SUCCEEDED(CreateAVCfromH264(&mt))) {
-		s.mts.push_back(mt);
+	if (mt.subtype == MEDIASUBTYPE_H264) {
+		if (m_pFile->m_streams[CMpegSplitterFile::stream_type::video].GetCount() == 1
+				&& m_pFile->m_streams[CMpegSplitterFile::stream_type::stereo].GetCount() == 1) {
+			CMpegSplitterFile::stream& stereo = m_pFile->m_streams[CMpegSplitterFile::stream_type::stereo].GetHead();
+			s.mts.push_back(stereo.mt);
+
+			m_bUseMVCExtension          = TRUE;
+			m_dwMasterH264TrackNumber   = s;
+			m_dwMVCExtensionTrackNumber = stereo;
+		}
+
+		if (SUCCEEDED(CreateAVCfromH264(&mt))) {
+			s.mts.push_back(mt);
+		}
 	}
 
 	s.mts.push_back(s.mt);
@@ -950,7 +995,7 @@ CString CMpegSplitterFilter::FormatStreamName(CMpegSplitterFile::stream& s, CMpe
 	CStringA lang_name	= s.lang;
 	lang_name			= m_pTI ? CStringA(m_pTI->GetTrackName(s.ps1id)) : lang_name;
 
-	CString FormatDesc = GetMediaTypeDesc(&s.mt, pClipInfo, StreamType, lang_name);
+	CString FormatDesc = GetMediaTypeDesc(&s.mts[0], pClipInfo, StreamType, lang_name);
 
 	if (!FormatDesc.IsEmpty()) {
 		str.Format(L"%s (%04x,%02x,%02x)", FormatDesc, s.pid, s.pesid, s.ps1id);
@@ -1070,7 +1115,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	for (int type = CMpegSplitterFile::stream_type::video; type < _countof(m_pFile->m_streams); type++) {
+	for (int type = CMpegSplitterFile::stream_type::video; type <= CMpegSplitterFile::stream_type::subpic; type++) {
 		int stream_idx	= 0;
 		int Idx_audio	= 99;
 		int Idx_subpic	= 99;
@@ -1153,7 +1198,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	CStringA palette;
-	for (int type = CMpegSplitterFile::stream_type::video; type < _countof(m_pFile->m_streams); type++) {
+	for (int type = CMpegSplitterFile::stream_type::video; type <= CMpegSplitterFile::stream_type::subpic; type++) {
 		POSITION pos = m_pFile->m_streams[type].GetHeadPosition();
 		while (pos) {
 			CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos);
@@ -1161,7 +1206,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	for (int type = CMpegSplitterFile::stream_type::video; type < _countof(m_pFile->m_streams); type++) {
+	for (int type = CMpegSplitterFile::stream_type::video; type <= CMpegSplitterFile::stream_type::subpic; type++) {
 		int stream_idx = 0;
 
 		POSITION pos = m_pFile->m_streams[type].GetHeadPosition();
@@ -1245,6 +1290,22 @@ bool CMpegSplitterFilter::DemuxInit()
 
 	m_rtStartOffset = 0;
 
+	if (m_bUseMVCExtension) {
+		BOOL bUseMVCExtension = FALSE;
+		if (IPin* pPin = dynamic_cast<IPin*>(GetOutputPin(m_dwMasterH264TrackNumber))) {
+			CMediaType mt;
+			if (SUCCEEDED(pPin->ConnectionMediaType(&mt))) {
+				bUseMVCExtension = (mt.subtype == MEDIASUBTYPE_AMVC);
+			}
+		}
+
+		if (!bUseMVCExtension) {
+			m_bUseMVCExtension          = FALSE;
+			m_dwMasterH264TrackNumber   = DWORD_MAX;
+			m_dwMVCExtensionTrackNumber = DWORD_MAX;
+		}
+	}
+
 	return true;
 }
 
@@ -1271,6 +1332,8 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		ASSERT(0);
 		return;
 	}
+
+	m_MVCExtensionQueue.RemoveAll();
 
 	CMpegSplitterFile::stream& masterStream = pMasterStream->GetHead();
 	DWORD TrackNum = masterStream;
@@ -1309,6 +1372,10 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 				CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNum);
 				if (pPin && pPin->IsConnected()) {
+					if (TrackNum == m_dwMasterH264TrackNumber) {
+						TrackNum = m_dwMVCExtensionTrackNumber;
+					}
+
 					m_pFile->Seek(seekpos);
 					__int64 curpos = seekpos;
 
@@ -1386,10 +1453,6 @@ bool CMpegSplitterFilter::DemuxLoop()
 	REFERENCE_TIME rtStartOffset = m_rtStartOffset ? m_rtStartOffset : m_pFile->m_rtMin;
 	m_rtGlobalPCRTimeStamp = INVALID_TIME;
 
-	const CMpegSplitterFile::stream st = pMasterStream->GetHead();
-	BOOL bMainIsVideo	= (st.mt.majortype == MEDIATYPE_Video);
-	__int64 AvailBytes	= bMainIsVideo ? 256 * KILOBYTE : 16 * KILOBYTE;
-
 	HRESULT hr = S_OK;
 	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
 		hr = DemuxNextPacket(rtStartOffset);
@@ -1397,14 +1460,14 @@ bool CMpegSplitterFilter::DemuxLoop()
 
 	POSITION pos = pPackets.GetStartPosition();
 	while (pos) {
-		CAutoPtr<CPacket>& p = pPackets.GetNextValue(pos);
-		if (p) {
+		if (CAutoPtr<CPacket>& p = pPackets.GetNextValue(pos)) {
 			if (p->bSyncPoint && GetOutputPin(p->TrackNumber)) {
 				DeliverPacket(p);
 			}
 			p.Free();
 		}
 	}
+	pPackets.RemoveAll();
 
 	return true;
 }
@@ -1442,7 +1505,7 @@ STDMETHODIMP CMpegSplitterFilter::Count(DWORD* pcStreams)
 
 	*pcStreams = 0;
 
-	for (int i = 0; i < _countof(m_pFile->m_streams); i++) {
+	for (int i = CMpegSplitterFile::stream_type::video; i <= CMpegSplitterFile::stream_type::subpic; i++) {
 		(*pcStreams) += m_pFile->m_streams[i].GetCount();
 	}
 
@@ -1472,7 +1535,7 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 					for (auto stream = p->streams.begin(); stream != p->streams.end(); stream++) {
 						if (stream->pid) {
 							long index = m_pFile->m_programs.GetValidCount();
-							for (int type = CMpegSplitterFile::stream_type::video; type < _countof(m_pFile->m_streams); type++) {
+							for (int type = CMpegSplitterFile::stream_type::video; type < CMpegSplitterFile::stream_type::subpic; type++) {
 								POSITION pos2 = m_pFile->m_streams[type].GetHeadPosition();
 								while (pos2) {
 									CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos2);
@@ -1495,7 +1558,7 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 		lIndex -= m_pFile->m_programs.GetValidCount();
 	}
 
-	for (int type = CMpegSplitterFile::stream_type::video, j = 0; type < _countof(m_pFile->m_streams); type++) {
+	for (int type = CMpegSplitterFile::stream_type::video, j = 0; type <= CMpegSplitterFile::stream_type::subpic; type++) {
 		int cnt = m_pFile->m_streams[type].GetCount();
 
 		if (lIndex >= j && lIndex < j + cnt) {
@@ -1568,7 +1631,7 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 	if (m_pFile->m_programs.GetValidCount() > 1) {
 		if (lIndex < (long)m_pFile->m_programs.GetValidCount()) {
 			int type = -1;
-			for (type = CMpegSplitterFile::stream_type::video; type < _countof(m_pFile->m_streams); type++) {
+			for (type = CMpegSplitterFile::stream_type::video; type <= CMpegSplitterFile::stream_type::subpic; type++) {
 				if (m_pFile->m_streams[type].GetCount()) {
 					break;
 				}
@@ -1647,7 +1710,7 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 		lIndex -= m_pFile->m_programs.GetValidCount();
 	}
 
-	for (int type = CMpegSplitterFile::stream_type::video, j = 0; type < _countof(m_pFile->m_streams); type++) {
+	for (int type = CMpegSplitterFile::stream_type::video, j = 0; type <= CMpegSplitterFile::stream_type::subpic; type++) {
 		int cnt = m_pFile->m_streams[type].GetCount();
 
 		if (lIndex >= j && lIndex < j+cnt) {

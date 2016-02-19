@@ -194,13 +194,17 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		__int64 posMin       = -1;
 		__int64 posMax       = posMin;
 
-		for (int type = stream_type::video; type <= stream_type::audio; type++) {
+		for (int type = stream_type::video; type < stream_type::unknown; type++) {
+			if (type == stream_type::subpic) {
+				continue;
+			}
 			const CStreamList& streams = m_streams[type];
 			POSITION pos = streams.GetHeadPosition();
 			while (pos) {
 				const stream& s = streams.GetNext(pos);
 				const SyncPoints& sps = m_SyncPoints[s];
-				if (sps.GetCount() && sps[0].rt < rtMin) {
+				if (sps.GetCount()
+						&& (sps[0].rt < rtMin || (sps[0].rt == rtMin && sps[0].fp < posMin))) {
 					rtMin = sps[0].rt;
 					posMin = posMax = sps[0].fp;
 				}
@@ -213,7 +217,10 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			const REFERENCE_TIME maxDelta      = 30 * 60 * 10000000i64; // 30 minutes
 			const REFERENCE_TIME maxStartDelta = 10 * 10000000i64;      // 10 seconds
 			m_rtMin = m_rtMax = rtMin;
-			for (int type = stream_type::video; type <= stream_type::audio; type++) {
+			for (int type = stream_type::video; type < stream_type::unknown; type++) {
+				if (type == stream_type::subpic) {
+					continue;
+				}
 				const CStreamList& streams = m_streams[type];
 				POSITION pos = streams.GetHeadPosition();
 				while (pos) {
@@ -242,7 +249,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	for (int type = stream_type::video; type <= stream_type::subpic; type++) {
+	for (int type = stream_type::video; type < stream_type::unknown; type++) {
 		const CStreamList& streams = m_streams[type];
 		POSITION pos = streams.GetHeadPosition();
 		while (pos) {
@@ -673,6 +680,7 @@ static const struct StreamType {
 	// H.264/AVC1 Video
 	{ VIDEO_STREAM_H264,					H264_VIDEO	},
 	{ VIDEO_STREAM_H264_ADDITIONAL_VIEW,	H264_VIDEO	},
+	{ MVC_H264,								H264_VIDEO	},
 	// VC-1 Video
 	{ VIDEO_STREAM_VC1,						VC1_VIDEO	},
 	// Dirac Video
@@ -775,9 +783,15 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		if (type == stream_type::unknown && (stream_type & H264_VIDEO)) {
 			Seek(start);
 			avchdr h;
-			if (!m_streams[stream_type::video].Find(s) && Read(h, len, avch[s], &s.mt)) {
-				s.codec = stream_codec::H264;
-				type = stream_type::video;
+			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::stereo].Find(s)
+					&& Read(h, len, avch[s], &s.mt)) {
+				if (pes_stream_type == MVC_H264) {
+					s.codec = stream_codec::MVC;
+					type = stream_type::stereo;
+				} else {
+					s.codec = stream_codec::H264;
+					type = stream_type::video;
+				}
 			}
 		}
 
@@ -1182,7 +1196,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			}
 		}
 
-		if (type == stream_type::video) {
+		if (type == stream_type::video || type == stream_type::stereo) {
 			REFERENCE_TIME rtAvgTimePerFrame = 1;
 			ExtractAvgTimePerFrame(&s.mt, rtAvgTimePerFrame);
 

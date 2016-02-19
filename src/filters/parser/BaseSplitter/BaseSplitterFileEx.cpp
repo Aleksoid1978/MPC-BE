@@ -1374,6 +1374,7 @@ static bool ParseAvc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 			}
 			switch (nalu_type) {
 				case NALU_TYPE_SPS:
+				case NALU_TYPE_SUBSET_SPS:
 					sps_present++;
 					break;
 				case NALU_TYPE_PPS:
@@ -1389,7 +1390,8 @@ static bool ParseAvc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 
 	Nalu.SetBuffer(pData.GetData(), pData.GetCount());
 	nalu_type = NALU_TYPE_UNKNOWN;
-	while (nalu_type != NALU_TYPE_SPS && Nalu.ReadNext()) {
+	while (!(nalu_type == NALU_TYPE_SPS || nalu_type == NALU_TYPE_SUBSET_SPS)
+			&& Nalu.ReadNext()) {
 		nalu_type = Nalu.GetType();
 	}
 
@@ -1400,7 +1402,7 @@ static bool ParseAvc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 			bmi.biSize			= sizeof(bmi);
 			bmi.biWidth			= params.width;
 			bmi.biHeight		= params.height;
-			bmi.biCompression	= FCC('H264');
+			bmi.biCompression	= nalu_type == NALU_TYPE_SUBSET_SPS ? FCC('AMVC') : FCC('H264');
 			bmi.biPlanes		= 1;
 			bmi.biBitCount		= 24;
 			bmi.biSizeImage		= DIBSIZE(bmi);
@@ -1421,8 +1423,9 @@ static bool ParseAvc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 					nalu_type = Nalu.GetType();
 					switch (nalu_type) {
 						case NALU_TYPE_SPS:
+						case NALU_TYPE_SUBSET_SPS:
 						case NALU_TYPE_PPS:
-							if (nalu_type == NALU_TYPE_SPS) {
+							if (nalu_type == NALU_TYPE_SPS || nalu_type == NALU_TYPE_SUBSET_SPS) {
 								if (sps_present) continue;
 								sps_present++;
 							} else if (nalu_type == NALU_TYPE_PPS) {
@@ -1479,11 +1482,12 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMedi
 		NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
 		CH264Nalu Nalu;
 		Nalu.SetBuffer(pTmpData.GetData(), pTmpData.GetCount());
-		while (nalu_type != NALU_TYPE_SPS && Nalu.ReadNext()) {
+		while (!(nalu_type == NALU_TYPE_SPS || nalu_type == NALU_TYPE_SUBSET_SPS)
+				&& Nalu.ReadNext()) {
 			nalu_type = Nalu.GetType();
 		}
 
-		if (nalu_type != NALU_TYPE_SPS) {
+		if (nalu_type != NALU_TYPE_SPS && nalu_type != NALU_TYPE_SUBSET_SPS) {
 			return false;
 		}
 

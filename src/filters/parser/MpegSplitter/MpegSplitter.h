@@ -58,6 +58,11 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	int m_AC3CoreOnly;
 	CCritSec m_csProps;
 
+	CAutoPtrList<CPacket> m_MVCExtensionQueue;
+	BOOL  m_bUseMVCExtension          = FALSE;
+	DWORD m_dwMasterH264TrackNumber   = DWORD_MAX;
+	DWORD m_dwMVCExtensionTrackNumber = DWORD_MAX;
+
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 	void	ReadClipInfo(LPCOLESTR pszFileName);
 
@@ -68,6 +73,8 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	bool DemuxLoop();
 	bool BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& files);
 	bool BuildChapters(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& PlaylistItems, CHdmvClipInfo::CPlaylistChapter& Items);
+
+	HRESULT DeliverPacket(CAutoPtr<CPacket> p);
 
 	template<typename T>
 	HRESULT HandleMPEGPacket(DWORD TrackNumber, __int64 nBytes, T& h, REFERENCE_TIME rtStartOffset, BOOL bStreamUsePTS);

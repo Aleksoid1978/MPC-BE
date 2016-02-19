@@ -193,6 +193,7 @@ public:
 	enum stream_codec {
 		NONE,
 		H264,
+		MVC,
 		HEVC,
 		MPEG,
 		VC1
@@ -202,6 +203,7 @@ public:
 		video,
 		audio,
 		subpic,
+		stereo,
 		unknown
 	};
 
@@ -314,6 +316,7 @@ public:
 				type == video	? L"Video" :
 				type == audio	? L"Audio" :
 				type == subpic	? L"Subtitle" :
+				type == stereo	? L"Stereo" :
 								  L"Unknown";
 		}
 
@@ -355,7 +358,7 @@ public:
 			size_t cnt = 0;
 			for (auto stream = streams.begin(); stream != streams.end(); stream++) {
 				if (stream->pid) {
-					for (int type = stream_type::video; type < stream_type::unknown; type++) {
+					for (int type = stream_type::video; type <= stream_type::subpic; type++) {
 						if (s[type].FindStream(stream->pid)) {
 							cnt++;
 							break;
