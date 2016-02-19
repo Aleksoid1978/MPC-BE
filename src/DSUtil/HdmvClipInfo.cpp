@@ -374,7 +374,7 @@ LPCTSTR CHdmvClipInfo::Stream::Format()
 HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bFullInfoRead)
 {
 
-	BYTE	Buff[5];
+	BYTE	Buff[9] = { 0 };
 	CPath	Path (strPlaylistFile);
 	bool	bDuplicate = false;
 	rtDuration  = 0;
@@ -399,19 +399,49 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 		}
 
-		LARGE_INTEGER	Pos = {0, 0};
-		DWORD			dwTemp;
-		USHORT			nPlaylistItems;
+		LARGE_INTEGER	Pos    = {0, 0};
+		LARGE_INTEGER	PosExt = {0, 0};
+		DWORD			dwTemp = 0;
+		USHORT			nPlaylistItems = 0;
+		USHORT			nSubPathsItems = 0;
 
-		Pos.QuadPart = ReadDword();	// PlayList_start_address
-		ReadDword();				// PlayListMark_start_address
+		Pos.QuadPart = ReadDword();		// PlayList_start_address
+		ReadDword();					// PlayListMark_start_address
+		PosExt.QuadPart = ReadDword();	// Extension_start_address
+
+		// Extension
+		if (PosExt.QuadPart) {
+			SetFilePointerEx(m_hFile, PosExt, NULL, FILE_BEGIN);
+			ReadDword();					// lenght
+			ReadDword();					// start address
+			ReadShort(); ReadByte();		// padding
+			BYTE nNumEntries = ReadByte();	// number of entries
+			for (BYTE i = 0; i < nNumEntries; i++) {
+				UINT id1 = ReadShort();
+				UINT id2 = ReadShort();
+				LARGE_INTEGER PosExtSub = PosExt;
+				PosExtSub.QuadPart += ReadDword();	// Extension_start_address
+				ReadDword();						// Extension_length
+
+				if (id1 == 2 && id2 == 2) {
+					LARGE_INTEGER savePosExt = {0, 0};
+					SetFilePointerEx(m_hFile, savePosExt, &savePosExt, FILE_CURRENT);
+
+					SetFilePointerEx(m_hFile, PosExtSub, NULL, FILE_BEGIN);
+					ReadDword();					// lenght
+					nSubPathsItems += ReadShort();	// number_of_SubPaths
+
+					SetFilePointerEx(m_hFile, savePosExt, NULL, FILE_BEGIN);
+				}
+			}
+		}
 
 		// PlayList()
 		SetFilePointerEx(m_hFile, Pos, NULL, FILE_BEGIN);
 		ReadDword();						// length
 		ReadShort();						// reserved_for_future_use
-		nPlaylistItems = ReadShort();		// number_of_PlayItems
-		ReadShort();						// number_of_SubPaths
+		nPlaylistItems  = ReadShort();		// number_of_PlayItems
+		nSubPathsItems += ReadShort();		// number_of_SubPaths
 
 		Pos.QuadPart += 10;
 		__int64 TotalSize = 0;
@@ -419,18 +449,21 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			CAutoPtr<PlaylistItem> Item(DNew PlaylistItem);
 			SetFilePointerEx(m_hFile, Pos, NULL, FILE_BEGIN);
 			Pos.QuadPart += ReadShort() + 2;
-			ReadBuffer(Buff, 5);
-			Item->m_strFileName.Format(_T("%s\\STREAM\\%c%c%c%c%c.M2TS"), CString(Path), Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
-
-			ReadBuffer(Buff, 4);
-			if (memcmp(Buff, "M2TS", 4)) {
+			ReadBuffer(Buff, 9);
+			if (memcmp(&Buff[5], "M2TS", 4)) {
 				return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 			}
 
+			LPCWSTR format = L"%s\\STREAM\\%c%c%c%c%c.M2TS";
+			if (nSubPathsItems) {
+				format = L"%s\\STREAM\\SSIF\\%c%c%c%c%c.SSIF";
+			}
+			Item->m_strFileName.Format(format, CString(Path), Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
 			if (!::PathFileExists(Item->m_strFileName)) {
 				DbgLog((LOG_TRACE, 3, _T("		==> %s is missing, skip it"), Item->m_strFileName));
 				continue;
 			}
+
 			ReadBuffer(Buff, 3);
 
 			dwTemp				= ReadDword();
@@ -479,8 +512,13 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			while (pos) {
 				PlaylistItem* pItem = Playlist.GetNext(pos);
 				CString fname = pItem->m_strFileName;
-				fname.Replace(L"\\STREAM\\", L"\\CLIPINF\\");
-				fname.Replace(L".M2TS", L".CLPI");
+				if (fname.Find(L".SSIF") > 0) {
+					fname.Replace(L"\\STREAM\\SSIF\\", L"\\CLIPINF\\");
+					fname.Replace(L".SSIF", L".CLPI");				
+				} else {
+					fname.Replace(L"\\STREAM\\", L"\\CLIPINF\\");
+					fname.Replace(L".M2TS", L".CLPI");
+				}
 
 				ReadInfo(fname, &pItem->m_sps);
 			}

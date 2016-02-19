@@ -1014,7 +1014,8 @@ __int64 CMpegSplitterFilter::SeekBD(REFERENCE_TIME rt)
 		POSITION pos = m_Items.GetHeadPosition();
 		while (pos) {
 			CHdmvClipInfo::PlaylistItem* Item = m_Items.GetNext(pos);
-			if (rt >= Item->m_rtStartTime && rt <= (Item->m_rtStartTime + Item->Duration())) {
+			if (Item->m_sps.GetCount()
+					&& rt >= Item->m_rtStartTime && rt <= (Item->m_rtStartTime + Item->Duration())) {
 				REFERENCE_TIME _rt = rt - Item->m_rtStartTime + Item->m_rtIn;
 				for (size_t idx = 0; idx < Item->m_sps.GetCount() - 1; idx++) {
 					if (_rt < Item->m_sps[idx].rt) {
@@ -1303,6 +1304,14 @@ bool CMpegSplitterFilter::DemuxInit()
 			m_bUseMVCExtension          = FALSE;
 			m_dwMasterH264TrackNumber   = DWORD_MAX;
 			m_dwMVCExtensionTrackNumber = DWORD_MAX;
+		}
+
+		if (m_Items.GetCount()) {
+			POSITION pos = m_Items.GetHeadPosition();
+			while (pos) {
+				CHdmvClipInfo::PlaylistItem* Item = m_Items.GetNext(pos);
+				Item->m_sps.RemoveAll();
+			}
 		}
 	}
 
