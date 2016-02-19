@@ -499,7 +499,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 
 void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 {
-	if (m_type != MPEG_TYPES::mpeg_ts || m_bIsBD) {
+	if (m_type != MPEG_TYPES::mpeg_ts/* || m_bIsBD*/) {
 		return;
 	}
 
