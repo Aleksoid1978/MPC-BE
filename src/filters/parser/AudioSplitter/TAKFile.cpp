@@ -367,8 +367,6 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 
 	m_pFile->Seek(m_startpos);
 
-	m_nAvgBytesPerSec = UNITS * m_framelen / m_samplerate;
-
 	return S_OK;
 }
 
@@ -431,7 +429,7 @@ REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 
 	m_pFile->Seek(CurFrmPos);
 
-	rt = CurFrmNum < 0 ? m_rtduration : CurFrmNum * m_nAvgBytesPerSec;
+	rt = CurFrmNum < 0 ? m_rtduration : SCALE64(UNITS, CurFrmNum * m_framelen, m_samplerate);
 	return rt;
 }
 
@@ -441,13 +439,37 @@ int CTAKFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 		return 0;
 	}
 
-	int size = min(1024, m_endpos - m_pFile->GetPos());
-	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
+	BYTE buffer[128 * KILOBYTE];
+	int size = 0;
+	int pos = 1;
+	bool syncfound = false;
+
+	while (!syncfound) {
+		int len = (int)min(1024, m_endpos - m_pFile->GetPos());
+
+		if (len <= 0 || size + len >= _countof(buffer) || m_pFile->ByteRead(buffer + size, len) != S_OK) {
+			break;
+		}
+		size += len;
+
+		for (; pos < (size - 2); pos++) {
+			if (GETWORD(buffer + pos) == 0xA0FF) {
+				syncfound = true;
+				m_pFile->Seek(m_pFile->GetPos() + pos - size);
+				size = pos;
+				break;
+			}
+		}
+	}
+
+	if (!packet->SetCount(size)) {
 		return 0;
 	}
 
+	memcpy(packet->GetData(), buffer, size);
+
 	packet->rtStart	= rtStart;
-	packet->rtStop	= rtStart + m_nAvgBytesPerSec;
+	packet->rtStop	= rtStart + UNITS * m_framelen / m_samplerate;
 
 	return size;
 }
