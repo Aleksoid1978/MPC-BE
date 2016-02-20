@@ -1313,6 +1313,10 @@ bool CMpegSplitterFilter::DemuxInit()
 				Item->m_sps.RemoveAll();
 			}
 		}
+
+		if (bUseMVCExtension) {
+			SetProperty(L"STEREOSCOPIC3DMODE", m_MVC_Base_View_R_flag ? L"mvc_rl" : L"mvc_lr");
+		}
 	}
 
 	return true;
@@ -1485,7 +1489,7 @@ bool CMpegSplitterFilter::BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPla
 {
 	m_rtPlaylistDuration = 0;
 
-	bool res = SUCCEEDED(m_ClipInfo.ReadPlaylist(pszFileName, m_rtPlaylistDuration, Items, TRUE));
+	bool res = SUCCEEDED(m_ClipInfo.ReadPlaylist(pszFileName, m_rtPlaylistDuration, Items, TRUE, &m_MVC_Base_View_R_flag));
 	if (res) {
 		m_rtMin = Items.GetHead()->m_rtIn;
 		REFERENCE_TIME rtDur = 0;

@@ -371,10 +371,10 @@ LPCTSTR CHdmvClipInfo::Stream::Format()
 	}
 }
 
-HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bFullInfoRead)
+HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bFullInfoRead/* = FALSE*/, BYTE* MVC_Base_View_R_flag/* = NULL*/)
 {
 
-	BYTE	Buff[9] = { 0 };
+	BYTE	Buff[20] = { 0 };
 	CPath	Path (strPlaylistFile);
 	bool	bDuplicate = false;
 	rtDuration  = 0;
@@ -408,6 +408,20 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 		Pos.QuadPart = ReadDword();		// PlayList_start_address
 		ReadDword();					// PlayListMark_start_address
 		PosExt.QuadPart = ReadDword();	// Extension_start_address
+
+		if (MVC_Base_View_R_flag) {
+			// skip 20 bytes
+			ReadBuffer(Buff, 20);
+
+			// App info
+			ReadDword();				// lenght
+			ReadByte();					// reserved
+			ReadByte();					// playback type
+			ReadShort();				// playback count
+			ReadBuffer(Buff, 8);		// mpls uo
+			BYTE flags = ReadByte();	// flags
+			*MVC_Base_View_R_flag = (flags >> 4) & 0x1;
+		}
 
 		// Extension
 		if (PosExt.QuadPart) {
