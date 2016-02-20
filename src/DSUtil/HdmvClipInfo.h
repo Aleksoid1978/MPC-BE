@@ -167,7 +167,7 @@ public:
 	Stream*		GetStreamByIndex(size_t nIndex) {return (nIndex < m_Streams.GetCount()) ? &m_Streams[nIndex] : NULL; };
 
 	HRESULT		FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile, CPlaylist& MainPlaylist, CPlaylist& MPLSPlaylists);
-	HRESULT		ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bFullInfoRead = FALSE);
+	HRESULT		ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bFullInfoRead = FALSE, BYTE* MVC_Base_View_R_flag = NULL);
 	HRESULT		ReadChapters(CString strPlaylistFile, CPlaylist& PlaylistItems, CPlaylistChapter& Chapters);
 
 private :

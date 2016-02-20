@@ -51,6 +51,8 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 
 	__int64 m_length;
 
+	BYTE m_MVC_Base_View_R_flag = 0;
+
 	CAtlMap<DWORD, CAutoPtr<CPacket>> pPackets;
 
 	CString m_AudioLanguageOrder, m_SubtitlesLanguageOrder;
