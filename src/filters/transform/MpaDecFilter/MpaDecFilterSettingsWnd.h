@@ -40,9 +40,7 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 	bool m_spdif_truehd;
 	bool m_spdif_dts;
 	bool m_spdif_dtshd;
-#if ENABLE_AC3_ENCODER
 	bool m_spdif_ac3enc;
-#endif
 
 	enum {
 		IDC_PP_CHECK_I16 = 10000,
@@ -55,9 +53,7 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 		IDC_PP_CHECK_SPDIF_TRUEHD,
 		IDC_PP_CHECK_SPDIF_DTS,
 		IDC_PP_CHECK_SPDIF_DTSHD,
-#if ENABLE_AC3_ENCODER
 		IDC_PP_CHECK_SPDIF_AC3ENC
-#endif
 	};
 
 	CButton   m_outfmt_group;
@@ -74,9 +70,7 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 	CButton   m_spdif_truehd_check;
 	CButton   m_spdif_dts_check;
 	CButton   m_spdif_dtshd_check;
-#if ENABLE_AC3_ENCODER
 	CButton   m_spdif_ac3enc_check;
-#endif
 
 	CButton		m_grpStatus;
 	CEdit		m_edtStatus;

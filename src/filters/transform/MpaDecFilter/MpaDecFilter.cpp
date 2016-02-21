@@ -57,9 +57,7 @@
 #define OPTION_SPDIF_truehd _T("HDMI_truehd")
 #define OPTION_SPDIF_dts    _T("SPDIF_dts")
 #define OPTION_SPDIF_dtshd  _T("HDMI_dtshd")
-#if ENABLE_AC3_ENCODER
 #define OPTION_SPDIF_ac3enc _T("SPDIF_ac3enc")
-#endif
 
 #define MAX_JITTER          1000000i64 // +-100ms jitter is allowed
 #define MAX_DTS_JITTER      1400000i64 // +-140ms jitter is allowed for DTS
@@ -391,9 +389,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_fSPDIF[truehd]       = false;
 	m_fSPDIF[dts]          = false;
 	m_fSPDIF[dtshd]        = false;
-#if ENABLE_AC3_ENCODER
 	m_fSPDIF[ac3enc]       = false;
-#endif
 
 	// read settings
 	CString layout_str;
@@ -432,11 +428,9 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SPDIF_dtshd, dw)) {
 			m_fSPDIF[dtshd] = !!dw;
 		}
-#if ENABLE_AC3_ENCODER
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SPDIF_ac3enc, dw)) {
 			m_fSPDIF[ac3enc] = !!dw;
 		}
-#endif
 	}
 #else
 	m_fSampleFmt[SF_PCM16] = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_i16, m_fSampleFmt[SF_PCM16]);
@@ -449,10 +443,9 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_fSPDIF[truehd]       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_truehd, m_fSPDIF[truehd]);
 	m_fSPDIF[dts]          = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dts, m_fSPDIF[dts]);
 	m_fSPDIF[dtshd]        = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dtshd, m_fSPDIF[dtshd]);
-#if ENABLE_AC3_ENCODER
 	m_fSPDIF[ac3enc]       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3enc, m_fSPDIF[ac3enc]);
 #endif
-#endif
+
 	if (!(m_fSampleFmt[SF_PCM16] || m_fSampleFmt[SF_PCM24] || m_fSampleFmt[SF_PCM32] || m_fSampleFmt[SF_FLOAT])) {
 		m_fSampleFmt[SF_PCM16] = true;
 	}
@@ -498,10 +491,8 @@ HRESULT CMpaDecFilter::EndFlush()
 	CAutoLock cAutoLock(&m_csReceive);
 	m_buff.RemoveAll();
 	m_FFAudioDec.FlushBuffers();
-#if ENABLE_AC3_ENCODER
 	m_Mixer.FlushBuffers();
 	m_encbuff.RemoveAll();
-#endif
 
 	HRESULT hr = __super::EndFlush();
 	m_bFlushing = FALSE;
@@ -610,9 +601,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 			|| (m_FFAudioDec.GetNeedSyncPoint() && S_OK == pIn->IsSyncPoint())) {
 		m_bDiscontinuity = TRUE;
 		m_buff.RemoveAll();
-#if ENABLE_AC3_ENCODER
 		m_encbuff.RemoveAll();
-#endif
 		m_bResync = true;
 		if (FAILED(hr)) {
 			DbgLog((LOG_TRACE, 3, L"CMpaDecFilter::Receive() : Discontinuity without timestamp"));
@@ -639,9 +628,8 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 		DbgLog((LOG_TRACE, 3, L"CMpaDecFilter::Receive() : Resync Request - [%I64d -> %I64d], buffer : %u", m_rtStart, rtStart, m_buff.GetCount()));
 
 		m_buff.RemoveAll();
-#if ENABLE_AC3_ENCODER
 		m_encbuff.RemoveAll();
-#endif
+
 		if (m_rtStart != INVALID_TIME && rtStart != m_rtStart) {
 			m_bDiscontinuity = TRUE;
 		}
@@ -1605,11 +1593,9 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWOR
 
 	m_InternalSampleFormat = sfmt;
 
-#if ENABLE_AC3_ENCODER
 	if (m_bBitstreamSupported[SPDIF] && GetSPDIF(ac3enc) && nChannels > 2) { // do not encode mono and stereo
 		return AC3Encode(pBuff, size, sfmt, nSamplesPerSec, nChannels, dwChannelMask);
 	}
-#endif
 
 	int nSamples = size / (nChannels * get_bytes_per_sample(sfmt));
 
@@ -1793,7 +1779,6 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 	return m_pOutput->Deliver(pOut);
 }
 
-#if ENABLE_AC3_ENCODER
 HRESULT CMpaDecFilter::AC3Encode(BYTE* pBuff, int size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask)
 {
 	DWORD new_layout     = m_AC3Enc.SelectLayout(dwChannelMask);
@@ -1839,7 +1824,6 @@ HRESULT CMpaDecFilter::AC3Encode(BYTE* pBuff, int size, SampleFormat sfmt, DWORD
 
 	return S_OK;
 }
-#endif
 
 HRESULT CMpaDecFilter::ReconnectOutput(int nSamples, CMediaType& mt)
 {
@@ -2118,12 +2102,9 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 
 	if (iPosition == 0) {
 		const GUID& subtype = mt.subtype;
-		if (GetSPDIF(ac3) && (subtype == MEDIASUBTYPE_DOLBY_AC3 || subtype == MEDIASUBTYPE_WAVE_DOLBY_AC3) ||
-			GetSPDIF(dts) && (subtype == MEDIASUBTYPE_DTS || subtype == MEDIASUBTYPE_DTS2)
-#if ENABLE_AC3_ENCODER
-			|| GetSPDIF(ac3enc) /*&& wfe->nChannels > 2*/
-#endif
-		) {
+		if (GetSPDIF(ac3) && (subtype == MEDIASUBTYPE_DOLBY_AC3 || subtype == MEDIASUBTYPE_WAVE_DOLBY_AC3)
+				|| GetSPDIF(dts) && (subtype == MEDIASUBTYPE_DTS || subtype == MEDIASUBTYPE_DTS2)
+				|| GetSPDIF(ac3enc) && wfe->nChannels > 2) { // do not encode mono and stereo
 			*pmt = CreateMediaTypeSPDIF(wfe->nSamplesPerSec);
 			return S_OK;
 		}
@@ -2309,9 +2290,7 @@ STDMETHODIMP CMpaDecFilter::SaveSettings()
 		key.SetDWORDValue(OPTION_SPDIF_truehd, m_fSPDIF[truehd]);
 		key.SetDWORDValue(OPTION_SPDIF_dts, m_fSPDIF[dts]);
 		key.SetDWORDValue(OPTION_SPDIF_dtshd, m_fSPDIF[dtshd]);
-#if ENABLE_AC3_ENCODER
 		key.SetDWORDValue(OPTION_SPDIF_ac3enc, m_fSPDIF[ac3enc]);
-#endif
 	}
 #else
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_i16, m_fSampleFmt[SF_PCM16]);
@@ -2324,9 +2303,7 @@ STDMETHODIMP CMpaDecFilter::SaveSettings()
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_truehd, m_fSPDIF[truehd]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dts, m_fSPDIF[dts]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dtshd, m_fSPDIF[dtshd]);
-#if ENABLE_AC3_ENCODER
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3enc, m_fSPDIF[ac3enc]);
-#endif
 #endif
 
 	return S_OK;

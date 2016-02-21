@@ -25,17 +25,13 @@
 #include "SampleFormat.h"
 #include <stdint.h>
 
-#define ENABLE_AC3_ENCODER 1
-
 #include "../DeCSSFilter/DeCSSFilter.h"
 #include "IMpaDecFilter.h"
 #include "MpaDecFilterSettingsWnd.h"
 #include "Mixer.h"
 #include "PaddedArray.h"
 #include "FFAudioDecoder.h"
-#if ENABLE_AC3_ENCODER
 #include "AC3Encoder.h"
-#endif
 
 #define MPCAudioDecName L"MPC Audio Decoder"
 
@@ -114,10 +110,8 @@ protected:
 
 	CMixer m_Mixer;
 	CAtlArray<float> m_encbuff;
-#if ENABLE_AC3_ENCODER
 	CAC3Encoder m_AC3Enc;
 	HRESULT AC3Encode(BYTE* pBuff, int size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
-#endif
 
 	BOOL ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL bEOF = FALSE);
 
