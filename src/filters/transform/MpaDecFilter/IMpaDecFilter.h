@@ -43,9 +43,7 @@ public IUnknown {
 		truehd,
 		dts,
 		dtshd,
-#if ENABLE_AC3_ENCODER
 		ac3enc,
-#endif
 		etcount};
 
 	STDMETHOD(SetOutputFormat(MPCSampleFormat sf, bool enable)) PURE;
