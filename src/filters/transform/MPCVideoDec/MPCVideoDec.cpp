@@ -1550,8 +1550,8 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 			return hr;
 		}
 
-		m_bDecodingStart		= FALSE;
-		m_pCurrentMediaType		= *pmt;
+		m_bDecodingStart    = FALSE;
+		m_pCurrentMediaType = *pmt;
 	} else if (direction == PINDIR_OUTPUT) {
 		BITMAPINFOHEADER bihOut;
 		if (!ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut)) {
@@ -1699,7 +1699,9 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 		CLSID clsidInput = GetCLSID(m_pInput->GetConnected());
 		// Daum PotPlayer's MKV Source - {A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}
-		BOOL bNotTrustSourceTimeStamp = (clsidInput == GUIDFromCString(L"{A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}"));
+		// WM ASF Reader               - {187463A0-5BB7-11D3-ACBE-0080C75E246E}
+		BOOL bNotTrustSourceTimeStamp = (clsidInput == GUIDFromCString(L"{A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}")
+										|| clsidInput == GUIDFromCString(L"{187463A0-5BB7-11D3-ACBE-0080C75E246E}"));
 
 		m_bCalculateStopTime = (m_nCodecId == AV_CODEC_ID_H264 ||
 								m_nCodecId == AV_CODEC_ID_DIRAC ||
@@ -2943,7 +2945,6 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 		case MODE_DXVA1 :
 			CheckPointer(m_pDXVADecoder, E_UNEXPECTED);
 
-			// stupid DXVA1 - size for the output MediaType should be the same that size of DXVA surface
 			if (m_nDecoderMode == MODE_DXVA1 && ReconnectOutput(PictWidth(), PictHeight(), false, GetFrameDuration()) == S_OK) {
 				(static_cast<CDXVA1Decoder*>(m_pDXVADecoder))->ConfigureDXVA1();
 			}
