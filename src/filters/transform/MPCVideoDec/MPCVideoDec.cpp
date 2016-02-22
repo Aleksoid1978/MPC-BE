@@ -1698,10 +1698,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 									|| m_nCodecId == AV_CODEC_ID_RV20));
 
 		CLSID clsidInput = GetCLSID(m_pInput->GetConnected());
-		// Daum PotPlayer's MKV Source - {A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}
-		// WM ASF Reader               - {187463A0-5BB7-11D3-ACBE-0080C75E246E}
-		BOOL bNotTrustSourceTimeStamp = (clsidInput == GUIDFromCString(L"{A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}")
-										|| clsidInput == GUIDFromCString(L"{187463A0-5BB7-11D3-ACBE-0080C75E246E}"));
+		BOOL bNotTrustSourceTimeStamp = (clsidInput == GUIDFromCString(L"{A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}") // Daum PotPlayer's MKV Source
+									  || clsidInput == CLSID_WMAsfReader); // WM ASF Reader
 
 		m_bCalculateStopTime = (m_nCodecId == AV_CODEC_ID_H264 ||
 								m_nCodecId == AV_CODEC_ID_DIRAC ||
