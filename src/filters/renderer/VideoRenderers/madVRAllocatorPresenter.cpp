@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,28 +35,10 @@ extern bool g_bExternalSubtitleTime;
 
 CmadVRAllocatorPresenter::CmadVRAllocatorPresenter(HWND hWnd, HRESULT& hr, CString &_Error)
 	: CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error)
-	, m_ScreenSize(0, 0)
 {
 	if (FAILED(hr)) {
 		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
 		return;
-	}
-
-	m_pDwmIsCompositionEnabled = NULL;
-	m_pDwmEnableComposition = NULL;
-	m_hDWMAPI = LoadLibrary(L"dwmapi.dll");
-	if (m_hDWMAPI) {
-		(FARPROC &)m_pDwmIsCompositionEnabled = GetProcAddress(m_hDWMAPI, "DwmIsCompositionEnabled");
-		(FARPROC &)m_pDwmEnableComposition = GetProcAddress(m_hDWMAPI, "DwmEnableComposition");
-	}
-
-	if (GetRenderersSettings().m_AdvRendSets.bDisableDesktopComposition) {
-		m_bDesktopCompositionDisabled = true;
-		if (m_pDwmEnableComposition) {
-			m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
-		}
-	} else {
-		m_bDesktopCompositionDisabled = false;
 	}
 
 	hr = S_OK;
@@ -64,46 +46,25 @@ CmadVRAllocatorPresenter::CmadVRAllocatorPresenter(HWND hWnd, HRESULT& hr, CStri
 
 CmadVRAllocatorPresenter::~CmadVRAllocatorPresenter()
 {
-	if (m_pSRCB) {
-		// nasty, but we have to let it know about our death somehow
-		((CSubRenderCallback*)(ISubRenderCallback2*)m_pSRCB)->SetDXRAP(NULL);
-	}
-
-	if (m_bDesktopCompositionDisabled) {
-		m_bDesktopCompositionDisabled = false;
-		if (m_pDwmEnableComposition) {
-			m_pDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
-		}
-	}
-
 	// the order is important here
 	m_pSubPicQueue = NULL;
 	m_pAllocator = NULL;
-	m_pDXR = NULL;
+	m_pMVR = NULL;
 }
 
 STDMETHODIMP CmadVRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
-	/*
-		if (riid == __uuidof(IVideoWindow))
-			return GetInterface((IVideoWindow*)this, ppv);
-		if (riid == __uuidof(IBasicVideo))
-			return GetInterface((IBasicVideo*)this, ppv);
-		if (riid == __uuidof(IBasicVideo2))
-			return GetInterface((IBasicVideo2*)this, ppv);
-	*/
-	/*
-		if (riid == __uuidof(IVMRWindowlessControl))
-			return GetInterface((IVMRWindowlessControl*)this, ppv);
-	*/
-
-	if (riid != IID_IUnknown && m_pDXR) {
-		if (SUCCEEDED(m_pDXR->QueryInterface(riid, ppv))) {
+	if (riid != IID_IUnknown && m_pMVR) {
+		if (SUCCEEDED(m_pMVR->QueryInterface(riid, ppv))) {
 			return S_OK;
 		}
 	}
 
-	return __super::NonDelegatingQueryInterface(riid, ppv);
+	return QI(ISubRenderCallback)
+		   QI(ISubRenderCallback2)
+		   QI(ISubRenderCallback3)
+		   QI(ISubRenderCallback4)
+		   __super::NonDelegatingQueryInterface(riid, ppv);
 }
 
 HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
@@ -115,7 +76,12 @@ HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 		return S_OK;
 	}
 
-	InitMaxSubtitleTextureSize(GetRenderersSettings().iSubpicMaxTexWidth, m_ScreenSize);
+	CSize screenSize;
+	MONITORINFO mi = { sizeof(MONITORINFO) };
+	if (GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi)) {
+		screenSize.SetSize(mi.rcMonitor.right - mi.rcMonitor.left, mi.rcMonitor.bottom - mi.rcMonitor.top);
+	}
+	InitMaxSubtitleTextureSize(GetRenderersSettings().iSubpicMaxTexWidth, screenSize);
 
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(pD3DDev);
@@ -135,34 +101,37 @@ HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 	} else {
 		m_pSubPicQueue->Invalidate();
 	}
-	if (!m_pSubPicQueue || FAILED(hr)) {
-		return E_FAIL;
-	}
 
-	if (m_pSubPicProvider) {
+	if (SUCCEEDED(hr) && m_pSubPicQueue && m_pSubPicProvider) {
 		m_pSubPicQueue->SetSubPicProvider(m_pSubPicProvider);
 	}
 
 	return hr;
 }
 
-HRESULT CmadVRAllocatorPresenter::Render(
-	REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, REFERENCE_TIME atpf,
-	int left, int top, int right, int bottom, int width, int height)
+// ISubRenderCallback4
+
+HRESULT CmadVRAllocatorPresenter::RenderEx3(REFERENCE_TIME rtStart,
+											REFERENCE_TIME rtStop,
+											REFERENCE_TIME atpf,
+											RECT croppedVideoRect,
+											RECT originalVideoRect,
+											RECT viewportRect,
+											const double videoStretchFactor,
+											int xOffsetInPixels, DWORD flags)
 {
-	CRect wndRect(0, 0, width, height);
-	CRect videoRect(left, top, right, bottom);
-	__super::SetPosition(wndRect, videoRect); // needed? should be already set by the player
+	CheckPointer(m_pSubPicQueue, E_UNEXPECTED);
+
+	__super::SetPosition(viewportRect, croppedVideoRect);
 	if (!g_bExternalSubtitleTime) {
 		SetTime(rtStart);
 	}
-	if (atpf > 0 && m_pSubPicQueue) {
-		m_fps = (double)(10000000.0 / atpf);
+	if (atpf > 0) {
+		m_fps = 10000000.0 / atpf;
 		m_pSubPicQueue->SetFPS(m_fps);
 	}
-
-	AlphaBltSubPic(wndRect, videoRect);
-
+	
+	AlphaBltSubPic(viewportRect, croppedVideoRect);
 	return S_OK;
 }
 
@@ -171,70 +140,54 @@ HRESULT CmadVRAllocatorPresenter::Render(
 STDMETHODIMP CmadVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 {
 	CheckPointer(ppRenderer, E_POINTER);
+	ASSERT(!m_pMVR);
 
-	if (m_pDXR) {
-		return E_UNEXPECTED;
-	}
-	m_pDXR.CoCreateInstance(CLSID_madVR, GetOwner());
-	if (!m_pDXR) {
-		return E_FAIL;
-	}
+	HRESULT hr = S_FALSE;
 
-	CComQIPtr<ISubRender> pSR = m_pDXR;
-	if (!pSR) {
-		m_pDXR = NULL;
-		return E_FAIL;
-	}
+	CHECK_HR(m_pMVR.CoCreateInstance(CLSID_madVR, GetOwner()));
 
-	m_pSRCB = DNew CSubRenderCallback(this);
-	if (FAILED(pSR->SetCallback(m_pSRCB))) {
-		m_pDXR = NULL;
-		return E_FAIL;
+	if (CComQIPtr<ISubRender> pSR = m_pMVR) {
+		VERIFY(SUCCEEDED(pSR->SetCallback(this)));
 	}
 
 	(*ppRenderer = (IUnknown*)(INonDelegatingUnknown*)(this))->AddRef();
-
-	MONITORINFO mi;
-	mi.cbSize = sizeof(MONITORINFO);
-	if (GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi)) {
-		m_ScreenSize.SetSize(mi.rcMonitor.right-mi.rcMonitor.left, mi.rcMonitor.bottom-mi.rcMonitor.top);
-	}
 
 	return S_OK;
 }
 
 STDMETHODIMP_(void) CmadVRAllocatorPresenter::SetPosition(RECT w, RECT v)
 {
-	if (CComQIPtr<IBasicVideo> pBV = m_pDXR) {
+	if (CComQIPtr<IBasicVideo> pBV = m_pMVR) {
 		pBV->SetDefaultSourcePosition();
 		pBV->SetDestinationPosition(v.left, v.top, v.right - v.left, v.bottom - v.top);
 	}
 
-	if (CComQIPtr<IVideoWindow> pVW = m_pDXR) {
+	if (CComQIPtr<IVideoWindow> pVW = m_pMVR) {
 		pVW->SetWindowPosition(w.left, w.top, w.right - w.left, w.bottom - w.top);
 	}
 }
 
-STDMETHODIMP_(SIZE) CmadVRAllocatorPresenter::GetVideoSize(bool fCorrectAR)
+STDMETHODIMP_(SIZE) CmadVRAllocatorPresenter::GetVideoSize(bool bCorrectAR)
 {
-	SIZE size = {0, 0};
+	CSize size;
 
-	if (!fCorrectAR) {
-		if (CComQIPtr<IBasicVideo> pBV = m_pDXR) {
+	if (!bCorrectAR) {
+		if (CComQIPtr<IBasicVideo> pBV = m_pMVR) {
+			// Final size of the video, after all scaling and cropping operations
+			// This is also aspect ratio adjusted
 			pBV->GetVideoSize(&size.cx, &size.cy);
 		}
 	} else {
-		if (CComQIPtr<IBasicVideo2> pBV2 = m_pDXR) {
+		if (CComQIPtr<IBasicVideo2> pBV2 = m_pMVR) {
 			pBV2->GetPreferredAspectRatio(&size.cx, &size.cy);
 		}
 	}
-
 	return size;
 }
 
-STDMETHODIMP_(bool) CmadVRAllocatorPresenter::Paint(bool fAll)
+STDMETHODIMP_(bool) CmadVRAllocatorPresenter::Paint(bool /*bAll*/)
 {
-	if (CComQIPtr<IMadVRCommand> pMVRC = m_pDXR) {
+	if (CComQIPtr<IMadVRCommand> pMVRC = m_pMVR) {
 		return SUCCEEDED(pMVRC->SendCommand("redraw"));
 	}
 	return false;
@@ -243,21 +196,8 @@ STDMETHODIMP_(bool) CmadVRAllocatorPresenter::Paint(bool fAll)
 STDMETHODIMP CmadVRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 {
 	HRESULT hr = E_NOTIMPL;
-	if (CComQIPtr<IBasicVideo> pBV = m_pDXR) {
+	if (CComQIPtr<IBasicVideo> pBV = m_pMVR) {
 		hr = pBV->GetCurrentImage((long*)size, (long*)lpDib);
-	}
-	return hr;
-}
-
-STDMETHODIMP CmadVRAllocatorPresenter::SetPixelShader(LPCSTR pSrcData, LPCSTR pTarget)
-{
-	HRESULT hr = E_NOTIMPL;
-	if (CComQIPtr<IMadVRExternalPixelShaders> pEPS = m_pDXR) {
-		if (!pSrcData && !pTarget) {
-			hr = pEPS->ClearPixelShaders(false);
-		} else {
-			hr = pEPS->AddPixelShader(pSrcData, pTarget, ShaderStage_PreScale, NULL);
-		}
 	}
 	return hr;
 }
@@ -265,11 +205,12 @@ STDMETHODIMP CmadVRAllocatorPresenter::SetPixelShader(LPCSTR pSrcData, LPCSTR pT
 STDMETHODIMP CmadVRAllocatorPresenter::SetPixelShader2(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace)
 {
 	HRESULT hr = E_NOTIMPL;
-	if (CComQIPtr<IMadVRExternalPixelShaders> pEPS = m_pDXR) {
+
+	if (CComQIPtr<IMadVRExternalPixelShaders> pMVREPS = m_pMVR) {
 		if (!pSrcData && !pTarget) {
-			hr = pEPS->ClearPixelShaders(bScreenSpace);
+			hr = pMVREPS->ClearPixelShaders(bScreenSpace ? ShaderStage_PostScale : ShaderStage_PreScale);
 		} else {
-			hr = pEPS->AddPixelShader(pSrcData, pTarget, bScreenSpace ? ShaderStage_PostScale : ShaderStage_PreScale, NULL);
+			hr = pMVREPS->AddPixelShader(pSrcData, pTarget, bScreenSpace ? ShaderStage_PostScale : ShaderStage_PreScale, NULL);
 		}
 	}
 	return hr;
@@ -279,7 +220,7 @@ STDMETHODIMP CmadVRAllocatorPresenter::SetPixelShader2(LPCSTR pSrcData, LPCSTR p
 
 STDMETHODIMP_(bool) CmadVRAllocatorPresenter::IsRendering()
 {
-	if (CComQIPtr<IMadVRInfo> pMVRI = m_pDXR) {
+	if (CComQIPtr<IMadVRInfo> pMVRI = m_pMVR) {
 		int playbackState;
 		if (SUCCEEDED(pMVRI->GetInt("playbackState", &playbackState))) {
 			return playbackState == State_Running;
