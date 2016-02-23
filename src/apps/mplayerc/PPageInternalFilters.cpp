@@ -131,7 +131,7 @@ static filter_t s_filters[] = {
 	{_T("WavPack lossless audio"),	AUDIO_DECODER, ADEC_WAVPACK,		0},
 	{_T("WMA v.1/v.2"),				AUDIO_DECODER, ADEC_WMA,			0},
 	{_T("WMA v.9 Professional"),	AUDIO_DECODER, ADEC_WMA9,			0},
-	{_T("WMA Lossless"),			AUDIO_DECODER, ADEC_WMALOSSLESS,	0},
+//	{_T("WMA Lossless"),			AUDIO_DECODER, ADEC_WMALOSSLESS,	0}, // bad support in FFmpeg
 	{_T("WMA Voice"),				AUDIO_DECODER, ADEC_WMAVOICE,		0},
 	{_T("Other PCM/ADPCM"),			AUDIO_DECODER, ADEC_PCM_ADPCM,		0},
 };

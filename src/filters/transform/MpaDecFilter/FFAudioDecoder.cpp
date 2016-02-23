@@ -119,8 +119,8 @@ static const struct {
 	{ &MEDIASUBTYPE_VOXWARE_RT29,      AV_CODEC_ID_METASOUND },
 	// Windows Media Audio 9 Professional
 	{ &MEDIASUBTYPE_WMAUDIO3,          AV_CODEC_ID_WMAPRO },
-	// Windows Media Audio Lossless
-	{ &MEDIASUBTYPE_WMAUDIO_LOSSLESS,  AV_CODEC_ID_WMALOSSLESS },
+//	// Windows Media Audio Lossless (bad support in FFmpeg)
+//	{ &MEDIASUBTYPE_WMAUDIO_LOSSLESS,  AV_CODEC_ID_WMALOSSLESS },
 	// Windows Media Audio 1, 2
 	{ &MEDIASUBTYPE_MSAUDIO1,          AV_CODEC_ID_WMAV1 },
 	{ &MEDIASUBTYPE_WMAUDIO2,          AV_CODEC_ID_WMAV2 },

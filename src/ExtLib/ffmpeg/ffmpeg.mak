@@ -449,7 +449,6 @@ SRCS_LC = \
 	libavcodec/wma_common.c \
 	libavcodec/wma_freqs.c \
 	libavcodec/wmadec.c \
-	libavcodec/wmalosslessdec.c \
 	libavcodec/wmaprodec.c \
 	libavcodec/wmavoice.c \
 	libavcodec/wmv2.c \

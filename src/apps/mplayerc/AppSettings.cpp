@@ -165,7 +165,7 @@ CAppSettings::CAppSettings()
 	AudioFiltersKeys[ADEC_WAVPACK]			= _T("adec_wavpack");
 	AudioFiltersKeys[ADEC_WMA]				= _T("adec_wma");
 	AudioFiltersKeys[ADEC_WMA9]				= _T("adec_wma9");
-	AudioFiltersKeys[ADEC_WMALOSSLESS]		= _T("adec_wmalossless");
+//	AudioFiltersKeys[ADEC_WMALOSSLESS]		= _T("adec_wmalossless"); // bad support in FFmpeg
 	AudioFiltersKeys[ADEC_WMAVOICE]			= _T("adec_wmavoice");
 	AudioFiltersKeys[ADEC_PCM_ADPCM]		= _T("adec_pcm_adpcm");
 }
