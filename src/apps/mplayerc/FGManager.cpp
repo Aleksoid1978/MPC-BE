@@ -2388,12 +2388,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WMAUDIO3);
 		m_transform.AddTail(pFGF);
 
-		// Windows Media Audio Lossless
-		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
-					(audio[ADEC_WMALOSSLESS]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
-					(audio[ADEC_WMALOSSLESS]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WMAUDIO_LOSSLESS);
-		m_transform.AddTail(pFGF);
+//		// Windows Media Audio Lossless (bad support in FFmpeg)
+//		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
+//					(audio[ADEC_WMALOSSLESS]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+//					(audio[ADEC_WMALOSSLESS]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+//		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WMAUDIO_LOSSLESS);
+//		m_transform.AddTail(pFGF);
 
 		// Windows Media Audio 1, 2
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
