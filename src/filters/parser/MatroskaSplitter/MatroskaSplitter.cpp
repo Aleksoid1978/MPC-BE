@@ -230,6 +230,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	bool bHasVideo = false;
 
 	REFERENCE_TIME codecAvgTimePerFrame = 0;
+	BOOL bInterlaced = FALSE;
 
 	POSITION pos = m_pFile->m_segment.Tracks.GetHeadPosition();
 	while (pos) {
@@ -359,6 +360,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vc_params_t params;
 						AVCParser::ParseSequenceParameterSet(pTE->CodecPrivate.GetData() + 9, pTE->CodecPrivate.GetCount() - 9, params);
 						codecAvgTimePerFrame = params.AvgTimePerFrame;
+						bInterlaced = params.interlaced;
 					}
 
 					BITMAPINFOHEADER pbmi;
@@ -438,6 +440,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						CBaseSplitterFileEx::seqhdr h;
 						if (m_pFile->CBaseSplitterFileEx::Read(h, buf)) {
 							codecAvgTimePerFrame = h.ifps;
+							bInterlaced = TRUE;
 						}
 					}
 				} else if (CodecID == "V_DSHOW/MPEG1VIDEO" || CodecID == "V_MPEG1") {
@@ -585,6 +588,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					AvgTimePerFrame = (REFERENCE_TIME)(10000000i64 / pTE->v.FramePerSec);
 				} else if (pTE->DefaultDuration > 0) {
 					AvgTimePerFrame = (REFERENCE_TIME)pTE->DefaultDuration / 100;
+				}
+
+				if (bInterlaced && codecAvgTimePerFrame && AvgTimePerFrame) {
+					float factor = (float)AvgTimePerFrame / (float)codecAvgTimePerFrame;
+					if (factor > 0.4 && factor < 0.6) {
+						AvgTimePerFrame = codecAvgTimePerFrame;
+					}
 				}
 
 				if (AvgTimePerFrame < 50000 // incorrect fps - calculate avarage value
