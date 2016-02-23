@@ -230,7 +230,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	bool bHasVideo = false;
 
 	REFERENCE_TIME codecAvgTimePerFrame = 0;
-	bool bInterlaced = FALSE;
+	BOOL bInterlaced = FALSE;
 
 	POSITION pos = m_pFile->m_segment.Tracks.GetHeadPosition();
 	while (pos) {
@@ -440,7 +440,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						CBaseSplitterFileEx::seqhdr h;
 						if (m_pFile->CBaseSplitterFileEx::Read(h, buf)) {
 							codecAvgTimePerFrame = h.ifps;
-							bInterlaced = true;
+							bInterlaced = TRUE;
 						}
 					}
 				} else if (CodecID == "V_DSHOW/MPEG1VIDEO" || CodecID == "V_MPEG1") {
@@ -691,11 +691,11 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				if (AvgTimePerFrame < 50000) {
 					ASSERT(FALSE); // hmm. really high fps?
-					//if (codecAvgTimePerFrame) {
-					//	DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CreateOutputs() : Something went wrong, take fps from the video stream."));
-					//	AvgTimePerFrame = codecAvgTimePerFrame;
-					//}
-					if (AvgTimePerFrame <= 0) {
+					if (codecAvgTimePerFrame > 0) {
+						DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CreateOutputs() : Something went wrong, take fps from the video stream."));
+						AvgTimePerFrame = codecAvgTimePerFrame;
+					}
+					else if (AvgTimePerFrame <= 0) {
 						DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CreateOutputs() : Everything is bad, set fps at random."));
 						AvgTimePerFrame = 417083; // set 23.976 as default
 					}
