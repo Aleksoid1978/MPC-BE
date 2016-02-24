@@ -94,27 +94,33 @@ public:
 	};
 
 	struct PlaylistItem {
-		PlaylistItem() {
-			m_rtIn = m_rtOut = m_rtStartTime = 0;
-			m_SizeIn = m_SizeOut = 0;
-		}
+		PlaylistItem() {}
+
 		PlaylistItem(const PlaylistItem& pi) {
 			*this = pi;
 		}
 
 		CString					m_strFileName;
-		REFERENCE_TIME			m_rtIn;
-		REFERENCE_TIME			m_rtOut;
-		REFERENCE_TIME			m_rtStartTime;
+		REFERENCE_TIME			m_rtIn        = 0;
+		REFERENCE_TIME			m_rtOut       = 0;
+		REFERENCE_TIME			m_rtStartTime = 0;
 
-		__int64					m_SizeIn;
-		__int64					m_SizeOut;
+		__int64					m_SizeIn      = 0;
+		__int64					m_SizeOut     = 0;
+
+		BYTE					m_num_video   = 0;
+		BYTE					m_num_pg      = 0;
+		BYTE					m_num_ig      = 0;
+
+		CAtlArray<BYTE>			m_pg_offset_sequence_id;
+		CAtlArray<BYTE>			m_ig_offset_sequence_id;
 
 		CAtlArray<SyncPoint> m_sps;
 
 		REFERENCE_TIME Duration() const {
 			return m_rtOut - m_rtIn;
 		}
+
 		__int64 Size() const {
 			return m_SizeOut - m_SizeIn;
 		}
@@ -122,6 +128,7 @@ public:
 		bool operator == (const PlaylistItem& pi) const {
 			return pi.m_strFileName == m_strFileName;
 		}
+
 		PlaylistItem& operator = (const PlaylistItem& pi) {
 			m_strFileName	= pi.m_strFileName;
 			m_rtIn			= pi.m_rtIn;
@@ -129,6 +136,12 @@ public:
 			m_rtStartTime	= pi.m_rtStartTime;
 			m_SizeIn		= pi.m_SizeIn;
 			m_SizeOut		= pi.m_SizeOut;
+			m_num_video		= pi.m_num_video;
+			m_num_pg		= pi.m_num_pg;
+			m_num_ig		= pi.m_num_ig;
+			
+			m_pg_offset_sequence_id.Copy(pi.m_pg_offset_sequence_id);
+			m_ig_offset_sequence_id.Copy(pi.m_ig_offset_sequence_id);
 			m_sps.Copy(pi.m_sps);
 
 			return *this;

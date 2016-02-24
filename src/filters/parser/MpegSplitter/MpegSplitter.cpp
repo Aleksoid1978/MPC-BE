@@ -1314,8 +1314,33 @@ bool CMpegSplitterFilter::DemuxInit()
 			}
 		}
 
-		if (bUseMVCExtension) {
+		if (bUseMVCExtension && m_Items.GetCount()) {
 			SetProperty(L"STEREOSCOPIC3DMODE", m_MVC_Base_View_R_flag ? L"mvc_rl" : L"mvc_lr");
+
+			// PG offsets
+			CHdmvClipInfo::PlaylistItem* Item = m_Items.GetHead();
+			for (BYTE i = 0; i < Item->m_num_pg; i++) {
+				if (Item->m_pg_offset_sequence_id[i] != 0xff) {
+					CString offset; offset.Format(L"%u", Item->m_pg_offset_sequence_id[i]);
+					SetProperty(L"stereo_subtitle_offset_id", offset);
+					break;
+				}
+			}
+
+			// IG offsets
+			CString offsets;
+			for (BYTE i = 0; i < Item->m_num_ig; i++) {
+				if (Item->m_pg_offset_sequence_id[i] != 0xff) {
+					if (offsets.IsEmpty()) {
+						offsets.Format(L"%u", Item->m_pg_offset_sequence_id[i]);
+					} else {
+						offsets.AppendFormat(L",%u", Item->m_pg_offset_sequence_id[i]);
+					}
+				}
+			}
+			if (!offsets.IsEmpty()) {
+				SetProperty(L"stereo_interactive_offset_ids", offsets);
+			}
 		}
 	}
 

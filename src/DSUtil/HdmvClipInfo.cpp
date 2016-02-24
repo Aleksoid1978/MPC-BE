@@ -424,6 +424,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 		}
 
 		// Extension
+		LARGE_INTEGER PosSTNSSExt = {0, 0};
 		if (PosExt.QuadPart) {
 			SetFilePointerEx(m_hFile, PosExt, NULL, FILE_BEGIN);
 			ReadDword();					// lenght
@@ -437,15 +438,19 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 				PosExtSub.QuadPart += ReadDword();	// Extension_start_address
 				ReadDword();						// Extension_length
 
-				if (id1 == 2 && id2 == 2) {
-					LARGE_INTEGER savePosExt = {0, 0};
-					SetFilePointerEx(m_hFile, savePosExt, &savePosExt, FILE_CURRENT);
+				if (id1 == 2) {
+					if (id2 == 1) {
+						PosSTNSSExt = PosExtSub;
+					} else if (id2 == 2) {
+						LARGE_INTEGER savePosExt = {0, 0};
+						SetFilePointerEx(m_hFile, savePosExt, &savePosExt, FILE_CURRENT);
 
-					SetFilePointerEx(m_hFile, PosExtSub, NULL, FILE_BEGIN);
-					ReadDword();					// lenght
-					nSubPathsItems += ReadShort();	// number_of_SubPaths
+						SetFilePointerEx(m_hFile, PosExtSub, NULL, FILE_BEGIN);
+						ReadDword();					// lenght
+						nSubPathsItems += ReadShort();	// number_of_SubPaths
 
-					SetFilePointerEx(m_hFile, savePosExt, NULL, FILE_BEGIN);
+						SetFilePointerEx(m_hFile, savePosExt, NULL, FILE_BEGIN);
+					}
 				}
 			}
 		}
@@ -463,22 +468,25 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			CAutoPtr<PlaylistItem> Item(DNew PlaylistItem);
 			SetFilePointerEx(m_hFile, Pos, NULL, FILE_BEGIN);
 			Pos.QuadPart += ReadShort() + 2;
-			ReadBuffer(Buff, 9);
+			ReadBuffer(Buff, 9); // M2TS file name
 			if (memcmp(&Buff[5], "M2TS", 4)) {
 				return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 			}
 
 			LPCWSTR format = L"%s\\STREAM\\%c%c%c%c%c.M2TS";
-			if (nSubPathsItems) {
+			if (nSubPathsItems == nPlaylistItems) {
 				format = L"%s\\STREAM\\SSIF\\%c%c%c%c%c.SSIF";
 			}
 			Item->m_strFileName.Format(format, CString(Path), Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
 			if (!::PathFileExists(Item->m_strFileName)) {
 				DbgLog((LOG_TRACE, 3, _T("		==> %s is missing, skip it"), Item->m_strFileName));
+
+				PosSTNSSExt.QuadPart = 0;
 				continue;
 			}
 
 			ReadBuffer(Buff, 3);
+			const BYTE is_multi_angle = (Buff[1] >> 4) & 0x1;
 
 			dwTemp				= ReadDword();
 			Item->m_rtIn		= REFERENCE_TIME(20000.0f*dwTemp/90);
@@ -490,10 +498,44 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 
 			rtDuration += (Item->m_rtOut - Item->m_rtIn);
 
+			ReadBuffer(Buff, 8);		// mpls uo
+			ReadByte();
+			ReadByte();					// still mode
+			ReadShort();				// still time
+			BYTE angle_count = 1;
+			if (is_multi_angle) {
+				angle_count = ReadByte();
+				if (angle_count < 1) {
+					angle_count = 1;
+				}
+				ReadByte();
+			}
+			for (BYTE i = 1; i < angle_count; i++) {
+				ReadBuffer(Buff, 9);	// M2TS file name
+				ReadByte();				// stc_id
+			}
+
+			// stn
+			ReadShort();					// length
+			ReadShort();					// reserved_for_future_use
+			Item->m_num_video = ReadByte();	// number of Primary Video Streams
+			ReadByte();						// number of Primary Audio Streams
+			Item->m_num_pg = ReadByte();	// number of Presentation Graphic Streams
+			Item->m_num_ig = ReadByte();	// number of Interactive Graphic Streams
+
+			Item->m_pg_offset_sequence_id.SetCount(Item->m_num_pg);
+			for (size_t i = 0; i < Item->m_num_pg; i++) {
+				Item->m_pg_offset_sequence_id[i] = 0xff;
+			}
+			Item->m_ig_offset_sequence_id.SetCount(Item->m_num_ig);
+			for (size_t i = 0; i < Item->m_num_ig; i++) {
+				Item->m_ig_offset_sequence_id[i] = 0xff;
+			}
+
 			if (bFullInfoRead) {
 				LARGE_INTEGER size = {0, 0};
 				HANDLE hFile = CreateFile(Item->m_strFileName, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL,
-											OPEN_EXISTING, FILE_ATTRIBUTE_READONLY|FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+										  OPEN_EXISTING, FILE_ATTRIBUTE_READONLY|FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 				if (hFile != INVALID_HANDLE_VALUE) {
 					GetFileSizeEx(hFile, &size);
 					CloseHandle(hFile);
@@ -511,12 +553,109 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 					bDuplicate = true;
 					break;
 				}
-
 			}
 
 			DbgLog((LOG_TRACE, 3, _T("	==> %s, Duration : %s [%15I64d], Total duration : %s, Size : %I64d"), Item->m_strFileName, ReftimeToString(Item->Duration()), Item->Duration(), ReftimeToString(rtDuration), Item->Size()));
 
 			Playlist.AddTail(Item);
+		}
+
+		// stn ss extension
+		if (bFullInfoRead && PosSTNSSExt.QuadPart && !Playlist.IsEmpty()) {
+			SetFilePointerEx(m_hFile, PosSTNSSExt, NULL, FILE_BEGIN);
+
+			int i = 0;
+			POSITION pos = Playlist.GetHeadPosition();
+			while (pos) {
+				PlaylistItem* pItem = Playlist.GetNext(pos);
+
+				SHORT lenght = ReadShort();
+				BYTE* buf = DNew BYTE[lenght];
+				ReadBuffer(buf, lenght);
+				CGolombBuffer gb(buf, lenght);
+
+				int Fixed_offset_during_PopUp_flag = gb.BitRead(1);
+				gb.BitRead(15); // reserved
+
+				for (i = 0; i < pItem->m_num_video; i++) {
+					// stream_entry
+					BYTE slen = gb.ReadByte();
+					gb.SkipBytes(slen);
+
+					// stream_attributes_ss
+					slen = gb.ReadByte();
+					gb.SkipBytes(slen);
+
+					gb.BitRead(10); // reserved
+					gb.BitRead(6);  // number_of_offset_sequences
+				}
+
+				for (i = 0; i < pItem->m_num_pg; i++) {
+					pItem->m_pg_offset_sequence_id[i] = gb.ReadByte();
+
+					gb.BitRead(4); // reserved
+					gb.BitRead(1); // dialog_region_offset_valid_flag
+					const BYTE is_SS_PG = gb.BitRead(1);
+					const BYTE is_top_AS_PG_textST = gb.BitRead(1);
+					const BYTE is_bottom_AS_PG_textST = gb.BitRead(1);
+					if (is_SS_PG) {
+						// stream_entry left eye
+						BYTE slen = gb.ReadByte();
+						gb.SkipBytes(slen);
+
+						// stream_entry right eye
+						slen = gb.ReadByte();
+						gb.SkipBytes(slen);
+
+						gb.BitRead(8); // reserved
+						gb.BitRead(8); // PG offset
+					}
+
+					if (is_top_AS_PG_textST) {
+						// stream_entry
+						BYTE slen = gb.ReadByte();
+						gb.SkipBytes(slen);
+
+						gb.BitRead(8); // reserved
+						gb.BitRead(8); // PG offset
+					}
+
+					if (is_bottom_AS_PG_textST) {
+						// stream_entry
+						BYTE slen = gb.ReadByte();
+						gb.SkipBytes(slen);
+
+						gb.BitRead(8); // reserved
+						gb.BitRead(8); // PG offset
+					}
+				}
+
+				for (i = 0; i < pItem->m_num_ig; i++) {
+					if (Fixed_offset_during_PopUp_flag) {
+						gb.ReadByte();
+					} else {
+						pItem->m_pg_offset_sequence_id[i] = gb.ReadByte();
+					}
+
+					gb.BitRead(16); // IG_Plane_offset_during_BB_video
+					gb.BitRead(7);  // reserved
+					BYTE is_SS_IG = gb.BitRead(1);
+					if (is_SS_IG) {
+						// stream_entry left eye
+						BYTE slen = gb.ReadByte();
+						gb.SkipBytes(slen);
+
+						// stream_entry right eye
+						slen = gb.ReadByte();
+						gb.SkipBytes(slen);
+
+						gb.ReadByte(); // reserved
+						gb.ReadByte(); // PG offset
+					}
+				}
+
+				delete [] buf;
+			}
 		}
 
 		CloseFile(S_OK);
