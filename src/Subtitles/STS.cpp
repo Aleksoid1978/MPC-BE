@@ -568,6 +568,95 @@ static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int Char
 	return !ret.IsEmpty();
 }
 
+static CString WebVTT2SSA(CString str, int CharSet)
+{
+	str = SubRipper2SSA(str, CharSet);
+	str.Replace(L"</c>", L"");
+	str.Replace(L"</v>", L"");
+
+	static const LPWSTR tags2remove[] = {
+		L"<v ",
+		L"<c"
+	};
+
+	int pos = -1;
+	int end = -1;
+	for (size_t i = 0; i < _countof(tags2remove); i++) {
+		for (;;) {
+			pos = str.Find(tags2remove[i]);
+			if (pos >= 0) {
+				end = str.Find(L">", pos);
+				if (end > pos) {
+					str.Delete(pos, end - pos + 1);
+				} else {
+					break;
+				}
+			} else {
+				break;
+			}
+		}
+	}
+
+	return str;
+}
+
+static bool OpenWebVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+{
+	CString buff;
+
+	if (!file->ReadString(buff)) {
+		return false;
+	}
+	FastTrim(buff);
+	if (buff.Find(L"WEBVTT") != 0) {
+		return false;
+	}
+
+	while (file->ReadString(buff)) {
+		FastTrim(buff);
+		if (buff.IsEmpty()) {
+			continue;
+		}
+
+		WCHAR sep;
+		int hh1, mm1, ss1, ms1, hh2, mm2, ss2, ms2;
+		WCHAR msStr1[5] = { 0 }, msStr2[5] = { 0 };
+		int c = swscanf_s(buff, L"%d%c%d%c%d%4[^-] --> %d%c%d%c%d%4s",
+						  &hh1, &sep, 1, &mm1, &sep, 1, &ss1, msStr1, _countof(msStr1),
+						  &hh2, &sep, 1, &mm2, &sep, 1, &ss2, msStr2, _countof(msStr2));
+
+		if (c >= 11) {
+			// Parse ms if present
+			if (2 != swscanf_s(msStr1, L"%c%d", &sep, 1, &ms1)) {
+				ms1 = 0;
+			}
+			if (2 != swscanf_s(msStr2, L"%c%d", &sep, 1, &ms2)) {
+				ms2 = 0;
+			}
+
+			CString subStr, tmp;
+			while (file->ReadString(tmp)) {
+				FastTrim(tmp);
+				if (tmp.IsEmpty()) {
+					break;
+				}
+
+				subStr += tmp + '\n';
+			}
+
+			ret.Add(
+				WebVTT2SSA(subStr, CharSet),
+				file->IsUnicode(),
+				(((hh1 * 60 + mm1) * 60) + ss1) * 1000 + ms1,
+				(((hh2 * 60 + mm2) * 60) + ss2) * 1000 + ms2);
+		} else {
+			continue;
+		}
+	}
+
+	return !ret.IsEmpty();
+}
+
 static bool OpenSubViewer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 {
 	STSStyle def;
@@ -1855,6 +1944,7 @@ static OpenFunctStruct OpenFuncts[] = {
 	OpenSubStationAlpha, TIME, Subtitle::SSA,
 	OpenSubRipper, TIME, Subtitle::SRT,
 	OpenOldSubRipper, TIME, Subtitle::SRT,
+	OpenWebVTT, TIME, Subtitle::SRT,
 	OpenSubViewer, TIME, Subtitle::SUB,
 	OpenMicroDVD, FRAME, Subtitle::SSA,
 	OpenSami, TIME, Subtitle::SMI,

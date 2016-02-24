@@ -31,7 +31,7 @@ namespace Subtitle
 		_T("srt"), _T("sub"), _T("smi"), _T("psb"),
 		_T("ssa"), _T("ass"), _T("idx"), _T("usf"),
 		_T("xss"), _T("txt"), _T("rt"),  _T("sup"),
-		_T("mks")
+		_T("vtt"), _T("mks")
 	};
 
 	enum SubType {
@@ -46,7 +46,8 @@ namespace Subtitle
 		XSS,
 		TXT,
 		RT,
-		SUP
+		SUP,
+		VTT
 	};
 
 	LPCTSTR GetSubtitleFileExt(SubType type);
