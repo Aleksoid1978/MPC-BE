@@ -192,6 +192,24 @@ static double Video_FrameRate_Rounding(double FrameRate)
 	return FrameRate;
 }
 
+#define MATROSKA_VIDEO_STEREOMODE 15
+static const LPWSTR matroska_stereo_mode[MATROSKA_VIDEO_STEREOMODE] = {
+	L"mono",
+	L"sbs_lr",
+	L"tb_rl",
+	L"tb_lr",
+	L"checkerboard_rl",
+	L"checkerboard_lr",
+	L"row_interleaved_rl",
+	L"row_interleaved_lr",
+	L"col_interleaved_rl",
+	L"col_interleaved_lr",
+	L"anaglyph_cyan_red",
+	L"sbs_rl",
+	L"anaglyph_green_magenta",
+	L"mvc_lr",
+	L"mvc_rl",
+};
 
 HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
@@ -756,6 +774,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							((MPEG2VIDEOINFO*)mts[i].Format())->hdr.dwPictAspectRatioY = aspect.cy;
 						}
 					}
+				}
+
+				if (pTE->v.StereoMode && pTE->v.StereoMode < MATROSKA_VIDEO_STEREOMODE) {
+					SetProperty(L"STEREOSCOPIC3DMODE", matroska_stereo_mode[pTE->v.StereoMode]);
 				}
 			} else if (pTE->TrackType == TrackEntry::TypeAudio) {
 				Name.Format(L"Audio %d", iAudio++);
