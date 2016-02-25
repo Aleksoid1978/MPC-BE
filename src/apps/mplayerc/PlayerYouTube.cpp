@@ -637,7 +637,7 @@ bool PlayerYouTube(CString url, CAtlList<CString>& urls, YOUTUBE_FIELDS& y_field
 									CString xmlValue = CString(szElementStart, int(szElementEnd - szElementStart));
 
 									if (xmlHeader == L"lang_code") {
-										url.Format(L"https://www.youtube.com/api/timedtext?lang=%s&v=%s&fmt=srt", xmlValue, videoId);
+										url.Format(L"https://www.youtube.com/api/timedtext?lang=%s&v=%s&fmt=vtt", xmlValue, videoId);
 									} else if (xmlHeader == L"lang_original") {
 										name = xmlValue;
 									}
