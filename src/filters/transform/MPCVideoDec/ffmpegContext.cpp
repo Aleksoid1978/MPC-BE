@@ -335,19 +335,17 @@ static BOOL DriverVersionCheck(LARGE_INTEGER VideoDriverVersion, int A, int B, i
 	return FALSE;
 }
 
-static unsigned __int64 GetFileVersion(LPCTSTR lptstrFilename)
+static unsigned __int64 GetFileVersion(LPCWSTR lptstrFilename)
 {
 	unsigned __int64 ret = 0;
 
-	DWORD buff[4] = { 0 };
-	VS_FIXEDFILEINFO* pvsf = (VS_FIXEDFILEINFO*)buff;
-	DWORD len = GetFileVersionInfoSize((LPTSTR)lptstrFilename, NULL);
-
+	const DWORD len = GetFileVersionInfoSize(lptstrFilename, NULL);
 	if (len) {
 		TCHAR* b1 = new TCHAR[len];
 		if (b1) {
 			UINT uLen;
-			if (GetFileVersionInfo((LPTSTR)lptstrFilename, 0, len, b1) && VerQueryValue(b1, L"\\", (void**)&pvsf, &uLen)) {
+			VS_FIXEDFILEINFO* pvsf = NULL;
+			if (GetFileVersionInfo(lptstrFilename, 0, len, b1) && VerQueryValue(b1, L"\\", (LPVOID*)&pvsf, &uLen)) {
 				ret = ((unsigned __int64)pvsf->dwFileVersionMS << 32) | pvsf->dwFileVersionLS;
 			}
 
@@ -359,7 +357,7 @@ static unsigned __int64 GetFileVersion(LPCTSTR lptstrFilename)
 }
 
 int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
-							 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible)
+							 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion)
 {
 	H264Context*	h				= (H264Context*)pAVCtx->priv_data;
 	SPS*			cur_sps			= &h->sps;
@@ -378,31 +376,23 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 			return DXVA_PROFILE_HIGHER_THAN_HIGH;
 		}
 
-		video_is_level51			= cur_sps->level_idc >= 51 ? 1 : 0;
-		int max_ref_frames			= max_ref_frames_dpb41; // default value is calculate
+		video_is_level51   = cur_sps->level_idc >= 51 ? 1 : 0;
+		int max_ref_frames = max_ref_frames_dpb41; // default value is calculate
 
 		if (nPCIVendor == PCIV_nVidia) {
 			// nVidia cards support level 5.1 since drivers v6.14.11.7800 for XP and drivers v7.15.11.7800 for Vista/7
 			if (IsWinVistaOrLater()) {
 				if (DriverVersionCheck(VideoDriverVersion, 7, 15, 11, 7800)) {
 					no_level51_support = 0;
-
-					// max ref frames is 16 for HD and 11 otherwise
-					// max_ref_frames = (nWidth >= 1280) ? 16 : 11;
 					max_ref_frames = 16;
 				}
 			} else {
 				if (DriverVersionCheck(VideoDriverVersion, 6, 14, 11, 7800)) {
 					no_level51_support = 0;
-
-					// max ref frames is 14
 					max_ref_frames = 14;
 				}
 			}
-		} else if (nPCIVendor == PCIV_S3_Graphics || nPCIVendor == PCIV_Intel) {
-			no_level51_support = 0;
-			max_ref_frames = 16;
-		} else if (nPCIVendor == PCIV_ATI && nIsAtiDXVACompatible) {
+		} else if (nPCIVendor == PCIV_ATI && !CheckPCID(nPCIDevice, PCID_ATI_UVD, _countof(PCID_ATI_UVD))) {
 			TCHAR path[MAX_PATH] = { 0 };
 			GetSystemDirectory(path, MAX_PATH);
 			wcscat(path, L"\\drivers\\atikmdag.sys\0");
@@ -428,6 +418,9 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 					max_ref_frames = 16;
 				}
 			}
+		} else if (nPCIVendor == PCIV_S3_Graphics || nPCIVendor == PCIV_Intel) {
+			no_level51_support = 0;
+			max_ref_frames = 16;
 		}
 
 		// Check maximum allowed number reference frames

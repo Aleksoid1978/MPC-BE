@@ -41,7 +41,7 @@ enum PCI_Vendors {
 
 // === H264 functions
 int		FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
-								 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion, bool nIsAtiDXVACompatible);
+								 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion);
 
 // === Mpeg2 functions
 int		MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);

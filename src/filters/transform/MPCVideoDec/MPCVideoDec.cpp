@@ -1651,11 +1651,6 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 	return hr;
 }
 
-#define ATI_IDENTIFY					_T("ATI ")
-#define AMD_IDENTIFY					_T("AMD ")
-#define RADEON_HD_IDENTIFY				_T("Radeon HD ")
-#define RADEON_MOBILITY_HD_IDENTIFY		_T("Mobility Radeon HD ")
-
 HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 {
 	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::InitDecoder()"));
@@ -1839,22 +1834,10 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 					break;
 				}
 
-				bool IsAtiDXVACompatible = false;
-				if (m_nPCIVendor == PCIV_ATI) {
-					if (!m_strDeviceDescription.Find(ATI_IDENTIFY) || !m_strDeviceDescription.Find(AMD_IDENTIFY)) {
-						m_strDeviceDescription.Delete(0, 4);
-						TCHAR ati_version = '0';
-						if (!m_strDeviceDescription.Find(RADEON_HD_IDENTIFY)) {
-							ati_version = m_strDeviceDescription.GetAt(CString(RADEON_HD_IDENTIFY).GetLength());
-						} else if (!m_strDeviceDescription.Find(RADEON_MOBILITY_HD_IDENTIFY)) {
-							ati_version = m_strDeviceDescription.GetAt(CString(RADEON_MOBILITY_HD_IDENTIFY).GetLength());
-						}
-						IsAtiDXVACompatible = (_wtoi(&ati_version) >= 4); // HD4xxx/Mobility and above AMD/ATI cards support level 5.1 and ref = 16
-					}
-				} else if (m_nPCIVendor == PCIV_Intel && !IsWinVistaOrLater()) {
+				if (m_nPCIVendor == PCIV_Intel && !IsWinVistaOrLater()) {
 					break; // Disable support H.264 DXVA on Intel in WinXP ...
 				}
-				int nCompat = FFH264CheckCompatibility(PictWidthAligned(), PictHeightAligned(), m_pAVCtx, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, IsAtiDXVACompatible);
+				int nCompat = FFH264CheckCompatibility(PictWidthAligned(), PictHeightAligned(), m_pAVCtx, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion);
 
 				if ((nCompat & DXVA_PROFILE_HIGHER_THAN_HIGH) || (nCompat & DXVA_HIGH_BIT)) { // DXVA unsupported
 					break;
