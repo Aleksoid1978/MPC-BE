@@ -9136,25 +9136,27 @@ void CMainFrame::OnAfterplayback(UINT nID)
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_DONOTHING);
 			break;
 		case ID_AFTERPLAYBACK_NEXT:
+			s.fExitAfterPlayback = false;
 			s.fNextInDirAfterPlayback = true;
 			s.fNextInDirAfterPlaybackLooped = false;
-			s.fExitAfterPlayback = false;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_NEXT);
 			break;
 		case ID_AFTERPLAYBACK_NEXT_LOOPED:
+			s.fExitAfterPlayback = false;
 			s.fNextInDirAfterPlayback = true;
 			s.fNextInDirAfterPlaybackLooped = true;
-			s.fExitAfterPlayback = false;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_NEXT);
 			break;
 		case ID_AFTERPLAYBACK_EXIT:
 			s.fExitAfterPlayback = true;
 			s.fNextInDirAfterPlayback = false;
+			s.fNextInDirAfterPlaybackLooped = false;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_EXIT);
 			break;
 		case ID_AFTERPLAYBACK_EVERYTIMEDONOTHING:
 			s.fExitAfterPlayback = false;
 			s.fNextInDirAfterPlayback = false;
+			s.fNextInDirAfterPlaybackLooped = false;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_DONOTHING);
 			break;
 	}
