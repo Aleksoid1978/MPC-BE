@@ -3836,12 +3836,14 @@ STDMETHODIMP CVideoDecOutputPin::GetCreateVideoAcceleratorData(const GUID *pGuid
 	return hr;
 }
 
-void GetFormatList(CAtlList<SUPPORTED_FORMATS>& fmts)
-{
-	fmts.RemoveAll();
+namespace MPCVideoDec {
+	void GetSupportedFormatList(FORMATS& fmts)
+	{
+		fmts.RemoveAll();
 
-	for (size_t i = 0; i < _countof(sudPinTypesIn); i++) {
-		SUPPORTED_FORMATS fmt = {sudPinTypesIn[i].clsMajorType, ffCodecs[i].clsMinorType, ffCodecs[i].FFMPEGCode, ffCodecs[i].DXVACode};
-		fmts.AddTail(fmt);
+		for (size_t i = 0; i < _countof(sudPinTypesIn); i++) {
+			FORMAT fmt = { sudPinTypesIn[i].clsMajorType, ffCodecs[i].clsMinorType, ffCodecs[i].FFMPEGCode, ffCodecs[i].DXVACode };
+			fmts.AddTail(fmt);
+		}
 	}
-}
+} // namespace MPCVideoDec
