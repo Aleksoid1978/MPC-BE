@@ -329,12 +329,15 @@ private :
 	DDPIXELFORMAT		m_ddUncompPixelFormat;
 };
 
-struct SUPPORTED_FORMATS {
-	const CLSID*	clsMajorType;
-	const CLSID*	clsMinorType;
+namespace MPCVideoDec {
+	struct FORMAT {
+		const CLSID* clsMajorType;
+		const CLSID* clsMinorType;
 
-	const int		FFMPEGCode;
-	const int		DXVACode;
-};
+		const int    FFMPEGCode;
+		const int    DXVACode;
+	};
+	typedef CAtlList<FORMAT> FORMATS;
 
-void GetFormatList(CAtlList<SUPPORTED_FORMATS>& fmts);
+	void GetSupportedFormatList(FORMATS& fmts);
+} // namespace MPCVideoDec

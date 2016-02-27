@@ -56,14 +56,14 @@ public:
 		CAppSettings& s = AfxGetAppSettings();
 
 		// Get supported MEDIASUBTYPE_ from decoder
-		CAtlList<SUPPORTED_FORMATS> fmts;
-		GetFormatList(fmts);
+		MPCVideoDec::FORMATS fmts;
+		MPCVideoDec::GetSupportedFormatList(fmts);
 
 		if (m_merit >= MERIT64_ABOVE_DSHOW) {
 			// High merit MPC Video Decoder
 			POSITION pos = fmts.GetHeadPosition();
 			while (pos) {
-				SUPPORTED_FORMATS fmt = fmts.GetNext(pos);
+				MPCVideoDec::FORMAT& fmt = fmts.GetNext(pos);
 				if (m_bIsPreview || s.VideoFilters[fmt.FFMPEGCode] || s.DXVAFilters[fmt.DXVACode]) {
 					AddType(*fmt.clsMajorType, *fmt.clsMinorType);
 				}
@@ -72,7 +72,7 @@ public:
 			// Low merit MPC Video Decoder
 			POSITION pos = fmts.GetHeadPosition();
 			while (pos) {
-				SUPPORTED_FORMATS fmt = fmts.GetNext(pos);
+				MPCVideoDec::FORMAT& fmt = fmts.GetNext(pos);
 				AddType(*fmt.clsMajorType, *fmt.clsMinorType);
 			}
 		}
