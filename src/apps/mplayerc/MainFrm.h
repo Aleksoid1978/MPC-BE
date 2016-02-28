@@ -274,6 +274,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CComPtr<ISubPicAllocatorPresenter2> m_pCAP2;
 
 	CComPtr<IMadVRSubclassReplacement> m_pMVRSR;
+	CComPtr<IMadVRCommand> m_pMVRC;
+	CComPtr<IMadVRInfo> m_pMVRI;
 
 	CComQIPtr<IBaseFilter>			m_pMainSourceFilter;
 	CComQIPtr<IBaseFilter>			m_pSwitcherFilter;
