@@ -474,7 +474,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			}
 
 			LPCWSTR format = L"%s\\STREAM\\%c%c%c%c%c.M2TS";
-			if (nSubPathsItems == nPlaylistItems) {
+			if (nSubPathsItems >= nPlaylistItems) {
 				format = L"%s\\STREAM\\SSIF\\%c%c%c%c%c.SSIF";
 			}
 			Item->m_strFileName.Format(format, CString(Path), Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
