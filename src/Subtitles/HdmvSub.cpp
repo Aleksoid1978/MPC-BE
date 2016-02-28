@@ -215,13 +215,14 @@ void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 
 				bbox.left	= bbox.left > 0 ? bbox.left : 0;
 				bbox.top	= bbox.top > 0 ? bbox.top : 0;
-				if (m_VideoDescriptor.nVideoWidth > spd.w) {
-					bbox.left	= MulDiv(bbox.left, spd.w, m_VideoDescriptor.nVideoWidth);
-					bbox.right	= MulDiv(bbox.right, spd.w, m_VideoDescriptor.nVideoWidth);
+				if (m_VideoDescriptor.nVideoWidth != spd.w) {
+					bbox.left  = MulDiv(bbox.left, spd.w, m_VideoDescriptor.nVideoWidth);
+					bbox.right = MulDiv(bbox.right, spd.w, m_VideoDescriptor.nVideoWidth);
 				}
-				if (m_VideoDescriptor.nVideoHeight > spd.h) {
-					bbox.top	= MulDiv(bbox.top, spd.h, m_VideoDescriptor.nVideoHeight);
-					bbox.bottom	= MulDiv(bbox.bottom, spd.h, m_VideoDescriptor.nVideoHeight);
+
+				if (m_VideoDescriptor.nVideoHeight != spd.h) {
+					bbox.top    = MulDiv(bbox.top, spd.h, m_VideoDescriptor.nVideoHeight);
+					bbox.bottom = MulDiv(bbox.bottom, spd.h, m_VideoDescriptor.nVideoHeight);
 				}
 
 				TRACE_HDMVSUB(_T("CHdmvSub::Render() : size = %ld, ObjRes = %dx%d, SPDRes = %dx%d, %I64d = %s\n"),

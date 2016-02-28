@@ -379,9 +379,8 @@ void CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 
 		bbox.left	= 0;
 		bbox.top	= 0;
-		bbox.right	= min(m_Display.width, spd.w);
-		ASSERT(spd.h >= 0);
-		bbox.bottom	= min(m_Display.height, spd.h);
+		bbox.right	= spd.w;
+		bbox.bottom	= spd.h;
 
 		FinalizeRender(spd);
 	}

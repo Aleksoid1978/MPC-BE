@@ -49,7 +49,7 @@ void CBaseSub::InitSpd(SubPicDesc& spd, int nWidth, int nHeight)
 		m_spd.bits		= (void*)m_pTempSpdBuff;
 	}
 
-	if (!m_bResizedRender && (m_spd.w > spd.w || m_spd.h > spd.h)) {
+	if (!m_bResizedRender && (m_spd.w != spd.w || m_spd.h != spd.h)) {
 		m_bResizedRender = TRUE;
 
 		BYTE* p = (BYTE*)m_spd.bits;
