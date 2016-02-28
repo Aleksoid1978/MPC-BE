@@ -7491,6 +7491,9 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 			m_ZoomX = m_ZoomY = 1.0;
 			m_PosX = m_PosY = 0.5;
 			m_AngleX = m_AngleY = m_AngleZ = 0;
+			if (m_pMVRC) {
+				m_pMVRC->SendCommandInt("rotate", 0);
+			}
 			break;
 		case ID_VIEW_INCSIZE:
 			x = y = 1;
@@ -7649,43 +7652,70 @@ void CMainFrame::OnUpdateViewPanNScanPresets(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewRotate(UINT nID)
 {
-	if (!m_pCAP) {
-		return;
+	HRESULT hr = E_NOTIMPL;
+
+	if (m_pMVRC && m_pMVRI) {
+		int rotation;
+		if (FAILED(m_pMVRI->GetInt("rotation", &rotation))) {
+			return;
+		}
+
+		switch (nID) {
+			case ID_PANSCAN_ROTATEZP:
+				rotation += 270;
+				break;
+			case ID_PANSCAN_ROTATEZM:
+				rotation += 90;
+				break;
+			default:
+				return;
+		}
+		rotation %= 360;
+		ASSERT(rotation >= 0);
+
+		if (SUCCEEDED(hr = m_pMVRC->SendCommandInt("rotate", rotation))) {
+			m_AngleZ = (360 - rotation) % 360;
+		}
+	} else if (m_pCAP) {
+		switch (nID) {
+			case ID_PANSCAN_ROTATEXP:
+				m_AngleX += 2;
+				if (m_AngleX >= 360) { m_AngleX -= 360; }
+				break;
+			case ID_PANSCAN_ROTATEXM:
+				m_AngleX -= 2;
+				if (m_AngleX <= -360) { m_AngleX += 360; }
+				break;
+			case ID_PANSCAN_ROTATEYP:
+				m_AngleY += 2;
+				if (m_AngleY >= 360) { m_AngleY -= 360; }
+				break;
+			case ID_PANSCAN_ROTATEYM:
+				m_AngleY -= 2;
+				if (m_AngleY <= -360) { m_AngleY += 360; }
+				break;
+			case ID_PANSCAN_ROTATEZP:
+				m_AngleZ += 2;
+				if (m_AngleZ >= 360) { m_AngleZ -= 360; }
+				break;
+			case ID_PANSCAN_ROTATEZM:
+				m_AngleZ -= 2;
+				if (m_AngleZ <= -360) { m_AngleZ += 360; }
+				break;
+			default:
+				return;
+		}
+
+		hr = m_pCAP->SetVideoAngle(Vector(Vector::DegToRad(m_AngleX), Vector::DegToRad(m_AngleY), Vector::DegToRad(m_AngleZ)));
 	}
 
-	switch (nID) {
-	case ID_PANSCAN_ROTATEXP:
-		m_AngleX += 2;
-		if (m_AngleX >= 360) { m_AngleX -= 360; }
-		break;
-	case ID_PANSCAN_ROTATEXM:
-		m_AngleX -= 2;
-		if (m_AngleX <= -360) { m_AngleX += 360; }
-		break;
-	case ID_PANSCAN_ROTATEYP:
-		m_AngleY += 2;
-		if (m_AngleY >= 360) { m_AngleY -= 360; }
-		break;
-	case ID_PANSCAN_ROTATEYM:
-		m_AngleY -= 2;
-		if (m_AngleY <= -360) { m_AngleY += 360; }
-		break;
-	case ID_PANSCAN_ROTATEZP:
-		m_AngleZ += 2;
-		if (m_AngleZ >= 360) { m_AngleZ -= 360; }
-		break;
-	case ID_PANSCAN_ROTATEZM:
-		m_AngleZ -= 2;
-		if (m_AngleZ <= -360) { m_AngleZ += 360; }
-		break;
-	default:
+	if (FAILED(hr)) {
+		m_AngleX = m_AngleY = m_AngleZ = 0;
 		return;
 	}
-
-	m_pCAP->SetVideoAngle(Vector(Vector::DegToRad(m_AngleX), Vector::DegToRad(m_AngleY), Vector::DegToRad(m_AngleZ)));
 
 	CString info;
-	info.Format(_T("x: %d°, y: %d°, z: %d°"), m_AngleX, m_AngleY, m_AngleZ);
+	info.Format(L"x: %d°, y: %d°, z: %d°", m_AngleX, m_AngleY, m_AngleZ);
 	SendStatusMessage(info, 3000);
 }
 
@@ -13889,6 +13919,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRWC), FALSE); // might have IVMRMixerBitmap9, but not IVMRWindowlessControl9
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRMC9), TRUE);
 		m_pMVRSR = m_pCAP;
+		m_pMVRC = m_pCAP;
+		m_pMVRI = m_pCAP;
 
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMB), TRUE);
 		m_pMVTO = m_pCAP;
@@ -14080,6 +14112,8 @@ void CMainFrame::CloseMediaPrivate()
 
 	// IMPORTANT: IVMRSurfaceAllocatorNotify/IVMRSurfaceAllocatorNotify9 has to be released before the VMR/VMR9, otherwise it will crash in Release()
 	m_pMVRSR.Release();
+	m_pMVRC.Release();
+	m_pMVRI.Release();
 	m_pCAP2.Release();
 	m_pCAP.Release();
 	m_pVMRWC.Release();
