@@ -500,6 +500,7 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_ForcedSub(false)
 	, m_AC3CoreOnly(0)
 	, m_SubEmptyPin(false)
+	, m_hasHdmvDvbSubPin(false)
 {
 #ifdef REGISTER_FILTER
 	CRegKey key;
@@ -1234,9 +1235,6 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			} else if (type == CMpegSplitterFile::stream_type::subpic) {
 				if (subpic_sel == stream_idx && (S_OK == AddOutputPin(s, pPinOut))) {
-					if (s.mt.subtype == MEDIASUBTYPE_HDMVSUB || s.mt.subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
-						m_hasHdmvDvbSubPin = true;
-					}
 					break;
 				}
 			} else if (S_OK == AddOutputPin(s, pPinOut)) {
@@ -1952,12 +1950,6 @@ CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpeg
 	: CBaseSplitterParserOutputPin(mts, pName, pFilter, pLock, phr)
 	, m_type(type)
 {
-	if (mts[0].subtype == MEDIASUBTYPE_HDMVSUB) {
-		m_SubtitleType = hdmvsub;
-	}
-	else if (mts[0].subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
-		m_SubtitleType = dvbsub;
-	}
 }
 
 HRESULT CMpegSplitterOutputPin::CheckMediaType(const CMediaType* pmt)
@@ -2056,6 +2048,22 @@ STDMETHODIMP CMpegSplitterOutputPin::Connect(IPin* pReceivePin, const AM_MEDIA_T
 	}
 
 	hr = __super::Connect(pReceivePin, pmt);
+
+	if (S_OK == hr && m_mt.majortype == MEDIATYPE_Subtitle) {
+		if (m_mt.subtype == MEDIASUBTYPE_HDMVSUB) {
+			m_SubtitleType = hdmvsub;
+			(static_cast<CMpegSplitterFilter*>(m_pFilter))->m_hasHdmvDvbSubPin = true;
+		}
+		else if (m_mt.subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
+			m_SubtitleType = dvbsub;
+			(static_cast<CMpegSplitterFilter*>(m_pFilter))->m_hasHdmvDvbSubPin = true;
+		}
+		else {
+			m_SubtitleType = not_hdmv_dvbsub;
+			(static_cast<CMpegSplitterFilter*>(m_pFilter))->m_hasHdmvDvbSubPin = false; // only one output pin for subtitles
+		}
+	}
+
 	(static_cast<CMpegSplitterFilter*>(m_pFilter))->SetPipo(false);
 
 	return hr;
