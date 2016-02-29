@@ -520,7 +520,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		if (mts.IsEmpty()) {
-			TRACE(_T("CAviSourceFilter: Unsupported stream (%d)\n"), i);
+			DbgLog((LOG_TRACE, 3, L"CAviSourceFilter: Unsupported stream (%d)", i));
 			continue;
 		}
 
@@ -657,8 +657,6 @@ void CAviSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	memset((DWORD*)m_tFrame, 0, m_pFile->m_avih.dwStreams * sizeof(DWORD));
 	m_pFile->Seek(0);
 
-	DbgLog((LOG_TRACE, 0, _T("Seek: %I64d"), rt / 10000));
-
 	if (rt > 0) {
 		for (DWORD track = 0; track < m_pFile->m_avih.dwStreams; track++) {
 			CAviFile::strm_t* s = m_pFile->m_strms[track];
@@ -679,7 +677,7 @@ bool CAviSplitterFilter::DemuxLoop()
 
 	CAtlArray<BOOL> fDiscontinuity;
 	fDiscontinuity.SetCount(m_pFile->m_avih.dwStreams);
-	memset(fDiscontinuity.GetData(), 0, m_pFile->m_avih.dwStreams * sizeof(BOOL));
+	memset(fDiscontinuity.GetData(), FALSE, m_pFile->m_avih.dwStreams * sizeof(BOOL));
 
 	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
 		DWORD curTrack = DWORD_MAX;
@@ -716,7 +714,6 @@ bool CAviSplitterFilter::DemuxLoop()
 		do {
 			CAviFile::strm_t* s = m_pFile->m_strms[curTrack];
 			DWORD f = m_tFrame[curTrack];
-			//TRACE(_T("CAviFile::DemuxLoop(): track %d, time %I64d, pos %I64d\n"), curTrack, minTime, s->cs[f].filepos);
 
 			m_pFile->Seek(s->cs[f].filepos);
 			DWORD size = 0;
@@ -724,14 +721,18 @@ bool CAviSplitterFilter::DemuxLoop()
 			if (s->cs[f].fChunkHdr) {
 				DWORD id = 0;
 				if (S_OK != m_pFile->ReadAvi(id) || id == 0 || curTrack != TRACKNUM(id) || S_OK != m_pFile->ReadAvi(size)) {
-					fDiscontinuity[curTrack] = true;
+					fDiscontinuity[curTrack] = TRUE;
 					break;
 				}
 
 				if (size != s->cs[f].orgsize) {
-					TRACE(_T("WARNING: CAviFile::DemuxLoop() incorrect chunk size. By index: %d, by header: %d\n"), s->cs[f].orgsize, size);
-					fDiscontinuity[curTrack] = true;
-					//ASSERT(0);
+					DbgLog((LOG_TRACE, 3, L"CAviSplitterFilter::DemuxLoop() : incorrect chunk size. TrackNum: %d, by index: %d, by header: %d", TRACKNUM(id), s->cs[f].orgsize, size));
+					const DWORD maxChunkSize = (f + 1 < s->cs.GetCount() ? s->cs[f + 1].filepos : m_pFile->GetLength()) - m_pFile->GetPos();
+					if (size > maxChunkSize) {
+						DbgLog((LOG_TRACE, 3, L"	using from index"));
+						size = s->cs[f].orgsize;
+					}
+					fDiscontinuity[curTrack] = TRUE;
 					//break; // Why so, why break ??? If anyone knows - please describe ...
 				}
 			} else {
@@ -747,10 +748,10 @@ bool CAviSplitterFilter::DemuxLoop()
 			p->rtStop			= s->GetRefTime(f + 1, f + 1 < (DWORD)s->cs.GetCount() ? s->cs[f + 1].size : s->totalsize);
 			p->SetCount(size);
 			if (S_OK != (hr = m_pFile->ByteRead(p->GetData(), p->GetCount()))) {
-				return true;    // break;
+				return true;
 			}
 #if defined(_DEBUG) && 0
-			DbgLog((LOG_TRACE, 0,
+			DbgLog((LOG_TRACE, 3,
 					_T("%d (%d): %I64d - %I64d, %I64d - %I64d (size = %d)"),
 					minTrack, (int)p->bSyncPoint,
 					(p->rtStart) / 10000, (p->rtStop) / 10000,
@@ -770,6 +771,7 @@ bool CAviSplitterFilter::DemuxLoop()
 	if (m_maxTimeStamp != INVALID_TIME) {
 		m_rtCurrent = m_maxTimeStamp;
 	}
+
 	return true;
 }
 
