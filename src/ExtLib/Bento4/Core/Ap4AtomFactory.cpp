@@ -525,6 +525,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_WMV1:
         case AP4_ATOM_TYPE_CUVC:
         case AP4_ATOM_TYPE_CHQX:
+        case AP4_ATOM_TYPE_CFHD:
             atom = new AP4_VisualSampleEntry(type, size, stream, *this);
             break;
 
