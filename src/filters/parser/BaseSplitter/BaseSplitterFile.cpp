@@ -117,6 +117,7 @@ void CBaseSplitterFile::ThreadUpdateLength()
 				m_len = total;
 				if (total == available) {
 					m_fmode = FM_FILE;
+					m_available = available;
 					return;
 				}
 			}
