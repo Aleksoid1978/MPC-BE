@@ -433,6 +433,8 @@ const AP4_Atom::Type AP4_ATOM_TYPE_WMV1 = AP4_ATOM_TYPE('W','M','V','1');
 // Canopus
 const AP4_Atom::Type AP4_ATOM_TYPE_CUVC = AP4_ATOM_TYPE('C','U','V','C');
 const AP4_Atom::Type AP4_ATOM_TYPE_CHQX = AP4_ATOM_TYPE('C','H','Q','X');
+// CineForm
+const AP4_Atom::Type AP4_ATOM_TYPE_CFHD = AP4_ATOM_TYPE('C','F','H','D');
 
 // fragmented atom ...
 const AP4_Atom::Type AP4_ATOM_TYPE_MVEX = AP4_ATOM_TYPE('m','v','e','x');
