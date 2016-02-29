@@ -4190,7 +4190,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	m_AngleZ = 0;
-	if (m_pCAP) {
+	m_ZoomX = m_ZoomY = 1.0;
+	if (m_pCAP && !m_pMVRC) {
 		if (OpenFileData *pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.m_p)) {
 			// Rotation flag;
 			BeginEnumFilters(m_pGB, pEF, pBF) {
