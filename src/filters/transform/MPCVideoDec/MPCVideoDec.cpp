@@ -1912,7 +1912,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			}
 		} else if (m_nDecoderMode == MODE_DXVA1) {
 			if (IsDXVASupported()) {
-				ReconnectOutput(PictWidth(), PictHeight(), true, GetFrameDuration());
+				ReconnectOutput(PictWidthAligned(), PictHeightAligned(), true, GetFrameDuration(), NULL, PictWidth(), PictHeight());
 				if (m_pDXVADecoder) {
 					(static_cast<CDXVA1Decoder*>(m_pDXVADecoder))->ConfigureDXVA1();
 				}
@@ -2926,7 +2926,8 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 		case MODE_DXVA1 :
 			CheckPointer(m_pDXVADecoder, E_UNEXPECTED);
 
-			if (m_nDecoderMode == MODE_DXVA1 && ReconnectOutput(PictWidth(), PictHeight(), false, GetFrameDuration()) == S_OK) {
+			// stupid DXVA1 - size for the output MediaType should be the same that size of DXVA surface
+			if (m_nDecoderMode == MODE_DXVA1 && ReconnectOutput(PictWidthAligned(), PictHeightAligned(), false, GetFrameDuration(), NULL, PictWidth(), PictHeight()) == S_OK) {
 				(static_cast<CDXVA1Decoder*>(m_pDXVADecoder))->ConfigureDXVA1();
 			}
 	}

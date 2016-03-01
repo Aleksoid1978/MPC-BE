@@ -181,7 +181,7 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, 
 	return S_OK;
 }
 
-HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* = false*/, REFERENCE_TIME AvgTimePerFrame/* = 0*/, DXVA2_ExtendedFormat* dxvaExtFormat/* = NULL*/)
+HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* = false*/, REFERENCE_TIME AvgTimePerFrame/* = 0*/, DXVA2_ExtendedFormat* dxvaExtFormat/* = NULL*/, int RealWidth/* = -1*/, int RealHeight/* = -1*/)
 {
 	CMediaType& mt = m_pOutput->CurrentMediaType();
 
@@ -264,9 +264,9 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 			NotifyEvent(EC_ERRORABORT, 0, 0);
 			return E_FAIL;
 		}
-		BOOL m_bOverlayMixer = (clsid == CLSID_OverlayMixer);
+		const bool m_bOverlayMixer = (clsid == CLSID_OverlayMixer);
 
-		CRect vih_rect(0, 0, m_w, m_h);
+		CRect vih_rect(0, 0, RealWidth > 0 ? RealWidth : m_w, RealHeight > 0 ? RealHeight : m_h);
 
 		DbgLog((LOG_TRACE, 3, L"CBaseVideoFilter::ReconnectOutput() : Performing reconnect"));
 		if (m_w != vih_rect.Width() || m_h != vih_rect.Height()) {
