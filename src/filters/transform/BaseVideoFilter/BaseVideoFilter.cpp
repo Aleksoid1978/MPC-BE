@@ -264,7 +264,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 			NotifyEvent(EC_ERRORABORT, 0, 0);
 			return E_FAIL;
 		}
-		const bool m_bOverlayMixer = (clsid == CLSID_OverlayMixer);
+		const bool m_bOverlayMixer = !!(clsid == CLSID_OverlayMixer);
 
 		CRect vih_rect(0, 0, RealWidth > 0 ? RealWidth : m_w, RealHeight > 0 ? RealHeight : m_h);
 
