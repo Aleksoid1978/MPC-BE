@@ -4471,14 +4471,15 @@ void CMainFrame::OnBossKey()
 	}
 
 	// Disable animation
-	ANIMATIONINFO AnimationInfo;
-	AnimationInfo.cbSize = sizeof(ANIMATIONINFO);
+	ANIMATIONINFO AnimationInfo = { sizeof(AnimationInfo) };
 	::SystemParametersInfo(SPI_GETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
-	int WindowAnimationType = AnimationInfo.iMinAnimate;
+	const int WindowAnimationType = AnimationInfo.iMinAnimate;
 	AnimationInfo.iMinAnimate = 0;
 	::SystemParametersInfo(SPI_SETANIMATION, sizeof(ANIMATIONINFO), &AnimationInfo, 0);
 
-	SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
+	if (State_Running == GetMediaState()) {
+		SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
+	}
 	if (m_bFullScreen || IsD3DFullScreenMode()) {
 		SendMessage(WM_COMMAND, ID_VIEW_FULLSCREEN);
 	}
