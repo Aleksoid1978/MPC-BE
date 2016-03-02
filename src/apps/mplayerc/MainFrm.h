@@ -1345,4 +1345,7 @@ protected:
 	BOOL		OpenYoutubePlaylist(CString url);
 
 	BOOL		AddSimilarFiles(CAtlList<CString>& fns);
+
+	void		SetToolBarAudioButton();
+	void		SetToolBarSubtitleButton();
 };

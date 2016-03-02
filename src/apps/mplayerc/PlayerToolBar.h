@@ -55,6 +55,9 @@ public:
 	LONG		m_nButtonHeight;
 	CVolumeCtrl	m_volctrl;
 
+	BOOL		m_bAudioEnable = FALSE;
+	BOOL		m_bSubtitleEnable = FALSE;
+
 	CPlayerToolBar(CMainFrame* pMainFrame);
 	virtual ~CPlayerToolBar();
 
@@ -98,6 +101,9 @@ protected:
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+
+	afx_msg void OnUpdateAudio(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateSubtitle(CCmdUI* pCmdUI);
 
 	DECLARE_MESSAGE_MAP()
 };

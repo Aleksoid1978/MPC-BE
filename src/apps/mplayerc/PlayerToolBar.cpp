@@ -541,12 +541,27 @@ BEGIN_MESSAGE_MAP(CPlayerToolBar, CToolBar)
 	ON_WM_RBUTTONDOWN()
 	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTW, 0, 0xFFFFFFFF, OnToolTipNotify)
 	ON_WM_MOUSEMOVE()
+
+	ON_UPDATE_COMMAND_UI(ID_NAVIGATE_AUDIO, OnUpdateAudio)
+	ON_UPDATE_COMMAND_UI(ID_NAVIGATE_SUBTITLES, OnUpdateSubtitle)
 END_MESSAGE_MAP()
 
 // CPlayerToolBar message handlers
 
+void CPlayerToolBar::OnUpdateAudio(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(m_bAudioEnable);
+}
+
+void CPlayerToolBar::OnUpdateSubtitle(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(m_bSubtitleEnable);
+}
+
 void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	//UpdateButonState(ID_NAVIGATE_SUBTITLES, FALSE);
+
 	LPNMTBCUSTOMDRAW pTBCD	= reinterpret_cast<LPNMTBCUSTOMDRAW>(pNMHDR);
 	LRESULT lr				= CDRF_DODEFAULT;
 
