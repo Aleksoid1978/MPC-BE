@@ -4348,6 +4348,9 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	UpdatePlayerStatus();
 
+	SetToolBarAudioButton();
+	SetToolBarSubtitleButton();
+
 	// correct window size if "Limit window proportions on resize" enable.
 	if (!s.fRememberZoomLevel) {
 		CRect r;
@@ -4468,6 +4471,9 @@ void CMainFrame::OnFilePostCloseMedia()
 	}
 
 	m_bAudioOnly = true;
+
+	SetToolBarAudioButton();
+	SetToolBarSubtitleButton();
 
 	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnFilePostCloseMedia() : end"));
 }
@@ -5642,6 +5648,8 @@ void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 			}
 
 			if (b_SubLoaded) {
+				SetToolBarSubtitleButton();
+
 				SendStatusMessage(GetFileOnly(fname) + ResStr(IDS_MAINFRM_47), 3000);
 				if (m_pDVS) {
 					return;
@@ -6541,18 +6549,19 @@ void CMainFrame::OnFileLoadSubtitle()
 			m_pDVS->put_HideSubtitles(true);
 			m_pDVS->put_HideSubtitles(false);
 		}
-		return;
-	}
-
-	pos = fns.GetHeadPosition();
-	while (pos) {
-		CString fname = fns.GetNext(pos);
-		ISubStream *pSubStream = NULL;
-		if (LoadSubtitle(fname, &pSubStream)) {
-			SetSubtitle(pSubStream); // the subtitle at the insert position according to LoadSubtitle()
-			AddSubtitlePathsAddons(fname);
+	} else {
+		pos = fns.GetHeadPosition();
+		while (pos) {
+			CString fname = fns.GetNext(pos);
+			ISubStream *pSubStream = NULL;
+			if (LoadSubtitle(fname, &pSubStream)) {
+				SetSubtitle(pSubStream); // the subtitle at the insert position according to LoadSubtitle()
+				AddSubtitlePathsAddons(fname);
+			}
 		}
 	}
+
+	SetToolBarSubtitleButton();
 }
 
 void CMainFrame::OnUpdateFileLoadSubtitle(CCmdUI *pCmdUI)
@@ -6610,6 +6619,8 @@ void CMainFrame::OnFileLoadAudio()
 
 	m_pSwitcherFilter.Release();
 	m_pSwitcherFilter = FindSwitcherFilter();
+
+	SetToolBarAudioButton();
 }
 
 void CMainFrame::OnFileSaveSubtitle()
@@ -19627,6 +19638,29 @@ BOOL CMainFrame::AddSimilarFiles(CAtlList<CString>& fns)
 	}
 
 	return FALSE;
+}
+
+void CMainFrame::SetToolBarAudioButton()
+{
+	m_wndToolBar.m_bAudioEnable = (m_eMediaLoadState == MLS_LOADED && m_pSwitcherFilter != NULL);
+}
+
+void CMainFrame::SetToolBarSubtitleButton()
+{
+	BOOL bEnabled = FALSE;
+
+	if (m_eMediaLoadState == MLS_LOADED) {
+		if (m_pDVS) {
+			int nLangs;
+			if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
+				bEnabled = TRUE;
+			}
+		} else if (!m_pSubStreams.IsEmpty()) {
+			bEnabled = TRUE;
+		}
+	}
+
+	m_wndToolBar.m_bSubtitleEnable = bEnabled;
 }
 
 #pragma region GraphThread
