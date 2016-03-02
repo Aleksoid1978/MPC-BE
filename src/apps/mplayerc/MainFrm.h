@@ -1117,6 +1117,8 @@ public:
 
 	afx_msg void OnLanguage(UINT nID);
 
+	CString UpdatePlayerStatus();
+
 	void OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD);
 	void OnFilePostCloseMedia();
 

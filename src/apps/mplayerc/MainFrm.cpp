@@ -4112,7 +4112,7 @@ void CMainFrame::OnMenuFilters()
 	OnMenu(&m_filtersMenu);
 }
 
-void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
+CString CMainFrame::UpdatePlayerStatus()
 {
 	CString msg;
 
@@ -4156,8 +4156,14 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 		msg = m_closingmsg;
 	}
 
-	pCmdUI->SetText(msg);
 	SetStatusMessage(msg);
+
+	return msg;
+}
+
+void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
+{
+	pCmdUI->SetText(UpdatePlayerStatus());
 }
 
 void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
@@ -4339,6 +4345,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	SetupVideoStreamsSubMenu();
 	SetupNavChaptersSubMenu();
 	SetupRecentFilesSubMenu();
+
+	UpdatePlayerStatus();
 
 	// correct window size if "Limit window proportions on resize" enable.
 	if (!s.fRememberZoomLevel) {
