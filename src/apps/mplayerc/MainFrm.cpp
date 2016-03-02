@@ -4114,15 +4114,15 @@ void CMainFrame::OnMenuFilters()
 
 void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 {
+	CString msg;
+
 	if (m_eMediaLoadState == MLS_LOADING) {
-		pCmdUI->SetText(ResStr(IDS_CONTROLS_OPENING));
+		msg = ResStr(IDS_CONTROLS_OPENING);
 		if (AfxGetAppSettings().fUseWin7TaskBar && m_pTaskbarList) {
 			m_pTaskbarList->SetProgressState(m_hWnd, TBPF_INDETERMINATE);
 		}
-
-		SetStatusMessage(ResStr(IDS_CONTROLS_OPENING));
 	} else if (m_eMediaLoadState == MLS_LOADED) {
-		CString msg = FillMessage();
+		msg = FillMessage();
 
 		if (msg.IsEmpty()) {
 			OAFilterState fs = GetMediaState();
@@ -4147,20 +4147,17 @@ void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 				msg.AppendFormat(_T(" [%s]"), GetDXVAVersion());
 			}
 		}
-
-		pCmdUI->SetText(msg);
-		SetStatusMessage(msg);
 	} else if (m_eMediaLoadState == MLS_CLOSING) {
-		pCmdUI->SetText(ResStr(IDS_CONTROLS_CLOSING));
+		msg = ResStr(IDS_CONTROLS_CLOSING);
 		if (AfxGetAppSettings().fUseWin7TaskBar && m_pTaskbarList) {
 			m_pTaskbarList->SetProgressState(m_hWnd, TBPF_INDETERMINATE);
 		}
-
-		SetStatusMessage(ResStr(IDS_CONTROLS_CLOSING));
 	} else {
-		pCmdUI->SetText(m_closingmsg);
-		SetStatusMessage(m_closingmsg);
+		msg = m_closingmsg;
 	}
+
+	pCmdUI->SetText(msg);
+	SetStatusMessage(msg);
 }
 
 void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
@@ -4358,6 +4355,9 @@ void CMainFrame::OnFilePostCloseMedia()
 
 	SetPlaybackMode(PM_NONE);
 	SetLoadState(MLS_CLOSED);
+
+	KillTimer(TIMER_STATUSERASER);
+	m_playingmsg.Empty();
 
 	if (m_closingmsg.IsEmpty()) {
 		m_closingmsg = ResStr(IDS_CONTROLS_CLOSED);
