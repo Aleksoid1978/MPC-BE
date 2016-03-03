@@ -958,6 +958,7 @@ STDMETHODIMP CStreamSwitcherInputPin::NewSegment(REFERENCE_TIME tStart, REFERENC
 	}
 
 	HRESULT hr = pSSF->DeliverNewSegment(tStart, tStop, dRate);
+	/*
 	if (hr == S_OK) {
 		const CLSID clsid = GetCLSID(pOut->GetConnected());
 		if (clsid != CLSID_ReClock) {
@@ -976,6 +977,7 @@ STDMETHODIMP CStreamSwitcherInputPin::NewSegment(REFERENCE_TIME tStart, REFERENC
 			}
 		}
 	}
+	*/
 
 	return hr;
 }
