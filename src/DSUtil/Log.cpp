@@ -72,11 +72,11 @@ void HexDump(CString fileName, BYTE* buf, int size)
 
 void LOG2FILE(LPCTSTR fmt, ...)
 {
-	static CString sDesktop;
-	if (sDesktop.IsEmpty()) {
+	static CString fname;
+	if (fname.IsEmpty()) {
 		TCHAR szPath[MAX_PATH];
 		if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOP, NULL, 0, szPath))) {
-			sDesktop = CString(szPath) + L"\\";
+			fname = CString(szPath) + L"\\mpc-be.log";
 		}
 	}
 
@@ -85,7 +85,6 @@ void LOG2FILE(LPCTSTR fmt, ...)
 	size_t len = _vsctprintf(fmt, args) + 1;
 	if (TCHAR* buff = DNew TCHAR[len]) {
 		_vstprintf(buff, len, fmt, args);
-		CString fname = sDesktop + L"mpc-be.log";
 		if (FILE* f = _tfopen(fname, L"at, ccs=UTF-8")) {
 			fseek(f, 0, 2);
 
