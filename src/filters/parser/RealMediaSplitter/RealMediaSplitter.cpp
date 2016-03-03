@@ -645,7 +645,7 @@ void CRealMediaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		POSITION pos = m_pFile->m_irs.GetTailPosition();
 		while (pos && !m_seekpos) {
 			IndexRecord* pir = m_pFile->m_irs.GetPrev(pos);
-			if (pir->tStart <= rt/10000) {
+			if (pir->tStart < rt/10000) {
 				m_seekpacket = pir->packet;
 
 				pos = m_pFile->m_dcs.GetTailPosition();
