@@ -53,7 +53,6 @@ protected:
 
 	HRESULT ParseRealAudioHeader(const BYTE* extra, const int extralen);
 
-	bool m_bIgnoreJitterChecking;
 	bool m_bNeedSyncpoint;
 
 public:
@@ -76,6 +75,5 @@ public:
 	DWORD GetChannelMask();      // unsafe
 	WORD  GetCoddedBitdepth();   // unsafe
 
-	bool GetIgnoreJitterChecking() const { return m_bIgnoreJitterChecking; }
 	bool GetNeedSyncPoint() const { return m_bNeedSyncpoint; }
 };

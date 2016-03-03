@@ -94,6 +94,7 @@ protected:
 
 	BOOL			m_bNeedCheck;
 	BOOL			m_bHasVideo;
+	BOOL			m_bIgnoreJitter;
 
 	double			m_dRate;
 
