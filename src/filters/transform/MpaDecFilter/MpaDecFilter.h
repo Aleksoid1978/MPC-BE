@@ -98,6 +98,7 @@ protected:
 	double			m_dRate;
 
 	BOOL			m_bFlushing;
+	BOOL			m_bNeedSyncPoint;
 
 	enum BitstreamType {
 		SPDIF,

@@ -352,6 +352,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bHasVideo(TRUE)
 	, m_dRate(1.0)
 	, m_bFlushing(FALSE)
+	, m_bNeedSyncPoint(FALSE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -510,6 +511,8 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	m_bResync = true;
 	m_rtStart = 0; // LOOKATTHIS // reset internal timer?
 
+	m_bNeedSyncPoint = m_FFAudioDec.GetNeedSyncPoint();
+
 	m_dRate = dRate > 0.0 ? dRate : 1.0;
 
 	return __super::NewSegment(tStart, tStop, dRate);
@@ -598,14 +601,19 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 #endif
 
 	if (pIn->IsDiscontinuity() == S_OK
-			|| (m_FFAudioDec.GetNeedSyncPoint() && S_OK == pIn->IsSyncPoint())) {
+			|| (m_bNeedSyncPoint && S_OK == pIn->IsSyncPoint())) {
+		DbgLog((LOG_ERROR, 3, L"CMpaDecFilter::Receive() : Discontinuity, flushing decoder"));
 		m_bDiscontinuity = TRUE;
 		m_buff.RemoveAll();
 		m_encbuff.RemoveAll();
 		m_bResync = true;
 		if (FAILED(hr)) {
-			DbgLog((LOG_TRACE, 3, L"CMpaDecFilter::Receive() : Discontinuity without timestamp"));
-			// LOOKATTHIS // return S_OK;
+			DbgLog((LOG_TRACE, 3, L"	-> Discontinuity without timestamp"));
+		}
+
+		if (m_bNeedSyncPoint && pIn->IsSyncPoint() == S_OK) {
+			DbgLog((LOG_TRACE, 10, L"	-> Got SyncPoint, resuming decoding"));
+			m_bNeedSyncPoint = FALSE;
 		}
 	}
 
