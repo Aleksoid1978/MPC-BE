@@ -894,13 +894,16 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 	BEGINDATA
 
 	if (ffCodecId == AV_CODEC_ID_NONE) {
-		m_FFAudioDec.Init(nCodecId, &m_pInput->CurrentMediaType());
-		m_FFAudioDec.SetDRC(GetDynamicRangeControl());
-
-		m_bIgnoreJitter = (nCodecId == AV_CODEC_ID_COOK
-						|| nCodecId == AV_CODEC_ID_ATRAC3
-						|| nCodecId == AV_CODEC_ID_SIPR
-						|| nCodecId == AV_CODEC_ID_BINKAUDIO_DCT);
+		if (m_FFAudioDec.Init(nCodecId, &m_pInput->CurrentMediaType())) {
+			m_FFAudioDec.SetDRC(GetDynamicRangeControl());
+			
+			m_bIgnoreJitter = (nCodecId == AV_CODEC_ID_COOK
+							  || nCodecId == AV_CODEC_ID_ATRAC3
+							  || nCodecId == AV_CODEC_ID_SIPR
+							  || nCodecId == AV_CODEC_ID_BINKAUDIO_DCT);
+		} else {
+			return S_OK;
+		}
 	}
 
 	// RealAudio
@@ -2172,6 +2175,8 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 {
 	if (dir == PINDIR_INPUT) {
+		m_bIgnoreJitter = FALSE;
+
 		if (m_FFAudioDec.GetCodecId() != AV_CODEC_ID_NONE) {
 			m_FFAudioDec.StreamFinish();
 		}
@@ -2180,6 +2185,11 @@ HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 		if (nCodecId != AV_CODEC_ID_NONE) {
 			if (m_FFAudioDec.Init(nCodecId, &m_pInput->CurrentMediaType())) {
 				m_FFAudioDec.SetDRC(GetDynamicRangeControl());
+
+				m_bIgnoreJitter = (nCodecId == AV_CODEC_ID_COOK
+								  || nCodecId == AV_CODEC_ID_ATRAC3
+								  || nCodecId == AV_CODEC_ID_SIPR
+								  || nCodecId == AV_CODEC_ID_BINKAUDIO_DCT);
 			} else {
 				return VFW_E_TYPE_NOT_ACCEPTED;
 			}
