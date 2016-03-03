@@ -200,7 +200,6 @@ CFFAudioDecoder::CFFAudioDecoder()
 	, m_pAVCtx(NULL)
 	, m_pParser(NULL)
 	, m_pFrame(NULL)
-	, m_bIgnoreJitterChecking(false)
 	, m_bNeedSyncpoint(false)
 {
 	memset(&m_raData, 0, sizeof(m_raData));
@@ -419,11 +418,6 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		StreamFinish();
 	}
 
-	m_bIgnoreJitterChecking = (codec_id == AV_CODEC_ID_COOK
-							|| codec_id == AV_CODEC_ID_ATRAC3
-							|| codec_id == AV_CODEC_ID_SIPR
-							|| codec_id == AV_CODEC_ID_BINKAUDIO_DCT);
-
 	m_bNeedSyncpoint = (m_raData.deint_id != 0);
 
 	return bRet;
@@ -566,7 +560,6 @@ void CFFAudioDecoder::StreamFinish()
 
 	av_frame_free(&m_pFrame);
 
-	m_bIgnoreJitterChecking = false;
 	m_bNeedSyncpoint = false;
 }
 

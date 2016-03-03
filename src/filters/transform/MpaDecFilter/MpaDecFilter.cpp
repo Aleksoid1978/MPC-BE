@@ -350,6 +350,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_truehd_framelength(0)
 	, m_bNeedCheck(TRUE)
 	, m_bHasVideo(TRUE)
+	, m_bIgnoreJitter(FALSE)
 	, m_dRate(1.0)
 	, m_bFlushing(FALSE)
 	, m_bNeedSyncPoint(FALSE)
@@ -621,7 +622,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	enum AVCodecID nCodecId = FindCodec(subtype);
 
 	REFERENCE_TIME jitterLimit = MAX_JITTER;
-	if (!m_bHasVideo || m_FFAudioDec.GetIgnoreJitterChecking()) {
+	if (!m_bHasVideo || m_bIgnoreJitter) {
 		jitterLimit = INT64_MAX;
 	} else if (nCodecId == AV_CODEC_ID_DTS) {
 		jitterLimit = MAX_DTS_JITTER;
@@ -895,6 +896,11 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 	if (ffCodecId == AV_CODEC_ID_NONE) {
 		m_FFAudioDec.Init(nCodecId, &m_pInput->CurrentMediaType());
 		m_FFAudioDec.SetDRC(GetDynamicRangeControl());
+
+		m_bIgnoreJitter = (nCodecId == AV_CODEC_ID_COOK
+						|| nCodecId == AV_CODEC_ID_ATRAC3
+						|| nCodecId == AV_CODEC_ID_SIPR
+						|| nCodecId == AV_CODEC_ID_BINKAUDIO_DCT);
 	}
 
 	// RealAudio
@@ -2190,6 +2196,7 @@ HRESULT CMpaDecFilter::BreakConnect(PIN_DIRECTION dir)
 	if (dir == PINDIR_INPUT) {
 		m_FFAudioDec.StreamFinish();
 		m_bNeedCheck = TRUE;
+		m_bIgnoreJitter = FALSE;
 	}
 
 	return __super::BreakConnect(dir);
