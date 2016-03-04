@@ -45,6 +45,7 @@
 #pragma warning(disable: 4005)
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
+	#include <ffmpeg/libavutil/mastering_display_metadata.h>
 	#include <ffmpeg/libavutil/pixdesc.h>
 	#include <ffmpeg/libavutil/imgutils.h>
 }
@@ -1164,32 +1165,35 @@ void CMPCVideoDecFilter::GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtSt
 	}
 }
 
+#define CALC_HDR_VALUE(value) (value.num * (1.0 / value.den))
 bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame)
 {
 	CheckPointer(pSample, false);
 	CheckPointer(pFrame, false);
 
-	CComPtr<IMediaSideData>pMediaSideData;
+	CComPtr<IMediaSideData> pMediaSideData;
 	if (SUCCEEDED(pSample->QueryInterface(&pMediaSideData))) {
-		AVFrameSideData* sdHDR = av_frame_get_side_data(pFrame, AV_FRAME_DATA_HDR_MASTERING_INFO);
-		if (sdHDR) {
-			if (sdHDR->size == 24) {
+		if (AVFrameSideData* sd = av_frame_get_side_data(pFrame, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA)) {
+			if (sd->size == sizeof(AVMasteringDisplayMetadata)) {
+				AVMasteringDisplayMetadata* metadataHDR = (AVMasteringDisplayMetadata*)sd->data;
 				MediaSideDataHDR hdr = { 0 };
-				CGolombBuffer gb(sdHDR->data, sdHDR->size);
+
+				const int mapping[3] = { 1, 2, 0 };
 				for (int i = 0; i < 3; i++) {
-					hdr.display_primaries_x[i] = gb.BitRead(16) * 0.00002;
-					hdr.display_primaries_y[i] = gb.BitRead(16) * 0.00002;
+					const int j = mapping[i];
+					hdr.display_primaries_x[i] = CALC_HDR_VALUE(metadataHDR->display_primaries[j][0]);
+					hdr.display_primaries_y[i] = CALC_HDR_VALUE(metadataHDR->display_primaries[j][1]);
 				}
-				hdr.white_point_x = gb.BitRead(16) * 0.00002;
-				hdr.white_point_y = gb.BitRead(16) * 0.00002;
-				hdr.max_display_mastering_luminance = gb.BitRead(32) * 0.0001;
-				hdr.min_display_mastering_luminance = gb.BitRead(32) * 0.0001;
+				hdr.white_point_x = CALC_HDR_VALUE(metadataHDR->white_point[0]);
+				hdr.white_point_y = CALC_HDR_VALUE(metadataHDR->white_point[1]);
+				hdr.max_display_mastering_luminance = CALC_HDR_VALUE(metadataHDR->max_luminance);
+				hdr.min_display_mastering_luminance = CALC_HDR_VALUE(metadataHDR->min_luminance);
 
 				pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)&hdr, sizeof(hdr));
 
 				return true;
 			} else {
-				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR data of an unexpected size (%d)", sdHDR->size));
+				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR data of an unexpected size (%d)", sd->size));
 			}
 		}
 	}
