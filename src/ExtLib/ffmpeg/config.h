@@ -900,4 +900,6 @@ Note: when adding a new codec, you have to:
 #define CONFIG_WMV3_VAAPI_HWACCEL 0
 #define CONFIG_WMV3_VDPAU_HWACCEL 0
 
+#define CONFIG_DIRAC_PARSE 1
+
 #endif /* FFMPEG_CONFIG_H */
