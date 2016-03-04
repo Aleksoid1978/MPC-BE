@@ -64,6 +64,8 @@ extern const char* Mpegv_transfer_characteristics(int8u transfer_characteristics
         case 13 : return "sYCC";                                        //Added in HEVC
         case 14 : return "BT.2020";                                     //Added in HEVC
         case 15 : return "BT.2020";                                     //Added in HEVC
+        case 16 : return "SMPTE ST 2084";                               //Added in HEVC 2015
+        case 17 : return "SMPTE ST 428-1";                              //Added in HEVC 2015
         default : return "";
     }
 }

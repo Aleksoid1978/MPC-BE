@@ -4101,6 +4101,18 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx()
     Skip_B6(                                                    "Reserved");
     Skip_B2(                                                    "Data reference index");
 
+    //Test of buggy files
+    if (StreamKind_Last==Stream_Other && Element_Code==0x61766331) //"avc1"
+    {
+        //Seen 1 file with "avc1" CodecID but with hdlr atom having "hint" subtype, quick and dirty hack
+        //TODO: something more generic for handling wrong hdlr atom
+        Stream_Erase(Stream_Other, StreamPos_Last);
+        Stream_Prepare(Stream_Video);
+        Streams[moov_trak_tkhd_TrackID].StreamKind=StreamKind_Last;
+        Streams[moov_trak_tkhd_TrackID].StreamPos=StreamPos_Last;
+        Fill(Stream_Video, StreamPos_Last, "WrongSubType", "Yes");
+    }
+
     FILLING_BEGIN()
         if (StreamKind_Last==Stream_Max)
         {
@@ -5086,7 +5098,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_chan()
                 if (ChannelBitmap&(1<<Bit))
                 {
                     Channels++;
-                    ChannelDescription_Layout+=Mpeg4_chan_ChannelBitmap_Layout((int32u)(Bit+1));
+                    ChannelDescription_Layout+=Mpeg4_chan_ChannelBitmap_Layout((int32u)(Bit));
                     ChannelDescription_Layout+=__T(' ');
                 }
             if (Channels)

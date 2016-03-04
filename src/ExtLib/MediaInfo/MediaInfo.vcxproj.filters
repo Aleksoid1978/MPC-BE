@@ -698,6 +698,9 @@
     <ClInclude Include="MediaInfo\HashWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\XmlUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1331,6 +1334,9 @@
       <Filter>Source Files\Export</Filter>
     </ClCompile>
     <ClCompile Include="MediaInfo\HashWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\XmlUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

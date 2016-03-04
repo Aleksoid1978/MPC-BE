@@ -828,10 +828,14 @@ Lyricist;Tekstschrijver
 Lyrics;Tekst
 Mastered_Date;Datum van master
 MasteredBy;Gemastered door
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About;Levert zeer gedetailleerde informatie\r\nover multimediabestanden:\r\nMatroska, OGG (inclusief OGM)\r\nMPEG1 (inclusief VCD)\r\nMPEG2 (inclusief DVD en SVCD)\r\nMPEG4 (inclusief Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (inclusief WMV, WMA)\r\nMicrosoft RIFF (inclusief AVI, WAV)\r\nGeluidsformaten (AC3, DTS, AAC, AU, AIFF...)
 Menu;Menu
 Menu stream(s);Menustromen

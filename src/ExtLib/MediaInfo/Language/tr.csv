@@ -828,10 +828,14 @@ Lyricist;Söz yazarı
 Lyrics;Şarkı Sözleri
 Mastered_Date;Sahip olma tarihi
 MasteredBy;Sahibi
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;Matriks katsayısı
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About;Çok ayrıntılı bilgi sağlanan çokluortam\r\ndosyaları:\r\nMatroska, OGG (OGM dahil)\r\nMPEG1 (VCD dahil)\r\nMPEG2 (DVD ve SVCD dahil)\r\nMPEG4 (Itunes M4A dahil)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA dahil)\r\nMicrosoft RIFF (AVI, WAV dahil)\r\nSadece-ses biçimleri (AC3, DTS, AAC, AU, AIFF...)
 Menu;Menü
 Menu stream(s);Menü akışları
@@ -1102,5 +1106,5 @@ Written_Location;Yazıldığı yer
 WrittenBy;Yazan
 Yes;Evet
 Your system;Sisteminiz
-ZZ_Automatic_Percent;93
-ZZ_AutomaticLanguage_Percent;93
+ZZ_Automatic_Percent;92
+ZZ_AutomaticLanguage_Percent;92

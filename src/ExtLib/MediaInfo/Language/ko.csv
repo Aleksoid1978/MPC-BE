@@ -828,10 +828,14 @@ Lyricist;작사가
 Lyrics;가사
 Mastered_Date;마스터 날짜
 MasteredBy;마스터
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About;미디어 파일에 대한\r\n상세한 정보를 제공:\r\nMatroska, OGG (OGM 포함)\r\nMPEG1 (VCD 포함)\r\nMPEG2 (DVD와 SVCD 포함)\r\nMPEG4 (Itunes M4A 포함)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA 포함)\r\nMicrosoft RIFF (AVI, WAV 포함)\r\n음악 포맷 (AC3, DTS, AAC, AU, AIFF...)
 Menu;메뉴
 Menu stream(s);메뉴 스트림
@@ -1102,5 +1106,5 @@ Written_Location;제작 장소
 WrittenBy;제작자
 Yes;예
 Your system;이 시스템
-ZZ_Automatic_Percent;85
-ZZ_AutomaticLanguage_Percent;89
+ZZ_Automatic_Percent;84
+ZZ_AutomaticLanguage_Percent;88

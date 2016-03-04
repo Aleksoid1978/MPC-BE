@@ -669,6 +669,8 @@ enum video
     Video_Colorimetry,
     Video_ColorSpace,
     Video_ChromaSubsampling,
+    Video_ChromaSubsampling_String,
+    Video_ChromaSubsampling_Position,
     Video_BitDepth,
     Video_BitDepth_String,
     Video_ScanType,

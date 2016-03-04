@@ -828,10 +828,14 @@ Lyricist;Երգի տեքստը
 Lyrics;Երգերի տեքստը
 Mastered_Date;Օրիգինալի ամսաթիվը
 MasteredBy;Օրիգինալը՝
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;Կետացանցի գործակիցը
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About;Ցուցադրում է մանրամասն տեղեկություններ\r\nմուլտիմեդիային ֆայլեր Matroska-ի, OGG-ի (ներառյալ OGM)\r\nMPEG1-ի (ներառյալ VCD), MPEG2-ի (ներառյալ DVD և SVCD), MPEG4-ի (ներառյալ iTunes M4A)\r\nQuicktime-ի\r\nRealMedia-ի\r\nWindowsMedia-ի (ներառյալ WMV, WMA)\r\nMicrosoft RIFF-ի (ներառյալ AVI, WAV, DivX)\r\nձայնային ֆայլերի (AC3, DTS, SSC, AU, AIFF) վերաբերյալ
 Menu;Ընտրացանկը
 Menu stream(s);Հոսքերի ընտրացանկը
@@ -1102,5 +1106,5 @@ Written_Location;Գրելու տեղը
 WrittenBy;Գրվել է՝
 Yes;Այո
 Your system;Ձեր համակարգը
-ZZ_Automatic_Percent;87
-ZZ_AutomaticLanguage_Percent;91
+ZZ_Automatic_Percent;86
+ZZ_AutomaticLanguage_Percent;90

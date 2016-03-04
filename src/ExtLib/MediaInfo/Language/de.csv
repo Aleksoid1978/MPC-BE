@@ -828,10 +828,14 @@ Lyricist;Liedtexter
 Lyrics;Liedtext
 Mastered_Date;Mastering-Datum
 MasteredBy;Gemastert von
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About;Liefert sehr detaillierte Informationen\r\nüber Multimedia-Dateien:\r\nMatroska, OGG (einschließlich OGM)\r\nMPEG1 (einschließlich VCD)\r\nMPEG2 (einschließlich DVD and SVCD)\r\nMPEG4 (einschließlich Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (einschließlich WMV, WMA)\r\nMicrosoft RIFF (einschließlich AVI, WAV)\r\nAudio-Formate (AC3, DTS, AAC, AU, AIFF...)
 Menu;Menü
 Menu stream(s);Menü-Streams
@@ -1102,5 +1106,5 @@ Written_Location;Ort des Schreibbeginns
 WrittenBy;Geschrieben von
 Yes;Ja
 Your system;Deine Systeminformationen
-ZZ_Automatic_Percent;85
-ZZ_AutomaticLanguage_Percent;89
+ZZ_Automatic_Percent;84
+ZZ_AutomaticLanguage_Percent;88

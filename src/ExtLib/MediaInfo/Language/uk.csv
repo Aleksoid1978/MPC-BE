@@ -828,10 +828,14 @@ Lyricist;Автор тексту
 Lyrics;Текст
 Mastered_Date;Дата мастерингу
 MasteredBy;Мастеринг
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;Матричні коефіцієнти
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About;Відображає докладну інформацію \r\nпро медіафайли:\r\nMatroska, OGG (включаючи OGM)\r\nMPEG1 (включаючи VCD)\r\nMPEG2 (включаючи DVD and SVCD)\r\nMPEG4 (включаючи Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (включаючи WMV, WMA)\r\nMicrosoft RIFF (включаючи AVI, WAV)\r\nАудіоформати (AC3, DTS, AAC, AU, AIFF...)
 Menu;Меню
 Menu stream(s);Меню потоків

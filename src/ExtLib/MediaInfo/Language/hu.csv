@@ -828,10 +828,14 @@ Lyricist;Szövegíró
 Lyrics;Dalszöveg
 Mastered_Date;Mesterpéldány kelte
 MasteredBy;Mesterpéldány
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About;Igen részletes adatok az alábbi\r\nmultimédia fájlokról:\r\nMatroska, OGG (OGM is)\r\nMPEG1 (VCD is)\r\nMPEG2 (DVD és SVCD is)\r\nMPEG4 (Itunes M4A is)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA is)\r\nMicrosoft RIFF (AVI, WAV is)\r\nCsak hangot tartalmazó fájlok (AC3, DTS, AAC, AU, AIFF...)
 Menu;Menü
 Menu stream(s);Menüsáv
@@ -1102,5 +1106,5 @@ Written_Location;Írás helye
 WrittenBy;Írta
 Yes;igen
 Your system;Rendszer
-ZZ_Automatic_Percent;78
+ZZ_Automatic_Percent;77
 ZZ_AutomaticLanguage_Percent;87
