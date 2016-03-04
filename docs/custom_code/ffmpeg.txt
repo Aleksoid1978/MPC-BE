@@ -19,7 +19,6 @@
 * libavcodec/hevc.c
 * libavcodec/hevc.h
 * libavcodec/hevc_refs.c
-* libavcodec/hevc_sei.c
 * libavcodec/hevcpred.c
 * libavcodec/hevcpred.h
 * libavcodec/internal.h

@@ -120,14 +120,7 @@ enum AVFrameSideDataType {
      * The GOP timecode in 25 bit timecode format. Data format is 64-bit integer.
      * This is set on the first frame of a GOP that has a temporal reference of 0.
      */
-    AV_FRAME_DATA_GOP_TIMECODE,
-
-    // ==> Start patch MPC
-    /**
-     * HDR Mastering Display Information, see HEVC spec
-     */
-    AV_FRAME_DATA_HDR_MASTERING_INFO
-    // ==> End patch MPC
+    AV_FRAME_DATA_GOP_TIMECODE
 };
 
 enum AVActiveFormatDescription {
