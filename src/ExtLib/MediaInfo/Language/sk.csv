@@ -828,10 +828,14 @@ Lyricist;Textár
 Lyrics;Text
 Mastered_Date;Mastered date
 MasteredBy;Mastered by
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About;Supply very detailled information\r\nabout a multimedia file:\r\nMatroska, OGG (including OGM)\r\nMPEG1 (including VCD)\r\nMPEG2 (including DVD and SVCD)\r\nMPEG4 (including Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (including WMV, WMA)\r\nMicrosoft RIFF (including AVI, WAV)\r\nSound-only formats (AC3, DTS, AAC, AU, AIFF...)
 Menu;Menu
 Menu stream(s);Menu streams
@@ -1103,4 +1107,4 @@ WrittenBy;Napísal
 Yes;Áno
 Your system;Váš systém
 ZZ_Automatic_Percent;75
-ZZ_AutomaticLanguage_Percent;81
+ZZ_AutomaticLanguage_Percent;80

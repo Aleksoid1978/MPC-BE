@@ -828,10 +828,14 @@ Lyricist;Поэт-песенник
 Lyrics;Текст песен
 Mastered_Date;Дата мастеринга
 MasteredBy;Мастеринг произвёл
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);Канал(ы) кодирования матрицы
 Matrix_ChannelPositions;Позиции каналов кодирования матрицы
 matrix_coefficients;Коэффициенты матрицы
 Matrix_Format;Формат кодирования матрицы
+MaxCLL;
+MaxFALL;
 MediaInfo_About;Отображает детальную информацию\r\nо мультимедиа-файлах Matroska, OGG (включая OGM)\r\nMPEG1 (включая VCD), MPEG2 (включая DVD и SVCD), MPEG4 (включая iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (включая WMV, WMA)\r\nMicrosoft RIFF (включая AVI, WAV, DivX)\r\nзвуковых форматах (AC3, DTS, SSC, AU, AIFF)
 Menu;Меню
 Menu stream(s);Меню потоков

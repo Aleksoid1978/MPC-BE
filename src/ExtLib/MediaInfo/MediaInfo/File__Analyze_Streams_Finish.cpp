@@ -447,6 +447,15 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
      && Retrieve(Stream_Video, Pos, Video_ChromaSubsampling)==__T("4:4:4"))
         Clear(Stream_Video, Pos, Video_ChromaSubsampling);
 
+    //Chroma subsampling position
+    if (Retrieve(Stream_Video, Pos, Video_ChromaSubsampling_String).empty() && !Retrieve(Stream_Video, Pos, Video_ChromaSubsampling).empty())
+    {
+        if (Retrieve(Stream_Video, Pos, Video_ChromaSubsampling_Position).empty())
+            Fill(Stream_Video, Pos, Video_ChromaSubsampling_String, Retrieve(Stream_Video, Pos, Video_ChromaSubsampling));
+        else
+            Fill(Stream_Video, Pos, Video_ChromaSubsampling_String, Retrieve(Stream_Video, Pos, Video_ChromaSubsampling)+__T(" (")+ Retrieve(Stream_Video, Pos, Video_ChromaSubsampling_Position)+__T(')'));
+    }
+
     //Commercial name
     #if defined(MEDIAINFO_VC3_YES)
         if (Retrieve(Stream_Video, Pos, Video_Format_Commercial_IfAny).empty() && Retrieve(Stream_Video, Pos, Video_Format)==__T("VC-3"))

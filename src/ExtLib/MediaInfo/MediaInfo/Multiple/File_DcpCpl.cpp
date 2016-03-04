@@ -25,6 +25,7 @@
 #include "MediaInfo/Multiple/File_DcpAm.h"
 #include "MediaInfo/MediaInfo.h"
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper.h"
+#include "MediaInfo/XmlUtils.h"
 #include "ZenLib/Dir.h"
 #include "ZenLib/File.h"
 #include "ZenLib/FileName.h"
@@ -91,6 +92,26 @@ size_t File_DcpCpl::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
 }
 #endif //MEDIAINFO_SEEK
 
+//---------------------------------------------------------------------------
+
+static bool IsSmpteSt2067_2(const char* Ns)
+{
+    return Ns &&
+           (!strcmp(Ns, "http://www.smpte-ra.org/schemas/2067-2/2013") ||
+            !strcmp(Ns, "http://www.smpte-ra.org/schemas/2067-2/XXXX")); //Some muxers use XXXX instead of year
+
+}
+
+//---------------------------------------------------------------------------
+
+static bool IsSmpteSt2067_3(const char* Ns)
+{
+    return Ns &&
+           (!strcmp(Ns, "http://www.smpte-ra.org/schemas/2067-3/2013") ||
+            !strcmp(Ns, "http://www.smpte-ra.org/schemas/2067-3/XXXX")); //Some muxers use XXXX instead of year
+
+}
+
 //***************************************************************************
 // Buffer - File header
 //***************************************************************************
@@ -102,30 +123,25 @@ bool File_DcpCpl::FileHeader_Begin()
     if (!FileHeader_Begin_XML(document))
        return false;
 
+    XMLElement* Root=document.FirstChildElement();
+    const char *NameSpace;
+    if (!Root || strcmp(LocalName(Root, NameSpace), "CompositionPlaylist"))
+    {
+        Reject("DcpCpl");
+        return false;
+    }
+
     bool IsDcp=false, IsImf=false;
-
-    XMLElement* Root=document.FirstChildElement("CompositionPlaylist");
-    if (!Root)
+    if (!strcmp(NameSpace, "http://www.digicine.com/PROTO-ASDCP-CPL-20040511#") ||
+        !strcmp(NameSpace, "http://www.smpte-ra.org/schemas/429-7/2006/CPL"))
     {
-        Reject("DcpCpl");
-        return false;
-    }
-
-    const char* Attribute=Root->Attribute("xmlns");
-    if (!Attribute)
-    {
-        Reject("DcpCpl");
-        return false;
-    }
-
-    if (!strcmp(Attribute, "http://www.digicine.com/PROTO-ASDCP-CPL-20040511#")
-     ||!strcmp(Attribute, "http://www.smpte-ra.org/schemas/429-7/2006/CPL"))
         IsDcp=true;
-    if (!strcmp(Attribute, "http://www.smpte-ra.org/schemas/2067-3/XXXX") //Some muxers use XXXX instead of year
-     || !strcmp(Attribute, "http://www.smpte-ra.org/schemas/2067-3/2013"))
+    }
+    else if (IsSmpteSt2067_3(NameSpace))
+    {
         IsImf=true;
-
-    if (!IsDcp && !IsImf)
+    }
+    else
     {
         Reject("DcpCpl");
         return false;
@@ -141,7 +157,7 @@ bool File_DcpCpl::FileHeader_Begin()
     for (XMLElement* CompositionPlaylist_Item=Root->FirstChildElement(); CompositionPlaylist_Item; CompositionPlaylist_Item=CompositionPlaylist_Item->NextSiblingElement())
     {
         //CompositionTimecode
-        if (IsImf && (!strcmp(CompositionPlaylist_Item->Value(), "CompositionTimecode") || !strcmp(CompositionPlaylist_Item->Value(), "cpl:CompositionTimecode")))
+        if (IsImf && MatchQName(CompositionPlaylist_Item, "CompositionTimecode", NameSpace))
         {
             sequence* Sequence=new sequence;
             Sequence->StreamKind=Stream_Other;
@@ -152,20 +168,27 @@ bool File_DcpCpl::FileHeader_Begin()
 
             for (XMLElement* CompositionTimecode_Item=CompositionPlaylist_Item->FirstChildElement(); CompositionTimecode_Item; CompositionTimecode_Item=CompositionTimecode_Item->NextSiblingElement())
             {
+                const char* Text=CompositionTimecode_Item->GetText();
+                if (!Text)
+                    continue;
+                const char *CtItemNs, *CtItemName = LocalName(CompositionTimecode_Item, CtItemNs);
+                if (!CtItemNs || strcmp(CtItemNs, NameSpace))
+                    continue; // item has wrong namespace
+
                 //TimecodeDropFrame
-                if (!strcmp(CompositionTimecode_Item->Value(), "TimecodeDropFrame") || !strcmp(CompositionTimecode_Item->Value(), "cpl:TimecodeDropFrame"))
+                if (!strcmp(CtItemName, "TimecodeDropFrame"))
                 {
-                    if (strcmp(CompositionTimecode_Item->GetText(), "") && strcmp(CompositionTimecode_Item->GetText(), "0"))
+                    if (strcmp(Text, "") && strcmp(Text, "0"))
                         IsDropFrame=true;
                 }
 
                 //TimecodeRate
-                if (!strcmp(CompositionTimecode_Item->Value(), "TimecodeRate") || !strcmp(CompositionTimecode_Item->Value(), "cpl:TimecodeRate"))
-                    Sequence->Infos["FrameRate"].From_UTF8(CompositionTimecode_Item->GetText());
+                if (!strcmp(CtItemName, "TimecodeRate"))
+                    Sequence->Infos["FrameRate"].From_UTF8(Text);
 
                 //TimecodeStartAddress
-                if (!strcmp(CompositionTimecode_Item->Value(), "TimecodeStartAddress") || !strcmp(CompositionTimecode_Item->Value(), "cpl:TimecodeStartAddress"))
-                    Sequence->Infos["TimeCode_FirstFrame"].From_UTF8(CompositionTimecode_Item->GetText());
+                if (!strcmp(CtItemName, "TimecodeStartAddress"))
+                    Sequence->Infos["TimeCode_FirstFrame"].From_UTF8(Text);
             }
 
             //Adaptation
@@ -186,62 +209,77 @@ bool File_DcpCpl::FileHeader_Begin()
         }
 
         //ReelList / SegmentList
-        if ((IsDcp && !strcmp(CompositionPlaylist_Item->Value(), "ReelList"))
-         || (IsImf && !strcmp(CompositionPlaylist_Item->Value(), "SegmentList")))
+        if (MatchQName(CompositionPlaylist_Item, IsDcp?"ReelList":"SegmentList", NameSpace))
         {
             for (XMLElement* ReelList_Item=CompositionPlaylist_Item->FirstChildElement(); ReelList_Item; ReelList_Item=ReelList_Item->NextSiblingElement())
             {
                 //Reel
-                if ((IsDcp && !strcmp(ReelList_Item->Value(), "Reel"))
-                 || (IsImf && !strcmp(ReelList_Item->Value(), "Segment")))
+                if (MatchQName(ReelList_Item, IsDcp?"Reel":"Segment", NameSpace))
                 {
                     for (XMLElement* Reel_Item=ReelList_Item->FirstChildElement(); Reel_Item; Reel_Item=Reel_Item->NextSiblingElement())
                     {
                         //AssetList
-                        if ((IsDcp && !strcmp(Reel_Item->Value(), "AssetList"))
-                         || (IsImf && !strcmp(Reel_Item->Value(), "SequenceList")))
+                        if (MatchQName(Reel_Item, IsDcp?"AssetList":"SequenceList", NameSpace))
                         {
                             for (XMLElement* AssetList_Item=Reel_Item->FirstChildElement(); AssetList_Item; AssetList_Item=AssetList_Item->NextSiblingElement())
                             {
+                                const char *AlItemNs, *AlItemName = LocalName(AssetList_Item, AlItemNs);
+                                if (!AlItemNs)
+                                    continue;
                                 //File
                                 //if ((IsDcp && (!strcmp(AssetList_Item->Value(), "MainPicture") || !strcmp(AssetList_Item->Value(), "MainSound")))
                                 // || (IsImf && (!strcmp(AssetList_Item->Value(), "cc:MainImageSequence") || !strcmp(AssetList_Item->Value(), "cc:MainImage"))))
+                                if (strcmp(AlItemName, "MarkerSequence")) //Ignoring MarkerSequence for the moment. TODO: check what to do with MarkerSequence
                                 {
                                     sequence* Sequence=new sequence;
                                     Ztring Asset_Id;
 
-                                    if ((IsDcp && !strcmp(AssetList_Item->Value(), "MainPicture"))
-                                     || (IsImf && !strcmp(AssetList_Item->Value(), "cc:MainImageSequence")))
-                                        Sequence->StreamKind=Stream_Video;
-                                    if ((IsDcp && !strcmp(AssetList_Item->Value(), "MainSound"))
-                                     || (IsImf && !strcmp(AssetList_Item->Value(), "cc:MainAudioSequence")))
-                                        Sequence->StreamKind=Stream_Audio;
+                                    if (IsDcp && !strcmp(NameSpace, AlItemNs))
+                                    {
+                                        if (!strcmp(AlItemName, "MainPicture"))
+                                            Sequence->StreamKind=Stream_Video;
+                                        else if (!strcmp(AlItemName, "MainSound"))
+                                            Sequence->StreamKind=Stream_Audio;
+                                    }
+                                    else if (IsImf && IsSmpteSt2067_2(AlItemNs))
+                                    {
+                                        if (!strcmp(AlItemName, "MainImageSequence"))
+                                            Sequence->StreamKind=Stream_Video;
+                                        else if (!strcmp(AlItemName, "MainAudioSequence"))
+                                            Sequence->StreamKind=Stream_Audio;
+                                    }
 
                                     for (XMLElement* File_Item=AssetList_Item->FirstChildElement(); File_Item; File_Item=File_Item->NextSiblingElement())
                                     {
                                         //Id
-                                        if (!strcmp(File_Item->Value(), "Id") && Asset_Id.empty())
+                                        if (MatchQName(File_Item, "Id", NameSpace) && Asset_Id.empty())
                                             Asset_Id.From_UTF8(File_Item->GetText());
 
                                         //ResourceList
-                                        if (IsImf && !strcmp(File_Item->Value(), "ResourceList"))
+                                        if (IsImf && MatchQName(File_Item, "ResourceList", NameSpace))
                                         {
                                             for (XMLElement* ResourceList_Item=File_Item->FirstChildElement(); ResourceList_Item; ResourceList_Item=ResourceList_Item->NextSiblingElement())
                                             {
                                                 //Resource
-                                                if (!strcmp(ResourceList_Item->Value(), "Resource"))
+                                                if (MatchQName(ResourceList_Item, "Resource", NameSpace))
                                                 {
                                                     Ztring Resource_Id;
 
                                                     resource* Resource=new resource;
                                                     for (XMLElement* Resource_Item=ResourceList_Item->FirstChildElement(); Resource_Item; Resource_Item=Resource_Item->NextSiblingElement())
                                                     {
+                                                        const char* ResText=Resource_Item->GetText();
+                                                        if (!ResText)
+                                                            continue;
+                                                        const char *ResItemNs, *ResItemName = LocalName(Resource_Item, ResItemNs);
+                                                        if (!ResItemNs || strcmp(ResItemNs, NameSpace))
+                                                            continue; // item has wrong namespace
+
                                                         //EditRate
-                                                        if (!strcmp(Resource_Item->Value(), "EditRate"))
+                                                        if (!strcmp(ResItemName, "EditRate"))
                                                         {
-                                                            const char* EditRate=Resource_Item->GetText();
-                                                            Resource->EditRate=atof(EditRate);
-                                                            const char* EditRate2=strchr(EditRate, ' ');
+                                                            Resource->EditRate=atof(ResText);
+                                                            const char* EditRate2=strchr(ResText, ' ');
                                                             if (EditRate2!=NULL)
                                                             {
                                                                 float64 EditRate2f=atof(EditRate2);
@@ -251,24 +289,24 @@ bool File_DcpCpl::FileHeader_Begin()
                                                         }
 
                                                         //EntryPoint
-                                                        if (!strcmp(Resource_Item->Value(), "EntryPoint"))
+                                                        if (!strcmp(ResItemName, "EntryPoint"))
                                                         {
-                                                            Resource->IgnoreEditsBefore=atoi(Resource_Item->GetText());
+                                                            Resource->IgnoreEditsBefore=atoi(ResText);
                                                             if (Resource->IgnoreEditsAfter!=(int64u)-1)
                                                                 Resource->IgnoreEditsAfter+=Resource->IgnoreEditsBefore;
                                                         }
 
                                                         //Id
-                                                        if (!strcmp(File_Item->Value(), "Id") && Resource_Id.empty())
-                                                            Resource_Id.From_UTF8(File_Item->GetText());
+                                                        if (!strcmp(ResItemName, "Id") && Resource_Id.empty())
+                                                            Resource_Id.From_UTF8(ResText);
 
                                                         //SourceDuration
-                                                        if (!strcmp(Resource_Item->Value(), "SourceDuration"))
-                                                            Resource->IgnoreEditsAfter=Resource->IgnoreEditsBefore+atoi(Resource_Item->GetText());
+                                                        if (!strcmp(ResItemName, "SourceDuration"))
+                                                            Resource->IgnoreEditsAfter=Resource->IgnoreEditsBefore+atoi(ResText);
 
                                                         //TrackFileId
-                                                        if (!strcmp(Resource_Item->Value(), "TrackFileId"))
-                                                            Resource->FileNames.push_back(Ztring().From_UTF8(Resource_Item->GetText()));
+                                                        if (!strcmp(ResItemName, "TrackFileId"))
+                                                            Resource->FileNames.push_back(Ztring().From_UTF8(ResText));
                                                     }
 
                                                     if (Resource->FileNames.empty())
@@ -300,7 +338,10 @@ bool File_DcpCpl::FileHeader_Begin()
 
     //Getting files names
     FileName Directory(File_Name);
-    Ztring Assetmap_FileName=Directory.Path_Get()+PathSeparator+__T("ASSETMAP.xml");
+    Ztring DirPath = Directory.Path_Get();
+    if (!DirPath.empty())
+        DirPath += PathSeparator;
+    Ztring Assetmap_FileName=DirPath+__T("ASSETMAP.xml");
     bool IsOk=false;
     if (File::Exists(Assetmap_FileName))
         IsOk=true;

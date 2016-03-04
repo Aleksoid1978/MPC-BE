@@ -828,10 +828,14 @@ Lyricist;作詞者
 Lyrics;歌詞
 Mastered_Date;後製日期
 MasteredBy;後製者
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;矩陣係數
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About;支援非常詳盡的多媒體檔案資訊:\r\nMatroska, OGG (包含 OGM)\r\nMPEG-1 (包含 VCD)\r\nMPEG-2 (包含 DVD, SVCD)\r\nMPEG-4 (包含 iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (包含 WMV, WMA)\r\nMicrosoft RIFF (包含 AVI, WAV)\r\n純聲音格式 (AC3, DTS, AAC, AU, AIFF...)
 Menu;選單
 Menu stream(s);選單串流

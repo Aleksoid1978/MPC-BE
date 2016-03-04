@@ -828,10 +828,14 @@ Lyricist;Autor de letra
 Lyrics;Letras
 Mastered_Date;Fecha de edición
 MasteredBy;Editado por
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About;Muestra información detallada\r\nde un archivo multimedia:\r\nMastroska, OGG, (incluyendo OGM)\r\n\MPEG1 (incluyendo VCD)\r\nMPEG2 (incluyendo DVD y SVCD)\r\nMPEG4 (incluyendo Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (incluyendo WMV, WMA)\r\nMicrosoft RIFF (incluyendo AVI, WAV)\r\nSólo formatos de sonido (AC3, DTS, AAC, AU, AIFF...)
 Menu;Menú
 Menu stream(s);Menú de pista(s)

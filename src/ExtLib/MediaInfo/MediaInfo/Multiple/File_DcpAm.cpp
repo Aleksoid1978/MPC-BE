@@ -26,6 +26,7 @@
 #include "MediaInfo/MediaInfo_Internal.h"
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper.h"
 #include "MediaInfo/Multiple/File_DcpCpl.h"
+#include "MediaInfo/XmlUtils.h"
 #include "ZenLib/Dir.h"
 #include "ZenLib/FileName.h"
 #include "tinyxml2.h"
@@ -111,32 +112,29 @@ size_t File_DcpAm::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
 //---------------------------------------------------------------------------
 bool File_DcpAm::FileHeader_Begin()
 {
+    static const char *InteropNs="http://www.digicine.com/PROTO-ASDCP-AM-20040311#";
+    static const char *SmpteNs="http://www.smpte-ra.org/schemas/429-9/2007/AM";
     XMLDocument document;
     if (!FileHeader_Begin_XML(document))
        return false;
 
-    std::string NameSpace;
-    XMLElement* AssetMap=document.FirstChildElement("AssetMap");
-    if (AssetMap==NULL)
-    {
-        NameSpace="am:";
-        AssetMap=document.FirstChildElement((NameSpace+"AssetMap").c_str());
-    }
-    if (!AssetMap)
+    XMLElement* AssetMap=document.FirstChildElement();
+    const char *NameSpace;
+    if (!AssetMap || strcmp(LocalName(AssetMap, NameSpace), "AssetMap") || !NameSpace)
     {
         Reject("DcpAm");
         return false;
     }
-
-    const char* Attribute=AssetMap->Attribute(NameSpace.empty()?"xmlns":"xmlns:am");
-    if (!Attribute)
+    std::string FmtVersion;
+    if (!strcmp(NameSpace, InteropNs))
     {
-        Reject("DcpAm");
-        return false;
+        FmtVersion="Interop";
     }
-
-    if (strcmp(Attribute, "http://www.digicine.com/PROTO-ASDCP-AM-20040311#")
-     && strcmp(Attribute, "http://www.smpte-ra.org/schemas/429-9/2007/AM"))
+    else if (!strcmp(NameSpace, SmpteNs))
+    {
+        FmtVersion="SMPTE";
+    }
+    else
     {
         Reject("DcpAm");
         return false;
@@ -144,39 +142,44 @@ bool File_DcpAm::FileHeader_Begin()
 
     Accept("DcpAm");
     Fill(Stream_General, 0, General_Format, "DCP AM");
-    Fill(Stream_General, 0, General_Format_Version, NameSpace=="am:"?"SMPTE":"Interop");
+    Fill(Stream_General, 0, General_Format_Version, FmtVersion);
     Config->File_ID_OnlyRoot_Set(false);
 
     //Parsing main elements
     for (XMLElement* AssetMap_Item=AssetMap->FirstChildElement(); AssetMap_Item; AssetMap_Item=AssetMap_Item->NextSiblingElement())
     {
+        const char *AmItemNs, *AmItemName = LocalName(AssetMap_Item, AmItemNs);
+        if (!AmItemNs || strcmp(AmItemNs, NameSpace))
+            continue; // item has wrong namespace
+
         //AssetList
-        if (!strcmp(AssetMap_Item->Value(), (NameSpace+"AssetList").c_str()))
+        if (!strcmp(AmItemName, "AssetList"))
         {
             for (XMLElement* AssetList_Item=AssetMap_Item->FirstChildElement(); AssetList_Item; AssetList_Item=AssetList_Item->NextSiblingElement())
             {
                 //Asset
-                if (!strcmp(AssetList_Item->Value(), (NameSpace+"Asset").c_str()))
+                if (MatchQName(AssetList_Item, "Asset", NameSpace))
                 {
                     File_DcpPkl::stream Stream;
 
                     for (XMLElement* Asset_Item=AssetList_Item->FirstChildElement(); Asset_Item; Asset_Item=Asset_Item->NextSiblingElement())
                     {
                         //ChunkList
-                        if (!strcmp(Asset_Item->Value(), (NameSpace+"ChunkList").c_str()))
+                        if (MatchQName(Asset_Item, "ChunkList", NameSpace))
                         {
                             for (XMLElement* ChunkList_Item=Asset_Item->FirstChildElement(); ChunkList_Item; ChunkList_Item=ChunkList_Item->NextSiblingElement())
                             {
                                 //Chunk
-                                if (!strcmp(ChunkList_Item->Value(), (NameSpace+"Chunk").c_str()))
+                                if (MatchQName(ChunkList_Item, "Chunk", NameSpace))
                                 {
                                     File_DcpPkl::stream::chunk Chunk;
 
                                     for (XMLElement* Chunk_Item=ChunkList_Item->FirstChildElement(); Chunk_Item; Chunk_Item=Chunk_Item->NextSiblingElement())
                                     {
                                         //Path
-                                        if (!strcmp(Chunk_Item->Value(), (NameSpace+"Path").c_str()))
-                                            Chunk.Path=Chunk_Item->GetText();
+                                        if (MatchQName(Chunk_Item, "Path", NameSpace))
+                                            if (const char* Text=Chunk_Item->GetText())
+                                                Chunk.Path=Text;
                                     }
 
                                     Stream.ChunkList.push_back(Chunk);
@@ -185,11 +188,13 @@ bool File_DcpAm::FileHeader_Begin()
                         }
 
                         //Id
-                        if (!strcmp(Asset_Item->Value(), (NameSpace+"Id").c_str()))
-                            Stream.Id=Asset_Item->GetText();
+                        if (MatchQName(Asset_Item, "Id", NameSpace))
+                            if (const char* Text=Asset_Item->GetText())
+                                Stream.Id=Text;
 
                         //PackingList
-                        if (!strcmp(Asset_Item->Value(), (NameSpace+"PackingList").c_str()))
+                        if (MatchQName(Asset_Item, "PackingList", NameSpace) &&
+                            Asset_Item->GetText() && !strcmp(Asset_Item->GetText(), "true"))
                         {
                             PKL_Pos=Streams.size();
                             Stream.StreamKind=(stream_t)(Stream_Max+2); // Means PKL
@@ -202,15 +207,15 @@ bool File_DcpAm::FileHeader_Begin()
         }
 
         //Creator
-        if (!strcmp(AssetMap_Item->Value(), (NameSpace+"Creator").c_str()))
+        if (!strcmp(AmItemName, "Creator"))
             Fill(Stream_General, 0, General_Encoded_Library, AssetMap_Item->GetText());
 
         //IssueDate
-        if (!strcmp(AssetMap_Item->Value(), (NameSpace+"IssueDate").c_str()))
+        if (!strcmp(AmItemName, "IssueDate"))
             Fill(Stream_General, 0, General_Encoded_Date, AssetMap_Item->GetText());
 
         //Issuer
-        if (!strcmp(AssetMap_Item->Value(), (NameSpace+"Issuer").c_str()))
+        if (!strcmp(AmItemName, "Issuer"))
             Fill(Stream_General, 0, General_EncodedBy, AssetMap_Item->GetText());
     }
     Element_Offset=File_Size;
@@ -229,7 +234,10 @@ bool File_DcpAm::FileHeader_Begin()
         MI.Option(__T("ParseSpeed"), __T("0"));
         MI.Option(__T("Demux"), Ztring());
         MI.Option(__T("File_IsReferenced"), __T("1"));
-        size_t MiOpenResult=MI.Open(Directory.Path_Get()+PathSeparator+PKL_FileName);
+        Ztring DirPath = Directory.Path_Get();
+        if (!DirPath.empty())
+            DirPath += PathSeparator;
+        size_t MiOpenResult=MI.Open(DirPath+PKL_FileName);
         MI.Option(__T("ParseSpeed"), ParseSpeed_Save); //This is a global value, need to reset it. TODO: local value
         MI.Option(__T("Demux"), Demux_Save); //This is a global value, need to reset it. TODO: local value
         if (MiOpenResult

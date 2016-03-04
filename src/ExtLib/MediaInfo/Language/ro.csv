@@ -828,10 +828,14 @@ Lyricist;Textier
 Lyrics;
 Mastered_Date;Data realizarii
 MasteredBy;Realizat de
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About;Furnizeaza informatii foarte detaliate\r\n despre un fisier multimedia
 Menu;Meniu
 Menu stream(s);

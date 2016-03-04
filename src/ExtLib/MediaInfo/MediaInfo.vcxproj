@@ -175,6 +175,7 @@
     <ClInclude Include="MediaInfo\Video\File_Hevc.h" />
     <ClInclude Include="MediaInfo\Video\File_HuffYuv.h" />
     <ClInclude Include="MediaInfo\Video\File_ProRes.h" />
+    <ClInclude Include="MediaInfo\XmlUtils.h" />
     <ClInclude Include="ThirdParty\base64\base64.h" />
     <ClInclude Include="ThirdParty\md5\md5.h" />
     <ClInclude Include="ThirdParty\tinyxml2\tinyxml2.h" />
@@ -518,6 +519,7 @@
     <ClCompile Include="MediaInfo\Video\File_Vc3.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Vp8.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Y4m.cpp" />
+    <ClCompile Include="MediaInfo\XmlUtils.cpp" />
     <ClCompile Include="ThirdParty\md5\md5.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>

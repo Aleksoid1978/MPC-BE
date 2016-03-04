@@ -828,10 +828,14 @@ Lyricist;Texter från
 Lyrics;Texter
 Mastered_Date;Master-datum
 MasteredBy;Mastrad av
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);Matriskodning
 Matrix_ChannelPositions;Matriskodning, kanalpositioner
 matrix_coefficients;Matriskoefficienter
 Matrix_Format;Matriskodning, format
+MaxCLL;
+MaxFALL;
 MediaInfo_About;MediaInfo tillhandahåller enkel tillgång till teknisk information, och tagginformation, om video- och ljudfiler.\r\nFörutom Mac App Stores grafiska användargränsnitt, är mjukvaran öppen källkod. Det innebär att den är kostnadsfri för slutanvändaren och att andra utvecklare tillåts studera, förbättra och återdistribuera programmet (BSD-licens).
 Menu;Meny
 Menu stream(s);Menyströmmar

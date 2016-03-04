@@ -828,10 +828,14 @@ Lyricist;作詞
 Lyrics;歌詞
 Mastered_Date;マスタリング日
 MasteredBy;マスタリング by
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About; 詳細情報提供者 \r\n マルチメディア ファイル:\r\n Matroska, OGG ( OGM を含む)\r\n MPEG1 ( VCD を含む)\r\n MPEG2 ( DVD , SVCD を含む)\r\n MPEG4 (iTunes の M4A を含む)\r\n Quicktime\r\n RealMedia\r\n WindowsMedia ( WMV , WMA を含む)\r\n Microsoft RIFF ( AVI , WAV を含む)\r\n 音声のみ (AC3 , DTS , AAC , AU , AIFF ...)
 Menu;メニュー
 Menu stream(s);メニューストリーム

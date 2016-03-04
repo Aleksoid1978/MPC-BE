@@ -828,10 +828,14 @@ Lyricist;作词
 Lyrics;歌词
 Mastered_Date;母带完成日期
 MasteredBy;母带制做
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;矩阵系数
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About;支持多种格式的多媒体文件:\r\nMatroska, OGG (包括 OGM)\r\nMPEG-1 (包括 VCD)\r\nMPEG-2 (包括 DVD, SVCD)\r\nMPEG-4 (包括 iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (包括 WMV, WMA)\r\nMicrosoft RIFF (包括 AVI, WAV)\r\n纯声音格式 (AC3, DTS, AAC, AU, AIFF...)
 Menu;菜单
 Menu stream(s);菜单
@@ -1103,4 +1107,4 @@ WrittenBy;作者
 Yes;是
 Your system;您的系统
 ZZ_Automatic_Percent;87
-ZZ_AutomaticLanguage_Percent;91
+ZZ_AutomaticLanguage_Percent;90

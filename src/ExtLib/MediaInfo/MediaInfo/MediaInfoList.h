@@ -64,7 +64,6 @@ public :
         /// @brief Open files
         /// @param File Full name of file(s) to open \n
         ///             or Full name of folder(s) to open \n
-        ///             (if multiple names, names must be separated by "|")
         /// @param Options: FileOption_Recursive = Recursive mode for folders \n
         ///                  FileOption_Close = Close all already opened files before
         /// @return Number of files successfuly added

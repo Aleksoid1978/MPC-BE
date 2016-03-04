@@ -828,10 +828,14 @@ Lyricist;Lyricist
 Lyrics;
 Mastered_Date;Mastered date
 MasteredBy;Mastered by
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About;Παρέχει λεπτομερείς πληροφορίες\r\nγια αρχεία πολυμέσων:\r\nMatroska, OGG (συμπεριλαμβάνεται OGM)\r\nMPEG1 (συμπεριλαμβάνεται VCD)\r\nMPEG2 (συμπεριλαμβάνεται DVD και SVCD)\r\nMPEG4 (συμπεριλαμβάνεται Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (συμπεριλαμβάνεται WMV, WMA)\r\nMicrosoft RIFF (συμπεριλαμβάνεται AVI, WAV)\r\nΜορφοποιήσεις ήχου (AC3, DTS, AAC, AU, AIFF...)
 Menu;Μενού
 Menu stream(s);Ροές μενού
@@ -1103,4 +1107,4 @@ WrittenBy;Γραμμένο από
 Yes;Ναι
 Your system;Το σύστημά σας
 ZZ_Automatic_Percent;69
-ZZ_AutomaticLanguage_Percent;77
+ZZ_AutomaticLanguage_Percent;76

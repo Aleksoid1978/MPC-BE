@@ -383,6 +383,8 @@ private :
     void sei_message_user_data_unregistered_x265(int32u payloadSize);
     void sei_message_active_parameter_sets();
     void sei_message_decoded_picture_hash(int32u payloadSize);
+    void sei_message_mastering_display_colour_volume();
+    void sei_message_light_level();
 
     //Packets - SubElements
     void slice_segment_header();
@@ -431,9 +433,15 @@ private :
     Ztring                              Encoded_Library_Version;
     Ztring                              Encoded_Library_Date;
     Ztring                              Encoded_Library_Settings;
+    Ztring                              MasteringDisplay_ColorPrimaries;
+    Ztring                              MasteringDisplay_Luminance;
     int32u  chroma_format_idc;
     int32u  slice_pic_parameter_set_id;
     int32u  slice_type;
+    int32u  chroma_sample_loc_type_top_field;
+    int32u  chroma_sample_loc_type_bottom_field;
+    int16u  maximum_content_light_level;
+    int16u  maximum_frame_average_light_level;
     int8u   nuh_layer_id;
     int8u   profile_space;
     int8u   profile_idc;

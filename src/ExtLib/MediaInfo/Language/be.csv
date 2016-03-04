@@ -828,10 +828,14 @@ Lyricist;Паэт-песеннік
 Lyrics;Тэкст песен
 Mastered_Date;Дата майстарынгу
 MasteredBy;Майстарынг
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;Каэфіцыенты матрыцы
 Matrix_Format;
+MaxCLL;
+MaxFALL;
 MediaInfo_About;Адлюстроўвае дэталёвую інфармацыю\r\nпра мультымедыя-файлы Matroska, OGG (уключаючы OGM)\r\nMPEG1 (уключаючы VCD), MPEG2 (уключаючы DVD і SVCD), MPEG4 (уключаючы iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (уключаючы WMV, WMA)\r\nMicrosoft RIFF (уключаючы AVI, WAV, DivX)\r\nгукавыя фарматы (AC3, DTS, SSC, AU, AIFF)
 Menu;Меню
 Menu stream(s);Меню струменяў
