@@ -452,6 +452,7 @@ SRCS_LC = \
 	libavcodec/wmaprodec.c \
 	libavcodec/wmavoice.c \
 	libavcodec/wmv2.c \
+	libavcodec/wmv2data.c \
 	libavcodec/wmv2dec.c \
 	libavcodec/wmv2dsp.c \
 	libavcodec/xiph.c \
@@ -569,6 +570,7 @@ SRCS_LU = \
 	libavutil/fixed_dsp.c \
 	libavutil/float_dsp.c \
 	libavutil/frame.c \
+	libavutil/hwcontext.c \
 	libavutil/imgutils.c \
 	libavutil/integer.c \
 	libavutil/intmath.c \
@@ -577,6 +579,7 @@ SRCS_LU = \
 	libavutil/log.c \
 	libavutil/log2_tab.c \
 	libavutil/lzo.c \
+	libavutil/mastering_display_metadata.c \
 	libavutil/mathematics.c \
 	libavutil/md5.c \
 	libavutil/mem.c \
@@ -691,7 +694,8 @@ SRCS_YASM_LC = \
 	libavcodec/x86/takdsp.asm \
 	libavcodec/x86/ttadsp.asm \
 	libavcodec/x86/v210.asm \
-	libavcodec/x86/vc1dsp.asm \
+	libavcodec/x86/vc1dsp_loopfilter.asm \
+	libavcodec/x86/vc1dsp_mc.asm \
 	libavcodec/x86/videodsp.asm \
 	libavcodec/x86/vorbisdsp.asm \
 	libavcodec/x86/vp3dsp.asm \

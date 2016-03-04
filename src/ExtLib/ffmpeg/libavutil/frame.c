@@ -1,5 +1,4 @@
 /*
- *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -357,6 +356,7 @@ FF_DISABLE_DEPRECATION_WARNINGS
     dst->qscale_table = NULL;
     dst->qstride      = 0;
     dst->qscale_type  = 0;
+    av_buffer_unref(&dst->qp_table_buf);
     if (src->qp_table_buf) {
         dst->qp_table_buf = av_buffer_ref(src->qp_table_buf);
         if (dst->qp_table_buf) {
@@ -428,6 +428,14 @@ int av_frame_ref(AVFrame *dst, const AVFrame *src)
         }
     }
 
+    if (src->hw_frames_ctx) {
+        dst->hw_frames_ctx = av_buffer_ref(src->hw_frames_ctx);
+        if (!dst->hw_frames_ctx) {
+            ret = AVERROR(ENOMEM);
+            goto fail;
+        }
+    }
+
     /* duplicate extended data */
     if (src->extended_data != src->data) {
         int ch = src->channels;
@@ -488,6 +496,8 @@ void av_frame_unref(AVFrame *frame)
 #if FF_API_FRAME_QP
     av_buffer_unref(&frame->qp_table_buf);
 #endif
+
+    av_buffer_unref(&frame->hw_frames_ctx);
 
     get_frame_defaults(frame);
 }
