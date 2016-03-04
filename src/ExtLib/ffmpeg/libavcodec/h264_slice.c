@@ -1229,6 +1229,9 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
         }
     }
 
+    if (!h->current_slice)
+        av_assert0(sl == h->slice_ctx);
+
     slice_type = get_ue_golomb_31(&sl->gb);
     if (slice_type > 9) {
         av_log(h->avctx, AV_LOG_ERROR,
@@ -1436,7 +1439,7 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
         }
     }
 
-    if (first_slice && h->dequant_coeff_pps != pps_id) {
+    if (!h->current_slice && h->dequant_coeff_pps != pps_id) {
         h->dequant_coeff_pps = pps_id;
         ff_h264_init_dequant_tables(h);
     }
@@ -1494,7 +1497,6 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
         }
     }
 
-    h->picture_structure = picture_structure;
     if (!h->setup_finished) {
         h->droppable         = droppable;
         h->picture_structure = picture_structure;
@@ -2063,7 +2065,6 @@ static av_always_inline void fill_filter_caches_inter(const H264Context *h,
 }
 
 /**
- *
  * @return non zero if the loop filter can be skipped
  */
 static int fill_filter_caches(const H264Context *h, H264SliceContext *sl, int mb_type)

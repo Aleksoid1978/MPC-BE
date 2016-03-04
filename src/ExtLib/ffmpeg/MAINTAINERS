@@ -44,7 +44,7 @@ Miscellaneous Areas
 
 documentation                           Stefano Sabatini, Mike Melanson, Timothy Gu, Lou Logan
 build system (configure, makefiles)     Diego Biurrun, Mans Rullgard
-project server                          Árpád Gereöffy, Michael Niedermayer, Reimar Doeffinger, Alexander Strasser, Lou Logan
+project server                          Árpád Gereöffy, Michael Niedermayer, Reimar Doeffinger, Alexander Strasser
 presets                                 Robert Swain
 metadata subsystem                      Aurelien Jacobs
 release management                      Michael Niedermayer
@@ -165,6 +165,7 @@ Codecs:
   crystalhd.c                           Philip Langdale
   cscd.c                                Reimar Doeffinger
   dca.c                                 Kostya Shishkov, Benjamin Larsson
+  dirac*                                Rostislav Pehlivanov
   dnxhd*                                Baptiste Coudurier
   dpcm.c                                Mike Melanson
   dss_sp.c                              Oleksij Rempel, Michael Niedermayer
@@ -209,7 +210,7 @@ Codecs:
   libschroedinger*                      David Conrad
   libspeexdec.c                         Justin Ruggles
   libtheoraenc.c                        David Conrad
-  libutvideo*                           Derek Buitenhuis
+  libutvideo*                           Carl Eugen Hoyos
   libvorbis.c                           David Conrad
   libvpx*                               James Zern
   libx264.c                             Mans Rullgard, Jason Garrett-Glaser
@@ -275,8 +276,10 @@ Codecs:
   vb.c                                  Kostya Shishkov
   vble.c                                Derek Buitenhuis
   vc1*                                  Kostya Shishkov, Christophe Gisquet
+  vc2*                                  Rostislav Pehlivanov
   vcr1.c                                Michael Niedermayer
   vda_h264_dec.c                        Xidorn Quan
+  videotoolboxenc.c                     Rick Kern
   vima.c                                Paul B Mahol
   vmnc.c                                Kostya Shishkov
   vorbisdec.c                           Denes Balatoni, David Conrad
@@ -351,6 +354,7 @@ Filters:
   af_biquads.c                          Paul B Mahol
   af_chorus.c                           Paul B Mahol
   af_compand.c                          Paul B Mahol
+  af_firequalizer.c                     Muhammad Faiz
   af_ladspa.c                           Paul B Mahol
   af_pan.c                              Nicolas George
   af_sidechaincompress.c                Paul B Mahol
@@ -475,6 +479,7 @@ Muxers/Demuxers:
   oggdec.c, oggdec.h                    David Conrad
   oggenc.c                              Baptiste Coudurier
   oggparse*.c                           David Conrad
+  oggparsedaala*                        Rostislav Pehlivanov
   oma.c                                 Maxim Poliakovski
   paf.c                                 Paul B Mahol
   psxstr.c                              Mike Melanson
@@ -561,6 +566,7 @@ Windows ICL                             Matthew Oliver
 ADI/Blackfin DSP                        Marc Hoffman
 Sparc                                   Roman Shaposhnik
 x86                                     Michael Niedermayer
+OS/2                                    KO Myung-Hun
 
 
 Releases

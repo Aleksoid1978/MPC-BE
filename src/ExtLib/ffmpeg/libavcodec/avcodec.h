@@ -70,7 +70,6 @@
  * @{
  * @}
  * @}
- *
  */
 
 /**
@@ -836,6 +835,10 @@ typedef struct RcOverride{
  * Do not skip samples and export skip information as frame side data
  */
 #define AV_CODEC_FLAG2_SKIP_MANUAL    (1 << 29)
+/**
+ * Do not reset ASS ReadOrder field on flush (subtitles decoding)
+ */
+#define AV_CODEC_FLAG2_RO_FLUSH_NOOP  (1 << 30)
 
 /* Unsupported options :
  *              Syntax Arithmetic coding (SAC)
@@ -1403,6 +1406,19 @@ enum AVPacketSideDataType {
      * side data includes updated metadata which appeared in the stream.
      */
     AV_PKT_DATA_METADATA_UPDATE,
+
+    /**
+     * MPEGTS stream ID, this is required to pass the stream ID
+     * information from the demuxer to the corresponding muxer.
+     */
+    AV_PKT_DATA_MPEGTS_STREAM_ID,
+
+    /**
+     * Mastering display metadata (based on SMPTE-2086:2014). This metadata
+     * should be associated with a video stream and containts data in the form
+     * of the AVMasteringDisplayMetadata struct.
+     */
+    AV_PKT_DATA_MASTERING_DISPLAY_METADATA
 };
 
 #define AV_PKT_DATA_QUALITY_FACTOR AV_PKT_DATA_QUALITY_STATS //DEPRECATED
@@ -2178,7 +2194,6 @@ typedef struct AVCodecContext {
 #endif
 
     /**
-     *
      * - encoding: Set by user.
      * - decoding: unused
      */
@@ -2220,7 +2235,6 @@ typedef struct AVCodecContext {
 #endif
 
     /**
-     *
      * Note: Value depends upon the compare function used for fullpel ME.
      * - encoding: Set by user.
      * - decoding: unused
@@ -3275,6 +3289,12 @@ typedef struct AVCodecContext {
 #define FF_SUB_CHARENC_MODE_AUTOMATIC    0  ///< libavcodec will select the mode itself
 #define FF_SUB_CHARENC_MODE_PRE_DECODER  1  ///< the AVPacket data needs to be recoded to UTF-8 before being fed to the decoder, requires iconv
 
+    int sub_text_format;
+#define FF_SUB_TEXT_FMT_ASS              0
+#if FF_API_ASS_TIMING
+#define FF_SUB_TEXT_FMT_ASS_WITH_TIMINGS 1
+#endif
+
     /**
      * Skip processing alpha if supported by codec.
      * Note that if the format uses pre-multiplied alpha (common with VP6,
@@ -3359,6 +3379,19 @@ typedef struct AVCodecContext {
     int  using_dxva;
     void *dxva_context;
     // ==> End patch MPC
+
+    /**
+     * Encoding only.
+     *
+     * For hardware encoders configured to use a hwaccel pixel format, this
+     * field should be set by the caller to a reference to the AVHWFramesContext
+     * describing input frames. AVHWFramesContext.format must be equal to
+     * AVCodecContext.pix_fmt.
+     *
+     * This field should be set before avcodec_open2() is called and is
+     * afterwards owned and managed by libavcodec.
+     */
+    AVBufferRef *hw_frames_ctx;
 } AVCodecContext;
 
 AVRational av_codec_get_pkt_timebase         (const AVCodecContext *avctx);
@@ -4173,7 +4206,6 @@ void av_packet_move_ref(AVPacket *dst, AVPacket *src);
  * @param src Source packet
  *
  * @return 0 on success AVERROR on failure.
- *
  */
 int av_packet_copy_props(AVPacket *dst, const AVPacket *src);
 

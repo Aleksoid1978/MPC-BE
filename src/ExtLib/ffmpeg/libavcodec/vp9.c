@@ -70,7 +70,13 @@ typedef struct VP9Context {
     uint8_t ss_h, ss_v;
     uint8_t last_bpp, bpp, bpp_index, bytesperpixel;
     uint8_t last_keyframe;
-    enum AVPixelFormat pix_fmt, last_fmt;
+    // sb_cols/rows, rows/cols and last_fmt are used for allocating all internal
+    // arrays, and are thus per-thread. w/h and gf_fmt are synced between threads
+    // and are therefore per-stream. pix_fmt represents the value in the header
+    // of the currently processed frame.
+    int w, h;
+    enum AVPixelFormat pix_fmt, last_fmt, gf_fmt;
+    unsigned sb_cols, sb_rows, rows, cols;
     ThreadFrame next_refs[8];
 
     struct {
@@ -78,7 +84,6 @@ typedef struct VP9Context {
         uint8_t mblim_lut[64];
     } filter_lut;
     unsigned tile_row_start, tile_row_end, tile_col_start, tile_col_end;
-    unsigned sb_cols, sb_rows, rows, cols;
     struct {
         prob_context p;
         uint8_t coef[4][2][2][6][6][3];

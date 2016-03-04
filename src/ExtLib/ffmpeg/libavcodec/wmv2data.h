@@ -16,19 +16,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_PROFILES_H
-#define AVCODEC_PROFILES_H
+#ifndef AVCODEC_WMV2DATA_H
+#define AVCODEC_WMV2DATA_H
 
-#include "avcodec.h"
+#include <stdint.h>
 
-extern const AVProfile ff_aac_profiles[];
-extern const AVProfile ff_dca_profiles[];
-extern const AVProfile ff_h264_profiles[];
-extern const AVProfile ff_hevc_profiles[];
-extern const AVProfile ff_jpeg2000_profiles[];
-extern const AVProfile ff_mpeg2_video_profiles[];
-extern const AVProfile ff_mpeg4_video_profiles[];
-extern const AVProfile ff_vc1_profiles[];
-extern const AVProfile ff_vp9_profiles[];
+extern const uint8_t ff_wmv2_scantableA[64];
+extern const uint8_t ff_wmv2_scantableB[64];
 
-#endif /* AVCODEC_PROFILES_H */
+#endif /* AVCODEC_WMV2DATA_H */
