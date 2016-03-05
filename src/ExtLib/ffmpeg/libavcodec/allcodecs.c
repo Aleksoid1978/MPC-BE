@@ -78,6 +78,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (AIC, aic);
     REGISTER_DECODER (AMV, amv);
     REGISTER_DECODER (BINK, bink);
+    REGISTER_DECODER (CFHD, cfhd);
     REGISTER_DECODER (CINEPAK, cinepak);
     REGISTER_DECODER (CLLC, cllc);
     REGISTER_DECODER (CSCD, cscd);

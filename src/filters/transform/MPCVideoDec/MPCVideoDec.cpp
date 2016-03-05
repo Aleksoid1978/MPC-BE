@@ -107,6 +107,7 @@ vcodecs[] = {
 	{_T("dnxhd"),		CODEC_DNXHD		},
 	{_T("cinepak"),		CODEC_CINEPAK	},
 	{_T("quicktime"),	CODEC_QT		},
+	{_T("cineform"),	CODEC_CINEFORM	},
 	// dxva codecs
 	{_T("h264_dxva"),	CODEC_H264_DXVA	},
 	{_T("hevc_dxva"),	CODEC_HEVC_DXVA	},
@@ -430,6 +431,9 @@ FFMPEG_CODECS ffCodecs[] = {
 	{ &MEDIASUBTYPE_CUVC, AV_CODEC_ID_HQ_HQA, NULL, VDEC_CANOPUS, -1 },
 	{ &MEDIASUBTYPE_CHQX, AV_CODEC_ID_HQX,    NULL, VDEC_CANOPUS, -1 },
 
+	// CineForm
+	{ &MEDIASUBTYPE_CFHD, AV_CODEC_ID_CFHD,   NULL, VDEC_CINEFORM, -1 },
+
 	// HEVC
 	{ &MEDIASUBTYPE_HEVC, AV_CODEC_ID_HEVC, &DXVA_HEVC, VDEC_HEVC, VDEC_DXVA_HEVC },
 	{ &MEDIASUBTYPE_HVC1, AV_CODEC_ID_HEVC, &DXVA_HEVC, VDEC_HEVC, VDEC_DXVA_HEVC },
@@ -744,6 +748,9 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_CLLC },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_CUVC },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_CHQX },
+
+	// CineForm
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_CFHD },
 
 	// HEVC
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HEVC },
@@ -1207,14 +1214,15 @@ void CMPCVideoDecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& 
 	h = PictHeight();
 }
 
+// some codecs can reset the values width/height on initialization
 int CMPCVideoDecFilter::PictWidth()
 {
-	return m_pAVCtx->width;
+	return m_pAVCtx->width ? m_pAVCtx->width : m_pAVCtx->coded_width;
 }
 
 int CMPCVideoDecFilter::PictHeight()
 {
-	return m_pAVCtx->height;
+	return m_pAVCtx->height ? m_pAVCtx->height : m_pAVCtx->coded_height;
 }
 
 int CMPCVideoDecFilter::PictWidthAligned()
@@ -1389,6 +1397,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 				case AV_CODEC_ID_HQ_HQA :
 				case AV_CODEC_ID_HQX :
 					bCodecActivated = (m_nActiveCodecs & CODEC_CANOPUS) != 0;
+					break;
+				case AV_CODEC_ID_CFHD :
+					bCodecActivated = (m_nActiveCodecs & VDEC_CINEFORM) != 0;
 					break;
 				case AV_CODEC_ID_V210 :
 				case AV_CODEC_ID_V410 :

@@ -568,12 +568,15 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 			case AV_CODEC_ID_HQX:
 				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P16; // or AV_PIX_FMT_YUV444P16
 				break;
+			case AV_CODEC_ID_CFHD:
+				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10; // most common format
+				break;
 			case AV_CODEC_ID_MJPEG:
 			case AV_CODEC_ID_DNXHD:
-				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; // most common format for these codecs
+				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; // most common format
 				break;
 			default: // most codecs
-				pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; // bad hack
+				pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; // most common format
 		}
 	}
 }

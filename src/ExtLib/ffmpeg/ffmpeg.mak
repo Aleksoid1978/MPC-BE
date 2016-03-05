@@ -145,6 +145,8 @@ SRCS_LC = \
 	libavcodec/canopus.c \
 	libavcodec/celp_filters.c \
 	libavcodec/celp_math.c \
+	libavcodec/cfhd.c \
+	libavcodec/cfhddata.c \
 	libavcodec/cinepak.c \
 	libavcodec/cllc.c \
 	libavcodec/codec_desc.c \
