@@ -7,8 +7,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
-
+#include "afxres.h"
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -233,7 +232,7 @@ BEGIN
     CONTROL         "Display full path",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,92,105,8
     CONTROL         "File name only",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,10,104,105,8
     CONTROL         "Don't prefix anything",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,10,116,105,8
-    CONTROL         "Replace file name with title",IDC_CHECK13,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP | WS_GROUP,10,128,105,18
+    CONTROL         "Replace file name with title",IDC_CHECK13,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_GROUP | WS_TABSTOP,10,128,105,18
     GROUPBOX        "History",IDC_STATIC,124,5,167,110
     CONTROL         "Keep history of recently opened files",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,17,156,8
@@ -300,7 +299,7 @@ BEGIN
     CONTROL         "Rewind when done playing",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,10,93,116,18
     GROUPBOX        "Output",IDC_STATIC,137,53,154,46
     CONTROL         "Auto-zoom:",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,65,75,8
-    COMBOBOX        IDC_COMBO1,219,63,65,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO1,219,63,69,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Auto fit factor:",IDC_STATIC2,142,82,82,8
     EDITTEXT        IDC_EDIT4,240,79,32,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,262,79,10,13
@@ -1145,7 +1144,7 @@ BEGIN
     DEFPUSHBUTTON   "&Yes",IDOK,129,40,50,14
     PUSHBUTTON      "&No",IDCANCEL,182,40,50,14
     LTEXT           "",IDC_UPDATE_DLG_TEXT,36,4,193,32
-    ICON            "",IDC_UPDATE_ICON,6,8,21,20,SS_ICON | SS_CENTERIMAGE
+    ICON            "",IDC_UPDATE_ICON,6,8,21,20,SS_CENTERIMAGE
 END
 
 IDD_ITEMPROPERTIES_DIALOG DIALOGEX 0, 0, 238, 100
@@ -1213,11 +1212,6 @@ BEGIN
     BEGIN
         VERTGUIDE, 10
         VERTGUIDE, 142
-    END
-
-    IDD_PPAGESUBTITLES, DIALOG
-    BEGIN
-        VERTGUIDE, 10
     END
 
     IDD_PPAGEFORMATS, DIALOG
@@ -1341,8 +1335,14 @@ BEGIN
     BEGIN
         VERTGUIDE, 10
     END
+
+    IDD_PPAGESUBTITLES, DIALOG
+    BEGIN
+        VERTGUIDE, 10
+    END
 END
 #endif    // APSTUDIO_INVOKED
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1372,18 +1372,13 @@ BEGIN
     BUTTON      ID_VOLUME_MUTE_DISABLED
 END
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
 IDB_PLAYERTOOLBAR       BITMAP                  "res\\toolbar.bmp"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog Info
-//
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1396,8 +1391,8 @@ BEGIN
     BEGIN
         MENUITEM "&Quick Open File...\tCtrl+Q", ID_FILE_OPENQUICK
         MENUITEM SEPARATOR
-        MENUITEM "&Open File/URL...\tCtrl+O",       ID_FILE_OPENMEDIA
-        MENUITEM "Open &DVD/Blu-ray...\tCtrl+D",        ID_FILE_OPENDVD
+        MENUITEM "&Open File/URL...\tCtrl+O",   ID_FILE_OPENMEDIA
+        MENUITEM "Open &DVD/Blu-ray...\tCtrl+D", ID_FILE_OPENDVD
         MENUITEM "Open De&vice...\tCtrl+V",     ID_FILE_OPENDEVICE
         MENUITEM "Open Directory...",           ID_FILE_OPENDIRECTORY
         MENUITEM "Open &Iso image...",          ID_FILE_OPENISO
@@ -1451,7 +1446,7 @@ BEGIN
             MENUITEM "Auto Fit\tAlt+4",             ID_VIEW_ZOOM_AUTOFIT
         END
         MENUITEM SEPARATOR
-        MENUITEM "&Language",                       ID_MENU_LANGUAGE
+        MENUITEM "&Language",                   ID_MENU_LANGUAGE
         MENUITEM SEPARATOR
         POPUP "Renderer Settings"
         BEGIN
@@ -1552,7 +1547,7 @@ BEGIN
             MENUITEM "------ Every time ------",    ID_AFTERPLAYBACK_EVERYTIME
             MENUITEM "Exit",                        ID_AFTERPLAYBACK_EXIT
             MENUITEM "Play next in the folder",     ID_AFTERPLAYBACK_NEXT
-            MENUITEM "Play next in the folder (looped)",     ID_AFTERPLAYBACK_NEXT_LOOPED
+            MENUITEM "Play next in the folder (looped)", ID_AFTERPLAYBACK_NEXT_LOOPED
             MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
         END
     END
@@ -1595,8 +1590,8 @@ BEGIN
         BEGIN
             MENUITEM "&Quick Open File...\tCtrl+Q", ID_FILE_OPENQUICK
             MENUITEM SEPARATOR
-            MENUITEM "&Open File/URL...\tCtrl+O",       ID_FILE_OPENMEDIA
-            MENUITEM "Open &DVD/Blu-ray...\tCtrl+D",        ID_FILE_OPENDVD
+            MENUITEM "&Open File/URL...\tCtrl+O",   ID_FILE_OPENMEDIA
+            MENUITEM "Open &DVD/Blu-ray...\tCtrl+D", ID_FILE_OPENDVD
             MENUITEM "Open De&vice...\tCtrl+V",     ID_FILE_OPENDEVICE
             MENUITEM "Open Directory...",           ID_FILE_OPENDIRECTORY
             MENUITEM "Open &Iso image...",          ID_FILE_OPENISO
@@ -1719,7 +1714,7 @@ BEGIN
             MENUITEM "------ Every time ------",    ID_AFTERPLAYBACK_EVERYTIME
             MENUITEM "Exit",                        ID_AFTERPLAYBACK_EXIT
             MENUITEM "Play next in the folder",     ID_AFTERPLAYBACK_NEXT
-            MENUITEM "Play next in the folder (looped)",     ID_AFTERPLAYBACK_NEXT_LOOPED
+            MENUITEM "Play next in the folder (looped)", ID_AFTERPLAYBACK_NEXT_LOOPED
             MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
         END
         MENUITEM SEPARATOR
@@ -1780,8 +1775,8 @@ BEGIN
         BEGIN
             MENUITEM "&Quick Open File...\tCtrl+Q", ID_FILE_OPENQUICK
             MENUITEM SEPARATOR
-            MENUITEM "&Open File/URL...\tCtrl+O",       ID_FILE_OPENMEDIA
-            MENUITEM "Open &DVD/Blu-ray...\tCtrl+D",        ID_FILE_OPENDVD
+            MENUITEM "&Open File/URL...\tCtrl+O",   ID_FILE_OPENMEDIA
+            MENUITEM "Open &DVD/Blu-ray...\tCtrl+D", ID_FILE_OPENDVD
             MENUITEM "Open De&vice...\tCtrl+V",     ID_FILE_OPENDEVICE
             MENUITEM "Open Directory...",           ID_FILE_OPENDIRECTORY
             MENUITEM "Open &Iso image...",          ID_FILE_OPENISO
@@ -1929,7 +1924,7 @@ BEGIN
         POPUP "&Help"
         BEGIN
             MENUITEM "&Home Page",                  ID_HELP_HOMEPAGE
-            MENUITEM "Check for &updates",            ID_HELP_CHECKFORUPDATE
+            MENUITEM "Check for &updates",          ID_HELP_CHECKFORUPDATE
             MENUITEM "&Command Line Switches",      ID_HELP_SHOWCOMMANDLINESWITCHES
 //          MENUITEM "Download &Toolbar Images",    ID_HELP_TOOLBARIMAGES
 //          MENUITEM "&Donate",                     ID_HELP_DONATE
@@ -1962,7 +1957,7 @@ BEGIN
             MENUITEM "------ Every time ------",    ID_AFTERPLAYBACK_EVERYTIME
             MENUITEM "Exit",                        ID_AFTERPLAYBACK_EXIT
             MENUITEM "Play next in the folder",     ID_AFTERPLAYBACK_NEXT
-            MENUITEM "Play next in the folder (looped)",     ID_AFTERPLAYBACK_NEXT_LOOPED
+            MENUITEM "Play next in the folder (looped)", ID_AFTERPLAYBACK_NEXT_LOOPED
             MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
         END
         MENUITEM SEPARATOR
@@ -3309,3 +3304,4 @@ LANGUAGE 9, 1
 #endif
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
