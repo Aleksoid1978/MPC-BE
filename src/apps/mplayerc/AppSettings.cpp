@@ -105,6 +105,7 @@ CAppSettings::CAppSettings()
 	VideoFiltersKeys[VDEC_DNXHD]			= _T("vdec_dnxhd");
 	VideoFiltersKeys[VDEC_BINK]				= _T("vdec_bink");
 	VideoFiltersKeys[VDEC_CANOPUS]			= _T("vdec_canopus");
+	VideoFiltersKeys[VDEC_CINEFORM]			= _T("vdec_cineform");
 	VideoFiltersKeys[VDEC_CINEPAK]			= _T("vdec_cinepak");
 	VideoFiltersKeys[VDEC_DIRAC]			= _T("vdec_dirac");
 	VideoFiltersKeys[VDEC_DIVX]				= _T("vdec_divx");

@@ -447,6 +447,7 @@ static const struct {
 	{CODEC_DNXHD,		_T("Avid DNxHD")},
 	{CODEC_BINKV,		_T("Bink video")},
 	{CODEC_CANOPUS,		_T("Canopus Lossless/HQ/HQX")},
+	{CODEC_CINEFORM,	_T("CineForm")},
 	{CODEC_CINEPAK,		_T("Cinepak")},
 	{CODEC_DIRAC,		_T("Dirac")},
 	{CODEC_DIVX,		_T("DivX")},

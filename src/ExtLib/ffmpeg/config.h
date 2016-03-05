@@ -556,6 +556,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_BINK_DECODER 1
 #define CONFIG_BRENDER_PIX_DECODER 0
 #define CONFIG_CAVS_DECODER 0
+#define CONFIG_CFHD_DECODER 1
 #define CONFIG_CINEPAK_DECODER 1
 #define CONFIG_CLLC_DECODER 1
 #define CONFIG_CSCD_DECODER 1
