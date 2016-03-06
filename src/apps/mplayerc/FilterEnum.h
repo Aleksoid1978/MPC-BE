@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2015 see Authors.txt
+ * (C) 2010-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru).
+ * (C) 2013-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
