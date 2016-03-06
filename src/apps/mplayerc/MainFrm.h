@@ -788,7 +788,8 @@ protected:  // control bar embedded members
 	void OnDragLeave();
 	DROPEFFECT OnDragScroll(DWORD dwKeyState, CPoint point);
 
-	const UINT CF_URL = RegisterClipboardFormat(_T("UniformResourceLocator"));
+	const UINT CF_URLA = RegisterClipboardFormat(L"UniformResourceLocator");
+	const UINT CF_URLW = RegisterClipboardFormat(L"UniformResourceLocatorW");
 	void DropFiles(CAtlList<CString>& slFiles);
 
 	LPCTSTR GetRecentFile();

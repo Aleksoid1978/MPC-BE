@@ -1058,7 +1058,7 @@ DROPEFFECT CMainFrame::OnDragEnter(COleDataObject* pDataObject, DWORD dwKeyState
 
 DROPEFFECT CMainFrame::OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
 {
-	return (pDataObject->IsDataAvailable(CF_URL) || pDataObject->IsDataAvailable(CF_HDROP)) ? DROPEFFECT_COPY : DROPEFFECT_NONE;
+	return (pDataObject->IsDataAvailable(CF_URLA) || pDataObject->IsDataAvailable(CF_URLW) || pDataObject->IsDataAvailable(CF_HDROP)) ? DROPEFFECT_COPY : DROPEFFECT_NONE;
 }
 
 BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point)
@@ -1081,10 +1081,22 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 			}
 			GlobalUnlock(hGlobal);
 		}
-	} else if (pDataObject->IsDataAvailable(CF_URL)) {
-		FORMATETC fmt = {CF_URL, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(CF_URL, &fmt)) {
+	} else if (pDataObject->IsDataAvailable(CF_URLA)) {
+		FORMATETC fmt = {CF_URLA, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(CF_URLA, &fmt)) {
 			LPCSTR pText = (LPCSTR)GlobalLock(hGlobal);
+			if (AfxIsValidString(pText)) {
+				CAtlList<CString> sl;
+				sl.AddTail(pText);
+				DropFiles(sl);
+				GlobalUnlock(hGlobal);
+				bResult = TRUE;
+			}
+		}
+	} else if (pDataObject->IsDataAvailable(CF_URLW)) {
+		FORMATETC fmt = { CF_URLW, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(CF_URLW, &fmt)) {
+			LPCTSTR pText = (LPCTSTR)GlobalLock(hGlobal);
 			if (AfxIsValidString(pText)) {
 				CAtlList<CString> sl;
 				sl.AddTail(pText);
