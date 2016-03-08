@@ -397,7 +397,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 				CStringA value = sl2.GetTail();
 
 				if (param == "content-type") {
-					if (value == "application/octet-stream") {
+					if (value == "application/octet-stream" || value == "video/mp2t") {
 						m_subtype = MEDIASUBTYPE_NULL; // "universal" subtype for most splitters
 
 						BYTE buf[1024];
