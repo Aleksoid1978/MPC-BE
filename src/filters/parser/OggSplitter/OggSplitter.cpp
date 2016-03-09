@@ -783,27 +783,13 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 				p->TrackNumber = page.m_hdr.bitstream_serial_number;
 
 				if (S_OK == UnpackPacket(p, pData + i, j - i)) {
-					/*
-					TRACE(_T("COggSplitterOutputPin::UnpackPage() : [%d]: %d, %I64d -> %I64d (disc=%d, sync=%d)\n"),
-							(int)p->TrackNumber, p->GetCount(), p->rtStart, p->rtStop,
-							(int)p->bDiscontinuity, (int)p->bSyncPoint);
-					*/
+					CAutoLock csAutoLock(&m_csPackets);
 
-					if (p->rtStart <= p->rtStop && p->rtStop <= p->rtStart + 10000000i64*60) {
-						CAutoLock csAutoLock(&m_csPackets);
-
-						m_rtLast = p->rtStop;
-						if (COggDiracOutputPin* pOggPin = dynamic_cast<COggDiracOutputPin*>(this)) {
-							m_rtLast = INVALID_TIME;
-						}
-
-						if (len < 255) {
-							m_packets.AddTail(p);
-						} else {
-							m_lastpacket = p;
-						}
+					m_rtLast = p->rtStop;
+					if (len < 255) {
+						m_packets.AddTail(p);
 					} else {
-						ASSERT(0);
+						m_lastpacket = p;
 					}
 				}
 			}
@@ -1594,12 +1580,12 @@ REFERENCE_TIME COggDiracOutputPin::GetRefTime(__int64 granule_position)
 	REFERENCE_TIME pts = 0;
 
 	if (m_bOldDirac) {
-		LONGLONG iframe		= granule_position >> 30;
-		LONGLONG pframe		= granule_position & 0x3fffffff;
-		pts					= (iframe + pframe) * m_rtAvgTimePerFrame;
+		REFERENCE_TIME iframe = granule_position >> 30;
+		REFERENCE_TIME pframe = granule_position & 0x3fffffff;
+		pts                   = (iframe + pframe) * m_rtAvgTimePerFrame;
 	} else {
-		REFERENCE_TIME dts	= (granule_position >> 31);
-		pts					= (dts + ((granule_position >> 9) & 0x1fff)) * m_rtAvgTimePerFrame / 2;
+		REFERENCE_TIME dts    = (granule_position >> 31);
+		pts                   = (dts + ((granule_position >> 9) & 0x1fff)) * m_rtAvgTimePerFrame / 2;
 	}
 
 	return pts;
