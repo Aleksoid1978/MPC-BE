@@ -1693,23 +1693,11 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	CheckPointer(m_pAVCodec, VFW_E_UNSUPPORTED_VIDEO);
 
 	if (bChangeType) {
-		bool bH264_HEVCIsAVI = ((m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC) && IsAVI());
-		bool bMPEG4BFrames = (m_nCodecId == AV_CODEC_ID_MPEG4 && pmt->formattype != FORMAT_MPEG2Video);
-		// code from LAV ... thanks to it's author
-		// Use ffmpegs logic to reorder timestamps
-		// This is required for H264 content (except AVI), and generally all codecs that use frame threading
-		m_bReorderBFrame = (bH264_HEVCIsAVI
-							|| bMPEG4BFrames
-							|| !((m_pAVCodec->capabilities & CODEC_CAP_FRAME_THREADS)
-									|| m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
-									|| m_nCodecId == AV_CODEC_ID_MPEG1VIDEO
-									|| m_nCodecId == AV_CODEC_ID_DIRAC
-									|| m_nCodecId == AV_CODEC_ID_RV10
-									|| m_nCodecId == AV_CODEC_ID_RV20));
+		m_bReorderBFrame = (m_nCodecId == AV_CODEC_ID_H264) && IsAVI();
 
 		CLSID clsidInput = GetCLSID(m_pInput->GetConnected());
 		BOOL bNotTrustSourceTimeStamp = (clsidInput == GUIDFromCString(L"{A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}") // Daum PotPlayer's MKV Source
-									  || clsidInput == CLSID_WMAsfReader); // WM ASF Reader
+										|| clsidInput == CLSID_WMAsfReader); // WM ASF Reader
 
 		m_bCalculateStopTime = (m_nCodecId == AV_CODEC_ID_H264 ||
 								m_nCodecId == AV_CODEC_ID_DIRAC ||
@@ -1718,8 +1706,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 		m_bRVDropBFrameTimings = (m_nCodecId == AV_CODEC_ID_RV10 || m_nCodecId == AV_CODEC_ID_RV20 || m_nCodecId == AV_CODEC_ID_RV30 || m_nCodecId == AV_CODEC_ID_RV40);
 
-		m_bUsePTS = (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_MPEG1VIDEO);
-		m_bCorrectPTS = m_bUsePTS;
+		m_bCorrectPTS = m_bUsePTS = m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_MPEG1VIDEO;
 	}
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
@@ -2930,9 +2917,9 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 	}
 
 	if (m_bReorderBFrame && m_pAVCtx->has_b_frames) {
-		m_BFrames[m_nPosB].rtStart	= rtStart;
-		m_BFrames[m_nPosB].rtStop	= rtStop;
-		m_nPosB						= 1 - m_nPosB;
+		m_BFrames[m_nPosB].rtStart = rtStart;
+		m_BFrames[m_nPosB].rtStop  = rtStop;
+		m_nPosB                    = 1 - m_nPosB;
 	}
 
 	switch (m_nDecoderMode) {
@@ -2989,8 +2976,8 @@ void CMPCVideoDecFilter::ReorderBFrames(REFERENCE_TIME& rtStart, REFERENCE_TIME&
 {
 	// Re-order B-frames if needed
 	if (m_bReorderBFrame && m_pAVCtx->has_b_frames) {
-		rtStart	= m_BFrames[m_nPosB].rtStart;
-		rtStop	= m_BFrames[m_nPosB].rtStop;
+		rtStart = m_BFrames[m_nPosB].rtStart;
+		rtStop  = m_BFrames[m_nPosB].rtStop;
 	}
 }
 
