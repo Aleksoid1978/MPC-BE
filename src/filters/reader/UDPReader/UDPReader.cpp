@@ -509,8 +509,6 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 			DbgLog((LOG_TRACE, 3, L"CUDPStream::Read() - wait %I64d bytes, %I64d -> %I64d", m_pos + len - m_packets.GetTail()->m_end, m_packets.GetTail()->m_end, m_pos + len));
 			Sleep(100);
 		}
-
-		m_EventComplete.Reset();
 	}
 
 	CAutoLock cAutoLock(&m_csLock);
@@ -594,6 +592,8 @@ void CUDPStream::CheckBuffer()
 	}
 }
 
+#define ENABLE_DUMP 0
+
 DWORD CUDPStream::ThreadProc()
 {
 	SetThreadPriority(m_hThread, THREAD_PRIORITY_TIME_CRITICAL);
@@ -602,29 +602,32 @@ DWORD CUDPStream::ThreadProc()
 		AfxSocketInit();
 	}
 
-#ifdef _DEBUG
-	FILE* dump = NULL;
-	//dump = _tfopen(_T("c:\\http.ts"), _T("wb"));
+#if ENABLE_DUMP
+	const CString fname = m_protocol == PR_HTTP ? L"http.dump" : m_protocol == PR_UDP ? L"udp.dump" : L"stdin.dump";
+	FILE* dump = _tfopen(fname, L"wb");
 #endif
 
 	for (;;) {
+		m_EventComplete.Set();
 		m_RequestCmd = GetRequest();
 
 		switch (m_RequestCmd) {
 			default:
 			case CMD_EXIT:
-				m_EventComplete.Set();
 				Reply(S_OK);
+				m_EventComplete.Set();
 				if (m_protocol == PR_HTTP) {
 					m_HttpSocketTread = m_HttpSocket.Detach();
 				}
-#ifdef _DEBUG
-				if (dump) { fclose(dump); }
+#if ENABLE_DUMP
+				if (dump) {
+					fclose(dump);
+				}
 #endif
 				return 0;
 			case CMD_STOP:
-				m_EventComplete.Set();
 				Reply(S_OK);
+				m_EventComplete.Set();
 				break;
 			case CMD_INIT:
 				if (m_protocol == PR_HTTP) {
@@ -633,6 +636,7 @@ DWORD CUDPStream::ThreadProc()
 			case CMD_PAUSE:
 			case CMD_RUN:
 				Reply(S_OK);
+				m_EventComplete.Reset();
 				char  buff[MAXBUFSIZE * 2];
 				int   buffsize = 0;
 				UINT  attempts = 0;
@@ -689,8 +693,10 @@ DWORD CUDPStream::ThreadProc()
 
 					buffsize += len;
 					if (buffsize >= MAXBUFSIZE) {
-#ifdef _DEBUG
-						if (dump) { fwrite(buff, buffsize, 1, dump); }
+#if ENABLE_DUMP
+						if (dump) {
+							fwrite(buff, buffsize, 1, dump);
+						}
 #endif
 						Append((BYTE*)buff, buffsize);
 						buffsize = 0;
