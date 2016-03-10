@@ -1086,7 +1086,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					memcpy(mt.pbFormat + (psi->dwOffset = sizeof(SUBTITLEINFO)), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 
 					mt.subtype =
-						CodecID == "S_TEXT/UTF8" ? MEDIASUBTYPE_UTF8 :
+						CodecID == "S_TEXT/UTF8" || CodecID == "D_WEBVTT/SUBTITLES" ? MEDIASUBTYPE_UTF8 :
 						CodecID == "S_TEXT/SSA" || CodecID == "S_SSA" ? MEDIASUBTYPE_SSA :
 						CodecID == "S_TEXT/ASS" || CodecID == "S_ASS" ? MEDIASUBTYPE_ASS :
 						CodecID == "S_TEXT/USF" || CodecID == "S_USF" ? MEDIASUBTYPE_USF :
