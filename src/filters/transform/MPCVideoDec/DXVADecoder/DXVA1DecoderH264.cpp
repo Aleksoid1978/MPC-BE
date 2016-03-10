@@ -225,6 +225,7 @@ HRESULT CDXVA1DecoderH264::DecodeFrame(BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	ClearUnusedRefFrames();
 
 	if (bAdded) {
+		m_pFilter->UpdateAspectRatio();
 		hr = DisplayNextFrame();
 	}
 

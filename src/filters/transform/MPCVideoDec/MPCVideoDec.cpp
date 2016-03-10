@@ -938,9 +938,9 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_pParser(NULL)
 	, m_nCodecNb(-1)
 	, m_nCodecId(AV_CODEC_ID_NONE)
-	, m_bReorderBFrame(true)
-	, m_bCalculateStopTime(false)
+	, m_bReorderBFrame(false)
 	, m_nPosB(1)
+	, m_bCalculateStopTime(false)
 	, m_bWaitKeyFrame(false)
 	, m_DXVADecoderGUID(GUID_NULL)
 	, m_nActiveCodecs(CODECS_ALL)
@@ -1693,11 +1693,11 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	CheckPointer(m_pAVCodec, VFW_E_UNSUPPORTED_VIDEO);
 
 	if (bChangeType) {
-		m_bReorderBFrame = (m_nCodecId == AV_CODEC_ID_H264) && IsAVI();
+		m_bReorderBFrame = (m_nCodecId == AV_CODEC_ID_H264) && !IsWinVistaOrLater() && IsAVI();
 
-		CLSID clsidInput = GetCLSID(m_pInput->GetConnected());
-		BOOL bNotTrustSourceTimeStamp = (clsidInput == GUIDFromCString(L"{A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}") // Daum PotPlayer's MKV Source
-										|| clsidInput == CLSID_WMAsfReader); // WM ASF Reader
+		const CLSID clsidInput = GetCLSID(m_pInput->GetConnected());
+		const BOOL bNotTrustSourceTimeStamp = (clsidInput == GUIDFromCString(L"{A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}") // Daum PotPlayer's MKV Source
+											   || clsidInput == CLSID_WMAsfReader); // WM ASF Reader
 
 		m_bCalculateStopTime = (m_nCodecId == AV_CODEC_ID_H264 ||
 								m_nCodecId == AV_CODEC_ID_DIRAC ||
@@ -2274,11 +2274,6 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		}
 
 		DetectVideoCard_EVR(pReceivePin);
-		
-		CLSID ClsidSourceFilter = GetCLSID(m_pInput->GetConnected());
-		if ((ClsidSourceFilter == __uuidof(CMpegSourceFilter)) || (ClsidSourceFilter == __uuidof(CMpegSplitterFilter))) {
-			m_bReorderBFrame = false;
-		}
 	}
 
 	return __super::CompleteConnect (direction, pReceivePin);
