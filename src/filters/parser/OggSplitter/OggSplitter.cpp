@@ -652,6 +652,7 @@ COggSourceFilter::COggSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 
 COggSplitterOutputPin::COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterOutputPin(pName, pFilter, pLock, phr)
+	, m_rtLast(0)
 {
 	ResetState((DWORD)-1);
 }
@@ -714,8 +715,20 @@ void COggSplitterOutputPin::ResetState(DWORD seqnum)
 {
 	CAutoLock csAutoLock(&m_csPackets);
 	m_packets.RemoveAll();
-	m_lastpacket.Free();
+	m_lastPacketData.RemoveAll();
 	m_lastseqnum = seqnum;
+}
+
+void COggSplitterOutputPin::HandlePacket(DWORD TrackNumber, BYTE* pData, int len)
+{
+	CAutoPtr<CPacket> p(DNew CPacket());
+	p->TrackNumber = TrackNumber;
+	if (S_OK == UnpackPacket(p, pData, len)) {
+		m_rtLast = p->rtStop;
+
+		CAutoLock csAutoLock(&m_csPackets);
+		m_packets.AddTail(p);
+	}
 }
 
 HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
@@ -752,47 +765,33 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 		j += len;
 
 		if (len < 255 || pos == page.m_lens.GetTailPosition()) {
-			if (first == pos && (page.m_hdr.header_type_flag & OggPageHeader::continued)) {
-				// ASSERT(m_lastpacket);
-				if (m_lastpacket) {
-					int size = m_lastpacket->GetCount();
-					m_lastpacket->SetCount(size + j - i);
-					memcpy(m_lastpacket->GetData() + size, pData + i, j - i);
+			if (last == pos && page.m_hdr.granule_position != -1) {
+				const REFERENCE_TIME rt = GetRefTime(page.m_hdr.granule_position);
+				if (llabs(rt - m_rtLast) > GetRefTime(1)) {
+					m_rtLast = rt;
+				}
+			}
 
-					CAutoLock csAutoLock(&m_csPackets);
+			if (first == pos && (page.m_hdr.header_type_flag & OggPageHeader::continued)) {
+				if (!m_lastPacketData.IsEmpty()) {
+					const size_t size = m_lastPacketData.GetCount();
+					m_lastPacketData.SetCount(size + j - i);
+					memcpy(m_lastPacketData.GetData() + size, pData + i, j - i);
 
 					if (len < 255) {
-						m_packets.AddTail(m_lastpacket);
+						HandlePacket(page.m_hdr.bitstream_serial_number, m_lastPacketData.GetData(), m_lastPacketData.GetCount());
+						m_lastPacketData.RemoveAll();
 					}
 				}
 			} else {
-				CAutoPtr<CPacket> p(DNew CPacket());
-
-				if (last == pos && page.m_hdr.granule_position != -1) {
-					REFERENCE_TIME rtLast = m_rtLast;
-					m_rtLast = GetRefTime(page.m_hdr.granule_position);
-
-					// some bad encodings have a +/-1 frame difference from the normal timeline,
-					// but these seem to cancel eachother out nicely so we can just ignore them
-					// to make it play a bit more smooth.
-					if (abs(rtLast - m_rtLast) == GetRefTime(1)) {
-						m_rtLast = rtLast;	// FIXME
-					}
-				}
-
-				p->TrackNumber = page.m_hdr.bitstream_serial_number;
-
-				if (S_OK == UnpackPacket(p, pData + i, j - i)) {
-					CAutoLock csAutoLock(&m_csPackets);
-
-					m_rtLast = p->rtStop;
-					if (len < 255) {
-						m_packets.AddTail(p);
-					} else {
-						m_lastpacket = p;
-					}
+				if (len < 255) {
+					HandlePacket(page.m_hdr.bitstream_serial_number, pData + i, j - i);
+				} else {
+					m_lastPacketData.SetCount(j - i);
+					memcpy(m_lastPacketData.GetData(), pData + i, j - i);
 				}
 			}
+			
 			i = j;
 		}
 	}
@@ -1546,7 +1545,7 @@ HRESULT COggDiracOutputPin::InitDirac(BYTE* p, int nCount)
 		return S_FALSE;
 	}
 
-	m_rtAvgTimePerFrame = params.AvgTimePerFrame;
+	m_rtAvgTimePerFrame = max(1, params.AvgTimePerFrame);
 
 	CMediaType mt;
 
@@ -1577,18 +1576,19 @@ HRESULT COggDiracOutputPin::InitDirac(BYTE* p, int nCount)
 
 REFERENCE_TIME COggDiracOutputPin::GetRefTime(__int64 granule_position)
 {
-	REFERENCE_TIME pts = 0;
+	REFERENCE_TIME pts_out = 0;
 
 	if (m_bOldDirac) {
-		REFERENCE_TIME iframe = granule_position >> 30;
-		REFERENCE_TIME pframe = granule_position & 0x3fffffff;
-		pts                   = (iframe + pframe) * m_rtAvgTimePerFrame;
+		const REFERENCE_TIME iframe = granule_position >> 30;
+		const REFERENCE_TIME pframe = granule_position & 0x3fffffff;
+		pts_out                     = (iframe + pframe) * m_rtAvgTimePerFrame;
 	} else {
-		REFERENCE_TIME dts    = (granule_position >> 31);
-		pts                   = (dts + ((granule_position >> 9) & 0x1fff)) * m_rtAvgTimePerFrame / 2;
+		const REFERENCE_TIME dts    = granule_position >> 31;
+		const REFERENCE_TIME pts    = dts + ((granule_position >> 9) & 0x1fff);
+		pts_out                     = pts * m_rtAvgTimePerFrame / 2;
 	}
 
-	return pts;
+	return pts_out;
 }
 
 HRESULT COggDiracOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len)
@@ -1601,9 +1601,9 @@ HRESULT COggDiracOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int 
 		return E_FAIL;
 	}
 
-	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast == INVALID_TIME ? m_rtLast : (m_rtLast + (m_rtAvgTimePerFrame > 0 ? m_rtAvgTimePerFrame : 1));
-	p->bSyncPoint	= (p->rtStart != INVALID_TIME);
+	p->rtStart    = m_rtLast;
+	p->rtStop     = m_rtLast != INVALID_TIME ? m_rtLast + m_rtAvgTimePerFrame : INVALID_TIME;
+	p->bSyncPoint = (p->rtStart != INVALID_TIME);
 	p->SetData(pData, len);
 
 	return S_OK;

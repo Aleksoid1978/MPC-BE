@@ -45,7 +45,7 @@ class COggSplitterOutputPin : public CBaseSplitterOutputPin
 protected:
 	CCritSec m_csPackets;
 	CAutoPtrList<CPacket> m_packets;
-	CAutoPtr<CPacket> m_lastpacket;
+	CAtlArray<BYTE> m_lastPacketData;
 	DWORD m_lastseqnum;
 	REFERENCE_TIME m_rtLast;
 	bool m_fSetKeyFrame;
@@ -58,6 +58,7 @@ public:
 	void AddComment(BYTE* p, int len);
 	CStringW GetComment(CStringW key);
 
+	void HandlePacket(DWORD TrackNumber, BYTE* pData, int len);
 	HRESULT UnpackPage(OggPage& page);
 	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len) PURE;
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position) PURE;
