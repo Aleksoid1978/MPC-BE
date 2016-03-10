@@ -22,17 +22,17 @@
 #include <Windows.h>
 #include "SysVersion.h"
 
-static OSVERSIONINFOEX osvi = { sizeof(OSVERSIONINFOEX), 0, 0, 0, 0, _T(""), 0, 0, 0, 0, 0 };
+static WORD InitGetSysVersion()
+{
+	OSVERSIONINFOEX osvi = { sizeof(osvi) };
+	GetVersionEx((LPOSVERSIONINFO)&osvi);
+
+	return MAKEWORD(osvi.dwMinorVersion, osvi.dwMajorVersion);
+}
 
 WORD GetSysVersion()
 {
-	static WORD ver = 0;
-
-	if (osvi.dwMajorVersion == 0) {
-		GetVersionEx((LPOSVERSIONINFOW)&osvi);
-		ver = MAKEWORD(osvi.dwMinorVersion, osvi.dwMajorVersion);
-	}
-
+	const static WORD ver = InitGetSysVersion();
 	return ver;
 }
 
@@ -91,25 +91,24 @@ BOOL IsWin10orLater()
 	return (GetSysVersion() >= 0x0A00);
 }
 
-BOOL IsWow64()
-{
-	typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
-	static LPFN_ISWOW64PROCESS fnIsWow64Process = NULL;
-	BOOL bIsWow64 = FALSE;
-	if (NULL == fnIsWow64Process) {
-		fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle(_T("kernel32")), "IsWow64Process");
-	}
-	if (NULL != fnIsWow64Process) {
-		fnIsWow64Process(GetCurrentProcess(), &bIsWow64);
-	}
-	return bIsWow64;
-}
-
-BOOL IsW64()
+static BOOL InitIsW64()
 {
 #ifdef _WIN64
 	return TRUE;
 #endif
 
-	return IsWow64();
+	typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
+	LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle(L"kernel32"), "IsWow64Process");
+	BOOL bIsWow64 = FALSE;
+	if (fnIsWow64Process) {
+		fnIsWow64Process(GetCurrentProcess(), &bIsWow64);
+	}
+	
+	return bIsWow64;
+}
+
+BOOL IsW64()
+{
+	const static BOOL bIsW64 = InitIsW64();
+	return bIsW64;
 }
