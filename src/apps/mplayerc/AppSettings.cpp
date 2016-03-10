@@ -2044,7 +2044,7 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
 				nCLSwitches |= CLSW_HELP|CLSW_UNRECOGNIZEDSWITCH;
 			}
 		} else if (param == _T("-")) { // Special case: standard input
-			slFiles.AddTail(_T("pipe:0"));
+			slFiles.AddTail(_T("pipe://stdin"));
 		} else {
 			slFiles.AddTail(ParseFileName(param));
 		}
