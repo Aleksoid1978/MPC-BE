@@ -13054,7 +13054,11 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 		title = fname + L" - " + m_strTitle;
 	}
 
-	SetWindowText(title);
+	CString curTitle;
+	GetWindowText(curTitle);
+	if (curTitle != title) {
+		SetWindowText(title);
+	}
 	m_Lcd.SetMediaTitle(LPCTSTR(fn));
 }
 
