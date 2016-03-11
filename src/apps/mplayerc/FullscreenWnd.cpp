@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -196,6 +196,10 @@ BOOL CFullscreenWnd::PreCreateWindow(CREATESTRUCT& cs)
 	if (!CWnd::PreCreateWindow(cs)) {
 		return FALSE;
 	}
+
+	m_hCursor = ::LoadCursor(NULL, IDC_ARROW);
+	m_bCursorVisible = false;
+	m_bTrackingMouseLeave = false;
 
 	cs.style &= ~WS_BORDER;
 	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_NOCLOSE,
