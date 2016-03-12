@@ -227,8 +227,10 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 					const stream& s = streams.GetNext(pos);
 					const SyncPoints& sps = m_SyncPoints[s];
 					for (size_t i = 1; i < sps.GetCount(); i++) {
-						if (sps[i].rt > m_rtMax && sps[i].fp > posMax
-								&& ((sps[i].rt - m_rtMax) < maxDelta)) {
+						if (sps[i].rt > m_rtMax && sps[i].fp > posMax) {
+							if ((sps[i].rt - m_rtMax) >= maxDelta && (sps[i].fp - posMax) < 100 * MEGABYTE) {
+								continue;
+							}
 							m_rtMax	= sps[i].rt;
 							posMax	= sps[i].fp;
 						}
