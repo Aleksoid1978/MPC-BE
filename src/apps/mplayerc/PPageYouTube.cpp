@@ -42,7 +42,7 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO1, m_iYoutubeFormatCtrl);
 	DDX_Control(pDX, IDC_CHECK1, m_chkYoutubeLoadPlaylist);
 	DDX_Radio(pDX, IDC_RADIO1, m_iYoutubeSourceType);
-	DDX_Radio(pDX, IDC_RADIO3, m_iYoutubeMemoryType);
+	DDX_Radio(pDX, IDC_RADIO4, m_iYoutubeMemoryType);
 	DDX_Control(pDX, IDC_SPIN1, m_nPercentMemoryCtrl);
 	DDX_Control(pDX, IDC_SPIN2, m_nMbMemoryCtrl);
 	DDX_Text(pDX, IDC_EDIT1, m_iYoutubePercentMemory);
@@ -54,7 +54,7 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
 	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO1, IDC_RADIO2, OnBnClickedRadio12)
-	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO3, IDC_RADIO4, OnBnClickedRadio34)
+	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO4, IDC_RADIO5, OnBnClickedRadio34)
 END_MESSAGE_MAP()
 
 // CPPageYoutube message handlers
@@ -62,6 +62,8 @@ END_MESSAGE_MAP()
 BOOL CPPageYoutube::OnInitDialog()
 {
 	__super::OnInitDialog();
+
+	GetDlgItem(IDC_RADIO3)->ShowWindow(SW_HIDE);
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 
@@ -177,8 +179,8 @@ void CPPageYoutube::UpdateMemoryCtrl()
 	switch (GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO2)) {
 		case IDC_RADIO1: {
 			GetDlgItem(IDC_STATIC3)->ShowWindow(TRUE);
-			GetDlgItem(IDC_RADIO3)->ShowWindow(TRUE);
 			GetDlgItem(IDC_RADIO4)->ShowWindow(TRUE);
+			GetDlgItem(IDC_RADIO5)->ShowWindow(TRUE);
 			GetDlgItem(IDC_EDIT1)->ShowWindow(TRUE);
 			GetDlgItem(IDC_EDIT2)->ShowWindow(TRUE);
 			GetDlgItem(IDC_SPIN1)->ShowWindow(TRUE);
@@ -187,8 +189,8 @@ void CPPageYoutube::UpdateMemoryCtrl()
 		break;
 		case IDC_RADIO2: {
 			GetDlgItem(IDC_STATIC3)->ShowWindow(FALSE);
-			GetDlgItem(IDC_RADIO3)->ShowWindow(FALSE);
 			GetDlgItem(IDC_RADIO4)->ShowWindow(FALSE);
+			GetDlgItem(IDC_RADIO5)->ShowWindow(FALSE);
 			GetDlgItem(IDC_EDIT1)->ShowWindow(FALSE);
 			GetDlgItem(IDC_EDIT2)->ShowWindow(FALSE);
 			GetDlgItem(IDC_SPIN1)->ShowWindow(FALSE);

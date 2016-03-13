@@ -511,15 +511,17 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI 핸들러: (.확장명1=경로1;.확장명2=경로2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
-5		"우선 포맷"
-7		"Load playlist"
-8		"Source 선택"
-9		"Internal"
-10		"파일 Source"
-11		"Initial buffer size"
-12		"% of source file size"
-13		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
+5		"Additional settings"
+6		"우선 포맷:"
+8		"Load playlist"
+9		"Source"
+10		"Internal downloader"
+11		"파일 Source"
+12		"External source filter"
+13		"Initial buffer size"
+14		"% of source file size"
+15		"Mb"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

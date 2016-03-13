@@ -511,15 +511,17 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI komutları: (.uzantı1=yol1;.uzantı2=yol2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
-5		"Tercih edilen biçim"
-7		"Load playlist"
-8		"Kaynak Seç"
-9		"Dahili"
-10		"Dosya Kaynağı"
-11		"Initial buffer size"
-12		"% of source file size"
-13		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
+5		"Additional settings"
+6		"Tercih edilen biçim:"
+8		"Load playlist"
+9		"Source"
+10		"Internal downloader"
+11		"Dosya Kaynağı"
+12		"External source filter"
+13		"Initial buffer size"
+14		"% of source file size"
+15		"Mb"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

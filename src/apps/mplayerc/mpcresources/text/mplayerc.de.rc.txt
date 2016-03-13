@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Über MPC-BE"
 7		"MPC-BE"
 8		"Copyright © 2002-2016 MPC-BE Team, siehe Authors.txt Datei"
@@ -511,15 +511,17 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI-Handler (.ext1=Pfad1; .ext2=Pfad2; ...):"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
-5		"Bevorzugtes Format"
-7		"Wiedergabeliste laden"
-8		"Quelle auswählen"
-9		"Intern"
-10		"Dateiquelle"
-11		"Anfangspuffergröße"
-12		"Quelldateigröße (in %)"
-13		"MB"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
+5		"Additional settings"
+6		"Bevorzugtes Format:"
+8		"Wiedergabeliste laden"
+9		"Source"
+10		"Internal downloader"
+11		"Dateiquelle"
+12		"External source filter"
+13		"Anfangspuffergröße"
+14		"Quelldateigröße (in %)"
+15		"MB"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

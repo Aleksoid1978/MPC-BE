@@ -511,15 +511,17 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI kudeatzaileak: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
-5		"Heuskarri Hobetsia"
-7		"Gertatu irakur-zerrenda"
-8		"Hautatu Iturburua"
-9		"Barnekoa"
-10		"Agiri Iturburua"
-11		"Hasierako buffer neurria"
-12		"Iturburu agiri neurriaren %-a"
-13		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
+5		"Additional settings"
+6		"Heuskarri Hobetsia:"
+8		"Gertatu irakur-zerrenda"
+9		"Source"
+10		"Internal downloader"
+11		"Agiri Iturburua"
+12		"External source filter"
+13		"Hasierako buffer neurria"
+14		"Iturburu agiri neurriaren %-a"
+15		"Mb"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
