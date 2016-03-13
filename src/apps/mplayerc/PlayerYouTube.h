@@ -65,10 +65,12 @@ static const YOUTUBE_PROFILES youtubeVideoProfiles[] = {
 	{315,	y_webm_video_60fps,	2160,	_T("webm")},
 	{308,	y_webm_video_60fps,	1440,	_T("webm")},
 	{303,	y_webm_video_60fps,	1080,	_T("webm")},
+	{302,	y_webm_video_60fps,	 720,	_T("webm")},
 	// VP9
 	{313,	y_webm_video,		2160,	_T("webm")},
 	{271,	y_webm_video,		1440,	_T("webm")},
 	{248,	y_webm_video,		1080,	_T("webm")},
+	{247,	y_webm_video,		 720,	_T("webm")},
 #if ENABLE_YOUTUBE_3D
 	{84,	y_3d_mp4,			 720,	_T("mp4") },
 	{83,	y_3d_mp4,			 480,	_T("mp4") },
