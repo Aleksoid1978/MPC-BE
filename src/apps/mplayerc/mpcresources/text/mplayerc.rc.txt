@@ -513,7 +513,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
 5		"Additional settings"
-6		"Preferred format"
+6		"Preferred format:"
 8		"Load playlist"
 9		"Source"
 10		"Internal downloader"

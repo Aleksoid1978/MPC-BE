@@ -11856,7 +11856,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	m_strUrl.Empty();
 
 	CString youtubeUrl;
-	if (pOFD->fns.GetCount() == 1) {
+	if (s.iYoutubeSource < 2 && pOFD->fns.GetCount() == 1) {
 		CString fn = (CString)pOFD->fns.GetHead();
 		if (PlayerYouTubeCheck(fn)) {
 			youtubeUrl = fn;
