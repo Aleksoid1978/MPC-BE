@@ -53,8 +53,8 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
-	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO1, IDC_RADIO2, OnBnClickedRadio12)
-	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO4, IDC_RADIO5, OnBnClickedRadio34)
+	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO1, IDC_RADIO3, OnBnClickedRadio13)
+	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO4, IDC_RADIO5, OnBnClickedRadio45)
 END_MESSAGE_MAP()
 
 // CPPageYoutube message handlers
@@ -62,8 +62,6 @@ END_MESSAGE_MAP()
 BOOL CPPageYoutube::OnInitDialog()
 {
 	__super::OnInitDialog();
-
-	GetDlgItem(IDC_RADIO3)->ShowWindow(SW_HIDE);
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 
@@ -135,7 +133,7 @@ BOOL CPPageYoutube::OnInitDialog()
 	m_nPercentMemoryCtrl.SetRange(1, 100);
 	m_nMbMemoryCtrl.SetRange(1, 128);
 
-	m_iYoutubeSourceType	= s.iYoutubeSource ? 1 : 0;
+	m_iYoutubeSourceType	= min(max(0, s.iYoutubeSource), 3);
 	m_iYoutubeMemoryType	= s.iYoutubeMemoryType ? 1 : 0;
 	m_iYoutubePercentMemory	= s.iYoutubePercentMemory;
 	m_iYoutubeMbMemory		= s.iYoutubeMbMemory;
@@ -163,21 +161,26 @@ BOOL CPPageYoutube::OnApply()
 	return __super::OnApply();
 }
 
-void CPPageYoutube::OnBnClickedRadio12(UINT nID)
+void CPPageYoutube::OnBnClickedRadio13(UINT nID)
 {
 	SetModified();
 	UpdateMemoryCtrl();
 }
 
-void CPPageYoutube::OnBnClickedRadio34(UINT nID)
+void CPPageYoutube::OnBnClickedRadio45(UINT nID)
 {
 	SetModified();
 }
 
 void CPPageYoutube::UpdateMemoryCtrl()
 {
-	switch (GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO2)) {
-		case IDC_RADIO1: {
+	switch (GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO3)) {
+		case IDC_RADIO1:
+			GetDlgItem(IDC_STATIC1)->ShowWindow(TRUE);
+			GetDlgItem(IDC_STATIC2)->ShowWindow(TRUE);
+			GetDlgItem(IDC_COMBO1)->ShowWindow(TRUE);
+			GetDlgItem(IDC_CHECK1)->ShowWindow(TRUE);
+
 			GetDlgItem(IDC_STATIC3)->ShowWindow(TRUE);
 			GetDlgItem(IDC_RADIO4)->ShowWindow(TRUE);
 			GetDlgItem(IDC_RADIO5)->ShowWindow(TRUE);
@@ -185,9 +188,13 @@ void CPPageYoutube::UpdateMemoryCtrl()
 			GetDlgItem(IDC_EDIT2)->ShowWindow(TRUE);
 			GetDlgItem(IDC_SPIN1)->ShowWindow(TRUE);
 			GetDlgItem(IDC_SPIN2)->ShowWindow(TRUE);
-		}
-		break;
-		case IDC_RADIO2: {
+			break;
+		case IDC_RADIO2:
+			GetDlgItem(IDC_STATIC1)->ShowWindow(TRUE);
+			GetDlgItem(IDC_STATIC2)->ShowWindow(TRUE);
+			GetDlgItem(IDC_COMBO1)->ShowWindow(TRUE);
+			GetDlgItem(IDC_CHECK1)->ShowWindow(TRUE);
+
 			GetDlgItem(IDC_STATIC3)->ShowWindow(FALSE);
 			GetDlgItem(IDC_RADIO4)->ShowWindow(FALSE);
 			GetDlgItem(IDC_RADIO5)->ShowWindow(FALSE);
@@ -195,7 +202,20 @@ void CPPageYoutube::UpdateMemoryCtrl()
 			GetDlgItem(IDC_EDIT2)->ShowWindow(FALSE);
 			GetDlgItem(IDC_SPIN1)->ShowWindow(FALSE);
 			GetDlgItem(IDC_SPIN2)->ShowWindow(FALSE);
-		}
-		break;
+			break;
+		case IDC_RADIO3:
+			GetDlgItem(IDC_STATIC1)->ShowWindow(FALSE);
+			GetDlgItem(IDC_STATIC2)->ShowWindow(FALSE);
+			GetDlgItem(IDC_COMBO1)->ShowWindow(FALSE);
+			GetDlgItem(IDC_CHECK1)->ShowWindow(FALSE);
+
+			GetDlgItem(IDC_STATIC3)->ShowWindow(FALSE);
+			GetDlgItem(IDC_RADIO4)->ShowWindow(FALSE);
+			GetDlgItem(IDC_RADIO5)->ShowWindow(FALSE);
+			GetDlgItem(IDC_EDIT1)->ShowWindow(FALSE);
+			GetDlgItem(IDC_EDIT2)->ShowWindow(FALSE);
+			GetDlgItem(IDC_SPIN1)->ShowWindow(FALSE);
+			GetDlgItem(IDC_SPIN2)->ShowWindow(FALSE);
+			break;
 	}
 }

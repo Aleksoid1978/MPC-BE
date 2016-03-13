@@ -46,8 +46,8 @@ public:
 	DWORD m_iYoutubePercentMemory;
 	DWORD m_iYoutubeMbMemory;
 
-	afx_msg void OnBnClickedRadio12(UINT nID);
-	afx_msg void OnBnClickedRadio34(UINT nID);
+	afx_msg void OnBnClickedRadio13(UINT nID);
+	afx_msg void OnBnClickedRadio45(UINT nID);
 
 	void UpdateMemoryCtrl();
 
