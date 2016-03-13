@@ -11853,6 +11853,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	bool bFirst = true;
 	m_youtubeFields.Empty();
 
+	m_strUrl.Empty();
+
 	CString youtubeUrl;
 	if (pOFD->fns.GetCount() == 1) {
 		CString fn = (CString)pOFD->fns.GetHead();
@@ -11865,6 +11867,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				while (pos) {
 					pOFD->fns.AddTail(urls.GetNext(pos));
 				}
+
+				m_strUrl = pOFD->fns.GetHead().GetName();
 
 				if (pOFD->fns.GetCount() == 1) {
 					fn = (CString)pOFD->fns.GetHead();
@@ -11905,8 +11909,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 	}
-
-	m_strUrl.Empty();
 
 	POSITION pos = pOFD->fns.GetHeadPosition();
 	while (pos) {
