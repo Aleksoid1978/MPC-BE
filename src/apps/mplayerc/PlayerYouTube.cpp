@@ -659,7 +659,9 @@ bool PlayerYouTube(CString url, CAtlList<CString>& urls, YOUTUBE_FIELDS& y_field
 
 				if (!final_audio_url.IsEmpty()) {
 					const YOUTUBE_PROFILES* current = getProfile(final_video_itag, youtubeProfiles::VIDEO_PROFILE);
-					if (current->quality >= 1080) {
+					if (current->quality > 720
+							|| current->type == y_webm_video_60fps
+							|| current->type == y_webm_video) {
 						urls.AddTail(final_audio_url);
 					}
 				}
