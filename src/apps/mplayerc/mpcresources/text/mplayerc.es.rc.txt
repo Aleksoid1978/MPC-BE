@@ -511,15 +511,17 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Tratantes de CGI: (.ext1=ruta1;.ext2=ruta2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
-5		"Preferred format"
-7		"Load playlist"
-8		"Select Source"
-9		"Internal"
-10		"File Source (URL)"
-11		"Initial buffer size"
-12		"% of source file size"
-13		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
+5		"Additional settings"
+6		"Preferred format:"
+8		"Load playlist"
+9		"Source"
+10		"Internal downloader"
+11		"File Source (URL)"
+12		"External source filter"
+13		"Initial buffer size"
+14		"% of source file size"
+15		"Mb"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

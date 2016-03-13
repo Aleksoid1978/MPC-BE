@@ -511,15 +511,17 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI 處理器: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
-5		"偏好格式"
-7		"載入播放清單"
-8		"選擇來源"
-9		"內部"
-10		"檔案來源"
-11		"初始緩衝大小"
-12		"來源檔案大小的百份之"
-13		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
+5		"Additional settings"
+6		"偏好格式:"
+8		"載入播放清單"
+9		"Source"
+10		"Internal downloader"
+11		"檔案來源"
+12		"External source filter"
+13		"初始緩衝大小"
+14		"來源檔案大小的百份之"
+15		"Mb"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

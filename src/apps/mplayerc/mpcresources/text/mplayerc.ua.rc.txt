@@ -511,15 +511,17 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Інтерпретація CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 18
-5		"Вибір формату перегляду"
-7		"Завантажити список відтворення"
-8		"Вибір фільтра джерела"
-9		"Внутрішній"
-10		"Системний"
-11		"Початковий розмір буфера"
-12		"% від розміру файла джерела"
-13		"Мб"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
+5		"Additional settings"
+6		"Вибір формату перегляду:"
+8		"Завантажити список відтворення"
+9		"Source"
+10		"Internal downloader"
+11		"Системний"
+12		"External source filter"
+13		"Початковий розмір буфера"
+14		"% від розміру файла джерела"
+15		"Мб"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
