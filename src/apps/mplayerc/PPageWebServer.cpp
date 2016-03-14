@@ -63,8 +63,8 @@ void CPPageWebServer::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT3, m_WebServerCGI);
 	DDX_Text(pDX, IDC_EDIT9, m_WebDefIndex);
 
-	m_nWebServerPort = min(max(APP_WEBSRVPORT_MIN, m_nWebServerPort), APP_WEBSRVPORT_MAX);
-	m_nWebServerQuality = min(max(APP_WEBSRVQUALITY_MIN, m_nWebServerQuality), APP_WEBSRVQUALITY_MAX);
+	m_nWebServerPort = clamp(m_nWebServerPort, APP_WEBSRVPORT_MIN, APP_WEBSRVPORT_MAX);
+	m_nWebServerQuality = clamp(m_nWebServerQuality, APP_WEBSRVQUALITY_MIN, APP_WEBSRVQUALITY_MAX);
 }
 
 BOOL CPPageWebServer::PreTranslateMessage(MSG* pMsg)

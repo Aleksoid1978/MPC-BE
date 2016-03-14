@@ -207,7 +207,7 @@ template <typename T, typename D>
 // If the specified value is out of range, set to default values.
 extern inline T discard(T const& val, T const& lo, T const& hi, D const& def)
 {
-	return (val > hi) ? def : (val < lo) ? def : val;
+	return (val > hi || val < lo) ? def : val;
 }
 
 enum FRAME_TYPE {

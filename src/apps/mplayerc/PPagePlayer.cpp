@@ -82,7 +82,7 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT1, m_nRecentFiles);
 	DDX_Control(pDX, IDC_SPIN1, m_RecentFilesCtrl);
 
-	m_nRecentFiles = min(max(APP_RECENTFILES_MIN, m_nRecentFiles), APP_RECENTFILES_MAX);
+	m_nRecentFiles = clamp(m_nRecentFiles, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayer, CPPageBase)
@@ -258,7 +258,7 @@ void CPPagePlayer::OnUpdateOSD(CCmdUI* pCmdUI)
 
 void CPPagePlayer::OnKillFocusEdit1()
 {
-	m_nRecentFiles = min(max(APP_RECENTFILES_MIN, m_nRecentFiles), APP_RECENTFILES_MAX); // CSpinButtonCtrl.SetRange() does not affect the manual input
+	m_nRecentFiles = clamp(m_nRecentFiles, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX); // CSpinButtonCtrl.SetRange() does not affect the manual input
 
 	UpdateData(FALSE);
 }

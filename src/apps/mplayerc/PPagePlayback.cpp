@@ -188,7 +188,7 @@ BOOL CPPagePlayback::OnApply()
 	s.fRewind = !!m_fRewind;
 	s.iZoomLevel = m_cmbZoomLevel.GetCurSel();
 	s.fRememberZoomLevel = !!m_chkRememberZoomLevel.GetCheck();
-	s.nAutoFitFactor = m_nAutoFitFactor = min(max(20, m_nAutoFitFactor), 80);
+	s.nAutoFitFactor = m_nAutoFitFactor = clamp(m_nAutoFitFactor, 20, 80);
 	s.nAudioWindowMode = m_cbAudioWindowMode.GetCurSel();
 	s.bAddSimilarFiles = !!m_bAddSimilarFiles;
 	s.fEnableWorkerThreadForOpening = !!m_fEnableWorkerThreadForOpening;
