@@ -1404,7 +1404,7 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 								if (abs(rtDiff) >= UNITS) {
 									const REFERENCE_TIME rtPos = m_wndSeekBar.GetPos();
 									REFERENCE_TIME rtNewPos = rtPos + rtDiff;
-									rtNewPos = CLAMP(rtNewPos, 0, stop);
+									rtNewPos = clamp(rtNewPos, 0LL, stop);
 									const bool bHighPrecision = !!m_wndSubresyncBar.IsWindowVisible();
 									
 									m_wndStatusBar.SetStatusTimer(rtNewPos, stop, bHighPrecision, GetTimeFormat());

@@ -36,9 +36,6 @@
                   (((DWORD)(ch4) & 0xFF000000) >> 24))
 #endif
 
-#define CLAMP(a, min, max) ((a)>(max)?(max):(a)<(min)?(min):(a))
-#define CLAMPDEF(a, min, max, def) ((a)>(max)||(a)<(min)?(def):(a))
-
 #define SCALE64(a, b, c) (__int64)((double)(a) * (b) / (c))
 
 #define LCID_NOSUBTITLES	-1
@@ -198,6 +195,20 @@ extern void				ReduceDim(SIZE &dim);
 extern SIZE				ReduceDim(double value);
 
 extern inline const LONGLONG GetPerfCounter();
+
+// Clamps the specified value to the specified minimum and maximum range.
+template <typename T>
+extern inline T clamp(T const& val, T const& lo, T const& hi)
+{
+	return (val > hi) ? hi : (val < lo) ? lo : val;
+}
+
+// If the specified value is out of range, set to default values.
+template <typename T, typename D>
+extern inline T discard(T const& val, T const& lo, T const& hi, D const& def)
+{
+	return (val > hi) ? def : (val < lo) ? def : val;
+}
 
 enum FRAME_TYPE {
 	PICT_NONE,

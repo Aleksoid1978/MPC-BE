@@ -1005,9 +1005,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fRewind = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REWIND, FALSE);
 	iZoomLevel = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ZOOM, 1);
 	nAutoFitFactor = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, 50);
-	nAutoFitFactor = CLAMP(nAutoFitFactor, 20, 80);
+	nAutoFitFactor = clamp(nAutoFitFactor, 20, 80);
 	nVolumeStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, 5);
-	nVolumeStep = CLAMP(nVolumeStep, 1, 10);
+	nVolumeStep = clamp(nVolumeStep, 1, 10);
 	nSpeedStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, 0);
 	if (nSpeedStep != 10 && nSpeedStep != 20 && nSpeedStep != 25 && nSpeedStep != 50 && nSpeedStep != 100) {
 		nSpeedStep = 0;
@@ -1123,7 +1123,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	sizeAspectRatio.cy = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, 0);
 	fKeepHistory = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, 1);
 	iRecentFilesNumber = (int)pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, APP_RECENTFILES_DEF);
-	iRecentFilesNumber = CLAMP(iRecentFilesNumber, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
+	iRecentFilesNumber = clamp(iRecentFilesNumber, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 	MRU.SetSize(iRecentFilesNumber);
 	MRUDub.SetSize(iRecentFilesNumber);
 
@@ -1180,7 +1180,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iAudioTimeShift					= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, 0);
 
 	iBufferDuration					= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, 3000);
-	iBufferDuration = CLAMPDEF(iBufferDuration, 100, 10000, 3000);
+	iBufferDuration = discard(iBufferDuration, 100, 10000, 3000);
 
 	bAudioMixer				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, FALSE);
 	nAudioMixerLayout		= SPK_STEREO;
@@ -1193,7 +1193,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		}
 	}
 	fAudioGain_dB			= (float)_tstof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, _T("0")));
-	fAudioGain_dB			= CLAMPDEF(fAudioGain_dB, -3.0f, 10.0f, 0.0f);
+	fAudioGain_dB			= discard(fAudioGain_dB, -3.0f, 10.0f, 0.0f);
 	bAudioAutoVolumeControl	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, FALSE);
 	bAudioNormBoost			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, TRUE);
 	iAudioNormLevel			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, 75);
@@ -1448,7 +1448,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fLCDSupport		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LCD_SUPPORT, FALSE);
 	fSmartSeek		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK, FALSE);
 	iSmartSeekSize	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_SIZE, 15);
-	iSmartSeekSize	= CLAMP(iSmartSeekSize, 10, 30);
+	iSmartSeekSize	= clamp(iSmartSeekSize, 10, 30);
 	fChapterMarker	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, FALSE);
 	fFlybar			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, TRUE);
 	fFlybarOnTop	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, FALSE);
@@ -1535,7 +1535,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	bUpdaterAutoCheck		= !!pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, 0);
 	nUpdaterDelay			= pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, 7);
-	nUpdaterDelay			= CLAMP(nUpdaterDelay, 1, 365);
+	nUpdaterDelay			= clamp(nUpdaterDelay, 1, 365);
 
 	tUpdaterLastCheck		= 0; // force check if the previous check undefined
 	if (pApp->GetProfileBinary(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, &ptr, &len)) {

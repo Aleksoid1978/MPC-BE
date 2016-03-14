@@ -1524,7 +1524,7 @@ static void decodeps2adpcm(ps2_state_t& s, int channel, BYTE* pin, int16_t* pout
 		a = b;
 		b = output;
 
-		*pout++ = (int16_t)min(max(INT16_MIN, output), INT16_MAX);
+		*pout++ = (int16_t)clamp(output, INT16_MIN, (int)INT16_MAX);
 	}
 }
 
