@@ -196,15 +196,15 @@ extern SIZE				ReduceDim(double value);
 
 extern inline const LONGLONG GetPerfCounter();
 
-// Clamps the specified value to the specified minimum and maximum range.
 template <typename T>
+// Clamps the specified value to the specified minimum and maximum range.
 extern inline T clamp(T const& val, T const& lo, T const& hi)
 {
 	return (val > hi) ? hi : (val < lo) ? lo : val;
 }
 
-// If the specified value is out of range, set to default values.
 template <typename T, typename D>
+// If the specified value is out of range, set to default values.
 extern inline T discard(T const& val, T const& lo, T const& hi, D const& def)
 {
 	return (val > hi) ? def : (val < lo) ? def : val;
