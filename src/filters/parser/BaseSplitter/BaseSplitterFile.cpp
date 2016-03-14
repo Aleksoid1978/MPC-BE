@@ -192,7 +192,7 @@ void CBaseSplitterFile::Seek(__int64 pos)
 	if (IsStreaming()) {
 		m_pos = pos;
 	} else {
-		m_pos = CLAMP(pos, 0, m_len);
+		m_pos = clamp(pos, 0LL, m_len);
 	}
 
 	BitFlush();

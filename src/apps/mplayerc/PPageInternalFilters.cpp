@@ -436,7 +436,7 @@ BOOL CPPageInternalFilters::OnInitDialog()
 	m_listVideo.UpdateCheckState();
 	m_listAudio.UpdateCheckState();
 
-	m_edtBufferDuration = CLAMP(s.iBufferDuration / 1000, 1, 10);
+	m_edtBufferDuration = clamp(s.iBufferDuration / 1000, 1, 10);
 	m_edtBufferDuration.SetRange(1, 10);
 	m_spnBufferDuration.SetRange(1, 10);
 
