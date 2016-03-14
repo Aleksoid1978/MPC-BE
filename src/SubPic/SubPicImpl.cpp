@@ -114,7 +114,7 @@ STDMETHODIMP CSubPicImpl::GetDirtyRect(RECT* pDirtyRect)
 	return pDirtyRect ? *pDirtyRect = m_rcDirty, S_OK : E_POINTER;
 }
 
-STDMETHODIMP CSubPicImpl::GetSourceAndDest(RECT rcWindow, RECT rcVideo, BOOL bPositionRelative, CPoint ShiftPos, RECT* pRcSource, RECT* pRcDest) const
+STDMETHODIMP CSubPicImpl::GetSourceAndDest(RECT rcWindow, RECT rcVideo, BOOL bPositionRelative, CPoint ShiftPos, RECT* pRcSource, RECT* pRcDest, int xOffsetInPixels) const
 {
 	CheckPointer(pRcSource, E_POINTER);
 	CheckPointer(pRcDest, E_POINTER);
@@ -140,7 +140,7 @@ STDMETHODIMP CSubPicImpl::GetSourceAndDest(RECT rcWindow, RECT rcVideo, BOOL bPo
 		CRect rcTemp = m_rcDirty;
 		*pRcSource = rcTemp;
 
-		rcTemp.OffsetRect(m_virtualTextureTopLeft);
+		rcTemp.OffsetRect(m_virtualTextureTopLeft + CPoint(xOffsetInPixels, 0));
 		rcTemp = CRect(lround(rcTemp.left   * scaleX),
 					   lround(rcTemp.top    * scaleY),
 					   lround(rcTemp.right  * scaleX),
