@@ -511,12 +511,16 @@ bool PlayerYouTube(CString url, CAtlList<CString>& urls, YOUTUBE_FIELDS& y_field
 					}
 				};
 
-				if (SelectBestProfile(final_video_itag, final_video_ext, itag, youtubeVideoSets, youtubeProfiles::VIDEO_PROFILE)) {
+				if (final_video_itag != youtubeVideoSets->iTag && SelectBestProfile(final_video_itag, final_video_ext, itag, youtubeVideoSets, youtubeProfiles::VIDEO_PROFILE)) {
 					final_video_url = url;
 					SignatureDecode(final_video_url);
 				} else if (SelectBestProfile(final_audio_itag, final_audio_ext, itag, youtubeAudioSets, youtubeProfiles::AUDIO_PROFILE)) {
 					final_audio_url = url;
 					SignatureDecode(final_audio_url);
+				}
+
+				if (final_video_itag == youtubeVideoSets->iTag && youtubeVideoSets->videoOnly == false) {
+					break;
 				}
 			}
 		}
@@ -659,9 +663,7 @@ bool PlayerYouTube(CString url, CAtlList<CString>& urls, YOUTUBE_FIELDS& y_field
 
 				if (!final_audio_url.IsEmpty()) {
 					const YOUTUBE_PROFILES* current = getProfile(final_video_itag, youtubeProfiles::VIDEO_PROFILE);
-					if (current->quality > 720
-							|| current->type == y_webm_video_60fps
-							|| current->type == y_webm_video) {
+					if (current->videoOnly == true) {
 						urls.AddTail(final_audio_url);
 					}
 				}
