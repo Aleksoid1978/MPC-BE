@@ -109,7 +109,7 @@ void CSubPicAllocatorPresenterImpl::InitMaxSubtitleTextureSize(int maxWidth, CSi
 	}
 }
 
-void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, SubPicDesc* pTarget)
+void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, SubPicDesc* pTarget, int xOffsetInPixels)
 {
 	if (m_pSubPicProvider) {
 		CComPtr<ISubPic> pSubPic;
@@ -120,25 +120,25 @@ void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, cons
 			if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE) {
 				CRect rcTemp(windowRect);
 				rcTemp.right -= rcTemp.Width() / 2;
-				AlphaBlt(rcTemp, videoRect, pSubPic, pTarget);
+				AlphaBlt(rcTemp, videoRect, pSubPic, pTarget, xOffsetInPixels);
 				rcSubs.left += rcSubs.Width() / 2;
 			} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM) {
 				CRect rcTemp(windowRect);
 				rcTemp.bottom -= rcTemp.Height() / 2;
-				AlphaBlt(rcTemp, videoRect, pSubPic, pTarget);
+				AlphaBlt(rcTemp, videoRect, pSubPic, pTarget, xOffsetInPixels);
 				rcSubs.top += rcSubs.Height() / 2;
 			}
 
-			AlphaBlt(rcSubs, videoRect, pSubPic, pTarget);
+			AlphaBlt(rcSubs, videoRect, pSubPic, pTarget, xOffsetInPixels);
 		}
 	}
 }
 
-void CSubPicAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget)
+void CSubPicAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget, int xOffsetInPixels)
 {
 	CRect rcSource, rcDest;
 	CRenderersSettings& rs = GetRenderersSettings();
-	if (SUCCEEDED(pSubPic->GetSourceAndDest(windowRect, videoRect, rs.bSubpicPosRelative, rs.SubpicShiftPos, rcSource, rcDest))) {
+	if (SUCCEEDED(pSubPic->GetSourceAndDest(windowRect, videoRect, rs.bSubpicPosRelative, rs.SubpicShiftPos, rcSource, rcDest, xOffsetInPixels))) {
 		pSubPic->AlphaBlt(rcSource, rcDest, pTarget);
 	}
 }

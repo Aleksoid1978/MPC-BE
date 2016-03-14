@@ -58,8 +58,8 @@ protected:
 	bool m_bPendingResetDevice;
 
 	void InitMaxSubtitleTextureSize(int maxWidth, CSize desktopSize);
-	void AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, SubPicDesc* pTarget = NULL);
-	void AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget);
+	void AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, SubPicDesc* pTarget = NULL, int xOffsetInPixels = 0);
+	void AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget = NULL, int xOffsetInPixels = 0);
 
 	XForm m_xform;
 	void Transform(CRect r, Vector v[4]);
