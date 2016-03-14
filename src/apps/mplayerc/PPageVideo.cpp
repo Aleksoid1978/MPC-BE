@@ -96,7 +96,7 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO4, m_cbCMAmbientLight);
 	DDX_Control(pDX, IDC_COMBO5, m_cbCMRenderingIntent);
 
-	m_iEvrBuffers = min(max(RS_EVRBUFFERS_MIN, m_iEvrBuffers), RS_EVRBUFFERS_MAX);
+	m_iEvrBuffers = clamp(m_iEvrBuffers, RS_EVRBUFFERS_MIN, RS_EVRBUFFERS_MAX);
 }
 
 BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)

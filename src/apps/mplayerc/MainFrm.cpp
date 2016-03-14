@@ -6048,9 +6048,9 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 
 	const int infoheight = 70;
 	const int margin	= 10;
-	const int width		= min(max(s.iThumbWidth, 256), 2560);
-	const int cols		= min(max(s.iThumbCols, 1), 10);
-	const int rows		= min(max(s.iThumbRows, 1), 20);
+	const int width		= clamp(s.iThumbWidth, 256, 2560);
+	const int cols		= clamp(s.iThumbCols, 1, 10);
+	const int rows		= clamp(s.iThumbRows, 1, 20);
 
 	CSize thumbsize;
 	thumbsize.cx		= (width - margin) / cols - margin;
@@ -7668,10 +7668,10 @@ void CMainFrame::OnViewPanNScanPresets(UINT nID)
 		return;
 	}
 
-	m_PosX = min(max(m_PosX, 0), 1);
-	m_PosY = min(max(m_PosY, 0), 1);
-	m_ZoomX = min(max(m_ZoomX, 0.2), 3);
-	m_ZoomY = min(max(m_ZoomY, 0.2), 3);
+	m_PosX = clamp(m_PosX, 0.0, 1.0);
+	m_PosY = clamp(m_PosY, 0.0, 1.0);
+	m_ZoomX = clamp(m_ZoomX, 0.2, 3.0);
+	m_ZoomY = clamp(m_ZoomY, 0.2, 3.0);
 
 	MoveVideoWindow(true);
 }
@@ -17447,16 +17447,16 @@ void CMainFrame::SetupVMR9ColorControl()
 void CMainFrame::SetColorControl(DWORD flags, int& brightness, int& contrast, int& hue, int& saturation)
 {
 	if (flags & ProcAmp_Brightness) {
-		brightness = min(max(-100, brightness), 100);
+		brightness = clamp(brightness, -100, 100);
 	}
 	if (flags & ProcAmp_Contrast) {
-		contrast = min(max(-100, contrast), 100);
+		contrast = clamp(contrast, -100, 100);
 	}
 	if (flags & ProcAmp_Hue) {
-		hue = min(max(-180, hue), 180);
+		hue = clamp(hue, -180, 180);
 	}
 	if (flags & ProcAmp_Saturation) {
-		saturation = min(max(-100, saturation), 100);
+		saturation = clamp(saturation, -100, 100);
 	}
 
 	if (m_pVMRMC9) {

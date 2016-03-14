@@ -121,7 +121,7 @@ BOOL CPPageMisc::OnApply()
 	CMiniDump::SetState(s.fMiniDump);
 
 	s.bUpdaterAutoCheck	= !!m_updaterAutoCheckCtrl.GetCheck();
-	m_nUpdaterDelay		= min(max(1, m_nUpdaterDelay), 365);
+	m_nUpdaterDelay		= clamp(m_nUpdaterDelay, 1, 365);
 	s.nUpdaterDelay		= m_nUpdaterDelay;
 
 	return __super::OnApply();

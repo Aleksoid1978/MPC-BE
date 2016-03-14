@@ -99,10 +99,10 @@ VMR9ProcAmpControl CColorControl::GetVMR9ProcAmpControl(DWORD flags, int brightn
 	VMR9ProcAmpControl procAmpControl;
 	procAmpControl.dwSize     = sizeof(VMR9ProcAmpControl);
 	procAmpControl.dwFlags    = flags;
-	procAmpControl.Brightness = min(max(m_VMR9ColorBri.MinValue, (float)brightness),               m_VMR9ColorBri.MaxValue);
-	procAmpControl.Contrast   = min(max(m_VMR9ColorCon.MinValue, (float)(contrast + 100) / 100),   m_VMR9ColorCon.MaxValue);
-	procAmpControl.Hue        = min(max(m_VMR9ColorHue.MinValue, (float)hue),                      m_VMR9ColorHue.MaxValue);
-	procAmpControl.Saturation = min(max(m_VMR9ColorSat.MinValue, (float)(saturation + 100) / 100), m_VMR9ColorSat.MaxValue);
+	procAmpControl.Brightness = clamp((float)brightness,               m_VMR9ColorBri.MinValue, m_VMR9ColorBri.MaxValue);
+	procAmpControl.Contrast   = clamp((float)(contrast + 100) / 100,   m_VMR9ColorCon.MinValue, m_VMR9ColorCon.MaxValue);
+	procAmpControl.Hue        = clamp((float)hue,                      m_VMR9ColorHue.MinValue, m_VMR9ColorHue.MaxValue);
+	procAmpControl.Saturation = clamp((float)(saturation + 100) / 100, m_VMR9ColorSat.MinValue, m_VMR9ColorSat.MaxValue);
 
 	return procAmpControl;
 }
@@ -110,10 +110,10 @@ VMR9ProcAmpControl CColorControl::GetVMR9ProcAmpControl(DWORD flags, int brightn
 DXVA2_ProcAmpValues CColorControl::GetEVRProcAmpValues(int brightness, int contrast, int hue, int saturation)
 {
 	DXVA2_ProcAmpValues procAmpValues;
-	procAmpValues.Brightness.ll = min(max(m_EVRColorBri.MinValue.ll, IntToFixed(brightness).ll),            m_EVRColorBri.MaxValue.ll);
-	procAmpValues.Contrast.ll   = min(max(m_EVRColorCon.MinValue.ll, IntToFixed(contrast + 100, 100).ll),   m_EVRColorCon.MaxValue.ll);
-	procAmpValues.Hue.ll        = min(max(m_EVRColorHue.MinValue.ll, IntToFixed(hue).ll),                   m_EVRColorHue.MaxValue.ll);
-	procAmpValues.Saturation.ll = min(max(m_EVRColorSat.MinValue.ll, IntToFixed(saturation + 100, 100).ll), m_EVRColorSat.MaxValue.ll);
+	procAmpValues.Brightness.ll = clamp(IntToFixed(brightness).ll,            m_EVRColorBri.MinValue.ll, m_EVRColorBri.MaxValue.ll);
+	procAmpValues.Contrast.ll   = clamp(IntToFixed(contrast + 100, 100).ll,   m_EVRColorCon.MinValue.ll, m_EVRColorCon.MaxValue.ll);
+	procAmpValues.Hue.ll        = clamp(IntToFixed(hue).ll,                   m_EVRColorHue.MinValue.ll, m_EVRColorHue.MaxValue.ll);
+	procAmpValues.Saturation.ll = clamp(IntToFixed(saturation + 100, 100).ll, m_EVRColorSat.MinValue.ll, m_EVRColorSat.MaxValue.ll);
 
 	return procAmpValues;
 }

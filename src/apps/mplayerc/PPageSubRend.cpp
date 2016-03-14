@@ -57,7 +57,7 @@ void CPPageSubRend::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_ALLOW_DROPPING_SUBPIC, m_bbSPAllowDropSubPic);
 	DDX_Text(pDX, IDC_EDIT4, m_nSubDelayInterval);
 
-	m_nSPCSize = min(max(RS_SPCSIZE_MIN, m_nSPCSize), RS_SPCSIZE_MAX);
+	m_nSPCSize = clamp(m_nSPCSize, RS_SPCSIZE_MIN, RS_SPCSIZE_MAX);
 }
 
 BEGIN_MESSAGE_MAP(CPPageSubRend, CPPageBase)
