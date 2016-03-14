@@ -323,7 +323,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 			m_pOutput->SetMediaType(&mt);
 			m_bSendMediaType = true;
 		} else {
-			int tryTimeout = 100;
+			bool tryReceiveConnection = true;
 			for (;;) {
 				hr = m_pOutput->GetConnected()->ReceiveConnection(m_pOutput, &mt);
 				if (SUCCEEDED(hr)) {
@@ -347,17 +347,12 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 						m_h = h_org;
 						return E_FAIL;
 					}
-				} else if (hr == VFW_E_BUFFERS_OUTSTANDING && tryTimeout >= 0) {
-					if (tryTimeout > 0) {
-						DbgLog((LOG_TRACE, 3, L"	VFW_E_BUFFERS_OUTSTANDING, retrying in 10ms ..."));
-						Sleep(10);
-					} else {
-						DbgLog((LOG_TRACE, 3, L"	VFW_E_BUFFERS_OUTSTANDING, flush data ..."));
-						m_pOutput->BeginFlush();
-						m_pOutput->EndFlush();
-					}
+				} else if (hr == VFW_E_BUFFERS_OUTSTANDING && tryReceiveConnection) {
+					DbgLog((LOG_TRACE, 3, L"	VFW_E_BUFFERS_OUTSTANDING, flushing data ..."));
+					m_pOutput->DeliverBeginFlush();
+					m_pOutput->DeliverEndFlush();
+					tryReceiveConnection = false;
 
-					tryTimeout -= 10;
 					continue;
 				} else {
 					DbgLog((LOG_TRACE, 3, L"	ReceiveConnection() failed (hr: %x); QueryAccept: %x\n", hr, hrQA));
