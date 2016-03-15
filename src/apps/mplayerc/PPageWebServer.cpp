@@ -287,7 +287,7 @@ void CPPageWebServer::OnUpdateButton2(CCmdUI* pCmdUI)
 
 void CPPageWebServer::OnKillFocusEdit1()
 {
-	m_nWebServerPort = min(max(APP_WEBSRVPORT_MIN, m_nWebServerPort), APP_WEBSRVPORT_MAX);
+	m_nWebServerPort = clamp(m_nWebServerPort, APP_WEBSRVPORT_MIN, APP_WEBSRVPORT_MAX);
 
 	UpdateData(FALSE);
 }
