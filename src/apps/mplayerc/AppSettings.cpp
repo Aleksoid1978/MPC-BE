@@ -1527,6 +1527,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iYoutubeTag				= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_TAG, 0);
 	bYoutubeLoadPlaylist	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, FALSE);
 	iYoutubeSource			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_SOURCE, 0);
+	iYoutubeSource = discard(iYoutubeSource, 0, 2, 0);
 	iYoutubeMemoryType		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_MEMTYPE, 0);
 	iYoutubePercentMemory	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_PERCENT_MEM, 5);
 	iYoutubeMbMemory		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_MB_MEM, 3);
