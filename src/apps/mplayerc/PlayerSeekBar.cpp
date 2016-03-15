@@ -146,7 +146,7 @@ void CPlayerSeekBar::SetPosInternal(REFERENCE_TIME pos)
 	}
 
 	CRect before = GetThumbRect();
-	m_pos = min(max(pos, 0), m_stop);
+	m_pos = clamp(pos, 0LL, m_stop);
 	m_posreal = pos;
 	CRect after = GetThumbRect();
 
@@ -164,7 +164,7 @@ void CPlayerSeekBar::SetPosInternal2(REFERENCE_TIME pos)
 	}
 
 	CRect before = GetThumbRect();
-	m_pos2 = min(max(pos, 0), m_stop);
+	m_pos2 = clamp(pos, 0LL, m_stop);
 	m_posreal2 = pos;
 	CRect after = GetThumbRect();
 

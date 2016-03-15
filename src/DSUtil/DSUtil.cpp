@@ -1233,7 +1233,7 @@ bool ExtractDim(const AM_MEDIA_TYPE* pmt, int& w, int& h, int& arx, int& ary)
 				struct {
 					int x, y;
 				} ar[] = {{w,h},{4,3},{16,9},{221,100},{w,h}};
-				int i = min(max(ptr[7]>>4, 1), 5)-1;
+				int i = clamp(ptr[7]>>4, 1, 5) - 1;
 				arx = ar[i].x;
 				ary = ar[i].y;
 			}

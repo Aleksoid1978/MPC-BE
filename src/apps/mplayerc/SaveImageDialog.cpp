@@ -43,11 +43,11 @@ CSaveImageDialog::CSaveImageDialog(
 
 			pfdc->StartVisualGroup(IDS_THUMB_IMAGE_QUALITY, ResStr(IDS_THUMB_IMAGE_QUALITY));
 			pfdc->AddText(IDS_THUMB_QUALITY, ResStr(IDS_THUMB_QUALITY));
-			str.Format(L"%d", max(70, min(100, m_quality)));
+			str.Format(L"%d", clamp(m_quality, 70, 100));
 			pfdc->AddEditBox(IDC_EDIT1, str);
 
 			pfdc->AddText(IDS_THUMB_LEVEL, ResStr(IDS_THUMB_LEVEL));
-			str.Format(L"%d", max(1, min(9, m_levelPNG)));
+			str.Format(L"%d", clamp(m_levelPNG, 1, 9));
 			pfdc->AddEditBox(IDC_EDIT5, str);
 			pfdc->EndVisualGroup();
 

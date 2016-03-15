@@ -742,7 +742,7 @@ void CPlayerCaptureDialog::UpdateMediaTypes()
 
 				if (pcaps) {
 					// FIXME: some drivers do not set the interval right and they still accept the preferable but unfortunately out-of-range fps
-					//					atpf = min(max(atpf, pcaps->MinFrameInterval), pcaps->MaxFrameInterval);
+					//atpf = clamp(atpf, pcaps->MinFrameInterval, pcaps->MaxFrameInterval);
 				}
 
 				if (pmt->formattype == FORMAT_VideoInfo) {

@@ -5957,7 +5957,7 @@ void CMainFrame::SaveDIB(LPCTSTR fn, BYTE* pData, long size)
 	if (ext == _T(".bmp")) {
 		BMPDIB(fn, pData, L"", 0, 0, 0, 0);
 	} else if (ext == _T(".png")) {
-		PNGDIB(fn, pData, max(1, min(9, s.iThumbLevelPNG)));
+		PNGDIB(fn, pData, clamp(s.iThumbLevelPNG, 1, 9));
 	} else if (ext == _T(".jpg")) {
 		BMPDIB(fn, pData, L"image/jpeg", s.iThumbQuality, 0, 0, 0);
 	}

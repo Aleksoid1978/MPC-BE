@@ -48,8 +48,8 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT1, m_iYoutubePercentMemory);
 	DDX_Text(pDX, IDC_EDIT2, m_iYoutubeMbMemory);
 
-	m_iYoutubePercentMemory = min(max(1, m_iYoutubePercentMemory), 100);
-	m_iYoutubeMbMemory = min(max(1, m_iYoutubeMbMemory), 128);
+	m_iYoutubePercentMemory = clamp(m_iYoutubePercentMemory, 1ul, 100ul);
+	m_iYoutubeMbMemory = clamp(m_iYoutubeMbMemory, 1ul, 128ul);
 }
 
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)

@@ -463,8 +463,8 @@ STDMETHODIMP CAudioSwitcherFilter::SetAutoVolumeControl(bool bAutoVolumeControl,
 {
 	m_bAutoVolumeControl	= bAutoVolumeControl;
 	m_bNormBoost			= bNormBoost;
-	m_iNormLevel			= min(max(0, iNormLevel), 100);
-	m_iNormRealeaseTime		= min(max(5, iNormRealeaseTime), 10);
+	m_iNormLevel			= clamp(iNormLevel, 0, 100);
+	m_iNormRealeaseTime		= clamp(iNormRealeaseTime, 5, 10);
 
 	m_AudioNormalizer.SetParam(m_iNormLevel, bNormBoost, m_iNormRealeaseTime);
 
@@ -487,7 +487,7 @@ STDMETHODIMP CAudioSwitcherFilter::SetChannelMixer(bool bMixer, int nLayout)
 
 STDMETHODIMP CAudioSwitcherFilter::SetAudioGain(float fGain_dB)
 {
-	m_fGain_dB = min(max(-3.0f, fGain_dB), 10.0f);
+	m_fGain_dB = clamp(fGain_dB, -3.0f, 10.0f);
 	m_fGainFactor = pow(10.0f, m_fGain_dB/20.0f);
 
 	return S_OK;
