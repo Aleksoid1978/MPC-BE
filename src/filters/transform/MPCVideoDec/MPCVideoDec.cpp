@@ -1210,8 +1210,8 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 
 void CMPCVideoDecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& vsfilter)
 {
-	w = PictWidth();
-	h = PictHeight();
+	w = m_nDecoderMode == MODE_DXVA1 ? PictWidthAligned()  : PictWidth();
+	h = m_nDecoderMode == MODE_DXVA1 ? PictHeightAligned() : PictHeight();
 }
 
 // some codecs can reset the values width/height on initialization
@@ -3279,6 +3279,8 @@ WORD CMPCVideoDecFilter::GetDXVA1RestrictedMode()
 HRESULT CMPCVideoDecFilter::CreateDXVA1Decoder(IAMVideoAccelerator* pAMVideoAccelerator, const GUID* pDecoderGuid, DWORD dwSurfaceCount)
 {
 	SAFE_DELETE(m_pDXVADecoder);
+	m_nDecoderMode    = MODE_SOFTWARE;
+	m_DXVADecoderGUID = GUID_NULL;
 
 	if (!m_bUseDXVA) {
 		return E_FAIL;
@@ -3286,8 +3288,8 @@ HRESULT CMPCVideoDecFilter::CreateDXVA1Decoder(IAMVideoAccelerator* pAMVideoAcce
 
 	m_pDXVADecoder = CDXVA1Decoder::CreateDecoderDXVA1(this, pAMVideoAccelerator, pDecoderGuid, dwSurfaceCount);
 	if (m_pDXVADecoder) {
-		m_nDecoderMode		= MODE_DXVA1;
-		m_DXVADecoderGUID	= *pDecoderGuid;
+		m_nDecoderMode    = MODE_DXVA1;
+		m_DXVADecoderGUID = *pDecoderGuid;
 
 		return S_OK;
 	}
