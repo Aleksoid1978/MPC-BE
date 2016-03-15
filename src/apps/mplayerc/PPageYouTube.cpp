@@ -133,7 +133,7 @@ BOOL CPPageYoutube::OnInitDialog()
 	m_nPercentMemoryCtrl.SetRange(1, 100);
 	m_nMbMemoryCtrl.SetRange(1, 128);
 
-	m_iYoutubeSourceType	= min(max(0, s.iYoutubeSource), 3);
+	m_iYoutubeSourceType	= s.iYoutubeSource;
 	m_iYoutubeMemoryType	= s.iYoutubeMemoryType ? 1 : 0;
 	m_iYoutubePercentMemory	= s.iYoutubePercentMemory;
 	m_iYoutubeMbMemory		= s.iYoutubeMbMemory;
