@@ -569,7 +569,7 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		iPosition = iPosition*2;
 	}
 
-	GetOutputFormats (nFormatCount, &fmts);
+	GetOutputFormats(nFormatCount, &fmts);
 	if (iPosition < 0) {
 		return E_INVALIDARG;
 	}
