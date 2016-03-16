@@ -2173,7 +2173,7 @@ void CAppSettings::CRecentFileAndURLList::Add(LPCTSTR lpszPathName)
 		return;
 	}
 
-	bool fURL = (pathName.Find(_T("://")) >= 0 || PlayerYouTubeCheck(lpszPathName));
+	bool fURL = (pathName.Find(_T("://")) >= 0 || YoutubeParser::CheckURL(lpszPathName));
 
 	// fully qualify the path name
 	if (!fURL) {

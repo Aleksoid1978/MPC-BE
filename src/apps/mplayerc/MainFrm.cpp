@@ -11858,10 +11858,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	CString youtubeUrl;
 	if (s.iYoutubeSource < 2 && pOFD->fns.GetCount() == 1) {
 		CString fn = (CString)pOFD->fns.GetHead();
-		if (PlayerYouTubeCheck(fn)) {
+		if (YoutubeParser::CheckURL(fn)) {
 			youtubeUrl = fn;
 			CAtlList<CString> urls;
-			if (PlayerYouTube(fn, urls, m_youtubeFields, pOFD->subs)) {
+			if (YoutubeParser::Parse_URL(fn, urls, m_youtubeFields, pOFD->subs)) {
 				pOFD->fns.RemoveAll();
 				POSITION pos = urls.GetHeadPosition();
 				while (pos) {
@@ -19530,15 +19530,15 @@ REFTIME CMainFrame::GetAvgTimePerFrame(BOOL bUsePCAP/* = TRUE*/) const
 
 BOOL CMainFrame::OpenYoutubePlaylist(CString url)
 {
-	if (AfxGetAppSettings().bYoutubeLoadPlaylist && PlayerYouTubePlaylistCheck(url)) {
-		YoutubePlaylist youtubePlaylist;
+	if (AfxGetAppSettings().bYoutubeLoadPlaylist && YoutubeParser::CheckPlaylist(url)) {
+		YoutubeParser::YoutubePlaylist youtubePlaylist;
 		int idx_CurrentPlay = 0;
-		if (PlayerYouTubePlaylist(url, youtubePlaylist, idx_CurrentPlay)) {
+		if (YoutubeParser::Parse_Playlist(url, youtubePlaylist, idx_CurrentPlay)) {
 			m_wndPlaylistBar.Empty();
 
 			POSITION pos = youtubePlaylist.GetHeadPosition();
 			while (pos) {
-				YoutubePlaylistItem& item = youtubePlaylist.GetNext(pos);
+				YoutubeParser::YoutubePlaylistItem& item = youtubePlaylist.GetNext(pos);
 				CAtlList<CString> fns;
 				fns.AddHead(item.url);
 				m_wndPlaylistBar.Append(fns, false, NULL, false);
