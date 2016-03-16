@@ -69,52 +69,52 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	m_iYoutubeFormatCtrl.Clear();
 
-	for (size_t i = 0; i < _countof(youtubeVideoProfiles); i++) {
+	for (size_t i = 0; i < _countof(YoutubeParser::youtubeVideoProfiles); i++) {
 		CString fmt;
 		CString fps;
-		switch (youtubeVideoProfiles[i].type) {
-			case y_mp4:
+		switch (YoutubeParser::youtubeVideoProfiles[i].type) {
+			case YoutubeParser::ytype::y_mp4:
 				fmt = L"MP4";
 				break;
-			case y_webm:
+			case YoutubeParser::ytype::y_webm:
 				fmt = L"WebM";
 				break;
-			case y_flv:
+			case YoutubeParser::ytype::y_flv:
 				fmt = L"FLV";
 				break;
-			case y_3gp:
+			case YoutubeParser::ytype::y_3gp:
 				fmt = L"3GP";
 				break;
 #if ENABLE_YOUTUBE_3D
-			case y_3d_mp4:
+			case YoutubeParser::ytype::y_3d_mp4:
 				fmt = L"3D MP4";
 				break;
-			case y_3d_webm:
+			case YoutubeParser::ytype::y_3d_webm:
 				fmt = L"3D WebM";
 				break;
 #endif
-			case y_webm_video:
+			case YoutubeParser::ytype::y_webm_video:
 				fmt = L"WebM";
 				break;
-			case y_webm_video_60fps:
+			case YoutubeParser::ytype::y_webm_video_60fps:
 				fmt = L"WebM";
 				fps = L"60";
 				break;
 #if ENABLE_YOUTUBE_DASH
-			case y_dash_mp4_video:
+			case YoutubeParser::ytype::y_dash_mp4_video:
 				fmt = L"DASH MP4";
 				break;
 #endif
 		default:
 			continue;
 		}
-		fmt.AppendFormat(_T("@%dp"), youtubeVideoProfiles[i].quality);
+		fmt.AppendFormat(_T("@%dp"), YoutubeParser::youtubeVideoProfiles[i].quality);
 		if (!fps.IsEmpty()) {
 			fmt.AppendFormat(_T("%s"), fps);
 		}
 
 		m_iYoutubeFormatCtrl.AddString(fmt);
-		m_iYoutubeFormatCtrl.SetItemData(i, youtubeVideoProfiles[i].iTag);
+		m_iYoutubeFormatCtrl.SetItemData(i, YoutubeParser::youtubeVideoProfiles[i].iTag);
 	}
 
 	int j = 0;

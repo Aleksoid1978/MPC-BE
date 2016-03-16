@@ -1164,9 +1164,9 @@ public:
 	CString		m_strFnFull;
 	CString		m_strUrl;
 
-	YOUTUBE_FIELDS	m_youtubeFields;
-	CString			GetStrForTitle();
-	CString			GetAltFileName();
+	YoutubeParser::YOUTUBE_FIELDS m_youtubeFields;
+	CString		GetStrForTitle();
+	CString		GetAltFileName();
 
 	bool		m_bToggleShader;
 	bool		m_bToggleShaderScreenSpace;

@@ -2239,7 +2239,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				CStringA field = sl2.RemoveHead().MakeLower();
 				if (field == "location" && !sl2.IsEmpty()) {
 					location = sl2.GetHead();
-					if (!PlayerYouTubeCheck(CString(sl2.GetHead()))) {
+					if (!YoutubeParser::CheckURL(CString(sl2.GetHead()))) {
 						return GetContentType(CString(sl2.GetHead()), redir);
 					}
 				}
@@ -2253,7 +2253,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				}
 			}
 
-			if (location.GetLength() > 0 && PlayerYouTubeCheck(CString(location)) && CString(location) != fn) {
+			if (location.GetLength() > 0 && YoutubeParser::CheckURL(CString(location)) && CString(location) != fn) {
 				if (redir) {
 					redir->AddTail(CString(location));
 				}

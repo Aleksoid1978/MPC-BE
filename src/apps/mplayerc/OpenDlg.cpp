@@ -110,7 +110,7 @@ BOOL COpenDlg::OnInitDialog()
 			LPCTSTR pText = (LPCTSTR)::GlobalLock(hglb);
 			if (pText) {
 				if (AfxIsValidString(pText)) {
-					if (PlayerYouTubeCheck(pText) || PlayerYouTubePlaylistCheck(pText)) {
+					if (YoutubeParser::CheckURL(pText) || YoutubeParser::CheckPlaylist(pText)) {
 						m_mrucombo.SetWindowTextW(pText);
 					}
 				}
@@ -263,7 +263,7 @@ void COpenDlg::OnUpdateAppendToPlaylist(CCmdUI* pCmdUI)
 {
 	UpdateData();
 
-	pCmdUI->Enable(!PlayerYouTubePlaylistCheck(m_path));
+	pCmdUI->Enable(!YoutubeParser::CheckPlaylist(m_path));
 }
 
 void COpenDlg::OnUpdateOk(CCmdUI* pCmdUI)
