@@ -182,11 +182,11 @@ namespace YoutubeParser {
 
 	static void InternetReadData(HINTERNET& f, char** pData, DWORD& dataSize, LPCSTR endCondition)
 	{
-		char buffer[4096] = { 0 };
+		char buffer[16 * KILOBYTE] = { 0 };
 		const DWORD dwNumberOfBytesToRead = _countof(buffer);
 		DWORD dwBytesRead = 0;
-		do {
-			if (InternetReadFile(f, (LPVOID)buffer, dwNumberOfBytesToRead, &dwBytesRead) == FALSE) {
+		for (;;) {
+			if (InternetReadFile(f, (LPVOID)buffer, dwNumberOfBytesToRead, &dwBytesRead) == FALSE || dwBytesRead == 0) {
 				break;
 			}
 
@@ -198,7 +198,7 @@ namespace YoutubeParser {
 			if (endCondition && strstr(*pData, endCondition)) {
 				break;
 			}
-		} while (dwBytesRead);
+		}
 	}
 
 	static bool ParseMetadata(HINTERNET& s, const CString videoId, YOUTUBE_FIELDS& y_fields)
