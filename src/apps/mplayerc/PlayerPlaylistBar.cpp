@@ -895,6 +895,13 @@ void CPlayerPlaylistBar::AddItem(CAtlList<CString>& fns, CSubtitleItemList* subs
 	}
 
 	pli.AutoLoadFiles();
+	if (pli.m_fns.GetCount() == 1) {
+		YoutubeParser::YOUTUBE_FIELDS y_fields;
+		if (YoutubeParser::Parse_URL(pli.m_fns.GetHead(), y_fields)) {
+			pli.m_label    = y_fields.title;
+			pli.m_duration = y_fields.duration;
+		}
+	}
 
 	m_pl.AddTail(pli);
 }
@@ -1461,6 +1468,35 @@ void CPlayerPlaylistBar::Append(CAtlList<CString>& fns, bool fMulti, CSubtitleIt
 	Refresh();
 	EnsureVisible(m_pl.FindIndex(idx + 1));
 	SavePlaylist();
+
+	UpdateList();
+}
+
+void CPlayerPlaylistBar::Append(CFileItemList& fis)
+{
+	INT_PTR idx = -1;
+
+	POSITION pos = m_pl.GetHeadPosition();
+	while (pos) {
+		idx++;
+		m_pl.GetNext(pos);
+	}
+
+	pos = fis.GetHeadPosition();
+	while (pos) {
+		const CFileItem& item = fis.GetNext(pos);
+
+		CPlaylistItem pli;
+		pli.m_fns.AddHead(item.GetName());
+		pli.m_label = item.GetTitle();
+		m_pl.AddTail(pli);
+	}
+
+	Refresh();
+	EnsureVisible(m_pl.FindIndex(idx + 1));
+	SavePlaylist();
+
+	UpdateList();
 }
 
 bool CPlayerPlaylistBar::Replace(CString filename, CAtlList<CString>& fns)

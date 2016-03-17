@@ -39,6 +39,10 @@ public:
 	CFileItem(const CString& str) {
 		m_fn = str;
 	}
+	CFileItem(const CString& strFn, const CString& strTitle) {
+		m_fn = strFn;
+		m_Title = strTitle;
+	}
 	CFileItem(const WCHAR* str) {
 		m_fn = str;
 	}
@@ -239,6 +243,7 @@ public:
 
 	void Open(CAtlList<CString>& fns, bool fMulti, CSubtitleItemList* subs = NULL, bool bCheck = true);
 	void Append(CAtlList<CString>& fns, bool fMulti, CSubtitleItemList* subs = NULL, bool bCheck = true);
+	void Append(CFileItemList& fis);
 	bool Replace(CString filename, CAtlList<CString>& fns);
 
 	void Open(CStringW vdn, CStringW adn, int vinput, int vchannel, int ainput);

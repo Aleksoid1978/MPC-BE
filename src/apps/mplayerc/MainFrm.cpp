@@ -19536,15 +19536,14 @@ BOOL CMainFrame::OpenYoutubePlaylist(CString url)
 		if (YoutubeParser::Parse_Playlist(url, youtubePlaylist, idx_CurrentPlay)) {
 			m_wndPlaylistBar.Empty();
 
+			CFileItemList fis;
 			POSITION pos = youtubePlaylist.GetHeadPosition();
 			while (pos) {
-				YoutubeParser::YoutubePlaylistItem& item = youtubePlaylist.GetNext(pos);
-				CAtlList<CString> fns;
-				fns.AddHead(item.url);
-				m_wndPlaylistBar.Append(fns, false, NULL, false);
-				m_wndPlaylistBar.SetLast();
-				m_wndPlaylistBar.SetCurLabel(item.title);
+				const YoutubeParser::YoutubePlaylistItem& item = youtubePlaylist.GetNext(pos);
+				CFileItem fi(item.url, item.title);
+				fis.AddTail(fi);
 			}
+			m_wndPlaylistBar.Append(fis);
 			m_wndPlaylistBar.SetSelIdx(idx_CurrentPlay, true);
 
 			OpenCurPlaylistItem();
