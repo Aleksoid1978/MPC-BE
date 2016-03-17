@@ -111,8 +111,8 @@ BOOL CSaveImageDialog::OnFileNameOK()
 		m_quality = m_qualityctrl.GetPos();
 	}
 
-	m_levelPNG = max(1, min(9, m_levelPNG));
-	m_quality = max(1, min(100, m_quality));
+	m_levelPNG = clamp(m_levelPNG, 1, 9);
+	m_quality = clamp(m_quality, 70, 100);
 
 	return __super::OnFileNameOK();
 }
@@ -182,17 +182,17 @@ CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 
 			pfdc->StartVisualGroup(IDS_THUMB_THUMBNAILS, ResStr(IDS_THUMB_THUMBNAILS));
 			pfdc->AddText(IDS_THUMB_ROWNUMBER, ResStr(IDS_THUMB_ROWNUMBER));
-			str.Format(L"%d", max(1, min(20, m_rows)));
+			str.Format(L"%d", clamp(m_rows, 1, 20));
 			pfdc->AddEditBox(IDC_EDIT4, str);
 
 			pfdc->AddText(IDS_THUMB_COLNUMBER, ResStr(IDS_THUMB_COLNUMBER));
-			str.Format(L"%d", max(1, min(10, m_cols)));
+			str.Format(L"%d", clamp(m_cols, 1, 10));
 			pfdc->AddEditBox(IDC_EDIT2, str);
 			pfdc->EndVisualGroup();
 
 			pfdc->StartVisualGroup(IDS_THUMB_IMAGE_WIDTH, ResStr(IDS_THUMB_IMAGE_WIDTH));
 			pfdc->AddText(IDS_THUMB_PIXELS, ResStr(IDS_THUMB_PIXELS));
-			str.Format(L"%d", max(256, min(2560, m_width)));
+			str.Format(L"%d", clamp(m_width, 256, 2560));
 			pfdc->AddEditBox(IDC_EDIT3, str);
 			pfdc->EndVisualGroup();
 

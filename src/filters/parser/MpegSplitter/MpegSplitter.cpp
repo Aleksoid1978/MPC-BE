@@ -917,9 +917,9 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 
 								y = (y - 16) * 255 / 219;
 
-								BYTE r = (BYTE)min(max(1.0 * y + 1.4022 * (v - 128), 0), 255);
-								BYTE g = (BYTE)min(max(1.0 * y - 0.3456 * (u - 128) - 0.7145 * (v - 128), 0), 255);
-								BYTE b = (BYTE)min(max(1.0 * y + 1.7710 * (u - 128), 0), 255);
+								BYTE r = (BYTE)clamp(1.0 * y + 1.4022 * (v - 128), 0.0, 255.0);
+								BYTE g = (BYTE)clamp(1.0 * y - 0.3456 * (u - 128) - 0.7145 * (v - 128), 0.0, 255.0);
+								BYTE b = (BYTE)clamp(1.0 * y + 1.7710 * (u - 128), 0.0, 255.0);
 
 								CStringA str;
 								str.Format("%02x%02x%02x", r, g, b);
