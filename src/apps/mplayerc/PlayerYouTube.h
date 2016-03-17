@@ -137,4 +137,6 @@ namespace YoutubeParser {
 	// we have to use a Parse_URL() in order to avoid conflict with the ParseURL define from the SDK
 	bool Parse_URL(CString url, CAtlList<CString>& urls, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& subs);
 	bool Parse_Playlist(CString url, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay);
+
+	bool Parse_URL(CString url, YOUTUBE_FIELDS& y_fields);
 } 
