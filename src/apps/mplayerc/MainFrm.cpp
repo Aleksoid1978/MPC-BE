@@ -3323,8 +3323,6 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				m_wndPlaylistBar.SetCurTime(rtDur);
 
 				if (!m_bMainIsMPEGSplitter) {
-					//OnTimer(TIMER_STREAMPOSPOLLER);
-					//OnTimer(TIMER_STREAMPOSPOLLER2);
 					SetupChapters();
 					LoadKeyFrames();
 				}
@@ -4244,10 +4242,18 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	m_wndPlaylistBar.SetCurValid(true);
-	if (!m_youtubeFields.title.IsEmpty()) {
-		CPlaylistItem pli;
-		if (m_wndPlaylistBar.GetCur(pli)) {
-			m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
+	if (m_youtubeFields.title.IsEmpty()) {
+		if (CComQIPtr<IBaseFilter> pBF = FindFilter(CLSID_3DYDYoutubeSource, m_pGB)) {
+			if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
+				CComBSTR bstr;
+				if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
+					m_youtubeFields.title = bstr.m_str;
+					// we do not know the format of the output stream, let it be MP4
+					m_youtubeFields.fname =  m_youtubeFields.title + L".mp4";
+					FixFilename(m_youtubeFields.fname);
+					bstr.Empty();
+				}
+			}
 		}
 	}
 

@@ -160,6 +160,21 @@ BOOL CSaveDlg::OnInitDialog()
 	if (!pReader) {
 		hr = S_OK;
 		CComPtr<IUnknown> pUnk;
+		pUnk.CoCreateInstance(CLSID_3DYDYoutubeSource);
+
+		if (CComQIPtr<IBaseFilter> pSrc = pUnk) {
+			hr = pGB->AddFilter(pSrc, fnw);
+
+			if (FAILED(hr) || !(pReader = pUnk) || FAILED(hr = pReader->Load(fnw, NULL))) {
+				pReader.Release();
+				pGB->RemoveFilter(pSrc);
+			}
+		}
+	}
+
+	if (!pReader) {
+		hr = S_OK;
+		CComPtr<IUnknown> pUnk;
 		hr = pUnk.CoCreateInstance(CLSID_URLReader);
 
 		if (CComQIPtr<IBaseFilter> pSrc = pUnk) {
@@ -406,6 +421,21 @@ HRESULT CSaveTaskDlg::InitFileCopy()
 
 		if (!(pReader = pUnk) || FAILED(pReader->Load(fnw, NULL))) {
 			pReader.Release();
+		}
+	}
+
+	if (!pReader) {
+		hr = S_OK;
+		CComPtr<IUnknown> pUnk;
+		pUnk.CoCreateInstance(CLSID_3DYDYoutubeSource);
+
+		if (CComQIPtr<IBaseFilter> pSrc = pUnk) {
+			pGB->AddFilter(pSrc, fnw);
+
+			if (!(pReader = pUnk) || FAILED(hr = pReader->Load(fnw, NULL))) {
+				pReader.Release();
+				pGB->RemoveFilter(pSrc);
+			}
 		}
 	}
 
