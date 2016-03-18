@@ -95,6 +95,9 @@
     <ClCompile Include="MediaDescription.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MFCHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DSMPropertyBag.h">
@@ -188,6 +191,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MediaDescription.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFCHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

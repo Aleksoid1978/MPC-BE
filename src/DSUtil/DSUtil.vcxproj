@@ -127,6 +127,7 @@
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="MediaDescription.cpp" />
     <ClCompile Include="MediaTypeEx.cpp" />
+    <ClCompile Include="MFCHelper.cpp" />
     <ClCompile Include="MPCSocket.cpp" />
     <ClCompile Include="NullRenderers.cpp" />
     <ClCompile Include="Packet.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="Log.h" />
     <ClInclude Include="MediaDescription.h" />
     <ClInclude Include="MediaTypeEx.h" />
+    <ClInclude Include="MFCHelper.h" />
     <ClInclude Include="MPCSocket.h" />
     <ClInclude Include="Mpeg2Def.h" />
     <ClInclude Include="NullRenderers.h" />

@@ -21,10 +21,10 @@
 
 #pragma once
 
-#include <afxstr.h>
 #include "NullRenderers.h"
 #include "H264Nalu.h"
 #include "MediaTypeEx.h"
+#include "MFCHelper.h"
 #include "vd.h"
 #include "text.h"
 #include "..\..\include\basestruct.h"
@@ -173,8 +173,6 @@ extern void				TraceFilterInfo(IBaseFilter* pBF);
 extern void				TracePinInfo(IPin* pPin);
 
 extern void				SetThreadName(DWORD dwThreadID, LPCSTR szThreadName);
-extern void				CorrectComboListWidth(CComboBox& pComboBox);
-extern void				CorrectCWndWidth(CWnd* pWnd);
 
 extern void				getExtraData(const BYTE *format, const GUID *formattype, const size_t formatlen, BYTE *extra, unsigned int *extralen);
 
@@ -358,6 +356,3 @@ namespace CStringUtils
 		}
 	};
 }
-
-extern void SetCursor(HWND m_hWnd, LPCTSTR lpCursorName);
-extern void SetCursor(HWND m_hWnd, UINT nID, LPCTSTR lpCursorName);
