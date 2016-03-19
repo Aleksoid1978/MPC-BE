@@ -55,8 +55,8 @@ struct SW_OUT_FMT {
 };
 
 const SW_OUT_FMT* GetSWOF(int pixfmt);
-LPCTSTR GetChromaSubsamplingStr(AVPixelFormat av_pix_fmt);
-int GetLumaBits(AVPixelFormat av_pix_fmt);
+LPCTSTR GetChromaSubsamplingStr(enum AVPixelFormat av_pix_fmt);
+int GetLumaBits(enum AVPixelFormat av_pix_fmt);
 
 // CFormatConverter
 
@@ -86,7 +86,7 @@ struct FrameProps {
 	enum AVColorRange	colorrange;
 };
 
-MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt);
+MPCPixFmtType GetPixFmtType(enum AVPixelFormat av_pix_fmt);
 
 class CFormatConverter
 {
