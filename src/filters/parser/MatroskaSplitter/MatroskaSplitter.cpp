@@ -1027,14 +1027,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					wfe->cbSize = 0; // IMPORTANT: this is screwed, but cbSize has to be 0 and the extra data from codec priv must be after WAVEFORMATEX
 					mts.Add(mt);
 				} else if (CodecID == "A_QUICKTIME" && pTE->CodecPrivate.GetCount() >= 8) {
-					DWORD* type = (DWORD*)(pTE->CodecPrivate.GetData() + 4);
-					if (*type == MAKEFOURCC('Q','D','M','2') || *type == MAKEFOURCC('Q','D','M','C')) {
-						mt.subtype = FOURCCMap(*type);
-						wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
-						wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
-						memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
-						mts.Add(mt);
-					}
+					DWORD type = GETDWORD(pTE->CodecPrivate.GetData() + 4);
+					// 'QDM2', 'QDMC', 'ima4'
+					mt.subtype = FOURCCMap(type);
+					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
+					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
+					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					mts.Add(mt);
 				} else if (CodecID == "A_OPUS" || CodecID == "A_OPUS/EXPERIMENTAL") {
 					wfe->wFormatTag = WAVE_FORMAT_OPUS;
 					mt.subtype = MEDIASUBTYPE_OPUS;
