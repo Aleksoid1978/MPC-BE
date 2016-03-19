@@ -9964,6 +9964,8 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 				MakeBDLabel(fn, fn2);
 			}
 			descList.AddHead(fn2);
+		} else if (!m_youtubeFields.title.IsEmpty()) {
+			descList.AddHead(m_youtubeFields.title);
 		}
 
 		// Name
@@ -10070,8 +10072,6 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 
 			osdMsg = ResStr(IDS_DVD_FAV_ADDED);
 		}
-	} else if (GetPlaybackMode() == PM_CAPTURE) {
-		// TODO
 	}
 
 	if (bDisplayMessage && !osdMsg.IsEmpty()) {
@@ -10152,10 +10152,10 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	REFERENCE_TIME rtStart = 0;
 	BOOL bRelativeDrive = FALSE;
 
-	ExplodeEsc(fav, args, _T(';'));
-	args.RemoveHeadNoReturn();									// desc / name
-	_stscanf_s(args.RemoveHead(), _T("%I64d"), &rtStart);		// pos
-	_stscanf_s(args.RemoveHead(), _T("%d"), &bRelativeDrive);	// relative drive
+	ExplodeEsc(fav, args, L';');
+	args.RemoveHeadNoReturn();								// desc / name
+	_stscanf_s(args.RemoveHead(), L"%I64d", &rtStart);		// pos
+	_stscanf_s(args.RemoveHead(), L"%d", &bRelativeDrive);	// relative drive
 	rtStart = max(rtStart, 0ll);
 
 	// NOTE: This is just for the favorites but we could add a global settings that does this always when on. Could be useful when using removable devices.
@@ -10170,8 +10170,7 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 			while (pos) {
 				CString &stringPath = args.GetNext(pos);
 				CPath path(stringPath);
-
-				int rootLength = path.SkipRoot();
+				const int rootLength = path.SkipRoot();
 
 				if (path.StripToRoot()) {
 					if (_tcsicmp(exeDrive, path) != 0) { // Do we need to replace the drive letter ?
@@ -10179,7 +10178,6 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 						CString newPath(exeDrive);
 
 						newPath += stringPath.Mid(rootLength);//newPath += stringPath.Mid( 3 );
-
 						stringPath = newPath;
 					}
 				}
@@ -10191,7 +10189,9 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 		return;
 	}
 
-	m_wndPlaylistBar.Open(args, false);
+	if (!m_wndPlaylistBar.SelectFileInPlaylist(args.GetHead())) {
+		m_wndPlaylistBar.Open(args, false);
+	}
 	if (GetPlaybackMode() == PM_FILE && args.GetHead() == m_lastOMD->title && !m_bEndOfStream) {
 		m_wndPlaylistBar.SetFirstSelected();
 		m_pMS->SetPositions(&rtStart, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
