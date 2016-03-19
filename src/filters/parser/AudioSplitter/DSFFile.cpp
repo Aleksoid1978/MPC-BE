@@ -69,10 +69,8 @@ HRESULT CDSFFile::Open(CBaseSplitterFile* pFile)
 			BYTE flags = (BYTE)m_pFile->BitRead(8);
 
 			DWORD size = m_pFile->BitRead(32);
-			size = (((size & 0x7F000000) >> 0x03) |
-					((size & 0x007F0000) >> 0x02) |
-					((size & 0x00007F00) >> 0x01) |
-					((size & 0x0000007F)		));
+			size = hexdec2uint(size);
+
 			if (major <= 4) {
 				BYTE* buf = DNew BYTE[size];
 				m_pFile->ByteRead(buf, size);

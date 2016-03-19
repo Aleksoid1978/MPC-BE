@@ -184,6 +184,9 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			size	= (DWORD)gb.BitRead(32);
 			flags	= (WORD)gb.BitRead(16);
 			tagsize = 10;
+			if (m_major == 4) {
+				size = hexdec2uint(size);
+			}
 		}
 
 		if (pos + tagsize + size > len) {

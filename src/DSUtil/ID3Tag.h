@@ -88,3 +88,11 @@ public:
 
 // additional functions
 void SetID3TagProperties(IBaseFilter* pBF, const CID3Tag* apetag);
+
+static unsigned int hexdec2uint(unsigned int size)
+{
+	return (((size & 0x7F000000) >> 3) |
+			((size & 0x007F0000) >> 2) |
+			((size & 0x00007F00) >> 1) |
+			((size & 0x0000007F)));
+}

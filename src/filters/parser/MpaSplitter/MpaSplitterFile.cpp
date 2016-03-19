@@ -83,10 +83,7 @@ HRESULT CMpaSplitterFile::Init()
 		BYTE flags = (BYTE)BitRead(8);
 
 		DWORD size = BitRead(32);
-		size = (((size & 0x7F000000) >> 0x03) |
-				((size & 0x007F0000) >> 0x02) |
-				((size & 0x00007F00) >> 0x01) |
-				((size & 0x0000007F)		));
+		size = hexdec2uint(size);
 
 		m_startpos = GetPos() + size;
 
