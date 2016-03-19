@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include "stdafx.h"
 #include "../../../../DSUtil/DSUtil.h"
 #include <stdint.h>
 #include <ffmpeg/libavcodec/dxva_internal.h>

@@ -70,7 +70,7 @@ protected:
 
 	bool									m_bDXVACompatible;
 	unsigned __int64						m_nActiveCodecs;
-	AVPixelFormat							m_PixelFormat;
+	enum AVPixelFormat						m_PixelFormat;
 
 	BOOL									m_bInterlaced;
 
