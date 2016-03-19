@@ -34,8 +34,9 @@ CID3TagItem::CID3TagItem(DWORD tag, CString value)
 {
 }
 
-CID3TagItem::CID3TagItem(CAtlArray<BYTE>& data, CString mime)
+CID3TagItem::CID3TagItem(DWORD tag, CAtlArray<BYTE>& data, CString mime)
 	: m_type(ID3_TYPE_BINARY)
+	, m_tag(tag)
 	, m_Mime(mime)
 {
 	m_Data.SetCount(data.GetCount());
@@ -204,13 +205,13 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			size -= 4;
 		}
 
-		CAtlArray<BYTE>	pData;
+		CAtlArray<BYTE> Data;
 		BOOL bUnSync = m_flags & 0x80 || flags & ID3v2_FLAG_UNSYNCH;
 		if (bUnSync) {
 			DWORD dwSize = size;
 			while (dwSize) {
 				BYTE b = gb.ReadByte();
-				pData.Add(b);
+				Data.Add(b);
 				dwSize--;
 				if (b == 0xFF && dwSize > 1) {
 					b = gb.ReadByte();
@@ -219,15 +220,15 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 						b = gb.ReadByte();
 						dwSize--;
 					}
-					pData.Add(b);
+					Data.Add(b);
 				}
 			}
 		} else {
-			pData.SetCount(size);
-			gb.ReadBuffer(pData.GetData(), size);
+			Data.SetCount(size);
+			gb.ReadBuffer(Data.GetData(), size);
 		}
-		CGolombBuffer gbData(pData.GetData(), pData.GetCount());
-		size = pData.GetCount();
+		CGolombBuffer gbData(Data.GetData(), Data.GetCount());
+		size = Data.GetCount();
 
 		if (tag == 'TIT2'
 				|| tag == 'TPE1'
@@ -270,11 +271,11 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 					}
 				}
 
-				CAtlArray<BYTE>	Data;
-				Data.SetCount(size);
-				gbData.ReadBuffer(Data.GetData(), size);
+				CAtlArray<BYTE> data;
+				data.SetCount(size);
+				gbData.ReadBuffer(data.GetData(), size);
 
-				CID3TagItem* item = DNew CID3TagItem(Data, mimeStr);
+				CID3TagItem* item = DNew CID3TagItem(tag, data, mimeStr);
 				TagItems.AddTail(item);
 			} else {
 				if (tag == 'COMM' || tag == '\0ULT' || tag == 'USLT') {
