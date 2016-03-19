@@ -226,10 +226,7 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			DWORD size;
 			m_file.Read(&size, sizeof(size));
 			size = FCC(size);
-			size = (((size & 0x7F000000) >> 0x03) |
-					((size & 0x007F0000) >> 0x02) |
-					((size & 0x00007F00) >> 0x01) |
-					((size & 0x0000007F)		));
+			size = hexdec2uint(size);
 
 			if (major <= 4) {
 				BYTE* buf = DNew BYTE[size];
