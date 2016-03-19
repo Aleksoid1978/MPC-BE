@@ -39,7 +39,7 @@ CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 	, m_procsize(0)
 	, m_coefficient(0.0)
 	, m_bIsVBR(false)
-	, ID3Tag(NULL)
+	, m_pID3Tag(NULL)
 {
 	if (SUCCEEDED(hr)) {
 		hr = Init();
@@ -48,7 +48,7 @@ CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 
 CMpaSplitterFile::~CMpaSplitterFile()
 {
-	SAFE_DELETE(ID3Tag);
+	SAFE_DELETE(m_pID3Tag);
 }
 
 HRESULT CMpaSplitterFile::Init()
@@ -96,8 +96,8 @@ HRESULT CMpaSplitterFile::Init()
 			BYTE* buf = DNew BYTE[size];
 			ByteRead(buf, size);
 
-			ID3Tag = DNew CID3Tag(major, flags);
-			ID3Tag->ReadTagsV2(buf, size);
+			m_pID3Tag = DNew CID3Tag(major, flags);
+			m_pID3Tag->ReadTagsV2(buf, size);
 			delete [] buf;
 		}
 
@@ -114,14 +114,14 @@ HRESULT CMpaSplitterFile::Init()
 		if (BitRead(24) == 'TAG') {
 			endpos -= 128;
 
-			if (!ID3Tag) {
-				ID3Tag = DNew CID3Tag();
+			if (!m_pID3Tag) {
+				m_pID3Tag = DNew CID3Tag();
 			}
 
 			size_t size = 128 - 3;
 			BYTE* buf = DNew BYTE[size];
 			ByteRead(buf, size);
-			ID3Tag->ReadTagsV1(buf, size);
+			m_pID3Tag->ReadTagsV1(buf, size);
 
 			delete [] buf;
 		}

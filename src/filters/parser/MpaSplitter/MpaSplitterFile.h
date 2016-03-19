@@ -50,7 +50,7 @@ public:
 	CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr);
 	virtual ~CMpaSplitterFile();
 
-	CID3Tag* ID3Tag;
+	CID3Tag* m_pID3Tag;
 
 	const CMediaType& GetMediaType() {
 		return m_mt;

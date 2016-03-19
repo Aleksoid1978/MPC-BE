@@ -160,7 +160,6 @@ static void ReadLang(CGolombBuffer &gb, DWORD &size)
 	size -= 3;
 }
 
-#define TAG_SIZE ((m_major == 2) ? 6 : 10)
 #define ID3v2_FLAG_DATALEN 0x0001
 #define ID3v2_FLAG_UNSYNCH 0x0002
 
@@ -171,23 +170,27 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 	while (!gb.IsEOF()) {
 		gb.Seek(pos);
 
-		DWORD tag	= 0;
-		DWORD size	= 0;
-		WORD flags	= 0;
+		DWORD tag;
+		DWORD size;
+		WORD flags;
+		int tagsize;
 		if (m_major == 2) {
 			tag		= (DWORD)gb.BitRead(24);
 			size	= (DWORD)gb.BitRead(24);
+			flags	= 0;
+			tagsize = 6;
 		} else {
 			tag		= (DWORD)gb.BitRead(32);
 			size	= (DWORD)gb.BitRead(32);
 			flags	= (WORD)gb.BitRead(16);
+			tagsize = 10;
 		}
 
-		if (TAG_SIZE + size + pos > len) {
+		if (pos + tagsize + size > len) {
 			break;
 		}
 
-		pos += TAG_SIZE + size;
+		pos += tagsize + size;
 
 		if (pos > gb.GetSize() || tag == 0) {
 			break;
