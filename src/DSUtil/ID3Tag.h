@@ -37,7 +37,7 @@ class CID3TagItem
 public:
 
 	CID3TagItem(DWORD tag, CString value);
-	CID3TagItem(CAtlArray<BYTE>& data, CString mime);
+	CID3TagItem(DWORD tag, CAtlArray<BYTE>& data, CString mime);
 
 	DWORD GetTag()			const { return m_tag; }
 	CString GetValue()		const { return m_value; }
