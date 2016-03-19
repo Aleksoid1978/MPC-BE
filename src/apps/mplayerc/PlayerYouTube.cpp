@@ -39,6 +39,12 @@
 #define MATCH_PLAYLIST_ITEM_START	"<li class=\"yt-uix-scroller-scroll-unit "
 #define MATCH_PLAYLIST_ITEM_START2	"<tr class=\"pl-video yt-uix-tile "
 
+#define MATCH_AGE_RESTRICTION		"player-age-gate-content\">"
+#define MATCH_STREAM_MAP_START_2	"url_encoded_fmt_stream_map="
+#define MATCH_ADAPTIVE_FMTS_START_2	"adaptive_fmts="
+#define MATCH_JS_START_2			"'PREFETCH_JS_RESOURCES': [\""
+#define MATCH_END_2					"&"
+
 #define INTERNET_OPEN_FALGS			INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD
 
 namespace YoutubeParser {
@@ -324,43 +330,84 @@ namespace YoutubeParser {
 			const CString Title = UTF8To16(GetEntry(data, "<title>", "</title>"));
 			y_fields.title = FixHtmlSymbols(Title);
 
-			// "hlspv" - live streaming
-			const CStringA hlspv_url = GetEntry(data, MATCH_HLSVP_START, MATCH_END);
-			if (!hlspv_url.IsEmpty()) {
-				url = UrlDecode(UrlDecode(hlspv_url));
-				url.Replace(L"\\/", L"/");
-				urls.AddHead(url);
-
-				InternetCloseHandle(s);
-				free(data);
-				return true;
-			}
-
-			// url_encoded_fmt_stream_map
-			const CStringA stream_map = GetEntry(data, MATCH_STREAM_MAP_START, MATCH_END);
-			if (stream_map.IsEmpty()) {
-				free(data);
-				InternetCloseHandle(s);
-				return false;
-			}
-			// adaptive_fmts
-			const CStringA adaptive_fmts = GetEntry(data, MATCH_ADAPTIVE_FMTS_START, MATCH_END);
-
-			CStringA strA = stream_map;
-			if (!adaptive_fmts.IsEmpty()) {
-				strA += ',';
-				strA += adaptive_fmts;
-			}
-			strA.Replace("\\u0026", "&");
-
 			CAtlArray<youtubeFuncType> JSFuncs;
 			CAtlArray<int> JSFuncArgs;
 			BOOL bJSParsed = FALSE;
 			CString JSUrl = UTF8To16(GetEntry(data, MATCH_JS_START, MATCH_END));
+			if (JSUrl.IsEmpty()) {
+				JSUrl = UTF8To16(GetEntry(data, MATCH_JS_START_2, MATCH_END));
+			}
 			if (!JSUrl.IsEmpty()) {
 				JSUrl.Replace(L"\\/", L"/");
 				JSUrl = L"https:" + JSUrl;
 			}
+			
+			CStringA strUrls;
+
+			if (strstr(data, MATCH_AGE_RESTRICTION)) {
+				free(data);
+				data = NULL;
+				dataSize = 0;
+				CString link; link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&ps=default&eurl=&gl=US&hl=en&el=info", videoId);
+				f = InternetOpenUrl(s, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
+				if (f) {
+					InternetReadData(f, &data, dataSize, NULL);
+					InternetCloseHandle(f);
+				}
+
+				if (!data) {
+					if (s) {
+						InternetCloseHandle(s);
+					}
+					return false;
+				}
+
+				// url_encoded_fmt_stream_map
+				const CStringA stream_map = UrlDecode(GetEntry(data, MATCH_STREAM_MAP_START_2, MATCH_END_2));
+				if (stream_map.IsEmpty()) {
+					free(data);
+					InternetCloseHandle(s);
+					return false;
+				}
+				// adaptive_fmts
+				const CStringA adaptive_fmts = UrlDecode(GetEntry(data, MATCH_ADAPTIVE_FMTS_START_2, MATCH_END_2));
+
+				strUrls = stream_map;
+				if (!adaptive_fmts.IsEmpty()) {
+					strUrls += ',';
+					strUrls += adaptive_fmts;
+				}
+			} else {
+				// "hlspv" - live streaming
+				const CStringA hlspv_url = GetEntry(data, MATCH_HLSVP_START, MATCH_END);
+				if (!hlspv_url.IsEmpty()) {
+					url = UrlDecode(UrlDecode(hlspv_url));
+					url.Replace(L"\\/", L"/");
+					urls.AddHead(url);
+
+					InternetCloseHandle(s);
+					free(data);
+					return true;
+				}
+
+				// url_encoded_fmt_stream_map
+				const CStringA stream_map = GetEntry(data, MATCH_STREAM_MAP_START, MATCH_END);
+				if (stream_map.IsEmpty()) {
+					free(data);
+					InternetCloseHandle(s);
+					return false;
+				}
+				// adaptive_fmts
+				const CStringA adaptive_fmts = GetEntry(data, MATCH_ADAPTIVE_FMTS_START, MATCH_END);
+
+				strUrls = stream_map;
+				if (!adaptive_fmts.IsEmpty()) {
+					strUrls += ',';
+					strUrls += adaptive_fmts;
+				}
+				strUrls.Replace("\\u0026", "&");
+			}
+
 			free(data);
 
 			const CAppSettings& sApp = AfxGetAppSettings();
@@ -380,7 +427,7 @@ namespace YoutubeParser {
 			int final_audio_itag = 0;
 
 			CAtlList<CStringA> linesA;
-			Explode(strA, linesA, ',');
+			Explode(strUrls, linesA, ',');
 
 			POSITION posLine = linesA.GetHeadPosition();
 			while (posLine) {
