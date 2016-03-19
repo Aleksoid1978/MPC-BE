@@ -134,7 +134,7 @@ HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = m_pFile->IsStreaming() ? 0 : m_pFile->GetDuration();
 
-	SetID3TagProperties(this, m_pFile->ID3Tag);
+	SetID3TagProperties(this, m_pFile->m_pID3Tag);
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
 }
