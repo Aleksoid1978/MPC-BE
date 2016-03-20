@@ -401,34 +401,34 @@ BOOL CPPageInternalFilters::OnInitDialog()
 	m_listVideo.SetItemHeight(0, ScaleY(13)+3); // 16 without scale
 	m_listAudio.SetItemHeight(0, ScaleY(13)+3); // 16 without scale
 
-	for (int i = 0; i < _countof(s_filters)-1; i++) {
-		CPPageInternalFiltersListBox* l;
+	for (int i = 0; i < _countof(s_filters); i++) {
+		CPPageInternalFiltersListBox* listbox;
 		bool checked = false;
 
 		switch (s_filters[i].type) {
 			case SOURCE_FILTER:
-				l		= &m_listSrc;
-				checked	= s.SrcFilters[s_filters[i].flag];
+				listbox = &m_listSrc;
+				checked = s.SrcFilters[s_filters[i].flag];
 				break;
 			case DXVA_DECODER:
-				l		= &m_listVideo;
-				checked	= s.DXVAFilters[s_filters[i].flag];
+				listbox = &m_listVideo;
+				checked = s.DXVAFilters[s_filters[i].flag];
 				break;
 			case VIDEO_DECODER:
-				l		= &m_listVideo;
-				checked	= s.VideoFilters[s_filters[i].flag];
+				listbox = &m_listVideo;
+				checked = s.VideoFilters[s_filters[i].flag];
 				break;
 			case AUDIO_DECODER:
-				l		= &m_listAudio;
-				checked	= s.AudioFilters[s_filters[i].flag];
+				listbox = &m_listAudio;
+				checked = s.AudioFilters[s_filters[i].flag];
 				break;
 			default:
-				l		= NULL;
-				checked	= false;
+				listbox = NULL;
+				checked = false;
 		}
 
-		if (l) {
-			l->AddFilter(&s_filters[i], checked);
+		if (listbox) {
+			listbox->AddFilter(&s_filters[i], checked);
 		}
 	}
 
