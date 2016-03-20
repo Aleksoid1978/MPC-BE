@@ -7370,12 +7370,27 @@ void CMainFrame::OnViewNormal()
 	ShowControls(CS_SEEKBAR | CS_TOOLBAR | CS_STATUSBAR);
 }
 
-#define IsD3DFS (IsD3DFullScreenMode() || (s.IsD3DFullscreen() && !(m_eMediaLoadState == MLS_LOADED && m_bAudioOnly) && !m_bFullScreen))
+bool CMainFrame::CanSwitchD3DFS()
+{
+	if (IsD3DFullScreenMode()) {
+		return true;
+	}
+
+	const CAppSettings& s = AfxGetAppSettings();
+	if ((s.fD3DFullscreen || (s.nCLSwitches & CLSW_D3DFULLSCREEN))) {
+		if (m_eMediaLoadState == MLS_LOADED) {
+			return m_pD3DFS && !m_bFullScreen;
+		}
+
+		return s.IsD3DFullscreen();
+	}
+
+	return false;
+}
+
 void CMainFrame::OnViewFullscreen()
 {
-	const CAppSettings& s = AfxGetAppSettings();
-
-	if (IsD3DFS) {
+	if (CanSwitchD3DFS()) {
 		ToggleD3DFullscreen(true);
 	} else {
 		ToggleFullscreen(true, true);
@@ -7384,9 +7399,7 @@ void CMainFrame::OnViewFullscreen()
 
 void CMainFrame::OnViewFullscreenSecondary()
 {
-	const CAppSettings& s = AfxGetAppSettings();
-
-	if (IsD3DFS) {
+	if (CanSwitchD3DFS()) {
 		ToggleD3DFullscreen(false);
 	} else {
 		ToggleFullscreen(true, false);
@@ -10931,7 +10944,7 @@ void CMainFrame::AutoChangeMonitorMode()
 					&& dFPS >= fsmode->vfr_from
 					&& dFPS <= fsmode->vfr_to) {
 
-				SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes, mf_hmonitor, IsD3DFS);
+				SetDispMode(s.AutoChangeFullscrRes.dmFullscreenRes[rs].dmFSRes, mf_hmonitor, CanSwitchD3DFS());
 				return;
 			}
 		}

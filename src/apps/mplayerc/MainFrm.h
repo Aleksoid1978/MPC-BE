@@ -1349,4 +1349,6 @@ protected:
 
 	void		SetToolBarAudioButton();
 	void		SetToolBarSubtitleButton();
+
+	bool		CanSwitchD3DFS();
 };
