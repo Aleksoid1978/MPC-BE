@@ -1524,8 +1524,8 @@ BOOL CMPlayerCApp::InitInstance()
 	m_mutexOneInstance.Create(NULL, TRUE, _T(MPC_WND_CLASS_NAME));
 
 	if (GetLastError() == ERROR_ALREADY_EXISTS
-			&& !(m_s.nCLSwitches&CLSW_NEW)
-			&& (m_s.nCLSwitches&CLSW_ADD ||
+			&& !(m_s.nCLSwitches & CLSW_NEW)
+			&& (m_s.nCLSwitches & CLSW_ADD ||
 				(m_s.GetMultiInst() == 1 && !m_cmdln.IsEmpty()) ||
 				m_s.GetMultiInst() == 0)) {
 
@@ -1533,18 +1533,17 @@ BOOL CMPlayerCApp::InitInstance()
 		if (res == WAIT_OBJECT_0 || res == WAIT_ABANDONED) {
 			HWND hWnd = ::FindWindow(_T(MPC_WND_CLASS_NAME), NULL);
 			if (hWnd) {
-				SetForegroundWindow(hWnd);
-				if (!(m_s.nCLSwitches&CLSW_MINIMIZED) && IsIconic(hWnd)) {
+				if (!(m_s.nCLSwitches & CLSW_MINIMIZED) && IsIconic(hWnd)) {
 					ShowWindow(hWnd, SW_RESTORE);
 				}
 				BOOL bDataIsSend = TRUE;
 
-				PTHREADCopyData pTCD	= DNew THREADCopyData;
-				pTCD->pMPlayerCApp		= this;
-				pTCD->hWND				= hWnd;
+				PTHREADCopyData pTCD = DNew THREADCopyData;
+				pTCD->pMPlayerCApp   = this;
+				pTCD->hWND           = hWnd;
 
 				CWinThread*	pTHREADCopyData = AfxBeginThread(RunTHREADCopyData, static_cast<LPVOID>(pTCD));
-				if (WaitForSingleObject(pTHREADCopyData->m_hThread, 7000) == WAIT_TIMEOUT) { // in CMainFrame::CloseMedia() wait to graph thread is complete 5000
+				if (WaitForSingleObject(pTHREADCopyData->m_hThread, 7000) == WAIT_TIMEOUT) { // in CMainFrame::CloseMedia() wait to graph thread is complete 7000
 					TerminateThread(pTHREADCopyData->m_hThread, 0xDEAD);
 					bDataIsSend = FALSE;
 				}
