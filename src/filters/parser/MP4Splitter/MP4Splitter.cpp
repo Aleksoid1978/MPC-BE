@@ -1204,16 +1204,12 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 						} else if (atom->GetType() == AP4_ATOM_TYPE_COVR) {
 							if (db->GetDataSize() > 10) {
-								DWORD sync = GETDWORD(db->GetData()+6);
-								// check for JFIF or Exif sync ...
-								if (sync == MAKEFOURCC('J', 'F', 'I', 'F') || sync == MAKEFOURCC('E', 'x', 'i', 'f')) {
+								DWORD sync = GETDWORD(db->GetData());
+								if ((sync & 0x00ffffff) == 0x00FFD8FF) { // SOI segment + first byte of next segment
 									ResAppend(_T("cover.jpg"), _T("cover"), _T("image/jpeg"), (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
-								} else {
-									sync = GETDWORD(db->GetData());
-									// check for PNG sync ...
-									if (sync == MAKEFOURCC(0x89, 'P', 'N', 'G')) {
-										ResAppend(_T("cover.png"), _T("cover"), _T("image/png"), (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
-									}
+								}
+								else if (sync == MAKEFOURCC(0x89, 'P', 'N', 'G')) {
+									ResAppend(_T("cover.png"), _T("cover"), _T("image/png"), (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
 								}
 							}
 						} else {
