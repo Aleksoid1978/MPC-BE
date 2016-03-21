@@ -222,6 +222,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		pWnd->SetFont(&m_font, FALSE);
 	}
 
+	CorrectComboListWidth(m_cbDeinterlacing);
 	CorrectComboListWidth(m_cbDXVACompatibilityCheck);
 	CorrectComboListWidth(m_cbDiscardMode);
 
