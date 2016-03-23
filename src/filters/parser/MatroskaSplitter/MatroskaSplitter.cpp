@@ -661,6 +661,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (timecodes.GetCount()) {
 						qsort(timecodes.GetData(), timecodes.GetCount(), sizeof(INT64), compare);
 
+						// calculate the average fps
+						double fps = 1000000000.0 * (timecodes.GetCount() - 1) / (m_pFile->m_segment.SegmentInfo.TimeCodeScale * (timecodes[timecodes.GetCount() - 1] - timecodes[0]));
+
 						CAtlArray<int> frametimes;
 						for (size_t i = 1; i < timecodes.GetCount(); i++) {
 							INT64 diff = timecodes[i] - timecodes[i-1];
@@ -690,12 +693,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 							}
 
-							if (longsum && longcount) {
-								double fps = 1000000000.0 * longcount / (m_pFile->m_segment.SegmentInfo.TimeCodeScale * longsum);
-								fps = Video_FrameRate_Rounding(fps);
-								AvgTimePerFrame = 10000000.0 / fps;
+							if (longsum && longcount >= 10) {
+								fps = 1000000000.0 * longcount / (m_pFile->m_segment.SegmentInfo.TimeCodeScale * longsum);
 							}
 						}
+
+						fps = Video_FrameRate_Rounding(fps);
+						AvgTimePerFrame = 10000000.0 / fps;
 					}
 				}
 
