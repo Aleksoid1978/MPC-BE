@@ -197,6 +197,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FrameDuration.cpp" />
     <ClCompile Include="MatroskaFile.cpp" />
     <ClCompile Include="MatroskaSplitter.cpp" />
     <ClCompile Include="MatroskaSplitterSettingsWnd.cpp" />

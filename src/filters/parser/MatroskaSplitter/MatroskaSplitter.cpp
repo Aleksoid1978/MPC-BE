@@ -167,31 +167,6 @@ STDMETHODIMP CMatroskaSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
-static int compare(const void* a, const void* b)
-{
-	return (*(INT64*)a - *(INT64*)b);
-}
-
-static double Video_FrameRate_Rounding(double FrameRate)
-{
-	// rounded up to the standard values if the difference is not more than 0.05%
-	     if (FrameRate > 14.993 && FrameRate <  15.008) FrameRate = 15.000;
-	else if (FrameRate > 23.964 && FrameRate <  23.988) FrameRate = 24/1.001;
-	else if (FrameRate > 23.988 && FrameRate <  24.012) FrameRate = 24;
-	else if (FrameRate > 24.988 && FrameRate <  25.013) FrameRate = 25.000;
-	else if (FrameRate > 29.955 && FrameRate <  29.985) FrameRate = 30/1.001;
-	else if (FrameRate > 29.985 && FrameRate <  30.015) FrameRate = 30.000;
-	else if (FrameRate > 47.928 && FrameRate <  47.976) FrameRate = 48/1.001;
-	else if (FrameRate > 47.976 && FrameRate <  48.024) FrameRate = 48;
-	else if (FrameRate > 49.975 && FrameRate <  50.025) FrameRate = 50;
-	else if (FrameRate > 59.910 && FrameRate <  59.970) FrameRate = 60/1.001;
-	else if (FrameRate > 59.970 && FrameRate <  60.030) FrameRate = 60;
-	else if (FrameRate >119.820 && FrameRate < 119.940) FrameRate = 120/1.001;
-	else if (FrameRate >119.940 && FrameRate < 120.060) FrameRate = 120;
-
-	return FrameRate;
-}
-
 #define MATROSKA_VIDEO_STEREOMODE 15
 static const LPWSTR matroska_stereo_mode[MATROSKA_VIDEO_STEREOMODE] = {
 	L"mono",
@@ -608,99 +583,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						&& CodecID != "V_DSHOW/MPEG1VIDEO" && CodecID != "V_MPEG1" && CodecID != "V_MPEG2") {
 					DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CreateOutputs() : calculate AvgTimePerFrame"));
 
-					CMatroskaNode Root(m_pFile);
-					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
-					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
-
-					CAtlArray<INT64> timecodes;
-					bool readmore = true;
-
-					do {
-						Cluster c;
-						c.ParseTimeCode(m_pCluster);
-
-						if (CAutoPtr<CMatroskaNode> pBlock = m_pCluster->GetFirstBlock()) {
-							do {
-								CBlockGroupNode bgn;
-
-								if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-									bgn.Parse(pBlock, true);
-								}
-								else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
-									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
-									bg->Block.Parse(pBlock, true);
-									bgn.AddTail(bg);
-								}
-
-								POSITION pos4 = bgn.GetHeadPosition();
-								while (pos4) {
-									BlockGroup* bg = bgn.GetNext(pos4);
-									if (bg->Block.TrackNumber != pTE->TrackNumber) {
-										continue;
-									}
-									INT64 tc = c.TimeCode + bg->Block.TimeCode;
-
-									if (tc < 0) {
-										continue;
-									}
-
-									timecodes.Add(tc);
-									DbgLog((LOG_TRACE, 3, L"	=> Frame: %02d, TimeCode: %5I64d = %10I64d", timecodes.GetCount(), tc, m_pFile->m_segment.GetRefTime(tc)));
-
-									if (timecodes.GetCount() >= 120) {
-										readmore = false;
-										break;
-									}
-								}
-							} while (readmore && pBlock->NextBlock());
-						}
-					} while (readmore && m_pCluster->Next(true));
-
-					m_pCluster.Free();
-
-					if (timecodes.GetCount()) {
-						qsort(timecodes.GetData(), timecodes.GetCount(), sizeof(INT64), compare);
-
-						// calculate the average fps
-						double fps = 1000000000.0 * (timecodes.GetCount() - 1) / (m_pFile->m_segment.SegmentInfo.TimeCodeScale * (timecodes[timecodes.GetCount() - 1] - timecodes[0]));
-
-						CAtlArray<int> frametimes;
-						for (size_t i = 1; i < timecodes.GetCount(); i++) {
-							INT64 diff = timecodes[i] - timecodes[i-1];
-							if (diff > 0 && diff < INT_MAX) {
-								frametimes.Add((int)diff);
-							}
-						}
-
-						if (frametimes.GetCount()) {
-							int longsum = 0;
-							int longcount = 0;
-
-							int sum = frametimes[0];
-							int count = 1;
-							for (size_t i = 1; i < frametimes.GetCount(); i++) {
-								if (abs(frametimes[i-1] - frametimes[i]) <= 1) {
-									sum += frametimes[i];
-									count++;
-
-									if (count > longcount) {
-										longsum = sum;
-										longcount = count;
-									}
-								} else {
-									sum = frametimes[i];
-									count = 1;
-								}
-							}
-
-							if (longsum && longcount >= 10) {
-								fps = 1000000000.0 * longcount / (m_pFile->m_segment.SegmentInfo.TimeCodeScale * longsum);
-							}
-						}
-
-						fps = Video_FrameRate_Rounding(fps);
-						AvgTimePerFrame = 10000000.0 / fps;
-					}
+					AvgTimePerFrame = CalcFrameDuration(pTE->TrackNumber);
 				}
 
 				if (bInterlaced && codecAvgTimePerFrame && AvgTimePerFrame) {
