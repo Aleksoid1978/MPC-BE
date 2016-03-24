@@ -92,6 +92,7 @@ private:
 	CCritSec m_csProps;
 	bool m_bLoadEmbeddedFonts, m_bCalcDuration;
 
+	REFERENCE_TIME CalcFrameDuration(CUInt trackNumber);
 
 protected:
 	CAutoPtr<MatroskaReader::CMatroskaFile> m_pFile;
