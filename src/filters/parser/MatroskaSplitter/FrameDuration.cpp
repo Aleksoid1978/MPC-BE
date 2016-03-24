@@ -135,9 +135,27 @@ REFERENCE_TIME CMatroskaSplitterFilter::CalcFrameDuration(CUInt trackNumber)
 		std::vector<int> frametimes;
 		frametimes.reserve(MAXTESTEDFRAMES - 1);
 
+		int k = 0;
 		for (size_t i = 1; i < timecodes.size(); i++) {
 			INT64 diff = timecodes[i] - timecodes[i-1];
 			if (diff > 0 && diff < INT_MAX) {
+
+				if (diff == 1) {
+					// calculate values equal to 1
+					k++;
+				}
+				else if (k > 0 && k < frametimes.size()) {
+					// fill values equal to 1 due to the previous value
+					size_t j = frametimes.size() - 1 - k;
+					int d = frametimes[j] + k;
+					k += 1;
+					for (; j < frametimes.size(); j++) {
+						frametimes[j] = d / k--;
+						d -= frametimes[j];
+					}
+					k = 0; // not necessarily, but let it be
+				}
+
 				frametimes.push_back((int)diff);
 			}
 		}
