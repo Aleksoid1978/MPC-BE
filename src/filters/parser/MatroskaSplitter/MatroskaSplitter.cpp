@@ -581,8 +581,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				if (AvgTimePerFrame < 50000 // incorrect fps - calculate avarage value
 						&& CodecID != "V_DSHOW/MPEG1VIDEO" && CodecID != "V_MPEG1" && CodecID != "V_MPEG2") {
-					DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CreateOutputs() : calculate AvgTimePerFrame"));
-
 					AvgTimePerFrame = CalcFrameDuration(pTE->TrackNumber);
 				}
 
