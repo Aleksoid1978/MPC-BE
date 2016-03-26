@@ -123,6 +123,7 @@
     <ClCompile Include="GUIDString.cpp" />
     <ClCompile Include="H264Nalu.cpp" />
     <ClCompile Include="HdmvClipInfo.cpp" />
+    <ClCompile Include="HTTPAsync.cpp" />
     <ClCompile Include="ID3Tag.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="MediaDescription.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="GUIDString.h" />
     <ClInclude Include="H264Nalu.h" />
     <ClInclude Include="HdmvClipInfo.h" />
+    <ClInclude Include="HTTPAsync.h" />
     <ClInclude Include="ID3Tag.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="MediaDescription.h" />
