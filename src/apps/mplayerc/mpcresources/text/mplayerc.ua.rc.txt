@@ -512,13 +512,13 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 END
 
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
-5		"Additional settings"
+5		"Додаткові налаштування"
 6		"Вибір формату перегляду:"
 8		"Завантажити список відтворення"
-9		"Source"
-10		"Internal downloader"
+9		"Джерело"
+10		"Вбудований завантажувач"
 11		"Системний"
-12		"External source filter"
+12		"Зовнішній фільтр джерела"
 13		"Початковий розмір буфера"
 14		"% від розміру файла джерела"
 15		"Мб"
