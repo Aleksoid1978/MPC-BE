@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include "HTTPAsync.h"
-#include "DSUtil.h"
 
 void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 								   __in_opt DWORD_PTR dwContext,
@@ -28,23 +27,22 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 								   __in_opt LPVOID lpvStatusInformation,
 								   __in DWORD dwStatusInformationLength)
 {
-	Context* pContext = (Context*)dwContext;
-	switch (pContext->dwContext) {
+	auto* pContext = (CHTTPAsync*)dwContext;
+	auto* pRes     = (INTERNET_ASYNC_RESULT*)lpvStatusInformation;
+	switch (pContext->m_context) {
 		case CONTEXT_CONNECT:
 			if (dwInternetStatus == INTERNET_STATUS_HANDLE_CREATED) {
-				INTERNET_ASYNC_RESULT *pRes = (INTERNET_ASYNC_RESULT *)lpvStatusInformation;
-				pContext->pObj->m_hConnect = (HINTERNET)pRes->dwResult;
-				SetEvent(pContext->pObj->m_hConnectedEvent);
+				pContext->m_hConnect = (HINTERNET)pRes->dwResult;
+				SetEvent(pContext->m_hConnectedEvent);
 			}
 			break;
-		case CONTEXT_REQUESTHANDLE: // Request handle
+		case CONTEXT_REQUEST:
 			{
 				switch (dwInternetStatus) {
 					case INTERNET_STATUS_HANDLE_CREATED:
 						{
-							INTERNET_ASYNC_RESULT *pRes = (INTERNET_ASYNC_RESULT *)lpvStatusInformation;
-							pContext->pObj->m_hRequest = (HINTERNET)pRes->dwResult;
-							SetEvent(pContext->pObj->m_hRequestOpenedEvent);
+							pContext->m_hRequest = (HINTERNET)pRes->dwResult;
+							SetEvent(pContext->m_hRequestOpenedEvent);
 						}
 						break;
 
@@ -57,8 +55,7 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 
 					case INTERNET_STATUS_REQUEST_COMPLETE:
 						{
-							INTERNET_ASYNC_RESULT *pAsyncRes = (INTERNET_ASYNC_RESULT *)lpvStatusInformation;
-							SetEvent(pContext->pObj->m_hRequestCompleteEvent);
+							SetEvent(pContext->m_hRequestCompleteEvent);
 						}
 						break;
 
@@ -86,13 +83,12 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 CString const CHTTPAsync::QueryInfo(DWORD dwInfoLevel)
 {
 	CString queryInfo;
-    DWORD   dwLen = 0 ;
-	if (!HttpQueryInfo(m_hRequest, dwInfoLevel, NULL, &dwLen, 0) && dwLen) {
+	DWORD   dwLen = 0 ;
+	if (m_hRequest && !HttpQueryInfo(m_hRequest, dwInfoLevel, NULL, &dwLen, 0) && dwLen) {
 		const DWORD dwError = GetLastError();
-		if (dwError == ERROR_INSUFFICIENT_BUFFER) {
-			if (HttpQueryInfo(m_hRequest, dwInfoLevel, (LPVOID)queryInfo.GetBuffer(dwLen), &dwLen, 0)) {
-				queryInfo.ReleaseBuffer(dwLen);
-			}
+		if (dwError == ERROR_INSUFFICIENT_BUFFER
+				&& HttpQueryInfo(m_hRequest, dwInfoLevel, (LPVOID)queryInfo.GetBuffer(dwLen), &dwLen, 0)) {
+			queryInfo.ReleaseBuffer(dwLen);
 		}
     }
 	
@@ -108,6 +104,8 @@ CHTTPAsync::CHTTPAsync()
 
 CHTTPAsync::~CHTTPAsync()
 {
+	Close();
+
 	if (m_hConnectedEvent) {
 		CloseHandle(m_hConnectedEvent);
 	}
@@ -117,8 +115,6 @@ CHTTPAsync::~CHTTPAsync()
 	if (m_hRequestCompleteEvent) {
 		CloseHandle(m_hRequestCompleteEvent);
 	}
-
-	Close();
 }
 
 #define SAFE_INTERNET_CLOSE_HANDLE(p) { if (p) { VERIFY(InternetCloseHandle(p)); (p) = NULL; } }
@@ -126,6 +122,14 @@ CHTTPAsync::~CHTTPAsync()
 
 void CHTTPAsync::Close()
 {
+	ResetEvent(m_hConnectedEvent);
+	ResetEvent(m_hRequestOpenedEvent);
+	ResetEvent(m_hRequestCompleteEvent);
+
+	if (m_hInstance) {
+		InternetSetStatusCallback(m_hInstance, NULL);
+	}
+
 	SAFE_INTERNET_CLOSE_HANDLE(m_hRequest);
 	SAFE_INTERNET_CLOSE_HANDLE(m_hConnect);
 	SAFE_INTERNET_CLOSE_HANDLE(m_hInstance);
@@ -144,10 +148,6 @@ void CHTTPAsync::Close()
 HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPCTSTR lpszAgent/* = L"MPC-BE"*/, BOOL bSendRequest/* = TRUE*/)
 {
 	Close();
-
-	ResetEvent(m_hConnectedEvent);
-	ResetEvent(m_hRequestOpenedEvent);
-	ResetEvent(m_hRequestCompleteEvent);
 
 	if (!m_url.CrackUrl(lpszURL)) {
 		return E_INVALIDARG;
@@ -182,8 +182,7 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 		return E_FAIL;
 	}
 
-	m_context.dwContext = CONTEXT_CONNECT;
-	m_context.pObj      = this;
+	m_context = CONTEXT_CONNECT;
 
 	m_hConnect = InternetConnect(m_hInstance, 
 								 m_host,
@@ -192,7 +191,7 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 								 NULL,
 								 INTERNET_SERVICE_HTTP,
 								 INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_NO_CACHE_WRITE,
-								 (DWORD)&m_context);
+								 (DWORD_PTR)this);
 
 	if (m_hConnect == NULL) {
 		CheckLastError(E_FAIL);
@@ -205,23 +204,21 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	CheckPointer(m_hConnect, E_FAIL);
 
 	if (bSendRequest) {
-		m_context.dwContext = CONTEXT_REQUESTHANDLE;
-		m_context.pObj      = this;
+		m_context = CONTEXT_REQUEST;
 
 		DWORD dwFlags = INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE;
 		if (m_nScheme == ATL_URL_SCHEME_HTTPS) {
 			dwFlags |= (INTERNET_FLAG_SECURE | INTERNET_FLAG_IGNORE_CERT_CN_INVALID | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID);
 		}
 
-
-		m_hRequest = HttpOpenRequest(m_hConnect, 
+		m_hRequest = HttpOpenRequest(m_hConnect,
 									 L"GET",
 									 m_path,
 									 NULL,
 									 NULL,
 									 NULL,
 									 dwFlags,
-									 (DWORD) &m_context); 
+									 (DWORD_PTR)this);
 
 		if (m_hRequest == NULL) {
 			CheckLastError(E_FAIL);
@@ -234,22 +231,20 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 		CheckPointer(m_hRequest, E_FAIL);
 
 		const CString lpszHeaders = L"Accept: */*\r\n";
-		if (!HttpSendRequest(m_hRequest, 
-							 lpszHeaders, 
-							 lpszHeaders.GetLength(), 
+		if (!HttpSendRequest(m_hRequest,
+							 lpszHeaders,
+							 lpszHeaders.GetLength(),
 							 NULL,
 							 0)) {
 			CheckLastError(E_FAIL);
 		}
 
 		if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
-			Close();
 			return E_FAIL;
 		}
 
 		CString queryInfo = QueryInfo(HTTP_QUERY_STATUS_CODE);
 		if (queryInfo != L"200") {
-			Close();
 			return E_FAIL;
 		}
 
@@ -271,13 +266,12 @@ DWORD CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSize, DWORD dwTimeOut/* = INFINITE
 	InetBuff.lpvBuffer        = pBuffer;
 	InetBuff.dwBufferLength   = dwSize;
 
-	m_context.dwContext = CONTEXT_REQUESTHANDLE;
-	m_context.pObj      = this;
+	m_context = CONTEXT_REQUEST;
 
 	if (!InternetReadFileEx(m_hRequest,
 							&InetBuff,
 							0,
-							(DWORD)&m_context)) {
+							(DWORD_PTR)this)) {
 		CheckLastError(0);
 		if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
 			return 0;
