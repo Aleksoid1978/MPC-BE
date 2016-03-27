@@ -31,6 +31,7 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/Filehandle.h"
 #include "../../DSUtil/FileVersionInfo.h"
+#include "../../DSUtil/HTTPAsync.h"
 #include "OpenDlg.h"
 #include "SaveDlg.h"
 #include "GoToDlg.h"
@@ -11944,25 +11945,21 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		CString tmp(fn);
 		tmp.MakeLower();
 
-		if (tmp.Find(_T("http://")) == 0 || tmp.Find(_T("www.")) == 0) {
-			// validate http url before opening
-			if (tmp.Find(_T("www.")) == 0) {
-				tmp = _T("http://") + tmp;
-			}
+		if (tmp.Find(L"www.") == 0) {
+			tmp = L"http://" + tmp;
+		}
 
-			CMPCSocket socket;
-			if (socket.Create()) {
-				socket.SetTimeOut(3000);
-				if (!socket.Connect(tmp, TRUE)) {
-					hr = VFW_E_NOT_FOUND;
-				}
-
-				socket.Close();
+		CUrl url;
+		if (::PathIsURL(tmp) && url.CrackUrl(tmp)
+				&& (url.GetScheme() == ATL_URL_SCHEME_HTTP || url.GetScheme() == ATL_URL_SCHEME_HTTPS)) {
+			CHTTPAsync HTTPAsync;
+			if (FAILED(HTTPAsync.Connect(fn, 5000))) {
+				hr = VFW_E_NOT_FOUND;
 			}
 		}
 
 		if (SUCCEEDED(hr)) {
-			TCHAR path[MAX_PATH] = {0};
+			TCHAR path[MAX_PATH] = { 0 };
 			BOOL bIsDirSet       = FALSE;
 			if (!::PathIsURL(fn) && ::GetCurrentDirectory(sizeof(path), path)) {
 				bIsDirSet = ::SetCurrentDirectory(GetFolderOnly(fn));

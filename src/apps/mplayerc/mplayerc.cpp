@@ -31,7 +31,7 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/FileVersionInfo.h"
-#include "../../DSUtil/MPCSocket.h"
+#include "../../DSUtil/HTTPAsync.h"
 #include "PlayerYouTube.h"
 #include <moreuuids.h>
 #include <winddk/ntddcdvd.h>
@@ -2197,14 +2197,17 @@ bool FindRedir(CString& fn, CString ct, CAtlList<CString>& fns, CAutoPtrList<CAt
 	return fns.GetCount() > 0;
 }
 
+CHTTPAsync HTTPAsync;
 CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 {
 	CUrl url;
 	CString ct, body;
 
-	if (fn.Find(_T("://")) > 0) {
-		url.CrackUrl(fn);
+	if (fn.Find(L"www.") == 0) {
+		fn = L"http://" + fn;
+	}
 
+	if (::PathIsURL(fn) && url.CrackUrl(fn)) {
 		if (_tcsicmp(url.GetSchemeName(), _T("pnm")) == 0) {
 			return "audio/x-pn-realaudio";
 		}
@@ -2213,27 +2216,17 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 			return "video/x-ms-asf";
 		}
 
-		if (url.GetScheme() != ATL_URL_SCHEME_HTTP) {
-			return "";
-		}
+		if (HTTPAsync.Connect(fn, 5000) == S_OK) {
+			const CString hdr = HTTPAsync.GetHeader();
+			QWORD ContentLength = HTTPAsync.GetLenght();
 
-		CMPCSocket socket;
-		if (!socket.Create()) {
-			return "";
-		}
-		socket.SetTimeOut(3000, 3000);
-		if (socket.Connect(url)) {
-			CStringA hdr = socket.GetHeader();
-
-			int ContentLength = 0;
-
-			CStringA location;
-			CAtlList<CStringA> sl;
+			CString location;
+			CAtlList<CString> sl;
 			Explode(hdr, sl, '\n');
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
-				CStringA& hdrline = sl.GetNext(pos);
-				CAtlList<CStringA> sl2;
+				CString& hdrline = sl.GetNext(pos);
+				CAtlList<CString> sl2;
 				Explode(hdrline, sl2, ':', 2);
 				CStringA field = sl2.RemoveHead().MakeLower();
 				if (field == "location" && !sl2.IsEmpty()) {
@@ -2244,11 +2237,6 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				}
 				if (field == "content-type" && !sl2.IsEmpty()) {
 					ct = sl2.GetHead();
-				}
-
-				hdrline.MakeLower();
-				if (1 == sscanf_s(hdrline, "content-length:%d", &ContentLength)) {
-					;
 				}
 			}
 
@@ -2286,16 +2274,9 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				nMinSize = min(nMinSize, ContentLength);
 			}
 
-			while (body.GetLength() < nMinSize) {
-				CStringA str;
-				socket.SetTimeOut(1500);
-				str.ReleaseBuffer(socket.Receive(str.GetBuffer(nMinSize), nMinSize)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
-				socket.KillTimeOut();
-				if (str.IsEmpty()) {
-					break;
-				}
-				body += str;
-			}
+			CStringA str;
+			str.ReleaseBuffer(HTTPAsync.Read((PBYTE)str.GetBuffer(nMinSize), nMinSize, 3000));
+			body += str;
 
 			if (body.GetLength() >= 8) {
 				CStringA str = TToA(body);
@@ -2325,18 +2306,10 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 					nMaxSize = min(ContentLength, nMaxSize);
 				}
 
-				while (body.GetLength() < nMaxSize) { // should be enough for a playlist...
-					CStringA str;
-					socket.SetTimeOut(1500);
-					str.ReleaseBuffer(socket.Receive(str.GetBuffer(nMinSize), nMinSize)); // SOCKET_ERROR == -1, also suitable for ReleaseBuffer
-					socket.KillTimeOut();
-					if (str.IsEmpty()) {
-						break;
-					}
-					body += str;
-				}
+				CStringA str;
+				str.ReleaseBuffer(HTTPAsync.Read((PBYTE)str.GetBuffer(nMaxSize), nMaxSize, 5000));
+				body += str;
 			}
-
 #if (SOCKET_DUMPLOGFILE)
 			{
 				if (body.GetLength() > 0) {
