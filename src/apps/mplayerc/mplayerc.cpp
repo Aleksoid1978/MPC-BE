@@ -2310,6 +2310,8 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				str.ReleaseBuffer(HTTPAsync.Read((PBYTE)str.GetBuffer(nMaxSize), nMaxSize, 5000));
 				body += str;
 			}
+
+			HTTPAsync.Close();
 #if (SOCKET_DUMPLOGFILE)
 			{
 				if (body.GetLength() > 0) {
