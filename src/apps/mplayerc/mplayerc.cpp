@@ -2269,7 +2269,7 @@ CStringA GetContentType(CString fn, CAtlList<CString>* redir)
 				}
 			}
 
-			int nMinSize = 256;
+			int nMinSize = KILOBYTE;
 			if (ContentLength) {
 				nMinSize = min(nMinSize, ContentLength);
 			}
