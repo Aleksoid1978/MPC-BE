@@ -23,17 +23,15 @@
 #include <wininet.h>
 #include <atlutil.h>
 
-class CHTTPAsync;
-
-struct Context {
-	CHTTPAsync* pObj = NULL;
-	DWORD dwContext  = 0;
-};
-
 class CHTTPAsync
 {
 protected:
-	Context m_context;
+	enum Context {
+		CONTEXT_INITIAL = -1,
+		CONTEXT_CONNECT,
+		CONTEXT_REQUEST
+	};
+	Context m_context = CONTEXT_INITIAL;
 
 	HANDLE m_hConnectedEvent       = INVALID_HANDLE_VALUE;
 	HANDLE m_hRequestOpenedEvent   = INVALID_HANDLE_VALUE;
@@ -47,7 +45,6 @@ protected:
 	CString m_url_str;
 	CString m_host;
 	CString m_path;
-
 
 	ATL_URL_PORT m_nPort     = INTERNET_DEFAULT_HTTP_PORT;
 	ATL_URL_SCHEME m_nScheme = ATL_URL_SCHEME_HTTP;
@@ -63,12 +60,6 @@ protected:
 	CString const QueryInfo(DWORD dwInfoLevel);
 
 public:
-	enum
-	{
-		CONTEXT_CONNECT,
-		CONTEXT_REQUESTHANDLE
-	};
-
 	CHTTPAsync();
 	virtual ~CHTTPAsync();
 
