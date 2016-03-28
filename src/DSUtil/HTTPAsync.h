@@ -49,6 +49,8 @@ protected:
 	ATL_URL_PORT m_nPort     = INTERNET_DEFAULT_HTTP_PORT;
 	ATL_URL_SCHEME m_nScheme = ATL_URL_SCHEME_HTTP;
 
+	CString m_header;
+	CString m_contentType;
 	QWORD m_lenght = 0;
 
 	static void CALLBACK Callback(__in HINTERNET hInternet,
@@ -67,9 +69,10 @@ public:
 	void Close();
 
 	HRESULT Connect(LPCTSTR lpszURL, DWORD dwTimeOut = INFINITE, LPCTSTR lpszAgent = L"MPC-BE", BOOL bSendRequest = TRUE);
-	DWORD Read(PBYTE pBuffer, DWORD dwSize, DWORD dwTimeOut = INFINITE);
+	HRESULT Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut = INFINITE);
 
-	CString const GetHeader() { return QueryInfoStr(HTTP_QUERY_RAW_HEADERS_CRLF); }
-	QWORD const GetLenght() { return m_lenght; }
+	CString GetHeader() const;
+	CString GetContentType() const;
+	QWORD GetLenght() const;
 };
 

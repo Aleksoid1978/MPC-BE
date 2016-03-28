@@ -45,30 +45,23 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 							SetEvent(pContext->m_hRequestOpenedEvent);
 						}
 						break;
-
 					case INTERNET_STATUS_REQUEST_SENT:
 						{
 							DWORD* lpBytesSent = (DWORD*)lpvStatusInformation;
 							UNREFERENCED_PARAMETER(lpBytesSent);
 						}
 						break;
-
 					case INTERNET_STATUS_REQUEST_COMPLETE:
 						{
 							SetEvent(pContext->m_hRequestCompleteEvent);
 						}
 						break;
-
 					case INTERNET_STATUS_REDIRECT:
 						{
-							CString strRealAddr = (LPCTSTR)lpvStatusInformation;
-							UNREFERENCED_PARAMETER(strRealAddr);
+							CString strNewAddr = (LPCTSTR)lpvStatusInformation;
+							UNREFERENCED_PARAMETER(strNewAddr);
 						}
 						break;
-
-					case INTERNET_STATUS_RECEIVING_RESPONSE:
-						break;
-
 					case INTERNET_STATUS_RESPONSE_RECEIVED:
 						{
 							DWORD* dwBytesReceived = (DWORD*)lpvStatusInformation;
@@ -82,9 +75,11 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 
 CString CHTTPAsync::QueryInfoStr(DWORD dwInfoLevel) const
 {
+	CheckPointer(m_hRequest, L"");
+
 	CString queryInfo;
 	DWORD   dwLen = 0;
-	if (m_hRequest && !HttpQueryInfo(m_hRequest, dwInfoLevel, NULL, &dwLen, 0) && dwLen) {
+	if (!HttpQueryInfo(m_hRequest, dwInfoLevel, NULL, &dwLen, 0) && dwLen) {
 		const DWORD dwError = GetLastError();
 		if (dwError == ERROR_INSUFFICIENT_BUFFER
 				&& HttpQueryInfo(m_hRequest, dwInfoLevel, (LPVOID)queryInfo.GetBuffer(dwLen), &dwLen, 0)) {
@@ -97,11 +92,11 @@ CString CHTTPAsync::QueryInfoStr(DWORD dwInfoLevel) const
 
 DWORD CHTTPAsync::QueryInfoDword(DWORD dwInfoLevel) const
 {
+	CheckPointer(m_hRequest, 0);
+
 	DWORD dwStatusCode = 0;
 	DWORD dwStatusLen  = sizeof(dwStatusCode);
-	if (m_hRequest) {
-		HttpQueryInfo(m_hRequest, HTTP_QUERY_FLAG_NUMBER | dwInfoLevel, &dwStatusCode, &dwStatusLen, 0);
-	}
+	HttpQueryInfo(m_hRequest, HTTP_QUERY_FLAG_NUMBER | dwInfoLevel, &dwStatusCode, &dwStatusLen, 0);
 
 	return dwStatusCode;
 }
@@ -153,6 +148,8 @@ void CHTTPAsync::Close()
 	m_nPort   = INTERNET_DEFAULT_HTTP_PORT;
 	m_nScheme = ATL_URL_SCHEME_HTTP;
 
+	m_header.Empty();
+	m_contentType.Empty();
 	m_lenght = 0;
 }
 
@@ -274,6 +271,9 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 			break;
 		}
 
+		m_header = QueryInfoStr(HTTP_QUERY_RAW_HEADERS_CRLF);
+		m_contentType = QueryInfoStr(HTTP_QUERY_CONTENT_TYPE);
+
 		const CString queryInfo = QueryInfoStr(HTTP_QUERY_CONTENT_LENGTH);
 		if (!queryInfo.IsEmpty()) {
 			QWORD val = 0;
@@ -286,11 +286,13 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	return S_OK;
 }
 
-DWORD CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSize, DWORD dwTimeOut/* = INFINITE*/)
+HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut/* = INFINITE*/)
 {
+	CheckPointer(m_hRequest, E_FAIL);
+
 	INTERNET_BUFFERS InetBuff = { sizeof(InetBuff) };
 	InetBuff.lpvBuffer        = pBuffer;
-	InetBuff.dwBufferLength   = dwSize;
+	InetBuff.dwBufferLength   = dwSizeToRead;
 
 	m_context = CONTEXT_REQUEST;
 
@@ -298,11 +300,30 @@ DWORD CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSize, DWORD dwTimeOut/* = INFINITE
 							&InetBuff,
 							0,
 							(DWORD_PTR)this)) {
-		CheckLastError(0);
+		CheckLastError(E_FAIL);
 		if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
-			return 0;
+			return E_FAIL;
 		}
 	}
 
-	return InetBuff.dwBufferLength;
+	if (dwSizeRead) {
+		*dwSizeRead = InetBuff.dwBufferLength;
+	}
+
+	return S_OK;
+}
+
+CString CHTTPAsync::GetHeader() const
+{
+	return m_header;
+}
+
+CString CHTTPAsync::GetContentType() const
+{
+	return m_contentType;
+}
+
+QWORD CHTTPAsync::GetLenght() const
+{
+	return m_lenght;
 }
