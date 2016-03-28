@@ -2567,7 +2567,7 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
 				}
 
 				if (nColor >= 0 && nColor < 4) {
-					CString key = WToT(params[j]).TrimLeft('#');
+					CString key = params[j].TrimLeft('#');
 					DWORD val;
 					if (g_colors.Lookup(key, val)) {
 						style.colors[nColor] = val;

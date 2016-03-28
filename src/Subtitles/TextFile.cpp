@@ -205,23 +205,23 @@ void CTextFile::WriteString(LPCSTR lpsz/*CStringA str*/)
 		str.Replace("\n", "\r\n");
 		Write((LPCSTR)str, str.GetLength());
 	} else if (m_encoding == UTF8) {
-		WriteString(AToW(str));
+		WriteString(AToT(str));
 	} else if (m_encoding == LE16) {
-		WriteString(AToW(str));
+		WriteString(AToT(str));
 	} else if (m_encoding == BE16) {
-		WriteString(AToW(str));
+		WriteString(AToT(str));
 	}
 }
 
 void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 {
-	CStringW str(lpsz);
+	CString str(lpsz);
 
 	if (m_encoding == ASCII) {
-		__super::WriteString(WToT(str));
+		__super::WriteString(str);
 	} else if (m_encoding == ANSI) {
 		str.Replace(L"\n", L"\r\n");
-		CStringA stra = CStringA(CString(str)); // TODO: codepage
+		CStringA stra = CStringA(str); // TODO: codepage
 		Write((LPCSTR)stra, stra.GetLength());
 	} else if (m_encoding == UTF8) {
 		str.Replace(L"\n", L"\r\n");
@@ -505,14 +505,14 @@ BOOL CTextFile::ReadString(CStringW& str)
 	if (m_encoding == ASCII) {
 		CString s;
 		fEOF = !__super::ReadString(s);
-		str = TToW(s);
+		str = s;
 		// For consistency with other encodings, we continue reading
 		// the file even when a NUL char is encountered.
 		char c;
 		while (fEOF && (Read(&c, sizeof(c)) == sizeof(c))) {
 			str += c;
 			fEOF = !__super::ReadString(s);
-			str += TToW(s);
+			str += s;
 		}
 	} else if (m_encoding == ANSI) {
 		bool bLineEndFound = false;
@@ -785,72 +785,20 @@ void CWebTextFile::Close()
 
 ///////////////////////////////////////////////////////////////
 
-CStringW AToW(CStringA str)
-{
-	CStringW ret;
-	for (int i = 0, j = str.GetLength(); i < j; i++) {
-		ret += (WCHAR)(BYTE)str[i];
-	}
-	return ret;
-}
-
-CStringA WToA(CStringW str)
-{
-	CStringA ret;
-	for (int i = 0, j = str.GetLength(); i < j; i++) {
-		ret += (CHAR)(WORD)str[i];
-	}
-	return ret;
-}
-
 CString AToT(CStringA str)
 {
-#ifdef UNICODE
 	CString ret;
 	for (int i = 0, j = str.GetLength(); i < j; i++) {
 		ret += (TCHAR)(BYTE)str[i];
 	}
 	return ret;
-#else
-	return str;
-#endif
-}
-
-CString WToT(CStringW str)
-{
-#ifdef UNICODE
-	return str;
-#else
-	CString ret;
-	for (int i = 0, j = str.GetLength(); i < j; i++) {
-		ret += (TCHAR)(WORD)str[i];
-	}
-	return ret;
-#endif
 }
 
 CStringA TToA(CString str)
 {
-#ifdef UNICODE
 	CStringA ret;
 	for (int i = 0, j = str.GetLength(); i < j; i++) {
 		ret += (CHAR)(BYTE)str[i];
 	}
 	return ret;
-#else
-	return str;
-#endif
-}
-
-CStringW TToW(CString str)
-{
-#ifdef UNICODE
-	return str;
-#else
-	CStringW ret;
-	for (size_t i = 0, j = str.GetLength(); i < j; i++) {
-		ret += (WCHAR)(BYTE)str[i];
-	}
-	return ret;
-#endif
 }
