@@ -54,7 +54,7 @@ enum {
 extern HICON LoadIcon(CString fn, bool fSmall);
 extern bool LoadType(CString fn, CString& type);
 extern bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
-extern CStringA GetContentType(CString fn, CAtlList<CString>* redir = NULL);
+extern CString GetContentType(CString fn, CAtlList<CString>* redir = NULL);
 extern WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen = false, bool bCheckMouse = true);
 
 extern void SetAudioRenderer(int AudioDevNo);
@@ -108,7 +108,6 @@ public:
 
 	static bool					IsVSFilterInstalled();
 	static bool					HasEVR();
-	static HRESULT				GetElevationType(TOKEN_ELEVATION_TYPE* ptet);
 	static void					RunAsAdministrator(LPCTSTR strCommand, LPCTSTR strArgs, bool bWaitProcess);
 
 	void						RegisterHotkeys();
