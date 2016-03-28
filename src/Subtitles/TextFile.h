@@ -87,9 +87,5 @@ public:
 	void Close();
 };
 
-extern CStringW	AToW(CStringA str);
-extern CStringA	WToA(CStringW str);
-extern CString	AToT(CStringA str);
-extern CString	WToT(CStringW str);
-extern CStringA	TToA(CString  str);
-extern CStringW	TToW(CString  str);
+extern CString  AToT(CStringA str);
+extern CStringA TToA(CString  str);

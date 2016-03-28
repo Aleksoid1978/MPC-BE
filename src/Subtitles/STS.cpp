@@ -697,7 +697,7 @@ static bool OpenSubViewer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 				i = j;
 
 				if (tag == L"font") {
-					font = def.fontName.CompareNoCase(WToT(param)) ? param : L"";
+					font = def.fontName.CompareNoCase(param) ? param : L"";
 				} else if (tag == L"colf") {
 					color = def.colors[0] != (DWORD)wcstol(((LPCWSTR)param)+2, 0, 16) ? param : L"";
 				} else if (tag == L"size") {
@@ -1016,7 +1016,7 @@ static bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 		if (c != 2) {
 			int i;
 			if (buff.Find('{') == 0 && (i = buff.Find('}')) > 1 && i < buff.GetLength()) {
-				if (STSStyle* s = GetMicroDVDStyle(WToT(buff.Mid(i+1)), CharSet)) {
+				if (STSStyle* s = GetMicroDVDStyle(buff.Mid(i+1), CharSet)) {
 					style = buff.Mid(1, i-1);
 					style.MakeUpper();
 					if (style.GetLength()) {
@@ -1527,8 +1527,8 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 					mm2 = GetInt(pszBuff, nBuffLength, L':');
 					ss2 = GetInt(pszBuff, nBuffLength, L'.');
 					ms2_div10 = GetInt(pszBuff, nBuffLength);
-					CString Style = WToT(GetStrW(pszBuff, nBuffLength));
-					CString Actor = WToT(GetStrW(pszBuff, nBuffLength));
+					CString Style = GetStrW(pszBuff, nBuffLength);
+					CString Actor = GetStrW(pszBuff, nBuffLength);
 					marginRect.left = GetInt(pszBuff, nBuffLength);
 					marginRect.right = GetInt(pszBuff, nBuffLength);
 					marginRect.top = marginRect.bottom = GetInt(pszBuff, nBuffLength);
@@ -1536,9 +1536,9 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 						marginRect.bottom = GetInt(pszBuff, nBuffLength);
 					}
 
-					CString Effect = WToT(GetStrW(pszBuff, nBuffLength));
+					CString Effect = GetStrW(pszBuff, nBuffLength);
 					int len = min(Effect.GetLength(), nBuffLength);
-					if (Effect.Left(len) == WToT(CStringW(pszBuff, len))) {
+					if (Effect.Left(len) == CString(pszBuff, len)) {
 						Effect.Empty();
 					}
 
@@ -1566,8 +1566,8 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 				}
 
 				try {
-					CString StyleName = WToT(GetStrW(pszBuff, nBuffLength));
-					style->fontName = WToT(GetStrW(pszBuff, nBuffLength));
+					CString StyleName = GetStrW(pszBuff, nBuffLength);
+					style->fontName = GetStrW(pszBuff, nBuffLength);
 					style->fontSize = GetFloat(pszBuff, nBuffLength);
 					for (size_t i = 0; i < 4; i++) {
 						style->colors[i] = (COLORREF)GetInt(pszBuff, nBuffLength);
@@ -1787,8 +1787,8 @@ static bool OpenXombieSub(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 			}
 
 			try {
-				CString StyleName = WToT(GetStrW(pszBuff, nBuffLength)) + _T("_") + WToT(GetStrW(pszBuff, nBuffLength));
-				style->fontName = WToT(GetStrW(pszBuff, nBuffLength));
+				CString StyleName = GetStrW(pszBuff, nBuffLength) + _T("_") + GetStrW(pszBuff, nBuffLength);
+				style->fontName = GetStrW(pszBuff, nBuffLength);
 				style->fontSize = GetFloat(pszBuff, nBuffLength);
 				for (size_t i = 0; i < 4; i++) {
 					style->colors[i] = (COLORREF)GetInt(pszBuff, nBuffLength);
@@ -1848,8 +1848,8 @@ static bool OpenXombieSub(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 				mm2 = GetInt(pszBuff, nBuffLength, L':');
 				ss2 = GetInt(pszBuff, nBuffLength, L'.');
 				ms2 = GetInt(pszBuff, nBuffLength);
-				CString Style = WToT(GetStrW(pszBuff, nBuffLength)) + _T("_") + WToT(GetStrW(pszBuff, nBuffLength));
-				CString Actor = WToT(GetStrW(pszBuff, nBuffLength));
+				CString Style = GetStrW(pszBuff, nBuffLength) + _T("_") + GetStrW(pszBuff, nBuffLength);
+				CString Actor = GetStrW(pszBuff, nBuffLength);
 				marginRect.left = GetInt(pszBuff, nBuffLength);
 				marginRect.right = GetInt(pszBuff, nBuffLength);
 				marginRect.top = marginRect.bottom = GetInt(pszBuff, nBuffLength);
@@ -2612,7 +2612,7 @@ void CSimpleTextSubtitle::ConvertUnicode(int i, bool fUnicode)
 
 CStringA CSimpleTextSubtitle::GetStrA(int i, bool fSSA)
 {
-	return WToA(GetStrWA(i, fSSA));
+	return TToA(GetStrWA(i, fSSA));
 }
 
 static CString CodeToCharacter(CString str)
@@ -2690,7 +2690,7 @@ CStringW CSimpleTextSubtitle::GetStrWA(int i, bool fSSA)
 
 void CSimpleTextSubtitle::SetStr(int i, CStringA str, bool fUnicode)
 {
-	SetStr(i, AToW(str), false);
+	SetStr(i, AToT(str), false);
 }
 
 void CSimpleTextSubtitle::SetStr(int i, CStringW str, bool fUnicode)
@@ -3080,18 +3080,18 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, Subtitle::SubType type, double fps,
 			str2.Format(fmt,
 						hh1, mm1, ss1, ms1 / 10,
 						hh2, mm2, ss2, ms2 / 10,
-						TToW(stse.style), TToW(stse.actor),
+						stse.style, stse.actor,
 						stse.marginRect.left, stse.marginRect.right, (stse.marginRect.top + stse.marginRect.bottom) / 2,
-						TToW(stse.effect), str);
+						stse.effect, str);
 		} else if (type ==Subtitle::ASS) {
 			str.Replace(L"\n", L"\\N");
 			str2.Format(fmt,
 						stse.layer,
 						hh1, mm1, ss1, ms1 / 10,
 						hh2, mm2, ss2, ms2 / 10,
-						TToW(stse.style), TToW(stse.actor),
+						stse.style, stse.actor,
 						stse.marginRect.left, stse.marginRect.right, (stse.marginRect.top + stse.marginRect.bottom) / 2,
-						TToW(stse.effect), str);
+						stse.effect, str);
 		}
 
 		f.WriteString(str2);
@@ -3290,7 +3290,7 @@ STSStyle& operator <<= (STSStyle& s, const CString& style)
 	s.SetDefault();
 
 	try {
-		CStringW str = TToW(style);
+		CStringW str = style;
 		LPCWSTR pszBuff = str;
 		int nBuffLength = str.GetLength();
 		if (str.Find(';')>=0) {
@@ -3311,7 +3311,7 @@ STSStyle& operator <<= (STSStyle& s, const CString& style)
 				s.alpha[i] = GetInt(pszBuff, nBuffLength, L';');
 			}
 			s.charSet = GetInt(pszBuff, nBuffLength, L';');
-			s.fontName = WToT(GetStrW(pszBuff, nBuffLength, L';'));
+			s.fontName = GetStrW(pszBuff, nBuffLength, L';');
 			s.fontSize = GetFloat(pszBuff, nBuffLength, L';');
 			s.fontScaleX = GetFloat(pszBuff, nBuffLength, L';');
 			s.fontScaleY = GetFloat(pszBuff, nBuffLength, L';');

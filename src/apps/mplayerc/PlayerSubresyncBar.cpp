@@ -146,7 +146,7 @@ void CPlayerSubresyncBar::ReloadSubtitle()
 		for (size_t i = 0, j = sp.GetCount(); i < j; i++) {
 			CString str;
 			str.Format(_T("%d,%d,%d,%Iu"), sp[i].vobid, sp[i].cellid, sp[i].fForced, i);
-			m_sts.Add(TToW(str), false, (int)sp[i].start, (int)sp[i].stop);
+			m_sts.Add(str, false, (int)sp[i].start, (int)sp[i].stop);
 		}
 
 		m_sts.CreateDefaultStyle(DEFAULT_CHARSET);

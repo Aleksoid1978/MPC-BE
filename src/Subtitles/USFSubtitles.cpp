@@ -386,7 +386,7 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 
 		stss->charSet = charSet;
 
-		sts.AddStyle(WToT(s->name), stss);
+		sts.AddStyle(s->name, stss);
 	}
 
 	pos = texts.GetHeadPosition();
@@ -439,7 +439,7 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 
 		// TODO: apply effects as {\t(..)} after usf's standard clearly defines them
 
-		sts.Add(t->str, true, t->start, t->stop, WToT(t->style), _T(""), _T(""), marginRect);
+		sts.Add(t->str, true, t->start, t->stop, t->style, _T(""), _T(""), marginRect);
 	}
 
 	return true;
