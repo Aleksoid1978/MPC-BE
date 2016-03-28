@@ -57,7 +57,8 @@ protected:
 								  __in_opt LPVOID lpvStatusInformation,
 								  __in DWORD dwStatusInformationLength);
 
-	CString const QueryInfo(DWORD dwInfoLevel);
+	CString QueryInfoStr(DWORD dwInfoLevel) const;
+	DWORD QueryInfoDword(DWORD dwInfoLevel) const;
 
 public:
 	CHTTPAsync();
@@ -68,7 +69,7 @@ public:
 	HRESULT Connect(LPCTSTR lpszURL, DWORD dwTimeOut = INFINITE, LPCTSTR lpszAgent = L"MPC-BE", BOOL bSendRequest = TRUE);
 	DWORD Read(PBYTE pBuffer, DWORD dwSize, DWORD dwTimeOut = INFINITE);
 
-	CString const GetHeader() { return QueryInfo(HTTP_QUERY_RAW_HEADERS_CRLF); }
+	CString const GetHeader() { return QueryInfoStr(HTTP_QUERY_RAW_HEADERS_CRLF); }
 	QWORD const GetLenght() { return m_lenght; }
 };
 
