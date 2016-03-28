@@ -80,19 +80,30 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 	}
 }
 
-CString const CHTTPAsync::QueryInfo(DWORD dwInfoLevel)
+CString CHTTPAsync::QueryInfoStr(DWORD dwInfoLevel) const
 {
 	CString queryInfo;
-	DWORD   dwLen = 0 ;
+	DWORD   dwLen = 0;
 	if (m_hRequest && !HttpQueryInfo(m_hRequest, dwInfoLevel, NULL, &dwLen, 0) && dwLen) {
 		const DWORD dwError = GetLastError();
 		if (dwError == ERROR_INSUFFICIENT_BUFFER
 				&& HttpQueryInfo(m_hRequest, dwInfoLevel, (LPVOID)queryInfo.GetBuffer(dwLen), &dwLen, 0)) {
 			queryInfo.ReleaseBuffer(dwLen);
 		}
-    }
-	
+	}
+
 	return queryInfo;
+}
+
+DWORD CHTTPAsync::QueryInfoDword(DWORD dwInfoLevel) const
+{
+	DWORD dwStatusCode = 0;
+	DWORD dwStatusLen  = sizeof(dwStatusCode);
+	if (m_hRequest) {
+		HttpQueryInfo(m_hRequest, HTTP_QUERY_FLAG_NUMBER | dwInfoLevel, &dwStatusCode, &dwStatusLen, 0);
+	}
+
+	return dwStatusCode;
 }
 
 CHTTPAsync::CHTTPAsync()
@@ -177,7 +188,6 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 							   INTERNET_FLAG_ASYNC);
 	CheckPointer(m_hInstance, E_FAIL);
 
-
 	if (InternetSetStatusCallback(m_hInstance, (INTERNET_STATUS_CALLBACK)&Callback) == INTERNET_INVALID_STATUS_CALLBACK) {
 		return E_FAIL;
 	}
@@ -206,7 +216,7 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	if (bSendRequest) {
 		m_context = CONTEXT_REQUEST;
 
-		DWORD dwFlags = INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE;
+		DWORD dwFlags = INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_KEEP_CONNECTION;
 		if (m_nScheme == ATL_URL_SCHEME_HTTPS) {
 			dwFlags |= (INTERNET_FLAG_SECURE | INTERNET_FLAG_IGNORE_CERT_CN_INVALID | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID);
 		}
@@ -231,24 +241,40 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 		CheckPointer(m_hRequest, E_FAIL);
 
 		const CString lpszHeaders = L"Accept: */*\r\n";
-		if (!HttpSendRequest(m_hRequest,
-							 lpszHeaders,
-							 lpszHeaders.GetLength(),
-							 NULL,
-							 0)) {
-			CheckLastError(E_FAIL);
+		for (;;) {
+			if (!HttpSendRequest(m_hRequest,
+								 lpszHeaders,
+								 lpszHeaders.GetLength(),
+								 NULL,
+								 0)) {
+				CheckLastError(E_FAIL);
+			}
+
+			if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
+				return E_FAIL;
+			}
+
+			const DWORD dwStatusCode = QueryInfoDword(HTTP_QUERY_STATUS_CODE);
+			if (dwStatusCode == HTTP_STATUS_PROXY_AUTH_REQ) {
+				dwFlags = FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS | FLAGS_ERROR_UI_FLAGS_GENERATE_DATA;
+				const DWORD ret = InternetErrorDlg(GetDesktopWindow(),
+												   m_hRequest,
+												   ERROR_INTERNET_INCORRECT_PASSWORD,
+												   dwFlags,
+												   NULL);
+				if (ret == ERROR_INTERNET_FORCE_RETRY) {
+					continue;
+				}
+
+				return E_FAIL;
+			} else if (dwStatusCode != HTTP_STATUS_OK) {
+				return E_FAIL;
+			}
+			
+			break;
 		}
 
-		if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
-			return E_FAIL;
-		}
-
-		CString queryInfo = QueryInfo(HTTP_QUERY_STATUS_CODE);
-		if (queryInfo != L"200") {
-			return E_FAIL;
-		}
-
-		queryInfo = QueryInfo(HTTP_QUERY_CONTENT_LENGTH);
+		const CString queryInfo = QueryInfoStr(HTTP_QUERY_CONTENT_LENGTH);
 		if (!queryInfo.IsEmpty()) {
 			QWORD val = 0;
 			if (1 == swscanf_s(queryInfo, L"%I64u", &val)) {
