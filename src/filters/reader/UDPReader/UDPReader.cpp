@@ -52,6 +52,7 @@ STDAPI DllRegisterServer()
 {
 	SetRegKeyValue(_T("udp"), 0, _T("Source Filter"), CStringFromGUID(__uuidof(CUDPReader)));
 	SetRegKeyValue(_T("http"), 0, _T("Source Filter"), CStringFromGUID(__uuidof(CUDPReader)));
+	SetRegKeyValue(_T("https"), 0, _T("Source Filter"), CStringFromGUID(__uuidof(CUDPReader)));
 
 	return AMovieDllRegisterServer2(TRUE);
 }
@@ -168,7 +169,6 @@ STDMETHODIMP CUDPReader::GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt)
 CUDPStream::CUDPStream()
 	: m_protocol(PR_NONE)
 	, m_UdpSocket(INVALID_SOCKET)
-	, m_HttpSocketTread(INVALID_SOCKET)
 	, m_pos(0)
 	, m_len(0)
 	, m_subtype(MEDIASUBTYPE_NULL)
@@ -199,10 +199,7 @@ void CUDPStream::Clear()
 		m_UdpSocket = INVALID_SOCKET;
 	}
 
-	if (m_HttpSocketTread != INVALID_SOCKET) {
-		m_HttpSocket.Attach(m_HttpSocketTread);
-	}
-	m_HttpSocket.Close();
+	m_HTTPAsync.Close();
 
 	if (m_protocol == PR_UDP) { // ?
 		WSACleanup();
@@ -349,104 +346,48 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			return false;
 		}
 
-	} else if (str_protocol == L"http") {
+	} else if (str_protocol == L"http" || str_protocol == L"https") {
 		m_protocol = PR_HTTP;
-
-		if (m_url.GetUrlPathLength() == 0) {
-			m_url.SetUrlPath(_T("/"));
-			m_url_str += '/';
-		}
-
 		BOOL connected = FALSE;
-		for (int k = 1; k <= 5; k++) {
-			bool redir = false;
-
-			CStringA hdr;
-
-			if (!m_HttpSocket.Create()) {
+		if (m_HTTPAsync.Connect(m_url_str, 5000, L"MPC UDP/HTTP Reader") == S_OK) {
+#ifdef DEBUG
+			const CString hdr = m_HTTPAsync.GetHeader();
+			DbgLog((LOG_TRACE, 3, "CUDPStream::Load() - HTTP hdr:\n%ws", hdr));
+#endif
+			const QWORD ContentLength = m_HTTPAsync.GetLenght();
+			if (ContentLength > 0) {
 				return false;
 			}
 
-			m_HttpSocket.SetUserAgent("MPC UDP/HTTP Reader");
-			m_HttpSocket.SetTimeOut(3000, 3000);
-			connected = m_HttpSocket.Connect(m_url);
-			if (connected) {
-				hdr = m_HttpSocket.GetHeader();
-				DbgLog((LOG_TRACE, 3, "CUDPStream::Load() - HTTP hdr:\n%s", hdr));
+			connected = TRUE;
+			CString contentType = m_HTTPAsync.GetContentType();
+			contentType.MakeLower();
+			if (contentType == "application/octet-stream" || contentType == "video/mp2t") {
+				m_subtype = MEDIASUBTYPE_NULL; // "universal" subtype for most splitters
 
-				connected = !hdr.IsEmpty();
-				hdr.MakeLower();
-			}
-
-			if (!connected) {
-				return false;
-			}
-
-			CAtlList<CStringA> sl;
-			Explode(hdr, sl, '\n');
-			POSITION pos = sl.GetHeadPosition();
-			while (pos) {
-				CStringA& hdrline = sl.GetNext(pos);
-				CAtlList<CStringA> sl2;
-				Explode(hdrline, sl2, ':', 2);
-				if (sl2.GetCount() != 2) {
-					continue;
+				BYTE buf[1024] = { 0 };
+				DWORD dwSizeRead = 0;
+				if (m_HTTPAsync.Read((PBYTE)&buf, sizeof(buf), &dwSizeRead, 3000) == S_OK && dwSizeRead) {
+					GetType(buf, dwSizeRead, m_subtype);
+					Append(buf, dwSizeRead);
 				}
-
-				CStringA param = sl2.GetHead();
-				CStringA value = sl2.GetTail();
-
-				if (param == "content-type") {
-					if (value == "application/octet-stream" || value == "video/mp2t") {
-						m_subtype = MEDIASUBTYPE_NULL; // "universal" subtype for most splitters
-
-						BYTE buf[1024];
-						int len = m_HttpSocket.Receive((LPVOID)&buf, sizeof(buf));
-						if (len) {
-							GetType(buf, len, m_subtype);
-							Append(buf, len);
-						}
-					} else if (value == "application/x-ogg" || value == "application/ogg" || value == "audio/ogg") {
-						m_subtype = MEDIASUBTYPE_Ogg;
-					} else if (value == "video/webm") {
-						m_subtype = MEDIASUBTYPE_Matroska;
-					} else if (value == "video/mp4" || value == "video/3gpp") {
-						m_subtype = MEDIASUBTYPE_MP4;
-					} else if (value == "video/x-flv") {
-						m_subtype = MEDIASUBTYPE_FLV;
-					} else { // "text/html..." and other
-						 // not supported content-type
-						connected = FALSE;
-					}
-				} else if (param == "content-length") {
-					// Not stream. This downloadable file. Here it is better to use "File Source (URL)".
-					connected = FALSE;
-				} else if (param == "location") {
-					if (value.Left(7) == "http://") {
-						if (value.Find('/', 8) == -1) { // looking for the beginning of URL path (find '/' after 'http://x')
-							value += '/'; // if not found, set minimum URL path
-						}
-						if (m_url_str != CString(value)) {
-							m_url_str = value;
-							m_url.CrackUrl(m_url_str);
-							redir = true;
-						}
-					}
-				}
+			} else if (contentType == "application/x-ogg" || contentType == "application/ogg" || contentType == "audio/ogg") {
+				m_subtype = MEDIASUBTYPE_Ogg;
+			} else if (contentType == "video/webm") {
+				m_subtype = MEDIASUBTYPE_Matroska;
+			} else if (contentType == "video/mp4" || contentType == "video/3gpp") {
+				m_subtype = MEDIASUBTYPE_MP4;
+			} else if (contentType == "video/x-flv") {
+				m_subtype = MEDIASUBTYPE_FLV;
+			} else { // "text/html..." and other
+					// not supported content-type
+				connected = FALSE;
 			}
-
-			if (!redir) {
-				break;
-			}
-
-			m_HttpSocket.Close();
 		}
 
 		if (!connected) {
 			return false;
 		}
-
-		m_HttpSocketTread = m_HttpSocket.Detach();
 	} else if (str_protocol == L"pipe") {
 		if (_setmode(_fileno(stdin), _O_BINARY) == -1) {
 			return false;
@@ -616,9 +557,6 @@ DWORD CUDPStream::ThreadProc()
 			case CMD_EXIT:
 				Reply(S_OK);
 				m_EventComplete.Set();
-				if (m_protocol == PR_HTTP) {
-					m_HttpSocketTread = m_HttpSocket.Detach();
-				}
 #if ENABLE_DUMP
 				if (dump) {
 					fclose(dump);
@@ -630,9 +568,6 @@ DWORD CUDPStream::ThreadProc()
 				m_EventComplete.Set();
 				break;
 			case CMD_INIT:
-				if (m_protocol == PR_HTTP) {
-					m_HttpSocket.Attach(m_HttpSocketTread);
-				}
 			case CMD_PAUSE:
 			case CMD_RUN:
 				Reply(S_OK);
@@ -662,15 +597,17 @@ DWORD CUDPStream::ThreadProc()
 							continue;
 						}
 					} else if (m_protocol == PR_HTTP) {
-						len = m_HttpSocket.Receive(&buff[buffsize], MAXBUFSIZE);
-						if (len == 0) {
+						len = 0;
+						DWORD dwSizeRead = 0;
+						if (FAILED(m_HTTPAsync.Read((PBYTE)&buff[buffsize], MAXBUFSIZE, &dwSizeRead, 3000))) {
+							attempts += 60;
+							continue;
+						} else if (dwSizeRead == 0) {
 							attempts++;
 							Sleep(50);
 							continue;
-						} else if (len == SOCKET_ERROR) {
-							attempts += 60;
-							continue;
 						}
+						len = dwSizeRead;
 						attempts = 0;
 					} else if (m_protocol == PR_PIPE) {
 						std::cin.read(&buff[buffsize], MAXBUFSIZE);

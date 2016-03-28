@@ -1807,6 +1807,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF = DNew CFGFilterInternal<CUDPReader>(UDPReaderName);
 		pFGF->m_protocols.AddTail(_T("udp"));
 		pFGF->m_protocols.AddTail(_T("http"));
+		pFGF->m_protocols.AddTail(_T("https"));
 		m_source.AddTail(pFGF);
 	}
 	
