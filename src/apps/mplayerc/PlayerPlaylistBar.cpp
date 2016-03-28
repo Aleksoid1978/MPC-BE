@@ -1048,7 +1048,7 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CSubtitleItemList
 		}
 
 		CAtlList<CString> redir;
-		CStringA ct = GetContentType(fns.GetHead(), &redir);
+		CString ct = GetContentType(fns.GetHead(), &redir);
 		if (!redir.IsEmpty()) {
 			POSITION pos = redir.GetHeadPosition();
 			while (pos) {
@@ -1057,19 +1057,16 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CSubtitleItemList
 			return;
 		}
 
-		if (ct == "application/x-mpc-playlist") {
+		if (ct == L"application/x-mpc-playlist") {
 			ParseMPCPlayList(fns.GetHead());
 			return;
-		}
-		else if (ct == "application/x-bdmv-playlist" && s.SrcFilters[SRC_MPEG]) {
+		} else if (ct == L"application/x-bdmv-playlist" && s.SrcFilters[SRC_MPEG]) {
 			ParseBDMVPlayList(fns.GetHead());
 			return;
-		}
-		else if (ct == _T("audio/x-mpegurl") || ct == _T("application/http-live-streaming-m3u")) {
+		} else if (ct == L"audio/x-mpegurl" || ct == L"application/http-live-streaming-m3u") {
 			ParseM3UPlayList(fns.GetHead());
 			return;
-		}
-		else if (ct == _T("application/x-cue-metadata")) {
+		} else if (ct == L"application/x-cue-metadata") {
 			if (ParseCUEPlayList(fns.GetHead())) {
 				return;
 			}
