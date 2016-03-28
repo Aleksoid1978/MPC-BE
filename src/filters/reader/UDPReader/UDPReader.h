@@ -23,7 +23,7 @@
 
 #include <AsyncReader/asyncio.h>
 #include <AsyncReader/asyncrdr.h>
-#include "../../../DSUtil/MPCSocket.h"
+#include "../../../DSUtil/HTTPAsync.h"
 
 #define UDPReaderName   L"MPC UDP/HTTP Reader"
 #define STDInReaderName L"MPC Std input Reader"
@@ -62,8 +62,7 @@ private:
 	sockaddr_in	m_addr;
 	WSAEVENT	m_WSAEvent[1];
 
-	CMPCSocket	m_HttpSocket;
-	SOCKET		m_HttpSocketTread;
+	CHTTPAsync	m_HTTPAsync;
 
 	__int64		m_pos, m_len;
 	CAtlList<packet_t*> m_packets;
