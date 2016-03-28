@@ -2241,35 +2241,8 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 		}
 
 		if (HTTPAsync.Connect(fn, 5000) == S_OK) {
-			const CString hdr = HTTPAsync.GetHeader();
-			QWORD ContentLength = HTTPAsync.GetLenght();
-
-			CString location;
-			CAtlList<CString> sl;
-			Explode(hdr, sl, '\n');
-			POSITION pos = sl.GetHeadPosition();
-			while (pos) {
-				CString& hdrline = sl.GetNext(pos);
-				CAtlList<CString> sl2;
-				Explode(hdrline, sl2, ':', 2);
-				CString field = sl2.RemoveHead().MakeLower();
-				if (field == L"location" && !sl2.IsEmpty()) {
-					location = sl2.GetHead();
-					if (!YoutubeParser::CheckURL(CString(sl2.GetHead()))) {
-						return GetContentType(CString(sl2.GetHead()), redir);
-					}
-				}
-				if (field == L"content-type" && !sl2.IsEmpty()) {
-					ct = sl2.GetHead();
-				}
-			}
-
-			if (location.GetLength() > 0 && YoutubeParser::CheckURL(CString(location)) && CString(location) != fn) {
-				if (redir) {
-					redir->AddTail(CString(location));
-				}
-				return ct;
-			}
+			const QWORD ContentLength = HTTPAsync.GetLenght();
+			ct = HTTPAsync.GetContentType();
 
 			if (ct.IsEmpty() || ct == L"application/octet-stream") {
 				GetContentTypeByExt(fn, ct);
@@ -2281,8 +2254,11 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 			}
 
 			CStringA str;
-			str.ReleaseBuffer(HTTPAsync.Read((PBYTE)str.GetBuffer(nMinSize), nMinSize, 3000));
-			body += AToT(str);
+			DWORD dwSizeRead = 0;
+			if (HTTPAsync.Read((PBYTE)str.GetBuffer(nMinSize), nMinSize, &dwSizeRead, 3000) == S_OK) {
+				str.ReleaseBuffer(dwSizeRead);
+				body += AToT(str);
+			}
 
 			if ((body.GetLength() >= 3 && wcsncmp(body, L".ra", 3) == 0)
 					|| (body.GetLength() >= 4 && wcsncmp(body, L".RMF", 4) == 0)) {
@@ -2311,8 +2287,11 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 				}
 
 				str.Empty();
-				str.ReleaseBuffer(HTTPAsync.Read((PBYTE)str.GetBuffer(nMaxSize), nMaxSize, 5000));
-				body += AToT(str);
+				dwSizeRead = 0;
+				if (HTTPAsync.Read((PBYTE)str.GetBuffer(nMaxSize), nMaxSize, &dwSizeRead, 3000) == S_OK) {
+					str.ReleaseBuffer(dwSizeRead);
+					body += AToT(str);
+				}
 			}
 
 			HTTPAsync.Close();
