@@ -70,7 +70,8 @@ private:
 	GUID		m_subtype;
 	DWORD		m_RequestCmd;
 
-	CAMEvent	m_EventComplete;
+	CAMEvent         m_EventComplete;
+	volatile __int64 m_SizeComplete;
 
 	void Clear();
 	void Append(BYTE* buff, int len);
