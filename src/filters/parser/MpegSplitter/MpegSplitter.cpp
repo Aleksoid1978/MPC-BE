@@ -725,7 +725,7 @@ inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(DWORD TrackNumber, __int64 
 			size_t oldSize = p->GetCount();
 			size_t newSize = p->GetCount() + nBytes;
 			p->SetCount(newSize, max(1024, newSize));
-			m_pFile->ByteRead(p->GetData() + oldSize, nBytes);
+			hr = m_pFile->ByteRead(p->GetData() + oldSize, nBytes);
 		} else {
 			REFERENCE_TIME rtStart = INVALID_TIME;
 			if (h.fpts) {
@@ -1492,6 +1492,13 @@ bool CMpegSplitterFilter::DemuxLoop()
 	HRESULT hr = S_OK;
 	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
 		hr = DemuxNextPacket(rtStartOffset);
+		if (hr == S_FALSE && m_pFile->IsStreaming()) {
+			// dirty trick to check the availability of data
+			const __int64 pos = m_pFile->GetPos();
+			DWORD tmp = 0;
+			hr = m_pFile->ByteRead((BYTE*)&tmp, sizeof(tmp));
+			m_pFile->Seek(pos);
+		}
 	}
 
 	POSITION pos = pPackets.GetStartPosition();
