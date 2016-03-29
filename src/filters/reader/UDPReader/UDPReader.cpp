@@ -206,9 +206,7 @@ void CUDPStream::Clear()
 		WSACleanup();
 	}
 
-	while (!m_packets.IsEmpty()) {
-		delete m_packets.RemoveHead();
-	}
+	EmptyBuffer();
 
 	m_pos = m_len = 0;
 }
@@ -538,15 +536,26 @@ inline __int64 CUDPStream::GetPacketsSize()
 
 void CUDPStream::CheckBuffer()
 {
-	CAutoLock cPacketLock(&m_csPacketsLock);
-
 	if (m_RequestCmd != CMD_RUN) {
 		return;
 	}
 
+	CAutoLock cPacketLock(&m_csPacketsLock);
+
 	while (!m_packets.IsEmpty() && m_packets.GetHead()->m_start < m_pos - 256 * KILOBYTE) {
 		delete m_packets.RemoveHead();
 	}
+}
+
+void CUDPStream::EmptyBuffer()
+{
+	CAutoLock cPacketLock(&m_csPacketsLock);
+
+	while (!m_packets.IsEmpty()) {
+		delete m_packets.RemoveHead();
+	}
+
+	m_len = m_pos;
 }
 
 #define ENABLE_DUMP 0
@@ -580,6 +589,7 @@ DWORD CUDPStream::ThreadProc()
 				return 0;
 			case CMD_STOP:
 				Reply(S_OK);
+				EmptyBuffer();
 				break;
 			case CMD_INIT:
 			case CMD_PAUSE:
@@ -592,7 +602,7 @@ DWORD CUDPStream::ThreadProc()
 
 				while (!CheckRequest(NULL) && attempts < 200) {
 					if (m_RequestCmd != CMD_INIT && GetPacketsSize() > MAXSTORESIZE) {
-						Sleep(100);
+						Sleep(300);
 						continue;
 					}
 					int len = 0;
@@ -618,7 +628,7 @@ DWORD CUDPStream::ThreadProc()
 						len = 0;
 						DWORD dwSizeRead = 0;
 						if (FAILED(m_HTTPAsync.Read((PBYTE)&buff[buffsize], MAXBUFSIZE, &dwSizeRead, 3000))) {
-							attempts += 60;
+							attempts += 50;
 							continue;
 						} else if (dwSizeRead == 0) {
 							attempts++;
@@ -632,7 +642,7 @@ DWORD CUDPStream::ThreadProc()
 						if (std::cin.fail() || std::cin.bad()) {
 							std::cin.clear();
 							len = 0;
-							attempts += 60;
+							attempts += 50;
 							continue;
 						} else if (std::cin.eof()) {
 							break;
@@ -657,6 +667,11 @@ DWORD CUDPStream::ThreadProc()
 						buffsize = 0;
 					}
 				}
+
+				if (attempts >= 200) {
+					EmptyBuffer();
+				}
+
 				break;
 		}
 	}

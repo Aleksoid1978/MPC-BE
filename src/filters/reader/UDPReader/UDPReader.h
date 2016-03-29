@@ -80,6 +80,7 @@ private:
 
 	inline __int64 GetPacketsSize();
 	void CheckBuffer();
+	void EmptyBuffer();
 
 public:
 	CUDPStream();
