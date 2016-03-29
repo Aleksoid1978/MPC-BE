@@ -451,7 +451,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
-	if (m_pFile->BitRead(24) != 'FLV' || m_pFile->BitRead(8) != 1) {
+	if (m_pFile->BitRead(32) != 'FLV\01') {
 		return E_FAIL;
 	}
 
@@ -480,14 +480,25 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	DWORD nSamplesPerSec			= 0;
 	int   metaHM_compatibility		= 0;
 
-	LONG vWidth		= 0;
-	LONG vHeight	= 0;
-	BYTE vCodecId	= 0;
+	LONG vWidth   = 0;
+	LONG vHeight  = 0;
+	BYTE vCodecId = 0;
 
 	m_sps.RemoveAll();
 
+	BOOL bVideoMetadataExists = FALSE;
+	BOOL bAudioMetadataExists = FALSE;
+	BOOL bVideoFound          = FALSE;
+	BOOL bAudioFound          = FALSE;
+
+	auto CheckMetadataStreams = [&]() {
+		return (bVideoMetadataExists + bAudioMetadataExists) != (bVideoFound + bAudioFound) && m_pFile->GetPos() <= 10 * MEGABYTE;
+	};
+
 	// read up to 180 tags (actual maximum was 168)
-	for (int i = 0; i < 180 && ReadTag(t) && (fTypeFlagsVideo || fTypeFlagsAudio); i++) {
+	UINT i = 0;
+	while (((i++ <= 180 && (fTypeFlagsVideo || fTypeFlagsAudio)) || CheckMetadataStreams())
+			&& ReadTag(t)) {
 		if (!t.DataSize) {
 			continue; // skip empty Tag
 		}
@@ -529,6 +540,9 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								vHeight = (LONG)((double)AMF0Array[i]);
 							} else if (AMF0Array[i].name == L"videocodecid") {
 								vCodecId = (BYTE)((double)AMF0Array[i]);
+								bVideoMetadataExists = TRUE;
+							} else if (AMF0Array[i].name == L"audiocodecid") {
+								bAudioMetadataExists = TRUE;
 							} else if (AMF0Array[i].name == L"duration") {
 								metaDataDuration = (REFERENCE_TIME)(UNITS * (double)AMF0Array[i]);
 							} else if (AMF0Array[i].name == L"framerate" || AMF0Array[i].name == L"videoframerate") {
@@ -545,6 +559,12 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 						} else if (AMF0Array[i].type == AMF_DATA_TYPE_STRING && AMF0Array[i].name == L"HM compatibility") {
 							metaHM_compatibility = (int)(_tstof(AMF0Array[i].value_s) * 10.0);
+						} else if (AMF0Array[i].type == AMF_DATA_TYPE_BOOL) {
+							if (AMF0Array[i].name == L"hasVideo") {
+								bVideoMetadataExists = (bool)AMF0Array[i];
+							} else if (AMF0Array[i].name == L"hasAudio") {
+								bAudioMetadataExists = (bool)AMF0Array[i];
+							}
 						}
 					}
 				}
@@ -556,6 +576,10 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			if (ReadTag(at)) {
 				int dataSize = t.DataSize - 1;
+
+				if (bAudioMetadataExists) {
+					bAudioFound = TRUE;
+				}
 
 				fTypeFlagsAudio = false;
 
@@ -659,6 +683,10 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			VideoTag vt;
 			if (ReadTag(vt) && vt.FrameType == 1) {
 				int dataSize = t.DataSize - 1;
+
+				if (bVideoMetadataExists) {
+					bVideoFound = TRUE;
+				}
 
 				fTypeFlagsVideo = false;
 				name = L"Video";
