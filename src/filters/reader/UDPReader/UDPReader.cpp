@@ -174,6 +174,7 @@ CUDPStream::CUDPStream()
 	, m_subtype(MEDIASUBTYPE_NULL)
 	, m_RequestCmd(0)
 	, m_EventComplete(TRUE)
+	, m_SizeComplete(MAXLONGLONG - 1)
 {
 	m_WSAEvent[0] = NULL;
 }
@@ -218,6 +219,11 @@ void CUDPStream::Append(BYTE* buff, int len)
 
 	m_packets.AddTail(DNew packet_t(buff, m_len, len));
 	m_len += len;
+
+	m_EventComplete.Reset();
+	if (m_len >= m_SizeComplete) {
+		m_EventComplete.Set();
+	}
 }
 
 static void GetType(BYTE* buf, int size, GUID& subtype)
@@ -446,10 +452,20 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 
 	if (!m_packets.IsEmpty()
 			&& m_pos + len > m_packets.GetTail()->m_end) {
-		while (!m_EventComplete.Check() && !m_packets.IsEmpty() && m_pos + len > m_packets.GetTail()->m_end) {
-			DbgLog((LOG_TRACE, 3, L"CUDPStream::Read() - wait %I64d bytes, %I64d -> %I64d", m_pos + len - m_packets.GetTail()->m_end, m_packets.GetTail()->m_end, m_pos + len));
-			Sleep(100);
-		}
+		m_SizeComplete = m_pos + len;
+
+#if DEBUG
+		DbgLog((LOG_TRACE, 3, L"CUDPStream::Read() : wait %I64d bytes, %I64d -> %I64d", m_SizeComplete - m_packets.GetTail()->m_end, m_packets.GetTail()->m_end, m_SizeComplete));
+		const ULONGLONG start = GetPerfCounter();
+#endif
+
+		m_EventComplete.Wait();
+		m_SizeComplete = MAXLONGLONG - 1;
+
+#if DEBUG
+		const ULONGLONG end = GetPerfCounter();
+		DbgLog((LOG_TRACE, 3, L"	=> do wait %0.3f ms", (end - start) / 10000.0));
+#endif
 	}
 
 	CAutoLock cAutoLock(&m_csLock);
@@ -556,7 +572,6 @@ DWORD CUDPStream::ThreadProc()
 			default:
 			case CMD_EXIT:
 				Reply(S_OK);
-				m_EventComplete.Set();
 #if ENABLE_DUMP
 				if (dump) {
 					fclose(dump);
@@ -565,18 +580,21 @@ DWORD CUDPStream::ThreadProc()
 				return 0;
 			case CMD_STOP:
 				Reply(S_OK);
-				m_EventComplete.Set();
 				break;
 			case CMD_INIT:
 			case CMD_PAUSE:
 			case CMD_RUN:
-				Reply(S_OK);
 				m_EventComplete.Reset();
+				Reply(S_OK);
 				char  buff[MAXBUFSIZE * 2];
 				int   buffsize = 0;
 				UINT  attempts = 0;
 
 				while (!CheckRequest(NULL) && attempts < 200) {
+					if (m_RequestCmd != CMD_INIT && GetPacketsSize() > MAXSTORESIZE) {
+						Sleep(100);
+						continue;
+					}
 					int len = 0;
 
 					if (m_protocol == PR_UDP) {
@@ -637,10 +655,6 @@ DWORD CUDPStream::ThreadProc()
 #endif
 						Append((BYTE*)buff, buffsize);
 						buffsize = 0;
-					}
-
-					while (GetPacketsSize() > MAXSTORESIZE && !CheckRequest(NULL)) {
-						Sleep(100);
 					}
 				}
 				break;
