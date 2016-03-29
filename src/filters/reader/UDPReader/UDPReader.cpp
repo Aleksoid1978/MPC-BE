@@ -218,7 +218,6 @@ void CUDPStream::Append(BYTE* buff, int len)
 	m_packets.AddTail(DNew packet_t(buff, m_len, len));
 	m_len += len;
 
-	m_EventComplete.Reset();
 	if (m_len >= m_SizeComplete) {
 		m_EventComplete.Set();
 	}
@@ -601,6 +600,7 @@ DWORD CUDPStream::ThreadProc()
 				UINT  attempts = 0;
 
 				while (!CheckRequest(NULL) && attempts < 200) {
+					m_EventComplete.Reset();
 					if (m_RequestCmd != CMD_INIT && GetPacketsSize() > MAXSTORESIZE) {
 						Sleep(300);
 						continue;
