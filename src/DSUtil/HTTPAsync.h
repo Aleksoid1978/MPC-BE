@@ -36,6 +36,7 @@ protected:
 	HANDLE m_hConnectedEvent       = INVALID_HANDLE_VALUE;
 	HANDLE m_hRequestOpenedEvent   = INVALID_HANDLE_VALUE;
 	HANDLE m_hRequestCompleteEvent = INVALID_HANDLE_VALUE;
+	BOOL m_bRequestComplete        = TRUE;
 
 	HINTERNET m_hInstance = NULL;
 	HINTERNET m_hConnect  = NULL;

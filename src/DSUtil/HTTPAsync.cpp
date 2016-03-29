@@ -53,6 +53,7 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 						break;
 					case INTERNET_STATUS_REQUEST_COMPLETE:
 						{
+							pContext->m_bRequestComplete = TRUE;
 							SetEvent(pContext->m_hRequestCompleteEvent);
 						}
 						break;
@@ -289,6 +290,10 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut/* = INFINITE*/)
 {
 	CheckPointer(m_hRequest, E_FAIL);
+	if (!m_bRequestComplete) {
+		DbgLog((LOG_TRACE, 3, L"CHTTPAsync::Read() : previous request has not completed, exit"));
+		return S_FALSE;
+	}
 
 	INTERNET_BUFFERS InetBuff = { sizeof(InetBuff) };
 	InetBuff.lpvBuffer        = pBuffer;
@@ -300,9 +305,11 @@ HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, 
 							&InetBuff,
 							0,
 							(DWORD_PTR)this)) {
+		m_bRequestComplete = FALSE;
 		CheckLastError(E_FAIL);
 		if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
-			return E_FAIL;
+			DbgLog((LOG_TRACE, 3, L"CHTTPAsync::Read() : %d seconds time out reached, exit", dwTimeOut));
+			return S_FALSE;
 		}
 	}
 
