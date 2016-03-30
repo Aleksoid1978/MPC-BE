@@ -367,13 +367,15 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			connected = TRUE;
 			CString contentType = m_HTTPAsync.GetContentType();
 			contentType.MakeLower();
-			if (contentType == "application/octet-stream" || contentType == "video/mp2t") {
+			if (contentType == "application/octet-stream") {
 				BYTE buf[1024] = { 0 };
 				DWORD dwSizeRead = 0;
 				if (m_HTTPAsync.Read((PBYTE)&buf, sizeof(buf), &dwSizeRead, 3000) == S_OK && dwSizeRead) {
 					GetType(buf, dwSizeRead, m_subtype);
 					Append(buf, dwSizeRead);
 				}
+			} else if (contentType == "video/mp2t") {
+				m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
 			} else if (contentType == "application/x-ogg" || contentType == "application/ogg" || contentType == "audio/ogg") {
 				m_subtype = MEDIASUBTYPE_Ogg;
 			} else if (contentType == "video/webm") {
