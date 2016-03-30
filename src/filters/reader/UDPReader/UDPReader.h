@@ -60,7 +60,7 @@ private:
 
 	SOCKET		m_UdpSocket;
 	sockaddr_in	m_addr;
-	WSAEVENT	m_WSAEvent[1];
+	WSAEVENT	m_WSAEvent;
 
 	CHTTPAsync	m_HTTPAsync;
 
@@ -86,7 +86,13 @@ public:
 	CUDPStream();
 	virtual ~CUDPStream();
 
-	enum {CMD_INIT, CMD_PAUSE, CMD_RUN, CMD_STOP, CMD_EXIT};
+	enum CMD {
+		CMD_INIT,
+		CMD_PAUSE,
+		CMD_RUN,
+		CMD_STOP,
+		CMD_EXIT
+	};
 
 	bool Load(const WCHAR* fnw);
 
