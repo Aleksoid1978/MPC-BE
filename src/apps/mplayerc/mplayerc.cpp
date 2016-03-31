@@ -2321,6 +2321,7 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 			CStringA str;
 			str.ReleaseBufferSetLength(fread(str.GetBuffer(10 * KILOBYTE), 1, 10 * KILOBYTE, f));
 			body = AToT(str);
+			fclose(f);
 		}
 	}
 
