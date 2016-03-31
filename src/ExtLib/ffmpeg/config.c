@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2013 see Authors.txt
+ * (C) 2009-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -18,8 +18,8 @@
  *
  */
 
-#include "libavcodec/avcodec.h"
-#include "libavcodec/internal.h"
+#include <stdio.h>
+#include "libavcodec/version.h"
 
 #ifdef __GNUC__
 #define _aligned_malloc  __mingw_aligned_malloc
