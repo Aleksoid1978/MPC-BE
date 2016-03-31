@@ -23,9 +23,13 @@
 #include <wininet.h>
 #include <atlutil.h>
 
+#include <mutex>
+
 class CHTTPAsync
 {
 protected:
+	std::mutex m_mutexRequest;
+
 	enum Context {
 		CONTEXT_INITIAL = -1,
 		CONTEXT_CONNECT,
@@ -70,6 +74,7 @@ public:
 	void Close();
 
 	HRESULT Connect(LPCTSTR lpszURL, DWORD dwTimeOut = INFINITE, LPCTSTR lpszAgent = L"MPC-BE", BOOL bSendRequest = TRUE);
+	HRESULT SendRequest(CString customHeader = L"", DWORD dwTimeOut = INFINITE);
 	HRESULT Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut = INFINITE);
 
 	CString GetHeader() const;

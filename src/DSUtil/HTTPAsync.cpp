@@ -30,13 +30,13 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 	auto* pContext = (CHTTPAsync*)dwContext;
 	auto* pRes     = (INTERNET_ASYNC_RESULT*)lpvStatusInformation;
 	switch (pContext->m_context) {
-		case CONTEXT_CONNECT:
+		case Context::CONTEXT_CONNECT:
 			if (dwInternetStatus == INTERNET_STATUS_HANDLE_CREATED) {
 				pContext->m_hConnect = (HINTERNET)pRes->dwResult;
 				SetEvent(pContext->m_hConnectedEvent);
 			}
 			break;
-		case CONTEXT_REQUEST:
+		case Context::CONTEXT_REQUEST:
 			{
 				switch (dwInternetStatus) {
 					case INTERNET_STATUS_HANDLE_CREATED:
@@ -190,7 +190,7 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 		return E_FAIL;
 	}
 
-	m_context = CONTEXT_CONNECT;
+	m_context = Context::CONTEXT_CONNECT;
 
 	m_hConnect = InternetConnect(m_hInstance, 
 								 m_host,
@@ -200,7 +200,6 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 								 INTERNET_SERVICE_HTTP,
 								 INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_NO_CACHE_WRITE,
 								 (DWORD_PTR)this);
-
 	if (m_hConnect == NULL) {
 		CheckLastError(E_FAIL);
 
@@ -212,64 +211,8 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	CheckPointer(m_hConnect, E_FAIL);
 
 	if (bSendRequest) {
-		m_context = CONTEXT_REQUEST;
-
-		DWORD dwFlags = INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_KEEP_CONNECTION;
-		if (m_nScheme == ATL_URL_SCHEME_HTTPS) {
-			dwFlags |= (INTERNET_FLAG_SECURE | INTERNET_FLAG_IGNORE_CERT_CN_INVALID | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID);
-		}
-
-		m_hRequest = HttpOpenRequest(m_hConnect,
-									 L"GET",
-									 m_path,
-									 NULL,
-									 NULL,
-									 NULL,
-									 dwFlags,
-									 (DWORD_PTR)this);
-
-		if (m_hRequest == NULL) {
-			CheckLastError(E_FAIL);
-			
-			if (WaitForSingleObject(m_hRequestOpenedEvent, dwTimeOut) == WAIT_TIMEOUT) {
-				return E_FAIL;
-			}
-		}
-
-		CheckPointer(m_hRequest, E_FAIL);
-
-		const CString lpszHeaders = L"Accept: */*\r\n";
-		for (;;) {
-			if (!HttpSendRequest(m_hRequest,
-								 lpszHeaders,
-								 lpszHeaders.GetLength(),
-								 NULL,
-								 0)) {
-				CheckLastError(E_FAIL);
-			}
-
-			if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
-				return E_FAIL;
-			}
-
-			const DWORD dwStatusCode = QueryInfoDword(HTTP_QUERY_STATUS_CODE);
-			if (dwStatusCode == HTTP_STATUS_PROXY_AUTH_REQ) {
-				dwFlags = FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS | FLAGS_ERROR_UI_FLAGS_GENERATE_DATA;
-				const DWORD ret = InternetErrorDlg(GetDesktopWindow(),
-												   m_hRequest,
-												   ERROR_INTERNET_INCORRECT_PASSWORD,
-												   dwFlags,
-												   NULL);
-				if (ret == ERROR_INTERNET_FORCE_RETRY) {
-					continue;
-				}
-
-				return E_FAIL;
-			} else if (dwStatusCode != HTTP_STATUS_OK) {
-				return E_FAIL;
-			}
-			
-			break;
+		if (SendRequest(L"", dwTimeOut) != S_OK) {
+			return E_FAIL;
 		}
 
 		m_header = QueryInfoStr(HTTP_QUERY_RAW_HEADERS_CRLF);
@@ -283,13 +226,96 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 			}
 		}
 	}
-	
+
+	return S_OK;
+}
+
+HRESULT CHTTPAsync::SendRequest(CString customHeader/* = L""*/, DWORD dwTimeOut/* = INFINITE*/)
+{
+	CheckPointer(m_hConnect, E_FAIL);
+
+	std::unique_lock<std::mutex> lock(m_mutexRequest);
+
+	if (!m_bRequestComplete) {
+		DbgLog((LOG_TRACE, 3, L"CHTTPAsync::SendRequest() : previous request has not completed, exit"));
+		return S_FALSE;
+	}
+
+	ResetEvent(m_hRequestOpenedEvent);
+	ResetEvent(m_hRequestCompleteEvent);
+
+	SAFE_INTERNET_CLOSE_HANDLE(m_hRequest);
+
+	m_context = Context::CONTEXT_REQUEST;
+
+	DWORD dwFlags = INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_KEEP_CONNECTION;
+	if (m_nScheme == ATL_URL_SCHEME_HTTPS) {
+		dwFlags |= (INTERNET_FLAG_SECURE | INTERNET_FLAG_IGNORE_CERT_CN_INVALID | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID);
+	}
+
+	m_hRequest = HttpOpenRequest(m_hConnect,
+								 L"GET",
+								 m_path,
+								 NULL,
+								 NULL,
+								 NULL,
+								 dwFlags,
+								 (DWORD_PTR)this);
+	if (m_hRequest == NULL) {
+		CheckLastError(E_FAIL);
+		
+		if (WaitForSingleObject(m_hRequestOpenedEvent, dwTimeOut) == WAIT_TIMEOUT) {
+			DbgLog((LOG_TRACE, 3, L"CHTTPAsync::SendRequest() : HttpOpenRequest() - %d ms time out reached, exit", dwTimeOut));
+			return E_FAIL;
+		}
+	}
+
+	CheckPointer(m_hRequest, E_FAIL);
+
+	const CString lpszHeaders = L"Accept: */*\r\n" + customHeader;
+	for (;;) {
+		if (!HttpSendRequest(m_hRequest,
+							 lpszHeaders,
+							 lpszHeaders.GetLength(),
+							 NULL,
+							 0)) {
+			CheckLastError(E_FAIL);
+
+			if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
+				DbgLog((LOG_TRACE, 3, L"CHTTPAsync::SendRequest() : HttpSendRequest() - %d ms time out reached, exit", dwTimeOut));
+				return S_FALSE;
+			}
+		}
+
+		const DWORD dwStatusCode = QueryInfoDword(HTTP_QUERY_STATUS_CODE);
+		if (dwStatusCode == HTTP_STATUS_PROXY_AUTH_REQ) {
+			DWORD dwFlags = FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS | FLAGS_ERROR_UI_FLAGS_GENERATE_DATA;
+			const DWORD ret = InternetErrorDlg(GetDesktopWindow(),
+												m_hRequest,
+												ERROR_INTERNET_INCORRECT_PASSWORD,
+												dwFlags,
+												NULL);
+			if (ret == ERROR_INTERNET_FORCE_RETRY) {
+				continue;
+			}
+
+			return E_FAIL;
+		} else if (dwStatusCode != HTTP_STATUS_OK && dwStatusCode != HTTP_STATUS_PARTIAL_CONTENT) {
+			return E_FAIL;
+		}
+			
+		break;
+	}
+
 	return S_OK;
 }
 
 HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut/* = INFINITE*/)
 {
 	CheckPointer(m_hRequest, E_FAIL);
+
+	std::unique_lock<std::mutex> lock(m_mutexRequest);
+
 	if (!m_bRequestComplete) {
 		DbgLog((LOG_TRACE, 3, L"CHTTPAsync::Read() : previous request has not completed, exit"));
 		return S_FALSE;
@@ -299,16 +325,17 @@ HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, 
 	InetBuff.lpvBuffer        = pBuffer;
 	InetBuff.dwBufferLength   = dwSizeToRead;
 
-	m_context = CONTEXT_REQUEST;
+	m_context = Context::CONTEXT_REQUEST;
 
 	if (!InternetReadFileEx(m_hRequest,
 							&InetBuff,
-							0,
+							IRF_ASYNC,
 							(DWORD_PTR)this)) {
 		m_bRequestComplete = FALSE;
 		CheckLastError(E_FAIL);
+
 		if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
-			DbgLog((LOG_TRACE, 3, L"CHTTPAsync::Read() : %d seconds time out reached, exit", dwTimeOut));
+			DbgLog((LOG_TRACE, 3, L"CHTTPAsync::Read() : InternetReadFileEx() - %d ms time out reached, exit", dwTimeOut));
 			return S_FALSE;
 		}
 	}
