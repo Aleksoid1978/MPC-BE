@@ -83,10 +83,6 @@ CUDPReader::CUDPReader(IUnknown* pUnk, HRESULT* phr)
 	if (phr) {
 		*phr = S_OK;
 	}
-
-#ifndef REGISTER_FILTER
-	AfxSocketInit();
-#endif
 }
 
 CUDPReader::~CUDPReader()
@@ -561,10 +557,6 @@ void CUDPStream::EmptyBuffer()
 DWORD CUDPStream::ThreadProc()
 {
 	SetThreadPriority(m_hThread, THREAD_PRIORITY_TIME_CRITICAL);
-
-	if (m_protocol == PR_HTTP) {
-		AfxSocketInit();
-	}
 
 #if ENABLE_DUMP
 	const CString fname = m_protocol == PR_HTTP ? L"http.dump" : m_protocol == PR_UDP ? L"udp.dump" : L"stdin.dump";
