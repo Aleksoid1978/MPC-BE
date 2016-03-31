@@ -336,6 +336,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 					timeout += 100;
 					continue;
 				}
+				GetType((BYTE*)buf, len, m_subtype);
 				Append((BYTE*)buf, len);
 				break;
 			} else {
@@ -347,10 +348,6 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		if (timeout == 500) {
 			return false;
 		}
-
-		// UDP - always MPEG-TS format
-		m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
-
 	} else if (str_protocol == L"http" || str_protocol == L"https") {
 		m_protocol = PR_HTTP;
 		BOOL connected = FALSE;
@@ -601,7 +598,9 @@ DWORD CUDPStream::ThreadProc()
 				int   buffsize = 0;
 				UINT  attempts = 0;
 
-				while (!CheckRequest(NULL) && attempts < 200) {
+				BOOL bEndOfStream = FALSE;
+				while (!CheckRequest(NULL)
+						&& attempts < 200 && !bEndOfStream) {
 					m_EventComplete.Reset();
 					if (m_RequestCmd != CMD::CMD_INIT && GetPacketsSize() > MAXSTORESIZE) {
 						Sleep(300);
@@ -627,18 +626,20 @@ DWORD CUDPStream::ThreadProc()
 							continue;
 						}
 					} else if (m_protocol == PR_HTTP) {
-						len = 0;
 						DWORD dwSizeRead = 0;
-						if (FAILED(m_HTTPAsync.Read((PBYTE)&buff[buffsize], MAXBUFSIZE, &dwSizeRead, 3000))) {
+						HRESULT hr = m_HTTPAsync.Read((PBYTE)&buff[buffsize], MAXBUFSIZE, &dwSizeRead);
+						if (FAILED(hr)) {
 							attempts += 50;
 							continue;
-						} else if (dwSizeRead == 0) {
+						} else if (hr == S_FALSE) {
 							attempts++;
 							Sleep(50);
 							continue;
+						} else if (dwSizeRead == 0) {
+							bEndOfStream = TRUE;
+							break;
 						}
 						len = dwSizeRead;
-						attempts = 0;
 					} else if (m_protocol == PR_PIPE) {
 						std::cin.read(&buff[buffsize], MAXBUFSIZE);
 						if (std::cin.fail() || std::cin.bad()) {
@@ -646,6 +647,7 @@ DWORD CUDPStream::ThreadProc()
 							attempts += 50;
 							continue;
 						} else if (std::cin.eof()) {
+							bEndOfStream = TRUE;
 							break;
 						} else {
 							len = std::cin.gcount();
@@ -670,7 +672,7 @@ DWORD CUDPStream::ThreadProc()
 					}
 				}
 
-				if (attempts >= 200) {
+				if (attempts >= 200 || bEndOfStream) {
 					EmptyBuffer();
 				}
 
