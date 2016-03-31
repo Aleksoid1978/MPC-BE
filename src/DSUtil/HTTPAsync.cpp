@@ -42,6 +42,7 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 					case INTERNET_STATUS_HANDLE_CREATED:
 						{
 							pContext->m_hRequest = (HINTERNET)pRes->dwResult;
+							pContext->m_bRequestComplete = TRUE;
 							SetEvent(pContext->m_hRequestOpenedEvent);
 						}
 						break;
@@ -262,6 +263,7 @@ HRESULT CHTTPAsync::SendRequest(CString customHeader/* = L""*/, DWORD dwTimeOut/
 								 dwFlags,
 								 (DWORD_PTR)this);
 	if (m_hRequest == NULL) {
+		m_bRequestComplete = FALSE;
 		CheckLastError(E_FAIL);
 		
 		if (WaitForSingleObject(m_hRequestOpenedEvent, dwTimeOut) == WAIT_TIMEOUT) {
@@ -279,6 +281,7 @@ HRESULT CHTTPAsync::SendRequest(CString customHeader/* = L""*/, DWORD dwTimeOut/
 							 lpszHeaders.GetLength(),
 							 NULL,
 							 0)) {
+			m_bRequestComplete = FALSE;
 			CheckLastError(E_FAIL);
 
 			if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
