@@ -375,7 +375,7 @@ void CPlaylistItem::AutoLoadFiles()
 							if (ext != ext2
 									&& mf.FindAudioExt(ext2)
 									&& !FindFileInList(m_fns, fullpath)
-									&& s.IsUsingRtspEngine(fullpath, DirectShow)) {
+									&& s.GetFileEngine(fullpath) == DirectShow) {
 								m_fns.AddTail(fullpath);
 							}
 						} while (FindNextFile(hFind, &fd));

@@ -77,9 +77,6 @@ public:
 	filetype_t GetFileType() const {
 		return m_filetype;
 	}
-	engine_t GetEngineType() const {
-		return (m_label == L"swf" ? ShockWave : DirectShow);
-	}
 };
 
 class CMediaFormats : public CAtlArray<CMediaFormatCategory>
