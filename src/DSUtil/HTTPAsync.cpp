@@ -21,6 +21,8 @@
 #include "stdafx.h"
 #include "HTTPAsync.h"
 
+#pragma comment(lib, "WinInet.Lib")
+
 void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 								   __in_opt DWORD_PTR dwContext,
 								   __in DWORD dwInternetStatus,
