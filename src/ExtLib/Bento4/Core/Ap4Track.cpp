@@ -329,7 +329,7 @@ AP4_Track::GetSampleIndexForRefTime(REFERENCE_TIME rt, AP4_Ordinal& index)
 |       AP4_Track::GetIndexForRefTime
 +---------------------------------------------------------------------*/
 AP4_Result
-AP4_Track::GetIndexForRefTime(REFERENCE_TIME rt, AP4_Ordinal& index, AP4_SI64& cts)
+AP4_Track::GetIndexForRefTime(REFERENCE_TIME rt, AP4_Ordinal& index, AP4_SI64& cts, AP4_Offset& offset)
 {
     if (!m_IndexEntries.ItemCount()) {
         return AP4_FAILURE;
@@ -338,15 +338,18 @@ AP4_Track::GetIndexForRefTime(REFERENCE_TIME rt, AP4_Ordinal& index, AP4_SI64& c
     for (AP4_Ordinal i = 0; i < m_IndexEntries.ItemCount(); i++) {
         if (m_IndexEntries[i].m_rt > rt) {
             const AP4_IndexTableEntry& indexEntry = m_IndexEntries[i ? i - 1 : 0];
-            index = indexEntry.m_index;
-            cts   = indexEntry.m_cts;
+            index  = indexEntry.m_index;
+            cts    = indexEntry.m_cts;
+            offset = indexEntry.m_offset;
             return AP4_SUCCESS;
         }
     }
 
     const AP4_IndexTableEntry& indexEntry = m_IndexEntries[m_IndexEntries.ItemCount() - 1];
-    index = indexEntry.m_index;
-    cts   = indexEntry.m_cts;
+    index  = indexEntry.m_index;
+    cts    = indexEntry.m_cts;
+    offset = indexEntry.m_offset;
+
     return AP4_SUCCESS;
 }
 // MPC-BE custom code end

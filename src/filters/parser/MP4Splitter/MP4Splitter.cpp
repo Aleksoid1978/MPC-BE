@@ -1322,12 +1322,14 @@ bool CMP4SplitterFilter::DemuxInit()
 
 		pPair->m_value.index = 0;
 		pPair->m_value.ts = 0;
+		pPair->m_value.offset = 0;
 
 		AP4_Track* track = movie->GetTrack(pPair->m_key);
 
 		AP4_Sample sample;
 		if (AP4_SUCCEEDED(track->GetSample(0, sample))) {
 			pPair->m_value.ts = sample.GetCts();
+			pPair->m_value.offset = sample.GetOffset();
 		}
 	}
 
@@ -1345,11 +1347,10 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	POSITION pos = m_trackpos.GetStartPosition();
 	while (pos) {
 		CAtlMap<DWORD, trackpos>::CPair* pPair = m_trackpos.GetNext(pos);
-
 		AP4_Track* track = movie->GetTrack(pPair->m_key);
 
 		if (track->HasIndex() && track->GetIndexEntries().ItemCount() > 1) {
-			if (AP4_FAILED(track->GetIndexForRefTime(rt, pPair->m_value.index, pPair->m_value.ts))) {
+			if (AP4_FAILED(track->GetIndexForRefTime(rt, pPair->m_value.index, pPair->m_value.ts, pPair->m_value.offset))) {
 				continue;
 			}
 		} else {
@@ -1360,6 +1361,7 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			AP4_Sample sample;
 			if (AP4_SUCCEEDED(track->GetSample(pPair->m_value.index, sample))) {
 				pPair->m_value.ts = sample.GetCts();
+				pPair->m_value.offset = sample.GetOffset();
 			}
 		}
 	}
@@ -1375,7 +1377,8 @@ bool CMP4SplitterFilter::DemuxLoop()
 	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
 
 		CAtlMap<DWORD, trackpos>::CPair* pPairNext = NULL;
-		REFERENCE_TIME rtNext = 0;
+		REFERENCE_TIME rtNext = _I64_MAX;
+		ULONGLONG nextOffset = 0;
 
 		POSITION pos = m_trackpos.GetStartPosition();
 		while (pos) {
@@ -1388,11 +1391,16 @@ bool CMP4SplitterFilter::DemuxLoop()
 				continue;
 			}
 
-			REFERENCE_TIME rt = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * pPair->m_value.ts);
+			const REFERENCE_TIME rt = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * pPair->m_value.ts);
 
-			if (pPair->m_value.index < track->GetSampleCount() && (!pPairNext || rt < rtNext)) {
-				pPairNext = pPair;
-				rtNext = rt;
+			if (pPair->m_value.index < track->GetSampleCount()) {
+				if (!pPairNext
+						|| (llabs(rtNext - rt) <= UNITS && pPair->m_value.offset < nextOffset)
+						|| (llabs(rtNext - rt) > UNITS && rt < rtNext)) {
+					pPairNext = pPair;
+					nextOffset = pPair->m_value.offset;
+					rtNext = rt;
+				}
 			}
 		}
 
@@ -1502,6 +1510,7 @@ bool CMP4SplitterFilter::DemuxLoop()
 			AP4_Sample sample;
 			if (AP4_SUCCEEDED(track->GetSample(++pPairNext->m_value.index, sample))) {
 				pPairNext->m_value.ts = sample.GetCts();
+				pPairNext->m_value.offset = sample.GetOffset();
 			}
 		}
 
