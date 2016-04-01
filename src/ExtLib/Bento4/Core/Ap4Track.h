@@ -119,7 +119,7 @@ class AP4_Track {
                                               AP4_Ordinal& index);
     // MPC-BE custom code start
     AP4_Result   GetSampleIndexForRefTime(REFERENCE_TIME rt, AP4_Ordinal& index);
-    AP4_Result   GetIndexForRefTime(REFERENCE_TIME rt, AP4_Ordinal& index, AP4_SI64& cts);
+    AP4_Result   GetIndexForRefTime(REFERENCE_TIME rt, AP4_Ordinal& index, AP4_SI64& cts, AP4_Offset& offset);
     // MPC-BE custom code end
     AP4_SampleDescription* GetSampleDescription(AP4_Ordinal index);
     AP4_UI32      GetId();
