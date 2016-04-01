@@ -195,8 +195,13 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 
 	// do not trust this value :)
 	if (vsize.cx == 0 || vsize.cy == 0) {
-		vsize.cx = m_wndDestFrame.TGetPropertyAsNumber(L"/", 8);
-		vsize.cy = m_wndDestFrame.TGetPropertyAsNumber(L"/", 9);
+		try {
+			vsize.cx = m_wndDestFrame.TGetPropertyAsNumber(L"/", 8);
+			vsize.cy = m_wndDestFrame.TGetPropertyAsNumber(L"/", 9);
+		} catch (CException* e) {
+			e->Delete();
+			vsize.cx = vsize.cy = 0;
+		}
 	}
 
 	// default value ...
