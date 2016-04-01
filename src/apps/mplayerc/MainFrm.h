@@ -705,7 +705,7 @@ public:
 	OAFilterState GetMediaState();
 	REFERENCE_TIME GetPos(), GetDur();
 	bool GetNeighbouringKeyFrames(REFERENCE_TIME rtTarget, std::pair<REFERENCE_TIME, REFERENCE_TIME>& keyframes) const;
-	REFERENCE_TIME GetClosestKeyFrame(REFERENCE_TIME rtTarget) const;
+	REFERENCE_TIME const GetClosestKeyFrame(REFERENCE_TIME rtTarget);
 	void SeekTo(REFERENCE_TIME rt, bool bShowOSD = true);
 	bool ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop);
 

@@ -8320,6 +8320,14 @@ void CMainFrame::OnPlaySeekKey(UINT nID)
 		bool bSeekingForward = (nID == ID_PLAY_SEEKKEYFORWARD);
 		const REFERENCE_TIME rtPos = m_wndSeekBar.GetPos();
 		REFERENCE_TIME rtSeekTo = rtPos - (bSeekingForward ? 0 : (GetMediaState() == State_Running) ? 10000000 : 10000);
+
+		REFERENCE_TIME rtDuration;
+		m_wndSeekBar.GetRange(rtDuration);
+		if (rtDuration && rtSeekTo >= rtDuration) {
+			SeekTo(rtDuration);
+			return;
+		}
+
 		std::pair<REFERENCE_TIME, REFERENCE_TIME> keyframes;
 
 		if (GetNeighbouringKeyFrames(rtSeekTo, keyframes)) {
@@ -16441,8 +16449,14 @@ void CMainFrame::LoadKeyFrames()
 	}
 }
 
-REFERENCE_TIME CMainFrame::GetClosestKeyFrame(REFERENCE_TIME rtTarget) const
+REFERENCE_TIME const CMainFrame::GetClosestKeyFrame(REFERENCE_TIME rtTarget)
 {
+	REFERENCE_TIME rtDuration;
+	m_wndSeekBar.GetRange(rtDuration);
+	if (rtDuration && rtTarget >= rtDuration) {
+		return rtDuration;
+	}
+
 	REFERENCE_TIME ret = rtTarget;
 	std::pair<REFERENCE_TIME, REFERENCE_TIME> keyframes;
 	if (GetNeighbouringKeyFrames(rtTarget, keyframes)) {
