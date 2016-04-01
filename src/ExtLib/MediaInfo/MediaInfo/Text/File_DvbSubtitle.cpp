@@ -388,8 +388,8 @@ void File_DvbSubtitle::region_composition_segment()
                         break;
             default   : ;
         }
+        Element_End0();
     }
-    Element_End0();
 
     FILLING_BEGIN();
         subtitle_streams[subtitle_stream_id].pages[page_id].regions[region_id].region_composition_segment=true;

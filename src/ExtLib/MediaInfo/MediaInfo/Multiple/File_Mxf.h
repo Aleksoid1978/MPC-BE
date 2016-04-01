@@ -1198,7 +1198,7 @@ protected :
     };
     typedef std::vector<acquisitionmetadata> acquisitionmetadatalist;
     vector<acquisitionmetadatalist*> AcquisitionMetadataLists;
-    void AcquisitionMetadata_Add(size_t Id, string Value)
+    void AcquisitionMetadata_Add(size_t Id, const string& Value)
     {
         if (!AcquisitionMetadataLists[Id])
         {
@@ -1214,7 +1214,7 @@ protected :
         AcquisitionMetadataLists[Id]->push_back(acquisitionmetadata(Value));
     }
     vector<acquisitionmetadatalist*> AcquisitionMetadata_Sony_E201_Lists;
-    void AcquisitionMetadata_Sony_E201_Add(size_t Id, string Value)
+    void AcquisitionMetadata_Sony_E201_Add(size_t Id, const string& Value)
     {
         if (!AcquisitionMetadata_Sony_E201_Lists[Id])
         {

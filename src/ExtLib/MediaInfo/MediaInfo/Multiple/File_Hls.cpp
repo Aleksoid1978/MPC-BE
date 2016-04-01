@@ -232,7 +232,7 @@ bool File_Hls::FileHeader_Begin()
     Element_Offset=File_Size;
 
     //All should be OK...
-    Config->File_TestContinuousFileNames_Set(true);
+    Config->File_TestContinuousFileNames_Set(false);
     return true;
 }
 

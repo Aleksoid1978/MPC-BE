@@ -1700,9 +1700,9 @@ void File_Mpeg4::mdat_xxxx()
                     else
                         stts_Offset=0;
                 }
-                FrameInfo.DTS=TimeCode_DtsOffset+stts_Offset*1000000000/Stream_Temp.mdhd_TimeScale;
+                FrameInfo.DTS=Stream_Temp.mdhd_TimeScale?(TimeCode_DtsOffset+stts_Offset*1000000000/Stream_Temp.mdhd_TimeScale):((int64u)-1);
                 FrameInfo.PTS=Stream_Temp.PtsDtsAreSame?FrameInfo.DTS:(int64u)-1;
-                FrameInfo.DUR=((int64u)stts_Duration->SampleDuration)*1000000000/Stream_Temp.mdhd_TimeScale;
+                FrameInfo.DUR=Stream_Temp.mdhd_TimeScale?(((int64u)stts_Duration->SampleDuration)*1000000000/Stream_Temp.mdhd_TimeScale):((int64u)-1);
                 Stream_Temp.stts_FramePos++;
                 if (Stream_Temp.stts_FramePos>=stts_Duration->Pos_End)
                     Stream_Temp.stts_Durations_Pos++;
