@@ -1644,23 +1644,18 @@ int CAppSettings::GetMultiInst()
 	return multiinst;
 }
 
-bool CAppSettings::IsUsingRtspEngine(CString path, engine_t e)
+engine_t CAppSettings::GetFileEngine(CString path)
 {
-	return (GetRtspEngine(path) == e);
-}
-
-engine_t CAppSettings::GetRtspEngine(CString path)
-{
-	path.Trim().MakeLower();
-
-	CString ext = CPath(path).GetExtension();
-	ext.MakeLower();
+	CString ext = CPath(path).GetExtension().MakeLower();
 
 	if (!ext.IsEmpty()) {
 		for (size_t i = 0; i < m_Formats.GetCount(); i++) {
 			CMediaFormatCategory& mfc = m_Formats.GetAt(i);
-			if (mfc.FindExt(ext)) {
-				return mfc.GetEngineType();
+			if (mfc.GetLabel() == L"swf") {
+				if (mfc.FindExt(ext)) {
+					return ShockWave;
+				}
+				break;
 			}
 		}
 	}

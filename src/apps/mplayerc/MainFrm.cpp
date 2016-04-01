@@ -11553,7 +11553,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	}
 
 	if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
-		engine_t engine = s.GetRtspEngine(pFileData->fns.GetHead());
+		engine_t engine = s.GetFileEngine(pFileData->fns.GetHead());
 
 		CStringA ct = GetContentType(pFileData->fns.GetHead());
 
@@ -17161,7 +17161,7 @@ void CMainFrame::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	bool bDirectShow	= pFileData && !pFileData->fns.IsEmpty() && s.GetRtspEngine(pFileData->fns.GetHead()) == DirectShow;
+	bool bDirectShow	= pFileData && !pFileData->fns.IsEmpty() && s.GetFileEngine(pFileData->fns.GetHead()) == DirectShow;
 	bool bUseThread		= m_pGraphThread && s.fEnableWorkerThreadForOpening && (bDirectShow || !pFileData) && !pDeviceData;
 
 	// create d3dfs window if launching in fullscreen and d3dfs is enabled

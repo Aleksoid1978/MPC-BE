@@ -876,9 +876,7 @@ public:
 	CDVBChannel*	FindChannelByPref(int nPrefNumber);
 
 	int				GetMultiInst();
-
-	bool			IsUsingRtspEngine(CString path, engine_t e);
-	engine_t		GetRtspEngine(CString path);
+	engine_t		GetFileEngine(CString path);
 
 private:
 	void			SaveRenderers();
