@@ -6747,7 +6747,7 @@ void CMainFrame::OnFileISDBDownload()
 {
 	CAppSettings& s = AfxGetAppSettings();
 	filehash fh;
-	if (!::mpc_filehash((CString)GetCurFileName(), fh)) {
+	if (!::mpc_filehash(GetCurFileName(), fh)) {
 		MessageBeep(UINT_MAX);
 		return;
 	}
@@ -6761,6 +6761,8 @@ void CMainFrame::OnFileISDBDownload()
 
 		CSubtitleDlDlg dlg(GetModalParent(), url, fh.name);
 		dlg.DoModal();
+
+		SetToolBarSubtitleButton();
 	} catch (CInternetException* ie) {
 		ie->Delete();
 		return;
