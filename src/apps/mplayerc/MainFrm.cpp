@@ -11945,10 +11945,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		CString tmp(fn);
 		tmp.MakeLower();
 
-		if (tmp.Find(L"www.") == 0) {
-			tmp = L"http://" + tmp;
-		}
-
 		CUrl url;
 		if (::PathIsURL(tmp) && url.CrackUrl(tmp)
 				&& (url.GetScheme() == ATL_URL_SCHEME_HTTP || url.GetScheme() == ATL_URL_SCHEME_HTTPS)) {
@@ -13750,9 +13746,14 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		POSITION pos = pFileData->fns.GetHeadPosition();
 		UINT index = 0;
 		while (pos) {
-			CString path = pFileData->fns.GetNext(pos);
+			CFileItem& fileItem = pFileData->fns.GetNext(pos);
+
+			if (fileItem.GetName().Left(4) == L"www.") {
+				fileItem = L"http://" + fileItem.GetName();
+			}
+
 			DbgLog((LOG_TRACE, 3, _T("--> CMainFrame::OpenMediaPrivate() - pFileData->fns[%d]:"), index));
-			DbgLog((LOG_TRACE, 3, _T("	%s"), path.GetString()));
+			DbgLog((LOG_TRACE, 3, _T("	%s"), fileItem.GetName()));
 			index++;
 		}
 	}
