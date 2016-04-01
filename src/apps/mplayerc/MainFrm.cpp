@@ -13751,7 +13751,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	m_bWasPausedOnMinimizedVideo = false;
 
-#ifdef _DEBUG
 	if (pFileData) {
 		POSITION pos = pFileData->fns.GetHeadPosition();
 		UINT index = 0;
@@ -13762,12 +13761,10 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 				fileItem = L"http://" + fileItem.GetName();
 			}
 
-			DbgLog((LOG_TRACE, 3, _T("--> CMainFrame::OpenMediaPrivate() - pFileData->fns[%d]:"), index));
+			DbgLog((LOG_TRACE, 3, _T("--> CMainFrame::OpenMediaPrivate() - pFileData->fns[%d]:"), index++));
 			DbgLog((LOG_TRACE, 3, _T("	%s"), fileItem.GetName()));
-			index++;
 		}
 	}
-#endif
 
 	CAppSettings& s = AfxGetAppSettings();
 
