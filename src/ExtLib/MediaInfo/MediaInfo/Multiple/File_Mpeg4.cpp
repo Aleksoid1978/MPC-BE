@@ -1995,7 +1995,7 @@ bool File_Mpeg4::BookMark_Needed()
                                 }
                             #endif //MEDIAINFO_DEMUX
                         }
-                        else if (stsc_Current < stsc_Max)
+                        else if (stsc_Current < stsc_Max && stsc_Current->SamplesPerChunk*Temp->second.stsz_Sample_Size < File_Size) // Checking integrity. TODO: don't try to expand the samples, just use data directly
                         {
                             //Same size per sample
                             int64u Chunk_Offset = 0;
