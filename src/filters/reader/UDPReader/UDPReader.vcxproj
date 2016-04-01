@@ -153,7 +153,7 @@
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>UDPReader.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
@@ -165,7 +165,7 @@
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>UDPReader.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
@@ -177,7 +177,7 @@
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>UDPReader.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
@@ -189,7 +189,7 @@
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;Wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Winmm.lib;vfw32.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>UDPReader.def</ModuleDefinitionFile>
     </Link>
     <ResourceCompile>
