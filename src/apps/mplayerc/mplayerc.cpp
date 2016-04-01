@@ -2227,10 +2227,6 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 	CUrl url;
 	CString ct, body;
 
-	if (fn.Find(L"www.") == 0) {
-		fn = L"http://" + fn;
-	}
-
 	if (::PathIsURL(fn) && url.CrackUrl(fn)) {
 		if (_tcsicmp(url.GetSchemeName(), L"pnm") == 0) {
 			return L"audio/x-pn-realaudio";
@@ -2319,14 +2315,14 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 		_tfopen_s(&f, fn, _T("rb"));
 		if (f) {
 			CStringA str;
-			str.ReleaseBufferSetLength(fread(str.GetBuffer(10 * KILOBYTE), 1, 10 * KILOBYTE, f));
+			str.ReleaseBufferSetLength(fread(str.GetBuffer(3), 1, 3, f));
 			body = AToT(str);
 			fclose(f);
 		}
 	}
 
 	if (body.GetLength() >= 3) { // here only those which cannot be opened through dshow
-		if (!wcsncmp(body, L"FWS", 3) || !wcsncmp(body, L"CWS", 3)) {
+		if (!wcsncmp(body, L"FWS", 3) || !wcsncmp(body, L"CWS", 3) || !wcsncmp(body, L"ZWS", 3)) {
 			return L"application/x-shockwave-flash";
 		}
 	}
