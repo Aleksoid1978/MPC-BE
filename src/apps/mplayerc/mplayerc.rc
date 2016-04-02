@@ -2940,7 +2940,6 @@ BEGIN
     IDS_MFMT_ROQ                "Id Software Game Video"
     IDS_MFMT_WMV                "Windows Media Video"
     IDS_MFMT_VIDEOCD            "VideoCD"
-    IDS_MFMT_RATDVD             "RatDVD"
     IDS_MFMT_BINK               "Smacker/Bink Video"
     IDS_MFMT_FLIC               "FLIC Animation"
     IDS_MFMT_DSM                "DirectShow Media"
