@@ -210,7 +210,6 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("ogm"),         ResStr(IDS_MFMT_OGM),         _T("ogm ogv")));
 		ADDFMT((_T("rm"),          ResStr(IDS_MFMT_RM),          _T("rm ram rmm rmvb")));
 		ADDFMT((_T("roq"),         ResStr(IDS_MFMT_ROQ),         _T("roq")));
-		ADDFMT((_T("rt"),          ResStr(IDS_MFMT_RT),          _T("rt rp smil")));
 		ADDFMT((_T("wmv"),         ResStr(IDS_MFMT_WMV),         _T("wmv wmp wm asf")));
 //		ADDFMT((_T("videocd"),     ResStr(IDS_MFMT_VIDEOCD),     _T("dat")));
 		ADDFMT((_T("ratdvd"),      ResStr(IDS_MFMT_RATDVD),      _T("ratdvd"), TVideo, _T("ratdvd media file")));

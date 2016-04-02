@@ -7,7 +7,8 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include "afxres.h"
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -2937,7 +2938,6 @@ BEGIN
     IDS_MFMT_OGM                "Ogg Media"
     IDS_MFMT_RM                 "Real Media"
     IDS_MFMT_ROQ                "Id Software Game Video"
-    IDS_MFMT_RT                 "Real Script"
     IDS_MFMT_WMV                "Windows Media Video"
     IDS_MFMT_VIDEOCD            "VideoCD"
     IDS_MFMT_RATDVD             "RatDVD"
