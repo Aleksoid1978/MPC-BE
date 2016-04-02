@@ -90,17 +90,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-enum engine_t {
-	DirectShow = 0,
-	ShockWave
-};
-
-interface __declspec(uuid("B110CDE5-6331-4118-8AAF-A870D6F7E2E4"))
-IGraphEngine :
-public IUnknown {
-	STDMETHOD_(engine_t, GetEngine) () PURE;
-};
-
 enum {
 	EC_BG_AUDIO_CHANGED = EC_USER+1,
 	EC_BG_ERROR
@@ -116,7 +105,6 @@ class CBaseGraph
 	, public IBasicVideo
 	, public IBasicAudio
 	, public IAMOpenProgress
-	, public IGraphEngine
 {
 	OAHWND m_hNotifyWnd;
 	long m_lNotifyMsg;
@@ -309,7 +297,4 @@ protected:
 	// IAMOpenProgress
 	STDMETHODIMP QueryProgress(LONGLONG* pllTotal, LONGLONG* pllCurrent);
 	STDMETHODIMP AbortOperation();
-
-	// IGraphEngine
-	STDMETHODIMP_(engine_t) GetEngine();
 };

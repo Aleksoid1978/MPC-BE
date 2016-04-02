@@ -189,6 +189,11 @@ enum {
 	TIME_TOOLTIP_BELOW_SEEKBAR
 };
 
+enum engine_t {
+	DirectShow = 0,
+	ShockWave
+};
+
 #pragma pack(push, 1)
 struct dispmode {
 	bool bValid = false;

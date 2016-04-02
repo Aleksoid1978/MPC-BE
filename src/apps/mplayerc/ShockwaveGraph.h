@@ -76,9 +76,6 @@ namespace DSObjects
 
 		// IAMOpenProgress
 		STDMETHODIMP QueryProgress(LONGLONG* pllTotal, LONGLONG* pllCurrent);
-
-		// IGraphEngine
-		STDMETHODIMP_(engine_t) GetEngine();
 	};
 
 }
