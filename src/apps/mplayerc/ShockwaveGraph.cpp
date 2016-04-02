@@ -447,9 +447,3 @@ STDMETHODIMP CShockwaveGraph::QueryProgress(LONGLONG* pllTotal, LONGLONG* pllCur
 
 	return S_OK;
 }
-
-// IGraphEngine
-STDMETHODIMP_(engine_t) CShockwaveGraph::GetEngine()
-{
-	return ShockWave;
-}
