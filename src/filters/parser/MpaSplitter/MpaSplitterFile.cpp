@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include <MMReg.h>
 #include "MpaSplitterFile.h"
+#include "../../../DSUtil/AudioParser.h"
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -33,7 +34,7 @@
 
 CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 	: CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_STREAM)
-	, m_mode(none)
+	, m_mode(mode::none)
 	, m_rtDuration(0)
 	, m_startpos(0)
 	, m_procsize(0)
@@ -50,6 +51,12 @@ CMpaSplitterFile::~CMpaSplitterFile()
 {
 	SAFE_DELETE(m_pID3Tag);
 }
+
+#define MPA_FRAME_SIZE  4
+#define ADTS_FRAME_SIZE 9
+
+#define MOVE_TO_MPA_START_CODE(b, e) while(b <= e - MPA_FRAME_SIZE  && ((GETWORD(b) & 0xe0ff) != 0xe0ff)) b++;
+#define MOVE_TO_AAC_START_CODE(b, e) while(b <= e - ADTS_FRAME_SIZE && ((GETWORD(b) & 0xf0ff) != 0xf0ff)) b++;
 
 HRESULT CMpaSplitterFile::Init()
 {
@@ -126,64 +133,106 @@ HRESULT CMpaSplitterFile::Init()
 
 	Seek(m_startpos);
 
-	int searchlen		= 0;
-	__int64 startpos	= 0;
+	__int64 startpos = 0;
 
 	const __int64 limit = IsRandomAccess() ? MEGABYTE : 64 * KILOBYTE;
-
-	__int64 endDataPos = min(endpos - MPA_HEADER_SIZE, limit + m_startpos);
-	while (m_mode == none && endDataPos > (GetPos() + MPA_HEADER_SIZE)) {
-		searchlen = (int)min(endDataPos - GetPos(), 512);
-
-		// Check for a valid MPA header
-		if (Read(m_mpahdr, searchlen, &m_mt, true, true)) {
-			// check multiple frame to ensure that the data is correct
-			__int64 savepos = GetPos() - MPA_HEADER_SIZE;
-			Seek(savepos + m_mpahdr.FrameSize);
-
-			int nValidFrameCount = 0;
-			while (endDataPos > GetPos() + MPA_HEADER_SIZE) {
-				m_mode = mpa;
-				if (!Sync(MPA_HEADER_SIZE)) {
-					m_mode = none;
+	const __int64 endDataPos = min(endpos - MPA_HEADER_SIZE, limit + m_startpos);
+	const __int64 size = endDataPos - m_startpos;
+	BYTE* buffer = DNew BYTE[size];
+	if (S_OK == ByteRead(buffer, size)) {
+		BYTE* start = buffer;
+		BYTE* end   = start + size;
+		while (m_mode != mode::mpa) {
+			MOVE_TO_MPA_START_CODE(start, end);
+			if (start < end - MPA_FRAME_SIZE) {
+				startpos = m_startpos + (start - buffer);
+				audioframe_t aframe;
+				int size = ParseMPAHeader(start, &aframe);
+				if (size == 0) {
+					start++;
+					continue;
+				}
+				if (start + size > end) {
 					break;
 				}
-				nValidFrameCount++;
 
-				Seek(GetPos() + m_mpahdr.FrameSize);
-			}
+				BYTE* start2 = start + size;
+				while (start2 + MPA_FRAME_SIZE <= end) {
+					int size = ParseMPAHeader(start2, &aframe);
+					if (size == 0) {
+						start++;
+						m_mode = mode::none;
+						break;
+					}
 
-			if (m_mode == mpa && nValidFrameCount >= 5) {
-				startpos = savepos;
+					m_mode = mode::mpa;
+					if (start2 + size > end) {
+						break;
+					}
+
+					start2 += size;
+				}
+			} else {
 				break;
 			}
+		}
+		
+		if (m_mode == mode::none) {
+			BYTE* start = buffer;
+			BYTE* end   = start + size;
+			while (m_mode != mode::mp4a) {
+				MOVE_TO_AAC_START_CODE(start, end);
+				if (start < end - ADTS_FRAME_SIZE) {
+					startpos = m_startpos + (start - buffer);
+					audioframe_t aframe;
+					int size = ParseADTSAACHeader(start, &aframe);
+					if (size == 0) {
+						start++;
+						continue;
+					}
+					if (start + size > end) {
+						break;
+					}
 
-			m_mode = none;
+					BYTE* start2 = start + size;
+					while (start2 + ADTS_FRAME_SIZE <= end) {
+						int size = ParseADTSAACHeader(start2, &aframe);
+						if (size == 0) {
+							start++;
+							m_mode = mode::none;
+							break;
+						}
+
+						m_mode = mode::mp4a;
+						if (start2 + size > end) {
+							break;
+						}
+
+						start2 += size;
+					}
+				} else {
+					break;
+				}
+			}
 		}
 	}
 
-	searchlen = (int)min(GetAvailable(), KILOBYTE);
-	Seek(m_startpos);
-
-	if (m_mode == none && Read(m_aachdr, searchlen, &m_mt)) {
-		m_mode = mp4a;
-
-		startpos = GetPos() - (m_aachdr.fcrc ? 7 : 9);
-
-		// make sure the first frame is followed by another of the same kind (validates m_aachdr basically)
-		Seek(startpos + m_aachdr.aac_frame_length);
-		if (!Sync(9)) {
-			m_mode = none;
-		}
-	}
-
-	if (m_mode == none) {
+	delete [] buffer;
+	
+	if (m_mode == mode::none) {
 		return E_FAIL;
 	}
 
 	m_startpos = startpos;
+	Seek(m_startpos);
 
-	if (m_mode == mpa) {
+	if (m_mode == mode::mpa) {
+		Read(m_mpahdr, MPA_HEADER_SIZE, &m_mt, true);
+	} else {
+		Read(m_aachdr, ADTS_FRAME_SIZE, &m_mt, false);
+	}
+
+	if (m_mode == mode::mpa) {
 		DWORD dwFrames = 0;		// total number of frames
 		Seek(m_startpos + MPA_HEADER_SIZE + 32);
 		if (BitRead(32, true) == 'Xing' || BitRead(32, true) == 'Info') {
@@ -212,13 +261,13 @@ HRESULT CMpaSplitterFile::Init()
 		}
 	}
 
-	if (m_mode == mpa) {
+	Seek(m_startpos);
+
+	if (m_mode == mode::mpa) {
 		m_coefficient = 10000000.0 * (GetLength() - m_startpos) * m_mpahdr.FrameSamples / m_mpahdr.Samplerate;
-	} else if (m_mode == mp4a) {
+	} else if (m_mode == mode::mp4a) {
 		m_coefficient = 10000000.0 * (GetLength() - m_startpos) * m_aachdr.FrameSamples / m_aachdr.Samplerate;
 	}
-
-	Seek(m_startpos);
 
 	int FrameSize;
 	REFERENCE_TIME rtFrameDur, rtPrevDur = -1;
@@ -247,7 +296,7 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 {
 	__int64 endpos = min(GetLength(), GetPos() + limit);
 
-	if (m_mode == mpa) {
+	if (m_mode == mode::mpa) {
 		while (GetPos() <= endpos - MPA_HEADER_SIZE) {
 			mpahdr h;
 
@@ -277,7 +326,7 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 				break;
 			}
 		}
-	} else if (m_mode == mp4a) {
+	} else if (m_mode == mode::mp4a) {
 		while (GetPos() <= endpos - 9) {
 			aachdr h;
 
