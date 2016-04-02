@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Über MPC-BE"
 7		"MPC-BE"
 8		"Copyright © 2002-2016 MPC-BE Team, siehe Authors.txt Datei"
@@ -1523,11 +1523,9 @@ STRING IDS_MFMT_OTHER		"Andere"
 STRING IDS_MFMT_OTHER_AUDIO		"Andere Audioformate"
 STRING IDS_MFMT_PLS		"Wiedergabeliste"
 STRING IDS_MFMT_RA		"Real Audio"
-STRING IDS_MFMT_RATDVD		"RatDVD"
 STRING IDS_MFMT_RAW_VIDEO		"Raw Video"
 STRING IDS_MFMT_RM		"Real Media"
 STRING IDS_MFMT_ROQ		"Id Software Game Video"
-STRING IDS_MFMT_RT		"Real Script"
 STRING IDS_MFMT_SPEEX		"Speex"
 STRING IDS_MFMT_SWF		"Shockwave Flash"
 STRING IDS_MFMT_TAK		"Tom's verlustfreier Audiokompressor"
