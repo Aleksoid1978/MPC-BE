@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,8 +37,10 @@
 #include "../../../DSUtil/MediaDescription.h"
 #include <vector>
 
-#define PACKET_PTS_DISCONTINUITY		0x0001
-#define PACKET_PTS_VALIDATE_POSITIVE	0x0002
+#define PACKET_PTS_DISCONTINUITY     0x0001
+#define PACKET_PTS_VALIDATE_POSITIVE 0x0002
+
+#define SOURCE_SUPPORT_URL           0x0004
 
 class CBaseSplitterFilter
 	: public CBaseFilter

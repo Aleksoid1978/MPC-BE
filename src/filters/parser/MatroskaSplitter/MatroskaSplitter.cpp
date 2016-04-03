@@ -98,6 +98,7 @@ CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_Seek_rt(INVALID_TIME)
 	, m_bSupportCueDuration(FALSE)
 {
+	m_nFlag |= SOURCE_SUPPORT_URL;
 #ifdef REGISTER_FILTER
 	CRegKey key;
 

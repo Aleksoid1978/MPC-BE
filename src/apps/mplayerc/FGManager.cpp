@@ -30,6 +30,7 @@
 #include "DeinterlacerFilter.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/FileVersionInfo.h"
+#include "../../DSUtil/HTTPAsync.h"
 #include "../../filters/transform/DeCSSFilter/VobFile.h"
 #include <InitGuid.h>
 #include <dmodshow.h>
@@ -261,6 +262,60 @@ bool CFGManager::CheckBytes(HANDLE hFile, CString chkbytes)
 	return sl.IsEmpty();
 }
 
+bool CFGManager::CheckBytes(PBYTE buf, DWORD size, CString chkbytes)
+{
+	CAtlList<CString> sl;
+	Explode(chkbytes, sl, ',');
+
+	if (sl.GetCount() < 4) {
+		return false;
+	}
+
+	ASSERT(!(sl.GetCount()&3));
+
+	CGolombBuffer gb(buf, size);
+
+	while (sl.GetCount() >= 4) {
+		CString offsetstr = sl.RemoveHead();
+		CString cbstr = sl.RemoveHead();
+		CString maskstr = sl.RemoveHead();
+		CString valstr = sl.RemoveHead();
+
+		long cb = _ttol(cbstr);
+
+		if (offsetstr.IsEmpty() || cbstr.IsEmpty()
+				|| valstr.IsEmpty() || (valstr.GetLength() & 1)
+				|| cb*2 != valstr.GetLength()) {
+			return false;
+		}
+
+		__int64 offset = _ttoi64(offsetstr);
+		if (offset + valstr.GetLength() > size) {
+			return false;
+		}
+
+		gb.Seek(offset);
+
+		// LAME
+		while (maskstr.GetLength() < valstr.GetLength()) {
+			maskstr += 'F';
+		}
+
+		CAtlArray<BYTE> mask, val;
+		CStringToBin(maskstr, mask);
+		CStringToBin(valstr, val);
+
+		for (size_t i = 0; i < val.GetCount(); i++) {
+			BYTE b = gb.ReadByte();
+			if ((b & mask[i]) != val[i]) {
+				return false;	
+			}
+		}
+	}
+
+	return sl.IsEmpty();
+}
+
 CFGFilter *LookupFilterRegistry(const GUID &guid, CAtlList<CFGFilter*> &list, UINT64 fallback_merit = MERIT64_DO_USE)
 {
 	POSITION pos = list.GetHeadPosition();
@@ -294,12 +349,21 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	}
 
 	HANDLE hFile = INVALID_HANDLE_VALUE;
+	
+	CHTTPAsync HTTPAsync;
+	BYTE httpbuf[1024] = { 0 };
+	DWORD httpbufSize = 0;
 
 	if ((protocol.GetLength() <= 1 || protocol == L"file") && (ext.Compare(_T(".cda")) != 0)) {
 		hFile = CreateFile(CString(fn), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
 
 		if (hFile == INVALID_HANDLE_VALUE) {
 			return VFW_E_NOT_FOUND;
+		}
+	} else if (::PathIsURL(lpcwstrFileName) && HTTPAsync.Connect(lpcwstrFileName, 5000) == S_OK) {
+		if (HTTPAsync.GetLenght() > 0) {
+			HTTPAsync.Read(httpbuf, _countof(httpbuf), &httpbufSize, 1000);
+			HTTPAsync.Close();
 		}
 	}
 
@@ -309,8 +373,23 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	// internal filters
 	{
 		if (hFile == INVALID_HANDLE_VALUE) {
-			// protocol
+			// check bytes for http
+			if (httpbufSize) {
+				POSITION pos = m_source.GetHeadPosition();
+				while (pos) {
+					CFGFilter* pFGF = m_source.GetNext(pos);
 
+					POSITION pos2 = pFGF->m_chkbytes.GetHeadPosition();
+					while (pos2) {
+						if (CheckBytes(httpbuf, httpbufSize, pFGF->m_chkbytes.GetNext(pos2))) {
+							fl.Insert(pFGF, 0, false, false);
+							break;
+						}
+					}
+				}
+			}
+
+			// protocol
 			POSITION pos = m_source.GetHeadPosition();
 			while (pos) {
 				CFGFilter* pFGF = m_source.GetNext(pos);
@@ -320,7 +399,6 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 			}
 		} else {
 			// check bytes
-
 			POSITION pos = m_source.GetHeadPosition();
 			while (pos) {
 				CFGFilter* pFGF = m_source.GetNext(pos);

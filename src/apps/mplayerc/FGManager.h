@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -66,7 +66,8 @@ protected:
 	CInterfaceList<IUnknown, &IID_IUnknown> m_pUnks;
 	CAtlList<CFGFilter*> m_source, m_transform, m_override;
 
-	static bool CheckBytes(HANDLE hFile, CString chkbytes);
+	bool CheckBytes(HANDLE hFile, CString chkbytes);
+	bool CheckBytes(PBYTE buf, DWORD size, CString chkbytes);
 
 	HRESULT EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl);
 	HRESULT AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppBF);

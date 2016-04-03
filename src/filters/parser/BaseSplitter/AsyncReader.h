@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,7 @@
 #pragma once
 
 #include "MultiFiles.h"
+#include "../../../DSUtil/HTTPAsync.h"
 
 interface __declspec(uuid("6DDB4EE7-45A0-4459-A508-BD77B32C91B2"))
 ISyncReader :
@@ -30,6 +31,7 @@ public IUnknown {
 	STDMETHOD_(bool, HasErrors)() PURE;
 	STDMETHOD_(void, ClearErrors)() PURE;
 	STDMETHOD_(void, SetPTSOffset)(REFERENCE_TIME* rtPTSOffset) PURE;
+	STDMETHOD_(int, GetSourceType)() PURE;
 };
 
 interface __declspec(uuid("7D55F67A-826E-40B9-8A7D-3DF0CBBD272D"))
@@ -37,17 +39,35 @@ IFileHandle :
 public IUnknown {
 	STDMETHOD_(HANDLE, GetFileHandle)() PURE;
 	STDMETHOD_(LPCTSTR, GetFileName)() PURE;
-	STDMETHOD_(bool, IsValidFilename)() PURE;
+	STDMETHOD_(BOOL, IsValidFileName)() PURE;
 };
 
 class CAsyncFileReader : public CUnknown, public CMultiFiles, public IAsyncReader, public ISyncReader, public IFileHandle
 {
+public:
+	enum SourceType {
+		LOCAL,
+		HTTP
+	};
+
 protected:
 	HANDLE m_hBreakEvent;
 	LONG m_lOsError; // CFileException::m_lOsError
 
+	SourceType m_sourcetype = SourceType::LOCAL;
+
+	BOOL m_bSupportURL = FALSE;
+	CHTTPAsync m_HTTPAsync;
+	ULONGLONG m_total = 0;
+	LONGLONG m_pos = 0;
+	CString m_url;
+
+	virtual BOOL Open(LPCTSTR lpszFileName) final;
+	virtual ULONGLONG GetLength() const final;
+
 public:
-	CAsyncFileReader(CString fn, HRESULT& hr);
+
+	CAsyncFileReader(CString fn, HRESULT& hr, BOOL bSupportURL);
 	CAsyncFileReader(CHdmvClipInfo::CPlaylist& Items, HRESULT& hr);
 
 	DECLARE_IUNKNOWN;
@@ -68,9 +88,10 @@ public:
 	STDMETHODIMP_(bool) HasErrors() { return m_lOsError != 0; }
 	STDMETHODIMP_(void) ClearErrors() { m_lOsError = 0; }
 	STDMETHODIMP_(void) SetPTSOffset(REFERENCE_TIME* rtPTSOffset) { m_pCurrentPTSOffset = rtPTSOffset; };
+	STDMETHODIMP_(int) GetSourceType() { return (int)m_sourcetype; }
 
 	// IFileHandle
 	STDMETHODIMP_(HANDLE) GetFileHandle() { return m_hFile; }
-	STDMETHODIMP_(LPCTSTR) GetFileName() { return m_nCurPart != -1 ? m_strFiles[m_nCurPart] : m_strFiles[0]; }
-	STDMETHODIMP_(bool) IsValidFilename() { return m_strFiles.IsEmpty() ? false : true; }
+	STDMETHODIMP_(LPCTSTR) GetFileName() { return !m_url.IsEmpty() ? m_url : (m_nCurPart != -1 ? m_strFiles[m_nCurPart] : m_strFiles[0]); }
+	STDMETHODIMP_(BOOL) IsValidFileName() { return !m_url.IsEmpty() || !m_strFiles.IsEmpty(); }
 };
