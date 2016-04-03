@@ -1273,8 +1273,16 @@ bool CFLVSplitterFilter::DemuxLoop()
 			break;
 		}
 
-		if (!ReadTag(t) || !ValidateTag(t)) {
+		if (!ReadTag(t)) {
 			break;
+		}
+
+		if (!ValidateTag(t)) {
+			__int64 pos = m_pFile->GetPos();
+			if (!Sync(pos)) {
+				break;
+			}
+			continue;
 		}
 
 		__int64 next = m_pFile->GetPos() + t.DataSize;
