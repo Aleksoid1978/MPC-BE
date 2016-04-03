@@ -19704,6 +19704,10 @@ void CMainFrame::SetToolBarSubtitleButton()
 			}
 		} else if (!m_pSubStreams.IsEmpty()) {
 			bEnabled = TRUE;
+		} else if (m_pDVDI) {
+			ULONG ulStreamsAvailable, ulCurrentStream;
+			BOOL bIsDisabled;
+			bEnabled = SUCCEEDED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled)) && (ulStreamsAvailable > 0);
 		}
 	}
 
