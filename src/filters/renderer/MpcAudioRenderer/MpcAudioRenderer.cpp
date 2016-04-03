@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2015 see Authors.txt
+ * (C) 2009-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1709,15 +1709,22 @@ HRESULT CMpcAudioRenderer::GetAudioDevice()
 			if (hr == S_OK) {
 				hr = endpoint->GetId(&pwszID);
 				if (hr == S_OK) {
-					m_strCurrentDeviceId = pwszID;
-					if (endpoint->OpenPropertyStore(STGM_READ, &pProps) == S_OK) {
+					hr = endpoint->OpenPropertyStore(STGM_READ, &pProps);
+					if (hr == S_OK) {
+						PROPVARIANT eventDriven;
+						PropVariantInit(&eventDriven);
+						BOOL bEventDrivenModeSupport = (pProps->GetValue(PKEY_AudioEndpoint_Supports_EventDriven_Mode, &eventDriven) == S_OK);
+						PropVariantClear(&eventDriven);
+
 						PROPVARIANT varName;
 						PropVariantInit(&varName);
 
 						// Found the configured audio endpoint
-						if ((pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK) && (m_DeviceId == CString(pwszID))) {
+						if (bEventDrivenModeSupport
+								&& (pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK) && (m_DeviceId == CString(pwszID))) {
 							DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - devices->GetId() OK, num: (%d), pwszVal: '%s', pwszID: '%s'", i, varName.pwszVal, pwszID));
 
+							m_strCurrentDeviceId = pwszID;
 							m_strCurrentDeviceName = varName.pwszVal;
 
 							enumerator->GetDevice(pwszID, &m_pMMDevice);
@@ -1733,6 +1740,7 @@ HRESULT CMpcAudioRenderer::GetAudioDevice()
 							SAFE_RELEASE(endpoint);
 							CoTaskMemFree(pwszID);
 							pwszID = NULL;
+							hr = E_FAIL;
 						}
 					}
 				} else {
@@ -1754,15 +1762,26 @@ HRESULT CMpcAudioRenderer::GetAudioDevice()
 		LPWSTR pwszID = NULL;
 		hr = m_pMMDevice->GetId(&pwszID);
 		if (hr == S_OK) {
-			m_strCurrentDeviceId = pwszID;
-
 			IPropertyStore* pProps = NULL;
-			if (m_pMMDevice->OpenPropertyStore(STGM_READ, &pProps) == S_OK) {
+			hr = m_pMMDevice->OpenPropertyStore(STGM_READ, &pProps);
+			if (hr == S_OK) {
+				hr = E_FAIL;
+
+				PROPVARIANT eventDriven;
+				PropVariantInit(&eventDriven);
+				BOOL bEventDrivenModeSupport = (pProps->GetValue(PKEY_AudioEndpoint_Supports_EventDriven_Mode, &eventDriven) == S_OK);
+				PropVariantClear(&eventDriven);
+
 				PROPVARIANT varName;
 				PropVariantInit(&varName);
-				if ((pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK)) {
+				if (bEventDrivenModeSupport
+						&& (pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK)) {
 					DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - Unable to find selected audio device, using the default end point : pwszVal: '%s', pwszID: '%s'", varName.pwszVal, pwszID));
+					
+					m_strCurrentDeviceId = pwszID;
 					m_strCurrentDeviceName = varName.pwszVal;
+
+					hr = S_OK;
 				}
 
 				PropVariantClear(&varName);
