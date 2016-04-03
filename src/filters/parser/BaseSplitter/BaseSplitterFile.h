@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,10 +24,10 @@
 #include <atlcoll.h>
 #include <thread>
 
-#define FM_FILE     1 // complete file or stream of known size (local file, VTS Reader, File Source (Async.))
-#define FM_FILE_DL  2 // downloading stream of known size (File Source (URL) for files < 4 GB)
+#define FM_FILE     1 // complete file or stream of known size (local file, VTS Reader, File Source (Async.), source filter with random access)
+#define FM_FILE_DL  2 // downloading stream of known size (File Source (URL) for files < 4 GB, source filter with continuous download)
 #define FM_FILE_VAR 4 // local file whose size increases
-#define FM_STREAM   8 // downloading stream of unknown size
+#define FM_STREAM   8 // downloading stream of unknown size (IPTV, radio)
 
 class CBaseSplitterFile
 {
