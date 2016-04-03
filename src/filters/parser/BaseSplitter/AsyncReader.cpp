@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,8 +26,9 @@
 // CAsyncFileReader
 //
 
-CAsyncFileReader::CAsyncFileReader(CString fn, HRESULT& hr)
+CAsyncFileReader::CAsyncFileReader(CString fn, HRESULT& hr, BOOL bSupportURL)
 	: CUnknown(NAME("CAsyncFileReader"), NULL, &hr)
+	, m_bSupportURL(bSupportURL)
 	, m_hBreakEvent(NULL)
 	, m_lOsError(0)
 {
@@ -53,11 +54,72 @@ STDMETHODIMP CAsyncFileReader::NonDelegatingQueryInterface(REFIID riid, void** p
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
+BOOL CAsyncFileReader::Open(LPCTSTR lpszFileName)
+{
+	if (::PathIsURL(lpszFileName)) {
+		CUrl url;
+		if (m_bSupportURL
+				&& url.CrackUrl(lpszFileName)
+				&& m_HTTPAsync.Connect(lpszFileName, 5000, L"MPC AsyncReader") == S_OK) {
+#ifdef DEBUG
+			const CString hdr = m_HTTPAsync.GetHeader();
+			DbgLog((LOG_TRACE, 3, "CAsyncFileReader::Open() - HTTP hdr:\n%ws", hdr));
+#endif
+			const QWORD ContentLength = m_HTTPAsync.GetLenght();
+			if (ContentLength == 0) {
+				return FALSE;
+			}
+		
+			m_total = ContentLength;
+			m_url = lpszFileName;
+			m_sourcetype = SourceType::HTTP;
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+	return __super::Open(lpszFileName);
+}
+
+ULONGLONG CAsyncFileReader::GetLength() const
+{
+	return m_total ? m_total : __super::GetLength();
+}
+
 // IAsyncReader
 
 STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE* pBuffer)
 {
 	do {
+		if (!m_url.IsEmpty()) {
+			if ((ULONGLONG)llPosition + lLength > GetLength()) {
+				return E_FAIL;
+			}
+
+			if (m_pos != llPosition) {
+				CString customHeader; customHeader.Format(L"Range: bytes=%I64d-\r\n", llPosition);
+				HRESULT hr = m_HTTPAsync.SendRequest(customHeader);
+#ifdef DEBUG
+				DbgLog((LOG_TRACE, 3, L"CAsyncFileReader::SyncRead : do HTTP seeking to %I64d(current pos %I64d), hr = 0x%08x", llPosition, m_pos, hr));
+#endif
+				if (hr != S_OK) {
+					return hr;
+				}
+
+				m_pos = llPosition;
+			}
+
+			DWORD dwSizeRead = 0;
+			HRESULT hr = m_HTTPAsync.Read(pBuffer, lLength, &dwSizeRead);
+			if (hr != S_OK || dwSizeRead != lLength) {
+				return E_FAIL;
+			}
+			m_pos += dwSizeRead;
+		
+			return S_OK;
+		}
+
 		try {
 			if ((ULONGLONG)llPosition + lLength > GetLength()) {
 				return E_FAIL; // strange, but the Seek below can return llPosition even if the file is not that big (?)

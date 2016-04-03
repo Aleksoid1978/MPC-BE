@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -487,7 +487,7 @@ STDMETHODIMP CBaseSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 	if (BuildPlaylist(pszFileName, m_Items)) {
 		pAsyncReader = (IAsyncReader*)DNew CAsyncFileReader(m_Items, hr);
 	} else {
-		pAsyncReader = (IAsyncReader*)DNew CAsyncFileReader(CString(pszFileName), hr);
+		pAsyncReader = (IAsyncReader*)DNew CAsyncFileReader(pszFileName, hr, m_nFlag & SOURCE_SUPPORT_URL);
 	}
 
 	if (FAILED(hr)
@@ -535,7 +535,7 @@ STDMETHODIMP CBaseSplitterFilter::GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TY
 LPCTSTR CBaseSplitterFilter::GetPartFilename(IAsyncReader* pAsyncReader)
 {
 	CComQIPtr<IFileHandle>	pFH = pAsyncReader;
-	return pFH && pFH->IsValidFilename() ? pFH->GetFileName() : m_fn;
+	return pFH && pFH->IsValidFileName() ? pFH->GetFileName() : m_fn;
 }
 
 // IMediaSeeking

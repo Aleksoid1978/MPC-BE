@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2015 see Authors.txt
+ * (C) 2013-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -102,6 +102,7 @@ CAudioSplitterFilter::CAudioSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_pAudioFile(NULL)
 	, m_rtime(0)
 {
+	m_nFlag |= SOURCE_SUPPORT_URL;
 }
 
 CAudioSplitterFilter::~CAudioSplitterFilter()

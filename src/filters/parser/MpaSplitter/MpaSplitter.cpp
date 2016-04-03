@@ -79,6 +79,7 @@ CFilterApp theApp;
 CMpaSplitterFilter::CMpaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CMpaSplitterFilter"), pUnk, phr, __uuidof(this))
 {
+	m_nFlag |= SOURCE_SUPPORT_URL;
 }
 
 STDMETHODIMP CMpaSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
