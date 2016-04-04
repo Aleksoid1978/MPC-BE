@@ -143,6 +143,7 @@ SRCS_LC = \
 	libavcodec/bswapdsp.c \
 	libavcodec/cabac.c \
 	libavcodec/canopus.c \
+	libavcodec/cbrt_data.c \
 	libavcodec/celp_filters.c \
 	libavcodec/celp_math.c \
 	libavcodec/cfhd.c \

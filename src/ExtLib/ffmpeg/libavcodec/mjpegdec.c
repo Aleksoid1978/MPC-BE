@@ -166,7 +166,7 @@ av_cold int ff_mjpeg_decode_init(AVCodecContext *avctx)
 /* quantize tables */
 int ff_mjpeg_decode_dqt(MJpegDecodeContext *s)
 {
-    int len, index, i, j;
+    int len, index, i;
 
     len = get_bits(&s->gb, 16) - 2;
 
@@ -187,13 +187,12 @@ int ff_mjpeg_decode_dqt(MJpegDecodeContext *s)
         av_log(s->avctx, AV_LOG_DEBUG, "index=%d\n", index);
         /* read quant table */
         for (i = 0; i < 64; i++) {
-            j = s->scantable.permutated[i];
-            s->quant_matrixes[index][j] = get_bits(&s->gb, pr ? 16 : 8);
+            s->quant_matrixes[index][i] = get_bits(&s->gb, pr ? 16 : 8);
         }
 
         // XXX FIXME finetune, and perhaps add dc too
-        s->qscale[index] = FFMAX(s->quant_matrixes[index][s->scantable.permutated[1]],
-                                 s->quant_matrixes[index][s->scantable.permutated[8]]) >> 1;
+        s->qscale[index] = FFMAX(s->quant_matrixes[index][1],
+                                 s->quant_matrixes[index][8]) >> 1;
         av_log(s->avctx, AV_LOG_DEBUG, "qscale[%d]: %d\n",
                index, s->qscale[index]);
         len -= 1 + 64 * (1+pr);
@@ -282,7 +281,7 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
     }
 
     if (s->avctx->bits_per_raw_sample != bits) {
-        av_log(s->avctx, AV_LOG_INFO, "Changing bps to %d\n", bits);
+        av_log(s->avctx, s->avctx->bits_per_raw_sample > 0 ? AV_LOG_INFO : AV_LOG_DEBUG, "Changing bps from %d to %d\n", s->avctx->bits_per_raw_sample, bits);
         s->avctx->bits_per_raw_sample = bits;
         init_idct(s->avctx);
     }
@@ -614,6 +613,13 @@ unk_pixfmt:
         return AVERROR_BUG;
     }
 
+    if (s->avctx->skip_frame == AVDISCARD_ALL) {
+        s->picture_ptr->pict_type = AV_PICTURE_TYPE_I;
+        s->picture_ptr->key_frame = 1;
+        s->got_picture            = 1;
+        return 0;
+    }
+
     av_frame_unref(s->picture_ptr);
     if (ff_get_buffer(s->avctx, s->picture_ptr, AV_GET_BUFFER_FLAG_REF) < 0)
         return -1;
@@ -716,7 +722,7 @@ static int decode_block(MJpegDecodeContext *s, int16_t *block, int component,
                 return AVERROR_INVALIDDATA;
             }
             j        = s->scantable.permutated[i];
-            block[j] = level * quant_matrix[j];
+            block[j] = level * quant_matrix[i];
         }
     } while (i < 63);
     CLOSE_READER(re, &s->gb);}
@@ -778,14 +784,14 @@ static int decode_block_progressive(MJpegDecodeContext *s, int16_t *block,
                 if (i >= se) {
                     if (i == se) {
                         j = s->scantable.permutated[se];
-                        block[j] = level * (quant_matrix[j] << Al);
+                        block[j] = level * (quant_matrix[se] << Al);
                         break;
                     }
                     av_log(s->avctx, AV_LOG_ERROR, "error count: %d\n", i);
                     return AVERROR_INVALIDDATA;
                 }
                 j = s->scantable.permutated[i];
-                block[j] = level * (quant_matrix[j] << Al);
+                block[j] = level * (quant_matrix[i] << Al);
             } else {
                 if (run == 0xF) {// ZRL - skip 15 coefficients
                     i += 15;
@@ -818,7 +824,7 @@ static int decode_block_progressive(MJpegDecodeContext *s, int16_t *block,
     UPDATE_CACHE(re, &s->gb);                                       \
     sign = block[j] >> 15;                                          \
     block[j] += SHOW_UBITS(re, &s->gb, 1) *                         \
-                ((quant_matrix[j] ^ sign) - sign) << Al;            \
+                ((quant_matrix[i] ^ sign) - sign) << Al;            \
     LAST_SKIP_BITS(re, &s->gb, 1);                                  \
 }
 
@@ -864,7 +870,7 @@ static int decode_block_refinement(MJpegDecodeContext *s, int16_t *block,
                 ZERO_RUN;
                 j = s->scantable.permutated[i];
                 val--;
-                block[j] = ((quant_matrix[j] << Al) ^ val) - val;
+                block[j] = ((quant_matrix[i] << Al) ^ val) - val;
                 if (i == se) {
                     if (i > *last_nnz)
                         *last_nnz = i;
@@ -1871,8 +1877,10 @@ static int mjpeg_decode_com(MJpegDecodeContext *s)
             else if ((!strncmp(cbuf, "Intel(R) JPEG Library, version 1", 32) && s->avctx->codec_tag) ||
                      (!strncmp(cbuf, "Metasoft MJPEG Codec", 20)))
                 s->flipped = 1;
-            else if (!strcmp(cbuf, "MULTISCOPE II"))
+            else if (!strcmp(cbuf, "MULTISCOPE II")) {
+                s->avctx->sample_aspect_ratio = (AVRational) { 1, 2 };
                 s->multiscope = 2;
+            }
 
             av_free(cbuf);
         }

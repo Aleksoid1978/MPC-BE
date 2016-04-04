@@ -11,7 +11,7 @@ Legend:
 ==============================
 
 Updated libraries:
-	ffmpeg git-n3.1-dev-427-g2761e25;
+	ffmpeg git-n3.1-dev-780-g54c9146;
 	jsoncpp git-1.6.5-83-gb4d2b65;
 	libpng-1.6.21-signed-1-g5031c77;
 	Little-CMS git-2.7-41-g0a78f85;
