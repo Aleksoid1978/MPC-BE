@@ -1191,13 +1191,7 @@ void CPlayerCaptureDialog::SetupAudioControls(
 		}
 
 		if (m_audinput.GetCount() > 0) {
-			for (int i = 0; i < m_audinput.GetCount(); i++) {
-				if (m_audinput.GetItemData(i) == iSel) {
-					m_audinput.SetCurSel(i);
-					break;
-				}
-			}
-
+			SelectByItemData(m_audinput, iSel);
 			m_audinput.EnableWindow(TRUE);
 		}
 	}
@@ -1573,7 +1567,7 @@ void CPlayerCaptureDialog::OnAudioCodecDimension()
 		m_pAudEncMoniker->BindToObject(0, 0, IID_IBaseFilter, (void**)&m_pAudEnc);
 		/*
 				SaveMediaType(
-					CString(m_pAudEncArray[m_audcodec.GetItemData(m_audcodec.GetCurSel())].DisplayName.m_str),
+					CString(m_pAudEncArray[GetCurItemData(m_audcodec)].DisplayName.m_str),
 					&m_mtca);
 		*/
 	}
