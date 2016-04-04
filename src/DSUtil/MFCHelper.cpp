@@ -103,7 +103,7 @@ void CorrectCWndWidth(CWnd* pWnd)
 	pWnd->MoveWindow(r);
 }
 
-void CBSelectItemByData(CComboBox& ComboBox, int data)
+void SelectByItemData(CComboBox& ComboBox, int data)
 {
 	for (int i = 0; i < ComboBox.GetCount(); i++) {
 		if ((int)ComboBox.GetItemData(i) == data) {
@@ -113,7 +113,23 @@ void CBSelectItemByData(CComboBox& ComboBox, int data)
 	}
 }
 
-inline int CBGetCurrentData(CComboBox& ComboBox)
+void SelectByItemData(CListBox ListBox, int data)
+{
+	for (int i = 0; i < ListBox.GetCount(); i++) {
+		if ((int)ListBox.GetItemData(i) == data) {
+			ListBox.SetCurSel(i);
+			ListBox.SetTopIndex(i);
+			break;
+		}
+	}
+}
+
+inline int GetCurItemData(CComboBox& ComboBox)
 {
 	return (int)ComboBox.GetItemData(ComboBox.GetCurSel());
+}
+
+inline int GetCurItemData(CListBox& ListBox)
+{
+	return (int)ListBox.GetItemData(ListBox.GetCurSel());
 }

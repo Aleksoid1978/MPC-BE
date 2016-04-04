@@ -151,7 +151,7 @@ BOOL CPPageYoutube::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.iYoutubeTag			= m_iYoutubeFormatCtrl.GetItemData(m_iYoutubeFormatCtrl.GetCurSel());
+	s.iYoutubeTag			= GetCurItemData(m_iYoutubeFormatCtrl);
 	s.bYoutubeLoadPlaylist	= !!m_chkYoutubeLoadPlaylist.GetCheck();
 	s.iYoutubeSource		= m_iYoutubeSourceType;
 	s.iYoutubeMemoryType	= m_iYoutubeMemoryType;

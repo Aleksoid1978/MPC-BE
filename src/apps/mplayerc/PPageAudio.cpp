@@ -201,12 +201,7 @@ BOOL CPPageAudio::OnInitDialog()
 	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("5.0")), SPK_5_0);
 	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("5.1")), SPK_5_1);
 	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("7.1")), SPK_7_1);
-	for (int i = 0; i < m_cmbMixerLayout.GetCount(); i++) {
-		if ((int)m_cmbMixerLayout.GetItemData(i) == s.nAudioMixerLayout) {
-			m_cmbMixerLayout.SetCurSel(i);
-			break;
-		}
-	}
+	SelectByItemData(m_cmbMixerLayout, s.nAudioMixerLayout);
 
 	m_sldGain.SetRange(-30, 100, TRUE);
 	m_sldGain.SetPos(s.fAudioGain_dB > 0 ? floor(s.fAudioGain_dB * 10 + 0.5f) : ceil(s.fAudioGain_dB * 10 - 0.5f));
@@ -253,7 +248,7 @@ BOOL CPPageAudio::OnApply()
 
 
 	s.bAudioMixer				= !!m_chkMixer.GetCheck();
-	s.nAudioMixerLayout			= (int)m_cmbMixerLayout.GetItemData(m_cmbMixerLayout.GetCurSel());
+	s.nAudioMixerLayout			= GetCurItemData(m_cmbMixerLayout);
 
 	s.fAudioGain_dB				= m_sldGain.GetPos() / 10.0f;
 
@@ -466,12 +461,8 @@ void CPPageAudio::OnTimeShiftCheck()
 void CPPageAudio::OnBnClickedSoundProcessingDefault()
 {
 	m_chkMixer.SetCheck(BST_UNCHECKED);
-	for (int i = 0; i < m_cmbMixerLayout.GetCount(); i++) {
-		if ((int)m_cmbMixerLayout.GetItemData(i) == SPK_STEREO) {
-			m_cmbMixerLayout.SetCurSel(i);
-			break;
-		}
-	}
+	SelectByItemData(m_cmbMixerLayout, SPK_STEREO);
+
 	m_sldGain.SetPos(0);
 	m_chkAutoVolumeControl.SetCheck(BST_UNCHECKED);
 	m_chkNormBoostAudio.SetCheck(BST_CHECKED);

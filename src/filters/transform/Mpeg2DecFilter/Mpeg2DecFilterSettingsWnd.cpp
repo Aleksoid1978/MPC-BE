@@ -103,10 +103,7 @@ bool CMpeg2DecSettingsWnd::OnActivate()
 	m_ditype_combo.SetItemData(m_ditype_combo.AddString(_T("Blend")), (DWORD)DIBlend);
 	m_ditype_combo.SetItemData(m_ditype_combo.AddString(_T("Bob")), (DWORD)DIBob);
 	m_ditype_combo.SetCurSel(0);
-	for (int i = 0; i < m_ditype_combo.GetCount(); i++)
-		if ((int)m_ditype_combo.GetItemData(i) == m_ditype) {
-			m_ditype_combo.SetCurSel(i);
-		}
+	SelectByItemData(m_ditype_combo, m_ditype);
 	m_ditype_combo.EnableWindow(!IsDlgButtonChecked(m_interlaced_check.GetDlgCtrlID()));
 	p.y += h25;
 
@@ -155,7 +152,7 @@ bool CMpeg2DecSettingsWnd::OnActivate()
 
 void CMpeg2DecSettingsWnd::OnDeactivate()
 {
-	m_ditype = (ditype)m_ditype_combo.GetItemData(m_ditype_combo.GetCurSel());
+	m_ditype = (ditype)GetCurItemData(m_ditype_combo);
 	m_procamp[0] = (float)m_procamp_slider[0].GetPos() - 128;
 	m_procamp[1] = (float)m_procamp_slider[1].GetPos() / 100;
 	m_procamp[2] = (float)m_procamp_slider[2].GetPos() - 180;

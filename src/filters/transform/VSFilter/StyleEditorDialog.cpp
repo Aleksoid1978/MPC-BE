@@ -229,12 +229,7 @@ void CStyleEditorDialog::OnBnClickedButton1()
 		}
 		m_font.SetWindowText(str);
 
-		for (ptrdiff_t i = 0, j = m_charset.GetCount(); i < j; i++) {
-			if (m_charset.GetItemData(i) == lf.lfCharSet) {
-				m_charset.SetCurSel(i);
-				break;
-			}
-		}
+		SelectByItemData(m_charset, lf.lfCharSet);
 
 		m_stss = lf;
 	}

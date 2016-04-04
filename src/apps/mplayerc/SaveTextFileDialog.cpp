@@ -125,7 +125,7 @@ BOOL CSaveTextFileDialog::OnFileNameOK()
 
 		pfdc->GetCheckButtonState(IDC_CHECK1, &m_bSaveExternalStyleFile);
 	} else {
-		m_e = (CTextFile::enc)m_encoding.GetItemData(m_encoding.GetCurSel());
+		m_e = (CTextFile::enc)GetCurItemData(m_encoding);
 	}
 
 	return __super::OnFileNameOK();

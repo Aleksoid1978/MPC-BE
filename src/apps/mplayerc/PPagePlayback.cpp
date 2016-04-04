@@ -133,13 +133,7 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_nSpeedStepCtrl.SetItemData(m_nSpeedStepCtrl.GetCount() - 1, 50);
 	m_nSpeedStepCtrl.AddString(L"1.0");
 	m_nSpeedStepCtrl.SetItemData(m_nSpeedStepCtrl.GetCount() - 1, 100);
-
-	for (int i = 0; i < m_nSpeedStepCtrl.GetCount(); i++) {
-		if (m_nSpeedStepCtrl.GetItemData(i) == s.nSpeedStep) {
-			m_nSpeedStepCtrl.SetCurSel(i);
-			break;
-		}
-	}
+	SelectByItemData(m_nSpeedStepCtrl, s.nSpeedStep);
 
 	m_chkRememberZoomLevel.SetCheck(s.fRememberZoomLevel);
 	m_cmbZoomLevel.AddString(L"50%");
@@ -198,7 +192,7 @@ BOOL CPPagePlayback::OnApply()
 	s.nVolumeStep = m_nVolumeStep + 1;
 	AfxGetMainFrame()->m_wndToolBar.m_volctrl.SetPageSize(s.nVolumeStep);
 
-	s.nSpeedStep = m_nSpeedStepCtrl.GetItemData(m_nSpeedStepCtrl.GetCurSel());
+	s.nSpeedStep = GetCurItemData(m_nSpeedStepCtrl);
 
 	s.fUseInternalSelectTrackLogic = !!m_fUseInternalSelectTrackLogic;
 
