@@ -346,11 +346,12 @@ int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe)
 		samplerate /= 4;
 	}
 
+	const BYTE l3ext = (layer_desc == 0x01 && mpaver_id == 0x02); // // MPEG Version 2 Layer 3
 	int frame_size;
 	if (layer_desc == 0x3) { // Layer 1
 		frame_size = (12 * bitrate / samplerate + pading) * 4;
 	} else { // Layer 2, Layer 3
-		frame_size = 144 * bitrate / samplerate + pading;
+		frame_size = 144 * bitrate / (samplerate << l3ext) + pading;
 	}
 
 	if (audioframe) {
@@ -364,7 +365,7 @@ int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe)
 		if (layer_desc == 0x3) { // Layer 1
 			audioframe->samples = 384;
 		} else { // Layer 2, Layer 3
-			audioframe->samples = 1152;
+			audioframe->samples = 1152 << l3ext;
 		}
 		audioframe->param1 = bitrate;
 		audioframe->param2 = (mpaver_id == 0x3 && layer_desc == 0x1) ? 1 : 0;
