@@ -31,17 +31,17 @@ void SetCursor(HWND m_hWnd, UINT nID, LPCTSTR lpCursorName)
 	SetCursor(::GetDlgItem(m_hWnd, nID), lpCursorName);
 }
 
-void CorrectComboListWidth(CComboBox& pComboBox)
+void CorrectComboListWidth(CComboBox& ComboBox)
 {
-	if (pComboBox.GetCount() <= 0)
+	if (ComboBox.GetCount() <= 0)
 		return;
 
 	CString    str;
 	CSize      sz;
 	TEXTMETRIC tm;
 	int        dx		= 0;
-	CDC*       pDC		= pComboBox.GetDC();
-	CFont*     pFont	= pComboBox.GetFont();
+	CDC*       pDC		= ComboBox.GetDC();
+	CFont*     pFont	= ComboBox.GetFont();
 
 	// Select the listbox font, save the old font
 	CFont* pOldFont = pDC->SelectObject(pFont);
@@ -49,8 +49,8 @@ void CorrectComboListWidth(CComboBox& pComboBox)
 	pDC->GetTextMetrics(&tm);
 
 	// Find the longest string in the combo box.
-	for (int i = 0; i < pComboBox.GetCount(); i++) {
-		pComboBox.GetLBText(i, str);
+	for (int i = 0; i < ComboBox.GetCount(); i++) {
+		ComboBox.GetLBText(i, str);
 		sz = pDC->GetTextExtent(str);
 
 		// Add the avg width to prevent clipping
@@ -62,18 +62,18 @@ void CorrectComboListWidth(CComboBox& pComboBox)
 	}
 	// Select the old font back into the DC
 	pDC->SelectObject(pOldFont);
-	pComboBox.ReleaseDC(pDC);
+	ComboBox.ReleaseDC(pDC);
 
 	// Get the scrollbar width if it exists
-	int min_visible = pComboBox.GetMinVisible();
-	int scroll_width = (pComboBox.GetCount() > min_visible) ?
+	int min_visible = ComboBox.GetMinVisible();
+	int scroll_width = (ComboBox.GetCount() > min_visible) ?
 					   ::GetSystemMetrics(SM_CXVSCROLL) : 0;
 
 	// Adjust the width for the vertical scroll bar and the left and right border.
 	dx += scroll_width + 2*::GetSystemMetrics(SM_CXEDGE);
 
 	// Set the width of the list box so that every item is completely visible.
-	pComboBox.SetDroppedWidth(dx);
+	ComboBox.SetDroppedWidth(dx);
 }
 
 void CorrectCWndWidth(CWnd* pWnd)
@@ -101,4 +101,19 @@ void CorrectCWndWidth(CWnd* pWnd)
 
 	r.right = r.left + ::GetSystemMetrics(SM_CXMENUCHECK) + szText.cx + tm.tmAveCharWidth;
 	pWnd->MoveWindow(r);
+}
+
+void CBSelectItemByData(CComboBox& ComboBox, int data)
+{
+	for (int i = 0; i < ComboBox.GetCount(); i++) {
+		if ((int)ComboBox.GetItemData(i) == data) {
+			ComboBox.SetCurSel(i);
+			break;
+		}
+	}
+}
+
+inline int CBGetCurrentData(CComboBox& ComboBox)
+{
+	return (int)ComboBox.GetItemData(ComboBox.GetCurSel());
 }
