@@ -167,26 +167,15 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 				SearchStreams(start, stop);
 			}
 		}
-	}
-	else if (IsStreaming()) {
-		__int64 len = GetAvailable();
-		int n = 0;
-		while (len < 512 * KILOBYTE && ++n < 10) { // wait 512 KB but no more 1 seconds
-			Sleep(100);
-			len = GetAvailable();
-		}
-		len = min(len, 3 * MEGABYTE); // limit just in case
-		DbgLog((LOG_TRACE, 3, L"CMpegSplitterFile::Init() : streaming - use %I64d bytes to search for tracks", len));
+	} else {
+		__int64 stop = GetAvailable();
+		const __int64 hi = IsStreaming() ? MEGABYTE : min(MEGABYTE, GetLength());
+		const __int64 lo = IsStreaming() ? 64 * KILOBYTE : min(64 * KILOBYTE, GetLength());
+		stop = clamp(stop, lo, hi);
+		SearchPrograms(0, stop);
 
-		SearchPrograms(0, len);
-		SearchStreams(0, len);
-	}
-	else { // downloading
-		__int64 len = GetLength();
-		len = min(len, 512 * KILOBYTE);
-
-		SearchPrograms(0, len);
-		SearchStreams(0, len);
+		stop = IsStreaming() ? 5 * MEGABYTE : min(10 * MEGABYTE, GetLength());
+		SearchStreams(0, stop, 2000);
 	}
 
 	if (!m_bIsBD) {
@@ -520,8 +509,10 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 	}
 }
 
-void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop)
+void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeOut/* = INFINITE*/)
 {
+	const ULONGLONG startTime = GetPerfCounter();
+
 	avch.RemoveAll();
 	hevch.RemoveAll();
 	seqh.RemoveAll();
@@ -529,7 +520,16 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop)
 	Seek(start);
 
 	for (;;) {
-		if (GetPos() >= stop) {
+		if (msTimeOut != INFINITE) {
+			const ULONGLONG endTime = GetPerfCounter();
+			const DWORD deltaTime = (endTime - startTime) / 10000;
+			if (deltaTime >= msTimeOut) {
+				break;
+			}
+		}
+
+		if (GetPos() >= stop
+				|| (!IsStreaming() && GetPos() == GetLength())) {
 			break;
 		}
 

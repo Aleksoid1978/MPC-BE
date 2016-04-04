@@ -334,7 +334,7 @@ public:
 	typedef CStreamList CStreamsList[unknown];
 	CStreamsList m_streams;
 
-	void SearchStreams(__int64 start, __int64 stop);
+	void SearchStreams(__int64 start, __int64 stop, DWORD msTimeOut = INFINITE);
 	DWORD AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, BOOL bAddStream = TRUE);
 	void  AddHdmvPGStream(WORD pid, const char* language_code);
 	CAtlList<stream>* GetMasterStream();
