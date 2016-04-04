@@ -1223,7 +1223,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 						Seek(nextPos);
 					}
 
-					if (count && (rt_start < rt_end)) {
+					if (count > 1 && (rt_start < rt_end)) {
 						rtAvgTimePerFrame = (rt_end - rt_start) / (count - 1);
 					}
 
