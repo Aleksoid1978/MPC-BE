@@ -1,5 +1,5 @@
 /*
- * (C) 2015 see Authors.txt
+ * (C) 2014-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,7 +45,7 @@ BOOL CAboutDlg::OnInitDialog()
 	__super::OnInitDialog();
 
 #ifdef _WIN64
-	m_appname += _T(" (64-bit)");
+	m_appname += L" (64-bit)";
 #endif
 
 	m_strVersionNumber.Format(L"%s (build %d)", CString(MPC_VERSION_STR), MPC_VERSION_REV);
@@ -61,22 +61,24 @@ BOOL CAboutDlg::OnInitDialog()
 #endif
 #elif defined(_MSC_VER)
 #if (_MSC_VER == 1900)
-	#if (_MSC_FULL_VER == 190023506)
-		m_MPCCompiler = _T("MSVC 2015.1");
+	#if (_MSC_FULL_VER == 190023918)
+		m_MPCCompiler = L"MSVC 2015.2";
+	#elif (_MSC_FULL_VER == 190023506)
+		m_MPCCompiler = L"MSVC 2015.1";
 	#else
-		m_MPCCompiler = _T("MSVC 2015");
+		m_MPCCompiler = L"MSVC 2015";
 	#endif
 #elif (_MSC_VER == 1800)
 	#if (_MSC_FULL_VER == 180040629)
-		m_MPCCompiler = _T("MSVC 2013.5");
+		m_MPCCompiler = L"MSVC 2013.5";
 	#elif (_MSC_FULL_VER == 180031101)
-		m_MPCCompiler = _T("MSVC 2013.4");
+		m_MPCCompiler = L"MSVC 2013.4";
 	#elif (_MSC_FULL_VER == 180030723)
-		m_MPCCompiler = _T("MSVC 2013.3");
+		m_MPCCompiler = L"MSVC 2013.3";
 	#elif (_MSC_FULL_VER == 180030501)
-		m_MPCCompiler = _T("MSVC 2013.2");
+		m_MPCCompiler = L"MSVC 2013.2";
 	#else
-		m_MPCCompiler = _T("MSVC 2013");
+		m_MPCCompiler = L"MSVC 2013";
 	#endif
 #elif (_MSC_VER < 1800)
 	#error Compiler is not supported!
@@ -86,34 +88,34 @@ BOOL CAboutDlg::OnInitDialog()
 #endif
 
 #if (__AVX__)
-	m_MPCCompiler += _T(" (AVX)");
+	m_MPCCompiler += L" (AVX)";
 #elif (__SSSE3__)
-	m_MPCCompiler += _T(" (SSSE3)");
+	m_MPCCompiler += L" (SSSE3)";
 #elif (__SSE3__)
-	m_MPCCompiler += _T(" (SSE3)");
+	m_MPCCompiler += L" (SSE3)";
 #elif !defined(_M_X64) && defined(_M_IX86_FP)
 	#if (_M_IX86_FP == 2)   // /arch:SSE2 was used
-		m_MPCCompiler += _T(" (SSE2)");
+		m_MPCCompiler += L" (SSE2)";
 	#elif (_M_IX86_FP == 1) // /arch:SSE was used
-		m_MPCCompiler += _T(" (SSE)");
+		m_MPCCompiler += L" (SSE)";
 	#endif
 #endif
 
 #ifdef _DEBUG
-	m_MPCCompiler += _T(" Debug");
+	m_MPCCompiler += L" Debug";
 #endif
 
 	m_FFmpegCompiler	= GetFFmpegCompiler();
 	m_libavcodecVersion	= GetlibavcodecVersion();
 
-	m_AuthorsPath = GetProgramDir() + _T("Authors.txt");
+	m_AuthorsPath = GetProgramDir() + L"Authors.txt";
 
 	if (::PathFileExists(m_AuthorsPath)) {
-		m_Credits.Replace(_T("Authors.txt"), _T("<a>Authors.txt</a>"));
+		m_Credits.Replace(L"Authors.txt", L"<a>Authors.txt</a>");
 	}
 
 	if (m_hIcon != NULL) {
-		((CStatic*)GetDlgItem(IDC_MAINFRAME_ICON))->SetIcon(m_hIcon);
+		static_cast<CStatic*>(GetDlgItem(IDC_MAINFRAME_ICON))->SetIcon(m_hIcon);
 	}
 
 	UpdateData(FALSE);
@@ -141,14 +143,14 @@ END_MESSAGE_MAP()
 
 void CAboutDlg::OnHomepage(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	ShellExecute(m_hWnd, _T("open"), _T(MPC_VERSION_COMMENTS), NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecute(m_hWnd, L"open", _T(MPC_VERSION_COMMENTS), NULL, NULL, SW_SHOWDEFAULT);
 
 	*pResult = 0;
 }
 
 void CAboutDlg::OnAuthors(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	ShellExecute(m_hWnd, _T("open"), m_AuthorsPath, NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecute(m_hWnd, L"open", m_AuthorsPath, NULL, NULL, SW_SHOWDEFAULT);
 
 	*pResult = 0;
 }
