@@ -734,10 +734,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (AP4_VisualSampleEntry* vse = dynamic_cast<AP4_VisualSampleEntry*>(atom)) {
 						AP4_DataBuffer* pData = (AP4_DataBuffer*)&db;
 
-
-						char buff[5];
+						char buff[5] = { 0 };
 						memcpy(buff, &fourcc, 4);
-						buff[4] = 0;
 
 						CString tname = UTF8To16(vse->GetCompressorName());
 						if ((buff[0] == 'x' || buff[0] == 'h') && buff[1] == 'd') {
@@ -777,10 +775,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 						} else if (type == AP4_ATOM_TYPE_RAW) {
 							fourcc = BI_RGB;
+						} else if (type == AP4_ATOM_TYPE_H263 && !wcsncmp(tname, L"Sorenson H263", 13)) {
+							fourcc = FCC('FLV1');
 						}
 
 						AP4_Size ExtraSize = pData->GetDataSize();
-						if (type == AP4_ATOM_TYPE_FFV1) {
+						if (type == AP4_ATOM_TYPE_FFV1
+								|| type == AP4_ATOM_TYPE_H263) {
 							ExtraSize = 0;
 						}
 
