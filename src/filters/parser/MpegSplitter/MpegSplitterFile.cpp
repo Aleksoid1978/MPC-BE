@@ -183,6 +183,32 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		__int64 posMin       = -1;
 		__int64 posMax       = posMin;
 
+		CMpegSplitterFile::CStreamList* pMasterStream = GetMasterStream();
+		if (!pMasterStream) {
+			ASSERT(0);
+			return E_FAIL;
+		}
+
+		WORD main_program_number = WORD_MAX;
+		if (m_type == MPEG_TYPES::mpeg_ts && m_programs.GetCount() > 1) {
+			DWORD pid = pMasterStream->GetHead();
+			const program* pProgram = FindProgram(pid);
+			if (pProgram) {
+				main_program_number = pProgram->program_number;
+			}
+		}
+
+		auto verifyProgram = [&](const stream& s) {
+			if (main_program_number != WORD_MAX) {
+				const program* pProgram = FindProgram(s);
+				if (!pProgram || pProgram->program_number != main_program_number) {
+					return false;
+				}
+			}
+
+			return true;
+		};
+
 		for (int type = stream_type::video; type < stream_type::unknown; type++) {
 			if (type == stream_type::subpic) {
 				continue;
@@ -191,6 +217,10 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			POSITION pos = streams.GetHeadPosition();
 			while (pos) {
 				const stream& s = streams.GetNext(pos);
+				if (!verifyProgram(s)) {
+					continue;
+				}
+
 				const SyncPoints& sps = m_SyncPoints[s];
 				if (sps.GetCount()
 						&& (sps[0].rt < rtMin || (sps[0].rt == rtMin && sps[0].fp < posMin))) {
@@ -203,8 +233,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		if (rtMin >= 0) {
 			m_posMin = posMin;
 
-			const REFERENCE_TIME maxDelta      = 30 * 60 * 10000000i64; // 30 minutes
-			const REFERENCE_TIME maxStartDelta = 10 * 10000000i64;      // 10 seconds
+			const REFERENCE_TIME maxStartDelta = 10 * 10000000i64; // 10 seconds
 			m_rtMin = m_rtMax = rtMin;
 			for (int type = stream_type::video; type < stream_type::unknown; type++) {
 				if (type == stream_type::subpic) {
@@ -214,12 +243,13 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 				POSITION pos = streams.GetHeadPosition();
 				while (pos) {
 					const stream& s = streams.GetNext(pos);
+					if (!verifyProgram(s)) {
+						continue;
+					}
+					
 					const SyncPoints& sps = m_SyncPoints[s];
 					for (size_t i = 1; i < sps.GetCount(); i++) {
 						if (sps[i].rt > m_rtMax && sps[i].fp > posMax) {
-							if ((sps[i].rt - m_rtMax) >= maxDelta && (sps[i].fp - posMax) < 100 * MEGABYTE) {
-								continue;
-							}
 							m_rtMax	= sps[i].rt;
 							posMax	= sps[i].fp;
 						}
@@ -992,9 +1022,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				if (type == stream_type::unknown && (stream_type & PGS_SUB)) {
 					Seek(start);
 
-					int iProgram;
+					int nProgram;
 					const CHdmvClipInfo::Stream *pClipInfo;
-					const program* pProgram = FindProgram(s.pid, iProgram, pClipInfo);
+					const program* pProgram = FindProgram(s.pid, &nProgram, &pClipInfo);
 
 					hdmvsubhdr h;
 					if (!m_ClipInfo.IsHdmv() && Read(h, &s.mt, pClipInfo ? pClipInfo->m_LanguageCode : NULL)) {
@@ -1270,7 +1300,7 @@ void CMpegSplitterFile::AddHdmvPGStream(WORD pid, const char* language_code)
 	}
 }
 
-CAtlList<CMpegSplitterFile::stream>* CMpegSplitterFile::GetMasterStream()
+CMpegSplitterFile::CStreamList* CMpegSplitterFile::GetMasterStream()
 {
 	return
 		!m_streams[stream_type::video].IsEmpty()  ? &m_streams[stream_type::video]  :
@@ -1926,18 +1956,24 @@ void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 	}
 }
 
-const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(WORD pid, int &iStream, const CHdmvClipInfo::Stream* &pClipInfo)
+const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(WORD pid, int* pStream/* = NULL*/, const CHdmvClipInfo::Stream** ppClipInfo/* = NULL*/)
 {
-	iStream   = -1;
-	pClipInfo = NULL;
+	if (pStream) {
+		*pStream = -1;
+	}
+	if (ppClipInfo) {
+		*ppClipInfo = NULL;
+	}
 
 	if (m_type == MPEG_TYPES::mpeg_ts) {
-		pClipInfo = m_ClipInfo.FindStream(pid);
+		if (ppClipInfo) {
+			*ppClipInfo = m_ClipInfo.FindStream(pid);
+		}
 
 		POSITION pos = m_programs.GetStartPosition();
 		while (pos) {
 			program* p = &m_programs.GetNextValue(pos);
-			if (p->streamFind(pid, &iStream)) {
+			if (p->streamFind(pid, pStream)) {
 				return p;
 			}
 		}
@@ -1950,13 +1986,13 @@ bool CMpegSplitterFile::GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type)
 {
 	if (ISVALIDPID(pid)) {
 		if (m_type == MPEG_TYPES::mpeg_ts) {
-			int iProgram;
+			int nProgram;
 			const CHdmvClipInfo::Stream *pClipInfo;
-			const program* pProgram = FindProgram(pid, iProgram, pClipInfo);
+			const program* pProgram = FindProgram(pid, &nProgram, &pClipInfo);
 			if (pClipInfo) {
 				stream_type = pClipInfo->m_Type;
 			} else if (pProgram) {
-				stream_type = pProgram->streams[iProgram].type;
+				stream_type = pProgram->streams[nProgram].type;
 			}
 			
 			if (stream_type != INVALID) {
