@@ -71,7 +71,6 @@ protected:
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
 
-	void UpdateSurfaceFormatList(int select);
 	void UpdateResizerList(int select);
 
 	DECLARE_MESSAGE_MAP()

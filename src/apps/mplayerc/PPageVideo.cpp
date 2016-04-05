@@ -194,51 +194,27 @@ BOOL CPPageVideo::OnInitDialog()
 		CString sName;
 
 		switch (nID) {
-			case VIDRNDT_SYSDEFAULT:
-				sName = ResStr(IDS_PPAGE_OUTPUT_SYS_DEF);
-				break;
-			case VIDRNDT_OVERLAYMIXER:
-				if (!IsWinXP()) {
-					return;
-				}
-				sName = ResStr(IDS_PPAGE_OUTPUT_OVERLAYMIXER);
-				break;
-			case VIDRNDT_VMR7WINDOWED:
-				sName = ResStr(IDS_PPAGE_OUTPUT_VMR7WINDOWED);
-				break;
-			case VIDRNDT_VMR9WINDOWED:
-				sName = ResStr(IDS_PPAGE_OUTPUT_VMR9WINDOWED);
-				break;
-			case VIDRNDT_VMR7RENDERLESS:
-				sName = ResStr(IDS_PPAGE_OUTPUT_VMR7RENDERLESS);
-				break;
-			case VIDRNDT_VMR9RENDERLESS:
-				sName = ResStr(IDS_PPAGE_OUTPUT_VMR9RENDERLESS);
-				break;
-			case VIDRNDT_DXR:
-				sName = ResStr(IDS_PPAGE_OUTPUT_DXR);
-				break;
-			case VIDRNDT_NULL_COMP:
-				sName = ResStr(IDS_PPAGE_OUTPUT_NULL_COMP);
-				break;
-			case VIDRNDT_NULL_UNCOMP:
-				sName = ResStr(IDS_PPAGE_OUTPUT_NULL_UNCOMP);
-				break;
-			case VIDRNDT_EVR:
-				sName = ResStr(IDS_PPAGE_OUTPUT_EVR);
-				break;
-			case VIDRNDT_EVR_CUSTOM:
-				sName = ResStr(IDS_PPAGE_OUTPUT_EVR_CUSTOM);
-				break;
-			case VIDRNDT_MADVR:
-				sName = ResStr(IDS_PPAGE_OUTPUT_MADVR);
-				break;
-			case VIDRNDT_SYNC:
-				sName = ResStr(IDS_PPAGE_OUTPUT_SYNC);
-				break;
-			default:
-				ASSERT(FALSE);
+		case VIDRNDT_SYSDEFAULT:		sName = ResStr(IDS_PPAGE_OUTPUT_SYS_DEF);			break;
+		case VIDRNDT_OVERLAYMIXER:
+			if (!IsWinXP()) {
 				return;
+			}
+			sName = ResStr(IDS_PPAGE_OUTPUT_OVERLAYMIXER);
+			break;
+		case VIDRNDT_VMR7WINDOWED:		sName = ResStr(IDS_PPAGE_OUTPUT_VMR7WINDOWED);		break;
+		case VIDRNDT_VMR9WINDOWED:		sName = ResStr(IDS_PPAGE_OUTPUT_VMR9WINDOWED);		break;
+		case VIDRNDT_VMR7RENDERLESS:	sName = ResStr(IDS_PPAGE_OUTPUT_VMR7RENDERLESS);	break;
+		case VIDRNDT_VMR9RENDERLESS:	sName = ResStr(IDS_PPAGE_OUTPUT_VMR9RENDERLESS);	break;
+		case VIDRNDT_DXR:				sName = ResStr(IDS_PPAGE_OUTPUT_DXR);				break;
+		case VIDRNDT_NULL_COMP:			sName = ResStr(IDS_PPAGE_OUTPUT_NULL_COMP);			break;
+		case VIDRNDT_NULL_UNCOMP:		sName = ResStr(IDS_PPAGE_OUTPUT_NULL_UNCOMP);		break;
+		case VIDRNDT_EVR:				sName = ResStr(IDS_PPAGE_OUTPUT_EVR);				break;
+		case VIDRNDT_EVR_CUSTOM:		sName = ResStr(IDS_PPAGE_OUTPUT_EVR_CUSTOM);		break;
+		case VIDRNDT_MADVR:				sName = ResStr(IDS_PPAGE_OUTPUT_MADVR);				break;
+		case VIDRNDT_SYNC:				sName = ResStr(IDS_PPAGE_OUTPUT_SYNC);				break;
+		default:
+			ASSERT(FALSE);
+			return;
 		}
 
 		if (!IsRenderTypeAvailable(nID, m_hWnd)) {
@@ -288,7 +264,14 @@ BOOL CPPageVideo::OnInitDialog()
 	m_wndToolTip.AddTool(&m_cbAPSurfaceUsage, L"");
 
 	OnDSRendererChange();
-	UpdateSurfaceFormatList(rs.m_AdvRendSets.iSurfaceFormat);
+
+	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"8-bit Integer Surfaces"), D3DFMT_X8R8G8B8);
+	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"10-bit Integer Surfaces"), D3DFMT_A2R10G10B10);
+	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"16-bit Floating Point Surfaces"), D3DFMT_A16B16G16R16F);
+	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"32-bit Floating Point Surfaces"), D3DFMT_A32B32G32R32F);
+	m_cbDX9SurfaceFormat.SetCurSel(0); // default
+	SelectByItemData(m_cbDX9SurfaceFormat, rs.m_AdvRendSets.iSurfaceFormat);
+
 	OnSurfaceChange();
 	UpdateResizerList(rs.iResizer);
 
@@ -354,10 +337,10 @@ BOOL CPPageVideo::OnApply()
 	s.iVideoRenderer	= m_iVideoRendererType = m_iVideoRendererType_store = GetCurItemData(m_cbVideoRenderer);
 	rs.iSurfaceType		= m_cbAPSurfaceUsage.GetCurSel();
 	rs.iResizer			= GetCurItemData(m_cbDX9Resizer);
-	rs.bVMRMixerMode		= !!m_chkVMRMixerMode.GetCheck();
-	rs.bVMRMixerYUV			= !!m_chkVMRMixerYUV.GetCheck();
-	s.fD3DFullscreen		= !!m_chkD3DFullscreen.GetCheck();
-	rs.bResetDevice			= !!m_bResetDevice;
+	rs.bVMRMixerMode	= !!m_chkVMRMixerMode.GetCheck();
+	rs.bVMRMixerYUV		= !!m_chkVMRMixerYUV.GetCheck();
+	s.fD3DFullscreen	= !!m_chkD3DFullscreen.GetCheck();
+	rs.bResetDevice		= !!m_bResetDevice;
 
 	rs.m_AdvRendSets.iSurfaceFormat		= GetCurItemData(m_cbDX9SurfaceFormat);
 	rs.m_AdvRendSets.b10BitOutput		= !!m_chk10bitOutput.GetCheck();
@@ -374,24 +357,6 @@ BOOL CPPageVideo::OnApply()
 	rs.m_AdvRendSets.iColorManagementIntent = m_cbCMRenderingIntent.GetCurSel();
 
 	return __super::OnApply();
-}
-
-void CPPageVideo::UpdateSurfaceFormatList(int select)
-{
-	m_cbDX9SurfaceFormat.ResetContent();
-
-	int videoRenderer = GetCurItemData(m_cbVideoRenderer);
-
-	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"8-bit Integer Surfaces"), D3DFMT_X8R8G8B8);
-
-	if ((videoRenderer == VIDRNDT_VMR9RENDERLESS || videoRenderer == VIDRNDT_EVR_CUSTOM) && m_cbAPSurfaceUsage.GetCurSel() == SURFACE_TEXTURE3D) {
-		m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"10-bit Integer Surfaces"), D3DFMT_A2R10G10B10);
-		m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"16-bit Floating Point Surfaces"), D3DFMT_A16B16G16R16F);
-		m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"32-bit Floating Point Surfaces"), D3DFMT_A32B32G32R32F);
-	}
-
-	m_cbDX9SurfaceFormat.SetCurSel(0); // default
-	SelectByItemData(m_cbDX9SurfaceFormat, select);
 }
 
 void CPPageVideo::UpdateResizerList(int select)
@@ -441,16 +406,20 @@ void CPPageVideo::OnSurfaceChange()
 	switch (m_cbAPSurfaceUsage.GetCurSel()) {
 		case SURFACE_OFFSCREEN:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_REGULARSURF), &m_cbAPSurfaceUsage);
+			m_cbDX9SurfaceFormat.EnableWindow(FALSE);
+			SelectByItemData(m_cbDX9SurfaceFormat, D3DFMT_X8R8G8B8);
 			break;
 		case SURFACE_TEXTURE2D:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_TEXTURESURF2D), &m_cbAPSurfaceUsage);
+			m_cbDX9SurfaceFormat.EnableWindow(FALSE);
+			SelectByItemData(m_cbDX9SurfaceFormat, D3DFMT_X8R8G8B8);
 			break;
 		case SURFACE_TEXTURE3D:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_TEXTURESURF3D), &m_cbAPSurfaceUsage);
+			m_cbDX9SurfaceFormat.EnableWindow(TRUE);
 			break;
 	}
 
-	UpdateSurfaceFormatList(GetCurItemData(m_cbDX9SurfaceFormat));
 	UpdateResizerList(GetCurItemData(m_cbDX9Resizer));
 
 	SetModified();
@@ -635,6 +604,8 @@ void CPPageVideo::OnDSRendererChange()
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_UNCOMP), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_MADVR:
+			SelectByItemData(m_cbDX9SurfaceFormat, D3DFMT_A16B16G16R16F);
+
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSMADVR), &m_cbVideoRenderer);
 			break;
 		default:
@@ -741,7 +712,7 @@ void CPPageVideo::OnBnClickedDefault()
 	m_chk10bitOutput.SetCheck(BST_UNCHECKED);
 	m_cbAPSurfaceUsage.SetCurSel(IsWinVistaOrLater() ? SURFACE_TEXTURE3D : SURFACE_TEXTURE2D);
 
-	UpdateSurfaceFormatList(D3DFMT_X8R8G8B8);
+	SelectByItemData(m_cbDX9SurfaceFormat, D3DFMT_X8R8G8B8);
 	UpdateResizerList(RESIZER_BILINEAR);
 
 	m_chkColorManagment.SetCheck(BST_UNCHECKED);
