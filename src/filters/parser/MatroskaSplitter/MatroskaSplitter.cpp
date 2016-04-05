@@ -513,7 +513,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						} else {
 							fourcc = GETDWORD(pTE->CodecPrivate.GetData() + 4);
 						}
-					} else if (CodecID.Left(9) == "V_REAL/RV" && CodecID.GetLength() == 11) {
+					} else if (CodecID.Left(9) == "V_REAL/RV" && CodecID.GetLength() >= 11) {
 						fourcc = CodecID[7] + (CodecID[8] << 8) + (CodecID[9] << 16) + (CodecID[10] << 24);
 					} else if (CodecID == "V_UNCOMPRESSED") {
 						fourcc = FCC((DWORD)pTE->v.ColourSpace);
@@ -904,7 +904,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						mts.InsertAt(0, mt);
 					}
-				} else if (CodecID.Find("A_REAL/") == 0 && CodecID.GetLength() >= 11) {
+				} else if (CodecID.Left(7) == "A_REAL/" && CodecID.GetLength() >= 11) {
 					mt.subtype = FOURCCMap((DWORD)CodecID[7]|((DWORD)CodecID[8]<<8)|((DWORD)CodecID[9]<<16)|((DWORD)CodecID[10]<<24));
 					mt.bTemporalCompression = TRUE;
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
@@ -920,7 +920,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
 					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					mts.Add(mt);
-				} else if (CodecID == "A_OPUS" || CodecID == "A_OPUS/EXPERIMENTAL") {
+				} else if (CodecID == "A_QUICKTIME/QDM2") {
+					mt.subtype = MEDIASUBTYPE_QDM2;
+					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
+					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
+					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					mts.Add(mt);
+				} else if (CodecID.Left(6) == "A_OPUS") {
 					wfe->wFormatTag = WAVE_FORMAT_OPUS;
 					mt.subtype = MEDIASUBTYPE_OPUS;
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
