@@ -418,6 +418,7 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 			guidnames[MEDIASUBTYPE_DSD8]			= L"DSD";
 			guidnames[MEDIASUBTYPE_DSDL]			= L"DSD";
 			guidnames[MEDIASUBTYPE_DSDM]			= L"DSD";
+			guidnames[MEDIASUBTYPE_NELLYMOSER]		= L"Nelly Moser";
 		}
 
 		if (!guidnames.Lookup(subtype, str)) {
