@@ -301,6 +301,8 @@ int ParseAC3IEC61937Header(const BYTE* buf)
 // MPEG Audio
 
 // http://mpgedit.org/mpgedit/mpeg_format/mpeghdr.htm
+// http://www.codeproject.com/Articles/8295/MPEG-Audio-Frame-Header
+
 static const short mpeg1_rates[3][16] = {
 	{ 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0 }, // MPEG 1 Layer 1
 	{ 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384, 0 }, // MPEG 1 Layer 2
@@ -312,6 +314,16 @@ static const short mpeg2_rates[2][16] = {
 };
 static const int mpeg1_samplerates[] = { 44100, 48000, 32000, 0 };
 
+#define MPEG_V1			0x3
+#define MPEG_V2			0x2
+#define MPEG_INVALID	0x1
+#define MPEG_V25		0x0
+
+#define LAYER1			0x3
+#define LAYER2			0x2
+#define LAYER3			0x1
+#define LAYER_INVALID	0x0
+
 int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe)
 {
 	if ((GETWORD(buf) & 0xe0ff) != 0xe0ff) { // sync
@@ -322,16 +334,16 @@ int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe)
 	BYTE layer_desc       = (buf[1] & 0x06) >> 1;
 	BYTE bitrate_index    = buf[2] >> 4;
 	BYTE samplerate_index = (buf[2] & 0x0c) >> 2;
-	if (mpaver_id == 0x1 || layer_desc == 0x0 || bitrate_index == 0 || bitrate_index == 15 || samplerate_index == 3) {
+	if (mpaver_id == MPEG_INVALID || layer_desc == LAYER_INVALID || bitrate_index == 0 || bitrate_index == 15 || samplerate_index == 3) {
 		return 0;
 	}
 	BYTE pading           = (buf[2] & 0x02) >> 1;
 
 	int bitrate;
-	if (mpaver_id == 0x3) { // MPEG Version 1
+	if (mpaver_id == MPEG_V1) { // MPEG Version 1
 		bitrate = mpeg1_rates[3 - layer_desc][bitrate_index];
 	} else { // MPEG Version 2, MPEG Version 2.5
-		if (layer_desc == 0x3) { // Layer 1
+		if (layer_desc == LAYER1) { // Layer 1
 			bitrate = mpeg2_rates[0][bitrate_index];
 		} else { // Layer 2, Layer 3
 			bitrate = mpeg2_rates[1][bitrate_index];
@@ -340,35 +352,45 @@ int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe)
 	bitrate *= 1000;
 
 	int samplerate = mpeg1_samplerates[samplerate_index];
-	if (mpaver_id == 0x2) { // MPEG Version 2
+	if (mpaver_id == MPEG_V2) { // MPEG Version 2
 		samplerate /= 2;
-	} else if (mpaver_id == 0x0) { // MPEG Version 2.5
+	} else if (mpaver_id == MPEG_V25) { // MPEG Version 2.5
 		samplerate /= 4;
 	}
 
-	const BYTE l3ext = (layer_desc == 0x01 && mpaver_id == 0x02); // // MPEG Version 2 Layer 3
 	int frame_size;
-	if (layer_desc == 0x3) { // Layer 1
+	if (layer_desc == LAYER1) { // Layer 1
 		frame_size = (12 * bitrate / samplerate + pading) * 4;
-	} else { // Layer 2, Layer 3
-		frame_size = 144 * bitrate / (samplerate << l3ext) + pading;
+	}
+	else if (mpaver_id != MPEG_V1 && layer_desc == LAYER3) { // MPEG Version 2/2.5 Layer 3
+		frame_size = 72 * bitrate / samplerate + pading;
+	}
+	else {
+		frame_size = 144 * bitrate / samplerate + pading;
 	}
 
 	if (audioframe) {
 		audioframe->size       = frame_size;
 		audioframe->samplerate = samplerate;
+
 		if ((buf[3] & 0xc0) == 0xc0) {
 			audioframe->channels = 1;
 		} else {
 			audioframe->channels = 2;
 		}
-		if (layer_desc == 0x3) { // Layer 1
+
+		if (layer_desc == LAYER1) { // Layer 1
 			audioframe->samples = 384;
-		} else { // Layer 2, Layer 3
-			audioframe->samples = 1152 << l3ext;
 		}
+		else if (mpaver_id != MPEG_V1 && layer_desc == LAYER3) { // MPEG Version 2/2.5 Layer 3
+			audioframe->samples = 576;
+		}
+		else {
+			audioframe->samples = 1152;
+		}
+
 		audioframe->param1 = bitrate;
-		audioframe->param2 = (mpaver_id == 0x3 && layer_desc == 0x1) ? 1 : 0;
+		audioframe->param2 = (mpaver_id == MPEG_V1 && layer_desc == LAYER3) ? 1 : 0;
 	}
 
 	return frame_size;
@@ -414,7 +436,7 @@ int ParseMPEG1Header(const BYTE* buf, MPEG1WAVEFORMAT* mpeg1wf)
 	mpeg1wf->wfx.nChannels       = channel_mode == 0x3 ? 1 : 2;
 	mpeg1wf->wfx.nSamplesPerSec  = mpeg1_samplerates[samplerate_index];
 	mpeg1wf->wfx.nAvgBytesPerSec = mpeg1wf->dwHeadBitrate / 8;
-	if (layer_desc == 0x3) { // Layer 1
+	if (layer_desc == LAYER1) { // Layer 1
 		mpeg1wf->wfx.nBlockAlign = (12 * mpeg1wf->dwHeadBitrate / mpeg1wf->wfx.nSamplesPerSec) * 4; // without pading_bit
 	} else { // Layer 2, Layer 3
 		mpeg1wf->wfx.nBlockAlign = 144 * mpeg1wf->dwHeadBitrate / mpeg1wf->wfx.nSamplesPerSec; // without pading_bit
