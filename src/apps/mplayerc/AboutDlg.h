@@ -43,20 +43,10 @@ public:
 	afx_msg void OnHomepage(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnAuthors(NMHDR *pNMHDR, LRESULT *pResult);
 
-	//{{AFX_DATA(CAboutDlg)
 	enum { IDD = IDD_ABOUTBOX };
-	//}}AFX_DATA
 
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CAboutDlg)
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
-	//}}AFX_VIRTUAL
 
-	// Implementation
-protected:
-	//{{AFX_MSG(CAboutDlg)
-	// No message handlers
-	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
