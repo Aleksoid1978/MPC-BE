@@ -225,6 +225,7 @@ void avcodec_register_all(void)
     REGISTER_PARSER (ADX, adx);
     REGISTER_PARSER (DCA, dca);
     REGISTER_PARSER (DNXHD, dnxhd);
+    REGISTER_PARSER (H263, h263);
     REGISTER_PARSER (H264, h264);
     REGISTER_PARSER (HEVC, hevc);
     REGISTER_PARSER (MJPEG, mjpeg);
