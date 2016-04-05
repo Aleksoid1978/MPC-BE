@@ -337,7 +337,7 @@ public:
 	void SearchStreams(__int64 start, __int64 stop, DWORD msTimeOut = INFINITE);
 	DWORD AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, BOOL bAddStream = TRUE);
 	void  AddHdmvPGStream(WORD pid, const char* language_code);
-	CAtlList<stream>* GetMasterStream();
+	CMpegSplitterFile::CStreamList* GetMasterStream();
 	bool IsHdmv() {
 		return m_ClipInfo.IsHdmv();
 	};
@@ -370,11 +370,11 @@ public:
 			return cnt;
 		}
 
-		bool streamFind(WORD pid, int* iStream = NULL) {
+		bool streamFind(WORD pid, int* pStream = NULL) {
 			for (size_t i = 0; i < streams.size(); i++) {
 				if (streams[i].pid == pid) {
-					if (iStream) {
-						*iStream = i;
+					if (pStream) {
+						*pStream = i;
 					}
 					return true;
 				}
@@ -444,7 +444,7 @@ public:
 	void ReadSDT(CAtlArray<BYTE>& pData, BYTE table_id);
 	void ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id);
 
-	const program* FindProgram(WORD pid, int &iStream, const CHdmvClipInfo::Stream* &pClipInfo);
+	const program* FindProgram(WORD pid, int* pStream = NULL, const CHdmvClipInfo::Stream** pClipInfo = NULL);
 
 	// program stream map - mpeg-ps
 	PES_STREAM_TYPE m_psm[256];

@@ -986,11 +986,11 @@ CString CMpegSplitterFilter::FormatStreamName(CMpegSplitterFile::stream& s, CMpe
 	CString name = CMpegSplitterFile::CStreamList::ToString(type);
 	CString str;
 
-	int iProgram = -1;
+	int nProgram;
 	const CHdmvClipInfo::Stream *pClipInfo;
-	const CMpegSplitterFile::program * pProgram = m_pFile->FindProgram(s.pid, iProgram, pClipInfo);
+	const CMpegSplitterFile::program * pProgram = m_pFile->FindProgram(s.pid, &nProgram, &pClipInfo);
 	const wchar_t *pStreamName	= NULL;
-	PES_STREAM_TYPE StreamType	= pClipInfo ? pClipInfo->m_Type : pProgram ? pProgram->streams[iProgram].type : INVALID;
+	PES_STREAM_TYPE StreamType	= pClipInfo ? pClipInfo->m_Type : pProgram ? pProgram->streams[nProgram].type : INVALID;
 	pStreamName					= StreamTypeToName((PES_STREAM_TYPE)StreamType);
 
 	CStringA lang_name	= s.lang;
@@ -1363,7 +1363,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		return;
 	}
 
-	CAtlList<CMpegSplitterFile::stream>* pMasterStream = m_pFile->GetMasterStream();
+	CMpegSplitterFile::CStreamList* pMasterStream = m_pFile->GetMasterStream();
 	if (!pMasterStream) {
 		ASSERT(0);
 		return;
@@ -1480,7 +1480,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 bool CMpegSplitterFilter::DemuxLoop()
 {
-	CAtlList<CMpegSplitterFile::stream>* pMasterStream = m_pFile->GetMasterStream();
+	CMpegSplitterFile::CStreamList* pMasterStream = m_pFile->GetMasterStream();
 	if (!pMasterStream) {
 		ASSERT(0);
 		return false;
