@@ -121,7 +121,7 @@ STDMETHODIMP CVTSReader::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 		QI(IDSMChapterBag)
 		QI(IVTSReader)
 		QI(ISpecifyPropertyPages)
-		QI(ISpecifyPropertyPages2)
+		//QI(ISpecifyPropertyPages2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
