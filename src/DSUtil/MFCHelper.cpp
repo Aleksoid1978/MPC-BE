@@ -106,7 +106,7 @@ void CorrectCWndWidth(CWnd* pWnd)
 void SelectByItemData(CComboBox& ComboBox, int data)
 {
 	for (int i = 0; i < ComboBox.GetCount(); i++) {
-		if ((int)ComboBox.GetItemData(i) == data) {
+		if (ComboBox.GetItemData(i) == (DWORD_PTR)data) {
 			ComboBox.SetCurSel(i);
 			break;
 		}
@@ -116,7 +116,7 @@ void SelectByItemData(CComboBox& ComboBox, int data)
 void SelectByItemData(CListBox ListBox, int data)
 {
 	for (int i = 0; i < ListBox.GetCount(); i++) {
-		if ((int)ListBox.GetItemData(i) == data) {
+		if (ListBox.GetItemData(i) == (DWORD_PTR)data) {
 			ListBox.SetCurSel(i);
 			ListBox.SetTopIndex(i);
 			break;
