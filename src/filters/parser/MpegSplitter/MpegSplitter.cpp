@@ -502,6 +502,7 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_SubEmptyPin(false)
 	, m_hasHdmvDvbSubPin(false)
 {
+	m_nFlag |= SOURCE_SUPPORT_URL;
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_MPEGSplit, KEY_READ)) {
