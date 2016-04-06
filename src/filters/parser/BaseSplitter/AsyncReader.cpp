@@ -98,13 +98,24 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 			}
 
 			if (m_pos != llPosition) {
-				CString customHeader; customHeader.Format(L"Range: bytes=%I64d-\r\n", llPosition);
-				HRESULT hr = m_HTTPAsync.SendRequest(customHeader);
+				if (llPosition > m_pos && (llPosition - m_pos) <= 64 * KILOBYTE) {
+					static BYTE pBufferTmp[64 * KILOBYTE] = { 0 };
+					DWORD lenght = llPosition - m_pos;
+
+					DWORD dwSizeRead = 0;
+					HRESULT hr = m_HTTPAsync.Read(pBufferTmp, lenght, &dwSizeRead);
+					if (hr != S_OK || dwSizeRead != lenght) {
+						return E_FAIL;
+					}
+				} else {
+					CString customHeader; customHeader.Format(L"Range: bytes=%I64d-\r\n", llPosition);
+					HRESULT hr = m_HTTPAsync.SendRequest(customHeader);
 #ifdef DEBUG
-				DbgLog((LOG_TRACE, 3, L"CAsyncFileReader::SyncRead : do HTTP seeking to %I64d(current pos %I64d), hr = 0x%08x", llPosition, m_pos, hr));
+					DbgLog((LOG_TRACE, 3, L"CAsyncFileReader::SyncRead() : do HTTP seeking to %I64d(current pos %I64d), hr = 0x%08x", llPosition, m_pos, hr));
 #endif
-				if (hr != S_OK) {
-					return hr;
+					if (hr != S_OK) {
+						return hr;
+					}
 				}
 
 				m_pos = llPosition;
