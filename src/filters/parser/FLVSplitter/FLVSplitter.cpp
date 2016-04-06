@@ -130,6 +130,7 @@ CFLVSplitterFilter::CFLVSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 {
 	m_nFlag |= PACKET_PTS_DISCONTINUITY;
 	m_nFlag |= PACKET_PTS_VALIDATE_POSITIVE;
+	m_nFlag |= SOURCE_SUPPORT_URL;
 	//memset(&meta, 0, sizeof(meta));
 }
 
@@ -382,50 +383,76 @@ bool CFLVSplitterFilter::ReadTag(VideoTweak& vt)
 }
 #endif
 
+#define RESYNC_BUFFER_SIZE (1 << 20)
+#define AV_RB24(p) ((((BYTE*)(p))[0] << 16) | (((BYTE*)(p))[1] << 8)  | ((BYTE*)(p))[2])
+#define AV_RB32(p) ((((BYTE*)(p))[0] << 24) | (((BYTE*)(p))[1] << 16) | (((BYTE*)(p))[2] <<  8) | ((BYTE*)(p))[3])
+
 bool CFLVSplitterFilter::Sync(__int64& pos)
 {
+	static BYTE resync_buffer[2 * RESYNC_BUFFER_SIZE] = { 0 };
+	
 	m_pFile->Seek(pos);
+	if (m_pFile->IsURL()) {
+		for (UINT32 i = 0; m_pFile->GetRemaining(); i++) {
+			const int j  = i & (RESYNC_BUFFER_SIZE - 1);
+			const int j1 = j + RESYNC_BUFFER_SIZE;
+			resync_buffer[j ] =
+			resync_buffer[j1] = m_pFile->BitRead(8);
 
-	while (m_pFile->GetRemaining() >= 15) {
-		__int64 limit = m_pFile->GetRemaining();
-		while (true) {
-			BYTE b = (BYTE)m_pFile->BitRead(8);
-			if (IsValidTag(b)) {
-				break;
-			}
-			if (--limit < 15) {
-				return false;
-			}
-		}
-
-		pos = m_pFile->GetPos() - 5;
-		m_pFile->Seek(pos);
-
-		Tag ct;
-		if (ReadTag(ct) && IsValidTag(ct.TagType)) {
-			__int64 next = m_pFile->GetPos() + ct.DataSize;
-			if (next == m_pFile->GetAvailable() - 4) {
-				m_pFile->Seek(pos);
-				return true;
-			} else if (next <= m_pFile->GetAvailable() - 19) {
-				m_pFile->Seek(next);
-				Tag nt;
-				if (ReadTag(nt) && IsValidTag(nt.TagType)) {
-					if (nt.PreviousTagSize == ct.DataSize) {
-						m_IgnorePrevSizes = true;
-					}
-					if ((nt.PreviousTagSize == ct.DataSize + 11) ||
-							(m_IgnorePrevSizes &&
-								nt.TimeStamp >= ct.TimeStamp/* &&
-								nt.TimeStamp - ct.TimeStamp <= 1000*/)) {
-						m_pFile->Seek(pos);
-						return true;
+			if (i > 22) {
+				UINT32 lsize2 = AV_RB32(resync_buffer + j1 - 4);
+				if (lsize2 >= 11 && lsize2 + 8LL < min(i, RESYNC_BUFFER_SIZE)) {
+					UINT32  size2 = AV_RB24(resync_buffer + j1 - lsize2 + 1 - 4);
+					UINT32 lsize1 = AV_RB32(resync_buffer + j1 - lsize2 - 8);
+					if (lsize1 >= 11 && lsize1 + 8LL + lsize2 < min(i, RESYNC_BUFFER_SIZE)) {
+						UINT32 size1 = AV_RB24(resync_buffer + j1 - lsize1 + 1 - lsize2 - 8);
+						if (size1 == lsize1 - 11 && size2  == lsize2 - 11) {
+							pos = pos + i - lsize1 - lsize2 - 8 - 4;
+							m_pFile->Seek(pos);
+							return true;
+						}
 					}
 				}
 			}
 		}
+	} else {
+		m_pFile->Seek(pos);
+		while (m_pFile->GetRemaining() >= 15) {
+			__int64 limit = m_pFile->GetRemaining();
+			while (true) {
+				BYTE b = (BYTE)m_pFile->BitRead(8);
+				if (IsValidTag(b)) {
+					break;
+				}
+				if (--limit < 15) {
+					return false;
+				}
+			}
 
-		m_pFile->Seek(pos + 5);
+			pos = m_pFile->GetPos() - 5;
+			m_pFile->Seek(pos);
+
+			Tag ct;
+			if (ReadTag(ct) && IsValidTag(ct.TagType)) {
+				__int64 next = m_pFile->GetPos() + ct.DataSize;
+				if (next == m_pFile->GetAvailable() - 4) {
+					m_pFile->Seek(pos);
+					return true;
+				} else if (next <= m_pFile->GetAvailable() - 19) {
+					m_pFile->Seek(next);
+					Tag nt;
+					if (ReadTag(nt) && IsValidTag(nt.TagType)) {
+						if ((nt.PreviousTagSize == ct.DataSize + 11) ||
+								(nt.TimeStamp >= ct.TimeStamp)) {
+							m_pFile->Seek(pos);
+							return true;
+						}
+					}
+				}
+			}
+
+			m_pFile->Seek(pos + 5);
+		}
 	}
 
 	return false;
@@ -468,9 +495,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	AudioTag at;
 	VideoTag vt;
 
-	UINT32 prevTagSize = 0;
-	m_IgnorePrevSizes = false;
-
 	m_pFile->Seek(m_DataOffset);
 
 	REFERENCE_TIME AvgTimePerFrame	= 0;
@@ -507,7 +531,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		if (!IsValidTag(t.TagType)) {
 			m_pFile->Seek(next);
-			prevTagSize = 0;
 			continue;
 		}
 
@@ -515,11 +538,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		CMediaType mt;
 		mt.subtype = GUID_NULL;
-
-		if (prevTagSize != 0 && t.PreviousTagSize != prevTagSize) {
-			m_IgnorePrevSizes = true;
-		}
-		prevTagSize = t.DataSize + 11;
 
 		if (t.TagType == FLV_SCRIPTDATA && t.DataSize) {
 			BYTE type = m_pFile->BitRead(8);
@@ -1086,7 +1104,7 @@ bool CFLVSplitterFilter::DemuxInit()
 	SetThreadName((DWORD)-1, "CFLVSplitterFilter");
 
 	if (m_pFile->IsRandomAccess()) {
-		__int64 pos = max(m_DataOffset, m_pFile->GetAvailable() - 256 * 1024);
+		__int64 pos = max(m_DataOffset, m_pFile->GetAvailable() - 256 * KILOBYTE);
 
 		if (Sync(pos)) {
 			Tag t;
@@ -1124,134 +1142,74 @@ void CFLVSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 	if (rt <= 0) {
 		m_pFile->Seek(m_DataOffset);
-	} else if (!m_IgnorePrevSizes) {
-		NormalSeek(rt);
-	} else {
-		AlternateSeek(rt);
+		return;
 	}
-}
 
-void CFLVSplitterFilter::NormalSeek(REFERENCE_TIME rt)
-{
-	bool fAudio = !!GetOutputPin(FLV_AUDIODATA);
-	bool fVideo = !!GetOutputPin(FLV_VIDEODATA);
+	const BYTE masterTagType = GetOutputPin(FLV_VIDEODATA) ? FLV_VIDEODATA : FLV_AUDIODATA;
 
-	__int64 pos	= 0;
+	__int64 estimPos = 0;
 
 	if (m_sps.GetCount() > 1) {
-		int i	= range_bsearch(m_sps, rt);
-		pos		= i >= 0 ? m_sps[i].fp : 0;
+		int i    = range_bsearch(m_sps, rt);
+		estimPos = i >= 0 ? m_sps[i].fp : 0;
 	}
 
-	if (!pos) {
-		pos = m_DataOffset + (__int64)(double(m_pFile->GetLength() - m_DataOffset) * rt / m_rtDuration);
+	if (!estimPos) {
+		estimPos = m_DataOffset + (__int64)(double(m_pFile->GetLength() - m_DataOffset) * rt / m_rtDuration);
 	}
 
-	if (pos > m_pFile->GetAvailable()) {
+	if (estimPos > m_pFile->GetAvailable()) {
 		return;
-	}
-
-	if (!Sync(pos)) {
-		m_pFile->Seek(m_DataOffset);
-		return;
-	}
-
-	if (m_IgnorePrevSizes) {
-		return AlternateSeek(rt);
 	}
 
 	Tag t;
-	AudioTag at;
-	VideoTag vt;
-
-	while (ReadTag(t) && ValidateTag(t)) {
-		pos = m_pFile->GetPos() + t.DataSize;
-
-		CBaseSplitterOutputPin* pOutPin = dynamic_cast<CBaseSplitterOutputPin*>(GetOutputPin(t.TagType));
-		if (!pOutPin) {
-			m_pFile->Seek(pos);
-			continue;
-		}
-
-		t.TimeStamp += (pOutPin->GetOffset() / 10000i64);
-
-		if (10000i64 * t.TimeStamp >= rt) {
-			m_pFile->Seek(m_pFile->GetPos() - 15);
-			break;
-		}
-
-		m_pFile->Seek(pos);
-	}
-
-	while (m_pFile->GetPos() >= m_DataOffset && (fAudio || fVideo) && ReadTag(t) && ValidateTag(t)) {
-		__int64 prev = max(m_pFile->GetPos() - 15 - t.PreviousTagSize - 4, 0);
-
-		CBaseSplitterOutputPin* pOutPin = dynamic_cast<CBaseSplitterOutputPin*>(GetOutputPin(t.TagType));
-		if (pOutPin) {
-			t.TimeStamp += (pOutPin->GetOffset() / 10000i64);
-
-			if (10000i64 * t.TimeStamp <= rt) {
-				if (t.TagType == FLV_AUDIODATA && ReadTag(at)) {
-					fAudio = false;
-				} else if (t.TagType == FLV_VIDEODATA && ReadTag(vt) && vt.FrameType == 1) {
-					fVideo = false;
-					fAudio = false;
-				}
-			}
-		}
-		m_pFile->Seek(prev);
-	}
-
-	if (fAudio || fVideo) {
+	if (!Sync(estimPos) || !ReadTag(t)) {
 		m_pFile->Seek(m_DataOffset);
+		return;
 	}
-}
 
-void CFLVSplitterFilter::AlternateSeek(REFERENCE_TIME rt)
-{
-	bool hasAudio = !!GetOutputPin(FLV_AUDIODATA);
-	bool hasVideo = !!GetOutputPin(FLV_VIDEODATA);
-
-	__int64 estimPos = m_DataOffset + (__int64)(double(m_pFile->GetAvailable() - m_DataOffset) * rt / m_rtDuration);
+	if (t.TagType == masterTagType) {
+		if (10000i64 * t.TimeStamp == rt) {
+			m_pFile->Seek(m_pFile->GetPos() - 15);
+			return;
+		}
+	}
 
 	while (true) {
-		estimPos -= 256 * KILOBYTE;
+		__int64 bestPos  = 0;
+		while (ReadTag(t) && t.TimeStamp * 10000i64 <= rt) {
+			const __int64 cur  = m_pFile->GetPos() - 15;
+			const __int64 next = m_pFile->GetPos() + t.DataSize;
+
+			if (t.TagType == masterTagType) {
+				AudioTag at;
+				VideoTag vt;
+				if ((t.TagType == FLV_AUDIODATA && ReadTag(at))
+						|| (t.TagType == FLV_VIDEODATA && ReadTag(vt) && vt.FrameType == 1)) {
+					bestPos = cur;
+				}
+			}
+
+			m_pFile->Seek(next);
+		}
+
+		if (bestPos) {
+			m_pFile->Seek(bestPos);
+			return;
+		}
+
+		if (estimPos == m_DataOffset) {
+			m_pFile->Seek(m_DataOffset);
+			return;
+		}
+
+		estimPos -= MEGABYTE;
 		if (estimPos < m_DataOffset) {
 			estimPos = m_DataOffset;
 		}
 
-		bool foundAudio = !hasAudio;
-		bool foundVideo = !hasVideo;
-		__int64 bestPos = estimPos;
-
-		if (Sync(bestPos)) {
-			Tag t;
-
-			while (ReadTag(t) && ValidateTag(t) && t.TimeStamp * 10000i64 <= (rt - UNITS / 2)) {
-				__int64 cur = m_pFile->GetPos() - 15;
-				__int64 next = cur + 15 + t.DataSize;
-
-				AudioTag at;
-				VideoTag vt;
-
-				if (hasAudio && t.TagType == FLV_AUDIODATA && ReadTag(at)) {
-					foundAudio = true;
-					if (!hasVideo) {
-						bestPos = cur;
-					}
-				} else if (hasVideo && t.TagType == FLV_VIDEODATA && ReadTag(vt) && vt.FrameType == 1) {
-					foundVideo = true;
-					bestPos = cur;
-				}
-
-				m_pFile->Seek(next);
-			}
-		}
-
-		if (foundAudio && foundVideo) {
-			m_pFile->Seek(bestPos);
-			return;
-		} else if (estimPos == m_DataOffset) {
+		bestPos = estimPos;
+		if (!Sync(bestPos)) {
 			m_pFile->Seek(m_DataOffset);
 			return;
 		}
@@ -1265,8 +1223,8 @@ bool CFLVSplitterFilter::DemuxLoop()
 	CAutoPtr<CPacket> p;
 
 	Tag t;
-	AudioTag at = {};
-	VideoTag vt = {};
+	AudioTag at;
+	VideoTag vt;
 
 	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
 		if (!m_pFile->IsStreaming() && !m_pFile->GetRemaining()) {
