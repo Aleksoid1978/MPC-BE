@@ -23,8 +23,6 @@
 
 #include <stdint.h>
 
-#pragma pack(1)
-
 class CIfo
 {
 public:
@@ -37,6 +35,7 @@ public:
 	~CIfo(void);
 
 private :
+#pragma pack(push, 1)
 	typedef struct {
 		uint16_t id		: 16;	// Language
 		uint16_t		: 16;	// don't know
@@ -165,6 +164,7 @@ private :
 		uint16_t bar		: 16;	// don't know
 		uint32_t start		: 32;	// Start of unit
 	} lu_sub_t;
+#pragma pack(pop)
 
 	BYTE*       m_pBuffer;
 	DWORD       m_dwSize;
