@@ -30,7 +30,6 @@ class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 	CFLVSplitterFilter : public CBaseSplitterFilter
 {
 	UINT32	m_DataOffset;
-	bool	m_IgnorePrevSizes;
 
 	UINT32	m_TimeStampOffset;
 	bool	m_DetectWrongTimeStamp;
@@ -38,36 +37,36 @@ class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 	bool Sync(__int64& pos);
 
 	struct VideoTweak {
-		BYTE x;
-		BYTE y;
+		BYTE x = 0;
+		BYTE y = 0;
 	};
 
 	bool ReadTag(VideoTweak& t);
 
 	struct Tag {
-		UINT32 PreviousTagSize;
-		BYTE TagType;
-		UINT32 DataSize;
-		UINT32 TimeStamp;
-		UINT32 StreamID;
+		UINT32 PreviousTagSize = 0;
+		BYTE   TagType = 0;
+		UINT32 DataSize = 0;
+		UINT32 TimeStamp = 0;
+		UINT32 StreamID = 0;
 	};
 
 	bool ReadTag(Tag& t);
 
 	struct AudioTag {
-		BYTE SoundFormat;
-		BYTE SoundRate;
-		BYTE SoundSize;
-		BYTE SoundType;
+		BYTE SoundFormat = 0;
+		BYTE SoundRate = 0;
+		BYTE SoundSize = 0;
+		BYTE SoundType = 0;
 	};
 
 	bool ReadTag(AudioTag& at);
 
 	struct VideoTag {
-		BYTE	FrameType;
-		BYTE	CodecID;
-		BYTE	AVCPacketType;
-		UINT32	tsOffset;
+		BYTE   FrameType = 0;
+		BYTE   CodecID = 0;
+		BYTE   AVCPacketType = 0;
+		UINT32 tsOffset = 0;
 	};
 
 	bool ReadTag(VideoTag& vt);
@@ -90,9 +89,6 @@ class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 	//	int     keyframenum;
 	//};
 	//MetaInfo meta;
-
-	void NormalSeek(REFERENCE_TIME rt);
-	void AlternateSeek(REFERENCE_TIME rt);
 
 	enum AMF_DATA_TYPE {
 		AMF_DATA_TYPE_EMPTY			= -1,
