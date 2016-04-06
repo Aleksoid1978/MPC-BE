@@ -185,6 +185,7 @@ CFilterApp theApp;
 CRealMediaSplitterFilter::CRealMediaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CRealMediaSplitterFilter"), pUnk, phr, __uuidof(this))
 {
+	m_nFlag |= SOURCE_SUPPORT_URL;
 }
 
 CRealMediaSplitterFilter::~CRealMediaSplitterFilter()

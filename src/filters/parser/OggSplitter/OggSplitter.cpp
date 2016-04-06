@@ -142,6 +142,7 @@ COggSplitterFilter::COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 {
 	m_nFlag |= PACKET_PTS_DISCONTINUITY;
 	m_nFlag |= PACKET_PTS_VALIDATE_POSITIVE;
+	m_nFlag |= SOURCE_SUPPORT_URL;
 }
 
 COggSplitterFilter::~COggSplitterFilter()
