@@ -40,13 +40,13 @@ public:
 
 	bool NextMpegStartCode(BYTE& b, __int64 len = 65536);
 
-#pragma pack(push, 1)
-
 	enum mpeg_t {
 		mpegunk,
 		mpeg1,
 		mpeg2
 	};
+
+#pragma pack(push, 1)
 
 	struct seqhdr {
 		WORD width;

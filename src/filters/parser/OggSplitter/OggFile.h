@@ -74,6 +74,7 @@ struct OggStreamHeader {
 	};
 	DWORD alignmentfix2;
 };
+
 #pragma pack(pop)
 
 class OggPage : public CAtlArray<BYTE>

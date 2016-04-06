@@ -25,7 +25,6 @@
 
 #define FlicSourceName   L"MPC FLIC Source"
 
-#pragma pack(push, 1)
 enum {
 	FLIC_256_COLOR = 4,
 	FLIC_DELTA = 7,
@@ -41,6 +40,7 @@ enum {
 };
 
 // http://www.compuphase.com/flic.htm
+#pragma pack(push, 1)
 struct FLIC {
 	DWORD size;          // Size of FLIC including this header
 	WORD  type;          // File type 0xAF11, 0xAF12, 0xAF30, 0xAF44, ...

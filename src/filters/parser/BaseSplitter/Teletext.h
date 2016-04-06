@@ -34,8 +34,7 @@ struct TeletextData {
 
 class CTeletext
 {
-	#pragma pack(push)
-	#pragma pack(1)
+	#pragma pack(push, 1)
 	struct teletext_packet_payload {
 		uint8_t _clock_in;     // clock run in
 		uint8_t _framing_code; // framing code, not needed, ETSI 300 706: const 0xe4

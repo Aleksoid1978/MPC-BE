@@ -23,7 +23,8 @@
 #include "DVBChannel.h"
 #include "BaseGraph.h"
 
-#pragma pack(1)
+#pragma pack(push, 1)
+
 struct SI_HEADER {
 	UINT8		TableID;
 	WORD		SectionSyntaxIndicator  : 1;
@@ -59,8 +60,9 @@ struct EventInformationSection {
 	WORD		RunninStatus			: 3;
 	WORD		FreeCAMode				: 1;
 	WORD		DescriptorsLoopLength	:12;
-
 };
+
+#pragma pack(pop)
 
 class CMpeg2DataParser
 {

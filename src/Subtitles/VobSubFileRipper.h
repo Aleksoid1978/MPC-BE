@@ -25,8 +25,7 @@
 #include "../filters/transform/DeCSSFilter/VobFile.h"
 #include "VobSubFile.h"
 
-#pragma pack(push)
-#pragma pack(1)
+#pragma pack(push, 1)
 
 typedef struct {
 	WORD perm_displ       : 2;

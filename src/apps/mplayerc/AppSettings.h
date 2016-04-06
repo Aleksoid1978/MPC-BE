@@ -195,6 +195,7 @@ enum engine_t {
 };
 
 #pragma pack(push, 1)
+
 struct dispmode {
 	bool bValid = false;
 	CSize size = 0;
