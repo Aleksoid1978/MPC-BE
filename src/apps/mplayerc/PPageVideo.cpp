@@ -361,6 +361,7 @@ BOOL CPPageVideo::OnApply()
 
 void CPPageVideo::UpdateResizerList(int select)
 {
+	m_cbDX9Resizer.SetRedraw(FALSE);
 	m_cbDX9Resizer.ResetContent();
 
 	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Nearest neighbor"), RESIZER_NEAREST);
@@ -388,6 +389,7 @@ void CPPageVideo::UpdateResizerList(int select)
 
 	m_cbDX9Resizer.SetCurSel(1); // default
 	SelectByItemData(m_cbDX9Resizer, select);
+	m_cbDX9Resizer.SetRedraw(TRUE);
 }
 
 void CPPageVideo::OnUpdateMixerYUV(CCmdUI* pCmdUI)
