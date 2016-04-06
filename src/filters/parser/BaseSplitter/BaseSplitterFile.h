@@ -23,6 +23,7 @@
 
 #include <atlcoll.h>
 #include <thread>
+#include "AsyncReader.h"
 
 #define FM_FILE     1 // complete file or stream of known size (local file, VTS Reader, File Source (Async.), source filter with random access)
 #define FM_FILE_DL  2 // downloading stream of known size (File Source (URL) for files < 4 GB, source filter with continuous download)
@@ -32,6 +33,7 @@
 class CBaseSplitterFile
 {
 	CComPtr<IAsyncReader> m_pAsyncReader;
+	CComPtr<ISyncReader>  m_pSyncReader;
 	__int64 m_pos             = 0;
 	__int64 m_len             = 0;
 	__int64 m_available       = 0;
@@ -83,6 +85,7 @@ public:
 	bool IsStreaming() const { return m_fmode == FM_STREAM; }
 	bool IsRandomAccess() const { return m_fmode == FM_FILE || m_fmode == FM_FILE_VAR; }
 	bool IsVariableSize() const { return m_fmode == FM_FILE_VAR; }
+	bool IsURL() const { return m_pSyncReader && m_pSyncReader->GetSourceType() == CAsyncFileReader::SourceType::HTTP; }
 
 	void SetBreakHandle(HANDLE hBreak) { m_hBreak = hBreak; }
 };
