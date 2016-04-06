@@ -82,6 +82,8 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, in
 		::SetThreadPriority(m_ThreadLength.native_handle(), THREAD_PRIORITY_LOWEST);
 	}
 
+	m_pSyncReader = m_pAsyncReader;
+
 	hr = S_OK;
 }
 
