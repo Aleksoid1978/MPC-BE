@@ -8857,6 +8857,14 @@ void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 		} else if (i >= 0) {
 			pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles);
 		}
+	} else if (GetPlaybackMode() == PM_DVD) {
+		if (i >= 0 && m_pDVDI) {
+			ULONG ulStreamsAvailable, ulCurrentStream;
+			BOOL bIsDisabled;
+			if (SUCCEEDED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled))) {
+				pCmdUI->Enable(!bIsDisabled);
+			}
+		}
 	}
 }
 
@@ -14778,7 +14786,7 @@ void CMainFrame::SetupNavMixSubtitleSubMenu()
 			return;
 		}
 
-		pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | (bIsDisabled?0:MF_CHECKED), id++, ResStr(IDS_AG_ENABLED));
+		pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | (bIsDisabled ? MF_ENABLED : MF_CHECKED), id++, ResStr(IDS_AG_ENABLED));
 		pSub->AppendMenu(MF_BYCOMMAND | MF_SEPARATOR | MF_ENABLED);
 
 		for (ULONG i = 0; i < ulStreamsAvailable; i++) {
@@ -14791,16 +14799,16 @@ void CMainFrame::SetupNavMixSubtitleSubMenu()
 			if (Language == DefLanguage) {
 				flags |= MF_DEFAULT;
 			}
-			if (i == ulCurrentStream) {
+			if (i == ulCurrentStream && !bIsDisabled) {
 				flags |= MF_CHECKED | MFT_RADIOCHECK;
 			}
 
 			CString str;
 			if (Language) {
 				int len = GetLocaleInfo(Language, LOCALE_SENGLANGUAGE, str.GetBuffer(256), 256);
-				str.ReleaseBufferSetLength(max(len-1, 0));
+				str.ReleaseBufferSetLength(max(len - 1, 0));
 			} else {
-				str.Format(ResStr(IDS_AG_UNKNOWN), i+1);
+				str.Format(ResStr(IDS_AG_UNKNOWN), i + 1);
 			}
 
 			DVD_SubpictureAttributes ATR;
@@ -14843,7 +14851,6 @@ void CMainFrame::SetupNavMixSubtitleSubMenu()
 			}
 
 			str.Replace(_T("&"), _T("&&"));
-
 			pSub->AppendMenu(flags, id++, str);
 		}
 	}
