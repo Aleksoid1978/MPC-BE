@@ -936,39 +936,61 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 		while (pos) {
 			CStringA& hdrline = sl.GetNext(pos);
 
-			CStringA dup(hdrline);
+			CStringA param, value;
+			int k = hdrline.Find(':');
+			if (k > 0 && k + 1 < hdrline.GetLength()) {
+				param = hdrline.Left(k).Trim().MakeLower();
+				value = hdrline.Mid(k + 1).Trim();
+			}
+
 			hdrline.MakeLower();
 			if (hdrline.Find("200 ok") > 0 && (hdrline.Find("icy") == 0 || hdrline.Find("http/") == 0)) {
 				fOK = true;
-			} else if (hdrline.Left(13) == "content-type:") {
-				hdrline = hdrline.Mid(13).Trim();
-				if (hdrline.Find("audio/mpeg") == 0) {
+			}
+			else if (param == "content-type") {
+				value.MakeLower();
+				if (value = "audio/mpeg") {
 					m_Format = AUDIO_MPEG;
 					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected MPEG Audio format"));
-				} else if (hdrline.Find("audio/aacp") == 0) {
+				}
+				else if (value == "audio/aac" || value == "audio/aacp") {
 					m_Format = AUDIO_AAC;
 					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected AAC Audio format"));
-				} else if (hdrline.Find("audio/x-scpls") == 0) {
+				}
+				else if (value = "audio/x-scpls") {
 					m_Format = AUDIO_PLAYLIST;
 					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected Playlist format"));
 				}
-			} else if (1 == sscanf_s(hdrline, "icy-br:%d", &m_bitrate)) {
-				m_bitrate *= 1000;
-			} else if (1 == sscanf_s(hdrline, "icy-metaint:%d", &metaint)) {
-				;
-			} else if (hdrline.Left(9) == "icy-name:") {
-				m_title = ConvertStr(dup.Mid(9).Trim());
-			} else if (hdrline.Left(8) == "icy-url:") {
-				m_url = dup.Mid(8).Trim();
-			} else if (1 == sscanf_s(hdrline, "content-length:%d", &ContentLength)) {
-				;
-			} else if (hdrline.Left(9) == "location:") {
-				redirectUrl = hdrline.Mid(9).Trim();
-			} else if (hdrline.Find("content-disposition:") >= 0 && hdrline.Find("filename=") > 0) {
-				int pos = hdrline.Find("filename=");
-				redirectUrl = _T("/") + CString(hdrline.Mid(pos + 9).Trim());
-			} else if (hdrline.Left(16) == "icy-description:") {
-				m_Description = ConvertStr(dup.Mid(16).Trim());
+				else if (value = "application/ogg") {
+					// not supported yet
+					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected Ogg format"));
+				}
+			}
+			else if (param == "icy-br") {
+				m_bitrate = atoi(value) * 1000;
+			}
+			else if (param == "icy-metaint") {
+				metaint = atoi(value);
+			}
+			else if (param == "icy-name") {
+				m_title = ConvertStr(value);
+			}
+			else if (param == "icy-url") {
+				m_url = value;
+			}
+			else if (param == "content-length") {
+				ContentLength = atoi(value);
+			}
+			else if (param == "location") {
+				redirectUrl = value;
+			}
+			else if (param == "content-disposition") {
+				if (int pos = value.Find("filename=") >= 0) {
+					redirectUrl = _T("/") + CString(value.Mid(pos + 9).Trim());
+				}
+			}
+			else if (param == "icy-description") {
+				m_Description = ConvertStr(value);
 			}
 		}
 
