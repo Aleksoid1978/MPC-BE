@@ -986,6 +986,7 @@ int ParseADTSAACHeader(const BYTE* buf, audioframe_t* audioframe)
 	if (audioframe) {
 		audioframe->size       = frame_size;
 		audioframe->param1     = headersize; // header size
+		audioframe->param2     = ((buf[2] & 0xc0) >> 6) + 1;
 		audioframe->samplerate = mp4a_samplerates[(buf[2] & 0x3c) >> 2];
 		BYTE channel_index = ((buf[2] & 0x01) << 2) | ((buf[3] & 0xc0) >> 6);
 		if (audioframe->samplerate == 0/* || channel_index == 0*/ || channel_index >= 8) {
