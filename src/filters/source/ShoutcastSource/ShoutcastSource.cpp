@@ -36,8 +36,8 @@
 #define AVGBUFFERLENGTH	 30000000i64
 #define MAXBUFFERLENGTH	100000000i64
 
-#define MPA_FRAME_SIZE	4
-#define ADTS_FRAME_SIZE	9
+#define MPA_HEADER_SIZE		4
+#define ADTS_HEADER_SIZE	9
 
 static const DWORD s_bitrate[2][16] = {
 	{1,8,16,24,32,40,48,56,64,80,96,112,128,144,160,0},
@@ -84,12 +84,12 @@ struct mp3hdr {
 	aachdr m_aachdr;
 
 	bool ExtractAACHeader(CSocket& socket) {
-		BYTE buff[ADTS_FRAME_SIZE];
-		if (ADTS_FRAME_SIZE != socket.Receive(buff, ADTS_FRAME_SIZE, MSG_PEEK)) {
+		BYTE buff[ADTS_HEADER_SIZE];
+		if (ADTS_HEADER_SIZE != socket.Receive(buff, ADTS_HEADER_SIZE, MSG_PEEK)) {
 			return false;
 		}
 
-		CGolombBuffer gb(buff, ADTS_FRAME_SIZE);
+		CGolombBuffer gb(buff, ADTS_HEADER_SIZE);
 
 		WORD sync = gb.BitRead(12);
 		if (sync != 0xfff) {
@@ -567,8 +567,8 @@ static UINT SocketThreadProc(LPVOID pParam)
 	return (static_cast<CShoutcastStream*>(pParam))->SocketThreadProc();
 }
 
-#define MOVE_TO_MPA_START_CODE(b, e)	while(b <= e - MPA_FRAME_SIZE  && ((GETWORD(b) & 0xe0ff) != 0xe0ff)) b++;
-#define MOVE_TO_AAC_START_CODE(b, e)	while(b <= e - ADTS_FRAME_SIZE && ((GETWORD(b) & 0xf0ff) != 0xf0ff)) b++;
+#define MOVE_TO_MPA_START_CODE(b, e)	while(b <= e - MPA_HEADER_SIZE  && ((GETWORD(b) & 0xe0ff) != 0xe0ff)) b++;
+#define MOVE_TO_AAC_START_CODE(b, e)	while(b <= e - ADTS_HEADER_SIZE && ((GETWORD(b) & 0xf0ff) != 0xf0ff)) b++;
 UINT CShoutcastStream::SocketThreadProc()
 {
 	fExitThread = false;
@@ -634,13 +634,13 @@ UINT CShoutcastStream::SocketThreadProc()
 			m_p.SetCount(nSize + len, 1024);
 			memcpy(m_p.GetData() + nSize, pData, (size_t)len);
 
-			if (m_p.GetCount() > MPA_FRAME_SIZE) {
+			if (m_p.GetCount() > MPA_HEADER_SIZE) {
 				BYTE* start	= m_p.GetData();
 				BYTE* end	= start + m_p.GetCount();
 
 				for(;;) {
 					MOVE_TO_MPA_START_CODE(start, end);
-					if (start <= end - MPA_FRAME_SIZE) {
+					if (start <= end - MPA_HEADER_SIZE) {
 						audioframe_t aframe;
 						int size = ParseMPAHeader(start, &aframe);
 						if (size == 0) {
@@ -651,7 +651,7 @@ UINT CShoutcastStream::SocketThreadProc()
 							break;
 						}
 
-						if (start + size + MPA_FRAME_SIZE <= end) {
+						if (start + size + MPA_HEADER_SIZE <= end) {
 							int size2 = ParseMPAHeader(start + size, &aframe);
 							if (size2 == 0) {
 								start++;
@@ -827,12 +827,10 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 
 			DbgLog((LOG_TRACE, 3, L"CShoutcastStream(): Metainfo: %s", str));
 
-			CString title("StreamTitle='"), url("StreamUrl='");
-
-			int i = str.Find(title);
+			int i = str.Find(L"StreamTitle='");
 			if (i >= 0) {
-				i += title.GetLength();
-				int j = str.Find(L"\';", i);
+				i += 13;
+				int j = str.Find(L"';", i);
 				if (!j) {
 					j = str.ReverseFind('\'');
 				}
@@ -843,10 +841,10 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 				DbgLog((LOG_TRACE, 3, L"CShoutcastStream(): StreamTitle is missing"));
 			}
 
-			i = str.Find(url);
+			i = str.Find(L"StreamUrl='");
 			if (i >= 0) {
-				i += url.GetLength();
-				int j = str.Find(L"\';", i);
+				i += 11;
+				int j = str.Find(L"';", i);
 				if (!j) {
 					j = str.ReverseFind('\'');
 				}
@@ -917,15 +915,12 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 	bool fOK = false;
 	bool fTryAgain = false;
 	int metaint = 0;
-
 	int ContentLength = 0;
 
 	do {
 		m_nBytesRead = 0;
 		m_metaint = metaint = 0;
 		m_bitrate = 0;
-
-		BYTE cur = 0, prev = 0;
 
 		CStringA hdr = GetHeader();
 		DbgLog((LOG_TRACE, 3, L"\nCShoutcastSocket::Connect() - HTTP hdr:\n%s", ConvertStr(hdr)));
