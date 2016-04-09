@@ -686,13 +686,13 @@ UINT CShoutcastStream::SocketThreadProc()
 			m_p.SetCount(nSize + len, 1024);
 			memcpy(m_p.GetData() + nSize, pData, (size_t)len);
 
-			if (m_p.GetCount() > ADTS_FRAME_SIZE) {
+			if (m_p.GetCount() > ADTS_HEADER_SIZE) {
 				BYTE* start	= m_p.GetData();
 				BYTE* end	= start + m_p.GetCount();
 
 				for(;;) {
 					MOVE_TO_AAC_START_CODE(start, end);
-					if (start <= end - ADTS_FRAME_SIZE) {
+					if (start <= end - ADTS_HEADER_SIZE) {
 						audioframe_t aframe;
 						int size = ParseADTSAACHeader(start, &aframe);
 						if (size == 0) {
@@ -703,7 +703,7 @@ UINT CShoutcastStream::SocketThreadProc()
 							break;
 						}
 
-						if (start + size + ADTS_FRAME_SIZE <= end) {
+						if (start + size + ADTS_HEADER_SIZE <= end) {
 							int size2 = ParseADTSAACHeader(start + size, &aframe);
 							if (size2 == 0) {
 								start++;
