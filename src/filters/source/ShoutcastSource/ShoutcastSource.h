@@ -38,37 +38,6 @@ enum StreamFormat {
 	AUDIO_PLAYLIST
 };
 
-struct aachdr
-{
-	WORD sync:12;
-	WORD version:1;
-	WORD layer:2;
-	WORD fcrc:1;
-	WORD profile:2;
-	WORD freq:4;
-	WORD privatebit:1;
-	WORD channels:3;
-	WORD original:1;
-	WORD home:1; // ?
-
-	WORD copyright_id_bit:1;
-	WORD copyright_id_start:1;
-	WORD aac_frame_length:13;
-	WORD adts_buffer_fullness:11;
-	WORD no_raw_data_blocks_in_frame:2;
-
-	WORD crc;
-
-	int FrameSize, nBytesPerSec;
-	REFERENCE_TIME rtDuration;
-
-	aachdr() {
-		memset(this, 0, sizeof(*this));
-	}
-};
-
-static int aacfreq[] = {96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350};
-
 class __declspec(uuid("68F540E9-766F-44d2-AB07-E26CC6D27A79"))
 	CShoutcastSource
 	: public CSource
@@ -179,37 +148,41 @@ class CShoutcastStream : public CSourceStream
 
 	class CShoutcastSocket : public CMPCSocket
 	{
-		DWORD m_nBytesRead;
+		DWORD m_nBytesRead = 0;
 
 	public:
 		CShoutcastSocket() {
 			SetTimeOut(3000, 3000);
-			m_metaint		= m_bitrate = m_freq = m_channels = 0;
-			m_nBytesRead	= 0;
-			m_Format		= AUDIO_NONE;
 		}
 
 		int Receive(void* lpBuf, int nBufLen, int nFlags = 0);
 
-		DWORD m_metaint, m_bitrate, m_freq, m_channels;
-		aachdr m_aachdr;
-		StreamFormat m_Format;
-		CString m_title, m_url, m_Description;
+		StreamFormat m_Format	= AUDIO_NONE;
+		unsigned m_metaint		= 0;
+		unsigned m_bitrate		= 0;
+		unsigned m_samplerate	= 0;
+		unsigned m_channels		= 0;
+		unsigned m_framesize	= 0;
+		unsigned m_aacprofile	= 0;
+
+		CString m_title, m_url, m_description;
+
 		bool Connect(CUrl& url, CString& redirectUrl);
 		bool FindSync();
 
 		CShoutcastSocket& operator = (const CShoutcastSocket& soc) {
+			m_Format		= soc.m_Format;
 			m_metaint		= soc.m_metaint;
 			m_bitrate		= soc.m_bitrate;
-			m_freq			= soc.m_freq;
+			m_samplerate	= soc.m_samplerate;
 			m_channels		= soc.m_channels;
+			m_framesize		= soc.m_framesize;
+			m_aacprofile	= soc.m_aacprofile;
 			m_nBytesRead	= soc.m_nBytesRead;
-			m_Format		= soc.m_Format;
-			m_aachdr		= soc.m_aachdr;
 
 			m_title			= soc.m_title;
 			m_url			= soc.m_url;
-			m_Description	= soc.m_Description;
+			m_description	= soc.m_description;
 
 			return *this;
 		}
@@ -222,7 +195,7 @@ class CShoutcastStream : public CSourceStream
 	CUrl m_url;
 
 	bool m_fBuffering;
-	CString m_title, m_Description;
+	CString m_title, m_description;
 
 public:
 	CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, HRESULT* phr);

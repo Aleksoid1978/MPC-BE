@@ -39,96 +39,6 @@
 #define MPA_HEADER_SIZE		4
 #define ADTS_HEADER_SIZE	9
 
-static const DWORD s_bitrate[2][16] = {
-	{1,8,16,24,32,40,48,56,64,80,96,112,128,144,160,0},
-	{1,32,40,48,56,64,80,96,112,128,160,192,224,256,320,0}
-};
-
-static const DWORD s_freq[4][4] = {
-	{11025,12000,8000,0},
-	{0,0,0,0},
-	{22050,24000,16000,0},
-	{44100,48000,32000,0}
-};
-
-static const BYTE s_channels[4] = {
-	2,2,2,1 // stereo, joint stereo, dual, mono
-};
-
-struct mp3hdr {
-	WORD sync;
-	BYTE version;
-	BYTE layer;
-	DWORD bitrate;
-	DWORD freq;
-	BYTE channels;
-	DWORD framesize;
-
-	bool ExtractHeader(CSocket& socket) {
-		BYTE buff[4];
-		if (4 != socket.Receive(buff, 4, MSG_PEEK)) {
-			return false;
-		}
-
-		sync = (buff[0]<<4)|(buff[1]>>4)|1;
-		version = (buff[1]>>3)&3;
-		layer = 4 - ((buff[1]>>1)&3);
-		bitrate = s_bitrate[version&1][buff[2]>>4]*1000;
-		freq = s_freq[version][(buff[2]>>2)&3];
-		channels = s_channels[(buff[3]>>6)&3];
-		framesize = freq ? ((((version&1)?144:72) * bitrate / freq) + ((buff[2]>>1)&1)) : 0;
-
-		return (sync == 0xfff && layer == 3 && bitrate != 0 && freq != 0);
-	}
-
-	aachdr m_aachdr;
-
-	bool ExtractAACHeader(CSocket& socket) {
-		BYTE buff[ADTS_HEADER_SIZE];
-		if (ADTS_HEADER_SIZE != socket.Receive(buff, ADTS_HEADER_SIZE, MSG_PEEK)) {
-			return false;
-		}
-
-		CGolombBuffer gb(buff, ADTS_HEADER_SIZE);
-
-		WORD sync = gb.BitRead(12);
-		if (sync != 0xfff) {
-			return false;
-		}
-
-		m_aachdr.sync = sync;
-		m_aachdr.version = gb.BitRead(1);
-		m_aachdr.layer = gb.BitRead(2);
-		m_aachdr.fcrc = gb.BitRead(1);
-		m_aachdr.profile = gb.BitRead(2);
-		m_aachdr.freq = gb.BitRead(4);
-		m_aachdr.privatebit = gb.BitRead(1);
-		m_aachdr.channels = gb.BitRead(3);
-		m_aachdr.original = gb.BitRead(1);
-		m_aachdr.home = gb.BitRead(1);
-
-		m_aachdr.copyright_id_bit = gb.BitRead(1);
-		m_aachdr.copyright_id_start = gb.BitRead(1);
-		m_aachdr.aac_frame_length = gb.BitRead(13);
-		m_aachdr.adts_buffer_fullness = gb.BitRead(11);
-		m_aachdr.no_raw_data_blocks_in_frame = gb.BitRead(2);
-
-		if (m_aachdr.fcrc == 0) {
-			m_aachdr.crc = (WORD)gb.BitRead(16);
-		}
-
-		if (m_aachdr.layer != 0 || m_aachdr.freq > 12 || m_aachdr.aac_frame_length <= (m_aachdr.fcrc == 0 ? 9 : 7) || !m_aachdr.channels) {
-			return false;
-		}
-
-		m_aachdr.FrameSize = m_aachdr.aac_frame_length - (m_aachdr.fcrc == 0 ? 9 : 7);
-		m_aachdr.nBytesPerSec = m_aachdr.aac_frame_length * aacfreq[m_aachdr.freq] / 1024; // ok?
-		m_aachdr.rtDuration = 10000000i64 * 1024 / aacfreq[m_aachdr.freq]; // ok?
-
-		return true;
-	}
-};
-
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
@@ -413,7 +323,7 @@ CString CShoutcastStream::GetTitle()
 CString CShoutcastStream::GetDescription()
 {
 	CAutoLock cAutoLock(&m_queue);
-	return m_Description;
+	return m_description;
 }
 
 HRESULT CShoutcastStream::DecideBufferSize(IMemAllocator* pAlloc, ALLOCATOR_PROPERTIES* pProperties)
@@ -522,7 +432,7 @@ HRESULT CShoutcastStream::GetMediaType(int iPosition, CMediaType* pmt)
 		memset(wfe, 0, sizeof(WAVEFORMATEX));
 		wfe->wFormatTag			= (WORD)MEDIASUBTYPE_MP3.Data1;
 		wfe->nChannels			= (WORD)m_socket.m_channels;
-		wfe->nSamplesPerSec		= m_socket.m_freq;
+		wfe->nSamplesPerSec		= m_socket.m_samplerate;
 		wfe->nAvgBytesPerSec	= m_socket.m_bitrate / 8;
 		wfe->nBlockAlign		= 1;
 		wfe->wBitsPerSample		= 0;
@@ -534,11 +444,11 @@ HRESULT CShoutcastStream::GetMediaType(int iPosition, CMediaType* pmt)
 		WAVEFORMATEX* wfe		= (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + 5];
 		memset(wfe, 0, sizeof(WAVEFORMATEX) + 5);
 		wfe->wFormatTag			= WAVE_FORMAT_RAW_AAC1;
-		wfe->nChannels			= m_socket.m_aachdr.channels <= 6 ? m_socket.m_aachdr.channels : 2;
-		wfe->nSamplesPerSec		= aacfreq[m_socket.m_aachdr.freq];
-		wfe->nBlockAlign		= m_socket.m_aachdr.aac_frame_length;
-		wfe->nAvgBytesPerSec	= m_socket.m_aachdr.nBytesPerSec;
-		wfe->cbSize				= MakeAACInitData((BYTE*)(wfe + 1), m_socket.m_aachdr.profile, wfe->nSamplesPerSec, wfe->nChannels);
+		wfe->nChannels			= (WORD)m_socket.m_channels;
+		wfe->nSamplesPerSec		= m_socket.m_samplerate;
+		wfe->nBlockAlign		= m_socket.m_framesize;
+		wfe->nAvgBytesPerSec	= m_socket.m_bitrate / 8;
+		wfe->cbSize				= MakeAACInitData((BYTE*)(wfe + 1), m_socket.m_aacprofile, wfe->nSamplesPerSec, wfe->nChannels);
 
 		pmt->SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX) + wfe->cbSize);
 
@@ -598,7 +508,7 @@ UINT CShoutcastStream::SocketThreadProc()
 	soc = m_socket;
 
 	m_title			= soc.m_title;
-	m_Description	= soc.m_Description;
+	m_description	= soc.m_description;
 
 	REFERENCE_TIME m_rtSampleTime = 0;
 
@@ -641,8 +551,7 @@ UINT CShoutcastStream::SocketThreadProc()
 				for(;;) {
 					MOVE_TO_MPA_START_CODE(start, end);
 					if (start <= end - MPA_HEADER_SIZE) {
-						audioframe_t aframe;
-						int size = ParseMPAHeader(start, &aframe);
+						int size = ParseMPAHeader(start);
 						if (size == 0) {
 							start++;
 							continue;
@@ -652,7 +561,7 @@ UINT CShoutcastStream::SocketThreadProc()
 						}
 
 						if (start + size + MPA_HEADER_SIZE <= end) {
-							int size2 = ParseMPAHeader(start + size, &aframe);
+							int size2 = ParseMPAHeader(start + size);
 							if (size2 == 0) {
 								start++;
 								continue;
@@ -961,6 +870,17 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected Ogg format"));
 				}
 			}
+			else if (param == "content-length") {
+				ContentLength = atoi(value);
+			}
+			else if (param == "location") {
+				redirectUrl = value;
+			}
+			else if (param == "content-disposition") {
+				if (int pos = value.Find("filename=") >= 0) {
+					redirectUrl = _T("/") + CString(value.Mid(pos + 9).Trim());
+				}
+			}
 			else if (param == "icy-br") {
 				m_bitrate = atoi(value) * 1000;
 			}
@@ -973,19 +893,8 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 			else if (param == "icy-url") {
 				m_url = value;
 			}
-			else if (param == "content-length") {
-				ContentLength = atoi(value);
-			}
-			else if (param == "location") {
-				redirectUrl = value;
-			}
-			else if (param == "content-disposition") {
-				if (int pos = value.Find("filename=") >= 0) {
-					redirectUrl = _T("/") + CString(value.Mid(pos + 9).Trim());
-				}
-			}
 			else if (param == "icy-description") {
-				m_Description = ConvertStr(value);
+				m_description = ConvertStr(value);
 			}
 		}
 
@@ -1046,31 +955,34 @@ bool CShoutcastStream::CShoutcastSocket::FindSync()
 		return false; // not supported
 	}
 
-	m_freq = (DWORD)-1;
+	m_samplerate = (DWORD)-1;
 	m_channels = (DWORD)-1;
 
+	BYTE buff[10];
 	BYTE b;
 
 	if (m_Format == AUDIO_MPEG) {
 		for (int i = MAXFRAMESIZE; i > 0; i--, Receive(&b, 1)) {
-			mp3hdr h;
-			if (h.ExtractHeader(*this)) {
-				if (h.bitrate > 1) {
-					m_bitrate = h.bitrate;
+			if (4 == Receive(buff, 4, MSG_PEEK) && ParseMPAHeader(buff)) {
+				audioframe_t aframe;
+				m_framesize = ParseMPAHeader(buff, &aframe);
+				m_samplerate	= aframe.samplerate;
+				m_channels		= aframe.channels;
+				if (aframe.param1 > 1) {
+					m_bitrate = aframe.param1;
 				}
-				m_freq = h.freq;
-				m_channels = h.channels;
 
 				return true;
 			}
 		}
 	} else if (m_Format == AUDIO_AAC) {
 		for (int i = MAXFRAMESIZE; i > 0; i--, Receive(&b, 1)) {
-			mp3hdr h;
-			if (h.ExtractAACHeader(*this)) {
-				m_freq = aacfreq[h.m_aachdr.freq];
-				m_channels = h.m_aachdr.channels;
-				m_aachdr = h.m_aachdr;
+			if (9 == Receive(buff, 9, MSG_PEEK) && ParseADTSAACHeader(buff)) {
+				audioframe_t aframe;
+				m_framesize		= ParseADTSAACHeader(buff, &aframe);
+				m_samplerate	= aframe.samplerate;
+				m_channels		= aframe.channels;
+				m_aacprofile	= aframe.param2;
 
 				return true;
 			}
