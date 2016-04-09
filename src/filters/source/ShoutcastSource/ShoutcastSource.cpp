@@ -944,7 +944,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 			}
 			else if (param == "content-type") {
 				value.MakeLower();
-				if (value = "audio/mpeg") {
+				if (value == "audio/mpeg") {
 					m_Format = AUDIO_MPEG;
 					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected MPEG Audio format"));
 				}
@@ -952,11 +952,11 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 					m_Format = AUDIO_AAC;
 					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected AAC Audio format"));
 				}
-				else if (value = "audio/x-scpls") {
+				else if (value == "audio/x-scpls") {
 					m_Format = AUDIO_PLAYLIST;
 					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected Playlist format"));
 				}
-				else if (value = "application/ogg") {
+				else if (value == "application/ogg") {
 					// not supported yet
 					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected Ogg format"));
 				}
