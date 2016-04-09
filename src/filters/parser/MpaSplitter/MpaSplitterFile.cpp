@@ -49,11 +49,11 @@ CMpaSplitterFile::~CMpaSplitterFile()
 	SAFE_DELETE(m_pID3Tag);
 }
 
-#define MPA_FRAME_SIZE  4
-#define ADTS_FRAME_SIZE 9
+#define MPA_HEADER_SIZE  4
+#define ADTS_HEADER_SIZE 9
 
-#define MOVE_TO_MPA_START_CODE(b, e) while(b <= e - MPA_FRAME_SIZE  && ((GETWORD(b) & 0xe0ff) != 0xe0ff)) b++;
-#define MOVE_TO_AAC_START_CODE(b, e) while(b <= e - ADTS_FRAME_SIZE && ((GETWORD(b) & 0xf0ff) != 0xf0ff)) b++;
+#define MOVE_TO_MPA_START_CODE(b, e) while(b <= e - MPA_HEADER_SIZE  && ((GETWORD(b) & 0xe0ff) != 0xe0ff)) b++;
+#define MOVE_TO_AAC_START_CODE(b, e) while(b <= e - ADTS_HEADER_SIZE && ((GETWORD(b) & 0xf0ff) != 0xf0ff)) b++;
 
 #define FRAMES_FLAG 0x0001
 
@@ -135,7 +135,7 @@ HRESULT CMpaSplitterFile::Init()
 	__int64 startpos = 0;
 
 	const __int64 limit = IsRandomAccess() ? MEGABYTE : 64 * KILOBYTE;
-	const __int64 endDataPos = min(endpos - MPA_FRAME_SIZE, limit + m_startpos);
+	const __int64 endDataPos = min(endpos - MPA_HEADER_SIZE, limit + m_startpos);
 	const __int64 size = endDataPos - m_startpos;
 	BYTE* buffer = DNew BYTE[size];
 	if (S_OK == ByteRead(buffer, size)) {
@@ -143,7 +143,7 @@ HRESULT CMpaSplitterFile::Init()
 		BYTE* end   = start + size;
 		while (m_mode != mode::mpa) {
 			MOVE_TO_MPA_START_CODE(start, end);
-			if (start < end - MPA_FRAME_SIZE) {
+			if (start < end - MPA_HEADER_SIZE) {
 				startpos = m_startpos + (start - buffer);
 				int size = ParseMPAHeader(start);
 				if (size == 0) {
@@ -155,7 +155,7 @@ HRESULT CMpaSplitterFile::Init()
 				}
 
 				BYTE* start2 = start + size;
-				while (start2 + MPA_FRAME_SIZE <= end) {
+				while (start2 + MPA_HEADER_SIZE <= end) {
 					int size = ParseMPAHeader(start2);
 					if (size == 0) {
 						start++;
@@ -180,7 +180,7 @@ HRESULT CMpaSplitterFile::Init()
 			BYTE* end   = start + size;
 			while (m_mode != mode::mp4a) {
 				MOVE_TO_AAC_START_CODE(start, end);
-				if (start < end - ADTS_FRAME_SIZE) {
+				if (start < end - ADTS_HEADER_SIZE) {
 					startpos = m_startpos + (start - buffer);
 					int size = ParseADTSAACHeader(start);
 					if (size == 0) {
@@ -192,7 +192,7 @@ HRESULT CMpaSplitterFile::Init()
 					}
 
 					BYTE* start2 = start + size;
-					while (start2 + ADTS_FRAME_SIZE <= end) {
+					while (start2 + ADTS_HEADER_SIZE <= end) {
 						int size = ParseADTSAACHeader(start2);
 						if (size == 0) {
 							start++;
@@ -224,14 +224,14 @@ HRESULT CMpaSplitterFile::Init()
 	Seek(m_startpos);
 
 	if (m_mode == mode::mpa) {
-		Read(m_mpahdr, MPA_FRAME_SIZE, &m_mt, true);
+		Read(m_mpahdr, MPA_HEADER_SIZE, &m_mt, true);
 	} else {
-		Read(m_aachdr, ADTS_FRAME_SIZE, &m_mt, false);
+		Read(m_aachdr, ADTS_HEADER_SIZE, &m_mt, false);
 	}
 
 	if (m_mode == mode::mpa) {
 		DWORD dwFrames = 0;		// total number of frames
-		Seek(m_startpos + MPA_FRAME_SIZE + 32);
+		Seek(m_startpos + MPA_HEADER_SIZE + 32);
 		if (BitRead(32, true) == 'Xing' || BitRead(32, true) == 'Info') {
 			BitRead(32); // Skip ID tag
 			DWORD dwFlags = (DWORD)BitRead(32);
@@ -294,17 +294,17 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 	__int64 endpos = min(GetLength(), GetPos() + limit);
 
 	if (m_mode == mode::mpa) {
-		while (GetPos() <= endpos - MPA_FRAME_SIZE) {
+		while (GetPos() <= endpos - MPA_HEADER_SIZE) {
 			mpahdr h;
 
 			if (Read(h, (int)(endpos - GetPos()), NULL, true, true)) {
-				Seek(GetPos() - MPA_FRAME_SIZE);
+				Seek(GetPos() - MPA_HEADER_SIZE);
 				if (bExtraCheck) {
 					__int64 pos = GetPos();
-					if (pos + h.FrameSize + MPA_FRAME_SIZE < GetLength()) {
+					if (pos + h.FrameSize + MPA_HEADER_SIZE < GetLength()) {
 						Seek(pos + h.FrameSize);
 						mpahdr h2;
-						if (!Read(h2, MPA_FRAME_SIZE, NULL, true)) {
+						if (!Read(h2, MPA_HEADER_SIZE, NULL, true)) {
 							Seek(pos + 1);
 							continue;
 						}
