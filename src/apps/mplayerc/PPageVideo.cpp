@@ -418,7 +418,12 @@ void CPPageVideo::OnSurfaceChange()
 			break;
 		case SURFACE_TEXTURE3D:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_TEXTURESURF3D), &m_cbAPSurfaceUsage);
-			m_cbDX9SurfaceFormat.EnableWindow(TRUE);
+			const int vrenderer = GetCurItemData(m_cbVideoRenderer);
+			if (vrenderer == VIDRNDT_VMR9RENDERLESS || vrenderer == VIDRNDT_EVR_CUSTOM) {
+				m_cbDX9SurfaceFormat.EnableWindow(TRUE);
+			} else {
+				m_cbDX9SurfaceFormat.EnableWindow(FALSE);
+			}
 			break;
 	}
 
