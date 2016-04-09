@@ -414,56 +414,9 @@ CString GetFilterName(IBaseFilter* pBF)
 	CString name;
 
 	if (pBF) {
-		/*
-		CLSID clsid = GetCLSID(pBF);
-		// system source filters
-		if (clsid == CLSID_AsyncReader) {
-			name = _T("File Source (Async.)");
-		} else if (clsid == CLSID_URLReader) {
-			name = _T("File Source (URL)");
-		} else if (clsid == CLSID_WMAsfReader) {
-			name = _T("WM ASF Reader");
-		} else if (clsid == CLSID_StreamBufferSource) {
-			name = _T("StreamBufferSource");
-		} else if (clsid == CLSID_AVIDoc) {
-			name = _T("AVI/WAV File Source");
-		// third-party actual filters
-		} else if (clsid == GUIDFromCString(_T("{D8980E15-E1F6-4916-A10F-D7EB4E9E10B8}"))) {
-			name = _T("AV Source");
-		} else if (clsid == GUIDFromCString(_T("{B98D13E7-55DB-4385-A33D-09FD1BA26338}"))) {
-			name = _T("LAV Splitter Source");
-		} else if (clsid == GUIDFromCString(_T("{55DA30FC-F16B-49FC-BAA5-AE59FC65F82D}"))) {
-			name = _T("Haali Media Source");
-		} else if (clsid == GUIDFromCString(_T("{D042079E-8E02-418B-AE2F-F12E26704FCA}"))) {
-			name = _T("APE DirectShow Filter");
-		// ArcSoft filters
-		} else if (clsid == GUIDFromCString(_T("{F4670DEF-0302-4F5E-BA74-843F2EC2B7C7}"))) {
-			name = _T("ArcSoft MP4 Splitter");
-		} else if (clsid == GUIDFromCString(_T("{A14CA03A-EC25-4D32-95B4-F03BA27B3D65}"))) {
-			name = _T("Arcsoft Web MP4 Splitter");
-		} else if (clsid == GUIDFromCString(_T("{F710DD5E-3ED7-442F-BA31-4BD2DF7F4366}"))) {
-			name = _T("ArcSoft 3GP Splitter");
-		} else if (clsid == GUIDFromCString(_T("{0ABA1910-9B72-4FB7-A297-BE387E532872}"))) {
-			name = _T("ArcSoft AMR/LPCM Splitter");
-		} else if (clsid == GUIDFromCString(_T("{1778D15A-18D4-4297-A322-6033153EF1AC}"))) {
-			name = _T("ArcSoft ASF Splitter");
-		} else if (clsid == GUIDFromCString(_T("{81719985-2940-4577-928E-B3C08E11B4D6}"))) {
-			name = _T("ArcSoft Dvrms Splitter");
-		} else if (clsid == GUIDFromCString(_T("{CC6AA236-0CDE-4C02-9518-766F7FEB2AC9}"))) {
-			name = _T("ArcSoft FLV Splitter");
-		} else if (clsid == GUIDFromCString(_T("{A3DC56BC-E71E-45C5-9A3A-E8AFABD3C1AA}"))) {
-			name = _T("ArcSoft Lossless Splitter");
-		} else if (clsid == GUIDFromCString(_T("{58DBF268-84B8-476E-B598-6C6DEA43DECC}"))) {
-			name = _T("ArcSoft Matroska Stream");
-		} else if (clsid == GUIDFromCString(_T("{B7493763-94F4-4D7F-93EB-18D54C41D1AA}"))) {
-			name = _T("ArcSoft Subtitle Splitter");
-		// other
-		} else */
-		{
-			CFilterInfo fi;
-			if (SUCCEEDED(pBF->QueryFilterInfo(&fi))) {
-				name = fi.achName;
-			}
+		CFilterInfo fi;
+		if (SUCCEEDED(pBF->QueryFilterInfo(&fi))) {
+			name = fi.achName;
 		}
 	}
 
