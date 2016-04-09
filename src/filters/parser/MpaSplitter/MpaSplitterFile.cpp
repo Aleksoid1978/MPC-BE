@@ -145,8 +145,7 @@ HRESULT CMpaSplitterFile::Init()
 			MOVE_TO_MPA_START_CODE(start, end);
 			if (start < end - MPA_FRAME_SIZE) {
 				startpos = m_startpos + (start - buffer);
-				audioframe_t aframe;
-				int size = ParseMPAHeader(start, &aframe);
+				int size = ParseMPAHeader(start);
 				if (size == 0) {
 					start++;
 					continue;
@@ -157,7 +156,7 @@ HRESULT CMpaSplitterFile::Init()
 
 				BYTE* start2 = start + size;
 				while (start2 + MPA_FRAME_SIZE <= end) {
-					int size = ParseMPAHeader(start2, &aframe);
+					int size = ParseMPAHeader(start2);
 					if (size == 0) {
 						start++;
 						m_mode = mode::none;
@@ -183,8 +182,7 @@ HRESULT CMpaSplitterFile::Init()
 				MOVE_TO_AAC_START_CODE(start, end);
 				if (start < end - ADTS_FRAME_SIZE) {
 					startpos = m_startpos + (start - buffer);
-					audioframe_t aframe;
-					int size = ParseADTSAACHeader(start, &aframe);
+					int size = ParseADTSAACHeader(start);
 					if (size == 0) {
 						start++;
 						continue;
@@ -195,7 +193,7 @@ HRESULT CMpaSplitterFile::Init()
 
 					BYTE* start2 = start + size;
 					while (start2 + ADTS_FRAME_SIZE <= end) {
-						int size = ParseADTSAACHeader(start2, &aframe);
+						int size = ParseADTSAACHeader(start2);
 						if (size == 0) {
 							start++;
 							m_mode = mode::none;

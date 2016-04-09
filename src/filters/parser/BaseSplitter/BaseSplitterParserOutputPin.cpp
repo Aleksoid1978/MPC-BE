@@ -279,8 +279,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAAC(CAutoPtr<CPacket> p)
 			}
 
 			if (start + size + 9 <= end) {
-				audioframe_t aframe2;
-				int size2 = ParseADTSAACHeader(start + size, &aframe2);
+				int size2 = ParseADTSAACHeader(start + size);
 				if (size2 == 0) {
 					start++;
 					continue;
@@ -721,8 +720,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseHDMVLPCM(CAutoPtr<CPacket> p)
 
 	HRESULT hr = S_OK;
 
-	audioframe_t aframe;
-	if (ParseHdmvLPCMHeader(p->GetData(), &aframe)) {
+	if (ParseHdmvLPCMHeader(p->GetData())) {
 		p->RemoveAt(0, 4);
 		hr = __super::DeliverPacket(p);
 	}
@@ -749,8 +747,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAC3(CAutoPtr<CPacket> p)
 	for(;;) {
 		MOVE_TO_AC3_START_CODE(start, end);
 		if (start <= end - 8) {
-			audioframe_t aframe;
-			int size = ParseAC3Header(start, &aframe);
+			int size = ParseAC3Header(start);
 			if (size == 0) {
 				start++;
 				continue;
@@ -760,7 +757,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAC3(CAutoPtr<CPacket> p)
 			}
 
 			if (start + size + 8 <= end) {
-				int size2 = ParseAC3Header(start + size, &aframe);
+				int size2 = ParseAC3Header(start + size);
 				if (size2 == 0) {
 					start++;
 					continue;
@@ -1010,8 +1007,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
 	for(;;) {
 		MOVE_TO_DTS_START_CODE(start, end);
 		if (start <= end - 16) {
-			audioframe_t aframe;
-			int size = ParseDTSHeader(start, &aframe);
+			int size = ParseDTSHeader(start);
 			if (size == 0) {
 				start++;
 				continue;
@@ -1029,7 +1025,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
 			}
 
 			if (start + size + sizehd + 16 <= end) {
-				if (!ParseDTSHeader(start + size + sizehd, &aframe)) {
+				if (!ParseDTSHeader(start + size + sizehd)) {
 					start++;
 					continue;
 				}
