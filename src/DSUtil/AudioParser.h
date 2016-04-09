@@ -68,4 +68,4 @@ int ParseMLPHeader			(const BYTE* buf, audioframe_t* audioframe = NULL);			// ne
 int ParseDTSHeader			(const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 10 bytes, param1 = transmission bitrate, param2 = x96k extension flag
 int ParseDTSHDHeader		(const BYTE* buf, const int buffsize = 0, audioframe_t* audioframe = NULL); // need >= 20 bytes, param1 = bitdepth
 int ParseHdmvLPCMHeader		(const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 4 bytes,  param1 = bitdepth, param2 = bytes per frame
-int ParseADTSAACHeader		(const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 7 bytes,  param1 = header size
+int ParseADTSAACHeader		(const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 7 bytes,  param1 = header size, param2 = MPEG-4 Audio Object Type
