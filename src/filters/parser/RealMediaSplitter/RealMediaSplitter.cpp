@@ -978,6 +978,9 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 			}
 
 			int len2 = min(len - (pIn - pInOrg), int(packetlen - packetoffset));
+			if (len2 <= 0) {
+				return E_FAIL;
+			}
 			if (m_segments.IsEmpty()) {
 				packetoffset = 0;
 			}
