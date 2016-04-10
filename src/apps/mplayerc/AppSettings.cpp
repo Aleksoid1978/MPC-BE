@@ -1525,12 +1525,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iYoutubeTag				= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_TAG, 0);
 	bYoutubeLoadPlaylist	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, FALSE);
 
-	// TODO: remove it
-	iYoutubeSource			= 0;
-	iYoutubeMemoryType		= 0;
-	iYoutubePercentMemory	= 5;
-	iYoutubeMbMemory		= 3;
-
 	nLastFileInfoPage		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, 0);
 
 	bUpdaterAutoCheck		= !!pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, 0);

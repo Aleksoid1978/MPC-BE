@@ -843,10 +843,6 @@ public:
 	bool			bYoutubePageParser;
 	int				iYoutubeTag;
 	bool			bYoutubeLoadPlaylist;
-	int				iYoutubeSource;
-	int				iYoutubeMemoryType;
-	DWORD			iYoutubePercentMemory;
-	DWORD			iYoutubeMbMemory;
 
 	DWORD			nLastFileInfoPage;
 
