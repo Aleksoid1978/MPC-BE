@@ -7,8 +7,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
-
+#include "afxres.h"
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -223,12 +222,9 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Open options",IDC_STATIC,5,5,115,71
-    CONTROL         "Force a single process",IDC_RADIO1,
-                    "Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP,10,53,105,18
-    CONTROL         "Use same process for every file",IDC_RADIO2,
-                    "Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,17,105,18
-    CONTROL         "New process for every file",IDC_RADIO3,
-                    "Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,35,105,18
+    CONTROL         "Force a single process",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP,10,53,105,18
+    CONTROL         "Use same process for every file",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,17,105,18
+    CONTROL         "New process for every file",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,35,105,18
     GROUPBOX        "Title bar",IDC_STATIC,5,80,115,68,WS_GROUP
     CONTROL         "Display full path",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,92,105,8
     CONTROL         "File name only",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,10,104,105,8
@@ -275,8 +271,7 @@ BEGIN
     GROUPBOX        "Additional settings",IDC_STATIC,5,140,286,37
     CONTROL         "Allow closed captions in 'Line 21 Decoder'",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,152,220,8
-    CONTROL         "Start playback from Main Title",IDC_CHECK3,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,164,220,8
+    CONTROL         "Start playback from Main Title",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,164,220,8
 END
 
 IDD_PPAGEPLAYBACK DIALOGEX 0, 0, 296, 241
@@ -428,7 +423,8 @@ BEGIN
     CONTROL         "",IDC_SPIN10,"msctls_updown32",UDS_WRAP | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,158,199,12,13
     CONTROL         "Shadow",IDC_CHECK_SHADOW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,224,167,46,8
     CONTROL         "Anti-aliasing",IDC_CHECK_AA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,224,179,61,8
-    CONTROL         "Use Windows 7 (and above) Taskbar features",IDC_CHECK_WIN7,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,219,270,11
+    CONTROL         "Use Windows 7 (and above) Taskbar features",IDC_CHECK_WIN7,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,219,270,11
 END
 
 IDD_PPAGEEXTERNALFILTERS DIALOGEX 0, 0, 296, 241
@@ -820,21 +816,11 @@ IDD_PPAGEYOUTUBE DIALOGEX 0, 0, 296, 236
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Additional settings",IDC_STATIC1,5,60,285,41
-    LTEXT           "Preferred format:",IDC_STATIC2,10,73,104,8
-    COMBOBOX        IDC_COMBO1,114,70,172,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Load playlist",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,87,100,10
-    GROUPBOX        "Source",IDC_STATIC,5,3,285,54
-    CONTROL         "Internal downloader",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,15,147,10
-    CONTROL         "File Source (URL)",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,30,147,8
-    CONTROL         "External source filter",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,10,44,147,8
-    GROUPBOX        "Initial buffer size",IDC_STATIC3,5,104,285,40,WS_GROUP
-    CONTROL         "% of source file size",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,114,89,10
-    CONTROL         "Mb",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,10,130,89,8
-    EDITTEXT        IDC_EDIT1,102,114,33,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
-    CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,134,113,11,14
-    EDITTEXT        IDC_EDIT2,102,128,33,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,134,127,11,14
+    GROUPBOX        "",IDC_STATIC,5,3,285,30
+    CONTROL         "Use the built-in web page parser",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,3,100,10
+    LTEXT           "Preferred format:",IDC_STATIC2,10,17,104,8
+    COMBOBOX        IDC_COMBO1,114,14,172,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Load playlist",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,36,100,10
 END
 
 IDD_AUTH_DLG DIALOGEX 0, 0, 213, 127
@@ -1130,7 +1116,8 @@ BEGIN
     CONTROL         "Prefer external subtitles over embedded subtitles",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,55,285,8
     CONTROL         "Ignore embedded subtitles",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,67,285,8
-    CONTROL         "Auto-reload subtitle files after detecting modification",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,8
+    CONTROL         "Auto-reload subtitle files after detecting modification",IDC_CHECK3,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,8
     CONTROL         "Use Subresync",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,8
     GROUPBOX        "Online database",IDC_STATIC,5,105,286,45
     LTEXT           "Base URL of the online subtitle database:",IDC_STATIC,10,116,222,8

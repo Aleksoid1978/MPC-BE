@@ -184,7 +184,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
 18		"Ետարկել"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 5		"DVD սարքավարի կամ ""VIDEO_TS"" թղթապանակի տեղը"" folder"
 6		"Ըստ ծրագրայինի"
 7		"Օգտագործողի կողմից նշված ճանապարհը."
@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Վերականգնել չափը՝ ծրագրիը փակելիս"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 6		"Use the ""dark"" theme (default)"
 7		"Brightness :"
 9		"Setting the color of the indicator of sound:"
@@ -361,35 +361,35 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Հաշվետվություն՝ ցուցադրման հոսքերի սխալների համար"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"Բացելու ընտրանքներ"
 6		"Force a single process"
-8		"Use same process for every file"
-10		"New process for every file"
-12		"Գլխագրում"
-13		"Ցուցադրել ամբողջական ճ-ը"
-14		"Միայն ֆայլի անունը"
-15		"Ոչինիչ ցույց չտալ"
-16		"Փոխել ֆայլի անունը՝ վերնագրով"
-17		"Պատմությունը"
-18		"Պահպանել բացված ֆայլերի պատ-ը"
-20		"Number of recent files:"
-23		"Հիշել DVD-ի դիրքը"
-24		"Հիշել ֆայլի դիրքը"
-25		"Հիշել դիրքը"
-26		"Հիշել չափը"
-27		"Հիշել վերջին Pan-n-Scan չափը"
-28		"Remember last playlist"
-29		"Այլ"
-30		"Պատկերակը առաջադրանքների վահանակ."
-31		"Ցուցադրել OSD-ն (պահ.է վերամեկնարկում)"
-32		"Show name of media file"
-33		"Show seek time"
-34		"Համամասնությունը ինչպես որ կադրում"
-35		"Ամրացնել էկրանի սահմաններին"
-36		"Store settings in the player folder"
-37		"Անջատել 'Բացել սկավառակը' ընտրացանկը"
-38		"Գործողության բարձր առաջնայնություն"
+7		"Use same process for every file"
+8		"New process for every file"
+9		"Գլխագրում"
+10		"Ցուցադրել ամբողջական ճ-ը"
+11		"Միայն ֆայլի անունը"
+12		"Ոչինիչ ցույց չտալ"
+13		"Փոխել ֆայլի անունը՝ վերնագրով"
+14		"Պատմությունը"
+15		"Պահպանել բացված ֆայլերի պատ-ը"
+17		"Number of recent files:"
+20		"Հիշել DVD-ի դիրքը"
+21		"Հիշել ֆայլի դիրքը"
+22		"Հիշել դիրքը"
+23		"Հիշել չափը"
+24		"Հիշել վերջին Pan-n-Scan չափը"
+25		"Remember last playlist"
+26		"Այլ"
+27		"Պատկերակը առաջադրանքների վահանակ."
+28		"Ցուցադրել OSD-ն (պահ.է վերամեկնարկում)"
+29		"Show name of media file"
+30		"Show seek time"
+31		"Համամասնությունը ինչպես որ կադրում"
+32		"Ամրացնել էկրանի սահմաններին"
+33		"Store settings in the player folder"
+34		"Անջատել 'Բացել սկավառակը' ընտրացանկը"
+35		"Գործողության բարձր առաջնայնություն"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -438,17 +438,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 5		"Subtitle renderer:"
 7		"Տողագրերի ճանապարհը"
 9		"Ետարկել"
 10		"Միշտ օգտագործել արտաքին տողագրերը որպես հիմնական"
 12		"Չօգտագործել ներքին տողագրերը"
 13		"Auto-reload subtitle files after detecting modification"
-14		"Use Subresync"
-15		"Ցանցային տվյալներ"
-16		"Տողագրերի ցանցային բազայի URL-ն."
-19		"Թեստ"
+15		"Use Subresync"
+16		"Ցանցային տվյալներ"
+17		"Տողագրերի ցանցային բազայի URL-ն."
+20		"Թեստ"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
@@ -511,17 +511,10 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI մեկնիչ. (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
-5		"Additional settings"
-6		"Preferred format:"
-8		"Load playlist"
-9		"Source"
-10		"Internal downloader"
-11		"File Source (URL)"
-12		"External source filter"
-13		"Initial buffer size"
-14		"% of source file size"
-15		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+6		"Use the built-in web page parser"
+7		"Preferred format:"
+9		"Load playlist"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

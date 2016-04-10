@@ -27,7 +27,6 @@
 IMPLEMENT_DYNAMIC(CPPageYoutube, CPPageBase)
 CPPageYoutube::CPPageYoutube()
 	: CPPageBase(CPPageYoutube::IDD, CPPageYoutube::IDD)
-	, m_iYoutubeSourceType(0)
 {
 }
 
@@ -39,22 +38,13 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Control(pDX, IDC_COMBO1, m_iYoutubeFormatCtrl);
-	DDX_Control(pDX, IDC_CHECK1, m_chkYoutubeLoadPlaylist);
-	DDX_Radio(pDX, IDC_RADIO1, m_iYoutubeSourceType);
-	DDX_Radio(pDX, IDC_RADIO4, m_iYoutubeMemoryType);
-	DDX_Control(pDX, IDC_SPIN1, m_nPercentMemoryCtrl);
-	DDX_Control(pDX, IDC_SPIN2, m_nMbMemoryCtrl);
-	DDX_Text(pDX, IDC_EDIT1, m_iYoutubePercentMemory);
-	DDX_Text(pDX, IDC_EDIT2, m_iYoutubeMbMemory);
-
-	m_iYoutubePercentMemory = clamp(m_iYoutubePercentMemory, 1ul, 100ul);
-	m_iYoutubeMbMemory = clamp(m_iYoutubeMbMemory, 1ul, 128ul);
+	DDX_Control(pDX, IDC_CHECK2, m_chkPageParser);
+	DDX_Control(pDX, IDC_COMBO1, m_cbPreferredFormat);
+	DDX_Control(pDX, IDC_CHECK1, m_chkLoadPlaylist);
 }
 
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
-	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO1, IDC_RADIO3, OnBnClickedRadio13)
-	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO4, IDC_RADIO5, OnBnClickedRadio45)
+	ON_COMMAND(IDC_CHECK2, OnCheckPageParser)
 END_MESSAGE_MAP()
 
 // CPPageYoutube message handlers
@@ -67,7 +57,9 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m_iYoutubeFormatCtrl.Clear();
+	m_chkPageParser.SetCheck(s.bYoutubePageParser);
+
+	m_cbPreferredFormat.Clear();
 
 	for (size_t i = 0; i < _countof(YoutubeParser::youtubeVideoProfiles); i++) {
 		CString fmt;
@@ -113,34 +105,26 @@ BOOL CPPageYoutube::OnInitDialog()
 			fmt.AppendFormat(_T("%s"), fps);
 		}
 
-		m_iYoutubeFormatCtrl.AddString(fmt);
-		m_iYoutubeFormatCtrl.SetItemData(i, YoutubeParser::youtubeVideoProfiles[i].iTag);
+		m_cbPreferredFormat.AddString(fmt);
+		m_cbPreferredFormat.SetItemData(i, YoutubeParser::youtubeVideoProfiles[i].iTag);
 	}
 
 	int j = 0;
-	for (j = 0; j < m_iYoutubeFormatCtrl.GetCount(); j++) {
-		if (m_iYoutubeFormatCtrl.GetItemData(j) == s.iYoutubeTag) {
-			m_iYoutubeFormatCtrl.SetCurSel(j);
+	for (j = 0; j < m_cbPreferredFormat.GetCount(); j++) {
+		if (m_cbPreferredFormat.GetItemData(j) == s.iYoutubeTag) {
+			m_cbPreferredFormat.SetCurSel(j);
 			break;
 		}
 	}
-	if (j >= m_iYoutubeFormatCtrl.GetCount()) {
-		m_iYoutubeFormatCtrl.SetCurSel(0);
+	if (j >= m_cbPreferredFormat.GetCount()) {
+		m_cbPreferredFormat.SetCurSel(0);
 	}
 
-	m_chkYoutubeLoadPlaylist.SetCheck(s.bYoutubeLoadPlaylist);
+	m_chkLoadPlaylist.SetCheck(s.bYoutubeLoadPlaylist);
 
-	m_nPercentMemoryCtrl.SetRange(1, 100);
-	m_nMbMemoryCtrl.SetRange(1, 128);
-
-	m_iYoutubeSourceType	= s.iYoutubeSource;
-	m_iYoutubeMemoryType	= s.iYoutubeMemoryType ? 1 : 0;
-	m_iYoutubePercentMemory	= s.iYoutubePercentMemory;
-	m_iYoutubeMbMemory		= s.iYoutubeMbMemory;
+	CorrectCWndWidth(GetDlgItem(IDC_CHECK2));
 
 	UpdateData(FALSE);
-
-	UpdateMemoryCtrl();
 
 	return TRUE;
 }
@@ -151,71 +135,23 @@ BOOL CPPageYoutube::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.iYoutubeTag			= GetCurItemData(m_iYoutubeFormatCtrl);
-	s.bYoutubeLoadPlaylist	= !!m_chkYoutubeLoadPlaylist.GetCheck();
-	s.iYoutubeSource		= m_iYoutubeSourceType;
-	s.iYoutubeMemoryType	= m_iYoutubeMemoryType;
-	s.iYoutubePercentMemory	= m_iYoutubePercentMemory;
-	s.iYoutubeMbMemory		= m_iYoutubeMbMemory;
+	s.bYoutubePageParser	= !!m_chkPageParser.GetCheck();
+	s.iYoutubeTag			= GetCurItemData(m_cbPreferredFormat);
+	s.bYoutubeLoadPlaylist	= !!m_chkLoadPlaylist.GetCheck();
 
 	return __super::OnApply();
 }
 
-void CPPageYoutube::OnBnClickedRadio13(UINT nID)
+void CPPageYoutube::OnCheckPageParser()
 {
-	SetModified();
-	UpdateMemoryCtrl();
-}
-
-void CPPageYoutube::OnBnClickedRadio45(UINT nID)
-{
-	SetModified();
-}
-
-void CPPageYoutube::UpdateMemoryCtrl()
-{
-	switch (GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO3)) {
-		case IDC_RADIO1:
-			GetDlgItem(IDC_STATIC1)->ShowWindow(TRUE);
-			GetDlgItem(IDC_STATIC2)->ShowWindow(TRUE);
-			GetDlgItem(IDC_COMBO1)->ShowWindow(TRUE);
-			GetDlgItem(IDC_CHECK1)->ShowWindow(TRUE);
-
-			GetDlgItem(IDC_STATIC3)->ShowWindow(TRUE);
-			GetDlgItem(IDC_RADIO4)->ShowWindow(TRUE);
-			GetDlgItem(IDC_RADIO5)->ShowWindow(TRUE);
-			GetDlgItem(IDC_EDIT1)->ShowWindow(TRUE);
-			GetDlgItem(IDC_EDIT2)->ShowWindow(TRUE);
-			GetDlgItem(IDC_SPIN1)->ShowWindow(TRUE);
-			GetDlgItem(IDC_SPIN2)->ShowWindow(TRUE);
-			break;
-		case IDC_RADIO2:
-			GetDlgItem(IDC_STATIC1)->ShowWindow(TRUE);
-			GetDlgItem(IDC_STATIC2)->ShowWindow(TRUE);
-			GetDlgItem(IDC_COMBO1)->ShowWindow(TRUE);
-			GetDlgItem(IDC_CHECK1)->ShowWindow(TRUE);
-
-			GetDlgItem(IDC_STATIC3)->ShowWindow(FALSE);
-			GetDlgItem(IDC_RADIO4)->ShowWindow(FALSE);
-			GetDlgItem(IDC_RADIO5)->ShowWindow(FALSE);
-			GetDlgItem(IDC_EDIT1)->ShowWindow(FALSE);
-			GetDlgItem(IDC_EDIT2)->ShowWindow(FALSE);
-			GetDlgItem(IDC_SPIN1)->ShowWindow(FALSE);
-			GetDlgItem(IDC_SPIN2)->ShowWindow(FALSE);
-			break;
-		case IDC_RADIO3:
-			GetDlgItem(IDC_STATIC1)->ShowWindow(FALSE);
-			GetDlgItem(IDC_STATIC2)->ShowWindow(FALSE);
-			GetDlgItem(IDC_COMBO1)->ShowWindow(FALSE);
-			GetDlgItem(IDC_CHECK1)->ShowWindow(FALSE);
-
-			GetDlgItem(IDC_STATIC3)->ShowWindow(FALSE);
-			GetDlgItem(IDC_RADIO4)->ShowWindow(FALSE);
-			GetDlgItem(IDC_RADIO5)->ShowWindow(FALSE);
-			GetDlgItem(IDC_EDIT1)->ShowWindow(FALSE);
-			GetDlgItem(IDC_EDIT2)->ShowWindow(FALSE);
-			GetDlgItem(IDC_SPIN1)->ShowWindow(FALSE);
-			GetDlgItem(IDC_SPIN2)->ShowWindow(FALSE);
-			break;
+	if (m_chkPageParser.GetCheck()) {
+		GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
+		m_cbPreferredFormat.EnableWindow(TRUE);
+	} else {
+		GetDlgItem(IDC_STATIC2)->EnableWindow(FALSE);
+		m_cbPreferredFormat.EnableWindow(FALSE);
 	}
+
+	SetModified();
 }
+

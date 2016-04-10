@@ -184,7 +184,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
 18		"Berrezarri"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 5		"DVD gidagailuaren edo ""VIDEO_TS"" agiritegiaren helbidea"
 6		"Berezkoa"
 7		"Erabiltzaileak adierazitako helburua:"
@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Leheneratu bereizmena programatik irtetzerakoan"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 6		"Erabili ""iluna"" azalgaia (berezkoa)"
 7		"Dizdira :"
 9		"Soinu adierazle margo ezarpena:"
@@ -361,35 +361,35 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Jakinarazi aurkezlean huts egiten duten pin-ak"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"Ireki aukerak"
 6		"Behartu prozesu bakarra"
-8		"Erabili prozesu berdina agiri guztientzat"
-10		"Prozesu berria agiri bakoitzarentzat"
-12		"Izenburu barra"
-13		"Erakutsi helburu osoa"
-14		"Agiri izena bakarrik"
-15		"Ez aurrizkitu ezer"
-16		"Ordeztu agiri izena izenburuarekin"
-17		"Historia"
-18		"Heutsi berriki irekitako agirien historiari"
-20		"Azken agiri zenbatekoa:"
-23		"Gogoratu DVD-aren kokapena"
-24		"Gogoratu Agiriaren kokapena"
-25		"Gogoratu azken leiho kokapena"
-26		"Gogoratu azken leiho neurria"
-27		"Gogoratu azken Pan-eta-Scan Zooma"
-28		"Gogoratu azken irakur-zerrenda"
-29		"Beste"
-30		"Erretilu ikurra"
-31		"Erakutsi IGE (beharrezkoa berrabiaratzea)"
-32		"Show name of media file"
-33		"Show seek time"
-34		"Mugatu leiho proportzioak birneurriratzean"
-35		"Finkatu mahaigain hertzetara"
-36		"Biltegiratu ezarpenak irakurgailuaren agiritegian"
-37		"Ezgaitu 'Ireki Diska' menua"
-38		"Ekinbide lehentasuna arruntetik gora"
+7		"Erabili prozesu berdina agiri guztientzat"
+8		"Prozesu berria agiri bakoitzarentzat"
+9		"Izenburu barra"
+10		"Erakutsi helburu osoa"
+11		"Agiri izena bakarrik"
+12		"Ez aurrizkitu ezer"
+13		"Ordeztu agiri izena izenburuarekin"
+14		"Historia"
+15		"Heutsi berriki irekitako agirien historiari"
+17		"Azken agiri zenbatekoa:"
+20		"Gogoratu DVD-aren kokapena"
+21		"Gogoratu Agiriaren kokapena"
+22		"Gogoratu azken leiho kokapena"
+23		"Gogoratu azken leiho neurria"
+24		"Gogoratu azken Pan-eta-Scan Zooma"
+25		"Gogoratu azken irakur-zerrenda"
+26		"Beste"
+27		"Erretilu ikurra"
+28		"Erakutsi IGE (beharrezkoa berrabiaratzea)"
+29		"Show name of media file"
+30		"Show seek time"
+31		"Mugatu leiho proportzioak birneurriratzean"
+32		"Finkatu mahaigain hertzetara"
+33		"Biltegiratu ezarpenak irakurgailuaren agiritegian"
+34		"Ezgaitu 'Ireki Diska' menua"
+35		"Ekinbide lehentasuna arruntetik gora"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -438,17 +438,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Berrezarri"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 5		"Subtitle renderer:"
 7		"Berez-gertatu helburuak"
 9		"Berrezarri"
 10		"Hobetsi kanpoko azpidatziak barneko azpidatziei"
 12		"Ezikusi barneratutako azpidatziak"
 13		"Berez-birgertatu azpidatzi agiriak aldaketa atzeman ondoren"
-14		"Erabili Azpberraldb"
-15		"Online datubasea"
-16		"Onlineko azpidatzi datubaseko URL-a:"
-19		"Azterketa"
+15		"Erabili Azpberraldb"
+16		"Online datubasea"
+17		"Onlineko azpidatzi datubaseko URL-a:"
+20		"Azterketa"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
@@ -511,17 +511,10 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI kudeatzaileak: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
-5		"Additional settings"
-6		"Heuskarri Hobetsia:"
-8		"Gertatu irakur-zerrenda"
-9		"Source"
-10		"Internal downloader"
-11		"Agiri Iturburua"
-12		"External source filter"
-13		"Hasierako buffer neurria"
-14		"Iturburu agiri neurriaren %-a"
-15		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+6		"Use the built-in web page parser"
+7		"Heuskarri Hobetsia:"
+9		"Gertatu irakur-zerrenda"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

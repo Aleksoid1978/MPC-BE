@@ -184,7 +184,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
 18		"Reiniciar"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 5		"Ubicación de la unidad de DVD o de la carpeta ""VIDEO_TS"""
 6		"Predeterminada"
 7		"Usar ruta definida:"
@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Restaurar resolución al salir"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 6		"Use the ""dark"" theme (default)"
 7		"Brightness :"
 9		"Setting the color of the indicator of sound:"
@@ -361,35 +361,35 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Reportar conectores que no quieran funcionar"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"Opciones de apertura"
 6		"Force a single process"
-8		"Use same process for every file"
-10		"New process for every file"
-12		"Barra de títulos"
-13		"Mostrar la ruta completa"
-14		"Solo el nombre de archivo"
-15		"No mostrar nada"
-16		"Usar titulo como nombre"
-17		"History"
-18		"Mantener historial de los archivos abiertos"
-20		"Number of recent files:"
-23		"Recordar la posición del DVD"
-24		"Recordar la posición del Archivo"
-25		"Recordar posición de la ventana"
-26		"Recordar tamaño de la ventana"
-27		"Remember last Pan-n-Scan Zoom"
-28		"Remember last playlist"
-29		"Otros"
-30		"Icono de bandeja"
-31		"Mostrar OSD (requiere reinicio)"
-32		"Show name of media file"
-33		"Show seek time"
-34		"Limitar proporciones ventana al ajustar"
-35		"Ajustarse a los bordes del escritorio"
-36		"Store settings in the player folder"
-37		"Disable 'Open Disc' menu"
-38		"Mayor prioridad para el proceso"
+7		"Use same process for every file"
+8		"New process for every file"
+9		"Barra de títulos"
+10		"Mostrar la ruta completa"
+11		"Solo el nombre de archivo"
+12		"No mostrar nada"
+13		"Usar titulo como nombre"
+14		"History"
+15		"Mantener historial de los archivos abiertos"
+17		"Number of recent files:"
+20		"Recordar la posición del DVD"
+21		"Recordar la posición del Archivo"
+22		"Recordar posición de la ventana"
+23		"Recordar tamaño de la ventana"
+24		"Remember last Pan-n-Scan Zoom"
+25		"Remember last playlist"
+26		"Otros"
+27		"Icono de bandeja"
+28		"Mostrar OSD (requiere reinicio)"
+29		"Show name of media file"
+30		"Show seek time"
+31		"Limitar proporciones ventana al ajustar"
+32		"Ajustarse a los bordes del escritorio"
+33		"Store settings in the player folder"
+34		"Disable 'Open Disc' menu"
+35		"Mayor prioridad para el proceso"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -438,17 +438,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 5		"Subtitle renderer:"
 7		"Autoload paths"
 9		"Reset"
 10		"Always default to external subtitles if available"
 12		"Do not load embedded subtitles"
 13		"Auto-reload subtitle files after detecting modification"
-14		"Use Subresync"
-15		"Online database"
-16		"La URL base de la base de datos de subtítulos:"
-19		"Probar"
+15		"Use Subresync"
+16		"Online database"
+17		"La URL base de la base de datos de subtítulos:"
+20		"Probar"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
@@ -511,17 +511,10 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Tratantes de CGI: (.ext1=ruta1;.ext2=ruta2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
-5		"Additional settings"
-6		"Preferred format:"
-8		"Load playlist"
-9		"Source"
-10		"Internal downloader"
-11		"File Source (URL)"
-12		"External source filter"
-13		"Initial buffer size"
-14		"% of source file size"
-15		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+6		"Use the built-in web page parser"
+7		"Preferred format:"
+9		"Load playlist"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

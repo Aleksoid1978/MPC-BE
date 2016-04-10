@@ -184,7 +184,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
 18		"Zurücksetzen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 5		"Verhalten bei ""DVD/BD öffnen"""
 6		"&Standard"
 7		"&Benutzerdefiniert:"
@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Ursprüngliche Bildschirmauflösung bei Programmende wiederherstellen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 6		"Die dunkle ""MPC-BE"" Theme benutzen (Standard)"
 7		"Helligkeit:"
 9		"Die Farbe des Klangindikators einstellen:"
@@ -361,35 +361,35 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Fehlerhafte Pins im Graph &melden"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"Verhalten bei Aufruf"
 6		"Einzelnen Prozess erzwingen"
-8		"Neue Dateien im aktuellen Fenster öffnen"
-10		"Dateien in einem neuen Fenster öffnen"
-12		"Beschriftung der Titelleiste"
-13		"Vollen Dateipfad anzei&gen"
-14		"Nur &Dateiname anzeigen"
-15		"&Nichts anzeigen"
-16		"Dateiname mit Titel ersetzen"
-17		"Verlauf und Privatsphäre"
-18		"&Zuletzt geöffnete Dateien merken"
-20		"Anzahl der aufgelisteten Dateien:"
-23		"DVD-Wiedergabeposition merken"
-24		"Datei-Wiedergabeposition merken"
-25		"Letzte Fensterposition merken"
-26		"Letzte Fenstergr&öße merken"
-27		"Letzten Pan&&Scan-Zoom merken"
-28		"Letzte Wiedergabeliste speichern"
-29		"Weitere Einstellungen"
-30		"&Taskleistensymbol anzeigen"
-31		"OSD anzeigen (Neustart notwendig)"
-32		"Name von Mediendatei anzeigen"
-33		"Suchzeit anzeigen"
-34		"Fenster-Seitenverhältnis fixieren"
-35		"Fenster an Desktoprand andocken"
-36		"Einstellungen als Datei (.ini) speichern"
-37		"Disc-Wiedergabe deaktivieren"
-38		"&Prozesspriorität ""Höher als normal"""
+7		"Neue Dateien im aktuellen Fenster öffnen"
+8		"Dateien in einem neuen Fenster öffnen"
+9		"Beschriftung der Titelleiste"
+10		"Vollen Dateipfad anzei&gen"
+11		"Nur &Dateiname anzeigen"
+12		"&Nichts anzeigen"
+13		"Dateiname mit Titel ersetzen"
+14		"Verlauf und Privatsphäre"
+15		"&Zuletzt geöffnete Dateien merken"
+17		"Anzahl der aufgelisteten Dateien:"
+20		"DVD-Wiedergabeposition merken"
+21		"Datei-Wiedergabeposition merken"
+22		"Letzte Fensterposition merken"
+23		"Letzte Fenstergr&öße merken"
+24		"Letzten Pan&&Scan-Zoom merken"
+25		"Letzte Wiedergabeliste speichern"
+26		"Weitere Einstellungen"
+27		"&Taskleistensymbol anzeigen"
+28		"OSD anzeigen (Neustart notwendig)"
+29		"Name von Mediendatei anzeigen"
+30		"Suchzeit anzeigen"
+31		"Fenster-Seitenverhältnis fixieren"
+32		"Fenster an Desktoprand andocken"
+33		"Einstellungen als Datei (.ini) speichern"
+34		"Disc-Wiedergabe deaktivieren"
+35		"&Prozesspriorität ""Höher als normal"""
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -438,17 +438,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Zurücksetzen"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 5		"Untertitel-Renderer:"
 7		"Pfade, in denen automatisch nach verfügbaren Untertiteln gesucht werden soll"
 9		"Zurücksetzen"
 10		"Externe Untertitel bevorzugen (wenn verfügbar)"
 12		"Interne Untertitel nicht benutzen"
 13		"Untertitel bei erkannten Veränderungen neu laden"
-14		"Subresync verwenden"
-15		"Online-Untertitel Datenbank"
-16		"URL zur Online-Untertitel Datenbank:"
-19		"Testen"
+15		"Subresync verwenden"
+16		"Online-Untertitel Datenbank"
+17		"URL zur Online-Untertitel Datenbank:"
+20		"Testen"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
@@ -511,17 +511,10 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI-Handler (.ext1=Pfad1; .ext2=Pfad2; ...):"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
-5		"Zusätzliche Einstellungen"
-6		"Bevorzugtes Format:"
-8		"Wiedergabeliste laden"
-9		"Quelle"
-10		"Interner Downloader"
-11		"Dateiquelle"
-12		"Externer Quellfilter"
-13		"Anfangspuffergröße"
-14		"Quelldateigröße (in %)"
-15		"MB"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+6		"Use the built-in web page parser"
+7		"Bevorzugtes Format:"
+9		"Wiedergabeliste laden"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

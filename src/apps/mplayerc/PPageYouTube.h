@@ -31,25 +31,17 @@ class CPPageYoutube : public CPPageBase
 	DECLARE_DYNAMIC(CPPageYoutube)
 
 private:
-	CComboBox m_iYoutubeFormatCtrl;
-	CButton m_chkYoutubeLoadPlaylist;
+	CButton m_chkPageParser;
+	CComboBox m_cbPreferredFormat;
+	CButton m_chkLoadPlaylist;
 
 public:
 	CPPageYoutube();
 	virtual ~CPPageYoutube();
 
 	enum { IDD = IDD_PPAGEYOUTUBE };
-	int m_iYoutubeSourceType;
-	int m_iYoutubeMemoryType;
-	CSpinButtonCtrl m_nPercentMemoryCtrl;
-	CSpinButtonCtrl m_nMbMemoryCtrl;
-	DWORD m_iYoutubePercentMemory;
-	DWORD m_iYoutubeMbMemory;
 
-	afx_msg void OnBnClickedRadio13(UINT nID);
-	afx_msg void OnBnClickedRadio45(UINT nID);
-
-	void UpdateMemoryCtrl();
+	afx_msg void OnCheckPageParser();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

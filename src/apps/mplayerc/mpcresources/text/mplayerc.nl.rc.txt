@@ -184,7 +184,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
 18		"Resetten"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 5		"Pad naar de dvd-speler of de ""VIDEO_TS""-map"
 6		"Standaard"
 7		"Door gebruiker bepaald:"
@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Herstel resolutie bij afsluiten"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 6		"Gebruik ""Dark""-thema (standaard)"
 7		"Helderheid :"
 9		"Kleur van de geluidindicator:"
@@ -361,35 +361,35 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Rapporteer pins die niet renderen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"Opties voor openen"
 6		"Forceer een enkel proces"
-8		"Gebruik hetzelfde proces voor elk bestand"
-10		"Nieuw proces voor elk bestand"
-12		"Titelbalk"
-13		"Volledige pad"
-14		"Alleen bestandsnaam"
-15		"Niets"
-16		"Vervang bestandsnaam door titel"
-17		"Geschiedenis"
-18		"Onlangs geopende bestanden onthouden"
-20		"Aantal recente bestanden:"
-23		"Dvd-positie bewaren"
-24		"Bestandspositie bewaren"
-25		"Vensterpositie onthouden"
-26		"Vensterafmetingen onthouden"
-27		"Laatste Pan&&Scan-zoom onthouden"
-28		"Laatste afspeellijst onthouden"
-29		"Overige"
-30		"Pictogram in systeemvak"
-31		"Toon OSD (vereist herstart)"
-32		"Toon naam van mediabestand"
-33		"Toon gezochte tijd"
-34		"Beperk vensterverhouding bij herschalen"
-35		"Aan bureaubladrand aanpassen"
-36		"Instellingen in de map van MPC-BE opslaan"
-37		"Menu ""Schijf openen"" uitschakelen"
-38		"Procesprioriteit ""hoger dan normaal"""
+7		"Gebruik hetzelfde proces voor elk bestand"
+8		"Nieuw proces voor elk bestand"
+9		"Titelbalk"
+10		"Volledige pad"
+11		"Alleen bestandsnaam"
+12		"Niets"
+13		"Vervang bestandsnaam door titel"
+14		"Geschiedenis"
+15		"Onlangs geopende bestanden onthouden"
+17		"Aantal recente bestanden:"
+20		"Dvd-positie bewaren"
+21		"Bestandspositie bewaren"
+22		"Vensterpositie onthouden"
+23		"Vensterafmetingen onthouden"
+24		"Laatste Pan&&Scan-zoom onthouden"
+25		"Laatste afspeellijst onthouden"
+26		"Overige"
+27		"Pictogram in systeemvak"
+28		"Toon OSD (vereist herstart)"
+29		"Toon naam van mediabestand"
+30		"Toon gezochte tijd"
+31		"Beperk vensterverhouding bij herschalen"
+32		"Aan bureaubladrand aanpassen"
+33		"Instellingen in de map van MPC-BE opslaan"
+34		"Menu ""Schijf openen"" uitschakelen"
+35		"Procesprioriteit ""hoger dan normaal"""
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -438,17 +438,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Resetten"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 5		"Ondertitelingsrenderer:"
 7		"Automatisch geladen locaties"
 9		"Resetten"
 10		"Prefereer externe ondertiteling boven interne ondertiteling"
 12		"Geïntegreerde ondertiteling niet laden"
 13		"Herlaad ondertitel-bestanden automatisch na de ontdekking van wijziging"
-14		"Activeer ondertitelings-resync"
-15		"Online database"
-16		"URL naar de online ondertitelings-database:"
-19		"Testen"
+15		"Activeer ondertitelings-resync"
+16		"Online database"
+17		"URL naar de online ondertitelings-database:"
+20		"Testen"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
@@ -511,17 +511,10 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI-handlers: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
-5		"Additional settings"
-6		"Voorkeursformaat:"
-8		"Afspeellijst laden"
-9		"Source"
-10		"Internal downloader"
-11		"Bestandsbron"
-12		"External source filter"
-13		"Initiële buffergrootte"
-14		"% v. bronbestandsgrootte"
-15		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+6		"Use the built-in web page parser"
+7		"Voorkeursformaat:"
+9		"Afspeellijst laden"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

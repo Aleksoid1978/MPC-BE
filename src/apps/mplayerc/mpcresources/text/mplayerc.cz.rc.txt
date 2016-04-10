@@ -184,7 +184,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
 18		"Výchozí"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 5		"Umístění DVD mechaniky nebo adresáře ""VIDEO_TS"""
 6		"Standardní"
 7		"Uživatelsky definované:"
@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Po ukončení obnovit výchozí rozlišení"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 6		"Use the ""dark"" theme (default)"
 7		"Brightness :"
 9		"Setting the color of the indicator of sound:"
@@ -361,35 +361,35 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Vypisovat podrobné informace o chybějících kodecích"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"Možnosti otevírání"
 6		"Force a single process"
-8		"Use same process for every file"
-10		"New process for every file"
-12		"Titulek v záhlaví"
-13		"Celá cesta"
-14		"Pouze název souboru"
-15		"Nic"
-16		"Nahradit název souboru titulem"
-17		"Historie"
-18		"Ukládat historii otevřených souborů"
-20		"Number of recent files:"
-23		"Pamatovat si pozici u DVD"
-24		"Pamatovat si pozici u souborů"
-25		"Pamatovat si poslední pozici okna"
-26		"Pamatovat si poslední velikost okna"
-27		"Zapamatovat si zvětšení Pan-n-Scan"
-28		"Remember last playlist"
-29		"Ostatní"
-30		"Ikona v oznamovací oblasti"
-31		"Zobrazit OSD (vyžaduje restart)"
-32		"Show name of media file"
-33		"Show seek time"
-34		"Při změně velikosti zachovat poměr stran okna"
-35		"Přichytávat k okrajům obrazovky"
-36		"Store settings in the player folder"
-37		"Zakázat nabídku Otevřít disk"
-38		"Spouštět se zvýšenou prioritou"
+7		"Use same process for every file"
+8		"New process for every file"
+9		"Titulek v záhlaví"
+10		"Celá cesta"
+11		"Pouze název souboru"
+12		"Nic"
+13		"Nahradit název souboru titulem"
+14		"Historie"
+15		"Ukládat historii otevřených souborů"
+17		"Number of recent files:"
+20		"Pamatovat si pozici u DVD"
+21		"Pamatovat si pozici u souborů"
+22		"Pamatovat si poslední pozici okna"
+23		"Pamatovat si poslední velikost okna"
+24		"Zapamatovat si zvětšení Pan-n-Scan"
+25		"Remember last playlist"
+26		"Ostatní"
+27		"Ikona v oznamovací oblasti"
+28		"Zobrazit OSD (vyžaduje restart)"
+29		"Show name of media file"
+30		"Show seek time"
+31		"Při změně velikosti zachovat poměr stran okna"
+32		"Přichytávat k okrajům obrazovky"
+33		"Store settings in the player folder"
+34		"Zakázat nabídku Otevřít disk"
+35		"Spouštět se zvýšenou prioritou"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -438,17 +438,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 5		"Subtitle renderer:"
 7		"Místa pro automatické načítání"
 9		"Výchozí"
 10		"Pokud jsou dostupné, upřednostňovat externí titulky"
 12		"Nenačítat vložené titulky"
 13		"Auto-reload subtitle files after detecting modification"
-14		"Use Subresync"
-15		"Online databáze"
-16		"Adresa online databáze titulků:"
-19		"Otestovat"
+15		"Use Subresync"
+16		"Online databáze"
+17		"Adresa online databáze titulků:"
+20		"Otestovat"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
@@ -511,17 +511,10 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Obsluha CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
-5		"Additional settings"
-6		"Preferred format:"
-8		"Load playlist"
-9		"Source"
-10		"Internal downloader"
-11		"File Source (URL)"
-12		"External source filter"
-13		"Initial buffer size"
-14		"% of source file size"
-15		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+6		"Use the built-in web page parser"
+7		"Preferred format:"
+9		"Load playlist"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

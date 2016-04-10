@@ -184,7 +184,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
 18		"リセット"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 5		"DVD ドライブまたは ""VIDEO_TS"" フォルダーの場所"
 6		"デフォルト"
 7		"ユーザー定義のパス:"
@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"プログラム終了時に解像度を元に戻す"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 6		"「dark」テーマを使用 (デフォルト)"
 7		"明るさ :"
 9		"音量調節の色設定:"
@@ -361,35 +361,35 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"再生に失敗したピンを報告する"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"開くオプション"
 6		"多重起動禁止"
-8		"ウィンドウを再利用"
-10		"新規ウィンドウで開く"
-12		"タイトル バー"
-13		"フルパスを表示"
-14		"ファイル名のみ"
-15		"何も付けない"
-16		"ファイル名をタイトル名に置き換え"
-17		"履歴"
-18		"最近使ったファイルの履歴を保存"
-20		"最近使ったファイルの表示数:"
-23		"DVD の再生位置を記憶"
-24		"ファイルの再生位置を記憶"
-25		"終了時のウィンドウ位置を記憶"
-26		"終了時のウィンドウ サイズを記憶"
-27		"終了時の PnS 拡大率を記憶"
-28		"終了時のプレイリストを記憶"
-29		"その他"
-30		"タスクトレイ アイコン"
-31		"OSD を表示"
-32		"メディア ファイル名を表示"
-33		"シーク タイムを表示"
-34		"リサイズ時にウィンドウ サイズのアスペクト比を固定"
-35		"デスクトップの端にスナップさせる"
-36		"MPC-BE のフォルダー内に設定を保存"
-37		"[ディスクを開く] のメニューを無効化"
-38		"プロセスの優先度を 通常以上 にする"
+7		"ウィンドウを再利用"
+8		"新規ウィンドウで開く"
+9		"タイトル バー"
+10		"フルパスを表示"
+11		"ファイル名のみ"
+12		"何も付けない"
+13		"ファイル名をタイトル名に置き換え"
+14		"履歴"
+15		"最近使ったファイルの履歴を保存"
+17		"最近使ったファイルの表示数:"
+20		"DVD の再生位置を記憶"
+21		"ファイルの再生位置を記憶"
+22		"終了時のウィンドウ位置を記憶"
+23		"終了時のウィンドウ サイズを記憶"
+24		"終了時の PnS 拡大率を記憶"
+25		"終了時のプレイリストを記憶"
+26		"その他"
+27		"タスクトレイ アイコン"
+28		"OSD を表示"
+29		"メディア ファイル名を表示"
+30		"シーク タイムを表示"
+31		"リサイズ時にウィンドウ サイズのアスペクト比を固定"
+32		"デスクトップの端にスナップさせる"
+33		"MPC-BE のフォルダー内に設定を保存"
+34		"[ディスクを開く] のメニューを無効化"
+35		"プロセスの優先度を 通常以上 にする"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -438,17 +438,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"リセット"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 5		"字幕レンダラー:"
 7		"字幕ファイルパス指定"
 9		"リセット"
 10		"内蔵字幕より外部字幕ファイルを優先する"
 12		"内蔵字幕を無視する"
 13		"修正検知後に字幕ファイルを自動リロード"
-14		"Subresync を使用"
-15		"オンライン データベース"
-16		"オンライン字幕データベースの基本 URL:"
-19		"テスト"
+15		"Subresync を使用"
+16		"オンライン データベース"
+17		"オンライン字幕データベースの基本 URL:"
+20		"テスト"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
@@ -511,17 +511,10 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI ハンドラー: (拡張子1=パス1; 拡張子2=パス2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
-5		"追加設定"
-6		"お気に入りの形式:"
-8		"プレイリストをロード"
-9		"ソース"
-10		"内部ダウンローダー"
-11		"ファイル ソース (URL)"
-12		"外部ソース フィルター"
-13		"イニシャル バッファー サイズ"
-14		"ソース ファイル サイズの %"
-15		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+6		"Use the built-in web page parser"
+7		"お気に入りの形式:"
+9		"プレイリストをロード"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

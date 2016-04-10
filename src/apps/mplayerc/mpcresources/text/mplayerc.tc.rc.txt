@@ -184,7 +184,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
 18		"重設"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 5		"DVD 光碟機或是「VIDEO_TS」資料夾的位置"
 6		"預設值"
 7		"使用者自訂路徑:"
@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"離開後回復解析度"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 6		"使用「Dark」主題 (預設)"
 7		"亮度 :"
 9		"設定音量控制器色彩:"
@@ -361,35 +361,35 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"回報繪製失敗的 Pin"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"開啟選項"
 6		"強制單一程式"
-8		"所有檔案使用同一處理程序"
-10		"所有檔案使用獨立處理程序"
-12		"標題列"
-13		"顯示完整路徑"
-14		"只有檔案名稱"
-15		"不使用前綴字串"
-16		"以標題替代檔案名稱"
-17		"歷史記錄"
-18		"保留最近開啟檔案的記錄"
-20		"保留的記錄數量:"
-23		"記住 DVD 位置"
-24		"記住檔案位置"
-25		"記住上次的視窗位置"
-26		"記住上次的視窗大小"
-27		"記住上次的平移掃描縮放"
-28		"記住上次的播放清單"
-29		"其它選項"
-30		"系統列 (通知區域) 圖示"
-31		"顯示 OSD (需要重新啟動)"
-32		"顯示媒體檔案名稱"
-33		"顯示搜尋時間"
-34		"縮放時限定視窗長寬比例"
-35		"貼齊視窗邊緣"
-36		"儲存設定到播放程式資料夾"
-37		"停用「開啟光碟」選單"
-38		"程式優先順序調成標準以上"
+7		"所有檔案使用同一處理程序"
+8		"所有檔案使用獨立處理程序"
+9		"標題列"
+10		"顯示完整路徑"
+11		"只有檔案名稱"
+12		"不使用前綴字串"
+13		"以標題替代檔案名稱"
+14		"歷史記錄"
+15		"保留最近開啟檔案的記錄"
+17		"保留的記錄數量:"
+20		"記住 DVD 位置"
+21		"記住檔案位置"
+22		"記住上次的視窗位置"
+23		"記住上次的視窗大小"
+24		"記住上次的平移掃描縮放"
+25		"記住上次的播放清單"
+26		"其它選項"
+27		"系統列 (通知區域) 圖示"
+28		"顯示 OSD (需要重新啟動)"
+29		"顯示媒體檔案名稱"
+30		"顯示搜尋時間"
+31		"縮放時限定視窗長寬比例"
+32		"貼齊視窗邊緣"
+33		"儲存設定到播放程式資料夾"
+34		"停用「開啟光碟」選單"
+35		"程式優先順序調成標準以上"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -438,17 +438,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"重設"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 5		"字幕繪製器:"
 7		"自動載入路徑"
 9		"重設"
 10		"存在時預設優先使用外部字幕檔案"
 12		"不載入內嵌字幕"
 13		"偵測到變更後自動重新載入字幕檔案"
-14		"啟用字幕同步編輯器"
-15		"線上資料庫"
-16		"線上字幕資料庫的基礎網址:"
-19		"測試"
+15		"啟用字幕同步編輯器"
+16		"線上資料庫"
+17		"線上字幕資料庫的基礎網址:"
+20		"測試"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
@@ -511,17 +511,10 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI 處理器: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
-5		"Additional settings"
-6		"偏好格式:"
-8		"載入播放清單"
-9		"Source"
-10		"Internal downloader"
-11		"檔案來源"
-12		"External source filter"
-13		"初始緩衝大小"
-14		"來源檔案大小的百份之"
-15		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+6		"Use the built-in web page parser"
+7		"偏好格式:"
+9		"載入播放清單"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

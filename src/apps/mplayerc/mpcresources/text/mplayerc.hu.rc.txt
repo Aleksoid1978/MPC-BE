@@ -184,7 +184,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
 18		"Visszaállítás"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 5		"A DVD meghajtó vagy a ""VIDEO_TS"" mappa elérési útja"
 6		"Alapértelmezés"
 7		"Felhasználó által definiált elérési út:"
@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Felbontás visszaállítása kilépéskor"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 6		"Use the ""dark"" theme (default)"
 7		"Brightness :"
 9		"Setting the color of the indicator of sound:"
@@ -361,35 +361,35 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Hibás, nem átalakítható csatlakozók jelentése"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"Megnyitási beállítások"
 6		"Force a single process"
-8		"Use same process for every file"
-10		"New process for every file"
-12		"Ablak fejlécsor"
-13		"Teljes elérési út"
-14		"Csak fájlnév"
-15		"Nincs semmilyen előtag"
-16		"Fájlnév lecserélése a címmel"
-17		"History"
-18		"Megnyitott fájlok előzményeinek megtartása"
-20		"Number of recent files:"
-23		"DVD-pozíció megjegyzése"
-24		"Fájlpozíció megjegyzése"
-25		"Utolsó ablakpozíció megjegyzése"
-26		"Utolsó ablakméret megjegyzése"
-27		"Remember last Pan-n-Scan Zoom"
-28		"Remember last playlist"
-29		"Egyéb"
-30		"Legyen tálca ikon"
-31		"OSD megjelenítése (újraindítást igényel)"
-32		"Show name of media file"
-33		"Show seek time"
-34		"Ablakméretarány követése átméretezéskor"
-35		"Asztalszélekhez igazítás"
-36		"Store settings in the player folder"
-37		"Disable 'Open Disc' menu"
-38		"A lejátszó prioritása normál érték felett"
+7		"Use same process for every file"
+8		"New process for every file"
+9		"Ablak fejlécsor"
+10		"Teljes elérési út"
+11		"Csak fájlnév"
+12		"Nincs semmilyen előtag"
+13		"Fájlnév lecserélése a címmel"
+14		"History"
+15		"Megnyitott fájlok előzményeinek megtartása"
+17		"Number of recent files:"
+20		"DVD-pozíció megjegyzése"
+21		"Fájlpozíció megjegyzése"
+22		"Utolsó ablakpozíció megjegyzése"
+23		"Utolsó ablakméret megjegyzése"
+24		"Remember last Pan-n-Scan Zoom"
+25		"Remember last playlist"
+26		"Egyéb"
+27		"Legyen tálca ikon"
+28		"OSD megjelenítése (újraindítást igényel)"
+29		"Show name of media file"
+30		"Show seek time"
+31		"Ablakméretarány követése átméretezéskor"
+32		"Asztalszélekhez igazítás"
+33		"Store settings in the player folder"
+34		"Disable 'Open Disc' menu"
+35		"A lejátszó prioritása normál érték felett"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -438,17 +438,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 5		"Subtitle renderer:"
 7		"Autoload paths"
 9		"Reset"
 10		"Always default to external subtitles if available"
 12		"Do not load embedded subtitles"
 13		"Auto-reload subtitle files after detecting modification"
-14		"Use Subresync"
-15		"Online database"
-16		"Az internetről elérhető felirat adatbázis bázis URL címe:"
-19		"Tesztelés"
+15		"Use Subresync"
+16		"Online database"
+17		"Az internetről elérhető felirat adatbázis bázis URL címe:"
+20		"Tesztelés"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
@@ -511,17 +511,10 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI kezelők: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
-5		"Additional settings"
-6		"Preferred format:"
-8		"Load playlist"
-9		"Source"
-10		"Internal downloader"
-11		"File Source (URL)"
-12		"External source filter"
-13		"Initial buffer size"
-14		"% of source file size"
-15		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+6		"Use the built-in web page parser"
+7		"Preferred format:"
+9		"Load playlist"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
