@@ -654,10 +654,6 @@ CMainFrame::CMainFrame() :
 	m_bfirstPlay(false),
 	m_dwLastRun(0),
 	IsMadVRExclusiveMode(false),
-	m_fYoutubeThreadWork(TH_CLOSE),
-	m_YoutubeThread(NULL),
-	m_YoutubeCurrent(0),
-	m_YoutubeTotal(0),
 	m_pBFmadVR(NULL),
 	m_hDWMAPI(0),
 	m_hWtsLib(0),
@@ -4404,24 +4400,6 @@ void CMainFrame::OnFilePostCloseMedia()
 		m_OSD.Start(m_pOSDWnd);
 	}
 
-	if (m_YoutubeThread) {
-		m_fYoutubeThreadWork = TH_CLOSE;
-		if (WaitForSingleObject(m_YoutubeThread->m_hThread, 3000) == WAIT_TIMEOUT) {
-			TerminateThread(m_YoutubeThread->m_hThread, 0xDEAD);
-		}
-		m_YoutubeThread = NULL;
-
-		// delete the temporary file because we do not use it anymore
-		if (::PathFileExists(m_YoutubeFile) && DeleteFile(m_YoutubeFile)) {
-			POSITION pos = AfxGetAppSettings().slTMPFilesList.Find(m_YoutubeFile);
-			if (pos) {
-				AfxGetAppSettings().slTMPFilesList.RemoveAt(pos);
-			}
-		}
-	}
-	m_YoutubeTotal		= 0;
-	m_YoutubeCurrent	= 0;
-
 	m_ExtSubFiles.RemoveAll();
 	m_ExtSubFilesTime.RemoveAll();
 	m_ExtSubPaths.RemoveAll();
@@ -5806,12 +5784,7 @@ void CMainFrame::OnFileSaveAs()
 		name = GetAltFileName();
 	}
 
-	BOOL bUseSaveDlg = ::PathIsURL(in);
-	if (bUseSaveDlg && !m_YoutubeFile.IsEmpty()) {
-		bUseSaveDlg = m_fYoutubeThreadWork != TH_CLOSE && m_fYoutubeThreadWork != TH_ERROR;
-	}
-
-	if (bUseSaveDlg) {
+	if (::PathIsURL(in)) {
 		if (CTaskDialog::IsSupported()) {
 			CSaveTaskDlg dlg(in, name, p);
 			dlg.DoModal();
@@ -5820,8 +5793,7 @@ void CMainFrame::OnFileSaveAs()
 			dlg.DoModal();
 		}
 	} else {
-		CString sourceFile = m_YoutubeFile.IsEmpty() ? in : m_YoutubeFile;
-		CopyFiles(sourceFile, p);
+		CopyFiles(in, p);
 	}
 
 	if (fs == State_Running) {
@@ -6508,12 +6480,10 @@ void CMainFrame::OnUpdateFileSaveThumbnails(CCmdUI* pCmdUI)
 	OAFilterState fs = GetMediaState();
 	UNREFERENCED_PARAMETER(fs);
 
-	int iProgress;
 	pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED
 					&& !m_bAudioOnly
 					&& (GetPlaybackMode() == PM_FILE /*|| GetPlaybackMode() == PM_DVD*/)
-					&& !GetBufferingProgress(&iProgress));
-	UNREFERENCED_PARAMETER(iProgress);
+					&& !GetBufferingProgress());
 
 	if (GetPlaybackMode() == PM_FILE) {
 		REFERENCE_TIME total = 0;
@@ -11786,13 +11756,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		return ResStr(IDS_MAINFRM_81);
 	}
 
-	m_YoutubeFile.Empty();
-	m_YoutubeThread			= NULL;
-	m_fYoutubeThreadWork	= TH_CLOSE;
-	m_YoutubeTotal			= 0;
-	m_YoutubeCurrent		= 0;
-
-	m_nMainFilterId			= NULL;
+	m_nMainFilterId = NULL;
 
 	CAppSettings& s = AfxGetAppSettings();
 
@@ -16425,9 +16389,9 @@ bool CMainFrame::ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop)
 	if (m_eMediaLoadState == MLS_LOADED && GetPlaybackMode() == PM_FILE && (rtPos > 0) && (rtStop > 0) && (rtPos <= rtStop)) {
 		if (m_pAMOP) {
 			__int64 t = 0, c = 0;
-			if ((SUCCEEDED(m_pAMOP->QueryProgress(&t, &c)) || SUCCEEDED(QueryProgressYoutube(&t, &c))) && t > 0 && c < t) {
-				int Query_percent	= c*100/t;
-				int Seek_percent	= rtPos*100/rtStop;
+			if (SUCCEEDED(m_pAMOP->QueryProgress(&t, &c)) && t > 0 && c < t) {
+				int Query_percent = llMulDiv(c, 100, t, 0);
+				int Seek_percent  = llMulDiv(rtPos, 100, rtStop, 0);
 				if (Seek_percent > Query_percent) {
 					return false;
 				}
@@ -16439,7 +16403,7 @@ bool CMainFrame::ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop)
 				if (CComQIPtr<IAMNetworkStatus, &IID_IAMNetworkStatus> pAMNS = pBF) {
 					long BufferingProgress = 0;
 					if (SUCCEEDED(pAMNS->get_BufferingProgress(&BufferingProgress)) && (BufferingProgress > 0 && BufferingProgress < 100)) {
-						int Seek_percent = rtPos*100/rtStop;
+						int Seek_percent = llMulDiv(rtPos, 100, rtStop, 0);
 						if (Seek_percent > BufferingProgress) {
 							return false;
 						}
@@ -16450,21 +16414,12 @@ bool CMainFrame::ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop)
 			}
 			EndEnumFilters;
 		}
-
-		__int64 t = 0, c = 0;
-		if (SUCCEEDED(QueryProgressYoutube(&t, &c)) && t > 0 && c < t) {
-			int Query_percent	= c*100/t;
-			int Seek_percent	= rtPos*100/rtStop;
-			if (Seek_percent > Query_percent) {
-				return false;
-			}
-		}
 	}
 
 	return true;
 }
 
-bool CMainFrame::GetBufferingProgress(int* iProgress)
+bool CMainFrame::GetBufferingProgress(int* iProgress/* = NULL*/)
 {
 	if (iProgress) {
 		*iProgress = 0;
@@ -16474,8 +16429,8 @@ bool CMainFrame::GetBufferingProgress(int* iProgress)
 	if (m_eMediaLoadState == MLS_LOADED && GetPlaybackMode() == PM_FILE) {
 		if (m_pAMOP) {
 			__int64 t = 0, c = 0;
-			if ((SUCCEEDED(m_pAMOP->QueryProgress(&t, &c)) || SUCCEEDED(QueryProgressYoutube(&t, &c))) && t > 0 && c < t) {
-				Progress = c*100/t;
+			if (SUCCEEDED(m_pAMOP->QueryProgress(&t, &c)) && t > 0 && c < t) {
+				Progress = llMulDiv(c, 100, t, 0);
 			}
 		}
 
@@ -16490,11 +16445,6 @@ bool CMainFrame::GetBufferingProgress(int* iProgress)
 				}
 			}
 			EndEnumFilters;
-		}
-
-		__int64 t = 0, c = 0;
-		if (SUCCEEDED(QueryProgressYoutube(&t, &c)) && t > 0 && c < t) {
-			Progress = c*100/t;
 		}
 
 		if (Progress > 0 && Progress < 100) {
@@ -18597,14 +18547,10 @@ CString CMainFrame::FillMessage()
 			}
 		}
 		EndEnumFilters;
-	} else if (m_pAMOP || SUCCEEDED(QueryProgressYoutube(NULL, NULL))) {
+	} else if (m_pAMOP) {
 		__int64 t = 0, c = 0;
 		if (SUCCEEDED(m_pMS->GetDuration(&t)) && t > 0 && SUCCEEDED(m_pAMOP->QueryProgress(&t, &c)) && t > 0 && c < t) {
-			msg.Format(ResStr(IDS_CONTROLS_BUFFERING), c * 100 / t);
-		}
-
-		if (SUCCEEDED(QueryProgressYoutube(&t, &c))) {
-			msg.Format(ResStr(IDS_CONTROLS_BUFFERING), c * 100 / t);
+			msg.Format(ResStr(IDS_CONTROLS_BUFFERING), llMulDiv(c, 100, t, 0));
 		}
 
 		if (!msg.IsEmpty() && State_Stopped == GetMediaState()) {

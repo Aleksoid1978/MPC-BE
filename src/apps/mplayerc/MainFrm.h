@@ -709,7 +709,7 @@ public:
 	void SeekTo(REFERENCE_TIME rt, bool bShowOSD = true);
 	bool ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop);
 
-	bool GetBufferingProgress(int* Progress);
+	bool GetBufferingProgress(int* Progress = NULL);
 
 	// subtitle streams order function
 	bool LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream = NULL);
@@ -1281,32 +1281,6 @@ public:
 	bool m_bUseReclock;
 
 private:
-	enum TH_STATE {
-		TH_START,
-		TH_WORK,
-		TH_CLOSE,
-		TH_ERROR
-	};
-	volatile TH_STATE	m_fYoutubeThreadWork;
-	volatile QWORD		m_YoutubeCurrent;
-	volatile QWORD		m_YoutubeTotal;
-	CString				m_YoutubeFile;
-	CWinThread*			m_YoutubeThread;
-
-	HRESULT		QueryProgressYoutube(LONGLONG *pllTotal, LONGLONG *pllCurrent) {
-		if (m_YoutubeTotal > 0 && m_YoutubeCurrent < m_YoutubeTotal) {
-			if (pllTotal) {
-				*pllTotal = m_YoutubeTotal;
-			}
-			if (pllCurrent) {
-				*pllCurrent = m_YoutubeCurrent;
-			}
-			return S_OK;
-		}
-
-		return E_FAIL;
-	}
-
 	int			GetStreamCount(DWORD dwSelGroup);
 
 	DWORD_PTR	m_nMainFilterId;
