@@ -184,7 +184,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
 18		"리셋"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 5		"DVD드라이브의 위치 또는 ""VIDEO_TS"" 폴더의 위치"
 6		"기본값"
 7		"사용자정의 위치:"
@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"종료후에 해상도 복원"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 6		"<<dark>> 테마 사용 (기본값)"
 7		"밝기:"
 9		"소리 조정막대 색상설정:"
@@ -361,35 +361,35 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"렌더링에 실패하면 핀 보고"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"열기 옵션"
 6		"프로세스 하나만 사용"
-8		"파일을 열때마다 같은 플레이어창 사용"
-10		"파일을 열때마다 새 플레이어창 사용"
-12		"제목표시줄"
-13		"전체 경로 표시"
-14		"파일이름만 표시"
-15		"아무것도 표시하지 않음"
-16		"제목과 파일이름 같이 보이기"
-17		"히스토리"
-18		"최근에 열었던 파일목록 기억"
-20		"Number of recent files:"
-23		"DVD 위치 기억"
-24		"파일 위치 기억"
-25		"마지막 윈도우창위치 기억"
-26		"마지막 윈도우창크기 기억"
-27		"지난 Pan-n-Scan 줌 기억"
-28		"지난 재생목록 기억"
-29		"기타"
-30		"트레이에 아이콘 보이기"
-31		"OSD보이기 (재시작필요)"
-32		"Show name of media file"
-33		"Show seek time"
-34		"리사이즈시 창비율 제한"
-35		"바탕화면 자석효과 사용"
-36		"실행파일 폴더에 설정 저장"
-37		"'디스크 열기' 메뉴 사용안함"
-38		"프로세스 우선순위 높이기"
+7		"파일을 열때마다 같은 플레이어창 사용"
+8		"파일을 열때마다 새 플레이어창 사용"
+9		"제목표시줄"
+10		"전체 경로 표시"
+11		"파일이름만 표시"
+12		"아무것도 표시하지 않음"
+13		"제목과 파일이름 같이 보이기"
+14		"히스토리"
+15		"최근에 열었던 파일목록 기억"
+17		"Number of recent files:"
+20		"DVD 위치 기억"
+21		"파일 위치 기억"
+22		"마지막 윈도우창위치 기억"
+23		"마지막 윈도우창크기 기억"
+24		"지난 Pan-n-Scan 줌 기억"
+25		"지난 재생목록 기억"
+26		"기타"
+27		"트레이에 아이콘 보이기"
+28		"OSD보이기 (재시작필요)"
+29		"Show name of media file"
+30		"Show seek time"
+31		"리사이즈시 창비율 제한"
+32		"바탕화면 자석효과 사용"
+33		"실행파일 폴더에 설정 저장"
+34		"'디스크 열기' 메뉴 사용안함"
+35		"프로세스 우선순위 높이기"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -438,17 +438,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 5		"Subtitle renderer:"
 7		"자동 불러오기 경로"
 9		"초기화"
 10		"항상 외부 자막보기(사용가능한경우)"
 12		"내장 자막 불러오지않음"
 13		"변경사항 탐지후 자막 파일 자동 다시 불러오기"
-14		"Use Subresync"
-15		"온라인 데이터베이스"
-16		"온라인 자막 데이터베이스 URL:"
-19		"테스트"
+15		"Use Subresync"
+16		"온라인 데이터베이스"
+17		"온라인 자막 데이터베이스 URL:"
+20		"테스트"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
@@ -511,17 +511,10 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI 핸들러: (.확장명1=경로1;.확장명2=경로2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
-5		"Additional settings"
-6		"우선 포맷:"
-8		"Load playlist"
-9		"Source"
-10		"Internal downloader"
-11		"파일 Source"
-12		"External source filter"
-13		"Initial buffer size"
-14		"% of source file size"
-15		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+6		"Use the built-in web page parser"
+7		"우선 포맷:"
+9		"Load playlist"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

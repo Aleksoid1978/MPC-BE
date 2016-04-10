@@ -857,12 +857,9 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
 
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_TAG, iYoutubeTag);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_SOURCE, iYoutubeSource);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_MEMTYPE, iYoutubeMemoryType);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_PERCENT_MEM, iYoutubePercentMemory);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_MB_MEM, iYoutubeMbMemory);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
 
@@ -1524,13 +1521,15 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	strLastOpenFilterDir	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR);
 
+	bYoutubePageParser		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_PAGEPARSER, TRUE);
 	iYoutubeTag				= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_TAG, 0);
 	bYoutubeLoadPlaylist	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, FALSE);
-	iYoutubeSource			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_SOURCE, 0);
-	iYoutubeSource = discard(iYoutubeSource, 0, 2, 0);
-	iYoutubeMemoryType		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_MEMTYPE, 0);
-	iYoutubePercentMemory	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_PERCENT_MEM, 5);
-	iYoutubeMbMemory		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_MB_MEM, 3);
+
+	// TODO: remove it
+	iYoutubeSource			= 0;
+	iYoutubeMemoryType		= 0;
+	iYoutubePercentMemory	= 5;
+	iYoutubeMbMemory		= 3;
 
 	nLastFileInfoPage		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, 0);
 

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -299,12 +299,9 @@
 
 #define IDS_RS_LAST_OPEN_FILTER_DIR			_T("LastOpenFilterDir")
 
+#define IDS_RS_YOUTUBE_PAGEPARSER			_T("YoutubePageParser")
 #define IDS_RS_YOUTUBE_TAG					_T("YoutubeTag")
 #define IDS_RS_YOUTUBE_LOAD_PLAYLIST		_T("YoutubeLoadPlaylist")
-#define IDS_RS_YOUTUBE_SOURCE				_T("YoutubeSourceType")
-#define IDS_RS_YOUTUBE_MEMTYPE				_T("YoutubeMemoryType")
-#define IDS_RS_YOUTUBE_PERCENT_MEM			_T("YoutubePercentMemory")
-#define IDS_RS_YOUTUBE_MB_MEM				_T("YoutubeMbMemory")
 
 #define IDS_R_FILTERS_PRIORITY				_T("\\Filters Priority")
 

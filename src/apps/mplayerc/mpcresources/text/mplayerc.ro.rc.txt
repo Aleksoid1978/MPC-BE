@@ -184,7 +184,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
 18		"Resetează"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 5		"Acţiuni pentru ""Deschide DVD/BD"""
 6		"Solicită locaţia"
 7		"Deschide întotdeauna locaţia implicită:"
@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Restaurează rezoluția la ieșirea din program"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 6		"Use the ""dark"" theme (default)"
 7		"Brightness :"
 9		"Setting the color of the indicator of sound:"
@@ -361,35 +361,35 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Raportează pinii care eșuează să randeze"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"Opțiuni pentru deschidere"
 6		"Force a single process"
-8		"Folosește același player pentru fiecare fișier media"
-10		"Deschide un player nou pentru fiecare fișier media redat"
-12		"Bară de titlu"
-13		"Afișează calea completă"
-14		"Doar numele fișierului"
-15		"Nu prefixa nimic"
-16		"Înlocuiește numele fișierului cu titlul filmului"
-17		"Istoric"
-18		"Ține un istoric al ultimelor fișiere deschise"
-20		"Number of recent files:"
-23		"Ține minte poziția pe DVD"
-24		"Ține minte poziția în fișier"
-25		"Ține minte ultima poziție a ferestrei"
-26		"Ține minte ultima dimensiune a ferestrei"
-27		"Ține minte ultima focalizare a Pan-n-Scan"
-28		"Ține minte ultima listă de redare"
-29		"Altele"
-30		"Pictogramă în zona de notificare"
-31		"Arată OSD (necesită repornire player)"
-32		"Show name of media file"
-33		"Show seek time"
-34		"Limitează proporțiile ferestrei la redimensionare"
-35		"Extinde până la marginile ecranului"
-36		"Store settings in the player folder"
-37		"Dezactivează meniul ""Deschide Disc"""
-38		"Prioritatea procesării peste normal"
+7		"Folosește același player pentru fiecare fișier media"
+8		"Deschide un player nou pentru fiecare fișier media redat"
+9		"Bară de titlu"
+10		"Afișează calea completă"
+11		"Doar numele fișierului"
+12		"Nu prefixa nimic"
+13		"Înlocuiește numele fișierului cu titlul filmului"
+14		"Istoric"
+15		"Ține un istoric al ultimelor fișiere deschise"
+17		"Number of recent files:"
+20		"Ține minte poziția pe DVD"
+21		"Ține minte poziția în fișier"
+22		"Ține minte ultima poziție a ferestrei"
+23		"Ține minte ultima dimensiune a ferestrei"
+24		"Ține minte ultima focalizare a Pan-n-Scan"
+25		"Ține minte ultima listă de redare"
+26		"Altele"
+27		"Pictogramă în zona de notificare"
+28		"Arată OSD (necesită repornire player)"
+29		"Show name of media file"
+30		"Show seek time"
+31		"Limitează proporțiile ferestrei la redimensionare"
+32		"Extinde până la marginile ecranului"
+33		"Store settings in the player folder"
+34		"Dezactivează meniul ""Deschide Disc"""
+35		"Prioritatea procesării peste normal"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -438,17 +438,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 5		"Subtitle renderer:"
 7		"Căi de încărcare automată"
 9		"Resetează"
 10		"Preferă subtitrările externe în locul celor integrate"
 12		"Ignoră subtitrările integrate"
 13		"Auto-reload subtitle files after detecting modification"
-14		"Use Subresync"
-15		"Bază de date online"
-16		"URL de bază pentru baza de date cu subtitrări online:"
-19		"Testează"
+15		"Use Subresync"
+16		"Bază de date online"
+17		"URL de bază pentru baza de date cu subtitrări online:"
+20		"Testează"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
@@ -511,17 +511,10 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Operatori CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
-5		"Additional settings"
-6		"Preferred format:"
-8		"Load playlist"
-9		"Source"
-10		"Internal downloader"
-11		"File Source (URL)"
-12		"External source filter"
-13		"Initial buffer size"
-14		"% of source file size"
-15		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+6		"Use the built-in web page parser"
+7		"Preferred format:"
+9		"Load playlist"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

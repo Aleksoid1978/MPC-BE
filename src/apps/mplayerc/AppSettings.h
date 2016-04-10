@@ -840,6 +840,7 @@ public:
 	CString			strLastOpenFilterDir;
 
 	// youtube
+	bool			bYoutubePageParser;
 	int				iYoutubeTag;
 	bool			bYoutubeLoadPlaylist;
 	int				iYoutubeSource;

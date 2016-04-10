@@ -184,7 +184,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
 18		"Réinitialiser"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 5		"Emplacement du lecteur DVD ou du dossier ""VIDEO_TS"""
 6		"Par défaut"
 7		"Personnalisé :"
@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Restaurer la résolution après la fermeture"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 6		"Use the ""dark"" theme (default)"
 7		"Brightness :"
 9		"Setting the color of the indicator of sound:"
@@ -361,35 +361,35 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Indiquer les connexions échouées lors du rendu"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"Options d'ouverture"
 6		"Force a single process"
-8		"Use same process for every file"
-10		"New process for every file"
-12		"Barre de titre"
-13		"Afficher le chemin complet"
-14		"Nom du fichier seulement"
-15		"Ne rien préfixer"
-16		"Remplacez le nom de fichier"
-17		"Historique"
-18		"Conserver l'historique des fichiers ouverts"
-20		"Number of recent files:"
-23		"Se souvenir de la position dans le DVD"
-24		"Se souvenir de la position dans le fichier"
-25		"Enregistrer la position de la fenêtre"
-26		"Enregistrer la taille de la fenêtre"
-27		"Se souvenir du recadrage (Pan && Scan)"
-28		"Remember last playlist"
-29		"Divers"
-30		"Icône dans la barre de notification"
-31		"Montrer l'OSD (nécessite un redémarrage)"
-32		"Show name of media file"
-33		"Show seek time"
-34		"Garder les proportions au redimensionnement"
-35		"Aimanter sur les bords du Bureau"
-36		"Store settings in the player folder"
-37		"Désactiver le menu 'Ouvrir le disque'"
-38		"Priorité supérieure à la normale"
+7		"Use same process for every file"
+8		"New process for every file"
+9		"Barre de titre"
+10		"Afficher le chemin complet"
+11		"Nom du fichier seulement"
+12		"Ne rien préfixer"
+13		"Remplacez le nom de fichier"
+14		"Historique"
+15		"Conserver l'historique des fichiers ouverts"
+17		"Number of recent files:"
+20		"Se souvenir de la position dans le DVD"
+21		"Se souvenir de la position dans le fichier"
+22		"Enregistrer la position de la fenêtre"
+23		"Enregistrer la taille de la fenêtre"
+24		"Se souvenir du recadrage (Pan && Scan)"
+25		"Remember last playlist"
+26		"Divers"
+27		"Icône dans la barre de notification"
+28		"Montrer l'OSD (nécessite un redémarrage)"
+29		"Show name of media file"
+30		"Show seek time"
+31		"Garder les proportions au redimensionnement"
+32		"Aimanter sur les bords du Bureau"
+33		"Store settings in the player folder"
+34		"Désactiver le menu 'Ouvrir le disque'"
+35		"Priorité supérieure à la normale"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -438,17 +438,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 5		"Subtitle renderer:"
 7		"Dossiers à utiliser pour le chargement automatique"
 9		"Reset"
 10		"Préférer les sous-titres externes aux sous-titres internes"
 12		"Ignorer les sous-titres internes"
 13		"Auto-reload subtitle files after detecting modification"
-14		"Use Subresync"
-15		"Base de données en ligne"
-16		"Racine du site de la base de données de sous-titres :"
-19		"Tester"
+15		"Use Subresync"
+16		"Base de données en ligne"
+17		"Racine du site de la base de données de sous-titres :"
+20		"Tester"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
@@ -511,17 +511,10 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Gestionnaires CGI : (.ext1=dossier1;.ext2=dossier2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
-5		"Additional settings"
-6		"Preferred format:"
-8		"Load playlist"
-9		"Source"
-10		"Internal downloader"
-11		"File Source (URL)"
-12		"External source filter"
-13		"Initial buffer size"
-14		"% of source file size"
-15		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+6		"Use the built-in web page parser"
+7		"Preferred format:"
+9		"Load playlist"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

@@ -184,7 +184,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
 18		"Скід"
 END
 
-BEGIN DIALOGEX IDD_PPAGEDVD LINES 20
+BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 5		"Размяшчэнне DVD-дыскавода або тэчкі ""VIDEO_TS"""
 6		"Стандартна"
 7		"Шлях вызначаны карыстальнікам:"
@@ -263,7 +263,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Узнаўляць вырашальнасць пасля выхаду з праграмы"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 6		"Use the ""dark"" theme (default)"
 7		"Brightness :"
 9		"Setting the color of the indicator of sound:"
@@ -361,35 +361,35 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 45		"Справазд. аб памылках рэндэрынгу струменяў"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 39
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 5		"Адкрываць файлы выкарыст."
 6		"Force a single process"
-8		"Use same process for every file"
-10		"New process for every file"
-12		"У загалоўку"
-13		"адлюстр. поўны шлях"
-14		"толькі імя файла"
-15		"не адлюстроўваць нічога"
-16		"Замяняць назвай"
-17		"Гісторыя"
-18		"Захоўваць гісторыю адчын. файлаў"
-20		"Number of recent files:"
-23		"Пры выхадзе запомніць пазіцыю DVD"
-24		"Пры выхадзе запомніць пазіцыю ў файле"
-25		"Запамінаць пазіцыю акна"
-26		"Запамінаць памер акна"
-27		"Remember last Pan-n-Scan Zoom"
-28		"Remember last playlist"
-29		"Іншае"
-30		"Значок у панэлі задач"
-31		"Паказаць OSD (патрабуецца перазапуск)"
-32		"Show name of media file"
-33		"Show seek time"
-34		"Суадносіны бакоў акна як у відэакадра"
-35		"Прыліпаць да межаў экрана"
-36		"Store settings in the player folder"
-37		"Disable 'Open Disc' menu"
-38		"Падвышаны прыярытэт працэсу"
+7		"Use same process for every file"
+8		"New process for every file"
+9		"У загалоўку"
+10		"адлюстр. поўны шлях"
+11		"толькі імя файла"
+12		"не адлюстроўваць нічога"
+13		"Замяняць назвай"
+14		"Гісторыя"
+15		"Захоўваць гісторыю адчын. файлаў"
+17		"Number of recent files:"
+20		"Пры выхадзе запомніць пазіцыю DVD"
+21		"Пры выхадзе запомніць пазіцыю ў файле"
+22		"Запамінаць пазіцыю акна"
+23		"Запамінаць памер акна"
+24		"Remember last Pan-n-Scan Zoom"
+25		"Remember last playlist"
+26		"Іншае"
+27		"Значок у панэлі задач"
+28		"Паказаць OSD (патрабуецца перазапуск)"
+29		"Show name of media file"
+30		"Show seek time"
+31		"Суадносіны бакоў акна як у відэакадра"
+32		"Прыліпаць да межаў экрана"
+33		"Store settings in the player folder"
+34		"Disable 'Open Disc' menu"
+35		"Падвышаны прыярытэт працэсу"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -438,17 +438,17 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 70
 69		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 5		"Subtitle renderer:"
 7		"Шлях да знешніх субтытраў"
 9		"Скід"
 10		"Заўсёды выкарыстоўваць знешнія субтытры як асноўныя"
 12		"Не загружаць убудаваныя субтытры"
 13		"Auto-reload subtitle files after detecting modification"
-14		"Use Subresync"
-15		"Online База"
-16		"URL анлайнавай базы субтытраў:"
-19		"Тэст"
+15		"Use Subresync"
+16		"Online База"
+17		"URL анлайнавай базы субтытраў:"
+20		"Тэст"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
@@ -511,17 +511,10 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Інтэрпрэтатары CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 20
-5		"Additional settings"
-6		"Preferred format:"
-8		"Load playlist"
-9		"Source"
-10		"Internal downloader"
-11		"File Source (URL)"
-12		"External source filter"
-13		"Initial buffer size"
-14		"% of source file size"
-15		"Mb"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
+6		"Use the built-in web page parser"
+7		"Preferred format:"
+9		"Load playlist"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
