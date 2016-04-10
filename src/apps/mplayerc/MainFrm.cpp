@@ -11780,98 +11780,6 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 	return hr;
 }
 
-static UINT YoutubeThreadProc(LPVOID pParam)
-{
-	return (static_cast<CMainFrame*>(pParam))->YoutubeThreadProc();
-}
-
-UINT CMainFrame::YoutubeThreadProc()
-{
-	CAppSettings& sApp = AfxGetAppSettings();
-	HINTERNET f, s = InternetOpen(L"MPC-BE", 0, NULL, NULL, 0);
-	if (s) {
-		f = InternetOpenUrl(s, m_YoutubeFile, NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
-		if (f) {
-			TCHAR QuerySizeText[100] = { 0 };
-			DWORD dw = _countof(QuerySizeText) * sizeof(TCHAR);
-			if (HttpQueryInfo(f, HTTP_QUERY_CONTENT_LENGTH, QuerySizeText, &dw, 0)) {
-				QWORD val = 0;
-				if (1 == swscanf_s(QuerySizeText, L"%I64d", &val)) {
-					m_YoutubeTotal = val;
-				}
-			}
-
-			if (GetTemporaryFilePath(GetFileExt(GetAltFileName()).MakeLower(), m_YoutubeFile)) {
-				HANDLE hFile;
-				hFile = CreateFile(m_YoutubeFile, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0 ,CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL);
-				if (hFile != INVALID_HANDLE_VALUE) {
-					sApp.slTMPFilesList.AddTail(m_YoutubeFile);
-
-					HANDLE hMapping = INVALID_HANDLE_VALUE;
-					if (m_YoutubeTotal > 0) {
-						ULARGE_INTEGER usize;
-						usize.QuadPart = m_YoutubeTotal;
-						hMapping = CreateFileMapping(hFile, 0, PAGE_READWRITE, usize.HighPart, usize.LowPart, NULL);
-						if (hMapping != INVALID_HANDLE_VALUE) {
-							CloseHandle(hMapping);
-						}
-					}
-
-					QWORD dwWaitSize = MEGABYTE;
-					switch (sApp.iYoutubeMemoryType) {
-						case 0:
-							if (m_YoutubeTotal && sApp.iYoutubePercentMemory && sApp.iYoutubePercentMemory <= 100) {
-								dwWaitSize = m_YoutubeTotal * ((float)sApp.iYoutubePercentMemory / 100);
-							}
-							break;
-						case 1:
-							if (sApp.iYoutubeMbMemory) {
-								dwWaitSize = m_YoutubeTotal ? min(sApp.iYoutubeMbMemory * MEGABYTE, m_YoutubeTotal) : sApp.iYoutubeMbMemory;
-							}
-							break;
-					}
-
-					DWORD dwBytesWritten	= 0;
-					DWORD dwBytesRead		= 0;
-					DWORD dataSize			= 0;
-					BYTE buf[64 * KILOBYTE];
-					while (InternetReadFile(f, (LPVOID)buf, sizeof(buf), &dwBytesRead) && dwBytesRead && m_fYoutubeThreadWork != TH_ERROR && m_fYoutubeThreadWork != TH_CLOSE) {
-						if (FALSE == WriteFile(hFile, (LPCVOID)buf, dwBytesRead, &dwBytesWritten, NULL) || dwBytesRead != dwBytesWritten) {
-							break;
-						}
-
-						m_YoutubeCurrent += dwBytesRead;
-						if (m_YoutubeCurrent >= dwWaitSize) {
-							m_fYoutubeThreadWork = TH_WORK;
-						}
-					}
-
-					if (m_fYoutubeThreadWork == TH_START) {
-						m_fYoutubeThreadWork = TH_WORK;
-					}
-					CloseHandle(hFile);
-				} else {
-					m_fYoutubeThreadWork = TH_ERROR;
-				}
-			} else {
-				m_fYoutubeThreadWork = TH_ERROR;
-			}
-			InternetCloseHandle(f);
-		} else {
-			m_fYoutubeThreadWork = TH_ERROR;
-		}
-		InternetCloseHandle(s);
-	} else {
-		m_fYoutubeThreadWork = TH_ERROR;
-	}
-
-	if (m_fYoutubeThreadWork != TH_ERROR) {
-		m_fYoutubeThreadWork = TH_CLOSE;
-	}
-
-	return (UINT)m_fYoutubeThreadWork;
-}
-
 CString CMainFrame::OpenFile(OpenFileData* pOFD)
 {
 	if (pOFD->fns.IsEmpty()) {
@@ -11894,7 +11802,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	m_strUrl.Empty();
 
 	CString youtubeUrl;
-	if (s.iYoutubeSource < 2 && pOFD->fns.GetCount() == 1) {
+	if (s.bYoutubePageParser && pOFD->fns.GetCount() == 1) {
 		CString fn = (CString)pOFD->fns.GetHead();
 		if (YoutubeParser::CheckURL(fn)) {
 			youtubeUrl = fn;
@@ -11911,32 +11819,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				if (pOFD->fns.GetCount() == 1) {
 					fn = (CString)pOFD->fns.GetHead();
 					CString tmp(fn); tmp.MakeLower();
-					if (s.iYoutubeSource == 0
-							&& tmp.Find(L".m3u8") == -1
-							&& !m_youtubeFields.fname.IsEmpty()) {
-						
-						m_fYoutubeThreadWork = TH_START;
-						m_YoutubeFile = fn;
-						m_YoutubeThread = AfxBeginThread(::YoutubeThreadProc, static_cast<LPVOID>(this), THREAD_PRIORITY_ABOVE_NORMAL);
-						while (m_fYoutubeThreadWork == TH_START && !m_fOpeningAborted) {
-							Sleep(50);
-						}
-						if (m_fOpeningAborted) {
-							m_fYoutubeThreadWork = TH_ERROR;
-							fn.Empty();
-							m_YoutubeFile.Empty();
-						}
-
-						if (m_fYoutubeThreadWork != TH_ERROR && ::PathFileExists(m_YoutubeFile)) {
-							fn = m_YoutubeFile;
-						} else {
-							fn.Empty();
-							m_YoutubeFile.Empty();
-						}
-
-						pOFD->fns.RemoveHeadNoReturn();
-						pOFD->fns.AddHead(fn);
-					} else if (tmp.Find(L".m3u8") > 0) {
+					if (tmp.Find(L".m3u8") > 0) {
 						CAtlList<CString> fns;
 						fns.AddTail(fn);
 						m_wndPlaylistBar.Open(fns, false);

@@ -1315,8 +1315,6 @@ private:
 	BOOL		m_bLeftMouseDownFullScreen	= FALSE;
 
 public:
-	UINT		YoutubeThreadProc();
-
 	BOOL		CheckMainFilter(IBaseFilter* pBF);
 
 	void		AddSubtitlePathsAddons(CString FileName);
