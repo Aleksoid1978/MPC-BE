@@ -39,13 +39,14 @@ CPPageFiltersPriority::~CPPageFiltersPriority()
 void CPPageFiltersPriority::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_COMBO1, m_AVI);
-	DDX_Control(pDX, IDC_COMBO2, m_MKV);
-	DDX_Control(pDX, IDC_COMBO3, m_MPEGTS);
-	DDX_Control(pDX, IDC_COMBO4, m_MPEG);
-	DDX_Control(pDX, IDC_COMBO5, m_MP4);
-	DDX_Control(pDX, IDC_COMBO6, m_FLV);
-	DDX_Control(pDX, IDC_COMBO7, m_WMV);
+	DDX_Control(pDX, IDC_COMBO1, m_HTTP);
+	DDX_Control(pDX, IDC_COMBO2, m_AVI);
+	DDX_Control(pDX, IDC_COMBO3, m_MKV);
+	DDX_Control(pDX, IDC_COMBO4, m_MPEGTS);
+	DDX_Control(pDX, IDC_COMBO5, m_MPEG);
+	DDX_Control(pDX, IDC_COMBO6, m_MP4);
+	DDX_Control(pDX, IDC_COMBO7, m_FLV);
+	DDX_Control(pDX, IDC_COMBO8, m_WMV);
 }
 
 BEGIN_MESSAGE_MAP(CPPageFiltersPriority, CPPageBase)
@@ -59,6 +60,8 @@ BOOL CPPageFiltersPriority::OnInitDialog()
 	__super::OnInitDialog();
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
+	GetDlgItem(IDC_STATIC1)->EnableWindow(FALSE);
+	m_HTTP.EnableWindow(FALSE);
 
 	Init();
 
@@ -102,6 +105,10 @@ BOOL CPPageFiltersPriority::OnApply()
 void CPPageFiltersPriority::Init()
 {
 	CAppSettings& s = AfxGetAppSettings();
+	
+	m_HTTP.ResetContent();
+	m_HTTP.AddString(ResStr(IDS_AG_DEFAULT_L));
+	m_HTTP.SetCurSel(0);
 
 	m_AVI.ResetContent();
 	m_AVI.AddString(ResStr(IDS_AG_DEFAULT_L));
