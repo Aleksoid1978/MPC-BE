@@ -26,6 +26,7 @@
 
 #define YOUTUBE_PL_URL				L"youtube.com/playlist?"
 #define YOUTUBE_URL					L"youtube.com/watch?"
+#define YOUTUBE_URL_A				L"www.youtube.com/attribution_link"
 #define YOUTUBE_URL_V				L"youtube.com/v/"
 #define YOUTU_BE_URL				L"youtu.be/"
 
@@ -46,6 +47,12 @@
 #define MATCH_END_2					"&"
 
 #define INTERNET_OPEN_FALGS			INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD
+
+static const LPCTSTR videoIdRegExps[] = {
+	L"?v={[-a-zA-Z0-9_]+}",
+	L"?video_ids={[-a-zA-Z0-9_]+}"
+};
+
 
 namespace YoutubeParser {
 	static const CString GOOGLE_API_KEY = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
@@ -134,6 +141,8 @@ namespace YoutubeParser {
 
 	static void HandleURL(CString& url)
 	{
+		url = UrlDecode(CStringA(url));
+
 		int pos = url.Find(L"youtube.com/");
 		if (pos == -1) {
 			pos = url.Find(L"youtu.be/");
@@ -142,6 +151,13 @@ namespace YoutubeParser {
 		if (pos != -1) {
 			url.Delete(0, pos);
 			url = L"https://www." + url;
+
+			if (url.Find(YOUTU_BE_URL) != -1) {
+				url.Replace(YOUTU_BE_URL, YOUTUBE_URL);
+				url.Replace(L"watch?", L"watch?v=");
+			} else if (url.Find(YOUTUBE_URL_V) != -1) {
+				url.Replace(L"v/", L"watch?v=");
+			}
 		}
 	}
 
@@ -150,7 +166,10 @@ namespace YoutubeParser {
 		CString tmp_fn(url);
 		tmp_fn.MakeLower();
 
-		if (tmp_fn.Find(YOUTUBE_URL) != -1 || tmp_fn.Find(YOUTUBE_URL_V) != -1 || tmp_fn.Find(YOUTU_BE_URL) != -1) {
+		if (tmp_fn.Find(YOUTUBE_URL) != -1
+				|| tmp_fn.Find(YOUTUBE_URL_A) != -1
+				|| tmp_fn.Find(YOUTUBE_URL_V) != -1
+				|| tmp_fn.Find(YOUTU_BE_URL) != -1) {
 			return true;
 		}
 
@@ -162,7 +181,9 @@ namespace YoutubeParser {
 		CString tmp_fn(url);
 		tmp_fn.MakeLower();
 
-		if (tmp_fn.Find(YOUTUBE_PL_URL) != -1 || (tmp_fn.Find(YOUTUBE_URL) != -1 && tmp_fn.Find(_T("&list=")) != -1)) {
+		if (tmp_fn.Find(YOUTUBE_PL_URL) != -1
+				|| (tmp_fn.Find(YOUTUBE_URL) != -1 && tmp_fn.Find(L"&list=") != -1)
+				|| (tmp_fn.Find(YOUTUBE_URL_A) != -1 && tmp_fn.Find(L"/watch_videos?video_ids") != -1)) {
 			return true;
 		}
 
@@ -301,18 +322,13 @@ namespace YoutubeParser {
 
 			HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
 			if (s) {
-				CString link = url;
-				HandleURL(link);
-				if (link.Find(YOUTU_BE_URL) != -1) {
-					link.Replace(YOUTU_BE_URL, YOUTUBE_URL);
-					link.Replace(_T("watch?"), _T("watch?v="));
-				} else if (link.Find(YOUTUBE_URL_V) != -1) {
-					link.Replace(_T("v/"), _T("watch?v="));
+				HandleURL(url);
+
+				for (int i = 0; i < _countof(videoIdRegExps) && videoId.IsEmpty(); i++) {
+					videoId = RegExpParse(url, videoIdRegExps[i]);
 				}
 
-				videoId = RegExpParse(link, L"v={[-a-zA-Z0-9_]+}");
-
-				f = InternetOpenUrl(s, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
+				f = InternetOpenUrl(s, url, NULL, 0, INTERNET_OPEN_FALGS, 0);
 				if (f) {
 					InternetReadData(f, &data, dataSize, NULL);
 					InternetCloseHandle(f);
@@ -719,9 +735,8 @@ namespace YoutubeParser {
 
 			HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
 			if (s) {
-				CString link(url);
-				HandleURL(link);
-				f = InternetOpenUrl(s, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
+				HandleURL(url);
+				f = InternetOpenUrl(s, url, NULL, 0, INTERNET_OPEN_FALGS, 0);
 				if (f) {
 					InternetReadData(f, &data, dataSize, "id=\"footer\"");
 					InternetCloseHandle(f);
@@ -790,7 +805,7 @@ namespace YoutubeParser {
 
 				if (!data_video_id.IsEmpty()) {
 					CString url;
-					url.Format(L"http://www.youtube.com/watch?v=%s", data_video_id);
+					url.Format(L"https://www.youtube.com/watch?v=%s", data_video_id);
 					YoutubePlaylistItem item(url, data_video_title);
 					youtubePlaylist.AddTail(item);
 
@@ -816,16 +831,13 @@ namespace YoutubeParser {
 		if (CheckURL(url)) {
 			HINTERNET s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
 			if (s) {
-				CString link(url);
-				HandleURL(link);
-				if (link.Find(YOUTU_BE_URL) != -1) {
-					link.Replace(YOUTU_BE_URL, YOUTUBE_URL);
-					link.Replace(_T("watch?"), _T("watch?v="));
-				} else if (link.Find(YOUTUBE_URL_V) != -1) {
-					link.Replace(_T("v/"), _T("watch?v="));
+				HandleURL(url);
+
+				CString videoId;
+				for (int i = 0; i < _countof(videoIdRegExps) && videoId.IsEmpty(); i++) {
+					videoId = RegExpParse(url, videoIdRegExps[i]);
 				}
 
-				CString videoId = RegExpParse(link, L"v={[-a-zA-Z0-9_]+}");
 				bRet = ParseMetadata(s, videoId, y_fields);
 				
 				InternetCloseHandle(s);
