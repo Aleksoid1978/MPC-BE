@@ -19423,107 +19423,105 @@ BOOL CMainFrame::OpenYoutubePlaylist(CString url)
 BOOL CMainFrame::AddSimilarFiles(CAtlList<CString>& fns)
 {
 	if (!AfxGetAppSettings().bAddSimilarFiles
-			|| fns.IsEmpty() || fns.GetCount() > 1) {
+			|| fns.GetCount() != 1
+			|| !::PathFileExists(fns.GetHead())
+			|| ::PathIsDirectory(fns.GetHead())) {
 		return FALSE;
 	}
 
 	CString fname = fns.GetHead();
-	if (::PathFileExists(fname)) {
-		const CString path = AddSlash(GetFolderOnly(fname));
-		fname = GetFileOnly(fname);
-		CString name(fname);
-		CString ext;
-		const int n = name.ReverseFind('.');
-		if (n > 0) {
-			ext = name.Mid(n).MakeLower();
-			name.Truncate(n);
+	const CString path = AddSlash(GetFolderOnly(fname));
+	fname = GetFileOnly(fname);
+	CString name(fname);
+	CString ext;
+	const int n = name.ReverseFind('.');
+	if (n > 0) {
+		ext = name.Mid(n).MakeLower();
+		name.Truncate(n);
+	}
+
+	const LPCTSTR excludeMask = 
+		L"ATS_\\d{2}_\\d{1}.*|" // DVD Audio
+		L"VTS_\\d{2}_\\d{1}.*|" // DVD Video
+		L"\\d{5}\\.clpi|"       // Blu-ray clip info
+		L"\\d{5}\\.m2ts|"       // Blu-ray streams
+		L"\\d{5}\\.mpls";       // Blu-ray playlist
+	const std::wregex excludeMaskRe(excludeMask, std::wregex::icase);
+	if (std::regex_match((LPCTSTR)fname, excludeMaskRe)) {
+		return FALSE;
+	};
+
+	const LPCTSTR excludeWords[][2] = {
+		{L"720p",  L"<seven_hundred_twenty>"},
+		{L"1080p", L"<thousand_and_eighty>"},
+		{L"1440p", L"<thousand_four_hundred_forty>"},
+		{L"2160p", L"<two_thousand_one_hundred_and_sixty>"},
+	};
+
+	int excludeWordsNum = -1;
+	for (int i = 0; i < _countof(excludeWords); i++) {
+		const auto& words = excludeWords[i];
+
+		CString tmp(name);
+		tmp.MakeLower();
+		const int n = tmp.Find(words[0]);
+		if (n >= 0) {
+			name.Replace(words[0], words[1]);
+			excludeWordsNum = i;
+			break;
 		}
-
-		const LPCTSTR excludeMask = 
-			L"ATS_\\d{2}_\\d{1}.*|" // DVD Audio
-			L"VTS_\\d{2}_\\d{1}.*|" // DVD Video
-			L"\\d{5}\\.clpi|"       // Blu-ray clip info
-			L"\\d{5}\\.m2ts|"       // Blu-ray streams
-			L"\\d{5}\\.mpls";       // Blu-ray playlist
-		const std::wregex excludeMaskRe(excludeMask, std::wregex::icase);
-		if (std::regex_match((LPCTSTR)fname, excludeMaskRe)) {
-			return FALSE;
-		};
-
-		const LPCTSTR excludeWords[][2] = {
-			{L"720p",  L"<seven_hundred_twenty>"},
-			{L"1080p", L"<thousand_and_eighty>"},
-			{L"1440p", L"<thousand_four_hundred_forty>"},
-			{L"2160p", L"<two_thousand_one_hundred_and_sixty>"},
-		};
-
-		int excludeWordsNum = -1;
-		for (int i = 0; i < _countof(excludeWords); i++) {
-			const auto& words = excludeWords[i];
-
-			CString tmp(name);
-			tmp.MakeLower();
-			const int n = tmp.Find(words[0]);
-			if (n >= 0) {
-				name.Replace(words[0], words[1]);
-				excludeWordsNum = i;
-				break;
-			}
-		}
+	}
 		
-		const std::wregex replace_spec(LR"([\.\(\)\[\]\{\}\+])", std::wregex::icase);
-		std::wstring regExp = std::regex_replace((LPCTSTR)name, replace_spec, L"\\$&");
+	const std::wregex replace_spec(LR"([\.\(\)\[\]\{\}\+])", std::wregex::icase);
+	std::wstring regExp = std::regex_replace((LPCTSTR)name, replace_spec, L"\\$&");
 
-		const std::wregex replace_digit(L"\\d+", std::wregex::icase);
-		regExp = std::regex_replace(regExp, replace_digit, L"\\d+");
+	const std::wregex replace_digit(L"\\d+", std::wregex::icase);
+	regExp = std::regex_replace(regExp, replace_digit, L"\\d+");
 
-		if (excludeWordsNum != -1) {
-			const auto& words = excludeWords[excludeWordsNum];
-			CString tmp(regExp.c_str());
-			tmp.Replace(words[1], words[0]);
-			regExp = tmp;
-		}
+	if (excludeWordsNum != -1) {
+		const auto& words = excludeWords[excludeWordsNum];
+		CString tmp(regExp.c_str());
+		tmp.Replace(words[1], words[0]);
+		regExp = tmp;
+	}
 
-		regExp += L".*";
-		if (!ext.IsEmpty()) {
-			regExp += L"\\" + ext;
-		}
+	regExp += L".*";
+	if (!ext.IsEmpty()) {
+		regExp += L"\\" + ext;
+	}
 
-		const std::wregex mask(regExp, std::wregex::icase);
+	const std::wregex mask(regExp, std::wregex::icase);
 
-		std::vector<CString> files;
-		WIN32_FIND_DATA wfd = { 0 };
-		HANDLE hFile = FindFirstFile(path + '*' + ext, &wfd);
-		if (hFile != INVALID_HANDLE_VALUE) {
-			do {
-				if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-					continue;
-				}
-
-				if (std::regex_match(wfd.cFileName, mask)) {
-					files.emplace_back(wfd.cFileName);
-				}
-			} while (FindNextFile(hFile, &wfd));
-
-			FindClose(hFile);
-		}
-
-		if (!files.empty()) {
-			bool bFoundCurFile = false;
-			for (size_t i = 0; i < files.size(); i++) {
-				const CString& fn = files[i];
-				if (bFoundCurFile) {
-					fns.AddTail(path + fn);
-				} else {
-					bFoundCurFile = (fn == fname);
-				}
+	std::vector<CString> files;
+	WIN32_FIND_DATA wfd = { 0 };
+	HANDLE hFile = FindFirstFile(path + '*' + ext, &wfd);
+	if (hFile != INVALID_HANDLE_VALUE) {
+		do {
+			if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				continue;
 			}
-				
-			return (fns.GetCount() > 1);
+
+			if (std::regex_match(wfd.cFileName, mask)) {
+				files.emplace_back(wfd.cFileName);
+			}
+		} while (FindNextFile(hFile, &wfd));
+
+		FindClose(hFile);
+	}
+
+	if (!files.empty()) {
+		bool bFoundCurFile = false;
+		for (size_t i = 0; i < files.size(); i++) {
+			const CString& fn = files[i];
+			if (bFoundCurFile) {
+				fns.AddTail(path + fn);
+			} else {
+				bFoundCurFile = (fn == fname);
+			}
 		}
 	}
 
-	return FALSE;
+	return (fns.GetCount() > 1);
 }
 
 void CMainFrame::SetToolBarAudioButton()
