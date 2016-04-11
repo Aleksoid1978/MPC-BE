@@ -548,6 +548,11 @@ void CPPageVideo::OnDSRendererChange()
 				GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
 				m_cbD3D9RenderDevice.EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE));
 			}
+
+			// Force 3D surface with EVR Custom
+			m_cbAPSurfaceUsage.SetCurSel(2);
+			OnSurfaceChange();
+
 			GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
 			m_cbDX9SurfaceFormat.EnableWindow(TRUE);
 			GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
@@ -558,10 +563,6 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
 			GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
 			m_spnEvrBuffers.EnableWindow(TRUE);
-
-			// Force 3D surface with EVR Custom
-			m_cbAPSurfaceUsage.SetCurSel(2);
-			OnSurfaceChange();
 
 			GetDlgItem(IDC_STATIC4)->EnableWindow(TRUE);
 			m_cbEVROutputRange.EnableWindow(TRUE);
@@ -584,6 +585,10 @@ void CPPageVideo::OnDSRendererChange()
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR_CUSTOM), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_SYNC:
+			// Force 3D surface with EVR Sync
+			m_cbAPSurfaceUsage.SetCurSel(2);
+			OnSurfaceChange();
+
 			GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
 			m_spnEvrBuffers.EnableWindow(TRUE);
@@ -592,9 +597,6 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
 			GetDlgItem(IDC_CHECK1)->EnableWindow(m_chkD3DFullscreen.GetCheck() == BST_CHECKED);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
-			// Force 3D surface with EVR Sync
-			m_cbAPSurfaceUsage.SetCurSel(2);
-			OnSurfaceChange();
 
 			GetDlgItem(IDC_STATIC4)->EnableWindow(TRUE);
 			m_cbEVROutputRange.EnableWindow(TRUE);
