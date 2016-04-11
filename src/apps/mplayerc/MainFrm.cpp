@@ -19484,7 +19484,10 @@ BOOL CMainFrame::AddSimilarFiles(CAtlList<CString>& fns)
 			regExp = tmp;
 		}
 
-		regExp += L".*\\" + ext;
+		regExp += L".*";
+		if (!ext.IsEmpty()) {
+			regExp += L"\\" + ext;
+		}
 
 		const std::wregex mask(regExp, std::wregex::icase);
 
