@@ -197,6 +197,7 @@ private :
 	DWORD		ReadDword();
 	SHORT		ReadShort();
 	BYTE		ReadByte();
+	void		Skip(LONG nLen);
 
 	HRESULT		ReadProgramInfo();
 	HRESULT		ReadCpiInfo(CAtlArray<SyncPoint>* sps);

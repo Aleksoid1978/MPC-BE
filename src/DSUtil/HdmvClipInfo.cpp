@@ -75,6 +75,11 @@ BYTE CHdmvClipInfo::ReadByte()
 	return value;
 }
 
+void CHdmvClipInfo::Skip(LONG nLen)
+{
+	SetFilePointer(m_hFile, nLen, NULL, FILE_CURRENT);
+}
+
 HRESULT CHdmvClipInfo::ReadProgramInfo()
 {
 	BYTE			number_of_program_sequences;
