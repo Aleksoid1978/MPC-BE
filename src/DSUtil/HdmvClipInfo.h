@@ -115,7 +115,7 @@ public:
 		CAtlArray<BYTE>			m_pg_offset_sequence_id;
 		CAtlArray<BYTE>			m_ig_offset_sequence_id;
 
-		CAtlArray<SyncPoint> m_sps;
+		CAtlArray<SyncPoint>	m_sps;
 
 		REFERENCE_TIME Duration() const {
 			return m_rtOut - m_rtIn;

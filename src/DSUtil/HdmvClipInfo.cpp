@@ -403,7 +403,6 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 		LARGE_INTEGER	PosExt = {0, 0};
 		DWORD			dwTemp = 0;
 		USHORT			nPlaylistItems = 0;
-		USHORT			nSubPathsItems = 0;
 
 		Pos.QuadPart = ReadDword();		// PlayList_start_address
 		ReadDword();					// PlayListMark_start_address
@@ -422,6 +421,12 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			BYTE flags = ReadByte();	// flags
 			*MVC_Base_View_R_flag = (flags >> 4) & 0x1;
 		}
+
+		struct ext_sub_path {
+			BYTE type = 0;
+			BYTE playitem_count = 0;
+		};
+		CAtlArray<ext_sub_path> ext_sub_paths;
 
 		// Extension
 		LARGE_INTEGER PosSTNSSExt = {0, 0};
@@ -446,8 +451,24 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 						SetFilePointerEx(m_hFile, savePosExt, &savePosExt, FILE_CURRENT);
 
 						SetFilePointerEx(m_hFile, PosExtSub, NULL, FILE_BEGIN);
-						ReadDword();					// lenght
-						nSubPathsItems += ReadShort();	// number_of_SubPaths
+						ReadDword();									// lenght
+						const USHORT ExtSubPathsItems = ReadShort();	// number_of_ExtSubPaths
+						for (USHORT k = 0; k < ExtSubPathsItems; k++) {
+							const DWORD lenght = ReadDword();
+
+							LARGE_INTEGER savePosExtPath = {0, 0};
+							SetFilePointerEx(m_hFile, savePosExtPath, &savePosExtPath, FILE_CURRENT);
+							savePosExtPath.QuadPart += lenght;
+
+							ext_sub_path _ext_sub_path;
+							ReadByte();
+							_ext_sub_path.type = ReadByte();
+							ReadShort();ReadByte();
+							_ext_sub_path.playitem_count = ReadByte();
+							ext_sub_paths.Add(_ext_sub_path);
+
+							SetFilePointerEx(m_hFile, savePosExtPath, NULL, FILE_BEGIN);
+						}
 
 						SetFilePointerEx(m_hFile, savePosExt, NULL, FILE_BEGIN);
 					}
@@ -455,12 +476,20 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			}
 		}
 
-		// PlayList()
+		// PlayList
 		SetFilePointerEx(m_hFile, Pos, NULL, FILE_BEGIN);
 		ReadDword();						// length
 		ReadShort();						// reserved_for_future_use
 		nPlaylistItems  = ReadShort();		// number_of_PlayItems
-		nSubPathsItems += ReadShort();		// number_of_SubPaths
+		ReadShort();						// number_of_SubPaths
+
+		BOOL bHaveMVCExtension = FALSE;
+		for (size_t i = 0; i < ext_sub_paths.GetCount(); i++) {
+			if (ext_sub_paths[i].type == 8 && ext_sub_paths[i].playitem_count == nPlaylistItems) {
+				bHaveMVCExtension = TRUE;
+				break;
+			}
+		}
 
 		Pos.QuadPart += 10;
 		__int64 TotalSize = 0;
@@ -474,7 +503,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			}
 
 			LPCWSTR format = L"%s\\STREAM\\%c%c%c%c%c.M2TS";
-			if (nSubPathsItems) {
+			if (bHaveMVCExtension) {
 				format = L"%s\\STREAM\\SSIF\\%c%c%c%c%c.SSIF";
 			}
 			Item->m_strFileName.Format(format, CString(Path), Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
