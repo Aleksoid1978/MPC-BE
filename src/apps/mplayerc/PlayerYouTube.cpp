@@ -49,8 +49,8 @@
 #define INTERNET_OPEN_FALGS			INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD
 
 static const LPCTSTR videoIdRegExps[] = {
-	L"?v={[-a-zA-Z0-9_]+}",
-	L"?video_ids={[-a-zA-Z0-9_]+}"
+	L"v={[-a-zA-Z0-9_]+}",
+	L"video_ids={[-a-zA-Z0-9_]+}"
 };
 
 
