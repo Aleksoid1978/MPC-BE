@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,7 @@
 #include <inttypes.h>
 #include "libmpeg2.h"
 #include "attributes.h"
-#include "../../../DSUtil/simd.h"
+#include "simd.h"
 
 // Intel's SSE2 implementation of iDCT
 // AP-945
