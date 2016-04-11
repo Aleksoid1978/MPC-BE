@@ -45,29 +45,34 @@ HRESULT CHdmvClipInfo::CloseFile(HRESULT hr)
 	return hr;
 }
 
-DWORD CHdmvClipInfo::ReadDword()
-{
-	return ReadByte()<<24 | ReadByte()<<16 | ReadByte()<<8 | ReadByte();
-}
-
-SHORT CHdmvClipInfo::ReadShort()
-{
-	return ReadByte()<<8 | ReadByte();
-}
-
-BYTE CHdmvClipInfo::ReadByte()
-{
-	BYTE	bVal;
-	DWORD	dwRead;
-	ReadFile(m_hFile, &bVal, sizeof(bVal), &dwRead, NULL);
-
-	return bVal;
-}
-
 void CHdmvClipInfo::ReadBuffer(BYTE* pBuff, DWORD nLen)
 {
 	DWORD	dwRead;
 	ReadFile(m_hFile, pBuff, nLen, &dwRead, NULL);
+}
+
+DWORD CHdmvClipInfo::ReadDword()
+{
+	DWORD value;
+	ReadBuffer((BYTE*)&value, sizeof(value));
+
+	return _byteswap_ulong(value);
+}
+
+SHORT CHdmvClipInfo::ReadShort()
+{
+	WORD value;
+	ReadBuffer((BYTE*)&value, sizeof(value));
+
+	return _byteswap_ushort(value);
+}
+
+BYTE CHdmvClipInfo::ReadByte()
+{
+	BYTE value;
+	ReadBuffer((BYTE*)&value, sizeof(value));
+
+	return value;
 }
 
 HRESULT CHdmvClipInfo::ReadProgramInfo()
