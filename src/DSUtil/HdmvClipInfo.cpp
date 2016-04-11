@@ -423,8 +423,8 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 		}
 
 		struct ext_sub_path {
-			BYTE type = 0;
-			BYTE playitem_count = 0;
+			BYTE type;
+			BYTE playitem_count;
 		};
 		CAtlArray<ext_sub_path> ext_sub_paths;
 
