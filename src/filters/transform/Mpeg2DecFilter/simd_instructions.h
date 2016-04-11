@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+#if defined(_M_IX86)
 
 MMX_INSTRUCTION(paddb,_mm_add_pi8)
 MMX_INSTRUCTION(paddsb,_mm_adds_pi8)
@@ -72,6 +74,8 @@ MMX_INSTRUCTION(pmaxsw,_mm_max_pi16)
 MMX_INSTRUCTION(pavgb,_mm_avg_pu8)
 
 MMX_INSTRUCTION(psadbw,_mm_sad_pu8)
+
+#endif // defined(_M_IX86)
 
 #ifdef __SSE2__
 

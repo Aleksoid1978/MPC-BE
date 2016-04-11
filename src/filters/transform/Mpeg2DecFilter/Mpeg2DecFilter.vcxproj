@@ -222,7 +222,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="attributes.h" />
-    <ClInclude Include="..\..\..\DSUtil\csimd.h" />
     <ClInclude Include="IMpeg2DecFilter.h" />
     <ClInclude Include="libmpeg2.h" />
     <ClInclude Include="Mpeg2DecFilter.h" />
@@ -230,9 +229,9 @@
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="..\..\..\DSUtil\simd.h" />
-    <ClInclude Include="..\..\..\DSUtil\simd_common.h" />
-    <ClInclude Include="..\..\..\DSUtil\simd_instructions.h" />
+    <ClInclude Include="simd.h" />
+    <ClInclude Include="simd_common.h" />
+    <ClInclude Include="simd_instructions.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

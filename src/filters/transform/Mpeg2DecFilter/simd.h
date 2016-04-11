@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -43,6 +43,7 @@
 #undef MMX_INSTRUCTION
 #undef SSE2I_INSTRUCTION
 
+#if defined(_M_IX86)
 static __forceinline void movq(__m64 &dst,const __m64 &src)
 {
 	dst=src;
@@ -244,6 +245,7 @@ static __forceinline void cvtpi2ps(__m128 &dst,const __m64 &src)
 {
 	dst=_mm_cvtpi32_ps(dst,src);
 }
+#endif // defined(_M_IX86)
 
 #ifdef __SSE2__
 static __forceinline void movq(__m128i &dst,const __m128i &src)
@@ -291,10 +293,13 @@ static __forceinline void movntdq(void *dst,const __m128i &src)
 {
 	_mm_stream_si128((__m128i*)dst,src);
 }
+
+#if defined(_M_IX86)
 static __forceinline void movdq2q(__m64 &dst,const __m128i &src)
 {
 	dst=_mm_movepi64_pi64(src);
 }
+#endif // defined(_M_IX86)
 
 static __forceinline void psrlw(__m128i &dst,int i)
 {
@@ -475,7 +480,10 @@ static __forceinline void movlhps(__m128i &dst,const __m128i &src)
 
 #endif //__SSE2__
 
+#endif
+
 //======================================= MMX ======================================
+#if defined(_M_IX86)
 #define MMX_INSTRUCTIONS \
  static __forceinline __m setzero_si64(void) {return _mm_setzero_si64();} \
  static __forceinline __m set_pi8(char b7,char b6,char b5,char b4,char b3,char b2,char b1,char b0) {return _mm_set_pi8(b7,b6,b5,b4,b3,b2,b1,b0);} \
@@ -965,7 +973,6 @@ template<class _mm> static __forceinline typename _mm::__m absdif_s16(typename _
 	mm1=_mm::xor_si64(mm1,mm3);
 	return _mm::sub_pi16(mm1,mm4);
 }
+#endif // defined(_M_IX86)
 
 #pragma warning(pop)
-
-#endif
