@@ -124,6 +124,8 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	CorrectCWndWidth(GetDlgItem(IDC_CHECK2));
 
+	OnCheckPageParser();
+
 	UpdateData(FALSE);
 
 	return TRUE;
