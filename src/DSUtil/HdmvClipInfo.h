@@ -193,10 +193,10 @@ private :
 	CAtlArray<Stream>	m_Streams;
 	bool				m_bIsHdmv;
 
+	void		ReadBuffer(BYTE* pBuff, DWORD nLen);
 	DWORD		ReadDword();
 	SHORT		ReadShort();
 	BYTE		ReadByte();
-	void		ReadBuffer(BYTE* pBuff, DWORD nLen);
 
 	HRESULT		ReadProgramInfo();
 	HRESULT		ReadCpiInfo(CAtlArray<SyncPoint>* sps);
