@@ -453,66 +453,63 @@ CString CMediaTypeEx::GetSubtitleCodecName(const GUID& subtype)
 	return str;
 }
 
-#define ADDENTRY(mode) DXVA_names[mode] = _T(#mode)
+#define ADDENTRY(mode) DXVA_names[mode] = #mode
 CString GetGUIDString(const GUID& guid)
 {
-	static CAtlMap<GUID, CString> DXVA_names;
+	static CAtlMap<GUID, CHAR*> DXVA_names;
 	{
-		DXVA_ModeNone;
-
+		// GUID names from dxva.h
 		ADDENTRY(DXVA_ModeNone);
 		ADDENTRY(DXVA_ModeH261_A);
 		ADDENTRY(DXVA_ModeH261_B);
-
 		ADDENTRY(DXVA_ModeH263_A);
 		ADDENTRY(DXVA_ModeH263_B);
 		ADDENTRY(DXVA_ModeH263_C);
 		ADDENTRY(DXVA_ModeH263_D);
 		ADDENTRY(DXVA_ModeH263_E);
 		ADDENTRY(DXVA_ModeH263_F);
-
 		ADDENTRY(DXVA_ModeMPEG1_A);
-
 		ADDENTRY(DXVA_ModeMPEG2_A);
 		ADDENTRY(DXVA_ModeMPEG2_B);
 		ADDENTRY(DXVA_ModeMPEG2_C);
 		ADDENTRY(DXVA_ModeMPEG2_D);
+		ADDENTRY(DXVA_ModeH264_MoComp_NoFGT);
+		ADDENTRY(DXVA_ModeH264_MoComp_FGT);
+		ADDENTRY(DXVA_ModeH264_IDCT_NoFGT);
+		ADDENTRY(DXVA_ModeH264_IDCT_FGT);
+		ADDENTRY(DXVA_ModeH264_VLD_NoFGT);
+		ADDENTRY(DXVA_ModeH264_VLD_FGT);
+		ADDENTRY(DXVA_ModeWMV8_PostProc);
+		ADDENTRY(DXVA_ModeWMV8_MoComp);
+		ADDENTRY(DXVA_ModeWMV9_PostProc);
+		ADDENTRY(DXVA_ModeWMV9_MoComp);
+		ADDENTRY(DXVA_ModeWMV9_IDCT);
+		ADDENTRY(DXVA_ModeVC1_PostProc);
+		ADDENTRY(DXVA_ModeVC1_MoComp);
+		ADDENTRY(DXVA_ModeVC1_IDCT);
+		ADDENTRY(DXVA_ModeVC1_VLD);
+		ADDENTRY(DXVA_NoEncrypt);
+
+		// GUID names from dxva2api.h
 		ADDENTRY(DXVA2_ModeMPEG2_MoComp);
 		ADDENTRY(DXVA2_ModeMPEG2_IDCT);
 		ADDENTRY(DXVA2_ModeMPEG2_VLD);
-		ADDENTRY(DXVA_ModeMPEG2and1_VLD);
-
-		ADDENTRY(DXVA_ModeH264_A);
-		ADDENTRY(DXVA_ModeH264_B);
-		ADDENTRY(DXVA_ModeH264_C);
-		ADDENTRY(DXVA_ModeH264_D);
-		ADDENTRY(DXVA_ModeH264_E);
-		ADDENTRY(DXVA_ModeH264_F);
-
-		ADDENTRY(DXVA_ModeWMV8_A);
-		ADDENTRY(DXVA_ModeWMV8_B);
-
-		ADDENTRY(DXVA_ModeWMV9_A);
-		ADDENTRY(DXVA_ModeWMV9_B);
-		ADDENTRY(DXVA_ModeWMV9_C);
-
-		ADDENTRY(DXVA_ModeVC1_A);
-		ADDENTRY(DXVA_ModeVC1_B);
-		ADDENTRY(DXVA_ModeVC1_C);
-		ADDENTRY(DXVA_ModeVC1_D);
-		ADDENTRY(DXVA_ModeVC1_D2010);
-
-		ADDENTRY(DXVA_Intel_H264_ClearVideo);
-		ADDENTRY(DXVA_Intel_VC1_ClearVideo);
-		ADDENTRY(DXVA_Intel_VC1_ClearVideo_2);
-		ADDENTRY(DXVA_MPEG4_ASP);
-
-		ADDENTRY(DXVA_ModeHEVC_VLD_Main);
-		ADDENTRY(DXVA_ModeHEVC_VLD_Main10);
-
-		ADDENTRY(DXVA_VP9_VLD_Profile0);
-
-		ADDENTRY(DXVA_NoEncrypt);
+		//ADDENTRY(DXVA2_ModeH264_MoComp_NoFGT);
+		//ADDENTRY(DXVA2_ModeH264_MoComp_FGT);
+		//ADDENTRY(DXVA2_ModeH264_IDCT_NoFGT);
+		//ADDENTRY(DXVA2_ModeH264_IDCT_FGT);
+		//ADDENTRY(DXVA2_ModeH264_VLD_NoFGT);
+		//ADDENTRY(DXVA2_ModeH264_VLD_FGT);
+		//ADDENTRY(DXVA2_ModeWMV8_PostProc);
+		//ADDENTRY(DXVA2_ModeWMV8_MoComp);
+		//ADDENTRY(DXVA2_ModeWMV9_PostProc);
+		//ADDENTRY(DXVA2_ModeWMV9_MoComp);
+		//ADDENTRY(DXVA2_ModeWMV9_IDCT);
+		//ADDENTRY(DXVA2_ModeVC1_PostProc);
+		//ADDENTRY(DXVA2_ModeVC1_MoComp);
+		//ADDENTRY(DXVA2_ModeVC1_IDCT);
+		//ADDENTRY(DXVA2_ModeVC1_VLD);
+		//ADDENTRY(DXVA2_NoEncrypt);
 	}
 
 	// to prevent print TIME_FORMAT_NONE for GUID_NULL
@@ -520,18 +517,18 @@ CString GetGUIDString(const GUID& guid)
 		return _T("GUID_NULL");
 	}
 
-	CString guidStr = CString(GuidNames[guid]);
-	if (guidStr == _T("Unknown GUID Name")) {
-		guidStr = CString(m_GuidNames[guid]);
+	CHAR* guidStr = GuidNames[guid]; // GUID names from uuids.h
+	if (strcmp(guidStr, "Unknown GUID Name") == 0) {
+		guidStr = m_GuidNames[guid]; // GUID names from moreuuids.h
 	}
-	if (guidStr == _T("Unknown GUID Name")) {
-		CString str;
+	if (strcmp(guidStr, "Unknown GUID Name") == 0) {
+		CHAR* str;
 		if (DXVA_names.Lookup(guid, str)) {
 			guidStr = str;
 		}
 	}
 
-	return guidStr;
+	return CString(guidStr);
 }
 
 void CMediaTypeEx::Dump(CAtlList<CString>& sl)
