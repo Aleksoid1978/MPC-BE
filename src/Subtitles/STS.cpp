@@ -654,7 +654,7 @@ static bool OpenWebVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 		}
 	}
 
-	return !ret.IsEmpty();
+	return true;
 }
 
 static bool OpenSubViewer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
