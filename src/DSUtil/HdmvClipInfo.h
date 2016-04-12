@@ -197,7 +197,10 @@ private :
 	DWORD		ReadDword();
 	SHORT		ReadShort();
 	BYTE		ReadByte();
-	void		Skip(LONG nLen);
+	
+	BOOL		Skip(LONGLONG nLen);
+	BOOL		GetPos(LONGLONG& Pos);
+	BOOL		SetPos(LONGLONG Pos, DWORD dwMoveMethod = FILE_BEGIN);
 
 	HRESULT		ReadProgramInfo();
 	HRESULT		ReadCpiInfo(CAtlArray<SyncPoint>* sps);
