@@ -536,7 +536,19 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 				}
 			}
 
-			fl.Insert(DNew CFGFilterRegistry(CLSID_URLReader), 6);
+			BOOL bIsBlocked = FALSE;
+			POSITION pos = m_override.GetHeadPosition();
+			while (pos) {
+				CFGFilter* pFGF = m_override.GetNext(pos);
+				if (pFGF->GetCLSID() == CLSID_URLReader && pFGF->GetMerit() == MERIT64_DO_NOT_USE) {
+					bIsBlocked = TRUE;
+					break;
+				}
+			}
+
+			if (!bIsBlocked) {
+				fl.Insert(DNew CFGFilterRegistry(CLSID_URLReader), 6);
+			}
 		} else {
 			// check bytes
 
@@ -619,19 +631,30 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	}
 
 	if (hFile != INVALID_HANDLE_VALUE) {
-		CloseHandle(hFile);
-	}
+		const CAppSettings& s = AfxGetAppSettings();
+		if (ext == L".mpc" && s.SrcFilters[SRC_MUSEPACK]) { // hack for internal Splitter without Source - add File Source (Async) with high merit
+			CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_ABOVE_DSHOW - 1);
+			pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
+			fl.Insert(pFGF, 3);
+		} else {
+			BOOL bIsBlocked = FALSE;
+			POSITION pos = m_override.GetHeadPosition();
+			while (pos) {
+				CFGFilter* pFGF = m_override.GetNext(pos);
+				if (pFGF->GetCLSID() == CLSID_AsyncReader && pFGF->GetMerit() == MERIT64_DO_NOT_USE) {
+					bIsBlocked = TRUE;
+					break;
+				}
+			}
 
-	CAppSettings& s	= AfxGetAppSettings();
-	bool *src		= s.SrcFilters;
-	if (ext == _T(".mpc") && src[SRC_MUSEPACK]) { // hack for internal Splitter without Source - add File Source (Async) with high merit
-		CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override, MERIT64_ABOVE_DSHOW - 1);
-		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
-		fl.Insert(pFGF, 3);
-	} else {
-		CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override);
-		pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
-		fl.Insert(pFGF, 9);
+			if (!bIsBlocked) {
+				CFGFilter* pFGF = LookupFilterRegistry(CLSID_AsyncReader, m_override);
+				pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_NULL);
+				fl.Insert(pFGF, 9);
+			}
+		}
+
+		CloseHandle(hFile);
 	}
 
 	return S_OK;
