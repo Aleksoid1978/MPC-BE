@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -118,7 +118,7 @@ HRESULT CAviFile::BuildAMVIndex()
 		Seek(GetPos() + ulSize);
 	}
 
-	TRACE ("Video packet : %d   Audio packet :%d\n", m_strms[0]->cs.GetCount(), m_strms[1]->cs.GetCount());
+	DbgLog((LOG_TRACE, 3, L"CAviFile::BuildAMVIndex() : Video packet : %d, Audio packet : %d", m_strms[0]->cs.GetCount(), m_strms[1]->cs.GetCount()));
 	return S_OK;
 }
 
@@ -146,11 +146,11 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 			}
 			size += (size&1) + 8;
 
-			TRACE(_T("CAviFile::Parse(..): LIST '%c%c%c%c'\n"),
-				  TCHAR((id>>0)&0xff),
-				  TCHAR((id>>8)&0xff),
-				  TCHAR((id>>16)&0xff),
-				  TCHAR((id>>24)&0xff));
+			DbgLog((LOG_TRACE, 3, L"CAviFile::Parse() : LIST '%c%c%c%c'",
+					TCHAR((id>>0)&0xff),
+					TCHAR((id>>8)&0xff),
+					TCHAR((id>>16)&0xff),
+					TCHAR((id>>24)&0xff)));
 
 			if (id == FCC('movi')) {
 				m_movis.AddTail(pos);
@@ -172,11 +172,11 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 				return E_FAIL; // broken chunk
 			}
 
-			TRACE(_T("CAviFile::Parse(..): '%c%c%c%c'\n"),
-				  TCHAR((id>>0)&0xff),
-				  TCHAR((id>>8)&0xff),
-				  TCHAR((id>>16)&0xff),
-				  TCHAR((id>>24)&0xff));
+			DbgLog((LOG_TRACE, 3, L"CAviFile::Parse() : '%c%c%c%c'",
+					TCHAR((id>>0)&0xff),
+					TCHAR((id>>8)&0xff),
+					TCHAR((id>>16)&0xff),
+					TCHAR((id>>24)&0xff)));
 
 			if (parentid == FCC('INFO') && size > 0) {
 				switch (id) {
@@ -313,11 +313,11 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					}
 					break;
 				default :
-					TRACE(_T("CAviFile::Parse(..): unknown tag '%c%c%c%c'\n"),
-						  TCHAR((id>>0)&0xff),
-						  TCHAR((id>>8)&0xff),
-						  TCHAR((id>>16)&0xff),
-						  TCHAR((id>>24)&0xff));
+					DbgLog((LOG_TRACE, 3, L"CAviFile::Parse() : unknown tag '%c%c%c%c'",
+							TCHAR((id>>0)&0xff),
+							TCHAR((id>>8)&0xff),
+							TCHAR((id>>16)&0xff),
+							TCHAR((id>>24)&0xff)));
 					break;
 			}
 
@@ -460,7 +460,7 @@ HRESULT CAviFile::BuildIndex()
 			Seek(offset + idx->aIndex[0].dwOffset);
 			ReadAvi(id);
 			if (id != idx->aIndex[0].dwChunkId) {
-				TRACE(_T("WARNING: CAviFile::Init() detected absolute chunk addressing in \'idx1\'\n"));
+				DbgLog((LOG_TRACE, 3, L"WARNING: CAviFile::BuildIndex() detected absolute chunk addressing in \'idx1\'"));
 				offset = 0;
 			}
 		}
