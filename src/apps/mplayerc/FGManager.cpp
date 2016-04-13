@@ -662,7 +662,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppBF)
 {
-	DbgLog((LOG_TRACE, 3, L"FGM: AddSourceFilter() trying '%s'", CStringFromGUID(pFGF->GetCLSID())));
+	DbgLog((LOG_TRACE, 3, L"FGM: AddSourceFilter() trying '%s'", pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName())/*CStringFromGUID(pFGF->GetCLSID())*/));
 
 	CheckPointer(lpcwstrFileName, E_POINTER);
 	CheckPointer(ppBF, E_POINTER);
@@ -1231,7 +1231,7 @@ STDMETHODIMP CFGManager::Render(IPin* pPinOut)
 
 STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlayList)
 {
-	DbgLog((LOG_TRACE, 3, L"--> CFGManager::RenderFile on thread: %d", GetCurrentThreadId()));
+	DbgLog((LOG_TRACE, 3, L"CFGManager::RenderFile() on thread: %d", GetCurrentThreadId()));
 	CAutoLock cAutoLock(this);
 
 	m_streampath.RemoveAll();
@@ -1844,7 +1844,7 @@ STDMETHODIMP CFGManager::GetDeadEnd(int iIndex, CAtlList<CStringW>& path, CAtlLi
 
 STDMETHODIMP CFGManager::RenderSubFile(LPCWSTR lpcwstrFileName)
 {
-	DbgLog((LOG_TRACE, 3, L"--> CFGManager::RenderSubFile(%s) on thread: %d", lpcwstrFileName, GetCurrentThreadId()));
+	DbgLog((LOG_TRACE, 3, L"CFGManager::RenderSubFile() on thread: %d", lpcwstrFileName, GetCurrentThreadId()));
 	CAutoLock cAutoLock(this);
 
 	HRESULT hr = VFW_E_CANNOT_RENDER;
@@ -2768,7 +2768,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	, m_vrmerit(MERIT64_PREFERRED)
 	, m_armerit(MERIT64_PREFERRED)
 {
-	DbgLog((LOG_TRACE, 3, L"--> CFGManagerPlayer::CFGManagerPlayer on thread: %d", GetCurrentThreadId()));
+	DbgLog((LOG_TRACE, 3, L"CFGManagerPlayer::CFGManagerPlayer() on thread: %d", GetCurrentThreadId()));
 	CFGFilter* pFGF;
 
 	CAppSettings& s = AfxGetAppSettings();

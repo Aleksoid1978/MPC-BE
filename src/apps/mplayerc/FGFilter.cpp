@@ -436,7 +436,7 @@ CFGFilterVideoRenderer::CFGFilterVideoRenderer(HWND hWnd, const CLSID& clsid, CS
 
 HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
 {
-	DbgLog((LOG_TRACE, 3, L"--> CFGFilterVideoRenderer::Create on thread: %d", GetCurrentThreadId()));
+	DbgLog((LOG_TRACE, 3, L"CFGFilterVideoRenderer::Create() on thread: %d", GetCurrentThreadId()));
 	CheckPointer(ppBF, E_POINTER);
 
 	HRESULT hr = S_OK;
@@ -645,25 +645,26 @@ POSITION CFGFilterList::GetHeadPosition()
 		CAtlArray<filter_t> sort;
 		sort.SetCount(m_filters.GetCount());
 		POSITION pos = m_filters.GetHeadPosition();
-		for (int i = 0; pos; i++) {
+		for (size_t i = 0; pos; i++) {
 			sort[i] = m_filters.GetNext(pos);
 		}
 		qsort(&sort[0], sort.GetCount(), sizeof(sort[0]), filter_cmp);
-		for (size_t i = 0; i < sort.GetCount(); i++)
+		for (size_t i = 0; i < sort.GetCount(); i++) {
 			if (sort[i].pFGF->GetMerit() >= MERIT64_DO_USE) {
 				m_sortedfilters.AddTail(sort[i].pFGF);
 			}
-	}
-
+		}
 #ifdef _DEBUG
-	DbgLog((LOG_TRACE, 3, L"FGM: Sorting filters"));
+		DbgLog((LOG_TRACE, 3, L"FGM: Sorting filters"));
 
-	POSITION pos = m_sortedfilters.GetHeadPosition();
-	while (pos) {
-		CFGFilter* pFGF = m_sortedfilters.GetNext(pos);
-		DbgLog((LOG_TRACE, 3, L"FGM: - %016I64x '%s', type = '%s'", pFGF->GetMerit(), pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()), pFGF->GetType()));
-	}
+		pos = m_sortedfilters.GetHeadPosition();
+		while (pos) {
+			CFGFilter* pFGF = m_sortedfilters.GetNext(pos);
+			DbgLog((LOG_TRACE, 3, L"FGM:    %016I64x '%s', type = '%s'", pFGF->GetMerit(), pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()), pFGF->GetType()));
+		}
 #endif
+
+	}
 
 	return m_sortedfilters.GetHeadPosition();
 }
