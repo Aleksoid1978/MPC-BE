@@ -405,8 +405,6 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 	m_hFile = CreateFile(strPlaylistFile, GENERIC_READ, dwShareMode, NULL,
 						 OPEN_EXISTING, dwFlagsAndAttributes, NULL);
 	if (m_hFile != INVALID_HANDLE_VALUE) {
-		DbgLog((LOG_TRACE, 3, _T("CHdmvClipInfo::ReadPlaylist() : %s"), strPlaylistFile));
-
 		bool bDuplicate = false;
 		BYTE Buff[9] = { 0 };
 
@@ -419,6 +417,8 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 		if ((memcmp(Buff, "0200", 4)) && (memcmp(Buff, "0100", 4))) {
 			return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 		}
+
+		DbgLog((LOG_TRACE, 3, L"CHdmvClipInfo::ReadPlaylist() : '%s'", strPlaylistFile));
 
 		LONGLONG playlistPos = 0;
 		LONGLONG extPos = 0;
@@ -528,7 +528,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			}
 			Item->m_strFileName.Format(format, CString(Path), Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
 			if (!::PathFileExists(Item->m_strFileName)) {
-				DbgLog((LOG_TRACE, 3, _T("		==> %s is missing, skip it"), Item->m_strFileName));
+				DbgLog((LOG_TRACE, 3, L"    ==> '%s' is missing, skip it", Item->m_strFileName));
 
 				stnssextPos = 0;
 				continue;
@@ -601,7 +601,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 				}
 			}
 
-			DbgLog((LOG_TRACE, 3, _T("	==> %s, Duration : %s [%15I64d], Total duration : %s, Size : %I64d"), Item->m_strFileName, ReftimeToString(Item->Duration()), Item->Duration(), ReftimeToString(rtDuration), Item->Size()));
+			DbgLog((LOG_TRACE, 3, L"    ==> '%s', Duration : %s [%15I64d], Total duration : %s, Size : %I64d", Item->m_strFileName, ReftimeToString(Item->Duration()), Item->Duration(), ReftimeToString(rtDuration), Item->Size()));
 
 			Playlist.AddTail(Item);
 		}
