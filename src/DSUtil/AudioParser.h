@@ -23,21 +23,29 @@
 #include <WinDef.h>
 #include <MMReg.h>
 
-#define RIFF_DWORD          0x46464952
+#define RIFF_SYNCWORD            0x46464952
 
-#define AC3_SYNC_WORD           0x770b
-#define AAC_LATM_SYNC_WORD       0x2b7
-#define TRUEHD_SYNC_WORD    0xba6f72f8
-#define MLP_SYNC_WORD       0xbb6f72f8
-#define IEC61937_SYNC_WORD  0x4e1ff872
+#define AC3_SYNCWORD                 0x770B
+#define AAC_ADTS_SYNCWORD            0xF0FF
+#define AAC_LATM_SYNCWORD             0x2B7
 
-#define DTS_SYNC_WORD       0x0180fe7f
-#define DTSHD_SYNC_WORD     0x25205864
+#define MPA_SYNCWORD                 0xE0FF
 
-#define EAC3_FRAME_TYPE_INDEPENDENT  0
-#define EAC3_FRAME_TYPE_DEPENDENT    1
-#define EAC3_FRAME_TYPE_AC3_CONVERT  2
-#define EAC3_FRAME_TYPE_RESERVED     3
+#define TRUEHD_SYNCWORD          0xBA6F72F8
+#define MLP_SYNCWORD             0xBB6F72F8
+
+#define IEC61937_SYNCWORD        0x4E1FF872
+
+#define DTS_SYNCWORD_CORE_BE     0x0180FE7F
+#define DTS_SYNCWORD_CORE_LE     0x80017FFE
+#define DTS_SYNCWORD_CORE_14B_BE 0x00E8FF1F
+#define DTS_SYNCWORD_CORE_14B_LE 0xE8001FFF
+#define DTS_SYNCWORD_SUBSTREAM   0x25205864
+
+#define EAC3_FRAME_TYPE_INDEPENDENT 0
+#define EAC3_FRAME_TYPE_DEPENDENT   1
+#define EAC3_FRAME_TYPE_AC3_CONVERT 2
+#define EAC3_FRAME_TYPE_RESERVED    3
 
 bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels, BYTE* extra, unsigned int& extralen);
 
