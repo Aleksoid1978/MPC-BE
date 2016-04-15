@@ -45,8 +45,8 @@ ECHO Something went wrong when generating the revision number.
 :SubCommon
 ECHO I'll use MPC_VERSION_REV=0 for now.
 
-set /p RevStr=<"include\Version_rev.h"
-IF "%RevStr%" NEQ "#define MPC_VERSION_REV 0" (
+SET /P RevStr=<"include\Version_rev.h"
+IF "%RevStr%" NEQ "#define MPC_VERSION_REV 0 " (
   ECHO #define MPC_VERSION_REV 0 > "include\Version_rev.h"
   TYPE "src\apps\mplayerc\res\mpc-be.exe.manifest.template" > "src\apps\mplayerc\res\mpc-be.exe.manifest"
 )
