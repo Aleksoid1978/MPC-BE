@@ -438,7 +438,7 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 {
 	memset(&h, 0, sizeof(h));
 
-	for (; len >= 7 && BitRead(11, true) != 0x2b7; len--) {
+	for (; len >= 7 && BitRead(11, true) != AAC_LATM_SYNCWORD; len--) {
 		BitRead(8);
 	}
 

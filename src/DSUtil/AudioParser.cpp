@@ -159,7 +159,7 @@ bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels
 {
 	CGolombBuffer gb((BYTE*)buf, len);
 
-	if (gb.BitRead(11) != 0x2b7) {
+	if (gb.BitRead(11) != AAC_LATM_SYNCWORD) {
 		return false;
 	}
 
@@ -287,7 +287,7 @@ DWORD CountBits(DWORD v) { // used code from \VirtualDub\h\vd2\system\bitmath.h 
 int ParseAC3IEC61937Header(const BYTE* buf)
 {
 	WORD* wbuf = (WORD*)buf;
-	if (GETDWORD(buf) != IEC61937_SYNC_WORD
+	if (GETDWORD(buf) != IEC61937_SYNCWORD
 			|| wbuf[2] !=  0x0001
 			|| wbuf[3] == 0
 			|| wbuf[3] >= (6144-8)*8
@@ -326,7 +326,7 @@ static const int mpeg1_samplerates[] = { 44100, 48000, 32000, 0 };
 
 int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe)
 {
-	if ((GETWORD(buf) & 0xe0ff) != 0xe0ff) { // sync
+	if ((GETWORD(buf) & MPA_SYNCWORD) != MPA_SYNCWORD) { // sync
 		return 0;
 	}
 
@@ -490,7 +490,7 @@ int ParseAC3Header(const BYTE* buf, audioframe_t* audioframe)
 	static const BYTE  ac3_halfrate[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3 };
 	static const BYTE  ac3_lfeon[8]     = { 0x10, 0x10, 0x04, 0x04, 0x04, 0x01, 0x04, 0x01 };
 
-	if (GETWORD(buf) != AC3_SYNC_WORD) { // syncword
+	if (GETWORD(buf) != AC3_SYNCWORD) { // syncword
 		return 0;
 	}
 
@@ -574,7 +574,7 @@ int ParseEAC3Header(const BYTE* buf, audioframe_t* audioframe)
 	static const BYTE  eac3_channels[8]    = { 2, 1, 2, 3, 3, 4, 4, 5 };
 	static const short eac3_samples_tbl[4] = { 256, 512, 768, 1536 };
 
-	if (GETWORD(buf) != AC3_SYNC_WORD) { // syncword
+	if (GETWORD(buf) != AC3_SYNCWORD) { // syncword
 		return 0;
 	}
 
@@ -625,9 +625,9 @@ int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 
 	DWORD sync = GETDWORD(buf+4);
 	bool isTrueHD;
-	if (sync == TRUEHD_SYNC_WORD) {
+	if (sync == TRUEHD_SYNCWORD) {
 		isTrueHD = true;
-	} else if (sync == MLP_SYNC_WORD) {
+	} else if (sync == MLP_SYNCWORD) {
 		isTrueHD = false;
 	} else {
 		return 0;
@@ -750,19 +750,19 @@ int ParseDTSHeader(const BYTE* buf, audioframe_t* audioframe)
 	int frame_size = 0;
 	DWORD sync = GETDWORD(buf);
 	switch (sync) {
-		case 0x0180fe7f:    // '7FFE8001' 16 bits and big endian bitstream
+		case DTS_SYNCWORD_CORE_BE:    // '7FFE8001' 16 bits and big endian bitstream
 			frame_size = ((buf[5] & 3) << 12 | buf[6] << 4 | (buf[7] & 0xf0) >> 4) + 1;
 			break;
-		case 0x80017ffe:    // 'FE7F0180' 16 bits and little endian bitstream
+		case DTS_SYNCWORD_CORE_LE:    // 'FE7F0180' 16 bits and little endian bitstream
 			frame_size = ((buf[4] & 3) << 12 | buf[7] << 4 | (buf[6] & 0xf0) >> 4) + 1;
 			break;
-		case 0x00e8ff1f:    // '1FFFE800 07Fx' 14 bits and big endian bitstream
+		case DTS_SYNCWORD_CORE_14B_BE:    // '1FFFE800 07Fx' 14 bits and big endian bitstream
 			if (buf[4] == 0x07 && (buf[5] & 0xf0) == 0xf0) {
 				frame_size = ((buf[6] & 3) << 12 | buf[7] << 4 | (buf[8] & 0x3C) >> 2) + 1;
 				frame_size = frame_size * 16 / 14;
 			}
 			break;
-		case 0xe8001fff:    // 'FF1F00E8 Fx07' 14 bits and little endian bitstream
+		case DTS_SYNCWORD_CORE_14B_LE:    // 'FF1F00E8 Fx07' 14 bits and little endian bitstream
 			if ((buf[4] & 0xf0) == 0xf0 && buf[5] == 0x07) { //
 				frame_size = ((buf[7] & 3) << 12 | buf[6] << 4 | (buf[9] & 0x3C) >> 2) + 1;
 				frame_size = frame_size * 16 / 14;
@@ -824,13 +824,11 @@ int ParseDTSHeader(const BYTE* buf, audioframe_t* audioframe)
 	return frame_size;
 }
 
-// DTS-HD
-
 int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t* audioframe /* = NULL*/)
 {
 	static const DWORD exss_sample_rates[16] = { 8000, 16000, 32000, 64000, 128000, 22050, 44100, 88200, 176400, 352800, 12000, 24000, 48000, 96000, 192000, 384000 };
 
-	if (GETDWORD(buf) != DTSHD_SYNC_WORD) { // syncword
+	if (GETDWORD(buf) != DTS_SYNCWORD_SUBSTREAM) { // syncword
 		return 0;
 	}
 
@@ -969,7 +967,7 @@ int ParseADTSAACHeader(const BYTE* buf, audioframe_t* audioframe)
 	static const int  mp4a_samplerates[16] = { 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350, 0, 0, 0 };
 	static const BYTE mp4a_channels[8]     = { 0, 1, 2, 3, 4, 5, 6, 8 };
 
-	if ((GETWORD(buf) & 0xf0ff) != 0xf0ff) { // syncword
+	if ((GETWORD(buf) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD) { // syncword
 		return 0;
 	}
 

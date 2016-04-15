@@ -195,7 +195,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			break;
 		}
 
-		if (id == RIFF_DWORD) {
+		if (id == RIFF_SYNCWORD) {
 			// ignore RIFF files
 			break;
 		}

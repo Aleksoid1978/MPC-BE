@@ -477,8 +477,8 @@ static UINT SocketThreadProc(LPVOID pParam)
 	return (static_cast<CShoutcastStream*>(pParam))->SocketThreadProc();
 }
 
-#define MOVE_TO_MPA_START_CODE(b, e)	while(b <= e - MPA_HEADER_SIZE  && ((GETWORD(b) & 0xe0ff) != 0xe0ff)) b++;
-#define MOVE_TO_AAC_START_CODE(b, e)	while(b <= e - ADTS_HEADER_SIZE && ((GETWORD(b) & 0xf0ff) != 0xf0ff)) b++;
+#define MOVE_TO_MPA_START_CODE(b, e) while(b <= e - MPA_HEADER_SIZE  && ((GETWORD(b) & MPA_SYNCWORD) != MPA_SYNCWORD)) b++;
+#define MOVE_TO_AAC_START_CODE(b, e) while(b <= e - ADTS_HEADER_SIZE && ((GETWORD(b) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) b++;
 UINT CShoutcastStream::SocketThreadProc()
 {
 	fExitThread = false;

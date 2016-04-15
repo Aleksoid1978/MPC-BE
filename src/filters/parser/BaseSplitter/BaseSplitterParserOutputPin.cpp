@@ -26,12 +26,12 @@
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/MediaDescription.h"
 
-#define MOVE_TO_H264_START_CODE(b, e)		while(b <= e - 4  && !((GETDWORD(b) == 0x01000000) || ((GETDWORD(b) & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e - 4) && GETDWORD(b) == 0x01000000) b++;
-#define MOVE_TO_AC3_START_CODE(b, e)		while(b <= e - 8  && (GETWORD(b) != AC3_SYNC_WORD)) b++;
-#define MOVE_TO_AAC_START_CODE(b, e)		while(b <= e - 9  && ((GETWORD(b) & 0xf0ff) != 0xf0ff)) b++;
-#define MOVE_TO_AACLATM_START_CODE(b, e)	while(b <= e - 4  && ((GETWORD(b) & 0xe0FF) != 0xe056)) b++;
-#define MOVE_TO_DIRAC_START_CODE(b, e)		while(b <= e - 4  && (GETDWORD(b) != 0x44434242)) b++;
-#define MOVE_TO_DTS_START_CODE(b, e)		while(b <= e - 16 && (GETDWORD(b) != DTS_SYNC_WORD)) b++;
+#define MOVE_TO_H264_START_CODE(b, e)    while(b <= e - 4  && !((GETDWORD(b) == 0x01000000) || ((GETDWORD(b) & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e - 4) && GETDWORD(b) == 0x01000000) b++;
+#define MOVE_TO_AC3_START_CODE(b, e)     while(b <= e - 8  && (GETWORD(b) != AC3_SYNCWORD)) b++;
+#define MOVE_TO_AAC_START_CODE(b, e)     while(b <= e - 9  && ((GETWORD(b) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) b++;
+#define MOVE_TO_AACLATM_START_CODE(b, e) while(b <= e - 4  && ((GETWORD(b) & 0xe0FF) != 0xe056)) b++;
+#define MOVE_TO_DIRAC_START_CODE(b, e)   while(b <= e - 4  && (GETDWORD(b) != 0x44434242)) b++;
+#define MOVE_TO_DTS_START_CODE(b, e)     while(b <= e - 16 && (GETDWORD(b) != DTS_SYNCWORD_CORE_BE)) b++;
 
 //
 // CBaseSplitterParserOutputPin

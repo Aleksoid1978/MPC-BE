@@ -1051,13 +1051,13 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 						}
 					} else if ((pes_stream_type == AUDIO_STREAM_DTS_HD || pes_stream_type == AUDIO_STREAM_DTS_HD_MASTER_AUDIO) && source->dts.bDTSCore && !source->dts.bDTSHD && source->mt.pbFormat) {
 						Seek(start);
-						if (BitRead(32, true) == FCC(DTSHD_SYNC_WORD)) {
+						if (BitRead(32, true) == FCC(DTS_SYNCWORD_SUBSTREAM)) {
 							BYTE* buf = DNew BYTE[len];
 							audioframe_t audioframe;
 							if (ByteRead(buf, len) == S_OK && ParseDTSHDHeader(buf, len, &audioframe)) {
 								WAVEFORMATEX* wfe = (WAVEFORMATEX*)source->mt.pbFormat;
-								wfe->nSamplesPerSec		= audioframe.samplerate;
-								wfe->nChannels			= audioframe.channels;
+								wfe->nSamplesPerSec = audioframe.samplerate;
+								wfe->nChannels      = audioframe.channels;
 								if (audioframe.param1) {
 									wfe->wBitsPerSample = audioframe.param1;
 								}
