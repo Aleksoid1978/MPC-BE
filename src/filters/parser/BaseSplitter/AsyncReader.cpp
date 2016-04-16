@@ -89,6 +89,17 @@ ULONGLONG CAsyncFileReader::GetLength() const
 
 // IAsyncReader
 
+#define RetryOnError() \
+{ \
+	if (GetLastError() == ERROR_INTERNET_CONNECTION_RESET) { \
+		CString customHeader; customHeader.Format(L"Range: bytes=%I64d-\r\n", llPosition); \
+		hr = m_HTTPAsync.SendRequest(customHeader); \
+		if (hr == S_OK) { \
+			goto again; \
+		} \
+	} \
+} \
+
 STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE* pBuffer)
 {
 	do {
@@ -96,15 +107,16 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 			if ((ULONGLONG)llPosition + lLength > GetLength()) {
 				return E_FAIL;
 			}
-
+again:
 			if (m_pos != llPosition) {
 				if (llPosition > m_pos && (llPosition - m_pos) <= 64 * KILOBYTE) {
 					static BYTE pBufferTmp[64 * KILOBYTE] = { 0 };
-					DWORD lenght = llPosition - m_pos;
+					const DWORD lenght = llPosition - m_pos;
 
 					DWORD dwSizeRead = 0;
 					HRESULT hr = m_HTTPAsync.Read(pBufferTmp, lenght, &dwSizeRead);
 					if (hr != S_OK || dwSizeRead != lenght) {
+						RetryOnError();
 						return E_FAIL;
 					}
 				} else {
@@ -124,6 +136,7 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 			DWORD dwSizeRead = 0;
 			HRESULT hr = m_HTTPAsync.Read(pBuffer, lLength, &dwSizeRead);
 			if (hr != S_OK || dwSizeRead != lLength) {
+				RetryOnError();
 				return E_FAIL;
 			}
 			m_pos += dwSizeRead;
