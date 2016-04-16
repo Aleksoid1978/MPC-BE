@@ -324,8 +324,8 @@ HRESULT CHTTPAsync::SendRequest(CString customHeader/* = L""*/, DWORD dwTimeOut/
 							 lpszHeaders.GetLength(),
 							 NULL,
 							 0)) {
-			m_bRequestComplete = FALSE;
 			CheckLastError(L"HttpSendRequest()", E_FAIL);
+			m_bRequestComplete = FALSE;
 
 			if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
 				DbgLog((LOG_TRACE, 3, L"CHTTPAsync::SendRequest() : HttpSendRequest() - %d ms time out reached, exit", dwTimeOut));
@@ -377,8 +377,8 @@ HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, 
 							 &InetBuff,
 							 IRF_ASYNC,
 							 (DWORD_PTR)this)) {
-		m_bRequestComplete = FALSE;
 		CheckLastError(L"InternetReadFileExA()", E_FAIL);
+		m_bRequestComplete = FALSE;
 
 		if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
 			DbgLog((LOG_TRACE, 3, L"CHTTPAsync::Read() : InternetReadFileExA() - %d ms time out reached, exit", dwTimeOut));
