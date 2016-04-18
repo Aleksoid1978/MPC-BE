@@ -141,11 +141,11 @@ namespace GothSync
 		D3DTEXTUREFILTERTYPE		m_filter;
 		D3DPRESENT_PARAMETERS		pp;
 
-		CComPtr<IDirect3DTexture9>	m_pVideoTexture[MAX_PICTURE_SLOTS];
-		CComPtr<IDirect3DSurface9>	m_pVideoSurface[MAX_PICTURE_SLOTS];
+		CComPtr<IDirect3DTexture9>	m_pVideoTextures[MAX_PICTURE_SLOTS];
+		CComPtr<IDirect3DSurface9>	m_pVideoSurfaces[MAX_PICTURE_SLOTS];
 		CComPtr<IDirect3DTexture9>	m_pOSDTexture;
 		CComPtr<IDirect3DSurface9>	m_pOSDSurface;
-		CComPtr<IDirect3DTexture9>	m_pScreenSizeTemporaryTexture[2];
+		CComPtr<IDirect3DTexture9>	m_pScreenSizeTextures[2];
 		CComPtr<ID3DXLine>			m_pLine;
 		CComPtr<ID3DXFont>			m_pFont;
 		CComPtr<ID3DXSprite>		m_pSprite;

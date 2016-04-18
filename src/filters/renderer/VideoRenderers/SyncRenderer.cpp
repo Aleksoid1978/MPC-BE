@@ -678,12 +678,12 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 	CRenderersSettings& rs = GetRenderersSettings();
 
 	for (int i = 0; i < m_nDXSurface+2; i++) {
-		m_pVideoTexture[i] = NULL;
-		m_pVideoSurface[i] = NULL;
+		m_pVideoTextures[i] = NULL;
+		m_pVideoSurfaces[i] = NULL;
 	}
 
-	m_pScreenSizeTemporaryTexture[0] = NULL;
-	m_pScreenSizeTemporaryTexture[1] = NULL;
+	m_pScreenSizeTextures[0] = NULL;
+	m_pScreenSizeTextures[1] = NULL;
 	m_SurfaceFmt = Format;
 
 	HRESULT hr;
@@ -692,26 +692,26 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 
 		for (int i = 0; i < nTexturesNeeded; i++) {
 			if (FAILED(hr = m_pD3DDev->CreateTexture(
-								m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &m_pVideoTexture[i], NULL))) {
+								m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &m_pVideoTextures[i], NULL))) {
 				return hr;
 			}
 
-			if (FAILED(hr = m_pVideoTexture[i]->GetSurfaceLevel(0, &m_pVideoSurface[i]))) {
+			if (FAILED(hr = m_pVideoTextures[i]->GetSurfaceLevel(0, &m_pVideoSurfaces[i]))) {
 				return hr;
 			}
 		}
 		if (rs.iSurfaceType == SURFACE_TEXTURE2D) {
 			for (int i = 0; i < m_nDXSurface+2; i++) {
-				m_pVideoTexture[i] = NULL;
+				m_pVideoTextures[i] = NULL;
 			}
 		}
 	} else {
-		if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(m_nativeVideoSize.cx, m_nativeVideoSize.cy, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &m_pVideoSurface[m_nCurSurface], NULL))) {
+		if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(m_nativeVideoSize.cx, m_nativeVideoSize.cy, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &m_pVideoSurfaces[m_nCurSurface], NULL))) {
 			return hr;
 		}
 	}
 
-	hr = m_pD3DDev->ColorFill(m_pVideoSurface[m_nCurSurface], NULL, 0);
+	hr = m_pD3DDev->ColorFill(m_pVideoSurfaces[m_nCurSurface], NULL, 0);
 	return S_OK;
 }
 
@@ -721,8 +721,8 @@ void CBaseAP::DeleteSurfaces()
 	CAutoLock cRenderLock(&m_allocatorLock);
 
 	for (int i = 0; i < m_nDXSurface+2; i++) {
-		m_pVideoTexture[i] = NULL;
-		m_pVideoSurface[i] = NULL;
+		m_pVideoTextures[i] = NULL;
+		m_pVideoSurfaces[i] = NULL;
 	}
 }
 
@@ -1170,7 +1170,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 	if (m_windowRect.right <= m_windowRect.left || m_windowRect.bottom <= m_windowRect.top
 			|| m_nativeVideoSize.cx <= 0 || m_nativeVideoSize.cy <= 0
-			|| !m_pVideoSurface) {
+			|| !m_pVideoSurfaces) {
 		return false;
 	}
 
@@ -1186,10 +1186,11 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	m_pD3DDev->SetRenderTarget(0, pBackBuffer);
 	hr = m_pD3DDev->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0);
 	if (!rDstVid.IsRectEmpty()) {
-		if (m_pVideoTexture[m_nCurSurface]) {
-			CComPtr<IDirect3DTexture9> pVideoTexture = m_pVideoTexture[m_nCurSurface];
+		if (m_pVideoTextures[m_nCurSurface]) {
+			CComPtr<IDirect3DTexture9> pVideoTexture = m_pVideoTextures[m_nCurSurface];
 
-			if (m_pVideoTexture[m_nDXSurface] && m_pVideoTexture[m_nDXSurface+1] && !m_pPixelShaders.IsEmpty()) {
+			// pre-resize pixel shaders
+			if (m_pPixelShaders.GetCount()) {
 				static __int64 counter = 0;
 				static long start = clock();
 
@@ -1203,7 +1204,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				int src = m_nCurSurface, dst = m_nDXSurface;
 
 				D3DSURFACE_DESC desc;
-				m_pVideoTexture[src]->GetLevelDesc(0, &desc);
+				m_pVideoTextures[src]->GetLevelDesc(0, &desc);
 
 				float fConstData[][4] = {
 					{(float)desc.Width, (float)desc.Height, (float)(counter++), (float)diff / CLOCKS_PER_SEC},
@@ -1217,17 +1218,17 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 				POSITION pos = m_pPixelShaders.GetHeadPosition();
 				while (pos) {
-					pVideoTexture = m_pVideoTexture[dst];
+					pVideoTexture = m_pVideoTextures[dst];
 
-					hr = m_pD3DDev->SetRenderTarget(0, m_pVideoSurface[dst]);
+					hr = m_pD3DDev->SetRenderTarget(0, m_pVideoSurfaces[dst]);
 					CExternalPixelShader &Shader = m_pPixelShaders.GetNext(pos);
 					if (!Shader.m_pPixelShader) {
 						Shader.Compile(m_pPSC);
 					}
 					hr = m_pD3DDev->SetPixelShader(Shader.m_pPixelShader);
-					TextureCopy(m_pVideoTexture[src]);
+					TextureCopy(m_pVideoTextures[src]);
 
-					src		= dst;
+					src = dst;
 					if (++dst >= m_nDXSurface+2) {
 						dst = m_nDXSurface;
 					}
@@ -1262,29 +1263,28 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				iResizer = RESIZER_BILINEAR;
 			}
 
-			bool bScreenSpacePixelShaders = !m_pPixelShadersScreenSpace.IsEmpty();
-			bool bNeedScreenSizeTexture = bScreenSpacePixelShaders;
-
-			if (bNeedScreenSizeTexture && (!m_pScreenSizeTemporaryTexture[0] || !m_pScreenSizeTemporaryTexture[1])) {
+			// post-resize pixel shaders
+			bool bScreenSpacePixelShaders = m_pPixelShadersScreenSpace.GetCount() > 0;
+			if (bScreenSpacePixelShaders && (!m_pScreenSizeTextures[0] || !m_pScreenSizeTextures[1])) {
 				if (FAILED(m_pD3DDev->CreateTexture(
 					min(m_ScreenSize.cx, (int)m_caps.MaxTextureWidth), min(max(m_ScreenSize.cy, m_nativeVideoSize.cy), (int)m_caps.MaxTextureHeight), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
-					D3DPOOL_DEFAULT, &m_pScreenSizeTemporaryTexture[0], NULL))) {
+					D3DPOOL_DEFAULT, &m_pScreenSizeTextures[0], NULL))) {
 					ASSERT(0);
-					m_pScreenSizeTemporaryTexture[0] = NULL; // will do 1 pass then
+					m_pScreenSizeTextures[0] = NULL; // will do 1 pass then
 					bScreenSpacePixelShaders = false;
 				}
 				else if (FAILED(m_pD3DDev->CreateTexture(
 					min(m_ScreenSize.cx, (int)m_caps.MaxTextureWidth), min(max(m_ScreenSize.cy, m_nativeVideoSize.cy), (int)m_caps.MaxTextureHeight), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
-					D3DPOOL_DEFAULT, &m_pScreenSizeTemporaryTexture[1], NULL))) {
+					D3DPOOL_DEFAULT, &m_pScreenSizeTextures[1], NULL))) {
 					ASSERT(0);
-					m_pScreenSizeTemporaryTexture[1] = NULL; // will do 1 pass then
+					m_pScreenSizeTextures[1] = NULL; // will do 1 pass then
 					bScreenSpacePixelShaders = false;
 				}
 			}
 
 			if (bScreenSpacePixelShaders) {
 				CComPtr<IDirect3DSurface9> pRT;
-				hr = m_pScreenSizeTemporaryTexture[1]->GetSurfaceLevel(0, &pRT);
+				hr = m_pScreenSizeTextures[1]->GetSurfaceLevel(0, &pRT);
 				if (hr != S_OK) {
 					bScreenSpacePixelShaders = false;
 				}
@@ -1325,7 +1325,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				}
 
 				D3DSURFACE_DESC desc;
-				m_pScreenSizeTemporaryTexture[0]->GetLevelDesc(0, &desc);
+				m_pScreenSizeTextures[0]->GetLevelDesc(0, &desc);
 
 				float fConstData[][4] = {
 					{(float)desc.Width, (float)desc.Height, (float)(counter++), (float)diff / CLOCKS_PER_SEC},
@@ -1342,7 +1342,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 						m_pD3DDev->SetRenderTarget(0, pBackBuffer);
 					} else {
 						CComPtr<IDirect3DSurface9> pRT;
-						hr = m_pScreenSizeTemporaryTexture[dst]->GetSurfaceLevel(0, &pRT);
+						hr = m_pScreenSizeTextures[dst]->GetSurfaceLevel(0, &pRT);
 						m_pD3DDev->SetRenderTarget(0, pRT);
 					}
 
@@ -1351,7 +1351,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 						Shader.Compile(m_pPSC);
 					}
 					hr = m_pD3DDev->SetPixelShader(Shader.m_pPixelShader);
-					TextureCopy(m_pScreenSizeTemporaryTexture[src]);
+					TextureCopy(m_pScreenSizeTextures[src]);
 
 					std::swap(src, dst);
 				}
@@ -1366,7 +1366,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				rSrcVid.right &= ~1;
 				rSrcVid.top &= ~1;
 				rSrcVid.bottom &= ~1;
-				hr = m_pD3DDev->StretchRect(m_pVideoSurface[m_nCurSurface], rSrcVid, pBackBuffer, rDstVid, m_filter);
+				hr = m_pD3DDev->StretchRect(m_pVideoSurfaces[m_nCurSurface], rSrcVid, pBackBuffer, rDstVid, m_filter);
 				if (FAILED(hr)) {
 					return false;
 				}
@@ -1945,7 +1945,7 @@ STDMETHODIMP CBaseAP::GetDIB(BYTE* lpDib, DWORD* size)
 
 	D3DSURFACE_DESC desc;
 	memset(&desc, 0, sizeof(desc));
-	m_pVideoSurface[m_nCurSurface]->GetDesc(&desc);
+	m_pVideoSurfaces[m_nCurSurface]->GetDesc(&desc);
 
 	DWORD required = sizeof(BITMAPINFOHEADER) + (desc.Width * desc.Height * 32 >> 3);
 	if (!lpDib) {
@@ -1957,12 +1957,12 @@ STDMETHODIMP CBaseAP::GetDIB(BYTE* lpDib, DWORD* size)
 	}
 	*size = required;
 
-	CComPtr<IDirect3DSurface9> pSurface = m_pVideoSurface[m_nCurSurface];
+	CComPtr<IDirect3DSurface9> pSurface = m_pVideoSurfaces[m_nCurSurface];
 	D3DLOCKED_RECT r;
 	if (FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY))) {
 		pSurface = NULL;
 		if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM, &pSurface, NULL))
-				|| FAILED(hr = m_pD3DDev->GetRenderTargetData(m_pVideoSurface[m_nCurSurface], pSurface))
+				|| FAILED(hr = m_pD3DDev->GetRenderTargetData(m_pVideoSurfaces[m_nCurSurface], pSurface))
 				|| FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY))) {
 			return hr;
 		}
@@ -2779,11 +2779,11 @@ bool CSyncAP::GetSampleFromMixer()
 			rcTearing.top = 0;
 			rcTearing.right	= rcTearing.left + 4;
 			rcTearing.bottom = m_nativeVideoSize.cy;
-			m_pD3DDev->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
+			m_pD3DDev->ColorFill(m_pVideoSurfaces[dwSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
 
 			rcTearing.left = (rcTearing.right + 15) % m_nativeVideoSize.cx;
 			rcTearing.right	= rcTearing.left + 4;
-			m_pD3DDev->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
+			m_pD3DDev->ColorFill(m_pVideoSurfaces[dwSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
 			m_nTearingPos = (m_nTearingPos + 7) % m_nativeVideoSize.cx;
 		}
 		MoveToScheduledList(pSample, false); // Schedule, then go back to see if there is more where that came from
@@ -3116,7 +3116,7 @@ STDMETHODIMP CSyncAP::InitializeDevice(AM_MEDIA_TYPE* pMediaType)
 
 	for (int i = 0; i < m_nDXSurface; i++) {
 		CComPtr<IMFSample> pMFSample;
-		hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurface[i], &pMFSample);
+		hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurfaces[i], &pMFSample);
 		if (SUCCEEDED (hr)) {
 			pMFSample->SetUINT32(GUID_SURFACE_INDEX, i);
 			m_FreeSamples.AddTail (pMFSample);
@@ -3396,7 +3396,7 @@ STDMETHODIMP_(bool) CSyncAP::ResetDevice()
 
 	for (int i = 0; i < m_nDXSurface; i++) {
 		CComPtr<IMFSample> pMFSample;
-		HRESULT hr = pfMFCreateVideoSampleFromSurface (m_pVideoSurface[i], &pMFSample);
+		HRESULT hr = pfMFCreateVideoSampleFromSurface (m_pVideoSurfaces[i], &pMFSample);
 		if (SUCCEEDED (hr)) {
 			pMFSample->SetUINT32(GUID_SURFACE_INDEX, i);
 			m_FreeSamples.AddTail(pMFSample);
