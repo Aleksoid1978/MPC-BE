@@ -9306,13 +9306,20 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 			}
 
 			if (i >= 0 && (DWORD)i < nChapters) {
-				SeekTo(rt);
-				SendStatusMessage(ResStr(IDS_AG_CHAPTER2) + CString(name), 3000);
+				SeekTo(rt, false);
+
+				if (name.Length()) {
+					SendStatusMessage(ResStr(IDS_AG_CHAPTER2) + name, 3000);
+				}
 
 				REFERENCE_TIME rtDur;
 				m_pMS->GetDuration(&rtDur);
 				CString strOSD;
-				strOSD.Format(_T("%s/%s %s%d/%d - \"%s\""), ReftimeToString2(rt), ReftimeToString2(rtDur), ResStr(IDS_AG_CHAPTER2), i + 1, nChapters, name);
+				CString chapName;
+				if (name.Length()) {
+					chapName.Format(L" - \"%s\"", name);
+				}
+				strOSD.Format(L"%s/%s %s%d/%d%s", ReftimeToString2(rt), ReftimeToString2(rtDur), ResStr(IDS_AG_CHAPTER2), i + 1, nChapters, chapName);
 				m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
 				return;
 			}
@@ -9713,12 +9720,19 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 			CComBSTR name;
 			if (SUCCEEDED(m_pCB->ChapGet(id, &rt, &name))) {
 				SeekTo(rt, false);
-				SendStatusMessage(ResStr(IDS_AG_CHAPTER2) + CString(name), 3000);
+
+				if (name.Length()) {
+					SendStatusMessage(ResStr(IDS_AG_CHAPTER2) + name, 3000);
+				}
 
 				REFERENCE_TIME rtDur;
 				m_pMS->GetDuration(&rtDur);
 				CString strOSD;
-				strOSD.Format(_T("%s/%s %s%d/%d - \"%s\""), ReftimeToString2(rt), ReftimeToString2(rtDur), ResStr(IDS_AG_CHAPTER2), id+1, m_pCB->ChapGetCount(), name);
+				CString chapName;
+				if (name.Length()) {
+					chapName.Format(L" - \"%s\"", name);
+				}
+				strOSD.Format(L"%s/%s %s%d/%d%s", ReftimeToString2(rt), ReftimeToString2(rtDur), ResStr(IDS_AG_CHAPTER2), id + 1, m_pCB->ChapGetCount(), chapName);
 				m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
 			}
 			return;
@@ -12148,7 +12162,7 @@ void CMainFrame::SetupChapters()
 							name = bstr;
 						}
 
-						m_pCB->ChapAppend(REFERENCE_TIME(MarkerTime*10000000), name);
+						m_pCB->ChapAppend(REFERENCE_TIME(MarkerTime * 10000000), name);
 					}
 				}
 			}
@@ -15000,14 +15014,14 @@ void CMainFrame::SetupNavChaptersSubMenu()
 				idx++;
 
 				CHdmvClipInfo::PlaylistItem* Item = m_MPLSPlaylist.GetNext(pos);
-				CString time = _T("[") + ReftimeToString2(Item->Duration()) + _T("]");
+				CString time = L"[" + ReftimeToString2(Item->Duration()) + L"]";
 				CString name = StripPath(Item->m_strFileName);
 
 				if (name == m_wndPlaylistBar.m_pl.GetHead().GetLabel()) {
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
 				}
 
-				name.Replace(_T("&"), _T("&&"));
+				name.Replace(L"&", L"&&");
 				pSub->AppendMenu(flags, id++, name + '\t' + time);
 			}
 		}
@@ -15023,11 +15037,9 @@ void CMainFrame::SetupNavChaptersSubMenu()
 					continue;
 				}
 
-				CString time = _T("[") + ReftimeToString2(rt) + _T("]");
-
-				CString name = CString(bstr);
-				name.Replace(_T("&"), _T("&&"));
-				name.Replace(_T("\t"), _T(" "));
+				CString name(bstr);
+				name.Replace(L"&", L"&&");
+				name.Replace('\t', ' ');
 
 				UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 				if (i == j) {
@@ -15045,7 +15057,14 @@ void CMainFrame::SetupNavChaptersSubMenu()
 						flags |= MF_MENUBARBREAK;
 					}
 				}
-				pSub->AppendMenu(flags, id, name + '\t' + time);
+
+				CString time = L"[" + ReftimeToString2(rt) + L"]";
+				if (name.IsEmpty()) {
+					name = time;
+				} else {
+					name += '\t' + time;
+				}
+				pSub->AppendMenu(flags, id, name);
 			}
 		}
 
