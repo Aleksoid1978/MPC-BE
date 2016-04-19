@@ -393,7 +393,7 @@ bool CFLVSplitterFilter::Sync(__int64& pos)
 	
 	m_pFile->Seek(pos);
 	if (m_pFile->IsURL()) {
-		for (UINT32 i = 0; m_pFile->GetRemaining(); i++) {
+		for (UINT32 i = 0; m_pFile->GetRemaining() && SUCCEEDED(m_pFile->GetLastReadError()); i++) {
 			const int j  = i & (RESYNC_BUFFER_SIZE - 1);
 			const int j1 = j + RESYNC_BUFFER_SIZE;
 			resync_buffer[j ] =
@@ -417,7 +417,7 @@ bool CFLVSplitterFilter::Sync(__int64& pos)
 		}
 	} else {
 		m_pFile->Seek(pos);
-		while (m_pFile->GetRemaining() >= 15) {
+		while (m_pFile->GetRemaining() >= 15 && SUCCEEDED(m_pFile->GetLastReadError())) {
 			__int64 limit = m_pFile->GetRemaining();
 			while (true) {
 				BYTE b = (BYTE)m_pFile->BitRead(8);
@@ -522,7 +522,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	// read up to 180 tags (actual maximum was 168)
 	UINT i = 0;
 	while (((i++ <= 180 && (fTypeFlagsVideo || fTypeFlagsAudio)) || CheckMetadataStreams())
-			&& ReadTag(t)) {
+			&& ReadTag(t)
+			&& SUCCEEDED(m_pFile->GetLastReadError())) {
 		if (!t.DataSize) {
 			continue; // skip empty Tag
 		}
@@ -1279,7 +1280,9 @@ bool CFLVSplitterFilter::DemuxLoop()
 			p->bSyncPoint	= t.TagType == FLV_VIDEODATA ? vt.FrameType == 1 : true;
 
 			p->SetCount((size_t)dataSize);
-			m_pFile->ByteRead(p->GetData(), p->GetCount());
+			if (S_OK != (hr = m_pFile->ByteRead(p->GetData(), p->GetCount()))) {
+				return true;
+			}
 
 			hr = DeliverPacket(p);
 		}
