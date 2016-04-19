@@ -1491,15 +1491,10 @@ bool CMpegSplitterFilter::DemuxLoop()
 	m_rtGlobalPCRTimeStamp = INVALID_TIME;
 
 	HRESULT hr = S_OK;
-	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
+	while (SUCCEEDED(hr)
+			&& !CheckRequest(NULL)
+			&& SUCCEEDED(m_pFile->GetLastReadError())) {
 		hr = DemuxNextPacket(rtStartOffset);
-		if (hr == S_FALSE && m_pFile->IsStreaming()) {
-			// dirty trick to check the availability of data
-			const __int64 pos = m_pFile->GetPos();
-			DWORD tmp = 0;
-			hr = m_pFile->ByteRead((BYTE*)&tmp, sizeof(tmp));
-			m_pFile->Seek(pos);
-		}
 	}
 
 	POSITION pos = pPackets.GetStartPosition();

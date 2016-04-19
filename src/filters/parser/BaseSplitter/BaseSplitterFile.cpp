@@ -231,23 +231,24 @@ HRESULT CBaseSplitterFile::SyncRead(BYTE* pData, int& len)
 	return hr;
 }
 
+#define Exit(hr) { m_hrLastReadError = hr; return hr; }
 HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 {
 	CheckPointer(m_pAsyncReader, E_NOINTERFACE);
 
 	__int64 new_pos = m_pos + len;
 	if (!IsStreaming() && (new_pos > m_len || m_bConnectionLost)) {
-		return E_FAIL;
+		Exit(E_FAIL);
 	}
 	if (m_fmode == FM_FILE_DL && new_pos > m_available && !WaitData(new_pos)) {
-		return E_FAIL;
+		Exit(E_FAIL);
 	}
 
 	HRESULT hr = S_OK;
 	if (m_cachetotal == 0 || !m_pCache) {
 		hr = SyncRead(pData, len);
 		m_pos += len;
-		return hr;
+		Exit(hr);
 	}
 
 	BYTE* pCache = m_pCache;
@@ -265,7 +266,7 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 	while (len > m_cachetotal) {
 		hr = SyncRead(pData, m_cachetotal);
 		if (S_OK != hr) {
-			return hr;
+			Exit(hr);
 		}
 
 		len -= m_cachetotal;
@@ -278,12 +279,12 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 		int maxlen = min(tmplen, m_cachetotal);
 		int minlen = min(len, maxlen);
 		if (minlen <= 0) {
-			return S_FALSE;
+			Exit(S_FALSE);
 		}
 
 		hr = SyncRead(pCache, maxlen);
 		if (S_OK != hr) {
-			return hr;
+			Exit(hr);
 		}
 
 		m_cachepos = m_pos;
@@ -296,7 +297,7 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 		pData += minlen;
 	}
 
-	return hr;
+	Exit(hr);
 }
 
 UINT64 CBaseSplitterFile::BitRead(int nBits, bool fPeek)

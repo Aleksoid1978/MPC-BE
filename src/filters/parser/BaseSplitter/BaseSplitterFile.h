@@ -50,6 +50,8 @@ class CBaseSplitterFile
 
 	HANDLE  m_hBreak          = NULL;
 
+	HRESULT m_hrLastReadError = S_OK;
+
 	bool WaitData(__int64 pos);
 
 	HRESULT Read(BYTE* pData, int len);
@@ -88,4 +90,6 @@ public:
 	bool IsURL() const { return m_pSyncReader && m_pSyncReader->GetSourceType() == CAsyncFileReader::SourceType::HTTP; }
 
 	void SetBreakHandle(HANDLE hBreak) { m_hBreak = hBreak; }
+
+	HRESULT GetLastReadError() const { return m_hrLastReadError; }
 };
