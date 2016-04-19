@@ -196,6 +196,8 @@ void CHTTPAsync::Close()
 	m_header.Empty();
 	m_contentType.Empty();
 	m_lenght = 0;
+
+	m_bRequestComplete = TRUE;
 }
 
 HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPCTSTR lpszAgent/* = L"MPC-BE"*/, BOOL bSendRequest/* = TRUE*/)
@@ -274,7 +276,7 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	return S_OK;
 }
 
-HRESULT CHTTPAsync::SendRequest(CString customHeader/* = L""*/, DWORD dwTimeOut/* = INFINITE*/)
+HRESULT CHTTPAsync::SendRequest(LPCTSTR customHeader/* = L""*/, DWORD dwTimeOut/* = INFINITE*/)
 {
 	CheckPointer(m_hConnect, E_FAIL);
 
@@ -306,18 +308,19 @@ HRESULT CHTTPAsync::SendRequest(CString customHeader/* = L""*/, DWORD dwTimeOut/
 								 dwFlags,
 								 (DWORD_PTR)this);
 	if (m_hRequest == NULL) {
-		m_bRequestComplete = FALSE;
 		CheckLastError(L"HttpOpenRequest()", E_FAIL);
 		
 		if (WaitForSingleObject(m_hRequestOpenedEvent, dwTimeOut) == WAIT_TIMEOUT) {
 			DbgLog((LOG_TRACE, 3, L"CHTTPAsync::SendRequest() : HttpOpenRequest() - %d ms time out reached, exit", dwTimeOut));
+			m_bRequestComplete = FALSE;
 			return E_FAIL;
 		}
 	}
 
 	CheckPointer(m_hRequest, E_FAIL);
 
-	const CString lpszHeaders = L"Accept: */*\r\n" + customHeader;
+	CString lpszHeaders = L"Accept: */*\r\n";
+	lpszHeaders += customHeader;
 	for (;;) {
 		if (!HttpSendRequest(m_hRequest,
 							 lpszHeaders,
@@ -325,10 +328,10 @@ HRESULT CHTTPAsync::SendRequest(CString customHeader/* = L""*/, DWORD dwTimeOut/
 							 NULL,
 							 0)) {
 			CheckLastError(L"HttpSendRequest()", E_FAIL);
-			m_bRequestComplete = FALSE;
 
 			if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
 				DbgLog((LOG_TRACE, 3, L"CHTTPAsync::SendRequest() : HttpSendRequest() - %d ms time out reached, exit", dwTimeOut));
+				m_bRequestComplete = FALSE;
 				return S_FALSE;
 			}
 		}
@@ -378,10 +381,10 @@ HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, 
 							 IRF_ASYNC,
 							 (DWORD_PTR)this)) {
 		CheckLastError(L"InternetReadFileExA()", E_FAIL);
-		m_bRequestComplete = FALSE;
 
 		if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
 			DbgLog((LOG_TRACE, 3, L"CHTTPAsync::Read() : InternetReadFileExA() - %d ms time out reached, exit", dwTimeOut));
+			m_bRequestComplete = FALSE;
 			return S_FALSE;
 		}
 	}
