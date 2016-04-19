@@ -1491,10 +1491,12 @@ bool CMpegSplitterFilter::DemuxLoop()
 	m_rtGlobalPCRTimeStamp = INVALID_TIME;
 
 	HRESULT hr = S_OK;
-	while (SUCCEEDED(hr)
-			&& !CheckRequest(NULL)
-			&& SUCCEEDED(m_pFile->GetLastReadError())) {
+	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
 		hr = DemuxNextPacket(rtStartOffset);
+
+		if (FAILED(m_pFile->GetLastReadError())) {
+			break;
+		}
 	}
 
 	POSITION pos = pPackets.GetStartPosition();
