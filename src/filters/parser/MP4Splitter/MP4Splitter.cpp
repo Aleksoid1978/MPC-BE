@@ -544,8 +544,29 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								m_pFile->Seek(sample.GetOffset());
 								CBaseSplitterFileEx::dtshdr h;
 								CMediaType mt2;
-								if (m_pFile->Read(h, sample.GetSize(), &mt2)) {
+								if (m_pFile->Read(h, sample.GetSize(), &mt2, false)) {
 									mt = mt2;
+
+									AP4_DataBuffer data;
+									if (AP4_SUCCEEDED(sample.ReadData(data))) {
+										const BYTE* start = data.GetData();
+										const BYTE* end = start + data.GetDataSize();
+										int size = ParseDTSHeader(start);
+										if (size && (start + size + 20 <= end)) {
+											audioframe_t aframe = { 0 };
+											int sizehd = ParseDTSHDHeader(start + size, end - start - size, &aframe);
+											if (sizehd) {
+												WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
+												wfe->nSamplesPerSec = aframe.samplerate;
+												wfe->nChannels = aframe.channels;
+												if (aframe.param1) {
+													wfe->wBitsPerSample = aframe.param1;
+												}
+												wfe->nBlockAlign = (wfe->nChannels * wfe->wBitsPerSample) / 8;
+												wfe->nAvgBytesPerSec = 0;
+											}
+										}
+									}
 								}
 							}
 							mts.Add(mt);
