@@ -20,7 +20,7 @@
  */
 
 #include "stdafx.h"
-#include <atl/atlrx.h>
+#include <regex>
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
 #endif
@@ -862,7 +862,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected AAC Audio format"));
 				}
 				else if (value == "audio/x-scpls") {
-					m_Format = AUDIO_PLAYLIST;
+					m_Format = AUDIO_PLS;
 					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected Playlist format"));
 				}
 				else if (value == "application/ogg") {
@@ -907,30 +907,19 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 	} while (fTryAgain);
 
 	if (!fOK || (m_bitrate == 0 && metaint == 0 && m_title.IsEmpty())) {
-		if (m_Format == AUDIO_PLAYLIST && ContentLength) {
-
+		if (m_Format == AUDIO_PLS && ContentLength) {
 			char* buf = DNew char[ContentLength + 1];
-			memset(buf, 0, ContentLength + 1);
+
 			if (ContentLength == Receive((void*)buf, ContentLength)) {
-				typedef CAtlRegExp<CAtlRECharTraits> CAtlRegExpT;
-				typedef CAtlREMatchContext<CAtlRECharTraits> CAtlREMatchContextT;
-				CString body(buf);
-				CAutoPtr<CAtlRegExpT> re;
+				buf[ContentLength] = 0;
+				const char* reg_esp = "File\\d[ \\t]*=[ \\t]*\"*([^\\n\"]+)";
+				std::regex rgx(reg_esp/*, std::regex_constants::icase*/);
+				std::cmatch match;
 
-				re.Attach(DNew CAtlRegExp<>());
-				if (re && REPARSE_ERROR_OK == re->Parse(_T("file\\z\\b*=\\b*[\"]*{[^\n\"]+}"), FALSE)) {
-					CAtlREMatchContextT mc;
-					const CAtlREMatchContextT::RECHAR* s = (LPCTSTR)body;
-					const CAtlREMatchContextT::RECHAR* e = NULL;
-					for (; s && re->Match(s, &mc, &e); s = e) {
-						const CAtlREMatchContextT::RECHAR* szStart = 0;
-						const CAtlREMatchContextT::RECHAR* szEnd = 0;
-						mc.GetMatch(0, &szStart, &szEnd);
-
-						redirectUrl.Format(_T("%.*s"), szEnd - szStart, szStart);
+				if (std::regex_search(buf, match, rgx)) {
+					if (match.size() == 2) {
+						redirectUrl = CString(match[1].first, match[1].length());
 						redirectUrl.Trim();
-
-						break;
 					}
 				}
 			}
@@ -951,7 +940,7 @@ bool CShoutcastStream::CShoutcastSocket::FindSync()
 {
 	m_nBytesRead = 0;
 
-	if (m_Format == AUDIO_NONE || m_Format == AUDIO_PLAYLIST) {
+	if (m_Format == AUDIO_NONE || m_Format == AUDIO_PLS) {
 		return false; // not supported
 	}
 
