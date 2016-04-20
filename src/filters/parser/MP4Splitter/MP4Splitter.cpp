@@ -552,8 +552,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										const BYTE* start = data.GetData();
 										const BYTE* end = start + data.GetDataSize();
 										int size = ParseDTSHeader(start);
-										if (size && (start + size + 20 <= end)) {
-											audioframe_t aframe = { 0 };
+										if (size && (start + size + 40 <= end)) {
+											audioframe_t aframe;
 											int sizehd = ParseDTSHDHeader(start + size, end - start - size, &aframe);
 											if (sizehd) {
 												WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
