@@ -246,7 +246,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		}
 
 		m_file.Seek(m_dataStart, CFile::begin);
-		BYTE buf[20];
+		BYTE buf[40] = { 0 };
 		if (m_file.Read(&buf, 20) != 20) {
 			break;
 		}
@@ -268,9 +268,9 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			int zero_bytes = 0;
 
 			m_file.Seek(m_dataStart + fsize, CFile::begin);
-			if (m_file.Read(&buf, 20) == 20) {
+			if (m_file.Read(&buf, _countof(buf)) == _countof(buf)) {
 				sync = GETDWORD(buf);
-				HD_size = ParseDTSHDHeader(buf, 20, &aframe);
+				HD_size = ParseDTSHDHeader(buf, _countof(buf), &aframe);
 				if (HD_size) {
 					m_samplerate = aframe.samplerate;
 					m_channels   = aframe.channels;
@@ -448,7 +448,7 @@ HRESULT CDTSAC3Stream::GetMediaType(int iPosition, CMediaType* pmt)
 		wfe->wFormatTag      = m_wFormatTag;
 		wfe->nChannels       = m_channels;
 		wfe->nSamplesPerSec  = m_samplerate;
-		wfe->nAvgBytesPerSec = (m_bitrate + 4) /8;
+		wfe->nAvgBytesPerSec = m_bitrate ? (m_bitrate + 4) /8 : 0;
 		wfe->nBlockAlign     = m_framesize < WORD_MAX ? m_framesize : WORD_MAX;
 		wfe->wBitsPerSample  = m_bitdepth;
 		wfe->cbSize = 0;

@@ -824,17 +824,32 @@ int ParseDTSHeader(const BYTE* buf, audioframe_t* audioframe)
 	return frame_size;
 }
 
+#define SPEAKER_PAIR_ALL_2 0xae66
+static inline int count_chs_for_mask(int mask)
+{
+	return CountBits(mask) + CountBits(mask & SPEAKER_PAIR_ALL_2);
+}
+
+// Core/extension mask
+enum ExtensionMask {
+	EXSS_XBR  = 0x020,
+	EXSS_XXCH = 0x040,
+	EXSS_X96  = 0x080,
+	EXSS_LBR  = 0x100,
+	EXSS_XLL  = 0x200,
+};
+
 int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t* audioframe /* = NULL*/)
 {
-	static const DWORD exss_sample_rates[16] = { 8000, 16000, 32000, 64000, 128000, 22050, 44100, 88200, 176400, 352800, 12000, 24000, 48000, 96000, 192000, 384000 };
-
 	if (GETDWORD(buf) != DTS_SYNCWORD_SUBSTREAM) { // syncword
 		return 0;
 	}
 
+	static const DWORD exss_sample_rates[16] = { 8000, 16000, 32000, 64000, 128000, 22050, 44100, 88200, 176400, 352800, 12000, 24000, 48000, 96000, 192000, 384000 };
+
 	int hd_frame_size = 0;
 
-	BYTE isBlownUpHeader = (buf[5] >> 5) & 1;
+	const BYTE isBlownUpHeader = (buf[5] >> 5) & 1;
 	if (isBlownUpHeader) {
 		hd_frame_size = ((buf[6] & 1) << 19 | buf[7] << 11 | buf[8] << 3 | buf[9] >> 5) + 1;
 	} else {
@@ -845,23 +860,36 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 		return hd_frame_size;
 	}
 
-	audioframe->clear();
+	audioframe->Empty();
 
 	CGolombBuffer gb((BYTE*)buf + 4, buffsize - 4); // skip DTSHD_SYNC_WORD
 
 	UINT num_audiop = 1;
 	UINT num_assets = 1;
 
+	BYTE mix_metadata_enabled = 0;
+
+	BYTE embedded_stereo = 0;
+	BYTE embedded_6ch = 0;
+	BYTE spkr_mask_enabled = 0;
+	UINT spkr_mask = 0;
+
+	UINT nmixoutconfigs = 0;
+	UINT nmixoutchs[4] = { 0 };
+
+	BYTE exss_frame_duration_code = 0;
+	UINT exss_sample_rates_index = 0;
+
 	gb.BitRead(8);
 	UINT ss_index = gb.BitRead(2);
 	gb.BitRead(1);
-	gb.BitRead(8 + 4 * isBlownUpHeader);
+	const int header_size = gb.BitRead(8 + 4 * isBlownUpHeader) + 1;
 	gb.BitRead(16 + 4 * isBlownUpHeader);
 
-	BYTE static_fields = gb.BitRead(1);
+	const BYTE static_fields = gb.BitRead(1);
 	if (static_fields) {
 		gb.BitRead(2);
-		gb.BitRead(3);
+		exss_frame_duration_code = gb.BitRead(3) + 1;
 		if (gb.BitRead(1)) {
 			gb.BitRead(36);
 		}
@@ -881,14 +909,13 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 			}
 		}
 
-		BYTE mix_metadata = gb.BitRead(1);
-		if (mix_metadata) {
+		mix_metadata_enabled = gb.BitRead(1);
+		if (mix_metadata_enabled) {
 			gb.BitRead(2);
-			UINT bits = gb.BitRead(2);
-			bits = 4 + bits * 4;
-			UINT num  = gb.BitRead(2) + 1;
-			for (UINT i = 0; i < num; i++) {
-				gb.BitRead(bits);
+			const UINT bits = (gb.BitRead(2) + 1) << 2;
+			nmixoutconfigs = gb.BitRead(2) + 1;
+			for (UINT i = 0; i < nmixoutconfigs; i++) {
+				nmixoutchs[i] = count_chs_for_mask(gb.BitRead(bits));
 			}
 		}
 	}
@@ -908,18 +935,163 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 				gb.BitRead(24);
 			}
 			if (gb.BitRead(1)) {
-				UINT bytes = gb.BitRead(10) + 1;
+				const UINT bytes = gb.BitRead(10) + 1;
 				for (UINT i = 0; i < bytes; i++) {
 					gb.BitRead(8);
 				}
 			}
 
 			audioframe->param1 = gb.BitRead(5) + 1;
-			UINT exss_sample_rates_index = gb.BitRead(4);
+			exss_sample_rates_index = gb.BitRead(4);
 			if (exss_sample_rates_index < _countof(exss_sample_rates)) {
 				audioframe->samplerate = exss_sample_rates[exss_sample_rates_index];
 			}
 			audioframe->channels = gb.BitRead(8) + 1;
+
+			BYTE one_to_one_map_ch_to_spkr = gb.BitRead(1);
+			if (one_to_one_map_ch_to_spkr) {
+				if (audioframe->channels > 2) {
+					embedded_stereo = gb.BitRead(1);
+				}
+				if (audioframe->channels > 6) {
+					embedded_6ch = gb.BitRead(1);
+				}
+
+				BYTE spkr_mask_enabled = gb.BitRead(1);
+				int spkr_mask_nbits = 0;
+				if (spkr_mask_enabled) {
+					spkr_mask_nbits = (gb.BitRead(2) + 1) << 2;
+					spkr_mask = gb.BitRead(spkr_mask_nbits);
+				}
+
+				int nspeakers[8] = { 0 };
+				const UINT spkr_remap_nsets = gb.BitRead(3);
+				for (UINT i = 0; i < spkr_remap_nsets; i++) {
+					nspeakers[i] = gb.BitRead(spkr_mask_nbits);
+				}
+				for (UINT i = 0; i < spkr_remap_nsets; i++) {
+					const UINT nch_for_remaps = gb.BitRead(5) + 1;
+					for (int j = 0; j < nspeakers[i]; j++) {
+						int remap_ch_mask = gb.BitRead(nch_for_remaps);
+						int ncodes = CountBits(remap_ch_mask);
+						for (int k = 0; k < ncodes * 5; k++) {
+							gb.BitRead(1);
+						}
+					}
+				}
+			} else {
+				gb.BitRead(3);
+			}
+		}
+
+		const BYTE drc_present = gb.BitRead(1);
+		if (drc_present) {
+			gb.BitRead(8);
+		}
+
+		if (gb.BitRead(1)) {
+			gb.BitRead(5);
+		}
+
+		if (drc_present && embedded_stereo) {
+			gb.BitRead(8);
+		}
+
+		if (mix_metadata_enabled && gb.BitRead(1)) {
+			gb.BitRead(1);
+			gb.BitRead(6);
+
+			if (gb.BitRead(2) == 3) {
+				gb.BitRead(8);
+			} else {
+				gb.BitRead(3);
+			}
+
+			if (gb.BitRead(1)) {
+				for (UINT i = 0; i < nmixoutconfigs; i++) {
+					gb.BitRead(6 * nmixoutchs[i]);
+				}
+			} else {
+				gb.BitRead(6 * nmixoutconfigs);
+			}
+
+			UINT nchannels_dmix = audioframe->channels;
+			if (embedded_6ch) {
+				nchannels_dmix += 6;
+			}
+			if (embedded_stereo) {
+				nchannels_dmix += 2;
+			}
+			for (UINT i = 0; i < nmixoutconfigs; i++) {
+				for (UINT j = 0; j < nchannels_dmix; j++) {
+					if (!nmixoutchs[i]) {
+						int c = 9;
+					}
+					const UINT mix_map_mask = gb.BitRead(nmixoutchs[i]);
+					int nmixcoefs = CountBits(mix_map_mask);
+					gb.BitRead(6 * nmixcoefs);
+				}
+			}
+		}
+
+		UINT extension_mask = 0;
+		const BYTE coding_mode = gb.BitRead(2);
+		switch (coding_mode) {
+			case 0:
+				extension_mask = gb.BitRead(12);
+				break;
+			case 1:
+				extension_mask = EXSS_XLL;
+				break;
+			case 2:
+				extension_mask = EXSS_LBR;
+				break;
+		}
+
+		if (extension_mask & (EXSS_XBR | EXSS_XXCH | EXSS_X96)) {
+			audioframe->param2 = DCA_PROFILE_HD_HRA;
+		} else if (extension_mask & EXSS_XLL) {
+			audioframe->param2 = DCA_PROFILE_HD_MA;
+		} else if (extension_mask & EXSS_LBR) {
+			audioframe->param2 = DCA_PROFILE_EXPRESS;
+		}
+
+		if (audioframe->param2 == DCA_PROFILE_HD_HRA || audioframe->param2 == DCA_PROFILE_EXPRESS) {
+			UINT factor = 0;
+			switch (exss_sample_rates_index) {
+				case  0 : //  8000
+				case 10 : // 12000
+					factor = 128;
+					break;
+				case  1 : // 16000
+				case  5 : // 22050
+				case 11 : // 24000
+					factor = 256;
+					break;
+				case  2 : // 32000
+				case  6 : // 44100
+				case 12 : // 48000
+					factor = 512;
+					break;
+				case  3 : // 64000
+				case  7 : // 88200
+				case 13 : // 96000
+					factor = 1024;
+					break;
+				case  4 : //128000
+				case  8 : //176400
+				case 14 : //192000
+					factor = 2048;
+					break;
+				case  9 : //352800
+				case 15 : //384000
+					factor = 4096;
+					break;
+			}
+			const UINT SamplesPerFrame = exss_frame_duration_code * factor;
+			if (SamplesPerFrame) {
+				audioframe->param3 = (int)(double(hd_frame_size) * 8 * audioframe->samplerate / SamplesPerFrame);
+			}
 		}
 
 		break;
