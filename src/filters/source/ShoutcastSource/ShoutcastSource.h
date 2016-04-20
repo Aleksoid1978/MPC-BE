@@ -35,7 +35,7 @@ enum StreamFormat {
 	AUDIO_NONE,
 	AUDIO_MPEG,
 	AUDIO_AAC,
-	AUDIO_PLAYLIST
+	AUDIO_PLS
 };
 
 class __declspec(uuid("68F540E9-766F-44d2-AB07-E26CC6D27A79"))
