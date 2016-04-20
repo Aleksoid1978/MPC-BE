@@ -166,29 +166,25 @@ STDMETHODIMP CAudioSwitcherFilter::NonDelegatingQueryInterface(REFIID riid, void
 HRESULT CAudioSwitcherFilter::CheckMediaType(const CMediaType* pmt)
 {
 	if (pmt->majortype == MEDIATYPE_Audio && pmt->formattype == FORMAT_WaveFormatEx) {
-		WORD wFormatTag = ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag;
-		WORD bps = ((WAVEFORMATEX*)pmt->pbFormat)->wBitsPerSample;
+		const WORD wFormatTag = ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag;
+		const WORD bps        = ((WAVEFORMATEX*)pmt->pbFormat)->wBitsPerSample;
 
 		if (pmt->subtype == MEDIASUBTYPE_PCM) {
 			switch (wFormatTag) {
-			case WAVE_FORMAT_PCM:
-				if (bps == 8 || bps == 16 || bps == 24 || bps == 32) {
+				case WAVE_FORMAT_PCM:
+				case WAVE_FORMAT_DOLBY_AC3_SPDIF:
 					return S_OK;
-				}
-				break;
-			case WAVE_FORMAT_DOLBY_AC3_SPDIF:
-				return S_OK;
-			case WAVE_FORMAT_EXTENSIBLE:
-				GUID& SubFormat = ((WAVEFORMATEXTENSIBLE*)pmt->pbFormat)->SubFormat;
-				if (SubFormat == KSDATAFORMAT_SUBTYPE_PCM
-						|| SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT
-						|| SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD
-						|| SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS
-						|| SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP) {
-					return S_OK;
-				}
+				case WAVE_FORMAT_EXTENSIBLE:
+					GUID& SubFormat = ((WAVEFORMATEXTENSIBLE*)pmt->pbFormat)->SubFormat;
+					if (SubFormat == KSDATAFORMAT_SUBTYPE_PCM
+							|| SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT
+							|| SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD
+							|| SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS
+							|| SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP) {
+						return S_OK;
+					}
 			}
-		} else if (pmt->subtype == MEDIASUBTYPE_IEEE_FLOAT && bps == 32
+		} else if (pmt->subtype == MEDIASUBTYPE_IEEE_FLOAT && (bps == 32 || bps == 64)
 				&& (wFormatTag == WAVE_FORMAT_IEEE_FLOAT || wFormatTag == WAVE_FORMAT_EXTENSIBLE)) {
 			return S_OK;
 		}
@@ -349,6 +345,10 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt)
 
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
 		WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
+		GUID subFormat = GUID_NULL;
+		if (IsWaveFormatExtensible(wfe)) {
+			subFormat = wfex->SubFormat;
+		}
 
 		// exclude spdif/bitstream formats
 		if (wfe->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
@@ -417,7 +417,7 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt)
 			wfex->Format.nAvgBytesPerSec	= wfex->Format.nBlockAlign * wfex->Format.nSamplesPerSec;
 			wfex->Format.cbSize				= 22;
 			wfex->dwChannelMask				= layout;
-			wfex->SubFormat					= mt.subtype;
+			wfex->SubFormat					= subFormat != GUID_NULL ? subFormat : mt.subtype;
 		}
 	}
 }
