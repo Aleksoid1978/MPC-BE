@@ -3848,16 +3848,16 @@ png_image_read_direct(png_voidp argument)
             else
                filler = 255;
 
-#           ifdef PNG_FORMAT_AFIRST_SUPPORTED
-               if ((format & PNG_FORMAT_FLAG_AFIRST) != 0)
-               {
-                  where = PNG_FILLER_BEFORE;
-                  change &= ~PNG_FORMAT_FLAG_AFIRST;
-               }
+#ifdef PNG_FORMAT_AFIRST_SUPPORTED
+            if ((format & PNG_FORMAT_FLAG_AFIRST) != 0)
+            {
+               where = PNG_FILLER_BEFORE;
+               change &= ~PNG_FORMAT_FLAG_AFIRST;
+            }
 
-               else
-#           endif
-               where = PNG_FILLER_AFTER;
+            else
+#endif
+            where = PNG_FILLER_AFTER;
 
             png_set_add_alpha(png_ptr, filler, where);
          }
@@ -3965,12 +3965,12 @@ png_image_read_direct(png_voidp argument)
       if (info_ptr->bit_depth == 16)
          info_format |= PNG_FORMAT_FLAG_LINEAR;
 
-#     ifdef PNG_FORMAT_BGR_SUPPORTED
-         if ((png_ptr->transformations & PNG_BGR) != 0)
-            info_format |= PNG_FORMAT_FLAG_BGR;
-#     endif
+#ifdef PNG_FORMAT_BGR_SUPPORTED
+      if ((png_ptr->transformations & PNG_BGR) != 0)
+         info_format |= PNG_FORMAT_FLAG_BGR;
+#endif
 
-#     ifdef PNG_FORMAT_AFIRST_SUPPORTED
+#ifdef PNG_FORMAT_AFIRST_SUPPORTED
          if (do_local_background == 2)
          {
             if ((format & PNG_FORMAT_FLAG_AFIRST) != 0)
@@ -4071,58 +4071,84 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
 {
    if (image != NULL && image->version == PNG_IMAGE_VERSION)
    {
-      png_uint_32 check;
+      /* Check for row_stride overflow.  This check is not performed on the
+       * original PNG format because it may not occur in the output PNG format
+       * and libpng deals with the issues of reading the original.
+       */
+      const unsigned int channels = PNG_IMAGE_PIXEL_CHANNELS(image->format);
 
-      if (row_stride == 0)
-         row_stride = PNG_IMAGE_ROW_STRIDE(*image);
-
-      if (row_stride < 0)
-         check = -row_stride;
-
-      else
-         check = row_stride;
-
-      if (image->opaque != NULL && buffer != NULL &&
-         check >= PNG_IMAGE_ROW_STRIDE(*image))
+      if (image->width <= 0x7FFFFFFFU/channels) /* no overflow */
       {
-         if ((image->format & PNG_FORMAT_FLAG_COLORMAP) == 0 ||
-            (image->colormap_entries > 0 && colormap != NULL))
+         png_uint_32 check;
+         const png_uint_32 png_row_stride = image->width * channels;
+
+         if (row_stride == 0)
+            row_stride = (png_int_32)/*SAFE*/png_row_stride;
+
+         if (row_stride < 0)
+            check = -row_stride;
+
+         else
+            check = row_stride;
+
+         if (image->opaque != NULL && buffer != NULL && check >= png_row_stride)
          {
-            int result;
-            png_image_read_control display;
-
-            memset(&display, 0, (sizeof display));
-            display.image = image;
-            display.buffer = buffer;
-            display.row_stride = row_stride;
-            display.colormap = colormap;
-            display.background = background;
-            display.local_row = NULL;
-
-            /* Choose the correct 'end' routine; for the color-map case all the
-             * setup has already been done.
+            /* Now check for overflow of the image buffer calculation; this
+             * limits the whole image size to 32 bits for API compatibility with
+             * the current, 32-bit, PNG_IMAGE_BUFFER_SIZE macro.
              */
-            if ((image->format & PNG_FORMAT_FLAG_COLORMAP) != 0)
-               result =
-                  png_safe_execute(image, png_image_read_colormap, &display) &&
-                  png_safe_execute(image, png_image_read_colormapped, &display);
+            if (image->height <= 0xFFFFFFFF/png_row_stride)
+            {
+               if ((image->format & PNG_FORMAT_FLAG_COLORMAP) == 0 ||
+                  (image->colormap_entries > 0 && colormap != NULL))
+               {
+                  int result;
+                  png_image_read_control display;
+
+                  memset(&display, 0, (sizeof display));
+                  display.image = image;
+                  display.buffer = buffer;
+                  display.row_stride = row_stride;
+                  display.colormap = colormap;
+                  display.background = background;
+                  display.local_row = NULL;
+
+                  /* Choose the correct 'end' routine; for the color-map case
+                   * all the setup has already been done.
+                   */
+                  if ((image->format & PNG_FORMAT_FLAG_COLORMAP) != 0)
+                     result = png_safe_execute(image,
+                                    png_image_read_colormap, &display) &&
+                              png_safe_execute(image,
+                                    png_image_read_colormapped, &display);
+
+                  else
+                     result =
+                        png_safe_execute(image,
+                              png_image_read_direct, &display);
+
+                  png_image_free(image);
+                  return result;
+               }
+
+               else
+                  return png_image_error(image,
+                     "png_image_finish_read[color-map]: no color-map");
+            }
 
             else
-               result =
-                  png_safe_execute(image, png_image_read_direct, &display);
-
-            png_image_free(image);
-            return result;
+               return png_image_error(image,
+                  "png_image_finish_read: image too large");
          }
 
          else
             return png_image_error(image,
-               "png_image_finish_read[color-map]: no color-map");
+               "png_image_finish_read: invalid argument");
       }
 
       else
          return png_image_error(image,
-            "png_image_finish_read: invalid argument");
+            "png_image_finish_read: row_stride too large");
    }
 
    else if (image != NULL)
