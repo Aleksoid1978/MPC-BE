@@ -1057,9 +1057,14 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 							if (ByteRead(buf, len) == S_OK && ParseDTSHDHeader(buf, len, &audioframe)) {
 								WAVEFORMATEX* wfe = (WAVEFORMATEX*)source->mt.pbFormat;
 								wfe->nSamplesPerSec = audioframe.samplerate;
-								wfe->nChannels      = audioframe.channels;
+								wfe->nChannels = audioframe.channels;
 								if (audioframe.param1) {
 									wfe->wBitsPerSample = audioframe.param1;
+								}
+								if (audioframe.param2 == DCA_PROFILE_HD_HRA) {
+									wfe->nAvgBytesPerSec += audioframe.param3;
+								} else {
+									wfe->nAvgBytesPerSec = 0;
 								}
 
 								source->dts.bDTSHD	= true;

@@ -552,18 +552,24 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										const BYTE* start = data.GetData();
 										const BYTE* end = start + data.GetDataSize();
 										int size = ParseDTSHeader(start);
-										if (size && (start + size + 40 <= end)) {
-											audioframe_t aframe;
-											int sizehd = ParseDTSHDHeader(start + size, end - start - size, &aframe);
-											if (sizehd) {
-												WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
-												wfe->nSamplesPerSec = aframe.samplerate;
-												wfe->nChannels = aframe.channels;
-												if (aframe.param1) {
-													wfe->wBitsPerSample = aframe.param1;
+										if (size) {
+											if (start + size + 40 <= end) {
+												audioframe_t aframe;
+												int sizehd = ParseDTSHDHeader(start + size, end - start - size, &aframe);
+												if (sizehd) {
+													WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
+													wfe->nSamplesPerSec = aframe.samplerate;
+													wfe->nChannels = aframe.channels;
+													if (aframe.param1) {
+														wfe->wBitsPerSample = aframe.param1;
+													}
+													wfe->nBlockAlign = (wfe->nChannels * wfe->wBitsPerSample) / 8;
+													if (aframe.param2 == DCA_PROFILE_HD_HRA) {
+														wfe->nAvgBytesPerSec += aframe.param3;
+													} else {
+														wfe->nAvgBytesPerSec = 0;
+													}
 												}
-												wfe->nBlockAlign = (wfe->nChannels * wfe->wBitsPerSample) / 8;
-												wfe->nAvgBytesPerSec = 0;
 											}
 										}
 									}

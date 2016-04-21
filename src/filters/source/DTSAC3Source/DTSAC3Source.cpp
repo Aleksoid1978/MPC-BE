@@ -262,6 +262,8 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_framelength = aframe.samples;
 			x96k          = aframe.param2;
 
+			int core_samplerate = m_samplerate;
+
 			// DTS-HD header and zero padded
 			DWORD sync = -1;
 			int HD_size = 0;
@@ -292,8 +294,17 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			}
 
 			// calculate actual bitrate
-			m_framesize = fsize + HD_size + zero_bytes;
-			m_bitrate   = int ((m_framesize) * 8i64 * m_samplerate / m_framelength); // inaccurate, because HD_size is not constant
+			m_framesize = fsize + zero_bytes;
+			m_bitrate   = int(m_framesize * 8i64 * core_samplerate / m_framelength);
+
+			if (HD_size) {
+				m_framesize += HD_size;
+				if (aframe.param2 == DCA_PROFILE_HD_HRA) {
+					m_bitrate += int(aframe.param3 * 8i64);
+				} else {
+					m_bitrate = 0;
+				}
+			}
 
 			// calculate framesize to support a sonic audio decoder 4.3 (TODO: make otherwise)
 			// sonicDTSminsize = fsize + HD_size + 4096
