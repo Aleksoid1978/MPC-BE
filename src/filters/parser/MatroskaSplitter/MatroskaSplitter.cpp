@@ -1192,7 +1192,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	// Tags
-	SetProperty(L"TITL", info.Title);
+	if (!info.Title.IsEmpty()) {
+		SetProperty(L"TITL", info.Title);
+	}
 	pos = m_pFile->m_segment.Tags.GetHeadPosition();
 	while (pos) {
 		Tags* Tags = m_pFile->m_segment.Tags.GetNext(pos);
@@ -1204,33 +1206,33 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			POSITION pos3 = Tag->SimpleTag.GetHeadPosition();
 			while (pos3) {
 				SimpleTag* SimpleTag = Tag->SimpleTag.GetNext(pos3);
-				if (SimpleTag->TagName == _T("TITLE")) {
-					DelProperty(L"TITL");
-					SetProperty(L"TITL", SimpleTag->TagString);
-				} else if (SimpleTag->TagName == _T("ARTIST")) {
-					DelProperty(L"AUTH");
-					SetProperty(L"AUTH", SimpleTag->TagString);
-				} else if (SimpleTag->TagName == _T("DATE_RELEASED")) {
-					DelProperty(L"DATE");
-					SetProperty(L"DATE", SimpleTag->TagString);
-				} else if (SimpleTag->TagName == _T("COPYRIGHT")) {
-					DelProperty(L"CPYR");
-					SetProperty(L"CPYR", SimpleTag->TagString);
-				} else if (SimpleTag->TagName == _T("COMMENT") || SimpleTag->TagName == _T("DESCRIPTION")) {
-					DelProperty(L"DESC");
-					SetProperty(L"DESC", SimpleTag->TagString);
+				if (!SimpleTag->TagString.IsEmpty()) {
+					if (SimpleTag->TagName == _T("TITLE")) {
+						SetProperty(L"TITL", SimpleTag->TagString);
+					} else if (SimpleTag->TagName == _T("ARTIST")) {
+						SetProperty(L"AUTH", SimpleTag->TagString);
+					} else if (SimpleTag->TagName == _T("DATE_RELEASED")) {
+						SetProperty(L"DATE", SimpleTag->TagString);
+					} else if (SimpleTag->TagName == _T("COPYRIGHT")) {
+						SetProperty(L"CPYR", SimpleTag->TagString);
+					} else if (SimpleTag->TagName == _T("COMMENT") || SimpleTag->TagName == _T("DESCRIPTION")) {
+						SetProperty(L"DESC", SimpleTag->TagString);
+					} else if (SimpleTag->TagName == _T("RATING")) {
+						SetProperty(L"RTNG", SimpleTag->TagString);
+					} else if (SimpleTag->TagName == _T("ALBUM")) {
+						SetProperty(L"ALBUM", SimpleTag->TagString);
+					}
 				}
 			}
 		}
 	}
 
-	BSTR title, date;
-	if (SUCCEEDED(GetProperty(L"TITL", &title)) & SUCCEEDED(GetProperty(L"DATE", &date))) {
-		if (!CString(title).IsEmpty() && !CString(date).IsEmpty()) {
-			CString Title;
-			Title.Format(_T("%s (%s)"), title, date);
-			SetProperty(L"TITL", Title);
-		}
+	CComBSTR title, date;
+	if (SUCCEEDED(GetProperty(L"TITL", &title)) & SUCCEEDED(GetProperty(L"DATE", &date))
+			&& title.Length() && date.Length()) {
+		CString Title;
+		Title.Format(L"%s (%s)", title, date);
+		SetProperty(L"TITL", Title);
 	}
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
