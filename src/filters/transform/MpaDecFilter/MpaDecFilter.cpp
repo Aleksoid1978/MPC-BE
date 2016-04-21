@@ -516,6 +516,8 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 
 	m_dRate = dRate > 0.0 ? dRate : 1.0;
 
+	m_DTSHDProfile = 0;
+
 	return __super::NewSegment(tStart, tStop, dRate);
 }
 
@@ -1197,6 +1199,13 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF(BOOL bEOF/* = FALSE*/)
 		int sizehd = 0;
 		if (p + size + 16 <= end) {
 			sizehd = ParseDTSHDHeader(p + size);
+			if (sizehd
+					&& !m_DTSHDProfile
+					&& (p + size + sizehd < end)) {
+				audioframe_t dtshdaframe;
+				ParseDTSHDHeader(p + size, end - p - size, &dtshdaframe);
+				m_DTSHDProfile = dtshdaframe.param2;
+			}
 		} else if (!bEOF){
 			break; // need more data for check DTS-HD syncword
 		}
@@ -2376,9 +2385,42 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 		WORD channels = 0;
 		DWORD layout = 0;
 
-		if (m_FFAudioDec.GetCodecId() != AV_CODEC_ID_NONE) {
-			infostr.Format(L"Codec: %hS", m_FFAudioDec.GetCodecName());
-			WORD bitdeph = m_FFAudioDec.GetCoddedBitdepth();
+		const AVCodecID codecId = m_FFAudioDec.GetCodecId();
+
+		if (codecId != AV_CODEC_ID_NONE) {
+			LPCSTR codecName = m_FFAudioDec.GetCodecName();
+
+			if (codecId == AV_CODEC_ID_DTS && m_DTSHDProfile != 0) {
+				if (WAVEFORMATEX* wfeout = (WAVEFORMATEX*)m_pOutput->CurrentMediaType().Format()) {
+					BOOL bIsBitstreamOutput = FALSE;
+					if (wfeout->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
+						bIsBitstreamOutput = TRUE;
+					} else if (IsWaveFormatExtensible(wfeout)) {
+						WAVEFORMATEXTENSIBLE *wfex = (WAVEFORMATEXTENSIBLE*)wfeout;
+						bIsBitstreamOutput = (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS
+											  || wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD
+											  || wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP);
+					}
+
+					if (bIsBitstreamOutput) {
+						switch (m_DTSHDProfile) {
+							case DCA_PROFILE_HD_HRA :
+								codecName = "dts-hd hra";
+								break;
+							case DCA_PROFILE_HD_MA :
+								codecName = "dts-hd ma";
+								break;
+							case DCA_PROFILE_EXPRESS :
+								codecName = "dts express";
+								break;
+						}
+					}
+
+				}
+			}
+
+			infostr.Format(L"Codec: %hS", codecName);
+			const WORD bitdeph = m_FFAudioDec.GetCoddedBitdepth();
 			if (bitdeph) {
 				infostr.AppendFormat(L", %u-bit", bitdeph);
 			}

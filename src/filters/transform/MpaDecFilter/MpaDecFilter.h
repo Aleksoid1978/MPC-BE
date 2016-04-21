@@ -101,6 +101,8 @@ protected:
 	BOOL			m_bFlushing;
 	BOOL			m_bNeedSyncPoint;
 
+	int				m_DTSHDProfile;
+
 	enum BitstreamType {
 		SPDIF,
 		EAC3,
