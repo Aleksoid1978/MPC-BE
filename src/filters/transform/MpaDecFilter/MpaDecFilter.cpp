@@ -2391,31 +2391,16 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 			LPCSTR codecName = m_FFAudioDec.GetCodecName();
 
 			if (codecId == AV_CODEC_ID_DTS && m_DTSHDProfile != 0) {
-				if (WAVEFORMATEX* wfeout = (WAVEFORMATEX*)m_pOutput->CurrentMediaType().Format()) {
-					BOOL bIsBitstreamOutput = FALSE;
-					if (wfeout->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
-						bIsBitstreamOutput = TRUE;
-					} else if (IsWaveFormatExtensible(wfeout)) {
-						WAVEFORMATEXTENSIBLE *wfex = (WAVEFORMATEXTENSIBLE*)wfeout;
-						bIsBitstreamOutput = (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS
-											  || wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD
-											  || wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP);
-					}
-
-					if (bIsBitstreamOutput) {
-						switch (m_DTSHDProfile) {
-							case DCA_PROFILE_HD_HRA :
-								codecName = "dts-hd hra";
-								break;
-							case DCA_PROFILE_HD_MA :
-								codecName = "dts-hd ma";
-								break;
-							case DCA_PROFILE_EXPRESS :
-								codecName = "dts express";
-								break;
-						}
-					}
-
+				switch (m_DTSHDProfile) {
+					case DCA_PROFILE_HD_HRA :
+						codecName = "dts-hd hra";
+						break;
+					case DCA_PROFILE_HD_MA :
+						codecName = "dts-hd ma";
+						break;
+					case DCA_PROFILE_EXPRESS :
+						codecName = "dts express";
+						break;
 				}
 			}
 
