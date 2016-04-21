@@ -47,8 +47,6 @@
 #define EAC3_FRAME_TYPE_AC3_CONVERT 2
 #define EAC3_FRAME_TYPE_RESERVED    3
 
-bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels, BYTE* extra, unsigned int& extralen);
-
 DWORD GetDefChannelMask(WORD nChannels);
 DWORD GetVorbisChannelMask(WORD nChannels);
 DWORD CountBits(DWORD v);
@@ -60,12 +58,17 @@ struct audioframe_t {
 	int samples;
 	int param1;
 	int param2;
-	int param3;
 
 	void Empty() {
 		memset(this, 0, sizeof(*this));
 	}
 };
+
+int CalcBitrate(const audioframe_t& audioframe);
+
+#define DCA_PROFILE_HD_HRA  0x01 // High Resolution Audio
+#define DCA_PROFILE_HD_MA   0x02 // Master Audio
+#define DCA_PROFILE_EXPRESS 0x03 // Express
 
 int ParseAC3IEC61937Header (const BYTE* buf);											// need >= 8 bytes
 int ParseMPAHeader         (const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 4 bytes,  param1 = bitrate, param2 = MP3 flag
@@ -74,12 +77,9 @@ int ParseMP3Header         (const BYTE* buf, MPEGLAYER3WAVEFORMAT* mp3wf);				//
 int ParseAC3Header         (const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 7 bytes,  param1 = bitrate
 int ParseEAC3Header        (const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 6 bytes,  param1 = eac3 frame type
 int ParseMLPHeader         (const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 12 bytes, param1 = bitdepth, param2 = TrueHD flag
-int ParseDTSHeader         (const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 10 bytes, param1 = transmission bitrate, param2 = x96k extension flag
+int ParseDTSHeader         (const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 10 bytes, param2 = x96k extension flag
+int ParseDTSHDHeader       (const BYTE* buf, const int buffsize = 0, audioframe_t* audioframe = NULL); // need >= 40 bytes, param1 = bitdepth, param2 = profile
 int ParseHdmvLPCMHeader    (const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 4 bytes,  param1 = bitdepth, param2 = bytes per frame
 int ParseADTSAACHeader     (const BYTE* buf, audioframe_t* audioframe = NULL);			// need >= 7 bytes,  param1 = header size, param2 = MPEG-4 Audio Object Type
 
-#define DCA_PROFILE_HD_HRA  0x01 // High Resolution Audio
-#define DCA_PROFILE_HD_MA   0x02 // Master Audio
-#define DCA_PROFILE_EXPRESS 0x03 // Express
-int ParseDTSHDHeader       (const BYTE* buf, const int buffsize = 0, audioframe_t* audioframe = NULL); // need >= 40 bytes, param1 = bitdepth, param2 = profile, param3 = bitrate(for HRA/LBR profile only)
-
+bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels, BYTE* extra, unsigned int& extralen);

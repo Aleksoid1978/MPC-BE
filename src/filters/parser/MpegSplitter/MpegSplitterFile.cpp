@@ -1053,16 +1053,16 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 						Seek(start);
 						if (BitRead(32, true) == FCC(DTS_SYNCWORD_SUBSTREAM)) {
 							BYTE* buf = DNew BYTE[len];
-							audioframe_t audioframe;
-							if (ByteRead(buf, len) == S_OK && ParseDTSHDHeader(buf, len, &audioframe)) {
+							audioframe_t aframe;
+							if (ByteRead(buf, len) == S_OK && ParseDTSHDHeader(buf, len, &aframe)) {
 								WAVEFORMATEX* wfe = (WAVEFORMATEX*)source->mt.pbFormat;
-								wfe->nSamplesPerSec = audioframe.samplerate;
-								wfe->nChannels = audioframe.channels;
-								if (audioframe.param1) {
-									wfe->wBitsPerSample = audioframe.param1;
+								wfe->nSamplesPerSec = aframe.samplerate;
+								wfe->nChannels = aframe.channels;
+								if (aframe.param1) {
+									wfe->wBitsPerSample = aframe.param1;
 								}
-								if (audioframe.param2 == DCA_PROFILE_HD_HRA) {
-									wfe->nAvgBytesPerSec += audioframe.param3;
+								if (aframe.param2 == DCA_PROFILE_HD_HRA) {
+									wfe->nAvgBytesPerSec += CalcBitrate(aframe) / 8;
 								} else {
 									wfe->nAvgBytesPerSec = 0;
 								}

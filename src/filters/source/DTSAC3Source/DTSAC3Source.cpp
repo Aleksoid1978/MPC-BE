@@ -300,7 +300,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			if (HD_size) {
 				m_framesize += HD_size;
 				if (aframe.param2 == DCA_PROFILE_HD_HRA) {
-					m_bitrate += int(aframe.param3 * 8i64);
+					m_bitrate += CalcBitrate(aframe);
 				} else {
 					m_bitrate = 0;
 				}
@@ -459,7 +459,7 @@ HRESULT CDTSAC3Stream::GetMediaType(int iPosition, CMediaType* pmt)
 		wfe->wFormatTag      = m_wFormatTag;
 		wfe->nChannels       = m_channels;
 		wfe->nSamplesPerSec  = m_samplerate;
-		wfe->nAvgBytesPerSec = m_bitrate ? (m_bitrate + 4) /8 : 0;
+		wfe->nAvgBytesPerSec = (m_bitrate + 4) / 8;
 		wfe->nBlockAlign     = m_framesize < WORD_MAX ? m_framesize : WORD_MAX;
 		wfe->wBitsPerSample  = m_bitdepth;
 		wfe->cbSize = 0;
