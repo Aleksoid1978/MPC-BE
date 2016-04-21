@@ -1142,7 +1142,7 @@ static enum AVPixelFormat alphaless_fmt(enum AVPixelFormat fmt)
 av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
                              SwsFilter *dstFilter)
 {
-    int i, j;
+    int i;
     int usesVFilter, usesHFilter;
     int unscaled;
     SwsFilter dummyFilter = { NULL, NULL, NULL, NULL };
@@ -1629,7 +1629,7 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
         {
             const int filterAlign = X86_MMX(cpu_flags)     ? 4 :
                                     PPC_ALTIVEC(cpu_flags) ? 8 :
-                                    have_neon(cpu_flags)   ? 4 : 1;
+                                    have_neon(cpu_flags)   ? 8 : 1;
 
             if ((ret = initFilter(&c->hLumFilter, &c->hLumFilterPos,
                            &c->hLumFilterSize, c->lumXInc,
@@ -1655,7 +1655,8 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
     /* precalculate vertical scaler filter coefficients */
     {
         const int filterAlign = X86_MMX(cpu_flags)     ? 2 :
-                                PPC_ALTIVEC(cpu_flags) ? 8 : 1;
+                                PPC_ALTIVEC(cpu_flags) ? 8 :
+                                have_neon(cpu_flags)   ? 2 : 1;
 
         if ((ret = initFilter(&c->vLumFilter, &c->vLumFilterPos, &c->vLumFilterSize,
                        c->lumYInc, srcH, dstH, filterAlign, (1 << 12),

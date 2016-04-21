@@ -139,7 +139,9 @@ SRCS_LC = \
 	libavcodec/binkaudio.c \
 	libavcodec/binkdsp.c \
 	libavcodec/bitstream.c \
+	libavcodec/bitstream_filters.c \
 	libavcodec/blockdsp.c \
+	libavcodec/bsf.c \
 	libavcodec/bswapdsp.c \
 	libavcodec/cabac.c \
 	libavcodec/canopus.c \
