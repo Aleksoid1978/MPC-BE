@@ -863,7 +863,15 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 				}
 				else if (value == "audio/x-scpls") {
 					m_Format = AUDIO_PLS;
-					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected Playlist format"));
+					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected PLS playlist format"));
+				}
+				else if (value == "audio/x-mpegurl") {
+					m_Format = AUDIO_M3U;
+					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected M3U playlist format"));
+				}
+				else if (value == "application/xspf+xml") {
+					m_Format = AUDIO_XSPF;
+					DbgLog((LOG_TRACE, 3, L"CShoutcastSocket::Connect() - detected XSPF playlist format"));
 				}
 				else if (value == "application/ogg") {
 					// not supported yet
@@ -907,17 +915,38 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 	} while (fTryAgain);
 
 	if (!fOK || (m_bitrate == 0 && metaint == 0 && m_title.IsEmpty())) {
-		if (m_Format == AUDIO_PLS && ContentLength) {
+		if (ContentLength && m_Format >= AUDIO_PLS) {
 			char* buf = DNew char[ContentLength + 1];
 
 			if (ContentLength == Receive((void*)buf, ContentLength)) {
 				buf[ContentLength] = 0;
-				const char* reg_esp = "File\\d[ \\t]*=[ \\t]*\"*([^\\n\"]+)";
-				std::regex rgx(reg_esp/*, std::regex_constants::icase*/);
-				std::cmatch match;
 
-				if (std::regex_search(buf, match, rgx)) {
-					if (match.size() == 2) {
+				if (m_Format == AUDIO_PLS) {
+					const char* reg_esp = "File\\d[ \\t]*=[ \\t]*\"*([^\\n\"]+)";
+					std::regex rgx(reg_esp/*, std::regex_constants::icase*/);
+					std::cmatch match;
+
+					if (std::regex_search(buf, match, rgx) && match.size() == 2) {
+						redirectUrl = CString(match[1].first, match[1].length());
+						redirectUrl.Trim();
+					}
+				}
+				else if (m_Format == AUDIO_M3U) {
+					const char* reg_esp = "(^|\\n)(http\\://[^\\n]+)";
+					std::regex rgx(reg_esp);
+					std::cmatch match;
+
+					if (std::regex_search(buf, match, rgx) && match.size() == 3) {
+						redirectUrl = CString(match[2].first, match[2].length());
+						redirectUrl.Trim();
+					}
+				}
+				else if (m_Format == AUDIO_XSPF) {
+					const char* reg_esp = "<location>(http\\://[^<]+)</location>";
+					std::regex rgx(reg_esp);
+					std::cmatch match;
+
+					if (std::regex_search(buf, match, rgx) && match.size() == 2) {
 						redirectUrl = CString(match[1].first, match[1].length());
 						redirectUrl.Trim();
 					}
@@ -940,7 +969,7 @@ bool CShoutcastStream::CShoutcastSocket::FindSync()
 {
 	m_nBytesRead = 0;
 
-	if (m_Format == AUDIO_NONE || m_Format == AUDIO_PLS) {
+	if (m_Format == AUDIO_NONE || m_Format >= AUDIO_PLS) {
 		return false; // not supported
 	}
 
