@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include <atlconv.h>
-#include <atlrx.h>
 #include <atlsync.h>
 #include <afxtaskdialog.h>
 #include <afxglobals.h>

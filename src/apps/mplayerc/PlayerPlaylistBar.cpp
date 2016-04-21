@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <atlrx.h>
 #include <atlutil.h>
 #include <atlpath.h>
 #include "MainFrm.h"

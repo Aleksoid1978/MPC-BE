@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include "GoToDlg.h"
-#include <atlrx.h>
 #include <math.h>
 
 
