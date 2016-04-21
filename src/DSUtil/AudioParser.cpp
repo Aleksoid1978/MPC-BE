@@ -1034,6 +1034,10 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 			}
 		}
 
+		if (gb.RemainingSize() < 2) {
+			break;
+		}
+
 		UINT extension_mask = 0;
 		const BYTE coding_mode = gb.BitRead(2);
 		switch (coding_mode) {
@@ -1090,7 +1094,7 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 			}
 			const UINT SamplesPerFrame = exss_frame_duration_code * factor;
 			if (SamplesPerFrame) {
-				audioframe->param3 = (int)(double(hd_frame_size) * 8 * audioframe->samplerate / SamplesPerFrame);
+				audioframe->param3 = hd_frame_size * audioframe->samplerate / SamplesPerFrame;
 			}
 		}
 
