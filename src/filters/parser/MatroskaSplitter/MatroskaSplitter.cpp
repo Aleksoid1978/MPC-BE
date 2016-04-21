@@ -765,15 +765,23 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								audioframe_t aframe;
 								int size = ParseDTSHeader(start, &aframe);
 								if (size) {
-									int sizehd = 0;
-									if (start + size + 20 <= end) {
-										sizehd = ParseDTSHDHeader(start + size, pb->GetCount(), &aframe);
+									if (!wfe->nAvgBytesPerSec) {
+										wfe->nAvgBytesPerSec = size * aframe.samplerate / aframe.samples;
+									}
+									if (start + size + 40 <= end) {
+										int sizehd = ParseDTSHDHeader(start + size, end - start - size, &aframe);
 										if (sizehd) {
-											wfe->nChannels			= (WORD)aframe.channels;
-											wfe->nSamplesPerSec		= (DWORD)aframe.samplerate;
-											wfe->wBitsPerSample		= (WORD)aframe.param1;
-											wfe->nBlockAlign		= (WORD)((wfe->nChannels * wfe->wBitsPerSample) / 8);
-											wfe->nAvgBytesPerSec	= 0;
+											wfe->nSamplesPerSec = aframe.samplerate;
+											wfe->nChannels = aframe.channels;
+											if (aframe.param1) {
+												wfe->wBitsPerSample = aframe.param1;
+											}
+											wfe->nBlockAlign = wfe->nChannels * wfe->wBitsPerSample / 8;
+											if (aframe.param2 == DCA_PROFILE_HD_HRA) {
+												wfe->nAvgBytesPerSec += aframe.param3;
+											} else {
+												wfe->nAvgBytesPerSec = 0;
+											}
 										}
 									}
 								}
