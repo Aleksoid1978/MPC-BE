@@ -565,7 +565,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 													}
 													wfe->nBlockAlign = (wfe->nChannels * wfe->wBitsPerSample) / 8;
 													if (aframe.param2 == DCA_PROFILE_HD_HRA) {
-														wfe->nAvgBytesPerSec += aframe.param3;
+														wfe->nAvgBytesPerSec += CalcBitrate(aframe) / 8;
 													} else {
 														wfe->nAvgBytesPerSec = 0;
 													}
