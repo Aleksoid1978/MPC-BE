@@ -433,6 +433,29 @@ void CFFAudioDecoder::SetDRC(bool fDRC)
 	}
 }
 
+static inline int decode(AVCodecContext *avctx, AVFrame *frame, int *got_picture, AVPacket *pkt)
+{
+	*got_picture = 0;
+	int ret;
+
+	if (pkt) {
+		ret = avcodec_send_packet(avctx, pkt);
+		if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
+			return ret;
+		}
+	}
+
+	ret = avcodec_receive_frame(avctx, frame);
+	if (ret >= 0) {
+		*got_picture = 1;
+	}
+	if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+		ret = 0;
+	}
+
+	return ret;
+}
+
 HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, int& size, CAtlArray<BYTE>& BuffOut, SampleFormat& samplefmt)
 {
 	size = 0;
@@ -441,8 +464,8 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 		return E_FAIL;
 	}
 
-	int got_frame = 0;
-	BOOL bFlush = (p == NULL);
+	int got_picture = 0;
+	BOOL bFlush     = (p == NULL);
 
 	AVPacket avpkt;
 	av_init_packet(&avpkt);
@@ -465,7 +488,7 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 			avpkt.data = pOut;
 			avpkt.size = pOut_size;
 
-			int ret = avcodec_decode_audio4(m_pAVCtx, m_pFrame, &got_frame, &avpkt);
+			int ret = decode(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
 			if (ret < 0) {
 				DbgLog((LOG_TRACE, 3, L"CFFAudioDecoder::Decode() : decoding failed despite successfull parsing"));
 				av_frame_unref(m_pFrame);
@@ -478,30 +501,26 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 		avpkt.data = p;
 		avpkt.size = buffsize;
 
-		int used_bytes = avcodec_decode_audio4(m_pAVCtx, m_pFrame, &got_frame, &avpkt);
-
-		if (used_bytes < 0) {
-			DbgLog((LOG_TRACE, 3, L"CFFAudioDecoder::Decode() : avcodec_decode_audio4() failed"));
+		int ret = decode(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
+		if (ret < 0) {
+			DbgLog((LOG_TRACE, 3, L"CFFAudioDecoder::Decode() : decoding failed"));
 			Init(nCodecId, NULL);
 
 			av_frame_unref(m_pFrame);
-			return E_FAIL;
-		} else if (used_bytes == 0 && !got_frame) {
-			DbgLog((LOG_TRACE, 3, L"CFFAudioDecoder::Decode() : could not process buffer while decoding"));
+			return S_FALSE;
 		} else if (m_pAVCtx->channels > 8) {
-			// sometimes avcodec_decode_audio4 cannot identify the garbage and produces incorrect data.
+			// sometimes decode() cannot identify the garbage and produces incorrect data.
 			// this code does not solve the problem, it only reduces the likelihood of crash.
 			// do it better!
 
 			av_frame_unref(m_pFrame);
 			return E_FAIL;
 		}
-		ASSERT(buffsize >= used_bytes);
 
-		size = used_bytes;
+		size = buffsize;
 	}
 
-	if (got_frame) {
+	if (got_picture) {
 		size_t nSamples = m_pFrame->nb_samples;
 
 		if (nSamples) {
