@@ -4286,7 +4286,7 @@ static void vp9_decode_flush(AVCodecContext *ctx)
         ff_thread_release_buffer(ctx, &s->s.refs[i]);
 
     // ==> Start patch MPC
-    for (i = 0; i < 8; i++)
+    for (i = 0; i < FF_ARRAY_ELEMS(s->next_refs); i++)
         ff_thread_release_buffer(ctx, &s->next_refs[i]);
     // ==> End patch MPC
 }
