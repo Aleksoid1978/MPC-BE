@@ -709,6 +709,7 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 	}
 
 	audioframe->Empty();
+	audioframe->size = hd_frame_size;
 
 	CGolombBuffer gb((BYTE*)buf + 4, buffsize - 4); // skip DTSHD_SYNC_WORD
 
@@ -731,7 +732,7 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 	gb.BitRead(8);
 	UINT ss_index = gb.BitRead(2);
 	gb.BitRead(1);
-	const int header_size = gb.BitRead(8 + 4 * isBlownUpHeader) + 1;
+	gb.BitRead(8 + 4 * isBlownUpHeader);
 	gb.BitRead(16 + 4 * isBlownUpHeader);
 
 	const BYTE static_fields = gb.BitRead(1);
