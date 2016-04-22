@@ -26,12 +26,14 @@
 
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
+// This is kind of an hack but it avoids using a C++ keyword as a struct member name
 #define class classFFMPEG
-	#include <ffmpeg/libavcodec/mpegvideo.h>
-#undef class
+// hack since "h264.h" is using "new" as a variable
 #define new newFFMPEG
+	#include <ffmpeg/libavcodec/mpegvideo.h>
 	#include <ffmpeg/libavcodec/h264.h>
 	#include <ffmpeg/libavcodec/h264data.h>
+#undef class
 #undef new
 }
 
