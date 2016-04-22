@@ -1,6 +1,5 @@
 /*
- *
- * (C) 2014 see Authors.txt
+ * (C) 2014-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -98,6 +97,27 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 	return true;
 }
 
+static inline int encode(AVCodecContext *avctx, AVFrame *frame, int *got_packet, AVPacket *pkt)
+{
+	*got_packet = 0;
+	int ret;
+
+	ret = avcodec_send_frame(avctx, frame);
+	if (ret < 0) {
+		return ret;
+	}
+
+	ret = avcodec_receive_packet(avctx, pkt);
+	if (!ret) {
+		*got_packet = 1;
+	}
+	if (ret == AVERROR(EAGAIN)) {
+		ret = 0;
+	}
+
+	return ret;
+}
+
 HRESULT CAC3Encoder::Encode(CAtlArray<float>& BuffIn, CAtlArray<BYTE>& BuffOut)
 {
 	int buffsamples = BuffIn.GetCount() / m_pAVCtx->channels;
@@ -124,7 +144,7 @@ HRESULT CAC3Encoder::Encode(CAtlArray<float>& BuffIn, CAtlArray<BYTE>& BuffOut)
 	avpkt.data = NULL; // packet data will be allocated by the encoder
 	avpkt.size = 0;
 
-	ret = avcodec_encode_audio2(m_pAVCtx, &avpkt, m_pFrame, &got_packet);
+	ret = encode(m_pAVCtx, m_pFrame, &got_packet, &avpkt);
 	if (ret < 0) {
 		av_packet_unref(&avpkt);
 		return E_FAIL;
