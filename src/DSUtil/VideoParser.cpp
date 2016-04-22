@@ -717,10 +717,12 @@ namespace HEVCParser {
 		uint32_t pic_conf_win_bottom_offset = 0;
 
 		if (gb.BitRead(1)) {			// conformance_window_flag
-			pic_conf_win_left_offset = gb.UExpGolombRead() * 2;
-			pic_conf_win_right_offset = gb.UExpGolombRead() * 2;
-			pic_conf_win_top_offset = gb.UExpGolombRead() * 2;
-			pic_conf_win_bottom_offset = gb.UExpGolombRead() * 2;
+			int vert_mult = 1 + (chroma_format_idc < 2);
+			int horiz_mult = 1 + (chroma_format_idc < 3);
+			pic_conf_win_left_offset = gb.UExpGolombRead() * horiz_mult;
+			pic_conf_win_right_offset = gb.UExpGolombRead() * horiz_mult;
+			pic_conf_win_top_offset = gb.UExpGolombRead() * vert_mult;
+			pic_conf_win_bottom_offset = gb.UExpGolombRead() * vert_mult;
 		}
 
 		params.width = width - (pic_conf_win_left_offset + pic_conf_win_right_offset);
