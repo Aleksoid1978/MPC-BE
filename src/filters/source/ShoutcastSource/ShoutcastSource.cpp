@@ -922,7 +922,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 				buf[ContentLength] = 0;
 
 				if (m_Format == AUDIO_PLS) {
-					const char* reg_esp = "File\\d[ \\t]*=[ \\t]*\"*([^\\n\"]+)";
+					const char* reg_esp = "File\\d[ \\t]*=[ \\t]*\"*(http\\://[^\\n\"]+)";
 					std::regex rgx(reg_esp/*, std::regex_constants::icase*/);
 					std::cmatch match;
 
