@@ -2200,20 +2200,21 @@ bool FindRedir(CString& fn, CString ct, CAtlList<CString>& fns, CAutoPtrList<CAt
 static void GetContentTypeByExt(CString path, CString& ct)
 {
 	CString ext = GetFileExt(path).MakeLower();
-	if (ext == L".asx") {
-		ct = L"video/x-ms-asf";
-	} else if (ext == L".pls") {
+
+	if (ext == L".pls") {
 		ct = L"audio/x-scpls";
 	} else if (ext == L".m3u" || ext == L".m3u8") {
 		ct = L"audio/x-mpegurl";
-	} else if (ext == L".qtl") {
-		ct = L"application/x-quicktimeplayer";
-	} else if (ext == L".mpcpl") {
-		ct = L"application/x-mpc-playlist";
-	} else if (ext == L".ram") {
-		ct = L"audio/x-pn-realaudio";
 	} else if (ext == L".xspf") {
 		ct = L"application/xspf+xml";
+	} else if (ext == L".asx") {
+		ct = L"video/x-ms-asf";
+	} else if (ext == L".qtl") {
+		ct = L"application/x-quicktimeplayer";
+	} else if (ext == L".ram") {
+		ct = L"audio/x-pn-realaudio";
+	} else if (ext == L".mpcpl") {
+		ct = L"application/x-mpc-playlist";
 	} else if (ext == L".bdmv") {
 		ct = L"application/x-bdmv-playlist";
 	} else if (ext == L".cue") {
@@ -2331,7 +2332,26 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 		CAutoPtrList<CAtlRegExpT> res;
 		CAutoPtr<CAtlRegExpT> re;
 
-		if (ct == L"video/x-ms-asf") {
+		if (ct == L"audio/x-scpls") { // PLS
+			// File1=...\n
+			re.Attach(DNew CAtlRegExp<>());
+			if (re && REPARSE_ERROR_OK == re->Parse(L"file\\z\\b*=\\b*[\"]*{[^\n\"]+}", FALSE)) {
+				res.AddTail(re);
+			}
+		} else if (ct == L"audio/x-mpegurl" && fn.Find(L"://") > 0) { // M3U
+			// #comment
+			// ...
+			re.Attach(DNew CAtlRegExp<>());
+			if (re && REPARSE_ERROR_OK == re->Parse(L"{[^#][^\n]+}", FALSE)) {
+				res.AddTail(re);
+			}
+		} else if (ct == L"application/xspf+xml") {
+			// <location>...</location>
+			re.Attach(DNew CAtlRegExp<>());
+			if (re && REPARSE_ERROR_OK == re->Parse(L"<location>{[^<]+}", FALSE)) {
+				res.AddTail(re);
+			}
+		} else if (ct == L"video/x-ms-asf") { // ASX
 			// ...://..."/>
 			re.Attach(DNew CAtlRegExpT());
 			if (re && REPARSE_ERROR_OK == re->Parse(L"{[a-zA-Z]+://[^\n\">]*}", FALSE)) {
@@ -2342,29 +2362,10 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 			if (re && REPARSE_ERROR_OK == re->Parse(L"Ref\\z\\b*=\\b*[\"]*{[a-zA-Z]+://[^\n\"]+}", FALSE)) {
 				res.AddTail(re);
 			}
-		} else if (ct == L"audio/x-scpls") {
-			// File1=...\n
-			re.Attach(DNew CAtlRegExp<>());
-			if (re && REPARSE_ERROR_OK == re->Parse(L"file\\z\\b*=\\b*[\"]*{[^\n\"]+}", FALSE)) {
-				res.AddTail(re);
-			}
-		} else if (ct == L"audio/x-mpegurl" && fn.Find(L"://") > 0) {
-			// #comment
-			// ...
-			re.Attach(DNew CAtlRegExp<>());
-			if (re && REPARSE_ERROR_OK == re->Parse(L"{[^#][^\n]+}", FALSE)) {
-				res.AddTail(re);
-			}
-		} else if (ct == L"audio/x-pn-realaudio") {
+		} else if (ct == L"audio/x-pn-realaudio") { // RAM
 			// rtsp://...
 			re.Attach(DNew CAtlRegExp<>());
 			if (re && REPARSE_ERROR_OK == re->Parse(L"{rtsp://[^\n]+}", FALSE)) {
-				res.AddTail(re);
-			}
-		} else if (ct == L"application/xspf+xml") {
-			// <location>...</location>
-			re.Attach(DNew CAtlRegExp<>());
-			if (re && REPARSE_ERROR_OK == re->Parse(L"<location>{[^<]+}", FALSE)) {
 				res.AddTail(re);
 			}
 		}
