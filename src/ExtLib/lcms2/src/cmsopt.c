@@ -1,8 +1,7 @@
-
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2011 Marti Maria Saguer
+//  Copyright (c) 1998-2016 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -1034,8 +1033,8 @@ cmsBool OptimizeByComputingLinearization(cmsPipeline** Lut, cmsUInt32Number Inte
     cmsColorSpaceSignature ColorSpace, OutputColorSpace;
     cmsStage* OptimizedPrelinMpe;
     cmsStage* mpe;
-    cmsToneCurve**   OptimizedPrelinCurves;
-    _cmsStageCLutData*     OptimizedPrelinCLUT;
+    cmsToneCurve** OptimizedPrelinCurves;
+    _cmsStageCLutData* OptimizedPrelinCLUT;
 
 
     // This is a loosy optimization! does not apply in floating-point cases
@@ -1419,7 +1418,10 @@ cmsBool OptimizeByJoiningCurves(cmsPipeline** Lut, cmsUInt32Number Intent, cmsUI
         GammaTables[i] = NULL;
     }
 
-    if (GammaTables != NULL) _cmsFree(Src ->ContextID, GammaTables);
+    if (GammaTables != NULL) {
+        _cmsFree(Src->ContextID, GammaTables);
+        GammaTables = NULL;
+    }
 
     // Maybe the curves are linear at the end
     if (!AllCurvesAreLinear(ObtainedCurves)) {

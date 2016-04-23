@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2012 Marti Maria Saguer
+//  Copyright (c) 1998-2016 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -92,7 +92,7 @@ cmsBool GrowMLUpool(cmsMLU* mlu)
 static
 cmsBool GrowMLUtable(cmsMLU* mlu)
 {
-    int AllocatedEntries;
+    cmsUInt32Number AllocatedEntries;
     _cmsMLUentry *NewPtr;
 
     // Sanity check
@@ -118,7 +118,7 @@ cmsBool GrowMLUtable(cmsMLU* mlu)
 static
 int SearchMLUEntry(cmsMLU* mlu, cmsUInt16Number LanguageCode, cmsUInt16Number CountryCode)
 {
-    int i;
+    cmsUInt32Number i;
 
     // Sanity check
     if (mlu == NULL) return -1;
@@ -325,8 +325,8 @@ const wchar_t* _cmsMLUgetWide(const cmsMLU* mlu,
                               cmsUInt16Number LanguageCode, cmsUInt16Number CountryCode,
                               cmsUInt16Number* UsedLanguageCode, cmsUInt16Number* UsedCountryCode)
 {
-    int i;
-    int Best = -1;
+    cmsUInt32Number i;
+    cmsInt32Number Best = -1;
     _cmsMLUentry* v;
 
     if (mlu == NULL) return NULL;
@@ -490,7 +490,7 @@ cmsBool CMSEXPORT cmsMLUtranslationsCodes(const cmsMLU* mlu,
 
     if (mlu == NULL) return FALSE;
 
-    if (idx >= (cmsUInt32Number) mlu->UsedEntries) return FALSE;
+    if (idx >= mlu->UsedEntries) return FALSE;
 
     entry = &mlu->Entries[idx];
     

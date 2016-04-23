@@ -1,7 +1,7 @@
 
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2015 Marti Maria Saguer
+//  Copyright (c) 1998-2016 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -670,8 +670,8 @@ struct _cms_MLU_struct {
     cmsContext ContextID;
 
     // The directory
-    int AllocatedEntries;
-    int UsedEntries;
+    cmsUInt32Number  AllocatedEntries;
+    cmsUInt32Number  UsedEntries;
     _cmsMLUentry* Entries;     // Array of pointers to strings allocated in MemPool
 
     // The Pool
