@@ -258,6 +258,12 @@ void File_DtvccTransport::Read_Buffer_Continue()
                     //Parsing
                     #if MEDIAINFO_DEMUX
                         Element_Code=Parser_Pos;
+                        /* //Used for debugging (CRC bit is removed of the demuxed stream)
+                        int8u A[2];
+                        A[0] = Buffer[Buffer_Offset+Element_Offset] & 0x7F;
+                        A[1] = Buffer[Buffer_Offset + Element_Offset + 1] & 0x7F;
+                        Demux(A, 2, ContentType_MainStream);
+                        //*/
                         Demux(Buffer+(size_t)(Buffer_Offset+Element_Offset), 2, ContentType_MainStream);
                     #endif //MEDIAINFO_DEMUX
                     if (!Streams[Parser_Pos]->Parser->Status[IsFinished])

@@ -237,6 +237,8 @@ void File_Eia608::Read_Buffer_Continue()
     if (!Status[IsAccepted])
         Accept("EIA-608");
 
+    while (Element_Offset+1<Element_Size)
+    {
     int8u cc_data_1, cc_data_2;
     Get_B1 (cc_data_1,                                          "cc_data");
     Get_B1 (cc_data_2,                                          "cc_data");
@@ -279,6 +281,7 @@ void File_Eia608::Read_Buffer_Continue()
     }
     else if (cc_data_1) //Special
         Special(cc_data_1, cc_data_2);
+    }
 }
 
 //***************************************************************************

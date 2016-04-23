@@ -219,6 +219,9 @@ private :
     int32u  num_v_slices;
     int32u  chroma_h_shift;
     int32u  chroma_v_shift;
+    int32u  picture_structure;
+    int32u  sample_aspect_ratio_num;
+    int32u  sample_aspect_ratio_den;
     int8u   coder_type;
     int8u   colorspace_type;
     int8u   bits_per_sample;

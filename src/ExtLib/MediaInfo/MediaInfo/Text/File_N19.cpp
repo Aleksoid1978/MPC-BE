@@ -65,13 +65,15 @@ const char* N19_CharacterCodeTable(int16u CCT)
 }
 
 //---------------------------------------------------------------------------
-float32 N19_DiskFormatCode_FrameRate(int64u DFC)
+float64 N19_DiskFormatCode_FrameRate(int64u DFC)
 {
     switch (DFC)
     {
-        case 0x53544C32352E3031LL : return 25.000;
-        case 0x53544C33302E3031LL : return 30.000;
-        default                   : return  0.000;
+        case 0x53544C32332E3031LL : return (float64)24000 / (float64)1001; 
+        case 0x53544C32352E3031LL : return (float64)25;
+        case 0x53544C32392E3031LL : return (float64)30000 / (float64)1001;
+        case 0x53544C33302E3031LL : return (float64)30;
+        default                   : return (float64) 0;
     }
 }
 
@@ -225,9 +227,12 @@ bool File_N19::FileHeader_Begin()
     if (Buffer_Size<11)
         return false; //Must wait for more data
 
-    int64u DiskFormatCode=CC8(Buffer+3);
-    if (DiskFormatCode!=0x53544C32352E3031LL
-     && DiskFormatCode!=0x53544C33302E3031LL)
+    if (Buffer[ 3]!=0x53
+     || Buffer[ 4]!=0x54   
+     || Buffer[ 5]!=0x4C   
+     || Buffer[ 8]!=0x2E   
+     || Buffer[ 9]!=0x30   
+     || Buffer[10]!=0x31) // "STLxx.01"
     {
         Reject("N19");
         return false;
@@ -310,7 +315,7 @@ void File_N19::FileHeader_Parse()
              && TCP[6]>='0' && TCP[6]<='2'
              && TCP[7]>='0' && TCP[7]<='9')
             {
-                int32u Delay=0;
+                int64u Delay=0;
                 Delay+=(((int32u)TCP[0])-'0')*10*60*60*1000;
                 Delay+=(((int32u)TCP[1])-'0')*   60*60*1000;
                 Delay+=(((int32u)TCP[2])-'0')*   10*60*1000;
@@ -320,7 +325,7 @@ void File_N19::FileHeader_Parse()
                 int8u Frames=0;
                 Frames+=(((int8u)TCP[6])-'0')*10;
                 Frames+=(((int8u)TCP[7])-'0');
-                Delay+=float32_int32s(Frames*1000/N19_DiskFormatCode_FrameRate(DFC));
+                Delay+=float64_int64s(Frames*1000/N19_DiskFormatCode_FrameRate(DFC));
                 //Fill(Stream_Text, 0, Text_Delay, Delay); //TODO is 0???
                 /*TCP.insert(':', 2);
                 TCP.insert(':', 5);
@@ -385,13 +390,13 @@ void File_N19::Data_Parse()
     TCI=((TCI>>24)&0xFF)*60*60*1000
       + ((TCI>>16)&0xFF)   *60*1000
       + ((TCI>>8 )&0xFF)      *1000
-      +  float32_int32s((TCI     &0xFF)      *1000/N19_DiskFormatCode_FrameRate(DFC));
+      +  float64_int64s((TCI     &0xFF)      *1000/N19_DiskFormatCode_FrameRate(DFC));
     Param_Info1(Ztring().Duration_From_Milliseconds((int64u)TCI));
     Get_B4    (TCO,                                             "TCO - Time Code Out");
     TCO=((TCO>>24)&0xFF)*60*60*1000
       + ((TCO>>16)&0xFF)   *60*1000
       + ((TCO>>8 )&0xFF)      *1000
-      +  float32_int32s((TCO     &0xFF)      *1000/N19_DiskFormatCode_FrameRate(DFC));
+      +  float64_int64s((TCO     &0xFF)      *1000/N19_DiskFormatCode_FrameRate(DFC));
     Param_Info1(Ztring().Duration_From_Milliseconds((int64u)TCO));
     Skip_B1   (                                                 "VP - Vertical Position");
     Skip_B1   (                                                 "JC - Justification Code");
@@ -409,8 +414,25 @@ void File_N19::Data_Parse()
                         Get_ISO_8859_1(112, TF,                 "TF - Text Field");
     }
     #if MEDIAINFO_TRACE
-        TF.FindAndReplace(__T("\x8A"), EOL, 0, Ztring_Recursive);
-        TF.FindAndReplace(__T("\x8F"), Ztring(), 0, Ztring_Recursive);
+        for (size_t i = 0; i < TF.size(); ++i)
+            switch (TF[i])
+            {
+                case 0x8A:  //EOL
+                            TF[i] = EOL[0]; 
+                            {
+                                size_t j = 1;
+                                while (EOL[j] != __T('\0'))
+                                    TF.insert(++i, 1, EOL[j++]);
+                            };
+                            break;
+                case 0x8F:  // Padding
+                            TF.erase(i--, 1);
+                            break;
+                default:
+                    if ( TF[i]< 0x20
+                     || (TF[i]>=0x80 && TF[i]<0xA0))
+                        TF.erase(i--, 1);
+            }
         Param_Info1(TF);
     #endif //MEDIAINFO_TRACE
 

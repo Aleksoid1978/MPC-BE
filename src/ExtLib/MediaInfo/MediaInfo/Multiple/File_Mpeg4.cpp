@@ -40,6 +40,7 @@
 #ifdef MEDIAINFO_REFERENCES_YES
     #include "MediaInfo/Multiple/File__ReferenceFilesHelper.h"
 #endif //MEDIAINFO_REFERENCES_YES
+#include "MediaInfo/Multiple/File_Mpeg4_TimeCode.h"
 #include "ZenLib/Format/Http/Http_Utils.h"
 #include <algorithm>    // std::sort
 //---------------------------------------------------------------------------
@@ -204,7 +205,7 @@ File_Mpeg4::File_Mpeg4()
         Demux_Level=2; //Container
     #endif //MEDIAINFO_DEMUX
     #if MEDIAINFO_TRACE
-        Trace_Layers_Update(0); //Container1
+        //Trace_Layers_Update(0); //Container1
     #endif //MEDIAINFO_TRACE
 
     DataMustAlwaysBeComplete=false;
@@ -852,7 +853,48 @@ void File_Mpeg4::Streams_Finish()
                 {
                     //Temp->second.Parsers[0]->Clear(StreamKind_Last, StreamPos_Last, "Delay"); //DV TimeCode is removed
                     Temp->second.Parsers[0]->Clear(StreamKind_Last, StreamPos_Last, "FrameCount");
-                    Merge(*Temp->second.Parsers[0], StreamKind_Last, 0, StreamPos_Last);
+                    size_t New_Count=Temp->second.Parsers[0]->Count_Get(StreamKind_Last);
+                    Ztring ID;
+                    ZtringList StreamSave;
+                    ZtringListList StreamMoreSave;
+                    if (New_Count > 1)
+                    {
+                        ID = Retrieve(StreamKind_Last, StreamPos_Last, General_ID);
+                        if (StreamKind_Last != Stream_Max)
+                        {
+                            StreamSave.Write((*File__Analyze::Stream)[StreamKind_Last][StreamPos_Last].Read());
+                            StreamMoreSave.Write((*Stream_More)[StreamKind_Last][StreamPos_Last].Read());
+                        }
+                    }
+                    for (size_t Parser_StreamPos=0; Parser_StreamPos<New_Count; Parser_StreamPos++)
+                    {
+                        if (Parser_StreamPos)
+                        {
+                            //Inserting a new stream (and updating the other streams not yet parsed with the corresponding StreamPos)
+                            Stream_Prepare(StreamKind_Last, StreamPos_Last + Parser_StreamPos);
+
+                            streams::iterator NextStream=Temp;
+                            ++NextStream;
+                            while (NextStream!=Streams.end())
+                            {
+                                if (NextStream->second.StreamKind== StreamKind_Last)
+                                   NextStream->second.StreamPos++;
+                                ++NextStream;
+                            }
+                        }
+                        Merge(*Temp->second.Parsers[0], StreamKind_Last, Parser_StreamPos, StreamPos_Last);
+                        const Ztring& Parser_ID=Temp->second.Parsers[0]->Retrieve(StreamKind_Last, Parser_StreamPos, General_ID);
+                        if (!Parser_ID.empty())
+                            Fill(StreamKind_Last, StreamPos_Last, General_ID, ID + __T('-') + Parser_ID, true);
+                        if (Parser_StreamPos)
+                        {
+                            for (size_t Pos=0; Pos<StreamSave.size(); Pos++)
+                                if (Retrieve(StreamKind_Last, StreamPos_Last, Pos).empty())
+                                    Fill(StreamKind_Last, StreamPos_Last, Pos, StreamSave[Pos]);
+                            for (size_t Pos=0; Pos<StreamMoreSave.size(); Pos++)
+                                Fill(StreamKind_Last, StreamPos_Last, StreamMoreSave(Pos, 0).To_Local().c_str(), StreamMoreSave(Pos, 1));
+                        }
+                    }
 
                     //Law rating
                     Ztring LawRating=Temp->second.Parsers[0]->Retrieve(Stream_General, 0, General_LawRating);

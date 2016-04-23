@@ -1435,6 +1435,7 @@ void MediaInfo_Config_CodecID_Video_Mpeg4 (InfoMap &Info)
     "ai14;AVC;;Advanced Video Coding;http://ffdshow-tryout.sourceforge.net;;\n"
     "ai15;AVC;;Advanced Video Coding;http://ffdshow-tryout.sourceforge.net;;\n"
     "ai1q;AVC;;Advanced Video Coding;http://ffdshow-tryout.sourceforge.net;;\n"
+    "ai26;AVC;;;;;\n"
     "ai5q;AVC;;Advanced Video Coding;http://ffdshow-tryout.sourceforge.net;;\n"
     "AV1x;YUV;;;;;;YUV;4:2:2\n"
     "avc1;AVC;;Advanced Video Coding;http://www.apple.com/quicktime/download/standalone.html;;;\n"
@@ -2758,6 +2759,7 @@ void MediaInfo_Config_CodecID_Other_Mpeg4 (InfoMap &Info)
     Info.Separator_Set(0, __T("\n"));
     Info.Write(Ztring().From_UTF8(
     "rtp ;RTP\n"
+    "Ovbi;Omneon VBI\n"
     ));
     Info.Separator_Set(0, ZenLib::EOL);
 }
