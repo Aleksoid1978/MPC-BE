@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2010 Marti Maria Saguer
+//  Copyright (c) 1998-2016 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -507,6 +507,7 @@ void* _cmsPluginMalloc(cmsContext ContextID, cmsUInt32Number size)
         if (ContextID == NULL) {
 
             ctx->MemPool = _cmsCreateSubAlloc(0, 2*1024);
+            if (ctx->MemPool == NULL) return NULL;
         }
         else {
             cmsSignalError(ContextID, cmsERROR_CORRUPTION_DETECTED, "NULL memory pool on context");

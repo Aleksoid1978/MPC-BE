@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2015 Marti Maria Saguer
+//  Copyright (c) 1998-2016 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -431,7 +431,7 @@ void _cmsHandleExtraChannels(_cmsTRANSFORM* p, const void* in,
        if (!(p->dwOriginalFlags & cmsFLAGS_COPY_ALPHA))
               return;
 
-       // Make sure we have same number of alpha channels. If not, just reurn as this should be checked at transform creation time.
+       // Make sure we have same number of alpha channels. If not, just return as this should be checked at transform creation time.
        nExtra = T_EXTRA(p->InputFormat);
        if (nExtra != T_EXTRA(p->OutputFormat))
               return;
@@ -447,17 +447,15 @@ void _cmsHandleExtraChannels(_cmsTRANSFORM* p, const void* in,
        // Check for conversions 8, 16, half, float, dbl
        copyValueFn = _cmsGetFormatterAlpha(p->ContextID, p->InputFormat, p->OutputFormat);
 
-
        memset(SourceStrideIncrements, 0, sizeof(SourceStrideIncrements));
        memset(DestStrideIncrements, 0, sizeof(DestStrideIncrements));
-
 
        // The loop itself       
        for (i = 0; i < LineCount; i++) {
 
               // Prepare pointers for the loop
-              for (j = 0; j < nExtra; j++)
-              {
+              for (j = 0; j < nExtra; j++) {
+
                      SourcePtr[j] = (cmsUInt8Number*)in + SourceStartingOrder[j] + SourceStrideIncrements[j];
                      DestPtr[j] = (cmsUInt8Number*)out + DestStartingOrder[j] + DestStrideIncrements[j];
               }
@@ -478,8 +476,6 @@ void _cmsHandleExtraChannels(_cmsTRANSFORM* p, const void* in,
                      SourceStrideIncrements[j] += Stride->BytesPerLineIn;
                      DestStrideIncrements[j] += Stride->BytesPerLineOut;
               }
-
        }
-
 }
 

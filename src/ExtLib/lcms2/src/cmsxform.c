@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2015 Marti Maria Saguer
+//  Copyright (c) 1998-2016 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -396,18 +396,18 @@ void PrecalculatedXFORM(_cmsTRANSFORM* p,
 
     for (i = 0; i < LineCount; i++) {
 
-           accum = (cmsUInt8Number*)in + strideIn;
-           output = (cmsUInt8Number*)out + strideOut;
+        accum = (cmsUInt8Number*)in + strideIn;
+        output = (cmsUInt8Number*)out + strideOut;
 
-           for (j = 0; j < PixelsPerLine; j++) {
+        for (j = 0; j < PixelsPerLine; j++) {
 
-                  accum = p->FromInput(p, wIn, accum, Stride->BytesPerPlaneIn);
-        p ->Lut ->Eval16Fn(wIn, wOut, p -> Lut->Data);
-                  output = p->ToOutput(p, wOut, output, Stride->BytesPerPlaneOut);
-    }
+            accum = p->FromInput(p, wIn, accum, Stride->BytesPerPlaneIn);
+            p->Lut->Eval16Fn(wIn, wOut, p->Lut->Data);
+            output = p->ToOutput(p, wOut, output, Stride->BytesPerPlaneOut);
+        }
 
-           strideIn += Stride->BytesPerLineIn;
-           strideOut += Stride->BytesPerLineOut;
+        strideIn += Stride->BytesPerLineIn;
+        strideOut += Stride->BytesPerLineOut;
     }
 
 }
@@ -463,7 +463,7 @@ void PrecalculatedXFORMGamutCheck(_cmsTRANSFORM* p,
            for (j = 0; j < PixelsPerLine; j++) {
 
                   accum = p->FromInput(p, wIn, accum, Stride->BytesPerPlaneIn);
-        TransformOnePixelWithGamutCheck(p, wIn, wOut);
+                  TransformOnePixelWithGamutCheck(p, wIn, wOut);
                   output = p->ToOutput(p, wOut, output, Stride->BytesPerPlaneOut);
            }
 
@@ -477,7 +477,7 @@ void PrecalculatedXFORMGamutCheck(_cmsTRANSFORM* p,
 static
 void CachedXFORM(_cmsTRANSFORM* p,
                  const void* in,
-                 void* out, 
+                 void* out,
                  cmsUInt32Number PixelsPerLine,
                  cmsUInt32Number LineCount,
                  const cmsStride* Stride)
@@ -486,46 +486,46 @@ void CachedXFORM(_cmsTRANSFORM* p,
     cmsUInt8Number* output;
     cmsUInt16Number wIn[cmsMAXCHANNELS], wOut[cmsMAXCHANNELS];
     _cmsCACHE Cache;
-       cmsUInt32Number i, j, strideIn, strideOut;
+    cmsUInt32Number i, j, strideIn, strideOut;
 
-       _cmsHandleExtraChannels(p, in, out, PixelsPerLine, LineCount, Stride);
+    _cmsHandleExtraChannels(p, in, out, PixelsPerLine, LineCount, Stride);
 
     // Empty buffers for quick memcmp
-    memset(wIn,  0, sizeof(wIn));
+    memset(wIn, 0, sizeof(wIn));
     memset(wOut, 0, sizeof(wOut));
 
     // Get copy of zero cache
-    memcpy(&Cache, &p ->Cache, sizeof(Cache));
+    memcpy(&Cache, &p->Cache, sizeof(Cache));
 
-       strideIn = 0;
-       strideOut = 0;
+    strideIn = 0;
+    strideOut = 0;
 
-       for (i = 0; i < LineCount; i++) {
+    for (i = 0; i < LineCount; i++) {
 
-              accum = (cmsUInt8Number*)in + strideIn;
-              output = (cmsUInt8Number*)out + strideOut;
+        accum = (cmsUInt8Number*)in + strideIn;
+        output = (cmsUInt8Number*)out + strideOut;
 
-              for (j = 0; j < PixelsPerLine; j++) {
+        for (j = 0; j < PixelsPerLine; j++) {
 
-                     accum = p->FromInput(p, wIn, accum, Stride->BytesPerPlaneIn);
+            accum = p->FromInput(p, wIn, accum, Stride->BytesPerPlaneIn);
 
-        if (memcmp(wIn, Cache.CacheIn, sizeof(Cache.CacheIn)) == 0) {
+            if (memcmp(wIn, Cache.CacheIn, sizeof(Cache.CacheIn)) == 0) {
 
-            memcpy(wOut, Cache.CacheOut, sizeof(Cache.CacheOut));
+                memcpy(wOut, Cache.CacheOut, sizeof(Cache.CacheOut));
+            }
+            else {
+                p->Lut->Eval16Fn(wIn, wOut, p->Lut->Data);
+
+                memcpy(Cache.CacheIn, wIn, sizeof(Cache.CacheIn));
+                memcpy(Cache.CacheOut, wOut, sizeof(Cache.CacheOut));
+            }
+
+            output = p->ToOutput(p, wOut, output, Stride->BytesPerPlaneOut);
         }
-        else {
-            p ->Lut ->Eval16Fn(wIn, wOut, p -> Lut->Data);
 
-            memcpy(Cache.CacheIn,  wIn,  sizeof(Cache.CacheIn));
-            memcpy(Cache.CacheOut, wOut, sizeof(Cache.CacheOut));
-        }
-
-                     output = p->ToOutput(p, wOut, output, Stride->BytesPerPlaneOut);
+        strideIn += Stride->BytesPerLineIn;
+        strideOut += Stride->BytesPerLineOut;
     }
-
-              strideIn += Stride->BytesPerLineIn;
-              strideOut += Stride->BytesPerLineOut;
-       }
 }
 
 // All those nice features together
@@ -537,50 +537,50 @@ void CachedXFORMGamutCheck(_cmsTRANSFORM* p,
                            cmsUInt32Number LineCount,
                            const cmsStride* Stride)
 {
-       cmsUInt8Number* accum;
-       cmsUInt8Number* output;
-       cmsUInt16Number wIn[cmsMAXCHANNELS], wOut[cmsMAXCHANNELS];
-       _cmsCACHE Cache;
-       cmsUInt32Number i, j, strideIn, strideOut;
+    cmsUInt8Number* accum;
+    cmsUInt8Number* output;
+    cmsUInt16Number wIn[cmsMAXCHANNELS], wOut[cmsMAXCHANNELS];
+    _cmsCACHE Cache;
+    cmsUInt32Number i, j, strideIn, strideOut;
 
-       _cmsHandleExtraChannels(p, in, out, PixelsPerLine, LineCount, Stride);
+    _cmsHandleExtraChannels(p, in, out, PixelsPerLine, LineCount, Stride);
 
-       // Empty buffers for quick memcmp
-       memset(wIn, 0, sizeof(wIn));
-       memset(wOut, 0, sizeof(wOut));
+    // Empty buffers for quick memcmp
+    memset(wIn, 0, sizeof(wIn));
+    memset(wOut, 0, sizeof(wOut));
 
-       // Get copy of zero cache
-       memcpy(&Cache, &p ->Cache, sizeof(Cache));
+    // Get copy of zero cache
+    memcpy(&Cache, &p->Cache, sizeof(Cache));
 
-       strideIn = 0;
-       strideOut = 0;
+    strideIn = 0;
+    strideOut = 0;
 
-       for (i = 0; i < LineCount; i++) {
+    for (i = 0; i < LineCount; i++) {
 
-              accum = (cmsUInt8Number*)in + strideIn;
-              output = (cmsUInt8Number*)out + strideOut;
+        accum = (cmsUInt8Number*)in + strideIn;
+        output = (cmsUInt8Number*)out + strideOut;
 
-              for (j = 0; j < PixelsPerLine; j++) {
+        for (j = 0; j < PixelsPerLine; j++) {
 
-                     accum = p->FromInput(p, wIn, accum, Stride->BytesPerPlaneIn);
+            accum = p->FromInput(p, wIn, accum, Stride->BytesPerPlaneIn);
 
             if (memcmp(wIn, Cache.CacheIn, sizeof(Cache.CacheIn)) == 0) {
 
-                    memcpy(wOut, Cache.CacheOut, sizeof(Cache.CacheOut));
+                memcpy(wOut, Cache.CacheOut, sizeof(Cache.CacheOut));
             }
             else {
-                    TransformOnePixelWithGamutCheck(p, wIn, wOut);
+                TransformOnePixelWithGamutCheck(p, wIn, wOut);
 
-                    memcpy(Cache.CacheIn, wIn, sizeof(Cache.CacheIn));
-                    memcpy(Cache.CacheOut, wOut, sizeof(Cache.CacheOut));
+                memcpy(Cache.CacheIn, wIn, sizeof(Cache.CacheIn));
+                memcpy(Cache.CacheOut, wOut, sizeof(Cache.CacheOut));
             }
 
-                     output = p->ToOutput(p, wOut, output, Stride->BytesPerPlaneOut);
-       }
+            output = p->ToOutput(p, wOut, output, Stride->BytesPerPlaneOut);
+        }
 
-              strideIn += Stride->BytesPerLineIn;
-              strideOut += Stride->BytesPerLineOut;
-       }
+        strideIn += Stride->BytesPerLineIn;
+        strideOut += Stride->BytesPerLineOut;
+    }
 }
 
 // Transform plug-ins ----------------------------------------------------------------------------------------------------
