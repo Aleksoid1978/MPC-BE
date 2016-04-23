@@ -125,6 +125,9 @@ File_H263::File_H263()
 {
     //Configuration
     ParserName=__T("H.263");
+    #if MEDIAINFO_TRACE
+        Trace_Layers_Update(8); //Stream
+    #endif //MEDIAINFO_TRACE
     MustSynchronize=true;
     Buffer_TotalBytes_FirstSynched_Max=64*1024;
     IsRawStream=true;

@@ -44,6 +44,9 @@ File_Aac::File_Aac()
     Base=this;
 
     //Configuration
+    #if MEDIAINFO_TRACE
+        Trace_Layers_Update(8); //Stream
+    #endif //MEDIAINFO_TRACE
     MustSynchronize=true;
     Buffer_TotalBytes_FirstSynched_Max=64*1024;
     PTS_DTS_Needed=true;

@@ -280,6 +280,7 @@ public :
     int64u        Demux_FirstFrameNumber_Get ();
     void          Demux_InitData_Set (int8u NewValue);
     int8u         Demux_InitData_Get ();
+    std::map<Ztring, File> Demux_Files;
     #endif //MEDIAINFO_DEMUX
 
     #if MEDIAINFO_IBIUSAGE

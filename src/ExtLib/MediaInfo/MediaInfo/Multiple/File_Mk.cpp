@@ -364,6 +364,9 @@ File_Mk::File_Mk()
     #if MEDIAINFO_DEMUX
         Demux_Level=2; //Container
     #endif //MEDIAINFO_DEMUX
+    #if MEDIAINFO_TRACE
+        Trace_Layers_Update(0); //Container1
+    #endif //MEDIAINFO_TRACE
     DataMustAlwaysBeComplete=false;
 
     //Temp

@@ -2400,6 +2400,7 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
         MEDIAINFO_DEBUG2(   "CallBackFunction",
                             )
     }
+    #if MEDIAINFO_DEMUX
     else if (!File_Name.empty())
     {
         MediaInfo_Event_Generic* Event_Generic=(MediaInfo_Event_Generic*)Data_Content;
@@ -2435,11 +2436,16 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
                     File_Name_Final+=__T(".raw");
             }
 
-            File F;
-            F.Open(File_Name_Final, File::Access_Write_Append);
-            F.Write(Event->Content, Event->Content_Size);
+            std::map<Ztring, File>::iterator F = Demux_Files.find(File_Name_Final);
+            if (F == Demux_Files.end())
+            {
+                Demux_Files[File_Name_Final].Open(File_Name_Final, File::Access_Write_Append);
+                F = Demux_Files.find(File_Name_Final);
+            }
+            F->second.Write(Event->Content, Event->Content_Size);
         }
     }
+    #endif //MEDIAINFO_DEMUX
 }
 
 void MediaInfo_Config_MediaInfo::Event_Accepted (File__Analyze* Source)

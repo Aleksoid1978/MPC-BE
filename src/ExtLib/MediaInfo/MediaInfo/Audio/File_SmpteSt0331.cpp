@@ -81,6 +81,9 @@ File_SmpteSt0331::File_SmpteSt0331()
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Aes3;
     #endif //MEDIAINFO_EVENTS
+    #if MEDIAINFO_TRACE
+        Trace_Layers_Update(8); //Stream
+    #endif //MEDIAINFO_TRACE
     PTS_DTS_Needed=true;
     IsRawStream=true;
 

@@ -3458,14 +3458,22 @@ void File_Mpegv::user_data_start_GA94_03()
 
         if (TemporalReference_Offset+temporal_reference>=TemporalReference.size())
             TemporalReference.resize(TemporalReference_Offset+temporal_reference+1);
-        if (TemporalReference[TemporalReference_Offset+temporal_reference]==NULL)
-            TemporalReference[TemporalReference_Offset+temporal_reference]=new temporalreference;
-        if (TemporalReference[TemporalReference_Offset+temporal_reference]->GA94_03==NULL)
-            TemporalReference[TemporalReference_Offset+temporal_reference]->GA94_03=new temporalreference::buffer_data;
-        TemporalReference[TemporalReference_Offset+temporal_reference]->GA94_03->Size=(size_t)(Element_Size-Element_Offset);
-        delete[] TemporalReference[TemporalReference_Offset+temporal_reference]->GA94_03->Data;
-        TemporalReference[TemporalReference_Offset+temporal_reference]->GA94_03->Data=new int8u[(size_t)(Element_Size-Element_Offset)];
-        std::memcpy(TemporalReference[TemporalReference_Offset+temporal_reference]->GA94_03->Data, Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
+        temporalreference* &Ref=TemporalReference[TemporalReference_Offset+temporal_reference];
+        if (Ref==NULL)
+            Ref=new temporalreference;
+        if (Ref->GA94_03==NULL)
+            Ref->GA94_03=new temporalreference::buffer_data;
+        temporalreference::buffer_data* NewBuffer=Ref->GA94_03;
+        int8u* NewData=new int8u[NewBuffer->Size+(size_t)(Element_Size-Element_Offset)];
+        if (NewBuffer->Size)
+        {
+            //Data already present, copying in the new buffer
+            std::memcpy(NewData, NewBuffer->Data, NewBuffer->Size);
+            delete[] NewBuffer->Data; //Reassignement done below
+        }
+        NewBuffer->Data=NewData;
+        std::memcpy(NewBuffer->Data+ NewBuffer->Size, Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
+        NewBuffer->Size+=(size_t)(Element_Size-Element_Offset);
 
         //Parsing
         Skip_XX(Element_Size-Element_Offset,                    "CC data");

@@ -211,6 +211,27 @@ const string Ffv1_colorspace_type(int8u colorspace_type, bool chroma_planes, boo
     return ToReturn;
 }
 
+const char* Ffv1_picture_structure_ScanType (int8u picture_structure)
+{
+    switch (picture_structure)
+    {
+        case 1 :
+        case 2 : return "Interlaced";
+        case 3 : return "Progressive";
+        default: return "";
+    }
+}
+
+const char* Ffv1_picture_structure_ScanOrder (int8u picture_structure)
+{
+    switch (picture_structure)
+    {
+        case 1 : return "TFF";
+        case 2 : return "BFF";
+        default: return "";
+    }
+}
+
 const state_transitions Ffv1_default_state_transition =
 {
       0,  0,  0,  0,  0,  0,  0,  0, 20, 21, 22, 23, 24, 25, 26, 27,
@@ -294,6 +315,9 @@ File_Ffv1::File_Ffv1()
 {
     //Configuration
     ParserName=__T("FFV1");
+    #if MEDIAINFO_TRACE
+        Trace_Layers_Update(8); //Stream
+    #endif //MEDIAINFO_TRACE
     IsRawStream=true;
 
     //use Ffv1_default_state_transition by default
@@ -313,6 +337,9 @@ File_Ffv1::File_Ffv1()
     num_h_slices = 1;
     num_v_slices = 1;
     slices = NULL;
+    picture_structure = (int32u)-1;
+    sample_aspect_ratio_num = 0;
+    sample_aspect_ratio_den = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -547,7 +574,7 @@ void File_Ffv1::Read_Buffer_Continue()
                 RC->AssignStateTransitions(state_transitions_table);
 
             #if MEDIAINFO_TRACE
-                if (Trace_Activated) // Parse slice only if trace feature is activated
+                if (!Frame_Count || Trace_Activated) // Parse slice only if trace feature is activated
                 {
                     int64u Start=Element_Offset;
                     Trace_Activated=false;
@@ -582,6 +609,14 @@ void File_Ffv1::Read_Buffer_Continue()
     }
 
     FILLING_BEGIN();
+        if (Frame_Count==0)
+        {
+            Fill(Stream_Video, 0, Video_ScanType, Ffv1_picture_structure_ScanType(picture_structure));
+            Fill(Stream_Video, 0, Video_ScanOrder, Ffv1_picture_structure_ScanOrder(picture_structure));
+            if (sample_aspect_ratio_num && sample_aspect_ratio_den)
+                Fill(Stream_Video, 0, Video_PixelAspectRatio, sample_aspect_ratio_num/sample_aspect_ratio_den);
+        }
+
         Frame_Count++;
     FILLING_END();
 
@@ -865,9 +900,9 @@ void File_Ffv1::slice_header(states &States)
         plane_count += 1;
     for (int8u i = 0; i < plane_count; i++)
         Get_RU (States, quant_table_index[i],               "quant_table_index");
-    Skip_RU(States,                                         "picture_structure");
-    Skip_RU(States,                                         "sample_aspect_ratio num");
-    Skip_RU(States,                                         "sample_aspect_ratio den");
+    Get_RU (States, picture_structure,                      "picture_structure");
+    Get_RU (States, sample_aspect_ratio_num,                "sample_aspect_ratio num");
+    Get_RU (States, sample_aspect_ratio_den,                "sample_aspect_ratio den");
     if (version > 3)
     {
         //TODO
