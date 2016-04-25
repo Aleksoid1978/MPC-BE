@@ -61,7 +61,6 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	m_bInterlaced(0),
 	m_nUsedBuffer(0),
 	m_TextScale(1.0),
-	m_dMainThreadId(0),
 	m_bNeedCheckSample(true),
 	m_hEvtQuit(NULL),
 	m_bIsFullscreen(bFullscreen),
@@ -1181,10 +1180,12 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	CRect rDstPri(m_windowRect);
 
 	m_pD3DDev->BeginScene();
+
 	CComPtr<IDirect3DSurface9> pBackBuffer;
 	m_pD3DDev->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
 	m_pD3DDev->SetRenderTarget(0, pBackBuffer);
 	hr = m_pD3DDev->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0);
+
 	if (!rDstVid.IsRectEmpty()) {
 		if (m_pVideoTextures[m_nCurSurface]) {
 			CComPtr<IDirect3DTexture9> pVideoTexture = m_pVideoTextures[m_nCurSurface];
@@ -1210,11 +1211,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					{(float)desc.Width, (float)desc.Height, (float)(counter++), (float)diff / CLOCKS_PER_SEC},
 					{1.0f / desc.Width, 1.0f / desc.Height, 0, 0},
 				};
-
 				hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-
-				CComPtr<IDirect3DSurface9> pRT;
-				hr = m_pD3DDev->GetRenderTarget(0, &pRT);
 
 				POSITION pos = m_pPixelShaders.GetHeadPosition();
 				while (pos) {
@@ -1234,14 +1231,14 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					}
 				}
 
-				hr = m_pD3DDev->SetRenderTarget(0, pRT);
+				hr = m_pD3DDev->SetRenderTarget(0, pBackBuffer);
 				hr = m_pD3DDev->SetPixelShader(NULL);
 			}
 
 			Vector dst[4];
 			Transform(rDstVid, dst);
 
-			// Resizers
+			// init resizer
 			DWORD iResizer = rs.iResizer;
 			hr = E_FAIL;
 
@@ -1263,7 +1260,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				iResizer = RESIZER_BILINEAR;
 			}
 
-			// post-resize pixel shaders
+			// init post-resize pixel shaders
 			bool bScreenSpacePixelShaders = m_pPixelShadersScreenSpace.GetCount() > 0;
 			if (bScreenSpacePixelShaders && (!m_pScreenSizeTextures[0] || !m_pScreenSizeTextures[1])) {
 				if (FAILED(m_pD3DDev->CreateTexture(
@@ -1297,6 +1294,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				}
 			}
 
+			// resize
 			if (rSrcVid.Size() != rDstVid.Size()) {
 				switch (iResizer) {
 				case RESIZER_NEAREST:  hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT);  break;
@@ -1313,6 +1311,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT);
 			}
 
+			// post-resize pixel shaders
 			if (bScreenSpacePixelShaders) {
 				static __int64 counter = 555;
 				static long start = clock() + 333;
