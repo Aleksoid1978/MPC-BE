@@ -91,7 +91,9 @@ ULONGLONG CAsyncFileReader::GetLength() const
 
 #define RetryOnError() \
 { \
-	if (GetLastError() == ERROR_INTERNET_CONNECTION_RESET) { \
+	const DWORD dwError = GetLastError(); \
+	if (dwError == ERROR_INTERNET_CONNECTION_RESET \
+			|| dwError == ERROR_HTTP_INVALID_SERVER_RESPONSE) { \
 		CString customHeader; customHeader.Format(L"Range: bytes=%I64d-\r\n", llPosition); \
 		hr = m_HTTPAsync.SendRequest(customHeader); \
 		if (hr == S_OK) { \
