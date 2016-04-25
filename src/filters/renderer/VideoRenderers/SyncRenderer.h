@@ -276,7 +276,6 @@ namespace GothSync
 		bool m_bDesktopCompositionDisabled;
 		bool m_bIsFullscreen;
 		bool m_bNeedCheckSample;
-		DWORD m_dMainThreadId;
 
 		CSize m_ScreenSize;
 
