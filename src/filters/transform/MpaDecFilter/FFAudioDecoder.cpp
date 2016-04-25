@@ -464,7 +464,7 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 			*out_size = used_bytes;
 		}
 
-		if (out_size > 0) {
+		if (pOut_size > 0) {
 			avpkt.data = pOut;
 			avpkt.size = pOut_size;
 
