@@ -433,17 +433,18 @@ void CFFAudioDecoder::SetDRC(bool fDRC)
 	}
 }
 
-HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, int& size, CAtlArray<BYTE>& BuffOut, SampleFormat& samplefmt)
+HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 {
-	size = 0;
-
+	HRESULT hr = E_FAIL;
+	
+	if (out_size) {
+		*out_size = 0;
+	}
 	if (GetCodecId() == AV_CODEC_ID_NONE) {
-		return E_FAIL;
+		return hr;
 	}
 
-	int got_frame = 0;
-	BOOL bFlush = (p == NULL);
-
+	int ret = 0;
 	AVPacket avpkt;
 	av_init_packet(&avpkt);
 
@@ -451,69 +452,60 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 		BYTE* pOut = NULL;
 		int pOut_size = 0;
 
-		int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, p, buffsize, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+		int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, p, size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
 		if (used_bytes < 0) {
 			DbgLog((LOG_TRACE, 3, L"CFFAudioDecoder::Decode() : audio parsing failed (ret: %d)", -used_bytes));
 			return E_FAIL;
-		} else if (used_bytes == 0 && pOut_size == 0) {
+		} else if (used_bytes == 0 && out_size == 0) {
 			DbgLog((LOG_TRACE, 3, L"CFFAudioDecoder::Decode() : could not process buffer while parsing"));
 		}
 
-		size = used_bytes;
+		if (out_size) {
+			*out_size = used_bytes;
+		}
 
-		if (pOut_size > 0) {
+		if (out_size > 0) {
 			avpkt.data = pOut;
 			avpkt.size = pOut_size;
 
-			int ret = avcodec_decode_audio4(m_pAVCtx, m_pFrame, &got_frame, &avpkt);
-			if (ret < 0) {
-				DbgLog((LOG_TRACE, 3, L"CFFAudioDecoder::Decode() : decoding failed despite successfull parsing"));
-				av_frame_unref(m_pFrame);
-				return S_FALSE;
-			}
+			ret = avcodec_send_packet(m_pAVCtx, &avpkt);
 		}
-	} else if (bFlush) {
-		return S_FALSE;
 	} else {
 		avpkt.data = p;
-		avpkt.size = buffsize;
+		avpkt.size = size;
 
-		int used_bytes = avcodec_decode_audio4(m_pAVCtx, m_pFrame, &got_frame, &avpkt);
-
-		if (used_bytes < 0) {
-			DbgLog((LOG_TRACE, 3, L"CFFAudioDecoder::Decode() : avcodec_decode_audio4() failed"));
-			Init(nCodecId, NULL);
-
-			av_frame_unref(m_pFrame);
-			return E_FAIL;
-		} else if (used_bytes == 0 && !got_frame) {
-			DbgLog((LOG_TRACE, 3, L"CFFAudioDecoder::Decode() : could not process buffer while decoding"));
-		} else if (m_pAVCtx->channels > 8) {
-			// sometimes avcodec_decode_audio4 cannot identify the garbage and produces incorrect data.
-			// this code does not solve the problem, it only reduces the likelihood of crash.
-			// do it better!
-
-			av_frame_unref(m_pFrame);
-			return E_FAIL;
-		}
-		ASSERT(buffsize >= used_bytes);
-
-		size = used_bytes;
+		ret = avcodec_send_packet(m_pAVCtx, &avpkt);
 	}
 
-	if (got_frame) {
-		size_t nSamples = m_pFrame->nb_samples;
+	if (ret >= 0 || ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+		if (!m_pParser && out_size) {
+			*out_size = size;
+		}
 
+		hr = S_OK;
+	}
+
+	if (hr == E_FAIL) {
+		Init(GetCodecId(), NULL);
+	}
+
+	return hr;
+}
+
+HRESULT CFFAudioDecoder::ReceiveData(CAtlArray<BYTE>& BuffOut, SampleFormat& samplefmt)
+{
+	HRESULT hr = E_FAIL;
+	const int ret = avcodec_receive_frame(m_pAVCtx, m_pFrame);
+	if (m_pAVCtx->channels > 8) {
+		// sometimes avcodec_receive_frame() cannot identify the garbage and produces incorrect data.
+		// this code does not solve the problem, it only reduces the likelihood of crash.
+		// do it better!
+	} else if (ret >= 0) {
+		const size_t nSamples = m_pFrame->nb_samples;
 		if (nSamples) {
-			WORD nChannels = m_pAVCtx->channels;
-			/*DWORD dwChannelMask;
-			if (m_pAVCtx->channel_layout) {
-				dwChannelMask = get_lav_channel_layout(m_pAVCtx->channel_layout);
-			} else {
-				dwChannelMask = GetDefChannelMask(nChannels);
-			}*/
+			const WORD nChannels = m_pAVCtx->channels;
 			samplefmt = (SampleFormat)m_pAVCtx->sample_fmt;
-			size_t monosize = nSamples * av_get_bytes_per_sample(m_pAVCtx->sample_fmt);
+			const size_t monosize = nSamples * av_get_bytes_per_sample(m_pAVCtx->sample_fmt);
 			BuffOut.SetCount(monosize * nChannels);
 
 			if (av_sample_fmt_is_planar(m_pAVCtx->sample_fmt)) {
@@ -527,18 +519,20 @@ HRESULT CFFAudioDecoder::Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, 
 			}
 		}
 
-		av_frame_unref(m_pFrame);
+		hr = S_OK;
 	}
 
-	return S_OK;
+	av_frame_unref(m_pFrame);
+	return hr;
 }
 
 void CFFAudioDecoder::FlushBuffers()
 {
-	if(m_pParser) { // reset the parser
+	if (m_pParser) {
 		av_parser_close(m_pParser);
 		m_pParser = av_parser_init(GetCodecId());
 	}
+
 	if (m_pAVCtx && avcodec_is_open(m_pAVCtx)) {
 		avcodec_flush_buffers(m_pAVCtx);
 	}

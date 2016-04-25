@@ -62,7 +62,8 @@ public:
 	void    SetDRC(bool fDRC);
 
 	HRESULT RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOut);
-	HRESULT Decode(enum AVCodecID nCodecId, BYTE* p, int buffsize, int& size, CAtlArray<BYTE>& BuffOut, SampleFormat& samplefmt);
+	HRESULT SendData(BYTE* p, int size, int* out_size = NULL);
+	HRESULT ReceiveData(CAtlArray<BYTE>& BuffOut, SampleFormat& samplefmt);
 	void    FlushBuffers();
 	void    StreamFinish();
 
