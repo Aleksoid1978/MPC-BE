@@ -621,7 +621,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	}
 
 	const GUID& subtype = m_pInput->CurrentMediaType().subtype;
-	enum AVCodecID nCodecId = FindCodec(subtype);
+	const enum AVCodecID nCodecId = FindCodec(subtype);
 
 	REFERENCE_TIME jitterLimit = MAX_JITTER;
 	if (!m_bHasVideo || m_bIgnoreJitter) {
@@ -650,10 +650,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 		m_bResync = false;
 	}
 
-	size_t bufflen = m_buff.GetCount();
-	m_buff.SetCount(bufflen + len, 4096);
-	memcpy(m_buff.GetData() + bufflen, pDataIn, len);
-	len += (long)bufflen;
+	m_buff.Append(pDataIn, len, 4096);
 
 //	if (subtype == MEDIASUBTYPE_DOLBY_AC3 || subtype == MEDIASUBTYPE_WAVE_DOLBY_AC3 || subtype == MEDIASUBTYPE_DNET) {
 //		return ProcessAC3();
@@ -720,25 +717,18 @@ BOOL CMpaDecFilter::ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL 
 	return FALSE;
 }
 
-#define BEGINDATA									\
-		BYTE* const base = m_buff.GetData();		\
-		BYTE* end = base + m_buff.GetCount();		\
-		BYTE* p = base;								\
+#define BEGINDATA								\
+		BYTE* const base = m_buff.GetData();	\
+		BYTE* end = base + m_buff.GetCount();	\
+		BYTE* p = base;							\
 
-#define ENDDATA										\
-		if (p == end) {								\
-			m_buff.RemoveAll();						\
-		} else if (p > base) {						\
-			size_t remaining = (size_t)(end - p);	\
-			memmove(base, p, remaining);			\
-			m_buff.SetCount(remaining);				\
-		}
+#define ENDDATA									\
+		m_buff.Consume(p - base);				\
 
 HRESULT CMpaDecFilter::ProcessLPCM()
 {
-	WAVEFORMATEX* wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
-
-	WORD nChannels = wfein->nChannels;
+	const WAVEFORMATEX* wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
+	const WORD nChannels = wfein->nChannels;
 	if (nChannels < 1 || nChannels > 8) {
 		return ERROR_NOT_SUPPORTED;
 	}
@@ -839,7 +829,7 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 			out_sf = SAMPLE_FMT_S16;
 			int16_t* pDataOut = (int16_t*)outBuff.GetData();
 
-			for (int i=0; i<nFrames; i++) {
+			for (int i = 0; i < nFrames; i++) {
 				for (int j = 0; j < nChannels; j++) {
 					BYTE nRemap = remap->ch[j];
 					*pDataOut = (int16_t)(pDataIn[nRemap * 2] << 8 | pDataIn[nRemap * 2 + 1]);
@@ -854,7 +844,7 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 			out_sf = SAMPLE_FMT_S32; // convert to 32-bit
 			int32_t* pDataOut = (int32_t*)outBuff.GetData();
 
-			for (int i=0; i<nFrames; i++) {
+			for (int i = 0; i < nFrames; i++) {
 				for (int j = 0; j < nChannels; j++) {
 					BYTE nRemap = remap->ch[j];
 					*pDataOut = (int32_t)(pDataIn[nRemap * 3] << 24 | pDataIn[nRemap * 3 + 1] << 16 | pDataIn[nRemap * 3 + 2] << 8);
@@ -865,8 +855,8 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 		}
 		break;
 	}
-	memmove(m_buff.GetData(), pDataIn, m_buff.GetCount() - len );
-	m_buff.SetCount(m_buff.GetCount() - len);
+	
+	m_buff.Consume((size_t)len);
 
 	return Deliver(outBuff.GetData(), outSize, out_sf, wfein->nSamplesPerSec, wfein->nChannels, remap->dwChannelMask);
 }

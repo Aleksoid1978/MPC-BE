@@ -456,7 +456,7 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 		if (used_bytes < 0) {
 			DbgLog((LOG_TRACE, 3, L"CFFAudioDecoder::Decode() : audio parsing failed (ret: %d)", -used_bytes));
 			return E_FAIL;
-		} else if (used_bytes == 0 && out_size == 0) {
+		} else if (used_bytes == 0 && pOut_size == 0) {
 			DbgLog((LOG_TRACE, 3, L"CFFAudioDecoder::Decode() : could not process buffer while parsing"));
 		}
 
