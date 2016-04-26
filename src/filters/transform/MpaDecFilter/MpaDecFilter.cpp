@@ -717,14 +717,6 @@ BOOL CMpaDecFilter::ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL 
 	return FALSE;
 }
 
-#define BEGINDATA								\
-		BYTE* const base = m_buff.GetData();	\
-		BYTE* end = base + m_buff.GetCount();	\
-		BYTE* p = base;							\
-
-#define ENDDATA									\
-		m_buff.Consume(p - base);				\
-
 HRESULT CMpaDecFilter::ProcessLPCM()
 {
 	const WAVEFORMATEX* wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
@@ -733,7 +725,9 @@ HRESULT CMpaDecFilter::ProcessLPCM()
 		return ERROR_NOT_SUPPORTED;
 	}
 
-	BEGINDATA
+	BYTE* const base = m_buff.GetData();
+	BYTE* end = base + m_buff.GetCount();
+	BYTE* p = base;
 
 	unsigned int blocksize = nChannels * 2 * wfein->wBitsPerSample / 8;
 	size_t nSamples = (m_buff.GetCount() / blocksize) * 2 * nChannels;
@@ -796,7 +790,7 @@ HRESULT CMpaDecFilter::ProcessLPCM()
 		break;
 	}
 
-	ENDDATA
+	m_buff.Consume(p - base);
 
 	return Deliver(outBuff.GetData(), outSize, out_sf, wfein->nSamplesPerSec, wfein->nChannels);
 }
@@ -895,7 +889,9 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 		return S_OK;
 	}
 
-	BEGINDATA
+	BYTE* const base = m_buff.GetData();
+	BYTE* end = base + m_buff.GetCount();
+	BYTE* p = base;
 
 	// RealAudio
 	CPaddedArray buffRA(AV_INPUT_BUFFER_PADDING_SIZE);
@@ -943,7 +939,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 		end = base + m_buff.GetCount();
 	}
 
-	ENDDATA
+	m_buff.Consume(p - base);
 
 	return S_OK;
 }
@@ -952,7 +948,9 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 //{
 //	HRESULT hr;
 //
-//	BEGINDATA
+//	BYTE* const base = m_buff.GetData();
+//	BYTE* end = base + m_buff.GetCount();
+//	BYTE* p = base;
 //
 //	while (p + 8 <= end) {
 //		if (*(WORD*)p != 0x770b) {
@@ -1002,7 +1000,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 //		p += size;
 //	}
 //
-//	ENDDATA
+//	m_buff.Consume(p - base);
 //
 //	return S_OK;
 //}
@@ -1011,7 +1009,9 @@ HRESULT CMpaDecFilter::ProcessAC3_SPDIF()
 {
 	HRESULT hr;
 
-	BEGINDATA
+	BYTE* const base = m_buff.GetData();
+	BYTE* end = base + m_buff.GetCount();
+	BYTE* p = base;
 
 	while (p + 8 <= end) { // 8 =  AC3 header size + 1
 		audioframe_t aframe;
@@ -1032,7 +1032,7 @@ HRESULT CMpaDecFilter::ProcessAC3_SPDIF()
 		p += size;
 	}
 
-	ENDDATA
+	m_buff.Consume(p - base);
 
 	return S_OK;
 }
@@ -1041,7 +1041,9 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
 {
 	HRESULT hr;
 
-	BEGINDATA
+	BYTE* const base = m_buff.GetData();
+	BYTE* end = base + m_buff.GetCount();
+	BYTE* p = base;
 
 	while (p + 8 <= end) {
 		audioframe_t aframe;
@@ -1081,7 +1083,7 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
 		}
 	}
 
-	ENDDATA
+	m_buff.Consume(p - base);
 
 	return S_OK;
 }
@@ -1094,7 +1096,9 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 
 	HRESULT hr;
 
-	BEGINDATA
+	BYTE* const base = m_buff.GetData();
+	BYTE* end = base + m_buff.GetCount();
+	BYTE* p = base;
 
 	while (p + 16 <= end) {
 		audioframe_t aframe;
@@ -1166,7 +1170,7 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 	}
 
 
-	ENDDATA
+	m_buff.Consume(p - base);
 
 	return S_OK;
 }
@@ -1175,7 +1179,9 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF(BOOL bEOF/* = FALSE*/)
 {
 	HRESULT hr;
 
-	BEGINDATA
+	BYTE* const base = m_buff.GetData();
+	BYTE* end = base + m_buff.GetCount();
+	BYTE* p = base;
 
 	BOOL bUseDTSHDBitstream = GetSPDIF(dtshd) && m_bBitstreamSupported[DTSHD];
 
@@ -1238,7 +1244,7 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF(BOOL bEOF/* = FALSE*/)
 		p += (size + sizehd);
 	}
 
-	ENDDATA
+	m_buff.Consume(p - base);
 
 	return S_OK;
 }
@@ -1457,7 +1463,9 @@ HRESULT CMpaDecFilter::ProcessPCMfloatLE() // little-endian 'fl32' and 'fl64'
 
 HRESULT CMpaDecFilter::ProcessPS2PCM()
 {
-	BEGINDATA
+	BYTE* const base = m_buff.GetData();
+	BYTE* end = base + m_buff.GetCount();
+	BYTE* p = base;
 
 	WAVEFORMATEXPS2* wfe = (WAVEFORMATEXPS2*)m_pInput->CurrentMediaType().Format();
 	size_t size = wfe->dwInterleave * wfe->nChannels;
@@ -1490,7 +1498,7 @@ HRESULT CMpaDecFilter::ProcessPS2PCM()
 		}
 	}
 
-	ENDDATA
+	m_buff.Consume(p - base);
 
 	return S_OK;
 }
@@ -1530,7 +1538,9 @@ static void decodeps2adpcm(ps2_state_t& s, int channel, BYTE* pin, int16_t* pout
 
 HRESULT CMpaDecFilter::ProcessPS2ADPCM()
 {
-	BEGINDATA
+	BYTE* const base = m_buff.GetData();
+	BYTE* end = base + m_buff.GetCount();
+	BYTE* p = base;
 
 	WAVEFORMATEXPS2* wfe = (WAVEFORMATEXPS2*)m_pInput->CurrentMediaType().Format();
 	size_t size  = wfe->dwInterleave * wfe->nChannels;
@@ -1571,7 +1581,7 @@ HRESULT CMpaDecFilter::ProcessPS2ADPCM()
 		}
 	}
 
-	ENDDATA
+	m_buff.Consume(p - base);
 
 	return S_OK;
 }
