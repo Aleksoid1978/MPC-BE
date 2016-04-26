@@ -33,7 +33,7 @@ public:
 	}
 
 	size_t GetCount() {
-		size_t count = __super::GetCount();
+		const size_t count = __super::GetCount();
 		return (count > m_padsize) ? count - m_padsize : 0;
 	}
 
@@ -42,6 +42,28 @@ public:
 			memset(GetData() + nNewSize, 0, m_padsize);
 			return true;
 		}
+
 		return false;
+	}
+
+	bool Append(BYTE* p, size_t nSize, int nGrowBy = - 1) {
+		const size_t oldSize = GetCount();
+		if (SetCount(oldSize + nSize, nGrowBy)) {
+			memcpy(GetData() + oldSize, p, nSize);
+			return true;
+		}
+	
+		return false;
+	}
+
+	void Consume(size_t nSize) {
+		const size_t count = GetCount();
+		ASSERT(nSize <= count);
+		if (nSize == count) {
+			RemoveAll();
+		} else {
+			memmove(GetData(), GetData() + nSize, count - nSize);
+			SetCount(count - nSize);
+		}
 	}
 };
