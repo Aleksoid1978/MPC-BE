@@ -790,7 +790,7 @@ HRESULT CMpaDecFilter::ProcessLPCM()
 		break;
 	}
 
-	m_buff.Consume(p - base);
+	m_buff.RemoveHead(p - base);
 
 	return Deliver(outBuff.GetData(), outSize, out_sf, wfein->nSamplesPerSec, wfein->nChannels);
 }
@@ -850,7 +850,7 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 		break;
 	}
 	
-	m_buff.Consume((size_t)len);
+	m_buff.RemoveHead(len);
 
 	return Deliver(outBuff.GetData(), outSize, out_sf, wfein->nSamplesPerSec, wfein->nChannels, remap->dwChannelMask);
 }
@@ -939,7 +939,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 		end = base + m_buff.GetCount();
 	}
 
-	m_buff.Consume(p - base);
+	m_buff.RemoveHead(p - base);
 
 	return S_OK;
 }
@@ -1032,7 +1032,7 @@ HRESULT CMpaDecFilter::ProcessAC3_SPDIF()
 		p += size;
 	}
 
-	m_buff.Consume(p - base);
+	m_buff.RemoveHead(p - base);
 
 	return S_OK;
 }
@@ -1083,7 +1083,7 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
 		}
 	}
 
-	m_buff.Consume(p - base);
+	m_buff.RemoveHead(p - base);
 
 	return S_OK;
 }
@@ -1170,7 +1170,7 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 	}
 
 
-	m_buff.Consume(p - base);
+	m_buff.RemoveHead(p - base);
 
 	return S_OK;
 }
@@ -1244,7 +1244,7 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF(BOOL bEOF/* = FALSE*/)
 		p += (size + sizehd);
 	}
 
-	m_buff.Consume(p - base);
+	m_buff.RemoveHead(p - base);
 
 	return S_OK;
 }
@@ -1498,7 +1498,7 @@ HRESULT CMpaDecFilter::ProcessPS2PCM()
 		}
 	}
 
-	m_buff.Consume(p - base);
+	m_buff.RemoveHead(p - base);
 
 	return S_OK;
 }
@@ -1581,7 +1581,7 @@ HRESULT CMpaDecFilter::ProcessPS2ADPCM()
 		}
 	}
 
-	m_buff.Consume(p - base);
+	m_buff.RemoveHead(p - base);
 
 	return S_OK;
 }
