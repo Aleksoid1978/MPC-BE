@@ -513,7 +513,7 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 END
 
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
-6		"Use the built-in web page parser"
+6		"使用內部網頁剖析器"
 7		"偏好格式:"
 9		"載入播放清單"
 END
