@@ -1041,16 +1041,6 @@ BOOL CMPlayerCApp::SendCommandLine(HWND hWnd)
 	return SendMessage(hWnd, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&cds);
 }
 
-typedef struct THREADCopyData {
-	CMPlayerCApp*	pMPlayerCApp;
-	HWND			hWND;
-} THREADCopyData, *PTHREADCopyData;
-
-UINT CMPlayerCApp::RunTHREADCopyData(LPVOID pParam) {
-	PTHREADCopyData pTCD = reinterpret_cast<PTHREADCopyData>(pParam);
-	return (BOOL)pTCD->pMPlayerCApp->SendCommandLine(pTCD->hWND);
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // CMPlayerCApp initialization
 
@@ -1533,24 +1523,26 @@ BOOL CMPlayerCApp::InitInstance()
 		if (res == WAIT_OBJECT_0 || res == WAIT_ABANDONED) {
 			HWND hWnd = ::FindWindow(_T(MPC_WND_CLASS_NAME), NULL);
 			if (hWnd) {
+				DWORD dwProcessId = 0;
+				if (GetWindowThreadProcessId(hWnd, &dwProcessId) && dwProcessId) {
+					VERIFY(AllowSetForegroundWindow(dwProcessId));
+				} else {
+					ASSERT(FALSE);
+				}
+
 				if (!(m_s.nCLSwitches & CLSW_MINIMIZED) && IsIconic(hWnd)) {
 					ShowWindow(hWnd, SW_RESTORE);
 				}
-				BOOL bDataIsSend = TRUE;
+				
+				BOOL bDataIsSent = TRUE;
 
-				PTHREADCopyData pTCD = DNew THREADCopyData;
-				pTCD->pMPlayerCApp   = this;
-				pTCD->hWND           = hWnd;
-
-				CWinThread*	pTHREADCopyData = AfxBeginThread(RunTHREADCopyData, static_cast<LPVOID>(pTCD));
-				if (WaitForSingleObject(pTHREADCopyData->m_hThread, 7000) == WAIT_TIMEOUT) { // in CMainFrame::CloseMedia() wait to graph thread is complete 7000
-					TerminateThread(pTHREADCopyData->m_hThread, 0xDEAD);
-					bDataIsSend = FALSE;
+				std::thread sendThread = std::thread([this, hWnd] { SendCommandLine(hWnd); });
+				if (WaitForSingleObject(sendThread.native_handle(), 7000) == WAIT_TIMEOUT) { // in CMainFrame::CloseMedia() wait to graph thread is complete 7000
+					bDataIsSent = FALSE;
+					sendThread.detach();
 				}
 
-				delete pTCD;
-
-				if (bDataIsSend) {
+				if (bDataIsSent) {
 					m_mutexOneInstance.Close();
 					return FALSE;
 				}
