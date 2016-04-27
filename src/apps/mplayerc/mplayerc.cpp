@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include <thread>
 #include "AboutDlg.h"
 #include <Tlhelp32.h>
 #include "MainFrm.h"
