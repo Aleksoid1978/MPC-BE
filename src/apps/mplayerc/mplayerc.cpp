@@ -1543,6 +1543,10 @@ BOOL CMPlayerCApp::InitInstance()
 					sendThread.detach();
 				}
 
+				if (sendThread.joinable()) {
+					sendThread.join();
+				}
+
 				if (bDataIsSent) {
 					m_mutexOneInstance.Close();
 					return FALSE;
