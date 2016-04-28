@@ -11780,7 +11780,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		if (YoutubeParser::CheckURL(fn)) {
 			youtubeUrl = fn;
 			CAtlList<CString> urls;
-			if (YoutubeParser::Parse_URL(fn, urls, m_youtubeFields, pOFD->subs)) {
+			if (YoutubeParser::Parse_URL(fn, urls, m_youtubeFields, pOFD->subs, pOFD->rtStart)) {
 				pOFD->fns.RemoveAll();
 				POSITION pos = urls.GetHeadPosition();
 				while (pos) {

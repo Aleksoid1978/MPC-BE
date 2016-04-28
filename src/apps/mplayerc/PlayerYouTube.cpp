@@ -19,10 +19,10 @@
  */
 
 #include "stdafx.h"
-#include "atl/atlrx.h"
-#include "PlayerYouTube.h"
-#include "../../DSUtil/text.h"
+#include <regex>
 #include <jsoncpp/include/json/json.h>
+#include "../../DSUtil/text.h"
+#include "PlayerYouTube.h"
 
 #define YOUTUBE_PL_URL				L"youtube.com/playlist?"
 #define YOUTUBE_URL					L"youtube.com/watch?"
@@ -48,14 +48,13 @@
 
 #define INTERNET_OPEN_FALGS			INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD
 
-static const LPCTSTR videoIdRegExps[] = {
-	L"v={[-a-zA-Z0-9_]+}",
-	L"video_ids={[-a-zA-Z0-9_]+}"
-};
-
-
 namespace YoutubeParser {
 	static const CString GOOGLE_API_KEY = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
+
+	static const LPCTSTR videoIdRegExps[] = {
+		L"v=([-a-zA-Z0-9]+)",
+		L"video_ids=([-a-zA-Z0-9]+)"
+	};
 
 	static const YOUTUBE_PROFILES youtubeProfileEmpty = { 0, y_unknown, 0, NULL, false };
 
@@ -190,18 +189,12 @@ namespace YoutubeParser {
 		return false;
 	}
 
-	static CString RegExpParse(CString szIn, CString szRE)
+	static CString RegExpParse(LPCTSTR szIn, LPCTSTR szRE)
 	{
-		CAtlRegExp<> re;
-		REParseError pe = re.Parse(szRE);
-		if (REPARSE_ERROR_OK == pe) {
-			LPCTSTR szEnd = szIn.GetBuffer();
-			CAtlREMatchContext<> mc;
-			if (re.Match(szEnd, &mc)) {
-				LPCTSTR szStart;
-				mc.GetMatch(0, &szStart, &szEnd);
-				return CString(szStart, szEnd - szStart);
-			}
+		const std::wregex regex(szRE);
+		std::wcmatch match;
+		if (std::regex_search(szIn, match, regex) && match.size() == 2) {
+			return CString(match[1].first, match[1].length());
 		}
 
 		return L"";
@@ -281,17 +274,25 @@ namespace YoutubeParser {
 						Json::Value contentDetails = root["items"][0]["contentDetails"];
 						if (!contentDetails["duration"].empty()
 								&& contentDetails["duration"].isString()) {
-							const CStringA sDuration = contentDetails["duration"].asCString();
-							WORD hh = 0, mm = 0, ss = 0;
-							if (sDuration.Find("H") > 0) {
-								sscanf_s(sDuration, "PT%huH%huM%huS", &hh, &mm, &ss);
-							} else if (sDuration.Find("M") > 0) {
-								sscanf_s(sDuration, "PT%huM%huS", &mm, &ss);
-							} else if (sDuration.Find("S") > 0) {
-								sscanf_s(sDuration, "PT%huS", &ss);
-							}
+							CStringA sDuration = contentDetails["duration"].asCString();
+							const std::regex regex("PT(?:(?:(\\d+)h)?(?:(\\d{1,2})m)?(?:(\\d{1,2})s)?)", std::regex_constants::icase);
+							std::cmatch match;
+							if (std::regex_search(sDuration.GetBuffer(), match, regex) && match.size() == 4) {
+								long h = 0;
+								long m = 0;
+								long s = 0;
+								if (match[1].matched) {
+									h = atol(CStringA(match[1].first, match[1].length()));
+								}
+								if (match[2].matched) {
+									m = atol(CStringA(match[2].first, match[2].length()));
+								}
+								if (match[3].matched) {
+									s = atol(CStringA(match[3].first, match[3].length()));
+								}
 
-							y_fields.duration = (ss + 60 * mm + 3600 * hh) * UNITS;
+								y_fields.duration = (h * 3600 + m * 60 + s) * UNITS;
+							}
 						}
 					}
 
@@ -312,7 +313,7 @@ namespace YoutubeParser {
 		funcSWAP
 	};
 
-	bool Parse_URL(CString url, CAtlList<CString>& urls, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& subs)
+	bool Parse_URL(CString url, CAtlList<CString>& urls, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& subs, REFERENCE_TIME& rtStart)
 	{
 		if (CheckURL(url)) {
 			char* data = NULL;
@@ -326,6 +327,39 @@ namespace YoutubeParser {
 
 				for (int i = 0; i < _countof(videoIdRegExps) && videoId.IsEmpty(); i++) {
 					videoId = RegExpParse(url, videoIdRegExps[i]);
+				}
+
+				if (rtStart <= 0) {
+					BOOL bMatch = FALSE;
+
+					const std::wregex regex(L"t=(?:(?:(\\d+)h)?(?:(\\d{1,2})m)?(?:(\\d{1,2})s)?)", std::regex_constants::icase);
+					std::wcmatch match;
+					if (std::regex_search(url.GetBuffer(), match, regex) && match.size() == 4) {
+						long h = 0;
+						long m = 0;
+						long s = 0;
+						if (match[1].matched) {
+							h = _wtol(CString(match[1].first, match[1].length()));
+							bMatch = TRUE;
+						}
+						if (match[2].matched) {
+							m = _wtol(CString(match[2].first, match[2].length()));
+							bMatch = TRUE;
+						}
+						if (match[3].matched) {
+							s = _wtol(CString(match[3].first, match[3].length()));
+							bMatch = TRUE;
+						}
+
+						rtStart = (h * 3600 + m * 60 + s) * UNITS;
+					}
+
+					if (!bMatch) {
+						CString timeStart = RegExpParse(url, L"t=([0-9]+)");
+						if (!timeStart.IsEmpty()) {
+							rtStart = _wtol(timeStart) * UNITS;
+						}
+					}
 				}
 
 				f = InternetOpenUrl(s, url, NULL, 0, INTERNET_OPEN_FALGS, 0);
@@ -662,44 +696,38 @@ namespace YoutubeParser {
 						if (dataSize) {
 							CString xml = UTF8To16(data);
 							free(data);
-
-							CAtlRegExp<> re;
-							CAtlREMatchContext<> mc;
-							REParseError pe = re.Parse(L"<track id{.*?}/>");
-
-							if (REPARSE_ERROR_OK == pe) {
-								LPCTSTR szEnd = xml.GetBuffer();
-								while (re.Match(szEnd, &mc)) {
+							const std::wregex regex(L"<track id(.*?)/>");
+							std::wcmatch match;
+							LPCTSTR text = xml.GetBuffer();
+							while (std::regex_search(text, match, regex)) {
+								if (match.size() == 2) {
 									CString url, name;
+									CString xmlElement = CString(match[1].first, match[1].length());
 
-									LPCTSTR szStart;
-									mc.GetMatch(0, &szStart, &szEnd);
-									CString xmlElement = CString(szStart, int(szEnd - szStart));
+									const std::wregex regexValues(L"([a-z_]+)=\"([^\"]+)\"");
+									std::wcmatch matchValues;
+									LPCTSTR textValues = xmlElement.GetBuffer();
+									while (std::regex_search(textValues, matchValues, regexValues)) {
+										if (matchValues.size() == 3) {
+											CString xmlHeader = CString(matchValues[1].first, matchValues[1].length());
+											CString xmlValue = CString(matchValues[2].first, matchValues[2].length());
 
-									CAtlRegExp<> reElement;
-									CAtlREMatchContext<> mcElement;
-									pe = reElement.Parse(L" {[a-z_]+}=\"{[^\"]+}\"");
-									LPCTSTR szElementEnd = xmlElement.GetBuffer();
-									while (reElement.Match(szElementEnd, &mcElement)) {
-										LPCTSTR szElementStart;
-
-										mcElement.GetMatch(0, &szElementStart, &szElementEnd);
-										CString xmlHeader = CString(szElementStart, int(szElementEnd - szElementStart));
-
-										mcElement.GetMatch(1, &szElementStart, &szElementEnd);
-										CString xmlValue = CString(szElementStart, int(szElementEnd - szElementStart));
-
-										if (xmlHeader == L"lang_code") {
-											url.Format(L"https://www.youtube.com/api/timedtext?lang=%s&v=%s&fmt=vtt", xmlValue, videoId);
-										} else if (xmlHeader == L"lang_original") {
-											name = xmlValue;
+											if (xmlHeader == L"lang_code") {
+												url.Format(L"https://www.youtube.com/api/timedtext?lang=%s&v=%s&fmt=vtt", xmlValue, videoId);
+											} else if (xmlHeader == L"lang_original") {
+												name = xmlValue;
+											}
 										}
+
+										textValues = matchValues[0].second;
 									}
 
 									if (!url.IsEmpty() && !name.IsEmpty()) {
 										subs.AddTail(CSubtitleItem(url, name));
 									}
 								}
+
+								text = match[0].second;
 							}
 						}
 					}
@@ -769,38 +797,29 @@ namespace YoutubeParser {
 				CString item = UTF8To16(blockEntry);
 				CString data_video_id;
 				int data_index = 0;
-				CString data_video_username;
 				CString data_video_title;
 
 				bool bCurrentPlay = (item.Find(L"currently-playing") != -1);
 
-				CAtlRegExp<> re;
-				CAtlREMatchContext<> mc;
-				REParseError pe = re.Parse(L" {[a-z-]+}=\"{[^\"]+}\"");
-				if (REPARSE_ERROR_OK == pe) {
-
-					LPCTSTR szEnd = item.GetBuffer();
-					while (re.Match(szEnd, &mc)) {
-						LPCTSTR szStart;
-						mc.GetMatch(0, &szStart, &szEnd);
-						CString propHeader = CString(szStart, int(szEnd - szStart));
-
-						mc.GetMatch(1, &szStart, &szEnd);
-						CString propValue = CString(szStart, int(szEnd - szStart));
+				const std::wregex regex(L"([a-z-]+)=\"([^\"]+)\"");
+				std::wcmatch match;
+				LPCTSTR text = item.GetBuffer();
+				while (std::regex_search(text, match, regex)) {
+					if (match.size() == 3) {
+						CString propHeader = CString(match[1].first, match[1].length());
+						CString propValue = CString(match[2].first, match[2].length());
 
 						// data-video-id, data-video-clip-end, data-index, data-video-username, data-video-title, data-video-clip-start.
 						if (propHeader == L"data-video-id") {
 							data_video_id = propValue;
 						} else if (propHeader == L"data-index") {
-							if (swscanf_s(propValue, L"%d", &data_index) != 1) {
-								data_index = 0;
-							}
-						} else if (propHeader == L"data-video-username") {
-							data_video_username = propValue;
+							data_index = _wtoi(propValue);
 						} else if (propHeader == L"data-video-title" || propHeader == L"data-title") {
 							data_video_title = FixHtmlSymbols(propValue);
 						}
 					}
+
+					text = match[0].second;
 				}
 
 				if (!data_video_id.IsEmpty()) {
