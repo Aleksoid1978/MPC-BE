@@ -275,20 +275,20 @@ namespace YoutubeParser {
 						if (!contentDetails["duration"].empty()
 								&& contentDetails["duration"].isString()) {
 							CStringA sDuration = contentDetails["duration"].asCString();
-							const std::regex regex("PT(?:(?:(\\d+)h)?(?:(\\d{1,2})m)?(?:(\\d{1,2})s)?)", std::regex_constants::icase);
+							const std::regex regex("PT(\\d+H)?(\\d{1,2}M)?(\\d{1,2}S)?", std::regex_constants::icase);
 							std::cmatch match;
 							if (std::regex_search(sDuration.GetBuffer(), match, regex) && match.size() == 4) {
-								long h = 0;
-								long m = 0;
-								long s = 0;
+								int h = 0;
+								int m = 0;
+								int s = 0;
 								if (match[1].matched) {
-									h = atol(CStringA(match[1].first, match[1].length()));
+									h = atoi(match[1].first);
 								}
 								if (match[2].matched) {
-									m = atol(CStringA(match[2].first, match[2].length()));
+									m = atoi(match[2].first);
 								}
 								if (match[3].matched) {
-									s = atol(CStringA(match[3].first, match[3].length()));
+									s = atoi(match[3].first);
 								}
 
 								y_fields.duration = (h * 3600 + m * 60 + s) * UNITS;
