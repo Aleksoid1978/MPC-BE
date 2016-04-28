@@ -332,22 +332,22 @@ namespace YoutubeParser {
 				if (rtStart <= 0) {
 					BOOL bMatch = FALSE;
 
-					const std::wregex regex(L"t=(?:(?:(\\d+)h)?(?:(\\d{1,2})m)?(?:(\\d{1,2})s)?)", std::regex_constants::icase);
+					const std::wregex regex(L"t=(\\d+h)?(\\d{1,2}m)?(\\d{1,2}s)?", std::regex_constants::icase);
 					std::wcmatch match;
 					if (std::regex_search(url.GetBuffer(), match, regex) && match.size() == 4) {
-						long h = 0;
-						long m = 0;
-						long s = 0;
+						int h = 0;
+						int m = 0;
+						int s = 0;
 						if (match[1].matched) {
-							h = _wtol(CString(match[1].first, match[1].length()));
+							h = _wtoi(match[1].first);
 							bMatch = TRUE;
 						}
 						if (match[2].matched) {
-							m = _wtol(CString(match[2].first, match[2].length()));
+							m = _wtoi(match[2].first);
 							bMatch = TRUE;
 						}
 						if (match[3].matched) {
-							s = _wtol(CString(match[3].first, match[3].length()));
+							s = _wtoi(match[3].first);
 							bMatch = TRUE;
 						}
 
