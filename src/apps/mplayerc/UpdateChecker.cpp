@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include <afxinet.h>
+#include "../../DSUtil/SysVersion.h"
 #include "UpdateChecker.h"
 
 // UpdateChecker
@@ -87,6 +88,11 @@ Update_Status UpdateChecker::CheckNewVersion()
 					|| MPC_VERSION_MAJOR == m_UpdateVersion.major && MPC_VERSION_MINOR == m_UpdateVersion.minor && MPC_VERSION_PATCH == m_UpdateVersion.patch && MPC_VERSION_REV < m_UpdateVersion.revision) {
 				updatestatus = UPDATER_NEW_VERSION_IS_AVAILABLE;
 			} else {
+				updatestatus = UPDATER_NO_NEW_VERSION;
+			}
+
+			if (IsWinXP() && (m_UpdateVersion.major >= 1 || m_UpdateVersion.major == 1 && m_UpdateVersion.minor >= 4)) {
+				// MPC-BE 1.5.x or later will not support Windows XP
 				updatestatus = UPDATER_NO_NEW_VERSION;
 			}
 		}
