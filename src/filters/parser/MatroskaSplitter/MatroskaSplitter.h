@@ -110,8 +110,8 @@ public:
 	CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
 	virtual ~CMatroskaSplitterFilter();
 
-	bool m_hasHDMVSubPin;
-	bool IsHDMVSubPinDrying();
+	bool m_hasHdmvDvbSubPin;
+	bool IsHdmvDvbSubPinDrying();
 
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);

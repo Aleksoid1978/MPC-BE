@@ -94,7 +94,7 @@ CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CMatroskaSplitterFilter"), pUnk, phr, __uuidof(this))
 	, m_bLoadEmbeddedFonts(true)
 	, m_bCalcDuration(false)
-	, m_hasHDMVSubPin(false)
+	, m_hasHdmvDvbSubPin(false)
 	, m_Seek_rt(INVALID_TIME)
 	, m_bSupportCueDuration(FALSE)
 {
@@ -123,9 +123,9 @@ CMatroskaSplitterFilter::~CMatroskaSplitterFilter()
 {
 }
 
-bool CMatroskaSplitterFilter::IsHDMVSubPinDrying()
+bool CMatroskaSplitterFilter::IsHdmvDvbSubPinDrying()
 {
-	if (m_hasHDMVSubPin) {
+	if (m_hasHdmvDvbSubPin) {
 		POSITION pos = m_pActivePins.GetHeadPosition();
 		while (pos) {
 			CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
@@ -1009,8 +1009,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mts.Add(mt);
 						isSub = true;
 
-						if (mt.subtype == MEDIASUBTYPE_HDMVSUB) {
-							m_hasHDMVSubPin = true;
+						if (mt.subtype == MEDIASUBTYPE_HDMVSUB || mt.subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
+							m_hasHdmvDvbSubPin = true;
 						}
 					}
 				}
@@ -2176,6 +2176,9 @@ CMatroskaSplitterOutputPin::CMatroskaSplitterOutputPin(CAtlArray<CMediaType>& mt
 	if (mts[0].subtype == MEDIASUBTYPE_HDMVSUB) {
 		m_SubtitleType = hdmvsub;
 	}
+	else if (mts[0].subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
+		m_SubtitleType = dvbsub;
+	}
 }
 
 CMatroskaSplitterOutputPin::~CMatroskaSplitterOutputPin()
@@ -2208,9 +2211,7 @@ HRESULT CMatroskaSplitterOutputPin::DeliverEndOfStream()
 
 HRESULT CMatroskaSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
-	if (m_SubtitleType) {
-		m_bNeedNextSubtitle = false;
-	}
+	m_bNeedNextSubtitle = false;
 
 	return __super::DeliverNewSegment(tStart, tStop, dRate);
 }
@@ -2223,7 +2224,7 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 
 	bool force_packet = false;
 
-	if (m_SubtitleType == hdmvsub && p) {
+	if (m_SubtitleType > not_hdmv_dvbsub && p) {
 		CMatroskaPacket* mp = static_cast<CMatroskaPacket*>(p.m_p);
 
 		size_t size = 0;
@@ -2233,7 +2234,7 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		}
 
 		// simple check
-		if (size <= 30) {
+		if (m_SubtitleType == hdmvsub && size <= 30 || m_SubtitleType == dvbsub && size <= 14) {
 			// this is empty sub, set standart mode
 			m_bNeedNextSubtitle = false;
 			force_packet = true; // but send this packet anyway
@@ -2243,7 +2244,7 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		}
 	}
 
-	if (S_OK == m_hrDeliver && (force_packet || ((CMatroskaSplitterFilter*)pSplitter)->IsHDMVSubPinDrying())) {
+	if (S_OK == m_hrDeliver && (force_packet || ((CMatroskaSplitterFilter*)pSplitter)->IsHdmvDvbSubPinDrying())) {
 		m_queue.Add(p);
 		return m_hrDeliver;
 	}
