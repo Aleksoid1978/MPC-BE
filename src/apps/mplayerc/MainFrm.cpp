@@ -12768,7 +12768,14 @@ void CMainFrame::OpenSetupInfoBar()
 					bstr.Empty();
 				}
 				if (SUCCEEDED(pAMMC->get_Description(&bstr))) {
-					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DESCRIPTION), bstr.m_str);
+					// show only the first description line
+					CString str(bstr.m_str);
+					int k = str.Find(L"\r\n");
+					if (k > 0) {
+						str.Truncate(k);
+						str.Append(L" \x2026");
+					}
+					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DESCRIPTION), str);
 					if (bstr.Length()) {
 						fEmpty = false;
 					}
