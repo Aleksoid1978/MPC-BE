@@ -164,6 +164,7 @@ SRCS_LC = \
 	libavcodec/dcadct.c \
 	libavcodec/dcadec.c \
 	libavcodec/dcadsp.c \
+	libavcodec/dcahuff.c \
 	libavcodec/dct.c \
 	libavcodec/dct32_fixed.c \
 	libavcodec/dct32_float.c \
@@ -220,13 +221,16 @@ SRCS_LC = \
 	libavcodec/h264_loopfilter.c \
 	libavcodec/h264_mb.c \
 	libavcodec/h264_mp4toannexb_bsf.c \
+	libavcodec/h264_parse.c \
 	libavcodec/h264_parser.c \
 	libavcodec/h264_picture.c \
 	libavcodec/h264_ps.c \
 	libavcodec/h264_refs.c \
 	libavcodec/h264_sei.c \
 	libavcodec/h264_slice.c \
+	libavcodec/h2645_parse.c \
 	libavcodec/h264chroma.c \
+	libavcodec/h264data.c \
 	libavcodec/h264dsp.c \
 	libavcodec/h264idct.c \
 	libavcodec/h264pred.c \
@@ -236,7 +240,6 @@ SRCS_LC = \
 	libavcodec/hevc_data.c \
 	libavcodec/hevc_filter.c \
 	libavcodec/hevc_mvs.c \
-	libavcodec/hevc_parse.c \
 	libavcodec/hevc_parser.c \
 	libavcodec/hevc_ps.c \
 	libavcodec/hevc_refs.c \
