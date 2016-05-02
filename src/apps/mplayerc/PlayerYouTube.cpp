@@ -52,8 +52,8 @@ namespace YoutubeParser {
 	static const CString GOOGLE_API_KEY = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
 
 	static const LPCTSTR videoIdRegExps[] = {
-		L"v=([-a-zA-Z0-9]+)",
-		L"video_ids=([-a-zA-Z0-9]+)"
+		L"v=([-a-zA-Z0-9_]+)",
+		L"video_ids=([-a-zA-Z0-9_]+)"
 	};
 
 	static const YOUTUBE_PROFILES youtubeProfileEmpty = { 0, y_unknown, 0, NULL, false };
