@@ -412,21 +412,18 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		if (FAILED(hr)) {
 			iResizer = RESIZER_BILINEAR;
 		}
-
 		m_nDX9Resizer = iResizer;
 		screenSpacePassCount++; // currently all resizers are 1-pass
 
 		// Custom screen space pixel shaders
 		bCustomScreenSpacePixelShaders = !m_pCustomScreenSpacePixelShaders.IsEmpty();
-
 		if (bCustomScreenSpacePixelShaders) {
 			screenSpacePassCount += (int)m_pCustomScreenSpacePixelShaders.GetCount();
 		}
 
 		// Custom pixel shaders
 		bCustomPixelShaders = !m_pCustomPixelShaders.IsEmpty();
-
-		hr = InitVideoTextures(m_pCustomPixelShaders.GetCount());
+		hr = InitVideoTextures();
 		if (FAILED(hr)) {
 			bCustomPixelShaders = false;
 		}
@@ -913,14 +910,10 @@ HRESULT CDX9RenderingEngine::RenderVideoDXVA(IDirect3DSurface9* pRenderTarget, c
 }
 #endif
 
-
-HRESULT CDX9RenderingEngine::InitVideoTextures(size_t count)
+HRESULT CDX9RenderingEngine::InitVideoTextures()
 {
 	HRESULT hr = S_OK;
-
-	if (count > _countof(m_pFrameTextures)) {
-		count = _countof(m_pFrameTextures);
-	}
+	size_t count = min(_countof(m_pFrameTextures), m_pCustomPixelShaders.GetCount());
 
 	for (size_t i = 0; i < count; i++) {
 		if (m_pFrameTextures[i] == NULL) {

@@ -108,8 +108,11 @@ namespace DSObjects
 		RenderingPath				m_RenderingPath;
 		D3DFORMAT					m_VideoBufferFmt;
 		D3DFORMAT					m_SurfaceFmt;
+
 		CComPtr<IDirect3DTexture9>	m_pVideoTexture[MAX_VIDEO_SURFACES];
 		CComPtr<IDirect3DSurface9>	m_pVideoSurface[MAX_VIDEO_SURFACES];
+		CComPtr<IDirect3DTexture9>	m_pFrameTextures[2];
+		CComPtr<IDirect3DTexture9>	m_pScreenSpaceTextures[2];
 
 		bool						m_bColorManagement;
 
@@ -165,12 +168,10 @@ namespace DSObjects
 
 		// Custom pixel shaders
 		CAtlList<CExternalPixelShader>	m_pCustomPixelShaders;
-		CComPtr<IDirect3DTexture9>		m_pFrameTextures[2];
 
 		// Screen space pipeline
 		int								m_ScreenSpaceTexWidth;
 		int								m_ScreenSpaceTexHeight;
-		CComPtr<IDirect3DTexture9>		m_pScreenSpaceTextures[2];
 
 		// Resizers
 		CComPtr<IDirect3DPixelShader9>	m_pResizerPixelShaders[shader_count];
@@ -204,10 +205,8 @@ namespace DSObjects
 		HRESULT RenderVideoDXVA(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect);
 #endif
 
-		// Custom pixel shaders
-		HRESULT InitVideoTextures(size_t count);
-
-		// Custom Screen space shaders
+		// init processing textures
+		HRESULT InitVideoTextures();
 		HRESULT InitScreenSpaceTextures(size_t count);
 
 		// Resizers
