@@ -292,6 +292,22 @@ struct MediaInfo_Event_Global_Demux_4
 };
 
 /*-------------------------------------------------------------------------*/
+/* Simple text                                                             */
+#define MediaInfo_Event_Global_SimpleText 0xAF01
+struct MediaInfo_Event_Global_SimpleText_0
+{
+    MEDIAINFO_EVENT_GENERIC
+    const wchar_t*      Content;
+    MediaInfo_int8u     Flags;
+    MediaInfo_int8u     MuxingMode;
+    MediaInfo_int8u     Service;
+    MediaInfo_int32u    Row_Max;
+    MediaInfo_int32u    Column_Max;
+    wchar_t**           Row_Values; //First indice is the row number, second indice is the column number. Row ends with \0
+    MediaInfo_int8u**   Row_Attributes;
+};
+
+/*-------------------------------------------------------------------------*/
 /* BytesRead                                                               */
 #define MediaInfo_Event_Global_BytesRead 0xAF02
 struct MediaInfo_Event_Global_BytesRead_0

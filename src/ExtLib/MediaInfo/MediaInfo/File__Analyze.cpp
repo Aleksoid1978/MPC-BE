@@ -111,6 +111,9 @@ File__Analyze::File__Analyze ()
     #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
         ServiceDescriptors=NULL;
     #endif
+    #if defined(MEDIAINFO_TELETEXT_YES)
+        Teletexts=NULL;
+    #endif
 
     //Out
     Frame_Count=0;

@@ -313,18 +313,9 @@ struct complete_stream
         table_ids                                   Table_IDs; //Key is table_id
         std::map<std::string, Ztring>               Infos;
         std::map<std::string, Ztring>               Infos_Option;
-        struct teletext
-        {
-            std::map<std::string, Ztring>           Infos;
-            stream_t                                StreamKind;
-            size_t                                  StreamPos;
-
-            teletext()
-                : StreamKind(Stream_Max)
-                , StreamPos((size_t)-1)
-            {}
-        };
-        std::map<int16u, teletext>                  Teletexts; //Key is teletext_magazine_number
+        #if defined(MEDIAINFO_TELETEXT_YES)
+            std::map<int16u, File__Analyze::teletext> Teletexts; //Key is teletext_magazine_number;
+        #endif
         #if MEDIAINFO_TRACE
             Ztring Element_Info1;
         #endif //MEDIAINFO_TRACE

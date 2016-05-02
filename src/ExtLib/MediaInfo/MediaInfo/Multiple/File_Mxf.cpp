@@ -2287,6 +2287,12 @@ void File_Mxf::Streams_Finish()
     {
         if (Tracks.empty())
         {
+            //Clear
+            for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
+            {
+                (*Stream)[StreamKind].clear();
+                (*Stream_More)[StreamKind].clear();
+            }
             for (essences::iterator Essence=Essences.begin(); Essence!=Essences.end(); ++Essence)
                 for (parsers::iterator Parser=Essence->second.Parsers.begin(); Parser!=Essence->second.Parsers.end(); ++Parser)
                 {
@@ -2473,6 +2479,9 @@ void File_Mxf::Streams_Finish()
 
     //CameraUnitMetadata
     if (!AcquisitionMetadataLists.empty())
+    {
+        Stream_Prepare(Stream_Other);
+
         for (size_t Pos = 0; Pos < AcquisitionMetadataLists.size(); Pos++)
         {
             if (UserDefinedAcquisitionMetadata_UdamSetIdentifier_IsSony && Pos==0xE201 && !AcquisitionMetadata_Sony_E201_Lists.empty())
@@ -2577,6 +2586,7 @@ void File_Mxf::Streams_Finish()
                 (*Stream_More)[Stream_Other][0](Ztring().From_UTF8(ElementName_FrameCounts.c_str()), Info_Options)=__T("N NT");
             }
         }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -8060,11 +8070,7 @@ void File_Mxf::SubDescriptors()
 void File_Mxf::LensUnitMetadata()
 {
     if (Count_Get(Stream_Other)==0)
-    {
-        Stream_Prepare(Stream_Other);
-
         AcquisitionMetadataLists.resize(0x10000);
-    }
 
     switch(Code2)
     {
@@ -8085,11 +8091,7 @@ void File_Mxf::LensUnitMetadata()
 void File_Mxf::CameraUnitMetadata()
 {
     if (Count_Get(Stream_Other)==0)
-    {
-        Stream_Prepare(Stream_Other);
-
         AcquisitionMetadataLists.resize(0x10000);
-    }
 
     switch(Code2)
     {
@@ -8128,8 +8130,6 @@ void File_Mxf::UserDefinedAcquisitionMetadata()
 {
     if (Count_Get(Stream_Other)==0)
     {
-        Stream_Prepare(Stream_Other);
-
         AcquisitionMetadataLists.resize(0x10000);
         AcquisitionMetadata_Sony_CalibrationType = (int8u)-1;
     }
