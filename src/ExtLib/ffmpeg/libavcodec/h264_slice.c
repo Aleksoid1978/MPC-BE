@@ -777,8 +777,8 @@ static void implicit_weight_table(const H264Context *h, H264SliceContext *sl, in
     int ref0, ref1, i, cur_poc, ref_start, ref_count0, ref_count1;
 
     for (i = 0; i < 2; i++) {
-        sl->luma_weight_flag[i]   = 0;
-        sl->chroma_weight_flag[i] = 0;
+        sl->pwt.luma_weight_flag[i]   = 0;
+        sl->pwt.chroma_weight_flag[i] = 0;
     }
 
     if (field < 0) {
@@ -789,8 +789,8 @@ static void implicit_weight_table(const H264Context *h, H264SliceContext *sl, in
         }
         if (sl->ref_count[0] == 1 && sl->ref_count[1] == 1 && !FRAME_MBAFF(h) &&
             sl->ref_list[0][0].poc + (int64_t)sl->ref_list[1][0].poc == 2 * cur_poc) {
-            sl->use_weight        = 0;
-            sl->use_weight_chroma = 0;
+            sl->pwt.use_weight        = 0;
+            sl->pwt.use_weight_chroma = 0;
             return;
         }
         ref_start  = 0;
@@ -803,10 +803,10 @@ static void implicit_weight_table(const H264Context *h, H264SliceContext *sl, in
         ref_count1 = 16 + 2 * sl->ref_count[1];
     }
 
-    sl->use_weight               = 2;
-    sl->use_weight_chroma        = 2;
-    sl->luma_log2_weight_denom   = 5;
-    sl->chroma_log2_weight_denom = 5;
+    sl->pwt.use_weight               = 2;
+    sl->pwt.use_weight_chroma        = 2;
+    sl->pwt.luma_log2_weight_denom   = 5;
+    sl->pwt.chroma_log2_weight_denom = 5;
 
     for (ref0 = ref_start; ref0 < ref_count0; ref0++) {
         int64_t poc0 = sl->ref_list[0][ref0].poc;
@@ -824,10 +824,10 @@ static void implicit_weight_table(const H264Context *h, H264SliceContext *sl, in
                 }
             }
             if (field < 0) {
-                sl->implicit_weight[ref0][ref1][0] =
-                sl->implicit_weight[ref0][ref1][1] = w;
+                sl->pwt.implicit_weight[ref0][ref1][0] =
+                sl->pwt.implicit_weight[ref0][ref1][1] = w;
             } else {
-                sl->implicit_weight[ref0][ref1][field] = w;
+                sl->pwt.implicit_weight[ref0][ref1][field] = w;
             }
         }
     }
@@ -841,7 +841,7 @@ static void init_scan_tables(H264Context *h)
     int i;
     for (i = 0; i < 16; i++) {
 #define TRANSPOSE(x) ((x) >> 2) | (((x) << 2) & 0xF)
-        h->zigzag_scan[i] = TRANSPOSE(zigzag_scan[i]);
+        h->zigzag_scan[i] = TRANSPOSE(ff_zigzag_scan[i]);
         h->field_scan[i]  = TRANSPOSE(field_scan[i]);
 #undef TRANSPOSE
     }
@@ -854,7 +854,7 @@ static void init_scan_tables(H264Context *h)
 #undef TRANSPOSE
     }
     if (h->sps.transform_bypass) { // FIXME same ugly
-        memcpy(h->zigzag_scan_q0          , zigzag_scan             , sizeof(h->zigzag_scan_q0         ));
+        memcpy(h->zigzag_scan_q0          , ff_zigzag_scan          , sizeof(h->zigzag_scan_q0         ));
         memcpy(h->zigzag_scan8x8_q0       , ff_zigzag_direct        , sizeof(h->zigzag_scan8x8_q0      ));
         memcpy(h->zigzag_scan8x8_cavlc_q0 , zigzag_scan8x8_cavlc    , sizeof(h->zigzag_scan8x8_cavlc_q0));
         memcpy(h->field_scan_q0           , field_scan              , sizeof(h->field_scan_q0          ));
@@ -1245,7 +1245,7 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
     } else
         sl->slice_type_fixed = 0;
 
-    slice_type = golomb_to_pict_type[slice_type];
+    slice_type         = ff_h264_golomb_to_pict_type[slice_type];
     sl->slice_type     = slice_type;
     sl->slice_type_nos = slice_type & 3;
 
@@ -1764,15 +1764,16 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
     if ((h->pps.weighted_pred && sl->slice_type_nos == AV_PICTURE_TYPE_P) ||
         (h->pps.weighted_bipred_idc == 1 &&
          sl->slice_type_nos == AV_PICTURE_TYPE_B))
-        ff_pred_weight_table(h, sl);
+        ff_h264_pred_weight_table(&sl->gb, &h->sps, sl->ref_count,
+                                  sl->slice_type_nos, &sl->pwt);
     else if (h->pps.weighted_bipred_idc == 2 &&
              sl->slice_type_nos == AV_PICTURE_TYPE_B) {
         implicit_weight_table(h, sl, -1);
     } else {
-        sl->use_weight = 0;
+        sl->pwt.use_weight = 0;
         for (i = 0; i < 2; i++) {
-            sl->luma_weight_flag[i]   = 0;
-            sl->chroma_weight_flag[i] = 0;
+            sl->pwt.luma_weight_flag[i]   = 0;
+            sl->pwt.chroma_weight_flag[i] = 0;
         }
     }
 
@@ -1961,8 +1962,8 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
                sl->qscale,
                sl->deblocking_filter,
                sl->slice_alpha_c0_offset, sl->slice_beta_offset,
-               sl->use_weight,
-               sl->use_weight == 1 && sl->use_weight_chroma ? "c" : "",
+               sl->pwt.use_weight,
+               sl->pwt.use_weight == 1 && sl->pwt.use_weight_chroma ? "c" : "",
                sl->slice_type == AV_PICTURE_TYPE_B ? (sl->direct_spatial_mv_pred ? "SPAT" : "TEMP") : "");
     }
 

@@ -108,7 +108,7 @@ static void CopyScalingMatrix(DXVA_Qmatrix_H264* pDest, PPS* pps, DWORD nPCIVend
 	} else {
 		for (int i = 0; i < 6; i++)
 			for (int j = 0; j < 16; j++)
-				pDest->bScalingLists4x4[i][j] = pps->scaling_matrix4[i][zigzag_scan[j]];
+				pDest->bScalingLists4x4[i][j] = pps->scaling_matrix4[i][ff_zigzag_scan[j]];
 
 		for (int i = 0; i < 64; i++) {
 			pDest->bScalingLists8x8[0][i] = pps->scaling_matrix8[0][ff_zigzag_direct[i]];

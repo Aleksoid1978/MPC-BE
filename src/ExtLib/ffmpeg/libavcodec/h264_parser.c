@@ -27,12 +27,22 @@
 
 #define UNCHECKED_BITSTREAM_READER 1
 
-#include "libavutil/attributes.h"
-#include "parser.h"
-#include "h264data.h"
+#include <assert.h>
+#include <stdint.h>
+
+#include "libavutil/avutil.h"
+#include "libavutil/error.h"
+#include "libavutil/log.h"
+#include "libavutil/mem.h"
+#include "libavutil/pixfmt.h"
+
+#include "get_bits.h"
 #include "golomb.h"
+#include "h264.h"
+#include "h264data.h"
 #include "internal.h"
 #include "mpegutils.h"
+#include "parser.h"
 
 typedef struct H264ParseContext {
     H264Context h;
@@ -173,7 +183,8 @@ static int scan_mmco_reset(AVCodecParserContext *s)
 
     if ((h->pps.weighted_pred && sl->slice_type_nos == AV_PICTURE_TYPE_P) ||
         (h->pps.weighted_bipred_idc == 1 && sl->slice_type_nos == AV_PICTURE_TYPE_B))
-        ff_pred_weight_table(h, sl);
+        ff_h264_pred_weight_table(&sl->gb, &h->sps, sl->ref_count, sl->slice_type_nos,
+                                  &sl->pwt);
 
     if (get_bits1(&sl->gb)) { // adaptive_ref_pic_marking_mode_flag
         int i;
@@ -302,7 +313,7 @@ static inline int parse_nal_units(AVCodecParserContext *s,
             init_get_bits(&sl->gb, ptr, 8 * dst_length);
             get_ue_golomb_long(&sl->gb);  // skip first_mb_in_slice
             slice_type   = get_ue_golomb_31(&sl->gb);
-            s->pict_type = golomb_to_pict_type[slice_type % 5];
+            s->pict_type = ff_h264_golomb_to_pict_type[slice_type % 5];
             if (h->sei_recovery_frame_cnt >= 0) {
                 /* key frame, since recovery_frame_cnt is set */
                 s->key_frame = 1;
