@@ -171,6 +171,20 @@ public :
         };
         servicedescriptors* ServiceDescriptors;
     #endif
+    #if defined(MEDIAINFO_TELETEXT_YES)
+        struct teletext
+        {
+            std::map<std::string, Ztring>           Infos;
+            stream_t                                StreamKind;
+            size_t                                  StreamPos;
+
+            teletext()
+                : StreamKind(Stream_Max)
+                , StreamPos((size_t)-1)
+            {}
+        };
+        std::map<int16u, teletext>*                 Teletexts; //Key is teletext_magazine_number
+    #endif
 
     //Out
     int64u PTS_Begin;                  //In nanoseconds

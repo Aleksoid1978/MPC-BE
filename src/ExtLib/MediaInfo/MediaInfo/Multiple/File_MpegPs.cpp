@@ -343,6 +343,10 @@ void File_MpegPs::Streams_Fill()
 //---------------------------------------------------------------------------
 void File_MpegPs::Streams_Fill_PerStream(size_t StreamID, ps_stream &Temp, kindofstream KindOfStream)
 {
+    size_t Counts[Stream_Max];
+    for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
+        Counts[StreamKind]=Count_Get((stream_t)StreamKind);
+
     //By the parser
     StreamKind_Last=Stream_Max;
     size_t Count=0;
@@ -411,6 +415,25 @@ void File_MpegPs::Streams_Fill_PerStream(size_t StreamID, ps_stream &Temp, kindo
             Fill(Stream_Audio, StreamPos_Last, Audio_MuxingMode, "SL");
     #endif //MEDIAINFO_MPEG4_YES
 
+    if (Counts[StreamKind_Last]+Count==Count_Get(StreamKind_Last)) //Old method
+        Streams_Fill_PerStream_PerKind(StreamID, Temp, KindOfStream, Count);
+    else
+    {
+        //Several kinds of streams at the same time. TODO: more generic code
+        stream_t StreamKind_Last_Before=StreamKind_Last;
+        for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
+        {
+            StreamKind_Last=(stream_t)StreamKind;
+            Streams_Fill_PerStream_PerKind(StreamID, Temp, KindOfStream, Count_Get((stream_t)StreamKind)-Counts[StreamKind]);
+        }
+        StreamKind_Last=StreamKind_Last_Before;
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_MpegPs::Streams_Fill_PerStream_PerKind(size_t StreamID, ps_stream &Temp, kindofstream KindOfStream, size_t Count)
+{
+
     //More info
     for (size_t StreamPos=Count_Get(StreamKind_Last)-Count; StreamPos<Count_Get(StreamKind_Last); StreamPos++)
     {
@@ -453,6 +476,8 @@ void File_MpegPs::Streams_Fill_PerStream(size_t StreamID, ps_stream &Temp, kindo
         }
         else if (KindOfStream==KindOfStream_Extension)
         {
+            if (!IsSub) //Not providing the StreamID if it is e.g. MPEG-TS, useless
+            {
             Ztring ID=__T("253");
             if (StreamID)
                 ID+=__T("-")+Ztring::ToZtring(StreamID);
@@ -461,6 +486,7 @@ void File_MpegPs::Streams_Fill_PerStream(size_t StreamID, ps_stream &Temp, kindo
             if (StreamID)
                 ID_String+=__T("-")+Ztring::ToZtring(StreamID)+__T(" (0x")+Ztring::ToZtring(StreamID, 16)+__T(")");
             Fill(StreamKind_Last, StreamPos, General_ID_String, ID_String, true); //TODO: merge with Decimal_Hexa in file_MpegTs
+            }
         }
 
         if (Retrieve(StreamKind_Last, StreamPos, Fill_Parameter(StreamKind_Last, Generic_Format)).empty() && Temp.stream_type!=0)
@@ -737,7 +763,11 @@ void File_MpegPs::Streams_Finish_PerStream(size_t StreamID, ps_stream &Temp, kin
                             Duration+=Ztring::ToZtring(90*1000/FrameRate, 0).To_int64u(); //We imagine that there is one frame in it
                     }
 
-                    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Duration), Duration/90, 10, true);
+                    //Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Duration), Duration/90, 10, true); //TODO: refactor in order to have a more optimal way to manage several streams
+                    for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
+                        for (size_t StreamPos=0; StreamPos<Count_Get(StreamKind_Last); StreamPos++)
+                            if (Retrieve((stream_t)StreamKind, StreamPos, Fill_Parameter((stream_t)StreamKind, Generic_Duration)).empty())
+                                Fill((stream_t)StreamKind, StreamPos, Fill_Parameter((stream_t)StreamKind, Generic_Duration), Duration/90, 10);
                 }
             }
         }
@@ -3979,6 +4009,9 @@ void File_MpegPs::xxx_stream_Parse(ps_stream &Temp, int8u &stream_Count)
             #endif //MEDIAINFO_IBIUSAGE
             #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
                 Temp.Parsers[Pos]->ServiceDescriptors=ServiceDescriptors;
+            #endif
+            #if defined(MEDIAINFO_TELETEXT_YES)
+                Temp.Parsers[Pos]->Teletexts=Teletexts;
             #endif
             Open_Buffer_Continue(Temp.Parsers[Pos], Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
             if (IsSub && Temp.Parsers[Pos]->Frame_Count_NotParsedIncluded!=(int64u)-1)

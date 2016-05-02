@@ -285,6 +285,7 @@ private :
         KindOfStream_Extension,
     };
     void Streams_Fill_PerStream(size_t StreamID, ps_stream &Temp, kindofstream KindOfStream);
+    void Streams_Fill_PerStream_PerKind(size_t StreamID, ps_stream &Temp, kindofstream KindOfStream, size_t Count);
     void Streams_Finish_PerStream(size_t StreamID, ps_stream &Temp, kindofstream KindOfStream);
     void xxx_stream_Parse(ps_stream &Temp, int8u &stream_Count);
 

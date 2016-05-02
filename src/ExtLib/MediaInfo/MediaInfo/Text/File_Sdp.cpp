@@ -70,12 +70,15 @@ void File_Sdp::Streams_Finish()
 {
     for (streams::iterator Stream=Streams.begin(); Stream!=Streams.end(); ++Stream)
     {
-        if (Stream->second.Parser && Stream->first<0x80) //For the moment, we filter and use only field 1)
+        if (Stream->second.Parser)
         {
+            size_t Current=Count_Get(Stream_Text);
             Finish(Stream->second.Parser);
             Merge(*Stream->second.Parser);
             //Fill(Stream_Text, StreamPos_Last, Text_ID, Ztring::ToZtring((Stream->first&0x80)?2:1)+__T('-')+Ztring::ToZtring(Stream->first&0x1F)+__T("-")+Stream->second.Parser->Get(Stream_Text, 0, Text_ID), true);
-            Fill(Stream_Text, StreamPos_Last, Text_ID, Stream->second.Parser->Get(Stream_Text, 0, Text_ID), true);
+            size_t Count=Count_Get(Stream_Text)-Current;
+            for (size_t Pos=0; Pos<Count; Pos++)
+                Fill(Stream_Text, Current+Pos, Text_ID, Stream->second.Parser->Get(Stream_Text, Pos, Text_ID), true);
         }
     }
 }

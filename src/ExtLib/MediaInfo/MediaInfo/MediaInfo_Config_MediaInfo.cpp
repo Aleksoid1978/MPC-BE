@@ -185,6 +185,8 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
         Event_UserHandler=NULL;
         SubFile_StreamID=(int64u)-1;
         ParseUndecodableFrames=false;
+        Events_TimestampShift_Reference_PTS=(int64u)-1;
+        Events_TimestampShift_Reference_ID=(int64u)-1;
     #endif //MEDIAINFO_EVENTS
     #if MEDIAINFO_DEMUX
         Demux_ForceIds=false;
@@ -261,6 +263,7 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     ParseSpeed=MediaInfoLib::Config.ParseSpeed_Get();
     #if MEDIAINFO_EVENTS
         Config_PerPackage=NULL;
+        Events_TimestampShift_Disabled=false;
     #endif //MEDIAINFO_EVENTS
     #if MEDIAINFO_DEMUX
         Demux_EventWasSent=false;
@@ -2351,6 +2354,118 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
                         Temp->PTS-=TimeOffset;
                     else
                         Temp->PTS=0;
+                }
+            }
+        }
+    }
+
+    //Adaptation of time stamps
+    if (!FileIsReferenced && !Events_TimestampShift_Disabled)
+    {
+        MediaInfo_Event_Generic* Event=(MediaInfo_Event_Generic*)Data_Content;
+
+        if (Event->StreamIDs_Size>=2 && Event->ParserIDs[0]==MediaInfo_Parser_MpegTs && Event->ParserIDs[1]==MediaInfo_Parser_MpegPs)
+        {
+            //Catching reference stream
+            if (Event->StreamIDs[1]==0xE0 && Events_TimestampShift_Reference_ID==(int64u)-1)
+                Events_TimestampShift_Reference_ID=Event->StreamIDs[0];
+
+            //Store the last PTS of the reference stream
+            if (Events_TimestampShift_Reference_ID==Event->StreamIDs[0] && Event->PTS!=(int64u)-1)
+                Events_TimestampShift_Reference_PTS=Event->PTS;
+
+            //Sending events whose were delayed
+            if (!Events_TimestampShift_Delayed.empty() && Events_TimestampShift_Reference_ID!=(int64u)-1 && Event->PTS!=(int64u)-1)
+            {
+                Events_TimestampShift_Disabled=true; //Disable the sending of events in the next call
+
+                for (size_t Pos=0; Pos<Events_TimestampShift_Delayed.size(); Pos++)
+                    if (Events_TimestampShift_Delayed[Pos])
+                    {
+                        Event_Send(NULL, Events_TimestampShift_Delayed[Pos]->Data_Content, Events_TimestampShift_Delayed[Pos]->Data_Size, Events_TimestampShift_Delayed[Pos]->File_Name);
+
+                        int32u EventCode=*((int32u*)Events_TimestampShift_Delayed[Pos]->Data_Content);
+                        bool IsSimpleText=(EventCode&0x00FFFF00)==(MediaInfo_Event_Global_SimpleText<<8);
+                        if (IsSimpleText)
+                        {
+                            MediaInfo_Event_Global_SimpleText_0* Old=(MediaInfo_Event_Global_SimpleText_0*)Events_TimestampShift_Delayed[Pos]->Data_Content;
+                            delete[] Old->Content; //Old->Content=NULL;
+                            if (Old->Row_Values)
+                            {
+                                for (size_t Row_Pos=0; Row_Pos<Old->Row_Max; Row_Pos++)
+                                    delete[] Old->Row_Values[Row_Pos]; // Row_Values[Row_Pos]=NULL;
+                                delete[] Old->Row_Values; //Old->Row_Values=NULL;
+                            }
+                            if (Old->Row_Attributes)
+                            {
+                                for (size_t Row_Pos=0; Row_Pos<Old->Row_Max; Row_Pos++)
+                                    delete[] Old->Row_Attributes[Row_Pos]; // Row_Attributes[Row_Pos]=NULL;
+                                delete[] Old->Row_Attributes; //Old->Row_Attributes=NULL;
+                            }
+                        }
+
+                        delete Events_TimestampShift_Delayed[Pos]; //Events_TimestampShift_Delayed[Pos]=NULL;
+                    }
+                Events_TimestampShift_Delayed.clear();
+                Events_TimestampShift_Disabled=false;
+            }
+
+            //MediaInfo_Event_Global_SimpleText
+            if ((Event->EventCode &0x00FFFF00)==(MediaInfo_Event_Global_SimpleText<<8)) //If it is MediaInfo_Event_Global_SimpleText
+            {
+                //Store the event if there is no reference stream
+                if (Events_TimestampShift_Reference_ID==(int64u)-1 || Events_TimestampShift_Reference_PTS==(int64u)-1)
+                {
+                    event_delayed* Event=new event_delayed(Data_Content, Data_Size, File_Name);
+                    Events_TimestampShift_Delayed.push_back(Event);
+
+                    // Copying buffers
+                    int32u* EventCode=(int32u*)Data_Content;
+                    if (((*EventCode)&0x00FFFFFF)==(MediaInfo_Event_Global_SimpleText<<8) && Data_Size==sizeof(MediaInfo_Event_Global_SimpleText_0))
+                    {
+                        MediaInfo_Event_Global_SimpleText_0* Old=(MediaInfo_Event_Global_SimpleText_0*)Data_Content;
+                        MediaInfo_Event_Global_SimpleText_0* New=(MediaInfo_Event_Global_SimpleText_0*)Event->Data_Content;
+                        if (New->Content)
+                        {
+                            size_t Content_Size=wcslen(New->Content);
+                            wchar_t* Content=new wchar_t[Content_Size+1];
+                            std::memcpy(Content, Old->Content, (Content_Size+1)*sizeof(wchar_t));
+                            New->Content=Content;
+                        }
+                        if (New->Row_Values)
+                        {
+                            wchar_t** Row_Values=new wchar_t*[New->Row_Max];
+                            for (size_t Row_Pos=0; Row_Pos<New->Row_Max; Row_Pos++)
+                            {
+                                Row_Values[Row_Pos]=new wchar_t[New->Column_Max];
+                                std::memcpy(Row_Values[Row_Pos], Old->Row_Values[Row_Pos], New->Column_Max*sizeof(wchar_t));
+                            }
+                            New->Row_Values=Row_Values;
+                        }
+                        if (New->Row_Attributes)
+                        {
+                            int8u** Row_Attributes=new int8u*[New->Row_Max];
+                            for (size_t Row_Pos=0; Row_Pos<New->Row_Max; Row_Pos++)
+                            {
+                                Row_Attributes[Row_Pos]=new int8u[New->Column_Max];
+                                std::memcpy(Row_Attributes[Row_Pos], Old->Row_Attributes[Row_Pos], New->Column_Max*sizeof(int8u));
+                            }
+                            New->Row_Attributes=Row_Attributes;
+                        }
+                    }
+                    return;
+                }
+
+                //Shift of the PTS if difference is too huge
+                if (Event->PTS>Events_TimestampShift_Reference_PTS+60000000000LL) // difference more than 60 seconds
+                {
+                    int64u Shift= Event->PTS -Events_TimestampShift_Reference_PTS;
+                    if (Shift>=55555555555555LL-10000000000LL && Shift<=55555555555555LL+10000000000LL) //+/- 10 second
+                        Shift=55555555555555LL;
+                    if (Event->PTS!=(int64u)-1)
+                        Event->PTS-=Shift;
+                    if (Event->DTS!=(int64u)-1)
+                        Event->DTS-=Shift;
                 }
             }
         }

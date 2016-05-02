@@ -1163,6 +1163,11 @@ void File_Mpeg_Psi::Table_00()
             program_number_Remove();
         }
     FILLING_END();
+
+    #if MEDIAINFO_EVENTS
+        if (Complete_Stream->Transport_Streams[table_id_extension].Programs_NotParsedCount>1)
+            Config->Events_TimestampShift_Disabled=true; //Enabled only if there is 1 program. TODO: support of more than 1 program
+    #endif //MEDIAINFO_EVENTS
 }
 
 //---------------------------------------------------------------------------
