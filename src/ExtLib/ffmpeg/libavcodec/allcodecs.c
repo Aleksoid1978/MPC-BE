@@ -189,6 +189,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (AMRWB, amrwb);
     REGISTER_DECODER (QDM2, qdm2);    
     REGISTER_DECODER (WAVPACK, wavpack);
+    REGISTER_DECODER (WMALOSSLESS, wmalossless);
     REGISTER_DECODER (WMAPRO, wmapro);
     REGISTER_DECODER (WMAV1, wmav1);
     REGISTER_DECODER (WMAV2, wmav2);
