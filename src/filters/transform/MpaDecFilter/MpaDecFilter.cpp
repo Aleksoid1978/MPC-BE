@@ -2245,25 +2245,26 @@ STDMETHODIMP_(bool) CMpaDecFilter::GetOutputFormat(MPCSampleFormat mpcsf)
 	return false;
 }
 
+
+const MPCSampleFormat SFmtPrority[sfcount][sfcount] = {
+	{ SF_PCM16, SF_PCM32, SF_PCM24, SF_FLOAT }, // int16
+	{ SF_PCM24, SF_PCM32, SF_FLOAT, SF_PCM16 }, // int24
+	{ SF_PCM32, SF_PCM24, SF_FLOAT, SF_PCM16 }, // int32
+	{ SF_FLOAT, SF_PCM32, SF_PCM24, SF_PCM16 }, // float
+};
+
 STDMETHODIMP_(MPCSampleFormat) CMpaDecFilter::SelectOutputFormat(MPCSampleFormat mpcsf)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	if (mpcsf >= 0 && mpcsf < sfcount && m_fSampleFmt[mpcsf]) {
-		return mpcsf;
+
+	if (mpcsf >= 0 && mpcsf < sfcount) {
+		for (int i = 0; i < sfcount; i++) {
+			if (m_fSampleFmt[SFmtPrority[mpcsf][i]]) {
+				return SFmtPrority[mpcsf][i];
+			}
+		}
 	}
 
-	if (m_fSampleFmt[SF_FLOAT]) {
-		return SF_FLOAT;
-	}
-	if (m_fSampleFmt[SF_PCM24]) {
-		return SF_PCM24;
-	}
-	if (m_fSampleFmt[SF_PCM16]) {
-		return SF_PCM16;
-	}
-	if (m_fSampleFmt[SF_PCM32]) {
-		return SF_PCM32;
-	}
 	return SF_PCM16;
 }
 
