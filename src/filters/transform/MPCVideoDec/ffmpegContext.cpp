@@ -290,12 +290,19 @@ static const WORD PCID_INTEL_4K [] = {
 	// Skylake
 	0x1902, // HD Graphics 510
 	0x1906, // HD Graphics 510
+	0x190B, // HD Graphics 510
 	0x1912, // HD Graphics 530
 	0x1916, // HD Graphics 520
 	0x191B, // HD Graphics 530
 	0x191D, // HD Graphics P530
 	0x191E, // HD Graphics 515
 	0x1921, // HD Graphics 520
+	0x1923, // HD Graphics 535
+	0x1926, // Iris Graphics 540
+	0x1927, // Iris Graphics 550
+	0x192B, // Iris Graphics 555
+	0x193B, // Iris Pro Graphics 580
+	0x193D, // Iris Pro Graphics P580
 	// Atom Z8000 Series
 	0x22B0, // HD Graphics
 };
