@@ -186,7 +186,7 @@ cmsUInt16Number strTo16(const char str[3])
 {
     cmsUInt16Number n = ((cmsUInt16Number) str[0] << 8) | str[1];
 
-    return _cmsAdjustEndianess16(n);
+    return n;  // Always big endian in this case
 }
 
 static
@@ -200,7 +200,7 @@ void strFrom16(char str[3], cmsUInt16Number n)
        
     } c;
 
-    c.n = _cmsAdjustEndianess16(n);
+    c.n = n;  // Always big endian in this case
 
     str[0] = c.str[0]; str[1] = c.str[1]; str[2] = 0;
 
