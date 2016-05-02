@@ -191,8 +191,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_VOXWARE_RT29},
 	// Windows Media Audio 9 Professional
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_WMAUDIO3},
-//	// Windows Media Audio Lossless (bad support in FFmpeg)
-//	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_WMAUDIO_LOSSLESS},
+	// Windows Media Audio Lossless
+	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_WMAUDIO_LOSSLESS},
 	// Windows Media Audio 1, 2
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_MSAUDIO1},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_WMAUDIO2},
