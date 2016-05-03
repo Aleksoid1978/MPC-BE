@@ -55,6 +55,7 @@ extern bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
 CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error),
 	m_ScreenSize(0, 0),
+	m_iRotation(0),
 	m_nDXSurface(1),
 	m_nCurSurface(0),
 	m_bSnapToVSync(false),
@@ -680,6 +681,8 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 		m_pVideoTextures[i] = NULL;
 		m_pVideoSurfaces[i] = NULL;
 	}
+	m_pRotateTexture = NULL;
+	m_pRotateSurface = NULL;
 
 	m_pScreenSizeTextures[0] = NULL;
 	m_pScreenSizeTextures[1] = NULL;
@@ -699,6 +702,18 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 				return hr;
 			}
 		}
+
+		if (rs.iSurfaceType == SURFACE_TEXTURE3D) {
+			UINT a = max(m_nativeVideoSize.cx, m_nativeVideoSize.cy);
+			if (FAILED(hr = m_pD3DDev->CreateTexture(
+				a, a, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &m_pRotateTexture, NULL))) {
+				return hr;
+			}
+			if (FAILED(hr = m_pRotateTexture->GetSurfaceLevel(0, &m_pRotateSurface))) {
+				return hr;
+			}
+		}
+
 		if (rs.iSurfaceType == SURFACE_TEXTURE2D) {
 			for (int i = 0; i < m_nDXSurface+2; i++) {
 				m_pVideoTextures[i] = NULL;
@@ -723,6 +738,8 @@ void CBaseAP::DeleteSurfaces()
 		m_pVideoTextures[i] = NULL;
 		m_pVideoSurfaces[i] = NULL;
 	}
+	m_pRotateTexture = NULL;
+	m_pRotateSurface = NULL;
 }
 
 UINT CBaseAP::GetAdapter(IDirect3D9* pD3D)
@@ -750,6 +767,18 @@ UINT CBaseAP::GetAdapter(IDirect3D9* pD3D)
 STDMETHODIMP CBaseAP::CreateRenderer(IUnknown** ppRenderer)
 {
 	return E_NOTIMPL;
+}
+
+STDMETHODIMP_(SIZE) CBaseAP::GetVideoSize(bool fCorrectAR)
+{
+	SIZE VideoSize = __super::GetVideoSize(fCorrectAR);
+
+	if (m_iRotation == 90 || m_iRotation == 270) {
+		std::swap(VideoSize.cx, VideoSize.cy);
+	}
+	// TODO: how to rotate the anamorphic and cropping frames?
+
+	return VideoSize;
 }
 
 bool CBaseAP::ClipToSurface(IDirect3DSurface9* pSurface, CRect& s, CRect& d)
@@ -1146,6 +1175,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 	CRenderersSettings& rs = GetRenderersSettings();
 	CRenderersData *pApp = GetRenderersData();
+	m_iRotation = 360 - pApp->m_iRotation;
 	D3DRASTER_STATUS rasterStatus;
 	REFERENCE_TIME llCurRefTime = 0;
 	REFERENCE_TIME llSyncOffset = 0;
@@ -1236,6 +1266,50 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			}
 
 			Vector dst[4];
+			if (m_iRotation) {
+				switch (m_iRotation) {
+				case 90:
+					dst[0].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
+					dst[1].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
+					dst[2].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
+					dst[3].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
+					hr = m_pD3DDev->SetRenderTarget(0, m_pRotateSurface);
+					break;
+				case 180:
+					dst[0].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
+					dst[1].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
+					dst[2].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
+					dst[3].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
+					hr = m_pD3DDev->SetRenderTarget(0, m_pVideoSurfaces[m_nDXSurface + 1]);
+					break;
+				case 270:
+					dst[0].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
+					dst[1].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
+					dst[2].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
+					dst[3].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
+					hr = m_pD3DDev->SetRenderTarget(0, m_pRotateSurface);
+					break;
+				}
+				MYD3DVERTEX<1> v[] = {
+					{ dst[0].x, dst[0].y, 0.5f, 2.0f, 0.0f, 0.0f },
+					{ dst[1].x, dst[1].y, 0.5f, 2.0f, 1.0f, 0.0f },
+					{ dst[2].x, dst[2].y, 0.5f, 2.0f, 0.0f, 1.0f },
+					{ dst[3].x, dst[3].y, 0.5f, 2.0f, 1.0f, 1.0f },
+				};
+				AdjustQuad(v, 0, 0);
+				hr = m_pD3DDev->SetTexture(0, pVideoTexture);
+				hr = m_pD3DDev->SetPixelShader(NULL);
+				hr = TextureBlt(m_pD3DDev, v, D3DTEXF_LINEAR);
+
+				if (m_iRotation == 180) {
+					pVideoTexture = m_pVideoTextures[m_nDXSurface + 1];
+				} else { // 90 and 270
+					pVideoTexture = m_pRotateTexture;
+				}
+
+				m_pD3DDev->SetRenderTarget(0, pBackBuffer);
+			}
+
 			Transform(rDstVid, dst);
 
 			// init resizer
@@ -1403,6 +1477,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	if (m_pOSDTexture) {
 		AlphaBlt(rSrcPri, rDstPri, m_pOSDTexture);
 	}
+
 	m_pD3DDev->EndScene();
 
 	if (m_pD3DDevEx) {

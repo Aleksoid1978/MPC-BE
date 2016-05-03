@@ -143,6 +143,8 @@ namespace GothSync
 
 		CComPtr<IDirect3DTexture9>	m_pVideoTextures[MAX_PICTURE_SLOTS];
 		CComPtr<IDirect3DSurface9>	m_pVideoSurfaces[MAX_PICTURE_SLOTS];
+		CComPtr<IDirect3DTexture9>	m_pRotateTexture;
+		CComPtr<IDirect3DSurface9>	m_pRotateSurface;
 		CComPtr<IDirect3DTexture9>	m_pOSDTexture;
 		CComPtr<IDirect3DSurface9>	m_pOSDSurface;
 		CComPtr<IDirect3DTexture9>	m_pScreenSizeTextures[2];
@@ -278,6 +280,7 @@ namespace GothSync
 		bool m_bNeedCheckSample;
 
 		CSize m_ScreenSize;
+		int m_iRotation;
 
 		// Display and frame rates and cycles
 		double m_dDetectedScanlineTime; // Time for one (horizontal) scan line. Extracted at stream start and used to calculate vsync time
@@ -342,6 +345,7 @@ namespace GothSync
 
 		// ISubPicAllocatorPresenter
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);
+		STDMETHODIMP_(SIZE) GetVideoSize(bool fCorrectAR = true);
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
 		STDMETHODIMP SetPixelShader(LPCSTR pSrcData, LPCSTR pTarget);
