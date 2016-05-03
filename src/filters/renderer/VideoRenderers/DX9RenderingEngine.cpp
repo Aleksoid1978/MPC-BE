@@ -142,6 +142,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_SurfaceFmt(D3DFMT_X8R8G8B8)
 	, m_bColorManagement(false)
 	, m_nDX9Resizer(RESIZER_UNKNOWN)
+	, m_iRotation(0)
 {
 	HINSTANCE hDll = GetD3X9Dll();
 	m_bD3DX = hDll != NULL;
@@ -242,6 +243,7 @@ void CDX9RenderingEngine::CleanupRenderingEngine()
 		Shader.m_pPixelShader = NULL;
 	}
 
+	m_pRotateTexture = NULL;	
 	NULL_PTR_ARRAY(m_pFrameTextures)
 	NULL_PTR_ARRAY(m_pScreenSpaceTextures);
 
@@ -259,6 +261,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 	FreeVideoSurfaces();
 
 	// Free previously allocated temporary video textures, because the native video size might have been changed!
+	m_pRotateTexture = NULL;
 	NULL_PTR_ARRAY(m_pFrameTextures);
 
 	if (settings.iSurfaceType == SURFACE_TEXTURE2D) {
@@ -359,15 +362,14 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		return S_OK;
 	}
 
-	CRenderersSettings& settings = GetRenderersSettings();
-
 	// Initialize the processing pipeline
 	bool bCustomPixelShaders;
 	bool bCustomScreenSpacePixelShaders;
 	bool bFinalPass;
 
 	int screenSpacePassCount = 0;
-	DWORD iResizer = settings.iResizer;
+	DWORD iResizer = GetRenderersSettings().iResizer;
+	m_iRotation = 360 - GetRenderersData()->m_iRotation;
 
 	if (m_bD3DX) {
 		// Final pass. Must be initialized first!
@@ -445,6 +447,12 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	// Apply the custom pixel shaders if there are any. Result: pVideoTexture
 	CComPtr<IDirect3DTexture9> pVideoTexture = m_pVideoTexture[m_nCurSurface];
 
+	D3DSURFACE_DESC videoDesc;
+	m_pVideoTexture[m_nCurSurface]->GetLevelDesc(0, &videoDesc);
+
+	int src = 1;
+	int dest = 0;
+
 	if (bCustomPixelShaders) {
 		static __int64 counter = 0;
 		static long start = clock();
@@ -457,28 +465,20 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		}
 
 #if 1
-		D3DSURFACE_DESC desc;
-		m_pVideoTexture[m_nCurSurface]->GetLevelDesc(0, &desc);
-
 		float fConstData[][4] = {
-			{(float)desc.Width, (float)desc.Height, (float)(counter++), (float)diff / CLOCKS_PER_SEC},
-			{1.0f / desc.Width, 1.0f / desc.Height, 0, 0},
+			{(float)videoDesc.Width, (float)videoDesc.Height, (float)(counter++), (float)diff / CLOCKS_PER_SEC},
+			{1.0f / videoDesc.Width, 1.0f / videoDesc.Height, 0, 0},
 		};
 #else
 		CSize VideoSize = GetVisibleVideoSize();
-
 		float fConstData[][4] = {
 			{(float)VideoSize.cx, (float)VideoSize.cy, (float)(counter++), (float)diff / CLOCKS_PER_SEC},
 			{1.0f / VideoSize.cx, 1.0f / VideoSize.cy, 0, 0},
 		};
 #endif
-
 		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 
-		int src = 1;
-		int dest = 0;
 		bool first = true;
-
 		POSITION pos = m_pCustomPixelShaders.GetHeadPosition();
 		while (pos) {
 			CComPtr<IDirect3DSurface9> pTemporarySurface;
@@ -504,8 +504,56 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		pVideoTexture = m_pFrameTextures[src];
 	}
 
-	// Resize the frame
 	Vector dst[4];
+	if (m_iRotation) {
+		CComPtr<IDirect3DSurface9> pTemporarySurface;
+		switch (m_iRotation) {
+		case 90:
+			dst[0].Set(0.0f, (float)videoDesc.Height, 0.5f);
+			dst[1].Set(0.0f, 0.0f, 0.5f);
+			dst[2].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
+			dst[3].Set((float)videoDesc.Width, 0.0f, 0.5f);
+			hr = m_pRotateTexture->GetSurfaceLevel(0, &pTemporarySurface);
+			break;
+		case 180:
+			dst[0].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
+			dst[1].Set(0.0f, (float)videoDesc.Height, 0.5f);
+			dst[2].Set((float)videoDesc.Width, 0.0f, 0.5f);
+			dst[3].Set(0.0f, 0.0f, 0.5f);
+			hr = m_pFrameTextures[dest]->GetSurfaceLevel(0, &pTemporarySurface);
+			break;
+		case 270:
+			dst[0].Set((float)videoDesc.Width, 0.0f, 0.5f);
+			dst[1].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
+			dst[2].Set(0.0f, 0.0f, 0.5f);
+			dst[3].Set(0.0f, (float)videoDesc.Height, 0.5f);
+			hr = m_pRotateTexture->GetSurfaceLevel(0, &pTemporarySurface);
+			break;
+		}
+		hr = m_pD3DDev->SetRenderTarget(0, pTemporarySurface);
+
+		MYD3DVERTEX<1> v[] = {
+			{ dst[0].x, dst[0].y, 0.5f, 2.0f, 0.0f, 0.0f },
+			{ dst[1].x, dst[1].y, 0.5f, 2.0f, 1.0f, 0.0f },
+			{ dst[2].x, dst[2].y, 0.5f, 2.0f, 0.0f, 1.0f },
+			{ dst[3].x, dst[3].y, 0.5f, 2.0f, 1.0f, 1.0f },
+		};
+		AdjustQuad(v, 0, 0);
+
+		hr = m_pD3DDev->SetTexture(0, pVideoTexture);
+		hr = m_pD3DDev->SetPixelShader(NULL);
+		hr = TextureBlt(m_pD3DDev, v, D3DTEXF_LINEAR);
+
+		if (m_iRotation == 180) {
+			pVideoTexture = m_pFrameTextures[dest];
+		}
+		else { // 90 and 270
+			pVideoTexture = m_pRotateTexture;
+		}
+	}
+
+	// Resize the frame
+
 	Transform(destRect, dst);
 
 	if (bCustomScreenSpacePixelShaders || bFinalPass) {
@@ -548,8 +596,8 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	}
 
 
-	int src = 0;
-	int dest = 1;
+	src = 0;
+	dest = 1;
 	// Apply the custom screen size pixel shaders
 	if (bCustomScreenSpacePixelShaders) {
 		static __int64 counter = 555;
@@ -913,7 +961,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDXVA(IDirect3DSurface9* pRenderTarget, c
 HRESULT CDX9RenderingEngine::InitVideoTextures()
 {
 	HRESULT hr = S_OK;
-	size_t count = min(_countof(m_pFrameTextures), m_pCustomPixelShaders.GetCount());
+	size_t count = min(_countof(m_pFrameTextures), m_pCustomPixelShaders.GetCount() + (m_iRotation == 180 ? 1 : 0));
 
 	for (size_t i = 0; i < count; i++) {
 		if (m_pFrameTextures[i] == NULL) {
@@ -933,6 +981,18 @@ HRESULT CDX9RenderingEngine::InitVideoTextures()
 	// Free unnecessary textures
 	for (size_t i = count; i < _countof(m_pFrameTextures); i++) {
 		m_pFrameTextures[i] = NULL;
+	}
+
+	if (m_iRotation == 90 || m_iRotation == 270) {
+		if (m_pRotateTexture == NULL) {
+			UINT a = max(m_nativeVideoSize.cx, m_nativeVideoSize.cy);
+			hr = m_pD3DDev->CreateTexture(
+				 a, a, 1, D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
+				 D3DPOOL_DEFAULT, &m_pRotateTexture, NULL);
+		}
+	}
+	else {
+		m_pRotateTexture = NULL;
 	}
 
 	return hr;
@@ -2045,4 +2105,18 @@ HRESULT CDX9RenderingEngine::SetCustomPixelShader(LPCSTR pSrcData, LPCSTR pTarge
 	Paint(false);
 
 	return S_OK;
+}
+
+// ISubPicAllocatorPresenter
+
+STDMETHODIMP_(SIZE) CDX9RenderingEngine::GetVideoSize(bool fCorrectAR)
+{
+	SIZE VideoSize = __super::GetVideoSize(fCorrectAR);
+
+	if (m_iRotation == 90 || m_iRotation == 270) {
+		std::swap(VideoSize.cx, VideoSize.cy);
+	}
+	// TODO: how to rotate the anamorphic and cropping frames?
+
+	return VideoSize;
 }

@@ -111,12 +111,13 @@ namespace DSObjects
 
 		CComPtr<IDirect3DTexture9>	m_pVideoTexture[MAX_VIDEO_SURFACES];
 		CComPtr<IDirect3DSurface9>	m_pVideoSurface[MAX_VIDEO_SURFACES];
+		CComPtr<IDirect3DTexture9>	m_pRotateTexture;
 		CComPtr<IDirect3DTexture9>	m_pFrameTextures[2];
 		CComPtr<IDirect3DTexture9>	m_pScreenSpaceTextures[2];
 
-		bool						m_bColorManagement;
-
-		int							m_nDX9Resizer;
+		bool	m_bColorManagement;
+		int		m_nDX9Resizer;
+		int		m_iRotation;
 
 		CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError);
 		~CDX9RenderingEngine();
@@ -225,6 +226,10 @@ namespace DSObjects
 
 		HRESULT TextureCopy(IDirect3DTexture9* pTexture);
 		bool ClipToSurface(IDirect3DSurface9* pSurface, CRect& s, CRect& d);
+
+	public:
+		// ISubPicAllocatorPresenter
+		STDMETHODIMP_(SIZE) GetVideoSize(bool fCorrectAR = true);
 	};
 
 }

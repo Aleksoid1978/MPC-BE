@@ -4198,20 +4198,21 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		m_wndEditListEditor.OpenFile(m_lastOMD->title);
 	}
 
-	m_AngleZ = 0;
-	if (m_pCAP && !m_pMVRC) {
+	if (m_pCAP || m_pMVRC) {
 		if (OpenFileData *pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.m_p)) {
 			// Rotation flag;
 			BeginEnumFilters(m_pGB, pEF, pBF) {
 				if (CComQIPtr<IPropertyBag> pPB = pBF) {
 					CComVariant var;
 					if (SUCCEEDED(pPB->Read(L"ROTATION", &var, NULL)) && var.vt == VT_BSTR) {
-						const int rotationValue = _wtoi(var.bstrVal);
-						if (rotationValue && (rotationValue % 90 == 0)) {
-							m_AngleZ = -rotationValue;
-							if (rotationValue % 180 == 90) {
-								const CSize vsize(GetVideoSize());
-								m_ZoomX = m_ZoomY = (double)vsize.cy / vsize.cx;
+						int rotation = _wtoi(var.bstrVal) % 360;
+						if (rotation && (rotation % 90 == 0)) {
+							if (rotation < 0) {
+								rotation += 360;
+							}
+							GetRenderersData()->m_iRotation = rotation;
+							if (m_pMVRC) {
+								m_pMVRC->SendCommandInt("rotate", rotation);
 							}
 						}
 						break;
@@ -7511,7 +7512,7 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 			m_PosX = m_PosY = 0.5;
 			m_AngleX = m_AngleY = m_AngleZ = 0;
 			if (m_pMVRC) {
-				m_pMVRC->SendCommandInt("rotate", 0);
+				m_pMVRC->SendCommandInt("rotate", GetRenderersData()->m_iRotation);
 			}
 			break;
 		case ID_VIEW_INCSIZE:
@@ -7693,7 +7694,7 @@ void CMainFrame::OnViewRotate(UINT nID)
 		ASSERT(rotation >= 0);
 
 		if (SUCCEEDED(hr = m_pMVRC->SendCommandInt("rotate", rotation))) {
-			m_AngleZ = (360 - rotation) % 360;
+			m_AngleZ = (360 + GetRenderersData()->m_iRotation - rotation) % 360;
 		}
 	} else if (m_pCAP) {
 		switch (nID) {
@@ -13617,6 +13618,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	SetEvent(m_hRefreshNotifyRenderThreadEvent);
 
 	m_PlaybackRate = 1.0;
+	GetRenderersData()->m_iRotation = 0;
 
 	ClearDXVAState();
 
