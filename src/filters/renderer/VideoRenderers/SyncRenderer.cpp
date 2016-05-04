@@ -1175,7 +1175,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 	CRenderersSettings& rs = GetRenderersSettings();
 	CRenderersData *pApp = GetRenderersData();
-	if (pApp->m_iRotation && (pApp->m_iRotation % 90 == 0)) {
+	if (pApp->m_iRotation) {
 		m_iRotation = 360 - pApp->m_iRotation;
 	}
 	D3DRASTER_STATUS rasterStatus;
