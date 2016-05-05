@@ -463,7 +463,7 @@ BOOL CPPageInternalFilters::OnInitDialog()
 	hdr.code		= TCN_SELCHANGE;
 	hdr.hwndFrom	= m_Tab.m_hWnd;
 
-	SendMessage (WM_NOTIFY, m_Tab.GetDlgCtrlID(), (LPARAM)&hdr);
+	SendMessage(WM_NOTIFY, m_Tab.GetDlgCtrlID(), (LPARAM)&hdr);
 
 	SetCursor(m_hWnd, IDC_BUTTON1, IDC_HAND);
 	SetCursor(m_hWnd, IDC_BUTTON2, IDC_HAND);
@@ -472,6 +472,8 @@ BOOL CPPageInternalFilters::OnInitDialog()
 	SetCursor(m_hWnd, IDC_BUTTON5, IDC_HAND);
 	SetCursor(m_hWnd, IDC_BUTTON6, IDC_HAND);
 	SetCursor(m_hWnd, IDC_BUTTON7, IDC_HAND);
+
+	m_btnVTSCfg.ShowWindow(SW_HIDE);
 
 	UpdateData(FALSE);
 
@@ -562,7 +564,7 @@ void CPPageInternalFilters::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_btnAviCfg.ShowWindow(SW_SHOW);
 			m_btnMpegCfg.ShowWindow(SW_SHOW);
 			m_btnMatroskaCfg.ShowWindow(SW_SHOW);
-			m_btnVTSCfg.ShowWindow(SW_SHOW);
+			//m_btnVTSCfg.ShowWindow(SW_SHOW);
 			m_btnVideoCfg.ShowWindow(SW_HIDE);
 			m_btnMPEG2Cfg.ShowWindow(SW_HIDE);
 			m_btnAudioCfg.ShowWindow(SW_HIDE);
@@ -580,7 +582,7 @@ void CPPageInternalFilters::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_btnAviCfg.ShowWindow(SW_HIDE);
 			m_btnMpegCfg.ShowWindow(SW_HIDE);
 			m_btnMatroskaCfg.ShowWindow(SW_HIDE);
-			m_btnVTSCfg.ShowWindow(SW_HIDE);
+			//m_btnVTSCfg.ShowWindow(SW_HIDE);
 			m_btnVideoCfg.ShowWindow(SW_SHOW);
 			m_btnMPEG2Cfg.ShowWindow(SW_SHOW);
 			m_btnAudioCfg.ShowWindow(SW_HIDE);
@@ -598,7 +600,7 @@ void CPPageInternalFilters::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_btnAviCfg.ShowWindow(SW_HIDE);
 			m_btnMpegCfg.ShowWindow(SW_HIDE);
 			m_btnMatroskaCfg.ShowWindow(SW_HIDE);
-			m_btnVTSCfg.ShowWindow(SW_HIDE);
+			//m_btnVTSCfg.ShowWindow(SW_HIDE);
 			m_btnVideoCfg.ShowWindow(SW_HIDE);
 			m_btnMPEG2Cfg.ShowWindow(SW_HIDE);
 			m_btnAudioCfg.ShowWindow(SW_SHOW);
