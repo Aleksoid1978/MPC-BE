@@ -4235,16 +4235,33 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	m_wndPlaylistBar.SetCurValid(true);
+
 	if (m_youtubeFields.title.IsEmpty()) {
 		if (CComQIPtr<IBaseFilter> pBF = FindFilter(CLSID_3DYDYoutubeSource, m_pGB)) {
 			if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
 				CComBSTR bstr;
 				if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-					m_youtubeFields.title = bstr.m_str;
-					// we do not know the format of the output stream, let it be MP4
-					m_youtubeFields.fname =  m_youtubeFields.title + L".mp4";
+					m_youtubeFields.title = bstr;
+
+					CString ext = L".mp4";
+					BeginEnumPins(pBF, pEP, pPin) {
+						PIN_DIRECTION dir;
+						if (SUCCEEDED(pPin->QueryDirection(&dir)) && dir == PINDIR_OUTPUT) {
+							AM_MEDIA_TYPE mt;
+							if (SUCCEEDED(pPin->ConnectionMediaType(&mt)) && mt.subtype != MEDIASUBTYPE_NULL) {
+								if (mt.subtype == MEDIASUBTYPE_Matroska) {
+									ext = L".webm";
+								} else if (mt.subtype == MEDIASUBTYPE_FLV) {
+									ext = L".flv";
+								}
+							}
+							break;
+						}
+					}
+					EndEnumPins;
+					
+					m_youtubeFields.fname =  m_youtubeFields.title + ext;
 					FixFilename(m_youtubeFields.fname);
-					bstr.Empty();
 				}
 			}
 		}
