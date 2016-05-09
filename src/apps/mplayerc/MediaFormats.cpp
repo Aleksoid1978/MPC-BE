@@ -248,7 +248,7 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("opus"),        ResStr(IDS_MFMT_OPUS),        _T("opus"), TAudio));
 		ADDFMT((_T("speex"),       ResStr(IDS_MFMT_SPEEX),       _T("spx"), TAudio));
 		// playlists
-		ADDFMT((_T("pls"),         ResStr(IDS_MFMT_PLS),         _T("asx m3u m3u8 pls wvx wax wmx mpcpl xspf"), TPlaylist));
+		ADDFMT((_T("pls"),         ResStr(IDS_MFMT_PLS),         _T("asx m3u m3u8 pls wpl mpcpl xspf"), TPlaylist));
 		ADDFMT((_T("bdpls"),       ResStr(IDS_MFMT_BDPLS),       _T("mpls bdmv"), TVideo)); // opens as a video file
 		ADDFMT((_T("cue"),         ResStr(IDS_MFMT_CUE),         _T("cue"), TPlaylist));
 #undef ADDFMT

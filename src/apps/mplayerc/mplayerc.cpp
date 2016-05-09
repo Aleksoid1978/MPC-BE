@@ -2069,7 +2069,8 @@ enum {
 	PLAYLIST_XSPF,
 	PLAYLIST_ASX,
 	PLAYLIST_RAM,
-	PLAYLIST_QTL
+	PLAYLIST_QTL,
+	PLAYLIST_WPL,
 };
 
 const std::wregex ref_m3u(L"(^|\\n)(?!#)([^\\n]+)");						// any lines except those that start with '#'
@@ -2078,6 +2079,7 @@ const std::wregex ref_xspf(L"<location>([^<>\\n]+)</location>");			// <location>
 const std::wregex ref_asx(L"<REF HREF[ \\t]*=[ \\t]*\"([^\"\\n]+)\"");		// <REF HREF = "..." />
 const std::wregex ref_ram(L"(^|\\n)(?!#)(file://)?([^\\n]+)");				// any lines except those that start with '#'. for local files used file://
 const std::wregex ref_qtl(L"src[ \\t]*=[ \\t]*\"([^\"\\n]+)\"");			// src="..."
+const std::wregex ref_wpl(L"<media src=\"([^\"\\n]+)\"");					// <media src="..."
 
 bool FindRedir(CUrl& src, CString ct, CString& body, CAtlList<CString>& urls, int playlist_type)
 {
@@ -2090,6 +2092,7 @@ bool FindRedir(CUrl& src, CString ct, CString& body, CAtlList<CString>& urls, in
 	case PLAYLIST_ASX: rgx = ref_asx; break;
 	case PLAYLIST_RAM: rgx = ref_ram; break;
 	case PLAYLIST_QTL: rgx = ref_qtl; break;
+	case PLAYLIST_WPL: rgx = ref_wpl; break;
 	default:
 		return false;
 	}
@@ -2163,6 +2166,7 @@ bool FindRedir(CString& fn, CString ct, CAtlList<CString>& fns, int playlist_typ
 	case PLAYLIST_ASX: rgx = ref_asx; break;
 	case PLAYLIST_RAM: rgx = ref_ram; break;
 	case PLAYLIST_QTL: rgx = ref_qtl; break;
+	case PLAYLIST_WPL: rgx = ref_wpl; break;
 	default:
 		return false;
 	}
@@ -2203,18 +2207,20 @@ static void GetContentTypeByExt(CString path, CString& ct)
 {
 	CString ext = GetFileExt(path).MakeLower();
 
-	if (ext == L".pls") {
-		ct = L"audio/x-scpls";
-	} else if (ext == L".m3u" || ext == L".m3u8") {
+	if (ext == L".m3u" || ext == L".m3u8") {
 		ct = L"audio/x-mpegurl";
+	} else if (ext == L".pls") {
+		ct = L"audio/x-scpls";
 	} else if (ext == L".xspf") {
 		ct = L"application/xspf+xml";
 	} else if (ext == L".asx") {
 		ct = L"video/x-ms-asf";
-	} else if (ext == L".qtl") {
-		ct = L"application/x-quicktimeplayer";
 	} else if (ext == L".ram") {
 		ct = L"audio/x-pn-realaudio";
+	} else if (ext == L".qtl") {
+		ct = L"application/x-quicktimeplayer";
+	} else if (ext == L".wpl") {
+		ct = L"application/vnd.ms-wpl";
 	} else if (ext == L".mpcpl") {
 		ct = L"application/x-mpc-playlist";
 	} else if (ext == L".bdmv") {
@@ -2345,6 +2351,8 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 			playlist_type = PLAYLIST_RAM;
 		} else if (ct == L"application/x-quicktimeplayer") {
 			playlist_type = PLAYLIST_QTL;
+		} else if (ct == L"application/vnd.ms-wpl") {
+			playlist_type = PLAYLIST_WPL;
 		}
 
 		if (!body.IsEmpty()) {
