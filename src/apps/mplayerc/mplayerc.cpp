@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include <thread>
+#include <regex>
 #include "AboutDlg.h"
 #include <Tlhelp32.h>
 #include "MainFrm.h"
@@ -40,7 +41,6 @@
 #include <afxsock.h>
 #include <atlsync.h>
 #include <atlutil.h>
-#include <atlrx.h>
 #include "UpdateChecker.h"
 
 const LanguageResource CMPlayerCApp::languageResources[] = {
@@ -2063,80 +2063,87 @@ void SetAudioRenderer(int AudioDevNo)
 	}
 }
 
-typedef CAtlRegExp<CAtlRECharTraits> CAtlRegExpT;
-typedef CAtlREMatchContext<CAtlRECharTraits> CAtlREMatchContextT;
+enum {
+	PLAYLIST_M3U,
+	PLAYLIST_PLS,
+	PLAYLIST_XSPF,
+	PLAYLIST_ASX,
+	PLAYLIST_RAM,
+	PLAYLIST_QTL
+};
 
-bool FindRedir(CUrl& src, CString ct, CString& body, CAtlList<CString>& urls, CAutoPtrList<CAtlRegExpT>& res)
+const std::wregex ref_m3u(L"(^|\\n)(?!#)([^\\n]+)");						// any lines except those that start with '#'
+const std::wregex ref_pls(L"(^|\\n)File\\d+[ \\t]*=[ \\t]*\"?([^\\n\"]+)");	// File1=...
+const std::wregex ref_xspf(L"<location>([^<>\\n]+)</location>");			// <location>...</location>
+const std::wregex ref_asx(L"<REF HREF[ \\t]*=[ \\t]*\"([^\"\\n]+)\"");		// <REF HREF = "..." />
+const std::wregex ref_ram(L"(^|\\n)(?!#)(file://)?([^\\n]+)");				// any lines except those that start with '#'. for local files used file://
+const std::wregex ref_qtl(L"src[ \\t]*=[ \\t]*\"([^\"\\n]+)\"");			// src="..."
+
+bool FindRedir(CUrl& src, CString ct, CString& body, CAtlList<CString>& urls, int playlist_type)
 {
-	if (body[body.GetLength() - 1] != '\n') {
-		body += '\n';
+	std::wregex rgx;
+
+	switch (playlist_type) {
+	case PLAYLIST_M3U: rgx = ref_m3u; break;
+	case PLAYLIST_PLS: rgx = ref_pls; break;
+	case PLAYLIST_XSPF:rgx = ref_xspf; break;
+	case PLAYLIST_ASX: rgx = ref_asx; break;
+	case PLAYLIST_RAM: rgx = ref_ram; break;
+	case PLAYLIST_QTL: rgx = ref_qtl; break;
+	default:
+		return false;
 	}
 
-	POSITION pos = res.GetHeadPosition();
-	while (pos) {
-		CAtlRegExpT* re = res.GetNext(pos);
+	std::wcmatch match;
+	const wchar_t* start = body.GetBuffer();
 
-		CAtlREMatchContextT mc;
-		const CAtlREMatchContextT::RECHAR* s = (LPCTSTR)body;
-		const CAtlREMatchContextT::RECHAR* e = NULL;
-		for (; s && re->Match(s, &mc, &e); s = e) {
-			const CAtlREMatchContextT::RECHAR* szStart = 0;
-			const CAtlREMatchContextT::RECHAR* szEnd = 0;
-			mc.GetMatch(0, &szStart, &szEnd);
+	while (std::regex_search(start, match, rgx) && match.size() > 1) {
+		start = match[0].second;
 
-			CString url;
-			url.Format(L"%.*s", szEnd - szStart, szStart);
-			url.Trim();
+		size_t k = match.size() - 1;
+		CString url = CString(match[k].first, match[k].length());
+		url.Trim();
 
-			if (url.CompareNoCase(L"asf path") == 0) {
-				continue;
+		CUrl dst;
+		dst.CrackUrl(url);
+
+		if (url.Find(L"://") < 0) {
+			DWORD dwUrlLen = src.GetUrlLength() + 1;
+			TCHAR* szUrl = new TCHAR[dwUrlLen];
+
+			// Retrieve the contents of the CUrl object
+			src.CreateUrl(szUrl, &dwUrlLen);
+			CString path(szUrl);
+			delete[] szUrl;
+
+			int pos = path.ReverseFind('/');
+			if (pos > 0) {
+				path.Delete(pos + 1, path.GetLength() - pos - 1);
 			}
 
-			if (url.Find(L"EXTM3U") == 0 || url.Find('#') == 0) {
-				continue;
+			if (url[0] == '/') {
+				path.Delete(path.GetLength() - 1, 1);
 			}
 
-			CUrl dst;
+			url = path + url;
 			dst.CrackUrl(url);
+		}
 
-			if (url.Find(L"://") < 0) {
-				DWORD dwUrlLen = src.GetUrlLength() + 1;
-				TCHAR* szUrl = new TCHAR[dwUrlLen];
-
-				// Retrieve the contents of the CUrl object
-				src.CreateUrl(szUrl, &dwUrlLen);
-				CString path(szUrl);
-				delete[] szUrl;
-
-				int pos = path.ReverseFind('/');
-				if (pos > 0) {
-					path.Delete(pos + 1, path.GetLength() - pos - 1);
-				}
-
-				if (url[0] == '/') {
-					path.Delete(path.GetLength() - 1, 1);
-				}
-
-				url = path + url;
-				dst.CrackUrl(url);
-			}
-
-			if (_tcsicmp(src.GetSchemeName(), dst.GetSchemeName())
-					|| _tcsicmp(src.GetHostName(), dst.GetHostName())
-					|| _tcsicmp(src.GetUrlPath(), dst.GetUrlPath())) {
-				urls.AddTail(url);
-			} else {
-				// recursive
-				urls.RemoveAll();
-				break;
-			}
+		if (_tcsicmp(src.GetSchemeName(), dst.GetSchemeName())
+				|| _tcsicmp(src.GetHostName(), dst.GetHostName())
+				|| _tcsicmp(src.GetUrlPath(), dst.GetUrlPath())) {
+			urls.AddTail(url);
+		} else {
+			// recursive
+			urls.RemoveAll();
+			break;
 		}
 	}
 
 	return urls.GetCount() > 0;
 }
 
-bool FindRedir(CString& fn, CString ct, CAtlList<CString>& fns, CAutoPtrList<CAtlRegExpT>& res)
+bool FindRedir(CString& fn, CString ct, CAtlList<CString>& fns, int playlist_type)
 {
 	CString body;
 
@@ -2147,48 +2154,46 @@ bool FindRedir(CString& fn, CString ct, CAtlList<CString>& fns, CAutoPtrList<CAt
 
 	CString dir = fn.Left(max(fn.ReverseFind('/'), fn.ReverseFind('\\')) + 1);
 
-	POSITION pos = res.GetHeadPosition();
-	while (pos) {
-		CAtlRegExpT* re = res.GetNext(pos);
+	std::wregex rgx;
 
-		CAtlREMatchContextT mc;
-		const CAtlREMatchContextT::RECHAR* s = (LPCTSTR)body;
-		const CAtlREMatchContextT::RECHAR* e = NULL;
-		for (; s && re->Match(s, &mc, &e); s = e) {
-			const CAtlREMatchContextT::RECHAR* szStart = 0;
-			const CAtlREMatchContextT::RECHAR* szEnd = 0;
-			mc.GetMatch(0, &szStart, &szEnd);
+	switch (playlist_type) {
+	case PLAYLIST_M3U: rgx = ref_m3u; break;
+	case PLAYLIST_PLS: rgx = ref_pls; break;
+	case PLAYLIST_XSPF:rgx = ref_xspf; break;
+	case PLAYLIST_ASX: rgx = ref_asx; break;
+	case PLAYLIST_RAM: rgx = ref_ram; break;
+	case PLAYLIST_QTL: rgx = ref_qtl; break;
+	default:
+		return false;
+	}
 
-			CString fn2;
-			fn2.Format(L"%.*s", szEnd - szStart, szStart);
-			fn2.Trim();
+	std::wcmatch match;
+	const wchar_t* start = body.GetBuffer();
 
-			if (!fn2.CompareNoCase(L"asf path")) {
-				continue;
-			}
+	while (std::regex_search(start, match, rgx) && match.size() > 1) {
+		start = match[0].second;
 
-			if (fn2.Find(L"EXTM3U") == 0 || fn2.Find('#') == 0) {
-				continue;
-			}
+		size_t k = match.size() - 1;
+		CString fn2 = CString(match[k].first, match[k].length());
+		fn2.Trim();
 
-			if (fn2.Find(':') < 0 && fn2.Find(L"\\\\") != 0 && fn2.Find(L"//") != 0) {
-				CPath p;
-				p.Combine(dir, fn2);
-				fn2 = (LPCTSTR)p;
-			}
-
-			CString fntmp = fn2;
-			fntmp.MakeLower();
-			if (fn2.Find(L"file:///") == 0) {
-				fn2 = fn2.Mid(8, fn2.GetLength() - 8);
-			}
-
-			if (!fn2.CompareNoCase(fn)) {
-				continue;
-			}
-
-			fns.AddTail(fn2);
+		if (fn2.Find(':') < 0 && fn2.Find(L"\\\\") != 0 && fn2.Find(L"//") != 0) {
+			CPath p;
+			p.Combine(dir, fn2);
+			fn2 = (LPCTSTR)p;
 		}
+
+		CString fntmp = fn2;
+		fntmp.MakeLower();
+		if (fn2.Find(L"file:///") == 0) {
+			fn2 = fn2.Mid(8, fn2.GetLength() - 8);
+		}
+
+		if (!fn2.CompareNoCase(fn)) {
+			continue;
+		}
+
+		fns.AddTail(fn2);
 	}
 
 	return fns.GetCount() > 0;
@@ -2326,52 +2331,25 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 	}
 
 	if (redir && !ct.IsEmpty()) {
-		CAutoPtrList<CAtlRegExpT> res;
-		CAutoPtr<CAtlRegExpT> re;
+		int playlist_type = -1;
 
-		if (ct == L"audio/x-scpls") { // PLS
-			// File1=...\n
-			re.Attach(DNew CAtlRegExp<>());
-			if (re && REPARSE_ERROR_OK == re->Parse(L"file\\z\\b*=\\b*[\"]*{[^\n\"]+}", FALSE)) {
-				res.AddTail(re);
-			}
-		} else if (ct == L"audio/x-mpegurl" && fn.Find(L"://") > 0) { // M3U
-			// #comment
-			// ...
-			re.Attach(DNew CAtlRegExp<>());
-			if (re && REPARSE_ERROR_OK == re->Parse(L"{[^#][^\n]+}", FALSE)) {
-				res.AddTail(re);
-			}
+		if (ct == L"audio/x-mpegurl" && fn.Find(L"://") > 0) {
+			playlist_type = PLAYLIST_M3U;
+		} else if (ct == L"audio/x-scpls") {
+			playlist_type = PLAYLIST_PLS;
 		} else if (ct == L"application/xspf+xml") {
-			// <location>...</location>
-			re.Attach(DNew CAtlRegExp<>());
-			if (re && REPARSE_ERROR_OK == re->Parse(L"<location>{[^<]+}", FALSE)) {
-				res.AddTail(re);
-			}
-		} else if (ct == L"video/x-ms-asf") { // ASX
-			// ...://..."/>
-			re.Attach(DNew CAtlRegExpT());
-			if (re && REPARSE_ERROR_OK == re->Parse(L"{[a-zA-Z]+://[^\n\">]*}", FALSE)) {
-				res.AddTail(re);
-			}
-			// Ref#n= ...://...\n
-			re.Attach(DNew CAtlRegExpT());
-			if (re && REPARSE_ERROR_OK == re->Parse(L"Ref\\z\\b*=\\b*[\"]*{[a-zA-Z]+://[^\n\"]+}", FALSE)) {
-				res.AddTail(re);
-			}
-		} else if (ct == L"audio/x-pn-realaudio") { // RAM
-			// rtsp://...
-			re.Attach(DNew CAtlRegExp<>());
-			if (re && REPARSE_ERROR_OK == re->Parse(L"{rtsp://[^\n]+}", FALSE)) {
-				res.AddTail(re);
-			}
+			playlist_type = PLAYLIST_XSPF;
+		} else if (ct == L"video/x-ms-asf") {
+			playlist_type = PLAYLIST_ASX;
+		} else if (ct == L"audio/x-pn-realaudio") {
+			playlist_type = PLAYLIST_RAM;
 		}
 
 		if (!body.IsEmpty()) {
 			if (fn.Find(L"://") >= 0) {
-				FindRedir(url, ct, body, *redir, res);
+				FindRedir(url, ct, body, *redir, playlist_type);
 			} else {
-				FindRedir(fn, ct, *redir, res);
+				FindRedir(fn, ct, *redir, playlist_type);
 			}
 		}
 	}
