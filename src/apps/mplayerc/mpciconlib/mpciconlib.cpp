@@ -259,9 +259,7 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 			|| _tcsicmp(ext, _T(".mpcpl")) == 0
 			|| _tcsicmp(ext, _T(".mpls")) == 0
 			|| _tcsicmp(ext, _T(".pls")) == 0
-			|| _tcsicmp(ext, _T(".wax")) == 0
-			|| _tcsicmp(ext, _T(".wmx")) == 0
-			|| _tcsicmp(ext, _T(".wvx")) == 0
+			|| _tcsicmp(ext, _T(".wpl")) == 0
 			|| _tcsicmp(ext, _T(".xspf")) == 0
 			|| _tcsicmp(ext, _T(".cue")) == 0) {
 		iconindex = IDI_PLAYLIST_ICON;
