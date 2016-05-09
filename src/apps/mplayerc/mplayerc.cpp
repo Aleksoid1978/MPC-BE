@@ -2343,6 +2343,8 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 			playlist_type = PLAYLIST_ASX;
 		} else if (ct == L"audio/x-pn-realaudio") {
 			playlist_type = PLAYLIST_RAM;
+		} else if (ct == L"application/x-quicktimeplayer") {
+			playlist_type = PLAYLIST_QTL;
 		}
 
 		if (!body.IsEmpty()) {
