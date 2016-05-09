@@ -513,7 +513,7 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 END
 
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 10
-6		"Use the built-in web page parser"
+6		"Використовувати вбудований парсер веб-сторінок"
 7		"Вибір формату перегляду:"
 9		"Завантажити список відтворення"
 END
