@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2001,2002,2003,2004,2005,2006,2007,2008,2009  Josh Coalson
+ * Copyright (C) 2001-2009  Josh Coalson
+ * Copyright (C) 2011-2014  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -499,7 +500,7 @@ FLAC_API FLAC__MetadataType FLAC__metadata_simple_iterator_get_block_type(const 
  * \retval unsigned
  *    The length of the metadata block at the current iterator position.
  *    The is same length as that in the
- *    <a href="http://flac.sourceforge.net/format.html#metadata_block_header">metadata block header</a>,
+ *    <a href="http://xiph.org/flac/format.html#metadata_block_header">metadata block header</a>,
  *    i.e. the length of the metadata body that follows the header.
  */
 FLAC_API unsigned FLAC__metadata_simple_iterator_get_block_length(const FLAC__Metadata_SimpleIterator *iterator);
@@ -666,7 +667,7 @@ FLAC_API FLAC__bool FLAC__metadata_simple_iterator_delete_block(FLAC__Metadata_S
  *
  * - Create a new chain using FLAC__metadata_chain_new().  A chain is a
  *   linked list of FLAC metadata blocks.
- * - Read all metadata into the the chain from a FLAC file using
+ * - Read all metadata into the chain from a FLAC file using
  *   FLAC__metadata_chain_read() or FLAC__metadata_chain_read_ogg() and
  *   check the status.
  * - Optionally, consolidate the padding using
@@ -763,7 +764,7 @@ typedef enum {
 	FLAC__METADATA_CHAIN_STATUS_READ_WRITE_MISMATCH,
 	/**< FLAC__metadata_chain_write() was called on a chain read by
 	 *   FLAC__metadata_chain_read_with_callbacks()/FLAC__metadata_chain_read_ogg_with_callbacks(),
-	 *   or 
+	 *   or
 	 *   FLAC__metadata_chain_write_with_callbacks()/FLAC__metadata_chain_write_with_callbacks_and_tempfile()
 	 *   was called on a chain read by
 	 *   FLAC__metadata_chain_read()/FLAC__metadata_chain_read_ogg().
@@ -1691,7 +1692,7 @@ FLAC_API FLAC__bool FLAC__metadata_object_vorbiscomment_append_comment(FLAC__Str
  *  For convenience, a trailing NUL is added to the entry if it doesn't have
  *  one already.
  *
- *  Depending on the the value of \a all, either all or just the first comment
+ *  Depending on the value of \a all, either all or just the first comment
  *  whose field name(s) match the given entry's name will be replaced by the
  *  given entry.  If no comments match, \a entry will simply be appended.
  *

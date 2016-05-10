@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007,2008,2009  Josh Coalson
+ * Copyright (C) 2000-2009  Josh Coalson
+ * Copyright (C) 2011-2014  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,7 +30,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -45,15 +46,32 @@
 
 /* Things should be fastest when this matches the machine word size */
 /* WATCHOUT: if you change this you must also change the following #defines down to SWAP_BE_WORD_TO_HOST below to match */
-/* WATCHOUT: there are a few places where the code will not work unless uint32_t is >= 32 bits wide */
-#define FLAC__BYTES_PER_WORD 4
+/* WATCHOUT: there are a few places where the code will not work unless bwword is >= 32 bits wide */
+
+#if (ENABLE_64_BIT_WORDS == 0)
+
+typedef FLAC__uint32 bwword;
+#define FLAC__BYTES_PER_WORD 4		/* sizeof bwword */
 #define FLAC__BITS_PER_WORD 32
-#define FLAC__WORD_ALL_ONES ((FLAC__uint32)0xffffffff)
-/* SWAP_BE_WORD_TO_HOST swaps bytes in a uint32_t (which is always big-endian) if necessary to match host byte order */
+/* SWAP_BE_WORD_TO_HOST swaps bytes in a bwword (which is always big-endian) if necessary to match host byte order */
 #if WORDS_BIGENDIAN
 #define SWAP_BE_WORD_TO_HOST(x) (x)
 #else
 #define SWAP_BE_WORD_TO_HOST(x) ENDSWAP_32(x)
+#endif
+
+#else
+
+typedef FLAC__uint64 bwword;
+#define FLAC__BYTES_PER_WORD 8		/* sizeof bwword */
+#define FLAC__BITS_PER_WORD 64
+/* SWAP_BE_WORD_TO_HOST swaps bytes in a bwword (which is always big-endian) if necessary to match host byte order */
+#if WORDS_BIGENDIAN
+#define SWAP_BE_WORD_TO_HOST(x) (x)
+#else
+#define SWAP_BE_WORD_TO_HOST(x) ENDSWAP_64(x)
+#endif
+
 #endif
 
 /*
@@ -62,26 +80,29 @@
  * a frame or metadata block, then write that out and clear the buffer for the
  * next one.
  */
-static const unsigned FLAC__BITWRITER_DEFAULT_CAPACITY = 32768u / sizeof(uint32_t); /* size in words */
+static const unsigned FLAC__BITWRITER_DEFAULT_CAPACITY = 32768u / sizeof(bwword); /* size in words */
 /* When growing, increment 4K at a time */
-static const unsigned FLAC__BITWRITER_DEFAULT_INCREMENT = 4096u / sizeof(uint32_t); /* size in words */
+static const unsigned FLAC__BITWRITER_DEFAULT_INCREMENT = 4096u / sizeof(bwword); /* size in words */
 
 #define FLAC__WORDS_TO_BITS(words) ((words) * FLAC__BITS_PER_WORD)
 #define FLAC__TOTAL_BITS(bw) (FLAC__WORDS_TO_BITS((bw)->words) + (bw)->bits)
 
 struct FLAC__BitWriter {
-	uint32_t *buffer;
-	uint32_t accum; /* accumulator; bits are right-justified; when full, accum is appended to buffer */
+	bwword *buffer;
+	bwword accum; /* accumulator; bits are right-justified; when full, accum is appended to buffer */
 	unsigned capacity; /* capacity of buffer in words */
 	unsigned words; /* # of complete words in buffer */
 	unsigned bits; /* # of used bits in accum */
 };
 
 /* * WATCHOUT: The current implementation only grows the buffer. */
-static FLAC__bool bitwriter_grow_(FLAC__BitWriter *bw, unsigned bits_to_add)
+#ifndef __SUNPRO_C
+static
+#endif
+FLAC__bool bitwriter_grow_(FLAC__BitWriter *bw, unsigned bits_to_add)
 {
 	unsigned new_capacity;
-	uint32_t *new_buffer;
+	bwword *new_buffer;
 
 	FLAC__ASSERT(0 != bw);
 	FLAC__ASSERT(0 != bw->buffer);
@@ -103,7 +124,7 @@ static FLAC__bool bitwriter_grow_(FLAC__BitWriter *bw, unsigned bits_to_add)
 	FLAC__ASSERT(new_capacity > bw->capacity);
 	FLAC__ASSERT(new_capacity >= bw->words + ((bw->bits + bits_to_add + FLAC__BITS_PER_WORD - 1) / FLAC__BITS_PER_WORD));
 
-	new_buffer = safe_realloc_mul_2op_(bw->buffer, sizeof(uint32_t), /*times*/new_capacity);
+	new_buffer = safe_realloc_mul_2op_(bw->buffer, sizeof(bwword), /*times*/new_capacity);
 	if(new_buffer == 0)
 		return false;
 	bw->buffer = new_buffer;
@@ -145,7 +166,7 @@ FLAC__bool FLAC__bitwriter_init(FLAC__BitWriter *bw)
 
 	bw->words = bw->bits = 0;
 	bw->capacity = FLAC__BITWRITER_DEFAULT_CAPACITY;
-	bw->buffer = malloc(sizeof(uint32_t) * bw->capacity);
+	bw->buffer = malloc(sizeof(bwword) * bw->capacity);
 	if(bw->buffer == 0)
 		return false;
 
@@ -180,13 +201,13 @@ void FLAC__bitwriter_dump(const FLAC__BitWriter *bw, FILE *out)
 		for(i = 0; i < bw->words; i++) {
 			fprintf(out, "%08X: ", i);
 			for(j = 0; j < FLAC__BITS_PER_WORD; j++)
-				fprintf(out, "%01u", bw->buffer[i] & (1 << (FLAC__BITS_PER_WORD-j-1)) ? 1:0);
+				fprintf(out, "%01u", bw->buffer[i] & ((bwword)1 << (FLAC__BITS_PER_WORD-j-1)) ? 1:0);
 			fprintf(out, "\n");
 		}
 		if(bw->bits > 0) {
 			fprintf(out, "%08X: ", i);
 			for(j = 0; j < bw->bits; j++)
-				fprintf(out, "%01u", bw->accum & (1 << (bw->bits-j-1)) ? 1:0);
+				fprintf(out, "%01u", bw->accum & ((bwword)1 << (bw->bits-j-1)) ? 1:0);
 			fprintf(out, "\n");
 		}
 	}
@@ -298,19 +319,23 @@ inline FLAC__bool FLAC__bitwriter_write_zeroes(FLAC__BitWriter *bw, unsigned bit
 	return true;
 }
 
-inline FLAC__bool FLAC__bitwriter_write_raw_uint32(FLAC__BitWriter *bw, FLAC__uint32 val, unsigned bits)
+static inline FLAC__bool FLAC__bitwriter_write_raw_uint32_nocheck(FLAC__BitWriter *bw, FLAC__uint32 val, unsigned bits)
 {
 	register unsigned left;
 
 	/* WATCHOUT: code does not work with <32bit words; we can make things much faster with this assertion */
 	FLAC__ASSERT(FLAC__BITS_PER_WORD >= 32);
 
-	FLAC__ASSERT(0 != bw);
-	FLAC__ASSERT(0 != bw->buffer);
+	if(bw == 0 || bw->buffer == 0)
+		return false;
 
-	FLAC__ASSERT(bits <= 32);
+	if (bits > 32)
+		return false;
+
 	if(bits == 0)
 		return true;
+
+	FLAC__ASSERT((bits == 32) || (val>>bits == 0));
 
 	/* slightly pessimistic size check but faster than "<= bw->words + (bw->bits+bits+FLAC__BITS_PER_WORD-1)/FLAC__BITS_PER_WORD" */
 	if(bw->capacity <= bw->words + bits && !bitwriter_grow_(bw, bits))
@@ -326,15 +351,22 @@ inline FLAC__bool FLAC__bitwriter_write_raw_uint32(FLAC__BitWriter *bw, FLAC__ui
 		bw->accum <<= left;
 		bw->accum |= val >> (bw->bits = bits - left);
 		bw->buffer[bw->words++] = SWAP_BE_WORD_TO_HOST(bw->accum);
-		bw->accum = val;
+		bw->accum = val; /* unused top bits can contain garbage */
 	}
-	else {
-		bw->accum = val;
-		bw->bits = 0;
-		bw->buffer[bw->words++] = SWAP_BE_WORD_TO_HOST(val);
+	else { /* at this point bits == FLAC__BITS_PER_WORD == 32  and  bw->bits == 0 */
+		bw->buffer[bw->words++] = SWAP_BE_WORD_TO_HOST((bwword)val);
 	}
 
 	return true;
+}
+
+inline FLAC__bool FLAC__bitwriter_write_raw_uint32(FLAC__BitWriter *bw, FLAC__uint32 val, unsigned bits)
+{
+	/* check that unused bits are unset */
+	if((bits < 32) && (val>>bits != 0))
+		return false;
+
+	return FLAC__bitwriter_write_raw_uint32_nocheck(bw, val, bits);
 }
 
 inline FLAC__bool FLAC__bitwriter_write_raw_int32(FLAC__BitWriter *bw, FLAC__int32 val, unsigned bits)
@@ -343,7 +375,7 @@ inline FLAC__bool FLAC__bitwriter_write_raw_int32(FLAC__BitWriter *bw, FLAC__int
 	if(bits < 32)
 		val &= (~(0xffffffff << bits));
 
-	return FLAC__bitwriter_write_raw_uint32(bw, (FLAC__uint32)val, bits);
+	return FLAC__bitwriter_write_raw_uint32_nocheck(bw, (FLAC__uint32)val, bits);
 }
 
 inline FLAC__bool FLAC__bitwriter_write_raw_uint64(FLAC__BitWriter *bw, FLAC__uint64 val, unsigned bits)
@@ -352,7 +384,7 @@ inline FLAC__bool FLAC__bitwriter_write_raw_uint64(FLAC__BitWriter *bw, FLAC__ui
 	if(bits > 32) {
 		return
 			FLAC__bitwriter_write_raw_uint32(bw, (FLAC__uint32)(val>>32), bits-32) &&
-			FLAC__bitwriter_write_raw_uint32(bw, (FLAC__uint32)val, 32);
+			FLAC__bitwriter_write_raw_uint32_nocheck(bw, (FLAC__uint32)val, 32);
 	}
 	else
 		return FLAC__bitwriter_write_raw_uint32(bw, (FLAC__uint32)val, bits);
@@ -362,13 +394,13 @@ inline FLAC__bool FLAC__bitwriter_write_raw_uint32_little_endian(FLAC__BitWriter
 {
 	/* this doesn't need to be that fast as currently it is only used for vorbis comments */
 
-	if(!FLAC__bitwriter_write_raw_uint32(bw, val & 0xff, 8))
+	if(!FLAC__bitwriter_write_raw_uint32_nocheck(bw, val & 0xff, 8))
 		return false;
-	if(!FLAC__bitwriter_write_raw_uint32(bw, (val>>8) & 0xff, 8))
+	if(!FLAC__bitwriter_write_raw_uint32_nocheck(bw, (val>>8) & 0xff, 8))
 		return false;
-	if(!FLAC__bitwriter_write_raw_uint32(bw, (val>>16) & 0xff, 8))
+	if(!FLAC__bitwriter_write_raw_uint32_nocheck(bw, (val>>16) & 0xff, 8))
 		return false;
-	if(!FLAC__bitwriter_write_raw_uint32(bw, val>>24, 8))
+	if(!FLAC__bitwriter_write_raw_uint32_nocheck(bw, val>>24, 8))
 		return false;
 
 	return true;
@@ -380,7 +412,7 @@ inline FLAC__bool FLAC__bitwriter_write_byte_block(FLAC__BitWriter *bw, const FL
 
 	/* this could be faster but currently we don't need it to be since it's only used for writing metadata */
 	for(i = 0; i < nvals; i++) {
-		if(!FLAC__bitwriter_write_raw_uint32(bw, (FLAC__uint32)(vals[i]), 8))
+		if(!FLAC__bitwriter_write_raw_uint32_nocheck(bw, (FLAC__uint32)(vals[i]), 8))
 			return false;
 	}
 
@@ -390,21 +422,23 @@ inline FLAC__bool FLAC__bitwriter_write_byte_block(FLAC__BitWriter *bw, const FL
 FLAC__bool FLAC__bitwriter_write_unary_unsigned(FLAC__BitWriter *bw, unsigned val)
 {
 	if(val < 32)
-		return FLAC__bitwriter_write_raw_uint32(bw, 1, ++val);
+		return FLAC__bitwriter_write_raw_uint32_nocheck(bw, 1, ++val);
 	else
 		return
 			FLAC__bitwriter_write_zeroes(bw, val) &&
-			FLAC__bitwriter_write_raw_uint32(bw, 1, 1);
+			FLAC__bitwriter_write_raw_uint32_nocheck(bw, 1, 1);
 }
 
 unsigned FLAC__bitwriter_rice_bits(FLAC__int32 val, unsigned parameter)
 {
 	FLAC__uint32 uval;
 
-	FLAC__ASSERT(parameter < sizeof(unsigned)*8);
+	FLAC__ASSERT(parameter < 32);
 
 	/* fold signed to unsigned; actual formula is: negative(v)? -2v-1 : 2v */
-	uval = (val<<1) ^ (val>>31);
+	uval = val;
+	uval <<= 1;
+	uval ^= (val>>31);
 
 	return 1 + parameter + (uval >> parameter);
 }
@@ -480,10 +514,12 @@ FLAC__bool FLAC__bitwriter_write_rice_signed(FLAC__BitWriter *bw, FLAC__int32 va
 
 	FLAC__ASSERT(0 != bw);
 	FLAC__ASSERT(0 != bw->buffer);
-	FLAC__ASSERT(parameter < 8*sizeof(uval));
+	FLAC__ASSERT(parameter < 32);
 
 	/* fold signed to unsigned; actual formula is: negative(v)? -2v-1 : 2v */
-	uval = (val<<1) ^ (val>>31);
+	uval = val;
+	uval <<= 1;
+	uval ^= (val>>31);
 
 	msbs = uval >> parameter;
 	interesting_bits = 1 + parameter;
@@ -501,60 +537,40 @@ FLAC__bool FLAC__bitwriter_write_rice_signed(FLAC__BitWriter *bw, FLAC__int32 va
 
 FLAC__bool FLAC__bitwriter_write_rice_signed_block(FLAC__BitWriter *bw, const FLAC__int32 *vals, unsigned nvals, unsigned parameter)
 {
-	const FLAC__uint32 mask1 = FLAC__WORD_ALL_ONES << parameter; /* we val|=mask1 to set the stop bit above it... */
-	const FLAC__uint32 mask2 = FLAC__WORD_ALL_ONES >> (31-parameter); /* ...then mask off the bits above the stop bit with val&=mask2*/
+	const FLAC__uint32 mask1 = (FLAC__uint32)0xffffffff << parameter; /* we val|=mask1 to set the stop bit above it... */
+	const FLAC__uint32 mask2 = (FLAC__uint32)0xffffffff >> (31-parameter); /* ...then mask off the bits above the stop bit with val&=mask2 */
 	FLAC__uint32 uval;
 	unsigned left;
 	const unsigned lsbits = 1 + parameter;
-	unsigned msbits;
+	unsigned msbits, total_bits;
 
 	FLAC__ASSERT(0 != bw);
 	FLAC__ASSERT(0 != bw->buffer);
-	FLAC__ASSERT(parameter < 8*sizeof(uint32_t)-1);
+	FLAC__ASSERT(parameter < 31);
 	/* WATCHOUT: code does not work with <32bit words; we can make things much faster with this assertion */
 	FLAC__ASSERT(FLAC__BITS_PER_WORD >= 32);
 
 	while(nvals) {
 		/* fold signed to unsigned; actual formula is: negative(v)? -2v-1 : 2v */
-		uval = (*vals<<1) ^ (*vals>>31);
+		uval = *vals;
+		uval <<= 1;
+		uval ^= (*vals>>31);
 
 		msbits = uval >> parameter;
+		total_bits = lsbits + msbits;
 
-#if 0 /* OPT: can remove this special case if it doesn't make up for the extra compare (doesn't make a statistically significant difference with msvc or gcc/x86) */
-		if(bw->bits && bw->bits + msbits + lsbits <= FLAC__BITS_PER_WORD) { /* i.e. if the whole thing fits in the current uint32_t */
-			/* ^^^ if bw->bits is 0 then we may have filled the buffer and have no free uint32_t to work in */
-			bw->bits = bw->bits + msbits + lsbits;
+		if(bw->bits && bw->bits + total_bits < FLAC__BITS_PER_WORD) { /* i.e. if the whole thing fits in the current bwword */
+			/* ^^^ if bw->bits is 0 then we may have filled the buffer and have no free bwword to work in */
+			bw->bits += total_bits;
 			uval |= mask1; /* set stop bit */
 			uval &= mask2; /* mask off unused top bits */
-			/* NOT: bw->accum <<= msbits + lsbits because msbits+lsbits could be 32, then the shift would be a NOP */
-			bw->accum <<= msbits;
-			bw->accum <<= lsbits;
-			bw->accum |= uval;
-			if(bw->bits == FLAC__BITS_PER_WORD) {
-				bw->buffer[bw->words++] = SWAP_BE_WORD_TO_HOST(bw->accum);
-				bw->bits = 0;
-				/* burying the capacity check down here means we have to grow the buffer a little if there are more vals to do */
-				if(bw->capacity <= bw->words && nvals > 1 && !bitwriter_grow_(bw, 1)) {
-					FLAC__ASSERT(bw->capacity == bw->words);
-					return false;
-				}
-			}
-		}
-		else {
-#elif 1 /*@@@@@@ OPT: try this version with MSVC6 to see if better, not much difference for gcc-4 */
-		if(bw->bits && bw->bits + msbits + lsbits < FLAC__BITS_PER_WORD) { /* i.e. if the whole thing fits in the current uint32_t */
-			/* ^^^ if bw->bits is 0 then we may have filled the buffer and have no free uint32_t to work in */
-			bw->bits = bw->bits + msbits + lsbits;
-			uval |= mask1; /* set stop bit */
-			uval &= mask2; /* mask off unused top bits */
-			bw->accum <<= msbits + lsbits;
+			bw->accum <<= total_bits;
 			bw->accum |= uval;
 		}
 		else {
-#endif
 			/* slightly pessimistic size check but faster than "<= bw->words + (bw->bits+msbits+lsbits+FLAC__BITS_PER_WORD-1)/FLAC__BITS_PER_WORD" */
 			/* OPT: pessimism may cause flurry of false calls to grow_ which eat up all savings before it */
-			if(bw->capacity <= bw->words + bw->bits + msbits + 1/*lsbits always fit in 1 uint32_t*/ && !bitwriter_grow_(bw, msbits+lsbits))
+			if(bw->capacity <= bw->words + bw->bits + msbits + 1 /* lsbits always fit in 1 bwword */ && !bitwriter_grow_(bw, total_bits))
 				return false;
 
 			if(msbits) {
@@ -604,11 +620,9 @@ break1:
 				bw->accum <<= left;
 				bw->accum |= uval >> (bw->bits = lsbits - left);
 				bw->buffer[bw->words++] = SWAP_BE_WORD_TO_HOST(bw->accum);
-				bw->accum = uval;
+				bw->accum = uval; /* unused top bits can contain garbage */
 			}
-#if 1
 		}
-#endif
 		vals++;
 		nvals--;
 	}
@@ -746,40 +760,41 @@ FLAC__bool FLAC__bitwriter_write_utf8_uint32(FLAC__BitWriter *bw, FLAC__uint32 v
 	FLAC__ASSERT(0 != bw);
 	FLAC__ASSERT(0 != bw->buffer);
 
-	FLAC__ASSERT(!(val & 0x80000000)); /* this version only handles 31 bits */
+	if((val & 0x80000000) != 0) /* this version only handles 31 bits */
+		return false;
 
 	if(val < 0x80) {
-		return FLAC__bitwriter_write_raw_uint32(bw, val, 8);
+		return FLAC__bitwriter_write_raw_uint32_nocheck(bw, val, 8);
 	}
 	else if(val < 0x800) {
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0xC0 | (val>>6), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (val&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0xC0 | (val>>6), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (val&0x3F), 8);
 	}
 	else if(val < 0x10000) {
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0xE0 | (val>>12), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | ((val>>6)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (val&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0xE0 | (val>>12), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | ((val>>6)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (val&0x3F), 8);
 	}
 	else if(val < 0x200000) {
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0xF0 | (val>>18), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | ((val>>12)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | ((val>>6)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (val&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0xF0 | (val>>18), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | ((val>>12)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | ((val>>6)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (val&0x3F), 8);
 	}
 	else if(val < 0x4000000) {
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0xF8 | (val>>24), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | ((val>>18)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | ((val>>12)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | ((val>>6)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (val&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0xF8 | (val>>24), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | ((val>>18)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | ((val>>12)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | ((val>>6)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (val&0x3F), 8);
 	}
 	else {
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0xFC | (val>>30), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | ((val>>24)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | ((val>>18)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | ((val>>12)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | ((val>>6)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (val&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0xFC | (val>>30), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | ((val>>24)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | ((val>>18)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | ((val>>12)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | ((val>>6)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (val&0x3F), 8);
 	}
 
 	return ok;
@@ -792,49 +807,50 @@ FLAC__bool FLAC__bitwriter_write_utf8_uint64(FLAC__BitWriter *bw, FLAC__uint64 v
 	FLAC__ASSERT(0 != bw);
 	FLAC__ASSERT(0 != bw->buffer);
 
-	FLAC__ASSERT(!(val & FLAC__U64L(0xFFFFFFF000000000))); /* this version only handles 36 bits */
+	if((val & FLAC__U64L(0xFFFFFFF000000000)) != 0) /* this version only handles 36 bits */
+		return false;
 
 	if(val < 0x80) {
-		return FLAC__bitwriter_write_raw_uint32(bw, (FLAC__uint32)val, 8);
+		return FLAC__bitwriter_write_raw_uint32_nocheck(bw, (FLAC__uint32)val, 8);
 	}
 	else if(val < 0x800) {
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0xC0 | (FLAC__uint32)(val>>6), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)(val&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0xC0 | (FLAC__uint32)(val>>6), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)(val&0x3F), 8);
 	}
 	else if(val < 0x10000) {
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0xE0 | (FLAC__uint32)(val>>12), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>6)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)(val&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0xE0 | (FLAC__uint32)(val>>12), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>6)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)(val&0x3F), 8);
 	}
 	else if(val < 0x200000) {
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0xF0 | (FLAC__uint32)(val>>18), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>12)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>6)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)(val&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0xF0 | (FLAC__uint32)(val>>18), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>12)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>6)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)(val&0x3F), 8);
 	}
 	else if(val < 0x4000000) {
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0xF8 | (FLAC__uint32)(val>>24), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>18)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>12)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>6)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)(val&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0xF8 | (FLAC__uint32)(val>>24), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>18)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>12)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>6)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)(val&0x3F), 8);
 	}
 	else if(val < 0x80000000) {
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0xFC | (FLAC__uint32)(val>>30), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>24)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>18)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>12)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>6)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)(val&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0xFC | (FLAC__uint32)(val>>30), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>24)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>18)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>12)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>6)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)(val&0x3F), 8);
 	}
 	else {
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0xFE, 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>30)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>24)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>18)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>12)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)((val>>6)&0x3F), 8);
-		ok &= FLAC__bitwriter_write_raw_uint32(bw, 0x80 | (FLAC__uint32)(val&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0xFE, 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>30)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>24)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>18)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>12)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)((val>>6)&0x3F), 8);
+		ok &= FLAC__bitwriter_write_raw_uint32_nocheck(bw, 0x80 | (FLAC__uint32)(val&0x3F), 8);
 	}
 
 	return ok;
@@ -848,3 +864,18 @@ FLAC__bool FLAC__bitwriter_zero_pad_to_byte_boundary(FLAC__BitWriter *bw)
 	else
 		return true;
 }
+
+/* These functions are declared inline in this file but are also callable as
+ * externs from elsewhere.
+ * According to the C99 spec, section 6.7.4, simply providing a function
+ * prototype in a header file without 'inline' and making the function inline
+ * in this file should be sufficient.
+ * Unfortunately, the Microsoft VS compiler doesn't pick them up externally. To
+ * fix that we add extern declarations here.
+ */
+extern FLAC__bool FLAC__bitwriter_write_zeroes(FLAC__BitWriter *bw, unsigned bits);
+extern FLAC__bool FLAC__bitwriter_write_raw_uint32(FLAC__BitWriter *bw, FLAC__uint32 val, unsigned bits);
+extern FLAC__bool FLAC__bitwriter_write_raw_int32(FLAC__BitWriter *bw, FLAC__int32 val, unsigned bits);
+extern FLAC__bool FLAC__bitwriter_write_raw_uint64(FLAC__BitWriter *bw, FLAC__uint64 val, unsigned bits);
+extern FLAC__bool FLAC__bitwriter_write_raw_uint32_little_endian(FLAC__BitWriter *bw, FLAC__uint32 val);
+extern FLAC__bool FLAC__bitwriter_write_byte_block(FLAC__BitWriter *bw, const FLAC__byte vals[], unsigned nvals);

@@ -67,8 +67,9 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>include;..\..\include;..\..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_LIB;FLAC__HAS_OGG;FLAC__CPU_IA32;FLAC__HAS_NASM;FLAC__USE_3DNOW;VERSION="1.2.0";FLAC__NO_DLL;FLAC__OVERFLOW_DETECT;_WINSOCK2API_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/D "_USE_MATH_DEFINES" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>.\include;..\..\include;..\..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FLAC__HAS_OGG;FLAC__CPU_IA32;FLAC__SSE_OS;FLAC__HAS_NASM;FLAC__HAS_X86INTRIN;FLAC__ALIGN_MALLOC_DATA;VERSION="1.3.1";FLAC__NO_DLL;DEBUG;FLAC__OVERFLOW_DETECT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <EnablePREfast>false</EnablePREfast>
@@ -76,16 +77,18 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>include;..\..\include;..\..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_LIB;FLAC__HAS_OGG;FLAC__HAS_NASM;FLAC__USE_3DNOW;VERSION="1.2.0";FLAC__NO_DLL;FLAC__OVERFLOW_DETECT;_WINSOCK2API_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/D "_USE_MATH_DEFINES" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>.\include;..\..\include;..\..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FLAC__HAS_OGG;ENABLE_64_BIT_WORDS;FLAC__CPU_X86_64;FLAC__HAS_X86INTRIN;FLAC__ALIGN_MALLOC_DATA;VERSION="1.3.1";FLAC__NO_DLL;DEBUG;FLAC__OVERFLOW_DETECT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>include;..\..\include;..\..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_LIB;FLAC__HAS_OGG;FLAC__CPU_IA32;FLAC__HAS_NASM;FLAC__USE_3DNOW;VERSION="1.2.0";FLAC__NO_DLL;_WINSOCK2API_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/D "_USE_MATH_DEFINES" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>.\include;..\..\include;..\..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FLAC__HAS_OGG;FLAC__CPU_IA32;FLAC__SSE_OS;FLAC__HAS_NASM;FLAC__HAS_X86INTRIN;FLAC__ALIGN_MALLOC_DATA;VERSION="1.3.1";FLAC__NO_DLL;FLaC__INLINE=_inline;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <EnablePREfast>false</EnablePREfast>
@@ -93,8 +96,9 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>include;..\..\include;..\..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_LIB;FLAC__HAS_OGG;FLAC__HAS_NASM;FLAC__USE_3DNOW;VERSION="1.2.0";FLAC__NO_DLL;_WINSOCK2API_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/D "_USE_MATH_DEFINES" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>.\include;..\..\include;..\..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FLAC__HAS_OGG;ENABLE_64_BIT_WORDS;FLAC__CPU_X86_64;FLAC__HAS_X86INTRIN;FLAC__ALIGN_MALLOC_DATA;VERSION="1.3.1";FLAC__NO_DLL;FLaC__INLINE=_inline;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -109,6 +113,14 @@
     <ClInclude Include="..\..\include\FLAC\ordinals.h" />
     <ClInclude Include="..\..\include\FLAC\stream_decoder.h" />
     <ClInclude Include="..\..\include\FLAC\stream_encoder.h" />
+    <ClInclude Include="..\..\include\share\alloc.h" />
+    <ClInclude Include="..\..\include\share\compat.h" />
+    <ClInclude Include="..\..\include\share\endswap.h" />
+    <ClInclude Include="..\..\include\share\macros.h" />
+    <ClInclude Include="..\..\include\share\private.h" />
+    <ClInclude Include="..\..\include\share\safe_str.h" />
+    <ClInclude Include="..\..\include\share\windows_unicode_filenames.h" />
+    <ClInclude Include="ia32\nasm.h" />
     <ClInclude Include="include\private\all.h" />
     <ClInclude Include="include\private\bitmath.h" />
     <ClInclude Include="include\private\bitreader.h" />
@@ -119,7 +131,6 @@
     <ClInclude Include="include\private\float.h" />
     <ClInclude Include="include\private\format.h" />
     <ClInclude Include="include\private\lpc.h" />
-    <ClInclude Include="include\private\macros.h" />
     <ClInclude Include="include\private\md5.h" />
     <ClInclude Include="include\private\memory.h" />
     <ClInclude Include="include\private\metadata.h" />
@@ -127,12 +138,12 @@
     <ClInclude Include="include\private\ogg_encoder_aspect.h" />
     <ClInclude Include="include\private\ogg_helper.h" />
     <ClInclude Include="include\private\ogg_mapping.h" />
+    <ClInclude Include="include\private\stream_encoder.h" />
     <ClInclude Include="include\private\stream_encoder_framing.h" />
     <ClInclude Include="include\private\window.h" />
     <ClInclude Include="include\protected\all.h" />
     <ClInclude Include="include\protected\stream_decoder.h" />
     <ClInclude Include="include\protected\stream_encoder.h" />
-    <ClInclude Include="ia32\nasm.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bitmath.c" />
@@ -141,9 +152,15 @@
     <ClCompile Include="cpu.c" />
     <ClCompile Include="crc.c" />
     <ClCompile Include="fixed.c" />
+    <ClCompile Include="fixed_intrin_sse2.c" />
+    <ClCompile Include="fixed_intrin_ssse3.c" />
     <ClCompile Include="float.c" />
     <ClCompile Include="format.c" />
     <ClCompile Include="lpc.c" />
+    <ClCompile Include="lpc_intrin_avx2.c" />
+    <ClCompile Include="lpc_intrin_sse.c" />
+    <ClCompile Include="lpc_intrin_sse2.c" />
+    <ClCompile Include="lpc_intrin_sse41.c" />
     <ClCompile Include="md5.c" />
     <ClCompile Include="memory.c" />
     <ClCompile Include="metadata_iterators.c" />
@@ -157,14 +174,13 @@
     <ClCompile Include="stream_decoder.c" />
     <ClCompile Include="stream_encoder.c" />
     <ClCompile Include="stream_encoder_framing.c" />
+    <ClCompile Include="stream_encoder_intrin_avx2.c" />
+    <ClCompile Include="stream_encoder_intrin_sse2.c" />
+    <ClCompile Include="stream_encoder_intrin_ssse3.c" />
     <ClCompile Include="window.c" />
+    <ClCompile Include="windows_unicode_filenames.c" />
   </ItemGroup>
   <ItemGroup>
-    <YASM Include="ia32\bitreader_asm.nasm">
-      <IncludePaths>ia32</IncludePaths>
-      <Defines>OBJ_FORMAT_win32</Defines>
-      <AdditionalDependencies>ia32/%(Filename).nasm;ia32/nasm.h</AdditionalDependencies>
-    </YASM>
     <YASM Include="ia32\cpu_asm.nasm">
       <IncludePaths>ia32</IncludePaths>
       <Defines>OBJ_FORMAT_win32</Defines>
@@ -176,11 +192,6 @@
       <AdditionalDependencies>ia32/%(Filename).nasm;ia32/nasm.h</AdditionalDependencies>
     </YASM>
     <YASM Include="ia32\lpc_asm.nasm">
-      <IncludePaths>ia32</IncludePaths>
-      <Defines>OBJ_FORMAT_win32</Defines>
-      <AdditionalDependencies>ia32/%(Filename).nasm;ia32/nasm.h</AdditionalDependencies>
-    </YASM>
-    <YASM Include="ia32\stream_encoder_asm.nasm">
       <IncludePaths>ia32</IncludePaths>
       <Defines>OBJ_FORMAT_win32</Defines>
       <AdditionalDependencies>ia32/%(Filename).nasm;ia32/nasm.h</AdditionalDependencies>
