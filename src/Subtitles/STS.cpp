@@ -465,9 +465,6 @@ static CStringW SubRipper2SSA(CStringW str, int CharSet)
 	str.Replace(L"<u>", L"{\\u1}");
 	str.Replace(L"</u>", L"{\\u}");
 
-	str.Replace(L"&gt;", L">");
-	str.Replace(L"&lt;", L"<");
-
 	return str;
 }
 
@@ -598,6 +595,9 @@ static CString WebVTT2SSA(CString str, int CharSet)
 			}
 		}
 	}
+
+	str.Replace(L"&gt;", L">");
+	str.Replace(L"&lt;", L"<");
 
 	return str;
 }
