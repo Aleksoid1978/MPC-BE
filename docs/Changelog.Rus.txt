@@ -9,7 +9,7 @@
 ==============================
 
 Обновлены библиотеки:
-	ffmpeg git-n3.1-dev-1254-gdeaf58a;
+	ffmpeg git-n3.1-dev-1426-g9486de5;
 	jsoncpp git-1.6.5-83-gb4d2b65;
 	libpng git-v1.6.22beta04-17-g0392e36;
 	Little-CMS git-2.7-60-ge342f44;
