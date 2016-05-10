@@ -1,7 +1,8 @@
 ;  vim:filetype=nasm ts=8
 
 ;  libFLAC - Free Lossless Audio Codec library
-;  Copyright (C) 2001,2002,2003,2004,2005,2006,2007,2008,2009  Josh Coalson
+;  Copyright (C) 2001-2009  Josh Coalson
+;  Copyright (C) 2011-2016  Xiph.Org Foundation
 ;
 ;  Redistribution and use in source and binary forms, with or without
 ;  modification, are permitted provided that the following conditions
@@ -40,7 +41,7 @@ cglobal FLAC__fixed_compute_best_predictor_asm_ia32_mmx_cmov
 
 ; **********************************************************************
 ;
-; unsigned FLAC__fixed_compute_best_predictor(const FLAC__int32 *data, unsigned data_len, FLAC__float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER+1])
+; unsigned FLAC__fixed_compute_best_predictor(const FLAC__int32 *data, unsigned data_len, float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER+1])
 ; {
 ; 	FLAC__int32 last_error_0 = data[-1];
 ; 	FLAC__int32 last_error_1 = data[-1] - data[-2];
@@ -69,11 +70,11 @@ cglobal FLAC__fixed_compute_best_predictor_asm_ia32_mmx_cmov
 ; 	else
 ; 		order = 4;
 ;
-; 	residual_bits_per_sample[0] = (FLAC__float)((data_len > 0 && total_error_0 > 0) ? log(M_LN2 * (FLAC__double)total_error_0 / (FLAC__double)data_len) / M_LN2 : 0.0);
-; 	residual_bits_per_sample[1] = (FLAC__float)((data_len > 0 && total_error_1 > 0) ? log(M_LN2 * (FLAC__double)total_error_1 / (FLAC__double)data_len) / M_LN2 : 0.0);
-; 	residual_bits_per_sample[2] = (FLAC__float)((data_len > 0 && total_error_2 > 0) ? log(M_LN2 * (FLAC__double)total_error_2 / (FLAC__double)data_len) / M_LN2 : 0.0);
-; 	residual_bits_per_sample[3] = (FLAC__float)((data_len > 0 && total_error_3 > 0) ? log(M_LN2 * (FLAC__double)total_error_3 / (FLAC__double)data_len) / M_LN2 : 0.0);
-; 	residual_bits_per_sample[4] = (FLAC__float)((data_len > 0 && total_error_4 > 0) ? log(M_LN2 * (FLAC__double)total_error_4 / (FLAC__double)data_len) / M_LN2 : 0.0);
+; 	residual_bits_per_sample[0] = (float)((data_len > 0 && total_error_0 > 0) ? log(M_LN2 * (double)total_error_0 / (double)data_len) / M_LN2 : 0.0);
+; 	residual_bits_per_sample[1] = (float)((data_len > 0 && total_error_1 > 0) ? log(M_LN2 * (double)total_error_1 / (double)data_len) / M_LN2 : 0.0);
+; 	residual_bits_per_sample[2] = (float)((data_len > 0 && total_error_2 > 0) ? log(M_LN2 * (double)total_error_2 / (double)data_len) / M_LN2 : 0.0);
+; 	residual_bits_per_sample[3] = (float)((data_len > 0 && total_error_3 > 0) ? log(M_LN2 * (double)total_error_3 / (double)data_len) / M_LN2 : 0.0);
+; 	residual_bits_per_sample[4] = (float)((data_len > 0 && total_error_4 > 0) ? log(M_LN2 * (double)total_error_4 / (double)data_len) / M_LN2 : 0.0);
 ;
 ; 	return order;
 ; }
@@ -133,7 +134,7 @@ cident FLAC__fixed_compute_best_predictor_asm_ia32_mmx_cmov
 	movq	mm5, mm6			; mm5 = error_1:error_0
 	movq	mm7, mm6			; mm7 = error_1:error_0
 	psubd	mm5, mm3			; mm5 = error_2:
-	movq	mm3, mm6			; mm3 = error_1:error_0	
+	movq	mm3, mm6			; mm3 = error_1:error_0
 	psrad	mm6, 31
 	pxor	mm7, mm6
 	psubd	mm7, mm6			; mm7 = abs(error_1):abs(error_0)
@@ -154,7 +155,7 @@ cident FLAC__fixed_compute_best_predictor_asm_ia32_mmx_cmov
 	pxor	mm6, mm5
 	psubd	mm6, mm5			; mm6 = :abs(error_4)
 	paddd	mm2, mm6			; mm2 = :total_error_4
-	
+
 	dec	ecx
 	jnz	short .loop
 
@@ -198,11 +199,11 @@ cident FLAC__fixed_compute_best_predictor_asm_ia32_mmx_cmov
 	movd	ebx, mm0			; ebx = total_error_0
 	emms
 
-	; 	residual_bits_per_sample[0] = (FLAC__float)((data_len > 0 && total_error_0 > 0) ? log(M_LN2 * (FLAC__double)total_error_0 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	; 	residual_bits_per_sample[1] = (FLAC__float)((data_len > 0 && total_error_1 > 0) ? log(M_LN2 * (FLAC__double)total_error_1 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	; 	residual_bits_per_sample[2] = (FLAC__float)((data_len > 0 && total_error_2 > 0) ? log(M_LN2 * (FLAC__double)total_error_2 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	; 	residual_bits_per_sample[3] = (FLAC__float)((data_len > 0 && total_error_3 > 0) ? log(M_LN2 * (FLAC__double)total_error_3 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	; 	residual_bits_per_sample[4] = (FLAC__float)((data_len > 0 && total_error_4 > 0) ? log(M_LN2 * (FLAC__double)total_error_4 / (FLAC__double)data_len) / M_LN2 : 0.0);
+	; 	residual_bits_per_sample[0] = (float)((data_len > 0 && total_error_0 > 0) ? log(M_LN2 * (double)total_error_0 / (double)data_len) / M_LN2 : 0.0);
+	; 	residual_bits_per_sample[1] = (float)((data_len > 0 && total_error_1 > 0) ? log(M_LN2 * (double)total_error_1 / (double)data_len) / M_LN2 : 0.0);
+	; 	residual_bits_per_sample[2] = (float)((data_len > 0 && total_error_2 > 0) ? log(M_LN2 * (double)total_error_2 / (double)data_len) / M_LN2 : 0.0);
+	; 	residual_bits_per_sample[3] = (float)((data_len > 0 && total_error_3 > 0) ? log(M_LN2 * (double)total_error_3 / (double)data_len) / M_LN2 : 0.0);
+	; 	residual_bits_per_sample[4] = (float)((data_len > 0 && total_error_4 > 0) ? log(M_LN2 * (double)total_error_4 / (double)data_len) / M_LN2 : 0.0);
 	xor	eax, eax
 	fild	dword [esp + 40]		; ST = data_len (NOTE: assumes data_len is <2gigs)
 .rbps_0:
@@ -305,8 +306,4 @@ cident FLAC__fixed_compute_best_predictor_asm_ia32_mmx_cmov
 	pop	ebp
 	ret
 
-end
-
-%ifdef OBJ_FORMAT_elf
-       section .note.GNU-stack noalloc
-%endif
+; end

@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007,2008,2009  Josh Coalson
+ * Copyright (C) 2000-2009  Josh Coalson
+ * Copyright (C) 2011-2014  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,7 +30,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -38,6 +39,7 @@
 #include <string.h> /* for memset() */
 #include "FLAC/assert.h"
 #include "FLAC/format.h"
+#include "share/alloc.h"
 #include "share/compat.h"
 #include "private/format.h"
 #include "private/macros.h"
@@ -45,12 +47,7 @@
 /* VERSION should come from configure */
 FLAC_API const char *FLAC__VERSION_STRING = VERSION;
 
-#if defined _MSC_VER || defined __BORLANDC__ || defined __MINW32__
-/* yet one more hack because of MSVC6: */
-FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC 1.2.1 20070917";
-#else
-FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC " VERSION " 20070917";
-#endif
+FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC " VERSION " 20141125";
 
 FLAC_API const FLAC__byte FLAC__STREAM_SYNC_STRING[4] = { 'f','L','a','C' };
 FLAC_API const unsigned FLAC__STREAM_SYNC = 0x664C6143;
@@ -277,6 +274,9 @@ FLAC_API unsigned FLAC__format_seektable_sort(FLAC__StreamMetadata_SeekTable *se
 	FLAC__bool first;
 
 	FLAC__ASSERT(0 != seek_table);
+
+	if (seek_table->num_points == 0)
+		return 0;
 
 	/* sort the seekpoints */
 	qsort(seek_table->points, seek_table->num_points, sizeof(FLAC__StreamMetadata_SeekPoint), (int (*)(const void *, const void *))seekpoint_compare_);
@@ -577,9 +577,9 @@ FLAC__bool FLAC__format_entropy_coding_method_partitioned_rice_contents_ensure_s
 	FLAC__ASSERT(object->capacity_by_order > 0 || (0 == object->parameters && 0 == object->raw_bits));
 
 	if(object->capacity_by_order < max_partition_order) {
-		if(0 == (object->parameters = realloc(object->parameters, sizeof(unsigned)*(1 << max_partition_order))))
+		if(0 == (object->parameters = safe_realloc_(object->parameters, sizeof(unsigned)*(1 << max_partition_order))))
 			return false;
-		if(0 == (object->raw_bits = realloc(object->raw_bits, sizeof(unsigned)*(1 << max_partition_order))))
+		if(0 == (object->raw_bits = safe_realloc_(object->raw_bits, sizeof(unsigned)*(1 << max_partition_order))))
 			return false;
 		memset(object->raw_bits, 0, sizeof(unsigned)*(1 << max_partition_order));
 		object->capacity_by_order = max_partition_order;

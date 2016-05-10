@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007,2008,2009  Josh Coalson
+ * Copyright (C) 2000-2009  Josh Coalson
+ * Copyright (C) 2011-2016  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,21 +30,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
 #include <math.h>
 #include <string.h>
+#include "share/compat.h"
 #include "private/bitmath.h"
 #include "private/fixed.h"
 #include "private/macros.h"
 #include "FLAC/assert.h"
-
-#ifndef M_LN2
-/* math.h in VC++ doesn't seem to have this (how Microsoft is that?) */
-#define M_LN2 0.69314718055994530942
-#endif
 
 #ifdef local_abs
 #undef local_abs
@@ -217,7 +214,7 @@ static FLAC__fixedpoint local__compute_rbps_wide_integerized(FLAC__uint64 err, F
 #endif
 
 #ifndef FLAC__INTEGER_ONLY_LIBRARY
-unsigned FLAC__fixed_compute_best_predictor(const FLAC__int32 data[], unsigned data_len, FLAC__float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER+1])
+unsigned FLAC__fixed_compute_best_predictor(const FLAC__int32 data[], unsigned data_len, float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER+1])
 #else
 unsigned FLAC__fixed_compute_best_predictor(const FLAC__int32 data[], unsigned data_len, FLAC__fixedpoint residual_bits_per_sample[FLAC__MAX_FIXED_ORDER+1])
 #endif
@@ -258,11 +255,11 @@ unsigned FLAC__fixed_compute_best_predictor(const FLAC__int32 data[], unsigned d
 	FLAC__ASSERT(data_len > 0 || total_error_3 == 0);
 	FLAC__ASSERT(data_len > 0 || total_error_4 == 0);
 #ifndef FLAC__INTEGER_ONLY_LIBRARY
-	residual_bits_per_sample[0] = (FLAC__float)((total_error_0 > 0) ? log(M_LN2 * (FLAC__double)total_error_0 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[1] = (FLAC__float)((total_error_1 > 0) ? log(M_LN2 * (FLAC__double)total_error_1 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[2] = (FLAC__float)((total_error_2 > 0) ? log(M_LN2 * (FLAC__double)total_error_2 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[3] = (FLAC__float)((total_error_3 > 0) ? log(M_LN2 * (FLAC__double)total_error_3 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[4] = (FLAC__float)((total_error_4 > 0) ? log(M_LN2 * (FLAC__double)total_error_4 / (FLAC__double)data_len) / M_LN2 : 0.0);
+	residual_bits_per_sample[0] = (float)((total_error_0 > 0) ? log(M_LN2 * (double)total_error_0 / (double)data_len) / M_LN2 : 0.0);
+	residual_bits_per_sample[1] = (float)((total_error_1 > 0) ? log(M_LN2 * (double)total_error_1 / (double)data_len) / M_LN2 : 0.0);
+	residual_bits_per_sample[2] = (float)((total_error_2 > 0) ? log(M_LN2 * (double)total_error_2 / (double)data_len) / M_LN2 : 0.0);
+	residual_bits_per_sample[3] = (float)((total_error_3 > 0) ? log(M_LN2 * (double)total_error_3 / (double)data_len) / M_LN2 : 0.0);
+	residual_bits_per_sample[4] = (float)((total_error_4 > 0) ? log(M_LN2 * (double)total_error_4 / (double)data_len) / M_LN2 : 0.0);
 #else
 	residual_bits_per_sample[0] = (total_error_0 > 0) ? local__compute_rbps_integerized(total_error_0, data_len) : 0;
 	residual_bits_per_sample[1] = (total_error_1 > 0) ? local__compute_rbps_integerized(total_error_1, data_len) : 0;
@@ -275,7 +272,7 @@ unsigned FLAC__fixed_compute_best_predictor(const FLAC__int32 data[], unsigned d
 }
 
 #ifndef FLAC__INTEGER_ONLY_LIBRARY
-unsigned FLAC__fixed_compute_best_predictor_wide(const FLAC__int32 data[], unsigned data_len, FLAC__float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER+1])
+unsigned FLAC__fixed_compute_best_predictor_wide(const FLAC__int32 data[], unsigned data_len, float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER+1])
 #else
 unsigned FLAC__fixed_compute_best_predictor_wide(const FLAC__int32 data[], unsigned data_len, FLAC__fixedpoint residual_bits_per_sample[FLAC__MAX_FIXED_ORDER+1])
 #endif
@@ -320,20 +317,11 @@ unsigned FLAC__fixed_compute_best_predictor_wide(const FLAC__int32 data[], unsig
 	FLAC__ASSERT(data_len > 0 || total_error_3 == 0);
 	FLAC__ASSERT(data_len > 0 || total_error_4 == 0);
 #ifndef FLAC__INTEGER_ONLY_LIBRARY
-#if defined _MSC_VER || defined __MINGW32__
-	/* with MSVC you have to spoon feed it the casting */
-	residual_bits_per_sample[0] = (FLAC__float)((total_error_0 > 0) ? log(M_LN2 * (FLAC__double)(FLAC__int64)total_error_0 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[1] = (FLAC__float)((total_error_1 > 0) ? log(M_LN2 * (FLAC__double)(FLAC__int64)total_error_1 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[2] = (FLAC__float)((total_error_2 > 0) ? log(M_LN2 * (FLAC__double)(FLAC__int64)total_error_2 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[3] = (FLAC__float)((total_error_3 > 0) ? log(M_LN2 * (FLAC__double)(FLAC__int64)total_error_3 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[4] = (FLAC__float)((total_error_4 > 0) ? log(M_LN2 * (FLAC__double)(FLAC__int64)total_error_4 / (FLAC__double)data_len) / M_LN2 : 0.0);
-#else
-	residual_bits_per_sample[0] = (FLAC__float)((total_error_0 > 0) ? log(M_LN2 * (FLAC__double)total_error_0 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[1] = (FLAC__float)((total_error_1 > 0) ? log(M_LN2 * (FLAC__double)total_error_1 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[2] = (FLAC__float)((total_error_2 > 0) ? log(M_LN2 * (FLAC__double)total_error_2 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[3] = (FLAC__float)((total_error_3 > 0) ? log(M_LN2 * (FLAC__double)total_error_3 / (FLAC__double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[4] = (FLAC__float)((total_error_4 > 0) ? log(M_LN2 * (FLAC__double)total_error_4 / (FLAC__double)data_len) / M_LN2 : 0.0);
-#endif
+	residual_bits_per_sample[0] = (float)((total_error_0 > 0) ? log(M_LN2 * (double)total_error_0 / (double)data_len) / M_LN2 : 0.0);
+	residual_bits_per_sample[1] = (float)((total_error_1 > 0) ? log(M_LN2 * (double)total_error_1 / (double)data_len) / M_LN2 : 0.0);
+	residual_bits_per_sample[2] = (float)((total_error_2 > 0) ? log(M_LN2 * (double)total_error_2 / (double)data_len) / M_LN2 : 0.0);
+	residual_bits_per_sample[3] = (float)((total_error_3 > 0) ? log(M_LN2 * (double)total_error_3 / (double)data_len) / M_LN2 : 0.0);
+	residual_bits_per_sample[4] = (float)((total_error_4 > 0) ? log(M_LN2 * (double)total_error_4 / (double)data_len) / M_LN2 : 0.0);
 #else
 	residual_bits_per_sample[0] = (total_error_0 > 0) ? local__compute_rbps_wide_integerized(total_error_0, data_len) : 0;
 	residual_bits_per_sample[1] = (total_error_1 > 0) ? local__compute_rbps_wide_integerized(total_error_1, data_len) : 0;
@@ -361,27 +349,15 @@ void FLAC__fixed_compute_residual(const FLAC__int32 data[], unsigned data_len, u
 			break;
 		case 2:
 			for(i = 0; i < idata_len; i++)
-#if 1 /* OPT: may be faster with some compilers on some systems */
-				residual[i] = data[i] - (data[i-1] << 1) + data[i-2];
-#else
 				residual[i] = data[i] - 2*data[i-1] + data[i-2];
-#endif
 			break;
 		case 3:
 			for(i = 0; i < idata_len; i++)
-#if 1 /* OPT: may be faster with some compilers on some systems */
-				residual[i] = data[i] - (((data[i-1]-data[i-2])<<1) + (data[i-1]-data[i-2])) - data[i-3];
-#else
 				residual[i] = data[i] - 3*data[i-1] + 3*data[i-2] - data[i-3];
-#endif
 			break;
 		case 4:
 			for(i = 0; i < idata_len; i++)
-#if 1 /* OPT: may be faster with some compilers on some systems */
-				residual[i] = data[i] - ((data[i-1]+data[i-3])<<2) + ((data[i-2]<<2) + (data[i-2]<<1)) + data[i-4];
-#else
 				residual[i] = data[i] - 4*data[i-1] + 6*data[i-2] - 4*data[i-3] + data[i-4];
-#endif
 			break;
 		default:
 			FLAC__ASSERT(0);
@@ -403,27 +379,15 @@ void FLAC__fixed_restore_signal(const FLAC__int32 residual[], unsigned data_len,
 			break;
 		case 2:
 			for(i = 0; i < idata_len; i++)
-#if 1 /* OPT: may be faster with some compilers on some systems */
-				data[i] = residual[i] + (data[i-1]<<1) - data[i-2];
-#else
 				data[i] = residual[i] + 2*data[i-1] - data[i-2];
-#endif
 			break;
 		case 3:
 			for(i = 0; i < idata_len; i++)
-#if 1 /* OPT: may be faster with some compilers on some systems */
-				data[i] = residual[i] + (((data[i-1]-data[i-2])<<1) + (data[i-1]-data[i-2])) + data[i-3];
-#else
 				data[i] = residual[i] + 3*data[i-1] - 3*data[i-2] + data[i-3];
-#endif
 			break;
 		case 4:
 			for(i = 0; i < idata_len; i++)
-#if 1 /* OPT: may be faster with some compilers on some systems */
-				data[i] = residual[i] + ((data[i-1]+data[i-3])<<2) - ((data[i-2]<<2) + (data[i-2]<<1)) - data[i-4];
-#else
 				data[i] = residual[i] + 4*data[i-1] - 6*data[i-2] + 4*data[i-3] - data[i-4];
-#endif
 			break;
 		default:
 			FLAC__ASSERT(0);

@@ -1,5 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007,2008,2009  Josh Coalson
+ * Copyright (C) 2000-2009  Josh Coalson
+ * Copyright (C) 2011-2014  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -175,7 +176,7 @@
  * #endif
  * \endcode
  *
- * The the source will work for multiple versions and the legacy code can
+ * The source will work for multiple versions and the legacy code can
  * easily be removed when the transition is complete.
  *
  * Another available symbol is FLAC_API_SUPPORTS_OGG_FLAC (defined in

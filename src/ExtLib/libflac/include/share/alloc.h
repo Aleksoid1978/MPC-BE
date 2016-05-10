@@ -1,5 +1,6 @@
 /* alloc - Convenience routines for safely allocating memory
- * Copyright (C) 2007,2008,2009  Josh Coalson
+ * Copyright (C) 2007-2009  Josh Coalson
+ * Copyright (C) 2011-2014  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,7 +33,7 @@
 #ifndef FLAC__SHARE__ALLOC_H
 #define FLAC__SHARE__ALLOC_H
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -45,11 +46,16 @@
 #include <stdint.h> /* for SIZE_MAX in case limits.h didn't get it */
 #endif
 #include <stdlib.h> /* for size_t, malloc(), etc */
+#include "share/compat.h"
 
 #ifndef SIZE_MAX
 # ifndef SIZE_T_MAX
 #  ifdef _MSC_VER
-#   define SIZE_T_MAX UINT_MAX /* What happens on 64 bit windows? */
+#   ifdef _WIN64
+#    define SIZE_T_MAX FLAC__U64L(0xffffffffffffffff)
+#   else
+#    define SIZE_T_MAX 0xffffffff
+#   endif
 #  else
 #   error
 #  endif
@@ -60,9 +66,7 @@
 /* avoid malloc()ing 0 bytes, see:
  * https://www.securecoding.cert.org/confluence/display/seccode/MEM04-A.+Do+not+make+assumptions+about+the+result+of+allocating+0+bytes?focusedCommentId=5407003
 */
-// ==> Start patch MPC
-static void *safe_malloc_(size_t size)
-// ==> End patch MPC
+static inline void *safe_malloc_(size_t size)
 {
 	/* malloc(0) is undefined; FLAC src convention is to always allocate */
 	if(!size)
@@ -70,9 +74,7 @@ static void *safe_malloc_(size_t size)
 	return malloc(size);
 }
 
-// ==> Start patch MPC
-static void *safe_calloc_(size_t nmemb, size_t size)
-// ==> End patch MPC
+static inline void *safe_calloc_(size_t nmemb, size_t size)
 {
 	if(!nmemb || !size)
 		return malloc(1); /* malloc(0) is undefined; FLAC src convention is to always allocate */
@@ -81,9 +83,7 @@ static void *safe_calloc_(size_t nmemb, size_t size)
 
 /*@@@@ there's probably a better way to prevent overflows when allocating untrusted sums but this works for now */
 
-// ==> Start patch MPC
-static void *safe_malloc_add_2op_(size_t size1, size_t size2)
-// ==> End patch MPC
+static inline void *safe_malloc_add_2op_(size_t size1, size_t size2)
 {
 	size2 += size1;
 	if(size2 < size1)
@@ -91,9 +91,7 @@ static void *safe_malloc_add_2op_(size_t size1, size_t size2)
 	return safe_malloc_(size2);
 }
 
-// ==> Start patch MPC
-static void *safe_malloc_add_3op_(size_t size1, size_t size2, size_t size3)
-// ==> End patch MPC
+static inline void *safe_malloc_add_3op_(size_t size1, size_t size2, size_t size3)
 {
 	size2 += size1;
 	if(size2 < size1)
@@ -104,9 +102,7 @@ static void *safe_malloc_add_3op_(size_t size1, size_t size2, size_t size3)
 	return safe_malloc_(size3);
 }
 
-// ==> Start patch MPC
-static void *safe_malloc_add_4op_(size_t size1, size_t size2, size_t size3, size_t size4)
-// ==> End patch MPC
+static inline void *safe_malloc_add_4op_(size_t size1, size_t size2, size_t size3, size_t size4)
 {
 	size2 += size1;
 	if(size2 < size1)
@@ -122,9 +118,7 @@ static void *safe_malloc_add_4op_(size_t size1, size_t size2, size_t size3, size
 
 void *safe_malloc_mul_2op_(size_t size1, size_t size2) ;
 
-// ==> Start patch MPC
-static void *safe_malloc_mul_3op_(size_t size1, size_t size2, size_t size3)
-// ==> End patch MPC
+static inline void *safe_malloc_mul_3op_(size_t size1, size_t size2, size_t size3)
 {
 	if(!size1 || !size2 || !size3)
 		return malloc(1); /* malloc(0) is undefined; FLAC src convention is to always allocate */
@@ -137,9 +131,7 @@ static void *safe_malloc_mul_3op_(size_t size1, size_t size2, size_t size3)
 }
 
 /* size1*size2 + size3 */
-// ==> Start patch MPC
-static void *safe_malloc_mul2add_(size_t size1, size_t size2, size_t size3)
-// ==> End patch MPC
+static inline void *safe_malloc_mul2add_(size_t size1, size_t size2, size_t size3)
 {
 	if(!size1 || !size2)
 		return safe_malloc_(size3);
@@ -149,9 +141,7 @@ static void *safe_malloc_mul2add_(size_t size1, size_t size2, size_t size3)
 }
 
 /* size1 * (size2 + size3) */
-// ==> Start patch MPC
-static void *safe_malloc_muladd2_(size_t size1, size_t size2, size_t size3)
-// ==> End patch MPC
+static inline void *safe_malloc_muladd2_(size_t size1, size_t size2, size_t size3)
 {
 	if(!size1 || (!size2 && !size3))
 		return malloc(1); /* malloc(0) is undefined; FLAC src convention is to always allocate */
@@ -163,19 +153,25 @@ static void *safe_malloc_muladd2_(size_t size1, size_t size2, size_t size3)
 	return malloc(size1*size2);
 }
 
-// ==> Start patch MPC
-static void *safe_realloc_add_2op_(void *ptr, size_t size1, size_t size2)
-// ==> End patch MPC
+static inline void *safe_realloc_(void *ptr, size_t size)
+{
+	void *oldptr = ptr;
+	void *newptr = realloc(ptr, size);
+	if(size > 0 && newptr == 0)
+		free(oldptr);
+	return newptr;
+}
+static inline void *safe_realloc_add_2op_(void *ptr, size_t size1, size_t size2)
 {
 	size2 += size1;
-	if(size2 < size1)
+	if(size2 < size1) {
+		free(ptr);
 		return 0;
+	}
 	return realloc(ptr, size2);
 }
 
-// ==> Start patch MPC
-static void *safe_realloc_add_3op_(void *ptr, size_t size1, size_t size2, size_t size3)
-// ==> End patch MPC
+static inline void *safe_realloc_add_3op_(void *ptr, size_t size1, size_t size2, size_t size3)
 {
 	size2 += size1;
 	if(size2 < size1)
@@ -186,9 +182,7 @@ static void *safe_realloc_add_3op_(void *ptr, size_t size1, size_t size2, size_t
 	return realloc(ptr, size3);
 }
 
-// ==> Start patch MPC
-static void *safe_realloc_add_4op_(void *ptr, size_t size1, size_t size2, size_t size3, size_t size4)
-// ==> End patch MPC
+static inline void *safe_realloc_add_4op_(void *ptr, size_t size1, size_t size2, size_t size3, size_t size4)
 {
 	size2 += size1;
 	if(size2 < size1)
@@ -202,21 +196,17 @@ static void *safe_realloc_add_4op_(void *ptr, size_t size1, size_t size2, size_t
 	return realloc(ptr, size4);
 }
 
-// ==> Start patch MPC
-static void *safe_realloc_mul_2op_(void *ptr, size_t size1, size_t size2)
-// ==> End patch MPC
+static inline void *safe_realloc_mul_2op_(void *ptr, size_t size1, size_t size2)
 {
 	if(!size1 || !size2)
 		return realloc(ptr, 0); /* preserve POSIX realloc(ptr, 0) semantics */
 	if(size1 > SIZE_MAX / size2)
 		return 0;
-	return realloc(ptr, size1*size2);
+	return safe_realloc_(ptr, size1*size2);
 }
 
 /* size1 * (size2 + size3) */
-// ==> Start patch MPC
-static void *safe_realloc_muladd2_(void *ptr, size_t size1, size_t size2, size_t size3)
-// ==> End patch MPC
+static inline void *safe_realloc_muladd2_(void *ptr, size_t size1, size_t size2, size_t size3)
 {
 	if(!size1 || (!size2 && !size3))
 		return realloc(ptr, 0); /* preserve POSIX realloc(ptr, 0) semantics */
