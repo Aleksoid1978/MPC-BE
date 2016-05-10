@@ -15,9 +15,9 @@ Updated libraries:
 	jsoncpp git-1.6.5-83-gb4d2b65;
 	libpng git-v1.6.22beta04-17-g0392e36;
 	Little-CMS git-2.7-60-ge342f44;
-	MediaInfo git-v0.7.85-7-gc7b46d1;
+	MediaInfo git-v0.7.85-25-g993690e;
 	Speex-1.2rc2-9-g9172c7e;
-	ZenLib git-v0.4.33-55cfeeb2.
+	ZenLib git-v0.4.33-11-g4bdc103.
 
 1.4.5
 ==============================
