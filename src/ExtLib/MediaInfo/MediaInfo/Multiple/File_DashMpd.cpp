@@ -162,7 +162,7 @@ struct template_generic
         initialization=ToCopy.initialization;
         media=ToCopy.media;
         duration=ToCopy.duration;
-        startNumber=ToCopy.duration;
+        startNumber=ToCopy.startNumber;
         duration_Max=ToCopy.duration_Max;
         startNumber_Max=ToCopy.startNumber_Max;
     }
@@ -380,10 +380,12 @@ void template_generic::Decode()
                         Media_Name_Temp.insert(Time_Pos, Index);
 
                     Ztring File_Name;
+                    Ztring File_Name_With_Path;
                     if (!SourceDir.empty())
-                        File_Name+=SourceDir+PathSeparator;
+                        File_Name_With_Path+=SourceDir+PathSeparator;
                     File_Name+=BaseURL+Media_Name_Temp;
-                    if (!File::Exists(File_Name))
+                    File_Name_With_Path+=BaseURL+Media_Name_Temp;
+                    if (!File::Exists(File_Name_With_Path))
                         break;
                     Sequence->AddFileName(File_Name);
                     Index_Pos_Temp++;

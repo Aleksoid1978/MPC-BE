@@ -465,6 +465,20 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                      Nom.resize(Nom_Size, ' ');
                 }
                 Ztring Valeur=Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Text);
+
+                //Handling values with \r\n inside
+                if (Text)
+                {
+                    if (Valeur.find(__T('\r'))!=string::npos || Valeur.find(__T('\n'))!=string::npos)
+                    {
+                        Valeur.FindAndReplace(__T("\r\n"), __T(" / "), 0, Ztring_Recursive);
+                        Valeur.FindAndReplace(__T("\r"), __T(" / "), 0, Ztring_Recursive);
+                        Valeur.FindAndReplace(__T("\n"), __T(" / "), 0, Ztring_Recursive);
+                        if (Valeur.size()>=3 && Valeur.rfind(__T(" / "))== Valeur.size()-3)
+                            Valeur.resize(Valeur.size()-3);
+                    }
+                }
+
                 #if defined(MEDIAINFO_XML_YES)
                     if (XML_0_7_78 && MediaInfoLib::Config.Info_Get(StreamKind).Read(Champ_Pos, Info_Measure)==__T(" ms"))
                     {

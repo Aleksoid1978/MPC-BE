@@ -302,7 +302,7 @@ ZtringList Dir::GetAllFileNames(const Ztring &Dir_Name_, dirlist_t Options)
                 glob_t globbuf;
                 if (glob(Dir_Name.To_Local().c_str(), GLOB_NOSORT, NULL, &globbuf)==0)
                 {
-                    for (int Pos=0; Pos<globbuf.gl_pathc; Pos++)
+                    for (size_t Pos=0; Pos<globbuf.gl_pathc; Pos++)
                         ToReturn.push_back(Ztring().From_Local(globbuf.gl_pathv[Pos]));
                 }
             }
