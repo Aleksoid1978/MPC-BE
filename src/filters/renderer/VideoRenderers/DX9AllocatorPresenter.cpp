@@ -2333,7 +2333,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 	BitBltFromRGBToRGBStretch(
 		bih->biWidth, bih->biHeight,
-		(p ? (BYTE*)p : (BYTE*)(bih + 1)), bih->biWidth * 4, 32,
+		p ? (BYTE*)p : (BYTE*)(bih + 1), bih->biWidth * 4, 32,
 		desc.Width, desc.Height,
 		(BYTE*)r.pBits + r.Pitch * (desc.Height - 1), -(int)r.Pitch, 32);
 
