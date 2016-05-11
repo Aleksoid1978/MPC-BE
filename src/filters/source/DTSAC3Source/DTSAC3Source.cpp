@@ -43,6 +43,7 @@ enum {
 	DTS,
 	DTSHD,
 	DTSPaded,
+	DTSExpress
 };
 
 #ifdef REGISTER_FILTER
@@ -77,6 +78,10 @@ STDAPI DllRegisterServer()
 	SetRegKeyValue(
 		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
 		_T("0"), _T("0,4,,fE7f0180")); // DTS LE
+
+	SetRegKeyValue(
+		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
+		_T("0"), _T("0,4,,64582025")); // DTS Substream
 
 	SetRegKeyValue(
 		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
@@ -217,6 +222,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_file.Seek(m_dataStart, CFile::begin);
 			buflen = m_file.Read(buffer, buflen);
 
+			audioframe_t aframe = { 0 };
 			m_streamtype = unknown;
 			UINT i;
 			for (i = 0; i + 12 < buflen; i++) { // looking for DTS or AC3 sync
@@ -231,6 +237,9 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 					break;
 				} else if (ParseMLPHeader(buffer + i)) {
 					m_streamtype = MLP;
+					break;
+				} else if (ParseDTSHDHeader(buffer + i, buflen - i, &aframe) && aframe.param2 == DCA_PROFILE_EXPRESS) {
+					m_streamtype = DTSExpress;
 					break;
 				}
 
@@ -247,7 +256,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 		m_file.Seek(m_dataStart, CFile::begin);
 		BYTE buf[40] = { 0 };
-		if (m_file.Read(&buf, 20) != 20) {
+		if (m_file.Read(&buf, 40) != 40) {
 			break;
 		}
 		audioframe_t aframe;
@@ -314,6 +323,18 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 			m_wFormatTag = WAVE_FORMAT_DTS;
 			m_subtype = MEDIASUBTYPE_DTS;
+		}
+		// DTS Express
+		else if (m_streamtype == DTSExpress && ParseDTSHDHeader(buf, _countof(buf), &aframe)) {
+			m_samplerate  = aframe.samplerate;
+			m_channels    = aframe.channels;
+			m_bitdepth    = aframe.param1;
+			m_framesize   = aframe.size;
+			m_framelength = aframe.samples;
+			m_bitrate     = CalcBitrate(aframe);
+
+			m_wFormatTag  = WAVE_FORMAT_DTS;
+			m_subtype     = MEDIASUBTYPE_DTS;
 		}
 		// AC3 & E-AC3
 		else if (m_streamtype == AC3 && ParseAC3Header(buf, &aframe)) {
