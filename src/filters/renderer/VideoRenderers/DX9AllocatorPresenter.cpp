@@ -2323,13 +2323,50 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	bih->biPlanes			= 1;
 	bih->biSizeImage		= DIBSIZE(*bih);
 
+	uint32_t* p = NULL;
+	if (m_iRotation) {
+		p = DNew uint32_t[bih->biWidth * bih->biHeight];
+	}
+
 	BitBltFromRGBToRGBStretch(
 		bih->biWidth, bih->biHeight,
-		(BYTE*)(bih + 1), bih->biWidth * 4, 32,
+		(p ? (BYTE*)p : (BYTE*)(bih + 1)), bih->biWidth * 4, 32,
 		desc.Width, desc.Height,
 		(BYTE*)r.pBits + r.Pitch * (desc.Height - 1), -(int)r.Pitch, 32);
 
 	pSurface->UnlockRect();
+
+	if (p) {
+		int w = bih->biWidth;
+		int h = bih->biHeight;
+		uint32_t* out = (uint32_t*)(bih + 1);
+
+		switch (m_iRotation) {
+		case 90:
+			for (int x = w-1; x >= 0; x--) {
+				for (int y = 0; y < h; y++) {
+					*out++ = p[x + w*y];
+				}
+			}
+			std::swap(bih->biWidth, bih->biHeight);
+			break;
+		case 180:
+			for (int i = w*h - 1; i >= 0; i--) {
+				*out++ = p[i];
+			}
+			break;
+		case 270:
+			for (int x = 0; x < w; x++) {
+				for (int y = h-1; y >= 0; y--) {
+					*out++ = p[x + w*y];
+				}
+			}
+			std::swap(bih->biWidth, bih->biHeight);
+			break;
+		}
+
+		delete[] p;
+	}
 
 	return S_OK;
 }
