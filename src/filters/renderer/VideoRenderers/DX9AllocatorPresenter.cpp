@@ -2272,6 +2272,9 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	if (dar.cx > 0 && dar.cy > 0) {
 		framesize.cx = MulDiv(framesize.cy, dar.cx, dar.cy);
 	}
+	if (m_iRotation == 90 || m_iRotation == 270) {
+		std::swap(framesize.cx, framesize.cy);
+	}
 
 	DWORD required = sizeof(BITMAPINFOHEADER) + (framesize.cx * framesize.cy * 4);
 	if (!lpDib) {
