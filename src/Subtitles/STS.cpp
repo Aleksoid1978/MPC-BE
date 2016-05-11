@@ -596,9 +596,6 @@ static CString WebVTT2SSA(CString str, int CharSet)
 		}
 	}
 
-	str.Replace(L"&gt;", L">");
-	str.Replace(L"&lt;", L"<");
-
 	return str;
 }
 
@@ -2652,6 +2649,16 @@ static CString CodeToCharacter(CString str)
 	return tmp;
 }
 
+static CString RemoveHtmlSpecialChars(CString str)
+{
+	str.Replace(L"&gt;", L">");
+	str.Replace(L"&lt;", L"<");
+	str.Replace(L"&amp;", L"&");
+	str.Replace(L"&quot;", L"\"");
+
+	return str;
+}
+
 CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
 {
 	STSEntry const& stse = GetAt(i);
@@ -2667,7 +2674,7 @@ CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
 		str = RemoveSSATags(str, true, CharSet);
 	}
 
-	str = CodeToCharacter(str);
+	str = CodeToCharacter(RemoveHtmlSpecialChars(str));
 
 	return str;
 }
