@@ -2829,7 +2829,7 @@ const wchar_t *StreamTypeToName(PES_STREAM_TYPE _Type)
 		case SECONDARY_AUDIO_AC3_PLUS:
 				return L"Secondary Dolby Digital Plus";
 		case SECONDARY_AUDIO_DTS_HD:
-				return L"Secondary DTS-HD High Resolution Audio";
+				return L"DTS Express";
 		case VIDEO_STREAM_VC1:
 				return L"VC-1";
 	}

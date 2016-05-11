@@ -670,22 +670,23 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 	}
 }
 
-#define MPEG_AUDIO					(1ULL << 0)
-#define AAC_AUDIO					(1ULL << 1)
-#define AC3_AUDIO					(1ULL << 2)
-#define DTS_AUDIO					(1ULL << 3)
-#define LPCM_AUDIO					(1ULL << 4)
-#define MPEG2_VIDEO					(1ULL << 5)
-#define H264_VIDEO					(1ULL << 6)
-#define VC1_VIDEO					(1ULL << 7)
-#define DIRAC_VIDEO					(1ULL << 8)
-#define HEVC_VIDEO					(1ULL << 9)
-#define PGS_SUB						(1ULL << 10)
-#define DVB_SUB						(1ULL << 11)
-#define TELETEXT_SUB				(1ULL << 12)
-#define OPUS_AUDIO					(1ULL << 13)
+#define MPEG_AUDIO          (1ULL << 0)
+#define AAC_AUDIO           (1ULL << 1)
+#define AC3_AUDIO           (1ULL << 2)
+#define DTS_AUDIO           (1ULL << 3)
+#define LPCM_AUDIO          (1ULL << 4)
+#define MPEG2_VIDEO         (1ULL << 5)
+#define H264_VIDEO          (1ULL << 6)
+#define VC1_VIDEO           (1ULL << 7)
+#define DIRAC_VIDEO         (1ULL << 8)
+#define HEVC_VIDEO          (1ULL << 9)
+#define PGS_SUB             (1ULL << 10)
+#define DVB_SUB             (1ULL << 11)
+#define TELETEXT_SUB        (1ULL << 12)
+#define OPUS_AUDIO          (1ULL << 13)
+#define DTS_EXPRESS_AUDIO   (1ULL << 14)
 
-#define PES_STREAM_TYPE_ANY			(MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | OPUS_AUDIO)
+#define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | OPUS_AUDIO | DTS_EXPRESS_AUDIO)
 
 static const struct StreamType {
 	PES_STREAM_TYPE pes_stream_type;
@@ -707,12 +708,13 @@ static const struct StreamType {
 	{ AUDIO_STREAM_DTS,						DTS_AUDIO	},
 	{ AUDIO_STREAM_DTS_HD,					DTS_AUDIO	},
 	{ AUDIO_STREAM_DTS_HD_MASTER_AUDIO,		DTS_AUDIO	},
-	{ SECONDARY_AUDIO_DTS_HD,				DTS_AUDIO	},
 	{ PES_PRIVATE,							DTS_AUDIO	},
+	// DTS Express
+	{ SECONDARY_AUDIO_DTS_HD,				DTS_EXPRESS_AUDIO },
 	// LPCM Audio
 	{ AUDIO_STREAM_LPCM,					LPCM_AUDIO	},
 	// Opus Audio
-	{ PES_PRIVATE,							OPUS_AUDIO },
+	{ PES_PRIVATE,							OPUS_AUDIO	},
 	// MPEG2 Video
 	{ VIDEO_STREAM_MPEG2,					MPEG2_VIDEO	},
 	{ VIDEO_STREAM_MPEG2_ADDITIONAL_VIEW,	MPEG2_VIDEO	},
@@ -966,6 +968,16 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 					dtshdr h;
 					if (Read(h, len, &s.mt, false)) {
 						s.dts.bDTSCore = true;
+						type = stream_type::audio;
+					}
+				}
+
+				// DTS Express
+				if (type == stream_type::unknown && (stream_type & DTS_EXPRESS_AUDIO)) {
+					Seek(start);
+					dtslbr_hdr h;
+					if (Read(h, len, &s.mt)) {
+						s.dts.bDTSHD = true;
 						type = stream_type::audio;
 					}
 				}
