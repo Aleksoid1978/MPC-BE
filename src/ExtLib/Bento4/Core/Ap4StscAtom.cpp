@@ -62,6 +62,9 @@ AP4_StscAtom::AP4_StscAtom(AP4_Size size, AP4_ByteStream& stream) :
             stream.ReadUI32(sample_description_index) == AP4_SUCCESS) {
             if (m_Entries.ItemCount() != 0) {
                 AP4_Ordinal prev = m_Entries.ItemCount()-1;
+                if (first_chunk == m_Entries[prev].m_FirstChunk) {
+                    continue;
+                }
                 m_Entries[prev].m_ChunkCount = 
                     first_chunk-m_Entries[prev].m_FirstChunk;
                 first_sample += 
