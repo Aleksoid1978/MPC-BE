@@ -2077,7 +2077,7 @@ const std::wregex ref_m3u(L"(^|\\n)(?!#)([^\\n]+)");						// any lines except th
 const std::wregex ref_pls(L"(^|\\n)File\\d+[ \\t]*=[ \\t]*\"?([^\\n\"]+)");	// File1=...
 const std::wregex ref_xspf(L"<location>([^<>\\n]+)</location>");			// <location>...</location>
 const std::wregex ref_asx(L"<REF HREF[ \\t]*=[ \\t]*\"([^\"\\n]+)\"");		// <REF HREF = "..." />
-const std::wregex ref_ram(L"(^|\\n)(?!#)(file://)?([^\\n]+)");				// any lines except those that start with '#'. for local files used file://
+const std::wregex ref_ram(L"(^|\\n)((?:rtsp|http|file)://[^\\n]+)");		// (rtsp|http|file)://...
 const std::wregex ref_qtl(L"src[ \\t]*=[ \\t]*\"([^\"\\n]+)\"");			// src="..."
 const std::wregex ref_wpl(L"<media src=\"([^\"\\n]+)\"");					// <media src="..."
 
@@ -2106,6 +2106,11 @@ bool FindRedir(CUrl& src, CString ct, CString& body, CAtlList<CString>& urls, in
 		size_t k = match.size() - 1;
 		CString url = CString(match[k].first, match[k].length());
 		url.Trim();
+
+		if (playlist_type == PLAYLIST_RAM && url.Left(7) == L"file://") {
+			url.Delete(0, 7);
+			url.Replace('/', '\\');
+		}
 
 		CUrl dst;
 		dst.CrackUrl(url);
@@ -2181,16 +2186,15 @@ bool FindRedir(CString& fn, CString ct, CAtlList<CString>& fns, int playlist_typ
 		CString fn2 = CString(match[k].first, match[k].length());
 		fn2.Trim();
 
+		if (playlist_type == PLAYLIST_RAM && fn2.Left(7) == L"file://") {
+			fn2.Delete(0, 7);
+			fn2.Replace('/', '\\');
+		}
+
 		if (fn2.Find(':') < 0 && fn2.Find(L"\\\\") != 0 && fn2.Find(L"//") != 0) {
 			CPath p;
 			p.Combine(dir, fn2);
 			fn2 = (LPCTSTR)p;
-		}
-
-		CString fntmp = fn2;
-		fntmp.MakeLower();
-		if (fn2.Find(L"file:///") == 0) {
-			fn2 = fn2.Mid(8, fn2.GetLength() - 8);
 		}
 
 		if (!fn2.CompareNoCase(fn)) {
