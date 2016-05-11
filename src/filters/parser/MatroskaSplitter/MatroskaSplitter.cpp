@@ -769,8 +769,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										wfe->nAvgBytesPerSec = size * aframe.samplerate / aframe.samples;
 									}
 									if (start + size + 40 <= end) {
-										int sizehd = ParseDTSHDHeader(start + size, end - start - size, &aframe);
-										if (sizehd) {
+										if (ParseDTSHDHeader(start + size, end - start - size, &aframe)) {
 											wfe->nSamplesPerSec = aframe.samplerate;
 											wfe->nChannels = aframe.channels;
 											if (aframe.param1) {
@@ -784,6 +783,12 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 											}
 										}
 									}
+								} else if (ParseDTSHDHeader(start, end - start, &aframe) && aframe.param2 == DCA_PROFILE_EXPRESS) {
+									wfe->nSamplesPerSec = aframe.samplerate;
+									wfe->nChannels = aframe.channels;
+									wfe->wBitsPerSample = aframe.param1;
+									wfe->nBlockAlign = wfe->nChannels * wfe->wBitsPerSample / 8;
+									wfe->nAvgBytesPerSec = CalcBitrate(aframe) / 8;
 								}
 							}
 
