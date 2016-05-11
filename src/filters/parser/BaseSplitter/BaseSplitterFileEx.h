@@ -211,6 +211,9 @@ public:
 		BYTE bits_per_sample:2;
 	};
 
+	struct dtslbr_hdr {
+	};
+
 	struct lpcmhdr
 	{
 		BYTE emphasis:1;
@@ -334,6 +337,7 @@ public:
 	bool Read(latm_aachdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(ac3hdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true, bool AC3CoreOnly = true);
 	bool Read(dtshdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
+	bool Read(dtslbr_hdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(lpcmhdr& h, CMediaType* pmt = NULL);
 	bool Read(dvdalpcmhdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(hdmvlpcmhdr& h, CMediaType* pmt = NULL);

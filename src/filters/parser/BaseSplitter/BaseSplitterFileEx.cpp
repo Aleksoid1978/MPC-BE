@@ -811,6 +811,39 @@ bool CBaseSplitterFileEx::Read(dtshdr& h, int len, CMediaType* pmt, bool find_sy
 	return true;
 }
 
+bool CBaseSplitterFileEx::Read(dtslbr_hdr& h, int len, CMediaType* pmt)
+{
+	if (BitRead(32, true) == FCC(DTS_SYNCWORD_SUBSTREAM)) {
+		BYTE* buf = DNew BYTE[len];
+		audioframe_t aframe;
+		if (ByteRead(buf, len) == S_OK && ParseDTSHDHeader(buf, len, &aframe) && aframe.param2 == DCA_PROFILE_EXPRESS) {
+			delete [] buf;
+
+			if (pmt) {
+				WAVEFORMATEX wfe;
+				memset(&wfe, 0, sizeof(wfe));
+				wfe.wFormatTag = WAVE_FORMAT_DTS2;
+				wfe.nSamplesPerSec = aframe.samplerate;
+				wfe.nChannels = aframe.channels;
+				wfe.wBitsPerSample = aframe.param1;
+				wfe.nBlockAlign = wfe.nChannels * wfe.wBitsPerSample >> 3;
+				wfe.nAvgBytesPerSec = CalcBitrate(aframe) >> 3;
+
+				pmt->majortype = MEDIATYPE_Audio;
+				pmt->subtype = MEDIASUBTYPE_DTS;
+				pmt->formattype = FORMAT_WaveFormatEx;
+				pmt->SetFormat((BYTE*)&wfe, sizeof(wfe));
+			}
+			
+			return true;
+		}
+
+		delete [] buf;
+	}
+
+	return false;
+}
+
 bool CBaseSplitterFileEx::Read(lpcmhdr& h, CMediaType* pmt)
 {
 	memset(&h, 0, sizeof(h));

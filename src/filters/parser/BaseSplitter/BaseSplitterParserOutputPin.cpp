@@ -31,7 +31,7 @@
 #define MOVE_TO_AAC_START_CODE(b, e)     while(b <= e - 9  && ((GETWORD(b) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) b++;
 #define MOVE_TO_AACLATM_START_CODE(b, e) while(b <= e - 4  && ((GETWORD(b) & 0xe0FF) != 0xe056)) b++;
 #define MOVE_TO_DIRAC_START_CODE(b, e)   while(b <= e - 4  && (GETDWORD(b) != 0x44434242)) b++;
-#define MOVE_TO_DTS_START_CODE(b, e)     while(b <= e - 16 && (GETDWORD(b) != DTS_SYNCWORD_CORE_BE)) b++;
+#define MOVE_TO_DTS_START_CODE(b, e)     while(b <= e - 16 && (GETDWORD(b) != DTS_SYNCWORD_CORE_BE) && GETDWORD(b) != DTS_SYNCWORD_SUBSTREAM) b++;
 
 //
 // CBaseSplitterParserOutputPin
@@ -1007,35 +1007,58 @@ HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
 	for(;;) {
 		MOVE_TO_DTS_START_CODE(start, end);
 		if (start <= end - 16) {
-			int size = ParseDTSHeader(start);
-			if (size == 0) {
-				start++;
-				continue;
-			}
-
-			int sizehd = 0;
-			if (start + size + 16 <= end) {
-				sizehd = ParseDTSHDHeader(start + size);
-			} else if (!m_bEndOfStream) {
-				break; // need more data
-			}
-
-			if (start + size + sizehd > end) {
-				break; // need more data
-			}
-
-			if (start + size + sizehd + 16 <= end) {
-				if (!ParseDTSHeader(start + size + sizehd)) {
+			if (GETDWORD(start) == DTS_SYNCWORD_CORE_BE) {
+				int size = ParseDTSHeader(start);
+				if (size == 0) {
 					start++;
 					continue;
 				}
+
+				int sizehd = 0;
+				if (start + size + 16 <= end) {
+					sizehd = ParseDTSHDHeader(start + size);
+				} else if (!m_bEndOfStream) {
+					break; // need more data
+				}
+
+				if (start + size + sizehd > end) {
+					break; // need more data
+				}
+
+				if (start + size + sizehd + 16 <= end) {
+					if (!ParseDTSHeader(start + size + sizehd)) {
+						start++;
+						continue;
+					}
+				}
+
+				size += sizehd;
+
+				HandlePacket(0);
+
+				start += size;
+			} else {
+				int size = ParseDTSHDHeader(start);
+				if (size == 0) {
+					start++;
+					continue;
+				}
+
+				if (start + size > end) {
+					break;
+				}
+
+				if (start + size + 16 <= end) {
+					if (!ParseDTSHDHeader(start + size)) {
+						start++;
+						continue;
+					}
+				}
+
+				HandlePacket(0);
+
+				start += size;
 			}
-
-			size += sizehd;
-
-			HandlePacket(0);
-
-			start += size;
 		} else {
 			break;
 		}
