@@ -158,6 +158,7 @@ SRCS_LC = \
 	libavcodec/dca.c \
 	libavcodec/dca_core.c \
 	libavcodec/dca_exss.c \
+	libavcodec/dca_lbr.c \
 	libavcodec/dca_parser.c \
 	libavcodec/dca_xll.c \
 	libavcodec/dcadata.c \
@@ -184,7 +185,6 @@ SRCS_LC = \
 	libavcodec/dvdata.c \
 	libavcodec/dvdec.c \
 	libavcodec/eac3_data.c \
-	libavcodec/eac3enc.c \
 	libavcodec/eac3dec.c \
 	libavcodec/elsdec.c \
 	libavcodec/error_resilience.c \
