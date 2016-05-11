@@ -1453,7 +1453,9 @@ bool CMP4SplitterFilter::DemuxLoop()
 			p->rtStop = p->rtStart + (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetDuration());
 			p->bSyncPoint = sample.IsSync();
 
-			if (track->GetType() == AP4_Track::TYPE_AUDIO && data.GetDataSize() >= 1 && data.GetDataSize() <= 16) {
+			if (track->GetType() == AP4_Track::TYPE_AUDIO
+					&& mt.subtype != MEDIASUBTYPE_RAW_AAC1
+					&& data.GetDataSize() >= 1 && data.GetDataSize() <= 16) {
 				WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();
 
 				int nBlockAlign;
