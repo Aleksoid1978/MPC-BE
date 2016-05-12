@@ -1458,18 +1458,21 @@ bool CMP4SplitterFilter::DemuxLoop()
 			if (track->GetType() == AP4_Track::TYPE_AUDIO
 					&& mt.subtype != MEDIASUBTYPE_RAW_AAC1
 					&& duration < 500000) { // duration < 50 ms
-				p->SetCount(0, (500000 / duration + 1)*data.GetDataSize());
 
-				do {
+				p->SetCount(0, (500000 / duration + 1)*data.GetDataSize());
+				p->SetData(data.GetData(), data.GetDataSize());
+
+				while (AP4_SUCCEEDED(track->ReadSample(pPairNext->m_value.index + 1, sample, data)) && duration < 500000) {
 					size_t size = p->GetCount();
 					p->SetCount(size + data.GetDataSize());
 					memcpy(p->GetData()+size, data.GetData(), data.GetDataSize());
 
 					p->rtStop = FractionScale64(sample.GetCts() + sample.GetDuration(), UNITS, track->GetMediaTimeScale());
+
 					duration = p->rtStop - p->rtStart;
 
 					pPairNext->m_value.index++;
-				} while (AP4_SUCCEEDED(track->ReadSample(pPairNext->m_value.index, sample, data)) && duration < 500000);
+				}
 			}
 			else if (track->GetType() == AP4_Track::TYPE_TEXT) {
 				const AP4_Byte* ptr = data.GetData();
