@@ -1449,49 +1449,29 @@ bool CMP4SplitterFilter::DemuxLoop()
 
 			CAutoPtr<CPacket> p(DNew CPacket());
 			p->TrackNumber = (DWORD)track->GetId();
-			p->rtStart = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
-			p->rtStop = p->rtStart + (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetDuration());
+			p->rtStart = FractionScale64(sample.GetCts(), UNITS, track->GetMediaTimeScale());
+			p->rtStop = FractionScale64(sample.GetCts() + sample.GetDuration(), UNITS, track->GetMediaTimeScale());
 			p->bSyncPoint = sample.IsSync();
+
+			REFERENCE_TIME duration = p->rtStop - p->rtStart;
 
 			if (track->GetType() == AP4_Track::TYPE_AUDIO
 					&& mt.subtype != MEDIASUBTYPE_RAW_AAC1
-					&& data.GetDataSize() >= 1 && data.GetDataSize() <= 16) {
-				WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();
+					&& duration < 500000) { // duration < 50 ms
+				p->SetCount(0, (500000 / duration + 1)*data.GetDataSize());
 
-				int nBlockAlign;
-				if (wfe->nBlockAlign == 0) {
-					nBlockAlign = 1200;
-				} else if (wfe->nBlockAlign <= 16) { // for PCM (from 8bit mono to 64bit stereo), A-Law, u-Law
-					nBlockAlign = wfe->nBlockAlign * (wfe->nSamplesPerSec >> 4); // 1/16s=62.5ms
-				} else {
-					nBlockAlign = wfe->nBlockAlign;
-					//pPairNext->m_value.index -= pPairNext->m_value.index % wfe->nBlockAlign; // if this code is necessary - we need explanations and examples
-				}
+				do {
+					size_t size = p->GetCount();
+					p->SetCount(size + data.GetDataSize());
+					memcpy(p->GetData()+size, data.GetData(), data.GetDataSize());
 
-				p->rtStop = p->rtStart;
-				int fFirst = true;
-
-				while (AP4_SUCCEEDED(track->ReadSample(pPairNext->m_value.index, sample, data))) {
-					AP4_Size size = data.GetDataSize();
-					const AP4_Byte* ptr = data.GetData();
-
-					if (fFirst) {
-						p->SetData(ptr, size);
-						p->rtStart = p->rtStop = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
-						fFirst = false;
-					} else {
-						for (int i = 0; i < size; ++i) p->Add(ptr[i]);
-					}
-
-					p->rtStop += (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetDuration());
-
-					if (pPairNext->m_value.index + 1 >= track->GetSampleCount() || (int)p->GetCount() >= nBlockAlign) {
-						break;
-					}
+					p->rtStop = FractionScale64(sample.GetCts() + sample.GetDuration(), UNITS, track->GetMediaTimeScale());
+					duration = p->rtStop - p->rtStart;
 
 					pPairNext->m_value.index++;
-				}
-			} else if (track->GetType() == AP4_Track::TYPE_TEXT) {
+				} while (AP4_SUCCEEDED(track->ReadSample(pPairNext->m_value.index, sample, data)) && duration < 500000);
+			}
+			else if (track->GetType() == AP4_Track::TYPE_TEXT) {
 				const AP4_Byte* ptr = data.GetData();
 				AP4_Size avail = data.GetDataSize();
 
@@ -1518,7 +1498,8 @@ bool CMP4SplitterFilter::DemuxLoop()
 						p->SetData((LPCSTR)dlgln, dlgln.GetLength());
 					}
 				}
-			} else {
+			}
+			else {
 				p->SetData(data.GetData(), data.GetDataSize());
 
 				if (track->m_hasPalette) {
