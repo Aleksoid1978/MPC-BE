@@ -6793,12 +6793,12 @@ void CMainFrame::OnUpdateViewTearingTest(CCmdUI* pCmdUI)
 					 r.iSurfaceType == SURFACE_TEXTURE3D;
 
 	pCmdUI->Enable(supported && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
-	pCmdUI->SetCheck(AfxGetMyApp()->m_Renderers.m_fTearingTest);
+	pCmdUI->SetCheck(AfxGetMyApp()->m_Renderers.m_bTearingTest);
 }
 
 void CMainFrame::OnViewTearingTest()
 {
-	AfxGetMyApp()->m_Renderers.m_fTearingTest = !AfxGetMyApp()->m_Renderers.m_fTearingTest;
+	AfxGetMyApp()->m_Renderers.m_bTearingTest = !AfxGetMyApp()->m_Renderers.m_bTearingTest;
 }
 
 void CMainFrame::OnUpdateViewDisplayStats(CCmdUI* pCmdUI)
@@ -6811,7 +6811,7 @@ void CMainFrame::OnUpdateViewDisplayStats(CCmdUI* pCmdUI)
 					 r.iSurfaceType == SURFACE_TEXTURE3D;
 
 	pCmdUI->Enable(supported && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
-	pCmdUI->SetCheck(supported && (AfxGetMyApp()->m_Renderers.m_fDisplayStats));
+	pCmdUI->SetCheck(supported && (AfxGetMyApp()->m_Renderers.m_iDisplayStats));
 }
 
 void CMainFrame::OnViewResetStats()
@@ -6821,13 +6821,13 @@ void CMainFrame::OnViewResetStats()
 
 void CMainFrame::OnViewDisplayStatsSC()
 {
-	if (!AfxGetMyApp()->m_Renderers.m_fDisplayStats) {
+	if (!AfxGetMyApp()->m_Renderers.m_iDisplayStats) {
 		AfxGetMyApp()->m_Renderers.m_bResetStats = true; // to Reset statistics on first call ...
 	}
 
-	++AfxGetMyApp()->m_Renderers.m_fDisplayStats;
-	if (AfxGetMyApp()->m_Renderers.m_fDisplayStats > 3) {
-		AfxGetMyApp()->m_Renderers.m_fDisplayStats = 0;
+	++AfxGetMyApp()->m_Renderers.m_iDisplayStats;
+	if (AfxGetMyApp()->m_Renderers.m_iDisplayStats > 3) {
+		AfxGetMyApp()->m_Renderers.m_iDisplayStats = 0;
 	}
 
 	RepaintVideo();

@@ -169,8 +169,8 @@ class CRenderersData
 public:
 	CRenderersData();
 
-	bool		m_fTearingTest;
-	int			m_fDisplayStats;
+	bool		m_bTearingTest;
+	int			m_iDisplayStats;
 	bool		m_bResetStats; // Set to reset the presentation statistics
 	CString		m_strD3DX9Version;
 	int			m_iRotation;

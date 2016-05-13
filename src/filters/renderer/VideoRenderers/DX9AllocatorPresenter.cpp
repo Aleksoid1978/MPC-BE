@@ -1389,7 +1389,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		pApp->m_bResetStats = false;
 	}
 
-	if (pApp->m_fDisplayStats) {
+	if (pApp->m_iDisplayStats) {
 		g_bGetFrameType = TRUE;
 		DrawStats();
 	} else {
@@ -1787,7 +1787,6 @@ void CDX9AllocatorPresenter::DrawText(const RECT &rc, const CString &strText, in
 
 void CDX9AllocatorPresenter::ResetStats()
 {
-	CRenderersData *pApp = GetRenderersData();
 	LONGLONG Time = GetPerfCounter();
 
 	m_PaintTime = 0;
@@ -1810,16 +1809,16 @@ void CDX9AllocatorPresenter::DrawStats()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	CRenderersData *pApp = GetRenderersData();
-	int bDetailedStats = 2;
-	switch (pApp->m_fDisplayStats) {
+	int iDetailedStats = 2;
+	switch (pApp->m_iDisplayStats) {
 		case 1:
-			bDetailedStats = 2;
+			iDetailedStats = 2;
 			break;
 		case 2:
-			bDetailedStats = 1;
+			iDetailedStats = 1;
 			break;
 		case 3:
-			bDetailedStats = 0;
+			iDetailedStats = 0;
 			break;
 	}
 
@@ -1873,7 +1872,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		m_pSprite->Begin(D3DXSPRITE_ALPHABLEND);
 		CString strText;
 
-		if (bDetailedStats > 1) {
+		if (iDetailedStats > 1) {
 			double rtMS, rtFPS;
 			rtMS = rtFPS = 0.0;
 			if (m_rtTimePerFrame) {
@@ -1909,7 +1908,7 @@ void CDX9AllocatorPresenter::DrawStats()
 			OffsetRect(&rc, 0, TextHeight);
 		}
 
-		if (bDetailedStats > 1) {
+		if (iDetailedStats > 1) {
 			strText = L"Settings     : ";
 
 			if (m_bIsEVR) {
@@ -1996,7 +1995,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		}
 
 		if (m_bSyncStatsAvailable) {
-			if (bDetailedStats > 1) {
+			if (iDetailedStats > 1) {
 				strText.Format(L"Sync offset  : Min = %+8.3f ms, Max = %+8.3f ms, StdDev = %7.3f ms, Avr = %7.3f ms, Mode = %d", (double(llMinSyncOffset)/10000.0), (double(llMaxSyncOffset)/10000.0), m_fSyncOffsetStdDev/10000.0, m_fSyncOffsetAvr/10000.0, m_VSyncMode);
 			} else {
 				strText.Format(L"Sync offset  : Mode = %d", m_VSyncMode);
@@ -2005,13 +2004,13 @@ void CDX9AllocatorPresenter::DrawStats()
 			OffsetRect(&rc, 0, TextHeight);
 		}
 
-		if (bDetailedStats > 1) {
+		if (iDetailedStats > 1) {
 			strText.Format(L"Jitter       : Min = %+8.3f ms, Max = %+8.3f ms, StdDev = %7.3f ms", (double(llMinJitter)/10000.0), (double(llMaxJitter)/10000.0), m_fJitterStdDev/10000.0);
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 		}
 
-		if (m_pAllocator && m_pSubPicProvider && bDetailedStats > 1) {
+		if (m_pAllocator && m_pSubPicProvider && iDetailedStats > 1) {
 			CDX9SubPicAllocator *pAlloc = (CDX9SubPicAllocator *)m_pAllocator.p;
 			int nFree = 0;
 			int nAlloc = 0;
@@ -2038,7 +2037,7 @@ void CDX9AllocatorPresenter::DrawStats()
 			OffsetRect(&rc, 0, TextHeight);
 		}
 
-		if (bDetailedStats > 1) {
+		if (iDetailedStats > 1) {
 			if (m_VBlankEndPresent == -100000) {
 				strText.Format(L"VBlank Wait  : Start %4d   End %4d   Wait %7.3f ms   Lock %7.3f ms   Offset %4d   Max %4d", m_VBlankStartWait, m_VBlankEndWait, (double(m_VBlankWaitTime)/10000.0), (double(m_VBlankLockTime)/10000.0), m_VBlankMin, m_VBlankMax - m_VBlankMin);
 			} else {
@@ -2058,13 +2057,13 @@ void CDX9AllocatorPresenter::DrawStats()
 
 		bool bDoVSyncInPresent = (!bCompositionEnabled && !m_bAlternativeVSync) || !rs.m_AdvRendSets.bVSync;
 
-		if (bDetailedStats > 1 && bDoVSyncInPresent) {
+		if (iDetailedStats > 1 && bDoVSyncInPresent) {
 			strText.Format(L"Present Wait : Wait %7.3f ms   Min %7.3f ms   Max %7.3f ms", (double(m_PresentWaitTime)/10000.0), (double(m_PresentWaitTimeMin)/10000.0), (double(m_PresentWaitTimeMax)/10000.0));
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 		}
 
-		if (bDetailedStats > 1) {
+		if (iDetailedStats > 1) {
 			if (m_WaitForGPUTime) {
 				strText.Format(L"Paint Time   : Draw %7.3f ms   Min %7.3f ms   Max %7.3f ms   GPU %7.3f ms", (double(m_PaintTime-m_WaitForGPUTime)/10000.0), (double(m_PaintTimeMin)/10000.0), (double(m_PaintTimeMax)/10000.0), (double(m_WaitForGPUTime)/10000.0));
 			} else {
@@ -2080,13 +2079,13 @@ void CDX9AllocatorPresenter::DrawStats()
 		DrawText(rc, strText, 2);
 		OffsetRect(&rc, 0, TextHeight);
 
-		if (bDetailedStats > 1) {
+		if (iDetailedStats > 1) {
 			strText.Format(L"Raster Status: Wait %7.3f ms   Min %7.3f ms   Max %7.3f ms", (double(m_RasterStatusWaitTime)/10000.0), (double(m_RasterStatusWaitTimeMin)/10000.0), (double(m_RasterStatusWaitTimeMax)/10000.0));
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 		}
 
-		if (bDetailedStats > 1) {
+		if (iDetailedStats > 1) {
 			if (m_bIsEVR) {
 				strText.Format(L"Buffering    : Buffered %3d    Free %3d    Current Surface %3d", m_nUsedBuffer, m_nNbDXSurface - m_nUsedBuffer, m_nCurSurface);
 			} else {
@@ -2098,7 +2097,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		DrawText(rc, strText, 1);
 		OffsetRect(&rc, 0, TextHeight);
 
-		if (bDetailedStats > 1) {
+		if (iDetailedStats > 1) {
 			strText.Format(L"Video size   : %d x %d (%d:%d)", m_nativeVideoSize.cx, m_nativeVideoSize.cy, m_aspectRatio.cx, m_aspectRatio.cy);
 			int videoW = m_videoRect.Width();
 			int videoH = m_videoRect.Height();
@@ -2189,7 +2188,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		OffsetRect(&rc, 0, TextHeight); // Extra "line feed"
 	}
 
-	if (m_pLine && bDetailedStats) {
+	if (m_pLine && iDetailedStats) {
 		D3DXVECTOR2 Points[NB_JITTER];
 
 		const int defwidth  = 810;

@@ -60,10 +60,13 @@ void CRenderersSettings::CAdvRendererSettings::SetDefault()
 
 CRenderersData::CRenderersData()
 {
-	m_fTearingTest  = false;
-	m_fDisplayStats = false;
-	m_bResetStats   = false;
-	m_hD3DX9Dll     = NULL;
+	m_hD3DX9Dll			= NULL;
+	m_hD3DCompilerDll	= NULL;
+
+	m_bTearingTest		= false;
+	m_iDisplayStats		= 0;
+	m_bResetStats		= false;
+	m_iRotation			= 0;
 
 	// Don't disable hardware features before initializing a renderer
 	m_bFP16Support  = true;
