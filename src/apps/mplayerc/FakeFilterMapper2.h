@@ -27,10 +27,7 @@ class FilterOverride
 {
 public:
 	bool fDisabled, fTemporary;
-	enum {
-		REGISTERED,
-		EXTERNAL
-	} type;
+	enum { REGISTERED, EXTERNAL } type;
 	// REGISTERED
 	CStringW dispname;
 	// EXTERNAL
@@ -38,18 +35,17 @@ public:
 	CLSID clsid;
 	// props
 	CAtlList<GUID> guids, backup;
-	enum {
-		PREFERRED,
-		BLOCK,
-		MERIT
-	};
+	enum { PREFERRED, BLOCK, MERIT };
 	int iLoadType;
 	DWORD dwMerit;
 
-	FilterOverride() {
-		fDisabled	= false;
-		fTemporary	= false;
-		clsid		= CLSID_NULL;
+	FilterOverride()
+		: fDisabled(false)
+		, fTemporary(false)
+		, type(EXTERNAL)
+		, clsid(GUID_NULL)
+		, iLoadType(0)
+		, dwMerit(0) {
 	}
 	FilterOverride(FilterOverride* f) {
 		fDisabled	= f->fDisabled;

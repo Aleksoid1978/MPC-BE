@@ -752,7 +752,7 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 	AfxGetApp()->m_pMainWnd->PostMessage(WM_REARRANGERENDERLESS);
 
 	pMixerType->FreeRepresentation(FORMAT_MFVideoFormat, (LPVOID)pAMMedia);
-	m_pMediaType->QueryInterface(IID_PPV_ARGS(&(*pType)));
+	m_pMediaType->QueryInterface(IID_PPV_ARGS(pType));
 
 	return hr;
 }
@@ -1037,7 +1037,7 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 		REFERENCE_TIME nsDuration;
 		pSample->GetSampleDuration(&nsDuration);
 
-		if (GetRenderersData()->m_fTearingTest) {
+		if (GetRenderersData()->m_bTearingTest) {
 			RECT rcTearing;
 
 			rcTearing.left		= m_nTearingPos;
@@ -2191,7 +2191,6 @@ void CEVRAllocatorPresenter::VSyncThread()
 	dwResolution = min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
 	timeBeginPeriod(dwResolution);
 
-	CRenderersData *pApp	= GetRenderersData();
 	CRenderersSettings& rs	= GetRenderersSettings();
 
 	while (!bQuit) {
