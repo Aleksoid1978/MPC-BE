@@ -1457,12 +1457,12 @@ bool CMP4SplitterFilter::DemuxLoop()
 
 			if (track->GetType() == AP4_Track::TYPE_AUDIO
 					&& mt.subtype != MEDIASUBTYPE_RAW_AAC1
-					&& duration < 500000) { // duration < 50 ms
+					&& duration < 100000) { // duration < 10 ms (hack for PCM, ADPCM, Law and other)
 
-				p->SetCount(0, (500000 / duration + 1)*data.GetDataSize());
+				p->SetCount(0, (500000 / duration + 1)*data.GetDataSize()); // grouping > 50 ms
 				p->SetData(data.GetData(), data.GetDataSize());
 
-				while (AP4_SUCCEEDED(track->ReadSample(pPairNext->m_value.index + 1, sample, data)) && duration < 500000) {
+				while (duration < 500000 && AP4_SUCCEEDED(track->ReadSample(pPairNext->m_value.index + 1, sample, data))) {
 					size_t size = p->GetCount();
 					p->SetCount(size + data.GetDataSize());
 					memcpy(p->GetData()+size, data.GetData(), data.GetDataSize());
