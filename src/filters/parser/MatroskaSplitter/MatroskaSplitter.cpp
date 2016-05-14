@@ -1474,17 +1474,17 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 		Segment& s = m_pFile->m_segment;
 
-		UINT64 TrackNumber = s.GetMasterTrack();
+		const UINT64 TrackNumber = s.GetMasterTrack();
 
 		REFERENCE_TIME seek_rt = 0;
 
 		POSITION pos1 = s.Cues.GetHeadPosition();
 		while (pos1) {
-			Cue* pCue = s.Cues.GetNext(pos1);
+			const Cue* pCue = s.Cues.GetNext(pos1);
 
 			POSITION pos2 = pCue->CuePoints.GetTailPosition();
 			while (pos2) {
-				CuePoint* pCuePoint = pCue->CuePoints.GetPrev(pos2);
+				const CuePoint* pCuePoint = pCue->CuePoints.GetPrev(pos2);
 
 				if (rt < s.GetRefTime(pCuePoint->CueTime)) {
 					continue;
@@ -1492,7 +1492,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 				POSITION pos3 = pCuePoint->CueTrackPositions.GetHeadPosition();
 				while (pos3) {
-					CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetNext(pos3);
+					const CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetNext(pos3);
 
 					if (TrackNumber != pCueTrackPositions->CueTrack) {
 						continue;
@@ -1514,9 +1514,8 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 						c.ParseTimeCode(m_pCluster);
 						seek_rt = s.GetRefTime(c.TimeCode);
 
-						bool fPassedCueTime = false;
+						bool bPassedCueTime = false;
 						if (CAutoPtr<CMatroskaNode> pBlock = m_pCluster->GetFirstBlock()) {
-
 							do {
 								CBlockGroupNode bgn;
 
@@ -1529,36 +1528,27 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 								}
 
 								POSITION pos4 = bgn.GetHeadPosition();
-								while (!fPassedCueTime && pos4) {
+								while (!bPassedCueTime && pos4) {
 									BlockGroup* bg = bgn.GetNext(pos4);
 									seek_rt = s.GetRefTime(c.TimeCode + bg->Block.TimeCode);
 
-									if ((bg->Block.TrackNumber == pCueTrackPositions->CueTrack && rt < seek_rt) || (abs(seek_rt - rt) <= 5000000i64)) {
-										fPassedCueTime = true;
+									if (bg->Block.TrackNumber == pCueTrackPositions->CueTrack && seek_rt <= rt) {
+										bPassedCueTime = true;
 									}
 								}
-							} while (!fPassedCueTime && pBlock->NextBlock());
+							} while (!bPassedCueTime && pBlock->NextBlock());
 						}
 
-						if (fPassedCueTime && seek_rt > 0) {
+						if (bPassedCueTime && seek_rt > 0) {
 							DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek() : Seek One - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt));
 							goto end;
 						}
 					}
 				}
-
-				Cluster c;
-				c.ParseTimeCode(m_pCluster);
-				REFERENCE_TIME seek_rt2 = s.GetRefTime(c.TimeCode);
-
-				if (seek_rt2 > 0) {
-					DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek() : Seek Two - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt2), rt, seek_rt2));
-					goto end;
-				}
 			}
 
 			if (seek_rt > 0 && seek_rt < rt) {
-				DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek() : Seek Three - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt));
+				DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek() : Seek Two - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt));
 				goto end;
 			}
 		}
@@ -1573,8 +1563,8 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 				if (FAILED(c.ParseTimeCode(m_pCluster))) {
 					continue;
 				}
-				REFERENCE_TIME seek_rt2 = s.GetRefTime(c.TimeCode);
 
+				const REFERENCE_TIME seek_rt2 = s.GetRefTime(c.TimeCode);
 				if (seek_rt2 > rt) {
 					break;
 				}
@@ -1590,7 +1580,6 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					if (FAILED(c.ParseTimeCode(m_pCluster))) {
 						continue;
 					}
-					REFERENCE_TIME seek_rt2 = s.GetRefTime(c.TimeCode);
 
 					if (s.GetRefTime(c.TimeCode) == seek_rt) {
 						DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek(), plan B : %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt));
