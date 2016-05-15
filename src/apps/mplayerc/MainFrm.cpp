@@ -12587,6 +12587,24 @@ void CMainFrame::OpenCustomizeGraph()
 
 void CMainFrame::OpenSetupVideo()
 {
+	// get rotation flag
+	BeginEnumFilters(m_pGB, pEF, pBF) {
+		if (CComQIPtr<IPropertyBag> pPB = pBF) {
+			CComVariant var;
+			if (SUCCEEDED(pPB->Read(L"ROTATION", &var, NULL)) && var.vt == VT_BSTR) {
+				int rotation = _wtoi(var.bstrVal) % 360;
+				if (rotation && (rotation % 90 == 0)) {
+					if (rotation < 0) {
+						rotation += 360;
+					}
+					GetRenderersData()->m_iRotation = rotation;
+				}
+				break;
+			}
+		}
+	}
+	EndEnumFilters;
+
 	m_bAudioOnly = true;
 
 	if (m_pMFVDC) {	// EVR
@@ -13813,24 +13831,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			if (!err.IsEmpty()) {
 				break;
 			}
-
-			// get rotation flag
-			BeginEnumFilters(m_pGB, pEF, pBF) {
-				if (CComQIPtr<IPropertyBag> pPB = pBF) {
-					CComVariant var;
-					if (SUCCEEDED(pPB->Read(L"ROTATION", &var, NULL)) && var.vt == VT_BSTR) {
-						int rotation = _wtoi(var.bstrVal) % 360;
-						if (rotation && (rotation % 90 == 0)) {
-							if (rotation < 0) {
-								rotation += 360;
-							}
-							GetRenderersData()->m_iRotation = rotation;
-						}
-						break;
-					}
-				}
-			}
-			EndEnumFilters;
 		} else if (pDVDData) {
 			err = OpenDVD(pDVDData);
 			if (!err.IsEmpty()) {
