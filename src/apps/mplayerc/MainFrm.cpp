@@ -4198,31 +4198,6 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		m_wndEditListEditor.OpenFile(m_lastOMD->title);
 	}
 
-	if (m_pCAP || m_pMVRC) {
-		if (OpenFileData *pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.m_p)) {
-			// Rotation flag;
-			BeginEnumFilters(m_pGB, pEF, pBF) {
-				if (CComQIPtr<IPropertyBag> pPB = pBF) {
-					CComVariant var;
-					if (SUCCEEDED(pPB->Read(L"ROTATION", &var, NULL)) && var.vt == VT_BSTR) {
-						int rotation = _wtoi(var.bstrVal) % 360;
-						if (rotation && (rotation % 90 == 0)) {
-							if (rotation < 0) {
-								rotation += 360;
-							}
-							GetRenderersData()->m_iRotation = rotation;
-							if (m_pMVRC) {
-								m_pMVRC->SendCommandInt("rotate", rotation);
-							}
-						}
-						break;
-					}
-				}
-			}
-			EndEnumFilters;
-		}
-	}
-
 	if (OpenDeviceData *pDeviceData = dynamic_cast<OpenDeviceData*>(m_lastOMD.m_p)) {
 		m_wndCaptureBar.m_capdlg.SetVideoInput(pDeviceData->vinput);
 		m_wndCaptureBar.m_capdlg.SetVideoChannel(pDeviceData->vchannel);
@@ -11591,8 +11566,8 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		if (!m_fCustomGraph) {
 			m_pGB = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_pVideoWnd->m_hWnd);
 
-			// Graph for preview
-			if (m_bUseSmartSeek && m_wndPreView) {
+			if (m_pGB && m_bUseSmartSeek && m_wndPreView) {
+				// build graph for preview
 				m_pGB_preview = DNew CFGManagerPlayer(_T("CFGManagerPlayer"), NULL, m_wndPreView.GetVideoHWND(), true);
 			}
 		}
@@ -13838,6 +13813,24 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			if (!err.IsEmpty()) {
 				break;
 			}
+
+			// get rotation flag
+			BeginEnumFilters(m_pGB, pEF, pBF) {
+				if (CComQIPtr<IPropertyBag> pPB = pBF) {
+					CComVariant var;
+					if (SUCCEEDED(pPB->Read(L"ROTATION", &var, NULL)) && var.vt == VT_BSTR) {
+						int rotation = _wtoi(var.bstrVal) % 360;
+						if (rotation && (rotation % 90 == 0)) {
+							if (rotation < 0) {
+								rotation += 360;
+							}
+							GetRenderersData()->m_iRotation = rotation;
+						}
+						break;
+					}
+				}
+			}
+			EndEnumFilters;
 		} else if (pDVDData) {
 			err = OpenDVD(pDVDData);
 			if (!err.IsEmpty()) {

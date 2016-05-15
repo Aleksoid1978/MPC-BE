@@ -358,7 +358,7 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 	if (arx > 0 && ary > 0) {
 		VideoSize.cx = VideoSize.cy * arx / ary;
 	}
-	if (VideoSize != GetVideoSize()) {
+	if (VideoSize != GetVisibleVideoSize()) {
 		m_aspectRatio.SetSize(arx, ary);
 		AfxGetApp()->m_pMainWnd->PostMessage(WM_REARRANGERENDERLESS);
 	}
