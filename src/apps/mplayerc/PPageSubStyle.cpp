@@ -286,6 +286,7 @@ void CPPageSubStyle::OnBnClickedButton2()
 	m_stss->SetDefault();
 
 	Init();
+	Invalidate();
 	SetModified();
 }
 
