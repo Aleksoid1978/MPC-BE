@@ -369,9 +369,6 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 
 	int screenSpacePassCount = 0;
 	DWORD iResizer = GetRenderersSettings().iResizer;
-	if (GetRenderersData()->m_iRotation) {
-		m_iRotation = 360 - GetRenderersData()->m_iRotation;
-	}
 
 	if (m_bD3DX) {
 		// Final pass. Must be initialized first!

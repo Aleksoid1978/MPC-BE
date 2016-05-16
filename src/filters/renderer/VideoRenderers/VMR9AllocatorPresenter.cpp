@@ -205,6 +205,29 @@ STDMETHODIMP CVMR9AllocatorPresenter::InitializeDevice(DWORD_PTR dwUserID, VMR9A
 	*lpNumBuffers = min(nOriginal, *lpNumBuffers);
 	m_iVMR9Surface = 0;
 
+	{
+		// get rotation flag
+		CComPtr<IBaseFilter> pBF;
+		if (SUCCEEDED(m_pIVMRSurfAllocNotify->QueryInterface(IID_PPV_ARGS(&pBF)))) {
+			while (pBF = GetUpStreamFilter(pBF)) {
+				if (CComQIPtr<IPropertyBag> pPB = pBF) {
+					CComVariant var;
+					if (SUCCEEDED(pPB->Read(L"ROTATION", &var, NULL)) && var.vt == VT_BSTR) {
+						int rotation = _wtoi(var.bstrVal) % 360;
+						if (rotation && (rotation % 90 == 0)) {
+							if (rotation < 0) {
+								rotation += 360;
+							}
+							m_iRotation = 360 - rotation;
+							GetRenderersData()->m_iRotation = rotation;
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	return hr;
 }
 

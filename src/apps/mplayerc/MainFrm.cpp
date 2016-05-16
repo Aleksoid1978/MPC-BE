@@ -12587,27 +12587,17 @@ void CMainFrame::OpenCustomizeGraph()
 
 void CMainFrame::OpenSetupVideo()
 {
-	// get rotation flag
-	BeginEnumFilters(m_pGB, pEF, pBF) {
-		if (CComQIPtr<IPropertyBag> pPB = pBF) {
-			CComVariant var;
-			if (SUCCEEDED(pPB->Read(L"ROTATION", &var, NULL)) && var.vt == VT_BSTR) {
-				int rotation = _wtoi(var.bstrVal) % 360;
-				if (rotation && (rotation % 90 == 0)) {
-					if (rotation < 0) {
-						rotation += 360;
-					}
-					GetRenderersData()->m_iRotation = rotation;
-				}
-				break;
-			}
+	if (m_pMVRI) {
+		// get initial rotation value for madVR
+		int rotation;
+		if (S_OK == (m_pMVRI->GetInt("rotation", &rotation))) {
+			GetRenderersData()->m_iRotation = rotation;
 		}
 	}
-	EndEnumFilters;
 
 	m_bAudioOnly = true;
 
-	if (m_pMFVDC) {	// EVR
+	if (m_pMFVDC) {// EVR
 		m_bAudioOnly = false;
 	} else if (m_pCAP) {
 		CSize vs = m_pCAP->GetVideoSize();

@@ -1177,9 +1177,6 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 	CRenderersSettings& rs = GetRenderersSettings();
 	CRenderersData *pApp = GetRenderersData();
-	if (pApp->m_iRotation) {
-		m_iRotation = 360 - pApp->m_iRotation;
-	}
 	D3DRASTER_STATUS rasterStatus;
 	REFERENCE_TIME llCurRefTime = 0;
 	REFERENCE_TIME llSyncOffset = 0;
@@ -3239,6 +3236,30 @@ STDMETHODIMP CSyncAP::InitializeDevice(AM_MEDIA_TYPE* pMediaType)
 		}
 		ASSERT (SUCCEEDED (hr));
 	}
+
+	{
+		// get rotation flag
+		CComPtr<IBaseFilter> pBF;
+		if (SUCCEEDED(m_pOuterEVR->QueryInterface(IID_PPV_ARGS(&pBF)))) {
+			while (pBF = GetUpStreamFilter(pBF)) {
+				if (CComQIPtr<IPropertyBag> pPB = pBF) {
+					CComVariant var;
+					if (SUCCEEDED(pPB->Read(L"ROTATION", &var, NULL)) && var.vt == VT_BSTR) {
+						int rotation = _wtoi(var.bstrVal) % 360;
+						if (rotation && (rotation % 90 == 0)) {
+							if (rotation < 0) {
+								rotation += 360;
+							}
+							m_iRotation = 360 - rotation;
+							GetRenderersData()->m_iRotation = rotation;
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	return hr;
 }
 
