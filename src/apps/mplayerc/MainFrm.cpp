@@ -5983,8 +5983,8 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 	CSize framesize, dar;
 
 	if (m_pCAP) {
-		framesize = m_pCAP->GetVideoSize(false);
-		dar = m_pCAP->GetVideoSize(true);
+		framesize = m_pCAP->GetVideoSize();
+		dar = m_pCAP->GetVideoSizeAR();
 	} else if (m_pMFVDC) {
 		m_pMFVDC->GetNativeVideoSize(&framesize, &dar);
 	} else {
@@ -10558,10 +10558,10 @@ CSize CMainFrame::GetVideoSize()
 	CSize wh(0, 0), arxy(0, 0);
 
 	if (m_pCAP) {
-		wh = m_pCAP->GetVideoSize(false);
-		arxy = m_pCAP->GetVideoSize(fKeepAspectRatio);
+		wh = m_pCAP->GetVideoSize();
+		arxy = fKeepAspectRatio ? m_pCAP->GetVideoSizeAR() : wh;
 	} else if (m_pMFVDC) {
-		m_pMFVDC->GetNativeVideoSize(&wh, &arxy);	// TODO : check AR !!
+		m_pMFVDC->GetNativeVideoSize(&wh, &arxy); // TODO : check AR !!
 	} else {
 		m_pBV->GetVideoSize(&wh.cx, &wh.cy);
 
@@ -12601,7 +12601,7 @@ void CMainFrame::OpenSetupVideo()
 	if (m_pMFVDC) {// EVR
 		m_bAudioOnly = false;
 	} else if (m_pCAP) {
-		CSize vs = m_pCAP->GetVideoSize();
+		CSize vs = m_pCAP->GetVideoSizeAR();
 		m_bAudioOnly = (vs.cx <= 0 || vs.cy <= 0);
 	} else {
 		{
@@ -16115,7 +16115,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 				pRTS->SetAlignment(s.fOverridePlacement, s.nHorPos, s.nVerPos);
 
 				if (m_pCAP && s.fKeepAspectRatio && pRTS->m_path.IsEmpty() && pRTS->m_dstScreenSizeActual) {
-					CSize szAspectRatio = m_pCAP->GetVideoSize(true);
+					CSize szAspectRatio = m_pCAP->GetVideoSizeAR();
 
 					if (szAspectRatio.cx && szAspectRatio.cy && pRTS->m_dstScreenSize.cx && pRTS->m_dstScreenSize.cy) {
 						pRTS->m_ePARCompensationType = CSimpleTextSubtitle::EPARCompensationType::EPCTAccurateSize_ISR;

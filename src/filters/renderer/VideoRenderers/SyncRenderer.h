@@ -345,13 +345,16 @@ namespace GothSync
 
 		// ISubPicAllocatorPresenter
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);
-		STDMETHODIMP_(SIZE) GetVideoSize(bool fCorrectAR = true);
+		STDMETHODIMP_(SIZE) GetVideoSize();
+		STDMETHODIMP_(SIZE) GetVideoSizeAR();
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
 		STDMETHODIMP SetPixelShader(LPCSTR pSrcData, LPCSTR pTarget);
-		STDMETHODIMP SetPixelShader2(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace);
 		STDMETHODIMP_(bool) ResetDevice();
 		STDMETHODIMP_(bool) DisplayChange();
+
+		// ISubPicAllocatorPresenter2
+		STDMETHODIMP SetPixelShader2(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace);
 
 		// ISubRenderOptions
 		STDMETHODIMP GetInt(LPCSTR field, int* value);

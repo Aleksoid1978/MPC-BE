@@ -469,7 +469,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			{1.0f / videoDesc.Width, 1.0f / videoDesc.Height, 0, 0},
 		};
 #else
-		CSize VideoSize = GetVisibleVideoSize();
+		CSize VideoSize = m_nativeVideoSize;
 		float fConstData[][4] = {
 			{(float)VideoSize.cx, (float)VideoSize.cy, (float)(counter++), (float)diff / CLOCKS_PER_SEC},
 			{1.0f / VideoSize.cx, 1.0f / VideoSize.cy, 0, 0},
@@ -2108,16 +2108,26 @@ HRESULT CDX9RenderingEngine::SetCustomPixelShader(LPCSTR pSrcData, LPCSTR pTarge
 
 // ISubPicAllocatorPresenter
 
-STDMETHODIMP_(SIZE) CDX9RenderingEngine::GetVideoSize(bool fCorrectAR)
+STDMETHODIMP_(SIZE) CDX9RenderingEngine::GetVideoSize()
 {
-	SIZE VideoSize = __super::GetVideoSize(fCorrectAR);
+	SIZE size = __super::GetVideoSize();
 
 	if (m_iRotation == 90 || m_iRotation == 270) {
-		std::swap(VideoSize.cx, VideoSize.cy);
+		std::swap(size.cx, size.cy);
 	}
-	// TODO: how to rotate the anamorphic and cropping frames?
 
-	return VideoSize;
+	return size;
+}
+
+STDMETHODIMP_(SIZE) CDX9RenderingEngine::GetVideoSizeAR()
+{
+	SIZE size = __super::GetVideoSizeAR();
+
+	if (m_iRotation == 90 || m_iRotation == 270) {
+		std::swap(size.cx, size.cy);
+	}
+
+	return size;
 }
 
 // ISubRenderOptions

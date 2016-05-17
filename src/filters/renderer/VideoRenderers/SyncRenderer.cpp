@@ -771,16 +771,26 @@ STDMETHODIMP CBaseAP::CreateRenderer(IUnknown** ppRenderer)
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP_(SIZE) CBaseAP::GetVideoSize(bool fCorrectAR)
+STDMETHODIMP_(SIZE) CBaseAP::GetVideoSize()
 {
-	SIZE VideoSize = __super::GetVideoSize(fCorrectAR);
+	SIZE size = __super::GetVideoSize();
 
 	if (m_iRotation == 90 || m_iRotation == 270) {
-		std::swap(VideoSize.cx, VideoSize.cy);
+		std::swap(size.cx, size.cy);
 	}
-	// TODO: how to rotate the anamorphic and cropping frames?
 
-	return VideoSize;
+	return size;
+}
+
+STDMETHODIMP_(SIZE) CBaseAP::GetVideoSizeAR()
+{
+	SIZE size = __super::GetVideoSizeAR();
+
+	if (m_iRotation == 90 || m_iRotation == 270) {
+		std::swap(size.cx, size.cy);
+	}
+
+	return size;
 }
 
 bool CBaseAP::ClipToSurface(IDirect3DSurface9* pSurface, CRect& s, CRect& d)
@@ -3565,7 +3575,7 @@ void CSyncAP::OnResetDevice()
 	if (m_pSink) {
 		m_pSink->Notify(EC_DISPLAY_CHANGED, 0, 0);
 	}
-	CSize videoSize = GetVisibleVideoSize();
+	CSize videoSize = m_nativeVideoSize;
 	if (m_pSink) {
 		m_pSink->Notify(EC_VIDEO_SIZE_CHANGED, MAKELPARAM(videoSize.cx, videoSize.cy), 0);
 	}

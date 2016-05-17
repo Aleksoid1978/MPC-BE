@@ -229,7 +229,8 @@ namespace DSObjects
 
 	public:
 		// ISubPicAllocatorPresenter
-		STDMETHODIMP_(SIZE) GetVideoSize(bool fCorrectAR = true);
+		STDMETHODIMP_(SIZE) GetVideoSize();
+		STDMETHODIMP_(SIZE) GetVideoSizeAR();
 
 		// ISubRenderOptions
 		STDMETHODIMP GetInt(LPCSTR field, int* value);
