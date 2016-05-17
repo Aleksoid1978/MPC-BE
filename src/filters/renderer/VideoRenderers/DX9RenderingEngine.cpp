@@ -508,10 +508,10 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		CComPtr<IDirect3DSurface9> pTemporarySurface;
 		switch (m_iRotation) {
 		case 90:
-			dst[0].Set(0.0f, (float)videoDesc.Height, 0.5f);
-			dst[1].Set(0.0f, 0.0f, 0.5f);
-			dst[2].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
-			dst[3].Set((float)videoDesc.Width, 0.0f, 0.5f);
+			dst[0].Set((float)videoDesc.Width, 0.0f, 0.5f);
+			dst[1].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
+			dst[2].Set(0.0f, 0.0f, 0.5f);
+			dst[3].Set(0.0f, (float)videoDesc.Height, 0.5f);
 			hr = m_pRotateTexture->GetSurfaceLevel(0, &pTemporarySurface);
 			break;
 		case 180:
@@ -522,10 +522,10 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			hr = m_pFrameTextures[dest]->GetSurfaceLevel(0, &pTemporarySurface);
 			break;
 		case 270:
-			dst[0].Set((float)videoDesc.Width, 0.0f, 0.5f);
-			dst[1].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
-			dst[2].Set(0.0f, 0.0f, 0.5f);
-			dst[3].Set(0.0f, (float)videoDesc.Height, 0.5f);
+			dst[0].Set(0.0f, (float)videoDesc.Height, 0.5f);
+			dst[1].Set(0.0f, 0.0f, 0.5f);
+			dst[2].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
+			dst[3].Set((float)videoDesc.Width, 0.0f, 0.5f);
 			hr = m_pRotateTexture->GetSurfaceLevel(0, &pTemporarySurface);
 			break;
 		}
@@ -2118,4 +2118,18 @@ STDMETHODIMP_(SIZE) CDX9RenderingEngine::GetVideoSize(bool fCorrectAR)
 	// TODO: how to rotate the anamorphic and cropping frames?
 
 	return VideoSize;
+}
+
+// ISubRenderOptions
+
+STDMETHODIMP CDX9RenderingEngine::GetInt(LPCSTR field, int* value)
+{
+	CheckPointer(value, E_POINTER);
+	if (strcmp(field, "rotation") == 0) {
+		*value = m_iRotation;
+
+		return S_OK; // TODO
+	}
+
+	return __super::GetInt(field, value);
 }

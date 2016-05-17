@@ -173,7 +173,6 @@ public:
 	int			m_iDisplayStats;
 	bool		m_bResetStats; // Set to reset the presentation statistics
 	CString		m_strD3DX9Version;
-	int			m_iRotation;
 
 	// Hardware feature support
 	bool		m_bFP16Support;

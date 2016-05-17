@@ -117,7 +117,7 @@ namespace DSObjects
 
 		bool	m_bColorManagement;
 		int		m_nDX9Resizer;
-		int		m_iRotation;
+		int		m_iRotation; // Rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
 
 		CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError);
 		~CDX9RenderingEngine();
@@ -230,6 +230,9 @@ namespace DSObjects
 	public:
 		// ISubPicAllocatorPresenter
 		STDMETHODIMP_(SIZE) GetVideoSize(bool fCorrectAR = true);
+
+		// ISubRenderOptions
+		STDMETHODIMP GetInt(LPCSTR field, int* value);
 	};
 
 }

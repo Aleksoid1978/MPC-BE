@@ -653,6 +653,7 @@ CMainFrame::CMainFrame() :
 	m_bfirstPlay(false),
 	m_dwLastRun(0),
 	IsMadVRExclusiveMode(false),
+	m_iMVRDefRotation(0),
 	m_pBFmadVR(NULL),
 	m_hDWMAPI(0),
 	m_hWtsLib(0),
@@ -7504,7 +7505,7 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 			m_PosX = m_PosY = 0.5;
 			m_AngleX = m_AngleY = m_AngleZ = 0;
 			if (m_pMVRC) {
-				m_pMVRC->SendCommandInt("rotate", GetRenderersData()->m_iRotation);
+				m_pMVRC->SendCommandInt("rotate", m_iMVRDefRotation);
 			}
 			break;
 		case ID_VIEW_INCSIZE:
@@ -7686,7 +7687,7 @@ void CMainFrame::OnViewRotate(UINT nID)
 		ASSERT(rotation >= 0);
 
 		if (SUCCEEDED(hr = m_pMVRC->SendCommandInt("rotate", rotation))) {
-			m_AngleZ = (360 + GetRenderersData()->m_iRotation - rotation) % 360;
+			m_AngleZ = (360 + m_iMVRDefRotation - rotation) % 360;
 		}
 	} else if (m_pCAP) {
 		switch (nID) {
@@ -12591,7 +12592,7 @@ void CMainFrame::OpenSetupVideo()
 		// get initial rotation value for madVR
 		int rotation;
 		if (S_OK == (m_pMVRI->GetInt("rotation", &rotation))) {
-			GetRenderersData()->m_iRotation = rotation;
+			m_iMVRDefRotation = rotation;
 		}
 	}
 
@@ -13618,7 +13619,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	SetEvent(m_hRefreshNotifyRenderThreadEvent);
 
 	m_PlaybackRate = 1.0;
-	GetRenderersData()->m_iRotation = 0;
+	m_iMVRDefRotation = 0;
 
 	ClearDXVAState();
 
