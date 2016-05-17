@@ -174,7 +174,7 @@ STDMETHODIMP CVMR9AllocatorPresenter::InitializeDevice(DWORD_PTR dwUserID, VMR9A
 
 	m_bNeedCheckSample = true;
 	m_nativeVideoSize = CSize(w, h);
-	CSize VideoSize = GetVisibleVideoSize();
+	CSize VideoSize = m_nativeVideoSize;
 	int arx = lpAllocInfo->szAspectRatio.cx;
 	int ary = lpAllocInfo->szAspectRatio.cy;
 	if (arx > 0 && ary > 0) {
@@ -380,7 +380,7 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 	if (arx > 0 && ary > 0) {
 		VideoSize.cx = VideoSize.cy * arx / ary;
 	}
-	if (VideoSize != GetVisibleVideoSize()) {
+	if (VideoSize != m_nativeVideoSize) {
 		m_aspectRatio.SetSize(arx, ary);
 		AfxGetApp()->m_pMainWnd->PostMessage(WM_REARRANGERENDERLESS);
 	}
@@ -461,7 +461,7 @@ STDMETHODIMP CVMR9AllocatorPresenter::SetVideoPosition(const LPRECT lpSRCRect, c
 
 STDMETHODIMP CVMR9AllocatorPresenter::GetVideoPosition(LPRECT lpSRCRect, LPRECT lpDSTRect)
 {
-	CopyRect(lpSRCRect, CRect(CPoint(0, 0), GetVisibleVideoSize()));
+	CopyRect(lpSRCRect, CRect(CPoint(0, 0), m_nativeVideoSize));
 	CopyRect(lpDSTRect, &m_videoRect);
 	return S_OK;
 }

@@ -74,44 +74,33 @@ public:
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
 	// ISubPicAllocatorPresenter
-
 	STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) PURE;
-
-	STDMETHODIMP_(SIZE) GetVideoSize(bool fCorrectAR = true);
-	STDMETHODIMP_(SIZE) GetVisibleVideoSize() { return m_nativeVideoSize; };
+	STDMETHODIMP_(SIZE) GetVideoSize();
+	STDMETHODIMP_(SIZE) GetVideoSizeAR();
 	STDMETHODIMP_(void) SetPosition(RECT w, RECT v);
 	STDMETHODIMP_(bool) Paint(bool fAll) PURE;
-
 	STDMETHODIMP_(void) SetTime(REFERENCE_TIME rtNow);
 	STDMETHODIMP_(void) SetSubtitleDelay(int delay_ms);
 	STDMETHODIMP_(int) GetSubtitleDelay();
 	STDMETHODIMP_(double) GetFPS();
-
 	STDMETHODIMP_(void) SetSubPicProvider(ISubPicProvider* pSubPicProvider);
 	STDMETHODIMP_(void) Invalidate(REFERENCE_TIME rtInvalidate = -1);
-
 	STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) { return E_NOTIMPL; }
-
-	STDMETHODIMP_(bool) ResetDevice() { return false; }
-
-	STDMETHODIMP_(bool) DisplayChange() { return false; }
-
 	STDMETHODIMP SetVideoAngle(Vector v, bool fRepaint = true);
 	STDMETHODIMP SetPixelShader(LPCSTR pSrcData, LPCSTR pTarget) { return E_NOTIMPL; }
+	STDMETHODIMP_(bool) ResetDevice() { return false; }
+	STDMETHODIMP_(bool) DisplayChange() { return false; }
 
 	// ISubPicAllocatorPresenter2
-
 	STDMETHODIMP SetPixelShader2(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace) {
 		if (!bScreenSpace) {
 			return SetPixelShader(pSrcData, pTarget);
 		}
 		return E_NOTIMPL;
 	}
-
 	STDMETHODIMP SetIsRendering(bool bIsRendering) { return E_NOTIMPL; }
 
 	// ISubRenderOptions
-
 	STDMETHODIMP GetBool(LPCSTR field, bool* value);
 	STDMETHODIMP GetInt(LPCSTR field, int* value);
 	STDMETHODIMP GetSize(LPCSTR field, SIZE* value);
@@ -130,7 +119,6 @@ public:
 	STDMETHODIMP SetBin(LPCSTR field, LPVOID value, int size);
 
 	// ISubRenderConsumer
-
 	STDMETHODIMP GetMerit(ULONG* plMerit) {
 		CheckPointer(plMerit, E_POINTER);
 		*plMerit = 4 << 16;
@@ -141,6 +129,5 @@ public:
 	STDMETHODIMP DeliverFrame(REFERENCE_TIME start, REFERENCE_TIME stop, LPVOID context, ISubRenderFrame* subtitleFrame);
 
 	// ISubRenderConsumer2
-
 	STDMETHODIMP Clear(REFERENCE_TIME clearNewerThan = 0);
 };

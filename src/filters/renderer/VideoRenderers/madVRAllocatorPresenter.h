@@ -68,16 +68,17 @@ namespace DSObjects
 
 		// ISubPicAllocatorPresenter
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) override;
+		STDMETHODIMP_(SIZE) GetVideoSize() override;
+		STDMETHODIMP_(SIZE) GetVideoSizeAR() override;
 		STDMETHODIMP_(void) SetPosition(RECT w, RECT v) override;
-		STDMETHODIMP_(SIZE) GetVideoSize(bool bCorrectAR = true) override;
 		STDMETHODIMP_(bool) Paint(bool bAll) override;
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) override;
 		STDMETHODIMP SetPixelShader(LPCSTR pSrcData, LPCSTR pTarget) override {
 			return SetPixelShader2(pSrcData, pTarget, false);
 		};
-		STDMETHODIMP SetPixelShader2(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace) override;
 
 		// ISubPicAllocatorPresenter2
+		STDMETHODIMP SetPixelShader2(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace) override;
 		STDMETHODIMP_(bool) IsRendering() override;
 	};
 }

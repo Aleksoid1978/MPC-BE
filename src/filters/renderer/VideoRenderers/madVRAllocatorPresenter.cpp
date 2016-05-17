@@ -167,20 +167,22 @@ STDMETHODIMP_(void) CmadVRAllocatorPresenter::SetPosition(RECT w, RECT v)
 	}
 }
 
-STDMETHODIMP_(SIZE) CmadVRAllocatorPresenter::GetVideoSize(bool bCorrectAR)
+STDMETHODIMP_(SIZE) CmadVRAllocatorPresenter::GetVideoSize()
 {
-	CSize size;
+	SIZE size = {0, 0};
+	if (CComQIPtr<IBasicVideo> pBV = m_pMVR) {
+		// Final size of the video, after all scaling and cropping operations
+		// This is also aspect ratio adjusted
+		pBV->GetVideoSize(&size.cx, &size.cy);
+	}
+	return size;
+}
 
-	if (!bCorrectAR) {
-		if (CComQIPtr<IBasicVideo> pBV = m_pMVR) {
-			// Final size of the video, after all scaling and cropping operations
-			// This is also aspect ratio adjusted
-			pBV->GetVideoSize(&size.cx, &size.cy);
-		}
-	} else {
-		if (CComQIPtr<IBasicVideo2> pBV2 = m_pMVR) {
-			pBV2->GetPreferredAspectRatio(&size.cx, &size.cy);
-		}
+STDMETHODIMP_(SIZE) CmadVRAllocatorPresenter::GetVideoSizeAR()
+{
+	SIZE size = {0, 0};
+	if (CComQIPtr<IBasicVideo2> pBV2 = m_pMVR) {
+		pBV2->GetPreferredAspectRatio(&size.cx, &size.cy);
 	}
 	return size;
 }

@@ -89,8 +89,9 @@ namespace DSObjects
 
 		// ISubPicAllocatorPresenter
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);
+		STDMETHODIMP_(SIZE) GetVideoSize();
+		STDMETHODIMP_(SIZE) GetVideoSizeAR();
 		STDMETHODIMP_(void) SetPosition(RECT w, RECT v);
-		STDMETHODIMP_(SIZE) GetVideoSize(bool fCorrectAR);
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
 		STDMETHODIMP SetPixelShader(LPCSTR pSrcData, LPCSTR pTarget);

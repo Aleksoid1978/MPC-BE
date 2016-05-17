@@ -172,7 +172,8 @@ ISubPicAllocatorPresenter :
 public IUnknown {
 	STDMETHOD (CreateRenderer) (IUnknown** ppRenderer) PURE;
 
-	STDMETHOD_(SIZE, GetVideoSize) (bool fCorrectAR = true) PURE;
+	STDMETHOD_(SIZE, GetVideoSize) () PURE;
+	STDMETHOD_(SIZE, GetVideoSizeAR) () PURE;
 	STDMETHOD_(void, SetPosition) (RECT w, RECT v) PURE;
 	STDMETHOD_(bool, Paint) (bool fAll) PURE;
 
@@ -198,7 +199,6 @@ interface __declspec(uuid("767AEBA8-A084-488a-89C8-F6B74E53A90F"))
 ISubPicAllocatorPresenter2 :
 public ISubPicAllocatorPresenter {
 	STDMETHOD (SetPixelShader2) (LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace) PURE;
-	STDMETHOD_(SIZE, GetVisibleVideoSize) () PURE;
 
 	STDMETHOD_(bool, IsRendering)() PURE;
 	STDMETHOD(SetIsRendering)(bool bIsRendering) PURE;

@@ -1357,7 +1357,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	m_pD3DDev->SetRenderTarget(0, pBackBuffer);
 	hr = m_pD3DDev->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0);
 
-	CRect rSrcVid(CPoint(0, 0), GetVisibleVideoSize());
+	CRect rSrcVid(CPoint(0, 0), m_nativeVideoSize);
 	CRect rDstVid(m_videoRect);
 
 	CRect rSrcPri(CPoint(0, 0), m_windowRect.Size());
@@ -2266,8 +2266,8 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	memset(&desc, 0, sizeof(desc));
 	m_pVideoSurface[m_nCurSurface]->GetDesc(&desc);
 
-	CSize framesize = GetVideoSize(false);
-	CSize dar = GetVideoSize(true);
+	CSize framesize = GetVideoSize();
+	CSize dar = GetVideoSizeAR();
 	if (dar.cx > 0 && dar.cy > 0) {
 		framesize.cx = MulDiv(framesize.cy, dar.cx, dar.cy);
 	}

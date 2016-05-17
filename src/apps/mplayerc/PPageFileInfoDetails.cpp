@@ -115,8 +115,8 @@ CPPageFileInfoDetails::CPPageFileInfoDetails(CString fn, IFilterGraph* pFG, ISub
 	CSize wh(0, 0), arxy(0, 0);
 
 	if (pCAP) {
-		wh = pCAP->GetVideoSize(false);
-		arxy = pCAP->GetVideoSize(true);
+		wh = pCAP->GetVideoSize();
+		arxy = pCAP->GetVideoSizeAR();
 	} else {
 		if (CComQIPtr<IBasicVideo> pBV = pFG) {
 			if (SUCCEEDED(pBV->GetVideoSize(&wh.cx, &wh.cy))) {

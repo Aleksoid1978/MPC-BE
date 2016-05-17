@@ -145,15 +145,20 @@ void CSubPicAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const CRec
 
 // ISubPicAllocatorPresenter
 
-STDMETHODIMP_(SIZE) CSubPicAllocatorPresenterImpl::GetVideoSize(bool fCorrectAR)
+STDMETHODIMP_(SIZE) CSubPicAllocatorPresenterImpl::GetVideoSize()
 {
-	CSize VideoSize(GetVisibleVideoSize());
+	return m_nativeVideoSize;
+}
 
-	if (fCorrectAR && m_aspectRatio.cx > 0 && m_aspectRatio.cy > 0) {
-		VideoSize.cx = (LONGLONG(VideoSize.cy) * LONGLONG(m_aspectRatio.cx)) / LONGLONG(m_aspectRatio.cy);
+STDMETHODIMP_(SIZE) CSubPicAllocatorPresenterImpl::GetVideoSizeAR()
+{
+	SIZE size = m_nativeVideoSize;
+
+	if (m_aspectRatio.cx > 0 && m_aspectRatio.cy > 0) {
+		size.cx = MulDiv(size.cy, m_aspectRatio.cx, m_aspectRatio.cy);
 	}
 
-	return VideoSize;
+	return size;
 }
 
 STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetPosition(RECT w, RECT v)
