@@ -94,6 +94,7 @@ CAviSplitterFilter::CAviSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_bBadInterleavedSuport(true)
 	, m_bSetReindex(true)
 {
+	m_nFlag |= SOURCE_SUPPORT_URL;
 #ifdef REGISTER_FILTER
 	CRegKey key;
 
@@ -681,9 +682,8 @@ bool CAviSplitterFilter::DemuxLoop()
 
 	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
 		DWORD curTrack = DWORD_MAX;
-
+		UINT64 minpos = 0;
 		REFERENCE_TIME minTime = INT64_MAX;
-		UINT64 minpos = INT64_MAX;
 		for (DWORD track = 0; track < m_pFile->m_avih.dwStreams; track++) {
 			CAviFile::strm_t* s = m_pFile->m_strms[track];
 			DWORD f = m_tFrame[track];
@@ -699,10 +699,12 @@ bool CAviSplitterFilter::DemuxLoop()
 				break; // read all subtitles at once
 			}
 
-			REFERENCE_TIME start = s->GetRefTime(f, s->cs[f].size);
-			if (start < minTime || (start == minTime && s->cs[f].filepos < minpos)) {
-				minTime  = start;
+			const REFERENCE_TIME rt = s->GetRefTime(f, s->cs[f].size);
+			if (curTrack == DWORD_MAX
+					|| (llabs(minTime - rt) <= UNITS && s->cs[f].filepos < minpos)
+					|| (llabs(minTime - rt) > UNITS && rt < minTime)) {
 				curTrack = track;
+				minTime  = rt;
 				minpos   = s->cs[f].filepos;
 			}
 		}
