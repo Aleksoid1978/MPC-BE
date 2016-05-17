@@ -218,8 +218,7 @@ STDMETHODIMP CVMR9AllocatorPresenter::InitializeDevice(DWORD_PTR dwUserID, VMR9A
 							if (rotation < 0) {
 								rotation += 360;
 							}
-							m_iRotation = 360 - rotation;
-							GetRenderersData()->m_iRotation = rotation;
+							m_iRotation = rotation;
 						}
 						break;
 					}

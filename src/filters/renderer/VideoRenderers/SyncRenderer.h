@@ -261,7 +261,7 @@ namespace GothSync
 		long m_nUsedBuffer;
 
 		CSize m_ScreenSize;
-		int m_iRotation;	// Rotation angle of frame (0, 90, 180 or 270 deg.)
+		int m_iRotation;	// Rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
 
 		LONG m_lNextSampleWait; // Waiting time for next sample in EVR
 		bool m_bSnapToVSync; // True if framerate is low enough so that snap to vsync makes sense
@@ -352,6 +352,9 @@ namespace GothSync
 		STDMETHODIMP SetPixelShader2(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace);
 		STDMETHODIMP_(bool) ResetDevice();
 		STDMETHODIMP_(bool) DisplayChange();
+
+		// ISubRenderOptions
+		STDMETHODIMP GetInt(LPCSTR field, int* value);
 	};
 
 	// Sync allocator-presenter

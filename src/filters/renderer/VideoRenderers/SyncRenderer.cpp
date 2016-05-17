@@ -1270,10 +1270,10 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			if (m_iRotation) {
 				switch (m_iRotation) {
 				case 90:
-					dst[0].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
-					dst[1].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
-					dst[2].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
-					dst[3].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
+					dst[0].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
+					dst[1].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
+					dst[2].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
+					dst[3].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
 					hr = m_pD3DDev->SetRenderTarget(0, m_pRotateSurface);
 					break;
 				case 180:
@@ -1284,10 +1284,10 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					hr = m_pD3DDev->SetRenderTarget(0, m_pVideoSurfaces[m_nSurface + 1]);
 					break;
 				case 270:
-					dst[0].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
-					dst[1].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
-					dst[2].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
-					dst[3].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
+					dst[0].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
+					dst[1].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
+					dst[2].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
+					dst[3].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
 					hr = m_pD3DDev->SetRenderTarget(0, m_pRotateSurface);
 					break;
 				}
@@ -1625,6 +1625,21 @@ STDMETHODIMP_(bool) CBaseAP::DisplayChange()
 {
 	return true;
 }
+
+// ISubRenderOptions
+
+STDMETHODIMP CBaseAP::GetInt(LPCSTR field, int* value)
+{
+	CheckPointer(value, E_POINTER);
+	if (strcmp(field, "rotation") == 0) {
+		*value = m_iRotation;
+
+		return S_OK;
+	}
+
+	return __super::GetInt(field, value);
+}
+
 
 void CBaseAP::DrawText(const RECT &rc, const CString &strText, int _Priority)
 {
@@ -2070,8 +2085,8 @@ STDMETHODIMP CBaseAP::GetDIB(BYTE* lpDib, DWORD* size)
 
 		switch (m_iRotation) {
 		case 90:
-			for (int x = 0; x < w; x++) {
-				for (int y = h-1; y >= 0; y--) {
+			for (int x = w-1; x >= 0; x--) {
+				for (int y = 0; y < h; y++) {
 					*out++ = p[x + w*y];
 				}
 			}
@@ -2083,8 +2098,8 @@ STDMETHODIMP CBaseAP::GetDIB(BYTE* lpDib, DWORD* size)
 			}
 			break;
 		case 270:
-			for (int x = w-1; x >= 0; x--) {
-				for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				for (int y = h-1; y >= 0; y--) {
 					*out++ = p[x + w*y];
 				}
 			}
@@ -3250,8 +3265,7 @@ STDMETHODIMP CSyncAP::InitializeDevice(AM_MEDIA_TYPE* pMediaType)
 							if (rotation < 0) {
 								rotation += 360;
 							}
-							m_iRotation = 360 - rotation;
-							GetRenderersData()->m_iRotation = rotation;
+							m_iRotation = rotation;
 						}
 						break;
 					}

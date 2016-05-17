@@ -66,7 +66,6 @@ CRenderersData::CRenderersData()
 	m_bTearingTest		= false;
 	m_iDisplayStats		= 0;
 	m_bResetStats		= false;
-	m_iRotation			= 0;
 
 	// Don't disable hardware features before initializing a renderer
 	m_bFP16Support  = true;
