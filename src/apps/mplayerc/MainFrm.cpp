@@ -7041,7 +7041,7 @@ void CMainFrame::OnShaderToggle()
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_65));
 	} else {
 		if (m_pCAP) {
-			m_pCAP->SetPixelShader(NULL, NULL);
+			m_pCAP->SetPixelShader(TARGET_FRAME, NULL, NULL);
 		}
 		RepaintVideo();
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_66));
@@ -7055,8 +7055,8 @@ void CMainFrame::OnShaderToggleScreenSpace()
 		SetShaders();
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_PPONSCR));
 	} else {
-		if (m_pCAP2) {
-			m_pCAP2->SetPixelShader2(NULL, NULL, true);
+		if (m_pCAP) {
+			m_pCAP->SetPixelShader(TARGET_SCREEN, NULL, NULL);
 		}
 		RepaintVideo();
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_PPOFFSCR));
@@ -7720,6 +7720,7 @@ void CMainFrame::OnViewRotate(UINT nID)
 		}
 
 		hr = m_pCAP->SetVideoAngle(Vector(Vector::DegToRad(m_AngleX), Vector::DegToRad(m_AngleY), Vector::DegToRad(m_AngleZ)));
+		hr = m_pCAP->Paint(true);
 	}
 
 	if (FAILED(hr)) {
@@ -10701,24 +10702,24 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	ModifyStyle(dwRemove, dwAdd, SWP_NOZORDER);
 	ModifyStyleEx(dwRemoveEx, dwAddEx, SWP_NOZORDER);
 
-	static bool m_Change_Monitor = false;
+	static bool change_monitor = false;
 	// try disable shader when move from one monitor to other ...
 	if (m_bFullScreen) {
-		m_Change_Monitor = (hm != hm_cur);
-		if ((m_Change_Monitor) && (!m_bToggleShader)) {
+		change_monitor = (hm != hm_cur);
+		if (change_monitor && (!m_bToggleShader)) {
 			if (m_pCAP) {
-				m_pCAP->SetPixelShader(NULL, NULL);
+				m_pCAP->SetPixelShader(TARGET_FRAME, NULL, NULL);
 			}
 		}
-		if (m_Change_Monitor && m_bToggleShaderScreenSpace) {
-			if (m_pCAP2) {
-				m_pCAP2->SetPixelShader2(NULL, NULL, true);
+		if (change_monitor && m_bToggleShaderScreenSpace) {
+			if (m_pCAP) {
+				m_pCAP->SetPixelShader(TARGET_SCREEN, NULL, NULL);
 			}
 		}
 	} else {
-		if (m_Change_Monitor && m_bToggleShader) {
+		if (change_monitor && m_bToggleShader) { // ???
 			if (m_pCAP) {
-				m_pCAP->SetPixelShader(NULL, NULL);
+				m_pCAP->SetPixelShader(TARGET_FRAME, NULL, NULL);
 			}
 		}
 	}
@@ -10804,7 +10805,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	MoveVideoWindow();
 
-	if ((m_Change_Monitor) && (!m_bToggleShader || !m_bToggleShaderScreenSpace)) { // Enabled shader ...
+	if ((change_monitor) && (!m_bToggleShader || !m_bToggleShaderScreenSpace)) { // Enabled shader ...
 		SetShaders();
 	}
 
@@ -11100,6 +11101,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 		if (m_pCAP) {
 			m_pCAP->SetPosition(wr, vr);
 			m_pCAP->SetVideoAngle(Vector(Vector::DegToRad(m_AngleX), Vector::DegToRad(m_AngleY), Vector::DegToRad(m_AngleZ)));
+			m_pCAP->Paint(true);
 		} else {
 			HRESULT hr;
 			hr = m_pBV->SetDefaultSourcePosition();
@@ -11382,10 +11384,8 @@ void CMainFrame::SetShaders()
 		s2s[pShader->label] = pShader;
 	}
 
-	m_pCAP->SetPixelShader(NULL, NULL);
-	if (m_pCAP2) {
-		m_pCAP2->SetPixelShader2(NULL, NULL, true);
-	}
+	m_pCAP->SetPixelShader(TARGET_FRAME, NULL, NULL);
+	m_pCAP->SetPixelShader(TARGET_SCREEN, NULL, NULL);
 
 	for (int i = 0; i < 2; ++i) {
 		if (i == 0 && !m_bToggleShader) {
@@ -11400,9 +11400,6 @@ void CMainFrame::SetShaders()
 		if (i == 0) {
 			pLabels = &m_shaderlabels;
 		} else {
-			if (!m_pCAP2) {
-				break;
-			}
 			pLabels = &m_shaderlabelsScreenSpace;
 		}
 
@@ -11415,16 +11412,14 @@ void CMainFrame::SetShaders()
 
 				HRESULT hr;
 				if (i == 0) {
-					hr = m_pCAP->SetPixelShader(srcdata, target);
+					hr = m_pCAP->SetPixelShader(TARGET_FRAME, srcdata, target);
 				} else {
-					hr = m_pCAP2->SetPixelShader2(srcdata, target, true);
+					hr = m_pCAP2->SetPixelShader(TARGET_SCREEN, srcdata, target);
 				}
 
 				if (FAILED(hr)) {
-					m_pCAP->SetPixelShader(NULL, NULL);
-					if (m_pCAP2) {
-						m_pCAP2->SetPixelShader2(NULL, NULL, true);
-					}
+					m_pCAP->SetPixelShader(TARGET_FRAME, NULL, NULL);
+					m_pCAP->SetPixelShader(TARGET_SCREEN, NULL, NULL);
 					SendStatusMessage(ResStr(IDS_MAINFRM_73) + pShader->label, 3000);
 					return;
 				}
@@ -18386,7 +18381,7 @@ void CMainFrame::EnableShaders1(bool enable)
 	} else {
 		m_bToggleShader = false;
 		if (m_pCAP) {
-			m_pCAP->SetPixelShader(NULL, NULL);
+			m_pCAP->SetPixelShader(TARGET_FRAME, NULL, NULL);
 		}
 	}
 }
@@ -18398,8 +18393,8 @@ void CMainFrame::EnableShaders2(bool enable)
 		SetShaders();
 	} else {
 		m_bToggleShaderScreenSpace = false;
-		if (m_pCAP2) {
-			m_pCAP2->SetPixelShader2(NULL, NULL, true);
+		if (m_pCAP) {
+			m_pCAP->SetPixelShader(TARGET_SCREEN, NULL, NULL);
 		}
 	}
 }

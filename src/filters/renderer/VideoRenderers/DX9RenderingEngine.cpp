@@ -2064,30 +2064,35 @@ HRESULT CDX9RenderingEngine::AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9*
 	return S_OK;
 }
 
-HRESULT CDX9RenderingEngine::SetCustomPixelShader(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace)
+HRESULT CDX9RenderingEngine::SetCustomPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
 {
 	CAtlList<CExternalPixelShader> *pPixelShaders;
-	if (bScreenSpace) {
-		pPixelShaders = &m_pCustomScreenSpacePixelShaders;
-	} else {
+	switch (target) {
+	case TARGET_FRAME:
 		pPixelShaders = &m_pCustomPixelShaders;
+		break;
+	case TARGET_SCREEN:
+		pPixelShaders = &m_pCustomScreenSpacePixelShaders;
+		break;
+	default:
+		return E_INVALIDARG;
 	}
 
-	if (!pSrcData && !pTarget) {
+	if (!sourceCode && !profile) {
 		pPixelShaders->RemoveAll();
 		m_pD3DDev->SetPixelShader(NULL);
 		return S_OK;
 	}
 
-	if (!pSrcData || !pTarget) {
+	if (!sourceCode || !profile) {
 		return E_INVALIDARG;
 	}
 
 	CExternalPixelShader Shader;
-	Shader.m_SourceData = pSrcData;
-	Shader.m_SourceTarget = m_ShaderProfile;
+	Shader.m_SourceCode = sourceCode;
+	Shader.m_Profile = m_ShaderProfile;
 
-	if (Shader.m_SourceTarget.Compare(pTarget) < 0) {
+	if (Shader.m_Profile.Compare(profile) < 0) {
 		// shader is not supported by hardware
 		return E_FAIL;
 	}

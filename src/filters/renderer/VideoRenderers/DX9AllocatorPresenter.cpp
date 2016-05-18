@@ -2373,16 +2373,11 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	return S_OK;
 }
 
-STDMETHODIMP CDX9AllocatorPresenter::SetPixelShader(LPCSTR pSrcData, LPCSTR pTarget)
-{
-	return SetPixelShader2(pSrcData, pTarget, false);
-}
-
-STDMETHODIMP CDX9AllocatorPresenter::SetPixelShader2(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace)
+STDMETHODIMP CDX9AllocatorPresenter::SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
 {
 	CAutoLock cRenderLock(&m_RenderLock);
 
-	return SetCustomPixelShader(pSrcData, pTarget, bScreenSpace);
+	return SetCustomPixelShader(target, sourceCode, profile);
 }
 
 void CDX9AllocatorPresenter::FillAddingField(CComPtr<IPin> pPin, CMediaType* mt)

@@ -2123,35 +2123,35 @@ STDMETHODIMP CBaseAP::GetDIB(BYTE* lpDib, DWORD* size)
 	return S_OK;
 }
 
-STDMETHODIMP CBaseAP::SetPixelShader(LPCSTR pSrcData, LPCSTR pTarget)
-{
-	return SetPixelShader2(pSrcData, pTarget, false);
-}
-
-STDMETHODIMP CBaseAP::SetPixelShader2(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace)
+STDMETHODIMP CBaseAP::SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
 {
 	CAutoLock cRenderLock(&m_allocatorLock);
 
 	CAtlList<CExternalPixelShader> *pPixelShaders;
-	if (bScreenSpace) {
-		pPixelShaders = &m_pPixelShadersScreenSpace;
-	} else {
+	switch (target) {
+	case TARGET_FRAME:
 		pPixelShaders = &m_pPixelShaders;
+		break;
+	case TARGET_SCREEN:
+		pPixelShaders = &m_pPixelShadersScreenSpace;
+		break;
+	default:
+		return E_INVALIDARG;
 	}
 
-	if (!pSrcData && !pTarget) {
+	if (!sourceCode && !profile) {
 		pPixelShaders->RemoveAll();
 		m_pD3DDev->SetPixelShader(NULL);
 		return S_OK;
 	}
 
-	if (!pSrcData || !pTarget) {
+	if (!sourceCode || !profile) {
 		return E_INVALIDARG;
 	}
 
 	CExternalPixelShader Shader;
-	Shader.m_SourceData = pSrcData;
-	Shader.m_SourceTarget = pTarget;
+	Shader.m_SourceCode = sourceCode;
+	Shader.m_Profile = profile;
 
 	CComPtr<IDirect3DPixelShader9> pPixelShader;
 

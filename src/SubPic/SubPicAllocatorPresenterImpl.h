@@ -86,18 +86,12 @@ public:
 	STDMETHODIMP_(void) SetSubPicProvider(ISubPicProvider* pSubPicProvider);
 	STDMETHODIMP_(void) Invalidate(REFERENCE_TIME rtInvalidate = -1);
 	STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) { return E_NOTIMPL; }
-	STDMETHODIMP SetVideoAngle(Vector v, bool fRepaint = true);
-	STDMETHODIMP SetPixelShader(LPCSTR pSrcData, LPCSTR pTarget) { return E_NOTIMPL; }
+	STDMETHODIMP SetVideoAngle(Vector v);
+	STDMETHODIMP SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile) { return E_NOTIMPL; }
 	STDMETHODIMP_(bool) ResetDevice() { return false; }
 	STDMETHODIMP_(bool) DisplayChange() { return false; }
 
 	// ISubPicAllocatorPresenter2
-	STDMETHODIMP SetPixelShader2(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace) {
-		if (!bScreenSpace) {
-			return SetPixelShader(pSrcData, pTarget);
-		}
-		return E_NOTIMPL;
-	}
 	STDMETHODIMP SetIsRendering(bool bIsRendering) { return E_NOTIMPL; }
 
 	// ISubRenderOptions
