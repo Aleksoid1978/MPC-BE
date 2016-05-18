@@ -133,7 +133,7 @@ namespace DSObjects
 		HRESULT DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect);
 		HRESULT AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9* pTexture);
 
-		HRESULT SetCustomPixelShader(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace);
+		HRESULT SetCustomPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
 
 
 	private:
@@ -141,10 +141,10 @@ namespace DSObjects
 		{
 		public:
 			CComPtr<IDirect3DPixelShader9> m_pPixelShader;
-			CStringA m_SourceData;
-			CStringA m_SourceTarget;
+			CStringA m_SourceCode;
+			CStringA m_Profile;
 			HRESULT Compile(CPixelShaderCompiler *pCompiler) {
-				HRESULT hr = pCompiler->CompileShader(m_SourceData, "main", m_SourceTarget, 0, NULL, &m_pPixelShader);
+				HRESULT hr = pCompiler->CompileShader(m_SourceCode, "main", m_Profile, 0, NULL, &m_pPixelShader);
 				if (FAILED(hr)) {
 					return hr;
 				}

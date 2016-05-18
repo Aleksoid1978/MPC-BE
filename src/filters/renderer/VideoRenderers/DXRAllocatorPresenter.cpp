@@ -215,7 +215,7 @@ STDMETHODIMP CDXRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	return hr;
 }
 
-STDMETHODIMP CDXRAllocatorPresenter::SetPixelShader(LPCSTR pSrcData, LPCSTR pTarget)
+STDMETHODIMP CDXRAllocatorPresenter::SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
 {
 	return E_NOTIMPL; // TODO
 }

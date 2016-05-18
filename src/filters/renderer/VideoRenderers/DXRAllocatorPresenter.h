@@ -94,7 +94,7 @@ namespace DSObjects
 		STDMETHODIMP_(void) SetPosition(RECT w, RECT v);
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
-		STDMETHODIMP SetPixelShader(LPCSTR pSrcData, LPCSTR pTarget);
+		STDMETHODIMP SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
 
 		// ISubPicAllocatorPresenter2
 		STDMETHODIMP_(bool) IsRendering() {

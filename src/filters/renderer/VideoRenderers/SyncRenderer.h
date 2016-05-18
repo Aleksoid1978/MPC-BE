@@ -158,10 +158,10 @@ namespace GothSync
 		{
 		public:
 			CComPtr<IDirect3DPixelShader9> m_pPixelShader;
-			CStringA m_SourceData;
-			CStringA m_SourceTarget;
+			CStringA m_SourceCode;
+			CStringA m_Profile;
 			HRESULT Compile(CPixelShaderCompiler *pCompiler) {
-				HRESULT hr = pCompiler->CompileShader(m_SourceData, "main", m_SourceTarget, 0, NULL, &m_pPixelShader);
+				HRESULT hr = pCompiler->CompileShader(m_SourceCode, "main", m_Profile, 0, NULL, &m_pPixelShader);
 				if (FAILED(hr)) {
 					return hr;
 				}
@@ -349,12 +349,9 @@ namespace GothSync
 		STDMETHODIMP_(SIZE) GetVideoSizeAR();
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
-		STDMETHODIMP SetPixelShader(LPCSTR pSrcData, LPCSTR pTarget);
+		STDMETHODIMP SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
 		STDMETHODIMP_(bool) ResetDevice();
 		STDMETHODIMP_(bool) DisplayChange();
-
-		// ISubPicAllocatorPresenter2
-		STDMETHODIMP SetPixelShader2(LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace);
 
 		// ISubRenderOptions
 		STDMETHODIMP GetInt(LPCSTR field, int* value);

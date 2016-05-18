@@ -54,7 +54,7 @@ CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT&
 		return;
 	}
 	GetWindowRect(m_hWnd, &m_windowRect);
-	SetVideoAngle(Vector(), false);
+	SetVideoAngle(Vector());
 	hr = S_OK;
 }
 
@@ -262,12 +262,9 @@ void CSubPicAllocatorPresenterImpl::Transform(CRect r, Vector v[4])
 	}
 }
 
-STDMETHODIMP CSubPicAllocatorPresenterImpl::SetVideoAngle(Vector v, bool fRepaint)
+STDMETHODIMP CSubPicAllocatorPresenterImpl::SetVideoAngle(Vector v)
 {
 	m_xform = XForm(Ray(Vector(0, 0, 0), v), Vector(1, 1, 1), false);
-	if (fRepaint) {
-		Paint(true);
-	}
 	return S_OK;
 }
 

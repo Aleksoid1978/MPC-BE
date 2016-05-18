@@ -166,6 +166,8 @@ public IUnknown {
 //
 // ISubPicAllocatorPresenter
 //
+#define TARGET_FRAME 0
+#define TARGET_SCREEN 1
 
 interface __declspec(uuid("CF75B1F0-535C-4074-8869-B15F177F944E"))
 ISubPicAllocatorPresenter :
@@ -187,8 +189,8 @@ public IUnknown {
 
 	STDMETHOD (GetDIB) (BYTE* lpDib, DWORD* size) PURE;
 
-	STDMETHOD (SetVideoAngle) (Vector v, bool fRepaint = true) PURE;
-	STDMETHOD (SetPixelShader) (LPCSTR pSrcData, LPCSTR pTarget) PURE;
+	STDMETHOD (SetVideoAngle) (Vector v) PURE;
+	STDMETHOD (SetPixelShader) (int target, LPCSTR sourceCode, LPCSTR profile) PURE;
 
 	STDMETHOD_(bool, ResetDevice) () PURE;
 
@@ -198,8 +200,6 @@ public IUnknown {
 interface __declspec(uuid("767AEBA8-A084-488a-89C8-F6B74E53A90F"))
 ISubPicAllocatorPresenter2 :
 public ISubPicAllocatorPresenter {
-	STDMETHOD (SetPixelShader2) (LPCSTR pSrcData, LPCSTR pTarget, bool bScreenSpace) PURE;
-
 	STDMETHOD_(bool, IsRendering)() PURE;
 	STDMETHOD(SetIsRendering)(bool bIsRendering) PURE;
 };
