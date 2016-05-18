@@ -269,9 +269,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CComPtr<IVMRMixerBitmap9>		m_pVMB;
 	CComPtr<IMadVRTextOsd>			m_pMVTO;
 
-
-	CComPtr<ISubPicAllocatorPresenter>  m_pCAP;
-	CComPtr<ISubPicAllocatorPresenter2> m_pCAP2;
+	CComPtr<ISubPicAllocatorPresenter3>	m_pCAP;
 
 	CComPtr<IMadVRSubclassReplacement> m_pMVRSR;
 	CComPtr<IMadVRCommand> m_pMVRC;

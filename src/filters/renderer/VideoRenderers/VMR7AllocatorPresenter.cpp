@@ -87,7 +87,7 @@ void CVMR7AllocatorPresenter::DeleteSurfaces()
 	__super::DeleteSurfaces();
 }
 
-// ISubPicAllocatorPresenter
+// ISubPicAllocatorPresenter3
 
 STDMETHODIMP CVMR7AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 {

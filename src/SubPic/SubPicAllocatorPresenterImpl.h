@@ -30,7 +30,7 @@
 class CSubPicAllocatorPresenterImpl
 	: public CUnknown
 	, public CCritSec
-	, public ISubPicAllocatorPresenter2
+	, public ISubPicAllocatorPresenter3
 	, public ISubRenderConsumer2
 {
 private:
@@ -73,7 +73,7 @@ public:
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-	// ISubPicAllocatorPresenter
+	// ISubPicAllocatorPresenter3
 	STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) PURE;
 	STDMETHODIMP_(SIZE) GetVideoSize();
 	STDMETHODIMP_(SIZE) GetVideoSizeAR();
@@ -90,8 +90,6 @@ public:
 	STDMETHODIMP SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile) { return E_NOTIMPL; }
 	STDMETHODIMP_(bool) ResetDevice() { return false; }
 	STDMETHODIMP_(bool) DisplayChange() { return false; }
-
-	// ISubPicAllocatorPresenter2
 	STDMETHODIMP SetIsRendering(bool bIsRendering) { return E_NOTIMPL; }
 
 	// ISubRenderOptions

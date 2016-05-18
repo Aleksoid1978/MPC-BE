@@ -56,14 +56,12 @@ namespace DSObjects
 		CDX7AllocatorPresenter(HWND hWnd, HRESULT& hr);
 		~CDX7AllocatorPresenter();
 
-		// ISubPicAllocatorPresenter
+		// ISubPicAllocatorPresenter3
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
 		STDMETHODIMP_(bool) ResetDevice();
 		STDMETHODIMP_(bool) DisplayChange();
-
-		// ISubPicAllocatorPresenter2
 		STDMETHODIMP_(bool) IsRendering() {
 			return m_bIsRendering;
 		}

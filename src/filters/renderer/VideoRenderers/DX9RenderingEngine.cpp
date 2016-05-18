@@ -2111,7 +2111,7 @@ HRESULT CDX9RenderingEngine::SetCustomPixelShader(int target, LPCSTR sourceCode,
 	return S_OK;
 }
 
-// ISubPicAllocatorPresenter
+// ISubPicAllocatorPresenter3
 
 STDMETHODIMP_(SIZE) CDX9RenderingEngine::GetVideoSize()
 {

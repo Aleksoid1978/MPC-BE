@@ -310,15 +310,13 @@ namespace DSObjects
 		CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error);
 		~CDX9AllocatorPresenter();
 
-		// ISubPicAllocatorPresenter
+		// ISubPicAllocatorPresenter3
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
 		STDMETHODIMP SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
 		STDMETHODIMP_(bool) ResetDevice();
 		STDMETHODIMP_(bool) DisplayChange();
-
-		// ISubPicAllocatorPresenter2
 		STDMETHODIMP_(bool) IsRendering() {
 			return m_bIsRendering;
 		}

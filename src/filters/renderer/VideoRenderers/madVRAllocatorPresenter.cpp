@@ -135,7 +135,7 @@ HRESULT CmadVRAllocatorPresenter::RenderEx3(REFERENCE_TIME rtStart,
 	return S_OK;
 }
 
-// ISubPicAllocatorPresenter
+// ISubPicAllocatorPresenter3
 
 STDMETHODIMP CmadVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 {
@@ -229,7 +229,7 @@ STDMETHODIMP CmadVRAllocatorPresenter::SetPixelShader(int target, LPCSTR sourceC
 	return hr;
 }
 
-// ISubPicAllocatorPresenter2
+// ISubPicAllocatorPresenter3
 
 STDMETHODIMP_(bool) CmadVRAllocatorPresenter::IsRendering()
 {

@@ -87,7 +87,7 @@ namespace DSObjects
 			REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, REFERENCE_TIME atpf,
 			int left, int top, int bottom, int right, int width, int height);
 
-		// ISubPicAllocatorPresenter
+		// ISubPicAllocatorPresenter3
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);
 		STDMETHODIMP_(SIZE) GetVideoSize();
 		STDMETHODIMP_(SIZE) GetVideoSizeAR();
@@ -95,8 +95,6 @@ namespace DSObjects
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
 		STDMETHODIMP SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
-
-		// ISubPicAllocatorPresenter2
 		STDMETHODIMP_(bool) IsRendering() {
 			return true; // We don't know so we always pretend to be rendering
 		}

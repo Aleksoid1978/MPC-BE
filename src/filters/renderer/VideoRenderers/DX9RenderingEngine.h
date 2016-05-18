@@ -228,7 +228,7 @@ namespace DSObjects
 		bool ClipToSurface(IDirect3DSurface9* pSurface, CRect& s, CRect& d);
 
 	public:
-		// ISubPicAllocatorPresenter
+		// ISubPicAllocatorPresenter3
 		STDMETHODIMP_(SIZE) GetVideoSize();
 		STDMETHODIMP_(SIZE) GetVideoSizeAR();
 

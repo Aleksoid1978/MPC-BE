@@ -948,7 +948,7 @@ DWORD CDX9AllocatorPresenter::GetVertexProcessing()
 	return D3DCREATE_HARDWARE_VERTEXPROCESSING;
 }
 
-// ISubPicAllocatorPresenter
+// ISubPicAllocatorPresenter3
 
 STDMETHODIMP CDX9AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 {
