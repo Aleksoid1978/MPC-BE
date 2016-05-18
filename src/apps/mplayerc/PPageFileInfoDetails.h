@@ -47,7 +47,7 @@ private:
 	void InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI);
 
 public:
-	CPPageFileInfoDetails(CString fn, IFilterGraph* pFG, ISubPicAllocatorPresenter* pCAP, IDvdInfo2* pDVDI);
+	CPPageFileInfoDetails(CString fn, IFilterGraph* pFG, ISubPicAllocatorPresenter3* pCAP, IDvdInfo2* pDVDI);
 	virtual ~CPPageFileInfoDetails();
 
 	enum { IDD = IDD_FILEPROPDETAILS };

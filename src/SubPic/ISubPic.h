@@ -164,13 +164,13 @@ public IUnknown {
 };
 
 //
-// ISubPicAllocatorPresenter
+// ISubPicAllocatorPresenter3 (under development)
 //
 #define TARGET_FRAME 0
 #define TARGET_SCREEN 1
 
-interface __declspec(uuid("CF75B1F0-535C-4074-8869-B15F177F944E"))
-ISubPicAllocatorPresenter :
+interface __declspec(uuid("AD863F43-83F9-4B8E-962C-426F2BDBEAEF"))
+ISubPicAllocatorPresenter3 :
 public IUnknown {
 	STDMETHOD (CreateRenderer) (IUnknown** ppRenderer) PURE;
 
@@ -193,13 +193,8 @@ public IUnknown {
 	STDMETHOD (SetPixelShader) (int target, LPCSTR sourceCode, LPCSTR profile) PURE;
 
 	STDMETHOD_(bool, ResetDevice) () PURE;
-
 	STDMETHOD_(bool, DisplayChange) () PURE;
-};
 
-interface __declspec(uuid("767AEBA8-A084-488a-89C8-F6B74E53A90F"))
-ISubPicAllocatorPresenter2 :
-public ISubPicAllocatorPresenter {
 	STDMETHOD_(bool, IsRendering)() PURE;
 	STDMETHOD(SetIsRendering)(bool bIsRendering) PURE;
 };

@@ -343,7 +343,7 @@ namespace GothSync
 		void UpdateAlphaBitmap();
 		void ResetStats();
 
-		// ISubPicAllocatorPresenter
+		// ISubPicAllocatorPresenter3
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);
 		STDMETHODIMP_(SIZE) GetVideoSize();
 		STDMETHODIMP_(SIZE) GetVideoSizeAR();
@@ -387,7 +387,7 @@ namespace GothSync
 		STDMETHODIMP InitializeDevice(AM_MEDIA_TYPE* pMediaType);
 		STDMETHODIMP_(bool) ResetDevice();
 
-		// ISubPicAllocatorPresenter2
+		// ISubPicAllocatorPresenter3
 		STDMETHODIMP_(bool) IsRendering() {
 			return (m_nRenderState == Started);
 		}

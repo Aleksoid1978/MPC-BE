@@ -46,7 +46,7 @@ namespace DSObjects
 		DECLARE_IUNKNOWN
 		STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-		// ISubPicAllocatorPresenter
+		// ISubPicAllocatorPresenter3
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);
 		STDMETHODIMP_(void) SetTime(REFERENCE_TIME rtNow);
 

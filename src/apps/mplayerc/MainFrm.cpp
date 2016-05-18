@@ -11414,7 +11414,7 @@ void CMainFrame::SetShaders()
 				if (i == 0) {
 					hr = m_pCAP->SetPixelShader(TARGET_FRAME, srcdata, target);
 				} else {
-					hr = m_pCAP2->SetPixelShader(TARGET_SCREEN, srcdata, target);
+					hr = m_pCAP->SetPixelShader(TARGET_SCREEN, srcdata, target);
 				}
 
 				if (FAILED(hr)) {
@@ -13842,11 +13842,9 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
-		m_pCAP2	= NULL;
 		m_pCAP	= NULL;
 
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pCAP), TRUE);
-		m_pGB->FindInterface(IID_PPV_ARGS(&m_pCAP2), TRUE);
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRWC), FALSE); // might have IVMRMixerBitmap9, but not IVMRWindowlessControl9
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRMC9), TRUE);
 		m_pMVRSR = m_pCAP;
@@ -14045,7 +14043,6 @@ void CMainFrame::CloseMediaPrivate()
 	m_pMVRSR.Release();
 	m_pMVRC.Release();
 	m_pMVRI.Release();
-	m_pCAP2.Release();
 	m_pCAP.Release();
 	m_pVMRWC.Release();
 	m_pVMRMC9.Release();
@@ -16755,10 +16752,8 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 
 		if (fVidPrev) {
 			m_pCAP = NULL;
-			m_pCAP2 = NULL;
 			m_pGB->Render(pVidPrevPin);
 			m_pGB->FindInterface(IID_PPV_ARGS(&m_pCAP), TRUE);
-			m_pGB->FindInterface(IID_PPV_ARGS(&m_pCAP2), TRUE);
 		}
 
 		if (fVidCap) {

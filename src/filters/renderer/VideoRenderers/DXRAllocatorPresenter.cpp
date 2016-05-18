@@ -132,7 +132,7 @@ HRESULT CDXRAllocatorPresenter::Render(
 	return S_OK;
 }
 
-// ISubPicAllocatorPresenter
+// ISubPicAllocatorPresenter3
 
 STDMETHODIMP CDXRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 {

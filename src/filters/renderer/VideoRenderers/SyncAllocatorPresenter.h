@@ -27,4 +27,4 @@ public IUnknown {
 	STDMETHOD (AdviseSyncClock)(ISyncClock* sC) PURE;
 };
 
-HRESULT CreateSyncRenderer(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter** ppAP);
+HRESULT CreateSyncRenderer(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP);

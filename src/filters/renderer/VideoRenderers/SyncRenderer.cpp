@@ -764,7 +764,7 @@ UINT CBaseAP::GetAdapter(IDirect3D9* pD3D)
 	return D3DADAPTER_DEFAULT;
 }
 
-// ISubPicAllocatorPresenter
+// ISubPicAllocatorPresenter3
 
 STDMETHODIMP CBaseAP::CreateRenderer(IUnknown** ppRenderer)
 {
@@ -3701,7 +3701,7 @@ HRESULT CSyncAP::BeginStreaming()
 	return S_OK;
 }
 
-HRESULT CreateSyncRenderer(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter** ppAP)
+HRESULT CreateSyncRenderer(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP)
 {
 	HRESULT		hr = E_FAIL;
 	if (clsid == CLSID_SyncAllocatorPresenter) {

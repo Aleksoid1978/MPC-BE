@@ -42,7 +42,7 @@ using namespace DSObjects;
 
 //
 
-HRESULT CreateAP7(const CLSID& clsid, HWND hWnd, ISubPicAllocatorPresenter** ppAP)
+HRESULT CreateAP7(const CLSID& clsid, HWND hWnd, ISubPicAllocatorPresenter3** ppAP)
 {
 	CheckPointer(ppAP, E_POINTER);
 

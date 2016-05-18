@@ -44,7 +44,7 @@ bool IsVMR9InGraph(IFilterGraph* pFG)
 
 //
 
-HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter** ppAP)
+HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP)
 {
 	CheckPointer(ppAP, E_POINTER);
 
@@ -97,7 +97,7 @@ HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAlloca
 	return hr;
 }
 
-HRESULT CreateEVR(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter** ppAP)
+HRESULT CreateEVR(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP)
 {
 	HRESULT hr = E_FAIL;
 	if (clsid == CLSID_EVRAllocatorPresenter) {

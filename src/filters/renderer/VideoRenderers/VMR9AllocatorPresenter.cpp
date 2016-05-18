@@ -26,9 +26,6 @@
 #include "MacrovisionKicker.h"
 #include "../../../DSUtil/SysVersion.h"
 
-// ISubPicAllocatorPresenter
-
-
 using namespace DSObjects;
 
 //

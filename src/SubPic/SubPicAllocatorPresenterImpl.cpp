@@ -65,8 +65,7 @@ CSubPicAllocatorPresenterImpl::~CSubPicAllocatorPresenterImpl()
 STDMETHODIMP CSubPicAllocatorPresenterImpl::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	return
-		QI(ISubPicAllocatorPresenter)
-		QI(ISubPicAllocatorPresenter2)
+		QI(ISubPicAllocatorPresenter3)
 		QI(ISubRenderOptions)
 		QI(ISubRenderConsumer)
 		__super::NonDelegatingQueryInterface(riid, ppv);
@@ -143,7 +142,7 @@ void CSubPicAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const CRec
 	}
 }
 
-// ISubPicAllocatorPresenter
+// ISubPicAllocatorPresenter3
 
 STDMETHODIMP_(SIZE) CSubPicAllocatorPresenterImpl::GetVideoSize()
 {

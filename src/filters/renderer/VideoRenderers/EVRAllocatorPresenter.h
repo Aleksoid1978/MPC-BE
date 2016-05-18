@@ -73,7 +73,7 @@ namespace DSObjects
 		STDMETHODIMP_(bool)	ResetDevice();
 		STDMETHODIMP_(bool)	DisplayChange();
 
-		// ISubPicAllocatorPresenter2
+		// ISubPicAllocatorPresenter3
 		STDMETHODIMP_(bool) IsRendering() {
 			return (m_nRenderState == Started);
 		}

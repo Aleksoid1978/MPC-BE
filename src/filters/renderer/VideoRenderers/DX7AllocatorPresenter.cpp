@@ -336,7 +336,7 @@ void CDX7AllocatorPresenter::DeleteSurfaces()
 	m_pVideoSurface = NULL;
 }
 
-// ISubPicAllocatorPresenter
+// ISubPicAllocatorPresenter3
 
 STDMETHODIMP CDX7AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 {

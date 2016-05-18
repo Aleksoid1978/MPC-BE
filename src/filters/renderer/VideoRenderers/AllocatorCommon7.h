@@ -23,6 +23,6 @@
 
 #include "../../../SubPic/ISubPic.h"
 
-extern HRESULT CreateAP7(const CLSID& clsid, HWND hWnd, ISubPicAllocatorPresenter** ppAP);
+extern HRESULT CreateAP7(const CLSID& clsid, HWND hWnd, ISubPicAllocatorPresenter3** ppAP);
 
 extern bool IsVMR7InGraph(IFilterGraph* pFG);

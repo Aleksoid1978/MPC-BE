@@ -66,7 +66,7 @@ namespace DSObjects
 							   const double videoStretchFactor = 1.0,
 							   int xOffsetInPixels = 0, DWORD flags = 0) override;
 
-		// ISubPicAllocatorPresenter
+		// ISubPicAllocatorPresenter3
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer) override;
 		STDMETHODIMP_(SIZE) GetVideoSize() override;
 		STDMETHODIMP_(SIZE) GetVideoSizeAR() override;
@@ -74,8 +74,6 @@ namespace DSObjects
 		STDMETHODIMP_(bool) Paint(bool bAll) override;
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) override;
 		STDMETHODIMP SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile) override;
-
-		// ISubPicAllocatorPresenter2
 		STDMETHODIMP_(bool) IsRendering() override;
 	};
 }
