@@ -22,7 +22,6 @@
 #pragma once
 
 #include "SubPicImpl.h"
-#include "SubPicAllocatorPresenterImpl.h"
 #include <dx/d3dx7.h>
 
 // CDX7SubPic
