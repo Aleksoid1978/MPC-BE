@@ -613,8 +613,6 @@ void CPPageVideo::OnDSRendererChange()
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_UNCOMP), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_MADVR:
-			SelectByItemData(m_cbDX9SurfaceFormat, D3DFMT_A16B16G16R16F);
-
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSMADVR), &m_cbVideoRenderer);
 			break;
 		default:
