@@ -734,5 +734,6 @@ void CPPageVideo::OnBnClickedDefault()
 	OnSurfaceFormatChange();
 	OnColorManagmentCheck();
 
+	Invalidate();
 	SetModified();
 }
