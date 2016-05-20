@@ -2671,50 +2671,48 @@ HRESULT CSyncAP::IsMediaTypeSupported(IMFMediaType* pMixerType)
 
 HRESULT CSyncAP::CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType** pType)
 {
-	HRESULT hr;
-	AM_MEDIA_TYPE *pAMMedia = NULL;
-	LARGE_INTEGER i64Size;
-	MFVIDEOFORMAT *VideoFormat;
+	HRESULT        hr;
+	AM_MEDIA_TYPE* pAMMedia = NULL;
+	MFVIDEOFORMAT* VideoFormat;
 
 	CHECK_HR(pMixerType->GetRepresentation(FORMAT_MFVideoFormat, (void**)&pAMMedia));
 
 	VideoFormat = (MFVIDEOFORMAT*)pAMMedia->pbFormat;
-	hr = pfMFCreateVideoMediaType(VideoFormat, &m_pMediaType);
+	CHECK_HR(pfMFCreateVideoMediaType(VideoFormat, &m_pMediaType));
+	
+	m_pMediaType->SetUINT32(MF_MT_PAN_SCAN_ENABLED, 0);
+	
+	const CRenderersSettings& rs = GetRenderersSettings();
+	m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, rs.m_AdvRendSets.iEVROutputRange == 1 ? MFNominalRange_16_235 : MFNominalRange_0_255);
+	m_LastSetOutputRange = rs.m_AdvRendSets.iEVROutputRange;
 
-	m_aspectRatio.cx = VideoFormat->videoInfo.PixelAspectRatio.Numerator;
-	m_aspectRatio.cy = VideoFormat->videoInfo.PixelAspectRatio.Denominator;
+	ULARGE_INTEGER ui64FrameSize;
+	m_pMediaType->GetUINT64(MF_MT_FRAME_SIZE, &ui64FrameSize.QuadPart);
 
-	if (SUCCEEDED (hr)) {
-		i64Size.HighPart = VideoFormat->videoInfo.dwWidth;
-		i64Size.LowPart	 = VideoFormat->videoInfo.dwHeight;
-		m_pMediaType->SetUINT64(MF_MT_FRAME_SIZE, i64Size.QuadPart);
-		m_pMediaType->SetUINT32(MF_MT_PAN_SCAN_ENABLED, 0);
-		CRenderersSettings& rs = GetRenderersSettings();
+	CSize videoSize((LONG)ui64FrameSize.HighPart, (LONG)ui64FrameSize.LowPart);
+	MFVideoArea Area = GetArea(0, 0, videoSize.cx, videoSize.cy);
+	m_pMediaType->SetBlob(MF_MT_GEOMETRIC_APERTURE, (UINT8*)&Area, sizeof(MFVideoArea));
 
-		if (rs.m_AdvRendSets.iEVROutputRange == 1) {
-			m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, MFNominalRange_16_235);
-		} else {
-			m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, MFNominalRange_0_255);
+	ULARGE_INTEGER ui64AspectRatio;
+	m_pMediaType->GetUINT64(MF_MT_PIXEL_ASPECT_RATIO, &ui64AspectRatio.QuadPart);
+
+	CSize aspectRatio(LONG(ui64AspectRatio.HighPart * videoSize.cx), LONG(ui64AspectRatio.LowPart * videoSize.cy));
+	if (aspectRatio.cx > 0 && aspectRatio.cy > 0) {
+		ReduceDim(aspectRatio);
+	}
+	
+	if (videoSize != m_nativeVideoSize || aspectRatio != m_aspectRatio) {
+		m_nativeVideoSize = videoSize;
+		m_aspectRatio = aspectRatio;
+
+		// Notify the graph about the change
+		if (m_pSink) {
+			m_pSink->Notify(EC_VIDEO_SIZE_CHANGED, MAKELPARAM(m_nativeVideoSize.cx, m_nativeVideoSize.cy), 0);
 		}
-
-		m_LastSetOutputRange = rs.m_AdvRendSets.iEVROutputRange;
-		i64Size.HighPart = m_aspectRatio.cx;
-		i64Size.LowPart  = m_aspectRatio.cy;
-		m_pMediaType->SetUINT64(MF_MT_PIXEL_ASPECT_RATIO, i64Size.QuadPart);
-
-		MFVideoArea Area = GetArea(0, 0, VideoFormat->videoInfo.dwWidth, VideoFormat->videoInfo.dwHeight);
-		m_pMediaType->SetBlob(MF_MT_GEOMETRIC_APERTURE, (UINT8*)&Area, sizeof(MFVideoArea));
 	}
 
-	m_aspectRatio.cx *= VideoFormat->videoInfo.dwWidth;
-	m_aspectRatio.cy *= VideoFormat->videoInfo.dwHeight;
-
-	if (m_aspectRatio.cx >= 1 && m_aspectRatio.cy >= 1) {
-		ReduceDim(m_aspectRatio);
-	}
-
-	pMixerType->FreeRepresentation(FORMAT_MFVideoFormat, (void*)pAMMedia);
-	m_pMediaType->QueryInterface(__uuidof(IMFMediaType), (void**) pType);
+	pMixerType->FreeRepresentation(FORMAT_MFVideoFormat, (LPVOID)pAMMedia);
+	m_pMediaType->QueryInterface(IID_PPV_ARGS(pType));
 
 	return hr;
 }
