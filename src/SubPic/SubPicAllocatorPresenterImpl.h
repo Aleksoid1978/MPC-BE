@@ -87,7 +87,8 @@ public:
 	STDMETHODIMP_(void) Invalidate(REFERENCE_TIME rtInvalidate = -1);
 	STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) { return E_NOTIMPL; }
 	STDMETHODIMP SetVideoAngle(Vector v);
-	STDMETHODIMP SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile) { return E_NOTIMPL; }
+	STDMETHODIMP ClearPixelShaders(int target) { return E_NOTIMPL; }
+	STDMETHODIMP AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile) { return E_NOTIMPL; }
 	STDMETHODIMP_(bool) ResetDevice() { return false; }
 	STDMETHODIMP_(bool) DisplayChange() { return false; }
 	STDMETHODIMP SetIsRendering(bool bIsRendering) { return E_NOTIMPL; }

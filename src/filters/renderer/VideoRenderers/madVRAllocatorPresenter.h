@@ -73,7 +73,8 @@ namespace DSObjects
 		STDMETHODIMP_(void) SetPosition(RECT w, RECT v) override;
 		STDMETHODIMP_(bool) Paint(bool bAll) override;
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) override;
-		STDMETHODIMP SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile) override;
+		STDMETHODIMP ClearPixelShaders(int target) override;
+		STDMETHODIMP AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile) override;
 		STDMETHODIMP_(bool) IsRendering() override;
 	};
 }

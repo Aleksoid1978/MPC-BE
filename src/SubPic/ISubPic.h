@@ -190,7 +190,8 @@ public IUnknown {
 	STDMETHOD (GetDIB) (BYTE* lpDib, DWORD* size) PURE;
 
 	STDMETHOD (SetVideoAngle) (Vector v) PURE;
-	STDMETHOD (SetPixelShader) (int target, LPCSTR sourceCode, LPCSTR profile) PURE;
+	STDMETHOD (ClearPixelShaders) (int target) PURE;
+	STDMETHOD (AddPixelShader) (int target, LPCSTR sourceCode, LPCSTR profile) PURE;
 
 	STDMETHOD_(bool, ResetDevice) () PURE;
 	STDMETHOD_(bool, DisplayChange) () PURE;

@@ -2118,26 +2118,33 @@ STDMETHODIMP CBaseAP::GetDIB(BYTE* lpDib, DWORD* size)
 	return S_OK;
 }
 
-STDMETHODIMP CBaseAP::SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
+STDMETHODIMP CBaseAP::ClearPixelShaders(int target)
+{
+	CAutoLock cRenderLock(&m_allocatorLock);
+
+	if (target == TARGET_FRAME) {
+		m_pPixelShaders.RemoveAll();
+	} else if (target == TARGET_SCREEN) {
+		m_pPixelShadersScreenSpace.RemoveAll();
+	} else {
+		return E_INVALIDARG;
+	}
+	m_pD3DDev->SetPixelShader(NULL);
+
+	return S_OK;
+}
+
+STDMETHODIMP CBaseAP::AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
 {
 	CAutoLock cRenderLock(&m_allocatorLock);
 
 	CAtlList<CExternalPixelShader> *pPixelShaders;
-	switch (target) {
-	case TARGET_FRAME:
+	if (target == TARGET_FRAME) {
 		pPixelShaders = &m_pPixelShaders;
-		break;
-	case TARGET_SCREEN:
+	} else if (target == TARGET_SCREEN) {
 		pPixelShaders = &m_pPixelShadersScreenSpace;
-		break;
-	default:
+	} else {
 		return E_INVALIDARG;
-	}
-
-	if (!sourceCode && !profile) {
-		pPixelShaders->RemoveAll();
-		m_pD3DDev->SetPixelShader(NULL);
-		return S_OK;
 	}
 
 	if (!sourceCode || !profile) {

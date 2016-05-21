@@ -2064,24 +2064,29 @@ HRESULT CDX9RenderingEngine::AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9*
 	return S_OK;
 }
 
-HRESULT CDX9RenderingEngine::SetCustomPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
+HRESULT CDX9RenderingEngine::ClearCustomPixelShaders(int target)
 {
-	CAtlList<CExternalPixelShader> *pPixelShaders;
-	switch (target) {
-	case TARGET_FRAME:
-		pPixelShaders = &m_pCustomPixelShaders;
-		break;
-	case TARGET_SCREEN:
-		pPixelShaders = &m_pCustomScreenSpacePixelShaders;
-		break;
-	default:
+	if (target == TARGET_FRAME) {
+		m_pCustomPixelShaders.RemoveAll();
+	} else if (target == TARGET_SCREEN) {
+		m_pCustomScreenSpacePixelShaders.RemoveAll();
+	} else {
 		return E_INVALIDARG;
 	}
+	m_pD3DDev->SetPixelShader(NULL);
 
-	if (!sourceCode && !profile) {
-		pPixelShaders->RemoveAll();
-		m_pD3DDev->SetPixelShader(NULL);
-		return S_OK;
+	return S_OK;
+}
+
+HRESULT CDX9RenderingEngine::AddCustomPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
+{
+	CAtlList<CExternalPixelShader> *pPixelShaders;
+	if (target == TARGET_FRAME) {
+		pPixelShaders = &m_pCustomPixelShaders;
+	} else if (target == TARGET_SCREEN) {
+		pPixelShaders = &m_pCustomScreenSpacePixelShaders;
+	} else {
+		return E_INVALIDARG;
 	}
 
 	if (!sourceCode || !profile) {

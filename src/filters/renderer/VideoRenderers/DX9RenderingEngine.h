@@ -133,7 +133,8 @@ namespace DSObjects
 		HRESULT DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect);
 		HRESULT AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9* pTexture);
 
-		HRESULT SetCustomPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
+		HRESULT ClearCustomPixelShaders(int target);
+		HRESULT AddCustomPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
 
 
 	private:
