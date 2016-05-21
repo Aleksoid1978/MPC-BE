@@ -680,7 +680,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 					if (Fixed_offset_during_PopUp_flag) {
 						gb.ReadByte();
 					} else {
-						pItem->m_pg_offset_sequence_id[i] = gb.ReadByte();
+						pItem->m_ig_offset_sequence_id[i] = gb.ReadByte();
 					}
 
 					gb.BitRead(16); // IG_Plane_offset_during_BB_video
