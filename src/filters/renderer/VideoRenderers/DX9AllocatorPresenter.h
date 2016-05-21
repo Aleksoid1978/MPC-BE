@@ -311,7 +311,6 @@ namespace DSObjects
 		~CDX9AllocatorPresenter();
 
 		// ISubPicAllocatorPresenter3
-		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
 		STDMETHODIMP SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);

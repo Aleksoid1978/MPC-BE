@@ -57,7 +57,6 @@ namespace DSObjects
 		~CDX7AllocatorPresenter();
 
 		// ISubPicAllocatorPresenter3
-		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
 		STDMETHODIMP_(bool) ResetDevice();
