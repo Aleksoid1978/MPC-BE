@@ -1198,9 +1198,9 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF(BOOL bEOF/* = FALSE*/)
 			sizehd = ParseDTSHDHeader(p + size);
 			if (sizehd
 					&& !m_DTSHDProfile
-					&& (p + size + sizehd < end)) {
+					&& (p + size + sizehd <= end)) {
 				audioframe_t dtshdaframe;
-				ParseDTSHDHeader(p + size, end - p - size, &dtshdaframe);
+				ParseDTSHDHeader(p + size, sizehd, &dtshdaframe);
 				m_DTSHDProfile = dtshdaframe.param2;
 			}
 		} else if (!bEOF){
