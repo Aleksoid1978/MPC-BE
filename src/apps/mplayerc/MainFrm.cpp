@@ -7041,7 +7041,7 @@ void CMainFrame::OnShaderToggle()
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_65));
 	} else {
 		if (m_pCAP) {
-			m_pCAP->SetPixelShader(TARGET_FRAME, NULL, NULL);
+			m_pCAP->ClearPixelShaders(TARGET_FRAME);
 		}
 		RepaintVideo();
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_66));
@@ -7056,7 +7056,7 @@ void CMainFrame::OnShaderToggleScreenSpace()
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_PPONSCR));
 	} else {
 		if (m_pCAP) {
-			m_pCAP->SetPixelShader(TARGET_SCREEN, NULL, NULL);
+			m_pCAP->ClearPixelShaders(TARGET_SCREEN);
 		}
 		RepaintVideo();
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_MAINFRM_PPOFFSCR));
@@ -10708,18 +10708,18 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 		change_monitor = (hm != hm_cur);
 		if (change_monitor && (!m_bToggleShader)) {
 			if (m_pCAP) {
-				m_pCAP->SetPixelShader(TARGET_FRAME, NULL, NULL);
+				m_pCAP->ClearPixelShaders(TARGET_FRAME);
 			}
 		}
 		if (change_monitor && m_bToggleShaderScreenSpace) {
 			if (m_pCAP) {
-				m_pCAP->SetPixelShader(TARGET_SCREEN, NULL, NULL);
+				m_pCAP->ClearPixelShaders(TARGET_SCREEN);
 			}
 		}
 	} else {
 		if (change_monitor && m_bToggleShader) { // ???
 			if (m_pCAP) {
-				m_pCAP->SetPixelShader(TARGET_FRAME, NULL, NULL);
+				m_pCAP->ClearPixelShaders(TARGET_FRAME);
 			}
 		}
 	}
@@ -11384,8 +11384,8 @@ void CMainFrame::SetShaders()
 		s2s[pShader->label] = pShader;
 	}
 
-	m_pCAP->SetPixelShader(TARGET_FRAME, NULL, NULL);
-	m_pCAP->SetPixelShader(TARGET_SCREEN, NULL, NULL);
+	m_pCAP->ClearPixelShaders(TARGET_FRAME);
+	m_pCAP->ClearPixelShaders(TARGET_SCREEN);
 
 	for (int i = 0; i < 2; ++i) {
 		if (i == 0 && !m_bToggleShader) {
@@ -11412,14 +11412,14 @@ void CMainFrame::SetShaders()
 
 				HRESULT hr;
 				if (i == 0) {
-					hr = m_pCAP->SetPixelShader(TARGET_FRAME, srcdata, target);
+					hr = m_pCAP->AddPixelShader(TARGET_FRAME, srcdata, target);
 				} else {
-					hr = m_pCAP->SetPixelShader(TARGET_SCREEN, srcdata, target);
+					hr = m_pCAP->AddPixelShader(TARGET_SCREEN, srcdata, target);
 				}
 
 				if (FAILED(hr)) {
-					m_pCAP->SetPixelShader(TARGET_FRAME, NULL, NULL);
-					m_pCAP->SetPixelShader(TARGET_SCREEN, NULL, NULL);
+					m_pCAP->ClearPixelShaders(TARGET_FRAME);
+					m_pCAP->ClearPixelShaders(TARGET_SCREEN);
 					SendStatusMessage(ResStr(IDS_MAINFRM_73) + pShader->label, 3000);
 					return;
 				}
@@ -18376,7 +18376,7 @@ void CMainFrame::EnableShaders1(bool enable)
 	} else {
 		m_bToggleShader = false;
 		if (m_pCAP) {
-			m_pCAP->SetPixelShader(TARGET_FRAME, NULL, NULL);
+			m_pCAP->ClearPixelShaders(TARGET_FRAME);
 		}
 	}
 }
@@ -18389,7 +18389,7 @@ void CMainFrame::EnableShaders2(bool enable)
 	} else {
 		m_bToggleShaderScreenSpace = false;
 		if (m_pCAP) {
-			m_pCAP->SetPixelShader(TARGET_SCREEN, NULL, NULL);
+			m_pCAP->ClearPixelShaders(TARGET_SCREEN);
 		}
 	}
 }

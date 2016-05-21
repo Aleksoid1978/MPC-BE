@@ -313,7 +313,8 @@ namespace DSObjects
 		// ISubPicAllocatorPresenter3
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
-		STDMETHODIMP SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
+		STDMETHODIMP ClearPixelShaders(int target);
+		STDMETHODIMP AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
 		STDMETHODIMP_(bool) ResetDevice();
 		STDMETHODIMP_(bool) DisplayChange();
 		STDMETHODIMP_(bool) IsRendering() {

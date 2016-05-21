@@ -204,27 +204,24 @@ STDMETHODIMP CmadVRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	return hr;
 }
 
-STDMETHODIMP CmadVRAllocatorPresenter::SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
+STDMETHODIMP CmadVRAllocatorPresenter::ClearPixelShaders(int target)
 {
+	ASSERT(TARGET_FRAME == ShaderStage_PreScale && TARGET_SCREEN == ShaderStage_PostScale);
 	HRESULT hr = E_NOTIMPL;
-	int stage;
-	switch (target) {
-	case TARGET_FRAME:
-		stage = ShaderStage_PreScale;
-		break;
-	case TARGET_SCREEN:
-		stage = ShaderStage_PostScale;
-		break;
-	default:
-		return E_INVALIDARG;
-	}
 
 	if (CComQIPtr<IMadVRExternalPixelShaders> pMVREPS = m_pMVR) {
-		if (!sourceCode && !profile) {
-			hr = pMVREPS->ClearPixelShaders(stage);
-		} else {
-			hr = pMVREPS->AddPixelShader(sourceCode, profile, stage, NULL);
-		}
+		hr = pMVREPS->ClearPixelShaders(target);
+	}
+	return hr;
+}
+
+STDMETHODIMP CmadVRAllocatorPresenter::AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
+{
+	ASSERT(TARGET_FRAME == ShaderStage_PreScale && TARGET_SCREEN == ShaderStage_PostScale);
+	HRESULT hr = E_NOTIMPL;
+
+	if (CComQIPtr<IMadVRExternalPixelShaders> pMVREPS = m_pMVR) {
+		hr = pMVREPS->AddPixelShader(sourceCode, profile, target, NULL);
 	}
 	return hr;
 }
