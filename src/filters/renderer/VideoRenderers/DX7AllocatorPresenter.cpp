@@ -338,11 +338,6 @@ void CDX7AllocatorPresenter::DeleteSurfaces()
 
 // ISubPicAllocatorPresenter3
 
-STDMETHODIMP CDX7AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
-{
-	return E_NOTIMPL;
-}
-
 STDMETHODIMP_(bool) CDX7AllocatorPresenter::Paint(bool fAll)
 {
 	if (m_bPendingResetDevice) {

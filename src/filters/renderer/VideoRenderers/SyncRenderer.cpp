@@ -766,11 +766,6 @@ UINT CBaseAP::GetAdapter(IDirect3D9* pD3D)
 
 // ISubPicAllocatorPresenter3
 
-STDMETHODIMP CBaseAP::CreateRenderer(IUnknown** ppRenderer)
-{
-	return E_NOTIMPL;
-}
-
 STDMETHODIMP_(SIZE) CBaseAP::GetVideoSize()
 {
 	SIZE size = __super::GetVideoSize();

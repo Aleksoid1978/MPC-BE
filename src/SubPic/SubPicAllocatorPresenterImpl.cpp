@@ -353,7 +353,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* valu
 {
 	CheckPointer(value, E_POINTER);
 	CheckPointer(chars, E_POINTER);
-	CString ret;
+	CStringW ret;
 
 	if (!strcmp(field, "name")) {
 		ret = L"MPC-BE";

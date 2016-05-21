@@ -950,11 +950,6 @@ DWORD CDX9AllocatorPresenter::GetVertexProcessing()
 
 // ISubPicAllocatorPresenter3
 
-STDMETHODIMP CDX9AllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
-{
-	return E_NOTIMPL;
-}
-
 void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 {
 	// Calculate the jitter!

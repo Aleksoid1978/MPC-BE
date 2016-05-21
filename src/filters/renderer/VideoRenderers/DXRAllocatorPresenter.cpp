@@ -201,11 +201,6 @@ STDMETHODIMP_(SIZE) CDXRAllocatorPresenter::GetVideoSizeAR()
 	return size;
 }
 
-STDMETHODIMP_(bool) CDXRAllocatorPresenter::Paint(bool fAll)
-{
-	return false; // TODO
-}
-
 STDMETHODIMP CDXRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 {
 	HRESULT hr = E_NOTIMPL;
@@ -213,9 +208,4 @@ STDMETHODIMP CDXRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 		hr = pBV->GetCurrentImage((long*)size, (long*)lpDib);
 	}
 	return hr;
-}
-
-STDMETHODIMP CDXRAllocatorPresenter::SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
-{
-	return E_NOTIMPL; // TODO
 }

@@ -92,9 +92,7 @@ namespace DSObjects
 		STDMETHODIMP_(SIZE) GetVideoSize();
 		STDMETHODIMP_(SIZE) GetVideoSizeAR();
 		STDMETHODIMP_(void) SetPosition(RECT w, RECT v);
-		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
-		STDMETHODIMP SetPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
 		STDMETHODIMP_(bool) IsRendering() {
 			return true; // We don't know so we always pretend to be rendering
 		}

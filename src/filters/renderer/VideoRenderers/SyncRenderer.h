@@ -345,7 +345,6 @@ namespace GothSync
 		void ResetStats();
 
 		// ISubPicAllocatorPresenter3
-		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);
 		STDMETHODIMP_(SIZE) GetVideoSize();
 		STDMETHODIMP_(SIZE) GetVideoSizeAR();
 		STDMETHODIMP_(bool) Paint(bool fAll);
