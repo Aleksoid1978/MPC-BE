@@ -278,30 +278,74 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetBool(LPCSTR field, bool* value)
 STDMETHODIMP CSubPicAllocatorPresenterImpl::GetInt(LPCSTR field, int* value)
 {
 	CheckPointer(value, E_POINTER);
+	if (!strcmp(field, "supportedLevels")) {
+		if (CComQIPtr<IMFVideoPresenter> pEVR = (ISubPicAllocatorPresenter3*)this) {
+			const CRenderersSettings& r = GetRenderersSettings();
+			if (r.m_AdvRendSets.iEVROutputRange == 1) {
+				*value = 3; // TV preferred
+			} else {
+				*value = 2; // PC preferred
+			}
+		} else {
+			*value = 0; // PC only
+		}
+		return S_OK;
+	}
+
 	return E_INVALIDARG;
 }
 
 STDMETHODIMP CSubPicAllocatorPresenterImpl::GetSize(LPCSTR field, SIZE* value)
 {
 	CheckPointer(value, E_POINTER);
+	if (!strcmp(field, "originalVideoSize")) {
+		*value = GetVideoSize();
+		return S_OK;
+	} else if (!strcmp(field, "arAdjustedVideoSize")) {
+		*value = GetVideoSizeAR();
+		return S_OK;
+	}
+
 	return E_INVALIDARG;
 }
 
 STDMETHODIMP CSubPicAllocatorPresenterImpl::GetRect(LPCSTR field, RECT* value)
 {
 	CheckPointer(value, E_POINTER);
+	if (!strcmp(field, "videoOutputRect") || !strcmp(field, "subtitleTargetRect")) {
+		if (m_videoRect.IsRectEmpty()) {
+			*value = m_windowRect;
+		} else {
+			value->left = 0;
+			value->top = 0;
+			value->right = m_videoRect.Width();
+			value->bottom = m_videoRect.Height();
+		}
+		return S_OK;
+	}
+
 	return E_INVALIDARG;
 }
 
 STDMETHODIMP CSubPicAllocatorPresenterImpl::GetUlonglong(LPCSTR field, ULONGLONG* value)
 {
 	CheckPointer(value, E_POINTER);
+	if (!strcmp(field, "frameRate")) {
+		*value = (REFERENCE_TIME)(10000000.0 / m_fps);
+		return S_OK;
+	}
+
 	return E_INVALIDARG;
 }
 
 STDMETHODIMP CSubPicAllocatorPresenterImpl::GetDouble(LPCSTR field, double* value)
 {
 	CheckPointer(value, E_POINTER);
+	if (!strcmp(field, "refreshRate")) {
+		*value = 1000.0 / m_refreshRate;
+		return S_OK;
+	}
+
 	return E_INVALIDARG;
 }
 
@@ -309,12 +353,39 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* valu
 {
 	CheckPointer(value, E_POINTER);
 	CheckPointer(chars, E_POINTER);
-	CStringW ret = NULL;
+	CString ret;
 
 	if (!strcmp(field, "name")) {
 		ret = L"MPC-BE";
 	} else if (!strcmp(field, "version")) {
 		ret = MPC_VERSION_STR;
+	} else if (!strcmp(field, "yuvMatrix")) {
+		ret = L"None";
+
+		if (m_inputMediaType.IsValid() && m_inputMediaType.formattype == FORMAT_VideoInfo2) {
+			VIDEOINFOHEADER2* pVIH2 = (VIDEOINFOHEADER2*)m_inputMediaType.pbFormat;
+
+			if (pVIH2->dwControlFlags & AMCONTROL_COLORINFO_PRESENT) {
+				DXVA2_ExtendedFormat& flags = (DXVA2_ExtendedFormat&)pVIH2->dwControlFlags;
+
+				ret = (flags.NominalRange == DXVA2_NominalRange_Normal) ? L"PC." : L"TV.";
+
+				switch (flags.VideoTransferMatrix) {
+					case DXVA2_VideoTransferMatrix_BT601:
+						ret.Append(L"601");
+						break;
+					case DXVA2_VideoTransferMatrix_BT709:
+						ret.Append(L"709");
+						break;
+					case DXVA2_VideoTransferMatrix_SMPTE240M:
+						ret.Append(L"240M");
+						break;
+					default:
+						ret = L"None";
+						break;
+				}
+			}
+		}
 	}
 
 	if (!ret.IsEmpty()) {
