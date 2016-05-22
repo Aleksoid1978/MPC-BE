@@ -46,6 +46,7 @@
 
 #define GETWORD(b)		*(WORD*)(b)
 #define GETDWORD(b)		*(DWORD*)(b)
+#define GETQWORD(b)		*(UINT64*)(b)
 
 extern CString			ResStr(UINT nID);
 

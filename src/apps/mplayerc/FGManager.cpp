@@ -2027,7 +2027,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_chkbytes.AddTail(_T("0,4,,64582025"));               // DTS Substream
 		pFGF->m_chkbytes.AddTail(_T("0,2,,0B77"));                   // AC3, E-AC3
 		pFGF->m_chkbytes.AddTail(_T("4,4,,F8726FBB"));               // MLP
-		pFGF->m_chkbytes.AddTail(_T("0,8,,4454534844484452"));       // DTSHDHDR
 		pFGF->m_extensions.AddTail(_T(".ac3"));
 		pFGF->m_extensions.AddTail(_T(".dts"));
 		pFGF->m_extensions.AddTail(_T(".dtshd"));
@@ -2078,6 +2077,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.AddTail(_T("0,12,,445344201C00000000000000")); // 'DSD..."
 		pFGF->m_chkbytes.AddTail(_T("0,4,,46524D38,12,4,,44534420")); // 'FRM8........DSD '
+		m_source.AddTail(pFGF);
+	}
+
+	if (src[SRC_DTSAC3] && !IsPreview) {
+		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
+		pFGF->m_chkbytes.AddTail(_T("0,8,,4454534844484452"));       // DTSHDHDR
 		m_source.AddTail(pFGF);
 	}
 

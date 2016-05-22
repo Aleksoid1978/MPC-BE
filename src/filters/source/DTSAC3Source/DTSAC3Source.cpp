@@ -93,10 +93,6 @@ STDAPI DllRegisterServer()
 
 	SetRegKeyValue(
 		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
-		_T("0"), _T("0,8,,4454534844484452")); // DTSHDHDR
-
-	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
 		_T("Source Filter"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"));
 
 	SetRegKeyValue(
@@ -180,7 +176,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 {
 	CAutoLock cAutoLock(&m_cSharedState);
 	CString fn(wfn);
-	CFileException	ex;
+	CFileException ex;
 	HRESULT hr = E_FAIL;
 	m_AvgTimePerFrame = 0;
 
@@ -189,19 +185,25 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			hr = AmHresultFromWin32 (ex.m_lOsError);
 			break;
 		}
+
+		BYTE data[8];
+		if (m_file.Read(&data, sizeof(data)) != sizeof(data)) {
+			break;
+		}
+		if (GETDWORD(data) == FCC('RIFF') ||		// ignore RIFF files
+			GETQWORD(data) == 0x5244484448535444) {	// ignore DTS-HD files ('DTSHDHDR')
+			break;
+		}
+
 		const CString path = m_file.GetFilePath();
 		const CString ext = CPath(m_file.GetFileName()).GetExtension().MakeLower();
 
+		m_file.Seek(0, CFile::begin);
 		m_dataStart = 0;
 		m_dataEnd   = m_file.GetLength();
 
 		DWORD id = 0;
 		if (m_file.Read(&id, sizeof(id)) != sizeof(id)) {
-			break;
-		}
-
-		if (id == RIFF_SYNCWORD) {
-			// ignore RIFF files
 			break;
 		}
 

@@ -24,6 +24,7 @@
 #include "APEFile.h"
 #include "DFFFile.h"
 #include "DSFFile.h"
+#include "DTSHDFile.h"
 #include "TAKFile.h"
 #include "TTAFile.h"
 #include "WavPackFile.h"
@@ -90,6 +91,9 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 	}
 	else if (memcmp(data, w64_guid_riff, 16) == 0 &&  memcmp(data+24, w64_guid_wave, 16) == 0) {
 		pAudioFile = DNew CWave64File();
+	}
+	else if (memcmp(data, chk_DTSHDHDR, 8) == 0) {
+		pAudioFile = DNew CDTSHDFile();
 	}
 	else if (*id == FCC('FRM8') && GETDWORD(data+12) == FCC('DSD ')) {
 		pAudioFile = DNew CDFFFile();
