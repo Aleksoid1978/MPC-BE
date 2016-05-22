@@ -59,7 +59,7 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	CAtlList<CString>chkbytes;
-	chkbytes.AddTail(_T("0,4,,4D414320"));					// 'MAC '
+	chkbytes.AddTail(_T("0,4,,4D414320"));                  // 'MAC '
 	chkbytes.AddTail(_T("0,4,,7442614B"));                  // 'tBaK'
 	chkbytes.AddTail(_T("0,4,,54544131"));                  // 'TTA1'
 	chkbytes.AddTail(_T("0,4,,7776706B"));                  // 'wvpk'
