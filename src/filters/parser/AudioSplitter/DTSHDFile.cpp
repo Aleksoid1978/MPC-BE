@@ -141,7 +141,7 @@ HRESULT CDTSHDFile::Open(CBaseSplitterFile* pFile)
 
 	if (m_endpos > end) {
 		// truncated file?
-		m_rtduration = MulDiv64(m_rtduration, end - m_startpos, m_length);
+		m_rtduration = SCALE64(m_rtduration, end - m_startpos, m_length);
 		m_endpos = end;
 		m_length = end - m_startpos;
 	}
@@ -156,7 +156,7 @@ REFERENCE_TIME CDTSHDFile::Seek(REFERENCE_TIME rt)
 		return 0;
 	}
 
-	__int64 len = SCALE64(m_endpos - m_startpos, rt , m_rtduration);
+	__int64 len = SCALE64(m_length, rt , m_rtduration);
 	m_pFile->Seek(m_startpos + len);
 
 	return rt;
@@ -175,8 +175,8 @@ int CDTSHDFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	}
 
 	__int64 len = m_pFile->GetPos() - m_startpos;
-	packet->rtStart = SCALE64(m_rtduration, len, m_endpos - m_startpos);
-	packet->rtStop = SCALE64(m_rtduration, (len + size), m_endpos - m_startpos);
+	packet->rtStart = SCALE64(m_rtduration, len, m_length);
+	packet->rtStop = SCALE64(m_rtduration, (len + size), m_length);
 
 	return size;
 }
