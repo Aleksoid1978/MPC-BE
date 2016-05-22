@@ -23,8 +23,6 @@
 #include <WinDef.h>
 #include <MMReg.h>
 
-#define RIFF_SYNCWORD            0x46464952
-
 #define AC3_SYNCWORD                 0x770B
 #define AAC_ADTS_SYNCWORD            0xF0FF
 #define AAC_LATM_SYNCWORD             0x2B7

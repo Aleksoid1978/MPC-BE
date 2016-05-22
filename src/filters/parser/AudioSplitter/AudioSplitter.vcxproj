@@ -202,6 +202,7 @@
     <ClCompile Include="AudioFile.cpp" />
     <ClCompile Include="DFFFile.cpp" />
     <ClCompile Include="DSFFile.cpp" />
+    <ClCompile Include="DTSHDFile.cpp" />
     <ClCompile Include="TAKFile.cpp" />
     <ClCompile Include="AudioSplitter.cpp" />
     <ClCompile Include="TTAFile.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="AudioFile.h" />
     <ClInclude Include="DFFFile.h" />
     <ClInclude Include="DSFFile.h" />
+    <ClInclude Include="DTSHDFile.h" />
     <ClInclude Include="TAKFile.h" />
     <ClInclude Include="AudioSplitter.h" />
     <ClInclude Include="TTAFile.h" />
