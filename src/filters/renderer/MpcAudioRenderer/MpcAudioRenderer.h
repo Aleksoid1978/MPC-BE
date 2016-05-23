@@ -198,7 +198,7 @@ private:
 	HRESULT					StartAudioClient();
 	HRESULT					StopAudioClient();
 
-	HRESULT					ReinitializeAudioDevice();
+	HRESULT					ReinitializeAudioDevice(BOOL bFullInitialization = FALSE);
 
 	HRESULT					RenderWasapiBuffer();
 	void					CheckBufferStatus();
@@ -255,6 +255,7 @@ private:
 	HANDLE					m_hWaitResumeEvent;
 	HANDLE					m_hStopRenderThreadEvent;
 	HANDLE					m_hReinitializeEvent;
+	HANDLE					m_hReinitializeFullEvent;
 
 	HANDLE					m_hRendererNeedMoreData;
 	HANDLE					m_hStopWaitingRenderer;

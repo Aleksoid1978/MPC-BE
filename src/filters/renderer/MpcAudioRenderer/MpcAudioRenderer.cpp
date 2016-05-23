@@ -135,6 +135,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_hWaitResumeEvent(NULL)
 	, m_hStopRenderThreadEvent(NULL)
 	, m_hReinitializeEvent(NULL)
+	, m_hReinitializeFullEvent(NULL)
 	, m_bIsBitstream(FALSE)
 	, m_BitstreamMode(BITSTREAM_NONE)
 	, m_hModule(NULL)
@@ -220,6 +221,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	m_hWaitResumeEvent			= CreateEvent(NULL, FALSE, FALSE, NULL);
 	m_hStopRenderThreadEvent	= CreateEvent(NULL, FALSE, FALSE, NULL);
 	m_hReinitializeEvent		= CreateEvent(NULL, FALSE, FALSE, NULL);
+	m_hReinitializeFullEvent	= CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	m_hRendererNeedMoreData		= CreateEvent(NULL, TRUE, FALSE, NULL);
 	m_hStopWaitingRenderer		= CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -283,6 +285,7 @@ CMpcAudioRenderer::~CMpcAudioRenderer()
 	SAFE_CLOSE_HANDLE(m_hResumeEvent);
 	SAFE_CLOSE_HANDLE(m_hWaitResumeEvent);
 	SAFE_CLOSE_HANDLE(m_hReinitializeEvent);
+	SAFE_CLOSE_HANDLE(m_hReinitializeFullEvent);
 
 	SAFE_CLOSE_HANDLE(m_hRendererNeedMoreData);
 	SAFE_CLOSE_HANDLE(m_hStopWaitingRenderer);
@@ -533,10 +536,11 @@ DWORD CMpcAudioRenderer::RenderThread()
 	HRESULT hr = S_OK;
 
 	// These are wait handles for the thread stopping, new sample arrival and pausing redering
-	HANDLE renderHandles[4] = {
+	HANDLE renderHandles[5] = {
 		m_hStopRenderThreadEvent,
 		m_hPauseEvent,
 		m_hReinitializeEvent,
+		m_hReinitializeFullEvent,
 		m_hDataEvent
 	};
 
@@ -554,7 +558,7 @@ DWORD CMpcAudioRenderer::RenderThread()
 		// 1) Waiting for the next WASAPI buffer to be available to be filled
 		// 2) Exit requested for the thread
 		// 3) For a pause request
-		DWORD result = WaitForMultipleObjects(4, renderHandles, FALSE, INFINITE);
+		DWORD result = WaitForMultipleObjects(5, renderHandles, FALSE, INFINITE);
 		switch (result) {
 			case WAIT_OBJECT_0:
 				DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderThread() - exit events"));
@@ -588,13 +592,16 @@ DWORD CMpcAudioRenderer::RenderThread()
 				ReinitializeAudioDevice();
 				break;
 			case WAIT_OBJECT_0 + 3:
+				ReinitializeAudioDevice(TRUE);
+				break;
+			case WAIT_OBJECT_0 + 4:
 				{
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
 					DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderThread() - Data Event, Audio client state = %s", m_bIsAudioClientStarted ? L"Started" : L"Stoped"));
 #endif
 					HRESULT hr = RenderWasapiBuffer();
 					if (hr == AUDCLNT_E_DEVICE_INVALIDATED) {
-						SetEvent(m_hReinitializeEvent);
+						SetEvent(m_hReinitializeFullEvent);
 					}
 				}
 				break;
@@ -811,7 +818,7 @@ STDMETHODIMP CMpcAudioRenderer::OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWOR
 	CheckPointer(m_hRenderThread, S_OK);
 
 	if (m_strCurrentDeviceId == pwstrDeviceId) {
-		SetEvent(m_hReinitializeEvent);
+		SetEvent(m_hReinitializeFullEvent);
 	}
 
 	return S_OK;
@@ -824,7 +831,7 @@ STDMETHODIMP CMpcAudioRenderer::OnDefaultDeviceChanged(EDataFlow flow, ERole rol
 	if (m_bUseDefaultDevice
 			&& flow == eRender
 			&& role == eConsole) {
-		SetEvent(m_hReinitializeEvent);
+		SetEvent(m_hReinitializeFullEvent);
 	}
 
 	return S_OK;
@@ -1015,7 +1022,7 @@ STDMETHODIMP CMpcAudioRenderer::SetDeviceId(CString pDeviceId)
 		}
 
 		if (deviceIdSrc != deviceIdDst) {
-			SetEvent(m_hReinitializeEvent);
+			SetEvent(m_hReinitializeFullEvent);
 		}
 	}
 
@@ -2078,70 +2085,49 @@ HRESULT CMpcAudioRenderer::StopAudioClient()
 	return hr;
 }
 
-HRESULT CMpcAudioRenderer::ReinitializeAudioDevice()
+HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = FALSE*/)
 {
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::ReinitializeAudioDevice()"));
 
 	m_eReinitialize.Set();
 	m_eEndReceive.Wait();
 
-	HRESULT hr = E_FAIL;
+	WAVEFORMATEX* pWaveFormatEx = NULL;
+	CopyWaveFormat(m_pWaveFileFormat, &pWaveFormatEx);
 
 	if (m_bIsAudioClientStarted && m_pAudioClient) {
 		m_pAudioClient->Stop();
 	}
 	m_bIsAudioClientStarted = false;
 
-	SAFE_RELEASE(m_pRenderClient);
-	SAFE_RELEASE(m_pAudioClient);
-	SAFE_RELEASE(m_pMMDevice);
+	if (bFullInitialization) {
+		SAFE_RELEASE(m_pRenderClient);
+		SAFE_RELEASE(m_pAudioClient);
+		SAFE_RELEASE(m_pMMDevice);
 
-	SAFE_DELETE_ARRAY(m_pWaveFileFormat);
+		SAFE_DELETE_ARRAY(m_pWaveFileFormat);
+	}
 	SAFE_DELETE_ARRAY(m_pWaveFileFormatOutput);
 
-	CMediaType mt;
-	if (SUCCEEDED(m_pInputPin->ConnectionMediaType(&mt)) && mt.pbFormat) {
-		hr = CheckMediaType(&mt);
+	WasapiFlush();
+	m_Filter.Flush();
+
+	HRESULT hr = S_OK;
+	
+	if (bFullInitialization) {
+		hr = CheckAudioClient();
 		if (SUCCEEDED(hr)) {
-			hr = SetMediaType(&mt);
-		} else {
-			IPin* pPin = m_pInputPin->GetConnected();
-			if (pPin) {
-				CComQIPtr<IMediaControl> pMC(m_pGraph);
-				OAFilterState fs = -1;
-				if (pMC) {
-					pMC->GetState(100, &fs);
-					pMC->Stop();
-				}
-
-				BeginEnumMediaTypes(pPin, pEMT, pmt) {
-					if (SUCCEEDED(pPin->QueryAccept(pmt))) {
-						mt = *pmt;
-						hr = CheckMediaType(&mt);
-						if (SUCCEEDED(hr)) {
-							hr = ReconnectPin(pPin, pmt);
-							if (SUCCEEDED(hr)) {
-								break;
-							}
-						}
-					}
-				}
-				EndEnumMediaTypes(pmt)
-
-				if (pMC && fs != State_Stopped) {
-					if(fs == State_Running) {
-						pMC->Run();
-					} else if (fs == State_Paused) {
-						pMC->Pause();
-					}
-				}
-			}
+			hr = CheckAudioClient(pWaveFormatEx);
 		}
+	} else {
+		hr = CheckAudioClient(pWaveFormatEx);
 	}
 
 	if (FAILED(hr)) {
 		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::ReinitializeAudioDevice() failed: (0x%08x)", hr));
 	}
+
+	SAFE_DELETE_ARRAY(pWaveFormatEx);
 
 	m_eReinitialize.Reset();
 	return hr;
