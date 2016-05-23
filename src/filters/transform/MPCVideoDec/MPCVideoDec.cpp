@@ -1695,7 +1695,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	if (bChangeType) {
 		m_bReorderBFrame = !IsWinVistaOrLater()
 						   && (((m_nCodecId == AV_CODEC_ID_H264) && IsAVI()) || m_nCodecId == AV_CODEC_ID_VC1);
-		
+
 		const CLSID clsidInput = GetCLSID(m_pInput->GetConnected());
 		const BOOL bNotTrustSourceTimeStamp = (clsidInput == GUIDFromCString(L"{A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}") // Daum PotPlayer's MKV Source
 											   || clsidInput == CLSID_WMAsfReader); // WM ASF Reader
@@ -2582,7 +2582,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 	HRESULT hr     = S_OK;
 	BOOL    bFlush = (pDataIn == NULL);
-	
+
 	AVPacket avpkt;
 	av_init_packet(&avpkt);
 
@@ -2889,11 +2889,11 @@ HRESULT CMPCVideoDecFilter::ReopenVideo()
 		m_pAVCtx->using_dxva = false;
 		m_pAVCtx->get_format = avcodec_default_get_format;
 		m_pAVCtx->get_buffer2 = avcodec_default_get_buffer2;
-		
+
 		if (m_nCodecId == AV_CODEC_ID_H264) {
 			m_pAVCtx->flags2 &= ~CODEC_FLAG2_SHOW_ALL;
 		}
-		
+
 		SetThreadCount();
 
 		avcodec_lock;

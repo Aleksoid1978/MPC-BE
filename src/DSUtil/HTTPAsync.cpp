@@ -157,7 +157,7 @@ static CString FormatErrorMessage(DWORD dwError)
 			}
 		}
 	}
-	
+
 	return errMsg;
 }
 
@@ -225,7 +225,7 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	m_nPort   = m_url.GetPortNumber();
 	m_nScheme = m_url.GetScheme();
 
-	m_hInstance = InternetOpen(lpszAgent, 
+	m_hInstance = InternetOpen(lpszAgent,
 							   INTERNET_OPEN_TYPE_PRECONFIG,
 							   NULL,
 							   NULL,
@@ -238,7 +238,7 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 
 	m_context = Context::CONTEXT_CONNECT;
 
-	m_hConnect = InternetConnect(m_hInstance, 
+	m_hConnect = InternetConnect(m_hInstance,
 								 m_host,
 								 m_nPort,
 								 NULL,
@@ -309,7 +309,7 @@ HRESULT CHTTPAsync::SendRequest(LPCTSTR customHeader/* = L""*/, DWORD dwTimeOut/
 								 (DWORD_PTR)this);
 	if (m_hRequest == NULL) {
 		CheckLastError(L"HttpOpenRequest()", E_FAIL);
-		
+
 		if (WaitForSingleObject(m_hRequestOpenedEvent, dwTimeOut) == WAIT_TIMEOUT) {
 			DbgLog((LOG_TRACE, 3, L"CHTTPAsync::SendRequest() : HttpOpenRequest() - %d ms time out reached, exit", dwTimeOut));
 			m_bRequestComplete = FALSE;
@@ -352,7 +352,7 @@ HRESULT CHTTPAsync::SendRequest(LPCTSTR customHeader/* = L""*/, DWORD dwTimeOut/
 		} else if (dwStatusCode != HTTP_STATUS_OK && dwStatusCode != HTTP_STATUS_PARTIAL_CONTENT) {
 			return E_FAIL;
 		}
-			
+
 		break;
 	}
 

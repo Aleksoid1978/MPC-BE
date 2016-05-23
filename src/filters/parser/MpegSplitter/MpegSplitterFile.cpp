@@ -151,7 +151,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 
 	if (IsRandomAccess()) {
 		const __int64 len = GetLength();
-		
+
 		__int64 stop = min(10 * MEGABYTE, len);
 		__int64 steps = 20;
 		if (IsURL()) {
@@ -253,7 +253,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 					if (!verifyProgram(s)) {
 						continue;
 					}
-					
+
 					const SyncPoints& sps = m_SyncPoints[s];
 					for (size_t i = 1; i < sps.GetCount(); i++) {
 						if (sps[i].rt > m_rtMax && sps[i].fp > posMax) {
@@ -1866,7 +1866,7 @@ static void Descriptor_A1(CGolombBuffer& gb, int descriptor_length, CAtlMap<WORD
 	for (BYTE cnt = 0; cnt < number_elements && descriptor_length >= 6; cnt++) {
 		gb.BitRead(8);                   // stream_type
 		gb.BitRead(3);                   // reserved
-		
+
 		WORD pid = (WORD)gb.BitRead(13); // elementary_PID
 		const char ch[4] = { 0 };
 		gb.ReadBuffer((BYTE *)ch, 3);    // ISO 639 language code
@@ -1916,7 +1916,7 @@ void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 
 		WORD program_number = (WORD)gb.BitRead(16);
 		if (program_number > 0 && program_number < 0x2000) {
-							
+
 			POSITION pos = m_programs.GetStartPosition();
 			while (pos) {
 				CPrograms::CPair* pPair = m_programs.GetNext(pos);
@@ -2018,7 +2018,7 @@ bool CMpegSplitterFile::GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type)
 			} else if (pProgram) {
 				stream_type = pProgram->streams[nProgram].type;
 			}
-			
+
 			if (stream_type != INVALID) {
 				return true;
 			}
@@ -2500,7 +2500,7 @@ bool CMpegSplitterFile::ReadPSI(psihdr& h)
 	h.hdr_size++;
 	Skip(pointer_field);
 	h.hdr_size += pointer_field;
-	
+
 	h.table_id                   = (BYTE)BitRead(8);
 	h.section_syntax_indicator   = (BYTE)BitRead(1);
 	h.zero                       = (BYTE)BitRead(1);
@@ -2519,5 +2519,5 @@ bool CMpegSplitterFile::ReadPSI(psihdr& h)
 		h.hdr_size += 5;
 	}
 
-	return (h.table_id <= 0x06) ? (h.section_syntax_indicator == 1 && h.section_length > 4) : h.section_length > 0; 
+	return (h.table_id <= 0x06) ? (h.section_syntax_indicator == 1 && h.section_length > 4) : h.section_length > 0;
 }

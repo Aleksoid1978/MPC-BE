@@ -42,7 +42,7 @@ HRESULT CHdmvClipInfo::CloseFile(HRESULT hr)
 		CloseHandle(m_hFile);
 		m_hFile = INVALID_HANDLE_VALUE;
 	}
-	
+
 	return hr;
 }
 
@@ -713,7 +713,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 				CString fname = pItem->m_strFileName;
 				if (fname.Find(L".SSIF") > 0) {
 					fname.Replace(L"\\STREAM\\SSIF\\", L"\\CLIPINF\\");
-					fname.Replace(L".SSIF", L".CLPI");				
+					fname.Replace(L".SSIF", L".CLPI");
 				} else {
 					fname.Replace(L"\\STREAM\\", L"\\CLIPINF\\");
 					fname.Replace(L".M2TS", L".CLPI");

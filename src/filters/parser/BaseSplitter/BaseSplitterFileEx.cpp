@@ -834,7 +834,7 @@ bool CBaseSplitterFileEx::Read(dtslbr_hdr& h, int len, CMediaType* pmt)
 				pmt->formattype = FORMAT_WaveFormatEx;
 				pmt->SetFormat((BYTE*)&wfe, sizeof(wfe));
 			}
-			
+
 			return true;
 		}
 
@@ -1804,6 +1804,6 @@ bool CBaseSplitterFileEx::Read(opus_ts_hdr& h, int len, CAtlArray<BYTE>& extrada
 		wfe->cbSize          = nCount;
 		memcpy((BYTE*)(wfe + 1), buf, nCount);
 	}
-	
+
 	return true;
 }

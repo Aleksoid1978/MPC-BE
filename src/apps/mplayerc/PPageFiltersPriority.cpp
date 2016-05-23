@@ -105,7 +105,7 @@ BOOL CPPageFiltersPriority::OnApply()
 void CPPageFiltersPriority::Init()
 {
 	CAppSettings& s = AfxGetAppSettings();
-	
+
 	m_HTTP.ResetContent();
 	m_HTTP.AddString(ResStr(IDS_AG_DEFAULT_L));
 	m_HTTP.SetCurSel(0);

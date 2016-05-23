@@ -792,7 +792,7 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 					memcpy(m_lastPacketData.GetData(), pData + i, j - i);
 				}
 			}
-			
+
 			i = j;
 		}
 	}
@@ -1814,7 +1814,7 @@ COggVP8OutputPin::COggVP8OutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilt
 
 	mt.bFixedSizeSamples = 0;
 	m_mts.Add(mt);
-	
+
 	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 
 	*phr = S_OK;

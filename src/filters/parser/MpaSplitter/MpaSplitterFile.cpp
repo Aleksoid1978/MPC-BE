@@ -174,7 +174,7 @@ HRESULT CMpaSplitterFile::Init()
 				break;
 			}
 		}
-		
+
 		if (m_mode == mode::none) {
 			BYTE* start = buffer;
 			BYTE* end   = start + size;
@@ -215,7 +215,7 @@ HRESULT CMpaSplitterFile::Init()
 	}
 
 	delete [] buffer;
-	
+
 	if (m_mode == mode::none) {
 		return E_FAIL;
 	}

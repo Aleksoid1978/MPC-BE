@@ -199,10 +199,10 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		if (!FLAC__stream_decoder_process_until_end_of_metadata(FLAC_DECODER)) {
 			break;
 		}
-		
+
 		FLAC__uint64 metadataend = 0;
 		FLAC__stream_decoder_get_decode_position(FLAC_DECODER, &metadataend);
-		
+
 		if (!FLAC__stream_decoder_seek_absolute(FLAC_DECODER, 0)) {
 			break;
 		}

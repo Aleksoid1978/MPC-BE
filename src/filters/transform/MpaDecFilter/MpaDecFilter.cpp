@@ -537,7 +537,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 				break;
 			}
 		}
-	
+
 		if (pPinRenderer) {
 			CMediaType mtRenderer;
 			if (SUCCEEDED(pPinRenderer->ConnectionMediaType(&mtRenderer)) && mtRenderer.pbFormat) {
@@ -561,7 +561,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 			}
 		}
 
-		m_bHasVideo = HasMediaType(m_pInput, MEDIATYPE_Video) || HasMediaType(m_pInput, MEDIASUBTYPE_MPEG2_VIDEO);	
+		m_bHasVideo = HasMediaType(m_pInput, MEDIATYPE_Video) || HasMediaType(m_pInput, MEDIASUBTYPE_MPEG2_VIDEO);
 	}
 
 	HRESULT hr;
@@ -849,7 +849,7 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 		}
 		break;
 	}
-	
+
 	m_buff.RemoveHead(len);
 
 	return Deliver(outBuff.GetData(), outSize, out_sf, wfein->nSamplesPerSec, wfein->nChannels, remap->dwChannelMask);
@@ -862,7 +862,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 	if (m_FFAudioDec.GetCodecId() == AV_CODEC_ID_NONE) {
 		if (m_FFAudioDec.Init(nCodecId, &m_pInput->CurrentMediaType())) {
 			m_FFAudioDec.SetDRC(GetDynamicRangeControl());
-			
+
 			m_bIgnoreJitter = (nCodecId == AV_CODEC_ID_COOK
 							  || nCodecId == AV_CODEC_ID_ATRAC3
 							  || nCodecId == AV_CODEC_ID_SIPR
@@ -922,7 +922,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 					hr = Deliver(output.GetData(), output.GetCount(), samplefmt, m_FFAudioDec.GetSampleRate(), m_FFAudioDec.GetChannels(), m_FFAudioDec.GetChannelMask());
 					output.RemoveAll();
 				}
-			}		
+			}
 		} else {
 			m_bResync = true;
 			if (!out_size) {

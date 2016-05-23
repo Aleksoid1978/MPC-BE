@@ -69,7 +69,7 @@ BOOL CAsyncFileReader::Open(LPCTSTR lpszFileName)
 			if (ContentLength == 0) {
 				return FALSE;
 			}
-		
+
 			m_total = ContentLength;
 			m_url = lpszFileName;
 			m_sourcetype = SourceType::HTTP;
@@ -142,7 +142,7 @@ again:
 				return E_FAIL;
 			}
 			m_pos += dwSizeRead;
-		
+
 			return S_OK;
 		}
 

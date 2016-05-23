@@ -351,7 +351,7 @@ bool CPPageFormats::UnRegisterExt(CString ext)
 	if (IsRegistered(ext)) {
 		SetFileAssociation(ext, strProgID, false);
 	}
-	
+
 	key.Attach(HKEY_CLASSES_ROOT);
 	key.RecurseDeleteKey(strProgID);
 	key.Close();
@@ -359,7 +359,7 @@ bool CPPageFormats::UnRegisterExt(CString ext)
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, CString(GetRegisteredKey()) + L"\\FileAssociations")) {
 		key.DeleteValue(ext);
 	}
-	
+
 	return true;
 }
 
@@ -575,7 +575,7 @@ bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 	ULONG len = _countof(buff);
 
 	CString exe = GetProgramPath();
-	
+
 	if (ERROR_SUCCESS != key.QueryStringValue(
 				CString(_T("MPCBEPlay")) + handlers[i].verb + _T("OnArrival"),
 				buff, &len)) {

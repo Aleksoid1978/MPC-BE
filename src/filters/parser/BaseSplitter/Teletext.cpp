@@ -334,7 +334,7 @@ void CTeletext::ProcessTeletextPage()
 				break;
 			}
 		}
-		
+
 		// line is empty
 		if (col_stop > 39) {
 			continue;

@@ -688,7 +688,7 @@ HRESULT CMpegSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 					DbgLog((LOG_TRACE, 3, L"CMpegSplitterFilter::DeliverPacket() : Dropping base %I64d, next MVC extension is %I64d", p->rtStart, pMVCExtensionPacket->rtStart));
 					break;
 				}
-			}						
+			}
 		} else {
 			return __super::DeliverPacket(p);
 		}
@@ -714,7 +714,7 @@ inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(DWORD TrackNumber, __int64 
 				}
 				p.Free();
 			}
-			
+
 			if (!p) {
 				p.Attach(DNew CPacket());
 				p->TrackNumber	= TrackNumber;
@@ -722,7 +722,7 @@ inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(DWORD TrackNumber, __int64 
 				p->rtStart		= h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;
 				p->rtStop		= (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;
 			}
-			
+
 			size_t oldSize = p->GetCount();
 			size_t newSize = p->GetCount() + nBytes;
 			p->SetCount(newSize, max(1024, newSize));

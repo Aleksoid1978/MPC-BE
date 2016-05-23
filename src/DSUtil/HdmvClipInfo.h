@@ -139,7 +139,7 @@ public:
 			m_num_video		= pi.m_num_video;
 			m_num_pg		= pi.m_num_pg;
 			m_num_ig		= pi.m_num_ig;
-			
+
 			m_pg_offset_sequence_id.Copy(pi.m_pg_offset_sequence_id);
 			m_ig_offset_sequence_id.Copy(pi.m_ig_offset_sequence_id);
 			m_sps.Copy(pi.m_sps);
@@ -197,7 +197,7 @@ private :
 	DWORD		ReadDword();
 	SHORT		ReadShort();
 	BYTE		ReadByte();
-	
+
 	BOOL		Skip(LONGLONG nLen);
 	BOOL		GetPos(LONGLONG& Pos);
 	BOOL		SetPos(LONGLONG Pos, DWORD dwMoveMethod = FILE_BEGIN);

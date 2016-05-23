@@ -436,7 +436,7 @@ void CFFAudioDecoder::SetDRC(bool fDRC)
 HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 {
 	HRESULT hr = E_FAIL;
-	
+
 	if (out_size) {
 		*out_size = 0;
 	}
