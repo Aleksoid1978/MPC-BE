@@ -1534,7 +1534,7 @@ BOOL CMPlayerCApp::InitInstance()
 				if (!(m_s.nCLSwitches & CLSW_MINIMIZED) && IsIconic(hWnd)) {
 					ShowWindow(hWnd, SW_RESTORE);
 				}
-				
+
 				BOOL bDataIsSent = TRUE;
 
 				std::thread sendThread = std::thread([this, hWnd] { SendCommandLine(hWnd); });

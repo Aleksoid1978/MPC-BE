@@ -1403,13 +1403,13 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 									REFERENCE_TIME rtNewPos = rtPos + rtDiff;
 									rtNewPos = clamp(rtNewPos, 0LL, stop);
 									const bool bHighPrecision = !!m_wndSubresyncBar.IsWindowVisible();
-									
+
 									m_wndStatusBar.SetStatusTimer(rtNewPos, stop, bHighPrecision, GetTimeFormat());
 									m_OSD.DisplayMessage(OSD_TOPLEFT, m_wndStatusBar.GetStatusTimer(), 1000);
 									m_wndStatusBar.SetStatusTimer(rtPos, stop, bHighPrecision, GetTimeFormat());
 								}
 							}
-						}			
+						}
 					}
 				}
 			}
@@ -1442,7 +1442,7 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 						} else {
 							CRect rc;
 							m_wndView.GetWindowRect(&rc);
-							
+
 							const int percent = 100 * point.x_end / rc.Width();
 							if (percent <= 10) {
 								MSG msg;
@@ -1490,7 +1490,7 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 						}
 					}
 				}
-				
+
 				m_touchScreen.Empty();
 			}
 		}
@@ -4235,7 +4235,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 						}
 					}
 					EndEnumPins;
-					
+
 					m_youtubeFields.fname =  m_youtubeFields.title + ext;
 					FixFilename(m_youtubeFields.fname);
 				}
@@ -4267,7 +4267,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	m_nCurSubtitle		= -1;
 	m_lSubtitleShift	= 0;
-	
+
 	if (m_pDVS) {
 		int SubtitleDelay, SubtitleSpeedMul, SubtitleSpeedDiv;
 		if (SUCCEEDED(m_pDVS->get_SubtitleTiming(&SubtitleDelay, &SubtitleSpeedMul, &SubtitleSpeedDiv))) {
@@ -19454,7 +19454,7 @@ BOOL CMainFrame::AddSimilarFiles(CAtlList<CString>& fns)
 		name.Truncate(n);
 	}
 
-	const LPCTSTR excludeMask = 
+	const LPCTSTR excludeMask =
 		L"ATS_\\d{2}_\\d{1}.*|" // DVD Audio
 		L"VTS_\\d{2}_\\d{1}.*|" // DVD Video
 		L"\\d{5}\\.clpi|"       // Blu-ray clip info
@@ -19485,7 +19485,7 @@ BOOL CMainFrame::AddSimilarFiles(CAtlList<CString>& fns)
 			break;
 		}
 	}
-		
+
 	const std::wregex replace_spec(LR"([\.\(\)\[\]\{\}\+])", std::wregex::icase);
 	std::wstring regExp = std::regex_replace((LPCTSTR)name, replace_spec, L"\\$&");
 

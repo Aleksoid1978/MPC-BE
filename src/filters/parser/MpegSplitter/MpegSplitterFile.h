@@ -182,7 +182,7 @@ public:
 
 	bool ReadPS(pshdr& h);              // program stream header
 	bool ReadPSS(pssyshdr& h);          // program stream system header
-	
+
 	bool ReadPES(peshdr& h, BYTE code); // packetized elementary stream
 
 	bool ReadPVA(pvahdr& h, bool fSync = true);
@@ -353,7 +353,7 @@ public:
 		std::vector<stream> streams;
 
 		CString name;
-		
+
 		size_t streamCount(CStreamsList s) {
 			size_t cnt = 0;
 			for (auto stream = streams.begin(); stream != streams.end(); stream++) {

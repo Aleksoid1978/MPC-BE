@@ -1096,7 +1096,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseTeletext(CAutoPtr<CPacket> p)
 		if (m_teletext.IsOutputPresent()) {
 			m_teletext.GetOutput(output);
 			m_teletext.EraseOutput();
-		}	
+		}
 	}
 
 	if (!output.empty()) {

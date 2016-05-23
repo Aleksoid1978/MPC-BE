@@ -599,12 +599,12 @@ protected:
 						point[i].dwID    = dwID;
 						point[i].x_start = x;
 						point[i].y_start = y;
-						
+
 						return i;
 					}
 				}
 			}
-			
+
 			return -1;
 		}
 

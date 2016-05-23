@@ -278,7 +278,7 @@ int CDXVA2Decoder::get_buffer_dxva(AVFrame *pic)
 
 	pic->data[0] = (uint8_t *)pSampleWrapper;
 	pic->data[4] = (uint8_t *)nSurfaceIndex;
- 
+
 	pic->buf[0]  = av_buffer_create(NULL, 0, release_buffer_dxva, pSampleWrapper, 0);
 
 	return 0;

@@ -103,7 +103,7 @@ static BOOL InitIsW64()
 	if (fnIsWow64Process) {
 		fnIsWow64Process(GetCurrentProcess(), &bIsWow64);
 	}
-	
+
 	return bIsWow64;
 }
 

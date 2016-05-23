@@ -572,7 +572,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							if (CodecID.Left(9) == "V_REAL/RV" && pTE->CodecPrivate.GetCount() > 26) {
 								const BYTE* extra = pTE->CodecPrivate.GetData() + 26;
 								const size_t extralen = pTE->CodecPrivate.GetCount() - 26;
-								
+
 								VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + extralen);
 								memcpy(pvih + 1, extra, extralen);
 								mts.InsertAt(0, mt);

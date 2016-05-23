@@ -3106,7 +3106,7 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 		POSITION pos = s->GetHeadPosition();
 		while (pos) {
 			CLine* l = s->GetNext(pos);
-			
+
 			p.x = (s->m_scrAlignment % 3) == 1 ? org.x
 				  : (s->m_scrAlignment % 3) == 0 ? org.x - l->m_width
 				  :                              org.x - (l->m_width / 2);

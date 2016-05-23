@@ -139,4 +139,4 @@ namespace YoutubeParser {
 	bool Parse_Playlist(CString url, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay);
 
 	bool Parse_URL(CString url, YOUTUBE_FIELDS& y_fields);
-} 
+}

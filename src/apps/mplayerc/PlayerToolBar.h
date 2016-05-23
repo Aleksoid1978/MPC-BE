@@ -37,11 +37,11 @@ private:
 
 	int			m_nUseDarkTheme;
 	bool		m_bMute;
-	
+
 	HICON		m_hDXVAIcon;
 	LONG		m_nDXVAIconWidth;
 	LONG		m_nDXVAIconHeight;
-	
+
 	bool		m_bDisableImgListRemap;
 
 	CMPCPngImage m_BackGroundbm;

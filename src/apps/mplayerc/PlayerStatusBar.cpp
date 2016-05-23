@@ -380,7 +380,7 @@ void CPlayerStatusBar::OnPaint()
 	} else {
 		CRect r;
 		GetClientRect(&r);
-		
+
 		CDC memdc;
 		memdc.CreateCompatibleDC(&dc);
 
@@ -426,7 +426,7 @@ void CPlayerStatusBar::OnPaint()
 
 		// texts
 		memdc.SelectObject(&m_font);
-		
+
 		CString str = GetStatusTimer();
 		int strlen = str.GetLength();
 
@@ -459,7 +459,7 @@ void CPlayerStatusBar::OnPaint()
 			CRect rt = r;
 			rt.left += xOffset;
 			rt.top  += yOffset;
-			
+
 			memdc.DrawText(str, strlen, &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
 		}
 

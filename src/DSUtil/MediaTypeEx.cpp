@@ -572,7 +572,7 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 
 	if (formattype == FORMAT_VideoInfo || formattype == FORMAT_VideoInfo2
 			|| formattype == FORMAT_MPEGVideo || formattype == FORMAT_MPEG2_VIDEO) {
-		
+
 		fmtsize =
 			formattype == FORMAT_VideoInfo   ? sizeof(VIDEOINFOHEADER)    :
 			formattype == FORMAT_VideoInfo2  ? sizeof(VIDEOINFOHEADER2)   :

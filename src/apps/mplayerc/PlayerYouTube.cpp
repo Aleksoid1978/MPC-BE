@@ -391,7 +391,7 @@ namespace YoutubeParser {
 				JSUrl.Replace(L"\\/", L"/");
 				JSUrl = L"https:" + JSUrl;
 			}
-			
+
 			CStringA strUrls;
 
 			if (strstr(data, MATCH_AGE_RESTRICTION)) {
@@ -785,7 +785,7 @@ namespace YoutubeParser {
 				free(data);
 				return false;
 			}
-			
+
 			LPCSTR block = data;
 			while ((block = strstr(block, sMatch)) != NULL) {
 				const CStringA blockEntry = GetEntry(block, sMatch, ">");
@@ -793,7 +793,7 @@ namespace YoutubeParser {
 					break;
 				}
 				block += blockEntry.GetLength();
-				
+
 				CString item = UTF8To16(blockEntry);
 				CString data_video_id;
 				int data_index = 0;
@@ -858,11 +858,11 @@ namespace YoutubeParser {
 				}
 
 				bRet = ParseMetadata(s, videoId, y_fields);
-				
+
 				InternetCloseHandle(s);
 			}
 		}
-	
+
 		return bRet;
 	}
 }

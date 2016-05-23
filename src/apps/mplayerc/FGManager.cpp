@@ -308,7 +308,7 @@ bool CFGManager::CheckBytes(PBYTE buf, DWORD size, CString chkbytes)
 		for (size_t i = 0; i < val.GetCount(); i++) {
 			BYTE b = gb.ReadByte();
 			if ((b & mask[i]) != val[i]) {
-				return false;	
+				return false;
 			}
 		}
 	}
@@ -349,7 +349,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	}
 
 	HANDLE hFile = INVALID_HANDLE_VALUE;
-	
+
 	CHTTPAsync HTTPAsync;
 	BYTE httpbuf[1024] = { 0 };
 	DWORD httpbufSize = 0;
@@ -1911,7 +1911,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_protocols.AddTail(_T("https"));
 		m_source.AddTail(pFGF);
 	}
-	
+
 	if (src[SRC_STDINPUT] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CUDPReader>(STDInReaderName);
 		pFGF->m_protocols.AddTail(_T("pipe"));
