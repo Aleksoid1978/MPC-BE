@@ -109,6 +109,10 @@ HRESULT CDTSHDFile::Open(CBaseSplitterFile* pFile)
 			m_startpos = pos;
 			m_length = chunk.size;
 			m_endpos = pos + chunk.size;
+
+			if (!m_pFile->IsRandomAccess()) {
+				break;
+			}
 		}
 		else if (memcmp(chunk.id, chk_FILEINFO, 8) == 0) {
 			if (chunk.size < 32 * KILOBYTE) { // set limit for 'FILEINFO' chunk
