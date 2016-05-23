@@ -82,7 +82,7 @@ HRESULT CDTSHDFile::Open(CBaseSplitterFile* pFile)
 
 		if (memcmp(chunk.id, chk_AUPR_HDR, 8) == 0) {
 			if (chunk.size < 21) {
-				DbgLog((LOG_TRACE, 3, L"CCDTSHDFile::Open() : broken 'AUPR_HDR' chunk\n"));
+				DbgLog((LOG_TRACE, 3, L"CCDTSHDFile::Open() : broken 'AUPR_HDR' chunk"));
 				return E_FAIL;
 			}
 			m_pFile->Skip(3);
@@ -114,7 +114,7 @@ HRESULT CDTSHDFile::Open(CBaseSplitterFile* pFile)
 			if (chunk.size < 32 * KILOBYTE) { // set limit for 'FILEINFO' chunk
 				CStringA info;
 				if (S_OK == m_pFile->ByteRead((BYTE*)info.GetBufferSetLength(chunk.size), chunk.size)) {
-					DbgLog((LOG_TRACE, 3, L"CCDTSHDFile::Open() : 'FILEINFO' = %s\n", info));
+					DbgLog((LOG_TRACE, 3, L"CCDTSHDFile::Open() : 'FILEINFO' = %s", info));
 				}
 			}
 		}
@@ -127,7 +127,7 @@ HRESULT CDTSHDFile::Open(CBaseSplitterFile* pFile)
 				&& memcmp(chunk.id, chk_BUILDVER, 8) != 0
 				&& memcmp(chunk.id, chk_BLACKOUT, 8) != 0
 				&& memcmp(chunk.id, chk_BRANCHPT, 8) != 0) {
-			DbgLog((LOG_TRACE, 3, L"CCDTSHDFile::Open() : bad or unknown chunk id.\n"));
+			DbgLog((LOG_TRACE, 3, L"CCDTSHDFile::Open() : bad or unknown chunk id."));
 			ASSERT(0);
 			return E_FAIL;
 		}
