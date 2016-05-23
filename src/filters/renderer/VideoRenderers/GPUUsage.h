@@ -59,7 +59,7 @@ class CGPUUsage
 	};
 
 	typedef char NvAPI_ShortString[64];
-	
+
 	typedef int *(*NvAPI_QueryInterface_t)(unsigned int offset);
 	typedef int (*NvAPI_Initialize_t)();
 	typedef int (*NvAPI_EnumPhysicalGPUs_t)(int **handles, int *count);

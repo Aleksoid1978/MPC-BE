@@ -197,7 +197,6 @@ public IUnknown {
 	STDMETHOD_(bool, DisplayChange) () PURE;
 
 	STDMETHOD_(bool, IsRendering)() PURE;
-	STDMETHOD(SetIsRendering)(bool bIsRendering) PURE;
 };
 
 //

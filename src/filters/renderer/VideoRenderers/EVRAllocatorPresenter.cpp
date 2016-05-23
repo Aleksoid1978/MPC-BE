@@ -689,9 +689,9 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 
 	VideoFormat = (MFVIDEOFORMAT*)pAMMedia->pbFormat;
 	CHECK_HR(pfMFCreateVideoMediaType(VideoFormat, &m_pMediaType));
-	
+
 	m_pMediaType->SetUINT32(MF_MT_PAN_SCAN_ENABLED, 0);
-	
+
 	const CRenderersSettings& rs = GetRenderersSettings();
 	m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, rs.m_AdvRendSets.iEVROutputRange == 1 ? MFNominalRange_16_235 : MFNominalRange_0_255);
 	m_LastSetOutputRange = rs.m_AdvRendSets.iEVROutputRange;
@@ -710,7 +710,7 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 	if (aspectRatio.cx > 0 && aspectRatio.cy > 0) {
 		ReduceDim(aspectRatio);
 	}
-	
+
 	if (videoSize != m_nativeVideoSize || aspectRatio != m_aspectRatio) {
 		m_nativeVideoSize = videoSize;
 		m_aspectRatio = aspectRatio;

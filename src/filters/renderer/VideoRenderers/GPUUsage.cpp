@@ -68,7 +68,7 @@ void CGPUUsage::Clean()
 	ATIData.ADL_Overdrive6_CurrentStatus_Get	= NULL;
 
 	ZeroMemory(&NVData.gpuHandles, sizeof(NVData.gpuHandles));
-	
+
 	ZeroMemory(&NVData.gpuUsages, sizeof(NVData.gpuUsages));
 	NVData.gpuUsages.version					= sizeof(gpuUsages) | 0x10000;
 	NVData.NvAPI_GPU_GetUsages					= NULL;
@@ -76,7 +76,7 @@ void CGPUUsage::Clean()
 	ZeroMemory(&NVData.gpuPStates, sizeof(NVData.gpuPStates));
 	NVData.gpuPStates.version					= sizeof(gpuPStates) | 0x10000;
 	NVData.NvAPI_GPU_GetPStates					= NULL;
-	
+
 	NVData.gpuSelected							= -1;
 
 	NVData.hNVApi								= NULL;
@@ -237,7 +237,7 @@ HRESULT CGPUUsage::Init(CString DeviceName, CString Device)
 							}
 						}
 					}
-					
+
 					if (NVData.gpuSelected == -1) {
 						Clean();
 					}

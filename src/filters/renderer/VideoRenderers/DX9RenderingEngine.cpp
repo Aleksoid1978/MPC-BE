@@ -243,7 +243,7 @@ void CDX9RenderingEngine::CleanupRenderingEngine()
 		Shader.m_pPixelShader = NULL;
 	}
 
-	m_pRotateTexture = NULL;	
+	m_pRotateTexture = NULL;
 	NULL_PTR_ARRAY(m_pFrameTextures)
 	NULL_PTR_ARRAY(m_pScreenSpaceTextures);
 
