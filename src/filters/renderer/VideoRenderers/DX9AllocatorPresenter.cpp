@@ -899,7 +899,7 @@ UINT CDX9AllocatorPresenter::GetAdapter(IDirect3D9* pD3D)
 
 					m_D3D9Device.Trim();
 					m_D3D9DeviceName.Trim();
-					
+
 					return adp;
 				}
 			}
@@ -2201,7 +2201,7 @@ void CDX9AllocatorPresenter::DrawStats()
 
 		const DWORD Alpha = 80;
 		DrawRect(RGB(0, 0, 0), Alpha, CRect(StartX, StartY, StartX + DrawWidth, StartY + DrawHeight));
-		
+
 		m_pLine->SetWidth(2.5f * ScaleX);
 		m_pLine->SetAntialias(TRUE);
 		m_pLine->Begin();
@@ -2229,7 +2229,7 @@ void CDX9AllocatorPresenter::DrawStats()
 			for (int i = 0; i < NB_JITTER; i++) {
 				int index = (m_nNextJitter + 1 + i) % NB_JITTER;
 				float jitter = float(m_pJitter[index] - m_iJitterMean);
-				
+
 				Points[i].x = StartX + i * StepX;
 				Points[i].y = StartY + (jitter * ScaleY / 5000.0f + DrawHeight / 2.0f);
 			}

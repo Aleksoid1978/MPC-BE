@@ -130,7 +130,7 @@ HRESULT CmadVRAllocatorPresenter::RenderEx3(REFERENCE_TIME rtStart,
 		m_fps = 10000000.0 / atpf;
 		m_pSubPicQueue->SetFPS(m_fps);
 	}
-	
+
 	AlphaBltSubPic(viewportRect, croppedVideoRect, NULL, xOffsetInPixels);
 	return S_OK;
 }

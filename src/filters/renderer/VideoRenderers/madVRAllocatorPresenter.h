@@ -58,7 +58,7 @@ namespace DSObjects
 							   const double videoStretchFactor = 1.0) override {
 			return RenderEx3(rtStart, rtStop, atpf, croppedVideoRect, originalVideoRect, viewportRect, videoStretchFactor);
 		}
-							   
+
 		// ISubRenderCallback4
 		STDMETHODIMP RenderEx3(REFERENCE_TIME rtStart, REFERENCE_TIME rtStop,
 							   REFERENCE_TIME atpf, RECT croppedVideoRect,

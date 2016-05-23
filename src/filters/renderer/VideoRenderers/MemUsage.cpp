@@ -35,7 +35,7 @@ const size_t CMemUsage::GetUsage()
 		PROCESS_MEMORY_COUNTERS pmc = { 0 };
 		if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)) && pmc.WorkingSetSize > 0) {
 			m_szMemUsage = pmc.WorkingSetSize;
-		
+
 		}
 
 		m_dwLastRun	= GetTickCount();
