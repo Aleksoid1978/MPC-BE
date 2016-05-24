@@ -133,11 +133,7 @@ HRESULT CDTSHDFile::Open(CBaseSplitterFile* pFile)
 				&& memcmp(chunk.id, chk_BRANCHPT, 8) != 0) {
 			DbgLog((LOG_TRACE, 3, L"CCDTSHDFile::Open() : bad or unknown chunk id."));
 			ASSERT(0);
-			if (m_length) {
-				break;
-			} else {
-				return E_FAIL;
-			}
+			return E_FAIL;
 		}
 
 		m_pFile->Seek(pos + chunk.size);
