@@ -1,6 +1,5 @@
 /*
- *
- * (C) 2013 v0lt
+ * (C) 2013-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
