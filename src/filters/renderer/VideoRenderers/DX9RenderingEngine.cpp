@@ -285,12 +285,20 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 		m_VideoBufferFmt = m_SurfaceFmt;
 		if (m_D3D9VendorId == PCIV_Intel) {
 			if (m_bIsEVR) {
+				// on Intel EVR-Mixer can work with X8R8G8B8 surface only
 				m_VideoBufferFmt = D3DFMT_X8R8G8B8;
 			} else if (m_SurfaceFmt == D3DFMT_A32B32G32R32F && settings.bVMRMixerMode && settings.bVMRMixerYUV) {
+				// on Intel VMR-9r with YUV Mixing Mode can not work with A32B32G32R32F surface
 				m_VideoBufferFmt = D3DFMT_A16B16G16R16F;
 			}
 		}
-		// TODO: show that surface in the statistics
+		else if (m_D3D9VendorId == PCIV_nVidia && m_bIsEVR
+				&& m_nativeVideoSize.cx == 1920 && m_nativeVideoSize.cy == 1088
+				&& m_SurfaceFmt == D3DFMT_A16B16G16R16F || m_SurfaceFmt == D3DFMT_A32B32G32R32F) {
+			// fix Nvidia driver bug ('Integer division by zero' in nvd3dumx.dll)
+			m_VideoBufferFmt = D3DFMT_A2R10G10B10;
+		}
+
 		for (int i = 0; i < m_nNbDXSurface; i++) {
 			if (FAILED(hr = m_pD3DDev->CreateTexture(
 								m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
