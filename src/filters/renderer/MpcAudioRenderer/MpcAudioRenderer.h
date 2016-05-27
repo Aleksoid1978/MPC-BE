@@ -45,12 +45,10 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	, public ISpecifyPropertyPages2
 	, public IMpcAudioRendererFilter
 {
+	CCritSec			m_csQueue;
 	CCritSec			m_csRender;
 	CCritSec			m_csProps;
 	CCritSec			m_csCheck;
-
-	CAMEvent			m_eEndReceive;
-	CAMEvent			m_eReinitialize;
 
 	CMixer				m_Resampler;
 
@@ -186,6 +184,7 @@ private:
 	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCheckFormat = TRUE);
 	HRESULT					CheckAudioClient(WAVEFORMATEX *pWaveFormatEx = NULL);
 	HRESULT					DoRenderSampleWasapi(IMediaSample *pMediaSample);
+	HRESULT					PushToQueue(CAutoPtr<CPacket> p);
 
 	bool					IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const WAVEFORMATEX *pNewWaveFormatEx);
 	bool					CheckFormatChanged(WAVEFORMATEX *pWaveFormatEx, WAVEFORMATEX **ppNewWaveFormatEx);
@@ -198,6 +197,7 @@ private:
 	HRESULT					StartAudioClient();
 	HRESULT					StopAudioClient();
 
+	void					SetReinitializeAudioDevice(BOOL bFullInitialization = FALSE);
 	HRESULT					ReinitializeAudioDevice(BOOL bFullInitialization = FALSE);
 
 	HRESULT					RenderWasapiBuffer();
@@ -254,11 +254,11 @@ private:
 	HANDLE					m_hWaitPauseEvent;
 	HANDLE					m_hWaitResumeEvent;
 	HANDLE					m_hStopRenderThreadEvent;
-	HANDLE					m_hReinitializeEvent;
-	HANDLE					m_hReinitializeFullEvent;
 
 	HANDLE					m_hRendererNeedMoreData;
-	HANDLE					m_hStopWaitingRenderer;
+
+	BOOL					m_bNeedReinitialize;
+	BOOL					m_bNeedReinitializeFull;
 
 	CSimpleArray<WORD>		m_wBitsPerSampleList;
 	CSimpleArray<WORD>		m_nChannelsList;
