@@ -187,16 +187,15 @@ bool CMixer::Init()
 	}
 
 #ifdef _DEBUG
-	DbgLog((LOG_TRACE, 3, L"CMixer::Init() : matrix"));
-	CString matrix_str;
+	CString matrix_str = L"CMixer::Init() : matrix";
 	for (int j = 0; j < out_ch; j++) {
-		matrix_str.Format(L"	%d:", j + 1);
+		matrix_str.AppendFormat(L"\n\t%d:", j + 1);
 		for (int i = 0; i < in_ch; i++) {
 			double k = m_matrix_dbl[j * in_ch + i];
 			matrix_str.AppendFormat(L" %.4f", k);
 		}
-		DbgLog((LOG_TRACE, 3, matrix_str));
 	}
+	DbgLog((LOG_TRACE, 3, matrix_str));
 #endif
 
 	// Set Matrix on the context
