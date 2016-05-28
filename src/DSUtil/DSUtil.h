@@ -36,7 +36,7 @@
                   (((DWORD)(ch4) & 0xFF000000) >> 24))
 #endif
 
-#define SCALE64(a, b, c) (__int64)((double)(a) * (b) / (c))
+#define SCALE64(a, b, c) (__int64)((double)(a) * (b) / (c)) // very fast, but it can give a small rounding error
 
 #define LCID_NOSUBTITLES	-1
 #define INVALID_TIME		_I64_MIN
