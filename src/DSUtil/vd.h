@@ -43,6 +43,6 @@ extern bool BitBltFromRGBToRGBStretch(int dstw, int dsth, BYTE* dst, int dstpitc
 extern void DeinterlaceBlend(BYTE* dst, BYTE* src, DWORD rowbytes, DWORD h, DWORD dstpitch, DWORD srcpitch);
 extern void DeinterlaceBob(BYTE* dst, BYTE* src, DWORD rowbytes, DWORD h, DWORD dstpitch, DWORD srcpitch, bool topfield);
 
-__int64 FractionScale64(__int64 a, UINT32 b, UINT32 c);
-UINT64  UMulDiv64x32(UINT64 a, UINT32 b, UINT32 c);
-__int64 MulDiv64(__int64 a, __int64 b, __int64 c); // rounding to the nearest integer. slow
+__int64 FractionScale64(__int64 a, UINT32 b, UINT32 c);	// faster that Int64x32Div32 from wxutil.h
+UINT64  UMulDiv64x32(UINT64 a, UINT32 b, UINT32 c);		// speed equal to FractionScale64
+__int64 MulDiv64(__int64 a, __int64 b, __int64 c);		// in x86 mode slower than llMulDiv from wxutil.h. rounding to the nearest integer
