@@ -2143,10 +2143,6 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::ReinitializeAudioDevice() failed: (0x%08x)", hr));
 	}
 
-	if (SUCCEEDED(hr)) {
-		WasapiFlush();
-	}
-
 	SAFE_DELETE_ARRAY(pWaveFormatEx);
 
 	m_bNeedReinitialize = m_bNeedReinitializeFull = FALSE;
