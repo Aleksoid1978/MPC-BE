@@ -541,8 +541,13 @@ DWORD CMpcAudioRenderer::RenderThread()
 	while (true) {
 		CheckBufferStatus();
 
-		const DWORD result = WaitForMultipleObjects(3, renderHandles, FALSE, INFINITE);
+		const DWORD result = WaitForMultipleObjects(3, renderHandles, FALSE, 1000);
 		switch (result) {
+			case WAIT_TIMEOUT: // timed out after a 1 second wait
+				if (m_pRenderClient) {
+					SetReinitializeAudioDevice(TRUE);
+				}
+				break;
 			case WAIT_OBJECT_0: // exit event
 				DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderThread() - exit events"));
 
