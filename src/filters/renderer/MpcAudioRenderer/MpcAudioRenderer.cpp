@@ -2379,6 +2379,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCh
 	REFERENCE_TIME hnsMinimumDevicePeriod = 0;
 	hr = m_pAudioClient->GetDevicePeriod(&hnsDefaultDevicePeriod, &hnsMinimumDevicePeriod);
 	if (SUCCEEDED(hr)) {
+		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::InitAudioClient() - DefaultDevicePeriod = %dms, MinimumDevicePeriod = %dms", int(hnsDefaultDevicePeriod / 10000), int(hnsMinimumDevicePeriod / 10000)));
 		m_hnsPeriod = IsExclusive(pWaveFormatEx) ? hnsMinimumDevicePeriod : hnsDefaultDevicePeriod;
 	}
 	m_hnsPeriod = max(500000, m_hnsPeriod); // 50 ms - minimal duration of buffer, TODO - optional ???
@@ -2457,6 +2458,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCh
 	// get the buffer size, which is aligned
 	hr = m_pAudioClient->GetBufferSize(&m_nFramesInBuffer);
 	EXIT_ON_ERROR(hr);
+	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::InitAudioClient() - NumBufferFrames = %u (%ums)", m_nFramesInBuffer, m_nFramesInBuffer * 1000 / pWaveFormatEx->nSamplesPerSec));
 
 	// enables a client to write output data to a rendering endpoint buffer
 	hr = m_pAudioClient->GetService(IID_PPV_ARGS(&m_pRenderClient));
