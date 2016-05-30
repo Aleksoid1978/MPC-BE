@@ -3260,9 +3260,11 @@ int GCD(int a, int b){
 
 void ReduceDim(LONG& num, LONG& den)
 {
-	int gcd = GCD(labs(num), labs(den));
-	num /= gcd;
-	den /= gcd;
+	if (den > 0 && num > 0) {
+		int gcd = GCD(labs(num), labs(den));
+		num /= gcd;
+		den /= gcd;
+	}
 }
 
 void ReduceDim(SIZE &dim)
