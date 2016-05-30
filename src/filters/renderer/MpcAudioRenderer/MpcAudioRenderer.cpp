@@ -108,6 +108,8 @@ static void DumpWaveFormatEx(WAVEFORMATEX* pwfx)
 #define FramesToTime(frames, wfex) (llMulDiv(frames, UNITS, wfex->nSamplesPerSec, 0))
 #define TimeToFrames(time, wfex)   (llMulDiv(time, wfex->nSamplesPerSec, UNITS, 0))
 
+#define IsExclusive(wfex)          (m_WASAPIMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(wfex))
+
 CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	: CBaseRenderer(__uuidof(this), NAME("CMpcAudioRenderer"), punk, phr)
 	, m_dRate(1.0)
@@ -1576,7 +1578,7 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 
 		CopyWaveFormat(m_pWaveFileFormat, &m_pWaveFileFormatOutput);
 
-		if (m_WASAPIMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(pWaveFormatEx)) { // EXCLUSIVE/BITSTREAM
+		if (IsExclusive(pWaveFormatEx)) { // EXCLUSIVE/BITSTREAM
 			WAVEFORMATEX *pFormat = NULL;
 			IPropertyStore *pProps = NULL;
 			PROPVARIANT varConfig;
@@ -2377,15 +2379,17 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCh
 	REFERENCE_TIME hnsMinimumDevicePeriod = 0;
 	hr = m_pAudioClient->GetDevicePeriod(&hnsDefaultDevicePeriod, &hnsMinimumDevicePeriod);
 	if (SUCCEEDED(hr)) {
-		m_hnsPeriod = hnsDefaultDevicePeriod;
+		m_hnsPeriod = IsExclusive(pWaveFormatEx) ? hnsMinimumDevicePeriod : hnsDefaultDevicePeriod;
 	}
-	m_hnsPeriod = max(500000, m_hnsPeriod); // 50 ms - minimal size of buffer
+	m_hnsPeriod = max(500000, m_hnsPeriod); // 50 ms - minimal duration of buffer, TODO - optional ???
+
+	const AUDCLNT_SHAREMODE ShareMode = IsExclusive(pWaveFormatEx) ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED;
 
 	if (bCheckFormat) {
 		WAVEFORMATEX *pClosestMatch = NULL;
-		hr = m_pAudioClient->IsFormatSupported((m_WASAPIMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(pWaveFormatEx)) ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED,
-												pWaveFormatEx,
-												&pClosestMatch);
+		hr = m_pAudioClient->IsFormatSupported(ShareMode,
+											   pWaveFormatEx,
+											   &pClosestMatch);
 		if (pClosestMatch) {
 			CoTaskMemFree(pClosestMatch);
 		}
@@ -2405,21 +2409,17 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCh
 	}
 
 	CalcBitstreamBufferPeriod(pWaveFormatEx, &m_hnsPeriod);
+	const REFERENCE_TIME hnsPeriodicity = IsExclusive(pWaveFormatEx) ? m_hnsPeriod : 0;
 
 	if (SUCCEEDED(hr)) {
-		hr = m_pAudioClient->Initialize((m_WASAPIMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(pWaveFormatEx)) ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED,
-										 AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
-										 m_hnsPeriod,
-										 (m_WASAPIMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(pWaveFormatEx)) ? m_hnsPeriod : 0,
-										 pWaveFormatEx, NULL);
+		hr = m_pAudioClient->Initialize(ShareMode,
+										AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
+										m_hnsPeriod,
+										hnsPeriodicity,
+										pWaveFormatEx, NULL);
 	}
 
-	if (FAILED(hr) && hr != AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED) {
-		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::InitAudioClient() - IAudioClient::Initialize() failed: (0x%08x)", hr));
-		return hr;
-	}
-
-	if (AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED == hr) {
+	if (AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED == hr && IsExclusive(pWaveFormatEx)) {
 		// if the buffer size was not aligned, need to do the alignment dance
 		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::InitAudioClient() - Buffer size not aligned. Realigning"));
 
@@ -2435,21 +2435,21 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCh
 		}
 
 		// calculate the new aligned periodicity
-		m_hnsPeriod = llMulDiv(m_nFramesInBuffer, UNITS, pWaveFormatEx->nSamplesPerSec, 0);
+		m_hnsPeriod = FramesToTime(m_nFramesInBuffer, pWaveFormatEx);
 
 		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::InitAudioClient() - Trying again with periodicity of %I64u hundred-nanoseconds, or %u frames.", m_hnsPeriod, m_nFramesInBuffer));
 		if (SUCCEEDED(hr)) {
-			hr = m_pAudioClient->Initialize((m_WASAPIMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(pWaveFormatEx)) ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED,
-											 AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
-											 m_hnsPeriod,
-											 (m_WASAPIMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(pWaveFormatEx)) ? m_hnsPeriod : 0,
-											 pWaveFormatEx, NULL);
+			hr = m_pAudioClient->Initialize(ShareMode,
+											AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
+											m_hnsPeriod,
+											m_hnsPeriod,
+											pWaveFormatEx, NULL);
 		}
+	}
 
-		if (FAILED(hr)) {
-			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::InitAudioClient() - IAudioClient::Initialize() - reinitialization failed: (0x%08x)", hr));
-			return hr;
-		}
+	if (FAILED(hr)) {
+		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::InitAudioClient() - IAudioClient::Initialize() failed: (0x%08x)", hr));
+		return hr;
 	}
 
 	EXIT_ON_ERROR(hr);
