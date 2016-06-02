@@ -283,6 +283,7 @@ SRCS_LC = \
 	libavcodec/lossless_audiodsp.c \
 	libavcodec/lossless_videodsp.c \
 	libavcodec/lsp.c \
+	libavcodec/magicyuv.c \
 	libavcodec/mathtables.c \
 	libavcodec/me_cmp.c \
 	libavcodec/mdct_fixed.c \
