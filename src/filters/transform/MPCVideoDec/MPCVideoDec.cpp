@@ -1943,7 +1943,18 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 
 			const MPCPixelFormat* OutList = NULL;
 
-			if (av_pfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL)) {
+			if (av_pfdesc->nb_components <= 2) { // greyscale formats with and without alfa channel
+				if (lumabits <= 8) {
+					OutList = YUV420_8;
+				}
+				else if (lumabits <= 10) {
+					OutList = YUV420_10;
+				}
+				else {
+					OutList = YUV420_16;
+				}
+			}
+			else if (av_pfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL)) {
 				OutList = RGB_8;
 			}
 			else if (av_pfdesc->nb_components >= 3) {
