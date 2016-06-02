@@ -24,6 +24,10 @@
 #define IDB_PLAYERTOOLBAR_PNG_150       252
 #define IDB_PLAYERTOOLBAR_PNG_175       253
 #define IDB_PLAYERTOOLBAR_PNG_200       254
+#define IDB_PLAYERTOOLBAR_PNG_225       255
+#define IDB_PLAYERTOOLBAR_PNG_250       256
+#define IDB_PLAYERTOOLBAR_PNG_300       257
+#define IDB_PLAYERTOOLBAR_PNG_350       258
 
 #define IDI_DVD                         302
 #define IDI_AUDIOCD                     303
@@ -80,6 +84,10 @@
 #define IDB_DXVA_INDICATOR_150          552
 #define IDB_DXVA_INDICATOR_175          553
 #define IDB_DXVA_INDICATOR_200          554
+#define IDB_DXVA_INDICATOR_225          555
+#define IDB_DXVA_INDICATOR_250          556
+#define IDB_DXVA_INDICATOR_300          557
+#define IDB_DXVA_INDICATOR_350          558
 
 #define IDF_SHADER_EMPTY                700
 #define IDF_SHADER_FINAL                701

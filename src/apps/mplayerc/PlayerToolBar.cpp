@@ -131,31 +131,31 @@ void CPlayerToolBar::SwitchTheme()
 	}
 
 	const int dpiScalePercent = m_pMainFrame->GetDPIScalePercent();
-	int imageDpiScalePercent = 100;
-	if (dpiScalePercent >= 200) {
-		imageDpiScalePercent = 200;
-	} else if (dpiScalePercent >= 175) {
-		imageDpiScalePercent = 175;
-	} else if (dpiScalePercent >= 150) {
-		imageDpiScalePercent = 150;
-	} else if (dpiScalePercent >= 125) {
-		imageDpiScalePercent = 125;
+	const int imageDpiScalePercent[] = {
+		350, 300, 250, 225, 200, 175, 150, 125	
+	};
+	const int toolbarImageResId[] = {
+		IDB_PLAYERTOOLBAR_PNG_350,
+		IDB_PLAYERTOOLBAR_PNG_300,
+		IDB_PLAYERTOOLBAR_PNG_250,
+		IDB_PLAYERTOOLBAR_PNG_225,
+		IDB_PLAYERTOOLBAR_PNG_200,
+		IDB_PLAYERTOOLBAR_PNG_175,
+		IDB_PLAYERTOOLBAR_PNG_150,
+		IDB_PLAYERTOOLBAR_PNG_125
+	};
+
+	int imageDpiScalePercentIndex = -1;
+	for (int i = 0; i < _countof(imageDpiScalePercent); i++) {
+		if (dpiScalePercent >= imageDpiScalePercent[i]) {
+			imageDpiScalePercentIndex = i;
+			break;
+		}
 	}
 
 	int resid = IDB_PLAYERTOOLBAR_PNG;
-	switch (imageDpiScalePercent) {
-		case 125:
-			resid = IDB_PLAYERTOOLBAR_PNG_125;
-			break;
-		case 150:
-			resid = IDB_PLAYERTOOLBAR_PNG_150;
-			break;
-		case 175:
-			resid = IDB_PLAYERTOOLBAR_PNG_175;
-			break;
-		case 200:
-			resid = IDB_PLAYERTOOLBAR_PNG_200;
-			break;
+	if (imageDpiScalePercentIndex != -1) {
+		resid = toolbarImageResId[imageDpiScalePercentIndex];
 	}
 
 	// load toolbar image
@@ -223,22 +223,20 @@ void CPlayerToolBar::SwitchTheme()
 		}
 		m_nDXVAIconWidth = m_nDXVAIconHeight = 0;
 
-		switch (imageDpiScalePercent) {
-			case 125:
-				resid = IDB_DXVA_INDICATOR_125;
-				break;
-			case 150:
-				resid = IDB_DXVA_INDICATOR_150;
-				break;
-			case 175:
-				resid = IDB_DXVA_INDICATOR_175;
-				break;
-			case 200:
-				resid = IDB_DXVA_INDICATOR_200;
-				break;
-			default:
-				resid = IDB_DXVA_INDICATOR;
-				break;
+		const int gpuImageResId[] = {
+			IDB_DXVA_INDICATOR_350,
+			IDB_DXVA_INDICATOR_300,
+			IDB_DXVA_INDICATOR_250,
+			IDB_DXVA_INDICATOR_225,
+			IDB_DXVA_INDICATOR_200,
+			IDB_DXVA_INDICATOR_175,
+			IDB_DXVA_INDICATOR_150,
+			IDB_DXVA_INDICATOR_125
+		};
+		
+		resid = IDB_DXVA_INDICATOR;
+		if (imageDpiScalePercentIndex != -1) {
+			resid = gpuImageResId[imageDpiScalePercentIndex];
 		}
 
 		hBmp = NULL;
@@ -258,16 +256,10 @@ void CPlayerToolBar::SwitchTheme()
 					DeleteObject(hBmp);
 					hBmp = NULL;
 
-					const int resids[] = {
-						IDB_DXVA_INDICATOR_200,
-						IDB_DXVA_INDICATOR_175,
-						IDB_DXVA_INDICATOR_150,
-						IDB_DXVA_INDICATOR_125
-					};
-					for (int i = 0; i < _countof(resids); i++) {
-						const int _resid = resids[i];
-						if (_resid < resid) {
-							hBmp = CMPCPngImage::LoadExternalImage(L"", _resid, IMG_TYPE::PNG);
+					for (int i = 0; i < _countof(gpuImageResId); i++) {
+						const int gpuresid = gpuImageResId[i];
+						if (gpuresid < resid) {
+							hBmp = CMPCPngImage::LoadExternalImage(L"", gpuresid, IMG_TYPE::PNG);
 							if (hBmp) {
 								::GetObject(hBmp, sizeof(bm), &bm);
 								if (bm.bmHeight < m_nButtonHeight) {
