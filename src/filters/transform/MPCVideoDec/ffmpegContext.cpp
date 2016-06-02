@@ -581,6 +581,22 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 			case AV_CODEC_ID_DNXHD:
 				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; // most common format
 				break;
+			case AV_CODEC_ID_MAGICYUV:
+				if (pAVCtx->extradata_size >= 32 && *(DWORD*)pAVCtx->extradata == 'YGAM') {
+					int hsize = *(DWORD*)(pAVCtx->extradata + 4);
+					if (hsize >= 32 && pAVCtx->extradata[8] == 7) {
+						switch (pAVCtx->extradata[9]) {
+						case 0x65: pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;     break;
+						case 0x66: pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP;    break;
+						case 0x67: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;  break;
+						case 0x68: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;  break;
+						case 0x69: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;  break;
+						case 0x6a: pAVCtx->pix_fmt = AV_PIX_FMT_YUVA444P; break;
+						case 0x6b: pAVCtx->pix_fmt = AV_PIX_FMT_GRAY8;    break;
+						}
+					}
+				}
+				break;
 			default: // most codecs
 				pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; // most common format
 		}
