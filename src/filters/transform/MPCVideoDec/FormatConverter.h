@@ -24,19 +24,19 @@
 
 #include <stdint.h>
 
-const MPCPixelFormat YUV420_8[PixFmt_count]  = {PixFmt_NV12, PixFmt_YV12, PixFmt_YUY2, PixFmt_YV16, PixFmt_AYUV, PixFmt_YV24, PixFmt_RGB32, PixFmt_P010, PixFmt_P016, PixFmt_P210, PixFmt_P216, PixFmt_Y410, PixFmt_Y416};
-const MPCPixelFormat YUV422_8[PixFmt_count]  = {PixFmt_YUY2, PixFmt_YV16, PixFmt_AYUV, PixFmt_YV24, PixFmt_RGB32, PixFmt_NV12, PixFmt_YV12, PixFmt_P210, PixFmt_P216, PixFmt_Y410, PixFmt_P010, PixFmt_P016, PixFmt_Y416};
-const MPCPixelFormat YUV444_8[PixFmt_count]  = {PixFmt_AYUV, PixFmt_YV24, PixFmt_RGB32, PixFmt_YUY2, PixFmt_YV16, PixFmt_NV12, PixFmt_YV12, PixFmt_Y410, PixFmt_P210, PixFmt_P216, PixFmt_P010, PixFmt_P016, PixFmt_Y416};
+const MPCPixelFormat YUV420_8[PixFmt_count]  = {PixFmt_NV12, PixFmt_YV12, PixFmt_YUY2, PixFmt_YV16, PixFmt_YV24, PixFmt_AYUV, PixFmt_RGB32, PixFmt_P010, PixFmt_P016, PixFmt_P210, PixFmt_P216, PixFmt_Y410, PixFmt_Y416};
+const MPCPixelFormat YUV422_8[PixFmt_count]  = {PixFmt_YUY2, PixFmt_YV16, PixFmt_YV24, PixFmt_AYUV, PixFmt_RGB32, PixFmt_NV12, PixFmt_YV12, PixFmt_P210, PixFmt_P216, PixFmt_Y410, PixFmt_P010, PixFmt_P016, PixFmt_Y416};
+const MPCPixelFormat YUV444_8[PixFmt_count]  = {PixFmt_YV24, PixFmt_AYUV, PixFmt_RGB32, PixFmt_YUY2, PixFmt_YV16, PixFmt_NV12, PixFmt_YV12, PixFmt_Y410, PixFmt_P210, PixFmt_P216, PixFmt_P010, PixFmt_P016, PixFmt_Y416};
 
-const MPCPixelFormat YUV420_10[PixFmt_count] = {PixFmt_P010, PixFmt_P016, PixFmt_P210, PixFmt_P216, PixFmt_Y410, PixFmt_Y416, PixFmt_NV12, PixFmt_YV12, PixFmt_YUY2, PixFmt_YV16, PixFmt_AYUV, PixFmt_YV24, PixFmt_RGB32};
-const MPCPixelFormat YUV422_10[PixFmt_count] = {PixFmt_P210, PixFmt_P216, PixFmt_YUY2, PixFmt_YV16, PixFmt_Y410, PixFmt_P010, PixFmt_P016, PixFmt_Y416, PixFmt_AYUV, PixFmt_YV24, PixFmt_RGB32, PixFmt_NV12, PixFmt_YV12};
-const MPCPixelFormat YUV444_10[PixFmt_count] = {PixFmt_Y410, PixFmt_AYUV, PixFmt_YV24, PixFmt_Y416, PixFmt_RGB32, PixFmt_P210, PixFmt_P216, PixFmt_P010, PixFmt_P016, PixFmt_YUY2, PixFmt_YV16, PixFmt_NV12, PixFmt_YV12};
+const MPCPixelFormat YUV420_10[PixFmt_count] = {PixFmt_P010, PixFmt_P016, PixFmt_P210, PixFmt_P216, PixFmt_Y410, PixFmt_Y416, PixFmt_NV12, PixFmt_YV12, PixFmt_YUY2, PixFmt_YV16, PixFmt_YV24, PixFmt_AYUV, PixFmt_RGB32};
+const MPCPixelFormat YUV422_10[PixFmt_count] = {PixFmt_P210, PixFmt_P216, PixFmt_YUY2, PixFmt_YV16, PixFmt_Y410, PixFmt_P010, PixFmt_P016, PixFmt_Y416, PixFmt_YV24, PixFmt_AYUV, PixFmt_RGB32, PixFmt_NV12, PixFmt_YV12};
+const MPCPixelFormat YUV444_10[PixFmt_count] = {PixFmt_Y410, PixFmt_YV24, PixFmt_AYUV, PixFmt_Y416, PixFmt_RGB32, PixFmt_P210, PixFmt_P216, PixFmt_P010, PixFmt_P016, PixFmt_YUY2, PixFmt_YV16, PixFmt_NV12, PixFmt_YV12};
 
-const MPCPixelFormat YUV420_16[PixFmt_count] = {PixFmt_P016, PixFmt_P010, PixFmt_P216, PixFmt_Y416, PixFmt_P210, PixFmt_Y410, PixFmt_NV12, PixFmt_YV12, PixFmt_YUY2, PixFmt_YV16, PixFmt_AYUV, PixFmt_YV24, PixFmt_RGB32};
-const MPCPixelFormat YUV422_16[PixFmt_count] = {PixFmt_P216, PixFmt_P210, PixFmt_YUY2, PixFmt_YV16, PixFmt_Y416, PixFmt_P016, PixFmt_Y410, PixFmt_P010, PixFmt_AYUV, PixFmt_YV24, PixFmt_RGB32, PixFmt_NV12, PixFmt_YV12};
-const MPCPixelFormat YUV444_16[PixFmt_count] = {PixFmt_Y416, PixFmt_Y410, PixFmt_AYUV, PixFmt_YV24, PixFmt_RGB32, PixFmt_P216, PixFmt_P016, PixFmt_P210, PixFmt_P010, PixFmt_YUY2, PixFmt_YV16, PixFmt_NV12, PixFmt_YV12};
+const MPCPixelFormat YUV420_16[PixFmt_count] = {PixFmt_P016, PixFmt_P010, PixFmt_P216, PixFmt_Y416, PixFmt_P210, PixFmt_Y410, PixFmt_NV12, PixFmt_YV12, PixFmt_YUY2, PixFmt_YV16, PixFmt_YV24, PixFmt_AYUV, PixFmt_RGB32};
+const MPCPixelFormat YUV422_16[PixFmt_count] = {PixFmt_P216, PixFmt_P210, PixFmt_YUY2, PixFmt_YV16, PixFmt_Y416, PixFmt_P016, PixFmt_Y410, PixFmt_P010, PixFmt_YV24, PixFmt_AYUV, PixFmt_RGB32, PixFmt_NV12, PixFmt_YV12};
+const MPCPixelFormat YUV444_16[PixFmt_count] = {PixFmt_Y416, PixFmt_Y410, PixFmt_YV24, PixFmt_AYUV, PixFmt_RGB32, PixFmt_P216, PixFmt_P016, PixFmt_P210, PixFmt_P010, PixFmt_YUY2, PixFmt_YV16, PixFmt_NV12, PixFmt_YV12};
 
-const MPCPixelFormat RGB_8[PixFmt_count]     = {PixFmt_RGB32, PixFmt_AYUV, PixFmt_YV24, PixFmt_YUY2, PixFmt_YV16, PixFmt_NV12, PixFmt_YV12, PixFmt_Y410, PixFmt_P210, PixFmt_P216, PixFmt_P010, PixFmt_P016, PixFmt_Y416};
+const MPCPixelFormat RGB_8[PixFmt_count]     = {PixFmt_RGB32, PixFmt_YV24, PixFmt_AYUV, PixFmt_YUY2, PixFmt_YV16, PixFmt_NV12, PixFmt_YV12, PixFmt_Y410, PixFmt_P210, PixFmt_P216, PixFmt_P010, PixFmt_P016, PixFmt_Y416};
 
 struct SW_OUT_FMT {
 	const LPCTSTR				name;
