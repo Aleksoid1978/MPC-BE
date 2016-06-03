@@ -22,6 +22,7 @@ endif
 OBJ_DIR		= $(BIN_DIR)/obj/$(MY_DIR_PREFIX)_$(MY_ARCH)/ffmpeg/
 TARGET_LIB_DIR = $(BIN_DIR)/lib/$(MY_DIR_PREFIX)_$(MY_ARCH)
 LIB_LIBAVCODEC = $(OBJ_DIR)libavcodec.a
+LIB_LIBAVCODEC_B = $(OBJ_DIR)libavcodec_b.a
 LIB_LIBAVFILTER = $(OBJ_DIR)libavfilter.a
 LIB_LIBAVRESAMPLE = $(OBJ_DIR)libavresample.a
 LIB_LIBAVUTIL = $(OBJ_DIR)libavutil.a
@@ -74,7 +75,7 @@ OBJ_DIRS = $(OBJ_DIR) \
 	$(TARGET_LIB_DIR)
 
 # Targets
-all: make_objdirs $(LIB_LIBAVCODEC) $(LIB_LIBAVFILTER) $(LIB_LIBSWSCALE) $(LIB_LIBAVUTIL) $(LIB_LIBAVRESAMPLE) $(LIB_LIBSWRESAMPLE)
+all: make_objdirs $(LIB_LIBAVCODEC) $(LIB_LIBAVCODEC_B) $(LIB_LIBAVFILTER) $(LIB_LIBSWSCALE) $(LIB_LIBAVUTIL) $(LIB_LIBAVRESAMPLE) $(LIB_LIBSWRESAMPLE)
 
 make_objdirs: $(OBJ_DIRS)
 $(OBJ_DIRS):
@@ -342,7 +343,9 @@ SRCS_LC = \
 	libavcodec/mss4.c \
 	libavcodec/msvideo1.c \
 	libavcodec/nellymoser.c \
-	libavcodec/nellymoserdec.c \
+	libavcodec/nellymoserdec.c
+
+SRCS_LC_B = \
 	libavcodec/options.c \
 	libavcodec/opus.c \
 	libavcodec/opus_celt.c \
@@ -754,6 +757,9 @@ OBJS_LC = \
 	$(SRCS_LC:%.c=$(OBJ_DIR)%.o) \
 	$(SRCS_YASM_LC:%.asm=$(OBJ_DIR)%.o)
 
+OBJS_LC_B = \
+	$(SRCS_LC_B:%.c=$(OBJ_DIR)%.o)
+
 OBJS_LF = \
 	$(SRCS_LF:%.c=$(OBJ_DIR)%.o) \
 	$(SRCS_YASM_LF:%.asm=$(OBJ_DIR)%.o)
@@ -787,6 +793,10 @@ $(LIB_LIBAVCODEC): $(OBJS_LC)
 	@echo $@
 	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LC)
 
+$(LIB_LIBAVCODEC_B): $(OBJS_LC_B)
+	@echo $@
+	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LC_B)
+
 $(LIB_LIBAVFILTER): $(OBJS_LF)
 	@echo $@
 	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LF)
@@ -808,6 +818,7 @@ $(LIB_LIBSWRESAMPLE): $(OBJS_LR)
 	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LR)
 
 -include $(SRCS_LC:%.c=$(OBJ_DIR)%.d)
+-include $(SRCS_LC_B:%.c=$(OBJ_DIR)%.d)
 -include $(SRCS_LF:%.c=$(OBJ_DIR)%.d)
 -include $(SRCS_LBR:%.c=$(OBJ_DIR)%.d)
 -include $(SRCS_LU:%.c=$(OBJ_DIR)%.d)
