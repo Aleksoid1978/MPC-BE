@@ -352,8 +352,6 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 		m_fps = 10000000.0 / m_rtTimePerFrame;
 	}
 
-	HRESULT hr;
-
 	if (!lpPresInfo || !lpPresInfo->lpSurf) {
 		return E_POINTER;
 	}
@@ -371,14 +369,9 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 		}
 	}
 
-	CSize VideoSize = m_nativeVideoSize;
-	int arx = lpPresInfo->szAspectRatio.cx;
-	int ary = lpPresInfo->szAspectRatio.cy;
-	if (arx > 0 && ary > 0) {
-		VideoSize.cx = VideoSize.cy * arx / ary;
-	}
-	if (VideoSize != m_nativeVideoSize) {
-		m_aspectRatio.SetSize(arx, ary);
+	const CSize ar(lpPresInfo->szAspectRatio.cx, lpPresInfo->szAspectRatio.cy);
+	if (ar != m_aspectRatio) {
+		m_aspectRatio.SetSize(ar.cx, ar.cy);
 		AfxGetApp()->m_pMainWnd->PostMessage(WM_REARRANGERENDERLESS);
 	}
 
@@ -392,7 +385,7 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 				m_pVideoTexture[m_nCurSurface] = pTexture;
 			}
 		} else {
-			hr = m_pD3DDev->StretchRect(lpPresInfo->lpSurf, NULL, m_pVideoSurface[m_nCurSurface], NULL, D3DTEXF_NONE);
+			m_pD3DDev->StretchRect(lpPresInfo->lpSurf, NULL, m_pVideoSurface[m_nCurSurface], NULL, D3DTEXF_NONE);
 		}
 
 		// Tear test bars
