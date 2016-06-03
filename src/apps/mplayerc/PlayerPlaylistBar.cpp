@@ -270,8 +270,8 @@ static void StringToPaths(const CString& curentdir, const CString& str, CAtlArra
 			continue; // the asterisk can only be in the last folder
 		}
 
-		CPath path = curentdir + s;
-		path.Canonicalize();
+		CPath path(curentdir);
+		path.Append(s);
 
 		if (path.IsRoot() && path.FileExists()) {
 			paths.Add(path);
