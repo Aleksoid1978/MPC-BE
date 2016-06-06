@@ -572,6 +572,16 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
             atom = new AP4_VisualSampleEntry(AP4_ATOM_TYPE('Y','U','Y','2'), size, stream, *this); // = 'YUY2'
             break;
 
+        case AP4_ATOM_TYPE_M8RG:
+        case AP4_ATOM_TYPE_M8RA:
+        case AP4_ATOM_TYPE_M8G0:
+        case AP4_ATOM_TYPE_M8Y0:
+        case AP4_ATOM_TYPE_M8Y2:
+        case AP4_ATOM_TYPE_M8Y4:
+        case AP4_ATOM_TYPE_M8YA:
+            atom = new AP4_VisualSampleEntry(AP4_ATOM_TYPE('M','A','G','Y'), size, stream, *this); // MEDIASUBTYPE_MagicYUV (need tests)
+            break;
+
         case AP4_ATOM_TYPE_SAMR:
         case AP4_ATOM_TYPE__MP3:
         case AP4_ATOM_TYPE_IMA4:

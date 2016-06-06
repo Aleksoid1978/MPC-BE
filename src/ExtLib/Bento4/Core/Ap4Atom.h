@@ -436,6 +436,14 @@ const AP4_Atom::Type AP4_ATOM_TYPE_CUVC = AP4_ATOM_TYPE('C','U','V','C');
 const AP4_Atom::Type AP4_ATOM_TYPE_CHQX = AP4_ATOM_TYPE('C','H','Q','X');
 // CineForm
 const AP4_Atom::Type AP4_ATOM_TYPE_CFHD = AP4_ATOM_TYPE('C','F','H','D');
+// MagicYUV
+const AP4_Atom::Type AP4_ATOM_TYPE_M8RG = AP4_ATOM_TYPE('M','8','R','G');
+const AP4_Atom::Type AP4_ATOM_TYPE_M8RA = AP4_ATOM_TYPE('M','8','R','A');
+const AP4_Atom::Type AP4_ATOM_TYPE_M8G0 = AP4_ATOM_TYPE('M','8','G','0');
+const AP4_Atom::Type AP4_ATOM_TYPE_M8Y0 = AP4_ATOM_TYPE('M','8','Y','0');
+const AP4_Atom::Type AP4_ATOM_TYPE_M8Y2 = AP4_ATOM_TYPE('M','8','Y','2');
+const AP4_Atom::Type AP4_ATOM_TYPE_M8Y4 = AP4_ATOM_TYPE('M','8','Y','4');
+const AP4_Atom::Type AP4_ATOM_TYPE_M8YA = AP4_ATOM_TYPE('M','8','Y','A');
 
 // fragmented atom ...
 const AP4_Atom::Type AP4_ATOM_TYPE_MVEX = AP4_ATOM_TYPE('m','v','e','x');
