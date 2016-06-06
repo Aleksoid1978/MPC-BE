@@ -23,6 +23,7 @@
 
 #include <atlbase.h>
 #include <atlcoll.h>
+#include <mutex>
 
 #define PauseGraph \
 	CComQIPtr<IMediaControl> _pMC(m_pGraph); \
@@ -131,17 +132,15 @@ class CStreamSwitcherInputPin : public CBaseInputPin, public IPinConnection, pub
 	BOOL m_bSampleSkipped;
 	BOOL m_bQualityChanged;
 	BOOL m_bUsingOwnAllocator;
-
-	CAMEvent m_evBlock;
-	bool m_fCanBlock;
-	HRESULT Active();
-	HRESULT Inactive();
+	BOOL m_bFlushing;
 
 	HRESULT QueryAcceptDownstream(const AM_MEDIA_TYPE* pmt);
 
 	HRESULT InitializeOutputSample(IMediaSample* pInSample, IMediaSample** ppOutSample);
 
 	HANDLE m_hNotifyEvent;
+
+	CStreamSwitcherFilter* m_pSSF;
 
 public:
 	CStreamSwitcherInputPin(CStreamSwitcherFilter* pFilter, HRESULT* phr, LPCWSTR pName);
@@ -159,8 +158,6 @@ public:
 	bool IsUsingOwnAllocator() {
 		return m_bUsingOwnAllocator == TRUE;
 	}
-
-	void Block(bool fBlock);
 
 	CCritSec m_csReceive;
 
@@ -251,6 +248,8 @@ class CStreamSwitcherFilter : public CBaseFilter, public IAMStreamSelect
 	CStreamSwitcherOutputPin* m_pOutput;
 
 	CCritSec m_csState, m_csPins;
+
+	std::mutex m_inputpin_receive_mutex;
 
 	HRESULT CompleteConnect(PIN_DIRECTION dir, CBasePin* pPin, IPin* pReceivePin);
 	bool m_bInputPinChanged;
