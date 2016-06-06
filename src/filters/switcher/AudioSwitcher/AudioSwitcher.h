@@ -82,9 +82,6 @@ public:
 	HRESULT Transform(IMediaSample* pIn, IMediaSample* pOut);
 	void TransformMediaType(CMediaType& mt);
 
-	HRESULT DeliverEndFlush();
-	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
-
 	// IAudioSwitcherFilter
 	STDMETHODIMP SetChannelMixer(bool bMixer, int nLayout);
 	STDMETHODIMP SetAudioGain(float fGain_dB);

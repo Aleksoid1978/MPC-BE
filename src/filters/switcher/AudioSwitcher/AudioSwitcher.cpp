@@ -236,7 +236,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	}
 
 	if (long(in_samples * out_wfe->nChannels * in_bytespersample) > pOut->GetSize()) {
-		DbgLog((LOG_TRACE, 3, L"CAudioSwitcherFilter::Transform: %d > %d", in_samples * out_wfe->nChannels * in_bytespersample, pOut->GetSize()));
+		DbgLog((LOG_TRACE, 3, L"CAudioSwitcherFilter::Transform(): %d > %d", in_samples * out_wfe->nChannels * in_bytespersample, pOut->GetSize()));
 		pOut->SetActualDataLength(0);
 		return S_OK;
 	}
@@ -420,20 +420,6 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt)
 			wfex->SubFormat					= subFormat != GUID_NULL ? subFormat : mt.subtype;
 		}
 	}
-}
-
-HRESULT CAudioSwitcherFilter::DeliverEndFlush()
-{
-	DbgLog((LOG_TRACE, 3, L"CAudioSwitcherFilter::DeliverEndFlush()"));
-
-	return __super::DeliverEndFlush();
-}
-
-HRESULT CAudioSwitcherFilter::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
-{
-	DbgLog((LOG_TRACE, 3, L"CAudioSwitcherFilter::DeliverNewSegment()"));
-
-	return __super::DeliverNewSegment(tStart, tStop, dRate);
 }
 
 // IAudioSwitcherFilter
