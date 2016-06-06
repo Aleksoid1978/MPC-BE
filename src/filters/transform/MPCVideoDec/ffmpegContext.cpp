@@ -25,6 +25,13 @@
 #include "../../../DSUtil/SysVersion.h"
 #include "ffmpegContext.h"
 
+#ifndef FCC
+#define FCC(ch4) ((((DWORD)(ch4) & 0xFF) << 24) |     \
+                  (((DWORD)(ch4) & 0xFF00) << 8) |    \
+                  (((DWORD)(ch4) & 0xFF0000) >> 8) |  \
+                  (((DWORD)(ch4) & 0xFF000000) >> 24))
+#endif
+
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 // This is kind of an hack but it avoids using a C++ keyword as a struct member name
@@ -582,7 +589,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; // most common format
 				break;
 			case AV_CODEC_ID_MAGICYUV:
-				if (pAVCtx->extradata_size >= 32 && *(DWORD*)pAVCtx->extradata == 'YGAM') {
+				if (pAVCtx->extradata_size >= 32 && *(DWORD*)pAVCtx->extradata == FCC('MAGY')) {
 					int hsize = *(DWORD*)(pAVCtx->extradata + 4);
 					if (hsize >= 32 && pAVCtx->extradata[8] == 7) {
 						switch (pAVCtx->extradata[9]) {
@@ -594,6 +601,17 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 						case 0x6a: pAVCtx->pix_fmt = AV_PIX_FMT_YUVA444P; break;
 						case 0x6b: pAVCtx->pix_fmt = AV_PIX_FMT_GRAY8;    break;
 						}
+					}
+				}
+				else if (pAVCtx->extradata_size >= 8) {
+					switch (*(DWORD*)(pAVCtx->extradata + 4)) {
+					case FCC('M8RG'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;     break;
+					case FCC('M8RA'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP;    break;
+					case FCC('M8Y4'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;  break;
+					case FCC('M8Y2'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;  break;
+					case FCC('M8Y0'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;  break;
+					case FCC('M8YA'): pAVCtx->pix_fmt = AV_PIX_FMT_YUVA444P; break;
+					case FCC('M8G0'): pAVCtx->pix_fmt = AV_PIX_FMT_GRAY8;    break;
 					}
 				}
 				break;
