@@ -50,7 +50,7 @@ protected:
 	REFERENCE_TIME m_rtLast;
 	bool m_fSetKeyFrame;
 
-	void ResetState(DWORD seqnum = -1);
+	void ResetState(DWORD seqnum = DWORD_MAX);
 
 public:
 	COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
@@ -245,11 +245,9 @@ protected:
 	void DemuxSeek(REFERENCE_TIME rt);
 	bool DemuxLoop();
 
-	DWORD m_bitstream_serial_number_start, m_bitstream_serial_number_last;
+	DWORD m_bitstream_serial_number_start = 0;
+	DWORD m_bitstream_serial_number_last = 0;
 	DWORD m_bitstream_serial_number_Video = DWORD_MAX;
-
-	BOOL bIsTheoraPresent;
-	BOOL bIsVP8Present;
 
 public:
 	COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);

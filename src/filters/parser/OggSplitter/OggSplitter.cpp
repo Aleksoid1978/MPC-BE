@@ -135,10 +135,6 @@ public:
 
 COggSplitterFilter::COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("COggSplitterFilter"), pUnk, phr, __uuidof(this))
-	, m_bitstream_serial_number_start(0)
-	, m_bitstream_serial_number_last(0)
-	, bIsTheoraPresent(FALSE)
-	, bIsVP8Present(FALSE)
 {
 	m_nFlag |= PACKET_PTS_DISCONTINUITY;
 	m_nFlag |= PACKET_PTS_VALIDATE_POSITIVE;
@@ -331,7 +327,7 @@ start:
 							pPinOut.Attach(DNew COggVP8OutputPin(page.GetData(), page.GetCount(), name, this, this, &hr));
 							AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 
-							bIsVP8Present = TRUE;
+							m_bitstream_serial_number_Video = page.m_hdr.bitstream_serial_number;
 						}
 						break;
 					case 0x02:
@@ -352,7 +348,7 @@ start:
 				pPin->UnpackInitPage(page);
 				if (pPin->IsInitialized()) {
 					streamMoreInit.RemoveKey(page.m_hdr.bitstream_serial_number);
-					bIsTheoraPresent = TRUE;
+					m_bitstream_serial_number_Video = page.m_hdr.bitstream_serial_number;
 				}
 			}
 		}
@@ -532,7 +528,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		__int64 seekpos		= CalcPos(rt);
 		__int64 minseekpos	= _I64_MIN;
 
-		REFERENCE_TIME rtmax = rt - UNITS * (bIsTheoraPresent || bIsVP8Present || (m_bitstream_serial_number_Video != DWORD_MAX) ? 2 : 0);
+		REFERENCE_TIME rtmax = rt - UNITS * (m_bitstream_serial_number_Video != DWORD_MAX ? 2 : 0);
 		REFERENCE_TIME rtmin = rtmax - UNITS / 2;
 
 		__int64 curpos = seekpos;
@@ -550,14 +546,6 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 					COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
 					if (!pOggPin) {
-						continue;
-					}
-
-					if (bIsTheoraPresent && !dynamic_cast<COggTheoraOutputPin*>(pOggPin)) {
-						continue;
-					}
-
-					if (bIsVP8Present && !dynamic_cast<COggVP8OutputPin*>(pOggPin)) {
 						continue;
 					}
 
@@ -655,7 +643,7 @@ COggSplitterOutputPin::COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter
 	: CBaseSplitterOutputPin(pName, pFilter, pLock, phr)
 	, m_rtLast(0)
 {
-	ResetState((DWORD)-1);
+	ResetState();
 }
 
 void COggSplitterOutputPin::AddComment(BYTE* p, int len)
@@ -712,7 +700,7 @@ CStringW COggSplitterOutputPin::GetComment(CStringW key)
 	return Implode(sl, ';');
 }
 
-void COggSplitterOutputPin::ResetState(DWORD seqnum)
+void COggSplitterOutputPin::ResetState(DWORD seqnum/* = DWORD_MAX*/)
 {
 	CAutoLock csAutoLock(&m_csPackets);
 	m_packets.RemoveAll();
@@ -736,7 +724,6 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 {
 	if (m_lastseqnum != page.m_hdr.page_sequence_number - 1) {
 		ResetState(page.m_hdr.page_sequence_number);
-		return S_FALSE; // FIXME
 	} else {
 		m_lastseqnum = page.m_hdr.page_sequence_number;
 	}
@@ -1844,7 +1831,7 @@ HRESULT COggVP8OutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int le
 
 	p->rtStart		= m_rtLast;
 	p->rtStop		= m_rtLast == INVALID_TIME ? m_rtLast : (m_rtLast + (m_rtAvgTimePerFrame > 0 ? m_rtAvgTimePerFrame : 1));
-	p->bSyncPoint	= (p->rtStart != INVALID_TIME);
+	p->bSyncPoint	= bKeyFrame && (p->rtStart != INVALID_TIME);
 	p->SetData(pData, len);
 
 	return S_OK;
