@@ -27,7 +27,6 @@
 #include "DirectVobSubPropPage.h"
 #include "VSFilter.h"
 #include "StyleEditorDialog.h"
-#include "../../../DSUtil/DSUtil.h"
 
 BOOL WINAPI MyGetDialogSize(int iResourceID, DLGPROC pDlgProc, LPARAM lParam, SIZE* pResult)
 {

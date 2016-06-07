@@ -25,8 +25,7 @@
 #include <moreuuids.h>
 #include "DirectVobSubFilter.h"
 #include "Scale2x.h"
-#include "../../../DSUtil/DSUtil.h"
-#include "..//MPCVideoDec/memcpy_sse.h"
+#include "../MPCVideoDec/memcpy_sse.h"
 
 extern int c2y_yb[256];
 extern int c2y_yg[256];

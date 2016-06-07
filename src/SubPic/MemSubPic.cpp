@@ -22,8 +22,6 @@
 #include "stdafx.h"
 #include "MemSubPic.h"
 
-// For CPUID usage
-#include "../DSUtil/vd.h"
 #include "../filters/transform/MPCVideoDec/memcpy_sse.h"
 #include <emmintrin.h>
 

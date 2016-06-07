@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include "SubPicProviderImpl.h"
-#include "../DSUtil/DSUtil.h"
 
 CSubPicProviderImpl::CSubPicProviderImpl(CCritSec* pLock)
 	: CUnknown(NAME("CSubPicProviderImpl"), NULL)

@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include "SubPicAllocatorPresenterImpl.h"
-#include "../DSUtil/DSUtil.h"
 #include "../filters/renderer/VideoRenderers/RenderersSettings.h"
 #include <Version.h>
 #include <math.h>

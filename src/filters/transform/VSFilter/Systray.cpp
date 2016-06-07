@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "resource.h"
 #include "DirectVobSubFilter.h"
-#include "../../../DSUtil/DSUtil.h"
 #include "Systray.h"
 
 // hWnd == INVALID_HANDLE_VALUE - get name, hWnd != INVALID_HANDLE_VALUE - show ppage
