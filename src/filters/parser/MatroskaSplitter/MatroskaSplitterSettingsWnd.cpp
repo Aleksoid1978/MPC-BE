@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include "MatroskaSplitterSettingsWnd.h"
-#include "../../../DSUtil/DSUtil.h"
 
 CMatroskaSplitterSettingsWnd::CMatroskaSplitterSettingsWnd(void)
 {

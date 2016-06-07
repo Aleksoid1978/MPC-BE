@@ -23,7 +23,6 @@
 #include "../SyncClock/ISyncClock.h"
 #include <atlbase.h>
 #include <atlcoll.h>
-#include "../../../DSUtil/DSUtil.h"
 #include <strsafe.h> // Required in CGenlock
 #include <videoacc.h>
 #include <InitGuid.h>

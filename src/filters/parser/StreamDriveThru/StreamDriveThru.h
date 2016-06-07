@@ -22,7 +22,6 @@
 #pragma once
 
 #include <atlbase.h>
-#include "../../../DSUtil/DSUtil.h"
 
 #define StreamDriveThruName L"MPC StreamDriveThru"
 
