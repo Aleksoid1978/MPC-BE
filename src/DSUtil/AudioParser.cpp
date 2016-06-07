@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "AudioParser.h"
 #include "GolombBuffer.h"
-#include "DSUtil.h"
+#include <mpc_defines.h>
 
 #define AC3_CHANNEL                  0
 #define AC3_MONO                     1
