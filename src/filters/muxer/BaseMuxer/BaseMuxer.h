@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "../../../DSUtil/DSUtil.h"
+#include <mpc_defines.h>
 #include "../../../DSUtil/DSMPropertyBag.h"
 
 interface __declspec(uuid("30AB78C7-5259-4594-AEFE-9C0FC2F08A5E"))
