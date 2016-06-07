@@ -2056,7 +2056,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 }
 
 bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsList& tagsList,
-		STSStyle& style, STSStyle& org, bool fAnimate /*= false*/)
+		STSStyle& style, STSStyle& org, bool bUseOriginal, bool bAnimate/* = false*/)
 {
 	if (!sub || !tagsList) {
 		return false;
@@ -2075,11 +2075,11 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 			case SSA_4c: {
 				int k = tag.cmd - SSA_1c;
 
-				if (!tag.paramsInt.IsEmpty()) {
+				if (!tag.paramsInt.IsEmpty() && !bUseOriginal) {
 					DWORD c = tag.paramsInt[0];
-					style.colors[k] = (((int)CalcAnimation(c & 0xff, style.colors[k] & 0xff, fAnimate)) & 0xff
-									   | ((int)CalcAnimation(c & 0xff00, style.colors[k] & 0xff00, fAnimate)) & 0xff00
-									   | ((int)CalcAnimation(c & 0xff0000, style.colors[k] & 0xff0000, fAnimate)) & 0xff0000);
+					style.colors[k] = (((int)CalcAnimation(c & 0xff, style.colors[k] & 0xff, bAnimate)) & 0xff
+									   | ((int)CalcAnimation(c & 0xff00, style.colors[k] & 0xff00, bAnimate)) & 0xff00
+									   | ((int)CalcAnimation(c & 0xff0000, style.colors[k] & 0xff0000, bAnimate)) & 0xff0000);
 				} else {
 					style.colors[k] = org.colors[k];
 				}
@@ -2091,45 +2091,45 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 			case SSA_4a: {
 				int k = tag.cmd - SSA_1a;
 
-				style.alpha[k] = !tag.paramsInt.IsEmpty()
-								 ? (BYTE)CalcAnimation(tag.paramsInt[0] & 0xff, style.alpha[k], fAnimate)
+				style.alpha[k] = !tag.paramsInt.IsEmpty() && !bUseOriginal
+								 ? (BYTE)CalcAnimation(tag.paramsInt[0] & 0xff, style.alpha[k], bAnimate)
 								 : org.alpha[k];
 			}
 			break;
 			case SSA_alpha:
 				for (ptrdiff_t k = 0; k < 4; k++) {
-					style.alpha[k] = !tag.paramsInt.IsEmpty()
-									 ? (BYTE)CalcAnimation(tag.paramsInt[0] & 0xff, style.alpha[k], fAnimate)
+					style.alpha[k] = !tag.paramsInt.IsEmpty() && !bUseOriginal
+									 ? (BYTE)CalcAnimation(tag.paramsInt[0] & 0xff, style.alpha[k], bAnimate)
 									 : org.alpha[k];
 				}
 				break;
 			case SSA_an: {
-				int n = !tag.paramsInt.IsEmpty() ? tag.paramsInt[0] : 0;
+				int n = !tag.paramsInt.IsEmpty() && !bUseOriginal ? tag.paramsInt[0] : 0;
 				if (sub->m_scrAlignment < 0) {
 					sub->m_scrAlignment = (n > 0 && n < 10) ? n : org.scrAlignment;
 				}
 			}
 			break;
 			case SSA_a: {
-				int n = !tag.paramsInt.IsEmpty() ? tag.paramsInt[0] : 0;
+				int n = !tag.paramsInt.IsEmpty() && !bUseOriginal ? tag.paramsInt[0] : 0;
 				if (sub->m_scrAlignment < 0) {
 					sub->m_scrAlignment = (n > 0 && n < 12) ? ((((n - 1) & 3) + 1) + ((n & 4) ? 6 : 0) + ((n & 8) ? 3 : 0)) : org.scrAlignment;
 				}
 			}
 			break;
 			case SSA_blur:
-				if (!tag.paramsReal.IsEmpty()) {
-					double n = CalcAnimation(tag.paramsReal[0], style.fGaussianBlur, fAnimate);
+				if (!tag.paramsReal.IsEmpty() && !bUseOriginal) {
+					double n = CalcAnimation(tag.paramsReal[0], style.fGaussianBlur, bAnimate);
 					style.fGaussianBlur = (n < 0 ? 0 : n);
 				} else {
 					style.fGaussianBlur = org.fGaussianBlur;
 				}
 				break;
 			case SSA_bord:
-				if (!tag.paramsReal.IsEmpty()) {
-					double nx = CalcAnimation(tag.paramsReal[0], style.outlineWidthX, fAnimate);
+				if (!tag.paramsReal.IsEmpty() && !bUseOriginal) {
+					double nx = CalcAnimation(tag.paramsReal[0], style.outlineWidthX, bAnimate);
 					style.outlineWidthX = (nx < 0 ? 0 : nx);
-					double ny = CalcAnimation(tag.paramsReal[0], style.outlineWidthY, fAnimate);
+					double ny = CalcAnimation(tag.paramsReal[0], style.outlineWidthY, bAnimate);
 					style.outlineWidthY = (ny < 0 ? 0 : ny);
 				} else {
 					style.outlineWidthX = org.outlineWidthX;
@@ -2137,12 +2137,12 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 				}
 				break;
 			case SSA_be:
-				style.fBlur = !tag.paramsInt.IsEmpty()
-							  ? (int)(CalcAnimation(tag.paramsInt[0], style.fBlur, fAnimate) + 0.5)
+				style.fBlur = !tag.paramsInt.IsEmpty() && !bUseOriginal
+							  ? (int)(CalcAnimation(tag.paramsInt[0], style.fBlur, bAnimate) + 0.5)
 							  : org.fBlur;
 				break;
 			case SSA_b: {
-				int n = !tag.paramsInt.IsEmpty() ? tag.paramsInt[0] : -1;
+				int n = !tag.paramsInt.IsEmpty() && !bUseOriginal ? tag.paramsInt[0] : -1;
 				style.fontWeight = (n == 0 ? FW_NORMAL : n == 1 ? FW_BOLD : n >= 100 ? n : org.fontWeight);
 			}
 			break;
@@ -2183,19 +2183,19 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 					}
 
 					sub->m_clip.SetRect(
-						static_cast<int>(CalcAnimation(dLeft, sub->m_clip.left, fAnimate)),
-						static_cast<int>(CalcAnimation(dTop, sub->m_clip.top, fAnimate)),
-						static_cast<int>(CalcAnimation(dRight, sub->m_clip.right, fAnimate)),
-						static_cast<int>(CalcAnimation(dBottom, sub->m_clip.bottom, fAnimate)));
+						static_cast<int>(CalcAnimation(dLeft, sub->m_clip.left, bAnimate)),
+						static_cast<int>(CalcAnimation(dTop, sub->m_clip.top, bAnimate)),
+						static_cast<int>(CalcAnimation(dRight, sub->m_clip.right, bAnimate)),
+						static_cast<int>(CalcAnimation(dBottom, sub->m_clip.bottom, bAnimate)));
 				}
 			}
 			break;
 			case SSA_c:
-				if (!tag.paramsInt.IsEmpty()) {
+				if (!tag.paramsInt.IsEmpty() && !bUseOriginal) {
 					DWORD c = tag.paramsInt[0];
-					style.colors[0] = (((int)CalcAnimation(c & 0xff, style.colors[0] & 0xff, fAnimate)) & 0xff
-									   | ((int)CalcAnimation(c & 0xff00, style.colors[0] & 0xff00, fAnimate)) & 0xff00
-									   | ((int)CalcAnimation(c & 0xff0000, style.colors[0] & 0xff0000, fAnimate)) & 0xff0000);
+					style.colors[0] = (((int)CalcAnimation(c & 0xff, style.colors[0] & 0xff, bAnimate)) & 0xff
+									   | ((int)CalcAnimation(c & 0xff00, style.colors[0] & 0xff00, bAnimate)) & 0xff00
+									   | ((int)CalcAnimation(c & 0xff0000, style.colors[0] & 0xff0000, bAnimate)) & 0xff0000);
 				} else {
 					style.colors[0] = org.colors[0];
 				}
@@ -2229,52 +2229,52 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 			}
 			break;
 			case SSA_fax:
-				style.fontShiftX = !tag.paramsReal.IsEmpty()
-								   ? CalcAnimation(tag.paramsReal[0], style.fontShiftX, fAnimate)
+				style.fontShiftX = !tag.paramsReal.IsEmpty() && !bUseOriginal
+								   ? CalcAnimation(tag.paramsReal[0], style.fontShiftX, bAnimate)
 								   : org.fontShiftX;
 				break;
 			case SSA_fay:
-				style.fontShiftY = !tag.paramsReal.IsEmpty()
-								   ? CalcAnimation(tag.paramsReal[0], style.fontShiftY, fAnimate)
+				style.fontShiftY = !tag.paramsReal.IsEmpty() && !bUseOriginal
+								   ? CalcAnimation(tag.paramsReal[0], style.fontShiftY, bAnimate)
 								   : org.fontShiftY;
 				break;
 			case SSA_fe:
-				style.charSet = !tag.paramsInt.IsEmpty()
+				style.charSet = !tag.paramsInt.IsEmpty() && !bUseOriginal
 								? tag.paramsInt[0]
 								: org.charSet;
 				break;
 			case SSA_fn:
-				style.fontName = (!tag.params.IsEmpty() && !tag.params[0].IsEmpty() && tag.params[0] != L"0")
+				style.fontName = (!tag.params.IsEmpty() && !tag.params[0].IsEmpty() && tag.params[0] != L"0" && !bUseOriginal)
 								 ? CString(tag.params[0]).Trim()
 								 : org.fontName;
 				break;
 			case SSA_frx:
-				style.fontAngleX = !tag.paramsReal.IsEmpty()
-								   ? CalcAnimation(tag.paramsReal[0], style.fontAngleX, fAnimate)
+				style.fontAngleX = !tag.paramsReal.IsEmpty() && !bUseOriginal
+								   ? CalcAnimation(tag.paramsReal[0], style.fontAngleX, bAnimate)
 								   : org.fontAngleX;
 				break;
 			case SSA_fry:
-				style.fontAngleY = !tag.paramsReal.IsEmpty()
-								   ? CalcAnimation(tag.paramsReal[0], style.fontAngleY, fAnimate)
+				style.fontAngleY = !tag.paramsReal.IsEmpty() && !bUseOriginal
+								   ? CalcAnimation(tag.paramsReal[0], style.fontAngleY, bAnimate)
 								   : org.fontAngleY;
 				break;
 			case SSA_frz:
 			case SSA_fr:
-				style.fontAngleZ = !tag.paramsReal.IsEmpty()
-								   ? CalcAnimation(tag.paramsReal[0], style.fontAngleZ, fAnimate)
+				style.fontAngleZ = !tag.paramsReal.IsEmpty() && !bUseOriginal
+								   ? CalcAnimation(tag.paramsReal[0], style.fontAngleZ, bAnimate)
 								   : org.fontAngleZ;
 				break;
 			case SSA_fscx:
-				if (!tag.paramsReal.IsEmpty()) {
-					double n = CalcAnimation(tag.paramsReal[0], style.fontScaleX, fAnimate);
+				if (!tag.paramsReal.IsEmpty() && !bUseOriginal) {
+					double n = CalcAnimation(tag.paramsReal[0], style.fontScaleX, bAnimate);
 					style.fontScaleX = (n < 0 ? 0 : n);
 				} else {
 					style.fontScaleX = org.fontScaleX;
 				}
 				break;
 			case SSA_fscy:
-				if (!tag.paramsReal.IsEmpty()) {
-					double n = CalcAnimation(tag.paramsReal[0], style.fontScaleY, fAnimate);
+				if (!tag.paramsReal.IsEmpty() && !bUseOriginal) {
+					double n = CalcAnimation(tag.paramsReal[0], style.fontScaleY, bAnimate);
 					style.fontScaleY = (n < 0 ? 0 : n);
 				} else {
 					style.fontScaleY = org.fontScaleY;
@@ -2285,17 +2285,17 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 				style.fontScaleY = org.fontScaleY;
 				break;
 			case SSA_fsp:
-				style.fontSpacing = !tag.paramsReal.IsEmpty()
-									? CalcAnimation(tag.paramsReal[0], style.fontSpacing, fAnimate)
+				style.fontSpacing = !tag.paramsReal.IsEmpty() && !bUseOriginal
+									? CalcAnimation(tag.paramsReal[0], style.fontSpacing, bAnimate)
 									: org.fontSpacing;
 				break;
 			case SSA_fs:
-				if (!tag.paramsInt.IsEmpty()) {
+				if (!tag.paramsInt.IsEmpty() && !bUseOriginal) {
 					if (!tag.params.IsEmpty() && (tag.params[0][0] == L'-' || tag.params[0][0] == L'+')) {
-						double n = CalcAnimation(style.fontSize + style.fontSize * tag.paramsInt[0] / 10, style.fontSize, fAnimate);
+						double n = CalcAnimation(style.fontSize + style.fontSize * tag.paramsInt[0] / 10, style.fontSize, bAnimate);
 						style.fontSize = (n > 0) ? n : org.fontSize;
 					} else {
-						double n = CalcAnimation(tag.paramsInt[0], style.fontSize, fAnimate);
+						double n = CalcAnimation(tag.paramsInt[0], style.fontSize, bAnimate);
 						style.fontSize = (n > 0) ? n : org.fontSize;
 					}
 				} else {
@@ -2303,14 +2303,14 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 				}
 				break;
 			case SSA_i: {
-				int n = !tag.paramsInt.IsEmpty() ? tag.paramsInt[0] : -1;
+				int n = !tag.paramsInt.IsEmpty() && !bUseOriginal ? tag.paramsInt[0] : -1;
 				style.fItalic = (n == 0 ? false : n == 1 ? true : org.fItalic);
 			}
 			break;
 			case SSA_kt:
 				sub->m_bIsAnimated = true;
 
-				m_kstart = !tag.paramsInt.IsEmpty()
+				m_kstart = !tag.paramsInt.IsEmpty() && !bUseOriginal
 						   ? tag.paramsInt[0] * 10
 						   : 0;
 				m_kend = m_kstart;
@@ -2321,27 +2321,27 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 
 				m_ktype = 1;
 				m_kstart = m_kend;
-				m_kend += !tag.paramsInt.IsEmpty()
+				m_kend += !tag.paramsInt.IsEmpty() && !bUseOriginal
 						  ? tag.paramsInt[0] * 10
-						  : 1000;
+						  : bUseOriginal ? 0 : 1000;
 				break;
 			case SSA_ko:
 				sub->m_bIsAnimated = true;
 
 				m_ktype = 2;
 				m_kstart = m_kend;
-				m_kend += !tag.paramsInt.IsEmpty()
+				m_kend += !tag.paramsInt.IsEmpty() && !bUseOriginal
 						  ? tag.paramsInt[0] * 10
-						  : 1000;
+						  : bUseOriginal ? 0 : 1000;
 				break;
 			case SSA_k:
 				sub->m_bIsAnimated = true;
 
 				m_ktype = 0;
 				m_kstart = m_kend;
-				m_kend += !tag.paramsInt.IsEmpty()
+				m_kend += !tag.paramsInt.IsEmpty() && !bUseOriginal
 						  ? tag.paramsInt[0] * 10
-						  : 1000;
+						  : bUseOriginal ? 0 : 1000;
 				break;
 			case SSA_move: // {\move(x1=param[0], y1=param[1], x2=param[2], y2=param[3][, t1=t[0], t2=t[1]])}
 				sub->m_bIsAnimated = true;
@@ -2380,7 +2380,7 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 				}
 				break;
 			case SSA_pbo:
-				m_polygonBaselineOffset = !tag.paramsInt.IsEmpty() ? tag.paramsInt[0] : 0;
+				m_polygonBaselineOffset = !tag.paramsInt.IsEmpty() && !bUseOriginal ? tag.paramsInt[0] : 0;
 				break;
 			case SSA_pos:
 				if (tag.paramsReal.GetCount() == 2 && !sub->m_effects[EF_MOVE]) {
@@ -2394,27 +2394,27 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 				}
 				break;
 			case SSA_p: {
-				int n = !tag.paramsInt.IsEmpty() ? tag.paramsInt[0] : 0;
+				int n = !tag.paramsInt.IsEmpty() && !bUseOriginal ? tag.paramsInt[0] : 0;
 				m_nPolygon = (n <= 0 ? 0 : n);
 			}
 			break;
 			case SSA_q: {
-				int n = !tag.paramsInt.IsEmpty() ? tag.paramsInt[0] : -1;
+				int n = !tag.paramsInt.IsEmpty() && !bUseOriginal ? tag.paramsInt[0] : -1;
 				sub->m_wrapStyle = (0 <= n && n <= 3)
 								   ? n
 								   : m_defaultWrapStyle;
 			}
 			break;
 			case SSA_r:
-				if (tag.params[0].IsEmpty() || !GetStyle(tag.params[0], style)) {
+				if (!bUseOriginal && (tag.params[0].IsEmpty() || !GetStyle(tag.params[0], style))) {
 					style = org;
 				}
 				break;
 			case SSA_shad:
-				if (!tag.paramsReal.IsEmpty()) {
-					double nx = CalcAnimation(tag.paramsReal[0], style.shadowDepthX, fAnimate);
+				if (!tag.paramsReal.IsEmpty() && !bUseOriginal) {
+					double nx = CalcAnimation(tag.paramsReal[0], style.shadowDepthX, bAnimate);
 					style.shadowDepthX = (nx < 0 ? 0 : nx);
-					double ny = CalcAnimation(tag.paramsReal[0], style.shadowDepthY, fAnimate);
+					double ny = CalcAnimation(tag.paramsReal[0], style.shadowDepthY, bAnimate);
 					style.shadowDepthY = (ny < 0 ? 0 : ny);
 				} else {
 					style.shadowDepthX = org.shadowDepthX;
@@ -2422,7 +2422,7 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 				}
 				break;
 			case SSA_s: {
-				int n = !tag.paramsInt.IsEmpty() ? tag.paramsInt[0] : -1;
+				int n = !tag.paramsInt.IsEmpty() && !bUseOriginal ? tag.paramsInt[0] : -1;
 				style.fStrikeOut = (n == 0 ? false : n == 1 ? true : org.fStrikeOut);
 			}
 			break;
@@ -2445,40 +2445,40 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 						m_animAccel = tag.paramsReal[0];
 					}
 
-					CreateSubFromSSATag(sub, tag.subTagsList, style, org, true);
+					CreateSubFromSSATag(sub, tag.subTagsList, style, org, bUseOriginal, true);
 
 					sub->m_fAnimated = true;
 				}
 				break;
 			case SSA_u: {
-				int n = !tag.paramsInt.IsEmpty() ? tag.paramsInt[0] : -1;
+				int n = !tag.paramsInt.IsEmpty() && !bUseOriginal ? tag.paramsInt[0] : -1;
 				style.fUnderline = (n == 0 ? false : n == 1 ? true : org.fUnderline);
 			}
 			break;
 			case SSA_xbord:
-				if (!tag.paramsReal.IsEmpty()) {
-					double nx = CalcAnimation(tag.paramsReal[0], style.outlineWidthX, fAnimate);
+				if (!tag.paramsReal.IsEmpty() && !bUseOriginal) {
+					double nx = CalcAnimation(tag.paramsReal[0], style.outlineWidthX, bAnimate);
 					style.outlineWidthX = (nx < 0 ? 0 : nx);
 				} else {
 					style.outlineWidthX = org.outlineWidthX;
 				}
 				break;
 			case SSA_xshad:
-				style.shadowDepthX = !tag.paramsReal.IsEmpty()
-									 ? CalcAnimation(tag.paramsReal[0], style.shadowDepthX, fAnimate)
+				style.shadowDepthX = !tag.paramsReal.IsEmpty() && !bUseOriginal
+									 ? CalcAnimation(tag.paramsReal[0], style.shadowDepthX, bAnimate)
 									 : org.shadowDepthX;
 				break;
 			case SSA_ybord:
-				if (!tag.paramsReal.IsEmpty()) {
-					double ny = CalcAnimation(tag.paramsReal[0], style.outlineWidthY, fAnimate);
+				if (!tag.paramsReal.IsEmpty() && !bUseOriginal) {
+					double ny = CalcAnimation(tag.paramsReal[0], style.outlineWidthY, bAnimate);
 					style.outlineWidthY = (ny < 0 ? 0 : ny);
 				} else {
 					style.outlineWidthY = org.outlineWidthY;
 				}
 				break;
 			case SSA_yshad:
-				style.shadowDepthY = !tag.paramsReal.IsEmpty()
-									 ? CalcAnimation(tag.paramsReal[0], style.shadowDepthY, fAnimate)
+				style.shadowDepthY = !tag.paramsReal.IsEmpty() && !bUseOriginal
+									 ? CalcAnimation(tag.paramsReal[0], style.shadowDepthY, bAnimate)
 									 : org.shadowDepthY;
 				break;
 		}
@@ -2487,7 +2487,7 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 	return true;
 }
 
-bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle& style, const STSStyle& org)
+bool CRenderedTextSubtitle::ParseHtmlTag(CStringW str, STSStyle& style, const STSStyle& org, bool bUseOriginal)
 {
 	if (str.Find(L"!--") == 0) {
 		return true;
@@ -2528,15 +2528,15 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
 	if (tag == L"text") {
 		;
 	} else if (tag == L"b" || tag == L"strong") {
-		style.fontWeight = !fClosing ? FW_BOLD : org.fontWeight;
+		style.fontWeight = !fClosing && !bUseOriginal ? FW_BOLD : org.fontWeight;
 	} else if (tag == L"i" || tag == L"em") {
-		style.fItalic = !fClosing ? true : org.fItalic;
+		style.fItalic = !fClosing && !bUseOriginal ? true : org.fItalic;
 	} else if (tag == L"u") {
-		style.fUnderline = !fClosing ? true : org.fUnderline;
+		style.fUnderline = !fClosing && !bUseOriginal ? true : org.fUnderline;
 	} else if (tag == L"s" || tag == L"strike" || tag == L"del") {
-		style.fStrikeOut = !fClosing ? true : org.fStrikeOut;
+		style.fStrikeOut = !fClosing && !bUseOriginal ? true : org.fStrikeOut;
 	} else if (tag == L"font") {
-		if (!fClosing) {
+		if (!fClosing && !bUseOriginal) {
 			for (size_t j = 0; j < attribs.GetCount(); j++) {
 				if (params[j].IsEmpty()) {
 					continue;
@@ -2574,7 +2574,7 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
 					} else if ((style.colors[nColor] = _tcstol(key, NULL, 16)) == 0) {
 						style.colors[nColor] = 0x00ffffff;	// default is white
 					}
-					style.colors[nColor] = ((style.colors[nColor]>>16)&0xff)|((style.colors[nColor]&0xff)<<16)|(style.colors[nColor]&0x00ff00);
+					style.colors[nColor] = ((style.colors[nColor] >> 16) & 0xff) | ((style.colors[nColor] & 0xff) << 16) | (style.colors[nColor] & 0x00ff00);
 				}
 			}
 		} else {
@@ -2583,9 +2583,11 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle&
 			memcpy(style.colors, org.colors, sizeof(style.colors));
 		}
 	} else if (tag == L"k" && attribs.GetCount() == 1 && attribs[0] == L"t") {
-		m_ktype = 1;
-		m_kstart = m_kend;
-		m_kend += wcstol(params[0], NULL, 10);
+		if (!bUseOriginal) {
+			m_ktype = 1;
+			m_kstart = m_kend;
+			m_kend += wcstol(params[0], NULL, 10);
+		}
 	} else {
 		return false;
 	}
@@ -2682,7 +2684,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 
 	orgstss = stss;
 
-	sub->m_clip.SetRect(0, 0, m_size.cx>>3, m_size.cy>>3);
+	sub->m_clip.SetRect(0, 0, m_size.cx >> 3, m_size.cy >> 3);
 	sub->m_scrAlignment = -stss.scrAlignment;
 	sub->m_wrapStyle = m_defaultWrapStyle;
 	sub->m_fAnimated = false;
@@ -2707,25 +2709,25 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	ParseEffect(sub, GetAt(entry).effect);
 
 	while (!str.IsEmpty()) {
-		bool fParsed = false;
+		bool bParsed = false;
 
 		int i;
 
 		if (str[0] == '{' && (i = str.Find(L'}')) > 0) {
 			SSATagsList tagsList;
-			fParsed = ParseSSATag(tagsList, str.Mid(1, i - 1));
-			if (fParsed) {
-				CreateSubFromSSATag(sub, tagsList, stss, orgstss);
+			bParsed = ParseSSATag(tagsList, str.Mid(1, i - 1));
+			if (bParsed) {
+				CreateSubFromSSATag(sub, tagsList, stss, orgstss, m_bOverrideStyle);
 				str = str.Mid(i+1);
 			}
 		} else if (str[0] == '<' && (i = str.Find(L'>')) > 0) {
-			fParsed = ParseHtmlTag(sub, str.Mid(1, i-1), stss, orgstss);
-			if (fParsed) {
-				str = str.Mid(i+1);
+			bParsed = ParseHtmlTag(str.Mid(1, i - 1), stss, orgstss, m_bOverrideStyle);
+			if (bParsed) {
+				str = str.Mid(i + 1);
 			}
 		}
 
-		if (fParsed) {
+		if (bParsed) {
 			i = str.FindOneOf(L"{<");
 			if (i < 0) {
 				i = str.GetLength();
@@ -2736,22 +2738,28 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		} else {
 			i = str.Mid(1).FindOneOf(L"{<");
 			if (i < 0) {
-				i = str.GetLength()-1;
+				i = str.GetLength() - 1;
 			}
 			i++;
 		}
 
+		if (m_bOverrideStyle) {
+			stss = orgstss;
+		}
+
 		STSStyle tmp = stss;
 
-		tmp.fontSize		*= sub->m_scaley * 64.0;
-		tmp.fontSpacing		*= sub->m_scalex * 64.0;
-		tmp.outlineWidthX	*= (m_fScaledBAS ? sub->m_scalex : 1.0) * 8.0;
-		tmp.outlineWidthY	*= (m_fScaledBAS ? sub->m_scaley : 1.0) * 8.0;
-		tmp.shadowDepthX	*= (m_fScaledBAS ? sub->m_scalex : 1.0) * 8.0;
-		tmp.shadowDepthY	*= (m_fScaledBAS ? sub->m_scaley : 1.0) * 8.0;
+		tmp.fontSize      *= sub->m_scaley * 64.0;
+		tmp.fontSpacing   *= sub->m_scalex * 64.0;
+		tmp.outlineWidthX *= (m_fScaledBAS ? sub->m_scalex : 1.0) * 8.0;
+		tmp.outlineWidthY *= (m_fScaledBAS ? sub->m_scaley : 1.0) * 8.0;
+		tmp.shadowDepthX  *= (m_fScaledBAS ? sub->m_scalex : 1.0) * 8.0;
+		tmp.shadowDepthY  *= (m_fScaledBAS ? sub->m_scaley : 1.0) * 8.0;
 
 		if (m_nPolygon) {
-			ParsePolygon(sub, str.Left(i), tmp);
+			if (!m_bOverrideStyle) {
+				ParsePolygon(sub, str.Left(i), tmp);
+			}
 		} else {
 			ParseString(sub, str.Left(i), tmp);
 		}
@@ -2760,7 +2768,9 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	}
 
 	if (m_bOverrideStyle) {
+		sub->m_fAnimated = false;
 		sub->EmptyEffects();
+		SAFE_DELETE(sub->m_pClipper);
 	}
 
 	// just a "work-around" solution... in most cases nobody will want to use \org together with moving but without rotating the subs
@@ -2785,15 +2795,15 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		marginRect.bottom = orgstss.marginRect.bottom;
 	}
 	marginRect.left   = std::lround(sub->m_scalex * marginRect.left * 8.0);
-	marginRect.top	= std::lround(sub->m_scaley * marginRect.top * 8.0);
+	marginRect.top    = std::lround(sub->m_scaley * marginRect.top * 8.0);
 	marginRect.right  = std::lround(sub->m_scalex * marginRect.right * 8.0);
 	marginRect.bottom = std::lround(sub->m_scaley * marginRect.bottom * 8.0);
 
 	if (stss.relativeTo == 1) {
-		marginRect.left		+= m_vidrect.left;
-		marginRect.top		+= m_vidrect.top;
-		marginRect.right	+= m_size.cx - m_vidrect.right;
-		marginRect.bottom	+= m_size.cy - m_vidrect.bottom;
+		marginRect.left   += m_vidrect.left;
+		marginRect.top    += m_vidrect.top;
+		marginRect.right  += m_size.cx - m_vidrect.right;
+		marginRect.bottom += m_size.cy - m_vidrect.bottom;
 	}
 
 	sub->CreateClippers(m_size);
