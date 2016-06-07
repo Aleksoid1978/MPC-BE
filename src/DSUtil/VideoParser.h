@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "DSUtil.h"
+#include <basestruct.h>
 
 static const byte pixel_aspect[17][2]= {
 	{  0,   1 },

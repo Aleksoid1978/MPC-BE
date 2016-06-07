@@ -20,8 +20,8 @@
 
 #pragma once
 
-#include <atlbase.h>
-#include "../../../DSUtil/DSUtil.h"
+#include <atlcoll.h>
+#include <mpc_defines.h>
 
 class CPacket : public CAtlArray<BYTE>
 {
