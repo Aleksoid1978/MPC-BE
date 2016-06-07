@@ -22,15 +22,9 @@
 
 #include <Windows.h>
 #include <time.h> // for the _time64 workaround
+#include <mpc_defines.h>
 #include "../../../DSUtil/SysVersion.h"
 #include "ffmpegContext.h"
-
-#ifndef FCC
-#define FCC(ch4) ((((DWORD)(ch4) & 0xFF) << 24) |     \
-                  (((DWORD)(ch4) & 0xFF00) << 8) |    \
-                  (((DWORD)(ch4) & 0xFF0000) >> 8) |  \
-                  (((DWORD)(ch4) & 0xFF000000) >> 24))
-#endif
 
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>

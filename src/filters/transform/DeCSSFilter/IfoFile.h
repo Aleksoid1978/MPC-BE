@@ -23,7 +23,6 @@
 
 #include <atlcoll.h>
 #include <basestruct.h>
-#include "../../../DSUtil/DSUtil.h"
 #include "VobFile.h"
 
 // CIfoFile

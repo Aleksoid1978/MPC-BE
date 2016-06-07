@@ -28,25 +28,9 @@
 #include "vd.h"
 #include "text.h"
 #include "..\..\include\basestruct.h"
-
-#ifndef FCC
-#define FCC(ch4) ((((DWORD)(ch4) & 0xFF) << 24) |     \
-                  (((DWORD)(ch4) & 0xFF00) << 8) |    \
-                  (((DWORD)(ch4) & 0xFF0000) >> 8) |  \
-                  (((DWORD)(ch4) & 0xFF000000) >> 24))
-#endif
-
-#define SCALE64(a, b, c) (__int64)((double)(a) * (b) / (c)) // very fast, but it can give a small rounding error
+#include <mpc_defines.h>
 
 #define LCID_NOSUBTITLES	-1
-#define INVALID_TIME		_I64_MIN
-
-#define KILOBYTE		1024
-#define MEGABYTE		1048576
-
-#define GETWORD(b)		*(WORD*)(b)
-#define GETDWORD(b)		*(DWORD*)(b)
-#define GETQWORD(b)		*(UINT64*)(b)
 
 extern CString			ResStr(UINT nID);
 
