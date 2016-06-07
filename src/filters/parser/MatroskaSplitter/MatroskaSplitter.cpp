@@ -24,6 +24,7 @@
 #include "MatroskaSplitter.h"
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/VideoParser.h"
+#include "../../../DSUtil/GolombBuffer.h"
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>

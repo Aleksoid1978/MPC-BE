@@ -23,6 +23,7 @@
 #include "BaseSplitterFileEx.h"
 #include <MMReg.h>
 #include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/GolombBuffer.h"
 #include <InitGuid.h>
 #include <moreuuids.h>
 #include <basestruct.h>

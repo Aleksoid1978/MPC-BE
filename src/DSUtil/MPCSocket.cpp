@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "MPCSocket.h"
-#include "DSUtil.h"
+#include "text.h"
 
 #define PROXY_TIMEOUT_FACTOR 0
 

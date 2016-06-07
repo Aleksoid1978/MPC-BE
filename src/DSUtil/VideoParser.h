@@ -21,7 +21,6 @@
 #pragma once
 
 #include "DSUtil.h"
-#include "GolombBuffer.h"
 
 static const byte pixel_aspect[17][2]= {
 	{  0,   1 },

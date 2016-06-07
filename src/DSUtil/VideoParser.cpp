@@ -21,8 +21,9 @@
 #include "stdafx.h"
 
 #include <stdint.h>
-#include "VideoParser.h"
 #include "H264Nalu.h"
+#include "GolombBuffer.h"
+#include "VideoParser.h"
 
 struct dirac_source_params {
 	unsigned width;

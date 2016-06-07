@@ -24,7 +24,15 @@
 #include <atlbase.h>
 #include <atlcoll.h>
 #include "CoordGeom.h"
-#include "../DSUtil/DSUtil.h"
+
+enum SUBTITLE_TYPE {
+	ST_TEXT,
+	ST_VOBSUB,
+	ST_DVB,
+	ST_HDMV,
+	ST_XSUB,
+	ST_XYSUBPIC
+};
 
 // flag for display only forced subtitles (PGS/VOBSUB)
 extern bool g_bForcedSubtitle;
