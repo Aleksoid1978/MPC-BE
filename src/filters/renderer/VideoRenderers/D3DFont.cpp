@@ -24,7 +24,6 @@
 #include <tchar.h>
 #include <dx/d3dx9.h>
 #include "D3DFont.h"
-#include "../../../DSUtil/DSUtil.h"
 
 //-----------------------------------------------------------------------------
 // Custom vertex types for rendering text

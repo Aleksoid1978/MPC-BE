@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include "MatroskaFile.h"
-#include "../../../DSUtil/DSUtil.h"
 #include <zlib/zlib.h>
 
 #define DOCTYPE			L"matroska"

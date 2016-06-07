@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include <InitGuid.h>
 #include "AllocatorCommon7.h"
-#include "../DSUtil/DSUtil.h"
 #include "moreuuids.h"
 
 #include "DX7AllocatorPresenter.h"
