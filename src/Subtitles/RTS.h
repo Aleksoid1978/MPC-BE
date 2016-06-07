@@ -371,8 +371,8 @@ class __declspec(uuid("537DCACA-2812-4a4f-B2C6-1A34C17ADEB0"))
 	void ParseString(CSubtitle* sub, CStringW str, STSStyle& style);
 	void ParsePolygon(CSubtitle* sub, CStringW str, STSStyle& style);
 	bool ParseSSATag(SSATagsList& tagsList, const CStringW& str);
-	bool CreateSubFromSSATag(CSubtitle* sub, const SSATagsList& tagsList, STSStyle& style, STSStyle& org, bool fAnimate = false);
-	bool ParseHtmlTag(CSubtitle* sub, CStringW str, STSStyle& style, const STSStyle& org);
+	bool CreateSubFromSSATag(CSubtitle* sub, const SSATagsList& tagsList, STSStyle& style, STSStyle& org, bool bUseOriginal, bool bAnimate = false);
+	bool ParseHtmlTag(CStringW str, STSStyle& style, const STSStyle& org, bool bUseOriginal);
 
 	double CalcAnimation(double dst, double src, bool fAnimate);
 
