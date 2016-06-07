@@ -1451,6 +1451,9 @@ bool CMP4SplitterFilter::DemuxLoop()
 			p->TrackNumber = (DWORD)track->GetId();
 			p->rtStart = FractionScale64(sample.GetCts(), UNITS, track->GetMediaTimeScale());
 			p->rtStop = FractionScale64(sample.GetCts() + sample.GetDuration(), UNITS, track->GetMediaTimeScale());
+			if (p->rtStop == p->rtStart && p->rtStart != INVALID_TIME) {
+				p->rtStop++;
+			}
 			p->bSyncPoint = sample.IsSync();
 
 			REFERENCE_TIME duration = p->rtStop - p->rtStart;
@@ -1459,13 +1462,13 @@ bool CMP4SplitterFilter::DemuxLoop()
 					&& mt.subtype != MEDIASUBTYPE_RAW_AAC1
 					&& duration < 100000) { // duration < 10 ms (hack for PCM, ADPCM, Law and other)
 
-				p->SetCount(0, (500000 / duration + 1)*data.GetDataSize()); // grouping > 50 ms
+				p->SetCount(0, (500000 / duration + 1) * data.GetDataSize()); // grouping > 50 ms
 				p->SetData(data.GetData(), data.GetDataSize());
 
 				while (duration < 500000 && AP4_SUCCEEDED(track->ReadSample(pPairNext->m_value.index + 1, sample, data))) {
 					size_t size = p->GetCount();
 					p->SetCount(size + data.GetDataSize());
-					memcpy(p->GetData()+size, data.GetData(), data.GetDataSize());
+					memcpy(p->GetData() + size, data.GetData(), data.GetDataSize());
 
 					p->rtStop = FractionScale64(sample.GetCts() + sample.GetDuration(), UNITS, track->GetMediaTimeScale());
 
