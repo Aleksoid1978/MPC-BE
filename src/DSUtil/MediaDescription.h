@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <atlcoll.h>
+
 static const TCHAR* MPEG2_Profile[]=
 {
 	L"4:2:2",

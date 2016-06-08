@@ -21,6 +21,16 @@
 #include "stdafx.h"
 #include "MFCHelper.h"
 
+CString ResStr(UINT nID)
+{
+	CString id;
+	if (!id.LoadString(nID)) {
+		id.LoadString(AfxGetApp()->m_hInstance, nID);
+	}
+
+	return id;
+}
+
 void SetCursor(HWND m_hWnd, LPCTSTR lpCursorName)
 {
 	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(lpCursorName));

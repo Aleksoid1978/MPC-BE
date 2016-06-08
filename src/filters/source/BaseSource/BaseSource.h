@@ -22,7 +22,6 @@
 #pragma once
 
 #include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/MediaDescription.h"
 
 template<class TStream>
 class CBaseSource

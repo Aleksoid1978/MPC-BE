@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "GolombBuffer.h"
-#include "DSUtil.h"
+#include <mpc_defines.h>
 
 static void RemoveMpegEscapeCode(BYTE* dst, BYTE* src, int& length)
 {

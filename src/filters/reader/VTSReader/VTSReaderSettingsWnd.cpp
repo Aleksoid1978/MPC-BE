@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "VTSReaderSettingsWnd.h"
-#include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/MFCHelper.h"
 
 CVTSReaderSettingsWnd::CVTSReaderSettingsWnd(void)
 {
