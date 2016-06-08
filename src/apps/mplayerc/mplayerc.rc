@@ -2934,7 +2934,6 @@ BEGIN
     IDS_MFMT_BINK               "Smacker/Bink Video"
     IDS_MFMT_FLIC               "FLIC Animation"
     IDS_MFMT_DSM                "DirectShow Media"
-    IDS_MFMT_IVF                "Indeo Video Format"
 END
 
 STRINGTABLE
