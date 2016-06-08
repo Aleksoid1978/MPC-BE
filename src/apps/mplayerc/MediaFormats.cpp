@@ -196,7 +196,7 @@ void CMediaFormats::UpdateData(bool fSave)
 
 #define ADDFMT(f) Add(CMediaFormatCategory##f)
 		// video files
-		ADDFMT((_T("avi"),         ResStr(IDS_MFMT_AVI),         _T("avi")));
+		ADDFMT((_T("avi"),         ResStr(IDS_MFMT_AVI),         _T("avi divx")));
 		ADDFMT((_T("mpeg"),        ResStr(IDS_MFMT_MPEG),        _T("mpg mpeg mpe m1v m2v mpv2 mp2v pva evo m2p sfd")));
 		ADDFMT((_T("mpegts"),      ResStr(IDS_MFMT_MPEGTS),      _T("ts tp trp m2t m2ts mts rec ssif")));
 		ADDFMT((_T("dvdvideo"),    ResStr(IDS_MFMT_DVDVIDEO),    _T("vob ifo")));
@@ -216,7 +216,7 @@ void CMediaFormats::UpdateData(bool fSave)
 		ADDFMT((_T("flic"),        ResStr(IDS_MFMT_FLIC),        _T("fli flc flic")));
 		ADDFMT((_T("dsm"),         ResStr(IDS_MFMT_DSM),         _T("dsm dsv dsa dss")));
 		ADDFMT((_T("swf"),         ResStr(IDS_MFMT_SWF),         _T("swf"), TVideo, _T("ShockWave ActiveX control")));
-		ADDFMT((_T("other"),       ResStr(IDS_MFMT_OTHER),       _T("divx amv wtv dvr-ms mxf ivf")));
+		ADDFMT((_T("other"),       ResStr(IDS_MFMT_OTHER),       _T("amv wtv dvr-ms mxf ivf")));
 		ADDFMT((_T("raw video"),   ResStr(IDS_MFMT_RAW_VIDEO),   _T("y4m h264 264 vc1 h265 265 hm10 hevc")));
 		// audio files
 		ADDFMT((_T("ac3dts"),      ResStr(IDS_MFMT_AC3),         _T("ac3 dts dtshd"), TAudio));
