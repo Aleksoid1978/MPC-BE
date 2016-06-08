@@ -15,8 +15,8 @@
 namespace Json {
 
 /// Converts a unicode code-point to UTF-8.
-static inline std::string codePointToUTF8(unsigned int cp) {
-  std::string result;
+static inline JSONCPP_STRING codePointToUTF8(unsigned int cp) {
+  JSONCPP_STRING result;
 
   // based on description from http://en.wikipedia.org/wiki/UTF-8
 
@@ -63,7 +63,7 @@ typedef char UIntToStringBuffer[uintToStringBufferSize];
 static inline void uintToString(LargestUInt value, char*& current) {
   *--current = 0;
   do {
-    *--current = static_cast<signed char>(value % 10U + static_cast<unsigned>('0'));
+    *--current = static_cast<char>(value % 10U + static_cast<unsigned>('0'));
     value /= 10;
   } while (value != 0);
 }

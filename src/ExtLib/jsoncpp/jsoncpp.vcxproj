@@ -111,6 +111,7 @@
     <ClCompile Include="src\json_writer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\json\allocator.h" />
     <ClInclude Include="include\json\assertions.h" />
     <ClInclude Include="include\json\autolink.h" />
     <ClInclude Include="include\json\config.h" />
@@ -119,6 +120,7 @@
     <ClInclude Include="include\json\json.h" />
     <ClInclude Include="include\json\reader.h" />
     <ClInclude Include="include\json\value.h" />
+    <ClInclude Include="include\json\version.h" />
     <ClInclude Include="include\json\writer.h" />
     <ClInclude Include="src\json_tool.h" />
   </ItemGroup>
