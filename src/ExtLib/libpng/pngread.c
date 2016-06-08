@@ -1,8 +1,8 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.6.17 [March 26, 2015]
- * Copyright (c) 1998-2002,2004,2006-2015 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.23 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -127,7 +127,10 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
       }
 
       else if ((png_ptr->mode & PNG_HAVE_IDAT) != 0)
+      {
+         png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
          png_ptr->mode |= PNG_AFTER_IDAT;
+      }
 
       /* This should be a binary subdivision search or a hash for
        * matching the chunk name rather than a linear search.
@@ -785,6 +788,9 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
       png_uint_32 length = png_read_chunk_header(png_ptr);
       png_uint_32 chunk_name = png_ptr->chunk_name;
 
+      if (chunk_name != png_IDAT)
+         png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
+
       if (chunk_name == png_IEND)
          png_handle_IEND(png_ptr, info_ptr, length);
 
@@ -799,9 +805,9 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
       {
          if (chunk_name == png_IDAT)
          {
-            if ((length > 0) ||
-                (png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT) != 0)
-               png_benign_error(png_ptr, "Too many IDATs found");
+            if ((length > 0 && !(png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED))
+                || (png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT) != 0)
+               png_benign_error(png_ptr, ".Too many IDATs found");
          }
          png_handle_unknown(png_ptr, info_ptr, length, keep);
          if (chunk_name == png_PLTE)
@@ -812,10 +818,14 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
       else if (chunk_name == png_IDAT)
       {
          /* Zero length IDATs are legal after the last IDAT has been
-          * read, but not after other chunks have been read.
+          * read, but not after other chunks have been read.  1.6 does not
+          * always read all the deflate data; specifically it cannot be relied
+          * upon to read the Adler32 at the end.  If it doesn't ignore IDAT
+          * chunks which are longer than zero as well:
           */
-         if ((length > 0) || (png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT) != 0)
-            png_benign_error(png_ptr, "Too many IDATs found");
+         if ((length > 0 && !(png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED))
+             || (png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT) != 0)
+            png_benign_error(png_ptr, "..Too many IDATs found");
 
          png_crc_finish(png_ptr, length);
       }
