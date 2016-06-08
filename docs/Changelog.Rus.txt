@@ -199,6 +199,7 @@ YouTube
 Обновлены библиотеки:
 	ffmpeg git-n3.1-dev-1426-g9486de5;
 	jsoncpp git-1.7.2-16-g43203f1;
+	libflac git-1.3.1-186-gfdc1ccf;
 	libpng git-v1.6.23rc02-1-gee3c4e4;
 	Little-CMS git-2.7-60-ge342f44;
 	MediaInfo git-v0.7.85-25-g993690e;

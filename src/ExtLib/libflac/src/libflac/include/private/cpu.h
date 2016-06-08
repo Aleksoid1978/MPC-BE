@@ -39,6 +39,23 @@
 #include <config.h>
 #endif
 
+#ifndef FLAC__CPU_X86_64
+
+#if defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64)
+#define FLAC__CPU_X86_64
+#endif
+
+#endif
+
+#ifndef FLAC__CPU_IA32
+
+#if defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__) ||defined( __i386) || defined(_M_IX86)
+#define FLAC__CPU_IA32
+#endif
+
+#endif
+
+
 #if defined FLAC__HAS_X86INTRIN
 /* SSE intrinsics support by ICC/MSVC/GCC */
 #if defined __INTEL_COMPILER
