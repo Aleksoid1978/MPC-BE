@@ -6,6 +6,7 @@
 #ifndef JSON_CONFIG_H_INCLUDED
 #define JSON_CONFIG_H_INCLUDED
 #include <stddef.h>
+#include <string> //typdef String
 
 /// If defined, indicates that json library is embedded in CppTL library.
 //# define JSON_IN_CPPTL 1
@@ -38,12 +39,12 @@
 #ifdef JSON_IN_CPPTL
 #define JSON_API CPPTL_API
 #elif defined(JSON_DLL_BUILD)
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #define JSON_API __declspec(dllexport)
 #define JSONCPP_DISABLE_DLL_INTERFACE_WARNING
 #endif // if defined(_MSC_VER)
 #elif defined(JSON_DLL)
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #define JSON_API __declspec(dllimport)
 #define JSONCPP_DISABLE_DLL_INTERFACE_WARNING
 #endif // if defined(_MSC_VER)
@@ -76,6 +77,16 @@
 
 #endif // defined(_MSC_VER)
 
+// In c++11 the override keyword allows you to explicity define that a function
+// is intended to override the base-class version.  This makes the code more
+// managable and fixes a set of common hard-to-find bugs.
+#if __cplusplus >= 201103L 
+# define JSONCPP_OVERRIDE override
+#elif defined(_MSC_VER) && _MSC_VER > 1600
+# define JSONCPP_OVERRIDE override
+#else
+# define JSONCPP_OVERRIDE
+#endif
 
 #ifndef JSON_HAS_RVALUE_REFERENCES
 
@@ -118,6 +129,16 @@
 #  define JSON_USE_INT64_DOUBLE_CONVERSION 1
 #endif
 
+#if !defined(JSON_IS_AMALGAMATION)
+
+# include "version.h"
+
+# if JSONCPP_USING_SECURE_MEMORY
+#  include "allocator.h" //typedef Allocator
+# endif
+
+#endif // if !defined(JSON_IS_AMALGAMATION)
+
 namespace Json {
 typedef int Int;
 typedef unsigned int UInt;
@@ -138,6 +159,19 @@ typedef Int64 LargestInt;
 typedef UInt64 LargestUInt;
 #define JSON_HAS_INT64
 #endif // if defined(JSON_NO_INT64)
+#if JSONCPP_USING_SECURE_MEMORY
+#define JSONCPP_STRING        std::basic_string<char, std::char_traits<char>, Json::SecureAllocator<char> >
+#define JSONCPP_OSTRINGSTREAM std::basic_ostringstream<char, std::char_traits<char>, Json::SecureAllocator<char> >
+#define JSONCPP_OSTREAM       std::basic_ostream<char, std::char_traits<char>>
+#define JSONCPP_ISTRINGSTREAM std::basic_istringstream<char, std::char_traits<char>, Json::SecureAllocator<char> >
+#define JSONCPP_ISTREAM       std::istream
+#else
+#define JSONCPP_STRING        std::string
+#define JSONCPP_OSTRINGSTREAM std::ostringstream
+#define JSONCPP_OSTREAM       std::ostream
+#define JSONCPP_ISTRINGSTREAM std::istringstream
+#define JSONCPP_ISTREAM       std::istream
+#endif // if JSONCPP_USING_SECURE_MEMORY
 } // end namespace Json
 
 #endif // JSON_CONFIG_H_INCLUDED
