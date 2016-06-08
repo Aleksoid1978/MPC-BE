@@ -26,8 +26,8 @@
 #include "Teletext.h"
 
 struct MpegParseContext {
-	bool	bFrameStartFound = FALSE;
-	UINT64	state64			 = 0;
+	bool   bFrameStartFound = false;
+	UINT64 state64          = 0;
 };
 
 class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CCritSec
@@ -38,21 +38,23 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 			BOOL bSliceExist = FALSE;
 	};
 
-	CAutoPtr<CPacket>			m_p;
-	CAutoPtrList<CH264Packet>	m_pl;
-	MpegParseContext			m_ParseContext;
-	CTeletext					m_teletext;
+	CAutoPtr<CPacket>         m_p;
+	CAutoPtrList<CH264Packet> m_pl;
+	
+	MpegParseContext m_ParseContext;
+	CTeletext        m_teletext;
 
-	bool	m_bHasAccessUnitDelimiters;
-	bool	m_bFlushed;
-	int		m_truehd_framelength;
-	bool	m_bEndOfStream;
+	bool  m_bHasAccessUnitDelimiters = false;
+	bool  m_bFlushed                 = false;
+	bool  m_bEndOfStream             = false;
+	bool  m_bFoundSeqStartCode       = false;
+	int   m_truehd_framelength       = 0;
 
-	WORD	m_nChannels;
-	DWORD	m_nSamplesPerSec;
-	WORD	m_wBitsPerSample;
+	WORD  m_nChannels      = 0;
+	DWORD m_nSamplesPerSec = 0;
+	WORD  m_wBitsPerSample = 0;
 
-	int		m_adx_block_size;
+	int   m_adx_block_size = 0;
 
 protected:
 	HRESULT DeliverPacket(CAutoPtr<CPacket> p);
@@ -76,6 +78,7 @@ protected:
 	HRESULT ParseAdxADPCM(CAutoPtr<CPacket> p);
 	HRESULT ParseDTS(CAutoPtr<CPacket> p);
 	HRESULT ParseTeletext(CAutoPtr<CPacket> p);
+	HRESULT ParseMpegVideo(CAutoPtr<CPacket> p);
 
 public:
 	CBaseSplitterParserOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);

@@ -26,12 +26,16 @@
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/MediaDescription.h"
 
+#define SEQ_START_CODE     0xB3010000
+#define PICTURE_START_CODE 0x00010000
+
 #define MOVE_TO_H264_START_CODE(b, e)    while(b <= e - 4  && !((GETDWORD(b) == 0x01000000) || ((GETDWORD(b) & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e - 4) && GETDWORD(b) == 0x01000000) b++;
 #define MOVE_TO_AC3_START_CODE(b, e)     while(b <= e - 8  && (GETWORD(b) != AC3_SYNCWORD)) b++;
 #define MOVE_TO_AAC_START_CODE(b, e)     while(b <= e - 9  && ((GETWORD(b) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) b++;
 #define MOVE_TO_AACLATM_START_CODE(b, e) while(b <= e - 4  && ((GETWORD(b) & 0xe0FF) != 0xe056)) b++;
 #define MOVE_TO_DIRAC_START_CODE(b, e)   while(b <= e - 4  && (GETDWORD(b) != 0x44434242)) b++;
 #define MOVE_TO_DTS_START_CODE(b, e)     while(b <= e - 16 && (GETDWORD(b) != DTS_SYNCWORD_CORE_BE) && GETDWORD(b) != DTS_SYNCWORD_SUBSTREAM) b++;
+#define MOVE_TO_MPEG_START_CODE(b, e)    while(b <= e - 4  && !(GETDWORD(b) == SEQ_START_CODE || (m_bFoundSeqStartCode && GETDWORD(b) == PICTURE_START_CODE))) b++;
 
 //
 // CBaseSplitterParserOutputPin
@@ -39,14 +43,6 @@
 
 CBaseSplitterParserOutputPin::CBaseSplitterParserOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
-	, m_bHasAccessUnitDelimiters(false)
-	, m_bFlushed(false)
-	, m_truehd_framelength(0)
-	, m_nChannels(0)
-	, m_nSamplesPerSec(0)
-	, m_wBitsPerSample(0)
-	, m_adx_block_size(0)
-	, m_bEndOfStream(false)
 {
 }
 
@@ -62,11 +58,12 @@ HRESULT CBaseSplitterParserOutputPin::Flush()
 	m_p.Free();
 	m_pl.RemoveAll();
 
-	m_bFlushed				= true;
-	m_truehd_framelength	= 0;
+	m_bFlushed           = true;
+	m_bFoundSeqStartCode = false;
+	m_truehd_framelength = 0;
 
-	m_ParseContext.bFrameStartFound	= FALSE;
-	m_ParseContext.state64			= 0;
+	m_ParseContext.bFrameStartFound = false;
+	m_ParseContext.state64          = 0;
 
 	InitAudioParams();
 
@@ -225,6 +222,10 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 	} else if (m_mt.subtype == MEDIASUBTYPE_UTF8) {
 		// Teletext -> UTF8
 		return ParseTeletext(p);
+	} else if (m_mt.subtype == MEDIASUBTYPE_MPEG2_VIDEO
+			|| (m_mt.majortype == MEDIATYPE_Video && m_mt.subtype == MEDIASUBTYPE_MPEG1Payload)) {
+		// MPEG1/2 Video
+		return ParseMpegVideo(p);
 	} else {
 		m_p.Free();
 		m_pl.RemoveAll();
@@ -550,16 +551,16 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 	return S_OK;
 }
 
-#define HEVC_NAL_RASL_R		9
-#define HEVC_NAL_BLA_W_LP	16
-#define HEVC_NAL_CRA_NUT	21
+#define HEVC_NAL_RASL_R     9
+#define HEVC_NAL_BLA_W_LP   16
+#define HEVC_NAL_CRA_NUT    21
 
-#define HEVC_NAL_VPS		32
-#define HEVC_NAL_AUD		35
-#define HEVC_NAL_SEI_PREFIX	39
+#define HEVC_NAL_VPS        32
+#define HEVC_NAL_AUD        35
+#define HEVC_NAL_SEI_PREFIX 39
 
-#define START_CODE			0x000001	///< start_code_prefix_one_3bytes
-#define END_NOT_FOUND		(-100)
+#define START_CODE          0x000001	///< start_code_prefix_one_3bytes
+#define END_NOT_FOUND       (-100)
 static int hevc_find_frame_end(BYTE* pData, int nSize, MpegParseContext& pc)
 {
 	for (int i = 0; i < nSize; i++) {
@@ -1117,6 +1118,49 @@ HRESULT CBaseSplitterParserOutputPin::ParseTeletext(CAutoPtr<CPacket> p)
 	}
 
 	return hr;
+}
+
+HRESULT CBaseSplitterParserOutputPin::ParseMpegVideo(CAutoPtr<CPacket> p)
+{
+	if (!m_p) {
+		InitPacket(p);
+	}
+
+	if (!m_p) {
+		return S_OK;
+	}
+
+	if (p) m_p->Append(*p);
+
+	HandleInvalidPacket(6);
+
+	BEGINDATA;
+
+	MOVE_TO_MPEG_START_CODE(start, end);
+	if (!m_bFoundSeqStartCode && GETDWORD(start) == SEQ_START_CODE) {
+		m_bFoundSeqStartCode = true;
+	}
+	while (start <= end - 4) {
+		BYTE* next = start + 1;
+		if (m_bEndOfStream) {
+			next = end;
+		} else {
+			MOVE_TO_MPEG_START_CODE(next, end);
+			if (next >= end - 4) {
+				break;
+			}
+		}
+
+		int size = next - start;
+
+		HandlePacket(0);
+		
+		start = next;
+	}
+
+	ENDDATA;
+
+	return S_OK;
 }
 
 HRESULT CBaseSplitterParserOutputPin::DeliverEndOfStream()
