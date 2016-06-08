@@ -32,6 +32,8 @@
 #include "../../../DSUtil/AudioParser.h"
 #include <atlpath.h>
 #include <stdint.h>
+#include <mpc_defines.h>
+#include "../../../DSUtil/MediaDescription.h"
 
 enum {
 	unknown,

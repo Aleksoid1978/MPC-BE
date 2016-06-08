@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include "MpaDecFilterSettingsWnd.h"
-#include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/MFCHelper.h"
 #include "../../../DSUtil/SysVersion.h"
 
 //

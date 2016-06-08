@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "MPCVideoDecSettingsWnd.h"
-#include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/MFCHelper.h"
 #include <ffmpeg/libavcodec/avcodec.h>
 
 //

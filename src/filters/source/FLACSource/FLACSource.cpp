@@ -31,6 +31,7 @@
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/CUE.h"
 #include "../../../DSUtil/ID3Tag.h"
+#include "../../../DSUtil/MediaDescription.h"
 #include <libflac/src/libflac/include/protected/stream_decoder.h>
 
 #define FLAC_DECODER (FLAC__StreamDecoder*)m_pDecoder

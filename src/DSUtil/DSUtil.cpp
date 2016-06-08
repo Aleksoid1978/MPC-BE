@@ -38,16 +38,6 @@
 // flag for display only forced subtitles (PGS/VOBSUB)
 bool g_bForcedSubtitle = false;
 
-CString ResStr(UINT nID)
-{
-	CString id;
-	if (!id.LoadString(nID)) {
-		id.LoadString(AfxGetApp()->m_hInstance, nID);
-	}
-
-	return id;
-}
-
 int CountPins(IBaseFilter* pBF, int& nIn, int& nOut, int& nInC, int& nOutC)
 {
 	nIn = nOut = 0;
