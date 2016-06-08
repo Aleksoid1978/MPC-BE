@@ -42,11 +42,10 @@ CLineNumberEdit     -                          -
 CSizingControlBar   GPLv2                      http://datamekanix.com/sizecbar/
 Detours             MSR-SSLA                   http://research.microsoft.com/en-us/projects/detours/
 FFmpeg              GPLv3                      http://ffmpeg.org/
-jsoncpp             MIT License                https://github.com/open-source-parsers/jsoncpp
-libdcadec           LGPLv2.1                   https://github.com/foo86/dcadec/
-libflac             GPLv2 / BSD License        http://sourceforge.net/projects/flac/
-libpng              zlib / libpng License      http://sourceforge.net/projects/libpng/
-libopenjpeg         BSD License                http://code.google.com/p/openjpeg/
+jsoncpp             MIT License                https://github.com/open-source-parsers/jsoncpp/
+libflac             GPLv2 / BSD License        https://github.com/xiph/flac/
+libpng              zlib / libpng License      https://github.com/glennrp/libpng/
+libopenjpeg         BSD License                https://github.com/uclouvain/openjpeg/
 libopus             BSD License                http://opus-codec.org/
 libspeex            BSD License                http://speex.org/
 Little CMS          MIT License                http://littlecms.com/
