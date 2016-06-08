@@ -24,7 +24,7 @@
 
 #include <vector>
 #include <stdint.h>
-#include "../../../DSUtil/DSUtil.h"
+#include <mpc_defines.h>
 
 struct TeletextData {
 	REFERENCE_TIME rtStart = INVALID_TIME;

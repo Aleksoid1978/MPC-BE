@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include "AviSplitterSettingsWnd.h"
-#include "../../../DSUtil/DSUtil.h"
 
 CAviSplitterSettingsWnd::CAviSplitterSettingsWnd(void)
 {

@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include "../../../DSUtil/DSUtil.h"
 #include <moreuuids.h>
 #include "../../switcher/AudioSwitcher/AudioSwitcher.h"
 #include "BaseSplitterOutputPin.h"

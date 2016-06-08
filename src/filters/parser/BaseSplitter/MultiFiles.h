@@ -21,7 +21,6 @@
 #pragma once
 
 #include <atlcoll.h>
-#include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/HdmvClipInfo.h"
 
 class CMultiFiles : public CObject
