@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include "MpegSplitterSettingsWnd.h"
-#include "../../../DSUtil/DSUtil.h"
 
 CMpegSplitterSettingsWnd::CMpegSplitterSettingsWnd(void)
 {
