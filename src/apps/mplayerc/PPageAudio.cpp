@@ -96,6 +96,8 @@ BOOL CPPageAudio::OnInitDialog()
 {
 	__super::OnInitDialog();
 
+	SetCursor(m_hWnd, IDC_AUDRND_COMBO, IDC_HAND);
+
 	CAppSettings& s = AfxGetAppSettings();
 
 	m_AudioRendererDisplayNames.Add(_T(""));
@@ -398,6 +400,8 @@ void CPPageAudio::OnAudioRenderPropClick()
 void CPPageAudio::OnDualAudioOutputCheck()
 {
 	m_iSecAudioRendererTypeCtrl.EnableWindow(!!m_DualAudioOutput.GetCheck());
+
+	SetModified();
 }
 
 void CPPageAudio::OnBnClickedResetAudioPaths()
