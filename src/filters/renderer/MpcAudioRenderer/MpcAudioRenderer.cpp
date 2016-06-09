@@ -200,13 +200,10 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		*phr = E_FAIL;
 	}
 
-	if (IsWinVistaOrLater()) {
-		// Load Vista & above specifics DLLs
-		m_hModule = LoadLibrary(L"AVRT.dll");
-		if (m_hModule) {
-			pfAvSetMmThreadCharacteristicsW   = (PTR_AvSetMmThreadCharacteristicsW)GetProcAddress(m_hModule, "AvSetMmThreadCharacteristicsW");
-			pfAvRevertMmThreadCharacteristics = (PTR_AvRevertMmThreadCharacteristics)GetProcAddress(m_hModule, "AvRevertMmThreadCharacteristics");
-		}
+	m_hModule = LoadLibrary(L"AVRT.dll");
+	if (m_hModule) {
+		pfAvSetMmThreadCharacteristicsW   = (PTR_AvSetMmThreadCharacteristicsW)GetProcAddress(m_hModule, "AvSetMmThreadCharacteristicsW");
+		pfAvRevertMmThreadCharacteristics = (PTR_AvRevertMmThreadCharacteristics)GetProcAddress(m_hModule, "AvRevertMmThreadCharacteristics");
 	}
 
 	if (!m_hModule) {
