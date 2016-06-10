@@ -26,10 +26,10 @@
 #include "../BaseSplitter/BaseSplitter.h"
 #include "../../../DSUtil/GolombBuffer.h"
 
-#define NO_SUBTITLE_PID		1 // Fake PID use for the "No subtitle" entry
-#define NO_SUBTITLE_NAME	L"No subtitle"
+#define NO_SUBTITLE_PID  1 // Fake PID use for the "No subtitle" entry
+#define NO_SUBTITLE_NAME L"No subtitle"
 
-#define ISVALIDPID(pid)		(pid >= 0x10 && pid < 0x1fff)
+#define ISVALIDPID(pid)  (pid >= 0x1 && pid < 0x1fff)
 
 enum MPEG_TYPES {
 	mpeg_invalid,
