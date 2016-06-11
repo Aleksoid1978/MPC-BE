@@ -37,10 +37,9 @@
 #include "../../../DSUtil/MediaDescription.h"
 #include <vector>
 
-#define PACKET_PTS_DISCONTINUITY     0x0001
-#define PACKET_PTS_VALIDATE_POSITIVE 0x0002
+#define PACKET_PTS_DISCONTINUITY 0x0001
 
-#define SOURCE_SUPPORT_URL           0x0004
+#define SOURCE_SUPPORT_URL       0x0002
 
 class CBaseSplitterFilter
 	: public CBaseFilter

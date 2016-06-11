@@ -136,8 +136,6 @@ public:
 COggSplitterFilter::COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("COggSplitterFilter"), pUnk, phr, __uuidof(this))
 {
-	m_nFlag |= PACKET_PTS_DISCONTINUITY;
-	m_nFlag |= PACKET_PTS_VALIDATE_POSITIVE;
 	m_nFlag |= SOURCE_SUPPORT_URL;
 }
 

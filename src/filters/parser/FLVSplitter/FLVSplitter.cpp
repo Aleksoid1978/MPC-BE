@@ -128,8 +128,6 @@ CFLVSplitterFilter::CFLVSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_TimeStampOffset(0)
 	, m_DetectWrongTimeStamp(true)
 {
-	m_nFlag |= PACKET_PTS_DISCONTINUITY;
-	m_nFlag |= PACKET_PTS_VALIDATE_POSITIVE;
 	m_nFlag |= SOURCE_SUPPORT_URL;
 	//memset(&meta, 0, sizeof(meta));
 }

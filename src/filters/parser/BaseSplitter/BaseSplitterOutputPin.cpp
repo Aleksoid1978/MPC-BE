@@ -352,11 +352,9 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		return S_OK;
 	}
 
-	DWORD nFlag = pSplitter->GetFlag();
-
-	if (p->rtStart != INVALID_TIME && (nFlag & PACKET_PTS_DISCONTINUITY)) {
+	if (p->rtStart != INVALID_TIME && (pSplitter->GetFlag() & PACKET_PTS_DISCONTINUITY)) {
 		// Filter invalid PTS value (if too different from previous packet)
-		if (!IsDiscontinuous() && !((nFlag & PACKET_PTS_VALIDATE_POSITIVE) && p->rtStart < 0)) {
+		if (!IsDiscontinuous()) {
 			REFERENCE_TIME rt = p->rtStart + m_rtOffset;
 			if (abs(rt - m_rtPrev) > MAX_PTS_SHIFT) {
 				m_rtOffset += m_rtPrev - rt;
@@ -364,10 +362,10 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 			}
 		}
 
-		p->rtStart	+= m_rtOffset;
-		p->rtStop	+= m_rtOffset;
+		p->rtStart += m_rtOffset;
+		p->rtStop  += m_rtOffset;
 
-		m_rtPrev	= p->rtStart;
+		m_rtPrev   = p->rtStart;
 	}
 
 	m_brs.nBytesSinceLastDeliverTime += nBytes;
