@@ -35,7 +35,7 @@
 #define MOVE_TO_AACLATM_START_CODE(b, e) while(b <= e - 4  && ((GETWORD(b) & 0xe0FF) != 0xe056)) b++;
 #define MOVE_TO_DIRAC_START_CODE(b, e)   while(b <= e - 4  && (GETDWORD(b) != 0x44434242)) b++;
 #define MOVE_TO_DTS_START_CODE(b, e)     while(b <= e - 16 && (GETDWORD(b) != DTS_SYNCWORD_CORE_BE) && GETDWORD(b) != DTS_SYNCWORD_SUBSTREAM) b++;
-#define MOVE_TO_MPEG_START_CODE(b, e)    while(b <= e - 4  && !(GETDWORD(b) == SEQ_START_CODE || (m_bFoundSeqStartCode && GETDWORD(b) == PICTURE_START_CODE))) b++;
+#define MOVE_TO_MPEG_START_CODE(b, e)    while(b <= e - 4  && !(GETDWORD(b) == SEQ_START_CODE || GETDWORD(b) == PICTURE_START_CODE)) b++;
 
 //
 // CBaseSplitterParserOutputPin
@@ -1136,9 +1136,6 @@ HRESULT CBaseSplitterParserOutputPin::ParseMpegVideo(CAutoPtr<CPacket> p)
 	BEGINDATA;
 
 	MOVE_TO_MPEG_START_CODE(start, end);
-	if (!m_bFoundSeqStartCode && GETDWORD(start) == SEQ_START_CODE) {
-		m_bFoundSeqStartCode = true;
-	}
 	while (start <= end - 4) {
 		BYTE* next = start + 1;
 		if (m_bEndOfStream) {

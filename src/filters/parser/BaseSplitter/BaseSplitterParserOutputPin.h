@@ -47,7 +47,6 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 	bool  m_bHasAccessUnitDelimiters = false;
 	bool  m_bFlushed                 = false;
 	bool  m_bEndOfStream             = false;
-	bool  m_bFoundSeqStartCode       = false;
 	int   m_truehd_framelength       = 0;
 
 	WORD  m_nChannels      = 0;
