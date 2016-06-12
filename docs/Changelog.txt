@@ -9,6 +9,193 @@ Legend:
 
 1.4.6 (beta)
 ==============================
+Splitters and source filters
+Added support for multiline tags in ID3v2.
+Fixed reading ID3v2.4 tags.
+Built-in filters sources can now work with HTTP / HTTPS independently.
+
+ShoutcastSource
+Fixed playback MPEG Version 2 Layer 3 streams.
+Added support for opening M3U and XSPF playlists. Improved support for PLS playlists.
+
+DTS AC3 Source
+Added support for DTS Express.
+
+UDP/HTTP Reader
+Added playback from standard input (stdin).
+Corrected shutdown of the filter.
+Reduced memory usage and waiting delay.
+Added support for opening streams with content-type "video/mp2t".
+Fixed a bug due to which the playback could stop.
+
+AviSplitter
+Added support for AAC audio tracks with ID 0x706D.
+
+AudioSplitter
+Fixed playback of TAK files.
+Added support .dtshd files (labeled 'DTSHDHDR' at the beginning of the file).
+
+MPEGSplitter
+Improved handling of invalid data at the beginning of MPEG files.
+Display a name of the service in the name of the program.
+Optimization of opening files.
+Fixed and optimized playback of HDMV and DVB subtitles.
+Added support for Teletext subtitles.
+Improved support for files that are downloaded and their size and duration are increased.
+Added support for Opus.
+Improved support for .ssif files.
+Added support for H.264 MVC streams for 3D Blu-ray discs (3D viewing requires LAV Video Decoder and madVR).
+Fixed incorrect determination of the duration for long records.
+Added support for DTS Express tracks.
+
+MatroskaSplitter
+Added "DESCRIPTION" tag support.
+Added support EBML elements with an unknown (not specified) length.
+Includes support for opening files from HTTP resources in tandem with File Source (URL).
+Added support for H264 MVC streams.
+Improved algorithm for finding the actual fps.
+Added support for exporting "STEREOSCOPIC3DMODE" properties.
+Added support WebVTT subtitles.
+Extended "A_QUICKTIME" format support, is now available 'ima4' and others.
+Added QDM2 sound support.
+Improved support for RV20 for the FFmpeg compatible decoders.
+Fixed rewind (does not work correctly on some files).
+Added support for "ALBUM" and "RATING" tags.
+Fixed and optimized playback of HDMV and DVB subtitles.
+Added support for DTS Express tracks.
+Optimized search engine after rewinding.
+
+MP4Splitter
+Fixed missing audio after rewinding some files.
+Fixed playback of some ALS tracks.
+Improved network streams.
+Added support for Windows Media Video 7 (WMV1), Canopus HQ, Canopus HQX, CineForm, Sorenson H263 (FLV1) and MagicYUV video streams.
+Fixed definition covers in JPEG format 'JFIF' and 'EXIF' segments.
+Optimized data reading.
+Improved support for DTS-HD tracks.
+Fixed work with RAW AAC data.
+Optimized to work with very short blocks of sound.
+
+OggSplitter
+Added support for "ALBUM".
+Added support for the VP8 video.
+Fixed Vorbis tags reading.
+
+MpaSplitter
+Increase the lookup length of ADTS header.
+
+RawVideoSplitter
+Added support for RAW MPEG-4 Visual. Filters "MPC MPEG4 Video Splitter" and "MPC MPEG4 Video Source" removed as non-working and more unnecessary.
+Added support for C420p10 format for Y4M files.
+
+RealMediaSplitter
+Fixed crashes on some files.
+
+MPCVideoDec
+Added additional check HEVC profile (older versions x265 recorded incorrect information in the header).
+Fixed conversion YUV420P10/16->NV12.
+Added information about the input format in the status.
+Added support for decoding of Canopus HQ and HQX.
+Added support for VP9 DXVA2.
+Added support MEDIASUBTYPE_LAV_RAWVIDEO.
+Fill in DXVA2_ExtendedFormat information about BT.2020 for madVR.
+Added the ability to transfer HEVC HDR metadata in the renderer.
+Removed the options "Standard" and "Preset".
+Improved compatibility with the WM ASF Reader.
+Added partial support for decoding CineForm and MagicYUV (FFmpeg does not fully support these codecs).
+Improved DXVA1 decoder.
+Changed priorities for output formats. Now preserve color resolution is more important than the color depth. For Intel GPU YV12 priority is now higher than the NV12.
+Added new IDs for graphics Intel Skylake to the list of cards that support 4k decoding.
+
+MpaDecFilter
+Added ability to switch between devices with SPDIF/Bitstream support to the device without such support.
+Fixed fast and slow playback modes.
+Fixed problems with playback in case of AC3 encoding the source with a frequency different from 44100/48000 Hz.
+Adjusted priorities of selecting a suitable output format.
+Improved output data bitstream for DTS-HD.
+
+AudioSwitcher
+Do not limit the sampling rate in the Audioswitcher if used MpcAudioRenderer or SanearAudioRenderer.
+Added the ability to connect to MultiChannel ASIO Renderer.
+Windows XP limit the maximum frequency of 96 kHz.
+Fixed allocation of initial buffer that eliminates the problem of playing some WMA files.
+Fixed error when connecting to the AC3Filter.
+Fixed a rare hang when switching tracks.
+
+MpcAudioRenderer
+Added interface IAMStreamSelect, that allows quickly and without changing the settings (only for the current session) to change the current audio device.
+Optimization and adjustment reinitialize the device. Added a mechanism for restoring a playback in case of loss of the device.
+
+VideoRenderers
+Slightly reduced load then downscaling frame using a shader interpolation.
+Using a shader "Simple averaging" for a strong downscaling in SyncRenderer.
+Fill DXVA2_ExtendedFormat only when using EVR / madVR.
+Fixed calculation of the size of the video in VMR9 renderless.
+Adjusting the graph scale in statistics.
+Improved madVR, adds the ability to disable Aero.
+Improved definition of connecting and disconnecting the output devices in a multi-monitor configuration.
+Added displaying information about the player memory consumption and loading Video Engine (VID Usage) in the statistic.
+For EVR-Custom added to the mix in the format D3DFMT_A2R10G10B10 for the input format P010 (works on Win8.1 and newer).
+Rewritten support "Rotation" flag is now the turn of the frame is carried out independently of the other strains.
+Built-in video renderers no longer support ISubPicAllocatorPresenter and ISubPicAllocatorPresenter2 interface.
+Fixed handling of resizing and the aspect ratio of the video frame in EVR-Custom and Sync renderer.
+Fixed crash EVR-mixer on Nvidia graphics cards on the float at the surface of the frame size 1920x1088 ('Integer division by zero' in nvd3dumx.dll).
+
+VSFilter
+Fixed use default style.
+Corrected display of the font selection dialog.
+Corrected display of the color selection dialog.
+Fixed output PGS/DVB subtitle if the subtitle resolution less than the resolution of the video.
+
+Subtitles
+When you open a file, reset the subtitle delay not only for the ISR, but for VSFilter/XySubFilter.
+Small optimization.
+Added basic support WebVTT subtitles.
+If forced using default style is rewritten not only the style, but also ignored the effects mentioned in the subtitle line.
+
+YouTube
+Added support for links such as "youtube.com/v/".
+Added support for the format WebM with separate streams of video and audio.
+Added ability to disable the built-in parser YouTube pages (required for 3DYD YouTube Source Filter).
+Added support 3DYD YouTube Source filter.
+Improved filling data on the video in the playlist.
+Removed the old built-in download files. Now sources filters alone download data without creating a temporary file.
+
+Player
+Fixed menu commands "Movie -> Set aspect ratio".
+Added the ability to resize the preview window.
+Added support High DPI and DPI Per Monitor.
+Fixed crash when calling windows file associations with administrative rights.
+In the FS mode, the D3D use switch the display mode to record in the register.
+Added extension .mxf in the group "Other".
+Fixed display of available subtitles renderers.
+Added the ability to download fonts from the folder "fonts" located near the current video.
+Added option "Add similar files to playlist".
+For Windows XP, disable DXVA2 interpolation selection as unsupported.
+The download window subtitles added sorting by language and file name.
+Added option "Pause the video playback when minimized".
+Added support for "Press and Hold" for devices with touch screen for easy access to the context menu.
+Added support for gesture control.
+Added extension .y4m (YUV4MPEG2) in the group "Raw Video".
+Added ability to use "*" in the last folder in the path of subtitles and audio tracks.
+Added keyboard shortcuts "Repeat forever".
+Fixed display for RLE8 and RLE4 media type in PinInfo window.
+Improved work with file associations in the Windows 8/10.
+Fixed condition button "Play/Pause" after clicking "Boss" button in the pause state.
+Added support for changing the activity of the buttons AUD / SUB on the toolbar.
+Do not switch the window to the foreground when using /add switch (provided that in the current playlist of the player already has files).
+Fixed missing item "Other PCM/ADPCM" in the list of built-in audio decoder.
+Removed "Real Script", "RatDVD" and "Indeo Video Format" group.
+Removeds .wvx, .wax, .wmx extension as unsupported formats from "Playlist" group.
+Extension .ivf moved to "Others" group, .divx moved to "AVI" group.
+In the panel "Information" in "Description" field show only the first line (in the file properties show full).
+Added support for WPL playlists (Windows Media Player Playlist).
+
+Updated German translation (by Klaus1189).
+Updated Japanese translation (by Socket774).
+Updated Dutch and Chinese (Traditional and Simplified) translation (by beter).
+Updated Ukrainian translation (by arestarh1986).
+Updated Basque translation (by Azpidatziak).
 
 Updated libraries:
 	ffmpeg git-n3.1-dev-1426-g9486de5;
