@@ -1150,7 +1150,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseMpegVideo(CAutoPtr<CPacket> p)
 		int size = next - start;
 
 		HandlePacket(0);
-		
+
 		start = next;
 	}
 

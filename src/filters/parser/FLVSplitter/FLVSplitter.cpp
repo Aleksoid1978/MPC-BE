@@ -388,7 +388,7 @@ bool CFLVSplitterFilter::ReadTag(VideoTweak& vt)
 bool CFLVSplitterFilter::Sync(__int64& pos)
 {
 	static BYTE resync_buffer[2 * RESYNC_BUFFER_SIZE] = { 0 };
-	
+
 	m_pFile->Seek(pos);
 	if (m_pFile->IsURL()) {
 		for (UINT32 i = 0; m_pFile->GetRemaining() && SUCCEEDED(m_pFile->GetLastReadError()); i++) {

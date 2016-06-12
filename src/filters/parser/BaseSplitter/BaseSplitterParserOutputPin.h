@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,7 +40,7 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 
 	CAutoPtr<CPacket>         m_p;
 	CAutoPtrList<CH264Packet> m_pl;
-	
+
 	MpegParseContext m_ParseContext;
 	CTeletext        m_teletext;
 
