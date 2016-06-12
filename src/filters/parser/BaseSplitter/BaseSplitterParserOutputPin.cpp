@@ -59,7 +59,6 @@ HRESULT CBaseSplitterParserOutputPin::Flush()
 	m_pl.RemoveAll();
 
 	m_bFlushed           = true;
-	m_bFoundSeqStartCode = false;
 	m_truehd_framelength = 0;
 
 	m_ParseContext.bFrameStartFound = false;
