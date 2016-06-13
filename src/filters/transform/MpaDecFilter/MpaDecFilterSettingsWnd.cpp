@@ -248,5 +248,5 @@ void CMpaDecSettingsWnd::OnFloatCheck()
 
 void CMpaDecSettingsWnd::OnDTSCheck()
 {
-	m_spdif_dtshd_check.EnableWindow(!!m_spdif_dts_check.GetCheck() && IsWinVistaOrLater());
+	m_spdif_dtshd_check.EnableWindow(!!m_spdif_dts_check.GetCheck());
 }

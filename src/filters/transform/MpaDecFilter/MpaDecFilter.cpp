@@ -546,16 +546,14 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 				CMediaType mt = CreateMediaTypeSPDIF();
 				m_bBitstreamSupported[SPDIF]		= pPinRenderer->QueryAccept(&mt) == S_OK;
 
-				if (IsWinVistaOrLater()) {
-					mt = CreateMediaTypeHDMI(IEC61937_EAC3);
-					m_bBitstreamSupported[EAC3]		= pPinRenderer->QueryAccept(&mt) == S_OK;
+				mt = CreateMediaTypeHDMI(IEC61937_EAC3);
+				m_bBitstreamSupported[EAC3]		= pPinRenderer->QueryAccept(&mt) == S_OK;
 
-					mt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
-					m_bBitstreamSupported[TRUEHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
+				mt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
+				m_bBitstreamSupported[TRUEHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
 
-					mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
-					m_bBitstreamSupported[DTSHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
-				}
+				mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
+				m_bBitstreamSupported[DTSHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
 
 				pPinRenderer->QueryAccept(&mtRenderer);
 			}
