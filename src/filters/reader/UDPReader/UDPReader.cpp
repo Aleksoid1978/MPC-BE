@@ -27,6 +27,7 @@
 #include <fcntl.h>
 #include <io.h>
 #include <iostream>
+#include <Ws2tcpip.h>
 
 #ifdef REGISTER_FILTER
 
@@ -283,7 +284,9 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		m_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 		ip_mreq imr;
-		imr.imr_multiaddr.s_addr = inet_addr(CStringA(m_url.GetHostName()));
+		if (InetPton(AF_INET, m_url.GetHostName(), &imr.imr_multiaddr.s_addr) != 1) {
+			return false;
+		}
 		imr.imr_interface.s_addr = INADDR_ANY;
 
 		if ((m_UdpSocket = socket(AF_INET, SOCK_DGRAM, 0)) != INVALID_SOCKET) {
