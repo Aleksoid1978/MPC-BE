@@ -167,7 +167,6 @@ Added the ability to resize the preview window.
 Added support High DPI and DPI Per Monitor.
 Fixed crash when calling windows file associations with administrative rights.
 In the FS mode, the D3D use switch the display mode to record in the register.
-Added extension .mxf in the group "Other".
 Fixed display of available subtitles renderers.
 Added the ability to download fonts from the folder "fonts" located near the current video.
 Added option "Add similar files to playlist".
@@ -176,7 +175,6 @@ The download window subtitles added sorting by language and file name.
 Added option "Pause the video playback when minimized".
 Added support for "Press and Hold" for devices with touch screen for easy access to the context menu.
 Added support for gesture control.
-Added extension .y4m (YUV4MPEG2) in the group "Raw Video".
 Added ability to use "*" in the last folder in the path of subtitles and audio tracks.
 Added keyboard shortcuts "Repeat forever".
 Fixed display for RLE8 and RLE4 media type in PinInfo window.
@@ -186,8 +184,10 @@ Added support for changing the activity of the buttons AUD / SUB on the toolbar.
 Do not switch the window to the foreground when using /add switch (provided that in the current playlist of the player already has files).
 Fixed missing item "Other PCM/ADPCM" in the list of built-in audio decoder.
 Removed "Real Script", "RatDVD" and "Indeo Video Format" group.
-Removeds .wvx, .wax, .wmx extension as unsupported formats from "Playlist" group.
-Extension .ivf moved to "Others" group, .divx moved to "AVI" group.
+Added extension .y4m (YUV4MPEG2) in "Raw Video" group.
+Added extensions .mxf and .ivf in "Other" group.
+Extension .divx moved to "AVI" group.
+Removed extensions .wvx, .wax, .wmx as unsupported formats from "Playlist" group.
 In the panel "Information" in "Description" field show only the first line (in the file properties show full).
 Added support for WPL playlists (Windows Media Player Playlist).
 
