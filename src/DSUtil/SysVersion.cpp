@@ -19,34 +19,18 @@
  */
 
 #include "stdafx.h"
-#include <VersionHelpers.h>
+#include <Windows.h>
 #include "SysVersion.h"
 
 static WORD InitGetSysVersion()
 {
-	const struct {
-		WORD wMajor;
-		WORD wMinor;
-	}
-	ver[] = {
-		{ 5, 1 }, // XP
-		{ 6, 0 }, // Vista
-		{ 6, 1 }, // 7
-		{ 6, 2 }, // 8
-		{ 6, 3 }, // 8.1
-		{ 10, 0 } // 10
-	};
+	OSVERSIONINFOEX osvi = { sizeof(osvi) };
+#pragma warning(push)
+#pragma warning(disable: 4996)
+	GetVersionEx((LPOSVERSIONINFO)&osvi);
+#pragma warning(pop)
 
-	int i = 1;
-	for (; i < _countof(ver); i++) {
-		if (!IsWindowsVersionOrGreater(ver[i].wMajor, ver[i].wMinor, 0)) {
-			i--;
-			break;
-		}
-	}
-	ASSERT(ver[i].wMajor >= 6);
-
-	return MAKEWORD(ver[i].wMinor,ver[i].wMajor);
+	return MAKEWORD(osvi.dwMinorVersion, osvi.dwMajorVersion);
 }
 
 WORD GetSysVersion()

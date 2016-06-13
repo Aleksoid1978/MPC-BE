@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include <VersionHelpers.h>
 #include "MPCBEContextMenu.h"
 
 #define MPC_WND_CLASS_NAME L"MPC-BE"
@@ -94,23 +95,9 @@ HBITMAP TransparentBMP(HBITMAP hBmp)
 	return RetBmp;
 }
 
-static bool IsVistaOrAbove()
-{
-	OSVERSIONINFO osver;
-	osver.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-
-	if (::GetVersionEx(&osver) && 
-		osver.dwPlatformId == VER_PLATFORM_WIN32_NT && 
-		(osver.dwMajorVersion >= 6)) {
-		return TRUE;
-	}
-
-	return FALSE;
-}
-
 CMPCBEContextMenu::CMPCBEContextMenu()
 {
-	if (IsVistaOrAbove()) {
+	if (IsWindowsVistaOrGreater()) {
 		m_hPlayBmp	= LoadBitmap( _AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_MPCBEBMP_PLAY));
 		m_hAddBmp	= LoadBitmap( _AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_MPCBEBMP_ADD));
 	} else {
