@@ -92,7 +92,10 @@ protected:
     {
         static OSVERSIONINFO osvi = { sizeof(osvi) };
         if (osvi.dwMajorVersion == 0) {
+#pragma warning(push)
+#pragma warning(disable: 4996)
             GetVersionEx(&osvi);
+#pragma warning(pop)
         }
 
         if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion >= 3 || osvi.dwMajorVersion > 6) {
