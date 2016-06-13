@@ -1,5 +1,5 @@
 ﻿;
-; (C) 2009-2015 see Authors.txt
+; (C) 2009-2016 see Authors.txt
 ;
 ; This file is part of MPC-BE.
 ;
@@ -123,7 +123,7 @@ AllowNoIcons=yes
 ShowTasksTreeLines=yes
 DisableDirPage=auto
 DisableProgramGroupPage=auto
-MinVersion=5.01.2600sp2
+MinVersion=6.0.6000
 AppMutex={#MPC_WND_CLASS_NAME}
 ChangesAssociations=true
 
