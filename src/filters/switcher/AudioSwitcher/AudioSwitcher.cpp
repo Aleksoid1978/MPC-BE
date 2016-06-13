@@ -376,7 +376,7 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt)
 		}
 
 		DWORD samplerate = wfe->nSamplesPerSec;
-		const DWORD limitsamplerate = IsWinVistaOrLater() ? 192000 : 96000;
+		const DWORD limitsamplerate = 192000;
 		if (samplerate > limitsamplerate) {
 			CLSID clsid = GUID_NULL;
 
