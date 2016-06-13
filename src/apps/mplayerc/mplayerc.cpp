@@ -1420,7 +1420,7 @@ BOOL CMPlayerCApp::InitInstance()
 	}
 
 	if (m_s.nCLSwitches & (CLSW_REGEXTVID | CLSW_REGEXTAUD | CLSW_REGEXTPL)) { // register file types
-		if (IsWinVistaOrLater() && !IsUserAdmin()) {
+		if (!IsUserAdmin()) {
 			AfxGetMyApp()->RunAsAdministrator(GetProgramPath(), m_lpCmdLine, false);
 		} else {
 
@@ -1464,7 +1464,7 @@ BOOL CMPlayerCApp::InitInstance()
 	}
 
 	if ((m_s.nCLSwitches&CLSW_UNREGEXT)) { // unregistered file types
-		if (IsWinVistaOrLater() && !IsUserAdmin()) {
+		if (!IsUserAdmin()) {
 			AfxGetMyApp()->RunAsAdministrator(GetProgramPath(), m_lpCmdLine, false);
 		} else {
 			BOOL bIs64 = IsW64();
@@ -2054,9 +2054,7 @@ void SetAudioRenderer(int AudioDevNo)
 
 	m_AudioRendererDisplayNames.Add(AUDRNDT_NULL_COMP);
 	m_AudioRendererDisplayNames.Add(AUDRNDT_NULL_UNCOMP);
-	if (IsWinVistaOrLater()) {
-		m_AudioRendererDisplayNames.Add(AUDRNDT_MPC);
-	}
+	m_AudioRendererDisplayNames.Add(AUDRNDT_MPC);
 	i += 3;
 	if (AudioDevNo >= 1 && AudioDevNo <= i) {
 		AfxGetMyApp()->m_AudioRendererDisplayName_CL = m_AudioRendererDisplayNames[AudioDevNo-1];

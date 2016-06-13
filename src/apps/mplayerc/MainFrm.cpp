@@ -5399,7 +5399,7 @@ void CMainFrame::OnFileOpenDVD()
 	CAppSettings& s = AfxGetAppSettings();
 	CString strTitle = ResStr(IDS_MAINFRM_46);
 	CString path;
-	if (IsWinVistaOrLater()) {
+	{
 		CFileDialog dlg(TRUE);
 		IFileOpenDialog *openDlgPtr = dlg.GetIFileOpenDialog();
 
@@ -5427,25 +5427,6 @@ void CMainFrame::OnFileOpenDVD()
 			}
 
 			openDlgPtr->Release();
-		}
-	} else {
-		TCHAR _path[_MAX_PATH] = { 0 };
-
-		BROWSEINFO bi;
-		bi.hwndOwner = m_hWnd;
-		bi.pidlRoot = NULL;
-		bi.pszDisplayName = _path;
-		bi.lpszTitle = strTitle;
-		bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_VALIDATE | BIF_USENEWUI | BIF_NONEWFOLDERBUTTON;
-		bi.lpfn = BrowseCallbackProc;
-		bi.lParam = 0;
-		bi.iImage = 0;
-
-		static PCIDLIST_ABSOLUTE iil;
-		iil = SHBrowseForFolder(&bi);
-		if (iil) {
-			SHGetPathFromIDList(iil, _path);
-			path = _path;
 		}
 	}
 
@@ -5661,44 +5642,30 @@ static HRESULT CopyFiles(CString sourceFile, CString destFile)
 
 	HRESULT hr = S_OK;
 
-	if (IsWinVistaOrLater()) {
-		CComPtr<IShellItem> psiItem;
-		hr = afxGlobalData.ShellCreateItemFromParsingName(sourceFile, NULL, IID_PPV_ARGS(&psiItem));
-		EXIT_ON_ERROR(hr);
+	CComPtr<IShellItem> psiItem;
+	hr = afxGlobalData.ShellCreateItemFromParsingName(sourceFile, NULL, IID_PPV_ARGS(&psiItem));
+	EXIT_ON_ERROR(hr);
 
-		CComPtr<IShellItem> psiDestinationFolder;
-		CString pszPath = AddSlash(GetFolderOnly(destFile));
-		hr = afxGlobalData.ShellCreateItemFromParsingName(pszPath, NULL, IID_PPV_ARGS(&psiDestinationFolder));
-		EXIT_ON_ERROR(hr);
+	CComPtr<IShellItem> psiDestinationFolder;
+	CString pszPath = AddSlash(GetFolderOnly(destFile));
+	hr = afxGlobalData.ShellCreateItemFromParsingName(pszPath, NULL, IID_PPV_ARGS(&psiDestinationFolder));
+	EXIT_ON_ERROR(hr);
 
-		CComPtr<IFileOperation> pFileOperation;
-		hr = CoCreateInstance(CLSID_FileOperation,
-							  NULL,
-							  CLSCTX_INPROC_SERVER,
-							  IID_PPV_ARGS(&pFileOperation));
-		EXIT_ON_ERROR(hr);
+	CComPtr<IFileOperation> pFileOperation;
+	hr = CoCreateInstance(CLSID_FileOperation,
+						  NULL,
+						  CLSCTX_INPROC_SERVER,
+						  IID_PPV_ARGS(&pFileOperation));
+	EXIT_ON_ERROR(hr);
 
-		hr = pFileOperation->SetOperationFlags(FOF_UI_FLAGS | FOFX_NOMINIMIZEBOX);
-		EXIT_ON_ERROR(hr);
+	hr = pFileOperation->SetOperationFlags(FOF_UI_FLAGS | FOFX_NOMINIMIZEBOX);
+	EXIT_ON_ERROR(hr);
 
-		CString pszCopyName = GetFileOnly(destFile);
-		hr = pFileOperation->CopyItem(psiItem, psiDestinationFolder, pszCopyName, NULL);
-		EXIT_ON_ERROR(hr);
+	CString pszCopyName = GetFileOnly(destFile);
+	hr = pFileOperation->CopyItem(psiItem, psiDestinationFolder, pszCopyName, NULL);
+	EXIT_ON_ERROR(hr);
 
-		hr = pFileOperation->PerformOperations();
-	} else {
-		sourceFile += '\0';
-		destFile += '\0';
-
-		SHFILEOPSTRUCT SHFileOp = { 0 };
-		SHFileOp.hwnd	= NULL;
-		SHFileOp.wFunc	= FO_COPY;
-		SHFileOp.pFrom	= sourceFile;
-		SHFileOp.pTo	= destFile;
-		SHFileOp.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR;
-
-		hr = (SHFileOperation(&SHFileOp) == 0) ? S_OK : E_FAIL;
-	}
+	hr = pFileOperation->PerformOperations();
 
 	return hr;
 }
@@ -17898,7 +17865,7 @@ void CMainFrame::OnFileOpenDirectory()
 	CString strTitle = ResStr(IDS_MAINFRM_DIR_TITLE);
 	CString path;
 
-	if (IsWinVistaOrLater()) {
+	{
 		CFileDialog dlg(TRUE);
 		dlg.AddCheckButton(IDS_MAINFRM_DIR_CHECK, ResStr(IDS_MAINFRM_DIR_CHECK), TRUE);
 		IFileOpenDialog *openDlgPtr = dlg.GetIFileOpenDialog();
@@ -17932,34 +17899,6 @@ void CMainFrame::OnFileOpenDirectory()
 		} else {
 			return;
 		}
-	} else {
-		CString filter;
-		CAtlArray<CString> mask;
-		s.m_Formats.GetFilter(filter, mask);
-
-		COpenDirHelper::strLastOpenDir = s.strLastOpenDir;
-
-		TCHAR _path[_MAX_PATH];
-		COpenDirHelper::m_incl_subdir = TRUE;
-
-		BROWSEINFO bi;
-		bi.hwndOwner      = m_hWnd;
-		bi.pidlRoot       = NULL;
-		bi.pszDisplayName = _path;
-		bi.lpszTitle      = strTitle;
-		bi.ulFlags        = BIF_RETURNONLYFSDIRS | BIF_VALIDATE | BIF_STATUSTEXT;
-		bi.lpfn           = COpenDirHelper::BrowseCallbackProcDIR;
-		bi.lParam         = 0;
-		bi.iImage         = 0;
-
-		static PCIDLIST_ABSOLUTE iil;
-		iil = SHBrowseForFolder(&bi);
-		if (iil) {
-			SHGetPathFromIDList(iil, _path);
-		} else {
-			return;
-		}
-		path = _path;
 	}
 
 	path = AddSlash(path);

@@ -638,17 +638,15 @@ void CPPageFullscreen::ModesUpdate()
 		int nHeaderWidth = m_list.GetColumnWidth(nCol);
 		int nNewWidth = max(nColumnWidth, nHeaderWidth);
 		m_list.SetColumnWidth(nCol, nNewWidth);
-		if (IsWinVistaOrLater()) {
+		{
 			LVCOLUMN col;
 			col.mask = LVCF_MINWIDTH;
 			col.cxMin = nNewWidth;
 			m_list.SetColumn(nCol, &col);
 		}
 	}
-	if (IsWinVistaOrLater()) {
-		m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_COLUMNSNAPPOINTS);
-	}
 
+	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_COLUMNSNAPPOINTS);
 	m_list.SetRedraw(TRUE);
 }
 

@@ -57,7 +57,7 @@ CPPageFormats::CPPageFormats()
 	, m_list(0)
 	, m_bInsufficientPrivileges(false)
 {
-	if (!m_pAAR && IsWinVistaOrLater() && !IsWin10orLater()) {
+	if (!m_pAAR && !IsWin10orLater()) {
 		// Default manager (requires at least Vista)
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 									  NULL,
@@ -189,28 +189,26 @@ static int GetIconIndex(LPCTSTR ext)
 
 bool CPPageFormats::RegisterApp()
 {
-	if (IsWinVistaOrLater()) {
-		CString AppIcon;
+	CString AppIcon;
 
-		AppIcon = GetProgramPath();
-		AppIcon = "\""+AppIcon+"\"";
-		AppIcon += _T(",0");
+	AppIcon = GetProgramPath();
+	AppIcon = "\""+AppIcon+"\"";
+	AppIcon += _T(",0");
 
-		// Register MPC for the windows "Default application" manager
-		CRegKey key;
+	// Register MPC for the windows "Default application" manager
+	CRegKey key;
 
-		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\RegisteredApplications"))) {
-			key.SetStringValue(_T("MPC-BE"), GetRegisteredKey());
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\RegisteredApplications"))) {
+		key.SetStringValue(_T("MPC-BE"), GetRegisteredKey());
 
-			if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE, GetRegisteredKey())) {
-				return false;
-			}
-
-			// ==>>  TODO icon !!!
-			key.SetStringValue(_T("ApplicationDescription"), ResStr(IDS_APP_DESCRIPTION), REG_EXPAND_SZ);
-			key.SetStringValue(_T("ApplicationIcon"), AppIcon, REG_EXPAND_SZ);
-			key.SetStringValue(_T("ApplicationName"), ResStr(IDR_MAINFRAME), REG_EXPAND_SZ);
+		if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE, GetRegisteredKey())) {
+			return false;
 		}
+
+		// ==>>  TODO icon !!!
+		key.SetStringValue(_T("ApplicationDescription"), ResStr(IDS_APP_DESCRIPTION), REG_EXPAND_SZ);
+		key.SetStringValue(_T("ApplicationIcon"), AppIcon, REG_EXPAND_SZ);
+		key.SetStringValue(_T("ApplicationName"), ResStr(IDR_MAINFRAME), REG_EXPAND_SZ);
 	}
 
 	return true;
@@ -716,7 +714,7 @@ BOOL CPPageFormats::OnInitDialog()
 
 	CreateToolTip();
 
-	if (IsWinVistaOrLater() && !IsUserAdmin()) {
+	if (!IsUserAdmin()) {
 		GetDlgItem(IDC_BUTTON1)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_BUTTON3)->ShowWindow(SW_HIDE);
 		GetDlgItem(IDC_BUTTON4)->ShowWindow(SW_HIDE);

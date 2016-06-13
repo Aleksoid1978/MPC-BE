@@ -320,7 +320,7 @@ void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaptio
 	lf.lfHeight = rect.Height();
 	lf.lfWidth = 0;
 	// <MPC-BE Custom Code>
-	CString face = IsWinVistaOrLater() ? _T("Segoe UI") : _T("Arial");
+	CString face = _T("Segoe UI");
 	_tcscpy_s(lf.lfFaceName, face);
 	// <MPC-BE Custom Code>
 	CFont f;
