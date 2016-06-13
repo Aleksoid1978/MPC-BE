@@ -1,5 +1,5 @@
 /*
- * (C) 2015 see Authors.txt
+ * (C) 2015-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -18,11 +18,12 @@
  *
  */
 
-#ifndef _MSC_VER
-#include <windows.h>
+#ifdef __GNUC__
+    #include <windows.h>
+    #include "compat/windows/dxva_hevc.h"
+#else
+    #include <dxva.h>
 #endif
-
-#include "compat/windows/dxva_hevc.h"
 
 #define MAX_HEVC_SLICES 256
 
