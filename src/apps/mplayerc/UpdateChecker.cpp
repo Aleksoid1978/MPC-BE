@@ -90,11 +90,6 @@ Update_Status UpdateChecker::CheckNewVersion()
 			} else {
 				updatestatus = UPDATER_NO_NEW_VERSION;
 			}
-
-			if (IsWinXP() && (m_UpdateVersion.major >= 1 || m_UpdateVersion.major == 1 && m_UpdateVersion.minor >= 4)) {
-				// MPC-BE 1.5.x or later will not support Windows XP
-				updatestatus = UPDATER_NO_NEW_VERSION;
-			}
 		}
 	}
 
