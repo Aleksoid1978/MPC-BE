@@ -1695,8 +1695,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	CheckPointer(m_pAVCodec, VFW_E_UNSUPPORTED_VIDEO);
 
 	if (bChangeType) {
-		m_bReorderBFrame = !IsWinVistaOrLater()
-						   && (((m_nCodecId == AV_CODEC_ID_H264) && IsAVI()) || m_nCodecId == AV_CODEC_ID_VC1);
+		m_bReorderBFrame = false;
 
 		const CLSID clsidInput = GetCLSID(m_pInput->GetConnected());
 		const BOOL bNotTrustSourceTimeStamp = (clsidInput == GUIDFromCString(L"{A2E7EDBB-DCDD-4C32-A2A9-0CFBBE6154B4}") // Daum PotPlayer's MKV Source
@@ -1839,9 +1838,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 					break;
 				}
 
-				if (m_nPCIVendor == PCIV_Intel && !IsWinVistaOrLater()) {
-					break; // Disable support H.264 DXVA on Intel in WinXP ...
-				}
 				int nCompat = FFH264CheckCompatibility(PictWidthAligned(), PictHeightAligned(), m_pAVCtx, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion);
 
 				if ((nCompat & DXVA_PROFILE_HIGHER_THAN_HIGH) || (nCompat & DXVA_HIGH_BIT)) { // DXVA unsupported
@@ -2288,13 +2284,6 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		}
 
 		DetectVideoCard_EVR(pReceivePin);
-
-		if (m_bReorderBFrame && !IsWinVistaOrLater()) {
-			const CLSID inputCLISD = GetCLSID(m_pInput->GetConnected());
-			if (inputCLISD == __uuidof(CMpegSourceFilter) || inputCLISD == __uuidof(CMpegSplitterFilter)) {
-				m_bReorderBFrame = false;
-			}
-		}
 	}
 
 	return __super::CompleteConnect (direction, pReceivePin);

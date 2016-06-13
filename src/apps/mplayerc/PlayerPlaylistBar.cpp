@@ -724,9 +724,6 @@ static void GetNonClientMetrics(NONCLIENTMETRICS* ncm)
 {
 	ZeroMemory(ncm, sizeof(NONCLIENTMETRICS));
 	ncm->cbSize = sizeof(NONCLIENTMETRICS);
-	if (!IsWinVistaOrLater()) {
-		ncm->cbSize -= sizeof(ncm->iPaddedBorderWidth);
-	}
 	VERIFY(SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm->cbSize, ncm, 0));
 }
 
