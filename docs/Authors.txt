@@ -2,27 +2,27 @@
 On the basis of the source code of the "Media Player Classic Home Cinema", Casimir666 (casimir666@users.sourceforge.net).
 The GUI on the basis of the original patch Bobdynlan (bobdynlan@users.sourceforge.net), with the adaptation of Leo1000 (leothousan@users.sourceforge.net).
 
-Active: (with SVN commit rights)
+Active:
 --------
 aleksoid (Admin, Senior Software Engineer, Forum moderator, Code) - Aleksoid1978@mail.ru, Russia
-Angel (Admin) - Russia
+Angel (Forum administrator) - Russia
 arestarh1986 (Documentation) - Ukraine
-Dimbat (Design) - zingerus@mail.ru, Russia
-judelaw (Code) - judelaw@mpc-next.ru, Ukraine
-kinjalka (Code) - Russia
 szl/alexins (Software Engineer Technologist) - mpcbe@outlook.com, icq:6531931, Republic of Slovenia
 v0lt (Admin, Forum moderator, Code) - Russia
-u_shell (Documentacion translator) - Russia
 
 Inactive:
 ----------
+Dimbat (Design) - zingerus@mail.ru, Russia
 exodus8 (Code) - Russia
+judelaw (Code) - judelaw@mpc-next.ru, Ukraine
+kinjalka (Code) - Russia
 leothousan (Code)
+u_shell (Documentacion translator) - Russia
 
 Translators:
 -------------
 Basque - azpidatziak - Xabier Aramendi (azpidatziak@users.sourceforge.net)
-Chinese (Simplified) - insolo
+Chinese (Simplified) - insolo, beter
 Chinese (Traditional) - beter
 Dutch - beter
 German - Markus Gaugg (gaugg@gmx.at), Sylt, Luan, Klaus
