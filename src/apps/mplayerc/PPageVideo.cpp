@@ -195,12 +195,6 @@ BOOL CPPageVideo::OnInitDialog()
 
 		switch (nID) {
 		case VIDRNDT_SYSDEFAULT:		sName = ResStr(IDS_PPAGE_OUTPUT_SYS_DEF);			break;
-		case VIDRNDT_OVERLAYMIXER:
-			if (!IsWinXP()) {
-				return;
-			}
-			sName = ResStr(IDS_PPAGE_OUTPUT_OVERLAYMIXER);
-			break;
 		case VIDRNDT_VMR7WINDOWED:		sName = ResStr(IDS_PPAGE_OUTPUT_VMR7WINDOWED);		break;
 		case VIDRNDT_VMR9WINDOWED:		sName = ResStr(IDS_PPAGE_OUTPUT_VMR9WINDOWED);		break;
 		case VIDRNDT_VMR7RENDERLESS:	sName = ResStr(IDS_PPAGE_OUTPUT_VMR7RENDERLESS);	break;
