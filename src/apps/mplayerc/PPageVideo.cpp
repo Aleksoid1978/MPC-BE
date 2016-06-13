@@ -362,7 +362,7 @@ void CPPageVideo::UpdateResizerList(int select)
 	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Bilinear"), RESIZER_BILINEAR);
 
 #if DXVAVP
-	if (IsWinVistaOrLater() && (D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
+	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"DXVA2"), RESIZER_DXVA2);
 	}
 #endif
@@ -704,14 +704,14 @@ void CPPageVideo::OnBnClickedDefault()
 
 	UpdateData(FALSE);
 
-	m_cbAPSurfaceUsage.SetCurSel(IsWinVistaOrLater() ? SURFACE_TEXTURE3D : SURFACE_TEXTURE2D);
+	m_cbAPSurfaceUsage.SetCurSel(SURFACE_TEXTURE3D);
 	m_cbEVROutputRange.SetCurSel(0);
-	m_chkVMRMixerMode.SetCheck(IsWinVistaOrLater() ? BST_CHECKED : BST_UNCHECKED);
-	m_chkVMRMixerYUV.SetCheck(IsWinVistaOrLater() ? BST_CHECKED : BST_UNCHECKED);
+	m_chkVMRMixerMode.SetCheck(BST_CHECKED);
+	m_chkVMRMixerYUV.SetCheck(BST_CHECKED);
 
 	m_chkD3DFullscreen.SetCheck(BST_UNCHECKED);
 	m_chk10bitOutput.SetCheck(BST_UNCHECKED);
-	m_cbAPSurfaceUsage.SetCurSel(IsWinVistaOrLater() ? SURFACE_TEXTURE3D : SURFACE_TEXTURE2D);
+	m_cbAPSurfaceUsage.SetCurSel(SURFACE_TEXTURE3D);
 
 	SelectByItemData(m_cbDX9SurfaceFormat, D3DFMT_X8R8G8B8);
 	UpdateResizerList(RESIZER_BILINEAR);

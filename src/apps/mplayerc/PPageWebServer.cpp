@@ -185,7 +185,7 @@ bool CPPageWebServer::PickDir(CString& dir)
 	CString strTitle = ResStr(IDS_PPAGEWEBSERVER_0);
 	bool success = false;
 
-	if (IsWinVistaOrLater()) {
+	{
 		CFileDialog dlg(TRUE);
 		IFileOpenDialog *openDlgPtr = dlg.GetIFileOpenDialog();
 
@@ -204,26 +204,6 @@ bool CPPageWebServer::PickDir(CString& dir)
 			}
 
 			openDlgPtr->Release();
-		}
-	} else {
-		TCHAR buff[_MAX_PATH];
-
-		BROWSEINFO bi;
-		bi.hwndOwner = m_hWnd;
-		bi.pidlRoot = NULL;
-		bi.pszDisplayName = buff;
-		bi.lpszTitle = strTitle;
-		bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_VALIDATE | BIF_USENEWUI;
-		bi.lpfn = BrowseCtrlCallback;
-		bi.lParam = (LPARAM)(LPCTSTR)dir;
-		bi.iImage = 0;
-
-		PCIDLIST_ABSOLUTE iil = SHBrowseForFolder(&bi);
-
-		if (iil) {
-			SHGetPathFromIDList(iil, buff);
-			dir = buff;
-			success =  true;
 		}
 	}
 

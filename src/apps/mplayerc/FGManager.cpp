@@ -2881,11 +2881,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				break;
 		}
 	} else {
-		if (IsWinVistaOrLater()) {
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"EVR - Preview Window", MERIT64_ABOVE_DSHOW + 2));
-		} else {
-			m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"VMR9 - Preview window", MERIT64_ABOVE_DSHOW + 2));
-		}
+		m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"EVR - Preview Window", MERIT64_ABOVE_DSHOW + 2));
 	}
 
 	if (!m_bIsPreview) {
@@ -2901,7 +2897,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				pFGF = DNew CFGFilterInternal<CNullUAudioRenderer>(AUDRNDT_NULL_UNCOMP, m_armerit);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 				m_transform.AddTail(pFGF);
-			} else if (SelAudioRenderer == AUDRNDT_MPC && IsWinVistaOrLater()) {
+			} else if (SelAudioRenderer == AUDRNDT_MPC) {
 				pFGF = DNew CFGFilterInternal<CMpcAudioRenderer>(AUDRNDT_MPC, m_armerit);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_PCM);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IEEE_FLOAT);

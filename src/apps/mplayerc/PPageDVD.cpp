@@ -281,7 +281,7 @@ void CPPageDVD::OnBnClickedButton1()
 	CString path;
 	CString strTitle = ResStr(IDS_MAINFRM_46);
 
-	if (IsWinVistaOrLater()) {
+	{
 		CFileDialog dlg(TRUE);
 		IFileOpenDialog *openDlgPtr = dlg.GetIFileOpenDialog();
 
@@ -297,25 +297,6 @@ void CPPageDVD::OnBnClickedButton1()
 			openDlgPtr->Release();
 
 			path = dlg.GetFolderPath();
-		}
-	} else {
-		TCHAR _path[_MAX_PATH];
-
-		BROWSEINFO bi;
-		bi.hwndOwner = m_hWnd;
-		bi.pidlRoot = NULL;
-		bi.pszDisplayName = _path;
-		bi.lpszTitle = strTitle;
-		bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_VALIDATE | BIF_USENEWUI | BIF_NONEWFOLDERBUTTON;
-		bi.lpfn = NULL;
-		bi.lParam = 0;
-		bi.iImage = 0;
-
-		static PCIDLIST_ABSOLUTE iil = SHBrowseForFolder(&bi);
-
-		if (iil) {
-			SHGetPathFromIDList(iil, _path);
-			path = _path;
 		}
 	}
 

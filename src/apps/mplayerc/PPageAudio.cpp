@@ -158,7 +158,7 @@ BOOL CPPageAudio::OnInitDialog()
 	static CString AudioDevAddon[] = {
 		AUDRNDT_NULL_COMP,
 		AUDRNDT_NULL_UNCOMP,
-		IsWinVistaOrLater() ? AUDRNDT_MPC : L""
+		AUDRNDT_MPC
 	};
 
 	for (size_t idx = 0; idx < _countof(AudioDevAddon); idx++) {

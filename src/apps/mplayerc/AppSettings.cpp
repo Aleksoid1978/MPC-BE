@@ -1009,7 +1009,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	if (nSpeedStep != 10 && nSpeedStep != 20 && nSpeedStep != 25 && nSpeedStep != 50 && nSpeedStep != 100) {
 		nSpeedStep = 0;
 	}
-	iVideoRenderer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DSVIDEORENDERERTYPE, (IsWinVistaOrLater() ? (CMPlayerCApp::HasEVR() ? VIDRNDT_EVR_CUSTOM : VIDRNDT_SYSDEFAULT) : VIDRNDT_VMR7WINDOWED) );
+	iVideoRenderer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DSVIDEORENDERERTYPE, (CMPlayerCApp::HasEVR() ? VIDRNDT_EVR_CUSTOM : VIDRNDT_SYSDEFAULT));
 
 	LoadRenderers();
 
@@ -1064,8 +1064,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	fUseTimeTooltip = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, TRUE);
 	nTimeTooltipPosition = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, TIME_TOOLTIP_ABOVE_SEEKBAR);
-	nOSDSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_OSD_SIZE, IsWinVistaOrLater() ? 18 : 20);
-	strOSDFont= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_MPC_OSD_FONT, IsWinVistaOrLater() ? _T("Segoe UI") : _T("Arial"));
+	nOSDSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_OSD_SIZE, 18);
+	strOSDFont= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_MPC_OSD_FONT, _T("Segoe UI"));
 
 	// Associated types with icon or not...
 	fAssociatedWithIcons	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, 1);
@@ -1713,10 +1713,10 @@ void CAppSettings::LoadRenderers()
 	CRenderersSettings& rs = m_RenderersSettings;
 	CRenderersSettings::CAdvRendererSettings& ars = rs.m_AdvRendSets;
 
-	rs.iSurfaceType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, (IsWinVistaOrLater() ? SURFACE_TEXTURE3D : SURFACE_TEXTURE2D));
+	rs.iSurfaceType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, SURFACE_TEXTURE3D);
 	rs.iResizer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, 1);
-	rs.bVMRMixerMode = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, IsWinVistaOrLater() ? TRUE : FALSE);
-	rs.bVMRMixerYUV = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, IsWinVistaOrLater() ? TRUE : FALSE);
+	rs.bVMRMixerMode = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, TRUE);
+	rs.bVMRMixerYUV = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, TRUE);
 
 	CRenderersSettings::CAdvRendererSettings DefaultSettings;
 	ars.bAlterativeVSync = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("VMRAlternateVSync"), DefaultSettings.bAlterativeVSync);

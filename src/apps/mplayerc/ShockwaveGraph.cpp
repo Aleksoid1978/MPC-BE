@@ -51,22 +51,20 @@ CShockwaveGraph::CShockwaveGraph(HWND hParent, HRESULT& hr)
 	}
 	m_wndDestFrame.put_BackgroundColor(0);
 
-	if (IsWinVistaOrLater()) {
-		CComPtr<IMMDeviceEnumerator> pDeviceEnumerator;
-		if (SUCCEEDED(pDeviceEnumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator)))) {
-			CComPtr<IMMDevice> pDevice;
-			if (SUCCEEDED(pDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &pDevice))) {
-				CComPtr<IAudioSessionManager> pSessionManager;
-				if (SUCCEEDED(pDevice->Activate(__uuidof(IAudioSessionManager), CLSCTX_ALL, nullptr,
-												reinterpret_cast<void**>(&pSessionManager)))) {
-					if (SUCCEEDED(pSessionManager->GetSimpleAudioVolume(nullptr, FALSE, &m_pSimpleVolume))) {
-						VERIFY(SUCCEEDED(m_pSimpleVolume->GetMasterVolume(&m_fInitialVolume)));
-					}
+	CComPtr<IMMDeviceEnumerator> pDeviceEnumerator;
+	if (SUCCEEDED(pDeviceEnumerator.CoCreateInstance(__uuidof(MMDeviceEnumerator)))) {
+		CComPtr<IMMDevice> pDevice;
+		if (SUCCEEDED(pDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &pDevice))) {
+			CComPtr<IAudioSessionManager> pSessionManager;
+			if (SUCCEEDED(pDevice->Activate(__uuidof(IAudioSessionManager), CLSCTX_ALL, nullptr,
+											reinterpret_cast<void**>(&pSessionManager)))) {
+				if (SUCCEEDED(pSessionManager->GetSimpleAudioVolume(nullptr, FALSE, &m_pSimpleVolume))) {
+					VERIFY(SUCCEEDED(m_pSimpleVolume->GetMasterVolume(&m_fInitialVolume)));
 				}
 			}
 		}
-		ASSERT(m_pSimpleVolume);
 	}
+	ASSERT(m_pSimpleVolume);
 }
 
 CShockwaveGraph::~CShockwaveGraph()

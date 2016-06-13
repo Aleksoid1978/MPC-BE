@@ -1081,9 +1081,7 @@ int CPlayerListCtrl::InsertColumn(_In_ int nCol, _In_z_ LPCTSTR lpszColumnHeadin
 		_In_ int nFormat, _In_ int nWidth, _In_ int nSubItem, _In_ int nMinWidth)
 {
 	nCol = __super::InsertColumn(nCol, lpszColumnHeading, nFormat, nWidth, nSubItem);
-	if (nCol != -1
-			&& nMinWidth > 0
-			&& IsWinVistaOrLater()) {
+	if (nCol != -1 && nMinWidth > 0) {
 		LVCOLUMN col;
 		col.mask	= LVCF_MINWIDTH;
 		col.cxMin	= nMinWidth;

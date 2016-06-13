@@ -251,12 +251,7 @@ CFGManagerBDA::CFGManagerBDA(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd)
 	m_DVBStreams[DVB_TIF]	= CDVBStream(L"tif",	&mt_Tif, true);
 	m_DVBStreams[DVB_EPG]	= CDVBStream(L"epg",	&mt_Epg);
 
-	// Warning : MEDIA_ELEMENTARY_STREAM didn't work for subtitles with Windows XP!
-	if (IsWinVistaOrLater()) {
-		m_DVBStreams[DVB_SUB]	= CDVBStream(L"sub",	&mt_Subtitle/*, false, MEDIA_TRANSPORT_PAYLOAD*/);
-	} else {
-		m_DVBStreams[DVB_SUB]	= CDVBStream(L"sub",	&mt_Subtitle, false, MEDIA_TRANSPORT_PAYLOAD);
-	}
+	m_DVBStreams[DVB_SUB]	= CDVBStream(L"sub",	&mt_Subtitle/*, false, MEDIA_ELEMENTARY_STREAM*/);
 
 	m_nCurVideoType			= DVB_MPV;
 	m_nCurAudioType			= DVB_MPA;

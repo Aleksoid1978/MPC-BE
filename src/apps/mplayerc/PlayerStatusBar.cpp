@@ -83,11 +83,9 @@ void CPlayerStatusBar::ScaleFontInternal()
 {
 	m_font.DeleteObject();
 
-	int size = IsWinVistaOrLater() ? 13 : 14;
-	CString face = IsWinVistaOrLater() ? L"Tahoma" : L"Microsoft Sans Serif";
-	m_font.CreateFont(AfxGetMainFrame()->ScaleY(size), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+	m_font.CreateFont(AfxGetMainFrame()->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
 					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
-					  face);
+					  L"Tahoma");
 }
 
 int CPlayerStatusBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
