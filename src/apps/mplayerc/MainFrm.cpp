@@ -5733,13 +5733,8 @@ void CMainFrame::OnFileSaveAs()
 	}
 
 	if (::PathIsURL(in)) {
-		if (CTaskDialog::IsSupported()) {
-			CSaveTaskDlg dlg(in, name, p);
-			dlg.DoModal();
-		} else {
-			CSaveDlg dlg(in, name, p);
-			dlg.DoModal();
-		}
+		CSaveDlg dlg(in, name, p);
+		dlg.DoModal();
 	} else {
 		CopyFiles(in, p);
 	}

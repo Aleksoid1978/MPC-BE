@@ -24,48 +24,12 @@
 #include <afxcmn.h>
 #include <afxwin.h>
 #include <afxtaskdialog.h>
-#include <ResizableLib/ResizableDialog.h>
 
 // CSaveDlg dialog
 
-class CSaveDlg : public CCmdUIDialog
+class CSaveDlg : public CTaskDialog
 {
 	DECLARE_DYNAMIC(CSaveDlg)
-
-private:
-	CString m_in, m_name, m_out;
-	CComPtr<IGraphBuilder> pGB;
-	CComQIPtr<IMediaControl> pMC;
-	CComQIPtr<IMediaEventEx> pME;
-	CComQIPtr<IMediaSeeking> pMS;
-	UINT_PTR m_nIDTimerEvent;
-
-public:
-	CSaveDlg(CString in, CString name, CString out, CWnd* pParent = NULL);
-	virtual ~CSaveDlg();
-
-	enum { IDD = IDD_SAVE_DLG };
-	CAnimateCtrl m_anim;
-	CProgressCtrl m_progress;
-	CStatic m_report;
-	CStatic m_fromto;
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);
-	virtual BOOL OnInitDialog();
-
-	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnBnClickedCancel();
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	afx_msg LRESULT OnGraphNotify(WPARAM wParam, LPARAM lParam);
-};
-
-// CSaveTaskDlg dialog
-
-class CSaveTaskDlg : public CTaskDialog
-{
-	DECLARE_DYNAMIC(CSaveTaskDlg)
 
 private:
 	CString m_in, m_out;
@@ -73,12 +37,12 @@ private:
 	CComQIPtr<IMediaControl> pMC;
 	CComQIPtr<IMediaEventEx> pME;
 	CComQIPtr<IMediaSeeking> pMS;
-	HICON	m_hIcon;
-	HWND	m_TaskDlgHwnd;
+	HICON m_hIcon;
+	HWND  m_TaskDlgHwnd;
 
 public:
-	CSaveTaskDlg(CString in, CString name, CString out);
-	virtual ~CSaveTaskDlg();
+	CSaveDlg(CString in, CString name, CString out);
+	virtual ~CSaveDlg();
 
 protected:
 	virtual HRESULT OnInit();
