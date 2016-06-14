@@ -50,13 +50,7 @@
     <None Include="res\film_add.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\film_add_XP.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\film_go.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\film_go_XP.bmp">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

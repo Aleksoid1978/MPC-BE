@@ -97,13 +97,8 @@ HBITMAP TransparentBMP(HBITMAP hBmp)
 
 CMPCBEContextMenu::CMPCBEContextMenu()
 {
-	if (IsWindowsVistaOrGreater()) {
-		m_hPlayBmp	= LoadBitmap( _AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_MPCBEBMP_PLAY));
-		m_hAddBmp	= LoadBitmap( _AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_MPCBEBMP_ADD));
-	} else {
-		m_hPlayBmp	= LoadBitmap( _AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_MPCBEBMP_PLAY_XP));
-		m_hAddBmp	= LoadBitmap( _AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_MPCBEBMP_ADD_XP));
-	}
+	m_hPlayBmp = LoadBitmap(_AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_MPCBEBMP_PLAY));
+	m_hAddBmp  = LoadBitmap(_AtlBaseModule.GetModuleInstance(), MAKEINTRESOURCE(IDB_MPCBEBMP_ADD));
 }
 
 CMPCBEContextMenu::~CMPCBEContextMenu()
