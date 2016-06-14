@@ -100,15 +100,16 @@ ULONGLONG CAsyncFileReader::GetLength() const
 			goto again; \
 		} \
 	} \
-} \
+}
 
 STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE* pBuffer)
 {
 	do {
+		if ((ULONGLONG)llPosition + lLength > GetLength()) {
+			return E_FAIL;
+		}
+
 		if (!m_url.IsEmpty()) {
-			if ((ULONGLONG)llPosition + lLength > GetLength()) {
-				return E_FAIL;
-			}
 again:
 			if (m_pos != llPosition) {
 				if (llPosition > m_pos && (llPosition - m_pos) <= 64 * KILOBYTE) {
@@ -147,9 +148,6 @@ again:
 		}
 
 		try {
-			if ((ULONGLONG)llPosition + lLength > GetLength()) {
-				return E_FAIL; // strange, but the Seek below can return llPosition even if the file is not that big (?)
-			}
 			if ((ULONGLONG)llPosition != Seek(llPosition, FILE_BEGIN)) {
 				return E_FAIL;
 			}
