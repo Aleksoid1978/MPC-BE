@@ -1,9 +1,7 @@
-﻿Part A: Preparing the Visual Studio 2013/2015 environment
+﻿Part A: Preparing the Visual Studio 2015 environment
 
- Visual Studio 2013
-  1. Install Visual C++ 2013, part of Visual Studio 2013 with Update 5 (Express won't work, other editions work fine).
  Visual Studio 2015
-  1. Install Visual C++ 2015, part of Visual Studio 2015 with Update 1 (any edition will work fine).
+  1. Install Visual C++ 2015, part of Visual Studio 2015 with Update 2 (any edition will work fine).
 
   Download URL: http://www.visualstudio.com/downloads/download-visual-studio-vs
 
@@ -33,7 +31,7 @@ Part C: Downloading and compiling the MPC-BE source
 
 3. Open folder "C:\mpc-be\"
    Execute the batch file update_gcc.bat (it is necessary to do to copy the files libgcc.a and libmingwex.a, in the folders "lib" and "lib64")
-4. Open the solution file: C:\mpc-be\mpc-be_2013.sln 
+4. Open the solution file: C:\mpc-be\mpc-be.sln 
    Change the solution's configuration to "Release" (in the toolbar).
 
 5. Press OK to save the changes and close the Properties window.
@@ -51,6 +49,6 @@ Alternatively, you can use build.bat (run: build.bat help for more info)
 
 Part D: Building the installer
 
-Download Inno Setup Unicode v5.5.5 or newer from: http://www.jrsoftware.org/isdl.php
+Download Inno Setup Unicode v5.5.8 or newer from: http://www.jrsoftware.org/isdl.php
 Install everything and then go to C:\mpc-be\distrib, open mpc-be_setup.iss with Inno Setup, read the first comments in the script and compile it.
 Note: Use Inno Setup's built-in IDE.

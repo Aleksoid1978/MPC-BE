@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2015 see Authors.txt
+REM (C) 2009-2016 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -34,7 +34,6 @@ SET ARGPA=0
 SET ARGIN=0
 SET ARGZI=0
 SET INPUT=0
-SET ARGVS=0
 SET ARGSIGN=0
 
 IF /I "%ARG%" == "?"          GOTO ShowHelp
@@ -61,8 +60,6 @@ FOR %%A IN (%ARG%) DO (
   IF /I "%%A" == "Packages"   SET "PACKAGES=True"     & SET /A ARGPA+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Installer"  SET "INSTALLER=True"    & SET /A ARGIN+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Zip"        SET "ZIP=True"          & SET /A ARGZI+=1 & SET /A ARGCL+=1 & SET /A ARGM+=1
-  IF /I "%%A" == "VS2013"     SET "COMPILER=VS2013"   & SET /A ARGVS+=1
-  IF /I "%%A" == "VS2015"     SET "COMPILER=VS2015"   & SET /A ARGVS+=1
   IF /I "%%A" == "Sign"       SET "SIGN=True"         & SET /A ARGSIGN+=1
 )
 
@@ -75,7 +72,7 @@ IF DEFINED MINGW64 (SET MPCBE_MINGW64=%MINGW64%) ELSE (GOTO MissingVar)
 IF DEFINED MSYS    (SET MPCBE_MSYS=%MSYS%)       ELSE (GOTO MissingVar)
 
 FOR %%X IN (%*) DO SET /A INPUT+=1
-SET /A VALID=%ARGB%+%ARGPL%+%ARGC%+%ARGBC%+%ARGPA%+%ARGIN%+%ARGZI%+%ARGVS%+%ARGSIGN%
+SET /A VALID=%ARGB%+%ARGPL%+%ARGC%+%ARGBC%+%ARGPA%+%ARGIN%+%ARGZI%+%ARGSIGN%
 
 IF %VALID% NEQ %INPUT% GOTO UnsupportedSwitch
 
@@ -86,7 +83,6 @@ IF %ARGBC% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGBC% == 0 (SET "BUILDCFG=Re
 IF %ARGPA% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGPA% == 0 (SET "PACKAGES=False")
 IF %ARGIN% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGIN% == 0 (SET "INSTALLER=False")
 IF %ARGZI% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGZI% == 0 (SET "ZIP=False")
-IF %ARGVS% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGVS% == 0 (SET "COMPILER=AUTODETECT")
 IF %ARGCL% GTR 1 (GOTO UnsupportedSwitch)
 IF %ARGD%  GTR 1 (GOTO UnsupportedSwitch)
 IF %ARGF%  GTR 1 (GOTO UnsupportedSwitch)
@@ -94,25 +90,10 @@ IF %ARGM%  GTR 1 (GOTO UnsupportedSwitch)
 
 IF /I "%PACKAGES%" == "True" SET "INSTALLER=True" & SET "ZIP=True"
 
-IF /I "%COMPILER%" == "AUTODETECT" (
-  IF DEFINED VS120COMNTOOLS (
-    SET "COMPILER=VS2013"
-  ) ELSE IF DEFINED VS140COMNTOOLS (
-    SET "COMPILER=VS2015"
-  ) ELSE GOTO MissingVar
-)
-
-IF /I "%COMPILER%" == "VS2015" (
-  SET SLN=_2015
-  SET BUILD=VS2015
-  SET "VSCOMNTOOLS=%VS140COMNTOOLS%"
-  SET "BIN=bin15"
-) ELSE IF /I "%COMPILER%" == "VS2013" (
-  SET SLN=_2013
-  SET BUILD=VS2013
-  SET "VSCOMNTOOLS=%VS120COMNTOOLS%"
-  SET "BIN=bin13"
-)
+rem SET SLN=_2015
+SET BUILD=VS2015
+SET "VSCOMNTOOLS=%VS140COMNTOOLS%"
+SET "BIN=bin"
 
 IF NOT DEFINED VSCOMNTOOLS GOTO MissingVar
 
@@ -323,13 +304,6 @@ EXIT /B
 
 :SubCreateInstaller
 IF "%~1" == "x64" SET ISDefs=/Dx64Build
-IF /I "%COMPILER%" == "VS2012" (
-  SET ISDefs=%ISDefs% /DVS2012
-) ELSE IF /I "%COMPILER%" == "VS2013" (
-  SET ISDefs=%ISDefs% /DVS2013
-) ELSE IF /I "%COMPILER%" == "VS2015" (
-  SET ISDefs=%ISDefs% /DVS2015
-)
 
 CALL :SubDetectInnoSetup
 
@@ -495,7 +469,7 @@ EXIT /B
 TITLE %~nx0 Help
 ECHO.
 ECHO Usage:
-ECHO %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|Both] [Main^|Resources^|MPCBE^|Filters^|All] [Debug^|Release] [Packages^|Installer^|Zip] [VS2013^|VS2015] [Sign]
+ECHO %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|Both] [Main^|Resources^|MPCBE^|Filters^|All] [Debug^|Release] [Packages^|Installer^|Zip] [Sign]
 ECHO.
 ECHO Notes: You can also prefix the commands with "-", "--" or "/".
 ECHO        Debug only applies to mpc-be.sln.
@@ -505,14 +479,14 @@ ECHO Executing %~nx0 without any arguments will use the default ones:
 ECHO "%~nx0 Build Both Release"
 ECHO. & ECHO.
 ECHO Examples:
-ECHO %~nx0 x86 Resources VS2013 -Builds the x86 resources
-ECHO %~nx0 Resources VS2013     -Builds both x86 and x64 resources
-ECHO %~nx0 x86 VS2013           -Builds x86 Main exe and the x86 resources
-ECHO %~nx0 x86 Debug VS2013     -Builds x86 Main Debug exe and x86 resources
-ECHO %~nx0 x86 Filters VS2013   -Builds x86 Filters
-ECHO %~nx0 x86 All VS2013       -Builds x86 Main exe, x86 Filters and the x86 resources
-ECHO %~nx0 x86 Packages VS2013  -Builds x86 Main exe, x86 resources and creates the installer and the .7z package
-ECHO %~nx0 x86 VS2013 Sign      -Builds x86 Main exe and the x86 resources and signing output files
+ECHO %~nx0 x86 Resources -Builds the x86 resources
+ECHO %~nx0 Resources     -Builds both x86 and x64 resources
+ECHO %~nx0 x86           -Builds x86 Main exe and the x86 resources
+ECHO %~nx0 x86 Debug     -Builds x86 Main Debug exe and x86 resources
+ECHO %~nx0 x86 Filters   -Builds x86 Filters
+ECHO %~nx0 x86 All       -Builds x86 Main exe, x86 Filters and the x86 resources
+ECHO %~nx0 x86 Packages  -Builds x86 Main exe, x86 resources and creates the installer and the .7z package
+ECHO %~nx0 x86 Sign      -Builds x86 Main exe and the x86 resources and signing output files
 ECHO.
 ENDLOCAL
 EXIT /B

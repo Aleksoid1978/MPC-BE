@@ -23,7 +23,6 @@
 #define localize
 #define sse_required
 ; #define x64Build
-; #define VS2015
 
 ; Don't forget to update the DirectX SDK number in "include\Version.h" (not updated so often)
 
@@ -47,10 +46,7 @@
 #define app_version_svn  str(MPC_VERSION_MAJOR) + "." + str(MPC_VERSION_MINOR) + "." + str(MPC_VERSION_PATCH) + "." + str(MPC_VERSION_REV)
 #define quick_launch     "{userappdata}\Microsoft\Internet Explorer\Quick Launch"
 
-#define bin_dir        = "..\bin13"
-#if defined(VS2015)
-  #define bin_dir      = "..\bin15"
-#endif
+#define bin_dir        = "..\bin"
 
 #define bindir_x64 = bin_dir + "\mpc-be_x64"
 #define bindir_x86 = bin_dir + "\mpc-be_x86"

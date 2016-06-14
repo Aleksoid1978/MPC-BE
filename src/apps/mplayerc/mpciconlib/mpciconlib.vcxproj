@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
@@ -39,10 +39,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\mpc-be_x86\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='120'">$(SolutionDir)bin13\mpc-be_x64\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32' And '$(PlatformToolsetVersion)'=='140'">$(SolutionDir)bin15\mpc-be_x86\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64' And '$(PlatformToolsetVersion)'=='140'">$(SolutionDir)bin15\mpc-be_x64\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)bin\mpc-be_x86\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)bin\mpc-be_x64\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug Filter|Win32">
       <Configuration>Debug Filter</Configuration>
@@ -76,7 +76,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ISOLATION_AWARE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions Condition="'$(PlatformToolsetVersion)'=='140'">/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -91,7 +91,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ISOLATION_AWARE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions Condition="'$(PlatformToolsetVersion)'=='140'">/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -106,7 +106,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ISOLATION_AWARE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions Condition="'$(PlatformToolsetVersion)'=='140'">/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -121,7 +121,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ISOLATION_AWARE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions Condition="'$(PlatformToolsetVersion)'=='140'">/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
