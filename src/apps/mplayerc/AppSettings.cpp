@@ -2126,8 +2126,7 @@ CDVBChannel* CAppSettings::FindChannelByPref(int nPrefNumber)
 
 bool CAppSettings::IsISRSelect() const
 {
-	return (iVideoRenderer == VIDRNDT_VMR7RENDERLESS ||
-			iVideoRenderer == VIDRNDT_VMR9RENDERLESS ||
+	return (iVideoRenderer == VIDRNDT_VMR9RENDERLESS ||
 			iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
 			iVideoRenderer == VIDRNDT_DXR ||
 			iVideoRenderer == VIDRNDT_SYNC ||

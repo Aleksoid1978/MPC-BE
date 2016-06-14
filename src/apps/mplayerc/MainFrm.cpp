@@ -66,7 +66,6 @@
 #include "TextPassThruFilter.h"
 #include "../../filters/filters.h"
 #include "../../filters/filters/InternalPropertyPage.h"
-#include <AllocatorCommon7.h>
 #include <AllocatorCommon.h>
 #include <SyncAllocatorPresenter.h>
 #include "ComPropertyPage.h"
@@ -6210,11 +6209,9 @@ BOOL CMainFrame::IsRendererCompatibleWithSaveImage()
 	if (m_fShockwaveGraph) {
 		AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_SHOCKWAVE), MB_ICONEXCLAMATION | MB_OK);
 		result = FALSE;
-	} else if (s.iVideoRenderer == VIDRNDT_OVERLAYMIXER) {
-		AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_OVERLAY), MB_ICONEXCLAMATION | MB_OK);
-		result = FALSE;
+	}
 	// the latest madVR build v0.84.0 now supports screenshots.
-	} else if (s.iVideoRenderer == VIDRNDT_MADVR) {
+	else if (s.iVideoRenderer == VIDRNDT_MADVR) {
 		CRegKey key;
 		CString clsid = _T("{E1A8B82A-32CE-4B0D-BE0D-AA68C772E423}");
 

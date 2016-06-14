@@ -14,13 +14,7 @@
     <ClCompile Include="AllocatorCommon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AllocatorCommon7.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="D3DFont.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DX7AllocatorPresenter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DX9AllocatorPresenter.cpp">
@@ -51,9 +45,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SyncRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VMR7AllocatorPresenter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VMR9AllocatorPresenter.cpp">
@@ -88,13 +79,7 @@
     <ClInclude Include="AllocatorCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AllocatorCommon7.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="D3DFont.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DX7AllocatorPresenter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DX9AllocatorPresenter.h">
@@ -128,9 +113,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SyncRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VMR7AllocatorPresenter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VMR9AllocatorPresenter.h">

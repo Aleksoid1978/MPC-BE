@@ -94,11 +94,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AllocatorCommon.cpp" />
-    <ClCompile Include="AllocatorCommon7.cpp" />
     <ClCompile Include="CPUUsage.cpp" />
     <ClCompile Include="D3DFont.cpp" />
     <ClCompile Include="Dither.cpp" />
-    <ClCompile Include="DX7AllocatorPresenter.cpp" />
     <ClCompile Include="DX9AllocatorPresenter.cpp" />
     <ClCompile Include="DX9RenderingEngine.cpp" />
     <ClCompile Include="DXRAllocatorPresenter.cpp" />
@@ -117,16 +115,13 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SyncRenderer.cpp" />
-    <ClCompile Include="VMR7AllocatorPresenter.cpp" />
     <ClCompile Include="VMR9AllocatorPresenter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllocatorCommon.h" />
-    <ClInclude Include="AllocatorCommon7.h" />
     <ClInclude Include="CPUUsage.h" />
     <ClInclude Include="D3DFont.h" />
     <ClInclude Include="Dither.h" />
-    <ClInclude Include="DX7AllocatorPresenter.h" />
     <ClInclude Include="DX9AllocatorPresenter.h" />
     <ClInclude Include="DX9RenderingEngine.h" />
     <ClInclude Include="DX9Shaders.h" />
@@ -145,7 +140,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SyncAllocatorPresenter.h" />
     <ClInclude Include="SyncRenderer.h" />
-    <ClInclude Include="VMR7AllocatorPresenter.h" />
     <ClInclude Include="VMR9AllocatorPresenter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

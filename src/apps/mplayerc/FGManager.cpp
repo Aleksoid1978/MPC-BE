@@ -2839,17 +2839,8 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	// Renderers
 	if (!m_bIsPreview) {
 		switch (s.iVideoRenderer) {
-			case VIDRNDT_OVERLAYMIXER:
-				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_OverlayMixer, L"Overlay Mixer", m_vrmerit));
-				break;
-			case VIDRNDT_VMR7WINDOWED:
-				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer, L"Video Mixing Renderer 7", m_vrmerit));
-				break;
 			case VIDRNDT_VMR9WINDOWED:
 				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"Video Mixing Renderer 9", m_vrmerit));
-				break;
-			case VIDRNDT_VMR7RENDERLESS:
-				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VMR7AllocatorPresenter, L"Video Mixing Renderer 7 (Renderless)", m_vrmerit));
 				break;
 			case VIDRNDT_VMR9RENDERLESS:
 				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VMR9AllocatorPresenter, L"Video Mixing Renderer 9 (Renderless)", m_vrmerit));
