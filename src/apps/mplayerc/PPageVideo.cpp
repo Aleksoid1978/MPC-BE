@@ -39,18 +39,6 @@ static bool IsRenderTypeAvailable(UINT VideoRendererType, HWND hwnd)
 			return IsCLSIDRegistered(CLSID_DXR);
 		case VIDRNDT_MADVR:
 			return IsCLSIDRegistered(CLSID_madVR);
-		case VIDRNDT_VMR7RENDERLESS:
-			#ifdef _WIN64
-			return false;
-			#endif
-			{
-				MONITORINFO mi;
-				mi.cbSize = sizeof(mi);
-				if (GetMonitorInfo(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST), &mi)) {
-					CRect rc(mi.rcMonitor);
-					return rc.Width() < 2048 && rc.Height() < 2048;
-				}
-			}
 		default:
 		return true;
 	}
@@ -195,9 +183,7 @@ BOOL CPPageVideo::OnInitDialog()
 
 		switch (nID) {
 		case VIDRNDT_SYSDEFAULT:		sName = ResStr(IDS_PPAGE_OUTPUT_SYS_DEF);			break;
-		case VIDRNDT_VMR7WINDOWED:		sName = ResStr(IDS_PPAGE_OUTPUT_VMR7WINDOWED);		break;
 		case VIDRNDT_VMR9WINDOWED:		sName = ResStr(IDS_PPAGE_OUTPUT_VMR9WINDOWED);		break;
-		case VIDRNDT_VMR7RENDERLESS:	sName = ResStr(IDS_PPAGE_OUTPUT_VMR7RENDERLESS);	break;
 		case VIDRNDT_VMR9RENDERLESS:	sName = ResStr(IDS_PPAGE_OUTPUT_VMR9RENDERLESS);	break;
 		case VIDRNDT_DXR:				sName = ResStr(IDS_PPAGE_OUTPUT_DXR);				break;
 		case VIDRNDT_NULL_COMP:			sName = ResStr(IDS_PPAGE_OUTPUT_NULL_COMP);			break;
@@ -222,10 +208,7 @@ BOOL CPPageVideo::OnInitDialog()
 	CComboBox& m_iDSVRTC = m_cbVideoRenderer;
 	m_iDSVRTC.SetRedraw(FALSE);
 	addRenderer(VIDRNDT_SYSDEFAULT);
-	addRenderer(VIDRNDT_OVERLAYMIXER);
-	addRenderer(VIDRNDT_VMR7WINDOWED);
 	addRenderer(VIDRNDT_VMR9WINDOWED);
-	addRenderer(VIDRNDT_VMR7RENDERLESS);
 	addRenderer(VIDRNDT_VMR9RENDERLESS);
 	addRenderer(VIDRNDT_EVR);
 	addRenderer(VIDRNDT_EVR_CUSTOM);
@@ -391,8 +374,7 @@ void CPPageVideo::OnUpdateMixerYUV(CCmdUI* pCmdUI)
 	int vrenderer = GetCurItemData(m_cbVideoRenderer);
 
 	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_DSVMRLOADMIXER)
-					&& (vrenderer == VIDRNDT_VMR7WINDOWED   || vrenderer == VIDRNDT_VMR9WINDOWED ||
-						vrenderer == VIDRNDT_VMR7RENDERLESS || vrenderer == VIDRNDT_VMR9RENDERLESS));
+					&& (vrenderer == VIDRNDT_VMR9WINDOWED || vrenderer == VIDRNDT_VMR9RENDERLESS));
 }
 
 void CPPageVideo::OnSurfaceChange()
@@ -477,28 +459,11 @@ void CPPageVideo::OnDSRendererChange()
 		case VIDRNDT_SYSDEFAULT:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSSYSDEF), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_OVERLAYMIXER:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSOVERLAYMIXER), &m_cbVideoRenderer);
-			break;
-		case VIDRNDT_VMR7WINDOWED:
-			m_chkVMRMixerMode.EnableWindow(TRUE);
-			m_chkVMRMixerYUV.EnableWindow(TRUE);
-
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR7WIN), &m_cbVideoRenderer);
-			break;
 		case VIDRNDT_VMR9WINDOWED:
 			m_chkVMRMixerMode.EnableWindow(TRUE);
 			m_chkVMRMixerYUV.EnableWindow(TRUE);
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9WIN), &m_cbVideoRenderer);
-			break;
-		case VIDRNDT_VMR7RENDERLESS:
-			GetDlgItem(IDC_STATIC1)->EnableWindow(TRUE);
-			m_cbAPSurfaceUsage.EnableWindow(TRUE);
-			m_chkVMRMixerMode.EnableWindow(TRUE);
-			m_chkVMRMixerYUV.EnableWindow(TRUE);
-
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR7REN), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_VMR9RENDERLESS:
 			if (m_cbD3D9RenderDevice.GetCount() > 1) {

@@ -23,7 +23,6 @@
 #include <mpconfig.h>
 #include "FGFilter.h"
 #include "MainFrm.h"
-#include <AllocatorCommon7.h>
 #include <AllocatorCommon.h>
 #include <SyncAllocatorPresenter.h>
 #include <moreuuids.h>
@@ -443,15 +442,13 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 
 	CComPtr<ISubPicAllocatorPresenter3> pCAP;
 
-	if (m_clsid == CLSID_VMR7AllocatorPresenter
-			|| m_clsid == CLSID_VMR9AllocatorPresenter
+	if (m_clsid == CLSID_VMR9AllocatorPresenter
 			|| m_clsid == CLSID_DXRAllocatorPresenter
 			|| m_clsid == CLSID_madVRAllocatorPresenter
 			|| m_clsid == CLSID_EVRAllocatorPresenter
 			|| m_clsid == CLSID_SyncAllocatorPresenter) {
 		bool bFullscreen = (AfxGetApp()->m_pMainWnd != NULL) && (((CMainFrame*)AfxGetApp()->m_pMainWnd)->IsD3DFullScreenMode());
-		if (SUCCEEDED(CreateAP7(m_clsid, m_hWnd, &pCAP))
-				|| SUCCEEDED(CreateAP9(m_clsid, m_hWnd, bFullscreen, &pCAP))
+		if (SUCCEEDED(CreateAP9(m_clsid, m_hWnd, bFullscreen, &pCAP))
 				|| SUCCEEDED(CreateEVR(m_clsid, m_hWnd, bFullscreen, &pCAP))
 				|| SUCCEEDED(CreateSyncRenderer(m_clsid, m_hWnd, bFullscreen, &pCAP))) {
 			CComPtr<IUnknown> pRenderer;
@@ -512,22 +509,6 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 					dwPrefs |= MixerPref9_RenderTargetYUV;
 				}
 				pVMRMC9->SetMixingPrefs(dwPrefs);
-			}
-		}
-		// VMR7
-		else if (CComQIPtr<IVMRFilterConfig> pConfig = *ppBF) {
-			pConfig->SetNumberOfStreams(1);
-
-			if (CComQIPtr<IVMRMixerControl> pVMRMC = *ppBF) {
-				DWORD dwPrefs;
-				pVMRMC->GetMixingPrefs(&dwPrefs);
-
-				dwPrefs |= MixerPref_NoDecimation;
-				if (rs.bVMRMixerYUV) {
-					dwPrefs &= ~MixerPref_RenderTargetMask;
-					dwPrefs |= MixerPref_RenderTargetYUV;
-				}
-				pVMRMC->SetMixingPrefs(dwPrefs);
 			}
 		}
 	}
