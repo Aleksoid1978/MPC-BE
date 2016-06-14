@@ -1986,40 +1986,19 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 
 	m_nVideoOutputCount = m_bUseFFmpeg ? nSwCount : 0;
 	if (IsDXVASupported()) {
-		if (IsWinVistaOrLater()) {
-			m_nVideoOutputCount += m_bHEVC10bit ? _countof(DXVAFormats10bit) : _countof(DXVAFormats);
-		} else {
-			m_nVideoOutputCount += ffCodecs[m_nCodecNb].DXVAModeCount();
-		}
+		m_nVideoOutputCount += m_bHEVC10bit ? _countof(DXVAFormats10bit) : _countof(DXVAFormats);
 	}
 
 	m_pVideoOutputFormat = DNew VIDEO_OUTPUT_FORMATS[m_nVideoOutputCount];
 
 	int nPos = 0;
 	if (IsDXVASupported()) {
-		if (IsWinVistaOrLater()) {
-			// Static list for DXVA2
-			if (m_bHEVC10bit) {
-				memcpy(&m_pVideoOutputFormat[nPos], DXVAFormats10bit, sizeof(DXVAFormats10bit));
-				nPos += _countof(DXVAFormats10bit);
-			} else {
-				memcpy(&m_pVideoOutputFormat[nPos], DXVAFormats, sizeof(DXVAFormats));
-				nPos += _countof(DXVAFormats);
-			}
+		if (m_bHEVC10bit) {
+			memcpy(&m_pVideoOutputFormat[nPos], DXVAFormats10bit, sizeof(DXVAFormats10bit));
+			nPos += _countof(DXVAFormats10bit);
 		} else {
-			// Dynamic DXVA media types for DXVA1
-			for (int pos = 0; pos < ffCodecs[m_nCodecNb].DXVAModeCount(); pos++) {
-				if (m_nPCIVendor == PCIV_ATI && *ffCodecs[m_nCodecNb].DXVAModes->Decoder[pos] == DXVA_ModeVC1_D2010) {
-					m_nVideoOutputCount--;
-					continue;
-				}
-
-				m_pVideoOutputFormat[nPos].subtype			= ffCodecs[m_nCodecNb].DXVAModes->Decoder[pos];
-				m_pVideoOutputFormat[nPos].biCompression	= FCC('dxva');
-				m_pVideoOutputFormat[nPos].biBitCount		= 12;
-				m_pVideoOutputFormat[nPos].biPlanes			= 1;
-				nPos++;
-			}
+			memcpy(&m_pVideoOutputFormat[nPos], DXVAFormats, sizeof(DXVAFormats));
+			nPos += _countof(DXVAFormats);
 		}
 	}
 
@@ -2718,10 +2697,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 		CComPtr<IMediaSample> pOut;
 		BYTE* pDataOut = NULL;
-		DXVA2_ExtendedFormat dxvaExtFormat = {0};
-		if (IsWinVistaOrLater()) { // bad hack for Windows XP and EVR Custom
-			dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
-		}
+		DXVA2_ExtendedFormat dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
 
 		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut, GetFrameDuration(), &dxvaExtFormat)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
 			Continue;
