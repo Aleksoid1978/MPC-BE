@@ -26,8 +26,6 @@
 #include "../BaseVideoFilter/BaseVideoFilter.h"
 #include "IMPCVideoDec.h"
 #include "MPCVideoDecSettingsWnd.h"
-#include "./DXVADecoder/DXVADecoder.h"
-#include "./DXVADecoder/DXVA1Decoder.h"
 #include "./DXVADecoder/DXVA2Decoder.h"
 #include "FormatConverter.h"
 #include "../../../apps/mplayerc/FilterEnum.h"
@@ -84,14 +82,7 @@ protected:
 	int										m_nWorkaroundBug;
 	int										m_nErrorConcealment;
 	REFERENCE_TIME							m_rtAvrTimePerFrame;
-	bool									m_bReorderBFrame;
 	bool									m_bCalculateStopTime;
-
-	struct {
-		REFERENCE_TIME rtStart;
-		REFERENCE_TIME rtStop;
-	} m_BFrames[2];
-	int										m_nPosB;
 
 	bool									m_bWaitKeyFrame;
 
@@ -115,7 +106,7 @@ protected:
 	// === common variables
 	VIDEO_OUTPUT_FORMATS*					m_pVideoOutputFormat;
 	int										m_nVideoOutputCount;
-	CDXVADecoder*							m_pDXVADecoder;
+	CDXVA2Decoder*							m_pDXVADecoder;
 	GUID									m_DXVADecoderGUID;
 
 	DWORD									m_nPCIVendor;
@@ -181,9 +172,9 @@ public:
 	virtual ~CMPCVideoDecFilter();
 
 	DECLARE_IUNKNOWN
-	STDMETHODIMP			NonDelegatingQueryInterface(REFIID riid, void** ppv);
-	virtual void			GetOutputSize(int& w, int& h, int& arx, int& ary, int& vsfilter);
-	CTransformOutputPin*	GetOutputPin() { return m_pOutput; };
+	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
+
+	CTransformOutputPin* GetOutputPin() { return m_pOutput; };
 
 	REFERENCE_TIME	GetFrameDuration();
 	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
@@ -257,26 +248,13 @@ public:
 	inline AVCodecContext*		GetAVCtx()			const { return m_pAVCtx; };
 	inline AVFrame*				GetFrame()			const { return m_pFrame; };
 	inline enum AVCodecID		GetCodec()			const { return m_nCodecId; };
-	inline bool					IsReorderBFrame()	const { return m_bReorderBFrame; };
 	inline DWORD				GetPCIVendor()		const { return m_nPCIVendor; };
 	inline DWORD				GetPCIDevice()		const { return m_nPCIDevice; };
 
 	bool						IsDXVASupported();
 	void						UpdateAspectRatio();
-	void						ReorderBFrames(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	void						FlushDXVADecoder();
 	void						SetTypeSpecificFlags(IMediaSample* pMS);
-
-	// === DXVA1 functions
-	const DDPIXELFORMAT*		GetDXVA1PixelFormat() { return &m_DDPixelFormat; }
-	HRESULT						FindDXVA1DecoderConfiguration(IAMVideoAccelerator* pAMVideoAccelerator,
-															  const GUID* guidDecoder,
-															  DDPIXELFORMAT* pPixelFormat);
-	HRESULT						CheckDXVA1Decoder(const GUID *pGuid);
-	void						SetDXVA1Params(const GUID* pGuid, DDPIXELFORMAT* pPixelFormat);
-	WORD						GetDXVA1RestrictedMode();
-	HRESULT						CreateDXVA1Decoder(IAMVideoAccelerator* pAMVideoAccelerator, const GUID* pDecoderGuid, DWORD dwSurfaceCount);
-
 
 	// === DXVA2 functions
 	void						FillInVideoDescription(DXVA2_VideoDesc *pDesc, D3DFORMAT Format = D3DFMT_A8R8G8B8);
@@ -306,27 +284,15 @@ private:
 };
 
 class CVideoDecOutputPin : public CBaseVideoOutputPin
-	, public IAMVideoAcceleratorNotify
 {
+	CMPCVideoDecFilter* m_pVideoDecFilter;
 public:
 	CVideoDecOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName);
 	~CVideoDecOutputPin();
 
-	HRESULT				InitAllocator(IMemAllocator **ppAlloc);
+	HRESULT InitAllocator(IMemAllocator **ppAlloc);
 
 	DECLARE_IUNKNOWN
-	STDMETHODIMP		NonDelegatingQueryInterface(REFIID riid, void** ppv);
-
-	// IAMVideoAcceleratorNotify
-	STDMETHODIMP		GetUncompSurfacesInfo(const GUID *pGuid, LPAMVAUncompBufferInfo pUncompBufferInfo);
-	STDMETHODIMP		SetUncompSurfacesInfo(DWORD dwActualUncompSurfacesAllocated);
-	STDMETHODIMP		GetCreateVideoAcceleratorData(const GUID *pGuid, LPDWORD pdwSizeMiscData, LPVOID *ppMiscData);
-
-private :
-	CMPCVideoDecFilter*	m_pVideoDecFilter;
-	DWORD				m_dwDXVA1SurfaceCount;
-	GUID				m_GuidDecoderDXVA1;
-	DDPIXELFORMAT		m_ddUncompPixelFormat;
 };
 
 namespace MPCVideoDec {

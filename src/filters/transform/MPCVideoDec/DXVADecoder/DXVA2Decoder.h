@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,11 +21,31 @@
 #pragma once
 
 #include <dxva2api.h>
-#include "DXVADecoder.h"
+#include <ffmpeg/libavcodec/dxva_internal.h>
 
-#define CHECK_HR_FRAME(x)	hr = ##x; if (FAILED(hr)) { DbgLog((LOG_TRACE, 3, L"DXVA Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__)); CHECK_HR_FALSE (EndFrame()); return S_FALSE; }
+#define DBGLOG_LEVEL 0
 
-class CDXVA2Decoder : public CDXVADecoder
+#if defined(_DEBUG) && DBGLOG_LEVEL > 0
+	#define CHECK_HR_FALSE(x)	hr = ##x; if (FAILED(hr)) { DbgLog((LOG_TRACE, 3, L"DXVA Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__)); return S_FALSE; }
+	#define CHECK_HR_FRAME(x)	hr = ##x; if (FAILED(hr)) { DbgLog((LOG_TRACE, 3, L"DXVA Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__)); CHECK_HR_FALSE (EndFrame()); return S_FALSE; }
+#else
+	#define CHECK_HR_FALSE(x)	hr = ##x; if (FAILED(hr)) { return S_FALSE; }
+	#define CHECK_HR_FRAME(x)	hr = ##x; if (FAILED(hr)) { CHECK_HR_FALSE (EndFrame()); return S_FALSE; }
+#endif
+
+#define MAX_RETRY_ON_PENDING	50
+#define DO_DXVA_PENDING_LOOP(x)	nTry = 0; \
+								while (FAILED(hr = x) && nTry < MAX_RETRY_ON_PENDING) \
+								{ \
+									if (hr != E_PENDING) break; \
+									Sleep(3); \
+									nTry++; \
+								}
+
+class CMPCVideoDecFilter;
+struct AVFrame;
+
+class CDXVA2Decoder
 {
 	struct SampleWrapper {
 		CComPtr<IMediaSample>		pSample	= NULL;
@@ -38,10 +58,11 @@ public :
 	static CDXVA2Decoder*			CreateDXVA2Decoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config);
 	virtual							~CDXVA2Decoder();
 
+	void							Flush() { m_dxva_context.report_id = 0; };
+	HRESULT							DeliverFrame(int got_picture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+
 	virtual HRESULT					CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDXVASize = UINT_MAX) PURE;
 	virtual HRESULT					ProcessDXVAFrame(IMediaSample* pSample) PURE;
-
-	virtual HRESULT					DeliverFrame(int got_picture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
 	int								get_buffer_dxva(struct AVFrame *pic);
 	static void						release_buffer_dxva(void *opaque, uint8_t *data);
@@ -63,4 +84,7 @@ protected :
 	CMPCVideoDecFilter*				m_pFilter;
 
 	DXVA2_ConfigPictureDecode		m_DXVA2Config;
+
+	UINT							m_nFieldNum;
+	dxva_context					m_dxva_context;
 };

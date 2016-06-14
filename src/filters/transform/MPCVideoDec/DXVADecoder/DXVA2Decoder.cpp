@@ -35,8 +35,7 @@ extern "C" {
 }
 
 CDXVA2Decoder::CDXVA2Decoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config, int CompressedBuffersSize)
-	: CDXVADecoder()
-	, m_pDirectXVideoDec(pDirectXVideoDec)
+	: m_pDirectXVideoDec(pDirectXVideoDec)
 	, m_guidDecoder(*guidDecoder)
 	, m_pFilter(pFilter)
 {
@@ -56,7 +55,9 @@ CDXVA2Decoder::CDXVA2Decoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* 
 
 CDXVA2Decoder::~CDXVA2Decoder()
 {
-	SAFE_DELETE_ARRAY(m_ExecuteParams.pCompressedBuffers);
+	if (m_ExecuteParams.pCompressedBuffers) {
+		delete [] m_ExecuteParams.pCompressedBuffers;
+	}
 	m_pDirectXVideoDec.Release();
 }
 
