@@ -35,8 +35,6 @@ public:
 	virtual ~CSaveImageDialog();
 
 protected:
-	DECLARE_MESSAGE_MAP()
-	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnFileNameOK();
 	virtual void OnTypeChange();
@@ -60,9 +58,6 @@ public:
 	virtual ~CSaveThumbnailsDialog();
 
 protected:
-	DECLARE_MESSAGE_MAP()
-	virtual void DoDataExchange(CDataExchange* pDX);
-	virtual BOOL OnInitDialog();
 	virtual BOOL OnFileNameOK();
 
 public:

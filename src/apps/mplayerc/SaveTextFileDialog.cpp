@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include "SaveTextFileDialog.h"
-#include "../../DSUtil/SysVersion.h"
 
 // CSaveTextFileDialog
 
@@ -38,10 +37,8 @@ CSaveTextFileDialog::CSaveTextFileDialog(
 	, m_bDisableExternalStyleCheckBox(bDisableExternalStyleCheckBox)
 	, m_bSaveExternalStyleFile(bSaveExternalStyleFile)
 {
-	if (IsWinVistaOrLater()) {
-
-		IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
-
+	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
+	if (pfdc) {
 		pfdc->StartVisualGroup(IDS_TEXTFILE_ENC, ResStr(IDS_TEXTFILE_ENC));
 		pfdc->AddComboBox(IDC_COMBO1);
 		pfdc->AddControlItem(IDC_COMBO1, CTextFile::ASCII, _T("ANSI"));
@@ -56,8 +53,6 @@ CSaveTextFileDialog::CSaveTextFileDialog(
 		pfdc->SetControlState(IDC_CHECK1, m_bDisableExternalStyleCheckBox ? CDCS_INACTIVE : CDCS_ENABLEDVISIBLE);
 
 		pfdc->Release();
-	} else {
-		SetTemplate(0, IDD_SAVETEXTFILEDIALOGTEMPL);
 	}
 }
 
@@ -65,68 +60,17 @@ CSaveTextFileDialog::~CSaveTextFileDialog()
 {
 }
 
-void CSaveTextFileDialog::DoDataExchange(CDataExchange* pDX)
-{
-	if (!IsWinVistaOrLater()) {
-		DDX_Control(pDX, IDC_COMBO1, m_encoding);
-		DDX_Check(pDX, IDC_CHECK1, m_bSaveExternalStyleFile);
-	}
-
-	__super::DoDataExchange(pDX);
-}
-
-BOOL CSaveTextFileDialog::OnInitDialog()
-{
-	__super::OnInitDialog();
-
-	if (!IsWinVistaOrLater()) {
-		m_encoding.SetItemData(m_encoding.AddString(_T("ANSI")), CTextFile::ASCII);
-		m_encoding.SetItemData(m_encoding.AddString(_T("Unicode 16-LE")), CTextFile::LE16);
-		m_encoding.SetItemData(m_encoding.AddString(_T("Unicode 16-BE")), CTextFile::BE16);
-		m_encoding.SetItemData(m_encoding.AddString(_T("UTF-8")), CTextFile::UTF8);
-
-		switch (m_e) {
-			default:
-			case CTextFile::ASCII:
-				m_encoding.SetCurSel(0);
-				break;
-			case CTextFile::LE16:
-				m_encoding.SetCurSel(1);
-				break;
-			case CTextFile::BE16:
-				m_encoding.SetCurSel(2);
-				break;
-			case CTextFile::UTF8:
-				m_encoding.SetCurSel(3);
-				break;
-		}
-
-		if (m_bDisableExternalStyleCheckBox) {
-			GetDlgItem(IDC_CHECK1)->EnableWindow(FALSE);
-		}
-	}
-
-	return TRUE;
-}
-
-BEGIN_MESSAGE_MAP(CSaveTextFileDialog, CFileDialog)
-END_MESSAGE_MAP()
-
-// CSaveTextFileDialog message handlers
-
 BOOL CSaveTextFileDialog::OnFileNameOK()
 {
-	if (IsWinVistaOrLater()) {
-		DWORD result;
-		IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
+	DWORD result;
+	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
+	if (pfdc) {
 		pfdc->GetSelectedControlItem(IDC_COMBO1, &result);
 		pfdc->Release();
 		m_e = (CTextFile::enc)result;
-
-		pfdc->GetCheckButtonState(IDC_CHECK1, &m_bSaveExternalStyleFile);
-	} else {
-		m_e = (CTextFile::enc)GetCurItemData(m_encoding);
 	}
+
+	pfdc->GetCheckButtonState(IDC_CHECK1, &m_bSaveExternalStyleFile);
 
 	return __super::OnFileNameOK();
 }

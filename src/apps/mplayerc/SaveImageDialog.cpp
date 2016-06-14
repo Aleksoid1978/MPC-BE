@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include "SaveImageDialog.h"
-#include "../../DSUtil/SysVersion.h"
 
 // CSaveImageDialog
 
@@ -36,25 +35,21 @@ CSaveImageDialog::CSaveImageDialog(
 	, m_quality(quality)
 	, m_levelPNG(levelPNG)
 {
-	if (IsWinVistaOrLater()) {
-		IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
-		if (pfdc) {
-			CString str;
+	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
+	if (pfdc) {
+		CString str;
 
-			pfdc->StartVisualGroup(IDS_THUMB_IMAGE_QUALITY, ResStr(IDS_THUMB_IMAGE_QUALITY));
-			pfdc->AddText(IDS_THUMB_QUALITY, ResStr(IDS_THUMB_QUALITY));
-			str.Format(L"%d", clamp(m_quality, 70, 100));
-			pfdc->AddEditBox(IDC_EDIT1, str);
+		pfdc->StartVisualGroup(IDS_THUMB_IMAGE_QUALITY, ResStr(IDS_THUMB_IMAGE_QUALITY));
+		pfdc->AddText(IDS_THUMB_QUALITY, ResStr(IDS_THUMB_QUALITY));
+		str.Format(L"%d", clamp(m_quality, 70, 100));
+		pfdc->AddEditBox(IDC_EDIT1, str);
 
-			pfdc->AddText(IDS_THUMB_LEVEL, ResStr(IDS_THUMB_LEVEL));
-			str.Format(L"%d", clamp(m_levelPNG, 1, 9));
-			pfdc->AddEditBox(IDC_EDIT5, str);
-			pfdc->EndVisualGroup();
+		pfdc->AddText(IDS_THUMB_LEVEL, ResStr(IDS_THUMB_LEVEL));
+		str.Format(L"%d", clamp(m_levelPNG, 1, 9));
+		pfdc->AddEditBox(IDC_EDIT5, str);
+		pfdc->EndVisualGroup();
 
-			pfdc->Release();
-		}
-	} else {
-		SetTemplate(0, IDD_SAVEIMAGEDIALOGTEMPL);
+		pfdc->Release();
 	}
 }
 
@@ -62,53 +57,32 @@ CSaveImageDialog::~CSaveImageDialog()
 {
 }
 
-void CSaveImageDialog::DoDataExchange(CDataExchange* pDX)
-{
-	if (!IsWinVistaOrLater()) {
-		DDX_Control(pDX, IDC_SPIN1, m_qualityctrl);
-	}
-
-	__super::DoDataExchange(pDX);
-}
-
 BOOL CSaveImageDialog::OnInitDialog()
 {
 	__super::OnInitDialog();
-
-	if (!IsWinVistaOrLater()) {
-		m_qualityctrl.SetRange(70, 100);
-		m_qualityctrl.SetPos(m_quality);
-	}
 
 	OnTypeChange();
 
 	return TRUE;
 }
 
-BEGIN_MESSAGE_MAP(CSaveImageDialog, CFileDialog)
-END_MESSAGE_MAP()
-
 // CSaveImageDialog message handlers
 
 BOOL CSaveImageDialog::OnFileNameOK()
 {
-	if (IsWinVistaOrLater()) {
-		IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
-		if (pfdc) {
-			WCHAR* result;
+	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
+	if (pfdc) {
+		WCHAR* result;
 
-			pfdc->GetEditBoxText(IDC_EDIT1, &result);
-			m_quality = _wtoi(result);
-			CoTaskMemFree(result);
+		pfdc->GetEditBoxText(IDC_EDIT1, &result);
+		m_quality = _wtoi(result);
+		CoTaskMemFree(result);
 
-			pfdc->GetEditBoxText(IDC_EDIT5, &result);
-			m_levelPNG = _wtoi(result);
-			CoTaskMemFree(result);
+		pfdc->GetEditBoxText(IDC_EDIT5, &result);
+		m_levelPNG = _wtoi(result);
+		CoTaskMemFree(result);
 
-			pfdc->Release();
-		}
-	} else {
-		m_quality = m_qualityctrl.GetPos();
+		pfdc->Release();
 	}
 
 	m_levelPNG = clamp(m_levelPNG, 1, 9);
@@ -121,43 +95,38 @@ void CSaveImageDialog::OnTypeChange()
 {
 	__super::OnTypeChange();
 
-	if (IsWinVistaOrLater()) {
-		IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
-		if (pfdc) {
-			switch (m_pOFN->nFilterIndex)
-			{
-				case 1:
-					pfdc->SetControlState(IDS_THUMB_IMAGE_QUALITY, CDCS_INACTIVE);
-					pfdc->SetControlState(IDS_THUMB_QUALITY, CDCS_INACTIVE);
-					pfdc->SetControlState(IDC_EDIT1, CDCS_INACTIVE);
+	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
+	if (pfdc) {
+		switch (m_pOFN->nFilterIndex) {
+			case 1:
+				pfdc->SetControlState(IDS_THUMB_IMAGE_QUALITY, CDCS_INACTIVE);
+				pfdc->SetControlState(IDS_THUMB_QUALITY, CDCS_INACTIVE);
+				pfdc->SetControlState(IDC_EDIT1, CDCS_INACTIVE);
 
-					pfdc->SetControlState(IDS_THUMB_LEVEL, CDCS_INACTIVE);
-					pfdc->SetControlState(IDC_EDIT5, CDCS_INACTIVE);
-					break;
-				case 2:
-					pfdc->SetControlState(IDS_THUMB_IMAGE_QUALITY, CDCS_ENABLEDVISIBLE);
-					pfdc->SetControlState(IDS_THUMB_QUALITY, CDCS_ENABLEDVISIBLE);
-					pfdc->SetControlState(IDC_EDIT1, CDCS_ENABLEDVISIBLE);
+				pfdc->SetControlState(IDS_THUMB_LEVEL, CDCS_INACTIVE);
+				pfdc->SetControlState(IDC_EDIT5, CDCS_INACTIVE);
+				break;
+			case 2:
+				pfdc->SetControlState(IDS_THUMB_IMAGE_QUALITY, CDCS_ENABLEDVISIBLE);
+				pfdc->SetControlState(IDS_THUMB_QUALITY, CDCS_ENABLEDVISIBLE);
+				pfdc->SetControlState(IDC_EDIT1, CDCS_ENABLEDVISIBLE);
 
-					pfdc->SetControlState(IDS_THUMB_LEVEL, CDCS_INACTIVE);
-					pfdc->SetControlState(IDC_EDIT5, CDCS_INACTIVE);
-					break;
-				case 3:
-					pfdc->SetControlState(IDS_THUMB_IMAGE_QUALITY, CDCS_ENABLEDVISIBLE);
-					pfdc->SetControlState(IDS_THUMB_QUALITY, CDCS_INACTIVE);
-					pfdc->SetControlState(IDC_EDIT1, CDCS_INACTIVE);
+				pfdc->SetControlState(IDS_THUMB_LEVEL, CDCS_INACTIVE);
+				pfdc->SetControlState(IDC_EDIT5, CDCS_INACTIVE);
+				break;
+			case 3:
+				pfdc->SetControlState(IDS_THUMB_IMAGE_QUALITY, CDCS_ENABLEDVISIBLE);
+				pfdc->SetControlState(IDS_THUMB_QUALITY, CDCS_INACTIVE);
+				pfdc->SetControlState(IDC_EDIT1, CDCS_INACTIVE);
 
-					pfdc->SetControlState(IDS_THUMB_LEVEL, CDCS_ENABLEDVISIBLE);
-					pfdc->SetControlState(IDC_EDIT5, CDCS_ENABLEDVISIBLE);
-					break;
-				default :
-					break;
-			}
-
-			pfdc->Release();
+				pfdc->SetControlState(IDS_THUMB_LEVEL, CDCS_ENABLEDVISIBLE);
+				pfdc->SetControlState(IDC_EDIT5, CDCS_ENABLEDVISIBLE);
+				break;
+			default :
+				break;
 		}
-	} else {
-		m_qualityctrl.EnableWindow(m_pOFN->nFilterIndex == 2);
+
+		pfdc->Release();
 	}
 }
 
@@ -175,31 +144,27 @@ CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 	, m_cols(cols)
 	, m_width(width)
 {
-	if (IsWinVistaOrLater()) {
-		IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
-		if (pfdc) {
-			CString str;
+	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
+	if (pfdc) {
+		CString str;
 
-			pfdc->StartVisualGroup(IDS_THUMB_THUMBNAILS, ResStr(IDS_THUMB_THUMBNAILS));
-			pfdc->AddText(IDS_THUMB_ROWNUMBER, ResStr(IDS_THUMB_ROWNUMBER));
-			str.Format(L"%d", clamp(m_rows, 1, 20));
-			pfdc->AddEditBox(IDC_EDIT4, str);
+		pfdc->StartVisualGroup(IDS_THUMB_THUMBNAILS, ResStr(IDS_THUMB_THUMBNAILS));
+		pfdc->AddText(IDS_THUMB_ROWNUMBER, ResStr(IDS_THUMB_ROWNUMBER));
+		str.Format(L"%d", clamp(m_rows, 1, 20));
+		pfdc->AddEditBox(IDC_EDIT4, str);
 
-			pfdc->AddText(IDS_THUMB_COLNUMBER, ResStr(IDS_THUMB_COLNUMBER));
-			str.Format(L"%d", clamp(m_cols, 1, 10));
-			pfdc->AddEditBox(IDC_EDIT2, str);
-			pfdc->EndVisualGroup();
+		pfdc->AddText(IDS_THUMB_COLNUMBER, ResStr(IDS_THUMB_COLNUMBER));
+		str.Format(L"%d", clamp(m_cols, 1, 10));
+		pfdc->AddEditBox(IDC_EDIT2, str);
+		pfdc->EndVisualGroup();
 
-			pfdc->StartVisualGroup(IDS_THUMB_IMAGE_WIDTH, ResStr(IDS_THUMB_IMAGE_WIDTH));
-			pfdc->AddText(IDS_THUMB_PIXELS, ResStr(IDS_THUMB_PIXELS));
-			str.Format(L"%d", clamp(m_width, 256, 2560));
-			pfdc->AddEditBox(IDC_EDIT3, str);
-			pfdc->EndVisualGroup();
+		pfdc->StartVisualGroup(IDS_THUMB_IMAGE_WIDTH, ResStr(IDS_THUMB_IMAGE_WIDTH));
+		pfdc->AddText(IDS_THUMB_PIXELS, ResStr(IDS_THUMB_PIXELS));
+		str.Format(L"%d", clamp(m_width, 256, 2560));
+		pfdc->AddEditBox(IDC_EDIT3, str);
+		pfdc->EndVisualGroup();
 
-			pfdc->Release();
-		}
-	} else {
-		SetTemplate(0, IDD_SAVETHUMBSDIALOGTEMPL);
+		pfdc->Release();
 	}
 }
 
@@ -207,62 +172,25 @@ CSaveThumbnailsDialog::~CSaveThumbnailsDialog()
 {
 }
 
-void CSaveThumbnailsDialog::DoDataExchange(CDataExchange* pDX)
-{
-	if (!IsWinVistaOrLater()) {
-		DDX_Control(pDX, IDC_SPIN4, m_rowsctrl);
-		DDX_Control(pDX, IDC_SPIN2, m_colsctrl);
-		DDX_Control(pDX, IDC_SPIN3, m_widthctrl);
-	}
-
-	__super::DoDataExchange(pDX);
-}
-
-BOOL CSaveThumbnailsDialog::OnInitDialog()
-{
-	__super::OnInitDialog();
-
-	if (!IsWinVistaOrLater()) {
-		m_rowsctrl.SetRange(1, 20);
-		m_colsctrl.SetRange(1, 10);
-		m_widthctrl.SetRange(256, 2560);
-
-		m_rowsctrl.SetPos(m_rows);
-		m_colsctrl.SetPos(m_cols);
-		m_widthctrl.SetPos(m_width);
-	}
-
-	return TRUE;
-}
-
-BEGIN_MESSAGE_MAP(CSaveThumbnailsDialog, CFileDialog)
-END_MESSAGE_MAP()
-
 // CSaveThumbnailsDialog message handlers
 
 BOOL CSaveThumbnailsDialog::OnFileNameOK()
 {
-	if (IsWinVistaOrLater()) {
-		IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
-		if (pfdc) {
-			WCHAR* result;
+	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
+	if (pfdc) {
+		WCHAR* result;
 
-			pfdc->GetEditBoxText(IDC_EDIT4, &result);
-			m_rows = _wtoi(result);
-			CoTaskMemFree(result);
-			pfdc->GetEditBoxText(IDC_EDIT2, &result);
-			m_cols = _wtoi(result);
-			CoTaskMemFree(result);
-			pfdc->GetEditBoxText(IDC_EDIT3, &result);
-			m_width = _wtoi(result);
-			CoTaskMemFree(result);
+		pfdc->GetEditBoxText(IDC_EDIT4, &result);
+		m_rows = _wtoi(result);
+		CoTaskMemFree(result);
+		pfdc->GetEditBoxText(IDC_EDIT2, &result);
+		m_cols = _wtoi(result);
+		CoTaskMemFree(result);
+		pfdc->GetEditBoxText(IDC_EDIT3, &result);
+		m_width = _wtoi(result);
+		CoTaskMemFree(result);
 
-			pfdc->Release();
-		}
-	} else {
-		m_rows = m_rowsctrl.GetPos();
-		m_cols = m_colsctrl.GetPos();
-		m_width = m_widthctrl.GetPos();
+		pfdc->Release();
 	}
 
 	return __super::OnFileNameOK();
