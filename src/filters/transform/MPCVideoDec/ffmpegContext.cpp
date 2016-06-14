@@ -387,17 +387,10 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 		int max_ref_frames = max_ref_frames_dpb41; // default value is calculate
 
 		if (nPCIVendor == PCIV_nVidia) {
-			// nVidia cards support level 5.1 since drivers v6.14.11.7800 for XP and drivers v7.15.11.7800 for Vista/7
-			if (IsWinVistaOrLater()) {
-				if (DriverVersionCheck(VideoDriverVersion, 7, 15, 11, 7800)) {
-					no_level51_support = 0;
-					max_ref_frames = 16;
-				}
-			} else {
-				if (DriverVersionCheck(VideoDriverVersion, 6, 14, 11, 7800)) {
-					no_level51_support = 0;
-					max_ref_frames = 14;
-				}
+			// nVidia cards support level 5.1 since drivers v7.15.11.7800 for Vista/7
+			if (DriverVersionCheck(VideoDriverVersion, 7, 15, 11, 7800)) {
+				no_level51_support = 0;
+				max_ref_frames = 16;
 			}
 		} else if (nPCIVendor == PCIV_ATI && !CheckPCID(nPCIDevice, PCID_ATI_UVD, _countof(PCID_ATI_UVD))) {
 			TCHAR path[MAX_PATH] = { 0 };
@@ -409,14 +402,10 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 				LARGE_INTEGER VideoDriverVersion;
 				VideoDriverVersion.QuadPart = f_version;
 
-				if (IsWinVistaOrLater()) {
-					// file version 8.1.1.1016 - Catalyst 10.4, WinVista & Win7
-					if (DriverVersionCheck(VideoDriverVersion, 8, 1, 1, 1016)) {
-						no_level51_support = 0;
-						max_ref_frames = 16;
-					}
-				} else {
-					// TODO - need file version for Catalyst 10.4 under WinXP
+				// file version 8.1.1.1016 - Catalyst 10.4, WinVista & Win7
+				if (DriverVersionCheck(VideoDriverVersion, 8, 1, 1, 1016)) {
+					no_level51_support = 0;
+					max_ref_frames = 16;
 				}
 			} else {
 				// driver version 8.14.1.6105 - Catalyst 10.4; TODO - verify this information
@@ -628,7 +617,7 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 	height = (height + 15) & ~15; // (height + 15) / 16 * 16;
 
 	if (nPCIVendor == PCIV_nVidia) {
-		if (IsWinVistaOrLater() && DriverVersionCheck(VideoDriverVersion, 9, 18, 13, 2018)) { // The video frame size is checked in the driver
+		if (DriverVersionCheck(VideoDriverVersion, 9, 18, 13, 2018)) { // The video frame size is checked in the driver
 			// For graphics cards with support for 4k, you must install the driver v320.18 and newer.
 			return TRUE;
 			// old check:
