@@ -137,10 +137,8 @@ END
 // Bitmap
 //
 
-IDB_MPCBEBMP_PLAY       BITMAP                  "res\\film_go.bmp"
-IDB_MPCBEBMP_ADD        BITMAP                  "res\\film_add.bmp"
-IDB_MPCBEBMP_PLAY_XP    BITMAP                  "res\\film_go_XP.bmp"
-IDB_MPCBEBMP_ADD_XP     BITMAP                  "res\\film_add_XP.bmp"
+IDB_MPCBEBMP_PLAY BITMAP "res\\film_go.bmp"
+IDB_MPCBEBMP_ADD  BITMAP "res\\film_add.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

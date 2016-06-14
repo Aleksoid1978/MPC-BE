@@ -256,9 +256,7 @@
   <ItemGroup>
     <None Include="MPCBEShellExt.def" />
     <None Include="res\film_add.bmp" />
-    <None Include="res\film_add_XP.bmp" />
     <None Include="res\film_go.bmp" />
-    <None Include="res\film_go_XP.bmp" />
     <None Include="MPCBEContextMenu.rgs" />
     <None Include="MPCBEShellExt.rgs" />
   </ItemGroup>
