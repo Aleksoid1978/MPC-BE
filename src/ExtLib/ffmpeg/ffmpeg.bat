@@ -1,5 +1,4 @@
 @ECHO OFF
-REM
 REM (C) 2009-2016 see Authors.txt
 REM
 REM This file is part of MPC-BE.
@@ -35,7 +34,6 @@ EXIT /B
 SET PATH=%MSYS%\bin;%MINGW32%\bin;%PATH%
 
 SET "BUILDTYPE=build"
-SET "VS=VS2013=yes"
 
 SET ARG=%*
 SET ARG=%ARG:/=%
@@ -46,7 +44,6 @@ FOR %%A IN (%ARG%) DO (
 	IF /I "%%A" == "rebuild" SET "BUILDTYPE=rebuild"
 	IF /I "%%A" == "64" SET "BIT=64BIT=yes"
 	IF /I "%%A" == "Debug" SET "DEBUG=DEBUG=yes"
-	IF /I "%%A" == "VS2015" SET "VS=VS2015=yes"
 )
 
 IF /I "%BUILDTYPE%" == "rebuild" (
@@ -72,7 +69,7 @@ IF "%BUILDTYPE%" == "clean" (
   )
 )
 
-make.exe -f ffmpeg.mak %BUILDTYPE% -j%JOBS% %BIT% %DEBUG% %VS%
+make.exe -f ffmpeg.mak %BUILDTYPE% -j%JOBS% %BIT% %DEBUG%
 
 SET "VCVARSTYPE=x86"
 IF /I "%BIT%" == "64BIT=yes" (
@@ -89,15 +86,9 @@ IF /I "%DEBUG%" == "Debug=yes" (
 )
 
 SET "TARGETFOLDER=%CONFIGBUILDS%_%ARCHBUILDS%"
-SET "VSCOMNTOOLS=%VS120COMNTOOLS%"
-SET "BINDIR=..\..\..\bin13"
-SET "VSNAME=Visual Studio 2013"
-
-IF /I "%VS%" == "VS2015=yes" (
-	SET "VSCOMNTOOLS=%VS140COMNTOOLS%"
-	SET "BINDIR=..\..\..\bin15"
-	SET "VSNAME=Visual Studio 2015"
-)
+SET "VSCOMNTOOLS=%VS140COMNTOOLS%"
+SET "BINDIR=..\..\..\bin"
+SET "VSNAME=Visual Studio 2015"
 
 IF "%BUILDTYPE%" NEQ "clean" (
   IF NOT DEFINED VSCOMNTOOLS (

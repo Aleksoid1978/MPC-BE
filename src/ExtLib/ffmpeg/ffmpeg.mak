@@ -1,4 +1,4 @@
-BIN_DIR  = ../../../bin13
+BIN_DIR  = ../../../bin
 ZLIB_DIR = ../zlib
 OPENJPEG_DIR = ../openjpeg
 SPEEX_DIR = ../speex
@@ -13,10 +13,6 @@ ifeq ($(DEBUG),yes)
 	MY_DIR_PREFIX = Debug
 else
 	MY_DIR_PREFIX = Release
-endif
-
-ifeq ($(VS2015),yes)
-	BIN_DIR  = ../../../bin15
 endif
 
 OBJ_DIR		= $(BIN_DIR)/obj/$(MY_DIR_PREFIX)_$(MY_ARCH)/ffmpeg/
