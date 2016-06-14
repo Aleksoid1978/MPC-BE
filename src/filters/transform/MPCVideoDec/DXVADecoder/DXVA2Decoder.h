@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <dxva2api.h>
-#include <stdint.h>
 #include <ffmpeg/libavcodec/dxva_internal.h>
 
 #define DBGLOG_LEVEL 0

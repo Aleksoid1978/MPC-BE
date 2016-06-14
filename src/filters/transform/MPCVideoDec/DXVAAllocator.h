@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,9 +19,6 @@
  */
 
 #pragma once
-
-#include <dxva.h>
-#include <dxva2api.h>
 
 class CMPCVideoDecFilter;
 class CVideoDecDXVAAllocator;

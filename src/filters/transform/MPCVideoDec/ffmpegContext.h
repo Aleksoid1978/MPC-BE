@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <dxva.h>
-
 struct AVCodecContext;
 struct AVFrame;
 

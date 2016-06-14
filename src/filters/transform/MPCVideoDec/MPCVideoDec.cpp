@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include <atlbase.h>
+#include <dxva.h>
 #include <MMReg.h>
 #include "../../../DSUtil/ff_log.h"
 

@@ -21,8 +21,6 @@
 #pragma once
 
 #include <dx/d3dx9.h>
-#include <videoacc.h>	// DXVA1
-#include <dxva2api.h>	// DXVA2
 #include "../BaseVideoFilter/BaseVideoFilter.h"
 #include "IMPCVideoDec.h"
 #include "MPCVideoDecSettingsWnd.h"
