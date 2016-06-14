@@ -76,9 +76,8 @@ struct WAVEFORMATEXFFMPEG
 	int nCodecId;
 	WAVEFORMATEX wfex;
 
-	struct WAVEFORMATEXFFMPEG()
-	{
-		nCodecId = 0;
+	struct WAVEFORMATEXFFMPEG() {
+		memset(this, 0, sizeof(*this));
 	}
 };
 

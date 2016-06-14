@@ -125,6 +125,7 @@ CFilterApp theApp;
 
 CFLVSplitterFilter::CFLVSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CFLVSplitterFilter"), pUnk, phr, __uuidof(this))
+	, m_DataOffset(0)
 	, m_TimeStampOffset(0)
 	, m_DetectWrongTimeStamp(true)
 {

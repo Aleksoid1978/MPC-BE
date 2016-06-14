@@ -276,7 +276,7 @@ start:
 					pPinOut.Attach(DNew COggFlacOutputPin(p, page.GetCount(), name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 				}
-			} else if ((!memcmp(page.GetData(), "BBCD\x00", 5) || !memcmp(page.GetData(), "KW-DIRAC\x00", 9))) {
+			} else if (!memcmp(page.GetData(), "BBCD\x00", 5) || !memcmp(page.GetData(), "KW-DIRAC\x00", 9)) {
 				if (PinNotExist) {
 					name.Format(L"Dirac %d", streamId++);
 					CAutoPtr<CBaseSplitterOutputPin> pPinOut;
@@ -386,7 +386,7 @@ start:
 			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
 			if (!pOggPin) {
 				BYTE* p = page.GetData();
-				if (!p || (p && (!memcmp(p, "fishead", 7) || !memcmp(p, "fisbone", 7)))) {
+				if (!p || !memcmp(p, "fishead", 7) || !memcmp(p, "fisbone", 7)) {
 					start_pos2 = m_pFile->GetPos();
 					continue;
 				}

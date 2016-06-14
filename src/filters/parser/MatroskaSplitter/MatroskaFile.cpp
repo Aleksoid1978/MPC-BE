@@ -258,24 +258,15 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 		}
 
 		if (Chapters.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_CHAPTERS, false))) {
-			do {
-				Chapters.Parse(pMN);
-				break;
-			} while (pMN->Next(true));
+			Chapters.Parse(pMN);
 		}
 
 		if (Attachments.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_ATTACHMENTS, false))) {
-			do {
-				Attachments.Parse(pMN);
-				break;
-			} while (pMN->Next(true));
+			Attachments.Parse(pMN);
 		}
 
 		if (Tags.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_TAGS, false))) {
-			do {
-				Tags.Parse(pMN);
-				break;
-			} while (pMN->Next(true));
+			Tags.Parse(pMN);
 		}
 	}
 
