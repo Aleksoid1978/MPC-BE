@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include <dxva2api.h>
 #include <moreuuids.h>
 #include "DXVA2Decoder.h"
 #include "DXVA2DecoderH264.h"
