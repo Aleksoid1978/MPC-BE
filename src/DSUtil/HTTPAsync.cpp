@@ -370,20 +370,20 @@ HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, 
 		return S_FALSE;
 	}
 
-	INTERNET_BUFFERSA InetBuff = { sizeof(InetBuff) };
-	InetBuff.lpvBuffer         = pBuffer;
-	InetBuff.dwBufferLength    = dwSizeToRead;
+	INTERNET_BUFFERS InetBuff = { sizeof(InetBuff) };
+	InetBuff.lpvBuffer        = pBuffer;
+	InetBuff.dwBufferLength   = dwSizeToRead;
 
 	m_context = Context::CONTEXT_REQUEST;
 
-	if (!InternetReadFileExA(m_hRequest,
-							 &InetBuff,
-							 IRF_ASYNC,
-							 (DWORD_PTR)this)) {
-		CheckLastError(L"InternetReadFileExA()", E_FAIL);
+	if (!InternetReadFileEx(m_hRequest,
+							&InetBuff,
+							IRF_ASYNC,
+							(DWORD_PTR)this)) {
+		CheckLastError(L"InternetReadFileEx()", E_FAIL);
 
 		if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
-			DbgLog((LOG_TRACE, 3, L"CHTTPAsync::Read() : InternetReadFileExA() - %d ms time out reached, exit", dwTimeOut));
+			DbgLog((LOG_TRACE, 3, L"CHTTPAsync::Read() : InternetReadFileEx() - %d ms time out reached, exit", dwTimeOut));
 			m_bRequestComplete = FALSE;
 			return S_FALSE;
 		}
