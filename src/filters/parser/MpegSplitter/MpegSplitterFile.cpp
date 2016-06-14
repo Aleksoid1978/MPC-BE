@@ -1304,7 +1304,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			s.mts.push_back(s.mt);
 		}
 
-		if (!m_bOpeningCompleted || (m_bOpeningCompleted && m_streams[type].GetCount() > 0)) {
+		if (!m_bOpeningCompleted || m_streams[type].GetCount() > 0) {
 			m_streams[type].Insert(s, type);
 		}
 	}
@@ -1629,7 +1629,9 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 											extradata[18] = channel_config_code ? (channels > 2) : 255;
 											extradata[19] = opus_stream_cnt[channel_config_code];
 											extradata[20] = opus_coupled_stream_cnt[channel_config_code];
-											memcpy(&extradata[21], opus_channel_map[channels - 1], channels);
+											if (channels >= 1) {
+												memcpy(&extradata[21], opus_channel_map[channels - 1], channels);
+											}
 										}
 									}
 								}

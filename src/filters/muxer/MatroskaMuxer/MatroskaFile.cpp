@@ -663,6 +663,7 @@ HRESULT BlockGroup::Write(IStream* pStream)
 CBlock::CBlock(DWORD id)
 	: CID(id)
 	, TimeCode(0)
+	, TimeCodeStop(0)
 {
 }
 

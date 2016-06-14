@@ -482,7 +482,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 
 					if (!pm2vi->dwFlags
-							&& ((extradata[0] || extradata[1] || extradata[2] > 1 && size > 25))) {
+							&& (extradata[0] || extradata[1] || extradata[2] > 1 && size > 25)) {
 						pm2vi->dwFlags = (extradata[21] & 3) + 1;
 					}
 
@@ -965,7 +965,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					BYTE *p = (BYTE *)(wfe + 1);
 
 					memset(p, 0, cbSize);
-					memcpy(p + 3,  &cbSize, 1);
+					memcpy(p + 3, &cbSize, 1);
 					memcpy(p + 4, (const unsigned char *)"alac", 4);
 					memcpy(p + 12, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					mts.Add(mt);
