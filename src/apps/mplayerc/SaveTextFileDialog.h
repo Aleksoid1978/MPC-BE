@@ -49,11 +49,5 @@ public:
 	BOOL GetSaveExternalStyleFile() const { return m_bSaveExternalStyleFile; }
 
 protected:
-	DECLARE_MESSAGE_MAP()
-	virtual void DoDataExchange(CDataExchange* pDX);
-	virtual BOOL OnInitDialog();
 	virtual BOOL OnFileNameOK();
-
-public:
-	afx_msg void OnEncodingChange();
 };
