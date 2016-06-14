@@ -60,21 +60,6 @@
     <ClCompile Include="DXVADecoder\DXVA2DecoderVC1.cpp">
       <Filter>Source Files\DXVADecoder</Filter>
     </ClCompile>
-    <ClCompile Include="DXVADecoder\DXVA1Decoder.cpp">
-      <Filter>Source Files\DXVADecoder</Filter>
-    </ClCompile>
-    <ClCompile Include="DXVADecoder\DXVA1DecoderH264.cpp">
-      <Filter>Source Files\DXVADecoder</Filter>
-    </ClCompile>
-    <ClCompile Include="DXVADecoder\ffmpegContext_DXVA1.cpp">
-      <Filter>Source Files\DXVADecoder</Filter>
-    </ClCompile>
-    <ClCompile Include="DXVADecoder\DXVA1DecoderVC1.cpp">
-      <Filter>Source Files\DXVADecoder</Filter>
-    </ClCompile>
-    <ClCompile Include="DXVADecoder\DXVA1DecoderMPEG2.cpp">
-      <Filter>Source Files\DXVADecoder</Filter>
-    </ClCompile>
     <ClCompile Include="DXVADecoder\DXVA2DecoderVP9.cpp">
       <Filter>Source Files\DXVADecoder</Filter>
     </ClCompile>
@@ -128,25 +113,7 @@
     <ClInclude Include="DXVADecoder\DXVA2DecoderVC1.h">
       <Filter>Header Files\DXVADecoder</Filter>
     </ClInclude>
-    <ClInclude Include="DXVADecoder\DXVADecoder.h">
-      <Filter>Header Files\DXVADecoder</Filter>
-    </ClInclude>
     <ClInclude Include="DXVADecoder\stdafx.h">
-      <Filter>Header Files\DXVADecoder</Filter>
-    </ClInclude>
-    <ClInclude Include="DXVADecoder\DXVA1Decoder.h">
-      <Filter>Header Files\DXVADecoder</Filter>
-    </ClInclude>
-    <ClInclude Include="DXVADecoder\DXVA1DecoderH264.h">
-      <Filter>Header Files\DXVADecoder</Filter>
-    </ClInclude>
-    <ClInclude Include="DXVADecoder\ffmpegContext_DXVA1.h">
-      <Filter>Header Files\DXVADecoder</Filter>
-    </ClInclude>
-    <ClInclude Include="DXVADecoder\DXVA1DecoderVC1.h">
-      <Filter>Header Files\DXVADecoder</Filter>
-    </ClInclude>
-    <ClInclude Include="DXVADecoder\DXVA1DecoderMPEG2.h">
       <Filter>Header Files\DXVADecoder</Filter>
     </ClInclude>
     <ClInclude Include="DXVADecoder\DXVA2DecoderVP9.h">

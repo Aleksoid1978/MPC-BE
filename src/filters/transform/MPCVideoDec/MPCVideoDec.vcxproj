@@ -230,20 +230,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CpuId.cpp" />
-    <ClCompile Include="DXVADecoder\DXVA1Decoder.cpp" />
-    <ClCompile Include="DXVADecoder\DXVA1DecoderH264.cpp" />
-    <ClCompile Include="DXVADecoder\DXVA1DecoderMPEG2.cpp" />
-    <ClCompile Include="DXVADecoder\DXVA1DecoderVC1.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2Decoder.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2DecoderH264.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2DecoderHEVC.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2DecoderMPEG2.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2DecoderVC1.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2DecoderVP9.cpp" />
-    <ClCompile Include="DXVADecoder\ffmpegContext_DXVA1.cpp">
-      <WarningLevel>Level1</WarningLevel>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="ffmpegContext.cpp">
       <WarningLevel>Level1</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -259,18 +251,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CpuId.h" />
-    <ClInclude Include="DXVADecoder\DXVA1Decoder.h" />
-    <ClInclude Include="DXVADecoder\DXVA1DecoderH264.h" />
-    <ClInclude Include="DXVADecoder\DXVA1DecoderMPEG2.h" />
-    <ClInclude Include="DXVADecoder\DXVA1DecoderVC1.h" />
     <ClInclude Include="DXVADecoder\DXVA2Decoder.h" />
     <ClInclude Include="DXVADecoder\DXVA2DecoderH264.h" />
     <ClInclude Include="DXVADecoder\DXVA2DecoderHEVC.h" />
     <ClInclude Include="DXVADecoder\DXVA2DecoderMPEG2.h" />
     <ClInclude Include="DXVADecoder\DXVA2DecoderVC1.h" />
     <ClInclude Include="DXVADecoder\DXVA2DecoderVP9.h" />
-    <ClInclude Include="DXVADecoder\DXVADecoder.h" />
-    <ClInclude Include="DXVADecoder\ffmpegContext_DXVA1.h" />
     <ClInclude Include="DXVADecoder\stdafx.h" />
     <ClInclude Include="ffmpegContext.h" />
     <ClInclude Include="FormatConverter.h" />

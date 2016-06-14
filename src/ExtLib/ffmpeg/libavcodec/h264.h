@@ -835,11 +835,6 @@ typedef struct H264Context {
 
     /*Green Metadata */
     GreenMetaData sei_green_metadata;
-
-    // ==> Start patch MPC
-    int ref_pic_flag;
-    int second_field_offset;
-    // ==> End patch MPC
 } H264Context;
 
 extern const uint16_t ff_h264_mb_sizes[4];

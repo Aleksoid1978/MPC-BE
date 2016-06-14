@@ -1066,14 +1066,10 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size,
     int idr_cleared=0;
     int i, ret = 0;
     // ==> Start patch MPC
-    int buf_index = 0;
     int nal_pass = 0;
     // ==> End patch MPC
 
     h->nal_unit_type= 0;
-    // ==> Start patch MPC
-    h->second_field_offset = 0;
-    // ==> End patch MPC
 
     if(!h->slice_context_count)
          h->slice_context_count= 1;
@@ -1108,10 +1104,6 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size,
         H2645NAL *nal = &h->pkt.nals[i];
         H264SliceContext *sl = &h->slice_ctx[context_count];
         int err;
-
-        // ==> Start patch MPC
-        buf_index += nal->raw_size;
-        // ==> End patch MPC
 
         if (avctx->skip_frame >= AVDISCARD_NONREF &&
             nal->ref_idc == 0 && nal->type != NAL_SEI)
@@ -1172,9 +1164,6 @@ again:
                 || (!(avctx->active_thread_type & FF_THREAD_FRAME) && !context_count))
                 h->au_pps_id = -1;
 
-                // ==> Start patch MPC
-                h->ref_pic_flag = (h->nal_ref_idc != 0);
-                // ==> End patch MPC
             if ((err = ff_h264_decode_slice_header(h, sl)))
                 break;
 
@@ -1223,9 +1212,7 @@ again:
                         }
                     }
                     nal_pass++;
-                    if (nal_pass == 1)
-                        h->second_field_offset = buf_index;
-					// ==> End patch MPC
+                    // ==> End patch MPC
 
                 if (h->avctx->hwaccel &&
                     (ret = h->avctx->hwaccel->start_frame(h->avctx, buf, buf_size)) < 0)
@@ -1393,11 +1380,6 @@ end:
         ff_thread_report_progress(&h->cur_pic_ptr->tf, INT_MAX,
                                   h->picture_structure == PICT_BOTTOM_FIELD);
     }
-
-    // ==> Start patch MPC
-    if (nal_pass < 2)
-        h->second_field_offset = 0;
-    // ==> End patch MPC
 
     return (ret < 0) ? ret : buf_size;
 }
