@@ -12,7 +12,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalOptions>/wd4005 /wd4091 /wd4267 /wd4302 /wd4311 /wd4312 /wd4473 /wd4476 /wd4477 /wd4478 /wd4838 /wd6031 /wd6246 /wd6309 /wd6387 /wd28204 /w34706 /Zo /Zc:rvalueCast %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/wd4005 /wd4091 /wd4267 /wd4302 /wd4311 /wd4312 /wd4473 /wd4476 /wd4477 /wd4478 /wd4838 /wd6031 /wd6246 /wd6309 /wd6387 /wd28204 /w34706 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zo /Zc:throwingNew /Zc:rvalueCast %(AdditionalOptions)</AdditionalOptions>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <ExceptionHandling>Sync</ExceptionHandling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -31,12 +32,12 @@
     </Lib>
     <Link>
       <DataExecutionPrevention>true</DataExecutionPrevention>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateDebugInformation>Debug</GenerateDebugInformation>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <SubSystem>Windows</SubSystem>
       <TargetMachine Condition="'$(Platform)'=='Win32'">MachineX86</TargetMachine>
       <TargetMachine Condition="'$(Platform)'=='x64'">MachineX64</TargetMachine>
+      <AdditionalDependencies>notelemetry.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -82,7 +83,6 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LargeAddressAware Condition="'$(Platform)'=='Win32'">true</LargeAddressAware>
-      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <MergeSections>.rdata=.text</MergeSections>
       <OptimizeReferences>true</OptimizeReferences>
