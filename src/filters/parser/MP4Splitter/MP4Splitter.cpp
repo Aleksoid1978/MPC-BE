@@ -1168,37 +1168,60 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				AP4_ChplAtom::AP4_Chapter& chapter = chapters[i];
 
 				CString ChapterName = ConvertStr(chapter.Name.c_str());
-
 				ChapAppend(chapter.Time, ChapterName);
 			}
 		} else if (ChapterTrackId != INT_MIN) {
 			for (AP4_List<AP4_Track>::Item* item = movie->GetTracks().FirstItem();
 					item;
 					item = item->GetNext()) {
-
 				AP4_Track* track = item->GetData();
 
 				if (ChapterTrackId == track->GetId()) {
-
-					char buff[256] = { 0 };
+					char* buff = NULL;
 					for (AP4_Cardinal i = 0; i < track->GetSampleCount(); i++) {
 						AP4_Sample sample;
 						AP4_DataBuffer data;
 						track->ReadSample(i, sample, data);
 
-						const AP4_Byte* ptr	= data.GetData();
-						AP4_Size avail		= data.GetDataSize();
+						const AP4_Byte* ptr  = data.GetData();
+						const AP4_Size avail = data.GetDataSize();
 						CString ChapterName;
 
 						if (avail > 2) {
 							size_t size = (ptr[0] << 8) | ptr[1];
-							if (size > avail) size = avail;
-							memcpy(buff, &ptr[2], size);
-							buff[size] = 0;
+							if (size > avail - 2) {
+								size = avail - 2;
+							}
 
-							ChapterName = ConvertStr(buff);
-							REFERENCE_TIME rtStart	= (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts());
+							bool bUTF16LE = false;
+							bool bUTF16BE = false;
+							if (avail > 4) {
+								const WORD bom = (ptr[2] << 8) | ptr[3];
+								if (bom == 0xfffe) {
+									bUTF16LE = true;
+								} else if (bom == 0xfeff) {
+									bUTF16BE = true;
+								}
+							}
 
+							if (bUTF16LE || bUTF16BE) {
+								memcpy((BYTE*)ChapterName.GetBufferSetLength(size / 2), &ptr[2], size);
+								if (bUTF16BE) {
+									for (int i = 0, j = ChapterName.GetLength(); i < j; i++) {
+										ChapterName.SetAt(i, (ChapterName[i] << 8) | (ChapterName[i] >> 8));
+									}
+								}
+							} else {
+								buff = DNew char[size + 1];
+								memcpy(buff, &ptr[2], size);
+								buff[size] = 0;
+
+								ChapterName = ConvertStr(buff);
+
+								SAFE_DELETE_ARRAY(buff);
+							}
+							
+							const REFERENCE_TIME rtStart = FractionScale64(sample.GetCts(), UNITS, track->GetMediaTimeScale());
 							ChapAppend(rtStart, ChapterName);
 						}
 					}
