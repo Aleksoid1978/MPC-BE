@@ -366,8 +366,8 @@ static unsigned __int64 GetFileVersion(LPCWSTR lptstrFilename)
 int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
 							 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion)
 {
-	H264Context*	h				= (H264Context*)pAVCtx->priv_data;
-	SPS*			cur_sps			= &h->sps;
+	const H264Context* h			= (H264Context*)pAVCtx->priv_data;
+	const SPS* cur_sps				= h->ps.sps;
 
 	int video_is_level51			= 0;
 	int no_level51_support			= 1;
@@ -499,7 +499,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 	// fill "Bitstream height" properties
 	if (pAVCtx->codec_id == AV_CODEC_ID_H264) {
 		const H264Context* h = (H264Context*)pAVCtx->priv_data;
-		const SPS* sps       = &h->sps;
+		const SPS* sps       = h->ps.sps;
 		if (h->current_sps_id != -1 && sps) {
 			pAVCtx->coded_height = sps->mb_height * (2 - sps->frame_mbs_only_flag) * 16;
 		}

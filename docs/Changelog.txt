@@ -11,6 +11,9 @@ Legend:
 ==============================
 Windows XP is no longer supported.
 
+Updated libraries:
+	ffmpeg git-n3.1-dev-1880-geaa1143;
+
 1.4.6
 ==============================
 Splitters and source filters
