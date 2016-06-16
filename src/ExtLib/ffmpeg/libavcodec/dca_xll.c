@@ -32,7 +32,7 @@ static int get_linear(GetBitContext *gb, int n)
 
 static int get_rice_un(GetBitContext *gb, int k)
 {
-    unsigned int v = get_unary(gb, 1, 128);
+    unsigned int v = get_unary(gb, 1, get_bits_left(gb));
     return (v << k) | get_bits_long(gb, k);
 }
 
@@ -1070,7 +1070,7 @@ static int copy_to_pbr(DCAXllDecoder *s, uint8_t *data, int size, int delay)
     if (size > DCA_XLL_PBR_BUFFER_MAX)
         return AVERROR(ENOSPC);
 
-    if (!s->pbr_buffer && !(s->pbr_buffer = av_malloc(DCA_XLL_PBR_BUFFER_MAX + DCA_BUFFER_PADDING_SIZE)))
+    if (!s->pbr_buffer && !(s->pbr_buffer = av_malloc(DCA_XLL_PBR_BUFFER_MAX + AV_INPUT_BUFFER_PADDING_SIZE)))
         return AVERROR(ENOMEM);
 
     memcpy(s->pbr_buffer, data, size);

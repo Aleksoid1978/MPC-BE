@@ -141,22 +141,6 @@ void ff_dca_downmix_to_stereo_float(AVFloatDSPContext *fdsp, float **samples,
     }
 }
 
-static int convert_bitstream(const uint8_t *src, int src_size, uint8_t *dst, int max_size)
-{
-    switch (AV_RB32(src)) {
-    case DCA_SYNCWORD_CORE_BE:
-    case DCA_SYNCWORD_SUBSTREAM:
-        memcpy(dst, src, src_size);
-        return src_size;
-    case DCA_SYNCWORD_CORE_LE:
-    case DCA_SYNCWORD_CORE_14B_BE:
-    case DCA_SYNCWORD_CORE_14B_LE:
-        return avpriv_dca_convert_bitstream(src, src_size, dst, max_size);
-    default:
-        return AVERROR_INVALIDDATA;
-    }
-}
-
 static int dcadec_decode_frame(AVCodecContext *avctx, void *data,
                                int *got_frame_ptr, AVPacket *avpkt)
 {
@@ -165,25 +149,31 @@ static int dcadec_decode_frame(AVCodecContext *avctx, void *data,
     uint8_t *input = avpkt->data;
     int input_size = avpkt->size;
     int i, ret, prev_packet = s->packet;
+    uint32_t mrk;
 
     if (input_size < MIN_PACKET_SIZE || input_size > MAX_PACKET_SIZE) {
         av_log(avctx, AV_LOG_ERROR, "Invalid packet size\n");
         return AVERROR_INVALIDDATA;
     }
 
-    av_fast_malloc(&s->buffer, &s->buffer_size,
-                   FFALIGN(input_size, 4096) + DCA_BUFFER_PADDING_SIZE);
-    if (!s->buffer)
-        return AVERROR(ENOMEM);
+    // Convert input to BE format
+    mrk = AV_RB32(input);
+    if (mrk != DCA_SYNCWORD_CORE_BE && mrk != DCA_SYNCWORD_SUBSTREAM) {
+        av_fast_padded_malloc(&s->buffer, &s->buffer_size, input_size);
+        if (!s->buffer)
+            return AVERROR(ENOMEM);
 
-    for (i = 0, ret = AVERROR_INVALIDDATA; i < input_size - MIN_PACKET_SIZE + 1 && ret < 0; i++)
-        ret = convert_bitstream(input + i, input_size - i, s->buffer, s->buffer_size);
+        for (i = 0, ret = AVERROR_INVALIDDATA; i < input_size - MIN_PACKET_SIZE + 1 && ret < 0; i++)
+            ret = avpriv_dca_convert_bitstream(input + i, input_size - i, s->buffer, s->buffer_size);
 
-    if (ret < 0)
-        return ret;
+        if (ret < 0) {
+            av_log(avctx, AV_LOG_ERROR, "Not a valid DCA frame\n");
+            return ret;
+        }
 
-    input      = s->buffer;
-    input_size = ret;
+        input      = s->buffer;
+        input_size = ret;
+    }
 
     s->packet = 0;
 
@@ -191,10 +181,8 @@ static int dcadec_decode_frame(AVCodecContext *avctx, void *data,
     if (AV_RB32(input) == DCA_SYNCWORD_CORE_BE) {
         int frame_size;
 
-        if ((ret = ff_dca_core_parse(&s->core, input, input_size)) < 0) {
-            s->core_residual_valid = 0;
+        if ((ret = ff_dca_core_parse(&s->core, input, input_size)) < 0)
             return ret;
-        }
 
         s->packet |= DCA_PACKET_CORE;
 
@@ -263,19 +251,20 @@ static int dcadec_decode_frame(AVCodecContext *avctx, void *data,
             if (s->xll.chset[0].freq == 96000 && s->core.sample_rate == 48000)
                 x96_synth = 1;
 
-            if ((ret = ff_dca_core_filter_fixed(&s->core, x96_synth)) < 0) {
-                s->core_residual_valid = 0;
+            if ((ret = ff_dca_core_filter_fixed(&s->core, x96_synth)) < 0)
                 return ret;
-            }
 
             // Force lossy downmixed output on the first core frame filtered.
             // This prevents audible clicks when seeking and is consistent with
             // what reference decoder does when there are multiple channel sets.
-            if (!s->core_residual_valid) {
-                if (s->xll.nreschsets > 0 && s->xll.nchsets > 1)
-                    s->packet |= DCA_PACKET_RECOVERY;
-                s->core_residual_valid = 1;
+            if (!(prev_packet & DCA_PACKET_RESIDUAL) && s->xll.nreschsets > 0
+                && s->xll.nchsets > 1) {
+                av_log(avctx, AV_LOG_VERBOSE, "Forcing XLL recovery mode\n");
+                s->packet |= DCA_PACKET_RECOVERY;
             }
+
+            // Set 'residual ok' flag for the next frame
+            s->packet |= DCA_PACKET_RESIDUAL;
         }
 
         if ((ret = ff_dca_xll_filter_frame(&s->xll, frame)) < 0) {
@@ -284,18 +273,18 @@ static int dcadec_decode_frame(AVCodecContext *avctx, void *data,
                 return ret;
             if (ret != AVERROR_INVALIDDATA || (avctx->err_recognition & AV_EF_EXPLODE))
                 return ret;
-            if ((ret = ff_dca_core_filter_frame(&s->core, frame)) < 0) {
-                s->core_residual_valid = 0;
+            if ((ret = ff_dca_core_filter_frame(&s->core, frame)) < 0)
                 return ret;
-            }
         }
     } else if (s->packet & DCA_PACKET_CORE) {
-        if ((ret = ff_dca_core_filter_frame(&s->core, frame)) < 0) {
-            s->core_residual_valid = 0;
+        if ((ret = ff_dca_core_filter_frame(&s->core, frame)) < 0)
             return ret;
-        }
-        s->core_residual_valid = !!(s->core.filter_mode & DCA_FILTER_MODE_FIXED);
+        if (s->core.filter_mode & DCA_FILTER_MODE_FIXED)
+            s->packet |= DCA_PACKET_RESIDUAL;
     } else {
+        av_log(avctx, AV_LOG_ERROR, "No valid DCA sub-stream found\n");
+        if (s->core_only)
+            av_log(avctx, AV_LOG_WARNING, "Consider disabling 'core_only' option\n");
         return AVERROR_INVALIDDATA;
     }
 
@@ -312,7 +301,7 @@ static av_cold void dcadec_flush(AVCodecContext *avctx)
     ff_dca_xll_flush(&s->xll);
     ff_dca_lbr_flush(&s->lbr);
 
-    s->core_residual_valid = 0;
+    s->packet &= DCA_PACKET_MASK;
 }
 
 static av_cold int dcadec_close(AVCodecContext *avctx)
@@ -372,9 +361,6 @@ static av_cold int dcadec_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_WARNING, "Invalid request_channel_layout\n");
         break;
     }
-
-    avctx->sample_fmt = AV_SAMPLE_FMT_S32P;
-    avctx->bits_per_raw_sample = 24;
 
     return 0;
 }

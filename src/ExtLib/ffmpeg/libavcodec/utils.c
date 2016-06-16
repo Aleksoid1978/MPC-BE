@@ -2290,6 +2290,9 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
 
     *got_frame_ptr = 0;
 
+    if (!avctx->codec)
+        return AVERROR(EINVAL);
+
     if (!avctx->codec->decode) {
         av_log(avctx, AV_LOG_ERROR, "This decoder requires using the avcodec_send_packet() API.\n");
         return AVERROR(ENOSYS);
@@ -2299,8 +2302,6 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
         av_log(avctx, AV_LOG_ERROR, "invalid packet: NULL data, size != 0\n");
         return AVERROR(EINVAL);
     }
-    if (!avctx->codec)
-        return AVERROR(EINVAL);
     if (avctx->codec->type != AVMEDIA_TYPE_AUDIO) {
         av_log(avctx, AV_LOG_ERROR, "Invalid media type for audio\n");
         return AVERROR(EINVAL);
@@ -2354,7 +2355,7 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
             skip_reason = AV_RL8(side + 8);
             discard_reason = AV_RL8(side + 9);
         }
-        if (avctx->internal->skip_samples && *got_frame_ptr &&
+        if (avctx->internal->skip_samples > 0 && *got_frame_ptr &&
             !(avctx->flags2 & AV_CODEC_FLAG2_SKIP_MANUAL)) {
             if(frame->nb_samples <= avctx->internal->skip_samples){
                 *got_frame_ptr = 0;
@@ -3499,6 +3500,8 @@ static int get_audio_frame_duration(enum AVCodecID id, int sr, int ch, int ba,
         /* calc from sample rate */
         if (id == AV_CODEC_ID_TTA)
             return 256 * sr / 245;
+        else if (id == AV_CODEC_ID_DST)
+            return 588 * sr / 44100;
 
         if (ch > 0) {
             /* calc from sample rate and channels */
@@ -3607,6 +3610,8 @@ static int get_audio_frame_duration(enum AVCodecID id, int sr, int ch, int ba,
                     return blocks * ((ba - 4 * ch) * 2 / ch);
                 case AV_CODEC_ID_ADPCM_MS:
                     return blocks * (2 + (ba - 7 * ch) * 2 / ch);
+                case AV_CODEC_ID_ADPCM_MTAF:
+                    return blocks * (ba - 16) * 2 / ch;
                 }
             }
 
@@ -4161,6 +4166,7 @@ int avcodec_parameters_to_context(AVCodecContext *codec,
         codec->sample_rate     = par->sample_rate;
         codec->block_align     = par->block_align;
         codec->frame_size      = par->frame_size;
+        codec->delay           =
         codec->initial_padding = par->initial_padding;
         codec->seek_preroll    = par->seek_preroll;
         break;
@@ -4181,23 +4187,3 @@ int avcodec_parameters_to_context(AVCodecContext *codec,
 
     return 0;
 }
-
-#ifdef TEST
-int main(void){
-    AVCodec *codec = NULL;
-    int ret = 0;
-    avcodec_register_all();
-
-    while (codec = av_codec_next(codec)) {
-        if (av_codec_is_encoder(codec)) {
-            if (codec->type == AVMEDIA_TYPE_AUDIO) {
-                if (!codec->sample_fmts) {
-                    av_log(NULL, AV_LOG_FATAL, "Encoder %s is missing the sample_fmts field\n", codec->name);
-                    ret = 1;
-                }
-            }
-        }
-    }
-    return ret;
-}
-#endif /* TEST */

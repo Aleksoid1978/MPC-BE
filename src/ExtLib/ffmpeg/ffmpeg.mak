@@ -175,6 +175,7 @@ SRCS_LC = \
 	libavcodec/dnxhd_parser.c \
 	libavcodec/dnxhddata.c \
 	libavcodec/dnxhddec.c \
+	libavcodec/dsd.c \
 	libavcodec/dsddec.c \
 	libavcodec/dv.c \
 	libavcodec/dv_profile.c \
