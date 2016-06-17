@@ -1330,9 +1330,12 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	CRect r;
 	GetWindowRect(&r);
 	MINMAXINFO mmi = { 0 };
-	SendMessage(WM_GETMINMAXINFO, 0, (LPARAM)&mmi);
-	r |= CRect(r.TopLeft(), CSize(r.Width(), mmi.ptMinTrackSize.y));
-	MoveWindow(&r);
+	OnGetMinMaxInfo(&mmi);
+	const POINT& min = mmi.ptMinTrackSize;
+	if (r.Height() < min.y || r.Width() < min.x) {
+		r |= CRect(r.TopLeft(), CSize(min));
+		MoveWindow(r);
+	}
 
 	FlyBarSetPos();
 	OSDBarSetPos();
@@ -1555,64 +1558,42 @@ BOOL CMainFrame::OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO*
 
 void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 {
-	CAppSettings &s	= AfxGetAppSettings();
-	DWORD style		= GetStyle();
+	const BOOL bMenuVisible = !IsMenuHidden();
 
-	lpMMI->ptMinTrackSize.x = 16;
-	if (!IsMenuHidden()) {
-		MENUBARINFO mbi;
-		memset(&mbi, 0, sizeof(mbi));
-		mbi.cbSize = sizeof(mbi);
-		::GetMenuBarInfo(m_hWnd, OBJID_MENU, 0, &mbi);
+	CSize cSize;
+	CalcControlsSize(cSize);
+	lpMMI->ptMinTrackSize = CPoint(cSize);
+	
+	if (bMenuVisible) {
+		MENUBARINFO mbi = { sizeof(mbi) };
+		GetMenuBarInfo(OBJID_MENU, 0, &mbi);
 
 		// Calculate menu's horizontal length in pixels
-		lpMMI->ptMinTrackSize.x = GetSystemMetrics(SM_CYMENU)/2; //free space after menu
+		long x = GetSystemMetrics(SM_CYMENU) / 2; // free space after menu
 		CRect r;
-		for (int i = 0; ::GetMenuItemRect(m_hWnd, mbi.hMenu, i, &r); i++) {
-			lpMMI->ptMinTrackSize.x += r.Width();
+		for (UINT uItem = 0; ::GetMenuItemRect(m_hWnd, mbi.hMenu, uItem, &r); uItem++) {
+			x += r.Width();
 		}
+		lpMMI->ptMinTrackSize.x = max(lpMMI->ptMinTrackSize.x, x);
 	}
+
 	if (IsWindow(m_wndToolBar.m_hWnd) && m_wndToolBar.IsVisible()) {
 		lpMMI->ptMinTrackSize.x = max(m_wndToolBar.GetMinWidth(), lpMMI->ptMinTrackSize.x);
 	}
 
-	lpMMI->ptMinTrackSize.y = 0;
-	if (style & WS_CAPTION ) {
-		lpMMI->ptMinTrackSize.y += GetSystemMetrics(SM_CYCAPTION);
-		if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
-			lpMMI->ptMinTrackSize.y += GetSystemMetrics(SM_CYMENU);    //(mbi.rcBar.bottom - mbi.rcBar.top);
-		}
-		//else MODE_HIDEMENU
-	}
+	// Ensure that window decorations will fit
+	CRect decorationsRect;
+	VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), bMenuVisible, GetWindowExStyle(m_hWnd)));
+	lpMMI->ptMinTrackSize.x += decorationsRect.Width();
+	lpMMI->ptMinTrackSize.y += decorationsRect.Height();
 
-	if (style & WS_THICKFRAME) {
-		lpMMI->ptMinTrackSize.x += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
-		lpMMI->ptMinTrackSize.y += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-		if ( (style & WS_CAPTION) == 0 ) {
-			lpMMI->ptMinTrackSize.x -= 2;
-			lpMMI->ptMinTrackSize.y -= 2;
-		}
-	}
+	// Final phase
+	lpMMI->ptMinTrackSize.x = max(lpMMI->ptMinTrackSize.x, GetSystemMetrics(SM_CXMIN));
+	lpMMI->ptMinTrackSize.y = max(lpMMI->ptMinTrackSize.y, GetSystemMetrics(SM_CYMIN));
 
-	POSITION pos = m_bars.GetHeadPosition();
-	while (pos) {
-		CControlBar *pCB = m_bars.GetNext( pos );
-		if (!IsWindow(pCB->m_hWnd) || !pCB->IsVisible()) {
-			continue;
-		}
-		lpMMI->ptMinTrackSize.y += pCB->CalcFixedLayout(TRUE, TRUE).cy;
-	}
-
-	pos = m_dockingbars.GetHeadPosition();
-	while (pos) {
-		CSizingControlBar *pCB = m_dockingbars.GetNext( pos );
-		if (IsWindow(pCB->m_hWnd) && pCB->IsWindowVisible() && !pCB->IsFloating()) {
-			lpMMI->ptMinTrackSize.y += pCB->CalcFixedLayout(TRUE, TRUE).cy - 2;    // 2 is a magic value from CSizingControlBar class, i guess this should be GetSystemMetrics( SM_CXBORDER ) or similar
-		}
-	}
-	if (lpMMI->ptMinTrackSize.y<16) {
-		lpMMI->ptMinTrackSize.y = 16;
-	}
+	lpMMI->ptMaxTrackSize.x = GetSystemMetrics(SM_CXVIRTUALSCREEN) + decorationsRect.Width();
+	lpMMI->ptMaxTrackSize.y = GetSystemMetrics(SM_CYVIRTUALSCREEN)
+							  + ((GetStyle() & WS_THICKFRAME) ? GetSystemMetrics(SM_CYSIZEFRAME) : 0);
 
 	FlyBarSetPos();
 	OSDBarSetPos();
