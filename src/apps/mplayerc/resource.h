@@ -366,10 +366,10 @@
 #define ID_PANNSCAN_PRESETS_END         4199
 #define ID_SHADERS_START                4200
 #define ID_SHADERS_END                  4299
-#define ID_NAVIGATE_CHAP_SUBITEM_START  4300
-#define ID_NAVIGATE_CHAP_SUBITEM_END    4499
-#define ID_RECENT_FILE_START            4500
-#define ID_RECENT_FILE_END              4599
+#define ID_RECENT_FILE_START            4300
+#define ID_RECENT_FILE_END              4399
+#define ID_NAVIGATE_CHAP_SUBITEM_START  4400
+#define ID_NAVIGATE_CHAP_SUBITEM_END    4699
 //
 #define ID_VIEW_LANGUAGE                5000
 #define ID_LANGUAGE_ENGLISH             5001
