@@ -19023,11 +19023,6 @@ void CMainFrame::AddAudioPathsAddons(CString FileName)
 
 BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
 {
-	CString fName = GetCurFileName();
-	if (CString(fName).MakeLower().Find(L"youtube") >= 0) {
-		return TRUE;
-	}
-
 	if (m_nMainFilterId) {
 		if (m_nMainFilterId == (DWORD_PTR)pBF) {
 			return TRUE;
@@ -19046,12 +19041,7 @@ BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
 			break;
 		}
 
-		IPin* pPin = GetFirstPin(pBF);
-
-		pPin = GetUpStreamPin(pBF, pPin);
-		if (pPin) {
-			pBF = GetFilterFromPin(pPin);
-		}
+		pBF = GetUpStreamFilter(pBF);
 	}
 
 	m_nMainFilterId = NULL;
