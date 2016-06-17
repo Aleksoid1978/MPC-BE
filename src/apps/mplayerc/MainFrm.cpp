@@ -15747,16 +15747,18 @@ void CMainFrame::CalcControlsSize(CSize& cSize)
 	pos = m_dockingbars.GetHeadPosition();
 	while (pos) {
 		CSizingControlBar *pCB = m_dockingbars.GetNext(pos);
-		BOOL IsWindowVisible = pCB->IsWindowVisible();
-		if (auto* playlistBar = dynamic_cast<CPlayerPlaylistBar*>(pCB)) {
-			IsWindowVisible = playlistBar->IsPlaylistVisible();
-		}
+		if (IsWindow(pCB->m_hWnd)) {
+			BOOL bIsWindowVisible = pCB->IsWindowVisible();
+			if (auto* playlistBar = dynamic_cast<CPlayerPlaylistBar*>(pCB)) {
+				bIsWindowVisible = playlistBar->IsPlaylistVisible();
+			}
 
-		if (IsWindow(pCB->m_hWnd) && IsWindowVisible && !pCB->IsFloating()) {
-			if (pCB->IsHorzDocked()) {
-				cSize.cy += pCB->CalcFixedLayout(TRUE, TRUE).cy - GetSystemMetrics(SM_CYBORDER);
-			} else if (pCB->IsVertDocked()) {
-				cSize.cx += pCB->CalcFixedLayout(TRUE, FALSE).cx;
+			if (bIsWindowVisible && !pCB->IsFloating()) {
+				if (pCB->IsHorzDocked()) {
+					cSize.cy += pCB->CalcFixedLayout(TRUE, TRUE).cy - GetSystemMetrics(SM_CYBORDER);
+				} else if (pCB->IsVertDocked()) {
+					cSize.cx += pCB->CalcFixedLayout(TRUE, FALSE).cx;
+				}
 			}
 		}
 	}
