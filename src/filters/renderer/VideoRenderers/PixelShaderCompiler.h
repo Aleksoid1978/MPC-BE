@@ -21,31 +21,35 @@
 
 #pragma once
 
-#include <dx/d3dx9shader.h>
-
+#include <atlstr.h>
+#include <D3Dcompiler.h>
+#include <D3D9.h>
 
 class CPixelShaderCompiler
 {
-	typedef HRESULT (WINAPI * D3DXCompileShaderPtr) (
-		LPCSTR		pSrcData,
-		UINT		SrcDataLen,
-		CONST D3DXMACRO* pDefines,
-		LPD3DXINCLUDE	pInclude,
-		LPCSTR		pFunctionName,
-		LPCSTR		pProfile,
-		DWORD		Flags,
-		LPD3DXBUFFER*	ppShader,
-		LPD3DXBUFFER*	ppErrorMsgs,
-		LPD3DXCONSTANTTABLE* ppConstantTable);
-
-	typedef HRESULT (WINAPI * D3DXDisassembleShaderPtr) (
-		CONST DWORD*	pShader,
-		bool		EnableColorCode,
-		LPCSTR		pComments,
-		LPD3DXBUFFER*	ppDisassembly);
-
-	D3DXCompileShaderPtr m_pD3DXCompileShader;
-	D3DXDisassembleShaderPtr m_pD3DXDisassembleShader;
+	typedef HRESULT(WINAPI* D3DCompilePtr)(
+		__in_bcount(SrcDataSize) LPCVOID pSrcData,
+		__in SIZE_T SrcDataSize,
+		__in_opt LPCSTR pSourceName,
+		__in_xcount_opt(pDefines->Name != NULL) CONST D3D_SHADER_MACRO* pDefines,
+		__in_opt ID3DInclude* pInclude,
+		__in LPCSTR pEntrypoint,
+		__in LPCSTR pTarget,
+		__in UINT Flags1,
+		__in UINT Flags2,
+		__out ID3DBlob** ppCode,
+		__out_opt ID3DBlob** ppErrorMsgs
+	);
+	typedef HRESULT(WINAPI* D3DDisassemblePtr)(
+		__in_bcount(SrcDataSize) LPCVOID pSrcData,
+		__in SIZE_T SrcDataSize,
+		__in UINT Flags,
+		__in_opt LPCSTR szComments,
+		__out ID3DBlob** ppDisassembly
+	);
+	// warning: the constructor function initializes these pointers as a sorted array
+	D3DCompilePtr m_fnD3DCompile;
+	D3DDisassemblePtr m_fnD3DDisassemble;
 
 	CComPtr<IDirect3DDevice9> m_pD3DDev;
 
@@ -58,7 +62,7 @@ public:
 		LPCSTR pFunctionName,
 		LPCSTR pProfile,
 		DWORD Flags,
-		const D3DXMACRO* pDefines,
+		const D3D_SHADER_MACRO* pDefines,
 		IDirect3DPixelShader9** ppPixelShader,
 		CString* errmsg = NULL,
 		CString* disasm = NULL);
