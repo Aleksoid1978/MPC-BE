@@ -1054,7 +1054,7 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int iShader)
 
 	bool twopass = false;
 	LPCSTR pSrcData = NULL;
-	D3DXMACRO ShaderMacros[3] = {
+	D3D_SHADER_MACRO ShaderMacros[3] = {
 		{ "Ml", m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "1" : "0" },
 		{ NULL, NULL },
 		{ NULL, NULL }
@@ -1558,7 +1558,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 
 	// Compile the final pixel shader
 	LPCSTR pSrcData = shader_final;
-	D3DXMACRO ShaderMacros[5] = { { NULL, NULL }, };
+	D3D_SHADER_MACRO ShaderMacros[5] = { { NULL, NULL }, };
 	size_t i = 0;
 
 	ShaderMacros[i++] = { "Ml", m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "1" : "0" };

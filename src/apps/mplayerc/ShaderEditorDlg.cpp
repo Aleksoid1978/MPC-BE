@@ -427,7 +427,7 @@ void CShaderEditorDlg::OnTimer(UINT_PTR nIDEvent)
 			}
 
 			CString disasm, errmsg;
-			HRESULT hr = m_pPSC->CompileShader(CStringA(srcdata), "main", CStringA(target), D3DXSHADER_DEBUG, NULL, NULL, &errmsg, &disasm);
+			HRESULT hr = m_pPSC->CompileShader(CStringA(srcdata), "main", CStringA(target), D3DCOMPILE_DEBUG, NULL, NULL, &errmsg, &disasm);
 
 			if (SUCCEEDED(hr)) {
 				errmsg = _T("D3DXCompileShader succeeded\n");

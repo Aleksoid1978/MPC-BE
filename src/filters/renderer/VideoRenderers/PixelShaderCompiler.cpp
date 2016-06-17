@@ -24,24 +24,34 @@
 #include "RenderersSettings.h"
 #include "PixelShaderCompiler.h"
 
+HINSTANCE GetD3dcompilerDll()
+{
+	static HINSTANCE s_hD3dcompilerDll = NULL;
+
+	if (s_hD3dcompilerDll == NULL) {
+		s_hD3dcompilerDll = LoadLibrary(L"D3dcompiler_43.dll"); // Microsoft DirectX SDK (June 2010)
+	}
+
+	return s_hD3dcompilerDll;
+}
 
 CPixelShaderCompiler::CPixelShaderCompiler(IDirect3DDevice9* pD3DDev, bool fStaySilent)
 	: m_pD3DDev(pD3DDev)
-	, m_pD3DXCompileShader(NULL)
-	, m_pD3DXDisassembleShader(NULL)
+	, m_fnD3DCompile(NULL)
+	, m_fnD3DDisassemble(NULL)
 {
-	HINSTANCE		hDll;
-	hDll = GetD3X9Dll();
+	HINSTANCE hDll;
+	hDll = GetD3dcompilerDll();
 
 	if (hDll) {
-		m_pD3DXCompileShader = (D3DXCompileShaderPtr)GetProcAddress(hDll, "D3DXCompileShader");
-		m_pD3DXDisassembleShader = (D3DXDisassembleShaderPtr)GetProcAddress(hDll, "D3DXDisassembleShader");
+		m_fnD3DCompile = (D3DCompilePtr)GetProcAddress(hDll, "D3DCompile");
+		m_fnD3DDisassemble = (D3DDisassemblePtr)GetProcAddress(hDll, "D3DDisassemble");
 	}
 
 	if (!fStaySilent) {
 		if (!hDll) {
 			AfxMessageBox(ResStr(IDS_PIXELSHADERCOMPILER_0), MB_OK);
-		} else if (!m_pD3DXCompileShader || !m_pD3DXDisassembleShader) {
+		} else if (!m_fnD3DCompile || !m_fnD3DDisassemble) {
 			AfxMessageBox(ResStr(IDS_PIXELSHADERCOMPILER_1), MB_OK);
 		}
 	}
@@ -56,19 +66,18 @@ HRESULT CPixelShaderCompiler::CompileShader(
 	LPCSTR pFunctionName,
 	LPCSTR pProfile,
 	DWORD Flags,
-	const D3DXMACRO* pDefines,
+	const D3D_SHADER_MACRO* pDefines,
 	IDirect3DPixelShader9** ppPixelShader,
 	CString* errmsg,
 	CString* disasm)
 {
-	if (!m_pD3DXCompileShader || !m_pD3DXDisassembleShader) {
+	if (!m_fnD3DCompile || !m_fnD3DDisassemble) {
 		return E_FAIL;
 	}
 
 	HRESULT hr;
-
-	CComPtr<ID3DXBuffer> pShader, pDisAsm, pErrorMsgs;
-	hr = m_pD3DXCompileShader(pSrcData, (UINT)strlen(pSrcData), pDefines, NULL, pFunctionName, pProfile, Flags, &pShader, &pErrorMsgs, NULL);
+	ID3DBlob* pShader, *pErrorMsgs;
+	hr = m_fnD3DCompile(pSrcData, (SIZE_T)strlen(pSrcData), NULL, pDefines, NULL, pFunctionName, pProfile, Flags, 0, &pShader, &pErrorMsgs);
 
 	if (FAILED(hr)) {
 		if (errmsg) {
@@ -96,7 +105,8 @@ HRESULT CPixelShaderCompiler::CompileShader(
 	}
 
 	if (disasm) {
-		hr = m_pD3DXDisassembleShader((DWORD*)pShader->GetBufferPointer(), FALSE, NULL, &pDisAsm);
+		ID3DBlob* pDisAsm;
+		hr = m_fnD3DDisassemble(pShader->GetBufferPointer(), pShader->GetBufferSize(), 0, NULL, &pDisAsm);
 		if (SUCCEEDED(hr) && pDisAsm) {
 			*disasm = CStringA((const char*)pDisAsm->GetBufferPointer());
 		}
