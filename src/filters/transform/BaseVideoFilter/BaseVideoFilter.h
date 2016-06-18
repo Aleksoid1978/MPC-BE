@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <dx/d3dx9.h>
+#include <d3d9.h>
 #include <dxva2api.h>
 
 bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* dstUV, int dstPitch, BYTE* srcY, BYTE* srcUV, int srcPitch);
