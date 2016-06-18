@@ -44,8 +44,8 @@ CPixelShaderCompiler::CPixelShaderCompiler(IDirect3DDevice9* pD3DDev, bool fStay
 	hDll = GetD3dcompilerDll();
 
 	if (hDll) {
-		m_fnD3DCompile = (D3DCompilePtr)GetProcAddress(hDll, "D3DCompile");
-		m_fnD3DDisassemble = (D3DDisassemblePtr)GetProcAddress(hDll, "D3DDisassemble");
+		m_fnD3DCompile = (pD3DCompile)GetProcAddress(hDll, "D3DCompile");
+		m_fnD3DDisassemble = (pD3DDisassemble)GetProcAddress(hDll, "D3DDisassemble");
 	}
 
 	if (!fStaySilent) {
