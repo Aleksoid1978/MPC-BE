@@ -78,12 +78,7 @@ HINSTANCE GetD3X9Dll()
 #if D3DX_SDK_VERSION < 43
 #error DirectX SDK June 2010 (v43) or newer is required to build MPC-BE
 #endif
-	static HINSTANCE s_hD3DX9Dll = NULL;
-
-	if (s_hD3DX9Dll == NULL) {
-		// load latest compatible version of the DLL that is available
-		s_hD3DX9Dll = LoadLibrary(L"d3dx9_43.dll");
-	}
+	static HINSTANCE s_hD3DX9Dll = LoadLibraryW(L"d3dx9_43.dll"); // load latest compatible version of the DLL that is available
 
 	return s_hD3DX9Dll;
 }
