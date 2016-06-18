@@ -29,7 +29,19 @@ HINSTANCE GetD3dcompilerDll()
 	static HINSTANCE s_hD3dcompilerDll = NULL;
 
 	if (s_hD3dcompilerDll == NULL) {
+#ifdef _DEBUG
+		CString path;
+		SHGetFolderPath(NULL, CSIDL_PROGRAM_FILESX86, NULL, 0, path.GetBuffer(_MAX_PATH));
+		path.ReleaseBuffer();
+	#ifdef _WIN64
+		path.Append(L"\\Windows Kits\\8.1\\bin\\x64\\d3dcompiler_47.dll");
+	#else
+		path.Append(L"\\Windows Kits\\8.1\\bin\\x86\\d3dcompiler_47.dll");
+	#endif
+		s_hD3dcompilerDll = LoadLibrary(path);
+#else
 		s_hD3dcompilerDll = LoadLibrary(L"d3dcompiler_47.dll"); // Windows Kits\8.1\Redist\D3D\[x86|x64]\d3dcompiler_47.dll
+#endif
 	}
 
 	return s_hD3dcompilerDll;
