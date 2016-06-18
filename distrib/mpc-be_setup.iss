@@ -191,8 +191,8 @@ Name: reset_settings;           Description: {cm:tsk_ResetSettings};     GroupDe
 [Files]
 Source: "{#bindir}\{#mpcbe_exe}";            DestDir: "{app}"; Flags: ignoreversion;                                   Components: main
 Source: "{#bindir}\mpciconlib.dll";          DestDir: "{app}"; Flags: ignoreversion;                                   Components: mpciconlib
-Source: "{#dxdir}\D3DCompiler_43.dll";       DestDir: "{app}"; Flags: ignoreversion;                                   Components: main;          Check : not D3DX9DLLExists();
-Source: "{#dxdir}\d3dx9_43.dll";             DestDir: "{app}"; Flags: ignoreversion;                                   Components: main;          Check : not D3DX9DLLExists();
+Source: "{#dxdir}\d3dcompiler_47.dll";       DestDir: "{app}"; Flags: ignoreversion;                                   Components: main;          Check : not D3DCompiler_47_DLLExists();
+Source: "{#dxdir}\d3dx9_43.dll";             DestDir: "{app}"; Flags: ignoreversion;                                   Components: main;          Check : not D3DX9_43_DLLExists();
 Source: "{#bindir_x64}\MPCBEShellExt64.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete regserver noregerror; Components: mpcbeshellext; Check : IsWin64
 Source: "{#bindir_x86}\MPCBEShellExt.dll";   DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete regserver noregerror; Components: mpcbeshellext;
 #ifdef localize
@@ -337,9 +337,17 @@ begin
   end;
 end;
 
-function D3DX9DLLExists(): Boolean;
+function D3DX9_43_DLLExists(): Boolean;
 begin
-  if FileExists(ExpandConstant('{sys}\D3DX9_43.dll')) then
+  if FileExists(ExpandConstant('{sys}\d3dx9_43.dll')) then
+    Result := True
+  else
+    Result := False;
+end;
+
+function D3DCompiler_47_DLLExists(): Boolean;
+begin
+  if FileExists(ExpandConstant('{sys}\d3dcompiler_47.dll')) then
     Result := True
   else
     Result := False;
