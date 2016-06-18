@@ -25,7 +25,6 @@
 #include <afxwin.h>                         // MFC core and standard components
 #include "../../../../include/stdafx_common_dshow.h"
 
-#include <dx/d3dx9.h>
 #include <evr.h>
 #include <mfapi.h>
 #include <Mferror.h>
