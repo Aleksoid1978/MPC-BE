@@ -23,7 +23,6 @@
 #include "RenderersSettings.h"
 #include "../../../apps/mplayerc/mplayerc.h"
 #include <version.h>
-#include <dx/d3dx9.h>
 
 void CRenderersSettings::SaveRenderers()
 {
@@ -75,9 +74,6 @@ CRenderersData::CRenderersData()
 
 HINSTANCE GetD3X9Dll()
 {
-#if D3DX_SDK_VERSION < 43
-#error DirectX SDK June 2010 (v43) or newer is required to build MPC-BE
-#endif
 	static HINSTANCE s_hD3DX9Dll = LoadLibraryW(L"d3dx9_43.dll"); // load latest compatible version of the DLL that is available
 
 	return s_hD3DX9Dll;

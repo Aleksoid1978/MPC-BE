@@ -23,7 +23,7 @@
 
 #include <atlstr.h>
 #include <D3Dcompiler.h>
-#include <dx/d3dx9.h>
+#include <d3d9.h>
 
 class CPixelShaderCompiler
 {

@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <dx/d3dx9.h>
 #include "../BaseVideoFilter/BaseVideoFilter.h"
 #include "IMPCVideoDec.h"
 #include "MPCVideoDecSettingsWnd.h"
