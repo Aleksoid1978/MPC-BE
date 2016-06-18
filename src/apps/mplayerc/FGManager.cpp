@@ -23,9 +23,6 @@
 #include <mpconfig.h>
 #include "FGManager.h"
 #include "../../filters/Filters.h"
-//#include <AllocatorCommon7.h>
-//#include <AllocatorCommon.h>
-//#include <SyncAllocatorPresenter.h>
 #include <madVRAllocatorPresenter.h>
 #include "DeinterlacerFilter.h"
 #include "../../DSUtil/SysVersion.h"
