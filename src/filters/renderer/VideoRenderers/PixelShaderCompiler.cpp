@@ -29,7 +29,7 @@ HINSTANCE GetD3dcompilerDll()
 	static HINSTANCE s_hD3dcompilerDll = NULL;
 
 	if (s_hD3dcompilerDll == NULL) {
-		s_hD3dcompilerDll = LoadLibrary(L"D3dcompiler_43.dll"); // Microsoft DirectX SDK (June 2010)
+		s_hD3dcompilerDll = LoadLibrary(L"d3dcompiler_47.dll"); // Windows Kits\8.1\Redist\D3D\[x86|x64]\d3dcompiler_47.dll
 	}
 
 	return s_hD3dcompilerDll;

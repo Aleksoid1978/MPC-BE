@@ -368,12 +368,12 @@ IF /I "%NAME%" == "MPC-BE" (
   IF /I "%ARCH%" == "x64" (
     COPY /Y /V "%~1_%ARCH%\mpc-be64.exe"                     "%PCKG_NAME%\mpc-be64.exe" >NUL
     COPY /Y /V "%~1_%ARCH%\MPCBEShellExt64.dll"              "%PCKG_NAME%\MPCBEShellExt64.dll" >NUL
-    COPY /Y /V "..\distrib\DirectX\x64\D3DCompiler_43.dll"   "%PCKG_NAME%\D3DCompiler_43.dll" >NUL
+    COPY /Y /V "..\distrib\DirectX\x64\d3dcompiler_47.dll"   "%PCKG_NAME%\d3dcompiler_47.dll" >NUL
     COPY /Y /V "..\distrib\DirectX\x64\d3dx9_43.dll"         "%PCKG_NAME%\d3dx9_43.dll" >NUL
   ) ELSE (
     COPY /Y /V "%~1_%ARCH%\mpc-be.exe"                       "%PCKG_NAME%\mpc-be.exe" >NUL
     COPY /Y /V "%~1_%ARCH%\MPCBEShellExt.dll"                "%PCKG_NAME%\MPCBEShellExt.dll" >NUL
-    COPY /Y /V "..\distrib\DirectX\x86\D3DCompiler_43.dll"   "%PCKG_NAME%\D3DCompiler_43.dll" >NUL
+    COPY /Y /V "..\distrib\DirectX\x86\d3dcompiler_47.dll"   "%PCKG_NAME%\d3dcompiler_47.dll" >NUL
     COPY /Y /V "..\distrib\DirectX\x86\d3dx9_43.dll"         "%PCKG_NAME%\d3dx9_43.dll" >NUL
   )
   COPY /Y /V "%~1_%ARCH%\mpciconlib.dll"           "%PCKG_NAME%\*.dll" >NUL
