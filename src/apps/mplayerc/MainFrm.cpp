@@ -1330,7 +1330,7 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 	CRect r;
 	GetWindowRect(&r);
 	MINMAXINFO mmi = { 0 };
-	OnGetMinMaxInfo(&mmi);
+	SendMessage(WM_GETMINMAXINFO, 0, (LPARAM)&mmi);
 	const POINT& min = mmi.ptMinTrackSize;
 	if (r.Height() < min.y || r.Width() < min.x) {
 		r |= CRect(r.TopLeft(), CSize(min));
