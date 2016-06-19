@@ -172,7 +172,6 @@ public:
 	bool		m_bTearingTest;
 	int			m_iDisplayStats;
 	bool		m_bResetStats; // Set to reset the presentation statistics
-	CString		m_strD3DX9Version;
 
 	// Hardware feature support
 	bool		m_bFP16Support;

@@ -23,7 +23,6 @@
 #include "AllocatorCommon.h"
 #include "RenderersSettings.h"
 #include <d3d9.h>
-#include <dx/d3dx9.h>
 #include <dxva2api.h>
 #include "../SubPic/SubPicAllocatorPresenterImpl.h"
 
@@ -104,7 +103,6 @@ namespace DSObjects
 #endif
 
 		// Variables initialized/managed by this class but can be accessed by the allocator-presenter
-		bool						m_bD3DX;
 		RenderingPath				m_RenderingPath;
 		D3DFORMAT					m_VideoBufferFmt;
 		D3DFORMAT					m_SurfaceFmt;
@@ -154,13 +152,6 @@ namespace DSObjects
 			}
 		};
 
-		// D3DX functions
-		typedef D3DXFLOAT16* (WINAPI* D3DXFloat32To16ArrayPtr)(
-			D3DXFLOAT16 *pOut,
-			CONST FLOAT *pIn,
-			UINT		 n);
-
-
 		CAutoPtr<CPixelShaderCompiler>	 m_pPSC;
 
 		// Settings
@@ -191,10 +182,6 @@ namespace DSObjects
 
 		// Custom screen space pixel shaders
 		CAtlList<CExternalPixelShader>	m_pCustomScreenSpacePixelShaders;
-
-		// D3DX function pointers
-		D3DXFloat32To16ArrayPtr			m_pD3DXFloat32To16Array;
-
 
 		// Video rendering paths
 		HRESULT RenderVideoDrawPath(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect);

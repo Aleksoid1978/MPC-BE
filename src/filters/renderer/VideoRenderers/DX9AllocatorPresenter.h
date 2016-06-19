@@ -22,6 +22,7 @@
 #pragma once
 
 #include "DX9RenderingEngine.h"
+#include <dx/d3dx9.h>
 #include "CPUUsage.h"
 #include "GPUUsage.h"
 #include "MemUsage.h"

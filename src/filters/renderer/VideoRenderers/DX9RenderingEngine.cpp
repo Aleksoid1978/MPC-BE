@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include <algorithm>
 #include <lcms2/include/lcms2.h>
+#include <DirectXPackedVector.h>
 #include "DX9Shaders.h"
 #include "Dither.h"
 #include "DX9RenderingEngine.h"
@@ -144,13 +145,6 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_nDX9Resizer(RESIZER_UNKNOWN)
 	, m_iRotation(0)
 {
-	HINSTANCE hDll = GetD3X9Dll();
-	m_bD3DX = hDll != NULL;
-
-	if (m_bD3DX) {
-		(FARPROC&)m_pD3DXFloat32To16Array = GetProcAddress(hDll, "D3DXFloat32To16Array");
-	}
-
 #if DXVAVP
 	m_hDxva2Lib = LoadLibrary(L"dxva2.dll");
 
@@ -378,7 +372,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	int screenSpacePassCount = 0;
 	DWORD iResizer = GetRenderersSettings().iResizer;
 
-	if (m_bD3DX) {
+	{
 		// Final pass. Must be initialized first!
 		hr = InitFinalPass();
 		if (SUCCEEDED(hr)) {
@@ -436,13 +430,6 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		if (FAILED(hr)) {
 			bCustomPixelShaders = false;
 		}
-	} else {
-		bCustomPixelShaders = false;
-		if (iResizer != RESIZER_NEAREST) {
-			iResizer = RESIZER_BILINEAR;
-		}
-		bCustomScreenSpacePixelShaders = false;
-		bFinalPass = false;
 	}
 
 	hr = InitScreenSpaceTextures(screenSpacePassCount);
@@ -1508,13 +1495,11 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 			return hr;
 		}
 
-		D3DXFLOAT16* lut3DFloat16 = DNew D3DXFLOAT16[m_Lut3DEntryCount * 3];
-		m_pD3DXFloat32To16Array(lut3DFloat16, lut3DFloat32, m_Lut3DEntryCount * 3);
+		DirectX::PackedVector::HALF* lut3DFloat16 = DNew DirectX::PackedVector::HALF[m_Lut3DEntryCount * 3];
+		DirectX::PackedVector::XMConvertFloatToHalfStream(lut3DFloat16, sizeof(lut3DFloat16[0]), lut3DFloat32, sizeof(lut3DFloat32[0]), m_Lut3DEntryCount * 3);
 		delete[] lut3DFloat32;
 
-		const float oneFloat32 = 1.0f;
-		D3DXFLOAT16 oneFloat16;
-		m_pD3DXFloat32To16Array(&oneFloat16, &oneFloat32, 1);
+		DirectX::PackedVector::HALF oneFloat16 = DirectX::PackedVector::XMConvertFloatToHalf(1.0f);
 
 		D3DLOCKED_BOX lockedBox;
 		hr = m_pLut3DTexture->LockBox(0, &lockedBox, NULL, D3DLOCK_DISCARD);
@@ -1524,13 +1509,13 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 			return hr;
 		}
 
-		D3DXFLOAT16* lut3DFloat16Iterator = lut3DFloat16;
+		DirectX::PackedVector::HALF* lut3DFloat16Iterator = lut3DFloat16;
 		char* outputSliceIterator = static_cast<char*>(lockedBox.pBits);
 		for (int b = 0; b < m_Lut3DSize; b++) {
 			char* outputRowIterator = outputSliceIterator;
 
 			for (int g = 0; g < m_Lut3DSize; g++) {
-				D3DXFLOAT16* outputIterator = reinterpret_cast<D3DXFLOAT16*>(outputRowIterator);
+				DirectX::PackedVector::HALF* outputIterator = reinterpret_cast<DirectX::PackedVector::HALF*>(outputRowIterator);
 
 				for (int r = 0; r < m_Lut3DSize; r++) {
 					// R, G, B
