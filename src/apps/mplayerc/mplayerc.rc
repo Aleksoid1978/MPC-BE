@@ -8,7 +8,6 @@
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #include "afxres.h"
-
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -115,8 +114,8 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Audio renderer",IDC_STATIC,5,5,285,46
-    COMBOBOX        IDC_AUDRND_COMBO,10,16,213,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Properties",IDC_BUTTON1,226,15,60,15
+    COMBOBOX        IDC_AUDRND_COMBO,10,15,213,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Properties",IDC_BUTTON1,226,14,60,14
     COMBOBOX        IDC_COMBO1,10,33,213,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Dual output",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,226,35,60,10
     GROUPBOX        "Audio open settings",IDC_STATIC,5,54,286,49
