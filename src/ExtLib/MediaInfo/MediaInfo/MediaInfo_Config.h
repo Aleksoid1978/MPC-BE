@@ -101,6 +101,9 @@ public :
           void      Compat_Set (int64u NewValue);
           int64u    Compat_Get ();
 
+          void      Https_Set(bool NewValue);
+          bool      Https_Get();
+
           void      Trace_TimeSection_OnlyFirstOccurrence_Set (bool Value);
           bool      Trace_TimeSection_OnlyFirstOccurrence_Get ();
 
@@ -297,6 +300,7 @@ private :
     float32         Verbosity;
     float32         Trace_Level;
     int64u          Compat;
+    int64u          Https;
     bool            Trace_TimeSection_OnlyFirstOccurrence;
     std::bitset<32> Trace_Layers; //0-7: Container, 8: Stream
     std::map<Ztring, bool> Trace_Modificators; //If we want to add/remove some details

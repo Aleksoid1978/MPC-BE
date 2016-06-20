@@ -127,7 +127,8 @@ public :
         /// @brief Get a piece of information about a file (parameter is an integer)
         /// @param StreamKind Kind of stream (general, video, audio...)
         /// @param StreamNumber Stream number in Kind of stream (first, second...)
-        /// @param Parameter Parameter you are looking for in the stream (Codec, width, bitrate...), in integer format (first parameter, second parameter...)
+        /// @param Parameter Parameter you are looking for in the stream (Codec, width, bitrate...), in integer format (first parameter, second parameter...) \n
+        ///        This integer is arbitarily assigned by the library, so its consistency should not be relied on, but is useful when looping through all the parameters
         /// @param InfoKind Kind of information you want about the parameter (the text, the measure, the help...)
         /// @return a string about information you search \n
         ///         an empty string if there is a problem

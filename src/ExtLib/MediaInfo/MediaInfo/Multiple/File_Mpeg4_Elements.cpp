@@ -4309,6 +4309,8 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
             //Filling
             Finish(&MI);
             Merge(MI, StreamKind_Last, 0, StreamPos_Last);
+
+            Streams[moov_trak_tkhd_TrackID].IsPcm=true;
         }
         #endif
         #if defined(MEDIAINFO_PCM_YES)

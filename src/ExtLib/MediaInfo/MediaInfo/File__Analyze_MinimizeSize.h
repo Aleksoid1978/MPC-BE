@@ -1247,9 +1247,9 @@ private :
     //***************************************************************************
 
     //Element
+public: //TO CHANGE
     BitStream_Fast* BS;             //For conversion from bytes to bitstream
     BitStream*      BT;             //For conversion from bytes to bitstream (Little Endian)
-public : //TO CHANGE
     int64u Header_Size;             //Size of the header of the current element
 private :
 

@@ -2648,6 +2648,52 @@ void File__Analyze::Element_Begin(const Ztring &Name)
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_TRACE
+void File__Analyze::Element_Begin(const char* Name)
+{
+    if (Trace_Activated)
+    {
+        switch (Config_Trace_Format)
+        {
+            case MediaInfo_Config::Trace_Format_XML         :
+                                                                {
+                                                                size_t Details_lt_Pos=Element[Element_Level].ToShow.Details.rfind(__T("<"));
+                                                                size_t Details_gt_Pos=Element[Element_Level].ToShow.Details.rfind(__T(">"));
+                                                                if (Details_lt_Pos!=string::npos && (Details_lt_Pos+1>=Element[Element_Level].ToShow.Details.size() || Details_gt_Pos==string::npos || (Details_lt_Pos>Details_gt_Pos && Element[Element_Level].ToShow.Details[Details_lt_Pos+1]!=__T('/')))) //else there is content like "</data> />"
+                                                                    Element[Element_Level].ToShow.Details+=__T(">")+Element[Element_Level].ToShow.Value+__T("</data>");
+                                                                }
+                                                                Element[Element_Level].ToShow.Value.clear();
+                                                                break;
+            default                                         : ;
+        }
+    }
+
+    //Level
+    Element_Level++;
+
+    //Element
+    Element[Element_Level].Code=0;
+    Element[Element_Level].Next=Element[Element_Level-1].Next;
+    Element[Element_Level].WaitForMoreData=false;
+    Element[Element_Level].UnTrusted=Element[Element_Level-1].UnTrusted;
+    Element[Element_Level].IsComplete=Element[Element_Level-1].IsComplete;
+
+    //ToShow
+    Element[Element_Level].ToShow.Pos=File_Offset+Buffer_Offset+Element_Offset+BS->OffsetBeforeLastCall_Get(); //TODO: change this, used in Element_End0()
+    if (Trace_Activated)
+    {
+        Element[Element_Level].ToShow.Size=Element[Element_Level].Next-(File_Offset+Buffer_Offset+Element_Offset+BS->OffsetBeforeLastCall_Get());
+        Element[Element_Level].ToShow.Header_Size=0;
+        Element_Name(Name);
+        Element[Element_Level].ToShow.Info.clear();
+        Element[Element_Level].ToShow.Details.clear();
+        Element[Element_Level].ToShow.Value.clear();
+        Element[Element_Level].ToShow.NoShow=false;
+    }
+}
+#endif //MEDIAINFO_TRACE
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_TRACE
 void File__Analyze::Element_Name(const Ztring &Name)
 {
     //ToShow

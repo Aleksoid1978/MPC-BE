@@ -102,6 +102,201 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+namespace Elements
+{
+    //Common
+    const int64u Zero=(int32u)-1; //Should be (int64u)-1 but Borland C++ does not like this
+    const int64u CRC32=0x3F;
+    const int64u Void=0x6C;
+
+    //EBML
+    const int64u Ebml=0xA45DFA3;
+    const int64u Ebml_Version=0x286;
+    const int64u Ebml_ReadVersion=0x2F7;
+    const int64u Ebml_MaxIDLength=0x2F2;
+    const int64u Ebml_MaxSizeLength=0x2F3;
+    const int64u Ebml_DocType=0x282;
+    const int64u Ebml_DocTypeVersion=0x287;
+    const int64u Ebml_DocTypeReadVersion=0x285;
+
+    //Segment
+    const int64u Segment=0x8538067;
+    const int64u Segment_Attachments=0x0941A469;
+    const int64u Segment_Attachments_AttachedFile=0x21A7;
+    const int64u Segment_Attachments_AttachedFile_FileDescription=0x067E;
+    const int64u Segment_Attachments_AttachedFile_FileName=0x066E;
+    const int64u Segment_Attachments_AttachedFile_FileMimeType=0x0660;
+    const int64u Segment_Attachments_AttachedFile_FileData=0x065C;
+    const int64u Segment_Attachments_AttachedFile_FileUID=0x06AE;
+    const int64u Segment_Attachments_AttachedFile_FileReferral=0x0675;
+    const int64u Segment_Attachments_AttachedFile_FileUsedStartTime=0x0661;
+    const int64u Segment_Attachments_AttachedFile_FileUsedEndTime=0x0662;
+    const int64u Segment_Chapters=0x43A770;
+    const int64u Segment_Chapters_EditionEntry=0x05B9;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom=0x36;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess=0x2944;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCodecID=0x2955;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand=0x2911;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessData=0x2933;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessTime=0x2922;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessPrivate=0x050D;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay=0x00;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapCountry=0x037E;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguage=0x037C;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapString=0x05;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagEnabled=0x0598;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagHidden=0x18;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterPhysicalEquiv=0x23C3;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentEditionUID=0x2EBC;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentUID=0x2E67;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeStart=0x11;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeEnd=0x12;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack=0x0F;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack_ChapterTrackNumber=0x09;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterUID=0x33C4;
+    const int64u Segment_Chapters_EditionEntry_EditionFlagDefault=0x05DB;
+    const int64u Segment_Chapters_EditionEntry_EditionFlagHidden=0x05BD;
+    const int64u Segment_Chapters_EditionEntry_EditionFlagOrdered=0x05DD;
+    const int64u Segment_Chapters_EditionEntry_EditionUID=0x05BC;
+    const int64u Segment_Cluster=0xF43B675;
+    const int64u Segment_Cluster_BlockGroup=0x20;
+    const int64u Segment_Cluster_BlockGroup_Block=0x21;
+    const int64u Segment_Cluster_BlockGroup_BlockVirtual=0x22;
+    const int64u Segment_Cluster_BlockGroup_BlockAdditions=0x35A1;
+    const int64u Segment_Cluster_BlockGroup_BlockAdditions_BlockMore=0x26;
+    const int64u Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAddID=0x6E;
+    const int64u Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAdditional=0x25;
+    const int64u Segment_Cluster_BlockGroup_BlockDuration=0x1B;
+    const int64u Segment_Cluster_BlockGroup_ReferencePriority=0x7A;
+    const int64u Segment_Cluster_BlockGroup_ReferenceBlock=0x7B;
+    const int64u Segment_Cluster_BlockGroup_ReferenceVirtual=0x7D;
+    const int64u Segment_Cluster_BlockGroup_CodecState=0x24;
+    const int64u Segment_Cluster_BlockGroup_DiscardPadding=0x35A2;
+    const int64u Segment_Cluster_BlockGroup_Slices=0xE;
+    const int64u Segment_Cluster_BlockGroup_Slices_TimeSlice=0x68;
+    const int64u Segment_Cluster_BlockGroup_Slices_TimeSlice_Duration=0x4F;
+    const int64u Segment_Cluster_BlockGroup_Slices_TimeSlice_LaceNumber=0x4C;
+    const int64u Segment_Cluster_Position=0x27;
+    const int64u Segment_Cluster_PrevSize=0x2B;
+    const int64u Segment_Cluster_SilentTracks=0x1854;
+    const int64u Segment_Cluster_SilentTracks_SilentTrackNumber=0x18D7;
+    const int64u Segment_Cluster_SimpleBlock=0x23;
+    const int64u Segment_Cluster_Timecode=0x67;
+    const int64u Segment_Cues=0xC53BB6B;
+    const int64u Segment_Cues_CuePoint=0x3B;
+    const int64u Segment_Cues_CuePoint_CueTime=0x33;
+    const int64u Segment_Cues_CuePoint_CueTrackPositions=0x37;
+    const int64u Segment_Cues_CuePoint_CueTrackPositions_CueTrack=0x77;
+    const int64u Segment_Cues_CuePoint_CueTrackPositions_CueClusterPosition=0x71;
+    const int64u Segment_Cues_CuePoint_CueTrackPositions_CueRelativePosition=0x70;
+    const int64u Segment_Cues_CuePoint_CueTrackPositions_CueDuration=0x32;
+    const int64u Segment_Cues_CuePoint_CueTrackPositions_CueBlockNumber=0x1378;
+    const int64u Segment_Info=0x549A966;
+    const int64u Segment_Info_ChapterTranslate=0x2924;
+    const int64u Segment_Info_ChapterTranslate_ChapterTranslateCodec=0x29BF;
+    const int64u Segment_Info_ChapterTranslate_ChapterTranslateEditionUID=0x29FC;
+    const int64u Segment_Info_ChapterTranslate_ChapterTranslateID=0x29A5;
+    const int64u Segment_Info_DateUTC=0x461;
+    const int64u Segment_Info_Duration=0x489;
+    const int64u Segment_Info_MuxingApp=0xD80;
+    const int64u Segment_Info_NextFilename=0x1E83BB;
+    const int64u Segment_Info_NextUID=0x1EB923;
+    const int64u Segment_Info_PrevFilename=0x1C83AB;
+    const int64u Segment_Info_PrevUID=0x1CB923;
+    const int64u Segment_Info_SegmentFamily=0x444;
+    const int64u Segment_Info_SegmentFilename=0x3384;
+    const int64u Segment_Info_SegmentUID=0x33A4;
+    const int64u Segment_Info_TimecodeScale=0xAD7B1;
+    const int64u Segment_Info_Title=0x3BA9;
+    const int64u Segment_Info_WritingApp=0x1741;
+    const int64u Segment_SeekHead=0x14D9B74;
+    const int64u Segment_SeekHead_Seek=0xDBB;
+    const int64u Segment_SeekHead_Seek_SeekID=0x13AB;
+    const int64u Segment_SeekHead_Seek_SeekPosition=0x13AC;
+    const int64u Segment_Tags=0x0254C367;
+    const int64u Segment_Tags_Tag=0x3373;
+    const int64u Segment_Tags_Tag_SimpleTag=0x27C8;
+    const int64u Segment_Tags_Tag_SimpleTag_TagBinary=0x485;
+    const int64u Segment_Tags_Tag_SimpleTag_TagDefault=0x484;
+    const int64u Segment_Tags_Tag_SimpleTag_TagLanguage=0x47A;
+    const int64u Segment_Tags_Tag_SimpleTag_TagName=0x5A3;
+    const int64u Segment_Tags_Tag_SimpleTag_TagString=0x487;
+    const int64u Segment_Tags_Tag_Targets=0x23C0;
+    const int64u Segment_Tags_Tag_Targets_TargetTypeValue=0x28CA;
+    const int64u Segment_Tags_Tag_Targets_TargetType=0x23CA;
+    const int64u Segment_Tags_Tag_Targets_TagTrackUID=0x23C5;
+    const int64u Segment_Tags_Tag_Targets_TagEditionUID=0x23C9;
+    const int64u Segment_Tags_Tag_Targets_TagChapterUID=0x23C4;
+    const int64u Segment_Tags_Tag_Targets_TagAttachmentUID=0x23C6;
+    const int64u Segment_Tracks=0x654AE6B;
+    const int64u Segment_Tracks_TrackEntry=0x2E;
+    const int64u Segment_Tracks_TrackEntry_AttachmentLink=0x3446;
+    const int64u Segment_Tracks_TrackEntry_Audio=0x61;
+    const int64u Segment_Tracks_TrackEntry_Audio_BitDepth=0x2264;
+    const int64u Segment_Tracks_TrackEntry_Audio_Channels=0x1F;
+    const int64u Segment_Tracks_TrackEntry_Audio_OutputSamplingFrequency=0x38B5;
+    const int64u Segment_Tracks_TrackEntry_Audio_SamplingFrequency=0x35;
+    const int64u Segment_Tracks_TrackEntry_CodecSettings=0x1A9697;
+    const int64u Segment_Tracks_TrackEntry_CodecInfoURL=0x1B4040;
+    const int64u Segment_Tracks_TrackEntry_CodecDownloadURL=0x06B240;
+    const int64u Segment_Tracks_TrackEntry_CodecDecodeAll=0x2A;
+    const int64u Segment_Tracks_TrackEntry_CodecID=0x6;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings=0x2D80;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding=0x2240;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingOrder=0x1031;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingScope=0x1032;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingType=0x1033;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression=0x1034;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression_ContentCompAlgo=0x0254;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression_ContentCompSettings=0x0255;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption=0x1035;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentEncAlgo=0x07E1;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentEncKeyID=0x07E2;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSignature=0x07E3;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSigKeyID=0x07E4;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSigAlgo=0x07E5;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSigHashAlgo=0x07E6;
+    const int64u Segment_Tracks_TrackEntry_CodecName=0x58688;
+    const int64u Segment_Tracks_TrackEntry_CodecPrivate=0x23A2;
+    const int64u Segment_Tracks_TrackEntry_DefaultDuration=0x3E383;
+    const int64u Segment_Tracks_TrackEntry_FlagDefault=0x8;
+    const int64u Segment_Tracks_TrackEntry_FlagEnabled=0x39;
+    const int64u Segment_Tracks_TrackEntry_FlagForced=0x15AA;
+    const int64u Segment_Tracks_TrackEntry_FlagLacing=0x1C;
+    const int64u Segment_Tracks_TrackEntry_Language=0x2B59C;
+    const int64u Segment_Tracks_TrackEntry_MaxBlockAdditionID=0x15EE;
+    const int64u Segment_Tracks_TrackEntry_MaxCache=0x2DF8;
+    const int64u Segment_Tracks_TrackEntry_MinCache=0x2DE7;
+    const int64u Segment_Tracks_TrackEntry_Name=0x136E;
+    const int64u Segment_Tracks_TrackEntry_TrackNumber=0x57;
+    const int64u Segment_Tracks_TrackEntry_TrackTimecodeScale=0x3314F;
+    const int64u Segment_Tracks_TrackEntry_TrackOffset=0x137F;
+    const int64u Segment_Tracks_TrackEntry_TrackType=0x3;
+    const int64u Segment_Tracks_TrackEntry_TrackUID=0x33C5;
+    const int64u Segment_Tracks_TrackEntry_Video=0x60;
+    const int64u Segment_Tracks_TrackEntry_Video_AspectRatioType=0x14B3;
+    const int64u Segment_Tracks_TrackEntry_Video_ColourSpace=0xEB524;
+    const int64u Segment_Tracks_TrackEntry_Video_DisplayHeight=0x14BA;
+    const int64u Segment_Tracks_TrackEntry_Video_DisplayUnit=0x14B2;
+    const int64u Segment_Tracks_TrackEntry_Video_DisplayWidth=0x14B0;
+    const int64u Segment_Tracks_TrackEntry_Video_FlagInterlaced=0x1A;
+    const int64u Segment_Tracks_TrackEntry_Video_FrameRate=0x383E3;
+    const int64u Segment_Tracks_TrackEntry_Video_PixelCropBottom=0x14AA;
+    const int64u Segment_Tracks_TrackEntry_Video_PixelCropLeft=0x14CC;
+    const int64u Segment_Tracks_TrackEntry_Video_PixelCropRight=0x14DD;
+    const int64u Segment_Tracks_TrackEntry_Video_PixelCropTop=0x14BB;
+    const int64u Segment_Tracks_TrackEntry_Video_PixelHeight=0x3A;
+    const int64u Segment_Tracks_TrackEntry_Video_PixelWidth=0x30;
+    const int64u Segment_Tracks_TrackEntry_Video_StereoMode=0x13B8;
+    const int64u Segment_Tracks_TrackEntry_Video_StereoModeBuggy=0x13B9;
+    const int64u Segment_Tracks_TrackEntry_TrackOverlay=0x2FAB;
+    const int64u Segment_Tracks_TrackEntry_TrackTranslate=0x2624;
+    const int64u Segment_Tracks_TrackEntry_TrackTranslate_Codec=0x26BF;
+    const int64u Segment_Tracks_TrackEntry_TrackTranslate_EditionUID=0x26FC;
+    const int64u Segment_Tracks_TrackEntry_TrackTranslate_TrackID=0x26A5;
+}
+
+//---------------------------------------------------------------------------
 // CRC_32_Table (Little Endian bitstream, )
 // The CRC in use is the IEEE-CRC-32 algorithm as used in the ISO 3309 standard and in section 8.1.1.6.2 of ITU-T recommendation V.42, with initial value of 0xFFFFFFFF. The CRC value MUST be computed on a little endian bitstream and MUST use little endian storage.
 // A CRC is computed like this:
@@ -379,6 +574,9 @@ File_Mk::File_Mk()
     Segment_Cluster_Count=0;
     CurrentAttachmentIsCover=false;
     CoverIsSetFromAttachment=false;
+
+    //Hints
+    File_Buffer_Size_Hint_Pointer=NULL;
 
     //Helpers
     CodecPrivate=NULL;
@@ -875,199 +1073,50 @@ void File_Mk::Header_Parse()
 
     //Parsing
     int64u Name, Size;
+    bool NameIsValid=true;
+    if (Element_Offset+1<Element_Size)
+    {
+        int8u NamePeek;
+        Peek_B1(NamePeek);
+        if (NamePeek<0x10)
+        {
+            Skip_B1(                                            "Invalid");
+            #if MEDIAINFO_TRACE
+            Element_Level--;
+            Element_Info("NOK");
+            Element_Level++;
+            #endif //MEDIAINFO_TRACE
+            NameIsValid=false;
+
+            Header_Fill_Code(0, "Junk");
+            Header_Fill_Size(1);
+        }
+    }
+    if (NameIsValid)
+    {
     Get_EB (Name,                                               "Name");
     Get_EB (Size,                                               "Size");
 
     //Filling
     Header_Fill_Code(Name, Ztring().From_Number(Name, 16));
     Header_Fill_Size(Element_Offset+Size);
+    }
+
+    if ((Name==Elements::Segment_Cluster_BlockGroup_Block || Name==Elements::Segment_Cluster_SimpleBlock) && Buffer_Offset+Element_Offset+Size>Buffer_Size && File_Buffer_Size_Hint_Pointer)
+    {
+        int64u Buffer_Size_Target = (size_t)(Buffer_Offset + Element_Offset + Size - Buffer_Size + Element_Offset); //+Element_Offset for next packet header
+
+        if (Buffer_Size_Target<128 * 1024)
+            Buffer_Size_Target = 128 * 1024;
+        (*File_Buffer_Size_Hint_Pointer) = (size_t)Buffer_Size_Target;
+
+        Element_WaitForMoreData();
+        return;
+    }
 
     //Incoherencies
     if (Element_Level<=2 && File_Offset+Buffer_Offset+Element_Offset+Size>File_Size)
         Fill(Stream_General, 0, "IsTruncated", "Yes");
-}
-
-//---------------------------------------------------------------------------
-namespace Elements
-{
-    //Common
-    const int64u Zero=(int32u)-1; //Should be (int64u)-1 but Borland C++ does not like this
-    const int64u CRC32=0x3F;
-    const int64u Void=0x6C;
-
-    //EBML
-    const int64u Ebml=0xA45DFA3;
-    const int64u Ebml_Version=0x286;
-    const int64u Ebml_ReadVersion=0x2F7;
-    const int64u Ebml_MaxIDLength=0x2F2;
-    const int64u Ebml_MaxSizeLength=0x2F3;
-    const int64u Ebml_DocType=0x282;
-    const int64u Ebml_DocTypeVersion=0x287;
-    const int64u Ebml_DocTypeReadVersion=0x285;
-
-    //Segment
-    const int64u Segment=0x8538067;
-    const int64u Segment_Attachements=0x0941A469;
-    const int64u Segment_Attachements_AttachedFile=0x21A7;
-    const int64u Segment_Attachements_AttachedFile_FileData=0x065C;
-    const int64u Segment_Attachements_AttachedFile_FileDescription=0x067E;
-    const int64u Segment_Attachements_AttachedFile_FileName=0x066E;
-    const int64u Segment_Attachements_AttachedFile_FileMimeType=0x0660;
-    const int64u Segment_Attachements_AttachedFile_FileReferral=0x0675;
-    const int64u Segment_Attachements_AttachedFile_FileUID=0x06AE;
-    const int64u Segment_Chapters=0x43A770;
-    const int64u Segment_Chapters_EditionEntry=0x05B9;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom=0x36;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess=0x2944;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCodecID=0x2955;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand=0x2911;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessData=0x2933;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessTime=0x2922;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessPrivate=0x050D;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay=0x00;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapCountry=0x037E;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguage=0x037C;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapString=0x05;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagEnabled=0x0598;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagHidden=0x18;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterPhysicalEquiv=0x23C3;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentEditionUID=0x2EBC;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentUID=0x2E67;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeStart=0x11;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeEnd=0x12;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack=0x0F;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack_ChapterTrackNumber=0x09;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterUID=0x33C4;
-    const int64u Segment_Chapters_EditionEntry_EditionFlagDefault=0x05DB;
-    const int64u Segment_Chapters_EditionEntry_EditionFlagHidden=0x05BD;
-    const int64u Segment_Chapters_EditionEntry_EditionFlagOrdered=0x05DD;
-    const int64u Segment_Chapters_EditionEntry_EditionUID=0x05BC;
-    const int64u Segment_Cluster=0xF43B675;
-    const int64u Segment_Cluster_BlockGroup=0x20;
-    const int64u Segment_Cluster_BlockGroup_Block=0x21;
-    const int64u Segment_Cluster_BlockGroup_BlockAdditions=0x35A1;
-    const int64u Segment_Cluster_BlockGroup_BlockAdditions_BlockMore=0x26;
-    const int64u Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAddID=0x6E;
-    const int64u Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAdditional=0x25;
-    const int64u Segment_Cluster_BlockGroup_BlockDuration=0x1B;
-    const int64u Segment_Cluster_BlockGroup_ReferenceBlock=0x7B;
-    const int64u Segment_Cluster_BlockGroup_ReferencePriority=0x7A;
-    const int64u Segment_Cluster_BlockGroup_Slices=0xE;
-    const int64u Segment_Cluster_BlockGroup_Slices_TimeSlice=0x68;
-    const int64u Segment_Cluster_BlockGroup_Slices_TimeSlice_Duration=0x4F;
-    const int64u Segment_Cluster_BlockGroup_Slices_TimeSlice_LaceNumber=0x4C;
-    const int64u Segment_Cluster_Position=0x27;
-    const int64u Segment_Cluster_PrevSize=0x2B;
-    const int64u Segment_Cluster_SilentTracks=0x1854;
-    const int64u Segment_Cluster_SilentTracks_SilentTrackNumber=0x18D7;
-    const int64u Segment_Cluster_SimpleBlock=0x23;
-    const int64u Segment_Cluster_Timecode=0x67;
-    const int64u Segment_Cues=0xC53BB6B;
-    const int64u Segment_Cues_CuePoint=0x3B;
-    const int64u Segment_Cues_CuePoint_CueTime=0x33;
-    const int64u Segment_Cues_CuePoint_CueTrackPositions=0x37;
-    const int64u Segment_Cues_CuePoint_CueTrackPositions_CueTrack=0x77;
-    const int64u Segment_Cues_CuePoint_CueTrackPositions_CueClusterPosition=0x71;
-    const int64u Segment_Cues_CuePoint_CueTrackPositions_CueBlockNumber=0x1378;
-    const int64u Segment_Info=0x549A966;
-    const int64u Segment_Info_ChapterTranslate=0x2924;
-    const int64u Segment_Info_ChapterTranslate_ChapterTranslateCodec=0x29BF;
-    const int64u Segment_Info_ChapterTranslate_ChapterTranslateEditionUID=0x29FC;
-    const int64u Segment_Info_ChapterTranslate_ChapterTranslateID=0x29A5;
-    const int64u Segment_Info_DateUTC=0x461;
-    const int64u Segment_Info_Duration=0x489;
-    const int64u Segment_Info_MuxingApp=0xD80;
-    const int64u Segment_Info_NextFilename=0x1E83BB;
-    const int64u Segment_Info_NextUID=0x1EB923;
-    const int64u Segment_Info_PrevFilename=0x1C83AB;
-    const int64u Segment_Info_PrevUID=0x1CB923;
-    const int64u Segment_Info_SegmentFamily=0x444;
-    const int64u Segment_Info_SegmentFilename=0x3384;
-    const int64u Segment_Info_SegmentUID=0x33A4;
-    const int64u Segment_Info_TimecodeScale=0xAD7B1;
-    const int64u Segment_Info_Title=0x3BA9;
-    const int64u Segment_Info_WritingApp=0x1741;
-    const int64u Segment_SeekHead=0x14D9B74;
-    const int64u Segment_SeekHead_Seek=0xDBB;
-    const int64u Segment_SeekHead_Seek_SeekID=0x13AB;
-    const int64u Segment_SeekHead_Seek_SeekPosition=0x13AC;
-    const int64u Segment_Tags=0x0254C367;
-    const int64u Segment_Tags_Tag=0x3373;
-    const int64u Segment_Tags_Tag_SimpleTag=0x27C8;
-    const int64u Segment_Tags_Tag_SimpleTag_TagBinary=0x485;
-    const int64u Segment_Tags_Tag_SimpleTag_TagDefault=0x484;
-    const int64u Segment_Tags_Tag_SimpleTag_TagLanguage=0x47A;
-    const int64u Segment_Tags_Tag_SimpleTag_TagName=0x5A3;
-    const int64u Segment_Tags_Tag_SimpleTag_TagString=0x487;
-    const int64u Segment_Tags_Tag_Targets=0x23C0;
-    const int64u Segment_Tags_Tag_Targets_AttachmentUID=0x23C6;
-    const int64u Segment_Tags_Tag_Targets_ChapterUID=0x23C4;
-    const int64u Segment_Tags_Tag_Targets_EditionUID=0x23C9;
-    const int64u Segment_Tags_Tag_Targets_TargetType=0x23CA;
-    const int64u Segment_Tags_Tag_Targets_TargetTypeValue=0x28CA;
-    const int64u Segment_Tags_Tag_Targets_TrackUID=0x23C5;
-    const int64u Segment_Tracks=0x654AE6B;
-    const int64u Segment_Tracks_TrackEntry=0x2E;
-    const int64u Segment_Tracks_TrackEntry_AttachmentLink=0x3446;
-    const int64u Segment_Tracks_TrackEntry_Audio=0x61;
-    const int64u Segment_Tracks_TrackEntry_Audio_BitDepth=0x2264;
-    const int64u Segment_Tracks_TrackEntry_Audio_Channels=0x1F;
-    const int64u Segment_Tracks_TrackEntry_Audio_OutputSamplingFrequency=0x38B5;
-    const int64u Segment_Tracks_TrackEntry_Audio_SamplingFrequency=0x35;
-    const int64u Segment_Tracks_TrackEntry_CodecDecodeAll=0x2A;
-    const int64u Segment_Tracks_TrackEntry_CodecID=0x6;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings=0x2D80;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding=0x2240;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Order=0x1031;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Scope=0x1032;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Type=0x1033;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Compression=0x1034;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Compression_ContentCompAlgo=0x0254;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Compression_ContentCompSettings=0x0255;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Encryption=0x1035;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Encryption_ContentEncAlgo=0x07E1;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Encryption_ContentEncKeyID=0x07E2;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Encryption_ContentSignature=0x07E3;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Encryption_ContentSigKeyID=0x07E4;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Encryption_ContentSigAlgo=0x07E5;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Encryption_ContentSigHashAlgo=0x07E6;
-    const int64u Segment_Tracks_TrackEntry_CodecName=0x58688;
-    const int64u Segment_Tracks_TrackEntry_CodecPrivate=0x23A2;
-    const int64u Segment_Tracks_TrackEntry_DefaultDuration=0x3E383;
-    const int64u Segment_Tracks_TrackEntry_FlagDefault=0x8;
-    const int64u Segment_Tracks_TrackEntry_FlagEnabled=0x39;
-    const int64u Segment_Tracks_TrackEntry_FlagForced=0x15AA;
-    const int64u Segment_Tracks_TrackEntry_FlagLacing=0x1C;
-    const int64u Segment_Tracks_TrackEntry_Language=0x2B59C;
-    const int64u Segment_Tracks_TrackEntry_MaxBlockAdditionID=0x15EE;
-    const int64u Segment_Tracks_TrackEntry_MaxCache=0x2DF8;
-    const int64u Segment_Tracks_TrackEntry_MinCache=0x2DE7;
-    const int64u Segment_Tracks_TrackEntry_Name=0x136E;
-    const int64u Segment_Tracks_TrackEntry_TrackNumber=0x57;
-    const int64u Segment_Tracks_TrackEntry_TrackTimecodeScale=0x3314F;
-    const int64u Segment_Tracks_TrackEntry_TrackType=0x3;
-    const int64u Segment_Tracks_TrackEntry_TrackUID=0x33C5;
-    const int64u Segment_Tracks_TrackEntry_Video=0x60;
-    const int64u Segment_Tracks_TrackEntry_Video_AspectRatioType=0x14B3;
-    const int64u Segment_Tracks_TrackEntry_Video_ColourSpace=0xEB524;
-    const int64u Segment_Tracks_TrackEntry_Video_DisplayHeight=0x14BA;
-    const int64u Segment_Tracks_TrackEntry_Video_DisplayUnit=0x14B2;
-    const int64u Segment_Tracks_TrackEntry_Video_DisplayWidth=0x14B0;
-    const int64u Segment_Tracks_TrackEntry_Video_FlagInterlaced=0x1A;
-    const int64u Segment_Tracks_TrackEntry_Video_FrameRate=0x383E3;
-    const int64u Segment_Tracks_TrackEntry_Video_PixelCropBottom=0x14AA;
-    const int64u Segment_Tracks_TrackEntry_Video_PixelCropLeft=0x14CC;
-    const int64u Segment_Tracks_TrackEntry_Video_PixelCropRight=0x14DD;
-    const int64u Segment_Tracks_TrackEntry_Video_PixelCropTop=0x14BB;
-    const int64u Segment_Tracks_TrackEntry_Video_PixelHeight=0x3A;
-    const int64u Segment_Tracks_TrackEntry_Video_PixelWidth=0x30;
-    const int64u Segment_Tracks_TrackEntry_Video_StereoMode=0x13B8;
-    const int64u Segment_Tracks_TrackEntry_Video_StereoModeBuggy=0x13B9;
-    const int64u Segment_Tracks_TrackEntry_TrackOverlay=0x2FAB;
-    const int64u Segment_Tracks_TrackEntry_TrackTranslate=0x2624;
-    const int64u Segment_Tracks_TrackEntry_TrackTranslate_Codec=0x26BF;
-    const int64u Segment_Tracks_TrackEntry_TrackTranslate_EditionUID=0x26FC;
-    const int64u Segment_Tracks_TrackEntry_TrackTranslate_TrackID=0x26A5;
 }
 
 //---------------------------------------------------------------------------
@@ -1119,16 +1168,18 @@ void File_Mk::Data_Parse()
         ATOM_END_MK
     LIST(Segment)
         ATOM_BEGIN
-        LIST(Segment_Attachements)
+        LIST(Segment_Attachments)
             ATOM_BEGIN
-            LIST(Segment_Attachements_AttachedFile)
+            LIST(Segment_Attachments_AttachedFile)
                 ATOM_BEGIN
-                LIST_SKIP(Segment_Attachements_AttachedFile_FileData) //This is ATOM, but some ATOMs are too big
-                ATOM(Segment_Attachements_AttachedFile_FileDescription)
-                ATOM(Segment_Attachements_AttachedFile_FileName)
-                ATOM(Segment_Attachements_AttachedFile_FileMimeType)
-                ATOM(Segment_Attachements_AttachedFile_FileReferral)
-                ATOM(Segment_Attachements_AttachedFile_FileUID)
+                ATOM(Segment_Attachments_AttachedFile_FileDescription)
+                ATOM(Segment_Attachments_AttachedFile_FileName)
+                ATOM(Segment_Attachments_AttachedFile_FileMimeType)
+                LIST_SKIP(Segment_Attachments_AttachedFile_FileData) //This is ATOM, but some ATOMs are too big
+                ATOM(Segment_Attachments_AttachedFile_FileUID)
+                ATOM(Segment_Attachments_AttachedFile_FileReferral)
+                ATOM(Segment_Attachments_AttachedFile_FileUsedStartTime)
+                ATOM(Segment_Attachments_AttachedFile_FileUsedEndTime)
                 ATOM_END_MK
             ATOM_END_MK
         LIST(Segment_Chapters)
@@ -1186,8 +1237,10 @@ void File_Mk::Data_Parse()
                         ATOM_END_MK
                     ATOM_END_MK
                 ATOM(Segment_Cluster_BlockGroup_BlockDuration)
-                ATOM(Segment_Cluster_BlockGroup_ReferenceBlock)
                 ATOM(Segment_Cluster_BlockGroup_ReferencePriority)
+                ATOM(Segment_Cluster_BlockGroup_ReferenceBlock)
+                ATOM(Segment_Cluster_BlockGroup_ReferenceVirtual)
+                ATOM(Segment_Cluster_BlockGroup_CodecState)
                 LIST(Segment_Cluster_BlockGroup_Slices)
                     ATOM_BEGIN
                     LIST(Segment_Cluster_BlockGroup_Slices_TimeSlice)
@@ -1215,6 +1268,8 @@ void File_Mk::Data_Parse()
                     ATOM_BEGIN
                     ATOM(Segment_Cues_CuePoint_CueTrackPositions_CueTrack)
                     ATOM(Segment_Cues_CuePoint_CueTrackPositions_CueClusterPosition)
+                    ATOM(Segment_Cues_CuePoint_CueTrackPositions_CueRelativePosition)
+                    ATOM(Segment_Cues_CuePoint_CueTrackPositions_CueDuration)
                     ATOM(Segment_Cues_CuePoint_CueTrackPositions_CueBlockNumber)
                     ATOM_END_MK
                 ATOM_END_MK
@@ -1279,12 +1334,12 @@ void File_Mk::Data_Parse()
                     ATOM_END_MK
                 LIST(Segment_Tags_Tag_Targets)
                     ATOM_BEGIN
-                    ATOM(Segment_Tags_Tag_Targets_AttachmentUID)
-                    ATOM(Segment_Tags_Tag_Targets_ChapterUID)
-                    ATOM(Segment_Tags_Tag_Targets_EditionUID)
-                    ATOM(Segment_Tags_Tag_Targets_TargetType)
                     ATOM(Segment_Tags_Tag_Targets_TargetTypeValue)
-                    ATOM(Segment_Tags_Tag_Targets_TrackUID)
+                    ATOM(Segment_Tags_Tag_Targets_TargetType)
+                    ATOM(Segment_Tags_Tag_Targets_TagTrackUID)
+                    ATOM(Segment_Tags_Tag_Targets_TagEditionUID)
+                    ATOM(Segment_Tags_Tag_Targets_TagChapterUID)
+                    ATOM(Segment_Tags_Tag_Targets_TagAttachmentUID)
                     ATOM_END_MK
                 ATOM_END_MK
             ATOM_END_MK
@@ -1300,28 +1355,31 @@ void File_Mk::Data_Parse()
                     ATOM(Segment_Tracks_TrackEntry_Audio_OutputSamplingFrequency)
                     ATOM(Segment_Tracks_TrackEntry_Audio_SamplingFrequency)
                     ATOM_END_MK
+                ATOM(Segment_Tracks_TrackEntry_CodecSettings)
+                ATOM(Segment_Tracks_TrackEntry_CodecInfoURL)
+                ATOM(Segment_Tracks_TrackEntry_CodecDownloadURL)
                 ATOM(Segment_Tracks_TrackEntry_CodecDecodeAll)
                 ATOM(Segment_Tracks_TrackEntry_CodecID)
                 LIS2(Segment_Tracks_TrackEntry_ContentEncodings, "ContentEncodings")
                     ATOM_BEGIN
                     LIS2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding, "ContentEncoding")
                     ATOM_BEGIN
-                        ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Order, "Order")
-                        ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Scope, "Scope")
-                        ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Type, "Type")
-                        LIS2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Compression, "Compression")
+                        ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingOrder, "ContentEncodingOrder")
+                        ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingScope, "ContentEncodingScope")
+                        ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingType, "ContentEncodingType")
+                        LIS2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression, "ContentCompression")
                             ATOM_BEGIN
-                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Compression_ContentCompAlgo, "Algo")
-                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Compression_ContentCompSettings, "Settings")
+                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression_ContentCompAlgo, "ContentCompAlgo")
+                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression_ContentCompSettings, "ContentCompSettings")
                             ATOM_END_MK
-                        LIS2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Encryption, "Encryption")
+                        LIS2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption, "ContentEncryption")
                             ATOM_BEGIN
-                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Encryption_ContentEncAlgo, "Algo")
-                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Encryption_ContentEncKeyID, "KeyID")
-                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Encryption_ContentSignature, "Signature")
-                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Encryption_ContentSigKeyID, "SigKeyID")
-                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Encryption_ContentSigAlgo, "SigAlgo")
-                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Encryption_ContentSigHashAlgo, "SigHashAlgo")
+                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentEncAlgo, "ContentAlgo")
+                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentEncKeyID, "ContentKeyID")
+                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSignature, "ContentSignature")
+                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSigKeyID, "ContentSigKeyID")
+                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSigAlgo, "ContentSigAlgo")
+                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSigHashAlgo, "ContentSigHashAlgo")
                             ATOM_END_MK
                         ATOM_END_MK
                     ATOM_END_MK
@@ -1339,6 +1397,7 @@ void File_Mk::Data_Parse()
                 ATOM(Segment_Tracks_TrackEntry_Name)
                 ATOM(Segment_Tracks_TrackEntry_TrackNumber)
                 ATOM(Segment_Tracks_TrackEntry_TrackTimecodeScale)
+                ATOM(Segment_Tracks_TrackEntry_TrackOffset)
                 ATOM(Segment_Tracks_TrackEntry_TrackType)
                 ATOM(Segment_Tracks_TrackEntry_TrackUID)
                 LIST(Segment_Tracks_TrackEntry_Video)
@@ -1491,6 +1550,8 @@ void File_Mk::Ebml_DocType()
         {
             Accept("Matroska");
             Fill(Stream_General, 0, General_Format, "Matroska");
+            Buffer_MaximumSize = 64 * 1024 * 1024; //Testing with huge lossless 4K frames
+            File_Buffer_Size_Hint_Pointer = Config->File_Buffer_Size_Hint_Pointer_Get();
         }
         else if (Data==__T("webm"))
         {
@@ -1549,19 +1610,52 @@ void File_Mk::Segment()
     Segment_Offset_End=File_Offset+Buffer_Offset+Element_TotalSize_Get();
 }
 
-void File_Mk::Segment_Attachements()
+void File_Mk::Segment_Attachments()
 {
-    Element_Name("Attachements");
+    Element_Name("Attachments");
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Attachements_AttachedFile()
+void File_Mk::Segment_Attachments_AttachedFile()
 {
     Element_Name("AttachedFile");
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Attachements_AttachedFile_FileData()
+void File_Mk::Segment_Attachments_AttachedFile_FileDescription()
+{
+    Element_Name("FileDescription");
+
+    //Parsing
+    UTF8_Info();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Attachments_AttachedFile_FileName()
+{
+    Element_Name("FileName");
+
+    //Parsing
+    Ztring Data=UTF8_Get();
+
+    Fill(Stream_General, 0, "Attachments", Data);
+    
+    //Cover is in the first file which name contains "cover"
+    if (!CoverIsSetFromAttachment && Data.MakeLowerCase().find(__T("cover")) != string::npos)
+        CurrentAttachmentIsCover=true;
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Attachments_AttachedFile_FileMimeType()
+{
+    Element_Name("FileMimeType");
+
+    //Parsing
+    Local_Info();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Attachments_AttachedFile_FileData()
 {
     Element_Name("FileData");
 
@@ -1588,40 +1682,16 @@ void File_Mk::Segment_Attachements_AttachedFile_FileData()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Attachements_AttachedFile_FileDescription()
+void File_Mk::Segment_Attachments_AttachedFile_FileUID()
 {
-    Element_Name("FileDescription");
+    Element_Name("FileUID");
 
     //Parsing
-    Local_Info();
+    UInteger_Info();
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Attachements_AttachedFile_FileName()
-{
-    Element_Name("FileName");
-
-    //Parsing
-    Ztring Data=UTF8_Get();
-
-    Fill(Stream_General, 0, "Attachments", Data);
-    
-    //Cover is in the first file which name contains "cover"
-    if (!CoverIsSetFromAttachment && Data.MakeLowerCase().find(__T("cover")) != string::npos)
-        CurrentAttachmentIsCover=true;
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Attachements_AttachedFile_FileMimeType()
-{
-    Element_Name("FileMimeType");
-
-    //Parsing
-    Local_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Attachements_AttachedFile_FileReferral()
+void File_Mk::Segment_Attachments_AttachedFile_FileReferral()
 {
     Element_Name("FileReferral");
 
@@ -1630,9 +1700,18 @@ void File_Mk::Segment_Attachements_AttachedFile_FileReferral()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Attachements_AttachedFile_FileUID()
+void File_Mk::Segment_Attachments_AttachedFile_FileUsedStartTime()
 {
-    Element_Name("FileUID");
+    Element_Name("FileUsedStartTime");
+
+    //Parsing
+    UInteger_Info();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Attachments_AttachedFile_FileUsedEndTime()
+{
+    Element_Name("FileUsedEndTime");
 
     //Parsing
     UInteger_Info();
@@ -1950,7 +2029,7 @@ void File_Mk::Segment_Cluster_BlockGroup()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Cluster_BlockGroup_Block()
 {
-    Element_Name("Block");
+    Element_Name(Element_Level==3?"SimpleBlock":"Block");
 
     //Parsing
     int64u TrackNumber;
@@ -2192,6 +2271,15 @@ void File_Mk::Segment_Cluster_BlockGroup_BlockDuration()
 }
 
 //---------------------------------------------------------------------------
+void File_Mk::Segment_Cluster_BlockGroup_ReferencePriority()
+{
+    Element_Name("ReferencePriority");
+
+    //Parsing
+    UInteger_Info();
+}
+
+//---------------------------------------------------------------------------
 void File_Mk::Segment_Cluster_BlockGroup_ReferenceBlock()
 {
     Element_Name("ReferenceBlock");
@@ -2201,12 +2289,21 @@ void File_Mk::Segment_Cluster_BlockGroup_ReferenceBlock()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_BlockGroup_ReferencePriority()
+void File_Mk::Segment_Cluster_BlockGroup_ReferenceVirtual()
 {
-    Element_Name("ReferencePriority");
+    Element_Name("ReferenceVirtual");
 
     //Parsing
     UInteger_Info();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Cluster_BlockGroup_CodecState()
+{
+    Element_Name("CodecState");
+
+    //Parsing
+    Skip_XX(Element_Size,                                       "Data");
 }
 
 //---------------------------------------------------------------------------
@@ -2324,6 +2421,24 @@ void File_Mk::Segment_Cues_CuePoint_CueTrackPositions_CueTrack()
 void File_Mk::Segment_Cues_CuePoint_CueTrackPositions_CueClusterPosition()
 {
     Element_Name("CueClusterPosition");
+
+    //Parsing
+    UInteger_Info();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Cues_CuePoint_CueTrackPositions_CueRelativePosition()
+{
+    Element_Name("CueRelativePosition");
+
+    //Parsing
+    UInteger_Info();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Cues_CuePoint_CueTrackPositions_CueDuration()
+{
+    Element_Name("CueDuration");
 
     //Parsing
     UInteger_Info();
@@ -2597,7 +2712,7 @@ void File_Mk::Segment_Tags_Tag()
     }
 
     //Init
-    Segment_Tags_Tag_Targets_TrackUID_Value=0; // Default is all tracks
+    Segment_Tags_Tag_Targets_TagTrackUID_Value=0; // Default is all tracks
 }
 
 //---------------------------------------------------------------------------
@@ -2610,12 +2725,18 @@ void File_Mk::Segment_Tags_Tag_SimpleTag()
 void File_Mk::Segment_Tags_Tag_SimpleTag_TagBinary()
 {
     Element_Name("TagBinary");
+
+    //Parsing
+    Skip_XX(Element_Size,                                       "Data");
 }
 
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tags_Tag_SimpleTag_TagDefault()
 {
     Element_Name("TagDefault");
+
+    //Parsing
+    UInteger_Get();
 }
 
 //---------------------------------------------------------------------------
@@ -2695,7 +2816,7 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_TagString()
             TagName+=__T('/');
     }
 
-    Segment_Tags_Tag_Items[Segment_Tags_Tag_Targets_TrackUID_Value][TagName]=TagString;
+    Segment_Tags_Tag_Items[Segment_Tags_Tag_Targets_TagTrackUID_Value][TagName]=TagString;
 }
 
 //---------------------------------------------------------------------------
@@ -2705,48 +2826,34 @@ void File_Mk::Segment_Tags_Tag_Targets()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tags_Tag_Targets_AttachmentUID()
+void File_Mk::Segment_Tags_Tag_Targets_TargetTypeValue()
 {
-    Element_Name("AttachmentUID");
-}
+    Element_Name("TargetTypeValue");
 
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tags_Tag_Targets_ChapterUID()
-{
-    Element_Name("ChapterUID");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tags_Tag_Targets_EditionUID()
-{
-    Element_Name("EditionUID");
+    UInteger_Info();
 }
 
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tags_Tag_Targets_TargetType()
 {
     Element_Name("TargetType");
+
+    UTF8_Info();
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tags_Tag_Targets_TargetTypeValue()
+void File_Mk::Segment_Tags_Tag_Targets_TagTrackUID()
 {
-    Element_Name("TargetTypeValue");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tags_Tag_Targets_TrackUID()
-{
-    Element_Name("TrackUID");
+    Element_Name("TagTrackUID");
 
     //Parsing
-    Segment_Tags_Tag_Targets_TrackUID_Value=UInteger_Get();
+    Segment_Tags_Tag_Targets_TagTrackUID_Value=UInteger_Get();
 
     FILLING_BEGIN();
         tags::iterator Items0 = Segment_Tags_Tag_Items.find((int64u)-1);
         if (Items0 != Segment_Tags_Tag_Items.end())
         {
-            tagspertrack &Items = Segment_Tags_Tag_Items[Segment_Tags_Tag_Targets_TrackUID_Value]; // Creates it if not yet present, else take the previous one
+            tagspertrack &Items = Segment_Tags_Tag_Items[Segment_Tags_Tag_Targets_TagTrackUID_Value]; // Creates it if not yet present, else take the previous one
 
             //Change the key of the current tag
             for (tagspertrack::iterator Item=Items0->second.begin(); Item!=Items0->second.end(); ++Item)
@@ -2754,6 +2861,30 @@ void File_Mk::Segment_Tags_Tag_Targets_TrackUID()
             Segment_Tags_Tag_Items.erase(Items0);
         }
     FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tags_Tag_Targets_TagEditionUID()
+{
+    Element_Name("TagEditionUID");
+
+    UInteger_Info();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tags_Tag_Targets_TagChapterUID()
+{
+    Element_Name("TagChapterUID");
+
+    UInteger_Info();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tags_Tag_Targets_TagAttachmentUID()
+{
+    Element_Name("TagAttachmentUID");
+
+    UInteger_Info();
 }
 
 //---------------------------------------------------------------------------
@@ -2870,6 +3001,33 @@ void File_Mk::Segment_Tracks_TrackEntry_Audio_SamplingFrequency()
 }
 
 //---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_CodecSettings()
+{
+    Element_Name("CodecSettings");
+
+    //Parsing
+    UTF8_Info();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_CodecInfoURL()
+{
+    Element_Name("CodecInfoURL");
+
+    //Parsing
+    Local_Info();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_CodecDownloadURL()
+{
+    Element_Name("CodecDecodeAll");
+
+    //Parsing
+    Local_Info();
+}
+
+//---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_CodecDecodeAll()
 {
     Element_Name("CodecDecodeAll");
@@ -2897,7 +3055,7 @@ void File_Mk::Segment_Tracks_TrackEntry_CodecID()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Compression()
+void File_Mk::Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression()
 {
     FILLING_BEGIN();
         if (Segment_Info_Count>1)
@@ -2908,7 +3066,7 @@ void File_Mk::Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Compres
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Compression_ContentCompAlgo()
+void File_Mk::Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression_ContentCompAlgo()
 {
     //Parsing
     int64u Algo=UInteger_Get(); Param_Info1(Mk_ContentCompAlgo(Algo));
@@ -2922,7 +3080,7 @@ void File_Mk::Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Compres
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Compression_ContentCompSettings()
+void File_Mk::Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression_ContentCompSettings()
 {
     //Parsing
     Skip_XX(Element_Size,                                       "Data");
@@ -3366,6 +3524,14 @@ void File_Mk::Segment_Tracks_TrackEntry_TrackTimecodeScale()
     Element_Name("TrackTimecodeScale");
 
     Float_Info();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_TrackOffset()
+{
+    Element_Name("TrackOffset");
+
+    UInteger_Info();
 }
 
 //---------------------------------------------------------------------------
@@ -4185,7 +4351,6 @@ void File_Mk::CodecPrivate_Manage()
     Element_Offset=Element_Size_Save;
     delete[] CodecPrivate; CodecPrivate=NULL;
     CodecPrivate_Size=0;
-    Element_Name("(Multiple info)");
 }
 
 //***************************************************************************
