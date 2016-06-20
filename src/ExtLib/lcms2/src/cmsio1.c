@@ -128,7 +128,7 @@ cmsBool  _cmsReadCHAD(cmsMAT3* Dest, cmsHPROFILE hProfile)
 }
 
 
-// Auxiliar, read colorants as a MAT3 structure. Used by any function that needs a matrix-shaper
+// Auxiliary, read colorants as a MAT3 structure. Used by any function that needs a matrix-shaper
 static
 cmsBool ReadICCMatrixRGB2XYZ(cmsMAT3* r, cmsHPROFILE hProfile)
 {
@@ -314,7 +314,7 @@ cmsPipeline* _cmsReadInputLUT(cmsHPROFILE hProfile, int Intent)
     cmsTagSignature tagFloat;
     cmsContext ContextID = cmsGetProfileContextID(hProfile);
 
-    // On named color, take the appropiate tag
+    // On named color, take the appropriate tag
     if (cmsGetDeviceClass(hProfile) == cmsSigNamedColorClass) {
 
         cmsPipeline* Lut;
@@ -336,7 +336,7 @@ cmsPipeline* _cmsReadInputLUT(cmsHPROFILE hProfile, int Intent)
         return Lut;
     }
 
-    // This is an attempt to reuse this funtion to retrieve the matrix-shaper as pipeline no
+    // This is an attempt to reuse this function to retrieve the matrix-shaper as pipeline no
     // matter other LUT are present and have precedence. Intent = -1 means just this.
     if (Intent != -1) {
 
@@ -394,7 +394,7 @@ Error:
     // Check if this is a grayscale profile.
     if (cmsGetColorSpace(hProfile) == cmsSigGrayData) {
 
-        // if so, build appropiate conversion tables.
+        // if so, build appropriate conversion tables.
         // The tables are the PCS iluminant, scaled across GrayTRC
         return BuildGrayInputMatrixPipeline(hProfile);
     }
@@ -549,7 +549,7 @@ cmsPipeline* _cmsReadFloatOutputTag(cmsHPROFILE hProfile, cmsTagSignature tagFlo
     if (Lut == NULL) return NULL;
     
     // If PCS is Lab or XYZ, the floating point tag is accepting data in the space encoding,
-    // and since the formatter has already accomodated to 0..1.0, we should undo this change
+    // and since the formatter has already accommodated to 0..1.0, we should undo this change
     if ( PCS == cmsSigLabData)
     {
         if (!cmsPipelineInsertStage(Lut, cmsAT_BEGIN, _cmsStageNormalizeToLabFloat(ContextID)))
@@ -651,7 +651,7 @@ Error:
     // Check if this is a grayscale profile.
     if (cmsGetColorSpace(hProfile) == cmsSigGrayData) {
 
-        // if so, build appropiate conversion tables.
+        // if so, build appropriate conversion tables.
         // The tables are the PCS iluminant, scaled across GrayTRC
         return BuildGrayOutputPipeline(hProfile);
     }
@@ -714,7 +714,7 @@ cmsPipeline* _cmsReadDevicelinkLUT(cmsHPROFILE hProfile, int Intent)
     cmsContext ContextID = cmsGetProfileContextID(hProfile);
 
 
-    // On named color, take the appropiate tag
+    // On named color, take the appropriate tag
     if (cmsGetDeviceClass(hProfile) == cmsSigNamedColorClass) {
 
         cmsNAMEDCOLORLIST* nc = (cmsNAMEDCOLORLIST*) cmsReadTag(hProfile, cmsSigNamedColor2Tag);
@@ -921,7 +921,7 @@ cmsBool _cmsWriteProfileSequence(cmsHPROFILE hProfile, const cmsSEQ* seq)
 }
 
 
-// Auxiliar, read and duplicate a MLU if found.
+// Auxiliary, read and duplicate a MLU if found.
 static
 cmsMLU* GetMLUFromProfile(cmsHPROFILE h, cmsTagSignature sig)
 {

@@ -156,7 +156,7 @@ cmsInterpParams* _cmsComputeInterpParams(cmsContext ContextID, int nSamples, int
     int i;
     cmsUInt32Number Samples[MAX_INPUT_DIMENSIONS];
 
-    // Fill the auxiliar array
+    // Fill the auxiliary array
     for (i=0; i < MAX_INPUT_DIMENSIONS; i++)
         Samples[i] = nSamples;
 

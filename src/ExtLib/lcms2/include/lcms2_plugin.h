@@ -128,7 +128,7 @@ struct _cms_io_handler {
                                                                    const void* Buffer);
 };
 
-// Endianess adjust functions
+// Endianness adjust functions
 CMSAPI cmsUInt16Number   CMSEXPORT  _cmsAdjustEndianess16(cmsUInt16Number Word);
 CMSAPI cmsUInt32Number   CMSEXPORT  _cmsAdjustEndianess32(cmsUInt32Number Value);
 CMSAPI void              CMSEXPORT  _cmsAdjustEndianess64(cmsUInt64Number* Result, cmsUInt64Number* QWord);

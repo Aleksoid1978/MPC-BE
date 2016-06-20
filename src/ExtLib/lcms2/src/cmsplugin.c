@@ -107,7 +107,7 @@ void CMSEXPORT  _cmsAdjustEndianess64(cmsUInt64Number* Result, cmsUInt64Number* 
 #endif
 }
 
-// Auxiliar -- read 8, 16 and 32-bit numbers
+// Auxiliary -- read 8, 16 and 32-bit numbers
 cmsBool CMSEXPORT  _cmsReadUInt8Number(cmsIOHANDLER* io, cmsUInt8Number* n)
 {
     cmsUInt8Number tmp;

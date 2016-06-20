@@ -11,6 +11,7 @@ Windows XP больше не поддерживается.
 
 Обновлены библиотеки:
 	ffmpeg git-n3.1-dev-1880-geaa1143;
+	Little-CMS git-2.7-65-ga47e96c;
 	MediaInfo git-v0.7.86-8-gf80d491;
 
 1.4.6

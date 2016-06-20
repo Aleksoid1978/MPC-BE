@@ -107,7 +107,7 @@ static cmsIntentsList DefaultIntents[] = {
 };
 
 
-// A pointer to the begining of the list
+// A pointer to the beginning of the list
 _cmsIntentsPluginChunkType _cmsIntentsPluginChunk = { NULL };
 
 // Duplicates the zone of memory used by the plug-in in the new context
@@ -889,7 +889,7 @@ int BlackPreservingSampler(register const cmsUInt16Number In[], register cmsUInt
         return TRUE;
     }
 
-    // Make sure to pass thru K (which now is fixed)
+    // Make sure to pass through K (which now is fixed)
     Outf[3] = LabK[3];
 
     // Apply TAC if needed
@@ -957,7 +957,7 @@ cmsPipeline* BlackPreservingKPlaneIntents(cmsContext     ContextID,
     memset(&bp, 0, sizeof(bp));
 
     // We need the input LUT of the last profile, assuming this one is responsible of
-    // black generation. This LUT will be seached in inverse order.
+    // black generation. This LUT will be searched in inverse order.
     bp.LabK2cmyk = _cmsReadInputLUT(hProfiles[nProfiles-1], INTENT_RELATIVE_COLORIMETRIC);
     if (bp.LabK2cmyk == NULL) goto Cleanup;
 

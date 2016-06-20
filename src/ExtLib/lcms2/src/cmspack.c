@@ -81,7 +81,7 @@ typedef struct {
 #define ANYFLAVOR       FLAVOR_SH(1)
 
 
-// Supress waning about info never being used
+// Suppress waning about info never being used
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4100)

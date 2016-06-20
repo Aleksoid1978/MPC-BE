@@ -38,7 +38,7 @@ void CMSEXPORT _cmsVEC3init(cmsVEC3* r, cmsFloat64Number x, cmsFloat64Number y, 
     r -> n[VZ] = z;
 }
 
-// Vector substraction
+// Vector subtraction
 void CMSEXPORT _cmsVEC3minus(cmsVEC3* r, const cmsVEC3* a, const cmsVEC3* b)
 {
   r -> n[VX] = a -> n[VX] - b -> n[VX];

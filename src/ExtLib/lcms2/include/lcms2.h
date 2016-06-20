@@ -656,7 +656,7 @@ typedef void* cmsHTRANSFORM;
 //            T: Pixeltype
 //            F: Flavor  0=MinIsBlack(Chocolate) 1=MinIsWhite(Vanilla)
 //            P: Planar? 0=Chunky, 1=Planar
-//            X: swap 16 bps endianess?
+//            X: swap 16 bps endianness?
 //            S: Do swap? ie, BGR, KYMC
 //            E: Extra samples
 //            C: Channels (Samples per pixel)
@@ -1016,7 +1016,7 @@ CMSAPI long int          CMSEXPORT cmsfilelength(FILE* f);
 // Context handling --------------------------------------------------------------------------------------------------------
 
 // Each context holds its owns globals and its own plug-ins. There is a global context with the id = 0 for lecacy compatibility
-// though using the global context is not recomended. Proper context handling makes lcms more thread-safe.
+// though using the global context is not recommended. Proper context handling makes lcms more thread-safe.
 
 typedef struct _cmsContext_struct* cmsContext;
 

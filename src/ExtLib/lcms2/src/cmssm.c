@@ -318,7 +318,7 @@ void CMSEXPORT cmsGBDFree(cmsHANDLE hGBD)
 }
 
 
-// Auxiliar to retrieve a pointer to the segmentr containing the Lab value
+// Auxiliary to retrieve a pointer to the segmentr containing the Lab value
 static
 cmsGDBPoint* GetPoint(cmsGDB* gbd, const cmsCIELab* Lab, cmsSpherical* sp)
 {
@@ -330,7 +330,7 @@ cmsGDBPoint* GetPoint(cmsGDB* gbd, const cmsCIELab* Lab, cmsSpherical* sp)
     _cmsAssert(Lab != NULL);
     _cmsAssert(sp != NULL);
 
-    // Center L* by substracting half of its domain, that's 50
+    // Center L* by subtracting half of its domain, that's 50
     _cmsVEC3init(&v, Lab ->L - 50.0, Lab ->a, Lab ->b);
 
     // Convert to spherical coordinates
