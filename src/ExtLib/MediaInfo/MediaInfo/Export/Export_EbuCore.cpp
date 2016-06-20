@@ -1538,7 +1538,7 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version)
     if (Version==Version_1_5)
         ToReturn+=__T("<ebucore:ebuCoreMain xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:ebucore=\"urn:ebu:metadata-schema:ebuCore_2014\"\n    xmlns:xalan=\"http://xml.apache.org/xalan\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xsi:schemaLocation=\"urn:ebu:metadata-schema:ebuCore_2014 http://www.ebu.ch/metadata/schemas/EBUCore/20140318/EBU_CORE_20140318.xsd\" version=\"1.5\" dateLastModified=\"")+Date+__T("\" timeLastModified=\"")+Time+__T("\">\n");
     else
-        ToReturn+=__T("<ebucore:ebuCoreMain xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:ebucore=\"urn:ebu:metadata-schema:ebuCore_2015\"\n    xmlns:xalan=\"http://xml.apache.org/xalan\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xsi:schemaLocation=\"urn:ebu:metadata-schema:ebuCore_2015 https://www.ebu.ch/metadata/schemas/EBUCore/20150522/ebucore_20150522.xsd\" version=\"1.6\" dateLastModified=\"")+Date+__T("\" timeLastModified=\"")+Time+__T("\">\n");
+        ToReturn+=__T("<ebucore:ebuCoreMain xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:ebucore=\"urn:ebu:metadata-schema:ebuCore_2015\"\n    xmlns:xalan=\"http://xml.apache.org/xalan\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xsi:schemaLocation=\"urn:ebu:metadata-schema:ebuCore_2015 http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://www.ebu.ch/metadata/schemas/EBUCore/20150522/ebucore_20150522.xsd\" version=\"1.6\" dateLastModified=\"")+Date+__T("\" timeLastModified=\"")+Time+__T("\">\n");
 
     //coreMetadata
     ToReturn+=__T("\t<ebucore:coreMetadata>\n");

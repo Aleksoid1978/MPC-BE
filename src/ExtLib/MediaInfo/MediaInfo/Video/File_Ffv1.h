@@ -47,11 +47,12 @@ public :
     int32u  get_symbol_u(int8u* States);
     int32s  get_symbol_s(int8u* States);
 
-    int16u Current;
-    int16u Mask;
+    int32u Current;
+    int32u Mask;
     state_transitions zero_state;
 public : //Temp
     state_transitions one_state;
+    const int8u* Buffer_Beg;
     const int8u* Buffer_Cur;
     const int8u* Buffer_End;
 
@@ -100,7 +101,7 @@ public:
     }
 
     void    run_index_init() { run_index=0; }
-    void    run_mode_init() { run_mode=RUN_MODE_STOP; }
+    void    run_mode_init() { run_segment_length = 0; run_mode=RUN_MODE_STOP; }
 
     //TEMP
     int32u  x;
@@ -112,8 +113,9 @@ public:
     int32s  run_segment_length;
     int16s* sample_buffer;
 
-    struct Context
+    class Context
     {
+    public:
         static const int32u N0; // Determined threshold to divide N and B
         static const int32s Cmax; // Storage limitation, C never upper than 127
         static const int32s Cmin; // Storage limitation, C never below than -128
@@ -121,12 +123,62 @@ public:
         int32s B; // Accumulated sum of corrected prediction residuals
         int32s A; // Accumulated sum of the absolute corrected prediction residuals (St + Nt)
         int32s C; // Correction value
+
+        Context() :
+            N(1),
+            B(0),
+            A(4),
+            C(0)
+        {}
+
+        inline void update_correlation_value_and_shift()
+        {
+            // Step 11: Resets
+            if (N == N0)
+            {
+                // divide by 2, if >= 0 : ROUND, otherwise, CEIL
+                N >>= 1;
+                A >>= 1;
+                B >>= 1;
+            }
+            ++N; // context meets
+
+                 // Step 12: Bias computation procedure
+                 // Keep B in (-N;0]
+            if (B <= -N)
+            {
+                if (C > Cmin)
+                    --C;
+
+                B += N;
+                if (B <= -N)
+                    B = -N + 1;
+            }
+            else if (B > 0)
+            {
+                if (C < Cmax)
+                    ++C;
+
+                if (B > N)
+                    B = 0;
+                else
+                    B -= N;
+            }
+        }
+        inline int compute_k()
+        {
+            int k = 0;
+            while ((N << k) < A)
+                ++k;
+            return k;
+        }
     };
 
     typedef Context* ContextPtr;
 
     ContextPtr contexts[MAX_PLANES];
     states_context_plane plane_states[MAX_QUANT_TABLES];
+    size_t               plane_states_maxsizes[MAX_QUANT_TABLES];
 
     // HELPER
     void contexts_init(int32u plane_count, int32u quant_table_index[MAX_PLANES], int32u context_count[MAX_QUANT_TABLES]);
@@ -136,6 +188,9 @@ public:
 //***************************************************************************
 // Class File_Ffv1
 //***************************************************************************
+
+typedef int16s quant_table_struct2[256];
+typedef quant_table_struct2 quant_table_struct[MAX_CONTEXT_INPUTS];
 
 class File_Ffv1 : public File__Analyze
 {
@@ -157,16 +212,16 @@ private :
     void Read_Buffer_Continue();
 
     //Elements
-    void FrameHeader();
-    void slice(states &States);
-    void slice_header(states &States);
+    void   FrameHeader();
+    int    slice(states &States);
+    int    slice_header(states &States);
     int32u CRC_Compute(size_t Size);
-    int32s get_symbol_with_bias_correlation(Slice::Context* context);
+    int32s get_symbol_with_bias_correlation(Slice::ContextPtr context);
     void rgb();
     void plane(int32u pos);
     void line(int pos, int16s *sample[2]);
-    int32s line_range_coder(int32s pos, int32s context);
-    int32s line_adaptive_symbol_by_symbol(size_t x, int32s pos, int32s context);
+    int32s pixel_GR(int32s context);
+    int32s pixel_RC(int32s context);
     void read_quant_tables(int i);
     void read_quant_table(int i, int j, size_t scale);
     void copy_plane_states_to_slice(int8u plane_count);
@@ -209,7 +264,7 @@ private :
     bool    ConfigurationRecordIsPresent;
     int32u  context_count[MAX_QUANT_TABLES];
     int32u  len_count[MAX_QUANT_TABLES][MAX_CONTEXT_INPUTS];
-    int16s  quant_tables[MAX_QUANT_TABLES][MAX_CONTEXT_INPUTS][256];
+    quant_table_struct quant_tables[MAX_QUANT_TABLES];
     int32u  quant_table_index[MAX_PLANES];
     int32u  quant_table_count;
     int32u  version;
@@ -233,12 +288,16 @@ private :
     //TEMP
     static const int32u PREFIX_MAX = 12; //limit
     int8u bits_max;
+    int16u bits_mask1;
+    int32s bits_mask2;
+    int32s bits_mask3;
+    states_context_plane Context_RC; // Range Coder context
+    Slice::ContextPtr    Context_GR; // Rice Golomb context
+    size_t x;
 
     states_context_plane plane_states[MAX_QUANT_TABLES];
+    size_t               plane_states_maxsizes[MAX_QUANT_TABLES];
 
-    int32s get_median_number(int32s one, int32s two, int32s three);
-    int32s predict(int16s *current, int16s *current_top);
-    void update_correlation_value_and_shift(Slice::Context *c);
     int32s golomb_rice_decode(int k);
     void plane_states_clean(states_context_plane states[MAX_QUANT_TABLES]);
 };

@@ -917,6 +917,9 @@ size_t MediaInfo_Internal::Open_Buffer_Finalize ()
     //Cleanup
     if (!Config.File_IsSub_Get() && !Config.File_KeepInfo_Get()) //We need info for the calling parser
     {
+        #if MEDIAINFO_TRACE
+            ParserName=Info->ParserName; //Keep it in memory in case we need it after delete of Info
+        #endif //MEDIAINFO_TRACE
         delete Info; Info=NULL;
     }
     if (Config.File_Names_Pos>=Config.File_Names.size())

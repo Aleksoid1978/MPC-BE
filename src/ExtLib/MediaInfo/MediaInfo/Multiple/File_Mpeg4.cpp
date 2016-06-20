@@ -197,6 +197,7 @@ File_Mpeg4::File_Mpeg4()
 :File__Analyze()
 {
     //Configuration
+    ParserName=__T("MPEG-4");
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Mpeg4;
         StreamIDs_Width[0]=8;

@@ -108,18 +108,22 @@ Ztring MediaInfo_Internal::Inform()
     #endif //MEDIAINFO_TRACE
 
     #if defined(MEDIAINFO_EBUCORE_YES)
+        if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.5"))
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_5);
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.6"))
             return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_6);
-        if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore") || MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.5"))
+        if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore"))
             return Export_EbuCore().Transform(*this);
     #endif //defined(MEDIAINFO_EBUCORE_YES)
     #if defined(MEDIAINFO_EBUCORE_YES)
         if (MediaInfoLib::Config.Inform_Get()==__T("FIMS_1.1"))
             return Export_Fims().Transform(*this, Export_Fims::Version_1_1);
-        if (MediaInfoLib::Config.Inform_Get()==__T("FIMS_1.2") || MediaInfoLib::Config.Inform_Get()==__T("FIMS"))
+        if (MediaInfoLib::Config.Inform_Get()==__T("FIMS_1.2"))
             return Export_Fims().Transform(*this, Export_Fims::Version_1_2);
         if (MediaInfoLib::Config.Inform_Get()==__T("FIMS_1.3"))
             return Export_Fims().Transform(*this, Export_Fims::Version_1_3);
+        if (MediaInfoLib::Config.Inform_Get()==__T("FIMS"))
+            return Export_Fims().Transform(*this);
     #endif //defined(MEDIAINFO_FIMS_YES)
     #if defined(MEDIAINFO_MPEG7_YES)
         if (MediaInfoLib::Config.Inform_Get()==__T("MPEG-7"))
@@ -269,10 +273,13 @@ Ztring MediaInfo_Internal::Inform()
     if (XML_0_7_78_MA || XML_0_7_78_MI)
     {
         size_t Modified;
-        Retour+=__T("<media ref=\"")+MediaInfo_Internal::Xml_Content_Escape(Get(Stream_General, 0, General_CompleteName), Modified)+__T("\">\n");
+        Retour+=__T("<media ref=\"")+MediaInfo_Internal::Xml_Content_Escape(Get(Stream_General, 0, General_CompleteName), Modified)+= __T("\"");
+        if (Info && !Info->ParserName.empty())
+            Retour+=__T(" parser=\"")+ Info->ParserName+=__T("\"");
+        Retour+= __T(">\n");
     }
     if (XML_0_7_78_MA)
-        Retour+=__T("<MediaInfo xmlns=\"https://mediaarea.net/mediainfo\" version=\"2.0beta1\">\n");
+        Retour+=__T("<MediaInfo xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediainfo\" version=\"2.0beta1\">\n");
     if (XML)
         Retour+=__T("<File>\n");
     #endif //defined(MEDIAINFO_XML_YES)
@@ -343,7 +350,7 @@ Ztring MediaInfo_Internal::Inform()
         {
             if (MediaInfoLib::Config.Trace_Level_Get() || MediaInfoLib::Config.Inform_Get()==__T("Details"))
             {
-                Retour+=__T("<MediaTrace xmlns=\"https://mediaarea.net/mediatrace\" version=\"0.1\">\n");
+                Retour+=__T("<MediaTrace xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatrace\" version=\"0.1\">\n");
                 if (!Details.empty())
                     Retour+=Details;
                 else if (Info)

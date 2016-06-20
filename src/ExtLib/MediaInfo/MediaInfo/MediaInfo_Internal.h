@@ -118,6 +118,7 @@ private :
     friend class File__ReferenceFilesHelper; //Theses classes need access to internal structure for optimization. There is recursivity with theses formats
     friend class resource;//Theses classes need access to internal structure for optimization. There is recursivity with theses formats
     friend class Reader_File; //For Info member
+    friend class MediaInfoList_Internal; //For Info member
 
     //Parsing handles
     File__Analyze*  Info;
@@ -137,6 +138,7 @@ private :
     std::vector<std::vector<ZtringList> > Stream;
     std::vector<std::vector<ZtringListList> > Stream_More;
     Ztring Details;
+    Ztring ParserName;
     void Traiter(Ztring &C); //enleve les $if...
 
 public :

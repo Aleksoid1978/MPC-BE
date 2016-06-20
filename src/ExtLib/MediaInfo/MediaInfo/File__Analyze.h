@@ -324,7 +324,7 @@ protected :
     //Elements - Begin
     void Element_Begin ();
     void Element_Begin (const Ztring &Name);
-    inline void Element_Begin (const char *Name) {Element_Begin(Ztring().From_UTF8(Name));}
+    void Element_Begin (const char *Name);
     #define Element_Begin0() Element_Begin()
     #define Element_Begin1(_NAME) Element_Begin(_NAME)
     #define Element_Trace_Begin0() Element_Begin()
@@ -395,51 +395,51 @@ public :
 
     //Param - Main
     void Param      (const Ztring &Parameter, const Ztring& Value);
-    inline void Param      (const char*   Parameter, const Ztring& Value) {Param(Ztring().From_Local(Parameter), Value);};
-    inline void Param      (const char*   Parameter, const std::string& Value) {Param(Parameter, Ztring().From_Local(Value.c_str()));}
-    inline void Param      (const char*   Parameter, const char*   Value, size_t Value_Size=Unlimited, bool Utf8=true) {Param(Parameter, ToZtring(Value, Value_Size, Utf8));}
-    inline void Param      (const char*   Parameter, const int8u*  Value, size_t Value_Size=Unlimited, bool Utf8=true) {Param(Parameter, (const char*)Value, Value_Size, Utf8);}
-    inline void Param      (const char*   Parameter, bool   Value) {if (Value) Param(Parameter, "Yes"); else Param(Parameter, "No");}
-    inline void Param      (const char*   Parameter, int8u  Value) {Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring().From_CC1(Value)+__T(")"));}
-    inline void Param      (const char*   Parameter, int8s  Value) {Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring().From_CC1(Value)+__T(")"));}
-    inline void Param      (const char*   Parameter, int16u Value) {Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring().From_CC2(Value)+__T(")"));}
-    inline void Param      (const char*   Parameter, int16s Value) {Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring().From_CC2(Value)+__T(")"));}
-    inline void Param      (const char*   Parameter, int32u Value) {Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring::ToZtring(Value, 16)+__T(")"));}
-    inline void Param      (const char*   Parameter, int32s Value) {Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring::ToZtring(Value, 16)+__T(")"));}
-    inline void Param      (const char*   Parameter, int64u Value) {Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring::ToZtring(Value, 16)+__T(")"));}
-    inline void Param      (const char*   Parameter, int64s Value) {Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring::ToZtring(Value, 16)+__T(")"));}
-    inline void Param      (const char*   Parameter, int128u Value){Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring::ToZtring(Value, 16)+__T(")"));}
-    inline void Param_GUID (const char*   Parameter, int128u Value){Param(Parameter, Ztring().From_GUID(Value));}
-    inline void Param_UUID (const char*   Parameter, int128u Value){Param(Parameter, Ztring().From_UUID(Value));}
+    inline void Param      (const char*   Parameter, const Ztring& Value) {if (Trace_Activated) Param(Ztring().From_Local(Parameter), Value);};
+    inline void Param      (const char*   Parameter, const std::string& Value) { if (Trace_Activated) Param(Parameter, Ztring().From_Local(Value.c_str()));}
+    inline void Param      (const char*   Parameter, const char*   Value, size_t Value_Size=Unlimited, bool Utf8=true) {if (Trace_Activated) Param(Parameter, ToZtring(Value, Value_Size, Utf8));}
+    inline void Param      (const char*   Parameter, const int8u*  Value, size_t Value_Size=Unlimited, bool Utf8=true) {if (Trace_Activated) Param(Parameter, (const char*)Value, Value_Size, Utf8);}
+    inline void Param      (const char*   Parameter, bool   Value) {if (Trace_Activated) {if (Value) Param(Parameter, "Yes"); else Param(Parameter, "No");}}
+    inline void Param      (const char*   Parameter, int8u  Value) {if (Trace_Activated) Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring().From_CC1(Value)+__T(")"));}
+    inline void Param      (const char*   Parameter, int8s  Value) {if (Trace_Activated) Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring().From_CC1(Value)+__T(")"));}
+    inline void Param      (const char*   Parameter, int16u Value) {if (Trace_Activated) Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring().From_CC2(Value)+__T(")"));}
+    inline void Param      (const char*   Parameter, int16s Value) {if (Trace_Activated) Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring().From_CC2(Value)+__T(")"));}
+    inline void Param      (const char*   Parameter, int32u Value) {if (Trace_Activated) Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring::ToZtring(Value, 16)+__T(")"));}
+    inline void Param      (const char*   Parameter, int32s Value) {if (Trace_Activated) Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring::ToZtring(Value, 16)+__T(")"));}
+    inline void Param      (const char*   Parameter, int64u Value) {if (Trace_Activated) Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring::ToZtring(Value, 16)+__T(")"));}
+    inline void Param      (const char*   Parameter, int64s Value) {if (Trace_Activated) Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring::ToZtring(Value, 16)+__T(")"));}
+    inline void Param      (const char*   Parameter, int128u Value){if (Trace_Activated) Param(Parameter, Ztring::ToZtring(Value)+__T(" (0x")+Ztring::ToZtring(Value, 16)+__T(")"));}
+    inline void Param_GUID (const char*   Parameter, int128u Value){if (Trace_Activated) Param(Parameter, Ztring().From_GUID(Value));}
+    inline void Param_UUID (const char*   Parameter, int128u Value){if (Trace_Activated) Param(Parameter, Ztring().From_UUID(Value));}
     #ifdef SIZE_T_IS_LONG
-    inline void Param      (const char*   Parameter, size_t Value, intu Radix=16) {Param(Parameter, Ztring::ToZtring(Value, Radix).MakeUpperCase()+__T(" (")+Ztring::ToZtring(Value, 10).MakeUpperCase()+__T(")"));}
+    inline void Param      (const char*   Parameter, size_t Value, intu Radix=16) {if (Trace_Activated) Param(Parameter, Ztring::ToZtring(Value, Radix).MakeUpperCase()+__T(" (")+Ztring::ToZtring(Value, 10).MakeUpperCase()+__T(")"));}
     #endif //SIZE_T_IS_LONG
-    inline void Param      (const char*   Parameter, float32 Value, int8u AfterComma=3) {Param(Parameter, Ztring::ToZtring(Value, AfterComma));}
-    inline void Param      (const char*   Parameter, float64 Value, int8u AfterComma=3) {Param(Parameter, Ztring::ToZtring(Value, AfterComma));}
-    inline void Param      (const char*   Parameter, float80 Value, int8u AfterComma=3) {Param(Parameter, Ztring::ToZtring(Value, AfterComma));}
-    inline void Param      (const int32u  Parameter, const Ztring& Value) {Param(Ztring().From_CC4(Parameter), Value);};
-    inline void Param      (const int16u  Parameter, const Ztring& Value) {Param(Ztring().From_CC2(Parameter), Value);};
+    inline void Param      (const char*   Parameter, float32 Value, int8u AfterComma=3) {if (Trace_Activated) Param(Parameter, Ztring::ToZtring(Value, AfterComma));}
+    inline void Param      (const char*   Parameter, float64 Value, int8u AfterComma=3) {if (Trace_Activated) Param(Parameter, Ztring::ToZtring(Value, AfterComma));}
+    inline void Param      (const char*   Parameter, float80 Value, int8u AfterComma=3) {if (Trace_Activated) Param(Parameter, Ztring::ToZtring(Value, AfterComma));}
+    inline void Param      (const int32u  Parameter, const Ztring& Value) {if (Trace_Activated) Param(Ztring().From_CC4(Parameter), Value);};
+    inline void Param      (const int16u  Parameter, const Ztring& Value) {if (Trace_Activated) Param(Ztring().From_CC2(Parameter), Value);};
     #define Param1(_A) Param_(_A)
     #define Param2(_A,_B) Param(_A, _B)
     #define Param3(_A,_B,_C) Param(_A, _B, _C)
 
     //Param - Info
     void Param_Info (const Ztring &Parameter);
-    inline void Param_Info (const char*   Parameter) {Param_Info(Ztring().From_UTF8(Parameter));}
-    inline void Param_Info (const char*   Parameter, const char*   Measure)      {Param_Info(Ztring().From_UTF8(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Param_Info (int64u        Parameter, const char*   Measure=NULL) {Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Param_Info (int64s        Parameter, const char*   Measure=NULL) {Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Param_Info (int32u        Parameter, const char*   Measure=NULL) {Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Param_Info (int32s        Parameter, const char*   Measure=NULL) {Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Param_Info (int16u        Parameter, const char*   Measure=NULL) {Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Param_Info (int16s        Parameter, const char*   Measure=NULL) {Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Param_Info (int8u         Parameter, const char*   Measure=NULL) {Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Param_Info (int8s         Parameter, const char*   Measure=NULL) {Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
-    inline void Param_Info (float32       Parameter, int8u AfterComma=3, const char*   Measure=NULL) {Param_Info(Ztring::ToZtring(Parameter, AfterComma)+Ztring().From_UTF8(Measure));}
-    inline void Param_Info (float64       Parameter, int8u AfterComma=3, const char*   Measure=NULL) {Param_Info(Ztring::ToZtring(Parameter, AfterComma)+Ztring().From_UTF8(Measure));}
-    inline void Param_Info (float80       Parameter, int8u AfterComma=3, const char*   Measure=NULL) {Param_Info(Ztring::ToZtring(Parameter, AfterComma)+Ztring().From_UTF8(Measure));}
+    inline void Param_Info (const char*   Parameter) {if (Trace_Activated) Param_Info(Ztring().From_UTF8(Parameter));}
+    inline void Param_Info (const char*   Parameter, const char*   Measure)      {if (Trace_Activated) Param_Info(Ztring().From_UTF8(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Param_Info (int64u        Parameter, const char*   Measure=NULL) {if (Trace_Activated) Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Param_Info (int64s        Parameter, const char*   Measure=NULL) {if (Trace_Activated) Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Param_Info (int32u        Parameter, const char*   Measure=NULL) {if (Trace_Activated) Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Param_Info (int32s        Parameter, const char*   Measure=NULL) {if (Trace_Activated) Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Param_Info (int16u        Parameter, const char*   Measure=NULL) {if (Trace_Activated) Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Param_Info (int16s        Parameter, const char*   Measure=NULL) {if (Trace_Activated) Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Param_Info (int8u         Parameter, const char*   Measure=NULL) {if (Trace_Activated) Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Param_Info (int8s         Parameter, const char*   Measure=NULL) {if (Trace_Activated) Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Param_Info (float32       Parameter, int8u AfterComma=3, const char*   Measure=NULL) {if (Trace_Activated) Param_Info(Ztring::ToZtring(Parameter, AfterComma)+Ztring().From_UTF8(Measure));}
+    inline void Param_Info (float64       Parameter, int8u AfterComma=3, const char*   Measure=NULL) {if (Trace_Activated) Param_Info(Ztring::ToZtring(Parameter, AfterComma)+Ztring().From_UTF8(Measure));}
+    inline void Param_Info (float80       Parameter, int8u AfterComma=3, const char*   Measure=NULL) {if (Trace_Activated) Param_Info(Ztring::ToZtring(Parameter, AfterComma)+Ztring().From_UTF8(Measure));}
     #ifdef SIZE_T_IS_LONG
-    inline void Param_Info (size_t        Parameter, const char*   Measure=NULL) {Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
+    inline void Param_Info (size_t        Parameter, const char*   Measure=NULL) {if (Trace_Activated) Param_Info(Ztring::ToZtring(Parameter)+Ztring().From_UTF8(Measure));}
     #endif //SIZE_T_IS_LONG
     #define Param_Info1(_A) Param_Info(_A)
     #define Param_Info2(_A,_B) Param_Info(_A, _B)
@@ -447,7 +447,7 @@ public :
     #define Param_Info1C(_CONDITION,_A) if (_CONDITION) Param_Info(_A)
     #define Param_Info2C(_CONDITION,_A,_B) if (_CONDITION) Param_Info(_A, _B)
     #define Param_Info3C(_CONDITION,_A,_B,_C) if (_CONDITION) Param_Info(_A, _B, _C)
-    inline void Param_Info_From_Milliseconds (int64u Parameter)                  {Param_Info(Ztring().Duration_From_Milliseconds(Parameter));}
+    inline void Param_Info_From_Milliseconds (int64u Parameter)                  {if (Trace_Activated) Param_Info(Ztring().Duration_From_Milliseconds(Parameter));}
 
     //***************************************************************************
     // Information
@@ -1215,6 +1215,7 @@ private :
     size_t Data_Level;              //Current level for Data ("Top level")
 
     //Element
+public: //TO CHANGE
     BitStream_Fast* BS;             //For conversion from bytes to bitstream
     BitStream*      BT;             //For conversion from bytes to bitstream
 public : //TO CHANGE

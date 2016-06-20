@@ -125,7 +125,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.85");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.86");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -217,6 +217,7 @@ void MediaInfo_Config::Init()
     Verbosity=(float32)0.5;
     Trace_Level=(float32)0.0;
     Compat=70778;
+    Https=true;
     Trace_TimeSection_OnlyFirstOccurrence=false;
     Trace_Format=Trace_Format_Tree;
     Language_Raw=false;
@@ -602,6 +603,20 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     else if (Option_Lower==__T("trace_level_get"))
     {
         return Ztring::ToZtring(Trace_Level_Get());
+    }
+    else if (Option_Lower==__T("https"))
+    {
+        Https_Set(Value.To_int64u()?true:false);
+        return Ztring();
+    }
+    else if (Option_Lower==__T("no-https"))
+    {
+        Https_Set(false);
+        return Ztring();
+    }
+    else if (Option_Lower==__T("https_get"))
+    {
+        return Https_Get()?__T("1"):__T("0");
     }
     else if (Option_Lower==__T("trace_timesection_onlyfirstoccurrence"))
     {
@@ -1228,6 +1243,20 @@ int64u MediaInfo_Config::Compat_Get ()
     return Compat;
 }
 
+//---------------------------------------------------------------------------
+void MediaInfo_Config::Https_Set(bool NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    Https=NewValue;
+}
+
+bool MediaInfo_Config::Https_Get()
+{
+    CriticalSectionLocker CSL(CS);
+    return Https;
+}
+
+//---------------------------------------------------------------------------
 std::bitset<32> MediaInfo_Config::Trace_Layers_Get ()
 {
     CriticalSectionLocker CSL(CS);
