@@ -413,7 +413,7 @@ void PrecalculatedXFORM(_cmsTRANSFORM* p,
 }
 
 
-// Auxiliar: Handle precalculated gamut check. The retrieval of context may be alittle bit slow, but this function is not critical.
+// Auxiliary: Handle precalculated gamut check. The retrieval of context may be alittle bit slow, but this function is not critical.
 static
 void TransformOnePixelWithGamutCheck(_cmsTRANSFORM* p,
                                      const cmsUInt16Number wIn[],

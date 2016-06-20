@@ -739,7 +739,7 @@ typedef struct _cms_iccprofile_struct {
     // Dictionary
     cmsUInt32Number          TagCount;
     cmsTagSignature          TagNames[MAX_TABLE_TAG];
-    cmsTagSignature          TagLinked[MAX_TABLE_TAG];           // The tag to wich is linked (0=none)
+    cmsTagSignature          TagLinked[MAX_TABLE_TAG];           // The tag to which is linked (0=none)
     cmsUInt32Number          TagSizes[MAX_TABLE_TAG];            // Size on disk
     cmsUInt32Number          TagOffsets[MAX_TABLE_TAG];
     cmsBool                  TagSaveAsRaw[MAX_TABLE_TAG];        // True to write uncooked

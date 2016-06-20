@@ -324,7 +324,7 @@ cmsUInt32Number FileRead(cmsIOHANDLER* iohandler, void *Buffer, cmsUInt32Number 
     return nReaded;
 }
 
-// Postion file pointer in the file
+// Position file pointer in the file
 static
 cmsBool  FileSeek(cmsIOHANDLER* iohandler, cmsUInt32Number offset)
 {
@@ -623,7 +623,7 @@ cmsBool _cmsNewTag(_cmsICCPROFILE* Icc, cmsTagSignature sig, int* NewPos)
 }
 
 
-// Check existance
+// Check existence
 cmsBool CMSEXPORT cmsIsTag(cmsHPROFILE hProfile, cmsTagSignature sig)
 {
        _cmsICCPROFILE*  Icc = (_cmsICCPROFILE*) (void*) hProfile;
@@ -679,7 +679,7 @@ cmsBool _cmsReadHeader(_cmsICCPROFILE* Icc)
         return FALSE;
     }
 
-    // Adjust endianess of the used parameters
+    // Adjust endianness of the used parameters
     Icc -> DeviceClass     = (cmsProfileClassSignature) _cmsAdjustEndianess32(Header.deviceClass);
     Icc -> ColorSpace      = (cmsColorSpaceSignature)   _cmsAdjustEndianess32(Header.colorSpace);
     Icc -> PCS             = (cmsColorSpaceSignature)   _cmsAdjustEndianess32(Header.pcs);
@@ -797,7 +797,7 @@ cmsBool _cmsWriteHeader(_cmsICCPROFILE* Icc, cmsUInt32Number UsedSpace)
 
     memset(&Header.reserved, 0, sizeof(Header.reserved));
 
-    // Set profile ID. Endianess is always big endian
+    // Set profile ID. Endianness is always big endian
     memmove(&Header.profileID, &Icc ->ProfileID, 16);
 
     // Dump the header
@@ -1544,7 +1544,7 @@ void* CMSEXPORT cmsReadTag(cmsHPROFILE hProfile, cmsTagSignature sig)
     LocalTypeHandler.ICCVersion = Icc ->Version;
     Icc -> TagPtrs[n] = LocalTypeHandler.ReadPtr(&LocalTypeHandler, io, &ElemCount, TagSize);
 
-    // The tag type is supported, but something wrong happend and we cannot read the tag.
+    // The tag type is supported, but something wrong happened and we cannot read the tag.
     // let know the user about this (although it is just a warning)
     if (Icc -> TagPtrs[n] == NULL) {
 

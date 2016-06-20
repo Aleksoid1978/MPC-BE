@@ -579,7 +579,7 @@ void EmitNGamma(cmsIOHANDLER* m, int n, cmsToneCurve* g[])
 //
 //  Each row contains Pipeline values for all but first component. So, I
 //  detect row changing by keeping a copy of last value of first
-//  component. -1 is used to mark begining of whole block.
+//  component. -1 is used to mark beginning of whole block.
 
 static
 int OutputValueSampler(register const cmsUInt16Number In[], register cmsUInt16Number Out[], register void* Cargo)

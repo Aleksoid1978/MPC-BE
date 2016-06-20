@@ -198,7 +198,7 @@ void _cmsAllocMemPluginChunk(struct _cmsContext_struct* ctx, const struct _cmsCo
     } 
 }
 
-// Auxiliar to fill memory management functions from plugin (or context 0 defaults)
+// Auxiliary to fill memory management functions from plugin (or context 0 defaults)
 void _cmsInstallAllocFunctions(cmsPluginMemHandler* Plugin, _cmsMemPluginChunkType* ptr)
 {
     if (Plugin == NULL) {
@@ -430,14 +430,14 @@ void* _cmsSubAllocDup(_cmsSubAllocator* s, const void *ptr, cmsUInt32Number size
 
 // Error logging ******************************************************************
 
-// There is no error handling at all. When a funtion fails, it returns proper value.
+// There is no error handling at all. When a function fails, it returns proper value.
 // For example, all create functions does return NULL on failure. Other return FALSE
 // It may be interesting, for the developer, to know why the function is failing.
 // for that reason, lcms2 does offer a logging function. This function does recive
 // a ENGLISH string with some clues on what is going wrong. You can show this
 // info to the end user, or just create some sort of log.
 // The logging function should NOT terminate the program, as this obviously can leave
-// resources. It is the programmer's responsability to check each function return code
+// resources. It is the programmer's responsibility to check each function return code
 // to make sure it didn't fail.
 
 // Error messages are limited to MAX_ERROR_MESSAGE_LEN

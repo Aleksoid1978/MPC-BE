@@ -308,7 +308,7 @@ void CMSEXPORT cmsFloat2LabEncoded(cmsUInt16Number wLab[3], const cmsCIELab* fLa
     wLab[2] = ab2Fix4(Lab.b);
 }
 
-// Auxiliar: convert to Radians
+// Auxiliary: convert to Radians
 static
 cmsFloat64Number RADIANS(cmsFloat64Number deg)
 {
@@ -316,7 +316,7 @@ cmsFloat64Number RADIANS(cmsFloat64Number deg)
 }
 
 
-// Auxiliar: atan2 but operating in degrees and returning 0 if a==b==0
+// Auxiliary: atan2 but operating in degrees and returning 0 if a==b==0
 static
 cmsFloat64Number atan2deg(cmsFloat64Number a, cmsFloat64Number b)
 {
@@ -339,7 +339,7 @@ cmsFloat64Number atan2deg(cmsFloat64Number a, cmsFloat64Number b)
 }
 
 
-// Auxiliar: Square
+// Auxiliary: Square
 static
 cmsFloat64Number Sqr(cmsFloat64Number v)
 {

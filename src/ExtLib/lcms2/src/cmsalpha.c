@@ -408,74 +408,111 @@ void  ComputeComponentIncrements(cmsUInt32Number Format,
 
 // Handles extra channels copying alpha if requested by the flags
 void _cmsHandleExtraChannels(_cmsTRANSFORM* p, const void* in,
-                             void* out, 
-                             cmsUInt32Number PixelsPerLine,
-                             cmsUInt32Number LineCount,
-                             const cmsStride* Stride)
+                                               void* out,
+                                               cmsUInt32Number PixelsPerLine,
+                                               cmsUInt32Number LineCount,
+                                               const cmsStride* Stride)
 {
-       size_t i, j, k;
-       cmsUInt32Number nExtra;
-       cmsUInt32Number SourceStartingOrder[cmsMAXCHANNELS];
-       cmsUInt32Number SourceIncrements[cmsMAXCHANNELS];
-       cmsUInt32Number DestStartingOrder[cmsMAXCHANNELS];
-       cmsUInt32Number DestIncrements[cmsMAXCHANNELS];
-       cmsUInt32Number SourceStrideIncrements[cmsMAXCHANNELS];
-       cmsUInt32Number DestStrideIncrements[cmsMAXCHANNELS];
+    cmsUInt32Number i, j, k;
+    cmsUInt32Number nExtra;
+    cmsUInt32Number SourceStartingOrder[cmsMAXCHANNELS];
+    cmsUInt32Number SourceIncrements[cmsMAXCHANNELS];
+    cmsUInt32Number DestStartingOrder[cmsMAXCHANNELS];
+    cmsUInt32Number DestIncrements[cmsMAXCHANNELS];
 
-       cmsUInt8Number* SourcePtr[cmsMAXCHANNELS];
-       cmsUInt8Number* DestPtr[cmsMAXCHANNELS];
+    cmsFormatterAlphaFn copyValueFn;
 
-       cmsFormatterAlphaFn copyValueFn;
+    // Make sure we need some copy
+    if (!(p->dwOriginalFlags & cmsFLAGS_COPY_ALPHA))
+        return;
 
-       // Make sure we need some copy
-       if (!(p->dwOriginalFlags & cmsFLAGS_COPY_ALPHA))
-              return;
+    // Exit early if in-place color-management is occurring - no need to copy extra channels to themselves.
+    if (p->InputFormat == p->OutputFormat && in == out)
+        return;
 
-       // Make sure we have same number of alpha channels. If not, just return as this should be checked at transform creation time.
-       nExtra = T_EXTRA(p->InputFormat);
-       if (nExtra != T_EXTRA(p->OutputFormat))
-              return;
-       
-       // Anything to do?
-       if (nExtra == 0)
-              return;
+    // Make sure we have same number of alpha channels. If not, just return as this should be checked at transform creation time.
+    nExtra = T_EXTRA(p->InputFormat);
+    if (nExtra != T_EXTRA(p->OutputFormat))
+        return;
 
-       // Compute the increments 
-       ComputeComponentIncrements(p->InputFormat, Stride->BytesPerPlaneIn, SourceStartingOrder, SourceIncrements);
-       ComputeComponentIncrements(p->OutputFormat, Stride->BytesPerPlaneOut, DestStartingOrder, DestIncrements);
-    
-       // Check for conversions 8, 16, half, float, dbl
-       copyValueFn = _cmsGetFormatterAlpha(p->ContextID, p->InputFormat, p->OutputFormat);
+    // Anything to do?
+    if (nExtra == 0)
+        return;
 
-       memset(SourceStrideIncrements, 0, sizeof(SourceStrideIncrements));
-       memset(DestStrideIncrements, 0, sizeof(DestStrideIncrements));
+    // Compute the increments 
+    ComputeComponentIncrements(p->InputFormat, Stride->BytesPerPlaneIn, SourceStartingOrder, SourceIncrements);
+    ComputeComponentIncrements(p->OutputFormat, Stride->BytesPerPlaneOut, DestStartingOrder, DestIncrements);
 
-       // The loop itself       
-       for (i = 0; i < LineCount; i++) {
+    // Check for conversions 8, 16, half, float, dbl
+    copyValueFn = _cmsGetFormatterAlpha(p->ContextID, p->InputFormat, p->OutputFormat);
 
-              // Prepare pointers for the loop
-              for (j = 0; j < nExtra; j++) {
+    if (nExtra == 1) { // Optimized routine for copying a single extra channel quickly
 
-                     SourcePtr[j] = (cmsUInt8Number*)in + SourceStartingOrder[j] + SourceStrideIncrements[j];
-                     DestPtr[j] = (cmsUInt8Number*)out + DestStartingOrder[j] + DestStrideIncrements[j];
-              }
+        cmsUInt8Number* SourcePtr;
+        cmsUInt8Number* DestPtr;
 
-              for (j = 0; j < PixelsPerLine; j++) {
+        cmsUInt32Number SourceStrideIncrement = 0;
+        cmsUInt32Number DestStrideIncrement = 0;
 
-                     for (k = 0; k < nExtra; k++) {
+        // The loop itself
+        for (i = 0; i < LineCount; i++) {
 
-                            copyValueFn(DestPtr[k], SourcePtr[k]);
+            // Prepare pointers for the loop
+            SourcePtr = (cmsUInt8Number*)in + SourceStartingOrder[0] + SourceStrideIncrement;
+            DestPtr = (cmsUInt8Number*)out + DestStartingOrder[0] + DestStrideIncrement;
 
-                            SourcePtr[k] += SourceIncrements[k];
-                            DestPtr[k] += DestIncrements[k];
-                     }
-              }
+            for (j = 0; j < PixelsPerLine; j++) {
 
-              for (j = 0; j < nExtra; j++) {
+                copyValueFn(DestPtr, SourcePtr);
 
-                     SourceStrideIncrements[j] += Stride->BytesPerLineIn;
-                     DestStrideIncrements[j] += Stride->BytesPerLineOut;
-              }
-       }
+                SourcePtr += SourceIncrements[0];
+                DestPtr += DestIncrements[0];
+            }
+
+            SourceStrideIncrement += Stride->BytesPerLineIn;
+            DestStrideIncrement += Stride->BytesPerLineOut;
+        }
+
+    }
+    else { // General case with more than one extra channel
+
+        cmsUInt8Number* SourcePtr[cmsMAXCHANNELS];
+        cmsUInt8Number* DestPtr[cmsMAXCHANNELS];
+
+        cmsUInt32Number SourceStrideIncrements[cmsMAXCHANNELS];
+        cmsUInt32Number DestStrideIncrements[cmsMAXCHANNELS];
+
+        memset(SourceStrideIncrements, 0, sizeof(SourceStrideIncrements));
+        memset(DestStrideIncrements, 0, sizeof(DestStrideIncrements));
+
+        // The loop itself       
+        for (i = 0; i < LineCount; i++) {
+
+            // Prepare pointers for the loop
+            for (j = 0; j < nExtra; j++) {
+
+                SourcePtr[j] = (cmsUInt8Number*)in + SourceStartingOrder[j] + SourceStrideIncrements[j];
+                DestPtr[j] = (cmsUInt8Number*)out + DestStartingOrder[j] + DestStrideIncrements[j];
+            }
+
+            for (j = 0; j < PixelsPerLine; j++) {
+
+                for (k = 0; k < nExtra; k++) {
+
+                    copyValueFn(DestPtr[k], SourcePtr[k]);
+
+                    SourcePtr[k] += SourceIncrements[k];
+                    DestPtr[k] += DestIncrements[k];
+                }
+            }
+
+            for (j = 0; j < nExtra; j++) {
+
+                SourceStrideIncrements[j] += Stride->BytesPerLineIn;
+                DestStrideIncrements[j] += Stride->BytesPerLineOut;
+            }
+        }
+    }
 }
+
 
