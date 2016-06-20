@@ -1700,12 +1700,6 @@ STDMETHODIMP CFGManager::ConnectFilterDirect(IPin* pPinOut, IBaseFilter* pBF, co
 				}
 			}
 
-			if (!m_bIsPreview && pPin && !GetDXVAStatus()) {
-				if (CComQIPtr<IAMVideoAccelerator> pAMVA = pPin) {
-					HookAMVideoAccelerator((IAMVideoAcceleratorC*)(IAMVideoAccelerator*)pAMVA);
-				}
-			}
-
 			HRESULT hr = ConnectDirect(pPinOut, pPin, pmt);
 			if (SUCCEEDED(hr)) {
 				return hr;

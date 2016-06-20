@@ -430,8 +430,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::CreateDevice()"));
 
 	// extern variable
-	g_bGetFrameType	= FALSE;
-	g_nFrameType	= PICT_NONE;
+	g_nFrameType = PICT_NONE;
 
 	CRenderersSettings& rs = GetRenderersSettings();
 	CRenderersData* renderersData = GetRenderersData();
@@ -1385,10 +1384,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	if (pApp->m_iDisplayStats) {
-		g_bGetFrameType = TRUE;
 		DrawStats();
-	} else {
-		g_bGetFrameType = FALSE;
 	}
 
 	// Casimir666 : show OSD
