@@ -2660,6 +2660,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	// mainconcept color space converter
 	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{272D77A0-A852-4851-ADA4-9091FEAD4C86}")), MERIT64_DO_NOT_USE));
 
+	bool VRwithSR =
+		s.iVideoRenderer == VIDRNDT_MADVR ||
+		s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
+		s.iVideoRenderer == VIDRNDT_SYNC ||
+		s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS;
+
 	switch (s.iSubtitleRenderer) {
 		case SUBRNDT_NONE:
 		case SUBRNDT_ISR:
@@ -2667,25 +2673,36 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VSFilter_autoloading, MERIT64_DO_NOT_USE));
 			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_DO_NOT_USE));
 			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_DO_NOT_USE));
+			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_AssFilterMod, MERIT64_DO_NOT_USE));
 			break;
 		case SUBRNDT_VSFILTER:
 			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VSFilter_autoloading, MERIT64_ABOVE_DSHOW));
 			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_DO_NOT_USE));
 			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_DO_NOT_USE));
+			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_AssFilterMod, MERIT64_DO_NOT_USE));
 			break;
 		case SUBRNDT_XYSUBFILTER:
 			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VSFilter, MERIT64_DO_NOT_USE));
 			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VSFilter_autoloading, MERIT64_DO_NOT_USE));
-			if (s.iVideoRenderer == VIDRNDT_MADVR
-					|| s.iVideoRenderer == VIDRNDT_EVR_CUSTOM
-					|| s.iVideoRenderer == VIDRNDT_SYNC
-					|| s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS) {
+			m_transform.AddTail(DNew CFGFilterRegistry(CLSID_AssFilterMod, MERIT64_DO_NOT_USE));
+			if (VRwithSR) {
 				m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_ABOVE_DSHOW));
 			} else {
 				// Prevent XySubFilter from connecting while renderer is not compatible
 				m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_DO_NOT_USE));
 				m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_DO_NOT_USE));
 			}
+		//case SUBRNDT_ASSFILTERMOD:
+		//	m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VSFilter, MERIT64_DO_NOT_USE));
+		//	m_transform.AddTail(DNew CFGFilterRegistry(CLSID_VSFilter_autoloading, MERIT64_DO_NOT_USE));
+		//	m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_DO_NOT_USE));
+		//	m_transform.AddTail(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_DO_NOT_USE));
+		//	if (VRwithSR) {
+		//		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_AssFilterMod, MERIT64_ABOVE_DSHOW));
+		//	} else {
+		//		m_transform.AddTail(DNew CFGFilterRegistry(CLSID_AssFilterMod, MERIT64_DO_NOT_USE));
+		//	}
+		//	break;
 	}
 
 	// Blacklist Accusoft PICVideo M-JPEG Codec 2.1 since causes a DEP crash

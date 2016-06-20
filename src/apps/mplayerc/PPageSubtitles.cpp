@@ -122,6 +122,12 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 	}
 	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_ISR
 
+	bool VRwithSR =
+		s.iVideoRenderer == VIDRNDT_MADVR ||
+		s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
+		s.iVideoRenderer == VIDRNDT_SYNC ||
+		s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS;
+
 	str = L"VSFilter/xy-VSFilter";
 	if (!IsCLSIDRegistered(CLSID_VSFilter_autoloading)) {
 		str += L" " + ResStr(IDS_REND_NOT_INSTALLED);
@@ -131,13 +137,19 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 	str = L"XySubFilter";
 	if (!IsCLSIDRegistered(CLSID_XySubFilter_AutoLoader)) {
 		str += L" " + ResStr(IDS_REND_NOT_INSTALLED);
-	} else if (!(s.iVideoRenderer == VIDRNDT_MADVR
-			|| s.iVideoRenderer == VIDRNDT_EVR_CUSTOM
-			|| s.iVideoRenderer == VIDRNDT_SYNC
-			|| s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS)) {
+	} else if (!VRwithSR) {
 		str += L" " + ResStr(IDS_REND_NOT_AVAILABLE);
 	}
 	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_XYSUBFILTER
+
+	//str = L"AssFilterMod";
+	//if (!IsCLSIDRegistered(CLSID_AssFilterMod)) {
+	//	str += L" " + ResStr(IDS_REND_NOT_INSTALLED);
+	//}
+	//else if (!VRwithSR) {
+	//	str += L" " + ResStr(IDS_REND_NOT_AVAILABLE);
+	//}
+	//m_cbSubtitleRenderer.AddString(str); // SUBRNDT_ASSFILTERMOD
 
 	if (m_cbSubtitleRenderer.SetCurSel(select) == CB_ERR) {
 		m_cbSubtitleRenderer.SetCurSel(1);
