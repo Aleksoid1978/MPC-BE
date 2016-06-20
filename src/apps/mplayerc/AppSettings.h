@@ -116,7 +116,8 @@ enum {
 	SUBRNDT_NONE = 0,
 	SUBRNDT_ISR,
 	SUBRNDT_VSFILTER,
-	SUBRNDT_XYSUBFILTER
+	SUBRNDT_XYSUBFILTER,
+	SUBRNDT_ASSFILTERMOD
 };
 
 // Enumeration for MCE remote control (careful : add 0x010000 for all keys!)
