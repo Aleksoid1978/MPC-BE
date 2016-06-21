@@ -155,7 +155,6 @@ namespace DSObjects
 			LPCWSTR			pFaceName,
 			LPD3DXFONT*		ppFont);
 
-		void				DrawText(const RECT &rc, const CString &strText, int _Priority);
 		void				ResetStats();
 		void				DrawStats();
 		virtual void		OnResetDevice() {};
