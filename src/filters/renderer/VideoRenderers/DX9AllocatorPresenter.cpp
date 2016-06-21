@@ -2250,7 +2250,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	CComPtr<IDirect3DSurface9> pSurface;
 	D3DLOCKED_RECT r;
 	if (FAILED(hr = m_pD3DDev->CreateRenderTarget(framesize.cx, framesize.cy, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pSurface, NULL))
-			|| (FAILED(hr = m_pD3DDev->StretchRect(m_pVideoSurface[m_nCurSurface], NULL, pSurface, NULL, D3DTEXF_POINT)))
+			|| (FAILED(hr = m_pD3DDev->StretchRect(m_pVideoSurface[m_nCurSurface], NULL, pSurface, NULL, D3DTEXF_NONE)))
 			|| (FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY)))) {
 		return hr;
 	}
