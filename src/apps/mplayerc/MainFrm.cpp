@@ -7756,6 +7756,9 @@ void CMainFrame::OnPlayPlay()
 		return;
 	}
 
+	CString strOSD;
+	int OSD_Flag = OSD_FILENAME;
+
 	if (m_eMediaLoadState == MLS_LOADED) {
 		if (GetPlaybackMode() == PM_FILE) {
 			if (m_bEndOfStream) {
@@ -7783,6 +7786,15 @@ void CMainFrame::OnPlayPlay()
 					DisplayCurrentChannelOSD();
 				}
 			}
+			else if (pAMTuner) {
+				long lChannel = 0, lVivSub = 0, lAudSub = 0;
+				pAMTuner->get_Channel(&lChannel, &lVivSub, &lAudSub);
+				long lFreq = 0;
+				pAMTuner->get_VideoFrequency(&lFreq);
+
+				strOSD.Format(_T("Channel %d (%.1f MHz)"), lChannel, lFreq / 1000000.0);
+				OSD_Flag = OSD_ENABLE;
+			}
 		}
 
 		SetTimersPlay();
@@ -7804,7 +7816,6 @@ void CMainFrame::OnPlayPlay()
 
 	SetupEVRColorControl(); // can be configured when streaming begins
 
-	CString strOSD;
 	if (m_bfirstPlay) {
 		m_bfirstPlay = false;
 
@@ -7845,7 +7856,6 @@ void CMainFrame::OnPlayPlay()
 		}
 	}
 
-	int OSD_Flag = OSD_FILENAME;
 	if (strOSD.IsEmpty()) {
 		OSD_Flag = OSD_ENABLE;
 		strOSD = ResStr(ID_PLAY_PLAY);
@@ -7854,6 +7864,7 @@ void CMainFrame::OnPlayPlay()
 			strOSD.Delete(i, strOSD.GetLength() - i);
 		}
 	}
+
 	if (AfxGetAppSettings().iShowOSD & OSD_Flag) {
 		m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
 	}
