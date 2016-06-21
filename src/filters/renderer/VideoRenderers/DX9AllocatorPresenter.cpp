@@ -1758,22 +1758,6 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 	return true;
 }
 
-void CDX9AllocatorPresenter::DrawText(const RECT &rc, const CString &strText, int _Priority)
-{
-	if (_Priority < 1) {
-		return;
-	}
-	//D3DXCOLOR Color1( 1.0f, 0.2f, 0.2f, 1.0f ); // red
-	//D3DXCOLOR Color1( 1.0f, 1.0f, 1.0f, 1.0f ); // white
-	D3DXCOLOR Color1( 1.0f, 0.8f, 0.0f, 1.0f ); // yellow
-	D3DXCOLOR Color0( 0.0f, 0.0f, 0.0f, 1.0f ); // black
-	RECT Rect1 = rc;
-	RECT Rect2 = rc;
-	OffsetRect(&Rect2 , 2, 2);
-	m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	m_pFont->DrawText(m_pSprite, strText, -1, &Rect1, DT_NOCLIP, Color1);
-}
-
 void CDX9AllocatorPresenter::ResetStats()
 {
 	LONGLONG Time = GetPerfCounter();
@@ -1796,8 +1780,8 @@ void CDX9AllocatorPresenter::ResetStats()
 
 void CDX9AllocatorPresenter::DrawStats()
 {
-	CRenderersSettings& rs = GetRenderersSettings();
-	CRenderersData *pApp = GetRenderersData();
+	const CRenderersSettings& rs = GetRenderersSettings();
+	const CRenderersData *pApp = GetRenderersData();
 	int iDetailedStats = 2;
 	switch (pApp->m_iDisplayStats) {
 		case 1:
@@ -1811,14 +1795,15 @@ void CDX9AllocatorPresenter::DrawStats()
 			break;
 	}
 
-	LONGLONG	llMaxJitter		= m_MaxJitter;
-	LONGLONG	llMinJitter		= m_MinJitter;
-	LONGLONG	llMaxSyncOffset	= m_MaxSyncOffset;
-	LONGLONG	llMinSyncOffset	= m_MinSyncOffset;
-	RECT		rc				= { 40, 40, 0, 0 };
+	const LONGLONG llMaxJitter     = m_MaxJitter;
+	const LONGLONG llMinJitter     = m_MinJitter;
+	const LONGLONG llMaxSyncOffset = m_MaxSyncOffset;
+	const LONGLONG llMinSyncOffset = m_MinSyncOffset;
+	
+	RECT rc = { 40, 40, 0, 0 };
 
-	static int		TextHeight = 0;
-	static CRect	WindowRect(0, 0, 0, 0);
+	static int   TextHeight = 0;
+	static CRect WindowRect;
 
 	if (WindowRect != m_windowRect) {
 		m_pFont.Release();
@@ -1858,6 +1843,18 @@ void CDX9AllocatorPresenter::DrawStats()
 	}
 
 	if (m_pFont && m_pSprite) {
+		auto drawText = [&](const CString& strText) {
+			static const D3DXCOLOR ShadowColor(0.0f, 0.0f, 0.0f, 1.0f); // black
+			RECT rcShadow = rc;
+			OffsetRect(&rcShadow , 2, 2);
+			m_pFont->DrawText(m_pSprite, strText, -1, &rcShadow, DT_NOCLIP, ShadowColor);
+
+			static const D3DXCOLOR TextColor(1.0f, 0.8f, 0.0f, 1.0f); // yellow
+			m_pFont->DrawText(m_pSprite, strText, -1, &rc, DT_NOCLIP, TextColor);
+
+			OffsetRect(&rc, 0, TextHeight);
+		};
+
 		m_pSprite->Begin(D3DXSPRITE_ALPHABLEND);
 		CString strText;
 
@@ -1865,8 +1862,8 @@ void CDX9AllocatorPresenter::DrawStats()
 			double rtMS, rtFPS;
 			rtMS = rtFPS = 0.0;
 			if (m_rtTimePerFrame) {
-				rtMS	= double(m_rtTimePerFrame) / 10000.0;
-				rtFPS	= 10000000.0 / (double)(m_rtTimePerFrame);
+				rtMS  = double(m_rtTimePerFrame) / 10000.0;
+				rtFPS = 10000000.0 / (double)(m_rtTimePerFrame);
 			}
 
 			if (m_bIsEVR) {
@@ -1885,16 +1882,14 @@ void CDX9AllocatorPresenter::DrawStats()
 		} else {
 			strText.Format(L"Frame rate   : %7.03f   (%.03f%s)", m_fAvrFps, GetFrameRate(), m_DetectedLock ? L" L" : L"");
 		}
-		DrawText(rc, strText, 1);
-		OffsetRect(&rc, 0, TextHeight);
+		drawText(strText);
 
 		if (g_nFrameType != PICT_NONE) {
 			strText.Format(L"Frame type   : %s",
 							g_nFrameType == PICT_FRAME ? L"Progressive" :
 							g_nFrameType == PICT_BOTTOM_FIELD ? L"Interlaced : Bottom field first" :
 							L"Interlaced : Top field first");
-			DrawText(rc, strText, 1);
-			OffsetRect(&rc, 0, TextHeight);
+			drawText(strText);
 		}
 
 		if (iDetailedStats > 1) {
@@ -1953,12 +1948,10 @@ void CDX9AllocatorPresenter::DrawStats()
 				}
 			}
 
-			DrawText(rc, strText, 1);
-			OffsetRect(&rc, 0, TextHeight);
+			drawText(strText);
 
 			strText = L"Formats      | Input  | Mixer       | VideoBuffer   | Surface       | Backbuffer/Display |";
-			DrawText(rc, strText, 1);
-			OffsetRect(&rc, 0, TextHeight);
+			drawText(strText);
 
 			ASSERT(m_BackbufferFmt == m_DisplayFmt);
 
@@ -1968,8 +1961,7 @@ void CDX9AllocatorPresenter::DrawStats()
 				, GetD3DFormatStr(m_VideoBufferFmt)
 				, GetD3DFormatStr(m_SurfaceFmt)
 				, GetD3DFormatStr(m_BackbufferFmt));
-			DrawText(rc, strText, 1);
-			OffsetRect(&rc, 0, TextHeight);
+			drawText(strText);
 
 			if (m_bIsEVR) {
 				if (rs.m_AdvRendSets.bVSync) {
@@ -1978,8 +1970,7 @@ void CDX9AllocatorPresenter::DrawStats()
 					strText.Format(L"Refresh rate : %3u Hz      ", m_refreshRate);
 				}
 				strText.AppendFormat(L"Last Duration: %8.4f      Corrected Frame Time: %s", double(m_LastFrameDuration) / 10000.0, m_bCorrectedFrameTime ? L"Yes" : L"No");
-				DrawText(rc, strText, 1);
-				OffsetRect(&rc, 0, TextHeight);
+				drawText(strText);
 			}
 		}
 
@@ -1989,14 +1980,12 @@ void CDX9AllocatorPresenter::DrawStats()
 			} else {
 				strText.Format(L"Sync offset  : Mode = %d", m_VSyncMode);
 			}
-			DrawText(rc, strText, 1);
-			OffsetRect(&rc, 0, TextHeight);
+			drawText(strText);
 		}
 
 		if (iDetailedStats > 1) {
 			strText.Format(L"Jitter       : Min = %+8.3f ms, Max = %+8.3f ms, StdDev = %7.3f ms", (double(llMinJitter)/10000.0), (double(llMaxJitter)/10000.0), m_fJitterStdDev/10000.0);
-			DrawText(rc, strText, 1);
-			OffsetRect(&rc, 0, TextHeight);
+			drawText(strText);
 		}
 
 		if (m_pAllocator && m_pSubPicProvider && iDetailedStats > 1) {
@@ -2022,8 +2011,7 @@ void CDX9AllocatorPresenter::DrawStats()
 
 			pAlloc->GetStats(nFree, nAlloc);
 			strText.Format(L"Subtitles    : Free %d     Allocated %d     Buffered %d     QueueStart %7.3f     QueueEnd %7.3f", nFree, nAlloc, nSubPic, (double(QueueStart)/10000000.0), (double(QueueEnd)/10000000.0));
-			DrawText(rc, strText, 1);
-			OffsetRect(&rc, 0, TextHeight);
+			drawText(strText);
 		}
 
 		if (iDetailedStats > 1) {
@@ -2039,17 +2027,12 @@ void CDX9AllocatorPresenter::DrawStats()
 				strText.Format(L"VBlank Wait  : Start %4d   End %4d   EP %4d", m_VBlankStartWait, m_VBlankEndWait, m_VBlankEndPresent);
 			}
 		}
-		DrawText(rc, strText, 1);
-		OffsetRect(&rc, 0, TextHeight);
+		drawText(strText);
 
-		BOOL bCompositionEnabled = m_bCompositionEnabled;
-
-		bool bDoVSyncInPresent = (!bCompositionEnabled && !m_bAlternativeVSync) || !rs.m_AdvRendSets.bVSync;
-
+		bool bDoVSyncInPresent = (!m_bCompositionEnabled && !m_bAlternativeVSync) || !rs.m_AdvRendSets.bVSync;
 		if (iDetailedStats > 1 && bDoVSyncInPresent) {
 			strText.Format(L"Present Wait : Wait %7.3f ms   Min %7.3f ms   Max %7.3f ms", (double(m_PresentWaitTime)/10000.0), (double(m_PresentWaitTimeMin)/10000.0), (double(m_PresentWaitTimeMax)/10000.0));
-			DrawText(rc, strText, 1);
-			OffsetRect(&rc, 0, TextHeight);
+			drawText(strText);
 		}
 
 		if (iDetailedStats > 1) {
@@ -2065,13 +2048,11 @@ void CDX9AllocatorPresenter::DrawStats()
 				strText.Format(L"Paint Time   : Draw %7.3f ms", (double(m_PaintTime - m_WaitForGPUTime)/10000.0));
 			}
 		}
-		DrawText(rc, strText, 2);
-		OffsetRect(&rc, 0, TextHeight);
+		drawText(strText);
 
 		if (iDetailedStats > 1) {
 			strText.Format(L"Raster Status: Wait %7.3f ms   Min %7.3f ms   Max %7.3f ms", (double(m_RasterStatusWaitTime)/10000.0), (double(m_RasterStatusWaitTimeMin)/10000.0), (double(m_RasterStatusWaitTimeMax)/10000.0));
-			DrawText(rc, strText, 1);
-			OffsetRect(&rc, 0, TextHeight);
+			drawText(strText);
 		}
 
 		if (iDetailedStats > 1) {
@@ -2083,8 +2064,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		} else {
 			strText.Format(L"Buffered     : %3d", m_nUsedBuffer);
 		}
-		DrawText(rc, strText, 1);
-		OffsetRect(&rc, 0, TextHeight);
+		drawText(strText);
 
 		if (iDetailedStats > 1) {
 			strText.Format(L"Video size   : %d x %d (%d:%d)", m_nativeVideoSize.cx, m_nativeVideoSize.cy, m_aspectRatio.cx, m_aspectRatio.cy);
@@ -2112,8 +2092,7 @@ void CDX9AllocatorPresenter::DrawStats()
 					case RESIZER_SHADER_AVERAGE:      strText.Append(L"Simple averaging"); break;
 				}
 			}
-			DrawText(rc, strText, 1);
-			OffsetRect(&rc, 0, TextHeight);
+			drawText(strText);
 			if (m_pVideoTexture[0] || m_pVideoSurface[0]) {
 				D3DSURFACE_DESC desc;
 				if (m_pVideoTexture[0]) {
@@ -2124,31 +2103,26 @@ void CDX9AllocatorPresenter::DrawStats()
 
 				if (desc.Width != (UINT)m_nativeVideoSize.cx || desc.Height != (UINT)m_nativeVideoSize.cy) {
 					strText.Format(L"Texture size : %d x %d", desc.Width, desc.Height);
-					DrawText(rc, strText, 1);
-					OffsetRect(&rc, 0, TextHeight);
+					drawText(strText);
 				}
 			}
 
 			strText.Format(L"%-13s: %s", GetDXVAVersion(), GetDXVADecoderDescription());
-			DrawText(rc, strText, 1);
-			OffsetRect(&rc, 0, TextHeight);
+			drawText(strText);
 
 			if (!m_D3D9Device.IsEmpty()) {
 				strText = L"Render device: " + m_D3D9Device;
-				DrawText(rc, strText, 1);
-				OffsetRect(&rc, 0, TextHeight);
+				drawText(strText);
 			}
 
 			if (!m_MonitorName.IsEmpty()) {
 				strText.Format(L"Monitor      : %s, Native resolution %ux%u", m_MonitorName, m_nMonitorHorRes, m_nMonitorVerRes);
-				DrawText(rc, strText, 1);
-				OffsetRect(&rc, 0, TextHeight);
+				drawText(strText);
 			}
 
 			if (!m_Decoder.IsEmpty()) {
 				strText = L"Decoder      : " + m_Decoder;
-				DrawText(rc, strText, 1);
-				OffsetRect(&rc, 0, TextHeight);
+				drawText(strText);
 			}
 
 			{
@@ -2167,10 +2141,8 @@ void CDX9AllocatorPresenter::DrawStats()
 					strText.AppendFormat(L", Memory:%4u MB", mem_usage / 1048576);
 				}
 
-				DrawText(rc, strText, 1);
-				OffsetRect(&rc, 0, TextHeight);
+				drawText(strText);
 			}
-
 		}
 
 		m_pSprite->End();
@@ -2241,8 +2213,6 @@ void CDX9AllocatorPresenter::DrawStats()
 		}
 		m_pLine->End();
 	}
-
-	// === Text
 }
 
 STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
