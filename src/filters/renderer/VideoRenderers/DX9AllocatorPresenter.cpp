@@ -2251,12 +2251,13 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 	HRESULT hr;
 
-	D3DSURFACE_DESC desc;
-	memset(&desc, 0, sizeof(desc));
-	m_pVideoSurface[m_nCurSurface]->GetDesc(&desc);
+	D3DSURFACE_DESC desc = {};
+	if (FAILED(hr = m_pVideoSurface[m_nCurSurface]->GetDesc(&desc))) {
+		return hr;
+	};
 
 	CSize framesize = GetVideoSize();
-	CSize dar = GetVideoSizeAR();
+	const CSize dar = GetVideoSizeAR();
 	if (dar.cx > 0 && dar.cy > 0) {
 		framesize.cx = MulDiv(framesize.cy, dar.cx, dar.cy);
 	}
@@ -2264,7 +2265,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 		std::swap(framesize.cx, framesize.cy);
 	}
 
-	DWORD required = sizeof(BITMAPINFOHEADER) + (framesize.cx * framesize.cy * 4);
+	const DWORD required = sizeof(BITMAPINFOHEADER) + (framesize.cx * framesize.cy * 4);
 	if (!lpDib) {
 		*size = required;
 		return S_OK;
@@ -2276,39 +2277,31 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 	CAutoLock lock(&m_RenderLock);
 
-	IDirect3DSurface9* pSurface;
+	CComPtr<IDirect3DSurface9> pSurface;
 	D3DLOCKED_RECT r;
-	if (FAILED(hr = m_pD3DDev->CreateRenderTarget(framesize.cx, framesize.cy, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pSurface, nullptr))) {
-		return hr;
-	}
-	if (FAILED(hr = m_pD3DDev->StretchRect(m_pVideoSurface[m_nCurSurface], nullptr, pSurface, nullptr, D3DTEXF_POINT))) {
-		pSurface->Release();
-		return hr;
-	}
-	if (FAILED(hr = pSurface->LockRect(&r, nullptr, D3DLOCK_READONLY))) {
-		pSurface->Release();
+	if (FAILED(hr = m_pD3DDev->CreateRenderTarget(framesize.cx, framesize.cy, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pSurface, NULL))
+			|| (FAILED(hr = m_pD3DDev->StretchRect(m_pVideoSurface[m_nCurSurface], NULL, pSurface, NULL, D3DTEXF_POINT)))
+			|| (FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY)))) {
 		return hr;
 	}
 
-	BITMAPINFOHEADER* bih	= (BITMAPINFOHEADER*)lpDib;
+	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)lpDib;
 	memset(bih, 0, sizeof(BITMAPINFOHEADER));
-	bih->biSize				= sizeof(BITMAPINFOHEADER);
-	bih->biWidth			= framesize.cx;
-	bih->biHeight			= framesize.cy;
-	bih->biBitCount			= 32;
-	bih->biPlanes			= 1;
-	bih->biSizeImage		= DIBSIZE(*bih);
+	bih->biSize           = sizeof(BITMAPINFOHEADER);
+	bih->biWidth          = framesize.cx;
+	bih->biHeight         = framesize.cy;
+	bih->biBitCount       = 32;
+	bih->biPlanes         = 1;
+	bih->biSizeImage      = DIBSIZE(*bih);
 
 	uint32_t* p = NULL;
 	if (m_iRotation) {
 		p = DNew uint32_t[bih->biWidth * bih->biHeight];
 	}
 
-	BitBltFromRGBToRGBStretch(
-		bih->biWidth, bih->biHeight,
-		p ? (BYTE*)p : (BYTE*)(bih + 1), bih->biWidth * 4, 32,
-		desc.Width, desc.Height,
-		(BYTE*)r.pBits + r.Pitch * (desc.Height - 1), -(int)r.Pitch, 32);
+	BitBltFromRGBToRGB(bih->biWidth, bih->biHeight,
+					   p ? (BYTE*)p : (BYTE*)(bih + 1), bih->biWidth * 4, 32,
+					   (BYTE*)r.pBits + r.Pitch * (desc.Height - 1), -(int)r.Pitch, 32);
 
 	pSurface->UnlockRect();
 
@@ -2341,7 +2334,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 			break;
 		}
 
-		delete[] p;
+		delete [] p;
 	}
 
 	return S_OK;
