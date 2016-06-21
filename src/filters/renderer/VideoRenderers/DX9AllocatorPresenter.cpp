@@ -66,7 +66,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_nMonitorHorRes(0), m_nMonitorVerRes(0)
 	, m_rcMonitor(0, 0, 0, 0)
 	, m_pD3DXLoadSurfaceFromMemory(NULL)
-	, m_pD3DXLoadSurfaceFromSurface(NULL)
 	, m_pD3DXCreateLine(NULL)
 	, m_pD3DXCreateFont(NULL)
 	, m_pD3DXCreateSprite(NULL)
@@ -83,7 +82,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	HINSTANCE hDll = GetD3X9Dll();
 	if (hDll) {
 		(FARPROC&)m_pD3DXLoadSurfaceFromMemory	= GetProcAddress(hDll, "D3DXLoadSurfaceFromMemory");
-		(FARPROC&)m_pD3DXLoadSurfaceFromSurface = GetProcAddress(hDll, "D3DXLoadSurfaceFromSurface");
 		(FARPROC&)m_pD3DXCreateLine				= GetProcAddress(hDll, "D3DXCreateLine");
 		(FARPROC&)m_pD3DXCreateFont				= GetProcAddress(hDll, "D3DXCreateFontW");
 		(FARPROC&)m_pD3DXCreateSprite			= GetProcAddress(hDll, "D3DXCreateSprite");
@@ -2276,35 +2274,20 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	}
 	*size = required;
 
-	D3DLOCKED_RECT r;
-	CComPtr<IDirect3DSurface9> pSurface;
-	if (m_VideoBufferFmt != D3DFMT_X8R8G8B8) {
-		CComPtr<IDirect3DSurface9> fSurface = m_pVideoSurface[m_nCurSurface];
-		if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(desc.Width, desc.Height, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &fSurface, NULL))
-				|| FAILED(hr = m_pD3DXLoadSurfaceFromSurface(fSurface, NULL, NULL, m_pVideoSurface[m_nCurSurface], NULL, NULL, D3DX_DEFAULT, 0))) {
-			return hr;
-		}
+	CAutoLock lock(&m_RenderLock);
 
-		pSurface = fSurface;
-		if (FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY))) {
-			pSurface = NULL;
-			if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(desc.Width, desc.Height, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &pSurface, NULL))
-					|| FAILED(hr = m_pD3DDev->GetRenderTargetData(fSurface, pSurface))
-					|| FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY))) {
-				return hr;
-			}
-		}
+	IDirect3DSurface9* pSurface;
+	D3DLOCKED_RECT r;
+	if (FAILED(hr = m_pD3DDev->CreateRenderTarget(framesize.cx, framesize.cy, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pSurface, nullptr))) {
+		return hr;
 	}
-	else {
-		pSurface = m_pVideoSurface[m_nCurSurface];
-		if (FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY))) {
-			pSurface = NULL;
-			if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM, &pSurface, NULL))
-					|| FAILED(hr = m_pD3DDev->GetRenderTargetData(m_pVideoSurface[m_nCurSurface], pSurface))
-					|| FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY))) {
-				return hr;
-			}
-		}
+	if (FAILED(hr = m_pD3DDev->StretchRect(m_pVideoSurface[m_nCurSurface], nullptr, pSurface, nullptr, D3DTEXF_POINT))) {
+		pSurface->Release();
+		return hr;
+	}
+	if (FAILED(hr = pSurface->LockRect(&r, nullptr, D3DLOCK_READONLY))) {
+		pSurface->Release();
+		return hr;
 	}
 
 	BITMAPINFOHEADER* bih	= (BITMAPINFOHEADER*)lpDib;
