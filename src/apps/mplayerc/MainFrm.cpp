@@ -8319,48 +8319,6 @@ void CMainFrame::OnPlayChangeRate(UINT nID)
 		return;
 	}
 
-	if (GetPlaybackMode() == PM_CAPTURE) {
-		if (GetMediaState() != State_Running) {
-			SendMessage(WM_COMMAND, ID_PLAY_PLAY);
-		}
-
-		long lChannelMin = 0, lChannelMax = 0;
-		pAMTuner->ChannelMinMax(&lChannelMin, &lChannelMax);
-		long lChannel = 0, lVivSub = 0, lAudSub = 0;
-		pAMTuner->get_Channel(&lChannel, &lVivSub, &lAudSub);
-
-		long lFreqOrg = 0, lFreqNew = -1;
-		pAMTuner->get_VideoFrequency(&lFreqOrg);
-
-		//long lSignalStrength;
-		do {
-			if (nID == ID_PLAY_DECRATE) {
-				lChannel--;
-			} else if (nID == ID_PLAY_INCRATE) {
-				lChannel++;
-			}
-
-			//if (lChannel < lChannelMin) lChannel = lChannelMax;
-			//if (lChannel > lChannelMax) lChannel = lChannelMin;
-
-			if (lChannel < lChannelMin || lChannel > lChannelMax) {
-				break;
-			}
-
-			if (FAILED(pAMTuner->put_Channel(lChannel, AMTUNER_SUBCHAN_DEFAULT, AMTUNER_SUBCHAN_DEFAULT))) {
-				break;
-			}
-
-			long flFoundSignal;
-			pAMTuner->AutoTune(lChannel, &flFoundSignal);
-
-			pAMTuner->get_VideoFrequency(&lFreqNew);
-		} while (FALSE);
-		/*			SUCCEEDED(pAMTuner->SignalPresent(&lSignalStrength))
-					&& (lSignalStrength != AMTUNER_SIGNALPRESENT || lFreqNew == lFreqOrg));*/
-		return;
-	}
-
 	if (GetPlaybackMode() != PM_FILE && GetPlaybackMode() != PM_DVD || nID != ID_PLAY_INCRATE && nID != ID_PLAY_DECRATE) {
 		return;
 	}
@@ -9352,6 +9310,46 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 					}
 				}
 			}
+		}
+		else if (pAMTuner) {
+			if (GetMediaState() != State_Running) {
+				SendMessage(WM_COMMAND, ID_PLAY_PLAY);
+			}
+
+			long lChannelMin = 0, lChannelMax = 0;
+			pAMTuner->ChannelMinMax(&lChannelMin, &lChannelMax);
+			long lChannel = 0, lVivSub = 0, lAudSub = 0;
+			pAMTuner->get_Channel(&lChannel, &lVivSub, &lAudSub);
+
+			if (nID == ID_NAVIGATE_SKIPBACK) {
+				if (lChannel > lChannelMin) {
+					lChannel--;
+				} else {
+					lChannel = lChannelMax;
+				}
+			}
+			else if (nID == ID_NAVIGATE_SKIPFORWARD) {
+				if (lChannel < lChannelMax) {
+					lChannel++;
+				} else {
+					lChannel = lChannelMin;
+				}
+			}
+
+			if (FAILED(pAMTuner->put_Channel(lChannel, AMTUNER_SUBCHAN_DEFAULT, AMTUNER_SUBCHAN_DEFAULT))) {
+				return;
+			}
+
+			long flFoundSignal = 0;
+			pAMTuner->AutoTune(lChannel, &flFoundSignal);
+			long lFreq = 0;
+			pAMTuner->get_VideoFrequency(&lFreq);
+			long lSignalStrength;
+			pAMTuner->SignalPresent(&lSignalStrength); // good if AMTUNER_SIGNALPRESENT
+
+			CString strOSD;
+			strOSD.Format(_T("Channel %d (%.1f MHz)"), lChannel, lFreq/1000000.0);
+			m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
 		}
 	}
 }
