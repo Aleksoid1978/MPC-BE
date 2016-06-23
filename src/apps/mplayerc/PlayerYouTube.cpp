@@ -676,13 +676,16 @@ namespace YoutubeParser {
 							item.url.Replace(L"http://", L"https://");
 							item.title = fmt;
 							item.tag = itag;
+							item.quality = current->quality;
 							item.videoOnly = current->videoOnly;
 
-							youtubeUrllist.AddTail(item);
+							youtubeUrllist.emplace_back(item);
 						}
 					}
 				}
 			}
+
+			std::sort(youtubeUrllist.begin(), youtubeUrllist.end());
 
 			if (!final_audio_url.IsEmpty()) {
 				final_audio_url.Replace(L"http://", L"https://");
@@ -839,17 +842,17 @@ namespace YoutubeParser {
 					CString url;
 					url.Format(L"https://www.youtube.com/watch?v=%s", data_video_id);
 					YoutubePlaylistItem item(url, data_video_title);
-					youtubePlaylist.AddTail(item);
+					youtubePlaylist.emplace_back(item);
 
 					if (bCurrentPlay) {
-						idx_CurrentPlay = youtubePlaylist.GetCount() - 1;
+						idx_CurrentPlay = youtubePlaylist.size() - 1;
 					}
 				}
 			}
 
 			free(data);
 
-			if (!youtubePlaylist.IsEmpty()) {
+			if (!youtubePlaylist.empty()) {
 				return true;
 			}
 		}
