@@ -23,6 +23,8 @@
 #define ENABLE_YOUTUBE_3D   0
 #define ENABLE_YOUTUBE_DASH 0
 
+#include <vector>
+
 namespace YoutubeParser {
 	enum ytype {
 		y_unknown,
@@ -124,13 +126,18 @@ namespace YoutubeParser {
 			: url(_url)
 			, title(_title) {};
 	};
-	typedef CAtlList<YoutubePlaylistItem> YoutubePlaylist;
+	typedef std::vector<YoutubePlaylistItem> YoutubePlaylist;
 
 	struct YoutubeUrllistItem : YoutubePlaylistItem {
-		int tag = 0;
+		int  tag = 0;
+		int  quality = 0;
 		bool videoOnly = false;
+
+		bool operator < (const YoutubeUrllistItem& val) const {
+			return tag > val.tag && quality >= val.quality;
+		}
 	};
-	typedef CAtlList<YoutubeUrllistItem> YoutubeUrllist;
+	typedef std::vector<YoutubeUrllistItem> YoutubeUrllist;
 
 	bool CheckURL(CString url);
 	bool CheckPlaylist(CString url);
