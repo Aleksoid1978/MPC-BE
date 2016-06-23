@@ -41,7 +41,7 @@ bool CApeTagItem::Load(CGolombBuffer &gb){
 	DWORD tag_size	= gb.ReadDwordLE();	/* field size */
 	DWORD flags		= gb.ReadDwordLE();	/* field flags */
 
-	CString key;
+	CStringA key;
 	BYTE b = gb.ReadByte();
 	while (b) {
 		key += b;
@@ -61,7 +61,7 @@ bool CApeTagItem::Load(CGolombBuffer &gb){
 		}
 
 		if (tag_size) {
-			m_key	= key;
+			m_key = key;
 			m_Data.SetCount(tag_size);
 			gb.ReadBuffer(m_Data.GetData(), tag_size);
 		}
@@ -70,7 +70,7 @@ bool CApeTagItem::Load(CGolombBuffer &gb){
 		memset(value, 0, tag_size + 1);
 		gb.ReadBuffer(value, tag_size);
 		m_value	= UTF8To16((LPCSTR)value);
-		m_key	= CString(key);
+		m_key	= key;
 		delete [] value;
 	}
 

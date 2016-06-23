@@ -149,11 +149,11 @@ CWebServer::CWebServer(CMainFrame* pMainFrame, int nPort)
 	}
 
 	CAtlList<CString> sl;
-	Explode(AfxGetAppSettings().strWebServerCGI, sl, ';');
+	Explode(AfxGetAppSettings().strWebServerCGI, sl, L';');
 	POSITION pos = sl.GetHeadPosition();
 	while (pos) {
 		CAtlList<CString> sl2;
-		CString ext = Explode(sl.GetNext(pos), sl2, '=', 2);
+		CString ext = Explode(sl.GetNext(pos), sl2, L'=', 2);
 		if (sl2.GetCount() < 2) {
 			continue;
 		}
@@ -255,7 +255,7 @@ bool CWebServer::ToLocalPath(CString& path, CString& redir)
 
 		if (p.IsDirectory()) {
 			CAtlList<CString> sl;
-			Explode(AfxGetAppSettings().strWebDefIndex, sl, ';');
+			Explode(AfxGetAppSettings().strWebDefIndex, sl, L';');
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
 				str = sl.GetNext(pos);
@@ -264,8 +264,8 @@ bool CWebServer::ToLocalPath(CString& path, CString& redir)
 				if (p2.FileExists()) {
 					p = p2;
 					redir = path;
-					if (redir.GetAt(redir.GetLength()-1) != '/') {
-						redir += '/';
+					if (redir.GetAt(redir.GetLength()-1) != L'/') {
+						redir += L'/';
 					}
 					redir += str;
 					break;

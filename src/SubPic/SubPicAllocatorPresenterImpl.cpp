@@ -48,7 +48,7 @@ CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT&
 	if (!IsWindow(m_hWnd)) {
 		hr = E_INVALIDARG;
 		if (_pError) {
-			*_pError += "Invalid window handle in ISubPicAllocatorPresenterImpl\n";
+			*_pError += L"Invalid window handle in ISubPicAllocatorPresenterImpl\n";
 		}
 		return;
 	}
@@ -357,7 +357,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* valu
 	if (!strcmp(field, "name")) {
 		ret = L"MPC-BE";
 	} else if (!strcmp(field, "version")) {
-		ret = MPC_VERSION_STR;
+		ret = _T(MPC_VERSION_STR);
 	} else if (!strcmp(field, "yuvMatrix")) {
 		ret = L"None";
 

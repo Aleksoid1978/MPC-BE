@@ -1023,7 +1023,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			if (mts.IsEmpty()) {
-				DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CreateOutputs() : Unsupported TrackType '%s' (%I64d)", CString(CodecID), (UINT64)pTE->TrackType));
+				DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CreateOutputs() : Unsupported TrackType '%S' (%I64d)", CodecID, (UINT64)pTE->TrackType));
 				continue;
 			}
 
@@ -1246,10 +1246,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 void CMatroskaSplitterFilter::SetupChapters(LPCSTR lng, ChapterAtom* parent, int level)
 {
-	CString tabs('+', level);
+	CString tabs(L'+', level);
 
 	if (!tabs.IsEmpty()) {
-		tabs += ' ';
+		tabs += L' ';
 	}
 
 	POSITION pos = parent->ChapterAtoms.GetHeadPosition();

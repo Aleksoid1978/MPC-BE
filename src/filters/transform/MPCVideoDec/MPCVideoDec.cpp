@@ -3500,11 +3500,11 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 
 	switch (index) {
 		case INFO_MPCVersion:
-			infostr.Format(_T("v%s (build %d)"), CString(MPC_VERSION_STR), MPC_VERSION_REV);
+			infostr.Format(_T("v%s (build %d)"), _T(MPC_VERSION_STR), MPC_VERSION_REV);
 			break;
 		case INFO_InputFormat:
 			if (m_pAVCtx) {
-				infostr = m_pAVCtx->codec_descriptor->name;;
+				infostr = m_pAVCtx->codec_descriptor->name;
 				if (const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)) {
 					if (desc->flags & AV_PIX_FMT_FLAG_PAL) {
 						infostr.Append(_T(", palettized RGB"));

@@ -531,7 +531,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		if (s->strn.IsEmpty()) {
 			name.Format(L"%s %u", label, i);
 		} else {
-			name.Format(L"%s (%s %u)", CStringW(s->strn), label, i);
+			name.Format(L"%S (%s %u)", s->strn, label, i);
 		}
 
 		HRESULT hr;

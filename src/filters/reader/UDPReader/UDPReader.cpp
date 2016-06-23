@@ -363,22 +363,22 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			connected = TRUE;
 			CString contentType = m_HTTPAsync.GetContentType();
 			contentType.MakeLower();
-			if (contentType == "application/octet-stream") {
+			if (contentType == L"application/octet-stream") {
 				BYTE buf[1024] = { 0 };
 				DWORD dwSizeRead = 0;
 				if (m_HTTPAsync.Read((PBYTE)&buf, sizeof(buf), &dwSizeRead, 3000) == S_OK && dwSizeRead) {
 					GetType(buf, dwSizeRead, m_subtype);
 					Append(buf, dwSizeRead);
 				}
-			} else if (contentType == "video/mp2t") {
+			} else if (contentType == L"video/mp2t") {
 				m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
-			} else if (contentType == "application/x-ogg" || contentType == "application/ogg" || contentType == "audio/ogg") {
+			} else if (contentType == L"application/x-ogg" || contentType == L"application/ogg" || contentType == L"audio/ogg") {
 				m_subtype = MEDIASUBTYPE_Ogg;
-			} else if (contentType == "video/webm") {
+			} else if (contentType == L"video/webm") {
 				m_subtype = MEDIASUBTYPE_Matroska;
-			} else if (contentType == "video/mp4" || contentType == "video/3gpp") {
+			} else if (contentType == L"video/mp4" || contentType == L"video/3gpp") {
 				m_subtype = MEDIASUBTYPE_MP4;
-			} else if (contentType == "video/x-flv") {
+			} else if (contentType == L"video/x-flv") {
 				m_subtype = MEDIASUBTYPE_FLV;
 			} else { // "text/html..." and other
 					// not supported content-type

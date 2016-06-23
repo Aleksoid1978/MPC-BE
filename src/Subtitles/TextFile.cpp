@@ -221,7 +221,7 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 		__super::WriteString(str);
 	} else if (m_encoding == ANSI) {
 		str.Replace(L"\n", L"\r\n");
-		CStringA stra = CStringA(str); // TODO: codepage
+		CStringA stra(str); // TODO: codepage
 		Write((LPCSTR)stra, stra.GetLength());
 	} else if (m_encoding == UTF8) {
 		str.Replace(L"\n", L"\r\n");

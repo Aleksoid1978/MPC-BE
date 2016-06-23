@@ -1131,8 +1131,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			if (!TrackLanguage.IsEmpty()) {
-				if (TrackLanguage != L"und") {
-					name += " (" + TrackLanguage + ")";
+				if (TrackLanguage != "und") {
+					name.AppendFormat(L" (%S)", TrackLanguage);
 				}
 			}
 

@@ -270,7 +270,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 
 	if (!Infos.IsEmpty()) {
 		CString Ret = pName;
-		Ret += " (";
+		Ret += L" (";
 
 		bool bFirst = true;
 
@@ -286,7 +286,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 			bFirst = false;
 		}
 
-		Ret += ')';
+		Ret += L')';
 
 		return Ret;
 	}

@@ -117,11 +117,11 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 	CAtlList<CString> Infos;
 
 	if (pMediaType->majortype == MEDIATYPE_Video) {
-		MajorType = "Video";
+		MajorType = L"Video";
 		if (pMediaType->subtype == MEDIASUBTYPE_DVD_SUBPICTURE
 			|| pMediaType->subtype == MEDIASUBTYPE_SVCD_SUBPICTURE
 			|| pMediaType->subtype == MEDIASUBTYPE_CVD_SUBPICTURE) {
-			MajorType = "Subtitle";
+			MajorType = L"Subtitle";
 		}
 
 		if (pClipInfo) {
@@ -303,7 +303,7 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 		}
 
 	} else if (pMediaType->majortype == MEDIATYPE_Audio) {
-		MajorType = "Audio";
+		MajorType = L"Audio";
 		if (pClipInfo) {
 			CString name = ISO6392ToLanguage(pClipInfo->m_LanguageCode);
 			if (!name.IsEmpty()) {
@@ -413,7 +413,7 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 
 		}
 	} else if (pMediaType->majortype == MEDIATYPE_Subtitle) {
-		MajorType = "Subtitle";
+		MajorType = L"Subtitle";
 
 		if (pPresentationDesc == NULL) {
 			if (pMediaType->subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
@@ -464,7 +464,7 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 		CString Ret;
 
 		Ret += MajorType;
-		Ret += " - ";
+		Ret += L" - ";
 
 		bool bFirst = true;
 

@@ -83,11 +83,11 @@ void Subtitle::GetSubFileNames(CString fn, const CAtlArray<CString>& paths, CAtl
 
 		for (size_t k = 0; k < paths.GetCount(); k++) {
 			CString path = paths[k];
-			path.Replace('\\', '/');
+			path.Replace(L'\\', L'/');
 
 			l = path.GetLength();
-			if (l > 0 && path[l - 1] != '/') {
-				path += '/';
+			if (l > 0 && path[l - 1] != L'/') {
+				path += L'/';
 			}
 
 			if (path.Find(':') == -1 && path.Find(_T("//")) != 0) {
@@ -95,7 +95,7 @@ void Subtitle::GetSubFileNames(CString fn, const CAtlArray<CString>& paths, CAtl
 			}
 
 			path.Replace(_T("/./"), _T("/"));
-			path.Replace('/', '\\');
+			path.Replace(L'/', L'\\');
 
 			CAtlList<CString> subs, vids;
 
