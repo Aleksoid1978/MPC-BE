@@ -1163,7 +1163,8 @@ public:
 	CString		m_strFnFull;
 	CString		m_strUrl;
 
-	YoutubeParser::YOUTUBE_FIELDS m_youtubeFields;
+	YoutubeParser::YoutubeFields m_youtubeFields;
+	YoutubeParser::YoutubeUrllist m_youtubeUrllist;
 	CString		GetStrForTitle();
 	CString		GetAltFileName();
 

@@ -843,6 +843,7 @@ public:
 	// youtube
 	bool			bYoutubePageParser;
 	int				iYoutubeTag;
+	int				iYoutubeTagSelected = 0;
 	bool			bYoutubeLoadPlaylist;
 
 	DWORD			nLastFileInfoPage;

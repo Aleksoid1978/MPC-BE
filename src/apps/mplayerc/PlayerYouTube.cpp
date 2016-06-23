@@ -19,34 +19,35 @@
  */
 
 #include "stdafx.h"
+#include <afxinet.h>
 #include <regex>
 #include <jsoncpp/include/json/json.h>
 #include "../../DSUtil/text.h"
 #include "PlayerYouTube.h"
 
-#define YOUTUBE_PL_URL				L"youtube.com/playlist?"
-#define YOUTUBE_URL					L"youtube.com/watch?"
-#define YOUTUBE_URL_A				L"www.youtube.com/attribution_link"
-#define YOUTUBE_URL_V				L"youtube.com/v/"
-#define YOUTU_BE_URL				L"youtu.be/"
+#define YOUTUBE_PL_URL              L"youtube.com/playlist?"
+#define YOUTUBE_URL                 L"youtube.com/watch?"
+#define YOUTUBE_URL_A               L"www.youtube.com/attribution_link"
+#define YOUTUBE_URL_V               L"youtube.com/v/"
+#define YOUTU_BE_URL                L"youtu.be/"
 
-#define MATCH_STREAM_MAP_START		"\"url_encoded_fmt_stream_map\":\""
-#define MATCH_ADAPTIVE_FMTS_START	"\"adaptive_fmts\":\""
-#define MATCH_WIDTH_START			"meta property=\"og:video:width\" content=\""
-#define MATCH_HLSVP_START			"\"hlsvp\":\""
-#define MATCH_JS_START				"\"js\":\""
-#define MATCH_END					"\""
+#define MATCH_STREAM_MAP_START      "\"url_encoded_fmt_stream_map\":\""
+#define MATCH_ADAPTIVE_FMTS_START   "\"adaptive_fmts\":\""
+#define MATCH_WIDTH_START           "meta property=\"og:video:width\" content=\""
+#define MATCH_HLSVP_START           "\"hlsvp\":\""
+#define MATCH_JS_START              "\"js\":\""
+#define MATCH_END                   "\""
 
-#define MATCH_PLAYLIST_ITEM_START	"<li class=\"yt-uix-scroller-scroll-unit "
-#define MATCH_PLAYLIST_ITEM_START2	"<tr class=\"pl-video yt-uix-tile "
+#define MATCH_PLAYLIST_ITEM_START   "<li class=\"yt-uix-scroller-scroll-unit "
+#define MATCH_PLAYLIST_ITEM_START2  "<tr class=\"pl-video yt-uix-tile "
 
-#define MATCH_AGE_RESTRICTION		"player-age-gate-content\">"
-#define MATCH_STREAM_MAP_START_2	"url_encoded_fmt_stream_map="
-#define MATCH_ADAPTIVE_FMTS_START_2	"adaptive_fmts="
-#define MATCH_JS_START_2			"'PREFETCH_JS_RESOURCES': [\""
-#define MATCH_END_2					"&"
+#define MATCH_AGE_RESTRICTION       "player-age-gate-content\">"
+#define MATCH_STREAM_MAP_START_2    "url_encoded_fmt_stream_map="
+#define MATCH_ADAPTIVE_FMTS_START_2 "adaptive_fmts="
+#define MATCH_JS_START_2            "'PREFETCH_JS_RESOURCES': [\""
+#define MATCH_END_2                 "&"
 
-#define INTERNET_OPEN_FALGS			INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD
+#define INTERNET_OPEN_FALGS         INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD
 
 namespace YoutubeParser {
 	static const CString GOOGLE_API_KEY = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
@@ -56,27 +57,27 @@ namespace YoutubeParser {
 		L"video_ids=([-a-zA-Z0-9_]+)"
 	};
 
-	static const YOUTUBE_PROFILES youtubeProfileEmpty = { 0, y_unknown, 0, NULL, false };
-
-	enum youtubeProfiles {
+	enum youtubeTypeProfiles {
 		UNKNOWN_PROFILE = -1,
 		AUDIO_PROFILE,
 		VIDEO_PROFILE
 	};
 
-	const YOUTUBE_PROFILES* getProfile(int iTag, youtubeProfiles type) {
-		YOUTUBE_PROFILES* profiles = NULL;
+	const YoutubeProfiles* getProfile(int iTag, youtubeTypeProfiles type) {
+		YoutubeProfiles* profiles = NULL;
 		int count = 0;
 
 		switch (type) {
-		case youtubeProfiles::AUDIO_PROFILE:
-			profiles = (YOUTUBE_PROFILES*)youtubeAudioProfiles;
-			count = _countof(youtubeAudioProfiles);
-			break;
-		case youtubeProfiles::VIDEO_PROFILE:
-			profiles = (YOUTUBE_PROFILES*)youtubeVideoProfiles;
-			count = _countof(youtubeVideoProfiles);
-			break;
+			case youtubeTypeProfiles::AUDIO_PROFILE:
+				profiles = (YoutubeProfiles*)youtubeAudioProfiles;
+				count = _countof(youtubeAudioProfiles);
+				break;
+			case youtubeTypeProfiles::VIDEO_PROFILE:
+				profiles = (YoutubeProfiles*)youtubeVideoProfiles;
+				count = _countof(youtubeVideoProfiles);
+				break;
+			default:
+				return NULL;
 		}
 
 		for (int i = 0; i < count; i++) {
@@ -85,21 +86,22 @@ namespace YoutubeParser {
 			}
 		}
 
-		return &youtubeProfileEmpty;
+		return NULL;
 	}
 
-	bool SelectBestProfile(int &itag_final, CString &ext_final, int itag_current, const YOUTUBE_PROFILES* sets, youtubeProfiles type)
+	bool SelectBestProfile(int &itag_final, CString &ext_final, int itag_current, const YoutubeProfiles* sets, youtubeTypeProfiles type)
 	{
-		const YOUTUBE_PROFILES* current = getProfile(itag_current, type);
+		const YoutubeProfiles* current = getProfile(itag_current, type);
+		CheckPointer(current, false);
 
-		if (current->iTag <= 0
-			|| current->quality > sets->quality) {
+		if (current->quality > sets->quality) {
 			return false;
 		}
 
 		if (itag_final != 0) {
-			const YOUTUBE_PROFILES* fin = getProfile(itag_final, type);
-			if (current->quality < fin->quality) {
+			const YoutubeProfiles* final = getProfile(itag_final, type);
+			CheckPointer(final, false);
+			if (current->quality < final->quality) {
 				return false;
 			}
 		}
@@ -221,7 +223,7 @@ namespace YoutubeParser {
 		}
 	}
 
-	static bool ParseMetadata(HINTERNET& s, const CString videoId, YOUTUBE_FIELDS& y_fields)
+	static bool ParseMetadata(HINTERNET& s, const CString videoId, YoutubeFields& y_fields)
 	{
 		if (s && !videoId.IsEmpty()) {
 			CString link;
@@ -313,7 +315,7 @@ namespace YoutubeParser {
 		funcSWAP
 	};
 
-	bool Parse_URL(CString url, CAtlList<CString>& urls, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& subs, REFERENCE_TIME& rtStart)
+	bool Parse_URL(CString url, CAtlList<CString>& urls, YoutubeFields& y_fields, YoutubeUrllist& youtubeUrllist, CSubtitleItemList& subs, REFERENCE_TIME& rtStart)
 	{
 		if (CheckURL(url)) {
 			char* data = NULL;
@@ -461,16 +463,17 @@ namespace YoutubeParser {
 			free(data);
 
 			const CAppSettings& sApp = AfxGetAppSettings();
-			const YOUTUBE_PROFILES* youtubeVideoSets = getProfile(sApp.iYoutubeTag, youtubeProfiles::VIDEO_PROFILE);
-			if (youtubeVideoSets->iTag == 0) {
-				youtubeVideoSets = getProfile(22, youtubeProfiles::VIDEO_PROFILE);
+			const int tag = sApp.iYoutubeTagSelected > 0 ? sApp.iYoutubeTagSelected : sApp.iYoutubeTag;
+			const YoutubeProfiles* youtubeVideoSets = getProfile(tag, youtubeTypeProfiles::VIDEO_PROFILE);
+			if (!youtubeVideoSets) {
+				youtubeVideoSets = getProfile(22, youtubeTypeProfiles::VIDEO_PROFILE);
 			}
 
 			CString final_video_url;
 			CString final_video_ext;
 			int final_video_itag = 0;
 
-			const YOUTUBE_PROFILES* youtubeAudioSets = getProfile(251, youtubeProfiles::AUDIO_PROFILE);
+			const YoutubeProfiles* youtubeAudioSets = getProfile(251, youtubeTypeProfiles::AUDIO_PROFILE);
 
 			CString final_audio_url;
 			CString final_audio_ext;
@@ -499,7 +502,6 @@ namespace YoutubeParser {
 						CStringA paramHeader = paramA.Left(k);
 						CStringA paramValue = paramA.Mid(k + 1);
 
-						// "quality", "fallback_host", "url", "itag", "type", "s"
 						if (paramHeader == "url") {
 							url = UrlDecode(UrlDecode(paramValue));
 						} else if (paramHeader == "s") {
@@ -513,7 +515,7 @@ namespace YoutubeParser {
 				}
 
 				if (itag) {
-					auto SignatureDecode = [&](CString& final_url) {
+					auto SignatureDecode = [&](CStringA& final_url) {
 						if (!signature.IsEmpty() && !JSUrl.IsEmpty()) {
 							if (!bJSParsed) {
 								bJSParsed = TRUE;
@@ -653,20 +655,31 @@ namespace YoutubeParser {
 								}
 							}
 
-							final_url.AppendFormat(L"&signature=%s", CString(signature));
+							final_url.AppendFormat("&signature=%s", signature);
 						}
 					};
 
-					if (final_video_itag != youtubeVideoSets->iTag && SelectBestProfile(final_video_itag, final_video_ext, itag, youtubeVideoSets, youtubeProfiles::VIDEO_PROFILE)) {
+					SignatureDecode(url);
+
+					if (final_video_itag != youtubeVideoSets->iTag && SelectBestProfile(final_video_itag, final_video_ext, itag, youtubeVideoSets, youtubeTypeProfiles::VIDEO_PROFILE)) {
 						final_video_url = url;
-						SignatureDecode(final_video_url);
-					} else if (SelectBestProfile(final_audio_itag, final_audio_ext, itag, youtubeAudioSets, youtubeProfiles::AUDIO_PROFILE)) {
+					} else if (SelectBestProfile(final_audio_itag, final_audio_ext, itag, youtubeAudioSets, youtubeTypeProfiles::AUDIO_PROFILE)) {
 						final_audio_url = url;
-						SignatureDecode(final_audio_url);
 					}
 
-					if (final_video_itag == youtubeVideoSets->iTag && youtubeVideoSets->videoOnly == false) {
-						break;
+					const YoutubeProfiles* current = getProfile(itag, youtubeTypeProfiles::VIDEO_PROFILE);
+					if (current) {
+						YoutubeUrllistItem item;
+						const CString fmt = FormatProfiles(*current);
+						if (!fmt.IsEmpty()) {
+							item.url = url;
+							item.url.Replace(L"http://", L"https://");
+							item.title = fmt;
+							item.tag = itag;
+							item.videoOnly = current->videoOnly;
+
+							youtubeUrllist.AddTail(item);
+						}
 					}
 				}
 			}
@@ -739,8 +752,8 @@ namespace YoutubeParser {
 					urls.AddHead(final_video_url);
 
 					if (!final_audio_url.IsEmpty()) {
-						const YOUTUBE_PROFILES* current = getProfile(final_video_itag, youtubeProfiles::VIDEO_PROFILE);
-						if (current->videoOnly == true) {
+						const YoutubeProfiles* current = getProfile(final_video_itag, youtubeTypeProfiles::VIDEO_PROFILE);
+						if (current && current->videoOnly == true) {
 							urls.AddTail(final_audio_url);
 						}
 					}
@@ -844,7 +857,7 @@ namespace YoutubeParser {
 		return false;
 	}
 
-	bool Parse_URL(CString url, YOUTUBE_FIELDS& y_fields)
+	bool Parse_URL(CString url, YoutubeFields& y_fields)
 	{
 		bool bRet = false;
 		if (CheckURL(url)) {
@@ -865,4 +878,52 @@ namespace YoutubeParser {
 
 		return bRet;
 	}
+
+	const CString FormatProfiles(const YoutubeProfiles profile) {
+		CString fmt;
+		CString fps;
+		switch (profile.type) {
+			case YoutubeParser::ytype::y_mp4:
+				fmt = L"MP4";
+				break;
+			case YoutubeParser::ytype::y_webm:
+				fmt = L"WebM";
+				break;
+			case YoutubeParser::ytype::y_flv:
+				fmt = L"FLV";
+				break;
+			case YoutubeParser::ytype::y_3gp:
+				fmt = L"3GP";
+				break;
+#if ENABLE_YOUTUBE_3D
+			case YoutubeParser::ytype::y_3d_mp4:
+				fmt = L"3D MP4";
+				break;
+			case YoutubeParser::ytype::y_3d_webm:
+				fmt = L"3D WebM";
+				break;
+#endif
+			case YoutubeParser::ytype::y_webm_video:
+				fmt = L"WebM";
+				break;
+			case YoutubeParser::ytype::y_webm_video_60fps:
+				fmt = L"WebM";
+				fps = L"60";
+				break;
+#if ENABLE_YOUTUBE_DASH
+			case YoutubeParser::ytype::y_dash_mp4_video:
+				fmt = L"DASH MP4";
+				break;
+#endif
+		}
+
+		if (!fmt.IsEmpty()) {
+			fmt.AppendFormat(L"@%dp", profile.quality);
+			if (!fps.IsEmpty()) {
+				fmt.AppendFormat(L"%s", fps);
+			}
+		}
+
+		return fmt;
+	};
 }
