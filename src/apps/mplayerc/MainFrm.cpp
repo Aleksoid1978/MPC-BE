@@ -9650,6 +9650,30 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 			id -= m_MPLSPlaylist.GetCount();
 		}
 
+		if (m_youtubeUrllist.GetCount() > 1 && id < m_youtubeUrllist.GetCount()) {
+			POSITION pos = m_youtubeUrllist.GetHeadPosition();
+			UINT idx = 0;
+			while (pos) {
+				const YoutubeParser::YoutubeUrllistItem& item = m_youtubeUrllist.GetNext(pos);
+				if (idx == id && item.url != m_strUrl) {
+					const int tagSelected = item.tag;
+					REFERENCE_TIME rtNow = INVALID_TIME;
+					m_pMS->GetCurrentPosition(&rtNow);
+
+					SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+
+					AfxGetAppSettings().iYoutubeTagSelected = tagSelected;
+					OpenCurPlaylistItem(rtNow, FALSE);
+					return;
+				}
+				idx++;
+			}
+		}
+
+		if (m_youtubeUrllist.GetCount() > 1) {
+			id -= m_youtubeUrllist.GetCount();
+		}
+
 		if (id >= 0 && id < (UINT)m_pCB->ChapGetCount() && m_pCB->ChapGetCount() > 1) {
 			REFERENCE_TIME rt;
 			CComBSTR name;
@@ -11701,6 +11725,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 	bool bFirst = true;
 	m_youtubeFields.Empty();
+	m_youtubeUrllist.RemoveAll();
 
 	m_strUrl.Empty();
 
@@ -11710,7 +11735,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		if (YoutubeParser::CheckURL(fn)) {
 			youtubeUrl = fn;
 			CAtlList<CString> urls;
-			if (YoutubeParser::Parse_URL(fn, urls, m_youtubeFields, pOFD->subs, pOFD->rtStart)) {
+			if (YoutubeParser::Parse_URL(fn, urls, m_youtubeFields, m_youtubeUrllist, pOFD->subs, pOFD->rtStart)) {
 				pOFD->fns.RemoveAll();
 				POSITION pos = urls.GetHeadPosition();
 				while (pos) {
@@ -13939,7 +13964,10 @@ void CMainFrame::CloseMediaPrivate()
 	m_strCurPlaybackLabel.Empty();
 	m_strFnFull.Empty();
 	m_strUrl.Empty();
+
 	m_youtubeFields.Empty();
+	m_youtubeUrllist.RemoveAll();
+	AfxGetAppSettings().iYoutubeTagSelected = 0;
 
 	m_OSD.Stop();
 	OnPlayStop();
@@ -14945,10 +14973,6 @@ void CMainFrame::SetupNavChaptersSubMenu()
 			POSITION pos = m_MPLSPlaylist.GetHeadPosition();
 			while (pos) {
 				UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
-				if (id != ID_NAVIGATE_CHAP_SUBITEM_START && pos == m_MPLSPlaylist.GetHeadPosition()) {
-					//pSub->AppendMenu(MF_SEPARATOR | MF_ENABLED);
-					flags |= MF_MENUBARBREAK;
-				}
 				if (idx == MENUBARBREAK) {
 					flags |= MF_MENUBARBREAK;
 					idx = 0;
@@ -14965,6 +14989,26 @@ void CMainFrame::SetupNavChaptersSubMenu()
 
 				name.Replace(L"&", L"&&");
 				pSub->AppendMenu(flags, id++, name + '\t' + time);
+			}
+		} else if (m_youtubeUrllist.GetCount() > 1) {
+			DWORD idx = 1;
+			POSITION pos = m_youtubeUrllist.GetHeadPosition();
+			while (pos) {
+				UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
+				if (idx == MENUBARBREAK) {
+					flags |= MF_MENUBARBREAK;
+					idx = 0;
+				}
+				idx++;
+
+				const YoutubeParser::YoutubeUrllistItem& item = m_youtubeUrllist.GetNext(pos);
+				if (item.url == m_strUrl) {
+					flags |= MF_CHECKED | MFT_RADIOCHECK;
+				}
+
+				CString name = item.title;
+				name.Replace(L"&", L"&&");
+				pSub->AppendMenu(flags, id++, name);
 			}
 		}
 
@@ -14995,7 +15039,7 @@ void CMainFrame::SetupNavChaptersSubMenu()
 
 				if (id != ID_NAVIGATE_CHAP_SUBITEM_START && i == 0) {
 					//pSub->AppendMenu(MF_SEPARATOR | MF_ENABLED);
-					if (m_MPLSPlaylist.GetCount() > 1) {
+					if (m_MPLSPlaylist.GetCount() > 1 || m_youtubeUrllist.GetCount() > 1) {
 						flags |= MF_MENUBARBREAK;
 					}
 				}

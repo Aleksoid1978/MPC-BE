@@ -892,7 +892,7 @@ void CPlayerPlaylistBar::AddItem(CAtlList<CString>& fns, CSubtitleItemList* subs
 
 	pli.AutoLoadFiles();
 	if (pli.m_fns.GetCount() == 1) {
-		YoutubeParser::YOUTUBE_FIELDS y_fields;
+		YoutubeParser::YoutubeFields y_fields;
 		if (YoutubeParser::Parse_URL(pli.m_fns.GetHead(), y_fields)) {
 			pli.m_label    = y_fields.title;
 			pli.m_duration = y_fields.duration;

@@ -20,10 +20,8 @@
 
 #pragma once
 
-#include <afxinet.h>
-
-#define ENABLE_YOUTUBE_3D	0
-#define ENABLE_YOUTUBE_DASH	0
+#define ENABLE_YOUTUBE_3D   0
+#define ENABLE_YOUTUBE_DASH 0
 
 namespace YoutubeParser {
 	enum ytype {
@@ -42,7 +40,7 @@ namespace YoutubeParser {
 		y_webm_audio,
 	};
 
-	struct YOUTUBE_PROFILES {
+	struct YoutubeProfiles {
 		const int   iTag;
 		const ytype type;
 		const int   quality;
@@ -50,7 +48,7 @@ namespace YoutubeParser {
 		const bool  videoOnly;
 	};
 
-	static const YOUTUBE_PROFILES youtubeVideoProfiles[] = {
+	static const YoutubeProfiles youtubeVideoProfiles[] = {
 		{22,	y_mp4,				 720,	_T("mp4"),	false },
 		{18,	y_mp4,				 360,	_T("mp4"),	false },
 		{43,	y_webm,				 360,	_T("webm"),	false },
@@ -88,7 +86,7 @@ namespace YoutubeParser {
 	#endif
 	};
 
-	static const YOUTUBE_PROFILES youtubeAudioProfiles[] = {
+	static const YoutubeProfiles youtubeAudioProfiles[] = {
 		{251,	y_webm_audio,		 256,	_T("webm"),	false },
 		{250,	y_webm_audio,		  64,	_T("webm"),	false },
 		{249,	y_webm_audio,		  48,	_T("webm"),	false },
@@ -100,17 +98,14 @@ namespace YoutubeParser {
 	#endif
 	};
 
-	struct YOUTUBE_FIELDS {
+	struct YoutubeFields {
 		CString        author;
 		CString        title;
 		CString        content;
 		CString        fname;
-		SYSTEMTIME     dtime;
-		REFERENCE_TIME duration;
+		SYSTEMTIME     dtime    = { 0 };
+		REFERENCE_TIME duration = 0;
 
-		YOUTUBE_FIELDS() {
-			dtime = { 0 };
-		}
 		void Empty() {
 			author.Empty();
 			title.Empty();
@@ -125,18 +120,25 @@ namespace YoutubeParser {
 		CString url, title;
 
 		YoutubePlaylistItem() {};
-		YoutubePlaylistItem(CString url, CString title)
-			: url(url)
-			, title(title) {};
+		YoutubePlaylistItem(CString _url, CString _title)
+			: url(_url)
+			, title(_title) {};
 	};
 	typedef CAtlList<YoutubePlaylistItem> YoutubePlaylist;
+
+	struct YoutubeUrllistItem : YoutubePlaylistItem {
+		int tag = 0;
+		bool videoOnly = false;
+	};
+	typedef CAtlList<YoutubeUrllistItem> YoutubeUrllist;
 
 	bool CheckURL(CString url);
 	bool CheckPlaylist(CString url);
 
-	// we have to use a Parse_URL() in order to avoid conflict with the ParseURL define from the SDK
-	bool Parse_URL(CString url, CAtlList<CString>& urls, YOUTUBE_FIELDS& y_fields, CSubtitleItemList& subs, REFERENCE_TIME& rtStart);
+	bool Parse_URL(CString url, CAtlList<CString>& urls, YoutubeFields& y_fields, YoutubeUrllist& youtubeUrllist, CSubtitleItemList& subs, REFERENCE_TIME& rtStart);
 	bool Parse_Playlist(CString url, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay);
 
-	bool Parse_URL(CString url, YOUTUBE_FIELDS& y_fields);
+	bool Parse_URL(CString url, YoutubeFields& y_fields);
+
+	const CString FormatProfiles(const YoutubeProfiles profile);
 }
