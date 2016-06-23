@@ -446,7 +446,7 @@ BOOL CID3Tag::ReadTagsV1(BYTE *buf, size_t len)
 	if (genre < _countof(s_genre)) {
 		tag = 'TCON';
 		if (!Tags.Lookup(tag, value)) {
-			value = CString(s_genre[genre]);
+			value = s_genre[genre];
 			CID3TagItem* item = DNew CID3TagItem(tag, value);
 			TagItems.AddTail(item);
 

@@ -299,7 +299,7 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 				ptr += 2;
 
 				if (tag == __GAB1_LANGUAGE__) {
-					pRTS->m_name = CString(ptr);
+					pRTS->m_name = ptr;
 				} else if (tag == __GAB1_ENTRY__) {
 					pRTS->Add(AToT(&ptr[8]), false, *(int*)ptr, *(int*)(ptr+4));
 					bInvalidate = true;
@@ -366,7 +366,7 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 				int fields = m_mt.subtype == MEDIASUBTYPE_ASS2 ? 10 : 9;
 
 				CAtlList<CStringW> sl;
-				Explode(str, sl, ',', fields);
+				Explode(str, sl, L',', fields);
 				if (sl.GetCount() == (size_t)fields) {
 					stse.readorder = wcstol(sl.RemoveHead(), NULL, 10);
 					stse.layer = wcstol(sl.RemoveHead(), NULL, 10);

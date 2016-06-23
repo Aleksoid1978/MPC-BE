@@ -12946,7 +12946,7 @@ BOOL CMainFrame::SelectMatchTrack(CAtlArray<Stream>& Tracks, CString pattern, BO
 			CharLower(name.GetBuffer());
 
 			CAtlList<CString> sl;
-			Explode(lang, sl, '|');
+			Explode(lang, sl, L'|');
 			POSITION pos = sl.GetHeadPosition();
 
 			int nLangMatch = 0;
@@ -18376,7 +18376,7 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 						CString line;
 						while (cf.ReadString(line)) {
 							CAtlList<CString> sl;
-							Explode(line, sl, '=');
+							Explode(line, sl, L'=');
 							if (sl.GetCount() == 2 && CString(sl.GetHead().Trim()).MakeLower() == L"label") {
 								m_BDLabel = sl.GetTail();
 								break;

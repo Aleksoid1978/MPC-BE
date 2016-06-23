@@ -851,10 +851,10 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 
 			str += ' ';
 
-			CStringA ch;
+			CString ch;
 			for (size_t k = i; k < line_end; k++) {
 				unsigned char c = (unsigned char)pbFormat[fmtsize + k];
-				ch.AppendFormat("%c", c >= 0x20 ? c : '.');
+				ch.AppendFormat(L"%C", c >= 0x20 ? c : '.');
 			}
 			str += ch;
 

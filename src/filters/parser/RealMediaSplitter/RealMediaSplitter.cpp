@@ -246,7 +246,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		CStringW name;
 		name.Format(L"Output %02d", pmp->stream);
 		if (!pmp->name.IsEmpty()) {
-			name += L" (" + CStringW(pmp->name) + L")";
+			name += L" (" + CStringW(pmp->name) + L')';
 		}
 
 		CAtlArray<CMediaType> mts;
@@ -505,7 +505,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					ChapAppend(
 						((((REFERENCE_TIME)h*60+m)*60+s)*1000+ms)*10000,
-						CStringW(CString(value)));
+						CString(value));
 				}
 			}
 		}
@@ -532,7 +532,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		CStringW name;
 		name.Format(L"Subtitle %02d", stream);
 		if (!s.name.IsEmpty()) {
-			name += L" (" + CStringW(CString(s.name)) + L")";
+			name += L" (" + CString(s.name) + L')';
 		}
 
 		CMediaType mt;
@@ -1995,8 +1995,8 @@ HRESULT CRealVideoDecoder::CheckInputType(const CMediaType* mtIn)
 				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && _tcslen(buff) > 0) {
 			oldpath = buff;
 			TCHAR c = oldpath[oldpath.GetLength()-1];
-			if (c != '\\' && c != '/') {
-				oldpath += '\\';
+			if (c != L'\\' && c != L'/') {
+				oldpath += L'\\';
 			}
 			key.Close();
 		}
@@ -2005,8 +2005,8 @@ HRESULT CRealVideoDecoder::CheckInputType(const CMediaType* mtIn)
 				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && _tcslen(buff) > 0) {
 			newpath = buff;
 			TCHAR c = newpath[newpath.GetLength()-1];
-			if (c != '\\' && c != '/') {
-				newpath += '\\';
+			if (c != L'\\' && c != L'/') {
+				newpath += L'\\';
 			}
 			key.Close();
 		}
@@ -2500,8 +2500,8 @@ HRESULT CRealAudioDecoder::CheckInputType(const CMediaType* mtIn)
 				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && _tcslen(buff) > 0) {
 			oldpath = buff;
 			TCHAR c = oldpath[oldpath.GetLength()-1];
-			if (c != '\\' && c != '/') {
-				oldpath += '\\';
+			if (c != L'\\' && c != L'/') {
+				oldpath += L'\\';
 			}
 			key.Close();
 		}
@@ -2510,8 +2510,8 @@ HRESULT CRealAudioDecoder::CheckInputType(const CMediaType* mtIn)
 				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && _tcslen(buff) > 0) {
 			newpath = buff;
 			TCHAR c = newpath[newpath.GetLength()-1];
-			if (c != '\\' && c != '/') {
-				newpath += '\\';
+			if (c != L'\\' && c != L'/') {
+				newpath += L'\\';
 			}
 			key.Close();
 		}

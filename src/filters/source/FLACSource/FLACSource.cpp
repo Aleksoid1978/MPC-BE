@@ -434,7 +434,7 @@ static bool ParseVorbisTag(const CString field_name, const CString VorbisTag, CS
 
 	CString vorbis_data = VorbisTag;
 	vorbis_data.MakeLower().Trim();
-	if (vorbis_data.Find(field_name + '=') != 0) {
+	if (vorbis_data.Find(field_name + L'=') != 0) {
 		return false;
 	}
 

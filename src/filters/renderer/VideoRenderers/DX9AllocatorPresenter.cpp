@@ -2329,7 +2329,7 @@ void CDX9AllocatorPresenter::FillAddingField(CComPtr<IPin> pPin, CMediaType* mt)
 	ExtractAvgTimePerFrame(mt, m_rtTimePerFrame);
 
 	CString subtypestr = GetGUIDString(mt->subtype);
-	if (subtypestr.Left(13) == "MEDIASUBTYPE_") {
+	if (subtypestr.Left(13) == L"MEDIASUBTYPE_") {
 		m_strStatsMsg[0] = subtypestr.Mid(13);
 	} else {
 		BITMAPINFOHEADER bih;

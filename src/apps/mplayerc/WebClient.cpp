@@ -88,7 +88,7 @@ void CWebClientSocket::Header()
 		}
 
 		CAtlList<CString> lines;
-		Explode(m_hdr, lines, '\n');
+		Explode(m_hdr, lines, L'\n');
 		CString str = lines.RemoveHead();
 
 		CAtlList<CString> sl;
@@ -100,7 +100,7 @@ void CWebClientSocket::Header()
 
 		POSITION pos = lines.GetHeadPosition();
 		while (pos) {
-			Explode(lines.GetNext(pos), sl, ':', 2);
+			Explode(lines.GetNext(pos), sl, L':', 2);
 			if (sl.GetCount() == 2) {
 				m_hdrlines[sl.GetHead().MakeLower()] = sl.GetTail();
 			}
@@ -112,11 +112,11 @@ void CWebClientSocket::Header()
 	CString value;
 	if (m_hdrlines.Lookup(_T("cookie"), value)) {
 		CAtlList<CString> sl;
-		Explode(value, sl, ';');
+		Explode(value, sl, L';');
 		POSITION pos = sl.GetHeadPosition();
 		while (pos) {
 			CAtlList<CString> sl2;
-			Explode(sl.GetNext(pos), sl2, '=', 2);
+			Explode(sl.GetNext(pos), sl2, L'=', 2);
 			m_cookie[sl2.GetHead()] = sl2.GetCount() == 2 ? sl2.GetTail() : _T("");
 		}
 	}
@@ -154,11 +154,11 @@ void CWebClientSocket::Header()
 					str += c;
 					if (c == '\n' || len == 1) {
 						CAtlList<CString> sl;
-						Explode(str, sl, '&');
+						Explode(str, sl, L'&');
 						POSITION pos = sl.GetHeadPosition();
 						while (pos) {
 							CAtlList<CString> sl2;
-							Explode(sl.GetNext(pos), sl2, '=', 2);
+							Explode(sl.GetNext(pos), sl2, L'=', 2);
 							if (sl2.GetCount() == 2) {
 								m_post[sl2.GetHead().MakeLower()] = UTF8To16(UrlDecode(TToA(sl2.GetTail())));
 							} else {
@@ -193,11 +193,11 @@ void CWebClientSocket::Header()
 			}
 
 			CAtlList<CString> sl;
-			Explode(m_query, sl, '&');
+			Explode(m_query, sl, L'&');
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
 				CAtlList<CString> sl2;
-				Explode(sl.GetNext(pos), sl2, '=', 2);
+				Explode(sl.GetNext(pos), sl2, L'=', 2);
 				if (sl2.GetCount() == 2) {
 					m_get[sl2.GetHead()] = UTF8To16(UrlDecode(TToA(sl2.GetTail())));
 				} else {

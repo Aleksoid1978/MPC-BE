@@ -2004,7 +2004,7 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
 				hMasterWnd = (HWND)IntToPtr(_ttoi(cmdln.GetNext(pos)));
 			} else if (sw == _T("fixedsize") && pos) {
 				CAtlList<CString> sl;
-				Explode(cmdln.GetNext(pos), sl, ',', 2);
+				Explode(cmdln.GetNext(pos), sl, L',', 2);
 				if (sl.GetCount() == 2) {
 					sizeFixedWindow.SetSize(_ttol(sl.GetHead()), _ttol(sl.GetTail()));
 					if (sizeFixedWindow.cx > 0 && sizeFixedWindow.cy > 0) {

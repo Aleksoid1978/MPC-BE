@@ -23,9 +23,9 @@
 #include "MatroskaFile.h"
 #include <zlib/zlib.h>
 
-#define DOCTYPE			L"matroska"
-#define DOCTYPE_WEBM	L"webm"
-#define DOCTYPEVERSION	2
+#define DOCTYPE        "matroska"
+#define DOCTYPE_WEBM   "webm"
+#define DOCTYPEVERSION 2
 
 using namespace MatroskaReader;
 

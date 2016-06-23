@@ -425,7 +425,7 @@ void CPlaylistItem::AutoLoadFiles()
 		CAtlArray<CString> mask;
 		AfxGetAppSettings().m_Formats.GetAudioFilter(filter, mask);
 		CAtlList<CString> sl;
-		Explode(mask[0], sl, ';');
+		Explode(mask[0], sl, L';');
 
 		BOOL bExists = false;
 		POSITION pos = sl.GetHeadPosition();
@@ -1126,7 +1126,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 
 	while (f.ReadString(str)) {
 		CAtlList<CString> sl;
-		Explode(str, sl, ',', 3);
+		Explode(str, sl, L',', 3);
 		if (sl.GetCount() != 3) {
 			continue;
 		}
@@ -1352,7 +1352,7 @@ bool CPlayerPlaylistBar::ParseCUEPlayList(CString fn)
 			CAtlArray<CString> mask;
 			AfxGetAppSettings().m_Formats.GetAudioFilter(filter, mask);
 			CAtlList<CString> sl;
-			Explode(mask[0], sl, ';');
+			Explode(mask[0], sl, L';');
 
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {

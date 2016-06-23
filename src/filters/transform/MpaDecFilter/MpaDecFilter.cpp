@@ -2419,16 +2419,16 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 			infostr = L"Input: ";
 			bool enable_bitdeph = true;
 			if (subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
-				infostr += "DVD LPCM";
+				infostr += L"DVD LPCM";
 			}
 			else if (subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
-				infostr += "HDMV LPCM";
+				infostr += L"HDMV LPCM";
 			}
 			else if (subtype == MEDIASUBTYPE_PS2_PCM) {
-				infostr += "PS2 PCM";
+				infostr += L"PS2 PCM";
 			}
 			else if (subtype == MEDIASUBTYPE_PS2_ADPCM) {
-				infostr += "PS2 ADPCM";
+				infostr += L"PS2 ADPCM";
 			}
 			else if (subtype == MEDIASUBTYPE_PCM_NONE
 					|| subtype == MEDIASUBTYPE_PCM_RAW
@@ -2439,7 +2439,7 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 					|| subtype == MEDIASUBTYPE_PCM_FL32
 					|| subtype == MEDIASUBTYPE_PCM_FL64
 					|| subtype == MEDIASUBTYPE_IEEE_FLOAT) {
-				infostr += "PCM";
+				infostr += L"PCM";
 			}
 			else {
 				// bitstream ac3, eac3, dts, truehd, mlp
@@ -2525,7 +2525,7 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 						// wfeout samplerate, channels and bit depth is not actual
 					}
 					else if (wfexout->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP) {
-						infostr += " -> HDMI TrueHD";
+						infostr += L" -> HDMI TrueHD";
 						// wfeout samplerate, channels and bit depth is not actual
 					}
 					break;

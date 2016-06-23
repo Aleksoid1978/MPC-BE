@@ -206,7 +206,7 @@ bool CFGManager::CStreamPath::Compare(const CStreamPath& path)
 bool CFGManager::CheckBytes(HANDLE hFile, CString chkbytes)
 {
 	CAtlList<CString> sl;
-	Explode(chkbytes, sl, ',');
+	Explode(chkbytes, sl, L',');
 
 	if (sl.GetCount() < 4) {
 		return false;
@@ -262,7 +262,7 @@ bool CFGManager::CheckBytes(HANDLE hFile, CString chkbytes)
 bool CFGManager::CheckBytes(PBYTE buf, DWORD size, CString chkbytes)
 {
 	CAtlList<CString> sl;
-	Explode(chkbytes, sl, ',');
+	Explode(chkbytes, sl, L',');
 
 	if (sl.GetCount() < 4) {
 		return false;

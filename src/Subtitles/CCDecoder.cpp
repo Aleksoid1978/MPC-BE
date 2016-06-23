@@ -87,7 +87,7 @@ void CCDecoder::SaveDisp(__int64 time)
 			if (m_disp[row][col]) {
 				CStringW str2(&m_disp[row][col]);
 				if (fNonEmptyRow) {
-					str += ' ';
+					str += L' ';
 				}
 				str += str2;
 				col += str2.GetLength();
@@ -96,7 +96,7 @@ void CCDecoder::SaveDisp(__int64 time)
 		}
 
 		if (fNonEmptyRow) {
-			str += '\n';
+			str += L'\n';
 		}
 	}
 

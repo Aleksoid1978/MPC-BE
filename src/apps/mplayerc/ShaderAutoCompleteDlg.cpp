@@ -173,7 +173,7 @@ void CShaderAutoCompleteDlg::OnLbnSelchangeList1()
 		CString str, desc;
 		m_inst.GetNextAssoc(pos, str, desc);
 		CAtlList<CString> sl;
-		Explode(desc, sl, '|', 2);
+		Explode(desc, sl, L'|', 2);
 
 		if (sl.GetCount() != 2) {
 			return;

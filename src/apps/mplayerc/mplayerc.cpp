@@ -2309,7 +2309,7 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 					LOG2FILE(L"%s", fn);
 					LOG2FILE(L"Body:");
 					CAtlList<CString> sl;
-					Explode(body, sl, '\n');
+					Explode(body, sl, L'\n');
 					POSITION pos = sl.GetHeadPosition();
 					while (pos) {
 						CString& hdrline = sl.GetNext(pos);

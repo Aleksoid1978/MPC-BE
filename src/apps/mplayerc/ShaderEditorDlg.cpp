@@ -147,7 +147,7 @@ void CShaderEdit::OnUpdate()
 
 			if (key.Find(text) == 0) {
 				CAtlList<CString> sl;
-				Explode(value, sl, '|', 2);
+				Explode(value, sl, L'|', 2);
 				if (sl.GetCount() != 2) {
 					continue;
 				}

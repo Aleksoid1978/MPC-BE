@@ -41,18 +41,18 @@ CMPCSocket::CMPCSocket()
 			m_sProxyServer.ReleaseBufferSetLength(len);
 
 			CAtlList<CString> sl;
-			m_sProxyServer = Explode(m_sProxyServer, sl, ';');
+			m_sProxyServer = Explode(m_sProxyServer, sl, L';');
 			POSITION pos = sl.GetHeadPosition();
 			while (pos) {
 				CAtlList<CString> sl2;
-				if (!Explode(sl.GetNext(pos), sl2, '=', 2).CompareNoCase(L"http")
+				if (!Explode(sl.GetNext(pos), sl2, L'=', 2).CompareNoCase(L"http")
 						&& sl2.GetCount() == 2) {
 					m_sProxyServer = sl2.GetTail();
 					break;
 				}
 			}
 
-			m_sProxyServer = Explode(m_sProxyServer, sl, ':');
+			m_sProxyServer = Explode(m_sProxyServer, sl, L':');
 			if (sl.GetCount() > 1) {
 				m_nProxyPort = _tcstol(sl.GetTail(), NULL, 10);
 			}

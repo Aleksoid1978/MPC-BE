@@ -1002,15 +1002,15 @@ STDMETHODIMP CVobSubFileRipper::LoadParamFile(CString fn)
 
 			CAtlArray<vc_t>& angle = pgc.angles[pgc.iSelAngle];
 
-			if (line.Find('v') >= 0) {
+			if (line.Find(L'v') >= 0) {
 				int vob = 0, cell = 0;
 
-				line += ' ';
+				line += L' ';
 
 				TCHAR* s = (LPTSTR)(LPCTSTR)line;
 				TCHAR* e = s + line.GetLength();
 				while (s < e) {
-					if (*s == 'v' || s == e-1) {
+					if (*s == L'v' || s == e-1) {
 						s++;
 						if (vob != 0 && cell == 0) {
 							for (size_t i = 0; i < angle.GetCount(); i++) {
@@ -1022,7 +1022,7 @@ STDMETHODIMP CVobSubFileRipper::LoadParamFile(CString fn)
 
 						vob = _tcstol(s, &s, 10);
 						cell = 0;
-					} else if (*s == 'c' && vob > 0) {
+					} else if (*s == L'c' && vob > 0) {
 						s++;
 						cell = _tcstol(s, &s, 10);
 
@@ -1051,10 +1051,10 @@ STDMETHODIMP CVobSubFileRipper::LoadParamFile(CString fn)
 				m_rd.fClosedCaption = true;
 				phase = P_OPTIONS;
 			} else {
-				line += ' ';
+				line += L' ';
 
 				while (line.GetLength() > 0) {
-					int n = line.Find(_T(" "));
+					int n = line.Find(L' ');
 
 					CString lang = line.Left(n);
 

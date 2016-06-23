@@ -2215,14 +2215,14 @@ CString ISO6391ToLanguage(LPCSTR code)
 	_strlwr_s(tmp);
 	for (ptrdiff_t i = 0, j = _countof(s_isolangs); i < j; i++)
 		if (!strcmp(s_isolangs[i].iso6391, tmp)) {
-			CString ret = CString(CStringA(s_isolangs[i].name));
+			CStringA ret(s_isolangs[i].name);
 			int i = ret.Find(';');
 			if (i > 0) {
 				ret = ret.Left(i);
 			}
-			return ret;
+			return CString(ret);
 		}
-	return _T("");
+	return L"";
 }
 
 CString ISO6392ToLanguage(LPCSTR code)
@@ -2233,12 +2233,12 @@ CString ISO6392ToLanguage(LPCSTR code)
 	_strlwr_s(tmp);
 	for (ptrdiff_t i = 0, j = _countof(s_isolangs); i < j; i++) {
 		if (!strcmp(s_isolangs[i].iso6392, tmp)) {
-			CString ret = CString(CStringA(s_isolangs[i].name));
+			CStringA ret(s_isolangs[i].name);
 			int i = ret.Find(';');
 			if (i > 0) {
 				ret = ret.Left(i);
 			}
-			return ret;
+			return CString(ret);
 		}
 	}
 	return CString(code);
@@ -2326,9 +2326,9 @@ CString ISO6391To6392(LPCSTR code)
 	_strlwr_s(tmp);
 	for (ptrdiff_t i = 0, j = _countof(s_isolangs); i < j; i++)
 		if (!strcmp(s_isolangs[i].iso6391, tmp)) {
-			return CString(CStringA(s_isolangs[i].iso6392));
+			return CString(s_isolangs[i].iso6392);
 		}
-	return _T("");
+	return L"";
 }
 
 CString ISO6392To6391(LPCSTR code)
@@ -2339,9 +2339,9 @@ CString ISO6392To6391(LPCSTR code)
 	_strlwr_s(tmp);
 	for (ptrdiff_t i = 0, j = _countof(s_isolangs); i < j; i++)
 		if (!strcmp(s_isolangs[i].iso6392, tmp)) {
-			return CString(CStringA(s_isolangs[i].iso6391));
+			return CString(s_isolangs[i].iso6391);
 		}
-	return _T("");
+	return L"";
 }
 
 CString LanguageToISO6392(LPCTSTR lang)
@@ -2350,7 +2350,7 @@ CString LanguageToISO6392(LPCTSTR lang)
 	str.MakeLower();
 	for (ptrdiff_t i = 0, j = _countof(s_isolangs); i < j; i++) {
 		CAtlList<CString> sl;
-		Explode(CString(s_isolangs[i].name), sl, ';');
+		Explode(CString(s_isolangs[i].name), sl, L';');
 		POSITION pos = sl.GetHeadPosition();
 		while (pos) {
 			if (!str.CompareNoCase(sl.GetNext(pos))) {
@@ -2358,7 +2358,7 @@ CString LanguageToISO6392(LPCTSTR lang)
 			}
 		}
 	}
-	return _T("");
+	return L"";
 }
 
 int MakeAACInitData(BYTE* pData, int profile, int freq, int channels)

@@ -100,7 +100,7 @@ BOOL CAuthDlg::OnInitDialog()
 			p += str.GetLength()+1;
 			len -= str.GetLength()+1;
 			CAtlList<CString> sl;
-			Explode(str, sl, '=', 2);
+			Explode(str, sl, L'=', 2);
 
 			if (sl.GetCount() == 2) {
 				m_logins[sl.GetHead()] = DEncrypt(sl.GetTail());

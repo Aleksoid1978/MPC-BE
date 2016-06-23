@@ -201,7 +201,7 @@ public:
 
 	virtual void OutputWinDebugString(const char *str) {
 		if (m_File) {
-			_ftprintf_s(m_File, _T("%s : %s"), GetLocalTime(), CString(str));
+			_ftprintf_s(m_File, _T("%s : %S"), GetLocalTime(), str);
 		}
 	};
 };

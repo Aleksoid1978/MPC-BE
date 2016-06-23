@@ -1826,25 +1826,25 @@ void CBaseAP::DrawStats()
 			strText = L"Settings     : ";
 
 			if (m_bIsFullscreen) {
-				strText += "D3DFS ";
+				strText += L"D3DFS ";
 			}
 			if (rs.m_AdvRendSets.bDisableDesktopComposition) {
-				strText += "DisDC ";
+				strText += L"DisDC ";
 			}
 			if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
-				strText += "SyncVideo ";
+				strText += L"SyncVideo ";
 			} else if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_DISPLAY) {
-				strText += "SyncDisplay ";
+				strText += L"SyncDisplay ";
 			} else if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_NEAREST) {
-				strText += "SyncNearest ";
+				strText += L"SyncNearest ";
 			}
 			if (m_b10BitOutput) {
-				strText += "10 bit ";
+				strText += L"10 bit ";
 			}
 			if (rs.m_AdvRendSets.iEVROutputRange == 0) {
-				strText += "0-255 ";
+				strText += L"0-255 ";
 			} else if (rs.m_AdvRendSets.iEVROutputRange == 1) {
-				strText += "16-235 ";
+				strText += L"16-235 ";
 			}
 
 			DrawText(rc, strText, 1);

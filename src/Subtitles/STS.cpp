@@ -267,12 +267,12 @@ static int FindChar(CStringW str, WCHAR c, int pos, bool fUnicode, int CharSet)
 			}
 		}
 
-		if (c2 == '{') {
+		if (c2 == L'{') {
 			fStyleMod++;
 		} else if (fStyleMod > 0) {
-			if (c2 == '}') {
+			if (c2 == L'}') {
 				fStyleMod--;
-			} else if (c2 == 'e' && i >= 3 && i < j-1 && str.Mid(i-2, 3) == L"\\fe") {
+			} else if (c2 == L'e' && i >= 3 && i < j-1 && str.Mid(i-2, 3) == L"\\fe") {
 				CharSet = 0;
 				for (k = i+1; _istdigit(str[k]); k++) {
 					CharSet = CharSet*10 + (str[k] - '0');
@@ -305,7 +305,7 @@ static CStringW ToMBCS(CStringW str, DWORD CharSet)
 				ret += (WCHAR)(BYTE)c[k];
 			}
 		} else {
-			ret += '?';
+			ret += L'?';
 		}
 	}
 
@@ -319,12 +319,12 @@ static CStringW UnicodeSSAToMBCS(CStringW str, DWORD CharSet)
 	int OrgCharSet = CharSet;
 
 	for (int j = 0; j < str.GetLength(); ) {
-		j = str.Find('{', j);
+		j = str.Find(L'{', j);
 		if (j >= 0) {
 			ret += ToMBCS(str.Left(j), CharSet);
 			str = str.Mid(j);
 
-			j = str.Find('}');
+			j = str.Find(L'}');
 			if (j < 0) {
 				ret += ToMBCS(str, CharSet);
 				break;
@@ -393,13 +393,13 @@ static CStringW MBCSSSAToUnicode(CStringW str, int CharSet)
 	int OrgCharSet = CharSet;
 
 	for (int j = 0; j < str.GetLength(); ) {
-		j = FindChar(str, '{', 0, false, CharSet);
+		j = FindChar(str, L'{', 0, false, CharSet);
 
 		if (j >= 0) {
 			ret += ToUnicode(str.Left(j), CharSet);
 			str = str.Mid(j);
 
-			j = FindChar(str, '}', 0, false, CharSet);
+			j = FindChar(str, L'}', 0, false, CharSet);
 
 			if (j < 0) {
 				ret += ToUnicode(str, CharSet);
@@ -438,10 +438,10 @@ static CStringW RemoveSSATags(CStringW str, bool fUnicode, int CharSet)
 	str.Replace (L"{\\i}", L"</i>");
 
 	for (int i = 0, j; i < str.GetLength(); ) {
-		if ((i = FindChar(str, '{', i, fUnicode, CharSet)) < 0) {
+		if ((i = FindChar(str, L'{', i, fUnicode, CharSet)) < 0) {
 			break;
 		}
-		if ((j = FindChar(str, '}', i, fUnicode, CharSet)) < 0) {
+		if ((j = FindChar(str, L'}', i, fUnicode, CharSet)) < 0) {
 			break;
 		}
 		str.Delete(i, j-i+1);
@@ -514,7 +514,7 @@ static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 					break;
 				}
 
-				str += tmp + '\n';
+				str += tmp + L'\n';
 			}
 
 			ret.Add(
@@ -544,10 +544,10 @@ static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int Char
 		}
 
 		for (int i = 0; i < buff.GetLength(); i++) {
-			if ((i = FindChar(buff, '|', i, file->IsUnicode(), CharSet)) < 0) {
+			if ((i = FindChar(buff, L'|', i, file->IsUnicode(), CharSet)) < 0) {
 				break;
 			}
-			buff.SetAt(i, '\n');
+			buff.SetAt(i, L'\n');
 		}
 
 		int hh1, mm1, ss1, hh2, mm2, ss2;
@@ -555,7 +555,7 @@ static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int Char
 
 		if (c == 6) {
 			ret.Add(
-				buff.Mid(buff.Find('}', buff.Find('}')+1)+1),
+				buff.Mid(buff.Find(L'}', buff.Find(L'}')+1)+1),
 				file->IsUnicode(),
 				(((hh1*60 + mm1)*60) + ss1)*1000,
 				(((hh2*60 + mm2)*60) + ss2)*1000);
@@ -584,7 +584,7 @@ static CString WebVTT2SSA(CString str, int CharSet)
 		for (;;) {
 			pos = str.Find(tags2remove[i]);
 			if (pos >= 0) {
-				end = str.Find(L">", pos);
+				end = str.Find(L'>', pos);
 				if (end > pos) {
 					str.Delete(pos, end - pos + 1);
 				} else {
@@ -640,7 +640,7 @@ static bool OpenWebVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 					break;
 				}
 
-				subStr += tmp + '\n';
+				subStr += tmp + L'\n';
 			}
 
 			ret.Add(
@@ -672,9 +672,9 @@ static bool OpenSubViewer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 			continue;
 		}
 
-		if (buff[0] == '[') {
-			for (int i = 0; i < buff.GetLength() && buff[i]== '['; ) {
-				int j = buff.Find(']', ++i);
+		if (buff[0] == L'[') {
+			for (int i = 0; i < buff.GetLength() && buff[i]== L'['; ) {
+				int j = buff.Find(L']', ++i);
 				if (j < i) {
 					break;
 				}
@@ -685,7 +685,7 @@ static bool OpenSubViewer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 
 				i += j-i;
 
-				j = buff.Find('[', ++i);
+				j = buff.Find(L'[', ++i);
 				if (j < 0) {
 					j = buff.GetLength();
 				}
@@ -774,7 +774,7 @@ static STSStyle* GetMicroDVDStyle(CString str, int CharSet)
 	}
 
 	for (int i = 0, len = str.GetLength(); i < len; i++) {
-		int j = str.Find('{', i);
+		int j = str.Find(L'{', i);
 		if (j < 0) {
 			j = len;
 		}
@@ -783,7 +783,7 @@ static STSStyle* GetMicroDVDStyle(CString str, int CharSet)
 			break;
 		}
 
-		int k = str.Find('}', j);
+		int k = str.Find(L'}', j);
 		if (k < 0) {
 			k = len;
 		}
@@ -806,16 +806,16 @@ static STSStyle* GetMicroDVDStyle(CString str, int CharSet)
 			_stscanf_s(code, _T("{h:%d"), &ret->charSet);
 		} else if (!_tcsnicmp(code, _T("{y:"), 3)) {
 			code.MakeLower();
-			if (code.Find('b') >= 0) {
+			if (code.Find(L'b') >= 0) {
 				ret->fontWeight = FW_BOLD;
 			}
-			if (code.Find('i') >= 0) {
+			if (code.Find(L'i') >= 0) {
 				ret->fItalic = true;
 			}
-			if (code.Find('u') >= 0) {
+			if (code.Find(L'u') >= 0) {
 				ret->fUnderline = true;
 			}
-			if (code.Find('s') >= 0) {
+			if (code.Find(L's') >= 0) {
 				ret->fStrikeOut = true;
 			}
 		} else if (!_tcsnicmp(code, _T("{p:"), 3)) {
@@ -850,7 +850,7 @@ static CStringW MicroDVD2SSA(CStringW str, bool fUnicode, int CharSet)
 	memset(fRestore, 0, sizeof(bool)*fRestoreLen);
 
 	for (int pos = 0, eol; pos < str.GetLength(); pos++) {
-		if ((eol = FindChar(str, '|', pos, fUnicode, CharSet)) < 0) {
+		if ((eol = FindChar(str, L'|', pos, fUnicode, CharSet)) < 0) {
 			eol = str.GetLength();
 		}
 
@@ -859,7 +859,7 @@ static CStringW MicroDVD2SSA(CStringW str, bool fUnicode, int CharSet)
 		pos = eol;
 
 		for (int i = 0, j, k, len = line.GetLength(); i < len; i++) {
-			if ((j = FindChar(line, '{', i, fUnicode, CharSet)) < 0) {
+			if ((j = FindChar(line, L'{', i, fUnicode, CharSet)) < 0) {
 				j = str.GetLength();
 			}
 
@@ -869,7 +869,7 @@ static CStringW MicroDVD2SSA(CStringW str, bool fUnicode, int CharSet)
 				break;
 			}
 
-			if ((k = FindChar(line, '}', j, fUnicode, CharSet)) < 0) {
+			if ((k = FindChar(line, L'}', j, fUnicode, CharSet)) < 0) {
 				k = len;
 			}
 
@@ -910,24 +910,24 @@ static CStringW MicroDVD2SSA(CStringW str, bool fUnicode, int CharSet)
 
 					code.MakeLower();
 
-					ret += '{';
-					if (code.Find('b') >= 0) {
+					ret += L'{';
+					if (code.Find(L'b') >= 0) {
 						ret += L"\\b1";
 						fRestore[BOLD] = f;
 					}
-					if (code.Find('i') >= 0) {
+					if (code.Find(L'i') >= 0) {
 						ret += L"\\i1";
 						fRestore[ITALIC] = f;
 					}
-					if (code.Find('u') >= 0) {
+					if (code.Find(L'u') >= 0) {
 						ret += L"\\u1";
 						fRestore[UNDERLINE] = f;
 					}
-					if (code.Find('s') >= 0) {
+					if (code.Find(L's') >= 0) {
 						ret += L"\\s1";
 						fRestore[STRIKEOUT] = f;
 					}
-					ret += '}';
+					ret += L'}';
 				} else if (!_wcsnicmp(code, L"{o:", 3)) {
 					code.MakeLower();
 
@@ -1014,7 +1014,7 @@ static bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 
 		if (c != 2) {
 			int i;
-			if (buff.Find('{') == 0 && (i = buff.Find('}')) > 1 && i < buff.GetLength()) {
+			if (buff.Find(L'{') == 0 && (i = buff.Find(L'}')) > 1 && i < buff.GetLength()) {
 				if (STSStyle* s = GetMicroDVDStyle(buff.Mid(i+1), CharSet)) {
 					style = buff.Mid(1, i-1);
 					style.MakeUpper();
@@ -1038,7 +1038,7 @@ static bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 			}
 
 			ret.Add(
-				MicroDVD2SSA(buff.Mid(buff.Find('}', buff.Find('}')+1)+1), file->IsUnicode(), CharSet),
+				MicroDVD2SSA(buff.Mid(buff.Find(L'}', buff.Find(L'}')+1)+1), file->IsUnicode(), CharSet),
 				file->IsUnicode(),
 				start, end,
 				style);
@@ -1111,14 +1111,14 @@ static CStringW SMI2SSA(CStringW str, int CharSet)
 	// now parse line
 	for (int i = 0, j = str.GetLength(); i < j; ) {
 		int k;
-		if ((k = lstr.Find('<', i)) < 0) {
+		if ((k = lstr.Find(L'<', i)) < 0) {
 			break;
 		}
 
 		int chars_inserted = 0;
 
 		int l = 1;
-		for (; k+l < j && lstr[k+l] != '>'; l++) {
+		for (; k+l < j && lstr[k+l] != L'>'; l++) {
 			;
 		}
 		l++;
@@ -1128,8 +1128,8 @@ static CStringW SMI2SSA(CStringW str, int CharSet)
 			CStringW args = lstr.Mid(k+6, l-6);	// delete "<font "
 			CStringW arg ;
 
-			args.Remove('\"');
-			args.Remove('#');	// may include 2 * " + #
+			args.Remove(L'\"');
+			args.Remove(L'#');	// may include 2 * " + #
 			arg.TrimLeft();
 			arg.TrimRight(L" >");
 
@@ -1267,10 +1267,10 @@ static bool OpenVPlayer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 		}
 
 		for (int i = 0; i < buff.GetLength(); i++) {
-			if ((i = FindChar(buff, '|', i, file->IsUnicode(), CharSet)) < 0) {
+			if ((i = FindChar(buff, L'|', i, file->IsUnicode(), CharSet)) < 0) {
 				break;
 			}
-			buff.SetAt(i, '\n');
+			buff.SetAt(i, L'\n');
 		}
 
 		int hh, mm, ss;
@@ -1447,7 +1447,7 @@ static bool LoadUUEFont(CTextFile* file)
 		if (s.IsEmpty()) {
 			break;
 		}
-		if (s[0] == '[') { // check for some standatr blocks
+		if (s[0] == L'[') { // check for some standatr blocks
 			if (s.Find(_T("[Script Info]")) == 0) {
 				break;
 			}
@@ -1918,7 +1918,7 @@ static bool OpenMPL2(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 
 		if (c == 2) {
 			ret.Add(
-				MPL22SSA(buff.Mid(buff.Find(']', buff.Find(']')+1)+1), file->IsUnicode(), CharSet),
+				MPL22SSA(buff.Mid(buff.Find(L']', buff.Find(']')+1)+1), file->IsUnicode(), CharSet),
 				file->IsUnicode(),
 				start*100, end*100);
 		} else if (c != EOF) { // might be another format
@@ -2096,12 +2096,12 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, int start, int end, C
 		return;
 	}
 
-	str.Remove('\r');
+	str.Remove(L'\r');
 	str.Replace(L"\n", L"\\N");
 	if (style.IsEmpty()) {
 		style = _T("Default");
 	}
-	style.TrimLeft('*');
+	style.TrimLeft(L'*');
 
 	STSEntry sub;
 	sub.str = str;
@@ -3076,13 +3076,13 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, Subtitle::SubType type, double fps,
 		if (type ==Subtitle::SRT) {
 			str2.Format(fmt, i - k + 1, hh1, mm1, ss1, ms1, hh2, mm2, ss2, ms2, str);
 		} else if (type ==Subtitle::SUB) {
-			str.Replace('\n', '|');
+			str.Replace(L'\n', L'|');
 			str2.Format(fmt, int(t1 * fps / 1000), int(t2 * fps / 1000), str);
 		} else if (type ==Subtitle::SMI) {
 			str.Replace(L"\n", L"<br>");
 			str2.Format(fmt, t1, str, t2);
 		} else if (type ==Subtitle::PSB) {
-			str.Replace('\n', '|');
+			str.Replace(L'\n', L'|');
 			str2.Format(fmt, hh1, mm1, ss1, hh2, mm2, ss2, str);
 		} else if (type ==Subtitle::SSA) {
 			str.Replace(L"\n", L"\\N");
@@ -3264,7 +3264,7 @@ LOGFONTA& operator <<= (LOGFONTA& lfa, STSStyle& s)
 LOGFONTW& operator <<= (LOGFONTW& lfw, STSStyle& s)
 {
 	lfw.lfCharSet = s.charSet;
-	wcsncpy_s(lfw.lfFaceName, LF_FACESIZE, CStringW(s.fontName), _TRUNCATE);
+	wcsncpy_s(lfw.lfFaceName, LF_FACESIZE, s.fontName, _TRUNCATE);
 	HDC hDC = GetDC(0);
 	lfw.lfHeight = -MulDiv((int)(s.fontSize+0.5), GetDeviceCaps(hDC, LOGPIXELSY), 72);
 	ReleaseDC(0, hDC);

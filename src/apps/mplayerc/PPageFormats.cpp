@@ -860,9 +860,9 @@ void GetUnRegisterExts(CString saved_ext, CString new_ext, CAtlList<CString>& Un
 {
 	if (saved_ext.CompareNoCase(new_ext) != 0) {
 		CAtlList<CString> saved_exts;
-		Explode(saved_ext, saved_exts, ' ');
+		Explode(saved_ext, saved_exts, L' ');
 		CAtlList<CString> new_exts;
-		Explode(new_ext, new_exts, ' ');
+		Explode(new_ext, new_exts, L' ');
 
 		POSITION pos = saved_exts.GetHeadPosition();
 		while (pos) {
@@ -933,7 +933,7 @@ BOOL CPPageFormats::OnApply()
 			}
 
 			CAtlList<CString> exts;
-			Explode(mf[(int)m_list.GetItemData(i)].GetExtsWithPeriod(), exts, ' ');
+			Explode(mf[(int)m_list.GetItemData(i)].GetExtsWithPeriod(), exts, L' ');
 
 			POSITION pos = exts.GetHeadPosition();
 			while (pos) {

@@ -217,7 +217,7 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	m_url_str = lpszURL;
 	if (m_url.GetUrlPathLength() == 0) {
 		m_url.SetUrlPath(L"/");
-		m_url_str += '/';
+		m_url_str += L'/';
 	}
 
 	m_host    = m_url.GetHostName();

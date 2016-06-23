@@ -2320,10 +2320,10 @@ void CVobSubStream::Open(CString name, BYTE* pData, int len)
 	m_name = name;
 
 	CAtlList<CString> lines;
-	Explode(CString(CStringA((CHAR*)pData, len)), lines, '\n');
+	Explode(CString(CStringA((CHAR*)pData, len)), lines, L'\n');
 	while (lines.GetCount()) {
 		CAtlList<CString> sl;
-		Explode(lines.RemoveHead(), sl, ':', 2);
+		Explode(lines.RemoveHead(), sl, L':', 2);
 		if (sl.GetCount() != 2) {
 			continue;
 		}
@@ -2344,7 +2344,7 @@ void CVobSubStream::Open(CString name, BYTE* pData, int len)
 				value == _T("2") || value == _T("OLD") ? 2 :
 				0;
 		else if (key == _T("align")) {
-			Explode(value, sl, ' ');
+			Explode(value, sl, L' ');
 			if (sl.GetCount() == 4) {
 				sl.RemoveAt(sl.FindIndex(1));
 			}
@@ -2363,16 +2363,16 @@ void CVobSubStream::Open(CString name, BYTE* pData, int len)
 		} else if (key == _T("forced subs")) {
 			m_fOnlyShowForcedSubs = value == _T("1") || value == _T("ON");
 		} else if (key == _T("palette")) {
-			Explode(value, sl, ',', 16);
+			Explode(value, sl, L',', 16);
 			for (size_t i = 0; i < 16 && sl.GetCount(); i++) {
 				GETDWORD(&m_orgpal[i]) = _tcstol(sl.RemoveHead(), NULL, 16);
 			}
 		} else if (key == _T("custom colors")) {
-			m_fCustomPal = Explode(value, sl, ',', 3) == _T("ON");
+			m_fCustomPal = Explode(value, sl, L',', 3) == _T("ON");
 			if (sl.GetCount() == 3) {
 				sl.RemoveHead();
 				CAtlList<CString> tridx, colors;
-				Explode(sl.RemoveHead(), tridx, ':', 2);
+				Explode(sl.RemoveHead(), tridx, L':', 2);
 
 				int _tridx = 1;
 				if (tridx.RemoveHead() == _T("tridx")) {
@@ -2383,9 +2383,9 @@ void CVobSubStream::Open(CString name, BYTE* pData, int len)
 						_tridx |= ((tr[i]=='1')?1:0)<<i;
 					}
 				}
-				Explode(sl.RemoveHead(), colors, ':', 2);
+				Explode(sl.RemoveHead(), colors, L':', 2);
 				if (colors.RemoveHead() == _T("colors")) {
-					Explode(colors.RemoveHead(), colors, ',', 4);
+					Explode(colors.RemoveHead(), colors, L',', 4);
 
 					RGBQUAD pal[4];
 					for (size_t i = 0; i < 4 && colors.GetCount(); i++) {

@@ -119,7 +119,7 @@ HRESULT CPixelShaderCompiler::CompileShader(
 		ID3DBlob* pDisAsm;
 		hr = m_fnD3DDisassemble(pShader->GetBufferPointer(), pShader->GetBufferSize(), 0, NULL, &pDisAsm);
 		if (SUCCEEDED(hr) && pDisAsm) {
-			*disasm = CStringA((const char*)pDisAsm->GetBufferPointer());
+			*disasm = CString((LPCSTR)pDisAsm->GetBufferPointer());
 		}
 	}
 

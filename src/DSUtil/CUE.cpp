@@ -65,7 +65,7 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList, CString& T
 	Performer.Empty();
 
 	CAtlList<CString> cuelines;
-	Explode(cueData, cuelines, '\n');
+	Explode(cueData, cuelines, L'\n');
 
 	if (cuelines.GetCount() <= 1) {
 		return false;
