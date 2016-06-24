@@ -193,6 +193,87 @@ static CString ConvertStr(const char* S)
 	return str;
 }
 
+DWORD GetFourcc(AP4_VisualSampleEntry* vse)
+{
+	DWORD fourcc = -1;
+
+	AP4_Atom::Type type = vse->GetType();
+	CString tname = UTF8To16(vse->GetCompressorName());
+
+	switch (type) {
+	// RAW video
+	case AP4_ATOM_TYPE_RAW:
+		fourcc = BI_RGB;
+		break;
+	case AP4_ATOM_TYPE_2vuy:
+	case AP4_ATOM_TYPE_2Vuy:
+		fourcc = FCC('UYVY');
+		break;
+	case AP4_ATOM_TYPE_DVOO:
+	case AP4_ATOM_TYPE_yuvs:
+		fourcc = FCC('YUY2');
+		break;
+	case AP4_ATOM_TYPE_v410:
+		fourcc = FCC('V410');
+		break;
+	// DivX 3
+	case AP4_ATOM_TYPE_DIV3:
+	case AP4_ATOM_TYPE_3IVD:
+		fourcc = FCC('DIV3');
+		break;
+	// H.263
+	case AP4_ATOM_TYPE_H263:
+		if (tname == L"Sorenson H263") {
+			fourcc = FCC('FLV1');
+		} else {
+			fourcc = FCC('H263');
+		}
+	break;
+	// Motion-JPEG
+	case AP4_ATOM_TYPE_MJPG:
+	case AP4_ATOM_TYPE_AVDJ: // uncommon fourcc
+	case AP4_ATOM_TYPE_DMB1: // uncommon fourcc
+		fourcc = FCC('MJPG');
+		break;
+	// VC-1
+	case AP4_ATOM_TYPE_OVC1:
+	case AP4_ATOM_TYPE_VC1:
+		fourcc = FCC('WVC1');
+	// DV Video (http://msdn.microsoft.com/en-us/library/windows/desktop/dd388646%28v=vs.85%29.aspx)
+	case AP4_ATOM_TYPE_DVC:
+	case AP4_ATOM_TYPE_DVCP:
+		fourcc = FCC('dvsd'); // MEDIASUBTYPE_dvsd (DV Video Decoder, ffdshow, LAV)
+		break;
+	case AP4_ATOM_TYPE_DVPP:
+		fourcc = FCC('dv25'); // MEDIASUBTYPE_dv25 (ffdshow, LAV)
+		break;
+	case AP4_ATOM_TYPE_DV5N:
+	case AP4_ATOM_TYPE_DV5P:
+		fourcc = FCC('dv50'); // MEDIASUBTYPE_dv50 (ffdshow, LAV)
+		break;
+	case AP4_ATOM_TYPE_DVHQ:
+	case AP4_ATOM_TYPE_DVH5:
+	case AP4_ATOM_TYPE_DVH6:
+		fourcc = FCC('CDVH'); // MEDIASUBTYPE_CDVH (LAV)
+		break;
+	// MagicYUV
+	case AP4_ATOM_TYPE_M8RG:
+	case AP4_ATOM_TYPE_M8RA:
+	case AP4_ATOM_TYPE_M8G0:
+	case AP4_ATOM_TYPE_M8Y0:
+	case AP4_ATOM_TYPE_M8Y2:
+	case AP4_ATOM_TYPE_M8Y4:
+	case AP4_ATOM_TYPE_M8YA:
+		fourcc = FCC('MAGY');
+		break;
+	default:
+		fourcc = _byteswap_ulong(type);
+		break;
+	}
+
+	return fourcc;
+}
+
 HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
@@ -752,19 +833,14 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						continue; // Multiple fourcc, we skip first JPEG.
 					}
 
-					DWORD fourcc =
-						((type >> 24) & 0x000000ff) |
-						((type >>  8) & 0x0000ff00) |
-						((type <<  8) & 0x00ff0000) |
-						((type << 24) & 0xff000000);
-
 					if (AP4_VisualSampleEntry* vse = dynamic_cast<AP4_VisualSampleEntry*>(atom)) {
+						const DWORD fourcc = GetFourcc(vse);
 						AP4_DataBuffer* pData = (AP4_DataBuffer*)&db;
 
 						char buff[5] = { 0 };
 						memcpy(buff, &fourcc, 4);
-
 						CString tname = UTF8To16(vse->GetCompressorName());
+
 						if ((buff[0] == 'x' || buff[0] == 'h') && buff[1] == 'd') {
 							// Apple HDV/XDCAM
 							FormatTrackName(_T("HDV/XDV MPEG2"), 0);
@@ -778,7 +854,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							mts.Add(mt);
 
 							break;
-						} else if (type == AP4_ATOM_TYPE_MJPA || type == AP4_ATOM_TYPE_MJPB || type == AP4_ATOM_TYPE_MJPG) {
+						} else if (type == AP4_ATOM_TYPE_MJPA || type == AP4_ATOM_TYPE_MJPB || fourcc == FCC('MJPG')) {
 							FormatTrackName(_T("M-Jpeg"), 1);
 						} else if (type == AP4_ATOM_TYPE_MJP2) {
 							FormatTrackName(_T("M-Jpeg 2000"), 1);
@@ -794,16 +870,11 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							FormatTrackName(_T("Sorenson"), 0);
 						} else if (type == AP4_ATOM_TYPE_CVID) {
 							FormatTrackName(_T("Cinepack"), 0);
-						} else if (type == AP4_ATOM_TYPE_OVC1 || type == AP4_ATOM_TYPE_VC1) {
-							fourcc = FCC('WVC1');
+						} else if (fourcc == FCC('WVC1')) {
 							FormatTrackName(_T("VC-1"), 0);
 							if (AP4_Dvc1Atom* Dvc1 = dynamic_cast<AP4_Dvc1Atom*>(vse->GetChild(AP4_ATOM_TYPE_DVC1))) {
 								pData = (AP4_DataBuffer*)Dvc1->GetDecoderInfo();
 							}
-						} else if (type == AP4_ATOM_TYPE_RAW) {
-							fourcc = BI_RGB;
-						} else if (type == AP4_ATOM_TYPE_H263 && !wcsncmp(tname, L"Sorenson H263", 13)) {
-							fourcc = FCC('FLV1');
 						}
 
 						AP4_Size ExtraSize = pData->GetDataSize();
@@ -868,8 +939,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						_strlwr_s(buff);
-						AP4_Atom::Type typelwr = *(AP4_Atom::Type*)buff;
-
+						DWORD typelwr = GETDWORD(buff);
 						if (typelwr != fourcc) {
 							mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = typelwr);
 							mts.Add(mt);
@@ -877,8 +947,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						_strupr_s(buff);
-						AP4_Atom::Type typeupr = *(AP4_Atom::Type*)buff;
-
+						DWORD typeupr = GETDWORD(buff);
 						if (typeupr != fourcc) {
 							mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = typeupr);
 							mts.Add(mt);
@@ -891,6 +960,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						break;
 					} else if (AP4_AudioSampleEntry* ase = dynamic_cast<AP4_AudioSampleEntry*>(atom)) {
+						DWORD fourcc        = _byteswap_ulong(ase->GetType());
 						DWORD samplerate    = ase->GetSampleRate();
 						WORD  channels      = ase->GetChannelCount();
 						WORD  bitspersample = ase->GetSampleSize();
@@ -1105,7 +1175,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						break;
 					} else {
-						TRACE(_T("Unknow MP4 Stream %x\n") , fourcc);
+						TRACE(_T("Unknow MP4 Stream %x\n") , type);
 					}
 				}
 			}

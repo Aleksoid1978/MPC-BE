@@ -465,8 +465,6 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_IV32:
         case AP4_ATOM_TYPE_IV41:
         case AP4_ATOM_TYPE_VP31:
-        case AP4_ATOM_TYPE_yv12:
-        case AP4_ATOM_TYPE_yuv2:
 
         case AP4_ATOM_TYPE_HDV1:
         case AP4_ATOM_TYPE_HDV2:
@@ -507,71 +505,52 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_XD5F:
 
         case AP4_ATOM_TYPE_XDHD:
-        case AP4_ATOM_TYPE_APCN:
-        case AP4_ATOM_TYPE_APCH:
-        case AP4_ATOM_TYPE_APCO:
-        case AP4_ATOM_TYPE_APCS:
-        case AP4_ATOM_TYPE_AP4H:
-        case AP4_ATOM_TYPE_V210:
-        case AP4_ATOM_TYPE_v210:
-        case AP4_ATOM_TYPE_v308:
-        case AP4_ATOM_TYPE_v408:
+
         case AP4_ATOM_TYPE_ICOD:
         case AP4_ATOM_TYPE_AVdn:
         case AP4_ATOM_TYPE_FFV1:
-        case AP4_ATOM_TYPE_R10g:
-        case AP4_ATOM_TYPE_R10k:
         case AP4_ATOM_TYPE_OVC1:
         case AP4_ATOM_TYPE_VC1:
         case AP4_ATOM_TYPE_WMV1:
         case AP4_ATOM_TYPE_CUVC:
         case AP4_ATOM_TYPE_CHQX:
         case AP4_ATOM_TYPE_CFHD:
-            atom = new AP4_VisualSampleEntry(type, size, stream, *this);
-            break;
-
         case AP4_ATOM_TYPE_DIV3:
         case AP4_ATOM_TYPE_3IVD:
-            atom = new AP4_VisualSampleEntry(AP4_ATOM_TYPE_DIV3, size, stream, *this);
-            break;
-
+        // RAW Video
+        case AP4_ATOM_TYPE_R10g:
+        case AP4_ATOM_TYPE_R10k:
+        case AP4_ATOM_TYPE_V210:
+        case AP4_ATOM_TYPE_v210:
+        case AP4_ATOM_TYPE_v308:
+        case AP4_ATOM_TYPE_v408:
+        case AP4_ATOM_TYPE_2vuy:
+        case AP4_ATOM_TYPE_2Vuy:
+        case AP4_ATOM_TYPE_DVOO:
+        case AP4_ATOM_TYPE_yuvs:
         case AP4_ATOM_TYPE_v410:
-            atom = new AP4_VisualSampleEntry(AP4_ATOM_TYPE('V','4','1','0'), size, stream, *this);
-            break;
-
+        case AP4_ATOM_TYPE_yv12:
+        case AP4_ATOM_TYPE_yuv2:
+        // Apple ProRes
+        case AP4_ATOM_TYPE_APCN:
+        case AP4_ATOM_TYPE_APCH:
+        case AP4_ATOM_TYPE_APCO:
+        case AP4_ATOM_TYPE_APCS:
+        case AP4_ATOM_TYPE_AP4H:
+        // Motion-JPEG
         case AP4_ATOM_TYPE_MJPG:
-        case AP4_ATOM_TYPE_AVDJ: // uncommon fourcc
-        case AP4_ATOM_TYPE_DMB1: // uncommon fourcc
-            atom = new AP4_VisualSampleEntry(AP4_ATOM_TYPE_MJPG, size, stream, *this);
-            break;
-
-        // DV Video Subtypes - http://msdn.microsoft.com/en-us/library/windows/desktop/dd388646%28v=vs.85%29.aspx
+        case AP4_ATOM_TYPE_AVDJ:
+        case AP4_ATOM_TYPE_DMB1:
+        // DV
         case AP4_ATOM_TYPE_DVC:
         case AP4_ATOM_TYPE_DVCP:
-            atom = new AP4_VisualSampleEntry(AP4_ATOM_TYPE('d','v','s','d'), size, stream, *this); // MEDIASUBTYPE_dvsd (DV Video Decoder, ffdshow, LAV)
-            break;
         case AP4_ATOM_TYPE_DVPP:
-            atom = new AP4_VisualSampleEntry(AP4_ATOM_TYPE('d','v','2','5'), size, stream, *this); // MEDIASUBTYPE_dv25 (ffdshow, LAV)
-            break;
         case AP4_ATOM_TYPE_DV5N:
         case AP4_ATOM_TYPE_DV5P:
-            atom = new AP4_VisualSampleEntry(AP4_ATOM_TYPE('d','v','5','0'), size, stream, *this); // MEDIASUBTYPE_dv50 (ffdshow, LAV)
-            break;
         case AP4_ATOM_TYPE_DVHQ:
         case AP4_ATOM_TYPE_DVH5:
         case AP4_ATOM_TYPE_DVH6:
-            atom = new AP4_VisualSampleEntry(AP4_ATOM_TYPE('C','D','V','H'), size, stream, *this); // MEDIASUBTYPE_CDVH (LAV)
-            break;
-
-        case AP4_ATOM_TYPE_2vuy:
-        case AP4_ATOM_TYPE_2Vuy:
-            atom = new AP4_VisualSampleEntry(AP4_ATOM_TYPE('U','Y','V','Y'), size, stream, *this); // = 'UYVY'
-            break;
-        case AP4_ATOM_TYPE_DVOO:
-        case AP4_ATOM_TYPE_yuvs:
-            atom = new AP4_VisualSampleEntry(AP4_ATOM_TYPE('Y','U','Y','2'), size, stream, *this); // = 'YUY2'
-            break;
-
+        // MagicYUV
         case AP4_ATOM_TYPE_M8RG:
         case AP4_ATOM_TYPE_M8RA:
         case AP4_ATOM_TYPE_M8G0:
@@ -579,7 +558,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_M8Y2:
         case AP4_ATOM_TYPE_M8Y4:
         case AP4_ATOM_TYPE_M8YA:
-            atom = new AP4_VisualSampleEntry(AP4_ATOM_TYPE('M','A','G','Y'), size, stream, *this); // MEDIASUBTYPE_MagicYUV (need tests)
+            atom = new AP4_VisualSampleEntry(type, size, stream, *this);
             break;
 
         case AP4_ATOM_TYPE_SAMR:
