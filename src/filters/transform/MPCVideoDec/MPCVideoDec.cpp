@@ -3524,7 +3524,11 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 						for (int i = 0; i < desc->nb_components; i++) {
 							bidepth += desc->comp[i].depth;
 						}
-						infostr.AppendFormat(_T(", RGB%d"), bidepth);
+						if (desc->flags & AV_PIX_FMT_FLAG_ALPHA) {
+							infostr.AppendFormat(_T(", ARGB%d"), bidepth);
+						} else {
+							infostr.AppendFormat(_T(", RGB%d"), bidepth);
+						}
 					}
 					else if (desc->nb_components == 0) {
 						// unknown
