@@ -449,9 +449,9 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	{
 		// Filters Priority
 		CAppSettings& s = AfxGetAppSettings();
-		CMediaFormatCategory* mfc = AfxGetAppSettings().m_Formats.FindMediaByExt(ext);
-		if (mfc) {
-			CString type = mfc->GetLabel();
+		CMediaFormatCategory* mfc = s.m_Formats.FindMediaByExt(ext);
+		if (mfc || httpbufSize) {
+			CString type = httpbufSize ? L"http" : mfc->GetLabel();
 			CLSID clsid_value = CLSID_NULL;
 			if (s.FiltersPrioritySettings.values.Lookup(type, clsid_value) && clsid_value != CLSID_NULL) {
 				POSITION pos = m_override.GetHeadPosition();
@@ -459,12 +459,12 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 					CFGFilter* pFGF = m_override.GetNext(pos);
 					if (pFGF->GetCLSID() == clsid_value) {
 						const CAtlList<GUID>& types = pFGF->GetTypes();
-						if (types.GetCount()) {
+						if (types.GetCount() && !httpbufSize) {
 							bool bIsSplitter = false;
 							POSITION pos = types.GetHeadPosition();
 							while (pos) {
-								CLSID major	= types.GetNext(pos);
-								CLSID sub	= types.GetNext(pos);
+								CLSID major = types.GetNext(pos);
+								CLSID sub   = types.GetNext(pos);
 
 								if (major == MEDIATYPE_Stream) {
 									bIsSplitter = true;

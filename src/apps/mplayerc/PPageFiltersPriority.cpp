@@ -60,8 +60,6 @@ BOOL CPPageFiltersPriority::OnInitDialog()
 	__super::OnInitDialog();
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
-	GetDlgItem(IDC_STATIC1)->EnableWindow(FALSE);
-	m_HTTP.EnableWindow(FALSE);
 
 	Init();
 
@@ -77,6 +75,10 @@ BOOL CPPageFiltersPriority::OnApply()
 	CAppSettings& s = AfxGetAppSettings();
 
 	s.FiltersPrioritySettings.SetDefault();
+	if (POSITION pos = (POSITION)m_HTTP.GetItemDataPtr(m_HTTP.GetCurSel())) {
+		s.FiltersPrioritySettings.values[_T("http")] = m_pFilters.GetAt(pos)->clsid;
+	}
+
 	if (POSITION pos = (POSITION)m_AVI.GetItemDataPtr(m_AVI.GetCurSel())) {
 		s.FiltersPrioritySettings.values[_T("avi")] = m_pFilters.GetAt(pos)->clsid;
 	}
@@ -144,12 +146,11 @@ void CPPageFiltersPriority::Init()
 	while (pos) {
 		CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_filters.GetNext(pos)));
 
-		CString name;
-
 		if (f->iLoadType == FilterOverride::BLOCK) {
 			continue;
 		}
 
+		CString name;
 		if (f->type == FilterOverride::REGISTERED) {
 			name = CFGFilterRegistry(f->dispname).GetName();
 			if (name.IsEmpty()) {
@@ -172,13 +173,13 @@ void CPPageFiltersPriority::Init()
 
 		CAtlList<CLSID> CLSID_List;
 
-		bool bIsSource		= (f->guids.GetCount() == 0);
-		bool bIsSplitter	= false;
+		const bool bIsSource = (f->guids.GetCount() == 0);
+		bool bIsSplitter     = false;
 		if (!bIsSource) {
 			POSITION pos = f->guids.GetHeadPosition();
 			while (pos) {
-				CLSID major	= f->guids.GetNext(pos);
-				CLSID sub	= f->guids.GetNext(pos);
+				CLSID major = f->guids.GetNext(pos);
+				CLSID sub   = f->guids.GetNext(pos);
 
 				if (major == MEDIATYPE_Stream) {
 					bIsSplitter = true;
@@ -195,6 +196,14 @@ void CPPageFiltersPriority::Init()
 
 		CLSID clsid = f->clsid;
 		POSITION pos2 = m_pFilters.AddTail(f);
+
+		if (bIsSource) {
+			int i = m_HTTP.AddString(name);
+			m_HTTP.SetItemDataPtr(i, pos2);
+			if (s.FiltersPrioritySettings.values[_T("http")] == clsid) {
+				m_HTTP.SetCurSel(i);
+			}
+		}
 
 		if (CLSID_List.Find(MEDIASUBTYPE_Avi) || CLSID_List.Find(MEDIASUBTYPE_NULL)) {
 			int i = m_AVI.AddString(name);
