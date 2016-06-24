@@ -46,7 +46,7 @@ AP4_File::AP4_File(AP4_Movie* movie) :
 /*----------------------------------------------------------------------
 |       AP4_File::AP4_File
 +---------------------------------------------------------------------*/
-AP4_File::AP4_File(AP4_ByteStream& stream, AP4_AtomFactory& atom_factory) :
+AP4_File::AP4_File(AP4_ByteStream& stream, bool bURL, AP4_AtomFactory& atom_factory) :
     m_Movie(NULL)
 {
     // get all atoms
@@ -58,6 +58,14 @@ AP4_File::AP4_File(AP4_ByteStream& stream, AP4_AtomFactory& atom_factory) :
                                         stream);
                 break;
             case AP4_ATOM_TYPE_MOOF:
+                if (bURL) {
+                    if (m_Movie) {
+                        delete m_Movie;
+                        m_Movie = NULL;
+                    }
+                    m_OtherAtoms.DeleteReferences();
+                    return;
+                }
                 if (m_Movie) {
                     m_Movie->ProcessMoof(AP4_DYNAMIC_CAST(AP4_ContainerAtom, atom),
                                          stream);

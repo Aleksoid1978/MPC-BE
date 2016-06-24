@@ -84,10 +84,10 @@ public:
 	UINT64 BitRead(int nBits, bool fPeek = false);
 	HRESULT ByteRead(BYTE* pData, __int64 len);
 
-	bool IsStreaming() const { return m_fmode == FM_STREAM; }
+	bool IsStreaming()    const { return m_fmode == FM_STREAM; }
 	bool IsRandomAccess() const { return m_fmode == FM_FILE || m_fmode == FM_FILE_VAR; }
 	bool IsVariableSize() const { return m_fmode == FM_FILE_VAR; }
-	bool IsURL() const { return m_pSyncReader && m_pSyncReader->GetSourceType() == CAsyncFileReader::SourceType::HTTP; }
+	bool IsURL()          const { return m_pSyncReader && m_pSyncReader->GetSourceType() == CAsyncFileReader::SourceType::HTTP || !IsRandomAccess(); }
 
 	void SetBreakHandle(HANDLE hBreak) { m_hBreak = hBreak; }
 
