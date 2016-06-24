@@ -11749,8 +11749,21 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 						CAtlList<CString> fns;
 						fns.AddTail(fn);
 						m_wndPlaylistBar.Open(fns, false);
+
+						POSITION pos = m_wndPlaylistBar.m_pl.GetHeadPosition();
+						while (pos) {
+							auto& listItem = m_wndPlaylistBar.m_pl.GetNext(pos);
+							if (!listItem.m_fns.IsEmpty()) {
+								auto& item = listItem.m_fns.GetHead();
+								CString fn = item;
+								fn.Replace(L"/keepalive/yes/", L"/");
+
+								item = fn;
+							}
+						}
+
 						m_wndPlaylistBar.SetFirstSelected();
-						fn = m_wndPlaylistBar.GetCurFileName();
+						pOFD->fns.GetHead() = m_wndPlaylistBar.GetCurFileName();
 					}
 				}
 			}
