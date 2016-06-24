@@ -23,7 +23,6 @@
 #include "MainFrm.h"
 #include "SaveDlg.h"
 #include "../../filters/filters.h"
-#include "OpenImage.h"
 
 static unsigned int AdaptUnit(double& val, size_t unitsNb)
 {
@@ -75,12 +74,7 @@ HRESULT CSaveDlg::OnInit()
 {
 	m_TaskDlgHwnd = ::GetActiveWindow();
 
-	if (OpenImageCheck(m_in)) {
-		OpenImageDIB(m_in, m_out, AfxGetAppSettings().iThumbQuality, 0);
-		::SendMessage(m_TaskDlgHwnd, TDM_CLICK_BUTTON, static_cast<WPARAM>(TDCBF_CANCEL_BUTTON), 0);
-	}
-
-	return S_OK;
+	return __super::OnInit();
 }
 
 HRESULT CSaveDlg::InitFileCopy()
