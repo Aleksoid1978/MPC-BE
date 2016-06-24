@@ -218,12 +218,12 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 	REFERENCE_TIME rtVideoDuration = 0;
 
-	CSize videoSize(0, 0);
+	CSize videoSize;
 
-	int nRotation		= 0;
-	int ChapterTrackId	= INT_MIN;
+	int nRotation      = 0;
+	int ChapterTrackId = INT_MIN;
 
-	if (AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie()) {
+	if (AP4_Movie* movie = m_pFile->GetMovie()) {
 		// looking for main video track (skip tracks with motionless frames)
 		AP4_UI32 mainvideoID = 0;
 		for (AP4_List<AP4_Track>::Item* item = movie->GetTracks().FirstItem();
@@ -1340,7 +1340,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
 	if (m_pOutputs.GetCount()) {
-		AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie();
+		AP4_Movie* movie = m_pFile->GetMovie();
 
 		POSITION pos = m_trackpos.GetStartPosition();
 		while (pos) {
@@ -1366,7 +1366,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 bool CMP4SplitterFilter::DemuxInit()
 {
-	AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie();
+	AP4_Movie* movie = m_pFile->GetMovie();
 
 	POSITION pos = m_trackpos.GetStartPosition();
 	while (pos) {
@@ -1394,7 +1394,7 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		return;
 	}
 
-	AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie();
+	AP4_Movie* movie = m_pFile->GetMovie();
 
 	POSITION pos = m_trackpos.GetStartPosition();
 	while (pos) {
@@ -1424,7 +1424,7 @@ bool CMP4SplitterFilter::DemuxLoop()
 	HRESULT hr = S_OK;
 
 	m_pFile->Seek(0);
-	AP4_Movie* movie = (AP4_Movie*)m_pFile->GetMovie();
+	AP4_Movie* movie = m_pFile->GetMovie();
 
 	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
 

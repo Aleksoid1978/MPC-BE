@@ -36,26 +36,26 @@ CMP4SplitterFile::CMP4SplitterFile(IAsyncReader* pReader, HRESULT& hr)
 
 CMP4SplitterFile::~CMP4SplitterFile()
 {
-	delete (AP4_File*)m_pAp4File;
+	delete m_pAp4File;
 }
 
-void* CMP4SplitterFile::GetMovie()
+AP4_Movie* CMP4SplitterFile::GetMovie()
 {
 	ASSERT(m_pAp4File);
-	return m_pAp4File ? ((AP4_File*)m_pAp4File)->GetMovie() : NULL;
+	return m_pAp4File ? m_pAp4File->GetMovie() : NULL;
 }
 
 HRESULT CMP4SplitterFile::Init()
 {
 	Seek(0);
 
-	delete (AP4_File*)m_pAp4File;
+	SAFE_DELETE(m_pAp4File);
 
 	AP4_ByteStream* stream = DNew AP4_AsyncReaderStream(this);
 
 	m_pAp4File = DNew AP4_File(*stream);
 
-	AP4_Movie* movie = ((AP4_File*)m_pAp4File)->GetMovie();
+	AP4_Movie* movie = m_pAp4File->GetMovie();
 
 	stream->Release();
 

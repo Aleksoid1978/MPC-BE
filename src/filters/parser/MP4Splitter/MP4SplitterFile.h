@@ -23,9 +23,12 @@
 
 #include "../BaseSplitter/BaseSplitter.h"
 
+class AP4_File;
+class AP4_Movie;
+
 class CMP4SplitterFile : public CBaseSplitterFileEx
 {
-	void* m_pAp4File;
+	AP4_File* m_pAp4File;
 
 	HRESULT Init();
 
@@ -33,5 +36,5 @@ public:
 	CMP4SplitterFile(IAsyncReader* pReader, HRESULT& hr);
 	virtual ~CMP4SplitterFile();
 
-	void* GetMovie();
+	AP4_Movie* GetMovie();
 };
