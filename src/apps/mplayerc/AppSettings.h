@@ -397,7 +397,7 @@ public:
 		SetDefault();
 	}
 	void SetDefault() {
-		static CString formats[] = {L"avi", L"mkv", L"mpegts", L"mpeg", L"mp4", L"flv", L"wmv"};
+		static CString formats[] = {L"http", L"avi", L"mkv", L"mpegts", L"mpeg", L"mp4", L"flv", L"wmv"};
 
 		values.RemoveAll();
 		for (size_t i = 0; i < _countof(formats); i++) {
