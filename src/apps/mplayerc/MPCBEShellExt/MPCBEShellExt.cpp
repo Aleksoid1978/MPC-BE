@@ -104,11 +104,10 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 
 static CString GetFileOnly(LPCTSTR Path)
 {
-	// Strip off the path and return just the filename part
-	CString temp = (LPCTSTR) Path; // Force CString to make a copy
-	::PathStripPath(temp.GetBuffer(0));
-	temp.ReleaseBuffer(-1);
-	return temp;
+	CString cs(Path);
+	::PathStripPath(cs.GetBuffer(0));
+	cs.ReleaseBuffer(-1);
+	return cs;
 }
 
 static CString GetKeyName()
@@ -148,7 +147,7 @@ static BOOL GetKeyValue(CString value)
 #define	IS_KEY_LEN 256
 STDAPI DllRegisterServer(void)
 {
-	OLECHAR	strWideCLSID[50];
+	OLECHAR	strWideCLSID[50] = { 0 };
 	HRESULT hr = _AtlModule.DllRegisterServer();
 
 	if (SUCCEEDED(hr)) {
@@ -170,7 +169,7 @@ STDAPI DllRegisterServer(void)
 				if (reg.Open(HKEY_CLASSES_ROOT, NULL, KEY_READ) == ERROR_SUCCESS) {
 					DWORD dwIndex = 0;
 					DWORD cbName = IS_KEY_LEN;
-					TCHAR szSubKeyName[IS_KEY_LEN];
+					TCHAR szSubKeyName[IS_KEY_LEN] = { 0 };
 					LONG lRet;
 
 					while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS) {
@@ -196,10 +195,11 @@ STDAPI DllRegisterServer(void)
 // DllUnregisterServer - Removes entries from the system registry
 STDAPI DllUnregisterServer(void)
 {
-	CRegKey		key;
 	HRESULT hr = _AtlModule.DllUnregisterServer();
 
 	if (SUCCEEDED(hr)) {
+		CRegKey key;
+
 		if (key.Open(HKEY_CLASSES_ROOT, L"directory\\shellex\\ContextMenuHandlers\\") == ERROR_SUCCESS) {
 			key.DeleteSubKey(L"MPCBEShellExt");
 		}
@@ -213,7 +213,7 @@ STDAPI DllUnregisterServer(void)
 		if (reg.Open(HKEY_CLASSES_ROOT, NULL, KEY_READ) == ERROR_SUCCESS) {
 			DWORD dwIndex = 0;
 			DWORD cbName = IS_KEY_LEN;
-			TCHAR szSubKeyName[IS_KEY_LEN];
+			TCHAR szSubKeyName[IS_KEY_LEN] = { 0 };
 			LONG lRet;
 
 			while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS) {
