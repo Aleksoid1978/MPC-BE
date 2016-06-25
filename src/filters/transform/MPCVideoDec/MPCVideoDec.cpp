@@ -3504,36 +3504,34 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 
 	switch (index) {
 		case INFO_MPCVersion:
-			infostr.Format(_T("v%s (build %d)"), _T(MPC_VERSION_STR), MPC_VERSION_REV);
+			infostr.Format(L"v%s (build %d)", _T(MPC_VERSION_STR), MPC_VERSION_REV);
 			break;
 		case INFO_InputFormat:
 			if (m_pAVCtx) {
 				infostr = m_pAVCtx->codec_descriptor->name;
 				if (const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)) {
 					if (desc->flags & AV_PIX_FMT_FLAG_PAL) {
-						infostr.Append(_T(", palettized RGB"));
+						infostr.Append(L", palettized RGB");
 					}
 					else if (desc->nb_components == 1 || desc->nb_components == 2) {
-						infostr.AppendFormat(_T(", Gray %d-bit"), GetLumaBits(m_pAVCtx->pix_fmt));
-					}
-					else if (desc->name && !strncmp(desc->name, "yuvj", 4)) {
-						infostr.AppendFormat(_T(", YUVJ %d-bit %s"), GetLumaBits(m_pAVCtx->pix_fmt), GetChromaSubsamplingStr(m_pAVCtx->pix_fmt));
+						infostr.AppendFormat(L", Gray %d-bit", GetLumaBits(m_pAVCtx->pix_fmt));
 					}
 					else if(desc->flags & AV_PIX_FMT_FLAG_RGB) {
 						int bidepth = 0;
 						for (int i = 0; i < desc->nb_components; i++) {
 							bidepth += desc->comp[i].depth;
 						}
-						if (desc->flags & AV_PIX_FMT_FLAG_ALPHA) {
-							infostr.AppendFormat(_T(", ARGB%d"), bidepth);
-						} else {
-							infostr.AppendFormat(_T(", RGB%d"), bidepth);
-						}
+						infostr.Append(desc->flags & AV_PIX_FMT_FLAG_ALPHA ? L", RGBA" : L", RGB");
+						infostr.AppendFormat(L" %dbpp", bidepth);
 					}
 					else if (desc->nb_components == 0) {
 						// unknown
 					} else {
-						infostr.AppendFormat(_T(", YUV %d-bit %s"), GetLumaBits(m_pAVCtx->pix_fmt), GetChromaSubsamplingStr(m_pAVCtx->pix_fmt));
+						infostr.Append(desc->flags & AV_PIX_FMT_FLAG_ALPHA ? L", YUVA" : L", YUV");
+						infostr.AppendFormat(L" %d-bit %s", GetLumaBits(m_pAVCtx->pix_fmt), GetChromaSubsamplingStr(m_pAVCtx->pix_fmt));
+						if (desc->name && !strncmp(desc->name, "yuvj", 4)) {
+							infostr.Append(L" full range");
+						}
 					}
 				}
 			}
