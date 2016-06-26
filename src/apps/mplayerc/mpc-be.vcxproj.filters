@@ -683,6 +683,9 @@
     <ClInclude Include="ItemPropertiesDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SmoothImageResampling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ani.avi">
