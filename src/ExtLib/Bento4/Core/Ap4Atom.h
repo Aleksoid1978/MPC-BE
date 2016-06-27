@@ -113,12 +113,10 @@ class AP4_Atom {
     virtual AP4_Size   GetSize() { return m_Size; }
     virtual AP4_Result Write(AP4_ByteStream& stream);
     virtual AP4_Result WriteHeader(AP4_ByteStream& stream);
-    virtual AP4_Result WriteFields(AP4_ByteStream& stream) = 0;
+    virtual AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
     virtual AP4_Result Inspect(AP4_AtomInspector& inspector);
     virtual AP4_Result InspectHeader(AP4_AtomInspector& inspector);
-    virtual AP4_Result InspectFields(AP4_AtomInspector& inspector) {
-        return AP4_SUCCESS; 
-    }
+    virtual AP4_Result InspectFields(AP4_AtomInspector& inspector) { return AP4_SUCCESS; }
 
     // parent/child realtionship methods
     virtual AP4_Result      SetParent(AP4_AtomParent* parent) {
@@ -454,6 +452,7 @@ const AP4_Atom::Type AP4_ATOM_TYPE_TRAF = AP4_ATOM_TYPE('t','r','a','f');
 const AP4_Atom::Type AP4_ATOM_TYPE_TFHD = AP4_ATOM_TYPE('t','f','h','d');
 const AP4_Atom::Type AP4_ATOM_TYPE_TFDT = AP4_ATOM_TYPE('t','f','d','t');
 const AP4_Atom::Type AP4_ATOM_TYPE_TRUN = AP4_ATOM_TYPE('t','r','u','n');
+const AP4_Atom::Type AP4_ATOM_TYPE_SIDX = AP4_ATOM_TYPE('s','i','d','x');
 
 /*----------------------------------------------------------------------
 |       AP4_AtomListInspector

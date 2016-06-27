@@ -906,18 +906,16 @@ namespace YoutubeParser {
 				fmt = L"3D WebM";
 				break;
 #endif
+			case YoutubeParser::ytype::y_webm_video_60fps:
+				fps = L"60";
 			case YoutubeParser::ytype::y_webm_video:
 				fmt = L"WebM";
 				break;
-			case YoutubeParser::ytype::y_webm_video_60fps:
-				fmt = L"WebM";
+			case YoutubeParser::ytype::y_dash_mp4_video_60fps:
 				fps = L"60";
-				break;
-#if ENABLE_YOUTUBE_DASH
 			case YoutubeParser::ytype::y_dash_mp4_video:
 				fmt = L"DASH MP4";
 				break;
-#endif
 		}
 
 		if (!fmt.IsEmpty()) {

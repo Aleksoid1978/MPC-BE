@@ -159,6 +159,7 @@
     <ClInclude Include="Core\Ap4SampleTable.h" />
     <ClInclude Include="Core\Ap4SchmAtom.h" />
     <ClInclude Include="Core\Ap4SdpAtom.h" />
+    <ClInclude Include="Core\Ap4SidxAtom.h" />
     <ClInclude Include="Core\Ap4SLConfigDescriptor.h" />
     <ClInclude Include="Core\Ap4SmhdAtom.h" />
     <ClInclude Include="Core\Ap4StcoAtom.h" />
@@ -239,6 +240,7 @@
     <ClCompile Include="Core\Ap4SampleTable.cpp" />
     <ClCompile Include="Core\Ap4SchmAtom.cpp" />
     <ClCompile Include="Core\Ap4SdpAtom.cpp" />
+    <ClCompile Include="Core\Ap4SidxAtom.cpp" />
     <ClCompile Include="Core\Ap4SLConfigDescriptor.cpp" />
     <ClCompile Include="Core\Ap4SmhdAtom.cpp" />
     <ClCompile Include="Core\Ap4StcoAtom.cpp" />

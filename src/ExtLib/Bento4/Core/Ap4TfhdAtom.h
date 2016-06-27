@@ -36,20 +36,17 @@ public:
     AP4_TfhdAtom(AP4_Size         size,
                  AP4_ByteStream&  stream);
 
-    virtual AP4_Result InspectFields(AP4_AtomInspector& inspector) { return AP4_FAILURE; }
-    virtual AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
-
-    AP4_UI32 GetTrackId()                                { return m_TrackId;                   }
+    AP4_UI32 GetTrackId() const                          { return m_TrackId;                   }
     void     SetTrackId(AP4_UI32 track_id)               { m_TrackId = track_id;               }
-    AP4_UI64 GetBaseDataOffset()                         { return m_BaseDataOffset;            }
+    AP4_UI64 GetBaseDataOffset() const                   { return m_BaseDataOffset;            }
     void     SetBaseDataOffset(AP4_UI64 offset)          { m_BaseDataOffset = offset;          }
-    AP4_UI32 GetSampleDescriptionIndex()                 { return m_SampleDescriptionIndex;    }
+    AP4_UI32 GetSampleDescriptionIndex() const           { return m_SampleDescriptionIndex;    }
     void     SetSampleDescriptionIndex(AP4_UI32 indx)    { m_SampleDescriptionIndex = indx;    }
-    AP4_UI32 GetDefaultSampleDuration()                  { return m_DefaultSampleDuration;     }
+    AP4_UI32 GetDefaultSampleDuration() const            { return m_DefaultSampleDuration;     }
     void     SetDefaultSampleDuration(AP4_UI32 duration) { m_DefaultSampleDuration = duration; }
-    AP4_UI32 GetDefaultSampleSize()                      { return m_DefaultSampleSize;         }
+    AP4_UI32 GetDefaultSampleSize() const                { return m_DefaultSampleSize;         }
     void     SetDefaultSampleSize(AP4_UI32 size)         { m_DefaultSampleSize = size;         }
-    AP4_UI32 GetDefaultSampleFlags()                     { return m_DefaultSampleFlags;        }
+    AP4_UI32 GetDefaultSampleFlags() const               { return m_DefaultSampleFlags;        }
     void     SetDefaultSampleFlags(AP4_UI32 flags)       { m_DefaultSampleFlags = flags;       }
 
 private:

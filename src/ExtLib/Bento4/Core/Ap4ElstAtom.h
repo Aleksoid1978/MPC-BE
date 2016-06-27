@@ -37,9 +37,6 @@ public:
     AP4_ElstAtom(AP4_Size         size,
                  AP4_ByteStream&  stream);
 
-    virtual AP4_Result InspectFields(AP4_AtomInspector& inspector) { return AP4_FAILURE; }
-    virtual AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
-
     AP4_Array<AP4_ElstEntry>& GetList() { return m_Entries; }
     AP4_UI64 GetDelay() const { return m_Delay; }
     AP4_UI64 GetStart() const { return m_Start; }

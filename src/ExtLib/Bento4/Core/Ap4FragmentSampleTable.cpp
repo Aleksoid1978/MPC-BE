@@ -2,7 +2,7 @@
 |
 |    AP4 - Fragment Sample Table
 |
-|    Copyright 2014 Aleksoid1978
+|    Copyright 2014-2016 Aleksoid1978
 |
  ****************************************************************/
 
@@ -187,4 +187,14 @@ AP4_FragmentSampleTable::GetSampleIndexForTimeStamp(AP4_SI64 ts, AP4_Ordinal& in
     }
 
     return AP4_FAILURE;
+}
+
+/*----------------------------------------------------------------------
+|       AP4_FragmentSampleTable::Clear
++---------------------------------------------------------------------*/
+void
+AP4_FragmentSampleTable::Clear()
+{
+    m_FragmentSamples.Clear();
+    m_Duration = 0;
 }

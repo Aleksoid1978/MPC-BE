@@ -25,14 +25,11 @@ public:
     AP4_TrexAtom(AP4_Size         size,
                  AP4_ByteStream&  stream);
 
-    virtual AP4_Result InspectFields(AP4_AtomInspector& inspector) { return AP4_FAILURE; }
-    virtual AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
-
-    AP4_UI32 GetTrackId()                       { return m_TrackId;                       }
-    AP4_UI32 GetDefaultSampleDescriptionIndex() { return m_DefaultSampleDescriptionIndex; }
-    AP4_UI32 GetDefaultSampleDuration()         { return m_DefaultSampleDuration;         }
-    AP4_UI32 GetDefaultSampleSize()             { return m_DefaultSampleSize;             }
-    AP4_UI32 GetDefaultSampleFlags()            { return m_DefaultSampleFlags;            }
+    AP4_UI32 GetTrackId() const                       { return m_TrackId;                       }
+    AP4_UI32 GetDefaultSampleDescriptionIndex() const { return m_DefaultSampleDescriptionIndex; }
+    AP4_UI32 GetDefaultSampleDuration() const         { return m_DefaultSampleDuration;         }
+    AP4_UI32 GetDefaultSampleSize() const             { return m_DefaultSampleSize;             }
+    AP4_UI32 GetDefaultSampleFlags() const            { return m_DefaultSampleFlags;            }
 
 private:
     // members

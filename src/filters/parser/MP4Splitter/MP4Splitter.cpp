@@ -1402,32 +1402,48 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				SetProperty(L"CPYR", copyright);
 			}
 		}
+
+		const AP4_Duration fragmentdurationms = movie->GetFragmentsDurationMs();
+		if (fragmentdurationms) {
+			// override duration from 'sidx' atom
+			const REFERENCE_TIME rtDuration = 10000i64 * fragmentdurationms;
+			m_rtDuration = rtVideoDuration = rtDuration;
+		}
 	}
 
-	if (rtVideoDuration > 0 && rtVideoDuration < m_rtDuration/2)
+	if (rtVideoDuration > 0 && rtVideoDuration < m_rtDuration / 2) {
 		m_rtDuration = rtVideoDuration; // fix incorrect duration
+	}
 
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
 	if (m_pOutputs.GetCount()) {
 		AP4_Movie* movie = m_pFile->GetMovie();
 
-		POSITION pos = m_trackpos.GetStartPosition();
-		while (pos) {
-			CAtlMap<DWORD, trackpos>::CPair* pPair = m_trackpos.GetNext(pos);
-			AP4_Track* track = movie->GetTrack(pPair->m_key);
-
-			if (!track->HasIndex()) {
-				continue;
-			}
-
-			const AP4_Array<AP4_IndexTableEntry>& entries = track->GetIndexEntries();
+		if (movie->HasFragmentsIndex()) {
+			const AP4_Array<AP4_IndexTableEntry>& entries = movie->GetFragmentsIndexEntries();
 			for (AP4_Cardinal i = 0; i < entries.ItemCount(); ++i) {
 				SyncPoint sp = { entries[i].m_rt, __int64(entries[i].m_offset) };
 				m_sps.Add(sp);
 			}
+		} else {
+			POSITION pos = m_trackpos.GetStartPosition();
+			while (pos) {
+				CAtlMap<DWORD, trackpos>::CPair* pPair = m_trackpos.GetNext(pos);
+				AP4_Track* track = movie->GetTrack(pPair->m_key);
 
-			break;
+				if (!track->HasIndex()) {
+					continue;
+				}
+
+				const AP4_Array<AP4_IndexTableEntry>& entries = track->GetIndexEntries();
+				for (AP4_Cardinal i = 0; i < entries.ItemCount(); ++i) {
+					SyncPoint sp = { entries[i].m_rt, __int64(entries[i].m_offset) };
+					m_sps.Add(sp);
+				}
+
+				break;
+			}
 		}
 	}
 
@@ -1466,6 +1482,11 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 	AP4_Movie* movie = m_pFile->GetMovie();
 
+	if (movie->HasFragmentsIndex()
+			&& (AP4_FAILED(movie->SelectMoof(rt)))) {
+		return;
+	}
+
 	POSITION pos = m_trackpos.GetStartPosition();
 	while (pos) {
 		CAtlMap<DWORD, trackpos>::CPair* pPair = m_trackpos.GetNext(pos);
@@ -1498,6 +1519,7 @@ bool CMP4SplitterFilter::DemuxLoop()
 
 	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
 
+start:
 		CAtlMap<DWORD, trackpos>::CPair* pPairNext = NULL;
 		REFERENCE_TIME rtNext = _I64_MAX;
 		ULONGLONG nextOffset = 0;
@@ -1527,7 +1549,13 @@ bool CMP4SplitterFilter::DemuxLoop()
 		}
 
 		if (!pPairNext) {
-			break;
+			if (movie->HasFragmentsIndex()
+					&& (AP4_SUCCEEDED(movie->SwitchNextMoof()))) {
+				DemuxInit();
+				goto start;
+			} else {
+				break;
+			}
 		}
 
 		AP4_Track* track = movie->GetTrack(pPairNext->m_key);

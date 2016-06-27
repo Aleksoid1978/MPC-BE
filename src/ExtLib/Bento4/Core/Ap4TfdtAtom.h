@@ -25,15 +25,8 @@ public:
     AP4_TfdtAtom(AP4_Size         size,
                  AP4_ByteStream&  stream);
 
-    virtual AP4_Result InspectFields(AP4_AtomInspector& inspector) { return AP4_FAILURE; }
-    virtual AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
-
-    AP4_UI64 GetBaseMediaDecodeTime() { 
-        return m_BaseMediaDecodeTime;
-    }
-    void SetBaseMediaDecodeTime(AP4_UI64 base_media_decode_time) { 
-        m_BaseMediaDecodeTime = base_media_decode_time;
-    }
+    AP4_UI64 GetBaseMediaDecodeTime() const                      { return m_BaseMediaDecodeTime;                   }
+    void SetBaseMediaDecodeTime(AP4_UI64 base_media_decode_time) { m_BaseMediaDecodeTime = base_media_decode_time; }
 
 private:
     // members

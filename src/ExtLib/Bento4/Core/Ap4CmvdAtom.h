@@ -51,8 +51,6 @@ public:
                  AP4_ByteStream&  stream,
                  AP4_AtomFactory& atom_factory);
 
-    virtual AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
-
     AP4_UI32 GetMovieResourceSize() const { return m_MovieResourceSize; }
     const AP4_DataBuffer& GetDataBuffer() { return m_Data; }
 
