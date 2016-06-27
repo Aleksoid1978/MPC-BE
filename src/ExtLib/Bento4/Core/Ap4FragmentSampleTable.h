@@ -2,7 +2,7 @@
 |
 |    AP4 - Fragment Sample Table
 |
-|    Copyright 2014 Aleksoid1978
+|    Copyright 2014-2016 Aleksoid1978
 |
  ****************************************************************/
 #ifndef _AP4_FRAGMENTSAMPLE_TABLE_H_
@@ -41,6 +41,7 @@ public:
     AP4_Result             EnsureCapacity(AP4_Cardinal sample_count) { return m_FragmentSamples.EnsureCapacity(sample_count); }
     AP4_Result             GetSampleIndexForTimeStamp(AP4_SI64 ts,
                                                       AP4_Ordinal& index);
+    void                   Clear();
 
 private:
     // members

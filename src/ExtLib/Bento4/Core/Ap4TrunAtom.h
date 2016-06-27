@@ -49,12 +49,9 @@ public:
     AP4_TrunAtom(AP4_Size         size,
                  AP4_ByteStream&  stream);
 
-    virtual AP4_Result InspectFields(AP4_AtomInspector& inspector) { return AP4_FAILURE; }
-    virtual AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
-
-    AP4_SI32                GetDataOffset()                { return m_DataOffset;       }
+    AP4_SI32                GetDataOffset() const          { return m_DataOffset;       }
     void                    SetDataOffset(AP4_SI32 offset) { m_DataOffset = offset;     }
-    AP4_UI32                GetFirstSampleFlags()          { return m_FirstSampleFlags; }
+    AP4_UI32                GetFirstSampleFlags() const    { return m_FirstSampleFlags; }
     const AP4_Array<Entry>& GetEntries()                   { return m_Entries;          }
     AP4_Array<Entry>&       UseEntries()                   { return m_Entries;          }
     AP4_Result              SetEntries(const AP4_Array<Entry>& entries);

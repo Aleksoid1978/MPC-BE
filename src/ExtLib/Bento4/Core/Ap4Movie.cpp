@@ -40,6 +40,7 @@
 #include "Ap4MfhdAtom.h"
 #include "Ap4AtomFactory.h"
 #include "Ap4Movie.h"
+#include "Ap4Utils.h"
 
 /*----------------------------------------------------------------------
 |       AP4_TrackFinderById
@@ -78,7 +79,9 @@ private:
 /*----------------------------------------------------------------------
 |       AP4_Movie::AP4_Movie
 +---------------------------------------------------------------------*/
-AP4_Movie::AP4_Movie(AP4_UI32 time_scale)
+AP4_Movie::AP4_Movie(AP4_UI32 time_scale) :
+    m_SidxAtom(NULL),
+    m_Stream(NULL)
 {
     m_MoovAtom = new AP4_MoovAtom();
     m_MvhdAtom = new AP4_MvhdAtom(0, 0, 
@@ -93,7 +96,9 @@ AP4_Movie::AP4_Movie(AP4_UI32 time_scale)
 |       AP4_Movie::AP4_Moovie
 +---------------------------------------------------------------------*/
 AP4_Movie::AP4_Movie(AP4_MoovAtom* moov, AP4_ByteStream& mdat) :
-    m_MoovAtom(moov)
+    m_MoovAtom(moov),
+    m_SidxAtom(NULL),
+    m_Stream(NULL)
 {
     // ignore null atoms
     if (moov == NULL) return;
@@ -137,6 +142,8 @@ AP4_Movie::~AP4_Movie()
 {
     m_Tracks.DeleteReferences();
     delete m_MoovAtom;
+
+    AP4_RELEASE(m_Stream);
 }
 
 /*----------------------------------------------------------------------
@@ -262,16 +269,38 @@ AP4_Movie::HasFragments()
 }
 
 /*----------------------------------------------------------------------
+|   AP4_Movie::GetFragmentsDuration
++---------------------------------------------------------------------*/
+AP4_Duration
+AP4_Movie::GetFragmentsDuration()
+{
+    if (m_SidxAtom) {
+        return m_SidxAtom->GetDuration();
+    }
+    return 0;
+}
+
+/*----------------------------------------------------------------------
+|   AP4_Movie::GetFragmentsDurationMs
++---------------------------------------------------------------------*/
+AP4_Duration
+AP4_Movie::GetFragmentsDurationMs()
+{
+    if (m_SidxAtom) {
+        return AP4_ConvertTime(m_SidxAtom->GetDuration(), m_SidxAtom->GetTimeScale(), 1000);
+    }
+    return 0;
+}
+
+/*----------------------------------------------------------------------
 |   AP4_Movie::ProcessMoof
 +---------------------------------------------------------------------*/
 void
-AP4_Movie::ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream)
+AP4_Movie::ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream, AP4_Offset offset, AP4_Duration dts/* = 0*/, bool bClearSampleTable/* = false*/)
 {
     if (moof) {
-        AP4_Offset offset = 0;
-        stream.Tell(offset);
         AP4_Offset moof_offset = offset - moof->GetSize();
-        AP4_Offset mdat_payload_offset = offset + 8;
+        AP4_Offset mdat_payload_offset = offset + AP4_ATOM_HEADER_SIZE;
 
         AP4_MfhdAtom* mfhd = AP4_DYNAMIC_CAST(AP4_MfhdAtom, moof->GetChild(AP4_ATOM_TYPE_MFHD));
         if (mfhd) {
@@ -309,6 +338,9 @@ AP4_Movie::ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream)
                         }
 
                         AP4_FragmentSampleTable* sampleTable = track->GetFragmentSampleTable();
+                        if (bClearSampleTable) {
+                            sampleTable->Clear();
+                        }
 
                         AP4_Cardinal sample_count = 0;
                         for (AP4_List<AP4_Atom>::Item* child_item = traf->GetChildren().FirstItem();
@@ -335,7 +367,7 @@ AP4_Movie::ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream)
                             return;
                         }
 
-                        AP4_UI64 dts_origin = tfdt ? tfdt->GetBaseMediaDecodeTime() : 0;
+                        AP4_UI64 dts_origin = tfdt ? tfdt->GetBaseMediaDecodeTime() : dts;
                         for (AP4_List<AP4_Atom>::Item* child_item = traf->GetChildren().FirstItem();
                                                        child_item;
                                                        child_item = child_item->GetNext()) {
@@ -352,4 +384,152 @@ AP4_Movie::ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream)
             }
         }
     }
+}
+
+/*----------------------------------------------------------------------
+|   AP4_Movie::SetSidxAtom
++---------------------------------------------------------------------*/
+AP4_Result
+AP4_Movie::SetSidxAtom(AP4_SidxAtom* atom, AP4_ByteStream& stream)
+{
+    if (!atom
+            || m_SidxAtom
+            || atom->IsEmpty()) {
+        return AP4_FAILURE;
+    }
+
+    m_CurrentMoof = 0;
+    m_Stream = &stream;
+    m_Stream->AddReference();
+    m_SidxAtom = atom;
+ 
+    AP4_UI32 mediaTimeScale = m_SidxAtom->GetTimeScale();
+    AP4_Track* track = GetTrack(m_SidxAtom->GetReferenceId());
+    if (track) {
+        mediaTimeScale = track->GetMediaTimeScale();
+	}
+
+    AP4_Array<AP4_SidxAtom::Fragments>& fragments = m_SidxAtom->GetSampleTable();
+    m_FragmentsIndexEntries.SetItemCount(fragments.ItemCount());
+    for (AP4_Cardinal i = 0; i < fragments.ItemCount(); i++) {
+        AP4_SidxAtom::Fragments& fragment = fragments[i];
+        auto convertTime = [&] (AP4_Duration& time) {
+            time = AP4_ConvertTime(time, m_SidxAtom->GetTimeScale(), mediaTimeScale);
+        };
+
+        convertTime(fragment.m_StartTime);
+        convertTime(fragment.m_Duration);
+
+        AP4_IndexTableEntry& entry = m_FragmentsIndexEntries[i];
+        entry.m_cts    = (AP4_SI64)fragment.m_StartTime;
+        entry.m_index  = i;
+        entry.m_offset = fragment.m_Offset;
+        entry.m_rt     = (REFERENCE_TIME)(10000000.0 / m_SidxAtom->GetTimeScale() * fragment.m_StartTime);
+    }
+
+    m_MoofAtomEntries.SetItemCount(fragments.ItemCount());
+    m_MoofOffsetEntries.SetItemCount(fragments.ItemCount());
+
+    return AP4_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   AP4_Movie::SelectMoof
++---------------------------------------------------------------------*/
+AP4_Result
+AP4_Movie::SelectMoof(REFERENCE_TIME rt)
+{
+    if (m_SidxAtom) {
+        const AP4_TimeStamp ts = (AP4_TimeStamp)((double(rt) * m_SidxAtom->GetTimeScale() + 5000000) / 10000000);
+        AP4_Array<AP4_SidxAtom::Fragments>& fragments = m_SidxAtom->GetSampleTable();
+        for (AP4_Cardinal index = fragments.ItemCount() - 1; index >= 0; index--) {
+            if (fragments[index].m_StartTime <= ts) {
+                if (m_CurrentMoof == index) {
+                    return AP4_SUCCESS;
+                }
+                if (AP4_SUCCEEDED(SwitchMoof(index, fragments[index].m_Offset, fragments[index].m_Size, fragments[index].m_StartTime))) {
+                    m_CurrentMoof = index;
+                    return AP4_SUCCESS;
+                }
+                break;
+            }
+        }
+    }
+
+    return AP4_FAILURE;
+}
+
+/*----------------------------------------------------------------------
+|   AP4_Movie::SwitchMoof
++---------------------------------------------------------------------*/
+AP4_Result
+AP4_Movie::SwitchMoof(AP4_Cardinal index, AP4_UI64 offset, AP4_UI64 size, AP4_Duration dts)
+{
+    if (m_SidxAtom) {
+        AP4_Atom* atom = NULL;
+        if (m_MoofAtomEntries[index]) {
+            atom   = m_MoofAtomEntries[index];
+            offset = m_MoofOffsetEntries[index];
+        } else {
+            m_Stream->Seek(offset);
+            if (AP4_SUCCEEDED(AP4_AtomFactory::DefaultFactory.CreateAtomFromStream(*m_Stream, size, atom, NULL))) {
+                m_Stream->Tell(offset);
+            }
+        }
+        if (atom && atom->GetType() == AP4_ATOM_TYPE_MOOF) {
+            ProcessMoof(AP4_DYNAMIC_CAST(AP4_ContainerAtom, atom),
+                        *m_Stream, offset, dts, true);
+            
+            if (!m_MoofAtomEntries[index]) {
+                m_MoofAtomEntries[index]   = AP4_DYNAMIC_CAST(AP4_ContainerAtom, atom);
+                m_MoofOffsetEntries[index] = offset;
+            }
+            return AP4_SUCCESS;
+        }
+
+        if (atom) {
+            delete atom;
+        }
+    }
+
+    return AP4_FAILURE;
+}
+
+/*----------------------------------------------------------------------
+|   AP4_Movie::SwitchNextMoof
++---------------------------------------------------------------------*/
+AP4_Result
+AP4_Movie::SwitchNextMoof()
+{
+    if (m_SidxAtom) {
+        AP4_Array<AP4_SidxAtom::Fragments>& fragments = m_SidxAtom->GetSampleTable();
+        if (m_CurrentMoof >= 0 && m_CurrentMoof < fragments.ItemCount() - 1) {
+            AP4_SidxAtom::Fragments& fragment = fragments[m_CurrentMoof + 1];
+            if (AP4_SUCCEEDED(SwitchMoof(m_CurrentMoof + 1, fragment.m_Offset, fragment.m_Size, fragment.m_StartTime))) {
+                m_CurrentMoof++;
+                return AP4_SUCCESS;
+            }
+        }
+    }
+
+    return AP4_FAILURE;
+}
+
+/*----------------------------------------------------------------------
+|   AP4_Movie::SwitchFirstMoof
++---------------------------------------------------------------------*/
+AP4_Result
+AP4_Movie::SwitchFirstMoof()
+{
+    if (m_SidxAtom) {
+        AP4_Array<AP4_SidxAtom::Fragments>& fragments = m_SidxAtom->GetSampleTable();
+        if (fragments.ItemCount()) {
+            AP4_SidxAtom::Fragments& fragment = fragments[0];
+            if (AP4_SUCCEEDED(SwitchMoof(0, fragment.m_Offset, fragment.m_Size, fragment.m_StartTime))) {
+                return AP4_SUCCESS;
+            }
+        }
+    }
+
+    return AP4_FAILURE;
 }

@@ -63,6 +63,7 @@
 #include "Ap4TfhdAtom.h"
 #include "Ap4TrexAtom.h"
 #include "Ap4TrunAtom.h"
+#include "Ap4SidxAtom.h"
 #include "Ap4RtpAtom.h"
 #include "Ap4SdpAtom.h"
 #include "Ap4IkmsAtom.h"
@@ -397,6 +398,10 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 
         case AP4_ATOM_TYPE_TRUN:
             atom = new AP4_TrunAtom(size, stream);
+            break;
+
+        case AP4_ATOM_TYPE_SIDX:
+            atom = new AP4_SidxAtom(size, stream);
             break;
 
         // full container atoms

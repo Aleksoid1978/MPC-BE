@@ -20,9 +20,6 @@
 
 #pragma once
 
-#define ENABLE_YOUTUBE_3D   0
-#define ENABLE_YOUTUBE_DASH 0
-
 #include <vector>
 
 namespace YoutubeParser {
@@ -36,6 +33,7 @@ namespace YoutubeParser {
 		y_3d_webm,
 		y_apple_live,
 		y_dash_mp4_video,
+		y_dash_mp4_video_60fps,
 		y_dash_mp4_audio,
 		y_webm_video,
 		y_webm_video_60fps,
@@ -51,53 +49,40 @@ namespace YoutubeParser {
 	};
 
 	static const YoutubeProfiles youtubeVideoProfiles[] = {
-		{22,	y_mp4,				 720,	_T("mp4"),	false },
-		{18,	y_mp4,				 360,	_T("mp4"),	false },
-		{43,	y_webm,				 360,	_T("webm"),	false },
-		{5,		y_flv,				 240,	_T("flv"),	false },
-		{36,	y_3gp,				 240,	_T("3gp"),	false },
-		{17,	y_3gp,				 144,	_T("3gp"),	false },
+		{22,	y_mp4,					 720,	_T("mp4"),	false },
+		{18,	y_mp4,					 360,	_T("mp4"),	false },
+		{43,	y_webm,					 360,	_T("webm"),	false },
+		{5,		y_flv,					 240,	_T("flv"),	false },
+		{36,	y_3gp,					 240,	_T("3gp"),	false },
+		{17,	y_3gp,					 144,	_T("3gp"),	false },
 		// VP9, 60fps
-		{315,	y_webm_video_60fps,	2160,	_T("webm"),	true },
-		{308,	y_webm_video_60fps,	1440,	_T("webm"),	true },
-		{303,	y_webm_video_60fps,	1080,	_T("webm"),	true },
-		{302,	y_webm_video_60fps,	 720,	_T("webm"),	true },
+		{315,	y_webm_video_60fps,		2160,	_T("webm"),	true },
+		{308,	y_webm_video_60fps,		1440,	_T("webm"),	true },
+		{303,	y_webm_video_60fps,		1080,	_T("webm"),	true },
+		{302,	y_webm_video_60fps,		 720,	_T("webm"),	true },
 		// VP9
-		{313,	y_webm_video,		2160,	_T("webm"),	true },
-		{271,	y_webm_video,		1440,	_T("webm"),	true },
-		{248,	y_webm_video,		1080,	_T("webm"),	true },
-		{247,	y_webm_video,		 720,	_T("webm"),	true },
-	#if ENABLE_YOUTUBE_3D
-		{84,	y_3d_mp4,			 720,	_T("mp4"),	false },
-		{83,	y_3d_mp4,			 480,	_T("mp4"),	false },
-		{82,	y_3d_mp4,			 360,	_T("mp4"),	false },
-		{100,	y_3d_webm,			 360,	_T("webm"),	false },
-	#endif
-	#if ENABLE_YOUTUBE_DASH
-		{138 	y_dash_mp4_video,	2160,	_T("mp4"),	true },
-		{137,	y_dash_mp4_video,	1080,	_T("mp4"),	true },
-		{136,	y_dash_mp4_video,	 720,	_T("mp4"),	true },
-		{135,	y_dash_mp4_video,	 480,	_T("mp4"),	true },
-		{134,	y_dash_mp4_video,	 360,	_T("mp4"),	true },
-		{133,	y_dash_mp4_video,	 240,	_T("mp4"),	true },
-		{160,	y_dash_mp4_video,	 144,	_T("mp4"),	true }, // 15fps
-		//
-		{266,	y_dash_mp4_video,	2160,	_T("mp4"),	true }, // h264, 30fps
-		{299,	y_dash_mp4_video,	1080,	_T("mp4"),	true }, // h264, 60fps
-		{298,	y_dash_mp4_video,	 720,	_T("mp4"),	true }, // h264, 60fps
-	#endif
+		{313,	y_webm_video,			2160,	_T("webm"),	true },
+		{271,	y_webm_video,			1440,	_T("webm"),	true },
+		{248,	y_webm_video,			1080,	_T("webm"),	true },
+		{247,	y_webm_video,			 720,	_T("webm"),	true },
+		{244,	y_webm_video,			 480,	_T("webm"),	true },
+		// MP4
+		{299,	y_dash_mp4_video_60fps,	1080,	_T("mp4"),	true },
+		{298,	y_dash_mp4_video_60fps,	 720,	_T("mp4"),	true },
+		{266,	y_dash_mp4_video,		2160,	_T("mp4"),	true },
+		{264,	y_dash_mp4_video,		1440,	_T("mp4"),	true },
+		{137,	y_dash_mp4_video,		1080,	_T("mp4"),	true },
+		{135,	y_dash_mp4_video,		 480,	_T("mp4"),	true },
 	};
 
 	static const YoutubeProfiles youtubeAudioProfiles[] = {
-		{251,	y_webm_audio,		 256,	_T("webm"),	false },
-		{250,	y_webm_audio,		  64,	_T("webm"),	false },
-		{249,	y_webm_audio,		  48,	_T("webm"),	false },
-		{172,	y_webm_audio,		 192,	_T("webm"),	false },
-		{171,	y_webm_audio,		 128,	_T("webm"),	false },
-	#if ENABLE_YOUTUBE_DASH
-		{141,	y_dash_mp4_audio,	 256,	_T("m4a"),	false },
-		{140,	y_dash_mp4_audio,	 128,	_T("m4a"),	false },
-	#endif
+		// Opus
+		{251,	y_webm_audio,			 160,	_T("webm"),	false },
+		{250,	y_webm_audio,			  64,	_T("webm"),	false },
+		{249,	y_webm_audio,			  48,	_T("webm"),	false },
+		// AAC
+		{140,	y_dash_mp4_audio,		 128,	_T("m4a"),	false },
+		{139,	y_dash_mp4_audio,		  48,	_T("m4a"),	false },
 	};
 
 	struct YoutubeFields {

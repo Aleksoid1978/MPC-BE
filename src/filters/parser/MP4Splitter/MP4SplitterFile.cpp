@@ -53,7 +53,7 @@ HRESULT CMP4SplitterFile::Init()
 
 	AP4_ByteStream* stream = DNew AP4_AsyncReaderStream(this);
 
-	m_pAp4File = DNew AP4_File(*stream, IsURL());
+	m_pAp4File = DNew AP4_File(*stream);
 
 	AP4_Movie* movie = m_pAp4File->GetMovie();
 

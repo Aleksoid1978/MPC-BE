@@ -49,7 +49,6 @@ public:
     // constructors and destructor
     AP4_File(AP4_Movie* movie);
     AP4_File(AP4_ByteStream& stream,
-             bool bURL,
              AP4_AtomFactory& atom_factory = AP4_AtomFactory::DefaultFactory);
     virtual ~AP4_File();
 

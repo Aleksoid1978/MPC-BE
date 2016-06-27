@@ -25,10 +25,7 @@ public:
     AP4_MfhdAtom(AP4_Size         size,
                  AP4_ByteStream&  stream);
 
-    virtual AP4_Result InspectFields(AP4_AtomInspector& inspector) { return AP4_FAILURE; }
-    virtual AP4_Result WriteFields(AP4_ByteStream& stream) { return AP4_FAILURE; }
-
-    AP4_UI32 GetSequenceNumber()                         { return m_SequenceNumber;            }
+    AP4_UI32 GetSequenceNumber() const                   { return m_SequenceNumber;            }
     void     SetSequenceNumber(AP4_UI32 sequence_number) { m_SequenceNumber = sequence_number; }
 
 private:
