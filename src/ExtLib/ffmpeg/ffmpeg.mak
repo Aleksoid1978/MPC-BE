@@ -92,7 +92,6 @@ SRCS_LC = \
 	libavcodec/aacdec.c \
 	libavcodec/aacps_float.c \
 	libavcodec/aacpsdsp_float.c \
-	libavcodec/aacps_tablegen.c \
 	libavcodec/aacsbr.c \
 	libavcodec/aactab.c \
 	libavcodec/ac3.c \
@@ -179,7 +178,6 @@ SRCS_LC = \
 	libavcodec/dsddec.c \
 	libavcodec/dv.c \
 	libavcodec/dv_profile.c \
-	libavcodec/dv_tablegen.c \
 	libavcodec/dvdata.c \
 	libavcodec/dvdec.c \
 	libavcodec/eac3_data.c \
@@ -386,7 +384,6 @@ SRCS_LC_B = \
 	libavcodec/shorten.c \
 	libavcodec/simple_idct.c \
 	libavcodec/sinewin.c \
-	libavcodec/sinewin_tablegen.c \
 	libavcodec/sipr.c \
 	libavcodec/sipr16k.c \
 	libavcodec/snow_dwt.c \
