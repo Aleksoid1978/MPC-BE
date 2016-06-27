@@ -541,16 +541,11 @@ void CFFAudioDecoder::FlushBuffers()
 void CFFAudioDecoder::StreamFinish()
 {
 	m_pAVCodec = NULL;
-	if (m_pParser) {
-		av_parser_close(m_pParser);
-		m_pParser = NULL;
-	}
+	
+	av_parser_close(m_pParser);
+	m_pParser = NULL;
 
-	if (m_pAVCtx) {
-		avcodec_close(m_pAVCtx);
-		av_freep(&m_pAVCtx->extradata);
-		av_freep(&m_pAVCtx);
-	}
+	avcodec_free_context(&m_pAVCtx);
 
 	av_frame_free(&m_pFrame);
 
