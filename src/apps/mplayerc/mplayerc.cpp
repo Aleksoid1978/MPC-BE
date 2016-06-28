@@ -2440,7 +2440,7 @@ void CMPlayerCApp::SetLanguage(int nLanguage)
 	if (!strSatellite.IsEmpty()) {
 		CString strSatVersion = CFileVersionInfo::GetFileVersionExShort(strSatellite);
 		if (strSatVersion.GetLength()) {
-			CString strNeededVersion = MPC_VERSION_STR;
+			CString strNeededVersion = _T(MPC_VERSION_STR);
 			if (strSatVersion == strNeededVersion) {
 				hMod = LoadLibrary(strSatellite);
 				s.iLanguage = nLanguage;
