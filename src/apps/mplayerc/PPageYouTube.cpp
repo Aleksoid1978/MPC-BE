@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include <algorithm>
 #include "PPageYoutube.h"
 
 // CPPageYoutube dialog
@@ -55,28 +56,40 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 
-	CAppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
 	m_chkPageParser.SetCheck(s.bYoutubePageParser);
 
 	m_cbPreferredFormat.Clear();
 
-	for (size_t i = 0; i < _countof(YoutubeParser::youtubeVideoProfiles); i++) {
-		const CString fmt = YoutubeParser::FormatProfiles(YoutubeParser::youtubeVideoProfiles[i]);
+	auto getSorted = [] () {
+		std::vector<YoutubeParser::YoutubeProfiles> profiles;
+		profiles.assign(YoutubeParser::youtubeVideoProfiles, YoutubeParser::youtubeVideoProfiles + _countof(YoutubeParser::youtubeVideoProfiles) - 1);
+		std::sort(profiles.begin(), profiles.end(), [](const YoutubeParser::YoutubeProfiles a, const YoutubeParser::YoutubeProfiles b) {
+			return a.priority > b.priority && a.quality >= b.quality;
+		});
+
+		return profiles;
+	};
+
+	static std::vector<YoutubeParser::YoutubeProfiles> profiles = getSorted();
+	int i = 0;
+	for(auto it = profiles.begin(); it != profiles.end(); ++it) {
+		const CString fmt = YoutubeParser::FormatProfiles(*it);
 		if (!fmt.IsEmpty()) {
 			m_cbPreferredFormat.AddString(fmt);
-			m_cbPreferredFormat.SetItemData(i, YoutubeParser::youtubeVideoProfiles[i].iTag);
+			m_cbPreferredFormat.SetItemData(i++, it->iTag);
 		}
 	}
 
-	int j = 0;
-	for (j = 0; j < m_cbPreferredFormat.GetCount(); j++) {
-		if (m_cbPreferredFormat.GetItemData(j) == s.iYoutubeTag) {
-			m_cbPreferredFormat.SetCurSel(j);
+	i = 0;
+	for (i = 0; i < m_cbPreferredFormat.GetCount(); i++) {
+		if (m_cbPreferredFormat.GetItemData(i) == s.iYoutubeTag) {
+			m_cbPreferredFormat.SetCurSel(i);
 			break;
 		}
 	}
-	if (j >= m_cbPreferredFormat.GetCount()) {
+	if (i >= m_cbPreferredFormat.GetCount()) {
 		m_cbPreferredFormat.SetCurSel(0);
 	}
 
@@ -97,9 +110,9 @@ BOOL CPPageYoutube::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.bYoutubePageParser	= !!m_chkPageParser.GetCheck();
-	s.iYoutubeTag			= GetCurItemData(m_cbPreferredFormat);
-	s.bYoutubeLoadPlaylist	= !!m_chkLoadPlaylist.GetCheck();
+	s.iYoutubeTag          = GetCurItemData(m_cbPreferredFormat);
+	s.bYoutubePageParser   = !!m_chkPageParser.GetCheck();
+	s.bYoutubeLoadPlaylist = !!m_chkLoadPlaylist.GetCheck();
 
 	return __super::OnApply();
 }

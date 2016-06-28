@@ -27,11 +27,9 @@ namespace YoutubeParser {
 		y_unknown,
 		y_mp4,
 		y_webm,
-		y_flv,
 		y_3gp,
 		y_3d_mp4,
 		y_3d_webm,
-		y_apple_live,
 		y_dash_mp4_video,
 		y_dash_mp4_video_60fps,
 		y_dash_mp4_audio,
@@ -41,48 +39,48 @@ namespace YoutubeParser {
 	};
 
 	struct YoutubeProfiles {
-		const int   iTag;
-		const ytype type;
-		const int   quality;
-		LPCTSTR     ext;
-		const bool  videoOnly;
+		int     iTag;
+		ytype   type;
+		int     quality;
+		int     priority;
+		LPCTSTR ext;
+		bool    videoOnly;
 	};
 
 	static const YoutubeProfiles youtubeVideoProfiles[] = {
-		{22,	y_mp4,					 720,	_T("mp4"),	false },
-		{18,	y_mp4,					 360,	_T("mp4"),	false },
-		{43,	y_webm,					 360,	_T("webm"),	false },
-		{5,		y_flv,					 240,	_T("flv"),	false },
-		{36,	y_3gp,					 240,	_T("3gp"),	false },
-		{17,	y_3gp,					 144,	_T("3gp"),	false },
+		{ 22, y_mp4,                   720,  7,  L"mp4", false },
+		{ 18, y_mp4,                   360,  3,  L"mp4", false },
+		{ 43, y_webm,                  360,  2, L"webm", false },
+		{ 36, y_3gp,                   240,  1,  L"3gp", false },
+		{ 17, y_3gp,                   144,  0,  L"3gp", false },
 		// VP9, 60fps
-		{315,	y_webm_video_60fps,		2160,	_T("webm"),	true },
-		{308,	y_webm_video_60fps,		1440,	_T("webm"),	true },
-		{303,	y_webm_video_60fps,		1080,	_T("webm"),	true },
-		{302,	y_webm_video_60fps,		 720,	_T("webm"),	true },
+		{315, y_webm_video_60fps,     2160, 19, L"webm", true },
+		{308, y_webm_video_60fps,     1440, 16, L"webm", true },
+		{303, y_webm_video_60fps,     1080, 12, L"webm", true },
+		{302, y_webm_video_60fps,      720,  8, L"webm", true },
 		// VP9
-		{313,	y_webm_video,			2160,	_T("webm"),	true },
-		{271,	y_webm_video,			1440,	_T("webm"),	true },
-		{248,	y_webm_video,			1080,	_T("webm"),	true },
-		{247,	y_webm_video,			 720,	_T("webm"),	true },
-		{244,	y_webm_video,			 480,	_T("webm"),	true },
+		{313, y_webm_video,           2160, 17, L"webm", true },
+		{271, y_webm_video,           1440, 14, L"webm", true },
+		{248, y_webm_video,           1080, 10, L"webm", true },
+		{247, y_webm_video,            720,  6, L"webm", true },
+		{244, y_webm_video,            480,  4, L"webm", true },
 		// MP4
-		{299,	y_dash_mp4_video_60fps,	1080,	_T("mp4"),	true },
-		{298,	y_dash_mp4_video_60fps,	 720,	_T("mp4"),	true },
-		{266,	y_dash_mp4_video,		2160,	_T("mp4"),	true },
-		{264,	y_dash_mp4_video,		1440,	_T("mp4"),	true },
-		{137,	y_dash_mp4_video,		1080,	_T("mp4"),	true },
-		{135,	y_dash_mp4_video,		 480,	_T("mp4"),	true },
+		{299, y_dash_mp4_video_60fps, 1080, 13,  L"mp4", true },
+		{298, y_dash_mp4_video_60fps,  720,  9,  L"mp4", true },
+		{266, y_dash_mp4_video,       2160, 18,  L"mp4", true },
+		{264, y_dash_mp4_video,       1440, 15,  L"mp4", true },
+		{137, y_dash_mp4_video,       1080, 11,  L"mp4", true },
+		{135, y_dash_mp4_video,        480,  5,  L"mp4", true },
 	};
 
 	static const YoutubeProfiles youtubeAudioProfiles[] = {
 		// Opus
-		{251,	y_webm_audio,			 160,	_T("webm"),	false },
-		{250,	y_webm_audio,			  64,	_T("webm"),	false },
-		{249,	y_webm_audio,			  48,	_T("webm"),	false },
+		{251, y_webm_audio,            160,  4, L"webm", false },
+		{250, y_webm_audio,             64,  2, L"webm", false },
+		{249, y_webm_audio,             48,  0, L"webm", false },
 		// AAC
-		{140,	y_dash_mp4_audio,		 128,	_T("m4a"),	false },
-		{139,	y_dash_mp4_audio,		  48,	_T("m4a"),	false },
+		{140, y_dash_mp4_audio,        128,  3,  L"m4a", false },
+		{139, y_dash_mp4_audio,         48,  1,  L"m4a", false },
 	};
 
 	struct YoutubeFields {
@@ -116,11 +114,8 @@ namespace YoutubeParser {
 	struct YoutubeUrllistItem : YoutubePlaylistItem {
 		int  tag = 0;
 		int  quality = 0;
+		int  priority = 0;
 		bool videoOnly = false;
-
-		bool operator < (const YoutubeUrllistItem& val) const {
-			return tag > val.tag && quality >= val.quality;
-		}
 	};
 	typedef std::vector<YoutubeUrllistItem> YoutubeUrllist;
 
