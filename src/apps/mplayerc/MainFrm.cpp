@@ -859,9 +859,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_bToggleShaderScreenSpace = s.fToggleShaderScreenSpace;
 
 #ifdef _WIN64
-	m_strTitle.Format(L"%s x64 - v%s", ResStr(IDR_MAINFRAME), CString(MPC_VERSION_STR));
+	m_strTitle.Format(L"%s x64 - v%s", ResStr(IDR_MAINFRAME), _T(MPC_VERSION_STR));
 #else
-	m_strTitle.Format(L"%s - v%s", ResStr(IDR_MAINFRAME), CString(MPC_VERSION_STR));
+	m_strTitle.Format(L"%s - v%s", ResStr(IDR_MAINFRAME), _T(MPC_VERSION_STR));
 #endif
 #if (MPC_VERSION_STATUS == 0)
 	m_strTitle.AppendFormat(L" (build %d) beta",  MPC_VERSION_REV);
