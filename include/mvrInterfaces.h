@@ -129,8 +129,7 @@ const static HRESULT CALLBACK_USER_INTERFACE = 77001;  // user interface, switch
 // when using the (2) render callbacks method, you need to provide
 // madVR with an instance of the IOsdRenderCallback interface
 // it contains three callbacks you have to provide
-[uuid("57FBF6DC-3E5F-4641-935A-CB62F00C9958")]
-interface IOsdRenderCallback : public IUnknown
+interface __declspec(uuid("57FBF6DC-3E5F-4641-935A-CB62F00C9958")) IOsdRenderCallback : public IUnknown
 {
   // "SetDevice" is called when you register the callbacks
   // it provides you with the D3D device object used by madVR
@@ -155,8 +154,7 @@ const static int BITMAP_USER_INTERFACE    = 4;  // user interface, switches madV
 const static int BITMAP_MASKING_AWARE     = 8;  // caller is aware of screen masking, bitmaps are positioned properly inside of "fullOutputRect"
 
 // this is the main interface which madVR provides to you
-[uuid("3AE03A88-F613-4BBA-AD3E-EE236976BF9A")]
-interface IMadVROsdServices : public IUnknown
+interface __declspec(uuid("3AE03A88-F613-4BBA-AD3E-EE236976BF9A")) IMadVROsdServices : public IUnknown
 {
   // this API provides the (1) bitmap based method
   STDMETHOD(OsdSetBitmap)(
@@ -203,8 +201,7 @@ interface IMadVROsdServices : public IUnknown
 // There can always be only one message active at the same time, so basically
 // the messages are overwriting each other.
 
-[uuid("ABA34FDA-DD22-4E00-9AB4-4ABF927D0B0C")]
-interface IMadVRTextOsd : public IUnknown
+interface __declspec(uuid("ABA34FDA-DD22-4E00-9AB4-4ABF927D0B0C")) IMadVRTextOsd : public IUnknown
 {
   STDMETHOD(OsdDisplayMessage)(LPCWSTR text, DWORD milliseconds) = 0;
   STDMETHOD(OsdClearMessage)(void) = 0;
@@ -233,8 +230,7 @@ interface IMadVRTextOsd : public IUnknown
 // If you use this interface, send the messages to madVR from the same window
 // that madVR would otherwise have subclassed.
 
-[uuid("9B517604-2D86-4FA2-A20C-ECF88301B010")]
-interface IMadVRSubclassReplacement : public IUnknown
+interface __declspec(uuid("9B517604-2D86-4FA2-A20C-ECF88301B010")) IMadVRSubclassReplacement : public IUnknown
 {
   STDMETHOD(DisableSubclassing)(void) = 0;
   STDMETHOD_(BOOL, ParentWindowProc)(HWND hwnd, UINT uMsg, WPARAM *wParam, LPARAM *lParam, LRESULT *result) = 0;
@@ -252,8 +248,7 @@ interface IMadVRSubclassReplacement : public IUnknown
 #define ExclusiveModeWasJustLeft        4
 typedef void (__stdcall *EXCLUSIVEMODECALLBACK)(LPVOID context, int event);
 
-[uuid("51CA9252-ACC5-4EC5-A02E-0F9F8C42B536")]
-interface IMadVRExclusiveModeCallback : public IUnknown
+interface __declspec(uuid("51CA9252-ACC5-4EC5-A02E-0F9F8C42B536")) IMadVRExclusiveModeCallback : public IUnknown
 {
   STDMETHOD(  Register)(EXCLUSIVEMODECALLBACK exclusiveModeCallback, LPVOID context) = 0;
   STDMETHOD(Unregister)(EXCLUSIVEMODECALLBACK exclusiveModeCallback, LPVOID context) = 0;
@@ -268,8 +263,7 @@ interface IMadVRExclusiveModeCallback : public IUnknown
 #define ShaderStage_PreScale 0
 #define ShaderStage_PostScale 1
 
-[uuid("B6A6D5D4-9637-4C7D-AAAE-BC0B36F5E433")]
-interface IMadVRExternalPixelShaders : public IUnknown
+interface __declspec(uuid("B6A6D5D4-9637-4C7D-AAAE-BC0B36F5E433")) IMadVRExternalPixelShaders : public IUnknown
 {
   STDMETHOD(ClearPixelShaders)(int stage) = 0;
   STDMETHOD(AddPixelShader)(LPCSTR sourceCode, LPCSTR compileProfile, int stage, LPVOID reserved) = 0;
@@ -281,8 +275,7 @@ interface IMadVRExternalPixelShaders : public IUnknown
 
 // this interface allows you to get all kinds of information from madVR
 
-[uuid("8FAB7F31-06EF-444C-A798-10314E185532")]
-interface IMadVRInfo : public IUnknown
+interface __declspec(uuid("8FAB7F31-06EF-444C-A798-10314E185532")) IMadVRInfo : public IUnknown
 {
   // The memory for strings and binary data is allocated by the callee
   // by using LocalAlloc. It is the caller's responsibility to release the
@@ -329,8 +322,7 @@ interface IMadVRInfo : public IUnknown
 // This interface allows you to give commands to madVR. These commands only
 // affect the current madVR instance. They don't change permanent settings.
 
-[uuid("5E9599D1-C5DB-4A84-98A9-09BC5F8F1B79")]
-interface IMadVRCommand : public IUnknown
+interface __declspec(uuid("5E9599D1-C5DB-4A84-98A9-09BC5F8F1B79")) IMadVRCommand : public IUnknown
 {
   // Command names and LPWSTR values are treated case insensitive.
   STDMETHOD(SendCommand         )(LPCSTR command) = 0;
@@ -385,8 +377,7 @@ interface IMadVRCommand : public IUnknown
 // If you don't specify a path, you automatically access the currently active
 // profile.
 
-[uuid("6F8A566C-4E19-439E-8F07-20E46ED06DEE")]
-interface IMadVRSettings : public IUnknown
+interface __declspec(uuid("6F8A566C-4E19-439E-8F07-20E46ED06DEE")) IMadVRSettings : public IUnknown
 {
   // returns the revision number of the settings record
   // the revision number is increased by 1 every time a setting changes
@@ -416,8 +407,7 @@ interface IMadVRSettings : public IUnknown
   STDMETHOD_(BOOL, SettingsGetBinary )(LPCWSTR path, LPVOID* value, int* bufLenInBytes) = 0;
 };
 
-[uuid("1C3E03D6-F422-4D31-9424-75936F663BF7")]
-interface IMadVRSettings2 : public IMadVRSettings
+interface __declspec(uuid("1C3E03D6-F422-4D31-9424-75936F663BF7")) IMadVRSettings2 : public IMadVRSettings
 {
   // Enumerate the available settings stuff in the specified path.
   // Simply loop from enumIndex 0 to infinite, until the enumeration returns FALSE.
@@ -714,33 +704,28 @@ interface IMadVRSettings2 : public IMadVRSettings
 interface ISubRenderCallback; // forward
 
 // interface exported by madVR
-[uuid("9CC7F9F7-3ED1-493c-AF65-527EA1D9947F")]
-interface ISubRender : public IUnknown
+interface __declspec(uuid("9CC7F9F7-3ED1-493c-AF65-527EA1D9947F")) ISubRender : public IUnknown
 {
   STDMETHOD(SetCallback)(ISubRenderCallback *callback) = 0;
 };
 
 // callback interfaces can provide madVR with
-[uuid("CD6D2AA5-20D3-4ebe-A8A9-34D3B00CC253")]
-interface ISubRenderCallback : public IUnknown
+interface __declspec(uuid("CD6D2AA5-20D3-4ebe-A8A9-34D3B00CC253")) ISubRenderCallback : public IUnknown
 {
   STDMETHOD(SetDevice)(IDirect3DDevice9 *device) = 0;
   STDMETHOD(Render)(REFERENCE_TIME frameStart, int left, int top, int right, int bottom, int width, int height) = 0;
 };
-[uuid("E602585E-C05A-4828-AC69-AF92997F2E0C")]
-interface ISubRenderCallback2 : public ISubRenderCallback
+interface __declspec(uuid("E602585E-C05A-4828-AC69-AF92997F2E0C")) ISubRenderCallback2 : public ISubRenderCallback
 {
   STDMETHOD(RenderEx)(REFERENCE_TIME frameStart, REFERENCE_TIME frameStop, REFERENCE_TIME avgTimePerFrame, int left, int top, int right, int bottom, int width, int height) = 0;
 };
-[uuid("BAC4273A-3EAD-47F5-9710-8488E52AC618")]
-interface ISubRenderCallback3 : public ISubRenderCallback2
+interface __declspec(uuid("BAC4273A-3EAD-47F5-9710-8488E52AC618")) ISubRenderCallback3 : public ISubRenderCallback2
 {
   STDMETHOD(RenderEx2)(REFERENCE_TIME frameStart, REFERENCE_TIME frameStop, REFERENCE_TIME avgTimePerFrame, RECT croppedVideoRect, RECT originalVideoRect, RECT viewportRect, const double videoStretchFactor = 1.0) = 0;
 };
 const static DWORD SUBRENDER_LEFT_EYE  = 1;
 const static DWORD SUBRENDER_RIGHT_EYE = 2;
-[uuid("C89CF1D4-29C5-4A96-8AAC-528EC6F7AF1E")]
-interface ISubRenderCallback4 : public ISubRenderCallback3
+interface __declspec(uuid("C89CF1D4-29C5-4A96-8AAC-528EC6F7AF1E")) ISubRenderCallback4 : public ISubRenderCallback3
 {
   STDMETHOD(RenderEx3)(REFERENCE_TIME frameStart, REFERENCE_TIME frameStop, REFERENCE_TIME avgTimePerFrame, RECT croppedVideoRect, RECT originalVideoRect, RECT viewportRect, const double videoStretchFactor = 1.0, int xOffsetInPixels = 0, DWORD flags = 0) = 0;
 };
@@ -785,8 +770,7 @@ interface ISubRenderCallback4 : public ISubRenderCallback3
 // disabled, you should still show your own seek bar, because otherwise
 // the user will have no way to seek at all.
 
-[uuid("D6EE8031-214E-4E9E-A3A7-458925F933AB")]
-interface IMadVRExclusiveModeInfo : public IUnknown
+interface __declspec(uuid("D6EE8031-214E-4E9E-A3A7-458925F933AB")) IMadVRExclusiveModeInfo : public IUnknown
 {
   STDMETHOD_(BOOL, IsExclusiveModeActive)(void) = 0;
   STDMETHOD_(BOOL, IsMadVRSeekbarEnabled)(void) = 0;
@@ -801,8 +785,7 @@ interface IMadVRExclusiveModeInfo : public IUnknown
 
 // this interface allows you to ask madVR about the detected refresh rate
 
-[uuid("3F6580E8-8DE9-48D0-8E4E-1F26FE02413E")]
-interface IMadVRRefreshRateInfo : public IUnknown
+interface __declspec(uuid("3F6580E8-8DE9-48D0-8E4E-1F26FE02413E")) IMadVRRefreshRateInfo : public IUnknown
 {
   STDMETHOD(GetRefreshRate)(double *refreshRate) = 0;
 };
@@ -814,8 +797,7 @@ interface IMadVRRefreshRateInfo : public IUnknown
 // CAUTION: This interface is obsolete. Use IMadVRCommand instead:
 // IMadVRCommand::SendCommandBool("disableSeekbar", true)
 
-[uuid("D2D3A520-7CFA-46EB-BA3B-6194A028781C")]
-interface IMadVRSeekbarControl : public IUnknown
+interface __declspec(uuid("D2D3A520-7CFA-46EB-BA3B-6194A028781C")) IMadVRSeekbarControl : public IUnknown
 {
   STDMETHOD(DisableSeekbar)(BOOL disable) = 0;
 };
@@ -827,8 +809,7 @@ interface IMadVRSeekbarControl : public IUnknown
 // CAUTION: This interface is obsolete. Use IMadVRCommand instead:
 // IMadVRCommand::SendCommandBool("disableExclusiveMode", true)
 
-[uuid("88A69329-3CD3-47D6-ADEF-89FA23AFC7F3")]
-interface IMadVRExclusiveModeControl : public IUnknown
+interface __declspec(uuid("88A69329-3CD3-47D6-ADEF-89FA23AFC7F3")) IMadVRExclusiveModeControl : public IUnknown
 {
   STDMETHOD(DisableExclusiveMode)(BOOL disable) = 0;
 };
@@ -842,8 +823,7 @@ interface IMadVRExclusiveModeControl : public IUnknown
 // can then blend the media player's GUI on top of madVR's rendered video
 // frames in madVR's OSD callback function.
 
-[uuid("1CAEE23B-D14B-4DB4-8AEA-F3528CB78922")]
-interface IMadVRDirect3D9Manager : public IUnknown
+interface __declspec(uuid("1CAEE23B-D14B-4DB4-8AEA-F3528CB78922")) IMadVRDirect3D9Manager : public IUnknown
 {
   STDMETHOD(UseTheseDevices)(LPDIRECT3DDEVICE9 scanlineReading, LPDIRECT3DDEVICE9 rendering, LPDIRECT3DDEVICE9 presentation) = 0;
   STDMETHOD(ConfigureDisplayModeChanger)(BOOL allowResolutionChanges, BOOL allowRefreshRateChanges) = 0;

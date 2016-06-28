@@ -319,8 +319,7 @@ IDirectVobSub2 :
 										   ) PURE;
 	};
 
-	[uuid("EC50DF65-1BCC-4512-BF26-1FB3561574D6")]
-	interface IDirectVobSub3 : public IUnknown
+	interface __declspec(uuid("EC50DF65-1BCC-4512-BF26-1FB3561574D6")) IDirectVobSub3 : public IUnknown
 	{
 		STDMETHOD(get_LanguageType)(int iLanguage, int* pType /* 0 - Embedded, 1 - External */) PURE;
 	};
