@@ -94,14 +94,14 @@ namespace YoutubeParser {
 		const YoutubeProfiles* current = getProfile(itag_current, type);
 		CheckPointer(current, false);
 
-		if (current->quality > sets->quality) {
+		if (current->priority > sets->priority) {
 			return false;
 		}
 
 		if (itag_final != 0) {
 			const YoutubeProfiles* final = getProfile(itag_final, type);
 			CheckPointer(final, false);
-			if (current->quality < final->quality) {
+			if (current->priority < final->priority) {
 				return false;
 			}
 		}
@@ -114,13 +114,13 @@ namespace YoutubeParser {
 
 	static CString FixHtmlSymbols(CString inStr)
 	{
-		inStr.Replace(_T("&quot;"), _T("\""));
-		inStr.Replace(_T("&amp;"), _T("&"));
-		inStr.Replace(_T("&#39;"), _T("'"));
-		inStr.Replace(_T("&#039;"), _T("'"));
-		inStr.Replace(_T("\\n"), _T("\r\n"));
-		inStr.Replace(_T("\n"), _T("\r\n"));
-		inStr.Replace(_T("\\"), _T(""));
+		inStr.Replace(L"&quot;", L"\"");
+		inStr.Replace(L"&amp;",  L"&");
+		inStr.Replace(L"&#39;",  L"'");
+		inStr.Replace(L"&#039;", L"'");
+		inStr.Replace(L"\\n",    L"\r\n");
+		inStr.Replace(L"\n",     L"\r\n");
+		inStr.Replace(L"\\",     L"");
 
 		return inStr;
 	}
@@ -357,7 +357,7 @@ namespace YoutubeParser {
 					}
 
 					if (!bMatch) {
-						CString timeStart = RegExpParse(url, L"t=([0-9]+)");
+						const CString timeStart = RegExpParse(url, L"t=([0-9]+)");
 						if (!timeStart.IsEmpty()) {
 							rtStart = _wtol(timeStart) * UNITS;
 						}
@@ -484,7 +484,7 @@ namespace YoutubeParser {
 
 			POSITION posLine = linesA.GetHeadPosition();
 			while (posLine) {
-				CStringA &lineA = linesA.GetNext(posLine);
+				const CStringA &lineA = linesA.GetNext(posLine);
 
 				int itag = 0;
 				CStringA url;
@@ -495,12 +495,12 @@ namespace YoutubeParser {
 
 				POSITION posParam = paramsA.GetHeadPosition();
 				while (posParam) {
-					CStringA &paramA = paramsA.GetNext(posParam);
+					const CStringA &paramA = paramsA.GetNext(posParam);
 
 					int k = paramA.Find('=');
 					if (k > 0) {
-						CStringA paramHeader = paramA.Left(k);
-						CStringA paramValue = paramA.Mid(k + 1);
+						const CStringA paramHeader = paramA.Left(k);
+						const CStringA paramValue = paramA.Mid(k + 1);
 
 						if (paramHeader == "url") {
 							url = UrlDecode(UrlDecode(paramValue));
@@ -549,7 +549,7 @@ namespace YoutubeParser {
 													funcList.AddTail(line);
 
 													if (funcGroup.IsEmpty()) {
-														int k = line.Find('.');
+														const int k = line.Find('.');
 														if (k > 0) {
 															funcGroup = line.Left(k);
 														}
@@ -572,7 +572,7 @@ namespace YoutubeParser {
 														const CStringA& func = funcList.GetNext(pos);
 
 														int funcArg = 0;
-														CStringA funcArgs = GetEntry(func, "(", ")");
+														const CStringA funcArgs = GetEntry(func, "(", ")");
 														CAtlList<CStringA> args;
 														Explode(funcArgs, args, ',');
 														if (args.GetCount() >= 1) {
@@ -643,15 +643,15 @@ namespace YoutubeParser {
 								const youtubeFuncType func = JSFuncs[i];
 								const int arg = JSFuncArgs[i];
 								switch (func) {
-								case youtubeFuncType::funcDELETE:
-									Delete(signature, arg);
-									break;
-								case youtubeFuncType::funcSWAP:
-									Swap(signature, arg);
-									break;
-								case youtubeFuncType::funcREVERSE:
-									Reverse(signature);
-									break;
+									case youtubeFuncType::funcDELETE:
+										Delete(signature, arg);
+										break;
+									case youtubeFuncType::funcSWAP:
+										Swap(signature, arg);
+										break;
+									case youtubeFuncType::funcREVERSE:
+										Reverse(signature);
+										break;
 								}
 							}
 
@@ -677,6 +677,7 @@ namespace YoutubeParser {
 							item.title = fmt;
 							item.tag = itag;
 							item.quality = current->quality;
+							item.priority = current->priority;
 							item.videoOnly = current->videoOnly;
 
 							youtubeUrllist.emplace_back(item);
@@ -685,7 +686,9 @@ namespace YoutubeParser {
 				}
 			}
 
-			std::sort(youtubeUrllist.begin(), youtubeUrllist.end());
+			std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), [](const YoutubeUrllistItem a, const YoutubeUrllistItem b) {
+				return a.priority > b.priority && a.quality >= b.quality;
+			});
 
 			if (!final_audio_url.IsEmpty()) {
 				final_audio_url.Replace(L"http://", L"https://");
@@ -725,8 +728,8 @@ namespace YoutubeParser {
 									LPCTSTR textValues = xmlElement.GetBuffer();
 									while (std::regex_search(textValues, matchValues, regexValues)) {
 										if (matchValues.size() == 3) {
-											CString xmlHeader = CString(matchValues[1].first, matchValues[1].length());
-											CString xmlValue = CString(matchValues[2].first, matchValues[2].length());
+											const CString xmlHeader = CString(matchValues[1].first, matchValues[1].length());
+											const CString xmlValue = CString(matchValues[2].first, matchValues[2].length());
 
 											if (xmlHeader == L"lang_code") {
 												url.Format(L"https://www.youtube.com/api/timedtext?lang=%s&v=%s&fmt=vtt", xmlValue, videoId);
@@ -822,8 +825,8 @@ namespace YoutubeParser {
 				LPCTSTR text = item.GetBuffer();
 				while (std::regex_search(text, match, regex)) {
 					if (match.size() == 3) {
-						CString propHeader = CString(match[1].first, match[1].length());
-						CString propValue = CString(match[2].first, match[2].length());
+						const CString propHeader = CString(match[1].first, match[1].length());
+						const CString propValue = CString(match[2].first, match[2].length());
 
 						// data-video-id, data-video-clip-end, data-index, data-video-username, data-video-title, data-video-clip-start.
 						if (propHeader == L"data-video-id") {
@@ -886,34 +889,31 @@ namespace YoutubeParser {
 		CString fmt;
 		CString fps;
 		switch (profile.type) {
-			case YoutubeParser::ytype::y_mp4:
+			case ytype::y_mp4:
 				fmt = L"MP4";
 				break;
-			case YoutubeParser::ytype::y_webm:
+			case ytype::y_webm:
 				fmt = L"WebM";
 				break;
-			case YoutubeParser::ytype::y_flv:
-				fmt = L"FLV";
-				break;
-			case YoutubeParser::ytype::y_3gp:
+			case ytype::y_3gp:
 				fmt = L"3GP";
 				break;
 #if ENABLE_YOUTUBE_3D
-			case YoutubeParser::ytype::y_3d_mp4:
+			case ytype::y_3d_mp4:
 				fmt = L"3D MP4";
 				break;
-			case YoutubeParser::ytype::y_3d_webm:
+			case ytype::y_3d_webm:
 				fmt = L"3D WebM";
 				break;
 #endif
-			case YoutubeParser::ytype::y_webm_video_60fps:
+			case ytype::y_webm_video_60fps:
 				fps = L"60";
-			case YoutubeParser::ytype::y_webm_video:
+			case ytype::y_webm_video:
 				fmt = L"WebM";
 				break;
-			case YoutubeParser::ytype::y_dash_mp4_video_60fps:
+			case ytype::y_dash_mp4_video_60fps:
 				fps = L"60";
-			case YoutubeParser::ytype::y_dash_mp4_video:
+			case ytype::y_dash_mp4_video:
 				fmt = L"DASH MP4";
 				break;
 		}
