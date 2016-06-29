@@ -5644,11 +5644,21 @@ void CMainFrame::OnFileSaveAs()
 
 			out = fname.Mid(fname.ReverseFind('/') + 1);
 			FixFilename(out);
+
+			if (GetFileExt(out).IsEmpty()) {
+				ext = L".ts";
+				out += ext;
+			}
 		}
 	}
 
 	if (!ext.IsEmpty()) {
-		ext_list.Format(_T("Media (*%s)|*%s|"), ext, ext);
+		CMediaFormatCategory* mfc = AfxGetAppSettings().m_Formats.FindMediaByExt(ext);
+		if (mfc) {
+			ext_list.Format(L"%s|*%s|", mfc->GetDescription(), ext);
+		} else {
+			ext_list.Format(L"Media (*%s)|*%s|", ext, ext);
+		}
 	}
 	ext_list.Append(ResStr(IDS_MAINFRM_48));
 
