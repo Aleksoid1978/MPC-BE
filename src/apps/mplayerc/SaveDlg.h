@@ -33,13 +33,12 @@ private:
 	CString m_in, m_out;
 	CComPtr<IGraphBuilder> pGB;
 	CComQIPtr<IMediaControl> pMC;
-	CComQIPtr<IMediaEventEx> pME;
 	CComQIPtr<IMediaSeeking> pMS;
 	HICON m_hIcon;
 	HWND  m_TaskDlgHwnd;
 
 public:
-	CSaveDlg(CString in, CString name, CString out);
+	CSaveDlg(CString in, CString name, CString out, HRESULT& hr);
 	virtual ~CSaveDlg();
 
 protected:

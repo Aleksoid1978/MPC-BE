@@ -23,7 +23,6 @@
 #include "MainFrm.h"
 #include <atlconv.h>
 #include <atlsync.h>
-#include <afxtaskdialog.h>
 #include <afxglobals.h>
 
 #include "../../DSUtil/WinAPIUtils.h"
@@ -5618,40 +5617,6 @@ void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 	OpenCurPlaylistItem();
 }
 
-static HRESULT CopyFiles(CString sourceFile, CString destFile)
-{
-	#define FOF_UI_FLAGS FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR
-
-	HRESULT hr = S_OK;
-
-	CComPtr<IShellItem> psiItem;
-	hr = afxGlobalData.ShellCreateItemFromParsingName(sourceFile, NULL, IID_PPV_ARGS(&psiItem));
-	EXIT_ON_ERROR(hr);
-
-	CComPtr<IShellItem> psiDestinationFolder;
-	CString pszPath = AddSlash(GetFolderOnly(destFile));
-	hr = afxGlobalData.ShellCreateItemFromParsingName(pszPath, NULL, IID_PPV_ARGS(&psiDestinationFolder));
-	EXIT_ON_ERROR(hr);
-
-	CComPtr<IFileOperation> pFileOperation;
-	hr = CoCreateInstance(CLSID_FileOperation,
-						  NULL,
-						  CLSCTX_INPROC_SERVER,
-						  IID_PPV_ARGS(&pFileOperation));
-	EXIT_ON_ERROR(hr);
-
-	hr = pFileOperation->SetOperationFlags(FOF_UI_FLAGS | FOFX_NOMINIMIZEBOX);
-	EXIT_ON_ERROR(hr);
-
-	CString pszCopyName = GetFileOnly(destFile);
-	hr = pFileOperation->CopyItem(psiItem, psiDestinationFolder, pszCopyName, NULL);
-	EXIT_ON_ERROR(hr);
-
-	hr = pFileOperation->PerformOperations();
-
-	return hr;
-}
-
 void CMainFrame::OnFileSaveAs()
 {
 	CString ext, ext_list, in = m_strUrl, out = in;
@@ -5660,14 +5625,13 @@ void CMainFrame::OnFileSaveAs()
 		out = GetAltFileName();
 		ext = GetFileExt(out).MakeLower();
 	} else {
-		int find = out.Find(_T("://"));
-		if (find < 0) {
+		if (!::PathIsURL(out)) {
 			ext = GetFileExt(out).MakeLower();
 			out = GetFileOnly(out);
-			if (ext == _T(".cda")) {
-				out = out.Left(out.GetLength()-4) + _T(".wav");
-			} else if (ext == _T(".ifo")) {
-				out = out.Left(out.GetLength()-4) + _T(".vob");
+			if (ext == L".cda") {
+				out = RenameFileExt(out, L".wav");
+			} else if (ext == L".ifo") {
+				out = RenameFileExt(out, L".vob");
 			}
 		} else {
 			CString fname = L"streaming_saved";
@@ -5714,11 +5678,10 @@ void CMainFrame::OnFileSaveAs()
 		name = GetAltFileName();
 	}
 
-	if (::PathIsURL(in)) {
-		CSaveDlg dlg(in, name, p);
+	HRESULT hr;
+	CSaveDlg dlg(in, name, p, hr);
+	if (SUCCEEDED(hr)) {
 		dlg.DoModal();
-	} else {
-		CopyFiles(in, p);
 	}
 
 	if (fs == State_Running) {
