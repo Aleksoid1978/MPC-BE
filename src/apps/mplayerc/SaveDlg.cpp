@@ -67,10 +67,6 @@ CSaveDlg::~CSaveDlg()
 		pMC->Stop();
 	}
 
-	if (pGB) {
-		pGB->Abort();
-	}
-
 	if (m_hIcon) {
 		DestroyIcon(m_hIcon);
 	}
@@ -299,6 +295,20 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 		if (dur && pos >= dur) {
 			::SendMessage(m_TaskDlgHwnd, TDM_CLICK_BUTTON, static_cast<WPARAM>(TDCBF_CANCEL_BUTTON), 0);
 			return S_FALSE;
+		}
+	}
+
+	return S_OK;
+}
+
+HRESULT CSaveDlg::OnCommandControlClick(_In_ int nCommandControlID)
+{
+	if (nCommandControlID == IDCANCEL) {
+		if (pGB) {
+			pGB->Abort();
+		}
+		if (pMC) {
+			pMC->Stop();
 		}
 	}
 

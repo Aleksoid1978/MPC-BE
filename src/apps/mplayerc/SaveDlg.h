@@ -44,6 +44,7 @@ public:
 protected:
 	virtual HRESULT OnInit();
 	virtual HRESULT OnTimer(_In_ long lTime);
+	virtual HRESULT OnCommandControlClick(_In_ int nCommandControlID);
 
 	HRESULT InitFileCopy();
 };
