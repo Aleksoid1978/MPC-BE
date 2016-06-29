@@ -45,7 +45,6 @@ CSaveDlg::CSaveDlg(CString in, CString name, CString out, HRESULT& hr)
 	: CTaskDialog(L"", name + L"\n" + out, ResStr(IDS_SAVE_FILE), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER|TDF_POSITION_RELATIVE_TO_WINDOW)
 	, m_in(in)
 	, m_out(out)
-	, m_TaskDlgHwnd(0)
 {
 	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 	if (m_hIcon != NULL) {
@@ -67,16 +66,18 @@ CSaveDlg::~CSaveDlg()
 		pMC->Stop();
 	}
 
+	if (m_SaveThread.joinable()) {
+		m_bAbort = true;
+		m_SaveThread.join();
+	}
+
+	if (m_hFile != INVALID_HANDLE_VALUE) {
+		CloseHandle(m_hFile);
+	}
+
 	if (m_hIcon) {
 		DestroyIcon(m_hIcon);
 	}
-}
-
-HRESULT CSaveDlg::OnInit()
-{
-	m_TaskDlgHwnd = ::GetActiveWindow();
-
-	return __super::OnInit();
 }
 
 static HRESULT CopyFiles(CString sourceFile, CString destFile)
@@ -118,6 +119,7 @@ HRESULT CSaveDlg::InitFileCopy()
 	if (FAILED(pGB.CoCreateInstance(CLSID_FilterGraph)) || !(pMC = pGB) || !(pMS = pGB)) {
 		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
 		SetFooterText(ResStr(IDS_AG_ERROR));
+
 		return S_FALSE;
 	}
 
@@ -126,7 +128,56 @@ HRESULT CSaveDlg::InitFileCopy()
 	const CString fn = m_in;
 	CComPtr<IFileSourceFilter> pReader;
 
-	if (!::PathIsURL(fn)) {
+	if (::PathIsURL(fn)) {
+		CUrl url;
+		url.CrackUrl(fn);
+		CString protocol = url.GetSchemeName();
+		protocol.MakeLower();
+		if (protocol == L"http" || protocol == L"https") {
+			CComPtr<IUnknown> pUnk;
+			pUnk.CoCreateInstance(CLSID_3DYDYoutubeSource);
+
+			if (CComQIPtr<IBaseFilter> pSrc = pUnk) {
+				pGB->AddFilter(pSrc, fn);
+
+				if (!(pReader = pUnk) || FAILED(hr = pReader->Load(fn, NULL))) {
+					pReader.Release();
+					pGB->RemoveFilter(pSrc);
+				}
+			}
+
+			if (!pReader
+					&& (m_HTTPAsync.Connect(fn, 3000) == S_OK)) {
+				m_len = m_HTTPAsync.GetLenght();
+
+				m_hFile = CreateFile(m_out, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+				if (m_hFile != INVALID_HANDLE_VALUE) {
+					if (m_len) {
+						ULARGE_INTEGER usize = { 0 };
+						usize.QuadPart = m_len;
+						HANDLE hMapping = CreateFileMapping(m_hFile, NULL, PAGE_READWRITE, usize.HighPart, usize.LowPart, NULL);
+						if (hMapping != INVALID_HANDLE_VALUE) {
+							CloseHandle(hMapping);
+						}
+					}
+
+					m_SaveThread = std::thread([this] { Save(); });
+
+					return S_OK;
+				}
+			}
+		} else if (protocol == L"udp") {
+			// don't working ...
+			/*
+			hr = S_OK;
+			CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CUDPReader(NULL, &hr);
+
+			if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fn, NULL))) {
+				pReader.Release();
+			}
+			*/
+		}
+	} else {
 		hr = S_OK;
 		CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CCDDAReader(NULL, &hr);
 
@@ -158,38 +209,11 @@ HRESULT CSaveDlg::InitFileCopy()
 		}
 	}
 
-	if (!pReader) {
-		CComPtr<IUnknown> pUnk;
-		pUnk.CoCreateInstance(CLSID_3DYDYoutubeSource);
-
-		if (CComQIPtr<IBaseFilter> pSrc = pUnk) {
-			pGB->AddFilter(pSrc, fn);
-
-			if (!(pReader = pUnk) || FAILED(hr = pReader->Load(fn, NULL))) {
-				pReader.Release();
-				pGB->RemoveFilter(pSrc);
-			}
-		}
-	}
-
-	if (!pReader) {
-		CComPtr<IUnknown> pUnk;
-		pUnk.CoCreateInstance(CLSID_URLReader);
-
-		if (CComQIPtr<IBaseFilter> pSrc = pUnk) {
-			pGB->AddFilter(pSrc, fn);
-
-			if (!(pReader = pUnk) || FAILED(hr = pReader->Load(fn, NULL))) {
-				pReader.Release();
-				pGB->RemoveFilter(pSrc);
-			}
-		}
-	}
-
 	CComQIPtr<IBaseFilter> pSrc = pReader;
 	if (FAILED(pGB->AddFilter(pSrc, fn))) {
 		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
-		SetFooterText(L"Sorry, can't save this file, press Cancel");
+		SetFooterText(L"Sorry, can't save this file, press \"Cancel\"");
+
 		return S_FALSE;
 	}
 
@@ -241,12 +265,104 @@ HRESULT CSaveDlg::InitFileCopy()
 	return S_OK;
 }
 
+void CSaveDlg::Save()
+{
+	if (m_hFile != INVALID_HANDLE_VALUE) {
+		m_startTime = clock();
+
+		const DWORD bufLen = 64 * KILOBYTE;
+		BYTE pBuffer[bufLen] = { 0 };
+
+		while (!m_bAbort) {
+			DWORD dwSizeRead = 0;
+			const HRESULT hr = m_HTTPAsync.Read(pBuffer, bufLen, &dwSizeRead);
+			if (hr != S_OK) {
+				m_bAbort = true;
+				break;
+			}
+
+			DWORD dwSizeWritten = 0;
+			if (FALSE == WriteFile(m_hFile, (LPCVOID)pBuffer, dwSizeRead, &dwSizeWritten, NULL) || dwSizeRead != dwSizeWritten) {
+				m_bAbort = true;
+				break;
+			}
+
+			m_pos += dwSizeRead;
+			if (m_len && m_len == m_pos) {
+				m_bAbort = true;
+				break;
+			}
+		}
+	}
+
+	ClickCommandControl(IDCANCEL);
+}
+
 HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 {
 	static UINT sizeUnits[]  = { IDS_SIZE_UNIT_K,  IDS_SIZE_UNIT_M,  IDS_SIZE_UNIT_G  };
 	static UINT speedUnits[] = { IDS_SPEED_UNIT_K, IDS_SPEED_UNIT_M, IDS_SPEED_UNIT_G };
 
-	if (pGB && pMS) {
+	if (m_hFile) {
+		const QWORD pos = m_pos;
+
+		double dPos = pos / 1024.0;
+		const unsigned int unitPos = AdaptUnit(dPos, _countof(sizeUnits));
+
+		const clock_t timeSec = (clock() - m_startTime) / 1000;
+		const LONG speed = timeSec > 0 ? pos / timeSec : 0;
+		double dSpeed = speed / 1024.0;
+		const unsigned int unitSpeed = AdaptUnit(dSpeed, _countof(speedUnits));
+
+		CString str;
+		if (m_len) {
+			double dDur = m_len / 1024.0;
+			const unsigned int unitDur = AdaptUnit(dDur, _countof(sizeUnits));
+
+			str.Format(L"%.2lf %s / %.2lf %s , %.2lf %s",
+					   dPos, ResStr(sizeUnits[unitPos]), dDur, ResStr(sizeUnits[unitDur]),
+					   dSpeed, ResStr(speedUnits[unitSpeed]));
+		} else {
+			str.Format(L"%.2lf %s , %.2lf %s",
+					   dPos, ResStr(sizeUnits[unitPos]),
+					   dSpeed, ResStr(speedUnits[unitSpeed]));
+		}
+
+		if (speed > 0 && m_len) {
+			const REFERENCE_TIME sec = (m_len - pos) / speed;
+			if (sec > 0) {
+				DVD_HMSF_TIMECODE tcDur = {
+					(BYTE)(sec / 3600),
+					(BYTE)(sec / 60 % 60),
+					(BYTE)(sec % 60),
+					0
+				};
+
+				str.Append(L",");
+
+				if (tcDur.bHours > 0) {
+					str.AppendFormat(L" %0.2dh", tcDur.bHours);
+				}
+				if (tcDur.bMinutes > 0) {
+					str.AppendFormat(L" %0.2dm", tcDur.bMinutes);
+				}
+				if (tcDur.bSeconds > 0) {
+					str.AppendFormat(L" %0.2ds", tcDur.bSeconds);
+				}
+			}
+		}
+
+		SetContent(str);
+
+		if (m_len) {
+			SetProgressBarPosition(static_cast<int>(100 * m_pos / m_len));
+		}
+
+		if (m_bAbort) {
+			ClickCommandControl(IDCANCEL);
+			return S_FALSE;
+		}
+	} else if (pGB && pMS) {
 		CString str;
 		REFERENCE_TIME pos = 0, dur = 0;
 		pMS->GetCurrentPosition(&pos);
@@ -266,25 +382,27 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 				   dPos, ResStr(sizeUnits[unitPos]), dDur, ResStr(sizeUnits[unitDur]),
 				   dSpeed, ResStr(speedUnits[unitSpeed]));
 
-		if (speed > 0) {
-			str.Append(L",");
-			REFERENCE_TIME sec = (dur - pos) / speed;
+		if (speed > 0 && m_len) {
+			const REFERENCE_TIME sec = (dur - pos) / speed;
+			if (sec > 0) {
+				DVD_HMSF_TIMECODE tcDur = {
+					(BYTE)(sec / 3600),
+					(BYTE)(sec / 60 % 60),
+					(BYTE)(sec % 60),
+					0
+				};
 
-			DVD_HMSF_TIMECODE tcDur = {
-				(BYTE)(sec / 3600),
-				(BYTE)(sec / 60 % 60),
-				(BYTE)(sec % 60),
-				0
-			};
+				str.Append(L",");
 
-			if (tcDur.bHours > 0) {
-				str.AppendFormat(L" %0.2dh", tcDur.bHours);
-			}
-			if (tcDur.bMinutes > 0) {
-				str.AppendFormat(L" %0.2dm", tcDur.bMinutes);
-			}
-			if (tcDur.bSeconds > 0) {
-				str.AppendFormat(L" %0.2ds", tcDur.bSeconds);
+				if (tcDur.bHours > 0) {
+					str.AppendFormat(L" %0.2dh", tcDur.bHours);
+				}
+				if (tcDur.bMinutes > 0) {
+					str.AppendFormat(L" %0.2dm", tcDur.bMinutes);
+				}
+				if (tcDur.bSeconds > 0) {
+					str.AppendFormat(L" %0.2ds", tcDur.bSeconds);
+				}
 			}
 		}
 
@@ -293,7 +411,7 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 		SetProgressBarPosition(dur > 0 ? (int)(100 * pos / dur) : 0);
 
 		if (dur && pos >= dur) {
-			::SendMessage(m_TaskDlgHwnd, TDM_CLICK_BUTTON, static_cast<WPARAM>(TDCBF_CANCEL_BUTTON), 0);
+			ClickCommandControl(IDCANCEL);
 			return S_FALSE;
 		}
 	}

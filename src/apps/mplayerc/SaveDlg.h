@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,8 @@
 #pragma once
 
 #include <afxtaskdialog.h>
+#include <thread>
+#include "../../DSUtil/HTTPAsync.h"
 
 // CSaveDlg dialog
 
@@ -31,18 +33,27 @@ class CSaveDlg : public CTaskDialog
 
 private:
 	CString m_in, m_out;
-	CComPtr<IGraphBuilder> pGB;
+	HICON m_hIcon;
+
+	CComPtr<IGraphBuilder>   pGB;
 	CComQIPtr<IMediaControl> pMC;
 	CComQIPtr<IMediaSeeking> pMS;
-	HICON m_hIcon;
-	HWND  m_TaskDlgHwnd;
+
+	CHTTPAsync m_HTTPAsync;
+	HANDLE m_hFile         = INVALID_HANDLE_VALUE;
+	QWORD m_len            = 0;
+	volatile QWORD m_pos   = 0;
+	clock_t m_startTime    = 0;
+
+	volatile bool m_bAbort = false;
+	std::thread m_SaveThread;
+	void Save();
 
 public:
 	CSaveDlg(CString in, CString name, CString out, HRESULT& hr);
 	virtual ~CSaveDlg();
 
 protected:
-	virtual HRESULT OnInit();
 	virtual HRESULT OnTimer(_In_ long lTime);
 	virtual HRESULT OnCommandControlClick(_In_ int nCommandControlID);
 
