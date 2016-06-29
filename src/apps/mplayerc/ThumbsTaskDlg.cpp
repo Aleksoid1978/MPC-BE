@@ -1,0 +1,371 @@
+/*
+ * (C) 2016 see Authors.txt
+ *
+ * This file is part of MPC-BE.
+ *
+ * MPC-BE is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MPC-BE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#include "stdafx.h"
+
+#include <afxwin.h>
+#include "MainFrm.h"
+#include "../../DSUtil/Filehandle.h"
+#include "SmoothImageResampling.h"
+
+#include "ThumbsTaskDlg.h"
+
+// CThumbsTaskDlg dialog
+
+#define UWM_SAVED		(WM_USER + 100)
+#define UWM_FAILED		(WM_USER + 101)
+#define UWM_PROCESSED	(WM_USER + 102)
+
+struct THREADSTRUCT {
+	HWND hWND;
+	CString filename;
+	SIZE framesize;
+	SIZE dar;
+};
+typedef THREADSTRUCT* PTHREADSTRUCT;
+
+void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
+{
+	m_iProgress = 0;
+
+	if (!thumbpath
+			|| !(pMainFrm->m_pMS)
+			|| !(pMainFrm->m_pFS)
+			|| !(pMainFrm->m_pME)) {
+		m_iProgress = -1;
+		return;
+	}
+
+	// get frame size and aspect ratio
+	CSize framesize, dar;
+	if (pMainFrm->m_pCAP) {
+		framesize = pMainFrm->m_pCAP->GetVideoSize();
+		dar = pMainFrm->m_pCAP->GetVideoSizeAR();
+	}
+	else if (pMainFrm->m_pMFVDC) {
+		pMainFrm->m_pMFVDC->GetNativeVideoSize(&framesize, &dar);
+	}
+	else if (pMainFrm->m_pBV) {
+		pMainFrm->m_pBV->GetVideoSize(&framesize.cx, &framesize.cy);
+		long arx = 0, ary = 0;
+		CComQIPtr<IBasicVideo2> pBV2 = pMainFrm->m_pBV;
+		if (pBV2 && SUCCEEDED(pBV2->GetPreferredAspectRatio(&arx, &ary)) && arx > 0 && ary > 0) {
+			dar.SetSize(arx, ary);
+		}
+	}
+	else {
+		m_iProgress = -1;
+		return;
+	}
+
+	// with the overlay mixer IBasicVideo2 won't tell the new AR when changed dynamically
+	DVD_VideoAttributes VATR;
+	if (pMainFrm->GetPlaybackMode() == PM_DVD && SUCCEEDED(pMainFrm->m_pDVDI->GetCurrentVideoAttributes(&VATR))) {
+		dar.SetSize(VATR.ulAspectX, VATR.ulAspectY);
+	}
+
+	// get duration
+	REFERENCE_TIME duration = 0;
+	pMainFrm->m_pMS->GetDuration(&duration);
+	if (duration <= 0) {
+		m_iProgress = -1;
+		return;
+	}
+
+	//
+	CAppSettings& s = AfxGetAppSettings();
+
+	const int infoheight = 70;
+	const int margin = 10;
+	const int width = clamp(s.iThumbWidth, 256, 2560);
+	const int cols = clamp(s.iThumbCols, 1, 10);
+	const int rows = clamp(s.iThumbRows, 1, 20);
+
+	CSize thumbsize;
+	thumbsize.cx = (width - margin) / cols - margin;
+	thumbsize.cy = MulDiv(thumbsize.cx, framesize.cy, framesize.cx);
+
+	const int height = infoheight + margin + (thumbsize.cy + margin) * rows;
+	const int dibsize = sizeof(BITMAPINFOHEADER) + width * height * 4;
+
+
+	std::unique_ptr<BYTE[]> dib(DNew BYTE[dibsize]);
+	if (!dib) {
+		AfxMessageBox(ResStr(IDS_MAINFRM_56));
+		m_iProgress = -1;
+		return;
+	}
+
+	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)dib.get();
+	memset(bih, 0, sizeof(BITMAPINFOHEADER));
+	bih->biSize = sizeof(BITMAPINFOHEADER);
+	bih->biWidth = width;
+	bih->biHeight = height;
+	bih->biPlanes = 1;
+	bih->biBitCount = 32;
+	bih->biCompression = BI_RGB;
+	bih->biSizeImage = DIBSIZE(*bih);
+	memsetd(bih + 1, 0xffffff, bih->biSizeImage);
+
+	SubPicDesc spd;
+	spd.w = width;
+	spd.h = height;
+	spd.bpp = 32;
+	spd.pitch = -width * 4;
+	spd.vidrect = CRect(0, 0, width, height);
+	spd.bits = (BYTE*)(bih + 1) + (width * 4) * (height - 1);
+
+	{
+		BYTE* p = (BYTE*)spd.bits;
+		for (int y = 0; y < spd.h; y++, p += spd.pitch) {
+			for (int x = 0; x < spd.w; x++) {
+				((DWORD*)p)[x] = 0x010101 * (0xe0 + 0x08 * y / spd.h + 0x18 * (spd.w - x) / spd.w);
+			}
+		}
+	}
+
+	CCritSec csSubLock;
+	RECT bbox;
+
+	std::unique_ptr<BYTE[]> thumb(DNew BYTE[thumbsize.cx * thumbsize.cy * 4]);
+	if (!thumb) {
+		AfxMessageBox(ResStr(IDS_MAINFRM_56));
+		m_iProgress = -1;
+		return;
+	}
+
+	m_iProgress = 1; // prepared DIB
+	if (m_bAbort) {
+		return;
+	}
+
+	for (int i = 1, pics = cols*rows; i <= pics; i++) {
+		REFERENCE_TIME rt = duration * i / (pics + 1);
+		DVD_HMSF_TIMECODE hmsf = RT2HMS_r(rt);
+
+		pMainFrm->SeekTo(rt);
+
+		// Number of steps you need to do more than one for some decoders.
+		// TODO - maybe need to find another way to get correct frame ???
+		HRESULT hr = pMainFrm->m_pFS->Step(2, NULL);
+
+		HANDLE hGraphEvent = NULL;
+		pMainFrm->m_pME->GetEventHandle((OAEVENT*)&hGraphEvent);
+		while (hGraphEvent && WaitForSingleObject(hGraphEvent, INFINITE) == WAIT_OBJECT_0) {
+			LONG evCode = 0;
+			LONG_PTR evParam1, evParam2;
+			while (pMainFrm->m_pME && SUCCEEDED(pMainFrm->m_pME->GetEvent(&evCode, &evParam1, &evParam2, 0))) {
+				pMainFrm->m_pME->FreeEventParams(evCode, evParam1, evParam2);
+				if (EC_STEP_COMPLETE == evCode) {
+					hGraphEvent = NULL;
+				}
+			}
+		}
+
+		const int col = (i - 1) % cols;
+		const int row = (i - 1) / cols;
+
+		const CPoint p(margin + col * (thumbsize.cx + margin), infoheight + margin + row * (thumbsize.cy + margin));
+		const CRect r(p, thumbsize);
+
+		CRenderedTextSubtitle rts(&csSubLock);
+		rts.CreateDefaultStyle(0);
+		rts.m_dstScreenSize.SetSize(width, height);
+		STSStyle* style = DNew STSStyle();
+		style->marginRect.SetRectEmpty();
+		rts.AddStyle(_T("thumbs"), style);
+
+		CStringW str;
+		str.Format(L"{\\an7\\1c&Hffffff&\\4a&Hb0&\\bord1\\shad4\\be1}{\\p1}m %d %d l %d %d %d %d %d %d{\\p}",
+			r.left, r.top, r.right, r.top, r.right, r.bottom, r.left, r.bottom);
+		rts.Add(str, true, 0, 1, _T("thumbs"));
+		str.Format(L"{\\an3\\1c&Hffffff&\\3c&H000000&\\alpha&H80&\\fs16\\b1\\bord2\\shad0\\pos(%d,%d)}%02d:%02d:%02d",
+			r.right - 5, r.bottom - 3, hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
+		rts.Add(str, true, 1, 2, _T("thumbs"));
+
+		rts.Render(spd, 0, 25, bbox);
+
+		BYTE* pData = NULL;
+		long size = 0;
+		if (!pMainFrm->GetDIB(&pData, size)) {
+			m_iProgress = -1;
+			return;
+		}
+
+		BITMAPINFO* bi = (BITMAPINFO*)pData;
+		if (bi->bmiHeader.biBitCount != 32) {
+			CString str;
+			str.Format(ResStr(IDS_MAINFRM_57), bi->bmiHeader.biBitCount);
+			AfxMessageBox(str);
+			delete[] pData;
+			m_iProgress = -1;
+			return;
+		}
+
+		Resize_HQ_4ch((const BYTE*)(&bi->bmiHeader + 1), bi->bmiHeader.biWidth, abs(bi->bmiHeader.biHeight),
+			thumb.get(), thumbsize.cx, thumbsize.cy);
+
+		const BYTE* src = thumb.get();
+		int srcPitch = thumbsize.cx * 4;
+		if (bi->bmiHeader.biHeight >= 0) {
+			src += srcPitch * (thumbsize.cy - 1);
+			srcPitch = -srcPitch;
+		}
+
+		BYTE* dst = (BYTE*)spd.bits + spd.pitch * r.top + r.left * 4;
+		for (int y = 0; y < thumbsize.cy; y++, dst += spd.pitch, src += srcPitch) {
+			memcpy(dst, src, abs(srcPitch));
+		}
+
+		rts.Render(spd, 10000, 25, bbox);
+
+		delete[] pData;
+
+		m_iProgress++; // make one more thumbnail
+		if (m_bAbort) {
+			return;
+		}
+	}
+
+	{
+		CRenderedTextSubtitle rts(&csSubLock);
+		rts.CreateDefaultStyle(0);
+		rts.m_dstScreenSize.SetSize(width, height);
+		STSStyle* style = DNew STSStyle();
+		style->marginRect.SetRect(margin, margin, margin, height - infoheight - margin);
+		rts.AddStyle(_T("thumbs"), style);
+
+		CStringW str;
+		str.Format(L"{\\an9\\fs%d\\b1\\bord0\\shad0\\1c&Hffffff&}%s", infoheight - 10, width >= 550 ? L"MPC-BE" : L"MPC");
+
+		rts.Add(str, true, 0, 1, _T("thumbs"), _T(""), _T(""), CRect(0, 0, 0, 0), -1);
+
+		DVD_HMSF_TIMECODE hmsf = RT2HMS_r(duration);
+
+		CStringW ar;
+		if (dar.cx > 0 && dar.cy > 0 && dar.cx != framesize.cx && dar.cy != framesize.cy) {
+			ar.Format(L"(%d:%d)", dar.cx, dar.cy);
+		}
+
+		CString filename = pMainFrm->GetAltFileName(); // YouTube
+		CString filesize;
+
+		if (filename.IsEmpty()) {
+			CString filepath = pMainFrm->GetCurFileName();
+			filename = GetFileOnly(filepath);
+
+			WIN32_FIND_DATA wfd;
+			HANDLE hFind = FindFirstFile(filepath, &wfd);
+			if (hFind != INVALID_HANDLE_VALUE) {
+				FindClose(hFind);
+
+				__int64 size = (__int64(wfd.nFileSizeHigh) << 32) | wfd.nFileSizeLow;
+				TCHAR szFileSize[65];
+				StrFormatByteSize(size, szFileSize, _countof(szFileSize));
+				CString szByteSize;
+				szByteSize.Format(L"%I64d", size);
+				filesize.Format(ResStr(IDS_MAINFRM_58), szFileSize, FormatNumber(szByteSize));
+			}
+		}
+
+		str.Format(ResStr(IDS_MAINFRM_59),
+			CompactPath(filename, 90),
+			filesize,
+			framesize.cx, framesize.cy, ar,
+			hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
+
+		rts.Add(str, true, 0, 1, _T("thumbs"));
+		rts.Render(spd, 0, 25, bbox);
+	}
+
+	pMainFrm->SaveDIB(thumbpath, dib.get(), dibsize);
+
+	m_iProgress = INT_MAX; // the end
+}
+
+IMPLEMENT_DYNAMIC(CThumbsTaskDlg, CTaskDialog)
+
+CThumbsTaskDlg::CThumbsTaskDlg(LPCTSTR filename)
+	: CTaskDialog(
+		_T(""),
+		_T(""),
+		ResStr(IDS_SAVE_FILE),
+		TDCBF_CANCEL_BUTTON,
+		TDF_CALLBACK_TIMER | TDF_SHOW_PROGRESS_BAR)
+	, m_filename(filename)
+	, m_iProgress(0)
+	, m_bAbort(0)
+{
+	pMainFrm = AfxGetMainFrame();
+
+	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
+	if (m_hIcon != NULL) {
+		SetMainIcon(m_hIcon);
+	}
+
+	SetDialogWidth(200); // I do not know why, but it does not work
+}
+
+CThumbsTaskDlg::~CThumbsTaskDlg()
+{
+	if (m_Thread.joinable()) {
+		m_bAbort = true;
+		m_Thread.join();
+	}
+
+	if (m_hIcon) {
+		DestroyIcon(m_hIcon);
+	}
+}
+
+HRESULT CThumbsTaskDlg::OnInit()
+{
+	if (m_filename.IsEmpty()) {
+		return E_INVALIDARG;
+	}
+
+	m_TaskDlgHwnd = ::GetActiveWindow();
+
+	CAppSettings& s = AfxGetAppSettings();
+	int n = 1 + clamp(s.iThumbCols, 1, 10) * clamp(s.iThumbRows, 1, 20) + 1;
+
+	SetProgressBarRange(0, n);
+	SetProgressBarPosition(0);
+
+	m_Thread = std::thread([this] { SaveThumbnails(m_filename); });
+
+	return S_OK;
+}
+
+HRESULT CThumbsTaskDlg::OnTimer(_In_ long lTime)
+{
+	if (m_iProgress < 0) {
+		ClickCommandControl(IDCANCEL);
+		return E_FAIL;
+	}
+
+	if (m_iProgress == INT_MAX) {
+		ClickCommandControl(IDCANCEL);
+		return S_FALSE;
+	}
+
+	SetProgressBarPosition(m_iProgress);
+	return S_OK;
+}

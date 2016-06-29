@@ -216,6 +216,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	friend class CFullscreenWnd;
 	friend class COSD;
 	friend class CChildView;
+	friend class CThumbsTaskDlg;
 
 	// TODO: wrap these graph objects into a class to make it look cleaner
 

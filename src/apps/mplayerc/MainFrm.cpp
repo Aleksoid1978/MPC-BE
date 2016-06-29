@@ -86,7 +86,7 @@
 #include <string>
 #include <regex>
 
-#include "SmoothImageResampling.h"
+#include "ThumbsTaskDlg.h"
 
 #define DEFCLIENTW		292
 #define DEFCLIENTH		200
@@ -5872,256 +5872,32 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 		return;
 	}
 
-	REFERENCE_TIME rtPos = GetPos();
-	REFERENCE_TIME rtDur = GetDur();
-
-	if (rtDur <= 0) {
+	if (GetDur() <= 0) {
 		AfxMessageBox(ResStr(IDS_MAINFRM_54));
 		return;
 	}
 
 	//pMC->Pause();
-
-	if (GetMediaState() != State_Paused) {
+	const auto ms = GetMediaState();
+	if (ms != State_Paused) {
 		SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
-	}
-	GetMediaState(); // wait for completion of the pause command
-
-	CSize framesize, dar;
-
-	if (m_pCAP) {
-		framesize = m_pCAP->GetVideoSize();
-		dar = m_pCAP->GetVideoSizeAR();
-	} else if (m_pMFVDC) {
-		m_pMFVDC->GetNativeVideoSize(&framesize, &dar);
-	} else {
-		m_pBV->GetVideoSize(&framesize.cx, &framesize.cy);
-
-		long arx = 0, ary = 0;
-		CComQIPtr<IBasicVideo2> pBV2 = m_pBV;
-		if (pBV2 && SUCCEEDED(pBV2->GetPreferredAspectRatio(&arx, &ary)) && arx > 0 && ary > 0) {
-			dar.SetSize(arx, ary);
-		}
+		GetMediaState(); // wait for completion of the pause command
 	}
 
-	if (framesize.cx <= 0 || framesize.cy <= 0) {
-		AfxMessageBox(ResStr(IDS_MAINFRM_55));
-		return;
-	}
+	REFERENCE_TIME rtPos = GetPos();
 
-	// with the overlay mixer IBasicVideo2 won't tell the new AR when changed dynamically
-	DVD_VideoAttributes VATR;
-	if (GetPlaybackMode() == PM_DVD && SUCCEEDED(m_pDVDI->GetCurrentVideoAttributes(&VATR))) {
-		dar.SetSize(VATR.ulAspectX, VATR.ulAspectY);
-	}
+	m_nVolumeBeforeFrameStepping = m_wndToolBar.Volume;
+	m_pBA->put_Volume(-10000);
 
-	if (dar.cx > 0 && dar.cy > 0) {
-		framesize.cx = MulDiv(framesize.cy, dar.cx, dar.cy);
-	}
+	CThumbsTaskDlg dlg(fn);
+	dlg.DoModal();
 
-	CAppSettings& s = AfxGetAppSettings();
-
-	const int infoheight = 70;
-	const int margin	= 10;
-	const int width		= clamp(s.iThumbWidth, 256, 2560);
-	const int cols		= clamp(s.iThumbCols, 1, 10);
-	const int rows		= clamp(s.iThumbRows, 1, 20);
-
-	CSize thumbsize;
-	thumbsize.cx		= (width - margin) / cols - margin;
-	thumbsize.cy		= MulDiv(thumbsize.cx, framesize.cy, framesize.cx);
-
-	const int height	= infoheight + margin + (thumbsize.cy + margin) * rows;
-	const int dibsize	= sizeof(BITMAPINFOHEADER) + width * height * 4;
-
-	CAutoVectorPtr<BYTE> dib;
-	if (!dib.Allocate(dibsize)) {
-		AfxMessageBox(ResStr(IDS_MAINFRM_56));
-		return;
-	}
-
-	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)(BYTE*)dib;
-	memset(bih, 0, sizeof(BITMAPINFOHEADER));
-	bih->biSize			= sizeof(BITMAPINFOHEADER);
-	bih->biWidth		= width;
-	bih->biHeight		= height;
-	bih->biPlanes		= 1;
-	bih->biBitCount		= 32;
-	bih->biCompression	= BI_RGB;
-	bih->biSizeImage	= DIBSIZE(*bih);
-	memsetd(bih + 1, 0xffffff, bih->biSizeImage);
-
-	SubPicDesc spd;
-	spd.w		= width;
-	spd.h		= height;
-	spd.bpp		= 32;
-	spd.pitch	= -width * 4;
-	spd.vidrect	= CRect(0, 0, width, height);
-	spd.bits	= (BYTE*)(bih + 1) + (width * 4) * (height - 1);
-
-	{
-		BYTE* p = (BYTE*)spd.bits;
-		for (int y = 0; y < spd.h; y++, p += spd.pitch)
-			for (int x = 0; x < spd.w; x++) {
-				((DWORD*)p)[x] = 0x010101 * (0xe0 + 0x08*y/spd.h + 0x18*(spd.w-x)/spd.w);
-			}
-	}
-
-	CCritSec csSubLock;
-	RECT bbox;
-
-	const int srcWidth  = thumbsize.cx;
-	const int srcHeight = thumbsize.cy;
-	BYTE* pResizeData   = DNew BYTE[srcWidth * srcHeight * 4];
-
-	for (int i = 1, pics = cols*rows; i <= pics; i++) {
-		REFERENCE_TIME rt = rtDur * i / (pics+1);
-		DVD_HMSF_TIMECODE hmsf = RT2HMS_r(rt);
-
-		SeekTo(rt);
-
-		m_nVolumeBeforeFrameStepping = m_wndToolBar.Volume;
-		m_pBA->put_Volume(-10000);
-
-		// Number of steps you need to do more than one for some decoders.
-		// TODO - maybe need to find another way to get correct frame ???
-		HRESULT hr = m_pFS ? m_pFS->Step(2, NULL) : E_FAIL;
-
-		if (FAILED(hr)) {
-			m_pBA->put_Volume(m_nVolumeBeforeFrameStepping);
-			AfxMessageBox(ResStr(IDS_FRAME_STEP_ERROR_RENDERER), MB_ICONEXCLAMATION | MB_OK);
-			return;
-		}
-
-		HANDLE hGraphEvent = NULL;
-		m_pME->GetEventHandle((OAEVENT*)&hGraphEvent);
-
-		while (hGraphEvent && WaitForSingleObject(hGraphEvent, INFINITE) == WAIT_OBJECT_0) {
-			LONG evCode = 0;
-			LONG_PTR evParam1, evParam2;
-			while (m_pME && SUCCEEDED(m_pME->GetEvent(&evCode, &evParam1, &evParam2, 0))) {
-				m_pME->FreeEventParams(evCode, evParam1, evParam2);
-				if (EC_STEP_COMPLETE == evCode) {
-					hGraphEvent = NULL;
-				}
-			}
-		}
-
-		m_pBA->put_Volume(m_nVolumeBeforeFrameStepping);
-
-		const int col = (i-1)%cols;
-		const int row = (i-1)/cols;
-
-		const CPoint p(margin + col * (thumbsize.cx + margin), infoheight + margin + row * (thumbsize.cy + margin));
-		const CRect r(p, thumbsize);
-
-		CRenderedTextSubtitle rts(&csSubLock);
-		rts.CreateDefaultStyle(0);
-		rts.m_dstScreenSize.SetSize(width, height);
-		STSStyle* style = DNew STSStyle();
-		style->marginRect.SetRectEmpty();
-		rts.AddStyle(_T("thumbs"), style);
-
-		CStringW str;
-		str.Format(L"{\\an7\\1c&Hffffff&\\4a&Hb0&\\bord1\\shad4\\be1}{\\p1}m %d %d l %d %d %d %d %d %d{\\p}",
-				   r.left, r.top, r.right, r.top, r.right, r.bottom, r.left, r.bottom);
-		rts.Add(str, true, 0, 1, _T("thumbs"));
-		str.Format(L"{\\an3\\1c&Hffffff&\\3c&H000000&\\alpha&H80&\\fs16\\b1\\bord2\\shad0\\pos(%d,%d)}%02d:%02d:%02d",
-				   r.right-5, r.bottom-3, hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
-		rts.Add(str, true, 1, 2, _T("thumbs"));
-
-		rts.Render(spd, 0, 25, bbox);
-
-		BYTE* pData = NULL;
-		long size = 0;
-		if (!GetDIB(&pData, size)) {
-			return;
-		}
-
-		BITMAPINFO* bi = (BITMAPINFO*)pData;
-
-		if (bi->bmiHeader.biBitCount != 32) {
-			CString str;
-			str.Format(ResStr(IDS_MAINFRM_57), bi->bmiHeader.biBitCount);
-			AfxMessageBox(str);
-			delete [] pResizeData;
-			delete [] pData;
-			return;
-		}
-
-		int srcPitch = srcWidth * 4;
-
-		Resize_HQ_4ch((const BYTE*)(&bi->bmiHeader + 1), bi->bmiHeader.biWidth, abs(bi->bmiHeader.biHeight),
-				  pResizeData, srcWidth, srcHeight);
-
-		const BYTE* src = pResizeData;
-		if (bi->bmiHeader.biHeight >= 0) {
-			src += srcPitch * (srcHeight - 1);
-			srcPitch = -srcPitch;
-		}
-
-		BYTE* dst = (BYTE*)spd.bits + spd.pitch * r.top + r.left * 4;
-		for (int y = 0; y < srcHeight; y++, dst += spd.pitch, src += srcPitch) {
-			memcpy(dst, src, abs(srcPitch));
-		}
-
-		rts.Render(spd, 10000, 25, bbox);
-
-		delete [] pData;
-	}
-
-	delete [] pResizeData;
-
-	{
-		CRenderedTextSubtitle rts(&csSubLock);
-		rts.CreateDefaultStyle(0);
-		rts.m_dstScreenSize.SetSize(width, height);
-		STSStyle* style = DNew STSStyle();
-		style->marginRect.SetRect(margin, margin, margin, height-infoheight-margin);
-		rts.AddStyle(_T("thumbs"), style);
-
-		CStringW str;
-		str.Format(L"{\\an9\\fs%d\\b1\\bord0\\shad0\\1c&Hffffff&}%s", infoheight-10, width >= 550 ? L"MPC-BE" : L"MPC");
-
-		rts.Add(str, true, 0, 1, _T("thumbs"), _T(""), _T(""), CRect(0,0,0,0), -1);
-
-		DVD_HMSF_TIMECODE hmsf = RT2HMS_r(rtDur);
-
-		CStringW fn = GetFileOnly(GetCurFileName());
-		if (!m_youtubeFields.fname.IsEmpty()) {
-			fn = GetAltFileName();
-		}
-
-		CStringW fs;
-		WIN32_FIND_DATA wfd;
-		HANDLE hFind = FindFirstFile(GetCurFileName(), &wfd);
-		if (hFind != INVALID_HANDLE_VALUE) {
-			FindClose(hFind);
-
-			__int64 size = (__int64(wfd.nFileSizeHigh)<<32)|wfd.nFileSizeLow;
-			const int MAX_FILE_SIZE_BUFFER = 65;
-			WCHAR szFileSize[MAX_FILE_SIZE_BUFFER];
-			StrFormatByteSizeW(size, szFileSize, MAX_FILE_SIZE_BUFFER);
-			CString szByteSize;
-			szByteSize.Format(L"%I64d", size);
-			fs.Format(ResStr(IDS_MAINFRM_58), szFileSize, FormatNumber(szByteSize));
-		}
-
-		CStringW ar;
-		if (dar.cx > 0 && dar.cy > 0 && dar.cx != framesize.cx && dar.cy != framesize.cy) {
-			ar.Format(L"(%d:%d)", dar.cx, dar.cy);
-		}
-
-		str.Format(ResStr(IDS_MAINFRM_59),
-				   CompactPath(fn, 90), fs, framesize.cx, framesize.cy, ar, hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
-		rts.Add(str, true, 0, 1, _T("thumbs"));
-
-		rts.Render(spd, 0, 25, bbox);
-	}
-
-	SaveDIB(fn, (BYTE*)dib, dibsize);
+	m_pBA->put_Volume(m_nVolumeBeforeFrameStepping);
 
 	SeekTo(rtPos);
+	if (ms == State_Running) {
+		SendMessage(WM_COMMAND, ID_PLAY_PLAY);
+	}
 
 	m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_THUMBS_SAVED), 3000);
 }
