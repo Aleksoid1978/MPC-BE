@@ -285,6 +285,7 @@
     </ClCompile>
     <ClCompile Include="SubtitleDlDlg.cpp" />
     <ClCompile Include="TextPassThruFilter.cpp" />
+    <ClCompile Include="ThumbsTaskDlg.cpp" />
     <ClCompile Include="TunerScanDlg.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="vkCodes.cpp" />
@@ -400,6 +401,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SubtitleDlDlg.h" />
     <ClInclude Include="TextPassThruFilter.h" />
+    <ClInclude Include="ThumbsTaskDlg.h" />
     <ClInclude Include="TunerScanDlg.h" />
     <ClInclude Include="..\..\..\include\Version.h" />
     <ClInclude Include="UpdateChecker.h" />

@@ -342,6 +342,9 @@
     <ClCompile Include="ItemPropertiesDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ThumbsTaskDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSettings.h">
@@ -684,6 +687,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SmoothImageResampling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ThumbsTaskDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
