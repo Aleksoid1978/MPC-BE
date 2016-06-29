@@ -20,8 +20,10 @@
  */
 
 #include "stdafx.h"
+#include <afxglobals.h>
 #include "MainFrm.h"
 #include "SaveDlg.h"
+#include "../../DSUtil/FileHandle.h"
 #include "../../filters/filters.h"
 
 static unsigned int AdaptUnit(double& val, size_t unitsNb)
@@ -39,8 +41,8 @@ static unsigned int AdaptUnit(double& val, size_t unitsNb)
 // CSaveDlg dialog
 
 IMPLEMENT_DYNAMIC(CSaveDlg, CTaskDialog)
-CSaveDlg::CSaveDlg(CString in, CString name, CString out)
-	: CTaskDialog(_T(""), name + _T("\n") + out, ResStr(IDS_SAVE_FILE), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER|TDF_POSITION_RELATIVE_TO_WINDOW)
+CSaveDlg::CSaveDlg(CString in, CString name, CString out, HRESULT& hr)
+	: CTaskDialog(L"", name + L"\n" + out, ResStr(IDS_SAVE_FILE), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER|TDF_POSITION_RELATIVE_TO_WINDOW)
 	, m_in(in)
 	, m_out(out)
 	, m_TaskDlgHwnd(0)
@@ -56,13 +58,17 @@ CSaveDlg::CSaveDlg(CString in, CString name, CString out)
 
 	SetDialogWidth(250);
 
-	InitFileCopy();
+	hr = InitFileCopy();
 }
 
 CSaveDlg::~CSaveDlg()
 {
 	if (pMC) {
 		pMC->Stop();
+	}
+
+	if (pGB) {
+		pGB->Abort();
 	}
 
 	if (m_hIcon) {
@@ -77,9 +83,43 @@ HRESULT CSaveDlg::OnInit()
 	return __super::OnInit();
 }
 
+static HRESULT CopyFiles(CString sourceFile, CString destFile)
+{
+	#define FOF_UI_FLAGS FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR
+
+	HRESULT hr = S_OK;
+
+	CComPtr<IShellItem> psiItem;
+	hr = afxGlobalData.ShellCreateItemFromParsingName(sourceFile, NULL, IID_PPV_ARGS(&psiItem));
+	EXIT_ON_ERROR(hr);
+
+	CComPtr<IShellItem> psiDestinationFolder;
+	CString pszPath = AddSlash(GetFolderOnly(destFile));
+	hr = afxGlobalData.ShellCreateItemFromParsingName(pszPath, NULL, IID_PPV_ARGS(&psiDestinationFolder));
+	EXIT_ON_ERROR(hr);
+
+	CComPtr<IFileOperation> pFileOperation;
+	hr = CoCreateInstance(CLSID_FileOperation,
+						  NULL,
+						  CLSCTX_INPROC_SERVER,
+						  IID_PPV_ARGS(&pFileOperation));
+	EXIT_ON_ERROR(hr);
+
+	hr = pFileOperation->SetOperationFlags(FOF_UI_FLAGS | FOFX_NOMINIMIZEBOX);
+	EXIT_ON_ERROR(hr);
+
+	CString pszCopyName = GetFileOnly(destFile);
+	hr = pFileOperation->CopyItem(psiItem, psiDestinationFolder, pszCopyName, NULL);
+	EXIT_ON_ERROR(hr);
+
+	hr = pFileOperation->PerformOperations();
+
+	return hr;
+}
+
 HRESULT CSaveDlg::InitFileCopy()
 {
-	if (FAILED(pGB.CoCreateInstance(CLSID_FilterGraph)) || !(pMC = pGB) || !(pME = pGB) || !(pMS = pGB)) {
+	if (FAILED(pGB.CoCreateInstance(CLSID_FilterGraph)) || !(pMC = pGB) || !(pMS = pGB)) {
 		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
 		SetFooterText(ResStr(IDS_AG_ERROR));
 		return S_FALSE;
@@ -87,59 +127,49 @@ HRESULT CSaveDlg::InitFileCopy()
 
 	HRESULT hr;
 
-	CStringW fnw = m_in;
+	const CString fn = m_in;
 	CComPtr<IFileSourceFilter> pReader;
 
-	if (!pReader && m_in.Mid(m_in.ReverseFind('.')+1).MakeLower() == _T("cda")) {
+	if (!::PathIsURL(fn)) {
 		hr = S_OK;
 		CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CCDDAReader(NULL, &hr);
 
-		if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fnw, NULL))) {
+		if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fn, NULL))) {
 			pReader.Release();
+		}
+
+		if (!pReader) {
+			hr = S_OK;
+			CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CCDXAReader(NULL, &hr);
+
+			if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fn, NULL))) {
+				pReader.Release();
+			}
+		}
+
+		if (!pReader) {
+			hr = S_OK;
+			CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CVTSReader(NULL, &hr);
+
+			if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fn, NULL))) {
+				pReader.Release();
+			}
+		}
+
+		if (!pReader) {
+			CopyFiles(m_in, m_out);
+			return E_ABORT;
 		}
 	}
 
 	if (!pReader) {
-		hr = S_OK;
-		CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CCDXAReader(NULL, &hr);
-
-		if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fnw, NULL))) {
-			pReader.Release();
-		}
-	}
-
-	if (!pReader) {
-		hr = S_OK;
-		CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CVTSReader(NULL, &hr);
-
-		if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fnw, NULL))) {
-			pReader.Release();
-		} else {
-			CPath pout(m_out);
-			pout.RenameExtension(_T(".ifo"));
-			CopyFile(m_in, pout, FALSE);
-		}
-	}
-
-	if (!pReader) {
-		hr = S_OK;
-		CComPtr<IUnknown> pUnk;
-		pUnk.CoCreateInstance(CLSID_AsyncReader);
-
-		if (!(pReader = pUnk) || FAILED(pReader->Load(fnw, NULL))) {
-			pReader.Release();
-		}
-	}
-
-	if (!pReader) {
-		hr = S_OK;
 		CComPtr<IUnknown> pUnk;
 		pUnk.CoCreateInstance(CLSID_3DYDYoutubeSource);
 
 		if (CComQIPtr<IBaseFilter> pSrc = pUnk) {
-			pGB->AddFilter(pSrc, fnw);
+			pGB->AddFilter(pSrc, fn);
 
-			if (!(pReader = pUnk) || FAILED(hr = pReader->Load(fnw, NULL))) {
+			if (!(pReader = pUnk) || FAILED(hr = pReader->Load(fn, NULL))) {
 				pReader.Release();
 				pGB->RemoveFilter(pSrc);
 			}
@@ -147,14 +177,13 @@ HRESULT CSaveDlg::InitFileCopy()
 	}
 
 	if (!pReader) {
-		hr = S_OK;
 		CComPtr<IUnknown> pUnk;
 		pUnk.CoCreateInstance(CLSID_URLReader);
 
 		if (CComQIPtr<IBaseFilter> pSrc = pUnk) {
-			pGB->AddFilter(pSrc, fnw);
+			pGB->AddFilter(pSrc, fn);
 
-			if (!(pReader = pUnk) || FAILED(hr = pReader->Load(fnw, NULL))) {
+			if (!(pReader = pUnk) || FAILED(hr = pReader->Load(fn, NULL))) {
 				pReader.Release();
 				pGB->RemoveFilter(pSrc);
 			}
@@ -162,15 +191,13 @@ HRESULT CSaveDlg::InitFileCopy()
 	}
 
 	CComQIPtr<IBaseFilter> pSrc = pReader;
-
-	if (FAILED(pGB->AddFilter(pSrc, fnw))) {
+	if (FAILED(pGB->AddFilter(pSrc, fn))) {
 		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
-		SetFooterText(_T("Sorry, can't save this file, press Cancel"));
+		SetFooterText(L"Sorry, can't save this file, press Cancel");
 		return S_FALSE;
 	}
 
 	CComQIPtr<IBaseFilter> pMid = DNew CStreamDriveThruFilter(NULL, &hr);
-
 	if (FAILED(pGB->AddFilter(pMid, L"StreamDriveThru"))) {
 		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
 		SetFooterText(ResStr(IDS_AG_ERROR));
@@ -192,22 +219,21 @@ HRESULT CSaveDlg::InitFileCopy()
 	}
 
 	hr = pGB->Connect(
-			 GetFirstPin((pSrc), PINDIR_OUTPUT),
-			 GetFirstPin((pMid), PINDIR_INPUT));
-
+		GetFirstPin((pSrc), PINDIR_OUTPUT),
+		GetFirstPin((pMid), PINDIR_INPUT));
 	if (FAILED(hr)) {
 		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
-		SetFooterText(_T("Error Connect pSrc / pMid"));
+		SetFooterText(L"Error Connect pSrc / pMid");
 
 		return S_FALSE;
 	}
 
 	hr = pGB->Connect(
-			 GetFirstPin((pMid), PINDIR_OUTPUT),
-			 GetFirstPin((pDst), PINDIR_INPUT));
+		GetFirstPin((pMid), PINDIR_OUTPUT),
+		GetFirstPin((pDst), PINDIR_INPUT));
 	if (FAILED(hr)) {
 		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
-		SetFooterText(_T("Error Connect pMid / pDst"));
+		SetFooterText(L"Error Connect pMid / pDst");
 
 		return S_FALSE;
 	}
@@ -231,21 +257,21 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 		pMS->GetDuration(&dur);
 		REFERENCE_TIME time = 0;
 		CComQIPtr<IMediaSeeking>(pGB)->GetCurrentPosition(&time);
-		REFERENCE_TIME speed = time > 0 ? pos * 10000000 / time : 0;
+		const REFERENCE_TIME speed = time > 0 ? pos * 10000000 / time : 0;
 
-		double dPos = pos / 1024.;
-		unsigned int unitPos = AdaptUnit(dPos, _countof(sizeUnits));
-		double dDur = dur / 1024.;
-		unsigned int unitDur = AdaptUnit(dDur, _countof(sizeUnits));
-		double dSpeed = speed / 1024.;
-		unsigned int unitSpeed = AdaptUnit(dSpeed, _countof(speedUnits));
+		double dPos = pos / 1024.0;
+		const unsigned int unitPos = AdaptUnit(dPos, _countof(sizeUnits));
+		double dDur = dur / 1024.0;
+		const unsigned int unitDur = AdaptUnit(dDur, _countof(sizeUnits));
+		double dSpeed = speed / 1024.0;
+		const unsigned int unitSpeed = AdaptUnit(dSpeed, _countof(speedUnits));
 
-		str.Format(_T("%.2lf %s / %.2lf %s , %.2lf %s"),
+		str.Format(L"%.2lf %s / %.2lf %s , %.2lf %s",
 				   dPos, ResStr(sizeUnits[unitPos]), dDur, ResStr(sizeUnits[unitDur]),
 				   dSpeed, ResStr(speedUnits[unitSpeed]));
 
 		if (speed > 0) {
-			str.Append(_T(","));
+			str.Append(L",");
 			REFERENCE_TIME sec = (dur - pos) / speed;
 
 			DVD_HMSF_TIMECODE tcDur = {
@@ -256,13 +282,13 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 			};
 
 			if (tcDur.bHours > 0) {
-				str.AppendFormat(_T(" %0.2dh"), tcDur.bHours);
+				str.AppendFormat(L" %0.2dh", tcDur.bHours);
 			}
 			if (tcDur.bMinutes > 0) {
-				str.AppendFormat(_T(" %0.2dm"), tcDur.bMinutes);
+				str.AppendFormat(L" %0.2dm", tcDur.bMinutes);
 			}
 			if (tcDur.bSeconds > 0) {
-				str.AppendFormat(_T(" %0.2ds"), tcDur.bSeconds);
+				str.AppendFormat(L" %0.2ds", tcDur.bSeconds);
 			}
 		}
 
