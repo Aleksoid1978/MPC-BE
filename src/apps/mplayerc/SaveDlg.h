@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <afxcmn.h>
-#include <afxwin.h>
 #include <afxtaskdialog.h>
 
 // CSaveDlg dialog
