@@ -350,7 +350,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	} else if (str_protocol == L"http" || str_protocol == L"https") {
 		m_protocol = PR_HTTP;
 		BOOL connected = FALSE;
-		if (m_HTTPAsync.Connect(m_url_str, 5000, L"MPC UDP/HTTP Reader") == S_OK) {
+		if (m_HTTPAsync.Connect(m_url_str, 10000, L"MPC UDP/HTTP Reader") == S_OK) {
 #ifdef DEBUG
 			const CString hdr = m_HTTPAsync.GetHeader();
 			DbgLog((LOG_TRACE, 3, "CUDPStream::Load() - HTTP hdr:\n%ws", hdr));
@@ -363,10 +363,11 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			connected = TRUE;
 			CString contentType = m_HTTPAsync.GetContentType();
 			contentType.MakeLower();
-			if (contentType == L"application/octet-stream") {
+			if (contentType == L"application/octet-stream"
+					|| contentType == L"video/unknown") {
 				BYTE buf[1024] = { 0 };
 				DWORD dwSizeRead = 0;
-				if (m_HTTPAsync.Read((PBYTE)&buf, sizeof(buf), &dwSizeRead, 3000) == S_OK && dwSizeRead) {
+				if (m_HTTPAsync.Read((PBYTE)&buf, sizeof(buf), &dwSizeRead) == S_OK && dwSizeRead) {
 					GetType(buf, dwSizeRead, m_subtype);
 					Append(buf, dwSizeRead);
 				}

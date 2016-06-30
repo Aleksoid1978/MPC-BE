@@ -60,7 +60,7 @@ BOOL CAsyncFileReader::Open(LPCTSTR lpszFileName)
 		CUrl url;
 		if (m_bSupportURL
 				&& url.CrackUrl(lpszFileName)
-				&& m_HTTPAsync.Connect(lpszFileName, 5000, L"MPC AsyncReader") == S_OK) {
+				&& m_HTTPAsync.Connect(lpszFileName, 10000, L"MPC AsyncReader") == S_OK) {
 #ifdef DEBUG
 			const CString hdr = m_HTTPAsync.GetHeader();
 			DbgLog((LOG_TRACE, 3, "CAsyncFileReader::Open() - HTTP hdr:\n%ws", hdr));

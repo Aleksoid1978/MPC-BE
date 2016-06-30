@@ -161,7 +161,7 @@ HRESULT CSaveDlg::InitFileCopy()
 			}
 
 			if (!pReader
-					&& (m_HTTPAsync.Connect(fn, 3000) == S_OK)) {
+					&& (m_HTTPAsync.Connect(fn, 10000) == S_OK)) {
 				m_len = m_HTTPAsync.GetLenght();
 				m_protocol = protocol::PROTOCOL_HTTP;
 			}
