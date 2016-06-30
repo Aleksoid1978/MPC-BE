@@ -31,16 +31,15 @@ class CThumbsTaskDlg : public CTaskDialog
 	DECLARE_DYNAMIC(CThumbsTaskDlg)
 
 private:
-	CMainFrame*		pMainFrm;
-	HICON			m_hIcon;
-	HWND			m_TaskDlgHwnd;
-	std::thread		m_Thread;
+	HICON         m_hIcon;
+	CString       m_filename;
 
-	CString			m_filename;
+	CMainFrame*   m_pMainFrm;
 
-	volatile int	m_iProgress;
-	volatile bool	m_bAbort;
+	volatile int  m_iProgress;
+	volatile bool m_bAbort;
 
+	std::thread   m_Thread;
 	void SaveThumbnails(LPCTSTR filepath);
 
 public:

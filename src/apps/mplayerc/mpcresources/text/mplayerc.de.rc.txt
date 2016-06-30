@@ -1732,6 +1732,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"Möchten Sie die MPC-BE Standardeinstellunge
 STRING IDS_SATURATION_DEC		"Sättigung verringern"
 STRING IDS_SATURATION_INC		"Sättigung erhöhen"
 STRING IDS_SAVE_FILE		"Datei speichern"
+STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
 STRING IDS_SCALE_16_9		"Skalierung nach 16:9,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"Zoom zu Ultra-Breitbild,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"Zoom zu Breitbild,%.3f,%.3f,%.3f,%.3f"

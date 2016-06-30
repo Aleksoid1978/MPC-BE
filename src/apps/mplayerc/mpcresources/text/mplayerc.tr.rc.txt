@@ -1732,6 +1732,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"MPC-BE uygulamasını varsayılan ayarların
 STRING IDS_SATURATION_DEC		"Doygunluğu azalt"
 STRING IDS_SATURATION_INC		"Doygunluğu arttır"
 STRING IDS_SAVE_FILE		"Saving file"
+STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
 STRING IDS_SCALE_16_9		"16:9 TV ekranına ölçekle,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"Çok geniş ekrana sığdır,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"Geniş ekrana sığdır,%.3f,%.3f,%.3f,%.3f"

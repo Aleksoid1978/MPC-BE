@@ -1735,6 +1735,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"Είστε βέβαιος ότι θέλετ�
 STRING IDS_SATURATION_DEC		"Μείωση κορεσμού"
 STRING IDS_SATURATION_INC		"Αύξηση κορεσμού"
 STRING IDS_SAVE_FILE		"Saving file"
+STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
 STRING IDS_SCALE_16_9		"Αναλογία σε 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"Εστίαση σε υπερευρυγώνια οθόνη,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"Εστίαση σε ευρυγώνια οθόνη,%.3f,%.3f,%.3f,%.3f"

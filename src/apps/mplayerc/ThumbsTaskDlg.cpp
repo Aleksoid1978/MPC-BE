@@ -29,43 +29,31 @@
 
 // CThumbsTaskDlg dialog
 
-#define UWM_SAVED		(WM_USER + 100)
-#define UWM_FAILED		(WM_USER + 101)
-#define UWM_PROCESSED	(WM_USER + 102)
-
-struct THREADSTRUCT {
-	HWND hWND;
-	CString filename;
-	SIZE framesize;
-	SIZE dar;
-};
-typedef THREADSTRUCT* PTHREADSTRUCT;
-
 void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 {
 	m_iProgress = 0;
 
 	if (!thumbpath
-			|| !(pMainFrm->m_pMS)
-			|| !(pMainFrm->m_pFS)
-			|| !(pMainFrm->m_pME)) {
+			|| !(m_pMainFrm->m_pMS)
+			|| !(m_pMainFrm->m_pFS)
+			|| !(m_pMainFrm->m_pME)) {
 		m_iProgress = -1;
 		return;
 	}
 
 	// get frame size and aspect ratio
 	CSize framesize, dar;
-	if (pMainFrm->m_pCAP) {
-		framesize = pMainFrm->m_pCAP->GetVideoSize();
-		dar = pMainFrm->m_pCAP->GetVideoSizeAR();
+	if (m_pMainFrm->m_pCAP) {
+		framesize = m_pMainFrm->m_pCAP->GetVideoSize();
+		dar = m_pMainFrm->m_pCAP->GetVideoSizeAR();
 	}
-	else if (pMainFrm->m_pMFVDC) {
-		pMainFrm->m_pMFVDC->GetNativeVideoSize(&framesize, &dar);
+	else if (m_pMainFrm->m_pMFVDC) {
+		m_pMainFrm->m_pMFVDC->GetNativeVideoSize(&framesize, &dar);
 	}
-	else if (pMainFrm->m_pBV) {
-		pMainFrm->m_pBV->GetVideoSize(&framesize.cx, &framesize.cy);
+	else if (m_pMainFrm->m_pBV) {
+		m_pMainFrm->m_pBV->GetVideoSize(&framesize.cx, &framesize.cy);
 		long arx = 0, ary = 0;
-		CComQIPtr<IBasicVideo2> pBV2 = pMainFrm->m_pBV;
+		CComQIPtr<IBasicVideo2> pBV2 = m_pMainFrm->m_pBV;
 		if (pBV2 && SUCCEEDED(pBV2->GetPreferredAspectRatio(&arx, &ary)) && arx > 0 && ary > 0) {
 			dar.SetSize(arx, ary);
 		}
@@ -77,26 +65,26 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 
 	// with the overlay mixer IBasicVideo2 won't tell the new AR when changed dynamically
 	DVD_VideoAttributes VATR;
-	if (pMainFrm->GetPlaybackMode() == PM_DVD && SUCCEEDED(pMainFrm->m_pDVDI->GetCurrentVideoAttributes(&VATR))) {
+	if (m_pMainFrm->GetPlaybackMode() == PM_DVD && SUCCEEDED(m_pMainFrm->m_pDVDI->GetCurrentVideoAttributes(&VATR))) {
 		dar.SetSize(VATR.ulAspectX, VATR.ulAspectY);
 	}
 
 	// get duration
 	REFERENCE_TIME duration = 0;
-	pMainFrm->m_pMS->GetDuration(&duration);
+	m_pMainFrm->m_pMS->GetDuration(&duration);
 	if (duration <= 0) {
 		m_iProgress = -1;
 		return;
 	}
 
-	//
-	CAppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
 	const int infoheight = 70;
 	const int margin = 10;
+
 	const int width = clamp(s.iThumbWidth, 256, 2560);
-	const int cols = clamp(s.iThumbCols, 1, 10);
-	const int rows = clamp(s.iThumbRows, 1, 20);
+	const int cols  = clamp(s.iThumbCols, 1, 10);
+	const int rows  = clamp(s.iThumbRows, 1, 20);
 
 	CSize thumbsize;
 	thumbsize.cx = (width - margin) / cols - margin;
@@ -104,7 +92,6 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 
 	const int height = infoheight + margin + (thumbsize.cy + margin) * rows;
 	const int dibsize = sizeof(BITMAPINFOHEADER) + width * height * 4;
-
 
 	std::unique_ptr<BYTE[]> dib(DNew BYTE[dibsize]);
 	if (!dib) {
@@ -115,22 +102,22 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)dib.get();
 	memset(bih, 0, sizeof(BITMAPINFOHEADER));
-	bih->biSize = sizeof(BITMAPINFOHEADER);
-	bih->biWidth = width;
-	bih->biHeight = height;
-	bih->biPlanes = 1;
-	bih->biBitCount = 32;
-	bih->biCompression = BI_RGB;
-	bih->biSizeImage = DIBSIZE(*bih);
+	bih->biSize           = sizeof(BITMAPINFOHEADER);
+	bih->biWidth          = width;
+	bih->biHeight         = height;
+	bih->biPlanes         = 1;
+	bih->biBitCount       = 32;
+	bih->biCompression    = BI_RGB;
+	bih->biSizeImage      = DIBSIZE(*bih);
 	memsetd(bih + 1, 0xffffff, bih->biSizeImage);
 
 	SubPicDesc spd;
-	spd.w = width;
-	spd.h = height;
-	spd.bpp = 32;
-	spd.pitch = -width * 4;
+	spd.w       = width;
+	spd.h       = height;
+	spd.bpp     = 32;
+	spd.pitch   = -width * 4;
 	spd.vidrect = CRect(0, 0, width, height);
-	spd.bits = (BYTE*)(bih + 1) + (width * 4) * (height - 1);
+	spd.bits    = (BYTE*)(bih + 1) + (width * 4) * (height - 1);
 
 	{
 		BYTE* p = (BYTE*)spd.bits;
@@ -140,9 +127,6 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 			}
 		}
 	}
-
-	CCritSec csSubLock;
-	RECT bbox;
 
 	std::unique_ptr<BYTE[]> thumb(DNew BYTE[thumbsize.cx * thumbsize.cy * 4]);
 	if (!thumb) {
@@ -156,27 +140,36 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 		return;
 	}
 
-	for (int i = 1, pics = cols*rows; i <= pics; i++) {
-		REFERENCE_TIME rt = duration * i / (pics + 1);
-		DVD_HMSF_TIMECODE hmsf = RT2HMS_r(rt);
+	CCritSec csSubLock;
+	RECT bbox;
 
-		pMainFrm->SeekTo(rt);
+	for (int i = 1, pics = cols * rows; i <= pics; i++) {
+		const REFERENCE_TIME rt = duration * i / (pics + 1);
+		const DVD_HMSF_TIMECODE hmsf = RT2HMS_r(rt);
+
+		m_pMainFrm->SeekTo(rt, false);
 
 		// Number of steps you need to do more than one for some decoders.
 		// TODO - maybe need to find another way to get correct frame ???
-		HRESULT hr = pMainFrm->m_pFS->Step(2, NULL);
+		HRESULT hr = m_pMainFrm->m_pFS->Step(2, NULL);
 
 		HANDLE hGraphEvent = NULL;
-		pMainFrm->m_pME->GetEventHandle((OAEVENT*)&hGraphEvent);
-		while (hGraphEvent && WaitForSingleObject(hGraphEvent, INFINITE) == WAIT_OBJECT_0) {
+		m_pMainFrm->m_pME->GetEventHandle((OAEVENT*)&hGraphEvent);
+		while (hGraphEvent && WaitForSingleObject(hGraphEvent, INFINITE) == WAIT_OBJECT_0
+				&& !m_bAbort) {
 			LONG evCode = 0;
 			LONG_PTR evParam1, evParam2;
-			while (pMainFrm->m_pME && SUCCEEDED(pMainFrm->m_pME->GetEvent(&evCode, &evParam1, &evParam2, 0))) {
-				pMainFrm->m_pME->FreeEventParams(evCode, evParam1, evParam2);
+			while (m_pMainFrm->m_pME && SUCCEEDED(m_pMainFrm->m_pME->GetEvent(&evCode, &evParam1, &evParam2, 0))
+					&& !m_bAbort) {
+				m_pMainFrm->m_pME->FreeEventParams(evCode, evParam1, evParam2);
 				if (EC_STEP_COMPLETE == evCode) {
 					hGraphEvent = NULL;
 				}
 			}
+		}
+
+		if (m_bAbort) {
+			return;
 		}
 
 		const int col = (i - 1) % cols;
@@ -190,37 +183,37 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 		rts.m_dstScreenSize.SetSize(width, height);
 		STSStyle* style = DNew STSStyle();
 		style->marginRect.SetRectEmpty();
-		rts.AddStyle(_T("thumbs"), style);
+		rts.AddStyle(L"thumbs", style);
 
-		CStringW str;
+		CString str;
 		str.Format(L"{\\an7\\1c&Hffffff&\\4a&Hb0&\\bord1\\shad4\\be1}{\\p1}m %d %d l %d %d %d %d %d %d{\\p}",
-			r.left, r.top, r.right, r.top, r.right, r.bottom, r.left, r.bottom);
-		rts.Add(str, true, 0, 1, _T("thumbs"));
+				   r.left, r.top, r.right, r.top, r.right, r.bottom, r.left, r.bottom);
+		rts.Add(str, true, 0, 1, L"thumbs");
 		str.Format(L"{\\an3\\1c&Hffffff&\\3c&H000000&\\alpha&H80&\\fs16\\b1\\bord2\\shad0\\pos(%d,%d)}%02d:%02d:%02d",
-			r.right - 5, r.bottom - 3, hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
-		rts.Add(str, true, 1, 2, _T("thumbs"));
+				   r.right - 5, r.bottom - 3, hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
+		rts.Add(str, true, 1, 2, L"thumbs");
 
 		rts.Render(spd, 0, 25, bbox);
 
 		BYTE* pData = NULL;
 		long size = 0;
-		if (!pMainFrm->GetDIB(&pData, size)) {
+		if (!m_pMainFrm->GetDIB(&pData, size)) {
 			m_iProgress = -1;
 			return;
 		}
 
-		BITMAPINFO* bi = (BITMAPINFO*)pData;
+		const BITMAPINFO* bi = (BITMAPINFO*)pData;
 		if (bi->bmiHeader.biBitCount != 32) {
 			CString str;
 			str.Format(ResStr(IDS_MAINFRM_57), bi->bmiHeader.biBitCount);
 			AfxMessageBox(str);
-			delete[] pData;
+			delete [] pData;
 			m_iProgress = -1;
 			return;
 		}
 
 		Resize_HQ_4ch((const BYTE*)(&bi->bmiHeader + 1), bi->bmiHeader.biWidth, abs(bi->bmiHeader.biHeight),
-			thumb.get(), thumbsize.cx, thumbsize.cy);
+					  thumb.get(), thumbsize.cx, thumbsize.cy);
 
 		const BYTE* src = thumb.get();
 		int srcPitch = thumbsize.cx * 4;
@@ -236,7 +229,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 
 		rts.Render(spd, 10000, 25, bbox);
 
-		delete[] pData;
+		delete [] pData;
 
 		m_iProgress++; // make one more thumbnail
 		if (m_bAbort) {
@@ -250,25 +243,25 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 		rts.m_dstScreenSize.SetSize(width, height);
 		STSStyle* style = DNew STSStyle();
 		style->marginRect.SetRect(margin, margin, margin, height - infoheight - margin);
-		rts.AddStyle(_T("thumbs"), style);
+		rts.AddStyle(L"thumbs", style);
 
 		CStringW str;
 		str.Format(L"{\\an9\\fs%d\\b1\\bord0\\shad0\\1c&Hffffff&}%s", infoheight - 10, width >= 550 ? L"MPC-BE" : L"MPC");
 
-		rts.Add(str, true, 0, 1, _T("thumbs"), _T(""), _T(""), CRect(0, 0, 0, 0), -1);
+		rts.Add(str, true, 0, 1, L"thumbs", L"", L"", CRect(0, 0, 0, 0), -1);
 
-		DVD_HMSF_TIMECODE hmsf = RT2HMS_r(duration);
+		const DVD_HMSF_TIMECODE hmsf = RT2HMS_r(duration);
 
 		CStringW ar;
 		if (dar.cx > 0 && dar.cy > 0 && dar.cx != framesize.cx && dar.cy != framesize.cy) {
 			ar.Format(L"(%d:%d)", dar.cx, dar.cy);
 		}
 
-		CString filename = pMainFrm->GetAltFileName(); // YouTube
+		CString filename = m_pMainFrm->GetAltFileName(); // YouTube
 		CString filesize;
 
 		if (filename.IsEmpty()) {
-			CString filepath = pMainFrm->GetCurFileName();
+			const CString filepath = m_pMainFrm->GetCurFileName();
 			filename = GetFileOnly(filepath);
 
 			WIN32_FIND_DATA wfd;
@@ -276,8 +269,8 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 			if (hFind != INVALID_HANDLE_VALUE) {
 				FindClose(hFind);
 
-				__int64 size = (__int64(wfd.nFileSizeHigh) << 32) | wfd.nFileSizeLow;
-				TCHAR szFileSize[65];
+				const __int64 size = (__int64(wfd.nFileSizeHigh) << 32) | wfd.nFileSizeLow;
+				TCHAR szFileSize[65] = { 0 };
 				StrFormatByteSize(size, szFileSize, _countof(szFileSize));
 				CString szByteSize;
 				szByteSize.Format(L"%I64d", size);
@@ -286,16 +279,16 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 		}
 
 		str.Format(ResStr(IDS_MAINFRM_59),
-			CompactPath(filename, 90),
-			filesize,
-			framesize.cx, framesize.cy, ar,
-			hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
+				   CompactPath(filename, 90),
+				   filesize,
+				   framesize.cx, framesize.cy, ar,
+				   hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
 
-		rts.Add(str, true, 0, 1, _T("thumbs"));
+		rts.Add(str, true, 0, 1, L"thumbs");
 		rts.Render(spd, 0, 25, bbox);
 	}
 
-	pMainFrm->SaveDIB(thumbpath, dib.get(), dibsize);
+	m_pMainFrm->SaveDIB(thumbpath, dib.get(), dibsize);
 
 	m_iProgress = INT_MAX; // the end
 }
@@ -303,24 +296,17 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 IMPLEMENT_DYNAMIC(CThumbsTaskDlg, CTaskDialog)
 
 CThumbsTaskDlg::CThumbsTaskDlg(LPCTSTR filename)
-	: CTaskDialog(
-		_T(""),
-		_T(""),
-		ResStr(IDS_SAVE_FILE),
-		TDCBF_CANCEL_BUTTON,
-		TDF_CALLBACK_TIMER | TDF_SHOW_PROGRESS_BAR)
+	: CTaskDialog(L"", L"", ResStr(IDS_SAVING_THUMBNAIL), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER | TDF_SHOW_PROGRESS_BAR | TDF_POSITION_RELATIVE_TO_WINDOW)
 	, m_filename(filename)
 	, m_iProgress(0)
-	, m_bAbort(0)
+	, m_bAbort(false)
 {
-	pMainFrm = AfxGetMainFrame();
-
 	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 	if (m_hIcon != NULL) {
 		SetMainIcon(m_hIcon);
 	}
 
-	SetDialogWidth(200); // I do not know why, but it does not work
+	SetDialogWidth(200);
 }
 
 CThumbsTaskDlg::~CThumbsTaskDlg()
@@ -341,9 +327,9 @@ HRESULT CThumbsTaskDlg::OnInit()
 		return E_INVALIDARG;
 	}
 
-	m_TaskDlgHwnd = ::GetActiveWindow();
+	m_pMainFrm = AfxGetMainFrame();
 
-	CAppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 	int n = 1 + clamp(s.iThumbCols, 1, 10) * clamp(s.iThumbRows, 1, 20) + 1;
 
 	SetProgressBarRange(0, n);

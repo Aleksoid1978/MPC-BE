@@ -1732,6 +1732,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"MPC-BE を初期設定に戻してもよろ�
 STRING IDS_SATURATION_DEC		"彩度を下げる"
 STRING IDS_SATURATION_INC		"彩度を上げる"
 STRING IDS_SAVE_FILE		"ファイルの保存"
+STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
 STRING IDS_SCALE_16_9		"16:9 画面に合わせる,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"ウルトラワイド画面に拡大,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"ワイド画面に拡大,%.3f,%.3f,%.3f,%.3f"

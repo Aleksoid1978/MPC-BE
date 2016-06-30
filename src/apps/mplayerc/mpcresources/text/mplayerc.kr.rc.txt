@@ -1732,6 +1732,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"MPC-BE 초기 설정으로 복원하시겠�
 STRING IDS_SATURATION_DEC		"채도 감소"
 STRING IDS_SATURATION_INC		"채도 증가"
 STRING IDS_SAVE_FILE		"파일 저장"
+STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
 STRING IDS_SCALE_16_9		"16:9 TV 스케일,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"울트라-와이드스크린으로 확대,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"와이드스크린으로 확대,%.3f,%.3f,%.3f,%.3f"

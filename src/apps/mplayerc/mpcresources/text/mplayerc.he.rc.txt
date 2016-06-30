@@ -1732,6 +1732,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"Are you sure you want to restore MPC-BE to i
 STRING IDS_SATURATION_DEC		"הפחתת הרוויה"
 STRING IDS_SATURATION_INC		"הגברת הרוויה"
 STRING IDS_SAVE_FILE		"Saving file"
+STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
 STRING IDS_SCALE_16_9		"התאם לטלוויזיית 16:9,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"זום למסך אולטרה-רחב,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"זום למסך רחב,%.3f,%.3f,%.3f,%.3f"

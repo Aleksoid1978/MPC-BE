@@ -1239,6 +1239,7 @@
 #define IDS_AUDIO_LEVEL                 33451
 #define IDS_AUDIO_RELEASETIME           33452
 #define IDS_AUDIO_GAIN                  33453
+#define IDS_SAVING_THUMBNAIL            33454
 // stereoscopic subtitles
 #define IDS_SUBTITLES_STEREO              34000
 #define IDS_SUBTITLES_STEREO_DONTUSE      34001

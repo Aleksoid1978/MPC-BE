@@ -1732,6 +1732,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"您確定要還原 MPC-BE 的設定至預設
 STRING IDS_SATURATION_DEC		"減少飽和度"
 STRING IDS_SATURATION_INC		"增加飽和度"
 STRING IDS_SAVE_FILE		"儲存檔案中"
+STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
 STRING IDS_SCALE_16_9		"縮放至 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"縮放至 Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"縮放至 Widescreen,%.3f,%.3f,%.3f,%.3f"
