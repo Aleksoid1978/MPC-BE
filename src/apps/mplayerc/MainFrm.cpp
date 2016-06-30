@@ -5888,8 +5888,12 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 	m_nVolumeBeforeFrameStepping = m_wndToolBar.Volume;
 	m_pBA->put_Volume(-10000);
 
+	m_wndSeekBar.LockWindowUpdate();
+
 	CThumbsTaskDlg dlg(fn);
 	dlg.DoModal();
+
+	m_wndSeekBar.UnlockWindowUpdate();
 
 	m_pBA->put_Volume(m_nVolumeBeforeFrameStepping);
 
