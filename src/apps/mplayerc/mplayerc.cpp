@@ -2247,7 +2247,7 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 			return L"video/x-ms-asf";
 		}
 
-		if (HTTPAsync.Connect(fn, 5000) == S_OK) {
+		if (HTTPAsync.Connect(fn, 10000) == S_OK) {
 			const QWORD ContentLength = HTTPAsync.GetLenght();
 			ct = HTTPAsync.GetContentType();
 
@@ -2262,7 +2262,7 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 
 			CStringA str;
 			DWORD dwSizeRead = 0;
-			if (HTTPAsync.Read((PBYTE)str.GetBuffer(nMinSize), nMinSize, &dwSizeRead, 3000) == S_OK) {
+			if (HTTPAsync.Read((PBYTE)str.GetBuffer(nMinSize), nMinSize, &dwSizeRead) == S_OK) {
 				str.ReleaseBuffer(dwSizeRead);
 				body += AToT(str);
 			}
@@ -2295,7 +2295,7 @@ CString GetContentType(CString fn, CAtlList<CString>* redir)
 
 				str.Empty();
 				dwSizeRead = 0;
-				if (HTTPAsync.Read((PBYTE)str.GetBuffer(nMaxSize), nMaxSize, &dwSizeRead, 3000) == S_OK) {
+				if (HTTPAsync.Read((PBYTE)str.GetBuffer(nMaxSize), nMaxSize, &dwSizeRead) == S_OK) {
 					str.ReleaseBuffer(dwSizeRead);
 					body += AToT(str);
 				}

@@ -357,7 +357,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		if (hFile == INVALID_HANDLE_VALUE) {
 			return VFW_E_NOT_FOUND;
 		}
-	} else if (::PathIsURL(lpcwstrFileName) && HTTPAsync.Connect(lpcwstrFileName, 5000) == S_OK) {
+	} else if (::PathIsURL(lpcwstrFileName) && HTTPAsync.Connect(lpcwstrFileName, 10000) == S_OK) {
 		if (HTTPAsync.GetLenght() > 0) {
 			HTTPAsync.Read(httpbuf, _countof(httpbuf), &httpbufSize, 1000);
 			HTTPAsync.Close();

@@ -11520,7 +11520,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		if (::PathIsURL(tmp) && url.CrackUrl(tmp)
 				&& (url.GetScheme() == ATL_URL_SCHEME_HTTP || url.GetScheme() == ATL_URL_SCHEME_HTTPS)) {
 			CHTTPAsync HTTPAsync;
-			if (FAILED(HTTPAsync.Connect(fn, 5000))) {
+			if (FAILED(HTTPAsync.Connect(fn, 10000))) {
 				hr = VFW_E_NOT_FOUND;
 			}
 		}
