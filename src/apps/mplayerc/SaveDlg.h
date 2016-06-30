@@ -39,6 +39,13 @@ private:
 	CComQIPtr<IMediaControl> pMC;
 	CComQIPtr<IMediaSeeking> pMS;
 
+	enum protocol {
+		PROTOCOL_NONE,
+		PROTOCOL_UDP,
+		PROTOCOL_HTTP,
+	};
+	protocol m_protocol = protocol::PROTOCOL_NONE;
+
 	CHTTPAsync m_HTTPAsync;
 	HANDLE m_hFile         = INVALID_HANDLE_VALUE;
 	QWORD m_len            = 0;
@@ -48,6 +55,10 @@ private:
 	volatile bool m_bAbort = false;
 	std::thread m_SaveThread;
 	void Save();
+
+	SOCKET m_UdpSocket     = INVALID_SOCKET;
+	WSAEVENT m_WSAEvent    = NULL;
+	sockaddr_in m_addr;
 
 public:
 	CSaveDlg(CString in, CString name, CString out, HRESULT& hr);
