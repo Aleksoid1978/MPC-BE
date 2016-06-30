@@ -20,13 +20,6 @@
 
 #pragma once
 
-#define DEFAULT_CACHE_LENGTH	64		// in Kb
-
-#define MINQUEUEPACKETS			50
-#define MAXQUEUEPACKETS			500
-#define MINQUEUESIZE			256		// in Kb
-#define MAXQUEUESIZE			128		// in Mb
-
 #define IDS_R_SETTINGS						_T("Settings")
 #define IDS_R_FILTERS						_T("Filters")
 #define IDS_R_INTERNAL_FILTERS				_T("InternalFilters")
