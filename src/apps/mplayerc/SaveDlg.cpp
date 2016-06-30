@@ -71,6 +71,20 @@ CSaveDlg::~CSaveDlg()
 		m_SaveThread.join();
 	}
 
+	if (m_protocol == protocol::PROTOCOL_UDP) {
+		if (m_WSAEvent != NULL) {
+			WSACloseEvent(m_WSAEvent);
+		}
+
+		if (m_UdpSocket != INVALID_SOCKET) {
+			closesocket(m_UdpSocket);
+			m_UdpSocket = INVALID_SOCKET;
+		}
+
+		WSACleanup();
+	}
+
+
 	if (m_hFile != INVALID_HANDLE_VALUE) {
 		CloseHandle(m_hFile);
 	}
@@ -149,33 +163,77 @@ HRESULT CSaveDlg::InitFileCopy()
 			if (!pReader
 					&& (m_HTTPAsync.Connect(fn, 3000) == S_OK)) {
 				m_len = m_HTTPAsync.GetLenght();
-
-				m_hFile = CreateFile(m_out, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-				if (m_hFile != INVALID_HANDLE_VALUE) {
-					if (m_len) {
-						ULARGE_INTEGER usize = { 0 };
-						usize.QuadPart = m_len;
-						HANDLE hMapping = CreateFileMapping(m_hFile, NULL, PAGE_READWRITE, usize.HighPart, usize.LowPart, NULL);
-						if (hMapping != INVALID_HANDLE_VALUE) {
-							CloseHandle(hMapping);
-						}
-					}
-
-					m_SaveThread = std::thread([this] { Save(); });
-
-					return S_OK;
-				}
+				m_protocol = protocol::PROTOCOL_HTTP;
 			}
 		} else if (protocol == L"udp") {
-			// don't working ...
-			/*
-			hr = S_OK;
-			CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CUDPReader(NULL, &hr);
+			WSADATA wsaData = { 0 };
+			WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-			if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fn, NULL))) {
-				pReader.Release();
+			int addr_size = sizeof(m_addr);
+
+			memset(&m_addr, 0, addr_size);
+			m_addr.sin_family      = AF_INET;
+			m_addr.sin_port        = htons((u_short)url.GetPortNumber());
+			m_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+			ip_mreq imr = { 0 };
+			if (InetPton(AF_INET, url.GetHostName(), &imr.imr_multiaddr.s_addr) != 1) {
+				goto fail;
 			}
-			*/
+			imr.imr_interface.s_addr = INADDR_ANY;
+
+			if ((m_UdpSocket = socket(AF_INET, SOCK_DGRAM, 0)) != INVALID_SOCKET) {
+				m_WSAEvent = WSACreateEvent();
+				WSAEventSelect(m_UdpSocket, m_WSAEvent, FD_READ);
+
+				DWORD dw = 1;
+				if (setsockopt(m_UdpSocket, SOL_SOCKET, SO_REUSEADDR, (const char*)&dw, sizeof(dw)) == SOCKET_ERROR) {
+					closesocket(m_UdpSocket);
+					m_UdpSocket = INVALID_SOCKET;
+				}
+
+				if (::bind(m_UdpSocket, (struct sockaddr*)&m_addr, addr_size) == SOCKET_ERROR) {
+					closesocket(m_UdpSocket);
+					m_UdpSocket = INVALID_SOCKET;
+				}
+
+				if (IN_MULTICAST(htonl(imr.imr_multiaddr.s_addr))
+						&& (setsockopt(m_UdpSocket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char*)&imr, sizeof(imr)) == SOCKET_ERROR)) {
+					closesocket(m_UdpSocket);
+					m_UdpSocket = INVALID_SOCKET;
+				}
+
+				dw = 65 * KILOBYTE;
+				if (setsockopt(m_UdpSocket, SOL_SOCKET, SO_RCVBUF, (const char*)&dw, sizeof(dw)) == SOCKET_ERROR) {
+					;
+				}
+
+				// set non-blocking mode
+				u_long param = 1;
+				ioctlsocket(m_UdpSocket, FIONBIO, &param);
+			}
+
+			if (m_UdpSocket != INVALID_SOCKET) {
+				m_protocol = protocol::PROTOCOL_UDP;
+			}
+		}
+
+		if (m_protocol != protocol::PROTOCOL_NONE) {
+			m_hFile = CreateFile(m_out, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			if (m_hFile != INVALID_HANDLE_VALUE) {
+				if (m_len) {
+					ULARGE_INTEGER usize = { 0 };
+					usize.QuadPart = m_len;
+					HANDLE hMapping = CreateFileMapping(m_hFile, NULL, PAGE_READWRITE, usize.HighPart, usize.LowPart, NULL);
+					if (hMapping != INVALID_HANDLE_VALUE) {
+						CloseHandle(hMapping);
+					}
+				}
+
+				m_SaveThread = std::thread([this] { Save(); });
+
+				return S_OK;
+			}
 		}
 	} else {
 		hr = S_OK;
@@ -208,6 +266,8 @@ HRESULT CSaveDlg::InitFileCopy()
 			return E_ABORT;
 		}
 	}
+
+fail:
 
 	CComQIPtr<IBaseFilter> pSrc = pReader;
 	if (FAILED(pGB->AddFilter(pSrc, fn))) {
@@ -273,12 +333,33 @@ void CSaveDlg::Save()
 		const DWORD bufLen = 64 * KILOBYTE;
 		BYTE pBuffer[bufLen] = { 0 };
 
-		while (!m_bAbort) {
+		int attempts = 0;
+
+		while (!m_bAbort && attempts <= 20) {
 			DWORD dwSizeRead = 0;
-			const HRESULT hr = m_HTTPAsync.Read(pBuffer, bufLen, &dwSizeRead);
-			if (hr != S_OK) {
-				m_bAbort = true;
-				break;
+			if (m_protocol == protocol::PROTOCOL_HTTP) {
+				const HRESULT hr = m_HTTPAsync.Read(pBuffer, bufLen, &dwSizeRead);
+				if (hr != S_OK) {
+					m_bAbort = true;
+					break;
+				}
+			} else if (m_protocol == protocol::PROTOCOL_UDP) {
+				const DWORD dwResult = WSAWaitForMultipleEvents(1, &m_WSAEvent, FALSE, 200, FALSE);
+				if (dwResult == WSA_WAIT_EVENT_0) {
+					WSAResetEvent(m_WSAEvent);
+					static int fromlen = sizeof(m_addr);
+					dwSizeRead = recvfrom(m_UdpSocket, (char*)pBuffer, bufLen, 0, (SOCKADDR*)&m_addr, &fromlen);
+					if (dwSizeRead <= 0) {
+						const int wsaLastError = WSAGetLastError();
+						if (wsaLastError != WSAEWOULDBLOCK) {
+							attempts++;
+						}
+						continue;
+					}
+				} else {
+					attempts++;
+					continue;
+				}
 			}
 
 			DWORD dwSizeWritten = 0;
@@ -292,6 +373,8 @@ void CSaveDlg::Save()
 				m_bAbort = true;
 				break;
 			}
+
+			attempts = 0;
 		}
 	}
 
