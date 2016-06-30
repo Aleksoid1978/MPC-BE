@@ -1732,6 +1732,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"Bent u zeker om MPC-BE naar de standaardinst
 STRING IDS_SATURATION_DEC		"Verzadiging verminderen"
 STRING IDS_SATURATION_INC		"Verzadiging vermeerderen"
 STRING IDS_SAVE_FILE		"Bestand aan het opslaan"
+STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
 STRING IDS_SCALE_16_9		"Schaal naar 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"Zoom naar Ultra-breedbeeld,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"Zoom naar breedbeeld,%.3f,%.3f,%.3f,%.3f"

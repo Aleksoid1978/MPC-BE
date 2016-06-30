@@ -1732,6 +1732,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"Are you sure you want to restore MPC-BE to i
 STRING IDS_SATURATION_DEC		"Saturation decrease"
 STRING IDS_SATURATION_INC		"Saturation increase"
 STRING IDS_SAVE_FILE		"Saving file"
+STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
 STRING IDS_SCALE_16_9		"Skálázás 16:9 TV-re,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"Nagyítás Ultra-Szélesvásznúra,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"Nagyítás Szélesvásznúra,%.3f,%.3f,%.3f,%.3f"

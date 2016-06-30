@@ -1735,6 +1735,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"Sigur doriți să restaurați MPC-BE la set�
 STRING IDS_SATURATION_DEC		"Micșorare saturație"
 STRING IDS_SATURATION_INC		"Mărire saturație"
 STRING IDS_SAVE_FILE		"Saving file"
+STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
 STRING IDS_SCALE_16_9		"Scalează la 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"Mărește la Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"Mărește la Widescreen,%.3f,%.3f,%.3f,%.3f"

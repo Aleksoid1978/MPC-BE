@@ -1732,6 +1732,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"Вы действительно хотите
 STRING IDS_SATURATION_DEC		"Насыщенность уменьшить"
 STRING IDS_SATURATION_INC		"Насыщенность увеличить"
 STRING IDS_SAVE_FILE		"Сохранение файла"
+STRING IDS_SAVING_THUMBNAIL		"Сохранение миниатюры"
 STRING IDS_SCALE_16_9		"Установить пропорции 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"Масштабировать в Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"Масштабировать в Widescreen,%.3f,%.3f,%.3f,%.3f"

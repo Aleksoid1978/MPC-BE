@@ -1732,6 +1732,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"Sei sicuro di voler ripristinare le impostaz
 STRING IDS_SATURATION_DEC		"Decremento saturazione"
 STRING IDS_SATURATION_INC		"Incremento saturazione"
 STRING IDS_SAVE_FILE		"Salvataggio"
+STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
 STRING IDS_SCALE_16_9		"Scala per TV 16:9,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"Zoom a Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"Zoom a Widescreen,%.3f,%.3f,%.3f,%.3f"

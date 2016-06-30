@@ -1732,6 +1732,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"Zihur zaude MPC-BE leheneratzea nahi duzula 
 STRING IDS_SATURATION_DEC		"Margoasetasuna gutxitu"
 STRING IDS_SATURATION_INC		"Margoasetasuna gehitu"
 STRING IDS_SAVE_FILE		"Agiria gordetzen"
+STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
 STRING IDS_SCALE_16_9		"Neurriratu hona: 16:9 TB,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"Zooma Ultra-Ikusleiho-zabalera,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"Zooma Ikusleiho-zabalera,%.3f,%.3f,%.3f,%.3f"

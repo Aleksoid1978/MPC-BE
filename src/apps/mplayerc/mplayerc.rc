@@ -3215,6 +3215,7 @@ STRINGTABLE
 BEGIN
     IDS_TEXTFILE_ENC                    "Encoding:"
     IDS_SAVE_FILE                       "Saving file"
+    IDS_SAVING_THUMBNAIL                "Saving thumbnails"
 END
 
 STRINGTABLE

@@ -5877,14 +5877,13 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 		return;
 	}
 
-	//pMC->Pause();
 	const auto ms = GetMediaState();
 	if (ms != State_Paused) {
 		SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 		GetMediaState(); // wait for completion of the pause command
 	}
 
-	REFERENCE_TIME rtPos = GetPos();
+	const REFERENCE_TIME rtPos = GetPos();
 
 	m_nVolumeBeforeFrameStepping = m_wndToolBar.Volume;
 	m_pBA->put_Volume(-10000);
@@ -5894,7 +5893,7 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 
 	m_pBA->put_Volume(m_nVolumeBeforeFrameStepping);
 
-	SeekTo(rtPos);
+	SeekTo(rtPos, false);
 	if (ms == State_Running) {
 		SendMessage(WM_COMMAND, ID_PLAY_PLAY);
 	}

@@ -1732,6 +1732,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"Վերականգնե՞լ MPC-BE-ի ծրագ�
 STRING IDS_SATURATION_DEC		"Խտայնության փոքրացում"
 STRING IDS_SATURATION_INC		"Խտայնության մեծացում"
 STRING IDS_SAVE_FILE		"Saving file"
+STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
 STRING IDS_SCALE_16_9		"Համամասնությունը 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"Նշել չափը Ամենա-Լայնէկրան,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"Նշել չափը Լայնէկրան,%.3f,%.3f,%.3f,%.3f"

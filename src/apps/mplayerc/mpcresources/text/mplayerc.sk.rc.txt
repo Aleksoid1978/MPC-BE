@@ -1732,6 +1732,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"Naozaj chcete obnoviť predvolené nastaveni
 STRING IDS_SATURATION_DEC		"Znížiť sýtosť"
 STRING IDS_SATURATION_INC		"Zvýšiť sýtosť"
 STRING IDS_SAVE_FILE		"Saving file"
+STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
 STRING IDS_SCALE_16_9		"Prepnúť na stranový pomer 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"Priblížiť na šírku obrazovky - ultra,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"Priblížiť na šírku obrazovky,%.3f,%.3f,%.3f,%.3f"
