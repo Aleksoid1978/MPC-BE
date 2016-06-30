@@ -42,9 +42,6 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 {
 	m_iProgress = 0;
 
-	m_iProgress = PROGRESS_E_MEMORY;
-	return;
-
 	if (!thumbpath
 			|| !(m_pMainFrm->m_pMS)
 			|| !(m_pMainFrm->m_pFS)
