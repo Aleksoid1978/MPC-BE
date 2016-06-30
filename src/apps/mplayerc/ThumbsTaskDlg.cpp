@@ -27,17 +27,29 @@
 
 #include "ThumbsTaskDlg.h"
 
+enum {
+	PROGRESS_E_VIDFMT	= -5,
+	PROGRESS_E_VIDSIZE	= -4,
+	PROGRESS_E_MEMORY	= -3,
+	PROGRESS_E_FAIL		= -2,
+	PROGRESS_E_WAIT		= -1,
+	PROGRESS_COMPLETED	= INT16_MAX,
+};
+
 // CThumbsTaskDlg dialog
 
 void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 {
 	m_iProgress = 0;
 
+	m_iProgress = PROGRESS_E_MEMORY;
+	return;
+
 	if (!thumbpath
 			|| !(m_pMainFrm->m_pMS)
 			|| !(m_pMainFrm->m_pFS)
 			|| !(m_pMainFrm->m_pME)) {
-		m_iProgress = -1;
+		m_iProgress = PROGRESS_E_FAIL;
 		return;
 	}
 
@@ -59,7 +71,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 		}
 	}
 	else {
-		m_iProgress = -1;
+		m_iProgress = PROGRESS_E_VIDSIZE;
 		return;
 	}
 
@@ -73,7 +85,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 	REFERENCE_TIME duration = 0;
 	m_pMainFrm->m_pMS->GetDuration(&duration);
 	if (duration <= 0) {
-		m_iProgress = -1;
+		m_iProgress = PROGRESS_E_FAIL;
 		return;
 	}
 
@@ -95,8 +107,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 
 	std::unique_ptr<BYTE[]> dib(DNew BYTE[dibsize]);
 	if (!dib) {
-		AfxMessageBox(ResStr(IDS_MAINFRM_56));
-		m_iProgress = -1;
+		m_iProgress = PROGRESS_E_MEMORY;
 		return;
 	}
 
@@ -130,8 +141,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 
 	std::unique_ptr<BYTE[]> thumb(DNew BYTE[thumbsize.cx * thumbsize.cy * 4]);
 	if (!thumb) {
-		AfxMessageBox(ResStr(IDS_MAINFRM_56));
-		m_iProgress = -1;
+		m_iProgress = PROGRESS_E_MEMORY;
 		return;
 	}
 
@@ -198,17 +208,15 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 		BYTE* pData = NULL;
 		long size = 0;
 		if (!m_pMainFrm->GetDIB(&pData, size)) {
-			m_iProgress = -1;
+			m_iProgress = PROGRESS_E_FAIL;
 			return;
 		}
 
 		const BITMAPINFO* bi = (BITMAPINFO*)pData;
 		if (bi->bmiHeader.biBitCount != 32) {
-			CString str;
-			str.Format(ResStr(IDS_MAINFRM_57), bi->bmiHeader.biBitCount);
-			AfxMessageBox(str);
 			delete [] pData;
-			m_iProgress = -1;
+
+			m_iProgress = PROGRESS_E_VIDFMT;
 			return;
 		}
 
@@ -290,21 +298,19 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 
 	m_pMainFrm->SaveDIB(thumbpath, dib.get(), dibsize);
 
-	m_iProgress = INT_MAX; // the end
+	m_iProgress = PROGRESS_COMPLETED; // the end
 }
 
 IMPLEMENT_DYNAMIC(CThumbsTaskDlg, CTaskDialog)
 
 CThumbsTaskDlg::CThumbsTaskDlg(LPCTSTR filename)
-	: CTaskDialog(L"", L"", ResStr(IDS_SAVING_THUMBNAIL), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER | TDF_SHOW_PROGRESS_BAR | TDF_POSITION_RELATIVE_TO_WINDOW)
+	: CTaskDialog(L"", L"", ResStr(IDS_SAVING_THUMBNAIL),
+		TDCBF_CANCEL_BUTTON,
+		TDF_CALLBACK_TIMER | TDF_SHOW_PROGRESS_BAR | TDF_POSITION_RELATIVE_TO_WINDOW)
 	, m_filename(filename)
 	, m_iProgress(0)
 	, m_bAbort(false)
 {
-	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
-	if (m_hIcon != NULL) {
-		SetMainIcon(m_hIcon);
-	}
 
 	SetDialogWidth(200);
 }
@@ -342,13 +348,34 @@ HRESULT CThumbsTaskDlg::OnInit()
 
 HRESULT CThumbsTaskDlg::OnTimer(_In_ long lTime)
 {
-	if (m_iProgress < 0) {
+	switch (m_iProgress) {
+	// waiting after error
+	case PROGRESS_E_WAIT:
+
+		return S_FALSE;
+	// errors
+	case PROGRESS_E_FAIL:
+		SetContent(ResStr(IDS_AG_ERROR));
+		break;
+	case PROGRESS_E_MEMORY:
+		SetContent(ResStr(IDS_MAINFRM_56));
+		break;
+	case PROGRESS_E_VIDSIZE:
+		SetContent(ResStr(IDS_MAINFRM_55));
+		break;
+	case PROGRESS_E_VIDFMT:
+		SetContent(ResStr(IDS_MAINFRM_57));
+		break;
+	// operation is completed, close the dialog
+	case PROGRESS_COMPLETED:
 		ClickCommandControl(IDCANCEL);
-		return E_FAIL;
+
+		return S_OK;
 	}
 
-	if (m_iProgress == INT_MAX) {
-		ClickCommandControl(IDCANCEL);
+	if (m_iProgress < PROGRESS_E_WAIT) {
+		m_iProgress = PROGRESS_E_WAIT;
+
 		return S_FALSE;
 	}
 
