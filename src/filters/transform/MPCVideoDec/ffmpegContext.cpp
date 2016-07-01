@@ -366,24 +366,24 @@ static unsigned __int64 GetFileVersion(LPCWSTR lptstrFilename)
 int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
 							 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion)
 {
-	const H264Context* h			= (H264Context*)pAVCtx->priv_data;
-	const SPS* cur_sps				= h->ps.sps;
+	const H264Context* h           = (H264Context*)pAVCtx->priv_data;
+	const SPS* sps                 = h264_getSPS(h);
 
-	int video_is_level51			= 0;
-	int no_level51_support			= 1;
-	int too_much_ref_frames			= 0;
-	const int max_ref_frames_dpb41	= min(11, 8388608/(nWidth * nHeight));
+	int video_is_level51           = 0;
+	int no_level51_support         = 1;
+	int too_much_ref_frames        = 0;
+	const int max_ref_frames_dpb41 = min(11, 8388608/(nWidth * nHeight));
 
-	if (cur_sps != NULL) {
-		if (cur_sps->bit_depth_luma > 8 || cur_sps->chroma_format_idc > 1) {
+	if (sps) {
+		if (sps->bit_depth_luma > 8 || sps->chroma_format_idc > 1) {
 			return DXVA_HIGH_BIT;
 		}
 
-		if (cur_sps->profile_idc > 100) {
+		if (sps->profile_idc > 100) {
 			return DXVA_PROFILE_HIGHER_THAN_HIGH;
 		}
 
-		video_is_level51   = cur_sps->level_idc >= 51 ? 1 : 0;
+		video_is_level51   = sps->level_idc >= 51 ? 1 : 0;
 		int max_ref_frames = max_ref_frames_dpb41; // default value is calculate
 
 		if (nPCIVendor == PCIV_nVidia) {
@@ -420,7 +420,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 		}
 
 		// Check maximum allowed number reference frames
-		if (cur_sps->ref_frame_count > max_ref_frames) {
+		if (sps->ref_frame_count > max_ref_frames) {
 			too_much_ref_frames = 1;
 		}
 	}
@@ -439,9 +439,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 // === Mpeg2 functions
 int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx)
 {
-	const MpegEncContext* s = (MpegEncContext*)pAVCtx->priv_data;
-
-	return (s->chroma_format < 2);
+	return (((MpegEncContext*)pAVCtx->priv_data)->chroma_format < 2);
 }
 
 // === Common functions
@@ -478,15 +476,15 @@ UINT FFGetMBCount(struct AVCodecContext* pAVCtx)
 	switch (pAVCtx->codec_id) {
 		case AV_CODEC_ID_H264 :
 			{
-				const H264Context* h	= (H264Context*)pAVCtx->priv_data;
-				MBCount					= h->mb_width * h->mb_height;
+				const H264Context* h    = (H264Context*)pAVCtx->priv_data;
+				MBCount                 = h->mb_width * h->mb_height;
 			}
 			break;
 		case AV_CODEC_ID_MPEG2VIDEO:
 			{
-				const MpegEncContext* s	= (MpegEncContext*)pAVCtx->priv_data;
-				const int is_field		= s->picture_structure != PICT_FRAME;
-				MBCount					= s->mb_width * (s->mb_height >> is_field);
+				const MpegEncContext* s = (MpegEncContext*)pAVCtx->priv_data;
+				const int is_field      = s->picture_structure != PICT_FRAME;
+				MBCount                 = s->mb_width * (s->mb_height >> is_field);
 			}
 			break;
 	}
@@ -499,8 +497,8 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 	// fill "Bitstream height" properties
 	if (pAVCtx->codec_id == AV_CODEC_ID_H264) {
 		const H264Context* h = (H264Context*)pAVCtx->priv_data;
-		const SPS* sps       = h->ps.sps;
-		if (h->current_sps_id != -1 && sps) {
+		const SPS* sps       = h264_getSPS(h);
+		if (sps && sps->mb_height > 0) {
 			pAVCtx->coded_height = sps->mb_height * (2 - sps->frame_mbs_only_flag) * 16;
 		}
 	}

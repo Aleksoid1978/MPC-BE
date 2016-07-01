@@ -21,7 +21,7 @@
 
 /**
  * @file
- * H.264 / AVC / MPEG4 part10 cabac decoding.
+ * H.264 / AVC / MPEG-4 part10 cabac decoding.
  * @author Michael Niedermayer <michaelni@gmx.at>
  */
 
@@ -40,7 +40,6 @@
 #include "h264.h"
 #include "h264data.h"
 #include "h264_mvpred.h"
-#include "golomb.h"
 #include "mpegutils.h"
 
 #if ARCH_X86
@@ -56,7 +55,7 @@ static const int8_t cabac_context_init_I[1024][2] =
     {  2,  54 }, {  3, 74 },  { -28,127 }, { -23, 104 },
     { -6,  53 }, { -1, 54 },  {  7,  51 },
 
-    /* 11 - 23 unsused for I */
+    /* 11 - 23 unused for I */
     { 0, 0 },    { 0, 0 },    { 0, 0 },      { 0, 0 },
     { 0, 0 },    { 0, 0 },    { 0, 0 },      { 0, 0 },
     { 0, 0 },    { 0, 0 },    { 0, 0 },      { 0, 0 },
@@ -1923,7 +1922,7 @@ int ff_h264_decode_mb_cabac(const H264Context *h, H264SliceContext *sl)
 
     mb_xy = sl->mb_xy = sl->mb_x + sl->mb_y*h->mb_stride;
 
-    ff_tlog(h->avctx, "pic:%d mb:%d/%d\n", h->frame_num, sl->mb_x, sl->mb_y);
+    ff_tlog(h->avctx, "pic:%d mb:%d/%d\n", h->poc.frame_num, sl->mb_x, sl->mb_y);
     if (sl->slice_type_nos != AV_PICTURE_TYPE_I) {
         int skip;
         /* a skipped mb needs the aff flag from the following mb */
