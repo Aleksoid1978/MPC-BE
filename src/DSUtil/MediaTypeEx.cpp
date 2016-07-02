@@ -525,8 +525,9 @@ CString GetGUIDString(const GUID& guid)
 		CHAR* str;
 		if (DXVA_names.Lookup(guid, str)) {
 			guidStr = str;
-		} else if (memcmp(&guid.Data2, &MEDIASUBTYPE_YUY2.Data2, sizeof(GUID)- sizeof(GUID::Data1)) == 0) {
-			static CHAR s_guidstr[] = "MEDIASUBTYPE_xxxx";
+		} else if (memcmp(&guid.Data2, &MEDIASUBTYPE_YUY2.Data2, sizeof(GUID)- sizeof(GUID::Data1)) == 0 // GUID like {xxxxxxxx-0000-0010-8000-00AA00389B71}
+				&& (guid.Data1 & 0xE0E0E0E0)) { // and FOURCC with chars >= 0x20
+			static CHAR s_guidstr[] = "MEDIASUBTYPE_XXXX";
 			memcpy(&s_guidstr[13], &guid.Data1, sizeof(guid.Data1));
 			guidStr = s_guidstr;
 		}
