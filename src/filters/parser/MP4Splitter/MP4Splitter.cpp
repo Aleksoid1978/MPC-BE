@@ -930,8 +930,19 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							mts.Add(mt);
 							break;
 						}
+
 						mt.subtype = FOURCCMap(fourcc);
 						mts.Add(mt);
+
+						if (fourcc == FCC('yuv2')
+								|| fourcc == FCC('b16g')
+								|| fourcc == FCC('b48r')
+								|| fourcc == FCC('b64a') // decoding support is planned in the future
+							) {
+							mt.subtype = MEDIASUBTYPE_LAV_RAWVIDEO;
+							mts.Add(mt);
+							break;
+						}
 
 						if (mt.subtype == MEDIASUBTYPE_WVC1) {
 							mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
