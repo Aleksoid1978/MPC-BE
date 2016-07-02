@@ -2124,6 +2124,11 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 		SAFE_RELEASE(m_pMMDevice);
 
 		SAFE_DELETE_ARRAY(m_pWaveFileFormat);
+
+		m_wBitsPerSampleList.RemoveAll();
+		m_nChannelsList.RemoveAll();
+		m_dwChannelMaskList.RemoveAll();
+		m_AudioParamsList.RemoveAll();
 	}
 	SAFE_DELETE_ARRAY(m_pWaveFileFormatOutput);
 
