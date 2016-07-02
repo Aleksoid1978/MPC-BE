@@ -211,6 +211,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 
 		const BITMAPINFO* bi = (BITMAPINFO*)pData;
 		if (bi->bmiHeader.biBitCount != 32) {
+			m_ErrorMsg.Format(ResStr(IDS_MAINFRM_57), bi->bmiHeader.biBitCount);
 			delete [] pData;
 
 			m_iProgress = PROGRESS_E_VIDFMT;
@@ -309,7 +310,7 @@ CThumbsTaskDlg::CThumbsTaskDlg(LPCTSTR filename)
 	, m_bAbort(false)
 {
 
-	SetDialogWidth(200);
+	SetDialogWidth(150);
 }
 
 CThumbsTaskDlg::~CThumbsTaskDlg()
@@ -361,7 +362,7 @@ HRESULT CThumbsTaskDlg::OnTimer(_In_ long lTime)
 		SetContent(ResStr(IDS_MAINFRM_55));
 		break;
 	case PROGRESS_E_VIDFMT:
-		SetContent(ResStr(IDS_MAINFRM_57));
+		SetContent(m_ErrorMsg);
 		break;
 	// operation is completed, close the dialog
 	case PROGRESS_COMPLETED:
