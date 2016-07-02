@@ -38,6 +38,7 @@ private:
 
 	volatile int  m_iProgress;
 	volatile bool m_bAbort;
+	CString       m_ErrorMsg;
 
 	std::thread   m_Thread;
 	void SaveThumbnails(LPCTSTR filepath);
