@@ -283,7 +283,7 @@ File_Mpeg4_Descriptors::File_Mpeg4_Descriptors()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("MPEG-4 Descriptor");
+    ParserName="MPEG-4 Descriptor";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Mpeg4_Desc;
         StreamIDs_Width[0]=0;

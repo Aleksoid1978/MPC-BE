@@ -82,7 +82,7 @@ const char* Tga_Image_Type_ColorSpace(int8u Image_Type)
 File_Tga::File_Tga()
 {
     //Configuration
-    ParserName=__T("TGA");
+    ParserName="TGA";
     Buffer_MaximumSize=64*1024*1024; //Some big frames are possible (e.g YUV 4:2:2 10 bits 1080p)
 }
 

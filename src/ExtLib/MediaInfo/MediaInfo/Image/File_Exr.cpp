@@ -55,7 +55,7 @@ File_Exr::File_Exr()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("EXR");
+    ParserName="EXR";
 }
 
 //***************************************************************************

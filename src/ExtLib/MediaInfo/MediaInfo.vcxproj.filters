@@ -701,6 +701,9 @@
     <ClInclude Include="MediaInfo\XmlUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\File__Analyze_Element.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1337,6 +1340,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MediaInfo\XmlUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\File__Analyze_Element.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

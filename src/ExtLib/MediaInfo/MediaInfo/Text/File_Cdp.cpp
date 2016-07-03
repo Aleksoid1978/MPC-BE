@@ -87,7 +87,7 @@ File_Cdp::File_Cdp()
     AspectRatio=0;
 
     //Temp
-    ParserName=__T("CDP");
+    ParserName="CDP";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Cdp;
         StreamIDs_Width[0]=1;

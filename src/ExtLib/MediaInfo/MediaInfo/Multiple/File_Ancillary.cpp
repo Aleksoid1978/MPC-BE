@@ -220,7 +220,7 @@ File_Ancillary::File_Ancillary()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("Ancillary");
+    ParserName="Ancillary";
     #if MEDIAINFO_EVENTS
         StreamIDs_Width[0]=4;
     #endif //MEDIAINFO_EVENTS

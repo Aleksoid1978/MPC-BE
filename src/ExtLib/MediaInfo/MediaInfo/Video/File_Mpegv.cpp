@@ -1033,7 +1033,7 @@ File_Mpegv::File_Mpegv()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("MPEG Video");
+    ParserName="MPEG Video";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Mpegv;
         StreamIDs_Width[0]=16;

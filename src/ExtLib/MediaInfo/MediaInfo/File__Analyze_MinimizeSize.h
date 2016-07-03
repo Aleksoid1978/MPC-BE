@@ -55,7 +55,7 @@ public :
     //***************************************************************************
 
     //In
-    Ztring ParserName;
+    std::string ParserName;
     #if MEDIAINFO_EVENTS
         size_t  StreamIDs_Size;
         int64u  StreamIDs[16];
@@ -333,7 +333,6 @@ protected :
 protected :
     //Element - Common
     void   Element_End_Common_Flush();
-    Ztring Element_End_Common_Flush_Build();
 public :
 
     //***************************************************************************
@@ -358,7 +357,7 @@ public :
     // Information
     //***************************************************************************
 
-    inline void Info (const Ztring&, size_t =0) {}
+    inline void Info (const std::string&, size_t =0) {}
 
     //***************************************************************************
     // Big Endian (Integer, Float, Fixed-Point)

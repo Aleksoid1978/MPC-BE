@@ -50,7 +50,7 @@ File_Wm::File_Wm()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("Wm");
+    ParserName="Wm";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Wm;
         StreamIDs_Width[0]=2;

@@ -38,7 +38,7 @@ File_Sdp::File_Sdp()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("SDP");
+    ParserName="SDP";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Sdp;
         StreamIDs_Width[0]=2;

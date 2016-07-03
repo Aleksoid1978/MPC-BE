@@ -168,10 +168,10 @@ void File_Mpc::FileHeader_Parse()
     BS_End();
 
     Skip_L2(                                                    "TitlePeak");
-    Get_L2 (TitleGain,                                          "TitleGain"); Param_Info3(((float32)((int16s)TitleGain))/1000, 2, " dB");
+    Get_L2 (TitleGain,                                          "TitleGain"); Param_Info3(((float32)((int16s)TitleGain))/1000, " dB", 2);
 
     Skip_L2(                                                    "AlbumPeak");
-    Get_L2 (AlbumGain,                                          "AlbumGain"); Param_Info3(((float32)((int16s)TitleGain))/1000, 2, " dB");
+    Get_L2 (AlbumGain,                                          "AlbumGain"); Param_Info3(((float32)((int16s)TitleGain))/1000, " dB", 2);
 
     BS_Begin();
     Skip_S2(16,                                                 "unused");

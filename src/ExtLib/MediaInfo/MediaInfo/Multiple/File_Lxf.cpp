@@ -115,7 +115,7 @@ File_Lxf::File_Lxf()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("LXF");
+    ParserName="LXF";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Lxf;
         StreamIDs_Width[0]=4; //2 numbers for Code, 2 numbers for subcode
@@ -665,17 +665,17 @@ void File_Lxf::Header_Parse()
                     int32u TimeStamp4, Duration4;
                     Get_L4 (TimeStamp4,                         "TimeStamp");
                     TimeStamp=TimeStamp4;
-                    Param_Info3(((float64)TimeStamp4)/TimeStamp_Rate, 3, " s");
+                    Param_Info3(((float64)TimeStamp4)/TimeStamp_Rate, " s", 3);
                     FrameInfo.DTS=FrameInfo.PTS=float64_int64s(((float64)TimeStamp)*1000000000/TimeStamp_Rate);
                     Get_L4 (Duration4,                          "Duration");
                     Duration=Duration4;
-                    Param_Info3(((float64)Duration)/TimeStamp_Rate, 3, " s");
+                    Param_Info3(((float64)Duration)/TimeStamp_Rate, " s", 3);
                     FrameInfo.DUR=float64_int64s(((float64)Duration)*1000000000/TimeStamp_Rate);
                     }
                     break;
         case 1 :
-                    Get_L8 (TimeStamp,                          "TimeStamp"); Param_Info3(((float64)TimeStamp)/720000, 3, " s"); FrameInfo.DTS=FrameInfo.PTS=float64_int64s(((float64)TimeStamp)*1000000/720);
-                    Get_L8 (Duration,                           "Duration"); Param_Info3(((float64)Duration)/720000, 3, " s"); FrameInfo.DUR=float64_int64s(((float64)Duration)*1000000/720);
+            Get_L8 (TimeStamp,                          "TimeStamp"); Param_Info3(((float64)TimeStamp)/720000, " s", 3); FrameInfo.DTS=FrameInfo.PTS=float64_int64s(((float64)TimeStamp)*1000000/720);
+            Get_L8 (Duration,                           "Duration"); Param_Info3(((float64)Duration)/720000, " s", 3); FrameInfo.DUR=float64_int64s(((float64)Duration)*1000000/720);
                     break;
         default:    ;
     }
@@ -1050,7 +1050,7 @@ void File_Lxf::Header_Meta()
                                             FrameRate=Mpegv_frame_rate[frameRateCode+1];
                                             if (Version==0)
                                                 TimeStamp_Rate=FrameRate*2; //Time stamp is in fields
-                                            Element_Info3(FrameRate, 3, " fps");
+                                            Element_Info3(FrameRate, " fps", 3);
                                         }
                                     }
                                     Element_End0();

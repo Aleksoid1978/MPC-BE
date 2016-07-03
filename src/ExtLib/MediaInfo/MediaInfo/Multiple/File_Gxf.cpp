@@ -234,7 +234,7 @@ File_Gxf::File_Gxf()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("GXF");
+    ParserName="GXF";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Gxf;
         StreamIDs_Width[0]=2;

@@ -69,19 +69,19 @@
  image stream1; strumień obrazu
  image stream2; strumienie obrazu
  image stream3; strumieni obrazu
- KB; KB
- Kb; Kb
- KBps; KB/s
- Kbps; Kb/s
- KHz; KHz
- KiB; KB
+ KB; kB
+ Kb; kb
+ KBps; kB/s
+ Kbps; kb/s
+ KHz; kHz
+ KiB; KiB
  KibiBit1; kilobit
  KibiBit2; kilobity
  KibiBit3; kilobitów
  KibiByte1; kilobajt
  KibiByte2; kilobajty
  KibiByte3; kilobajtów
- KiBps; KB/s
+ KiBps; KiB/s
  KiloBit1; kilobit
  KiloBit2; kilobity
  KiloBit3; kilobitów
@@ -105,9 +105,9 @@
  MegaByte2; megabajty
  MegaByte3; megabajtów
  MHz; MHz
- MiB; MB
- Mib; Mb
- MiBps; MB/s
+ MiB; MiB
+ Mib; Mib
+ MiBps; MiB/s
  millisecond1; milisekunda
  millisecond2; milisekundy
  millisecond3; milisekund
@@ -585,7 +585,7 @@ Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
-h;h
+h; h
 Header file;Utwórz plik nagłówka
 Height;Wysokość
 Height_CleanAperture;
@@ -844,11 +844,11 @@ Menu_Hint;Więcej możliwosci
 Menu_No;Brak menu
 MenuCount;Liczba strumieni menu
 MenuID;ID menu
-mn; min.
+mn; min
 Mood;Nastrój
 More;Więcej
 Movie;Tytuł filmu
-ms;ms
+ms; ms
 MSDI;MSDI
 MusicBy;Kompozytor
 MuxingMode;Tryb multipleksowania

@@ -67,7 +67,7 @@ File_DtvccTransport::File_DtvccTransport()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("DTVCC Transport");
+    ParserName="DTVCC Transport";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_DtvccTransport;
         StreamIDs_Width[0]=1;

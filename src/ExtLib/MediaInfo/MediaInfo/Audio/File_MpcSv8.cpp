@@ -195,9 +195,9 @@ void File_MpcSv8::RG()
     //Parsing
     int16u TitleGain, AlbumGain;
     Skip_B1(                                                    "Version");
-    Get_L2 (TitleGain,                                          "Title gain"); Param_Info3(((float32)((int16s)TitleGain))/1000, 2, " dB");
+    Get_L2 (TitleGain,                                          "Title gain"); Param_Info3(((float32)((int16s)TitleGain))/1000, " dB", 2);
     Skip_L2(                                                    "Title peak");
-    Get_L2 (AlbumGain,                                          "Album gain"); Param_Info3(((float32)((int16s)TitleGain))/1000, 2, " dB");
+    Get_L2 (AlbumGain,                                          "Album gain"); Param_Info3(((float32)((int16s)TitleGain))/1000, " dB", 2);
     Skip_L2(                                                    "Album peak");
 }
 

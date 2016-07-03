@@ -58,7 +58,7 @@ File_Cdxa::File_Cdxa()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("CDXA");
+    ParserName="CDXA";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Cdxa;
         StreamIDs_Width[0]=0;
@@ -295,7 +295,7 @@ void File_Cdxa::Data_Parse()
     if (Config_Trace_Level)
     {
         if (!MI->Inform().empty())
-            Element_Show_Add(MI->Inform());
+            Element_Show_Add(MI->Info);
     }
     #endif //MEDIAINFO_TRACE
 

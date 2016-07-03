@@ -14,8 +14,8 @@
  bit1; bit
  bit2; bit
  bit3; bit
- bps; bps
- Bps; Bps
+ bps; b/s
+ Bps; B/s
  Byte1; Bayt
  Byte2; Bayt
  Byte3; Bayt
@@ -34,9 +34,9 @@
  day1; gün
  day2; gün
  day3; gün
- dB1;dB
- dB2;dB
- dB3;dB
+ dB1; dB
+ dB2; dB
+ dB3; dB
  file1; dosya
  file2; dosya
  file3; dosya
@@ -48,14 +48,14 @@
  frame3; kare
  GB; GB
  Gb; Gb
- Gbps; Gbps
- GBps; GBps
+ Gbps; Gb/s
+ GBps; GB/s
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiBayt
  GibiByte2; GibiBayt
  GibiByte3; GibiBayt
- GiBps; GiBps
+ GiBps; GiB/s
  GigaBit1; GigaBit
  GigaBit2; GigaBit
  GigaBit3; GigaBit
@@ -69,11 +69,11 @@
  image stream1; imaj akışı
  image stream2; imaj akışı
  image stream3; imaj akışı
- KB; KB
- Kb; Kb
- KBps; KBps
- Kbps; Kbps
- KHz; KHz
+ KB; kB
+ Kb; kb
+ KBps; kB/s
+ Kbps; kb/s
+ KHz; kHz
  KiB; KiB
  KibiBit1; KibiBit
  KibiBit2; KibiBit
@@ -81,7 +81,7 @@
  KibiByte1; KibiBayt
  KibiByte2; KibiBayt
  KibiByte3; KibiBayt
- KiBps; KiBps
+ KiBps; KiB/s
  KiloBit1; KiloBit
  KiloBit2; KiloBit
  KiloBit3; KiloBit
@@ -90,7 +90,7 @@
  KiloByte3; KiloBayt
  MB; MB
  Mb; Mb
- Mbps; Mbps
+ Mbps; Mb/s
  MBps; MebiBayt
  MebiBit1; MebiBit
  MebiBit2; MebiBit
@@ -107,7 +107,7 @@
  MHz; MHz
  MiB; MiB
  Mib; Mib
- MiBps; MiBps
+ MiBps; MiB/s
  millisecond1; milisaniye
  millisecond2; milisaniye
  millisecond3; milisaniye
@@ -585,7 +585,7 @@ Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
-h;s
+h; s
 Header file;Üst bilgi dosyası oluştur
 Height;Yükseklik
 Height_CleanAperture;
@@ -848,7 +848,7 @@ mn;dk
 Mood;Mizaç
 More;Daha
 Movie;Film adı
-ms;ms
+ms; ms
 MSDI;MSDI
 MusicBy;Müziği yapan
 MuxingMode;Çoklama kipi

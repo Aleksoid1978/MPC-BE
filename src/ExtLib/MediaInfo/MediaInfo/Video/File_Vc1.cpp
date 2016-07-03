@@ -1108,7 +1108,7 @@ void File_Vc1::SequenceHeader()
             TEST_SB_END();
             TEST_SB_GET(framerate_present,                      "framerate_flag");
                 TESTELSE_SB_GET(framerate_form,                 "framerateind");
-                    Get_S2 (16, framerateexp,                   "framerateexp"); Param_Info3((float32)((framerateexp+1)/32.0), 3, " fps");
+                Get_S2 (16, framerateexp,                   "framerateexp"); Param_Info3((float32)((framerateexp+1)/32.0), " fps", 3);
                 TESTELSE_SB_ELSE(                               "framerateind");
                     Get_S1 ( 8, frameratecode_enr,              "frameratenr"); Param_Info1(Vc1_FrameRate_enr(frameratecode_enr));
                     Get_S1 ( 4, frameratecode_dr,               "frameratedr"); Param_Info1(Vc1_FrameRate_dr(frameratecode_dr));

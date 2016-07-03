@@ -467,7 +467,7 @@ void File__Tags_Helper::GoToFromEnd (int64u GoToFromEnd, const char* ParserName)
             bool MustElementBegin=Base->Element_Level?true:false;
             if (Base->Element_Level>0)
                 Base->Element_End0(); //Element
-            Base->Info(Ztring(ParserName)+__T(", wants to go to somewhere, but not valid"));
+            Base->Info(std::string(ParserName)+", wants to go to somewhere, but not valid");
             if (MustElementBegin)
                 Base->Element_Level++;
         }
@@ -498,7 +498,7 @@ void File__Tags_Helper::Finish (const char* ParserName)
         bool MustElementBegin=Base->Element_Level?true:false;
         if (Base->Element_Level>0)
             Base->Element_End0(); //Element
-        Base->Info(Ztring(ParserName)+__T(", finished but searching tags"));
+        Base->Info(std::string(ParserName)+", finished but searching tags");
         if (MustElementBegin)
             Base->Element_Level++;
     }

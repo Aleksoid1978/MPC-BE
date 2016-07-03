@@ -36,7 +36,7 @@ File_Lagarith::File_Lagarith()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("Lagarith");
+    ParserName="Lagarith";
 }
 
 //***************************************************************************

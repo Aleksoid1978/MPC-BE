@@ -14,8 +14,8 @@
  bit1; bit
  bit2; bit
  bit3; bit
- bps; bps
- Bps; Bps
+ bps; b/s
+ Bps; B/s
  Byte1; bájt
  Byte2; bájt
  Byte3; bájt
@@ -40,22 +40,22 @@
  file1; fájl
  file2; fájl
  file3; fájl
- fps1; fps
- fps2; fps
- fps3; fps
+ fps1; FPS
+ fps2; FPS
+ fps3; FPS
  frame1; képkocka
  frame2; képkocka
  frame3; képkocka
  GB; GB
  Gb; Gb
- Gbps; Gbps
- GBps; GBps
+ Gbps; Gb/s
+ GBps; GB/s
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiBájt
  GibiByte2; GibiBájt
  GibiByte3; GibiBájt
- GiBps; GiBps
+ GiBps; GiB/s
  GigaBit1; GigaBit
  GigaBit2; GigaBit
  GigaBit3; GigaBit
@@ -69,11 +69,11 @@
  image stream1; képadat
  image stream2; képadat
  image stream3; képadat
- KB; Kbps
- Kb; Kb
- KBps; KBps
- Kbps; Kbps
- KHz; KHz
+ KB; kb/s
+ Kb; kb
+ KBps; kB/s
+ Kbps; kb/s
+ KHz; kHz
  KiB; KiB
  KibiBit1; KibiBit
  KibiBit2; KibiBit
@@ -81,7 +81,7 @@
  KibiByte1; KibiBájt
  KibiByte2; KibiBájt
  KibiByte3; KibiBájt
- KiBps; KiBps
+ KiBps; KiB/s
  KiloBit1; KiloBit
  KiloBit2; KiloBit
  KiloBit3; KiloBit
@@ -90,7 +90,7 @@
  KiloByte3; KiloBájt
  MB; MB
  Mb; Mb
- Mbps; Mbps
+ Mbps; Mb/s
  MBps; MebiBájt
  MebiBit1; MebiBit
  MebiBit2; MebiBit
@@ -107,7 +107,7 @@
  MHz; MHz
  MiB; MiB
  Mib; Mib
- MiBps; MiBps
+ MiBps; MiB/s
  millisecond1; ezredmásodperc
  millisecond2; ezredmásodperc
  millisecond3; ezredmásodperc

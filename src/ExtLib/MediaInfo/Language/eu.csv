@@ -69,11 +69,11 @@
  image stream1; irudi jarioa
  image stream2; irudi jarioa
  image stream3; irudi jarioa
- KB; KB
- Kb; Kb
+ KB; kB
+ Kb; kb
  KBps; KBs-ko
  Kbps; Kbs-ko
- KHz; KHz
+ KHz; kHz
  KiB; KiB
  KibiBit1; KibiBit
  KibiBit2; KibiBit
@@ -585,7 +585,7 @@ Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
-h;h
+h; h
 Header file;Sortu idazburu agiria
 Height;Garaiera
 Height_CleanAperture;
@@ -844,11 +844,11 @@ Menu_Hint;Aukera gehiago
 Menu_No;Menurik ez
 MenuCount;Menu jario zenbatekoa
 MenuID;Menu ID-a
-mn;mn
+mn; min
 Mood;Modua
 More;Gehiago
 Movie;Filma izena
-ms;sm
+ms; sm
 MSDI;MSDI
 MusicBy;Musikaria
 MuxingMode;Nahasketa modua

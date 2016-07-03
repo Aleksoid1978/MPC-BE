@@ -1421,13 +1421,13 @@ Ztring Export_Fims::Transform(MediaInfo_Internal &MI, version Version)
         //format - containerFormat - technicalAttribute formatLabel=\"string\" - Encoded_Application
         if (!MI.Get(Stream_General, 0, __T("Encoded_Application")).empty())
         {
-            ToReturn+=__T("\t\t\t\t\t<bms:technicalAttribute formatLabel=\"string\" typeLabel=\"WrittingApplication\">")+MI.Get(Stream_General, 0, __T("Encoded_Application"))+__T("</bms:technicalAttribute>\n");
+            ToReturn+=__T("\t\t\t\t\t<bms:technicalAttribute formatLabel=\"string\" typeLabel=\"WritingApplication\">")+MI.Get(Stream_General, 0, __T("Encoded_Application"))+__T("</bms:technicalAttribute>\n");
         }
 
         //format - containerFormat - technicalAttribute formatLabel=\"string\" - Encoded_Library
         if (!MI.Get(Stream_General, 0, __T("Encoded_Library/String")).empty())
         {
-            ToReturn+=__T("\t\t\t\t\t<bms:technicalAttribute formatLabel=\"string\" typeLabel=\"WrittingLibrary\">")+MI.Get(Stream_General, 0, __T("Encoded_Library/String"))+__T("</bms:technicalAttribute>\n");
+            ToReturn+=__T("\t\t\t\t\t<bms:technicalAttribute formatLabel=\"string\" typeLabel=\"WritingLibrary\">")+MI.Get(Stream_General, 0, __T("Encoded_Library/String"))+__T("</bms:technicalAttribute>\n");
         }
 
         //format - containerFormat

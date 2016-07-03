@@ -37,7 +37,7 @@ namespace MediaInfoLib
 File_TimedText::File_TimedText()
 {
     //Configuration
-    ParserName=__T("Timed Text");
+    ParserName="Timed Text";
 
     //Temp
     #ifdef MEDIAINFO_MPEG4_YES

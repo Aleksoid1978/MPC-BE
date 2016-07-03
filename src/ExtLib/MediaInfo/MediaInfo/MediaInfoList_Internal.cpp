@@ -290,6 +290,7 @@ String MediaInfoList_Internal::Inform(size_t FilePos, size_t)
 {
     if (FilePos==Error)
     {
+        #if defined(MEDIAINFO_XML_YES)
         if (MediaInfoLib::Config.Inform_Get()==__T("MAXML"))
         {
             Ztring Result;
@@ -361,6 +362,34 @@ String MediaInfoList_Internal::Inform(size_t FilePos, size_t)
             return Result;
         }
 
+        if (MediaInfoLib::Config.Trace_Level_Get() && MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_MICRO_XML)
+        {
+            Ztring Result;
+            Result+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
+            Result+=__T('<');
+            Result+=__T("MicroMediaTrace");
+            Result+=__T(" xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/micromediatrace\"");
+            Result+=__T(" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+            Result+=__T(" mtsl=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/micromediatrace http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/micromediatrace/micromediatrace.xsd\"");
+            Result+=__T(" version=\"0.1\">");
+            Result+=__T("<creatingLibrary version=\"")+Ztring(MediaInfo_Version).SubString(__T(" - v"), Ztring())+__T("\" url=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>");
+
+            for (size_t FilePos=0; FilePos<Info.size(); FilePos++)
+            {
+                size_t Modified;
+                Result+=__T("<media ref=\"")+MediaInfo_Internal::Xml_Content_Escape(Info[FilePos]->Get(Stream_General, 0, General_CompleteName), Modified)+__T("\"");
+                if (Info[FilePos] && !Info[FilePos]->ParserName.empty())
+                    Result+=__T(" parser=\"")+Info[FilePos]->ParserName+=__T("\"");
+                Result+= __T('>');
+                Result+=Inform(FilePos);
+                Result+=__T("</media>");
+            }
+
+            Result+=__T("</MicroMediaTrace>");
+
+            return Result;
+        }
+
         if (MediaInfoLib::Config.Inform_Get()==__T("MIXML"))
         {
             Ztring Result;
@@ -390,10 +419,12 @@ String MediaInfoList_Internal::Inform(size_t FilePos, size_t)
 
             return Result;
         }
+        #endif //defined(MEDIAINFO_XML_YES)
 
         Ztring Retour;
         FilePos=0;
         ZtringListList MediaInfo_Custom_View; MediaInfo_Custom_View.Write(Option(__T("Inform_Get")));
+        #if defined(MEDIAINFO_XML_YES)
         bool XML=false;
         if (MediaInfoLib::Config.Inform_Get()==__T("XML"))
             XML=true;
@@ -404,6 +435,7 @@ String MediaInfoList_Internal::Inform(size_t FilePos, size_t)
             Retour+=MediaInfoLib::Config.LineSeparator_Get();
         }
         else
+        #endif //defined(MEDIAINFO_XML_YES)
         Retour+=MediaInfo_Custom_View("Page_Begin");
         while (FilePos<Info.size())
         {
@@ -414,6 +446,7 @@ String MediaInfoList_Internal::Inform(size_t FilePos, size_t)
             }
             FilePos++;
         }
+        #if defined(MEDIAINFO_XML_YES)
         if (XML)
         {
             if (!Retour.empty() && Retour[Retour.size()-1]!=__T('\r') && Retour[Retour.size()-1]!=__T('\n'))
@@ -421,11 +454,15 @@ String MediaInfoList_Internal::Inform(size_t FilePos, size_t)
             Retour+=__T("</");
             if (MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_XML)
                 Retour+=__T("MediaTrace");
+            else if (MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_MICRO_XML)
+                Retour+=__T("MicroMediaTrace");
             else
                 Retour+=__T("Mediainfo");
             Retour+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
         }
-        else Retour+=MediaInfo_Custom_View("Page_End");//
+        else
+        #endif //defined(MEDIAINFO_XML_YES)
+            Retour+=MediaInfo_Custom_View("Page_End");//
         return Retour.c_str();
     }
 

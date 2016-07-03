@@ -14,8 +14,8 @@
  bit1;bit
  bit2;biti
  bit3;biti
- bps;bps
- Bps;Bps
+ bps;b/s
+ Bps;B/s
  Byte1;Bite
  Byte2;Biti
  Byte3;Biti
@@ -585,7 +585,7 @@ Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;Grouping
-h;h
+h; h
 Header file;Generare header fisier
 Height;Inaltime
 Height_CleanAperture;
@@ -844,11 +844,11 @@ Menu_Hint;Mai multe posibilitati
 Menu_No;
 MenuCount;
 MenuID;
-mn;mn
+mn; min
 Mood;Mod
 More;Mai mult(e)
 Movie;Numele filmului
-ms;
+ms; ms
 MSDI;
 MusicBy;
 MuxingMode;

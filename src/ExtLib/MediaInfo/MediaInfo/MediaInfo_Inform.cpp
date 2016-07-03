@@ -99,7 +99,7 @@ Ztring MediaInfo_Internal::Inform()
         if (MediaInfoLib::Config.Inform_Get()!=__T("MAXML") && (MediaInfoLib::Config.Trace_Level_Get() || MediaInfoLib::Config.Inform_Get()==__T("Details")))
         {
             if (!Details.empty())
-                return Details;
+                return Ztring().From_UTF8(Details);
             else if (Info)
                 return Info->Details_Get();
             else
@@ -275,7 +275,7 @@ Ztring MediaInfo_Internal::Inform()
         size_t Modified;
         Retour+=__T("<media ref=\"")+MediaInfo_Internal::Xml_Content_Escape(Get(Stream_General, 0, General_CompleteName), Modified)+= __T("\"");
         if (Info && !Info->ParserName.empty())
-            Retour+=__T(" parser=\"")+ Info->ParserName+=__T("\"");
+            Retour+=__T(" parser=\"")+ Ztring().From_UTF8(Info->ParserName)+=__T("\"");
         Retour+= __T(">\n");
     }
     if (XML_0_7_78_MA)
@@ -352,7 +352,7 @@ Ztring MediaInfo_Internal::Inform()
             {
                 Retour+=__T("<MediaTrace xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatrace\" version=\"0.1\">\n");
                 if (!Details.empty())
-                    Retour+=Details;
+                    Retour+=Ztring().From_UTF8(Details);
                 else if (Info)
                     Retour+=Info->Details_Get();
                 Retour+=__T("\n");
@@ -474,7 +474,9 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                 Ztring Valeur=Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Text);
 
                 //Handling values with \r\n inside
+                #if defined(MEDIAINFO_TEXT_YES) && (defined(MEDIAINFO_HTML_YES) || defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_CSV_YES))
                 if (Text)
+                #endif //defined(MEDIAINFO_TEXT_YES) && (defined(MEDIAINFO_HTML_YES) || defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_CSV_YES))
                 {
                     if (Valeur.find(__T('\r'))!=string::npos || Valeur.find(__T('\n'))!=string::npos)
                     {

@@ -148,6 +148,7 @@
     <ClInclude Include="MediaInfo\Export\Export_EbuCore.h" />
     <ClInclude Include="MediaInfo\Export\Export_Fims.h" />
     <ClInclude Include="MediaInfo\Export\Export_PBCore2.h" />
+    <ClInclude Include="MediaInfo\File__Analyze_Element.h" />
     <ClInclude Include="MediaInfo\HashWrapper.h" />
     <ClInclude Include="MediaInfo\Image\File_ArriRaw.h" />
     <ClInclude Include="MediaInfo\Image\File_Bpg.h" />
@@ -383,6 +384,7 @@
     <ClCompile Include="MediaInfo\File__Analyze.cpp" />
     <ClCompile Include="MediaInfo\File__Analyze_Buffer.cpp" />
     <ClCompile Include="MediaInfo\File__Analyze_Buffer_MinimizeSize.cpp" />
+    <ClCompile Include="MediaInfo\File__Analyze_Element.cpp" />
     <ClCompile Include="MediaInfo\File__Analyze_Streams.cpp" />
     <ClCompile Include="MediaInfo\File__Analyze_Streams_Finish.cpp" />
     <ClCompile Include="MediaInfo\File__Base.cpp" />

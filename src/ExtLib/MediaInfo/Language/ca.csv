@@ -1,7 +1,7 @@
   Language_ISO639;ca
-  Author_Email;bennybeat@gmail.com
-  Author_Name;BennyBeat
-  Author_OldNames;Traductor inicial
+  Author_Email;sergi@octovisuals.com
+  Author_Name;Sergi Medina
+  Author_OldNames;BennyBeat <bennybeat@gmail.com>
   Language_Name;Català
   Config_Text_ColumnSize;40
   Config_Text_Separator; : 
@@ -14,8 +14,8 @@
  bit1; bit
  bit2; bits
  bit3; bits
- bps; bps
- Bps; Bps
+ bps; b/s
+ Bps; B/s
  Byte1; Byte
  Byte2; Bytes
  Byte3; Bytes
@@ -28,34 +28,34 @@
  chapters stream1; pista de capítol
  chapters stream2; pistes de capítols
  chapters stream3; pistes de capítols
- character1;
- character2;
- character3;
+ character1; caràcter
+ character2; caràcters
+ character3; caràcters
  day1; dia
  day2; dies
  day3; dies
- dB1; dB1
- dB2; dB2
- dB3; dB3
+ dB1; dB
+ dB2; dB
+ dB3; dB
  file1; arxiu
  file2; arxius
  file3; arxius
- fps1; fps
- fps2; fps
- fps3; fps
- frame1; fotograma1
- frame2; fotograma2
- frame3; fotograma1
+ fps1; FPS
+ fps2; FPS
+ fps3; FPS
+ frame1; fotograma
+ frame2; fotogrames
+ frame3; fotogrames
  GB; GB
  Gb; Gb
- Gbps; Gbps
- GBps; GBps
+ Gbps; Gb/s
+ GBps; GB/s
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiBytes
  GibiByte2; GibiBytes
  GibiByte3; GibiBytes
- GiBps; GiBps
+ GiBps; GiB/s
  GigaBit1; GigaBit
  GigaBit2; GigaBits
  GigaBit3; GigaBits
@@ -69,11 +69,11 @@
  image stream1; pista d'imatge
  image stream2; pistes d'imatge
  image stream3; pistes d'imatge
- KB; KB
- Kb; Kb
- KBps; KBps
- Kbps; Kbps
- KHz; KHz
+ KB; kB
+ Kb; kb
+ KBps; kB/s
+ Kbps; kb/s
+ KHz; kHz
  KiB; KiB
  KibiBit1; KibiBit
  KibiBit2; KibiBits
@@ -81,7 +81,7 @@
  KibiByte1; KibiByte
  KibiByte2; KibiBytes
  KibiByte3; KibiBytes
- KiBps; KiBps
+ KiBps; KiB/s
  KiloBit1; KiloBit
  KiloBit2; KiloBits
  KiloBit3; KiloBits
@@ -90,7 +90,7 @@
  KiloByte3; KiloBytes
  MB; MB
  Mb; Mb
- Mbps; Mbps
+ Mbps; Mb/s
  MBps; MebiBytes
  MebiBit1; MebiBit
  MebiBit2; MebiBits
@@ -107,7 +107,7 @@
  MHz; MHz
  MiB; MiB
  Mib; Mib
- MiBps; MiBps
+ MiBps; MiB/s
  millisecond1; mil·lisegon
  millisecond2; mil·lisegons
  millisecond3; mil·lisegons
@@ -126,16 +126,16 @@
  text stream1; pista de text
  text stream2; pistes de text
  text stream3; pistes de text
- video frames1;
- video frames2;
- video frames3;
+ video frames1; fotograma vídeo
+ video frames2; fotogrames vídeo
+ video frames3; fotogrames vídeo
  video stream1; pista de vídeo
  video stream2; pistes de vídeo
  video stream3; pistes de vídeo
- warppoint0;
- warppoint1;
- warppoint2;
- warppoint3;
+ warppoint0;Sense warppoints
+ warppoint1; warppoint
+ warppoint2; warppoints
+ warppoint3; warppoints
  week1; setmana
  week2; setmanes
  week3; setmanes
@@ -144,247 +144,247 @@
  year3; anys
 , ;, 
 : ;: 
-3D;
-3DType;
+3D;3D
+3DType;Tipus 3D
 About;Quant a...
-About_Hint;Quant a l'ajuda
-Accompaniment;Banda Sonora
-ActiveFormatDescription;
-ActiveFormatDescription_MuxingMode;
+About_Hint;Com contactar-me i trobar l'última versió
+Accompaniment;Acompanyament
+ActiveFormatDescription;Descripció format actiu
+ActiveFormatDescription_MuxingMode;Descripció format actiu, mode multiplexor
 Actor;Actor
-Actor_Character;Personatge
-Added_Date; Data d'actualització
+Actor_Character;Personatge interpretat
+Added_Date;Data d'addició
 Address;Adreça
 Advanced;Avançat
 Advanced mode;Mode avançat
 Album;Àlbum
-Album_ReplayGain_Gain;
-Album_ReplayGain_Peak;
-Alignment; Alineació
-Alignment_Aligned; Alignment_Aligned
-Alignment_Split;Alignment_Split
+Album_ReplayGain_Gain;Ganància reproducció àlbum
+Album_ReplayGain_Peak;Ganància màxima reproducció àlbum
+Alignment;Alineació
+Alignment_Aligned;Alineament a intercalats
+Alignment_Split;Dividir a través intercalats
 All;Tot
 Archival_Location;Arxivat a
-Arranger;Compositor
+Arranger;Arranjador
 ArtDirector;Director artístic
-AspectRatio;Ràtio
-AssistantDirector;Assistent del Director
+AspectRatio;Relació d'aspecte
+AssistantDirector;Assistent del director
 at;a
-At least one file;(heu de tenir com a mínim un arxiu obert)
+At least one file;(Has d'obrir al menys un arxiu)
 Audio;Àudio
-Audio stream(s);pistes d'àudio
-Audio_Codec_List;Codecs d'àudio
+Audio stream(s);Pistes d'àudio
+Audio_Codec_List;Còdecs d'àudio
 Audio_No;Sense àudio
 Audio1;Primera pista d'àudio
 Audio2;Segona pista d'àudio
-AudioComments;
+AudioComments;Audiocomentaris
 AudioCount;Total de pistes d'àudio
-AudioDescriptionPresent;
-AudioDescriptionType;
-AudioLoudnessStandard;
-AudioTrackLayout;
+AudioDescriptionPresent;Descripció àudio present
+AudioDescriptionType;Tipus descripció àudio
+AudioLoudnessStandard;Estàndard del volum d'àudio
+AudioTrackLayout;Disposició pista àudio
 Author;Autor
 BarCode;Codi de barres
 Basic;Bàsic
-Basic_Note;Nota : per a més informació quant aquest arxiu, heu de triar una vista diferent (fulla, arbre...)
-BitDepth;
-BitDepth_Stored;
-BitRate;Bit ràtio
-BitRate_Encoded;
-BitRate_Maximum;
-BitRate_Minimum;
-BitRate_Mode;Mode de Bit ràtio
-BitRate_Mode_CBR;
-BitRate_Mode_VBR;
-BitRate_Nominal;Ràtio nominal
-Bits-(Pixel*Frame);Bits/(Píxel*imatge)
-BufferSize;
+Basic_Note;Nota: Per a més informació quant aquest arxiu, has de triar una vista diferent (fulla, arbre...)
+BitDepth;Profunditat de bits
+BitDepth_Stored;Profunditat bits emmagatzemada
+BitRate;Taxa de bits
+BitRate_Encoded;Taxa de bits codificada
+BitRate_Maximum;Taxa de bits màxima
+BitRate_Minimum;Taxa de bits mínima
+BitRate_Mode;Mode de taxa de bits
+BitRate_Mode_CBR;Constant
+BitRate_Mode_VBR;Variable
+BitRate_Nominal;Taxa de bits nominal
+Bits-(Pixel*Frame);Bits/(píxel*fotograma)
+BufferSize;Mida búfer
 Cancel;Cancel·la
 Channel(s);Canal(s)
 ChannelPositions;Posicions dels canals
 Chapter(s);Capítol(s)
 Chapters;Capítols
-Chapters stream(s);pista de capítol(s)
-Chapters_Codec_List;Llistat de codecs
+Chapters stream(s);Pista(es) de capítol(s)
+Chapters_Codec_List;Còdecs capítols
 Chapters_No;Sense capítols
-ChaptersCount;Comptador de capítols
+ChaptersCount;Total pistes capítols
 CheckNewVersion;Cercar una nova versió
-Choose custom;Trieu personalitzats
-Choose custom sheet;Trieu les etiquetes desitjades
-Choose custom text;Trieu el text personal
-Choose export format;trieu el format a exportar
-Choose file(s);Trieu els arxius a obrir
-Choose filename;trieu el nom d'arxiu
-Choose language;trieu el vostre idioma
+Choose custom;Tria personalitzat
+Choose custom sheet;Tria les etiquetes desitjades
+Choose custom text;Tria el text personal
+Choose export format;Tria el format a exportar
+Choose file(s);Tria els arxius a obrir
+Choose filename;Tria el nom d'arxiu
+Choose language;Tria el teu idioma
 Choregrapher;Coreografia
-Chroma;Cromat
-ChromaSubsampling;
+Chroma;Croma
+ChromaSubsampling;Submostreig croma
 Close;Tanca
 Close all before open;Tanca tot abans d'obrir
-ClosedCaptionsLanguage;
-ClosedCaptionsPresent;
-ClosedCaptionsType;
+ClosedCaptionsLanguage;Idioma subtítols incrustats
+ClosedCaptionsPresent;Subtítols incrustats presents
+ClosedCaptionsType;Tipus subtítols incrustats
 Codec;Còdec
-Codec_Description; Descripció del Còdec
+Codec_Description;Descripció del còdec
 Codec_Info;Detalls del còdec
-Codec_Profile;Perfil del codec
-Codec_Settings;Configuració del còdec
-Codec_Settings_BVOP;
-Codec_Settings_CABAC;
-Codec_Settings_Endianness;
-Codec_Settings_Firm;
-Codec_Settings_Floor;
-Codec_Settings_GMC;
-Codec_Settings_ITU;
-Codec_Settings_Law;
-Codec_Settings_Matrix;
-Codec_Settings_PacketBitStream;
-Codec_Settings_QPel;
-Codec_Settings_Sign;
-Codec_Url;Enllaç del codec
-CodecID;
-CodecID_Description;
-CoDirector;
+Codec_Profile;Perfil del còdec
+Codec_Settings;Ajustos del còdec
+Codec_Settings_BVOP;Ajustos del còdec, BVOP
+Codec_Settings_CABAC;Ajustos del còdec, CABAC
+Codec_Settings_Endianness;Ajustos del còdec, Endianness
+Codec_Settings_Firm;Ajustos del còdec, Firm
+Codec_Settings_Floor;Ajustos del còdec, Floor
+Codec_Settings_GMC;Ajustos del còdec, GMC
+Codec_Settings_ITU;Ajustos del còdec, ITU
+Codec_Settings_Law;Ajustos del còdec, Law
+Codec_Settings_Matrix;Ajustos del còdec, Matrix
+Codec_Settings_PacketBitStream;Ajustos del còdec, Packet bitstream
+Codec_Settings_QPel;Ajustos del còdec, QPel
+Codec_Settings_Sign;Ajustos del còdec, Sign
+Codec_Url;Enllaç del còdec
+CodecID;ID còdec
+CodecID_Description;Descripció del còdec
+CoDirector;Codirector
 Collection;Col·lecció
-Colorimetry;
-ColorSpace;
-colour_primaries;
-colour_range;
+Colorimetry;Colorimetria
+ColorSpace;Espai de color
+colour_primaries;Primàries de color
+colour_range;Gama de color
 Comment;Comentari
 CommissionedBy;Commissionat per
-Compilation;
+Compilation;Compilació
 CompleteName;Nom complet
-CompletionDate;
+CompletionDate;Data completat
 Composer;Compositor
-Compression_Mode;
-Compression_Mode_Lossless;
-Compression_Mode_Lossy;
-Compression_Ratio;
+Compression_Mode;Mode compressió
+Compression_Mode_Lossless;Sense pèrdua
+Compression_Mode_Lossy;Amb pèrdua
+Compression_Ratio;Proporció compressió
 Conductor;Conductor
-ContactEmail;
-ContactTelephoneNumber;
+ContactEmail;Correu de contacte
+ContactTelephoneNumber;Telèfon de contacte
 Container and general information;Contenidor i informació general
 ContentType;Tipus de contingut
-CoProducer;Co-productor
+CoProducer;Coproductor
 Copyright;Drets d'autor
-CopyrightYear;
+CopyrightYear;Any copyright
 CostumeDesigner;Costume designer
-Count;Còmput
+Count;Quantitat
 Country;País
 Cover;Portada
 Cover_Datas;Informació de la portada
-Cover_Description; Descripció de la portada
-Cover_Mime; Codificació de la portada
-Cover_Type; Tipus de portada
-Cropped; Retallat
-Custom;Personal
+Cover_Description;Descripció de la portada
+Cover_Mime;Codificació de la portada
+Cover_Type;Tipus de portada
+Cropped;Mida retallat
+Custom;Personalitzat
 Customize;Personalitza
 Date;Data
-Debug;Errada
+Debug;Depuració
 Decimal point;Punt decimal
 Delay;Retard
-Delay_Source;
-Delay_Source_Container;
-Delay_Source_Stream;
+Delay_Source;Retard, origen
+Delay_Source_Container;Contenidor
+Delay_Source_Stream;Pista en brut
 Delete;Esborra
 Description;Descripció
 Digitized_Date;Data de la digitalització
-Dimensions; Mides
+Dimensions;Mides
 Director;Director
 DirectorOfPhotography;Director de fotografia
 DisplayAspectRatio;Relació d'aspecte
-DisplayAspectRatio_CleanAperture;
-DisplayAspectRatio_Original;
+DisplayAspectRatio_CleanAperture;Relació d'aspecte d'obertura neta
+DisplayAspectRatio_Original;Relació d'aspecte original
 DistributedBy;Distribuït per
-Distributor;
+Distributor;Distribuïdor
 Donate;Donació
-DotsPerInch; Punts per polçada
-Duration; Durada
-Duration_End;
-Duration_Start;
+DotsPerInch;Punts per polçada
+Duration;Durada
+Duration_End;Temps final
+Duration_Start;Temps inicial
 Edit;Edita
 EditedBy;Editat per
-EMail;Adreça electrònica
+EMail;Correu
 Encoded_Application;Aplicació
-Encoded_Date;Codificant la data
-Encoded_Library;Escrivint la llibreria
-Encoded_Library_Settings;Opcions de codificació
-Encoded_Original;Original
+Encoded_Date;Data de codificació
+Encoded_Library;Llibreria d'escriptura
+Encoded_Library_Settings;Ajustos de codificació
+Encoded_Original;Suport original
 EncodedBy;Codificat per
-EPG_Positions;
-EpisodeTitleNumber;
+EPG_Positions;Posicions EPG (internes)
+EpisodeTitleNumber;Número títol episodi
 Error_File;Error en llegir l'arxiu
 ExecutiveProducer;Productor executiu
 Exit;Surt
-Exit_Hint;Finalitza l'aplicació
+Exit_Hint;Tanca el programa
 Export;Exporta
 Export_Hint;Exporta en format personalitzat
-Extensions;Extensions emprades actualment
-Family;Familia
+Extensions;Extensions emprades generalment
+Family;Família
 Fax;Fax
 File;Arxiu
 File size;Mida d'arxiu
-File_Append;Crida a un arxiu existent (Atenció : tingueu cura. Han de ser els mateixos paràmetres)
-File_Created_Date;
-File_Created_Date_Local;
+File_Append;Annexar a l'arxiu existent (atenció: tingues cura. Han de ser els mateixos paràmetres)
+File_Created_Date;Data creació arxiu
+File_Created_Date_Local;Data creació arxiu (local)
 File_Hint;Trieu l'arxiu Multimèdia
-File_Modified_Date;
-File_Modified_Date_Local;
+File_Modified_Date;Data última modificació
+File_Modified_Date_Local;Data última modificació (local)
 FileExtension;Extensió d'arxiu
 FileName;Nom de l'arxiu
 FileSize;Mida de l'arxiu
 Folder;Carpeta
 Folder (R);Carpeta (R)
-Folder (R)_Hint;Tria una carpeta (i les seves sub-carpetes)
+Folder (R)_Hint;Tria una carpeta (i les seves subcarpetes)
 Folder (Recursively);Carpeta general
 Folder_Hint;Tria la carpeta general
 FolderName;Nom de la carpeta
 Format;Format
-Format_Commercial;
-Format_Commercial_IfAny;
-Format_Description; Descripció
-Format_Info; Info
-Format_Profile; Perfil
-Format_Settings; Configuració
-Format_Settings_BVOP; BVOP
-Format_Settings_CABAC;
-Format_Settings_Emphasis;
-Format_Settings_Endianness;
-Format_Settings_Firm;
-Format_Settings_Floor;
-Format_Settings_FrameMode;
-Format_Settings_GMC;
-Format_Settings_GOP;
-Format_Settings_ITU;
-Format_Settings_Law;
-Format_Settings_Matrix;
-Format_Settings_Matrix_Custom;
-Format_Settings_Matrix_Default;
-Format_Settings_Mode;
-Format_Settings_ModeExtension;
-Format_Settings_PacketBitStream; Bitstream
-Format_Settings_PictureStructure;
-Format_Settings_PS;
-Format_Settings_Pulldown;
-Format_Settings_QPel;
-Format_Settings_RefFrames;
-Format_Settings_SBR;
-Format_Settings_Sign;
-Format_Settings_Wrapping;
-Format_Url; Enllaç
-Format_Version; Versió
-FpaManufacturer;
-FpaPass;
-FpaVersion;
-FrameCount; Comptador
-FrameRate;Imatges per segon
-FrameRate_Maximum;Imatges per segon màximes
-FrameRate_Minimum;Imatges per segon mínimes
-FrameRate_Mode;
-FrameRate_Mode_CFR;
-FrameRate_Mode_VFR;
-FrameRate_Nominal;
-FrameRate_Original;
+Format_Commercial;Nom comercial
+Format_Commercial_IfAny;Nom comercial
+Format_Description;Descripció format
+Format_Info;Detalls del format
+Format_Profile;Perfil format
+Format_Settings;Ajustos del perfil
+Format_Settings_BVOP;Ajustos del perfil, BVOP
+Format_Settings_CABAC;Ajustos del perfil, CABAC
+Format_Settings_Emphasis;Èmfasi
+Format_Settings_Endianness;Ajustos del perfil, Endianness
+Format_Settings_Firm;Ajustos del perfil, Firm
+Format_Settings_Floor;Ajustos del perfil, Floor
+Format_Settings_FrameMode;Mode fotograma
+Format_Settings_GMC;Ajustos del perfil, GMC
+Format_Settings_GOP;Ajustos del perfil, GOP
+Format_Settings_ITU;Ajustos del perfil, ITU
+Format_Settings_Law;Ajustos del perfil, Law
+Format_Settings_Matrix;Ajustos del perfil, Matrix
+Format_Settings_Matrix_Custom;Personalitza
+Format_Settings_Matrix_Default;Predeterminat
+Format_Settings_Mode;Mode
+Format_Settings_ModeExtension;Extensió mode
+Format_Settings_PacketBitStream;Ajustos del perfil, Packet bitstream
+Format_Settings_PictureStructure;Ajustos del perfil, picture structure
+Format_Settings_PS;Ajustos del perfil, PS
+Format_Settings_Pulldown;Ajustos del perfil, Pulldown
+Format_Settings_QPel;Ajustos del perfil, QPel
+Format_Settings_RefFrames;Ajustos del perfil, ReFrames
+Format_Settings_SBR;Ajustos del perfil, SBR
+Format_Settings_Sign;Ajustos del perfil, SBR
+Format_Settings_Wrapping;Ajustos del perfil, wrapping mode
+Format_Url;Enllaç web format
+Format_Version;Versió format
+FpaManufacturer;Fabricant FPA
+FpaPass;Passada FPA
+FpaVersion;Versió FPA
+FrameCount;Quantitat fotogrames
+FrameRate;Fotogrames per segon
+FrameRate_Maximum;Fotogrames per segon màxims
+FrameRate_Minimum;Fotogrames per segon mínims
+FrameRate_Mode;Mode fotogrames per segon
+FrameRate_Mode_CFR;Constant
+FrameRate_Mode_VFR;Variable
+FrameRate_Nominal;Fotogrames per segon nominals
+FrameRate_Original;Fotogrames per segon originals
 General;General
 Genre;Gènere
 Genre_000;Blues
@@ -412,7 +412,7 @@ Genre_021;Ska
 Genre_022;Death Metal
 Genre_023;Pranks
 Genre_024;Soundtrack
-Genre_025;Euro-Techno
+Genre_025;Eurotecno
 Genre_026;Ambient
 Genre_027;Trip-Hop
 Genre_028;Vocal
@@ -433,12 +433,12 @@ Genre_042;Soul
 Genre_043;Punk
 Genre_044;Space
 Genre_045;Meditative
-Genre_046;Instrumental Pop
-Genre_047;Instrumental Rock
+Genre_046;Pop instrumental
+Genre_047;Rock instrumental
 Genre_048;Ethnic
 Genre_049;Gothic
 Genre_050;Darkwave
-Genre_051;Techno-Industrial
+Genre_051;Tecnoindustrial
 Genre_052;Electronic
 Genre_053;Pop-Folk
 Genre_054;Eurodance
@@ -448,16 +448,16 @@ Genre_057;Comèdia
 Genre_058;Cult
 Genre_059;Gangsta
 Genre_060;Top 40
-Genre_061;Christian Rap
+Genre_061;Rap cristià
 Genre_062;Pop/Funk
 Genre_063;Jungle
-Genre_064;Native American
+Genre_064;Natiu americà
 Genre_065;Cabaret
 Genre_066;New Wave
 Genre_067;Psychadelic
 Genre_068;Rave
 Genre_069;Showtunes
-Genre_070;Trailer
+Genre_070;Tràiler
 Genre_071;Lo-Fi
 Genre_072;Tribal
 Genre_073;Acid Punk
@@ -478,22 +478,22 @@ Genre_087;Revival
 Genre_088;Celtic
 Genre_089;Bluegrass
 Genre_090;Avantgarde
-Genre_091;Gothic Rock
-Genre_092;Progressive Rock
-Genre_093;Psychedelic Rock
-Genre_094;Symphonic Rock
-Genre_095;Slow Rock
+Genre_091;Rock gòtic
+Genre_092;Rock progressiu
+Genre_093;Rock psicodèlic
+Genre_094;Rock simfònic
+Genre_095;Rock lent
 Genre_096;Big Band
-Genre_097;Chorus
+Genre_097;Coral
 Genre_098;Easy Listening
-Genre_099;Acoustic
+Genre_099;Acústica
 Genre_100;Humour
 Genre_101;Speech
 Genre_102;Chanson
-Genre_103;Opera
-Genre_104;Chamber Music
+Genre_103;Òpera
+Genre_104;Música de càmera
 Genre_105;Sonata
-Genre_106;Symphony
+Genre_106;Simfonia
 Genre_107;Booty Bass
 Genre_108;Primus
 Genre_109;Porn Groove
@@ -509,9 +509,9 @@ Genre_118;Rhythmic Soul
 Genre_119;Freestyle
 Genre_120;Duet
 Genre_121;Punk Rock
-Genre_122;Solo de Bateria
+Genre_122;Solo de bateria
 Genre_123;A capella
-Genre_124;Euro-House
+Genre_124;Eurohouse
 Genre_125;Dance Hall
 Genre_126;Goa
 Genre_127;Drum & Bass
@@ -528,16 +528,16 @@ Genre_137;Heavy Metal
 Genre_138;Black Metal
 Genre_139;Crossover
 Genre_140;Contemporary Christian
-Genre_141;Christian Rock
+Genre_141;Rock cristià
 Genre_142;Merengue
 Genre_143;Salsa
 Genre_144;Trash Metal
 Genre_145;Anime
 Genre_146;JPop
 Genre_147;Synthpop
-Genre_148;
-Genre_149;
-Genre_150;
+Genre_148;Abstracte
+Genre_149;Rock artístic
+Genre_150;Barroc
 Genre_151;
 Genre_152;
 Genre_153;
@@ -545,16 +545,16 @@ Genre_154;
 Genre_155;
 Genre_156;
 Genre_157;
-Genre_158;
+Genre_158;Eclèctica
 Genre_159;
 Genre_160;
 Genre_161;
 Genre_162;
-Genre_163;
+Genre_163;Garatge
 Genre_164;
 Genre_165;
 Genre_166;
-Genre_167;
+Genre_167;Gòtic industrial
 Genre_168;
 Genre_169;
 Genre_170;
@@ -562,65 +562,65 @@ Genre_171;
 Genre_172;
 Genre_173;
 Genre_174;
-Genre_175;
-Genre_176;
+Genre_175;Postpunk
+Genre_176;Postrock
 Genre_177;
 Genre_178;
 Genre_179;
 Genre_180;
-Genre_181;
-Genre_182;
-Genre_183;
+Genre_181;Música del món
+Genre_182;Neoclàssica
+Genre_183;Audiollibre
 Genre_184;
 Genre_185;
 Genre_186;
-Genre_187;
+Genre_187;Rock independent
 Genre_188;
 Genre_189;
-Genre_190;
+Genre_190;Rock de garatge
 Genre_191;
-Go to WebSite;Ves-hi a la pàgina
-Grouping;
-Gop_OpenClosed;
-Gop_OpenClosed_Open;
-Gop_OpenClosed_Closed;
-Gop_OpenClosed_FirstFrame;
-h;h
+Go to WebSite;Vés al lloc web
+Grouping;Agrupament
+Gop_OpenClosed;GOP, obert/tancat
+Gop_OpenClosed_Open;Obert
+Gop_OpenClosed_Closed;Tancat
+Gop_OpenClosed_FirstFrame;GOP, obert/tancat primer fotograma
+h; h
 Header file;Capçalera de l'arxiu
 Height;Alçada
-Height_CleanAperture;
-Height_Original;
+Height_CleanAperture;Alçada obertura neta
+Height_Original;Alçada original
 Help;Ajuda
-Hint;
+Hint;Consell
 How many audio streams?;Quantes pistes d'àudio?
-How many chapters streams?;Quant pistes de capítols?
+How many chapters streams?;Quantes pistes de capítols?
 How many text streams?;Quantes pistes de text?
 How many video streams?;Quantes pistes de vídeo?
 HTML;HTML
-ID;Nombre de canals
-IdentClockStart;
+ID;ID
+IdentClockStart;Inici rellotge ident
 Image;Imatge
 Image stream(s);Pistes d'imatge
-Image_Codec_List;Llista de codecs
+Image_Codec_List;Llista de còdecs
 ImageCount;Comptador de pistes d'imatge
 Info;Info
 Instruments;Instruments
 Interlaced_BFF;Camp inferior primer
-Interlaced_Interlaced;Interliniat
+Interlaced_Interlaced;Entrellaçat
 Interlaced_PPF;Progressiu
 Interlaced_Progressive;Progressiu
 Interlaced_TFF;Camp superior primer
-Interlacement;Interliniat
-Interleave_Duration;
-Interleave_Preload;
-Interleave_VideoFrames;
-Interleaved;
-InternetMediaType;
+Interlacement;Entrellaçament
+Interleave_Duration;Intercalat, duració
+Interleave_Preload;Intercalat, duració precàrrega
+Interleave_VideoFrames;Intercalat, duració
+Interleaved;Intercalat
+InternetMediaType;Tipus medis Internet
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-Keywords;paraules clau
-Known codecs;Codecs coneguts
+Keywords;Paraules clau
+Known codecs;Còdecs coneguts
 Known formats;Formats coneguts
 Known parameters;Paràmetres coneguts
 Label;Etiqueta
@@ -638,13 +638,13 @@ Language_av;Avaric
 Language_ay;Aymara
 Language_az;Azerbaijani
 Language_ba;Bashkir
-Language_be;Belarusian
-Language_bg;Bulgarian
+Language_be;Bielorús
+Language_bg;Búlgar
 Language_bh;Bihari
 Language_bi;Bislama
 Language_bm;Bambara
-Language_bn;Bengali
-Language_bo;Tibetan
+Language_bn;Bengalí
+Language_bo;Tibetà
 Language_br;Breton
 Language_bs;Bosnian
 Language_ca;Català
@@ -655,43 +655,43 @@ Language_cr;Cree
 Language_cs;Txec
 Language_cu;Slave
 Language_cv;Chuvash
-Language_cy;Welsh
-Language_da;Danish
+Language_cy;Gal·lès
+Language_da;Danès
 Language_de;Alemany
 Language_dv;Divehi
 Language_dz;Dzongkha
 Language_ee;Ewe
 Language_el;Grec
 Language_en;Anglès
-Language_en-gb;
-Language_en-us;
+Language_en-gb;Anglès (Gran Bretanya)
+Language_en-us;Anglès (Estats Units)
 Language_eo;Esperanto
 Language_es;Castellà
 Language_et;Estonian
 Language_eu;Basc
-Language_fa;Persian
+Language_fa;Persià
 Language_ff;Fulah
-Language_fi;Finnish
+Language_fi;Finlandès
 Language_fj;Fijian
 Language_fo;Faroese
 Language_fr;Francès
 Language_fy;Frisian
-Language_ga;Irish
-Language_gd;Gaelic
+Language_ga;Irlandès
+Language_gd;Gaèlic
 Language_gl;Gallec
-Language_gn;Guarani
+Language_gn;Guaraní
 Language_gu;Gujarati
 Language_gv;Manx
 Language_ha;Hausa
 Language_he;Hebreu
 Language_hi;Hindi
 Language_ho;Hiri Motu
-Language_hr;Croatian
-Language_ht;Haitian
+Language_hr;Croat
+Language_ht;Haitià
 Language_hu;Hongarès
 Language_hy;Armeni
 Language_hz;Herero
-Language_ia;Auxiliary Language Association
+Language_ia;Associació de llengües auxiliar
 Language_id;Indonès
 Language_ie;Interlingue
 Language_ig;Igbo
@@ -699,12 +699,12 @@ Language_ii;Sichuan Yi
 Language_ik;Inupiaq
 Language_Info;Informació d'idioma
 Language_io;Ido
-Language_is;Icelandic
+Language_is;Islandès
 Language_it;Italià
 Language_iu;Inuktitut
 Language_ja;Japonès
-Language_jv;Javanese
-Language_ka;Georgian
+Language_jv;Javanès
+Language_ka;Georgià
 Language_kg;Kongo
 Language_ki;Kikuyu
 Language_kj;Kuanyama
@@ -712,7 +712,7 @@ Language_kk;Kazakh
 Language_kl;Kalaallisut
 Language_km;Khmer
 Language_kn;Kannada
-Language_ko;Korean
+Language_ko;Coreà
 Language_kr;Kanuri
 Language_ks;Kashmiri
 Language_ku;Kurdish
@@ -720,54 +720,54 @@ Language_kv;Komi
 Language_kw;Cornish
 Language_ky;Kirghiz
 Language_la;Llatí
-Language_lb;Luxembourgish
+Language_lb;Luxemburguès
 Language_lg;Ganda
 Language_li;Limburgish
 Language_ln;Lingala
 Language_lo;Lao
-Language_lt;Lithuanian
+Language_lt;Lituà
 Language_lu;Luba-Katanga
-Language_lv;Latvian
+Language_lv;Letó
 Language_mg;Malagasy
 Language_mh;Marshallese
-Language_mi;Maori
-Language_mk;Macedonian
+Language_mi;Maorí
+Language_mk;Macedoni
 Language_ml;Malayalam
-Language_mn;Mongolian
+Language_mn;Mongol
 Language_mo;Moldavian
-Language_More;
+Language_More;Idioma, més info
 Language_mr;Marathi
-Language_ms;Malay
-Language_mt;Maltese
+Language_ms;Malai
+Language_mt;Maltès
 Language_mul;Diversos idiomes
-Language_my;Burmese
+Language_my;Burmès
 Language_na;Nauru
 Language_nb;Norwegian Bokmal
 Language_nd;Ndebele
 Language_ne;Nepali
 Language_ng;Ndonga
-Language_nl;Dutch
+Language_nl;Holandès
 Language_nn;Norwegian Nynorsk
 Language_no;Norwegian
 Language_nr;Ndebele
 Language_nv;Navaho
 Language_ny;Nyanja
-Language_oc;Occitan
+Language_oc;Occità
 Language_oj;Ojibwa
 Language_om;Oromo
 Language_or;Oriya
 Language_os;Ossetic
 Language_pa;Panjabi
 Language_pi;Pali
-Language_pl;Polish
+Language_pl;Polac
 Language_ps;Pushto
 Language_pt;Portuguès
-Language_pt-br;
+Language_pt-br;Portuguès (Brasil)
 Language_qu;Quechua
 Language_rm;Raeto-Romance
 Language_rn;Rundi
-Language_ro;Romanian
-Language_ru;Rús
+Language_ro;Romanès
+Language_ru;Rus
 Language_rw;Kinyarwanda
 Language_sa;Sanskrit
 Language_sc;Sardinian
@@ -775,8 +775,8 @@ Language_sd;Sindhi
 Language_se;Northern Sami
 Language_sg;Sango
 Language_si;Sinhala
-Language_sk;Slovak
-Language_sl;Slovenian
+Language_sk;Eslovac
+Language_sl;Eslovè
 Language_sm;Samoan
 Language_sn;Shona
 Language_so;Somali
@@ -784,13 +784,13 @@ Language_sq;Albanès
 Language_sr;Serbi
 Language_ss;Swati
 Language_st;Sotho
-Language_su;Sundanese
-Language_sv;Swedish
+Language_su;Sundanès
+Language_sv;Suec
 Language_sw;Swahili
 Language_ta;Tamil
 Language_te;Telugu
 Language_tg;Tajik
-Language_th;Thai
+Language_th;Tailandès
 Language_ti;Tigrinya
 Language_tk;Turkmen
 Language_tl;Tagalog
@@ -815,296 +815,296 @@ Language_yi;Yiddish
 Language_yo;Yoruba
 Language_za;Zhuang
 Language_zh;Xinès
-Language_zh-cn;
-Language_zh-tw;
-Language_zu;Zulu
-LawRating;Classificació
+Language_zh-cn;Xinès (Xina)
+Language_zh-tw;Xinès (Taiwan)
+Language_zu;Zulú
+LawRating;Classificació llei
 LCCN;LCCN
-Library;Llibreria
-Lightness; Iluminació
-LineUpStart;
-List; Llista
-Lyricist;transcriptor del text
-Lyrics; Lletres
+Library;Llibreria multiplexat
+Lightness;Lleugeresa
+LineUpStart;Alineació inicial
+List;Llista
+Lyricist;Lletrista
+Lyrics;Lletra
 Mastered_Date;Data de masterització
 MasteredBy;Masteritzat per
-MasteringDisplay_ColorPrimaries;
-MasteringDisplay_Luminance;
-Matrix_Channel(s);
-Matrix_ChannelPositions;
-matrix_coefficients;
-Matrix_Format;
-MaxCLL;
-MaxFALL;
-MediaInfo_About;Proporciona informació detallada\r\nquant a un arxiu multimèdia:\r\nMatroska, OGG (including OGM)\r\nMPEG1 (fins i tot VCD)\r\nMPEG2 (fins i tot DVD i SVCD)\r\nMPEG4 (també l'Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (també WMV, WMA)\r\nMicrosoft RIFF (inclouent AVI, WAV)\r\nArxius només sonors (AC3, DTS, AAC, AU, AIFF...)
+MasteringDisplay_ColorPrimaries;Primàries color monitor masterització
+MasteringDisplay_Luminance;Lluminància monitor masterització
+Matrix_Channel(s);Codificació matriu, canal(s)
+Matrix_ChannelPositions;Codificació matriu, posició canals
+matrix_coefficients;Coeficients matriu
+Matrix_Format;Codificació matriu, format
+MaxCLL;Nivell leuger contingut màxim
+MaxFALL;Nivell leuger mitjana fotogrames màxim
+MediaInfo_About;MediaInfo proporciona informació tècnica d'arxius de vídeo i àudio.\r\nExcepte la interfaç gràfica a la Mac App Store, és de codi obert, el que significa que és gratuït per als usuaris i els desenvolupadors tenen accés lliure per a estudiar-lo, millorar-lo i redistribuir-lo (llicència BSD)
 Menu;Menú
 Menu stream(s);Menú de pistes
 Menu_Codec_List;Menú de codecs
 Menu_Hint;Més possibilitats
 Menu_No;Sense menú
 MenuCount;Nombre de pistes al menú
-MenuID; MenuID
-mn;mn
-Mood;humor
+MenuID;ID menú
+mn; min
+Mood;Humor
 More;Més
 Movie;Nom de la pel·lícula
-ms;ms
+ms; ms
 MSDI;MSDI
-MusicBy;
-MuxingMode;
-MuxingMode_MoreInfo;
-MuxingMode_PackedBitstream;
+MusicBy;Música per
+MuxingMode;Mode multiplexat
+MuxingMode_MoreInfo;Mode multiplexat, més info
+MuxingMode_PackedBitstream;Seqüència de bits empaquetada
 Name;Nom
 Nationality;Nacionalitat
-NetworkName;
+NetworkName;Nom xarxa
 New;Nou
 Newest version;Cerca actualitzacions (requereix connexió a Internet)
-NewVersion_Menu;
-NewVersion_Question_Content;
-NewVersion_Question_Title;
-No;Cancel·la
-Not yet;
-NumColors;
+NewVersion_Menu;Està disponible una nova versió
+NewVersion_Question_Content;Està disponible una nova versió (v%Version%), vols descarregar-la?
+NewVersion_Question_Title;S'ha publicat una nova versió!
+No;No
+Not yet;Encara no
+NumColors;Nombre de colors
 OK;D'acord
 One output file per input file;Un arxiu de sortida per arxiu d'entrada
 Open;Obre
-OpenCandy_01;
-OpenCandy_02;
-OpenCandy_03;
-OpenCandy_04;
-OpenCandy_05;
-OpenCandy_06;
+OpenCandy_01;Descarregant ________
+OpenCandy_02;__ % complet
+OpenCandy_03;Connexió a Internet interrompuda
+OpenCandy_04;________ descàrrega completa
+OpenCandy_05;Fes clic to instal·lar ________
+OpenCandy_06;Estàs segur que vols cancel·lar la instal·lació?\r\nSi vols posposar-la, selecciona «No».\r\nNota: 
 OpenCandy_07;
-OpenCandy_08;
-OpenCandy_09;
-OpenCandy_10;
-OpenCandy_11;
-OpenCandy_12;
+OpenCandy_08;Ha ocorregut un error crític. La instal·lació de _________ s'abortarà.
+OpenCandy_09;Pausa descàrrega
+OpenCandy_10;Cancel·la la instal·lació
+OpenCandy_11;Continua la descàrrega
+OpenCandy_12;Surt de l'instal·lador
 OpenCandy_13;
 OpenCandy_14;
 OpenCandy_15;
 OpenCandy_16;
 OpenCandy_17;
 OpenCandy_18;
-OpenCandy_19;
-OpenCandy_20;
-OpenCandy_21;
-OpenCandy_22;
+OpenCandy_19;Patrocinat per OpenCandy
+OpenCandy_20;Aprèn més a OpenCandy.com
+OpenCandy_21;Instal·lar
+OpenCandy_22;Instal·lació de ___________
 OpenCandy_23;
-OpenCandy_24;
-OpenCandy_25;
-OpenCandy_26;
-OpenCandy_27;
-OpenCandy_28;
-OpenCandy_29;
-OpenCandy_30;
-OpenCandy_31;
-OpenCandy_32;
-OpenCandy_33;
-OpenCandy_34;
-OpenCandy_35;
-OpenCandy_36;
-OpenCaptionsLanguage;
-OpenCaptionsPresent;
-OpenCaptionsType;
+OpenCandy_24;Pausa
+OpenCandy_25;La descàrrega s'ha pausat. Fes clic a «Continua» quan estiguis a punt per seguir.
+OpenCandy_26;Continua
+OpenCandy_27;Instal·lar ara
+OpenCandy_28;Pausa descàrrega
+OpenCandy_29;Continua descàrrega
+OpenCandy_30;Cancel·la instal·lació
+OpenCandy_31;Escull una opció d'instal·lació
+OpenCandy_32;Instal·la ___________
+OpenCandy_33;No instal·lar
+OpenCandy_34;Selecciona una opció d'instal·lació
+OpenCandy_35;______ recomana aquest software
+OpenCandy_36;La instal·lació actual no s'interromprà
+OpenCaptionsLanguage;Idioma subtítols incrustats
+OpenCaptionsPresent;Subtítols incrustats presents
+OpenCaptionsType;Tipus subtítols incrustats
 Options;Opcions
 Options_Hint;Preferències
 Original;Original
-OriginalNetworkName;
-OriginalSourceForm;
-OriginalSourceMedium;
-Originator;
+OriginalNetworkName;Nom xarxa original
+OriginalSourceForm;Formulari font original
+OriginalSourceMedium;Mitjà font original
+Originator;Creador
 Other;Altres
-OtherIdentifier;
-OtherIdentifierType;
+OtherIdentifier;Altre identificador
+OtherIdentifierType;Tipus altre identificador
 Output;Sortida
 Output format;Format de sortida
-OverallBitRate;Velocitat de transmissió
-OverallBitRate_Maximum;
-OverallBitRate_Minimum;
-OverallBitRate_Mode;
-OverallBitRate_Nominal;
+OverallBitRate;Velocitat bits general
+OverallBitRate_Maximum;Velocitat màxima bits general
+OverallBitRate_Minimum;Velocitat mínima bits general
+OverallBitRate_Mode;Mode general velocitat bits
+OverallBitRate_Nominal;Velocitat de bits nominal
 Part;Part
-Part_Count;Comptador Total
-PartNumber;
-PartTotal;
+Part_Count;Quantitat total
+PartNumber;Codi sèrie
+PartTotal;Codi publicació
 Performer;Intèrpret
 Period;Període
 Phone;Telèfon
-PictureRatio;
+PictureRatio;Relació imatge
 PixelAspectRatio;Relació d'aspecte
-PixelAspectRatio_CleanAperture;
-PixelAspectRatio_Original;Relació d'aspecte
-PlayCounter;Comptador
-Played_Count;Temps reproduït
+PixelAspectRatio_CleanAperture;Relació aspecte píxel obertura neta
+PixelAspectRatio_Original;Relació aspecte píxel
+PlayCounter;Comptador reproduccions
+Played_Count;Quantitat reproduccions
 Played_First_Date;Data de la primera reproducció
 Played_Last_Date;Darrera data de reproducció
 PlayTime;Duració
 Position;Posició
-Position_Total;
+Position_Total;Total
 Preferences;Preferències
-PrimaryAudioLanguage;
+PrimaryAudioLanguage;Idioma àudio primari
 Producer;Productor
 ProductionDesigner;Disseny de producció
-ProductionNumber;
+ProductionNumber;Número de producció
 ProductionStudio;Estudi de producció
-ProductPlacement;
-ProgrammeHasText;
-ProgrammeTextLanguage;
-ProgrammeTitle;
+ProductPlacement;Col·locació de productes
+ProgrammeHasText;El programa té text
+ProgrammeTextLanguage;Idioma text programa
+ProgrammeTitle;Títol del programa
 Publisher;Publicista
 Purchased_Date;Data de compra
-Quote character;Caràcter cometes
+Quote character;Caràcter cita
 RadioStation;Emissora de ràdio
-Rating;puntuació
+Rating;Valoració
 Recorded_Date;Data d'enregistrament
 Recorded_Location;Lloc de gravació
-Released_Date;Data de llançament
+Released_Date;Data de publicació
 RemixedBy;Remesclat per
-ReplayGain_Gain; Ganància
-ReplayGain_Peak; Límit
+ReplayGain_Gain;Ganància reproducció
+ReplayGain_Peak;Límit ganància reproducció
 Resolution;Resolució
-s;seg
-SamplingCount;
-SamplingRate;Freqüència de mostratge
+s; s
+SamplingCount;Quantitat mostres
+SamplingRate;Freqüència de mostreig
 Save;Desa
-ScanOrder;
-ScanOrder_Original;
-ScanOrder_Stored;
-ScanOrder_StoredDisplayedInverted;
-ScanOrder_StoreMethod;
-ScanType;
-ScanType_Original;
-ScanType_StoreMethod;
+ScanOrder;Ordre d'escombrat
+ScanOrder_Original;Ordre d'escombrat original
+ScanOrder_Stored;Ordre d'escombrat emmagatzemat
+ScanOrder_StoredDisplayedInverted;Ordre d'escombrat, ordre emmagatzemat/mostrat invertit
+ScanOrder_StoreMethod;Ordre d'escombrat, mètode d'emmagatzematge
+ScanType;Tipus d'escaneig
+ScanType_Original;Tipus d'escaneig original
+ScanType_StoreMethod;Tipus d'escaneig, mètode d'emmagatzematge
 ScreenplayBy;posat en escena per
 Season;Estació
-SecondaryAudioLanguage;
-see below;Mireu mes avall
-Send HeaderFile;
+SecondaryAudioLanguage;Idioma àudio secondari
+see below;mira més avall
+Send HeaderFile;Envia'm l'arxiu Header aquí: http://sourceforge.net/projects/mediainfo/ (secció Bug)
 Separator_Columns;Separador de columnes
 Separator_Lines;Separador de línies
-SeriesTitle;
-ServiceChannel; Canal
-ServiceName; Nom
-ServiceProvider; Proveïdor
-ServiceType; Tipus
-Set;Unitats
-Set_Count;Nombre d'unitats
+SeriesTitle;Títol sèrie
+ServiceChannel;Canal servei
+ServiceName;Nom servei
+ServiceProvider;Proveïdor servei
+ServiceType;Tipus servei
+Set;Grup
+Set_Count;Quantitat grups
 Setup;Configura
-Sharpness; Contrast
+Sharpness;Nitidesa
 Sheet;Fulla
-Sheet (Complete);Fulla (Completa)
-Shell extension;Veure l'opció Media Info al menú contextual del botó dret del ratolí a l'explorador.
-Shell extension, folder;
-Shell InfoTip;Amplia la informació en passar amb el ratolí per sobre d'un arxiu a l'explorador.
-ShimName;
-ShimVersion;
+Sheet (Complete);Fulla (completa)
+Shell extension;Extensió Explorer (a Windows, clic dret a un arxiu mostrarà la opció MediaInfo)
+Shell extension, folder;També per a carpetes
+Shell InfoTip;Consells Explorer (a Windows, mou el ratolí sobre un arxiu per mostrar info)
+ShimName;Nom de falca
+ShimVersion;Versió de falca
 Show menu;Mostra el menú
 Show toolbar;Mostra la barra d'eines
-SigningPresent;
-SignLanguage;
-Sort;Endreça per
-SoundEngineer;Enginyer de só
-Source;
-Source_Duration;
-Source_FrameCount;
-Source_SamplingCount;
-Source_StreamSize;
-Source_StreamSize_Encoded;
+SigningPresent;Signatura present
+SignLanguage;Idioma signatura
+Sort;Ordenats per
+SoundEngineer;Sonidista
+Source;Origen
+Source_Duration;Duració original
+Source_FrameCount;Quantitat fotogrames original
+Source_SamplingCount;Quantitat mostres original
+Source_StreamSize;Mida pista original
+Source_StreamSize_Encoded;Mida pista codificada original
 Standard;Estàndard
-StoreMethod_InterleavedFields;
-StoreMethod_SeparatedFields;
-StoreMethod_SeparatedFields_1;
-StoreMethod_SeparatedFields_2;
+StoreMethod_InterleavedFields;Camps intercalats
+StoreMethod_SeparatedFields;Camps separats
+StoreMethod_SeparatedFields_1;Camps separats (1 camp per bloc)
+StoreMethod_SeparatedFields_2;Camps separats (2 camps per bloc)
 Stream;Pista
 Stream_MoreInfo;Més informació pel que fa a aquesta pista
-StreamCount;Comptador d'aquest tipus de pistes
-StreamID;ID de Pista
+StreamCount;Quantitat d'aquest tipus de pistes
+StreamID;ID de pista
 StreamKind;Tipus de pista
-StreamKindID; StreamID
-StreamKindPos; StreamPOS
-StreamSize;StreamSize
-StreamSize_Encoded;
-StreamSize_Proportion;StreamSize_Proportion
+StreamKindID;Identificador pista
+StreamKindPos;Identificador pista
+StreamSize;Mida pista
+StreamSize_Encoded;Mida pista codificada
+StreamSize_Proportion;Proporció d'aquesta pista
 Subject;Subjecte
-SubTrack;transició
-Summary;Sumari
-Supported formats;Formats suportats
-Supported?;Suportat ?
+SubTrack;Subpista
+Summary;Resum
+Supported formats;Formats compatibles
+Supported?;Compatible?
 Synopsis;Sinopsi
 SystemId;Id
-Tagged_Application;
-Tagged_Date;Data
+Tagged_Application;Aplicació d'etiquetatge
+Tagged_Date;Data d'etiquetatge
 Technician;Tècnic
-TermsOfUse;Termes d'ús
-TertiaryAudioLanguage;
+TermsOfUse;Condicions d'ús
+TertiaryAudioLanguage;Idoma àudio terciari
 Text;Text
-Text - Custom;Text - personalitzat
+Text - Custom;Tex: personalitzat
 Text (HTML);Text (HTML)
-Text stream(s);pistes de text
-Text streams;Pista de text
-Text_Codec_List;Codecs de text
-Text_No;No text
+Text stream(s);Pistes de text
+Text streams;Pistaes de text
+Text_Codec_List;Còdecs de text
+Text_No;Sense text
 Text1;Primera pista de text
 Text2;Segona pista de text
 Text3;Tercera pista de text
 TextCount;Total de pistes de text
-TextlessElementsExist;
-ThanksTo;Gràcies a
+TextlessElementsExist;Existeixen elements sense text
+ThanksTo;Agraïments a
 Thousands separator;Separador de milers
-TimeCode;
-TimeCode_FirstFrame;
-TimeCode_Settings;
-TimeCode_Source;
-TimeCode_Striped;
-TimeStamp;
-TimeZone;
+TimeCode;Codi de temps
+TimeCode_FirstFrame;Codi de temps del primer fotograma
+TimeCode_Settings;Ajustos del codi de temps
+TimeCode_Source;Origen del codi de temps
+TimeCode_Striped;Codi de temps, ratllat
+TimeStamp;Segell de temps
+TimeZone;Zona horària
 Title;Títol
 Title_More;Títol, més informació
 Total;Total
-TotalNumberOfParts;
-TotalProgrammeDuration;
+TotalNumberOfParts;Nombre total parts
+TotalProgrammeDuration;Duració total programa
 Track;Nom de la pista
 Track_Count;Total de pistes
-transfer_characteristics;
+transfer_characteristics;Característiques transferència
 Translator;Traductor
 Tree;Arbre
 Tree & Text;Arbre i text
-Type;
-UniqueID;
+Type;Tipus
+UniqueID;ID únic
 Unknown;Desconegut
-Url;Adreça web
+Url;URL
 Video;Vídeo
-Video stream(s);Pistes de vídeo
-Video_Codec_List;Codecs de Vídeo
-Video_Delay;Retard de Vídeo
-Video_No;Sense video
-Video0_Delay;Retard de Vídeo
+Video stream(s);Pista(es) de vídeo
+Video_Codec_List;Còdecs de vídeo
+Video_Delay;Retard de vídeo
+Video_No;Sense vídeo
+Video0_Delay;Retard de vídeo
 Video1;Primera pista de vídeo
-VideoComments;
+VideoComments;Comentaris del vídeo
 VideoCount;Total de pistes de vídeo
 View;Visualitza
 View_Hint;Canvia la manera de visualitzar la informació
-Warning : more streams in the files;Atenció : Hi han més pistes als arxius
+Warning : more streams in the files;Atenció: Hi ha més pistes als arxius
 Web;Web
-WebSite_Audio;Visiteu el web d'aquest tipus de còdec
-WebSite_Audio_More;Aneu al web (%Url%) per a trobar aquest còdec
-WebSite_General;Aneu al web del reproductor d'aquest format
-WebSite_General_More;Aneu al web del reproductor d'aquest arxiu
-WebSite_Text;Visiteu el web d'aquest tipus de text
-WebSite_Text_More;Aneu al web (%Url%)  per a trobar aquest còdec
+WebSite_Audio;Visita el web d'aquest còdec d'àudio
+WebSite_Audio_More;Vés al web (%Url%) per trobar aquest còdec d'àudio
+WebSite_General;Vés al web d'un reproductor d'aquest arxiu
+WebSite_General_More;Vés al web d'un reproductor d'aquest arxiu
+WebSite_Text;Vés al web d'aquest còdec de text
+WebSite_Text_More;Vés al web (%Url%) per trobar aquest còdec de text
 WebSite_Url;http://MediaArea.net/MediaInfo
-WebSite_Video;Visiteu el web d'aquest tipus de còdec
-WebSite_Video_More;Aneu al web (%Url%)  per a trobar aquest tipus de còdec
+WebSite_Video;Vés al web d'aquest còdec de vídeo
+WebSite_Video_More;Vés al web (%Url%) per trobar aquest còdec de vídeo
 Width;Amplada
-Width_CleanAperture;
-Width_Original;
-WriteMe;Escriviu-me
-WriteToTranslator;Escriviu al traductor
-Written_Date;Inseriu la data
-Written_Location;Inseriu el lloc de gravació
+Width_CleanAperture;Amplada obertura neta
+Width_Original;Amplada original
+WriteMe;Escriu un correu a l'autor
+WriteToTranslator;Escriu al traductor
+Written_Date;Data escrita
+Written_Location;Ubicació escrita
 WrittenBy;Escrit per
 Yes;Sí
-Your system;El vostre sistema
-ZZ_Automatic_Percent;73
-ZZ_AutomaticLanguage_Percent;80
+Your system;El teu sistema
+ZZ_Automatic_Percent;96
+ZZ_AutomaticLanguage_Percent;100

@@ -41,7 +41,7 @@ File_Teletext::File_Teletext()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("Teletext");
+    ParserName="Teletext";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Teletext;
         StreamIDs_Width[0]=2;

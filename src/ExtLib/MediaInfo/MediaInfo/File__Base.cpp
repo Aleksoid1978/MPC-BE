@@ -74,7 +74,7 @@ File__Base::~File__Base ()
 //---------------------------------------------------------------------------
 //Base
 #if MEDIAINFO_TRACE
-void File__Base::Init (MediaInfo_Config_MediaInfo * Config_, Ztring* Details_, std::vector<std::vector<ZtringList> > * Stream_, std::vector<std::vector<ZtringListList> > * Stream_More_)
+void File__Base::Init (MediaInfo_Config_MediaInfo * Config_, string* Details_, std::vector<std::vector<ZtringList> > * Stream_, std::vector<std::vector<ZtringListList> > * Stream_More_)
 #else //MEDIAINFO_TRACE
 void File__Base::Init (MediaInfo_Config_MediaInfo * Config_, std::vector<std::vector<ZtringList> > * Stream_, std::vector<std::vector<ZtringListList> > * Stream_More_)
 #endif //MEDIAINFO_TRACE

@@ -368,7 +368,7 @@ File_Dpx::File_Dpx()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("DPX");
+    ParserName="DPX";
 }
 
 //***************************************************************************
