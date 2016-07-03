@@ -354,6 +354,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_dRate(1.0)
 	, m_bFlushing(FALSE)
 	, m_bNeedSyncPoint(FALSE)
+	, m_DTSHDProfile(0)
 {
 	if (phr) {
 		*phr = S_OK;
