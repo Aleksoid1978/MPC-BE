@@ -206,10 +206,10 @@ void strFrom16(char str[3], cmsUInt16Number n)
 
 }
 
-// Add an ASCII entry.
+// Add an ASCII entry. Do not add any \0 termination (ICC1v43_2010-12.pdf page 61)
 cmsBool CMSEXPORT cmsMLUsetASCII(cmsMLU* mlu, const char LanguageCode[3], const char CountryCode[3], const char* ASCIIString)
 {
-    cmsUInt32Number i, len = (cmsUInt32Number) strlen(ASCIIString)+1;
+    cmsUInt32Number i, len = (cmsUInt32Number) strlen(ASCIIString);
     wchar_t* WStr;
     cmsBool  rc;
     cmsUInt16Number Lang  = strTo16(LanguageCode);
@@ -243,8 +243,7 @@ cmsUInt32Number mywcslen(const wchar_t *s)
     return (cmsUInt32Number)(p - s);
 }
 
-
-// Add a wide entry
+// Add a wide entry. Do not add any \0 terminator (ICC1v43_2010-12.pdf page 61)
 cmsBool  CMSEXPORT cmsMLUsetWide(cmsMLU* mlu, const char Language[3], const char Country[3], const wchar_t* WideString)
 {
     cmsUInt16Number Lang  = strTo16(Language);
@@ -254,7 +253,7 @@ cmsBool  CMSEXPORT cmsMLUsetWide(cmsMLU* mlu, const char Language[3], const char
     if (mlu == NULL) return FALSE;
     if (WideString == NULL) return FALSE;
 
-    len = (cmsUInt32Number) (mywcslen(WideString) + 1) * sizeof(wchar_t);
+    len = (cmsUInt32Number) (mywcslen(WideString)) * sizeof(wchar_t);
     return AddMLUBlock(mlu, len, WideString, Lang, Cntry);
 }
 

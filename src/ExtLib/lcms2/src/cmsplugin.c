@@ -172,13 +172,13 @@ cmsBool CMSEXPORT  _cmsReadFloat32Number(cmsIOHANDLER* io, cmsFloat32Number* n)
 
     _cmsAssert(io != NULL);
 
-    if (io -> Read(io, &tmp, sizeof(cmsFloat32Number), 1) != 1)
+    if (io -> Read(io, &tmp, sizeof(cmsUInt32Number), 1) != 1)
             return FALSE;
 
     if (n != NULL) {
 
         tmp = _cmsAdjustEndianess32(tmp);
-        *n = *(cmsFloat32Number*) &tmp;
+        *n = *(cmsFloat32Number*) (void*) &tmp;
     }
     return TRUE;
 }
@@ -289,7 +289,7 @@ cmsBool CMSEXPORT  _cmsWriteFloat32Number(cmsIOHANDLER* io, cmsFloat32Number n)
 
     _cmsAssert(io != NULL);
 
-    tmp = *(cmsUInt32Number*) &n;
+    tmp = *(cmsUInt32Number*) (void*) &n;
     tmp = _cmsAdjustEndianess32(tmp);
     if (io -> Write(io, sizeof(cmsUInt32Number), &tmp) != 1)
             return FALSE;
@@ -485,7 +485,10 @@ cmsBool CMSEXPORT _cmsIOPrintf(cmsIOHANDLER* io, const char* frm, ...)
     va_start(args, frm);
 
     len = vsnprintf((char*) Buffer, 2047, frm, args);
-    if (len < 0) return FALSE;   // Truncated, which is a fatal error for us
+    if (len < 0) {
+        va_end(args);
+        return FALSE;   // Truncated, which is a fatal error for us
+    }
 
     rc = io ->Write(io, len, Buffer);
 

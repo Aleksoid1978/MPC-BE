@@ -994,7 +994,7 @@ cmsBool  Type_Text_Description_Write(struct _cms_typehandler_struct* self, cmsIO
     }
 
     // Tell the real text len including the null terminator and padding
-    len_text = strlen(Text) + 1;
+    len_text = (cmsUInt32Number) strlen(Text) + 1;
     // Compute an total tag size requirement
     len_tag_requirement = (8+4+len_text+4+4+2*len_text+2+1+67);
     len_aligned = _cmsALIGNLONG(len_tag_requirement);
