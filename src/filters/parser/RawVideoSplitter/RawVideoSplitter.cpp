@@ -161,7 +161,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	HRESULT hr = E_FAIL;
 	m_pFile.Free();
 
-	m_pFile.Attach(DNew CBaseSplitterFileEx(pAsyncReader, hr));
+	m_pFile.Attach(DNew CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_STREAM));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
@@ -192,16 +192,16 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			return E_FAIL; // incorrect or unsuppurted YUV4MPEG2 file
 		}
 
-		int    width		= 0;
-		int    height		= 0;
-		int    fpsnum		= 24;
-		int    fpsden		= 1;
-		LONG   sar_x		= 1;
-		LONG   sar_y		= 1;
-		FOURCC fourcc		= FCC('I420'); // 4:2:0 - I420 by default
-		FOURCC fourcc_2		= 0;
-		WORD   bpp			= 12;
-		DWORD  interl		= 0;
+		int    width    = 0;
+		int    height   = 0;
+		int    fpsnum   = 24;
+		int    fpsden   = 1;
+		LONG   sar_x    = 1;
+		LONG   sar_y    = 1;
+		FOURCC fourcc   = FCC('I420'); // 4:2:0 - I420 by default
+		FOURCC fourcc_2 = 0;
+		WORD   bpp      = 12;
+		DWORD  interl   = 0;
 
 		int k;
 		CAtlList<CStringA> sl;
@@ -298,17 +298,17 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		memset(vih2, 0, sizeof(VIDEOINFOHEADER2));
 
-		vih2->bmiHeader.biSize        = sizeof(vih2->bmiHeader);
-		vih2->bmiHeader.biWidth       = width;
-		vih2->bmiHeader.biHeight      = height;
-		vih2->bmiHeader.biPlanes      = 1;
-		vih2->bmiHeader.biBitCount    = bpp;
-		vih2->bmiHeader.biSizeImage   = m_framesize;
+		vih2->bmiHeader.biSize      = sizeof(vih2->bmiHeader);
+		vih2->bmiHeader.biWidth     = width;
+		vih2->bmiHeader.biHeight    = height;
+		vih2->bmiHeader.biPlanes    = 1;
+		vih2->bmiHeader.biBitCount  = bpp;
+		vih2->bmiHeader.biSizeImage = m_framesize;
 		//vih2->rcSource = vih2->rcTarget = CRect(0, 0, width, height);
-		//vih2->dwBitRate      = m_framesize * 8 * fpsnum / fpsden;
-		vih2->AvgTimePerFrame  = m_AvgTimePerFrame;
+		//vih2->dwBitRate = m_framesize * 8 * fpsnum / fpsden;
+		vih2->AvgTimePerFrame       = m_AvgTimePerFrame;
 		// always tell DirectShow it's interlaced (progressive flags set in IMediaSample struct)
-		vih2->dwInterlaceFlags = AMINTERLACE_IsInterlaced | AMINTERLACE_DisplayModeBobOrWeave;
+		vih2->dwInterlaceFlags      = AMINTERLACE_IsInterlaced | AMINTERLACE_DisplayModeBobOrWeave;
 
 		sar_x *= width;
 		sar_y *= height;
@@ -316,7 +316,9 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		vih2->dwPictAspectRatioX = sar_x;
 		vih2->dwPictAspectRatioY = sar_y;
 
-		m_rtDuration      = (m_pFile->GetLength() - m_startpos) / (sizeof(FRAME_) + m_framesize) * 10000000i64 * fpsden / fpsnum;
+		if (!m_pFile->IsStreaming()) {
+			m_rtNewStop = m_rtStop = m_rtDuration = (m_pFile->GetLength() - m_startpos) / (sizeof(FRAME_) + m_framesize) * 10000000i64 * fpsden / fpsnum;
+		}
 		mt.SetSampleSize(m_framesize);
 
 		vih2->bmiHeader.biCompression = fourcc;
@@ -349,58 +351,59 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				pName = L"MPEG2 Video Output";
 			}
 
-			m_AvgTimePerFrame	= h.ifps;
+			m_AvgTimePerFrame = h.ifps;
+			if (m_pFile->IsRandomAccess()) {
+				REFERENCE_TIME rtStart = INVALID_TIME;
+				REFERENCE_TIME rtStop  = INVALID_TIME;
 
-			REFERENCE_TIME rtStart	= INVALID_TIME;
-			REFERENCE_TIME rtStop	= INVALID_TIME;
-
-			__int64 posMin			= 0;
-			__int64 posMax			= 0;
-			// find start PTS
-			{
-				BYTE id = 0x00;
-				m_pFile->Seek(0);
-				while (m_pFile->GetPos() < min(MEGABYTE, m_pFile->GetLength()) && rtStart == INVALID_TIME) {
-					if (!m_pFile->NextMpegStartCode(id)) {
-						continue;
-					}
-
-					if (id == 0xb8) {	// GOP
-						REFERENCE_TIME rt = 0;
-						__int64 pos = m_pFile->GetPos();
-						if (!ReadGOP(rt)) {
+				__int64 posMin = 0;
+				__int64 posMax = 0;
+				// find start PTS
+				{
+					BYTE id = 0x00;
+					m_pFile->Seek(0);
+					while (m_pFile->GetPos() < min(MEGABYTE, m_pFile->GetLength()) && rtStart == INVALID_TIME) {
+						if (!m_pFile->NextMpegStartCode(id)) {
 							continue;
 						}
 
-						if (rtStart == INVALID_TIME) {
-							rtStart	= rt;
-							posMin	= pos;
+						if (id == 0xb8) {	// GOP
+							REFERENCE_TIME rt = 0;
+							__int64 pos = m_pFile->GetPos();
+							if (!ReadGOP(rt)) {
+								continue;
+							}
+
+							if (rtStart == INVALID_TIME) {
+								rtStart = rt;
+								posMin  = pos;
+							}
 						}
 					}
 				}
-			}
 
-			// find end PTS
-			{
-				BYTE id = 0x00;
-				m_pFile->Seek(m_pFile->GetLength() - min(MEGABYTE, m_pFile->GetLength()));
-				while (m_pFile->GetPos() < m_pFile->GetLength()) {
-					if (!m_pFile->NextMpegStartCode(id)) {
-						continue;
-					}
+				// find end PTS
+				{
+					BYTE id = 0x00;
+					m_pFile->Seek(m_pFile->GetLength() - min(MEGABYTE, m_pFile->GetLength()));
+					while (m_pFile->GetPos() < m_pFile->GetLength()) {
+						if (!m_pFile->NextMpegStartCode(id)) {
+							continue;
+						}
 
-					if (id == 0xb8) {	// GOP
-						__int64 pos = m_pFile->GetPos();
-						if (ReadGOP(rtStop)) {
-							posMax = pos;
+						if (id == 0xb8) {	// GOP
+							__int64 pos = m_pFile->GetPos();
+							if (ReadGOP(rtStop)) {
+								posMax = pos;
+							}
 						}
 					}
 				}
-			}
 
-			if (rtStart != INVALID_TIME && rtStop != INVALID_TIME && rtStop > rtStart) {
-				double rate = (double)(posMax - posMin) / (rtStop - rtStart);
-				m_rtNewStop = m_rtStop = m_rtDuration = (REFERENCE_TIME)((double)m_pFile->GetLength() / rate);
+				if (rtStart != INVALID_TIME && rtStop != INVALID_TIME && rtStop > rtStart) {
+					const double rate = (double)(posMax - posMin) / (rtStop - rtStart);
+					m_rtNewStop = m_rtStop = m_rtDuration = (REFERENCE_TIME)((double)m_pFile->GetLength() / rate);
+				}
 			}
 		}
 	}
@@ -726,10 +729,10 @@ bool CRawVideoSplitterFilter::DemuxInit()
 void CRawVideoSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
 	if (m_RAWType == RAW_Y4M) {
-		if (rt <= 0) {
+		if (rt <= 0 || m_rtDuration <= 0) {
 			m_pFile->Seek(m_startpos);
 		} else {
-			__int64 framenum = rt / m_AvgTimePerFrame;
+			const __int64 framenum = rt / m_AvgTimePerFrame;
 			m_pFile->Seek(m_startpos + framenum * (sizeof(FRAME_) + m_framesize));
 		}
 		return;
@@ -752,25 +755,20 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 	while (SUCCEEDED(hr) && !CheckRequest(NULL) && m_pFile->GetRemaining()) {
 
 		if (m_RAWType == RAW_Y4M) {
-			if (m_pFile->GetRemaining() < m_framesize + (int)sizeof(FRAME_)) {
+			static BYTE buf[sizeof(FRAME_)];
+			if ((hr = m_pFile->ByteRead(buf, sizeof(FRAME_))) != S_OK || memcmp(buf, FRAME_, sizeof(FRAME_)) != 0) {
 				break;
 			}
-
-			BYTE buf[sizeof(FRAME_)];
-			if (m_pFile->ByteRead(buf, sizeof(FRAME_)) != S_OK || memcmp(buf, FRAME_, sizeof(FRAME_)) != 0) {
-				ASSERT(0);
-			}
-			__int64 framenum = (m_pFile->GetPos() - m_startpos) / (sizeof(FRAME_) + m_framesize);
+			const __int64 framenum = (m_pFile->GetPos() - m_startpos) / (sizeof(FRAME_) + m_framesize);
 
 			CAutoPtr<CPacket> p(DNew CPacket());
-			p->TrackNumber	= 0;
-			p->bSyncPoint	= FALSE;
+			p->rtStart = framenum * m_AvgTimePerFrame;
+			p->rtStop  = p->rtStart + m_AvgTimePerFrame;
 
 			p->SetCount(m_framesize);
-			m_pFile->ByteRead(p->GetData(), m_framesize);
-
-			p->rtStart     = framenum * m_AvgTimePerFrame;
-			p->rtStop      = p->rtStart + m_AvgTimePerFrame;
+			if ((hr = m_pFile->ByteRead(p->GetData(), m_framesize)) != S_OK) {
+				break;
+			}
 
 			hr = DeliverPacket(p);
 			continue;
@@ -778,7 +776,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 
 		if (m_RAWType == RAW_MPEG4) {
 			for (int i = 0; i < 65536; ++i) { // don't call CheckRequest so often
-				bool eof = !m_pFile->GetRemaining();
+				const bool eof = !m_pFile->GetRemaining();
 
 				if (mpeg4packet && !mpeg4packet->IsEmpty() && (m_pFile->BitRead(32, true) == 0x000001b6 || eof)) {
 					hr = DeliverPacket(mpeg4packet);
@@ -791,10 +789,8 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 				if (!mpeg4packet) {
 					mpeg4packet.Attach(DNew CPacket());
 					mpeg4packet->SetCount(0, 1024);
-					mpeg4packet->TrackNumber = 0;
 					mpeg4packet->rtStart = rt;
-					mpeg4packet->rtStop = rt + m_AvgTimePerFrame;
-					mpeg4packet->bSyncPoint = FALSE;
+					mpeg4packet->rtStop  = rt + m_AvgTimePerFrame;
 					rt += m_AvgTimePerFrame;
 					// rt = INVALID_TIME;
 				}
@@ -807,16 +803,12 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 		}
 
 
-		if (size_t size = min(64 * KILOBYTE, m_pFile->GetRemaining())) {
+		if (const size_t size = min(64 * KILOBYTE, m_pFile->GetRemaining())) {
 			CAutoPtr<CPacket> p(DNew CPacket());
-			p->TrackNumber = 0;
-			p->bSyncPoint = FALSE;
-
 			p->SetCount(size);
-			m_pFile->ByteRead(p->GetData(), size);
-
-			p->rtStart = INVALID_TIME;
-			p->rtStop = INVALID_TIME;
+			if ((hr = m_pFile->ByteRead(p->GetData(), size)) != S_OK) {
+				break;
+			}
 
 			hr = DeliverPacket(p);
 		}
