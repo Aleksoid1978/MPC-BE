@@ -14,8 +14,8 @@
  bit1; bit
  bit2; bits
  bit3; bits
- bps; bps
- Bps; Bps
+ bps; b/s
+ Bps; B/s
  Byte1; Octet
  Byte2; Octets
  Byte3; Octets
@@ -48,14 +48,14 @@
  frame3; images
  GB; Go
  Gb; Gb
- Gbps; Gbps
+ Gbps; Gb/s
  GBps; Go/s
  GHz; GHz
  GiB; Gio
  GibiByte1; GibiOctets
  GibiByte2; GibiOctets
  GibiByte3; GibiOctets
- GiBps; GiBps
+ GiBps; GiB/s
  GigaBit1; GigaBit
  GigaBit2; GigaBits
  GigaBit3; GigaBits
@@ -69,11 +69,11 @@
  image stream1; flux image
  image stream2; flux images
  image stream3; flux images
- KB; Ko
- Kb; Kb
- KBps; KBps
- Kbps; Kbps
- KHz; KHz
+ KB; ko
+ Kb; kb
+ KBps; kB/s
+ Kbps; kb/s
+ KHz; kHz
  KiB; Kio
  KibiBit1; KibiBit
  KibiBit2; KibiBits
@@ -81,7 +81,7 @@
  KibiByte1; KibiOctet
  KibiByte2; KibiOctets
  KibiByte3; KibiOctets
- KiBps; KiBps
+ KiBps; KiB/s
  KiloBit1; KiloBit
  KiloBit2; KiloBits
  KiloBit3; KiloBits
@@ -91,7 +91,7 @@
  MB; MB
  Mb; Mb
  Mbps; Mb/s
- MBps; Mbps
+ MBps; MebiBytes
  MebiBit1; MebiBit
  MebiBit2; MebiBits
  MebiBit3; MebiBits
@@ -107,7 +107,7 @@
  MHz; MHz
  MiB; Mio
  Mib; Mib
- MiBps; MiBps
+ MiBps; MiB/s
  millisecond1; milliseconde
  millisecond2; millisecondes
  millisecond3; millisecondes
@@ -585,7 +585,7 @@ Gop_OpenClosed;GOP, ouvert/fermé
 Gop_OpenClosed_Open;Ouvert
 Gop_OpenClosed_Closed;Fermé
 Gop_OpenClosed_FirstFrame;GOP, ouvert/fermé de la première imageGrouping
-h;h
+h; h
 Header file;Créer un fichier Header
 Height;Hauteur
 Height_CleanAperture;Hauteur, Clean Aperture
@@ -844,11 +844,11 @@ Menu_Hint;Plus de possibilités
 Menu_No;Pas de menu
 MenuCount;Nombre de pistes menu
 MenuID;ID de menu
-mn;mn
+mn; min
 Mood;Humeur
 More;Plus
 Movie;Nom du film
-ms;ms
+ms; ms
 MSDI;MSDI
 MusicBy;Musique par
 MuxingMode;Type de muxing

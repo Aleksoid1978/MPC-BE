@@ -69,7 +69,7 @@
  image stream1; image stream
  image stream2; image streams
  image stream3; image streams
- KB; KB
+ KB; kB
  Kb; kb
  KBps; kB/s
  Kbps; kb/s
@@ -585,7 +585,7 @@ Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
-h;h
+h; h
 Header file;Create a header file
 Height;Výška
 Height_CleanAperture;

@@ -97,7 +97,7 @@ extern const char* Pcm_VOB_ChannelsPositions2(int8u channel_assignment);
 File_Pcm_M2ts::File_Pcm_M2ts()
 {
     //Configuration
-    ParserName=__T("PCM M2TS");
+    ParserName="PCM M2TS";
     IsRawStream=true;
     PTS_DTS_Needed=true;
 }

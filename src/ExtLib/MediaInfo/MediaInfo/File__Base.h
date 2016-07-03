@@ -35,7 +35,7 @@ public :
     File__Base();
     virtual ~File__Base();
     #if MEDIAINFO_TRACE
-        void Init(MediaInfo_Config_MediaInfo * Config, Ztring* Details, std::vector<std::vector<ZtringList> > * Stream_=NULL, std::vector<std::vector<ZtringListList> > * Stream_More=NULL);
+        void Init(MediaInfo_Config_MediaInfo * Config, string* Details, std::vector<std::vector<ZtringList> > * Stream_=NULL, std::vector<std::vector<ZtringListList> > * Stream_More=NULL);
     #else //MEDIAINFO_TRACE
         void Init(MediaInfo_Config_MediaInfo * Config, std::vector<std::vector<ZtringList> > * Stream_=NULL, std::vector<std::vector<ZtringListList> > * Stream_More=NULL);
     #endif //MEDIAINFO_TRACE
@@ -84,7 +84,7 @@ protected :
 
     //Details
     #if MEDIAINFO_TRACE
-        Ztring* Details;
+        string* Details;
     #endif //MEDIAINFO_TRACE
 
 public :

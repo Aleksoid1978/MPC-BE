@@ -43,7 +43,7 @@ File_Eia708::File_Eia708()
     //In
     cc_type=(int8u)-1;
     AspectRatio=((float32)4)/3; //Default to 4:3
-    ParserName=__T("EIA-708");
+    ParserName="EIA-708";
 
     //Stream
     service_number=(int8u)-1;

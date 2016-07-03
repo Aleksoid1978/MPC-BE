@@ -38,7 +38,7 @@ File_Canopus::File_Canopus()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("Canopus");
+    ParserName="Canopus";
 }
 
 //***************************************************************************

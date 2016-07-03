@@ -199,7 +199,7 @@ File_MpegPs::File_MpegPs()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("MpegPs");
+    ParserName="MpegPs";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_MpegPs;
         StreamIDs_Width[0]=2;

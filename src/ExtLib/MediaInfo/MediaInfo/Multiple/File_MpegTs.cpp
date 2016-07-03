@@ -252,7 +252,7 @@ File_MpegTs::File_MpegTs()
 #endif //MEDIAINFO_DUPLICATE
 {
     //Configuration
-    ParserName=__T("MpegTs");
+    ParserName="MpegTs";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_MpegTs;
         StreamIDs_Width[0]=4;

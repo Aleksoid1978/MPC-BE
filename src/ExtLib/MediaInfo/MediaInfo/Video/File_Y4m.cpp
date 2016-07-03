@@ -49,7 +49,7 @@ File_Y4m::File_Y4m()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("YUV4MPEG2");
+    ParserName="YUV4MPEG2";
     #if MEDIAINFO_TRACE
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE

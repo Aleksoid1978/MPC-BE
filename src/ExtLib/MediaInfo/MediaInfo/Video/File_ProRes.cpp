@@ -91,7 +91,7 @@ File_ProRes::File_ProRes()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("ProRes");
+    ParserName="ProRes";
 }
 
 //***************************************************************************

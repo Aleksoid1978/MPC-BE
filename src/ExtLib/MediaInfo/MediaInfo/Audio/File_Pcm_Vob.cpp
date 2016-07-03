@@ -98,7 +98,7 @@ const char* Pcm_VOB_ChannelsPositions2(int8u channel_assignment)
 File_Pcm_Vob::File_Pcm_Vob()
 {
     //Configuration
-    ParserName=__T("PCM VOB");
+    ParserName="PCM VOB";
     IsRawStream=true;
     PTS_DTS_Needed=true;
 }

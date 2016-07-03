@@ -122,7 +122,7 @@ File_HuffYuv::File_HuffYuv()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("HuffYUV");
+    ParserName="HuffYUV";
     #if MEDIAINFO_TRACE
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE

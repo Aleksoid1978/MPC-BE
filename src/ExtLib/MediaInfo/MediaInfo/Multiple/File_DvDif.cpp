@@ -226,7 +226,7 @@ File_DvDif::File_DvDif()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("DV");
+    ParserName="DV";
     MustSynchronize=true;
     Buffer_TotalBytes_FirstSynched_Max=64*1024;
 

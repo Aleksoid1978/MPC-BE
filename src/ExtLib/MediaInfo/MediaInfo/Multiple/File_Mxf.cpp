@@ -2115,7 +2115,7 @@ File_Mxf::File_Mxf()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("MXF");
+    ParserName="MXF";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Mxf;
         StreamIDs_Width[0]=8;
@@ -6043,9 +6043,9 @@ void File_Mxf::Data_Parse()
                         if (Essence->second.FrameInfo.DUR!=(int64u)-1)
                             (*Parser)->FrameInfo.DUR=Essence->second.FrameInfo.DUR;
                         #if defined(MEDIAINFO_ANCILLARY_YES)
-                            if ((*Parser)->ParserName==__T("Ancillary"))
+                            if ((*Parser)->ParserName=="Ancillary")
                                 ((File_Ancillary*)(*Parser))->LineNumber=LineNumber;
-                            if ((*Parser)->ParserName==__T("Ancillary") && (((File_Ancillary*)(*Parser))->FrameRate==0 || ((File_Ancillary*)(*Parser))->AspectRatio==0))
+                            if ((*Parser)->ParserName=="Ancillary" && (((File_Ancillary*)(*Parser))->FrameRate==0 || ((File_Ancillary*)(*Parser))->AspectRatio==0))
                             {
                                 //Configuring with video info
                                 for (descriptors::iterator Descriptor=Descriptors.begin(); Descriptor!=Descriptors.end(); ++Descriptor)

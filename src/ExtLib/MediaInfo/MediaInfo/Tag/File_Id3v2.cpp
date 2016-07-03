@@ -1014,7 +1014,7 @@ void File_Id3v2::RGAD()
         Get_S1 (3, Name_code,                                   "Name code"); Param_Info1(Id3v2_RGAD_Name_code[Name_code]);
         Info_S1(3, Originator_code,                             "Originator code"); Param_Info1(Id3v2_RGAD_Originator_code[Originator_code]);
         Get_SB (Sign_bit,                                       "Sign bit");
-        Get_S2 (9, Replay_Gain_Adjustment,                      "Replay Gain Adjustment"); Param_Info3 ((Sign_bit?-1:1)*(float)Replay_Gain_Adjustment/10, 1, " dB");
+        Get_S2 (9, Replay_Gain_Adjustment,                      "Replay Gain Adjustment"); Param_Info3 ((Sign_bit?-1:1)*(float)Replay_Gain_Adjustment/10, " dB", 1);
         BS_End();
         Element_End0();
 

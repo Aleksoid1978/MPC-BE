@@ -418,7 +418,7 @@ File_Flv::File_Flv()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("FLV");
+    ParserName="FLV";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Flv;
         StreamIDs_Width[0]=2;

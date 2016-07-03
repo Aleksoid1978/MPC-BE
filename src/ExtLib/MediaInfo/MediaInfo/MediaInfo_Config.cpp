@@ -125,7 +125,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.86");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.87");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -598,6 +598,11 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
             Inform_Set(Ztring());
             Trace_Format_Set(Trace_Format_XML); // TODO: better coherency in options
         }
+        if (Inform_Get()==__T("MICRO_XML"))
+        {
+            Inform_Set(Ztring());
+            Trace_Format_Set(Trace_Format_MICRO_XML);
+        }
         return Ztring();
     }
     else if (Option_Lower==__T("trace_level_get"))
@@ -645,6 +650,8 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
             Trace_Format_Set(Trace_Format_CSV);
         else if (NewValue_Lower==__T("xml") || NewValue_Lower==__T("MAXML"))
             Trace_Format_Set(Trace_Format_XML);
+        else if (NewValue_Lower==__T("micro_xml"))
+            Trace_Format_Set(Trace_Format_MICRO_XML);
         else
             Trace_Format_Set(Trace_Format_Tree);
         return Ztring();
@@ -1648,6 +1655,11 @@ void MediaInfo_Config::Inform_Set (const ZtringListList &NewValue)
     else if (Trace_Level_Get() && NewValue.Read(0, 0)==__T("XML"))
     {
         Trace_Format_Set(Trace_Format_XML); // TODO: better coherency in options
+        return;
+    }
+    else if (Trace_Level_Get() && NewValue.Read(0, 0)==__T("MICRO_XML"))
+    {
+        Trace_Format_Set(Trace_Format_MICRO_XML);
         return;
     }
     else

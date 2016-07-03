@@ -918,7 +918,7 @@ size_t MediaInfo_Internal::Open_Buffer_Finalize ()
     if (!Config.File_IsSub_Get() && !Config.File_KeepInfo_Get()) //We need info for the calling parser
     {
         #if MEDIAINFO_TRACE
-            ParserName=Info->ParserName; //Keep it in memory in case we need it after delete of Info
+        ParserName=Ztring().From_UTF8(Info->ParserName); //Keep it in memory in case we need it after delete of Info
         #endif //MEDIAINFO_TRACE
         delete Info; Info=NULL;
     }
@@ -1327,6 +1327,12 @@ String MediaInfo_Internal::Option (const String &Option, const String &Value)
             return __T("Seek manager is disabled due to compilation options");
         #endif //MEDIAINFO_SEEK
     }
+    #if MEDIAINFO_TRACE
+        if (OptionLower.find(__T("file_details_stringpointer")) == 0 && MediaInfoLib::Config.Inform_Get()!=__T("MAXML") && (MediaInfoLib::Config.Trace_Level_Get() || MediaInfoLib::Config.Inform_Get()==__T("Details")) && !Details.empty())
+        {
+            return Ztring::ToZtring((int64u)Details.data())+__T(':')+Ztring::ToZtring((int64u)Details.size());
+        }
+    #endif //MEDIAINFO_TRACE
     else if (OptionLower.find(__T("file_"))==0)
     {
         Ztring ToReturn2=Config.Option(Option, Value);

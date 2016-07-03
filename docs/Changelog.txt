@@ -14,7 +14,7 @@ Windows XP is no longer supported.
 Updated libraries:
 	ffmpeg git-n3.2-dev-124-gc1c7e0a;
 	Little-CMS git-2.7-69-g5c23621;
-	MediaInfo git-v0.7.86-8-gf80d491;
+	MediaInfo git-v0.7.87-4-g5cf23b8;
 
 1.4.6
 ==============================

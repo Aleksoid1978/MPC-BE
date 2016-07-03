@@ -14,8 +14,8 @@
  bit1; bit
  bit2; bit
  bit3; bit
- bps; bps
- Bps; Bps
+ bps; b/s
+ Bps; B/s
  Byte1; Byte
  Byte2; Byte
  Byte3; Byte
@@ -40,22 +40,22 @@
  file1; fil
  file2; filer
  file3; filer
- fps1; fps
- fps2; fps
- fps3; fps
+ fps1; FPS
+ fps2; FPS
+ fps3; FPS
  frame1; bildruta
  frame2; bildrutor
  frame3; bildrutor
  GB; GB
  Gb; Gb
- Gbps; Gbps
- GBps; GBps
+ Gbps; Gb/s
+ GBps; GB/s
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiByte
  GibiByte2; GibiByte
  GibiByte3; GibiByte
- GiBps; GiBps
+ GiBps; GiB/s
  GigaBit1; GigaBit
  GigaBit2; GigaBit
  GigaBit3; GigaBit
@@ -69,11 +69,11 @@
  image stream1; bildström
  image stream2; bildströmmar
  image stream3; bildströmmar
- KB; KB
- Kb; Kb
- KBps; KBps
- Kbps; Kbps
- KHz; KHz
+ KB; kB
+ Kb; kb
+ KBps; kB/s
+ Kbps; kb/s
+ KHz; kHz
  KiB; KiB
  KibiBit1; KibiBit
  KibiBit2; KibiBit
@@ -81,7 +81,7 @@
  KibiByte1; KibiByte
  KibiByte2; KibiByte
  KibiByte3; KibiByte
- KiBps; KiBps
+ KiBps; KiB/s
  KiloBit1; KiloBit
  KiloBit2; KiloBit
  KiloBit3; KiloBit
@@ -90,7 +90,7 @@
  KiloByte3; KiloByte
  MB; MB
  Mb; Mb
- Mbps; Mbps
+ Mbps; Mb/s
  MBps; MebiByte
  MebiBit1; MebiBit
  MebiBit2; MebiBit
@@ -107,7 +107,7 @@
  MHz; MHz
  MiB; MiB
  Mib; Mib
- MiBps; MiBps
+ MiBps; MiB/s
  millisecond1; millisekund
  millisecond2; millisekunder
  millisecond3; millisekunder
@@ -585,7 +585,7 @@ Gop_OpenClosed;GOP, Öppen/Stängd
 Gop_OpenClosed_Open;Öppen
 Gop_OpenClosed_Closed;Stängd
 Gop_OpenClosed_FirstFrame;GOP, Öppen/Stängd av första bildrutan
-h;h
+h; h
 Header file;Skapa en header-fil
 Height;Höjd
 Height_CleanAperture;

@@ -836,7 +836,7 @@ void File_DolbyE::Block()
     }
     Skip_S2(14,                                                 "Unknown");
     Get_S1 ( 6, ProgramConfiguration,                           "Program configuration"); Param_Info1(DolbyE_ChannelPositions[ProgramConfiguration]);
-    Get_S1 ( 4, FrameRate,                                      "Frame rate 1"); Param_Info3(Mpegv_frame_rate[FrameRate], 3, " fps");
+    Get_S1 ( 4, FrameRate,                                      "Frame rate 1"); Param_Info3(Mpegv_frame_rate[FrameRate], " fps", 3);
     Skip_S1( 4,                                                 "Frame rate 2? Always same as Frame rate 1");
     Skip_S2(16,                                                 "Frame number?");
     Element_Begin1("SMPTE time code?");

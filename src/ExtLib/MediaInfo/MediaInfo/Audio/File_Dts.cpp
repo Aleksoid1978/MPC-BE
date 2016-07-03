@@ -340,7 +340,7 @@ File_Dts::File_Dts()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("Dts");
+    ParserName="Dts";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Dts;
         StreamIDs_Width[0]=0;

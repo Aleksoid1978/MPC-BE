@@ -73,7 +73,7 @@ File_Scc::File_Scc()
 :File__Analyze()
 {
     //Configuration
-    ParserName=__T("SCC");
+    ParserName="SCC";
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Scc;
     #endif //MEDIAINFO_EVENTS

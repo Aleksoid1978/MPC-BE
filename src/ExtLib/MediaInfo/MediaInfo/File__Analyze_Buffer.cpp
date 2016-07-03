@@ -157,14 +157,7 @@ void File__Analyze::Get_B3(int32u &Info, const char* Name)
     INTEGRITY_SIZE_ATLEAST_INT(3);
     Info=BigEndian2int24u(Buffer+Buffer_Offset+(size_t)Element_Offset);
     if (Trace_Activated)
-    {
-        Ztring Pos1; Pos1.From_Number(Info, 16);
-        Ztring Temp;
-        Temp.resize(6-Pos1.size(), __T('0'));
-        Temp.append(Pos1);
-        Temp.MakeUpperCase();
-        Param(Name, Ztring::ToZtring(Info)+__T(" (0x")+Temp+__T(")"));
-    }
+        Param(Name, Info, 24);
     Element_Offset+=3;
 }
 
@@ -174,23 +167,7 @@ void File__Analyze::Get_B4(int32u &Info, const char* Name)
     INTEGRITY_SIZE_ATLEAST_INT(4);
     Info=BigEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
     if (Trace_Activated)
-    {
-        switch (Config_Trace_Format)
-        {
-            case MediaInfo_Config::Trace_Format_XML         :
-                                                                Param(Name, Ztring::ToZtring(Info));
-                                                                break;
-            default                                         :
-                                                                {
-                                                                Ztring Pos1; Pos1.From_Number(Info, 16);
-                                                                Ztring Temp;
-                                                                Temp.resize(8-Pos1.size(), __T('0'));
-                                                                Temp.append(Pos1);
-                                                                Temp.MakeUpperCase();
-                                                                Param(Name, Ztring::ToZtring(Info)+__T(" (0x")+Temp+__T(")"));
-                                                                }
-        }
-    }
+        Param(Name, Info);
     Element_Offset+=4;
 }
 
@@ -408,12 +385,7 @@ void File__Analyze::Skip_B3(const char* Name)
     if (Trace_Activated)
     {
         int32u Info=BigEndian2int24u(Buffer+Buffer_Offset+(size_t)Element_Offset);
-        Ztring Pos1; Pos1.From_Number(Info, 16);
-        Ztring Temp;
-        Temp.resize(6-Pos1.size(), __T('0'));
-        Temp.append(Pos1);
-        Temp.MakeUpperCase();
-        Param(Name, Ztring::ToZtring(Info)+__T(" (0x")+Temp+__T(")"));
+        Param(Name, Info, 24);
     }
     Element_Offset+=3;
 }
@@ -425,21 +397,7 @@ void File__Analyze::Skip_B4(const char* Name)
     if (Trace_Activated)
     {
         int32u Info=BigEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
-        switch (Config_Trace_Format)
-        {
-            case MediaInfo_Config::Trace_Format_XML         :
-                                                                Param(Name, Ztring::ToZtring(Info));
-                                                                break;
-            default                                         :
-                                                                {
-                                                                Ztring Pos1; Pos1.From_Number(Info, 16);
-                                                                Ztring Temp;
-                                                                Temp.resize(8-Pos1.size(), __T('0'));
-                                                                Temp.append(Pos1);
-                                                                Temp.MakeUpperCase();
-                                                                Param(Name, Ztring::ToZtring(Info)+__T(" (0x")+Temp+__T(")"));
-                                                                }
-        }
+        Param(Name, Info);
     }
     Element_Offset+=4;
 }
@@ -689,12 +647,7 @@ void File__Analyze::Skip_L3(const char* Name)
     if (Trace_Activated)
     {
         int32u Info=LittleEndian2int24u(Buffer+Buffer_Offset+(size_t)Element_Offset);
-        Ztring Pos1; Pos1.From_Number(Info, 16);
-        Ztring Temp;
-        Temp.resize(6-Pos1.size(), __T('0'));
-        Temp.append(Pos1);
-        Temp.MakeUpperCase();
-        Param(Name, Ztring::ToZtring(Info)+__T(" (0x")+Temp+__T(")"));
+        Param(Name, Info, 24);
     }
     Element_Offset+=3;
 }
@@ -706,12 +659,7 @@ void File__Analyze::Skip_L4(const char* Name)
     if (Trace_Activated)
     {
         int32u Info=LittleEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
-        Ztring Pos1; Pos1.From_Number(Info, 16);
-        Ztring Temp;
-        Temp.resize(8-Pos1.size(), __T('0'));
-        Temp.append(Pos1);
-        Temp.MakeUpperCase();
-        Param(Name, Ztring::ToZtring(Info)+__T(" (0x")+Temp+__T(")"));
+        Param(Name, Info);
     }
     Element_Offset+=4;
 }
@@ -940,12 +888,7 @@ void File__Analyze::Skip_D3(const char* Name)
     if (Trace_Activated)
     {
         int32u Info=LittleEndian2int24u(Buffer+Buffer_Offset+(size_t)Element_Offset);
-        Ztring Pos1; Pos1.From_Number(Info, 16);
-        Ztring Temp;
-        Temp.resize(6-Pos1.size(), __T('0'));
-        Temp.append(Pos1);
-        Temp.MakeUpperCase();
-        Param(Name, Ztring::ToZtring(Info)+__T(" (0x")+Temp+__T(")"));
+        Param(Name, Info, 24);
     }
     Element_Offset+=6;
 }
@@ -957,12 +900,7 @@ void File__Analyze::Skip_D4(const char* Name)
     if (Trace_Activated)
     {
         int32u Info=LittleEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
-        Ztring Pos1; Pos1.From_Number(Info, 16);
-        Ztring Temp;
-        Temp.resize(8-Pos1.size(), __T('0'));
-        Temp.append(Pos1);
-        Temp.MakeUpperCase();
-        Param(Name, Ztring::ToZtring(Info)+__T(" (0x")+Temp+__T(")"));
+        Param(Name, Info);
     }
     Element_Offset+=8;
 }
@@ -1150,7 +1088,7 @@ void File__Analyze::Get_EB(int64u &Info, const char* Name)
                  break;
     }
 
-    if (Trace_Activated) Param(Name, Info);
+    if (Trace_Activated) Param(Name, Info, Size * 7);
     Element_Offset+=Size;
 }
 
@@ -2036,7 +1974,7 @@ void File__Analyze::Get_Flags (int64u Flags, size_t Order, bool &Info, const cha
         Info=false;
 
     Element_Begin0();
-    if (Trace_Activated && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_XML) Param(Name, Info?"Yes":"No");
+    if (Trace_Activated && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_XML && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_MICRO_XML) Param(Name, Info);
     Element_End0();
 }
 
@@ -2046,7 +1984,7 @@ void File__Analyze::Get_Flags (int64u ValueToPut, int8u &Info, const char* Name)
     Info=(int8u)ValueToPut;
 
     Element_Begin0();
-    if (Trace_Activated && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_XML) Param(Name, Info);
+    if (Trace_Activated && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_XML && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_MICRO_XML) Param(Name, Info);
     Element_End0();
 }
 
@@ -2054,7 +1992,7 @@ void File__Analyze::Get_Flags (int64u ValueToPut, int8u &Info, const char* Name)
 void File__Analyze::Skip_Flags(int64u Flags, size_t Order, const char* Name)
 {
     Element_Begin0();
-    if (Trace_Activated && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_XML) Param(Name, (Flags&((int64u)1<<Order))?"Yes":"No"); //TODO: support flags in XML trace
+    if (Trace_Activated && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_XML && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_MICRO_XML) Param(Name, (Flags&((int64u)1<<Order))); //TODO: support flags in XML trace
     Element_End0();
 }
 
@@ -2062,7 +2000,7 @@ void File__Analyze::Skip_Flags(int64u Flags, size_t Order, const char* Name)
 void File__Analyze::Skip_Flags(int64u ValueToPut, const char* Name)
 {
     Element_Begin0();
-    if (Trace_Activated && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_XML) Param(Name, ValueToPut);
+    if (Trace_Activated && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_XML && MediaInfoLib::Config.Trace_Format_Get()!=MediaInfoLib::Config.Trace_Format_MICRO_XML) Param(Name, ValueToPut);
     Element_End0();
 }
 
