@@ -306,6 +306,7 @@ CThumbsTaskDlg::CThumbsTaskDlg(LPCTSTR filename)
 		TDCBF_CANCEL_BUTTON,
 		TDF_CALLBACK_TIMER | TDF_SHOW_PROGRESS_BAR | TDF_POSITION_RELATIVE_TO_WINDOW)
 	, m_filename(filename)
+	, m_pMainFrm(NULL)
 	, m_iProgress(0)
 	, m_bAbort(false)
 {

@@ -218,7 +218,7 @@ HBITMAP CMPCPngImage::TypeLoadImage(IMG_TYPE type, BYTE** pData, int* width, int
 		*height = abs(bi.bmiHeader.biHeight);
 		*bpp = bi.bmiHeader.biBitCount;
 
-		hbm = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)&(*pData), 0, 0);
+		hbm = CreateDIBSection(0, &bi, DIB_RGB_COLORS, (void**)pData, 0, 0);
 
 	} else if (type == IMG_TYPE::PNG) {
 
@@ -253,7 +253,7 @@ HBITMAP CMPCPngImage::TypeLoadImage(IMG_TYPE type, BYTE** pData, int* width, int
 
 		BITMAPINFO bmi = {{sizeof(BITMAPINFOHEADER), *width, -(*height), 1, *bpp, BI_RGB, 0, 0, 0, 0, 0}};
 
-		hbm = CreateDIBSection(0, &bmi, DIB_RGB_COLORS, (void**)&(*pData), 0, 0);
+		hbm = CreateDIBSection(0, &bmi, DIB_RGB_COLORS, (void**)pData, 0, 0);
 	}
 
 	int memWidth = (*width) * (*bpp) / 8;

@@ -759,7 +759,7 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 		return S_FALSE;
 	}
 
-	bool bFormatChanged = m_pSSF->m_bInputPinChanged | m_pSSF->m_bOutputFormatChanged;
+	bool bFormatChanged = m_pSSF->m_bInputPinChanged || m_pSSF->m_bOutputFormatChanged;
 
 	AM_MEDIA_TYPE* pmt = NULL;
 	if (SUCCEEDED(pSample->GetMediaType(&pmt)) && pmt) {

@@ -155,7 +155,7 @@ HRESULT CAC3Encoder::Encode(CAtlArray<float>& BuffIn, CAtlArray<BYTE>& BuffOut)
 	av_packet_unref(&avpkt);
 
 	size_t old_size  = BuffIn.GetCount() * sizeof(float);
-	size_t new_size  = BuffIn.GetCount() * sizeof(float) - m_framesize;
+	size_t new_size  = old_size - m_framesize;
 	size_t new_count = new_size / sizeof(float);
 
 	memmove(pIn, (BYTE*)pIn + m_framesize, new_size);
