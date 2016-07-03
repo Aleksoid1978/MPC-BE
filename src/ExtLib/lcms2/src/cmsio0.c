@@ -368,6 +368,7 @@ cmsIOHANDLER* CMSEXPORT cmsOpenIOhandlerFromFile(cmsContext ContextID, const cha
 {
     cmsIOHANDLER* iohandler = NULL;
     FILE* fm = NULL;
+    cmsInt32Number fileLen;
 
     _cmsAssert(FileName != NULL);
     _cmsAssert(AccessMode != NULL);
@@ -383,8 +384,16 @@ cmsIOHANDLER* CMSEXPORT cmsOpenIOhandlerFromFile(cmsContext ContextID, const cha
             _cmsFree(ContextID, iohandler);
              cmsSignalError(ContextID, cmsERROR_FILE, "File '%s' not found", FileName);
             return NULL;
+        }                                     
+        fileLen = cmsfilelength(fm);
+        if (fileLen < 0)
+        {
+            _cmsFree(ContextID, iohandler);
+            cmsSignalError(ContextID, cmsERROR_FILE, "Cannot get size of file '%s'", FileName);
+            return NULL;
         }
-        iohandler -> ReportedSize = (cmsUInt32Number) cmsfilelength(fm);
+
+        iohandler -> ReportedSize = (cmsUInt32Number) fileLen;
         break;
 
     case 'w':
@@ -424,6 +433,14 @@ cmsIOHANDLER* CMSEXPORT cmsOpenIOhandlerFromFile(cmsContext ContextID, const cha
 cmsIOHANDLER* CMSEXPORT cmsOpenIOhandlerFromStream(cmsContext ContextID, FILE* Stream)
 {
     cmsIOHANDLER* iohandler = NULL;
+    cmsInt32Number fileSize;
+
+    fileSize = cmsfilelength(Stream);
+    if (fileSize < 0)
+    {
+        cmsSignalError(ContextID, cmsERROR_FILE, "Cannot get size of stream");
+        return NULL;
+    }
 
     iohandler = (cmsIOHANDLER*) _cmsMallocZero(ContextID, sizeof(cmsIOHANDLER));
     if (iohandler == NULL) return NULL;
@@ -431,7 +448,7 @@ cmsIOHANDLER* CMSEXPORT cmsOpenIOhandlerFromStream(cmsContext ContextID, FILE* S
     iohandler -> ContextID = ContextID;
     iohandler -> stream = (void*) Stream;
     iohandler -> UsedSpace = 0;
-    iohandler -> ReportedSize = (cmsUInt32Number) cmsfilelength(Stream);
+    iohandler -> ReportedSize = (cmsUInt32Number) fileSize;
     iohandler -> PhysicalFile[0] = 0;
 
     iohandler ->Read    = FileRead;
