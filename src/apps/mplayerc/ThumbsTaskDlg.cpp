@@ -283,6 +283,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 
 	m_pMainFrm->SaveDIB(thumbpath, dib.get(), dibsize);
 
+	m_bSuccessfully = true;
 	m_iProgress = PROGRESS_COMPLETED; // the end
 }
 
@@ -296,6 +297,7 @@ CThumbsTaskDlg::CThumbsTaskDlg(LPCTSTR filename)
 	, m_pMainFrm(NULL)
 	, m_iProgress(0)
 	, m_bAbort(false)
+	, m_bSuccessfully(false)
 {
 
 	SetDialogWidth(150);
