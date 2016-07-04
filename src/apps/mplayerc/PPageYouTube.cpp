@@ -101,7 +101,7 @@ BOOL CPPageYoutube::OnInitDialog()
 		}
 	}
 	if (i >= m_cbPreferredFormat.GetCount()) {
-		m_cbPreferredFormat.SetCurSel(0);
+		SelectByItemData(m_cbPreferredFormat, 22);
 	}
 
 	m_chkLoadPlaylist.SetCheck(s.bYoutubeLoadPlaylist);
