@@ -27,7 +27,6 @@
 #include "DeinterlacerFilter.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/FileVersionInfo.h"
-#include "../../DSUtil/HTTPAsync.h"
 #include "../../filters/transform/DeCSSFilter/VobFile.h"
 #include <InitGuid.h>
 #include <dmodshow.h>
@@ -36,6 +35,7 @@
 #include <ksproxy.h>
 #include <moreuuids.h>
 #include "MediaFormats.h"
+#include "Content.h"
 #include <IPinHook.h>
 
 #define MERIT64_EXT_FILTERS_PREFER (MERIT64_ABOVE_DSHOW + 0x2000)
@@ -347,9 +347,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 
-	CHTTPAsync HTTPAsync;
-	BYTE httpbuf[1024] = { 0 };
-	DWORD httpbufSize = 0;
+	std::vector<BYTE> httpbuf;
 
 	if ((protocol.GetLength() <= 1 || protocol == L"file") && (ext.Compare(_T(".cda")) != 0)) {
 		hFile = CreateFile(CString(fn), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
@@ -357,11 +355,8 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		if (hFile == INVALID_HANDLE_VALUE) {
 			return VFW_E_NOT_FOUND;
 		}
-	} else if (::PathIsURL(lpcwstrFileName) && HTTPAsync.Connect(lpcwstrFileName, 10000) == S_OK) {
-		if (HTTPAsync.GetLenght() > 0) {
-			HTTPAsync.Read(httpbuf, _countof(httpbuf), &httpbufSize, 1000);
-			HTTPAsync.Close();
-		}
+	} else {
+		Content::Online::GetRaw(lpcwstrFileName, httpbuf);
 	}
 
 	TCHAR buff[256], buff2[256];
@@ -371,14 +366,14 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	{
 		if (hFile == INVALID_HANDLE_VALUE) {
 			// check bytes for http
-			if (httpbufSize) {
+			if (httpbuf.size()) {
 				POSITION pos = m_source.GetHeadPosition();
 				while (pos) {
 					CFGFilter* pFGF = m_source.GetNext(pos);
 
 					POSITION pos2 = pFGF->m_chkbytes.GetHeadPosition();
 					while (pos2) {
-						if (CheckBytes(httpbuf, httpbufSize, pFGF->m_chkbytes.GetNext(pos2))) {
+						if (CheckBytes(httpbuf.data(), httpbuf.size(), pFGF->m_chkbytes.GetNext(pos2))) {
 							fl.Insert(pFGF, 0, false, false);
 							break;
 						}
@@ -450,8 +445,8 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		// Filters Priority
 		CAppSettings& s = AfxGetAppSettings();
 		CMediaFormatCategory* mfc = s.m_Formats.FindMediaByExt(ext);
-		if (mfc || httpbufSize) {
-			CString type = httpbufSize ? L"http" : mfc->GetLabel();
+		if (mfc || httpbuf.size()) {
+			CString type = httpbuf.size() ? L"http" : mfc->GetLabel();
 			CLSID clsid_value = CLSID_NULL;
 			if (s.FiltersPrioritySettings.values.Lookup(type, clsid_value) && clsid_value != CLSID_NULL) {
 				POSITION pos = m_override.GetHeadPosition();
@@ -459,7 +454,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 					CFGFilter* pFGF = m_override.GetNext(pos);
 					if (pFGF->GetCLSID() == clsid_value) {
 						const CAtlList<GUID>& types = pFGF->GetTypes();
-						if (types.GetCount() && !httpbufSize) {
+						if (types.GetCount() && !httpbuf.size()) {
 							bool bIsSplitter = false;
 							POSITION pos = types.GetHeadPosition();
 							while (pos) {

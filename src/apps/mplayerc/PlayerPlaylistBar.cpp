@@ -28,6 +28,7 @@
 #include "SaveTextFileDialog.h"
 #include "PlayerPlaylistBar.h"
 #include "OpenDlg.h"
+#include "Content.h"
 
 static CString MakePath(CString path)
 {
@@ -1043,8 +1044,12 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CSubtitleItemList
 			}
 		}
 
+
+		const CString fn = fns.GetHead();
+		Content::Online::Clear(fn);
+
 		CAtlList<CString> redir;
-		CString ct = GetContentType(fns.GetHead(), &redir);
+		const CString ct = Content::GetType(fn, &redir);
 		if (!redir.IsEmpty()) {
 			POSITION pos = redir.GetHeadPosition();
 			while (pos) {
@@ -1054,16 +1059,16 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CSubtitleItemList
 		}
 
 		if (ct == L"application/x-mpc-playlist") {
-			ParseMPCPlayList(fns.GetHead());
+			ParseMPCPlayList(fn);
 			return;
 		} else if (ct == L"application/x-bdmv-playlist" && s.SrcFilters[SRC_MPEG]) {
-			ParseBDMVPlayList(fns.GetHead());
+			ParseBDMVPlayList(fn);
 			return;
 		} else if (ct == L"audio/x-mpegurl" || ct == L"application/http-live-streaming-m3u") {
-			ParseM3UPlayList(fns.GetHead());
+			ParseM3UPlayList(fn);
 			return;
 		} else if (ct == L"application/x-cue-metadata") {
-			if (ParseCUEPlayList(fns.GetHead())) {
+			if (ParseCUEPlayList(fn)) {
 				return;
 			}
 		}

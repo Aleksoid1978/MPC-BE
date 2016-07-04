@@ -29,7 +29,6 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/Filehandle.h"
 #include "../../DSUtil/FileVersionInfo.h"
-#include "../../DSUtil/HTTPAsync.h"
 #include "OpenDlg.h"
 #include "SaveDlg.h"
 #include "GoToDlg.h"
@@ -87,6 +86,7 @@
 #include <regex>
 
 #include "ThumbsTaskDlg.h"
+#include "Content.h"
 
 #define DEFCLIENTW		292
 #define DEFCLIENTH		200
@@ -11225,11 +11225,11 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
 		engine_t engine = s.GetFileEngine(pFileData->fns.GetHead());
 
-		CStringA ct = GetContentType(pFileData->fns.GetHead());
+		const CString ct = Content::GetType(pFileData->fns.GetHead());
 
-		if (ct == "video/x-ms-asf") {
+		if (ct == L"video/x-ms-asf") {
 			// TODO: put something here to make the windows media source filter load later
-		} else if (ct == "application/x-shockwave-flash") {
+		} else if (ct == L"application/x-shockwave-flash") {
 			engine = ShockWave;
 		}
 
@@ -11465,6 +11465,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			youtubeUrl = fn;
 			CAtlList<CString> urls;
 			if (YoutubeParser::Parse_URL(fn, urls, m_youtubeFields, m_youtubeUrllist, pOFD->subs, pOFD->rtStart)) {
+				Content::Online::Disconnect(fn);
+
 				pOFD->fns.RemoveAll();
 				POSITION pos = urls.GetHeadPosition();
 				while (pos) {
@@ -11513,17 +11515,11 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 		HRESULT hr = S_OK;
 
-		CString tmp(fn);
-		tmp.MakeLower();
-
-		CUrl url;
-		if (::PathIsURL(tmp) && url.CrackUrl(tmp)
-				&& (url.GetScheme() == ATL_URL_SCHEME_HTTP || url.GetScheme() == ATL_URL_SCHEME_HTTPS)) {
-			CHTTPAsync HTTPAsync;
-			if (FAILED(HTTPAsync.Connect(fn, 10000))) {
-				hr = VFW_E_NOT_FOUND;
-			}
+		if (!Content::Online::CheckConnect(fn)) {
+			hr = VFW_E_NOT_FOUND;
 		}
+
+		Content::Online::Disconnect(fn);
 
 		if (SUCCEEDED(hr)) {
 			TCHAR path[MAX_PATH] = { 0 };
@@ -13716,6 +13712,8 @@ void CMainFrame::CloseMediaPrivate()
 
 	m_pparray.RemoveAll();
 	m_ssarray.RemoveAll();
+
+	Content::Online::Clear();
 
 	if (m_pMC) {
 		OAFilterState fs;
