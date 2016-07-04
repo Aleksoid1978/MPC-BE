@@ -44,8 +44,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 
 	if (!thumbpath
 			|| !(m_pMainFrm->m_pMS)
-			|| !(m_pMainFrm->m_pFS)
-			|| !(m_pMainFrm->m_pME)) {
+			|| !(m_pMainFrm->m_pFS)) {
 		m_iProgress = PROGRESS_E_FAIL;
 		return;
 	}
@@ -156,27 +155,15 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 
 		m_pMainFrm->SeekTo(rt, false);
 
+		m_pMainFrm->m_fFrameSteppingActive = true;
 		// Number of steps you need to do more than one for some decoders.
 		// TODO - maybe need to find another way to get correct frame ???
 		HRESULT hr = m_pMainFrm->m_pFS->Step(2, NULL);
-
-		HANDLE hGraphEvent = NULL;
-		m_pMainFrm->m_pME->GetEventHandle((OAEVENT*)&hGraphEvent);
-		while (hGraphEvent && WaitForSingleObject(hGraphEvent, INFINITE) == WAIT_OBJECT_0
-				&& !m_bAbort) {
-			LONG evCode = 0;
-			LONG_PTR evParam1, evParam2;
-			while (m_pMainFrm->m_pME && SUCCEEDED(m_pMainFrm->m_pME->GetEvent(&evCode, &evParam1, &evParam2, 0))
-					&& !m_bAbort) {
-				m_pMainFrm->m_pME->FreeEventParams(evCode, evParam1, evParam2);
-				if (EC_STEP_COMPLETE == evCode) {
-					hGraphEvent = NULL;
-				}
+		while (m_pMainFrm->m_fFrameSteppingActive) {
+			if (m_bAbort) {
+				return;
 			}
-		}
-
-		if (m_bAbort) {
-			return;
+			Sleep(50);
 		}
 
 		const int col = (i - 1) % cols;
