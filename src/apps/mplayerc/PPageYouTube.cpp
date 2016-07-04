@@ -62,6 +62,17 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	m_cbPreferredFormat.Clear();
 
+	{
+		LOGFONT lf;
+		memset(&lf, 0, sizeof(lf));
+		lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
+		CDC* cDC = m_cbPreferredFormat.GetDC();
+		lf.lfHeight = -MulDiv(8, cDC->GetDeviceCaps(LOGPIXELSY), 72);
+		wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Courier New");
+		m_MonoFont.CreateFontIndirect(&lf);
+		m_cbPreferredFormat.SetFont(&m_MonoFont);
+	}
+
 	auto getSorted = [] () {
 		std::vector<YoutubeParser::YoutubeProfiles> profiles;
 		profiles.assign(YoutubeParser::youtubeVideoProfiles, YoutubeParser::youtubeVideoProfiles + _countof(YoutubeParser::youtubeVideoProfiles) - 1);
