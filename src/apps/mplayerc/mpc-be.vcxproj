@@ -189,6 +189,7 @@
     <ClCompile Include="BaseGraph.cpp" />
     <ClCompile Include="ColorControl.cpp" />
     <ClCompile Include="ComPropertyPage.cpp" />
+    <ClCompile Include="Content.cpp" />
     <ClCompile Include="CShockwaveFlash.cpp" />
     <ClCompile Include="DiskImage.cpp" />
     <ClCompile Include="ItemPropertiesDlg.cpp" />
@@ -301,6 +302,7 @@
     <ClInclude Include="BaseGraph.h" />
     <ClInclude Include="ColorControl.h" />
     <ClInclude Include="ComPropertyPage.h" />
+    <ClInclude Include="Content.h" />
     <ClInclude Include="CShockwaveFlash.h" />
     <ClInclude Include="DIB.h" />
     <ClInclude Include="DiskImage.h" />
