@@ -35,6 +35,8 @@ private:
 	CComboBox m_cbPreferredFormat;
 	CButton m_chkLoadPlaylist;
 
+	CFont m_MonoFont;
+
 public:
 	CPPageYoutube();
 	virtual ~CPPageYoutube();

@@ -887,42 +887,32 @@ namespace YoutubeParser {
 
 	const CString FormatProfiles(const YoutubeProfiles profile) {
 		CString fmt;
-		CString fps;
 		switch (profile.type) {
-			case ytype::y_mp4:
-				fmt = L"MP4";
+			case y_mp4:
+			case y_dash_mp4_video:
+			case y_dash_mp4_video_60fps:
+				fmt = L"MP4 ";
 				break;
-			case ytype::y_webm:
+			case y_webm:
+			case y_webm_video:
+			case y_webm_video_60fps:
 				fmt = L"WebM";
 				break;
-			case ytype::y_3gp:
-				fmt = L"3GP";
-				break;
-#if ENABLE_YOUTUBE_3D
-			case ytype::y_3d_mp4:
-				fmt = L"3D MP4";
-				break;
-			case ytype::y_3d_webm:
-				fmt = L"3D WebM";
-				break;
-#endif
-			case ytype::y_webm_video_60fps:
-				fps = L"60";
-			case ytype::y_webm_video:
-				fmt = L"WebM";
-				break;
-			case ytype::y_dash_mp4_video_60fps:
-				fps = L"60";
-			case ytype::y_dash_mp4_video:
-				fmt = L"DASH MP4";
+			case y_3gp:
+				fmt = L"3GP ";
 				break;
 		}
 
-		if (!fmt.IsEmpty()) {
-			fmt.AppendFormat(L"@%dp", profile.quality);
-			if (!fps.IsEmpty()) {
-				fmt.AppendFormat(L"%s", fps);
-			}
+		fmt.AppendFormat(L"  %4dp", profile.quality);
+
+		if (profile.type == y_dash_mp4_video_60fps || profile.type == y_webm_video_60fps) {
+			fmt.Append(L"  60fps");
+		} else {
+			fmt.Append(L"       ");
+		}
+
+		if (profile.type == y_dash_mp4_video || profile.type == y_dash_mp4_video_60fps) {
+			fmt.Append(L"  DASH");
 		}
 
 		return fmt;
