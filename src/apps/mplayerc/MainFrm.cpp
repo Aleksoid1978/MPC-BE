@@ -5885,8 +5885,9 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 
 	const REFERENCE_TIME rtPos = GetPos();
 
-	m_nVolumeBeforeFrameStepping = m_wndToolBar.Volume;
+	int volume = m_wndToolBar.Volume;
 	m_pBA->put_Volume(-10000);
+	m_nVolumeBeforeFrameStepping = -10000;
 
 	m_wndSeekBar.LockWindowUpdate();
 
@@ -5895,7 +5896,8 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 
 	m_wndSeekBar.UnlockWindowUpdate();
 
-	m_pBA->put_Volume(m_nVolumeBeforeFrameStepping);
+	m_pBA->put_Volume(volume);
+	m_nVolumeBeforeFrameStepping = volume;
 
 	SeekTo(rtPos, false);
 	if (ms == State_Running) {
