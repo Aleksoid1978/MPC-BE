@@ -47,6 +47,8 @@ public:
 	CThumbsTaskDlg(LPCTSTR filename);
 	virtual ~CThumbsTaskDlg();
 
+	bool m_bSuccessfully;
+
 protected:
 	virtual HRESULT OnInit();
 	virtual HRESULT OnTimer(_In_ long lTime);

@@ -5904,7 +5904,9 @@ void CMainFrame::SaveThumbnails(LPCTSTR fn)
 		SendMessage(WM_COMMAND, ID_PLAY_PLAY);
 	}
 
-	m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_THUMBS_SAVED), 3000);
+	if (dlg.m_bSuccessfully) {
+		m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_THUMBS_SAVED), 3000);
+	}
 }
 
 static CString MakeSnapshotFileName(LPCTSTR prefix)
