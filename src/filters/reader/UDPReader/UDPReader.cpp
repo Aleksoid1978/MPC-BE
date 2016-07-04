@@ -455,7 +455,7 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 		const ULONGLONG start = GetPerfCounter();
 #endif
 
-		m_EventComplete.Wait();
+		while (!m_bEndOfStream && !m_EventComplete.Wait(1));
 		m_SizeComplete = MAXLONGLONG - 1;
 
 #if DEBUG
@@ -495,6 +495,10 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 	}
 
 	CheckBuffer();
+
+	if (m_bEndOfStream && len > 0) {
+		EmptyBuffer();
+	}
 
 	return len == dwBytesToRead ? E_FAIL : (len > 0 ? S_FALSE : S_OK);
 }
@@ -590,9 +594,9 @@ DWORD CUDPStream::ThreadProc()
 			case CMD::CMD_RUN:
 				m_EventComplete.Reset();
 				Reply(S_OK);
-				char  buff[MAXBUFSIZE * 2];
-				int   buffsize = 0;
-				UINT  attempts = 0;
+				char buff[MAXBUFSIZE * 2];
+				int  buffsize = 0;
+				UINT attempts = 0;
 
 				BOOL bEndOfStream = FALSE;
 				while (!CheckRequest(NULL)
@@ -669,7 +673,7 @@ DWORD CUDPStream::ThreadProc()
 				}
 
 				if (attempts >= 200 || bEndOfStream) {
-					EmptyBuffer();
+					m_bEndOfStream = TRUE;
 				}
 
 				break;

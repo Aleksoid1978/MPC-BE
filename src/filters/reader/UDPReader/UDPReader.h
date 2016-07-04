@@ -82,6 +82,8 @@ private:
 	void CheckBuffer();
 	void EmptyBuffer();
 
+	volatile BOOL m_bEndOfStream = FALSE;
+
 public:
 	CUDPStream();
 	virtual ~CUDPStream();
