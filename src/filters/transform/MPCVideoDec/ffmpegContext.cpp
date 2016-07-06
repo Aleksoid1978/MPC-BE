@@ -245,10 +245,20 @@ static const WORD PCID_ATI_UVD [] = {
 
 static const WORD PCID_AMD_4K [] = { // not tested
 	// http://pci-ids.ucw.cz/read/PC/1002
+	// UVD ?
+	0x67C0, // Polaris10 (Ellesmere)
+	0x67DF, // Radeon RX 480 (Ellesmere)
+	0x67e0, // Polaris11 (Baffin)
+	0x67e1, // Polaris11 (Baffin)
+	0x67e8, // Polaris11 (Baffin)
+	0x67e9, // Polaris11 (Baffin)
+	0x67eb, // Polaris11 (Baffin)
+	0x67ff, // Polaris11 (Baffin)
 	// UVD 5
-	0x6939, // Radeon R9 285/380
+	0x6939, // Radeon R9 285/380 (Tonga PRO)
 	// UVD 6
-	0x7300, // Radeon R9 FURY Series
+	0x7300, // Radeon R9 FURY/NANO Series (Fiji)
+	0x9874, // Carrizo
 };
 
 static const WORD PCID_INTEL_4K [] = {
