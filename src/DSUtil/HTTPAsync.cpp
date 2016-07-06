@@ -200,7 +200,7 @@ void CHTTPAsync::Close()
 	m_bRequestComplete = TRUE;
 }
 
-HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPCTSTR lpszAgent/* = L"MPC-BE"*/, BOOL bSendRequest/* = TRUE*/)
+HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPCTSTR lpszAgent/* = L"MPC-BE"*/, LPCTSTR lpszCustomHeader/* = L""*/, BOOL bSendRequest/* = TRUE*/)
 {
 	Close();
 
@@ -257,7 +257,7 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	CheckPointer(m_hConnect, E_FAIL);
 
 	if (bSendRequest) {
-		if (SendRequest(L"", dwTimeOut) != S_OK) {
+		if (SendRequest(lpszCustomHeader, dwTimeOut) != S_OK) {
 			return E_FAIL;
 		}
 
@@ -276,7 +276,7 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	return S_OK;
 }
 
-HRESULT CHTTPAsync::SendRequest(LPCTSTR customHeader/* = L""*/, DWORD dwTimeOut/* = INFINITE*/)
+HRESULT CHTTPAsync::SendRequest(LPCTSTR lpszCustomHeader/* = L""*/, DWORD dwTimeOut/* = INFINITE*/)
 {
 	CheckPointer(m_hConnect, E_FAIL);
 
@@ -320,7 +320,7 @@ HRESULT CHTTPAsync::SendRequest(LPCTSTR customHeader/* = L""*/, DWORD dwTimeOut/
 	CheckPointer(m_hRequest, E_FAIL);
 
 	CString lpszHeaders = L"Accept: */*\r\n";
-	lpszHeaders += customHeader;
+	lpszHeaders += lpszCustomHeader;
 	for (;;) {
 		if (!HttpSendRequest(m_hRequest,
 							 lpszHeaders,
