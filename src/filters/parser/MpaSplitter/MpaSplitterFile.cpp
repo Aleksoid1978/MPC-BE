@@ -62,6 +62,10 @@ HRESULT CMpaSplitterFile::Init()
 	m_startpos = 0;
 	__int64 endpos = GetLength();
 
+	if (IsURL()) {
+		SetCacheSize(16 * KILOBYTE);
+	}
+
 	Seek(0);
 
 	// some files can be determined as Mpeg Audio

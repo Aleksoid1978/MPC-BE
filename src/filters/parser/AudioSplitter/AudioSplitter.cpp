@@ -158,6 +158,10 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 	m_pFile->SetBreakHandle(GetRequestHandle());
 
+	if (m_pFile->IsURL()) {
+		m_pFile->SetCacheSize(16 * KILOBYTE);
+	}
+
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
