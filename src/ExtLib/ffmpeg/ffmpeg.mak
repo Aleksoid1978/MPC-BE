@@ -31,7 +31,7 @@ CFLAGS	= -I. -I.. -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(SPEEX_DIR)\
 		-DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 		-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 \
 		-fomit-frame-pointer -std=gnu99 \
-		-fno-common -mthreads
+		-fno-common -fno-ident -mthreads
 YASMFLAGS = -I. -Pconfig.asm
 
 ifeq ($(64BIT),yes)
