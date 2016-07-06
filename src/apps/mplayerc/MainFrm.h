@@ -1209,11 +1209,11 @@ public:
 	HRESULT		UpdateThumbnailClip();
 
 	HMODULE		m_hDWMAPI;
-	HRESULT		(__stdcall * m_DwmGetWindowAttributeFnc)(HWND hwnd, DWORD dwAttribute, __in  LPCVOID pvAttribute, DWORD cbAttribute);
-	HRESULT		(__stdcall * m_DwmSetWindowAttributeFnc)(HWND hwnd, DWORD dwAttribute, __in  LPCVOID pvAttribute, DWORD cbAttribute);
-	HRESULT		(__stdcall * m_DwmSetIconicThumbnailFnc)( __in  HWND hwnd, __in  HBITMAP hbmp, __in  DWORD dwSITFlags);
-	HRESULT		(__stdcall * m_DwmSetIconicLivePreviewBitmapFnc)(HWND hwnd, HBITMAP hbmp, __in_opt  POINT *pptClient, DWORD dwSITFlags);
-	HRESULT		(__stdcall * m_DwmInvalidateIconicBitmapsFnc)( __in  HWND hwnd);
+	HRESULT		(__stdcall * m_DwmGetWindowAttributeFnc)(HWND hwnd, DWORD dwAttribute, __out_bcount(cbAttribute) PVOID pvAttribute, DWORD cbAttribute);
+	HRESULT		(__stdcall * m_DwmSetWindowAttributeFnc)(HWND hwnd, DWORD dwAttribute, __in_bcount(cbAttribute) LPCVOID pvAttribute, DWORD cbAttribute);
+	HRESULT		(__stdcall * m_DwmSetIconicThumbnailFnc)(HWND hwnd, HBITMAP hbmp, DWORD dwSITFlags);
+	HRESULT		(__stdcall * m_DwmSetIconicLivePreviewBitmapFnc)(HWND hwnd, HBITMAP hbmp, __in_opt POINT *pptClient, DWORD dwSITFlags);
+	HRESULT		(__stdcall * m_DwmInvalidateIconicBitmapsFnc)(HWND hwnd);
 
 	HBITMAP		m_CaptureWndBitmap;
 	bool		isWindowMinimized;
@@ -1221,12 +1221,12 @@ public:
 	void		CreateCaptureWindow();
 
 
-	HRESULT		SetAudioPicture(BOOL show = TRUE);
+	HRESULT			SetAudioPicture(BOOL show = TRUE);
 	CMPCPngImage	m_InternalImage, m_InternalImageSmall;
-	bool		m_bInternalImageRes;
+	bool			m_bInternalImageRes;
 
-	HBITMAP		m_ThumbCashedBitmap;
-	CSize		m_ThumbCashedSize;
+	HBITMAP			m_ThumbCashedBitmap;
+	CSize			m_ThumbCashedSize;
 
 	void		AddFavorite(bool bDisplayMessage = false, bool bShowDialog = true);
 
@@ -1263,11 +1263,7 @@ protected:
 	::CEvent				m_hGraphThreadEventClose;
 
 public:
-#if (_MSC_VER < 1800)
-	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, UINT nEventData);
-#else
 	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData);
-#endif
 	afx_msg void OnSessionChange(UINT nSessionState, UINT nId);
 
 	void EnableShaders1(bool enable);
@@ -1283,8 +1279,6 @@ public:
 
 private:
 	int			GetStreamCount(DWORD dwSelGroup);
-
-	DWORD_PTR	m_nMainFilterId;
 
 	BOOL		m_bLeftMouseDown			= FALSE;
 	BOOL		m_bLeftMouseDownFullScreen	= FALSE;

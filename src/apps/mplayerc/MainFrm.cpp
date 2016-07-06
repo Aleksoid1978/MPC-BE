@@ -664,7 +664,6 @@ CMainFrame::CMainFrame() :
 	m_hNotifyRenderThread(NULL),
 	m_hStopNotifyRenderThreadEvent(NULL),
 	m_hRefreshNotifyRenderThreadEvent(NULL),
-	m_nMainFilterId(NULL),
 	m_hGraphThreadEventOpen(FALSE, TRUE),
 	m_hGraphThreadEventClose(FALSE, TRUE),
 	m_DwmGetWindowAttributeFnc(NULL),
@@ -11452,8 +11451,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		return ResStr(IDS_MAINFRM_81);
 	}
 
-	m_nMainFilterId = NULL;
-
 	CAppSettings& s = AfxGetAppSettings();
 
 	bool bFirst = true;
@@ -17977,11 +17974,7 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return ret;
 }
 
-#if (_MSC_VER < 1800)
-UINT CMainFrame::OnPowerBroadcast(UINT nPowerEvent, UINT nEventData)
-#else
 UINT CMainFrame::OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData)
-#endif
 {
 	static BOOL bWasPausedBeforeSuspention;
 	OAFilterState mediaState;
@@ -18818,15 +18811,6 @@ void CMainFrame::AddAudioPathsAddons(CString FileName)
 
 BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
 {
-	if (m_nMainFilterId) {
-		if (m_nMainFilterId == (DWORD_PTR)pBF) {
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	m_nMainFilterId = (DWORD_PTR)pBF;
 	while (pBF) {
 		if (CComQIPtr<IFileSourceFilter> pFSF = pBF) {
 			if (pFSF == m_pMainFSF) {
@@ -18839,7 +18823,6 @@ BOOL CMainFrame::CheckMainFilter(IBaseFilter* pBF)
 		pBF = GetUpStreamFilter(pBF);
 	}
 
-	m_nMainFilterId = NULL;
 	return FALSE;
 }
 
