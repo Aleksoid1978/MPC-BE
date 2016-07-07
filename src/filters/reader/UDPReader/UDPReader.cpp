@@ -121,7 +121,6 @@ STDMETHODIMP CUDPReader::Stop()
 
 STDMETHODIMP CUDPReader::Pause()
 {
-	m_stream.CallWorker(CUDPStream::CMD::CMD_PAUSE);
 	return S_OK;
 }
 
@@ -171,7 +170,6 @@ CUDPStream::CUDPStream()
 	, m_len(0)
 	, m_subtype(MEDIASUBTYPE_NULL)
 	, m_RequestCmd(0)
-	, m_EventComplete(TRUE)
 	, m_SizeComplete(MAXLONGLONG - 1)
 {
 }
@@ -329,14 +327,14 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			DWORD res = WSAWaitForMultipleEvents(1, &m_WSAEvent, FALSE, 100, FALSE);
 			if (res == WSA_WAIT_EVENT_0) {
 				WSAResetEvent(m_WSAEvent);
-				char buf[MAXBUFSIZE] = { 0 };
-				int len = recvfrom(m_UdpSocket, buf, MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &m_addr_size);
+				BYTE buf[MAXBUFSIZE] = {};
+				int len = recvfrom(m_UdpSocket, (PCHAR)buf, MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &m_addr_size);
 				if (len <= 0) {
 					timeout += 100;
 					continue;
 				}
-				GetType((BYTE*)buf, len, m_subtype);
-				Append((BYTE*)buf, len);
+				GetType(buf, len, m_subtype);
+				Append(buf, len);
 				break;
 			} else {
 				timeout += 100;
@@ -349,25 +347,22 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		}
 	} else if (str_protocol == L"http" || str_protocol == L"https") {
 		m_protocol = PR_HTTP;
-		BOOL connected = FALSE;
-		if (m_HTTPAsync.Connect(m_url_str, 10000, L"MPC UDP/HTTP Reader") == S_OK) {
+		BOOL bConnected = FALSE;
+		if (m_HTTPAsync.Connect(m_url_str, 10000, L"MPC UDP/HTTP Reader") == S_OK
+				&& !m_HTTPAsync.GetLenght()) {
 #ifdef DEBUG
 			const CString hdr = m_HTTPAsync.GetHeader();
 			DbgLog((LOG_TRACE, 3, "CUDPStream::Load() - HTTP hdr:\n%ws", hdr));
 #endif
-			const QWORD ContentLength = m_HTTPAsync.GetLenght();
-			if (ContentLength > 0) {
-				return false;
-			}
 
-			connected = TRUE;
+			bConnected = TRUE;
 			CString contentType = m_HTTPAsync.GetContentType();
 			contentType.MakeLower();
 			if (contentType == L"application/octet-stream"
 					|| contentType == L"video/unknown") {
-				BYTE buf[1024] = { 0 };
+				BYTE buf[1024] = {};
 				DWORD dwSizeRead = 0;
-				if (m_HTTPAsync.Read((PBYTE)&buf, sizeof(buf), &dwSizeRead) == S_OK && dwSizeRead) {
+				if (m_HTTPAsync.Read(buf, sizeof(buf), &dwSizeRead) == S_OK && dwSizeRead) {
 					GetType(buf, dwSizeRead, m_subtype);
 					Append(buf, dwSizeRead);
 				}
@@ -381,13 +376,13 @@ bool CUDPStream::Load(const WCHAR* fnw)
 				m_subtype = MEDIASUBTYPE_MP4;
 			} else if (contentType == L"video/x-flv") {
 				m_subtype = MEDIASUBTYPE_FLV;
-			} else { // "text/html..." and other
+			} else { // other ...
 					// not supported content-type
-				connected = FALSE;
+				bConnected = FALSE;
 			}
 		}
 
-		if (!connected) {
+		if (!bConnected) {
 			return false;
 		}
 	} else if (str_protocol == L"pipe") {
@@ -397,8 +392,8 @@ bool CUDPStream::Load(const WCHAR* fnw)
 
 		m_protocol = PR_PIPE;
 
-		BYTE buf[1024] = { 0 };
-		std::cin.read((char*)buf, sizeof(buf));
+		BYTE buf[1024] = {};
+		std::cin.read((PCHAR)buf, sizeof(buf));
 		std::streamsize len = std::cin.gcount();
 		if (len) {
 			GetType(buf, len, m_subtype);
@@ -414,9 +409,9 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		return false;
 	}
 
-	clock_t start = clock();
-	while (clock() - start < 1000 && m_len < 512 * KILOBYTE) {
-		Sleep(100);
+	const clock_t start = clock();
+	while (clock() - start < 500 && m_len < 64 * KILOBYTE) {
+		Sleep(50);
 	}
 
 	return true;
@@ -462,6 +457,14 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 		const ULONGLONG end = GetPerfCounter();
 		DbgLog((LOG_TRACE, 3, L"	=> do wait %0.3f ms", (end - start) / 10000.0));
 #endif
+
+		if (m_bEndOfStream) {
+			if (pdwBytesRead) {
+				*pdwBytesRead = 0;
+			}
+
+			return E_FAIL;
+		}
 	}
 
 	CAutoLock cAutoLock(&m_csLock);
@@ -495,10 +498,6 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 	}
 
 	CheckBuffer();
-
-	if (m_bEndOfStream && len > 0) {
-		EmptyBuffer();
-	}
 
 	return len == dwBytesToRead ? E_FAIL : (len > 0 ? S_FALSE : S_OK);
 }
@@ -572,7 +571,6 @@ DWORD CUDPStream::ThreadProc()
 #endif
 
 	for (;;) {
-		m_EventComplete.Set();
 		m_RequestCmd = GetRequest();
 
 		switch (m_RequestCmd) {
@@ -587,33 +585,35 @@ DWORD CUDPStream::ThreadProc()
 				return 0;
 			case CMD::CMD_STOP:
 				Reply(S_OK);
+				m_bEndOfStream = TRUE;
 				EmptyBuffer();
 				break;
 			case CMD::CMD_INIT:
-			case CMD::CMD_PAUSE:
 			case CMD::CMD_RUN:
-				m_EventComplete.Reset();
 				Reply(S_OK);
-				char buff[MAXBUFSIZE * 2];
+				BYTE buff[MAXBUFSIZE * 2];
 				int  buffsize = 0;
 				UINT attempts = 0;
+				int  len      = 0;
+
+				CheckBuffer();
 
 				BOOL bEndOfStream = FALSE;
 				while (!CheckRequest(NULL)
 						&& attempts < 200 && !bEndOfStream) {
-					m_EventComplete.Reset();
-					if (m_RequestCmd != CMD::CMD_INIT && GetPacketsSize() > MAXSTORESIZE) {
-						Sleep(300);
+
+					if (m_RequestCmd == CMD::CMD_RUN && GetPacketsSize() > MAXSTORESIZE) {
+						Sleep(50);
 						continue;
 					}
-					int len = 0;
 
+					len = 0;
 					if (m_protocol == PR_UDP) {
 						DWORD res = WSAWaitForMultipleEvents(1, &m_WSAEvent, FALSE, 100, FALSE);
 						if (res == WSA_WAIT_EVENT_0) {
 							WSAResetEvent(m_WSAEvent);
 							static int fromlen = sizeof(m_addr);
-							len = recvfrom(m_UdpSocket, &buff[buffsize], MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
+							len = recvfrom(m_UdpSocket, (PCHAR)&buff[buffsize], MAXBUFSIZE, 0, (SOCKADDR*)&m_addr, &fromlen);
 							if (len <= 0) {
 								const int wsaLastError = WSAGetLastError();
 								if (wsaLastError != WSAEWOULDBLOCK) {
@@ -627,7 +627,7 @@ DWORD CUDPStream::ThreadProc()
 						}
 					} else if (m_protocol == PR_HTTP) {
 						DWORD dwSizeRead = 0;
-						HRESULT hr = m_HTTPAsync.Read((PBYTE)&buff[buffsize], MAXBUFSIZE, &dwSizeRead);
+						HRESULT hr = m_HTTPAsync.Read(&buff[buffsize], MAXBUFSIZE, &dwSizeRead);
 						if (FAILED(hr)) {
 							attempts += 50;
 							continue;
@@ -641,7 +641,7 @@ DWORD CUDPStream::ThreadProc()
 						}
 						len = dwSizeRead;
 					} else if (m_protocol == PR_PIPE) {
-						std::cin.read(&buff[buffsize], MAXBUFSIZE);
+						std::cin.read((PCHAR)&buff[buffsize], MAXBUFSIZE);
 						if (std::cin.fail() || std::cin.bad()) {
 							std::cin.clear();
 							attempts += 50;
@@ -667,7 +667,7 @@ DWORD CUDPStream::ThreadProc()
 							fwrite(buff, buffsize, 1, dump);
 						}
 #endif
-						Append((BYTE*)buff, buffsize);
+						Append(buff, buffsize);
 						buffsize = 0;
 					}
 				}
@@ -681,7 +681,7 @@ DWORD CUDPStream::ThreadProc()
 	}
 
 	ASSERT(0);
-	return (DWORD)-1;
+	return DWORD_MAX;
 }
 
 CUDPStream::packet_t::packet_t(BYTE* p, __int64 start, int size)
