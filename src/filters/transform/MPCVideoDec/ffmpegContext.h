@@ -39,7 +39,7 @@ enum PCI_Vendors {
 
 // === H264 functions
 int		FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
-								 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion);
+								 DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion);
 
 // === Mpeg2 functions
 int		MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
@@ -52,4 +52,4 @@ void	FillAVCodecProps(struct AVCodecContext* pAVCtx);
 
 bool	IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
 BOOL	DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height,
-						   DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion);
+						   DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion);
