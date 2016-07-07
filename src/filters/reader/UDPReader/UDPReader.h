@@ -90,7 +90,6 @@ public:
 
 	enum CMD {
 		CMD_INIT,
-		CMD_PAUSE,
 		CMD_RUN,
 		CMD_STOP,
 		CMD_EXIT
