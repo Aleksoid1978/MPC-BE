@@ -43,180 +43,6 @@ extern "C" {
 	#include <ffmpeg/libavcodec/dxva_vp9.h>
 }
 
-/* not used
-static const WORD PCID_NVIDIA_4K[] = {
-	// http://us.download.nvidia.com/XFree86/Linux-x86_64/355.06/README/supportedchips.html
-	// http://pci-ids.ucw.cz/read/PC/10de
-	// VP5, Nvidia VDPAU Feature Set D: GF117, GF119, GK104, GK106, GK107, GK110, GK208.
-	0x0FC2, // GeForce GT 630 (GK107) (not officially supported or typo, 4k tested)
-	0x0FC6, // GeForce GTX 650
-	0x0FC8, // GeForce GT 740
-	0x0FCD, // GeForce GT 755M
-	0x0FD1, // GeForce GT 650M
-	0x0FD2, // GeForce GT 640M
-	0x0FD4, // GeForce GTX 660M
-	0x0FD5, // GeForce GT 650M
-	0x0FD8, // GeForce GT 640M
-	0x0FD9, // GeForce GT 645M
-	0x0FDF, // GeForce GT 740M
-	0x0FE0, // GeForce GTX 660M
-	0x0FE1, // GeForce GT 730M
-	0x0FE2, // GeForce GT 745M
-	0x0FE3, // GeForce GT 745M
-	0x0FE4, // GeForce GT 750M
-	0x0FE9, // GeForce GT 750M
-	0x0FEA, // GeForce GT 755M
-	0x0FEF, // GRID K340
-	0x0FF2, // GRID K1
-	0x0FF3, // Quadro K420
-	0x0FF6, // Quadro K1100M
-	0x0FF8, // Quadro K500M
-	0x0FF9, // Quadro K2000D
-	0x0FFA, // Quadro K600
-	0x0FFB, // Quadro K2000M
-	0x0FFC, // Quadro K1000M
-	0x0FFD, // NVS 510
-	0x0FFE, // Quadro K2000
-	0x0FFF, // Quadro 410
-	0x1001, // GeForce GTX TITAN Z
-	0x1004, // GeForce GTX 780
-	0x1005, // GeForce GTX TITAN
-	0x1007, // GeForce GTX 780
-	0x1008, // GeForce GTX 780 Ti
-	0x100A, // GeForce GTX 780 Ti
-	0x100C, // GeForce GTX TITAN Black
-	0x1021, // Tesla K20Xm
-	0x1022, // Tesla K20c
-	0x1023, // Tesla K40m
-	0x1024, // Tesla K40c
-	0x1026, // Tesla K20s
-	0x1027, // Tesla K40st
-	0x1028, // Tesla K20m
-	0x1029, // Tesla K40s
-	0x102A, // Tesla K40t
-	0x102D, // Tesla K80
-	0x103A, // Quadro K6000
-	0x103C, // Quadro K5200
-	0x1040, // GeForce GT 520 (GF119) (not officially supported or typo, 4k tested)
-	0x1042, // GeForce 510
-	0x1048, // GeForce 605
-	0x104A, // GeForce GT 610 ((not officially supported or typo, fully tested)
-	0x104B, // GeForce GT 625 (OEM)
-	0x104C, // GeForce GT 705
-	0x1050, // GeForce GT 520M (GF119) (not officially supported or typo)
-	0x1051, // GeForce GT 520MX
-	0x1052, // GeForce GT 520M (GF119) (not officially supported or typo)
-	0x1054, // GeForce 410M
-	0x1055, // GeForce 410M
-	0x1056, // NVS 4200M
-	0x1057, // NVS 4200M
-	0x107C, // NVS 315
-	0x107D, // NVS 310
-	0x1180, // GeForce GTX 680
-	0x1183, // GeForce GTX 660 Ti (fully tested)
-	0x1184, // GeForce GTX 770
-	0x1185, // GeForce GTX 660
-	0x1187, // GeForce GTX 760
-	0x1188, // GeForce GTX 690
-	0x1189, // GeForce GTX 670
-	0x118A, // GRID K520
-	0x118E, // GeForce GTX 760 (192-bit)
-	0x118F, // Tesla K10
-	0x1193, // GeForce GTX 760 Ti OEM
-	0x1194, // Tesla K8
-	0x1195, // GeForce GTX 660
-	0x1198, // GeForce GTX 880M
-	0x1199, // GeForce GTX 870M
-	0x119A, // GeForce GTX 860M
-	0x119D, // GeForce GTX 775M
-	0x119E, // GeForce GTX 780M
-	0x119F, // GeForce GTX 780M
-	0x11A0, // GeForce GTX 680M
-	0x11A1, // GeForce GTX 670MX
-	0x11A2, // GeForce GTX 675MX
-	0x11A3, // GeForce GTX 680MX
-	0x11A7, // GeForce GTX 675MX
-	0x11B4, // Quadro K4200
-	0x11B6, // Quadro K3100M
-	0x11B7, // Quadro K4100M
-	0x11B8, // Quadro K5100M
-	0x11BA, // Quadro K5000
-	0x11BC, // Quadro K5000M
-	0x11BD, // Quadro K4000M
-	0x11BE, // Quadro K3000M
-	0x11BF, // GRID K2
-	0x11C0, // GeForce GTX 660
-	0x11C2, // GeForce GTX 650 Ti BOOST
-	0x11C3, // GeForce GTX 650 Ti
-	0x11C4, // GeForce GTX 645
-	0x11C5, // GeForce GT 740
-	0x11C6, // GeForce GTX 650 Ti
-	0x11C8, // GeForce GTX 650
-	0x11CB, // GeForce GT 740
-	0x11E0, // GeForce GTX 770M
-	0x11E1, // GeForce GTX 765M
-	0x11E2, // GeForce GTX 765M
-	0x11E3, // GeForce GTX 760M
-	0x11FA, // Quadro K4000
-	0x11FC, // Quadro K2100M
-	0x1280, // GeForce GT 635
-	0x1281, // GeForce GT 710
-	0x1282, // GeForce GT 640 rev. 2 (not officially supported or typo, fully tested)
-	0x1284, // GeForce GT 630 rev. 2 (not officially supported or typo, fully tested)
-	0x1286, // GeForce GT 720
-	0x1288, // GeForce GT 720
-	0x1289, // GeForce GT 710
-	0x1290, // GeForce GT 730M
-	0x1291, // GeForce GT 735M
-	0x1292, // GeForce GT 740M
-	0x1293, // GeForce GT 730M
-	0x1295, // GeForce 710M
-	0x1296, // GeForce 825M
-	0x1299, // GeForce 920M
-	0x129A, // GeForce 910M
-	0x12B9, // Quadro K610M
-	0x12BA, // Quadro K510M
-
-	// VP6, Nvidia VDPAU Feature Set E: GM107, GM108, GM204.
-	0x1340, // GeForce 830M
-	0x1341, // GeForce 840M
-	0x1344, // GeForce 845M
-	0x1346, // GeForce 930M
-	0x1347, // GeForce 940M
-	0x1380, // GeForce GTX 750 Ti
-	0x1381, // GeForce GTX 750
-	0x1382, // GeForce GTX 745
-	0x1390, // GeForce 845M
-	0x1391, // GeForce GTX 850M
-	0x1392, // GeForce GTX 860M
-	0x1393, // GeForce 840M
-	0x1398, // GeForce 845M
-	0x139A, // GeForce GTX 950M
-	0x139B, // GeForce GTX 960M
-	0x139C, // GeForce 940M
-	0x13B3, // Quadro K2200M
-	0x13BA, // Quadro K2200
-	0x13BB, // Quadro K620
-	0x13BC, // Quadro K1200
-	0x13C0, // GeForce GTX 980
-	0x13C2, // GeForce GTX 970
-	0x13D7, // GeForce GTX 980M
-	0x13D8, // GeForce GTX 970M
-	0x13D9, // GeForce GTX 965M
-
-	// VP7, Nvidia VDPAU Feature Set F: GM206.
-	0x1401, // GeForce GTX 960
-
-	// VP6, Nvidia VDPAU Feature Set E: GM200, GM204
-	0x1617, // GeForce GTX 980M
-	0x1618, // GeForce GTX 970M
-	0x1619, // GeForce GTX 965M
-	0x17C2, // GeForce GTX TITAN X
-	0x17C8, // GeForce GTX 980 Ti
-	0x17F0, // Quadro M6000
-};
-*/
-
 static const WORD PCID_ATI_UVD [] = {
 	0x94C7, // ATI Radeon HD 2350
 	0x94C1, // ATI Radeon HD 2400 XT
@@ -330,51 +156,39 @@ static bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t count)
 	return false;
 }
 
-// === H264 functions
-// returns TRUE if version is equal to or higher than A.B.C.D, returns FALSE otherwise
-static BOOL DriverVersionCheck(LARGE_INTEGER VideoDriverVersion, int A, int B, int C, int D)
+// returns 'true' if version is equal to or higher than A.B.C.D, returns 'false' otherwise
+static bool DriverVersionCheck(UINT64 VideoDriverVersion, UINT16 A, UINT16 B, UINT16 C, UINT16 D)
 {
-	if (HIWORD(VideoDriverVersion.HighPart) > A) {
-		return TRUE;
-	} else if (HIWORD(VideoDriverVersion.HighPart) == A) {
-		if (LOWORD(VideoDriverVersion.HighPart) > B) {
-			return TRUE;
-		} else if (LOWORD(VideoDriverVersion.HighPart) == B) {
-			if (HIWORD(VideoDriverVersion.LowPart) > C) {
-				return TRUE;
-			} else if (HIWORD(VideoDriverVersion.LowPart) == C) {
-				if (LOWORD(VideoDriverVersion.LowPart) >= D) {
-					return TRUE;
-				}
-			}
-		}
-	}
-	return FALSE;
+	LONGLONG ver = (UINT64)A << 48 | (UINT64)B << 32 | (UINT64)C << 16 | (UINT64)D;
+
+	return VideoDriverVersion >= ver;
 }
 
-static unsigned __int64 GetFileVersion(LPCWSTR lptstrFilename)
+static UINT64 GetFileVersion(LPCWSTR wstrFilename)
 {
-	unsigned __int64 ret = 0;
+	UINT64 ret = 0;
 
-	const DWORD len = GetFileVersionInfoSize(lptstrFilename, NULL);
+	const DWORD len = GetFileVersionInfoSizeW(wstrFilename, NULL);
 	if (len) {
-		TCHAR* b1 = new TCHAR[len];
-		if (b1) {
+		WCHAR* buf = new WCHAR[len];
+		if (buf) {
 			UINT uLen;
 			VS_FIXEDFILEINFO* pvsf = NULL;
-			if (GetFileVersionInfo(lptstrFilename, 0, len, b1) && VerQueryValue(b1, L"\\", (LPVOID*)&pvsf, &uLen)) {
-				ret = ((unsigned __int64)pvsf->dwFileVersionMS << 32) | pvsf->dwFileVersionLS;
+			if (GetFileVersionInfoW(wstrFilename, 0, len, buf) && VerQueryValueW(buf, L"\\", (LPVOID*)&pvsf, &uLen)) {
+				ret = ((UINT64)pvsf->dwFileVersionMS << 32) | pvsf->dwFileVersionLS;
 			}
 
-			delete [] b1;
+			delete [] buf;
 		}
 	}
 
 	return ret;
 }
 
+// === H264 functions
+
 int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
-							 DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion)
+							 DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion)
 {
 	const H264Context* h           = (H264Context*)pAVCtx->priv_data;
 	const SPS* sps                 = h264_getSPS(h);
@@ -406,14 +220,11 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 			TCHAR path[MAX_PATH] = { 0 };
 			GetSystemDirectory(path, MAX_PATH);
 			wcscat(path, L"\\drivers\\atikmdag.sys\0");
-			unsigned __int64 f_version = GetFileVersion(path);
+			UINT64 atikmdag_ver = GetFileVersion(path);
 
-			if (f_version) {
-				LARGE_INTEGER VideoDriverVersion;
-				VideoDriverVersion.QuadPart = f_version;
-
+			if (atikmdag_ver) {
 				// file version 8.1.1.1016 - Catalyst 10.4, WinVista & Win7
-				if (DriverVersionCheck(VideoDriverVersion, 8, 1, 1, 1016)) {
+				if (DriverVersionCheck(atikmdag_ver, 8, 1, 1, 1016)) {
 					no_level51_support = 0;
 					max_ref_frames = 16;
 				}
@@ -447,7 +258,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 }
 
 // === Mpeg2 functions
-int	MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx)
+int MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx)
 {
 	return (((MpegEncContext*)pAVCtx->priv_data)->chroma_format < 2);
 }
@@ -619,19 +430,16 @@ bool IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice)
 
 #define CHECK_AVC_L52_SIZE(w, h) ((w) <= 4096 && (h) <= 4096 && (w) * (h) <= 36864 * 16 * 16)
 
-BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nPCIVendor, DWORD nPCIDevice, LARGE_INTEGER VideoDriverVersion)
+BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion)
 {
 	width = (width + 15) & ~15; // (width + 15) / 16 * 16;
 	height = (height + 15) & ~15; // (height + 15) / 16 * 16;
 
 	if (nPCIVendor == PCIV_nVidia) {
-		if (DriverVersionCheck(VideoDriverVersion, 9, 18, 13, 2018)) { // The video frame size is checked in the driver
+		if (DriverVersionCheck(VideoDriverVersion, 9, 18, 13, 2018)) {
+			// The video frame size is checked in the driver
 			// For graphics cards with support for 4k, you must install the driver v320.18 and newer.
 			return TRUE;
-			// old check:
-			// if (CheckPCID(nPCIDevice, PCID_NVIDIA_VP567, _countof(PCID_NVIDIA_VP567)) && width <= 4096 && height <= 4096 && width * height <= 4080 * 4080) {
-			// tested H.264 on VP5 (GT 610, GTX 660 Ti)
-			// 4080x4080 = 65025 macroblocks
 		}
 		else if (width <= 2032 && height <= 2032 && width * height <= 8190 * 16 * 16) {
 			// tested H.264, VC-1 and MPEG-2 on VP4 (feature set C) (G210M, GT220)

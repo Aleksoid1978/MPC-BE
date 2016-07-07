@@ -108,7 +108,7 @@ protected:
 
 	DWORD									m_nPCIVendor;
 	DWORD									m_nPCIDevice;
-	LARGE_INTEGER							m_VideoDriverVersion;
+	UINT64									m_VideoDriverVersion;
 	CString									m_strDeviceDescription;
 
 	// === DXVA1 variables

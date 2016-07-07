@@ -1107,8 +1107,7 @@ void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 	IDirect3D9* pD3D9				= NULL;
 	m_nPCIVendor					= 0;
 	m_nPCIDevice					= 0;
-	m_VideoDriverVersion.HighPart	= 0;
-	m_VideoDriverVersion.LowPart	= 0;
+	m_VideoDriverVersion			= 0;
 
 	pD3D9 = Direct3DCreate9(D3D_SDK_VERSION);
 	if (pD3D9) {
@@ -1116,7 +1115,7 @@ void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 		if (pD3D9->GetAdapterIdentifier(GetAdapter(pD3D9, hWnd), 0, &adapterIdentifier) == S_OK) {
 			m_nPCIVendor			= adapterIdentifier.VendorId;
 			m_nPCIDevice			= adapterIdentifier.DeviceId;
-			m_VideoDriverVersion	= adapterIdentifier.DriverVersion;
+			m_VideoDriverVersion	= adapterIdentifier.DriverVersion.QuadPart;
 			m_strDeviceDescription	= adapterIdentifier.Description;
 			m_strDeviceDescription.AppendFormat(L" (%04X:%04X)", m_nPCIVendor, m_nPCIDevice);
 		}
@@ -3218,7 +3217,7 @@ HRESULT CMPCVideoDecFilter::DetectVideoCard_EVR(IPin *pPin)
 								// copy adapter description
 								m_nPCIVendor					= AdapID9.VendorId;
 								m_nPCIDevice					= AdapID9.DeviceId;
-								m_VideoDriverVersion.QuadPart	= AdapID9.DriverVersion.QuadPart;
+								m_VideoDriverVersion			= AdapID9.DriverVersion.QuadPart;
 								m_strDeviceDescription			= AdapID9.Description;
 								m_strDeviceDescription.AppendFormat(_T(" (%04hX:%04hX)"), m_nPCIVendor, m_nPCIDevice);
 							}
