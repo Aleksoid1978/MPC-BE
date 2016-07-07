@@ -61,10 +61,11 @@ bool CBaseSplitterFileEx::NextMpegStartCode(BYTE& code, __int64 len)
 
 bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sync)
 {
-	size_t nSize = min(len, GetRemaining());
 	CAtlArray<BYTE> pData;
-	pData.SetCount(nSize);
-	ByteRead(pData.GetData(), nSize);
+	pData.SetCount(len);
+	if (S_OK != ByteRead(pData.GetData(), len)) {
+		return false;
+	}
 
 	return Read(h, pData, pmt, find_sync);
 }
