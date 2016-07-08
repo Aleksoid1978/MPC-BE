@@ -28,7 +28,9 @@
 #define UDPReaderName   L"MPC UDP/HTTP Reader"
 #define STDInReaderName L"MPC Std input Reader"
 
-class CUDPStream : public CAsyncStream, public CAMThread
+class CUDPStream
+	: public CAsyncStream
+	, public CAMThread
 {
 public:
 	enum protocol {
@@ -39,50 +41,51 @@ public:
 	};
 
 private:
-	CCritSec m_csLock;
-	CCritSec m_csPacketsLock;
-
-	class packet_t
+	class CPacket
 	{
 	public:
-		BYTE*   m_buff;
-		__int64 m_start, m_end;
+		BYTE*     m_buff;
+		ULONGLONG m_start, m_end;
 
-		packet_t(BYTE* p, __int64 start, int size);
-		virtual ~packet_t() {
+		CPacket(const BYTE* p, ULONGLONG start, UINT size);
+		virtual ~CPacket() {
 			delete [] m_buff;
 		}
 	};
 
-	CString		m_url_str;
-	CUrl		m_url;
-	protocol	m_protocol;
+	CCritSec           m_csLock;
+	CCritSec           m_csPacketsLock;
 
-	SOCKET		m_UdpSocket;
-	sockaddr_in	m_addr;
-	WSAEVENT	m_WSAEvent;
+	CUrl               m_url;
+	CString            m_url_str;
+	protocol           m_protocol   = protocol::PR_NONE;
+	GUID               m_subtype    = MEDIASUBTYPE_NULL;
+	DWORD              m_RequestCmd = 0;
 
-	CHTTPAsync	m_HTTPAsync;
+	SOCKET             m_UdpSocket  = INVALID_SOCKET;
+	WSAEVENT           m_WSAEvent   = NULL;
+	sockaddr_in        m_addr;
 
-	__int64		m_pos, m_len;
-	CAtlList<packet_t*> m_packets;
+	CHTTPAsync         m_HTTPAsync;
 
-	GUID		m_subtype;
-	DWORD		m_RequestCmd;
+	ULONGLONG          m_pos = 0;
+	ULONGLONG          m_len = 0;
+	
+	CAtlList<CPacket*> m_packets;
+	
+	CAMEvent           m_EventComplete;
 
-	CAMEvent         m_EventComplete;
-	volatile __int64 m_SizeComplete;
+	volatile ULONGLONG m_SizeComplete = 0;
+	volatile BOOL      m_bEndOfStream = FALSE;
 
 	void Clear();
-	void Append(BYTE* buff, int len);
+	void Append(const BYTE* buff, UINT len);
 
-	DWORD ThreadProc();
-
-	inline __int64 GetPacketsSize();
+	inline const ULONGLONG GetPacketsSize();
 	void CheckBuffer();
 	void EmptyBuffer();
 
-	volatile BOOL m_bEndOfStream = FALSE;
+	DWORD ThreadProc();
 
 public:
 	CUDPStream();
@@ -115,7 +118,7 @@ class __declspec(uuid("0E4221A9-9718-48D5-A5CF-4493DAD4A015"))
 	, public IFileSourceFilter
 {
 	CUDPStream m_stream;
-	CStringW   m_fn;
+	CString    m_fn;
 
 public:
 	CUDPReader(IUnknown* pUnk, HRESULT* phr);

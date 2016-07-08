@@ -20,14 +20,13 @@
  */
 
 #include "stdafx.h"
-#include "UDPReader.h"
-#include <moreuuids.h>
-#include "../../../DSUtil/DSUtil.h"
-
 #include <fcntl.h>
 #include <io.h>
 #include <iostream>
 #include <Ws2tcpip.h>
+#include "UDPReader.h"
+#include <moreuuids.h>
+#include "../../../DSUtil/DSUtil.h"
 
 #ifdef REGISTER_FILTER
 
@@ -140,10 +139,8 @@ STDMETHODIMP CUDPReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 
 	m_fn = pszFileName;
 
-	CMediaType mt;
-	mt.majortype = MEDIATYPE_Stream;
-	mt.subtype = m_stream.GetSubtype();
-	m_mt = mt;
+	m_mt.majortype = MEDIATYPE_Stream;
+	m_mt.subtype   = m_stream.GetSubtype();
 
 	return S_OK;
 }
@@ -163,14 +160,6 @@ STDMETHODIMP CUDPReader::GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt)
 // CUDPStream
 
 CUDPStream::CUDPStream()
-	: m_protocol(PR_NONE)
-	, m_UdpSocket(INVALID_SOCKET)
-	, m_WSAEvent(NULL)
-	, m_pos(0)
-	, m_len(0)
-	, m_subtype(MEDIASUBTYPE_NULL)
-	, m_RequestCmd(0)
-	, m_SizeComplete(MAXLONGLONG - 1)
 {
 }
 
@@ -186,7 +175,7 @@ void CUDPStream::Clear()
 		CAMThread::Close();
 	}
 
-	if (m_protocol == PR_UDP) {
+	if (m_protocol == protocol::PR_UDP) {
 		if (m_WSAEvent != NULL) {
 			WSACloseEvent(m_WSAEvent);
 		}
@@ -204,16 +193,17 @@ void CUDPStream::Clear()
 	EmptyBuffer();
 
 	m_pos = m_len = 0;
+	m_SizeComplete = 0;
 }
 
-void CUDPStream::Append(BYTE* buff, int len)
+void CUDPStream::Append(const BYTE* buff, UINT len)
 {
 	CAutoLock cPacketLock(&m_csPacketsLock);
 
-	m_packets.AddTail(DNew packet_t(buff, m_len, len));
+	m_packets.AddTail(DNew CPacket(buff, m_len, len));
 	m_len += len;
 
-	if (m_len >= m_SizeComplete) {
+	if (m_SizeComplete && m_len >= m_SizeComplete) {
 		m_EventComplete.Set();
 	}
 }
@@ -269,7 +259,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	}
 
 	if (str_protocol == L"udp") {
-		m_protocol = PR_UDP;
+		m_protocol = protocol::PR_UDP;
 
 		WSADATA wsaData;
 		WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -346,7 +336,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			return false;
 		}
 	} else if (str_protocol == L"http" || str_protocol == L"https") {
-		m_protocol = PR_HTTP;
+		m_protocol = protocol::PR_HTTP;
 		BOOL bConnected = FALSE;
 		if (m_HTTPAsync.Connect(m_url_str, 10000, L"MPC UDP/HTTP Reader") == S_OK
 				&& !m_HTTPAsync.GetLenght()) {
@@ -390,7 +380,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			return false;
 		}
 
-		m_protocol = PR_PIPE;
+		m_protocol = protocol::PR_PIPE;
 
 		BYTE buf[1024] = {};
 		std::cin.read((PCHAR)buf, sizeof(buf));
@@ -429,7 +419,7 @@ HRESULT CUDPStream::SetPointer(LONGLONG llPos)
 
 	const __int64 start = m_packets.IsEmpty() ? 0 : m_packets.GetHead()->m_start;
 	if (llPos < start) {
-		DbgLog((LOG_TRACE, 3, L"CUDPStream::SetPointer() warning! %lld misses in [%I64d - %I64d]", llPos, start, m_packets.GetTail()->m_end));
+		DbgLog((LOG_TRACE, 3, L"CUDPStream::SetPointer() warning! %lld misses in [%llu - %llu]", llPos, start, m_packets.GetTail()->m_end));
 		return S_FALSE;
 	}
 
@@ -446,12 +436,12 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 		m_SizeComplete = m_pos + len;
 
 #if DEBUG
-		DbgLog((LOG_TRACE, 3, L"CUDPStream::Read() : wait %I64d bytes, %I64d -> %I64d", m_SizeComplete - m_packets.GetTail()->m_end, m_packets.GetTail()->m_end, m_SizeComplete));
+		DbgLog((LOG_TRACE, 3, L"CUDPStream::Read() : wait %llu bytes, %llu -> %llu", m_SizeComplete - m_packets.GetTail()->m_end, m_packets.GetTail()->m_end, m_SizeComplete));
 		const ULONGLONG start = GetPerfCounter();
 #endif
 
 		while (!m_bEndOfStream && !m_EventComplete.Wait(1));
-		m_SizeComplete = MAXLONGLONG - 1;
+		m_SizeComplete = 0;
 
 #if DEBUG
 		const ULONGLONG end = GetPerfCounter();
@@ -472,17 +462,17 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 
 	POSITION pos = m_packets.GetHeadPosition();
 	while (pos && len > 0) {
-		packet_t* p = m_packets.GetNext(pos);
+		const CPacket* p = m_packets.GetNext(pos);
 
 		if (p->m_start <= m_pos && m_pos < p->m_end) {
-			DWORD size;
+			size_t size;
 
 			if (m_pos < p->m_start) {
 				ASSERT(0);
-				size = (DWORD)min(len, p->m_start - m_pos);
+				size = min(len, p->m_start - m_pos);
 				memset(ptr, 0, size);
 			} else {
-				size = (DWORD)min(len, p->m_end - m_pos);
+				size = min(len, p->m_end - m_pos);
 				memcpy(ptr, &p->m_buff[m_pos - p->m_start], size);
 			}
 
@@ -528,7 +518,7 @@ void CUDPStream::Unlock()
 	m_csLock.Unlock();
 }
 
-inline __int64 CUDPStream::GetPacketsSize()
+inline const ULONGLONG CUDPStream::GetPacketsSize()
 {
 	CAutoLock cPacketLock(&m_csPacketsLock);
 
@@ -537,14 +527,12 @@ inline __int64 CUDPStream::GetPacketsSize()
 
 void CUDPStream::CheckBuffer()
 {
-	if (m_RequestCmd != CMD::CMD_RUN) {
-		return;
-	}
+	if (m_RequestCmd == CMD::CMD_RUN) {
+		CAutoLock cPacketLock(&m_csPacketsLock);
 
-	CAutoLock cPacketLock(&m_csPacketsLock);
-
-	while (!m_packets.IsEmpty() && m_packets.GetHead()->m_start < m_pos - 256 * KILOBYTE) {
-		delete m_packets.RemoveHead();
+		while (!m_packets.IsEmpty() && m_packets.GetHead()->m_start < m_pos - 256 * KILOBYTE) {
+			delete m_packets.RemoveHead();
+		}
 	}
 }
 
@@ -566,7 +554,7 @@ DWORD CUDPStream::ThreadProc()
 	SetThreadPriority(m_hThread, THREAD_PRIORITY_TIME_CRITICAL);
 
 #if ENABLE_DUMP
-	const CString fname = m_protocol == PR_HTTP ? L"http.dump" : m_protocol == PR_UDP ? L"udp.dump" : L"stdin.dump";
+	const CString fname = m_protocol == protocol::PR_HTTP ? L"http.dump" : m_protocol == protocol::PR_UDP ? L"udp.dump" : L"stdin.dump";
 	FILE* dump = _tfopen(fname, L"wb");
 #endif
 
@@ -596,19 +584,18 @@ DWORD CUDPStream::ThreadProc()
 				UINT attempts = 0;
 				int  len      = 0;
 
-				CheckBuffer();
-
 				BOOL bEndOfStream = FALSE;
 				while (!CheckRequest(NULL)
 						&& attempts < 200 && !bEndOfStream) {
 
-					if (m_RequestCmd == CMD::CMD_RUN && GetPacketsSize() > MAXSTORESIZE) {
+					if (!m_SizeComplete
+							&& m_RequestCmd == CMD::CMD_RUN && GetPacketsSize() > MAXSTORESIZE) {
 						Sleep(50);
 						continue;
 					}
 
 					len = 0;
-					if (m_protocol == PR_UDP) {
+					if (m_protocol == protocol::PR_UDP) {
 						DWORD res = WSAWaitForMultipleEvents(1, &m_WSAEvent, FALSE, 100, FALSE);
 						if (res == WSA_WAIT_EVENT_0) {
 							WSAResetEvent(m_WSAEvent);
@@ -625,7 +612,7 @@ DWORD CUDPStream::ThreadProc()
 							attempts++;
 							continue;
 						}
-					} else if (m_protocol == PR_HTTP) {
+					} else if (m_protocol == protocol::PR_HTTP) {
 						DWORD dwSizeRead = 0;
 						HRESULT hr = m_HTTPAsync.Read(&buff[buffsize], MAXBUFSIZE, &dwSizeRead);
 						if (FAILED(hr)) {
@@ -640,7 +627,7 @@ DWORD CUDPStream::ThreadProc()
 							break;
 						}
 						len = dwSizeRead;
-					} else if (m_protocol == PR_PIPE) {
+					} else if (m_protocol == protocol::PR_PIPE) {
 						std::cin.read((PCHAR)&buff[buffsize], MAXBUFSIZE);
 						if (std::cin.fail() || std::cin.bad()) {
 							std::cin.clear();
@@ -667,7 +654,7 @@ DWORD CUDPStream::ThreadProc()
 							fwrite(buff, buffsize, 1, dump);
 						}
 #endif
-						Append(buff, buffsize);
+						Append(buff, (UINT)buffsize);
 						buffsize = 0;
 					}
 				}
@@ -684,7 +671,7 @@ DWORD CUDPStream::ThreadProc()
 	return DWORD_MAX;
 }
 
-CUDPStream::packet_t::packet_t(BYTE* p, __int64 start, int size)
+CUDPStream::CPacket::CPacket(const BYTE* p, ULONGLONG start, UINT size)
 	: m_start(start)
 	, m_end(start + size)
 {
