@@ -588,8 +588,7 @@ DWORD CUDPStream::ThreadProc()
 				while (!CheckRequest(NULL)
 						&& attempts < 200 && !bEndOfStream) {
 
-					if (!m_SizeComplete
-							&& m_RequestCmd == CMD::CMD_RUN && GetPacketsSize() > MAXSTORESIZE) {
+					if (!m_SizeComplete && GetPacketsSize() > MAXSTORESIZE) {
 						Sleep(50);
 						continue;
 					}
