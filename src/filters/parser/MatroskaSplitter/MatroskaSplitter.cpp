@@ -32,6 +32,7 @@
 #include <moreuuids.h>
 #include <basestruct.h>
 #include <vector>
+#include <list>
 
 // option names
 #define OPT_REGKEY_MATROSKASplit	_T("Software\\MPC-BE Filters\\Matroska Splitter")
@@ -1202,6 +1203,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		SetProperty(L"TITL", info.Title);
 	}
 	pos = m_pFile->m_segment.Tags.GetHeadPosition();
+
+	std::list<int> pg_offsets;
+
 	while (pos) {
 		Tags* Tags = m_pFile->m_segment.Tags.GetNext(pos);
 
@@ -1227,10 +1231,28 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						SetProperty(L"RTNG", SimpleTag->TagString);
 					} else if (SimpleTag->TagName == _T("ALBUM")) {
 						SetProperty(L"ALBUM", SimpleTag->TagString);
+					} else if (SimpleTag->TagName == L"3d-plane") {
+						pg_offsets.push_back(_wtoi(SimpleTag->TagString));
 					}
 				}
 			}
 		}
+	}
+	
+	if (pg_offsets.size()) {
+		CString offsets;
+
+		pg_offsets.sort();
+		pg_offsets.unique();
+		for (auto it = pg_offsets.begin(); it != pg_offsets.end(); it++) {
+			if (offsets.IsEmpty()) {
+				offsets.Format(L"%d", *it);
+			} else {
+				offsets.AppendFormat(L",%d", *it);
+			}
+		}
+
+		SetProperty(L"stereo_subtitle_offset_ids", offsets);
 	}
 
 	CComBSTR title, date;
