@@ -566,17 +566,11 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			ReadShort();					// reserved_for_future_use
 			Item->m_num_video = ReadByte();	// number of Primary Video Streams
 			ReadByte();						// number of Primary Audio Streams
-			Item->m_num_pg = ReadByte();	// number of Presentation Graphic Streams
-			Item->m_num_ig = ReadByte();	// number of Interactive Graphic Streams
+			const BYTE num_pg = ReadByte();	// number of Presentation Graphic Streams
+			const BYTE num_ig = ReadByte();	// number of Interactive Graphic Streams
 
-			Item->m_pg_offset_sequence_id.SetCount(Item->m_num_pg);
-			for (size_t i = 0; i < Item->m_num_pg; i++) {
-				Item->m_pg_offset_sequence_id[i] = 0xff;
-			}
-			Item->m_ig_offset_sequence_id.SetCount(Item->m_num_ig);
-			for (size_t i = 0; i < Item->m_num_ig; i++) {
-				Item->m_ig_offset_sequence_id[i] = 0xff;
-			}
+			Item->m_pg_offset_sequence_id.resize(num_pg, 0xFF);
+			Item->m_ig_offset_sequence_id.resize(num_ig, 0xFF);
 
 			if (bFullInfoRead) {
 				LARGE_INTEGER size = {0, 0};
@@ -636,8 +630,8 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 					gb.BitRead(6);  // number_of_offset_sequences
 				}
 
-				for (i = 0; i < pItem->m_num_pg; i++) {
-					pItem->m_pg_offset_sequence_id[i] = gb.ReadByte();
+				for (auto it = pItem->m_pg_offset_sequence_id.begin(); it != pItem->m_pg_offset_sequence_id.end(); it++) {
+					*it = gb.ReadByte();
 
 					gb.BitRead(4); // reserved
 					gb.BitRead(1); // dialog_region_offset_valid_flag
@@ -676,11 +670,11 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 					}
 				}
 
-				for (i = 0; i < pItem->m_num_ig; i++) {
+				for (auto it = pItem->m_ig_offset_sequence_id.begin(); it != pItem->m_ig_offset_sequence_id.end(); it++) {
 					if (Fixed_offset_during_PopUp_flag) {
 						gb.ReadByte();
 					} else {
-						pItem->m_ig_offset_sequence_id[i] = gb.ReadByte();
+						*it = gb.ReadByte();
 					}
 
 					gb.BitRead(16); // IG_Plane_offset_during_BB_video

@@ -29,6 +29,7 @@
 #include <moreuuids.h>
 #include <basestruct.h>
 #include <atlpath.h>
+#include <list>
 
 #include "../../reader/VTSReader/VTSReader.h"
 #include "../apps/mplayerc/SettingsDefines.h"
@@ -1313,32 +1314,61 @@ bool CMpegSplitterFilter::DemuxInit()
 			}
 		}
 
-		if (bUseMVCExtension && m_Items.GetCount()) {
+		if (bUseMVCExtension && !m_Items.IsEmpty()) {
 			SetProperty(L"STEREOSCOPIC3DMODE", m_MVC_Base_View_R_flag ? L"mvc_rl" : L"mvc_lr");
 
 			// PG offsets
-			CHdmvClipInfo::PlaylistItem* Item = m_Items.GetHead();
-			for (BYTE i = 0; i < Item->m_num_pg; i++) {
-				if (Item->m_pg_offset_sequence_id[i] != 0xff) {
-					CString offset; offset.Format(L"%u", Item->m_pg_offset_sequence_id[i]);
-					SetProperty(L"stereo_subtitle_offset_id", offset);
-					break;
+			const CHdmvClipInfo::PlaylistItem* Item = m_Items.GetHead();
+			if (Item->m_pg_offset_sequence_id.size()) {
+				std::list<BYTE> pg_offsets;
+				for (auto it = Item->m_pg_offset_sequence_id.begin(); it != Item->m_pg_offset_sequence_id.end(); it++) {
+					if (*it != 0xff) {
+						pg_offsets.push_back(*it);
+
+						CString offset; offset.Format(L"%u", *it);
+						SetProperty(L"stereo_subtitle_offset_id", offset);
+					}
+				}
+				if (pg_offsets.size()) {
+					CString offsets;
+
+					pg_offsets.sort();
+					pg_offsets.unique();
+					for (auto it = pg_offsets.begin(); it != pg_offsets.end(); it++) {
+						if (offsets.IsEmpty()) {
+							offsets.Format(L"%u", *it);
+						} else {
+							offsets.AppendFormat(L",%u", *it);
+						}
+					}
+
+					SetProperty(L"stereo_subtitle_offset_ids", offsets);
 				}
 			}
 
 			// IG offsets
-			CString offsets;
-			for (BYTE i = 0; i < Item->m_num_ig; i++) {
-				if (Item->m_pg_offset_sequence_id[i] != 0xff) {
-					if (offsets.IsEmpty()) {
-						offsets.Format(L"%u", Item->m_pg_offset_sequence_id[i]);
-					} else {
-						offsets.AppendFormat(L",%u", Item->m_pg_offset_sequence_id[i]);
+			if (Item->m_ig_offset_sequence_id.size()) {
+				std::list<BYTE> ig_offsets;
+				for (auto it = Item->m_ig_offset_sequence_id.begin(); it != Item->m_ig_offset_sequence_id.end(); it++) {
+					if (*it != 0xff) {
+						ig_offsets.push_back(*it);
 					}
 				}
-			}
-			if (!offsets.IsEmpty()) {
-				SetProperty(L"stereo_interactive_offset_ids", offsets);
+				if (ig_offsets.size()) {
+					CString offsets;
+
+					ig_offsets.sort();
+					ig_offsets.unique();
+					for (auto it = ig_offsets.begin(); it != ig_offsets.end(); it++) {
+						if (offsets.IsEmpty()) {
+							offsets.Format(L"%u", *it);
+						} else {
+							offsets.AppendFormat(L",%u", *it);
+						}
+					}
+
+					SetProperty(L"stereo_interactive_offset_ids", offsets);
+				}
 			}
 		}
 	}
