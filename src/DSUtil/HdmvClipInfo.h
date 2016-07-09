@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <vector>
 #include "Mpeg2Def.h"
 #include "../../include/basestruct.h"
 
@@ -109,11 +110,9 @@ public:
 		__int64					m_SizeOut     = 0;
 
 		BYTE					m_num_video   = 0;
-		BYTE					m_num_pg      = 0;
-		BYTE					m_num_ig      = 0;
 
-		CAtlArray<BYTE>			m_pg_offset_sequence_id;
-		CAtlArray<BYTE>			m_ig_offset_sequence_id;
+		std::vector<BYTE>		m_pg_offset_sequence_id;
+		std::vector<BYTE>		m_ig_offset_sequence_id;
 
 		CAtlArray<SyncPoint>	m_sps;
 
@@ -130,18 +129,17 @@ public:
 		}
 
 		PlaylistItem& operator = (const PlaylistItem& pi) {
-			m_strFileName	= pi.m_strFileName;
-			m_rtIn			= pi.m_rtIn;
-			m_rtOut			= pi.m_rtOut;
-			m_rtStartTime	= pi.m_rtStartTime;
-			m_SizeIn		= pi.m_SizeIn;
-			m_SizeOut		= pi.m_SizeOut;
-			m_num_video		= pi.m_num_video;
-			m_num_pg		= pi.m_num_pg;
-			m_num_ig		= pi.m_num_ig;
+			m_strFileName			= pi.m_strFileName;
+			m_rtIn					= pi.m_rtIn;
+			m_rtOut					= pi.m_rtOut;
+			m_rtStartTime			= pi.m_rtStartTime;
+			m_SizeIn				= pi.m_SizeIn;
+			m_SizeOut				= pi.m_SizeOut;
+			m_num_video				= pi.m_num_video;
 
-			m_pg_offset_sequence_id.Copy(pi.m_pg_offset_sequence_id);
-			m_ig_offset_sequence_id.Copy(pi.m_ig_offset_sequence_id);
+			m_pg_offset_sequence_id	= pi.m_pg_offset_sequence_id;
+			m_ig_offset_sequence_id	= pi.m_ig_offset_sequence_id;
+
 			m_sps.Copy(pi.m_sps);
 
 			return *this;
