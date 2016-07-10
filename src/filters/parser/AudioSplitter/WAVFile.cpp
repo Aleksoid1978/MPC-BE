@@ -38,17 +38,13 @@ typedef union {
 
 CWAVFile::CWAVFile()
 	: CAudioFile()
-	, m_length(0)
-	, m_fmtdata(NULL)
-	, m_fmtsize(0)
-	, m_nBlockAlign(0)
-	, m_blocksize(0)
 {
 }
 
 CWAVFile::~CWAVFile()
 {
 	SAFE_DELETE_ARRAY(m_fmtdata);
+	SAFE_DELETE(m_ID3Tag);
 }
 
 bool CWAVFile::ProcessWAVEFORMATEX()
@@ -206,6 +202,10 @@ void CWAVFile::SetProperties(IBaseFilter* pBF)
 			}
 		}
 	}
+
+	if (m_ID3Tag) {
+		SetID3TagProperties(pBF, m_ID3Tag);
+	}
 }
 
 HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
@@ -260,12 +260,16 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 			}
 			break;
 		case FCC('LIST'):
-			ReadRIFFINFO(pos, Chunk.size);
+			ReadRIFFINFO(Chunk.size);
 			break;
 		case FCC('wavl'): // not supported
 		case FCC('slnt'): // not supported
 			TRACE(L"CWAVFile::Open() : WAVE file is not supported!\n");
 			return E_FAIL;
+		case FCC('ID3 '):
+		case FCC('id3 '):
+			ReadID3Tag(Chunk.size);
+			break;
 		default:
 			for (int i = 0; i < sizeof(Chunk.id); i++) {
 				BYTE ch = Chunk.data[i];
@@ -341,17 +345,18 @@ int CWAVFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	return size;
 }
 
-HRESULT CWAVFile::ReadRIFFINFO(const __int64 info_pos, const int info_size)
+HRESULT CWAVFile::ReadRIFFINFO(const DWORD chunk_size)
 {
 	m_info.RemoveAll();
 	DWORD id = 0;
-	m_pFile->Seek(info_pos);
 
-	if (info_size < 4 || m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('INFO')) {
+	const __int64 chunk_pos = m_pFile->GetPos();
+
+	if (chunk_size < 4 || m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('INFO')) {
 		return E_FAIL;
 	}
 
-	__int64 end = info_pos + info_size;
+	const __int64 end = chunk_pos + chunk_size;
 	chunk_t Chunk;
 
 	while (m_pFile->GetPos() + 8 < end && m_pFile->ByteRead(Chunk.data, sizeof(Chunk)) == S_OK && m_pFile->GetPos() + Chunk.size <= end) {
@@ -369,4 +374,31 @@ HRESULT CWAVFile::ReadRIFFINFO(const __int64 info_pos, const int info_size)
 	}
 
 	return S_OK;
+}
+
+HRESULT CWAVFile::ReadID3Tag(const DWORD chunk_size)
+{
+	if (m_pFile->BitRead(24) == 'ID3') {
+		const BYTE major    = (BYTE)m_pFile->BitRead(8);
+		const BYTE revision = (BYTE)m_pFile->BitRead(8);
+		UNREFERENCED_PARAMETER(revision);
+
+		const BYTE flags = (BYTE)m_pFile->BitRead(8);
+
+		DWORD size = m_pFile->BitRead(32);
+		size = hexdec2uint(size);
+
+		if (chunk_size == size + 10 && major <= 4) {
+			BYTE* buf = DNew BYTE[size];
+			m_pFile->ByteRead(buf, size);
+
+			m_ID3Tag = DNew CID3Tag(major, flags);
+			m_ID3Tag->ReadTagsV2(buf, size);
+			delete [] buf;
+
+			return S_OK;
+		}
+	}
+
+	return E_FAIL;
 }

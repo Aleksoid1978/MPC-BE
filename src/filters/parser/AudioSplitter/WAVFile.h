@@ -25,18 +25,21 @@
 class CWAVFile : public CAudioFile
 {
 protected:
-	__int64	m_length;
+	__int64  m_length      = 0;
 
-	BYTE*	m_fmtdata;
-	DWORD	m_fmtsize;
+	BYTE*    m_fmtdata     = NULL;
+	DWORD    m_fmtsize     = 0;
 
-	WORD	m_nBlockAlign;
-	int		m_blocksize;
+	WORD     m_nBlockAlign = 0;
+	int      m_blocksize   = 0;
+
+	CID3Tag* m_ID3Tag      = NULL;
 
 	CAtlMap<DWORD, CStringA> m_info;
 
 	bool ProcessWAVEFORMATEX();
-	HRESULT ReadRIFFINFO(const __int64 info_pos, const int info_size);
+	HRESULT ReadRIFFINFO(const DWORD chunk_size);
+	HRESULT ReadID3Tag(const DWORD chunk_size);
 	bool CheckDTSAC3CD();
 
 public:
