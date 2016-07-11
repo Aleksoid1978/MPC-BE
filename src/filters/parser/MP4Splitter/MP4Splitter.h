@@ -41,6 +41,8 @@ class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
 
 	CAtlArray<SyncPoint> m_sps;
 
+	BOOL bSelectMoofSuccessfully = TRUE;
+
 protected:
 	CAutoPtr<CMP4SplitterFile> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
