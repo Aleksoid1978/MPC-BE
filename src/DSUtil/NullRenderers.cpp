@@ -23,6 +23,7 @@
 #include "NullRenderers.h"
 #include <moreuuids.h>
 #include "MediaTypeEx.h"
+#include "D3D9Helper.h"
 
 #define USE_DXVA
 
@@ -173,11 +174,7 @@ CNullVideoRendererInputPin::CNullVideoRendererInputPin(CBaseRenderer *pRenderer,
 
 void CNullVideoRendererInputPin::CreateSurface()
 {
-	HRESULT		hr;
-	m_pD3D.Attach(Direct3DCreate9(D3D_SDK_VERSION));
-	if (!m_pD3D) {
-		m_pD3D.Attach(Direct3DCreate9(D3D9b_SDK_VERSION));
-	}
+	m_pD3D.Attach(D3D9Helper::Direct3DCreate9());
 
 	m_hWnd = NULL;	// TODO : put true window
 
@@ -197,10 +194,12 @@ void CNullVideoRendererInputPin::CreateSurface()
 	pp.BackBufferHeight = d3ddm.Height;
 	pp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 
-	hr = m_pD3D->CreateDevice(
-			 D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, m_hWnd,
-			 D3DCREATE_SOFTWARE_VERTEXPROCESSING|D3DCREATE_MULTITHREADED, //D3DCREATE_MANAGED
-			 &pp, &m_pD3DDev);
+	HRESULT hr = m_pD3D->CreateDevice(
+					D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, m_hWnd,
+					D3DCREATE_SOFTWARE_VERTEXPROCESSING|D3DCREATE_MULTITHREADED, //D3DCREATE_MANAGED
+					&pp, &m_pD3DDev);
+
+	UNREFERENCED_PARAMETER(hr);
 }
 
 STDMETHODIMP CNullVideoRendererInputPin::NonDelegatingQueryInterface(REFIID riid, void** ppv)

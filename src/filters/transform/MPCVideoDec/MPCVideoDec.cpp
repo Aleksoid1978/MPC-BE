@@ -33,6 +33,7 @@
 #include "CpuId.h"
 #include "FfmpegContext.h"
 
+#include "../../../DSUtil/D3D9Helper.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/SysVersion.h"
 #include "../../../DSUtil/WinAPIUtils.h"
@@ -1104,22 +1105,20 @@ CMPCVideoDecFilter::~CMPCVideoDecFilter()
 
 void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 {
-	IDirect3D9* pD3D9				= NULL;
-	m_nPCIVendor					= 0;
-	m_nPCIDevice					= 0;
-	m_VideoDriverVersion			= 0;
+	m_nPCIVendor         = 0;
+	m_nPCIDevice         = 0;
+	m_VideoDriverVersion = 0;
 
-	pD3D9 = Direct3DCreate9(D3D_SDK_VERSION);
+	CComPtr<IDirect3D9> pD3D9 = D3D9Helper::Direct3DCreate9();
 	if (pD3D9) {
-		D3DADAPTER_IDENTIFIER9 adapterIdentifier;
-		if (pD3D9->GetAdapterIdentifier(GetAdapter(pD3D9, hWnd), 0, &adapterIdentifier) == S_OK) {
-			m_nPCIVendor			= adapterIdentifier.VendorId;
-			m_nPCIDevice			= adapterIdentifier.DeviceId;
-			m_VideoDriverVersion	= adapterIdentifier.DriverVersion.QuadPart;
-			m_strDeviceDescription	= adapterIdentifier.Description;
+		D3DADAPTER_IDENTIFIER9 adapterIdentifier = {};
+		if (pD3D9->GetAdapterIdentifier(D3D9Helper::GetAdapter(pD3D9, hWnd), 0, &adapterIdentifier) == S_OK) {
+			m_nPCIVendor           = adapterIdentifier.VendorId;
+			m_nPCIDevice           = adapterIdentifier.DeviceId;
+			m_VideoDriverVersion   = adapterIdentifier.DriverVersion.QuadPart;
+			m_strDeviceDescription = adapterIdentifier.Description;
 			m_strDeviceDescription.AppendFormat(L" (%04X:%04X)", m_nPCIVendor, m_nPCIDevice);
 		}
-		pD3D9->Release();
 	}
 }
 

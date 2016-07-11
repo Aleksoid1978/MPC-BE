@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include <d3d9.h>
 #include <moreuuids.h>
+#include "../../DSUtil/D3D9Helper.h"
 #include "../../DSUtil/SysVersion.h"
 #include "MultiMonitor.h"
 #include "PPageVideo.h"
@@ -140,17 +141,17 @@ BOOL CPPageVideo::OnInitDialog()
 
 	m_bResetDevice = s.m_RenderersSettings.bResetDevice;
 
-	IDirect3D9* pD3D = Direct3DCreate9(D3D_SDK_VERSION);
-	if (pD3D) {
-		TCHAR strGUID[50] = { 0 };
+	CComPtr<IDirect3D9> pD3D9 = D3D9Helper::Direct3DCreate9();
+	if (pD3D9) {
+		TCHAR strGUID[50] = {};
 		CString cstrGUID;
 		CString d3ddevice_str;
-		D3DADAPTER_IDENTIFIER9 adapterIdentifier = { 0 };
+		D3DADAPTER_IDENTIFIER9 adapterIdentifier = {};
 
-		for (UINT adp = 0; adp < pD3D->GetAdapterCount(); ++adp) {
-			if (SUCCEEDED(pD3D->GetAdapterIdentifier(adp, 0, &adapterIdentifier))) {
+		for (UINT adp = 0; adp < pD3D9->GetAdapterCount(); ++adp) {
+			if (SUCCEEDED(pD3D9->GetAdapterIdentifier(adp, 0, &adapterIdentifier))) {
 				d3ddevice_str = adapterIdentifier.Description;
-				d3ddevice_str += _T(" - ");
+				d3ddevice_str += L" - ";
 				d3ddevice_str += adapterIdentifier.DeviceName;
 				cstrGUID.Empty();
 				if (::StringFromGUID2(adapterIdentifier.DeviceIdentifier, strGUID, 50) > 0) {
@@ -173,7 +174,6 @@ BOOL CPPageVideo::OnInitDialog()
 				}
 			}
 		}
-		pD3D->Release();
 	}
 
 	CorrectComboListWidth(m_cbD3D9RenderDevice);

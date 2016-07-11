@@ -28,6 +28,7 @@
 #include "../../../SubPic/SubPicQueueImpl.h"
 #include "IPinHook.h"
 #include <Version.h>
+#include "../DSUtil/D3D9Helper.h"
 #include "../DSUtil/WinAPIUtils.h"
 #include "../../transform/VSFilter/IDirectVobSub.h"
 #include "FocusThread.h"
@@ -112,10 +113,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		}
 	}
 	if (!m_pD3DEx) {
-		m_pD3D.Attach(Direct3DCreate9(D3D_SDK_VERSION));
-		if (!m_pD3D) {
-			m_pD3D.Attach(Direct3DCreate9(D3D9b_SDK_VERSION));
-		}
+		m_pD3D.Attach(D3D9Helper::Direct3DCreate9());
 	} else {
 		m_pD3D = m_pD3DEx;
 	}
@@ -1731,10 +1729,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 		}
 	}
 	if (!pD3DEx) {
-		pD3D.Attach(Direct3DCreate9(D3D_SDK_VERSION));
-		if (!pD3D) {
-			pD3D.Attach(Direct3DCreate9(D3D9b_SDK_VERSION));
-		}
+		pD3D = D3D9Helper::Direct3DCreate9();
 	} else {
 		pD3D = pD3DEx;
 	}

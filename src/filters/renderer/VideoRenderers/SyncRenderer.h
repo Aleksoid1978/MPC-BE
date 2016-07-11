@@ -184,7 +184,6 @@ namespace GothSync
 
 		HANDLE m_hEvtQuit; // Stop rendering thread event
 		LONGLONG m_LastAdapterCheck;
-		UINT GetAdapter(IDirect3D9 *pD3D);
 
 		HRESULT InitShaderResizer(int iShader);
 
