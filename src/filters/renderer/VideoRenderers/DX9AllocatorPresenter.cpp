@@ -42,6 +42,7 @@ bool queue_ffdshow_support = false;
 #define FRAMERATE_MAX_DELTA 3000
 
 using namespace DSObjects;
+using namespace D3D9Helper;
 
 // CDX9AllocatorPresenter
 
@@ -113,7 +114,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		}
 	}
 	if (!m_pD3DEx) {
-		m_pD3D.Attach(D3D9Helper::Direct3DCreate9());
+		m_pD3D.Attach(Direct3DCreate9());
 	} else {
 		m_pD3D = m_pD3DEx;
 	}
@@ -1729,7 +1730,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 		}
 	}
 	if (!pD3DEx) {
-		pD3D = D3D9Helper::Direct3DCreate9();
+		pD3D = Direct3DCreate9();
 	} else {
 		pD3D = pD3DEx;
 	}
