@@ -24,9 +24,6 @@
 #include "PngImage.h"
 #include "../../DSUtil/DSMPropertyBag.h"
 
-#define SHOW_DELAY 200
-#define AUTOPOP_DELAY 1000
-
 // CPlayerSeekBar
 
 class CMainFrame;
@@ -36,28 +33,28 @@ class CPlayerSeekBar : public CDialogBar
 	DECLARE_DYNAMIC(CPlayerSeekBar)
 
 private:
-	enum tooltip_state_t { TOOLTIP_HIDDEN, TOOLTIP_TRIGGERED, TOOLTIP_VISIBLE };
+	enum tooltip_state { TOOLTIP_HIDDEN, TOOLTIP_TRIGGERED, TOOLTIP_VISIBLE };
 
-	REFERENCE_TIME	m_stop				= 0;
-	REFERENCE_TIME	m_pos				= 0;
-	REFERENCE_TIME	m_posreal			= 0;
-	REFERENCE_TIME	m_pos2				= 0;
-	REFERENCE_TIME	m_posreal2			= 0;
-	bool			m_fEnabled			= false;
-	tooltip_state_t	m_tooltipState		= TOOLTIP_HIDDEN;
-	REFERENCE_TIME	m_tooltipPos		= 0;
-	REFERENCE_TIME	m_tooltipLastPos	= -1;
-	UINT_PTR		m_tooltipTimer		= 1;
+	REFERENCE_TIME m_stop           = 0;
+	REFERENCE_TIME m_pos            = 0;
+	REFERENCE_TIME m_posreal        = 0;
+	REFERENCE_TIME m_pos2           = 0;
+	REFERENCE_TIME m_posreal2       = 0;
+	bool           m_bEnabled       = false;
+	tooltip_state  m_tooltipState   = TOOLTIP_HIDDEN;
+	REFERENCE_TIME m_tooltipPos     = 0;
+	REFERENCE_TIME m_tooltipLastPos = -1;
+	UINT_PTR       m_tooltipTimer   = 1;
 
-	TOOLINFO		m_ti;
-	CToolTipCtrl	m_tooltip;
-	CMPCPngImage	m_BackGroundbm;
-	CCritSec		m_CBLock;
+	TOOLINFO        m_ti            = {};
+	CToolTipCtrl    m_tooltip;
+	CMPCPngImage    m_BackGroundbm;
+	CCritSec        m_CBLock;
 	CComPtr<IDSMChapterBag> m_pChapterBag;
-	CString			m_strChap;
-	CRect			m_rLock;
+	CString         m_strChap;
+	CRect           m_rLock;
 
-	CMainFrame*		m_pMainFrame;
+	CMainFrame*     m_pMainFrame;
 
 	void MoveThumb(CPoint point);
 	REFERENCE_TIME CalculatePosition(CPoint point);
@@ -75,20 +72,21 @@ public:
 	CPlayerSeekBar(CMainFrame* pMainFrame);
 	virtual ~CPlayerSeekBar();
 
-	void Enable(bool fEnable);
+	void Enable(bool bEnable);
 
 	void GetRange(REFERENCE_TIME& stop);
 	void SetRange(REFERENCE_TIME stop);
-	REFERENCE_TIME GetPos(), GetPosReal();
 	void SetPos(REFERENCE_TIME pos);
+
+	REFERENCE_TIME GetPos() const { return m_pos; }
+	REFERENCE_TIME GetPosReal() const { return m_posreal; }
+	BOOL HasDuration() const { return m_stop > 0; }
 
 	void HideToolTip();
 	void UpdateToolTipPosition(CPoint& point);
 	void UpdateToolTipText();
 
 	void SetChapterBag(CComPtr<IDSMChapterBag>& pCB);
-
-	BOOL HasDuration() { return m_stop > 0; };
 
 	virtual BOOL Create(CWnd* pParentWnd);
 	virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz) override;
@@ -98,7 +96,7 @@ public:
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	virtual ULONG GetGestureStatus(CPoint) { return 0; };
+	virtual ULONG GetGestureStatus(CPoint) { return 0; }
 
 	afx_msg void OnPaint();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
@@ -107,7 +105,7 @@ protected:
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnMouseLeave();
-	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC) { return TRUE; }
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnMButtonDown(UINT nFlags, CPoint point);
