@@ -23,6 +23,9 @@
 #include "MainFrm.h"
 #include "PlayerSeekBar.h"
 
+#define SHOW_DELAY    200
+#define AUTOPOP_DELAY 1000
+
 // CPlayerSeekBar
 
 IMPLEMENT_DYNAMIC(CPlayerSeekBar, CDialogBar)
@@ -50,13 +53,13 @@ BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 	m_tooltip.SetDelayTime(TTDT_INITIAL, 0);
 	m_tooltip.SetDelayTime(TTDT_RESHOW, 0);
 
-	memset(&m_ti, 0, sizeof(TOOLINFO));
-	m_ti.cbSize		= sizeof(TOOLINFO);
-	m_ti.uFlags		= TTF_IDISHWND | TTF_TRACK | TTF_ABSOLUTE;
-	m_ti.hwnd		= m_hWnd;
-	m_ti.hinst		= AfxGetInstanceHandle();
-	m_ti.lpszText	= NULL;
-	m_ti.uId		= (UINT)m_hWnd;
+	ZeroMemory(&m_ti, sizeof(TOOLINFO));
+	m_ti.cbSize   = sizeof(TOOLINFO);
+	m_ti.uFlags   = TTF_IDISHWND | TTF_TRACK | TTF_ABSOLUTE;
+	m_ti.hwnd     = m_hWnd;
+	m_ti.hinst    = AfxGetInstanceHandle();
+	m_ti.lpszText = NULL;
+	m_ti.uId      = (UINT)m_hWnd;
 
 	m_tooltip.SendMessage(TTM_ADDTOOL, 0, (LPARAM)&m_ti);
 
@@ -85,9 +88,9 @@ CSize CPlayerSeekBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
 	return ret;
 }
 
-void CPlayerSeekBar::Enable(bool fEnable)
+void CPlayerSeekBar::Enable(bool bEnable)
 {
-	m_fEnabled = fEnable;
+	m_bEnabled = bEnable;
 
 	Invalidate();
 }
@@ -110,19 +113,9 @@ void CPlayerSeekBar::SetRange(REFERENCE_TIME stop)
 	}
 }
 
-REFERENCE_TIME CPlayerSeekBar::GetPos()
-{
-	return m_pos;
-}
-
-REFERENCE_TIME CPlayerSeekBar::GetPosReal()
-{
-	return m_posreal;
-}
-
 void CPlayerSeekBar::SetPos(REFERENCE_TIME pos)
 {
-	CWnd* w = GetCapture();
+	const CWnd* w = GetCapture();
 
 	if (w && w->m_hWnd == m_hWnd) {
 		return;
@@ -139,36 +132,32 @@ void CPlayerSeekBar::SetPos(REFERENCE_TIME pos)
 
 void CPlayerSeekBar::SetPosInternal(REFERENCE_TIME pos)
 {
-	const CAppSettings& s = AfxGetAppSettings();
-
 	if (m_pos == pos) {
 		return;
 	}
 
-	CRect before = GetThumbRect();
+	const CRect before = GetThumbRect();
 	m_pos = clamp(pos, 0LL, m_stop);
 	m_posreal = pos;
-	CRect after = GetThumbRect();
+	const CRect after = GetThumbRect();
 
-	if (before != after && !s.bUseDarkTheme) {
+	if (before != after && !AfxGetAppSettings().bUseDarkTheme) {
 		InvalidateRect(before | after);
 	}
 }
 
 void CPlayerSeekBar::SetPosInternal2(REFERENCE_TIME pos)
 {
-	const CAppSettings& s = AfxGetAppSettings();
-
 	if (m_pos2 == pos) {
 		return;
 	}
 
-	CRect before = GetThumbRect();
+	const CRect before = GetThumbRect();
 	m_pos2 = clamp(pos, 0LL, m_stop);
 	m_posreal2 = pos;
-	CRect after = GetThumbRect();
+	const CRect after = GetThumbRect();
 
-	if (before != after && !s.bUseDarkTheme) {
+	if (before != after && !AfxGetAppSettings().bUseDarkTheme) {
 		InvalidateRect(before | after);
 	}
 }
@@ -181,9 +170,9 @@ CRect CPlayerSeekBar::GetChannelRect()
 	if (AfxGetAppSettings().bUseDarkTheme) {
 		//r.DeflateRect(1,1,1,1);
 	} else {
-		int dx = m_pMainFrame->ScaleFloorX(8);
-		int dy1 = m_pMainFrame->ScaleFloorY(7) + 2;
-		int dy2 = m_pMainFrame->ScaleFloorY(5) + 1;
+		const int dx  = m_pMainFrame->ScaleFloorX(8);
+		const int dy1 = m_pMainFrame->ScaleFloorY(7) + 2;
+		const int dy2 = m_pMainFrame->ScaleFloorY(5) + 1;
 
 		r.DeflateRect(dx, dy1, dx, dy2);
 	}
@@ -195,14 +184,14 @@ CRect CPlayerSeekBar::GetThumbRect()
 {
 	CRect r = GetChannelRect();
 
-	int x = r.left + (int)((m_stop > 0) ? (REFERENCE_TIME)r.Width() * m_pos / m_stop : 0);
-	int y = r.CenterPoint().y;
+	const int x = r.left + (int)((m_stop > 0) ? (REFERENCE_TIME)r.Width() * m_pos / m_stop : 0);
+	const int y = r.CenterPoint().y;
 
 	if (AfxGetAppSettings().bUseDarkTheme) {
 		r.SetRect(x, y - 2, x + 3, y + 3);
 	} else {
-		int dx = m_pMainFrame->ScaleFloorY(7);
-		int dy = m_pMainFrame->ScaleFloorY(5);
+		const int dx = m_pMainFrame->ScaleFloorY(7);
+		const int dy = m_pMainFrame->ScaleFloorY(5);
 
 		r.SetRect(x + 1 - dx, r.top - dy, x + dx, r.bottom + dy);
 	}
@@ -214,9 +203,9 @@ CRect CPlayerSeekBar::GetInnerThumbRect()
 {
 	CRect r = GetThumbRect();
 
-	int dx = m_pMainFrame->ScaleFloorX(4) - 1;
+	const int dx = m_pMainFrame->ScaleFloorX(4) - 1;
 	int dy = m_pMainFrame->ScaleFloorY(5);
-	if (!m_fEnabled || m_stop <= 0) {
+	if (!m_bEnabled || m_stop <= 0) {
 		dy -= 1;
 	}
 
@@ -228,14 +217,14 @@ CRect CPlayerSeekBar::GetInnerThumbRect()
 __int64 CPlayerSeekBar::CalculatePosition(CPoint point)
 {
 	REFERENCE_TIME pos = -1;
-	CRect r = GetChannelRect();
+	const CRect r = GetChannelRect();
 
 	if (point.x < r.left) {
 		pos = 0;
 	} else if (point.x >= r.right) {
 		pos = m_stop;
 	} else if (m_stop > 0) {
-		LONG w = r.right - r.left;
+		const LONG w = r.right - r.left;
 		pos = (m_stop * (point.x - r.left) + (w / 2)) / w;
 	}
 
@@ -293,14 +282,13 @@ void CPlayerSeekBar::OnPaint()
 
 	int R, G, B, R2, G2, B2;
 
-	bool fEnabled = m_fEnabled && m_stop > 0;
+	const bool bEnabled = m_bEnabled && m_stop > 0;
 
 	if (s.bUseDarkTheme) {
-		CRect rt;
 		CString str = m_pMainFrame->GetStrForTitle();
 		CDC memdc;
 		CBitmap m_bmPaint;
-		CRect r,rf,rc;
+		CRect r;
 		GetClientRect(&r);
 		memdc.CreateCompatibleDC(&dc);
 		m_bmPaint.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
@@ -327,18 +315,18 @@ void CPlayerSeekBar::OnPaint()
 		CPen penPlayed(s.clrFaceABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, s.clrFaceABGR);
 		CPen penPlayedOutline(s.clrOutlineABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, s.clrOutlineABGR);
 
-		rc = GetChannelRect();
-		int nposx = GetThumbRect().right - 2;
-		int nposy = r.top;
+		CRect rc = GetChannelRect();
+		const int nposx = GetThumbRect().right - 2;
+		const int nposy = r.top;
 
 		ThemeRGB(30, 35, 40, R, G, B);
-		CPen penPlayed1(PS_SOLID,0,RGB(R,G,B));
+		CPen penPlayed1(PS_SOLID, 0, RGB(R,G,B));
 		memdc.SelectObject(&penPlayed1);
 		memdc.MoveTo(rc.left, rc.top);
 		memdc.LineTo(rc.right, rc.top);
 
 		ThemeRGB(80, 85, 90, R, G, B);
-		CPen penPlayed2(PS_SOLID,0,RGB(R,G,B));
+		CPen penPlayed2(PS_SOLID, 0, RGB(R,G,B));
 		memdc.SelectObject(&penPlayed2);
 		memdc.MoveTo(rc.left - 1, rc.bottom - 1);
 		memdc.LineTo(rc.right + 2, rc.bottom - 1);
@@ -348,7 +336,7 @@ void CPlayerSeekBar::OnPaint()
 		int Progress;
 		if (m_pMainFrame->GetBufferingProgress(&Progress)) {
 			m_rLock = r;
-			int r_right = ((REFERENCE_TIME)r.Width() / 100) * Progress;
+			const int r_right = r.Width() / 100 * Progress;
 			ThemeRGB(45, 55, 60, R, G, B);
 				ThemeRGB(65, 70, 75, R2, G2, B2);
 				TRIVERTEX tvb[2] = {
@@ -359,7 +347,7 @@ void CPlayerSeekBar::OnPaint()
 				m_rLock.left = r_right;
 		}
 
-		if (fEnabled) {
+		if (bEnabled) {
 			if (m_BackGroundbm.IsExtGradiendLoading()) {
 				rc.right = nposx;
 				rc.left = rc.left + 1;
@@ -395,7 +383,7 @@ void CPlayerSeekBar::OnPaint()
 			}
 
 			ThemeRGB(80, 85, 90, R, G, B);
-			CPen penPlayed3(PS_SOLID,0,RGB(R,G,B));
+			CPen penPlayed3(PS_SOLID, 0, RGB(R,G,B));
 			memdc.SelectObject(&penPlayed3);
 			memdc.MoveTo(rc.left, rc.top);//active_top
 			memdc.LineTo(nposx, rc.top);
@@ -405,9 +393,9 @@ void CPlayerSeekBar::OnPaint()
 				CAutoLock lock(&m_CBLock);
 
 				if (m_pChapterBag && m_pChapterBag->ChapGetCount()) {
-					CRect rc2 = rc;
+					const CRect rc2 = rc;
 					for (DWORD idx = 0; idx < m_pChapterBag->ChapGetCount(); idx++) {
-						CRect r = GetChannelRect();
+						const CRect r = GetChannelRect();
 						REFERENCE_TIME rt;
 
 						if (FAILED(m_pChapterBag->ChapGet(idx, &rt, NULL))) {
@@ -418,7 +406,7 @@ void CPlayerSeekBar::OnPaint()
 							continue;
 						}
 
-						int x = r.left + (int)((m_stop > 0) ? (REFERENCE_TIME)r.Width() * rt / m_stop : 0);
+						const int x = r.left + (int)((m_stop > 0) ? (REFERENCE_TIME)r.Width() * rt / m_stop : 0);
 
 						// instead of drawing hands can be a marker icon
 						// HICON appIcon = (HICON)::LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
@@ -439,25 +427,25 @@ void CPlayerSeekBar::OnPaint()
 		}
 
 		if (s.fFileNameOnSeekBar || !s.bStatusBarIsVisible || !m_strChap.IsEmpty()) {
-			CFont font2;
 			ThemeRGB(135, 140, 145, R, G, B);
 			memdc.SetTextColor(RGB(R,G,B));
 
-			font2.CreateFont(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
-					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH|FF_DONTCARE, _T("Tahoma"));
+			CFont font;
+			font.CreateFont(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+							OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Tahoma");
 
-			CFont* oldfont2 = memdc.SelectObject(&font2);
+			CFont* pOldFont = memdc.SelectObject(&font);
 			SetBkMode(memdc, TRANSPARENT);
 
 			LONG xt = s.bStatusBarIsVisible ? 0 : s.strTimeOnSeekBar.GetLength() <= 21 ? 150 : 160;
 
 			if (s.fFileNameOnSeekBar || !m_strChap.IsEmpty()) {
-				if (!m_strChap.IsEmpty() && fEnabled) {
+				if (!m_strChap.IsEmpty() && bEnabled) {
 					str = m_strChap;
 				}
 
 				// draw filename || chapter name.
-				rt = rc;
+				CRect rt = rc;
 				rt.left  += 6;
 				rt.top   -= 2;
 				rt.right -= xt;
@@ -475,14 +463,14 @@ void CPlayerSeekBar::OnPaint()
 			}
 
 			if (!s.bStatusBarIsVisible) {
-				CString strT = s.strTimeOnSeekBar;
-				rt = rc;
+				str = s.strTimeOnSeekBar;
+				CRect rt = rc;
 				rt.left  -= xt - 10;
 				rt.top   -= 2;
 				rt.right -= 6;
 				ThemeRGB(200, 205, 210, R, G, B);
 				memdc.SetTextColor(RGB(R,G,B));
-				memdc.DrawText(strT, strT.GetLength(), &rt, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
+				memdc.DrawText(str, str.GetLength(), &rt, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
 			}
 		}
 
@@ -491,11 +479,10 @@ void CPlayerSeekBar::OnPaint()
 		memdc.DeleteDC();
 		m_bmPaint.DeleteObject();
 	} else {
-		COLORREF
-		white  = GetSysColor(COLOR_WINDOW),
-		shadow = GetSysColor(COLOR_3DSHADOW),
-		light  = GetSysColor(COLOR_3DHILIGHT),
-		bkg    = GetSysColor(COLOR_BTNFACE);
+		const COLORREF white  = GetSysColor(COLOR_WINDOW);
+		const COLORREF shadow = GetSysColor(COLOR_3DSHADOW);
+		const COLORREF light  = GetSysColor(COLOR_3DHILIGHT);
+		const COLORREF bkg    = GetSysColor(COLOR_BTNFACE);
 
 		// thumb
 		{
@@ -517,7 +504,7 @@ void CPlayerSeekBar::OnPaint()
 			r.DeflateRect(1, 1, 0, 0);
 			dc.Draw3dRect(&r, shadow, bkg);
 
-			if (fEnabled) {
+			if (bEnabled) {
 				r.DeflateRect(1, 1, 1, 2);
 				CPen white(PS_INSIDEFRAME, 1, white);
 				CPen* old = dc.SelectObject(&white);
@@ -545,7 +532,7 @@ void CPlayerSeekBar::OnPaint()
 		{
 			CRect r = GetChannelRect();
 
-			dc.FillSolidRect(&r, fEnabled ? white : bkg);
+			dc.FillSolidRect(&r, bEnabled ? white : bkg);
 			r.InflateRect(1, 1);
 			dc.Draw3dRect(&r, shadow, light);
 			dc.ExcludeClipRect(&r);
@@ -572,22 +559,16 @@ void CPlayerSeekBar::OnSize(UINT nType, int cx, int cy)
 
 void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	REFERENCE_TIME pos = CalculatePosition(point);
+	const REFERENCE_TIME pos = CalculatePosition(point);
 	if (m_pMainFrame->ValidateSeek(pos, m_stop)) {
-
-		if (AfxGetAppSettings().bUseDarkTheme && m_fEnabled) {
+		if (m_bEnabled && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
 			SetCapture();
 			MoveThumb(point);
+			m_pMainFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 		} else {
-			if (m_fEnabled && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
-				SetCapture();
-				MoveThumb(point);
-				m_pMainFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
-			} else {
-				if (!m_pMainFrame->m_bFullScreen) {
-					MapWindowPoints(m_pMainFrame, &point, 1);
-					m_pMainFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
-				}
+			if (!m_pMainFrame->m_bFullScreen) {
+				MapWindowPoints(m_pMainFrame, &point, 1);
+				m_pMainFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 			}
 		}
 	}
@@ -599,13 +580,6 @@ void CPlayerSeekBar::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	ReleaseCapture();
 
-	__int64 pos = CalculatePosition(point);
-	if (m_pMainFrame->ValidateSeek(pos, m_stop)) {
-		if (AfxGetAppSettings().bUseDarkTheme && m_fEnabled) {
-			m_pMainFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
-		}
-	}
-
 	CDialogBar::OnLButtonUp(nFlags, point);
 }
 
@@ -614,15 +588,15 @@ void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
 	CAppSettings& s = AfxGetAppSettings();
 
 	if (!s.bStatusBarIsVisible) {
-		CRect rc = GetChannelRect();
-		CRect rT = rc;
-		rT.left  = rc.right - 140;
-		rT.right = rc.right - 6;
+		const CRect rc(GetChannelRect());
+		CRect rt(rc);
+		rt.left  = rc.right - 140;
+		rt.right = rc.right - 6;
 		CPoint p;
 		GetCursorPos(&p);
 		ScreenToClient(&p);
 
-		if (rT.PtInRect(p)) {
+		if (rt.PtInRect(p)) {
 			s.fRemainingTime = !s.fRemainingTime;
 		}
 	}
@@ -636,12 +610,12 @@ void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
 void CPlayerSeekBar::UpdateTooltip(CPoint point)
 {
 	m_tooltipPos = CalculatePosition(point);
-	if (m_fEnabled && m_stop > 0 && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
+	if (m_bEnabled && m_stop > 0 && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
 		if (m_tooltipState == TOOLTIP_HIDDEN && m_tooltipPos != m_tooltipLastPos) {
 
 			TRACKMOUSEEVENT tme = { sizeof(TRACKMOUSEEVENT) };
 			tme.hwndTrack = m_hWnd;
-			tme.dwFlags = TME_LEAVE;
+			tme.dwFlags   = TME_LEAVE;
 			TrackMouseEvent(&tme);
 
 			m_tooltipState = TOOLTIP_TRIGGERED;
@@ -663,26 +637,24 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 
 void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 {
-	const CAppSettings& s = AfxGetAppSettings();
-
-	CWnd* w = GetCapture();
-
+	const CWnd* w = GetCapture();
 	if (w && w->m_hWnd == m_hWnd && (nFlags & MK_LBUTTON)) {
-		REFERENCE_TIME pos = CalculatePosition(point);
+		const REFERENCE_TIME pos = CalculatePosition(point);
 		if (m_pMainFrame->ValidateSeek(pos, m_stop)) {
 			MoveThumb(point);
-		}
 
-		if (!s.bUseDarkTheme) {
 			m_pMainFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBTRACK), (LPARAM)m_hWnd);
+
+			Invalidate();
+			UpdateWindow();
 		}
 	}
 
-	if (s.fUseTimeTooltip || m_pMainFrame->CanPreviewUse()) {
+	if (AfxGetAppSettings().fUseTimeTooltip || m_pMainFrame->CanPreviewUse()) {
 		UpdateTooltip(point);
 	}
 
-	OAFilterState fs = m_pMainFrame->GetMediaState();
+	const OAFilterState fs = m_pMainFrame->GetMediaState();
 
 	if (fs != -1) {
 		if (m_pMainFrame->CanPreviewUse()) {
@@ -709,16 +681,11 @@ BOOL CPlayerSeekBar::PreTranslateMessage(MSG* pMsg)
 	POINT ptWnd(pMsg->pt);
 	this->ScreenToClient(&ptWnd);
 
-	if (m_fEnabled && AfxGetAppSettings().fUseTimeTooltip && m_stop > 0 && (GetChannelRect() | GetThumbRect()).PtInRect(ptWnd)) {
+	if (m_bEnabled && AfxGetAppSettings().fUseTimeTooltip && m_stop > 0 && (GetChannelRect() | GetThumbRect()).PtInRect(ptWnd)) {
 		m_tooltip.RelayEvent(pMsg);
 	}
 
 	return CDialogBar::PreTranslateMessage(pMsg);
-}
-
-BOOL CPlayerSeekBar::OnEraseBkgnd(CDC* pDC)
-{
-	return TRUE;
 }
 
 BOOL CPlayerSeekBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
@@ -728,14 +695,12 @@ BOOL CPlayerSeekBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	ScreenToClient(&p);
 	if (m_rLock.PtInRect(p)) {
 		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
-
 		return TRUE;
 	}
 
 
-	if (m_fEnabled && m_stop > 0 && m_stop != 100) {
+	if (m_bEnabled && m_stop > 0 && m_stop != 100) {
 		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_HAND));
-
 		return TRUE;
 	}
 
@@ -761,7 +726,7 @@ void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
 				GetCursorPos(&point);
 				ScreenToClient(&point);
 
-				if (m_fEnabled && m_stop > 0 && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
+				if (m_bEnabled && m_stop > 0 && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
 					m_tooltipTimer = SetTimer(m_tooltipTimer, m_pMainFrame->CanPreviewUse() ? 10 : AUTOPOP_DELAY, NULL);
 					m_tooltipPos = CalculatePosition(point);
 					UpdateToolTipText();
