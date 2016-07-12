@@ -637,6 +637,15 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 
 void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 {
+	if (m_CurrentPoint.x == point.x) {
+		if (AfxGetAppSettings().fUseTimeTooltip || m_pMainFrame->CanPreviewUse()) {
+			UpdateTooltip(point);
+		}
+
+		CDialogBar::OnMouseMove(nFlags, point);
+		return;
+	}
+
 	const CWnd* w = GetCapture();
 	if (w && w->m_hWnd == m_hWnd && (nFlags & MK_LBUTTON)) {
 		const REFERENCE_TIME pos = CalculatePosition(point);
@@ -664,6 +673,8 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 	} else {
 		m_pMainFrame->PreviewWindowHide();
 	}
+
+	m_CurrentPoint = point;
 
 	CDialogBar::OnMouseMove(nFlags, point);
 }

@@ -56,6 +56,8 @@ private:
 
 	CMainFrame*     m_pMainFrame;
 
+	CPoint          m_CurrentPoint;
+
 	void MoveThumb(CPoint point);
 	REFERENCE_TIME CalculatePosition(CPoint point);
 	void SetPosInternal(REFERENCE_TIME pos);
