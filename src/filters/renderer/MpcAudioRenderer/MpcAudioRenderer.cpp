@@ -158,6 +158,8 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_bHasVideo(TRUE)
 	, m_bNeedReinitialize(FALSE)
 	, m_bNeedReinitializeFull(FALSE)
+	, m_FlushEvent(TRUE)
+	, m_ReceiveEvent(TRUE)
 {
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CMpcAudioRenderer()"));
 
@@ -355,49 +357,60 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 
 HRESULT CMpcAudioRenderer::Receive(IMediaSample* pSample)
 {
-	ASSERT(pSample);
+	auto ReceiveInternal = [&](IMediaSample* pSample) {
+		ASSERT(pSample);
 
-	// It may return VFW_E_SAMPLE_REJECTED code to say don't bother
-	HRESULT hr = PrepareReceive(pSample);
-	ASSERT(m_bInReceive == SUCCEEDED(hr));
-	if (FAILED(hr)) {
-		if (hr == VFW_E_SAMPLE_REJECTED) {
-			return NOERROR;
+		if (m_FlushEvent.Check()) {
+			return S_OK;
 		}
 
-		return hr;
-	}
+		m_ReceiveEvent.Set();
 
-	if (m_State == State_Paused) {
-		{
-			CAutoLock cRendererLock(&m_InterfaceLock);
-			if (m_State == State_Stopped) {
-				m_bInReceive = FALSE;
-				return NOERROR;
+		// It may return VFW_E_SAMPLE_REJECTED code to say don't bother
+		HRESULT hr = PrepareReceive(pSample);
+		ASSERT(m_bInReceive == SUCCEEDED(hr));
+		if (FAILED(hr)) {
+			if (hr == VFW_E_SAMPLE_REJECTED) {
+				hr = S_OK;
 			}
+			return hr;
 		}
-		Ready();
-	}
 
-	// http://blogs.msdn.com/b/mediasdkstuff/archive/2008/09/19/custom-directshow-audio-renderer-hangs-playback-in-windows-media-player-11.aspx
-	DoRenderSampleWasapi(pSample);
+		if (m_State == State_Paused) {
+			{
+				CAutoLock cRendererLock(&m_InterfaceLock);
+				if (m_State == State_Stopped) {
+					m_bInReceive = FALSE;
+					return S_OK;
+				}
+			}
+			Ready();
+		}
 
-	m_bInReceive = FALSE;
+		DoRenderSampleWasapi(pSample);
 
-	CAutoLock cRendererLock(&m_InterfaceLock);
-	if (m_State == State_Stopped) {
-		return NOERROR;
-	}
+		m_bInReceive = FALSE;
 
-	CAutoLock cSampleLock(&m_RendererLock);
+		CAutoLock cRendererLock(&m_InterfaceLock);
+		if (m_State == State_Stopped) {
+			return S_OK;
+		}
 
-	ClearPendingSample();
-	SendEndOfStream();
-	CancelNotification();
+		CAutoLock cSampleLock(&m_RendererLock);
 
-	return NOERROR;
+		ClearPendingSample();
+		SendEndOfStream();
+		CancelNotification();
+
+		return S_OK;
+	
+	};
+
+	HRESULT hr = ReceiveInternal(pSample);
+	m_ReceiveEvent.Reset();
+
+	return hr;
 }
-
 
 STDMETHODIMP CMpcAudioRenderer::NonDelegatingQueryInterface(REFIID riid, void **ppv)
 {
@@ -1196,14 +1209,15 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 
 	CheckBufferStatus();
 
-	HANDLE handles[2] = {
+	HANDLE handles[3] = {
 		m_hStopRenderThreadEvent,
+		m_FlushEvent,
 		m_hRendererNeedMoreData,
 	};
 
-	const DWORD result = WaitForMultipleObjects(2, handles, FALSE, INFINITE);
-	if (result == WAIT_OBJECT_0) {
-		// m_hStopRenderThreadEvent
+	const DWORD result = WaitForMultipleObjects(3, handles, FALSE, INFINITE);
+	if (result == WAIT_OBJECT_0 || result == WAIT_OBJECT_0 + 1) {
+		// m_hStopRenderThreadEvent, m_FlushEvent
 		return S_FALSE;
 	}
 
@@ -1378,6 +1392,8 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 			DbgLog((LOG_TRACE, 3, L"		samplerate	= %d", out_samplerate));
 #endif
 
+			CAutoLock cResamplerLock(&m_csResampler);
+
 			m_Resampler.UpdateInput(in_sf, in_layout, in_samplerate);
 			m_Resampler.UpdateOutput(out_sf, out_layout, out_samplerate);
 			out_samples = m_Resampler.CalcOutSamples(in_samples);
@@ -1507,6 +1523,10 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 
 HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 {
+	if (m_FlushEvent.Check()) {
+		return S_FALSE;
+	}
+
 	if (!m_pRenderClient) {
 		InitAudioClient(m_pWaveFileFormatOutput);
 	}
@@ -2175,7 +2195,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 	}
 
 	const UINT32 numFramesAvailable = m_nFramesInBuffer - numFramesPadding;
-	UINT32 nAvailableBytes = numFramesAvailable * m_pWaveFileFormatOutput->nBlockAlign;
+	const UINT32 nAvailableBytes = numFramesAvailable * m_pWaveFileFormatOutput->nBlockAlign;
 
 	BYTE* pData = NULL;
 	hr = m_pRenderClient->GetBuffer(numFramesAvailable, &pData);
@@ -2189,12 +2209,15 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 	const size_t nWasapiQueueSize = WasapiQueueSize();
 	DWORD dwFlags = 0;
 
-	if (!pData || !nWasapiQueueSize || m_filterState != State_Running) {
+	const BOOL bFlushing = m_FlushEvent.Check();
+	if (!pData || !nWasapiQueueSize || m_filterState != State_Running || bFlushing) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 1
 		if (m_filterState != State_Running) {
 			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - not running"));
 		} else if (!nWasapiQueueSize) {
 			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - data queue is empty"));
+		} else if (bFlushing) {
+			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::RenderWasapiBuffer() - flushing"));
 		}
 #endif
 		dwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
@@ -2618,7 +2641,7 @@ HRESULT CMpcAudioRenderer::EnableMMCSS()
 			// to reduce glitches while the low-latency stream plays.
 			DWORD taskIndex = 0;
 
-			m_hTask = pfAvSetMmThreadCharacteristicsW(_T("Pro Audio"), &taskIndex);
+			m_hTask = pfAvSetMmThreadCharacteristicsW(L"Pro Audio", &taskIndex);
 			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::EnableMMCSS() - Putting thread 0x%x in higher priority for Wasapi mode (lowest latency)", ::GetCurrentThreadId()));
 			if (m_hTask == NULL) {
 				return HRESULT_FROM_WIN32(GetLastError());
@@ -2648,35 +2671,51 @@ void CMpcAudioRenderer::WasapiFlush()
 {
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::WasapiFlush()"));
 
-	CAutoLock cQueueLock(&m_csQueue);
+	{
+		CAutoLock cQueueLock(&m_csQueue);
+		m_WasapiQueue.RemoveAll();
+		m_CurrentPacket.Free();
 
-	m_Resampler.FlushBuffers();
-	m_WasapiQueue.RemoveAll();
-	m_CurrentPacket.Free();
-
-	m_nSampleOffset = 0;
-	m_nSampleNum = 0;
-}
-
-HRESULT CMpcAudioRenderer::BeginFlush()
-{
-	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::BeginFlush()"));
-
-	if (m_hRendererNeedMoreData) {
-		SetEvent(m_hRendererNeedMoreData);
+		m_nSampleOffset = 0;
+		m_nSampleNum = 0;
 	}
 
-	return CBaseRenderer::BeginFlush();
+	{
+		CAutoLock cResamplerLock(&m_csResampler);
+		m_Resampler.FlushBuffers();
+	}
 }
 
-HRESULT	CMpcAudioRenderer::EndFlush()
+HRESULT CMpcAudioRenderer::EndFlush()
 {
-	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::EndFlush()"));
-
 	WasapiFlush();
 	m_Filter.Flush();
 
-	return CBaseRenderer::EndFlush();
+	HRESULT hr = CBaseRenderer::EndFlush();
+	m_FlushEvent.Reset();
+
+	return hr;
+}
+
+void CMpcAudioRenderer::Flush()
+{
+	m_FlushEvent.Set();
+
+#if DEBUG
+	ULONGLONG start = 0;
+	if (m_ReceiveEvent.Check()) {
+		start = GetPerfCounter();
+	}
+#endif
+	while (m_ReceiveEvent.Check()) {
+		Sleep(1);
+	};
+#if DEBUG
+	if (start) {
+		const ULONGLONG end = GetPerfCounter();
+		DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::Flush() : Waiting for the end of data receive - %0.3f ms", (end - start) / 10000.0));
+	}
+#endif
 }
 
 size_t CMpcAudioRenderer::WasapiQueueSize()
@@ -2812,9 +2851,23 @@ CMpcAudioRendererInputPin::CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, H
 {
 }
 
+STDMETHODIMP CMpcAudioRendererInputPin::NewSegment(REFERENCE_TIME startTime, REFERENCE_TIME stopTime, double rate)
+{
+	CAutoLock cReceiveLock(&m_csReceive);
+	return CRendererInputPin::NewSegment(startTime, stopTime, rate);
+}
+
+STDMETHODIMP CMpcAudioRendererInputPin::Receive(IMediaSample* pSample)
+{
+	CAutoLock cReceiveLock(&m_csReceive);
+	return CRendererInputPin::Receive(pSample);
+}
+
 STDMETHODIMP CMpcAudioRendererInputPin::EndOfStream()
 {
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRendererInputPin::EndOfStream()"));
+
+	CAutoLock cReceiveLock(&m_csReceive);
 
 	m_bEndOfStream = TRUE;
 	m_pRenderer->WaitFinish();
@@ -2825,11 +2878,22 @@ STDMETHODIMP CMpcAudioRendererInputPin::EndOfStream()
 
 STDMETHODIMP CMpcAudioRendererInputPin::BeginFlush()
 {
+	DbgLog((LOG_TRACE, 3, L"CMpcAudioRendererInputPin::BeginFlush()"));
+
+	m_pRenderer->Flush();
+
 	HRESULT hr = CRendererInputPin::BeginFlush();
 
 	m_bEndOfStream = FALSE;
 
 	return hr;
+}
+
+STDMETHODIMP CMpcAudioRendererInputPin::EndFlush()
+{
+	DbgLog((LOG_TRACE, 3, L"CMpcAudioRendererInputPin::EndFlush()"));
+
+	return CRendererInputPin::EndFlush();
 }
 
 HRESULT CMpcAudioRendererInputPin::Run(REFERENCE_TIME rtStart)
