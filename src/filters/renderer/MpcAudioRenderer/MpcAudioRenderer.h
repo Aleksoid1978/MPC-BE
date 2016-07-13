@@ -46,6 +46,7 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	, public IMpcAudioRendererFilter
 {
 	CCritSec			m_csQueue;
+	CCritSec			m_csResampler;
 	CCritSec			m_csRender;
 	CCritSec			m_csProps;
 	CCritSec			m_csCheck;
@@ -78,8 +79,9 @@ public:
 	HRESULT SetMediaType(const CMediaType *pmt) override;
 	HRESULT DoRenderSample(IMediaSample *pMediaSample) override { return E_NOTIMPL; }
 
-	HRESULT BeginFlush() override;
 	HRESULT EndFlush() override;
+
+	void Flush();
 
 	size_t WasapiQueueSize();
 	void WaitFinish();
@@ -257,6 +259,9 @@ private:
 
 	HANDLE					m_hRendererNeedMoreData;
 
+	CAMEvent				m_FlushEvent;
+	CAMEvent				m_ReceiveEvent;
+
 	BOOL					m_bNeedReinitialize;
 	BOOL					m_bNeedReinitializeFull;
 
@@ -288,11 +293,17 @@ class CMpcAudioRendererInputPin final
 
 	BOOL m_bEndOfStream;
 
+	CCritSec m_csReceive;
+
 public:
 	CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, HRESULT* phr);
 
+	STDMETHODIMP NewSegment(REFERENCE_TIME startTime, REFERENCE_TIME stopTime, double rate) override;
+	STDMETHODIMP Receive(IMediaSample* pSample) override;
+
 	STDMETHODIMP EndOfStream() override;
 	STDMETHODIMP BeginFlush() override;
+	STDMETHODIMP EndFlush() override;
 
 	HRESULT Run(REFERENCE_TIME rtStart) override;
 };
