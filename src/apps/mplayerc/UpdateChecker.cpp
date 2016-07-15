@@ -61,19 +61,20 @@ Update_Status UpdateChecker::CheckNewVersion()
 	Update_Status updatestatus = UPDATER_ERROR;
 	CStringA updateinfo;
 
-	HINTERNET f, s = InternetOpen(L"MPC-BE", 0, NULL, NULL, 0);
-	if (s) {
-		f = InternetOpenUrl(s, L"http://mpc-be.org/version.txt", NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
-		if (f) {
+	HINTERNET hUrl;
+	HINTERNET hInet = InternetOpen(L"MPC-BE", 0, NULL, NULL, 0);
+	if (hInet) {
+		hUrl = InternetOpenUrl(hInet, L"http://mpc-be.org/version.txt", NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
+		if (hUrl) {
 			char buffer[1024] = { 0 }; // limit update file to 1024 bytes
 			DWORD dwBytesRead = 0;
 
-			if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == TRUE && dwBytesRead < _countof(buffer)) {
+			if (InternetReadFile(hUrl, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == TRUE && dwBytesRead < _countof(buffer)) {
 				updateinfo = CStringA(buffer);
 			}
-			InternetCloseHandle(f);
+			InternetCloseHandle(hUrl);
 		}
-		InternetCloseHandle(s);
+		InternetCloseHandle(hInet);
 	}
 
 	if (updateinfo.GetLength()) {
