@@ -209,17 +209,17 @@ namespace Youtube
 		}
 	}
 
-	static bool ParseMetadata(HINTERNET& s, const CString videoId, YoutubeFields& y_fields)
+	static bool ParseMetadata(HINTERNET& hInet, const CString videoId, YoutubeFields& y_fields)
 	{
-		if (s && !videoId.IsEmpty()) {
+		if (hInet && !videoId.IsEmpty()) {
 			CString link;
 			link.Format(L"https://www.googleapis.com/youtube/v3/videos?id=%s&key=%s&part=snippet,contentDetails&fields=items/snippet/title,items/snippet/publishedAt,items/snippet/channelTitle,items/snippet/description,items/contentDetails/duration", videoId, GOOGLE_API_KEY);
-			HINTERNET f = InternetOpenUrl(s, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
-			if (f) {
+			HINTERNET hUrl = InternetOpenUrl(hInet, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
+			if (hUrl) {
 				char* data = NULL;
 				DWORD dataSize = 0;
-				InternetReadData(f, &data, dataSize, NULL);
-				InternetCloseHandle(f);
+				InternetReadData(hUrl, &data, dataSize, NULL);
+				InternetCloseHandle(hUrl);
 
 				if (dataSize) {
 					Json::Reader reader;
@@ -827,15 +827,16 @@ namespace Youtube
 			char* data = NULL;
 			DWORD dataSize = 0;
 
-			HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
-			if (s) {
+			HINTERNET hUrl;
+			HINTERNET hInet = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
+			if (hInet) {
 				HandleURL(url);
-				f = InternetOpenUrl(s, url, NULL, 0, INTERNET_OPEN_FALGS, 0);
-				if (f) {
-					InternetReadData(f, &data, dataSize, "id=\"footer\"");
-					InternetCloseHandle(f);
+				hUrl = InternetOpenUrl(hInet, url, NULL, 0, INTERNET_OPEN_FALGS, 0);
+				if (hUrl) {
+					InternetReadData(hUrl, &data, dataSize, "id=\"footer\"");
+					InternetCloseHandle(hUrl);
 				}
-				InternetCloseHandle(s);
+				InternetCloseHandle(hInet);
 			}
 
 			if (!data) {
@@ -914,8 +915,8 @@ namespace Youtube
 	{
 		bool bRet = false;
 		if (CheckURL(url)) {
-			HINTERNET s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
-			if (s) {
+			HINTERNET hInet = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
+			if (hInet) {
 				HandleURL(url);
 
 				CString videoId;
@@ -923,9 +924,9 @@ namespace Youtube
 					videoId = RegExpParse(url, videoIdRegExps[i]);
 				}
 
-				bRet = ParseMetadata(s, videoId, y_fields);
+				bRet = ParseMetadata(hInet, videoId, y_fields);
 
-				InternetCloseHandle(s);
+				InternetCloseHandle(hInet);
 			}
 		}
 
