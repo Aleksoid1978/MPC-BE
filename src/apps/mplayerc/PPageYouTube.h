@@ -1,6 +1,5 @@
 /*
- * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2012-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +21,6 @@
 #pragma once
 
 #include "PPageBase.h"
-#include "PlayerYouTube.h"
 
 // CPPageYoutube dialog
 
@@ -32,10 +30,10 @@ class CPPageYoutube : public CPPageBase
 
 private:
 	CButton m_chkPageParser;
-	CComboBox m_cbPreferredFormat;
+	CComboBox m_cbFormat;
+	CComboBox m_cbResolution;
+	CButton m_chk60fps;
 	CButton m_chkLoadPlaylist;
-
-	CFont m_MonoFont;
 
 public:
 	CPPageYoutube();
@@ -44,6 +42,7 @@ public:
 	enum { IDD = IDD_PPAGEYOUTUBE };
 
 	afx_msg void OnCheckPageParser();
+	afx_msg void OnFormatSelChange();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

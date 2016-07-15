@@ -1,6 +1,5 @@
 /*
- * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2012-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,12 +39,15 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 
 	DDX_Control(pDX, IDC_CHECK2, m_chkPageParser);
-	DDX_Control(pDX, IDC_COMBO1, m_cbPreferredFormat);
+	DDX_Control(pDX, IDC_COMBO1, m_cbFormat);
+	DDX_Control(pDX, IDC_COMBO2, m_cbResolution);
+	DDX_Control(pDX, IDC_CHECK3, m_chk60fps);
 	DDX_Control(pDX, IDC_CHECK1, m_chkLoadPlaylist);
 }
 
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
 	ON_COMMAND(IDC_CHECK2, OnCheckPageParser)
+	ON_CBN_SELCHANGE(IDC_COMBO1, OnFormatSelChange)
 END_MESSAGE_MAP()
 
 // CPPageYoutube message handlers
@@ -60,49 +62,20 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	m_chkPageParser.SetCheck(s.bYoutubePageParser);
 
-	m_cbPreferredFormat.Clear();
+	m_cbFormat.AddString(L"MP4");
+	m_cbFormat.AddString(L"WebM");
+	m_cbFormat.SetCurSel(s.YoutubeFormat.fmt);
 
-	{
-		LOGFONT lf;
-		memset(&lf, 0, sizeof(lf));
-		lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-		CDC* cDC = m_cbPreferredFormat.GetDC();
-		lf.lfHeight = -MulDiv(8, cDC->GetDeviceCaps(LOGPIXELSY), 72);
-		wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Courier New");
-		m_MonoFont.CreateFontIndirect(&lf);
-		m_cbPreferredFormat.SetFont(&m_MonoFont);
+	int resolutions[] = { 2160, 1440, 1080, 720, 480, 360 };
+	for (int i = 0; i < _countof(resolutions); i++) {
+		CString str;
+		str.Format(L"%dp", resolutions[i]);
+		m_cbResolution.AddString(str);
+		m_cbResolution.SetItemData(i, resolutions[i]);
 	}
+	SelectByItemData(m_cbResolution, s.YoutubeFormat.res);
 
-	auto getSorted = [] () {
-		std::vector<YoutubeParser::YoutubeProfiles> profiles;
-		profiles.assign(YoutubeParser::youtubeVideoProfiles, YoutubeParser::youtubeVideoProfiles + _countof(YoutubeParser::youtubeVideoProfiles) - 1);
-		std::sort(profiles.begin(), profiles.end(), [](const YoutubeParser::YoutubeProfiles a, const YoutubeParser::YoutubeProfiles b) {
-			return a.priority > b.priority && a.quality >= b.quality;
-		});
-
-		return profiles;
-	};
-
-	static std::vector<YoutubeParser::YoutubeProfiles> profiles = getSorted();
-	int i = 0;
-	for(auto it = profiles.begin(); it != profiles.end(); ++it) {
-		const CString fmt = YoutubeParser::FormatProfiles(*it);
-		if (!fmt.IsEmpty()) {
-			m_cbPreferredFormat.AddString(fmt);
-			m_cbPreferredFormat.SetItemData(i++, it->iTag);
-		}
-	}
-
-	i = 0;
-	for (i = 0; i < m_cbPreferredFormat.GetCount(); i++) {
-		if (m_cbPreferredFormat.GetItemData(i) == s.iYoutubeTag) {
-			m_cbPreferredFormat.SetCurSel(i);
-			break;
-		}
-	}
-	if (i >= m_cbPreferredFormat.GetCount()) {
-		SelectByItemData(m_cbPreferredFormat, 22);
-	}
+	m_chk60fps.SetCheck(s.YoutubeFormat.fps60 ? BST_CHECKED : BST_UNCHECKED);
 
 	m_chkLoadPlaylist.SetCheck(s.bYoutubeLoadPlaylist);
 
@@ -121,9 +94,11 @@ BOOL CPPageYoutube::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.iYoutubeTag          = GetCurItemData(m_cbPreferredFormat);
-	s.bYoutubePageParser   = !!m_chkPageParser.GetCheck();
-	s.bYoutubeLoadPlaylist = !!m_chkLoadPlaylist.GetCheck();
+	s.bYoutubePageParser	= !!m_chkPageParser.GetCheck();
+	s.YoutubeFormat.fmt		= m_cbFormat.GetCurSel();
+	s.YoutubeFormat.res		= GetCurItemData(m_cbResolution);
+	s.YoutubeFormat.fps60	= !!m_chk60fps.GetCheck();
+	s.bYoutubeLoadPlaylist	= !!m_chkLoadPlaylist.GetCheck();
 
 	return __super::OnApply();
 }
@@ -132,12 +107,23 @@ void CPPageYoutube::OnCheckPageParser()
 {
 	if (m_chkPageParser.GetCheck()) {
 		GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
-		m_cbPreferredFormat.EnableWindow(TRUE);
+		m_cbFormat.EnableWindow(TRUE);
 	} else {
 		GetDlgItem(IDC_STATIC2)->EnableWindow(FALSE);
-		m_cbPreferredFormat.EnableWindow(FALSE);
+		m_cbFormat.EnableWindow(FALSE);
 	}
 
 	SetModified();
 }
 
+void CPPageYoutube::OnFormatSelChange()
+{
+	if (m_cbFormat.GetCurSel() == 0) {
+		
+	}
+	else if(m_cbFormat.GetCurSel() == 0) {
+		
+	}
+
+	SetModified();
+}

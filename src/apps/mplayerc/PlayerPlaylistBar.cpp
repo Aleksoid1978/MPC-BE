@@ -32,7 +32,7 @@
 
 static CString MakePath(CString path)
 {
-	if (path.Find(L"://") >= 0 || YoutubeParser::CheckURL(path)) { // skip URLs
+	if (path.Find(L"://") >= 0 || Youtube::CheckURL(path)) { // skip URLs
 		return path;
 	}
 
@@ -893,8 +893,8 @@ void CPlayerPlaylistBar::AddItem(CAtlList<CString>& fns, CSubtitleItemList* subs
 
 	pli.AutoLoadFiles();
 	if (pli.m_fns.GetCount() == 1) {
-		YoutubeParser::YoutubeFields y_fields;
-		if (YoutubeParser::Parse_URL(pli.m_fns.GetHead(), y_fields)) {
+		Youtube::YoutubeFields y_fields;
+		if (Youtube::Parse_URL(pli.m_fns.GetHead(), y_fields)) {
 			pli.m_label    = y_fields.title;
 			pli.m_duration = y_fields.duration;
 		}
@@ -1013,7 +1013,7 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CSubtitleItemList
 
 	ResolveLinkFiles(fns);
 
-	if (bCheck && !YoutubeParser::CheckURL(fns.GetHead())) {
+	if (bCheck && !Youtube::CheckURL(fns.GetHead())) {
 		CAtlList<CString> sl;
 		if (SearchFiles(fns.GetHead(), sl)) {
 

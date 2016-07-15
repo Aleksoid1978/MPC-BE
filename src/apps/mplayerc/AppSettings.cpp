@@ -858,7 +858,9 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_TAG, iYoutubeTag);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_YOUTUBE_FORMAT, YoutubeFormat.fmt == 1 ? L"WEBM" : L"MP4");
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
@@ -1522,7 +1524,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	strLastOpenFilterDir	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR);
 
 	bYoutubePageParser		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_PAGEPARSER, TRUE);
-	iYoutubeTag				= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_TAG, 22);
+	str = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_YOUTUBE_FORMAT, L"MP4");
+	YoutubeFormat.fmt = (str == L"WEBM") ? 1 : 0;
+	YoutubeFormat.res		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_RESOLUTION, 720);
+	YoutubeFormat.fps60		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_60FPS, FALSE);
 	bYoutubeLoadPlaylist	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, FALSE);
 
 	nLastFileInfoPage		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, 0);
@@ -2160,7 +2165,7 @@ void CAppSettings::CRecentFileAndURLList::Add(LPCTSTR lpszPathName)
 		return;
 	}
 
-	bool fURL = (pathName.Find(_T("://")) >= 0 || YoutubeParser::CheckURL(lpszPathName));
+	bool fURL = (pathName.Find(_T("://")) >= 0 || Youtube::CheckURL(lpszPathName));
 
 	// fully qualify the path name
 	if (!fURL) {
