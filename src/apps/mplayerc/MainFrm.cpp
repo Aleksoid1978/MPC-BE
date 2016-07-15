@@ -73,7 +73,6 @@
 #include <dwmapi.h>
 
 #include "OpenImage.h"
-#include "PlayerYouTube.h"
 
 #include "../../Subtitles/RenderedHdmvSubtitle.h"
 #include "../../Subtitles/SupSubFile.h"
@@ -9388,7 +9387,7 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 			UINT idx = 0;
 			for(auto item = m_youtubeUrllist.begin(); item != m_youtubeUrllist.end(); ++item) {
 				if (idx == id && item->url != m_strUrl) {
-					const int tagSelected = item->tag;
+					const int tagSelected = item->profile->iTag;
 					REFERENCE_TIME rtNow = INVALID_TIME;
 					m_pMS->GetCurrentPosition(&rtNow);
 
@@ -11462,10 +11461,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	CString youtubeUrl;
 	if (s.bYoutubePageParser && pOFD->fns.GetCount() == 1) {
 		CString fn = (CString)pOFD->fns.GetHead();
-		if (YoutubeParser::CheckURL(fn)) {
+		if (Youtube::CheckURL(fn)) {
 			youtubeUrl = fn;
 			CAtlList<CString> urls;
-			if (YoutubeParser::Parse_URL(fn, urls, m_youtubeFields, m_youtubeUrllist, pOFD->subs, pOFD->rtStart)) {
+			if (Youtube::Parse_URL(fn, urls, m_youtubeFields, m_youtubeUrllist, pOFD->subs, pOFD->rtStart)) {
 				Content::Online::Disconnect(fn);
 
 				pOFD->fns.RemoveAll();
@@ -19084,10 +19083,10 @@ REFTIME CMainFrame::GetAvgTimePerFrame(BOOL bUsePCAP/* = TRUE*/) const
 
 BOOL CMainFrame::OpenYoutubePlaylist(CString url)
 {
-	if (AfxGetAppSettings().bYoutubeLoadPlaylist && YoutubeParser::CheckPlaylist(url)) {
-		YoutubeParser::YoutubePlaylist youtubePlaylist;
+	if (AfxGetAppSettings().bYoutubeLoadPlaylist && Youtube::CheckPlaylist(url)) {
+		Youtube::YoutubePlaylist youtubePlaylist;
 		int idx_CurrentPlay = 0;
-		if (YoutubeParser::Parse_Playlist(url, youtubePlaylist, idx_CurrentPlay)) {
+		if (Youtube::Parse_Playlist(url, youtubePlaylist, idx_CurrentPlay)) {
 			m_wndPlaylistBar.Empty();
 
 			CFileItemList fis;

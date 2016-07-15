@@ -842,9 +842,13 @@ public:
 
 	// youtube
 	bool			bYoutubePageParser;
-	int				iYoutubeTag;
-	int				iYoutubeTagSelected = 0;
+	struct {
+		int		fmt;
+		int		res;
+		bool	fps60;
+	} YoutubeFormat;
 	bool			bYoutubeLoadPlaylist;
+	int				iYoutubeTagSelected = 0; // not saved
 
 	DWORD			nLastFileInfoPage;
 

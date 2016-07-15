@@ -49,67 +49,53 @@
 
 #define INTERNET_OPEN_FALGS         INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD
 
-namespace YoutubeParser {
-	static const CString GOOGLE_API_KEY = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
+namespace Youtube
+{
+	static const LPCTSTR GOOGLE_API_KEY = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
 
 	static const LPCTSTR videoIdRegExps[] = {
 		L"v=([-a-zA-Z0-9_]+)",
 		L"video_ids=([-a-zA-Z0-9_]+)"
 	};
 
-	enum youtubeTypeProfiles {
-		UNKNOWN_PROFILE = -1,
-		AUDIO_PROFILE,
-		VIDEO_PROFILE
-	};
-
-	const YoutubeProfiles* getProfile(int iTag, youtubeTypeProfiles type) {
-		YoutubeProfiles* profiles = NULL;
-		int count = 0;
-
-		switch (type) {
-			case youtubeTypeProfiles::AUDIO_PROFILE:
-				profiles = (YoutubeProfiles*)youtubeAudioProfiles;
-				count = _countof(youtubeAudioProfiles);
-				break;
-			case youtubeTypeProfiles::VIDEO_PROFILE:
-				profiles = (YoutubeProfiles*)youtubeVideoProfiles;
-				count = _countof(youtubeVideoProfiles);
-				break;
-			default:
-				return NULL;
-		}
-
-		for (int i = 0; i < count; i++) {
-			if (iTag == profiles[i].iTag) {
-				return &profiles[i];
+	const YoutubeProfile* GetProfile(int iTag)
+	{
+		for (int i = 0; i < _countof(YProfiles); i++) {
+			if (iTag == YProfiles[i].iTag) {
+				return &YProfiles[i];
 			}
 		}
 
 		return NULL;
 	}
 
-	bool SelectBestProfile(int &itag_final, CString &ext_final, int itag_current, const YoutubeProfiles* sets, youtubeTypeProfiles type)
+	const YoutubeProfile* GetAudioProfile(int iTag)
 	{
-		const YoutubeProfiles* current = getProfile(itag_current, type);
-		CheckPointer(current, false);
-
-		if (current->priority > sets->priority) {
-			return false;
-		}
-
-		if (itag_final != 0) {
-			const YoutubeProfiles* final = getProfile(itag_final, type);
-			CheckPointer(final, false);
-			if (current->priority < final->priority) {
-				return false;
+		for (int i = 0; i < _countof(YAudioProfiles); i++) {
+			if (iTag == YAudioProfiles[i].iTag) {
+				return &YAudioProfiles[i];
 			}
 		}
 
-		itag_final = current->iTag;
-		ext_final = '.' + CString(current->ext);
+		return NULL;
+	}
 
-		return true;
+	bool CompareProfile(const YoutubeProfile* a, const YoutubeProfile* b)
+	{
+		if (a->format != b->format) {
+			return (a->format < b->format);
+		}
+
+		if (a->quality != b->quality) {
+			return (a->quality > b->quality);
+		}
+
+		return (a->fps60 > b->fps60);
+	}
+
+	bool CompareUrllistItem(YoutubeUrllistItem a, YoutubeUrllistItem b)
+	{
+		return CompareProfile(a.profile, b.profile);
 	}
 
 	static CString FixHtmlSymbols(CString inStr)
@@ -323,8 +309,9 @@ namespace YoutubeParser {
 
 			CString videoId;
 
-			HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
-			if (s) {
+			HINTERNET hUrl;
+			HINTERNET hInet = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
+			if (hInet) {
 				HandleURL(url);
 
 				for (int i = 0; i < _countof(videoIdRegExps) && videoId.IsEmpty(); i++) {
@@ -364,16 +351,16 @@ namespace YoutubeParser {
 					}
 				}
 
-				f = InternetOpenUrl(s, url, NULL, 0, INTERNET_OPEN_FALGS, 0);
-				if (f) {
-					InternetReadData(f, &data, dataSize, NULL);
-					InternetCloseHandle(f);
+				hUrl = InternetOpenUrl(hInet, url, NULL, 0, INTERNET_OPEN_FALGS, 0);
+				if (hUrl) {
+					InternetReadData(hUrl, &data, dataSize, NULL);
+					InternetCloseHandle(hUrl);
 				}
 			}
 
 			if (!data) {
-				if (s) {
-					InternetCloseHandle(s);
+				if (hInet) {
+					InternetCloseHandle(hInet);
 				}
 
 				return false;
@@ -401,15 +388,15 @@ namespace YoutubeParser {
 				data = NULL;
 				dataSize = 0;
 				CString link; link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&ps=default&eurl=&gl=US&hl=en&el=info", videoId);
-				f = InternetOpenUrl(s, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
-				if (f) {
-					InternetReadData(f, &data, dataSize, NULL);
-					InternetCloseHandle(f);
+				hUrl = InternetOpenUrl(hInet, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
+				if (hUrl) {
+					InternetReadData(hUrl, &data, dataSize, NULL);
+					InternetCloseHandle(hUrl);
 				}
 
 				if (!data) {
-					if (s) {
-						InternetCloseHandle(s);
+					if (hInet) {
+						InternetCloseHandle(hInet);
 					}
 					return false;
 				}
@@ -418,7 +405,7 @@ namespace YoutubeParser {
 				const CStringA stream_map = UrlDecode(GetEntry(data, MATCH_STREAM_MAP_START_2, MATCH_END_2));
 				if (stream_map.IsEmpty()) {
 					free(data);
-					InternetCloseHandle(s);
+					InternetCloseHandle(hInet);
 					return false;
 				}
 				// adaptive_fmts
@@ -437,7 +424,7 @@ namespace YoutubeParser {
 					url.Replace(L"\\/", L"/");
 					urls.AddHead(url);
 
-					InternetCloseHandle(s);
+					InternetCloseHandle(hInet);
 					free(data);
 					return true;
 				}
@@ -446,7 +433,7 @@ namespace YoutubeParser {
 				const CStringA stream_map = GetEntry(data, MATCH_STREAM_MAP_START, MATCH_END);
 				if (stream_map.IsEmpty()) {
 					free(data);
-					InternetCloseHandle(s);
+					InternetCloseHandle(hInet);
 					return false;
 				}
 				// adaptive_fmts
@@ -462,27 +449,12 @@ namespace YoutubeParser {
 
 			free(data);
 
-			const CAppSettings& sApp = AfxGetAppSettings();
-			const int tag = sApp.iYoutubeTagSelected > 0 ? sApp.iYoutubeTagSelected : sApp.iYoutubeTag;
-			const YoutubeProfiles* youtubeVideoSets = getProfile(tag, youtubeTypeProfiles::VIDEO_PROFILE);
-			if (!youtubeVideoSets) {
-				youtubeVideoSets = getProfile(22, youtubeTypeProfiles::VIDEO_PROFILE);
-			}
-
-			CString final_video_url;
-			CString final_video_ext;
-			int final_video_itag = 0;
-
-			const YoutubeProfiles* youtubeAudioSets = getProfile(251, youtubeTypeProfiles::AUDIO_PROFILE);
-
-			CString final_audio_url;
-			CString final_audio_ext;
-			int final_audio_itag = 0;
+			YoutubeUrllist AudioList;
 
 			CAtlList<CStringA> linesA;
 			Explode(strUrls, linesA, ',');
-
 			POSITION posLine = linesA.GetHeadPosition();
+
 			while (posLine) {
 				const CStringA &lineA = linesA.GetNext(posLine);
 
@@ -519,12 +491,12 @@ namespace YoutubeParser {
 						if (!signature.IsEmpty() && !JSUrl.IsEmpty()) {
 							if (!bJSParsed) {
 								bJSParsed = TRUE;
-								f = InternetOpenUrl(s, JSUrl, NULL, 0, INTERNET_OPEN_FALGS, 0);
-								if (f) {
+								hUrl = InternetOpenUrl(hInet, JSUrl, NULL, 0, INTERNET_OPEN_FALGS, 0);
+								if (hUrl) {
 									char* data = NULL;
 									DWORD dataSize = 0;
-									InternetReadData(f, &data, dataSize, NULL);
-									InternetCloseHandle(f);
+									InternetReadData(hUrl, &data, dataSize, NULL);
+									InternetCloseHandle(hUrl);
 									if (dataSize) {
 										const CStringA funcName = GetEntry(data, "\"signature\",", "(");
 										if (!funcName.IsEmpty()) {
@@ -661,34 +633,112 @@ namespace YoutubeParser {
 
 					SignatureDecode(url);
 
-					if (final_video_itag != youtubeVideoSets->iTag && SelectBestProfile(final_video_itag, final_video_ext, itag, youtubeVideoSets, youtubeTypeProfiles::VIDEO_PROFILE)) {
-						final_video_url = url;
-					} else if (SelectBestProfile(final_audio_itag, final_audio_ext, itag, youtubeAudioSets, youtubeTypeProfiles::AUDIO_PROFILE)) {
-						final_audio_url = url;
-					}
-
-					const YoutubeProfiles* current = getProfile(itag, youtubeTypeProfiles::VIDEO_PROFILE);
-					if (current) {
+					if (const YoutubeProfile* profile = GetProfile(itag)) {
 						YoutubeUrllistItem item;
-						const CString fmt = FormatProfiles(*current);
-						if (!fmt.IsEmpty()) {
-							item.url = url;
-							item.url.Replace(L"http://", L"https://");
-							item.title = fmt;
-							item.tag = itag;
-							item.quality = current->quality;
-							item.priority = current->priority;
-							item.videoOnly = current->videoOnly;
-
-							youtubeUrllist.emplace_back(item);
+						item.profile = profile;
+						item.url = url;
+						item.title.Format(L"%s %dp",
+							profile->format == 1 ? L"WebM" : L"MP4",
+							profile->quality);
+						if (profile->fps60) {
+							item.title.Append(L" 60fps");
 						}
+						if (profile->type == y_video) {
+							item.title.Append(L" dash");
+						}
+
+						youtubeUrllist.emplace_back(item);
+					}
+					else if (const YoutubeProfile* audioprofile = GetAudioProfile(itag)) {
+						YoutubeUrllistItem item;
+						item.profile = audioprofile;
+						item.url = url;
+
+						AudioList.emplace_back(item);
 					}
 				}
 			}
 
-			std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), [](const YoutubeUrllistItem a, const YoutubeUrllistItem b) {
-				return a.priority > b.priority && a.quality >= b.quality;
-			});
+			if (youtubeUrllist.empty()) {
+				return false;
+			}
+
+			std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), CompareUrllistItem);
+			std::sort(AudioList.begin(), AudioList.end(), CompareUrllistItem);
+
+			const CAppSettings& s = AfxGetAppSettings();
+
+			// select video stream
+			const YoutubeUrllistItem* final_item = NULL;
+
+			if (s.iYoutubeTagSelected) {
+				for (auto item : youtubeUrllist) {
+					if (s.iYoutubeTagSelected == item.profile->iTag) {
+						final_item = &item;
+						break;
+					}
+				}
+			}
+
+			if (!final_item) {
+				int k;
+				for (k = 0; k < youtubeUrllist.size(); k++) {
+					if (s.YoutubeFormat.fmt == youtubeUrllist[k].profile->format) {
+						final_item = &youtubeUrllist[k];
+						break;
+					}
+				}
+				if (!final_item) {
+					final_item = &youtubeUrllist[0];
+					k = 0;
+					DbgLog((LOG_TRACE, 3, L"YouTube: %s format not found, used %s", s.YoutubeFormat.fmt == 1 ? L"WebM" : L"MP4", final_item->profile->format == 1 ? L"WebM" : L"MP4"));
+				}
+
+				for (int i = k + 1; i < youtubeUrllist.size(); i++) {
+					auto profile = youtubeUrllist[i].profile;
+
+					if (final_item->profile->format == profile->format) {
+						if (profile->quality == final_item->profile->quality && profile->fps60 != s.YoutubeFormat.fps60) {
+							// same resolution as that of the previous, but not suitable fps
+							continue;
+						}
+
+						if (profile->quality < final_item->profile->quality && final_item->profile->quality <= s.YoutubeFormat.res) {
+							break;
+						}
+
+						final_item = &youtubeUrllist[i];
+					}
+				}
+			}
+
+			int final_video_itag = final_item->profile->iTag;
+			CString final_video_url = final_item->url;
+			CString final_video_ext = final_item->profile->ext;
+
+			int final_audio_itag = 0;
+			CString final_audio_url;
+			CString final_audio_ext;
+
+			if (final_item->profile->type == y_video && AudioList.size()) {
+				int fmt = final_item->profile->format;
+				final_item = NULL;
+
+				// select audio stream
+				for (int k = 0; k < AudioList.size(); k++) {
+					if (fmt == AudioList[k].profile->format) {
+						final_item = &AudioList[k];
+						break;
+					}
+				}
+				if (!final_item) {
+					final_item = &AudioList[0];
+				}
+
+				final_audio_itag = final_item->profile->iTag;
+				final_audio_url = final_item->url;
+				final_audio_ext = final_item->profile->ext;
+			}
 
 			if (!final_audio_url.IsEmpty()) {
 				final_audio_url.Replace(L"http://", L"https://");
@@ -697,7 +747,7 @@ namespace YoutubeParser {
 			if (!final_video_url.IsEmpty()) {
 				final_video_url.Replace(L"http://", L"https://");
 
-				ParseMetadata(s, videoId, y_fields);
+				ParseMetadata(hInet, videoId, y_fields);
 
 				y_fields.fname = y_fields.title + final_video_ext;
 				FixFilename(y_fields.fname);
@@ -705,12 +755,12 @@ namespace YoutubeParser {
 				if (!videoId.IsEmpty()) { // subtitle
 					CString link;
 					link.Format(L"https://video.google.com/timedtext?hl=en&type=list&v=%s", videoId);
-					f = InternetOpenUrl(s, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
-					if (f) {
+					hUrl = InternetOpenUrl(hInet, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
+					if (hUrl) {
 						char* data = NULL;
 						DWORD dataSize = 0;
-						InternetReadData(f, &data, dataSize, NULL);
-						InternetCloseHandle(f);
+						InternetReadData(hUrl, &data, dataSize, NULL);
+						InternetCloseHandle(hUrl);
 
 						if (dataSize) {
 							CString xml = UTF8To16(data);
@@ -752,16 +802,13 @@ namespace YoutubeParser {
 					}
 				}
 
-				InternetCloseHandle(s);
+				InternetCloseHandle(hInet);
 
 				if (!final_video_url.IsEmpty()) {
 					urls.AddHead(final_video_url);
 
 					if (!final_audio_url.IsEmpty()) {
-						const YoutubeProfiles* current = getProfile(final_video_itag, youtubeTypeProfiles::VIDEO_PROFILE);
-						if (current && current->videoOnly == true) {
-							urls.AddTail(final_audio_url);
-						}
+						urls.AddTail(final_audio_url);
 					}
 				}
 
@@ -884,37 +931,4 @@ namespace YoutubeParser {
 
 		return bRet;
 	}
-
-	const CString FormatProfiles(const YoutubeProfiles profile) {
-		CString fmt;
-		switch (profile.type) {
-			case y_mp4:
-			case y_dash_mp4_video:
-			case y_dash_mp4_video_60fps:
-				fmt = L"MP4 ";
-				break;
-			case y_webm:
-			case y_webm_video:
-			case y_webm_video_60fps:
-				fmt = L"WebM";
-				break;
-			case y_3gp:
-				fmt = L"3GP ";
-				break;
-		}
-
-		fmt.AppendFormat(L"  %4dp", profile.quality);
-
-		if (profile.type == y_dash_mp4_video_60fps || profile.type == y_webm_video_60fps) {
-			fmt.Append(L"  60fps");
-		} else {
-			fmt.Append(L"       ");
-		}
-
-		if (profile.type == y_dash_mp4_video || profile.type == y_dash_mp4_video_60fps) {
-			fmt.Append(L"  DASH");
-		}
-
-		return fmt;
-	};
 }

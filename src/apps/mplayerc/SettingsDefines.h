@@ -293,7 +293,9 @@
 #define IDS_RS_LAST_OPEN_FILTER_DIR			_T("LastOpenFilterDir")
 
 #define IDS_RS_YOUTUBE_PAGEPARSER			_T("YoutubePageParser")
-#define IDS_RS_YOUTUBE_TAG					_T("YoutubeTag")
+#define IDS_RS_YOUTUBE_FORMAT				_T("YoutubeFormat")
+#define IDS_RS_YOUTUBE_RESOLUTION			_T("YoutubeResolution")
+#define IDS_RS_YOUTUBE_60FPS				_T("Youtube60fps")
 #define IDS_RS_YOUTUBE_LOAD_PLAYLIST		_T("YoutubeLoadPlaylist")
 
 #define IDS_R_FILTERS_PRIORITY				_T("\\Filters Priority")

@@ -22,65 +22,66 @@
 
 #include <vector>
 
-namespace YoutubeParser {
-	enum ytype {
-		y_unknown,
+namespace Youtube
+{
+	enum yformat {
 		y_mp4,
 		y_webm,
+		// not used
+		y_flv,
 		y_3gp,
-		y_3d_mp4,
-		y_3d_webm,
-		y_dash_mp4_video,
-		y_dash_mp4_video_60fps,
-		y_dash_mp4_audio,
-		y_webm_video,
-		y_webm_video_60fps,
-		y_webm_audio,
 	};
 
-	struct YoutubeProfiles {
-		int     iTag;
-		ytype   type;
-		int     quality;
-		int     priority;
-		LPCTSTR ext;
-		bool    videoOnly;
+	enum ytype {
+		y_media,
+		y_video,
+		y_audio,
 	};
 
-	static const YoutubeProfiles youtubeVideoProfiles[] = {
-		{ 22, y_mp4,                   720,  7,  L"mp4", false },
-		{ 18, y_mp4,                   360,  3,  L"mp4", false },
-		{ 43, y_webm,                  360,  2, L"webm", false },
-		{ 36, y_3gp,                   240,  1,  L"3gp", false },
-		{ 17, y_3gp,                   144,  0,  L"3gp", false },
-		// VP9, 60fps
-		{315, y_webm_video_60fps,     2160, 19, L"webm", true },
-		{308, y_webm_video_60fps,     1440, 16, L"webm", true },
-		{303, y_webm_video_60fps,     1080, 12, L"webm", true },
-		{302, y_webm_video_60fps,      720,  8, L"webm", true },
-		// VP9
-		{313, y_webm_video,           2160, 17, L"webm", true },
-		{271, y_webm_video,           1440, 14, L"webm", true },
-		{248, y_webm_video,           1080, 10, L"webm", true },
-		{247, y_webm_video,            720,  6, L"webm", true },
-		{244, y_webm_video,            480,  4, L"webm", true },
-		// MP4
-		{299, y_dash_mp4_video_60fps, 1080, 13,  L"mp4", true },
-		{298, y_dash_mp4_video_60fps,  720,  9,  L"mp4", true },
-		{266, y_dash_mp4_video,       2160, 18,  L"mp4", true },
-		{264, y_dash_mp4_video,       1440, 15,  L"mp4", true },
-		{137, y_dash_mp4_video,       1080, 11,  L"mp4", true },
-		{135, y_dash_mp4_video,        480,  5,  L"mp4", true },
+	struct YoutubeProfile {
+		int		iTag;
+		yformat	format;
+		ytype	type;
+		int		quality;
+		LPCTSTR	ext;
+		bool	fps60;
 	};
 
-	static const YoutubeProfiles youtubeAudioProfiles[] = {
-		// Opus
-		{251, y_webm_audio,            160,  4, L"webm", false },
-		{250, y_webm_audio,             64,  2, L"webm", false },
-		{249, y_webm_audio,             48,  0, L"webm", false },
+	// MP4, WebM and 360p resolution or above only
+	static const YoutubeProfile YProfiles[] = {
+		// MP4 (H.264)
+		{266, y_mp4,  y_video, 2160, L"mp4",  false},
+		//{138, y_mp4,  y_video, 2160, L"mp4",  false}, // sometimes duplicates the 266, so useless
+		{264, y_mp4,  y_video, 1440, L"mp4",  false},
+		{299, y_mp4,  y_video, 1080, L"mp4",  true },
+		{137, y_mp4,  y_video, 1080, L"mp4",  false},
+		{298, y_mp4,  y_video,  720, L"mp4",  true },
+		{ 22, y_mp4,  y_media,  720, L"mp4",  false}, // H.264 + AAC
+		{135, y_mp4,  y_video,  480, L"mp4",  false},
+		{ 18, y_mp4,  y_media,  360, L"mp4",  false}, // H.264 + AAC
+		// WebM (VP9)
+		{315, y_webm, y_video, 2160, L"webm", true },
+		{313, y_webm, y_video, 2160, L"webm", false},
+		{308, y_webm, y_video, 1440, L"webm", true },
+		{271, y_webm, y_video, 1440, L"webm", false},
+		{303, y_webm, y_video, 1080, L"webm", true },
+		{248, y_webm, y_video, 1080, L"webm", false},
+		{302, y_webm, y_video,  720, L"webm", true },
+		{247, y_webm, y_video,  720, L"webm", false},
+		{244, y_webm, y_video,  480, L"webm", false},
+		{ 43, y_webm, y_media,  360, L"webm", false}, // VP8 + Vorbis
+	};
+
+	static const YoutubeProfile YAudioProfiles[] = {
 		// AAC
-		{140, y_dash_mp4_audio,        128,  3,  L"m4a", false },
-		{139, y_dash_mp4_audio,         48,  1,  L"m4a", false },
+		{140, y_mp4,  y_audio, 128, L"m4a",  false},
+		{139, y_mp4,  y_audio,  48, L"m4a",  false}, // may be outdated and no longer supported
+		// Opus
+		{251, y_webm, y_audio, 160, L"webm", false},
+		{250, y_webm, y_audio,  70, L"webm", false},
+		{249, y_webm, y_audio,  50, L"webm", false},
+		// Vorbis
+		//{249, y_webm, y_audio, 128, L"webm", false},
 	};
 
 	struct YoutubeFields {
@@ -112,10 +113,7 @@ namespace YoutubeParser {
 	typedef std::vector<YoutubePlaylistItem> YoutubePlaylist;
 
 	struct YoutubeUrllistItem : YoutubePlaylistItem {
-		int  tag = 0;
-		int  quality = 0;
-		int  priority = 0;
-		bool videoOnly = false;
+		const YoutubeProfile* profile;
 	};
 	typedef std::vector<YoutubeUrllistItem> YoutubeUrllist;
 
@@ -126,6 +124,4 @@ namespace YoutubeParser {
 	bool Parse_Playlist(CString url, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay);
 
 	bool Parse_URL(CString url, YoutubeFields& y_fields);
-
-	const CString FormatProfiles(const YoutubeProfiles profile);
 }

@@ -24,7 +24,6 @@
 #include <shlobj.h>
 #include <dlgs.h>
 #include "OpenDlg.h"
-#include "PlayerYouTube.h"
 #include "MainFrm.h"
 #include "../../DSUtil/Filehandle.h"
 
@@ -110,7 +109,7 @@ BOOL COpenDlg::OnInitDialog()
 			LPCTSTR pText = (LPCTSTR)::GlobalLock(hglb);
 			if (pText) {
 				if (AfxIsValidString(pText)) {
-					if (YoutubeParser::CheckURL(pText) || YoutubeParser::CheckPlaylist(pText)) {
+					if (Youtube::CheckURL(pText) || Youtube::CheckPlaylist(pText)) {
 						m_mrucombo.SetWindowTextW(pText);
 					}
 				}
@@ -263,7 +262,7 @@ void COpenDlg::OnUpdateAppendToPlaylist(CCmdUI* pCmdUI)
 {
 	UpdateData();
 
-	pCmdUI->Enable(!YoutubeParser::CheckPlaylist(m_path));
+	pCmdUI->Enable(!Youtube::CheckPlaylist(m_path));
 }
 
 void COpenDlg::OnUpdateOk(CCmdUI* pCmdUI)

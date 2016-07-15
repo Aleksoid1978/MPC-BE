@@ -32,7 +32,6 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/FileVersionInfo.h"
-#include "PlayerYouTube.h"
 #include <moreuuids.h>
 #include <winddk/ntddcdvd.h>
 #include <detours/detours.h>

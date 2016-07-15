@@ -41,6 +41,7 @@
 #include "PPageFileInfoSheet.h"
 #include "FileDropTarget.h"
 #include "KeyProvider.h"
+#include "PlayerYouTube.h"
 
 #include "../../DSUtil/DSMPropertyBag.h"
 #include "../../DSUtil/FontInstaller.h"
@@ -1164,8 +1165,8 @@ public:
 	CString		m_strFnFull;
 	CString		m_strUrl;
 
-	YoutubeParser::YoutubeFields m_youtubeFields;
-	YoutubeParser::YoutubeUrllist m_youtubeUrllist;
+	Youtube::YoutubeFields m_youtubeFields;
+	Youtube::YoutubeUrllist m_youtubeUrllist;
 	CString		GetStrForTitle();
 	CString		GetAltFileName();
 
