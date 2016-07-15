@@ -2141,19 +2141,23 @@ void CMPlayerCApp::SetLanguage(int nLanguage)
 		}
 	}
 
+	// In case no dll was loaded, load the English translation from the executable
 	if (hMod == NULL) {
 		hMod = AfxGetApp()->m_hInstance;
-		s.iLanguage = GetLanguageIndex(ID_LANGUAGE_ENGLISH);
-
-	} else if (nLanguage == GetLanguageIndex(ID_LANGUAGE_HEBREW)) {
+	}
+	// In case a dll was loaded, check if some special action is needed
+	else if (nLanguage == GetLanguageIndex(ID_LANGUAGE_HEBREW)) {
 		// Hebrew needs the RTL flag.
 		SetProcessDefaultLayout(LAYOUT_RTL);
 		SetWindowsHookEx(WH_CBT, RTLWindowsLayoutCbtFilterHook, NULL, GetCurrentThreadId());
 	}
 
+	// Free the old resource if it was a dll
 	if (AfxGetResourceHandle() != AfxGetApp()->m_hInstance) {
 		FreeLibrary(AfxGetResourceHandle());
 	}
+
+	// Set the new resource
 	AfxSetResourceHandle(hMod);
 }
 
