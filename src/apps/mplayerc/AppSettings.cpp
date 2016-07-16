@@ -2141,7 +2141,7 @@ bool CAppSettings::IsISRSelect() const
 bool CAppSettings::IsISRAutoLoadEnabled() const
 {
 #if ENABLE_ASSFILTERMOD
-	return (iSubtitleRenderer == SUBRNDT_ISR || iSubtitleRenderer == SUBRNDT_ASSFILTERMOD) && IsISRSelect();
+	return (iSubtitleRenderer == SUBRNDT_ISR || iSubtitleRenderer == SUBRNDT_ASSFILTERMOD) && IsISRSelect(); // hmmm
 #else
 	return iSubtitleRenderer == SUBRNDT_ISR && IsISRSelect();
 #endif

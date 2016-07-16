@@ -358,7 +358,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* valu
 	if (!strcmp(field, "name")) {
 		ret = L"MPC-BE";
 	} else if (!strcmp(field, "version")) {
-		ret = _T(MPC_VERSION_STR);
+		ret = _T(MPC_VERSION_STR_SVN);
 	} else if (!strcmp(field, "yuvMatrix")) {
 		ret = L"None";
 
