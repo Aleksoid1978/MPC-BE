@@ -67,6 +67,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::NonDelegatingQueryInterface(REFIID r
 		QI(ISubPicAllocatorPresenter3)
 		QI(ISubRenderOptions)
 		QI(ISubRenderConsumer)
+		QI(ISubRenderConsumer2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
