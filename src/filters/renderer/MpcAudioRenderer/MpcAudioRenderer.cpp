@@ -475,6 +475,15 @@ HRESULT CMpcAudioRenderer::SetMediaType(const CMediaType *pmt)
 	return CBaseRenderer::SetMediaType(pmt);
 }
 
+HRESULT CMpcAudioRenderer::CompleteConnect(IPin *pReceivePin)
+{
+	DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::CompleteConnect()"));
+
+	m_bHasVideo = HasMediaType(m_pInputPin, MEDIATYPE_Video) || HasMediaType(m_pInputPin, MEDIASUBTYPE_MPEG2_VIDEO);
+
+	return CBaseRenderer::CompleteConnect(pReceivePin);
+}
+
 DWORD WINAPI CMpcAudioRenderer::RenderThreadEntryPoint(LPVOID lpParameter)
 {
 	return ((CMpcAudioRenderer*)lpParameter)->RenderThread();
@@ -499,12 +508,7 @@ HRESULT CMpcAudioRenderer::StartRendererThread()
 {
 	if (!m_hRenderThread) {
 		m_hRenderThread = ::CreateThread(NULL, 0, RenderThreadEntryPoint, (LPVOID)this, 0, &m_nThreadId);
-		if (m_hRenderThread) {
-			//SetThreadPriority(m_hRenderThread, THREAD_PRIORITY_HIGHEST);
-			return S_OK;
-		} else {
-			return E_FAIL;
-		}
+		return m_hRenderThread ? S_OK : E_FAIL;
 	} else if (m_bThreadPaused) {
 		SetEvent(m_hResumeEvent);
 		WaitForSingleObject(m_hWaitResumeEvent, INFINITE);
@@ -2499,8 +2503,6 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCh
 	WasapiFlush();
 	hr = m_pAudioClient->SetEventHandle(m_hDataEvent);
 	EXIT_ON_ERROR(hr);
-
-	m_bHasVideo = HasMediaType(m_pInputPin, MEDIATYPE_Video) || HasMediaType(m_pInputPin, MEDIASUBTYPE_MPEG2_VIDEO);
 
 	hr = StartRendererThread();
 	EXIT_ON_ERROR(hr);
