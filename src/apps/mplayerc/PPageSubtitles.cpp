@@ -142,14 +142,16 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 	}
 	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_XYSUBFILTER
 
-	//str = L"AssFilterMod";
-	//if (!IsCLSIDRegistered(CLSID_AssFilterMod)) {
-	//	str += L" " + ResStr(IDS_REND_NOT_INSTALLED);
-	//}
-	//else if (!VRwithSR) {
-	//	str += L" " + ResStr(IDS_REND_NOT_AVAILABLE);
-	//}
-	//m_cbSubtitleRenderer.AddString(str); // SUBRNDT_ASSFILTERMOD
+#if ENABLE_ASSFILTERMOD
+	str = L"AssFilterMod";
+	if (!IsCLSIDRegistered(CLSID_AssFilterMod)) {
+		str += L" " + ResStr(IDS_REND_NOT_INSTALLED);
+	}
+	else if (!VRwithSR) {
+		str += L" " + ResStr(IDS_REND_NOT_AVAILABLE);
+	}
+	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_ASSFILTERMOD
+#endif
 
 	if (m_cbSubtitleRenderer.SetCurSel(select) == CB_ERR) {
 		m_cbSubtitleRenderer.SetCurSel(1);
