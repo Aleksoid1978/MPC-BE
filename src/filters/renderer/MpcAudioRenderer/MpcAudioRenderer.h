@@ -190,7 +190,6 @@ private:
 	HRESULT					PushToQueue(CAutoPtr<CPacket> p);
 
 	bool					IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const WAVEFORMATEX *pNewWaveFormatEx);
-	bool					CheckFormatChanged(WAVEFORMATEX *pWaveFormatEx, WAVEFORMATEX **ppNewWaveFormatEx);
 	bool					CopyWaveFormat(WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
 
 	BOOL					IsBitstream(WAVEFORMATEX *pWaveFormatEx);

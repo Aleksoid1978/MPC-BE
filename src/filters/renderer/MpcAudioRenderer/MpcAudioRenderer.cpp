@@ -1261,20 +1261,6 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 	BYTE* buff    = NULL;
 	BYTE* out_buf = NULL;
 
-	AM_MEDIA_TYPE *pmt;
-	if (SUCCEEDED(pMediaSample->GetMediaType(&pmt)) && pmt != NULL) {
-		CMediaType mt(*pmt);
-		hr = CheckAudioClient((WAVEFORMATEX*)mt.Format());
-
-		DeleteMediaType(pmt);
-		if (FAILED(hr)) {
-#if defined(_DEBUG) && DBGLOG_LEVEL > 1
-			DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::DoRenderSampleWasapi() - Error while checking audio client with input media type"));
-#endif
-			return hr;
-		}
-	}
-
 	const bool bFormatChanged = !m_bIsBitstream && IsFormatChanged(m_pWaveFileFormat, m_pWaveFileFormatOutput);
 	if (bFormatChanged) {
 		// prepare for resample ... if needed
@@ -1591,6 +1577,14 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 
 	BOOL bInitNeed = TRUE;
 
+	auto CheckFormatChanged = [&](WAVEFORMATEX *pWaveFormatEx, WAVEFORMATEX **ppNewWaveFormatEx) {
+		if (m_pWaveFileFormat == NULL || IsFormatChanged(pWaveFormatEx, m_pWaveFileFormat)) {
+			return CopyWaveFormat(pWaveFormatEx, ppNewWaveFormatEx);
+		}
+
+		return false;
+	};
+
 	// Compare the exisiting WAVEFORMATEX with the one provided
 	if (CheckFormatChanged(pWaveFormatEx, &m_pWaveFileFormat) || !m_pWaveFileFormatOutput) {
 
@@ -1874,22 +1868,6 @@ bool CMpcAudioRenderer::IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const
 	}
 
 	return false;
-}
-
-bool CMpcAudioRenderer::CheckFormatChanged(WAVEFORMATEX *pWaveFormatEx, WAVEFORMATEX **ppNewWaveFormatEx)
-{
-	bool formatChanged = false;
-	if (m_pWaveFileFormat == NULL) {
-		formatChanged = true;
-	} else {
-		formatChanged = IsFormatChanged(pWaveFormatEx, m_pWaveFileFormat);
-	}
-
-	if (!formatChanged) {
-		return false;
-	}
-
-	return CopyWaveFormat(pWaveFormatEx, ppNewWaveFormatEx);
 }
 
 bool CMpcAudioRenderer::CopyWaveFormat(WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx)
