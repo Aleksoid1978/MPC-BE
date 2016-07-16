@@ -29,7 +29,7 @@
 #include "DVBChannel.h"
 #include <afxsock.h>
 
-#define ENABLE_ASSFILTERMOD 0
+#define ENABLE_ASSFILTERMOD 1
 
 // flags for CAppSettings::nCS
 #define CS_NONE			0
