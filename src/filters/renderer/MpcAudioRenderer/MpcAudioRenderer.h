@@ -77,6 +77,7 @@ public:
 	HRESULT Receive(IMediaSample* pSample) override;
 	HRESULT CheckMediaType(const CMediaType *pmt) override;
 	HRESULT SetMediaType(const CMediaType *pmt) override;
+	HRESULT CompleteConnect(IPin *pReceivePin) override;
 	HRESULT DoRenderSample(IMediaSample *pMediaSample) override { return E_NOTIMPL; }
 
 	HRESULT EndFlush() override;
