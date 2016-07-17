@@ -74,13 +74,11 @@ BOOL CPPageWebServer::PreTranslateMessage(MSG* pMsg)
 
 		CAppSettings& s = AfxGetAppSettings();
 
-		if (CMainFrame* pWnd = AfxGetMainFrame()) {
-			if (m_fEnableWebServer) {
-				if (s.nWebServerPort != m_nWebServerPort) {
-					AfxMessageBox(ResStr(IDS_WEBSERVER_ERROR_TEST), MB_ICONEXCLAMATION | MB_OK);
+		if (m_fEnableWebServer) {
+			if (s.nWebServerPort != m_nWebServerPort) {
+				AfxMessageBox(ResStr(IDS_WEBSERVER_ERROR_TEST), MB_ICONEXCLAMATION | MB_OK);
 
-					return TRUE;
-				}
+				return TRUE;
 			}
 		}
 	}
@@ -143,17 +141,17 @@ BOOL CPPageWebServer::OnApply()
 	s.strWebDefIndex = m_WebDefIndex;
 	s.strWebServerCGI = m_WebServerCGI;
 
-	if (CMainFrame* pWnd = AfxGetMainFrame()) {
-		if (m_fEnableWebServer) {
-			if (fRestart) {
-				pWnd->StopWebServer();
-			}
-
-			pWnd->StartWebServer(m_nWebServerPort);
-		} else {
+	CMainFrame* pWnd = AfxGetMainFrame();
+	if (m_fEnableWebServer) {
+		if (fRestart) {
 			pWnd->StopWebServer();
 		}
+
+		pWnd->StartWebServer(m_nWebServerPort);
+	} else {
+		pWnd->StopWebServer();
 	}
+	
 
 	m_launch.EnableWindow(m_fEnableWebServer);
 
