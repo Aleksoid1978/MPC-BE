@@ -1624,6 +1624,31 @@ STDMETHODIMP CBaseAP::GetInt(LPCSTR field, int* value)
 	return __super::GetInt(field, value);
 }
 
+STDMETHODIMP CBaseAP::GetString(LPCSTR field, LPWSTR* value, int* chars)
+{
+	CheckPointer(value, E_POINTER);
+	CheckPointer(chars, E_POINTER);
+
+	if (!strcmp(field, "name")) {
+		CStringW ret = L"MPC-BE: EVR Sync";
+		int len = ret.GetLength();
+		size_t sz = (len + 1) * sizeof(WCHAR);
+		LPWSTR buf = (LPWSTR)LocalAlloc(LPTR, sz);
+
+		if (!buf) {
+			return E_OUTOFMEMORY;
+		}
+
+		wcscpy_s(buf, len + 1, ret);
+		*chars = len;
+		*value = buf;
+
+		return S_OK;
+	}
+
+	return __super::GetString(field, value, chars);
+}
+
 
 void CBaseAP::DrawText(const RECT &rc, const CString &strText, int _Priority)
 {

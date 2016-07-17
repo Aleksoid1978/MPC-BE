@@ -2146,3 +2146,28 @@ STDMETHODIMP CDX9RenderingEngine::GetInt(LPCSTR field, int* value)
 
 	return __super::GetInt(field, value);
 }
+
+STDMETHODIMP CDX9RenderingEngine::GetString(LPCSTR field, LPWSTR* value, int* chars)
+{
+	CheckPointer(value, E_POINTER);
+	CheckPointer(chars, E_POINTER);
+
+	if (!strcmp(field, "name")) {
+		CStringW ret = m_bIsEVR ? L"MPC-BE: EVR (custom presenter)" : L"MPC-BE: VMR-9 (renderless)";
+		int len = ret.GetLength();
+		size_t sz = (len + 1) * sizeof(WCHAR);
+		LPWSTR buf = (LPWSTR)LocalAlloc(LPTR, sz);
+
+		if (!buf) {
+			return E_OUTOFMEMORY;
+		}
+
+		wcscpy_s(buf, len + 1, ret);
+		*chars = len;
+		*value = buf;
+
+		return S_OK;
+	}
+
+	return __super::GetString(field, value, chars);
+}
