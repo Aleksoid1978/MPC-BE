@@ -1967,7 +1967,7 @@ void CPlayerPlaylistBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 	LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)pNMHDR;
 
 	if (lpnmlv->iItem >= 0 && lpnmlv->iSubItem >= 0) {
-		CMainFrame* pMainFrame = static_cast<CMainFrame*>(AfxGetMainWnd());
+		CMainFrame* pMainFrame = AfxGetMainFrame();
 
 		POSITION pos = FindPos(lpnmlv->iItem);
 		// If the file is already playing, don't try to restore a previously saved position
