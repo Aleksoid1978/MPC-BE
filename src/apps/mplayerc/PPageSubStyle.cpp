@@ -247,9 +247,7 @@ BOOL CPPageSubStyle::OnApply()
 
 	BOOL bStyleChanged = (m_stss_init != *m_stss);
 	if (bStyleChanged) {
-		if (auto pFrame = AfxFindMainFrame()) {
-			pFrame->UpdateSubDefaultStyle();
-		}
+		AfxGetMainFrame()->UpdateSubDefaultStyle();
 	}
 
 	m_stss_init = *m_stss;

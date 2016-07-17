@@ -156,9 +156,7 @@ void CChildView::OnPaint()
 {
 	CPaintDC dc(this);
 
-	if (auto pFrame = AfxFindMainFrame()) {
-		pFrame->RepaintVideo();
-	}
+	AfxGetMainFrame()->RepaintVideo();
 }
 
 BOOL CChildView::OnEraseBkgnd(CDC* pDC)
@@ -220,10 +218,9 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 {
 	__super::OnSize(nType, cx, cy);
 
-	if (auto pFrame = AfxFindMainFrame()) {
-		pFrame->MoveVideoWindow();
-		pFrame->UpdateThumbnailClip();
-	}
+	auto pFrame = AfxGetMainFrame();
+	pFrame->MoveVideoWindow();
+	pFrame->UpdateThumbnailClip();
 }
 
 BOOL CChildView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
