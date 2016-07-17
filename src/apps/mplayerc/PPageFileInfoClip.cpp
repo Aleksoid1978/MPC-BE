@@ -173,7 +173,7 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 		}
 	}
 
-	const CMainFrame* pMainFrame = ((CMainFrame*)AfxGetMyApp()->GetMainWnd());
+	const CMainFrame* pMainFrame = AfxGetMainFrame();
 	if (pMainFrame) {
 		if (!pMainFrame->m_youtubeFields.title.IsEmpty()) {
 			m_clip = pMainFrame->m_youtubeFields.title;

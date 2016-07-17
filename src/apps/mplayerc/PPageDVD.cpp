@@ -271,7 +271,7 @@ BOOL CPPageDVD::OnApply()
 	s.fClosedCaptions	= !!m_fClosedCaptions;
 	s.fStartMainTitle	= !!m_fStartMainTitle;
 
-	((CMainFrame*)AfxGetMyApp()->GetMainWnd())->SetClosedCaptions(s.fClosedCaptions);
+	AfxGetMainFrame()->SetClosedCaptions(s.fClosedCaptions);
 
 	return __super::OnApply();
 }
