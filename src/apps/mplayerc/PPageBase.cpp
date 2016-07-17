@@ -99,7 +99,7 @@ void CPPageBase::OnDestroy()
 
 BOOL CPPageBase::OnApply()
 {
-	if (auto pMainFrame = AfxFindMainFrame()) {
+	if (auto pMainFrame = AfxFindMainFrame()) { // need dynamic_cast, because CPPageFormats can be run in a separate process without CMainFrame.
 		pMainFrame->PostMessage(WM_SAVESETTINGS);
 	}
 
