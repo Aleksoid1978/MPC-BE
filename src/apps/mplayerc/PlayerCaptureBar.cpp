@@ -1615,7 +1615,7 @@ void CPlayerCaptureDialog::OnRecord()
 {
 	UpdateData();
 
-	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
+	CMainFrame* pFrame = AfxGetMainFrame();
 	if (!pFrame) {
 		return;
 	}

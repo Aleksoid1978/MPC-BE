@@ -789,7 +789,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 				}
 				if (items.GetCount() == 1) {
 					m_pl.SetPos(FindPos(items.GetHead()));
-					CMainFrame*	pMainFrame = (CMainFrame*)AfxGetMainWnd();
+					CMainFrame* pMainFrame = AfxGetMainFrame();
 					if (pMainFrame) {
 						pMainFrame->OpenCurPlaylistItem();
 						AfxGetMainWnd()->SetFocus();

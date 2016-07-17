@@ -47,7 +47,6 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
 	ON_COMMAND(IDC_CHECK2, OnCheckPageParser)
-	ON_CBN_SELCHANGE(IDC_COMBO1, OnFormatSelChange)
 END_MESSAGE_MAP()
 
 // CPPageYoutube message handlers
@@ -111,18 +110,6 @@ void CPPageYoutube::OnCheckPageParser()
 	} else {
 		GetDlgItem(IDC_STATIC2)->EnableWindow(FALSE);
 		m_cbFormat.EnableWindow(FALSE);
-	}
-
-	SetModified();
-}
-
-void CPPageYoutube::OnFormatSelChange()
-{
-	if (m_cbFormat.GetCurSel() == 0) {
-		
-	}
-	else if(m_cbFormat.GetCurSel() == 0) {
-		
 	}
 
 	SetModified();
