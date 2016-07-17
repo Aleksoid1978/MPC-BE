@@ -66,11 +66,7 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 
 BOOL CChildView::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTOUCHINPUT pInput)
 {
-	if (auto pFrame = AfxGetMainFrame()) {
-		return pFrame->OnTouchInput(pt, nInputNumber, nInputsCount, pInput);
-	}
-
-	return FALSE;
+	return AfxGetMainFrame()->OnTouchInput(pt, nInputNumber, nInputsCount, pInput);
 }
 
 BOOL CChildView::PreTranslateMessage(MSG* pMsg)
