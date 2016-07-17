@@ -515,7 +515,7 @@ END
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 12
 6		"Використовувати вбудований парсер веб-сторінок"
 7		"Вибір формату перегляду:"
-10		"60 fps"
+10		"60 кадрів\с"
 11		"Завантажити список відтворення"
 END
 
@@ -1733,7 +1733,7 @@ STRING IDS_RESET_SETTINGS_WARNING		"Ви впевнені, що хочете в�
 STRING IDS_SATURATION_DEC		"Зменшення насиченості"
 STRING IDS_SATURATION_INC		"Збільшення насиченості"
 STRING IDS_SAVE_FILE		"Збереження файла"
-STRING IDS_SAVING_THUMBNAIL		"Saving thumbnails"
+STRING IDS_SAVING_THUMBNAIL		"Збереження мініатюр"
 STRING IDS_SCALE_16_9		"Масштабувати до 16:9 TV,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_ULTRAWIDE		"Збільшити до Ultra-Widescreen,%.3f,%.3f,%.3f,%.3f"
 STRING IDS_SCALE_WIDESCREEN		"Збільшити до Widescreen,%.3f,%.3f,%.3f,%.3f"
