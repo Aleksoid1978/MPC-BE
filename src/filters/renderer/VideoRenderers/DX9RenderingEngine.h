@@ -222,6 +222,7 @@ namespace DSObjects
 
 		// ISubRenderOptions
 		STDMETHODIMP GetInt(LPCSTR field, int* value);
+		STDMETHODIMP GetString(LPCSTR field, LPWSTR* value, int* chars);
 	};
 
 }
