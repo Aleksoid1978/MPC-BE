@@ -123,7 +123,7 @@ BOOL CPPageColor::OnApply()
 
 void CPPageColor::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	CMainFrame* pMainFrame = ((CMainFrame*)AfxGetMyApp()->GetMainWnd());
+	CMainFrame* pMainFrame = AfxGetMainFrame();
 	UpdateData();
 
 	if (*pScrollBar == m_SliBrightness) {
@@ -156,7 +156,7 @@ void CPPageColor::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 void CPPageColor::OnBnClickedReset()
 {
-	CMainFrame* pMainFrame = ((CMainFrame*)AfxGetMyApp()->GetMainWnd());
+	CMainFrame* pMainFrame = AfxGetMainFrame();
 
 	pMainFrame->m_ColorCintrol.GetDefaultValues(m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
 
@@ -170,7 +170,7 @@ void CPPageColor::OnBnClickedReset()
 	m_iHue        ? m_sHue.Format       (_T("%+d"), m_iHue)        : m_sHue        = _T("0");
 	m_iSaturation ? m_sSaturation.Format(_T("%+d"), m_iSaturation) : m_sSaturation = _T("0");
 
-	((CMainFrame*)AfxGetMyApp()->GetMainWnd())->SetColorControl(ProcAmp_All, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
+	pMainFrame->SetColorControl(ProcAmp_All, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
 
 	UpdateData(FALSE);
 
@@ -181,7 +181,7 @@ void CPPageColor::OnCancel()
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	((CMainFrame*)AfxGetMyApp()->GetMainWnd())->SetColorControl(ProcAmp_All, s.iBrightness, s.iContrast, s.iHue, s.iSaturation);
+	AfxGetMainFrame()->SetColorControl(ProcAmp_All, s.iBrightness, s.iContrast, s.iHue, s.iSaturation);
 
 	__super::OnCancel();
 }
