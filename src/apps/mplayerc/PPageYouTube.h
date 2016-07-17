@@ -42,7 +42,6 @@ public:
 	enum { IDD = IDD_PPAGEYOUTUBE };
 
 	afx_msg void OnCheckPageParser();
-	afx_msg void OnFormatSelChange();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

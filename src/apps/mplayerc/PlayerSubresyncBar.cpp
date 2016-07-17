@@ -246,7 +246,7 @@ void CPlayerSubresyncBar::ResetSubtitle()
 
 void CPlayerSubresyncBar::SaveSubtitle()
 {
-	CMainFrame* pFrame = ((CMainFrame*)AfxGetMainWnd());
+	CMainFrame* pFrame = AfxGetMainFrame();
 	if (!pFrame) {
 		return;
 	}
@@ -1128,7 +1128,7 @@ void CPlayerSubresyncBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 	LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)pNMHDR;
 
 	if (lpnmlv->iItem >= 0 && lpnmlv->iSubItem >= 0 && (m_mode == VOBSUB || m_mode == TEXTSUB)) {
-		if (CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd()) {
+		if (CMainFrame* pFrame = AfxGetMainFrame()) {
 			int t = 0;
 			if (lpnmlv->iSubItem > COL_PREVEND || !ParseTime(m_list.GetItemText(lpnmlv->iItem, lpnmlv->iSubItem), t, false)) {
 				t = m_sts[lpnmlv->iItem].start;
