@@ -80,7 +80,7 @@ namespace Youtube
 		return NULL;
 	}
 
-	bool CompareProfile(const YoutubeProfile* a, const YoutubeProfile* b)
+	static bool CompareProfile(const YoutubeProfile* a, const YoutubeProfile* b)
 	{
 		if (a->format != b->format) {
 			return (a->format < b->format);
@@ -93,7 +93,7 @@ namespace Youtube
 		return (a->fps60 > b->fps60);
 	}
 
-	bool CompareUrllistItem(YoutubeUrllistItem a, YoutubeUrllistItem b)
+	static bool CompareUrllistItem(YoutubeUrllistItem a, YoutubeUrllistItem b)
 	{
 		return CompareProfile(a.profile, b.profile);
 	}
@@ -681,7 +681,7 @@ namespace Youtube
 			}
 
 			if (!final_item) {
-				int k;
+				size_t k;
 				for (k = 0; k < youtubeUrllist.size(); k++) {
 					if (s.YoutubeFormat.fmt == youtubeUrllist[k].profile->format) {
 						final_item = &youtubeUrllist[k];
@@ -691,10 +691,10 @@ namespace Youtube
 				if (!final_item) {
 					final_item = &youtubeUrllist[0];
 					k = 0;
-					DbgLog((LOG_TRACE, 3, L"YouTube: %s format not found, used %s", s.YoutubeFormat.fmt == 1 ? L"WebM" : L"MP4", final_item->profile->format == 1 ? L"WebM" : L"MP4"));
+					DbgLog((LOG_TRACE, 3, L"YouTube::Parse_URL() : %s format not found, used %s", s.YoutubeFormat.fmt == 1 ? L"WebM" : L"MP4", final_item->profile->format == y_webm ? L"WebM" : L"MP4"));
 				}
 
-				for (int i = k + 1; i < youtubeUrllist.size(); i++) {
+				for (size_t i = k + 1; i < youtubeUrllist.size(); i++) {
 					auto profile = youtubeUrllist[i].profile;
 
 					if (final_item->profile->format == profile->format) {
@@ -712,22 +712,18 @@ namespace Youtube
 				}
 			}
 
-			int final_video_itag = final_item->profile->iTag;
 			CString final_video_url = final_item->url;
 			CString final_video_ext = final_item->profile->ext;
 
-			int final_audio_itag = 0;
 			CString final_audio_url;
-			CString final_audio_ext;
-
-			if (final_item->profile->type == y_video && AudioList.size()) {
+			if (final_item->profile->type == y_video && !AudioList.empty()) {
 				int fmt = final_item->profile->format;
 				final_item = NULL;
 
 				// select audio stream
-				for (int k = 0; k < AudioList.size(); k++) {
-					if (fmt == AudioList[k].profile->format) {
-						final_item = &AudioList[k];
+				for (auto item : AudioList) {
+					if (fmt == item.profile->format) {
+						final_item = &item;
 						break;
 					}
 				}
@@ -735,9 +731,7 @@ namespace Youtube
 					final_item = &AudioList[0];
 				}
 
-				final_audio_itag = final_item->profile->iTag;
 				final_audio_url = final_item->url;
-				final_audio_ext = final_item->profile->ext;
 			}
 
 			if (!final_audio_url.IsEmpty()) {
@@ -749,7 +743,7 @@ namespace Youtube
 
 				ParseMetadata(hInet, videoId, y_fields);
 
-				y_fields.fname = y_fields.title + final_video_ext;
+				y_fields.fname = y_fields.title + L"." + final_video_ext;
 				FixFilename(y_fields.fname);
 
 				if (!videoId.IsEmpty()) { // subtitle
