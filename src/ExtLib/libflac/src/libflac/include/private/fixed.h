@@ -57,7 +57,7 @@
 unsigned FLAC__fixed_compute_best_predictor(const FLAC__int32 data[], unsigned data_len, float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER+1]);
 unsigned FLAC__fixed_compute_best_predictor_wide(const FLAC__int32 data[], unsigned data_len, float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER+1]);
 # ifndef FLAC__NO_ASM
-#  if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && defined FLAC__HAS_X86INTRIN
+#  if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && FLAC__HAS_X86INTRIN
 #   ifdef FLAC__SSE2_SUPPORTED
 unsigned FLAC__fixed_compute_best_predictor_intrin_sse2(const FLAC__int32 data[], unsigned data_len, float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER + 1]);
 unsigned FLAC__fixed_compute_best_predictor_wide_intrin_sse2(const FLAC__int32 data[], unsigned data_len, float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER + 1]);

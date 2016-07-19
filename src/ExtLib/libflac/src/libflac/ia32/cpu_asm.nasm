@@ -78,6 +78,7 @@ cident FLAC__cpu_info_asm_ia32
 	cpuid
 	cmp	eax, 1
 	jb	.no_cpuid
+	xor	ecx, ecx
 	mov	eax, 1
 	cpuid
 	mov	ebx, [esp + 8]

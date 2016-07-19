@@ -917,7 +917,7 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 		if(encoder->private_->cpuinfo.ia32.mmx && encoder->private_->cpuinfo.ia32.cmov)
 			encoder->private_->local_fixed_compute_best_predictor = FLAC__fixed_compute_best_predictor_asm_ia32_mmx_cmov;
 #   endif /* FLAC__HAS_NASM */
-#   ifdef FLAC__HAS_X86INTRIN
+#   if FLAC__HAS_X86INTRIN
 #    if defined FLAC__SSE_SUPPORTED
 		if(encoder->private_->cpuinfo.ia32.sse) {
 			if(encoder->private_->cpuinfo.ia32.sse42 || !encoder->private_->cpuinfo.ia32.intel) { /* use new autocorrelation functions */
@@ -982,7 +982,7 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 #   endif /* FLAC__HAS_X86INTRIN */
 #  elif defined FLAC__CPU_X86_64
 		FLAC__ASSERT(encoder->private_->cpuinfo.type == FLAC__CPUINFO_TYPE_X86_64);
-#   ifdef FLAC__HAS_X86INTRIN
+#   if FLAC__HAS_X86INTRIN
 #    ifdef FLAC__SSE_SUPPORTED
 		if(encoder->private_->cpuinfo.x86.sse42 || !encoder->private_->cpuinfo.x86.intel) { /* use new autocorrelation functions */
 			if(encoder->protected_->max_lpc_order < 4)
@@ -1037,7 +1037,7 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 	}
 # endif /* !FLAC__NO_ASM */
 #endif /* !FLAC__INTEGER_ONLY_LIBRARY */
-#if !defined FLAC__NO_ASM && defined FLAC__HAS_X86INTRIN
+#if !defined FLAC__NO_ASM && FLAC__HAS_X86INTRIN
 	if(encoder->private_->cpuinfo.use_asm) {
 # if defined FLAC__CPU_IA32
 #  ifdef FLAC__SSE2_SUPPORTED
