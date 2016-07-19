@@ -79,7 +79,7 @@ void FLAC__lpc_compute_autocorrelation_asm_ia32_sse_lag_12_old(const FLAC__real 
 void FLAC__lpc_compute_autocorrelation_asm_ia32_sse_lag_16_old(const FLAC__real data[], unsigned data_len, unsigned lag, FLAC__real autoc[]);
 #    endif
 #  endif
-#  if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && defined FLAC__HAS_X86INTRIN
+#  if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && FLAC__HAS_X86INTRIN
 #    ifdef FLAC__SSE_SUPPORTED
 void FLAC__lpc_compute_autocorrelation_intrin_sse_lag_4_old(const FLAC__real data[], unsigned data_len, unsigned lag, FLAC__real autoc[]);
 void FLAC__lpc_compute_autocorrelation_intrin_sse_lag_8_old(const FLAC__real data[], unsigned data_len, unsigned lag, FLAC__real autoc[]);
@@ -161,7 +161,7 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_asm_ia32_mmx(const FLAC__i
 void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_asm_ia32(const FLAC__int32 *data, unsigned data_len, const FLAC__int32 qlp_coeff[], unsigned order, int lp_quantization, FLAC__int32 residual[]);
 #    endif
 #  endif
-#  if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && defined FLAC__HAS_X86INTRIN
+#  if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && FLAC__HAS_X86INTRIN
 #    ifdef FLAC__SSE2_SUPPORTED
 void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC__int32 *data, unsigned data_len, const FLAC__int32 qlp_coeff[], unsigned order, int lp_quantization, FLAC__int32 residual[]);
 void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__int32 *data, unsigned data_len, const FLAC__int32 qlp_coeff[], unsigned order, int lp_quantization, FLAC__int32 residual[]);
@@ -205,7 +205,7 @@ void FLAC__lpc_restore_signal_asm_ia32_mmx(const FLAC__int32 residual[], unsigne
 void FLAC__lpc_restore_signal_wide_asm_ia32(const FLAC__int32 residual[], unsigned data_len, const FLAC__int32 qlp_coeff[], unsigned order, int lp_quantization, FLAC__int32 data[]);
 #    endif /* FLAC__HAS_NASM */
 #  endif /* FLAC__CPU_IA32 */
-#  if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && defined FLAC__HAS_X86INTRIN
+#  if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && FLAC__HAS_X86INTRIN
 #    ifdef FLAC__SSE2_SUPPORTED
 void FLAC__lpc_restore_signal_16_intrin_sse2(const FLAC__int32 residual[], unsigned data_len, const FLAC__int32 qlp_coeff[], unsigned order, int lp_quantization, FLAC__int32 data[]);
 #    endif

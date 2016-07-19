@@ -37,7 +37,7 @@
 #include "private/cpu.h"
 
 #ifndef FLAC__NO_ASM
-#if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && defined FLAC__HAS_X86INTRIN
+#if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && FLAC__HAS_X86INTRIN
 #include "private/stream_encoder.h"
 #include "private/bitmath.h"
 #ifdef FLAC__SSSE3_SUPPORTED
