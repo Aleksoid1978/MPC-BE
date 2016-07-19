@@ -51,7 +51,6 @@ AP4_File::AP4_File(AP4_ByteStream& stream, AP4_AtomFactory& atom_factory)
     : m_Movie(NULL)
     , m_FileType(NULL)
 {
-    AP4_SidxAtom* sidxAtom = NULL;
     // get all atoms
     AP4_Atom* atom;
     while (AP4_SUCCEEDED(atom_factory.CreateAtomFromStream(stream, atom))) {
@@ -62,12 +61,6 @@ AP4_File::AP4_File(AP4_ByteStream& stream, AP4_AtomFactory& atom_factory)
                 break;
             case AP4_ATOM_TYPE_MOOF:
                 if (m_Movie) {
-                    if (sidxAtom) {
-                        m_Movie->SwitchFirstMoof();
-                        delete atom;
-                        return;
-                    }
-
                     AP4_Offset offset;
                     stream.Tell(offset);
                     m_Movie->ProcessMoof(AP4_DYNAMIC_CAST(AP4_ContainerAtom, atom),
@@ -81,13 +74,14 @@ AP4_File::AP4_File(AP4_ByteStream& stream, AP4_AtomFactory& atom_factory)
                 m_OtherAtoms.Add(atom);
                 break;
             case AP4_ATOM_TYPE_SIDX:
+                m_OtherAtoms.Add(atom);
                 if (m_Movie) {
                     if (AP4_SUCCEEDED(m_Movie->SetSidxAtom(AP4_DYNAMIC_CAST(AP4_SidxAtom, atom),
                                                            stream))) {
-                        sidxAtom = AP4_DYNAMIC_CAST(AP4_SidxAtom, atom);
+                        m_Movie->SwitchFirstMoof();
+                        return;
                     }
                 }
-                m_OtherAtoms.Add(atom);
                 break;
             default:
                 m_OtherAtoms.Add(atom);
