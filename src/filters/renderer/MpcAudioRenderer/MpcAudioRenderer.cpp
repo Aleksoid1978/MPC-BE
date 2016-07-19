@@ -630,6 +630,10 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 	m_filterState = State_Running;
 	m_rtStartTime = rtStart;
 
+	if (m_bEOS) {
+		NotifyEvent(EC_COMPLETE, S_OK, NULL);
+	}
+
 	return CBaseRenderer::Run(rtStart);
 }
 
@@ -837,9 +841,7 @@ STDMETHODIMP CMpcAudioRenderer::OnDefaultDeviceChanged(EDataFlow flow, ERole rol
 // === IAMStreamSelect
 STDMETHODIMP CMpcAudioRenderer::Count(DWORD* pcStreams)
 {
-	if (!pcStreams) {
-		return E_POINTER;
-	}
+	CheckPointer(pcStreams, E_POINTER);
 
 	return AudioDevices::GetActiveAudioDevicesCount(*(UINT*)pcStreams, FALSE);
 }
@@ -2827,7 +2829,6 @@ void CMpcAudioRenderer::ApplyVolumeBalance(BYTE* pData, UINT32 size)
 CMpcAudioRendererInputPin::CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, HRESULT* phr)
 	: CRendererInputPin(pRenderer, phr, L"In")
 	, m_pRenderer(static_cast<CMpcAudioRenderer*>(pRenderer))
-	, m_bEndOfStream(FALSE)
 {
 }
 
@@ -2849,11 +2850,9 @@ STDMETHODIMP CMpcAudioRendererInputPin::EndOfStream()
 
 	CAutoLock cReceiveLock(&m_csReceive);
 
-	m_bEndOfStream = TRUE;
 	m_pRenderer->WaitFinish();
-	m_pFilter->NotifyEvent(EC_COMPLETE, S_OK, (LONG_PTR)m_pFilter);
 
-	return S_OK;
+	return CRendererInputPin::EndOfStream();
 }
 
 STDMETHODIMP CMpcAudioRendererInputPin::BeginFlush()
@@ -2862,11 +2861,7 @@ STDMETHODIMP CMpcAudioRendererInputPin::BeginFlush()
 
 	m_pRenderer->Flush();
 
-	HRESULT hr = CRendererInputPin::BeginFlush();
-
-	m_bEndOfStream = FALSE;
-
-	return hr;
+	return CRendererInputPin::BeginFlush();
 }
 
 STDMETHODIMP CMpcAudioRendererInputPin::EndFlush()
@@ -2874,13 +2869,4 @@ STDMETHODIMP CMpcAudioRendererInputPin::EndFlush()
 	DbgLog((LOG_TRACE, 3, L"CMpcAudioRendererInputPin::EndFlush()"));
 
 	return CRendererInputPin::EndFlush();
-}
-
-HRESULT CMpcAudioRendererInputPin::Run(REFERENCE_TIME rtStart)
-{
-	if (m_bEndOfStream) {
-		m_pFilter->NotifyEvent(EC_COMPLETE, S_OK, (LONG_PTR)m_pFilter);
-	}
-
-	return S_OK;
 }
