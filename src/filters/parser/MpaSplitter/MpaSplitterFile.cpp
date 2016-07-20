@@ -38,6 +38,7 @@ CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 	, m_coefficient(0.0)
 	, m_bIsVBR(false)
 	, m_pID3Tag(NULL)
+	, m_pAPETag(NULL)
 {
 	if (SUCCEEDED(hr)) {
 		hr = Init();
@@ -47,6 +48,7 @@ CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 CMpaSplitterFile::~CMpaSplitterFile()
 {
 	SAFE_DELETE(m_pID3Tag);
+	SAFE_DELETE(m_pAPETag);
 }
 
 #define MPA_HEADER_SIZE  4
@@ -56,6 +58,8 @@ CMpaSplitterFile::~CMpaSplitterFile()
 #define MOVE_TO_AAC_START_CODE(b, e) while(b <= e - ADTS_HEADER_SIZE && ((GETWORD(b) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) b++;
 
 #define FRAMES_FLAG 0x0001
+
+#define ID3v1_TAG_SIZE 128
 
 HRESULT CMpaSplitterFile::Init()
 {
@@ -79,11 +83,7 @@ HRESULT CMpaSplitterFile::Init()
 
 	Seek(0);
 
-	bool MP3_find = false;
-
 	if (BitRead(24, true) == 'ID3') {
-		MP3_find = true;
-
 		BitRead(24);
 
 		BYTE major = (BYTE)BitRead(8);
@@ -115,22 +115,46 @@ HRESULT CMpaSplitterFile::Init()
 	}
 
 	endpos = GetLength();
-	if (endpos > 128 && IsRandomAccess()) {
-		Seek(endpos - 128);
+	if (IsRandomAccess()) {
+		bool bID3TagPresent = false;
+		if (endpos > ID3v1_TAG_SIZE) {
+			Seek(endpos - ID3v1_TAG_SIZE);
 
-		if (BitRead(24) == 'TAG') {
-			endpos -= 128;
+			if (BitRead(24) == 'TAG') {
+				bID3TagPresent = true;
+				endpos -= ID3v1_TAG_SIZE;
 
-			if (!m_pID3Tag) {
-				m_pID3Tag = DNew CID3Tag();
+				if (!m_pID3Tag) {
+					m_pID3Tag = DNew CID3Tag();
+				}
+
+				size_t size = 128 - 3;
+				BYTE* buf = DNew BYTE[size];
+				ByteRead(buf, size);
+				m_pID3Tag->ReadTagsV1(buf, size);
+
+				delete [] buf;
 			}
+		}
 
-			size_t size = 128 - 3;
-			BYTE* buf = DNew BYTE[size];
-			ByteRead(buf, size);
-			m_pID3Tag->ReadTagsV1(buf, size);
+		if (!bID3TagPresent && endpos > APE_TAG_FOOTER_BYTES) {
+			BYTE buf[APE_TAG_FOOTER_BYTES] = {};
 
-			delete [] buf;
+			Seek(endpos - APE_TAG_FOOTER_BYTES);
+			if (ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
+				m_pAPETag = DNew CAPETag;
+				if (m_pAPETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_pAPETag->GetTagSize()) {
+					const size_t tag_size = m_pAPETag->GetTagSize();
+					Seek(endpos - tag_size);
+					BYTE *p = DNew BYTE[tag_size];
+					if (ByteRead(p, tag_size) == S_OK) {
+						m_pAPETag->ReadTags(p, tag_size);
+					}
+					delete [] p;
+
+					endpos -= tag_size;
+				}
+			}
 		}
 	}
 
@@ -139,40 +163,42 @@ HRESULT CMpaSplitterFile::Init()
 	__int64 startpos = 0;
 
 	const __int64 limit = IsRandomAccess() ? MEGABYTE : 64 * KILOBYTE;
-	const __int64 endDataPos = min(endpos - MPA_HEADER_SIZE, limit + m_startpos);
+	const __int64 endDataPos = min(endpos, limit + m_startpos);
 	const __int64 size = endDataPos - m_startpos;
 	BYTE* buffer = DNew BYTE[size];
 	if (S_OK == ByteRead(buffer, size)) {
-		BYTE* start = buffer;
-		BYTE* end   = start + size;
+		BYTE* start     = buffer;
+		const BYTE* end = start + size;
 		while (m_mode != mode::mpa) {
 			MOVE_TO_MPA_START_CODE(start, end);
 			if (start < end - MPA_HEADER_SIZE) {
 				startpos = m_startpos + (start - buffer);
-				int size = ParseMPAHeader(start);
-				if (size == 0) {
+				int frame_size = ParseMPAHeader(start);
+				if (frame_size == 0) {
 					start++;
 					continue;
 				}
-				if (start + size > end) {
+				if (start + frame_size >= end) {
 					break;
 				}
 
-				BYTE* start2 = start + size;
+				BYTE* start2 = start + frame_size;
 				while (start2 + MPA_HEADER_SIZE <= end) {
-					int size = ParseMPAHeader(start2);
-					if (size == 0) {
+					frame_size = ParseMPAHeader(start2);
+					if (frame_size == 0) {
+						if (end - start2 > size / 2) {
+							m_mode = mode::none;
+						}
 						start++;
-						m_mode = mode::none;
 						break;
 					}
 
 					m_mode = mode::mpa;
-					if (start2 + size > end) {
+					if (start2 + frame_size >= end) {
 						break;
 					}
 
-					start2 += size;
+					start2 += frame_size;
 				}
 			} else {
 				break;
@@ -180,36 +206,38 @@ HRESULT CMpaSplitterFile::Init()
 		}
 
 		if (m_mode == mode::none) {
-			BYTE* start = buffer;
-			BYTE* end   = start + size;
+			BYTE* start     = buffer;
+			const BYTE* end = start + size;
 			while (m_mode != mode::mp4a) {
 				MOVE_TO_AAC_START_CODE(start, end);
 				if (start < end - ADTS_HEADER_SIZE) {
 					startpos = m_startpos + (start - buffer);
-					int size = ParseADTSAACHeader(start);
-					if (size == 0) {
+					int frame_size = ParseADTSAACHeader(start);
+					if (frame_size == 0) {
 						start++;
 						continue;
 					}
-					if (start + size > end) {
+					if (start + frame_size >= end) {
 						break;
 					}
 
-					BYTE* start2 = start + size;
+					BYTE* start2 = start + frame_size;
 					while (start2 + ADTS_HEADER_SIZE <= end) {
-						int size = ParseADTSAACHeader(start2);
-						if (size == 0) {
+						frame_size = ParseADTSAACHeader(start2);
+						if (frame_size == 0) {
+							if (end - start2 > size / 2) {
+								m_mode = mode::none;
+							}
 							start++;
-							m_mode = mode::none;
 							break;
 						}
 
 						m_mode = mode::mp4a;
-						if (start2 + size > end) {
+						if (start2 + frame_size >= end) {
 							break;
 						}
 
-						start2 += size;
+						start2 += frame_size;
 					}
 				} else {
 					break;

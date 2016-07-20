@@ -23,6 +23,7 @@
 
 #include "../BaseSplitter/BaseSplitterFileEx.h"
 #include "../../../DSUtil/ID3Tag.h"
+#include "../../../DSUtil/ApeTag.h"
 
 #define DEF_SYNC_SIZE 8096
 
@@ -56,6 +57,7 @@ public:
 	virtual ~CMpaSplitterFile();
 
 	CID3Tag* m_pID3Tag;
+	CAPETag* m_pAPETag;
 
 	const CMediaType& GetMediaType() {
 		return m_mt;
