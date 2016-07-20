@@ -71,7 +71,7 @@ public:
     bool                                  HasFragmentsIndex() const  { return m_FragmentsIndexEntries.ItemCount() > 0; }
     const AP4_Array<AP4_IndexTableEntry>& GetFragmentsIndexEntries() { return m_FragmentsIndexEntries; }
 
-    AP4_Result   SelectMoof(REFERENCE_TIME rt);
+    AP4_Result   SelectMoof(const REFERENCE_TIME rt);
     AP4_Result   SwitchMoof(AP4_Cardinal index, AP4_UI64 offset, AP4_UI64 size, AP4_Duration dts);
     AP4_Result   SwitchNextMoof();
     AP4_Result   SwitchFirstMoof();

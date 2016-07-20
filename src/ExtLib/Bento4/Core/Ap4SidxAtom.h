@@ -36,9 +36,14 @@ public:
     AP4_UI32              GetReferenceId() const { return m_ReferenceId; }
     AP4_UI32              GetTimeScale()   const { return m_TimeScale;   }
     AP4_UI64              GetOffset()      const { return m_Offset;      }
+    AP4_UI64              GetSegmentEnd()  const { return m_SegmentEnd;  }
     AP4_Duration          GetDuration()    const { return m_Duration;    }
+    bool                  IsLastSegment()  const { return m_LastSegment; }
+
     AP4_Array<Fragments>& GetSampleTable()       { return m_Fragments;   }
     bool                  IsEmpty()        const { return m_Fragments.ItemCount() == 0; }
+
+    AP4_Result            Append(AP4_SidxAtom* atom);
 
 private:
     // members
@@ -46,7 +51,9 @@ private:
     AP4_UI32             m_TimeScale                = 0;
     AP4_UI64             m_EarliestPresentationTime = 0;
     AP4_UI64             m_Offset                   = 0;
+    AP4_UI64             m_SegmentEnd               = 0;
     AP4_Duration         m_Duration                 = 0;
+    bool                 m_LastSegment              = false;
     AP4_Array<Fragments> m_Fragments;
 };
 
