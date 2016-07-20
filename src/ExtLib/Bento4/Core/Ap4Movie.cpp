@@ -437,7 +437,7 @@ AP4_Movie::SetSidxAtom(AP4_SidxAtom* atom, AP4_ByteStream& stream)
 |   AP4_Movie::SelectMoof
 +---------------------------------------------------------------------*/
 AP4_Result
-AP4_Movie::SelectMoof(REFERENCE_TIME rt)
+AP4_Movie::SelectMoof(const REFERENCE_TIME rt)
 {
     if (m_SidxAtom) {
         const AP4_TimeStamp ts = (AP4_TimeStamp)((double(rt) * m_SidxAtom->GetTimeScale() + 5000000) / 10000000);

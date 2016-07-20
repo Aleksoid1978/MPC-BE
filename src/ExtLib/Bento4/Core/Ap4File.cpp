@@ -51,16 +51,18 @@ AP4_File::AP4_File(AP4_ByteStream& stream, AP4_AtomFactory& atom_factory)
     : m_Movie(NULL)
     , m_FileType(NULL)
 {
+    AP4_SidxAtom* sidxAtom = NULL;
+    bool bBreak = false;
     // get all atoms
     AP4_Atom* atom;
-    while (AP4_SUCCEEDED(atom_factory.CreateAtomFromStream(stream, atom))) {
+    while (!bBreak && AP4_SUCCEEDED(atom_factory.CreateAtomFromStream(stream, atom))) {
         switch (atom->GetType()) {
             case AP4_ATOM_TYPE_MOOV:
                 m_Movie = new AP4_Movie(dynamic_cast<AP4_MoovAtom*>(atom),
                                         stream);
                 break;
             case AP4_ATOM_TYPE_MOOF:
-                if (m_Movie) {
+                if (m_Movie && !sidxAtom) {
                     AP4_Offset offset;
                     stream.Tell(offset);
                     m_Movie->ProcessMoof(AP4_DYNAMIC_CAST(AP4_ContainerAtom, atom),
@@ -74,18 +76,29 @@ AP4_File::AP4_File(AP4_ByteStream& stream, AP4_AtomFactory& atom_factory)
                 m_OtherAtoms.Add(atom);
                 break;
             case AP4_ATOM_TYPE_SIDX:
-                m_OtherAtoms.Add(atom);
                 if (m_Movie) {
-                    if (AP4_SUCCEEDED(m_Movie->SetSidxAtom(AP4_DYNAMIC_CAST(AP4_SidxAtom, atom),
-                                                           stream))) {
-                        m_Movie->SwitchFirstMoof();
-                        return;
+                    if (!sidxAtom) {
+                        sidxAtom = AP4_DYNAMIC_CAST(AP4_SidxAtom, atom);
+                        m_OtherAtoms.Add(atom);
+                    } else {
+                        sidxAtom->Append(AP4_DYNAMIC_CAST(AP4_SidxAtom, atom));
+                        delete atom;
+                    }
+
+                    if (sidxAtom->IsLastSegment() || AP4_FAILED(stream.Seek(sidxAtom->GetSegmentEnd()))) {
+                        bBreak = true;
+                        break;
                     }
                 }
                 break;
             default:
                 m_OtherAtoms.Add(atom);
         }
+    }
+
+    if (m_Movie && AP4_SUCCEEDED(m_Movie->SetSidxAtom(sidxAtom, stream))) {
+        m_Movie->SwitchFirstMoof();
+        return;
     }
 
     if (m_Movie && m_Movie->HasFragments()) {

@@ -68,4 +68,36 @@ AP4_SidxAtom::AP4_SidxAtom(AP4_Size        size,
         m_Duration += duration;
         offset += size;
     }
+
+    m_SegmentEnd = offset;
+    m_Duration -= m_EarliestPresentationTime;
+
+    AP4_Size streamSize = 0;
+    stream.GetSize(streamSize);
+    m_LastSegment = (offset == streamSize);
+}
+
+/*----------------------------------------------------------------------
+|       AP4_SidxAtom::AP4_SidxAtom
++---------------------------------------------------------------------*/
+AP4_Result
+AP4_SidxAtom::Append(AP4_SidxAtom* atom)
+{
+    if (!atom || atom->IsEmpty()) {
+        return AP4_FAILURE;
+    }
+
+    AP4_Array<AP4_SidxAtom::Fragments>& fragments = atom->GetSampleTable();
+    if (AP4_FAILED(m_Fragments.EnsureCapacity(fragments.ItemCount() + m_Fragments.ItemCount()))) {
+        return AP4_FAILURE;
+    }
+
+    for (AP4_Cardinal i = 0; i < fragments.ItemCount(); i++) {
+        m_Fragments.Append(fragments[i]);
+    }
+    m_Duration += atom->GetDuration();
+    m_SegmentEnd = atom->GetSegmentEnd();
+    m_LastSegment = atom->IsLastSegment();
+
+    return AP4_SUCCESS;
 }
