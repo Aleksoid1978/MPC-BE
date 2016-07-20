@@ -38,8 +38,8 @@ bool CApeTagItem::Load(CGolombBuffer &gb){
 		return false;
 	}
 
-	DWORD tag_size	= gb.ReadDwordLE();	/* field size */
-	DWORD flags		= gb.ReadDwordLE();	/* field flags */
+	DWORD tag_size    = gb.ReadDwordLE(); /* field size */
+	const DWORD flags = gb.ReadDwordLE(); /* field flags */
 
 	CStringA key;
 	BYTE b = gb.ReadByte();
@@ -69,8 +69,8 @@ bool CApeTagItem::Load(CGolombBuffer &gb){
 		BYTE* value = DNew BYTE[tag_size + 1];
 		memset(value, 0, tag_size + 1);
 		gb.ReadBuffer(value, tag_size);
-		m_value	= UTF8To16((LPCSTR)value);
-		m_key	= key;
+		m_value = UTF8To16((LPCSTR)value);
+		m_key   = key;
 		delete [] value;
 	}
 
@@ -95,7 +95,7 @@ CAPETag::~CAPETag()
 void CAPETag::Clear()
 {
 	CApeTagItem* item;
-	while (TagItems.GetCount() > 0) {
+	while (!TagItems.IsEmpty()) {
 		item = TagItems.RemoveHead();
 		if (item) {
 			delete item;
@@ -113,26 +113,26 @@ bool CAPETag::ReadFooter(BYTE *buf, size_t len)
 		return false;
 	}
 
-	if (memcmp(buf, "APETAGEX", 8) || memcmp(buf+24, "\0\0\0\0\0\0\0\0", 8)) {
+	if (memcmp(buf, "APETAGEX", 8) || memcmp(buf + 24, "\0\0\0\0\0\0\0\0", 8)) {
 		return false;
 	}
 
 	CGolombBuffer gb((BYTE*)buf + 8, APE_TAG_FOOTER_BYTES - 8);
-	DWORD ver = gb.ReadDwordLE();
+	const DWORD ver = gb.ReadDwordLE();
 	if (ver != APE_TAG_VERSION) {
 		return false;
 	}
 
-	DWORD tag_size	= gb.ReadDwordLE();
-	DWORD fields	= gb.ReadDwordLE();
-	DWORD flags		= gb.ReadDwordLE();
+	const DWORD tag_size = gb.ReadDwordLE();
+	const DWORD fields   = gb.ReadDwordLE();
+	const DWORD flags    = gb.ReadDwordLE();
 
 	if ((fields > 65536) || (flags & APE_TAG_FLAG_IS_HEADER)) {
 		return false;
 	}
 
-	m_TagSize	= tag_size;
-	m_TagFields	= fields;
+	m_TagSize   = tag_size;
+	m_TagFields = fields;
 
 	return true;
 }
@@ -165,8 +165,8 @@ CApeTagItem* CAPETag::Find(CString key)
 
 	POSITION pos = TagItems.GetHeadPosition();
 	while (pos) {
-		CApeTagItem* item	= TagItems.GetAt(pos);
-		CString TagKey		= item->GetKey();
+		CApeTagItem* item = TagItems.GetAt(pos);
+		CString TagKey    = item->GetKey();
 		TagKey.MakeLower();
 		if (TagKey == key_lc) {
 			return item;
@@ -182,26 +182,29 @@ CApeTagItem* CAPETag::Find(CString key)
 
 void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag)
 {
-	CAtlArray<BYTE>		CoverData;
-	CString				CoverMime;
-	CString				CoverFileName;
+	if (!apetag || apetag->TagItems.IsEmpty()) {
+		return;
+	}
+
+	CAtlArray<BYTE> CoverData;
+	CString CoverMime, CoverFileName;
 
 	CString Artist, Comment, Title, Year, Album;
 
 	POSITION pos = apetag->TagItems.GetHeadPosition();
 	while (pos) {
-		CApeTagItem* item	= apetag->TagItems.GetAt(pos);
-		CString TagKey		= item->GetKey();
+		CApeTagItem* item = apetag->TagItems.GetAt(pos);
+		CString TagKey    = item->GetKey();
 		TagKey.MakeLower();
 
 		if (item->GetType() == CApeTagItem::APE_TYPE_BINARY) {
 			CoverMime.Empty();
 			if (!TagKey.IsEmpty()) {
-				CString ext = TagKey.Mid(TagKey.ReverseFind('.')+1);
-				if (ext == _T("jpeg") || ext == _T("jpg")) {
-					CoverMime = _T("image/jpeg");
-				} else if (ext == _T("png")) {
-					CoverMime = _T("image/png");
+				CString ext = TagKey.Mid(TagKey.ReverseFind('.') + 1);
+				if (ext == L"jpeg" || ext == L"jpg") {
+					CoverMime = L"image/jpeg";
+				} else if (ext == L"png") {
+					CoverMime = L"image/png";
 				}
 			}
 
@@ -214,7 +217,7 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag)
 			CString sTitle, sPerformer;
 
 			CString TagValue = item->GetValue();
-			if (TagKey == _T("cuesheet")) {
+			if (TagKey == L"cuesheet") {
 				CAtlList<Chapters> ChaptersList;
 				if (ParseCUESheet(TagValue, ChaptersList, sTitle, sPerformer)) {
 					if (sTitle.GetLength() > 0 && Title.IsEmpty()) {
@@ -235,15 +238,15 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag)
 			}
 
 			if (TagValue.GetLength() > 0) {
-				if (TagKey == _T("artist")) {
+				if (TagKey == L"artist") {
 					Artist = TagValue;
-				} else if (TagKey == _T("comment")) {
+				} else if (TagKey == L"comment") {
 					Comment = TagValue;
-				} else if (TagKey == _T("title")) {
+				} else if (TagKey == L"title") {
 					Title = TagValue;
-				} else if (TagKey == _T("year")) {
+				} else if (TagKey == L"year") {
 					Year = TagValue;
-				} else if (TagKey == _T("album")) {
+				} else if (TagKey == L"album") {
 					Album = TagValue;
 				}
 			}
