@@ -243,16 +243,14 @@ public:
 
 		stream_codec codec;
 
-		stream() {
-			pid				= 0;
-			pesid			= 0;
-			ps1id			= 0;
-			lang_set		= false;
-			codec			= stream_codec::NONE;
-
-			dts.bDTSCore	= false;
-			dts.bDTSHD		= false;
-
+		stream()
+			: pid(0)
+			, pesid(0)
+			, ps1id(0)
+			, lang_set(false)
+			, codec(stream_codec::NONE)
+			, dts({false, false})
+		{
 			mt.InitMediaType();
 			memset(lang, 0, _countof(lang));
 		}
@@ -348,7 +346,6 @@ public:
 		struct stream {
 			WORD			pid  = 0;
 			PES_STREAM_TYPE	type = PES_STREAM_TYPE::INVALID;
-
 		};
 		std::vector<stream> streams;
 

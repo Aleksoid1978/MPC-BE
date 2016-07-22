@@ -107,17 +107,11 @@ class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 	};
 
 	struct AMF0 {
-		AMF_DATA_TYPE type;
+		AMF_DATA_TYPE type = AMF_DATA_TYPE_EMPTY;
 		CString	name;
-		CString value_s;
-		double	value_d;
-		bool	value_b;
-
-		AMF0() {
-			type	= AMF_DATA_TYPE_EMPTY;
-			value_d	= 0;
-			value_b	= 0;
-		}
+		CString	value_s;
+		double	value_d = 0.0;
+		bool	value_b = false;
 
 		operator CString() const {
 			return value_s;
