@@ -100,7 +100,6 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_bChangeMT(false)
 	, m_LastScheduledSampleTimeFP(-1)
 	, pfDXVA2CreateDirect3DDeviceManager9(NULL)
-	, pfMFCreateDXSurfaceBuffer(NULL)
 	, pfMFCreateVideoSampleFromSurface(NULL)
 	, pfMFCreateVideoMediaType(NULL)
 	, pfAvSetMmThreadCharacteristicsW(NULL)
@@ -126,16 +125,12 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 	// Load EVR functions
 	hLib = LoadLibrary(L"evr.dll");
-	pfMFCreateDXSurfaceBuffer			= hLib ? (PTR_MFCreateDXSurfaceBuffer)			GetProcAddress(hLib, "MFCreateDXSurfaceBuffer") : NULL;
 	pfMFCreateVideoSampleFromSurface	= hLib ? (PTR_MFCreateVideoSampleFromSurface)	GetProcAddress(hLib, "MFCreateVideoSampleFromSurface") : NULL;
 	pfMFCreateVideoMediaType			= hLib ? (PTR_MFCreateVideoMediaType)			GetProcAddress(hLib, "MFCreateVideoMediaType") : NULL;
 
-	if (!pfDXVA2CreateDirect3DDeviceManager9 || !pfMFCreateDXSurfaceBuffer || !pfMFCreateVideoSampleFromSurface || !pfMFCreateVideoMediaType) {
+	if (!pfDXVA2CreateDirect3DDeviceManager9 || !pfMFCreateVideoSampleFromSurface || !pfMFCreateVideoMediaType) {
 		if (!pfDXVA2CreateDirect3DDeviceManager9) {
 			_Error += L"Could not find DXVA2CreateDirect3DDeviceManager9 (dxva2.dll)\n";
-		}
-		if (!pfMFCreateDXSurfaceBuffer) {
-			_Error += L"Could not find MFCreateDXSurfaceBuffer (evr.dll)\n";
 		}
 		if (!pfMFCreateVideoSampleFromSurface) {
 			_Error += L"Could not find MFCreateVideoSampleFromSurface (evr.dll)\n";
