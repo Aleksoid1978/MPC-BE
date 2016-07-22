@@ -33,29 +33,24 @@ CMediaFormatCategory::CMediaFormatCategory()
 {
 }
 
-CMediaFormatCategory::CMediaFormatCategory(
-	CString label, CString description, CAtlList<CString>& exts, filetype_t filetype,
-	CString specreqnote)
+CMediaFormatCategory::CMediaFormatCategory(CString label, CString description, CAtlList<CString>& exts, filetype_t filetype, CString specreqnote)
+	: m_label(label)
+	, m_description(description)
+	, m_specreqnote(specreqnote)
+	, m_filetype(filetype)
 {
-	m_label			= label;
-	m_description	= description;
-	m_specreqnote	= specreqnote;
-	m_filetype		= filetype;
 	m_exts.AddTailList(&exts);
 	m_backupexts.AddTailList(&m_exts);
 }
 
-CMediaFormatCategory::CMediaFormatCategory(
-	CString label, CString description, CString exts, filetype_t filetype,
-	CString specreqnote)
+CMediaFormatCategory::CMediaFormatCategory(CString label, CString description, CString exts, filetype_t filetype, CString specreqnote)
+	: m_label(label)
+	, m_description(description)
+	, m_specreqnote(specreqnote)
+	, m_filetype(filetype)
 {
-	m_label			= label;
-	m_description	= description;
-	m_specreqnote	= specreqnote;
-	m_filetype		= filetype;
 	ExplodeMin(exts, m_exts, ' ');
 	POSITION pos = m_exts.GetHeadPosition();
-
 	while (pos) {
 		m_exts.GetNext(pos).TrimLeft('.');
 	}
