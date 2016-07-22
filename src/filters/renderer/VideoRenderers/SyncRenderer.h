@@ -479,10 +479,7 @@ namespace GothSync
 	private:
 		// dxva.dll
 		typedef HRESULT (__stdcall *PTR_DXVA2CreateDirect3DDeviceManager9)(UINT* pResetToken, IDirect3DDeviceManager9** ppDeviceManager);
-		// mf.dll
-		typedef HRESULT (__stdcall *PTR_MFCreatePresentationClock)(IMFPresentationClock** ppPresentationClock);
 		// evr.dll
-		typedef HRESULT (__stdcall *PTR_MFCreateDXSurfaceBuffer)(REFIID riid, IUnknown* punkSurface, BOOL fBottomUpWhenLinear, IMFMediaBuffer** ppBuffer);
 		typedef HRESULT (__stdcall *PTR_MFCreateVideoSampleFromSurface)(IUnknown* pUnkSurface, IMFSample** ppSample);
 		typedef HRESULT (__stdcall *PTR_MFCreateVideoMediaType)(const MFVIDEOFORMAT* pVideoFormat, IMFVideoMediaType** ppIVideoMediaType);
 		// avrt.dll
@@ -562,7 +559,6 @@ namespace GothSync
 
 		// Functions pointers for Vista/.NET3 specific library
 		PTR_DXVA2CreateDirect3DDeviceManager9 pfDXVA2CreateDirect3DDeviceManager9;
-		PTR_MFCreateDXSurfaceBuffer pfMFCreateDXSurfaceBuffer;
 		PTR_MFCreateVideoSampleFromSurface pfMFCreateVideoSampleFromSurface;
 		PTR_MFCreateVideoMediaType pfMFCreateVideoMediaType;
 
