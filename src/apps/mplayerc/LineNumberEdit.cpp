@@ -327,6 +327,7 @@ CLineNumberStatic::CLineNumberStatic()
 	m_bgcol = RGB( 255, 255, 248 );
 	m_fgcol = RGB( 0, 0, 0 );
 	m_format = _T( "%05i" );
+	m_topmargin = 0;
 	m_topline = 0;
 	m_bottomline = 0;
 }

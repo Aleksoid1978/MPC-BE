@@ -69,12 +69,12 @@ CRoQVideoDecoder : public CTransformFilter
 {
 	CCritSec m_csReceive;
 
-	REFERENCE_TIME m_rtStart;
+	REFERENCE_TIME m_rtStart = 0;
 
-	BYTE* m_y[2];
-	BYTE* m_u[2];
-	BYTE* m_v[2];
-	int m_pitch;
+	BYTE* m_y[2] = { 0 };
+	BYTE* m_u[2] = { 0 };
+	BYTE* m_v[2] = { 0 };
+	int m_pitch = 0;
 
 	void Copy(BYTE* pOut, BYTE* pIn, DWORD w, DWORD h);
 

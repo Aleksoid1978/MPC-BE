@@ -80,6 +80,7 @@ CEditListEditor::CEditListEditor(void)
 	m_bDragging		= FALSE;
 	m_nDragIndex	= -1;
 	m_nDropIndex	= -1;
+	m_pDragImage	= NULL;
 	m_bFileOpen		= false;
 }
 
