@@ -168,6 +168,7 @@ SRCS_LC = \
 	libavcodec/dirac.c \
 	libavcodec/dirac_arith.c \
 	libavcodec/dirac_dwt.c \
+	libavcodec/dirac_vlc.c \
 	libavcodec/diracdec.c \
 	libavcodec/diracdsp.c \
 	libavcodec/diractab.c \

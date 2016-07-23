@@ -368,6 +368,8 @@ int ff_h264_build_ref_list(H264Context *h, H264SliceContext *sl)
                 }
                 break;
             }
+            default:
+                av_assert1(0);
             }
 
             if (i < 0) {
@@ -579,26 +581,6 @@ void ff_h264_remove_all_refs(H264Context *h)
     h->short_ref_count = 0;
 
     memset(h->default_ref, 0, sizeof(h->default_ref));
-    for (i = 0; i < h->nb_slice_ctx; i++) {
-        H264SliceContext *sl = &h->slice_ctx[i];
-        sl->list_count = sl->ref_count[0] = sl->ref_count[1] = 0;
-        memset(sl->ref_list, 0, sizeof(sl->ref_list));
-    }
-}
-
-static int check_opcodes(MMCO *mmco1, MMCO *mmco2, int n_mmcos)
-{
-    int i;
-
-    for (i = 0; i < n_mmcos; i++) {
-        if (mmco1[i].opcode != mmco2[i].opcode) {
-            av_log(NULL, AV_LOG_ERROR, "MMCO opcode [%d, %d] at %d mismatches between slices\n",
-                   mmco1[i].opcode, mmco2[i].opcode, i);
-            return -1;
-        }
-    }
-
-    return 0;
 }
 
 static void generate_sliding_window_mmcos(H264Context *h)
