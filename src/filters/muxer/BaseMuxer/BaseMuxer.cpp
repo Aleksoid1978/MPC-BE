@@ -529,6 +529,7 @@ CBitStream::CBitStream(IStream* pStream, bool fThrowError)
 	: CUnknown(_T("CBitStream"), NULL)
 	, m_pStream(pStream)
 	, m_fThrowError(fThrowError)
+	, m_bitbuff(0)
 	, m_bitlen(0)
 {
 	ASSERT(m_pStream);
@@ -664,6 +665,7 @@ STDMETHODIMP CBitStream::StrWrite(LPCSTR pData, BOOL bFixNewLine)
 //
 
 CBaseMuxerRelatedPin::CBaseMuxerRelatedPin()
+	: m_pRelatedPin(NULL)
 {
 }
 
@@ -692,6 +694,7 @@ CBaseMuxerInputPin::CBaseMuxerInputPin(LPCWSTR pName, CBaseFilter* pFilter, CCri
 	: CBaseInputPin(NAME("CBaseMuxerInputPin"), pFilter, pLock, phr, pName)
 	, m_rtDuration(0)
 	, m_evAcceptPacket(TRUE)
+	, m_fEOS(false)
 	, m_iPacketIndex(0)
 {
 	static int s_iID = 0;
