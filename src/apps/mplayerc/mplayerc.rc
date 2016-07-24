@@ -2996,6 +2996,7 @@ BEGIN
     IDS_DVB_CHANNEL_STOP_SCAN       "Stop"
     IDS_DVB_TVNAV_SEERADIO          "Radio stations"
     IDS_DVB_TVNAV_SEETV             "TV stations"
+    IDS_CAPTURE_CHANNEL_FREQ        "Channel %d (%.1f MHz)"
 END
 
 STRINGTABLE

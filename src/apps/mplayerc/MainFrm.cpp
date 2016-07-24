@@ -7525,7 +7525,7 @@ void CMainFrame::OnPlayPlay()
 				long lFreq = 0;
 				pAMTuner->get_VideoFrequency(&lFreq);
 
-				strOSD.Format(_T("Channel %d (%.1f MHz)"), lChannel, lFreq / 1000000.0);
+				strOSD.Format(ResStr(IDS_CAPTURE_CHANNEL_FREQ), lChannel, lFreq / 1000000.0);
 				OSD_Flag = OSD_ENABLE;
 			}
 		}
@@ -9092,7 +9092,7 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 			pAMTuner->SignalPresent(&lSignalStrength); // good if AMTUNER_SIGNALPRESENT
 
 			CString strOSD;
-			strOSD.Format(_T("Channel %d (%.1f MHz)"), lChannel, lFreq/1000000.0);
+			strOSD.Format(ResStr(IDS_CAPTURE_CHANNEL_FREQ), lChannel, lFreq/1000000.0);
 			m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
 		}
 	}
