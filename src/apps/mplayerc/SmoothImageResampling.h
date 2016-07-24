@@ -76,7 +76,7 @@ static void Resize_HQ_4ch(const BYTE* src, int srcWidth, int srcHeight,
 		}
 
 		// FOR EVERY OUTPUT PIXEL
-		for (int y2 = 0; y2 < destHeight; y2++) {   
+		for (int y2 = 0; y2 < destHeight; y2++) {
 			// find the y-range of input pixels that will contribute:
 			int y1a = (int)(y2 * fh);
 			y1a = min(y1a, 256 * (srcHeight - 1) - 1);
@@ -86,7 +86,7 @@ static void Resize_HQ_4ch(const BYTE* src, int srcWidth, int srcHeight,
 
 			for (int x2 = 0; x2 < destWidth; x2++) {
 				// find the x-range of input pixels that will contribute:
-				const int x1a = g_px1a[x2]; // (int)(x2 * fw); 
+				const int x1a = g_px1a[x2]; // (int)(x2 * fw);
 				const int x1c = x1a >> 8;
 
 				const unsigned int *dsrc2 = &dsrc[y1c * srcWidth + x1c];
@@ -121,8 +121,8 @@ static void Resize_HQ_4ch(const BYTE* src, int srcWidth, int srcHeight,
 
 		for (int x2 = 0; x2 < destWidth; x2++) {
 			// find the x-range of input pixels that will contribute:
-			const int x1a = (int)((x2    ) * fw); 
-			int x1b       = (int)((x2 + 1) * fw); 
+			const int x1a = (int)((x2    ) * fw);
+			int x1b       = (int)((x2 + 1) * fw);
 			if (bUpsampleX) { // map to same pixel -> we want to interpolate between two pixels!
 				x1b = x1a + 256;
 			}
@@ -132,10 +132,10 @@ static void Resize_HQ_4ch(const BYTE* src, int srcWidth, int srcHeight,
 		}
 
 		// FOR EVERY OUTPUT PIXEL
-		for (int y2 = 0; y2 < destHeight; y2++) {   
+		for (int y2 = 0; y2 < destHeight; y2++) {
 			// find the y-range of input pixels that will contribute:
-			const int y1a = (int)((y2    ) * fh); 
-			int y1b       = (int)((y2 + 1) * fh); 
+			const int y1a = (int)((y2    ) * fh);
+			int y1b       = (int)((y2 + 1) * fh);
 			if (bUpsampleY) { // map to same pixel -> we want to interpolate between two pixels!
 				y1b = y1a + 256;
 			}

@@ -132,7 +132,7 @@ void CPlayerToolBar::SwitchTheme()
 
 	const int dpiScalePercent = m_pMainFrame->GetDPIScalePercent();
 	const int imageDpiScalePercent[] = {
-		350, 300, 250, 225, 200, 175, 150, 125	
+		350, 300, 250, 225, 200, 175, 150, 125
 	};
 	const int toolbarImageResId[] = {
 		IDB_PLAYERTOOLBAR_PNG_350,
@@ -233,7 +233,7 @@ void CPlayerToolBar::SwitchTheme()
 			IDB_DXVA_INDICATOR_150,
 			IDB_DXVA_INDICATOR_125
 		};
-		
+
 		resid = IDB_DXVA_INDICATOR;
 		if (imageDpiScalePercentIndex != -1) {
 			resid = gpuImageResId[imageDpiScalePercentIndex];

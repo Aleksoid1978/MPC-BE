@@ -583,7 +583,7 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	int w = m_win, h = m_hin, arx = m_arxin, ary = m_aryin;
 	int vsfilter = 0;
 	GetOutputSize(w, h, arx, ary, vsfilter);
-	
+
 	m_wout = m_win;
 	m_hout = m_hin;
 	m_arxout = m_arxin;

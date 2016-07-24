@@ -1562,7 +1562,7 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	CSize cSize;
 	CalcControlsSize(cSize);
 	lpMMI->ptMinTrackSize = CPoint(cSize);
-	
+
 	if (bMenuVisible) {
 		MENUBARINFO mbi = { sizeof(mbi) };
 		GetMenuBarInfo(OBJID_MENU, 0, &mbi);

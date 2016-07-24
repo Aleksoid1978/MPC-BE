@@ -1795,7 +1795,7 @@ void CDX9AllocatorPresenter::DrawStats()
 	const LONGLONG llMinJitter     = m_MinJitter;
 	const LONGLONG llMaxSyncOffset = m_MaxSyncOffset;
 	const LONGLONG llMinSyncOffset = m_MinSyncOffset;
-	
+
 	RECT rc = { 40, 40, 0, 0 };
 
 	static int   TextHeight = 0;

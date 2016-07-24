@@ -403,7 +403,7 @@ HRESULT CMpcAudioRenderer::Receive(IMediaSample* pSample)
 		CancelNotification();
 
 		return S_OK;
-	
+
 	};
 
 	HRESULT hr = ReceiveInternal(pSample);
@@ -1541,7 +1541,7 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 				}
 			}
 		}
-	
+
 		return S_FALSE;
 	}
 
@@ -1817,7 +1817,7 @@ HRESULT CMpcAudioRenderer::GetAudioDevice()
 				if (bEventDrivenModeSupport
 						&& (pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK)) {
 					DbgLog((LOG_TRACE, 3, L"CMpcAudioRenderer::GetAudioDevice() - Unable to find selected audio device, using the default end point : pwszVal: '%s', pwszID: '%s'", varName.pwszVal, pwszID));
-					
+
 					m_strCurrentDeviceId = pwszID;
 					m_strCurrentDeviceName = varName.pwszVal;
 
@@ -2137,7 +2137,7 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 	SAFE_DELETE_ARRAY(m_pWaveFileFormatOutput);
 
 	HRESULT hr = S_OK;
-	
+
 	if (bFullInitialization) {
 		hr = CheckAudioClient();
 		if (SUCCEEDED(hr)) {

@@ -96,7 +96,6 @@ bool CMpaDecSettingsWnd::OnActivate()
 {
 	const int h20 = ScaleY(20);
 	const int h25 = ScaleY(25);
-	const int h30 = ScaleY(30);
 	DWORD dwStyle = WS_VISIBLE|WS_CHILD|WS_TABSTOP;
 	CPoint p(10, 10);
 	CRect r;

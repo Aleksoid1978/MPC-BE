@@ -151,7 +151,6 @@ BOOL CPPageWebServer::OnApply()
 	} else {
 		pWnd->StopWebServer();
 	}
-	
 
 	m_launch.EnableWindow(m_fEnableWebServer);
 

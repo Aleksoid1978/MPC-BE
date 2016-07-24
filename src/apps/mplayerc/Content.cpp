@@ -142,7 +142,7 @@ namespace Content {
 					if (content.ct.IsEmpty() || content.ct == L"application/octet-stream") {
 						GetContentTypeByExt(fn, content.ct);
 					}
-			
+
 					if ((content.body.GetLength() >= 3 && wcsncmp(content.body, L".ra", 3) == 0)
 							|| (content.body.GetLength() >= 4 && wcsncmp(content.body, L".RMF", 4) == 0)) {
 						content.ct = L"audio/x-pn-realaudio";
