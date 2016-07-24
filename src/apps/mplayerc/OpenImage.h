@@ -47,7 +47,7 @@ static HBITMAP OpenImage(CString fn)
 		if (!fp) {
 			return NULL;
 		}
-		
+
 		fseek(fp, 0, SEEK_END);
 		size_t fs = ftell(fp);
 		rewind(fp);

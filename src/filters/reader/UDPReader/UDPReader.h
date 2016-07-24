@@ -70,9 +70,9 @@ private:
 
 	ULONGLONG          m_pos = 0;
 	ULONGLONG          m_len = 0;
-	
+
 	CAtlList<CPacket*> m_packets;
-	
+
 	CAMEvent           m_EventComplete;
 
 	volatile ULONGLONG m_SizeComplete = 0;

@@ -541,7 +541,7 @@ void CFFAudioDecoder::FlushBuffers()
 void CFFAudioDecoder::StreamFinish()
 {
 	m_pAVCodec = NULL;
-	
+
 	av_parser_close(m_pParser);
 	m_pParser = NULL;
 
