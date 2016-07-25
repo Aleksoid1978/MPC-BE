@@ -714,6 +714,7 @@ namespace Youtube
 
 			CString final_video_url = final_item->url;
 			CString final_video_ext = final_item->profile->ext;
+			CString final_video_quality_suffix; final_video_quality_suffix.Format(L"%dp", final_item->profile->quality);
 
 			CString final_audio_url;
 			if (final_item->profile->type == y_video && !AudioList.empty()) {
@@ -743,7 +744,7 @@ namespace Youtube
 
 				ParseMetadata(hInet, videoId, y_fields);
 
-				y_fields.fname = y_fields.title + L"." + final_video_ext;
+				y_fields.fname = y_fields.title + L" - " + final_video_quality_suffix + L"." + final_video_ext;
 				FixFilename(y_fields.fname);
 
 				if (!videoId.IsEmpty()) { // subtitle
