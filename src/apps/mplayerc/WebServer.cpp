@@ -183,7 +183,7 @@ DWORD WINAPI CWebServer::StaticThreadProc(LPVOID lpParam)
 DWORD CWebServer::ThreadProc()
 {
 	if (!AfxSocketInit(NULL)) {
-		return (DWORD)-1;
+		return DWORD_ERROR;
 	}
 
 	CWebServerSocket s(this, m_nPort);
@@ -291,7 +291,7 @@ bool CWebServer::LoadPage(UINT resid, CStringA& str, CString path)
 			fseek(f, 0, 2);
 			char* buff = str.GetBufferSetLength(ftell(f));
 			fseek(f, 0, 0);
-			int len = fread(buff, 1, str.GetLength(), f);
+			int len = (int)fread(buff, 1, str.GetLength(), f);
 			fclose(f);
 			return len == str.GetLength();
 		}
@@ -452,16 +452,16 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 				debug += "REQUEST[" + key + "] = " + value + "<br>\r\n";
 			}
 		}
+		body.Replace("[debug]", debug);
 
-		body.Replace("[path]", CStringA(pClient->m_path));
-		body.Replace("[indexpath]", "/index.html");
-		body.Replace("[commandpath]", "/command.html");
 		body.Replace("[browserpath]", "/browser.html");
+		body.Replace("[commandpath]", "/command.html");
 		body.Replace("[controlspath]", "/controls.html");
-		body.Replace("[wmcname]", "wm_command");
+		body.Replace("[indexpath]", "/index.html");
+		body.Replace("[path]", CStringA(pClient->m_path));
 		body.Replace("[setposcommand]", CMD_SETPOS);
 		body.Replace("[setvolumecommand]", CMD_SETVOLUME);
-		body.Replace("[debug]", debug);
+		body.Replace("[wmcname]", "wm_command");
 	}
 
 	// gzip
@@ -477,11 +477,13 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 				break;
 			}
 
+			// Allocate deflate state
 			z_stream strm;
+
 			strm.zalloc = Z_NULL;
 			strm.zfree = Z_NULL;
 			strm.opaque = Z_NULL;
-			int ret = deflateInit2(&strm, 9, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY);
+			int ret = deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY);
 			if (ret != Z_OK) {
 				ASSERT(0);
 				break;
@@ -489,8 +491,11 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 
 			int gzippedBuffLen = body.GetLength();
 			BYTE* gzippedBuff = DNew BYTE[gzippedBuffLen];
+
+			// Compress
 			strm.avail_in = body.GetLength();
 			strm.next_in = (Bytef*)(LPCSTR)body;
+
 			strm.avail_out = gzippedBuffLen;
 			strm.next_out = gzippedBuff;
 
@@ -503,6 +508,8 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 			}
 			gzippedBuffLen -= strm.avail_out;
 			memcpy(body.GetBufferSetLength(gzippedBuffLen), gzippedBuff, gzippedBuffLen);
+
+			// Clean up
 			deflateEnd(&strm);
 			delete [] gzippedBuff;
 
@@ -615,16 +622,16 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 		UINT port;
 
 		if (pClient->GetPeerName(name, port)) {
-			str.Format(_T("%d"), port);
-			env.AddTail(_T("REMOTE_ADDR=")+name);
-			env.AddTail(_T("REMOTE_HOST=")+name);
-			env.AddTail(_T("REMOTE_PORT=")+str);
+			str.Format(_T("%u"), port);
+			env.AddTail(_T("REMOTE_ADDR=") + name);
+			env.AddTail(_T("REMOTE_HOST=") + name);
+			env.AddTail(_T("REMOTE_PORT=") + str);
 		}
 
 		if (pClient->GetSockName(name, port)) {
-			str.Format(_T("%d"), port);
-			env.AddTail(_T("SERVER_NAME=")+name);
-			env.AddTail(_T("SERVER_PORT=")+str);
+			str.Format(_T("%u"), port);
+			env.AddTail(_T("SERVER_NAME=") + name);
+			env.AddTail(_T("SERVER_PORT=") + str);
 		}
 
 		env.AddTail(_T("\0"));
@@ -644,7 +651,7 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 					envstr.GetLength() ? (LPVOID)(LPCSTR)envstr : NULL,
 					dir, &siStartInfo, &piProcInfo)) {
 			DWORD ThreadId;
-			CreateThread(NULL, 0, KillCGI, (LPVOID)piProcInfo.hProcess, 0, &ThreadId);
+			VERIFY(CreateThread(NULL, 0, KillCGI, (LPVOID)piProcInfo.hProcess, 0, &ThreadId));
 
 			static const int BUFFSIZE = 1024;
 			DWORD dwRead, dwWritten = 0;
@@ -668,8 +675,8 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 
 			int hdrend = body.Find("\r\n\r\n");
 			if (hdrend >= 0) {
-				hdr = body.Left(hdrend+2);
-				body = body.Mid(hdrend+4);
+				hdr = body.Left(hdrend + 2);
+				body = body.Mid(hdrend + 4);
 			}
 
 			CloseHandle(hChildStdinRd);
