@@ -20,7 +20,7 @@
  */
 
 #include "stdafx.h"
-#include <BaseClasses/streams.h>
+#include "BaseClasses/streams.h"
 #include <aviriff.h>
 #include "WavDest.h"
 #include "../../../DSUtil/DSUtil.h"
@@ -75,28 +75,26 @@ CWavDestFilter::CWavDestFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_cbWavData(0)
 	, m_cbHeader(0)
 {
-	if (SUCCEEDED(*phr)) {
-		if (CWavDestOutputPin* pOut = DNew CWavDestOutputPin(this, phr)) {
-			if (SUCCEEDED(*phr)) {
-				m_pOutput = pOut;
-			} else {
-				delete pOut;
-			}
+	if (CWavDestOutputPin* pOut = DNew CWavDestOutputPin(this, phr)) {
+		if (SUCCEEDED(*phr)) {
+			m_pOutput = pOut;
 		} else {
-			*phr = E_OUTOFMEMORY;
-			return;
+			delete pOut;
 		}
+	} else {
+		*phr = E_OUTOFMEMORY;
+		return;
+	}
 
-		if (CTransformInputPin* pIn = DNew CTransformInputPin(NAME("Transform input pin"), this, phr, L"In")) {
-			if (SUCCEEDED(*phr)) {
-				m_pInput = pIn;
-			} else {
-				delete pIn;
-			}
+	if (CTransformInputPin* pIn = DNew CTransformInputPin(NAME("Transform input pin"), this, phr, L"In")) {
+		if (SUCCEEDED(*phr)) {
+			m_pInput = pIn;
 		} else {
-			*phr = E_OUTOFMEMORY;
-			return;
+			delete pIn;
 		}
+	} else {
+		*phr = E_OUTOFMEMORY;
+		return;
 	}
 }
 
@@ -134,7 +132,7 @@ HRESULT CWavDestFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	// Prepare it for writing
 	LONG lActual = pOut->GetActualDataLength();
 
-	if (m_cbWavData + m_cbHeader + lActual < m_cbWavData + m_cbHeader ) { // overflow
+	if (m_cbWavData + m_cbHeader + lActual < m_cbWavData + m_cbHeader) { // overflow
 		return E_FAIL;
 	}
 
@@ -153,32 +151,37 @@ HRESULT CWavDestFilter::Copy(IMediaSample* pSource, IMediaSample* pDest) const
 	long lSourceSize = pSource->GetActualDataLength();
 
 #ifdef _DEBUG
-	long lDestSize	= pDest->GetSize();
+	long lDestSize = pDest->GetSize();
 	ASSERT(lDestSize >= lSourceSize);
 #endif
 
-	pSource->GetPointer(&pSourceBuffer);
-	pDest->GetPointer(&pDestBuffer);
+	if (FAILED(pSource->GetPointer(&pSourceBuffer)) || !pSourceBuffer) {
+		return E_FAIL;
+	}
+	if (FAILED(pDest->GetPointer(&pDestBuffer)) || !pDestBuffer) {
+		return E_FAIL;
+	}
 
 	CopyMemory((PVOID)pDestBuffer, (PVOID)pSourceBuffer, lSourceSize);
 
 	// Copy the sample times
 
-	REFERENCE_TIME TimeStart, TimeEnd;
-	if (NOERROR == pSource->GetTime(&TimeStart, &TimeEnd)) {
-		pDest->SetTime(&TimeStart, &TimeEnd);
+	REFERENCE_TIME rtTimeStart, rtTimeEnd;
+	if (SUCCEEDED(pSource->GetTime(&rtTimeStart, &rtTimeEnd))) {
+		pDest->SetTime(&rtTimeStart, &rtTimeEnd);
 	}
 
-	LONGLONG MediaStart, MediaEnd;
-	if (pSource->GetMediaTime(&MediaStart, &MediaEnd) == NOERROR) {
-		pDest->SetMediaTime(&MediaStart, &MediaEnd);
+	LONGLONG rtMediaStart, rtMediaEnd;
+	if (SUCCEEDED(pSource->GetMediaTime(&rtMediaStart, &rtMediaEnd))) {
+		pDest->SetMediaTime(&rtMediaStart, &rtMediaEnd);
 	}
 
 	// Copy the media type
 	AM_MEDIA_TYPE* pMediaType;
-	pSource->GetMediaType(&pMediaType);
-	pDest->SetMediaType(pMediaType);
-	DeleteMediaType(pMediaType);
+	if (SUCCEEDED(pSource->GetMediaType(&pMediaType)) && pMediaType) {
+		pDest->SetMediaType(pMediaType);
+		DeleteMediaType(pMediaType);
+	}
 
 	// Copy the actual data length
 	long lDataLength = pSource->GetActualDataLength();
@@ -231,7 +234,7 @@ HRESULT CWavDestFilter::DecideBufferSize(IMemAllocator* pAlloc, ALLOCATOR_PROPER
 	ASSERT(pProperties->cbBuffer);
 
 	ALLOCATOR_PROPERTIES Actual;
-	if (FAILED(hr = pAlloc->SetProperties(pProperties,&Actual))) {
+	if (FAILED(hr = pAlloc->SetProperties(pProperties, &Actual))) {
 		return hr;
 	}
 
@@ -279,13 +282,13 @@ HRESULT CWavDestFilter::StopStreaming()
 		return E_FAIL;
 	}
 
-	HRESULT hr = ((IMemInputPin *) pDwnstrmInputPin)->QueryInterface(IID_IStream, (void **)&pStream);
+	HRESULT hr = ((IMemInputPin*) pDwnstrmInputPin)->QueryInterface(IID_PPV_ARGS(&pStream));
 	if (SUCCEEDED(hr)) {
-		BYTE *pb = (BYTE *)_alloca(m_cbHeader);
+		BYTE* pb = (BYTE*)_alloca(m_cbHeader);
 
-		RIFFLIST *pRiffWave = (RIFFLIST *)pb;
-		RIFFCHUNK *pRiffFmt = (RIFFCHUNK *)(pRiffWave + 1);
-		RIFFCHUNK *pRiffData = (RIFFCHUNK *)(((BYTE *)(pRiffFmt + 1)) +  m_pInput->CurrentMediaType().FormatLength());
+		RIFFLIST* pRiffWave = (RIFFLIST*)pb;
+		RIFFCHUNK* pRiffFmt = (RIFFCHUNK*)(pRiffWave + 1);
+		RIFFCHUNK* pRiffData = (RIFFCHUNK*)(((BYTE*)(pRiffFmt + 1)) + m_pInput->CurrentMediaType().FormatLength());
 
 		pRiffData->fcc = FCC('data');
 		pRiffData->cb = m_cbWavData;

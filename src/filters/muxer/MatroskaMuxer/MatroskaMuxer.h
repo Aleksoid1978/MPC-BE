@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,9 +47,7 @@ public:
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-	MatroskaWriter::TrackEntry* GetTrackEntry() {
-		return m_pTE;
-	}
+	MatroskaWriter::TrackEntry* GetTrackEntry() { return m_pTE; }
 
 	REFERENCE_TIME m_rtDur;
 
@@ -90,7 +88,7 @@ public:
 interface __declspec(uuid("38E2D43D-915D-493C-B373-888DB16EE3DC"))
 IMatroskaMuxer :
 public IUnknown {
-	STDMETHOD (CorrectTimeOffset) (bool fNegative, bool fPositive) PURE;
+	STDMETHOD(CorrectTimeOffset)(bool fNegative, bool fPositive) PURE;
 	// TODO: chapters
 };
 
@@ -111,7 +109,7 @@ protected:
 
 	bool m_fNegative, m_fPositive;
 
-	enum {CMD_EXIT, CMD_RUN};
+	enum { CMD_EXIT, CMD_RUN };
 	DWORD ThreadProc();
 
 public:
@@ -122,7 +120,7 @@ public:
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
 	void AddInput();
-	UINT GetTrackNumber(CBasePin* pPin);
+	UINT GetTrackNumber(const CBasePin* pPin);
 
 	int GetPinCount();
 	CBasePin* GetPin(int n);
@@ -147,8 +145,10 @@ public:
 	STDMETHODIMP GetDuration(LONGLONG* pDuration);
 	STDMETHODIMP GetStopPosition(LONGLONG* pStop);
 	STDMETHODIMP GetCurrentPosition(LONGLONG* pCurrent);
-	STDMETHODIMP ConvertTimeFormat(LONGLONG* pTarget, const GUID* pTargetFormat, LONGLONG Source, const GUID* pSourceFormat);
-	STDMETHODIMP SetPositions(LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags);
+	STDMETHODIMP ConvertTimeFormat(LONGLONG* pTarget, const GUID* pTargetFormat,
+								   LONGLONG Source, const GUID* pSourceFormat);
+	STDMETHODIMP SetPositions(LONGLONG* pCurrent, DWORD dwCurrentFlags,
+							  LONGLONG* pStop, DWORD dwStopFlags);
 	STDMETHODIMP GetPositions(LONGLONG* pCurrent, LONGLONG* pStop);
 	STDMETHODIMP GetAvailable(LONGLONG* pEarliest, LONGLONG* pLatest);
 	STDMETHODIMP SetRate(double dRate);

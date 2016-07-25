@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include <algorithm>
 #include <MMReg.h>
 #include "DSMMuxer.h"
 #include "../../../DSUtil/DSUtil.h"
@@ -89,6 +90,7 @@ CDSMMuxerFilter::CDSMMuxerFilter(LPUNKNOWN pUnk, HRESULT* phr, bool fAutoChap, b
 	: CBaseMuxerFilter(pUnk, phr, __uuidof(this))
 	, m_fAutoChap(fAutoChap)
 	, m_fAutoRes(fAutoRes)
+	, m_rtPrevSyncPoint(INVALID_TIME)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -115,10 +117,10 @@ void CDSMMuxerFilter::MuxPacketHeader(IBitStream* pBS, dsmp_t type, UINT64 len)
 
 	int i = GetByteLength(len, 1);
 
-	pBS->BitWrite(DSMSW, DSMSW_SIZE<<3);
+	pBS->BitWrite(DSMSW, DSMSW_SIZE << 3);
 	pBS->BitWrite(type, 5);
-	pBS->BitWrite(i-1, 3);
-	pBS->BitWrite(len, i<<3);
+	pBS->BitWrite(i - 1, 3);
+	pBS->BitWrite(len, i << 3);
 }
 
 void CDSMMuxerFilter::MuxFileInfo(IBitStream* pBS)
@@ -140,7 +142,7 @@ void CDSMMuxerFilter::MuxFileInfo(IBitStream* pBS)
 	for (int i = 0; i < si.GetSize(); i++) {
 		CStringA key = si.GetKeyAt(i), value = si.GetValueAt(i);
 		pBS->ByteWrite((LPCSTR)key, 4);
-		pBS->ByteWrite((LPCSTR)value, value.GetLength()+1);
+		pBS->ByteWrite((LPCSTR)value, value.GetLength() + 1);
 	}
 
 }
@@ -165,7 +167,7 @@ void CDSMMuxerFilter::MuxStreamInfo(IBitStream* pBS, CBaseMuxerInputPin* pPin)
 		for (int i = 0; i < si.GetSize(); i++) {
 			CStringA key = si.GetKeyAt(i), value = si.GetValueAt(i);
 			pBS->ByteWrite((LPCSTR)key, 4);
-			pBS->ByteWrite((LPCSTR)value, value.GetLength()+1);
+			pBS->ByteWrite((LPCSTR)value, value.GetLength() + 1);
 		}
 	}
 }
@@ -180,7 +182,7 @@ void CDSMMuxerFilter::MuxInit()
 void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 {
 	CString muxer;
-	muxer.Format(_T("DSM Muxer (%s)"), CString(__TIMESTAMP__));
+	muxer.Format(_T("DSM Muxer (%S)"), __TIMESTAMP__);
 
 	SetProperty(L"MUXR", CStringW(muxer));
 	SetProperty(L"DATE", CStringW(CTime::GetCurrentTime().FormatGmt(_T("%Y-%m-%d %H:%M:%S"))));
@@ -194,7 +196,7 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 
 		ASSERT((mt.lSampleSize >> 30) == 0); // you don't need >1GB samples, do you?
 
-		MuxPacketHeader(pBS, DSMP_MEDIATYPE, 5 + sizeof(GUID)*3 + mt.FormatLength());
+		MuxPacketHeader(pBS, DSMP_MEDIATYPE, 5 + sizeof(GUID) * 3 + mt.FormatLength());
 		pBS->BitWrite(pPin->GetID(), 8);
 		pBS->ByteWrite(&mt.majortype, sizeof(mt.majortype));
 		pBS->ByteWrite(&mt.subtype, sizeof(mt.subtype));
@@ -249,16 +251,16 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 
 				MuxPacketHeader(pBS, DSMP_RESOURCE,
 								1 +
-								utf8_name.GetLength()+1 +
-								utf8_desc.GetLength()+1 +
-								utf8_mime.GetLength()+1 +
+								utf8_name.GetLength() + 1 +
+								utf8_desc.GetLength() + 1 +
+								utf8_mime.GetLength() + 1 +
 								len);
 
 				pBS->BitWrite(0, 2);
 				pBS->BitWrite(0, 6); // reserved
-				pBS->ByteWrite(utf8_name, utf8_name.GetLength()+1);
-				pBS->ByteWrite(utf8_desc, utf8_desc.GetLength()+1);
-				pBS->ByteWrite(utf8_mime, utf8_mime.GetLength()+1);
+				pBS->ByteWrite(utf8_name, utf8_name.GetLength() + 1);
+				pBS->ByteWrite(utf8_desc, utf8_desc.GetLength() + 1);
+				pBS->ByteWrite(utf8_mime, utf8_mime.GetLength() + 1);
 				pBS->ByteWrite(pData, len);
 
 				CoTaskMemFree(pData);
@@ -283,7 +285,7 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 				rtPrev = c.rt;
 				c.rt = rtDiff;
 				c.name = name;
-				len += 1 + GetByteLength(myabs(c.rt)) + UTF16To8(c.name).GetLength()+1;
+				len += 1 + GetByteLength(myabs(c.rt)) + UTF16To8(c.name).GetLength() + 1;
 				chapters.AddTail(c);
 			}
 		}
@@ -299,8 +301,8 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 				pBS->BitWrite(c.rt < 0, 1);
 				pBS->BitWrite(irt, 3);
 				pBS->BitWrite(0, 4);
-				pBS->BitWrite(myabs(c.rt), irt<<3);
-				pBS->ByteWrite((LPCSTR)name, name.GetLength()+1);
+				pBS->BitWrite(myabs(c.rt), irt << 3);
+				pBS->ByteWrite((LPCSTR)name, name.GetLength() + 1);
 			}
 		}
 	}
@@ -313,7 +315,7 @@ void CDSMMuxerFilter::MuxPacket(IBitStream* pBS, const MuxerPacket* pPacket)
 	}
 
 	if (pPacket->pPin->CurrentMediaType().majortype == MEDIATYPE_Text) {
-		CStringA str((char*)pPacket->pData.GetData(), pPacket->pData.GetCount());
+		CStringA str((char*)pPacket->pData.GetData(), (int)pPacket->pData.GetCount());
 		str.Replace("\xff", " ");
 		str.Replace("&nbsp;", " ");
 		str.Replace("&nbsp", " ");
@@ -330,7 +332,7 @@ void CDSMMuxerFilter::MuxPacket(IBitStream* pBS, const MuxerPacket* pPacket)
 
 	if (pPacket->IsTimeValid()) {
 		rtTimeStamp = pPacket->rtStart;
-		rtDuration = max(pPacket->rtStop - pPacket->rtStart, 0);
+		rtDuration = (std::max)(pPacket->rtStop - pPacket->rtStart, 0ll);
 
 		iTimeStamp = GetByteLength(myabs(rtTimeStamp));
 		ASSERT(iTimeStamp <= 7);
@@ -341,7 +343,7 @@ void CDSMMuxerFilter::MuxPacket(IBitStream* pBS, const MuxerPacket* pPacket)
 		IndexSyncPoint(pPacket, pBS->GetPos());
 	}
 
-	int len = 2 + iTimeStamp + iDuration + pPacket->pData.GetCount(); // id + flags + data
+	UINT64 len = 2 + iTimeStamp + iDuration + pPacket->pData.GetCount(); // id + flags + data
 
 	MuxPacketHeader(pBS, DSMP_SAMPLE, len);
 	pBS->BitWrite(pPacket->pPin->GetID(), 8);
@@ -349,9 +351,9 @@ void CDSMMuxerFilter::MuxPacket(IBitStream* pBS, const MuxerPacket* pPacket)
 	pBS->BitWrite(rtTimeStamp < 0, 1);
 	pBS->BitWrite(iTimeStamp, 3);
 	pBS->BitWrite(iDuration, 3);
-	pBS->BitWrite(myabs(rtTimeStamp), iTimeStamp<<3);
-	pBS->BitWrite(rtDuration, iDuration<<3);
-	pBS->ByteWrite(pPacket->pData.GetData(), pPacket->pData.GetCount());
+	pBS->BitWrite(myabs(rtTimeStamp), iTimeStamp << 3);
+	pBS->BitWrite(rtDuration, iDuration << 3);
+	pBS->ByteWrite(pPacket->pData.GetData(), (int)pPacket->pData.GetCount());
 }
 
 void CDSMMuxerFilter::MuxFooter(IBitStream* pBS)
@@ -394,8 +396,8 @@ void CDSMMuxerFilter::MuxFooter(IBitStream* pBS)
 		pBS->BitWrite(irt, 3);
 		pBS->BitWrite(ifp, 3);
 		pBS->BitWrite(0, 1); // reserved
-		pBS->BitWrite(myabs(isp.rt), irt<<3);
-		pBS->BitWrite(isp.fp, ifp<<3);
+		pBS->BitWrite(myabs(isp.rt), irt << 3);
+		pBS->BitWrite(isp.fp, ifp << 3);
 	}
 }
 
@@ -415,7 +417,7 @@ void CDSMMuxerFilter::IndexSyncPoint(const MuxerPacket* p, __int64 fp)
 	m_rtPrevSyncPoint = p->rtStart;
 
 	SyncPoint sp;
-	sp.id = p->pPin->GetID();
+	sp.id = (BYTE)p->pPin->GetID();
 	sp.rtStart = p->rtStart;
 	sp.rtStop = p->pPin->IsSubtitleStream() ? p->rtStop : _I64_MAX;
 	sp.fp = fp;
