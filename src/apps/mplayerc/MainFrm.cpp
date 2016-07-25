@@ -5532,6 +5532,12 @@ void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 	}
 
 	if (m_wndPlaylistBar.IsWindowVisible()) {
+		if (slFiles.GetCount() == 1) {
+			const CString& path = slFiles.GetHead();
+			if (OpenYoutubePlaylist(path, TRUE)) {
+				return;
+			}
+		}
 		AddSimilarFiles(slFiles);
 
 		m_wndPlaylistBar.DropFiles(slFiles);
@@ -5602,9 +5608,11 @@ void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 		return;
 	}
 
-	{
-		CString path = slFiles.GetHead();
-		if (OpenBD(path) || (slFiles.GetCount() == 1 && OpenIso(path))) {
+	if (slFiles.GetCount() == 1) {
+		const CString& path = slFiles.GetHead();
+		if (OpenBD(path)
+				|| OpenIso(path)
+				|| OpenYoutubePlaylist(path)) {
 			return;
 		}
 	}
@@ -19087,13 +19095,15 @@ REFTIME CMainFrame::GetAvgTimePerFrame(BOOL bUsePCAP/* = TRUE*/) const
 	return refAvgTimePerFrame;
 }
 
-BOOL CMainFrame::OpenYoutubePlaylist(CString url)
+BOOL CMainFrame::OpenYoutubePlaylist(CString url, BOOL bOnlyParse/* = FALSE*/)
 {
 	if (AfxGetAppSettings().bYoutubeLoadPlaylist && Youtube::CheckPlaylist(url)) {
 		Youtube::YoutubePlaylist youtubePlaylist;
 		int idx_CurrentPlay = 0;
 		if (Youtube::Parse_Playlist(url, youtubePlaylist, idx_CurrentPlay)) {
-			m_wndPlaylistBar.Empty();
+			if (!bOnlyParse) {
+				m_wndPlaylistBar.Empty();
+			}
 
 			CFileItemList fis;
 			for(auto item = youtubePlaylist.begin(); item != youtubePlaylist.end(); ++item) {
@@ -19101,9 +19111,11 @@ BOOL CMainFrame::OpenYoutubePlaylist(CString url)
 				fis.AddTail(fi);
 			}
 			m_wndPlaylistBar.Append(fis);
-			m_wndPlaylistBar.SetSelIdx(idx_CurrentPlay, true);
 
-			OpenCurPlaylistItem();
+			if (!bOnlyParse) {
+				m_wndPlaylistBar.SetSelIdx(idx_CurrentPlay, true);
+				OpenCurPlaylistItem();
+			}
 			return TRUE;
 		}
 	}
