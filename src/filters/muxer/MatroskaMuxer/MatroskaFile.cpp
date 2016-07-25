@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include <algorithm>
 #include "MatroskaFile.h"
 #include "../../../DSUtil/DSUtil.h"
 
@@ -27,14 +28,15 @@ using namespace MatroskaWriter;
 
 static void bswap(BYTE* s, int len)
 {
-	for (BYTE* d = s + len-1; s < d; s++, d--) {
+	for (BYTE* d = s + len - 1; s < d; s++, d--) {
 		*s ^= *d, *d ^= *s, *s ^= *d;
 	}
 }
 
 //
 
-CID::CID(DWORD id) : m_id(id)
+CID::CID(DWORD id)
+	: m_id(id)
 {
 }
 
@@ -48,7 +50,7 @@ HRESULT CID::Write(IStream* pStream)
 	QWORD len = CID::Size();
 	DWORD id = m_id;
 	bswap((BYTE*)&id, (int)len);
-	*(BYTE*)&id = ((*(BYTE*)&id)&(1<<(8-len))-1)|(1<<(8-len));
+	*(BYTE*)&id = ((*(BYTE*)&id) & (1 << (8 - len)) - 1) | (1 << (8 - len));
 	return pStream->Write(&id, (ULONG)len, NULL);
 }
 
@@ -66,7 +68,7 @@ HRESULT CID::HeaderWrite(IStream* pStream)
 
 QWORD CBinary::Size(bool fWithHeader)
 {
-	if (GetCount() == 0) {
+	if (IsEmpty()) {
 		return 0;
 	}
 
@@ -80,17 +82,17 @@ QWORD CBinary::Size(bool fWithHeader)
 
 HRESULT CBinary::Write(IStream* pStream)
 {
-	if (GetCount() == 0) {
+	if (IsEmpty()) {
 		return S_OK;
 	}
 
 	HeaderWrite(pStream);
-	return pStream->Write(GetData(), GetCount(), NULL);
+	return pStream->Write(GetData(), (ULONG)GetCount(), NULL);
 }
 
 QWORD CANSI::Size(bool fWithHeader)
 {
-	if (GetLength() == 0) {
+	if (IsEmpty()) {
 		return 0;
 	}
 
@@ -104,17 +106,17 @@ QWORD CANSI::Size(bool fWithHeader)
 
 HRESULT CANSI::Write(IStream* pStream)
 {
-	if (GetLength() == 0) {
+	if (IsEmpty()) {
 		return S_OK;
 	}
 
 	HeaderWrite(pStream);
-	return pStream->Write((LPCSTR)*this, GetLength(), NULL);
+	return pStream->Write((LPCSTR) * this, GetLength(), NULL);
 }
 
 QWORD CUTF8::Size(bool fWithHeader)
 {
-	if (GetLength() == 0) {
+	if (IsEmpty()) {
 		return 0;
 	}
 
@@ -128,7 +130,7 @@ QWORD CUTF8::Size(bool fWithHeader)
 
 HRESULT CUTF8::Write(IStream* pStream)
 {
-	if (GetLength() == 0) {
+	if (IsEmpty()) {
 		return S_OK;
 	}
 
@@ -177,7 +179,7 @@ QWORD CUInt::Size(bool fWithHeader)
 		len++;
 	} else {
 		for (int i = 8; i > 0; i--) {
-			if (((0xffi64<<((i-1)*8))&m_val)) {
+			if (((0xffi64 << ((i - 1) * 8))&m_val)) {
 				len += i;
 				break;
 			}
@@ -216,9 +218,9 @@ QWORD CInt::Size(bool fWithHeader)
 	} else {
 		UINT64 val = m_val >= 0 ? m_val : -m_val;
 		for (int i = 8; i > 0; i--) {
-			if (((0xffi64<<((i-1)*8))&val)) {
+			if (((0xffi64 << ((i - 1) * 8))&val)) {
 				len += i;
-				if (m_val < 0 && !(m_val&(0x80<<(i-1)))) {
+				if (m_val < 0 && !(m_val & (0x80 << (i - 1)))) {
 					len++;
 				}
 				break;
@@ -253,7 +255,7 @@ QWORD CLength::Size(bool fWithHeader)
 
 	QWORD len = 0;
 	for (int i = 1; i <= 8; i++) {
-		if (!(m_len&(~((1i64<<(7*i))-1))) && (m_len&((1i64<<(7*i))-1)) != ((1i64<<(7*i))-1)) {
+		if (!(m_len & (~((QWORD(1) << (7 * i)) - 1))) && (m_len & ((QWORD(1) << (7 * i)) - 1)) != ((QWORD(1) << (7 * i)) - 1)) {
 			len += i;
 			break;
 		}
@@ -266,7 +268,7 @@ HRESULT CLength::Write(IStream* pStream)
 	QWORD len = Size(false);
 	UINT64 val = m_len;
 	bswap((BYTE*)&val, (int)len);
-	*(BYTE*)&val = ((*(BYTE*)&val)&(1<<(8-len))-1)|(1<<(8-len));
+	*(BYTE*)&val = ((*(BYTE*)&val) & (1 << (8 - len)) - 1) | (1 << (8 - len));
 	return pStream->Write(&val, (ULONG)len, NULL);
 }
 
@@ -379,7 +381,7 @@ QWORD Segment::Size(bool fWithHeader)
 	return 0x00FFFFFFFFFFFFFFi64;
 	/*
 		QWORD len = 0;
-		if(fWithHeader) len += HeaderSize(len);
+		if (fWithHeader) len += HeaderSize(len);
 		return len;
 	*/
 }
@@ -677,7 +679,7 @@ QWORD CBlock::Size(bool fWithHeader)
 		while (pos) {
 			CBinary* b = BlockData.GetNext(pos);
 			if (pos) {
-				len += b->GetCount()/255 + 1;
+				len += b->GetCount() / 255 + 1;
 			}
 		}
 	}
@@ -700,7 +702,7 @@ HRESULT CBlock::Write(IStream* pStream)
 	bswap((BYTE*)&t, 2);
 	pStream->Write(&t, 2, NULL);
 	BYTE Lacing = 0;
-	BYTE n = BlockData.GetCount();
+	BYTE n = (BYTE)BlockData.GetCount();
 	if (n > 1) {
 		Lacing |= 2;
 	}
@@ -711,9 +713,9 @@ HRESULT CBlock::Write(IStream* pStream)
 		while (pos) {
 			CBinary* b = BlockData.GetNext(pos);
 			if (pos) {
-				int len = b->GetCount();
+				INT_PTR len = b->GetCount();
 				while (len >= 0) {
-					n = min(len, 255);
+					n = (BYTE)std::min<INT_PTR>(len, 255);
 					pStream->Write(&n, 1, NULL);
 					len -= 255;
 				}
@@ -723,7 +725,7 @@ HRESULT CBlock::Write(IStream* pStream)
 	POSITION pos = BlockData.GetHeadPosition();
 	while (pos) {
 		CBinary* b = BlockData.GetNext(pos);
-		pStream->Write(b->GetData(), b->GetCount(), NULL);
+		pStream->Write(b->GetData(), (ULONG)b->GetCount(), NULL);
 	}
 	return S_OK;
 }
@@ -791,7 +793,7 @@ QWORD CueTrackPosition::Size(bool fWithHeader)
 	len += CueClusterPosition.Size();
 	len += CueBlockNumber.Size();
 	len += CueCodecState.Size();
-	//	len += CueReferences.Size();
+	//len += CueReferences.Size();
 	if (fWithHeader) {
 		len += HeaderSize(len);
 	}
@@ -805,7 +807,7 @@ HRESULT CueTrackPosition::Write(IStream* pStream)
 	CueClusterPosition.Write(pStream);
 	CueBlockNumber.Write(pStream);
 	CueCodecState.Write(pStream);
-	//	CueReferences.Write(pStream);
+	//CueReferences.Write(pStream);
 	return S_OK;
 }
 
@@ -833,14 +835,14 @@ HRESULT Seek::Write(IStream* pStream)
 
 SeekID::SeekID(DWORD id)
 	: CID(id)
-	, m_id(0)
+	, m_cid(0)
 {
 }
 
 QWORD SeekID::Size(bool fWithHeader)
 {
 	QWORD len = 0;
-	len += m_id.Size();
+	len += m_cid.Size();
 	if (fWithHeader) {
 		len += HeaderSize(len);
 	}
@@ -850,7 +852,7 @@ QWORD SeekID::Size(bool fWithHeader)
 HRESULT SeekID::Write(IStream* pStream)
 {
 	HeaderWrite(pStream);
-	m_id.Write(pStream);
+	m_cid.Write(pStream);
 	return S_OK;
 }
 
@@ -887,7 +889,7 @@ Tags::Tags(DWORD id)
 QWORD Tags::Size(bool fWithHeader)
 {
 	QWORD len = 0;
-	//	len += .Size();
+	//len += .Size();
 	if (fWithHeader) {
 		len += HeaderSize(len);
 	}
@@ -897,7 +899,7 @@ QWORD Tags::Size(bool fWithHeader)
 HRESULT Tags::Write(IStream* pStream)
 {
 	HeaderWrite(pStream);
-	//	.Write(pStream);
+	//.Write(pStream);
 	return S_OK;
 }
 
@@ -922,8 +924,14 @@ HRESULT Void::Write(IStream* pStream)
 	HeaderWrite(pStream);
 	BYTE buff[64];
 	memset(buff, 0x80, sizeof(buff));
-	for (int len = (int)m_len; len > 0; len -= sizeof(buff)) {
-		pStream->Write(buff, (ULONG)min(sizeof(buff), len), NULL);
+	QWORD len = m_len;
+	for (; len >= sizeof(buff); len -= sizeof(buff)) {
+		pStream->Write(buff, sizeof(buff), NULL);
 	}
+
+	if (len > 0) {
+		pStream->Write(buff, (ULONG)len, NULL);
+	}
+
 	return S_OK;
 }

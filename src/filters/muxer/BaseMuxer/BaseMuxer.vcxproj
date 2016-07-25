@@ -94,12 +94,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BaseMuxer.cpp" />
+    <ClCompile Include="BaseMuxerInputPin.cpp" />
+    <ClCompile Include="BaseMuxerOutputPin.cpp" />
+    <ClCompile Include="BaseMuxerRelatedPin.cpp" />
+    <ClCompile Include="BitStream.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseMuxer.h" />
+    <ClInclude Include="BaseMuxerInputPin.h" />
+    <ClInclude Include="BaseMuxerOutputPin.h" />
+    <ClInclude Include="BaseMuxerRelatedPin.h" />
+    <ClInclude Include="BitStream.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

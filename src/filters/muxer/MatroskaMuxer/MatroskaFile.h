@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -60,17 +60,17 @@ namespace MatroskaWriter
 		CBinary(DWORD id) : CID(id) {}
 		CBinary& operator = (const CBinary& b) {
 			Copy(b);
-			return(*this);
+			return *this;
 		}
-		operator BYTE*() {
+		operator BYTE* () {
 			return (BYTE*)GetData();
 		}
 		CBinary& Set(CStringA str) {
-			SetCount(str.GetLength()+1);
+			SetCount(str.GetLength() + 1);
 			strcpy_s((char*)GetData(), str.GetLength() + 1, str);
-			return(*this);
+			return *this;
 		}
-		//		CBinary& Set(CStringA str) {SetCount(str.GetLength()); memcpy((char*)GetData(), str, str.GetLength()); return(*this);}
+		//CBinary& Set(CStringA str) {SetCount(str.GetLength()); memcpy((char*)GetData(), str, str.GetLength()); return *this;}
 		QWORD Size(bool fWithHeader = true);
 		HRESULT Write(IStream* pStream);
 	};
@@ -81,7 +81,7 @@ namespace MatroskaWriter
 		CANSI(DWORD id) : CID(id) {}
 		CANSI& Set(CStringA str) {
 			CStringA::operator = (str);
-			return(*this);
+			return *this;
 		}
 		QWORD Size(bool fWithHeader = true);
 		HRESULT Write(IStream* pStream);
@@ -93,7 +93,7 @@ namespace MatroskaWriter
 		CUTF8(DWORD id) : CID(id) {}
 		CUTF8& Set(CStringW str) {
 			CStringW::operator = (str);
-			return(*this);
+			return *this;
 		}
 		QWORD Size(bool fWithHeader = true);
 		HRESULT Write(IStream* pStream);
@@ -115,7 +115,7 @@ namespace MatroskaWriter
 		BASE& Set(T val) {
 			m_val = val;
 			m_fSet = true;
-			return(*(BASE*)this);
+			return (*(BASE*)this);
 		}
 		void UnSet() {
 			m_fSet = false;
@@ -171,11 +171,13 @@ namespace MatroskaWriter
 			return len;
 		}
 		HRESULT Write(IStream* pStream) {
-			HRESULT hr;
 			POSITION pos = GetHeadPosition();
-			while (pos) if (FAILED(hr = GetNext(pos)->Write(pStream))) {
+			while (pos) {
+				HRESULT hr;
+				if (FAILED(hr = GetNext(pos)->Write(pStream))) {
 					return hr;
 				}
+			}
 			return S_OK;
 		}
 	};
@@ -240,7 +242,14 @@ namespace MatroskaWriter
 	class TrackEntry : public CID
 	{
 	public:
-		enum {TypeVideo = 1, TypeAudio = 2, TypeComplex = 3, TypeLogo = 0x10, TypeSubtitle = 0x11, TypeControl = 0x20};
+		enum {
+			TypeVideo = 1,
+			TypeAudio = 2,
+			TypeComplex = 3,
+			TypeLogo = 0x10,
+			TypeSubtitle = 0x11,
+			TypeControl = 0x20
+		};
 		CUInt TrackNumber, TrackUID, TrackType;
 		CUInt FlagEnabled, FlagDefault, FlagLacing;
 		CUInt MinCache, MaxCache;
@@ -255,7 +264,7 @@ namespace MatroskaWriter
 		CUInt CodecDecodeAll;
 		CUInt TrackOverlay;
 		CUInt DefaultDuration;
-		enum {NoDesc = 0, DescVideo = 1, DescAudio = 2};
+		enum { NoDesc = 0, DescVideo = 1, DescAudio = 2 };
 		int DescType;
 		Video v;
 		Audio a;
@@ -296,7 +305,7 @@ namespace MatroskaWriter
 		CInt ReferenceVirtual;
 		CBinary CodecState;
 		CBlock Block;
-		//				CNode<TimeSlice> TimeSlices;
+		//CNode<TimeSlice> TimeSlices;
 
 		BlockGroup(DWORD id = 0xA0);
 		QWORD Size(bool fWithHeader = true);
@@ -314,21 +323,21 @@ namespace MatroskaWriter
 		HRESULT Write(IStream* pStream);
 	};
 
-	/*					class CueReference : public CID
-						{
-						public:
-							CUInt CueRefTime, CueRefCluster, CueRefNumber, CueRefCodecState;
+	/*class CueReference : public CID
+	{
+	public:
+		CUInt CueRefTime, CueRefCluster, CueRefNumber, CueRefCodecState;
 
-							CueReference(DWORD id = 0xDB);
-							QWORD Size(bool fWithHeader = true);
-							HRESULT Write(IStream* pStream);
-						};
-	*/
+		CueReference(DWORD id = 0xDB);
+		QWORD Size(bool fWithHeader = true);
+		HRESULT Write(IStream* pStream);
+	};*/
+
 	class CueTrackPosition : public CID
 	{
 	public:
 		CUInt CueTrack, CueClusterPosition, CueBlockNumber, CueCodecState;
-		//					CNode<CueReference> CueReferences;
+		//CNode<CueReference> CueReferences;
 
 		CueTrackPosition(DWORD id = 0xB7);
 		QWORD Size(bool fWithHeader = true);
@@ -358,11 +367,11 @@ namespace MatroskaWriter
 
 	class SeekID : public CID
 	{
-		CID m_id;
+		CID m_cid;
 	public:
 		SeekID(DWORD id = 0x53AB);
 		void Set(DWORD id) {
-			m_id = id;
+			m_cid = id;
 		}
 		QWORD Size(bool fWithHeader = true);
 		HRESULT Write(IStream* pStream);

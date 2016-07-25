@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,7 +47,7 @@ public:
 	HRESULT Receive(IMediaSample* pSample);
 
 	HRESULT CheckInputType(const CMediaType* mtIn);
-	HRESULT CheckTransform(const CMediaType*mtIn, const CMediaType* mtOut);
+	HRESULT CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut);
 	HRESULT GetMediaType(int iPosition, CMediaType* pMediaType);
 
 	HRESULT DecideBufferSize(IMemAllocator* pAlloc, ALLOCATOR_PROPERTIES* pProperties);
