@@ -2008,28 +2008,14 @@ HRESULT CMpcAudioRenderer::SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE
 		}
 	}
 
-	WAVEFORMATEX& wfe   = wfex.Format;
-	wfe.nChannels       = nChannels;
-	wfe.nSamplesPerSec  = nSamplesPerSec;
-	wfe.wBitsPerSample  = wBitsPerSample;
-	wfe.nBlockAlign     = nChannels * wfe.wBitsPerSample / 8;
-	wfe.nAvgBytesPerSec = nSamplesPerSec * wfe.nBlockAlign;
-
-	wfex.Format.wFormatTag               = WAVE_FORMAT_EXTENSIBLE;
-	wfex.Format.cbSize                   = sizeof(wfex) - sizeof(wfex.Format);
-	wfex.SubFormat                       = MEDIASUBTYPE_PCM;
-	wfex.dwChannelMask                   = dwChannelMask;
-	wfex.Samples.wValidBitsPerSample     = wfex.Format.wBitsPerSample;
-	if (wfex.Samples.wValidBitsPerSample == 32 && wfe.wBitsPerSample == 32) {
-		wfex.Samples.wValidBitsPerSample = 24;
-	}
+	CreateFormat(wfex, wBitsPerSample, nChannels, dwChannelMask, nSamplesPerSec);
 
 	return S_OK;
 }
 
 void CMpcAudioRenderer::CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec)
 {
-	memset(&wfex, 0, sizeof(wfex));
+	ZeroMemory(&wfex, sizeof(wfex));
 
 	WAVEFORMATEX& wfe   = wfex.Format;
 	wfe.nChannels       = nChannels;
