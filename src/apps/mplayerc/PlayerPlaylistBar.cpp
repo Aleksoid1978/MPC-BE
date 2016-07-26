@@ -681,8 +681,9 @@ CPlaylistItem& CPlaylist::GetPrevWrap(POSITION& pos)
 
 IMPLEMENT_DYNAMIC(CPlayerPlaylistBar, CPlayerBar)
 
-CPlayerPlaylistBar::CPlayerPlaylistBar()
-	: m_list(0)
+CPlayerPlaylistBar::CPlayerPlaylistBar(CMainFrame* pMainFrame)
+	: m_pMainFrame(pMainFrame)
+	, m_list(0)
 	, m_nTimeColWidth(0)
 	, m_bDragging(FALSE)
 	, m_bHiddenDueToFullscreen(false)
@@ -740,7 +741,7 @@ void CPlayerPlaylistBar::ScaleFontInternal()
 {
 	LOGFONT lf = { 0 };
 	GetMessageFont(&lf);
-	lf.lfHeight = AfxGetMainFrame()->ScaleSystemToMonitorY(lf.lfHeight);
+	lf.lfHeight = m_pMainFrame->ScaleSystemToMonitorY(lf.lfHeight);
 
 	m_font.DeleteObject();
 	if (m_font.CreateFontIndirect(&lf)) {
@@ -749,7 +750,7 @@ void CPlayerPlaylistBar::ScaleFontInternal()
 
 	CDC* pDC = m_list.GetDC();
 	CFont* old = pDC->SelectObject(GetFont());
-	m_nTimeColWidth = pDC->GetTextExtent(_T("000:00:00")).cx + AfxGetMainFrame()->ScaleX(5);
+	m_nTimeColWidth = pDC->GetTextExtent(_T("000:00:00")).cx + m_pMainFrame->ScaleX(5);
 	pDC->SelectObject(old);
 	m_list.ReleaseDC(pDC);
 
@@ -789,11 +790,8 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 				}
 				if (items.GetCount() == 1) {
 					m_pl.SetPos(FindPos(items.GetHead()));
-					CMainFrame* pMainFrame = AfxGetMainFrame();
-					if (pMainFrame) {
-						pMainFrame->OpenCurPlaylistItem();
-						AfxGetMainWnd()->SetFocus();
-					}
+					m_pMainFrame->OpenCurPlaylistItem();
+					AfxGetMainWnd()->SetFocus();
 
 					return TRUE;
 				}
@@ -1106,7 +1104,7 @@ bool CPlayerPlaylistBar::ParseBDMVPlayList(CString fn)
 	Path.RemoveFileSpec();
 	Path.RemoveFileSpec();
 
-	if (SUCCEEDED(ClipInfo.FindMainMovie(Path + L"\\", strPlaylistFile, MainPlaylist, AfxGetMainFrame()->m_MPLSPlaylist))) {
+	if (SUCCEEDED(ClipInfo.FindMainMovie(Path + L"\\", strPlaylistFile, MainPlaylist, m_pMainFrame->m_MPLSPlaylist))) {
 		CAtlList<CString> strFiles;
 		strFiles.AddHead(strPlaylistFile);
 		Append(strFiles, MainPlaylist.GetCount() > 1, NULL);
@@ -1940,7 +1938,7 @@ void CPlayerPlaylistBar::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 		while (pos) {
 			int i = items.GetNext(pos);
 			if (m_pl.RemoveAt(FindPos(i))) {
-				AfxGetMainFrame()->SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+				m_pMainFrame->SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			}
 			m_list.DeleteItem(i);
 		}
@@ -1955,7 +1953,7 @@ void CPlayerPlaylistBar::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 		*pResult = TRUE;
 	} else if (pLVKeyDown->wVKey == VK_SPACE && items.GetCount() == 1) {
 		m_pl.SetPos(FindPos(items.GetHead()));
-		AfxGetMainFrame()->OpenCurPlaylistItem();
+		m_pMainFrame->OpenCurPlaylistItem();
 		AfxGetMainWnd()->SetFocus();
 
 		*pResult = TRUE;
@@ -1967,11 +1965,9 @@ void CPlayerPlaylistBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 	LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)pNMHDR;
 
 	if (lpnmlv->iItem >= 0 && lpnmlv->iSubItem >= 0) {
-		CMainFrame* pMainFrame = AfxGetMainFrame();
-
 		POSITION pos = FindPos(lpnmlv->iItem);
 		// If the file is already playing, don't try to restore a previously saved position
-		if (pMainFrame->GetPlaybackMode() == PM_FILE && pos == m_pl.GetPos()) {
+		if (m_pMainFrame->GetPlaybackMode() == PM_FILE && pos == m_pl.GetPos()) {
 			const CPlaylistItem& pli = m_pl.GetAt(pos);
 			AfxGetAppSettings().RemoveFile(pli.m_fns.GetHead());
 		} else {
@@ -1979,7 +1975,7 @@ void CPlayerPlaylistBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 		}
 
 		m_list.Invalidate();
-		pMainFrame->OpenCurPlaylistItem();
+		m_pMainFrame->OpenCurPlaylistItem();
 	}
 
 	AfxGetMainWnd()->SetFocus();
@@ -2044,7 +2040,7 @@ void CPlayerPlaylistBar::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasure
 	if (m_itemHeight == 0) {
 		m_itemHeight = lpMeasureItemStruct->itemHeight;
 	}
-	lpMeasureItemStruct->itemHeight = AfxGetMainFrame()->ScaleY(m_itemHeight);
+	lpMeasureItemStruct->itemHeight = m_pMainFrame->ScaleY(m_itemHeight);
 }
 
 void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
@@ -2128,7 +2124,7 @@ void CPlayerPlaylistBar::DropFiles(CAtlList<CString>& slFiles)
 	SetForegroundWindow();
 	m_list.SetFocus();
 
-	AfxGetMainFrame()->ParseDirs(slFiles);
+	m_pMainFrame->ParseDirs(slFiles);
 
 	Append(slFiles, true);
 
@@ -2378,7 +2374,6 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	};
 
 	CAppSettings& s = AfxGetAppSettings();
-	auto pMainFrm = AfxGetMainFrame();
 
 	m.AppendMenu(MF_STRING | (!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_OPEN, ResStr(IDS_PLAYLIST_OPEN));
 	m.AppendMenu(MF_STRING | MF_ENABLED, M_ADD, ResStr(IDS_PLAYLIST_ADD));
@@ -2403,12 +2398,12 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		case M_OPEN:
 			m_pl.SetPos(pos);
 			m_list.Invalidate();
-			pMainFrm->OpenCurPlaylistItem();
+			m_pMainFrame->OpenCurPlaylistItem();
 			break;
 		case M_ADD:
 			{
-				if (pMainFrm->GetPlaybackMode() == PM_CAPTURE) {
-					pMainFrm->AddCurDevToPlaylist();
+				if (m_pMainFrame->GetPlaybackMode() == PM_CAPTURE) {
+					m_pMainFrame->AddCurDevToPlaylist();
 					m_pl.SetPos(m_pl.GetTailPosition());
 				} else {
 					CString filter;
@@ -2448,7 +2443,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 				while (pos) {
 					int i = items.GetNext(pos);
 					if (m_pl.RemoveAt(FindPos(i))) {
-						pMainFrm->SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+						m_pMainFrame->SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 					}
 					m_list.DeleteItem(i);
 				}
@@ -2465,7 +2460,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			break;
 		case M_CLEAR:
 			if (Empty()) {
-				pMainFrm->SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+				m_pMainFrame->SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			}
 			break;
 		case M_SORTBYID:

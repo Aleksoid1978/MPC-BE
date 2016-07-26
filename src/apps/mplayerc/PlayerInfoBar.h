@@ -24,6 +24,8 @@
 #include <atlcoll.h>
 #include "StatusLabel.h"
 
+class CMainFrame;
+
 // CPlayerInfoBar
 
 class CPlayerInfoBar : public CDialogBar
@@ -31,6 +33,8 @@ class CPlayerInfoBar : public CDialogBar
 	DECLARE_DYNAMIC(CPlayerInfoBar)
 
 private:
+	CMainFrame* m_pMainFrame;
+
 	CAutoPtrArray<CStatusLabel> m_labels;
 	CAutoPtrArray<CStatusLabel> m_infos;
 
@@ -39,7 +43,7 @@ private:
 	void Relayout();
 
 public:
-	CPlayerInfoBar(int nFirstColWidth = 100);
+	CPlayerInfoBar(CMainFrame* pMainFrame, int nFirstColWidth = 100);
 	virtual ~CPlayerInfoBar();
 
 	BOOL Create(CWnd* pParentWnd);

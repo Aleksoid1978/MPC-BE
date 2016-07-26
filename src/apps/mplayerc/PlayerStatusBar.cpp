@@ -29,8 +29,9 @@
 
 IMPLEMENT_DYNAMIC(CPlayerStatusBar, CDialogBar)
 
-CPlayerStatusBar::CPlayerStatusBar()
-	: m_status(false, false)
+CPlayerStatusBar::CPlayerStatusBar(CMainFrame* pMainFrame)
+	: m_pMainFrame(pMainFrame)
+	, m_status(false, false)
 	, m_time(true, false)
 	, m_bmid(0)
 	, m_time_rect(-1, -1, -1, -1)
@@ -67,7 +68,7 @@ BOOL CPlayerStatusBar::PreCreateWindow(CREATESTRUCT& cs)
 CSize CPlayerStatusBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
 {
 	CSize ret = __super::CalcFixedLayout(bStretch, bHorz);
-	ret.cy = AfxGetMainFrame()->ScaleSystemToMonitorY(ret.cy);
+	ret.cy = m_pMainFrame->ScaleSystemToMonitorY(ret.cy);
 	return ret;
 }
 
@@ -83,7 +84,7 @@ void CPlayerStatusBar::ScaleFontInternal()
 {
 	m_font.DeleteObject();
 
-	m_font.CreateFont(AfxGetMainFrame()->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+	m_font.CreateFont(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
 					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
 					  L"Tahoma");
 }
@@ -335,13 +336,11 @@ BOOL CPlayerStatusBar::OnEraseBkgnd(CDC* pDC)
 
 		GetClientRect(&r);
 
-		auto pFrame = AfxGetMainFrame();
-
-		if (pFrame->m_pLastBar != this || pFrame->m_bFullScreen) {
+		if (m_pMainFrame->m_pLastBar != this || m_pMainFrame->m_bFullScreen) {
 			r.InflateRect(0, 0, 0, 1);
 		}
 
-		if (pFrame->m_bFullScreen) {
+		if (m_pMainFrame->m_bFullScreen) {
 			r.InflateRect(1, 0, 1, 0);
 		}
 
@@ -478,27 +477,25 @@ void CPlayerStatusBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	auto pFrame = AfxGetMainFrame();
-
 	WINDOWPLACEMENT wp;
 	wp.length = sizeof(wp);
-	pFrame->GetWindowPlacement(&wp);
+	m_pMainFrame->GetWindowPlacement(&wp);
 
 	if (m_time_rect.PtInRect(point) || m_time_rect2.PtInRect(point)) {
 		s.fRemainingTime = !s.fRemainingTime;
-		pFrame->OnTimer(2);
+		m_pMainFrame->OnTimer(2);
 		return;
 	}
 
-	if (!pFrame->m_bFullScreen && wp.showCmd != SW_SHOWMAXIMIZED) {
+	if (!m_pMainFrame->m_bFullScreen && wp.showCmd != SW_SHOWMAXIMIZED) {
 		CRect r;
 		GetClientRect(r);
 		CPoint p = point;
 
-		MapWindowPoints(pFrame, &point, 1);
+		MapWindowPoints(m_pMainFrame, &point, 1);
 
-		pFrame->PostMessage(WM_NCLBUTTONDOWN,
-							(p.x >= r.Width()-r.Height() && !pFrame->IsCaptionHidden()) ? HTBOTTOMRIGHT :
+		m_pMainFrame->PostMessage(WM_NCLBUTTONDOWN,
+							(p.x >= r.Width()-r.Height() && !m_pMainFrame->IsCaptionHidden()) ? HTBOTTOMRIGHT :
 							HTCAPTION,
 							MAKELPARAM(point.x, point.y));
 	}
@@ -506,11 +503,9 @@ void CPlayerStatusBar::OnLButtonDown(UINT nFlags, CPoint point)
 
 BOOL CPlayerStatusBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 {
-	auto pFrame = AfxGetMainFrame();
-
 	WINDOWPLACEMENT wp;
 	wp.length = sizeof(wp);
-	pFrame->GetWindowPlacement(&wp);
+	m_pMainFrame->GetWindowPlacement(&wp);
 
 	CPoint p;
 	GetCursorPos(&p);
@@ -521,10 +516,10 @@ BOOL CPlayerStatusBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		return TRUE;
 	}
 
-	if (!pFrame->m_bFullScreen && wp.showCmd != SW_SHOWMAXIMIZED) {
+	if (!m_pMainFrame->m_bFullScreen && wp.showCmd != SW_SHOWMAXIMIZED) {
 		CRect r;
 		GetClientRect(r);
-		if (p.x >= r.Width()-r.Height() && !pFrame->IsCaptionHidden()) {
+		if (p.x >= r.Width()-r.Height() && !m_pMainFrame->IsCaptionHidden()) {
 			SetCursor(LoadCursor(NULL, IDC_SIZENWSE));
 			return TRUE;
 		}
