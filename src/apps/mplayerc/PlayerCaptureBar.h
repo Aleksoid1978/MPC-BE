@@ -344,11 +344,16 @@ struct Codec {
 
 typedef CAtlArray<Codec> CCodecArray;
 
+class CMainFrame;
+
 // CPlayerCaptureDialog dialog
 
 class CPlayerCaptureDialog : public CResizableDialog
 {
 	//DECLARE_DYNAMIC(CPlayerCaptureDialog)
+
+private:
+	CMainFrame* m_pMainFrame;
 
 	// video input
 	CStringW m_VidDisplayName;
@@ -390,7 +395,7 @@ class CPlayerCaptureDialog : public CResizableDialog
 	bool m_fEnableOgm;
 
 public:
-	CPlayerCaptureDialog();   // standard constructor
+	CPlayerCaptureDialog(CMainFrame* pMainFrame);
 	virtual ~CPlayerCaptureDialog();
 
 	BOOL Create(CWnd* pParent = NULL);
@@ -496,7 +501,7 @@ class CPlayerCaptureBar : public CPlayerBar
 	DECLARE_DYNAMIC(CPlayerCaptureBar)
 
 public:
-	CPlayerCaptureBar();
+	CPlayerCaptureBar(CMainFrame* pMainFrame);
 	virtual ~CPlayerCaptureBar();
 
 	BOOL Create(CWnd* pParentWnd, UINT defDockBarID);

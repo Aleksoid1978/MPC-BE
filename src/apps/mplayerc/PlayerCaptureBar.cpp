@@ -31,7 +31,8 @@
 
 IMPLEMENT_DYNAMIC(CPlayerCaptureBar, CPlayerBar)
 
-CPlayerCaptureBar::CPlayerCaptureBar()
+CPlayerCaptureBar::CPlayerCaptureBar(CMainFrame* pMainFrame)
+	: m_capdlg(pMainFrame)
 {
 }
 
@@ -567,8 +568,9 @@ static int ShowPPage(CAtlArray<Codec>& codecs, CComboBox& box, HWND hWnd = NULL)
 // CPlayerCaptureDialog dialog
 
 //IMPLEMENT_DYNAMIC(CPlayerCaptureDialog, CResizableDialog)
-CPlayerCaptureDialog::CPlayerCaptureDialog()
+CPlayerCaptureDialog::CPlayerCaptureDialog(CMainFrame* pMainFrame)
 	: CResizableDialog(CPlayerCaptureDialog::IDD, NULL)
+	, m_pMainFrame(pMainFrame)
 	, m_fEnableOgm(false)
 	, m_vidfps(0)
 	, m_file(_T(""))
@@ -937,9 +939,9 @@ void CPlayerCaptureDialog::UpdateGraph()
 {
 	UpdateMediaTypes();
 
-	//	UpdateMuxer();
+	//UpdateMuxer();
 
-	AfxGetMainFrame()->BuildGraphVideoAudio(m_fVidPreview, false, m_fAudPreview, false);
+	m_pMainFrame->BuildGraphVideoAudio(m_fVidPreview, false, m_fAudPreview, false);
 
 	UpdateUserDefinableControls();
 }
@@ -1435,9 +1437,9 @@ void CPlayerCaptureDialog::OnVideoInput()
 			HRESULT hr = m_pAMVfwCD->ShowDialog(iSel, m_hWnd);
 
 			if (VFW_E_NOT_STOPPED == hr) {
-				AfxGetMainFrame()->SendMessage(WM_COMMAND, ID_PLAY_STOP);
+				m_pMainFrame->SendMessage(WM_COMMAND, ID_PLAY_STOP);
 				hr = m_pAMVfwCD->ShowDialog(iSel, m_hWnd);
-				AfxGetMainFrame()->SendMessage(WM_COMMAND, ID_PLAY_PLAY);
+				m_pMainFrame->SendMessage(WM_COMMAND, ID_PLAY_PLAY);
 			}
 
 			if (VFW_E_CANNOT_CONNECT == hr) {
@@ -1619,12 +1621,7 @@ void CPlayerCaptureDialog::OnRecord()
 {
 	UpdateData();
 
-	CMainFrame* pFrame = AfxGetMainFrame();
-	if (!pFrame) {
-		return;
-	}
-
-	if (!pFrame->m_fCapturing) {
+	if (!m_pMainFrame->m_fCapturing) {
 		UpdateMuxer();
 
 		CComQIPtr<IFileSinkFilter2> pFSF = m_pMux;
@@ -1678,13 +1675,13 @@ void CPlayerCaptureDialog::OnRecord()
 
 		EnableControls(this, false);
 
-		pFrame->StartCapture();
+		m_pMainFrame->StartCapture();
 
 		SetTimer(1, 100, NULL);
 	} else {
 		KillTimer(1);
 
-		pFrame->StopCapture();
+		m_pMainFrame->StopCapture();
 		/*
 				{
 					if (FILE* f = _tfopen(m_file, _T("rb+")))
@@ -1718,7 +1715,7 @@ void CPlayerCaptureDialog::OnEnChangeEdit12()
 void CPlayerCaptureDialog::OnTimer(UINT_PTR nIDEvent)
 {
 	if (nIDEvent == 1) {
-		if (AfxGetMainFrame()->m_fCapturing) {
+		if (m_pMainFrame->m_fCapturing) {
 			ULARGE_INTEGER FreeBytesAvailable, TotalNumberOfBytes, TotalNumberOfFreeBytes;
 			if (GetDiskFreeSpaceEx(m_file.Left(m_file.ReverseFind('\\')+1), &FreeBytesAvailable, &TotalNumberOfBytes, &TotalNumberOfFreeBytes)
 					&& FreeBytesAvailable.QuadPart < 1024i64*1024*10) {

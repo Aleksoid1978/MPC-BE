@@ -27,7 +27,9 @@
 
 IMPLEMENT_DYNAMIC(CPlayerInfoBar, CDialogBar)
 
-CPlayerInfoBar::CPlayerInfoBar(int nFirstColWidth) : m_nFirstColWidth(nFirstColWidth)
+CPlayerInfoBar::CPlayerInfoBar(CMainFrame* pMainFrame, int nFirstColWidth)
+	: m_pMainFrame(pMainFrame)
+	, m_nFirstColWidth(nFirstColWidth)
 {
 }
 
@@ -142,7 +144,7 @@ CSize CPlayerInfoBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
 	CRect r;
 	GetParent()->GetClientRect(&r);
 
-	r.bottom = r.top + m_labels.GetCount() * AfxGetMainFrame()->ScaleY(17) + (m_labels.GetCount() ? AfxGetMainFrame()->ScaleY(2) * 2 : 0);
+	r.bottom = r.top + m_labels.GetCount() * m_pMainFrame->ScaleY(17) + (m_labels.GetCount() ? m_pMainFrame->ScaleY(2) * 2 : 0);
 
 	return r.Size();
 }
@@ -152,9 +154,9 @@ void CPlayerInfoBar::Relayout()
 	CRect r;
 	GetParent()->GetClientRect(&r);
 
-	int w = AfxGetMainFrame()->ScaleY(m_nFirstColWidth);
-	int h = AfxGetMainFrame()->ScaleY(17);
-	int y = AfxGetMainFrame()->ScaleY(2);
+	int w = m_pMainFrame->ScaleY(m_nFirstColWidth);
+	int h = m_pMainFrame->ScaleY(17);
+	int y = m_pMainFrame->ScaleY(2);
 
 	for (size_t i = 0; i < m_labels.GetCount(); i++) {
 		CDC* pDC = m_labels[i]->GetDC();
@@ -164,7 +166,7 @@ void CPlayerInfoBar::Relayout()
 		m_labels[i]->ReleaseDC(pDC);
 	}
 
-	const int sep = AfxGetMainFrame()->ScaleX(10);
+	const int sep = m_pMainFrame->ScaleX(10);
 	for (size_t i = 0; i < m_labels.GetCount(); i++, y += h) {
 		m_labels[i]->MoveWindow(1, y, w - sep, h);
 		m_infos[i]->MoveWindow(w + sep, y, r.Width() - w - sep - 1, h);
@@ -191,13 +193,11 @@ BOOL CPlayerInfoBar::OnEraseBkgnd(CDC* pDC)
 	CRect r;
 	GetClientRect(&r);
 
-	auto pFrame = AfxGetMainFrame();
-
-	if (pFrame->m_pLastBar != this || pFrame->m_bFullScreen) {
+	if (m_pMainFrame->m_pLastBar != this || m_pMainFrame->m_bFullScreen) {
 		r.InflateRect(0, 0, 0, 1);
 	}
 
-	if (pFrame->m_bFullScreen) {
+	if (m_pMainFrame->m_bFullScreen) {
 		r.InflateRect(1, 0, 1, 0);
 	}
 
@@ -234,9 +234,8 @@ void CPlayerInfoBar::OnSize(UINT nType, int cx, int cy)
 
 void CPlayerInfoBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	auto pFrame = AfxGetMainFrame();
-	if (!pFrame->m_bFullScreen) {
-		MapWindowPoints(pFrame, &point, 1);
-		pFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+	if (!m_pMainFrame->m_bFullScreen) {
+		MapWindowPoints(m_pMainFrame, &point, 1);
+		m_pMainFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 	}
 }

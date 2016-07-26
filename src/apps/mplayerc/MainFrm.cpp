@@ -673,6 +673,11 @@ CMainFrame::CMainFrame() :
 	m_OSD(this),
 	m_wndToolBar(this),
 	m_wndSeekBar(this),
+	m_wndInfoBar(this),
+	m_wndStatsBar(this),
+	m_wndStatusBar(this),
+	m_wndPlaylistBar(this),
+	m_wndCaptureBar(this),
 	m_dMediaInfoFPS(0.0),
 	m_bAudioOnly(true),
 	m_bMainIsMPEGSplitter(false)

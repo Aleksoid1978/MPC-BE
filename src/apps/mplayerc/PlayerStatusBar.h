@@ -24,14 +24,19 @@
 #include "PngImage.h"
 #include "StatusLabel.h"
 
+class CMainFrame;
+
 // CPlayerStatusBar
 
 class CPlayerStatusBar : public CDialogBar
 {
 	DECLARE_DYNAMIC(CPlayerStatusBar)
 
+private:
+	CMainFrame* m_pMainFrame;
+
 	CStatic m_type;
-	CStatusLabel m_status, m_time;
+	CStatusLabel m_time;
 	CBitmap m_bm;
 	UINT m_bmid;
 
@@ -42,10 +47,8 @@ class CPlayerStatusBar : public CDialogBar
 
 	CFont m_font;
 
-	void Relayout();
-
 public:
-	CPlayerStatusBar();
+	CPlayerStatusBar(CMainFrame* pMainFrame);
 	virtual ~CPlayerStatusBar();
 
 	void Clear();
@@ -65,6 +68,9 @@ public:
 	virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz);
 
 	void ScaleFont();
+
+	CStatusLabel m_status;
+	void Relayout();
 
 	DECLARE_MESSAGE_MAP()
 

@@ -158,6 +158,7 @@ public:
 };
 
 class OpenMediaData;
+class CMainFrame;
 
 class CPlayerPlaylistBar : public CPlayerBar
 {
@@ -165,6 +166,8 @@ class CPlayerPlaylistBar : public CPlayerBar
 
 private:
 	enum {COL_NAME, COL_TIME};
+
+	CMainFrame* m_pMainFrame;
 
 	CImageList m_fakeImageList;
 	CPlayerListCtrl m_list;
@@ -209,7 +212,7 @@ private:
 	void ScaleFontInternal();
 
 public:
-	CPlayerPlaylistBar();
+	CPlayerPlaylistBar(CMainFrame* pMainFrame);
 	virtual ~CPlayerPlaylistBar();
 
 	BOOL Create(CWnd* pParentWnd, UINT defDockBarID);
