@@ -464,7 +464,7 @@ static void InitCodecList(CAtlArray<Codec>& codecs, CComboBox& box, const GUID& 
 	box.ResetContent();
 	box.EnableWindow(FALSE);
 
-	box.SetItemData(box.AddString(_T("Uncompressed")), (DWORD_PTR)-1);
+	box.SetItemData(box.AddString(L"Uncompressed"), (DWORD_PTR)-1);
 
 	BeginEnumSysDev(cat, pMoniker) {
 		Codec c;
@@ -489,20 +489,23 @@ static void InitCodecList(CAtlArray<Codec>& codecs, CComboBox& box, const GUID& 
 		pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB);
 
 		CComVariant var;
-		if (FAILED(pPB->Read(CComBSTR(_T("FriendlyName")), &var, NULL))) {
+		if (FAILED(pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL))) {
 			continue;
 		}
 
-		c.FriendlyName = var.bstrVal;
-
 		CStringW str = CStringW(c.DisplayName).MakeLower();
 		if (str.Find(L"@device:dmo:") == 0) {
-			c.FriendlyName = _T("(DMO) ") + c.FriendlyName;
+			c.FriendlyName = L"(DMO)";
 		} else if (str.Find(L"@device:sw:") == 0) {
-			c.FriendlyName = _T("(DS) ") + c.FriendlyName;
+			c.FriendlyName = L"(DS)";
 		} else if (str.Find(L"@device:cm:") == 0) {
-			c.FriendlyName = _T("(VfW) ") + c.FriendlyName;
+			if (cat == CLSID_VideoCompressorCategory) {
+				c.FriendlyName = L"(VfW)"; // for some unknown reason, the VfW codecs never added
+			} else if (cat == CLSID_AudioCompressorCategory) {
+				c.FriendlyName = L"(ACM)";
+			}
 		}
+		c.FriendlyName.AppendFormat(L" %s", var.bstrVal);
 
 		box.SetItemData(
 			box.AddString(c.FriendlyName),
