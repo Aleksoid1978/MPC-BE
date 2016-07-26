@@ -2028,8 +2028,8 @@ void CMpcAudioRenderer::CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSa
 	wfex.Format.cbSize                   = sizeof(wfex) - sizeof(wfex.Format);
 	wfex.SubFormat                       = MEDIASUBTYPE_PCM;
 	wfex.dwChannelMask                   = dwChannelMask;
-	wfex.Samples.wValidBitsPerSample     = wfex.Format.wBitsPerSample;
-	if (wfex.Samples.wValidBitsPerSample == 32 && wfe.wBitsPerSample == 32) {
+	wfex.Samples.wValidBitsPerSample     = wBitsPerSample;
+	if (wfex.Samples.wValidBitsPerSample == 32) {
 		wfex.Samples.wValidBitsPerSample = 24;
 	}
 }
