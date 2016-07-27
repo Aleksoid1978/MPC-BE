@@ -297,25 +297,24 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 			WAVEFORMATEX *pWfxIn, *pWfxOut;
 			m_pMAR->GetStatus(&pWfxIn, &pWfxOut);
 			if (pWfxIn && pWfxOut) {
-				{
-					// Input
-					bool bIsFloat	= false;
-					DWORD layout	= 0;
-					if (IsWaveFormatExtensible(pWfxIn)) {
-						WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)pWfxIn;
+				auto SetText = [](WAVEFORMATEX* pwfex, CStatic& formatText, CStatic& channelText, CStatic& rateText) {
+					bool bIsFloat = false;
+					DWORD layout  = 0;
+					if (IsWaveFormatExtensible(pwfex)) {
+						WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)pwfex;
 						layout = wfex->dwChannelMask;
 						if (wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT) {
 							bIsFloat = true;
 						}
 					} else {
-						layout = GetDefChannelMask(pWfxIn->nChannels);
-						if (pWfxIn->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
+						layout = GetDefChannelMask(pwfex->nChannels);
+						if (pwfex->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
 							bIsFloat = true;
 						}
 					}
 
 					CString sFormat;
-					sFormat.Format(L"%dbit %s", pWfxIn->wBitsPerSample, bIsFloat ? L"Float" : L"Integer");
+					sFormat.Format(L"%dbit %s", pwfex->wBitsPerSample, bIsFloat ? L"Float" : L"Integer");
 
 					CString sChannel;
 					switch (layout) {
@@ -328,62 +327,21 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 							sChannel = L"7.1";
 							break;
 						default:
-							sChannel.Format(L"%d", pWfxIn->nChannels);
+							sChannel.Format(L"%d", pwfex->nChannels);
 							break;
 					}
 					sChannel.AppendFormat(L" / 0x%x", layout);
 
 					CString sSampleRate;
-					sSampleRate.Format(L"%d", pWfxIn->nSamplesPerSec);
+					sSampleRate.Format(L"%d", pwfex->nSamplesPerSec);
 
-					m_InputFormatText.SetWindowText(sFormat);
-					m_InputChannelText.SetWindowText(sChannel);
-					m_InputRateText.SetWindowText(sSampleRate);
-				}
+					formatText.SetWindowText(sFormat);
+					channelText.SetWindowText(sChannel);
+					rateText.SetWindowText(sSampleRate);
+				};
 
-				{
-					// Output
-					bool bIsFloat	= false;
-					DWORD layout	= 0;
-					if (IsWaveFormatExtensible(pWfxOut)) {
-						WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)pWfxOut;
-						layout = wfex->dwChannelMask;
-						if (wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT) {
-							bIsFloat = true;
-						}
-					} else {
-						layout = GetDefChannelMask(pWfxOut->nChannels);
-						if (pWfxOut->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
-							bIsFloat = true;
-						}
-					}
-
-					CString sFormat;
-					sFormat.Format(L"%dbit %s", pWfxOut->wBitsPerSample, bIsFloat ? L"Float" : L"Integer");
-
-					CString sChannel;
-					switch (layout) {
-						case KSAUDIO_SPEAKER_5POINT1:
-						case KSAUDIO_SPEAKER_5POINT1_SURROUND:
-							sChannel = L"5.1";
-							break;
-						case KSAUDIO_SPEAKER_7POINT1:
-						case KSAUDIO_SPEAKER_7POINT1_SURROUND:
-							sChannel = L"7.1";
-							break;
-						default:
-							sChannel.Format(L"%d", pWfxOut->nChannels);
-							break;
-					}
-					sChannel.AppendFormat(L" / 0x%x", layout);
-
-					CString sSampleRate;
-					sSampleRate.Format(L"%d", pWfxOut->nSamplesPerSec);
-
-					m_OutputFormatText.SetWindowText(sFormat);
-					m_OutputChannelText.SetWindowText(sChannel);
-					m_OutputRateText.SetWindowText(sSampleRate);
-				}
+				SetText(pWfxIn, m_InputFormatText, m_InputChannelText, m_InputRateText);
+				SetText(pWfxOut, m_OutputFormatText, m_OutputChannelText, m_OutputRateText);
 			}
 		}
 
