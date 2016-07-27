@@ -966,8 +966,8 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 			}
 
 			// HACK: ffdshow - audio capture filter
-			if (GetCLSID(pPinOut) == GUIDFromCString(_T("{04FE9017-F873-410E-871E-AB91661A4EF7}"))
-					&& GetCLSID(pBF) == GUIDFromCString(_T("{E30629D2-27E5-11CE-875D-00608CB78066}"))) {
+			if (GetCLSID(pPinOut) == GUIDFromCString(L"{04FE9017-F873-410E-871E-AB91661A4EF7}")
+					&& GetCLSID(pBF) == GUIDFromCString(L"{E30629D2-27E5-11CE-875D-00608CB78066}")) {
 				continue;
 			}
 
@@ -989,7 +989,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				}
 			}
 
-			EXECUTE_ASSERT(Disconnect(pPinOut));
+			EXECUTE_ASSERT(SUCCEEDED(Disconnect(pPinOut)));
 		}
 	}
 
@@ -1018,7 +1018,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 		}
 
 		CComPtr<IEnumMoniker> pEM;
-		if (types.GetCount() > 0
+		if (!types.IsEmpty()
 				&& SUCCEEDED(m_pFM->EnumMatchingFilters(
 								 &pEM, 0, FALSE, MERIT_DO_NOT_USE+1,
 								 TRUE, types.GetCount()/2, types.GetData(), NULL, NULL, FALSE,
@@ -1078,23 +1078,25 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				continue;
 			}
 
+			auto hookDirectXVideoDecoderService = [](CComQIPtr<IMFGetService> pMFGS) {
+				CComPtr<IDirectXVideoDecoderService> pDecoderService;
+				CComPtr<IDirect3DDeviceManager9>     pDeviceManager;
+				HANDLE                               hDevice = INVALID_HANDLE_VALUE;
+
+				if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_PPV_ARGS(&pDeviceManager)))
+						&& SUCCEEDED(pDeviceManager->OpenDeviceHandle(&hDevice))
+						&& SUCCEEDED(pDeviceManager->GetVideoService(hDevice, IID_PPV_ARGS(&pDecoderService)))) {
+					HookDirectXVideoDecoderService(pDecoderService);
+					pDeviceManager->CloseDeviceHandle(hDevice);
+				}
+			};
+
 			if (!m_bIsPreview && !pMadVRAllocatorPresenter) {
 				if (CComQIPtr<IMFGetService> pMFGS = pBF) {
 					// hook IDirectXVideoDecoderService to get DXVA status & logging;
 					// why before ConnectFilterDirect() - some decoder, like ArcSoft & Cyberlink, init DXVA2 decoder while connect to the renderer ...
 					// madVR crash on call ::GetService() before connect
-					CComPtr<IDirectXVideoDecoderService>	pDecoderService;
-					CComPtr<IDirect3DDeviceManager9>		pDeviceManager;
-					HANDLE									hDevice = INVALID_HANDLE_VALUE;
-
-					if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_PPV_ARGS(&pDeviceManager)))
-							&& SUCCEEDED(pDeviceManager->OpenDeviceHandle(&hDevice))
-							&& SUCCEEDED(pDeviceManager->GetVideoService(hDevice, IID_PPV_ARGS(&pDecoderService)))) {
-						HookDirectXVideoDecoderService(pDecoderService);
-						pDeviceManager->CloseDeviceHandle(hDevice);
-					}
-					pDeviceManager.Release();
-					pDecoderService.Release();
+					hookDirectXVideoDecoderService(pMFGS);
 				}
 			}
 
@@ -1157,18 +1159,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 						if (!m_bIsPreview && pMadVRAllocatorPresenter) {
 							// hook IDirectXVideoDecoderService to get DXVA status & logging;
 							// madVR crash on call ::GetService() before connect - so set Hook after ConnectFilterDirect()
-							CComPtr<IDirectXVideoDecoderService>	pDecoderService;
-							CComPtr<IDirect3DDeviceManager9>		pDeviceManager;
-							HANDLE									hDevice = INVALID_HANDLE_VALUE;
-
-							if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_PPV_ARGS(&pDeviceManager)))
-									&& SUCCEEDED(pDeviceManager->OpenDeviceHandle(&hDevice))
-									&& SUCCEEDED(pDeviceManager->GetVideoService(hDevice, IID_PPV_ARGS(&pDecoderService)))) {
-								HookDirectXVideoDecoderService(pDecoderService);
-								pDeviceManager->CloseDeviceHandle(hDevice);
-							}
-							pDeviceManager.Release();
-							pDecoderService.Release();
+							hookDirectXVideoDecoderService(pMFGS);
 						}
 					}
 
@@ -1365,8 +1356,6 @@ STDMETHODIMP CFGManager::RenderEx(IPin* pPinOut, DWORD dwFlags, DWORD* pvContext
 		return E_INVALIDARG;
 	}
 
-	HRESULT hr;
-
 	if (dwFlags & AM_RENDEREX_RENDERTOEXISTINGRENDERERS) {
 		CInterfaceList<IBaseFilter> pBFs;
 
@@ -1390,6 +1379,7 @@ STDMETHODIMP CFGManager::RenderEx(IPin* pPinOut, DWORD dwFlags, DWORD* pvContext
 		EndEnumFilters;
 
 		while (!pBFs.IsEmpty()) {
+			HRESULT hr;
 			if (SUCCEEDED(hr = ConnectFilter(pPinOut, pBFs.RemoveHead()))) {
 				return hr;
 			}
@@ -1623,17 +1613,17 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 			}
 
 			if (SUCCEEDED(hr)) {
-				for (int i = m_deadends.GetCount()-1; i >= 0; i--)
+				for (ptrdiff_t i = m_deadends.GetCount() - 1; i >= 0; i--) {
 					if (m_deadends[i]->Compare(m_streampath)) {
 						m_deadends.RemoveAt(i);
 					}
-
+				}
 				nRendered++;
 			}
 
 			nTotal++;
 
-			m_streampath.RemoveTail();
+			m_streampath.RemoveTailNoReturn();
 
 			if (SUCCEEDED(hr) && pPinIn) {
 				return S_OK;
@@ -1719,7 +1709,15 @@ STDMETHODIMP CFGManager::NukeDownstream(IUnknown* pUnk)
 		CComPtr<IPin> pPinTo;
 		if (S_OK == IsPinDirection(pPin, PINDIR_OUTPUT)
 				&& SUCCEEDED(pPin->ConnectedTo(&pPinTo)) && pPinTo) {
-			if (CComPtr<IBaseFilter> pBF = GetFilterFromPin(pPinTo)) {
+			if (pBF = GetFilterFromPin(pPinTo)) {
+				if (GetCLSID(pBF) == CLSID_EnhancedVideoRenderer) {
+					// GetFilterFromPin() returns pointer to the Base EVR,
+					// but we need to remove Outer EVR from the graph.
+					CComPtr<IBaseFilter> pOuterEVR;
+					if (SUCCEEDED(pBF->QueryInterface(&pOuterEVR))) {
+						pBF = pOuterEVR;
+					}
+				}
 				NukeDownstream(pBF);
 				Disconnect(pPinTo);
 				Disconnect(pPin);
