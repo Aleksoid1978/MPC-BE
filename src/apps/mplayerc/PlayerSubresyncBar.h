@@ -27,6 +27,7 @@
 #include "../Subtitles/RTS.h"
 #include "../Subtitles/VobSubFile.h"
 
+class CMainFrame;
 
 // CPlayerSubresyncBar
 
@@ -35,8 +36,9 @@ class CPlayerSubresyncBar : public CPlayerBar
 	DECLARE_DYNAMIC(CPlayerSubresyncBar)
 
 private:
-	CPlayerListCtrl m_list;
+	CMainFrame* m_pMainFrame;
 
+	CPlayerListCtrl m_list;
 	CFont m_font;
 
 	CCritSec* m_pSubLock;
@@ -106,7 +108,7 @@ private:
 	bool ModEnd(int iItem, int t, bool fReset = false);
 
 public:
-	CPlayerSubresyncBar();
+	CPlayerSubresyncBar(CMainFrame* pMainFrame);
 	virtual ~CPlayerSubresyncBar();
 
 	BOOL Create(CWnd* pParentWnd, UINT defDockBarID, CCritSec* pSubLock);

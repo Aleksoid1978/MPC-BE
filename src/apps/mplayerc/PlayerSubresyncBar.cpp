@@ -28,8 +28,10 @@
 // CPlayerSubresyncBar
 
 IMPLEMENT_DYNAMIC(CPlayerSubresyncBar, CPlayerBar)
-CPlayerSubresyncBar::CPlayerSubresyncBar()
-	: m_pSubLock(NULL)
+
+CPlayerSubresyncBar::CPlayerSubresyncBar(CMainFrame* pMainFrame)
+	: m_pMainFrame(pMainFrame)
+	, m_pSubLock(NULL)
 	, m_fps(0.0)
 	, m_mode(0)
 	, m_rt(0)
@@ -246,11 +248,6 @@ void CPlayerSubresyncBar::ResetSubtitle()
 
 void CPlayerSubresyncBar::SaveSubtitle()
 {
-	CMainFrame* pFrame = AfxGetMainFrame();
-	if (!pFrame) {
-		return;
-	}
-
 	CLSID clsid;
 	m_pSubStream->GetClassID(&clsid);
 
@@ -287,7 +284,7 @@ void CPlayerSubresyncBar::SaveSubtitle()
 		return;
 	}
 
-	pFrame->InvalidateSubtitle();
+	m_pMainFrame->InvalidateSubtitle();
 }
 
 void CPlayerSubresyncBar::UpdatePreview()
@@ -1134,7 +1131,7 @@ void CPlayerSubresyncBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 		}
 
 		REFERENCE_TIME rt = (REFERENCE_TIME)t * 10000;
-		AfxGetMainFrame()->SeekTo(rt);
+		m_pMainFrame->SeekTo(rt);
 	}
 
 	*pResult = 0;

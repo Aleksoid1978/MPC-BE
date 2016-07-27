@@ -31,6 +31,7 @@ class CPPageCapture : public CPPageBase
 {
 	DECLARE_DYNAMIC(CPPageCapture)
 
+private:
 	CAtlArray<CString> m_vidnames, m_audnames, m_providernames, m_tunernames, m_receivernames;
 
 	CComboBox m_cbAnalogVideo;

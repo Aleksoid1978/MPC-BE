@@ -26,16 +26,17 @@ class CPPageFileMediaInfo : public CPropertyPage
 {
 	DECLARE_DYNAMIC(CPPageFileMediaInfo)
 
+private:
 	CString m_fn;
 	CEdit m_mediainfo;
 	CFont* m_pCFont;
-	CString MI_Text;
 
 public:
 	CPPageFileMediaInfo(CString fn);
 	virtual ~CPPageFileMediaInfo();
 
 	enum { IDD = IDD_FILEMEDIAINFO };
+	CString MI_Text;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

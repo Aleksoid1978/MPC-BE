@@ -74,6 +74,13 @@ private:
 	CButton m_Button_MI_SaveAs;
 	CButton m_Button_MI_Clipboard;
 
+	CString m_fn;
+	BOOL    m_bNeedInit;
+	CRect   m_rCrt;
+	CRect   m_rWnd;
+	int     m_nMinCX;
+	int     m_nMinCY;
+
 public:
 	CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWnd* pParentWnd);
 	virtual ~CPPageFileInfoSheet();
@@ -81,7 +88,6 @@ public:
 	afx_msg void OnSaveAs();
 	afx_msg void OnCopyToClipboard();
 	INT_PTR DoModal();
-	CString m_fn;
 
 protected:
 	virtual BOOL OnInitDialog();
@@ -91,10 +97,4 @@ protected:
 	afx_msg void OnDestroy();
 
 	DECLARE_MESSAGE_MAP()
-
-	BOOL   m_bNeedInit;
-	CRect  m_rCrt;
-	CRect  m_rWnd;
-	int    m_nMinCX;
-	int    m_nMinCY;
 };
