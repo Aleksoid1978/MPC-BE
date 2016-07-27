@@ -24,16 +24,10 @@
 
 // CPrevView
 
-CFlyBar::CFlyBar() :
-	bt_idx(-1),
-	r_ExitIcon(0,0,0,0),
-	r_MinIcon(0,0,0,0),
-	r_RestoreIcon(0,0,0,0),
-	r_SettingsIcon(0,0,0,0),
-	r_InfoIcon(0,0,0,0),
-	r_FSIcon(0,0,0,0),
-	r_LockIcon(0,0,0,0),
-	m_pButtonsImages(NULL)
+CFlyBar::CFlyBar(CMainFrame* pMainFrame)
+	: m_pMainFrame(pMainFrame)
+	, bt_idx(-1)
+	, m_pButtonsImages(NULL)
 {
 	HBITMAP hBmp = CMPCPngImage::LoadExternalImage(L"flybar", IDB_PLAYERFLYBAR_PNG, IMG_TYPE::UNDEF);
 	BITMAP bm = { 0 };
@@ -169,8 +163,7 @@ void CFlyBar::DrawButton(CDC *pDC, int x, int y, int z)
 
 void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	auto pFrame = AfxGetMainFrame();
-	pFrame->SetFocus();
+	m_pMainFrame->SetFocus();
 
 	CPoint p;
 	GetCursorPos(&p);
@@ -180,26 +173,26 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 
 	if (r_ExitIcon.PtInRect(p)) {
 		ShowWindow(SW_HIDE);
-		pFrame->PostMessage(WM_COMMAND, ID_FILE_EXIT);
+		m_pMainFrame->PostMessage(WM_COMMAND, ID_FILE_EXIT);
 	} else if (r_MinIcon.PtInRect(p)) {
-		pFrame->m_fTrayIcon ? pFrame->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE, -1) : pFrame->ShowWindow(SW_SHOWMINIMIZED);
+		m_pMainFrame->m_fTrayIcon ? m_pMainFrame->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE, -1) : m_pMainFrame->ShowWindow(SW_SHOWMINIMIZED);
 	} else if (r_RestoreIcon.PtInRect(p)) {
-		if (pFrame->m_bFullScreen) {
-			pFrame->ToggleFullscreen(true, true);
+		if (m_pMainFrame->m_bFullScreen) {
+			m_pMainFrame->ToggleFullscreen(true, true);
 		}
-		pFrame->ShowWindow(pFrame->IsZoomed() ? SW_SHOWNORMAL : SW_SHOWMAXIMIZED);
+		m_pMainFrame->ShowWindow(m_pMainFrame->IsZoomed() ? SW_SHOWNORMAL : SW_SHOWMAXIMIZED);
 		Invalidate();
 	} else if (r_SettingsIcon.PtInRect(p)) {
-		pFrame->PostMessage(WM_COMMAND, ID_VIEW_OPTIONS);
+		m_pMainFrame->PostMessage(WM_COMMAND, ID_VIEW_OPTIONS);
 		Invalidate();
 	} else if (r_InfoIcon.PtInRect(p)) {
-		OAFilterState fs = pFrame->GetMediaState();
+		OAFilterState fs = m_pMainFrame->GetMediaState();
 		if (fs != -1) {
-			pFrame->PostMessage(WM_COMMAND, ID_FILE_PROPERTIES);
+			m_pMainFrame->PostMessage(WM_COMMAND, ID_FILE_PROPERTIES);
 		}
 		Invalidate();
 	} else if (r_FSIcon.PtInRect(p)) {
-		pFrame->ToggleFullscreen(true, true);
+		m_pMainFrame->ToggleFullscreen(true, true);
 		Invalidate();
 	} else if (r_LockIcon.PtInRect(p)) {
 		CAppSettings& s = AfxGetAppSettings();
@@ -236,8 +229,6 @@ void CFlyBar::UpdateWnd(CPoint point)
 	CString str, str2;
 	m_tooltip.GetText(str,this);
 
-	auto pFrame = AfxGetMainFrame();
-
 	if (r_ExitIcon.PtInRect(point)) {
 		if (str != ResStr(IDS_AG_EXIT)) {
 			m_tooltip.UpdateTipText(ResStr(IDS_AG_EXIT), this);
@@ -250,7 +241,7 @@ void CFlyBar::UpdateWnd(CPoint point)
 		bt_idx = 1;
 	} else if (r_RestoreIcon.PtInRect(point)) {
 		WINDOWPLACEMENT wp;
-		pFrame->GetWindowPlacement(&wp);
+		m_pMainFrame->GetWindowPlacement(&wp);
 		str2 = (wp.showCmd == SW_SHOWMAXIMIZED) ? ResStr(IDS_TOOLTIP_RESTORE) : ResStr(IDS_TOOLTIP_MAXIMIZE);
 		if (str != str2) {
 			m_tooltip.UpdateTipText(str2, this);
@@ -267,7 +258,7 @@ void CFlyBar::UpdateWnd(CPoint point)
 		}
 		bt_idx = 4;
 	} else if (r_FSIcon.PtInRect(point)) {
-		str2 = pFrame->m_bFullScreen ? ResStr(IDS_TOOLTIP_WINDOW) : ResStr(IDS_TOOLTIP_FULLSCREEN);
+		str2 = m_pMainFrame->m_bFullScreen ? ResStr(IDS_TOOLTIP_WINDOW) : ResStr(IDS_TOOLTIP_FULLSCREEN);
 		if (str != str2) {
 			m_tooltip.UpdateTipText(str2, this);
 		}
@@ -315,11 +306,10 @@ void CFlyBar::DrawWnd()
 		GetClientRect(&rcBar);
 		int x = rcBar.Width();
 
-		auto pFrame = AfxGetMainFrame();
 		WINDOWPLACEMENT wp;
-		pFrame->GetWindowPlacement(&wp);
+		m_pMainFrame->GetWindowPlacement(&wp);
 
-		OAFilterState fs = pFrame->GetMediaState();
+		OAFilterState fs = m_pMainFrame->GetMediaState();
 		CDC mdc;
 		mdc.CreateCompatibleDC(&dc);
 		CBitmap bm;
@@ -361,7 +351,7 @@ void CFlyBar::DrawWnd()
 			}
 
 			if (!i || bt_idx == 5) { // fs
-				if (pFrame->m_bFullScreen) {
+				if (m_pMainFrame->m_bFullScreen) {
 					DrawButton(&mdc, x, sep[8][i], 4);
 				} else {
 					DrawButton(&mdc, x, sep[10][i], 4);

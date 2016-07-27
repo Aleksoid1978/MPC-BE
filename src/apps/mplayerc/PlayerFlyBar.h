@@ -22,21 +22,15 @@
 
 #include "PngImage.h"
 
+class CMainFrame;
+
+// CFlyBar
+
 class CFlyBar : public CWnd
 {
-public:
-	CFlyBar();
-	~CFlyBar();
-
-	HRESULT Create(CWnd* pWnd);
-
-	int iw;
-
-	void CalcButtonsRect();
-
-	DECLARE_DYNAMIC(CFlyBar)
-
 private:
+	CMainFrame* m_pMainFrame;
+
 	CRect r_ExitIcon;
 	CRect r_MinIcon;
 	CRect r_RestoreIcon;
@@ -50,6 +44,19 @@ private:
 
 	int bt_idx;
 
+public:
+	CFlyBar(CMainFrame* pMainFrame);
+	~CFlyBar();
+
+	HRESULT Create(CWnd* pWnd);
+
+	int iw;
+
+	void CalcButtonsRect();
+
+	DECLARE_DYNAMIC(CFlyBar)
+
+private:
 	void DrawButton(CDC *pDC, int x, int y, int z);
 	void UpdateWnd(CPoint point);
 	void DrawWnd();

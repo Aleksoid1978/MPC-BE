@@ -20,8 +20,15 @@
 
 #pragma once
 
+class CMainFrame;
+
+// CPreView
+
 class CPreView : public CWnd
 {
+private:
+	CMainFrame* m_pMainFrame;
+
 	const int m_border = 5;
 
 	int m_caption = 20;
@@ -32,7 +39,7 @@ class CPreView : public CWnd
 	CRect	m_videorect;
 
 public:
-	CPreView();
+	CPreView(CMainFrame* pMainFrame);
 	virtual ~CPreView();
 
 	DECLARE_DYNAMIC(CPreView)
