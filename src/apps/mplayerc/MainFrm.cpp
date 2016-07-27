@@ -676,6 +676,8 @@ CMainFrame::CMainFrame() :
 	m_wndInfoBar(this),
 	m_wndStatsBar(this),
 	m_wndStatusBar(this),
+	m_wndFlyBar(this),
+	m_wndPreView(this),
 	m_wndPlaylistBar(this),
 	m_wndCaptureBar(this),
 	m_dMediaInfoFPS(0.0),

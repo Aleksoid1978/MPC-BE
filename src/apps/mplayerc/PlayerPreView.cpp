@@ -36,7 +36,8 @@ static COLORREF RGBFill(int r1, int g1, int b1, int r2, int g2, int b2, int i, i
 
 // CPrevView
 
-CPreView::CPreView()
+CPreView::CPreView(CMainFrame* pMainFrame)
+	: m_pMainFrame(pMainFrame)
 {
 }
 
@@ -97,7 +98,7 @@ int CPreView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	}
 
-	m_caption = AfxGetMainFrame()->ScaleY(20);
+	m_caption = m_pMainFrame->ScaleY(20);
 
 	CRect rc;
 	GetClientRect(rc);
@@ -266,7 +267,7 @@ void CPreView::OnPaint()
 
 	mdc.SetTextColor(RGB(r1,g1,b1));
 
-	font.CreateFont(AfxGetMainFrame()->ScaleY(13), 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET,
+	font.CreateFont(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET,
 									OUT_RASTER_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH | FF_MODERN,
 									_T("Tahoma"));
 
@@ -287,7 +288,7 @@ void CPreView::OnPaint()
 void CPreView::OnShowWindow(BOOL bShow, UINT nStatus)
 {
 	if (bShow) {
-		AfxGetMainFrame()->SetPreviewVideoPosition();
+		m_pMainFrame->SetPreviewVideoPosition();
 	}
 
 	__super::OnShowWindow(bShow, nStatus);
