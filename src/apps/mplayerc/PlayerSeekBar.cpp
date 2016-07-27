@@ -867,7 +867,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 
 void CPlayerSeekBar::OnMButtonDown(UINT nFlags, CPoint point)
 {
-	if (m_pMainFrame->m_wndPreView) {
+	if (m_pMainFrame->m_wndPreView.IsWindowVisible()) {
 		m_pMainFrame->PreviewWindowHide();
 		AfxGetAppSettings().fSmartSeek = !AfxGetAppSettings().fSmartSeek;
 		OnMouseMove(nFlags,point);
