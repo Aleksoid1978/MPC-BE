@@ -33,6 +33,14 @@ class CPPageCapture : public CPPageBase
 
 	CAtlArray<CString> m_vidnames, m_audnames, m_providernames, m_tunernames, m_receivernames;
 
+	CComboBox m_cbAnalogVideo;
+	CComboBox m_cbAnalogAudio;
+	CComboBox m_cbAnalogCountry;
+	CComboBox m_cbDigitalNetworkProvider;
+	CComboBox m_cbDigitalTuner;
+	CComboBox m_cbDigitalReceiver;
+	int m_iDefaultDevice;
+
 public:
 	CPPageCapture();
 	virtual ~CPPageCapture();
@@ -48,12 +56,8 @@ protected:
 	void FindDigitalDevices();
 
 	DECLARE_MESSAGE_MAP()
-public:
-	CComboBox m_cbAnalogVideo;
-	CComboBox m_cbAnalogAudio;
-	CComboBox m_cbAnalogCountry;
-	CComboBox m_cbDigitalNetworkProvider;
-	CComboBox m_cbDigitalTuner;
-	CComboBox m_cbDigitalReceiver;
-	int m_iDefaultDevice;
+
+	afx_msg void OnUpdateAnalog(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateDigital(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateDigitalReciver(CCmdUI* pCmdUI);
 };

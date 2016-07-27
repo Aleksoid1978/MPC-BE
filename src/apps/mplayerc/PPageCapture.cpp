@@ -304,6 +304,18 @@ void CPPageCapture::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CPPageCapture, CPPageBase)
+	ON_UPDATE_COMMAND_UI(IDC_COMBO1, OnUpdateAnalog)
+	ON_UPDATE_COMMAND_UI(IDC_COMBO2, OnUpdateAnalog)
+	ON_UPDATE_COMMAND_UI(IDC_COMBO9, OnUpdateAnalog)
+	ON_UPDATE_COMMAND_UI(IDC_STATIC1, OnUpdateAnalog)
+	ON_UPDATE_COMMAND_UI(IDC_STATIC2, OnUpdateAnalog)
+	ON_UPDATE_COMMAND_UI(IDC_STATIC3, OnUpdateAnalog)
+	ON_UPDATE_COMMAND_UI(IDC_COMBO4, OnUpdateDigital)
+	ON_UPDATE_COMMAND_UI(IDC_COMBO5, OnUpdateDigital)
+	ON_UPDATE_COMMAND_UI(IDC_STATIC4, OnUpdateDigital)
+	ON_UPDATE_COMMAND_UI(IDC_STATIC5, OnUpdateDigital)
+	ON_UPDATE_COMMAND_UI(IDC_COMBO3, OnUpdateDigitalReciver)
+	ON_UPDATE_COMMAND_UI(IDC_STATIC6, OnUpdateDigitalReciver)
 END_MESSAGE_MAP()
 
 // CPPageCapture message handlers
@@ -319,11 +331,38 @@ BOOL CPPageCapture::OnInitDialog()
 	FindAnalogDevices();
 	FindDigitalDevices();
 
-	m_iDefaultDevice = s.iDefaultCaptureDevice;
+	if (m_cbAnalogVideo.GetCount() && m_cbDigitalTuner.GetCount()) {
+		m_iDefaultDevice = s.iDefaultCaptureDevice;
+	} else if (m_cbAnalogVideo.GetCount()) {
+		m_iDefaultDevice = 0;
+		GetDlgItem(IDC_RADIO2)->EnableWindow(FALSE);
+	} else if (m_cbDigitalTuner.GetCount()) {
+		m_iDefaultDevice = 1;
+		GetDlgItem(IDC_RADIO1)->EnableWindow(FALSE);
+	} else {
+		m_iDefaultDevice = s.iDefaultCaptureDevice;
+		GetDlgItem(IDC_RADIO2)->EnableWindow(FALSE);
+		GetDlgItem(IDC_RADIO1)->EnableWindow(FALSE);
+	}
 
 	UpdateData(FALSE);
 
 	return TRUE;
+}
+
+void CPPageCapture::OnUpdateAnalog(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(IsDlgButtonChecked(IDC_RADIO1) && m_cbAnalogVideo.GetCount());
+}
+
+void CPPageCapture::OnUpdateDigital(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(IsDlgButtonChecked(IDC_RADIO2) && m_cbDigitalTuner.GetCount());
+}
+
+void CPPageCapture::OnUpdateDigitalReciver(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(IsDlgButtonChecked(IDC_RADIO2) && m_cbDigitalReceiver.GetCount());
 }
 
 void CPPageCapture::FindAnalogDevices()
