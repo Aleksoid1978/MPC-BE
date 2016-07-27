@@ -28,6 +28,8 @@ class CMainFrame;
 
 class CFlyBar : public CWnd
 {
+	DECLARE_DYNAMIC(CFlyBar)
+
 private:
 	CMainFrame* m_pMainFrame;
 
@@ -53,8 +55,6 @@ public:
 	int iw;
 
 	void CalcButtonsRect();
-
-	DECLARE_DYNAMIC(CFlyBar)
 
 private:
 	void DrawButton(CDC *pDC, int x, int y, int z);

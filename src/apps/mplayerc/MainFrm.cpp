@@ -680,6 +680,7 @@ CMainFrame::CMainFrame() :
 	m_wndPreView(this),
 	m_wndPlaylistBar(this),
 	m_wndCaptureBar(this),
+	m_wndSubresyncBar(this),
 	m_dMediaInfoFPS(0.0),
 	m_bAudioOnly(true),
 	m_bMainIsMPEGSplitter(false)

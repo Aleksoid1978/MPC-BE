@@ -26,6 +26,8 @@ class CMainFrame;
 
 class CPreView : public CWnd
 {
+	DECLARE_DYNAMIC(CPreView)
+
 private:
 	CMainFrame* m_pMainFrame;
 
@@ -42,7 +44,6 @@ public:
 	CPreView(CMainFrame* pMainFrame);
 	virtual ~CPreView();
 
-	DECLARE_DYNAMIC(CPreView)
 	virtual BOOL SetWindowText(LPCWSTR lpString);
 
 	void SetRelativeSize(int relativesize) { m_relativeSize = relativesize; }
