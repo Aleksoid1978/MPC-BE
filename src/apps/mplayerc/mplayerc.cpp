@@ -1497,7 +1497,7 @@ BOOL CMPlayerCApp::InitInstance()
 
 		switch (m_s.iAdminOption) {
 			case CPPageFormats::IDD : {
-				CPPageSheet options(ResStr(IDS_OPTIONS_CAPTION), NULL, NULL, m_s.iAdminOption);
+				CPPageSheet options(ResStr(IDS_OPTIONS_CAPTION), NULL, m_s.iAdminOption);
 				options.LockPage();
 				options.DoModal();
 			}
