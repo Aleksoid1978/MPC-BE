@@ -27,9 +27,8 @@
 
 IMPLEMENT_DYNAMIC(CPPageSheet, CTreePropSheet)
 
-CPPageSheet::CPPageSheet(LPCTSTR pszCaption, IFilterGraph* pFG, CWnd* pParentWnd, UINT idPage)
+CPPageSheet::CPPageSheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT idPage)
 	: CTreePropSheet(pszCaption, pParentWnd, 0)
-	, m_audio(pFG)
 	, m_bLockPage(false)
 {
 	int nWidth = 210;

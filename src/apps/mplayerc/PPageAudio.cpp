@@ -30,7 +30,7 @@
 // CPPageAudio dialog
 
 IMPLEMENT_DYNAMIC(CPPageAudio, CPPageBase)
-CPPageAudio::CPPageAudio(IFilterGraph* pFG)
+CPPageAudio::CPPageAudio()
 	: CPPageBase(CPPageAudio::IDD, CPPageAudio::IDD)
 	, m_iAudioRendererType(0)
 	, m_iSecAudioRendererType(0)
@@ -38,7 +38,6 @@ CPPageAudio::CPPageAudio(IFilterGraph* pFG)
 	, m_fAutoloadAudio(FALSE)
 	, m_fPrioritizeExternalAudio(FALSE)
 {
-	m_pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG);
 }
 
 CPPageAudio::~CPPageAudio()
@@ -261,11 +260,15 @@ BOOL CPPageAudio::OnApply()
 	s.bAudioTimeShift			= !!m_chkTimeShift.GetCheck();
 	s.iAudioTimeShift			= m_edtTimeShift;
 
-	if (m_pASF) {
-		m_pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
-		m_pASF->SetAudioGain(s.fAudioGain_dB);
-		m_pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
-		m_pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
+	IFilterGraph* pFG = AfxGetMainFrame()->m_pGB;
+	if (pFG) {
+		CComQIPtr<IAudioSwitcherFilter> m_pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG);
+		if (m_pASF) {
+			m_pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
+			m_pASF->SetAudioGain(s.fAudioGain_dB);
+			m_pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
+			m_pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
+		}
 	}
 
 	return __super::OnApply();

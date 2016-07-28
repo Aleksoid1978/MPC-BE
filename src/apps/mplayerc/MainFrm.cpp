@@ -16644,7 +16644,7 @@ void CMainFrame::ShowOptions(int idPage)
 	CAppSettings& s = AfxGetAppSettings();
 	s.iSelectedVideoRenderer = -1;
 
-	CPPageSheet options(ResStr(IDS_OPTIONS_CAPTION), m_pGB, GetModalParent(), idPage);
+	CPPageSheet options(ResStr(IDS_OPTIONS_CAPTION), GetModalParent(), idPage);
 
 	m_bInOptions = true;
 	INT_PTR dResult = options.DoModal();

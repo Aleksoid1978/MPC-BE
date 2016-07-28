@@ -33,12 +33,10 @@ class CPPageAudio : public CPPageBase
 	DECLARE_DYNAMIC(CPPageAudio)
 
 private:
-	CComQIPtr<IAudioSwitcherFilter> m_pASF;
-
 	CStringArray m_AudioRendererDisplayNames;
 
 public:
-	CPPageAudio(IFilterGraph* pFG);
+	CPPageAudio();
 	virtual ~CPPageAudio();
 
 	enum { IDD = IDD_PPAGEAUDIO };
