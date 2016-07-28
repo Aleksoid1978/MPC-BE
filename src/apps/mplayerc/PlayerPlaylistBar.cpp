@@ -118,7 +118,7 @@ static bool ParseCUESheetFile(CString fn, CAtlList<CUETrack> &CUETrackList, CStr
 			TCHAR type[256] = { 0 };
 			trackNum = 0;
 			fAudioTrack = FALSE;
-			if (2 == swscanf_s(cueLine, L"%d %s", &trackNum, type, _countof(type) - 1)) {
+			if (2 == swscanf_s(cueLine, L"%u %s", &trackNum, type, _countof(type) - 1)) {
 				fAudioTrack = (wcscmp(type, L"AUDIO") == 0);
 			}
 		} else if (cmd == L"TITLE") {
