@@ -158,6 +158,7 @@ public:
 	HRESULT EndFlush();
 	HRESULT NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 	HRESULT Receive(IMediaSample* pIn);
+	HRESULT CompleteConnect(PIN_DIRECTION direction, IPin *pReceivePin);
 
 	HRESULT CheckInputType(const CMediaType* mtIn);
 	HRESULT CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut);

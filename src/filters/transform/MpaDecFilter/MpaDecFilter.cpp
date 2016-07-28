@@ -349,7 +349,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_truehd_samplerate(0)
 	, m_truehd_framelength(0)
 	, m_bNeedCheck(TRUE)
-	, m_bHasVideo(TRUE)
+	, m_bHasVideo(FALSE)
 	, m_bIgnoreJitter(FALSE)
 	, m_dRate(1.0)
 	, m_bFlushing(FALSE)
@@ -558,8 +558,6 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 				pPinRenderer->QueryAccept(&mtRenderer);
 			}
 		}
-
-		m_bHasVideo = HasMediaType(m_pInput, MEDIATYPE_Video) || HasMediaType(m_pInput, MEDIASUBTYPE_MPEG2_VIDEO);
 	}
 
 	HRESULT hr;
@@ -687,6 +685,14 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	}
 
 	return hr;
+}
+
+HRESULT CMpaDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin *pReceivePin)
+{
+	if (direction == PINDIR_OUTPUT) {
+		m_bHasVideo = HasMediaType(m_pInput, MEDIATYPE_Video) || HasMediaType(m_pInput, MEDIASUBTYPE_MPEG2_VIDEO);
+	}
+	return __super::CompleteConnect(direction, pReceivePin);
 }
 
 BOOL CMpaDecFilter::ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL bEOF/* = FALSE*/)
