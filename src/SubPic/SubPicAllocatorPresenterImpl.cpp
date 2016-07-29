@@ -108,6 +108,7 @@ void CSubPicAllocatorPresenterImpl::InitMaxSubtitleTextureSize(int maxWidth, CSi
 	}
 }
 
+#define DefaultStereoOffsetInPixels 4
 void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels)
 {
 	if (m_pSubPicProvider) {
@@ -115,16 +116,16 @@ void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, cons
 		if (m_pSubPicQueue->LookupSubPic(m_rtNow, !IsRendering(), pSubPic)) {
 			CRect rcSubs(windowRect);
 
-			CRenderersSettings& rs = GetRenderersSettings();
+			const CRenderersSettings& rs = GetRenderersSettings();
 			if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE) {
 				CRect rcTemp(windowRect);
 				rcTemp.right -= rcTemp.Width() / 2;
-				AlphaBlt(rcTemp, videoRect, pSubPic, NULL, xOffsetInPixels);
+				AlphaBlt(rcTemp, videoRect, pSubPic, NULL, xOffsetInPixels ? xOffsetInPixels : DefaultStereoOffsetInPixels);
 				rcSubs.left += rcSubs.Width() / 2;
 			} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM) {
 				CRect rcTemp(windowRect);
 				rcTemp.bottom -= rcTemp.Height() / 2;
-				AlphaBlt(rcTemp, videoRect, pSubPic, NULL, xOffsetInPixels);
+				AlphaBlt(rcTemp, videoRect, pSubPic, NULL, xOffsetInPixels ? xOffsetInPixels : DefaultStereoOffsetInPixels);
 				rcSubs.top += rcSubs.Height() / 2;
 			}
 
@@ -136,7 +137,7 @@ void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, cons
 void CSubPicAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget, int xOffsetInPixels)
 {
 	CRect rcSource, rcDest;
-	CRenderersSettings& rs = GetRenderersSettings();
+	const CRenderersSettings& rs = GetRenderersSettings();
 	if (SUCCEEDED(pSubPic->GetSourceAndDest(windowRect, videoRect, rs.bSubpicPosRelative, rs.SubpicShiftPos, rcSource, rcDest, xOffsetInPixels))) {
 		pSubPic->AlphaBlt(rcSource, rcDest, pTarget);
 	}
@@ -162,16 +163,14 @@ STDMETHODIMP_(SIZE) CSubPicAllocatorPresenterImpl::GetVideoSizeAR()
 
 STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetPosition(RECT w, RECT v)
 {
-	bool fWindowPosChanged = !!(m_windowRect != w);
-	bool fWindowSizeChanged = !!(m_windowRect.Size() != CRect(w).Size());
+	const bool bWindowPosChanged  = !!(m_windowRect != w);
+	const bool bWindowSizeChanged = !!(m_windowRect.Size() != CRect(w).Size());
+	const bool bVideoRectChanged  = !!(m_videoRect != v);
 
 	m_windowRect = w;
-
-	bool fVideoRectChanged = !!(m_videoRect != v);
-
 	m_videoRect = v;
 
-	if (fWindowSizeChanged || fVideoRectChanged) {
+	if (bWindowSizeChanged || bVideoRectChanged) {
 		if (m_pAllocator) {
 			m_pAllocator->SetCurSize(m_windowRect.Size());
 			m_pAllocator->SetCurVidRect(m_videoRect);
@@ -182,7 +181,7 @@ STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::SetPosition(RECT w, RECT v)
 		}
 	}
 
-	if (fWindowPosChanged || fVideoRectChanged) {
+	if (bWindowPosChanged || bVideoRectChanged) {
 		Paint(false);
 	}
 }
@@ -250,7 +249,7 @@ void CSubPicAllocatorPresenterImpl::Transform(CRect r, Vector v[4])
 	v[3] = Vector((float)r.right, (float)r.bottom, 0);
 
 	Vector center((float)r.CenterPoint().x, (float)r.CenterPoint().y, 0);
-	int l = (int)(Vector((float)r.Size().cx, (float)r.Size().cy, 0).Length()*1.5f)+1;
+	int l = (int)(Vector((float)r.Size().cx, (float)r.Size().cy, 0).Length() * 1.5f) + 1;
 
 	for (size_t i = 0; i < 4; i++) {
 		v[i] = m_xform << (v[i] - center);
@@ -353,7 +352,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* valu
 {
 	CheckPointer(value, E_POINTER);
 	CheckPointer(chars, E_POINTER);
-	CStringW ret;
+	CString ret;
 
 	if (!strcmp(field, "name")) {
 		ret = L"MPC-BE";
@@ -363,7 +362,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* valu
 		ret = L"None";
 
 		if (m_inputMediaType.IsValid() && m_inputMediaType.formattype == FORMAT_VideoInfo2) {
-			VIDEOINFOHEADER2* pVIH2 = (VIDEOINFOHEADER2*)m_inputMediaType.pbFormat;
+			const VIDEOINFOHEADER2* pVIH2 = (VIDEOINFOHEADER2*)m_inputMediaType.pbFormat;
 
 			if (pVIH2->dwControlFlags & AMCONTROL_COLORINFO_PRESENT) {
 				DXVA2_ExtendedFormat& flags = (DXVA2_ExtendedFormat&)pVIH2->dwControlFlags;
@@ -389,7 +388,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* valu
 	}
 
 	if (!ret.IsEmpty()) {
-		int len = ret.GetLength();
+		const int len = ret.GetLength();
 		size_t sz = (len + 1) * sizeof(WCHAR);
 		LPWSTR buf = (LPWSTR)LocalAlloc(LPTR, sz);
 
