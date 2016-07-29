@@ -8479,12 +8479,23 @@ void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 
 void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 {
-	UINT nID = pCmdUI->m_nID;
-	int i = (int)nID - (10 + ID_SUBTITLES_SUBITEM_START);
+	const UINT nID = pCmdUI->m_nID;
+	const int i = (int)nID - (10 + ID_SUBTITLES_SUBITEM_START);
 
-	CAppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
 	pCmdUI->Enable(m_pCAP && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
+
+	auto SetRadioCheck = [](CCmdUI* pCmdUI, BOOL bCheck) {
+		if (IsMenu(*pCmdUI->m_pMenu)) {
+			MENUITEMINFO mii = { sizeof(mii) };
+			mii.fMask = MIIM_FTYPE | MIIM_STATE;
+			mii.fType = bCheck ? MFT_RADIOCHECK : MF_ENABLED;
+			mii.fState = bCheck ? MFS_CHECKED : MF_ENABLED;
+			VERIFY(pCmdUI->m_pMenu->SetMenuItemInfo(pCmdUI->m_nID, &mii));
+		}
+		pCmdUI->Enable(TRUE);
+	};
 
 	if (i == -10) {
 		pCmdUI->Enable(GetPlaybackMode() == PM_NONE || (m_pCAP && !m_pDVS && !m_bAudioOnly)) ;
@@ -8538,26 +8549,11 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 		pCmdUI->SetCheck(s.fForcedSubtitles);
 		pCmdUI->Enable(s.fEnableSubtitles && m_pCAP && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
 	} else if (i == -3) {
-		if (s.m_RenderersSettings.iSubpicStereoMode == SUBPIC_STEREO_NONE) {
-			CheckMenuRadioItem(ID_SUBTITLES_SUBITEM_START + 7, ID_SUBTITLES_SUBITEM_START + 9, pCmdUI->m_nID);
-		}
-		pCmdUI->Enable(TRUE);
-		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !m_pDVS && !m_bAudioOnly && GetPlaybackMode() != PM_DVD;
-		//pCmdUI->Enable(bEnabled);
+		SetRadioCheck(pCmdUI, s.m_RenderersSettings.iSubpicStereoMode == SUBPIC_STEREO_NONE);
 	} else if (i == -2) {
-		if (s.m_RenderersSettings.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE) {
-			CheckMenuRadioItem(ID_SUBTITLES_SUBITEM_START + 7, ID_SUBTITLES_SUBITEM_START + 9, pCmdUI->m_nID);
-		}
-		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !m_pDVS && !m_bAudioOnly && GetPlaybackMode() != PM_DVD;
-		//pCmdUI->Enable(bEnabled);
-		pCmdUI->Enable(TRUE);
+		SetRadioCheck(pCmdUI, s.m_RenderersSettings.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE);
 	} else if (i == -1) {
-		if (s.m_RenderersSettings.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM) {
-			CheckMenuRadioItem(ID_SUBTITLES_SUBITEM_START + 7, ID_SUBTITLES_SUBITEM_START + 9, pCmdUI->m_nID);
-		}
-		//BOOL bEnabled = s.fEnableSubtitles && m_pCAP && !m_pDVS && !m_bAudioOnly && GetPlaybackMode() != PM_DVD;
-		//pCmdUI->Enable(bEnabled);
-		pCmdUI->Enable(TRUE);
+		SetRadioCheck(pCmdUI, s.m_RenderersSettings.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM);
 	}
 }
 
