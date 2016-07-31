@@ -138,7 +138,8 @@ extern "C" __declspec(dllexport) int get_icon_index(LPCTSTR ext)
 		iconindex = IDI_MIDI_ICON;
 	} else if (_tcsicmp(ext, _T(".mka")) == 0) {
 		iconindex = IDI_MKA_ICON;
-	} else if (_tcsicmp(ext, _T(".mkv")) == 0) {
+	} else if (_tcsicmp(ext, _T(".mkv")) == 0
+			|| _tcsicmp(ext, _T(".mk3d")) == 0) {
 		iconindex = IDI_MKV_ICON;
 	} else if (_tcsicmp(ext, _T(".mlp")) == 0) {
 		iconindex = IDI_MLP_ICON;
