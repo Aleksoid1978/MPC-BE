@@ -76,6 +76,7 @@ HRESULT CMpaSplitterFile::Init()
 	if ((BitRead(24, true) == 0x000001)		||	// MPEG-PS? (0x000001BA)
 		(BitRead(32, true) == 'RIFF')		||	// RIFF files (AVI, WAV, AMV and other)
 		(BitRead(24, true) == 'AMV')		||	// MTV files (.mtv)
+		(BitRead(32, true) == 'FORM')		||	// IFF files (ANIM)
 		(BitRead(32, true) == 0x47400010)	||	// ?
 		((BitRead(64, true) & 0x00000000FFFFFFFF) == 0x47400010)) { // MPEG-TS
 		return E_FAIL;
