@@ -87,7 +87,7 @@ public IUnknown {
 	STDMETHOD (Unlock) (RECT* pDirtyRect /*[in]*/) PURE;
 
 	STDMETHOD (AlphaBlt) (RECT* pSrc, RECT* pDst, SubPicDesc* pTarget = NULL /*[in]*/) PURE;
-	STDMETHOD (GetSourceAndDest) (RECT rcWindow /*[in]*/, RECT rcVideo /*[in]*/, BOOL bPositionRelative /*[in]*/, CPoint ShiftPos /*[in]*/, RECT* pRcSource /*[out]*/, RECT* pRcDest /*[out]*/, int xOffsetInPixels /*[in]*/) const PURE;
+	STDMETHOD (GetSourceAndDest) (RECT rcWindow /*[in]*/, RECT rcVideo /*[in]*/, BOOL bPositionRelative /*[in]*/, CPoint ShiftPos /*[in]*/, RECT* pRcSource /*[out]*/, RECT* pRcDest /*[out]*/, int xOffsetInPixels /*[in]*/, const BOOL bUseSpecialCase/*[in]*/) const PURE;
 	STDMETHOD (SetVirtualTextureSize) (const SIZE pSize, const POINT pTopLeft) PURE;
 
 	STDMETHOD_(REFERENCE_TIME, GetSegmentStart) () PURE;
