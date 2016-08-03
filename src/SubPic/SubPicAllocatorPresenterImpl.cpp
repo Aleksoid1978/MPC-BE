@@ -114,31 +114,42 @@ void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, cons
 	if (m_pSubPicProvider) {
 		CComPtr<ISubPic> pSubPic;
 		if (m_pSubPicQueue->LookupSubPic(m_rtNow, !IsRendering(), pSubPic)) {
-			CRect rcSubs(windowRect);
+			CRect rcWindow(windowRect);
+			CRect rcVideo(videoRect);
 
 			const CRenderersSettings& rs = GetRenderersSettings();
 			if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE) {
-				CRect rcTemp(windowRect);
-				rcTemp.right -= rcTemp.Width() / 2;
-				AlphaBlt(rcTemp, videoRect, pSubPic, NULL, xOffsetInPixels ? xOffsetInPixels : DefaultStereoOffsetInPixels);
-				rcSubs.left += rcSubs.Width() / 2;
+				CRect rcTempWindow(windowRect);
+				rcTempWindow.right -= rcTempWindow.Width() / 2;
+				CRect rcTempVideo(videoRect);
+				rcTempVideo.right -= rcTempVideo.Width() / 2;
+
+				AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, NULL, xOffsetInPixels ? xOffsetInPixels : DefaultStereoOffsetInPixels, FALSE);
+
+				rcWindow.left += rcWindow.Width() / 2;
+				rcVideo.left += rcVideo.Width() / 2;
 			} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM) {
-				CRect rcTemp(windowRect);
-				rcTemp.bottom -= rcTemp.Height() / 2;
-				AlphaBlt(rcTemp, videoRect, pSubPic, NULL, xOffsetInPixels ? xOffsetInPixels : DefaultStereoOffsetInPixels);
-				rcSubs.top += rcSubs.Height() / 2;
+				CRect rcTempWindow(windowRect);
+				rcTempWindow.bottom -= rcTempWindow.Height() / 2;
+				CRect rcTempVideo(videoRect);
+				rcTempVideo.bottom -= rcTempVideo.Height() / 2;
+
+				AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, NULL, xOffsetInPixels ? xOffsetInPixels : DefaultStereoOffsetInPixels, FALSE);
+
+				rcWindow.top += rcWindow.Height() / 2;
+				rcVideo.top += rcVideo.Height() / 2;
 			}
 
-			AlphaBlt(rcSubs, videoRect, pSubPic, NULL, xOffsetInPixels);
+			AlphaBlt(rcWindow, rcVideo, pSubPic, NULL, xOffsetInPixels, rs.iSubpicStereoMode == SUBPIC_STEREO_NONE);
 		}
 	}
 }
 
-void CSubPicAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget, int xOffsetInPixels)
+void CSubPicAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget, int xOffsetInPixels/* = 0*/, const BOOL bUseSpecialCase/* = TRUE*/)
 {
 	CRect rcSource, rcDest;
 	const CRenderersSettings& rs = GetRenderersSettings();
-	if (SUCCEEDED(pSubPic->GetSourceAndDest(windowRect, videoRect, rs.bSubpicPosRelative, rs.SubpicShiftPos, rcSource, rcDest, xOffsetInPixels))) {
+	if (SUCCEEDED(pSubPic->GetSourceAndDest(windowRect, videoRect, rs.bSubpicPosRelative, rs.SubpicShiftPos, rcSource, rcDest, xOffsetInPixels, bUseSpecialCase))) {
 		pSubPic->AlphaBlt(rcSource, rcDest, pTarget);
 	}
 }
