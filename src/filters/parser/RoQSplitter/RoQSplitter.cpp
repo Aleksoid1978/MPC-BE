@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -107,6 +107,11 @@ STDAPI DllUnregisterServer()
 CFilterApp theApp;
 
 #endif
+
+#pragma pack(push, 1)
+struct roq_chunk { WORD id; DWORD size; WORD arg; };
+struct roq_info { WORD w, h, unk1, unk2; };
+#pragma pack(pop)
 
 //
 // CRoQSplitterFilter
