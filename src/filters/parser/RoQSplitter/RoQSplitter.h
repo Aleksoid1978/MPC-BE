@@ -28,11 +28,6 @@
 #define RoQVideoDecoderName		L"MPC RoQ Video Decoder"
 #define RoQAudioDecoderName		L"MPC RoQ Audio Decoder"
 
-#pragma pack(push, 1)
-struct roq_chunk {WORD id; DWORD size; WORD arg;};
-struct roq_info {WORD w, h, unk1, unk2;};
-#pragma pack(pop)
-
 class __declspec(uuid("C73DF7C1-21F2-44C7-A430-D35FB9BB298F"))
 CRoQSplitterFilter : public CBaseSplitterFilter
 {
