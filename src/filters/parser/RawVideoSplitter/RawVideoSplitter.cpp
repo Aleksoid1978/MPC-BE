@@ -53,9 +53,10 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	CAtlList<CString> chkbytes;
-	chkbytes.AddTail(_T("0,9,,595556344D50454732"));	// YUV4MPEG2
-	chkbytes.AddTail(_T("0,3,,000001"));				// MPEG1/2, VC-1
-	chkbytes.AddTail(_T("0,4,,00000001"));				// H.264/AVC, H.265/HEVC
+	chkbytes.AddTail(_T("0,9,,595556344D50454732"));		// YUV4MPEG2
+	chkbytes.AddTail(_T("0,3,,000001"));					// MPEG1/2, VC-1
+	chkbytes.AddTail(_T("0,4,,00000001"));					// H.264/AVC, H.265/HEVC
+	chkbytes.AddTail(_T("0,4,,434D5331,20,4,,50445652"));	// 'CMS1................PDVR'
 
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_NULL, chkbytes, NULL);
 
@@ -337,6 +338,30 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		pName = L"YUV4MPEG2 Video Output";
 	}
 
+	if (m_RAWType == RAW_NONE && GETDWORD(buf) == FCC('CMS1') && GETDWORD(buf+20) == FCC('PDVR')) {
+		m_pFile->Seek(24);
+		DWORD value;
+		if (S_OK != m_pFile->ByteRead((BYTE*)&value, 4)) {
+			return E_FAIL;
+		}
+		m_pFile->Skip(value);
+
+		// simple search for the beginning of H.264 packet
+		// TODO: to alter in accordance with the specification
+		__int64 pos = m_pFile->GetPos();
+		while (pos < 2048 && S_OK == m_pFile->ByteRead((BYTE*)&value, 4)) {
+			if (value == 0x01000000) {
+				m_pFile->Seek(pos);
+				if (S_OK != m_pFile->ByteRead(buf, 255)) {
+					return E_FAIL;
+				}
+				m_startpos = pos;
+				break;
+			}
+			m_pFile->Seek(++pos);
+		}
+	}
+
 	if (m_RAWType == RAW_NONE && memcmp(buf, SYNC_MPEG1, sizeof(SYNC_MPEG1)) == 0) {
 		m_pFile->Seek(0);
 		CBaseSplitterFileEx::seqhdr h;
@@ -409,7 +434,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	if (m_RAWType == RAW_NONE && memcmp(buf, SYNC_H264, sizeof(SYNC_H264)) == 0) {
-		m_pFile->Seek(0);
+		m_pFile->Seek(m_startpos);
 
 		CBaseSplitterFileEx::avchdr h;
 		if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt)) {
