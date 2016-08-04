@@ -57,7 +57,7 @@ STDAPI DllRegisterServer()
 	chkbytes.AddTail(_T("0,3,,000001"));					// MPEG1/2, VC-1
 	chkbytes.AddTail(_T("0,4,,00000001"));					// H.264/AVC, H.265/HEVC
 	chkbytes.AddTail(_T("0,4,,434D5331,20,4,,50445652"));	// 'CMS1................PDVR'
-	chkbytes.AddTail(_T("12,4,,50616778,20,4,,50616778"));	// '............Pagx....Pagx'
+	chkbytes.AddTail(_T("0,4,,FFFFFF88"));
 
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_NULL, chkbytes, NULL);
 
@@ -341,18 +341,29 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	if (m_RAWType == RAW_NONE) {
 		// chinese DVRs with H.264 RAW
+		int maxpos = 0;
+		DWORD value;
+
+		// Polyvision PVDR ?
 		if (GETDWORD(buf) == FCC('CMS1') && GETDWORD(buf + 20) == FCC('PDVR')) {
 			m_pFile->Seek(24);
-			DWORD value;
 			if (S_OK != m_pFile->ByteRead((BYTE*)&value, 4)) {
 				return E_FAIL;
 			}
 			m_pFile->Skip(value);
+			maxpos = 1536;
+		}
+		// LTV-DVR ?
+		else if (GETDWORD(buf) == 0x88FFFFFF && GETDWORD(buf + 12) == GETDWORD(buf + 20)) {
+			m_pFile->Seek(28);
+			maxpos = 512;
+		}
 
+		if (maxpos) {
 			// simple search for the beginning of H.264 packet
 			// TODO: to alter in accordance with the specification
 			__int64 pos = m_pFile->GetPos();
-			while (pos < 2048 && S_OK == m_pFile->ByteRead((BYTE*)&value, 4)) {
+			while (pos < maxpos && S_OK == m_pFile->ByteRead((BYTE*)&value, 4)) {
 				if (value == 0x01000000) {
 					m_pFile->Seek(pos);
 					if (S_OK != m_pFile->ByteRead(buf, 255)) {
@@ -363,13 +374,6 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 				m_pFile->Seek(++pos);
 			}
-		}
-		else if (GETDWORD(buf + 12) == FCC('Pagx') && GETDWORD(buf + 20) == FCC('Pagx')) {
-			m_pFile->Seek(28);
-			if (S_OK != m_pFile->ByteRead(buf, 255)) {
-				return E_FAIL;
-			}
-			m_startpos = 28;
 		}
 	}
 
