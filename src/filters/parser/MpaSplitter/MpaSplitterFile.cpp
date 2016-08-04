@@ -164,9 +164,11 @@ HRESULT CMpaSplitterFile::Init()
 	__int64 startpos = 0;
 
 	const __int64 limit = IsRandomAccess() ? MEGABYTE : 64 * KILOBYTE;
-	const __int64 endDataPos = min(endpos, limit + m_startpos);
+	const __int64 endDataPos = min(endpos / 2, limit + m_startpos);
 	const __int64 size = endDataPos - m_startpos;
 	BYTE* buffer = DNew BYTE[size];
+
+	int valid_cnt = 0;
 	if (S_OK == ByteRead(buffer, size)) {
 		BYTE* start     = buffer;
 		const BYTE* end = start + size;
@@ -187,13 +189,13 @@ HRESULT CMpaSplitterFile::Init()
 				while (start2 + MPA_HEADER_SIZE <= end) {
 					frame_size = ParseMPAHeader(start2);
 					if (frame_size == 0) {
-						if (end - start2 > size / 2) {
-							m_mode = mode::none;
-						}
+						valid_cnt = 0;
+						m_mode = mode::none;
 						start++;
 						break;
 					}
 
+					valid_cnt++;
 					m_mode = mode::mpa;
 					if (start2 + frame_size >= end) {
 						break;
@@ -204,6 +206,9 @@ HRESULT CMpaSplitterFile::Init()
 			} else {
 				break;
 			}
+		}
+		if (valid_cnt < 3) {
+			m_mode = mode::none;
 		}
 
 		if (m_mode == mode::none) {
@@ -226,13 +231,13 @@ HRESULT CMpaSplitterFile::Init()
 					while (start2 + ADTS_HEADER_SIZE <= end) {
 						frame_size = ParseADTSAACHeader(start2);
 						if (frame_size == 0) {
-							if (end - start2 > size / 2) {
-								m_mode = mode::none;
-							}
+							valid_cnt = 0;
+							m_mode = mode::none;
 							start++;
 							break;
 						}
 
+						valid_cnt++;
 						m_mode = mode::mp4a;
 						if (start2 + frame_size >= end) {
 							break;
@@ -243,6 +248,9 @@ HRESULT CMpaSplitterFile::Init()
 				} else {
 					break;
 				}
+			}
+			if (valid_cnt < 3) {
+				m_mode = mode::none;
 			}
 		}
 	}
