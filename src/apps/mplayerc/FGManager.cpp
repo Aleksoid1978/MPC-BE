@@ -2082,6 +2082,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_chkbytes.AddTail(_T("0,3,,000001"));					// MPEG1/2, VC-1
 		pFGF->m_chkbytes.AddTail(_T("0,4,,00000001"));					// H.264/AVC, H.265/HEVC
 		pFGF->m_chkbytes.AddTail(_T("0,4,,434D5331,20,4,,50445652"));	// 'CMS1................PDVR'
+		pFGF->m_chkbytes.AddTail(_T("12,4,,50616778,20,4,,50616778"));	// '............Pagx....Pagx'
 		m_source.AddTail(pFGF);
 	}
 
