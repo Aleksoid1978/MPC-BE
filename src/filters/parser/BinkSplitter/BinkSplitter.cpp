@@ -86,21 +86,6 @@ CBinkSplitterFilter::CBinkSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 {
 }
 
-STDMETHODIMP CBinkSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
-{
-	CheckPointer(pInfo, E_POINTER);
-	ValidateReadWritePtr(pInfo, sizeof(FILTER_INFO));
-
-	wcscpy_s(pInfo->achName, BinkSplitterName);
-
-	pInfo->pGraph = m_pGraph;
-	if (m_pGraph) {
-		m_pGraph->AddRef();
-	}
-
-	return S_OK;
-}
-
 #define SEEK(n) m_pos = n
 #define SKIP(n) m_pos += n
 #define READ(a) m_pAsyncReader->SyncRead(m_pos, sizeof(a), (BYTE*)&a); m_pos += sizeof(a)
@@ -361,6 +346,71 @@ bool CBinkSplitterFilter::DemuxLoop()
 	}
 
 	return true;
+}
+
+// CBaseFilter
+
+STDMETHODIMP CBinkSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
+{
+	CheckPointer(pInfo, E_POINTER);
+	ValidateReadWritePtr(pInfo, sizeof(FILTER_INFO));
+
+	wcscpy_s(pInfo->achName, BinkSplitterName);
+
+	pInfo->pGraph = m_pGraph;
+	if (m_pGraph) {
+		m_pGraph->AddRef();
+	}
+
+	return S_OK;
+}
+
+// IKeyFrameInfo
+
+STDMETHODIMP CBinkSplitterFilter::GetKeyFrameCount(UINT& nKFs)
+{
+	nKFs = 0;
+
+	if (m_seektable.empty()) {
+		return E_UNEXPECTED;
+	}
+
+	UINT count = 0;
+	for (auto frame : m_seektable) {
+		if (frame.keyframe) {
+			count++;
+		}
+	}
+
+	nKFs = count;
+
+	return (m_seektable.size() == count) ? S_FALSE : S_OK;
+}
+
+STDMETHODIMP CBinkSplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIME* pKFs, UINT& nKFs)
+{
+	CheckPointer(pFormat, E_POINTER);
+	CheckPointer(pKFs, E_POINTER);
+
+	if (m_seektable.empty()) {
+		return E_UNEXPECTED;
+	}
+	if (*pFormat != TIME_FORMAT_MEDIA_TIME && *pFormat != TIME_FORMAT_FRAME) {
+		return E_INVALIDARG;
+	}
+
+	bool bRefTime = (*pFormat == TIME_FORMAT_MEDIA_TIME);
+
+	UINT count = 0;
+	for (size_t i = 0; i < m_seektable.size() && count < nKFs; i++) {
+		if (m_seektable[i].keyframe) {
+			pKFs[count++] = bRefTime ? (10000000i64 * i * m_fps.den / m_fps.num) : i;
+		}
+	}
+
+	nKFs = count;
+
+	return S_OK;
 }
 
 //
