@@ -1954,6 +1954,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.AddTail(pFGF);
 	}
 
+	if (src[SRC_BINK] || IsPreview) {
+		pFGF = DNew CFGFilterInternal<CBinkSourceFilter>(BinkSourceName);
+		pFGF->m_chkbytes.AddTail(_T("0,3,,42494B"));
+		m_source.AddTail(pFGF);
+	}
+
 	if (src[SRC_FLIC] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CFLICSource>(FlicSourceName);
 		pFGF->m_chkbytes.AddTail(_T("4,2,,11AF"));
@@ -2183,6 +2189,14 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF = DNew CFGFilterInternal<CFLVSplitterFilter>(LowMerit(FlvSplitterName), MERIT64_DO_USE);
 	}
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_FLV);
+	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
+	m_transform.AddTail(pFGF);
+
+	if (src[SRC_BINK] || IsPreview) {
+		pFGF = DNew CFGFilterInternal<CBinkSplitterFilter>(BinkSplitterName, MERIT64_ABOVE_DSHOW);
+	} else {
+		pFGF = DNew CFGFilterInternal<CBinkSplitterFilter>(LowMerit(BinkSplitterName), MERIT64_DO_USE);
+	}
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 	m_transform.AddTail(pFGF);
 

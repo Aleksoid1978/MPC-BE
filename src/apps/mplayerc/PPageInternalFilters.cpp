@@ -31,6 +31,7 @@ static filter_t s_filters[] = {
 	{_T("AMR"),						SOURCE_FILTER, SRC_AMR,				0},
 	{_T("AVI"),						SOURCE_FILTER, SRC_AVI,				IDS_SRC_AVI},
 	{_T("APE"),						SOURCE_FILTER, SRC_APE,				0},
+	{_T("Bink Video"),				SOURCE_FILTER, SRC_BINK,			0 },
 	{_T("CDDA (Audio CD)"),			SOURCE_FILTER, SRC_CDDA,			IDS_SRC_CDDA},
 	{_T("CDXA (VCD/SVCD/XCD)"),		SOURCE_FILTER, SRC_CDXA,			0},
 	{_T("DirectShow Media"),		SOURCE_FILTER, SRC_DSM,				0},
