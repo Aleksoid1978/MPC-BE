@@ -53,7 +53,14 @@ protected:
 public:
 	CBinkSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
 
+	// CBaseFilter
+
 	STDMETHODIMP_(HRESULT) QueryFilterInfo(FILTER_INFO* pInfo);
+
+	// IKeyFrameInfo
+
+	STDMETHODIMP GetKeyFrameCount(UINT& nKFs);
+	STDMETHODIMP GetKeyFrames(const GUID* pFormat, REFERENCE_TIME* pKFs, UINT& nKFs);
 };
 
 class __declspec(uuid("1BB4BD04-D9D2-4136-A3B6-75B1A10E11BF"))
