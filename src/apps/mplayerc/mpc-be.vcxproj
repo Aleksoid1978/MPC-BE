@@ -573,6 +573,9 @@
     <ProjectReference Include="..\..\filters\parser\BaseSplitter\BaseSplitter.vcxproj">
       <Project>{37768b3f-89bc-4c16-b2a8-767c5da84c3f}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\filters\parser\BinkSplitter\BinkSplitter.vcxproj">
+      <Project>{2BC02329-D46C-4EC5-B5C7-30E21CD41F78}</Project>
+    </ProjectReference>	
     <ProjectReference Include="..\..\filters\parser\DSMSplitter\DSMSplitter.vcxproj">
       <Project>{1e91f58c-0bae-4021-8087-d1864d8ec066}</Project>
     </ProjectReference>

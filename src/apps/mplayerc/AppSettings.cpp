@@ -65,6 +65,7 @@ CAppSettings::CAppSettings()
 	SrcFiltersKeys[SRC_AMR]					= _T("src_amr");
 	SrcFiltersKeys[SRC_AVI]					= _T("src_avi");
 	SrcFiltersKeys[SRC_APE]					= _T("src_ape");
+	SrcFiltersKeys[SRC_BINK]				= _T("src_bink");
 	SrcFiltersKeys[SRC_CDDA]				= _T("src_cdda");
 	SrcFiltersKeys[SRC_CDXA]				= _T("src_cdxa");
 	SrcFiltersKeys[SRC_DSD]					= _T("src_dsd");
