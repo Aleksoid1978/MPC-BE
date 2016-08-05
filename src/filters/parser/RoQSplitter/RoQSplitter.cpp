@@ -90,7 +90,7 @@ int g_cTemplates = _countof(g_Templates);
 
 STDAPI DllRegisterServer()
 {
-	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_RoQ, _T("0,8,,8410FFFFFFFF1E00"), _T(".roq"), NULL);
+	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_RoQ, _T("0,8,,8410FFFFFFFF1E00"));
 
 	return AMovieDllRegisterServer2(TRUE);
 }
@@ -145,9 +145,11 @@ HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_pAsyncReader = pAsyncReader;
 
-	UINT64 hdr = 0, hdrchk = 0x001effffffff1084;
+	UINT64 hdr = 0;
 	m_pAsyncReader->SyncRead(0, 8, (BYTE*)&hdr);
-	if(hdr != hdrchk) return E_FAIL;
+	if (hdr != 0x001effffffff1084) {
+		return E_FAIL;
+	}
 
 	//
 
