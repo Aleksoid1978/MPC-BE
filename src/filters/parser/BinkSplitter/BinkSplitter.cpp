@@ -185,28 +185,28 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		for (unsigned i = 0; i < num_audio_tracks; i++) {
 			READ(audiotracks[i].sample_rate);
 			READ(audiotracks[i].audio_flags);
+
+			mts.RemoveAll();
+			mt.InitMediaType();
+			mt.majortype = MEDIATYPE_Audio;
+			mt.subtype = audiotracks[0].audio_flags & BINK_AUD_USEDCT ? MEDIASUBTYPE_BINKA_DCT : MEDIASUBTYPE_BINKA_RDFT;
+			mt.formattype = FORMAT_WaveFormatEx;
+			WAVEFORMATEX wfe;
+			memset(&wfe, 0, sizeof(wfe));
+			wfe.wFormatTag = 0x4142;
+			wfe.nChannels = audiotracks[0].audio_flags & BINK_AUD_STEREO ? 2 : 1;
+			wfe.nSamplesPerSec = audiotracks[0].sample_rate;
+			wfe.wBitsPerSample = 16;
+			mt.SetFormat((BYTE*)&wfe, sizeof(wfe));
+			mt.lSampleSize = 1;
+			mts.Add(mt);
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
+			AddOutputPin(i + 1, pPinOut);
 		}
 
 		for (unsigned i = 0; i < num_audio_tracks; i++) {
 			READ(audiotracks[i].track_ID);
 		}
-
-		mts.RemoveAll();
-		mt.InitMediaType();
-		mt.majortype = MEDIATYPE_Audio;
-		mt.subtype = audiotracks[0].audio_flags & BINK_AUD_USEDCT ? MEDIASUBTYPE_BINKA_DCT : MEDIASUBTYPE_BINKA_RDFT;
-		mt.formattype = FORMAT_WaveFormatEx;
-		WAVEFORMATEX wfe;
-		memset(&wfe, 0, sizeof(wfe));
-		wfe.wFormatTag = 0x4142;
-		wfe.nChannels = audiotracks[0].audio_flags & BINK_AUD_STEREO ? 2 : 1;
-		wfe.nSamplesPerSec = audiotracks[0].sample_rate;
-		wfe.wBitsPerSample = 16;
-		mt.SetFormat((BYTE*)&wfe, sizeof(wfe));
-		mt.lSampleSize = 1;
-		mts.Add(mt);
-		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
-		AddOutputPin(1, pPinOut);
 	}
 
 	/* frame index table */
@@ -302,22 +302,17 @@ bool CBinkSplitterFilter::DemuxLoop()
 				UINT32 packet_size = 0;
 				READ(packet_size);
 				if (packet_size >= 4) {
-					if (i == 0) {
-						CAutoPtr<CPacket> pa(DNew CPacket());
-						if (pa->SetCount(packet_size)) {
-							pa->TrackNumber = 1;
-							pa->bSyncPoint = TRUE;
-							pa->rtStart = rtstart;
-							pa->rtStop = rtstop;
+					CAutoPtr<CPacket> pa(DNew CPacket());
+					if (pa->SetCount(packet_size)) {
+						pa->TrackNumber = i + 1;
+						pa->bSyncPoint = TRUE;
+						pa->rtStart = rtstart;
+						pa->rtStop = rtstop;
 
-							m_pAsyncReader->SyncRead(m_pos, packet_size, pa->GetData());
-							m_pos += packet_size;
+						m_pAsyncReader->SyncRead(m_pos, packet_size, pa->GetData());
+						m_pos += packet_size;
 
-							hr = DeliverPacket(pa);
-						}
-					}
-					else {
-						SKIP(packet_size);
+						hr = DeliverPacket(pa);
 					}
 				}
 				else {
