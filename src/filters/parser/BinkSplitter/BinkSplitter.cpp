@@ -120,12 +120,12 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	file_size += 8;
 	READ(num_frames);
 	if (num_frames > 1000000) {
-		TRACE("CBinkSplitter: invalid header: more than 1000000 frames\n");
+		DLog("CBinkSplitter: invalid header: more than 1000000 frames");
 		return E_FAIL;
 	}
 	READ(larges_framesize);
 	if (larges_framesize > file_size) {
-		TRACE("CBinkSplitter: invalid header: largest frame size greater than file size\n");
+		DLog("CBinkSplitter: invalid header: largest frame size greater than file size");
 		return E_FAIL;
 	}
 	SKIP(4);
@@ -134,13 +134,13 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	READ(fps_num);
 	READ(fps_den);
 	if (fps_num == 0 || fps_den == 0) {
-		TRACE("CBinkSplitter: invalid header: invalid fps (%u / %u)\n", fps_num, fps_den);
+		DLog("CBinkSplitter: invalid header: invalid fps (%u / %u)\n", fps_num, fps_den);
 		return E_FAIL;
 	}
 	READ(video_flags);
 	READ(num_audio_tracks);
 	if (num_audio_tracks > 256) {
-		TRACE("CBinkSplitter: invalid header: more than 256 audio tracks (%u32)\n", num_audio_tracks);
+		DLog("CBinkSplitter: invalid header: more than 256 audio tracks (%u32)\n", num_audio_tracks);
 		return E_FAIL;
 	}
 
@@ -231,7 +231,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		int size = next_pos - pos;
 		if (size < 0) {
-			TRACE("CBinkSplitter: invalid frame index table\n");
+			DLog("CBinkSplitter: invalid frame index table");
 			return E_FAIL;
 		}
 
@@ -246,7 +246,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (m_seektable.size()) {
 		SEEK(m_seektable[0].pos);
 	} else {
-		TRACE("CBinkSplitter: files without index not supported!\n");
+		DLog("CBinkSplitter: files without index not supported!");
 		return E_FAIL;
 	}
 
