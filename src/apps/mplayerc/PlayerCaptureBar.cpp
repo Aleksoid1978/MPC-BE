@@ -472,11 +472,11 @@ static void InitCodecList(CAtlArray<Codec>& codecs, CComboBox& box, const GUID& 
 
 		c.pMoniker = pMoniker;
 		/*
-				CComPtr<IBaseFilter> pBF;
-				if (FAILED(pMoniker->BindToObject(0, 0, IID_IBaseFilter, (void**)&pBF)) || !pBF)
-					continue;
+		CComPtr<IBaseFilter> pBF;
+		if (FAILED(pMoniker->BindToObject(0, 0, IID_IBaseFilter, (void**)&pBF)) || !pBF)
+			continue;
 
-				c.pBF = pBF;
+		c.pBF = pBF;
 		*/
 		LPOLESTR strName = NULL;
 		if (FAILED(pMoniker->GetDisplayName(NULL, NULL, &strName))) {
@@ -501,7 +501,8 @@ static void InitCodecList(CAtlArray<Codec>& codecs, CComboBox& box, const GUID& 
 			c.FriendlyName = L"(DS)";
 		} else if (str.Find(L"@device:cm:") == 0) {
 			if (cat == CLSID_VideoCompressorCategory) {
-				c.FriendlyName = L"(VfW)"; // for some unknown reason, the VfW codecs never added
+				// for some unknown reason, the VfW codecs never added in x64 mode
+				c.FriendlyName = L"(VfW)";
 			} else if (cat == CLSID_AudioCompressorCategory) {
 				c.FriendlyName = L"(ACM)";
 			}
