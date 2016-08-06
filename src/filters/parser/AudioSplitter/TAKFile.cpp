@@ -425,7 +425,7 @@ REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 		}
 	}
 
-	TRACE(L"CTAKFile::Seek() : Seek to frame number %d (%d)\n", CurFrmNum, FrameNumber);
+	DLog("CTAKFile::Seek() : Seek to frame number %d (%d)", CurFrmNum, FrameNumber);
 
 	m_pFile->Seek(CurFrmPos);
 

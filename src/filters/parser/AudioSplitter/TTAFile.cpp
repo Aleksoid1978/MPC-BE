@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2015 see Authors.txt
+ * (C) 2014-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -98,7 +98,7 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 	m_currentframe		= 0;
 
 	if(m_totalframes >= UINT_MAX/sizeof(uint32_t) || m_totalframes <= 0) {
-		TRACE(L"CTTAile::Open() : totalframes %d invalid\n", m_totalframes);
+		DLog("CTTAile::Open() : totalframes %d invalid", m_totalframes);
 		return E_FAIL;
 	}
 

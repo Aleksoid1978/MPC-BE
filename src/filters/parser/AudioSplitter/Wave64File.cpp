@@ -70,7 +70,7 @@ HRESULT CWave64File::Open(CBaseSplitterFile* pFile)
 
 	while (m_pFile->ByteRead(Chunk64.data, sizeof(Chunk64)) == S_OK && m_pFile->GetPos() < end) {
 		if (Chunk64.size < sizeof(Chunk64)) {
-			TRACE(L"CWave64File::Open() : bad chunk size\n");
+			DLog("CWave64File::Open() : bad chunk size");
 			return E_FAIL;
 		}
 
@@ -79,14 +79,14 @@ HRESULT CWave64File::Open(CBaseSplitterFile* pFile)
 
 		if (memcmp(Chunk64.guid, w64_guid_fmt, 16) == 0) {
 			if (m_fmtdata || Chunk64.size < sizeof(PCMWAVEFORMAT) || Chunk64.size > 65536) {
-				TRACE(L"CWave64File::Open() : bad format\n");
+				DLog("CWave64File::Open() : bad format");
 				return E_FAIL;
 			}
 			m_fmtsize = max(Chunk64.size, sizeof(WAVEFORMATEX)); // PCMWAVEFORMAT to WAVEFORMATEX
 			m_fmtdata = DNew BYTE[m_fmtsize];
 			memset(m_fmtdata, 0, m_fmtsize);
 			if (m_pFile->ByteRead(m_fmtdata, Chunk64.size) != S_OK) {
-				TRACE(L"CWave64File::Open() : format can not be read.\n");
+				DLog("CWave64File::Open() : format can not be read.");
 				return E_FAIL;
 			}
 		}
@@ -101,7 +101,7 @@ HRESULT CWave64File::Open(CBaseSplitterFile* pFile)
 				&& memcmp(Chunk64.guid, w64_guid_bext, 16) != 0
 				&& memcmp(Chunk64.guid, w64_guid_marker, 16) != 0
 				&& memcmp(Chunk64.guid, w64_guid_summarylist, 16) != 0) {
-			TRACE(L"CWave64File::Open() : bad or unknown chunk guid.\n");
+			DLog("CWave64File::Open() : bad or unknown chunk guid.");
 			return E_FAIL;
 		}
 
