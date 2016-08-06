@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2015 see Authors.txt
+ * (C) 2014-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -87,7 +87,7 @@ bool CDFFFile::parse_dsd_prop(__int64 eof)
 			m_layout = 0;
 
 			if (m_channels > 6) {
-				DbgLog((LOG_TRACE, 3, L"CDFFFile::parse_dsd_prop() - invalid channels count : %d", m_channels));
+				DLog("CDFFFile::parse_dsd_prop() - invalid channels count : %d", m_channels);
 				break;
 			}
 
@@ -200,9 +200,9 @@ bool CDFFFile::parse_dsd_diin(__int64 eof)
 	return true;
 }
 
-#define ABORT													\
-	DbgLog((LOG_TRACE, 3, L"CDFFFile::Open() : broken file!"));	\
-	return E_ABORT;												\
+#define ABORT									\
+	DLog("CDFFFile::Open() : broken file!");	\
+	return E_ABORT;								\
 
 HRESULT CDFFFile::Open(CBaseSplitterFile* pFile)
 {
@@ -231,25 +231,25 @@ HRESULT CDFFFile::Open(CBaseSplitterFile* pFile)
 	while (ReadDFFChunk(Chunk) && m_pFile->GetPos() < end) {
 		__int64 pos = m_pFile->GetPos();
 
-		DbgLog((LOG_TRACE, 3, L"CDFFFile::Open() : found '%c%c%c%c' chunk.",
+		DLog("CDFFFile::Open() : found '%c%c%c%c' chunk.",
 				TCHAR((Chunk.id>>0)&0xff),
 				TCHAR((Chunk.id>>8)&0xff),
 				TCHAR((Chunk.id>>16)&0xff),
-				TCHAR((Chunk.id>>24)&0xff)));
+				TCHAR((Chunk.id>>24)&0xff));
 
 		switch (Chunk.id) {
 		case FCC('FVER'):
 			if (Chunk.size < 4 || m_pFile->ByteRead((BYTE*)&version, 4) != S_OK) {
 				ABORT;
 			}
-			DbgLog((LOG_TRACE, 3, L"CDFFFile::Open() : DSIFF v%d.%d.%d.%d", version >> 24, (version >> 16) & 0xFF, (version >> 8) & 0xFF, version & 0xFF));
+			DLog("CDFFFile::Open() : DSIFF v%d.%d.%d.%d", version >> 24, (version >> 16) & 0xFF, (version >> 8) & 0xFF, version & 0xFF);
 			break;
 		case FCC('PROP'):
 			if (Chunk.size < 4 || m_pFile->ByteRead((BYTE*)&id, 4) != S_OK) {
 				ABORT;
 			}
 			if (id != FCC('SND ')) {
-				DbgLog((LOG_TRACE, 3, L"CDFFFile::Open() : unknown property type!"));
+				DLog("CDFFFile::Open() : unknown property type!");
 				break;
 			}
 			if (!parse_dsd_prop(pos + Chunk.size)) {
