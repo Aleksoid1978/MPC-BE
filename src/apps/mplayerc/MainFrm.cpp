@@ -714,7 +714,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// create a Main View Window
 	if (!m_wndView.Create(NULL, NULL, AFX_WS_DEFAULT_VIEW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
 						  CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST)) {
-		TRACE(_T("Failed to create Main View Window\n"));
+		DLog("Failed to create Main View Window");
 		return -1;
 	}
 
@@ -728,7 +728,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// Create Preview Window
 	if (!m_wndPreView.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 160, 109), this, 0)) {
-		TRACE(_T("Failed to create Preview Window\n"));
+		DLog("Failed to create Preview Window");
 		m_wndView.DestroyWindow();
 		return -1;
 	} else {
@@ -751,7 +751,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		bResult = m_wndSeekBar.Create(this);
 	}
 	if (!bResult) {
-		TRACE0("Failed to create all control bars\n");
+		DLog("Failed to create all control bars");
 		return -1;      // fail to create
 	}
 
@@ -939,7 +939,7 @@ void CMainFrame::OnDestroy()
 		CAMMsgEvent e;
 		m_pGraphThread->PostThreadMessage(CGraphThread::TM_EXIT, 0, (LPARAM)&e);
 		if (!e.Wait(5000)) {
-			TRACE(_T("ERROR: Must call TerminateThread() on CMainFrame::m_pGraphThread->m_hThread\n"));
+			DLog("ERROR: Must call TerminateThread() on CMainFrame::m_pGraphThread->m_hThread");
 			TerminateThread(m_pGraphThread->m_hThread, 0xDEAD);
 		}
 	}
@@ -2123,7 +2123,7 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	// Only stop screensaver if video playing; allow for audio only
 	if ((GetMediaState() == State_Running && !m_bAudioOnly) && (((nID & 0xFFF0) == SC_SCREENSAVE) || ((nID & 0xFFF0) == SC_MONITORPOWER))) {
-		TRACE(_T("SC_SCREENSAVE, nID = %d, lParam = %d\n"), nID, lParam);
+		DLog("SC_SCREENSAVE, nID = %d, lParam = %d", nID, lParam);
 		return;
 	} else if ((nID & 0xFFF0) == SC_MINIMIZE && m_fTrayIcon) {
 		if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {
@@ -12095,36 +12095,36 @@ CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 		if (!pAudCapTmp) {
 			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Interleaved, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCCap))
 					&& FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCCap))) {
-				TRACE(_T("Warning: No IAMStreamConfig interface for vidcap capture"));
+				DLog("Warning: No IAMStreamConfig interface for vidcap capture");
 			}
 
 			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Interleaved, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCPrev))
 					&& FAILED(pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Video, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCPrev))) {
-				TRACE(_T("Warning: No IAMStreamConfig interface for vidcap capture"));
+				DLog("Warning: No IAMStreamConfig interface for vidcap capture");
 			}
 
 			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio, pVidCap, IID_IAMStreamConfig, (void **)&pAMASC))
 					&& FAILED(pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Audio, pVidCap, IID_IAMStreamConfig, (void **)&pAMASC))) {
-				TRACE(_T("Warning: No IAMStreamConfig interface for vidcap"));
+				DLog("Warning: No IAMStreamConfig interface for vidcap");
 			} else {
 				pAudCap = pVidCap;
 			}
 		} else {
 			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCCap))) {
-				TRACE(_T("Warning: No IAMStreamConfig interface for vidcap capture"));
+				DLog("Warning: No IAMStreamConfig interface for vidcap capture");
 			}
 
 			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCPrev))) {
-				TRACE(_T("Warning: No IAMStreamConfig interface for vidcap capture"));
+				DLog("Warning: No IAMStreamConfig interface for vidcap capture");
 			}
 		}
 
 		if (FAILED(pCGB->FindInterface(&LOOK_UPSTREAM_ONLY, NULL, pVidCap, IID_IAMCrossbar, (void**)&pAMXBar))) {
-			TRACE(_T("Warning: No IAMCrossbar interface was found\n"));
+			DLog("Warning: No IAMCrossbar interface was found");
 		}
 
 		if (FAILED(pCGB->FindInterface(&LOOK_UPSTREAM_ONLY, NULL, pVidCap, IID_IAMTVTuner, (void**)&pAMTuner))) {
-			TRACE(_T("Warning: No IAMTVTuner interface was found\n"));
+			DLog("Warning: No IAMTVTuner interface was found");
 		}
 
 		if (pAMTuner) { // load saved channel
@@ -12157,7 +12157,7 @@ CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 
 		if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio, pAudCap, IID_IAMStreamConfig, (void **)&pAMASC))
 				&& FAILED(pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Audio, pAudCap, IID_IAMStreamConfig, (void **)&pAMASC))) {
-			TRACE(_T("Warning: No IAMStreamConfig interface for vidcap"));
+			DLog("Warning: No IAMStreamConfig interface for vidcap");
 		}
 		/*
 		CInterfaceArray<IAMAudioInputMixer> pAMAIM;
@@ -13299,7 +13299,7 @@ void __stdcall MadVRExclusiveModeCallback(LPVOID context, int event)
 		case ExclusiveModeWasJustLeft			: _event = _T("ExclusiveModeWasJustLeft"); break;
 		default									: _event = _T("Unknown event"); break;
 	}
-	TRACE(_T("MadVRExclusiveModeCallback() : event = %ws\n"), _event);
+	DLog(L"MadVRExclusiveModeCallback() : event = %ws", _event);
 
 	if (event == ExclusiveModeIsAboutToBeEntered) {
 		((CMainFrame*)context)->IsMadVRExclusiveMode = true;
@@ -16131,7 +16131,7 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 			SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 		}
 	} else if (GetPlaybackMode() == PM_CAPTURE) {
-		//TRACE(_T("Warning (CMainFrame::SeekTo): Trying to seek in capture mode"));
+		//DLog("Warning (CMainFrame::SeekTo): Trying to seek in capture mode");
 	}
 	m_bEndOfStream = false;
 
@@ -16244,7 +16244,7 @@ void CMainFrame::CleanGraph()
 
 		int nIn, nOut, nInC, nOutC;
 		if (CountPins(pBF, nIn, nOut, nInC, nOutC) > 0 && (nInC + nOutC) == 0) {
-			TRACE(L"Removing from graph : %s\n", GetFilterName(pBF));
+			DLog(L"Removing from graph : %s", GetFilterName(pBF));
 
 			m_pGB->RemoveFilter(pBF);
 			pEF->Reset();
@@ -16821,7 +16821,7 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 			BeginWaitCursor();
 			if (WaitForSingleObject(m_hGraphThreadEventOpen, 5000) == WAIT_TIMEOUT) {
 				MessageBeep(MB_ICONEXCLAMATION);
-				TRACE(_T("CRITICAL ERROR: !!! Must kill opener thread !!!\n"));
+				DLog("CRITICAL ERROR: !!! Must kill opener thread !!!");
 				TerminateThread(m_pGraphThread->m_hThread, 0xDEAD);
 
 				m_pGraphThread = (CGraphThread*)AfxBeginThread(RUNTIME_CLASS(CGraphThread));
@@ -17997,7 +17997,7 @@ UINT CMainFrame::OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData)
 
 	switch (nPowerEvent) {
 		case PBT_APMSUSPEND: // System is suspending operation.
-			TRACE("OnPowerBroadcast() - suspending\n"); // For user tracking
+			DLog("OnPowerBroadcast() - suspending"); // For user tracking
 
 			bWasPausedBeforeSuspention = FALSE; // Reset value
 
@@ -18008,7 +18008,7 @@ UINT CMainFrame::OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData)
 			}
 			break;
 		case PBT_APMRESUMEAUTOMATIC: // Operation is resuming automatically from a low-power state. This message is sent every time the system resumes.
-			TRACE("OnPowerBroadcast() - resuming\n"); // For user tracking
+			DLog("OnPowerBroadcast() - resuming"); // For user tracking
 
 			// Resume if we paused before suspension.
 			if (bWasPausedBeforeSuspention) {
@@ -18026,7 +18026,7 @@ void CMainFrame::OnSessionChange(UINT nSessionState, UINT nId)
 
 	switch (nSessionState) {
 		case WTS_SESSION_LOCK:
-			TRACE(_T("OnSessionChange() - Lock session\n"));
+			DLog("OnSessionChange() - Lock session");
 
 			bWasPausedBeforeSessionChange = FALSE;
 			if (GetMediaState() == State_Running && !m_bAudioOnly) {
@@ -18035,7 +18035,7 @@ void CMainFrame::OnSessionChange(UINT nSessionState, UINT nId)
 			}
 			break;
 		case WTS_SESSION_UNLOCK:
-			TRACE(_T("OnSessionChange() - UnLock session\n"));
+			DLog("OnSessionChange() - UnLock session");
 
 			if (bWasPausedBeforeSessionChange) {
 				SendMessage( WM_COMMAND, ID_PLAY_PLAY );

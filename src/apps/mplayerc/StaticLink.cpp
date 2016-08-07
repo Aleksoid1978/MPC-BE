@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -89,7 +89,7 @@ void CStaticLink::OnLButtonDown(UINT nFlags, CPoint point)
 		Invalidate();
 	} else {
 		MessageBeep(0);
-		TRACE(_T("*** WARNING: CStaticLink: unable to navigate link %s\n"),
+		DLog(L"*** WARNING: CStaticLink: unable to navigate link %s",
 			  (LPCTSTR)m_link);
 	}
 }

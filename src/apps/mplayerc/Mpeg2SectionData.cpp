@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,7 +35,7 @@
 
 #define SkipDescriptor(gb, nType, nLength)										\
 			gb.ReadBuffer(DescBuffer, nLength);									\
-			TRACE ("Skipped descriptor : 0x%02x\n", nType);						\
+			DLog("Skipped descriptor : 0x%02x", nType);						\
 			UNREFERENCED_PARAMETER(nType);
 
 #define EndEnumDescriptors	}}
@@ -230,7 +230,7 @@ HRESULT CMpeg2DataParser::ParseSDT(ULONG ulFreq)
 					gb.ReadBuffer (DescBuffer, nLength);					// service_name
 					DescBuffer[nLength] = 0;
 					Channel.SetName (ConvertString (DescBuffer, nLength));
-					TRACE ("%15S %d\n", Channel.GetName(), Channel.GetSID());
+					DLog(L"%15s %d", Channel.GetName(), Channel.GetSID());
 					break;
 				default :
 					SkipDescriptor (gb, nType, nLength);					// descriptor()
@@ -558,7 +558,7 @@ HRESULT CMpeg2DataParser::ParseNIT()
 						WORD	logical_channel_number	= (WORD)gb.BitRead(10);
 						if (Channels.Lookup(service_id)) {
 							Channels[service_id].SetOriginNumber (logical_channel_number);
-							TRACE ("NIT association : %d -> %S\n", logical_channel_number, Channels[service_id].ToString());
+							DLog("NIT association : %d -> %s", logical_channel_number, Channels[service_id].ToString());
 						}
 					}
 					break;
