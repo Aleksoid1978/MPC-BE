@@ -435,7 +435,7 @@ CFGFilterVideoRenderer::CFGFilterVideoRenderer(HWND hWnd, const CLSID& clsid, CS
 
 HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
 {
-	DbgLog((LOG_TRACE, 3, L"CFGFilterVideoRenderer::Create() on thread: %d", GetCurrentThreadId()));
+	DLog("CFGFilterVideoRenderer::Create() on thread: %d", GetCurrentThreadId());
 	CheckPointer(ppBF, E_POINTER);
 
 	HRESULT hr = S_OK;
@@ -555,9 +555,9 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 			if (CFGFilterRegistry* f2r = dynamic_cast<CFGFilterRegistry*>(f2.pFGF)) {
 				if (f1r->GetMoniker() && f2r->GetMoniker() && S_OK == f1r->GetMoniker()->IsEqual(f2r->GetMoniker())
 						|| f1r->GetCLSID() != GUID_NULL && f1r->GetCLSID() == f2r->GetCLSID()) {
-					DbgLog((LOG_TRACE, 3, L"FGM: Inserting %d %d %016I64x '%s' NOT!",
+					DLog(L"FGM: Inserting %d %d %016I64x '%s' NOT!",
 						  group, exactmatch, pFGF->GetMerit(),
-						  pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName())));
+						  pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()));
 
 					if (autodelete) {
 						delete pFGF;
@@ -582,10 +582,10 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 				}
 			}
 
-			DbgLog((LOG_TRACE, 3, L"FGM: Inserting %d %d %016I64x '%s', type = '%s' DUP!",
+			DLog(L"FGM: Inserting %d %d %016I64x '%s', type = '%s' DUP!",
 				  group, exactmatch, pFGF->GetMerit(),
 				  pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()),
-				  pFGF->GetType()));
+				  pFGF->GetType());
 
 			if (autodelete) {
 				delete pFGF;
@@ -594,10 +594,10 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 		}
 	}
 
-	DbgLog((LOG_TRACE, 3, L"FGM: Inserting %d %d %016I64x '%s', type = '%s'",
+	DLog(L"FGM: Inserting %d %d %016I64x '%s', type = '%s'",
 		  group, exactmatch, pFGF->GetMerit(),
 		  pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()),
-		  pFGF->GetType()));
+		  pFGF->GetType());
 
 	CString name = pFGF->GetName();
 	if (name.Find(L"MPC ") == 0 && pFGF->GetType() != L"CFGFilterInternal") {
@@ -632,12 +632,12 @@ POSITION CFGFilterList::GetHeadPosition()
 			}
 		}
 #ifdef _DEBUG
-		DbgLog((LOG_TRACE, 3, L"FGM: Sorting filters"));
+		DLog("FGM: Sorting filters");
 
 		pos = m_sortedfilters.GetHeadPosition();
 		while (pos) {
 			CFGFilter* pFGF = m_sortedfilters.GetNext(pos);
-			DbgLog((LOG_TRACE, 3, L"FGM:    %016I64x '%s', type = '%s'", pFGF->GetMerit(), pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()), pFGF->GetType()));
+			DLog(L"FGM:    %016I64x '%s', type = '%s'", pFGF->GetMerit(), pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()), pFGF->GetType());
 		}
 #endif
 

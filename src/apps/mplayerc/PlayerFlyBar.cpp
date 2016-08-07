@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2015 see Authors.txt
+ * (C) 2012-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -65,7 +65,7 @@ CFlyBar::~CFlyBar()
 HRESULT CFlyBar::Create(CWnd* pWnd)
 {
 	if (!CreateEx(WS_EX_TOPMOST | WS_EX_LAYERED, AfxRegisterWndClass(0), NULL, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), pWnd, 0, NULL)) {
-		DbgLog((LOG_TRACE, 3, L"Failed to create Flybar Window"));
+		DLog("Failed to create Flybar Window");
 		return E_FAIL;
 	}
 	SetLayeredWindowAttributes(RGB(255, 0, 255), 150, LWA_ALPHA | LWA_COLORKEY);

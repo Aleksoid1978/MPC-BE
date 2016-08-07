@@ -691,7 +691,7 @@ namespace Youtube
 				if (!final_item) {
 					final_item = &youtubeUrllist[0];
 					k = 0;
-					DbgLog((LOG_TRACE, 3, L"YouTube::Parse_URL() : %s format not found, used %s", s.YoutubeFormat.fmt == 1 ? L"WebM" : L"MP4", final_item->profile->format == y_webm ? L"WebM" : L"MP4"));
+					DLog(L"YouTube::Parse_URL() : %s format not found, used %s", s.YoutubeFormat.fmt == 1 ? L"WebM" : L"MP4", final_item->profile->format == y_webm ? L"WebM" : L"MP4");
 				}
 
 				for (size_t i = k + 1; i < youtubeUrllist.size(); i++) {

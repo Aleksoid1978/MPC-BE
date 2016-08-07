@@ -978,7 +978,7 @@ void CMainFrame::OnDestroy()
 
 void CMainFrame::OnClose()
 {
-	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnClose() : start"));
+	DLog("CMainFrame::OnClose() : start");
 
 	m_bClosingState = true;
 
@@ -1050,7 +1050,7 @@ void CMainFrame::OnClose()
 		}
 	}
 
-	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnClose() : end"));
+	DLog("CMainFrame::OnClose() : end");
 	__super::OnClose();
 }
 
@@ -1224,10 +1224,10 @@ LRESULT CMainFrame::OnTaskBarThumbnailsCreate(WPARAM, LPARAM)
 LRESULT CMainFrame::OnQueryCancelAutoPlay(WPARAM wParam, LPARAM lParam)
 {
 	if (wParam == m_DiskImage.GetDriveLetter() - 'A') {
-		DbgLog((LOG_TRACE, 3, L"CMainFrame: block autopay for %C:\\", (PCHAR)wParam + 'A'));
+		DLog("CMainFrame: block autopay for %C:\\", (PCHAR)wParam + 'A');
 		return TRUE;
 	} else {
-		DbgLog((LOG_TRACE, 3, L"CMainFrame: allow autopay for %C:\\", (PCHAR)wParam + 'A'));
+		DLog("CMainFrame: allow autopay for %C:\\", (PCHAR)wParam + 'A');
 		return FALSE;
 	}
 }
@@ -2071,7 +2071,7 @@ void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
 
 void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 {
-	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnDisplayChange() : start"));
+	DLog("CMainFrame::OnDisplayChange() : start");
 	if (m_eMediaLoadState == MLS_LOADED) {
 		if (m_pGraphThread) {
 			CAMMsgEvent e;
@@ -2100,7 +2100,7 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 		}
 	}
 
-	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnDisplayChange() : end"));
+	DLog("CMainFrame::OnDisplayChange() : end");
 }
 
 LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
@@ -2955,7 +2955,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 	LONG_PTR evParam1, evParam2;
 	while (m_pME && SUCCEEDED(m_pME->GetEvent(&evCode, &evParam1, &evParam2, 0))) {
 #ifdef _DEBUG
-		DbgLog((LOG_TRACE, 3, L"--> CMainFrame::OnGraphNotify on thread: %d; event: 0x%08x (%s)", GetCurrentThreadId(), evCode, GetEventString(evCode)));
+		DLog(L"--> CMainFrame::OnGraphNotify on thread: %d; event: 0x%08x (%s)", GetCurrentThreadId(), evCode, GetEventString(evCode));
 #endif
 		CString str;
 
@@ -2978,10 +2978,10 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				}
 				break;
 			case EC_ERRORABORT:
-				DbgLog((LOG_TRACE, 3, L"\thr = %08x", (HRESULT)evParam1));
+				DLog("\thr = %08x", (HRESULT)evParam1);
 				break;
 			case EC_BUFFERING_DATA:
-				DbgLog((LOG_TRACE, 3, L"\t%d, %d", evParam1, evParam2));
+				DLog("\t%d, %d", evParam1, evParam2);
 
 				m_fBuffering = ((HRESULT)evParam1 != S_OK);
 				break;
@@ -3230,7 +3230,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				break;
 			case EC_DVD_ERROR:
 				if (m_pDVDC) {
-					DbgLog((LOG_TRACE, 3, L"\t%d, %d", evParam1, evParam2));
+					DLog("\t%d, %d", evParam1, evParam2);
 
 					CString err;
 
@@ -3272,11 +3272,11 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				break;
 			case EC_DVD_WARNING:
 				if (m_pDVDC) {
-					DbgLog((LOG_TRACE, 3, L"\t%d, %d", evParam1, evParam2));
+					DLog("\t%d, %d", evParam1, evParam2);
 				}
 				break;
 			case EC_VIDEO_SIZE_CHANGED: {
-				DbgLog((LOG_TRACE, 3, L"\t%dx%d", CSize(evParam1)));
+				DLog("\t%dx%d", CSize(evParam1));
 
 				WINDOWPLACEMENT wp;
 				wp.length = sizeof(wp);
@@ -3337,7 +3337,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 
 LRESULT CMainFrame::OnResetDevice(WPARAM wParam, LPARAM lParam)
 {
-	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnResetDevice() : start"));
+	DLog("CMainFrame::OnResetDevice() : start");
 
 	OAFilterState fs = State_Stopped;
 	m_pMC->GetState(0, &fs);
@@ -3373,7 +3373,7 @@ LRESULT CMainFrame::OnResetDevice(WPARAM wParam, LPARAM lParam)
 		m_pMC->Run();
 	}
 
-	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnResetDevice() : end"));
+	DLog("CMainFrame::OnResetDevice() : end");
 	return S_OK;
 }
 
@@ -4344,7 +4344,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 void CMainFrame::OnFilePostCloseMedia()
 {
-	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnFilePostCloseMedia() : start"));
+	DLog("CMainFrame::OnFilePostCloseMedia() : start");
 
 	SetPlaybackMode(PM_NONE);
 	SetLoadState(MLS_CLOSED);
@@ -4439,7 +4439,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	SetToolBarAudioButton();
 	SetToolBarSubtitleButton();
 
-	DbgLog((LOG_TRACE, 3, L"CMainFrame::OnFilePostCloseMedia() : end"));
+	DLog("CMainFrame::OnFilePostCloseMedia() : end");
 }
 
 void CMainFrame::OnBossKey()
@@ -12874,9 +12874,9 @@ void CMainFrame::OpenSetupAudioStream()
 
 #ifdef DEBUG
 		if (!MixAS.IsEmpty()) {
-			DbgLog((LOG_TRACE, 3, L"Audio Track list :"));
+			DLog("Audio Track list :");
 			for (size_t i = 0; i < MixAS.GetCount(); i++) {
-				DbgLog((LOG_TRACE, 3, L"	%s, type = %s", MixAS[i].Name, MixAS[i].Filter == 1 ? L"Splitter" : L"AudioSwitcher"));
+				DLog(L"	%s, type = %s", MixAS[i].Name, MixAS[i].Filter == 1 ? L"Splitter" : L"AudioSwitcher");
 			}
 		}
 #endif
@@ -13345,8 +13345,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 				fileItem = L"http://" + fileItem.GetName();
 			}
 
-			DbgLog((LOG_TRACE, 3, _T("--> CMainFrame::OpenMediaPrivate() - pFileData->fns[%d]:"), index++));
-			DbgLog((LOG_TRACE, 3, _T("	%s"), fileItem.GetName()));
+			DLog("--> CMainFrame::OpenMediaPrivate() - pFileData->fns[%d]:", index++);
+			DLog(L"    %s", fileItem.GetName());
 		}
 	}
 
@@ -13704,7 +13704,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 void CMainFrame::CloseMediaPrivate()
 {
-	DbgLog((LOG_TRACE, 3, L"CMainFrame::CloseMediaPrivate() : start"));
+	DLog("CMainFrame::CloseMediaPrivate() : start");
 
 	ASSERT(m_eMediaLoadState == MLS_CLOSING);
 
@@ -13841,7 +13841,7 @@ void CMainFrame::CloseMediaPrivate()
 
 	m_FontInstaller.UninstallFonts();
 
-	DbgLog((LOG_TRACE, 3, L"CMainFrame::CloseMediaPrivate() : end"));
+	DLog("CMainFrame::CloseMediaPrivate() : end");
 }
 
 void CMainFrame::ParseDirs(CAtlList<CString>& sl)
@@ -16806,7 +16806,7 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 		return;
 	}
 
-	DbgLog((LOG_TRACE, 3, L"CMainFrame::CloseMedia() : start"));
+	DLog("CMainFrame::CloseMedia() : start");
 
 	m_bNextIsOpened = bNextIsOpened;
 
@@ -16871,7 +16871,7 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 
 	OnFilePostCloseMedia();
 
-	DbgLog((LOG_TRACE, 3, L"CMainFrame::CloseMedia() : end"));
+	DLog("CMainFrame::CloseMedia() : end");
 }
 
 void CMainFrame::StartTunerScan(CAutoPtr<TunerScanData> pTSD)
@@ -16941,16 +16941,16 @@ void CMainFrame::SetLoadState(MPC_LOADSTATE iState)
 
 	switch (m_eMediaLoadState) {
 		case MLS_CLOSED:
-			DbgLog((LOG_TRACE, 3, L"CMainFrame::SetLoadState() : CLOSED"));
+			DLog("CMainFrame::SetLoadState() : CLOSED");
 			break;
 		case MLS_LOADING:
-			DbgLog((LOG_TRACE, 3, L"CMainFrame::SetLoadState() : LOADING"));
+			DLog("CMainFrame::SetLoadState() : LOADING");
 			break;
 		case MLS_LOADED:
-			DbgLog((LOG_TRACE, 3, L"CMainFrame::SetLoadState() : LOADED"));
+			DLog("CMainFrame::SetLoadState() : LOADED");
 			break;
 		case MLS_CLOSING:
-			DbgLog((LOG_TRACE, 3, L"CMainFrame::SetLoadState() : CLOSING"));
+			DLog("CMainFrame::SetLoadState() : CLOSING");
 			break;
 		default:
 			break;
@@ -18765,7 +18765,7 @@ DWORD CMainFrame::NotifyRenderThread()
 				}
 			}
 		} else {
-			DbgLog((LOG_TRACE, 3, L"CMainFrame::NotifyRenderThread() : %s", GetLastErrorMsg(L"WaitForMultipleObjects")));
+			DLog(L"CMainFrame::NotifyRenderThread() : %s", GetLastErrorMsg(L"WaitForMultipleObjects"));
 			ASSERT(FALSE);
 			break;
 		}
