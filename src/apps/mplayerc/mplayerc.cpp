@@ -1858,18 +1858,18 @@ void CRemoteCtrlClient::Connect(CString addr)
 	CAutoLock cAutoLock(&m_csLock);
 
 	if (m_nStatus == CONNECTING && m_addr == addr) {
-		TRACE(_T("CRemoteCtrlClient (Connect): already connecting to %s\n"), addr);
+		DLog(L"CRemoteCtrlClient (Connect): already connecting to %s", addr);
 		return;
 	}
 
 	if (m_nStatus == CONNECTED && m_addr == addr) {
-		TRACE(_T("CRemoteCtrlClient (Connect): already connected to %s\n"), addr);
+		DLog(L"CRemoteCtrlClient (Connect): already connected to %s", addr);
 		return;
 	}
 
 	m_nStatus = CONNECTING;
 
-	TRACE(_T("CRemoteCtrlClient (Connect): connecting to %s\n"), addr);
+	DLog(L"CRemoteCtrlClient (Connect): connecting to %s", addr);
 
 	Close();
 
@@ -1897,7 +1897,7 @@ void CRemoteCtrlClient::OnConnect(int nErrorCode)
 
 	m_nStatus = (nErrorCode == 0 ? CONNECTED : DISCONNECTED);
 
-	TRACE(_T("CRemoteCtrlClient (OnConnect): %d\n"), nErrorCode);
+	DLog("CRemoteCtrlClient (OnConnect): %d", nErrorCode);
 }
 
 void CRemoteCtrlClient::OnClose(int nErrorCode)
@@ -1905,12 +1905,12 @@ void CRemoteCtrlClient::OnClose(int nErrorCode)
 	CAutoLock cAutoLock(&m_csLock);
 
 	if (m_hSocket != INVALID_SOCKET && m_nStatus == CONNECTED) {
-		TRACE(_T("CRemoteCtrlClient (OnClose): connection lost\n"));
+		DLog("CRemoteCtrlClient (OnClose): connection lost");
 	}
 
 	m_nStatus = DISCONNECTED;
 
-	TRACE(_T("CRemoteCtrlClient (OnClose): %d\n"), nErrorCode);
+	DLog("CRemoteCtrlClient (OnClose): %d", nErrorCode);
 }
 
 void CRemoteCtrlClient::OnReceive(int nErrorCode)
@@ -1926,7 +1926,7 @@ void CRemoteCtrlClient::OnReceive(int nErrorCode)
 	}
 	str.ReleaseBuffer(ret);
 
-	TRACE(_T("CRemoteCtrlClient (OnReceive): %s\n"), CString(str));
+	DLog(L"CRemoteCtrlClient (OnReceive): %s", CString(str));
 
 	OnCommand(str);
 
@@ -1951,7 +1951,7 @@ void CRemoteCtrlClient::ExecuteCommand(CStringA cmd, int repcnt)
 		if ((repcnt == 0 && wc.rmrepcnt == 0 || wc.rmrepcnt > 0 && (repcnt%wc.rmrepcnt) == 0)
 				&& (!name.CompareNoCase(cmd) || !wc.rmcmd.CompareNoCase(cmd) || wc.cmd == (WORD)strtol(cmd, NULL, 10))) {
 			CAutoLock cAutoLock(&m_csLock);
-			TRACE(_T("CRemoteCtrlClient (calling command): %s\n"), wc.GetName());
+			DLog(L"CRemoteCtrlClient (calling command): %s", wc.GetName());
 			m_pWnd->SendMessage(WM_COMMAND, wc.cmd);
 			break;
 		}
@@ -1966,7 +1966,7 @@ CWinLircClient::CWinLircClient()
 
 void CWinLircClient::OnCommand(CStringA str)
 {
-	TRACE(_T("CWinLircClient (OnCommand): %s\n"), CString(str));
+	DLog(L"CWinLircClient (OnCommand): %s", CString(str));
 
 	int i = 0, j = 0, repcnt = 0;
 	for (CStringA token = str.Tokenize(" ", i);
@@ -1988,7 +1988,7 @@ CUIceClient::CUIceClient()
 
 void CUIceClient::OnCommand(CStringA str)
 {
-	TRACE(_T("CUIceClient (OnCommand): %s\n"), CString(str));
+	DLog(L"CUIceClient (OnCommand): %s", CString(str));
 
 	CStringA cmd;
 	int i = 0, j = 0;
