@@ -1106,7 +1106,7 @@ NTSTATUS (* Real_NtQueryInformationProcess) (HANDLE				ProcessHandle,
 
 BOOL WINAPI Mine_IsDebuggerPresent()
 {
-	DbgLog((LOG_TRACE, 3, L"Oops, somebody was trying to be naughty! (called IsDebuggerPresent)"));
+	DLog("Oops, somebody was trying to be naughty! (called IsDebuggerPresent)");
 	return FALSE;
 }
 
@@ -1143,11 +1143,11 @@ LONG WINAPI Mine_ChangeDisplaySettingsEx(LONG ret, DWORD dwFlags, LPVOID lParam)
 			if (vp->dwCommand == VP_COMMAND_GET) {
 				if ((vp->dwTVStandard&VP_TV_STANDARD_WIN_VGA)
 						&& vp->dwTVStandard != VP_TV_STANDARD_WIN_VGA) {
-					DbgLog((LOG_TRACE, 3, L"Ooops, tv-out enabled? macrovision checks suck..."));
+					DLog("Ooops, tv-out enabled? macrovision checks suck...");
 					vp->dwTVStandard = VP_TV_STANDARD_WIN_VGA;
 				}
 			} else if (vp->dwCommand == VP_COMMAND_SET) {
-				DbgLog((LOG_TRACE, 3, L"Ooops, as I already told ya, no need for any macrovision bs here"));
+				DLog("Ooops, as I already told ya, no need for any macrovision bs here");
 				return 0;
 			}
 		}
@@ -1294,9 +1294,9 @@ BOOL CMPlayerCApp::InitInstance()
 	long lError;
 
 	if (SetHeapOptions()) {
-		DbgLog((LOG_TRACE, 3, L"Terminate on corruption enabled"));
+		DLog("Terminate on corruption enabled");
 	} else {
-		DbgLog((LOG_TRACE, 3, L"Terminate on corruption error = %d", GetLastError()));
+		DLog("Terminate on corruption error = %d", GetLastError());
 	}
 
 	DetourRestoreAfterWith();
@@ -1610,7 +1610,7 @@ BOOL CMPlayerCApp::InitInstance()
 			ULONG IoPriority = 3;
 			ULONG ProcessIoPriority = 0x21;
 			NTSTATUS NtStatus = NtSetInformationProcess(GetCurrentProcess(), ProcessIoPriority, &IoPriority, sizeof(ULONG));
-			DbgLog((LOG_TRACE, 3, L"Set I/O Priority - %d", NtStatus));
+			DLog("Set I/O Priority - %d", NtStatus);
 		}
 
 		FreeLibrary( hNTDLL );

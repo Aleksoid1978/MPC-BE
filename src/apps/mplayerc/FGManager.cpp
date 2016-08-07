@@ -654,7 +654,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppBF)
 {
-	DbgLog((LOG_TRACE, 3, L"FGM: AddSourceFilter() trying '%s'", pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName())/*CStringFromGUID(pFGF->GetCLSID())*/));
+	DLog(L"FGM: AddSourceFilter() trying '%s'", pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName())/*CStringFromGUID(pFGF->GetCLSID())*/);
 
 	CheckPointer(lpcwstrFileName, E_POINTER);
 	CheckPointer(ppBF, E_POINTER);
@@ -1052,7 +1052,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				if (!fname.IsEmpty()) {
 					CComPtr<IBaseFilter> pBFVR;
 					if (SUCCEEDED(FindFilterByName(fname, &pBFVR)) && pBFVR) {
-						DbgLog((LOG_TRACE, 3, L"FGM: Skip '%s' - already in graph", pFGF->GetName()));
+						DLog(L"FGM: Skip '%s' - already in graph", pFGF->GetName());
 						continue;
 					}
 				}
@@ -1065,7 +1065,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				pFGF = pMadVRAllocatorPresenter;
 			}
 
-			DbgLog((LOG_TRACE, 3, L"FGM: Connecting '%s'", pFGF->GetName()));
+			DLog(L"FGM: Connecting '%s'", pFGF->GetName());
 
 			CComPtr<IBaseFilter> pBF;
 			CInterfaceList<IUnknown, &IID_IUnknown> pUnks;
@@ -1163,7 +1163,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 						}
 					}
 
-					DbgLog((LOG_TRACE, 3, L"FGM: '%s' Successfully connected", pFGF->GetName()));
+					DLog(L"FGM: '%s' Successfully connected", pFGF->GetName());
 
 					return hr;
 				}
@@ -1171,10 +1171,10 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 			BOOL bIsEnd = FALSE;
 			if (pFGF->GetMerit() == MERIT64_HIGH) {
-				DbgLog((LOG_TRACE, 3, L"FGM: Connecting priority filter '%s' FAILED!", pFGF->GetName()));
+				DLog(L"FGM: Connecting priority filter '%s' FAILED!", pFGF->GetName());
 				bIsEnd = TRUE;
 			} else {
-				DbgLog((LOG_TRACE, 3, L"FGM: Connecting '%s' FAILED!", pFGF->GetName()));
+				DLog(L"FGM: Connecting '%s' FAILED!", pFGF->GetName());
 			}
 
 			EXECUTE_ASSERT(SUCCEEDED(RemoveFilter(pBF)));
@@ -1214,7 +1214,7 @@ STDMETHODIMP CFGManager::Render(IPin* pPinOut)
 
 STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlayList)
 {
-	DbgLog((LOG_TRACE, 3, L"CFGManager::RenderFile() on thread: %d", GetCurrentThreadId()));
+	DLog("CFGManager::RenderFile() on thread: %d", GetCurrentThreadId());
 	CAutoLock cAutoLock(this);
 
 	m_streampath.RemoveAll();
@@ -1448,7 +1448,7 @@ HRESULT CFGManager::ConnectFilterDirect(IPin* pPinOut, CFGFilter* pFGF)
 
 	if (FAILED(hr)) {
 		EXECUTE_ASSERT(SUCCEEDED(RemoveFilter(pBF)));
-		DbgLog((LOG_TRACE, 3, L"FGM: Connecting '%s' FAILED!", pFGF->GetName()));
+		DLog(L"FGM: Connecting '%s' FAILED!", pFGF->GetName());
 		pBF.Release();
 	}
 
@@ -1542,7 +1542,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 											if (SelAudioRenderer == pFGF->GetName()) {
 												hr = ConnectFilterDirect(infTeeFilterOutPin, pFGF);
 												if (SUCCEEDED(hr)) {
-													DbgLog((LOG_TRACE, 3, L"FGM: Connect Direct to '%s'", pFGF->GetName()));
+													DLog(L"FGM: Connect Direct to '%s'", pFGF->GetName());
 													bIsConnected = TRUE;
 													break;
 												}
@@ -1558,7 +1558,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 												if (SelAudioRenderer == f.GetDisplayName()) {
 													hr = ConnectFilterDirect(infTeeFilterOutPin, &f);
 													if (SUCCEEDED(hr)) {
-														DbgLog((LOG_TRACE, 3, L"FGM: Connect Direct to '%s'", f.GetName()));
+														DLog(L"FGM: Connect Direct to '%s'", f.GetName());
 														bIsConnected = TRUE;
 														break;
 													}
@@ -1580,7 +1580,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 												if (f.GetName() == L"Default DirectSound Device") {
 													hr = ConnectFilterDirect(infTeeFilterOutPin, &f);
 													if (SUCCEEDED(hr)) {
-														DbgLog((LOG_TRACE, 3, L"FGM: Connect Direct to '%s'", f.GetName()));
+														DLog(L"FGM: Connect Direct to '%s'", f.GetName());
 														bIsConnected = TRUE;
 														break;
 													}
@@ -1828,7 +1828,7 @@ STDMETHODIMP CFGManager::GetDeadEnd(int iIndex, CAtlList<CStringW>& path, CAtlLi
 
 STDMETHODIMP CFGManager::RenderSubFile(LPCWSTR lpcwstrFileName)
 {
-	DbgLog((LOG_TRACE, 3, L"CFGManager::RenderSubFile() on thread: %d", lpcwstrFileName, GetCurrentThreadId()));
+	DLog("CFGManager::RenderSubFile() on thread: %d", lpcwstrFileName, GetCurrentThreadId());
 	CAutoLock cAutoLock(this);
 
 	HRESULT hr = VFW_E_CANNOT_RENDER;
@@ -2792,7 +2792,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	, m_vrmerit(MERIT64_PREFERRED)
 	, m_armerit(MERIT64_PREFERRED)
 {
-	DbgLog((LOG_TRACE, 3, L"CFGManagerPlayer::CFGManagerPlayer() on thread: %d", GetCurrentThreadId()));
+	DLog("CFGManagerPlayer::CFGManagerPlayer() on thread: %d", GetCurrentThreadId());
 	CFGFilter* pFGF;
 
 	CAppSettings& s = AfxGetAppSettings();
