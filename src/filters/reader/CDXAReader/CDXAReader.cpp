@@ -328,7 +328,7 @@ HRESULT CCDXAStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 					break;
 				}
 
-				TRACE(_T("CCDXAStream: CRC error at sector %d (fp=0x%I64x, retriesleft=%d)\n"), sector, FilePointer.QuadPart, nRetries);
+				DLog("CCDXAStream: CRC error at sector %d (fp=0x%I64x, retriesleft=%d)", sector, FilePointer.QuadPart, nRetries);
 			}
 
 			m_nBufferedSector = sector;
@@ -480,7 +480,7 @@ bool CCDXAStream::LookForMediaSubType()
 
 				for (int k = 0, l; nTries >= 0 && (l = p.Find(',', k)) >= 0; k = l+1, nTries++) {
 					CString s = p.Mid(k, l-k);
-					TRACE(s + '\n');
+					DLog(s);
 
 					TCHAR* end = NULL;
 

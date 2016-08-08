@@ -25,3 +25,5 @@
 #include "../../../../include/stdafx_common.h"
 #include <afxwin.h>                         // MFC core and standard components
 #include "../../../../include/stdafx_common_dshow.h"
+
+#include "../../../DSUtil/Log.h"

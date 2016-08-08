@@ -30,15 +30,14 @@ void HexDump(CString fileName, BYTE* buf, int size)
 
 	CString dump_str;
 	dump_str.Format(_T("Dump size = %d\n"), size);
-	int len, i, j, c;
 
-	for (i = 0; i < size; i +=16) {
-		len = size - i;
+	for (int i = 0; i < size; i += 16) {
+		int len = size - i;
 		if (len > 16) {
 			len = 16;
 		}
-		dump_str.AppendFormat(_T("%08x "), i);
-		for (j = 0; j < 16; j++) {
+		dump_str.AppendFormat(_T("%08x:"), i);
+		for (int j = 0; j < 16; j++) {
 			if (j < len) {
 				dump_str.AppendFormat(_T(" %02x"), buf[i+j]);
 			}
@@ -46,9 +45,9 @@ void HexDump(CString fileName, BYTE* buf, int size)
 				dump_str.Append(_T("   "));
 			}
 		}
-		dump_str.Append(_T(" "));
-		for (j = 0; j < len; j++) {
-			c = buf[i+j];
+		dump_str.Append(_T(" | "));
+		for (int j = 0; j < len; j++) {
+			int c = buf[i+j];
 			if (c < ' ' || c > '~') {
 				c = '.';
 			}
@@ -86,13 +85,13 @@ void LOG2FILE(LPCTSTR fmt, ...)
 	if (TCHAR* buff = DNew TCHAR[len]) {
 		_vstprintf(buff, len, fmt, args);
 		if (FILE* f = _tfopen(fname, L"at, ccs=UTF-8")) {
-			fseek(f, 0, 2);
+			fseek(f, 0, SEEK_END);
 
 			SYSTEMTIME st;
 			::GetLocalTime(&st);
 
 			CString lt;
-			lt.Format(L"%04d.%02d.%02d %02d:%02d:%02d.%03d", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+			lt.Format(L"%04u.%02u.%02u %02u:%02u:%02u.%03u", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
 
 			_ftprintf_s(f, _T("%s : %s\n"), lt, buff);
 			fclose(f);

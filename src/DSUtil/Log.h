@@ -20,5 +20,13 @@
 
 #pragma once
 
+#ifdef _DEBUG
+#define DLog(...) DbgLogInfo(LOG_TRACE, 3, __VA_ARGS__)
+#define DLogError(...) DbgLogInfo(LOG_ERROR, 3, __VA_ARGS__)
+#else
+#define DLog(...) __noop
+#define DLogError(...) __noop
+#endif
+
 void HexDump(CString fName, BYTE* buf, int size);
 void LOG2FILE(LPCTSTR fmt, ...);
