@@ -1964,8 +1964,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF = DNew CFGFilterInternal<CFLICSource>(FlicSourceName);
 		pFGF->m_chkbytes.AddTail(_T("4,2,,11AF"));
 		pFGF->m_chkbytes.AddTail(_T("4,2,,12AF"));
-		pFGF->m_extensions.AddTail(_T(".fli"));
-		pFGF->m_extensions.AddTail(_T(".flc"));
 		m_source.AddTail(pFGF);
 	}
 
