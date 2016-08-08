@@ -27,6 +27,7 @@
 #include "MFCHelper.h"
 #include "vd.h"
 #include "text.h"
+#include "Log.h"
 #include <basestruct.h>
 #include <mpc_defines.h>
 
@@ -41,12 +42,6 @@
 
 #define QI(i)  (riid == __uuidof(i)) ? GetInterface((i*)this, ppv) :
 #define QI2(i) (riid == IID_##i) ? GetInterface((i*)this, ppv) :
-
-#ifdef _DEBUG
-#define DLog(...) DbgLogInfo(LOG_TRACE, 3, __VA_ARGS__)
-#else
-#define DLog(...) __noop
-#endif
 
 //#ifndef _countof
 //#define _countof(array) (sizeof(array)/sizeof(array[0]))

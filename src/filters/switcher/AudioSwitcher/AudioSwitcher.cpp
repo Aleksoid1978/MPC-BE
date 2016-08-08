@@ -236,7 +236,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	}
 
 	if (long(in_samples * out_wfe->nChannels * in_bytespersample) > pOut->GetSize()) {
-		DbgLog((LOG_TRACE, 3, L"CAudioSwitcherFilter::Transform(): %d > %d", in_samples * out_wfe->nChannels * in_bytespersample, pOut->GetSize()));
+		DLog("CAudioSwitcherFilter::Transform(): %d > %d", in_samples * out_wfe->nChannels * in_bytespersample, pOut->GetSize());
 		pOut->SetActualDataLength(0);
 		return S_OK;
 	}

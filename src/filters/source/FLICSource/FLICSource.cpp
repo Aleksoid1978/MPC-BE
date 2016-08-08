@@ -57,22 +57,12 @@ STDAPI DllRegisterServer()
 		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}"),
 		_T("Source Filter"), _T("{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}"));
 
-	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".fli"),
-		_T("Source Filter"), _T("{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}"));
-
-	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".flc"),
-		_T("Source Filter"), _T("{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}"));
-
 	return AMovieDllRegisterServer2(TRUE);
 }
 
 STDAPI DllUnregisterServer()
 {
 	DeleteRegKey(_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}"));
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".fli"));
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".flc"));
 
 	return AMovieDllRegisterServer2(FALSE);
 }

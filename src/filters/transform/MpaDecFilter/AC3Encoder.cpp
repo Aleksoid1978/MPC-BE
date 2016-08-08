@@ -63,13 +63,13 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 	ret = avcodec_open2(m_pAVCtx, m_pAVCodec, NULL);
 	avcodec_unlock;
 	if (ret < 0) {
-		DbgLog((LOG_TRACE, 3, L"CAC3Encoder::Init() : avcodec_open2() failed"));
+		DLog("CAC3Encoder::Init() : avcodec_open2() failed");
 		return false;
 	}
 
 	m_pFrame = av_frame_alloc();
 	if (!m_pFrame) {
-		DbgLog((LOG_TRACE, 3, L"CAC3Encoder::Init() : avcodec_alloc_frame() failed"));
+		DLog("CAC3Encoder::Init() : avcodec_alloc_frame() failed");
 		return false;
 	}
 	m_pFrame->nb_samples     = m_pAVCtx->frame_size;
@@ -83,13 +83,13 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 
 	m_pSamples = (float*)av_malloc(m_buffersize);
 	if (!m_pSamples) {
-		DbgLog((LOG_TRACE, 3, L"CAC3Encoder::Init() : av_malloc(%d) failed", m_buffersize));
+		DLog("CAC3Encoder::Init() : av_malloc(%d) failed", m_buffersize);
 		return false;
 	}
 	/* setup the data pointers in the AVFrame */
 	ret = avcodec_fill_audio_frame(m_pFrame, m_pAVCtx->channels, m_pAVCtx->sample_fmt, (const uint8_t*)m_pSamples, m_buffersize, 0);
 	if (ret < 0) {
-		DbgLog((LOG_TRACE, 3, L"CAC3Encoder::Init() : avcodec_fill_audio_frame() failed"));
+		DLog("CAC3Encoder::Init() : avcodec_fill_audio_frame() failed");
 		return false;
 	}
 
