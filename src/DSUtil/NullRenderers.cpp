@@ -30,7 +30,6 @@
 #ifdef USE_DXVA
 
 #include <d3d9.h>
-#include <dxva.h>
 #include <dxva2api.h>		// DXVA2
 #include <evr.h>
 #include <mfapi.h>	// API Media Foundation

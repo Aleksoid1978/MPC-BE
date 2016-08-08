@@ -67,9 +67,9 @@ CDXVA2Decoder* CDXVA2Decoder::CreateDXVA2Decoder(CMPCVideoDecFilter* pFilter, ID
 
 	if ((*guidDecoder == DXVA2_ModeH264_E) || (*guidDecoder == DXVA2_ModeH264_F) || (*guidDecoder == DXVA_Intel_H264_ClearVideo)) {
 		pDecoder = DNew CDXVA2DecoderH264(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
-	} else if (*guidDecoder == DXVA2_ModeVC1_D || *guidDecoder == DXVA_ModeVC1_D2010) {
+	} else if (*guidDecoder == DXVA2_ModeVC1_D || *guidDecoder == DXVA2_ModeVC1_D2010) {
 		pDecoder = DNew CDXVA2DecoderVC1(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
-	} else if (*guidDecoder == DXVA_ModeHEVC_VLD_Main || *guidDecoder == DXVA_ModeHEVC_VLD_Main10) {
+	} else if (*guidDecoder == DXVA2_ModeHEVC_VLD_Main || *guidDecoder == DXVA2_ModeHEVC_VLD_Main10) {
 		pDecoder = DNew CDXVA2DecoderHEVC(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
 	} else if (*guidDecoder == DXVA2_ModeMPEG2_VLD) {
 		pDecoder = DNew CDXVA2DecoderMPEG2(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
