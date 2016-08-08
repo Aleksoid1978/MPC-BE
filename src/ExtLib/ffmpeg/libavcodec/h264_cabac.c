@@ -37,7 +37,7 @@
 #include "cabac_functions.h"
 #include "internal.h"
 #include "avcodec.h"
-#include "h264.h"
+#include "h264dec.h"
 #include "h264data.h"
 #include "h264_mvpred.h"
 #include "mpegutils.h"
@@ -2358,7 +2358,7 @@ decode_intra_mb:
             }
         }
         if (sl->top_type && !IS_8x8DCT(sl->top_type)){
-            uint32_t top_empty = CABAC(h) && !IS_INTRA(mb_type) ? 0 : 0x40404040;
+            uint32_t top_empty = !IS_INTRA(mb_type) ? 0 : 0x40404040;
             AV_WN32A(&nnz_cache[4+8* 0], top_empty);
             AV_WN32A(&nnz_cache[4+8* 5], top_empty);
             AV_WN32A(&nnz_cache[4+8*10], top_empty);
