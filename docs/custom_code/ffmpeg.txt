@@ -12,9 +12,9 @@
 * libavcodec/allcodecs.c
 * libavcodec/avcodec.h
 * libavcodec/error_resilience.c
-* libavcodec/h264.c
-* libavcodec/h264.h
 * libavcodec/h264_slice.c
+* libavcodec/h264dec.c
+* libavcodec/h264dec.h
 * libavcodec/hevc.c
 * libavcodec/hevc.h
 * libavcodec/hevc_refs.c
@@ -29,7 +29,6 @@
 * libavcodec/utils.c
 * libavcodec/vc1.h
 * libavcodec/vc1dec.c
-* libavcodec/vorbis.c
 * libavcodec/vp9.c
 
 * libavfilter/allfilters.c 

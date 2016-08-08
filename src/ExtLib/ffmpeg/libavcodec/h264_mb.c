@@ -31,7 +31,8 @@
 #include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
-#include "h264.h"
+#include "h264dec.h"
+#include "h264_ps.h"
 #include "qpeldsp.h"
 #include "thread.h"
 

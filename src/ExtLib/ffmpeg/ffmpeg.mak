@@ -211,7 +211,6 @@ SRCS_LC = \
 	libavcodec/h263data.c \
 	libavcodec/h263dec.c \
 	libavcodec/h263dsp.c \
-	libavcodec/h264.c \
 	libavcodec/h264_cabac.c \
 	libavcodec/h264_cavlc.c \
 	libavcodec/h264_direct.c \
@@ -225,6 +224,7 @@ SRCS_LC = \
 	libavcodec/h264_refs.c \
 	libavcodec/h264_sei.c \
 	libavcodec/h264_slice.c \
+	libavcodec/h264dec.c \
 	libavcodec/h2645_parse.c \
 	libavcodec/h264chroma.c \
 	libavcodec/h264data.c \
