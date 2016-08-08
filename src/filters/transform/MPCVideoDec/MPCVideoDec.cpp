@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include <atlbase.h>
-#include <dxva.h>
 #include <MMReg.h>
 #include "../../../DSUtil/ff_log.h"
 
@@ -160,7 +159,7 @@ DXVA_PARAMS DXVA_H264 = {
 DXVA_PARAMS DXVA_HEVC = {
 	24,		// PicEntryNumber
 	1,		// PreferedConfigBitstream
-	{ &DXVA_ModeHEVC_VLD_Main10, &DXVA_ModeHEVC_VLD_Main, &GUID_NULL }
+	{ &DXVA2_ModeHEVC_VLD_Main10, &DXVA2_ModeHEVC_VLD_Main, &GUID_NULL }
 };
 
 // DXVA modes supported for Mpeg2
@@ -174,7 +173,7 @@ DXVA_PARAMS DXVA_Mpeg2 = {
 DXVA_PARAMS DXVA_VC1 = {
 	24,		// PicEntryNumber
 	1,		// PreferedConfigBitstream
-	{ &DXVA_ModeVC1_D2010, &DXVA2_ModeVC1_D, &GUID_NULL }
+	{ &DXVA2_ModeVC1_D2010, &DXVA2_ModeVC1_D, &GUID_NULL }
 };
 
 // DXVA modes supported for VP9
@@ -2920,8 +2919,8 @@ BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID* mode)
 			}
 
 			if (*mode == decoderGUID) {
-				if (m_bHEVC10bit && *mode == DXVA_ModeHEVC_VLD_Main10
-						|| !m_bHEVC10bit && decoderGUID != DXVA_ModeHEVC_VLD_Main10) {
+				if (m_bHEVC10bit && *mode == DXVA2_ModeHEVC_VLD_Main10
+						|| !m_bHEVC10bit && decoderGUID != DXVA2_ModeHEVC_VLD_Main10) {
 					return TRUE;
 				}
 			}
