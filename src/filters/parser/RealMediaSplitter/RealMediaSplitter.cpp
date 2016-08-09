@@ -511,7 +511,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		if (mts.IsEmpty()) {
-			TRACE(_T("Unsupported RealMedia stream (%d): %s\n"), pmp->stream, CString(pmp->mime));
+			DLog(L"Unsupported RealMedia stream (%u): %S", (UINT32)pmp->stream, pmp->mime);
 			continue;
 		}
 
@@ -1773,7 +1773,7 @@ HRESULT CRealVideoDecoder::Transform(IMediaSample* pIn)
 			memset(m_pI420, 0, size);
 			memset(m_pI420 + size, 0x80, size / 2);
 		} else {
-			DbgLog((LOG_TRACE, 3, L"m_pI420.Allocate fail %d", size * 3 / 2));
+			DLog(L"m_pI420.Allocate fail %d", size * 3 / 2);
 			return S_OK;
 		}
 		m_pI420Tmp = (BYTE*)_aligned_malloc(size * 3 / 2, 16);
@@ -1781,7 +1781,7 @@ HRESULT CRealVideoDecoder::Transform(IMediaSample* pIn)
 			memset(m_pI420Tmp, 0, size);
 			memset(m_pI420Tmp + size, 0x80, size / 2);
 		} else {
-			DbgLog((LOG_TRACE, 3, L"m_pI420Tmp.Allocate fail %d", size * 3 / 2));
+			DLog(L"m_pI420Tmp.Allocate fail %d", size * 3 / 2);
 			return S_OK;
 		}
 	}
@@ -1791,8 +1791,8 @@ HRESULT CRealVideoDecoder::Transform(IMediaSample* pIn)
 	m_timestamp = transform_in.timestamp;
 
 	if (FAILED(hr)) {
-		TRACE(_T("RV returned an error code!!!\n"));
-		ASSERT(!(transform_out.unk1 & 1));	// error allowed when the "render" flag is not set
+		DLog(L"RV returned an error code!!!");
+		ASSERT(!(transform_out.unk1 & 1)); // error allowed when the "render" flag is not set
 	}
 
 	if (pIn->IsPreroll() == S_OK || rtStart < 0 || !(transform_out.unk1 & 1)) {
@@ -1835,8 +1835,8 @@ HRESULT CRealVideoDecoder::Transform(IMediaSample* pIn)
 	pOut->SetDiscontinuity(pIn->IsDiscontinuity() == S_OK);
 
 #if 0
-	DbgLog((LOG_TRACE, 3, _T("V: rtStart = %I64d, rtStop = %I64d, disc = %d, sync = %d"),
-			rtStart, rtStop, pOut->IsDiscontinuity() == S_OK, pOut->IsSyncPoint() == S_OK));
+	DLog(L"V: rtStart = %I64d, rtStop = %I64d, disc = %d, sync = %d",
+			rtStart, rtStop, pOut->IsDiscontinuity() == S_OK, pOut->IsSyncPoint() == S_OK);
 #endif
 
 	if (CComQIPtr<IMediaSample2> pMS2 = pOut) {
@@ -2145,7 +2145,7 @@ HRESULT CRealVideoDecoder::AlterQuality(Quality q)
 	if (q.Late <= 0) {
 		m_fDropFrames = false;
 	}
-	//	TRACE(_T("CRealVideoDecoder::AlterQuality: Type=%d, Proportion=%d, Late=%I64d, TimeStamp=%I64d\n"), q.Type, q.Proportion, q.Late, q.TimeStamp);
+	//DLog(L"CRealVideoDecoder::AlterQuality: Type=%d, Proportion=%d, Late=%I64d, TimeStamp=%I64d", q.Type, q.Proportion, q.Late, q.TimeStamp);
 	return E_NOTIMPL;
 }
 
@@ -2352,7 +2352,7 @@ HRESULT CRealAudioDecoder::Receive(IMediaSample* pIn)
 						|| m_pInput->CurrentMediaType().subtype == MEDIASUBTYPE_ATRC)) {
 				for (int y = 0; y < h; y++) {
 					for (int x = 0, w2 = w / sps; x < w2; x++) {
-						// TRACE(_T("--- %d, %d\n"), (h*x+((h+1)/2)*(y&1)+(y>>1)), sps*(h*x+((h+1)/2)*(y&1)+(y>>1)));
+						//DLog(L"--- %d, %d", (h*x+((h+1)/2)*(y&1)+(y>>1)), sps*(h*x+((h+1)/2)*(y&1)+(y>>1)));
 						memcpy(dst + sps*(h*x+((h+1)/2)*(y&1)+(y>>1)), src, sps);
 						src += sps;
 					}
@@ -2419,7 +2419,7 @@ HRESULT CRealAudioDecoder::Receive(IMediaSample* pIn)
 		hr = RADecode(m_dwCookie, src, w, pDataOut, &len, -1);
 
 		if (FAILED(hr)) {
-			TRACE(_T("RA returned an error code!!!\n"));
+			DLog(L"RA returned an error code!!!");
 			continue;
 			//			return hr;
 		}
@@ -2437,8 +2437,8 @@ HRESULT CRealAudioDecoder::Receive(IMediaSample* pIn)
 		pOut->SetActualDataLength(len);
 
 #if 0
-		DbgLog((LOG_TRACE, 0, _T("A: rtStart=%I64d, rtStop=%I64d, disc=%d, sync=%d"),
-				rtStart, rtStop, pOut->IsDiscontinuity() == S_OK, pOut->IsSyncPoint() == S_OK));
+		DLog(L"A: rtStart=%I64d, rtStop=%I64d, disc=%d, sync=%d",
+				rtStart, rtStop, pOut->IsDiscontinuity() == S_OK, pOut->IsSyncPoint() == S_OK);
 #endif
 
 		if (rtStart >= 0 && S_OK != (hr = m_pOutput->Deliver(pOut))) {

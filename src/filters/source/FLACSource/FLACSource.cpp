@@ -630,7 +630,7 @@ FLAC__StreamDecoderWriteStatus StreamDecoderWrite(const FLAC__StreamDecoder *dec
 
 void StreamDecoderError(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data)
 {
-	DLog("FLAC::StreamDecoderError() : %s", FLAC__StreamDecoderErrorStatusString[status]);
+	DLog(L"FLAC::StreamDecoderError() : %S", FLAC__StreamDecoderErrorStatusString[status]);
 }
 
 void StreamDecoderMetadata(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)

@@ -228,7 +228,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 	while (m_pFile->ByteRead(Chunk.data, sizeof(Chunk)) == S_OK && m_pFile->GetPos() < end) {
 		__int64 pos = m_pFile->GetPos();
 
-		DLog("CWAVFile::Open() : found '%c%c%c%c' chunk.",
+		DLog(L"CWAVFile::Open() : found '%c%c%c%c' chunk.",
 			TCHAR((Chunk.id>>0)&0xff),
 			TCHAR((Chunk.id>>8)&0xff),
 			TCHAR((Chunk.id>>16)&0xff),
@@ -237,20 +237,20 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 		switch (Chunk.id) {
 		case FCC('fmt '):
 			if (m_fmtdata || Chunk.size < sizeof(PCMWAVEFORMAT) || Chunk.size > 65536) {
-				DLog("CWAVFile::Open() : bad format");
+				DLog(L"CWAVFile::Open() : bad format");
 				return E_FAIL;
 			}
 			m_fmtsize = max(Chunk.size, sizeof(WAVEFORMATEX)); // PCMWAVEFORMAT to WAVEFORMATEX
 			m_fmtdata = DNew BYTE[m_fmtsize];
 			memset(m_fmtdata, 0, m_fmtsize);
 			if (m_pFile->ByteRead(m_fmtdata, Chunk.size) != S_OK) {
-				DLog("CWAVFile::Open() : format can not be read.");
+				DLog(L"CWAVFile::Open() : format can not be read.");
 				return E_FAIL;
 			}
 			break;
 		case FCC('data'):
 			if (m_endpos) {
-				DLog("CWAVFile::Open() : bad format");
+				DLog(L"CWAVFile::Open() : bad format");
 				return E_FAIL;
 			}
 			m_startpos	= pos;
@@ -264,7 +264,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 			break;
 		case FCC('wavl'): // not supported
 		case FCC('slnt'): // not supported
-			DLog("CWAVFile::Open() : WAVE file is not supported!");
+			DLog(L"CWAVFile::Open() : WAVE file is not supported!");
 			return E_FAIL;
 		case FCC('ID3 '):
 		case FCC('id3 '):
@@ -274,7 +274,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 			for (int i = 0; i < sizeof(Chunk.id); i++) {
 				BYTE ch = Chunk.data[i];
 				if (ch != 0x20 && (ch < '0' || ch > '9') && (ch < 'A' || ch > 'Z') && (ch < 'a' || ch > 'z')) {
-					DLog("CWAVFile::Open() : broken file!");
+					DLog(L"CWAVFile::Open() : broken file!");
 					return E_FAIL;
 				}
 			}

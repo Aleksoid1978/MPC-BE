@@ -522,9 +522,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 END_MESSAGE_MAP()
 
 #ifdef _DEBUG
-const TCHAR *GetEventString(LONG evCode)
+const WCHAR* GetEventString(LONG evCode)
 {
-#define UNPACK_VALUE(VALUE) case VALUE: return _T( #VALUE );
+#define UNPACK_VALUE(VALUE) case VALUE: return L#VALUE;
 	switch (evCode) {
 			UNPACK_VALUE(EC_COMPLETE);
 			UNPACK_VALUE(EC_USERABORT);
@@ -593,7 +593,7 @@ const TCHAR *GetEventString(LONG evCode)
 			UNPACK_VALUE(EC_BG_ERROR);
 	};
 #undef UNPACK_VALUE
-	return _T("UNKNOWN");
+	return L"UNKNOWN";
 }
 #endif
 
@@ -714,7 +714,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// create a Main View Window
 	if (!m_wndView.Create(NULL, NULL, AFX_WS_DEFAULT_VIEW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
 						  CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST)) {
-		DLog("Failed to create Main View Window");
+		DLog(L"Failed to create Main View Window");
 		return -1;
 	}
 
@@ -728,7 +728,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// Create Preview Window
 	if (!m_wndPreView.CreateEx(WS_EX_TOPMOST, AfxRegisterWndClass(0), NULL, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 160, 109), this, 0)) {
-		DLog("Failed to create Preview Window");
+		DLog(L"Failed to create Preview Window");
 		m_wndView.DestroyWindow();
 		return -1;
 	} else {
@@ -751,7 +751,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		bResult = m_wndSeekBar.Create(this);
 	}
 	if (!bResult) {
-		DLog("Failed to create all control bars");
+		DLog(L"Failed to create all control bars");
 		return -1;      // fail to create
 	}
 
@@ -939,7 +939,7 @@ void CMainFrame::OnDestroy()
 		CAMMsgEvent e;
 		m_pGraphThread->PostThreadMessage(CGraphThread::TM_EXIT, 0, (LPARAM)&e);
 		if (!e.Wait(5000)) {
-			DLog("ERROR: Must call TerminateThread() on CMainFrame::m_pGraphThread->m_hThread");
+			DLog(L"ERROR: Must call TerminateThread() on CMainFrame::m_pGraphThread->m_hThread");
 			TerminateThread(m_pGraphThread->m_hThread, 0xDEAD);
 		}
 	}
@@ -978,7 +978,7 @@ void CMainFrame::OnDestroy()
 
 void CMainFrame::OnClose()
 {
-	DLog("CMainFrame::OnClose() : start");
+	DLog(L"CMainFrame::OnClose() : start");
 
 	m_bClosingState = true;
 
@@ -1050,7 +1050,7 @@ void CMainFrame::OnClose()
 		}
 	}
 
-	DLog("CMainFrame::OnClose() : end");
+	DLog(L"CMainFrame::OnClose() : end");
 	__super::OnClose();
 }
 
@@ -1224,10 +1224,10 @@ LRESULT CMainFrame::OnTaskBarThumbnailsCreate(WPARAM, LPARAM)
 LRESULT CMainFrame::OnQueryCancelAutoPlay(WPARAM wParam, LPARAM lParam)
 {
 	if (wParam == m_DiskImage.GetDriveLetter() - 'A') {
-		DLog("CMainFrame: block autopay for %C:\\", (PCHAR)wParam + 'A');
+		DLog(L"CMainFrame: block autopay for %C:\\", (PCHAR)wParam + 'A');
 		return TRUE;
 	} else {
-		DLog("CMainFrame: allow autopay for %C:\\", (PCHAR)wParam + 'A');
+		DLog(L"CMainFrame: allow autopay for %C:\\", (PCHAR)wParam + 'A');
 		return FALSE;
 	}
 }
@@ -2071,7 +2071,7 @@ void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
 
 void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 {
-	DLog("CMainFrame::OnDisplayChange() : start");
+	DLog(L"CMainFrame::OnDisplayChange() : start");
 	if (m_eMediaLoadState == MLS_LOADED) {
 		if (m_pGraphThread) {
 			CAMMsgEvent e;
@@ -2100,7 +2100,7 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 		}
 	}
 
-	DLog("CMainFrame::OnDisplayChange() : end");
+	DLog(L"CMainFrame::OnDisplayChange() : end");
 }
 
 LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
@@ -2123,7 +2123,7 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	// Only stop screensaver if video playing; allow for audio only
 	if ((GetMediaState() == State_Running && !m_bAudioOnly) && (((nID & 0xFFF0) == SC_SCREENSAVE) || ((nID & 0xFFF0) == SC_MONITORPOWER))) {
-		DLog("SC_SCREENSAVE, nID = %d, lParam = %d", nID, lParam);
+		DLog(L"SC_SCREENSAVE, nID = %d, lParam = %d", nID, lParam);
 		return;
 	} else if ((nID & 0xFFF0) == SC_MINIMIZE && m_fTrayIcon) {
 		if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {
@@ -2978,10 +2978,10 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				}
 				break;
 			case EC_ERRORABORT:
-				DLog("\thr = %08x", (HRESULT)evParam1);
+				DLog(L"OnGraphNotify: EC_ERRORABORT -> hr = %08x", (HRESULT)evParam1);
 				break;
 			case EC_BUFFERING_DATA:
-				DLog("\t%d, %d", evParam1, evParam2);
+				DLog(L"OnGraphNotify: EC_BUFFERING_DATA -> %d, %d", evParam1, evParam2);
 
 				m_fBuffering = ((HRESULT)evParam1 != S_OK);
 				break;
@@ -3230,7 +3230,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				break;
 			case EC_DVD_ERROR:
 				if (m_pDVDC) {
-					DLog("\t%d, %d", evParam1, evParam2);
+					DLog(L"OnGraphNotify: EC_DVD_ERROR -> %d, %d", evParam1, evParam2);
 
 					CString err;
 
@@ -3272,17 +3272,17 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				break;
 			case EC_DVD_WARNING:
 				if (m_pDVDC) {
-					DLog("\t%d, %d", evParam1, evParam2);
+					DLog(L"OnGraphNotify: EC_DVD_WARNING -> %d, %d", evParam1, evParam2);
 				}
 				break;
 			case EC_VIDEO_SIZE_CHANGED: {
-				DLog("\t%dx%d", CSize(evParam1));
+				CSize size(evParam1);
+				DLog(L"OnGraphNotify: EC_VIDEO_SIZE_CHANGED -> %ldx%ld", size.cx, size.cy);
 
 				WINDOWPLACEMENT wp;
 				wp.length = sizeof(wp);
 				GetWindowPlacement(&wp);
 
-				CSize size(evParam1);
 				m_bAudioOnly = (size.cx <= 0 || size.cy <= 0);
 
 				if (s.fRememberZoomLevel
@@ -3337,7 +3337,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 
 LRESULT CMainFrame::OnResetDevice(WPARAM wParam, LPARAM lParam)
 {
-	DLog("CMainFrame::OnResetDevice() : start");
+	DLog(L"CMainFrame::OnResetDevice() : start");
 
 	OAFilterState fs = State_Stopped;
 	m_pMC->GetState(0, &fs);
@@ -3373,7 +3373,7 @@ LRESULT CMainFrame::OnResetDevice(WPARAM wParam, LPARAM lParam)
 		m_pMC->Run();
 	}
 
-	DLog("CMainFrame::OnResetDevice() : end");
+	DLog(L"CMainFrame::OnResetDevice() : end");
 	return S_OK;
 }
 
@@ -4344,7 +4344,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 void CMainFrame::OnFilePostCloseMedia()
 {
-	DLog("CMainFrame::OnFilePostCloseMedia() : start");
+	DLog(L"CMainFrame::OnFilePostCloseMedia() : start");
 
 	SetPlaybackMode(PM_NONE);
 	SetLoadState(MLS_CLOSED);
@@ -4439,7 +4439,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	SetToolBarAudioButton();
 	SetToolBarSubtitleButton();
 
-	DLog("CMainFrame::OnFilePostCloseMedia() : end");
+	DLog(L"CMainFrame::OnFilePostCloseMedia() : end");
 }
 
 void CMainFrame::OnBossKey()
@@ -12095,36 +12095,36 @@ CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 		if (!pAudCapTmp) {
 			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Interleaved, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCCap))
 					&& FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCCap))) {
-				DLog("Warning: No IAMStreamConfig interface for vidcap capture");
+				DLog(L"Warning: No IAMStreamConfig interface for vidcap capture");
 			}
 
 			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Interleaved, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCPrev))
 					&& FAILED(pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Video, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCPrev))) {
-				DLog("Warning: No IAMStreamConfig interface for vidcap capture");
+				DLog(L"Warning: No IAMStreamConfig interface for vidcap capture");
 			}
 
 			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio, pVidCap, IID_IAMStreamConfig, (void **)&pAMASC))
 					&& FAILED(pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Audio, pVidCap, IID_IAMStreamConfig, (void **)&pAMASC))) {
-				DLog("Warning: No IAMStreamConfig interface for vidcap");
+				DLog(L"Warning: No IAMStreamConfig interface for vidcap");
 			} else {
 				pAudCap = pVidCap;
 			}
 		} else {
 			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCCap))) {
-				DLog("Warning: No IAMStreamConfig interface for vidcap capture");
+				DLog(L"Warning: No IAMStreamConfig interface for vidcap capture");
 			}
 
 			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCPrev))) {
-				DLog("Warning: No IAMStreamConfig interface for vidcap capture");
+				DLog(L"Warning: No IAMStreamConfig interface for vidcap capture");
 			}
 		}
 
 		if (FAILED(pCGB->FindInterface(&LOOK_UPSTREAM_ONLY, NULL, pVidCap, IID_IAMCrossbar, (void**)&pAMXBar))) {
-			DLog("Warning: No IAMCrossbar interface was found");
+			DLog(L"Warning: No IAMCrossbar interface was found");
 		}
 
 		if (FAILED(pCGB->FindInterface(&LOOK_UPSTREAM_ONLY, NULL, pVidCap, IID_IAMTVTuner, (void**)&pAMTuner))) {
-			DLog("Warning: No IAMTVTuner interface was found");
+			DLog(L"Warning: No IAMTVTuner interface was found");
 		}
 
 		if (pAMTuner) { // load saved channel
@@ -12157,7 +12157,7 @@ CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 
 		if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio, pAudCap, IID_IAMStreamConfig, (void **)&pAMASC))
 				&& FAILED(pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Audio, pAudCap, IID_IAMStreamConfig, (void **)&pAMASC))) {
-			DLog("Warning: No IAMStreamConfig interface for vidcap");
+			DLog(L"Warning: No IAMStreamConfig interface for vidcap");
 		}
 		/*
 		CInterfaceArray<IAMAudioInputMixer> pAMAIM;
@@ -12874,9 +12874,9 @@ void CMainFrame::OpenSetupAudioStream()
 
 #ifdef DEBUG
 		if (!MixAS.IsEmpty()) {
-			DLog("Audio Track list :");
+			DLog(L"Audio Track list :");
 			for (size_t i = 0; i < MixAS.GetCount(); i++) {
-				DLog(L"	%s, type = %s", MixAS[i].Name, MixAS[i].Filter == 1 ? L"Splitter" : L"AudioSwitcher");
+				DLog(L"    %s, type = %s", MixAS[i].Name, MixAS[i].Filter == 1 ? L"Splitter" : L"AudioSwitcher");
 			}
 		}
 #endif
@@ -13293,13 +13293,13 @@ void __stdcall MadVRExclusiveModeCallback(LPVOID context, int event)
 {
 	CString _event;
 	switch (event) {
-		case ExclusiveModeIsAboutToBeEntered	: _event = _T("ExclusiveModeIsAboutToBeEntered"); break;
-		case ExclusiveModeWasJustEntered		: _event = _T("ExclusiveModeWasJustEntered"); break;
-		case ExclusiveModeIsAboutToBeLeft		: _event = _T("ExclusiveModeIsAboutToBeLeft"); break;
-		case ExclusiveModeWasJustLeft			: _event = _T("ExclusiveModeWasJustLeft"); break;
-		default									: _event = _T("Unknown event"); break;
+		case ExclusiveModeIsAboutToBeEntered	: _event = L"ExclusiveModeIsAboutToBeEntered"; break;
+		case ExclusiveModeWasJustEntered		: _event = L"ExclusiveModeWasJustEntered"; break;
+		case ExclusiveModeIsAboutToBeLeft		: _event = L"ExclusiveModeIsAboutToBeLeft"; break;
+		case ExclusiveModeWasJustLeft			: _event = L"ExclusiveModeWasJustLeft"; break;
+		default									: _event = L"Unknown event"; break;
 	}
-	DLog(L"MadVRExclusiveModeCallback() : event = %ws", _event);
+	DLog(L"MadVRExclusiveModeCallback() : event = %s", _event);
 
 	if (event == ExclusiveModeIsAboutToBeEntered) {
 		((CMainFrame*)context)->IsMadVRExclusiveMode = true;
@@ -13345,7 +13345,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 				fileItem = L"http://" + fileItem.GetName();
 			}
 
-			DLog("--> CMainFrame::OpenMediaPrivate() - pFileData->fns[%d]:", index++);
+			DLog(L"--> CMainFrame::OpenMediaPrivate() - pFileData->fns[%d]:", index++);
 			DLog(L"    %s", fileItem.GetName());
 		}
 	}
@@ -13704,7 +13704,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 void CMainFrame::CloseMediaPrivate()
 {
-	DLog("CMainFrame::CloseMediaPrivate() : start");
+	DLog(L"CMainFrame::CloseMediaPrivate() : start");
 
 	ASSERT(m_eMediaLoadState == MLS_CLOSING);
 
@@ -13841,7 +13841,7 @@ void CMainFrame::CloseMediaPrivate()
 
 	m_FontInstaller.UninstallFonts();
 
-	DLog("CMainFrame::CloseMediaPrivate() : end");
+	DLog(L"CMainFrame::CloseMediaPrivate() : end");
 }
 
 void CMainFrame::ParseDirs(CAtlList<CString>& sl)
@@ -16131,7 +16131,7 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 			SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 		}
 	} else if (GetPlaybackMode() == PM_CAPTURE) {
-		//DLog("Warning (CMainFrame::SeekTo): Trying to seek in capture mode");
+		//DLog(L"Warning (CMainFrame::SeekTo): Trying to seek in capture mode");
 	}
 	m_bEndOfStream = false;
 
@@ -16806,7 +16806,7 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 		return;
 	}
 
-	DLog("CMainFrame::CloseMedia() : start");
+	DLog(L"CMainFrame::CloseMedia() : start");
 
 	m_bNextIsOpened = bNextIsOpened;
 
@@ -16821,7 +16821,7 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 			BeginWaitCursor();
 			if (WaitForSingleObject(m_hGraphThreadEventOpen, 5000) == WAIT_TIMEOUT) {
 				MessageBeep(MB_ICONEXCLAMATION);
-				DLog("CRITICAL ERROR: !!! Must kill opener thread !!!");
+				DLog(L"CRITICAL ERROR: !!! Must kill opener thread !!!");
 				TerminateThread(m_pGraphThread->m_hThread, 0xDEAD);
 
 				m_pGraphThread = (CGraphThread*)AfxBeginThread(RUNTIME_CLASS(CGraphThread));
@@ -16871,7 +16871,7 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 
 	OnFilePostCloseMedia();
 
-	DLog("CMainFrame::CloseMedia() : end");
+	DLog(L"CMainFrame::CloseMedia() : end");
 }
 
 void CMainFrame::StartTunerScan(CAutoPtr<TunerScanData> pTSD)
@@ -16941,16 +16941,16 @@ void CMainFrame::SetLoadState(MPC_LOADSTATE iState)
 
 	switch (m_eMediaLoadState) {
 		case MLS_CLOSED:
-			DLog("CMainFrame::SetLoadState() : CLOSED");
+			DLog(L"CMainFrame::SetLoadState() : CLOSED");
 			break;
 		case MLS_LOADING:
-			DLog("CMainFrame::SetLoadState() : LOADING");
+			DLog(L"CMainFrame::SetLoadState() : LOADING");
 			break;
 		case MLS_LOADED:
-			DLog("CMainFrame::SetLoadState() : LOADED");
+			DLog(L"CMainFrame::SetLoadState() : LOADED");
 			break;
 		case MLS_CLOSING:
-			DLog("CMainFrame::SetLoadState() : CLOSING");
+			DLog(L"CMainFrame::SetLoadState() : CLOSING");
 			break;
 		default:
 			break;
@@ -17997,7 +17997,7 @@ UINT CMainFrame::OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData)
 
 	switch (nPowerEvent) {
 		case PBT_APMSUSPEND: // System is suspending operation.
-			DLog("OnPowerBroadcast() - suspending"); // For user tracking
+			DLog(L"OnPowerBroadcast() - suspending"); // For user tracking
 
 			bWasPausedBeforeSuspention = FALSE; // Reset value
 
@@ -18008,7 +18008,7 @@ UINT CMainFrame::OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData)
 			}
 			break;
 		case PBT_APMRESUMEAUTOMATIC: // Operation is resuming automatically from a low-power state. This message is sent every time the system resumes.
-			DLog("OnPowerBroadcast() - resuming"); // For user tracking
+			DLog(L"OnPowerBroadcast() - resuming"); // For user tracking
 
 			// Resume if we paused before suspension.
 			if (bWasPausedBeforeSuspention) {
@@ -18026,7 +18026,7 @@ void CMainFrame::OnSessionChange(UINT nSessionState, UINT nId)
 
 	switch (nSessionState) {
 		case WTS_SESSION_LOCK:
-			DLog("OnSessionChange() - Lock session");
+			DLog(L"OnSessionChange() - Lock session");
 
 			bWasPausedBeforeSessionChange = FALSE;
 			if (GetMediaState() == State_Running && !m_bAudioOnly) {
@@ -18035,7 +18035,7 @@ void CMainFrame::OnSessionChange(UINT nSessionState, UINT nId)
 			}
 			break;
 		case WTS_SESSION_UNLOCK:
-			DLog("OnSessionChange() - UnLock session");
+			DLog(L"OnSessionChange() - UnLock session");
 
 			if (bWasPausedBeforeSessionChange) {
 				SendMessage( WM_COMMAND, ID_PLAY_PLAY );

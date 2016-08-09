@@ -435,7 +435,7 @@ CFGFilterVideoRenderer::CFGFilterVideoRenderer(HWND hWnd, const CLSID& clsid, CS
 
 HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
 {
-	DLog("CFGFilterVideoRenderer::Create() on thread: %d", GetCurrentThreadId());
+	DLog(L"CFGFilterVideoRenderer::Create() on thread: %d", GetCurrentThreadId());
 	CheckPointer(ppBF, E_POINTER);
 
 	HRESULT hr = S_OK;
@@ -632,7 +632,7 @@ POSITION CFGFilterList::GetHeadPosition()
 			}
 		}
 #ifdef _DEBUG
-		DLog("FGM: Sorting filters");
+		DLog(L"FGM: Sorting filters");
 
 		pos = m_sortedfilters.GetHeadPosition();
 		while (pos) {

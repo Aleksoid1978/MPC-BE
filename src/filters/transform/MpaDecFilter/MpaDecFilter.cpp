@@ -593,25 +593,25 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 
 #if 0
 	if (SUCCEEDED(hr)) {
-		DLog("CMpaDecFilter::Receive(): [%10I64d => %10I64d], %d", rtStart, rtStop, rtStop - rtStart);
+		DLog(L"CMpaDecFilter::Receive(): [%10I64d => %10I64d], %I64d", rtStart, rtStop, rtStop - rtStart);
 	} else {
-		DLog("CMpaDecFilter::Receive(): frame without timestamp");
+		DLog(L"CMpaDecFilter::Receive(): frame without timestamp");
 	}
 #endif
 
 	if (pIn->IsDiscontinuity() == S_OK
 			|| (m_bNeedSyncPoint && S_OK == pIn->IsSyncPoint())) {
-		DLog("CMpaDecFilter::Receive() : Discontinuity, flushing decoder");
+		DLog(L"CMpaDecFilter::Receive() : Discontinuity, flushing decoder");
 		m_bDiscontinuity = TRUE;
 		m_buff.RemoveAll();
 		m_encbuff.RemoveAll();
 		m_bResync = true;
 		if (FAILED(hr)) {
-			DLog("    -> Discontinuity without timestamp");
+			DLog(L"    -> Discontinuity without timestamp");
 		}
 
 		if (m_bNeedSyncPoint && pIn->IsSyncPoint() == S_OK) {
-			DLog("    -> Got SyncPoint, resuming decoding");
+			DLog(L"    -> Got SyncPoint, resuming decoding");
 			m_bNeedSyncPoint = FALSE;
 		}
 	}
@@ -627,12 +627,12 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	}
 
 	if (rtStart != INVALID_TIME && abs(m_rtStart - rtStart) > jitterLimit) {
-		DLog("CMpaDecFilter::Receive() : jitter limit is exceeded - %I64d", abs(m_rtStart - rtStart));
+		DLog(L"CMpaDecFilter::Receive() : jitter limit is exceeded - %I64d", abs(m_rtStart - rtStart));
 		m_bResync = true;
 	}
 
 	if (m_bResync && SUCCEEDED(hr)) {
-		DLog("CMpaDecFilter::Receive() : Resync Request - [%I64d -> %I64d], buffer : %u", m_rtStart, rtStart, m_buff.GetCount());
+		DLog(L"CMpaDecFilter::Receive() : Resync Request - [%I64d -> %I64d], buffer : %Iu", m_rtStart, rtStart, m_buff.GetCount());
 
 		m_buff.RemoveAll();
 		m_encbuff.RemoveAll();
@@ -1237,7 +1237,7 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF(BOOL bEOF/* = FALSE*/)
 					type = IEC61937_DTS3;
 					break;
 				default:
-					DLog("CMpaDecFilter:ProcessDTS_SPDIF() - framelength is not supported");
+					DLog(L"CMpaDecFilter:ProcessDTS_SPDIF() - framelength is not supported");
 					return E_FAIL;
 			}
 			if (FAILED(hr = DeliverBitstream(p, size, type, aframe.samplerate >> aframe.param2, aframe.samples))) {
@@ -1731,7 +1731,7 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 			isHDMI = true;
 			break;
 		default:
-			DLog("CMpaDecFilter::DeliverBitstream() - type is not supported");
+			DLog(L"CMpaDecFilter::DeliverBitstream() - type is not supported");
 			return E_INVALIDARG;
 	}
 
@@ -2215,7 +2215,7 @@ HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 
 HRESULT CMpaDecFilter::BreakConnect(PIN_DIRECTION dir)
 {
-	DLog("CMpaDecFilter::BreakConnect()");
+	DLog(L"CMpaDecFilter::BreakConnect()");
 
 	if (dir == PINDIR_INPUT) {
 		m_FFAudioDec.StreamFinish();

@@ -521,7 +521,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		if (mts.IsEmpty()) {
-			DbgLog((LOG_TRACE, 3, L"CAviSourceFilter: Unsupported stream (%d)", i));
+			DLog(L"CAviSourceFilter: Unsupported stream (%d)", i);
 			continue;
 		}
 
@@ -728,10 +728,10 @@ bool CAviSplitterFilter::DemuxLoop()
 				}
 
 				if (size != s->cs[f].orgsize) {
-					DbgLog((LOG_TRACE, 3, L"CAviSplitterFilter::DemuxLoop() : incorrect chunk size. TrackNum: %d, by index: %d, by header: %d", TRACKNUM(id), s->cs[f].orgsize, size));
+					DLog(L"CAviSplitterFilter::DemuxLoop() : incorrect chunk size. TrackNum: %d, by index: %u, by header: %u", TRACKNUM(id), s->cs[f].orgsize, size);
 					const DWORD maxChunkSize = (f + 1 < s->cs.GetCount() ? s->cs[f + 1].filepos : m_pFile->GetLength()) - m_pFile->GetPos();
 					if (size > maxChunkSize) {
-						DbgLog((LOG_TRACE, 3, L"	using from index"));
+						DLog(L"    using from index");
 						size = s->cs[f].orgsize;
 					}
 					fDiscontinuity[curTrack] = TRUE;
@@ -753,12 +753,11 @@ bool CAviSplitterFilter::DemuxLoop()
 				return true;
 			}
 #if defined(_DEBUG) && 0
-			DbgLog((LOG_TRACE, 3,
-					_T("%d (%d): %I64d - %I64d, %I64d - %I64d (size = %d)"),
+			DLog(L"%d (%d): %I64d - %I64d, %I64d - %I64d (size = %u)",
 					minTrack, (int)p->bSyncPoint,
 					(p->rtStart) / 10000, (p->rtStop) / 10000,
 					(p->rtStart - m_rtStart) / 10000, (p->rtStop - m_rtStart) / 10000,
-					size));
+					size);
 #endif
 			m_maxTimeStamp = max(m_maxTimeStamp, p->rtStart);
 

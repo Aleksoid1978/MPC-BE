@@ -63,7 +63,7 @@ BOOL CAsyncFileReader::Open(LPCTSTR lpszFileName)
 				&& m_HTTPAsync.Connect(lpszFileName, 10000, L"MPC AsyncReader") == S_OK) {
 #ifdef DEBUG
 			const CString hdr = m_HTTPAsync.GetHeader();
-			DbgLog((LOG_TRACE, 3, "CAsyncFileReader::Open() - HTTP hdr:\n%ws", hdr));
+			DLog(L"CAsyncFileReader::Open() - HTTP hdr:\n%s", hdr);
 #endif
 			const QWORD ContentLength = m_HTTPAsync.GetLenght();
 			if (ContentLength == 0) {
@@ -126,7 +126,7 @@ again:
 					CString customHeader; customHeader.Format(L"Range: bytes=%I64d-\r\n", llPosition);
 					HRESULT hr = m_HTTPAsync.SendRequest(customHeader);
 #ifdef DEBUG
-					DbgLog((LOG_TRACE, 3, L"CAsyncFileReader::SyncRead() : do HTTP seeking to %I64d(current pos %I64d), hr = 0x%08x", llPosition, m_pos, hr));
+					DLog(L"CAsyncFileReader::SyncRead() : do HTTP seeking to %I64d(current pos %I64d), hr = 0x%08x", llPosition, m_pos, hr);
 #endif
 					if (hr != S_OK) {
 						return hr;

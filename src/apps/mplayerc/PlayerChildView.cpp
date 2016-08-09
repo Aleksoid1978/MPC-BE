@@ -43,9 +43,9 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	int digitizerStatus = GetSystemMetrics(SM_DIGITIZER);
 	if ((digitizerStatus & (NID_READY + NID_MULTI_INPUT))) {
-		DLog("CChildView::OnCreate() : touch is ready for input + support multiple inputs");
+		DLog(L"CChildView::OnCreate() : touch is ready for input + support multiple inputs");
 		if (!RegisterTouchWindow()) {
-			DLog("CChildView::OnCreate() : RegisterTouchWindow() failed");
+			DLog(L"CChildView::OnCreate() : RegisterTouchWindow() failed");
 		}
 	}
 

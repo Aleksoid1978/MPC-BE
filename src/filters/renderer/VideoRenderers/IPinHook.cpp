@@ -30,7 +30,7 @@
 #include "AllocatorCommon.h"
 #include "../../../DSUtil/SysVersion.h"
 
-#define DXVA_LOGFILE_A 1 // set to 1 for logging DXVA data to a file
+#define DXVA_LOGFILE_A 0 // set to 1 for logging DXVA data to a file
 #define LOG_BITSTREAM  0 // set to 1 for logging DXVA bistream data to a file
 #define LOG_MATRIX     0 // set to 1 for logging DXVA matrix data to a file
 

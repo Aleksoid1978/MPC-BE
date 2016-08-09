@@ -117,12 +117,12 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 	}
 
 	if (!ff_wv_parse_header(&wvc->header, wvc->block_header)) {
-		DLog("wv_read_block_header : Invalid block header.");
+		DLog(L"wv_read_block_header : Invalid block header.");
 		return E_FAIL;
 	}
 
 	if (wvc->header.version < 0x402 || wvc->header.version > 0x410) {
-		DLog("wv_read_block_header : Unsupported version %03X", wvc->header.version);
+		DLog(L"wv_read_block_header : Unsupported version %03X", wvc->header.version);
 		return E_FAIL;
 	}
 
@@ -160,7 +160,7 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 			switch (id & 0x3F) {
 			case 0xD:
 				if (size <= 1) {
-					DLog("wv_read_block_header : Insufficient channel information");
+					DLog(L"wv_read_block_header : Insufficient channel information");
 					return E_FAIL;
 				}
 				chan = 0;
@@ -185,7 +185,7 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 					pFile->ByteRead((BYTE*)&chmask, 3);
 					break;
 				default:
-					DLog("wv_read_block_header : Invalid channel info size %d", size);
+					DLog(L"wv_read_block_header : Invalid channel info size %d", size);
 					return E_FAIL;
 				}
 				break;
@@ -201,7 +201,7 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 			}
 		}
 		if (rate == -1) {
-			DLog("wv_read_block_header : Cannot determine custom sampling rate");
+			DLog(L"wv_read_block_header : Cannot determine custom sampling rate");
 			return E_FAIL;
 		}
 		pFile->Seek(block_end - wvc->header.blocksize);
@@ -216,15 +216,15 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 		wvc->rate   = rate;
 
 	if (flags && bpp != wvc->bpp) {
-		DLog("wv_read_block_header : Bits per sample differ, this block: %i, header block: %i", bpp, wvc->bpp);
+		DLog(L"wv_read_block_header : Bits per sample differ, this block: %d, header block: %d", bpp, wvc->bpp);
 		return E_FAIL;
 	}
 	if (flags && !wvc->multichannel && chan != wvc->chan) {
-		DLog("wv_read_block_header : Channels differ, this block: %i, header block: %i", chan, wvc->chan);
+		DLog(L"wv_read_block_header : Channels differ, this block: %d, header block: %d", chan, wvc->chan);
 		return E_FAIL;
 	}
 	if (flags && rate != -1 && rate != wvc->rate) {
-		DLog("wv_read_block_header : Sampling rate differ, this block: %i, header block: %i", rate, wvc->rate);
+		DLog(L"wv_read_block_header : Sampling rate differ, this block: %d, header block: %d", rate, wvc->rate);
 		return E_FAIL;
 	}
 
@@ -425,7 +425,7 @@ REFERENCE_TIME CWavPackFile::Seek(REFERENCE_TIME rt)
 		return 0;
 	}
 
-	DLog("CWavPackFile::Seek() : Seek to frame index %d (%d)", CurBlockIdx, BlockIndex);
+	DLog(L"CWavPackFile::Seek() : Seek to frame index %u (%u)", CurBlockIdx, BlockIndex);
 
 	m_pFile->Seek(CurFrmPos);
 

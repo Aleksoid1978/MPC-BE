@@ -805,7 +805,7 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 
 
 	if (bFormatChanged || cbBuffer > actual.cbBuffer) {
-		DLog("CStreamSwitcherInputPin::Receive(): %s", bFormatChanged ? "input or output media type changed" : "cbBuffer > actual.cbBuffer");
+		DLog(L"CStreamSwitcherInputPin::Receive(): %s", bFormatChanged ? L"input or output media type changed" : L"cbBuffer > actual.cbBuffer");
 
 		m_SampleProps.dwSampleFlags |= AM_SAMPLE_TYPECHANGED/* | AM_SAMPLE_DATADISCONTINUITY | AM_SAMPLE_TIMEDISCONTINUITY*/;
 
@@ -847,7 +847,7 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 	pmt = NULL;
 	if (bFormatChanged || S_OK == pOutSample->GetMediaType(&pmt)) {
 		pOutSample->SetMediaType(&pOut->CurrentMediaType());
-		DLog("CStreamSwitcherInputPin::Receive(): output media type changed");
+		DLog(L"CStreamSwitcherInputPin::Receive(): output media type changed");
 	}
 
 	// Transform

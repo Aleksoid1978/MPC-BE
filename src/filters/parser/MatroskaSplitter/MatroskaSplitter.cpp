@@ -608,18 +608,18 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				if (AvgTimePerFrame < 50000) {
 					ASSERT(FALSE); // hmm. really high fps?
 					if (codecAvgTimePerFrame > 0) {
-						DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CreateOutputs() : Something went wrong, take fps from the video stream."));
+						DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Something went wrong, take fps from the video stream.");
 						AvgTimePerFrame = codecAvgTimePerFrame;
 					}
 					else if (AvgTimePerFrame <= 0) {
-						DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CreateOutputs() : Everything is bad, set fps at random."));
+						DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Everything is bad, set fps at random.");
 						AvgTimePerFrame = 417083; // set 23.976 as default
 					}
 				}
 
 				if (!pTE->DefaultDuration) {
 					// manual fill DefaultDuration only if it is empty
-					DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CreateOutputs() : Empty DefaultDuration! Set calculated value."));
+					DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Empty DefaultDuration! Set calculated value.");
 					pTE->DefaultDuration.Set(AvgTimePerFrame * 100);
 				}
 
@@ -1024,7 +1024,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			if (mts.IsEmpty()) {
-				DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CreateOutputs() : Unsupported TrackType '%S' (%I64d)", CodecID, (UINT64)pTE->TrackType));
+				DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Unsupported TrackType '%S' (%I64u)", CodecID, (UINT64)pTE->TrackType);
 				continue;
 			}
 
@@ -1386,7 +1386,7 @@ void CMatroskaSplitterFilter::SendVorbisHeaderSample()
 			}
 
 			if (FAILED(hr)) {
-				DbgLog((LOG_TRACE, 3, L"MatroskaSplitterFilter::SendVorbisHeaderSample() - ERROR: Vorbis initialization failed for stream %I64d", TrackNumber));
+				DLog(L"MatroskaSplitterFilter::SendVorbisHeaderSample() - ERROR: Vorbis initialization failed for stream %u", TrackNumber);
 			}
 		}
 	}
@@ -1534,7 +1534,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					c.ParseTimeCode(m_pCluster);
 					const REFERENCE_TIME seek_rt = s.GetRefTime(c.TimeCode);
 					if (seek_rt <= rt) {
-						DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek() : plan A - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt));
+						DLog(L"CMatroskaSplitterFilter::DemuxSeek() : plan A - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
 						goto end;
 					}
 				}
@@ -1570,7 +1570,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					}
 
 					if (s.GetRefTime(c.TimeCode) == seek_rt) {
-						DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek(), plan B : %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt));
+						DLog(L"CMatroskaSplitterFilter::DemuxSeek(), plan B : %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
 						goto end;
 					}
 				} while (m_pCluster->Next());
@@ -1579,13 +1579,13 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 		// epic fail ...
 		m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
-		DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek(), epic fail ... start from begin"));
+		DLog(L"CMatroskaSplitterFilter::DemuxSeek(), epic fail ... start from begin");
 
 	end:
 		Cluster c;
 		c.ParseTimeCode(m_pCluster);
 		m_Seek_rt = s.GetRefTime(c.TimeCode);
-		DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::DemuxSeek() : Final(Cluster timecode) - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(m_Seek_rt), rt, m_Seek_rt));
+		DLog(L"CMatroskaSplitterFilter::DemuxSeek() : Final(Cluster timecode) - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(m_Seek_rt), rt, m_Seek_rt);
 	}
 }
 
