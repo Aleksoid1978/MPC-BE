@@ -261,7 +261,7 @@ redirect:
 	if (!m_socket.Connect(m_url, redirectUrl)) {
 		int nError = GetLastError();
 		if (nError == WSAEINTR) {
-			DLog("CShoutcastStream(): failed connect for TimeOut!");
+			DLog(L"CShoutcastStream(): failed connect for TimeOut!");
 		}
 
 		m_socket.Close();
@@ -367,7 +367,7 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 			}
 		}
 
-		DLog("CShoutcastStream(): START BUFFERING");
+		DLog(L"CShoutcastStream(): START BUFFERING");
 		m_fBuffering = true;
 
 		for (;;) {
@@ -390,7 +390,7 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 
 		DeliverNewSegment(0, ~0, 1.0);
 
-		DLog("CShoutcastStream(): END BUFFERING");
+		DLog(L"CShoutcastStream(): END BUFFERING");
 		m_fBuffering = false;
 	} while (false);
 
@@ -748,7 +748,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 					m_title = str.Mid(i, j - i);
 				}
 			} else {
-				DLog("CShoutcastStream(): StreamTitle is missing");
+				DLog(L"CShoutcastStream(): StreamTitle is missing");
 			}
 
 			i = str.Find(L"StreamUrl='");
@@ -775,19 +775,19 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 				continue;
 			}
 
-			DLog("CShoutcastStream(): !!!!!!!!!StreamTitle found inside mp3 data!!!!!!!!! offset=%d", p - p0);
-			DLog("resyncing...");
+			DLog(L"CShoutcastStream(): !!!!!!!!!StreamTitle found inside mp3 data!!!!!!!!! offset=%Id", p - p0);
+			DLog(L"resyncing...");
 			while (p-- > p0) {
 				if ((BYTE)*p >= 0x20) {
 					continue;
 				}
 
-				DLog("CShoutcastStream(): found possible length byte: %d, skipping %d bytes", *p, 1 + *p*16);
+				DLog(L"CShoutcastStream(): found possible length byte: %d, skipping %d bytes", *p, 1 + *p*16);
 				p += 1 + *p*16;
 				len = (int)(p0 + len - p);
-				DLog("CShoutcastStream(): returning the remaining bytes in the packet: %d", len);
+				DLog(L"CShoutcastStream(): returning the remaining bytes in the packet: %d", len);
 				if (len <= 0) {
-					DLog("CShoutcastStream(): nothing to return, reading a bit more in");
+					DLog(L"CShoutcastStream(): nothing to return, reading a bit more in");
 					if (len < 0) {
 						__super::Receive(lpBuf, -len, nFlags);
 					}
@@ -833,7 +833,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 		m_bitrate = 0;
 
 		CStringA hdr = GetHeader();
-		DLog("CShoutcastSocket::Connect() - HTTP hdr:\n%s", hdr);
+		DLog(L"CShoutcastSocket::Connect() - HTTP hdr:\n%S", hdr);
 
 		CAtlList<CStringA> sl;
 		Explode(hdr, sl, '\n');
@@ -856,27 +856,27 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 				value.MakeLower();
 				if (value == "audio/mpeg") {
 					m_Format = AUDIO_MPEG;
-					DLog("CShoutcastSocket::Connect() - detected MPEG Audio format");
+					DLog(L"CShoutcastSocket::Connect() - detected MPEG Audio format");
 				}
 				else if (value == "audio/aac" || value == "audio/aacp") {
 					m_Format = AUDIO_AAC;
-					DLog("CShoutcastSocket::Connect() - detected AAC Audio format");
+					DLog(L"CShoutcastSocket::Connect() - detected AAC Audio format");
 				}
 				else if (value == "audio/x-scpls") {
 					m_Format = AUDIO_PLS;
-					DLog("CShoutcastSocket::Connect() - detected PLS playlist format");
+					DLog(L"CShoutcastSocket::Connect() - detected PLS playlist format");
 				}
 				else if (value == "audio/x-mpegurl") {
 					m_Format = AUDIO_M3U;
-					DLog("CShoutcastSocket::Connect() - detected M3U playlist format");
+					DLog(L"CShoutcastSocket::Connect() - detected M3U playlist format");
 				}
 				else if (value == "application/xspf+xml") {
 					m_Format = AUDIO_XSPF;
-					DLog("CShoutcastSocket::Connect() - detected XSPF playlist format");
+					DLog(L"CShoutcastSocket::Connect() - detected XSPF playlist format");
 				}
 				else if (value == "application/ogg") {
 					// not supported yet
-					DLog("CShoutcastSocket::Connect() - detected Ogg format");
+					DLog(L"CShoutcastSocket::Connect() - detected Ogg format");
 				}
 			}
 			else if (param == "content-length") {

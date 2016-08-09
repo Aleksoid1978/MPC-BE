@@ -98,7 +98,7 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 	m_currentframe		= 0;
 
 	if(m_totalframes >= UINT_MAX/sizeof(uint32_t) || m_totalframes <= 0) {
-		DLog("CTTAile::Open() : totalframes %d invalid", m_totalframes);
+		DLog(L"CTTAile::Open() : totalframes %d invalid", m_totalframes);
 		return E_FAIL;
 	}
 

@@ -48,9 +48,9 @@ int CFullscreenWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	int digitizerStatus = GetSystemMetrics(SM_DIGITIZER);
 	if ((digitizerStatus & (NID_READY + NID_MULTI_INPUT))) {
-		DLog("CFullscreenWnd::OnCreate() : touch is ready for input + support multiple inputs");
+		DLog(L"CFullscreenWnd::OnCreate() : touch is ready for input + support multiple inputs");
 		if (!RegisterTouchWindow()) {
-			DLog("CFullscreenWnd::OnCreate() : RegisterTouchWindow() failed");
+			DLog(L"CFullscreenWnd::OnCreate() : RegisterTouchWindow() failed");
 		}
 	}
 

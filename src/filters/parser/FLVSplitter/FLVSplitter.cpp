@@ -324,7 +324,7 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 
 	if (m_TimeStampOffset > 0) {
 		t.TimeStamp -= m_TimeStampOffset;
-		DbgLog((LOG_TRACE, 3, L"CFLVSplitterFilter::ReadTag() : Detect wrong TimeStamp offset, corrected [%d -> %d]",  (t.TimeStamp + m_TimeStampOffset), t.TimeStamp));
+		DLog(L"CFLVSplitterFilter::ReadTag() : Detect wrong TimeStamp offset, corrected [%u -> %u]",  (t.TimeStamp + m_TimeStampOffset), t.TimeStamp);
 	}
 
 	return !m_pFile->IsStreaming() ? (m_pFile->GetRemaining() >= t.DataSize) : true;

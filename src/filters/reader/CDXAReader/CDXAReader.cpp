@@ -328,7 +328,7 @@ HRESULT CCDXAStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 					break;
 				}
 
-				DLog("CCDXAStream: CRC error at sector %d (fp=0x%I64x, retriesleft=%d)", sector, FilePointer.QuadPart, nRetries);
+				DLog(L"CCDXAStream: CRC error at sector %u (fp=0x%I64x, retriesleft=%d)", sector, FilePointer.QuadPart, nRetries);
 			}
 
 			m_nBufferedSector = sector;

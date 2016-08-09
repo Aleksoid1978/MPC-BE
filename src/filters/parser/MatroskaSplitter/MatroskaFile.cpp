@@ -1363,7 +1363,7 @@ HRESULT CLength::Parse(CMatroskaNode* pMN)
 	}
 
 	if (m_val == UnknownSize) {
-		DbgLog((LOG_TRACE, 3, L"CLength::Parse() : Unspecified chunk size 0x%016I64x at %I64u", m_val, pMN->GetPos()));
+		DLog(L"CLength::Parse() : Unspecified chunk size 0x%016I64x at %I64u", m_val, pMN->GetPos());
 		m_val = UINT64_MAX;
 	}
 
@@ -1413,7 +1413,7 @@ HRESULT CSignedLength::Parse(CMatroskaNode* pMN)
 	if (m_val == UnknownSize)
 	{
 		m_val = pMN->GetLength() - pMN->GetPos();
-		TRACE(_T("CLength: Unspecified chunk size at %I64d (corrected to %I64d)\n"), pMN->GetPos(), m_val);
+		DLog(L"CLength: Unspecified chunk size at %I64u (corrected to %I64u)", pMN->GetPos(), m_val);
 	}
 
 	m_val -= (UnknownSize >> 1);
@@ -1540,7 +1540,7 @@ bool CMatroskaNode::Next(bool fSame)
 
 	for (;;) {
 		if (/*m_pParent->m_id == MATROSKA_ID_SEGMENT && */m_len > m_pParent->m_len) {
-			DbgLog((LOG_TRACE, 3, L"CMatroskaNode::Next() : skip invalid element : len = %I64u, parent element len = %I64u", (UINT64)m_len, (UINT64)m_pParent->m_len));
+			DLog(L"CMatroskaNode::Next() : skip invalid element : len = %I64u, parent element len = %I64u", (UINT64)m_len, (UINT64)m_pParent->m_len);
 			SeekTo(m_start + 1);
 		} else if (m_start + m_len >= m_pParent->m_start + m_pParent->m_len) {
 			break;
@@ -1658,7 +1658,7 @@ bool CMatroskaNode::NextBlock()
 
 	for (;;) {
 		if (m_len > m_pParent->m_len) {
-			DbgLog((LOG_TRACE, 3, L"CMatroskaNode::NextBlock() : skip invalid element : len = %I64u, parent element len = %I64u", (UINT64)m_len, (UINT64)m_pParent->m_len));
+			DLog(L"CMatroskaNode::NextBlock() : skip invalid element : len = %I64u, parent element len = %I64u", (UINT64)m_len, (UINT64)m_pParent->m_len);
 			SeekTo(m_start + 1);
 		} else if (m_start + m_len >= m_pParent->m_start + m_pParent->m_len) {
 			break;

@@ -1106,7 +1106,7 @@ NTSTATUS (* Real_NtQueryInformationProcess) (HANDLE				ProcessHandle,
 
 BOOL WINAPI Mine_IsDebuggerPresent()
 {
-	DLog("Oops, somebody was trying to be naughty! (called IsDebuggerPresent)");
+	DLog(L"Oops, somebody was trying to be naughty! (called IsDebuggerPresent)");
 	return FALSE;
 }
 
@@ -1143,11 +1143,11 @@ LONG WINAPI Mine_ChangeDisplaySettingsEx(LONG ret, DWORD dwFlags, LPVOID lParam)
 			if (vp->dwCommand == VP_COMMAND_GET) {
 				if ((vp->dwTVStandard&VP_TV_STANDARD_WIN_VGA)
 						&& vp->dwTVStandard != VP_TV_STANDARD_WIN_VGA) {
-					DLog("Ooops, tv-out enabled? macrovision checks suck...");
+					DLog(L"Ooops, tv-out enabled? macrovision checks suck...");
 					vp->dwTVStandard = VP_TV_STANDARD_WIN_VGA;
 				}
 			} else if (vp->dwCommand == VP_COMMAND_SET) {
-				DLog("Ooops, as I already told ya, no need for any macrovision bs here");
+				DLog(L"Ooops, as I already told ya, no need for any macrovision bs here");
 				return 0;
 			}
 		}
@@ -1294,9 +1294,9 @@ BOOL CMPlayerCApp::InitInstance()
 	long lError;
 
 	if (SetHeapOptions()) {
-		DLog("Terminate on corruption enabled");
+		DLog(L"Terminate on corruption enabled");
 	} else {
-		DLog("Terminate on corruption error = %d", GetLastError());
+		DLog(L"Terminate on corruption error = %u", GetLastError());
 	}
 
 	DetourRestoreAfterWith();
@@ -1610,7 +1610,7 @@ BOOL CMPlayerCApp::InitInstance()
 			ULONG IoPriority = 3;
 			ULONG ProcessIoPriority = 0x21;
 			NTSTATUS NtStatus = NtSetInformationProcess(GetCurrentProcess(), ProcessIoPriority, &IoPriority, sizeof(ULONG));
-			DLog("Set I/O Priority - %d", NtStatus);
+			DLog(L"Set I/O Priority - %d", NtStatus);
 		}
 
 		FreeLibrary( hNTDLL );
@@ -1897,7 +1897,7 @@ void CRemoteCtrlClient::OnConnect(int nErrorCode)
 
 	m_nStatus = (nErrorCode == 0 ? CONNECTED : DISCONNECTED);
 
-	DLog("CRemoteCtrlClient (OnConnect): %d", nErrorCode);
+	DLog(L"CRemoteCtrlClient (OnConnect): %d", nErrorCode);
 }
 
 void CRemoteCtrlClient::OnClose(int nErrorCode)
@@ -1905,12 +1905,12 @@ void CRemoteCtrlClient::OnClose(int nErrorCode)
 	CAutoLock cAutoLock(&m_csLock);
 
 	if (m_hSocket != INVALID_SOCKET && m_nStatus == CONNECTED) {
-		DLog("CRemoteCtrlClient (OnClose): connection lost");
+		DLog(L"CRemoteCtrlClient (OnClose): connection lost");
 	}
 
 	m_nStatus = DISCONNECTED;
 
-	DLog("CRemoteCtrlClient (OnClose): %d", nErrorCode);
+	DLog(L"CRemoteCtrlClient (OnClose): %d", nErrorCode);
 }
 
 void CRemoteCtrlClient::OnReceive(int nErrorCode)

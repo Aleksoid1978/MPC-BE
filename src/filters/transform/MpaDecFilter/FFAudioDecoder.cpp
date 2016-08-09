@@ -348,7 +348,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 					}
 					if (codec_id == AV_CODEC_ID_SIPR) {
 						if (m_raData.flavor > 3) {
-							DLog("CFFAudioDecoder::Init() : Invalid SIPR flavor (%d)", m_raData.flavor);
+							DLog(L"CFFAudioDecoder::Init() : Invalid SIPR flavor (%d)", m_raData.flavor);
 							return false;
 						}
 						static BYTE sipr_subpk_size[4] = { 29, 19, 37, 20 };
@@ -454,10 +454,10 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 
 		int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, p, size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
 		if (used_bytes < 0) {
-			DLog("CFFAudioDecoder::Decode() : audio parsing failed (ret: %d)", -used_bytes);
+			DLog(L"CFFAudioDecoder::Decode() : audio parsing failed (ret: %d)", -used_bytes);
 			return E_FAIL;
 		} else if (used_bytes == 0 && pOut_size == 0) {
-			DLog("CFFAudioDecoder::Decode() : could not process buffer while parsing");
+			DLog(L"CFFAudioDecoder::Decode() : could not process buffer while parsing");
 		}
 
 		if (out_size) {
@@ -557,10 +557,10 @@ void CFFAudioDecoder::StreamFinish()
 HRESULT CFFAudioDecoder::ParseRealAudioHeader(const BYTE* extra, const int extralen)
 {
 	const uint8_t* fmt = extra + 4;
-	uint16_t version = AV_RB16(fmt);
+	int version = AV_RB16(fmt);
 	fmt += 2;
 	if (version == 3) {
-		DLog("CFFAudioDecoder::ParseRealAudioHeader() : RealAudio Header version 3 unsupported");
+		DLog(L"CFFAudioDecoder::ParseRealAudioHeader() : RealAudio Header version 3 unsupported");
 		return VFW_E_UNSUPPORTED_AUDIO;
 	} else if (version == 4 || (version == 5 && extralen > 50)) {
 		// main format block
@@ -611,7 +611,7 @@ HRESULT CFFAudioDecoder::ParseRealAudioHeader(const BYTE* extra, const int extra
 			memcpy((void*)m_pAVCtx->extradata, fmt + 4, ra_extralen);
 		}
 	} else {
-		DLog("CFFAudioDecoder::ParseRealAudioHeader() : Unknown RealAudio Header version: %d", version);
+		DLog(L"CFFAudioDecoder::ParseRealAudioHeader() : Unknown RealAudio Header version: %d", version);
 		return VFW_E_UNSUPPORTED_AUDIO;
 	}
 

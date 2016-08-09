@@ -72,7 +72,7 @@ static REFERENCE_TIME Video_FrameDuration_Rounding(REFERENCE_TIME FrameDuration)
 
 REFERENCE_TIME CMatroskaSplitterFilter::CalcFrameDuration(CUInt trackNumber)
 {
-	DbgLog((LOG_TRACE, 3, L"CMatroskaSplitterFilter::CalcFrameDuration() : calculate AvgTimePerFrame"));
+	DLog(L"CMatroskaSplitterFilter::CalcFrameDuration() : calculate AvgTimePerFrame");
 	REFERENCE_TIME FrameDuration = 0;
 
 	CMatroskaNode Root(m_pFile);
@@ -109,7 +109,7 @@ REFERENCE_TIME CMatroskaSplitterFilter::CalcFrameDuration(CUInt trackNumber)
 					}
 					INT64 tc = c.TimeCode + bg->Block.TimeCode;
 
-					DbgLog((LOG_TRACE, 3, L"	=> Frame: %3d, TimeCode: %5I64d = %10I64d", timecodes.size(), tc, m_pFile->m_segment.GetRefTime(tc)));
+					DLog(L"    => Frame: %3Iu, TimeCode: %5I64d = %10I64d", timecodes.size(), tc, m_pFile->m_segment.GetRefTime(tc));
 					timecodes.push_back(tc);
 
 					if (timecodes.size() >= MAXTESTEDFRAMES) {

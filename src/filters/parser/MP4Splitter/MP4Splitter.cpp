@@ -543,7 +543,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 
 					if (mt.subtype == GUID_NULL) {
-						TRACE(_T("Unknown video OBI: %02x\n"), video_desc->GetObjectTypeId());
+						DLog(L"Unknown video OBI: %02x", video_desc->GetObjectTypeId());
 					}
 				} else if (AP4_MpegAudioSampleDescription* audio_desc =
 							   dynamic_cast<AP4_MpegAudioSampleDescription*>(mpeg_desc)) {
@@ -667,7 +667,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 
 					if (mt.subtype == GUID_NULL) {
-						TRACE(_T("Unknown audio OBI: %02x\n"), audio_desc->GetObjectTypeId());
+						DLog(L"Unknown audio OBI: %02x", audio_desc->GetObjectTypeId());
 					}
 				} else if (AP4_MpegSystemSampleDescription* system_desc =
 							   dynamic_cast<AP4_MpegSystemSampleDescription*>(desc)) {
@@ -729,7 +729,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 
 					if (mt.subtype == GUID_NULL) {
-						TRACE(_T("Unknown audio OBI: %02x\n"), system_desc->GetObjectTypeId());
+						DLog(L"Unknown audio OBI: %02x", system_desc->GetObjectTypeId());
 					}
 				} else if (AP4_UnknownSampleDescription* unknown_desc =
 							   dynamic_cast<AP4_UnknownSampleDescription*>(desc)) { // TEMP
@@ -1186,7 +1186,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						break;
 					} else {
-						TRACE(_T("Unknow MP4 Stream %x\n") , type);
+						DLog(L"Unknow MP4 Stream %x" , type);
 					}
 				}
 			}

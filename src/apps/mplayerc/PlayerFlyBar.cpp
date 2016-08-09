@@ -65,7 +65,7 @@ CFlyBar::~CFlyBar()
 HRESULT CFlyBar::Create(CWnd* pWnd)
 {
 	if (!CreateEx(WS_EX_TOPMOST | WS_EX_LAYERED, AfxRegisterWndClass(0), NULL, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), pWnd, 0, NULL)) {
-		DLog("Failed to create Flybar Window");
+		DLog(L"Failed to create Flybar Window");
 		return E_FAIL;
 	}
 	SetLayeredWindowAttributes(RGB(255, 0, 255), 150, LWA_ALPHA | LWA_COLORKEY);

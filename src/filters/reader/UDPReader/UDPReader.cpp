@@ -342,7 +342,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 				&& !m_HTTPAsync.GetLenght()) {
 #ifdef DEBUG
 			const CString hdr = m_HTTPAsync.GetHeader();
-			DLog(L"CUDPStream::Load() - HTTP hdr:\n%ws", hdr);
+			DLog(L"CUDPStream::Load() - HTTP hdr:\n%s", hdr);
 #endif
 
 			bConnected = TRUE;
@@ -419,7 +419,7 @@ HRESULT CUDPStream::SetPointer(LONGLONG llPos)
 
 	const __int64 start = m_packets.IsEmpty() ? 0 : m_packets.GetHead()->m_start;
 	if (llPos < start) {
-		DLog("CUDPStream::SetPointer() warning! %lld misses in [%llu - %llu]", llPos, start, m_packets.GetTail()->m_end);
+		DLog(L"CUDPStream::SetPointer() warning! %lld misses in [%llu - %llu]", llPos, start, m_packets.GetTail()->m_end);
 		return S_FALSE;
 	}
 
@@ -436,7 +436,7 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 		m_SizeComplete = m_pos + len;
 
 #if DEBUG
-		DLog("CUDPStream::Read() : wait %llu bytes, %llu -> %llu", m_SizeComplete - m_packets.GetTail()->m_end, m_packets.GetTail()->m_end, m_SizeComplete);
+		DLog(L"CUDPStream::Read() : wait %llu bytes, %llu -> %llu", m_SizeComplete - m_packets.GetTail()->m_end, m_packets.GetTail()->m_end, m_SizeComplete);
 		const ULONGLONG start = GetPerfCounter();
 #endif
 
@@ -445,7 +445,7 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 
 #if DEBUG
 		const ULONGLONG end = GetPerfCounter();
-		DLog("    => do wait %0.3f ms", (end - start) / 10000.0);
+		DLog(L"    => do wait %0.3f ms", (end - start) / 10000.0);
 #endif
 
 		if (m_bEndOfStream) {

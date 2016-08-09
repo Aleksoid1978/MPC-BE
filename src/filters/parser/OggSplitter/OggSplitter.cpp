@@ -1121,7 +1121,7 @@ HRESULT COggDirectShowOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData,
 
 		if (m_mt.majortype == MEDIATYPE_Video) {
 			if (!m_fSetKeyFrame) {
-				DbgLog((LOG_TRACE, 3, L"COggDirectShowOutputPin::UnpackPacket() : KeyFrame not found !!!"));
+				DLog(L"COggDirectShowOutputPin::UnpackPacket() : KeyFrame not found !!!");
 				return E_FAIL; // waiting for a key frame after seeking
 			}
 		}
@@ -1179,7 +1179,7 @@ HRESULT COggStreamOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int
 
 		if (COggVideoOutputPin* pOggPinVideo = dynamic_cast<COggVideoOutputPin*>(this)) {
 			if (!m_fSetKeyFrame) {
-				DbgLog((LOG_TRACE, 3, L"COggStreamOutputPin::UnpackPacket() : KeyFrame not found !!!"));
+				DLog(L"COggStreamOutputPin::UnpackPacket() : KeyFrame not found !!!");
 				return E_FAIL; // waiting for a key frame after seeking
 			}
 		}
@@ -1470,7 +1470,7 @@ HRESULT COggTheoraOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int
 		m_fSetKeyFrame = bKeyFrame;
 	}
 	if (!m_fSetKeyFrame && IsInitialized()) {
-		DbgLog((LOG_TRACE, 3, L"COggTheoraOutputPin::UnpackPacket() : KeyFrame not found !!!"));
+		DLog(L"COggTheoraOutputPin::UnpackPacket() : KeyFrame not found !!!");
 		return E_FAIL; // waiting for a key frame after seeking
 	}
 
@@ -1824,7 +1824,7 @@ HRESULT COggVP8OutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int le
 		m_fSetKeyFrame = bKeyFrame;
 	}
 	if (!m_fSetKeyFrame) {
-		DbgLog((LOG_TRACE, 3, L"COggVP8OutputPin::UnpackPacket() : KeyFrame not found !!!"));
+		DLog(L"COggVP8OutputPin::UnpackPacket() : KeyFrame not found !!!");
 		return E_FAIL; // waiting for a key frame after seeking
 	}
 

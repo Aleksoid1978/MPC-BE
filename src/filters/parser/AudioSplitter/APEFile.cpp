@@ -106,11 +106,11 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	int version = 0;
 	m_pFile->ByteRead((BYTE*)&version, 2);
 	if (version < APE_MIN_VERSION) {
-		DLog("CAPEFile::Open() : Attempting to open an APE file with unsupported version. APE file version : %d, MIN Supported version : %d", version, APE_MIN_VERSION);
+		DLog(L"CAPEFile::Open() : Attempting to open an APE file with unsupported version. APE file version : %d, MIN Supported version : %d", version, APE_MIN_VERSION);
 		return E_FAIL;
 	}
 	if (version > APE_MAX_VERSION) {
-		DLog("CAPEFile::Open() : Attempting to open an APE file that was encoded with a version of Monkey's Audio which is newer than filter is supported. APE file version : %d, MAX Supported version : %d", version, APE_MAX_VERSION);
+		DLog(L"CAPEFile::Open() : Attempting to open an APE file that was encoded with a version of Monkey's Audio which is newer than filter is supported. APE file version : %d, MAX Supported version : %d", version, APE_MAX_VERSION);
 	}
 
 	APEContext ape;
@@ -191,15 +191,15 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	}
 
 	if(!ape.totalframes){
-		DLog("CAPEFile::Open() : No frames in the file!");
+		DLog(L"CAPEFile::Open() : No frames in the file!");
 		return E_FAIL;
 	}
 	if(ape.totalframes > UINT_MAX / sizeof(APEFrame)){
-		DLog("CAPEFile::Open() : Too many frames: %d", ape.totalframes);
+		DLog(L"CAPEFile::Open() : Too many frames: %u", ape.totalframes);
 		return E_FAIL;
 	}
 	if (ape.seektablelength / sizeof(*ape.seektable) < ape.totalframes) {
-		DLog("CAPEFile::Open() : Number of seek entries is less than number of frames: %zu vs. %d", ape.seektablelength / sizeof(*ape.seektable), ape.totalframes);
+		DLog(L"CAPEFile::Open() : Number of seek entries is less than number of frames: %u vs. %u", ape.seektablelength / sizeof(*ape.seektable), ape.totalframes);
 		return E_FAIL;
 	}
 	if (!m_frames.SetCount(ape.totalframes)) {
@@ -238,7 +238,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 			}
 		}
 		if (!m_pFile->GetRemaining()) {
-			DLog("CAPEFile::Open() : File truncated");
+			DLog(L"CAPEFile::Open() : File truncated");
 		}
 	}
 

@@ -35,7 +35,7 @@
 
 #define SkipDescriptor(gb, nType, nLength)										\
 			gb.ReadBuffer(DescBuffer, nLength);									\
-			DLog("Skipped descriptor : 0x%02x", nType);						\
+			DLog(L"Skipped descriptor : 0x%02x", nType);						\
 			UNREFERENCED_PARAMETER(nType);
 
 #define EndEnumDescriptors	}}
@@ -558,7 +558,7 @@ HRESULT CMpeg2DataParser::ParseNIT()
 						WORD	logical_channel_number	= (WORD)gb.BitRead(10);
 						if (Channels.Lookup(service_id)) {
 							Channels[service_id].SetOriginNumber (logical_channel_number);
-							DLog("NIT association : %d -> %s", logical_channel_number, Channels[service_id].ToString());
+							DLog(L"NIT association : %d -> %s", logical_channel_number, Channels[service_id].ToString());
 						}
 					}
 					break;

@@ -314,7 +314,7 @@ bool CRoQSplitterFilter::DemuxLoop()
 			p->bSyncPoint = rtVideo == 0;
 			p->rtStart = rtVideo;
 			p->rtStop = rtVideo += (rc.id == 0x1011 ? 10000000i64/30 : 0);
-			DLog("v: %I64d - %I64d (%d)", p->rtStart/10000, p->rtStop/10000, p->GetCount());
+			DLog(L"v: %I64d - %I64d (%Iu)", p->rtStart/10000, p->rtStop/10000, p->GetCount());
 		}
 		else if(rc.id == 0x1020 || rc.id == 0x1021)
 		{
@@ -324,7 +324,7 @@ bool CRoQSplitterFilter::DemuxLoop()
 			p->bSyncPoint = TRUE;
 			p->rtStart = rtAudio;
 			p->rtStop = rtAudio += 10000000i64*rc.size/(nChannels*22050);
-			DLog("a: %I64d - %I64d (%d)", p->rtStart/10000, p->rtStop/10000, p->GetCount());
+			DLog(L"a: %I64d - %I64d (%Iu)", p->rtStart/10000, p->rtStop/10000, p->GetCount());
 		}
 
 		if(rc.id == 0x1002 || rc.id == 0x1011 || rc.id == 0x1020 || rc.id == 0x1021)

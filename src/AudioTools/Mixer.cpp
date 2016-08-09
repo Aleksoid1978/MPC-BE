@@ -58,7 +58,7 @@ CMixer::~CMixer()
 bool CMixer::Init()
 {
 	if (sample_fmt_is_planar(m_out_sf)) {
-		DLog("CMixer::Init() : planar formats are not supported in the output.");
+		DLog(L"CMixer::Init() : planar formats are not supported in the output.");
 		return false;
 	}
 
@@ -90,7 +90,7 @@ bool CMixer::Init()
 		ret = avresample_open(m_pAVRCxt);
 
 		if (ret < 0) {
-			DLog("CMixer::Init() : avresample_open failed");
+			DLog(L"CMixer::Init() : avresample_open failed");
 			return false;
 		}
 	}
@@ -145,7 +145,7 @@ bool CMixer::Init()
 		const int normalize = 0;
 		ret = avresample_build_matrix(m_in_layout, m_out_layout, center_mix_level, surround_mix_level, lfe_mix_level, normalize, m_matrix_dbl, in_ch, AV_MATRIX_ENCODING_NONE);
 		if (ret < 0) {
-			DLog("CMixer::Init() : avresample_build_matrix failed");
+			DLog(L"CMixer::Init() : avresample_build_matrix failed");
 			av_free(m_matrix_dbl);
 			m_matrix_dbl = NULL;
 			return false;
@@ -201,7 +201,7 @@ bool CMixer::Init()
 	// Set Matrix on the context
 	ret = avresample_set_matrix(m_pAVRCxt, m_matrix_dbl, in_ch);
 	if (ret < 0) {
-		DLog("CMixer::Init() : avresample_set_matrix failed");
+		DLog(L"CMixer::Init() : avresample_set_matrix failed");
 		av_free(m_matrix_dbl);
 		m_matrix_dbl = NULL;
 		return false;
@@ -242,7 +242,7 @@ void CMixer::SetOptions(float matrix_norm)
 int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 {
 	if (!m_ActualContext && !Init()) {
-		DLog("CMixer::Mixing : Init() failed");
+		DLog(L"CMixer::Mixing : Init() failed");
 		return 0;
 	}
 
@@ -279,7 +279,7 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 
 	out_samples = avresample_convert(m_pAVRCxt, (uint8_t**)&output, out_plane_size, out_samples, ppInput, in_plane_size, in_samples);
 	if (out_samples < 0) {
-		DLog("CMixer::Mixing() : avresample_convert failed");
+		DLog(L"CMixer::Mixing() : avresample_convert failed");
 		out_samples = 0;
 	}
 
@@ -302,7 +302,7 @@ int CMixer::GetInputDelay()
 int CMixer::CalcOutSamples(int in_samples)
 {
 	if (!m_ActualContext && !Init()) {
-		DLog("Mixer::CalcOutSamples : Init() failed");
+		DLog(L"Mixer::CalcOutSamples : Init() failed");
 		return 0;
 	}
 
@@ -323,14 +323,14 @@ void CMixer::FlushBuffers()
 		// Open Resample Context
 		ret = avresample_open(m_pAVRCxt);
 		if (ret < 0) {
-			DLog("CMixer::FlushBuffers() : avresample_open failed");
+			DLog(L"CMixer::FlushBuffers() : avresample_open failed");
 			return;
 		}
 
 		// Set Matrix on the context
 		ret = avresample_set_matrix(m_pAVRCxt, m_matrix_dbl, av_popcount(m_in_layout));
 		if (ret < 0) {
-			DLog("CMixer::FlushBuffers() : avresample_set_matrix failed");
+			DLog(L"CMixer::FlushBuffers() : avresample_set_matrix failed");
 			return;
 		}
 	}

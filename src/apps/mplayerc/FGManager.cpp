@@ -1214,7 +1214,7 @@ STDMETHODIMP CFGManager::Render(IPin* pPinOut)
 
 STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlayList)
 {
-	DLog("CFGManager::RenderFile() on thread: %d", GetCurrentThreadId());
+	DLog(L"CFGManager::RenderFile() on thread: %u", GetCurrentThreadId());
 	CAutoLock cAutoLock(this);
 
 	m_streampath.RemoveAll();
@@ -1828,7 +1828,7 @@ STDMETHODIMP CFGManager::GetDeadEnd(int iIndex, CAtlList<CStringW>& path, CAtlLi
 
 STDMETHODIMP CFGManager::RenderSubFile(LPCWSTR lpcwstrFileName)
 {
-	DLog("CFGManager::RenderSubFile() on thread: %d", lpcwstrFileName, GetCurrentThreadId());
+	DLog(L"CFGManager::RenderSubFile() on thread: %u", GetCurrentThreadId());
 	CAutoLock cAutoLock(this);
 
 	HRESULT hr = VFW_E_CANNOT_RENDER;
@@ -2790,7 +2790,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	, m_vrmerit(MERIT64_PREFERRED)
 	, m_armerit(MERIT64_PREFERRED)
 {
-	DLog("CFGManagerPlayer::CFGManagerPlayer() on thread: %d", GetCurrentThreadId());
+	DLog(L"CFGManagerPlayer::CFGManagerPlayer() on thread: %u", GetCurrentThreadId());
 	CFGFilter* pFGF;
 
 	CAppSettings& s = AfxGetAppSettings();
