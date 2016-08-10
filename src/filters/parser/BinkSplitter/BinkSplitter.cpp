@@ -212,7 +212,6 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	/* frame index table */
 	m_seektable.clear();
 	m_seektable.reserve(num_frames);
-	int framebuffersize = 0;
 	UINT32 next_pos = 0;
 	READ(next_pos);
 	for (unsigned i = 0; i < num_frames; i++) {
@@ -235,10 +234,6 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			return E_FAIL;
 		}
 
-		if (size > framebuffersize) {
-			framebuffersize = size;
-		}
-
 		frame_t frame = { pos, keyframe, size };
 		m_seektable.push_back(frame);
 	}
@@ -249,8 +244,6 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		DLog(L"CBinkSplitter: files without index not supported!");
 		return E_FAIL;
 	}
-
-	m_framebuffer.resize(framebuffersize);
 
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 10000000i64 * num_frames * fps_den / fps_num;

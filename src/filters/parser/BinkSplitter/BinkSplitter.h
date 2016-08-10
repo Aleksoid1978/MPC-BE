@@ -34,7 +34,6 @@ CBinkSplitterFilter : public CBaseSplitterFilter
 	fraction_t m_fps = { 1, 1 };
 	UINT32 num_audio_tracks = 0;
 
-	std::vector<BYTE> m_framebuffer;
 	size_t m_indexpos = 0;
 
 	struct frame_t {
