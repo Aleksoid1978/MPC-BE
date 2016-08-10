@@ -28,8 +28,7 @@
 class __declspec(uuid("C14684E8-CCA6-468D-9ABC-1CED631CC31C"))
 CBinkSplitterFilter : public CBaseSplitterFilter
 {
-	CComPtr<IAsyncReader> m_pAsyncReader;
-	INT64 m_pos = 0;
+	CAutoPtr<CBaseSplitterFile> m_pFile;
 
 	fraction_t m_fps = { 1, 1 };
 	UINT32 num_audio_tracks = 0;
