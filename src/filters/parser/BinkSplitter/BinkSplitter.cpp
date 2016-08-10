@@ -86,10 +86,6 @@ CBinkSplitterFilter::CBinkSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 {
 }
 
-#define SEEK(n) m_pos = n
-#define SKIP(n) m_pos += n
-#define READ(a) m_pAsyncReader->SyncRead(m_pos, sizeof(a), (BYTE*)&a); m_pos += sizeof(a)
-
 // https://wiki.multimedia.cx/index.php?title=Bink_Container
 // https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/bink.c
 
@@ -98,11 +94,24 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	CheckPointer(pAsyncReader, E_POINTER);
 
 	HRESULT hr = E_FAIL;
-	m_pAsyncReader = pAsyncReader;
-	SEEK(0);
+	m_pFile.Free();
+
+	m_pFile.Attach(DNew CBaseSplitterFile(pAsyncReader, hr, FM_FILE | FM_FILE_DL));
+	if (!m_pFile) {
+		return E_OUTOFMEMORY;
+	}
+	if (FAILED(hr)) {
+		m_pFile.Free();
+		return hr;
+	}
+	if (m_pFile->IsStreaming()) {
+		m_pFile.Free();
+		return E_FAIL;
+	}
+	m_pFile->SetBreakHandle(GetRequestHandle());
 
 	UINT32 codec_tag = 0;
-	READ(codec_tag);
+	m_pFile->ByteRead((BYTE*)&codec_tag, 4);
 	if (codec_tag != FCC('BIKb') && codec_tag != FCC('BIKi')) {
 		return E_FAIL;
 	}
@@ -116,29 +125,29 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	UINT32 fps_den			= 0;
 	UINT32 video_flags		= 0;
 
-	READ(file_size);
+	m_pFile->ByteRead((BYTE*)&file_size, 4);
 	file_size += 8;
-	READ(num_frames);
+	m_pFile->ByteRead((BYTE*)&num_frames, 4);
 	if (num_frames > 1000000) {
 		DLog(L"CBinkSplitter: invalid header: more than 1000000 frames");
 		return E_FAIL;
 	}
-	READ(larges_framesize);
+	m_pFile->ByteRead((BYTE*)&larges_framesize, 4);
 	if (larges_framesize > file_size) {
 		DLog(L"CBinkSplitter: invalid header: largest frame size greater than file size");
 		return E_FAIL;
 	}
-	SKIP(4);
-	READ(width);
-	READ(height);
-	READ(fps_num);
-	READ(fps_den);
+	m_pFile->Skip(4);
+	m_pFile->ByteRead((BYTE*)&width, 4);
+	m_pFile->ByteRead((BYTE*)&height, 4);
+	m_pFile->ByteRead((BYTE*)&fps_num, 4);
+	m_pFile->ByteRead((BYTE*)&fps_den, 4);
 	if (fps_num == 0 || fps_den == 0) {
 		DLog(L"CBinkSplitter: invalid header: invalid fps (%u / %u)", fps_num, fps_den);
 		return E_FAIL;
 	}
-	READ(video_flags);
-	READ(num_audio_tracks);
+	m_pFile->ByteRead((BYTE*)&video_flags, 4);
+	m_pFile->ByteRead((BYTE*)&num_audio_tracks, 4);
 	if (num_audio_tracks > 256) {
 		DLog(L"CBinkSplitter: invalid header: more than 256 audio tracks (%u)", num_audio_tracks);
 		return E_FAIL;
@@ -180,11 +189,11 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		};
 		std::vector<audiotrack_t> audiotracks(num_audio_tracks);
 
-		SKIP(4 * num_audio_tracks);
+		m_pFile->Skip(4 * num_audio_tracks);
 
 		for (unsigned i = 0; i < num_audio_tracks; i++) {
-			READ(audiotracks[i].sample_rate);
-			READ(audiotracks[i].audio_flags);
+			m_pFile->ByteRead((BYTE*)&audiotracks[i].sample_rate, 2);
+			m_pFile->ByteRead((BYTE*)&audiotracks[i].audio_flags, 2);
 
 			mts.RemoveAll();
 			mt.InitMediaType();
@@ -205,7 +214,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		for (unsigned i = 0; i < num_audio_tracks; i++) {
-			READ(audiotracks[i].track_ID);
+			m_pFile->ByteRead((BYTE*)&audiotracks[i].track_ID, 4);
 		}
 	}
 
@@ -213,7 +222,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_seektable.clear();
 	m_seektable.reserve(num_frames);
 	UINT32 next_pos = 0;
-	READ(next_pos);
+	m_pFile->ByteRead((BYTE*)&next_pos, 4);
 	for (unsigned i = 0; i < num_frames; i++) {
 		UINT32 pos = next_pos;
 		UINT32 keyframe;
@@ -222,7 +231,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			next_pos = file_size;
 			keyframe = 0;
 		} else {
-			READ(next_pos);
+			m_pFile->ByteRead((BYTE*)&next_pos, 4);
 			keyframe = pos & 1;
 		}
 		pos &= ~1;
@@ -239,7 +248,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	if (m_seektable.size()) {
-		SEEK(m_seektable[0].pos);
+		m_pFile->Seek(m_seektable[0].pos);
 	} else {
 		DLog(L"CBinkSplitter: files without index not supported!");
 		return E_FAIL;
@@ -289,12 +298,12 @@ bool CBinkSplitterFilter::DemuxLoop()
 		CString timestart = ReftimeToString(rtstart);
 		CString timestop = ReftimeToString(rtstop);
 
-		m_pos = m_seektable[m_indexpos].pos;
+		m_pFile->Seek(m_seektable[m_indexpos].pos);
 
 		if (num_audio_tracks) {
 			for (unsigned i = 0; i < num_audio_tracks; i++) {
 				UINT32 packet_size = 0;
-				READ(packet_size);
+				m_pFile->ByteRead((BYTE*)&packet_size, 4);
 				if (packet_size >= 4) {
 					CAutoPtr<CPacket> pa(DNew CPacket());
 					if (pa->SetCount(packet_size)) {
@@ -303,19 +312,18 @@ bool CBinkSplitterFilter::DemuxLoop()
 						pa->rtStart = rtstart;
 						pa->rtStop = rtstop;
 
-						m_pAsyncReader->SyncRead(m_pos, packet_size, pa->GetData());
-						m_pos += packet_size;
+						m_pFile->ByteRead(pa->GetData(), packet_size);
 
 						hr = DeliverPacket(pa);
 					}
 				}
 				else {
-					SKIP(packet_size);
+					m_pFile->Skip(packet_size);
 				}
 			}
 		}
 
-		int packet_size = m_seektable[m_indexpos].pos + m_seektable[m_indexpos].size - m_pos;
+		int packet_size = m_seektable[m_indexpos].pos + m_seektable[m_indexpos].size - m_pFile->GetPos();
 		ASSERT(packet_size > 0);
 
 		CAutoPtr<CPacket> pv(DNew CPacket());
@@ -325,8 +333,7 @@ bool CBinkSplitterFilter::DemuxLoop()
 			pv->rtStart = rtstart;
 			pv->rtStop = rtstop;
 
-			m_pAsyncReader->SyncRead(m_pos, packet_size, pv->GetData());
-			m_pos += packet_size;
+			m_pFile->ByteRead(pv->GetData(), packet_size);
 
 			hr = DeliverPacket(pv);
 		}
