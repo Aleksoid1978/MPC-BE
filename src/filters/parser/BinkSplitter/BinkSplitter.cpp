@@ -189,13 +189,13 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mts.RemoveAll();
 			mt.InitMediaType();
 			mt.majortype = MEDIATYPE_Audio;
-			mt.subtype = audiotracks[0].audio_flags & BINK_AUD_USEDCT ? MEDIASUBTYPE_BINKA_DCT : MEDIASUBTYPE_BINKA_RDFT;
+			mt.subtype = (audiotracks[i].audio_flags & BINK_AUD_USEDCT) ? MEDIASUBTYPE_BINKA_DCT : MEDIASUBTYPE_BINKA_RDFT;
 			mt.formattype = FORMAT_WaveFormatEx;
 			WAVEFORMATEX wfe;
 			memset(&wfe, 0, sizeof(wfe));
 			wfe.wFormatTag = 0x4142;
-			wfe.nChannels = audiotracks[0].audio_flags & BINK_AUD_STEREO ? 2 : 1;
-			wfe.nSamplesPerSec = audiotracks[0].sample_rate;
+			wfe.nChannels = (audiotracks[i].audio_flags & BINK_AUD_STEREO) ? 2 : 1;
+			wfe.nSamplesPerSec = audiotracks[i].sample_rate;
 			wfe.wBitsPerSample = 16;
 			mt.SetFormat((BYTE*)&wfe, sizeof(wfe));
 			mt.lSampleSize = 1;
