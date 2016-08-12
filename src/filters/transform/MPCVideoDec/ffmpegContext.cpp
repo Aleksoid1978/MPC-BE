@@ -70,13 +70,14 @@ static const WORD PCID_AMD_4K [] = { // not tested
 	// http://pci-ids.ucw.cz/read/PC/1002
 	// UVD ?
 	0x67C0, // Polaris10 (Ellesmere)
-	0x67DF, // Radeon RX 480 (Ellesmere)
-	0x67e0, // Polaris11 (Baffin)
-	0x67e1, // Polaris11 (Baffin)
-	0x67e8, // Polaris11 (Baffin)
-	0x67e9, // Polaris11 (Baffin)
-	0x67eb, // Polaris11 (Baffin)
-	0x67ff, // Polaris11 (Baffin)
+	0x67DF, // Radeon RX 470/480 (Ellesmere)
+	0X67E0, // Polaris11 (Baffin)
+	0X67E1, // Polaris11 (Baffin)
+	0X67E8, // Polaris11 (Baffin)
+	0X67E9, // Polaris11 (Baffin)
+	0X67EB, // Polaris11 (Baffin)
+	0X67EF, // Radeon RX 460 (Baffin)
+	0X67FF, // Polaris11 (Baffin)
 	// UVD 5
 	0x6939, // Radeon R9 285/380 (Tonga PRO)
 	// UVD 6
