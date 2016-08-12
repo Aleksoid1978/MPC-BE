@@ -32,9 +32,9 @@ inline void ff_log(void* par, int level, const char *fmt, va_list valist)
 
 		CStringA fmtStr(fmt);
 		fmtStr.Replace("%td", "%ld");
-		fmtStr.Replace("\n", "");
+		fmtStr.TrimRight('\n');
 		vsnprintf_s(Msg, sizeof(Msg), _TRUNCATE, fmtStr, valist);
-		DbgLog((LOG_TRACE, 3, L"FF_LOG : %S", Msg));
+		DbgLogInfo(LOG_TRACE, 3, L"FF_LOG : %S", Msg);
 	}
 #endif
 }

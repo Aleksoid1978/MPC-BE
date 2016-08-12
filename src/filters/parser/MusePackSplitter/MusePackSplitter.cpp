@@ -1358,7 +1358,7 @@ int CMusePackReader::Read(void *buf, int size)
 	}
 
 	// TODO: Caching here !!!!
-	//TRACE("    - read, %I64d, %d\n", position, size);
+	//DLog(L"    - read, %I64d, %d", position, size);
 
 	HRESULT hr = reader->SyncRead(position, size, (BYTE*)buf);
 	if (FAILED(hr)) {

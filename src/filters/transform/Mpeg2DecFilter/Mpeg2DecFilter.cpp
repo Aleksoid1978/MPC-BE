@@ -170,7 +170,7 @@ LONG (__stdcall * Real_ChangeDisplaySettingsExW)(LPCWSTR a0,
 
 BOOL WINAPI Mine_IsDebuggerPresent()
 {
-	TRACE(_T("Oops, somebody was trying to be naughty! (called IsDebuggerPresent)\n"));
+	DLog(L"Oops, somebody was trying to be naughty! (called IsDebuggerPresent)");
 	return FALSE;
 }
 
@@ -183,11 +183,11 @@ LONG WINAPI Mine_ChangeDisplaySettingsEx(LONG ret, DWORD dwFlags, LPVOID lParam)
 				&& (vp->dwFlags & VP_FLAGS_COPYPROTECT)) {
 			if (vp->dwCommand == VP_COMMAND_GET) {
 				if ((vp->dwTVStandard & VP_TV_STANDARD_WIN_VGA) && vp->dwTVStandard != VP_TV_STANDARD_WIN_VGA) {
-					TRACE(_T("Ooops, tv-out enabled? macrovision checks suck...\n"));
+					DLog(L"Ooops, tv-out enabled? macrovision checks suck...");
 					vp->dwTVStandard = VP_TV_STANDARD_WIN_VGA;
 				}
 			} else if (vp->dwCommand == VP_COMMAND_SET) {
-				TRACE(_T("Ooops, as I already told ya, no need for any macrovision bs here\n"));
+				DLog(L"Ooops, as I already told ya, no need for any macrovision bs here");
 				return 0;
 			}
 		}
@@ -472,7 +472,7 @@ void CMpeg2DecFilter::InputTypeChanged()
 {
 	CAutoLock cAutoLock(&m_csReceive);
 
-	TRACE(_T("ResetMpeg2Decoder()\n"));
+	DLog(L"ResetMpeg2Decoder()");
 
 	for (int i = 0; i < _countof(m_dec->m_pictures); i++) {
 		m_dec->m_pictures[i].rtStart = m_dec->m_pictures[i].rtStop = INVALID_TIME+1;
@@ -622,7 +622,7 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 		}
 
 		if (nInvalidBufferCount == 3 && m_dec->m_decoder.m_mpeg1) {
-			TRACE(_T("CMpeg2DecFilter::Transform() : flush decoder\n"));
+			DLog(L"CMpeg2DecFilter::Transform() : flush decoder");
 			InputTypeChanged();
 			return S_OK;
 		}
@@ -640,7 +640,7 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 				}
 				break;
 			case STATE_INVALID:
-				TRACE(_T("*** STATE_INVALID\n"));
+				DLog(L"CMpeg2DecFilter::Transform : *** STATE_INVALID");
 				break;
 			case STATE_GOP:
 				m_pClosedCaptionOutput->Deliver(m_dec->m_info.m_user_data, m_dec->m_info.m_user_data_len);
@@ -963,7 +963,7 @@ HRESULT CMpeg2DecFilter::AlterQuality(Quality q)
 		m_fDropFrames = false;
 	}
 
-	//TRACE(_T("CMpeg2DecFilter::AlterQuality: Type=%d, Proportion=%d, Late=%I64d, TimeStamp=%I64d\n"), q.Type, q.Proportion, q.Late, q.TimeStamp);
+	//DLog(L"CMpeg2DecFilter::AlterQuality: Type=%d, Proportion=%d, Late=%I64d, TimeStamp=%I64d"), q.Type, q.Proportion, q.Late, q.TimeStamp);
 	return S_OK;
 }
 
@@ -1282,7 +1282,7 @@ STDMETHODIMP CMpeg2DecInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceD
 				}
 				CAutoLock cAutoLock(&m_csRateLock);
 				m_ratechange = *p;
-				DbgLog((LOG_TRACE, 3, L"DVD TSRateChange Event : StartTime = %20I64d, Rate = %ld", p->StartTime, p->Rate));
+				DLog(L"DVD TSRateChange Event : StartTime = %20I64d, Rate = %ld", p->StartTime, p->Rate);
 			}
 			break;
 			case AM_RATE_UseRateVersion: {
@@ -1639,7 +1639,7 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 			memcpy(m_sppal, pSPPAL->sppal, sizeof(AM_PROPERTY_SPPAL));
 			m_fsppal = true;
 
-			DbgLog((LOG_TRACE, 3, _T("DVD Palette Event")));
+			DLog(L"DVD Palette Event");
 		}
 		break;
 		case AM_PROPERTY_DVDSUBPIC_HLI: {
@@ -1666,9 +1666,9 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 				}
 
 				if (bRefresh) {
-					DbgLog((LOG_TRACE, 3, L"DVD HLI Event: %20I64d -> %20I64d, (%u,%u) - (%u,%u)",
+					DLog(L"DVD HLI Event: %20I64d -> %20I64d, (%u,%u) - (%u,%u)",
 							PTS2RT(pSPHLI->StartPTM), PTS2RT(pSPHLI->EndPTM),
-							pSPHLI->StartX, pSPHLI->StartY, pSPHLI->StopX, pSPHLI->StopY));
+							pSPHLI->StartX, pSPHLI->StartY, pSPHLI->StopX, pSPHLI->StopY);
 				}
 			} else {
 				m_sphli.Free();
@@ -1872,7 +1872,7 @@ bool CSubpicInputPin::dvdspu::Parse()
 			}
 
 			if (i+len >= packetsize) {
-				TRACE(_T("Warning: Wrong subpicture parameter block ending\n"));
+				DLog(L"Warning: Wrong subpicture parameter block ending");
 				break;
 			}
 

@@ -1487,11 +1487,11 @@ static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, CString& ISO
 
 #ifdef _DEBUG
 	if (!teletexts.IsEmpty()) {
-		DbgLog((LOG_TRACE, 3, L"ReadPMT() : found %u teletext pages", teletexts.GetCount()));
+		DLog(L"ReadPMT() : found %Iu teletext pages", teletexts.GetCount());
 		POSITION pos = teletexts.GetStartPosition();
 		while (pos) {
 			CAtlMap<USHORT, CString>::CPair* pPair = teletexts.GetNext(pos);
-			DbgLog((LOG_TRACE, 3, L"	=> %03x - '%s'", pPair->m_key, pPair->m_value));
+			DLog(L"    => %03x - '%s'", pPair->m_key, pPair->m_value);
 		}
 	}
 #endif
@@ -2275,7 +2275,7 @@ bool CMpegSplitterFile::ReadPES(peshdr& h, BYTE code)
 			BYTE skip = (pes_ext >> 4) & 0xb;
 			skip += skip & 0x9;
 			if (pes_ext & 0x40 || skip > left) {
-				TRACE(_T("peshdr read - pes_ext %X is invalid\n"), pes_ext);
+				DLog(L"peshdr read - pes_ext %X is invalid", pes_ext);
 				pes_ext = skip = 0;
 			}
 			Skip(skip);
