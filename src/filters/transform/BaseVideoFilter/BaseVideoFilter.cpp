@@ -268,15 +268,15 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 
 		CRect vih_rect(0, 0, RealWidth > 0 ? RealWidth : m_w, RealHeight > 0 ? RealHeight : m_h);
 
-		DbgLog((LOG_TRACE, 3, L"CBaseVideoFilter::ReconnectOutput() : Performing reconnect"));
+		DLog(L"CBaseVideoFilter::ReconnectOutput() : Performing reconnect");
 		if (m_w != vih_rect.Width() || m_h != vih_rect.Height()) {
-			DbgLog((LOG_TRACE, 3, L"	=> SIZE  : %d:%d => %d:%d(%d:%d)", m_wout, m_hout, m_w, m_h, vih_rect.Width(), vih_rect.Height()));
+			DLog(L"    => SIZE  : %d:%d => %d:%d(%d:%d)", m_wout, m_hout, m_w, m_h, vih_rect.Width(), vih_rect.Height());
 		} else {
-			DbgLog((LOG_TRACE, 3, L"	=> SIZE  : %d:%d => %d:%d", m_wout, m_hout, vih_rect.Width(), vih_rect.Height()));
+			DLog(L"    => SIZE  : %d:%d => %d:%d", m_wout, m_hout, vih_rect.Width(), vih_rect.Height());
 		}
 		{
-			DbgLog((LOG_TRACE, 3, L"	=> AR    : %d:%d => %d:%d", m_arxout, m_aryout, m_arx, m_ary));
-			DbgLog((LOG_TRACE, 3, L"	=> FPS   : %I64d => %I64d", nAvgTimePerFrame, AvgTimePerFrame));
+			DLog(L"    => AR    : %d:%d => %d:%d", m_arxout, m_aryout, m_arx, m_ary);
+			DLog(L"    => FPS   : %I64d => %I64d", nAvgTimePerFrame, AvgTimePerFrame);
 		}
 
 		const bool bVideoSizeChanged = (m_w != m_wout || m_h != m_hout);
@@ -301,7 +301,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 			vih2->dwPictAspectRatioX	= m_arx;
 			vih2->dwPictAspectRatioY	= m_ary;
 
-			DbgLog((LOG_TRACE, 3, L"	=> FLAGS : 0x%0.8x -> 0x%0.8x", vih2->dwControlFlags, (extformatsupport && dxvaExtFormat) ? dxvaExtFormat->value : vih2->dwControlFlags));
+			DLog(L"    => FLAGS : 0x%0.8x -> 0x%0.8x", vih2->dwControlFlags, (extformatsupport && dxvaExtFormat) ? dxvaExtFormat->value : vih2->dwControlFlags);
 			if (extformatsupport && dxvaExtFormat) {
 				vih2->dwControlFlags	= dxvaExtFormat->value;
 			}
@@ -348,14 +348,14 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 						return E_FAIL;
 					}
 				} else if (hr == VFW_E_BUFFERS_OUTSTANDING && tryReceiveConnection) {
-					DbgLog((LOG_TRACE, 3, L"	VFW_E_BUFFERS_OUTSTANDING, flushing data ..."));
+					DLog(L"    VFW_E_BUFFERS_OUTSTANDING, flushing data ...");
 					m_pOutput->DeliverBeginFlush();
 					m_pOutput->DeliverEndFlush();
 					tryReceiveConnection = false;
 
 					continue;
 				} else {
-					DbgLog((LOG_TRACE, 3, L"	ReceiveConnection() failed (hr: %x); QueryAccept: %x\n", hr, hrQA));
+					DLog(L"    ReceiveConnection() failed (hr: %x); QueryAccept: %x", hr, hrQA);
 				}
 
 				break;

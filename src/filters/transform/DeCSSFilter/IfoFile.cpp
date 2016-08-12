@@ -283,8 +283,8 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 					ReadByte();
 					chapter.Cell_id = ReadByte();
 
-					DbgLog((LOG_TRACE, 3, L"CVobFile::OpenIFO() - PGS : %2d, Pg : %2d, Cell : %2d, VOB id : %2d, Cell id : %2d, first sector : %10lu, last sector : %10lu, duration = %s",
-							prog, chap, cell, chapter.VOB_id, chapter.Cell_id, firstVOBUStartSector, lastVOBUEndSector, ReftimeToString(duration)));
+					DLog(L"CVobFile::OpenIFO() - PGS : %2d, Pg : %2d, Cell : %2d, VOB id : %2d, Cell id : %2d, first sector : %10lu, last sector : %10lu, duration = %s",
+							prog, chap, cell, chapter.VOB_id, chapter.Cell_id, firstVOBUStartSector, lastVOBUEndSector, ReftimeToString(duration));
 
 					for (size_t i = 0; i < programs[0].chapters.GetCount(); i++) {
 						if (chapter.VOB_id == programs[0].chapters[i].VOB_id && chapter.Cell_id == programs[0].chapters[i].Cell_id) {
@@ -413,7 +413,7 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 			title.tracks_info.SetCount(title.nb_tracks);
 			gb.SkipBytes(1);
 			title.length_PTS = gb.BitRead(32);
-			TRACE("ATS_XX_0.IFO paser: Title #%d, %u seconds (%u PTS)\n", i, title.length_PTS / 90000, title.length_PTS);
+			DLog(L"ATS_XX_0.IFO paser: Title #%d, %u seconds (%u PTS)", i, title.length_PTS / 90000, title.length_PTS);
 			gb.SkipBytes(8);
 
 			for (int j = 0; j < title.nb_tracks; j++) {
@@ -425,7 +425,7 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 				track.first_PTS = gb.BitRead(32);
 				track.length_PTS = gb.BitRead(32);
 				gb.SkipBytes(6);
-				TRACE("ATS_XX_0.IFO paser: Title #%d, track %d, %u seconds (%u PTS), start from %u PTS\n", i, j, track.length_PTS / 90000, track.length_PTS, track.first_PTS);
+				DLog(L"ATS_XX_0.IFO paser: Title #%d, track %d, %u seconds (%u PTS), start from %u PTS", i, j, track.length_PTS / 90000, track.length_PTS, track.first_PTS);
 				nb_chapters++;
 			}
 
@@ -435,7 +435,7 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 				gb.SkipBytes(4);
 				track.first_sector = gb.BitRead(32);
 				track.last_sector = gb.BitRead(32);
-				TRACE("ATS_XX_0.IFO paser: Title #%d, track %d, first sector %u, last_sector %u\n", i, j, track.first_sector, track.last_sector);
+				DLog(L"ATS_XX_0.IFO paser: Title #%d, track %d, first sector %u, last_sector %u", i, j, track.first_sector, track.last_sector);
 			}
 		}
 

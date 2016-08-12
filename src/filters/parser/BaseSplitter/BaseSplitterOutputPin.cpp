@@ -358,7 +358,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 			REFERENCE_TIME rt = p->rtStart + m_rtOffset;
 			if (abs(rt - m_rtPrev) > MAX_PTS_SHIFT) {
 				m_rtOffset += m_rtPrev - rt;
-				DbgLog((LOG_TRACE, 3, L"CBaseSplitterOutputPin::DeliverPacket() : Packet discontinuity detected, adjusting offset to %I64d", m_rtOffset));
+				DLog(L"CBaseSplitterOutputPin::DeliverPacket() : Packet discontinuity detected, adjusting offset to %I64d", m_rtOffset);
 			}
 		}
 
@@ -395,10 +395,10 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 			m_brs.rtLastDeliverTime = p->rtStart;
 			m_brs.nBytesSinceLastDeliverTime = 0;
 			/*
-						TRACE(_T("[%d] c: %d kbps, a: %d kbps\n"),
-							p->TrackNumber,
-							(m_brs.nCurrentBitRate+500)/1000,
-							(m_brs.nAverageBitRate+500)/1000);
+			DLog(L"[%u] c: %u kbps, a: %u kbps",
+				p->TrackNumber,
+				(m_brs.nCurrentBitRate+500)/1000,
+				(m_brs.nAverageBitRate+500)/1000);
 			*/
 		}
 
@@ -459,7 +459,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		bool fTimeValid = p->rtStart != INVALID_TIME;
 
 #if defined(_DEBUG) && 0
-		TRACE(_T("[%d]: d%d s%d p%d, b=%d, [%20I64d - %20I64d]\n"),
+		DLog(L"[%u]: d%d s%d p%d, b=%d, [%20I64d - %20I64d]",
 			  p->TrackNumber,
 			  p->bDiscontinuity, p->bSyncPoint, fTimeValid && p->rtStart < 0,
 			  nBytes, p->rtStart, p->rtStop);

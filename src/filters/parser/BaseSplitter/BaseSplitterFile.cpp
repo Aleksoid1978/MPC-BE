@@ -41,7 +41,7 @@ CBaseSplitterFile::CBaseSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, in
 	}
 
 	if (!available && (fmode & FM_STREAM)) {
-		DbgLog((LOG_TRACE, 3, L"BaseSplitter : no data available in streaming mode, wait and try again."));
+		DLog(L"BaseSplitter : no data available in streaming mode, wait and try again.");
 		Sleep(500);
 		hr = m_pAsyncReader->Length(&total, &available);
 		if (FAILED(hr)) {
@@ -157,7 +157,7 @@ bool CBaseSplitterFile::WaitData(__int64 pos)
 
 		if (available == m_available) {
 			if (++n >= 10) {
-				DbgLog((LOG_TRACE, 3, L"BaseSplitter : no new data more than 10 seconds, most likely loss of connection."));
+				DLog(L"BaseSplitter : no new data more than 10 seconds, most likely loss of connection.");
 				m_bConnectionLost = true;
 				return false;
 			}
@@ -215,14 +215,14 @@ HRESULT CBaseSplitterFile::SyncRead(BYTE* pData, int& len)
 	}
 
 	if (hr == S_FALSE && IsStreaming()) {
-		DbgLog((LOG_TRACE, 3, L"CBaseSplitterFile::SyncRead() - we reached the end of data (pos: %I64d), but the size of the data changes, trying reading manually", m_pos));
+		DLog(L"CBaseSplitterFile::SyncRead() - we reached the end of data (pos: %I64d), but the size of the data changes, trying reading manually", m_pos);
 
 		int read = 0;
 		__int64 pos = m_pos;
 		do {
 			hr = m_pAsyncReader->SyncRead(pos++, 1, pData + read);
 		} while (hr == S_OK && (++read) < len);
-		DbgLog((LOG_TRACE, 3, L"	-> Read %d bytes", read));
+		DLog(L"    -> Read %d bytes", read);
 
 		len = read;
 	}

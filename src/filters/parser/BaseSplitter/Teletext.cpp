@@ -223,7 +223,7 @@ static uint8_t unham_8_4(uint8_t a)
 {
 	uint8_t r = UNHAM_8_4[a];
 	if (r == 0xff) {
-		DbgLog((LOG_TRACE, 3, L"unham_8_4() - Unrecoverable data error; UNHAM8/4(%02x)", a));
+		DLog(L"unham_8_4() - Unrecoverable data error; UNHAM8/4(%02x)", a);
 	}
 	return (r & 0x0f);
 }
@@ -233,7 +233,7 @@ static uint16_t telx_to_ucs2(uint8_t c)
 {
 	if (PARITY_8[c] == 0)
 	{
-		DbgLog((LOG_TRACE, 3, L"telx_to_ucs2() - Unrecoverable data error; PARITY(%02x)", c));
+		DLog(L"telx_to_ucs2() - Unrecoverable data error; PARITY(%02x)", c);
 		return 0x20;
 	}
 
@@ -266,7 +266,7 @@ static void remap_g0_charset(uint8_t c)
 	if (c != primary_charset.current) {
 		uint8_t m = G0_LATIN_NATIONAL_SUBSETS_MAP[c];
 		if (m == 0xff) {
-			DbgLog((LOG_TRACE, 3, L"remap_g0_charset() - G0 Latin National Subset ID 0x%1x.%1x is not implemented", (c >> 3), (c & 0x7)));
+			DLog(L"remap_g0_charset() - G0 Latin National Subset ID 0x%1x.%1x is not implemented", (c >> 3), (c & 0x7));
 		} else {
 			for (uint8_t j = 0; j < 13; j++) {
 				G0[LATIN][G0_LATIN_NATIONAL_SUBSETS_POSITIONS[j]] = G0_LATIN_NATIONAL_SUBSETS[m].characters[j];
@@ -416,7 +416,7 @@ void CTeletext::ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE
 
 		if ((m_nSuitablePage == 0) && (flag_subtitle == YES) && (i < 0xff)) {
 			m_nSuitablePage = page_number;
-			DbgLog((LOG_TRACE, 3, L"ProcessTeletextPacket() - No teletext page specified, first received suitable page is %03x, not guaranteed", m_nSuitablePage));
+			DLog(L"ProcessTeletextPacket() - No teletext page specified, first received suitable page is %03x, not guaranteed", m_nSuitablePage);
 		}
 
 		// Page transmission is terminated, however now we are waiting for our new page

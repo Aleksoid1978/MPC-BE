@@ -335,7 +335,7 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 	BOOL bDiscontinuity = p->bDiscontinuity;
 
 #if defined(_DEBUG) && 0
-	TRACE(_T("[%d]: d%d s%d p%d, b=%d, [%20I64d - %20I64d]\n"),
+	DLog(L"[%u]: d%d s%d p%d, b=%Iu, [%20I64d - %20I64d]",
 		  p->TrackNumber,
 		  p->bDiscontinuity, p->bSyncPoint, p->rtStart != INVALID_TIME && p->rtStart < 0,
 		  p->GetCount(), p->rtStart, p->rtStop);
@@ -716,7 +716,7 @@ HRESULT CBaseSplitterFilter::SetPositionsInternal(void* id, LONGLONG* pCurrent, 
 	m_LastSeekers.RemoveAll();
 	m_LastSeekers.AddTail(id);
 
-	DbgLog((LOG_TRACE, 0, _T("Seek Started %I64d"), rtCurrent));
+	DbgLogInfo(LOG_TRACE, 0, L"Seek Started %I64d", rtCurrent);
 
 	m_rtNewStart = m_rtCurrent = rtCurrent;
 	m_rtNewStop = rtStop;
@@ -727,7 +727,7 @@ HRESULT CBaseSplitterFilter::SetPositionsInternal(void* id, LONGLONG* pCurrent, 
 		DeliverEndFlush();
 	}
 
-	DbgLog((LOG_TRACE, 0, _T("Seek Ended")));
+	DbgLogInfo(LOG_TRACE, 0, L"Seek Ended");
 
 	return S_OK;
 }

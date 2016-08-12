@@ -683,10 +683,10 @@ HRESULT CMpegSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 
 					return __super::DeliverPacket(p);
 				} else if (pMVCExtensionPacket->rtStart < p->rtStart) {
-					DbgLog((LOG_TRACE, 3, L"CMpegSplitterFilter::DeliverPacket() : Dropping MVC extension %I64d, base is %I64d", pMVCExtensionPacket->rtStart, p->rtStart));
+					DLog(L"CMpegSplitterFilter::DeliverPacket() : Dropping MVC extension %I64d, base is %I64d", pMVCExtensionPacket->rtStart, p->rtStart);
 					m_MVCExtensionQueue.RemoveHeadNoReturn();
 				} else {
-					DbgLog((LOG_TRACE, 3, L"CMpegSplitterFilter::DeliverPacket() : Dropping base %I64d, next MVC extension is %I64d", p->rtStart, pMVCExtensionPacket->rtStart));
+					DLog(L"CMpegSplitterFilter::DeliverPacket() : Dropping base %I64d, next MVC extension is %I64d", p->rtStart, pMVCExtensionPacket->rtStart);
 					break;
 				}
 			}
