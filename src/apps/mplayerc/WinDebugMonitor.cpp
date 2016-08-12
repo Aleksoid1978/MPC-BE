@@ -37,7 +37,7 @@ CWinDebugMonitor::CWinDebugMonitor(DWORD dwProcessId)
 	bIsInitialize = TRUE;
 	if (Initialize() != 0) {
 		bIsInitialize = FALSE;
-		DbgLogInfo(LOG_TRACE, 3, "CWinDebugMonitor::Initialize() failed");
+		DbgLog((LOG_TRACE, 3, "CWinDebugMonitor::Initialize() failed"));
 	}
 #endif
 }
