@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "HTTPAsync.h"
+#include "Log.h"
 
 #pragma comment(lib, "WinInet.Lib")
 
@@ -166,7 +167,7 @@ static CString FormatErrorMessage(DWORD dwError)
 { \
 	const DWORD dwError = GetLastError(); \
 	if (dwError != ERROR_IO_PENDING) { \
-		DbgLog((LOG_TRACE, 3, L"CHTTPAsync() error : Function '%s' failed with error %d - '%s', line %i", CString(lpszFunction), dwError, FormatErrorMessage(dwError), __LINE__)); \
+		DLog(L"CHTTPAsync() error : Function '%s' failed with error %d - '%s', line %i", CString(lpszFunction), dwError, FormatErrorMessage(dwError), __LINE__); \
 		return (ret); \
 	} \
 } \
@@ -283,7 +284,7 @@ HRESULT CHTTPAsync::SendRequest(LPCTSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 	std::unique_lock<std::mutex> lock(m_mutexRequest);
 
 	if (!m_bRequestComplete) {
-		DbgLog((LOG_TRACE, 3, L"CHTTPAsync::SendRequest() : previous request has not completed, exit"));
+		DLog(L"CHTTPAsync::SendRequest() : previous request has not completed, exit");
 		return S_FALSE;
 	}
 
@@ -311,7 +312,7 @@ HRESULT CHTTPAsync::SendRequest(LPCTSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 		CheckLastError(L"HttpOpenRequest()", E_FAIL);
 
 		if (WaitForSingleObject(m_hRequestOpenedEvent, dwTimeOut) == WAIT_TIMEOUT) {
-			DbgLog((LOG_TRACE, 3, L"CHTTPAsync::SendRequest() : HttpOpenRequest() - %d ms time out reached, exit", dwTimeOut));
+			DLog(L"CHTTPAsync::SendRequest() : HttpOpenRequest() - %u ms time out reached, exit", dwTimeOut);
 			m_bRequestComplete = FALSE;
 			return E_FAIL;
 		}
@@ -330,7 +331,7 @@ HRESULT CHTTPAsync::SendRequest(LPCTSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 			CheckLastError(L"HttpSendRequest()", E_FAIL);
 
 			if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
-				DbgLog((LOG_TRACE, 3, L"CHTTPAsync::SendRequest() : HttpSendRequest() - %d ms time out reached, exit", dwTimeOut));
+				DLog(L"CHTTPAsync::SendRequest() : HttpSendRequest() - %u ms time out reached, exit", dwTimeOut);
 				m_bRequestComplete = FALSE;
 				return S_FALSE;
 			}
@@ -366,7 +367,7 @@ HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, 
 	std::unique_lock<std::mutex> lock(m_mutexRequest);
 
 	if (!m_bRequestComplete) {
-		DbgLog((LOG_TRACE, 3, L"CHTTPAsync::Read() : previous request has not completed, exit"));
+		DLog(L"CHTTPAsync::Read() : previous request has not completed, exit");
 		return S_FALSE;
 	}
 
@@ -383,7 +384,7 @@ HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, 
 		CheckLastError(L"InternetReadFileEx()", E_FAIL);
 
 		if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
-			DbgLog((LOG_TRACE, 3, L"CHTTPAsync::Read() : InternetReadFileEx() - %d ms time out reached, exit", dwTimeOut));
+			DLog(L"CHTTPAsync::Read() : InternetReadFileEx() - %u ms time out reached, exit", dwTimeOut);
 			m_bRequestComplete = FALSE;
 			return S_FALSE;
 		}

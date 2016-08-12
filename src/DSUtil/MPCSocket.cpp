@@ -158,7 +158,7 @@ BOOL CMPCSocket::OnMessagePending()
 
 	if (::PeekMessage(&msg, NULL, WM_TIMER, WM_TIMER, PM_REMOVE)) {
 		if (msg.wParam == (UINT) m_nTimerID) {
-			TRACE(_T("CMPCSocket::OnMessagePending(WM_TIMER) PASSED!\n"));
+			DLog(L"CMPCSocket::OnMessagePending(WM_TIMER) PASSED!");
 			// Remove the message and call CancelBlockingCall.
 			::PeekMessage(&msg, NULL, WM_TIMER, WM_TIMER, PM_REMOVE);
 			CancelBlockingCall();
@@ -218,16 +218,16 @@ BOOL CMPCSocket::SendRequest()
 		CString path = szUrl;
 		delete [] szUrl;
 
-		LOG2FILE(L"===");
-		LOG2FILE(L"Request URL = %s", path);
-		LOG2FILE(L"Header:");
+		Log2File(L"===");
+		Log2File(L"Request URL = %s", path);
+		Log2File(L"Header:");
 		CAtlList<CStringA> sl;
 		CStringA hdr = GetHeader();
 		Explode(hdr, sl, '\n');
 		POSITION pos = sl.GetHeadPosition();
 		while (pos) {
 			CStringA& hdrline = sl.GetNext(pos);
-			LOG2FILE(L"%s", CString(hdrline));
+			Log2File(L"%s", CString(hdrline));
 		}
 	}
 #endif

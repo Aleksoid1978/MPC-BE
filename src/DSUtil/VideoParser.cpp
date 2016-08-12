@@ -24,6 +24,7 @@
 #include "H264Nalu.h"
 #include "GolombBuffer.h"
 #include "VideoParser.h"
+#include "Log.h"
 
 struct dirac_source_params {
 	unsigned width;
@@ -1097,7 +1098,7 @@ namespace HEVCParser {
 
 		// HEVCDecoderConfigurationRecord
 		uint8_t configurationVersion = gb.BitRead(8); // configurationVersion = 1 (or 0 for beta MKV DivX HEVC)
-		TRACE(L"%s", configurationVersion == 0 ? L"WARNING: beta MKV DivX HEVC\n" : L"");
+		DLog(L"%s", configurationVersion == 0 ? L"WARNING: beta MKV DivX HEVC" : L"");
 		if (configurationVersion > 1) {
 			return false;
 		}
