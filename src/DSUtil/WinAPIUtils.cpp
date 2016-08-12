@@ -23,6 +23,7 @@
 #include <d3d9.h>
 #include "WinAPIUtils.h"
 #include "SysVersion.h"
+#include "Log.h"
 
 BOOL IsCompositionEnabled()
 {
@@ -422,7 +423,7 @@ BOOL CFileGetStatus(LPCTSTR lpszFileName, CFileStatus& status)
 	} catch (CException* e) {
 		// MFCBUG: E_INVALIDARG / "Parameter is incorrect" is thrown for certain cds (vs2003)
 		// http://groups.google.co.uk/groups?hl=en&lr=&ie=UTF-8&threadm=OZuXYRzWDHA.536%40TK2MSFTNGP10.phx.gbl&rnum=1&prev=/groups%3Fhl%3Den%26lr%3D%26ie%3DISO-8859-1
-		TRACE(_T("CFile::GetStatus has thrown an exception\n"));
+		DLog(L"CFile::GetStatus has thrown an exception");
 		e->Delete();
 		return false;
 	}

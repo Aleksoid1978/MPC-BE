@@ -2748,9 +2748,9 @@ DWORD YCrCbToRGB_Rec709(BYTE A, BYTE Y, BYTE Cr, BYTE Cb)
 
 void TraceFilterInfo(IBaseFilter* pBF)
 {
-	FILTER_INFO		Info;
+	FILTER_INFO Info;
 	if (SUCCEEDED (pBF->QueryFilterInfo(&Info))) {
-		TRACE (" === Filter info : %S\n", Info.achName);
+		DLog(L" === Filter info : %s", Info.achName);
 		BeginEnumPins(pBF, pEnum, pPin) {
 			TracePinInfo(pPin);
 		}
@@ -2775,9 +2775,9 @@ void TracePinInfo(IPin* pPin)
 		ConnectedFilterInfo.pGraph->Release();
 	}
 	pPin->QueryPinInfo (&PinInfo);
-	TRACE("		%S (%S) -> %S (Filter %S)\n",
+	DLog(L"        %s (%s) -> %s (Filter %s)",
 		  PinInfo.achName,
-		  PinInfo.dir == PINDIR_OUTPUT ? _T("Out") : _T("In"),
+		  PinInfo.dir == PINDIR_OUTPUT ? L"Out" : L"In",
 		  ConnectedInfo.achName,
 		  ConnectedFilterInfo.achName);
 	PinInfo.pFilter->Release();

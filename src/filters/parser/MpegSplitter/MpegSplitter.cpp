@@ -2021,8 +2021,8 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		if (p && p->GetCount() >= 3) {
 			int segtype = p->GetData()[0];
 			//int unitsize = p->GetData()[1] << 8 | p->GetData()[2];
-			//if (segtype == 22) LOG2FILE(L"");
-			//LOG2FILE(L"segtype %3d, unitsize %5d, time %4.3f", segtype, unitsize, p->rtStart/10000000.0);
+			//if (segtype == 22) Log2File(L"");
+			//Log2File(L"segtype %3d, unitsize %5d, time %4.3f", segtype, unitsize, p->rtStart/10000000.0);
 
 			if (segtype == 22) {
 				// this is first packet of HDMV sub, set standart mode

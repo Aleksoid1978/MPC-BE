@@ -28,35 +28,33 @@ void HexDump(CString fileName, BYTE* buf, int size)
 		return;
 	}
 
-	CString dump_str;
-	dump_str.Format(_T("Dump size = %d\n"), size);
+	CStringW dump_str;
+	dump_str.Format(L"Dump size = %d\n", size);
 
 	for (int i = 0; i < size; i += 16) {
 		int len = size - i;
 		if (len > 16) {
 			len = 16;
 		}
-		dump_str.AppendFormat(_T("%08x:"), i);
+		dump_str.AppendFormat(L"%08x:", i);
 		for (int j = 0; j < 16; j++) {
 			if (j < len) {
-				dump_str.AppendFormat(_T(" %02x"), buf[i+j]);
+				dump_str.AppendFormat(L" %02x", buf[i+j]);
 			}
 			else {
-				dump_str.Append(_T("   "));
+				dump_str.Append(L"   ");
 			}
 		}
-		dump_str.Append(_T(" | "));
+		dump_str.Append(L" | ");
 		for (int j = 0; j < len; j++) {
 			int c = buf[i+j];
 			if (c < ' ' || c > '~') {
 				c = '.';
 			}
-			dump_str.AppendFormat(_T("%c"), c);
+			dump_str.AppendFormat(L"%c", c);
 		}
-		dump_str.Append(_T("\n"));
+		dump_str.AppendChar('\n');
 	}
-
-	dump_str.Append(_T("\n"));
 
 	if (!fileName.IsEmpty()) {
 		CStdioFile file;
@@ -65,11 +63,11 @@ void HexDump(CString fileName, BYTE* buf, int size)
 			file.Close();
 		}
 	} else {
-		TRACE(dump_str);
+		DLog(dump_str);
 	}
 }
 
-void LOG2FILE(LPCTSTR fmt, ...)
+void Log2File(LPCTSTR fmt, ...)
 {
 	static CString fname;
 	if (fname.IsEmpty()) {

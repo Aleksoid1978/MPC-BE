@@ -29,4 +29,4 @@
 #endif
 
 void HexDump(CString fName, BYTE* buf, int size);
-void LOG2FILE(LPCTSTR fmt, ...);
+void Log2File(LPCTSTR fmt, ...);
