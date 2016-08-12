@@ -716,7 +716,7 @@ HRESULT CBaseSplitterFilter::SetPositionsInternal(void* id, LONGLONG* pCurrent, 
 	m_LastSeekers.RemoveAll();
 	m_LastSeekers.AddTail(id);
 
-	DbgLogInfo(LOG_TRACE, 0, L"Seek Started %I64d", rtCurrent);
+	DbgLog((LOG_TRACE, 0, L"Seek Started %I64d", rtCurrent));
 
 	m_rtNewStart = m_rtCurrent = rtCurrent;
 	m_rtNewStop = rtStop;
@@ -727,7 +727,7 @@ HRESULT CBaseSplitterFilter::SetPositionsInternal(void* id, LONGLONG* pCurrent, 
 		DeliverEndFlush();
 	}
 
-	DbgLogInfo(LOG_TRACE, 0, L"Seek Ended");
+	DbgLog((LOG_TRACE, 0, L"Seek Ended"));
 
 	return S_OK;
 }

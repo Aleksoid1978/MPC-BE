@@ -2437,8 +2437,8 @@ HRESULT CRealAudioDecoder::Receive(IMediaSample* pIn)
 		pOut->SetActualDataLength(len);
 
 #if 0
-		DbgLogInfo(LOG_TRACE, 0, L"A: rtStart=%I64d, rtStop=%I64d, disc=%d, sync=%d",
-				rtStart, rtStop, pOut->IsDiscontinuity() == S_OK, pOut->IsSyncPoint() == S_OK);
+		DbgLog((LOG_TRACE, 0, L"A: rtStart=%I64d, rtStop=%I64d, disc=%d, sync=%d",
+				rtStart, rtStop, pOut->IsDiscontinuity() == S_OK, pOut->IsSyncPoint() == S_OK));
 #endif
 
 		if (rtStart >= 0 && S_OK != (hr = m_pOutput->Deliver(pOut))) {
