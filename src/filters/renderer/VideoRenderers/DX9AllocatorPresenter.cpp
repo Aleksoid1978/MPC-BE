@@ -424,7 +424,7 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 
 HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 {
-	DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::CreateDevice()"));
+	DLog(L"CDX9AllocatorPresenter::CreateDevice()");
 
 	// extern variable
 	g_nFrameType = PICT_NONE;
@@ -702,11 +702,11 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	if (m_pD3DDev) {
 		while (hr == D3DERR_DEVICELOST) {
-			DbgLog((LOG_TRACE, 3, L"	=> D3DERR_DEVICELOST. Trying to Reset."));
+			DLog(L"    => D3DERR_DEVICELOST. Trying to Reset.");
 			hr = m_pD3DDev->TestCooperativeLevel();
 		}
 		if (hr == D3DERR_DEVICENOTRESET) {
-			DbgLog((LOG_TRACE, 3, L"	=> D3DERR_DEVICENOTRESET"));
+			DLog(L"    => D3DERR_DEVICENOTRESET");
 			hr = m_pD3DDev->Reset(&m_d3dpp);
 		}
 
@@ -715,7 +715,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		}
 	}
 
-	DbgLog((LOG_TRACE, 3, L"	=> CreateDevice() : 0x%08x", hr));
+	DLog(L"    => CreateDevice() : 0x%08x", hr);
 
 	if (FAILED(hr)) {
 		_Error += L"CreateDevice() failed\n";
@@ -761,7 +761,7 @@ HRESULT CDX9AllocatorPresenter::AllocSurfaces()
 
 HRESULT CDX9AllocatorPresenter::ResetD3D9Device()
 {
-	DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::ResetD3D9Device()"));
+	DLog(L"CDX9AllocatorPresenter::ResetD3D9Device()");
 
 	if (m_CurrentAdapter != GetAdapter(m_pD3D)) {
 		return E_FAIL;
@@ -1591,18 +1591,18 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		bool bResetDevice = false;
 
 		if (hr == D3DERR_DEVICELOST && m_pD3DDev->TestCooperativeLevel() == D3DERR_DEVICENOTRESET) {
-			DbgLog((LOG_TRACE, 3, L"D3D Device Lost - need Reset Device"));
+			DLog(L"D3D Device Lost - need Reset Device");
 			bResetDevice = true;
 		}
 
 		//if (hr == S_PRESENT_MODE_CHANGED)
 		//{
-		//	TRACE("Reset Device: D3D Device mode changed\n");
+		//	DLog(L"Reset Device: D3D Device mode changed");
 		//	bResetDevice = true;
 		//}
 
 		if (SettingsNeedResetDevice()) {
-			DbgLog((LOG_TRACE, 3, L"Settings Changed - need Reset Device"));
+			DLog(L"Settings Changed - need Reset Device");
 			bResetDevice = true;
 		}
 
@@ -1614,7 +1614,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			if (m_bIsFullscreen) {
 				m_bCompositionEnabled = (bCompositionEnabled != 0);
 			} else {
-				DbgLog((LOG_TRACE, 3, L"DWM Composition Changed - need Reset Device"));
+				DLog(L"DWM Composition Changed - need Reset Device");
 				bResetDevice = true;
 			}
 		}
@@ -1630,7 +1630,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 				}
 #endif
 				if (m_CurrentAdapter != GetAdapter(m_pD3D)) {
-					DbgLog((LOG_TRACE, 3, L"D3D adapter changed - need Reset Device"));
+					DLog(L"D3D adapter changed - need Reset Device");
 					bResetDevice = true;
 				}
 #ifdef _DEBUG
@@ -1684,7 +1684,7 @@ void CDX9AllocatorPresenter::SendResetRequest()
 
 STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 {
-	DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::ResetDevice()"));
+	DLog(L"CDX9AllocatorPresenter::ResetDevice()");
 
 	ASSERT(m_MainThreadId == GetCurrentThreadId());
 
@@ -1704,7 +1704,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 		// TODO: We should probably pause player
 #ifdef _DEBUG
 		Error += GetWindowsErrorMessage(hr, NULL);
-		DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::ResetDevice() - Error:\n%s\n", Error));
+		DLog(L"CDX9AllocatorPresenter::ResetDevice() - Error:\n%s", Error);
 #endif
 		m_bDeviceResetRequested = false;
 		return false;
@@ -1718,7 +1718,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 
 STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 {
-	DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::DisplayChange()"));
+	DLog(L"CDX9AllocatorPresenter::DisplayChange()");
 
 	CComPtr<IDirect3D9>   pD3D;
 	CComPtr<IDirect3D9Ex> pD3DEx;
@@ -1745,7 +1745,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 	}
 
 	if (FAILED(ResetD3D9Device())) {
-		DbgLog((LOG_TRACE, 3, L"CDX9AllocatorPresenter::DisplayChange() - ResetD3D9Device() FAILED, send reset request"));
+		DLog(L"CDX9AllocatorPresenter::DisplayChange() - ResetD3D9Device() FAILED, send reset request");
 
 		m_bPendingResetDevice = true;
 		SendResetRequest();
