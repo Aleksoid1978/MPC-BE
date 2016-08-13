@@ -937,7 +937,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (fourcc == FCC('yuv2')
 								|| fourcc == FCC('b16g')
 								|| fourcc == FCC('b48r')
-								|| fourcc == FCC('b64a') // decoding support is planned in the future
+								|| fourcc == FCC('b64a')
 							) {
 							mt.subtype = MEDIASUBTYPE_LAV_RAWVIDEO;
 							mts.Add(mt);
