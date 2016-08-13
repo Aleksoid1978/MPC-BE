@@ -368,10 +368,10 @@ static int raw_decode(AVCodecContext *avctx, void *data, int *got_frame,
         if (pal) {
             av_buffer_unref(&context->palette);
             context->palette = av_buffer_alloc(AVPALETTE_SIZE);
-            if (!context->palette) {
-                av_buffer_unref(&frame->buf[0]);
-                return AVERROR(ENOMEM);
-            }
+        if (!context->palette) {
+            av_buffer_unref(&frame->buf[0]);
+            return AVERROR(ENOMEM);
+        }
             memcpy(context->palette->data, pal, AVPALETTE_SIZE);
             frame->palette_has_changed = 1;
         } else if (context->is_nut_pal8) {
@@ -441,6 +441,17 @@ static int raw_decode(AVCodecContext *avctx, void *data, int *got_frame,
             for (x = 0; x < avctx->width; x++)
                 line[2 * x + 1] ^= 0x80;
             line += frame->linesize[0];
+        }
+    }
+
+    if (avctx->codec_tag == AV_RL32("b64a") &&
+        avctx->pix_fmt   == AV_PIX_FMT_RGBA64BE) {
+        uint8_t *dst = frame->data[0];
+        uint64_t v;
+        int x;
+        for (x = 0; x >> 3 < avctx->width * avctx->height; x += 8) {
+            v = AV_RB64(&dst[x]);
+            AV_WB64(&dst[x], v << 16 | v >> 48);
         }
     }
 
