@@ -10948,22 +10948,10 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 	int w = r1.Width() - r2.Width() + lWidth;
 	int h = r1.Height() - r2.Height() + lHeight;
 
-	if (style & WS_THICKFRAME) {
-		w += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
-		h += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-		if ((style & WS_CAPTION) == 0 ) {
-			w -= 2;
-			h -= 2;
-		}
-	}
-
-	if (style & WS_CAPTION) {
-		h += GetSystemMetrics(SM_CYCAPTION);
-		if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
-			h += GetSystemMetrics(SM_CYMENU);
-		}
-		//else MODE_HIDEMENU
-	}
+	CRect decorationsRect;
+	VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), !IsMenuHidden(), GetWindowExStyle(m_hWnd)));
+	w += decorationsRect.Width();
+	h += decorationsRect.Height();
 
 	if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && !m_bFullScreen && !m_wndNavigationBar.IsVisible()) {
 		CSize r = m_wndNavigationBar.CalcFixedLayout(FALSE, TRUE);
