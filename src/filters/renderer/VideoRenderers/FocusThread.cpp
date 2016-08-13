@@ -52,7 +52,7 @@ CFocusThread::CFocusThread()
 	wndclass.lpszClassName = L"D3DFocusClass";
 
 	if (!RegisterClass(&wndclass)) {
-		DbgLog((LOG_TRACE, 3, L"CFocusThread::CFocusThread() : Registering focus window failed"));
+		DLog(L"CFocusThread::CFocusThread() : Registering focus window failed");
 	}
 
 	m_hEvtInit = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -70,7 +70,7 @@ BOOL CFocusThread::InitInstance()
 	m_hWnd = CreateWindow(L"D3DFocusClass", L"D3D Focus Window", WS_OVERLAPPED, 0, 0, 0, 0, NULL, NULL, NULL, NULL);
 	SetEvent(m_hEvtInit);
 	if (!m_hWnd) {
-		DbgLog((LOG_TRACE, 3, L"CFocusThread::InitInstance() : Creating focus window failed"));
+		DLog(L"CFocusThread::InitInstance() : Creating focus window failed");
 		return FALSE;
 	}
 	return TRUE;

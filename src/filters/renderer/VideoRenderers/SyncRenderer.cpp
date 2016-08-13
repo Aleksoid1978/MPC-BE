@@ -2346,7 +2346,7 @@ STDMETHODIMP CSyncAP::CreateRenderer(IUnknown** ppRenderer)
 		CComQIPtr<IEVRFilterConfig> pConfig	= pBF;
 
 		if (FAILED(pConfig->SetNumberOfStreams(3))) { // TODO - maybe need other number of input stream ...
-			DbgLog((LOG_TRACE, 3, L"IEVRFilterConfig->SetNumberOfStreams(3) fail"));
+			DLog(L"IEVRFilterConfig->SetNumberOfStreams(3) fail");
 			break;
 		}
 

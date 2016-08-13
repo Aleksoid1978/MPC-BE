@@ -294,7 +294,7 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		CComQIPtr<IEVRFilterConfig>	pConfig	= pBF;
 
 		if (FAILED(pConfig->SetNumberOfStreams(3))) { // TODO - maybe need other number of input stream ...
-			DbgLog((LOG_TRACE, 3, L"IEVRFilterConfig->SetNumberOfStreams(3) fail"));
+			DLog(L"IEVRFilterConfig->SetNumberOfStreams(3) fail");
 			break;
 		}
 
@@ -917,16 +917,15 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 		}
 	}
 
-
-	size_t nValidTypes = ValidMixerTypes.GetCount();
 #ifdef _DEBUG
-	for (size_t i = 0; i < nValidTypes; ++i) {
-		// Step 3. Adjust the mixer's type to match our requirements.
-		pType = ValidMixerTypes[i];
-		DbgLog((LOG_TRACE, 3, L"EVR: Valid mixer output type: %s", GetMediaTypeFormatDesc(pType)));
+	CString dbgmsg = L"EVR: Valid mixer output types:";
+	for (size_t i = 0; i < ValidMixerTypes.GetCount(); ++i) {
+		dbgmsg.AppendFormat(L"\n - %s", GetMediaTypeFormatDesc(ValidMixerTypes[i]));
 	}
+	DLog(dbgmsg);
 #endif
-	for (size_t i = 0; i < nValidTypes; ++i) {
+
+	for (size_t i = 0; i < ValidMixerTypes.GetCount(); ++i) {
 		// Step 3. Adjust the mixer's type to match our requirements.
 		pType = ValidMixerTypes[i];
 
@@ -1761,7 +1760,7 @@ void CEVRAllocatorPresenter::OnVBlankFinished(bool fAll, LONGLONG PerformanceCou
 
 STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResetDevice()
 {
-	DbgLog((LOG_TRACE, 3, L"CEVRAllocatorPresenter::ResetDevice()"));
+	DLog(L"CEVRAllocatorPresenter::ResetDevice()");
 
 	StopWorkerThreads();
 
