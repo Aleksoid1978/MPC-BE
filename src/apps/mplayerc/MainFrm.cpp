@@ -6774,59 +6774,59 @@ void CMainFrame::OnViewCaptionmenu()
 	DWORD dwRemove = 0, dwAdd = 0;
 	DWORD dwMenuFlags = GetMenuBarVisibility();
 
-	CRect wr;
-	GetWindowRect(&wr);
-
 	const BOOL bZoomed = IsZoomed();
+
+	CRect windowRect;
+	GetWindowRect(&windowRect);
+	const CRect oldwindowRect(windowRect);
+    if (!bZoomed) {
+		CRect decorationsRect;
+		VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), dwMenuFlags == AFX_MBV_KEEPVISIBLE, GetWindowExStyle(m_hWnd)));
+		windowRect.bottom -= decorationsRect.bottom;
+		windowRect.right  -= decorationsRect.right;
+		windowRect.top    -= decorationsRect.top;
+		windowRect.left   -= decorationsRect.left;
+    }
 
 	switch (s.iCaptionMenuMode) {
 		case MODE_SHOWCAPTIONMENU:	// borderless -> normal
 			dwMenuFlags = AFX_MBV_KEEPVISIBLE;
 			dwAdd |= (WS_CAPTION | WS_THICKFRAME);
 			dwRemove &= ~(WS_CAPTION | WS_THICKFRAME);
-			wr.InflateRect(GetSystemMetrics(SM_CXSIZEFRAME), GetSystemMetrics(SM_CYSIZEFRAME));
-			if (!bZoomed) {
-				wr.bottom += GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYMENU);
-			}
 			break;
 		case MODE_HIDEMENU:			// normal -> hidemenu
 			dwMenuFlags = AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10;
-			if (!bZoomed) {
-				wr.bottom -= GetSystemMetrics(SM_CYMENU);
-			}
 			break;
 		case MODE_FRAMEONLY:		// hidemenu -> frameonly
 			dwMenuFlags = AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10;
 			dwAdd &= ~WS_CAPTION;
 			dwRemove |= WS_CAPTION;
-			wr.DeflateRect(GetSystemMetrics(SM_CXBORDER), GetSystemMetrics(SM_CYBORDER));
-			if (!bZoomed) {
-				wr.bottom -= GetSystemMetrics(SM_CYCAPTION);
-			}
 			break;
 		case MODE_BORDERLESS:		// frameonly -> borderless
 			dwMenuFlags = AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10;
 			dwAdd &= ~WS_THICKFRAME;
 			dwRemove |= WS_THICKFRAME;
-			wr.DeflateRect(GetSystemMetrics(SM_CXSIZEFRAME) - GetSystemMetrics(SM_CXBORDER),
-						   GetSystemMetrics(SM_CYSIZEFRAME) - GetSystemMetrics(SM_CYBORDER));
 		break;
 	}
 
-	if (bZoomed && (s.iCaptionMenuMode == MODE_FRAMEONLY || s.iCaptionMenuMode == MODE_BORDERLESS)) {
-		MONITORINFO mi = { sizeof(mi) };
-		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
-		wr = mi.rcWork;
-	}
-
 	UINT uFlags = SWP_NOZORDER;
-	if (dwRemove || dwAdd) {
+	if (dwRemove != dwAdd) {
 		uFlags |= SWP_FRAMECHANGED;
+		VERIFY(SetWindowLong(m_hWnd, GWL_STYLE, (GetWindowLong(m_hWnd, GWL_STYLE) | dwAdd) & ~dwRemove));
 	}
 
 	SetMenuBarVisibility(dwMenuFlags);
-	VERIFY(SetWindowLong(m_hWnd, GWL_STYLE, (GetWindowLong(m_hWnd, GWL_STYLE) | dwAdd) & ~dwRemove));
-	VERIFY(SetWindowPos(NULL, wr.left, wr.top, wr.Width(), wr.Height(), uFlags));
+
+	if (bZoomed) {
+		CMonitors::GetNearestMonitor(this).GetWorkAreaRect(windowRect);
+	} else {
+		VERIFY(AdjustWindowRectEx(windowRect, GetWindowStyle(m_hWnd), dwMenuFlags == AFX_MBV_KEEPVISIBLE, GetWindowExStyle(m_hWnd)));
+		if (oldwindowRect.top != windowRect.top) {
+			// restore original top position
+			windowRect.OffsetRect(0, oldwindowRect.top - windowRect.top);
+		}
+	}
+	VERIFY(SetWindowPos(NULL, windowRect.left, windowRect.top, windowRect.Width(), windowRect.Height(), uFlags));
 
 	FlyBarSetPos();
 	OSDBarSetPos();
