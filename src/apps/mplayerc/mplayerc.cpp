@@ -1257,15 +1257,14 @@ BOOL WINAPI Mine_DeviceIoControl(HANDLE hDevice, DWORD dwIoControlCode, LPVOID l
 	return ret;
 }
 
-BOOL SetHeapOptions()
+static BOOL SetHeapOptions()
 {
 	HMODULE hLib = LoadLibrary(L"kernel32.dll");
 	if (hLib == NULL) {
 		return FALSE;
 	}
 
-	typedef BOOL (WINAPI *HSI)
-	(HANDLE, HEAP_INFORMATION_CLASS ,PVOID, SIZE_T);
+	typedef BOOL (WINAPI *HSI)(HANDLE, HEAP_INFORMATION_CLASS, PVOID, SIZE_T);
 	HSI pHsi = (HSI)GetProcAddress(hLib,"HeapSetInformation");
 	if (!pHsi) {
 		FreeLibrary(hLib);
@@ -1273,12 +1272,10 @@ BOOL SetHeapOptions()
 	}
 
 #ifndef HeapEnableTerminationOnCorruption
-#	define HeapEnableTerminationOnCorruption (HEAP_INFORMATION_CLASS)1
+	#define HeapEnableTerminationOnCorruption (HEAP_INFORMATION_CLASS)1
 #endif
 
-	BOOL fRet = (pHsi)(NULL,HeapEnableTerminationOnCorruption,NULL,0)
-				? TRUE
-				: FALSE;
+	const BOOL fRet = (pHsi)(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 	if (hLib) {
 		FreeLibrary(hLib);
 	}
@@ -1288,10 +1285,13 @@ BOOL SetHeapOptions()
 
 BOOL CMPlayerCApp::InitInstance()
 {
+#ifdef DEBUG
+	DbgSetModuleLevel(LOG_TRACE, DWORD_MAX);
+	DbgSetModuleLevel(LOG_ERROR, DWORD_MAX);
+#endif
+
 	// Remove the working directory from the search path to work around the DLL preloading vulnerability
 	SetDllDirectory(L"");
-
-	long lError;
 
 	if (SetHeapOptions()) {
 		DLog(L"Terminate on corruption enabled");
@@ -1311,7 +1311,7 @@ BOOL CMPlayerCApp::InitInstance()
 	DetourAttach(&(PVOID&)Real_mixerSetControlDetails, (PVOID)Mine_mixerSetControlDetails);
 	DetourAttach(&(PVOID&)Real_DeviceIoControl, (PVOID)Mine_DeviceIoControl);
 
-	HMODULE hNTDLL = LoadLibrary (_T("ntdll.dll"));
+	HMODULE hNTDLL = LoadLibrary(L"ntdll.dll");
 
 #ifndef _DEBUG	// Disable NtQueryInformationProcess in debug (prevent VS debugger to stop on crash address)
 	if (hNTDLL) {
@@ -1325,19 +1325,14 @@ BOOL CMPlayerCApp::InitInstance()
 
 	CFilterMapper2::Init();
 
-	lError = DetourTransactionCommit();
+	const LONG lError = DetourTransactionCommit();
 	ASSERT (lError == NOERROR);
 
 	HRESULT hr;
 	if (FAILED(hr = OleInitialize(0))) {
-		AfxMessageBox(_T("OleInitialize failed!"));
+		AfxMessageBox(L"OleInitialize failed!");
 		return FALSE;
 	}
-
-#ifdef DEBUG
-	DbgSetModuleLevel (LOG_TRACE, DWORD_MAX);
-	DbgSetModuleLevel (LOG_ERROR, DWORD_MAX);
-#endif
 
 	WNDCLASS wndcls;
 	memset(&wndcls, 0, sizeof(WNDCLASS));
@@ -1351,12 +1346,12 @@ BOOL CMPlayerCApp::InitInstance()
 	wndcls.lpszClassName = _T(MPC_WND_CLASS_NAME);
 
 	if (!AfxRegisterClass(&wndcls)) {
-		AfxMessageBox(_T("MainFrm class registration failed!"));
+		AfxMessageBox(L"MainFrm class registration failed!");
 		return FALSE;
 	}
 
 	if (!AfxSocketInit(NULL)) {
-		AfxMessageBox(_T("AfxSocketInit failed!"));
+		AfxMessageBox(L"AfxSocketInit failed!");
 		return FALSE;
 	}
 
@@ -1395,7 +1390,7 @@ BOOL CMPlayerCApp::InitInstance()
 			CFile::Remove(GetIniPath());
 		} else {
 			HKEY reg = GetAppRegistryKey();
-			SHDeleteKey(reg, _T(""));
+			SHDeleteKey(reg, L"");
 			RegCloseKey(reg);
 		}
 
@@ -1403,7 +1398,7 @@ BOOL CMPlayerCApp::InitInstance()
 		CString strSavePath;
 		if (AfxGetMyApp()->GetAppSavePath(strSavePath)) {
 			CPath playlistPath;
-			playlistPath.Combine(strSavePath, _T("default.mpcpl"));
+			playlistPath.Combine(strSavePath, L"default.mpcpl");
 
 			CFileStatus status;
 			if (CFile::GetStatus(playlistPath, status)) {
@@ -1412,7 +1407,7 @@ BOOL CMPlayerCApp::InitInstance()
 		}
 	}
 
-	if ((m_s.nCLSwitches&CLSW_CLOSE) && m_s.slFiles.IsEmpty()) { // "/close" switch and empty file list
+	if ((m_s.nCLSwitches & CLSW_CLOSE) && m_s.slFiles.IsEmpty()) { // "/close" switch and empty file list
 		return FALSE;
 	}
 
@@ -1440,7 +1435,7 @@ BOOL CMPlayerCApp::InitInstance()
 						|| (m_s.nCLSwitches & CLSW_REGEXTPL) && filetype == TPlaylist) {
 					int j = 0;
 					CString str = mf[i].GetExtsWithPeriod();
-					for (CString ext = str.Tokenize(_T(" "), j); !ext.IsEmpty(); ext = str.Tokenize(_T(" "), j)) {
+					for (CString ext = str.Tokenize(L" ", j); !ext.IsEmpty(); ext = str.Tokenize(L" ", j)) {
 						CPPageFormats::RegisterExt(ext, mf[i].GetDescription(), filetype);
 					}
 				}
@@ -1460,14 +1455,14 @@ BOOL CMPlayerCApp::InitInstance()
 		return FALSE;
 	}
 
-	if ((m_s.nCLSwitches&CLSW_UNREGEXT)) { // unregistered file types
+	if (m_s.nCLSwitches & CLSW_UNREGEXT) { // unregistered file types
 		if (!IsUserAdmin()) {
 			AfxGetMyApp()->RunAsAdministrator(GetProgramPath(), m_lpCmdLine, false);
 		} else {
 			BOOL bIs64 = IsW64();
-			CPPageFormats::UnRegisterShellExt(GetProgramDir() + _T("MPCBEShellExt.dll"));
+			CPPageFormats::UnRegisterShellExt(GetProgramDir() + L"MPCBEShellExt.dll");
 			if (bIs64) {
-				CPPageFormats::UnRegisterShellExt(GetProgramDir() + _T("MPCBEShellExt64.dll"));
+				CPPageFormats::UnRegisterShellExt(GetProgramDir() + L"MPCBEShellExt64.dll");
 			}
 
 			CMediaFormats& mf = m_s.m_Formats;
@@ -1476,7 +1471,7 @@ BOOL CMPlayerCApp::InitInstance()
 			for (unsigned int i = 0; i < mf.GetCount(); i++) {
 				int j = 0;
 				CString str = mf[i].GetExtsWithPeriod();
-				for (CString ext = str.Tokenize(_T(" "), j); !ext.IsEmpty(); ext = str.Tokenize(_T(" "), j)) {
+				for (CString ext = str.Tokenize(L" ", j); !ext.IsEmpty(); ext = str.Tokenize(L" ", j)) {
 					CPPageFormats::UnRegisterExt(ext);
 				}
 			}
@@ -1555,14 +1550,14 @@ BOOL CMPlayerCApp::InitInstance()
 	m_s.LoadSettings(); // read settings
 
 	if (!__super::InitInstance()) {
-		AfxMessageBox(_T("InitInstance failed!"));
+		AfxMessageBox(L"InitInstance failed!");
 		return FALSE;
 	}
 
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
+	if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
 		CString path = GetProgramPath();
-		key.SetStringValue(_T("ExePath"), path);
+		key.SetStringValue(L"ExePath", path);
 	}
 
 	AfxEnableControlContainer();
@@ -1570,7 +1565,7 @@ BOOL CMPlayerCApp::InitInstance()
 	CMainFrame* pFrame = DNew CMainFrame;
 	m_pMainWnd = pFrame;
 	if (!pFrame->LoadFrame(IDR_MAINFRAME, WS_OVERLAPPEDWINDOW|FWS_ADDTOTITLE, NULL, NULL)) {
-		AfxMessageBox(_T("CMainFrame::LoadFrame failed!"));
+		AfxMessageBox(L"CMainFrame::LoadFrame failed!");
 		return FALSE;
 	}
 	pFrame->RestoreControlBars();
@@ -1604,7 +1599,7 @@ BOOL CMPlayerCApp::InitInstance()
 	// set HIGH I/O Priority for better playback perfomance
 	if (hNTDLL) {
 		typedef NTSTATUS (WINAPI *FUNC_NTSETINFORMATIONPROCESS)(HANDLE, ULONG, PVOID, ULONG);
-		FUNC_NTSETINFORMATIONPROCESS NtSetInformationProcess = (FUNC_NTSETINFORMATIONPROCESS)GetProcAddress (hNTDLL, "NtSetInformationProcess");
+		FUNC_NTSETINFORMATIONPROCESS NtSetInformationProcess = (FUNC_NTSETINFORMATIONPROCESS)GetProcAddress(hNTDLL, "NtSetInformationProcess");
 
 		if (NtSetInformationProcess && SetPrivilege(SE_INC_BASE_PRIORITY_NAME)) {
 			ULONG IoPriority = 3;
@@ -1613,11 +1608,12 @@ BOOL CMPlayerCApp::InitInstance()
 			DLog(L"Set I/O Priority - %d", NtStatus);
 		}
 
-		FreeLibrary( hNTDLL );
+		FreeLibrary(hNTDLL);
 		hNTDLL = NULL;
 	}
 
 	m_mutexOneInstance.Release();
+
 	return TRUE;
 }
 
