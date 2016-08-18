@@ -129,9 +129,7 @@ namespace GothSync
 		HRESULT (__stdcall * m_pDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**);
 
 		CCritSec m_allocatorLock;
-		CComPtr<IDirect3D9>			m_pD3D;
 		CComPtr<IDirect3D9Ex>		m_pD3DEx;
-		CComPtr<IDirect3DDevice9>	m_pD3DDev;
 		CComPtr<IDirect3DDevice9Ex>	m_pD3DDevEx;
 
 		UINT						m_CurrentAdapter;
