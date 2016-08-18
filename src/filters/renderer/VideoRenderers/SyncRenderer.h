@@ -262,6 +262,7 @@ namespace GothSync
 
 		CSize m_ScreenSize;
 		int m_iRotation;	// Rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
+		const wchar_t* m_wsResizer;
 
 		LONG m_lNextSampleWait; // Waiting time for next sample in EVR
 		bool m_bSnapToVSync; // True if framerate is low enough so that snap to vsync makes sense

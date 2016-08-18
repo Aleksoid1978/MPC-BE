@@ -60,6 +60,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error),
 	m_ScreenSize(0, 0),
 	m_iRotation(0),
+	m_wsResizer(L""), // empty string, not nullptr
 	m_nSurface(1),
 	m_iCurSurface(0),
 	m_bSnapToVSync(false),
@@ -606,7 +607,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	}
 
 	if (FAILED(hr)) {
-		_Error.AppendFormat(_T("CreateDevice() failed: %s\n"), GetWindowsErrorMessage(hr, m_hD3D9));
+		_Error.AppendFormat(L"CreateDevice() failed: %s\n", GetWindowsErrorMessage(hr, m_hD3D9));
 		return hr;
 	}
 
@@ -1322,19 +1323,19 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			// init post-resize pixel shaders
 			bool bScreenSpacePixelShaders = m_pPixelShadersScreenSpace.GetCount() > 0;
 			if (bScreenSpacePixelShaders && (!m_pScreenSizeTextures[0] || !m_pScreenSizeTextures[1])) {
-				if (FAILED(m_pD3DDev->CreateTexture(
-					min(m_ScreenSize.cx, (int)m_caps.MaxTextureWidth), min(max(m_ScreenSize.cy, m_nativeVideoSize.cy), (int)m_caps.MaxTextureHeight), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
-					D3DPOOL_DEFAULT, &m_pScreenSizeTextures[0], NULL))) {
+				UINT texWidth = min((DWORD)m_ScreenSize.cx, m_caps.MaxTextureWidth);
+				UINT texHeight = min((DWORD)m_ScreenSize.cy, m_caps.MaxTextureHeight);
+
+				if (D3D_OK != m_pD3DDev->CreateTexture(
+							texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
+							D3DPOOL_DEFAULT, &m_pScreenSizeTextures[0], NULL)
+					|| D3D_OK != m_pD3DDev->CreateTexture(
+							texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
+							D3DPOOL_DEFAULT, &m_pScreenSizeTextures[1], NULL)) {
 					ASSERT(0);
-					m_pScreenSizeTextures[0] = NULL; // will do 1 pass then
-					bScreenSpacePixelShaders = false;
-				}
-				else if (FAILED(m_pD3DDev->CreateTexture(
-					min(m_ScreenSize.cx, (int)m_caps.MaxTextureWidth), min(max(m_ScreenSize.cy, m_nativeVideoSize.cy), (int)m_caps.MaxTextureHeight), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
-					D3DPOOL_DEFAULT, &m_pScreenSizeTextures[1], NULL))) {
-					ASSERT(0);
-					m_pScreenSizeTextures[1] = NULL; // will do 1 pass then
-					bScreenSpacePixelShaders = false;
+					m_pScreenSizeTextures[0] = NULL;
+					m_pScreenSizeTextures[1] = NULL;
+					bScreenSpacePixelShaders = false; // will do 1 pass then
 				}
 			}
 
@@ -1356,18 +1357,46 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			// resize
 			if (rSrcVid.Size() != rDstVid.Size()) {
 				switch (iResizer) {
-				case RESIZER_NEAREST:  hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT);  break;
-				case RESIZER_BILINEAR: hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_LINEAR); break;
-				case RESIZER_SHADER_SMOOTHERSTEP: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_smootherstep); break;
-				case RESIZER_SHADER_BSPLINE4:  hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bspline4);  break;
-				case RESIZER_SHADER_MITCHELL4: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_mitchell4); break;
-				case RESIZER_SHADER_CATMULL4:  hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_catmull4);  break;
-				case RESIZER_SHADER_BICUBIC06: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic06); break;
-				case RESIZER_SHADER_BICUBIC08: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic08); break;
-				case RESIZER_SHADER_BICUBIC10: hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic10); break;
+				case RESIZER_NEAREST:
+					hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT);
+					m_wsResizer = L"Nearest neighbor";
+					break;
+				case RESIZER_BILINEAR:
+					hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_LINEAR);
+					m_wsResizer = L"Bilinear";
+					break;
+				case RESIZER_SHADER_SMOOTHERSTEP:
+					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_smootherstep);
+					m_wsResizer = L"Perlin Smootherstep";
+					break;
+				case RESIZER_SHADER_BSPLINE4:
+					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bspline4);
+					m_wsResizer = L"B-spline4";
+					break;
+				case RESIZER_SHADER_MITCHELL4:
+					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_mitchell4);
+					m_wsResizer = L"Mitchell-Netravali spline4";
+					break;
+				case RESIZER_SHADER_CATMULL4:
+					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_catmull4);
+					m_wsResizer = L"Catmull-Rom spline4";
+					break;
+				case RESIZER_SHADER_BICUBIC06:
+					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic06);
+					m_wsResizer = L"Bicubic A=-0.6";
+					break;
+				case RESIZER_SHADER_BICUBIC08:
+					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic08);
+					m_wsResizer = L"Bicubic A=-0.8";
+					break;
+				case RESIZER_SHADER_BICUBIC10:
+					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic10);
+					m_wsResizer = L"Bicubic A=-1.0";
+					break;
 				}
 			} else {
 				hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT);
+				m_wsResizer = L""; // empty string, not nullptr
 			}
 
 			// post-resize pixel shaders
@@ -1733,7 +1762,7 @@ void CBaseAP::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
-			strText.Format(L"Windows      : Display cycle %.3f ms    Display refresh rate %d Hz", m_dD3DRefreshCycle, m_refreshRate);
+			strText.Format(L"Display      : %d x %d, %d Hz  Cycle %.3f ms", m_ScreenSize.cx, m_ScreenSize.cy, m_refreshRate, m_dD3DRefreshCycle);
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
@@ -1783,7 +1812,11 @@ void CBaseAP::DrawStats()
 			}
 #endif
 
-			strText.Format(L"Video size   : %d x %d  (AR = %d : %d)  Display resolution %d x %d ", m_nativeVideoSize.cx, m_nativeVideoSize.cy, m_aspectRatio.cx, m_aspectRatio.cy, m_ScreenSize.cx, m_ScreenSize.cy);
+			strText.Format(L"Video size   : %d x %d (%d:%d)", m_nativeVideoSize.cx, m_nativeVideoSize.cy, m_aspectRatio.cx, m_aspectRatio.cy);
+			CSize videoSize = m_videoRect.Size();
+			if (m_nativeVideoSize != videoSize) {
+				strText.AppendFormat(L" -> %d x %d %s", videoSize.cx, videoSize.cy, m_wsResizer);
+			}
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
@@ -1810,7 +1843,7 @@ void CBaseAP::DrawStats()
 
 		if (pApp->m_iDisplayStats == 1) {
 			if (m_pAudioStats && rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
-				strText.Format(L"Audio lag   : %3d ms [%d ms, %d ms] | %s", m_lAudioLag, m_lAudioLagMin, m_lAudioLagMax, (m_lAudioSlaveMode == 4) ? _T("Audio renderer is matching rate (for analog sound output)") : _T("Audio renderer is not matching rate"));
+				strText.Format(L"Audio lag   : %3d ms [%d ms, %d ms] | %s", m_lAudioLag, m_lAudioLagMin, m_lAudioLagMax, (m_lAudioSlaveMode == 4) ? L"Audio renderer is matching rate (for analog sound output)" : L"Audio renderer is not matching rate");
 				DrawText(rc, strText, 1);
 				OffsetRect(&rc, 0, TextHeight);
 			}
@@ -3954,7 +3987,7 @@ CGenlock::~CGenlock()
 
 BOOL CGenlock::PowerstripRunning()
 {
-	psWnd = FindWindow(_T("TPShidden"), NULL);
+	psWnd = FindWindow(L"TPShidden", NULL);
 	if (!psWnd) {
 		return FALSE;    // Powerstrip is not running
 	} else {
