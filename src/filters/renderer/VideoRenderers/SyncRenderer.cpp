@@ -931,6 +931,7 @@ HRESULT CBaseAP::TextureResizeShader(IDirect3DTexture9* pTexture, Vector dst[4],
 		float fConstData[][4] = {{dx, dy, 0, 0}, {rx, 0, 0, 0}, {ry, 0, 0, 0}};
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShader[shader_downscaling]);
+		m_wsResizer = L"Simple averaging";
 	}
 	else {
 		float fConstData[][4] = { { dx, dy, 0, 0 }, { dx*0.5f, dy*0.5f, 0, 0 }, { dx, 0, 0, 0 }, { 0, dy, 0, 0 } };
@@ -1310,45 +1311,45 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			if (rSrcVid.Size() != rDstVid.Size()) {
 				switch (iResizer) {
 				case RESIZER_NEAREST:
-					hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT);
 					m_wsResizer = L"Nearest neighbor";
+					hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT);
 					break;
 				case RESIZER_BILINEAR:
-					hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_LINEAR);
 					m_wsResizer = L"Bilinear";
+					hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_LINEAR);
 					break;
 				case RESIZER_SHADER_SMOOTHERSTEP:
-					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_smootherstep);
 					m_wsResizer = L"Perlin Smootherstep";
+					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_smootherstep);
 					break;
 				case RESIZER_SHADER_BSPLINE4:
-					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bspline4);
 					m_wsResizer = L"B-spline4";
+					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bspline4);
 					break;
 				case RESIZER_SHADER_MITCHELL4:
-					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_mitchell4);
 					m_wsResizer = L"Mitchell-Netravali spline4";
+					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_mitchell4);
 					break;
 				case RESIZER_SHADER_CATMULL4:
-					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_catmull4);
 					m_wsResizer = L"Catmull-Rom spline4";
+					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_catmull4);
 					break;
 				case RESIZER_SHADER_BICUBIC06:
-					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic06);
 					m_wsResizer = L"Bicubic A=-0.6";
+					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic06);
 					break;
 				case RESIZER_SHADER_BICUBIC08:
-					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic08);
 					m_wsResizer = L"Bicubic A=-0.8";
+					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic08);
 					break;
 				case RESIZER_SHADER_BICUBIC10:
-					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic10);
 					m_wsResizer = L"Bicubic A=-1.0";
+					hr = TextureResizeShader(pVideoTexture, dst, rSrcVid, shader_bicubic10);
 					break;
 				}
 			} else {
-				hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT);
 				m_wsResizer = L""; // empty string, not nullptr
+				hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT);
 			}
 
 			// post-resize pixel shaders
