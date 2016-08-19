@@ -46,9 +46,6 @@
 #include "FocusThread.h"
 #include "../DSUtil/D3D9Helper.h"
 
-// only for debugging
-//#define DISABLE_USING_D3D9EX
-
 using namespace GothSync;
 using namespace D3D9Helper;
 
@@ -124,18 +121,21 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 
 	m_pDirect3DCreate9Ex = NULL;
 	m_hD3D9 = LoadLibrary(L"d3d9.dll");
-#ifndef DISABLE_USING_D3D9EX
 	if (m_hD3D9) {
 		(FARPROC &)m_pDirect3DCreate9Ex = GetProcAddress(m_hD3D9, "Direct3DCreate9Ex");
 	}
-#endif
 
 	if (m_pDirect3DCreate9Ex) {
-		DEBUG_ONLY(_tprintf_s(_T("m_pDirect3DCreate9Ex\n")));
 		m_pDirect3DCreate9Ex(D3D_SDK_VERSION, &m_pD3DEx);
 		if (!m_pD3DEx) {
 			m_pDirect3DCreate9Ex(D3D9b_SDK_VERSION, &m_pD3DEx);
 		}
+	}
+
+	if (!m_pD3DEx) {
+		hr = E_FAIL;
+		_Error += L"Failed to create Direct3D 9Ex\n";
+		return;
 	}
 
 	ZeroMemory(&m_VMR9AlphaBitmap, sizeof(m_VMR9AlphaBitmap));
@@ -475,30 +475,28 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 			m_FocusThread = (CFocusThread*)AfxBeginThread(RUNTIME_CLASS(CFocusThread), 0, 0, 0);
 		}
 
-		if (m_pD3DEx) {
-			D3DDISPLAYMODEEX DisplayMode;
-			ZeroMemory(&DisplayMode, sizeof(DisplayMode));
-			DisplayMode.Size = sizeof(DisplayMode);
-			m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &DisplayMode, NULL);
+		D3DDISPLAYMODEEX DisplayMode;
+		ZeroMemory(&DisplayMode, sizeof(DisplayMode));
+		DisplayMode.Size = sizeof(DisplayMode);
+		m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &DisplayMode, NULL);
 
-			DisplayMode.Format = pp.BackBufferFormat;
-			pp.FullScreen_RefreshRateInHz = DisplayMode.RefreshRate;
+		DisplayMode.Format = pp.BackBufferFormat;
+		pp.FullScreen_RefreshRateInHz = DisplayMode.RefreshRate;
 
-			bTryToReset = bTryToReset && m_pD3DDevEx && SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&pp, &DisplayMode));
+		bTryToReset = bTryToReset && m_pD3DDevEx && SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&pp, &DisplayMode));
 
-			if (!bTryToReset) {
-				m_pD3DDevEx = NULL;
+		if (!bTryToReset) {
+			m_pD3DDevEx = NULL;
 
-				hr = m_pD3DEx->CreateDeviceEx(
-						m_CurrentAdapter, D3DDEVTYPE_HAL, m_FocusThread->GetFocusWindow(),
-						D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS | D3DCREATE_NOWINDOWCHANGES,
-						&pp, &DisplayMode, &m_pD3DDevEx);
-			}
+			hr = m_pD3DEx->CreateDeviceEx(
+					m_CurrentAdapter, D3DDEVTYPE_HAL, m_FocusThread->GetFocusWindow(),
+					D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS | D3DCREATE_NOWINDOWCHANGES,
+					&pp, &DisplayMode, &m_pD3DDevEx);
+		}
 
-			if (m_pD3DDevEx) {
-				m_BackbufferFmt = pp.BackBufferFormat;
-				m_DisplayFmt = DisplayMode.Format;
-			}
+		if (m_pD3DDevEx) {
+			m_BackbufferFmt = pp.BackBufferFormat;
+			m_DisplayFmt = DisplayMode.Format;
 		}
 	} else { // Windowed
 		pp.Windowed = TRUE;
@@ -529,17 +527,15 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 			pp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 		}
 
-		if (m_pD3DEx) {
-			bTryToReset = bTryToReset && m_pD3DDevEx && SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&pp, NULL));
+		bTryToReset = bTryToReset && m_pD3DDevEx && SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&pp, NULL));
 
-			if (!bTryToReset) {
-				m_pD3DDevEx = NULL;
+		if (!bTryToReset) {
+			m_pD3DDevEx = NULL;
 
-				hr = m_pD3DEx->CreateDeviceEx(
-						m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
-						D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS,
-						&pp, NULL, &m_pD3DDevEx);
-			}
+			hr = m_pD3DEx->CreateDeviceEx(
+					m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
+					D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS,
+					&pp, NULL, &m_pD3DDevEx);
 		}
 	}
 
@@ -1453,16 +1449,11 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 		} else {
 			hr = m_pD3DDevEx->PresentEx(rSrcPri, rDstPri, NULL, NULL, NULL);
 		}
-	} else {
-		if (m_bIsFullscreen) {
-			hr = m_pD3DDevEx->Present(NULL, NULL, NULL, NULL);
-		} else {
-			hr = m_pD3DDevEx->Present(rSrcPri, rDstPri, NULL, NULL);
-		}
 	}
 	if (FAILED(hr)) {
 		DEBUG_ONLY(_tprintf_s(_T("Device lost or something\n")));
 	}
+
 	// Calculate timing statistics
 	if (m_pRefClock) {
 		m_pRefClock->GetTime(&llCurRefTime);    // To check if we called Present too late to hit the right vsync
@@ -2159,7 +2150,8 @@ STDMETHODIMP CBaseAP::AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profi
 
 // CSyncAP
 
-CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error): CBaseAP(hWnd, bFullscreen, hr, _Error)
+CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
+	: CBaseAP(hWnd, bFullscreen, hr, _Error)
 {
 	HMODULE		hLib;
 	CRenderersSettings& rs = GetRenderersSettings();
