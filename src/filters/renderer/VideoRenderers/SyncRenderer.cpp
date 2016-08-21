@@ -51,6 +51,9 @@ using namespace D3D9Helper;
 
 extern bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
 
+//#undef DLog
+//#define DLog(...) Log2File(__VA_ARGS__)
+
 // CBaseAP
 
 CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
@@ -378,7 +381,7 @@ bool CBaseAP::SettingsNeedResetDevice()
 
 HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 {
-	TRACE("--> CBaseAP::CreateDXDevice on thread: %d\n", GetCurrentThreadId());
+	DLog(L"--> CBaseAP::CreateDXDevice on thread: %u", GetCurrentThreadId());
 
 	CAutoLock cRenderLock(&m_allocatorLock);
 
@@ -452,7 +455,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		pp.BackBufferWidth = d3ddm.Width;
 		pp.BackBufferHeight = d3ddm.Height;
 		pp.hDeviceWindow = m_hWnd;
-		DEBUG_ONLY(_tprintf_s(_T("Wnd in CreateDXDevice: %p\n"), m_hWnd));
+		DLog(L"CBaseAP::CreateDXDevice : m_hWnd = %p", m_hWnd);
 		pp.BackBufferCount = 3;
 		pp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 		pp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
@@ -541,11 +544,11 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 
 	if (m_pD3DDevEx) {
 		while (hr == D3DERR_DEVICELOST) {
-			TRACE("D3DERR_DEVICELOST. Trying to Reset.\n");
+			DLog(L"D3DERR_DEVICELOST. Trying to Reset.");
 			hr = m_pD3DDevEx->TestCooperativeLevel();
 		}
 		if (hr == D3DERR_DEVICENOTRESET) {
-			TRACE("D3DERR_DEVICENOTRESET\n");
+			DLog(L"D3DERR_DEVICENOTRESET");
 			hr = m_pD3DDevEx->Reset(&pp);
 		}
 
@@ -815,7 +818,7 @@ HRESULT CBaseAP::InitShaderResizer(int iShader)
 	}
 
 	if (FAILED(hr)) {
-		TRACE("%ws", ErrorMessage.GetString());
+		DLog(ErrorMessage.GetString());
 		ASSERT(0);
 		return hr;
 	}
@@ -1451,7 +1454,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 		}
 	}
 	if (FAILED(hr)) {
-		DEBUG_ONLY(_tprintf_s(_T("Device lost or something\n")));
+		DLog(L"CBaseAP::Paint : Device lost or something");
 	}
 
 	// Calculate timing statistics
@@ -3547,7 +3550,7 @@ STDMETHODIMP_(bool) CSyncAP::ResetDevice()
 
 void CSyncAP::OnResetDevice()
 {
-	TRACE("--> CSyncAP::OnResetDevice on thread: %d\n", GetCurrentThreadId());
+	DLog(L"--> CSyncAP::OnResetDevice on thread: %u", GetCurrentThreadId());
 	HRESULT hr;
 	hr = m_pD3DManager->ResetDevice(m_pD3DDevEx, m_nResetToken);
 	if (m_pSink) {
