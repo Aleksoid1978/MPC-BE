@@ -114,8 +114,8 @@ namespace DSObjects
 		CComPtr<IDirect3DTexture9>	m_pScreenSpaceTextures[2];
 
 		bool	m_bColorManagement;
-		int		m_nDX9Resizer;
 		int		m_iRotation; // Rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
+		const wchar_t* m_wsResizer;
 
 		CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError);
 		~CDX9RenderingEngine();
@@ -199,7 +199,7 @@ namespace DSObjects
 		HRESULT InitScreenSpaceTextures(size_t count);
 
 		// Resizers
-		HRESULT InitShaderResizer(int iShader);
+		HRESULT InitShaderResizer();
 		HRESULT TextureResize(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, D3DTEXTUREFILTERTYPE filter);
 		HRESULT TextureResizeShader(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, int iShader);
 #if ENABLE_2PASS_RESIZE
