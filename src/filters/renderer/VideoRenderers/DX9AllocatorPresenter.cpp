@@ -2064,29 +2064,9 @@ void CDX9AllocatorPresenter::DrawStats()
 
 		if (iDetailedStats > 1) {
 			strText.Format(L"Video size   : %d x %d (%d:%d)", m_nativeVideoSize.cx, m_nativeVideoSize.cy, m_aspectRatio.cx, m_aspectRatio.cy);
-			int videoW = m_videoRect.Width();
-			int videoH = m_videoRect.Height();
-			if (m_nativeVideoSize.cx != videoW || m_nativeVideoSize.cy != videoH) {
-				strText.AppendFormat(L" -> %d x %d ", videoW, videoH); // TODO: check modes without scaling but with cutting
-				switch (m_nDX9Resizer) {
-					case RESIZER_NEAREST:             strText.Append(L"Nearest neighbor"); break;
-					case RESIZER_BILINEAR:            strText.Append(L"Bilinear"); break;
-#if DXVAVP
-					case RESIZER_DXVA2:               strText.Append(L"DXVA2"); break;
-#endif
-					case RESIZER_SHADER_SMOOTHERSTEP: strText.Append(L"Perlin Smootherstep"); break;
-					case RESIZER_SHADER_BSPLINE4:     strText.Append(L"B-spline4"); break;
-					case RESIZER_SHADER_MITCHELL4:    strText.Append(L"Mitchell-Netravali spline4"); break;
-					case RESIZER_SHADER_CATMULL4:     strText.Append(L"Catmull-Rom spline4"); break;
-					case RESIZER_SHADER_BICUBIC06:    strText.Append(L"Bicubic A=-0.6"); break;
-					case RESIZER_SHADER_BICUBIC08:    strText.Append(L"Bicubic A=-0.8"); break;
-					case RESIZER_SHADER_BICUBIC10:    strText.Append(L"Bicubic A=-1.0"); break;
-#if ENABLE_2PASS_RESIZE
-					case RESIZER_SHADER_LANCZOS2:     strText.Append(L"Lanczos2"); break;
-					case RESIZER_SHADER_LANCZOS3:     strText.Append(L"Lanczos3"); break;
-#endif
-					case RESIZER_SHADER_AVERAGE:      strText.Append(L"Simple averaging"); break;
-				}
+			CSize videoSize = m_videoRect.Size();
+			if (m_nativeVideoSize != videoSize) {
+				strText.AppendFormat(L" -> %d x %d %s", videoSize.cx, videoSize.cy, m_wsResizer);
 			}
 			drawText(strText);
 			if (m_pVideoTexture[0] || m_pVideoSurface[0]) {
