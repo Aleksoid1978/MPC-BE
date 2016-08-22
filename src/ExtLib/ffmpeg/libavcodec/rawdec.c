@@ -204,8 +204,9 @@ static int raw_decode(AVCodecContext *avctx, void *data, int *got_frame,
 
     desc = av_pix_fmt_desc_get(avctx->pix_fmt);
 
-    if ((avctx->bits_per_coded_sample == 8 || avctx->bits_per_coded_sample == 4
-            || avctx->bits_per_coded_sample <= 2) &&
+    if ((avctx->bits_per_coded_sample == 8 || avctx->bits_per_coded_sample == 4 ||
+         avctx->bits_per_coded_sample == 2 || avctx->bits_per_coded_sample == 1 ||
+         (avctx->bits_per_coded_sample == 0 && (context->is_nut_pal8 || context->is_mono)) ) &&
         (context->is_mono || context->is_pal8) &&
         (!avctx->codec_tag || avctx->codec_tag == MKTAG('r','a','w',' ') ||
                 context->is_nut_mono || context->is_nut_pal8)) {
@@ -365,20 +366,29 @@ static int raw_decode(AVCodecContext *avctx, void *data, int *got_frame,
     if (avctx->pix_fmt == AV_PIX_FMT_PAL8) {
         const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE,
                                                      NULL);
-        if (pal) {
-            av_buffer_unref(&context->palette);
+        int ret;
+        if (!context->palette)
             context->palette = av_buffer_alloc(AVPALETTE_SIZE);
         if (!context->palette) {
             av_buffer_unref(&frame->buf[0]);
             return AVERROR(ENOMEM);
         }
+        ret = av_buffer_make_writable(&context->palette);
+        if (ret < 0) {
+            av_buffer_unref(&frame->buf[0]);
+            return ret;
+        }
+
+        if (pal) {
             memcpy(context->palette->data, pal, AVPALETTE_SIZE);
             frame->palette_has_changed = 1;
         } else if (context->is_nut_pal8) {
             int vid_size = avctx->width * avctx->height;
-            if (avpkt->size - vid_size) {
+            int pal_size = avpkt->size - vid_size;
+
+            if (avpkt->size > vid_size && pal_size <= AVPALETTE_SIZE) {
                 pal = avpkt->data + vid_size;
-                memcpy(context->palette->data, pal, avpkt->size - vid_size);
+                memcpy(context->palette->data, pal, pal_size);
                 frame->palette_has_changed = 1;
             }
         }

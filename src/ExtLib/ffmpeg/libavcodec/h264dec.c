@@ -789,7 +789,7 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size)
     }
 
     ret = ff_h2645_packet_split(&h->pkt, buf, buf_size, avctx, h->is_avc,
-                                h->nal_length_size, avctx->codec_id);
+                                h->nal_length_size, avctx->codec_id, avctx->flags2 & AV_CODEC_FLAG2_FAST);
     if (ret < 0) {
         av_log(avctx, AV_LOG_ERROR,
                "Error splitting the input into NAL units.\n");
@@ -847,18 +847,18 @@ again:
                 if (!(avctx->flags2 & AV_CODEC_FLAG2_CHUNKS))
                     decode_postinit(h, i >= nals_needed);
 
-					// ==> Start patch MPC
-                    if (h->avctx->using_dxva && nal_pass < 2) {
-                        dxva_context* ctx = (dxva_context*)avctx->dxva_context;
-                        if (ctx && ctx->dxva_decoder_context) {
-                            DXVA_H264_Context* decoder_ctx = (DXVA_H264_Context*)ctx->dxva_decoder_context;
-                            decoder_ctx->frame_count++;
-                            DXVA_H264_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[nal_pass];
-                            dxva_start_frame(avctx, ctx_pic);
-                        }
+                // ==> Start patch MPC
+                if (h->avctx->using_dxva && nal_pass < 2) {
+                    dxva_context* ctx = (dxva_context*)avctx->dxva_context;
+                    if (ctx && ctx->dxva_decoder_context) {
+                        DXVA_H264_Context* decoder_ctx = (DXVA_H264_Context*)ctx->dxva_decoder_context;
+                        decoder_ctx->frame_count++;
+                        DXVA_H264_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[nal_pass];
+                        dxva_start_frame(avctx, ctx_pic);
                     }
-                    nal_pass++;
-                    // ==> End patch MPC
+                }
+                nal_pass++;
+                // ==> End patch MPC
 
                 if (h->avctx->hwaccel &&
                     (ret = h->avctx->hwaccel->start_frame(h->avctx, buf, buf_size)) < 0)
