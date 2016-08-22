@@ -25,6 +25,7 @@
 #include "DX9Shaders.h"
 #include "Dither.h"
 #include "DX9RenderingEngine.h"
+#include "../../../apps/mplayerc/resource.h"
 
 #define NULL_PTR_ARRAY(a) for (size_t i = 0; i < _countof(a); i++) { a[i] = NULL; }
 
@@ -1166,16 +1167,16 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 #endif
 	} else {
 		hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[iShader], &ErrorMessage);
-
-		if (hr == S_OK && m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) && !m_pResizerPixelShaders[shader_downscaling]) {
-			hr = m_pPSC->CompileShader(shader_resizer_downscaling, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling], &ErrorMessage);
-		}
 	}
 
 	if (FAILED(hr)) {
 		DLog(L"CDX9RenderingEngine::InitShaderResizer() : shader compilation failed\n%s", ErrorMessage.GetString());
 		ASSERT(0);
 		return hr;
+	}
+
+	if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) && !m_pResizerPixelShaders[shader_downscaling]) {
+		hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[shader_downscaling], IDF_SHADER_DOWNSCALING);
 	}
 
 	return S_OK;

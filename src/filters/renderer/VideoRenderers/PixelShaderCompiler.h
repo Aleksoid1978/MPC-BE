@@ -46,3 +46,7 @@ public:
 		CString* errmsg = NULL,
 		CString* disasm = NULL);
 };
+
+//
+
+HRESULT CreateShaderFromResource(IDirect3DDevice9* pD3DDev, IDirect3DPixelShader9** ppPixelShader, UINT resid);

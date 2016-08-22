@@ -125,3 +125,27 @@ HRESULT CPixelShaderCompiler::CompileShader(
 
 	return S_OK;
 }
+
+//
+
+HRESULT CreateShaderFromResource(IDirect3DDevice9* pD3DDev, IDirect3DPixelShader9** ppPixelShader, UINT resid)
+{
+	if (!pD3DDev || !ppPixelShader) {
+		return E_POINTER;
+	}
+
+	HRSRC hrsrc = FindResource(AfxGetApp()->m_hInstance, MAKEINTRESOURCE(resid), L"SHADER");
+	if (!hrsrc) {
+		return E_INVALIDARG;
+	}
+	HGLOBAL hGlobal = LoadResource(AfxGetApp()->m_hInstance, hrsrc);
+	if (!hGlobal) {
+		return E_FAIL;
+	}
+	DWORD size = SizeofResource(AfxGetApp()->m_hInstance, hrsrc);
+	if (size < 4) {
+		return E_FAIL;
+	}
+
+	return pD3DDev->CreatePixelShader((const DWORD*)LockResource(hGlobal), ppPixelShader);
+}

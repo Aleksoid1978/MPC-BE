@@ -438,17 +438,7 @@
     <None Include="res\multi.ico" />
     <None Include="res\noaudio.bmp" />
     <None Include="res\onoff.bmp" />
-    <None Include="res\shaders\downscaling.hlsl" />
-    <None Include="res\shaders\empty.hlsl" />
-    <None Include="res\shaders\final.hlsl" />
-    <None Include="res\shaders\resizer_bicubic.hlsl" />
-    <None Include="res\shaders\resizer_bilinear.hlsl" />
-    <None Include="res\shaders\resizer_bspline4.hlsl" />
-    <None Include="res\shaders\resizer_catmull4.hlsl" />
-    <None Include="res\shaders\resizer_lanczos2.hlsl" />
-    <None Include="res\shaders\resizer_mitchell4.hlsl" />
-    <None Include="res\shaders\resizer_smootherstep.hlsl" />
-    <None Include="res\shaders\resizer_template.hlsl" />
+    <None Include="res\empty.hlsl" />
     <None Include="res\single.ico" />
     <None Include="res\stereo.bmp" />
     <None Include="res\streamtypes.bmp" />
@@ -525,6 +515,9 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Shaders\Shaders.vcxproj">
+      <Project>{154D3FA8-9BB8-4EC1-8D56-DA14715ACD56}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\AudioTools\AudioTools.vcxproj">
       <Project>{1B6DE4C0-9D27-4150-A327-E7F3B492B5F0}</Project>
     </ProjectReference>
@@ -575,7 +568,7 @@
     </ProjectReference>
     <ProjectReference Include="..\..\filters\parser\BinkSplitter\BinkSplitter.vcxproj">
       <Project>{2BC02329-D46C-4EC5-B5C7-30E21CD41F78}</Project>
-    </ProjectReference>	
+    </ProjectReference>
     <ProjectReference Include="..\..\filters\parser\DSMSplitter\DSMSplitter.vcxproj">
       <Project>{1e91f58c-0bae-4021-8087-d1864d8ec066}</Project>
     </ProjectReference>
