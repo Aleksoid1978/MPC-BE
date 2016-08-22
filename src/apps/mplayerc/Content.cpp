@@ -179,13 +179,13 @@ namespace Content {
 		PLAYLIST_WPL,
 	};
 
-	const std::wregex ref_m3u(L"(^|\\n)(?!#)([^\\n]+)");						// any lines except those that start with '#'
-	const std::wregex ref_pls(L"(^|\\n)File\\d+[ \\t]*=[ \\t]*\"?([^\\n\"]+)");	// File1=...
-	const std::wregex ref_xspf(L"<location>([^<>\\n]+)</location>");			// <location>...</location>
-	const std::wregex ref_asx(L"<REF HREF[ \\t]*=[ \\t]*\"([^\"\\n]+)\"");		// <REF HREF = "..." />
-	const std::wregex ref_ram(L"(^|\\n)((?:rtsp|http|file)://[^\\n]+)");		// (rtsp|http|file)://...
-	const std::wregex ref_qtl(L"src[ \\t]*=[ \\t]*\"([^\"\\n]+)\"");			// src="..."
-	const std::wregex ref_wpl(L"<media src=\"([^\"\\n]+)\"");					// <media src="..."
+	const std::wregex ref_m3u(L"(^|\\n)(?!#)([^\\n]+)");                                                // any lines except those that start with '#'
+	const std::wregex ref_pls(L"(^|\\n)File\\d+[ \\t]*=[ \\t]*\"?([^\\n\"]+)");                         // File1=...
+	const std::wregex ref_xspf(L"<location>([^<>\\n]+)</location>");                                    // <location>...</location>
+	const std::wregex ref_asx(L"<REF HREF[ \\t]*=[ \\t]*\"([^\"\\n]+)\"", std::regex_constants::icase); // <REF HREF = "..." />
+	const std::wregex ref_ram(L"(^|\\n)((?:rtsp|http|file)://[^\\n]+)");                                // (rtsp|http|file)://...
+	const std::wregex ref_qtl(L"src[ \\t]*=[ \\t]*\"([^\"\\n]+)\"");                                    // src="..."
+	const std::wregex ref_wpl(L"<media src=\"([^\"\\n]+)\"");                                           // <media src="..."
 
 	static const bool FindRedir(CUrl& src, CString ct, CString& body, CAtlList<CString>& urls, int playlist_type)
 	{
