@@ -81,6 +81,18 @@ IDF_FAVICON                      FILE                    "res\\web\\favicon.png"
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// SHADER
+//
+
+#ifdef _DEBUG
+IDF_SHADER_DOWNSCALING           SHADER                  "..\\..\\..\\bin\\shaders\\Debug\\resizer_downscaling.cso"
+#else
+IDF_SHADER_DOWNSCALING           SHADER                  "..\\..\\..\\bin\\shaders\\Release\\resizer_downscaling.cso"
+#endif
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // HTML
 //
 

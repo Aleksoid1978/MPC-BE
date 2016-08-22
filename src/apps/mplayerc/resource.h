@@ -91,6 +91,8 @@
 
 #define IDF_SHADER_EMPTY                700
 #define IDF_SHADER_FINAL                701
+#define IDF_SHADER_DOWNSCALING          702
+
 // commands
 #define ID_FILE_OPENMEDIA               800
 #define ID_FILE_OPENDVD                 801

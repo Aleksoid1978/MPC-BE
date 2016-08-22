@@ -45,11 +45,10 @@
 #include <Version.h>
 #include "FocusThread.h"
 #include "../DSUtil/D3D9Helper.h"
+#include "../../../apps/mplayerc/resource.h"
 
 using namespace GothSync;
 using namespace D3D9Helper;
-
-extern bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
 
 //#undef DLog
 //#define DLog(...) Log2File(__VA_ARGS__)
@@ -813,14 +812,14 @@ HRESULT CBaseAP::InitShaderResizer(int iShader)
 
 	hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShader[iShader], &ErrorMessage);
 
-	if (hr == S_OK && m_caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) && !m_pResizerPixelShader[shader_downscaling]) {
-		hr = m_pPSC->CompileShader(shader_resizer_downscaling, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShader[shader_downscaling], &ErrorMessage);
-	}
-
 	if (FAILED(hr)) {
 		DLog(ErrorMessage.GetString());
 		ASSERT(0);
 		return hr;
+	}
+
+	if (m_caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) && !m_pResizerPixelShader[shader_downscaling]) {
+		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShader[shader_downscaling], IDF_SHADER_DOWNSCALING);
 	}
 
 	return S_OK;
