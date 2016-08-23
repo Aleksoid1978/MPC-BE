@@ -3,5 +3,16 @@
   <ItemGroup>
     <FxCompile Include="resizer_downscaling.hlsl" />
     <FxCompile Include="resizer_smootherstep.hlsl" />
+    <FxCompile Include="resizer_bspline4.hlsl" />
+    <FxCompile Include="resizer_mitchell4.hlsl" />
+    <FxCompile Include="resizer_catmull4.hlsl" />
+    <FxCompile Include="resizer_bicubic06.hlsl" />
+    <FxCompile Include="resizer_bicubic08.hlsl" />
+    <FxCompile Include="resizer_bicubic10.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resizer_bicubic_base.hlsl" />
+    <None Include="resizer_bilinear.hlsl" />
+    <None Include="resizer_nearest.hlsl" />
   </ItemGroup>
 </Project>

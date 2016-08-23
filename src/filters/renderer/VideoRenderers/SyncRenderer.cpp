@@ -757,69 +757,51 @@ bool CBaseAP::ClipToSurface(IDirect3DSurface9* pSurface, CRect& s, CRect& d)
 
 HRESULT CBaseAP::InitShaderResizer(int iShader)
 {
-	if (iShader < 0 || iShader >= shader_count) {
-		return E_INVALIDARG;
-	}
-
 	if (m_pResizerPixelShader[iShader]) {
 		return S_OK;
 	}
 
-	if (m_caps.PixelShaderVersion < D3DPS_VERSION(2, 0)) {
+	if (m_caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) { // TODO: back support Pxel Shader 2.0
 		return E_FAIL;
 	}
 
-	LPCSTR pSrcData = NULL;
-	D3D_SHADER_MACRO ShaderMacros[3] = {
-		{ "Ml", m_caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "1" : "0" },
-		{ NULL, NULL },
-		{ NULL, NULL }
-	};
+	UINT resid = 0;
 
 	switch (iShader) {
 	case shader_smootherstep:
-		pSrcData = shader_resizer_smootherstep;
+		resid = IDF_SHADER_RESIZER_SMOOTHERSTEP;
 		break;
 	case shader_bspline4:
-		pSrcData = shader_resizer_bspline4;
+		resid = IDF_SHADER_RESIZER_BSPLINE4;
 		break;
 	case shader_mitchell4:
-		pSrcData = shader_resizer_mitchell4;
+		resid = IDF_SHADER_RESIZER_MITCHELL4;
 		break;
 	case shader_catmull4:
-		pSrcData = shader_resizer_catmull4;
+		resid = IDF_SHADER_RESIZER_CATMULL4;
 		break;
 	case shader_bicubic06:
-		pSrcData = shader_resizer_bicubic;
-		ShaderMacros[1] = { "A", "-0.6" };
+		resid = IDF_SHADER_RESIZER_BICUBIC06;
 		break;
 	case shader_bicubic08:
-		pSrcData = shader_resizer_bicubic;
-		ShaderMacros[1] = { "A", "-0.8" };
+		resid = IDF_SHADER_RESIZER_BICUBIC08;
 		break;
 	case shader_bicubic10:
-		pSrcData = shader_resizer_bicubic;
-		ShaderMacros[1] = { "A", "-1.0" };
+		resid = IDF_SHADER_RESIZER_BICUBIC10;
 		break;
+	default:
+		return E_INVALIDARG;
 	}
 
-	if (!pSrcData) {
-		return E_FAIL;
-	}
-
-	HRESULT hr = S_OK;
-	CString ErrorMessage;
-
-	hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShader[iShader], &ErrorMessage);
-
+	HRESULT hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShader[iShader], resid);
 	if (FAILED(hr)) {
-		DLog(ErrorMessage.GetString());
 		ASSERT(0);
 		return hr;
 	}
 
 	if (m_caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) && !m_pResizerPixelShader[shader_downscaling]) {
 		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShader[shader_downscaling], IDF_SHADER_DOWNSCALING);
+		ASSERT(S_OK == hr);
 	}
 
 	return S_OK;

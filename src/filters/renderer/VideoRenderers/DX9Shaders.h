@@ -86,7 +86,7 @@ char const shader_resizer_bicubic[] =
 
 "sampler s0 : register(s0);"
 "float2 dxdy : register(c0);"
-"float4 dxdy05 : register(c1);"
+"float2 dxdy05 : register(c1);"
 "float2 dx : register(c2);"
 "float2 dy : register(c3);"
 

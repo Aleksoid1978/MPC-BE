@@ -84,11 +84,14 @@ IDF_FAVICON                      FILE                    "res\\web\\favicon.png"
 // SHADER
 //
 
-#ifdef _DEBUG
-IDF_SHADER_DOWNSCALING           SHADER                  "..\\..\\..\\bin\\shaders\\Debug\\resizer_downscaling.cso"
-#else
-IDF_SHADER_DOWNSCALING           SHADER                  "..\\..\\..\\bin\\shaders\\Release\\resizer_downscaling.cso"
-#endif
+IDF_SHADER_RESIZER_SMOOTHERSTEP  SHADER                  "..\\..\\..\\bin\\shaders\\resizer_smootherstep.cso"
+IDF_SHADER_RESIZER_BSPLINE4      SHADER                  "..\\..\\..\\bin\\shaders\\resizer_bspline4.cso"
+IDF_SHADER_RESIZER_MITCHELL4     SHADER                  "..\\..\\..\\bin\\shaders\\resizer_mitchell4.cso"
+IDF_SHADER_RESIZER_CATMULL4      SHADER                  "..\\..\\..\\bin\\shaders\\resizer_catmull4.cso"
+IDF_SHADER_RESIZER_BICUBIC06     SHADER                  "..\\..\\..\\bin\\shaders\\resizer_bicubic06.cso"
+IDF_SHADER_RESIZER_BICUBIC08     SHADER                  "..\\..\\..\\bin\\shaders\\resizer_bicubic08.cso"
+IDF_SHADER_RESIZER_BICUBIC10     SHADER                  "..\\..\\..\\bin\\shaders\\resizer_bicubic10.cso"
+IDF_SHADER_DOWNSCALING           SHADER                  "..\\..\\..\\bin\\shaders\\resizer_downscaling.cso"
 
 
 /////////////////////////////////////////////////////////////////////////////
