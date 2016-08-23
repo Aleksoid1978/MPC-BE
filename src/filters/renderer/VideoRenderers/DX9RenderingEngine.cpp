@@ -1051,91 +1051,93 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 		return S_OK;
 	}
 
-	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) { // TODO: back support Pxel Shader 2.0
+	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(2, 0)) {
 		return E_FAIL;
 	}
 
 	bool twopass = false;
 	UINT resid = 0;
 
-	switch (iShader) {
-	case shader_smootherstep:
-		resid = IDF_SHADER_RESIZER_SMOOTHERSTEP;
-		break;
+	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
+		switch (iShader) {
+		case shader_smootherstep: resid = IDF_SHADER_PS20_SMOOTHERSTEP; break;
+		case shader_bspline4:     resid = IDF_SHADER_PS20_BSPLINE4;     break;
+		case shader_mitchell4:    resid = IDF_SHADER_PS20_MITCHELL4;    break;
+		case shader_catmull4:
+			return E_NOTIMPL;
+		case shader_bicubic06:    resid = IDF_SHADER_PS20_BICUBIC06;    break;
+		case shader_bicubic08:    resid = IDF_SHADER_PS20_BICUBIC08;    break;
+		case shader_bicubic10:    resid = IDF_SHADER_PS20_BICUBIC10;    break;
+		default:
+			return E_INVALIDARG;
+		}
+	}
+	else {
+		switch (iShader) {
+		case shader_smootherstep: resid = IDF_SHADER_RESIZER_SMOOTHERSTEP; break;
 #if ENABLE_2PASS_RESIZE
-	case shader_bspline4_y:
-		iShader--;
-	case shader_bspline4_x:
-		pSrcData = shader_resizer_bspline4_2pass;
-		twopass = true;
-		break;
-	case shader_mitchell4_y:
-		iShader--;
-	case shader_mitchell4_x:
-		pSrcData = shader_resizer_mitchell4_2pass;
-		twopass = true;
-		break;
-	case shader_catmull4_y:
-		iShader--;
-	case shader_catmull4_x:
-		pSrcData = shader_resizer_catmull4_2pass;
-		twopass = true;
-		break;
-	case shader_bicubic06_y:
-		iShader--;
-	case shader_bicubic06_x:
-		pSrcData = shader_resizer_bicubic_2pass;
-		ShaderMacros[1] = { "A", "-0.6" };
-		twopass = true;
-		break;
-	case shader_bicubic08_y:
-		iShader--;
-	case shader_bicubic08_x:
-		pSrcData = shader_resizer_bicubic_2pass;
-		ShaderMacros[1] = { "A", "-0.8" };
-		twopass = true;
-		break;
-	case shader_bicubic10_y:
-		iShader--;
-	case shader_bicubic10_x:
-		pSrcData = shader_resizer_bicubic_2pass;
-		ShaderMacros[1] = { "A", "-1.0" };
-		twopass = true;
-		break;
-	case shader_lanczos2_y:
-		iShader--;
-	case shader_lanczos2_x:
-		pSrcData = shader_resizer_lanczos2_2pass;
-		twopass = true;
-		break;
-	case shader_lanczos3_y:
-		iShader--;
-	case shader_lanczos3_x:
-		pSrcData = shader_resizer_lanczos3_2pass;
-		twopass = true;
-		break;
+		case shader_bspline4_y:
+			iShader--;
+		case shader_bspline4_x:
+			pSrcData = shader_resizer_bspline4_2pass;
+			twopass = true;
+			break;
+		case shader_mitchell4_y:
+			iShader--;
+		case shader_mitchell4_x:
+			pSrcData = shader_resizer_mitchell4_2pass;
+			twopass = true;
+			break;
+		case shader_catmull4_y:
+			iShader--;
+		case shader_catmull4_x:
+			pSrcData = shader_resizer_catmull4_2pass;
+			twopass = true;
+			break;
+		case shader_bicubic06_y:
+			iShader--;
+		case shader_bicubic06_x:
+			pSrcData = shader_resizer_bicubic_2pass;
+			ShaderMacros[1] = { "A", "-0.6" };
+			twopass = true;
+			break;
+		case shader_bicubic08_y:
+			iShader--;
+		case shader_bicubic08_x:
+			pSrcData = shader_resizer_bicubic_2pass;
+			ShaderMacros[1] = { "A", "-0.8" };
+			twopass = true;
+			break;
+		case shader_bicubic10_y:
+			iShader--;
+		case shader_bicubic10_x:
+			pSrcData = shader_resizer_bicubic_2pass;
+			ShaderMacros[1] = { "A", "-1.0" };
+			twopass = true;
+			break;
+		case shader_lanczos2_y:
+			iShader--;
+		case shader_lanczos2_x:
+			pSrcData = shader_resizer_lanczos2_2pass;
+			twopass = true;
+			break;
+		case shader_lanczos3_y:
+			iShader--;
+		case shader_lanczos3_x:
+			pSrcData = shader_resizer_lanczos3_2pass;
+			twopass = true;
+			break;
 #else
-	case shader_bspline4:
-		resid = IDF_SHADER_RESIZER_BSPLINE4;
-		break;
-	case shader_mitchell4:
-		resid = IDF_SHADER_RESIZER_MITCHELL4;
-		break;
-	case shader_catmull4:
-		resid = IDF_SHADER_RESIZER_CATMULL4;
-		break;
-	case shader_bicubic06:
-		resid = IDF_SHADER_RESIZER_BICUBIC06;
-		break;
-	case shader_bicubic08:
-		resid = IDF_SHADER_RESIZER_BICUBIC08;
-		break;
-	case shader_bicubic10:
-		resid = IDF_SHADER_RESIZER_BICUBIC10;
-		break;
+		case shader_bspline4:  resid = IDF_SHADER_RESIZER_BSPLINE4;  break;
+		case shader_mitchell4: resid = IDF_SHADER_RESIZER_MITCHELL4; break;
+		case shader_catmull4:  resid = IDF_SHADER_RESIZER_CATMULL4;  break;
+		case shader_bicubic06: resid = IDF_SHADER_RESIZER_BICUBIC06; break;
+		case shader_bicubic08: resid = IDF_SHADER_RESIZER_BICUBIC08; break;
+		case shader_bicubic10: resid = IDF_SHADER_RESIZER_BICUBIC10; break;
 #endif
-	default:
-		return E_INVALIDARG;
+		default:
+			return E_INVALIDARG;
+		}
 	}
 
 	HRESULT hr = S_OK;

@@ -761,36 +761,38 @@ HRESULT CBaseAP::InitShaderResizer(int iShader)
 		return S_OK;
 	}
 
-	if (m_caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) { // TODO: back support Pxel Shader 2.0
+	if (m_caps.PixelShaderVersion < D3DPS_VERSION(2, 0)) {
 		return E_FAIL;
 	}
 
 	UINT resid = 0;
 
-	switch (iShader) {
-	case shader_smootherstep:
-		resid = IDF_SHADER_RESIZER_SMOOTHERSTEP;
-		break;
-	case shader_bspline4:
-		resid = IDF_SHADER_RESIZER_BSPLINE4;
-		break;
-	case shader_mitchell4:
-		resid = IDF_SHADER_RESIZER_MITCHELL4;
-		break;
-	case shader_catmull4:
-		resid = IDF_SHADER_RESIZER_CATMULL4;
-		break;
-	case shader_bicubic06:
-		resid = IDF_SHADER_RESIZER_BICUBIC06;
-		break;
-	case shader_bicubic08:
-		resid = IDF_SHADER_RESIZER_BICUBIC08;
-		break;
-	case shader_bicubic10:
-		resid = IDF_SHADER_RESIZER_BICUBIC10;
-		break;
-	default:
-		return E_INVALIDARG;
+	if (m_caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
+		switch (iShader) {
+		case shader_smootherstep: resid = IDF_SHADER_PS20_SMOOTHERSTEP; break;
+		case shader_bspline4:     resid = IDF_SHADER_PS20_BSPLINE4;     break;
+		case shader_mitchell4:    resid = IDF_SHADER_PS20_MITCHELL4;    break;
+		case shader_catmull4:
+			return E_NOTIMPL;
+		case shader_bicubic06:    resid = IDF_SHADER_PS20_BICUBIC06;    break;
+		case shader_bicubic08:    resid = IDF_SHADER_PS20_BICUBIC08;    break;
+		case shader_bicubic10:    resid = IDF_SHADER_PS20_BICUBIC10;    break;
+		default:
+			return E_INVALIDARG;
+		}
+	}
+	else {
+		switch (iShader) {
+		case shader_smootherstep: resid = IDF_SHADER_RESIZER_SMOOTHERSTEP; break;
+		case shader_bspline4:     resid = IDF_SHADER_RESIZER_BSPLINE4;     break;
+		case shader_mitchell4:    resid = IDF_SHADER_RESIZER_MITCHELL4;    break;
+		case shader_catmull4:     resid = IDF_SHADER_RESIZER_CATMULL4;     break;
+		case shader_bicubic06:    resid = IDF_SHADER_RESIZER_BICUBIC06;    break;
+		case shader_bicubic08:    resid = IDF_SHADER_RESIZER_BICUBIC08;    break;
+		case shader_bicubic10:    resid = IDF_SHADER_RESIZER_BICUBIC10;    break;
+		default:
+			return E_INVALIDARG;
+		}
 	}
 
 	HRESULT hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShader[iShader], resid);
