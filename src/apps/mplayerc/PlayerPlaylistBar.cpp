@@ -32,7 +32,12 @@
 
 static CString MakePath(CString path)
 {
-	if (path.Find(L"://") >= 0 || Youtube::CheckURL(path)) { // skip URLs
+	if (::PathIsURL(path) || Youtube::CheckURL(path)) { // skip URLs
+		if (path.Left(8).MakeLower() == L"file:///") {
+			path.Delete(0, 8);
+			path.Replace('/', '\\');
+		}
+
 		return path;
 	}
 
