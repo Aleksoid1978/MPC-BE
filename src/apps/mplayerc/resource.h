@@ -105,6 +105,7 @@
 #define IDF_SHADER_PS20_BICUBIC06       733
 #define IDF_SHADER_PS20_BICUBIC08       734
 #define IDF_SHADER_PS20_BICUBIC10       735
+#define IDF_SHADER_PS20_DOWNSCALING     740
 
 // commands
 #define ID_FILE_OPENMEDIA               800
