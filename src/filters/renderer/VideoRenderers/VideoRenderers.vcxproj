@@ -124,7 +124,7 @@
     <ClInclude Include="Dither.h" />
     <ClInclude Include="DX9AllocatorPresenter.h" />
     <ClInclude Include="DX9RenderingEngine.h" />
-    <ClInclude Include="DX9Shaders.h" />
+    <ClInclude Include="FinalPassShader.h" />
     <ClInclude Include="DXRAllocatorPresenter.h" />
     <ClInclude Include="EVRAllocatorPresenter.h" />
     <ClInclude Include="FocusThread.h" />

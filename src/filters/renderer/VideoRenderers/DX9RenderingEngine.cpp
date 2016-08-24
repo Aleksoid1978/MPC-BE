@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <lcms2/include/lcms2.h>
 #include <DirectXPackedVector.h>
-#include "DX9Shaders.h"
+#include "FinalPassShader.h"
 #include "Dither.h"
 #include "DX9RenderingEngine.h"
 #include "../../../apps/mplayerc/resource.h"
