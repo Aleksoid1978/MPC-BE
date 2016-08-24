@@ -98,6 +98,7 @@ IDF_SHADER_PS20_MITCHELL4        SHADER                  "..\\..\\..\\bin\\shade
 IDF_SHADER_PS20_BICUBIC06        SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_bicubic06.cso"
 IDF_SHADER_PS20_BICUBIC08        SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_bicubic08.cso"
 IDF_SHADER_PS20_BICUBIC10        SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_bicubic10.cso"
+IDF_SHADER_PS20_DOWNSCALING      SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_downscaling.cso"
 
 
 /////////////////////////////////////////////////////////////////////////////

@@ -1171,8 +1171,9 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 		}
 	}
 
-	if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) && !m_pResizerPixelShaders[shader_downscaling]) {
-		hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[shader_downscaling], IDF_SHADER_DOWNSCALING);
+	if (!m_pResizerPixelShaders[shader_downscaling]) {
+		UINT resid = m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0) ? IDF_SHADER_PS20_DOWNSCALING : IDF_SHADER_DOWNSCALING;
+		hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[shader_downscaling], resid);
 		ASSERT(S_OK == hr);
 	}
 

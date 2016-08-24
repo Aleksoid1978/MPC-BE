@@ -801,8 +801,9 @@ HRESULT CBaseAP::InitShaderResizer(int iShader)
 		return hr;
 	}
 
-	if (m_caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) && !m_pResizerPixelShader[shader_downscaling]) {
-		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShader[shader_downscaling], IDF_SHADER_DOWNSCALING);
+	if (!m_pResizerPixelShader[shader_downscaling]) {
+		UINT resid = m_caps.PixelShaderVersion < D3DPS_VERSION(3, 0) ? IDF_SHADER_PS20_DOWNSCALING : IDF_SHADER_DOWNSCALING;
+		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShader[shader_downscaling], resid);
 		ASSERT(S_OK == hr);
 	}
 
