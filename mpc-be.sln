@@ -145,8 +145,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VSFilter", "src\filters\tra
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bento4", "src\ExtLib\Bento4\Bento4.vcxproj", "{40177920-A66C-4647-B119-332A10224C83}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mpciconlib", "src\apps\mpciconlib\mpciconlib.vcxproj", "{86251DC4-9298-424C-AE6C-07844F79C0B5}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MusePackSplitter", "src\filters\parser\MusePackSplitter\MusePackSplitter.vcxproj", "{3FF8D24A-877C-4957-B377-F20A1527F423}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeCSSFilterStatic", "src\filters\transform\DeCSSFilter\DeCSSFilterStatic.vcxproj", "{4B065C3D-054E-4F95-9A74-4E53E9DF7144}"
@@ -1096,16 +1094,6 @@ Global
 		{40177920-A66C-4647-B119-332A10224C83}.Release|Win32.Build.0 = Release|Win32
 		{40177920-A66C-4647-B119-332A10224C83}.Release|x64.ActiveCfg = Release|x64
 		{40177920-A66C-4647-B119-332A10224C83}.Release|x64.Build.0 = Release|x64
-		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Debug Filter|Win32.ActiveCfg = Release|Win32
-		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Debug Filter|x64.ActiveCfg = Release|x64
-		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Debug|Win32.ActiveCfg = Release|Win32
-		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Debug|x64.ActiveCfg = Release|x64
-		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release Filter|Win32.ActiveCfg = Release|Win32
-		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release Filter|x64.ActiveCfg = Release|x64
-		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release|Win32.ActiveCfg = Release|Win32
-		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release|Win32.Build.0 = Release|Win32
-		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release|x64.ActiveCfg = Release|x64
-		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release|x64.Build.0 = Release|x64
 		{3FF8D24A-877C-4957-B377-F20A1527F423}.Debug Filter|Win32.ActiveCfg = Debug Filter|Win32
 		{3FF8D24A-877C-4957-B377-F20A1527F423}.Debug Filter|Win32.Build.0 = Debug Filter|Win32
 		{3FF8D24A-877C-4957-B377-F20A1527F423}.Debug Filter|x64.ActiveCfg = Debug Filter|x64

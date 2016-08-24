@@ -217,6 +217,17 @@ IF %ERRORLEVEL% NEQ 0 (
   CALL :SubMsg "INFO" "mpc-be.sln %BUILDCFG% %1 compiled successfully"
 )
 
+TITLE Compiling mpciconlib - %BUILDCFG%^|%1...
+MSBuild.exe mpciconlib.sln %MSBUILD_SWITCHES%^
+ /target:%BUILDTYPE% /property:Configuration=%BUILDCFG%;Platform=%1^
+ /flp1:LogFile=%LOG_DIR%\mpciconlib_errors_%BUILDCFG%_%1.log;errorsonly;Verbosity=diagnostic^
+ /flp2:LogFile=%LOG_DIR%\mpciconlib_warnings_%BUILDCFG%_%1.log;warningsonly;Verbosity=diagnostic
+IF %ERRORLEVEL% NEQ 0 (
+  CALL :SubMsg "ERROR" "mpciconlib.sln %BUILDCFG% %1 - Compilation failed!"
+) ELSE (
+  CALL :SubMsg "INFO" "mpciconlib.sln %BUILDCFG% %1 compiled successfully"
+)
+
 IF /I "%1" == "Win32" (
   SET "DIR=%BIN%\mpc-be_x86"
 ) ELSE (

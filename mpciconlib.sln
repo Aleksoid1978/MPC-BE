@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mpciconlib", "src\apps\mpciconlib\mpciconlib.vcxproj", "{86251DC4-9298-424C-AE6C-07844F79C0B5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug Filter|Win32 = Debug Filter|Win32
+		Debug Filter|x64 = Debug Filter|x64
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release Filter|Win32 = Release Filter|Win32
+		Release Filter|x64 = Release Filter|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Debug Filter|Win32.ActiveCfg = Release|Win32
+		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Debug Filter|x64.ActiveCfg = Release|x64
+		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Debug|Win32.ActiveCfg = Release|Win32
+		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Debug|x64.ActiveCfg = Release|x64
+		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release Filter|Win32.ActiveCfg = Release|Win32
+		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release Filter|x64.ActiveCfg = Release|x64
+		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release|Win32.ActiveCfg = Release|Win32
+		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release|Win32.Build.0 = Release|Win32
+		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release|x64.ActiveCfg = Release|x64
+		{86251DC4-9298-424C-AE6C-07844F79C0B5}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
