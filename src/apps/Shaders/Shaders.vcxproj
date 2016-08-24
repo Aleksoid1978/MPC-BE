@@ -29,9 +29,21 @@
       <FileType>Document</FileType>
     </None>
     <FxCompile Include="resizer_bspline4.hlsl" />
+    <FxCompile Include="resizer_bspline4_x.hlsl" />
+    <FxCompile Include="resizer_bspline4_y.hlsl" />
     <FxCompile Include="resizer_catmull4.hlsl" />
+    <FxCompile Include="resizer_catmull4_x.hlsl" />
+    <FxCompile Include="resizer_catmull4_y.hlsl" />
     <FxCompile Include="resizer_downscaling.hlsl" />
+    <FxCompile Include="resizer_downscaling_x.hlsl" />
+    <FxCompile Include="resizer_downscaling_y.hlsl" />
+    <FxCompile Include="resizer_lanczos2_x.hlsl" />
+    <FxCompile Include="resizer_lanczos2_y.hlsl" />
+    <FxCompile Include="resizer_lanczos3_x.hlsl" />
+    <FxCompile Include="resizer_lanczos3_y.hlsl" />
     <FxCompile Include="resizer_mitchell4.hlsl" />
+    <FxCompile Include="resizer_mitchell4_x.hlsl" />
+    <FxCompile Include="resizer_mitchell4_y.hlsl" />	
     <None Include="resizer_nearest.hlsl">
       <FileType>Document</FileType>
     </None>

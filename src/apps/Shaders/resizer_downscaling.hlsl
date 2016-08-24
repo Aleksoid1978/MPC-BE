@@ -2,9 +2,10 @@
 
 #if Ml
 #define tex2D(s, t) tex2Dlod(s, float4(t, 0., 0.))
-#endif
-
 #define MAXSTEPS 10
+#else
+#define MAXSTEPS 3
+#endif
 
 sampler s0 : register(s0);
 float2 dxdy : register(c0);
