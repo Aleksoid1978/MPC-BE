@@ -20,11 +20,23 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resizer_bicubic06.hlsl" />
+    <FxCompile Include="resizer_bicubic06_x.hlsl" />
+    <FxCompile Include="resizer_bicubic06_y.hlsl" />
     <FxCompile Include="resizer_bicubic08.hlsl" />
+    <FxCompile Include="resizer_bicubic08_x.hlsl" />
+    <FxCompile Include="resizer_bicubic08_y.hlsl" />
     <FxCompile Include="resizer_bicubic10.hlsl" />
+    <FxCompile Include="resizer_bicubic10_x.hlsl" />
+    <FxCompile Include="resizer_bicubic10_y.hlsl" />
     <None Include="resizer_bicubic_base.hlsl">
       <FileType>Document</FileType>
     </None>
+    <None Include="resizer_bicubic_base_x.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="resizer_bicubic_base_y.hlsl">
+      <FileType>Document</FileType>
+    </None>	
     <None Include="resizer_bilinear.hlsl">
       <FileType>Document</FileType>
     </None>
@@ -43,7 +55,7 @@
     <FxCompile Include="resizer_lanczos3_y.hlsl" />
     <FxCompile Include="resizer_mitchell4.hlsl" />
     <FxCompile Include="resizer_mitchell4_x.hlsl" />
-    <FxCompile Include="resizer_mitchell4_y.hlsl" />	
+    <FxCompile Include="resizer_mitchell4_y.hlsl" />
     <None Include="resizer_nearest.hlsl">
       <FileType>Document</FileType>
     </None>
