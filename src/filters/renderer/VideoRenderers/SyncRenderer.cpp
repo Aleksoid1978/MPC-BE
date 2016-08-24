@@ -40,7 +40,7 @@
 #include "MacrovisionKicker.h"
 #include "IPinHook.h"
 #include "PixelShaderCompiler.h"
-#include "DX9Shaders.h"
+#include "FinalPassShader.h"
 #include "SyncRenderer.h"
 #include <Version.h>
 #include "FocusThread.h"

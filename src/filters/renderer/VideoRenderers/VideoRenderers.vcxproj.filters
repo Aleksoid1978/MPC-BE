@@ -124,9 +124,6 @@
     <ClInclude Include="DX9RenderingEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DX9Shaders.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OuterEVR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -143,6 +140,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MemUsage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FinalPassShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
