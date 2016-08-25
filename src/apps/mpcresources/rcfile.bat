@@ -4,7 +4,7 @@ rem This is a simple script to check out the head revision of mplayerc.rc,
 rem then rename it to old file for rcfile.pl to process it
 
 echo Getting the latest mplayerc.rc from repository...
-svn cat -r head ../mplayerc.rc > $$TEMP$$.old
+svn cat -r head ../mplayerc/mplayerc.rc > $$TEMP$$.old
 if %ERRORLEVEL% neq 0 goto NOSVNCLI
 
 echo Generating new rc files and string files...

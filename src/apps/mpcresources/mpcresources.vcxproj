@@ -209,7 +209,7 @@
     <ProjectName>mpcresources</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <Import Project="..\..\..\platform.props" />
+  <Import Project="..\..\platform.props" />
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release Ukrainian|x64'">
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release Chinese Traditional|x64'">
@@ -319,7 +319,7 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\..\common.props" />
+    <Import Project="..\..\common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -363,7 +363,7 @@
       <SetChecksum>true</SetChecksum>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\include;..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\mplayerc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -444,46 +444,46 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\resource.h" />
+    <ClInclude Include="..\mplayerc\resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\res\ani.avi" />
-    <None Include="..\res\icon.ico" />
-    <None Include="..\res\Icon_114.ico" />
-    <None Include="..\res\Icon_116.ico" />
-    <None Include="..\res\Icon_41.ico" />
-    <None Include="..\res\logo.0.png" />
-    <None Include="..\res\logo.1.png">
+    <None Include="..\mplayerc\res\ani.avi" />
+    <None Include="..\mplayerc\res\icon.ico" />
+    <None Include="..\mplayerc\res\Icon_114.ico" />
+    <None Include="..\mplayerc\res\Icon_116.ico" />
+    <None Include="..\mplayerc\res\Icon_41.ico" />
+    <None Include="..\mplayerc\res\logo.0.png" />
+    <None Include="..\mplayerc\res\logo.1.png">
       <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="..\res\logo.1_x64.png">
+    <None Include="..\mplayerc\res\logo.1_x64.png">
       <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="..\res\logo.2.png">
+    <None Include="..\mplayerc\res\logo.2.png">
       <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="..\res\logo.2_x64.png">
+    <None Include="..\mplayerc\res\logo.2_x64.png">
       <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="..\res\logo.3.png">
+    <None Include="..\mplayerc\res\logo.3.png">
       <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="..\res\logo.3_x64.png">
+    <None Include="..\mplayerc\res\logo.3_x64.png">
       <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="..\res\mono.bmp" />
-    <None Include="..\res\multi.ico" />
-    <None Include="..\res\noaudio.bmp" />
-    <None Include="..\res\onoff.bmp" />
-    <None Include="..\res\single.ico" />
-    <None Include="..\res\stereo.bmp" />
-    <None Include="..\res\streamtypes.bmp" />
-    <None Include="..\res\tb_pause_16.ico" />
-    <None Include="..\res\tb_play_16.ico" />
-    <None Include="..\res\tb_stop_16.ico" />
-    <None Include="..\res\toolbar.bmp" />
-    <None Include="..\res\toolbar.png" />
-    <None Include="..\res\Toolbarw7.png" />
+    <None Include="..\mplayerc\res\mono.bmp" />
+    <None Include="..\mplayerc\res\multi.ico" />
+    <None Include="..\mplayerc\res\noaudio.bmp" />
+    <None Include="..\mplayerc\res\onoff.bmp" />
+    <None Include="..\mplayerc\res\single.ico" />
+    <None Include="..\mplayerc\res\stereo.bmp" />
+    <None Include="..\mplayerc\res\streamtypes.bmp" />
+    <None Include="..\mplayerc\res\tb_pause_16.ico" />
+    <None Include="..\mplayerc\res\tb_play_16.ico" />
+    <None Include="..\mplayerc\res\tb_stop_16.ico" />
+    <None Include="..\mplayerc\res\toolbar.bmp" />
+    <None Include="..\mplayerc\res\toolbar.png" />
+    <None Include="..\mplayerc\res\Toolbarw7.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
