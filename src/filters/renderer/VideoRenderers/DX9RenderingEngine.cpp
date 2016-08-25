@@ -539,14 +539,38 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_smootherstep);
 			break;
 #if ENABLE_2PASS_RESIZE
-		case RESIZER_SHADER_BSPLINE4:  hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bspline4_x);  break;
-		case RESIZER_SHADER_MITCHELL4: hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_mitchell4_x); break;
-		case RESIZER_SHADER_CATMULL4:  hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_catmull4_x);  break;
-		case RESIZER_SHADER_BICUBIC06: hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic06_x); break;
-		case RESIZER_SHADER_BICUBIC08: hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic08_x); break;
-		case RESIZER_SHADER_BICUBIC10: hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic10_x); break;
-		case RESIZER_SHADER_LANCZOS2:  hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_lanczos2_x);  break;
-		case RESIZER_SHADER_LANCZOS3:  hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_lanczos3_x);  break;
+		case RESIZER_SHADER_BSPLINE4:
+			m_wsResizer = L"B-spline4";
+			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bspline4_x);
+			break;
+		case RESIZER_SHADER_MITCHELL4:
+			m_wsResizer = L"Mitchell-Netravali spline4";
+			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_mitchell4_x);
+			break;
+		case RESIZER_SHADER_CATMULL4:
+			m_wsResizer = L"Catmull-Rom spline4";
+			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_catmull4_x);
+			break;
+		case RESIZER_SHADER_BICUBIC06:
+			m_wsResizer = L"Bicubic A=-0.6";
+			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic06_x);
+			break;
+		case RESIZER_SHADER_BICUBIC08:
+			m_wsResizer = L"Bicubic A=-0.8";
+			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic08_x);
+			break;
+		case RESIZER_SHADER_BICUBIC10:
+			m_wsResizer = L"Bicubic A=-1.0";
+			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic10_x);
+			break;
+		case RESIZER_SHADER_LANCZOS2:
+			m_wsResizer = L"Lanczos2";
+			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_lanczos2_x);
+			break;
+		case RESIZER_SHADER_LANCZOS3:
+			m_wsResizer = L"Lanczos3";
+			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_lanczos3_x);
+			break;
 #else
 		case RESIZER_SHADER_BSPLINE4:
 			m_wsResizer = L"B-spline4";
@@ -1061,6 +1085,43 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 		switch (iShader) {
 		case shader_smootherstep: resid = IDF_SHADER_PS20_SMOOTHERSTEP; break;
+#if ENABLE_2PASS_RESIZE
+		case shader_bspline4_y: iShader--;
+		case shader_bspline4_x:
+			resid = IDF_SHADER_PS20_BSPLINE4_X;
+			twopass = true;
+			break;
+		case shader_mitchell4_y: iShader--;
+		case shader_mitchell4_x:
+			resid = IDF_SHADER_PS20_MITCHELL4_X;
+			twopass = true;
+			break;
+		case shader_catmull4_y: iShader--;
+		case shader_catmull4_x:
+			resid = IDF_SHADER_PS20_CATMULL4_X;
+			twopass = true;
+			break;
+		case shader_bicubic06_y: iShader--;
+		case shader_bicubic06_x:
+			resid = IDF_SHADER_PS20_BICUBIC06_X;
+			twopass = true;
+			break;
+		case shader_bicubic08_y: iShader--;
+		case shader_bicubic08_x:
+			resid = IDF_SHADER_PS20_BICUBIC08_X;
+			twopass = true;
+			break;
+		case shader_bicubic10_y: iShader--;
+		case shader_bicubic10_x:
+			resid = IDF_SHADER_PS20_BICUBIC10_X;
+			twopass = true;
+			break;
+		case shader_lanczos2_y: iShader--;
+		case shader_lanczos2_x:
+			resid = IDF_SHADER_PS20_LANCZOS2_X;
+			twopass = true;
+			break;
+#else
 		case shader_bspline4:     resid = IDF_SHADER_PS20_BSPLINE4;     break;
 		case shader_mitchell4:    resid = IDF_SHADER_PS20_MITCHELL4;    break;
 		case shader_catmull4:
@@ -1068,6 +1129,7 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 		case shader_bicubic06:    resid = IDF_SHADER_PS20_BICUBIC06;    break;
 		case shader_bicubic08:    resid = IDF_SHADER_PS20_BICUBIC08;    break;
 		case shader_bicubic10:    resid = IDF_SHADER_PS20_BICUBIC10;    break;
+#endif
 		default:
 			return E_INVALIDARG;
 		}
@@ -1076,55 +1138,44 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 		switch (iShader) {
 		case shader_smootherstep: resid = IDF_SHADER_RESIZER_SMOOTHERSTEP; break;
 #if ENABLE_2PASS_RESIZE
-		case shader_bspline4_y:
-			iShader--;
+		case shader_bspline4_y: iShader--;
 		case shader_bspline4_x:
-			pSrcData = shader_resizer_bspline4_2pass;
+			resid = IDF_SHADER_RESIZER_BSPLINE4_X;
 			twopass = true;
 			break;
-		case shader_mitchell4_y:
-			iShader--;
+		case shader_mitchell4_y: iShader--;
 		case shader_mitchell4_x:
-			pSrcData = shader_resizer_mitchell4_2pass;
+			resid = IDF_SHADER_RESIZER_MITCHELL4_X;
 			twopass = true;
 			break;
-		case shader_catmull4_y:
-			iShader--;
+		case shader_catmull4_y: iShader--;
 		case shader_catmull4_x:
-			pSrcData = shader_resizer_catmull4_2pass;
+			resid = IDF_SHADER_RESIZER_CATMULL4_X;
 			twopass = true;
 			break;
-		case shader_bicubic06_y:
-			iShader--;
+		case shader_bicubic06_y: iShader--;
 		case shader_bicubic06_x:
-			pSrcData = shader_resizer_bicubic_2pass;
-			ShaderMacros[1] = { "A", "-0.6" };
+			resid = IDF_SHADER_RESIZER_BICUBIC06_X;
 			twopass = true;
 			break;
-		case shader_bicubic08_y:
-			iShader--;
+		case shader_bicubic08_y: iShader--;
 		case shader_bicubic08_x:
-			pSrcData = shader_resizer_bicubic_2pass;
-			ShaderMacros[1] = { "A", "-0.8" };
+			resid = IDF_SHADER_RESIZER_BICUBIC08_X;
 			twopass = true;
 			break;
-		case shader_bicubic10_y:
-			iShader--;
+		case shader_bicubic10_y: iShader--;
 		case shader_bicubic10_x:
-			pSrcData = shader_resizer_bicubic_2pass;
-			ShaderMacros[1] = { "A", "-1.0" };
+			resid = IDF_SHADER_RESIZER_BICUBIC10_X;
 			twopass = true;
 			break;
-		case shader_lanczos2_y:
-			iShader--;
+		case shader_lanczos2_y: iShader--;
 		case shader_lanczos2_x:
-			pSrcData = shader_resizer_lanczos2_2pass;
+			resid = IDF_SHADER_RESIZER_LANCZOS2_X;
 			twopass = true;
 			break;
-		case shader_lanczos3_y:
-			iShader--;
+		case shader_lanczos3_y: iShader--;
 		case shader_lanczos3_x:
-			pSrcData = shader_resizer_lanczos3_2pass;
+			resid = IDF_SHADER_RESIZER_LANCZOS3_X;
 			twopass = true;
 			break;
 #else
@@ -1143,39 +1194,33 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 	HRESULT hr = S_OK;
 	CString ErrorMessage;
 
-	if (twopass) {
+	hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[iShader], resid);
 #if ENABLE_2PASS_RESIZE
-		hr = m_pPSC->CompileShader(pSrcData, "main_x", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[iShader], &ErrorMessage);
-		if (hr == S_OK) {
-			hr = m_pPSC->CompileShader(pSrcData, "main_y", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[iShader + 1], &ErrorMessage);
-		}
-
-		if (hr == S_OK && !m_pResizerPixelShaders[shader_downscaling_x]) {
-			hr = m_pPSC->CompileShader(shader_resizer_downscaling_2pass, "main_x", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling_x], &ErrorMessage);
-			if (hr == S_OK) {
-				hr = m_pPSC->CompileShader(shader_resizer_downscaling_2pass, "main_y", m_ShaderProfile, 0, ShaderMacros, &m_pResizerPixelShaders[shader_downscaling_y], &ErrorMessage);
-			}
-		}
-
-		if (FAILED(hr)) {
-			DLog(L"CDX9RenderingEngine::InitShaderResizer() : shader compilation failed\n%s", ErrorMessage.GetString());
-			ASSERT(0);
-			return hr;
-		}
+	if (hr == S_OK && twopass) {
+		hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[iShader + 1], resid + 1);
+	}
 #endif
-	} else {
-		hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[iShader], resid);
-		if (FAILED(hr)) {
-			ASSERT(0);
-			return hr;
-		}
+	if (FAILED(hr)) {
+		ASSERT(0);
+		return hr;
 	}
 
+#if ENABLE_2PASS_RESIZE
+	if (!m_pResizerPixelShaders[shader_downscaling_x] || !m_pResizerPixelShaders[shader_downscaling_y]) {
+		UINT resid = m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0) ? IDF_SHADER_PS20_DOWNSCALING_X : IDF_SHADER_DOWNSCALING_X;
+		hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[shader_downscaling_x], resid);
+		if (S_OK == hr) {
+			hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[shader_downscaling_y], resid + 1);
+		}
+		ASSERT(S_OK == hr);
+	}
+#else
 	if (!m_pResizerPixelShaders[shader_downscaling]) {
 		UINT resid = m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0) ? IDF_SHADER_PS20_DOWNSCALING : IDF_SHADER_DOWNSCALING;
 		hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[shader_downscaling], resid);
 		ASSERT(S_OK == hr);
 	}
+#endif
 
 	return S_OK;
 }
