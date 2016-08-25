@@ -515,7 +515,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Shaders\Shaders.vcxproj">
+    <ProjectReference Include="..\..\Shaders\Shaders.vcxproj">
       <Project>{154D3FA8-9BB8-4EC1-8D56-DA14715ACD56}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\AudioTools\AudioTools.vcxproj">
