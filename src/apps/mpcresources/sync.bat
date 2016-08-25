@@ -6,7 +6,7 @@ rem Then it will overwrite rc files with new rc ones, and after that it will gen
 rem This is only an example.
 
 echo Get the latest mplayerc.rc from repository first...
-svn cat -r head ../mplayerc.rc > $$TEMP$$.old
+svn cat -r head ../mplayerc/mplayerc.rc > $$TEMP$$.old
 if %ERRORLEVEL% neq 0 goto NOSVNCLI
 echo ----------------------
 
@@ -27,7 +27,7 @@ rmdir /s /q newrc
 echo ----------------------
 
 echo Generating new string files...
-copy ..\mplayerc.rc .
+copy ..\mplayerc\mplayerc.rc .
 perl rcstrings.pl -a
 del mplayerc.rc
 echo ----------------------

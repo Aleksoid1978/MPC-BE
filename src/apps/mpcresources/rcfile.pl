@@ -33,8 +33,8 @@ use File::Glob qw(:globally :nocase);
 
 require "common.pl";
 
-my $BaseFileName = "../mplayerc.rc";
-my $NewFileName = "../mplayerc.rc";
+my $BaseFileName = "../mplayerc/mplayerc.rc";
+my $NewFileName = "../mplayerc/mplayerc.rc";
 my $help;
 
 my %LANG_EXEPTIONS = (
@@ -64,7 +64,7 @@ my %LANG_EXEPTIONS = (
 	'ua' => 'uk',
 );
 
-my $MEDIA_INFO_LANG_FILE = 'IDB_MEDIAINFO_LANGUAGE  FILE                    "..\\\\..\\\\..\\\\ExtLib\\\\MediaInfo\\\\Language\\\\%s.csv"';
+my $MEDIA_INFO_LANG_FILE = 'IDB_MEDIAINFO_LANGUAGE  FILE                    "..\\\\..\\\\ExtLib\\\\MediaInfo\\\\Language\\\\%s.csv"';
 
 my $result = GetOptions("base|b=s" =>\$BaseFileName, "new|n=s" =>\$NewFileName, "help|h"=>\$help);
 
@@ -75,8 +75,8 @@ Copy all changes between two version of mplayerc.rc files to all rc files in the
 generate new rc files under the "newrc" subdirectory.
 
 Options:
-	--base -b	base file, default "../mplayerc.rc" optional
-	--new -n	modified file, default "../mplayerc.rc" optional
+	--base -b	base file, default "../mplayerc/mplayerc.rc" optional
+	--new -n	modified file, default "../mplayerc/mplayerc.rc" optional
 	--help -h	show this help
 
 	Base file: the previous revision of mplayerc.rc file
@@ -89,7 +89,7 @@ Options:
 
 	example 2: you changed some gui of mpc-be, that means you also modified the mplayerc.rc file.
 	First: checkout the head revision of mplayerc.rc using the svn client, give it any other name, for example:
-	>svn cat -r head ../mplayerc.rc > mplayer.rc.old
+	>svn cat -r head ../mplayerc/mplayerc.rc > mplayer.rc.old
 	Second: >perl rcfile.pl -b mplayerc.rc.old
 	Or better yet use provided batch file: >rcfile.bat
 
