@@ -59,7 +59,7 @@ const char* HashWrapper_Hex = "0123456789abcdef";
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-HashWrapper::HashWrapper (const HashFunctions &Functions)
+void HashWrapper::Init (const HashFunctions &Functions)
 {
     m = new void*[HashFunction_Max];
 
@@ -166,17 +166,7 @@ string HashWrapper::Generate (const HashFunction Function)
         {
             unsigned char Digest[16];
             MD5Final(Digest, (struct MD5Context*)((void**)m)[MD5]);
-            Ztring Temp;
-            Temp+=Ztring().From_CC2(BigEndian2int16u(Digest+ 0));
-            Temp+=Ztring().From_CC2(BigEndian2int16u(Digest+ 2));
-            Temp+=Ztring().From_CC2(BigEndian2int16u(Digest+ 4));
-            Temp+=Ztring().From_CC2(BigEndian2int16u(Digest+ 6));
-            Temp+=Ztring().From_CC2(BigEndian2int16u(Digest+ 8));
-            Temp+=Ztring().From_CC2(BigEndian2int16u(Digest+10));
-            Temp+=Ztring().From_CC2(BigEndian2int16u(Digest+12));
-            Temp+=Ztring().From_CC2(BigEndian2int16u(Digest+14));
-            Temp.MakeLowerCase();
-            return Temp.To_UTF8();
+            return Hex2String(Digest, 16);
         }
     #endif //MEDIAINFO_MD5
 
@@ -185,14 +175,7 @@ string HashWrapper::Generate (const HashFunction Function)
         {
             unsigned char Digest[20];
             sha1_end(Digest, (sha1_ctx*)((void**)m)[SHA1]);
-            string DigestS;
-            DigestS.reserve(40);
-            for (size_t i=0; i<20; ++i)
-            {
-                DigestS.append(1, HashWrapper_Hex[Digest[i] >> 4]);
-                DigestS.append(1, HashWrapper_Hex[Digest[i] & 0xF]);
-            }
-            return DigestS;
+            return Hex2String(Digest, 20);
         }
     #endif //MEDIAINFO_SHA1
 
@@ -201,53 +184,25 @@ string HashWrapper::Generate (const HashFunction Function)
         {
             unsigned char Digest[28];
             sha224_end(Digest, (sha224_ctx*)((void**)m)[SHA224]);
-            string DigestS;
-            DigestS.reserve(28*2);
-            for (size_t i=0; i<28; ++i)
-            {
-                DigestS.append(1, HashWrapper_Hex[Digest[i] >> 4]);
-                DigestS.append(1, HashWrapper_Hex[Digest[i] & 0xF]);
-            }
-            return DigestS;
+            return Hex2String(Digest, 28);
         }
         if (Function==SHA256 && ((void**)m)[SHA256])
         {
             unsigned char Digest[32];
             sha256_end(Digest, (sha256_ctx*)((void**)m)[SHA256]);
-            string DigestS;
-            DigestS.reserve(32*2);
-            for (size_t i=0; i<32; ++i)
-            {
-                DigestS.append(1, HashWrapper_Hex[Digest[i] >> 4]);
-                DigestS.append(1, HashWrapper_Hex[Digest[i] & 0xF]);
-            }
-            return DigestS;
+            return Hex2String(Digest, 32);
         }
         if (Function==SHA384 && ((void**)m)[SHA384])
         {
             unsigned char Digest[48];
             sha384_end(Digest, (sha384_ctx*)((void**)m)[SHA384]);
-            string DigestS;
-            DigestS.reserve(48*2);
-            for (size_t i=0; i<48; ++i)
-            {
-                DigestS.append(1, HashWrapper_Hex[Digest[i] >> 4]);
-                DigestS.append(1, HashWrapper_Hex[Digest[i] & 0xF]);
-            }
-            return DigestS;
+            return Hex2String(Digest, 48);
         }
         if (Function==SHA512 && ((void**)m)[SHA512])
         {
             unsigned char Digest[64];
             sha512_end(Digest, (sha512_ctx*)((void**)m)[SHA512]);
-            string DigestS;
-            DigestS.reserve(64*2);
-            for (size_t i=0; i<64; ++i)
-            {
-                DigestS.append(1, HashWrapper_Hex[Digest[i] >> 4]);
-                DigestS.append(1, HashWrapper_Hex[Digest[i] & 0xF]);
-            }
-            return DigestS;
+            return Hex2String(Digest, 64);
         }
     #endif //MEDIAINFO_SHA2
 
@@ -278,6 +233,18 @@ string HashWrapper::Name (const HashFunction Function)
     #endif //MEDIAINFO_SHA2
 
     return string();
+}
+
+string HashWrapper::Hex2String(const int8u* Digest, const size_t Digest_Size)
+{
+    string DigestS;
+    DigestS.resize(Digest_Size*2);
+    for (size_t i=0, j=0; i<Digest_Size; ++i)
+    {
+        DigestS[j++]=HashWrapper_Hex[Digest[i] >> 4];
+        DigestS[j++]=HashWrapper_Hex[Digest[i] & 0xF];
+    }
+    return DigestS;
 }
 
 } //NameSpace
