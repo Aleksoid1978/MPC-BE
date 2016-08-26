@@ -90,9 +90,6 @@ extern const char* Mpegv_matrix_coefficients(int8u matrix_coefficients)
 
 } //NameSpace
 
-#if !MEDIAINFO_ADVANCED
-    const int64u Config_VariableGopDetection_Occurences=4;
-#endif // MEDIAINFO_ADVANCED
 //---------------------------------------------------------------------------
 #endif //...
 //---------------------------------------------------------------------------
@@ -1023,6 +1020,10 @@ const File__Analyze::vlc Mpegv_coded_block_pattern[]=
 };
 
 #endif //MEDIAINFO_MACROBLOCKS
+
+#if !MEDIAINFO_ADVANCED
+    const int64u Config_VariableGopDetection_Occurences=4;
+#endif // MEDIAINFO_ADVANCED
 
 //***************************************************************************
 // Constructor/Destructor

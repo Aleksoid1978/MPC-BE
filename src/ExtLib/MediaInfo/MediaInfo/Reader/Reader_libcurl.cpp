@@ -43,7 +43,10 @@
     #include "hmac.h"
     #include "base64.h"
 #endif //MEDIAINFO_HMAC
+#include "MediaInfo/HashWrapper.h"
 #include "ZenLib/File.h"
+#include "tinyxml2.h"
+using namespace tinyxml2;
 using namespace ZenLib;
 using namespace std;
 #ifdef MEDIAINFO_DEBUG
@@ -103,6 +106,39 @@ namespace Http
             std::transform(Protocol.begin(), Protocol.end(), Protocol.begin(), ::tolower);
         }
 
+        string ToString()
+        {
+            string ToReturn;
+            if (!Protocol.empty())
+            {
+                ToReturn += Protocol;
+                ToReturn += "://";
+            }
+            if (!User.empty() || !Password.empty())
+            {
+                ToReturn += User;
+                ToReturn += ':';
+                ToReturn += Password;
+                ToReturn += '@';
+            }
+            ToReturn += Host;
+            if (!Port.empty())
+            {
+                ToReturn += ':';
+                ToReturn += Port;
+            }
+            if (!Path.empty() || !Search.empty())
+            {
+                ToReturn += Path;
+                if (!Search.empty())
+                {
+                    ToReturn += '?';
+                    ToReturn += Search;
+                }
+            }
+            return ToReturn;
+        }
+
         // Members
         std::string Protocol;
         std::string User;
@@ -154,7 +190,7 @@ struct Reader_libcurl::curl_data
     bool                Ssh_IgnoreSecurity;
     bool                Init_AlreadyDone;
     bool                Init_NotAFile;
-    #if MEDIAINFO_NEXTPACKET
+#if MEDIAINFO_NEXTPACKET
         bool            NextPacket;
     #endif //MEDIAINFO_NEXTPACKET
     time_t              Time_Max;
@@ -194,6 +230,204 @@ struct Reader_libcurl::curl_data
         #endif //MEDIAINFO_EVENTS
     }
 };
+
+//---------------------------------------------------------------------------
+struct Reader_libcurl_curl_data_getregion
+{
+    CURL*               Curl;
+    Ztring              File_Name;
+    std::string         Amazon_AWS_Region;
+};
+
+//---------------------------------------------------------------------------
+size_t libcurl_WriteData_CallBack_Amazon_AWS_Region(void *ptr, size_t size, size_t nmemb, void *data)
+{
+    //Must be a 200 HTTP code
+    long http_code=0;
+    if (curl_easy_getinfo(((Reader_libcurl_curl_data_getregion*)data)->Curl, CURLINFO_RESPONSE_CODE, &http_code)!=CURLE_OK || http_code!=200)
+    {
+        MediaInfoLib::Config.Log_Send(0xC0, 0xFF, 0, Reader_libcurl_FileNameWithoutPassword(((Reader_libcurl_curl_data_getregion*)data)->File_Name)+__T(", ")+Ztring().From_UTF8(string((char*)ptr, size*nmemb)));
+        return size*nmemb;
+    }
+
+    //Must be a LocationConstraint XML
+    tinyxml2::XMLDocument document;
+    if (!document.Parse((const char*)ptr, size*nmemb))
+    {
+        XMLElement* Root=document.FirstChildElement("LocationConstraint");
+        if (Root)
+        {
+            const char* Text=Root->GetText();
+            if (Text)
+                ((Reader_libcurl_curl_data_getregion*)data)->Amazon_AWS_Region=Text;
+            else if (!Root->FirstChild())
+                ((Reader_libcurl_curl_data_getregion*)data)->Amazon_AWS_Region="us-east-1"; //LocationConstraint XML present + empty content means that it is the standard region
+        }
+    }
+
+    //Error is displayed if region is not filled
+    if (((Reader_libcurl_curl_data_getregion*)data)->Amazon_AWS_Region.empty())
+    {
+        MediaInfoLib::Config.Log_Send(0xC0, 0xFF, 0, Reader_libcurl_FileNameWithoutPassword(((Reader_libcurl_curl_data_getregion*)data)->File_Name)+__T(", ")+Ztring().From_UTF8(string((char*)ptr, size*nmemb)));
+        return 0;
+    }
+
+    return size*nmemb;
+}
+
+//---------------------------------------------------------------------------
+void Amazon_AWS_Sign(MediaInfoLib::String &File_Name, struct curl_slist* &HttpHeader, const Http::Url &File_URL, const string &regionName, const string &serviceName)
+{
+    // Amazon AWS Authorization Header v4
+    // See http://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
+    char timeStamp_Buffer[17];
+    time_t timeStamp_Time=time(0);
+
+    strftime(timeStamp_Buffer, sizeof(timeStamp_Buffer), "%Y%m%dT%H%M%SZ", gmtime(&timeStamp_Time));
+
+    string timeStamp(timeStamp_Buffer);
+    string dateStamp=timeStamp.substr(0, 8);
+
+    //SigningKey
+    string SigningKey; SigningKey.resize(HASH_OUTPUT_SIZE);
+    string Secret="AWS4"+File_URL.Password;
+    hmac_sha((int8u*)Secret.c_str(), (unsigned long)Secret.size(), (int8u*)dateStamp.c_str(), (unsigned long)dateStamp.size(), (int8u*)SigningKey.c_str(), HASH_OUTPUT_SIZE);
+    hmac_sha((int8u*)SigningKey.c_str(), (unsigned long)HASH_OUTPUT_SIZE, (int8u*)regionName.c_str(), (unsigned long)regionName.size(), (int8u*)SigningKey.c_str(), HASH_OUTPUT_SIZE);
+    hmac_sha((int8u*)SigningKey.c_str(), (unsigned long)HASH_OUTPUT_SIZE, (int8u*)serviceName.c_str(), (unsigned long)serviceName.size(), (int8u*)SigningKey.c_str(), HASH_OUTPUT_SIZE);
+    hmac_sha((int8u*)SigningKey.c_str(), (unsigned long)HASH_OUTPUT_SIZE, (int8u*)"aws4_request", 12, (int8u*)SigningKey.c_str(), HASH_OUTPUT_SIZE);
+
+    //CanonicalRequest
+    string CanonicalRequest;
+    CanonicalRequest+="GET\n";
+    CanonicalRequest+=File_URL.Path+'\n';
+    if (!File_URL.Search.empty())
+    {
+        CanonicalRequest+=File_URL.Search;
+        if (File_URL.Search[File_URL.Search.size()-1]!='=')
+            CanonicalRequest+='=';
+    }
+    CanonicalRequest+='\n';
+    CanonicalRequest+="host:"+File_URL.Host+'\n';
+    CanonicalRequest+="x-amz-content-sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\n";
+    CanonicalRequest+="x-amz-date:"+timeStamp+'\n';
+    CanonicalRequest+='\n';
+    CanonicalRequest+="host;x-amz-content-sha256;x-amz-date\n";
+    CanonicalRequest+="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+    string CanonicalRequest_Signature=HashWrapper::Generate(HashWrapper::SHA256, (const int8u*)CanonicalRequest.c_str(), CanonicalRequest.size());
+
+    //StringToSign
+    string StringToSign;
+    StringToSign+="AWS4-HMAC-SHA256\n";
+    StringToSign+=timeStamp+'\n';
+    StringToSign+=dateStamp+"/"+regionName+"/"+serviceName+"/aws4_request\n";
+    StringToSign+=CanonicalRequest_Signature;
+    string Signature; Signature.resize(HASH_OUTPUT_SIZE);
+    hmac_sha((int8u*)SigningKey.c_str(), (unsigned long)HASH_OUTPUT_SIZE, (int8u*)StringToSign.c_str(), (unsigned long)StringToSign.size(), (int8u*)Signature.c_str(), HASH_OUTPUT_SIZE);
+
+    //Authorization
+    string Amazon_S3_Authorization="AWS4-HMAC-SHA256 Credential="+File_URL.User+"/"+dateStamp+"/"+regionName+"/"+serviceName+"/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature="+HashWrapper::Hex2String((const int8u*)Signature.c_str(), Signature.size());
+
+    //Set cUrl headers
+    HttpHeader=curl_slist_append(HttpHeader, ("Authorization: "+Amazon_S3_Authorization).c_str());
+    HttpHeader=curl_slist_append(HttpHeader, "x-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+    HttpHeader=curl_slist_append(HttpHeader, ("x-amz-date: "+timeStamp).c_str());
+};
+
+//---------------------------------------------------------------------------
+string Amazon_AWS_GetRegion(const string &serviceName, const string &bucketName, const Http::Url &File_URL, CURL* Curl)
+{
+    //Transform the URL to a location request URL
+    Http::Url File_URL2=File_URL;
+    File_URL2.Host.erase(0, bucketName.size()+1);
+    File_URL2.Path='/'+bucketName;
+    File_URL2.Search="location";
+
+    //Send a location request
+    Reader_libcurl_curl_data_getregion Curl_Data2;
+    Curl_Data2.Curl=Curl;
+    Curl_Data2.File_Name.From_UTF8(File_URL2.ToString());
+    struct curl_slist* HttpHeader=NULL;
+    Amazon_AWS_Sign(Curl_Data2.File_Name, HttpHeader, File_URL2, "us-east-1", serviceName);
+    string FileName_String=Curl_Data2.File_Name.To_UTF8();
+    curl_easy_setopt(Curl, CURLOPT_WRITEFUNCTION, &libcurl_WriteData_CallBack_Amazon_AWS_Region);
+    curl_easy_setopt(Curl, CURLOPT_WRITEDATA, &Curl_Data2);
+    curl_easy_setopt(Curl, CURLOPT_HTTPHEADER, HttpHeader);
+    curl_easy_setopt(Curl, CURLOPT_URL, FileName_String.c_str());
+    CURLcode Result=curl_easy_perform(Curl);
+    curl_easy_setopt(Curl, CURLOPT_WRITEFUNCTION, NULL);
+    curl_easy_setopt(Curl, CURLOPT_WRITEDATA, NULL);
+    curl_easy_setopt(Curl, CURLOPT_HTTPHEADER, NULL);
+    curl_easy_setopt(Curl, CURLOPT_URL, NULL);
+    curl_slist_free_all(HttpHeader);
+
+    //We get the region name
+    return Curl_Data2.Amazon_AWS_Region;
+}
+
+void Amazon_AWS_Manage(Http::Url &File_URL, Reader_libcurl::curl_data* Curl_Data)
+{
+    // Looking for style of URL (Virtual-hosted–style URL Path-style URL), service name, region name
+    // Format:
+    // <bucket>.<service>.<aws-region>
+    // <service>.<aws-region>
+    // bucket can have dots
+    // Exception: s3 and s3-website services, <service>-<aws-region> means <service>.<aws-region>
+    // Exception: s3 on the right means unknown region
+    // Exception: s3-external-1 on the right means unknown region
+    string regionName(File_URL.Host, 0, File_URL.Host.size()-14);
+    string serviceName;
+
+    // Handling of exceptions
+    size_t AfterLastDot=regionName.rfind('.');
+    if (AfterLastDot==string::npos)
+        AfterLastDot=0;
+    else
+        AfterLastDot++;
+    if (regionName.substr(AfterLastDot)=="s3" || regionName.substr(AfterLastDot)=="s3-external-1")
+    {
+        serviceName="s3";
+        if (AfterLastDot)
+        {
+            string bucketName=regionName.substr(0, AfterLastDot-1); 
+            regionName=Amazon_AWS_GetRegion(serviceName, bucketName, File_URL, Curl_Data->Curl);
+        }
+        else
+            regionName="us-east-1";
+    }
+    else
+    {
+        if (regionName.find("s3-website-", AfterLastDot)==AfterLastDot)
+        {
+            regionName[AfterLastDot+10]='.';
+        }
+        else if (regionName.find("s3-", AfterLastDot)==AfterLastDot)
+        {
+            regionName[AfterLastDot+2]='.';
+        }
+    }
+    
+    // Splitting regionName and serviceName
+    size_t LastDot=regionName.rfind('.');
+    if (LastDot!=string::npos)
+    {
+        serviceName=regionName.substr(0, LastDot);
+        regionName=regionName.substr(LastDot+1);
+        LastDot=serviceName.rfind('.');
+        if (LastDot!=string::npos)
+            serviceName=serviceName.substr(LastDot + 1);
+    }
+
+    // Handling S3 signature
+    if (serviceName=="s3" && !regionName.empty())
+    {
+        Amazon_AWS_Sign(Curl_Data->File_Name, Curl_Data->HttpHeader, File_URL, regionName, serviceName);
+
+        //Removing the login/pass FTP-style, not usable by libcurl
+        File_URL.User.clear();
+        File_URL.Password.clear();
+        Curl_Data->File_Name=Ztring().From_UTF8(File_URL.ToString());
+    }
+}
 
 //---------------------------------------------------------------------------
 size_t libcurl_WriteData_CallBack(void *ptr, size_t size, size_t nmemb, void *data)
@@ -495,62 +729,16 @@ size_t Reader_libcurl::Format_Test_PerParser(MediaInfo_Internal* MI, const Strin
         for (size_t Pos=0; Pos<HttpHeaderStrings.size(); Pos++)
             Curl_Data->HttpHeader=curl_slist_append(Curl_Data->HttpHeader, HttpHeaderStrings[Pos].To_Local().c_str());
     }
+
+    //Special cases
     Http::Url File_URL=Http::Url(Ztring(File_Name).To_UTF8());
     if (!File_URL.Protocol.empty())
     {
         // Amazon S3 specific credentials
-        if ((File_URL.Protocol=="http" || File_URL.Protocol=="https") && !File_URL.User.empty() && !File_URL.Password.empty())
+        if ((File_URL.Protocol=="http" || File_URL.Protocol=="https") && !File_URL.User.empty())
         {
-            //Exploding the path
-            const string Amazon_AWS_Host(".amazonaws.com");
-            const size_t Amazon_AWS_Host_Size=14;
-            size_t Amazon_Host_Pos=File_URL.Host.find(Amazon_AWS_Host);
-            if (Amazon_Host_Pos+Amazon_AWS_Host_Size==File_URL.Host.size())
-            {
-                string Amazon_S3_Bucket;
-                string Amazon_S3_CanonicalizedResource;
-
-                string Amazon_S3_Host(File_URL.Host, 0, File_URL.Host.size()-Amazon_AWS_Host_Size);
-                size_t Amazon_S3_Host_Pos=Amazon_S3_Host.find('.');
-                if (Amazon_S3_Host_Pos!=(size_t)-1)
-                {
-                    //Virtual-hosted–style URL
-                    Amazon_S3_Bucket=Amazon_S3_Host.substr(0, Amazon_S3_Host_Pos);
-                    Amazon_S3_Host.erase(0, Amazon_S3_Host_Pos+1);
-                    Amazon_S3_CanonicalizedResource=File_URL.Path.substr(1);
-                }
-                else
-                {
-                    //Path-style URL
-                    size_t Bucket_Size=File_URL.Path.find('/', 1);
-                    if (Bucket_Size!=(size_t)-1)
-                    {
-                        Amazon_S3_Bucket=File_URL.Path.substr(1, Bucket_Size-1);
-                        Amazon_S3_CanonicalizedResource=File_URL.Path.substr(Bucket_Size+1);
-                    }
-                }
-                size_t Region_Pos=Amazon_S3_Host.find('-');
-                if (Region_Pos!=(size_t)-1)
-                    Amazon_S3_Host.erase(Region_Pos);
-                if (Amazon_S3_Host=="s3")
-                {
-                    // Amazon S3, computing the Authorization value
-                    // See http://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html
-                    Ztring File_Name2(Curl_Data->File_Name);
-                    File_Name2.FindAndReplace(Ztring().From_UTF8(File_URL.User+':'+File_URL.Password+'@'), Ztring());
-                    Curl_Data->File_Name=File_Name2;
-                    char Amazon_S3_Date_Buffer[100];
-                    time_t Amazon_S3_Date_Time=time(0);
-                    strftime(Amazon_S3_Date_Buffer, sizeof(Amazon_S3_Date_Buffer), "%a, %d %b %Y %H:%M:%S +0000", gmtime(&Amazon_S3_Date_Time));
-                    string Amazon_S3_Date(Amazon_S3_Date_Buffer);
-                    string Amazon_S3_ToSign = "GET\n\n\n"+Amazon_S3_Date+"\n/"+Amazon_S3_Bucket+"/"+Amazon_S3_CanonicalizedResource;
-                    string Hmac_Result; Hmac_Result.resize(HASH_OUTPUT_SIZE);
-                    hmac_sha((int8u*)File_URL.Password.c_str(), (unsigned long)File_URL.Password.size(), (int8u*)Amazon_S3_ToSign.c_str(), (unsigned long)Amazon_S3_ToSign.size(), (int8u*)Hmac_Result.c_str(), HASH_OUTPUT_SIZE);
-                    string Amazon_S3_Authorization="AWS "+File_URL.User+":"+Base64::encode(Hmac_Result);
-                    Curl_Data->HttpHeader=curl_slist_append(Curl_Data->HttpHeader, ("Date: "+Amazon_S3_Date).c_str());
-                    Curl_Data->HttpHeader=curl_slist_append(Curl_Data->HttpHeader, ("Authorization: "+Amazon_S3_Authorization).c_str());
-                }
-            }
+            if (File_URL.Host.find(".amazonaws.com")+14==File_URL.Host.size())
+                Amazon_AWS_Manage(File_URL, Curl_Data);
         }
 
         if (File_URL.Protocol=="sftp" || File_URL.Protocol=="scp")
