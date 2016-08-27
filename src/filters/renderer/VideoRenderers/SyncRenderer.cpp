@@ -67,7 +67,6 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	m_nUsedBuffer(0),
 	m_TextScale(1.0),
 	m_bNeedCheckSample(true),
-	m_hEvtQuit(NULL),
 	m_bIsFullscreen(bFullscreen),
 	m_uSyncGlitches(0),
 	m_pGenlock(NULL),
@@ -1615,49 +1614,12 @@ void CBaseAP::DrawText(const RECT &rc, const CString &strText, int _Priority)
 	if (_Priority < 1) {
 		return;
 	}
-	int Quality = 1;
-	//D3DXCOLOR Color1(1.0f, 0.2f, 0.2f, 1.0f); // red
-	//D3DXCOLOR Color1(1.0f, 1.0f, 1.0f, 1.0f); // white
-	D3DXCOLOR Color1(1.0f, 0.8f, 0.0f, 1.0f); // yellow
-	D3DXCOLOR Color0(0.0f, 0.0f, 0.0f, 1.0f); // black
+	D3DXCOLOR Color1(D3DCOLOR_XRGB(255, 204, 0)); // yellow
+	D3DXCOLOR Color0(D3DCOLOR_XRGB(0, 0, 0)); // black
 	RECT Rect1 = rc;
 	RECT Rect2 = rc;
-	if (Quality == 1) {
-		OffsetRect(&Rect2 , 2, 2);
-	} else {
-		OffsetRect(&Rect2 , -1, -1);
-	}
-	if (Quality > 0) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
-	OffsetRect (&Rect2 , 1, 0);
-	if (Quality > 3) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
-	OffsetRect (&Rect2 , 1, 0);
-	if (Quality > 2) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
-	OffsetRect (&Rect2 , 0, 1);
-	if (Quality > 3) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
-	OffsetRect (&Rect2 , 0, 1);
-	if (Quality > 1) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
-	OffsetRect (&Rect2 , -1, 0);
-	if (Quality > 3) {
-		m_pFont->DrawText( m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
-	OffsetRect (&Rect2 , -1, 0);
-	if (Quality > 2) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
-	OffsetRect (&Rect2 , 0, -1);
-	if (Quality > 3) {
-		m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	}
+	OffsetRect(&Rect2 , 2, 2);
+	m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
 	m_pFont->DrawText( m_pSprite, strText, -1, &Rect1, DT_NOCLIP, Color1);
 }
 
@@ -2704,11 +2666,6 @@ HRESULT CSyncAP::SetMediaType(IMFMediaType* pType)
 
 	return hr;
 }
-
-struct D3DFORMAT_TYPE {
-	const int Format;
-	const LPCTSTR Description;
-};
 
 LONGLONG CSyncAP::GetMediaTypeMerit(IMFMediaType *pMediaType)
 {

@@ -180,7 +180,6 @@ namespace GothSync
 		virtual HRESULT AllocSurfaces(D3DFORMAT Format = D3DFMT_A8R8G8B8);
 		virtual void DeleteSurfaces();
 
-		HANDLE m_hEvtQuit; // Stop rendering thread event
 		LONGLONG m_LastAdapterCheck;
 
 		HRESULT InitShaderResizer(int iShader);
