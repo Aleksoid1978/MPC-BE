@@ -477,7 +477,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"设置在关闭并重新启动后生效。"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 5		"视频渲染器"
 7		"VMR-7/VMR-9 (未渲染) 及 EVR (自定义)设置"
 8		"选择 D3D9 渲染设备"
@@ -489,13 +489,14 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 15		"表面:"
 17		"格式:"
 19		"改变大小:"
-21		"输出范围:"
-23		"EVR 缓冲:"
-27		"色彩管理"
-28		"输入类型:"
-30		"环境光线:"
-32		"渲染意图:"
-34		"默认"
+21		"Downscaling*:"
+23		"输出范围:"
+25		"EVR 缓冲:"
+29		"色彩管理"
+30		"输入类型:"
+32		"环境光线:"
+34		"渲染意图:"
+36		"默认"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

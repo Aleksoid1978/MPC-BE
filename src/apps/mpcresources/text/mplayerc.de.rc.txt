@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Über MPC-BE"
 7		"MPC-BE"
 8		"Copyright © 2002-2016 MPC-BE Team, siehe Authors.txt Datei"
@@ -477,7 +477,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Änderungen werden erst nach Neustart der Wiedergabe wirksam."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 5		"Video-Renderer"
 7		"Einstellungen für VMR-7/VMR-9 (renderless) und EVR (custom presenter) "
 8		"Rendergerät verwenden:"
@@ -489,13 +489,14 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 15		"Oberfläche:"
 17		"Format:"
 19		"Resizer:"
-21		"Ausgabebereich:"
-23		"EVR-Puffer:"
-27		"Farbmanagement"
-28		"Eingangstyp:"
-30		"Umgebungslicht:"
-32		"Wiedergabeziel:"
-34		"Zurücksetzen"
+21		"Downscaling*:"
+23		"Ausgabebereich:"
+25		"EVR-Puffer:"
+29		"Farbmanagement"
+30		"Eingangstyp:"
+32		"Umgebungslicht:"
+34		"Wiedergabeziel:"
+36		"Zurücksetzen"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
