@@ -477,7 +477,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Ցուցադրել մոտագույն vsync-ի հետ"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 5		"Video renderer"
 7		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
 8		"Select D3D9 Render Device"
@@ -489,13 +489,14 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 15		"Մակերեսը."
 17		"Format:"
 19		"Resizer:"
-21		"Output range:"
-23		"EVR Buffers:"
-27		"Color Management"
-28		"Input type:"
-30		"Ambient Light:"
-32		"Rendering Intent:"
-34		"Default"
+21		"Downscaling*:"
+23		"Output range:"
+25		"EVR Buffers:"
+29		"Color Management"
+30		"Input type:"
+32		"Ambient Light:"
+34		"Rendering Intent:"
+36		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
