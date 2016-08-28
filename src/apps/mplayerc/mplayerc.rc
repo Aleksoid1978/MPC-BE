@@ -7,7 +7,8 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include "afxres.h"
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -2434,23 +2435,23 @@ BEGIN
     IDS_AG_VOLUME_UP        "Volume Up"
     IDS_AG_VOLUME_DOWN      "Volume Down"
     IDS_AG_VOLUME_MUTE      "Volume Mute"
-    IDS_MPLAYERC_63         "DVD Title Menu"
-    IDS_AG_DVD_ROOT_MENU    "DVD Root Menu"
-    IDS_MPLAYERC_65         "DVD Subtitle Menu"
-    IDS_MPLAYERC_66         "DVD Audio Menu"
+    IDS_AG_DVD_TITLEMENU    "DVD Title Menu"
+    IDS_AG_DVD_ROOTMENU     "DVD Root Menu"
+    IDS_AG_DVD_SUBPICTUREMENU "DVD Subtitle Menu"
+    IDS_AG_DVD_AUDIOMENU    "DVD Audio Menu"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_MPLAYERC_67         "DVD Angle Menu"
-    IDS_MPLAYERC_68         "DVD Chapter Menu"
+    IDS_AG_DVD_ANGLEMENU    "DVD Angle Menu"
+    IDS_AG_DVD_CHAPTERMENU  "DVD Chapter Menu"
     IDS_AG_DVD_MENU_LEFT    "DVD Menu Left"
-    IDS_MPLAYERC_70         "DVD Menu Right"
+    IDS_AG_DVD_MENU_RIGHT   "DVD Menu Right"
     IDS_AG_DVD_MENU_UP      "DVD Menu Up"
     IDS_AG_DVD_MENU_DOWN    "DVD Menu Down"
-    IDS_MPLAYERC_73         "DVD Menu Activate"
+    IDS_AG_DVD_MENU_ACTIVATE "DVD Menu Activate"
     IDS_AG_DVD_MENU_BACK    "DVD Menu Back"
-    IDS_MPLAYERC_75         "DVD Menu Leave"
+    IDS_AG_DVD_MENU_LEAVE   "DVD Menu Leave"
     IDS_AG_BOSS_KEY         "Boss key"
     IDS_MPLAYERC_77         "Player Menu (short)"
     IDS_MPLAYERC_78         "Player Menu (long)"
