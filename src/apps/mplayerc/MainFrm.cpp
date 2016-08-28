@@ -9512,46 +9512,42 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 
 void CMainFrame::OnNavigateMenuItem(UINT nID)
 {
-	nID -= ID_NAVIGATE_MENU_LEFT;
-
 	if (GetPlaybackMode() == PM_DVD) {
 		switch (nID) {
-			case 0:
+			case ID_NAVIGATE_MENU_LEFT:
 				m_pDVDC->SelectRelativeButton(DVD_Relative_Left);
 				break;
-			case 1:
+			case ID_NAVIGATE_MENU_RIGHT:
 				m_pDVDC->SelectRelativeButton(DVD_Relative_Right);
 				break;
-			case 2:
+			case IDS_AG_DVD_MENU_UP:
 				m_pDVDC->SelectRelativeButton(DVD_Relative_Upper);
 				break;
-			case 3:
+			case ID_NAVIGATE_MENU_DOWN:
 				m_pDVDC->SelectRelativeButton(DVD_Relative_Lower);
 				break;
-			case 4:
-				if (m_iDVDDomain != DVD_DOMAIN_Title) {	// for the remote control
+			case ID_NAVIGATE_MENU_ACTIVATE:
+				//if (m_iDVDDomain != DVD_DOMAIN_Title) { // for the remote control
 					m_pDVDC->ActivateButton();
-				} else {
-					OnPlayPlay();
-				}
+				//} else {
+				//	OnPlayPlay();
+				//}
 				break;
-			case 5:
+			case ID_NAVIGATE_MENU_BACK:
 				m_pDVDC->ReturnFromSubmenu(DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
 				break;
-			case 6:
+			case ID_NAVIGATE_MENU_LEAVE:
 				m_pDVDC->Resume(DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
 				break;
 			default:
 				break;
 		}
-	} else if (GetPlaybackMode() == PM_FILE) {
-		OnPlayPlay();
 	}
 }
 
 void CMainFrame::OnUpdateNavigateMenuItem(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable((m_eMediaLoadState == MLS_LOADED) && ((GetPlaybackMode() == PM_DVD) || (GetPlaybackMode() == PM_FILE)));
+	pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && GetPlaybackMode() == PM_DVD);
 }
 
 void CMainFrame::OnTunerScan()
