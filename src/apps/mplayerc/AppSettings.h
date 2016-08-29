@@ -856,6 +856,9 @@ public:
 
 	bool			IsISRSelect() const;
 	bool			IsISRAutoLoadEnabled() const;
+
+	bool			bOSDRemainingTime;
+
 private :
 	DVD_POSITION	DvdPosition[MAX_DVD_POSITION];
 	int				nCurrentDvdPosition;

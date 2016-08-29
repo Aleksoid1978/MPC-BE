@@ -1153,7 +1153,6 @@ public:
 	CFullscreenWnd*	m_pFullscreenWnd;
 	COSD		m_OSD;
 
-	bool		m_bRemainingTime;
 	bool		m_bOSDLocalTime;
 	bool		m_bOSDFileName;
 	CString		GetSystemLocalTime();

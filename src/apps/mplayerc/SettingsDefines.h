@@ -309,3 +309,5 @@
 
 #define IDS_RS_CONTEXTFILES					_T("ShowContextFiles")
 #define IDS_RS_CONTEXTDIR					_T("ShowContextDir")
+
+#define IDS_RS_OSD_REMAINING_TIME			_T("OSD_RemainingTime")
