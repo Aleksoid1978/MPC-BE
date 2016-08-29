@@ -11490,7 +11490,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 							}
 						}
 
-						m_wndPlaylistBar.SetFirstSelected();
+						m_wndPlaylistBar.SetLast();
 						pOFD->fns.GetHead() = m_wndPlaylistBar.GetCurFileName();
 					}
 				}
