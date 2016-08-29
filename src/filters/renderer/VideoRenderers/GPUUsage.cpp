@@ -25,12 +25,14 @@
 // Memory allocation function
 static void* __stdcall ADL_Main_Memory_Alloc(int iSize)
 {
-	void* lpBuffer = malloc(iSize);
-	return lpBuffer;
+	//void* lpBuffer = malloc(iSize);
+	//return lpBuffer;
+	return malloc(iSize);
 }
 
 CGPUUsage::CGPUUsage()
-	: m_nGPUUsage(0)
+	: m_iGPUUsage(0)
+	, m_iGPUClock(0)
 	, m_dwLastRun(0)
 	, m_lRunCount(0)
 	, m_GPUType(UNKNOWN_GPU)
@@ -75,6 +77,10 @@ void CGPUUsage::Clean()
 	ZeroMemory(&NVData.gpuPStates, sizeof(NVData.gpuPStates));
 	NVData.gpuPStates.version					= sizeof(gpuPStates) | 0x10000;
 	NVData.NvAPI_GPU_GetPStates					= NULL;
+
+	ZeroMemory(&NVData.gpuClocks, sizeof(NVData.gpuClocks));
+	NVData.gpuClocks.version					= sizeof(gpuClocks) | 0x20000;
+	NVData.NvAPI_GPU_GetAllClocks				= NULL;
 
 	NVData.gpuSelected							= -1;
 
@@ -203,11 +209,12 @@ HRESULT CGPUUsage::Init(CString DeviceName, CString Device)
 			NvAPI_EnumPhysicalGPUs_t NvAPI_EnumPhysicalGPUs = NULL;
 			NvAPI_GPU_GetFullName_t  NvAPI_GPU_GetFullName  = NULL;
 			if (NvAPI_QueryInterface) {
-				NvAPI_Initialize            = (NvAPI_Initialize_t)(NvAPI_QueryInterface)(0x0150E828);
-				NvAPI_EnumPhysicalGPUs      = (NvAPI_EnumPhysicalGPUs_t)(NvAPI_QueryInterface)(0xE5AC921F);
-				NvAPI_GPU_GetFullName       = (NvAPI_GPU_GetFullName_t)(NvAPI_QueryInterface)(0xCEEE8E9F);
-				NVData.NvAPI_GPU_GetUsages  = (NvAPI_GPU_GetUsages_t)(NvAPI_QueryInterface)(0x189A1FDF);
-				NVData.NvAPI_GPU_GetPStates = (NvAPI_GPU_GetPStates_t)(NvAPI_QueryInterface)(0x60DED2ED);
+				NvAPI_Initialize              = (NvAPI_Initialize_t)(NvAPI_QueryInterface)(0x0150E828);
+				NvAPI_EnumPhysicalGPUs        = (NvAPI_EnumPhysicalGPUs_t)(NvAPI_QueryInterface)(0xE5AC921F);
+				NvAPI_GPU_GetFullName         = (NvAPI_GPU_GetFullName_t)(NvAPI_QueryInterface)(0xCEEE8E9F);
+				NVData.NvAPI_GPU_GetUsages    = (NvAPI_GPU_GetUsages_t)(NvAPI_QueryInterface)(0x189A1FDF);
+				NVData.NvAPI_GPU_GetPStates   = (NvAPI_GPU_GetPStates_t)(NvAPI_QueryInterface)(0x60DED2ED);
+				NVData.NvAPI_GPU_GetAllClocks = (NvAPI_GPU_GetAllClocks_t)(NvAPI_QueryInterface)(0x1BD69F49);
 			}
 			if (NULL == NvAPI_QueryInterface ||
 					NULL == NvAPI_Initialize ||
@@ -252,13 +259,14 @@ HRESULT CGPUUsage::Init(CString DeviceName, CString Device)
 	return m_GPUType == UNKNOWN_GPU ? E_FAIL : S_OK;
 }
 
-const DWORD CGPUUsage::GetUsage()
+void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock)
 {
-	DWORD nGPUCopy = m_nGPUUsage;
+	gpu_usage = m_iGPUUsage;
+	gpu_clock = m_iGPUClock;
 	if (m_GPUType != UNKNOWN_GPU && ::InterlockedIncrement(&m_lRunCount) == 1) {
 		if (!EnoughTimePassed()) {
 			::InterlockedDecrement(&m_lRunCount);
-			return nGPUCopy;
+			return;
 		}
 
 		if (m_GPUType == ATI_GPU) {
@@ -266,12 +274,14 @@ const DWORD CGPUUsage::GetUsage()
 				ADLPMActivity activity = {0};
 				activity.iSize = sizeof(ADLPMActivity);
 				if (ADL_OK == ATIData.ADL_Overdrive5_CurrentActivity_Get(ATIData.iAdapterId, &activity)) {
-					m_nGPUUsage = activity.iActivityPercent;
+					m_iGPUUsage = activity.iActivityPercent;
+					m_iGPUClock = activity.iEngineClock / 100;
 				}
 			} else if (ATIData.iOverdriveVersion == 6) {
 				ADLOD6CurrentStatus currentStatus = {0};
 				if (ADL_OK == ATIData.ADL_Overdrive6_CurrentStatus_Get(ATIData.iAdapterId, &currentStatus)) {
-					m_nGPUUsage = currentStatus.iActivityPercent;
+					m_iGPUUsage = currentStatus.iActivityPercent;
+					m_iGPUClock = currentStatus.iEngineClock / 100;
 				}
 			}
 		} else if (m_GPUType == NVIDIA_GPU) {
@@ -280,22 +290,30 @@ const DWORD CGPUUsage::GetUsage()
 				if (NVData.NvAPI_GPU_GetPStates(NVData.gpuHandles[idx], &NVData.gpuPStates) == OK) {
 					UINT state_gpu = NVData.gpuPStates.pstates[NVAPI_DOMAIN_GPU].present ? NVData.gpuPStates.pstates[NVAPI_DOMAIN_GPU].percent : 0;
 					UINT state_vid = NVData.gpuPStates.pstates[NVAPI_DOMAIN_VID].present ? NVData.gpuPStates.pstates[NVAPI_DOMAIN_VID].percent : 0;
-					m_nGPUUsage = state_vid << 16 | state_gpu;
+					m_iGPUUsage = state_vid << 16 | state_gpu;
 				}
 			} else {
 				if (NVData.NvAPI_GPU_GetUsages(NVData.gpuHandles[idx], &NVData.gpuUsages) == OK) {
-					m_nGPUUsage = NVData.gpuUsages.usage[10] << 16 | NVData.gpuUsages.usage[2];
+					m_iGPUUsage = NVData.gpuUsages.usage[10] << 16 | NVData.gpuUsages.usage[2];
+				}
+			}
+
+			if (NVData.NvAPI_GPU_GetAllClocks
+					&& NVData.NvAPI_GPU_GetAllClocks(NVData.gpuHandles[idx], &NVData.gpuClocks) == OK) {
+				if (NVData.gpuClocks.clock[30] != 0) {
+					m_iGPUClock = NVData.gpuClocks.clock[30] / 2000;
+				} else {
+					m_iGPUClock = NVData.gpuClocks.clock[0] / 1000;
 				}
 			}
 		}
 
-		m_dwLastRun	= GetTickCount();
-		nGPUCopy	= m_nGPUUsage;
+		m_dwLastRun = GetTickCount();
+		gpu_usage = m_iGPUUsage;
+		gpu_clock = m_iGPUClock;
 	}
 
 	::InterlockedDecrement(&m_lRunCount);
-
-	return nGPUCopy;
 }
 
 bool CGPUUsage::EnoughTimePassed()

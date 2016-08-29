@@ -37,10 +37,11 @@ class CGPUUsage
 	typedef int (*ADL_OVERDRIVE6_CAPABILITIES_GET)(int iAdapterIndex, ADLOD6Capabilities *lpODCapabilities);
 	typedef int	(*ADL_OVERDRIVE6_CURRENTSTATUS_GET)(int iAdapterIndex, ADLOD6CurrentStatus *lpCurrentStatus);
 
-	#define OK                         0
-	#define NVAPI_MAX_PHYSICAL_GPUS   64
-	#define NVAPI_MAX_USAGES_PER_GPU  33
-	#define NVAPI_MAX_PSTATES_PER_GPU  8
+	#define OK                            0
+	#define NVAPI_MAX_PHYSICAL_GPUS      64
+	#define NVAPI_MAX_USAGES_PER_GPU     33
+	#define NVAPI_MAX_PSTATES_PER_GPU     8
+	#define NVAPI_MAX_CLOCKS_PER_GPU  0x120
 	struct gpuUsages {
 		UINT version;
 		UINT usage[NVAPI_MAX_USAGES_PER_GPU];
@@ -57,6 +58,11 @@ class CGPUUsage
 		} pstates[NVAPI_MAX_PSTATES_PER_GPU];
 	};
 
+	struct gpuClocks {
+		UINT version;
+		UINT clock[NVAPI_MAX_CLOCKS_PER_GPU];
+	};
+
 	typedef char NvAPI_ShortString[64];
 
 	typedef int *(*NvAPI_QueryInterface_t)(unsigned int offset);
@@ -65,6 +71,7 @@ class CGPUUsage
 	typedef int (*NvAPI_GPU_GetUsages_t)(int *handle, gpuUsages *gpuUsages);
 	typedef int (*NvAPI_GPU_GetPStates_t)(int *handle, gpuPStates *gpuPStates);
 	typedef int (*NvAPI_GPU_GetFullName_t)(int *handle, NvAPI_ShortString gpuName);
+	typedef int (*NvAPI_GPU_GetAllClocks_t)(int *handle, gpuClocks *gpuClocks);
 
 public:
 	enum GPUType {
@@ -77,13 +84,14 @@ public:
 	~CGPUUsage();
 	HRESULT Init(CString DeviceName, CString Device);
 
-	const DWORD		GetUsage();
-	const GPUType	GetType() { return m_GPUType; }
+	void	GetUsage(UINT& gpu_usage, UINT& gpu_clock);
+	GPUType	GetType() const { return m_GPUType; }
 
 private:
 	bool EnoughTimePassed();
 
-	DWORD m_nGPUUsage;
+	UINT m_iGPUUsage;
+	UINT m_iGPUClock;
 	DWORD m_dwLastRun;
 
 	GPUType m_GPUType;
@@ -101,14 +109,16 @@ private:
 	} ATIData;
 
 	struct {
-		HMODULE                hNVApi;
-		int*                   gpuHandles[NVAPI_MAX_PHYSICAL_GPUS];
-		gpuUsages              gpuUsages;
-		gpuPStates             gpuPStates;
-		int                    gpuSelected;
+		HMODULE                  hNVApi;
+		int*                     gpuHandles[NVAPI_MAX_PHYSICAL_GPUS];
+		gpuUsages                gpuUsages;
+		gpuPStates               gpuPStates;
+		gpuClocks                gpuClocks;
+		int                      gpuSelected;
 
-		NvAPI_GPU_GetUsages_t  NvAPI_GPU_GetUsages;
-		NvAPI_GPU_GetPStates_t NvAPI_GPU_GetPStates;
+		NvAPI_GPU_GetUsages_t    NvAPI_GPU_GetUsages;
+		NvAPI_GPU_GetPStates_t   NvAPI_GPU_GetPStates;
+		NvAPI_GPU_GetAllClocks_t NvAPI_GPU_GetAllClocks;
 	} NVData;
 
 	void Clean();
