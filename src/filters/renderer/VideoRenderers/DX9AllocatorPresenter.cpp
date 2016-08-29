@@ -2110,12 +2110,12 @@ void CDX9AllocatorPresenter::DrawStats()
 					m_GPUUsage.GetUsage(gpu_usage, gpu_clock);
 					strText.AppendFormat(L", GPU:%3u%%", gpu_usage & 0xFFFF);
 
-					if (m_GPUUsage.GetType() == CGPUUsage::NVIDIA_GPU) {
-						strText.AppendFormat(L", Video Engine:%3u%%", gpu_usage >> 16);
+					if (gpu_clock) {
+						strText.AppendFormat(L" (%4u MHz)", gpu_clock);
 					}
 
-					if (gpu_clock) {
-						strText.AppendFormat(L", GPU Core Clock:%4uMHz", gpu_clock);
+					if (m_GPUUsage.GetType() == CGPUUsage::NVIDIA_GPU) {
+						strText.AppendFormat(L", Video Engine:%3u%%", gpu_usage >> 16);
 					}
 				}
 
