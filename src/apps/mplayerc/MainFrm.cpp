@@ -629,7 +629,6 @@ CMainFrame::CMainFrame() :
 	m_pFullscreenWnd(NULL),
 	m_pVideoWnd(NULL),
 	m_pOSDWnd(NULL),
-	m_bRemainingTime(false),
 	m_bOSDLocalTime(false),
 	m_bOSDFileName(false),
 	m_nCurSubtitle(-1),
@@ -2493,7 +2492,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 						str_temp = GetSystemLocalTime();
 					}
 
-					if (m_bRemainingTime) {
+					if (AfxGetAppSettings().bOSDRemainingTime) {
 						str_temp.GetLength() > 0 ? str_temp += L"\n" + m_wndStatusBar.GetStatusTimer() : str_temp = m_wndStatusBar.GetStatusTimer();
 					}
 
@@ -6632,9 +6631,10 @@ void CMainFrame::OnViewVSyncOffsetDecrease()
 
 void CMainFrame::OnViewRemainingTime()
 {
-	m_bRemainingTime = !m_bRemainingTime;
+	CAppSettings& s = AfxGetAppSettings();
+	s.bOSDRemainingTime = !s.bOSDRemainingTime;
 
-	if (!m_bRemainingTime) {
+	if (!s.bOSDRemainingTime) {
 		m_OSD.ClearMessage();
 	}
 
