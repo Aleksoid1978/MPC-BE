@@ -25,8 +25,6 @@
 // Memory allocation function
 static void* __stdcall ADL_Main_Memory_Alloc(int iSize)
 {
-	//void* lpBuffer = malloc(iSize);
-	//return lpBuffer;
 	return malloc(iSize);
 }
 
