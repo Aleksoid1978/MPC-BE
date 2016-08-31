@@ -365,7 +365,6 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		}
 
 		// Resizers
-		hr = E_FAIL;
 		hr = InitShaderResizer();
 		if (FAILED(hr)) {
 			iResizer = RESIZER_BILINEAR;
@@ -1191,12 +1190,9 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 		}
 	}
 
-	HRESULT hr = S_OK;
-	CString ErrorMessage;
-
-	hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[iShader], resid);
+	HRESULT hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[iShader], resid);
 #if ENABLE_2PASS_RESIZE
-	if (hr == S_OK && twopass) {
+	if (S_OK == hr && twopass) {
 		hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[iShader + 1], resid + 1);
 	}
 #endif
@@ -1303,7 +1299,6 @@ HRESULT CDX9RenderingEngine::TextureResizeShader(IDirect3DTexture9* pTexture, Ve
 }
 
 #if ENABLE_2PASS_RESIZE
-// The 2 pass sampler is incorrect in that it only does bilinear resampling in the y direction.
 HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, int iShader1)
 {
 	HRESULT hr;
