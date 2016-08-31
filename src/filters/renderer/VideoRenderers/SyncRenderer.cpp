@@ -155,17 +155,17 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	hr = CreateDXDevice(_Error);
 
 	// Define the shader profile.
-	if (m_caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
+	if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
 		m_ShaderProfile = "ps_3_0";
-	} else if (m_caps.PixelShaderVersion >= D3DPS_VERSION(2,0)) {
+	} else if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(2,0)) {
 		// http://en.wikipedia.org/wiki/High-level_shader_language
 
-		if (m_caps.PS20Caps.NumTemps >= 22
-			&& (m_caps.PS20Caps.Caps & (D3DPS20CAPS_ARBITRARYSWIZZLE | D3DPS20CAPS_GRADIENTINSTRUCTIONS |
+		if (m_Caps.PS20Caps.NumTemps >= 22
+			&& (m_Caps.PS20Caps.Caps & (D3DPS20CAPS_ARBITRARYSWIZZLE | D3DPS20CAPS_GRADIENTINSTRUCTIONS |
 			D3DPS20CAPS_PREDICATION | D3DPS20CAPS_NODEPENDENTREADLIMIT | D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT))) {
 			m_ShaderProfile = "ps_2_a";
-		} else if (m_caps.PS20Caps.NumTemps >= 32
-			&& (m_caps.PS20Caps.Caps & D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT)) {
+		} else if (m_Caps.PS20Caps.NumTemps >= 32
+			&& (m_Caps.PS20Caps.Caps & D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT)) {
 			m_ShaderProfile = "ps_2_b";
 		} else {
 			m_ShaderProfile = "ps_2_0";
@@ -394,8 +394,8 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	m_pPSC.Free();
 	m_pD3DDevEx = NULL;
 
-	for (int i = 0; i < _countof(m_pResizerPixelShader); i++) {
-		m_pResizerPixelShader[i] = NULL;
+	for (int i = 0; i < _countof(m_pResizerPixelShaders); i++) {
+		m_pResizerPixelShaders[i] = NULL;
 	}
 
 	POSITION pos = m_pPixelShadersScreenSpace.GetHeadPosition();
@@ -429,8 +429,8 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		return E_UNEXPECTED;
 	}
 
-	if (FAILED(m_pD3DEx->GetDeviceCaps(m_CurrentAdapter, D3DDEVTYPE_HAL, &m_caps))) {
-		if ((m_caps.Caps & D3DCAPS_READ_SCANLINE) == 0) {
+	if (FAILED(m_pD3DEx->GetDeviceCaps(m_CurrentAdapter, D3DDEVTYPE_HAL, &m_Caps))) {
+		if ((m_Caps.Caps & D3DCAPS_READ_SCANLINE) == 0) {
 			_Error += L"Video card does not have scanline access. Display synchronization is not possible.\n";
 			return E_UNEXPECTED;
 		}
@@ -562,7 +562,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 
 	m_pPSC.Attach(DNew CPixelShaderCompiler(m_pD3DDevEx, true));
 
-	if (m_caps.StretchRectFilterCaps&D3DPTFILTERCAPS_MINFLINEAR && m_caps.StretchRectFilterCaps&D3DPTFILTERCAPS_MAGFLINEAR) {
+	if (m_Caps.StretchRectFilterCaps&D3DPTFILTERCAPS_MINFLINEAR && m_Caps.StretchRectFilterCaps&D3DPTFILTERCAPS_MAGFLINEAR) {
 		m_filter = D3DTEXF_LINEAR;
 	} else {
 		m_filter = D3DTEXF_NONE;
@@ -793,18 +793,18 @@ HRESULT CBaseAP::InitShaderResizer()
 		return E_INVALIDARG;
 	}
 
-	if (m_pResizerPixelShader[iShader]) {
+	if (m_pResizerPixelShaders[iShader]) {
 		return S_OK;
 	}
 
-	if (m_caps.PixelShaderVersion < D3DPS_VERSION(2, 0)) {
+	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(2, 0)) {
 		return E_FAIL;
 	}
 
 	bool twopass = false;
 	UINT resid = 0;
 
-	if (m_caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
+	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 		switch (iShader) {
 		case shader_smootherstep: resid = IDF_SHADER_PS20_SMOOTHERSTEP; break;
 #if ENABLE_2PASS_RESIZE
@@ -913,10 +913,10 @@ HRESULT CBaseAP::InitShaderResizer()
 		}
 	}
 
-	HRESULT hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShader[iShader], resid);
+	HRESULT hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[iShader], resid);
 #if ENABLE_2PASS_RESIZE
 	if (S_OK == hr && twopass) {
-		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShader[iShader + 1], resid + 1);
+		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[iShader + 1], resid + 1);
 	}
 #endif
 	if (FAILED(hr)) {
@@ -925,18 +925,18 @@ HRESULT CBaseAP::InitShaderResizer()
 	}
 
 #if ENABLE_2PASS_RESIZE
-	if (!m_pResizerPixelShader[shader_downscaling_x] || !m_pResizerPixelShader[shader_downscaling_y]) {
+	if (!m_pResizerPixelShaders[shader_downscaling_x] || !m_pResizerPixelShaders[shader_downscaling_y]) {
 		UINT resid = m_caps.PixelShaderVersion < D3DPS_VERSION(3, 0) ? IDF_SHADER_PS20_DOWNSCALING_X : IDF_SHADER_DOWNSCALING_X;
-		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShader[shader_downscaling_x], resid);
+		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[shader_downscaling_x], resid);
 		if (S_OK == hr) {
-			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShader[shader_downscaling_y], resid + 1);
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[shader_downscaling_y], resid + 1);
 		}
 		ASSERT(S_OK == hr);
 	}
 #else
-	if (!m_pResizerPixelShader[shader_downscaling]) {
-		UINT resid = m_caps.PixelShaderVersion < D3DPS_VERSION(3, 0) ? IDF_SHADER_PS20_DOWNSCALING : IDF_SHADER_DOWNSCALING;
-		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShader[shader_downscaling], resid);
+	if (!m_pResizerPixelShaders[shader_downscaling]) {
+		UINT resid = m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0) ? IDF_SHADER_PS20_DOWNSCALING : IDF_SHADER_DOWNSCALING;
+		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[shader_downscaling], resid);
 		ASSERT(S_OK == hr);
 	}
 #endif
@@ -1044,16 +1044,16 @@ HRESULT CBaseAP::TextureResizeShader(IDirect3DTexture9* pTexture, Vector dst[4],
 	};
 
 	hr = m_pD3DDevEx->SetTexture(0, pTexture);
-	if (m_pResizerPixelShader[shader_downscaling] && rx > 2.0f && ry > 2.0f) {
+	if (m_pResizerPixelShaders[shader_downscaling] && rx > 2.0f && ry > 2.0f) {
 		float fConstData[][4] = {{dx, dy, 0, 0}, {rx, 0, 0, 0}, {ry, 0, 0, 0}};
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShader[shader_downscaling]);
+		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[shader_downscaling]);
 		m_wsResizer = L"Simple averaging";
 	}
 	else {
 		float fConstData[][4] = { { dx, dy, 0, 0 }, { dx*0.5f, dy*0.5f, 0, 0 }, { dx, 0, 0, 0 }, { 0, dy, 0, 0 } };
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShader[iShader]);
+		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader]);
 	}
 	hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_POINT);
 	m_pD3DDevEx->SetPixelShader(NULL);
@@ -1138,12 +1138,12 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector ds
 	if (rx > 2.0f) {
 		float fConstData[][4] = { { dx0, dy0, 0, 0 },{ rx, 0, 0, 0 },{ ry, 0, 0, 0 } };
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShader[shader_downscaling_x]);
+		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[shader_downscaling_x]);
 	}
 	else {
 		float fConstData[][4] = { { dx0, dy0, 0, 0 } };
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShader[iShader1]);
+		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader1]);
 	}
 	hr = TextureBlt(m_pD3DDevEx, vx, D3DTEXF_POINT);
 
@@ -1155,12 +1155,12 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector ds
 	if (ry > 2.0f) {
 		float fConstData[][4] = { { dx1, dy1, 0, 0 },{ rx, 0, 0, 0 },{ ry, 0, 0, 0 } };
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShader[shader_downscaling_y]);
+		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[shader_downscaling_y]);
 	}
 	else {
 		float fConstData[][4] = { { dx1, dy1, 0, 0 } };
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShader[iShader1 + 1]);
+		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader1 + 1]);
 	}
 	hr = TextureBlt(m_pD3DDevEx, vy, D3DTEXF_POINT);
 
@@ -1485,8 +1485,8 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			// init post-resize pixel shaders
 			bool bScreenSpacePixelShaders = m_pPixelShadersScreenSpace.GetCount() > 0;
 			if (bScreenSpacePixelShaders && (!m_pScreenSizeTextures[0] || !m_pScreenSizeTextures[1])) {
-				UINT texWidth = min((DWORD)m_ScreenSize.cx, m_caps.MaxTextureWidth);
-				UINT texHeight = min((DWORD)m_ScreenSize.cy, m_caps.MaxTextureHeight);
+				UINT texWidth = min((DWORD)m_ScreenSize.cx, m_Caps.MaxTextureWidth);
+				UINT texHeight = min((DWORD)m_ScreenSize.cy, m_Caps.MaxTextureHeight);
 
 				if (D3D_OK != m_pD3DDevEx->CreateTexture(
 							texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
@@ -1927,7 +1927,7 @@ void CBaseAP::DrawStats()
 				OffsetRect(&rc, 0, TextHeight);
 			}
 
-			if ((m_caps.Caps & D3DCAPS_READ_SCANLINE) == 0) {
+			if ((m_Caps.Caps & D3DCAPS_READ_SCANLINE) == 0) {
 				strText = L"Scan line err: Graphics device does not support scan line access. No sync is possible";
 				DrawText(rc, strText, 1);
 				OffsetRect(&rc, 0, TextHeight);
