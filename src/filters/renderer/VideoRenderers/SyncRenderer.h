@@ -154,7 +154,7 @@ namespace GothSync
 		CComPtr<IDirect3DDevice9Ex>	m_pD3DDevEx;
 
 		UINT						m_CurrentAdapter;
-		D3DCAPS9					m_caps;
+		D3DCAPS9					m_Caps;
 		D3DFORMAT					m_SurfaceFmt;
 		D3DFORMAT					m_BackbufferFmt;
 		D3DFORMAT					m_DisplayFmt;
@@ -196,7 +196,7 @@ namespace GothSync
 		CAutoPtr<CPixelShaderCompiler>	m_pPSC;
 		CAtlList<CExternalPixelShader>	m_pPixelShaders;
 		CAtlList<CExternalPixelShader>	m_pPixelShadersScreenSpace;
-		CComPtr<IDirect3DPixelShader9>	m_pResizerPixelShader[shader_count];
+		CComPtr<IDirect3DPixelShader9>	m_pResizerPixelShaders[shader_count];
 
 		bool SettingsNeedResetDevice();
 		void SendResetRequest();
