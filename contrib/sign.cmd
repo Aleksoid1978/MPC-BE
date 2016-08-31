@@ -11,16 +11,12 @@ IF NOT EXIST "%~dp0signinfo.txt" (
   GOTO END
 )
 
-IF DEFINED VS140COMNTOOLS (
-  SET "VSCOMNTOOLS=%VS140COMNTOOLS%"
-) ELSE IF DEFINED VS120COMNTOOLS (
-  SET "VSCOMNTOOLS=%VS120COMNTOOLS%"
-) ELSE (
-  ECHO %~nx0: Visual Studio does not seem to be installed...
+IF NOT DEFINED VS140COMNTOOLS (
+  ECHO %~nx0: Visual Studio 2015 does not seem to be installed...
   GOTO END
 )
 
-CALL "%VSCOMNTOOLS%..\..\VC\vcvarsall.bat" x86 > nul
+CALL "%VS140COMNTOOLS%..\..\VC\vcvarsall.bat" x86 > nul
 
 TITLE Signing "%~1"...
 ECHO. & ECHO Signing "%~1"...
