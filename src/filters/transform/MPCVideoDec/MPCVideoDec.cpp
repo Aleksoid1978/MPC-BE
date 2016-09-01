@@ -2506,6 +2506,21 @@ static inline int decode(AVCodecContext *avctx, AVFrame *frame, int *got_picture
 	return ret;
 }
 
+static BOOL GOPFound(BYTE *buf, int len)
+{
+	if (buf && len > 0) {
+		CGolombBuffer gb(buf, len);
+		BYTE state = 0x00;
+		while (gb.NextMpegStartCode(state)) {
+			if (state == 0xb8) { // GOP
+				return TRUE;
+			}
+		}
+	}
+
+	return FALSE;
+}
+
 #define Continue av_frame_unref(m_pFrame); continue;
 HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn)
 {
@@ -2634,6 +2649,11 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 						avpkt.duration = rtStop - rtStart;
 					} else {
 						avpkt.duration = 0;
+					}
+
+					if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO && m_bWaitingForKeyFrame
+							&& GOPFound(avpkt.data, avpkt.size)) {
+						m_bWaitingForKeyFrame = FALSE;
 					}
 				} else {
 					avpkt.data = NULL;
