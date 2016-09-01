@@ -194,7 +194,7 @@ private:
 
 	BOOL					IsBitstream(WAVEFORMATEX *pWaveFormatEx);
 	HRESULT					SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex);
-	void					CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec);
+	void					CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec, WORD wValidBitsPerSample = 0);
 
 	HRESULT					StartAudioClient();
 	HRESULT					StopAudioClient();
@@ -268,6 +268,8 @@ private:
 	CSimpleArray<WORD>		m_wBitsPerSampleList;
 	CSimpleArray<WORD>		m_nChannelsList;
 	CSimpleArray<DWORD>		m_dwChannelMaskList;
+
+	BOOL					m_bReal32bitSupport;
 
 	struct AudioParams {
 		WORD  wBitsPerSample;

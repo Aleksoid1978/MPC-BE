@@ -160,6 +160,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_bNeedReinitializeFull(FALSE)
 	, m_FlushEvent(TRUE)
 	, m_ReceiveEvent(TRUE)
+	, m_bReal32bitSupport(FALSE)
 {
 	DLog(L"CMpcAudioRenderer::CMpcAudioRenderer()");
 
@@ -2012,7 +2013,7 @@ HRESULT CMpcAudioRenderer::SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE
 	return S_OK;
 }
 
-void CMpcAudioRenderer::CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec)
+void CMpcAudioRenderer::CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec, WORD wValidBitsPerSample/* = 0*/)
 {
 	ZeroMemory(&wfex, sizeof(wfex));
 
@@ -2027,8 +2028,10 @@ void CMpcAudioRenderer::CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSa
 	wfex.Format.cbSize                   = sizeof(wfex) - sizeof(wfex.Format);
 	wfex.SubFormat                       = MEDIASUBTYPE_PCM;
 	wfex.dwChannelMask                   = dwChannelMask;
-	wfex.Samples.wValidBitsPerSample     = wBitsPerSample;
-	if (wfex.Samples.wValidBitsPerSample == 32) {
+	wfex.Samples.wValidBitsPerSample     = wValidBitsPerSample ? wValidBitsPerSample : wBitsPerSample;
+	if (wfex.Samples.wValidBitsPerSample == 32
+			&& !wValidBitsPerSample
+			&& !m_bReal32bitSupport) {
 		wfex.Samples.wValidBitsPerSample = 24;
 	}
 }
@@ -2118,6 +2121,8 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 		m_nChannelsList.RemoveAll();
 		m_dwChannelMaskList.RemoveAll();
 		m_AudioParamsList.RemoveAll();
+
+		m_bReal32bitSupport = FALSE;
 	}
 	SAFE_DELETE_ARRAY(m_pWaveFileFormatOutput);
 
@@ -2499,14 +2504,22 @@ HRESULT CMpcAudioRenderer::CreateAudioClient()
 		DLog(L"CMpcAudioRenderer::CreateAudioClient() - success");
 		if (!m_wBitsPerSampleList.GetSize()) {
 			// get list of supported output formats - wBitsPerSample, nChannels(dwChannelMask), nSamplesPerSec
-			const WORD wBitsPerSampleValues[]  = {16, 24, 32};
+			const WORD  wBitsPerSampleValues[] = {16, 24, 32};
 			const DWORD nSamplesPerSecValues[] = {44100, 48000, 88200, 96000, 176400, 192000};
-			const WORD nChannelsValues[]       = {2, 4, 4, 6, 6, 8, 8};
+			const WORD  nChannelsValues[]      = {2, 4, 4, 6, 6, 8, 8};
 			const DWORD dwChannelMaskValues[]  = {
 				KSAUDIO_SPEAKER_STEREO,
 				KSAUDIO_SPEAKER_QUAD, KSAUDIO_SPEAKER_SURROUND,
 				KSAUDIO_SPEAKER_5POINT1_SURROUND, KSAUDIO_SPEAKER_5POINT1,
 				KSAUDIO_SPEAKER_7POINT1_SURROUND, KSAUDIO_SPEAKER_7POINT1
+			};
+
+			auto RemoveAll = [&]() {
+				m_wBitsPerSampleList.RemoveAll();
+				m_nChannelsList.RemoveAll();
+				m_dwChannelMaskList.RemoveAll();
+				m_AudioParamsList.RemoveAll();
+				m_bReal32bitSupport = FALSE;
 			};
 
 			WAVEFORMATEXTENSIBLE wfex;
@@ -2515,18 +2528,20 @@ HRESULT CMpcAudioRenderer::CreateAudioClient()
 			for (int i = 0; i < _countof(wBitsPerSampleValues); i++) {
 				for (int k = 0; k < _countof(nSamplesPerSecValues); k++) {
 					CreateFormat(wfex, wBitsPerSampleValues[i], 2, KSAUDIO_SPEAKER_STEREO, nSamplesPerSecValues[k]);
-					if (S_OK == m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfex, NULL)
-							&& m_wBitsPerSampleList.Find(wBitsPerSampleValues[i]) == -1) {
-						m_wBitsPerSampleList.Add(wBitsPerSampleValues[i]);
+					if (S_OK == m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfex, NULL)) {
+						if (m_wBitsPerSampleList.Find(wBitsPerSampleValues[i]) == -1) {
+							m_wBitsPerSampleList.Add(wBitsPerSampleValues[i]);
+						}
+
+						if (wBitsPerSampleValues[i] == 32) {
+							CreateFormat(wfex, wBitsPerSampleValues[i], 2, KSAUDIO_SPEAKER_STEREO, nSamplesPerSecValues[k], 32);
+							m_bReal32bitSupport = (S_OK == m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfex, NULL));
+						}
 					}
 				}
 			}
 			if (m_wBitsPerSampleList.GetSize() == 0) {
-				m_wBitsPerSampleList.RemoveAll();
-				m_nChannelsList.RemoveAll();
-				m_dwChannelMaskList.RemoveAll();
-				m_AudioParamsList.RemoveAll();
-
+				RemoveAll();
 				return hr;
 			}
 
@@ -2541,11 +2556,7 @@ HRESULT CMpcAudioRenderer::CreateAudioClient()
 				}
 			}
 			if (m_AudioParamsList.GetSize() == 0) {
-				m_wBitsPerSampleList.RemoveAll();
-				m_nChannelsList.RemoveAll();
-				m_dwChannelMaskList.RemoveAll();
-				m_AudioParamsList.RemoveAll();
-
+				RemoveAll();
 				return hr;
 			}
 
@@ -2559,11 +2570,7 @@ HRESULT CMpcAudioRenderer::CreateAudioClient()
 				}
 			}
 			if (m_nChannelsList.GetSize() == 0) {
-				m_wBitsPerSampleList.RemoveAll();
-				m_nChannelsList.RemoveAll();
-				m_dwChannelMaskList.RemoveAll();
-				m_AudioParamsList.RemoveAll();
-
+				RemoveAll();
 				return hr;
 			}
 
@@ -2571,7 +2578,11 @@ HRESULT CMpcAudioRenderer::CreateAudioClient()
 			DLog(L"    List of supported output formats:");
 			DLog(L"        BitsPerSample:");
 			for (int i = 0; i < m_wBitsPerSampleList.GetSize(); i++) {
-				DLog(L"            %d", m_wBitsPerSampleList[i]);
+				if (m_wBitsPerSampleList[i] == 32 && !m_bReal32bitSupport) {
+					DLog(L"            24 padded to 32");
+				} else {
+					DLog(L"            %d", m_wBitsPerSampleList[i]);
+				}
 				DLog(L"            SamplesPerSec:");
 				for (int k = 0; k < m_AudioParamsList.GetSize(); k++) {
 					if (m_AudioParamsList[k].wBitsPerSample == m_wBitsPerSampleList[i]) {
