@@ -926,7 +926,7 @@ HRESULT CBaseAP::InitShaderResizer()
 
 #if ENABLE_2PASS_RESIZE
 	if (!m_pResizerPixelShaders[shader_downscaling_x] || !m_pResizerPixelShaders[shader_downscaling_y]) {
-		UINT resid = m_caps.PixelShaderVersion < D3DPS_VERSION(3, 0) ? IDF_SHADER_PS20_DOWNSCALING_X : IDF_SHADER_DOWNSCALING_X;
+		UINT resid = m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0) ? IDF_SHADER_PS20_DOWNSCALING_X : IDF_SHADER_DOWNSCALING_X;
 		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[shader_downscaling_x], resid);
 		if (S_OK == hr) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[shader_downscaling_y], resid + 1);
@@ -1071,8 +1071,8 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector ds
 		return E_FAIL;
 	}
 
-	UINT texWidth = min((UINT)m_ScreenSize.cx, m_caps.MaxTextureWidth);
-	UINT TexHeight = min((UINT)m_nativeVideoSize.cy, m_caps.MaxTextureHeight);
+	UINT texWidth = min((UINT)m_ScreenSize.cx, m_Caps.MaxTextureWidth);
+	UINT TexHeight = min((UINT)m_nativeVideoSize.cy, m_Caps.MaxTextureHeight);
 	if (!m_pResizeTexture) {
 		hr = m_pD3DDevEx->CreateTexture(
 			texWidth, TexHeight, 1, D3DUSAGE_RENDERTARGET,
