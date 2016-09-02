@@ -5,6 +5,7 @@
 
 #ifndef LIB_JSONCPP_JSON_TOOL_H_INCLUDED
 #define LIB_JSONCPP_JSON_TOOL_H_INCLUDED
+#include <clocale>
 
 /* This header provides common string manipulation support, such as UTF-8,
  * portable conversion from/to string...
@@ -13,6 +14,26 @@
  */
 
 namespace Json {
+
+/// Fallback for decimal_point on android, where the lconv is an empty struct.
+template<typename Lconv, bool=(sizeof(Lconv) >= sizeof(char*))>
+struct Locale {
+  static char decimalPoint() {
+    return '\0';
+  }
+};
+
+/// Return decimal_point for the current locale.
+template<typename Lconv>
+struct Locale<Lconv, true> {
+  static char decimalPoint() {
+    Lconv* lc = localeconv();
+    if (lc == NULL) {
+      return '\0';
+    }
+    return *(lc->decimal_point);
+  }
+};
 
 /// Converts a unicode code-point to UTF-8.
 static inline JSONCPP_STRING codePointToUTF8(unsigned int cp) {
@@ -79,6 +100,18 @@ static inline void fixNumericLocale(char* begin, char* end) {
       *begin = '.';
     }
     ++begin;
+  }
+}
+
+static inline void fixNumericLocaleInput(char* begin, char* end) {
+  char decimalPoint = Locale<struct lconv>::decimalPoint();
+  if (decimalPoint != '\0' && decimalPoint != '.') {
+    while (begin < end) {
+      if (*begin == '.') {
+        *begin = decimalPoint;
+      }
+      ++begin;
+    }
   }
 }
 
