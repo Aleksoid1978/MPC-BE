@@ -21,9 +21,13 @@
 #pragma once
 
 namespace ColorConvert {
-	COLORREF YCrCbToRGB_Rec601(BYTE Y, BYTE Cr, BYTE Cb, bool TV_RANGE = true);
-	DWORD    YCrCbToRGB_Rec601(BYTE A, BYTE Y, BYTE Cr, BYTE Cb, bool TV_RANGE = true);
+	enum convertType {
+		DEFAULT,
+		TV_2_TV = DEFAULT,
+		PC_2_PC,
+		TV_2_PC,
+		PC_2_TV
+	};
 
-	COLORREF YCrCbToRGB_Rec709(BYTE Y, BYTE Cr, BYTE Cb, bool TV_RANGE = true);
-	DWORD    YCrCbToRGB_Rec709(BYTE A, BYTE Y, BYTE Cr, BYTE Cb, bool TV_RANGE = true);
+	DWORD YCrCbToRGB(BYTE A, BYTE Y, BYTE Cr, BYTE Cb, bool bRec709, convertType type = convertType::DEFAULT);
 } // namespace ColorConvert
