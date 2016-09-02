@@ -20,6 +20,8 @@
 
 #include <dxva.h>
 
+#define MAX_VC1_PICTURE_CONTEXT 2
+
 typedef struct DXVA_VC1_Picture_Context {
     DXVA_PictureParameters   pp;
     DXVA_SliceInfo           slice;
@@ -27,8 +29,8 @@ typedef struct DXVA_VC1_Picture_Context {
     unsigned                 bitstream_size;
 } DXVA_VC1_Picture_Context;
 typedef struct DXVA_VC1_Context {
-    unsigned                 frame_count;
-    DXVA_VC1_Picture_Context ctx_pic[2];	
+    unsigned                 ctx_pic_count;
+    DXVA_VC1_Picture_Context ctx_pic[MAX_VC1_PICTURE_CONTEXT];
 } DXVA_VC1_Context;
 
 void vc1_getcurframe(struct AVCodecContext* avctx, AVFrame** frame);

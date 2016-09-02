@@ -1725,12 +1725,14 @@ static int mpeg_field_start(MpegEncContext *s, const uint8_t *buf, int buf_size)
     // ==> Start patch MPC
     if (avctx->using_dxva && avctx->dxva_context) {
         dxva_context* ctx = (dxva_context*)avctx->dxva_context;
-        DXVA_MPEG2_Context* decoder_ctx = (DXVA_MPEG2_Context*)ctx->dxva_decoder_context;
-        decoder_ctx->frame_count++;
-        if (decoder_ctx->frame_count <= 2) {
-            DXVA_MPEG2_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[decoder_ctx->frame_count - 1];
-            if (dxva_start_frame(avctx, decoder_ctx, ctx_pic) < 0)
-                return AVERROR_INVALIDDATA;
+        if (ctx->dxva_decoder_context) {
+            DXVA_MPEG2_Context* decoder_ctx = (DXVA_MPEG2_Context*)ctx->dxva_decoder_context;
+            if (decoder_ctx->ctx_pic_count < MAX_MPEG2_PICTURE_CONTEXT) {
+                DXVA_MPEG2_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[decoder_ctx->ctx_pic_count];
+                if (dxva_start_frame(avctx, decoder_ctx, ctx_pic) < 0)
+                    return AVERROR_INVALIDDATA;
+                decoder_ctx->ctx_pic_count++;
+            }
         }
     }
     // ==> End patch MPC
@@ -1822,20 +1824,22 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
     // ==> Start patch MPC
     if (avctx->using_dxva && avctx->dxva_context) {
         dxva_context* ctx = (dxva_context*)avctx->dxva_context;
-        DXVA_MPEG2_Context* decoder_ctx = (DXVA_MPEG2_Context*)ctx->dxva_decoder_context;
-        if (decoder_ctx->frame_count <= 2) {
-            DXVA_MPEG2_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[decoder_ctx->frame_count - 1];
-            const uint8_t *buf_end, *buf_start = *buf - 4; /* include start_code */
-            int start_code = -1;
-            buf_end = avpriv_find_start_code(buf_start + 2, *buf + buf_size, &start_code);
-            if (buf_end < *buf + buf_size)
-                buf_end -= 4;
-            s->mb_y = mb_y;
-		    if (dxva_decode_slice(avctx, ctx_pic, buf_start, buf_end - buf_start) < 0)
-                return DECODE_SLICE_ERROR;
-            *buf = buf_end;
-		}
-        return DECODE_SLICE_OK;
+        if (ctx->dxva_decoder_context) {
+            DXVA_MPEG2_Context* decoder_ctx = (DXVA_MPEG2_Context*)ctx->dxva_decoder_context;
+            if (decoder_ctx->ctx_pic_count && decoder_ctx->ctx_pic_count <= MAX_MPEG2_PICTURE_CONTEXT) {
+                DXVA_MPEG2_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[decoder_ctx->ctx_pic_count - 1];
+                const uint8_t *buf_end, *buf_start = *buf - 4; /* include start_code */
+                int start_code = -1;
+                buf_end = avpriv_find_start_code(buf_start + 2, *buf + buf_size, &start_code);
+                if (buf_end < *buf + buf_size)
+                    buf_end -= 4;
+                s->mb_y = mb_y;
+                if (dxva_decode_slice(avctx, ctx_pic, buf_start, buf_end - buf_start) < 0)
+                    return DECODE_SLICE_ERROR;
+                *buf = buf_end;
+            }
+            return DECODE_SLICE_OK;
+        }
     }
     // ==> End patch MPC
 

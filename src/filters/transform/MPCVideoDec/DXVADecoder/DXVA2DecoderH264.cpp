@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,7 +40,7 @@ CDXVA2DecoderH264::CDXVA2DecoderH264(CMPCVideoDecFilter* pFilter, IDirectXVideoD
 
 HRESULT CDXVA2DecoderH264::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDXVASize/* = UINT_MAX*/)
 {
-	DXVA_H264_Picture_Context *ctx_pic	= &m_DXVA_Context.ctx_pic[m_nFieldNum];
+	DXVA_H264_Picture_Context *ctx_pic	= &m_DXVA_Context.ctx_pic[m_ctx_pic_num];
 	DXVA_Slice_H264_Short *slice		= NULL;
 	BYTE* current						= pDXVABuffer;
 	UINT MBCount						= FFGetMBCount(m_pFilter->GetAVCtx());
@@ -100,14 +100,14 @@ HRESULT CDXVA2DecoderH264::ProcessDXVAFrame(IMediaSample* pSample)
 {
 	HRESULT hr = S_OK;
 
-	for (UINT i = 0; i < m_DXVA_Context.frame_count; i++) {
+	for (UINT i = 0; i < m_DXVA_Context.ctx_pic_count; i++) {
 		DXVA_H264_Picture_Context* ctx_pic = &m_DXVA_Context.ctx_pic[i];
 
 		if (!ctx_pic->slice_count) {
 			continue;
 		}
 
-		m_nFieldNum = i;
+		m_ctx_pic_num = i;
 
 		// Begin frame
 		CHECK_HR_FALSE (BeginFrame(pSample));

@@ -767,9 +767,6 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size)
     int nals_needed = 0; ///< number of NALs that need decoding before the next frame thread starts
     int idr_cleared=0;
     int i, ret = 0;
-    // ==> Start patch MPC
-    int nal_pass = 0;
-    // ==> End patch MPC
 
     h->nal_unit_type= 0;
 
@@ -848,16 +845,17 @@ again:
                     decode_postinit(h, i >= nals_needed);
 
                 // ==> Start patch MPC
-                if (h->avctx->using_dxva && nal_pass < 2) {
-                    dxva_context* ctx = (dxva_context*)avctx->dxva_context;
-                    if (ctx && ctx->dxva_decoder_context) {
+                if (h->avctx->using_dxva && h->avctx->dxva_context) {
+                    dxva_context* ctx = (dxva_context*)h->avctx->dxva_context;
+                    if (ctx->dxva_decoder_context) {
                         DXVA_H264_Context* decoder_ctx = (DXVA_H264_Context*)ctx->dxva_decoder_context;
-                        decoder_ctx->frame_count++;
-                        DXVA_H264_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[nal_pass];
-                        dxva_start_frame(avctx, ctx_pic);
+                        if (decoder_ctx->ctx_pic_count < MAX_H264_PICTURE_CONTEXT) {
+                            DXVA_H264_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[decoder_ctx->ctx_pic_count];
+                            dxva_start_frame(avctx, ctx_pic);
+                            decoder_ctx->ctx_pic_count++;
+                        }
                     }
                 }
-                nal_pass++;
                 // ==> End patch MPC
 
                 if (h->avctx->hwaccel &&
@@ -871,14 +869,16 @@ again:
             }
 
             // ==> Start patch MPC
-            if (h->avctx->using_dxva && nal_pass <= 2) {
-                dxva_context* ctx = (dxva_context*)avctx->dxva_context;
-                if (ctx && ctx->dxva_decoder_context) {
+            if (h->avctx->using_dxva && h->avctx->dxva_context) {
+                dxva_context* ctx = (dxva_context*)h->avctx->dxva_context;
+                if (ctx->dxva_decoder_context) {
                     DXVA_H264_Context* decoder_ctx = (DXVA_H264_Context*)ctx->dxva_decoder_context;
-                    DXVA_H264_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[nal_pass - 1];
-                    ret = dxva_decode_slice(avctx, ctx_pic, nal->raw_data, nal->raw_size);
-                    if (ret < 0)
-                        goto end;
+                    if (decoder_ctx->ctx_pic_count && decoder_ctx->ctx_pic_count <= MAX_H264_PICTURE_CONTEXT) {
+                        DXVA_H264_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[decoder_ctx->ctx_pic_count - 1];
+                        ret = dxva_decode_slice(avctx, ctx_pic, nal->raw_data, nal->raw_size);
+                        if (ret < 0)
+                            goto end;
+                    }
                 }
             }
             // ==> End patch MPC
