@@ -34,18 +34,14 @@ CompositionObject::~CompositionObject()
 	SAFE_DELETE_ARRAY(m_pRLEData);
 }
 
-void CompositionObject::SetPalette(int nNbEntry, HDMV_PALETTE* pPalette, bool b709, bool bTV_Range/* = true*/, bool bIsRGB/* = false*/)
+void CompositionObject::SetPalette(int nNbEntry, HDMV_PALETTE* pPalette, bool bRec709, ColorConvert::convertType type/* = ColorConvert::convertType::DEFAULT*/, bool bIsRGB/* = false*/)
 {
 	m_nColorNumber = nNbEntry;
 	for (int i = 0; i < nNbEntry; i++) {
 		if (bIsRGB) {
 			m_Colors[pPalette[i].entry_id] = D3DCOLOR_ARGB(pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb);
 		} else {
-			if (b709) {
-				m_Colors[pPalette[i].entry_id] = ColorConvert::YCrCbToRGB_Rec709(pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb, bTV_Range);
-			} else {
-				m_Colors[pPalette[i].entry_id] = ColorConvert::YCrCbToRGB_Rec601(pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb, bTV_Range);
-			}
+			m_Colors[pPalette[i].entry_id] = ColorConvert::YCrCbToRGB(pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb, bRec709, type);
 		}
 	}
 }
