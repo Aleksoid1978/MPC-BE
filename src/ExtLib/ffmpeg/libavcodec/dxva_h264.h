@@ -20,7 +20,8 @@
 
 #include <dxva.h>
 
-#define MAX_H264_SLICES 32
+#define MAX_H264_SLICES          32
+#define MAX_H264_PICTURE_CONTEXT  2
 
 typedef struct DXVA_H264_Picture_Context {
     DXVA_PicParams_H264       pp;
@@ -32,8 +33,8 @@ typedef struct DXVA_H264_Picture_Context {
     unsigned                  bitstream_size;
 } DXVA_H264_Picture_Context;
 typedef struct DXVA_H264_Context {
-    unsigned                  frame_count;
-    DXVA_H264_Picture_Context ctx_pic[2];
+    unsigned                  ctx_pic_count;
+    DXVA_H264_Picture_Context ctx_pic[MAX_H264_PICTURE_CONTEXT];
 } DXVA_H264_Context;
 
 void h264_getcurframe(struct AVCodecContext* avctx, AVFrame** frame);

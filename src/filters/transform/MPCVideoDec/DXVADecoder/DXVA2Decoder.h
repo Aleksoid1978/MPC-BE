@@ -84,6 +84,6 @@ protected :
 
 	DXVA2_ConfigPictureDecode		m_DXVA2Config;
 
-	UINT							m_nFieldNum;
+	UINT							m_ctx_pic_num;
 	dxva_context					m_dxva_context;
 };

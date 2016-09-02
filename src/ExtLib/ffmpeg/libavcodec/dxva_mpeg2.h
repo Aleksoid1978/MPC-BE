@@ -20,7 +20,9 @@
 
 #include <dxva.h>
 
-#define MAX_SLICE 1024
+#define MAX_SLICE                 1024
+#define MAX_MPEG2_PICTURE_CONTEXT    2
+
 typedef struct DXVA_MPEG2_Picture_Context {
     DXVA_PictureParameters     pp;
     DXVA_QmatrixData           qm;
@@ -32,8 +34,8 @@ typedef struct DXVA_MPEG2_Picture_Context {
     int                        frame_start;
 } DXVA_MPEG2_Picture_Context;
 typedef struct DXVA_MPEG2_Context {
-    unsigned                   frame_count;
-    DXVA_MPEG2_Picture_Context ctx_pic[2];	
+    unsigned                   ctx_pic_count;
+    DXVA_MPEG2_Picture_Context ctx_pic[MAX_MPEG2_PICTURE_CONTEXT];
 } DXVA_MPEG2_Context;
 
 void mpeg2_getcurframe(struct AVCodecContext* avctx, AVFrame** frame);
