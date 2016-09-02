@@ -169,11 +169,6 @@ extern void				UnRegisterSourceFilter(const GUID& subtype);
 
 extern CString			GetDXVAMode(const GUID* guidDecoder);
 
-extern COLORREF			YCrCbToRGB_Rec601(BYTE Y, BYTE Cr, BYTE Cb);
-extern COLORREF			YCrCbToRGB_Rec709(BYTE Y, BYTE Cr, BYTE Cb);
-extern DWORD			YCrCbToRGB_Rec601(BYTE A, BYTE Y, BYTE Cr, BYTE Cb);
-extern DWORD			YCrCbToRGB_Rec709(BYTE A, BYTE Y, BYTE Cr, BYTE Cb);
-
 extern void				TraceFilterInfo(IBaseFilter* pBF);
 extern void				TracePinInfo(IPin* pPin);
 

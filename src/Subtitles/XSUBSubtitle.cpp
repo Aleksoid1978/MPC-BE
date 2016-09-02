@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -254,7 +254,7 @@ HRESULT CXSUBSubtitle::ParseSample (IMediaSample* pSample)
 	gb.ReadShortLE();
 	// Palette, 4 color entries
 	HDMV_PALETTE Palette[4];
-	for (int entry=0; entry < 4; entry++) {
+	for (int entry = 0; entry < 4; entry++) {
 		Palette[entry].entry_id	= entry;
 		Palette[entry].Y	= gb.ReadByte();	// red
 		Palette[entry].Cr	= gb.ReadByte();	// green
@@ -264,7 +264,7 @@ HRESULT CXSUBSubtitle::ParseSample (IMediaSample* pSample)
 		}
 	}
 
-	pSub->SetPalette(4, Palette, false, true);
+	pSub->SetPalette(4, Palette, false, true, true);
 
 	int RLESize = gb.GetSize() - gb.GetPos();
 	pSub->SetRLEData(gb.GetBufferPos(), RLESize, RLESize);
