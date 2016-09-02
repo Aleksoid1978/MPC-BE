@@ -107,6 +107,7 @@
   <ItemGroup>
     <ClCompile Include="BaseSub.cpp" />
     <ClCompile Include="CCDecoder.cpp" />
+    <ClCompile Include="ColorConvert.cpp" />
     <ClCompile Include="CompositionObject.cpp" />
     <ClCompile Include="DVBSub.cpp" />
     <ClCompile Include="Ellipse.cpp" />
@@ -133,6 +134,7 @@
   <ItemGroup>
     <ClInclude Include="BaseSub.h" />
     <ClInclude Include="CCDecoder.h" />
+    <ClInclude Include="ColorConvert.h" />
     <ClInclude Include="CompositionObject.h" />
     <ClInclude Include="DVBSub.h" />
     <ClInclude Include="Ellipse.h" />

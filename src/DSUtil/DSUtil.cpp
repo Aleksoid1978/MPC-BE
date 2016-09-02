@@ -2699,53 +2699,6 @@ REFERENCE_TIME StringToReftime2(LPCTSTR strVal)
 	return rt;
 }
 
-const double Rec601_Kr = 0.299;
-const double Rec601_Kb = 0.114;
-const double Rec601_Kg = 0.587;
-COLORREF YCrCbToRGB_Rec601(BYTE Y, BYTE Cr, BYTE Cb)
-{
-
-	double rp = Y + 2*(Cr-128)*(1.0-Rec601_Kr);
-	double gp = Y - 2*(Cb-128)*(1.0-Rec601_Kb)*Rec601_Kb/Rec601_Kg - 2*(Cr-128)*(1.0-Rec601_Kr)*Rec601_Kr/Rec601_Kg;
-	double bp = Y + 2*(Cb-128)*(1.0-Rec601_Kb);
-
-	return RGB(fabs(rp), fabs(gp), fabs(bp));
-}
-
-DWORD YCrCbToRGB_Rec601(BYTE A, BYTE Y, BYTE Cr, BYTE Cb)
-{
-
-	double rp = Y + 2*(Cr-128)*(1.0-Rec601_Kr);
-	double gp = Y - 2*(Cb-128)*(1.0-Rec601_Kb)*Rec601_Kb/Rec601_Kg - 2*(Cr-128)*(1.0-Rec601_Kr)*Rec601_Kr/Rec601_Kg;
-	double bp = Y + 2*(Cb-128)*(1.0-Rec601_Kb);
-
-	return D3DCOLOR_ARGB(A, (BYTE)fabs(rp), (BYTE)fabs(gp), (BYTE)fabs(bp));
-}
-
-
-const double Rec709_Kr = 0.2125;
-const double Rec709_Kb = 0.0721;
-const double Rec709_Kg = 0.7154;
-
-COLORREF YCrCbToRGB_Rec709(BYTE Y, BYTE Cr, BYTE Cb)
-{
-
-	double rp = Y + 2*(Cr-128)*(1.0-Rec709_Kr);
-	double gp = Y - 2*(Cb-128)*(1.0-Rec709_Kb)*Rec709_Kb/Rec709_Kg - 2*(Cr-128)*(1.0-Rec709_Kr)*Rec709_Kr/Rec709_Kg;
-	double bp = Y + 2*(Cb-128)*(1.0-Rec709_Kb);
-
-	return RGB(fabs(rp), fabs(gp), fabs(bp));
-}
-
-DWORD YCrCbToRGB_Rec709(BYTE A, BYTE Y, BYTE Cr, BYTE Cb)
-{
-	double rp = Y + 2*(Cr-128)*(1.0-Rec709_Kr);
-	double gp = Y - 2*(Cb-128)*(1.0-Rec709_Kb)*Rec709_Kb/Rec709_Kg - 2*(Cr-128)*(1.0-Rec709_Kr)*Rec709_Kr/Rec709_Kg;
-	double bp = Y + 2*(Cb-128)*(1.0-Rec709_Kb);
-
-	return D3DCOLOR_ARGB(A, (BYTE)fabs(rp), (BYTE)fabs(gp), (BYTE)fabs(bp));
-}
-
 void TraceFilterInfo(IBaseFilter* pBF)
 {
 	FILTER_INFO Info;
