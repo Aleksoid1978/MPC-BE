@@ -196,10 +196,10 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 	const int h20 = ScaleY(20);
 	CPoint p(10, 10);
 
-	m_gInput.Create(L"Input", WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(ScaleX(150), h20 * 4 + ScaleY(5))), this, (UINT)IDC_STATIC);
+	m_gInput.Create(L"Input", WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(ScaleX(185), h20 * 4 + ScaleY(5))), this, (UINT)IDC_STATIC);
 
-	p = CPoint(ScaleX(170), 10);
-	m_gOutput.Create(L"Output", WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(ScaleX(150), h20 * 4 + ScaleY(5))), this, (UINT)IDC_STATIC);
+	p = CPoint(ScaleX(205), 10);
+	m_gOutput.Create(L"Output", WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(ScaleX(185), h20 * 4 + ScaleY(5))), this, (UINT)IDC_STATIC);
 
 	{
 		// Format
@@ -207,13 +207,13 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 		p.y += h20;
 		m_InputFormatLabel.Create(L"Format:", WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(50), m_fontheight)), this, (UINT)IDC_STATIC);
 		p.x += ScaleX(70);
-		m_InputFormatText.Create(L"", WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(70), m_fontheight)), this, (UINT)IDC_STATIC);
+		m_InputFormatText.Create(L"", WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(105), m_fontheight)), this, (UINT)IDC_STATIC);
 
-		p = CPoint(ScaleX(170), 10);
+		p = CPoint(ScaleX(205), 10);
 		p.y += h20;
 		m_OutputFormatLabel.Create(L"Format:", WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(50), m_fontheight)), this, (UINT)IDC_STATIC);
 		p.x += ScaleX(70);
-		m_OutputFormatText.Create(L"", WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(70), m_fontheight)), this, (UINT)IDC_STATIC);
+		m_OutputFormatText.Create(L"", WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(105), m_fontheight)), this, (UINT)IDC_STATIC);
 	}
 
 	{
@@ -224,7 +224,7 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 		p.x += ScaleX(70);
 		m_InputChannelText.Create(L"", WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(70), m_fontheight)), this, (UINT)IDC_STATIC);
 
-		p = CPoint(ScaleX(170), 10);
+		p = CPoint(ScaleX(205), 10);
 		p.y += h20 * 2;
 		m_OutputChannelLabel.Create(L"Channel:", WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(50), m_fontheight)), this, (UINT)IDC_STATIC);
 		p.x += ScaleX(70);
@@ -239,7 +239,7 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 		p.x += ScaleX(70);
 		m_InputRateText.Create(L"", WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(70), m_fontheight)), this, (UINT)IDC_STATIC);
 
-		p = CPoint(ScaleX(170), 10);
+		p = CPoint(ScaleX(205), 10);
 		p.y += h20 * 3;
 		m_OutputRateLabel.Create(L"Sample Rate:", WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(70), m_fontheight)), this, (UINT)IDC_STATIC);
 		p.x += ScaleX(70);
@@ -248,42 +248,47 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 
 	p = CPoint(ScaleX(10), 10);
 	p.y += h20 * 4 + ScaleY(15);
-	m_ModeText.Create(ResStr(IDS_ARS_WASAPI_MODE_STATUS_1), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(300), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_ModeText.Create(ResStr(IDS_ARS_WASAPI_MODE_STATUS_1), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(377), m_fontheight)), this, (UINT)IDC_STATIC);
 
 	p.y += ScaleY(15);
-	m_CurrentDeviceText.Create(WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_READONLY, CRect(p, CSize(ScaleX(300), m_fontheight)), this, 0);
+	m_CurrentDeviceText.Create(WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_READONLY, CRect(p, CSize(ScaleX(377), m_fontheight)), this, (UINT)IDC_STATIC);
 
 	if (m_pMAR) {
 		UINT status = m_pMAR->GetMode();
 		switch (status) {
-			case MODE_NONE :
+			case MODE_NONE:
 			default:
 				break;
-			case MODE_WASAPI_EXCLUSIVE :
+			case MODE_WASAPI_EXCLUSIVE:
 				m_ModeText.SetWindowText(ResStr(IDS_ARS_WASAPI_MODE_STATUS_2));
 				break;
-			case MODE_WASAPI_SHARED :
+			case MODE_WASAPI_SHARED:
 				m_ModeText.SetWindowText(ResStr(IDS_ARS_WASAPI_MODE_STATUS_3));
 				break;
-			case MODE_WASAPI_EXCLUSIVE_BITSTREAM :
+			case MODE_WASAPI_EXCLUSIVE_BITSTREAM:
 				CString btMode_str;
 
 				BITSTREAM_MODE btMode = m_pMAR->GetBitstreamMode();
 				switch (btMode) {
-					case BITSTREAM_AC3 : btMode_str = L"AC3";
+					case BITSTREAM_AC3:
+						btMode_str = L"AC3";
 						break;
-					case BITSTREAM_DTS : btMode_str = L"DTS";
+					case BITSTREAM_DTS:
+						btMode_str = L"DTS";
 						break;
-					case BITSTREAM_EAC3 : btMode_str = L"E-AC3";
+					case BITSTREAM_EAC3:
+						btMode_str = L"E-AC3";
 						break;
-					case BITSTREAM_TRUEHD : btMode_str = L"TrueHD";
+					case BITSTREAM_TRUEHD:
+						btMode_str = L"TrueHD";
 						break;
-					case BITSTREAM_DTSHD : btMode_str = L"DTS-HD";
+					case BITSTREAM_DTSHD:
+						btMode_str = L"DTS-HD";
 						break;
 				}
 
 				CString msg = ResStr(IDS_ARS_WASAPI_MODE_STATUS_5);
-				if (btMode_str.GetLength()) {
+				if (!btMode_str.IsEmpty()) {
 					msg.AppendFormat(L" [%s]", btMode_str);
 				}
 				m_ModeText.SetWindowText(msg);
@@ -299,12 +304,15 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 			if (pWfxIn && pWfxOut) {
 				auto SetText = [](WAVEFORMATEX* pwfex, CStatic& formatText, CStatic& channelText, CStatic& rateText) {
 					bool bIsFloat = false;
-					DWORD layout  = 0;
+					bool m_b24PaddedTo32bit = false;
+					DWORD layout = 0;
 					if (IsWaveFormatExtensible(pwfex)) {
 						WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)pwfex;
 						layout = wfex->dwChannelMask;
 						if (wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT) {
 							bIsFloat = true;
+						} else {
+							m_b24PaddedTo32bit = wfex->Samples.wValidBitsPerSample == 24 && pwfex->wBitsPerSample == 32;
 						}
 					} else {
 						layout = GetDefChannelMask(pwfex->nChannels);
@@ -314,7 +322,7 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 					}
 
 					CString sFormat;
-					sFormat.Format(L"%dbit %s", pwfex->wBitsPerSample, bIsFloat ? L"Float" : L"Integer");
+					sFormat.Format(L"%dbit %s%s", m_b24PaddedTo32bit ? 24 : pwfex->wBitsPerSample, m_b24PaddedTo32bit ? L"[padded] " : L"", bIsFloat ? L"Float" : L"Integer");
 
 					CString sChannel;
 					switch (layout) {
