@@ -36,7 +36,7 @@
     </None>
     <None Include="resizer_bicubic_base_y.hlsl">
       <FileType>Document</FileType>
-    </None>	
+    </None>
     <None Include="resizer_bilinear.hlsl">
       <FileType>Document</FileType>
     </None>

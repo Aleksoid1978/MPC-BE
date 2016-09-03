@@ -33,6 +33,7 @@ float4 main(float2 tex : TEXCOORD0) : COLOR
 		float wc = 1.-dot(1., w0+w1); // compensate truncated window factor by linear factoring on the two nearest samples
 		w0.z += wc*(1.-t);
 		w1.x += wc*t;
+
 		return w0.x*Q0+w0.y*Q1+w0.z*Q2+w1.x*Q3+w1.y*Q4+w1.z*Q5; // interpolation output
 	}
 }

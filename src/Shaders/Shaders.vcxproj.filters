@@ -21,8 +21,6 @@
     <FxCompile Include="resizer_lanczos3_y.hlsl" />
     <FxCompile Include="resizer_downscaling_x.hlsl" />
     <FxCompile Include="resizer_downscaling_y.hlsl" />
-    <FxCompile Include="resizer_bicubic_base_x.hlsl" />
-    <FxCompile Include="resizer_bicubic_base_y.hlsl" />
     <FxCompile Include="resizer_bicubic06_x.hlsl" />
     <FxCompile Include="resizer_bicubic06_y.hlsl" />
     <FxCompile Include="resizer_bicubic08_x.hlsl" />
@@ -32,6 +30,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resizer_bicubic_base.hlsl" />
+    <None Include="resizer_bicubic_base_x.hlsl" />
+    <None Include="resizer_bicubic_base_y.hlsl" />
     <None Include="resizer_bilinear.hlsl" />
     <None Include="resizer_nearest.hlsl" />
   </ItemGroup>

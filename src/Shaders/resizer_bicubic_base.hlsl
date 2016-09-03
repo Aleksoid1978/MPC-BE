@@ -49,5 +49,6 @@ float4 main(float2 tex : TEXCOORD0) : COLOR
 	float2 dd = frac(tex);
 	float2 ExactPixel = tex - dd;
 	float2 samplePos = ExactPixel * dxdy + dxdy05;
+
 	return SampleY(taps(dd.x), taps(dd.y), samplePos);
 }
