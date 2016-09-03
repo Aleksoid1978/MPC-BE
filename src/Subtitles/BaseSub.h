@@ -39,6 +39,8 @@ public:
 	virtual void			CleanOld(REFERENCE_TIME rt) PURE;
 	virtual HRESULT			EndOfStream() PURE;
 
+	HRESULT					SetConvertType(CString _yuvMatrix, ColorConvert::convertType _convertType) { yuvMatrix = _yuvMatrix; convertType = _convertType; return S_OK; };
+
 protected :
 	SUBTITLE_TYPE			m_nType;
 
@@ -49,4 +51,7 @@ protected :
 
 	void					InitSpd(SubPicDesc& spd, int nWidth, int nHeight);
 	void					FinalizeRender(SubPicDesc& spd);
+
+	CString						yuvMatrix;
+	ColorConvert::convertType	convertType;
 };

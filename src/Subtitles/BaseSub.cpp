@@ -26,6 +26,7 @@ CBaseSub::CBaseSub(SUBTITLE_TYPE nType)
 	: m_nType(nType)
 	, m_bResizedRender(FALSE)
 	, m_pTempSpdBuff(NULL)
+	, convertType(ColorConvert::convertType::DEFAULT)
 {
 }
 

@@ -219,7 +219,7 @@ public IPersist {
 	STDMETHOD_(int, GetStream) () PURE;
 	STDMETHOD (SetStream) (int iStream) PURE;
 	STDMETHOD (Reload) () PURE;
-
+	STDMETHOD (SetSourceTargetInfo)(CString yuvMatrix, CString inputRange, CString outpuRange) { return E_NOTIMPL; };
 	// TODO: get rid of IPersist to identify type and use only
 	// interface functions to modify the settings of the substream
 };

@@ -39,7 +39,7 @@ CRenderedHdmvSubtitle::CRenderedHdmvSubtitle(CCritSec* pLock, SUBTITLE_TYPE nTyp
 			if (name.IsEmpty() || (name == _T("Unknown"))) m_name = _T("PGS");
 			break;
 		default :
-			ASSERT (FALSE);
+			ASSERT(FALSE);
 			m_pSub = NULL;
 	}
 	m_rtStart = 0;
@@ -67,24 +67,28 @@ STDMETHODIMP CRenderedHdmvSubtitle::NonDelegatingQueryInterface(REFIID riid, voi
 STDMETHODIMP_(POSITION) CRenderedHdmvSubtitle::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
+
 	return m_pSub->GetStartPosition(rt - m_rtStart, fps, CleanOld);
 }
 
 STDMETHODIMP_(POSITION) CRenderedHdmvSubtitle::GetNext(POSITION pos)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
+
 	return m_pSub->GetNext (pos);
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CRenderedHdmvSubtitle::GetStart(POSITION pos, double fps)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
+
 	return m_pSub->GetStart(pos) + m_rtStart;
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CRenderedHdmvSubtitle::GetStop(POSITION pos, double fps)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
+
 	return m_pSub->GetStop(pos) + m_rtStart;
 }
 
@@ -96,6 +100,7 @@ STDMETHODIMP_(bool) CRenderedHdmvSubtitle::IsAnimated(POSITION pos)
 STDMETHODIMP CRenderedHdmvSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
+
 	m_pSub->Render(spd, rt - m_rtStart, bbox);
 	m_pSub->CleanOld(rt - m_rtStart - 60*10000000i64); // Cleanup subtitles older than 1 minute ...
 
@@ -105,6 +110,7 @@ STDMETHODIMP CRenderedHdmvSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 STDMETHODIMP CRenderedHdmvSubtitle::GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
+
 	HRESULT hr = m_pSub->GetTextureSize(pos, MaxTextureSize, VideoSize, VideoTopLeft);
 	return hr;
 };
@@ -120,7 +126,7 @@ STDMETHODIMP CRenderedHdmvSubtitle::GetClassID(CLSID* pClassID)
 
 STDMETHODIMP_(int) CRenderedHdmvSubtitle::GetStreamCount()
 {
-	return (1);
+	return 1;
 }
 
 STDMETHODIMP CRenderedHdmvSubtitle::GetStreamInfo(int iStream, WCHAR** ppName, LCID* pLCID)
@@ -147,7 +153,7 @@ STDMETHODIMP CRenderedHdmvSubtitle::GetStreamInfo(int iStream, WCHAR** ppName, L
 
 STDMETHODIMP_(int) CRenderedHdmvSubtitle::GetStream()
 {
-	return(0);
+	return 0;
 }
 
 STDMETHODIMP CRenderedHdmvSubtitle::SetStream(int iStream)
@@ -160,12 +166,27 @@ STDMETHODIMP CRenderedHdmvSubtitle::Reload()
 	return S_OK;
 }
 
+STDMETHODIMP CRenderedHdmvSubtitle::SetSourceTargetInfo(CString yuvMatrix, CString inputRange, CString outpuRange)
+{
+	ColorConvert::convertType convertType = ColorConvert::convertType::DEFAULT;
+	if (inputRange == L"TV" && outpuRange == L"TV") {
+		convertType = ColorConvert::convertType::TV_2_TV;
+	} else if (inputRange == L"PC" && outpuRange == L"PC") {
+		convertType = ColorConvert::convertType::PC_2_PC;
+	} else if (inputRange == L"TV" && outpuRange == L"PC") {
+		convertType = ColorConvert::convertType::TV_2_PC;
+	} else if (inputRange == L"PC" && outpuRange == L"TV") {
+		convertType = ColorConvert::convertType::PC_2_TV;
+	}
+
+	return m_pSub->SetConvertType(yuvMatrix, convertType);
+}
+
 HRESULT CRenderedHdmvSubtitle::ParseSample (IMediaSample* pSample)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
-	HRESULT		hr;
-
-	hr = m_pSub->ParseSample (pSample);
+	
+	HRESULT hr = m_pSub->ParseSample (pSample);
 	return hr;
 }
 

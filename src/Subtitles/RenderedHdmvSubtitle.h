@@ -54,6 +54,7 @@ public:
 	STDMETHODIMP_(int) GetStream();
 	STDMETHODIMP SetStream(int iStream);
 	STDMETHODIMP Reload();
+	STDMETHODIMP SetSourceTargetInfo(CString yuvMatrix, CString inputRange, CString outpuRange);
 
 	HRESULT ParseSample (IMediaSample* pSample);
 	HRESULT	NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);

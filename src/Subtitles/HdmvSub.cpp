@@ -178,6 +178,11 @@ HRESULT CHdmvSub::ParseSample(BYTE* pData, int lSampleLen, REFERENCE_TIME rtStar
 	return hr;
 }
 
+static void SetPalette(CompositionObject* pObject, const int nNbEntry, HDMV_PALETTE* pPalette, const CString yuvMatrix, const SHORT nVideoWidth, ColorConvert::convertType convertType)
+{
+	pObject->SetPalette(nNbEntry, pPalette, yuvMatrix == L"709" ? true : yuvMatrix == L"601" ? false : nVideoWidth > 720, convertType);
+}
+
 void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 {
 	bbox.left	= LONG_MAX;
@@ -200,7 +205,7 @@ void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 				}
 
 				if (!pObject->HavePalette() && m_DefaultCLUT.Palette) {
-					pObject->SetPalette(m_DefaultCLUT.pSize, m_DefaultCLUT.Palette, m_VideoDescriptor.nVideoWidth > 720);
+					SetPalette(pObject, m_DefaultCLUT.pSize, m_DefaultCLUT.Palette, yuvMatrix, m_VideoDescriptor.nVideoWidth, convertType);
 				}
 
 				if (!pObject->HavePalette()) {
@@ -326,7 +331,7 @@ void CHdmvSub::ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME 
 					pObject->SetRLEData(pObjectData.GetRLEData(), pObjectData.GetRLEDataSize(), pObjectData.GetRLEDataSize());
 
 					if (!pObject->HavePalette() && m_CLUT[palette_id_ref].Palette) {
-						pObject->SetPalette(m_CLUT[palette_id_ref].pSize, m_CLUT[palette_id_ref].Palette, m_VideoDescriptor.nVideoWidth > 720);
+						SetPalette(pObject, m_CLUT[palette_id_ref].pSize, m_CLUT[palette_id_ref].Palette, yuvMatrix, m_VideoDescriptor.nVideoWidth, convertType);
 					}
 
 					TRACE_HDMVSUB(_T("			store Segment : m_object_id_ref = %d, m_window_id_ref = %d, compositionNumber = %d, [%10I64d -> %10I64d], [%s -> %s]\n"),
@@ -414,7 +419,7 @@ void CHdmvSub::ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize)
 
 	if (m_pCurrentWindow && m_pCurrentWindow->m_palette_id_ref == palette_id && m_pCurrentWindow->m_nObjectNumber) {
 		for (int i = 0; i < m_pCurrentWindow->m_nObjectNumber; i++) {
-			m_pCurrentWindow->Objects[i]->SetPalette(nNbEntry, pPalette, m_VideoDescriptor.nVideoWidth > 720);
+			SetPalette(m_pCurrentWindow->Objects[i], nNbEntry, pPalette, yuvMatrix, m_VideoDescriptor.nVideoWidth, convertType);
 		}
 	}
 }
