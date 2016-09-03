@@ -26,6 +26,7 @@ float4 main(float2 tex : TEXCOORD0) : COLOR
 		float wc = 1.-dot(1., w); // compensate truncated window factor by bilinear factoring on the two nearest samples
 		w.y += wc*(1.-t);
 		w.z += wc*t;
+
 		return w.x*Q0+w.y*Q1+w.z*Q2+w.w*Q3; // interpolation output
 	}
 
