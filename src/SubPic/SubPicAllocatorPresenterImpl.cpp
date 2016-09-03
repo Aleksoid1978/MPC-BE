@@ -370,13 +370,13 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* valu
 	} else if (!strcmp(field, "version")) {
 		ret = _T(MPC_VERSION_STR_SVN);
 	} else if (!strcmp(field, "yuvMatrix")) {
-		ret = L"None";
+		ret = L"TV.709";
 
 		if (m_inputMediaType.IsValid() && m_inputMediaType.formattype == FORMAT_VideoInfo2) {
 			const VIDEOINFOHEADER2* pVIH2 = (VIDEOINFOHEADER2*)m_inputMediaType.pbFormat;
 
 			if (pVIH2->dwControlFlags & AMCONTROL_COLORINFO_PRESENT) {
-				DXVA2_ExtendedFormat& flags = (DXVA2_ExtendedFormat&)pVIH2->dwControlFlags;
+				const DXVA2_ExtendedFormat& flags = (DXVA2_ExtendedFormat&)pVIH2->dwControlFlags;
 
 				ret = (flags.NominalRange == DXVA2_NominalRange_Normal) ? L"PC." : L"TV.";
 
@@ -384,14 +384,12 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* valu
 					case DXVA2_VideoTransferMatrix_BT601:
 						ret.Append(L"601");
 						break;
+					default:
 					case DXVA2_VideoTransferMatrix_BT709:
 						ret.Append(L"709");
 						break;
 					case DXVA2_VideoTransferMatrix_SMPTE240M:
 						ret.Append(L"240M");
-						break;
-					default:
-						ret = L"None";
 						break;
 				}
 			}
@@ -400,7 +398,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* valu
 
 	if (!ret.IsEmpty()) {
 		const int len = ret.GetLength();
-		size_t sz = (len + 1) * sizeof(WCHAR);
+		const size_t sz = (len + 1) * sizeof(WCHAR);
 		LPWSTR buf = (LPWSTR)LocalAlloc(LPTR, sz);
 
 		if (!buf) {

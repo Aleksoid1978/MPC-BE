@@ -274,6 +274,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CComPtr<ISubPicAllocatorPresenter3>	m_pCAP;
 
 	CComPtr<IMadVRSubclassReplacement> m_pMVRSR;
+	CComPtr<IMadVRSettings> m_pMVRS;
 	CComPtr<IMadVRCommand> m_pMVRC;
 	CComPtr<IMadVRInfo> m_pMVRI;
 	int m_iMVRDefRotation;

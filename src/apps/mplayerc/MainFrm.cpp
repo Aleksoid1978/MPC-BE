@@ -87,6 +87,8 @@
 #include "ThumbsTaskDlg.h"
 #include "Content.h"
 
+#include <SubRenderIntf.h>
+
 #define DEFCLIENTW		292
 #define DEFCLIENTH		200
 #define MENUBARBREAK	30
@@ -13547,6 +13549,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRWC), FALSE); // might have IVMRMixerBitmap9, but not IVMRWindowlessControl9
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRMC9), TRUE);
 		m_pMVRSR = m_pCAP;
+		m_pMVRS = m_pCAP;
 		m_pMVRC = m_pCAP;
 		m_pMVRI = m_pCAP;
 
@@ -13745,6 +13748,7 @@ void CMainFrame::CloseMediaPrivate()
 
 	// IMPORTANT: IVMRSurfaceAllocatorNotify/IVMRSurfaceAllocatorNotify9 has to be released before the VMR/VMR9, otherwise it will crash in Release()
 	m_pMVRSR.Release();
+	m_pMVRS.Release();
 	m_pMVRC.Release();
 	m_pMVRI.Release();
 	m_pCAP.Release();
@@ -15803,17 +15807,9 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 			CLSID clsid;
 			pSubStream->GetClassID(&clsid);
 
-			if (clsid == __uuidof(CVobSubFile)) {
-				CVobSubFile* pVSF = (CVobSubFile*)(ISubStream*)pSubStream;
-
-				if (fApplyDefStyle) {
-					pVSF->SetAlignment(s.fOverridePlacement, s.nHorPos, s.nVerPos, 1, 1);
-				}
-			} else if (clsid == __uuidof(CVobSubStream)) {
-				CVobSubStream* pVSS = (CVobSubStream*)(ISubStream*)pSubStream;
-
-				if (fApplyDefStyle) {
-					pVSS->SetAlignment(s.fOverridePlacement, s.nHorPos, s.nVerPos, 1, 1);
+			if (clsid == __uuidof(CVobSubFile) || clsid == __uuidof(CVobSubStream)) {
+				if (auto pVSS = dynamic_cast<CVobSubSettings*>((ISubStream*)pSubStream)) {
+					pVSS->SetAlignment(s.fOverridePlacement, s.nHorPos, s.nVerPos);
 				}
 			} else if (clsid == __uuidof(CRenderedTextSubtitle)) {
 				CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)pSubStream;
@@ -15847,8 +15843,50 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 
 				pRTS->Deinit();
 			} else if (clsid == __uuidof(CRenderedHdmvSubtitle) || clsid == __uuidof(CSupSubFile)) {
-				s.m_RenderersSettings.bSubpicPosRelative	= s.subdefstyle.relativeTo;
+				s.m_RenderersSettings.bSubpicPosRelative = s.subdefstyle.relativeTo;
 			}
+
+			CComQIPtr<ISubRenderOptions> pSRO = m_pCAP;
+
+			LPWSTR yuvMatrixString = NULL;
+			int nLen;
+			if (m_pMVRI) {
+				m_pMVRI->GetString("yuvMatrix", &yuvMatrixString, &nLen);
+			} else if (pSRO) {
+				pSRO->GetString("yuvMatrix", &yuvMatrixString, &nLen);
+			}
+
+			CString yuvMatrix(yuvMatrixString);
+			LocalFree(yuvMatrixString);
+
+			CString inputRange(L"TV"), outpuRange(L"PC");
+			if (!yuvMatrix.IsEmpty()) {
+				yuvMatrix.Replace(L".VSFilter", L"");
+				int nPos = 0;
+				inputRange = yuvMatrix.Tokenize(L".", nPos);
+				yuvMatrix = yuvMatrix.Mid(nPos);
+				if (yuvMatrix != L"601") {
+					yuvMatrix = L"709";
+				}
+			} else {
+				yuvMatrix = L"709";
+			}
+
+			if (m_pMVRS) {
+				int targetWhiteLevel = 255;
+				m_pMVRS->SettingsGetInteger(L"White", &targetWhiteLevel);
+				if (targetWhiteLevel < 245) {
+					outpuRange = L"TV";
+				}
+			} else if (pSRO) {
+				int range = 0;
+				pSRO->GetInt("supportedLevels", &range);
+				if (range == 3) {
+					outpuRange = L"TV";
+				}
+			}
+
+			pSubStream->SetSourceTargetInfo(yuvMatrix, inputRange, outpuRange);
 		}
 
 		if (!fApplyDefStyle && iSubtitleSel == -1) {
