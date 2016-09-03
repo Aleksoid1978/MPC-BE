@@ -15861,7 +15861,6 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 
 			CString inputRange(L"TV"), outpuRange(L"PC");
 			if (!yuvMatrix.IsEmpty()) {
-				yuvMatrix.Replace(L".VSFilter", L"");
 				int nPos = 0;
 				inputRange = yuvMatrix.Tokenize(L".", nPos);
 				yuvMatrix = yuvMatrix.Mid(nPos);
