@@ -1851,18 +1851,9 @@ void CDirectVobSubFilter::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyl
 		CLSID clsid;
 		pSubStream->GetClassID(&clsid);
 
-		if (clsid == __uuidof(CVobSubFile)) {
-			CVobSubSettings* pVSS = (CVobSubFile*)(ISubStream*)pSubStream;
-
-			if (fApplyDefStyle) {
-				pVSS->SetAlignment(m_bOverridePlacement, m_PlacementXperc, m_PlacementYperc, 1, 1);
-				pVSS->m_fOnlyShowForcedSubs = m_bOnlyShowForcedVobSubs;
-			}
-		} else if (clsid == __uuidof(CVobSubStream)) {
-			CVobSubSettings* pVSS = (CVobSubStream*)(ISubStream*)pSubStream;
-
-			if (fApplyDefStyle) {
-				pVSS->SetAlignment(m_bOverridePlacement, m_PlacementXperc, m_PlacementYperc, 1, 1);
+		if (clsid == __uuidof(CVobSubFile) || clsid == __uuidof(CVobSubStream)) {
+			if (auto pVSS = dynamic_cast<CVobSubSettings*>(pSubStream)) {
+				pVSS->SetAlignment(m_bOverridePlacement, m_PlacementXperc, m_PlacementYperc);
 				pVSS->m_fOnlyShowForcedSubs = m_bOnlyShowForcedVobSubs;
 			}
 		} else if (clsid == __uuidof(CRenderedTextSubtitle)) {
@@ -1895,6 +1886,17 @@ void CDirectVobSubFilter::SetSubtitle(ISubStream* pSubStream, bool fApplyDefStyl
 
 			pRTS->Deinit();
 		}
+
+		const CMediaType& mt = m_pOutput->CurrentMediaType();
+		DXVA2_ExtendedFormat extFormat; extFormat.value = 0;
+		if (mt.formattype == FORMAT_VideoInfo2) {
+			extFormat.value = ((VIDEOINFOHEADER2*)mt.Format())->dwControlFlags;
+		}
+		CString yuvMatrix = extFormat.VideoTransferMatrix == DXVA2_VideoTransferMatrix_BT601 ? L"601" : L"709";
+		CString inputRange = extFormat.NominalRange == DXVA2_NominalRange_Normal ? L"PC" : L"TV";
+		CString outpuRange(L"PC");
+
+		pSubStream->SetSourceTargetInfo(yuvMatrix, inputRange, outpuRange);
 	}
 
 	if (!fApplyDefStyle) {
