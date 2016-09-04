@@ -1450,20 +1450,30 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 								}
 							}
 						} else {
+							auto peekMouseMessage = [&]() {
+								MSG msg;
+								while (PeekMessage(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDBLCLK, PM_REMOVE));
+							};
+
 							CRect rc;
 							m_wndView.GetWindowRect(&rc);
 
-							const int percent = 100 * point.x_end / rc.Width();
-							if (percent <= 10) {
-								MSG msg;
-								while (PeekMessage(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDBLCLK, PM_REMOVE));
-
+							const int percentX = 100 * point.x_end / rc.Width();
+							const int percentY = 100 * point.y_end / rc.Height();
+							if (percentX <= 10) {
+								peekMouseMessage();
 								PostMessage(WM_COMMAND, ID_PLAY_SEEKBACKWARDMED);
-							} else if (percent >= 90) {
-								MSG msg;
-								while (PeekMessage(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDBLCLK, PM_REMOVE));
-
+							} else if (percentX >= 90) {
+								peekMouseMessage();
 								PostMessage(WM_COMMAND, ID_PLAY_SEEKFORWARDMED);
+							} else if (percentX >= 15 && percentX <= 45
+									&& percentY <= 15) {
+								peekMouseMessage();
+								PostMessage(WM_COMMAND, ID_NAVIGATE_SKIPBACK);
+							} else if (percentX >= 55 && percentX <= 85
+									&& percentY <= 15) {
+								peekMouseMessage();
+								PostMessage(WM_COMMAND, ID_NAVIGATE_SKIPFORWARD);
 							}
 						}
 					} else if (m_touchScreen.Count() == 2) {
