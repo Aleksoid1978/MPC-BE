@@ -351,7 +351,9 @@ void CPPageVideo::UpdateResizerList(int select)
 #endif
 
 	if (m_cbAPSurfaceUsage.GetCurSel() == SURFACE_TEXTURE3D) {
+#if !ENABLE_2PASS_RESIZE
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Perlin Smootherstep"), RESIZER_SHADER_SMOOTHERSTEP);
+#endif
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: B-spline4"), RESIZER_SHADER_BSPLINE4);
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Mitchell-Netravali spline4"), RESIZER_SHADER_MITCHELL4);
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Catmull-Rom spline4"), RESIZER_SHADER_CATMULL4);
