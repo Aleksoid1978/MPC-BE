@@ -27,7 +27,6 @@
 #include "../SubPic/SubPicAllocatorPresenterImpl.h"
 
 enum {
-	shader_smootherstep,
 #if ENABLE_2PASS_RESIZE
 	shader_bspline4_x,
 	shader_bspline4_y,
@@ -48,14 +47,15 @@ enum {
 	shader_downscaling_x,
 	shader_downscaling_y,
 #else
+	shader_smootherstep,
 	shader_bspline4,
 	shader_mitchell4,
 	shader_catmull4,
 	shader_bicubic06,
 	shader_bicubic08,
 	shader_bicubic10,
-#endif
 	shader_downscaling,
+#endif
 	shader_count
 };
 
@@ -201,9 +201,10 @@ namespace DSObjects
 		// Resizers
 		HRESULT InitShaderResizer();
 		HRESULT TextureResize(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, D3DTEXTUREFILTERTYPE filter);
-		HRESULT TextureResizeShader(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, int iShader);
 #if ENABLE_2PASS_RESIZE
 		HRESULT TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, int iShader1);
+#else
+		HRESULT TextureResizeShader(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, int iShader);
 #endif
 
 		// Final pass
