@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,7 +41,7 @@ public:
 	STDMETHODIMP_(REFERENCE_TIME) GetStop(POSITION pos, double fps);
 	STDMETHODIMP_(bool) IsAnimated(POSITION pos);
 	STDMETHODIMP Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox);
-	STDMETHODIMP GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VirtualSize, POINT& VirtualTopLeft);
+	STDMETHODIMP GetTextureSize(POSITION pos, SIZE& MaxTextureSize, SIZE& VirtualSize, POINT& VirtualTopLeft);
 
 	STDMETHODIMP_(SUBTITLE_TYPE) GetType() { return m_nType; };
 
@@ -63,7 +63,6 @@ public:
 private :
 	CString			m_name;
 	LCID			m_lcid;
-	REFERENCE_TIME	m_rtStart;
 
 	CBaseSub*		m_pSub;
 	CCritSec		m_csCritSec;

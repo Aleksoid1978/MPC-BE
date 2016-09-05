@@ -50,6 +50,15 @@
 // (BYTE*)
 #define __GAB1_RAWTEXTSUBTITLE__ 4
 
+static const bool IsHdmvSub(const CMediaType* pmt)
+{
+	return (pmt->subtype == MEDIASUBTYPE_DVB_SUBTITLES
+			|| (pmt->majortype == MEDIATYPE_Subtitle && pmt->subtype == MEDIASUBTYPE_HDMVSUB)
+			|| (pmt->subtype == MEDIASUBTYPE_NULL && pmt->formattype == FORMAT_SubtitleInfo)) // Workaround : support for Haali PGS
+			? true
+			: false;
+}
+
 CSubtitleInputPin::CSubtitleInputPin(CBaseFilter* pFilter, CCritSec* pLock, CCritSec* pSubLock, HRESULT* phr)
 	: CBaseInputPin(NAME("CSubtitleInputPin"), pFilter, pLock, phr, L"Input")
 	, m_pSubLock(pSubLock)
@@ -280,15 +289,11 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 
 	switch (hr) {
 		case S_OK:
-			if (!IsHdmvSub(&m_mt)) {
-				tStart += m_tStart;
-				tStop += m_tStart;
-			}
+			tStart += m_tStart;
+			tStop += m_tStart;
 			break;
 		case VFW_S_NO_STOP_TIME:
-			if (!IsHdmvSub(&m_mt)) {
-				tStart += m_tStart;
-			}
+			tStart += m_tStart;
 			tStop = INVALID_TIME;
 			break;
 		case VFW_E_SAMPLE_TIME_NOT_SET:
@@ -427,13 +432,4 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 	}
 
 	return hr;
-}
-
-bool CSubtitleInputPin::IsHdmvSub(const CMediaType* pmt)
-{
-	return (pmt->subtype == MEDIASUBTYPE_DVB_SUBTITLES
-			|| (pmt->majortype == MEDIATYPE_Subtitle && pmt->subtype == MEDIASUBTYPE_HDMVSUB)
-			|| (pmt->subtype == MEDIASUBTYPE_NULL && pmt->formattype == FORMAT_SubtitleInfo)) // Workaround : support for Haali PGS
-			? true
-			: false;
 }
