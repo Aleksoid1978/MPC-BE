@@ -872,9 +872,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 #if (MPC_VERSION_STATUS == 0)
 	m_strTitle.AppendFormat(L" (build %d) beta",  MPC_VERSION_REV);
 #endif
-#if ENABLE_2PASS_RESIZE
-	m_strTitle.Append(L" 2passresize"); // test build
-#endif
 
 	SetWindowText(m_strTitle);
 	m_Lcd.SetMediaTitle(m_strTitle);

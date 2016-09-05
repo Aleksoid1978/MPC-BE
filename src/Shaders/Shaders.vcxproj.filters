@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <FxCompile Include="resizer_downscaling.hlsl" />
-    <FxCompile Include="resizer_smootherstep.hlsl" />
-    <FxCompile Include="resizer_bspline4.hlsl" />
-    <FxCompile Include="resizer_mitchell4.hlsl" />
-    <FxCompile Include="resizer_catmull4.hlsl" />
-    <FxCompile Include="resizer_bicubic06.hlsl" />
-    <FxCompile Include="resizer_bicubic08.hlsl" />
-    <FxCompile Include="resizer_bicubic10.hlsl" />
     <FxCompile Include="resizer_bspline4_x.hlsl" />
     <FxCompile Include="resizer_bspline4_y.hlsl" />
     <FxCompile Include="resizer_catmull4_x.hlsl" />
@@ -27,12 +19,47 @@
     <FxCompile Include="resizer_bicubic08_y.hlsl" />
     <FxCompile Include="resizer_bicubic10_x.hlsl" />
     <FxCompile Include="resizer_bicubic10_y.hlsl" />
+    <FxCompile Include="resizer_bspline4.hlsl">
+      <Filter>OnePassResizers</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resizer_bicubic_base.hlsl" />
     <None Include="resizer_bicubic_base_x.hlsl" />
     <None Include="resizer_bicubic_base_y.hlsl" />
-    <None Include="resizer_bilinear.hlsl" />
-    <None Include="resizer_nearest.hlsl" />
+    <None Include="resizer_bicubic_base.hlsl">
+      <Filter>OnePassResizers</Filter>
+    </None>
+    <None Include="resizer_bilinear.hlsl">
+      <Filter>OnePassResizers</Filter>
+    </None>
+    <None Include="resizer_nearest.hlsl">
+      <Filter>OnePassResizers</Filter>
+    </None>
+    <None Include="resizer_bicubic06.hlsl">
+      <Filter>OnePassResizers</Filter>
+    </None>
+    <None Include="resizer_bicubic08.hlsl">
+      <Filter>OnePassResizers</Filter>
+    </None>
+    <None Include="resizer_bicubic10.hlsl">
+      <Filter>OnePassResizers</Filter>
+    </None>
+    <None Include="resizer_catmull4.hlsl">
+      <Filter>OnePassResizers</Filter>
+    </None>
+    <None Include="resizer_downscaling.hlsl">
+      <Filter>OnePassResizers</Filter>
+    </None>
+    <None Include="resizer_mitchell4.hlsl">
+      <Filter>OnePassResizers</Filter>
+    </None>
+    <None Include="resizer_smootherstep.hlsl">
+      <Filter>OnePassResizers</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="OnePassResizers">
+      <UniqueIdentifier>{b1862738-ccad-4f73-addf-54f3c5ad2b35}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
