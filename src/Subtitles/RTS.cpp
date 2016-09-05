@@ -2394,7 +2394,7 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 				}
 				break;
 			case SSA_p: {
-				int n = !tag.paramsInt.IsEmpty() && !bUseOriginal ? tag.paramsInt[0] : 0;
+				int n = !tag.paramsInt.IsEmpty() ? tag.paramsInt[0] : 0;
 				m_nPolygon = (n <= 0 ? 0 : n);
 			}
 			break;
@@ -2769,6 +2769,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 
 	if (m_bOverrideStyle) {
 		sub->m_fAnimated = false;
+		sub->m_bIsAnimated = false;
 		sub->EmptyEffects();
 		SAFE_DELETE(sub->m_pClipper);
 	}
