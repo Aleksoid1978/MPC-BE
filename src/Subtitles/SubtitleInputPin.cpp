@@ -257,19 +257,12 @@ STDMETHODIMP CSubtitleInputPin::EndOfStream()
 
 STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 {
-	HRESULT hr = S_OK;
-
-	hr = __super::Receive(pSample);
+	HRESULT hr = __super::Receive(pSample);
 	if (FAILED(hr)) {
 		return hr;
 	}
 
 	CAutoLock cAutoLock(&m_csReceive);
-
-	REFERENCE_TIME tStart, tStop;
-	pSample->GetTime(&tStart, &tStop);
-	tStart += m_tStart;
-	tStop += m_tStart;
 
 	BYTE* pData = NULL;
 	hr = pSample->GetPointer(&pData);
@@ -277,9 +270,33 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 		return hr;
 	}
 
-	long len = pSample->GetActualDataLength();
-	if (len <= 0) {
+	long nLen = pSample->GetActualDataLength();
+	if (nLen <= 0) {
 		return E_FAIL;
+	}
+
+	REFERENCE_TIME tStart, tStop;
+	hr = pSample->GetTime(&tStart, &tStop);
+
+	switch (hr) {
+		case S_OK:
+			if (!IsHdmvSub(&m_mt)) {
+				tStart += m_tStart;
+				tStop += m_tStart;
+			}
+			break;
+		case VFW_S_NO_STOP_TIME:
+			if (!IsHdmvSub(&m_mt)) {
+				tStart += m_tStart;
+			}
+			tStop = INVALID_TIME;
+			break;
+		case VFW_E_SAMPLE_TIME_NOT_SET:
+			tStart = tStop = INVALID_TIME;
+			break;
+		default:
+			ASSERT(FALSE);
+			return hr;
 	}
 
 	bool bInvalidate = false;
@@ -290,7 +307,7 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 
 		if (!strncmp((char*)pData, __GAB1__, strlen(__GAB1__))) {
 			char* ptr = (char*)&pData[strlen(__GAB1__)+1];
-			char* end = (char*)&pData[len];
+			char* end = (char*)&pData[nLen];
 
 			while (ptr < end) {
 				WORD tag = *((WORD*)(ptr));
@@ -314,7 +331,7 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 			}
 		} else if (!strncmp((char*)pData, __GAB2__, strlen(__GAB2__))) {
 			char* ptr = (char*)&pData[strlen(__GAB2__)+1];
-			char* end = (char*)&pData[len];
+			char* end = (char*)&pData[nLen];
 
 			while (ptr < end) {
 				WORD tag = *((WORD*)(ptr));
@@ -331,8 +348,8 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 
 				ptr += size;
 			}
-		} else if (pData != 0 && len > 1 && *pData != 0) {
-			CStringA str((char*)pData, len);
+		} else if (pData != 0 && nLen > 1 && *pData != 0) {
+			CStringA str((char*)pData, nLen);
 
 			str.Replace("\r\n", "\n");
 			str.Trim();
@@ -351,7 +368,7 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 		if (m_mt.subtype == MEDIASUBTYPE_UTF8) {
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
 
-			CStringW str = UTF8To16(CStringA((LPCSTR)pData, len)).Trim();
+			CStringW str = UTF8To16(CStringA((LPCSTR)pData, nLen)).Trim();
 			if (!str.IsEmpty()) {
 				pRTS->Add(str, true, (int)(tStart / 10000), (int)(tStop / 10000));
 				bInvalidate = true;
@@ -359,7 +376,7 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 		} else if (m_mt.subtype == MEDIASUBTYPE_SSA || m_mt.subtype == MEDIASUBTYPE_ASS || m_mt.subtype == MEDIASUBTYPE_ASS2) {
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
 
-			CStringW str = UTF8To16(CStringA((LPCSTR)pData, len)).Trim();
+			CStringW str = UTF8To16(CStringA((LPCSTR)pData, nLen)).Trim();
 			if (!str.IsEmpty()) {
 				STSEntry stse;
 
@@ -391,13 +408,13 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 		} else if (m_mt.subtype == MEDIASUBTYPE_VOBSUB
 				   || (m_mt.majortype == MEDIATYPE_Video && m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE)) {
 			CVobSubStream* pVSS = (CVobSubStream*)(ISubStream*)m_pSubStream;
-			pVSS->Add(tStart, tStop, pData, len);
+			pVSS->Add(tStart, tStop, pData, nLen);
 		} else if (IsHdmvSub(&m_mt)) {
 			CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)(ISubStream*)m_pSubStream;
-			pHdmvSubtitle->ParseSample (pSample);
+			pHdmvSubtitle->ParseSample(pData, nLen, tStart, tStop);
 		} else if (m_mt.subtype == MEDIASUBTYPE_XSUB) {
 			CXSUBSubtitle* pXSUBSubtitle = (CXSUBSubtitle*)(ISubStream*)m_pSubStream;
-			pXSUBSubtitle->ParseSample (pSample);
+			pXSUBSubtitle->ParseSample(pData, nLen);
 		}
 	}
 

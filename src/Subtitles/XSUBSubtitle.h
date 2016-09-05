@@ -57,7 +57,7 @@ public:
 	void	Reset();
 	void	CleanOld(REFERENCE_TIME rt);
 
-	HRESULT	ParseSample (IMediaSample* pSample);
+	HRESULT	ParseSample(BYTE* pData, long nLen);
 	HRESULT	NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 
 private :

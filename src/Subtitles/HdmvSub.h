@@ -91,8 +91,7 @@ public:
 	virtual REFERENCE_TIME	GetStart(POSITION nPos);
 	virtual REFERENCE_TIME	GetStop(POSITION nPos);
 
-	virtual HRESULT			ParseSample(IMediaSample* pSample);
-	HRESULT					ParseSample(BYTE* pData, int lSampleLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	HRESULT					ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
 	virtual void			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox);
 	virtual HRESULT			GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft);

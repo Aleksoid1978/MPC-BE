@@ -30,7 +30,7 @@ public:
 	CDVBSub();
 	~CDVBSub();
 
-	virtual HRESULT			ParseSample (IMediaSample* pSample);
+	virtual HRESULT			ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 	virtual void			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox);
 	virtual HRESULT			GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft);
 	virtual POSITION		GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld = false);
@@ -189,8 +189,6 @@ private:
 	int					m_nBufferReadPos	= 0;
 	int					m_nBufferWritePos	= 0;
 	BYTE*				m_pBuffer			= NULL;
-	REFERENCE_TIME		m_rtStart			= 0;
-	REFERENCE_TIME		m_rtStop			= 0;
 	CAtlList<DVB_PAGE*>	m_pages;
 	CAutoPtr<DVB_PAGE>	m_pCurrentPage;
 	DVB_DISPLAY			m_Display;
