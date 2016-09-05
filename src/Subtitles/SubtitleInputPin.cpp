@@ -62,8 +62,22 @@ static const bool IsHdmvSub(const CMediaType* pmt)
 CSubtitleInputPin::CSubtitleInputPin(CBaseFilter* pFilter, CCritSec* pLock, CCritSec* pSubLock, HRESULT* phr)
 	: CBaseInputPin(NAME("CSubtitleInputPin"), pFilter, pLock, phr, L"Input")
 	, m_pSubLock(pSubLock)
+	, m_bExitDecodingThread(false)
+	, m_bStopDecoding(false)
 {
 	m_bCanReconnectWhenActive = true;
+	m_decodeThread = std::thread([this]() {
+		DecodeSamples();
+	});
+}
+
+CSubtitleInputPin::~CSubtitleInputPin()
+{
+	m_bExitDecodingThread = m_bStopDecoding = true;
+	m_condQueueReady.notify_one();
+	if (m_decodeThread.joinable()) {
+		m_decodeThread.join();
+	}
 }
 
 HRESULT CSubtitleInputPin::CheckMediaType(const CMediaType* pmt)
@@ -83,6 +97,8 @@ HRESULT CSubtitleInputPin::CheckMediaType(const CMediaType* pmt)
 
 HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 {
+	InvalidateSamples();
+
 	if (m_mt.majortype == MEDIATYPE_Text) {
 		if (!(m_pSubStream = DNew CRenderedTextSubtitle(m_pSubLock))) {
 			return E_FAIL;
@@ -95,10 +111,10 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 			|| m_mt.majortype == MEDIATYPE_Subtitle
 			|| (m_mt.majortype == MEDIATYPE_Video && (m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE || m_mt.subtype == MEDIASUBTYPE_XSUB))) {
 
-		SUBTITLEINFO*	psi		= (SUBTITLEINFO*)m_mt.pbFormat;
-		DWORD			dwOffset	= 0;
-		CString			name;
-		LCID			lcid = 0;
+		SUBTITLEINFO* psi = (SUBTITLEINFO*)m_mt.pbFormat;
+		DWORD         dwOffset = 0;
+		CString       name;
+		LCID          lcid = 0;
 
 		if (m_mt.subtype == MEDIASUBTYPE_XSUB) {
 			name = CString(GetPinName(pReceivePin));
@@ -197,6 +213,8 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 
 HRESULT CSubtitleInputPin::BreakConnect()
 {
+	InvalidateSamples();
+
 	RemoveSubStream(m_pSubStream);
 	m_pSubStream = NULL;
 
@@ -208,6 +226,8 @@ HRESULT CSubtitleInputPin::BreakConnect()
 STDMETHODIMP CSubtitleInputPin::ReceiveConnection(IPin* pConnector, const AM_MEDIA_TYPE* pmt)
 {
 	if (m_Connected) {
+		InvalidateSamples();
+
 		RemoveSubStream(m_pSubStream);
 		m_pSubStream = NULL;
 
@@ -221,6 +241,8 @@ STDMETHODIMP CSubtitleInputPin::ReceiveConnection(IPin* pConnector, const AM_MED
 STDMETHODIMP CSubtitleInputPin::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
 	CAutoLock cAutoLock(&m_csReceive);
+
+	InvalidateSamples();
 
 	if (m_mt.majortype == MEDIATYPE_Text
 			|| (m_mt.majortype == MEDIATYPE_Subtitle
@@ -241,11 +263,11 @@ STDMETHODIMP CSubtitleInputPin::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME
 	} else if (IsHdmvSub(&m_mt)) {
 		CAutoLock cAutoLock(m_pSubLock);
 		CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)(ISubStream*)m_pSubStream;
-		pHdmvSubtitle->NewSegment (tStart, tStop, dRate);
+		pHdmvSubtitle->NewSegment(tStart, tStop, dRate);
 	} else if (m_mt.subtype == MEDIASUBTYPE_XSUB) {
 		CAutoLock cAutoLock(m_pSubLock);
 		CXSUBSubtitle* pXSUBSubtitle = (CXSUBSubtitle*)(ISubStream*)m_pSubStream;
-		pXSUBSubtitle->NewSegment (tStart, tStop, dRate);
+		pXSUBSubtitle->NewSegment(tStart, tStop, dRate);
 	}
 
 	InvalidateSubtitle(tStart, m_pSubStream);
@@ -255,13 +277,16 @@ STDMETHODIMP CSubtitleInputPin::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME
 
 STDMETHODIMP CSubtitleInputPin::EndOfStream()
 {
-	if (IsHdmvSub(&m_mt)) {
-		CAutoLock cAutoLock(m_pSubLock);
-		CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)(ISubStream*)m_pSubStream;
-		pHdmvSubtitle->EndOfStream();
+	HRESULT hr = __super::EndOfStream();
+
+	if (SUCCEEDED(hr)) {
+		std::unique_lock<std::mutex> lock(m_mutexQueue);
+		m_sampleQueue.emplace_back(nullptr); // nullptr means end of stream
+		lock.unlock();
+		m_condQueueReady.notify_one();
 	}
 
-	return __super::EndOfStream();
+	return hr;
 }
 
 STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
@@ -272,17 +297,6 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 	}
 
 	CAutoLock cAutoLock(&m_csReceive);
-
-	BYTE* pData = NULL;
-	hr = pSample->GetPointer(&pData);
-	if (FAILED(hr) || pData == NULL) {
-		return hr;
-	}
-
-	long nLen = pSample->GetActualDataLength();
-	if (nLen <= 0) {
-		return E_FAIL;
-	}
 
 	REFERENCE_TIME tStart, tStop;
 	hr = pSample->GetTime(&tStart, &tStop);
@@ -304,7 +318,88 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 			return hr;
 	}
 
+	if ((tStart == INVALID_TIME || tStop == INVALID_TIME) && !IsHdmvSub(&m_mt)) {
+		ASSERT(FALSE);
+	} else {
+		BYTE* pData = NULL;
+		hr = pSample->GetPointer(&pData);
+		long len = pSample->GetActualDataLength();
+		if (FAILED(hr) || pData == NULL || len <= 0) {
+			return hr;
+		}
+
+		{
+			std::unique_lock<std::mutex> lock(m_mutexQueue);
+			m_sampleQueue.emplace_back(DNew SubtitleSample(tStart, tStop, pData, (size_t)len));
+			lock.unlock();
+			m_condQueueReady.notify_one();
+		}
+	}
+
+	return S_OK;
+}
+
+void  CSubtitleInputPin::DecodeSamples()
+{
+	SetThreadName(DWORD_MAX, "Subtitle Input Pin Thread");
+
+	while(!m_bExitDecodingThread) {
+		std::unique_lock<std::mutex> lock(m_mutexQueue);
+
+		auto needStopProcessing = [this]() {
+			return m_bStopDecoding || m_bExitDecodingThread;
+		};
+
+		auto isQueueReady = [&]() {
+			return !m_sampleQueue.empty() || needStopProcessing();
+		};
+
+		m_condQueueReady.wait(lock, isQueueReady);
+		lock.unlock(); // Release this lock until we can acquire the other one
+
+		REFERENCE_TIME rtInvalidate = -1;
+
+		if (!needStopProcessing()) {
+			CAutoLock cAutoLock(m_pSubLock);
+			lock.lock(); // Reacquire the lock
+
+			while (!m_sampleQueue.empty() && !needStopProcessing()) {
+				const auto& pSample = m_sampleQueue.front();
+
+				if (pSample) {
+					const REFERENCE_TIME rtSampleInvalidate = DecodeSample(pSample);
+					if (rtSampleInvalidate >= 0 && (rtSampleInvalidate < rtInvalidate || rtInvalidate < 0)) {
+						rtInvalidate = rtSampleInvalidate;
+					}
+				} else { // marker for end of stream
+					if (IsHdmvSub(&m_mt)) {
+						CRenderedHdmvSubtitle* pHdmvSubtitle = (CRenderedHdmvSubtitle*)(ISubStream*)m_pSubStream;
+						pHdmvSubtitle->EndOfStream();
+					}
+				}
+
+				m_sampleQueue.pop_front();
+			}
+		}
+
+		if (rtInvalidate >= 0) {
+#if (FALSE)
+			DbgLog((LOG_TRACE, 3, L"InvalidateSubtitle() : %I64d", rtInvalidate));
+#endif
+			// IMPORTANT: m_pSubLock must not be locked when calling this
+			InvalidateSubtitle(rtInvalidate, m_pSubStream);
+		}
+	}
+}
+
+REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSample>& pSample)
+{
 	bool bInvalidate = false;
+
+	BYTE* pData = pSample->data.data();
+	const size_t nLen = pSample->data.size();
+	const REFERENCE_TIME tStart = pSample->rtStart;
+	const REFERENCE_TIME tStop = pSample->rtStop;
 
 	if (m_mt.majortype == MEDIATYPE_Text) {
 		CAutoLock cAutoLock(m_pSubLock);
@@ -423,13 +518,15 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 		}
 	}
 
-	if (bInvalidate) {
-#if (FALSE)
-		DbgLog((LOG_TRACE, 3, L"InvalidateSubtitle() : %I64d", tStart));
-#endif
-		// IMPORTANT: m_pSubLock must not be locked when calling this
-		InvalidateSubtitle(tStart, m_pSubStream);
-	}
+	return bInvalidate ? tStart : -1;
+}
 
-	return hr;
+void CSubtitleInputPin::InvalidateSamples()
+{
+	m_bStopDecoding = true;
+	{
+		std::lock_guard<std::mutex> lock(m_mutexQueue);
+		m_sampleQueue.clear();
+		m_bStopDecoding = false;
+	}
 }
