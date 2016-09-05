@@ -979,7 +979,7 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector ds
 	// resize width
 	hr = m_pD3DDevEx->SetTexture(0, pTexture);
 	if (rx > 2.0f) {
-		float fConstData[][4] = { { dx0, dy0, 0, 0 },{ rx, 0, 0, 0 },{ ry, 0, 0, 0 } };
+		float fConstData[][4] = { { dx0, dy0, 0, 0 },{ rx, 0, 0, 0 } };
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[shader_downscaling_x]);
 	}
@@ -996,7 +996,7 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector ds
 	// resize height
 	hr = m_pD3DDevEx->SetTexture(0, m_pResizeTexture);
 	if (ry > 2.0f) {
-		float fConstData[][4] = { { dx1, dy1, 0, 0 },{ rx, 0, 0, 0 },{ ry, 0, 0, 0 } };
+		float fConstData[][4] = { { dx1, dy1, 0, 0 },{ 0, ry, 0, 0 } };
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[shader_downscaling_y]);
 	}
