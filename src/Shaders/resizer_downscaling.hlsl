@@ -9,11 +9,10 @@
 
 sampler s0 : register(s0);
 float2 dxdy : register(c0);
-float rx : register(c1);
-float ry : register(c2);
+float2 r : register(c1);
 
-static const int kx = clamp(int(rx+0.5), 2, MAXSTEPS);
-static const int ky = clamp(int(ry+0.5), 2, MAXSTEPS);
+static const int kx = clamp(int(r.x+0.5), 2, MAXSTEPS);
+static const int ky = clamp(int(r.y+0.5), 2, MAXSTEPS);
 static const int kxy = kx*ky;
 
 float4 main(float2 tex : TEXCOORD0) : COLOR0
