@@ -22,7 +22,6 @@
 #pragma once
 
 #define WM_MYMOUSELAST WM_XBUTTONDBLCLK
-#define ENABLE_2PASS_RESIZE 0
 #define DXVAVP 1
 
 #define RS_EVRBUFFERS_MIN	4

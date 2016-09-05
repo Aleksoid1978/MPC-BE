@@ -221,10 +221,7 @@ void CDX9RenderingEngine::CleanupRenderingEngine()
 	m_pRotateTexture = NULL;
 	NULL_PTR_ARRAY(m_pFrameTextures)
 	NULL_PTR_ARRAY(m_pScreenSpaceTextures);
-
-#if ENABLE_2PASS_RESIZE
 	m_pResizeTexture = NULL;
-#endif
 }
 
 HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
@@ -533,7 +530,6 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			m_wsResizer = L"Bilinear";
 			hr = TextureResize(pVideoTexture, dst, srcRect, D3DTEXF_LINEAR);
 			break;
-#if ENABLE_2PASS_RESIZE
 		case RESIZER_SHADER_BSPLINE4:
 			m_wsResizer = L"B-spline4";
 			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bspline4_x);
@@ -566,36 +562,6 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			m_wsResizer = L"Lanczos3";
 			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_lanczos3_x);
 			break;
-#else
-		case RESIZER_SHADER_SMOOTHERSTEP:
-			m_wsResizer = L"Perlin Smootherstep";
-			hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_smootherstep);
-			break;
-		case RESIZER_SHADER_BSPLINE4:
-			m_wsResizer = L"B-spline4";
-			hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_bspline4);
-			break;
-		case RESIZER_SHADER_MITCHELL4:
-			m_wsResizer = L"Mitchell-Netravali spline4";
-			hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_mitchell4);
-			break;
-		case RESIZER_SHADER_CATMULL4:
-			m_wsResizer = L"Catmull-Rom spline4";
-			hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_catmull4);
-			break;
-		case RESIZER_SHADER_BICUBIC06:
-			m_wsResizer = L"Bicubic A=-0.6";
-			hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_bicubic06);
-			break;
-		case RESIZER_SHADER_BICUBIC08:
-			m_wsResizer = L"Bicubic A=-0.8";
-			hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_bicubic08);
-			break;
-		case RESIZER_SHADER_BICUBIC10:
-			m_wsResizer = L"Bicubic A=-1.0";
-			hr = TextureResizeShader(pVideoTexture, dst, srcRect, shader_bicubic10);
-			break;
-#endif
 		}
 	}
 
@@ -1048,7 +1014,6 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 	case RESIZER_BILINEAR:
 	case RESIZER_DXVA2:
 		return S_FALSE;
-#if ENABLE_2PASS_RESIZE
 	case RESIZER_SHADER_BSPLINE4:  iShader = shader_bspline4_x;  break;
 	case RESIZER_SHADER_MITCHELL4: iShader = shader_mitchell4_x; break;
 	case RESIZER_SHADER_CATMULL4:  iShader = shader_catmull4_x;  break;
@@ -1057,15 +1022,6 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 	case RESIZER_SHADER_BICUBIC10: iShader = shader_bicubic10_x; break;
 	case RESIZER_SHADER_LANCZOS2:  iShader = shader_lanczos2_x;  break;
 	case RESIZER_SHADER_LANCZOS3:  iShader = shader_lanczos3_x;  break;
-#else
-	case RESIZER_SHADER_SMOOTHERSTEP: iShader = shader_smootherstep; break;
-	case RESIZER_SHADER_BSPLINE4:     iShader = shader_bspline4;  break;
-	case RESIZER_SHADER_MITCHELL4:    iShader = shader_mitchell4; break;
-	case RESIZER_SHADER_CATMULL4:     iShader = shader_catmull4;  break;
-	case RESIZER_SHADER_BICUBIC06:    iShader = shader_bicubic06; break;
-	case RESIZER_SHADER_BICUBIC08:    iShader = shader_bicubic08; break;
-	case RESIZER_SHADER_BICUBIC10:    iShader = shader_bicubic10; break;
-#endif
 	default:
 		return E_INVALIDARG;
 	}
@@ -1078,130 +1034,45 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 		return E_FAIL;
 	}
 
-	bool twopass = false;
 	UINT resid = 0;
 
 	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 		switch (iShader) {
-#if ENABLE_2PASS_RESIZE
-		case shader_bspline4_y: iShader--;
-		case shader_bspline4_x:
-			resid = IDF_SHADER_PS20_BSPLINE4_X;
-			twopass = true;
-			break;
-		case shader_mitchell4_y: iShader--;
-		case shader_mitchell4_x:
-			resid = IDF_SHADER_PS20_MITCHELL4_X;
-			twopass = true;
-			break;
-		case shader_catmull4_y: iShader--;
-		case shader_catmull4_x:
-			resid = IDF_SHADER_PS20_CATMULL4_X;
-			twopass = true;
-			break;
-		case shader_bicubic06_y: iShader--;
-		case shader_bicubic06_x:
-			resid = IDF_SHADER_PS20_BICUBIC06_X;
-			twopass = true;
-			break;
-		case shader_bicubic08_y: iShader--;
-		case shader_bicubic08_x:
-			resid = IDF_SHADER_PS20_BICUBIC08_X;
-			twopass = true;
-			break;
-		case shader_bicubic10_y: iShader--;
-		case shader_bicubic10_x:
-			resid = IDF_SHADER_PS20_BICUBIC10_X;
-			twopass = true;
-			break;
-		case shader_lanczos2_y: iShader--;
-		case shader_lanczos2_x:
-			resid = IDF_SHADER_PS20_LANCZOS2_X;
-			twopass = true;
-			break;
-#else
-		case shader_smootherstep: resid = IDF_SHADER_PS20_SMOOTHERSTEP; break;
-		case shader_bspline4:     resid = IDF_SHADER_PS20_BSPLINE4;     break;
-		case shader_mitchell4:    resid = IDF_SHADER_PS20_MITCHELL4;    break;
-		case shader_catmull4:
-			return E_NOTIMPL;
-		case shader_bicubic06:    resid = IDF_SHADER_PS20_BICUBIC06;    break;
-		case shader_bicubic08:    resid = IDF_SHADER_PS20_BICUBIC08;    break;
-		case shader_bicubic10:    resid = IDF_SHADER_PS20_BICUBIC10;    break;
-#endif
+		case shader_bspline4_x:  resid = IDF_SHADER_PS20_BSPLINE4_X;  break;
+		case shader_mitchell4_x: resid = IDF_SHADER_PS20_MITCHELL4_X; break;
+		case shader_catmull4_x:  resid = IDF_SHADER_PS20_CATMULL4_X;  break;
+		case shader_bicubic06_x: resid = IDF_SHADER_PS20_BICUBIC06_X; break;
+		case shader_bicubic08_x: resid = IDF_SHADER_PS20_BICUBIC08_X; break;
+		case shader_bicubic10_x: resid = IDF_SHADER_PS20_BICUBIC10_X; break;
+		case shader_lanczos2_x:  resid = IDF_SHADER_PS20_LANCZOS2_X;  break;
 		default:
 			return E_INVALIDARG;
 		}
 	}
 	else {
 		switch (iShader) {
-#if ENABLE_2PASS_RESIZE
-		case shader_bspline4_y: iShader--;
-		case shader_bspline4_x:
-			resid = IDF_SHADER_RESIZER_BSPLINE4_X;
-			twopass = true;
-			break;
-		case shader_mitchell4_y: iShader--;
-		case shader_mitchell4_x:
-			resid = IDF_SHADER_RESIZER_MITCHELL4_X;
-			twopass = true;
-			break;
-		case shader_catmull4_y: iShader--;
-		case shader_catmull4_x:
-			resid = IDF_SHADER_RESIZER_CATMULL4_X;
-			twopass = true;
-			break;
-		case shader_bicubic06_y: iShader--;
-		case shader_bicubic06_x:
-			resid = IDF_SHADER_RESIZER_BICUBIC06_X;
-			twopass = true;
-			break;
-		case shader_bicubic08_y: iShader--;
-		case shader_bicubic08_x:
-			resid = IDF_SHADER_RESIZER_BICUBIC08_X;
-			twopass = true;
-			break;
-		case shader_bicubic10_y: iShader--;
-		case shader_bicubic10_x:
-			resid = IDF_SHADER_RESIZER_BICUBIC10_X;
-			twopass = true;
-			break;
-		case shader_lanczos2_y: iShader--;
-		case shader_lanczos2_x:
-			resid = IDF_SHADER_RESIZER_LANCZOS2_X;
-			twopass = true;
-			break;
-		case shader_lanczos3_y: iShader--;
-		case shader_lanczos3_x:
-			resid = IDF_SHADER_RESIZER_LANCZOS3_X;
-			twopass = true;
-			break;
-#else
-		case shader_smootherstep: resid = IDF_SHADER_RESIZER_SMOOTHERSTEP; break;
-		case shader_bspline4:     resid = IDF_SHADER_RESIZER_BSPLINE4;  break;
-		case shader_mitchell4:    resid = IDF_SHADER_RESIZER_MITCHELL4; break;
-		case shader_catmull4:     resid = IDF_SHADER_RESIZER_CATMULL4;  break;
-		case shader_bicubic06:    resid = IDF_SHADER_RESIZER_BICUBIC06; break;
-		case shader_bicubic08:    resid = IDF_SHADER_RESIZER_BICUBIC08; break;
-		case shader_bicubic10:    resid = IDF_SHADER_RESIZER_BICUBIC10; break;
-#endif
+		case shader_bspline4_x:  resid = IDF_SHADER_RESIZER_BSPLINE4_X;  break;
+		case shader_mitchell4_x: resid = IDF_SHADER_RESIZER_MITCHELL4_X; break;
+		case shader_catmull4_x:  resid = IDF_SHADER_RESIZER_CATMULL4_X;  break;
+		case shader_bicubic06_x: resid = IDF_SHADER_RESIZER_BICUBIC06_X; break;
+		case shader_bicubic08_x: resid = IDF_SHADER_RESIZER_BICUBIC08_X; break;
+		case shader_bicubic10_x: resid = IDF_SHADER_RESIZER_BICUBIC10_X; break;
+		case shader_lanczos2_x:  resid = IDF_SHADER_RESIZER_LANCZOS2_X;  break;
+		case shader_lanczos3_x:  resid = IDF_SHADER_RESIZER_LANCZOS3_X;  break;
 		default:
 			return E_INVALIDARG;
 		}
 	}
 
 	HRESULT hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[iShader], resid);
-#if ENABLE_2PASS_RESIZE
-	if (S_OK == hr && twopass) {
+	if (S_OK == hr) {
 		hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[iShader + 1], resid + 1);
 	}
-#endif
 	if (FAILED(hr)) {
 		ASSERT(0);
 		return hr;
 	}
 
-#if ENABLE_2PASS_RESIZE
 	if (!m_pResizerPixelShaders[shader_downscaling_x] || !m_pResizerPixelShaders[shader_downscaling_y]) {
 		UINT resid = m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0) ? IDF_SHADER_PS20_DOWNSCALING_X : IDF_SHADER_DOWNSCALING_X;
 		hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[shader_downscaling_x], resid);
@@ -1210,13 +1081,6 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 		}
 		ASSERT(S_OK == hr);
 	}
-#else
-	if (!m_pResizerPixelShaders[shader_downscaling]) {
-		UINT resid = m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0) ? IDF_SHADER_PS20_DOWNSCALING : IDF_SHADER_DOWNSCALING;
-		hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[shader_downscaling], resid);
-		ASSERT(S_OK == hr);
-	}
-#endif
 
 	return S_OK;
 }
@@ -1251,7 +1115,6 @@ HRESULT CDX9RenderingEngine::TextureResize(IDirect3DTexture9* pTexture, Vector d
 	return hr;
 }
 
-#if ENABLE_2PASS_RESIZE
 HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, int iShader1)
 {
 	HRESULT hr;
@@ -1360,55 +1223,6 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 
 	return hr;
 }
-
-#else
-HRESULT CDX9RenderingEngine::TextureResizeShader(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, int iShader)
-{
-	HRESULT hr;
-
-	D3DSURFACE_DESC desc;
-	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc))) {
-		return E_FAIL;
-	}
-
-	const float w = sqrt(pow(dst[1].x - dst[0].x, 2) + pow(dst[1].y - dst[0].y, 2) + pow(dst[1].z - dst[0].z, 2));
-	const float h = sqrt(pow(dst[2].x - dst[0].x, 2) + pow(dst[2].y - dst[0].y, 2) + pow(dst[2].z - dst[0].z, 2));
-	const float rx = srcRect.Width() / w;
-	const float ry = srcRect.Height() / h;
-
-	// make const to give compiler a chance of optimising, also float faster than double and converted to float to sent to PS anyway
-	const float dx = 1.0f / (float)desc.Width;
-	const float dy = 1.0f / (float)desc.Height;
-	const float tx0 = (float)srcRect.left - 0.5f;
-	const float tx1 = (float)srcRect.right - 0.5f;
-	const float ty0 = (float)srcRect.top - 0.5f;
-	const float ty1 = (float)srcRect.bottom - 0.5f;
-
-	MYD3DVERTEX<1> v[] = {
-		{ dst[0].x - 0.5f, dst[0].y - 0.5f, dst[0].z, 1.0f / dst[0].z,{ tx0, ty0 } },
-		{ dst[1].x - 0.5f, dst[1].y - 0.5f, dst[1].z, 1.0f / dst[1].z,{ tx1, ty0 } },
-		{ dst[2].x - 0.5f, dst[2].y - 0.5f, dst[2].z, 1.0f / dst[2].z,{ tx0, ty1 } },
-		{ dst[3].x - 0.5f, dst[3].y - 0.5f, dst[3].z, 1.0f / dst[3].z,{ tx1, ty1 } },
-	};
-
-	hr = m_pD3DDev->SetTexture(0, pTexture);
-
-	if (m_pResizerPixelShaders[shader_downscaling] && rx > 2.0f && ry > 2.0f) {
-		m_wsResizer = L"Simple averaging";
-		float fConstData[][4] = { { dx, dy, 0, 0 },{ rx, 0, 0, 0 },{ ry, 0, 0, 0 } };
-		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDev->SetPixelShader(m_pResizerPixelShaders[shader_downscaling]);
-	}
-	else {
-		float fConstData[][4] = { { dx, dy, 0, 0 },{ dx*0.5f, dy*0.5f, 0, 0 },{ dx, 0, 0, 0 },{ 0, dy, 0, 0 } };
-		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDev->SetPixelShader(m_pResizerPixelShaders[iShader]);
-	}
-	hr = TextureBlt(m_pD3DDev, v, D3DTEXF_POINT);
-
-	return hr;
-}
-#endif
 
 HRESULT CDX9RenderingEngine::InitFinalPass()
 {

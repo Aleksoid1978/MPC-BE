@@ -69,7 +69,6 @@ extern bool g_bExternalSubtitleTime;
 #define MAX_FIFO_SIZE 1024
 
 enum {
-#if ENABLE_2PASS_RESIZE
 	shader_bspline4_x,
 	shader_bspline4_y,
 	shader_mitchell4_x,
@@ -88,16 +87,6 @@ enum {
 	shader_lanczos3_y,
 	shader_downscaling_x,
 	shader_downscaling_y,
-#else
-	shader_smootherstep,
-	shader_bspline4,
-	shader_mitchell4,
-	shader_catmull4,
-	shader_bicubic06,
-	shader_bicubic08,
-	shader_bicubic10,
-	shader_downscaling,
-#endif
 	shader_count
 };
 
@@ -168,9 +157,7 @@ namespace GothSync
 		CComPtr<IDirect3DTexture9>	m_pOSDTexture;
 		CComPtr<IDirect3DSurface9>	m_pOSDSurface;
 		CComPtr<IDirect3DTexture9>	m_pScreenSizeTextures[2];
-#if ENABLE_2PASS_RESIZE
 		CComPtr<IDirect3DTexture9>	m_pResizeTexture;
-#endif
 		CComPtr<ID3DXLine>			m_pLine;
 		CComPtr<ID3DXFont>			m_pFont;
 		CComPtr<ID3DXSprite>		m_pSprite;
@@ -226,11 +213,7 @@ namespace GothSync
 		HRESULT DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect);
 		HRESULT TextureCopy(IDirect3DTexture9* pTexture);
 		HRESULT TextureResize(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &SrcRect, D3DTEXTUREFILTERTYPE filter);
-#if ENABLE_2PASS_RESIZE
 		HRESULT TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, int iShader1);
-#else
-		HRESULT TextureResizeShader(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, int iShader);
-#endif
 
 		typedef HRESULT (WINAPI * D3DXLoadSurfaceFromMemoryPtr)(
 			LPDIRECT3DSURFACE9 pDestSurface,

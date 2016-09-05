@@ -1,13 +1,5 @@
 @echo off
 echo === Compiling Pixel Shaders 2.0 ===
-set LIST=%LIST% resizer_smootherstep.hlsl
-set LIST=%LIST% resizer_bspline4.hlsl
-set LIST=%LIST% resizer_mitchell4.hlsl
-set LIST=%LIST% resizer_bicubic06.hlsl
-set LIST=%LIST% resizer_bicubic08.hlsl
-set LIST=%LIST% resizer_bicubic10.hlsl
-set LIST=%LIST% resizer_downscaling.hlsl
-
 set LIST=%LIST% resizer_bspline4_x.hlsl
 set LIST=%LIST% resizer_bspline4_y.hlsl
 set LIST=%LIST% resizer_mitchell4_x.hlsl
