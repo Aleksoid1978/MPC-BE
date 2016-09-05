@@ -28,7 +28,7 @@ public:
 	CBaseSub(SUBTITLE_TYPE nType);
 	virtual ~CBaseSub();
 
-	virtual HRESULT			ParseSample (IMediaSample* pSample) PURE;
+	virtual HRESULT			ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop) PURE;
 	virtual void			Reset() PURE;
 	virtual POSITION		GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld = false) PURE;
 	virtual POSITION		GetNext(POSITION pos) PURE;

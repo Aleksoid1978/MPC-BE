@@ -182,11 +182,11 @@ STDMETHODIMP CRenderedHdmvSubtitle::SetSourceTargetInfo(CString yuvMatrix, CStri
 	return m_pSub->SetConvertType(yuvMatrix, convertType);
 }
 
-HRESULT CRenderedHdmvSubtitle::ParseSample (IMediaSample* pSample)
+HRESULT CRenderedHdmvSubtitle::ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
 	
-	HRESULT hr = m_pSub->ParseSample (pSample);
+	HRESULT hr = m_pSub->ParseSample(pData, nLen, rtStart, rtStop);
 	return hr;
 }
 

@@ -207,21 +207,13 @@ STDMETHODIMP CXSUBSubtitle::Reload()
 	return S_OK;
 }
 
-HRESULT CXSUBSubtitle::ParseSample (IMediaSample* pSample)
+HRESULT CXSUBSubtitle::ParseSample(BYTE* pData, long nLen)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
-	HRESULT		hr = E_FAIL;
 
-	CheckPointer (pSample, E_POINTER);
-	BYTE*	pData = NULL;
-	int		lSampleLen;
-
-	hr = pSample->GetPointer(&pData);
-	if (FAILED(hr) || pData == NULL) {
-		return hr;
-	}
-	lSampleLen = pSample->GetActualDataLength();
-	if (lSampleLen < (27 + 7 * 2 + 4 * 3)) {
+	CheckPointer(pData, E_POINTER);
+	
+	if (nLen < (27 + 7 * 2 + 4 * 3)) {
 		return E_FAIL;
 	}
 
@@ -242,7 +234,7 @@ HRESULT CXSUBSubtitle::ParseSample (IMediaSample* pSample)
 	pSub->m_rtStart	= rtStart;
 	pSub->m_rtStop	= rtStop;
 
-	CGolombBuffer gb(pData + 27, lSampleLen - 27);
+	CGolombBuffer gb(pData + 27, nLen - 27);
 	pSub->m_width				= gb.ReadShortLE();
 	pSub->m_height				= gb.ReadShortLE();
 	pSub->m_horizontal_position	= gb.ReadShortLE();
@@ -271,9 +263,7 @@ HRESULT CXSUBSubtitle::ParseSample (IMediaSample* pSample)
 
 	m_pObjects.AddTail(pSub);
 
-	hr = S_OK;
-
-	return hr;
+	return S_OK;
 }
 
 HRESULT CXSUBSubtitle::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
