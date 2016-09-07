@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "MiniDump.h"
+#include "Misc.h"
 #include <DbgHelp.h>
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/WinAPIUtils.h"

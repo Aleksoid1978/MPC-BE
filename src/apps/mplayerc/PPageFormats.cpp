@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "PPageFormats.h"
+#include "Misc.h"
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/WinAPIUtils.h"
@@ -28,7 +29,6 @@
 #include <string>
 #include <atlimage.h>
 #include <HighDPI.h>
-
 
 // CPPageFormats dialog
 

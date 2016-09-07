@@ -24,6 +24,7 @@
 #include <atlpath.h>
 #include <d3d9types.h>
 #include "MiniDump.h"
+#include "Misc.h"
 #include "PlayerYouTube.h"
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/SysVersion.h"

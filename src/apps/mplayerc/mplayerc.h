@@ -32,7 +32,6 @@
 #include "FakeFilterMapper2.h"
 #include "AppSettings.h"
 #include "../../../Include/Version.h"
-#include "WinDebugMonitor.h"
 
 #include <map>
 #include <mutex>
@@ -50,15 +49,6 @@ enum {
 };
 
 #define WM_MYMOUSELAST WM_XBUTTONDBLCLK
-
-extern HICON LoadIcon(CString fn, bool fSmall);
-extern bool LoadType(CString fn, CString& type);
-extern bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
-
-extern WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen = false, bool bCheckMouse = true);
-
-extern void SetAudioRenderer(int AudioDevNo);
-extern void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue);
 
 struct LanguageResource {
 	const UINT resourceID;
@@ -153,56 +143,3 @@ public:
 #define AfxGetAppSettings()	static_cast<CMPlayerCApp*>(AfxGetApp())->m_s
 #define AfxGetMainFrame()	static_cast<CMainFrame*>(AfxGetMainWnd())
 #define AfxFindMainFrame()	dynamic_cast<CMainFrame*>(AfxGetMainWnd())
-
-class CDebugMonitor : public CWinDebugMonitor
-{
-	FILE* m_File;
-
-private:
-	CString GetLocalTime() {
-		SYSTEMTIME st;
-		::GetLocalTime(&st);
-
-		CString lt;
-		lt.Format(L"%04d.%02d.%02d %02d:%02d:%02d.%03d", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
-
-		return lt;
-	}
-
-public:
-	CDebugMonitor(DWORD dwProcessId) : CWinDebugMonitor(dwProcessId) {
-		static CString sDesktop;
-		if (sDesktop.IsEmpty()) {
-			TCHAR szPath[MAX_PATH];
-			if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOP, NULL, 0, szPath))) {
-				sDesktop = CString(szPath) + L"\\";
-			}
-		}
-
-		m_File = NULL;
-		if (bIsInitialize) {
-			CString fname = sDesktop + L"mpc-be_debug.log";
-			m_File = _tfopen(fname, L"at, ccs=UTF-8");
-			if (m_File) {
-				fseek(m_File, 0, 2);
-
-				_ftprintf_s(m_File, _T("=== Start MPC-BE Debug log [%s] ===\n"), GetLocalTime());
-			}
-		}
-	}
-
-	~CDebugMonitor() {
-		if (m_File) {
-			_ftprintf_s(m_File, _T("=== End MPC-BE Debug log [%s] ===\n"), GetLocalTime());
-
-			fclose(m_File);
-		}
-	}
-
-	virtual void OutputWinDebugString(const char *str) {
-		if (m_File) {
-			_ftprintf_s(m_File, _T("%s : %S"), GetLocalTime(), str);
-		}
-	};
-};
-

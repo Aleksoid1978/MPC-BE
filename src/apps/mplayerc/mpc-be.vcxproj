@@ -193,6 +193,7 @@
     <ClCompile Include="CShockwaveFlash.cpp" />
     <ClCompile Include="DiskImage.cpp" />
     <ClCompile Include="ItemPropertiesDlg.cpp" />
+    <ClCompile Include="Misc.cpp" />
     <ClCompile Include="OSD.cpp" />
     <ClCompile Include="PlayerFlyBar.cpp" />
     <ClCompile Include="PlayerYouTube.cpp" />
@@ -307,6 +308,7 @@
     <ClInclude Include="DIB.h" />
     <ClInclude Include="DiskImage.h" />
     <ClInclude Include="ItemPropertiesDlg.h" />
+    <ClInclude Include="Misc.h" />
     <ClInclude Include="OpenImage.h" />
     <ClInclude Include="OSD.h" />
     <ClInclude Include="PlayerFlyBar.h" />
