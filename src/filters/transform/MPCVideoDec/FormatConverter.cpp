@@ -301,6 +301,8 @@ void CFormatConverter::SetConvertFunc()
 			if (m_FProps.pftype == PFType_YUV422Px) {
 				pConvertFn = &CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le;
 				m_RequiredAlignment = 8;
+			} else if (m_FProps.avpixfmt == AV_PIX_FMT_NV12) {
+				break;
 			} else if (m_FProps.pftype == PFType_YUV420 || m_FProps.pftype == PFType_YUV420Px && m_FProps.lumabits <= 14) {
 				pConvertFn = &CFormatConverter::convert_yuv420_yuy2;
 				m_RequiredAlignment = 8;
