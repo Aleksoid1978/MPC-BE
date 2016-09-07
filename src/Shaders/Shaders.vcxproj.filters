@@ -19,41 +19,41 @@
     <FxCompile Include="resizer_bicubic08_y.hlsl" />
     <FxCompile Include="resizer_bicubic10_x.hlsl" />
     <FxCompile Include="resizer_bicubic10_y.hlsl" />
-    <FxCompile Include="resizer_bspline4.hlsl">
-      <Filter>OnePassResizers</Filter>
-    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resizer_bicubic_base_x.hlsl" />
     <None Include="resizer_bicubic_base_y.hlsl" />
-    <None Include="resizer_bicubic_base.hlsl">
+    <None Include="OnePassResizers\resizer_bicubic_base.hlsl">
       <Filter>OnePassResizers</Filter>
     </None>
-    <None Include="resizer_bilinear.hlsl">
+    <None Include="OnePassResizers\resizer_bilinear.hlsl">
       <Filter>OnePassResizers</Filter>
     </None>
-    <None Include="resizer_nearest.hlsl">
+    <None Include="OnePassResizers\resizer_nearest.hlsl">
       <Filter>OnePassResizers</Filter>
     </None>
-    <None Include="resizer_bicubic06.hlsl">
+    <None Include="OnePassResizers\resizer_bicubic06.hlsl">
       <Filter>OnePassResizers</Filter>
     </None>
-    <None Include="resizer_bicubic08.hlsl">
+    <None Include="OnePassResizers\resizer_bicubic08.hlsl">
       <Filter>OnePassResizers</Filter>
     </None>
-    <None Include="resizer_bicubic10.hlsl">
+    <None Include="OnePassResizers\resizer_bicubic10.hlsl">
       <Filter>OnePassResizers</Filter>
     </None>
-    <None Include="resizer_catmull4.hlsl">
+    <None Include="OnePassResizers\resizer_catmull4.hlsl">
       <Filter>OnePassResizers</Filter>
     </None>
-    <None Include="resizer_downscaling.hlsl">
+    <None Include="OnePassResizers\resizer_downscaling.hlsl">
       <Filter>OnePassResizers</Filter>
     </None>
-    <None Include="resizer_mitchell4.hlsl">
+    <None Include="OnePassResizers\resizer_mitchell4.hlsl">
       <Filter>OnePassResizers</Filter>
     </None>
-    <None Include="resizer_smootherstep.hlsl">
+    <None Include="OnePassResizers\resizer_smootherstep.hlsl">
+      <Filter>OnePassResizers</Filter>
+    </None>
+    <None Include="OnePassResizers\resizer_bspline4.hlsl">
       <Filter>OnePassResizers</Filter>
     </None>
   </ItemGroup>
