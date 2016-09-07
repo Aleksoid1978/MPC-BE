@@ -112,6 +112,33 @@ static LRESULT CALLBACK ControlProc(HWND control, UINT message, WPARAM wParam, L
 	return CallWindowProc(OldControlProc, control, message, wParam, lParam);
 }
 
+static int CALLBACK EnumFontFamExProc(ENUMLOGFONTEX* /*lpelfe*/, NEWTEXTMETRICEX* /*lpntme*/, int /*FontType*/, LPARAM lParam)
+{
+	LPARAM* l = (LPARAM*)lParam;
+	*l = TRUE;
+	return TRUE;
+}
+
+static bool IsFontInstalled(LPCTSTR lpszFont)
+{
+	// Get the screen DC
+	CDC dc;
+	if (!dc.CreateCompatibleDC(NULL)) {
+		return false;
+	}
+
+	LOGFONT lf = {0};
+	// Any character set will do
+	lf.lfCharSet = DEFAULT_CHARSET;
+	// Set the facename to check for
+	_tcscpy_s(lf.lfFaceName, lpszFont);
+	LPARAM lParam = 0;
+	// Enumerate fonts
+	EnumFontFamiliesEx(dc.GetSafeHdc(), &lf, (FONTENUMPROC)EnumFontFamExProc, (LPARAM)&lParam, 0);
+
+	return lParam ? true : false;
+}
+
 BOOL CPPageFileMediaInfo::OnInitDialog()
 {
 	__super::OnInitDialog();

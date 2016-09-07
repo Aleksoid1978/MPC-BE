@@ -20,17 +20,9 @@
 
 #pragma once
 
-struct IDirect3D9;
-
-BOOL				IsCompositionEnabled();
-bool				SetPrivilege(LPCTSTR privilege, bool bEnable=true);
-bool				ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName);
-bool				IsFontInstalled(LPCTSTR lpszFont);
-bool				ExploreToFile(CString path);
-bool				ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, UINT16* MonitorVerRes);
-
-BOOL				CFileGetStatus(LPCTSTR lpszFileName, CFileStatus& status);
-
-BOOL				IsUserAdmin();
-
-CString				GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw = GetLastError());
+bool    SetPrivilege(LPCTSTR privilege, bool bEnable=true);
+bool    ExploreToFile(CString path);
+bool    ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, UINT16* MonitorVerRes);
+BOOL    CFileGetStatus(LPCTSTR lpszFileName, CFileStatus& status);
+BOOL    IsUserAdmin();
+CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw = GetLastError());

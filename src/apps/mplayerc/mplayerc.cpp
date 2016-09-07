@@ -949,6 +949,126 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	return success;
 }
 
+static const CString GetHiveName(HKEY hive)
+{
+	switch ((ULONG_PTR)hive) {
+		case (ULONG_PTR)HKEY_CLASSES_ROOT:
+			return L"HKEY_CLASSES_ROOT";
+		case (ULONG_PTR)HKEY_CURRENT_USER:
+			return L"HKEY_CURRENT_USER";
+		case (ULONG_PTR)HKEY_LOCAL_MACHINE:
+			return L"HKEY_LOCAL_MACHINE";
+		case (ULONG_PTR)HKEY_USERS:
+			return L"HKEY_USERS";
+		case (ULONG_PTR)HKEY_PERFORMANCE_DATA:
+			return L"HKEY_PERFORMANCE_DATA";
+		case (ULONG_PTR)HKEY_CURRENT_CONFIG:
+			return L"HKEY_CURRENT_CONFIG";
+		case (ULONG_PTR)HKEY_DYN_DATA:
+			return L"HKEY_DYN_DATA";
+		case (ULONG_PTR)HKEY_PERFORMANCE_TEXT:
+			return L"HKEY_PERFORMANCE_TEXT";
+		case (ULONG_PTR)HKEY_PERFORMANCE_NLSTEXT:
+			return L"HKEY_PERFORMANCE_NLSTEXT";
+		default:
+			return L"";
+	}
+}
+
+static bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
+{
+	HKEY hKey = NULL;
+	if (RegOpenKeyEx(hKeyRoot, keyName, 0, KEY_READ, &hKey) != ERROR_SUCCESS) {
+		return false;
+	}
+
+	DWORD subKeysCount = 0, maxSubKeyLen = 0;
+	DWORD valuesCount = 0, maxValueNameLen = 0, maxValueDataLen = 0;
+	if (RegQueryInfoKey(hKey, NULL, NULL, NULL, &subKeysCount, &maxSubKeyLen, NULL, &valuesCount, &maxValueNameLen, &maxValueDataLen, NULL, NULL) != ERROR_SUCCESS) {
+		return false;
+	}
+	maxSubKeyLen += 1;
+	maxValueNameLen += 1;
+
+	CString buffer;
+
+	buffer.Format(L"[%s\\%s]\n", GetHiveName(hKeyRoot), keyName);
+	file.WriteString(buffer);
+
+	CString valueName;
+	DWORD valueNameLen, valueDataLen, type;
+	BYTE* data = DNew BYTE[maxValueDataLen];
+
+	for (DWORD indexValue = 0; indexValue < valuesCount; indexValue++) {
+		valueNameLen = maxValueNameLen;
+		valueDataLen = maxValueDataLen;
+
+		if (RegEnumValue(hKey, indexValue, valueName.GetBuffer(maxValueNameLen), &valueNameLen, NULL, &type, data, &valueDataLen) != ERROR_SUCCESS) {
+			delete [] data;
+			return false;
+		}
+
+		switch (type) {
+			case REG_SZ:
+				{
+					CString str((TCHAR*)data);
+					str.Replace(L"\\", L"\\\\");
+					str.Replace(L"\"", L"\\\"");
+					buffer.Format(L"\"%s\"=\"%s\"\n", valueName, str);
+					file.WriteString(buffer);
+				}
+				break;
+			case REG_BINARY:
+				buffer.Format(L"\"%s\"=hex:%02x", valueName, data[0]);
+				file.WriteString(buffer);
+				for (DWORD i = 1; i < valueDataLen; i++) {
+					buffer.Format(L",%02x", data[i]);
+					file.WriteString(buffer);
+				}
+				file.WriteString(L"\n");
+				break;
+			case REG_DWORD:
+				buffer.Format(L"\"%s\"=dword:%08x\n", valueName, *((DWORD*)data));
+				file.WriteString(buffer);
+				break;
+			default:
+				{
+					CString msg;
+					msg.Format(L"The value \"%s\\%s\\%s\" has an unsupported type and has been ignored.\nPlease report this error to the developers.",
+							   GetHiveName(hKeyRoot), keyName, valueName);
+					AfxMessageBox(msg, MB_ICONERROR | MB_OK);
+				}
+				delete [] data;
+				return false;
+		}
+	}
+
+	delete [] data;
+
+	file.WriteString(L"\n");
+
+	CString subKeyName;
+	DWORD subKeyLen;
+
+	for (DWORD indexSubKey = 0; indexSubKey < subKeysCount; indexSubKey++) {
+		subKeyLen = maxSubKeyLen;
+
+		if (RegEnumKeyEx(hKey, indexSubKey, subKeyName.GetBuffer(maxSubKeyLen), &subKeyLen, NULL, NULL, NULL, NULL) != ERROR_SUCCESS) {
+			return false;
+		}
+
+		buffer.Format(L"%s\\%s", keyName, subKeyName);
+
+		if (!ExportRegistryKey(file, hKeyRoot, buffer)) {
+			return false;
+		}
+	}
+
+	RegCloseKey(hKey);
+
+	return true;
+}
+
 void CMPlayerCApp::ExportSettings()
 {
 	CString ext = IsIniValid() ? _T("ini") : _T("reg");
