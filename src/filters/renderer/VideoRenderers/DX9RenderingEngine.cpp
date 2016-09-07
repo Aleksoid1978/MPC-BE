@@ -110,10 +110,7 @@ static HRESULT TextureBlt(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<texcoords> v[4]
 
 	hr = pD3DDev->SetFVF(D3DFVF_XYZRHW | FVF);
 	// hr = pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, v, sizeof(v[0]));
-
-	MYD3DVERTEX<texcoords> tmp = v[2];
-	v[2] = v[3];
-	v[3] = tmp;
+	std::swap(v[2], v[3]);
 	hr = pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, v, sizeof(v[0]));
 
 	//
@@ -1827,10 +1824,7 @@ HRESULT CDX9RenderingEngine::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_
 
 	hr = m_pD3DDev->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX0 | D3DFVF_DIFFUSE);
 	// hr = m_pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, v, sizeof(v[0]));
-
-	MYD3DVERTEX<0> tmp = v[2];
-	v[2] = v[3];
-	v[3] = tmp;
+	std::swap(v[2], v[3]);
 	hr = m_pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, v, sizeof(v[0]));
 
 	return S_OK;
