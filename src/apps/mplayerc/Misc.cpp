@@ -1,0 +1,414 @@
+/*
+ * (C) 2016 see Authors.txt
+ *
+ * This file is part of MPC-BE.
+ *
+ * MPC-BE is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MPC-BE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#include "stdafx.h"
+#include "Misc.h"
+
+bool SetPrivilege(LPCTSTR privilege, bool bEnable/* = true*/)
+{
+	SetThreadExecutionState(ES_CONTINUOUS);
+
+	HANDLE hToken;
+	// Get a token for this process.
+	if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
+		return false;
+	}
+
+	TOKEN_PRIVILEGES tkp;
+	// Get the LUID for the privilege.
+	LookupPrivilegeValue(NULL, privilege, &tkp.Privileges[0].Luid);
+
+	tkp.PrivilegeCount = 1;  // one privilege to set
+	tkp.Privileges[0].Attributes = bEnable ? SE_PRIVILEGE_ENABLED : 0;
+
+	// Set the privilege for this process.
+	AdjustTokenPrivileges(hToken, FALSE, &tkp, 0, (PTOKEN_PRIVILEGES)NULL, 0);
+
+	return (GetLastError() == ERROR_SUCCESS);
+}
+
+bool ExploreToFile(CString path)
+{
+	bool success = false;
+	HRESULT res = CoInitialize(NULL);
+
+	if (res == S_OK || res == S_FALSE) {
+		PIDLIST_ABSOLUTE pidl;
+
+		if (SHParseDisplayName(path, NULL, &pidl, 0, NULL) == S_OK) {
+			success = SUCCEEDED(SHOpenFolderAndSelectItems(pidl, 0, NULL, 0));
+			CoTaskMemFree(pidl);
+		}
+
+		CoUninitialize();
+	}
+
+	return success;
+}
+
+BOOL IsUserAdmin()
+/*++
+Routine Description: This routine returns TRUE if the caller's
+process is a member of the Administrators local group. Caller is NOT
+expected to be impersonating anyone and is expected to be able to
+open its own process and process token.
+Arguments: None.
+Return Value:
+	TRUE - Caller has Administrators local group.
+	FALSE - Caller does not have Administrators local group. --
+
+from http://msdn.microsoft.com/en-us/library/windows/desktop/aa376389(v=vs.85).aspx
+*/
+{
+	BOOL ret;
+	SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
+	PSID AdministratorsGroup;
+	ret = AllocateAndInitializeSid(
+		  &NtAuthority,
+		  2,
+		  SECURITY_BUILTIN_DOMAIN_RID,
+		  DOMAIN_ALIAS_RID_ADMINS,
+		  0, 0, 0, 0, 0, 0,
+		  &AdministratorsGroup);
+	if (ret) {
+		if (!CheckTokenMembership(NULL, AdministratorsGroup, &ret)) {
+			ret = FALSE;
+		}
+		FreeSid(AdministratorsGroup);
+	}
+
+	return ret;
+}
+
+// from http://msdn.microsoft.com/ru-RU/library/windows/desktop/ms680582(v=vs.85).aspx
+CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw/* = GetLastError()*/)
+{
+	LPVOID lpMsgBuf;
+	LPVOID lpDisplayBuf;
+
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM |
+		FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL,
+		dw,
+		MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+		//MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default system language
+		(LPTSTR)&lpMsgBuf,
+		0, NULL);
+
+	// Format the error message
+
+	lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
+		(lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR));
+	StringCchPrintf((LPTSTR)lpDisplayBuf,
+		LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+		L"Function '%s' failed with error %d: %s",
+		lpszFunction, dw, lpMsgBuf);
+
+	CString ret = (LPCTSTR)lpDisplayBuf;
+
+	LocalFree(lpMsgBuf);
+	LocalFree(lpDisplayBuf);
+
+	return ret;
+}
+
+HICON LoadIcon(CString fn, bool fSmall)
+{
+	if (fn.IsEmpty()) {
+		return NULL;
+	}
+
+	CString ext = fn.Left(fn.Find(_T("://"))+1).TrimRight(':');
+	if (ext.IsEmpty() || !ext.CompareNoCase(_T("file"))) {
+		ext = _T(".") + fn.Mid(fn.ReverseFind('.')+1);
+	}
+
+	CSize size(fSmall?16:32, fSmall?16:32);
+
+	if (!ext.CompareNoCase(_T(".ifo"))) {
+		if (HICON hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DVD), IMAGE_ICON, size.cx, size.cy, 0)) {
+			return hIcon;
+		}
+	}
+
+	if (!ext.CompareNoCase(_T(".cda"))) {
+		if (HICON hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_AUDIOCD), IMAGE_ICON, size.cx, size.cy, 0)) {
+			return hIcon;
+		}
+	}
+
+	if ((CString(fn).MakeLower().Find(_T("://"))) >= 0) {
+		if (HICON hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, size.cx, size.cy, 0)) {
+			return hIcon;
+		}
+
+		return NULL;
+	}
+
+	TCHAR buff[MAX_PATH];
+	lstrcpy(buff, fn.GetBuffer());
+
+	SHFILEINFO sfi;
+	ZeroMemory(&sfi, sizeof(sfi));
+
+	if (SUCCEEDED(SHGetFileInfo(buff, 0, &sfi, sizeof(sfi), (fSmall ? SHGFI_SMALLICON : SHGFI_LARGEICON) |SHGFI_ICON)) && sfi.hIcon) {
+		return sfi.hIcon;
+	}
+
+	ULONG len;
+	HICON hIcon = NULL;
+
+	do {
+		CRegKey key;
+
+		CString RegPathAssociated;
+		RegPathAssociated.Format(_T("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\%ws\\UserChoice"), ext);
+
+		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, RegPathAssociated, KEY_READ)) {
+			len = _countof(buff);
+			memset(buff, 0, sizeof(buff));
+
+			CString ext_Associated = ext;
+			if (ERROR_SUCCESS == key.QueryStringValue(_T("Progid"), buff, &len) && !(ext_Associated = buff).Trim().IsEmpty()) {
+				ext = ext_Associated;
+			}
+		}
+
+		if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext + _T("\\DefaultIcon"), KEY_READ)) {
+			if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext, KEY_READ)) {
+				break;
+			}
+
+			len = _countof(buff);
+			memset(buff, 0, sizeof(buff));
+			if (ERROR_SUCCESS != key.QueryStringValue(NULL, buff, &len) || (ext = buff).Trim().IsEmpty()) {
+				break;
+			}
+
+			if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext + _T("\\DefaultIcon"), KEY_READ)) {
+				break;
+			}
+		}
+
+		CString icon;
+
+		len = _countof(buff);
+		memset(buff, 0, sizeof(buff));
+		if (ERROR_SUCCESS != key.QueryStringValue(NULL, buff, &len) || (icon = buff).Trim().IsEmpty()) {
+			break;
+		}
+
+		int i = icon.ReverseFind(',');
+		if (i < 0) {
+			break;
+		}
+
+		int id = 0;
+		if (_stscanf_s(icon.Mid(i+1), _T("%d"), &id) != 1) {
+			break;
+		}
+
+		icon = icon.Left(i);
+		icon.Replace(_T("\""), _T(""));
+
+		hIcon = NULL;
+		UINT cnt = fSmall
+				   ? ExtractIconEx(icon, id, NULL, &hIcon, 1)
+				   : ExtractIconEx(icon, id, &hIcon, NULL, 1);
+		UNREFERENCED_PARAMETER(cnt);
+		if (hIcon) {
+			return hIcon;
+		}
+	} while (0);
+
+	return (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_UNKNOWN), IMAGE_ICON, size.cx, size.cy, 0);
+}
+
+bool LoadType(CString fn, CString& type)
+{
+	bool found = false;
+
+	if (!fn.IsEmpty()) {
+		CString ext = fn.Left(fn.Find(_T("://"))+1).TrimRight(':');
+		if (ext.IsEmpty() || !ext.CompareNoCase(_T("file"))) {
+			ext = _T(".") + fn.Mid(fn.ReverseFind('.')+1);
+		}
+
+		// Try MPC-BE's internal formats list
+		CMediaFormatCategory* mfc = AfxGetAppSettings().m_Formats.FindMediaByExt(ext);
+
+		if (mfc != NULL) {
+			found = true;
+			type = mfc->GetDescription();
+		} else { // Fallback to registry
+			CRegKey key;
+
+			CString tmp;
+			CString mplayerc_ext = _T("mplayerc") + ext;
+
+			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, mplayerc_ext)) {
+				tmp = mplayerc_ext;
+			}
+
+			if (!tmp.IsEmpty() || ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, ext)) {
+				found = true;
+
+				if (tmp.IsEmpty()) {
+					tmp = ext;
+				}
+
+				TCHAR buff[256] = { 0 };
+				ULONG len;
+
+				while (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, tmp)) {
+					len = _countof(buff);
+					memset(buff, 0, sizeof(buff));
+
+					if (ERROR_SUCCESS != key.QueryStringValue(NULL, buff, &len)) {
+						break;
+					}
+
+					CString str(buff);
+					str.Trim();
+
+					if (str.IsEmpty() || str == tmp) {
+						break;
+					}
+
+					tmp = str;
+				}
+
+				type = tmp;
+			}
+		}
+	}
+
+	return found;
+}
+
+bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype)
+{
+	str.Empty();
+	HRSRC hrsrc = FindResource(AfxGetApp()->m_hInstance, MAKEINTRESOURCE(resid), restype);
+	if (!hrsrc) {
+		return false;
+	}
+	HGLOBAL hGlobal = LoadResource(AfxGetApp()->m_hInstance, hrsrc);
+	if (!hGlobal) {
+		return false;
+	}
+	DWORD size = SizeofResource(AfxGetApp()->m_hInstance, hrsrc);
+	if (!size) {
+		return false;
+	}
+	memcpy(str.GetBufferSetLength(size), LockResource(hGlobal), size);
+	return true;
+}
+
+WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen/* = false*/, bool bCheckMouse/* = true*/)
+{
+	WORD assignTo = 0;
+	CAppSettings& s = AfxGetAppSettings();
+
+	POSITION pos = s.wmcmds.GetHeadPosition();
+	while (pos && !assignTo) {
+		wmcmd& wc = s.wmcmds.GetNext(pos);
+
+		if (bCheckMouse) {
+			if (bIsFullScreen) {
+				if (wc.mouseFS == keyOrMouseValue) {
+					assignTo = wc.cmd;
+				}
+			} else if (wc.mouse == keyOrMouseValue) {
+				assignTo = wc.cmd;
+			}
+		} else if (wc.key == keyOrMouseValue) {
+			assignTo = wc.cmd;
+		}
+	}
+
+	return assignTo;
+}
+
+void SetAudioRenderer(int AudioDevNo)
+{
+	auto pApp = AfxGetMyApp();
+	pApp->m_AudioRendererDisplayName_CL.Empty();
+
+	CStringArray m_AudioRendererDisplayNames;
+	m_AudioRendererDisplayNames.Add(L"");
+	int i = 2;
+
+	BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
+		LPOLESTR olestr = NULL;
+		if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
+			continue;
+		}
+
+		CComPtr<IPropertyBag> pPB;
+		if (SUCCEEDED(pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB))) {
+			CComVariant var;
+			if (pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL) == S_OK) {
+				bool dev_enable = true;
+
+				var.Clear();
+				if (pPB->Read(CComBSTR(L"WaveOutId"), &var, NULL) == S_OK) {
+					//if (var.lVal >= 0) { fname.Insert(0, L"WaveOut: "); }
+					dev_enable = false; // skip WaveOut devices
+				}
+				else if (pPB->Read(CComBSTR(L"DSGuid"), &var, NULL) == S_OK) {
+					if (CString(var.bstrVal) == "{00000000-0000-0000-0000-000000000000}") {
+						dev_enable = false; // skip Default DirectSound Device
+					}
+				}
+
+				if (dev_enable) {
+					m_AudioRendererDisplayNames.Add(olestr);
+					i++;
+				}
+			}
+		}
+		CoTaskMemFree(olestr);
+	}
+	EndEnumSysDev
+
+	m_AudioRendererDisplayNames.Add(AUDRNDT_NULL_COMP);
+	m_AudioRendererDisplayNames.Add(AUDRNDT_NULL_UNCOMP);
+	m_AudioRendererDisplayNames.Add(AUDRNDT_MPC);
+	i += 3;
+	if (AudioDevNo >= 1 && AudioDevNo <= i) {
+		pApp->m_AudioRendererDisplayName_CL = m_AudioRendererDisplayNames[AudioDevNo-1];
+	}
+}
+
+void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue)
+{
+	const CAppSettings& s = AfxGetAppSettings();
+
+	iRed   = (s.nThemeBrightness + iR) * s.nThemeRed   / 256;
+	iGreen = (s.nThemeBrightness + iG) * s.nThemeGreen / 256;
+	iBlue  = (s.nThemeBrightness + iB) * s.nThemeBlue  / 256;
+
+	iRed   = clamp(iRed,   0, 255);
+	iGreen = clamp(iGreen, 0, 255);
+	iRed   = clamp(iRed,   0, 255);
+}

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "PPageFileInfoRes.h"
+#include "Misc.h"
 
 // CPPageFileInfoRes dialog
 

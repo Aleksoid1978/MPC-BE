@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2016 see Authors.txt
+ * (C) 2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,5 +20,15 @@
 
 #pragma once
 
-bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, UINT16* MonitorVerRes);
-bool CFileGetStatus(LPCTSTR lpszFileName, CFileStatus& status);
+bool    SetPrivilege(LPCTSTR privilege, bool bEnable = true);
+bool    ExploreToFile(CString path);
+BOOL    IsUserAdmin();
+CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw = GetLastError());
+
+HICON LoadIcon(CString fn, bool fSmall);
+bool  LoadType(CString fn, CString& type);
+bool  LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
+
+WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen = false, bool bCheckMouse = true);
+void SetAudioRenderer(int AudioDevNo);
+void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue);

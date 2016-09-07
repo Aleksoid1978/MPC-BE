@@ -24,48 +24,6 @@
 #include "Log.h"
 #include "../apps/mplayerc/resource.h"
 
-bool SetPrivilege(LPCTSTR privilege, bool bEnable)
-{
-	SetThreadExecutionState(ES_CONTINUOUS);
-
-	HANDLE hToken;
-	// Get a token for this process.
-	if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
-		return false;
-	}
-
-	TOKEN_PRIVILEGES tkp;
-	// Get the LUID for the privilege.
-	LookupPrivilegeValue(NULL, privilege, &tkp.Privileges[0].Luid);
-
-	tkp.PrivilegeCount = 1;  // one privilege to set
-	tkp.Privileges[0].Attributes = bEnable ? SE_PRIVILEGE_ENABLED : 0;
-
-	// Set the privilege for this process.
-	AdjustTokenPrivileges(hToken, FALSE, &tkp, 0, (PTOKEN_PRIVILEGES)NULL, 0);
-
-	return (GetLastError() == ERROR_SUCCESS);
-}
-
-bool ExploreToFile(CString path)
-{
-	bool success = false;
-	HRESULT res = CoInitialize(NULL);
-
-	if (res == S_OK || res == S_FALSE) {
-		PIDLIST_ABSOLUTE pidl;
-
-		if (SHParseDisplayName(path, NULL, &pidl, 0, NULL) == S_OK) {
-			success = SUCCEEDED(SHOpenFolderAndSelectItems(pidl, 0, NULL, 0));
-			CoTaskMemFree(pidl);
-		}
-
-		CoUninitialize();
-	}
-
-	return success;
-}
-
 // retrieves the monitor EDID info
 // thanks to JanWillem32 for this code
 static UINT16 const gk_au16CodePage437ForEDIDLookup[256] = {
@@ -247,83 +205,15 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 	return false;
 }
 
-BOOL CFileGetStatus(LPCTSTR lpszFileName, CFileStatus& status)
+bool CFileGetStatus(LPCTSTR lpszFileName, CFileStatus& status)
 {
 	try {
-		return CFile::GetStatus(lpszFileName, status);
+		return !!CFile::GetStatus(lpszFileName, status);
 	} catch (CException* e) {
 		// MFCBUG: E_INVALIDARG / "Parameter is incorrect" is thrown for certain cds (vs2003)
 		// http://groups.google.co.uk/groups?hl=en&lr=&ie=UTF-8&threadm=OZuXYRzWDHA.536%40TK2MSFTNGP10.phx.gbl&rnum=1&prev=/groups%3Fhl%3Den%26lr%3D%26ie%3DISO-8859-1
-		DLog(L"CFile::GetStatus has thrown an exception");
+		DLog(L"CFile::GetStatus() has thrown an exception");
 		e->Delete();
 		return false;
 	}
-}
-
-BOOL IsUserAdmin()
-/*++
-Routine Description: This routine returns TRUE if the caller's
-process is a member of the Administrators local group. Caller is NOT
-expected to be impersonating anyone and is expected to be able to
-open its own process and process token.
-Arguments: None.
-Return Value:
-	TRUE - Caller has Administrators local group.
-	FALSE - Caller does not have Administrators local group. --
-
-from http://msdn.microsoft.com/en-us/library/windows/desktop/aa376389(v=vs.85).aspx
-*/
-{
-	BOOL ret;
-	SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
-	PSID AdministratorsGroup;
-	ret = AllocateAndInitializeSid(
-		  &NtAuthority,
-		  2,
-		  SECURITY_BUILTIN_DOMAIN_RID,
-		  DOMAIN_ALIAS_RID_ADMINS,
-		  0, 0, 0, 0, 0, 0,
-		  &AdministratorsGroup);
-	if (ret) {
-		if (!CheckTokenMembership(NULL, AdministratorsGroup, &ret)) {
-			ret = FALSE;
-		}
-		FreeSid(AdministratorsGroup);
-	}
-
-	return ret;
-}
-
-// from http://msdn.microsoft.com/ru-RU/library/windows/desktop/ms680582(v=vs.85).aspx
-CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw/* = GetLastError()*/)
-{
-	LPVOID lpMsgBuf;
-	LPVOID lpDisplayBuf;
-
-	FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		FORMAT_MESSAGE_FROM_SYSTEM |
-		FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL,
-		dw,
-		MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
-		//MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default system language
-		(LPTSTR)&lpMsgBuf,
-		0, NULL);
-
-	// Format the error message
-
-	lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
-		(lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR));
-	StringCchPrintf((LPTSTR)lpDisplayBuf,
-		LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-		L"Function '%s' failed with error %d: %s",
-		lpszFunction, dw, lpMsgBuf);
-
-	CString ret = (LPCTSTR)lpDisplayBuf;
-
-	LocalFree(lpMsgBuf);
-	LocalFree(lpDisplayBuf);
-
-	return ret;
 }
