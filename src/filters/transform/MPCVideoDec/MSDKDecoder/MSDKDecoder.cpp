@@ -531,28 +531,24 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
   const int width = pBaseView->surface.Info.CropW;
   const int height = pBaseView->surface.Info.CropH;
 
-  auto allocateFrame = [&](AVFrame** pFrame, bool bMain) {
-    uint8_t *src_data[4] = { 0 };
-    int src_linesizes[4] = { 0 };
+  auto allocateFrame = [&](AVFrame** ppFrame, bool bMain) {
+    *ppFrame = av_frame_alloc();
+    AVFrame* pFrame = *ppFrame;
+
+    pFrame->format      = AV_PIX_FMT_NV12;
+    pFrame->width       = width;
+    pFrame->height      = height;
+    pFrame->colorspace  = AVCOL_SPC_UNSPECIFIED;
+    pFrame->color_range = AVCOL_RANGE_UNSPECIFIED;
     if (bMain) {
-      src_data[0] = pBaseView->surface.Data.Y;
-      src_data[1] = pBaseView->surface.Data.UV;
+      pFrame->data[0]   = pBaseView->surface.Data.Y;
+      pFrame->data[1]   = pBaseView->surface.Data.UV;
     } else {
-      src_data[0] = pExtraView->surface.Data.Y;
-      src_data[1] = pExtraView->surface.Data.UV;
+      pFrame->data[0]   = pExtraView->surface.Data.Y;
+      pFrame->data[1]   = pExtraView->surface.Data.UV;
     }
-
-    src_linesizes[0] = pBaseView->surface.Data.PitchLow;
-    src_linesizes[1] = pBaseView->surface.Data.PitchLow;
-
-    *pFrame = av_frame_alloc();
-    (*pFrame)->format      = AV_PIX_FMT_NV12;
-    (*pFrame)->width       = width;
-    (*pFrame)->height      = height;
-    (*pFrame)->colorspace  = AVCOL_SPC_UNSPECIFIED;
-    (*pFrame)->color_range = AVCOL_RANGE_UNSPECIFIED;
-    av_frame_get_buffer(*pFrame, AV_INPUT_BUFFER_PADDING_SIZE);
-    av_image_copy((*pFrame)->data, (*pFrame)->linesize, (const uint8_t**)src_data, src_linesizes, (AVPixelFormat)(*pFrame)->format, (*pFrame)->width, (*pFrame)->height);
+    pFrame->linesize[0] = pBaseView->surface.Data.PitchLow;
+    pFrame->linesize[1] = pBaseView->surface.Data.PitchLow;
   };
 
   CComPtr<IMediaSample> pOut;
