@@ -33,7 +33,7 @@ extern "C" {
 }
 #pragma warning(pop)
 
-static const SW_OUT_FMT s_sw_formats[] = {
+SW_OUT_FMT s_sw_formats[] = {
 	//  name     biCompression  subtype                                         av_pix_fmt   chroma_w chroma_h actual_bpp luma_bits
 	// YUV 8 bit
 	{_T("NV12"),  FCC('NV12'), &MEDIASUBTYPE_NV12,  12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,        1, 1, 12,  8}, // PixFmt_NV12
@@ -134,6 +134,10 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
 	if (!pfdesc) {
 		return PFType_unspecified;
+	}
+
+	if (av_pix_fmt == AV_PIX_FMT_NV12) {
+		return PFType_NV12;
 	}
 
 	int lumabits = pfdesc->comp->depth;
@@ -275,75 +279,91 @@ void CFormatConverter::SetConvertFunc()
 
 	if (m_nCPUFlag & CCpuId::MPC_MM_SSE2) {
 		switch (m_out_pixfmt) {
-		case PixFmt_AYUV:
-			if (m_FProps.pftype == PFType_YUV444Px) {
-				pConvertFn = &CFormatConverter::convert_yuv444_ayuv_dither_le;
-			}
-			break;
-		case PixFmt_P010:
-		case PixFmt_P016:
-			if (m_FProps.pftype == PFType_YUV420Px) {
-				pConvertFn = &CFormatConverter::convert_yuv420_px1x_le;
-			}
-			break;
-		case PixFmt_Y410:
-			if (m_FProps.pftype == PFType_YUV444Px && m_FProps.lumabits <= 10) {
-				pConvertFn = &CFormatConverter::convert_yuv444_y410;
-			}
-			break;
-		case PixFmt_P210:
-		case PixFmt_P216:
-			if (m_FProps.pftype == PFType_YUV422Px) {
-				pConvertFn = &CFormatConverter::convert_yuv420_px1x_le;
-			}
-			break;
-		case PixFmt_YUY2:
-			if (m_FProps.pftype == PFType_YUV422Px) {
-				pConvertFn = &CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le;
-				m_RequiredAlignment = 8;
-			} else if (m_FProps.avpixfmt == AV_PIX_FMT_NV12) {
-				break; // fix crush when NV12->YUY2
-			} else if (m_FProps.pftype == PFType_YUV420 || m_FProps.pftype == PFType_YUV420Px && m_FProps.lumabits <= 14) {
-				pConvertFn = &CFormatConverter::convert_yuv420_yuy2;
-				m_RequiredAlignment = 8;
-			}
-			break;
-		case PixFmt_NV12:
-#if (0) // crash on AVI with NV12 video.
-			if (m_FProps.pftype == PFType_YUV420) {
-				pConvertFn = &CFormatConverter::convert_yuv420_nv12;
-				m_RequiredAlignment = 32;
-			}
+			case PixFmt_AYUV:
+				if (m_FProps.pftype == PFType_YUV444Px) {
+					pConvertFn = &CFormatConverter::convert_yuv444_ayuv_dither_le;
+				}
+				break;
+			case PixFmt_P010:
+			case PixFmt_P016:
+				if (m_FProps.pftype == PFType_YUV420Px) {
+					pConvertFn = &CFormatConverter::convert_yuv420_px1x_le;
+				}
+				break;
+			case PixFmt_Y410:
+				if (m_FProps.pftype == PFType_YUV444Px && m_FProps.lumabits <= 10) {
+					pConvertFn = &CFormatConverter::convert_yuv444_y410;
+				}
+				break;
+			case PixFmt_P210:
+			case PixFmt_P216:
+				if (m_FProps.pftype == PFType_YUV422Px) {
+					pConvertFn = &CFormatConverter::convert_yuv420_px1x_le;
+				}
+				break;
+			case PixFmt_YUY2:
+				if (m_FProps.pftype == PFType_YUV422Px) {
+					pConvertFn = &CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le;
+					m_RequiredAlignment = 8;
+				} else if (m_FProps.pftype == PFType_YUV420
+						|| (m_FProps.pftype == PFType_YUV420Px && m_FProps.lumabits <= 14)
+						|| m_FProps.pftype == PFType_NV12) {
+					pConvertFn = &CFormatConverter::convert_yuv420_yuy2;
+					m_RequiredAlignment = 8;
+				}
+				break;
+			case PixFmt_NV12:
+				if (m_FProps.pftype == PFType_NV12) {
+					pConvertFn = &CFormatConverter::plane_copy_sse2;
+					break;
+				} else if (m_FProps.pftype == PFType_YUV420) {
+					pConvertFn = &CFormatConverter::convert_yuv420_nv12;
+					m_RequiredAlignment = 32;
+				}
+			case PixFmt_YV12:
+				if (m_FProps.pftype == PFType_YUV420Px) {
+					pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
+					m_RequiredAlignment = 32;
+				} else if (m_FProps.pftype == PFType_NV12) {
+					pConvertFn = &CFormatConverter::convert_nv12_yv12;
+					m_RequiredAlignment = 32;
+				}
+#if (0) // disabled because not increase performance
+				else if (m_FProps.pftype == PFType_YUV420) {
+					pConvertFn = &CFormatConverter::convert_yuv_yv;
+				}
 #endif
-		case PixFmt_YV12:
-			if (m_FProps.pftype == PFType_YUV420Px) {
-				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
-				m_RequiredAlignment = 32;
-			}
-			// disabled because not increase performance
-			//if (m_FProps.pftype == PFType_YUV420) {
-			//	pConvertFn = &CFormatConverter::convert_yuv_yv;
-			//}
-			break;
-		case PixFmt_YV16:
-			if (m_FProps.pftype == PFType_YUV422Px) {
-				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
-				m_RequiredAlignment = 32;
-			}
-			// disabled because not increase performance
-			//else if (m_FProps.pftype == PFType_YUV422) {
-			//	pConvertFn = &CFormatConverter::convert_yuv_yv;
-			//}
-			break;
-		case PixFmt_YV24:
-			if (m_FProps.pftype == PFType_YUV444Px) {
-				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
-				m_RequiredAlignment = 32;
-			} else if (m_FProps.pftype == PFType_YUV444) {
-				pConvertFn = &CFormatConverter::convert_yuv_yv;
-				m_RequiredAlignment = 0;
-			}
-			break;
+				break;
+			case PixFmt_YV16:
+				if (m_FProps.pftype == PFType_YUV422Px) {
+					pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
+					m_RequiredAlignment = 32;
+				}
+#if (0) // disabled because not increase performance
+				else if (m_FProps.pftype == PFType_YUV422) {
+					pConvertFn = &CFormatConverter::convert_yuv_yv;
+				}
+#endif
+				break;
+			case PixFmt_YV24:
+				if (m_FProps.pftype == PFType_YUV444Px) {
+					pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
+					m_RequiredAlignment = 32;
+				} else if (m_FProps.pftype == PFType_YUV444) {
+					pConvertFn = &CFormatConverter::convert_yuv_yv;
+					m_RequiredAlignment = 0;
+				}
+				break;
+		}
+	} else if (m_out_pixfmt == PixFmt_NV12 && m_FProps.pftype == PFType_NV12) {
+		pConvertFn = &CFormatConverter::plane_copy;
+	}
+
+	if (m_nCPUFlag & CCpuId::MPC_MM_SSE4) {
+		if (m_out_pixfmt == PixFmt_NV12 && m_FProps.pftype == PFType_NV12) {
+			pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
+		} else if (m_out_pixfmt == PixFmt_YV12 && m_FProps.pftype == PFType_NV12) {
+			pConvertFn = &CFormatConverter::convert_nv12_yv12_direct_sse4;
 		}
 	}
 }

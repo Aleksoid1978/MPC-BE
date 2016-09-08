@@ -115,6 +115,7 @@ CAppSettings::CAppSettings()
 	VideoFiltersKeys[VDEC_FLV]				= _T("vdec_flv");
 	VideoFiltersKeys[VDEC_H263]				= _T("vdec_h263");
 	VideoFiltersKeys[VDEC_H264]				= _T("vdec_h264");
+	VideoFiltersKeys[VDEC_H264_MVC]			= _T("vdec_h264_mvc");
 	VideoFiltersKeys[VDEC_HEVC]				= _T("vdec_hevc");
 	VideoFiltersKeys[VDEC_INDEO]			= _T("vdec_indeo");
 	VideoFiltersKeys[VDEC_LOSSLESS]			= _T("vdec_lossless");
@@ -1380,7 +1381,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		DXVAFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, DXVAFiltersKeys[f], 1);
 	}
 	for (int f = 0; f < VDEC_LAST; f++) {
-		VideoFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, VideoFiltersKeys[f], 1);
+		VideoFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, VideoFiltersKeys[f], f == VDEC_H264_MVC ? 0 : 1);
 	}
 	for (int f = 0; f < ADEC_LAST; f++) {
 		AudioFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, AudioFiltersKeys[f], 1);

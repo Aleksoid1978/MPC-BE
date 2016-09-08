@@ -456,6 +456,7 @@ static const struct {
 	{CODEC_FLASH,		_T("FLV1/4")},
 	{CODEC_H263,		_T("H.263")},
 	{CODEC_H264,		_T("H.264/AVC (FFmpeg)")},
+	{CODEC_H264_MVC,	_T("H264 (MVC 3D)")},
 	{CODEC_HEVC,		_T("HEVC (experimental)")},
 	{CODEC_INDEO,		_T("Indeo 3/4/5")},
 	{CODEC_LOSSLESS,	_T("Lossless video (huffyuv, Lagarith, FFV1, MagicYUV)")},

@@ -77,6 +77,7 @@ public :
 
 	size_t GetLength() const { return m_nCurPos - m_nNALStartPos; };
 	BYTE* GetNALBuffer() { return m_pBuffer + m_nNALStartPos; };
+	size_t GetNALPos() { return m_nNALStartPos; }
 	bool IsEOF() const { return m_nCurPos >= m_nSize; };
 
 	void SetBuffer(BYTE* pBuffer, size_t nSize, int nNALSize = 0);

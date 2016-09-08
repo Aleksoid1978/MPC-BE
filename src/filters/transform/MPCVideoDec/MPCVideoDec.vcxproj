@@ -132,8 +132,9 @@
       <AdditionalDependencies>libucrtd.lib;libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>MPCVideoDec.def</ModuleDefinitionFile>
-      <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4049 /ignore:4099 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <IgnoreSpecificDefaultLibraries>libcpmt.lib;libcmtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -147,8 +148,9 @@
       <AdditionalDependencies>libucrtd.lib;libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>MPCVideoDec.def</ModuleDefinitionFile>
-      <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4049 /ignore:4099 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <IgnoreSpecificDefaultLibraries>libcpmt.lib;libcmtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -162,7 +164,7 @@
       <AdditionalDependencies>libucrt.lib;libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>MPCVideoDec.def</ModuleDefinitionFile>
-      <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4049 /ignore:4099 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <ResourceCompile>
@@ -177,7 +179,7 @@
       <AdditionalDependencies>libucrt.lib;libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>MPCVideoDec.def</ModuleDefinitionFile>
-      <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4049 /ignore:4099 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <ResourceCompile>
@@ -227,6 +229,9 @@
     <ClCompile Include="FormatConverter.cpp" />
     <ClCompile Include="MPCVideoDec.cpp" />
     <ClCompile Include="MPCVideoDecSettingsWnd.cpp" />
+    <ClCompile Include="MSDKDecoder\AnnexBConverter.cpp" />
+    <ClCompile Include="MSDKDecoder\ByteParser.cpp" />
+    <ClCompile Include="MSDKDecoder\MSDKDecoder.cpp" />
     <ClCompile Include="pixconv_functions.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -248,6 +253,18 @@
     <ClInclude Include="memcpy_sse.h" />
     <ClInclude Include="MPCVideoDec.h" />
     <ClInclude Include="MPCVideoDecSettingsWnd.h" />
+    <ClInclude Include="MSDKDecoder\AnnexBConverter.h" />
+    <ClInclude Include="MSDKDecoder\ByteParser.h" />
+    <ClInclude Include="MSDKDecoder\growarray.h" />
+    <ClInclude Include="MSDKDecoder\include\mfxcommon.h" />
+    <ClInclude Include="MSDKDecoder\include\mfxdefs.h" />
+    <ClInclude Include="MSDKDecoder\include\mfxmvc.h" />
+    <ClInclude Include="MSDKDecoder\include\mfxsession.h" />
+    <ClInclude Include="MSDKDecoder\include\mfxstructures.h" />
+    <ClInclude Include="MSDKDecoder\include\mfxvideo.h" />
+    <ClInclude Include="MSDKDecoder\include\mfxvstructures.h" />
+    <ClInclude Include="MSDKDecoder\MSDKDecoder.h" />
+    <ClInclude Include="MSDKDecoder\stdafx.h" />
     <ClInclude Include="pixconv_sse2_templates.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>

@@ -19,6 +19,15 @@
     <Filter Include="Header Files\DXVADecoder">
       <UniqueIdentifier>{26a70972-2c74-42ba-b2a6-c6652f6df5a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\MSDKDecoder">
+      <UniqueIdentifier>{3a7990f6-f5c9-458f-9bfb-3e29856a3553}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MSDKDecoder">
+      <UniqueIdentifier>{02056a7c-9383-416f-a91c-9892dc07a79e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MSDKDecoder\include">
+      <UniqueIdentifier>{6dcd5a6f-58d7-47b6-bf30-e20e765f189d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CpuId.cpp">
@@ -62,6 +71,15 @@
     </ClCompile>
     <ClCompile Include="DXVADecoder\DXVA2DecoderVP9.cpp">
       <Filter>Source Files\DXVADecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="MSDKDecoder\AnnexBConverter.cpp">
+      <Filter>Source Files\MSDKDecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="MSDKDecoder\MSDKDecoder.cpp">
+      <Filter>Source Files\MSDKDecoder</Filter>
+    </ClCompile>
+    <ClCompile Include="MSDKDecoder\ByteParser.cpp">
+      <Filter>Source Files\MSDKDecoder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +136,42 @@
     </ClInclude>
     <ClInclude Include="DXVADecoder\DXVA2DecoderVP9.h">
       <Filter>Header Files\DXVADecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="MSDKDecoder\AnnexBConverter.h">
+      <Filter>Header Files\MSDKDecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="MSDKDecoder\growarray.h">
+      <Filter>Header Files\MSDKDecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="MSDKDecoder\MSDKDecoder.h">
+      <Filter>Header Files\MSDKDecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="MSDKDecoder\stdafx.h">
+      <Filter>Header Files\MSDKDecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="MSDKDecoder\include\mfxcommon.h">
+      <Filter>Header Files\MSDKDecoder\include</Filter>
+    </ClInclude>
+    <ClInclude Include="MSDKDecoder\include\mfxdefs.h">
+      <Filter>Header Files\MSDKDecoder\include</Filter>
+    </ClInclude>
+    <ClInclude Include="MSDKDecoder\include\mfxmvc.h">
+      <Filter>Header Files\MSDKDecoder\include</Filter>
+    </ClInclude>
+    <ClInclude Include="MSDKDecoder\include\mfxsession.h">
+      <Filter>Header Files\MSDKDecoder\include</Filter>
+    </ClInclude>
+    <ClInclude Include="MSDKDecoder\include\mfxstructures.h">
+      <Filter>Header Files\MSDKDecoder\include</Filter>
+    </ClInclude>
+    <ClInclude Include="MSDKDecoder\include\mfxvideo.h">
+      <Filter>Header Files\MSDKDecoder\include</Filter>
+    </ClInclude>
+    <ClInclude Include="MSDKDecoder\include\mfxvstructures.h">
+      <Filter>Header Files\MSDKDecoder\include</Filter>
+    </ClInclude>
+    <ClInclude Include="MSDKDecoder\ByteParser.h">
+      <Filter>Header Files\MSDKDecoder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

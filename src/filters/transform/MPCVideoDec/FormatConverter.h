@@ -21,7 +21,6 @@
 #pragma once
 
 #include "IMPCVideoDec.h"
-
 #include <stdint.h>
 
 const MPCPixelFormat YUV420_8[PixFmt_count]  = {PixFmt_NV12, PixFmt_YV12, PixFmt_YUY2, PixFmt_YV16, PixFmt_YV24, PixFmt_AYUV, PixFmt_RGB32, PixFmt_P010, PixFmt_P016, PixFmt_P210, PixFmt_P216, PixFmt_Y410, PixFmt_Y416};
@@ -54,6 +53,8 @@ struct SW_OUT_FMT {
 	const int					luma_bits;
 };
 
+extern SW_OUT_FMT s_sw_formats[];
+
 const SW_OUT_FMT* GetSWOF(int pixfmt);
 LPCTSTR GetChromaSubsamplingStr(enum AVPixelFormat av_pix_fmt);
 int GetLumaBits(enum AVPixelFormat av_pix_fmt);
@@ -72,6 +73,7 @@ enum MPCPixFmtType {
 	PFType_YUV420Px,
 	PFType_YUV422Px,
 	PFType_YUV444Px,
+	PFType_NV12,
 };
 
 struct FrameProps {
@@ -136,6 +138,12 @@ protected:
 	HRESULT convert_yuv_yv_nv12_dither_le(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv_yv(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv420_nv12(CONV_FUNC_PARAMS);
+	HRESULT convert_nv12_yv12(CONV_FUNC_PARAMS);
+	HRESULT convert_nv12_yv12_direct_sse4(CONV_FUNC_PARAMS);
+	
+	HRESULT plane_copy_sse2(CONV_FUNC_PARAMS);
+	HRESULT plane_copy_direct_sse4(CONV_FUNC_PARAMS);
+	HRESULT plane_copy(CONV_FUNC_PARAMS);
 
 public:
 	CFormatConverter();
