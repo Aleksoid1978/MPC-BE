@@ -29,6 +29,8 @@
 
 #include <IMediaSideData.h>
 
+#include "./MSDKDecoder/MSDKDecoder.h"
+
 #define MPCVideoDecName L"MPC Video Decoder"
 #define MPCVideoConvName L"MPC Video Converter"
 
@@ -138,6 +140,8 @@ protected:
 	BOOL									m_bDecodingStart;
 
 	BOOL									m_bHEVC10bit;
+
+	CMSDKDecoder*							m_pMSDKDecoder;
 
 	// === Private functions
 	void			Cleanup();
@@ -273,6 +277,7 @@ public:
 
 private:
 	friend class CVideoDecDXVAAllocator;
+	friend class CMSDKDecoder;
 	CVideoDecDXVAAllocator*		m_pDXVA2Allocator;
 
 	// *** from LAV

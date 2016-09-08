@@ -16,7 +16,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- *  Adaptation for MPC-BE (C) 2013 v0lt & Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ *  Adaptation for MPC-BE (C) 2013-2016 v0lt & Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  *
  */
 
@@ -27,9 +27,9 @@
 #pragma warning(push)
 #pragma warning(disable: 4005)
 extern "C" {
-	#include <ffmpeg/libavutil/pixfmt.h>
-	#include <ffmpeg/libavutil/intreadwrite.h>
-	#include <ffmpeg/libswscale/swscale.h>
+  #include <ffmpeg/libavutil/pixfmt.h>
+  #include <ffmpeg/libavutil/intreadwrite.h>
+  #include <ffmpeg/libswscale/swscale.h>
 }
 #pragma warning(pop)
 
@@ -332,32 +332,32 @@ HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const ptrdi
 
 HRESULT CFormatConverter::ConvertGeneric(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
-	switch (m_out_pixfmt) {
-	case PixFmt_AYUV:
-		ConvertToAYUV(src, srcStride, dst, width, height, dstStride);
-		break;
-	case PixFmt_P010:
-	case PixFmt_P016:
-		ConvertToPX1X(src, srcStride, dst, width, height, dstStride, 2);
-		break;
-	case PixFmt_Y410:
-		ConvertToY410(src, srcStride, dst, width, height, dstStride);
-		break;
-	case PixFmt_P210:
-	case PixFmt_P216:
-		ConvertToPX1X(src, srcStride, dst, width, height, dstStride, 1);
-		break;
-	case PixFmt_Y416:
-		ConvertToY416(src, srcStride, dst, width, height, dstStride);
-		break;
-	default:
-		if (m_out_pixfmt == PixFmt_YV12 || m_out_pixfmt == PixFmt_YV16 || m_out_pixfmt == PixFmt_YV24) {
-			std::swap(dst[1], dst[2]);
-		}
-		int ret = sws_scale2(m_pSwsContext, src, srcStride, 0, height, dst, dstStride);
-	}
+  switch (m_out_pixfmt) {
+  case PixFmt_AYUV:
+    ConvertToAYUV(src, srcStride, dst, width, height, dstStride);
+    break;
+  case PixFmt_P010:
+  case PixFmt_P016:
+    ConvertToPX1X(src, srcStride, dst, width, height, dstStride, 2);
+    break;
+  case PixFmt_Y410:
+    ConvertToY410(src, srcStride, dst, width, height, dstStride);
+    break;
+  case PixFmt_P210:
+  case PixFmt_P216:
+    ConvertToPX1X(src, srcStride, dst, width, height, dstStride, 1);
+    break;
+  case PixFmt_Y416:
+    ConvertToY416(src, srcStride, dst, width, height, dstStride);
+    break;
+  default:
+    if (m_out_pixfmt == PixFmt_YV12 || m_out_pixfmt == PixFmt_YV16 || m_out_pixfmt == PixFmt_YV24) {
+      std::swap(dst[1], dst[2]);
+    }
+    int ret = sws_scale2(m_pSwsContext, src, srcStride, 0, height, dst, dstStride);
+  }
 
-	return S_OK;
+  return S_OK;
 }
 
 HRESULT CFormatConverter::convert_yuv444_y410(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
@@ -601,6 +601,14 @@ static int yuv420yuy2_convert_pixels(const uint8_t* &srcY, const uint8_t* &srcU,
     // Interleave U and V
     xmm0 = _mm_unpacklo_epi16(xmm1, xmm0);                       /* 0V0U0V0U */
     xmm2 = _mm_unpacklo_epi16(xmm3, xmm2);                       /* 0V0U0V0U */
+  } else if (inputFormat == PFType_NV12) {
+    // Load 4 16-bit macro pixels, which contain 4 UV samples
+    PIXCONV_LOAD_4PIXEL16(xmm0, srcU);
+    PIXCONV_LOAD_4PIXEL16(xmm2, srcU+srcStrideUV);
+
+    // Expand to 16-bit
+    xmm0 = _mm_unpacklo_epi8(xmm0, xmm7);                       /* 0V0U0V0U */
+    xmm2 = _mm_unpacklo_epi8(xmm2, xmm7);                       /* 0V0U0V0U */
   } else {
     PIXCONV_LOAD_4PIXEL8(xmm1, srcU);
     PIXCONV_LOAD_4PIXEL8(xmm3, srcU+srcStrideUV);
@@ -619,7 +627,7 @@ static int yuv420yuy2_convert_pixels(const uint8_t* &srcY, const uint8_t* &srcU,
   // xmm0/xmm2 contain 4 interleaved U/V samples from two lines each in the 16bit parts, still in their native bitdepth
 
   // Chroma upsampling
-  if (shift > 0) {
+  if (shift > 0 || inputFormat == PFType_NV12) {
     srcU += 8;
     srcV += 8;
   } else {
@@ -757,6 +765,8 @@ static int __stdcall yuv420yuy2_dispatch(MPCPixFmtType inputFormat, int bpp, con
   switch (inputFormat) {
   case PFType_YUV420:
     return yuv420yuy2_process_lines<PFType_YUV420, 0, uyvy, dithertype>(srcY, srcU, srcV, dst, width, height, srcStrideY, srcStrideUV, dstStride, dithers);
+  case PFType_NV12:
+    return yuv420yuy2_process_lines<PFType_NV12, 0, uyvy, dithertype>(srcY, srcU, srcV, dst, width, height, srcStrideY, srcStrideUV, dstStride, dithers);
   case PFType_YUV420Px:
     if (bpp == 9)
       return yuv420yuy2_process_lines<PFType_YUV420, 1, uyvy, dithertype>(srcY, srcU, srcV, dst, width, height, srcStrideY, srcStrideUV, dstStride, dithers);
@@ -1037,6 +1047,269 @@ HRESULT CFormatConverter::convert_yuv420_nv12(const uint8_t* const src[4], const
 
       PIXCONV_PUT_STREAM(d + (i << 1) +  0, xmm0);
       PIXCONV_PUT_STREAM(d + (i << 1) + 16, xmm2);
+    }
+  }
+
+  return S_OK;
+}
+
+HRESULT CFormatConverter::convert_nv12_yv12(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+{
+  const ptrdiff_t inLumaStride    = srcStride[0];
+  const ptrdiff_t inChromaStride  = srcStride[1];
+  const ptrdiff_t outLumaStride   = dstStride[0];
+  const ptrdiff_t outChromaStride = dstStride[1];
+  const ptrdiff_t chromaHeight    = height >> 1;
+
+  ptrdiff_t line, i;
+  __m128i xmm0,xmm1,xmm2,xmm3,xmm7;
+
+  xmm7 = _mm_set1_epi16(0x00FF);
+
+  _mm_sfence();
+
+  // Copy the y
+  for (line = 0; line < height; line++) {
+    PIXCONV_MEMCPY_ALIGNED(dst[0] + outLumaStride * line, src[0] + inLumaStride * line, width);
+  }
+
+  for (line = 0; line < chromaHeight; line++) {
+    const uint8_t * const uv = src[1] + line * inChromaStride;
+          uint8_t * const dv = dst[1] + outChromaStride * line;
+          uint8_t * const du = dst[2] + outChromaStride * line;
+
+    for (i = 0; i < width; i+=32) {
+      PIXCONV_LOAD_PIXEL8_ALIGNED(xmm0, uv+i+0);
+      PIXCONV_LOAD_PIXEL8_ALIGNED(xmm1, uv+i+16);
+      xmm2 = xmm0;
+      xmm3 = xmm1;
+
+      // null out the high-order bytes to get the U values
+      xmm0 = _mm_and_si128(xmm0, xmm7);
+      xmm1 = _mm_and_si128(xmm1, xmm7);
+      // right shift the V values
+      xmm2 = _mm_srli_epi16(xmm2, 8);
+      xmm3 = _mm_srli_epi16(xmm3, 8);
+      // unpack the values
+      xmm0 = _mm_packus_epi16(xmm0, xmm1);
+      xmm2 = _mm_packus_epi16(xmm2, xmm3);
+
+      PIXCONV_PUT_STREAM(du + (i>>1), xmm0);
+      PIXCONV_PUT_STREAM(dv + (i>>1), xmm2);
+    }
+  }
+
+  return S_OK;
+}
+
+HRESULT CFormatConverter::convert_nv12_yv12_direct_sse4(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+{
+  const ptrdiff_t inStride = srcStride[0];
+  const ptrdiff_t outStride = dstStride[0];
+  const ptrdiff_t outChromaStride = dstStride[1];
+  const ptrdiff_t chromaHeight = (height >> 1);
+
+  const ptrdiff_t stride = min(FFALIGN(width, 64), min(inStride, outStride));
+
+  __m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm7;
+  xmm7 = _mm_set1_epi16(0x00FF);
+
+  _mm_sfence();
+
+  ptrdiff_t line, i;
+
+  for (line = 0; line < height; line++) {
+    const uint8_t *y = (src[0] + line * inStride);
+    uint8_t *dy = (dst[0] + line * outStride);
+    for (i = 0; i < (stride - 63); i += 64) {
+      PIXCONV_STREAM_LOAD(xmm0, y + i + 0);
+      PIXCONV_STREAM_LOAD(xmm1, y + i + 16);
+      PIXCONV_STREAM_LOAD(xmm2, y + i + 32);
+      PIXCONV_STREAM_LOAD(xmm3, y + i + 48);
+
+      _ReadWriteBarrier();
+
+      PIXCONV_PUT_STREAM(dy + i + 0, xmm0);
+      PIXCONV_PUT_STREAM(dy + i + 16, xmm1);
+      PIXCONV_PUT_STREAM(dy + i + 32, xmm2);
+      PIXCONV_PUT_STREAM(dy + i + 48, xmm3);
+    }
+
+    for (; i < width; i += 16) {
+      PIXCONV_LOAD_ALIGNED(xmm0, y + i);
+      PIXCONV_PUT_STREAM(dy + i, xmm0);
+    }
+  }
+
+  for (line = 0; line < chromaHeight; line++) {
+    const uint8_t *uv = (src[1] + line * inStride);
+    uint8_t *dv = (dst[1] + line * outChromaStride);
+    uint8_t *du = (dst[2] + line * outChromaStride);
+    for (i = 0; i < (stride - 63); i += 64) {
+      PIXCONV_STREAM_LOAD(xmm0, uv + i + 0);
+      PIXCONV_STREAM_LOAD(xmm1, uv + i + 16);
+      PIXCONV_STREAM_LOAD(xmm2, uv + i + 32);
+      PIXCONV_STREAM_LOAD(xmm3, uv + i + 48);
+
+      _ReadWriteBarrier();
+
+      // process first pair
+      xmm4 = _mm_srli_epi16(xmm0, 8);
+      xmm5 = _mm_srli_epi16(xmm1, 8);
+      xmm0 = _mm_and_si128(xmm0, xmm7);
+      xmm1 = _mm_and_si128(xmm1, xmm7);
+      xmm0 = _mm_packus_epi16(xmm0, xmm1);
+      xmm4 = _mm_packus_epi16(xmm4, xmm5);
+
+      PIXCONV_PUT_STREAM(du + (i >> 1) + 0, xmm0);
+      PIXCONV_PUT_STREAM(dv + (i >> 1) + 0, xmm4);
+
+      // and second pair
+      xmm4 = _mm_srli_epi16(xmm2, 8);
+      xmm5 = _mm_srli_epi16(xmm3, 8);
+      xmm2 = _mm_and_si128(xmm2, xmm7);
+      xmm3 = _mm_and_si128(xmm3, xmm7);
+      xmm2 = _mm_packus_epi16(xmm2, xmm3);
+      xmm4 = _mm_packus_epi16(xmm4, xmm5);
+
+      PIXCONV_PUT_STREAM(du + (i >> 1) + 16, xmm2);
+      PIXCONV_PUT_STREAM(dv + (i >> 1) + 16, xmm4);
+    }
+
+    for (; i < width; i += 32) {
+      PIXCONV_LOAD_ALIGNED(xmm0, uv + i + 0);
+      PIXCONV_LOAD_ALIGNED(xmm1, uv + i + 16);
+
+      xmm4 = _mm_srli_epi16(xmm0, 8);
+      xmm5 = _mm_srli_epi16(xmm1, 8);
+      xmm0 = _mm_and_si128(xmm0, xmm7);
+      xmm1 = _mm_and_si128(xmm1, xmm7);
+      xmm0 = _mm_packus_epi16(xmm0, xmm1);
+      xmm4 = _mm_packus_epi16(xmm4, xmm5);
+
+      PIXCONV_PUT_STREAM(du + (i >> 1), xmm0);
+      PIXCONV_PUT_STREAM(dv + (i >> 1), xmm4);
+    }
+  }
+
+  return S_OK;
+}
+
+HRESULT CFormatConverter::plane_copy_sse2(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+{
+  const SW_OUT_FMT& swof = s_sw_formats[m_out_pixfmt];
+
+  const int widthBytes = width * swof.codedbytes;
+  const int planes = max(swof.planes, 1);
+
+  ptrdiff_t line, plane;
+
+  for (plane = 0; plane < planes; plane++) {
+    const int planeWidth = widthBytes / swof.planeWidth[plane];
+    const int planeHeight = height / swof.planeHeight[plane];
+    const ptrdiff_t srcPlaneStride = srcStride[plane];
+    const ptrdiff_t dstPlaneStride = dstStride[plane];
+    const uint8_t * const srcBuf = src[plane];
+          uint8_t * const dstBuf = dst[plane];
+
+    if ((dstPlaneStride % 16) == 0 && ((intptr_t)dstBuf % 16u) == 0) {
+      for (line = 0; line < planeHeight; ++line) {
+        PIXCONV_MEMCPY_ALIGNED(dstBuf + line * dstPlaneStride, srcBuf + line * srcPlaneStride, planeWidth);
+      }
+    } else {
+      for (line = 0; line < planeHeight; ++line) {
+        memcpy(dstBuf + line * dstPlaneStride, srcBuf + line * srcPlaneStride, planeWidth);
+      }
+    }
+  }
+
+  return S_OK;
+}
+
+// This function is only designed for NV12-like pixel formats, like NV12, P010, P016, ...
+HRESULT CFormatConverter::plane_copy_direct_sse4(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+{
+  const ptrdiff_t inStride     = srcStride[0];
+  const ptrdiff_t outStride    = dstStride[0];
+  const ptrdiff_t chromaHeight = (height >> 1);
+
+  const ptrdiff_t byteWidth    = (m_out_pixfmt == PixFmt_P010 || m_out_pixfmt == PixFmt_P016) ? width << 1 : width;
+  const ptrdiff_t stride       = min(FFALIGN(byteWidth, 64), min(inStride, outStride));
+
+  __m128i xmm0,xmm1,xmm2,xmm3;
+
+  _mm_sfence();
+
+  ptrdiff_t line, i;
+
+  for (line = 0; line < height; line++) {
+    const uint8_t *y  = (src[0] + line * inStride);
+          uint8_t *dy = (dst[0] + line * outStride);
+    for (i = 0; i < (stride - 63); i += 64) {
+      PIXCONV_STREAM_LOAD(xmm0, y + i +  0);
+      PIXCONV_STREAM_LOAD(xmm1, y + i + 16);
+      PIXCONV_STREAM_LOAD(xmm2, y + i + 32);
+      PIXCONV_STREAM_LOAD(xmm3, y + i + 48);
+
+      _ReadWriteBarrier();
+
+      PIXCONV_PUT_STREAM(dy + i +  0, xmm0);
+      PIXCONV_PUT_STREAM(dy + i + 16, xmm1);
+      PIXCONV_PUT_STREAM(dy + i + 32, xmm2);
+      PIXCONV_PUT_STREAM(dy + i + 48, xmm3);
+    }
+
+    for (; i < byteWidth; i += 16) {
+      PIXCONV_LOAD_ALIGNED(xmm0, y + i);
+      PIXCONV_PUT_STREAM(dy + i, xmm0);
+    }
+  }
+
+  for (line = 0; line < chromaHeight; line++) {
+    const uint8_t *uv  = (src[1] + line * inStride);
+          uint8_t *duv = (dst[1] + line * outStride);
+    for (i = 0; i < (stride - 63); i += 64) {
+      PIXCONV_STREAM_LOAD(xmm0, uv + i +  0);
+      PIXCONV_STREAM_LOAD(xmm1, uv + i + 16);
+      PIXCONV_STREAM_LOAD(xmm2, uv + i + 32);
+      PIXCONV_STREAM_LOAD(xmm3, uv + i + 48);
+
+      _ReadWriteBarrier();
+
+      PIXCONV_PUT_STREAM(duv + i +  0, xmm0);
+      PIXCONV_PUT_STREAM(duv + i + 16, xmm1);
+      PIXCONV_PUT_STREAM(duv + i + 32, xmm2);
+      PIXCONV_PUT_STREAM(duv + i + 48, xmm3);
+    }
+
+    for (; i < byteWidth; i += 16) {
+      PIXCONV_LOAD_ALIGNED(xmm0, uv + i);
+      PIXCONV_PUT_STREAM(duv + i, xmm0);
+    }
+  }
+
+  return S_OK;
+}
+
+HRESULT CFormatConverter::plane_copy(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+{
+  const SW_OUT_FMT& swof = s_sw_formats[m_out_pixfmt];
+
+  const int widthBytes = width * swof.codedbytes;
+  const int planes = max(swof.planes, 1);
+
+  ptrdiff_t line, plane;
+
+  for (plane = 0; plane < planes; plane++) {
+    const int planeWidth = widthBytes / swof.planeWidth[plane];
+    const int planeHeight = height / swof.planeHeight[plane];
+    const ptrdiff_t srcPlaneStride = srcStride[plane];
+    const ptrdiff_t dstPlaneStride = dstStride[plane];
+    const uint8_t * const srcBuf = src[plane];
+          uint8_t * const dstBuf = dst[plane];
+
+    for (line = 0; line < planeHeight; ++line) {
+      memcpy(dstBuf + line * dstPlaneStride, srcBuf + line * srcPlaneStride, planeWidth);
     }
   }
 
