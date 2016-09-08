@@ -393,17 +393,19 @@ void CFormatConverter::SetOptions(int rgblevels)
 
 int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 {
-	if (!m_pSwsContext || FormatChanged(&m_FProps.avpixfmt, (AVPixelFormat*)&pFrame->format) || pFrame->width != m_FProps.width || pFrame->height != m_FProps.height) {
+	if (!m_pSwsContext
+			|| FormatChanged(&m_FProps.avpixfmt, (AVPixelFormat*)&pFrame->format)
+			|| pFrame->width != m_FProps.width || pFrame->height != m_FProps.height) {
 		// update the basic properties
-		m_FProps.avpixfmt	= (AVPixelFormat)pFrame->format;
-		m_FProps.width		= pFrame->width;
-		m_FProps.height		= pFrame->height;
+		m_FProps.avpixfmt   = (AVPixelFormat)pFrame->format;
+		m_FProps.width      = pFrame->width;
+		m_FProps.height     = pFrame->height;
 
 		// update the additional properties (updated only when changing basic properties)
-		m_FProps.lumabits	= GetLumaBits(m_FProps.avpixfmt);
-		m_FProps.pftype		= GetPixFmtType(m_FProps.avpixfmt);
-		m_FProps.colorspace	= pFrame->colorspace;
-		m_FProps.colorrange	= pFrame->color_range;
+		m_FProps.lumabits   = GetLumaBits(m_FProps.avpixfmt);
+		m_FProps.pftype     = GetPixFmtType(m_FProps.avpixfmt);
+		m_FProps.colorspace = pFrame->colorspace;
+		m_FProps.colorrange = pFrame->color_range;
 
 		if (!Init()) {
 			DbgLog((LOG_TRACE, 3, L"CFormatConverter::Converting() - Init() failed"));
@@ -430,14 +432,14 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		out = m_pAlignedBuffer;
 	}
 
-	uint8_t*	dstArray[4]			= {NULL};
-	ptrdiff_t	dstStrideArray[4]	= {0};
-	ptrdiff_t	byteStride			= outStride * swof.codedbytes;
+	uint8_t*  dstArray[4]       = { NULL };
+	ptrdiff_t dstStrideArray[4] = { 0 };
+	ptrdiff_t byteStride        = outStride * swof.codedbytes;
 
 	dstArray[0] = out;
 	dstStrideArray[0] = byteStride;
 	for (int i = 1; i < swof.planes; ++i) {
-		dstArray[i] = dstArray[i - 1] + dstStrideArray[i - 1] * (m_planeHeight / swof.planeHeight[i-1]);
+		dstArray[i] = dstArray[i - 1] + dstStrideArray[i - 1] * (m_planeHeight / swof.planeHeight[i - 1]);
 		dstStrideArray[i] = byteStride / swof.planeWidth[i];
 	}
 
@@ -452,9 +454,9 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		int line = 0;
 
 		// Copy first plane
-		const size_t widthBytes			= m_FProps.width * swof.codedbytes;
-		const ptrdiff_t srcStrideBytes	= outStride * swof.codedbytes;
-		const ptrdiff_t dstStrideBytes	= m_dstStride * swof.codedbytes;
+		const size_t widthBytes        = m_FProps.width * swof.codedbytes;
+		const ptrdiff_t srcStrideBytes = outStride * swof.codedbytes;
+		const ptrdiff_t dstStrideBytes = m_dstStride * swof.codedbytes;
 		for (line = 0; line < m_FProps.height; ++line) {
 			memcpy(dst, out, widthBytes);
 			out += srcStrideBytes;
@@ -463,17 +465,17 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		dst += (m_planeHeight - m_FProps.height) * dstStrideBytes;
 
 		for (int plane = 1; plane < swof.planes; ++plane) {
-			const size_t planeWidth			= widthBytes      / swof.planeWidth[plane];
-			const int activePlaneHeight		= m_FProps.height / swof.planeHeight[plane];
-			const int totalPlaneHeight		= m_planeHeight   / swof.planeHeight[plane];
-			const ptrdiff_t srcPlaneStride	= srcStrideBytes  / swof.planeWidth[plane];
-			const ptrdiff_t dstPlaneStride	= dstStrideBytes  / swof.planeWidth[plane];
+			const size_t planeWidth        = widthBytes      / swof.planeWidth[plane];
+			const int activePlaneHeight    = m_FProps.height / swof.planeHeight[plane];
+			const int totalPlaneHeight     = m_planeHeight   / swof.planeHeight[plane];
+			const ptrdiff_t srcPlaneStride = srcStrideBytes  / swof.planeWidth[plane];
+			const ptrdiff_t dstPlaneStride = dstStrideBytes  / swof.planeWidth[plane];
 			for (line = 0; line < activePlaneHeight; ++line) {
 				memcpy(dst, out, planeWidth);
 				out += srcPlaneStride;
 				dst += dstPlaneStride;
 			}
-			dst+= (totalPlaneHeight - activePlaneHeight) * dstPlaneStride;
+			dst += (totalPlaneHeight - activePlaneHeight) * dstPlaneStride;
 		}
 	}
 
