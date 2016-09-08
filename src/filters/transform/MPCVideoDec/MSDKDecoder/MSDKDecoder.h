@@ -51,6 +51,7 @@ typedef struct _MVCGOP {
 } MVCGOP;
 
 class CMPCVideoDecFilter;
+struct AVFrame;
 
 class CMSDKDecoder
 {
@@ -111,4 +112,5 @@ private:
   MediaSideData3DOffset m_PrevOffset;
 
   CMPCVideoDecFilter   *m_pFilter;
+  AVFrame              *m_pFrame = nullptr;
 };

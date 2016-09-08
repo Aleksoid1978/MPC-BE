@@ -145,7 +145,7 @@ HRESULT CMSDKDecoder::Init()
 
   mfxStatus sts = MFXInit(impl, &version, &m_mfxSession);
   if (sts != MFX_ERR_NONE) {
-  DLog(L"CMSDKDecoder::Init(): MSDK not available");
+    DLog(L"CMSDKDecoder::Init(): MSDK not available");
     return E_NOINTERFACE;
   }
 
@@ -189,6 +189,8 @@ void CMSDKDecoder::DestroyDecoder(bool bFull)
   SAFE_DELETE(m_mfxExtMVCSeq.OP);
 
   SAFE_DELETE(m_pAnnexBConverter);
+
+  av_frame_free(&m_pFrame);
 
   if (bFull) {
     if (m_mfxSession) {
@@ -243,6 +245,9 @@ HRESULT CMSDKDecoder::InitDecoder(const CMediaType *pmt)
         return hr;
     }
   }
+
+  m_pFrame = av_frame_alloc();
+  CheckPointer(m_pFrame, E_POINTER);
 
   return S_OK;
 }
@@ -531,24 +536,21 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
   const int width = pBaseView->surface.Info.CropW;
   const int height = pBaseView->surface.Info.CropH;
 
-  auto allocateFrame = [&](AVFrame** ppFrame, bool bMain) {
-    *ppFrame = av_frame_alloc();
-    AVFrame* pFrame = *ppFrame;
-
-    pFrame->format      = AV_PIX_FMT_NV12;
-    pFrame->width       = width;
-    pFrame->height      = height;
-    pFrame->colorspace  = AVCOL_SPC_UNSPECIFIED;
-    pFrame->color_range = AVCOL_RANGE_UNSPECIFIED;
+  auto allocateFrame = [&](bool bMain) {
+    m_pFrame->format      = AV_PIX_FMT_NV12;
+    m_pFrame->width       = width;
+    m_pFrame->height      = height;
+    m_pFrame->colorspace  = AVCOL_SPC_UNSPECIFIED;
+    m_pFrame->color_range = AVCOL_RANGE_UNSPECIFIED;
     if (bMain) {
-      pFrame->data[0]   = pBaseView->surface.Data.Y;
-      pFrame->data[1]   = pBaseView->surface.Data.UV;
+      m_pFrame->data[0]   = pBaseView->surface.Data.Y;
+      m_pFrame->data[1]   = pBaseView->surface.Data.UV;
     } else {
-      pFrame->data[0]   = pExtraView->surface.Data.Y;
-      pFrame->data[1]   = pExtraView->surface.Data.UV;
+      m_pFrame->data[0]   = pExtraView->surface.Data.Y;
+      m_pFrame->data[1]   = pExtraView->surface.Data.UV;
     }
-    pFrame->linesize[0] = pBaseView->surface.Data.PitchLow;
-    pFrame->linesize[1] = pBaseView->surface.Data.PitchLow;
+    m_pFrame->linesize[0] = pBaseView->surface.Data.PitchLow;
+    m_pFrame->linesize[1] = pBaseView->surface.Data.PitchLow;
   };
 
   CComPtr<IMediaSample> pOut;
@@ -564,20 +566,16 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       if (SUCCEEDED(hr = pOut->QueryInterface(&pSample3D))) {
         BYTE *pDataOut3D = nullptr;
         if (SUCCEEDED(pSample3D->Enable3D()) && SUCCEEDED(pSample3D->GetPointer3D(&pDataOut3D))) {
-          AVFrame* p3DFrame = nullptr;
-          allocateFrame(&p3DFrame, false);
+          allocateFrame(false);
 
-          m_pFilter->m_FormatConverter.Converting(pDataOut3D, p3DFrame);
-
-          av_frame_free(&p3DFrame);
+          m_pFilter->m_FormatConverter.Converting(pDataOut3D, m_pFrame);
         }
       }
     }
 
-    AVFrame* pFrame = nullptr;
-    allocateFrame(&pFrame, true);
+    allocateFrame(true);
 
-    m_pFilter->m_FormatConverter.Converting(pDataOut, pFrame);
+    m_pFilter->m_FormatConverter.Converting(pDataOut, m_pFrame);
 
     pOut->SetTime(&rtStart, &rtStop);
     pOut->SetMediaTime(NULL, NULL);
@@ -587,8 +585,6 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
     SetTypeSpecificFlags(pOut);
 
     hr = m_pFilter->m_pOutput->Deliver(pOut);
-
-    av_frame_free(&pFrame);
   }
 
   {
