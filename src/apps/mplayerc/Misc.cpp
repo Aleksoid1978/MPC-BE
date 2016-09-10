@@ -410,5 +410,5 @@ void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue)
 
 	iRed   = clamp(iRed,   0, 255);
 	iGreen = clamp(iGreen, 0, 255);
-	iRed   = clamp(iRed,   0, 255);
+	iBlue  = clamp(iBlue,  0, 255);
 }
