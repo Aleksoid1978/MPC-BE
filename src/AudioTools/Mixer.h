@@ -21,100 +21,9 @@
 #pragma once
 
 #include "SampleFormat.h"
-#include "AudioHelper.h"
+#include "LowPassFilter.h"
 
 struct AVAudioResampleContext;
-
-/*   Algorithms: Recursive single pole low pass filter
- *   Reference: The Scientist and Engineer's Guide to Digital Signal Processing
- *
- *   low-pass: output[N] = input[N] * A + output[N-1] * B
- *     X = exp(-2.0 * pi * Fc)
- *     A = 1 - X
- *     B = X
- *     Fc = cutoff freq / sample rate
- *
- *     Mimics an RC low-pass filter:
- *
- *     ---/\/\/\/\----------->
- *                   |
- *                  --- C
- *                  ---
- *                   |
- *                   |
- *                   V
- */
-
-class LowPassFilter
-{
-	float A = 0.0f;
-	float B = 0.0f;
-	int m_channels = 0;
-	SampleFormat m_sampleFormat = SAMPLE_FMT_NONE;
-
-public:
-	void SetParams(const int channels, const int samplerate, const SampleFormat sampleFormat, const float freq) {
-		const float Fc = freq / samplerate;
-		const float X  = exp(-2.0f * M_PI * Fc);
-		A = 1.0f - X;
-		B = X;
-
-		m_channels = channels;
-		m_sampleFormat = sampleFormat;
-	}
-
-	#define LFE(p) (*(p + 3))
-
-	template <typename T>
-	inline void Process(BYTE** ppData, const int samples) {
-		if (m_sampleFormat != SAMPLE_FMT_NONE) {
-			float input, output, prev = 0.0f;
-
-			T* p = (T*)*ppData;
-			T sample;
-			for (int i = 0; i < samples; i++) {
-				sample = LFE(p);
-
-				switch (m_sampleFormat) {
-					case SAMPLE_FMT_U8:
-						input = SAMPLE_uint8_to_float((uint8_t)sample);
-						break;
-					case SAMPLE_FMT_S16:
-						input = SAMPLE_int16_to_float(sample);
-						break;
-					case SAMPLE_FMT_S24:
-					case SAMPLE_FMT_S32:
-						input = SAMPLE_int32_to_float(sample);
-						break;
-					default:
-						input = (float)sample;
-				}
-
-				output = input * A + prev * B;
-				prev = output;
-
-				switch (m_sampleFormat) {
-					case SAMPLE_FMT_U8:
-						sample = SAMPLE_float_to_uint8(output);
-						break;
-					case SAMPLE_FMT_S16:
-						sample = SAMPLE_float_to_int16(output);
-						break;
-					case SAMPLE_FMT_S24:
-					case SAMPLE_FMT_S32:
-						sample = SAMPLE_float_to_int32(output);
-						break;
-					default:
-						sample = (T)output;
-				}
-
-				LFE(p) = sample;
-
-				p += m_channels;
-			}
-		}
-	}
-};
 
 class CMixer
 {
@@ -134,7 +43,7 @@ protected:
 	enum AVSampleFormat m_in_avsf;
 	enum AVSampleFormat m_out_avsf;
 
-	LowPassFilter m_LowPassFilter;
+	CLowPassFilter m_LowPassFilter;
 
 	bool Init();
 
