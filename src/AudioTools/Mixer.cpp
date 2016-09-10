@@ -28,7 +28,6 @@ extern "C" {
 	#include "ffmpeg/libavutil/opt.h"
 }
 #pragma warning(default: 4005)
-#include "AudioHelper.h"
 
 CMixer::CMixer()
 	: m_pAVRCxt(NULL)
@@ -123,8 +122,8 @@ bool CMixer::Init()
 			m_matrix_dbl[i++] = 0.5;
 		}
 		if (m_out_layout & AV_CH_LOW_FREQUENCY) {
-			m_matrix_dbl[i++] = 0.0;
-			m_matrix_dbl[i++] = 0.0;
+			m_matrix_dbl[i++] = 0.5;
+			m_matrix_dbl[i++] = 0.5;
 		}
 		if (m_out_layout & (AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT)) {
 			m_matrix_dbl[i++] = 0.6666;
@@ -207,6 +206,8 @@ bool CMixer::Init()
 		return false;
 	}
 
+	m_LowPassFilter.SetParams(av_popcount(m_out_layout), m_out_samplerate, m_out_sf, 120.0f);
+
 	m_ActualContext = true;
 	return true;
 }
@@ -281,6 +282,28 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 	if (out_samples < 0) {
 		DLog(L"CMixer::Mixing() : avresample_convert failed");
 		out_samples = 0;
+	}
+
+	if (m_in_layout == AV_CH_LAYOUT_STEREO && out_ch >= 4
+			&& m_out_layout & AV_CH_LOW_FREQUENCY) {
+		switch (m_out_sf) {
+			case SAMPLE_FMT_U8:
+				m_LowPassFilter.Process<uint8_t>(&output, out_samples);
+				break;
+			case SAMPLE_FMT_S16:
+				m_LowPassFilter.Process<int16_t>(&output, out_samples);
+				break;
+			case SAMPLE_FMT_S24:
+			case SAMPLE_FMT_S32:
+				m_LowPassFilter.Process<int32_t>(&output, out_samples);
+				break;
+			case SAMPLE_FMT_FLT:
+				m_LowPassFilter.Process<float>(&output, out_samples);
+				break;
+			case SAMPLE_FMT_DBL:
+				m_LowPassFilter.Process<double>(&output, out_samples);
+				break;
+		}
 	}
 
 	if (buf1) {
