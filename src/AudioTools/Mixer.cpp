@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include "AudioHelper.h"
 #include "Mixer.h"
 
 #pragma warning(disable: 4005)
@@ -206,7 +207,7 @@ bool CMixer::Init()
 		return false;
 	}
 
-	m_LowPassFilter.SetParams(av_popcount(m_out_layout), m_out_samplerate, m_out_sf, 120.0f);
+	m_LowPassFilter.SetParams(3 , av_popcount(m_out_layout), m_out_samplerate, 120);
 
 	m_ActualContext = true;
 	return true;
@@ -288,20 +289,20 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 			&& m_out_layout & AV_CH_LOW_FREQUENCY) {
 		switch (m_out_sf) {
 			case SAMPLE_FMT_U8:
-				m_LowPassFilter.Process<uint8_t>(&output, out_samples);
+				m_LowPassFilter.Process_uint8((uint8_t*)output, out_samples);
 				break;
 			case SAMPLE_FMT_S16:
-				m_LowPassFilter.Process<int16_t>(&output, out_samples);
+				m_LowPassFilter.Process_int16((int16_t*)output, out_samples);
 				break;
 			case SAMPLE_FMT_S24:
 			case SAMPLE_FMT_S32:
-				m_LowPassFilter.Process<int32_t>(&output, out_samples);
+				m_LowPassFilter.Process_int32((int32_t*)output, out_samples);
 				break;
 			case SAMPLE_FMT_FLT:
-				m_LowPassFilter.Process<float>(&output, out_samples);
+				m_LowPassFilter.Process_float((float*)output, out_samples);
 				break;
 			case SAMPLE_FMT_DBL:
-				m_LowPassFilter.Process<double>(&output, out_samples);
+				m_LowPassFilter.Process_double((double*)output, out_samples);
 				break;
 		}
 	}

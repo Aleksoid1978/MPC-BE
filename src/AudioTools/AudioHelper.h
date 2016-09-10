@@ -72,6 +72,7 @@
 #define SAMPLE_uint8_to_float(sample)  ((float)(int8_t((sample) ^ 0x80)) / INT8_PEAK)
 #define SAMPLE_int16_to_float(sample)  ((float)(sample) / INT16_PEAK)
 #define SAMPLE_int32_to_float(sample)  ((float)(double(sample) / INT32_PEAK))
+#define SAMPLE_float_to_float(sample)  (sample)
 #define SAMPLE_double_to_float(sample) ((float)(sample))
 
 #define SAMPLE_float_to_double(sample) ((double)(sample))
