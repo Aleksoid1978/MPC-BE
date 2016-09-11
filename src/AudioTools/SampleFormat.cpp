@@ -17,6 +17,8 @@ sample_fmt_info[SAMPLE_FMT_NB] = {
     { 32,  true }, // SAMPLE_FMT_S32P
     { 32,  true }, // SAMPLE_FMT_FLTP
     { 64,  true }, // SAMPLE_FMT_DBLP
+    { 64, false }, // SAMPLE_FMT_S64
+    { 64,  true }, // SAMPLE_FMT_S64P
     { 24, false }, // SAMPLE_FMT_S24
 //  { 24,  true }  // SAMPLE_FMT_S24P
 };

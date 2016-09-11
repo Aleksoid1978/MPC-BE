@@ -13,6 +13,8 @@ enum SampleFormat {
     SAMPLE_FMT_S32P,        ///< signed 32 bits, planar
     SAMPLE_FMT_FLTP,        ///< float, planar
     SAMPLE_FMT_DBLP,        ///< double, planar
+    SAMPLE_FMT_S64,         ///< signed 64 bits
+    SAMPLE_FMT_S64P,        ///< signed 64 bits, planar
 
     SAMPLE_FMT_S24,         ///< signed 24 bits
   //SAMPLE_FMT_S24P,        ///< signed 24 bits, planar
