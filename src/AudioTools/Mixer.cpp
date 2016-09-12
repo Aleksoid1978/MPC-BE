@@ -207,7 +207,7 @@ bool CMixer::Init()
 		return false;
 	}
 
-	m_LowPassFilter.SetParams(3 , av_popcount(m_out_layout), m_out_samplerate, m_out_sf, 120);
+	m_LowPassFilter.SetParams(m_out_sf, 3 , av_popcount(m_out_layout), m_out_samplerate, 120);
 
 	m_ActualContext = true;
 	return true;

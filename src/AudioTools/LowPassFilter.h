@@ -56,6 +56,6 @@ class CLowPassFilter
 	void Process_double(double* p, const int samples);
 
 public:
-	void SetParams(const int shift, const int step, const int samplerate, const SampleFormat sampleFormat, const int freq);
+	void SetParams(SampleFormat sampleFormat, int shift, int step, int samplerate, int freq);
 	void Process(BYTE* p, const int samples);
 };
