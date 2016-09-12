@@ -24,5 +24,5 @@
 
 namespace FrameDuration {
 	const int MAXTESTEDFRAMES = 120;
-	REFERENCE_TIME Calculate(std::vector<REFERENCE_TIME> timecodes, const REFERENCE_TIME default = 417083);
+	REFERENCE_TIME Calculate(std::vector<REFERENCE_TIME> timecodes);
 }
