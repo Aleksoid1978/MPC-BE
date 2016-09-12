@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include <MMReg.h>
 #include "FLVSplitter.h"
+#include "../BaseSplitter/FrameDuration.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/VideoParser.h"
 
@@ -716,53 +717,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				BITMAPINFOHEADER* bih = &vih->bmiHeader;
 
-				// calculate video fps
-				if (!AvgTimePerFrame) {
-					__int64 pos = m_pFile->GetPos();
-					__int64 sync_pos = m_DataOffset;
-					if (Sync(sync_pos)) {
-						Tag tag;
-						VideoTag vtag;
-						UINT32 first_ts, current_ts;
-						first_ts = current_ts = 0;
-						int frame_cnt = 0;
-
-						while ((frame_cnt < 30) && ReadTag(tag) && !CheckRequest(NULL) && m_pFile->GetRemaining()) {
-							__int64 _next = m_pFile->GetPos() + tag.DataSize;
-							if ((tag.DataSize > 0) && (tag.TagType == FLV_VIDEODATA && ReadTag(vtag) && tag.TimeStamp > 0)) {
-
-								if (IsAVCCodec(vtag.CodecID)) {
-									if (vtag.AVCPacketType != 1) {
-										continue;
-									}
-
-									t.TimeStamp += vtag.tsOffset;
-								}
-
-								if (tag.TimeStamp != current_ts) {
-									frame_cnt++;
-								}
-
-								current_ts = tag.TimeStamp;
-
-								if (!first_ts && current_ts) {
-									first_ts = current_ts;
-								}
-							}
-							m_pFile->Seek(_next);
-							if (!Sync(_next)) {
-								break;
-							}
-						}
-
-						if (frame_cnt > 1 && current_ts > first_ts) {
-							AvgTimePerFrame = 10000 * (current_ts - first_ts) / (frame_cnt - 1);
-						}
-					}
-
-					m_pFile->Seek(pos);
-				}
-
 				vih->AvgTimePerFrame = AvgTimePerFrame;
 
 				switch (vt.CodecID) {
@@ -1077,6 +1031,59 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					default:
 						fTypeFlagsVideo = true;
+				}
+
+				if (mt.subtype != GUID_NULL) {
+					REFERENCE_TIME rtAvgTimePerFrame = 1;
+					ExtractAvgTimePerFrame(&mt, rtAvgTimePerFrame);
+
+					// calculate video fps
+					if (rtAvgTimePerFrame < 50000) {
+						const __int64 pos = m_pFile->GetPos();
+						__int64 sync_pos = m_DataOffset;
+						if (Sync(sync_pos)) {
+							std::vector<REFERENCE_TIME> timecodes;
+							timecodes.reserve(FrameDuration::MAXTESTEDFRAMES);
+
+							Tag tag;
+							VideoTag vtag;
+
+							while (ReadTag(tag) && !CheckRequest(NULL) && m_pFile->GetRemaining()) {
+								__int64 _next = m_pFile->GetPos() + tag.DataSize;
+								if ((tag.DataSize > 0) && (tag.TagType == FLV_VIDEODATA && ReadTag(vtag) && tag.TimeStamp > 0)) {
+									if (IsAVCCodec(vtag.CodecID)) {
+										if (vtag.AVCPacketType != 1) {
+											continue;
+										}
+										tag.TimeStamp += vtag.tsOffset;
+									}
+
+									timecodes.push_back(10000i64 * tag.TimeStamp);
+									if (timecodes.size() >= FrameDuration::MAXTESTEDFRAMES) {
+										break;
+									}
+								}
+
+								m_pFile->Seek(_next);
+								if (!Sync(_next)) {
+									break;
+								}
+							}
+
+							rtAvgTimePerFrame = FrameDuration::Calculate(timecodes);
+
+							if (mt.formattype == FORMAT_MPEG2_VIDEO) {
+								((MPEG2VIDEOINFO*)mt.pbFormat)->hdr.AvgTimePerFrame = rtAvgTimePerFrame;
+							} else if (mt.formattype == FORMAT_MPEGVideo) {
+								((MPEG1VIDEOINFO*)mt.pbFormat)->hdr.AvgTimePerFrame = rtAvgTimePerFrame;
+							} else if (mt.formattype == FORMAT_VIDEOINFO2) {
+								((VIDEOINFOHEADER2*)mt.pbFormat)->AvgTimePerFrame   = rtAvgTimePerFrame;
+							} else if (mt.formattype == FORMAT_VideoInfo) {
+								((VIDEOINFOHEADER*)mt.pbFormat)->AvgTimePerFrame    = rtAvgTimePerFrame;
+							}
+						}
+						m_pFile->Seek(pos);
+					}
 				}
 			}
 		}

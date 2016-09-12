@@ -20,7 +20,8 @@
 
 #include "stdafx.h"
 #include <algorithm>
-#include "MatroskaSplitter.h"
+#include <vector>
+#include "FrameDuration.h"
 
 static double Video_FrameRate_Rounding(double FrameRate)
 {
@@ -64,128 +65,79 @@ static REFERENCE_TIME Video_FrameDuration_Rounding(REFERENCE_TIME FrameDuration)
 	return FrameDuration;
 }
 
-//
-// CMatroskaSplitterFilter
-//
+namespace FrameDuration {
+	REFERENCE_TIME Calculate(std::vector<REFERENCE_TIME> timecodes, const REFERENCE_TIME default/* = 417083*/)
+	{
+		DLog(L"FrameDuration::Calculate()");
+		REFERENCE_TIME FrameDuration = 0;
 
-#define MAXTESTEDFRAMES 120
-
-REFERENCE_TIME CMatroskaSplitterFilter::CalcFrameDuration(CUInt trackNumber)
-{
-	DLog(L"CMatroskaSplitterFilter::CalcFrameDuration() : calculate AvgTimePerFrame");
-	REFERENCE_TIME FrameDuration = 0;
-
-	CMatroskaNode Root(m_pFile);
-	m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
-	m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
-
-	std::vector<INT64> timecodes;
-	timecodes.reserve(MAXTESTEDFRAMES);
-
-	bool readmore = true;
-
-	do {
-		Cluster c;
-		c.ParseTimeCode(m_pCluster);
-
-		if (CAutoPtr<CMatroskaNode> pBlock = m_pCluster->GetFirstBlock()) {
-			do {
-				CBlockGroupNode bgn;
-
-				if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-					bgn.Parse(pBlock, true);
-				}
-				else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
-					CAutoPtr<BlockGroup> bg(DNew BlockGroup());
-					bg->Block.Parse(pBlock, true);
-					bgn.AddTail(bg);
-				}
-
-				POSITION pos4 = bgn.GetHeadPosition();
-				while (pos4) {
-					BlockGroup* bg = bgn.GetNext(pos4);
-					if (bg->Block.TrackNumber != trackNumber) {
-						continue;
-					}
-					INT64 tc = c.TimeCode + bg->Block.TimeCode;
-
-					DLog(L"    => Frame: %3Iu, TimeCode: %5I64d = %10I64d", timecodes.size(), tc, m_pFile->m_segment.GetRefTime(tc));
-					timecodes.push_back(tc);
-
-					if (timecodes.size() >= MAXTESTEDFRAMES) {
-						readmore = false;
-						break;
-					}
-				}
-			} while (readmore && pBlock->NextBlock());
-		}
-	} while (readmore && m_pCluster->Next(true));
-
-	m_pCluster.Free();
-
-	if (timecodes.size()) {
-		std::sort(timecodes.begin(), timecodes.end());
-
-		// calculate the average fps
-		double fps = 1000000000.0 * (timecodes.size() - 1) / (m_pFile->m_segment.SegmentInfo.TimeCodeScale * (timecodes.back() - timecodes.front()));
-
-		std::vector<int> frametimes;
-		frametimes.reserve(MAXTESTEDFRAMES - 1);
-
-		unsigned k = 0;
-		for (size_t i = 1; i < timecodes.size(); i++) {
-			INT64 diff = timecodes[i] - timecodes[i-1];
-			if (diff > 0 && diff < INT_MAX) {
-
-				if (diff == 1) {
-					// calculate values equal to 1
-					k++;
-				}
-				else if (k > 0 && k < frametimes.size()) {
-					// fill values equal to 1 due to the previous value
-					size_t j = frametimes.size() - k - 1;
-					int d = frametimes[j] + k;
-					k += 1;
-					while (k) {
-						frametimes[j] = d / k--;
-						d -= frametimes[j++];
-					}
-				}
-
-				frametimes.push_back((int)diff);
+		if (timecodes.size()) {
+#ifdef DEBUG
+			for (size_t i = 0; i < timecodes.size(); i++) {
+				DLog(L"    => Frame: %3Iu, TimeCode: %10I64d", i, timecodes[i]);
 			}
-		}
+#endif
+			std::sort(timecodes.begin(), timecodes.end());
 
-		if (frametimes.size()) {
-			int longsum = 0;
-			int longcount = 0;
+			// calculate the average fps
+			double fps = 10000000.0 * (timecodes.size() - 1) / (timecodes.back() - timecodes.front());
 
-			int sum = frametimes[0];
-			int count = 1;
-			for (size_t i = 1; i < frametimes.size(); i++) {
-				if (abs(frametimes[i-1] - frametimes[i]) <= 1) {
-					sum += frametimes[i];
-					count++;
+			std::vector<int> frametimes;
+			frametimes.reserve(MAXTESTEDFRAMES - 1);
 
-					if (count > longcount) {
-						longsum = sum;
-						longcount = count;
+			unsigned k = 0;
+			for (size_t i = 1; i < timecodes.size(); i++) {
+				const REFERENCE_TIME diff = timecodes[i] - timecodes[i - 1];
+				if (diff > 0 && diff < INT_MAX) {
+					if (diff == 1) {
+						// calculate values equal to 1
+						k++;
+					} else if (k > 0 && k < frametimes.size()) {
+						// fill values equal to 1 due to the previous value
+						size_t j = frametimes.size() - k - 1;
+						int d = frametimes[j] + k;
+						k += 1;
+						while (k) {
+							frametimes[j] = d / k--;
+							d -= frametimes[j++];
+						}
 					}
-				} else {
-					sum = frametimes[i];
-					count = 1;
+
+					frametimes.push_back((int)diff);
 				}
 			}
 
-			if (longsum && longcount >= 10) {
-				fps = 1000000000.0 * longcount / (m_pFile->m_segment.SegmentInfo.TimeCodeScale * longsum);
+			if (frametimes.size()) {
+				int longsum = 0;
+				int longcount = 0;
+
+				int sum = frametimes[0];
+				int count = 1;
+				for (size_t i = 1; i < frametimes.size(); i++) {
+					if (abs(frametimes[i - 1] - frametimes[i]) <= 1) {
+						sum += frametimes[i];
+						count++;
+
+						if (count > longcount) {
+							longsum = sum;
+							longcount = count;
+						}
+					} else {
+						sum = frametimes[i];
+						count = 1;
+					}
+				}
+
+				if (longsum && longcount >= 10) {
+					fps = 10000000.0 * longcount / longsum;
+				}
 			}
+
+			fps = Video_FrameRate_Rounding(fps);
+
+			FrameDuration = REFERENCE_TIME(10000000.0 / fps);
 		}
 
-		fps = Video_FrameRate_Rounding(fps);
-
-		FrameDuration = 10000000.0 / fps;
+		return FrameDuration < 50000 ? default : FrameDuration;
 	}
-
-	return FrameDuration;
-}
+} // namespace FrameDuration
