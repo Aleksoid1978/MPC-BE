@@ -20,7 +20,7 @@
 
 #pragma once
 
- /*   Algorithms: Recursive single pole low pass filter
+/*   Algorithms: Recursive single pole low pass filter
  *   Reference: The Scientist and Engineer's Guide to Digital Signal Processing
  *
  *   low-pass: output[N] = input[N] * A + output[N-1] * B
@@ -47,13 +47,15 @@ class CLowPassFilter
 	unsigned m_shift = 0;
 	unsigned m_step = 1;
 	float m_sample = 0.0f;
-
-public:
-	void SetParams(int shift, int step, int samplerate, int freq);
+	SampleFormat m_sf = SAMPLE_FMT_NONE;
 
 	void Process_uint8(uint8_t* p, const int samples);
 	void Process_int16(int16_t* p, const int samples);
 	void Process_int32(int32_t* p, const int samples);
 	void Process_float(float* p, const int samples);
 	void Process_double(double* p, const int samples);
+
+public:
+	void SetParams(const int shift, const int step, const int samplerate, const SampleFormat sampleFormat, const int freq);
+	void Process(BYTE* p, const int samples);
 };

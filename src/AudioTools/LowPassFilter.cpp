@@ -24,17 +24,41 @@
 
 // CLowPassFilter
 
-void CLowPassFilter::SetParams(int shift, int step, int samplerate, int freq)
+void CLowPassFilter::SetParams(const int shift, const int step, const int samplerate, const SampleFormat sampleFormat, const int freq)
 {
-	double Fc = (double)freq / samplerate;
-	float X = exp(-2.0 * M_PI * Fc);
+	const double Fc = (double)freq / samplerate;
+	const float X = exp(-2.0 * M_PI * Fc);
 	A = 1.0f - X;
 	B = X;
 
 	m_shift = shift;
 	m_step = step;
 
-	float m_sample = 0.0f;
+	m_sf = sampleFormat;
+
+	m_sample = 0.0f;
+}
+
+void CLowPassFilter::Process(BYTE* p, const int samples)
+{
+	switch (m_sf) {
+		case SAMPLE_FMT_U8:
+			Process_uint8((uint8_t*)p, samples);
+			break;
+		case SAMPLE_FMT_S16:
+			Process_int16((int16_t*)p, samples);
+			break;
+		case SAMPLE_FMT_S24:
+		case SAMPLE_FMT_S32:
+			Process_int32((int32_t*)p, samples);
+			break;
+		case SAMPLE_FMT_FLT:
+			Process_float((float*)p, samples);
+			break;
+		case SAMPLE_FMT_DBL:
+			Process_double((double*)p, samples);
+			break;
+	}
 }
 
 #define LOWPASSPROCESS(fmt) \
@@ -48,7 +72,6 @@ void CLowPassFilter::Process_##fmt## (##fmt##_t* p, const int samples) \
     } \
 } \
  
-
 LOWPASSPROCESS(uint8)
 LOWPASSPROCESS(int16)
 LOWPASSPROCESS(int32)
