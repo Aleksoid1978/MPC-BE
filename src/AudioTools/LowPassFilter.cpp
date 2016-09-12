@@ -24,17 +24,16 @@
 
 // CLowPassFilter
 
-void CLowPassFilter::SetParams(const int shift, const int step, const int samplerate, const SampleFormat sampleFormat, const int freq)
+void CLowPassFilter::SetParams(SampleFormat sampleFormat, int shift, int step, int samplerate, int freq)
 {
 	const double Fc = (double)freq / samplerate;
 	const float X = exp(-2.0 * M_PI * Fc);
 	A = 1.0f - X;
 	B = X;
 
+	m_sf = sampleFormat;
 	m_shift = shift;
 	m_step = step;
-
-	m_sf = sampleFormat;
 
 	m_sample = 0.0f;
 }
