@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include <MMReg.h>
 #include "MpegSplitterFile.h"
+#include "../BaseSplitter/FrameDuration.h"
 #include "../../../DSUtil/AudioParser.h"
 
 #ifdef REGISTER_FILTER
@@ -1257,42 +1258,41 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			ExtractAvgTimePerFrame(&s.mt, rtAvgTimePerFrame);
 
 			if (rtAvgTimePerFrame < 50000) {
-				__int64 _pos = GetPos();
+				const __int64 _pos = GetPos();
+				Seek(m_posMin);
+
 				__int64 nextPos;
-				REFERENCE_TIME rt_start = NextPTS(s, s.codec, nextPos);
-				if (rt_start != INVALID_TIME) {
+				REFERENCE_TIME rt = NextPTS(s, s.codec, nextPos);
+				if (rt != INVALID_TIME) {
+					std::vector<REFERENCE_TIME> timecodes;
+					timecodes.reserve(FrameDuration::MAXTESTEDFRAMES);
+
 					Seek(nextPos);
-					REFERENCE_TIME rt_end = rt_start;
 					int count = 0;
-					while (count < 30) {
-						REFERENCE_TIME rt = NextPTS(s, s.codec, nextPos);
+					for (;;) {
+						rt = NextPTS(s, s.codec, nextPos);
 						if (rt == INVALID_TIME) {
 							break;
 						}
-						if (rt > rt_start) {
-							rt_end = rt;
-							count++;
+						
+						timecodes.push_back(rt);
+						if (timecodes.size() >= FrameDuration::MAXTESTEDFRAMES) {
+							break;
 						}
 
 						Seek(nextPos);
 					}
 
-					if (count > 1 && (rt_start < rt_end)) {
-						rtAvgTimePerFrame = (rt_end - rt_start) / (count - 1);
-					}
+					rtAvgTimePerFrame = FrameDuration::Calculate(timecodes);
 
-					if (rtAvgTimePerFrame < 50000) {
-						rtAvgTimePerFrame = 417083; // set 23.976 as default
-					}
-
-					if (rtAvgTimePerFrame) {
-						if (s.mt.formattype == FORMAT_MPEG2_VIDEO) {
-							((MPEG2VIDEOINFO*)s.mt.pbFormat)->hdr.AvgTimePerFrame	= rtAvgTimePerFrame;
-						} else if (s.mt.formattype == FORMAT_VIDEOINFO2) {
-							((VIDEOINFOHEADER2*)s.mt.pbFormat)->AvgTimePerFrame		= rtAvgTimePerFrame;
-						} else if (s.mt.formattype == FORMAT_VideoInfo) {
-							((VIDEOINFOHEADER*)s.mt.pbFormat)->AvgTimePerFrame		= rtAvgTimePerFrame;
-						}
+					if (s.mt.formattype == FORMAT_MPEG2_VIDEO) {
+						((MPEG2VIDEOINFO*)s.mt.pbFormat)->hdr.AvgTimePerFrame = rtAvgTimePerFrame;
+					} else if (s.mt.formattype == FORMAT_MPEGVideo) {
+						((MPEG1VIDEOINFO*)s.mt.pbFormat)->hdr.AvgTimePerFrame = rtAvgTimePerFrame;
+					} else if (s.mt.formattype == FORMAT_VIDEOINFO2) {
+						((VIDEOINFOHEADER2*)s.mt.pbFormat)->AvgTimePerFrame   = rtAvgTimePerFrame;
+					} else if (s.mt.formattype == FORMAT_VideoInfo) {
+						((VIDEOINFOHEADER*)s.mt.pbFormat)->AvgTimePerFrame    = rtAvgTimePerFrame;
 					}
 				}
 

@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include <MMReg.h>
 #include "MatroskaSplitter.h"
+#include "../BaseSplitter/FrameDuration.h"
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/VideoParser.h"
 #include "../../../DSUtil/GolombBuffer.h"
@@ -31,7 +32,6 @@
 #endif
 #include <moreuuids.h>
 #include <basestruct.h>
-#include <vector>
 #include <list>
 
 // option names
@@ -594,7 +594,52 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				if (AvgTimePerFrame < 50000 // incorrect fps - calculate avarage value
 						&& CodecID != "V_DSHOW/MPEG1VIDEO" && CodecID != "V_MPEG1" && CodecID != "V_MPEG2") {
-					AvgTimePerFrame = CalcFrameDuration(pTE->TrackNumber);
+					CMatroskaNode Root(m_pFile);
+					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
+					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
+
+					std::vector<REFERENCE_TIME> timecodes;
+					timecodes.reserve(FrameDuration::MAXTESTEDFRAMES);
+
+					bool readmore = true;
+
+					do {
+						Cluster c;
+						c.ParseTimeCode(m_pCluster);
+
+						if (CAutoPtr<CMatroskaNode> pBlock = m_pCluster->GetFirstBlock()) {
+							do {
+								CBlockGroupNode bgn;
+
+								if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
+									bgn.Parse(pBlock, true);
+								}
+								else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
+									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+									bg->Block.Parse(pBlock, true);
+									bgn.AddTail(bg);
+								}
+
+								POSITION pos4 = bgn.GetHeadPosition();
+								while (pos4) {
+									BlockGroup* bg = bgn.GetNext(pos4);
+									if (bg->Block.TrackNumber != pTE->TrackNumber) {
+										continue;
+									}
+									timecodes.push_back(m_pFile->m_segment.GetRefTime(c.TimeCode + bg->Block.TimeCode));
+
+									if (timecodes.size() >= FrameDuration::MAXTESTEDFRAMES) {
+										readmore = false;
+										break;
+									}
+								}
+							} while (readmore && pBlock->NextBlock());
+						}
+					} while (readmore && m_pCluster->Next(true));
+
+					m_pCluster.Free();
+
+					AvgTimePerFrame = FrameDuration::Calculate(timecodes, 0);
 				}
 
 				if (bInterlaced && codecAvgTimePerFrame && AvgTimePerFrame) {
