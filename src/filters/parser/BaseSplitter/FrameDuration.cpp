@@ -65,79 +65,87 @@ static REFERENCE_TIME Video_FrameDuration_Rounding(REFERENCE_TIME FrameDuration)
 	return FrameDuration;
 }
 
-namespace FrameDuration {
-	REFERENCE_TIME Calculate(std::vector<REFERENCE_TIME> timecodes, const REFERENCE_TIME default/* = 417083*/)
-	{
-		DLog(L"FrameDuration::Calculate()");
-		REFERENCE_TIME FrameDuration = 0;
+REFERENCE_TIME FrameDuration::Calculate(std::vector<REFERENCE_TIME> timecodes)
+{
+	DLog(L"FrameDuration::Calculate()");
+	REFERENCE_TIME frameDuration = 417083;
 
-		if (timecodes.size()) {
+	if (timecodes.size() > 1) {
 #ifdef DEBUG
-			for (size_t i = 0; i < timecodes.size(); i++) {
-				DLog(L"    => Frame: %3Iu, TimeCode: %10I64d", i, timecodes[i]);
-			}
+		for (size_t i = 0; i < timecodes.size(); i++) {
+			DLog(L"    => Frame: %3Iu, TimeCode: %10I64d", i, timecodes[i]);
+		}
 #endif
-			std::sort(timecodes.begin(), timecodes.end());
+		std::sort(timecodes.begin(), timecodes.end());
 
-			// calculate the average fps
-			double fps = 10000000.0 * (timecodes.size() - 1) / (timecodes.back() - timecodes.front());
+		// calculate the average frame duration
+		frameDuration = (timecodes.back() - timecodes.front()) / (timecodes.size() - 1);
+		DLog(L"Average frame duration for %Iu frames = %I64d (fps = %.3f)",
+			timecodes.size(),
+			frameDuration,
+			10000000.0 * (timecodes.size() - 1) / (timecodes.back() - timecodes.front()));
 
-			std::vector<int> frametimes;
-			frametimes.reserve(MAXTESTEDFRAMES - 1);
 
-			unsigned k = 0;
-			for (size_t i = 1; i < timecodes.size(); i++) {
-				const REFERENCE_TIME diff = timecodes[i] - timecodes[i - 1];
-				if (diff > 0 && diff < INT_MAX) {
-					if (diff == 1) {
-						// calculate values equal to 1
-						k++;
-					} else if (k > 0 && k < frametimes.size()) {
-						// fill values equal to 1 due to the previous value
-						size_t j = frametimes.size() - k - 1;
-						int d = frametimes[j] + k;
-						k += 1;
-						while (k) {
-							frametimes[j] = d / k--;
-							d -= frametimes[j++];
-						}
-					}
+		std::vector<int> frametimes;
+		frametimes.reserve(MAXTESTEDFRAMES - 1);
 
-					frametimes.push_back((int)diff);
-				}
-			}
-
-			if (frametimes.size()) {
-				int longsum = 0;
-				int longcount = 0;
-
-				int sum = frametimes[0];
-				int count = 1;
-				for (size_t i = 1; i < frametimes.size(); i++) {
-					if (abs(frametimes[i - 1] - frametimes[i]) <= 1) {
-						sum += frametimes[i];
-						count++;
-
-						if (count > longcount) {
-							longsum = sum;
-							longcount = count;
-						}
-					} else {
-						sum = frametimes[i];
-						count = 1;
+		unsigned k = 0;
+		for (size_t i = 1; i < timecodes.size(); i++) {
+			const REFERENCE_TIME diff = timecodes[i] - timecodes[i - 1];
+			if (diff > 0 && diff < INT_MAX) {
+				if (diff == 1) {
+					// calculate values equal to 1
+					k++;
+				} else if (k > 0 && k < frametimes.size()) {
+					// fill values equal to 1 due to the previous value
+					size_t j = frametimes.size() - k - 1;
+					int d = frametimes[j] + k;
+					k += 1;
+					while (k) {
+						frametimes[j] = d / k--;
+						d -= frametimes[j++];
 					}
 				}
 
-				if (longsum && longcount >= 10) {
-					fps = 10000000.0 * longcount / longsum;
-				}
+				frametimes.push_back((int)diff);
 			}
-
-			fps = Video_FrameRate_Rounding(fps);
-
-			FrameDuration = REFERENCE_TIME(10000000.0 / fps);
 		}
 
-		return FrameDuration < 50000 ? default : FrameDuration;
+		if (frametimes.size()) {
+			int longsum = 0;
+			int longcount = 0;
+
+			int sum = frametimes[0];
+			int count = 1;
+			for (size_t i = 1; i < frametimes.size(); i++) {
+				if (abs(frametimes[i - 1] - frametimes[i]) <= 1) {
+					sum += frametimes[i];
+					count++;
+
+					if (count > longcount) {
+						longsum = sum;
+						longcount = count;
+					}
+				} else {
+					sum = frametimes[i];
+					count = 1;
+				}
+			}
+
+			if (longsum && longcount >= 10) {
+				frameDuration = longsum / longcount;
+				DLog(L"Average frame duration for longest monotone interval (%Iu frames) = %I64d (fps = %.3f)",
+					longcount + 1,
+					frameDuration,
+					10000000.0 * longcount / longsum);
+			}
+		}
+
+		frameDuration = Video_FrameDuration_Rounding(frameDuration);
+		DLog(L"Average frame duration after trying to rounding to the standard value = %I64d (fps = %.3f)",
+			frameDuration,
+			10000000.0 / frameDuration);
 	}
-} // namespace FrameDuration
+
+	return frameDuration;
+}

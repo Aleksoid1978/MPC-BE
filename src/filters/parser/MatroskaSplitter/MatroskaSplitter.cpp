@@ -639,7 +639,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					m_pCluster.Free();
 
-					AvgTimePerFrame = FrameDuration::Calculate(timecodes, 0);
+					AvgTimePerFrame = FrameDuration::Calculate(timecodes);
 				}
 
 				if (bInterlaced && codecAvgTimePerFrame && AvgTimePerFrame) {
