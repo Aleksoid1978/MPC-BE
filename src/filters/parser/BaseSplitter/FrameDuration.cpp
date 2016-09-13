@@ -65,7 +65,7 @@ static REFERENCE_TIME Video_FrameDuration_Rounding(REFERENCE_TIME FrameDuration)
 	return FrameDuration;
 }
 
-REFERENCE_TIME FrameDuration::Calculate(std::vector<REFERENCE_TIME> timecodes)
+REFERENCE_TIME FrameDuration::Calculate(std::vector<int64_t>& timecodes, int64_t timecodescale)
 {
 	DLog(L"FrameDuration::Calculate()");
 	REFERENCE_TIME frameDuration = 417083;
@@ -79,11 +79,11 @@ REFERENCE_TIME FrameDuration::Calculate(std::vector<REFERENCE_TIME> timecodes)
 		std::sort(timecodes.begin(), timecodes.end());
 
 		// calculate the average frame duration
-		frameDuration = (timecodes.back() - timecodes.front()) / (timecodes.size() - 1);
-		DLog(L"Average frame duration for %Iu frames = %I64d (fps = %.3f)",
+		frameDuration = timecodescale * (timecodes.back() - timecodes.front()) / (timecodes.size() - 1);
+		DLog(L"Average frame duration for %Iu frames = %I64d (fps = %.6f)",
 			timecodes.size(),
 			frameDuration,
-			10000000.0 * (timecodes.size() - 1) / (timecodes.back() - timecodes.front()));
+			10000000.0 * (timecodes.size() - 1) / ((timecodes.back() - timecodes.front()) * timecodescale));
 
 
 		std::vector<int> frametimes;
@@ -133,16 +133,16 @@ REFERENCE_TIME FrameDuration::Calculate(std::vector<REFERENCE_TIME> timecodes)
 			}
 
 			if (longsum && longcount >= 10) {
-				frameDuration = longsum / longcount;
-				DLog(L"Average frame duration for longest monotone interval (%Iu frames) = %I64d (fps = %.3f)",
+				frameDuration = timecodescale * longsum / longcount;
+				DLog(L"Average frame duration for longest monotone interval (%Iu frames) = %I64d (fps = %.6f)",
 					longcount + 1,
 					frameDuration,
-					10000000.0 * longcount / longsum);
+					10000000.0 * longcount / (longsum * timecodescale));
 			}
 		}
 
 		frameDuration = Video_FrameDuration_Rounding(frameDuration);
-		DLog(L"Average frame duration after trying to rounding to the standard value = %I64d (fps = %.3f)",
+		DLog(L"Average frame duration after trying to rounding to the standard value = %I64d (fps = %.6f)",
 			frameDuration,
 			10000000.0 / frameDuration);
 	}

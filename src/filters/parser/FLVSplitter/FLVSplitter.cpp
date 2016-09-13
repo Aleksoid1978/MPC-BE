@@ -1070,7 +1070,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 							}
 
-							rtAvgTimePerFrame = FrameDuration::Calculate(timecodes);
+							rtAvgTimePerFrame = FrameDuration::Calculate(timecodes, 1);
 
 							if (mt.formattype == FORMAT_MPEG2_VIDEO) {
 								((MPEG2VIDEOINFO*)mt.pbFormat)->hdr.AvgTimePerFrame = rtAvgTimePerFrame;

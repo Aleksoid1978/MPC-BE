@@ -626,7 +626,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									if (bg->Block.TrackNumber != pTE->TrackNumber) {
 										continue;
 									}
-									timecodes.push_back(m_pFile->m_segment.GetRefTime(c.TimeCode + bg->Block.TimeCode));
+									timecodes.push_back(c.TimeCode + bg->Block.TimeCode);
 
 									if (timecodes.size() >= FrameDuration::MAXTESTEDFRAMES) {
 										readmore = false;
@@ -639,7 +639,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					m_pCluster.Free();
 
-					AvgTimePerFrame = FrameDuration::Calculate(timecodes);
+					AvgTimePerFrame = FrameDuration::Calculate(timecodes, m_pFile->m_segment.SegmentInfo.TimeCodeScale / 100);
 				}
 
 				if (bInterlaced && codecAvgTimePerFrame && AvgTimePerFrame) {
