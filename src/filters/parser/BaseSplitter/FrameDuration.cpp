@@ -65,18 +65,27 @@ static REFERENCE_TIME Video_FrameDuration_Rounding(REFERENCE_TIME FrameDuration)
 	return FrameDuration;
 }
 
-REFERENCE_TIME FrameDuration::Calculate(std::vector<int64_t>& timecodes, const int64_t timecodescale/* = 10000i64*/)
+REFERENCE_TIME FrameDuration::Calculate(std::vector<int64_t>& timecodes, const int64_t timecodescale)
 {
 	DLog(L"FrameDuration::Calculate()");
 	REFERENCE_TIME frameDuration = 417083;
 
 	if (timecodes.size() > 1) {
 #ifdef DEBUG
+		DLog(L"Frame timecodes as is:");
 		for (size_t i = 0; i < timecodes.size(); i++) {
 			DLog(L"    => Frame: %3Iu, TimeCode: %10I64d", i, timecodes[i]);
 		}
 #endif
 		std::sort(timecodes.begin(), timecodes.end());
+
+#ifdef DEBUG
+		DLog(L"Sorted frame timecodes with durations:");
+		for (size_t i = 0; i < timecodes.size() - 1; i++) {
+			DLog(L"    => Frame: %3Iu, TimeCode: %10I64d, Duration: %10I64d", i, timecodes[i], timecodes[i + 1] - timecodes[i]);
+		}
+		DLog(L"    => Frame: %3Iu, TimeCode: %10I64d", timecodes.size() - 1, timecodes.back());
+#endif
 
 		// calculate the average frame duration
 		frameDuration = timecodescale * (timecodes.back() - timecodes.front()) / (timecodes.size() - 1);
