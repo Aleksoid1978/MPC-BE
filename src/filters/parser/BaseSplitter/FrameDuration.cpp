@@ -65,7 +65,7 @@ static REFERENCE_TIME Video_FrameDuration_Rounding(REFERENCE_TIME FrameDuration)
 	return FrameDuration;
 }
 
-REFERENCE_TIME FrameDuration::Calculate(std::vector<int64_t>& timecodes, int64_t timecodescale)
+REFERENCE_TIME FrameDuration::Calculate(std::vector<int64_t>& timecodes, const int64_t timecodescale/* = 10000i64*/)
 {
 	DLog(L"FrameDuration::Calculate()");
 	REFERENCE_TIME frameDuration = 417083;
@@ -91,7 +91,7 @@ REFERENCE_TIME FrameDuration::Calculate(std::vector<int64_t>& timecodes, int64_t
 
 		unsigned k = 0;
 		for (size_t i = 1; i < timecodes.size(); i++) {
-			const REFERENCE_TIME diff = timecodes[i] - timecodes[i - 1];
+			const int64_t diff = timecodes[i] - timecodes[i - 1];
 			if (diff > 0 && diff < INT_MAX) {
 				if (diff == 1) {
 					// calculate values equal to 1

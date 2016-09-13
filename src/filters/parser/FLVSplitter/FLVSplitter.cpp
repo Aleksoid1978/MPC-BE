@@ -1058,7 +1058,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										tag.TimeStamp += vtag.tsOffset;
 									}
 
-									timecodes.push_back(10000i64 * tag.TimeStamp);
+									timecodes.push_back(tag.TimeStamp);
 									if (timecodes.size() >= FrameDuration::MAXTESTEDFRAMES) {
 										break;
 									}
@@ -1070,7 +1070,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 							}
 
-							rtAvgTimePerFrame = FrameDuration::Calculate(timecodes, 1);
+							rtAvgTimePerFrame = FrameDuration::Calculate(timecodes);
 
 							if (mt.formattype == FORMAT_MPEG2_VIDEO) {
 								((MPEG2VIDEOINFO*)mt.pbFormat)->hdr.AvgTimePerFrame = rtAvgTimePerFrame;
