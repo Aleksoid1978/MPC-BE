@@ -80,7 +80,7 @@ static filter_t s_filters[] = {
 	{_T("FLV1/4"),					VIDEO_DECODER, VDEC_FLV,			0},
 	{_T("H263"),					VIDEO_DECODER, VDEC_H263,			0},
 	{_T("H264/AVC (FFmpeg)"),		VIDEO_DECODER, VDEC_H264,			0},
-	{_T("H264 (MVC 3D)"),			VIDEO_DECODER, VDEC_H264_MVC,		0},
+	{_T("H264 (MVC 3D)"),			VIDEO_DECODER, VDEC_H264_MVC,		IDS_TRA_INTEL_MSDK},
 	{_T("HEVC"),					VIDEO_DECODER, VDEC_HEVC,			0},
 	{_T("Indeo 3/4/5"),				VIDEO_DECODER, VDEC_INDEO,			0},
 	{_T("Lossless video (huffyuv, Lagarith, FFV1, MagicYUV)"), VIDEO_DECODER, VDEC_LOSSLESS, 0},

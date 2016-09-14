@@ -799,6 +799,7 @@
 #define IDS_TRA_LPCM                    14023
 #define IDS_TRA_PS2AUD                  14028
 #define IDS_TRA_FFMPEG                  14029
+#define IDS_TRA_INTEL_MSDK              14030
 #define IDS_PLAYLIST_OPEN               14114
 #define IDS_PLAYLIST_ADD                14115
 #define IDS_PLAYLIST_REMOVE             14116
