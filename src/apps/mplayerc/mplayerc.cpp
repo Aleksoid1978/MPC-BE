@@ -1968,26 +1968,28 @@ int CMPlayerCApp::GetDefLanguage()
 	return GetLanguageIndex(ID_LANGUAGE_ENGLISH);
 }
 
-void CMPlayerCApp::SetLanguage(int nLanguage)
+void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 {
-	CAppSettings&	s = AfxGetAppSettings();
-	HMODULE			hMod = NULL;
-	CString			strSatellite;
+	CAppSettings& s = AfxGetAppSettings();
+	HMODULE hMod    = NULL;
 
-	strSatellite = GetSatelliteDll(nLanguage);
+	const CString strSatellite = GetSatelliteDll(nLanguage);
 	if (!strSatellite.IsEmpty()) {
-		CString strSatVersion = CFileVersionInfo::GetFileVersionExShort(strSatellite);
-		if (strSatVersion.GetLength()) {
-			CString strNeededVersion = _T(MPC_VERSION_STR);
-			if (strSatVersion == strNeededVersion) {
+		const CString strSatVersion = CFileVersionInfo::GetFileVersionExShort(strSatellite);
+		if (!strSatVersion.IsEmpty()) {
+			if (strSatVersion == _T(MPC_VERSION_STR)) {
 				hMod = LoadLibrary(strSatellite);
-				s.iLanguage = nLanguage;
+				if (bSave) {
+					s.iLanguage = nLanguage;
+				}
 			} else {
 				// This message should stay in English!
-				MessageBox(NULL, _T("Your language pack will not work with this version. Please download a compatible one from the MPC-BE homepage."),
-						   _T("MPC-BE"), MB_OK);
+				MessageBox(NULL, L"Your language pack will not work with this version. Please download a compatible one from the MPC-BE homepage.",
+						   L"MPC-BE", MB_OK);
 			}
 		}
+	} else if (bSave && nLanguage == GetLanguageIndex(ID_LANGUAGE_ENGLISH)) {
+		s.iLanguage = nLanguage;
 	}
 
 	// In case no dll was loaded, load the English translation from the executable

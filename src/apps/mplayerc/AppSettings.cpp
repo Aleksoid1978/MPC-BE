@@ -520,7 +520,6 @@ void CAppSettings::SaveSettings()
 		return;
 	}
 
-	//PerfomanceSettings.SaveSettings();
 	FiltersPrioritySettings.SaveSettings();
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode);
@@ -990,9 +989,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	if (iLanguage < 0) {
 		iLanguage = CMPlayerCApp::GetDefLanguage();
 	}
-	CMPlayerCApp::SetLanguage(iLanguage);
+	CMPlayerCApp::SetLanguage(iLanguage, false);
 
-	//PerfomanceSettings.LoadSettings();
 	FiltersPrioritySettings.LoadSettings();
 
 	iCaptionMenuMode = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, MODE_SHOWCAPTIONMENU);

@@ -88,18 +88,18 @@ public:
 	static const LanguageResource languageResources[];
 	static const size_t languageResourcesCount;
 
-	static void					SetLanguage(int nLanguage);
-	static CString				GetSatelliteDll(int nLanguage);
-	static int					GetLanguageIndex(UINT resID);
-	static int					GetLanguageIndex(CString langcode);
-	static int					GetDefLanguage();
+	static void		SetLanguage(int nLanguage, bool bSave = true);
+	static CString	GetSatelliteDll(int nLanguage);
+	static int		GetLanguageIndex(UINT resID);
+	static int		GetLanguageIndex(CString langcode);
+	static int		GetDefLanguage();
 
-	static bool					IsVSFilterInstalled();
-	static bool					HasEVR();
-	static void					RunAsAdministrator(LPCTSTR strCommand, LPCTSTR strArgs, bool bWaitProcess);
+	static bool		IsVSFilterInstalled();
+	static bool		HasEVR();
+	static void		RunAsAdministrator(LPCTSTR strCommand, LPCTSTR strArgs, bool bWaitProcess);
 
-	void						RegisterHotkeys();
-	void						UnregisterHotkeys();
+	void			RegisterHotkeys();
+	void			UnregisterHotkeys();
 
 private:
 	std::map<CString, std::map<CString, CString, CStringUtils::IgnoreCaseLess>, CStringUtils::IgnoreCaseLess> m_ProfileMap;
