@@ -1275,7 +1275,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 							break;
 						}
 						
-						timecodes.push_back(rt);
+						timecodes.push_back((rt + 100) / 200); // get a real precision for time codes (need for some files)
 						if (timecodes.size() >= FrameDuration::MAXTESTEDFRAMES) {
 							break;
 						}
@@ -1283,7 +1283,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 						Seek(nextPos);
 					}
 
-					rtAvgTimePerFrame = FrameDuration::Calculate(timecodes, 1);
+					rtAvgTimePerFrame = FrameDuration::Calculate(timecodes, 200);
 
 					if (s.mt.formattype == FORMAT_MPEG2_VIDEO) {
 						((MPEG2VIDEOINFO*)s.mt.pbFormat)->hdr.AvgTimePerFrame = rtAvgTimePerFrame;
