@@ -2197,6 +2197,7 @@ BEGIN
     IDS_TRA_MPEG2           "Based on libmpeg2"
     IDS_TRA_PS2AUD          "Decodes audio streams of PSS files"
     IDS_TRA_FFMPEG          "Based on FFmpeg, http://ffmpeg.org/"
+    IDS_TRA_INTEL_MSDK      "Based on Intel Media SDK, requires external library(libmfxsw32.dll/libmfxsw64.dll)"
 END
 
 STRINGTABLE
