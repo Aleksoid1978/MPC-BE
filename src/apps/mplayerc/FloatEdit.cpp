@@ -137,8 +137,12 @@ CIntEdit::operator int()
 	CString s;
 	GetWindowText(s);
 	int integer;
+	if (_stscanf_s(s, _T("%d"), &integer) != 1) {
+		integer = 0;
+	}
+	integer = clamp(integer, m_lower, m_upper); // correction value after the simultaneous input and closing
 
-	return(_stscanf_s(s, _T("%d"), &integer) == 1 ? integer : 0);
+	return integer;
 }
 
 void CIntEdit::SetRange(int nLower, int nUpper)
