@@ -2061,7 +2061,21 @@ void CMpegSplitterFile::UpdatePSM()
 	}
 }
 
-#define MARKER if (BitRead(1) != 1) {DEBUG_ASSERT(FALSE); /*return false;*/} // TODO
+static UINT64 ReadPTS(CBaseSplitterFile* pFile)
+{
+	#define MARKER if (pFile->BitRead(1) != 1) { DEBUG_ASSERT(FALSE); };
+
+	UINT64 pts = pFile->BitRead(3) << 30;
+	MARKER // 32..30
+	pts |= pFile->BitRead(15) << 15;
+	MARKER // 29..15
+	pts |= pFile->BitRead(15);
+	MARKER // 14..0
+
+	return pts;
+}
+
+#define MARKER if (BitRead(1) != 1) { DEBUG_ASSERT(FALSE); /*return false;*/} // TODO
 bool CMpegSplitterFile::ReadPS(pshdr& h)
 {
 	memset(&h, 0, sizeof(h));
@@ -2073,14 +2087,8 @@ bool CMpegSplitterFile::ReadPS(pshdr& h)
 
 		EXECUTE_ASSERT(BitRead(4) == 2);
 
-		h.scr = 0;
-		h.scr |= BitRead(3) << 30;
-		MARKER; // 32..30
-		h.scr |= BitRead(15) << 15;
-		MARKER; // 29..15
-		h.scr |= BitRead(15);
+		h.scr = ReadPTS(this);
 		MARKER;
-		MARKER; // 14..0
 		h.bitrate = BitRead(22);
 		MARKER;
 	} else if ((b & 0xc4) == 0x44) {
@@ -2088,13 +2096,7 @@ bool CMpegSplitterFile::ReadPS(pshdr& h)
 
 		EXECUTE_ASSERT(BitRead(2) == 1);
 
-		h.scr = 0;
-		h.scr |= BitRead(3) << 30;
-		MARKER; // 32..30
-		h.scr |= BitRead(15) << 15;
-		MARKER; // 29..15
-		h.scr |= BitRead(15);
-		MARKER; // 14..0
+		h.scr = ReadPTS(this);
 		h.scr = (h.scr * 300 + BitRead(9)) * 10 / 27;
 		MARKER;
 		h.bitrate = BitRead(22);
@@ -2146,7 +2148,7 @@ bool CMpegSplitterFile::ReadPSS(pssyshdr& h)
 	return true;
 }
 
-#define PTS(x) (10000 * x / 90 + m_rtPTSOffset)
+#define PTS(pts) (llMulDiv(pts, 10000, 90, 0) + m_rtPTSOffset)
 bool CMpegSplitterFile::ReadPES(peshdr& h, BYTE code)
 {
 	memset(&h, 0, sizeof(h));
@@ -2212,38 +2214,20 @@ bool CMpegSplitterFile::ReadPES(peshdr& h, BYTE code)
 
 	if (h.fpts) {
 		if (h.type == mpeg2) {
-			BYTE b = (BYTE)BitRead(4);
-			if (!(h.fdts && b == 3 || !h.fdts && b == 2)) {DEBUG_ASSERT(FALSE); /*goto error;*/} // TODO
+			if (h.fdts != ((BYTE)BitRead(4) & 0x01)) { DEBUG_ASSERT(FALSE); /*goto error;*/} // TODO
 		}
 
-		h.pts = 0;
-		h.pts |= BitRead(3) << 30;
-		MARKER; // 32..30
-		h.pts |= BitRead(15) << 15;
-		MARKER; // 29..15
-		h.pts |= BitRead(15);
-		MARKER; // 14..0
-		h.pts = PTS(h.pts);
+		h.pts = PTS(ReadPTS(this));
 	}
 
 	if (h.fdts) {
-		BYTE b = (BYTE)BitRead(4);
-		//if (b != 1) {return false;} // TODO
+		if (BitRead(4) != 0x01) { DEBUG_ASSERT(FALSE); /*goto error;*/} // TODO
 
-		h.dts = 0;
-		h.dts |= BitRead(3) << 30;
-		MARKER; // 32..30
-		h.dts |= BitRead(15) << 15;
-		MARKER; // 29..15
-		h.dts |= BitRead(15);
-		MARKER; // 14..0
-		h.dts = PTS(h.dts);
+		h.dts = PTS(ReadPTS(this));
 	}
 
 	if (h.type == mpeg1) {
-		if (!h.fpts && !h.fdts && BitRead(4) != 0xf) {
-			DEBUG_ASSERT(0);/* goto error;*/ // TODO
-		}
+		if (!h.fpts && !h.fdts && BitRead(4) != 0xf) { DEBUG_ASSERT(FALSE); /* goto error;*/} // TODO
 
 		if (h.len) {
 			h.len--;
