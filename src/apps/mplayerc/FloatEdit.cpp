@@ -32,18 +32,18 @@ bool CFloatEdit::GetFloat(float& f)
 	CString s;
 	GetWindowText(s);
 
-	return(_stscanf_s(s, _T("%f"), &f) == 1);
+	return (swscanf_s(s, L"%f", &f) == 1);
 }
 
 double CFloatEdit::operator = (double d)
 {
 	CString s;
-	s.Format(_T("%.4f"), d);
+	s.Format(L"%.4f", d);
 	s.TrimRight('0');
 	if (s[s.GetLength() - 1] == '.') s.Truncate(s.GetLength() - 1);
 	SetWindowText(s);
 
-	return(d);
+	return d;
 }
 
 CFloatEdit::operator double()
@@ -52,7 +52,7 @@ CFloatEdit::operator double()
 	GetWindowText(s);
 	float f = 0;
 
-	return(_stscanf_s(s, _T("%f"), &f) == 1 ? f : 0);
+	return (swscanf_s(s, L"%f", &f) == 1 ? f : 0);
 }
 
 BEGIN_MESSAGE_MAP(CFloatEdit, CEdit)
@@ -74,7 +74,7 @@ void CFloatEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		GetWindowText(s);
 		float f = 0;
 		wchar_t ch;
-		if (_stscanf_s(s, L"%f%c", &f, &ch) != 1 && s != "-") {
+		if (swscanf_s(s, L"%f%c", &f, &ch) != 1 && s != "-") {
 			SetWindowText(str);
 			SetSel(nStartChar, nEndChar);
 		};
@@ -102,7 +102,7 @@ LRESULT CFloatEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 		GetWindowText(s);
 		float f = 0;
 		wchar_t ch;
-		if (_stscanf_s(s, L"%f%c", &f, &ch) != 1) {
+		if (swscanf_s(s, L"%f%c", &f, &ch) != 1) {
 			SetWindowText(str);
 			SetSel(nStartChar, nEndChar);
 		};
@@ -120,16 +120,16 @@ bool CIntEdit::GetInt(int& integer)
 	CString s;
 	GetWindowText(s);
 
-	return(_stscanf_s(s, _T("%d"), &integer) == 1);
+	return (swscanf_s(s, L"%d", &integer) == 1);
 }
 
 int CIntEdit::operator = (int integer)
 {
 	CString s;
-	s.Format(_T("%d"), integer);
+	s.Format(L"%d", integer);
 	SetWindowText(s);
 
-	return(integer);
+	return integer;
 }
 
 CIntEdit::operator int()
@@ -137,7 +137,7 @@ CIntEdit::operator int()
 	CString s;
 	GetWindowText(s);
 	int integer;
-	if (_stscanf_s(s, _T("%d"), &integer) != 1) {
+	if (swscanf_s(s, L"%d", &integer) != 1) {
 		integer = 0;
 	}
 	integer = clamp(integer, m_lower, m_upper); // correction value after the simultaneous input and closing
@@ -172,7 +172,7 @@ void CIntEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		GetWindowText(s);
 		int d = 0;
 		wchar_t ch;
-		if (_stscanf_s(s, L"%d%c", &d, &ch) != 1 && s != "-") {
+		if (swscanf_s(s, L"%d%c", &d, &ch) != 1 && s != "-") {
 			SetWindowText(str);
 			SetSel(nStartChar, nEndChar);
 		};
@@ -200,7 +200,7 @@ LRESULT CIntEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 		GetWindowText(s);
 		int d = 0;
 		wchar_t ch;
-		if (_stscanf_s(s, L"%d%c", &d, &ch) != 1) {
+		if (swscanf_s(s, L"%d%c", &d, &ch) != 1) {
 			SetWindowText(str);
 			SetSel(nStartChar, nEndChar);
 		};
@@ -215,14 +215,12 @@ void CIntEdit::OnKillFocus (CWnd* pNewWnd)
 	GetWindowText(s);
 	int integer;
 
-	if (_stscanf_s(s, _T("%d"), &integer) != 1) {
+	if (swscanf_s(s, L"%d", &integer) != 1) {
 		integer = 0;
 	}
+	integer = clamp(integer, m_lower, m_upper);
 
-	if (integer > m_upper) { integer = m_upper; }
-	else if (integer < m_lower) { integer = m_lower; }
-
-	s.Format(_T("%d"), integer);
+	s.Format(L"%d", integer);
 	SetWindowText(s);
 
 	CEdit::OnKillFocus(pNewWnd);
@@ -237,16 +235,16 @@ bool CHexEdit::GetDWORD(DWORD& dw)
 	CString s;
 	GetWindowText(s);
 
-	return(_stscanf_s(s, _T("%x"), &dw) == 1);
+	return (swscanf_s(s, L"%x", &dw) == 1);
 }
 
 DWORD CHexEdit::operator = (DWORD dw)
 {
 	CString s;
-	s.Format(_T("%08lx"), dw);
+	s.Format(L"%08lx", dw);
 	SetWindowText(s);
 
-	return(dw);
+	return dw;
 }
 
 CHexEdit::operator DWORD()
@@ -255,7 +253,7 @@ CHexEdit::operator DWORD()
 	GetWindowText(s);
 	DWORD dw;
 
-	return(_stscanf_s(s, _T("%x"), &dw) == 1 ? dw : 0);
+	return (swscanf_s(s, L"%x", &dw) == 1 ? dw : 0);
 }
 
 BEGIN_MESSAGE_MAP(CHexEdit, CEdit)
@@ -279,7 +277,7 @@ void CHexEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		GetWindowText(s);
 		DWORD x = 0;
 		wchar_t ch;
-		if (_stscanf_s(s, L"%x%c", &x, &ch) != 1) {
+		if (swscanf_s(s, L"%x%c", &x, &ch) != 1) {
 			SetWindowText(str);
 			SetSel(nStartChar, nEndChar);
 		};
@@ -307,7 +305,7 @@ LRESULT CHexEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 		GetWindowText(s);
 		DWORD x = 0;
 		wchar_t ch;
-		if (_stscanf_s(s, L"%x%c", &x, &ch) != 1) {
+		if (swscanf_s(s, L"%x%c", &x, &ch) != 1) {
 			SetWindowText(str);
 			SetSel(nStartChar, nEndChar);
 		};
