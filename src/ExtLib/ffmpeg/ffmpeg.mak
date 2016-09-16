@@ -295,6 +295,7 @@ SRCS_LC = \
 	libavcodec/mlp_parser.c \
 	libavcodec/mlpdec.c \
 	libavcodec/mlpdsp.c \
+	libavcodec/mlz.c \
 	libavcodec/motion_est.c \
 	libavcodec/mpc.c \
 	libavcodec/mpc7.c \

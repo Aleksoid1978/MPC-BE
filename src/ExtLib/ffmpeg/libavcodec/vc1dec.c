@@ -1192,9 +1192,7 @@ err:
 static void vc1_decode_flush(AVCodecContext *avctx)
 {
     VC1Context *v = avctx->priv_data;
-
     ff_mpeg_flush(avctx);
-
     v->recovered = 0;
 }
 // ==> End patch MPC

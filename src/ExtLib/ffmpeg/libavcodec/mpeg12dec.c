@@ -68,9 +68,7 @@ typedef struct Mpeg1Context {
     int sync;                   /* Did we reach a sync point like a GOP/SEQ/KEYFrame? */
     int tmpgexs;
     int first_slice;
-    // ==> Start patch MPC
-    // int extradata_decoded;
-    // ==> End patch MPC
+    int extradata_decoded;
 } Mpeg1Context;
 
 #define MB_TYPE_ZERO_MV   0x20000000
@@ -1063,41 +1061,6 @@ static int mpeg_decode_mb(MpegEncContext *s, int16_t block[12][64])
 
     return 0;
 }
-
-// ==> Start patch MPC
-// static av_cold int mpeg_decode_init(AVCodecContext *avctx)
-// {
-//     Mpeg1Context *s    = avctx->priv_data;
-//     MpegEncContext *s2 = &s->mpeg_enc_ctx;
-// 
-//     ff_mpv_decode_defaults(s2);
-// 
-//     // ==> Start patch MPC
-//     /*
-//     if (   avctx->codec_tag != AV_RL32("VCR2")
-//         && avctx->codec_tag != AV_RL32("BW10"))
-//         avctx->coded_width = avctx->coded_height = 0; // do not trust dimensions from input
-//     */
-//     // ==> End patch MPC
-//     ff_mpv_decode_init(s2, avctx);
-// 
-//     s->mpeg_enc_ctx.avctx  = avctx;
-// 
-//     /* we need some permutation to store matrices,
-//      * until the decoder sets the real permutation. */
-//     ff_mpv_idct_init(s2);
-//     ff_mpeg12_common_init(&s->mpeg_enc_ctx);
-//     ff_mpeg12_init_vlcs();
-// 
-//     s2->chroma_format              = 1;
-//     s->mpeg_enc_ctx_allocated      = 0;
-//     s->mpeg_enc_ctx.picture_number = 0;
-//     s->repeat_field                = 0;
-//     s->mpeg_enc_ctx.codec_id       = avctx->codec->id;
-//     avctx->color_range             = AVCOL_RANGE_MPEG;
-//     return 0;
-// }
-// ==> End patch MPC
 
 #if HAVE_THREADS
 static int mpeg_decode_update_thread_context(AVCodecContext *avctx,
@@ -2311,7 +2274,31 @@ static int mpeg_decode_a53_cc(AVCodecContext *avctx,
         return 1;
     } else if (buf_size >= 11 &&
                p[0] == 'C' && p[1] == 'C' && p[2] == 0x01 && p[3] == 0xf8) {
-        /* extract DVD CC data */
+        /* extract DVD CC data
+         *
+         * uint32_t   user_data_start_code        0x000001B2    (big endian)
+         * uint16_t   user_identifier             0x4343 "CC"
+         * uint8_t    user_data_type_code         0x01
+         * uint8_t    caption_block_size          0xF8
+         * uint8_t
+         *   bit 7    caption_odd_field_first     1=odd field (CC1/CC2) first  0=even field (CC3/CC4) first
+         *   bit 6    caption_filler              0
+         *   bit 5:1  caption_block_count         number of caption blocks (pairs of caption words = frames). Most DVDs use 15 per start of GOP.
+         *   bit 0    caption_extra_field_added   1=one additional caption word
+         *
+         * struct caption_field_block {
+         *   uint8_t
+         *     bit 7:1 caption_filler             0x7F (all 1s)
+         *     bit 0   caption_field_odd          1=odd field (this is CC1/CC2)  0=even field (this is CC3/CC4)
+         *   uint8_t   caption_first_byte
+         *   uint8_t   caption_second_byte
+         * } caption_block[(caption_block_count * 2) + caption_extra_field_added];
+         *
+         * Some DVDs encode caption data for both fields with caption_field_odd=1. The only way to decode the fields
+         * correctly is to start on the field indicated by caption_odd_field_first and count between odd/even fields.
+         * Don't assume that the first caption word is the odd field. There do exist MPEG files in the wild that start
+         * on the even field. There also exist DVDs in the wild that encode an odd field count and the
+         * caption_extra_field_added/caption_odd_field_first bits change per packet to allow that. */
         int cc_count = 0;
         int i;
         // There is a caption count field in the data, but it is often
@@ -2802,7 +2789,6 @@ static int decode_chunks(AVCodecContext *avctx, AVFrame *picture,
     }
 }
 
-// ==> Start patch MPC
 static av_cold int mpeg_decode_init(AVCodecContext *avctx)
 {
     Mpeg1Context *s    = avctx->priv_data;
@@ -2810,6 +2796,13 @@ static av_cold int mpeg_decode_init(AVCodecContext *avctx)
 
     ff_mpv_decode_defaults(s2);
 
+    // ==> Start patch MPC
+    /*
+    if (   avctx->codec_tag != AV_RL32("VCR2")
+        && avctx->codec_tag != AV_RL32("BW10"))
+        avctx->coded_width = avctx->coded_height = 0; // do not trust dimensions from input
+    */
+    // ==> End patch MPC
     ff_mpv_decode_init(s2, avctx);
 
     s->mpeg_enc_ctx.avctx  = avctx;
@@ -2826,19 +2819,19 @@ static av_cold int mpeg_decode_init(AVCodecContext *avctx)
     s->repeat_field                = 0;
     s->mpeg_enc_ctx.codec_id       = avctx->codec->id;
     avctx->color_range             = AVCOL_RANGE_MPEG;
-
+    // ==> Start patch MPC
     if (avctx->extradata_size > 0 && avctx->extradata) {
         int ret, got_output;
         ret = decode_chunks(avctx, NULL, &got_output,
                             avctx->extradata, avctx->extradata_size);
+        s->extradata_decoded = 1;
         if (ret < 0 && (avctx->err_recognition & AV_EF_EXPLODE)) {
             return ret;
         }
     }
-
+    // ==> End patch MPC
     return 0;
 }
-// ==> End patch MPC
 
 static int mpeg_decode_frame(AVCodecContext *avctx, void *data,
                              int *got_output, AVPacket *avpkt)
@@ -2889,8 +2882,6 @@ static int mpeg_decode_frame(AVCodecContext *avctx, void *data,
 
     s->slice_count = 0;
 
-    // ==> Start patch MPC
-    /*
     if (avctx->extradata && !s->extradata_decoded) {
         ret = decode_chunks(avctx, picture, got_output,
                             avctx->extradata, avctx->extradata_size);
@@ -2904,8 +2895,6 @@ static int mpeg_decode_frame(AVCodecContext *avctx, void *data,
             return ret;
         }
     }
-    */
-    // ==> End patch MPC
 
     ret = decode_chunks(avctx, picture, got_output, buf, buf_size);
     if (ret<0 || *got_output) {
