@@ -3990,8 +3990,10 @@ static int vp9_decode_frame(AVCodecContext *ctx, void *frame,
     // ==> Start patch MPC
     if (ctx->using_dxva && ctx->dxva_context) {
         dxva_context* dxva_ctx = (dxva_context*)ctx->dxva_context;
-        DXVA_VP9_Picture_Context* ctx_pic = (DXVA_VP9_Picture_Context*)dxva_ctx->dxva_decoder_context;
-        memset(ctx_pic, 0, sizeof(*ctx_pic));
+        if (ctx->dxva_context) {
+            DXVA_VP9_Picture_Context* ctx_pic = (DXVA_VP9_Picture_Context*)dxva_ctx->dxva_decoder_context;
+            memset(ctx_pic, 0, sizeof(*ctx_pic));
+        }
     }
     // ==> End patch MPC
 
@@ -4076,8 +4078,8 @@ static int vp9_decode_frame(AVCodecContext *ctx, void *frame,
     // ==> Start patch MPC
     if (ctx->using_dxva && ctx->dxva_context) {
         dxva_context* dxva_ctx = (dxva_context*)ctx->dxva_context;
-        DXVA_VP9_Picture_Context* ctx_pic = (DXVA_VP9_Picture_Context*)dxva_ctx->dxva_decoder_context;
-        if (ctx_pic) {
+        if (dxva_ctx->dxva_decoder_context) {
+            DXVA_VP9_Picture_Context* ctx_pic = (DXVA_VP9_Picture_Context*)dxva_ctx->dxva_decoder_context;
             res = dxva_start_frame(ctx, ctx_pic);
             if (res < 0)
                 return res;
