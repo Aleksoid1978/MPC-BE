@@ -1121,10 +1121,25 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 		return E_FAIL;
 	}
 
+	float w2 = sqrt(pow(dst[1].x - dst[0].x, 2) + pow(dst[1].y - dst[0].y, 2) + pow(dst[1].z - dst[0].z, 2));
+	float h2 = sqrt(pow(dst[2].x - dst[0].x, 2) + pow(dst[2].y - dst[0].y, 2) + pow(dst[2].z - dst[0].z, 2));
+
+	float rx = srcRect.Width() / w2;
+	float ry = srcRect.Height() / h2;
+
+	const float dx0 = 1.0f / desc.Width;
+	const float dy0 = 1.0f / desc.Height;
+
+	UINT texWidth = min((UINT)w2, m_Caps.MaxTextureWidth);
+	UINT texHeight = min((UINT)m_nativeVideoSize.cy, m_Caps.MaxTextureHeight);
+
+	if (m_pResizeTexture && m_pResizeTexture->GetLevelDesc(0, &desc) == D3D_OK) {
+		if (texWidth != desc.Width || texHeight != desc.Height) {
+			m_pResizeTexture = NULL;
+		}
+	}
 
 	if (!m_pResizeTexture) {
-		UINT texWidth = min((UINT)m_ScreenSize.cx, m_Caps.MaxTextureWidth);
-		UINT texHeight = min((UINT)m_nativeVideoSize.cy, m_Caps.MaxTextureHeight);
 		hr = m_pD3DDev->CreateTexture(
 					texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET,
 					m_SurfaceFmt == D3DFMT_A32B32G32R32F ? D3DFMT_A32B32G32R32F : D3DFMT_A16B16G16R16F, // use only float textures here
@@ -1134,15 +1149,6 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 			return TextureResize(pTexture, dst, srcRect, D3DTEXF_LINEAR);
 		}
 	}
-
-	float w2 = sqrt(pow(dst[1].x - dst[0].x, 2) + pow(dst[1].y - dst[0].y, 2) + pow(dst[1].z - dst[0].z, 2));
-	float h2 = sqrt(pow(dst[2].x - dst[0].x, 2) + pow(dst[2].y - dst[0].y, 2) + pow(dst[2].z - dst[0].z, 2));
-
-	float rx = srcRect.Width() / w2;
-	float ry = srcRect.Height() / h2;
-
-	const float dx0 = 1.0f / desc.Width;
-	const float dy0 = 1.0f / desc.Height;
 
 	if (FAILED(m_pResizeTexture->GetLevelDesc(0, &desc))) {
 		return TextureResize(pTexture, dst, srcRect, D3DTEXF_LINEAR);
