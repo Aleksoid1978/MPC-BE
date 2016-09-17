@@ -17909,10 +17909,6 @@ HRESULT CMainFrame::UpdateThumbarButton()
 			m_pTaskbarList->SetProgressState(m_hWnd, TBPF_PAUSED);
 		}
 
-		if (m_bAudioOnly) {
-			buttons[4].dwFlags = THBF_DISABLED;
-		}
-
 		if (GetPlaybackMode() == PM_DVD && m_iDVDDomain != DVD_DOMAIN_Title) {
 			buttons[0].dwFlags = THBF_DISABLED;
 			buttons[1].dwFlags = THBF_DISABLED;
