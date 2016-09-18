@@ -90,7 +90,7 @@ bool CTextFile::ReopenAsText()
 {
 	CString strFileName = m_strFileName;
 
-	Close();
+	__super::Close();
 
 	return !!__super::Open(strFileName, modeRead | typeText | shareDenyNone);
 }
@@ -710,6 +710,11 @@ CWebTextFile::CWebTextFile(CTextFile::enc encoding/* = ASCII*/, CTextFile::enc d
 	: CTextFile(encoding, defaultencoding)
 	, m_llMaxSize(llMaxSize)
 {
+}
+
+CWebTextFile::~CWebTextFile()
+{
+	Close();
 }
 
 bool CWebTextFile::Open(LPCTSTR lpszFileName)

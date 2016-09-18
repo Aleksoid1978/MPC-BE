@@ -81,6 +81,7 @@ class CWebTextFile : public CTextFile
 
 public:
 	CWebTextFile(enc encoding = ASCII, enc defaultencoding = ASCII, LONGLONG llMaxSize = 1024 * 1024);
+	~CWebTextFile();
 
 	bool Open(LPCTSTR lpszFileName);
 	bool Save(LPCTSTR lpszFileName, enc e /*= ASCII*/);
