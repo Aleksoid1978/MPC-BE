@@ -45,6 +45,7 @@ public IUnknown {
 	STDMETHOD(SetAutoVolumeControl) (bool bAutoVolumeControl, bool bNormBoost, int iNormLevel, int iNormRealeaseTime) PURE;
 	STDMETHOD_(REFERENCE_TIME, GetAudioTimeShift) () PURE;
 	STDMETHOD(SetAudioTimeShift) (REFERENCE_TIME rtAudioTimeShift) PURE;
+	STDMETHOD(SetBassRedirect) (bool bBassRedirect) PURE;
 };
 
 class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
@@ -57,6 +58,7 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	CMixer	m_Mixer;
 	bool	m_bMixer;
 	int		m_nMixerLayout;
+	bool	m_bBassRedirect;
 
 	CAudioNormalizer m_AudioNormalizer;
 	bool	m_bAutoVolumeControl;
@@ -89,6 +91,7 @@ public:
 	STDMETHODIMP SetAutoVolumeControl(bool bAutoVolumeControl, bool bNormBoost, int iNormLevel, int iNormRealeaseTime);
 	STDMETHODIMP_(REFERENCE_TIME) GetAudioTimeShift();
 	STDMETHODIMP SetAudioTimeShift(REFERENCE_TIME rtAudioTimeShift);
+	STDMETHODIMP SetBassRedirect(bool bBassRedirect);
 
 	// IAMStreamSelect
 	STDMETHODIMP Enable(long lIndex, DWORD dwFlags);
