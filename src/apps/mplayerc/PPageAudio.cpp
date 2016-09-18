@@ -269,6 +269,7 @@ BOOL CPPageAudio::OnApply()
 		CComQIPtr<IAudioSwitcherFilter> m_pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG);
 		if (m_pASF) {
 			m_pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
+			m_pASF->SetBassRedirect(s.bAudioBassRedirect);
 			m_pASF->SetAudioGain(s.fAudioGain_dB);
 			m_pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
 			m_pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);

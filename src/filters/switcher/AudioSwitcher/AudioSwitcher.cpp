@@ -479,6 +479,13 @@ STDMETHODIMP CAudioSwitcherFilter::SetAudioGain(float fGain_dB)
 	return S_OK;
 }
 
+STDMETHODIMP CAudioSwitcherFilter::SetBassRedirect(bool bBassRedirect)
+{
+	m_bBassRedirect = bBassRedirect;
+
+	return S_OK;
+}
+
 // IAMStreamSelect
 
 STDMETHODIMP CAudioSwitcherFilter::Enable(long lIndex, DWORD dwFlags)
