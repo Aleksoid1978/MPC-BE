@@ -28,6 +28,7 @@ Dutch - beter
 German - Markus Gaugg (gaugg@gmx.at), Sylt, Luan, Klaus
 Italian - Lord Maius
 Korean - kuh3h3
+Polish - Volfield
 Turkish - Thingol
 Ukrainian - arestarh1986, Ukraine
 Japanese - Gyeong, Socket774
