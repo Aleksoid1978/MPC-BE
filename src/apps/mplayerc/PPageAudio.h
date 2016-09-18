@@ -54,6 +54,7 @@ public:
 
 	CButton		m_chkMixer;
 	CComboBox	m_cmbMixerLayout;
+	CButton		m_chkBassRedirect;
 
 	CStatic		m_stcGain;
 	CSliderCtrl	m_sldGain;

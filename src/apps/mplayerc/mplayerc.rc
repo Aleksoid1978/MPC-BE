@@ -7,8 +7,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
-
+#include "afxres.h"
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -127,7 +126,8 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,91,273,8
     GROUPBOX        "Sound processing",IDC_STATIC,5,107,286,117
     CONTROL         "Mix channels to:",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,119,106,8
-    COMBOBOX        IDC_COMBO2,129,116,58,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO2,129,116,55,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Redirect bass to LFE*",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,194,119,94,8
     RTEXT           "Static",IDC_STATIC4,10,135,110,8
     CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,125,133,109,12
     CONTROL         "Auto volume control",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,149,154,8

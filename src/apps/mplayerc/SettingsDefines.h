@@ -66,6 +66,7 @@
 
 #define IDS_RS_AUDIOMIXER					_T("AudioMixer")
 #define IDS_RS_AUDIOMIXERLAYOUT				_T("AudioMixerLayout")
+#define IDS_RS_AUDIOBASSREDIRECT			_T("AudioBassRedirect")
 #define IDS_RS_AUDIOGAIN					_T("AudioGain")
 #define IDS_RS_AUDIOAUTOVOLUMECONTROL		_T("AudioAutoVolumeControl")
 #define IDS_RS_AUDIONORMBOOST				_T("AudioNormBoost")

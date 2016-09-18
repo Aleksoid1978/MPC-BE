@@ -145,7 +145,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Reset Selected"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 32
 5		"Audio renderer"
 7		"Properties"
 9		"Dual output"
@@ -155,10 +155,11 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
 14		"Prefer external audio files over embedded audio track"
 16		"Sound processing"
 17		"Mix channels to:"
-21		"Auto volume control"
-22		"Boost audio"
-27		"Audio time shift (ms):"
-30		"Default"
+19		"Redirect bass to LFE*"
+22		"Auto volume control"
+23		"Boost audio"
+28		"Audio time shift (ms):"
+31		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

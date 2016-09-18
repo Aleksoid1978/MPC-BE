@@ -619,6 +619,7 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, bAudioMixer);
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, channel_mode_sets[nAudioMixerLayout]);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, bAudioBassRedirect);
 	CString strGain;
 	strGain.Format(L"%.1f", fAudioGain_dB);
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, strGain);
@@ -1194,6 +1195,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			break;
 		}
 	}
+	bAudioBassRedirect		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, FALSE);
 	fAudioGain_dB			= (float)_tstof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, _T("0")));
 	fAudioGain_dB			= discard(fAudioGain_dB, -3.0f, 10.0f, 0.0f);
 	bAudioAutoVolumeControl	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, FALSE);

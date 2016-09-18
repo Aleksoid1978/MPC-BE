@@ -61,6 +61,7 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDC_CHECK7, m_chkMixer);
 	DDX_Control(pDX, IDC_COMBO2, m_cmbMixerLayout);
+	DDX_Control(pDX, IDC_CHECK8, m_chkBassRedirect);
 
 	DDX_Control(pDX, IDC_SLIDER1, m_sldGain);
 	DDX_Control(pDX, IDC_STATIC4, m_stcGain);
@@ -203,6 +204,8 @@ BOOL CPPageAudio::OnInitDialog()
 	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("5.1")), SPK_5_1);
 	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("7.1")), SPK_7_1);
 	SelectByItemData(m_cmbMixerLayout, s.nAudioMixerLayout);
+	m_chkBassRedirect.SetCheck(s.bAudioBassRedirect);
+	m_chkBassRedirect.ShowWindow(SW_HIDE); // TODO
 
 	m_sldGain.SetRange(-30, 100, TRUE);
 	m_sldGain.SetPos(s.fAudioGain_dB > 0 ? floor(s.fAudioGain_dB * 10 + 0.5f) : ceil(s.fAudioGain_dB * 10 - 0.5f));
@@ -250,6 +253,7 @@ BOOL CPPageAudio::OnApply()
 
 	s.bAudioMixer				= !!m_chkMixer.GetCheck();
 	s.nAudioMixerLayout			= GetCurItemData(m_cmbMixerLayout);
+	s.bAudioBassRedirect		= !!m_chkBassRedirect.GetCheck();
 
 	s.fAudioGain_dB				= m_sldGain.GetPos() / 10.0f;
 
@@ -469,6 +473,7 @@ void CPPageAudio::OnBnClickedSoundProcessingDefault()
 {
 	m_chkMixer.SetCheck(BST_UNCHECKED);
 	SelectByItemData(m_cmbMixerLayout, SPK_STEREO);
+	m_chkBassRedirect.SetCheck(BST_UNCHECKED);
 
 	m_sldGain.SetPos(0);
 	m_chkAutoVolumeControl.SetCheck(BST_UNCHECKED);

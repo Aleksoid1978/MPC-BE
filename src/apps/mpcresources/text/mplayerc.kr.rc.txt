@@ -145,7 +145,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"선택 초기화"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 32
 5		"오디오 렌더러"
 7		"등록정보"
 9		"듀얼 출력"
@@ -155,10 +155,11 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 31
 14		"Prefer external audio files over embedded audio track"
 16		"Sound processing"
 17		"Mix channels to:"
-21		"Auto volume control"
-22		"Boost audio"
-27		"오디오 시간 조절 (ms):"
-30		"Default"
+19		"Redirect bass to LFE*"
+22		"Auto volume control"
+23		"Boost audio"
+28		"오디오 시간 조절 (ms):"
+31		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
