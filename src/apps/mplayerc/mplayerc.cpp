@@ -868,8 +868,12 @@ void CMPlayerCApp::ExportSettings()
 			savePath.Append(_T(".") + ext);
 		}
 
+		auto& s = AfxGetAppSettings();
+		const int nLastUsedPage = s.nLastUsedPage;
+		s.nLastUsedPage = 0;
+
 		bool success = false;
-		AfxGetAppSettings().SaveSettings();
+		s.SaveSettings();
 
 		if (IsIniValid()) {
 			success = !!CopyFile(GetIniPath(), savePath, FALSE);
@@ -886,6 +890,8 @@ void CMPlayerCApp::ExportSettings()
 
 			file.Close();
 		}
+
+		s.nLastUsedPage = nLastUsedPage;
 
 		if (success) {
 			MessageBox(GetMainWnd()->m_hWnd, ResStr(IDS_EXPORT_SETTINGS_SUCCESS), ResStr(IDS_EXPORT_SETTINGS), MB_ICONINFORMATION | MB_OK);
