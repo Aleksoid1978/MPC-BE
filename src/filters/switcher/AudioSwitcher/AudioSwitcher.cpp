@@ -120,6 +120,7 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CStreamSwitcherFilter(lpunk, phr, __uuidof(this))
 	, m_bMixer(false)
 	, m_nMixerLayout(SPK_STEREO)
+	, m_bBassRedirect(false)
 	, m_bAutoVolumeControl(false)
 	, m_bNormBoost(true)
 	, m_iNormLevel(75)
@@ -270,6 +271,11 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	} else if (in_sampleformat == SAMPLE_FMT_FLT) {
 		memcpy(pDataOut, data, in_allsamples * sizeof(float));
 		data = pDataOut;
+	}
+
+	// Bass redirect
+	if (m_bBassRedirect && in_layout & SPEAKER_LOW_FREQUENCY && out_layout & SPEAKER_LOW_FREQUENCY) {
+		// TODO
 	}
 
 	// Auto volume control

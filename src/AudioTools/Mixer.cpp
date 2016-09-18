@@ -123,6 +123,7 @@ bool CMixer::Init()
 			m_matrix_dbl[i++] = 0.5;
 		}
 		if (m_out_layout & AV_CH_LOW_FREQUENCY) {
+			// mix front left and front right for later low pass processing
 			m_matrix_dbl[i++] = 0.5;
 			m_matrix_dbl[i++] = 0.5;
 		}
