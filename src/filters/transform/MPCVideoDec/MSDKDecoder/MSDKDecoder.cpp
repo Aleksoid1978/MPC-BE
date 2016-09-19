@@ -140,7 +140,7 @@ CMSDKDecoder::~CMSDKDecoder()
 
 HRESULT CMSDKDecoder::Init()
 {
-  mfxIMPL impl = MFX_IMPL_AUTO_ANY;
+  mfxIMPL impl = MFX_IMPL_AUTO_ANY | MFX_IMPL_VIA_D3D9;
   mfxVersion version = { 8, 1 };
 
   mfxStatus sts = MFXInit(impl, &version, &m_mfxSession);
