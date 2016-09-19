@@ -202,7 +202,7 @@ void CBaseSplitterFile::Seek(__int64 pos)
 void CBaseSplitterFile::Skip(__int64 offset)
 {
 	ASSERT(offset >= 0);
-	if (offset) {
+	if (offset > 0) {
 		Seek(GetPos() + offset);
 	}
 }

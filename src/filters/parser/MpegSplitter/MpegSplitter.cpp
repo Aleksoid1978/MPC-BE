@@ -781,8 +781,8 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			}
 
 			if (peshdr.type == CMpegSplitterFile::mpeg2 && peshdr.scrambling) {
-				ASSERT(0);
-				return E_FAIL;
+				m_pFile->Seek(m_pFile->GetPos() + peshdr.len);
+				return S_FALSE;
 			}
 
 			__int64 pos = m_pFile->GetPos();
@@ -814,8 +814,8 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 					if (m_pFile->NextMpegStartCode(b, 4)) { // pes packet
 						if (m_pFile->ReadPES(peshdr, b)) {
 							if (peshdr.type == CMpegSplitterFile::mpeg2 && peshdr.scrambling) {
-								ASSERT(0);
-								return E_FAIL;
+								m_pFile->Seek(h.next);
+								return S_OK;
 							}
 							TrackNumber = m_pFile->AddStream(h.pid, b, 0, (DWORD)(h.bytes - (m_pFile->GetPos() - pos)));
 						}
