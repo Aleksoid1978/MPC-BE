@@ -631,6 +631,8 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 								Seek(h.next);
 								continue;
 							}
+						} else {
+							continue;
 						}
 					} else {
 						Seek(pos);
@@ -2275,6 +2277,10 @@ bool CMpegSplitterFile::ReadPES(peshdr& h, BYTE code)
 					left--;
 				}
 			}
+		}
+
+		if (left < 0) {
+			goto error;
 		}
 
 		Skip(left);
