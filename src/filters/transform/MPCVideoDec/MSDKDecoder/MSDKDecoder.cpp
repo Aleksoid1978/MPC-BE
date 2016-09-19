@@ -140,15 +140,10 @@ CMSDKDecoder::~CMSDKDecoder()
 
 HRESULT CMSDKDecoder::Init()
 {
-  mfxIMPL impl = MFX_IMPL_HARDWARE;
+  mfxIMPL impl = MFX_IMPL_AUTO_ANY;
   mfxVersion version = { 8, 1 };
 
   mfxStatus sts = MFXInit(impl, &version, &m_mfxSession);
-  if (sts != MFX_ERR_NONE) {
-    DLog(L"CMSDKDecoder::Init(): MFXInit(MFX_IMPL_HARDWARE) failed");
-    impl = MFX_IMPL_SOFTWARE;
-    sts = MFXInit(impl, &version, &m_mfxSession);
-  }
   if (sts != MFX_ERR_NONE) {
     DLog(L"CMSDKDecoder::Init(): MSDK not available");
     return E_NOINTERFACE;
