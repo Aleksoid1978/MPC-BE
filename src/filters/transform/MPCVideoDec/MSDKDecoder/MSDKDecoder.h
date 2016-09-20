@@ -91,7 +91,6 @@ private:
 
 private:
   mfxSession m_mfxSession = nullptr;
-  mfxVersion m_mfxVersion = { 0 };
 
   BOOL                 m_bDecodeReady   = FALSE;
   mfxVideoParam        m_mfxVideoParams = { 0 };
