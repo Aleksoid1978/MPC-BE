@@ -140,6 +140,8 @@ static const WORD PCID_INTEL_4K [] = {
 	0x193D, // Iris Pro Graphics P580
 	// Atom Z8000 Series
 	0x22B0, // HD Graphics
+	// Braswell
+	0x22B1, // HD Graphics
 };
 
 static bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t count)
