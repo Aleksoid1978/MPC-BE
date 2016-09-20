@@ -32,7 +32,9 @@ extern "C" {
 #include "MSDKDecoder.h"
 #include <moreuuids.h>
 #include <IMediaSample3D.h>
+#include "../../../../DSUtil/D3D9Helper.h"
 #include "../../../../DSUtil/DSUtil.h"
+#include "../../../../DSUtil/SysVersion.h"
 #include "ByteParser.h"
 
 #include "../MPCVideoDec.h"
@@ -133,24 +135,69 @@ CMSDKDecoder::~CMSDKDecoder()
   DestroyDecoder(true);
 }
 
-HRESULT CMSDKDecoder::Init()
+static UINT GetIntelAdapterIdD3D9()
 {
-  mfxIMPL impl = MFX_IMPL_AUTO_ANY | MFX_IMPL_VIA_D3D9;
-  mfxVersion version = { 8, 1 };
-
-  mfxStatus sts = MFXInit(impl, &version, &m_mfxSession);
-  if (sts != MFX_ERR_NONE) {
-    DLog(L"CMSDKDecoder::Init(): MSDK not available");
-    return E_NOINTERFACE;
+  CComPtr<IDirect3D9> pD3D9 = D3D9Helper::Direct3DCreate9();
+  if (pD3D9) {
+    D3DADAPTER_IDENTIFIER9 adIdentifier;
+    for (UINT adp = 0, num_adp = pD3D9->GetAdapterCount(); adp < num_adp; ++adp) {
+      if (SUCCEEDED(pD3D9->GetAdapterIdentifier(adp, 0, &adIdentifier))
+          && adIdentifier.VendorId == 0x8086) {
+        return adp;
+      }
+    }
   }
 
-  // query actual API version
-  MFXQueryVersion(m_mfxSession, &m_mfxVersion);
+  return UINT_MAX;
+}
 
-#ifdef DEBUG
-  MFXQueryIMPL(m_mfxSession, &impl);
-  DLog(L"CMSDKDecoder::Init(): MSDK Initialized, version %d.%d, impl 0x%04x", m_mfxVersion.Major, m_mfxVersion.Minor, impl);
-#endif
+HRESULT CMSDKDecoder::Init()
+{
+  const mfxIMPL impls[] = { MFX_IMPL_AUTO_ANY, MFX_IMPL_SOFTWARE };
+  for (int i = 0; i < _countof(impls); i++) {
+    mfxIMPL impl = impls[i];
+    mfxVersion version = { 8, 1 };
+
+    mfxStatus sts = MFXInit(impl, &version, &m_mfxSession);
+    if (sts != MFX_ERR_NONE) {
+      DLog(L"CMSDKDecoder::Init(): MSDK not available");
+      return E_NOINTERFACE;
+    }
+
+    // query actual API version
+    MFXQueryVersion(m_mfxSession, &version);
+    // query implementation
+    MFXQueryIMPL(m_mfxSession, &impl);
+
+    const bool bHwAcceleration = impl != MFX_IMPL_SOFTWARE;
+    const bool bUseD3D9Alloc   = bHwAcceleration && ((impl & MFX_IMPL_VIA_D3D9) == MFX_IMPL_VIA_D3D9);
+    const bool bUseD3D11Alloc  = bHwAcceleration && ((impl & MFX_IMPL_VIA_D3D11) == MFX_IMPL_VIA_D3D11);
+
+    DLog(L"CMSDKDecoder::Init(): MSDK Initialized, version %d.%d, impl 0x%04x, using %s decoding", version.Major, version.Minor, impl, bHwAcceleration ? L"hardware" : L"software");
+
+    if (bUseD3D11Alloc) {
+      if (!IsWin8orLater()) {
+        DLog(L"CMSDKDecoder::Init(): hardware decoding via D3D11 supported only in Windows 8 and higher");
+        if (m_mfxSession) {
+          MFXClose(m_mfxSession);
+          m_mfxSession = nullptr;
+        }
+        continue;
+      }
+    } else if (bUseD3D9Alloc) {
+      const UINT d3d9IntelAdapter = GetIntelAdapterIdD3D9();
+      if (d3d9IntelAdapter == UINT_MAX) {
+        DLog(L"CMSDKDecoder::Init(): hardware decoding via D3D9 supported only if iGPU connected to the screen");
+        if (m_mfxSession) {
+          MFXClose(m_mfxSession);
+          m_mfxSession = nullptr;
+        }
+        continue;
+      }
+    }
+
+    break;
+  }
 
   return S_OK;
 }
