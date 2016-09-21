@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="YCgCo_correction.hlsl" />
     <None Include="OnePassResizers\resizer_bicubic06.hlsl">
       <FileType>Document</FileType>
     </None>

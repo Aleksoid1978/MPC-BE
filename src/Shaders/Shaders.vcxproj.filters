@@ -19,6 +19,7 @@
     <FxCompile Include="resizer_bicubic08_y.hlsl" />
     <FxCompile Include="resizer_bicubic10_x.hlsl" />
     <FxCompile Include="resizer_bicubic10_y.hlsl" />
+    <FxCompile Include="YCgCo_correction.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resizer_bicubic_base_x.hlsl" />
