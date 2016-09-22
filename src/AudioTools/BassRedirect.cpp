@@ -129,6 +129,8 @@ void CBassRedirect::Process(BYTE* p, const int samples)
 			Process_int16((int16_t*)p, samples);
 			break;
 		case SAMPLE_FMT_S24:
+			Process_int24(p, samples);
+			break;
 		case SAMPLE_FMT_S32:
 			Process_int32((int32_t*)p, samples);
 			break;
