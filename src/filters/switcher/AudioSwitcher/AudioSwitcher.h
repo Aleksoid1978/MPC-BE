@@ -24,6 +24,7 @@
 #include "StreamSwitcher.h"
 #include "AudioNormalizer.h"
 #include "../../../AudioTools/Mixer.h"
+#include "../../../AudioTools/BassRedirect.h"
 
 #define AudioSwitcherName L"MPC AudioSwitcher"
 
@@ -58,6 +59,8 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	CMixer	m_Mixer;
 	bool	m_bMixer;
 	int		m_nMixerLayout;
+
+	CBassRedirect m_BassRedirect;
 	bool	m_bBassRedirect;
 
 	CAudioNormalizer m_AudioNormalizer;

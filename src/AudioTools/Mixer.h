@@ -21,7 +21,6 @@
 #pragma once
 
 #include "SampleFormat.h"
-#include "LowPassFilter.h"
 
 struct AVAudioResampleContext;
 
@@ -42,8 +41,6 @@ protected:
 
 	enum AVSampleFormat m_in_avsf;
 	enum AVSampleFormat m_out_avsf;
-
-	CLowPassFilter m_LowPassFilter;
 
 	bool Init();
 

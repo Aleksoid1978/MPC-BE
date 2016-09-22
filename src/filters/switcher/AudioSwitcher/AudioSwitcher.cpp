@@ -245,9 +245,13 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	BYTE* data = pDataIn;
 	int delay = 0;
 
+
+	SampleFormat sampleformat = in_sampleformat;
+
 	// Mixer
 	DWORD in_layout = GetChannelLayout(in_wfe);
 	DWORD out_layout = GetChannelLayout(out_wfe);
+
 	if (in_layout != out_layout || in_wfe->nSamplesPerSec != out_wfe->nSamplesPerSec) {
 		m_Mixer.UpdateInput(in_sampleformat, in_layout, in_wfe->nSamplesPerSec);
 		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, out_layout, out_wfe->nSamplesPerSec);
@@ -268,14 +272,18 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		in_samples		= out_samples;
 		in_channels		= out_wfe->nChannels;
 		in_allsamples	= in_samples * in_channels;
-	} else if (in_sampleformat == SAMPLE_FMT_FLT) {
+
+		sampleformat = SAMPLE_FMT_FLT;
+	}
+	else if (in_sampleformat == SAMPLE_FMT_FLT) {
 		memcpy(pDataOut, data, in_allsamples * sizeof(float));
 		data = pDataOut;
 	}
 
 	// Bass redirect
-	if (m_bBassRedirect && in_layout & SPEAKER_LOW_FREQUENCY && out_layout & SPEAKER_LOW_FREQUENCY) {
-		// TODO
+	if ((m_bBassRedirect || in_layout == KSAUDIO_SPEAKER_STEREO) && CHL_CONTAINS_ALL(out_layout, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_LOW_FREQUENCY)) {
+		m_BassRedirect.UpdateInput(sampleformat, out_layout, out_wfe->nSamplesPerSec);
+		m_BassRedirect.Process(data, in_samples);
 	}
 
 	// Auto volume control
