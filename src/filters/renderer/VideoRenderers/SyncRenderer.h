@@ -28,7 +28,7 @@
 #include <dxva2api.h>
 
 #define VMRBITMAP_UPDATE 0x80000000
-#define MAX_PICTURE_SLOTS (60+2) // Last 2 for pixels shader!
+#define MAX_PICTURE_SLOTS (30+2) // Last 2 for pixels shader!
 #define NB_JITTER 126
 
 extern bool g_bNoDuration; // Defined in MainFrm.cpp
@@ -184,6 +184,7 @@ namespace GothSync
 		CAtlList<CExternalPixelShader>	m_pPixelShaders;
 		CAtlList<CExternalPixelShader>	m_pPixelShadersScreenSpace;
 		CComPtr<IDirect3DPixelShader9>	m_pResizerPixelShaders[shader_count];
+		CComPtr<IDirect3DPixelShader9>	m_pYCgCoCorrectionPixelShader;
 
 		bool SettingsNeedResetDevice();
 		void SendResetRequest();
@@ -270,6 +271,7 @@ namespace GothSync
 
 		CSize m_ScreenSize;
 		int m_iRotation;	// Rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
+		bool m_bYCgCo;
 		const wchar_t* m_wsResizer;
 
 		LONG m_lNextSampleWait; // Waiting time for next sample in EVR
@@ -289,7 +291,6 @@ namespace GothSync
 		bool m_bCompositionEnabled;
 		bool m_bDesktopCompositionDisabled;
 		bool m_bIsFullscreen;
-		bool m_bNeedCheckSample;
 
 		// Display and frame rates and cycles
 		double m_dDetectedScanlineTime; // Time for one (horizontal) scan line. Extracted at stream start and used to calculate vsync time
@@ -326,7 +327,6 @@ namespace GothSync
 		LONG m_lShiftToNearest, m_lShiftToNearestPrev;
 		bool m_bVideoSlowerThanDisplay;
 
-		int m_bInterlaced;
 		double m_TextScale;
 		CString m_strStatsMsg[10];
 
