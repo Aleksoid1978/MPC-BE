@@ -205,7 +205,6 @@ BOOL CPPageAudio::OnInitDialog()
 	m_cmbMixerLayout.SetItemData(m_cmbMixerLayout.AddString(_T("7.1")), SPK_7_1);
 	SelectByItemData(m_cmbMixerLayout, s.nAudioMixerLayout);
 	m_chkBassRedirect.SetCheck(s.bAudioBassRedirect);
-	m_chkBassRedirect.ShowWindow(SW_HIDE); // TODO
 
 	m_sldGain.SetRange(-30, 100, TRUE);
 	m_sldGain.SetPos(s.fAudioGain_dB > 0 ? floor(s.fAudioGain_dB * 10 + 0.5f) : ceil(s.fAudioGain_dB * 10 - 0.5f));

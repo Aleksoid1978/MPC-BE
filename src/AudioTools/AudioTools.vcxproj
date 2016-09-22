@@ -94,7 +94,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AudioHelper.cpp" />
-    <ClCompile Include="LowPassFilter.cpp" />
+    <ClCompile Include="BassRedirect.cpp" />
     <ClCompile Include="Mixer.cpp" />
     <ClCompile Include="SampleFormat.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -103,7 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AudioHelper.h" />
-    <ClInclude Include="LowPassFilter.h" />
+    <ClInclude Include="BassRedirect.h" />
     <ClInclude Include="Mixer.h" />
     <ClInclude Include="SampleFormat.h" />
     <ClInclude Include="stdafx.h" />

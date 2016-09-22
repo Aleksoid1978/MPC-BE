@@ -40,14 +40,23 @@
  *                   V
  */
 
-class CLowPassFilter
+#define CHL_CONTAINS_ALL(l, m) (((l) & (m)) == (m))
+
+class CBassRedirect
 {
+	SampleFormat m_sf          = SAMPLE_FMT_NONE;
+	DWORD        m_layout      = 0;
+	unsigned     m_chanels     = 0;
+	unsigned     m_lfepos      = 0;
+	int          m_samplerate  = 0;
+	int          m_cutoff_freq = 120;
+
+
 	float A = 0.0f;
 	float B = 0.0f;
-	unsigned m_shift = 0;
-	unsigned m_step = 1;
 	float m_sample = 0.0f;
-	SampleFormat m_sf = SAMPLE_FMT_NONE;
+
+	void CalcAB();
 
 	void Process_uint8(uint8_t* p, const int samples);
 	void Process_int16(int16_t* p, const int samples);
@@ -55,7 +64,11 @@ class CLowPassFilter
 	void Process_float(float* p, const int samples);
 	void Process_double(double* p, const int samples);
 
+	void Process_int24(BYTE* p, const int samples);
+
 public:
-	void SetParams(SampleFormat sampleFormat, int shift, int step, int samplerate, int freq);
+	void SetOptions(int cutoff_freq);
+	void UpdateInput(SampleFormat sf, DWORD layout, int samplerate);
+
 	void Process(BYTE* p, const int samples);
 };
