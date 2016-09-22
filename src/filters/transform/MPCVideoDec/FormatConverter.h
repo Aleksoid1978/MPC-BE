@@ -74,6 +74,7 @@ enum MPCPixFmtType {
 	PFType_YUV422Px,
 	PFType_YUV444Px,
 	PFType_NV12,
+	PFType_P010,
 };
 
 struct FrameProps {
@@ -89,6 +90,18 @@ struct FrameProps {
 };
 
 MPCPixFmtType GetPixFmtType(enum AVPixelFormat av_pix_fmt);
+
+typedef struct _RGBCoeffs {
+	__m128i Ysub;
+	__m128i CbCr_center;
+	__m128i rgb_add;
+	__m128i cy;
+	__m128i cR_Cr;
+	__m128i cG_Cb_cG_Cr;
+	__m128i cB_Cb;
+} RGBCoeffs;
+
+typedef int (__stdcall *YUVRGBConversionFunc)(const uint8_t *srcY, const uint8_t *srcU, const uint8_t *srcV, uint8_t *dst, int width, int height, ptrdiff_t srcStrideY, ptrdiff_t srcStrideUV, ptrdiff_t dstStride, ptrdiff_t sliceYStart, ptrdiff_t sliceYEnd, const RGBCoeffs *coeffs, const uint16_t *dithers);
 
 class CFormatConverter
 {
@@ -113,8 +126,20 @@ protected:
 
 	unsigned			m_RequiredAlignment;
 
+	int					m_NumThreads;
+
 	bool Init();
 	void UpdateDetails();
+
+	int m_swsWidth  = 0;
+	int m_swsHeight = 0;
+
+	RGBCoeffs *m_rgbCoeffs = nullptr;
+	BOOL m_bRGBConverter   = FALSE;
+	BOOL m_bRGBConvInit    = FALSE;
+
+	// [out32][dithermode][ycgco][format][shift]
+	YUVRGBConversionFunc m_RGBConvFuncs[2][1][2][PixFmt_count][9];
 
 	void SetConvertFunc();
 	// from LAV Filters
@@ -144,6 +169,10 @@ protected:
 	HRESULT plane_copy_sse2(CONV_FUNC_PARAMS);
 	HRESULT plane_copy_direct_sse4(CONV_FUNC_PARAMS);
 	HRESULT plane_copy(CONV_FUNC_PARAMS);
+
+	HRESULT convert_yuv_rgb(CONV_FUNC_PARAMS);
+	const RGBCoeffs* getRGBCoeffs(int width, int height);
+	void InitRGBConvDispatcher();
 
 public:
 	CFormatConverter();
