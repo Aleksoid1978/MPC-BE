@@ -182,6 +182,7 @@ CFormatConverter::CFormatConverter()
 	, m_pAlignedBuffer(NULL)
 	, m_nCPUFlag(0)
 	, m_RequiredAlignment(0)
+	, m_NumThreads(1)
 {
 	ASSERT(PixFmt_count == _countof(s_sw_formats));
 
@@ -197,6 +198,8 @@ CFormatConverter::CFormatConverter()
 	m_nCPUFlag = cpuId.GetFeatures();
 
 	pConvertFn			= &CFormatConverter::ConvertGeneric;
+
+	m_NumThreads		= min(8, max(1, cpuId.GetProcessorNumber() / 2));
 }
 
 CFormatConverter::~CFormatConverter()
@@ -242,7 +245,7 @@ bool CFormatConverter::Init()
 	return true;
 }
 
-void  CFormatConverter::UpdateDetails()
+void CFormatConverter::UpdateDetails()
 {
 	if (m_pSwsContext) {
 		int *inv_tbl = NULL, *tbl = NULL;
@@ -352,6 +355,20 @@ void CFormatConverter::SetConvertFunc()
 				} else if (m_FProps.pftype == PFType_YUV444) {
 					pConvertFn = &CFormatConverter::convert_yuv_yv;
 					m_RequiredAlignment = 0;
+				}
+				break;
+			case PixFmt_RGB32:
+				switch (m_FProps.pftype) {
+					case PFType_YUV420:
+					case PFType_YUV420Px:
+					case PFType_YUV422:
+					case PFType_YUV422Px:
+					case PFType_YUV444:
+					case PFType_YUV444Px:
+					case PFType_NV12:
+					case PFType_P010:
+						pConvertFn = &CFormatConverter::convert_yuv_rgb;
+						m_RequiredAlignment = 4;
 				}
 				break;
 		}
@@ -490,6 +507,11 @@ void CFormatConverter::Cleanup()
 	}
 	av_freep(&m_pAlignedBuffer);
 	m_nAlignedBufferSize = 0;
+
+	if (m_rgbCoeffs) {
+		_aligned_free(m_rgbCoeffs);
+		m_rgbCoeffs = nullptr;
+	}
 }
 
 bool CFormatConverter::FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2)
