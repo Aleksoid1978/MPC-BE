@@ -1234,7 +1234,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			int src = m_iCurSurface;
 			int dst = m_nSurface;
 
-			if (1 || m_bYCgCo) {
+			if (m_bYCgCo) {
 				if (!m_pYCgCoCorrectionPixelShader) {
 					if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 						hr = CreateShaderFromResource(m_pD3DDevEx, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_PS20_YCGCOCORRECTION);
@@ -2821,12 +2821,20 @@ HRESULT CSyncAP::RenegotiateMediaType()
 	// Get the mixer's input type
 	hr = m_pMixer->GetInputCurrentType(0, &pType);
 	if (SUCCEEDED(hr)) {
-	    AM_MEDIA_TYPE* pMT;
-	    hr = pType->GetRepresentation(FORMAT_VideoInfo2, (void**)&pMT);
-	    if (SUCCEEDED(hr)) {
-	        m_inputMediaType = *pMT;
-	        pType->FreeRepresentation(FORMAT_VideoInfo2, pMT);
-	    }
+		AM_MEDIA_TYPE* pMT;
+		hr = pType->GetRepresentation(FORMAT_VideoInfo2, (void**)&pMT);
+		if (SUCCEEDED(hr)) {
+			m_inputMediaType = *pMT;
+			pType->FreeRepresentation(FORMAT_VideoInfo2, pMT);
+
+			m_bYCgCo = false;
+			if (m_inputMediaType.formattype == FORMAT_VideoInfo2) {
+				DWORD dwControlFlags = ((VIDEOINFOHEADER2*)m_inputMediaType.pbFormat)->dwControlFlags;
+				if (dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
+					m_bYCgCo = ((DXVA2_ExtendedFormat*)&dwControlFlags)->VideoTransferMatrix == 7;
+				}
+			}
+		}
 	}
 
 	CInterfaceArray<IMFMediaType> ValidMixerTypes;
