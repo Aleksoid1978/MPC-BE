@@ -241,7 +241,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 
 		if (dxvaExtFormat->value != 0 && m_RenderClsid != CLSID_madVR) {
 			// Remove custom matrix settings, which are not understood upstream
-			if (dxvaExtFormat->VideoTransferMatrix > DXVA2_VideoTransferMatrix_SMPTE240M) {
+			if (dxvaExtFormat->VideoTransferMatrix > 7) {
 				dxvaExtFormat->VideoTransferMatrix = DXVA2_VideoTransferMatrix_Unknown;
 			}
 			if (dxvaExtFormat->VideoPrimaries > DXVA2_VideoPrimaries_SMPTE_C) {
