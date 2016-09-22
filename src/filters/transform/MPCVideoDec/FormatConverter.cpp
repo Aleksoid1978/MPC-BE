@@ -138,6 +138,8 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 
 	if (av_pix_fmt == AV_PIX_FMT_NV12) {
 		return PFType_NV12;
+	} else if (av_pix_fmt == AV_PIX_FMT_P010) {
+		return PFType_P010;
 	}
 
 	int lumabits = pfdesc->comp->depth;
