@@ -59,14 +59,13 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error),
 	m_ScreenSize(0, 0),
 	m_iRotation(0),
+	m_bYCgCo(false),
 	m_wsResizer(L""), // empty string, not nullptr
 	m_nSurface(1),
 	m_iCurSurface(0),
 	m_bSnapToVSync(false),
-	m_bInterlaced(0),
 	m_nUsedBuffer(0),
 	m_TextScale(1.0),
-	m_bNeedCheckSample(true),
 	m_bIsFullscreen(bFullscreen),
 	m_uSyncGlitches(0),
 	m_pGenlock(NULL),
@@ -1232,6 +1231,32 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 		if (m_pVideoTextures[m_iCurSurface]) {
 			CComPtr<IDirect3DTexture9> pVideoTexture = m_pVideoTextures[m_iCurSurface];
 
+			int src = m_iCurSurface;
+			int dst = m_nSurface;
+
+			if (1 || m_bYCgCo) {
+				if (!m_pYCgCoCorrectionPixelShader) {
+					if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
+						hr = CreateShaderFromResource(m_pD3DDevEx, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_PS20_YCGCOCORRECTION);
+					}
+					else {
+						hr = CreateShaderFromResource(m_pD3DDevEx, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_YCGCOCORRECTION);
+					}
+				}
+
+				if (m_pYCgCoCorrectionPixelShader) {
+					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[dst]);
+					hr = m_pD3DDevEx->SetPixelShader(m_pYCgCoCorrectionPixelShader);
+					TextureCopy(m_pVideoTextures[src]);
+					pVideoTexture = m_pVideoTextures[dst];
+					src = dst;
+					dst++;
+
+					hr = m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
+					hr = m_pD3DDevEx->SetPixelShader(NULL);
+				}
+			}
+
 			// pre-resize pixel shaders
 			if (m_pPixelShaders.GetCount()) {
 				static __int64 counter = 0;
@@ -1244,8 +1269,6 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					start = stop;    // reset after 10 min (ps float has its limits in both range and accuracy)
 				}
 
-				int src = m_iCurSurface, dst = m_nSurface;
-
 				D3DSURFACE_DESC desc;
 				m_pVideoTextures[src]->GetLevelDesc(0, &desc);
 
@@ -1257,8 +1280,6 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 				POSITION pos = m_pPixelShaders.GetHeadPosition();
 				while (pos) {
-					pVideoTexture = m_pVideoTextures[dst];
-
 					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[dst]);
 					CExternalPixelShader &Shader = m_pPixelShaders.GetNext(pos);
 					if (!Shader.m_pPixelShader) {
@@ -1266,6 +1287,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					}
 					hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
 					TextureCopy(m_pVideoTextures[src]);
+					pVideoTexture = m_pVideoTextures[dst];
 
 					src = dst;
 					if (++dst >= m_nSurface+2) {
@@ -1277,36 +1299,36 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				hr = m_pD3DDevEx->SetPixelShader(NULL);
 			}
 
-			Vector dst[4];
+			Vector dest[4];
 			if (m_iRotation) {
 				switch (m_iRotation) {
 				case 90:
-					dst[0].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
-					dst[1].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
-					dst[2].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
-					dst[3].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
+					dest[0].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
+					dest[1].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
+					dest[2].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
+					dest[3].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
 					hr = m_pD3DDevEx->SetRenderTarget(0, m_pRotateSurface);
 					break;
 				case 180:
-					dst[0].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
-					dst[1].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
-					dst[2].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
-					dst[3].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
+					dest[0].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
+					dest[1].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
+					dest[2].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
+					dest[3].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
 					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[m_nSurface + 1]);
 					break;
 				case 270:
-					dst[0].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
-					dst[1].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
-					dst[2].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
-					dst[3].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
+					dest[0].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
+					dest[1].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
+					dest[2].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
+					dest[3].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
 					hr = m_pD3DDevEx->SetRenderTarget(0, m_pRotateSurface);
 					break;
 				}
 				MYD3DVERTEX<1> v[] = {
-					{ dst[0].x, dst[0].y, 0.5f, 2.0f, 0.0f, 0.0f },
-					{ dst[1].x, dst[1].y, 0.5f, 2.0f, 1.0f, 0.0f },
-					{ dst[2].x, dst[2].y, 0.5f, 2.0f, 0.0f, 1.0f },
-					{ dst[3].x, dst[3].y, 0.5f, 2.0f, 1.0f, 1.0f },
+					{ dest[0].x, dest[0].y, 0.5f, 2.0f, 0.0f, 0.0f },
+					{ dest[1].x, dest[1].y, 0.5f, 2.0f, 1.0f, 0.0f },
+					{ dest[2].x, dest[2].y, 0.5f, 2.0f, 0.0f, 1.0f },
+					{ dest[3].x, dest[3].y, 0.5f, 2.0f, 1.0f, 1.0f },
 				};
 				AdjustQuad(v, 0, 0);
 				hr = m_pD3DDevEx->SetTexture(0, pVideoTexture);
@@ -1322,7 +1344,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
 			}
 
-			Transform(rDstVid, dst);
+			Transform(rDstVid, dest);
 
 			// init resizer
 			DWORD iResizer = rs.iResizer;
@@ -1370,48 +1392,48 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				switch (iResizer) {
 				case RESIZER_NEAREST:
 					m_wsResizer = L"Nearest neighbor";
-					hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT);
+					hr = TextureResize(pVideoTexture, dest, rSrcVid, D3DTEXF_POINT);
 					break;
 				case RESIZER_BILINEAR:
 					m_wsResizer = L"Bilinear";
-					hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_LINEAR);
+					hr = TextureResize(pVideoTexture, dest, rSrcVid, D3DTEXF_LINEAR);
 					break;
 				case RESIZER_SHADER_BSPLINE4:
 					m_wsResizer = L"B-spline4";
-					hr = TextureResizeShader2pass(pVideoTexture, dst, rSrcVid, shader_bspline4_x);
+					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_bspline4_x);
 					break;
 				case RESIZER_SHADER_MITCHELL4:
 					m_wsResizer = L"Mitchell-Netravali spline4";
-					hr = TextureResizeShader2pass(pVideoTexture, dst, rSrcVid, shader_mitchell4_x);
+					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_mitchell4_x);
 					break;
 				case RESIZER_SHADER_CATMULL4:
 					m_wsResizer = L"Catmull-Rom spline4";
-					hr = TextureResizeShader2pass(pVideoTexture, dst, rSrcVid, shader_catmull4_x);
+					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_catmull4_x);
 					break;
 				case RESIZER_SHADER_BICUBIC06:
 					m_wsResizer = L"Bicubic A=-0.6";
-					hr = TextureResizeShader2pass(pVideoTexture, dst, rSrcVid, shader_bicubic06_x);
+					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_bicubic06_x);
 					break;
 				case RESIZER_SHADER_BICUBIC08:
 					m_wsResizer = L"Bicubic A=-0.8";
-					hr = TextureResizeShader2pass(pVideoTexture, dst, rSrcVid, shader_bicubic08_x);
+					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_bicubic08_x);
 					break;
 				case RESIZER_SHADER_BICUBIC10:
 					m_wsResizer = L"Bicubic A=-1.0";
-					hr = TextureResizeShader2pass(pVideoTexture, dst, rSrcVid, shader_bicubic10_x);
+					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_bicubic10_x);
 					break;
 				case RESIZER_SHADER_LANCZOS2:
 					m_wsResizer = L"Lanczos2";
-					hr = TextureResizeShader2pass(pVideoTexture, dst, rSrcVid, shader_lanczos2_x);
+					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_lanczos2_x);
 					break;
 				case RESIZER_SHADER_LANCZOS3:
 					m_wsResizer = L"Lanczos3";
-					hr = TextureResizeShader2pass(pVideoTexture, dst, rSrcVid, shader_lanczos3_x);
+					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_lanczos3_x);
 					break;
 				}
 			} else {
 				m_wsResizer = L""; // empty string, not nullptr
-				hr = TextureResize(pVideoTexture, dst, rSrcVid, D3DTEXF_POINT);
+				hr = TextureResize(pVideoTexture, dest, rSrcVid, D3DTEXF_POINT);
 			}
 
 			// post-resize pixel shaders

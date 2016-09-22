@@ -1497,8 +1497,8 @@ void CEVRAllocatorPresenter::GetMixerThread()
 					// Use the code from VMR9 to get the movie fps, as this method is reliable.
 					CComPtr<IPin>	pPin;
 					CMediaType		mt;
-					if (SUCCEEDED(m_pOuterEVR->FindPin(L"EVR Input0", &pPin)) &&
-						SUCCEEDED(pPin->ConnectionMediaType(&mt)) ) {
+					if (SUCCEEDED(m_pOuterEVR->FindPin(L"EVR Input0", &pPin))
+							&& SUCCEEDED(pPin->ConnectionMediaType(&mt)) ) {
 
 						FillAddingField(pPin, &mt);
 

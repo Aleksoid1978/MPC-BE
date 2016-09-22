@@ -394,22 +394,26 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	m_pVideoTexture[m_nCurSurface]->GetLevelDesc(0, &videoDesc);
 
 	int src = 1;
-	int dest = 0;
+	int dst = 0;
 	bool first = true;
 
 	if (m_bYCgCo) {
 		if (!m_pYCgCoCorrectionPixelShader) {
-			hr = CreateShaderFromResource(m_pD3DDev, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_YCGCOCORRECTION);
+			if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
+				hr = CreateShaderFromResource(m_pD3DDev, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_PS20_YCGCOCORRECTION);
+			} else {
+				hr = CreateShaderFromResource(m_pD3DDev, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_YCGCOCORRECTION);
+			}
 		}
 
 		if (m_pYCgCoCorrectionPixelShader) {
 			CComPtr<IDirect3DSurface9> pTemporarySurface;
-			hr = m_pFrameTextures[dest]->GetSurfaceLevel(0, &pTemporarySurface);
+			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
 			hr = m_pD3DDev->SetRenderTarget(0, pTemporarySurface);
 			hr = m_pD3DDev->SetPixelShader(m_pYCgCoCorrectionPixelShader);
 			TextureCopy(m_pVideoTexture[m_nCurSurface]);
 			first = false;
-			std::swap(src, dest);
+			std::swap(src, dst);
 			pVideoTexture = m_pFrameTextures[src];
 		}
 	}
@@ -442,7 +446,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		POSITION pos = m_pCustomPixelShaders.GetHeadPosition();
 		while (pos) {
 			CComPtr<IDirect3DSurface9> pTemporarySurface;
-			hr = m_pFrameTextures[dest]->GetSurfaceLevel(0, &pTemporarySurface);
+			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
 			hr = m_pD3DDev->SetRenderTarget(0, pTemporarySurface);
 
 			CExternalPixelShader &Shader = m_pCustomPixelShaders.GetNext(pos);
@@ -458,45 +462,45 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 				TextureCopy(m_pFrameTextures[src]);
 			}
 
-			std::swap(src, dest);
+			std::swap(src, dst);
 		}
 
 		pVideoTexture = m_pFrameTextures[src];
 	}
 
-	Vector dst[4];
+	Vector dest[4];
 	if (m_iRotation) {
 		CComPtr<IDirect3DSurface9> pTemporarySurface;
 		switch (m_iRotation) {
 		case 90:
-			dst[0].Set((float)videoDesc.Width, 0.0f, 0.5f);
-			dst[1].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
-			dst[2].Set(0.0f, 0.0f, 0.5f);
-			dst[3].Set(0.0f, (float)videoDesc.Height, 0.5f);
+			dest[0].Set((float)videoDesc.Width, 0.0f, 0.5f);
+			dest[1].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
+			dest[2].Set(0.0f, 0.0f, 0.5f);
+			dest[3].Set(0.0f, (float)videoDesc.Height, 0.5f);
 			hr = m_pRotateTexture->GetSurfaceLevel(0, &pTemporarySurface);
 			break;
 		case 180:
-			dst[0].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
-			dst[1].Set(0.0f, (float)videoDesc.Height, 0.5f);
-			dst[2].Set((float)videoDesc.Width, 0.0f, 0.5f);
-			dst[3].Set(0.0f, 0.0f, 0.5f);
-			hr = m_pFrameTextures[dest]->GetSurfaceLevel(0, &pTemporarySurface);
+			dest[0].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
+			dest[1].Set(0.0f, (float)videoDesc.Height, 0.5f);
+			dest[2].Set((float)videoDesc.Width, 0.0f, 0.5f);
+			dest[3].Set(0.0f, 0.0f, 0.5f);
+			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
 			break;
 		case 270:
-			dst[0].Set(0.0f, (float)videoDesc.Height, 0.5f);
-			dst[1].Set(0.0f, 0.0f, 0.5f);
-			dst[2].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
-			dst[3].Set((float)videoDesc.Width, 0.0f, 0.5f);
+			dest[0].Set(0.0f, (float)videoDesc.Height, 0.5f);
+			dest[1].Set(0.0f, 0.0f, 0.5f);
+			dest[2].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
+			dest[3].Set((float)videoDesc.Width, 0.0f, 0.5f);
 			hr = m_pRotateTexture->GetSurfaceLevel(0, &pTemporarySurface);
 			break;
 		}
 		hr = m_pD3DDev->SetRenderTarget(0, pTemporarySurface);
 
 		MYD3DVERTEX<1> v[] = {
-			{ dst[0].x, dst[0].y, 0.5f, 2.0f, 0.0f, 0.0f },
-			{ dst[1].x, dst[1].y, 0.5f, 2.0f, 1.0f, 0.0f },
-			{ dst[2].x, dst[2].y, 0.5f, 2.0f, 0.0f, 1.0f },
-			{ dst[3].x, dst[3].y, 0.5f, 2.0f, 1.0f, 1.0f },
+			{ dest[0].x, dest[0].y, 0.5f, 2.0f, 0.0f, 0.0f },
+			{ dest[1].x, dest[1].y, 0.5f, 2.0f, 1.0f, 0.0f },
+			{ dest[2].x, dest[2].y, 0.5f, 2.0f, 0.0f, 1.0f },
+			{ dest[3].x, dest[3].y, 0.5f, 2.0f, 1.0f, 1.0f },
 		};
 		AdjustQuad(v, 0, 0);
 
@@ -505,7 +509,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		hr = TextureBlt(m_pD3DDev, v, D3DTEXF_LINEAR);
 
 		if (m_iRotation == 180) {
-			pVideoTexture = m_pFrameTextures[dest];
+			pVideoTexture = m_pFrameTextures[dst];
 		}
 		else { // 90 and 270
 			pVideoTexture = m_pRotateTexture;
@@ -514,7 +518,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 
 	// Resize the frame
 
-	Transform(destRect, dst);
+	Transform(destRect, dest);
 
 	if (bCustomScreenSpacePixelShaders || bFinalPass) {
 		CComPtr<IDirect3DSurface9> pTemporarySurface;
@@ -534,54 +538,54 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 
 	if (srcSize == dstSize) {
 		m_wsResizer = L""; // empty string, not nullptr
-		hr = TextureResize(pVideoTexture, dst, srcRect, D3DTEXF_POINT);
+		hr = TextureResize(pVideoTexture, dest, srcRect, D3DTEXF_POINT);
 	} else {
 		switch (iResizer) {
 		case RESIZER_NEAREST:
 			m_wsResizer = L"Nearest neighbor";
-			hr = TextureResize(pVideoTexture, dst, srcRect, D3DTEXF_POINT);
+			hr = TextureResize(pVideoTexture, dest, srcRect, D3DTEXF_POINT);
 			break;
 		case RESIZER_BILINEAR:
 			m_wsResizer = L"Bilinear";
-			hr = TextureResize(pVideoTexture, dst, srcRect, D3DTEXF_LINEAR);
+			hr = TextureResize(pVideoTexture, dest, srcRect, D3DTEXF_LINEAR);
 			break;
 		case RESIZER_SHADER_BSPLINE4:
 			m_wsResizer = L"B-spline4";
-			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bspline4_x);
+			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_bspline4_x);
 			break;
 		case RESIZER_SHADER_MITCHELL4:
 			m_wsResizer = L"Mitchell-Netravali spline4";
-			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_mitchell4_x);
+			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_mitchell4_x);
 			break;
 		case RESIZER_SHADER_CATMULL4:
 			m_wsResizer = L"Catmull-Rom spline4";
-			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_catmull4_x);
+			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_catmull4_x);
 			break;
 		case RESIZER_SHADER_BICUBIC06:
 			m_wsResizer = L"Bicubic A=-0.6";
-			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic06_x);
+			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_bicubic06_x);
 			break;
 		case RESIZER_SHADER_BICUBIC08:
 			m_wsResizer = L"Bicubic A=-0.8";
-			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic08_x);
+			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_bicubic08_x);
 			break;
 		case RESIZER_SHADER_BICUBIC10:
 			m_wsResizer = L"Bicubic A=-1.0";
-			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_bicubic10_x);
+			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_bicubic10_x);
 			break;
 		case RESIZER_SHADER_LANCZOS2:
 			m_wsResizer = L"Lanczos2";
-			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_lanczos2_x);
+			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_lanczos2_x);
 			break;
 		case RESIZER_SHADER_LANCZOS3:
 			m_wsResizer = L"Lanczos3";
-			hr = TextureResizeShader2pass(pVideoTexture, dst, srcRect, shader_lanczos3_x);
+			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_lanczos3_x);
 			break;
 		}
 	}
 
 	src = 0;
-	dest = 1;
+	dst = 1;
 	// Apply the custom screen size pixel shaders
 	if (bCustomScreenSpacePixelShaders) {
 		static __int64 counter = 555;
@@ -610,7 +614,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 
 			if (pos || bFinalPass) {
 				CComPtr<IDirect3DSurface9> pTemporarySurface;
-				hr = m_pScreenSpaceTextures[dest]->GetSurfaceLevel(0, &pTemporarySurface);
+				hr = m_pScreenSpaceTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
 				if (SUCCEEDED(hr)) {
 					hr = m_pD3DDev->SetRenderTarget(0, pTemporarySurface);
 				}
@@ -620,7 +624,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 
 			hr = m_pD3DDev->SetPixelShader(Shader.m_pPixelShader);
 			TextureCopy(m_pScreenSpaceTextures[src]);
-			std::swap(src, dest);
+			std::swap(src, dst);
 		}
 	}
 

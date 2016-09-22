@@ -60,7 +60,7 @@ namespace DSObjects
 			RENDERING_PATH_DRAW,
 		};
 
-		static const int MAX_VIDEO_SURFACES = 60;
+		static const int MAX_VIDEO_SURFACES = 30;
 
 		// Variables initialized/managed by the allocator-presenter!
 		CComPtr<IDirect3D9>			m_pD3D;
