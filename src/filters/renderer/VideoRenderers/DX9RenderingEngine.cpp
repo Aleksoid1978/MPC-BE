@@ -141,6 +141,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_SurfaceFmt(D3DFMT_X8R8G8B8)
 	, m_bColorManagement(false)
 	, m_iRotation(0)
+	, m_bYCgCo(false)
 	, m_wsResizer(L"") // empty string, not nullptr
 {
 #if DXVAVP
@@ -394,6 +395,24 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 
 	int src = 1;
 	int dest = 0;
+	bool first = true;
+
+	if (m_bYCgCo) {
+		if (!m_pYCgCoCorrectionPixelShader) {
+			hr = CreateShaderFromResource(m_pD3DDev, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_YCGCOCORRECTION);
+		}
+
+		if (m_pYCgCoCorrectionPixelShader) {
+			CComPtr<IDirect3DSurface9> pTemporarySurface;
+			hr = m_pFrameTextures[dest]->GetSurfaceLevel(0, &pTemporarySurface);
+			hr = m_pD3DDev->SetRenderTarget(0, pTemporarySurface);
+			hr = m_pD3DDev->SetPixelShader(m_pYCgCoCorrectionPixelShader);
+			TextureCopy(m_pVideoTexture[m_nCurSurface]);
+			first = false;
+			std::swap(src, dest);
+			pVideoTexture = m_pFrameTextures[src];
+		}
+	}
 
 	if (bCustomPixelShaders) {
 		static __int64 counter = 0;
@@ -420,7 +439,6 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 #endif
 		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 
-		bool first = true;
 		POSITION pos = m_pCustomPixelShaders.GetHeadPosition();
 		while (pos) {
 			CComPtr<IDirect3DSurface9> pTemporarySurface;
@@ -932,7 +950,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDXVA(IDirect3DSurface9* pRenderTarget, c
 HRESULT CDX9RenderingEngine::InitVideoTextures()
 {
 	HRESULT hr = S_OK;
-	size_t count = min(_countof(m_pFrameTextures), m_pCustomPixelShaders.GetCount() + (m_iRotation == 180 ? 1 : 0));
+	size_t count = min(_countof(m_pFrameTextures), m_pCustomPixelShaders.GetCount() + (m_bYCgCo ? 1 : 0) + (m_iRotation == 180 ? 1 : 0));
 
 	for (size_t i = 0; i < count; i++) {
 		if (m_pFrameTextures[i] == NULL) {

@@ -104,6 +104,7 @@ namespace DSObjects
 
 		bool	m_bColorManagement;
 		int		m_iRotation; // Rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
+		bool	m_bYCgCo;
 		const wchar_t* m_wsResizer;
 
 		CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError);
@@ -149,6 +150,7 @@ namespace DSObjects
 		ColorRenderingIntent			m_RenderingIntent;
 
 		// Custom pixel shaders
+		CComPtr<IDirect3DPixelShader9>	m_pYCgCoCorrectionPixelShader;
 		CAtlList<CExternalPixelShader>	m_pCustomPixelShaders;
 
 		// Screen space pipeline
