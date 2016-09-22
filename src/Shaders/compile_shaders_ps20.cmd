@@ -16,6 +16,7 @@ set LIST=%LIST% resizer_lanczos2_x.hlsl
 set LIST=%LIST% resizer_lanczos2_y.hlsl
 set LIST=%LIST% resizer_downscaling_x.hlsl
 set LIST=%LIST% resizer_downscaling_y.hlsl
+set LIST=%LIST% YCgCo_correction.hlsl
 
 for %%f in (%LIST%) do (
   fxc.exe /nologo /T ps_2_0 /Fo ..\..\bin\shaders\ps20_%%~nf.cso %%f

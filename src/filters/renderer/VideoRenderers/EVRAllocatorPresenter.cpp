@@ -1501,6 +1501,14 @@ void CEVRAllocatorPresenter::GetMixerThread()
 						SUCCEEDED(pPin->ConnectionMediaType(&mt)) ) {
 
 						FillAddingField(pPin, &mt);
+
+						m_bYCgCo = false;
+						if (mt.formattype == FORMAT_VideoInfo2) {
+							DWORD dwControlFlags = ((VIDEOINFOHEADER2*)mt.pbFormat)->dwControlFlags;
+							if (dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
+								m_bYCgCo = ((DXVA2_ExtendedFormat*)&dwControlFlags)->VideoTransferMatrix == 7;
+							}
+						}
 					}
 					// If framerate not set by Video Decoder - choose 23.976
 					if (m_rtTimePerFrame == 1) {

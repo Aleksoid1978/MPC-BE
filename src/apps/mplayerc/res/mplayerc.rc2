@@ -101,6 +101,7 @@ IDF_SHADER_RESIZER_LANCZOS3_X    SHADER                  "..\\..\\..\\bin\\shade
 IDF_SHADER_RESIZER_LANCZOS3_Y    SHADER                  "..\\..\\..\\bin\\shaders\\resizer_lanczos3_y.cso"
 IDF_SHADER_DOWNSCALING_X         SHADER                  "..\\..\\..\\bin\\shaders\\resizer_downscaling_x.cso"
 IDF_SHADER_DOWNSCALING_Y         SHADER                  "..\\..\\..\\bin\\shaders\\resizer_downscaling_y.cso"
+IDF_SHADER_YCGCOCORRECTION       SHADER                  "..\\..\\..\\bin\\shaders\\YCgCo_correction.cso"
 IDF_SHADER_PS20_BSPLINE4_X       SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_bspline4_x.cso"
 IDF_SHADER_PS20_BSPLINE4_Y       SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_bspline4_y.cso"
 IDF_SHADER_PS20_MITCHELL4_X      SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_mitchell4_x.cso"
@@ -117,6 +118,7 @@ IDF_SHADER_PS20_LANCZOS2_X       SHADER                  "..\\..\\..\\bin\\shade
 IDF_SHADER_PS20_LANCZOS2_Y       SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_lanczos2_y.cso"
 IDF_SHADER_PS20_DOWNSCALING_X    SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_downscaling_x.cso"
 IDF_SHADER_PS20_DOWNSCALING_Y    SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_downscaling_y.cso"
+IDF_SHADER_PS20_YCGCOCORRECTION  SHADER                  "..\\..\\..\\bin\\shaders\\ps20_YCgCo_correction.cso"
 
 /////////////////////////////////////////////////////////////////////////////
 //
