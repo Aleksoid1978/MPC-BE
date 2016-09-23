@@ -141,7 +141,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_SurfaceFmt(D3DFMT_X8R8G8B8)
 	, m_bColorManagement(false)
 	, m_iRotation(0)
-	, m_bYCgCo(false)
+	, m_inputExtFormat({0})
 	, m_wsResizer(L"") // empty string, not nullptr
 {
 #if DXVAVP
@@ -397,7 +397,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	int dst = 0;
 	bool first = true;
 
-	if (m_bYCgCo) {
+	if (m_inputExtFormat.VideoTransferMatrix == 7) {
 		if (!m_pYCgCoCorrectionPixelShader) {
 			if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 				hr = CreateShaderFromResource(m_pD3DDev, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_PS20_YCGCOCORRECTION);
@@ -954,7 +954,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDXVA(IDirect3DSurface9* pRenderTarget, c
 HRESULT CDX9RenderingEngine::InitVideoTextures()
 {
 	HRESULT hr = S_OK;
-	size_t count = min(_countof(m_pFrameTextures), m_pCustomPixelShaders.GetCount() + (m_bYCgCo ? 1 : 0) + (m_iRotation == 180 ? 1 : 0));
+	size_t count = min(_countof(m_pFrameTextures), m_pCustomPixelShaders.GetCount() + (m_inputExtFormat.VideoTransferMatrix == 7 ? 1 : 0) + (m_iRotation == 180 ? 1 : 0));
 
 	for (size_t i = 0; i < count; i++) {
 		if (m_pFrameTextures[i] == NULL) {

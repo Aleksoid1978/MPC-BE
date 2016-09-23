@@ -59,7 +59,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error),
 	m_ScreenSize(0, 0),
 	m_iRotation(0),
-	m_bYCgCo(false),
+	m_inputExtFormat({0}),
 	m_wsResizer(L""), // empty string, not nullptr
 	m_nSurface(1),
 	m_iCurSurface(0),
@@ -1234,7 +1234,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			int src = m_iCurSurface;
 			int dst = m_nSurface;
 
-			if (m_bYCgCo) {
+			if (m_inputExtFormat.VideoTransferMatrix == 7) {
 				if (!m_pYCgCoCorrectionPixelShader) {
 					if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 						hr = CreateShaderFromResource(m_pD3DDevEx, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_PS20_YCGCOCORRECTION);
@@ -2827,12 +2827,9 @@ HRESULT CSyncAP::RenegotiateMediaType()
 			m_inputMediaType = *pMT;
 			pType->FreeRepresentation(FORMAT_VideoInfo2, pMT);
 
-			m_bYCgCo = false;
+			m_inputExtFormat.value = 0;
 			if (m_inputMediaType.formattype == FORMAT_VideoInfo2) {
-				DWORD dwControlFlags = ((VIDEOINFOHEADER2*)m_inputMediaType.pbFormat)->dwControlFlags;
-				if (dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
-					m_bYCgCo = ((DXVA2_ExtendedFormat*)&dwControlFlags)->VideoTransferMatrix == 7;
-				}
+				m_inputExtFormat.value = ((VIDEOINFOHEADER2*)m_inputMediaType.pbFormat)->dwControlFlags;
 			}
 		}
 	}
