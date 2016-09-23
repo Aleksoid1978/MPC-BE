@@ -21,7 +21,9 @@
 #pragma once
 
 struct IDirect3D9;
-namespace D3D9Helper {
+
+namespace D3D9Helper
+{
 	UINT GetAdapter(IDirect3D9* pD3D, HWND hWnd);
 	IDirect3D9* Direct3DCreate9();
 }
