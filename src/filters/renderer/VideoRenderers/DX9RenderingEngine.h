@@ -63,9 +63,7 @@ namespace DSObjects
 		static const int MAX_VIDEO_SURFACES = 30;
 
 		// Variables initialized/managed by the allocator-presenter!
-		CComPtr<IDirect3D9>			m_pD3D;
 		CComPtr<IDirect3D9Ex>		m_pD3DEx;
-		CComPtr<IDirect3DDevice9>	m_pD3DDev;
 		CComPtr<IDirect3DDevice9Ex>	m_pD3DDevEx;
 		UINT						m_CurrentAdapter;
 		UINT						m_AdapterCount;

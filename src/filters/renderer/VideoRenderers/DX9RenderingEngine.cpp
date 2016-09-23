@@ -169,7 +169,7 @@ void CDX9RenderingEngine::InitRenderingEngine()
 {
 	// Get the device caps
 	ZeroMemory(&m_Caps, sizeof(m_Caps));
-	m_pD3DDev->GetDeviceCaps(&m_Caps);
+	m_pD3DDevEx->GetDeviceCaps(&m_Caps);
 
 	// Define the shader profile.
 	if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
@@ -192,7 +192,7 @@ void CDX9RenderingEngine::InitRenderingEngine()
 	}
 
 	// Initialize the pixel shader compiler
-	m_pPSC.Attach(DNew CPixelShaderCompiler(m_pD3DDev, true));
+	m_pPSC.Attach(DNew CPixelShaderCompiler(m_pD3DDevEx, true));
 
 	HRESULT hr = InitShaderResizer();
 }
@@ -235,7 +235,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 	NULL_PTR_ARRAY(m_pFrameTextures);
 
 	if (settings.iSurfaceType == SURFACE_TEXTURE2D) {
-		if (FAILED(hr = m_pD3DDev->CreateTexture(
+		if (FAILED(hr = m_pD3DDevEx->CreateTexture(
 			m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
 			D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
 			D3DPOOL_DEFAULT, &m_pVideoTexture[0], NULL))) {
@@ -270,7 +270,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 		}
 
 		for (int i = 0; i < m_nNbDXSurface; i++) {
-			if (FAILED(hr = m_pD3DDev->CreateTexture(
+			if (FAILED(hr = m_pD3DDevEx->CreateTexture(
 								m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
 								D3DUSAGE_RENDERTARGET, m_VideoBufferFmt,
 								D3DPOOL_DEFAULT, &m_pVideoTexture[i], NULL))) {
@@ -285,7 +285,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 		m_RenderingPath = RENDERING_PATH_DRAW;
 	}
 	else {
-		if (FAILED(hr = m_pD3DDev->CreateOffscreenPlainSurface(
+		if (FAILED(hr = m_pD3DDevEx->CreateOffscreenPlainSurface(
 							m_nativeVideoSize.cx, m_nativeVideoSize.cy,
 							m_SurfaceFmt,
 							D3DPOOL_DEFAULT, &m_pVideoSurface[m_nCurSurface], NULL))) {
@@ -295,7 +295,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 		m_RenderingPath = RENDERING_PATH_STRETCHRECT;
 	}
 
-	hr = m_pD3DDev->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0);
+	hr = m_pD3DDevEx->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0);
 
 	return S_OK;
 }
@@ -400,17 +400,17 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	if (m_inputExtFormat.VideoTransferMatrix == 7) {
 		if (!m_pYCgCoCorrectionPixelShader) {
 			if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
-				hr = CreateShaderFromResource(m_pD3DDev, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_PS20_YCGCOCORRECTION);
+				hr = CreateShaderFromResource(m_pD3DDevEx, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_PS20_YCGCOCORRECTION);
 			} else {
-				hr = CreateShaderFromResource(m_pD3DDev, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_YCGCOCORRECTION);
+				hr = CreateShaderFromResource(m_pD3DDevEx, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_YCGCOCORRECTION);
 			}
 		}
 
 		if (m_pYCgCoCorrectionPixelShader) {
 			CComPtr<IDirect3DSurface9> pTemporarySurface;
 			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
-			hr = m_pD3DDev->SetRenderTarget(0, pTemporarySurface);
-			hr = m_pD3DDev->SetPixelShader(m_pYCgCoCorrectionPixelShader);
+			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
+			hr = m_pD3DDevEx->SetPixelShader(m_pYCgCoCorrectionPixelShader);
 			TextureCopy(m_pVideoTexture[m_nCurSurface]);
 			first = false;
 			std::swap(src, dst);
@@ -441,19 +441,19 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			{1.0f / VideoSize.cx, 1.0f / VideoSize.cy, 0, 0},
 		};
 #endif
-		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 
 		POSITION pos = m_pCustomPixelShaders.GetHeadPosition();
 		while (pos) {
 			CComPtr<IDirect3DSurface9> pTemporarySurface;
 			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
-			hr = m_pD3DDev->SetRenderTarget(0, pTemporarySurface);
+			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
 
 			CExternalPixelShader &Shader = m_pCustomPixelShaders.GetNext(pos);
 			if (!Shader.m_pPixelShader) {
 				Shader.Compile(m_pPSC);
 			}
-			hr = m_pD3DDev->SetPixelShader(Shader.m_pPixelShader);
+			hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
 
 			if (first) {
 				TextureCopy(m_pVideoTexture[m_nCurSurface]);
@@ -494,7 +494,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			hr = m_pRotateTexture->GetSurfaceLevel(0, &pTemporarySurface);
 			break;
 		}
-		hr = m_pD3DDev->SetRenderTarget(0, pTemporarySurface);
+		hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
 
 		MYD3DVERTEX<1> v[] = {
 			{ dest[0].x, dest[0].y, 0.5f, 2.0f, 0.0f, 0.0f },
@@ -504,9 +504,9 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		};
 		AdjustQuad(v, 0, 0);
 
-		hr = m_pD3DDev->SetTexture(0, pVideoTexture);
-		hr = m_pD3DDev->SetPixelShader(NULL);
-		hr = TextureBlt(m_pD3DDev, v, D3DTEXF_LINEAR);
+		hr = m_pD3DDevEx->SetTexture(0, pVideoTexture);
+		hr = m_pD3DDevEx->SetPixelShader(NULL);
+		hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_LINEAR);
 
 		if (m_iRotation == 180) {
 			pVideoTexture = m_pFrameTextures[dst];
@@ -525,11 +525,11 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		hr = m_pScreenSpaceTextures[0]->GetSurfaceLevel(0, &pTemporarySurface);
 
 		if (SUCCEEDED(hr)) {
-			hr = m_pD3DDev->SetRenderTarget(0, pTemporarySurface);
-			hr = m_pD3DDev->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0);
+			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
+			hr = m_pD3DDevEx->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0);
 		}
 	} else {
-		hr = m_pD3DDev->SetRenderTarget(0, pRenderTarget);
+		hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
 	}
 
 
@@ -603,7 +603,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			{1.0f / m_ScreenSpaceTexWidth, 1.0f / m_ScreenSpaceTexHeight, 0, 0},
 		};
 
-		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 
 		POSITION pos = m_pCustomScreenSpacePixelShaders.GetHeadPosition();
 		while (pos) {
@@ -616,13 +616,13 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 				CComPtr<IDirect3DSurface9> pTemporarySurface;
 				hr = m_pScreenSpaceTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
 				if (SUCCEEDED(hr)) {
-					hr = m_pD3DDev->SetRenderTarget(0, pTemporarySurface);
+					hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
 				}
 			} else {
-				hr = m_pD3DDev->SetRenderTarget(0, pRenderTarget);
+				hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
 			}
 
-			hr = m_pD3DDev->SetPixelShader(Shader.m_pPixelShader);
+			hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
 			TextureCopy(m_pScreenSpaceTextures[src]);
 			std::swap(src, dst);
 		}
@@ -630,12 +630,12 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 
 	// Final pass
 	if (bFinalPass) {
-		hr = m_pD3DDev->SetRenderTarget(0, pRenderTarget);
+		hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
 
 		hr = FinalPass(m_pScreenSpaceTextures[src]);
 	}
 
-	hr = m_pD3DDev->SetPixelShader(NULL);
+	hr = m_pD3DDevEx->SetPixelShader(NULL);
 
 	return hr;
 }
@@ -667,7 +667,7 @@ HRESULT CDX9RenderingEngine::RenderVideoStretchRectPath(IDirect3DSurface9* pRend
 	rSrcVid.right &= ~1;
 	rSrcVid.top &= ~1;
 	rSrcVid.bottom &= ~1;
-	hr = m_pD3DDev->StretchRect(m_pVideoSurface[m_nCurSurface], rSrcVid, pRenderTarget, rDstVid, filter);
+	hr = m_pD3DDevEx->StretchRect(m_pVideoSurface[m_nCurSurface], rSrcVid, pRenderTarget, rDstVid, filter);
 
 	return hr;
 }
@@ -688,7 +688,7 @@ BOOL CDX9RenderingEngine::InitializeDXVA2VP(int width, int height)
 	if (pDXVA2CreateVideoService) {
 		HRESULT hr = S_OK;
 		// Create DXVA2 Video Processor Service.
-		hr = pDXVA2CreateVideoService(m_pD3DDev, IID_IDirectXVideoProcessorService, (VOID**)&m_pDXVAVPS);
+		hr = pDXVA2CreateVideoService(m_pD3DDevEx, IID_IDirectXVideoProcessorService, (VOID**)&m_pDXVAVPS);
 		if (FAILED(hr)) {
 			TRACE("DXVA2CreateVideoService failed with error 0x%x.\n", hr);
 			return FALSE;
@@ -939,7 +939,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDXVA(IDirect3DSurface9* pRenderTarget, c
 	CRect clientRect;
 	if (rDstRect.left > 0 || rDstRect.top > 0 ||
 			GetClientRect(m_hWnd, clientRect) && (rDstRect.right < clientRect.Width() || rDstRect.bottom < clientRect.Height())) {
-		m_pD3DDev->ColorFill(pRenderTarget, NULL, 0);
+		m_pD3DDevEx->ColorFill(pRenderTarget, NULL, 0);
 	}
 
 	hr = m_pDXVAVPD->VideoProcessBlt(pRenderTarget, &blt, samples, 1, NULL);
@@ -958,7 +958,7 @@ HRESULT CDX9RenderingEngine::InitVideoTextures()
 
 	for (size_t i = 0; i < count; i++) {
 		if (m_pFrameTextures[i] == NULL) {
-			hr = m_pD3DDev->CreateTexture(
+			hr = m_pD3DDevEx->CreateTexture(
 					 m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1, D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
 					 D3DPOOL_DEFAULT, &m_pFrameTextures[i], NULL);
 
@@ -979,7 +979,7 @@ HRESULT CDX9RenderingEngine::InitVideoTextures()
 	if (m_iRotation == 90 || m_iRotation == 270) {
 		if (m_pRotateTexture == NULL) {
 			UINT a = max(m_nativeVideoSize.cx, m_nativeVideoSize.cy);
-			hr = m_pD3DDev->CreateTexture(
+			hr = m_pD3DDevEx->CreateTexture(
 				 a, a, 1, D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
 				 D3DPOOL_DEFAULT, &m_pRotateTexture, NULL);
 		}
@@ -1003,7 +1003,7 @@ HRESULT CDX9RenderingEngine::InitScreenSpaceTextures(size_t count)
 
 	for (size_t i = 0; i < count; i++) {
 		if (m_pScreenSpaceTextures[i] == NULL) {
-			hr = m_pD3DDev->CreateTexture(
+			hr = m_pD3DDevEx->CreateTexture(
 					m_ScreenSpaceTexWidth, m_ScreenSpaceTexHeight, 1, D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
 					D3DPOOL_DEFAULT, &m_pScreenSpaceTextures[i], NULL);
 
@@ -1083,9 +1083,9 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 		}
 	}
 
-	HRESULT hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[iShader], resid);
+	HRESULT hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[iShader], resid);
 	if (S_OK == hr) {
-		hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[iShader + 1], resid + 1);
+		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[iShader + 1], resid + 1);
 	}
 	if (FAILED(hr)) {
 		ASSERT(0);
@@ -1094,9 +1094,9 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 
 	if (!m_pResizerPixelShaders[shader_downscaling_x] || !m_pResizerPixelShaders[shader_downscaling_y]) {
 		UINT resid = m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0) ? IDF_SHADER_PS20_DOWNSCALING_X : IDF_SHADER_DOWNSCALING_X;
-		hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[shader_downscaling_x], resid);
+		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[shader_downscaling_x], resid);
 		if (S_OK == hr) {
-			hr = CreateShaderFromResource(m_pD3DDev, &m_pResizerPixelShaders[shader_downscaling_y], resid + 1);
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[shader_downscaling_y], resid + 1);
 		}
 		ASSERT(S_OK == hr);
 	}
@@ -1127,9 +1127,9 @@ HRESULT CDX9RenderingEngine::TextureResize(IDirect3DTexture9* pTexture, Vector d
 	};
 	AdjustQuad(v, 0, 0);
 
-	hr = m_pD3DDev->SetTexture(0, pTexture);
-	hr = m_pD3DDev->SetPixelShader(NULL);
-	hr = TextureBlt(m_pD3DDev, v, filter);
+	hr = m_pD3DDevEx->SetTexture(0, pTexture);
+	hr = m_pD3DDevEx->SetPixelShader(NULL);
+	hr = TextureBlt(m_pD3DDevEx, v, filter);
 
 	return hr;
 }
@@ -1162,7 +1162,7 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 	}
 
 	if (!m_pResizeTexture) {
-		hr = m_pD3DDev->CreateTexture(
+		hr = m_pD3DDevEx->CreateTexture(
 					texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET,
 					m_SurfaceFmt == D3DFMT_A32B32G32R32F ? D3DFMT_A32B32G32R32F : D3DFMT_A16B16G16R16F, // use only float textures here
 					D3DPOOL_DEFAULT, &m_pResizeTexture, NULL);
@@ -1205,46 +1205,46 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 
 	// remember current RenderTarget
 	CComPtr<IDirect3DSurface9> pRenderTarget;
-	hr = m_pD3DDev->GetRenderTarget(0, &pRenderTarget);
+	hr = m_pD3DDevEx->GetRenderTarget(0, &pRenderTarget);
 	// set temp RenderTarget
 	CComPtr<IDirect3DSurface9> pTempRenderTarget;
 	hr = m_pResizeTexture->GetSurfaceLevel(0, &pTempRenderTarget);
-	hr = m_pD3DDev->SetRenderTarget(0, pTempRenderTarget);
+	hr = m_pD3DDevEx->SetRenderTarget(0, pTempRenderTarget);
 
 	if (rx > 2.0f && ry > 2.0f) {
 		m_wsResizer = L"Simple averaging";
 	}
 
 	// resize width
-	hr = m_pD3DDev->SetTexture(0, pTexture);
+	hr = m_pD3DDevEx->SetTexture(0, pTexture);
 	if (rx > 2.0f) {
 		float fConstData[][4] = {{dx0, dy0, 0, 0}, {rx, 0, 0, 0}};
-		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDev->SetPixelShader(m_pResizerPixelShaders[shader_downscaling_x]);
+		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[shader_downscaling_x]);
 	}
 	else {
 		float fConstData[][4] = {{dx0, dy0, 0, 0}};
-		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDev->SetPixelShader(m_pResizerPixelShaders[iShader1]);
+		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader1]);
 	}
-	hr = TextureBlt(m_pD3DDev, vx, D3DTEXF_POINT);
+	hr = TextureBlt(m_pD3DDevEx, vx, D3DTEXF_POINT);
 
 	// restore current RenderTarget
-	hr = m_pD3DDev->SetRenderTarget(0, pRenderTarget);
+	hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
 
 	// resize height
-	hr = m_pD3DDev->SetTexture(0, m_pResizeTexture);
+	hr = m_pD3DDevEx->SetTexture(0, m_pResizeTexture);
 	if (ry > 2.0f) {
 		float fConstData[][4] = {{dx1, dy1, 0, 0}, {0, ry, 0, 0}};
-		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDev->SetPixelShader(m_pResizerPixelShaders[shader_downscaling_y]);
+		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[shader_downscaling_y]);
 	}
 	else {
 		float fConstData[][4] = {{dx1, dy1, 0, 0}};
-		hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDev->SetPixelShader(m_pResizerPixelShaders[iShader1 + 1]);
+		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader1 + 1]);
 	}
-	hr = TextureBlt(m_pD3DDev, vy, D3DTEXF_POINT);
+	hr = TextureBlt(m_pD3DDevEx, vy, D3DTEXF_POINT);
 
 	return hr;
 }
@@ -1309,7 +1309,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 
 	if (!m_pDitherTexture) {
 		// Create the dither texture
-		hr = m_pD3DDev->CreateTexture(DITHER_MATRIX_SIZE, DITHER_MATRIX_SIZE,
+		hr = m_pD3DDevEx->CreateTexture(DITHER_MATRIX_SIZE, DITHER_MATRIX_SIZE,
 									  1,
 									  D3DUSAGE_DYNAMIC,
 									  D3DFMT_A16B16G16R16F,
@@ -1370,7 +1370,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 		m_Lut3DSize = 64; // 64x64x64 LUT is enough for high-quality color management
 		m_Lut3DEntryCount = m_Lut3DSize * m_Lut3DSize * m_Lut3DSize;
 
-		hr = m_pD3DDev->CreateVolumeTexture(m_Lut3DSize, m_Lut3DSize, m_Lut3DSize,
+		hr = m_pD3DDevEx->CreateVolumeTexture(m_Lut3DSize, m_Lut3DSize, m_Lut3DSize,
 											1,
 											D3DUSAGE_DYNAMIC,
 											D3DFMT_A16B16G16R16F,
@@ -1705,50 +1705,50 @@ HRESULT CDX9RenderingEngine::FinalPass(IDirect3DTexture9* pTexture)
 		v[i].y -= 0.5f;
 	}
 
-	hr = m_pD3DDev->SetPixelShader(m_pFinalPixelShader);
+	hr = m_pD3DDevEx->SetPixelShader(m_pFinalPixelShader);
 
 	// Set sampler: image
-	hr = m_pD3DDev->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-	hr = m_pD3DDev->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-	hr = m_pD3DDev->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+	hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+	hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+	hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-	hr = m_pD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-	hr = m_pD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+	hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 
-	hr = m_pD3DDev->SetTexture(0, pTexture);
+	hr = m_pD3DDevEx->SetTexture(0, pTexture);
 
 	// Set sampler: ditherMap
-	hr = m_pD3DDev->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-	hr = m_pD3DDev->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-	hr = m_pD3DDev->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+	hr = m_pD3DDevEx->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+	hr = m_pD3DDevEx->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+	hr = m_pD3DDevEx->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-	hr = m_pD3DDev->SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
-	hr = m_pD3DDev->SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+	hr = m_pD3DDevEx->SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+	hr = m_pD3DDevEx->SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
 
-	hr = m_pD3DDev->SetTexture(1, m_pDitherTexture);
+	hr = m_pD3DDevEx->SetTexture(1, m_pDitherTexture);
 
 	if (m_bColorManagement) {
-		hr = m_pD3DDev->SetSamplerState(2, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-		hr = m_pD3DDev->SetSamplerState(2, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-		hr = m_pD3DDev->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+		hr = m_pD3DDevEx->SetSamplerState(2, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+		hr = m_pD3DDevEx->SetSamplerState(2, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+		hr = m_pD3DDevEx->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-		hr = m_pD3DDev->SetSamplerState(2, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-		hr = m_pD3DDev->SetSamplerState(2, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-		hr = m_pD3DDev->SetSamplerState(2, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);
+		hr = m_pD3DDevEx->SetSamplerState(2, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+		hr = m_pD3DDevEx->SetSamplerState(2, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+		hr = m_pD3DDevEx->SetSamplerState(2, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);
 
-		hr = m_pD3DDev->SetTexture(2, m_pLut3DTexture);
+		hr = m_pD3DDevEx->SetTexture(2, m_pLut3DTexture);
 	}
 
 	// Set constants
 	float fConstData[][4] = {{(float)w / DITHER_MATRIX_SIZE, (float)h / DITHER_MATRIX_SIZE, 0, 0}};
-	hr = m_pD3DDev->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 
-	hr = TextureBlt(m_pD3DDev, v, D3DTEXF_POINT);
+	hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_POINT);
 
-	hr = m_pD3DDev->SetTexture(1, NULL);
+	hr = m_pD3DDevEx->SetTexture(1, NULL);
 
 	if (m_bColorManagement) {
-		hr = m_pD3DDev->SetTexture(2, NULL);
+		hr = m_pD3DDevEx->SetTexture(2, NULL);
 	}
 
 	return hr;
@@ -1773,9 +1773,9 @@ HRESULT CDX9RenderingEngine::TextureCopy(IDirect3DTexture9* pTexture)
 		{    w,     h, 0.5f, 2.0f, 1, 1},
 	};
 
-	hr = m_pD3DDev->SetTexture(0, pTexture);
+	hr = m_pD3DDevEx->SetTexture(0, pTexture);
 
-	return TextureBlt(m_pD3DDev, v, D3DTEXF_POINT);
+	return TextureBlt(m_pD3DDevEx, v, D3DTEXF_POINT);
 }
 
 bool CDX9RenderingEngine::ClipToSurface(IDirect3DSurface9* pSurface, CRect& s, CRect& d)
@@ -1819,7 +1819,7 @@ bool CDX9RenderingEngine::ClipToSurface(IDirect3DSurface9* pSurface, CRect& s, C
 
 HRESULT CDX9RenderingEngine::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect)
 {
-	if (!m_pD3DDev) {
+	if (!m_pD3DDevEx) {
 		return E_POINTER;
 	}
 
@@ -1836,24 +1836,24 @@ HRESULT CDX9RenderingEngine::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_
 		v[i].y -= 0.5f;
 	}
 
-	HRESULT hr = m_pD3DDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	hr = m_pD3DDev->SetRenderState(D3DRS_LIGHTING, FALSE);
-	hr = m_pD3DDev->SetRenderState(D3DRS_ZENABLE, FALSE);
-	hr = m_pD3DDev->SetRenderState(D3DRS_STENCILENABLE, FALSE);
-	hr = m_pD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	hr = m_pD3DDev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	hr = m_pD3DDev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	HRESULT hr = m_pD3DDevEx->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_LIGHTING, FALSE);
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_ZENABLE, FALSE);
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	//D3DRS_COLORVERTEX
-	hr = m_pD3DDev->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-	hr = m_pD3DDev->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 
 
-	hr = m_pD3DDev->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA|D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA|D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
 
-	hr = m_pD3DDev->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX0 | D3DFVF_DIFFUSE);
+	hr = m_pD3DDevEx->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX0 | D3DFVF_DIFFUSE);
 	// hr = m_pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, v, sizeof(v[0]));
 	std::swap(v[2], v[3]);
-	hr = m_pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, v, sizeof(v[0]));
+	hr = m_pD3DDevEx->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, v, sizeof(v[0]));
 
 	return S_OK;
 }
@@ -1893,35 +1893,35 @@ HRESULT CDX9RenderingEngine::AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9*
 		pVertices[i].y -= 0.5f;
 	}
 
-	hr = m_pD3DDev->SetTexture(0, pTexture);
+	hr = m_pD3DDevEx->SetTexture(0, pTexture);
 
 	// GetRenderState fails for devices created with D3DCREATE_PUREDEVICE
 	// so we need to provide default values in case GetRenderState fails
 	DWORD abe, sb, db;
-	if (FAILED(m_pD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &abe)))
+	if (FAILED(m_pD3DDevEx->GetRenderState(D3DRS_ALPHABLENDENABLE, &abe)))
 		abe = FALSE;
-	if (FAILED(m_pD3DDev->GetRenderState(D3DRS_SRCBLEND, &sb)))
+	if (FAILED(m_pD3DDevEx->GetRenderState(D3DRS_SRCBLEND, &sb)))
 		sb = D3DBLEND_ONE;
-	if (FAILED(m_pD3DDev->GetRenderState(D3DRS_DESTBLEND, &db)))
+	if (FAILED(m_pD3DDevEx->GetRenderState(D3DRS_DESTBLEND, &db)))
 		db = D3DBLEND_ZERO;
 
-	hr = m_pD3DDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	hr = m_pD3DDev->SetRenderState(D3DRS_LIGHTING, FALSE);
-	hr = m_pD3DDev->SetRenderState(D3DRS_ZENABLE, FALSE);
-	hr = m_pD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	hr = m_pD3DDev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE); // pre-multiplied src and ...
-	hr = m_pD3DDev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_SRCALPHA); // ... inverse alpha channel for dst
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_LIGHTING, FALSE);
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_ZENABLE, FALSE);
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE); // pre-multiplied src and ...
+	hr = m_pD3DDevEx->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_SRCALPHA); // ... inverse alpha channel for dst
 
-	hr = m_pD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-	hr = m_pD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	hr = m_pD3DDev->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+	hr = m_pD3DDevEx->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+	hr = m_pD3DDevEx->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	hr = m_pD3DDevEx->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 
-	hr = m_pD3DDev->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-	hr = m_pD3DDev->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-	hr = m_pD3DDev->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+	hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+	hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+	hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-	hr = m_pD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-	hr = m_pD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+	hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	hr = m_pD3DDevEx->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 
 	/*//
 
@@ -1936,18 +1936,18 @@ HRESULT CDX9RenderingEngine::AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9*
 
 	*///
 
-	hr = m_pD3DDev->SetPixelShader(NULL);
+	hr = m_pD3DDevEx->SetPixelShader(NULL);
 
-	hr = m_pD3DDev->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
-	hr = m_pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, pVertices, sizeof(pVertices[0]));
+	hr = m_pD3DDevEx->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
+	hr = m_pD3DDevEx->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, pVertices, sizeof(pVertices[0]));
 
 	//
 
-	m_pD3DDev->SetTexture(0, NULL);
+	m_pD3DDevEx->SetTexture(0, NULL);
 
-	m_pD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, abe);
-	m_pD3DDev->SetRenderState(D3DRS_SRCBLEND, sb);
-	m_pD3DDev->SetRenderState(D3DRS_DESTBLEND, db);
+	m_pD3DDevEx->SetRenderState(D3DRS_ALPHABLENDENABLE, abe);
+	m_pD3DDevEx->SetRenderState(D3DRS_SRCBLEND, sb);
+	m_pD3DDevEx->SetRenderState(D3DRS_DESTBLEND, db);
 
 	return S_OK;
 }
@@ -1961,7 +1961,7 @@ HRESULT CDX9RenderingEngine::ClearCustomPixelShaders(int target)
 	} else {
 		return E_INVALIDARG;
 	}
-	m_pD3DDev->SetPixelShader(NULL);
+	m_pD3DDevEx->SetPixelShader(NULL);
 
 	return S_OK;
 }

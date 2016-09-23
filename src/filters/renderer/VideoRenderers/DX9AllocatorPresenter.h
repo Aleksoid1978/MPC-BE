@@ -74,8 +74,8 @@ namespace DSObjects
 		CComPtr<IDirectDraw> m_pDirectDraw;
 
 		void LockD3DDevice() {
-			if (m_pD3DDev) {
-				_RTL_CRITICAL_SECTION *pCritSec = (_RTL_CRITICAL_SECTION *)((size_t)m_pD3DDev.p + sizeof(size_t));
+			if (m_pD3DDevEx) {
+				_RTL_CRITICAL_SECTION *pCritSec = (_RTL_CRITICAL_SECTION *)((size_t)m_pD3DDevEx.p + sizeof(size_t));
 
 				if (!IsBadReadPtr(pCritSec, sizeof(*pCritSec)) && !IsBadWritePtr(pCritSec, sizeof(*pCritSec))
 						&& !IsBadReadPtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo))) && !IsBadWritePtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo)))) {
@@ -87,8 +87,8 @@ namespace DSObjects
 		}
 
 		void UnlockD3DDevice() {
-			if (m_pD3DDev) {
-				_RTL_CRITICAL_SECTION *pCritSec = (_RTL_CRITICAL_SECTION *)((size_t)m_pD3DDev.p + sizeof(size_t));
+			if (m_pD3DDevEx) {
+				_RTL_CRITICAL_SECTION *pCritSec = (_RTL_CRITICAL_SECTION *)((size_t)m_pD3DDevEx.p + sizeof(size_t));
 
 				if (!IsBadReadPtr(pCritSec, sizeof(*pCritSec)) && !IsBadWritePtr(pCritSec, sizeof(*pCritSec))
 						&& !IsBadReadPtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo))) && !IsBadWritePtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo)))) {

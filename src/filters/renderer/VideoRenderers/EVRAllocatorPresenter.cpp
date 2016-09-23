@@ -164,7 +164,7 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	// Init DXVA manager
 	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
 	if (SUCCEEDED(hr)) {
-		hr = m_pD3DManager->ResetDevice(m_pD3DDev, m_nResetToken);
+		hr = m_pD3DManager->ResetDevice(m_pD3DDevEx, m_nResetToken);
 		if (!SUCCEEDED(hr)) {
 			_Error += L"m_pD3DManager->ResetDevice() failed\n";
 		}
@@ -1008,11 +1008,11 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 			rcTearing.top		= 0;
 			rcTearing.right		= rcTearing.left + 4;
 			rcTearing.bottom	= m_nativeVideoSize.cy;
-			m_pD3DDev->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
+			m_pD3DDevEx->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
 
 			rcTearing.left		= (rcTearing.right + 15) % m_nativeVideoSize.cx;
 			rcTearing.right		= rcTearing.left + 4;
-			m_pD3DDev->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
+			m_pD3DDevEx->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
 			m_nTearingPos		= (m_nTearingPos + 7) % m_nativeVideoSize.cx;
 		}
 
@@ -1143,10 +1143,10 @@ STDMETHODIMP CEVRAllocatorPresenter::GetIdealVideoSize(SIZE *pszMin, SIZE *pszMa
 	}
 
 	if (pszMax) {
-		D3DDISPLAYMODE	d3ddm;
+		D3DDISPLAYMODE d3ddm;
 
 		ZeroMemory(&d3ddm, sizeof(d3ddm));
-		if (SUCCEEDED(m_pD3D->GetAdapterDisplayMode(GetAdapter(m_pD3D), &d3ddm))) {
+		if (SUCCEEDED(m_pD3DEx->GetAdapterDisplayMode(GetAdapter(m_pD3DEx), &d3ddm))) {
 			pszMax->cx	= d3ddm.Width;
 			pszMax->cy	= d3ddm.Height;
 		}
@@ -2192,7 +2192,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 				break;
 			case WAIT_TIMEOUT : {
 				// Do our stuff
-				if (m_pD3DDev && rs.m_AdvRendSets.bVSync) {
+				if (m_pD3DDevEx && rs.m_AdvRendSets.bVSync) {
 					if (m_nRenderState == Started) {
 						int VSyncPos = GetVBlackPos();
 						int WaitRange = max(m_ScreenSize.cy / 40, 5);
@@ -2333,7 +2333,7 @@ void CEVRAllocatorPresenter::OnResetDevice()
 	CAutoLock cRenderLock(&m_RenderLock);
 
 	// Reset DXVA Manager, and get new buffers
-	HRESULT hr = m_pD3DManager->ResetDevice(m_pD3DDev, m_nResetToken);
+	HRESULT hr = m_pD3DManager->ResetDevice(m_pD3DDevEx, m_nResetToken);
 
 	// Not necessary, but Microsoft documentation say Presenter should send this message...
 	if (m_pSink) {
