@@ -271,7 +271,7 @@ namespace GothSync
 
 		CSize m_ScreenSize;
 		int m_iRotation;	// Rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
-		bool m_bYCgCo;
+		DXVA2_ExtendedFormat m_inputExtFormat;
 		const wchar_t* m_wsResizer;
 
 		LONG m_lNextSampleWait; // Waiting time for next sample in EVR
