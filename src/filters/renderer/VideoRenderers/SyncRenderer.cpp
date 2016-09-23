@@ -1531,12 +1531,10 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 	m_pD3DDevEx->EndScene();
 
-	if (m_pD3DDevEx) {
-		if (m_bIsFullscreen) {
-			hr = m_pD3DDevEx->PresentEx(NULL, NULL, NULL, NULL, NULL);
-		} else {
-			hr = m_pD3DDevEx->PresentEx(rSrcPri, rDstPri, NULL, NULL, NULL);
-		}
+	if (m_bIsFullscreen) {
+		hr = m_pD3DDevEx->PresentEx(NULL, NULL, NULL, NULL, NULL);
+	} else {
+		hr = m_pD3DDevEx->PresentEx(rSrcPri, rDstPri, NULL, NULL, NULL);
 	}
 	if (FAILED(hr)) {
 		DLog(L"CBaseAP::Paint : Device lost or something");

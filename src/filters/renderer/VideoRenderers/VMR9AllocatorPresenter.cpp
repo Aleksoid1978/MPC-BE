@@ -61,8 +61,8 @@ HRESULT CVMR9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 
 	if (m_pIVMRSurfAllocNotify) {
-		HMONITOR hMonitor = m_pD3D->GetAdapterMonitor(m_CurrentAdapter);
-		if (FAILED(hr = m_pIVMRSurfAllocNotify->ChangeD3DDevice(m_pD3DDev, hMonitor))) {
+		HMONITOR hMonitor = m_pD3DEx->GetAdapterMonitor(m_CurrentAdapter);
+		if (FAILED(hr = m_pIVMRSurfAllocNotify->ChangeD3DDevice(m_pD3DDevEx, hMonitor))) {
 			_Error += L"m_pIVMRSurfAllocNotify->ChangeD3DDevice failed";
 			return hr; //return false;
 		}
@@ -188,13 +188,13 @@ STDMETHODIMP CVMR9AllocatorPresenter::InitializeDevice(DWORD_PTR dwUserID, VMR9A
 
 	if (!(lpAllocInfo->dwFlags & VMR9AllocFlag_TextureSurface)) {
 		// test if the colorspace is acceptable
-		if (FAILED(hr = m_pD3DDev->StretchRect(m_pSurfaces[0], NULL, m_pVideoSurface[m_nCurSurface], NULL, D3DTEXF_NONE))) {
+		if (FAILED(hr = m_pD3DDevEx->StretchRect(m_pSurfaces[0], NULL, m_pVideoSurface[m_nCurSurface], NULL, D3DTEXF_NONE))) {
 			DeleteSurfaces();
 			return E_FAIL;
 		}
 	}
 
-	hr = m_pD3DDev->ColorFill(m_pVideoSurface[m_nCurSurface], NULL, 0);
+	hr = m_pD3DDevEx->ColorFill(m_pVideoSurface[m_nCurSurface], NULL, 0);
 
 	if (m_nVMR9Surfaces && m_nVMR9Surfaces != (int)*lpNumBuffers) {
 		m_nVMR9Surfaces = *lpNumBuffers;
@@ -290,8 +290,8 @@ STDMETHODIMP CVMR9AllocatorPresenter::AdviseNotify(IVMRSurfaceAllocatorNotify9* 
 	m_pIVMRSurfAllocNotify = lpIVMRSurfAllocNotify;
 
 	HRESULT hr;
-	HMONITOR hMonitor = m_pD3D->GetAdapterMonitor(GetAdapter(m_pD3D));
-	if (FAILED(hr = m_pIVMRSurfAllocNotify->SetD3DDevice(m_pD3DDev, hMonitor))) {
+	HMONITOR hMonitor = m_pD3DEx->GetAdapterMonitor(GetAdapter(m_pD3DEx));
+	if (FAILED(hr = m_pIVMRSurfAllocNotify->SetD3DDevice(m_pD3DDevEx, hMonitor))) {
 		return hr;
 	}
 
@@ -303,7 +303,7 @@ STDMETHODIMP CVMR9AllocatorPresenter::AdviseNotify(IVMRSurfaceAllocatorNotify9* 
 STDMETHODIMP CVMR9AllocatorPresenter::StartPresenting(DWORD_PTR dwUserID)
 {
 	if (!m_bPendingResetDevice) {
-		ASSERT(m_pD3DDev);
+		ASSERT(m_pD3DDevEx);
 	}
 
 	CAutoLock cAutoLock(this);
@@ -318,7 +318,7 @@ STDMETHODIMP CVMR9AllocatorPresenter::StartPresenting(DWORD_PTR dwUserID)
 
 	m_bIsRendering = true;
 
-	return m_pD3DDev ? S_OK : E_FAIL;
+	return m_pD3DDevEx ? S_OK : E_FAIL;
 }
 
 STDMETHODIMP CVMR9AllocatorPresenter::StopPresenting(DWORD_PTR dwUserID)
@@ -385,7 +385,7 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 				m_pVideoTexture[m_nCurSurface] = pTexture;
 			}
 		} else {
-			m_pD3DDev->StretchRect(lpPresInfo->lpSurf, NULL, m_pVideoSurface[m_nCurSurface], NULL, D3DTEXF_NONE);
+			m_pD3DDevEx->StretchRect(lpPresInfo->lpSurf, NULL, m_pVideoSurface[m_nCurSurface], NULL, D3DTEXF_NONE);
 		}
 
 		// Tear test bars
@@ -396,11 +396,11 @@ STDMETHODIMP CVMR9AllocatorPresenter::PresentImage(DWORD_PTR dwUserID, VMR9Prese
 			rcTearing.top		= 0;
 			rcTearing.right		= rcTearing.left + 4;
 			rcTearing.bottom	= m_nativeVideoSize.cy;
-			m_pD3DDev->ColorFill (m_pVideoSurface[m_nCurSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
+			m_pD3DDevEx->ColorFill (m_pVideoSurface[m_nCurSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
 
 			rcTearing.left	= (rcTearing.right + 15) % m_nativeVideoSize.cx;
 			rcTearing.right	= rcTearing.left + 4;
-			m_pD3DDev->ColorFill (m_pVideoSurface[m_nCurSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
+			m_pD3DDevEx->ColorFill (m_pVideoSurface[m_nCurSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
 
 			m_nTearingPos = (m_nTearingPos + 7) % m_nativeVideoSize.cx;
 		}
