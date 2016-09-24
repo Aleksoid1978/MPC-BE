@@ -70,6 +70,7 @@ protected:
 	enum AVPixelFormat						m_PixelFormat;
 
 	BOOL									m_bInterlaced;
+	MPCStereoMode							m_iStereoMode;
 
 	// === FFMpeg variables
 	AVCodec*								m_pAVCodec;
@@ -232,7 +233,9 @@ public:
 
 	STDMETHODIMP_(GUID*) GetDXVADecoderGuid();
 	STDMETHODIMP_(int) GetColorSpaceConversion();
-	STDMETHODIMP GetOutputMediaType(CMediaType* pmt);
+
+	STDMETHODIMP SetStereoMode(int nValue);
+	STDMETHODIMP_(int) GetStereoMode();
 
 	// === common functions
 	BOOL						IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);

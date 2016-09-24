@@ -987,6 +987,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bHEVC10bit(FALSE)
 	, m_dRate(1.0)
 	, m_pMSDKDecoder(NULL)
+	, m_iStereoMode(STEREO_Auto)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -3556,12 +3557,20 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetColorSpaceConversion()
 	return 0; // YUV->YUV or RGB->RGB conversion
 }
 
-STDMETHODIMP CMPCVideoDecFilter::GetOutputMediaType(CMediaType* pmt)
+STDMETHODIMP CMPCVideoDecFilter::SetStereoMode(int nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	CopyMediaType(pmt, &m_pOutput->CurrentMediaType());
-
+	if (nValue < 0 || nValue > STEREO_TopBottom) {
+		return E_INVALIDARG;
+	}
+	m_iStereoMode = (MPCStereoMode)nValue;
 	return S_OK;
+}
+
+STDMETHODIMP_(int) CMPCVideoDecFilter::GetStereoMode()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_iStereoMode;
 }
 
 STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
