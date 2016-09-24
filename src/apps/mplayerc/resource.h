@@ -378,6 +378,10 @@
 #define ID_SUB_POS_LEFT                 1102
 #define ID_SUB_POS_RIGHT                1103
 #define ID_SUB_POS_RESTORE              1104
+#define ID_STEREO3D_AUTO                1110
+#define ID_STEREO3D_MONO                1111
+#define ID_STEREO3D_HALFOVERUNDER       1112
+#define ID_STEREO3D_INTERLACED
 //
 #define ID_FILTERS_SUBITEM_START        2000
 #define ID_FILTERS_SUBITEM_END          2099
