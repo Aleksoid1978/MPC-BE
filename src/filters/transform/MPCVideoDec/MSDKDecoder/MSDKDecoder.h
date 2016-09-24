@@ -120,6 +120,8 @@ private:
   MediaSideData3DOffset m_PrevOffset;
 
   CMPCVideoDecFilter   *m_pFilter;
+
+  CCritSec              m_csFrame;
   AVFrame              *m_pFrame = nullptr;
 
   MPCStereoMode         m_iStereoMode;
