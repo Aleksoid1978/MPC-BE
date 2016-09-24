@@ -1500,6 +1500,12 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "Reset\tNumpad 5",             ID_VIEW_RESET
         END
+        POPUP "Stereo 3D Mode"
+        BEGIN
+            MENUITEM "Auto",                        ID_STEREO3D_AUTO
+            MENUITEM "Mono",                        ID_STEREO3D_MONO
+            MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
+        END
         MENUITEM SEPARATOR
         POPUP "On Top"
         BEGIN
