@@ -544,7 +544,8 @@ HRESULT CMSDKDecoder::HandleOutput(MVCBuffer * pOutputBuffer)
 
 HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraView)
 {
-  //TODO: add lock here
+  CAutoLock lock(&m_csFrame);
+
   mfxStatus sts = MFX_ERR_NONE;
 
   ASSERT(pBaseView->surface.Info.FrameId.ViewId == 0 && pExtraView->surface.Info.FrameId.ViewId > 0);
@@ -975,11 +976,9 @@ void CMSDKDecoder::ReleaseBuffer(mfxFrameSurface1 * pSurface)
 
 void CMSDKDecoder::SetStereoMode(MPCStereoMode mode)
 {
-	//TODO: add lock here
-	if (mode != m_iStereoMode) {
-		if (mode == STEREO_TopBottom) {
-			av_frame_free(&m_pFrame);
-		}
-		m_iStereoMode = mode;
-	}
+  CAutoLock lock(&m_csFrame);
+  if (mode != m_iStereoMode) {
+    av_frame_free(&m_pFrame);
+    m_iStereoMode = mode;
+  }
 }
