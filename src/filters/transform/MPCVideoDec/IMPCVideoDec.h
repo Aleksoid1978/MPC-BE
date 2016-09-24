@@ -105,12 +105,6 @@ enum MPCInfo {
 	INFO_GraphicsAdapter
 };
 
-enum MPCStereoMode {
-	STEREO_Auto = 0,
-	STEREO_Mono,     // force mono frame (left)
-	STEREO_TopBottom // convert to stereoscopic half height anamorphic video
-};
-
 interface __declspec(uuid("CDC3B5B3-A8B0-4c70-A805-9FC80CDEF262"))
 IMPCVideoDecFilter :
 public IUnknown {

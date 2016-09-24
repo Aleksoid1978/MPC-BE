@@ -70,7 +70,6 @@ protected:
 	enum AVPixelFormat						m_PixelFormat;
 
 	BOOL									m_bInterlaced;
-	MPCStereoMode							m_iStereoMode;
 
 	// === FFMpeg variables
 	AVCodec*								m_pAVCodec;
