@@ -127,6 +127,7 @@ private:
 
 CMSDKDecoder::CMSDKDecoder(CMPCVideoDecFilter* pFilter)
   : m_pFilter(pFilter)
+  , m_iStereoMode(STEREO_Auto)
 {
 }
 
@@ -287,9 +288,6 @@ HRESULT CMSDKDecoder::InitDecoder(const CMediaType *pmt)
         return hr;
     }
   }
-
-  m_pFrame = av_frame_alloc();
-  CheckPointer(m_pFrame, E_POINTER);
 
   return S_OK;
 }
@@ -575,15 +573,29 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
 
   m_pFilter->UpdateFrameTime(rtStart, rtStop);
 
-  const int width = pBaseView->surface.Info.CropW;
+  const int width  = pBaseView->surface.Info.CropW;
   const int height = pBaseView->surface.Info.CropH;
 
-  auto allocateFrame = [&](bool bMain) {
+  if (m_pFrame && (m_pFrame->width != width || m_pFrame->height != height)) {
+    av_frame_free(&m_pFrame);
+  }
+
+  if (!m_pFrame) {
+    m_pFrame = av_frame_alloc();
+    CheckPointer(m_pFrame, E_POINTER);
+
     m_pFrame->format      = AV_PIX_FMT_NV12;
     m_pFrame->width       = width;
     m_pFrame->height      = height;
     m_pFrame->colorspace  = AVCOL_SPC_UNSPECIFIED;
     m_pFrame->color_range = AVCOL_RANGE_UNSPECIFIED;
+
+    if (m_iStereoMode == STEREO_TopBottom) {
+      av_frame_get_buffer(m_pFrame, 64);
+    }
+  }
+
+  auto allocateFrame = [&](bool bMain) {
     if (bMain) {
       m_pFrame->data[0]   = pBaseView->surface.Data.Y;
       m_pFrame->data[1]   = pBaseView->surface.Data.UV;
@@ -602,7 +614,7 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
   if (rtStart >= 0
       && SUCCEEDED(hr = m_pFilter->GetDeliveryBuffer(width, height, &pOut, m_pFilter->GetFrameDuration()))
       && SUCCEEDED(hr = pOut->GetPointer(&pDataOut))) {
-    {
+    if (m_iStereoMode != STEREO_Auto) {
       // Write the second view into IMediaSample3D, if available
       CComPtr<IMediaSample3D> pSample3D;
       if (SUCCEEDED(hr = pOut->QueryInterface(&pSample3D))) {
@@ -615,7 +627,45 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       }
     }
 
-    allocateFrame(true);
+    if (m_iStereoMode == STEREO_TopBottom) {
+      const unsigned lines = FFALIGN(m_mfxVideoParams.mfx.FrameInfo.Height, 64);
+      const size_t linesize = pBaseView->surface.Data.PitchLow;
+
+      uint8_t* dstY = m_pFrame->data[0];
+      uint8_t* dstUV = m_pFrame->data[1];
+
+      // luminance
+      auto dst = dstY;
+      auto src = pBaseView->surface.Data.Y;
+      for (unsigned i = 0; i < lines / 2; i++) {
+        memcpy(dst, src, linesize);
+        dst += linesize;
+        src += linesize * 2;
+      }
+      src = pExtraView->surface.Data.Y + linesize;
+      for (unsigned i = 0; i < lines / 2; i++) {
+        memcpy(dst, src, linesize);
+        dst += linesize;
+        src += linesize * 2;
+      }
+      // color
+      dst = dstUV;
+      src = pBaseView->surface.Data.UV;
+      for (unsigned i = 0; i < lines / 4; i++) {
+        memcpy(dst, src, linesize);
+        dst += linesize;
+        src += linesize * 2;
+      }
+      src = pExtraView->surface.Data.UV + linesize;
+      for (unsigned i = 0; i < lines / 4; i++) {
+        memcpy(dst, src, linesize);
+        dst += linesize;
+        src += linesize * 2;
+      }
+    }
+    else {
+      allocateFrame(true);
+    }
 
     m_pFilter->m_FormatConverter.Converting(pDataOut, m_pFrame);
 

@@ -987,7 +987,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bHEVC10bit(FALSE)
 	, m_dRate(1.0)
 	, m_pMSDKDecoder(NULL)
-	, m_iStereoMode(STEREO_Auto)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -3563,14 +3562,21 @@ STDMETHODIMP CMPCVideoDecFilter::SetStereoMode(int nValue)
 	if (nValue < 0 || nValue > STEREO_TopBottom) {
 		return E_INVALIDARG;
 	}
-	m_iStereoMode = (MPCStereoMode)nValue;
+	if (!m_pMSDKDecoder) {
+		return E_ABORT;
+	}
+
+	m_pMSDKDecoder->SetStereoMode((MPCStereoMode)nValue);
 	return S_OK;
 }
 
 STDMETHODIMP_(int) CMPCVideoDecFilter::GetStereoMode()
 {
 	CAutoLock cAutoLock(&m_csProps);
-	return m_iStereoMode;
+	if (!m_pMSDKDecoder) {
+		return E_ABORT;
+	}
+	return m_pMSDKDecoder->GetStereoMode();
 }
 
 STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
