@@ -544,6 +544,7 @@ HRESULT CMSDKDecoder::HandleOutput(MVCBuffer * pOutputBuffer)
 
 HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraView)
 {
+  //TODO: add lock here
   mfxStatus sts = MFX_ERR_NONE;
 
   ASSERT(pBaseView->surface.Info.FrameId.ViewId == 0 && pExtraView->surface.Info.FrameId.ViewId > 0);
@@ -631,11 +632,8 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       const unsigned lines = FFALIGN(m_mfxVideoParams.mfx.FrameInfo.Height, 64);
       const size_t linesize = pBaseView->surface.Data.PitchLow;
 
-      uint8_t* dstY = m_pFrame->data[0];
-      uint8_t* dstUV = m_pFrame->data[1];
-
       // luminance
-      auto dst = dstY;
+      auto dst = m_pFrame->data[0];
       auto src = pBaseView->surface.Data.Y;
       for (unsigned i = 0; i < lines / 2; i++) {
         memcpy(dst, src, linesize);
@@ -649,7 +647,7 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
         src += linesize * 2;
       }
       // color
-      dst = dstUV;
+      dst = m_pFrame->data[1];
       src = pBaseView->surface.Data.UV;
       for (unsigned i = 0; i < lines / 4; i++) {
         memcpy(dst, src, linesize);
@@ -973,4 +971,15 @@ void CMSDKDecoder::ReleaseBuffer(mfxFrameSurface1 * pSurface)
     pBuffer->queued = 0;
     pBuffer->sync = nullptr;
   }
+}
+
+void CMSDKDecoder::SetStereoMode(MPCStereoMode mode)
+{
+	//TODO: add lock here
+	if (mode != m_iStereoMode) {
+		if (mode == STEREO_TopBottom) {
+			av_frame_free(&m_pFrame);
+		}
+		m_iStereoMode = mode;
+	}
 }

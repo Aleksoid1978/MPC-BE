@@ -73,7 +73,7 @@ public:
   void Flush();
   HRESULT EndOfStream();
 
-  void SetStereoMode(MPCStereoMode mode) { m_iStereoMode = mode; }
+  void SetStereoMode(MPCStereoMode mode);
   MPCStereoMode GetStereoMode() { return m_iStereoMode; }
 
 private:
