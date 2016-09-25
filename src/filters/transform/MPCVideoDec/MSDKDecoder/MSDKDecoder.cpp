@@ -577,25 +577,6 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
   const int width  = pBaseView->surface.Info.CropW;
   const int height = pBaseView->surface.Info.CropH;
 
-  if (m_pFrame && (m_pFrame->width != width || m_pFrame->height != height)) {
-    av_frame_free(&m_pFrame);
-  }
-
-  if (!m_pFrame) {
-    m_pFrame = av_frame_alloc();
-    CheckPointer(m_pFrame, E_POINTER);
-
-    m_pFrame->format      = AV_PIX_FMT_NV12;
-    m_pFrame->width       = width;
-    m_pFrame->height      = height;
-    m_pFrame->colorspace  = AVCOL_SPC_UNSPECIFIED;
-    m_pFrame->color_range = AVCOL_RANGE_UNSPECIFIED;
-
-    if (m_iStereoMode == STEREO_TopBottom) {
-      av_frame_get_buffer(m_pFrame, 64);
-    }
-  }
-
   auto allocateFrame = [&](bool bMain) {
     if (bMain) {
       m_pFrame->data[0]   = pBaseView->surface.Data.Y;
@@ -612,15 +593,36 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
   BYTE* pDataOut = nullptr;
 
   HRESULT hr = S_OK;
+
+  if (m_pFrame && (m_pFrame->width != width || m_pFrame->height != height)) {
+    av_frame_free(&m_pFrame);
+  }
+
+  if (!m_pFrame) {
+    m_pFrame = av_frame_alloc();
+    if (!m_pFrame) {
+      hr = E_POINTER;
+      goto error;
+    }
+
+    m_pFrame->format      = AV_PIX_FMT_NV12;
+    m_pFrame->width       = width;
+    m_pFrame->height      = height;
+    m_pFrame->colorspace  = AVCOL_SPC_UNSPECIFIED;
+    m_pFrame->color_range = AVCOL_RANGE_UNSPECIFIED;
+  }
+
   if (rtStart >= 0
       && SUCCEEDED(hr = m_pFilter->GetDeliveryBuffer(width, height, &pOut, m_pFilter->GetFrameDuration()))
       && SUCCEEDED(hr = pOut->GetPointer(&pDataOut))) {
+    bool bMediaSample3DSupport = false;
     if (m_iStereoMode == STEREO_Auto) {
       // Write the second view into IMediaSample3D, if available
       CComPtr<IMediaSample3D> pSample3D;
       if (SUCCEEDED(hr = pOut->QueryInterface(&pSample3D))) {
         BYTE *pDataOut3D = nullptr;
         if (SUCCEEDED(pSample3D->Enable3D()) && SUCCEEDED(pSample3D->GetPointer3D(&pDataOut3D))) {
+          bMediaSample3DSupport = true;
           allocateFrame(false);
 
           m_pFilter->m_FormatConverter.Converting(pDataOut3D, m_pFrame);
@@ -628,7 +630,13 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       }
     }
 
-    if (m_iStereoMode == STEREO_TopBottom) {
+    if (m_iStereoMode == STEREO_TopBottom
+        || (m_iStereoMode == STEREO_Auto && !bMediaSample3DSupport)) {
+      if (!m_pFrame->data[0] && av_frame_get_buffer(m_pFrame, 64) < 0) {
+        hr = E_POINTER;
+        goto error;
+      }
+
       const unsigned lines = FFALIGN(m_mfxVideoParams.mfx.FrameInfo.Height, 64);
       const size_t linesize = pBaseView->surface.Data.PitchLow;
 
@@ -677,6 +685,7 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
     hr = m_pFilter->m_pOutput->Deliver(pOut);
   }
 
+error:
   {
     MVCBuffer * pStoredBuffer = FindBuffer(&pBaseView->surface);
     if (pStoredBuffer) {
@@ -694,7 +703,8 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       SAFE_DELETE(pExtraView);
     }
   }
-  return S_OK;
+
+  return hr;
 }
 
 void CMSDKDecoder::Flush()
