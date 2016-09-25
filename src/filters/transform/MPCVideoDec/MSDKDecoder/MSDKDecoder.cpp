@@ -641,38 +641,40 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       }
 
       const unsigned lines = FFALIGN(m_mfxVideoParams.mfx.FrameInfo.Height, 64);
+      const unsigned half_lines = lines >> 1;
+      const unsigned half_chromalines = half_lines >> 1;
       const size_t linesize = pBaseView->surface.Data.PitchLow;
 
       // luminance
-      auto dst = m_pFrame->data[0];
-      auto src = pBaseView->surface.Data.Y;
-      for (unsigned i = 0; i < lines / 2; i++) {
-        memcpy(dst, src, linesize);
-        dst += linesize;
-        src += linesize * 2;
+      auto dstBase  = m_pFrame->data[0];
+      auto srcBase  = pBaseView->surface.Data.Y;
+      auto dstExtra = dstBase + (half_lines - 1) * linesize;
+      auto srcExtra = pExtraView->surface.Data.Y + linesize;
+      for (unsigned i = 0; i < half_lines; i++) {
+        memcpy(dstBase, srcBase, linesize);
+        dstBase += linesize;
+        srcBase += linesize * 2;
+
+        memcpy(dstExtra, srcExtra, linesize);
+        dstExtra += linesize;
+        srcExtra += linesize * 2;
       }
-      src = pExtraView->surface.Data.Y + linesize;
-      for (unsigned i = 0; i < lines / 2; i++) {
-        memcpy(dst, src, linesize);
-        dst += linesize;
-        src += linesize * 2;
-      }
+
       // color
-      dst = m_pFrame->data[1];
-      src = pBaseView->surface.Data.UV;
-      for (unsigned i = 0; i < lines / 4; i++) {
-        memcpy(dst, src, linesize);
-        dst += linesize;
-        src += linesize * 2;
+      dstBase  = m_pFrame->data[1];
+      srcBase  = pBaseView->surface.Data.UV;
+      dstExtra = dstBase + (half_chromalines - 1) * linesize;
+      srcExtra = pExtraView->surface.Data.UV + linesize;
+      for (unsigned i = 0; i < half_chromalines; i++) {
+        memcpy(dstBase, srcBase, linesize);
+        dstBase += linesize;
+        srcBase += linesize * 2;
+
+        memcpy(dstExtra, srcExtra, linesize);
+        dstExtra += linesize;
+        srcExtra += linesize * 2;
       }
-      src = pExtraView->surface.Data.UV + linesize;
-      for (unsigned i = 0; i < lines / 4; i++) {
-        memcpy(dst, src, linesize);
-        dst += linesize;
-        src += linesize * 2;
-      }
-    }
-    else {
+    } else {
       allocateFrame(true);
     }
 
