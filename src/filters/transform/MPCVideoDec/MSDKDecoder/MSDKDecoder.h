@@ -51,9 +51,9 @@ typedef struct _MVCGOP {
 } MVCGOP;
 
 enum MPCStereoMode {
-	STEREO_Auto = 0,
-	STEREO_Mono,     // force mono frame (left)
-	STEREO_TopBottom // convert to stereoscopic half height anamorphic video
+  STEREO_Auto = 0,
+  STEREO_Mono,     // force mono frame (left)
+  STEREO_TopBottom // convert to stereoscopic half height anamorphic video
 };
 
 class CMPCVideoDecFilter;
@@ -124,5 +124,5 @@ private:
   CCritSec              m_csFrame;
   AVFrame              *m_pFrame = nullptr;
 
-  MPCStereoMode         m_iStereoMode;
+  MPCStereoMode         m_iStereoMode = STEREO_Auto;
 };
