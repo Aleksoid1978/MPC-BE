@@ -121,8 +121,8 @@ private:
 
   CMPCVideoDecFilter   *m_pFilter;
 
-  CCritSec              m_csFrame;
   AVFrame              *m_pFrame = nullptr;
 
   MPCStereoMode         m_iStereoMode = STEREO_Auto;
+  MPCStereoMode         m_iNewStereoMode = STEREO_Auto;
 };
