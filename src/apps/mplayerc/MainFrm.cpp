@@ -371,6 +371,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_ASPECTRATIO_START, ID_ASPECTRATIO_END, OnUpdateViewAspectRatio)
 	ON_COMMAND(ID_ASPECTRATIO_NEXT, OnViewAspectRatioNext)
 	ON_COMMAND_RANGE(ID_STEREO3D_AUTO, ID_STEREO3D_HALFOVERUNDER, OnViewStereo3DMode)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_STEREO3D_AUTO, ID_STEREO3D_HALFOVERUNDER, OnUpdateViewStereo3DMode)
 	ON_COMMAND_RANGE(ID_ONTOP_NEVER, ID_ONTOP_WHILEPLAYINGVIDEO, OnViewOntop)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_ONTOP_NEVER, ID_ONTOP_WHILEPLAYINGVIDEO, OnUpdateViewOntop)
 	ON_COMMAND(ID_VIEW_OPTIONS, OnViewOptions)
@@ -7476,17 +7477,22 @@ void CMainFrame::OnViewAspectRatioNext()
 
 void CMainFrame::OnViewStereo3DMode(UINT nID)
 {
-	if (m_eMediaLoadState != MLS_LOADED) {
-		return;
-	}
+	int mode = nID - ID_STEREO3D_AUTO;
+	AfxGetAppSettings().iStereoMode = mode;
 
 	IFilterGraph* pFG = m_pGB;
 	if (pFG) {
 		CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), pFG);
 		if (pVDF) {
-			int mode = nID - ID_STEREO3D_AUTO;
 			pVDF->SetStereoMode(mode);
 		}
+	}
+}
+
+void CMainFrame::OnUpdateViewStereo3DMode(CCmdUI* pCmdUI)
+{
+	if (AfxGetAppSettings().iStereoMode == (pCmdUI->m_nID - ID_STEREO3D_AUTO)) {
+		CheckMenuRadioItem(ID_STEREO3D_AUTO, ID_STEREO3D_HALFOVERUNDER, pCmdUI->m_nID);
 	}
 }
 
