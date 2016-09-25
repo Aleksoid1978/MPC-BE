@@ -2780,6 +2780,10 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 		pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64 * s.iAudioTimeShift : 0);
 	}
 
+	if (CComQIPtr<IMPCVideoDecFilter> pVDF = pBF) {
+		pVDF->SetStereoMode(s.iStereoMode);
+	}
+
 	return hr;
 }
 

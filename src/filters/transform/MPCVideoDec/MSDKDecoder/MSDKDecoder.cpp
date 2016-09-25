@@ -128,6 +128,7 @@ private:
 CMSDKDecoder::CMSDKDecoder(CMPCVideoDecFilter* pFilter)
   : m_pFilter(pFilter)
 {
+  m_iStereoMode = m_iNewStereoMode = m_pFilter->m_iStereoMode;
 }
 
 CMSDKDecoder::~CMSDKDecoder()

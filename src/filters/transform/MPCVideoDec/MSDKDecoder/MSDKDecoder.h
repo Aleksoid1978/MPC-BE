@@ -74,7 +74,6 @@ public:
   HRESULT EndOfStream();
 
   void SetStereoMode(MPCStereoMode mode);
-  MPCStereoMode GetStereoMode() { return m_iStereoMode; }
 
 private:
   void DestroyDecoder(bool bFull);
