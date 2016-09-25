@@ -127,7 +127,6 @@ private:
 
 CMSDKDecoder::CMSDKDecoder(CMPCVideoDecFilter* pFilter)
   : m_pFilter(pFilter)
-  , m_iStereoMode(STEREO_Auto)
 {
 }
 
@@ -616,7 +615,7 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
   if (rtStart >= 0
       && SUCCEEDED(hr = m_pFilter->GetDeliveryBuffer(width, height, &pOut, m_pFilter->GetFrameDuration()))
       && SUCCEEDED(hr = pOut->GetPointer(&pDataOut))) {
-    if (m_iStereoMode != STEREO_Auto) {
+    if (m_iStereoMode == STEREO_Auto) {
       // Write the second view into IMediaSample3D, if available
       CComPtr<IMediaSample3D> pSample3D;
       if (SUCCEEDED(hr = pOut->QueryInterface(&pSample3D))) {
