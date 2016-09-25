@@ -623,6 +623,7 @@ public:
 	CString			strSecondAudioRendererDisplayName;
 
 	bool			fD3DFullscreen;
+	int				iStereoMode;
 
 	// Color control
 	int				iBrightness;

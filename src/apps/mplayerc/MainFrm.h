@@ -1047,6 +1047,7 @@ public:
 	afx_msg void OnUpdateViewAspectRatio(CCmdUI* pCmdUI);
 	afx_msg void OnViewAspectRatioNext();
 	afx_msg void OnViewStereo3DMode(UINT nID);
+	afx_msg void OnUpdateViewStereo3DMode(CCmdUI* pCmdUI);
 	afx_msg void OnViewOntop(UINT nID);
 	afx_msg void OnUpdateViewOntop(CCmdUI* pCmdUI);
 	afx_msg void OnViewOptions();
