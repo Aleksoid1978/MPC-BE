@@ -2353,7 +2353,7 @@ BEGIN
     IDS_AG_NOT_KNOWN        "Not known"
     IDS_UNDETERMINED        "Undetermined"
     IDS_MPLAYERC_0          "Quick Open File"
-    IDS_AG_OPEN_FILE        "Open File"
+    IDS_AG_OPEN_FILE        "Open File/URL"
 END
 
 STRINGTABLE
