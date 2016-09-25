@@ -142,6 +142,7 @@ protected:
 	BOOL									m_bHEVC10bit;
 
 	CMSDKDecoder*							m_pMSDKDecoder;
+	MPCStereoMode							m_iStereoMode;
 
 	// === Private functions
 	void			Cleanup();
