@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="halfoverunder_to_interlace.hlsl" />
     <FxCompile Include="YCgCo_correction.hlsl" />
     <None Include="OnePassResizers\resizer_bicubic06.hlsl">
       <FileType>Document</FileType>

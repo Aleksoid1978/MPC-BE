@@ -665,7 +665,7 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, fD3DFullscreen);
 	//pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, fMonitorAutoRefreshRate);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3DMODE, iStereoMode);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3DMODE, iStereo3DMode);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_BRIGHTNESS, iBrightness);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_CONTRAST, iContrast);
@@ -1433,7 +1433,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	fD3DFullscreen	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, FALSE);
 	//fMonitorAutoRefreshRate	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, FALSE);
-	iStereoMode		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3DMODE, 0);
+	iStereo3DMode	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3DMODE, 0);
+	if (iStereo3DMode == 3) {
+		GetRenderersData()->m_iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
+	}
 
 	iBrightness		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_BRIGHTNESS, 0);
 	iContrast		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_CONTRAST, 0);
