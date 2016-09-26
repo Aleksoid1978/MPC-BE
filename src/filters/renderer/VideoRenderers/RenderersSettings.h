@@ -93,6 +93,11 @@ enum {
 	SUBPIC_STEREO_TOPANDBOTTOM,
 };
 
+enum {
+	STEREO3D_AsIs = 0,
+	STEREO3D_HalfOverUnder_to_Interlace,
+};
+
 class CRenderersSettings
 {
 
@@ -171,6 +176,7 @@ public:
 	bool		m_bTearingTest;
 	int			m_iDisplayStats;
 	bool		m_bResetStats; // Set to reset the presentation statistics
+	int			m_iStereo3DTransform;
 
 	// Hardware feature support
 	bool		m_bFP16Support;
