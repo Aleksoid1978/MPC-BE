@@ -38,6 +38,8 @@ extern "C" {
 #include "ByteParser.h"
 
 #include "../MPCVideoDec.h"
+#include "../pixconv_sse2_templates.h"
+#include <intrin.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Bitstream buffering
@@ -129,6 +131,13 @@ CMSDKDecoder::CMSDKDecoder(CMPCVideoDecFilter* pFilter)
   : m_pFilter(pFilter)
 {
   m_iStereoMode = m_iNewStereoMode = m_pFilter->m_iStereoMode;
+
+  int info[4] = { 0 };
+  __cpuid(info, 0);
+  if (info[0] >= 1) {
+    __cpuid(info, 0x00000001);
+    m_bSSE2 = (info[3] & (1 << 26)) != 0;
+  }
 }
 
 CMSDKDecoder::~CMSDKDecoder()
@@ -645,20 +654,33 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       const unsigned half_lines = lines >> 1;
       const unsigned half_chromalines = half_lines >> 1;
       const size_t linesize = pBaseView->surface.Data.PitchLow;
+      unsigned line;
 
       // luminance
       auto dstBase  = m_pFrame->data[0];
       auto srcBase  = pBaseView->surface.Data.Y;
       auto dstExtra = dstBase + (half_lines - 1) * linesize;
       auto srcExtra = pExtraView->surface.Data.Y + linesize;
-      for (unsigned i = 0; i < half_lines; i++) {
-        memcpy(dstBase, srcBase, linesize);
-        dstBase += linesize;
-        srcBase += linesize * 2;
+      if (m_bSSE2 && ((size_t)dstBase % 16u) == 0 && ((size_t)dstExtra % 16u) == 0 && (linesize % 16u) == 0) {
+        for (line = 0; line < half_lines; line++) {
+          PIXCONV_MEMCPY_ALIGNED_TWO(dstBase, srcBase, dstExtra, srcExtra, (ptrdiff_t)linesize)
+      
+          dstBase += linesize;
+          srcBase += linesize * 2;
 
-        memcpy(dstExtra, srcExtra, linesize);
-        dstExtra += linesize;
-        srcExtra += linesize * 2;
+          dstExtra += linesize;
+          srcExtra += linesize * 2;
+        }
+      } else {
+        for (line = 0; line < half_lines; line++) {
+          memcpy(dstBase, srcBase, linesize);
+          dstBase += linesize;
+          srcBase += linesize * 2;
+
+          memcpy(dstExtra, srcExtra, linesize);
+          dstExtra += linesize;
+          srcExtra += linesize * 2;
+        }
       }
 
       // color
@@ -666,14 +688,26 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       srcBase  = pBaseView->surface.Data.UV;
       dstExtra = dstBase + (half_chromalines - 1) * linesize;
       srcExtra = pExtraView->surface.Data.UV + linesize;
-      for (unsigned i = 0; i < half_chromalines; i++) {
-        memcpy(dstBase, srcBase, linesize);
-        dstBase += linesize;
-        srcBase += linesize * 2;
+      if (m_bSSE2 && ((size_t)dstBase % 16u) == 0 && ((size_t)dstExtra % 16u) == 0 && (linesize % 16u) == 0) {
+        for (line = 0; line < half_chromalines; line++) {
+          PIXCONV_MEMCPY_ALIGNED_TWO(dstBase, srcBase, dstExtra, srcExtra, (ptrdiff_t)linesize);
 
-        memcpy(dstExtra, srcExtra, linesize);
-        dstExtra += linesize;
-        srcExtra += linesize * 2;
+          dstBase += linesize;
+          srcBase += linesize * 2;
+
+          dstExtra += linesize;
+          srcExtra += linesize * 2;
+        }
+      } else {
+        for (line = 0; line < half_chromalines; line++) {
+          memcpy(dstBase, srcBase, linesize);
+          dstBase += linesize;
+          srcBase += linesize * 2;
+
+          memcpy(dstExtra, srcExtra, linesize);
+          dstExtra += linesize;
+          srcExtra += linesize * 2;
+        }
       }
     } else {
       allocateFrame(true);

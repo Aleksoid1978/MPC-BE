@@ -124,4 +124,6 @@ private:
 
   MPCStereoMode         m_iStereoMode = STEREO_Auto;
   MPCStereoMode         m_iNewStereoMode = STEREO_Auto;
+
+  bool                  m_bSSE2 = false;
 };
