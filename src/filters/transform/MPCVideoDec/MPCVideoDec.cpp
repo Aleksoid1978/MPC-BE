@@ -1846,6 +1846,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	const int depth = GetLumaBits(m_pAVCtx->pix_fmt);
 	m_bHEVC10bit = (m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10 && depth == 10);
 
+	m_dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
+
 	if (bChangeType && IsDXVASupported()) {
 		do {
 			m_bDXVACompatible = false;
@@ -2530,6 +2532,13 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 		fmt.NominalRange = DXVA2_NominalRange_0_255;
 	} else {
 		fmt.NominalRange = DXVA2_NominalRange_16_235;
+	}
+
+	// HACK: 1280 is the value when only chroma location is set to MPEG2, do not bother to send this information, as its the same for basically every clip
+	if ((fmt.value & ~0xff) != 0 && (fmt.value & ~0xff) != 1280) {
+		fmt.SampleFormat = AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT;
+	} else {
+		fmt.value = 0;
 	}
 
 	return fmt;
