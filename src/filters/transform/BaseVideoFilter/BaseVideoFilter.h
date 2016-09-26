@@ -65,6 +65,7 @@ protected:
 	int m_w, m_h, m_arx, m_ary;
 
 	DECODER_MODE m_nDecoderMode;
+	DXVA2_ExtendedFormat m_dxvaExtFormat;
 
 	HRESULT GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFormat = NULL);
 	HRESULT CopyBuffer(BYTE* pOut, BYTE* pIn, int w, int h, int pitchIn, const GUID& subtype, bool fInterlaced = false);

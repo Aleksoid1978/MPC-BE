@@ -85,6 +85,8 @@ CBaseVideoFilter::CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, 
 	m_hout = m_hin = m_h = 0;
 	m_arxout = m_arxin = m_arx = 0;
 	m_aryout = m_aryin = m_ary = 0;
+
+	m_dxvaExtFormat.value = 0;
 }
 
 CBaseVideoFilter::~CBaseVideoFilter()
@@ -229,28 +231,6 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 	}
 
 	if (extformatsupport && dxvaExtFormat && mt.formattype == FORMAT_VideoInfo2) {
-		// from LAVVideo
-
-		// HACK: 1280 is the value when only chroma location is set to MPEG2, do not bother to send this information, as its the same for basically every clip
-		if ((dxvaExtFormat->value & ~0xff) != 0 && (dxvaExtFormat->value & ~0xff) != 1280) {
-			dxvaExtFormat->SampleFormat = AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT;
-		} else {
-			dxvaExtFormat->value = 0;
-		}
-
-		if (dxvaExtFormat->value != 0 && m_RenderClsid != CLSID_madVR) {
-			// Remove custom matrix settings, which are not understood upstream
-			if (dxvaExtFormat->VideoTransferMatrix > 7) {
-				dxvaExtFormat->VideoTransferMatrix = DXVA2_VideoTransferMatrix_Unknown;
-			}
-			if (dxvaExtFormat->VideoPrimaries > DXVA2_VideoPrimaries_SMPTE_C) {
-				dxvaExtFormat->VideoPrimaries = DXVA2_VideoPrimaries_Unknown;
-			}
-			if (dxvaExtFormat->VideoTransferFunction > MFVideoTransFunc_Log_316) {
-				dxvaExtFormat->VideoTransferFunction = DXVA2_VideoTransFunc_Unknown;
-			}
-		}
-
 		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.Format();
 		if (vih2->dwControlFlags != dxvaExtFormat->value) {
 			bNeedReconnect = true;
@@ -613,6 +593,10 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		vih2->dwPictAspectRatioY = ary;
 		if (IsVideoInterlaced()) {
 			vih2->dwInterlaceFlags = AMINTERLACE_IsInterlaced | AMINTERLACE_DisplayModeBobOrWeave;
+		}
+
+		if (m_dxvaExtFormat.value && pmt->subtype != MEDIASUBTYPE_RGB32) {
+			vih2->dwControlFlags = m_dxvaExtFormat.value;
 		}
 	}
 
