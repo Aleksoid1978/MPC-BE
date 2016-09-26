@@ -25,7 +25,6 @@
 #include <moreuuids.h>
 #include "DirectVobSubFilter.h"
 #include "Scale2x.h"
-#include "../MPCVideoDec/memcpy_sse.h"
 
 extern int c2y_yb[256];
 extern int c2y_yg[256];
@@ -161,7 +160,7 @@ HRESULT CDirectVobSubFilter::Copy(BYTE* pSub, BYTE* pIn, CSize sub, CSize in, in
 		} else {
 			for (ptrdiff_t k = min(j, hSub); i < k; i++, pIn += pitchIn, pSub += pitchSub) {
 				memsetd(pSub, black, dpLeft);
-				memcpy_sse(pSub + dpLeft, pIn, dpMid);
+				memcpy(pSub + dpLeft, pIn, dpMid);
 				memsetd(pSub + dpLeft+dpMid, black, dpRight);
 			}
 		}
