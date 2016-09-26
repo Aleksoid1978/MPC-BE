@@ -7478,7 +7478,7 @@ void CMainFrame::OnViewAspectRatioNext()
 void CMainFrame::OnViewStereo3DMode(UINT nID)
 {
 	int mode = nID - ID_STEREO3D_AUTO;
-	AfxGetAppSettings().iStereoMode = mode;
+	AfxGetAppSettings().iStereo3DMode = mode;
 
 	IFilterGraph* pFG = m_pGB;
 	if (pFG) {
@@ -7491,7 +7491,7 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 
 void CMainFrame::OnUpdateViewStereo3DMode(CCmdUI* pCmdUI)
 {
-	if (AfxGetAppSettings().iStereoMode == (pCmdUI->m_nID - ID_STEREO3D_AUTO)) {
+	if (AfxGetAppSettings().iStereo3DMode == (pCmdUI->m_nID - ID_STEREO3D_AUTO)) {
 		CheckMenuRadioItem(ID_STEREO3D_AUTO, ID_STEREO3D_HALFOVERUNDER, pCmdUI->m_nID);
 	}
 }
