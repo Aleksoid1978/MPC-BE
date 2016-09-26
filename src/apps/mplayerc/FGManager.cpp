@@ -2781,7 +2781,7 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 	}
 
 	if (CComQIPtr<IMPCVideoDecFilter> pVDF = pBF) {
-		pVDF->SetStereoMode(s.iStereoMode);
+		pVDF->SetStereoMode(s.iStereo3DMode);
 	}
 
 	return hr;
