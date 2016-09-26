@@ -25,7 +25,6 @@
 #include <mfapi.h>
 #include "BaseVideoFilter.h"
 #include "../../../DSUtil/DSUtil.h"
-#include "../MPCVideoDec/memcpy_sse.h"
 
 #include <InitGuid.h>
 #include <moreuuids.h>
@@ -37,7 +36,7 @@ static inline bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* ds
 		BYTE* src = srcY + row * srcPitch;
 		BYTE* dst = dstY + row * dstPitch;
 
-		memcpy_sse(dst, src, dstPitch);
+		memcpy(dst, src, dstPitch);
 	}
 
 	// Copy UV plane. UV plane is half height.
@@ -45,7 +44,7 @@ static inline bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* ds
 		BYTE* src = srcUV + row * srcPitch;
 		BYTE* dst = dstUV + row * dstPitch;
 
-		memcpy_sse(dst, src, dstPitch);
+		memcpy(dst, src, dstPitch);
 	}
 
 	return true;

@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "MemSubPic.h"
 
-#include "../filters/transform/MPCVideoDec/memcpy_sse.h"
 #include <emmintrin.h>
 
 // color conv
@@ -137,7 +136,7 @@ STDMETHODIMP CMemSubPic::CopyTo(ISubPic* pSubPic)
 	BYTE* d = (BYTE*)dst.bits + dst.pitch*m_rcDirty.top + m_rcDirty.left * 4;
 
 	for (ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) {
-		memcpy_sse(d, s, w * 4);
+		memcpy(d, s, w * 4);
 	}
 
 	return S_OK;

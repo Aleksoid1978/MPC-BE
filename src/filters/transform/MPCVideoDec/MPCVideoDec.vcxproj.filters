@@ -113,9 +113,6 @@
     <ClInclude Include="pixconv_sse2_templates.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="memcpy_sse.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DXVADecoder\DXVA2Decoder.h">
       <Filter>Header Files\DXVADecoder</Filter>
     </ClInclude>
