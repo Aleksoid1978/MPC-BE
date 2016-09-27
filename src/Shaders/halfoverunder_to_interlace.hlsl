@@ -20,15 +20,15 @@ float4 p1 : register(c1);
 float4 main(float2 tex : TEXCOORD0) : COLOR
 {
 	if (tex.y >= dbottom) {
-		return float4(0,0,0,1);
+		return float4(0.0, 0.0, 0.0, 1.0);
 	}
 
-	if (fmod((tex.y - dtop) * height, 2) < 1) {
+	if (fmod((tex.y - dtop) * height, 2.0) < 1.0) {
 		// even
-		tex.y = (dtop + tex.y) / 2;
+		tex.y = (dtop + tex.y) / 2.0;
 	} else {
 		// odd
-		tex.y = (dbottom + tex.y) / 2;
+		tex.y = (dbottom + tex.y) / 2.0;
 	}
 
 	return tex2D(s0, tex);
