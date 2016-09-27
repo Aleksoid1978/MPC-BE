@@ -169,6 +169,7 @@ namespace DSObjects
 
 		// Custom screen space pixel shaders
 		CAtlList<CExternalPixelShader>	m_pCustomScreenSpacePixelShaders;
+		CComPtr<IDirect3DPixelShader9>	m_pConvertToInterlacePixelShader;
 
 		// Video rendering paths
 		HRESULT RenderVideoDrawPath(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect);

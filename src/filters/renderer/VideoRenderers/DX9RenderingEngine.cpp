@@ -338,13 +338,16 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		return S_OK;
 	}
 
+	CRenderersSettings& settings = GetRenderersSettings();
+	CRenderersData* data = GetRenderersData();
+
 	// Initialize the processing pipeline
 	bool bCustomPixelShaders;
 	bool bCustomScreenSpacePixelShaders;
 	bool bFinalPass;
 
 	int screenSpacePassCount = 0;
-	DWORD iResizer = GetRenderersSettings().iResizer;
+	DWORD iResizer = settings.iResizer;
 
 	{
 		// Final pass. Must be initialized first!
@@ -371,6 +374,10 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		bCustomScreenSpacePixelShaders = !m_pCustomScreenSpacePixelShaders.IsEmpty();
 		if (bCustomScreenSpacePixelShaders) {
 			screenSpacePassCount += (int)m_pCustomScreenSpacePixelShaders.GetCount();
+		}
+
+		if (data->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+			screenSpacePassCount++;
 		}
 
 		// Custom pixel shaders
@@ -520,7 +527,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 
 	Transform(destRect, dest);
 
-	if (bCustomScreenSpacePixelShaders || bFinalPass) {
+	if (bCustomScreenSpacePixelShaders || bFinalPass || data->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 		CComPtr<IDirect3DSurface9> pTemporarySurface;
 		hr = m_pScreenSpaceTextures[0]->GetSurfaceLevel(0, &pTemporarySurface);
 
@@ -612,7 +619,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 				Shader.Compile(m_pPSC);
 			}
 
-			if (pos || bFinalPass) {
+			if (pos || bFinalPass || data->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 				CComPtr<IDirect3DSurface9> pTemporarySurface;
 				hr = m_pScreenSpaceTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
 				if (SUCCEEDED(hr)) {
@@ -623,6 +630,40 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			}
 
 			hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
+			TextureCopy(m_pScreenSpaceTextures[src]);
+			std::swap(src, dst);
+		}
+	}
+
+	if (data->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+		if (!m_pConvertToInterlacePixelShader) {
+			if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
+				hr = CreateShaderFromResource(m_pD3DDevEx, &m_pConvertToInterlacePixelShader, IDF_SHADER_PS20_CONVERT_TO_INTERLACE);
+			}
+			else {
+				hr = CreateShaderFromResource(m_pD3DDevEx, &m_pConvertToInterlacePixelShader, IDF_SHADER_CONVERT_TO_INTERLACE);
+			}
+		}
+
+		if (m_pConvertToInterlacePixelShader) {
+			float fConstData[][4] = {
+				{ (float)m_ScreenSpaceTexWidth, (float)m_ScreenSpaceTexHeight, 0, 0 },
+				{ (float)destRect.left / m_ScreenSpaceTexWidth, (float)destRect.top / m_ScreenSpaceTexHeight, (float)destRect.right / m_ScreenSpaceTexWidth, (float)destRect.bottom / m_ScreenSpaceTexHeight },
+			};
+			hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+			hr = m_pD3DDevEx->SetPixelShader(m_pConvertToInterlacePixelShader);
+
+			if (bFinalPass) {
+				CComPtr<IDirect3DSurface9> pTemporarySurface;
+				hr = m_pScreenSpaceTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
+				if (SUCCEEDED(hr)) {
+					hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
+				}
+			}
+			else {
+				hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
+			}
+
 			TextureCopy(m_pScreenSpaceTextures[src]);
 			std::swap(src, dst);
 		}
