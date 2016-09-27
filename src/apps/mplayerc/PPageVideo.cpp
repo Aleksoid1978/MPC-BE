@@ -346,7 +346,7 @@ void CPPageVideo::UpdateResizerList(int select)
 
 #if DXVAVP
 	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
-		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"DXVA2"), RESIZER_DXVA2);
+		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"DXVA2 (Intel GPU only)"), RESIZER_DXVA2);
 	}
 #endif
 
