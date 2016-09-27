@@ -19,6 +19,10 @@ float4 p1 : register(c1);
 
 float4 main(float2 tex : TEXCOORD0) : COLOR
 {
+	if (tex.y >= dbottom) {
+		return float4(0,0,0,1);
+	}
+
 	if (fmod((tex.y - dtop) * height, 2) < 1) {
 		// even
 		tex.y = (dtop + tex.y) / 2;
