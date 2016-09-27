@@ -7493,6 +7493,8 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 	} else {
 		GetRenderersData()->m_iStereo3DTransform = STEREO3D_AsIs;
 	}
+
+	RepaintVideo();
 }
 
 void CMainFrame::OnUpdateViewStereo3DMode(CCmdUI* pCmdUI)
