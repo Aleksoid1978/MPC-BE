@@ -23,12 +23,12 @@ float4 main(float2 tex : TEXCOORD0) : COLOR
 		return float4(0.0, 0.0, 0.0, 1.0);
 	}
 
-	if (fmod((tex.y - dtop) * height, 2.0) < 1.0) {
+	if (fmod((tex.y - dtop) * height, 2) < 1.0) {
 		// even
-		tex.y = (dtop + tex.y) / 2.0;
+		tex.y = (dtop + tex.y) / 2;
 	} else {
 		// odd
-		tex.y = (dbottom + tex.y) / 2.0;
+		tex.y = (dbottom + tex.y) / 2;
 	}
 
 	return tex2D(s0, tex);
