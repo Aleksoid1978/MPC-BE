@@ -59,7 +59,7 @@ namespace DSObjects
 
 		bool	m_bIsRendering;
 
-		CRenderersSettings::CAdvRendererSettings m_LastRendererSettings;
+		CAffectingRenderersSettings m_LastAffectingSettings;
 
 		HRESULT (__stdcall * m_pDwmIsCompositionEnabled)(__out BOOL* pfEnabled);
 		HRESULT (__stdcall * m_pDwmEnableComposition)(UINT uCompositionAction);

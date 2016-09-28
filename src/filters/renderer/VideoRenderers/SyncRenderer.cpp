@@ -141,7 +141,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	ZeroMemory(&m_VMR9AlphaBitmap, sizeof(m_VMR9AlphaBitmap));
 
 	CRenderersSettings& rs = GetRenderersSettings();
-	if (rs.m_AdvRendSets.bDisableDesktopComposition) {
+	if (rs.bDisableDesktopComposition) {
 		m_bDesktopCompositionDisabled = true;
 		if (m_pDwmEnableComposition) {
 			m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
@@ -150,7 +150,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 		m_bDesktopCompositionDisabled = false;
 	}
 
-	m_pGenlock = DNew CGenlock(rs.m_AdvRendSets.dTargetSyncOffset, rs.m_AdvRendSets.dControlLimit, rs.m_AdvRendSets.iLineDelta, rs.m_AdvRendSets.iColumnDelta, rs.m_AdvRendSets.dCycleDelta, 0); // Must be done before CreateDXDevice
+	m_pGenlock = DNew CGenlock(rs.dTargetSyncOffset, rs.dControlLimit, rs.iLineDelta, rs.iColumnDelta, rs.dCycleDelta, 0); // Must be done before CreateDXDevice
 	hr = CreateDXDevice(_Error);
 
 	// Define the shader profile.
@@ -344,9 +344,8 @@ void CBaseAP::ResetStats()
 
 bool CBaseAP::SettingsNeedResetDevice()
 {
-	CRenderersSettings& rs = GetRenderersSettings();
-	CRenderersSettings::CAdvRendererSettings & New = rs.m_AdvRendSets;
-	CRenderersSettings::CAdvRendererSettings & Current = m_LastRendererSettings;
+	CRenderersSettings& New = GetRenderersSettings();
+	CAffectingRenderersSettings& Current = m_LastAffectingSettings;
 
 	bool bRet = false;
 	if (!m_bIsFullscreen) {
@@ -368,7 +367,9 @@ bool CBaseAP::SettingsNeedResetDevice()
 	}
 	bRet = bRet || New.b10BitOutput != Current.b10BitOutput;
 	bRet = bRet || New.iSurfaceFormat != Current.iSurfaceFormat;
-	m_LastRendererSettings = rs.m_AdvRendSets;
+
+	Current.Fill(New);
+
 	return bRet;
 }
 
@@ -379,7 +380,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	CAutoLock cRenderLock(&m_allocatorLock);
 
 	CRenderersSettings& rs = GetRenderersSettings();
-	m_LastRendererSettings = rs.m_AdvRendSets;
+	m_LastAffectingSettings.Fill(rs);
 	HRESULT hr = E_FAIL;
 
 	m_pFont = NULL;
@@ -453,7 +454,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		pp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 		pp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 		pp.Flags = D3DPRESENTFLAG_VIDEO;
-		m_b10BitOutput = rs.m_AdvRendSets.b10BitOutput;
+		m_b10BitOutput = rs.b10BitOutput;
 		if (m_b10BitOutput) {
 			if (FAILED(m_pD3DEx->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3ddm.Format, D3DFMT_A2R10G10B10, false))) {
 				m_strStatsMsg[MSG_ERROR] = L"10 bit RGB is not supported by this graphics device in this resolution.";
@@ -504,7 +505,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		pp.BackBufferHeight = d3ddm.Height;
 		m_BackbufferFmt = d3ddm.Format;
 		m_DisplayFmt = d3ddm.Format;
-		m_b10BitOutput = rs.m_AdvRendSets.b10BitOutput;
+		m_b10BitOutput = rs.b10BitOutput;
 		if (m_b10BitOutput) {
 			if (FAILED(m_pD3DEx->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3ddm.Format, D3DFMT_A2R10G10B10, false))) {
 				m_strStatsMsg[MSG_ERROR] = L"10 bit RGB is not supported by this graphics device in this resolution.";
@@ -1558,9 +1559,9 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 		frameCycle = 0.0;    // Happens when searching.
 	}
 
-	if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
+	if (rs.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
 		m_pGenlock->ControlClock(dSyncOffset, frameCycle);
-	} else if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_DISPLAY) {
+	} else if (rs.iSynchronizeMode == SYNCHRONIZE_DISPLAY) {
 		m_pGenlock->ControlDisplay(dSyncOffset, frameCycle);
 	} else {
 		m_pGenlock->UpdateStats(dSyncOffset, frameCycle);    // No sync or sync to nearest neighbor
@@ -1813,8 +1814,8 @@ void CBaseAP::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
-			if (rs.m_AdvRendSets.iSynchronizeMode != SYNCHRONIZE_NEAREST) {
-				if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_DISPLAY && !m_pGenlock->PowerstripRunning()) {
+			if (rs.iSynchronizeMode != SYNCHRONIZE_NEAREST) {
+				if (rs.iSynchronizeMode == SYNCHRONIZE_DISPLAY && !m_pGenlock->PowerstripRunning()) {
 					strText = L"Sync error   : PowerStrip is not running. No display sync is possible.";
 					DrawText(rc, strText, 1);
 					OffsetRect(&rc, 0, TextHeight);
@@ -1826,7 +1827,7 @@ void CBaseAP::DrawStats()
 			}
 		}
 
-		strText.Format(L"Sync offset  : Average %3.1f ms [%.1f ms, %.1f ms]   Target %3.1f ms", m_pGenlock->syncOffsetAvg, m_pGenlock->minSyncOffset, m_pGenlock->maxSyncOffset, rs.m_AdvRendSets.dTargetSyncOffset);
+		strText.Format(L"Sync offset  : Average %3.1f ms [%.1f ms, %.1f ms]   Target %3.1f ms", m_pGenlock->syncOffsetAvg, m_pGenlock->minSyncOffset, m_pGenlock->maxSyncOffset, rs.dTargetSyncOffset);
 		DrawText(rc, strText, 1);
 		OffsetRect(&rc, 0, TextHeight);
 
@@ -1835,14 +1836,14 @@ void CBaseAP::DrawStats()
 		OffsetRect(&rc, 0, TextHeight);
 
 		if (pApp->m_iDisplayStats == 1) {
-			if (m_pAudioStats && rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
+			if (m_pAudioStats && rs.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
 				strText.Format(L"Audio lag   : %3d ms [%d ms, %d ms] | %s", m_lAudioLag, m_lAudioLagMin, m_lAudioLagMax, (m_lAudioSlaveMode == 4) ? L"Audio renderer is matching rate (for analog sound output)" : L"Audio renderer is not matching rate");
 				DrawText(rc, strText, 1);
 				OffsetRect(&rc, 0, TextHeight);
 			}
 
 			strText.Format(L"Sample time  : waiting %3d ms", m_lNextSampleWait);
-			if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_NEAREST) {
+			if (rs.iSynchronizeMode == SYNCHRONIZE_NEAREST) {
 				CString temp;
 				temp.Format(L"  paint time correction: %3d ms  Hysteresis: %d", m_lShiftToNearest, m_llHysteresis /10000);
 				strText += temp;
@@ -1859,22 +1860,22 @@ void CBaseAP::DrawStats()
 			if (m_bIsFullscreen) {
 				strText += L"D3DFS ";
 			}
-			if (rs.m_AdvRendSets.bDisableDesktopComposition) {
+			if (rs.bDisableDesktopComposition) {
 				strText += L"DisDC ";
 			}
-			if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
+			if (rs.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
 				strText += L"SyncVideo ";
-			} else if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_DISPLAY) {
+			} else if (rs.iSynchronizeMode == SYNCHRONIZE_DISPLAY) {
 				strText += L"SyncDisplay ";
-			} else if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_NEAREST) {
+			} else if (rs.iSynchronizeMode == SYNCHRONIZE_NEAREST) {
 				strText += L"SyncNearest ";
 			}
 			if (m_b10BitOutput) {
 				strText += L"10 bit ";
 			}
-			if (rs.m_AdvRendSets.iEVROutputRange == 0) {
+			if (rs.iEVROutputRange == 0) {
 				strText += L"0-255 ";
-			} else if (rs.m_AdvRendSets.iEVROutputRange == 1) {
+			} else if (rs.iEVROutputRange == 1) {
 				strText += L"16-235 ";
 			}
 
@@ -2712,8 +2713,8 @@ HRESULT CSyncAP::CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType
 	m_pMediaType->SetUINT32(MF_MT_PAN_SCAN_ENABLED, 0);
 
 	const CRenderersSettings& rs = GetRenderersSettings();
-	m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, rs.m_AdvRendSets.iEVROutputRange == 1 ? MFNominalRange_16_235 : MFNominalRange_0_255);
-	m_LastSetOutputRange = rs.m_AdvRendSets.iEVROutputRange;
+	m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, rs.iEVROutputRange == 1 ? MFNominalRange_16_235 : MFNominalRange_0_255);
+	m_LastSetOutputRange = rs.iEVROutputRange;
 
 	ULARGE_INTEGER ui64FrameSize;
 	m_pMediaType->GetUINT64(MF_MT_FRAME_SIZE, &ui64FrameSize.QuadPart);
@@ -3402,7 +3403,7 @@ void CSyncAP::RenderThread()
 		LONG lDisplayCycle4 = (LONG)(GetDisplayCycle() / 4.0);
 
 		CRenderersSettings& rs = GetRenderersSettings();
-		dTargetSyncOffset = rs.m_AdvRendSets.dTargetSyncOffset;
+		dTargetSyncOffset = rs.dTargetSyncOffset;
 
 		if ((m_nRenderState == Started || !m_bPrerolled) && !pNewSample) { // If either streaming or the pre-roll sample and no sample yet fetched
 			if (SUCCEEDED(GetScheduledSample(&pNewSample, nSamplesLeft))) { // Get the next sample
@@ -3420,7 +3421,7 @@ void CSyncAP::RenderThread()
 						m_lNextSampleWait = (LONG)((m_llSampleTime - llRefClockTime) / 10000); // Time left until sample is due, in ms
 						if (m_bStepping) {
 							m_lNextSampleWait = 0;
-						} else if (rs.m_AdvRendSets.iSynchronizeMode == SYNCHRONIZE_NEAREST) { // Present at the closest "safe" occasion at dTargetSyncOffset ms before vsync to avoid tearing
+						} else if (rs.iSynchronizeMode == SYNCHRONIZE_NEAREST) { // Present at the closest "safe" occasion at dTargetSyncOffset ms before vsync to avoid tearing
 							if (m_lNextSampleWait < -lDisplayCycle) { // We have to allow slightly negative numbers at this stage. Otherwise we get "choking" when frame rate > refresh rate
 								SetEvent(m_hEvtSkip);
 								m_bEvtSkip = true;
@@ -3518,7 +3519,7 @@ void CSyncAP::RenderThread()
 				break;
 
 			case WAIT_TIMEOUT: // Time to show the sample or something
-				if (m_LastSetOutputRange != -1 && m_LastSetOutputRange != rs.m_AdvRendSets.iEVROutputRange || m_bPendingRenegotiate) {
+				if (m_LastSetOutputRange != -1 && m_LastSetOutputRange != rs.iEVROutputRange || m_bPendingRenegotiate) {
 					if (pNewSample) {
 						MoveToFreeList(pNewSample, true);
 					}

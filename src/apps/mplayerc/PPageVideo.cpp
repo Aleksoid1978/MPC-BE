@@ -123,7 +123,7 @@ BOOL CPPageVideo::OnInitDialog()
 
 	m_chkD3DFullscreen.SetCheck(s.fD3DFullscreen);
 	m_chk10bitOutput.EnableWindow(s.fD3DFullscreen);
-	m_chk10bitOutput.SetCheck(rs.m_AdvRendSets.b10BitOutput);
+	m_chk10bitOutput.SetCheck(rs.b10BitOutput);
 	m_chkVMRMixerMode.SetCheck(rs.bVMRMixerMode);
 	m_chkVMRMixerYUV.SetCheck(rs.bVMRMixerYUV);
 
@@ -134,7 +134,7 @@ BOOL CPPageVideo::OnInitDialog()
 
 	m_cbEVROutputRange.AddString(L"0-255");
 	m_cbEVROutputRange.AddString(L"16-235");
-	m_cbEVROutputRange.SetCurSel(rs.m_AdvRendSets.iEVROutputRange);
+	m_cbEVROutputRange.SetCurSel(rs.iEVROutputRange);
 
 	m_iEvrBuffers = rs.nEVRBuffers;
 	m_spnEvrBuffers.SetRange(RS_EVRBUFFERS_MIN, RS_EVRBUFFERS_MAX);
@@ -247,7 +247,7 @@ BOOL CPPageVideo::OnInitDialog()
 	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"16-bit Floating Point Surfaces"), D3DFMT_A16B16G16R16F);
 	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"32-bit Floating Point Surfaces"), D3DFMT_A32B32G32R32F);
 	m_cbDX9SurfaceFormat.SetCurSel(0); // default
-	SelectByItemData(m_cbDX9SurfaceFormat, rs.m_AdvRendSets.iSurfaceFormat);
+	SelectByItemData(m_cbDX9SurfaceFormat, rs.iSurfaceFormat);
 
 	OnSurfaceChange();
 	UpdateResizerList(rs.iResizer);
@@ -276,21 +276,21 @@ BOOL CPPageVideo::OnInitDialog()
 
 	// Color Managment
 	CorrectCWndWidth(&m_chkColorManagment);
-	m_chkColorManagment.SetCheck(rs.m_AdvRendSets.bColorManagementEnable);
+	m_chkColorManagment.SetCheck(rs.bColorManagementEnable);
 	m_cbCMInputType.AddString(ResStr(IDS_CM_INPUT_AUTO));
 	m_cbCMInputType.AddString(L"HDTV");
 	m_cbCMInputType.AddString(L"SDTV NTSC");
 	m_cbCMInputType.AddString(L"SDTV PAL");
-	m_cbCMInputType.SetCurSel(rs.m_AdvRendSets.iColorManagementInput);
+	m_cbCMInputType.SetCurSel(rs.iColorManagementInput);
 	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_BRIGHT));
 	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_DIM));
 	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_DARK));
-	m_cbCMAmbientLight.SetCurSel(rs.m_AdvRendSets.iColorManagementAmbientLight);
+	m_cbCMAmbientLight.SetCurSel(rs.iColorManagementAmbientLight);
 	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_PERCEPTUAL));
 	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_RELATIVECM));
 	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_SATURATION));
 	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_ABSOLUTECM));
-	m_cbCMRenderingIntent.SetCurSel(rs.m_AdvRendSets.iColorManagementIntent);
+	m_cbCMRenderingIntent.SetCurSel(rs.iColorManagementIntent);
 	CorrectComboListWidth(m_cbCMInputType);
 	CorrectComboListWidth(m_cbCMAmbientLight);
 	CorrectComboListWidth(m_cbCMRenderingIntent);
@@ -319,19 +319,19 @@ BOOL CPPageVideo::OnApply()
 	s.fD3DFullscreen	= !!m_chkD3DFullscreen.GetCheck();
 	rs.bResetDevice		= !!m_bResetDevice;
 
-	rs.m_AdvRendSets.iSurfaceFormat		= GetCurItemData(m_cbDX9SurfaceFormat);
-	rs.m_AdvRendSets.b10BitOutput		= !!m_chk10bitOutput.GetCheck();
-	rs.m_AdvRendSets.iEVROutputRange	= m_cbEVROutputRange.GetCurSel();
+	rs.iSurfaceFormat		= GetCurItemData(m_cbDX9SurfaceFormat);
+	rs.b10BitOutput		= !!m_chk10bitOutput.GetCheck();
+	rs.iEVROutputRange	= m_cbEVROutputRange.GetCurSel();
 
 	rs.nEVRBuffers = m_iEvrBuffers;
 
 	rs.sD3DRenderDevice = m_bD3D9RenderDevice ? m_D3D9GUIDNames[m_iD3D9RenderDevice] : L"";
 
 	// Color Managment
-	rs.m_AdvRendSets.bColorManagementEnable = !!m_chkColorManagment.GetCheck();
-	rs.m_AdvRendSets.iColorManagementInput = m_cbCMInputType.GetCurSel();
-	rs.m_AdvRendSets.iColorManagementAmbientLight = m_cbCMAmbientLight.GetCurSel();
-	rs.m_AdvRendSets.iColorManagementIntent = m_cbCMRenderingIntent.GetCurSel();
+	rs.bColorManagementEnable = !!m_chkColorManagment.GetCheck();
+	rs.iColorManagementInput = m_cbCMInputType.GetCurSel();
+	rs.iColorManagementAmbientLight = m_cbCMAmbientLight.GetCurSel();
+	rs.iColorManagementIntent = m_cbCMRenderingIntent.GetCurSel();
 
 	return __super::OnApply();
 }

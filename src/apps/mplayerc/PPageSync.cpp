@@ -81,22 +81,21 @@ void CPPageSync::InitDialogPrivate()
 {
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& rs = s.m_RenderersSettings;
-	CRenderersSettings::CAdvRendererSettings& ars = s.m_RenderersSettings.m_AdvRendSets;
 
 	CMainFrame * pFrame;
 	pFrame = (CMainFrame *)(AfxGetApp()->m_pMainWnd);
 
-	m_chkVMR9VSync.SetCheck(ars.bVSync);
-	m_chkVMR9VSyncAccurate.SetCheck(ars.bVSyncAccurate);
-	m_chkVMR9AlterativeVSync.SetCheck(ars.bAlterativeVSync);
+	m_chkVMR9VSync.SetCheck(rs.bVSync);
+	m_chkVMR9VSyncAccurate.SetCheck(rs.bVSyncAccurate);
+	m_chkVMR9AlterativeVSync.SetCheck(rs.bAlterativeVSync);
 	m_spnVMR9VSyncOffset.SetRange(-20, 20);
 	m_edtVMR9VSyncOffset.SetRange(-20, 20);
-	m_edtVMR9VSyncOffset = ars.iVSyncOffset;
-	m_chkDisableAero.SetCheck(ars.bDisableDesktopComposition);
-	m_chkEnableFrameTimeCorrection.SetCheck(ars.bEVRFrameTimeCorrection);
-	m_chkVMRFlushGPUBeforeVSync.SetCheck(ars.bFlushGPUBeforeVSync);
-	m_chkVMRFlushGPUAfterPresent.SetCheck(ars.bFlushGPUAfterPresent);
-	m_chkVMRFlushGPUWait.SetCheck(ars.bFlushGPUWait);
+	m_edtVMR9VSyncOffset = rs.iVSyncOffset;
+	m_chkDisableAero.SetCheck(rs.bDisableDesktopComposition);
+	m_chkEnableFrameTimeCorrection.SetCheck(rs.bEVRFrameTimeCorrection);
+	m_chkVMRFlushGPUBeforeVSync.SetCheck(rs.bFlushGPUBeforeVSync);
+	m_chkVMRFlushGPUAfterPresent.SetCheck(rs.bFlushGPUAfterPresent);
+	m_chkVMRFlushGPUWait.SetCheck(rs.bFlushGPUWait);
 
 	if ((s.iVideoRenderer == VIDRNDT_EVR_CUSTOM || s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS) && rs.iSurfaceType == SURFACE_TEXTURE3D) {
 		m_chkVMR9VSync.EnableWindow(TRUE);
@@ -127,14 +126,14 @@ void CPPageSync::InitDialogPrivate()
 
 	m_chkEnableFrameTimeCorrection.EnableWindow(s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ? TRUE : FALSE);
 
-	m_iSyncMode = ars.iSynchronizeMode == SYNCHRONIZE_VIDEO ? 0
-				: ars.iSynchronizeMode == SYNCHRONIZE_DISPLAY ? 1
+	m_iSyncMode = rs.iSynchronizeMode == SYNCHRONIZE_VIDEO ? 0
+				: rs.iSynchronizeMode == SYNCHRONIZE_DISPLAY ? 1
 				: 2;
-	m_iLineDelta = ars.iLineDelta;
-	m_iColumnDelta = ars.iColumnDelta;
-	m_edtCycleDelta = ars.dCycleDelta;
-	m_edtTargetSyncOffset = ars.dTargetSyncOffset;
-	m_edtControlLimit = ars.dControlLimit;
+	m_iLineDelta = rs.iLineDelta;
+	m_iColumnDelta = rs.iColumnDelta;
+	m_edtCycleDelta = rs.dCycleDelta;
+	m_edtTargetSyncOffset = rs.dTargetSyncOffset;
+	m_edtControlLimit = rs.dControlLimit;
 
 	if ((s.iVideoRenderer == VIDRNDT_SYNC) && (pFrame->GetPlaybackMode() == PM_NONE)) {
 		GetDlgItem(IDC_RADIO1)->EnableWindow(TRUE);
@@ -180,28 +179,26 @@ void CPPageSync::InitDialogPrivate()
 BOOL CPPageSync::OnApply()
 {
 	UpdateData();
+	CRenderersSettings& rs = GetRenderersSettings();
 
-	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings::CAdvRendererSettings& ars = s.m_RenderersSettings.m_AdvRendSets;
+	rs.bVSync						= !!m_chkVMR9VSync.GetCheck();
+	rs.bVSyncAccurate				= !!m_chkVMR9VSyncAccurate.GetCheck();
+	rs.bAlterativeVSync				= !!m_chkVMR9AlterativeVSync.GetCheck();
+	rs.iVSyncOffset					= m_edtVMR9VSyncOffset;
+	rs.bDisableDesktopComposition	= !!m_chkDisableAero.GetCheck();
+	rs.bEVRFrameTimeCorrection		= !!m_chkEnableFrameTimeCorrection.GetCheck();
+	rs.bFlushGPUBeforeVSync			= !!m_chkVMRFlushGPUBeforeVSync.GetCheck();
+	rs.bFlushGPUAfterPresent		= !!m_chkVMRFlushGPUAfterPresent.GetCheck();
+	rs.bFlushGPUWait				= !!m_chkVMRFlushGPUWait.GetCheck();
 
-	ars.bVSync						= !!m_chkVMR9VSync.GetCheck();
-	ars.bVSyncAccurate				= !!m_chkVMR9VSyncAccurate.GetCheck();
-	ars.bAlterativeVSync			= !!m_chkVMR9AlterativeVSync.GetCheck();
-	ars.iVSyncOffset				 = m_edtVMR9VSyncOffset;
-	ars.bDisableDesktopComposition	= !!m_chkDisableAero.GetCheck();
-	ars.bEVRFrameTimeCorrection	= !!m_chkEnableFrameTimeCorrection.GetCheck();
-	ars.bFlushGPUBeforeVSync			= !!m_chkVMRFlushGPUBeforeVSync.GetCheck();
-	ars.bFlushGPUAfterPresent		= !!m_chkVMRFlushGPUAfterPresent.GetCheck();
-	ars.bFlushGPUWait				= !!m_chkVMRFlushGPUWait.GetCheck();
-
-	ars.iSynchronizeMode	= m_iSyncMode == 0 ? SYNCHRONIZE_VIDEO
+	rs.iSynchronizeMode	= m_iSyncMode == 0 ? SYNCHRONIZE_VIDEO
 							: m_iSyncMode == 1 ? SYNCHRONIZE_DISPLAY
 							: SYNCHRONIZE_NEAREST;
-	ars.iLineDelta			= m_iLineDelta;
-	ars.iColumnDelta		= m_iColumnDelta;
-	ars.dCycleDelta			= m_edtCycleDelta;
-	ars.dTargetSyncOffset	= m_edtTargetSyncOffset;
-	ars.dControlLimit		= m_edtControlLimit;
+	rs.iLineDelta			= m_iLineDelta;
+	rs.iColumnDelta			= m_iColumnDelta;
+	rs.dCycleDelta			= m_edtCycleDelta;
+	rs.dTargetSyncOffset	= m_edtTargetSyncOffset;
+	rs.dControlLimit		= m_edtControlLimit;
 
 	return __super::OnApply();
 }

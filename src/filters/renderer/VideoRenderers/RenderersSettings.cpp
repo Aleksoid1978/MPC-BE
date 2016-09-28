@@ -24,27 +24,36 @@
 #include "../../../apps/mplayerc/mplayerc.h"
 #include <version.h>
 
-void CRenderersSettings::SaveRenderers()
+CRenderersSettings::CRenderersSettings()
 {
-	AfxGetAppSettings().SaveRenderers();
+	SetDefault();
 }
 
-void CRenderersSettings::CAdvRendererSettings::SetDefault()
+void CRenderersSettings::SetDefault()
 {
+	sD3DRenderDevice.Empty();
+	bResetDevice					= true;
+
+	iSurfaceType					= SURFACE_TEXTURE3D;
+	iSurfaceFormat					= D3DFMT_X8R8G8B8;
+	b10BitOutput					= false;
+	iResizer						= 1;
+
+	bVSync							= false;
+	bVSyncAccurate					= false;
 	bAlterativeVSync				= false;
 	iVSyncOffset					= 0;
-	bVSyncAccurate					= false;
-	bVSync							= false;
-	bColorManagementEnable			= false;
-	iColorManagementInput			= VIDEO_SYSTEM_UNKNOWN;
-	iColorManagementAmbientLight	= AMBIENT_LIGHT_BRIGHT;
-	iColorManagementIntent			= COLOR_RENDERING_INTENT_PERCEPTUAL;
 	bDisableDesktopComposition		= false;
+	bEVRFrameTimeCorrection			= false;
 	bFlushGPUBeforeVSync			= false;
 	bFlushGPUAfterPresent			= false;
 	bFlushGPUWait					= false;
-	bEVRFrameTimeCorrection			= false;
+
+	bVMRMixerMode					= true;
+	bVMRMixerYUV					= true;
+
 	iEVROutputRange					= 0;
+	nEVRBuffers						= 5;
 
 	iSynchronizeMode				= SYNCHRONIZE_NEAREST;
 	iLineDelta						= 0;
@@ -52,24 +61,38 @@ void CRenderersSettings::CAdvRendererSettings::SetDefault()
 	dCycleDelta						= 0.0012;
 	dTargetSyncOffset				= 12.0;
 	dControlLimit					= 2.0;
+
+	bColorManagementEnable			= false;
+	iColorManagementInput			= VIDEO_SYSTEM_UNKNOWN;
+	iColorManagementAmbientLight	= AMBIENT_LIGHT_BRIGHT;
+	iColorManagementIntent			= COLOR_RENDERING_INTENT_PERCEPTUAL;
+
+	bSubpicPosRelative				= 0;
+	SubpicShiftPos.SetPoint(0, 0);
+	nSubpicCount					= RS_SPCSIZE_DEF;
+	iSubpicMaxTexWidth				= 1280;
+	bSubpicAnimationWhenBuffering	= true;
+	bSubpicAllowDrop				= true;
+	iSubpicStereoMode				= 0;
+}
+
+void CRenderersSettings::SaveRenderers()
+{
+	AfxGetAppSettings().SaveRenderers();
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // CRenderersData construction
 
 CRenderersData::CRenderersData()
+	: m_bTearingTest(false)
+	, m_iDisplayStats(0)
+	, m_bResetStats(false)
+	, m_iStereo3DTransform(STEREO3D_AsIs)
+	// don't disable hardware features before initializing a renderer
+	, m_bFP16Support(true) 
+	, m_b10bitSupport(true)
 {
-	m_hD3DX9Dll			= NULL;
-	m_hD3DCompilerDll	= NULL;
-
-	m_bTearingTest		= false;
-	m_iDisplayStats		= 0;
-	m_bResetStats		= false;
-	m_iStereo3DTransform = STEREO3D_AsIs;
-
-	// Don't disable hardware features before initializing a renderer
-	m_bFP16Support  = true;
-	m_b10bitSupport = true;
 }
 
 
