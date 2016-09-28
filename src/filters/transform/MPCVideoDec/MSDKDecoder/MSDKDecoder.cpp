@@ -650,8 +650,7 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
         goto error;
       }
 
-      const unsigned lines = FFALIGN(m_mfxVideoParams.mfx.FrameInfo.Height, 64);
-      const unsigned half_lines = lines >> 1;
+      const unsigned half_lines = height >> 1;
       const unsigned half_chromalines = half_lines >> 1;
       const size_t linesize = pBaseView->surface.Data.PitchLow;
       unsigned line;
@@ -659,7 +658,7 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       // luminance
       auto dstBase  = m_pFrame->data[0];
       auto srcBase  = pBaseView->surface.Data.Y;
-      auto dstExtra = dstBase + (half_lines - 1) * linesize;
+      auto dstExtra = dstBase + (half_lines) * linesize;
       auto srcExtra = pExtraView->surface.Data.Y + linesize;
       if (m_bSSE2 && ((size_t)dstBase % 16u) == 0 && ((size_t)dstExtra % 16u) == 0 && (linesize % 16u) == 0) {
         for (line = 0; line < half_lines; line++) {
@@ -686,7 +685,7 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       // color
       dstBase  = m_pFrame->data[1];
       srcBase  = pBaseView->surface.Data.UV;
-      dstExtra = dstBase + (half_chromalines - 1) * linesize;
+      dstExtra = dstBase + (half_chromalines) * linesize;
       srcExtra = pExtraView->surface.Data.UV + linesize;
       if (m_bSSE2 && ((size_t)dstBase % 16u) == 0 && ((size_t)dstExtra % 16u) == 0 && (linesize % 16u) == 0) {
         for (line = 0; line < half_chromalines; line++) {
