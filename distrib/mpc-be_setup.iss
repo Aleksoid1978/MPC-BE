@@ -18,8 +18,10 @@
 
 ; Requirements:
 ; Inno Setup Unicode: http://www.jrsoftware.org/isdl.php
+; IDP: Download plugin for Inno Setup : https://bitbucket.org/mitrich_k/inno-download-plugin/downloads
+#include <idp.iss>
 
-; If you want to compile the 64-bit version define "x64build" (uncomment the define below or use build_2010.bat)
+; If you want to compile the 64-bit version define "x64build" (uncomment the define below or use build.bat)
 #define localize
 #define sse_required
 ; #define x64Build
@@ -59,6 +61,8 @@
   #define dxdir        = "DirectX\x64"
   #define BeveledLabel = app_name + " x64 " + app_version_svn
   #define Description  = app_name + " x64 " + app_version
+  #define msdk_dll     = "libmfxsw64.dll"
+  #define msdk_dll_zip = "libmfxsw64.dll.zip"
 #else
   #define bindir       = bin_dir + "\mpc-be_x86"
   #define mpcbe_exe    = "mpc-be.exe"
@@ -67,6 +71,8 @@
   #define dxdir        = "DirectX\x86"
   #define BeveledLabel = app_name + " " + app_version_svn
   #define Description  = app_name + " " + app_version
+  #define msdk_dll     = "libmfxsw32.dll"
+  #define msdk_dll_zip = "libmfxsw32.dll.zip"
 #endif
 
 [Setup]
@@ -176,8 +182,12 @@ Name: "mpcberegvid";   Description: "{cm:AssociationVideo}";    Types: custom;  
 Name: "mpcberegaud";   Description: "{cm:AssociationAudio}";    Types: custom;         Flags: disablenouninstallwarning;
 Name: "mpcberegpl";    Description: "{cm:AssociationPlaylist}"; Types: custom;         Flags: disablenouninstallwarning;
 
-Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}";  Types: custom;         Flags: disablenouninstallwarning
-
+Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}";  Types: custom;         Flags: disablenouninstallwarning;
+#ifdef x64Build
+Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 19936456;
+#else
+Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 16064712;
+#endif
 [Tasks]
 Name: desktopicon;              Description: {cm:CreateDesktopIcon};     GroupDescription: {cm:AdditionalIcons}
 Name: desktopicon\user;         Description: {cm:tsk_CurrentUser};       GroupDescription: {cm:AdditionalIcons}; Flags: exclusive
@@ -243,6 +253,9 @@ Type: files; Name: {app}\COPYING;                   Check: IsUpgrade()
 Type: files; Name: {app}\mpcresources.??.dll
 #endif
 
+[UninstallDelete]
+Type: files; Name: {app}\{#msdk_dll}
+
 ;[UninstallRun]
 ;Filename: "{app}\{#mpcbe_exe}"; Parameters: "/unregall"; WorkingDir: "{app}"; Flags: runhidden
 
@@ -258,6 +271,9 @@ external 'IsProcessorFeaturePresent@kernel32.dll stdcall';
 const
   installer_mutex = 'mpcbe_setup_mutex';
   LOAD_LIBRARY_AS_DATAFILE = $2;
+
+  SHCONTCH_NOPROGRESSBOX = 4;
+  SHCONTCH_RESPONDYESTOALL = 16;
 
 function LoadLibraryEx(lpFileName: String; hFile: THandle; dwFlags: DWORD): THandle; external 'LoadLibraryExW@kernel32.dll stdcall';
 function LoadString(hInstance: THandle; uID: SmallInt; var lpBuffer: Char; nBufferMax: Integer): Integer; external 'LoadStringW@user32.dll stdcall';
@@ -317,6 +333,16 @@ begin
       FreeDLL(hInst);
     end;
   end;
+end;
+
+procedure Unzip(ZipFile, TargetFolder: String); 
+var
+  ShellObj, SrcFile, DestFolder: Variant;
+begin
+  ShellObj := CreateOleObject('Shell.Application');
+  SrcFile := ShellObj.NameSpace(ZipFile);
+  DestFolder := ShellObj.NameSpace(TargetFolder);
+  DestFolder.CopyHere(SrcFile.Items, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL)
 end;
 
 function GetInstallFolder(Default: String): String;
@@ -445,6 +471,20 @@ begin
 
     if IsComponentSelected('mpcberegpl') then
       Exec(ExpandConstant('{app}\{#mpcbe_exe}'), ' /regpl', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
+
+    if IsComponentSelected('intel_msdk') then
+      Unzip(ExpandConstant('{tmp}\{#msdk_dll_zip}'), ExpandConstant('{app}'));
+  end;
+end;
+
+procedure CurPageChanged(CurPageID: Integer);
+begin
+  if CurPageID = wpReady then begin
+    idpClearFiles;
+
+    if IsComponentSelected('intel_msdk') then begin
+      idpAddFile('http://mpc-be.org/Intel_MSDK/{#msdk_dll_zip}', ExpandConstant('{tmp}\{#msdk_dll_zip}'));
+    end;
   end;
 end;
 
@@ -514,4 +554,24 @@ begin
   else begin
     Result :=  True;
   end;
+end;
+
+procedure InitializeWizard();
+Var
+  DeltaY : Integer;
+  Page: TWizardPage;
+begin
+  DeltaY := ScaleY(10);
+  WizardForm.Height := WizardForm.Height + DeltaY;
+  WizardForm.NextButton.Top := WizardForm.NextButton.Top + DeltaY;
+  WizardForm.BackButton.Top := WizardForm.BackButton.Top + DeltaY;
+  WizardForm.CancelButton.Top := WizardForm.CancelButton.Top + DeltaY;
+  WizardForm.ComponentsList.Height := WizardForm.ComponentsList.Height + DeltaY;
+  WizardForm.OuterNotebook.Height := WizardForm.OuterNotebook.Height + DeltaY;
+  WizardForm.InnerNotebook.Height := WizardForm.InnerNotebook.Height + DeltaY;
+  WizardForm.Bevel.Top := WizardForm.Bevel.Top + DeltaY;
+  WizardForm.BeveledLabel.Top := WizardForm.BeveledLabel.Top + DeltaY;
+  WizardForm.ComponentsDiskSpaceLabel.Top := WizardForm.ComponentsDiskSpaceLabel.Top + DeltaY;
+
+  idpDownloadAfter(wpReady);
 end;
