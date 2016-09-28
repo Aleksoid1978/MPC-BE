@@ -650,8 +650,8 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
         goto error;
       }
 
-      const unsigned half_lines = height >> 1;
-      const unsigned half_chromalines = half_lines >> 1;
+      const unsigned half_lines = height / 2;
+      const unsigned half_chromalines = half_lines / 2;
       const size_t linesize = pBaseView->surface.Data.PitchLow;
       unsigned line;
 
