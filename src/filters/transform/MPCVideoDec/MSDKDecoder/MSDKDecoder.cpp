@@ -657,10 +657,10 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
 
       // luminance
       auto dstBase  = m_pFrame->data[0];
-      auto srcBase  = pBaseView->surface.Data.Y;
+      auto srcBase  = m_pFilter->m_MVC_Base_View_R_flag ? pExtraView->surface.Data.Y : pBaseView->surface.Data.Y;
       auto dstExtra = dstBase + (half_lines) * linesize;
-      auto srcExtra = pExtraView->surface.Data.Y + linesize;
-      if (m_bSSE2 && ((size_t)dstBase % 16u) == 0 && ((size_t)dstExtra % 16u) == 0 && (linesize % 16u) == 0) {
+      auto srcExtra = (m_pFilter->m_MVC_Base_View_R_flag ? pBaseView->surface.Data.Y : pExtraView->surface.Data.Y) + linesize;
+      if (m_bSSE2 && ((size_t)dstBase % 16u) == 0 && ((size_t)dstExtra % 16u) == 0) {
         for (line = 0; line < half_lines; line++) {
           PIXCONV_MEMCPY_ALIGNED_TWO(dstBase, srcBase, dstExtra, srcExtra, (ptrdiff_t)linesize)
       
@@ -684,10 +684,10 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
 
       // color
       dstBase  = m_pFrame->data[1];
-      srcBase  = pBaseView->surface.Data.UV;
+      srcBase  = m_pFilter->m_MVC_Base_View_R_flag ? pExtraView->surface.Data.UV : pBaseView->surface.Data.UV;
       dstExtra = dstBase + (half_chromalines) * linesize;
-      srcExtra = pExtraView->surface.Data.UV + linesize;
-      if (m_bSSE2 && ((size_t)dstBase % 16u) == 0 && ((size_t)dstExtra % 16u) == 0 && (linesize % 16u) == 0) {
+      srcExtra = (m_pFilter->m_MVC_Base_View_R_flag ? pBaseView->surface.Data.UV : pExtraView->surface.Data.UV) + linesize;
+      if (m_bSSE2 && ((size_t)dstBase % 16u) == 0 && ((size_t)dstExtra % 16u) == 0) {
         for (line = 0; line < half_chromalines; line++) {
           PIXCONV_MEMCPY_ALIGNED_TWO(dstBase, srcBase, dstExtra, srcExtra, (ptrdiff_t)linesize);
 
