@@ -144,6 +144,8 @@ protected:
 	CMSDKDecoder*							m_pMSDKDecoder;
 	MPCStereoMode							m_iStereoMode;
 
+	BOOL									m_MVC_Base_View_R_flag;
+
 	// === Private functions
 	void			Cleanup();
 	void			ffmpegCleanup();

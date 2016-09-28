@@ -988,6 +988,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_dRate(1.0)
 	, m_pMSDKDecoder(NULL)
 	, m_iStereoMode(STEREO_Auto)
+	, m_MVC_Base_View_R_flag(FALSE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -2348,6 +2349,21 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 
 	if (m_nCodecId == AV_CODEC_ID_H264 && m_bDecodingStart && (m_nDecoderMode == MODE_SOFTWARE || (m_nPCIVendor == PCIV_ATI && m_bInterlaced))) {
 		InitDecoder(&m_pInput->CurrentMediaType());
+	}
+
+	if (m_pMSDKDecoder) {
+		m_MVC_Base_View_R_flag = FALSE;
+		BeginEnumFilters(m_pGraph, pEF, pBF) {
+			if (CComQIPtr<IPropertyBag> pPB = pBF) {
+				CComVariant var;
+				if (SUCCEEDED(pPB->Read(L"STEREOSCOPIC3DMODE", &var, NULL))) {
+					CString mode(var.bstrVal); mode.MakeLower();
+					m_MVC_Base_View_R_flag = mode == L"mvc_rl";
+					break;
+				}
+			}
+		}
+		EndEnumFilters;
 	}
 
 	return __super::NewSegment(rtStart, rtStop, dRate);
