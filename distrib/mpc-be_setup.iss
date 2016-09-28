@@ -163,6 +163,19 @@ Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
 ; Include installer's custom messages
 #include "custom_messages.iss"
 
+#ifdef localize
+  #include <idplang\czech.iss>
+  #include <idplang\default.iss>
+  #include <idplang\french.iss>
+  #include <idplang\german.iss>
+  #include <idplang\hungarian.iss>
+  #include <idplang\italian.iss>
+  #include <idplang\polish.iss>
+  #include <idplang\russian.iss>
+  #include <idplang\slovak.iss>
+  #include <idplang\spanish.iss>
+#endif
+
 [Messages]
 BeveledLabel = {#BeveledLabel}
 
