@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"&Hakkında..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"&Dosya"
 7		"&Hızlı Dosya Aç...\tCtrl+Q"
 9		"&Dosya/URL Aç...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"En Az"
 162		"Az"
 163		"Normal"
-166		"Çevirici ayarları"
-168		"&Kopukluk Testi\tCtrl+T"
-169		"&İstatistikleri Göster\tCtrl+J"
-171		"Sunum"
-173		"Tam ekran D3D kipi"
-174		"Masaüstü düzeltmesini kapat"
-175		"Görüntü süresi düzeltmesini aç\tC"
-177		"Varsayılan çevirici ayarlarına dön"
-179		"Seçe&nekler"
-180		"&Ayarlar..."
-182		"Ç&ıkış\tAlt+X"
+167		"Çevirici ayarları"
+169		"&Kopukluk Testi\tCtrl+T"
+170		"&İstatistikleri Göster\tCtrl+J"
+172		"Sunum"
+174		"Tam ekran D3D kipi"
+175		"Masaüstü düzeltmesini kapat"
+176		"Görüntü süresi düzeltmesini aç\tC"
+178		"Varsayılan çevirici ayarlarına dön"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"Seçe&nekler"
+189		"&Ayarlar..."
+191		"Ç&ıkış\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

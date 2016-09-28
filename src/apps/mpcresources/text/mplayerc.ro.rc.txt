@@ -735,7 +735,7 @@ BEGIN MENU IDR_MAINFRAME LINES 202
 200		"&Despre..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"&Fișier"
 7		"&Deschide rapid un fișier...\tCtrl+Q"
 9		"&Deschide fișier...\tCtrl+O"
@@ -849,17 +849,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"&Minimal"
 162		"&Compact"
 163		"&Normal"
-166		"Setări randor"
-168		"&Test de rupere (tearing)\tCtrl+T"
-169		"&Afișează statistici\tCtrl+J"
-171		"Prezentare"
-173		"Mod ecran complet D3D"
-174		"Dezactivează compoziție desktop (Aero)"
-175		"Activează corecție de timp pentru cadru\tC"
-177		"Resetează la setări implicite ale randorului"
-179		"P&roprietăți"
-180		"&Opțiuni..."
-182		"I&eșire\tAlt+X"
+167		"Setări randor"
+169		"&Test de rupere (tearing)\tCtrl+T"
+170		"&Afișează statistici\tCtrl+J"
+172		"Prezentare"
+174		"Mod ecran complet D3D"
+175		"Dezactivează compoziție desktop (Aero)"
+176		"Activează corecție de timp pentru cadru\tC"
+178		"Resetează la setări implicite ale randorului"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"P&roprietăți"
+189		"&Opțiuni..."
+191		"I&eșire\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

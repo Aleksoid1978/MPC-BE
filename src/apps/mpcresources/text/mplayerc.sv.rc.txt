@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"&Om..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"&Arkiv"
 7		"&Snabb Öppna Fil...\tCtrl+Q"
 9		"&Open File/URL...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"Minimal"
 162		"Kompakt"
 163		"Normal"
-166		"Renderar Inställningar"
-168		"&Tearing Test\tCtrl+T"
-169		"&Visa Stats\tCtrl+J"
-171		"Presentation"
-173		"D3D Helskärms Läge"
-174		"Avaktivera skrivbordets sammansättning"
-175		"Aktivera Bild Tids Rättelse\tC"
-177		"Återställ till standard renderar inställningar"
-179		"E&genskaper"
-180		"&Valmöjligheter..."
-182		"A&vsluta\tAlt+X"
+167		"Renderar Inställningar"
+169		"&Tearing Test\tCtrl+T"
+170		"&Visa Stats\tCtrl+J"
+172		"Presentation"
+174		"D3D Helskärms Läge"
+175		"Avaktivera skrivbordets sammansättning"
+176		"Aktivera Bild Tids Rättelse\tC"
+178		"Återställ till standard renderar inställningar"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"E&genskaper"
+189		"&Valmöjligheter..."
+191		"A&vsluta\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

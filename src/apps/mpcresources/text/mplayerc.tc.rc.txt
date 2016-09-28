@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"關於(&A)..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"檔案(&F)"
 7		"快速開啟檔案(&Q)...\tCtrl+Q"
 9		"開啟檔案/網址(&O)...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"最小(&M)"
 162		"輕巧(&C)"
 163		"正常(&N)"
-166		"繪製器設定"
-168		"撕裂及抖動測試(&T)\tCtrl+T"
-169		"顯示統計(&D)\tCtrl+J"
-171		"呈現"
-173		"D3D 全螢幕模式"
-174		"停用桌面轉譯 (Aero)"
-175		"啟用影格時間校正\tC"
-177		"重新設定為預設的繪製器設定"
-179		"內容(&R)"
-180		"設定選項(&O)..."
-182		"離開(&X)\tAlt+X"
+167		"繪製器設定"
+169		"撕裂及抖動測試(&T)\tCtrl+T"
+170		"顯示統計(&D)\tCtrl+J"
+172		"呈現"
+174		"D3D 全螢幕模式"
+175		"停用桌面轉譯 (Aero)"
+176		"啟用影格時間校正\tC"
+178		"重新設定為預設的繪製器設定"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"內容(&R)"
+189		"設定選項(&O)..."
+191		"離開(&X)\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

@@ -731,7 +731,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"&O programie..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"&Plik"
 7		"&Otwórz...\tCtrl+Q"
 9		"&Otwórz Plik...\tCtrl+O"
@@ -842,17 +842,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"Minimalny"
 162		"Kompaktowy"
 163		"Zwykły"
-166		"Renderowanie"
-168		"&Test szarpania obrazu\tCtrl+T"
-169		"&Statystyki odtwarzania\tCtrl+J"
-171		"Wyświetlanie"
-173		"Pełny ekran Direct3D"
-174		"Wyłączenie kompozycji pulpitu"
-175		"Korekcja czasu klatki\tC"
-177		"Domyślne"
-179		"Właśc&iwości..."
-180		"&Ustawienia..."
-182		"Za&kończ\tAlt+X"
+167		"Renderowanie"
+169		"&Test szarpania obrazu\tCtrl+T"
+170		"&Statystyki odtwarzania\tCtrl+J"
+172		"Wyświetlanie"
+174		"Pełny ekran Direct3D"
+175		"Wyłączenie kompozycji pulpitu"
+176		"Korekcja czasu klatki\tC"
+178		"Domyślne"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"Właśc&iwości..."
+189		"&Ustawienia..."
+191		"Za&kończ\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

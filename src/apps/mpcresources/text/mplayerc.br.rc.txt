@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"Sobre..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"&Arquivo"
 7		"Abrir arquivo &rápidamente...\tCtrl+Q"
 9		"&Open File/URL...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"Mínimo"
 162		"Compacto"
 163		"Normal"
-166		"Ajustes do renderizador"
-168		"Teste de tearing\tCtrl+T"
-169		"&Mostrar estatísticas\tCtrl+J"
-171		"Apresentação"
-173		"D3D Modo tela cheia"
-174		"Desativar composição da área de trabalho"
-175		"Ativar correção de tempos em quadros\tC"
-177		"Resetar aos ajustes pré-determinados do render"
-179		"P&ropriedades"
-180		"&Opções..."
-182		"Sair\tAlt+X"
+167		"Ajustes do renderizador"
+169		"Teste de tearing\tCtrl+T"
+170		"&Mostrar estatísticas\tCtrl+J"
+172		"Apresentação"
+174		"D3D Modo tela cheia"
+175		"Desativar composição da área de trabalho"
+176		"Ativar correção de tempos em quadros\tC"
+178		"Resetar aos ajustes pré-determinados do render"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"P&ropriedades"
+189		"&Opções..."
+191		"Sair\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

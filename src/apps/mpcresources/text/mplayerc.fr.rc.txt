@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"&A propos de MPC-BE..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"&Fichier"
 7		"Ouvrir &rapidement...\tCtrl+Q"
 9		"&Open File/URL...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"Minimal"
 162		"Compact"
 163		"Normal"
-166		"Options d'affichage"
-168		"Test de &Tearing\tCtrl+T"
-169		"Statistiques d'affichage\tCtrl+J"
-171		"Présentation"
-173		"Direct3D plein écran"
-174		"Désactiver Aero pendant la lecture"
-175		"Activer la correction temporelle\tC"
-177		"Valeurs par défaut"
-179		"&Propriétés"
-180		"&Options..."
-182		"Q&uitter\tAlt+X"
+167		"Options d'affichage"
+169		"Test de &Tearing\tCtrl+T"
+170		"Statistiques d'affichage\tCtrl+J"
+172		"Présentation"
+174		"Direct3D plein écran"
+175		"Désactiver Aero pendant la lecture"
+176		"Activer la correction temporelle\tC"
+178		"Valeurs par défaut"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"&Propriétés"
+189		"&Options..."
+191		"Q&uitter\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

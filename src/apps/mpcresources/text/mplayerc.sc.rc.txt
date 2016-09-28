@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"关于(&A)..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"文件(&F)"
 7		"快速打开文件(&Q)...\tCtrl+Q"
 9		"打开文件(&O)...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"最小"
 162		"简洁"
 163		"普通"
-166		"渲染器设置"
-168		"撕裂测试(&T)\tCtrl+T"
-169		"显示统计(&D)\tCtrl+J"
-171		"展示"
-173		"D3D全屏幕模式"
-174		"禁止桌面混合"
-175		"允许帧时间校准\tC"
-177		"重置渲染器设置为默认值"
-179		"属性(&R)"
-180		"选项(&O)..."
-182		"退出(&X)\tAlt+X"
+167		"渲染器设置"
+169		"撕裂测试(&T)\tCtrl+T"
+170		"显示统计(&D)\tCtrl+J"
+172		"展示"
+174		"D3D全屏幕模式"
+175		"禁止桌面混合"
+176		"允许帧时间校准\tC"
+178		"重置渲染器设置为默认值"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"属性(&R)"
+189		"选项(&O)..."
+191		"退出(&X)\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

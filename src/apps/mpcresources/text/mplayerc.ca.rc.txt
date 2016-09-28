@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"&Quant Al..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"&Arxiu"
 7		"Obrir Arxiu &Ràpid...\tCtrl+Q"
 9		"&Open File/URL...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"Mínim"
 162		"Compacte"
 163		"Normal"
-166		"Ajustaments del Render"
-168		"Prova de &Pipelleig\tCtrl+T"
-169		"&Mostrar Estadístiques\tCtrl+J"
-171		"Presentació"
-173		"Mode D3D de pantalla completa"
-174		"Desactivar composició de l'escriptori(Aero)"
-175		"Activar correcció temporal de quadre\tC"
-177		"Renicialitzar ajustaments predeterminats del renderitzador"
-179		"P&ropietats"
-180		"&Opcions..."
-182		"So&rtir\tAlt+X"
+167		"Ajustaments del Render"
+169		"Prova de &Pipelleig\tCtrl+T"
+170		"&Mostrar Estadístiques\tCtrl+J"
+172		"Presentació"
+174		"Mode D3D de pantalla completa"
+175		"Desactivar composició de l'escriptori(Aero)"
+176		"Activar correcció temporal de quadre\tC"
+178		"Renicialitzar ajustaments predeterminats del renderitzador"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"P&ropietats"
+189		"&Opcions..."
+191		"So&rtir\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213
