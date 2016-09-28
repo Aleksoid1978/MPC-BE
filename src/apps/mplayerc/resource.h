@@ -383,7 +383,7 @@
 #define ID_STEREO3D_AUTO                1110
 #define ID_STEREO3D_MONO                1111
 #define ID_STEREO3D_HALFOVERUNDER       1112
-#define ID_STEREO3D_INTERLACED          1113
+#define ID_STEREO3D_ROW_INTERLEAVED     1113
 //
 #define ID_FILTERS_SUBITEM_START        2000
 #define ID_FILTERS_SUBITEM_END          2099
