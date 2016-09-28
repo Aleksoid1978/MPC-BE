@@ -1754,6 +1754,7 @@ BEGIN
                 MENUITEM "&Normal",                     ID_VIEW_PRESETS_NORMAL
             END
         END
+        MENUITEM SEPARATOR
         POPUP "Renderer Settings"
         BEGIN
             MENUITEM "&Tearing Test\tCtrl+T",       ID_VIEW_TEARING_TEST
@@ -1767,6 +1768,14 @@ BEGIN
             END
             MENUITEM "Reset to default renderer settings", ID_VIEW_RESET_DEFAULT
         END
+        POPUP "Stereo 3D Mode"
+        BEGIN
+            MENUITEM "Auto",                        ID_STEREO3D_AUTO
+            MENUITEM "Mono",                        ID_STEREO3D_MONO
+            MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
+            MENUITEM "Interlaced",                  ID_STEREO3D_INTERLACED
+        END
+        MENUITEM SEPARATOR
         MENUITEM "P&roperties",                 ID_FILE_PROPERTIES
         MENUITEM "&Options...",                 ID_VIEW_OPTIONS
         MENUITEM SEPARATOR

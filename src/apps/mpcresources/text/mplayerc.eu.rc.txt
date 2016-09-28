@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"&Honi buruz..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"&Agiria"
 7		"Agiri Irekitze A&zkarra...\tKtrl+Q"
 9		"&Ireki Agiria/URL-a...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"T&xikiena"
 162		"&Trinkoa"
 163		"A&rrunta"
-166		"Aurkezle Ezarpenak"
-168		"&Hauspen Azterketa\tKtrl+T"
-169		"&Erakutsi Estatistikak\tKtrl+J"
-171		"Aurkezpena"
-173		"D3D Ikusleiho-osoko Modua"
-174		"Ezgaitu mahaigain osaketa (Aero)"
-175		"Gaitu Frame Denbora Zuzentzea\tC"
-177		"Berrezarri aurkezlearen berezko ezarpenetan"
-179		"E&zagugarriak"
-180		"A&ukerak..."
-182		"I&rten\tAlt+X"
+167		"Aurkezle Ezarpenak"
+169		"&Hauspen Azterketa\tKtrl+T"
+170		"&Erakutsi Estatistikak\tKtrl+J"
+172		"Aurkezpena"
+174		"D3D Ikusleiho-osoko Modua"
+175		"Ezgaitu mahaigain osaketa (Aero)"
+176		"Gaitu Frame Denbora Zuzentzea\tC"
+178		"Berrezarri aurkezlearen berezko ezarpenetan"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"E&zagugarriak"
+189		"A&ukerak..."
+191		"I&rten\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

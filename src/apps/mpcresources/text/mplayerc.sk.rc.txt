@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"&O programe..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"&Súbor"
 7		"&Rýchle otvorenie súboru...\tCtrl+Q"
 9		"&Open File/URL...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"Minimum ovládačov"
 162		"Kompaktný panel"
 163		"Normálne ovládače"
-166		"Nastavenia vykresľovania"
-168		"&Test trhania\tCtrl+T"
-169		"&Štatistika zobrazovania\tCtrl+J"
-171		"Prezentácia"
-173		"Celoobrazovkový režim D3D"
-174		"Vypnúť skladanie pracovnej plochy"
-175		"Zapnúť korekciu času snímky\tC"
-177		"Obnoviť predvolené nastavenia vykresľovania"
-179		"V&lastnosti"
-180		"&Nastavenia..."
-182		"U&končiť\tAlt+X"
+167		"Nastavenia vykresľovania"
+169		"&Test trhania\tCtrl+T"
+170		"&Štatistika zobrazovania\tCtrl+J"
+172		"Prezentácia"
+174		"Celoobrazovkový režim D3D"
+175		"Vypnúť skladanie pracovnej plochy"
+176		"Zapnúť korekciu času snímky\tC"
+178		"Obnoviť predvolené nastavenia vykresľovania"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"V&lastnosti"
+189		"&Nastavenia..."
+191		"U&končiť\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

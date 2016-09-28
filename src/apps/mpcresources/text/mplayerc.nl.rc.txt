@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"&Info..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"&Bestand"
 7		"Snel &bestand openen...\tCtrl+Q"
 9		"Bestand/URL &openen...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"&Minimum"
 162		"&Compact"
 163		"&Standaard"
-166		"Renderer-instellingen"
-168		"&Tearingtest\tCtrl+T"
-169		"&Statistieken tonen\tCtrl+J"
-171		"Presentatie"
-173		"D3D-volledigscherm"
-174		"Deactiveer Bureaubladsamenstelling (Aero)"
-175		"Activeer Frametime-correctie\tC"
-177		"Instellingen van renderer op &standaard"
-179		"&Eigenschappen"
-180		"&Opties..."
-182		"Afsluiten\tAlt+X"
+167		"Renderer-instellingen"
+169		"&Tearingtest\tCtrl+T"
+170		"&Statistieken tonen\tCtrl+J"
+172		"Presentatie"
+174		"D3D-volledigscherm"
+175		"Deactiveer Bureaubladsamenstelling (Aero)"
+176		"Activeer Frametime-correctie\tC"
+178		"Instellingen van renderer op &standaard"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"&Eigenschappen"
+189		"&Opties..."
+191		"Afsluiten\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

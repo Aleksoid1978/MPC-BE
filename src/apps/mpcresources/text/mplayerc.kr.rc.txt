@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"MPC-BE 정보(&A)..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"파일(&F)"
 7		"파일 바로 열기(&Q)...\tCtrl+Q"
 9		"파일/URL 열기(&O)...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"최소"
 162		"간단히"
 163		"표준"
-166		"렌더러 설정"
-168		"잔상 테스트(&T)\tCtrl+T"
-169		"디스플레이 상태(&D)\tCtrl+J"
-171		"프리젠테이션"
-173		"D3D 전체화면 모드"
-174		"데스크톱 합성 사용안함"
-175		"프레임시간수정 사용\tC"
-177		"기본값으로 초기화"
-179		"등록정보(&R)"
-180		"옵션(&O)..."
-182		"종료(&X)\tAlt+X"
+167		"렌더러 설정"
+169		"잔상 테스트(&T)\tCtrl+T"
+170		"디스플레이 상태(&D)\tCtrl+J"
+172		"프리젠테이션"
+174		"D3D 전체화면 모드"
+175		"데스크톱 합성 사용안함"
+176		"프레임시간수정 사용\tC"
+178		"기본값으로 초기화"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"등록정보(&R)"
+189		"옵션(&O)..."
+191		"종료(&X)\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"&O programu..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"&Soubor"
 7		"&Rychle otevřít soubor...\tCtrl+Q"
 9		"&Open File/URL...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"Minimální"
 162		"Kompaktní"
 163		"Standardní"
-166		"Nastavení rendereru"
-168		"Test &trhání\tCtrl+T"
-169		"&Statistika zobrazení\tCtrl+J"
-171		"Zobrazení"
-173		"D3D Fullscreen režim"
-174		"Zakázat kompozici plochy"
-175		"Povolit opravu času snímků\tC"
-177		"Obnovit výchozí nastavení rendereru"
-179		"Vlastnosti"
-180		"Možnosti..."
-182		"&Konec\tAlt+X"
+167		"Nastavení rendereru"
+169		"Test &trhání\tCtrl+T"
+170		"&Statistika zobrazení\tCtrl+J"
+172		"Zobrazení"
+174		"D3D Fullscreen režim"
+175		"Zakázat kompozici plochy"
+176		"Povolit opravu času snímků\tC"
+178		"Obnovit výchozí nastavení rendereru"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"Vlastnosti"
+189		"Možnosti..."
+191		"&Konec\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

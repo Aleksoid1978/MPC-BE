@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"バージョン情報(&A)..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"ファイル(&F)"
 7		"クイック再生(&Q)...\tCtrl+Q"
 9		"ファイル/URL を開く(&O)...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"最小(&M)"
 162		"コンパクト(&C)"
 163		"標準(&N)"
-166		"レンダラー設定"
-168		"テアリング テスト(&T)\tCtrl+T"
-169		"統計を表示(&D)\tCtrl+J"
-171		"表示"
-173		"D3D フルスクリーン モード"
-174		"デスクトップ コンポジション (Aero) の無効化"
-175		"フレーム時間補正\tC"
-177		"デフォルトのレンダラー設定"
-179		"プロパティ(&R)"
-180		"オプション(&O)..."
-182		"終了(&X)\tAlt+X"
+167		"レンダラー設定"
+169		"テアリング テスト(&T)\tCtrl+T"
+170		"統計を表示(&D)\tCtrl+J"
+172		"表示"
+174		"D3D フルスクリーン モード"
+175		"デスクトップ コンポジション (Aero) の無効化"
+176		"フレーム時間補正\tC"
+178		"デフォルトのレンダラー設定"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"プロパティ(&R)"
+189		"オプション(&O)..."
+191		"終了(&X)\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

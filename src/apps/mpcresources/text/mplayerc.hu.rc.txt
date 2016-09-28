@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"&Névjegy..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"&Fájl"
 7		"&Gyors fájl megnyitás...\tCtrl+Q"
 9		"&Open File/URL...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"Minimális"
 162		"Tömörített"
 163		"Normál"
-166		"Videó átalakító beállítások"
-168		"&Képszétválasztás teszt\tCtrl+T"
-169		"&Statisztika megjelenítése\tCtrl+J"
-171		"Megjelenítés"
-173		"D3D Teljes képernyős mód"
-174		"Asztal-összeállítás kikapcsolása"
-175		"Képkocka időzítés-javítás engedélyezése\tC"
-177		"Alapértelmezett videó átalakító beállítások visszaállítása"
-179		"&Tulajdonságok"
-180		"&Beállítások..."
-182		"Kilépés\tAlt+X"
+167		"Videó átalakító beállítások"
+169		"&Képszétválasztás teszt\tCtrl+T"
+170		"&Statisztika megjelenítése\tCtrl+J"
+172		"Megjelenítés"
+174		"D3D Teljes képernyős mód"
+175		"Asztal-összeállítás kikapcsolása"
+176		"Képkocka időzítés-javítás engedélyezése\tC"
+178		"Alapértelmezett videó átalakító beállítások visszaállítása"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"&Tulajdonságok"
+189		"&Beállítások..."
+191		"Kilépés\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213

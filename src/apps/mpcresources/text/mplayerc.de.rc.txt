@@ -734,7 +734,7 @@ BEGIN MENU IDR_MAINFRAME LINES 203
 201		"&Über..."
 END
 
-BEGIN MENU IDR_POPUP LINES 184
+BEGIN MENU IDR_POPUP LINES 193
 5		"&Datei"
 7		"Mediendatei öff&nen...\tCtrl+Q"
 9		"Medien öff&nen...\tCtrl+O"
@@ -848,17 +848,22 @@ BEGIN MENU IDR_POPUP LINES 184
 161		"&Minimal"
 162		"&Kompakt"
 163		"&Normal"
-166		"Video-Renderer"
-168		"Te&aring-Test\tCtrl+T"
-169		"An&zeigestatistik\tCtrl+J"
-171		"Präsentation"
-173		"Direct3D-Vollbildmodus"
-174		"Windows-Desktopgestaltung (Aero) deaktivieren"
-175		"Bildzeit-Korrektur\tC"
-177		"Standard-Einstellungen laden"
-179		"&Eigenschaften"
-180		"&Optionen..."
-182		"&Beenden\tAlt+X"
+167		"Video-Renderer"
+169		"Te&aring-Test\tCtrl+T"
+170		"An&zeigestatistik\tCtrl+J"
+172		"Präsentation"
+174		"Direct3D-Vollbildmodus"
+175		"Windows-Desktopgestaltung (Aero) deaktivieren"
+176		"Bildzeit-Korrektur\tC"
+178		"Standard-Einstellungen laden"
+180		"Stereo 3D Mode"
+182		"Auto"
+183		"Mono"
+184		"Half OverUnder"
+185		"Interlaced"
+188		"&Eigenschaften"
+189		"&Optionen..."
+191		"&Beenden\tAlt+X"
 END
 
 BEGIN MENU IDR_POPUPMAIN LINES 213
