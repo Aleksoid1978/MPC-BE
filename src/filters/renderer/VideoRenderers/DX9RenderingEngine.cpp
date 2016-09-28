@@ -1294,14 +1294,14 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 {
 	HRESULT hr;
 
-	CRenderersSettings& settings = GetRenderersSettings();
-	CRenderersData* data = GetRenderersData();
+	CRenderersSettings& rs = GetRenderersSettings();
+	CRenderersData* rd = GetRenderersData();
 
 	// Check whether the final pass must be initialized
-	bool bColorManagement = settings.m_AdvRendSets.bColorManagementEnable;
-	VideoSystem inputVideoSystem = static_cast<VideoSystem>(settings.m_AdvRendSets.iColorManagementInput);
-	AmbientLight ambientLight = static_cast<AmbientLight>(settings.m_AdvRendSets.iColorManagementAmbientLight);
-	ColorRenderingIntent renderingIntent = static_cast<ColorRenderingIntent>(settings.m_AdvRendSets.iColorManagementIntent);
+	bool bColorManagement = rs.bColorManagementEnable;
+	VideoSystem inputVideoSystem = (VideoSystem)rs.iColorManagementInput;
+	AmbientLight ambientLight = (AmbientLight)rs.iColorManagementAmbientLight;
+	ColorRenderingIntent renderingIntent = (ColorRenderingIntent)rs.iColorManagementIntent;
 
 	bool bInitRequired = false;
 
@@ -1326,7 +1326,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	}
 
 	// Check whether the final pass is supported by the hardware
-	m_bFinalPass = data->m_bFP16Support;
+	m_bFinalPass = rd->m_bFP16Support;
 	if (!m_bFinalPass) {
 		return S_OK;
 	}

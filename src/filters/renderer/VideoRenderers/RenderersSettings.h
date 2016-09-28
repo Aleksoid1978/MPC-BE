@@ -100,76 +100,87 @@ enum {
 
 class CRenderersSettings
 {
-
 public:
-	bool bResetDevice;
+	// device
+	CString	sD3DRenderDevice;
+	bool	bResetDevice;
 
-	// Subtitle position settings
-	int bSubpicPosRelative;
-	CPoint SubpicShiftPos;
-
-	// Stereoscopic Subtitles
-	int iSubpicStereoMode;
-
-	class CAdvRendererSettings
-	{
-	public:
-		CAdvRendererSettings() {SetDefault();}
-
-		bool	bAlterativeVSync;
-		int		iVSyncOffset;
-		bool	bVSyncAccurate;
-		bool	bVSync;
-		bool	bColorManagementEnable;
-		int		iColorManagementInput;
-		int		iColorManagementAmbientLight;
-		int		iColorManagementIntent;
-		bool	bDisableDesktopComposition;
-		bool	bFlushGPUBeforeVSync;
-		bool	bFlushGPUAfterPresent;
-		bool	bFlushGPUWait;
-		int		iSurfaceFormat;
-		bool	b10BitOutput;
-
-		// EVR
-		bool	bEVRFrameTimeCorrection;
-		int		iEVROutputRange;
-
-		// SyncRenderer settings
-		int		iSynchronizeMode;
-		int		iLineDelta;
-		int		iColumnDelta;
-		double	dCycleDelta;
-		double	dTargetSyncOffset;
-		double	dControlLimit;
-
-		void SetDefault();
-	};
-
-	CAdvRendererSettings m_AdvRendSets;
-
+	// surfaces and resizer
 	int		iSurfaceType;
+	int		iSurfaceFormat;
+	bool	b10BitOutput;
 	int		iResizer;
+
+	// frame synchronization
+	bool	bVSync;
+	bool	bVSyncAccurate;
+	bool	bAlterativeVSync;
+	int		iVSyncOffset;
+	bool	bDisableDesktopComposition;
+	bool	bEVRFrameTimeCorrection;
+	bool	bFlushGPUBeforeVSync;
+	bool	bFlushGPUAfterPresent;
+	bool	bFlushGPUWait;
+
+	// VMR
 	bool	bVMRMixerMode;
 	bool	bVMRMixerYUV;
 
+	// EVR
+	int		iEVROutputRange;
 	int		nEVRBuffers;
 
+	// SyncRenderer settings
+	int		iSynchronizeMode;
+	int		iLineDelta;
+	int		iColumnDelta;
+	double	dCycleDelta;
+	double	dTargetSyncOffset;
+	double	dControlLimit;
+
+	// color management
+	bool	bColorManagementEnable;
+	int		iColorManagementInput;
+	int		iColorManagementAmbientLight;
+	int		iColorManagementIntent;
+
+	// subtitles
+	int		bSubpicPosRelative;
+	CPoint	SubpicShiftPos;
 	int		nSubpicCount;
 	int		iSubpicMaxTexWidth;
 	bool	bSubpicAnimationWhenBuffering;
 	bool	bSubpicAllowDrop;
+	int		iSubpicStereoMode;
 
-	CString	sD3DRenderDevice;
+	CRenderersSettings();
+
+	void	SetDefault();
 	void	SaveRenderers();
-	void	LoadRenderers();
+	//void	LoadRenderers();
+};
+
+class CAffectingRenderersSettings // used in SettingsNeedResetDevice()
+{
+public:
+	int iSurfaceFormat		= D3DFMT_X8R8G8B8;
+	bool b10BitOutput		= false;
+
+	bool bVSyncAccurate		= false;
+	bool bAlterativeVSync	= false;
+	bool bDisableDesktopComposition = false;
+
+	void Fill(CRenderersSettings& rs)
+	{
+		iSurfaceFormat		= rs.iSurfaceFormat;
+		b10BitOutput		= rs.b10BitOutput;
+		bVSyncAccurate		= rs.bVSyncAccurate;
+		bAlterativeVSync	= rs.bAlterativeVSync;
+	}
 };
 
 class CRenderersData
 {
-	HINSTANCE	m_hD3DX9Dll;
-	HINSTANCE	m_hD3DCompilerDll;
-
 public:
 	CRenderersData();
 
@@ -183,8 +194,8 @@ public:
 	bool		m_b10bitSupport;
 };
 
-extern CRenderersData*		GetRenderersData();
 extern CRenderersSettings&	GetRenderersSettings();
+extern CRenderersData*		GetRenderersData();
 
 extern bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
 
