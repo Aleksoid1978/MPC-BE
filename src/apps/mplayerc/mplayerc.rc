@@ -1506,7 +1506,7 @@ BEGIN
             MENUITEM "Auto",                        ID_STEREO3D_AUTO
             MENUITEM "Mono",                        ID_STEREO3D_MONO
             MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
-            MENUITEM "Interlaced",                  ID_STEREO3D_INTERLACED
+            MENUITEM "Row Interleaved",             ID_STEREO3D_ROW_INTERLEAVED
         END
         MENUITEM SEPARATOR
         POPUP "On Top"
@@ -1773,7 +1773,7 @@ BEGIN
             MENUITEM "Auto",                        ID_STEREO3D_AUTO
             MENUITEM "Mono",                        ID_STEREO3D_MONO
             MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
-            MENUITEM "Interlaced",                  ID_STEREO3D_INTERLACED
+            MENUITEM "Row Interleaved",             ID_STEREO3D_ROW_INTERLEAVED
         END
         MENUITEM SEPARATOR
         MENUITEM "P&roperties",                 ID_FILE_PROPERTIES
