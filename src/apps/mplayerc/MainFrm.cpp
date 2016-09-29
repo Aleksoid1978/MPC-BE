@@ -8448,6 +8448,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 
 		if (m_pCAP) {
 			m_pCAP->Invalidate();
+			RepaintVideo();
 		}
 
 		CString osd = ResStr(IDS_SUBTITLES_STEREO);
@@ -8458,6 +8459,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 
 		if (m_pCAP) {
 			m_pCAP->Invalidate();
+			RepaintVideo();
 		}
 
 		CString osd = ResStr(IDS_SUBTITLES_STEREO);
@@ -8468,6 +8470,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 
 		if (m_pCAP) {
 			m_pCAP->Invalidate();
+			RepaintVideo();
 		}
 
 		CString osd = ResStr(IDS_SUBTITLES_STEREO);
