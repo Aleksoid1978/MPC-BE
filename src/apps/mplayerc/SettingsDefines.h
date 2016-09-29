@@ -76,7 +76,8 @@
 
 #define IDS_RS_D3DFULLSCREEN				_T("D3DFullScreen")
 #define IDS_RS_MONITOR_AUTOREFRESHRATE		_T("MonitorAutoRefreshRate")
-#define IDS_RS_STEREO3DMODE					_T("Stereo3DMode")
+#define IDS_RS_STEREO3D_MODE				_T("Stereo3DMode")
+#define IDS_RS_STEREO3D_SWAPLEFTRIGHT		_T("Stereo3DSwapLeftRight")
 #define IDS_RS_COLOR_BRIGHTNESS				_T("VideoBrightness")
 #define IDS_RS_COLOR_CONTRAST				_T("VideoContrast")
 #define IDS_RS_COLOR_HUE					_T("VideoHue")

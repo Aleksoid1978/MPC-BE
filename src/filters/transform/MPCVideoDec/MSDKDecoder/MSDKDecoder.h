@@ -73,7 +73,7 @@ public:
   void Flush();
   HRESULT EndOfStream();
 
-  void SetStereoMode(MPCStereoMode mode);
+  void SetStereoMode(MPCStereoMode mode, bool swaplr);
 
 private:
   void DestroyDecoder(bool bFull);
@@ -124,6 +124,7 @@ private:
 
   MPCStereoMode         m_iStereoMode = STEREO_Auto;
   MPCStereoMode         m_iNewStereoMode = STEREO_Auto;
+  bool                  m_bSwapLR = false;
 
   bool                  m_bSSE2 = false;
 };
