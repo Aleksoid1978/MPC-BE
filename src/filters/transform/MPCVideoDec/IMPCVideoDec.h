@@ -139,6 +139,5 @@ public IUnknown {
 	STDMETHOD_(GUID*, GetDXVADecoderGuid()) PURE;
 	STDMETHOD_(int, GetColorSpaceConversion()) PURE;
 
-	STDMETHOD(SetStereoMode(int nValue)) PURE;
-	STDMETHOD_(int, GetStereoMode()) PURE;
+	STDMETHOD(SetStereoMode(int nMode, bool bSwapLR)) PURE;
 };

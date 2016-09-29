@@ -372,6 +372,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_ASPECTRATIO_NEXT, OnViewAspectRatioNext)
 	ON_COMMAND_RANGE(ID_STEREO3D_AUTO, ID_STEREO3D_ROW_INTERLEAVED, OnViewStereo3DMode)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_STEREO3D_AUTO, ID_STEREO3D_ROW_INTERLEAVED, OnUpdateViewStereo3DMode)
+	ON_UPDATE_COMMAND_UI(ID_STEREO3D_SWAP_LEFTRIGHT, OnUpdateViewSwapLeftRight)
+	ON_COMMAND(ID_STEREO3D_SWAP_LEFTRIGHT, OnViewSwapLeftRight)
 	ON_COMMAND_RANGE(ID_ONTOP_NEVER, ID_ONTOP_WHILEPLAYINGVIDEO, OnViewOntop)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_ONTOP_NEVER, ID_ONTOP_WHILEPLAYINGVIDEO, OnUpdateViewOntop)
 	ON_COMMAND(ID_VIEW_OPTIONS, OnViewOptions)
@@ -7475,32 +7477,54 @@ void CMainFrame::OnViewAspectRatioNext()
 	OnViewAspectRatio(nID);
 }
 
+void CMainFrame::OnUpdateViewStereo3DMode(CCmdUI* pCmdUI)
+{
+	if (AfxGetAppSettings().iStereo3DMode == (pCmdUI->m_nID - ID_STEREO3D_AUTO)) {
+		CheckMenuRadioItem(ID_STEREO3D_AUTO, ID_STEREO3D_ROW_INTERLEAVED, pCmdUI->m_nID);
+	}
+}
+
 void CMainFrame::OnViewStereo3DMode(UINT nID)
 {
-	int mode = nID - ID_STEREO3D_AUTO;
-	AfxGetAppSettings().iStereo3DMode = mode;
+	CAppSettings& s = AfxGetAppSettings();
+
+	s.iStereo3DMode = nID - ID_STEREO3D_AUTO;
 
 	IFilterGraph* pFG = m_pGB;
 	if (pFG) {
 		CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), pFG);
 		if (pVDF) {
-			pVDF->SetStereoMode(mode == 3 ? 2 : mode);
+			pVDF->SetStereoMode(s.iStereo3DMode == 3 ? 2 : s.iStereo3DMode, s.bStereo3DSwapLR);
 		}
 	}
 
-	if (mode == 3) {
+	if (nID == ID_STEREO3D_ROW_INTERLEAVED) {
 		GetRenderersData()->m_iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
-	} else {
+	}
+	else {
 		GetRenderersData()->m_iStereo3DTransform = STEREO3D_AsIs;
 	}
 
 	RepaintVideo();
 }
 
-void CMainFrame::OnUpdateViewStereo3DMode(CCmdUI* pCmdUI)
+void CMainFrame::OnUpdateViewSwapLeftRight(CCmdUI* pCmdUI)
 {
-	if (AfxGetAppSettings().iStereo3DMode == (pCmdUI->m_nID - ID_STEREO3D_AUTO)) {
-		CheckMenuRadioItem(ID_STEREO3D_AUTO, ID_STEREO3D_ROW_INTERLEAVED, pCmdUI->m_nID);
+	pCmdUI->SetCheck(AfxGetAppSettings().bStereo3DSwapLR);
+}
+
+void CMainFrame::OnViewSwapLeftRight()
+{
+	CAppSettings& s = AfxGetAppSettings();
+
+	s.bStereo3DSwapLR = !s.bStereo3DSwapLR;
+
+	IFilterGraph* pFG = m_pGB;
+	if (pFG) {
+		CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), pFG);
+		if (pVDF) {
+			pVDF->SetStereoMode(s.iStereo3DMode == 3 ? 2 : s.iStereo3DMode, s.bStereo3DSwapLR);
+		}
 	}
 }
 

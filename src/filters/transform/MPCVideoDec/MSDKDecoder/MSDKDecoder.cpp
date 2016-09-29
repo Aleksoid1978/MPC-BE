@@ -131,6 +131,7 @@ CMSDKDecoder::CMSDKDecoder(CMPCVideoDecFilter* pFilter)
   : m_pFilter(pFilter)
 {
   m_iStereoMode = m_iNewStereoMode = m_pFilter->m_iStereoMode;
+  m_bSwapLR = m_pFilter->m_iStereoSwapLR;
 
   int info[4] = { 0 };
   __cpuid(info, 0);
@@ -1022,7 +1023,7 @@ void CMSDKDecoder::ReleaseBuffer(mfxFrameSurface1 * pSurface)
   }
 }
 
-void CMSDKDecoder::SetStereoMode(MPCStereoMode mode)
+void CMSDKDecoder::SetStereoMode(MPCStereoMode mode, bool swaplr)
 {
   m_iNewStereoMode = mode;
 }
