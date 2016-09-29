@@ -987,8 +987,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bHEVC10bit(FALSE)
 	, m_dRate(1.0)
 	, m_pMSDKDecoder(NULL)
-	, m_iStereoMode(STEREO_Auto)
-	, m_iStereoSwapLR(false)
+	, m_iMvcOutputMode(MVC_OUTPUT_Auto)
+	, m_iMvcSwapLR(false)
 	, m_MVC_Base_View_R_flag(FALSE)
 {
 	if (phr) {
@@ -3583,17 +3583,17 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetColorSpaceConversion()
 	return 0; // YUV->YUV or RGB->RGB conversion
 }
 
-STDMETHODIMP CMPCVideoDecFilter::SetStereoMode(int nMode, bool bSwapLR)
+STDMETHODIMP CMPCVideoDecFilter::SetMvcOutputMode(int nMode, bool bSwapLR)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	if (nMode < 0 || nMode > STEREO_TopBottom) {
+	if (nMode < 0 || nMode > MVC_OUTPUT_TopBottom) {
 		return E_INVALIDARG;
 	}
-	m_iStereoMode = (MPCStereoMode)nMode;
-	m_iStereoSwapLR = bSwapLR;
+	m_iMvcOutputMode = nMode;
+	m_iMvcSwapLR = bSwapLR;
 
 	if (m_pMSDKDecoder) {
-		m_pMSDKDecoder->SetStereoMode(m_iStereoMode, m_iStereoSwapLR);
+		m_pMSDKDecoder->SetOutputMode(nMode, bSwapLR);
 	}
 
 	return S_OK;

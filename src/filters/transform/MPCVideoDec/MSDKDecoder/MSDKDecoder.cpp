@@ -130,8 +130,8 @@ private:
 CMSDKDecoder::CMSDKDecoder(CMPCVideoDecFilter* pFilter)
   : m_pFilter(pFilter)
 {
-  m_iStereoMode = m_iNewStereoMode = m_pFilter->m_iStereoMode;
-  m_bSwapLR = m_pFilter->m_iStereoSwapLR;
+  m_iOutputMode = m_iNewOutputMode = m_pFilter->m_iMvcOutputMode;
+  m_bSwapLR = m_pFilter->m_iMvcSwapLR;
 
   int info[4] = { 0 };
   __cpuid(info, 0);
@@ -603,9 +603,9 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
 
   HRESULT hr = S_OK;
 
-  if (m_iNewStereoMode != m_iStereoMode) {
+  if (m_iNewOutputMode != m_iOutputMode) {
     av_frame_free(&m_pFrame);
-    m_iStereoMode = m_iNewStereoMode;
+    m_iOutputMode = m_iNewOutputMode;
   }
 
   if (m_pFrame && (m_pFrame->width != width || m_pFrame->height != height)) {
@@ -630,7 +630,7 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       && SUCCEEDED(hr = m_pFilter->GetDeliveryBuffer(width, height, &pOut, m_pFilter->GetFrameDuration()))
       && SUCCEEDED(hr = pOut->GetPointer(&pDataOut))) {
     bool bMediaSample3DSupport = false;
-    if (m_iStereoMode == STEREO_Auto) {
+    if (m_iOutputMode == MVC_OUTPUT_Auto) {
       // Write the second view into IMediaSample3D, if available
       CComPtr<IMediaSample3D> pSample3D;
       if (SUCCEEDED(hr = pOut->QueryInterface(&pSample3D))) {
@@ -644,8 +644,8 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       }
     }
 
-    if (m_iStereoMode == STEREO_TopBottom
-        || (m_iStereoMode == STEREO_Auto && !bMediaSample3DSupport)) {
+    if (m_iOutputMode == MVC_OUTPUT_TopBottom
+        || (m_iOutputMode == MVC_OUTPUT_Auto && !bMediaSample3DSupport)) {
       if (!m_pFrame->data[0] && av_frame_get_buffer(m_pFrame, 64) < 0) {
         hr = E_POINTER;
         goto error;
@@ -1023,7 +1023,7 @@ void CMSDKDecoder::ReleaseBuffer(mfxFrameSurface1 * pSurface)
   }
 }
 
-void CMSDKDecoder::SetStereoMode(MPCStereoMode mode, bool swaplr)
+void CMSDKDecoder::SetOutputMode(int mode, bool swaplr)
 {
-  m_iNewStereoMode = mode;
+  m_iNewOutputMode = mode;
 }
