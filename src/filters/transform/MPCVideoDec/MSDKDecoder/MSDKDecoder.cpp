@@ -657,10 +657,16 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       unsigned line;
 
       // luminance
-      auto dstBase  = m_pFrame->data[0];
-      auto srcBase  = m_pFilter->m_MVC_Base_View_R_flag ? pExtraView->surface.Data.Y : pBaseView->surface.Data.Y;
-      auto dstExtra = dstBase + (half_lines) * linesize;
-      auto srcExtra = (m_pFilter->m_MVC_Base_View_R_flag ? pBaseView->surface.Data.Y : pExtraView->surface.Data.Y) + linesize;
+      uint8_t* dstBase = m_pFrame->data[0];
+      uint8_t* dstExtra = dstBase + (half_lines)* linesize;;
+
+      bool swapLR = !!m_pFilter->m_MVC_Base_View_R_flag;
+      if (m_bSwapLR) {
+        swapLR != swapLR;
+      }
+      uint8_t* srcBase = swapLR ? pExtraView->surface.Data.Y : pBaseView->surface.Data.Y;
+      uint8_t* srcExtra = (swapLR ? pBaseView->surface.Data.Y : pExtraView->surface.Data.Y) + linesize;
+
       if (m_bSSE2 && ((size_t)dstBase % 16u) == 0 && ((size_t)dstExtra % 16u) == 0) {
         for (line = 0; line < half_lines; line++) {
           PIXCONV_MEMCPY_ALIGNED_TWO(dstBase, srcBase, dstExtra, srcExtra, (ptrdiff_t)linesize)
@@ -685,9 +691,10 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
 
       // color
       dstBase  = m_pFrame->data[1];
-      srcBase  = m_pFilter->m_MVC_Base_View_R_flag ? pExtraView->surface.Data.UV : pBaseView->surface.Data.UV;
       dstExtra = dstBase + (half_chromalines) * linesize;
-      srcExtra = (m_pFilter->m_MVC_Base_View_R_flag ? pBaseView->surface.Data.UV : pExtraView->surface.Data.UV) + linesize;
+      srcBase  = swapLR ? pExtraView->surface.Data.UV : pBaseView->surface.Data.UV;
+      srcExtra = (swapLR ? pBaseView->surface.Data.UV : pExtraView->surface.Data.UV) + linesize;
+
       if (m_bSSE2 && ((size_t)dstBase % 16u) == 0 && ((size_t)dstExtra % 16u) == 0) {
         for (line = 0; line < half_chromalines; line++) {
           PIXCONV_MEMCPY_ALIGNED_TWO(dstBase, srcBase, dstExtra, srcExtra, (ptrdiff_t)linesize);
