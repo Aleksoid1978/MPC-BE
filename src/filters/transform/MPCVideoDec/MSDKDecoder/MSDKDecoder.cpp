@@ -41,6 +41,34 @@ extern "C" {
 #include "../pixconv_sse2_templates.h"
 #include <intrin.h>
 
+inline void CopyEverySecondLine(uint8_t* dst, uint8_t* src1, uint8_t* src2, size_t linesize, unsigned lines)
+{
+	for (unsigned i = 0; i < lines; i++) {
+		memcpy(dst, src1, linesize);
+		dst += linesize;
+		src1 += linesize * 2;
+	}
+	for (unsigned i = 0; i < lines; i++) {
+		memcpy(dst, src2, linesize);
+		dst += linesize;
+		src2 += linesize * 2;
+	}
+}
+
+inline void CopyEverySecondLineSSE2(uint8_t* dst, uint8_t* src1, uint8_t* src2, size_t linesize, unsigned lines)
+{
+	for (unsigned i = 0; i < lines; i++) {
+		PIXCONV_MEMCPY_ALIGNED(dst, src1, (ptrdiff_t)linesize)
+		dst += linesize;
+		src1 += linesize * 2;
+	}
+	for (unsigned i = 0; i < lines; i++) {
+		PIXCONV_MEMCPY_ALIGNED(dst, src2, (ptrdiff_t)linesize)
+		dst += linesize;
+		src2 += linesize * 2;
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Bitstream buffering
 ////////////////////////////////////////////////////////////////////////////////
@@ -651,72 +679,35 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
         goto error;
       }
 
-      const unsigned half_lines = height / 2;
-      const unsigned half_chromalines = half_lines / 2;
       const size_t linesize = pBaseView->surface.Data.PitchLow;
-      unsigned line;
-
-      // luminance
-      uint8_t* dstBase = m_pFrame->data[0];
-      uint8_t* dstExtra = dstBase + (half_lines)* linesize;;
-
       bool swapLR = !!m_pFilter->m_MVC_Base_View_R_flag;
       if (m_bSwapLR) {
-        swapLR != swapLR;
+        swapLR = !swapLR;
       }
+
+      // luminance
+      uint8_t* dst = m_pFrame->data[0];
       uint8_t* srcBase = swapLR ? pExtraView->surface.Data.Y : pBaseView->surface.Data.Y;
       uint8_t* srcExtra = (swapLR ? pBaseView->surface.Data.Y : pExtraView->surface.Data.Y) + linesize;
 
-      if (m_bSSE2 && ((size_t)dstBase % 16u) == 0 && ((size_t)dstExtra % 16u) == 0) {
-        for (line = 0; line < half_lines; line++) {
-          PIXCONV_MEMCPY_ALIGNED_TWO(dstBase, srcBase, dstExtra, srcExtra, (ptrdiff_t)linesize)
-      
-          dstBase += linesize;
-          srcBase += linesize * 2;
-
-          dstExtra += linesize;
-          srcExtra += linesize * 2;
-        }
+      if (m_bSSE2 && ((size_t)dst % 16) == 0) {
+        CopyEverySecondLineSSE2(dst, srcBase, srcExtra, linesize, height / 2);
       } else {
-        for (line = 0; line < half_lines; line++) {
-          memcpy(dstBase, srcBase, linesize);
-          dstBase += linesize;
-          srcBase += linesize * 2;
-
-          memcpy(dstExtra, srcExtra, linesize);
-          dstExtra += linesize;
-          srcExtra += linesize * 2;
-        }
+        CopyEverySecondLine(dst, srcBase, srcExtra, linesize, height / 2);
       }
 
       // color
-      dstBase  = m_pFrame->data[1];
-      dstExtra = dstBase + (half_chromalines) * linesize;
+      dst  = m_pFrame->data[1];
       srcBase  = swapLR ? pExtraView->surface.Data.UV : pBaseView->surface.Data.UV;
       srcExtra = (swapLR ? pBaseView->surface.Data.UV : pExtraView->surface.Data.UV) + linesize;
 
-      if (m_bSSE2 && ((size_t)dstBase % 16u) == 0 && ((size_t)dstExtra % 16u) == 0) {
-        for (line = 0; line < half_chromalines; line++) {
-          PIXCONV_MEMCPY_ALIGNED_TWO(dstBase, srcBase, dstExtra, srcExtra, (ptrdiff_t)linesize);
-
-          dstBase += linesize;
-          srcBase += linesize * 2;
-
-          dstExtra += linesize;
-          srcExtra += linesize * 2;
-        }
+      if (m_bSSE2 && ((size_t)dst % 16) == 0) {
+        CopyEverySecondLineSSE2(dst, srcBase, srcExtra, linesize, height / 4);
       } else {
-        for (line = 0; line < half_chromalines; line++) {
-          memcpy(dstBase, srcBase, linesize);
-          dstBase += linesize;
-          srcBase += linesize * 2;
-
-          memcpy(dstExtra, srcExtra, linesize);
-          dstExtra += linesize;
-          srcExtra += linesize * 2;
-        }
+        CopyEverySecondLine(dst, srcBase, srcExtra, linesize, height / 4);
       }
-    } else {
+    }
+    else {
       allocateFrame(true);
     }
 
