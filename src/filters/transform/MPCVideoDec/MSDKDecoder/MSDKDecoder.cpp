@@ -1024,4 +1024,5 @@ void CMSDKDecoder::ReleaseBuffer(mfxFrameSurface1 * pSurface)
 void CMSDKDecoder::SetOutputMode(int mode, bool swaplr)
 {
   m_iNewOutputMode = mode;
+  m_bSwapLR = swaplr;
 }
