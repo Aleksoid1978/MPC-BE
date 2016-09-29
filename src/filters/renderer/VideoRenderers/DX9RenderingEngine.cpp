@@ -220,6 +220,9 @@ void CDX9RenderingEngine::CleanupRenderingEngine()
 	NULL_PTR_ARRAY(m_pFrameTextures)
 	NULL_PTR_ARRAY(m_pScreenSpaceTextures);
 	m_pResizeTexture = NULL;
+
+	m_pYCgCoCorrectionPixelShader.Release();
+	m_pConvertToInterlacePixelShader.Release();
 }
 
 HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
