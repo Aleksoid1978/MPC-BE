@@ -50,10 +50,10 @@ typedef struct _MVCGOP {
   std::deque<MediaSideData3DOffset> offsets;
 } MVCGOP;
 
-enum MPCStereoMode {
-  STEREO_Auto = 0,
-  STEREO_Mono,     // force mono frame (left)
-  STEREO_TopBottom // convert to stereoscopic half height anamorphic video
+enum {
+  MVC_OUTPUT_Auto = 0,
+  MVC_OUTPUT_Mono,     // force mono frame (left)
+  MVC_OUTPUT_TopBottom // convert to stereoscopic half height anamorphic video
 };
 
 class CMPCVideoDecFilter;
@@ -73,7 +73,7 @@ public:
   void Flush();
   HRESULT EndOfStream();
 
-  void SetStereoMode(MPCStereoMode mode, bool swaplr);
+  void SetOutputMode(int mode, bool swaplr);
 
 private:
   void DestroyDecoder(bool bFull);
@@ -122,8 +122,8 @@ private:
 
   AVFrame              *m_pFrame = nullptr;
 
-  MPCStereoMode         m_iStereoMode = STEREO_Auto;
-  MPCStereoMode         m_iNewStereoMode = STEREO_Auto;
+  int                   m_iOutputMode = MVC_OUTPUT_Auto;
+  int                   m_iNewOutputMode = MVC_OUTPUT_Auto;
   bool                  m_bSwapLR = false;
 
   bool                  m_bSSE2 = false;

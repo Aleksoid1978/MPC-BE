@@ -142,8 +142,8 @@ protected:
 	BOOL									m_bHEVC10bit;
 
 	CMSDKDecoder*							m_pMSDKDecoder;
-	MPCStereoMode							m_iStereoMode;
-	bool									m_iStereoSwapLR;
+	int										m_iMvcOutputMode;
+	bool									m_iMvcSwapLR;
 
 	BOOL									m_MVC_Base_View_R_flag;
 
@@ -237,7 +237,7 @@ public:
 	STDMETHODIMP_(GUID*) GetDXVADecoderGuid();
 	STDMETHODIMP_(int) GetColorSpaceConversion();
 
-	STDMETHODIMP SetStereoMode(int nMode, bool bSwapLR);
+	STDMETHODIMP SetMvcOutputMode(int nMode, bool bSwapLR);
 
 	// === common functions
 	BOOL						IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);

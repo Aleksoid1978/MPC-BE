@@ -7494,7 +7494,7 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 	if (pFG) {
 		CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), pFG);
 		if (pVDF) {
-			pVDF->SetStereoMode(s.iStereo3DMode == 3 ? 2 : s.iStereo3DMode, s.bStereo3DSwapLR);
+			pVDF->SetMvcOutputMode(s.iStereo3DMode == 3 ? 2 : s.iStereo3DMode, s.bStereo3DSwapLR);
 		}
 	}
 
@@ -7523,7 +7523,7 @@ void CMainFrame::OnViewSwapLeftRight()
 	if (pFG) {
 		CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), pFG);
 		if (pVDF) {
-			pVDF->SetStereoMode(s.iStereo3DMode == 3 ? 2 : s.iStereo3DMode, s.bStereo3DSwapLR);
+			pVDF->SetMvcOutputMode(s.iStereo3DMode == 3 ? 2 : s.iStereo3DMode, s.bStereo3DSwapLR);
 		}
 	}
 }
