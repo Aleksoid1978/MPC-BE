@@ -1773,14 +1773,12 @@ void File__Analyze::Duration_Duration123(stream_t StreamKind, size_t StreamPos, 
             if (DurationString1.size()>0)
                 DurationString1+=__T(" ");
             DurationString1+=Ztring::ToZtring(Sec)+MediaInfoLib::Config.Language_Get(__T("s"));
-            if (DurationString2.size()<5)
+            if (HH==0)
             {
                 if (DurationString2.size()>0)
                     DurationString2+=__T(" ");
                 DurationString2+=Ztring::ToZtring(Sec)+MediaInfoLib::Config.Language_Get(__T("s"));
             }
-            else if (DurationString2.size()==0)
-                DurationString2+=Ztring::ToZtring(Sec)+MediaInfoLib::Config.Language_Get(__T("s"));
             if (Sec<10)
                 DurationString3+=Ztring(__T("0"))+Ztring::ToZtring(Sec)+__T(".");
             else
@@ -1798,7 +1796,7 @@ void File__Analyze::Duration_Duration123(stream_t StreamKind, size_t StreamPos, 
             if (DurationString1.size()>0)
                 DurationString1+=__T(" ");
             DurationString1+=Ztring::ToZtring(MS)+MediaInfoLib::Config.Language_Get(__T("ms"));
-            if (DurationString2.size()<5)
+            if (HH==0 && MM==0)
             {
                 if (DurationString2.size()>0)
                     DurationString2+=__T(" ");

@@ -113,6 +113,9 @@ void File__Analyze::TestContinuousFileNames(size_t CountOfFiles, Ztring FileExte
     size_t Pos_Base = (size_t)-1;
     bool AlreadyPresent=Config->File_Names.size()==1?true:false;
     FileName FileToTest(Config->File_Names.Read(Config->File_Names.size()-1));
+    #ifdef WIN32
+        FileToTest.FindAndReplace(__T("/"), __T("\\"), 0, Ztring_Recursive); // "/" is sometimes used on Windows and it is considered as valid
+    #endif //WIN32
     Ztring FileToTest_Name=FileToTest.Name_Get();
     Ztring FileToTest_Name_After=FileToTest_Name;
     size_t FileNameToTest_End=FileToTest_Name.size();

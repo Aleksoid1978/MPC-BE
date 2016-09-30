@@ -420,6 +420,10 @@ protected :
     void LensUnitMetadata_LensZoomActualFocalLength();          //8005
     void LensUnitMetadata_OpticalExtenderMagnification();       //8006
     void LensUnitMetadata_LensAttributes();                     //8007
+    void LensUnitMetadata_IrisTNumber();                        //8008
+    void LensUnitMetadata_IrisRingPosition();                   //8009
+    void LensUnitMetadata_FocusRingPosition();                  //800A
+    void LensUnitMetadata_ZoomRingPosition();                   //800B
     void CameraUnitMetadata_CaptureGammaEquation();             //3210
     void CameraUnitMetadata_AutoExposureMode();                 //8100
     void CameraUnitMetadata_AutoFocusSensingAreaSetting();      //8101
@@ -445,6 +449,7 @@ protected :
     void CameraUnitMetadata_ExposureIndexofPhotoMeter();        //8115
     void CameraUnitMetadata_GammaForCDL();                      //8116
     void CameraUnitMetadata_ASC_CDL_V12();                      //8117
+    void CameraUnitMetadata_ColorMatrix();                      //8118
     void UserDefinedAcquisitionMetadata_UdamSetIdentifier();    //E000
     void UserDefinedAcquisitionMetadata_Sony_8007();
     void UserDefinedAcquisitionMetadata_Sony_E101();

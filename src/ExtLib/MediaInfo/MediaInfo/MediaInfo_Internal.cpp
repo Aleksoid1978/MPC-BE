@@ -746,7 +746,11 @@ size_t MediaInfo_Internal::Open_Buffer_Init (int64u File_Size_, int64u File_Offs
     if (Config.File_Names.size()<=1) //If analyzing multiple files, theses members are adapted in File_Reader.cpp
     {
         if (File_Size_!=(int64u)-1)
+        {
             Config.File_Size=Config.File_Current_Size=File_Size_;
+            if (Info && !Info->Retrieve(Stream_General, 0, General_FileSize).empty())
+                Info->Fill(Stream_General, 0, General_FileSize, File_Size_, 10, true); //TODO: avoid multiple tests of file size field, refactor it in order to have a single place for file size info
+        }
     }
 
     if (Info==NULL || File_Size_!=(int64u)-1)

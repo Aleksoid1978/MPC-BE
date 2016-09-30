@@ -297,6 +297,84 @@ int32u Avc_MaxDpbMbs(int8u level)
     }
 }
 
+//---------------------------------------------------------------------------
+namespace AVC_Intra_Headers
+{
+    //720p50
+    static const size_t __720p50__50_Size = 4 * 0x10 + 0xA;
+    static const int8u  __720p50__50[__720p50__50_Size] = { 0x00, 0x00, 0x01, 0x67, 0x6E, 0x10, 0x20, 0xA6, 0xD4, 0x20, 0x32, 0x33, 0x0C, 0x71, 0x18, 0x88,
+                                                            0x62, 0x10, 0x19, 0x19, 0x86, 0x38, 0x8C, 0x44, 0x30, 0x21, 0x02, 0x56, 0x4E, 0x6F, 0x37, 0xCD,
+                                                            0xF9, 0xBF, 0x81, 0x6B, 0xF3, 0x7C, 0xDE, 0x6E, 0x6C, 0xD3, 0x3C, 0x0F, 0x01, 0x6E, 0xFF, 0xC0,
+                                                            0x00, 0xC0, 0x01, 0x38, 0xC0, 0x40, 0x40, 0x50, 0x00, 0x00, 0x03, 0x00, 0x10, 0x00, 0x00, 0x06,
+                                                            0x48, 0x40, 0x00, 0x00, 0x01, 0x68, 0xEE, 0x31, 0x12, 0x11 };
+    static const size_t __720p50_100_Size = 5 * 0x10 + 0x2;
+    static const int8u  __720p50_100[__720p50_100_Size] = { 0x00, 0x00, 0x01, 0x67, 0x7A, 0x10, 0x29, 0xB6, 0xD4, 0x20, 0x2A, 0x33, 0x1D, 0xC7, 0x62, 0xA1,
+                                                            0x08, 0x40, 0x54, 0x66, 0x3B, 0x8E, 0xC5, 0x42, 0x02, 0x10, 0x25, 0x64, 0x2C, 0x89, 0xE8, 0x85,
+                                                            0xE4, 0x21, 0x4B, 0x90, 0x83, 0x06, 0x95, 0xD1, 0x06, 0x46, 0x97, 0x20, 0xC8, 0xD7, 0x43, 0x08,
+                                                            0x11, 0xC2, 0x1E, 0x4C, 0x91, 0x0F, 0x01, 0x40, 0x16, 0xEC, 0x07, 0x8C, 0x04, 0x04, 0x05, 0x00,
+                                                            0x00, 0x03, 0x00, 0x01, 0x00, 0x00, 0x03, 0x00, 0x64, 0x84, 0x00, 0x00, 0x01, 0x68, 0xCE, 0x31,
+                                                            0x12, 0x11 };
+    //720p60
+    static const size_t __720p60__50_Size = 4 * 0x10 + 0xB;
+    static const int8u  __720p60__50[__720p60__50_Size] = { 0x00, 0x00, 0x01, 0x67, 0x6E, 0x10, 0x20, 0xA6, 0xD4, 0x20, 0x32, 0x33, 0x0C, 0x71, 0x18, 0x88,
+                                                            0x62, 0x10, 0x19, 0x19, 0x86, 0x38, 0x8C, 0x44, 0x30, 0x21, 0x02, 0x56, 0x4E, 0x6F, 0x37, 0xCD,
+                                                            0xF9, 0xBF, 0x81, 0x6B, 0xF3, 0x7C, 0xDE, 0x6E, 0x6C, 0xD3, 0x3C, 0x0F, 0x01, 0x6E, 0xFF, 0xC0,
+                                                            0x00, 0xC0, 0x01, 0x38, 0xC0, 0x40, 0x40, 0x50, 0x00, 0x00, 0x3E, 0x90, 0x00, 0x1D, 0x4C, 0x08,
+                                                            0x40, 0x00, 0x00, 0x00, 0x00, 0x01, 0x68, 0xEE, 0x31, 0x12, 0x11 };
+    static const size_t __720p60_100_Size = 5 * 0x10 + 0x1;
+    static const int8u  __720p60_100[__720p60_100_Size] = { 0x00, 0x00, 0x01, 0x67, 0x7A, 0x10, 0x29, 0xB6, 0xD4, 0x20, 0x2A, 0x33, 0x1D, 0xC7, 0x62, 0xA1,
+                                                            0x08, 0x40, 0x54, 0x66, 0x3B, 0x8E, 0xC5, 0x42, 0x02, 0x10, 0x25, 0x64, 0x2C, 0x89, 0xE8, 0x85,
+                                                            0xE4, 0x21, 0x4B, 0x90, 0x83, 0x06, 0x95, 0xD1, 0x06, 0x46, 0x97, 0x20, 0xC8, 0xD7, 0x43, 0x08,
+                                                            0x11, 0xC2, 0x1E, 0x4C, 0x91, 0x0F, 0x01, 0x40, 0x16, 0xEC, 0x07, 0x8C, 0x04, 0x04, 0x05, 0x00,
+                                                            0x00, 0x03, 0x03, 0xE9, 0x00, 0x01, 0xD4, 0xC0, 0x84, 0x00, 0x00, 0x01, 0x68, 0xCE, 0x31, 0x12,
+                                                            0x11 };
+
+    //1080i50
+    static const size_t _1080i50__50_Size = 5 * 0x10 + 0xE;
+    static const int8u  _1080i50__50[_1080i50__50_Size] = { 0x00, 0x00, 0x01, 0x67, 0x6E, 0x10, 0x28, 0xA6, 0xD4, 0x20, 0x32, 0x33, 0x0C, 0x71, 0x18, 0x88,
+                                                            0x62, 0x10, 0x19, 0x19, 0x86, 0x38, 0x8C, 0x44, 0x30, 0x21, 0x02, 0x56, 0x4E, 0x6E, 0x61, 0x87,
+                                                            0x3E, 0x73, 0x4D, 0x98, 0x0C, 0x03, 0x06, 0x9C, 0x0B, 0x73, 0xE6, 0xC0, 0xB5, 0x18, 0x63, 0x0D,
+                                                            0x39, 0xE0, 0x5B, 0x02, 0xD4, 0xC6, 0x19, 0x1A, 0x79, 0x8C, 0x32, 0x34, 0x24, 0xF0, 0x16, 0x81,
+                                                            0x13, 0xF7, 0xFF, 0x80, 0x01, 0x80, 0x02, 0x71, 0x80, 0x80, 0x80, 0xA0, 0x00, 0x00, 0x03, 0x00,
+                                                            0x20, 0x00, 0x00, 0x06, 0x50, 0x80, 0x00, 0x00, 0x01, 0x68, 0xEE, 0x31, 0x12, 0x11 };
+    static const size_t _1080i50_100_Size = 5 * 0x10 + 0xF;
+    static const int8u  _1080i50_100[_1080i50_100_Size] = { 0x00, 0x00, 0x01, 0x67, 0x7A, 0x10, 0x29, 0xB6, 0xD4, 0x20, 0x22, 0x33, 0x19, 0xC6, 0x63, 0x23,
+                                                            0x21, 0x01, 0x11, 0x98, 0xCE, 0x33, 0x19, 0x18, 0x21, 0x03, 0x3A, 0x46, 0x65, 0x6A, 0x65, 0x24,
+                                                            0xAD, 0xE9, 0x12, 0x32, 0x14, 0x1A, 0x26, 0x34, 0xAD, 0xA4, 0x41, 0x82, 0x23, 0x01, 0x50, 0x2B,
+                                                            0x1A, 0x24, 0x69, 0x48, 0x30, 0x40, 0x2E, 0x11, 0x12, 0x08, 0xC6, 0x8C, 0x04, 0x41, 0x28, 0x4C,
+                                                            0x34, 0xF0, 0x1E, 0x01, 0x13, 0xF2, 0xE0, 0x3C, 0x60, 0x20, 0x20, 0x28, 0x00, 0x00, 0x03, 0x00,
+                                                            0x08, 0x00, 0x00, 0x03, 0x01, 0x94, 0x20, 0x00, 0x00, 0x01, 0x68, 0xCE, 0x33, 0x48, 0xD0 };
+    //1080i60
+    static const size_t _1080i60__50_Size = 5 * 0x10 + 0xD;
+    static const int8u  _1080i60__50[_1080i60__50_Size] = { 0x00, 0x00, 0x01, 0x67, 0x6E, 0x10, 0x28, 0xA6, 0xD4, 0x20, 0x32, 0x33, 0x0C, 0x71, 0x18, 0x88,
+                                                            0x62, 0x10, 0x19, 0x19, 0x86, 0x38, 0x8C, 0x44, 0x30, 0x21, 0x02, 0x56, 0x4E, 0x6E, 0x61, 0x87,
+                                                            0x3E, 0x73, 0x4D, 0x98, 0x0C, 0x03, 0x06, 0x9C, 0x0B, 0x73, 0xE6, 0xC0, 0xB5, 0x18, 0x63, 0x0D,
+                                                            0x39, 0xE0, 0x5B, 0x02, 0xD4, 0xC6, 0x19, 0x1A, 0x79, 0x8C, 0x32, 0x34, 0x24, 0xF0, 0x16, 0x81,
+                                                            0x13, 0xF7, 0xFF, 0x80, 0x01, 0x80, 0x02, 0x71, 0x80, 0x80, 0x80, 0xA0, 0x00, 0x00, 0x7D, 0x20,
+                                                            0x00, 0x1D, 0x4C, 0x10, 0x80, 0x00, 0x00, 0x01, 0x68, 0xEE, 0x31, 0x12, 0x11 };
+    static const size_t _1080i60_100_Size = 5 * 0x10 + 0xD;
+    static const int8u  _1080i60_100[_1080i60_100_Size] = { 0x00, 0x00, 0x01, 0x67, 0x7A, 0x10, 0x29, 0xB6, 0xD4, 0x20, 0x22, 0x33, 0x19, 0xC6, 0x63, 0x23,
+                                                            0x21, 0x01, 0x11, 0x98, 0xCE, 0x33, 0x19, 0x18, 0x21, 0x03, 0x3A, 0x46, 0x65, 0x6A, 0x65, 0x24,
+                                                            0xAD, 0xE9, 0x12, 0x32, 0x14, 0x1A, 0x26, 0x34, 0xAD, 0xA4, 0x41, 0x82, 0x23, 0x01, 0x50, 0x2B,
+                                                            0x1A, 0x24, 0x69, 0x48, 0x30, 0x40, 0x2E, 0x11, 0x12, 0x08, 0xC6, 0x8C, 0x04, 0x41, 0x28, 0x4C,
+                                                            0x34, 0xF0, 0x1E, 0x01, 0x13, 0xF2, 0xE0, 0x3C, 0x60, 0x20, 0x20, 0x28, 0x00, 0x00, 0x1F, 0x48,
+                                                            0x00, 0x07, 0x53, 0x04, 0x20, 0x00, 0x00, 0x01, 0x68, 0xCE, 0x33, 0x48, 0xD0 };
+
+    //1080p50
+    static const size_t _1080p50_100_Size = 4 * 0x10 + 0xA;
+    static const int8u  _1080p50_100[_1080p50_100_Size] = { 0x00, 0x00, 0x01, 0x67, 0x7A, 0x10, 0x2A, 0xB6, 0xD4, 0x20, 0x22, 0x33, 0x19, 0xC6, 0x63, 0x23,
+                                                            0x21, 0x01, 0x11, 0x98, 0xCE, 0x33, 0x19, 0x18, 0x21, 0x02, 0x56, 0xB9, 0x3D, 0x7D, 0x7E, 0x4F,
+                                                            0xE3, 0x3F, 0x11, 0xF1, 0x9E, 0x08, 0xB8, 0x8C, 0x54, 0x43, 0xC0, 0x78, 0x02, 0x27, 0xE2, 0x70,
+                                                            0x1E, 0x30, 0x10, 0x10, 0x14, 0x00, 0x00, 0x03, 0x00, 0x04, 0x00, 0x00, 0x03, 0x01, 0x92, 0x10,
+                                                            0x00, 0x00, 0x00, 0x00, 0x01, 0x68, 0xCE, 0x33, 0x48, 0xD0 };
+    //1080p60
+    static const size_t _1080p60_100_Size = 4 * 0x10 + 0x8;
+    static const int8u  _1080p60_100[_1080p60_100_Size] = { 0x00, 0x00, 0x01, 0x67, 0x7A, 0x10, 0x2A, 0xB6, 0xD4, 0x20, 0x22, 0x33, 0x19, 0xC6, 0x63, 0x23,
+                                                            0x21, 0x01, 0x11, 0x98, 0xCE, 0x33, 0x19, 0x18, 0x21, 0x02, 0x56, 0xB9, 0x3D, 0x7D, 0x7E, 0x4F,
+                                                            0xE3, 0x3F, 0x11, 0xF1, 0x9E, 0x08, 0xB8, 0x8C, 0x54, 0x43, 0xC0, 0x78, 0x02, 0x27, 0xE2, 0x70,
+                                                            0x1E, 0x30, 0x10, 0x10, 0x14, 0x00, 0x00, 0x0F, 0xA4, 0x00, 0x07, 0x53, 0x02, 0x10, 0x00, 0x00,
+                                                            0x00, 0x00, 0x01, 0x68, 0xCE, 0x33, 0x48, 0xD0 };
+};
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -353,6 +431,139 @@ File_Avc::~File_Avc()
 
     for (size_t Pos=0; Pos<pic_parameter_sets.size(); Pos++)
         delete pic_parameter_sets[Pos]; //TemporalReferences[Pos]=NULL;
+}
+
+//***************************************************************************
+// AVC-Intra hardcoded headers
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+File_Avc::avcintra_header File_Avc::AVC_Intra_Headers_Data(int32u CodecID)
+{
+    switch (CodecID)
+    {
+        case  0x61693132: //ai12
+        case  0x61693232: //ai22
+                            return avcintra_header(AVC_Intra_Headers::_1080p50_100, AVC_Intra_Headers::_1080p50_100_Size);  // AVC-Intra 1080p50 class 100/200
+        case  0x61693133: //ai13
+        case  0x61693233: //ai23
+                            return avcintra_header(AVC_Intra_Headers::_1080p60_100, AVC_Intra_Headers::_1080p60_100_Size);  // AVC-Intra 1080p60 class 100/200
+        case  0x61693135: //ai15
+        case  0x61693235: //ai25
+                            return avcintra_header(AVC_Intra_Headers::_1080i50_100, AVC_Intra_Headers::_1080i50_100_Size);  // AVC-Intra 1080i50 class 100/200
+        case  0x61693136: //ai16
+        case  0x61693236: //ai26
+                            return avcintra_header(AVC_Intra_Headers::_1080i60_100, AVC_Intra_Headers::_1080i60_100_Size);  // AVC-Intra 1080i60 class 100/200
+        case  0x61693170: //ai1p
+        case  0x61693270: //ai2p
+                            return avcintra_header(AVC_Intra_Headers::__720p60_100, AVC_Intra_Headers::__720p60_100_Size);  // AVC-Intra  720p60 class 100/200
+        case  0x61693171: //ai1q
+        case  0x61693271: //ai2q
+                            return avcintra_header(AVC_Intra_Headers::__720p50_100, AVC_Intra_Headers::__720p50_100_Size);  // AVC-Intra  720p50 class 100/200
+      //case  0x61693532: //ai52
+      //                    return avcintra_header(NULL, 0);                                                                // AVC-Intra 1080p25 class  50 (not supported)
+      //case  0x61693533: //ai53
+      //                    return avcintra_header(NULL, 0);                                                                // AVC-Intra 1080p30 class  50 (not supported)
+        case  0x61693535: //ai55
+                            return avcintra_header(AVC_Intra_Headers::_1080i50__50, AVC_Intra_Headers::_1080i50__50_Size);  // AVC-Intra 1080i50 class  50
+        case  0x61693536: //ai56
+                            return avcintra_header(AVC_Intra_Headers::_1080i60__50, AVC_Intra_Headers::_1080i60__50_Size);  // AVC-Intra 1080i60 class  50
+        case  0x61693570: //ai5p
+                            return avcintra_header(AVC_Intra_Headers::__720p60__50, AVC_Intra_Headers::__720p60__50_Size);  // AVC-Intra  720p60 class  50
+        case  0x61693571: //ai5q
+                            return avcintra_header(AVC_Intra_Headers::__720p50__50, AVC_Intra_Headers::__720p50__50_Size);  // AVC-Intra  720p50 class  50
+        default       :
+                            return avcintra_header(NULL, 0);
+    }
+}
+
+//---------------------------------------------------------------------------
+int32u File_Avc::AVC_Intra_CodecID_FromMeta(int32u Height, int32u Fields, int32u SampleDuration, int32u TimeScale, int32u SizePerFrame)
+{
+    // Computing bitrate
+    int64u BitRate=((int64u)SizePerFrame)*8*TimeScale/SampleDuration;
+    int64u SampleRate=float64_int64s(((float64)TimeScale)/SampleDuration);
+    int32u Class=BitRate<=75000000?50:100; //Arbitrary choosen. TODO: check real maximumm bitrate, check class 200
+    switch (Class)
+    {
+        case 100 : 
+                    switch (Height)
+                    {
+                        case 1080 :
+                                    switch (Fields)
+                                    {
+                                        case 1: 
+                                                    switch (SampleRate)
+                                                    {
+                                                        case 50: return 0x61693132; //ai12
+                                                        case 60: return 0x61693133; //ai13
+                                                        default: return 0x4156696E; //AVin (neutral)
+                                                    }
+                                        case 2: 
+                                                    switch (SampleRate)
+                                                    {
+                                                        case 25: return 0x61693135; //ai15 //TODO: check more files in order to know if it should be 1 or 2 fields per sample
+                                                        case 30: return 0x61693136; //ai16 //TODO: check more files in order to know if it should be 1 or 2 fields per sample
+                                                        case 50: return 0x61693135; //ai15 //TODO: check more files in order to know if it should be 1 or 2 fields per sample
+                                                        case 60: return 0x61693136; //ai16 //TODO: check more files in order to know if it should be 1 or 2 fields per sample
+                                                        default: return 0x4156696E; //AVin (neutral)
+                                                    }
+                                        default:    return 0x4156696E; //AVin (neutral)
+                                    }
+                        case  720 :
+                                    switch (Fields)
+                                    {
+                                        case 1: 
+                                                    switch (SampleRate)
+                                                    {
+                                                        case 50: return 0x61693170; //ai1p
+                                                        case 60: return 0x61693171; //ai1q
+                                                        default: return 0x4156696E; //AVin (neutral)
+                                                    }
+                                        default:    return 0x4156696E; //AVin (neutral)
+                                    }
+                        default   : return 0x4156696E; //AVin (neutral)
+                    }
+        case  50 : 
+                    switch (Height)
+                    {
+                        case 1080 :
+                                    switch (Fields)
+                                    {
+                                        case 1: 
+                                                    switch (SampleRate)
+                                                    {
+                                                        case 25: return 0x61693532; //ai52
+                                                        case 30: return 0x61693533; //ai53
+                                                        default: return 0x4156696E; //AVin (neutral)
+                                                    }
+                                        case 2: 
+                                                    switch (SampleRate)
+                                                    {
+                                                        case 25: return 0x61693535; //ai55 //TODO: check more files in order to know if it should be 1 or 2 fields per sample
+                                                        case 30: return 0x61693536; //ai56 //TODO: check more files in order to know if it should be 1 or 2 fields per sample
+                                                        case 50: return 0x61693535; //ai55 //TODO: check more files in order to know if it should be 1 or 2 fields per sample
+                                                        case 60: return 0x61693536; //ai56 //TODO: check more files in order to know if it should be 1 or 2 fields per sample
+                                                        default: return 0x4156696E; //AVin (neutral)
+                                                    }
+                                        default:    return 0x4156696E; //AVin (neutral)
+                                    }
+                        case  720 :
+                                    switch (Fields)
+                                    {
+                                        case 1: 
+                                                    switch (SampleRate)
+                                                    {
+                                                        case 50: return 0x61693570; //ai5p
+                                                        case 60: return 0x61693571; //ai5q
+                                                        default: return 0x4156696E; //AVin (neutral)
+                                                    }
+                                        default:    return 0x4156696E; //AVin (neutral)
+                                    }
+                        default   : return 0x4156696E; //AVin (neutral)
+                    }
+        default: return 0x4156696E; //AVin (neutral)
+    }
 }
 
 //***************************************************************************

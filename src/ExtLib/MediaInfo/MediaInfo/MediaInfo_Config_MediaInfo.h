@@ -325,6 +325,7 @@ public :
     #endif //MEDIAINFO_MACROBLOCKS
     void          File_GrowingFile_Delay_Set(float64 Value);
     float64       File_GrowingFile_Delay_Get();
+    void          File_GrowingFile_Force_Set(float64 Value);
     #if defined(MEDIAINFO_LIBCURL_YES)
     void          File_Curl_Set (const Ztring &NewValue);
     void          File_Curl_Set (const Ztring &Field, const Ztring &NewValue);

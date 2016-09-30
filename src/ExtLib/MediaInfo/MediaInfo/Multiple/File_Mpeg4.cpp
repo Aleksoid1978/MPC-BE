@@ -1413,6 +1413,12 @@ void File_Mpeg4::Read_Buffer_Unsynched()
 
                         break;
                     }
+
+            if (Stream->second.Demux_Level&(1<<6))
+            {
+                Stream->second.Demux_Level|= (1<<7); //Add the flag, SPS/PPS must be sent
+                Stream->second.Demux_Level&=~(1<<6); //In case of seek again, no need to do it again
+            }
         #endif //MEDIAINFO_SEEK && MEDIAINFO_DEMUX
     }
 }

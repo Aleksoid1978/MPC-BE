@@ -40,6 +40,20 @@ public :
     File_Avc();
     ~File_Avc();
 
+    //AVC-Intra hardcoded headers
+    struct avcintra_header
+    {
+        const int8u* Data;
+        size_t       Size;
+
+        avcintra_header(const int8u* Data_, size_t Size_)
+            : Data(Data_)
+            , Size(Size_)
+        {}
+    };
+    static avcintra_header AVC_Intra_Headers_Data(int32u CodecID);
+    static int32u AVC_Intra_CodecID_FromMeta(int32u Height, int32u Fields, int32u SampleDuration, int32u TimeScale, int32u SizePerFrame);
+
 private :
     File_Avc(const File_Avc &File_Avc); //No copy
 

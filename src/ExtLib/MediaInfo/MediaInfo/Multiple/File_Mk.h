@@ -215,7 +215,14 @@ private :
     void Segment_Tracks_TrackEntry_Video_DisplayUnit();
     void Segment_Tracks_TrackEntry_Video_DisplayWidth();
     void Segment_Tracks_TrackEntry_Video_FlagInterlaced();
+    void Segment_Tracks_TrackEntry_Video_FieldOrder();
     void Segment_Tracks_TrackEntry_Video_FrameRate();
+    void Segment_Tracks_TrackEntry_Video_Colour();
+    void Segment_Tracks_TrackEntry_Video_Colour_MatrixCoefficients();
+    void Segment_Tracks_TrackEntry_Video_Colour_BitsPerChannel();
+    void Segment_Tracks_TrackEntry_Video_Colour_Range();
+    void Segment_Tracks_TrackEntry_Video_Colour_TransferCharacteristics();
+    void Segment_Tracks_TrackEntry_Video_Colour_Primaries();
     void Segment_Tracks_TrackEntry_Video_PixelCropBottom();
     void Segment_Tracks_TrackEntry_Video_PixelCropLeft();
     void Segment_Tracks_TrackEntry_Video_PixelCropRight();
