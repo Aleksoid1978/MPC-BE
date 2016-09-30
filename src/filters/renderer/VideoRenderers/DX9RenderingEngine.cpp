@@ -143,6 +143,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_iRotation(0)
 	, m_inputExtFormat({0})
 	, m_wsResizer(L"") // empty string, not nullptr
+	, m_bFP16Support(true) // don't disable hardware features before initializing a renderer
 {
 #if DXVAVP
 	m_hDxva2Lib = LoadLibrary(L"dxva2.dll");
@@ -241,12 +242,12 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 		if (FAILED(hr = m_pD3DDevEx->CreateTexture(
 			m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
 			D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
-			D3DPOOL_DEFAULT, &m_pVideoTexture[0], NULL))) {
+			D3DPOOL_DEFAULT, &m_pVideoTextures[0], NULL))) {
 			return hr;
 		}
 
-		hr = m_pVideoTexture[0]->GetSurfaceLevel(0, &m_pVideoSurface[0]);
-		m_pVideoTexture[0] = NULL;
+		hr = m_pVideoTextures[0]->GetSurfaceLevel(0, &m_pVideoSurfaces[0]);
+		m_pVideoTextures[0] = NULL;
 
 		if (FAILED(hr)) {
 			return hr;
@@ -276,11 +277,11 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 			if (FAILED(hr = m_pD3DDevEx->CreateTexture(
 								m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
 								D3DUSAGE_RENDERTARGET, m_VideoBufferFmt,
-								D3DPOOL_DEFAULT, &m_pVideoTexture[i], NULL))) {
+								D3DPOOL_DEFAULT, &m_pVideoTextures[i], NULL))) {
 				return hr;
 			}
 
-			if (FAILED(hr = m_pVideoTexture[i]->GetSurfaceLevel(0, &m_pVideoSurface[i]))) {
+			if (FAILED(hr = m_pVideoTextures[i]->GetSurfaceLevel(0, &m_pVideoSurfaces[i]))) {
 				return hr;
 			}
 		}
@@ -291,7 +292,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 		if (FAILED(hr = m_pD3DDevEx->CreateOffscreenPlainSurface(
 							m_nativeVideoSize.cx, m_nativeVideoSize.cy,
 							m_SurfaceFmt,
-							D3DPOOL_DEFAULT, &m_pVideoSurface[m_nCurSurface], NULL))) {
+							D3DPOOL_DEFAULT, &m_pVideoSurfaces[m_nCurSurface], NULL))) {
 			return hr;
 		}
 
@@ -306,8 +307,8 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 void CDX9RenderingEngine::FreeVideoSurfaces()
 {
 	for (int i = 0; i < m_nNbDXSurface; i++) {
-		m_pVideoTexture[i] = NULL;
-		m_pVideoSurface[i] = NULL;
+		m_pVideoTextures[i] = NULL;
+		m_pVideoSurfaces[i] = NULL;
 	}
 }
 
@@ -337,7 +338,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	HRESULT hr;
 
 	// Return if the video texture is not initialized
-	if (m_pVideoTexture[m_nCurSurface] == NULL) {
+	if (m_pVideoTextures[m_nCurSurface] == NULL) {
 		return S_OK;
 	}
 
@@ -398,10 +399,10 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	}
 
 	// Apply the custom pixel shaders if there are any. Result: pVideoTexture
-	CComPtr<IDirect3DTexture9> pVideoTexture = m_pVideoTexture[m_nCurSurface];
+	CComPtr<IDirect3DTexture9> pVideoTexture = m_pVideoTextures[m_nCurSurface];
 
 	D3DSURFACE_DESC videoDesc;
-	m_pVideoTexture[m_nCurSurface]->GetLevelDesc(0, &videoDesc);
+	m_pVideoTextures[m_nCurSurface]->GetLevelDesc(0, &videoDesc);
 
 	int src = 1;
 	int dst = 0;
@@ -421,7 +422,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
 			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
 			hr = m_pD3DDevEx->SetPixelShader(m_pYCgCoCorrectionPixelShader);
-			TextureCopy(m_pVideoTexture[m_nCurSurface]);
+			TextureCopy(m_pVideoTextures[m_nCurSurface]);
 			first = false;
 			std::swap(src, dst);
 			pVideoTexture = m_pFrameTextures[src];
@@ -466,7 +467,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
 
 			if (first) {
-				TextureCopy(m_pVideoTexture[m_nCurSurface]);
+				TextureCopy(m_pVideoTextures[m_nCurSurface]);
 				first = false;
 			} else {
 				TextureCopy(m_pFrameTextures[src]);
@@ -689,7 +690,7 @@ HRESULT CDX9RenderingEngine::RenderVideoStretchRectPath(IDirect3DSurface9* pRend
 	HRESULT hr;
 
 	// Return if the render target or the video surface is not initialized
-	if (pRenderTarget == NULL || m_pVideoSurface[m_nCurSurface] == NULL) {
+	if (pRenderTarget == NULL || m_pVideoSurfaces[m_nCurSurface] == NULL) {
 		return S_OK;
 	}
 
@@ -711,7 +712,7 @@ HRESULT CDX9RenderingEngine::RenderVideoStretchRectPath(IDirect3DSurface9* pRend
 	rSrcVid.right &= ~1;
 	rSrcVid.top &= ~1;
 	rSrcVid.bottom &= ~1;
-	hr = m_pD3DDevEx->StretchRect(m_pVideoSurface[m_nCurSurface], rSrcVid, pRenderTarget, rDstVid, filter);
+	hr = m_pD3DDevEx->StretchRect(m_pVideoSurfaces[m_nCurSurface], rSrcVid, pRenderTarget, rDstVid, filter);
 
 	return hr;
 }
@@ -887,7 +888,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDXVA(IDirect3DSurface9* pRenderTarget, c
 	HRESULT hr;
 
 	// Return if the render target or the video surface is not initialized
-	if (pRenderTarget == NULL || m_pVideoSurface[m_nCurSurface] == NULL) {
+	if (pRenderTarget == NULL || m_pVideoSurfaces[m_nCurSurface] == NULL) {
 		return S_OK;
 	}
 
@@ -968,7 +969,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDXVA(IDirect3DSurface9* pRenderTarget, c
 
 	samples[0].SampleFormat.SampleFormat = DXVA2_SampleProgressiveFrame;
 
-	samples[0].SrcSurface = m_pVideoSurface[m_nCurSurface];
+	samples[0].SrcSurface = m_pVideoSurfaces[m_nCurSurface];
 
 	// DXVA2_VideoProcess_SubRects
 	samples[0].SrcRect = rSrcRect;
@@ -1329,7 +1330,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	}
 
 	// Check whether the final pass is supported by the hardware
-	m_bFinalPass = rd->m_bFP16Support;
+	m_bFinalPass = m_bFP16Support;
 	if (!m_bFinalPass) {
 		return S_OK;
 	}

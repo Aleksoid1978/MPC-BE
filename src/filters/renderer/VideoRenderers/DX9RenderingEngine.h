@@ -26,30 +26,29 @@
 #include <dxva2api.h>
 #include "../SubPic/SubPicAllocatorPresenterImpl.h"
 
-enum {
-	shader_bspline4_x,
-	shader_bspline4_y,
-	shader_mitchell4_x,
-	shader_mitchell4_y,
-	shader_catmull4_x,
-	shader_catmull4_y,
-	shader_bicubic06_x,
-	shader_bicubic06_y,
-	shader_bicubic08_x,
-	shader_bicubic08_y,
-	shader_bicubic10_x,
-	shader_bicubic10_y,
-	shader_lanczos2_x,
-	shader_lanczos2_y,
-	shader_lanczos3_x,
-	shader_lanczos3_y,
-	shader_downscaling_x,
-	shader_downscaling_y,
-	shader_count
-};
-
 namespace DSObjects
 {
+	enum {
+		shader_bspline4_x,
+		shader_bspline4_y,
+		shader_mitchell4_x,
+		shader_mitchell4_y,
+		shader_catmull4_x,
+		shader_catmull4_y,
+		shader_bicubic06_x,
+		shader_bicubic06_y,
+		shader_bicubic08_x,
+		shader_bicubic08_y,
+		shader_bicubic10_x,
+		shader_bicubic10_y,
+		shader_lanczos2_x,
+		shader_lanczos2_y,
+		shader_lanczos3_x,
+		shader_lanczos3_y,
+		shader_downscaling_x,
+		shader_downscaling_y,
+		shader_count
+	};
 
 	class CDX9RenderingEngine
 		: public CSubPicAllocatorPresenterImpl
@@ -67,8 +66,7 @@ namespace DSObjects
 		CComPtr<IDirect3DDevice9Ex>	m_pD3DDevEx;
 		UINT						m_CurrentAdapter;
 		UINT						m_AdapterCount;
-		D3DCAPS9					m_Caps;
-		LPCSTR						m_ShaderProfile;
+
 		D3DFORMAT					m_BackbufferFmt;
 		D3DFORMAT					m_DisplayFmt;
 		CSize						m_ScreenSize;
@@ -76,34 +74,21 @@ namespace DSObjects
 		int							m_nCurSurface;					// Surface currently displayed
 		bool						m_bIsEVR;
 		DWORD						m_D3D9VendorId;
-
-#if DXVAVP
-		CComPtr<IDirectXVideoProcessorService> m_pDXVAVPS;
-		CComPtr<IDirectXVideoProcessor> m_pDXVAVPD;
-
-		DXVA2_VideoDesc          m_VideoDesc;
-		DXVA2_VideoProcessorCaps m_VPCaps;
-
-		DXVA2_Fixed32 m_ProcAmpValues[4];
-		DXVA2_Fixed32 m_NFilterValues[6];
-		DXVA2_Fixed32 m_DFilterValues[6];
-#endif
+		bool						m_bFP16Support;
 
 		// Variables initialized/managed by this class but can be accessed by the allocator-presenter
 		RenderingPath				m_RenderingPath;
 		D3DFORMAT					m_VideoBufferFmt;
 		D3DFORMAT					m_SurfaceFmt;
 
-		CComPtr<IDirect3DTexture9>	m_pVideoTexture[MAX_VIDEO_SURFACES];
-		CComPtr<IDirect3DSurface9>	m_pVideoSurface[MAX_VIDEO_SURFACES];
-		CComPtr<IDirect3DTexture9>	m_pRotateTexture;
-		CComPtr<IDirect3DTexture9>	m_pFrameTextures[2];
-		CComPtr<IDirect3DTexture9>	m_pScreenSpaceTextures[2];
+		CComPtr<IDirect3DTexture9>	m_pVideoTextures[MAX_VIDEO_SURFACES];
+		CComPtr<IDirect3DSurface9>	m_pVideoSurfaces[MAX_VIDEO_SURFACES];
 
 		bool	m_bColorManagement;
 		int		m_iRotation; // Rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
 		DXVA2_ExtendedFormat m_inputExtFormat;
 		const wchar_t* m_wsResizer;
+
 
 		CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError);
 		~CDX9RenderingEngine();
@@ -122,8 +107,30 @@ namespace DSObjects
 		HRESULT ClearCustomPixelShaders(int target);
 		HRESULT AddCustomPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
 
-
 	private:
+		D3DCAPS9					m_Caps;
+		LPCSTR						m_ShaderProfile;
+
+#if DXVAVP
+		CComPtr<IDirectXVideoProcessorService> m_pDXVAVPS;
+		CComPtr<IDirectXVideoProcessor> m_pDXVAVPD;
+
+		DXVA2_VideoDesc          m_VideoDesc;
+		DXVA2_VideoProcessorCaps m_VPCaps;
+
+		DXVA2_Fixed32 m_ProcAmpValues[4];
+		DXVA2_Fixed32 m_NFilterValues[6];
+		DXVA2_Fixed32 m_DFilterValues[6];
+#endif
+
+		CComPtr<IDirect3DTexture9>	m_pRotateTexture;
+		CComPtr<IDirect3DTexture9>	m_pFrameTextures[2];
+		CComPtr<IDirect3DTexture9>	m_pResizeTexture;
+		CComPtr<IDirect3DTexture9>	m_pScreenSpaceTextures[2];
+
+		int							m_ScreenSpaceTexWidth;
+		int							m_ScreenSpaceTexHeight;
+
 		class CExternalPixelShader
 		{
 		public:
@@ -140,7 +147,7 @@ namespace DSObjects
 			}
 		};
 
-		CAutoPtr<CPixelShaderCompiler>	 m_pPSC;
+		CAutoPtr<CPixelShaderCompiler>	m_pPSC;
 
 		// Settings
 		VideoSystem						m_InputVideoSystem;
@@ -151,13 +158,8 @@ namespace DSObjects
 		CComPtr<IDirect3DPixelShader9>	m_pYCgCoCorrectionPixelShader;
 		CAtlList<CExternalPixelShader>	m_pCustomPixelShaders;
 
-		// Screen space pipeline
-		int								m_ScreenSpaceTexWidth;
-		int								m_ScreenSpaceTexHeight;
-
 		// Resizers
 		CComPtr<IDirect3DPixelShader9>	m_pResizerPixelShaders[shader_count];
-		CComPtr<IDirect3DTexture9>		m_pResizeTexture;
 
 		// Final pass
 		bool							m_bFinalPass;

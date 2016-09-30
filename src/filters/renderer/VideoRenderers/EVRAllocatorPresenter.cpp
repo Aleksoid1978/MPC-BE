@@ -1008,11 +1008,11 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 			rcTearing.top		= 0;
 			rcTearing.right		= rcTearing.left + 4;
 			rcTearing.bottom	= m_nativeVideoSize.cy;
-			m_pD3DDevEx->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
+			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[dwSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
 
 			rcTearing.left		= (rcTearing.right + 15) % m_nativeVideoSize.cx;
 			rcTearing.right		= rcTearing.left + 4;
-			m_pD3DDevEx->ColorFill(m_pVideoSurface[dwSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
+			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[dwSurface], &rcTearing, D3DCOLOR_ARGB(255, 255, 0, 0));
 			m_nTearingPos		= (m_nTearingPos + 7) % m_nativeVideoSize.cx;
 		}
 
@@ -1389,7 +1389,7 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 	if (m_bStreamChanged && SUCCEEDED(hr)) {
 		for (int i = 0; i < m_nNbDXSurface; i++) {
 			CComPtr<IMFSample> pMFSample;
-			hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurface[i], &pMFSample);
+			hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurfaces[i], &pMFSample);
 
 			if (SUCCEEDED(hr)) {
 				pMFSample->SetUINT32(GUID_SURFACE_INDEX, i);
@@ -1779,7 +1779,7 @@ STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResetDevice()
 
 	for (int i = 0; i < m_nNbDXSurface; i++) {
 		CComPtr<IMFSample> pMFSample;
-		HRESULT hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurface[i], &pMFSample);
+		HRESULT hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurfaces[i], &pMFSample);
 
 		if (SUCCEEDED(hr)) {
 			pMFSample->SetUINT32(GUID_SURFACE_INDEX, i);
