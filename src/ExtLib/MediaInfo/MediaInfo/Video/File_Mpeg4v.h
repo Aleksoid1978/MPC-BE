@@ -118,11 +118,14 @@ private :
     int32u fixed_vop_time_increment;
     int32u Time_Begin_Seconds;
     int32u Time_End_Seconds;
+    int32u bit_rate;
+    int32u vbv_buffer_size;
     int16u Time_Begin_MilliSeconds;
     int16u Time_End_MilliSeconds;
     int16u object_layer_width;
     int16u object_layer_height;
     int16u vop_time_increment_resolution;
+    int8u  visual_object_type;
     int8u  time_size;
     int8u  visual_object_verid;
     int8u  profile_and_level_indication;
@@ -138,6 +141,7 @@ private :
     int8u  colour_primaries;
     int8u  transfer_characteristics;
     int8u  matrix_coefficients;
+    int8u  frame_rate_code;
     bool   quarter_sample;
     bool   low_delay;
     bool   load_intra_quant_mat;
@@ -177,6 +181,7 @@ private :
     bool   data_partitioned;
     bool   reversible_vlc;
     bool   colour_description;
+    bool   rgb_components;
 
     //From user_data
     Ztring Library;

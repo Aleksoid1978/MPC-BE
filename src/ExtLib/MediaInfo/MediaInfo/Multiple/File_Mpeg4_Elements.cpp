@@ -688,9 +688,11 @@ namespace Elements
     const int64u moov_trak_mdia_minf_stbl_stsd_tx3g=0x74783367;
     const int64u moov_trak_mdia_minf_stbl_stsd_tx3g_ftab=0x66746162;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_alac=0x616C6163;
+    const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_AALP=0x41414C50;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_ACLR=0x41434C52;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_APRG=0x41505247;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_ARES=0x41524553;
+    const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_AORD=0x414F5244;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_avcC=0x61766343;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_bitr=0x62697472;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_btrt=0x62747274;
@@ -1022,9 +1024,11 @@ void File_Mpeg4::Data_Parse()
                             LIST_DEFAULT(moov_trak_mdia_minf_stbl_stsd_xxxx)
                                 ATOM_BEGIN
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_alac)
+                                ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_AALP)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_ACLR)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_APRG)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_ARES)
+                                ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_AORD)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_avcC)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_bitr)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_btrt)
@@ -1726,8 +1730,67 @@ void File_Mpeg4::mdat_xxxx()
                 Stream_Temp.stts_FramePos++;
             }
 
-            Demux_Level=Stream_Temp.Demux_Level;
-            Demux(Buffer+Buffer_Offset+Stream_Temp.Demux_Offset, (size_t)(Element_Size-Stream_Temp.Demux_Offset), ContentType_MainStream);
+
+            bool ShouldDemux=true;
+            if (Stream_Temp.Demux_Level&(1<<7) && Element_Size-Stream_Temp.Demux_Offset)
+            {
+                if (Stream_Temp.Parsers[0]->Status[IsAccepted])
+                    ShouldDemux=false;
+                else
+                {
+                    //Checking if we need to add SPS/PPS
+                    size_t CheckMax=Stream_Temp.Demux_Offset+0x10; //SPS uses to be in the first bytes only
+                    if (CheckMax>Element_Size-4)
+                        CheckMax=Element_Size-4;
+                    ShouldDemux=false;
+                    for (size_t i=Stream_Temp.Demux_Offset; i<CheckMax; i++)
+                        if (Buffer[i]==0x00 && Buffer[i+1]==0x00 && Buffer[i+2]==0x01 && Buffer[i+3]==0x67)
+                        {
+                            Stream_Temp.Demux_Level&=~((1<<7)|(1<<6)); //Remove the flag, SPS/PPS detected
+                            ShouldDemux=true;
+                            break;
+                        }
+                }
+
+                if (!ShouldDemux)
+                {
+                    if (Stream_Temp.CodecID==0x4156696E) //AVin
+                    {
+                        int32u Height=Retrieve(Stream_Video, Stream_Temp.StreamPos, Video_Height).To_int32u();
+                        int32u Fields;
+                        if (Retrieve(Stream_Video, Stream_Temp.StreamPos, Video_ScanType)==__T("Progressive"))
+                            Fields=1;
+                        else if (Retrieve(Stream_Video, Stream_Temp.StreamPos, Video_ScanType)==__T("Interlaced"))
+                            Fields=2;
+                        else
+                            Fields=0;
+                        int32u SampleDuration;
+                        if (Stream_Temp.stts.size()==1)
+                            SampleDuration=Stream_Temp.stts[0].SampleDuration;
+                        else
+                            SampleDuration=0;
+                        Stream_Temp.CodecID=File_Avc::AVC_Intra_CodecID_FromMeta(Height, Fields, SampleDuration, Stream_Temp.mdhd_TimeScale, Stream_Temp.stsz_Sample_Size);
+                    }
+
+                    //Stream_Temp.Demux_Level|= (1<<6); //In case of seek, we need to send again SPS/PPS //Deactivated because Hydra does not decode after a seek + 1 SPS/PPS only.
+                    //Stream_Temp.Demux_Level&=~(1<<7); //Remove the flag, SPS/PPS sent
+                    Demux_Level=Stream_Temp.Demux_Level;
+                    File_Avc::avcintra_header AvcIntraHeader=File_Avc::AVC_Intra_Headers_Data(Stream_Temp.CodecID);
+                    size_t Buffer_Temp_Size=AvcIntraHeader.Size+(size_t)(Element_Size-Stream_Temp.Demux_Offset);
+                    int8u* Buffer_Temp_Data=new int8u[Buffer_Temp_Size];
+                    if (AvcIntraHeader.Data)
+                        memcpy(Buffer_Temp_Data, AvcIntraHeader.Data, AvcIntraHeader.Size);
+                    memcpy(Buffer_Temp_Data+AvcIntraHeader.Size, Buffer+Buffer_Offset+Stream_Temp.Demux_Offset, (size_t)(Element_Size-Stream_Temp.Demux_Offset));
+                    Demux(Buffer_Temp_Data, Buffer_Temp_Size, ContentType_MainStream);
+                    Open_Buffer_Continue(Stream_Temp.Parsers[0], AvcIntraHeader.Data, AvcIntraHeader.Size);
+                    ShouldDemux = false;
+                }
+            }
+            if (ShouldDemux)
+            {
+                Demux_Level=Stream_Temp.Demux_Level;
+                Demux(Buffer+Buffer_Offset+Stream_Temp.Demux_Offset, (size_t)(Element_Size-Stream_Temp.Demux_Offset), ContentType_MainStream);
+            }
         }
     #endif //MEDIAINFO_DEMUX
 
@@ -4702,11 +4765,44 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxVideo()
                     File_Avc* Parser=new File_Avc;
                     Parser->FrameIsAlwaysComplete=true;
                     #if MEDIAINFO_DEMUX
-                        if (Config->Demux_Avc_Transcode_Iso14496_15_to_Iso14496_10_Get())
+                        switch ((int32u)Element_Code)
                         {
-                            Streams[moov_trak_tkhd_TrackID].Demux_Level=4; //Intermediate
-                            Parser->Demux_Level=2; //Container
-                            Parser->Demux_UnpacketizeContainer=true;
+                            case  0x61693132: //ai12
+                            case  0x61693232: //ai22
+                            case  0x61693133: //ai13
+                            case  0x61693233: //ai23
+                            case  0x61693135: //ai15
+                            case  0x61693235: //ai25
+                            case  0x61693236: //ai26
+                            case  0x61693136: //ai16
+                            case  0x61693270: //ai2p
+                            case  0x61693170: //ai1p
+                            case  0x61693171: //ai1q
+                            case  0x61693271: //ai2q
+                            case  0x61693532: //ai52
+                            case  0x61693533: //ai53
+                            case  0x61693535: //ai55
+                            case  0x61693536: //ai56
+                            case  0x61693570: //ai5p
+                            case  0x61693571: //ai5q
+                            case  0x4156696E: //AVin
+                                                Streams[moov_trak_tkhd_TrackID].Demux_Level|=(1<<7); //Add the flag, SPS/PPS must be sent
+                                                Streams[moov_trak_tkhd_TrackID].CodecID=((int32u)Element_Code);
+                                                switch ((Element_Code>>8)&0xF)
+                                                {
+                                                    case 1 : Fill(Stream_Video, StreamPos_Last, Video_Format_Commercial_IfAny, "AVC-Intra 100"); break;
+                                                    case 2 : Fill(Stream_Video, StreamPos_Last, Video_Format_Commercial_IfAny, "AVC-Intra 200"); break;
+                                                    case 5 : Fill(Stream_Video, StreamPos_Last, Video_Format_Commercial_IfAny, "AVC-Intra 50"); break;
+                                                    default: Fill(Stream_Video, StreamPos_Last, Video_Format_Commercial_IfAny, "AVC-Intra"); break;
+                                                }
+                                                break;
+                            default       :
+                                                if (Config->Demux_Avc_Transcode_Iso14496_15_to_Iso14496_10_Get())
+                                                {
+                                                    Streams[moov_trak_tkhd_TrackID].Demux_Level=4; //Intermediate
+                                                    Parser->Demux_Level=2; //Container
+                                                    Parser->Demux_UnpacketizeContainer=true;
+                                                }
                         }
                     #endif //MEDIAINFO_DEMUX
                     Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
@@ -4894,45 +4990,66 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_alac()
 }
 
 //---------------------------------------------------------------------------
-void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_ACLR()
+void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_AALP()
 {
-    Element_Name("Avid ACLR");
+    Element_Name("Avid Alpha Coding Type");
 
     //Parsing
-    Skip_C4(                                                    "tag");
-    Skip_C4(                                                    "vers");
-    Skip_B4(                                                    "yuv range"); //full 1 / normal 2
-    Skip_B4(                                                    "unknown (always 0?)");
+    int32u NumberOfTypes;
+    Skip_C4(                                                    "Tag");
+    Skip_C4(                                                    "Version");
+    Get_B4 (NumberOfTypes,                                      "Number of types");
+    for (int32u i=0; i<NumberOfTypes; i++)
+        Skip_C4(                                                "Encoding type");
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_ACLR()
+{
+    Element_Name("Avid Color Sampling Type");
+
+    //Parsing
+    Skip_C4(                                                    "Tag");
+    Skip_C4(                                                    "Version");
+    Skip_B4(                                                    "YUV range"); // 1 = In CCIR; 2 = In Full Range; 3 = In 709 (what is it?)
+    Skip_B4(                                                    "Reserved"); // Must be 0
 }
 
 //---------------------------------------------------------------------------
 void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_APRG()
 {
-    Element_Name("Avid APRG");
+    Element_Name("Avid Progressive Type");
 
     //Parsing
-    Skip_C4(                                                    "tag");
-    Skip_C4(                                                    "vers");
-    Skip_B4(                                                    "unknown (always 1?)");
-    Skip_B4(                                                    "unknown (always 0?)");
+    int32u ScanType;
+    Skip_C4("Tag");
+    Skip_C4(                                                    "Version");
+    Get_B4 (ScanType,                                           "Number of fields"); Param_Info1(ScanType==1?"Progressive":ScanType==2?"Interlaced":"");
+    Skip_B4(                                                    "Reserved"); // Must be 0
 }
 
 //---------------------------------------------------------------------------
 void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_ARES()
 {
-    Element_Name("Avid ARES");
+    Element_Name("Avid Resolution Coding Type");
 
     //Parsing
     //Source: http://lists.apple.com/archives/quicktime-api/2012/Mar/msg00039.html
     int32u x1;
-    Skip_C4(                                                    "tag");
-    Skip_C4(                                                    "vers");
-    Skip_B4(                                                    "cid"); //Compression ID, From inspection this is 160 for MPEG 50, 161 for MPEG 40 and 162 for MPEG 30. 171 for raw?
-    Skip_B4(                                                    "width");
-    Skip_B4(                                                    "height"); //Of a field
-    Get_B4 (x1,                                                 "x1");  //1=Progressive, 2=Interlaced
-    Skip_B4(                                                    "zero");
-    Skip_B4(                                                    "x2"); //4=Interlaced, 5=Progressive 1080, 6 Progressive not 1080?
+    Skip_C4(                                                    "Tag");
+    Skip_C4(                                                    "Version");
+    Skip_B4(                                                    "Compression ID"); //Compression ID, From inspection this is 160 for MPEG 50, 161 for MPEG 40 and 162 for MPEG 30. 171 for raw?
+    Skip_B4(                                                    "Field width");
+    Skip_B4(                                                    "Field height");
+    Get_B4 (x1,                                                 "Number of fields"); Param_Info1(x1==1?"Progressive":x1==2?"Interlaced":"");
+    Skip_B4(                                                    "Number of black lines");
+    Skip_B4(                                                    "Video format"); // 1 = NTSC, 2 = PAL, 3 = Custom, 4 = 1080i, 5 = 1080p, 6 = 720p
+    Skip_B4(                                                    "Compression table ID");
+    Skip_B4(                                                    "Render min scale factor (part 1)");
+    Skip_B4(                                                    "Render min scale factor (part 2)");
+    Skip_B4(                                                    "Render min scale factor (part 3)");
+    Skip_String(32,                                             "Name");
+    Skip_String(32,                                             "Format");
 
     switch (x1)
     {
@@ -4940,6 +5057,21 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_ARES()
         case 0x02 : Fill(Stream_Video, StreamPos_Last, Video_ScanType, "Interlaced", Unlimited, true, true); break;
         default   : ;
     }
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_AORD()
+{
+    Element_Name("Avid Ordering Type");
+
+    //Parsing
+    Skip_C4(                                                    "Tag");
+    Skip_C4(                                                    "Version");
+    Skip_B4(                                                    "Field structure ordering"); // 1 = Split fields, 2 = Interlaced fields
+    Skip_B4(                                                    "Field time ordering"); // 1 = First field in buffer is odd (timecode 1), 2 = First field in buffer is even (timecode 2)
+    Skip_B4(                                                    "Field display ordering"); // 1 = First field in time display first line, 2 = First field in time display second line, 
+    Skip_B4(                                                    "Byte ordering"); // 1 = YCbCr, 2 = CbYCrY
+    Skip_B4(                                                    "Reserved"); // Must be 0
 }
 
 //---------------------------------------------------------------------------

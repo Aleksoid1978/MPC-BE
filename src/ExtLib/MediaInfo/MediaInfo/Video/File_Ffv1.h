@@ -46,6 +46,11 @@ const int32u RUN_MODE_STOP = 0;
 const int32u RUN_MODE_PROCESSING = 1;
 const int32u RUN_MODE_INTERRUPTED = 2;
 
+namespace FFV1
+{
+    typedef int32s pixel_t;
+}
+
 class Slice
 {
 public:
@@ -77,7 +82,7 @@ public:
             delete [] sample_buffer;
             sample_buffer = NULL;
         }
-        sample_buffer = new int16s[size];
+        sample_buffer = new FFV1::pixel_t[size];
     }
 
     void    run_index_init() { run_index=0; }
@@ -91,7 +96,7 @@ public:
     int32u  run_index;
     int32u  run_mode;
     int32s  run_segment_length;
-    int16s* sample_buffer;
+    FFV1::pixel_t* sample_buffer;
 
     class Context
     {
@@ -169,7 +174,7 @@ public:
 // Class File_Ffv1
 //***************************************************************************
 
-typedef int16s quant_table_struct2[256];
+typedef FFV1::pixel_t quant_table_struct2[256];
 typedef quant_table_struct2 quant_table_struct[MAX_CONTEXT_INPUTS];
 
 class File_Ffv1 : public File__Analyze
@@ -201,7 +206,7 @@ private :
     int32s get_symbol_with_bias_correlation(Slice::ContextPtr context);
     void rgb();
     void plane(int32u pos);
-    void line(int pos, int16s *sample[2]);
+    void line(int pos, FFV1::pixel_t *sample[2]);
     int32s pixel_GR(int32s context);
     int32s pixel_RC(int32s context);
     void read_quant_tables(int i);
@@ -266,12 +271,13 @@ private :
     bool    keyframe;
     bool    chroma_planes;
     bool    alpha_plane;
+    bool    is_overflow_16bit;
     state_transitions state_transitions_table;
 
     //TEMP
     static const int32u PREFIX_MAX = 12; //limit
     int8u bits_max;
-    int16u bits_mask1;
+    int32s bits_mask1;
     int32s bits_mask2;
     int32s bits_mask3;
     states_context_plane Context_RC; // Range Coder context

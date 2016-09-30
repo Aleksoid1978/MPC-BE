@@ -40,6 +40,8 @@ using namespace std;
 namespace MediaInfoLib
 {
 
+using namespace FFV1;
+
 //***************************************************************************
 // Const
 //***************************************************************************
@@ -806,7 +808,7 @@ void File_Ffv1::FrameHeader()
     if (coder_type == 2) //Range coder with custom state transition table
     {
         Element_Begin1("state_transition_deltas");
-        for (int16u i = 1; i < state_transitions_size; i++)
+        for (size_t i = 1; i < state_transitions_size; i++)
         {
             int32s state_transition_delta;
             Get_RS (States, state_transition_delta,             "state_transition_delta");
@@ -863,7 +865,7 @@ void File_Ffv1::FrameHeader()
             context_count[i] = context_count[0];
         }
     }
-    memset(quant_tables+quant_table_count, 0x00, (MAX_QUANT_TABLES-quant_table_count)*MAX_CONTEXT_INPUTS*256*sizeof(int16s));
+    memset(quant_tables+quant_table_count, 0x00, (MAX_QUANT_TABLES-quant_table_count)*MAX_CONTEXT_INPUTS*256*sizeof(pixel_t));
 
     for (size_t i = 0; i < quant_table_count; i++)
     {
@@ -915,6 +917,9 @@ void File_Ffv1::FrameHeader()
         if (micro_version)
             Get_RU (States, intra,                              "intra");
     }
+
+    //Marking handling of 16-bit overflow computing
+    is_overflow_16bit=(colorspace_type==0 && bits_per_raw_sample==16 && (coder_type==1 || coder_type==2))?true:false; //TODO: check in FFmpeg the version when the stream is fixed. Note: only with YUV colorspace
 
     FILLING_BEGIN();
         if (Frame_Count==0)
@@ -1149,7 +1154,7 @@ void File_Ffv1::plane(int32u pos)
     bits_mask2 = 1 << (bits_max - 1);
     bits_mask3 = bits_mask2 - 1;
 
-    int16s *sample[2];
+    pixel_t *sample[2];
     sample[0] = current_slice->sample_buffer + 3;
     sample[1] = sample[0] + current_slice->w + 6;
 
@@ -1195,7 +1200,7 @@ void File_Ffv1::rgb()
 
     size_t c_max = alpha_plane ? 4 : 3;
 
-    int16s *sample[4][2];
+    pixel_t *sample[4][2];
 
     current_slice->run_index = 0;
 
@@ -1262,17 +1267,27 @@ static inline int32s get_median_number(int32s one, int32s two, int32s three)
 }
 
 //---------------------------------------------------------------------------
-static inline int32s predict(int16s *current, int16s *current_top)
+static inline int32s predict(pixel_t *current, pixel_t *current_top, bool is_overflow_16bit)
 {
-    int32s LeftTop = current_top[-1];
-    int32s Top = current_top[0];
-    int32s Left = current[-1];
+    int32s LeftTop, Top, Left;
+    if (is_overflow_16bit)
+    {
+        LeftTop = (int16s)current_top[-1];
+        Top = (int16s)current_top[0];
+        Left = (int16s)current[-1];
+    }
+    else
+    {
+        LeftTop = current_top[-1];
+        Top = current_top[0];
+        Left = current[-1];
+    }
 
     return get_median_number(Left, Left + Top - LeftTop, Top);
 }
 
 //---------------------------------------------------------------------------
-static inline int get_context_3(int16s quant_table[MAX_CONTEXT_INPUTS][256], int16s *src, int16s *last)
+static inline int get_context_3(pixel_t quant_table[MAX_CONTEXT_INPUTS][256], pixel_t *src, pixel_t *last)
 {
     const int LT = last[-1];
     const int T  = last[0];
@@ -1283,7 +1298,7 @@ static inline int get_context_3(int16s quant_table[MAX_CONTEXT_INPUTS][256], int
         + quant_table[1][(LT - T) & 0xFF]
         + quant_table[2][(T - RT) & 0xFF];
 }
-static inline int get_context_5(int16s quant_table[MAX_CONTEXT_INPUTS][256], int16s *src, int16s *last)
+static inline int get_context_5(pixel_t quant_table[MAX_CONTEXT_INPUTS][256], pixel_t *src, pixel_t *last)
 {
     const int LT = last[-1];
     const int T  = last[0];
@@ -1420,15 +1435,15 @@ int32s File_Ffv1::pixel_GR(int32s context)
 }
 
 //---------------------------------------------------------------------------
-void File_Ffv1::line(int pos, int16s *sample[2])
+void File_Ffv1::line(int pos, pixel_t *sample[2])
 {
     // TODO: slice_coding_mode (version 4)
 
     quant_table_struct& quant_table = quant_tables[quant_table_index[pos]];
     bool Is5 = quant_table[3][127] ? true : false;
-    int16s* s0c = sample[0];
-    int16s* s0e = s0c + current_slice->w;
-    int16s* s1c = sample[1];
+    pixel_t* s0c = sample[0];
+    pixel_t* s0e = s0c + current_slice->w;
+    pixel_t* s1c = sample[1];
 
     if (coder_type)
     {
@@ -1438,7 +1453,7 @@ void File_Ffv1::line(int pos, int16s *sample[2])
         {
             int32s context = Is5 ? get_context_5(quant_table, s1c, s0c) : get_context_3(quant_table, s1c, s0c);
 
-            int32s Value = predict(s1c, s0c);
+            int32s Value = predict(s1c, s0c, is_overflow_16bit);
             #if MEDIAINFO_TRACE_FFV1CONTENT
                 if (context >= 0)
                     Value += pixel_RC(context);
@@ -1467,7 +1482,7 @@ void File_Ffv1::line(int pos, int16s *sample[2])
         {
             int32s context = Is5 ? get_context_5(quant_table, s1c, s0c) : get_context_3(quant_table, s1c, s0c);
 
-            *s1c = (predict(s1c, s0c) + (context >= 0 ? pixel_GR(context) : -pixel_GR(-context))) & bits_mask1;
+            *s1c = (predict(s1c, s0c, is_overflow_16bit) + (context >= 0 ? pixel_GR(context) : -pixel_GR(-context))) & bits_mask1;
 
             s0c++;
             s1c++;

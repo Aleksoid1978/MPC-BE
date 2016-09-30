@@ -1057,6 +1057,11 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     {
         return Ztring::ToZtring(File_GrowingFile_Delay_Get());
     }
+    else if (Option_Lower==__T("file_growingfile_force"))
+    {
+        File_GrowingFile_Force_Set(Ztring(Value).To_float64());
+        return Ztring();
+    }
     else if (Option_Lower==__T("file_curl"))
     {
         #if defined(MEDIAINFO_LIBCURL_YES)
@@ -2840,6 +2845,22 @@ float64 MediaInfo_Config_MediaInfo::File_GrowingFile_Delay_Get ()
     CriticalSectionLocker CSL(CS);
     float64 Temp=File_GrowingFile_Delay;
     return Temp;
+}
+
+//---------------------------------------------------------------------------
+void MediaInfo_Config_MediaInfo::File_GrowingFile_Force_Set (float64 NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    if (NewValue)
+    {
+        File_IsGrowing=true;
+        File_IsNotGrowingAnymore=false;
+    }
+    else
+    {
+        File_IsGrowing=false;
+        File_IsNotGrowingAnymore=true;
+    }
 }
 
 //---------------------------------------------------------------------------

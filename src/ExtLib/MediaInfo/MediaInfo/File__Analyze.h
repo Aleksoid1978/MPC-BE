@@ -1442,7 +1442,11 @@ public :
         {
 
     #define FILLING_BEGIN_PRECISE() \
-        if (Element_IsOK() && Element_Offset==Element_Size) \
+        if (Element_Offset!=Element_Size) \
+        { \
+            Trusted_IsNot("Size is wrong"); \
+        } \
+        if (Element_IsOK()) \
         {
 
     //Else

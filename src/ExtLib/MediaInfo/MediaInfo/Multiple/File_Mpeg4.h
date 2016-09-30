@@ -155,9 +155,11 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxxText();
     void moov_trak_mdia_minf_stbl_stsd_xxxxVideo();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_alac();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_AALP();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_ACLR();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_APRG();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_ARES();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_AORD();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_avcC();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_bitr();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_btrt();
@@ -445,6 +447,7 @@ private :
         #if MEDIAINFO_DEMUX
             bool            PtsDtsAreSame;
             bool            Demux_EventWasSent;
+            int32u          CodecID;
         #endif //MEDIAINFO_DEMUX
 
         stream()
@@ -494,6 +497,7 @@ private :
             #if MEDIAINFO_DEMUX
                 PtsDtsAreSame=false;
                 Demux_EventWasSent=false;
+                CodecID=0x00000000;
             #endif //MEDIAINFO_DEMUX
         }
 

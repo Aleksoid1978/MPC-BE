@@ -42,6 +42,10 @@ extern const char* Mpegv_colour_primaries(int8u colour_primaries)
         case  7 : return "SMPTE 240M"; //Same as BT.601 NTSC
         case  8 : return "Generic film";
         case  9 : return "BT.2020";                                     //Added in HEVC
+        case 10 : return "XYZ";                                         //Added in HEVC 2014
+        case 11 : return "SMPTE RP 431-2";                              //Added in ISO 23001-8:201x/PDAM1
+        case 12 : return "SMPTE EG 432-1";                              //Added in ISO 23001-8:201x/PDAM1
+        case 22 : return "EBU Tech 3213";                               //Added in ISO 23001-8:201x/PDAM1
         default : return "";
     }
 }
@@ -66,6 +70,7 @@ extern const char* Mpegv_transfer_characteristics(int8u transfer_characteristics
         case 15 : return "BT.2020";                                     //Added in HEVC
         case 16 : return "SMPTE ST 2084";                               //Added in HEVC 2015
         case 17 : return "SMPTE ST 428-1";                              //Added in HEVC 2015
+        case 18 : return "HLG";                                         //Added in ISO 23001-8:201x/PDAM1
         default : return "";
     }
 }
@@ -84,6 +89,8 @@ extern const char* Mpegv_matrix_coefficients(int8u matrix_coefficients)
         case  8 : return "YCgCo";                                       //Added in AVC
         case  9 : return "BT.2020 non-constant";                        //Added in HEVC
         case 10 : return "BT.2020 constant";                            //Added in HEVC
+        case 11 : return "Chroma-derived non-constant";                 //Added in ISO 23001-8:201x/PDAM1
+        case 12 : return "Chroma-derived constant";                     //Added in ISO 23001-8:201x/PDAM1
         default : return "";
     }
 }

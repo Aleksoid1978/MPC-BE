@@ -35,6 +35,9 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
+extern const float64 Mpegv_frame_rate[16];
+
+//---------------------------------------------------------------------------
 const char* Mpeg4v_Profile_Level(int32u Profile_Level)
 {
     switch (Profile_Level)
@@ -91,6 +94,8 @@ const char* Mpeg4v_Profile_Level(int32u Profile_Level)
         case B8(11100110) : return "Core Studio@L2";
         case B8(11100111) : return "Core Studio@L3";
         case B8(11101000) : return "Core Studio@L4";
+        case B8(11101011) : return "Simple Studio@L5";
+        case B8(11101100) : return "Simple Studio@L6";
         case B8(11110000) : return "Advanced Simple@L0";
         case B8(11110001) : return "Advanced Simple@L1";
         case B8(11110010) : return "Advanced Simple@L2";
@@ -142,8 +147,8 @@ const char* Mpeg4v_Colorimetry[]=
 {
     "",
     "4:2:0",
-    "",
-    "",
+    "4:2:2",
+    "4:4:4",
 };
 
 //---------------------------------------------------------------------------
@@ -313,6 +318,8 @@ void File_Mpeg4v::Synched_Init()
     fixed_vop_time_increment=0;
     Time_Begin_Seconds=(int32u)-1;
     Time_End_Seconds=(int32u)-1;
+    bit_rate=(int32u)-1;
+    vbv_buffer_size=(int32u)-1;
     Time_Begin_MilliSeconds=(int16u)-1;
     Time_End_MilliSeconds=(int16u)-1;
     object_layer_width=0;
@@ -332,6 +339,7 @@ void File_Mpeg4v::Synched_Init()
     colour_primaries=(int8u)-1;
     transfer_characteristics=(int8u)-1;
     matrix_coefficients=(int8u)-1;
+    frame_rate_code=(int8u)-1;
     quarter_sample=false;
     low_delay=false;
     load_intra_quant_mat=false;
@@ -340,6 +348,7 @@ void File_Mpeg4v::Synched_Init()
     load_nonintra_quant_mat_grayscale=false;
     interlaced=false;
     newpred_enable=0;
+    visual_object_type=0;
     time_size=0;
     reduced_resolution_vop_enable=0;
     scalability=0;
@@ -368,6 +377,7 @@ void File_Mpeg4v::Synched_Init()
     sadct=false;
     quarterpel=false;
     quant_type=false;
+    rgb_components=false;
 
     if (!IsSub)
         FrameInfo.DTS=0;
@@ -375,10 +385,13 @@ void File_Mpeg4v::Synched_Init()
     //Default stream values
     Streams.resize(0x100);
     Streams[0x00].Searching_Payload=true; //video_object_start
-    Streams[0x20].Searching_Payload=true; //video_object_layer_start
+    if (!IsRawStream) //TODO: better detection in all cases. Currently there are too many false-positives if we test all files
+        Streams[0x20].Searching_Payload=true; //video_object_layer_start
     Streams[0xB0].Searching_Payload=true; //visual_object_sequence_start
-    Streams[0xB5].Searching_Payload=true; //visual_object_start
-    NextCode_Add(0x20); //video_object_layer_start
+    NextCode_Add(0x00); //video_object_start
+    if (!IsRawStream) //TODO: better detection in all cases. Currently there are too many false-positives if we test all files
+        NextCode_Add(0x20); //video_object_layer_start
+    NextCode_Add(0xB0); //visual_object_sequence_start
     for (int8u Pos=0xFF; Pos>=0xB9; Pos--)
         Streams[Pos].Searching_Payload=true; //Testing MPEG-PS
 }
@@ -401,6 +414,12 @@ void File_Mpeg4v::Streams_Fill()
         Fill(Stream_Video, 0, Video_Codec_Profile, Mpeg4v_Profile_Level(profile_and_level_indication));
     }
 
+    if (frame_rate_code!=(int8u)-1)
+        Fill(Stream_Video, StreamPos_Last, Video_FrameRate, Mpegv_frame_rate[frame_rate_code]);
+    if (bit_rate!=(int32u)-1)
+        Fill(Stream_Video, StreamPos_Last, Video_BitRate_Nominal, bit_rate*400);
+    if (vbv_buffer_size!=(int32u)-1)
+        Fill(Stream_Video, StreamPos_Last, Video_BufferSize, vbv_buffer_size*2048);
     if (fixed_vop_time_increment && vop_time_increment_resolution)
         Fill(Stream_Video, StreamPos_Last, Video_FrameRate, ((float)vop_time_increment_resolution)/fixed_vop_time_increment);
     if (object_layer_height)
@@ -417,7 +436,7 @@ void File_Mpeg4v::Streams_Fill()
         Fill(Stream_Video, 0, Video_PixelAspectRatio, PixelAspectRatio_Value, 3, true);
         Fill(Stream_Video, StreamPos_Last, Video_DisplayAspectRatio, ((float)object_layer_width)/object_layer_height*PixelAspectRatio_Value, 3, true);
     }
-    Fill(Stream_Video, 0, Video_ColorSpace, "YUV");
+    Fill(Stream_Video, 0, Video_ColorSpace, rgb_components?"RGB":"YUV");
     Fill(Stream_Video, 0, Video_BitDepth, bits_per_pixel);
     if (chroma_format<4)
         Fill(Stream_Video, 0, Video_Colorimetry, Mpeg4v_Colorimetry[chroma_format]);
@@ -827,6 +846,16 @@ void File_Mpeg4v::video_object_start()
         Trusted_IsNot("size is wrong");
         return;
     }
+
+    FILLING_BEGIN();
+        //NextCode
+        NextCode_Test();
+        NextCode_Clear();
+        NextCode_Add(0x20); //video_object_layer_start
+
+        //Autorisation of other streams
+        Streams[0x20].Searching_Payload=true; //video_object_layer_start
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -846,6 +875,55 @@ void File_Mpeg4v::video_object_layer_start()
     BS_Begin();
     Skip_SB(                                                    "random_accessible_vol");
     Skip_S1(8,                                                  "video_object_type_indication");
+    if (profile_and_level_indication>=B8(11100001) && profile_and_level_indication<=B8(11101000)) // Test if "Studio" profile
+    {
+        Get_S1 ( 4, visual_object_verid,                        "video_object_layer_verid");  Param_Info1(Mpeg4v_video_object_layer_verid[video_object_layer_verid]);
+        Get_S1 (2, shape,                                       "video_object_layer_shape");
+        Get_S1 (4, shape_extension,                             "video_object_layer_shape_extension");
+        Get_SB (interlaced,                                     "progressive_sequence");
+        interlaced=!interlaced; //this is progressive_sequence so the opposite
+        if (shape!=2) //Shape!=BinaryOnly
+        {
+            Get_SB (   rgb_components,                          "rgb_components");
+            Get_S1 (2, chroma_format,                           "chroma_format"); Param_Info1(Mpeg4v_Colorimetry[chroma_format]);
+            Get_S1 (4, bits_per_pixel,                          "bits_per_pixel");
+        }
+        if (shape==0) //Shape=Rectangular
+        {
+            Mark_1 ();
+            Get_S2 (14, object_layer_width,                     "video_object_layer_width");
+            Mark_1 ();
+            Get_S2 (14, object_layer_height,                    "video_object_layer_height");
+            Mark_1 ();
+        }
+        Get_S1 (4, aspect_ratio_info,                           "aspect_ratio_info");
+        if (aspect_ratio_info==0x0F)
+        {
+            Get_S1 (8, par_width,                               "par_width");
+            Get_S1 (8, par_height,                              "par_height");
+        }
+        Get_S1 (4, frame_rate_code,                             "frame_rate_code"); Param_Info1(Mpegv_frame_rate[frame_rate_code]);
+            int16u first_half_bit_rate, latter_half_bit_rate, first_half_vbv_buffer_size, latter_half_vbv_buffer_size;
+            Get_S2 (15, first_half_bit_rate,                    "first_half_bit_rate");
+            Mark_1 ();
+            Get_S2(15, latter_half_bit_rate,                    "latter_half_bit_rate");
+            Mark_1 ();
+            Get_S2 (15, first_half_vbv_buffer_size,             "first_half_vbv_buffer_size");
+            Mark_1 ();
+            Get_S2 ( 3, latter_half_vbv_buffer_size,            "latter_half_vbv_buffer_size");
+            Skip_S2(11,                                         "first_half_vbv_occupancy");
+            Mark_1 ();
+            Skip_S2(15,                                         "latter_half_vbv_occupancy");
+            Mark_1 ();
+            bit_rate=first_half_bit_rate*0x8000+latter_half_bit_rate;
+            vbv_buffer_size=first_half_vbv_buffer_size*0x8+latter_half_vbv_buffer_size;
+        Get_SB (   low_delay,                                   "low_delay");
+        Skip_SB(                                                "mpeg2_stream");
+        BS_End();
+        Skip_XX(Element_Size-Element_Offset,                    "(TODO)");
+    }
+    else
+    {
     TEST_SB_SKIP(                                               "is_object_layer_identifier");
         Get_S1 (4, video_object_layer_verid,                    "video_object_layer_verid"); Param_Info1(Mpeg4v_video_object_layer_verid[video_object_layer_verid]);
         Skip_S1(3,                                              "video_object_layer_priority");
@@ -857,20 +935,23 @@ void File_Mpeg4v::video_object_layer_start()
         Get_S1 (8, par_height,                                  "par_height");
     }
     TEST_SB_SKIP(                                               "vol_control_parameters");
-        Get_S1 (2, chroma_format,                               "chroma_format");
+        Get_S1 (2, chroma_format,                               "chroma_format"); Param_Info1(Mpeg4v_Colorimetry[chroma_format]);
         Get_SB (   low_delay,                                   "low_delay");
         TEST_SB_SKIP(                                           "vbv_parameters");
-            Skip_S2(15,                                         "first_half_bit_rate");
+            int16u first_half_bit_rate, latter_half_bit_rate, first_half_vbv_buffer_size, latter_half_vbv_buffer_size;
+            Get_S2 (15, first_half_bit_rate,                    "first_half_bit_rate");
             Mark_1 ();
-            Skip_S2(15,                                         "latter_half_bit_rate");
+            Get_S2(15, latter_half_bit_rate,                    "latter_half_bit_rate");
             Mark_1 ();
-            Skip_S2(15,                                         "first_half_vbv_Element_Size");
+            Get_S2 (15, first_half_vbv_buffer_size,             "first_half_vbv_buffer_size");
             Mark_1 ();
-            Skip_S1( 3,                                         "latter_half_vbv_Element_Size");
+            Get_S2 ( 3, latter_half_vbv_buffer_size,            "latter_half_vbv_buffer_size");
             Skip_S2(11,                                         "first_half_vbv_occupancy");
             Mark_1 ();
             Skip_S2(15,                                         "latter_half_vbv_occupancy");
             Mark_1 ();
+            bit_rate=first_half_bit_rate*0x8+latter_half_bit_rate;
+            vbv_buffer_size=first_half_vbv_buffer_size*0x8000+latter_half_vbv_buffer_size;
         TEST_SB_END();
     TEST_SB_END();
     Get_S1 (2, shape,                                           "video_object_layer_shape");
@@ -1131,9 +1212,10 @@ void File_Mpeg4v::video_object_layer_start()
         Skip_SB(                                                "resync_marker_disable");
     }
     BS_End();
+    }
 
     //Coherancy
-    if (object_layer_width==0 || object_layer_height==0 || ((float32)object_layer_width)/object_layer_height<((float32)0.1) || object_layer_width/object_layer_height>10)
+    if (shape!=2 && shape==0 && (object_layer_width==0 || object_layer_height==0 || ((float32)object_layer_width)/object_layer_height<((float32)0.1) || object_layer_width/object_layer_height>10))
         Trusted_IsNot("Problem with width and height!");
 
     FILLING_BEGIN();
@@ -1176,13 +1258,13 @@ void File_Mpeg4v::visual_object_sequence_start()
     Get_B1 (profile_and_level_indication,                       "profile_and_level_indication"); Param_Info1(Mpeg4v_Profile_Level(profile_and_level_indication));
 
     //Integrity
-    if (Element_Size>1)
+    if (profile_and_level_indication==0)
     {
-        Trusted_IsNot("Size is wrong");
+        Trusted_IsNot("profile_and_level_indication is wrong");
         return;
     }
 
-    FILLING_BEGIN();
+    FILLING_BEGIN_PRECISE();
         //NextCode
         NextCode_Clear();
         NextCode_Add(0xB1); //visual_object_sequence_end
@@ -1192,6 +1274,7 @@ void File_Mpeg4v::visual_object_sequence_start()
         //Autorisation of other streams
         Streams[0xB1].Searching_Payload=true, //visual_object_sequence_end
         Streams[0xB2].Searching_Payload=true; //user_data
+        Streams[0xB5].Searching_Payload=true; //visual_object_start
     FILLING_END();
 }
 
@@ -1201,7 +1284,7 @@ void File_Mpeg4v::visual_object_sequence_end()
 {
     Element_Name("visual_object_sequence_end");
 
-    FILLING_BEGIN();
+    FILLING_BEGIN_PRECISE();
         //NextCode
         NextCode_Clear();
         NextCode_Add(0xB0); //visual_object_sequence_start
@@ -1394,6 +1477,7 @@ void File_Mpeg4v::group_of_vop_start()
         NextCode_Clear();
         for (int8u Pos=0x00; Pos<0x1F; Pos++)
             NextCode_Add(Pos); //video_object_start
+        NextCode_Add(0xB6); //vop_start
     FILLING_END();
 }
 
@@ -1411,14 +1495,20 @@ void File_Mpeg4v::visual_object_start()
     Element_Name("visual_object_start");
 
     //Parsing
-    int8u visual_object_type;
     BS_Begin();
+    if (profile_and_level_indication>=B8(11100001) && profile_and_level_indication<=B8(11101000)) // Test if "Studio" profile
+    {
+        Get_S1 ( 4, visual_object_verid,                        "visual_object_verid");  Param_Info1(Mpeg4v_visual_object_verid[visual_object_verid]);
+    }
+    else
+    {
     TEST_SB_SKIP(                                               "is_visual_object_identifier");
         Get_S1 ( 4, visual_object_verid,                        "visual_object_verid");  Param_Info1(Mpeg4v_visual_object_verid[visual_object_verid]);
         Skip_BS( 3,                                             "visual_object_priority");
     TEST_SB_END();
+    }
     Get_S1 ( 4, visual_object_type,                             "visual_object_type"); Param_Info1(Mpeg4v_visual_object_type[visual_object_type]);
-    if (visual_object_type==1 || visual_object_type==2)
+    if (profile_and_level_indication<B8(11100001) || profile_and_level_indication>B8(11101000) && (visual_object_type==1 || visual_object_type==2))
     {
         TEST_SB_SKIP(                                           "video_signal_type");
             Skip_S1(3,                                          "video_format");
@@ -1429,14 +1519,17 @@ void File_Mpeg4v::visual_object_start()
                 Get_S1 (8, matrix_coefficients,                 "matrix_coefficients"); Param_Info1(Mpegv_matrix_coefficients(matrix_coefficients));
             TEST_SB_END();
         TEST_SB_END();
-        BS_End();
+    }
+    BS_End();
 
-        //Integrity
-        if (Element_Offset<Element_Size)
-            Trusted_IsNot("Size is wrong");
+    //Integrity
+    if (profile_and_level_indication>=B8(11100001) && profile_and_level_indication<=B8(11101000) && visual_object_type!=1)
+    {
+        Param_Info1("Not in specs"); 
+        Trusted_IsNot("Not in specs");
     }
 
-    FILLING_BEGIN();
+    FILLING_BEGIN_PRECISE();
         //NextCode
         NextCode_Clear();
         NextCode_Add(0xB2); //user_data
@@ -1474,11 +1567,90 @@ void File_Mpeg4v::vop_start()
     int32u vop_time_increment;
     int8u vop_coding_type;
     bool  vop_coded;
+    int8u modulo_time_base=0;
     BS_Begin();
+    if (profile_and_level_indication>=B8(11100001) && profile_and_level_indication<=B8(11101000)) // Test if "Studio" profile
+    {
+        Element_Begin1("time_code_smpte12m");
+        int8u Frames_Units, Frames_Tens, Seconds_Units, Seconds_Tens, Minutes_Units, Minutes_Tens, Hours_Units, Hours_Tens;
+        bool  DropFrame;
+        BS_Begin();
+
+        Skip_SB(                                                "CF - Color fame");
+        Get_SB (   DropFrame,                                   "DP - Drop frame");
+        Get_S1 (2, Frames_Tens,                                 "Frames (Tens)");
+        Get_S1 (4, Frames_Units,                                "Frames (Units)");
+
+        Skip_SB(                                                "FP - Field Phase / BGF0");
+        Get_S1 (3, Seconds_Tens,                                "Seconds (Tens)");
+        Get_S1 (4, Seconds_Units,                               "Seconds (Units)");
+
+        Mark_1();
+
+        Skip_SB(                                                "BGF0 / BGF2");
+        Get_S1 (3, Minutes_Tens,                                "Minutes (Tens)");
+        Get_S1 (4, Minutes_Units,                               "Minutes (Units)");
+
+        Skip_SB(                                                "BGF2 / Field Phase");
+        Skip_SB(                                                "BGF1");
+        Get_S1 (2, Hours_Tens,                                  "Hours (Tens)");
+        Get_S1 (4, Hours_Units,                                 "Hours (Units)");
+
+        Mark_1();
+
+        Skip_S1(4,                                              "BG2");
+        Skip_S1(4,                                              "BG1");
+
+        Skip_S1(4,                                              "BG4");
+        Skip_S1(4,                                              "BG3");
+
+        Mark_1();
+
+        Skip_S1(4,                                              "BG6");
+        Skip_S1(4,                                              "BG5");
+
+        Skip_S1(4,                                              "BG8");
+        Skip_S1(4,                                              "BG7");
+
+        Mark_1();
+        Skip_S4(4,                                              "reserved_bits");
+        Element_End0();
+
+        bool vop_coded;
+        Skip_S2(10,                                             "temporal_reference");
+        Skip_S1(2,                                              "vop_structure");
+        Get_S1 (2, vop_coding_type,                             "vop_coding_type"); Param_Info1(Mpeg4v_vop_coding_type[vop_coding_type]);
+        Get_SB (   vop_coded,                                   "vop_coded");
+        if (vop_coded)
+        {
+            if (shape!=0) //Shape!=Rectangular
+            {
+                if (sprite_enable==1    //Sprite_Enable=Static
+                 && vop_coding_type==0) //Type=I
+                {
+                    Skip_S2(14,                                     "vop_width");
+                    Mark_1 ();
+                    Skip_S2(14,                                     "vop_height");
+                    Mark_1 ();
+                    Skip_S2(14,                                     "vop_horizontal_mc_spatial_ref");
+                    Mark_1 ();
+                    Skip_S2(14,                                     "vop_vertical_mc_spatial_ref");
+                    Mark_1 ();
+                }
+                }
+            Skip_SB(                                            "top_field_first");
+            Skip_SB(                                            "repeat_first_field");
+            Skip_SB(                                            "progressive_frame");
+                
+            BS_End();
+            Skip_XX(Element_Size-Element_Offset,                "(TODO)");
+        }
+    }
+    else
+    {
     Get_S1 (2, vop_coding_type,                                 "vop_coding_type"); Param_Info1(Mpeg4v_vop_coding_type[vop_coding_type]);
     Element_Info1(Mpeg4v_vop_coding_type[vop_coding_type]);
     bool modulo_time_base_Continue;
-    int8u modulo_time_base=0;
     do
     {
         Get_SB (modulo_time_base_Continue,                      "modulo_time_base");
@@ -1656,6 +1828,8 @@ void File_Mpeg4v::vop_start()
         }
         //...
     }
+    BS_End();
+    }
 
     if (!vop_coded)              //VOP with no data
         NVOP_Count++;
@@ -1684,7 +1858,7 @@ void File_Mpeg4v::vop_start()
 
     FILLING_BEGIN();
         //Duration
-        if (vop_time_increment_resolution)
+        if (!Mpeg4v_visual_object_type[visual_object_type][0] && vop_time_increment_resolution)
         {
             int16u Time=modulo_time_base*1000+(int16u)vop_time_increment*1000/vop_time_increment_resolution;
             while (Time_End_MilliSeconds!=(int16u)-1 && Time+500<Time_End_MilliSeconds)
