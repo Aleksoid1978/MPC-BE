@@ -1387,7 +1387,7 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 	}
 
 	if (m_bStreamChanged && SUCCEEDED(hr)) {
-		for (int i = 0; i < m_nNbDXSurface; i++) {
+		for (unsigned i = 0; i < m_nNbDXSurface; i++) {
 			CComPtr<IMFSample> pMFSample;
 			hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurfaces[i], &pMFSample);
 
@@ -1737,7 +1737,7 @@ void CEVRAllocatorPresenter::OnVBlankFinished(bool fAll, LONGLONG PerformanceCou
 		LONGLONG SyncOffset = nsSampleTime - llClockTime;
 
 		m_pllSyncOffset[m_nNextSyncOffset] = SyncOffset;
-		//TRACE_EVR("EVR: SyncOffset(%d, %d): %8I64d     %8I64d     %8I64d \n", m_nCurSurface, m_VSyncMode, m_LastPredictedSync, -SyncOffset, m_LastPredictedSync - (-SyncOffset));
+		//TRACE_EVR("EVR: SyncOffset(%u, %d): %8I64d     %8I64d     %8I64d \n", m_nCurSurface, m_VSyncMode, m_LastPredictedSync, -SyncOffset, m_LastPredictedSync - (-SyncOffset));
 
 		m_MaxSyncOffset = MINLONG64;
 		m_MinSyncOffset = MAXLONG64;
@@ -1777,7 +1777,7 @@ STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResetDevice()
 
 	bool bResult = __super::ResetDevice();
 
-	for (int i = 0; i < m_nNbDXSurface; i++) {
+	for (unsigned i = 0; i < m_nNbDXSurface; i++) {
 		CComPtr<IMFSample> pMFSample;
 		HRESULT hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurfaces[i], &pMFSample);
 
@@ -1887,7 +1887,7 @@ void CEVRAllocatorPresenter::RenderThread()
 					UNREFERENCED_PARAMETER(llPerf);
 					int nSamplesLeft = 0;
 					if (SUCCEEDED(GetScheduledSample(&pMFSample, nSamplesLeft))) {
-						//pMFSample->GetUINT32(GUID_SURFACE_INDEX, (UINT32*)&m_nCurSurface);
+						//pMFSample->GetUINT32(GUID_SURFACE_INDEX, &m_nCurSurface);
 						m_pCurrentDisplaydSample = pMFSample;
 
 						bool bValidSampleTime = true;
@@ -1899,7 +1899,7 @@ void CEVRAllocatorPresenter::RenderThread()
 						LONGLONG SampleDuration = 0;
 						pMFSample->GetSampleDuration(&SampleDuration);
 
-						//TRACE_EVR("EVR: RenderThread ==>> Presenting surface %d  (%I64d)\n", m_nCurSurface, nsSampleTime);
+						//TRACE_EVR("EVR: RenderThread ==>> Presenting surface %u  (%I64d)\n", m_nCurSurface, nsSampleTime);
 
 						bool bStepForward = false;
 
@@ -1911,7 +1911,7 @@ void CEVRAllocatorPresenter::RenderThread()
 							m_nStepCount = 0;
 							/*
 							} else if (m_nStepCount > 0) {
-								pMFSample->GetUINT32(GUID_SURFACE_INDEX, (UINT32 *)&m_nCurSurface);
+								pMFSample->GetUINT32(GUID_SURFACE_INDEX, &m_nCurSurface);
 								++m_OrderedPaint;
 								if (!g_bExternalSubtitleTime) {
 									__super::SetTime (g_tSegmentStart + nsSampleTime);
@@ -1934,7 +1934,7 @@ void CEVRAllocatorPresenter::RenderThread()
 							if (!bValidSampleTime) {
 								// Just play as fast as possible
 								bStepForward = true;
-								pMFSample->GetUINT32(GUID_SURFACE_INDEX, (UINT32 *)&m_nCurSurface);
+								pMFSample->GetUINT32(GUID_SURFACE_INDEX, &m_nCurSurface);
 								++m_OrderedPaint;
 								if (!g_bExternalSubtitleTime) {
 									__super::SetTime (g_tSegmentStart + nsSampleTime);
@@ -1995,7 +1995,7 @@ void CEVRAllocatorPresenter::RenderThread()
 									SyncOffset = (nsSampleTime - ClockTimeAtNextVSync);
 
 									//if (SyncOffset < 0)
-									//	TRACE_EVR("EVR: SyncOffset(%d): %I64d     %I64d     %I64d\n", m_nCurSurface, SyncOffset, TimePerFrame, VSyncTime);
+									//	TRACE_EVR("EVR: SyncOffset(%u): %I64d     %I64d     %I64d\n", m_nCurSurface, SyncOffset, TimePerFrame, VSyncTime);
 								} else {
 									SyncOffset = (nsSampleTime - llClockTime);
 								}
@@ -2053,7 +2053,7 @@ void CEVRAllocatorPresenter::RenderThread()
 									TRACE_EVR("EVR: Normalframe\n");
 									m_nDroppedUpdate = 0;
 									bStepForward = true;
-									pMFSample->GetUINT32(GUID_SURFACE_INDEX, (UINT32 *)&m_nCurSurface);
+									pMFSample->GetUINT32(GUID_SURFACE_INDEX, &m_nCurSurface);
 									m_LastFrameDuration = nsSampleTime - m_LastSampleTime;
 									m_LastSampleTime = nsSampleTime;
 									m_LastPredictedSync = VSyncOffset0;
@@ -2107,7 +2107,7 @@ void CEVRAllocatorPresenter::RenderThread()
 									//VSyncOffsetMin; = (((VSyncOffsetMin) % VSyncTime) + VSyncTime) % VSyncTime;
 									//VSyncOffsetMax = (((VSyncOffsetMax) % VSyncTime) + VSyncTime) % VSyncTime;
 
-									//TRACE_EVR("EVR: SyncOffset(%d, %d): %8I64d     %8I64d     %8I64d     %8I64d\n", m_nCurSurface, m_VSyncMode,VSyncOffset0, VSyncOffsetMin, VSyncOffsetMax, VSyncOffsetMax - VSyncOffsetMin);
+									//TRACE_EVR("EVR: SyncOffset(%u, %d): %8I64d     %8I64d     %8I64d     %8I64d\n", m_nCurSurface, m_VSyncMode,VSyncOffset0, VSyncOffsetMin, VSyncOffsetMax, VSyncOffsetMax - VSyncOffsetMin);
 
 									if (m_VSyncMode == 0) {
 										// 23.976 in 60 Hz
@@ -2359,7 +2359,7 @@ HRESULT CEVRAllocatorPresenter::GetFreeSample(IMFSample** ppSample)
 	CAutoLock lock(&m_SampleQueueLock);
 	HRESULT hr = S_OK;
 
-	if (m_FreeSamples.GetCount() > 1) {	// <= Cannot use first free buffer (can be currently displayed)
+	if (m_FreeSamples.GetCount() > 1) { // <= Cannot use first free buffer (can be currently displayed)
 		InterlockedIncrement (&m_nUsedBuffer);
 		*ppSample = m_FreeSamples.RemoveHead().Detach();
 	} else {
