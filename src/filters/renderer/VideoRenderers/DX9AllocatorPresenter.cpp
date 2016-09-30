@@ -546,28 +546,33 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	m_bCompositionEnabled = !!bCompositionEnabled;
 	m_bAlternativeVSync = rs.bAlterativeVSync;
 
-	// detect FP textures support
-	renderersData->m_bFP16Support = SUCCEEDED(m_pD3DEx->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_VOLUMETEXTURE, D3DFMT_A32B32G32R32F));
-
-	// detect 10-bit textures support
-	renderersData->m_b10bitSupport = SUCCEEDED(m_pD3DEx->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_TEXTURE, D3DFMT_A2R10G10B10));
-
-	// detect 10-bit device support
-	bool b10BitOutputSupport = SUCCEEDED(m_pD3DEx->CheckDeviceType(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_A2R10G10B10, D3DFMT_A2R10G10B10, FALSE));
-
+	// detect FP 16-bit textures support
+	m_bFP16Support = SUCCEEDED(m_pD3DEx->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_VOLUMETEXTURE, D3DFMT_A16B16G16R16F));
 
 	// set surface formats
-	m_SurfaceFmt = D3DFMT_X8R8G8B8;
 	switch (rs.iSurfaceFormat) {
-		case D3DFMT_A2R10G10B10:
-			if (m_bIsEVR && renderersData->m_b10bitSupport) {
+	case D3DFMT_A32B32G32R32F: {
+		bool bFP32Support = SUCCEEDED(m_pD3DEx->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_VOLUMETEXTURE, D3DFMT_A32B32G32R32F));
+		if (bFP32Support) {
+			m_SurfaceFmt = D3DFMT_A32B32G32R32F;
+			break;
+		}
+	}
+	case D3DFMT_A16B16G16R16F:
+		if (m_bFP16Support) {
+			m_SurfaceFmt = D3DFMT_A16B16G16R16F;
+			break;
+		}
+	case D3DFMT_A2R10G10B10:
+		if (m_bIsEVR) {
+			bool b10bitSupport = SUCCEEDED(m_pD3DEx->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_TEXTURE, D3DFMT_A2R10G10B10));
+			if (b10bitSupport) {
 				m_SurfaceFmt = D3DFMT_A2R10G10B10;
+				break;
 			}
-		case D3DFMT_A16B16G16R16F:
-		case D3DFMT_A32B32G32R32F:
-			if (renderersData->m_bFP16Support) {
-				m_SurfaceFmt = (D3DFORMAT)rs.iSurfaceFormat;
-			}
+		}
+	default:
+		m_SurfaceFmt = D3DFMT_X8R8G8B8;
 	}
 
 	D3DDISPLAYMODEEX d3ddmEx = { sizeof(d3ddmEx) };
@@ -576,6 +581,9 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
 
 	if (m_bIsFullscreen) {
+		// detect 10-bit device support
+		bool b10BitOutputSupport = SUCCEEDED(m_pD3DEx->CheckDeviceType(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_A2R10G10B10, D3DFMT_A2R10G10B10, FALSE));
+
 		if (b10BitOutputSupport && rs.b10BitOutput) {
 			m_d3dpp.BackBufferFormat = D3DFMT_A2R10G10B10;
 		} else {
@@ -1998,12 +2006,12 @@ void CDX9AllocatorPresenter::DrawStats()
 				strText.AppendFormat(L" -> %d x %d %s", videoSize.cx, videoSize.cy, m_wsResizer);
 			}
 			drawText(strText);
-			if (m_pVideoTexture[0] || m_pVideoSurface[0]) {
+			if (m_pVideoTextures[0] || m_pVideoSurfaces[0]) {
 				D3DSURFACE_DESC desc;
-				if (m_pVideoTexture[0]) {
-					m_pVideoTexture[0]->GetLevelDesc(0, &desc);
-				} else if (m_pVideoSurface[0]) {
-					m_pVideoSurface[0]->GetDesc(&desc);
+				if (m_pVideoTextures[0]) {
+					m_pVideoTextures[0]->GetLevelDesc(0, &desc);
+				} else if (m_pVideoSurfaces[0]) {
+					m_pVideoSurfaces[0]->GetDesc(&desc);
 				}
 
 				if (desc.Width != (UINT)m_nativeVideoSize.cx || desc.Height != (UINT)m_nativeVideoSize.cy) {
@@ -2133,7 +2141,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	HRESULT hr;
 
 	D3DSURFACE_DESC desc = {};
-	if (FAILED(hr = m_pVideoSurface[m_nCurSurface]->GetDesc(&desc))) {
+	if (FAILED(hr = m_pVideoSurfaces[m_nCurSurface]->GetDesc(&desc))) {
 		return hr;
 	};
 
@@ -2161,7 +2169,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	CComPtr<IDirect3DSurface9> pSurface;
 	D3DLOCKED_RECT r;
 	if (FAILED(hr = m_pD3DDevEx->CreateRenderTarget(framesize.cx, framesize.cy, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pSurface, NULL))
-			|| (FAILED(hr = m_pD3DDevEx->StretchRect(m_pVideoSurface[m_nCurSurface], NULL, pSurface, NULL, D3DTEXF_NONE)))
+			|| (FAILED(hr = m_pD3DDevEx->StretchRect(m_pVideoSurfaces[m_nCurSurface], NULL, pSurface, NULL, D3DTEXF_NONE)))
 			|| (FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY)))) {
 		return hr;
 	}

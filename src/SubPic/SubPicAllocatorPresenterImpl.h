@@ -112,11 +112,7 @@ public:
 	STDMETHODIMP SetBin(LPCSTR field, LPVOID value, int size);
 
 	// ISubRenderConsumer
-	STDMETHODIMP GetMerit(ULONG* plMerit) {
-		CheckPointer(plMerit, E_POINTER);
-		*plMerit = 4 << 16;
-		return S_OK;
-	}
+	STDMETHODIMP GetMerit(ULONG* plMerit);
 	STDMETHODIMP Connect(ISubRenderProvider* subtitleRenderer);
 	STDMETHODIMP Disconnect();
 	STDMETHODIMP DeliverFrame(REFERENCE_TIME start, REFERENCE_TIME stop, LPVOID context, ISubRenderFrame* subtitleFrame);

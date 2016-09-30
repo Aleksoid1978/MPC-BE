@@ -89,9 +89,6 @@ CRenderersData::CRenderersData()
 	, m_iDisplayStats(0)
 	, m_bResetStats(false)
 	, m_iStereo3DTransform(STEREO3D_AsIs)
-	// don't disable hardware features before initializing a renderer
-	, m_bFP16Support(true) 
-	, m_b10bitSupport(true)
 {
 }
 

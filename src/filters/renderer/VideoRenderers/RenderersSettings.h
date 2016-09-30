@@ -188,10 +188,6 @@ public:
 	int			m_iDisplayStats;
 	bool		m_bResetStats; // Set to reset the presentation statistics
 	int			m_iStereo3DTransform;
-
-	// Hardware feature support
-	bool		m_bFP16Support;
-	bool		m_b10bitSupport;
 };
 
 extern CRenderersSettings&	GetRenderersSettings();

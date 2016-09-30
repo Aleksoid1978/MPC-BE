@@ -472,6 +472,13 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::SetBin(LPCSTR field, LPVOID value, i
 
 // ISubRenderConsumer
 
+STDMETHODIMP CSubPicAllocatorPresenterImpl::GetMerit(ULONG* plMerit)
+{
+	CheckPointer(plMerit, E_POINTER);
+	*plMerit = 4 << 16;
+	return S_OK;
+}
+
 STDMETHODIMP CSubPicAllocatorPresenterImpl::Connect(ISubRenderProvider* subtitleRenderer)
 {
 	HRESULT hr = E_FAIL;
