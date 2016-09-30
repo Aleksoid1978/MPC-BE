@@ -118,29 +118,37 @@ void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, cons
 			CRect rcVideo(videoRect);
 
 			const CRenderersSettings& rs = GetRenderersSettings();
+			//const CRenderersData* data = GetRenderersData();
+
 			if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE) {
 				CRect rcTempWindow(windowRect);
 				rcTempWindow.right -= rcTempWindow.Width() / 2;
 				CRect rcTempVideo(videoRect);
 				rcTempVideo.right -= rcTempVideo.Width() / 2;
 
-				AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, NULL, xOffsetInPixels ? xOffsetInPixels : DefaultStereoOffsetInPixels, FALSE);
+				xOffsetInPixels = -DefaultStereoOffsetInPixels;
+				AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, NULL, xOffsetInPixels, FALSE);
 
 				rcWindow.left += rcWindow.Width() / 2;
 				rcVideo.left += rcVideo.Width() / 2;
-			} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM) {
+
+				xOffsetInPixels = DefaultStereoOffsetInPixels;
+			} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM/* || data->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace*/) {
 				CRect rcTempWindow(windowRect);
 				rcTempWindow.bottom -= rcTempWindow.Height() / 2;
 				CRect rcTempVideo(videoRect);
 				rcTempVideo.bottom -= rcTempVideo.Height() / 2;
 
-				AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, NULL, xOffsetInPixels ? xOffsetInPixels : DefaultStereoOffsetInPixels, FALSE);
+				xOffsetInPixels = -DefaultStereoOffsetInPixels;
+				AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, NULL, xOffsetInPixels, FALSE);
 
 				rcWindow.top += rcWindow.Height() / 2;
 				rcVideo.top += rcVideo.Height() / 2;
+
+				xOffsetInPixels = DefaultStereoOffsetInPixels;
 			}
 
-			AlphaBlt(rcWindow, rcVideo, pSubPic, NULL, xOffsetInPixels, rs.iSubpicStereoMode == SUBPIC_STEREO_NONE);
+			AlphaBlt(rcWindow, rcVideo, pSubPic, NULL, xOffsetInPixels, rs.iSubpicStereoMode == SUBPIC_STEREO_NONE/* && data->m_iStereo3DTransform != STEREO3D_HalfOverUnder_to_Interlace*/);
 		}
 	}
 }

@@ -1353,17 +1353,27 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	if (m_pOSDTexture) {
+		const int xOffsetInPixels = 4;
+
 		CRect rcDst(rDstPri);
 		if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE) {
 			CRect rcTemp(rcDst);
 			rcTemp.right -= rcTemp.Width() / 2;
+			rcTemp.OffsetRect(-xOffsetInPixels, 0);
+
 			AlphaBlt(rSrcPri, rcTemp, m_pOSDTexture);
+
 			rcDst.left += rcDst.Width() / 2;
+			rcTemp.OffsetRect(xOffsetInPixels * 2, 0);
 		} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM) {
 			CRect rcTemp(rcDst);
 			rcTemp.bottom -= rcTemp.Height() / 2;
+			rcTemp.OffsetRect(-xOffsetInPixels, 0);
+
 			AlphaBlt(rSrcPri, rcTemp, m_pOSDTexture);
+
 			rcDst.top += rcDst.Height() / 2;
+			rcTemp.OffsetRect(xOffsetInPixels * 2, 0);
 		}
 
 		AlphaBlt(rSrcPri, rcDst, m_pOSDTexture);
