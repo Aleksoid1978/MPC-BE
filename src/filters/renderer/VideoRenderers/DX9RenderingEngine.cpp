@@ -139,11 +139,19 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_D3D9VendorId(0)
 	, m_VideoBufferFmt(D3DFMT_X8R8G8B8)
 	, m_SurfaceFmt(D3DFMT_X8R8G8B8)
-	, m_bColorManagement(false)
 	, m_iRotation(0)
 	, m_inputExtFormat({0})
 	, m_wsResizer(L"") // empty string, not nullptr
 	, m_bFP16Support(true) // don't disable hardware features before initializing a renderer
+	, m_RenderingPath(RENDERING_PATH_STRETCHRECT)
+	, m_ScreenSpaceTexWidth(0)
+	, m_ScreenSpaceTexHeight(0)
+	, m_bIsEVR(false)
+	, m_bFinalPass(false)
+	, m_bColorManagement(false)
+	, m_InputVideoSystem(VIDEO_SYSTEM_UNKNOWN)
+	, m_AmbientLight(AMBIENT_LIGHT_BRIGHT)
+	, m_RenderingIntent(COLOR_RENDERING_INTENT_PERCEPTUAL)
 {
 #if DXVAVP
 	m_hDxva2Lib = LoadLibrary(L"dxva2.dll");
@@ -273,7 +281,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 			m_VideoBufferFmt = D3DFMT_A2R10G10B10;
 		}
 
-		for (int i = 0; i < m_nNbDXSurface; i++) {
+		for (unsigned i = 0; i < m_nNbDXSurface; i++) {
 			if (FAILED(hr = m_pD3DDevEx->CreateTexture(
 								m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
 								D3DUSAGE_RENDERTARGET, m_VideoBufferFmt,
@@ -306,7 +314,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 
 void CDX9RenderingEngine::FreeVideoSurfaces()
 {
-	for (int i = 0; i < m_nNbDXSurface; i++) {
+	for (unsigned i = 0; i < m_nNbDXSurface; i++) {
 		m_pVideoTextures[i] = NULL;
 		m_pVideoSurfaces[i] = NULL;
 	}
@@ -1412,9 +1420,6 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 		}
 
 		// Create the 3D LUT texture
-		m_Lut3DSize = 64; // 64x64x64 LUT is enough for high-quality color management
-		m_Lut3DEntryCount = m_Lut3DSize * m_Lut3DSize * m_Lut3DSize;
-
 		hr = m_pD3DDevEx->CreateVolumeTexture(m_Lut3DSize, m_Lut3DSize, m_Lut3DSize,
 											1,
 											D3DUSAGE_DYNAMIC,
@@ -1454,13 +1459,13 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 
 		DirectX::PackedVector::HALF* lut3DFloat16Iterator = lut3DFloat16;
 		char* outputSliceIterator = static_cast<char*>(lockedBox.pBits);
-		for (int b = 0; b < m_Lut3DSize; b++) {
+		for (unsigned b = 0; b < m_Lut3DSize; b++) {
 			char* outputRowIterator = outputSliceIterator;
 
-			for (int g = 0; g < m_Lut3DSize; g++) {
+			for (unsigned g = 0; g < m_Lut3DSize; g++) {
 				DirectX::PackedVector::HALF* outputIterator = reinterpret_cast<DirectX::PackedVector::HALF*>(outputRowIterator);
 
-				for (int r = 0; r < m_Lut3DSize; r++) {
+				for (unsigned r = 0; r < m_Lut3DSize; r++) {
 					// R, G, B
 					for (int i = 0; i < 3; i++) {
 						*outputIterator++ = *lut3DFloat16Iterator++;
@@ -1495,7 +1500,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 
 	if (bColorManagement) {
 		static char lut3DSizeStr[12];
-		sprintf(lut3DSizeStr, "%d", m_Lut3DSize);
+		sprintf(lut3DSizeStr, "%u", m_Lut3DSize);
 		ShaderMacros[i++] = { "LUT3D_SIZE", lut3DSizeStr };
 	}
 
@@ -1700,9 +1705,9 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(TCHAR* profilePath, float* lut3
 
 	unsigned short* lut3DInputIterator = lut3DInput;
 
-	for (int b = 0; b < m_Lut3DSize; b++) {
-		for (int g = 0; g < m_Lut3DSize; g++) {
-			for (int r = 0; r < m_Lut3DSize; r++) {
+	for (unsigned b = 0; b < m_Lut3DSize; b++) {
+		for (unsigned g = 0; g < m_Lut3DSize; g++) {
+			for (unsigned r = 0; r < m_Lut3DSize; r++) {
 				*lut3DInputIterator++ = r * 65535 / (m_Lut3DSize - 1);
 				*lut3DInputIterator++ = g * 65535 / (m_Lut3DSize - 1);
 				*lut3DInputIterator++ = b * 65535 / (m_Lut3DSize - 1);

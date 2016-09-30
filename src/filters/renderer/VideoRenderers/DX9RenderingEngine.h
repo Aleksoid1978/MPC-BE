@@ -70,8 +70,8 @@ namespace DSObjects
 		D3DFORMAT					m_BackbufferFmt;
 		D3DFORMAT					m_DisplayFmt;
 		CSize						m_ScreenSize;
-		int							m_nNbDXSurface;					// Total number of DX Surfaces
-		int							m_nCurSurface;					// Surface currently displayed
+		unsigned					m_nNbDXSurface; // Total number of DX Surfaces
+		unsigned					m_nCurSurface;  // Surface currently displayed
 		bool						m_bIsEVR;
 		DWORD						m_D3D9VendorId;
 		bool						m_bFP16Support;
@@ -163,8 +163,8 @@ namespace DSObjects
 
 		// Final pass
 		bool							m_bFinalPass;
-		int								m_Lut3DSize;
-		int								m_Lut3DEntryCount;
+		const unsigned					m_Lut3DSize = 64; // 64x64x64 LUT is enough for high-quality color management
+		const unsigned					m_Lut3DEntryCount = 64 * 64 * 64;
 		CComPtr<IDirect3DVolumeTexture9> m_pLut3DTexture;
 		CComPtr<IDirect3DTexture9>		m_pDitherTexture;
 		CComPtr<IDirect3DPixelShader9>	m_pFinalPixelShader;
