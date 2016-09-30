@@ -143,7 +143,7 @@ protected:
 
 	CMSDKDecoder*							m_pMSDKDecoder;
 	int										m_iMvcOutputMode;
-	bool									m_iMvcSwapLR;
+	bool									m_bMvcSwapLR;
 
 	BOOL									m_MVC_Base_View_R_flag;
 

@@ -988,7 +988,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_dRate(1.0)
 	, m_pMSDKDecoder(NULL)
 	, m_iMvcOutputMode(MVC_OUTPUT_Auto)
-	, m_iMvcSwapLR(false)
+	, m_bMvcSwapLR(false)
 	, m_MVC_Base_View_R_flag(FALSE)
 {
 	if (phr) {
@@ -3590,7 +3590,7 @@ STDMETHODIMP CMPCVideoDecFilter::SetMvcOutputMode(int nMode, bool bSwapLR)
 		return E_INVALIDARG;
 	}
 	m_iMvcOutputMode = nMode;
-	m_iMvcSwapLR = bSwapLR;
+	m_bMvcSwapLR = bSwapLR;
 
 	if (m_pMSDKDecoder) {
 		m_pMSDKDecoder->SetOutputMode(nMode, bSwapLR);

@@ -159,7 +159,7 @@ CMSDKDecoder::CMSDKDecoder(CMPCVideoDecFilter* pFilter)
   : m_pFilter(pFilter)
 {
   m_iOutputMode = m_iNewOutputMode = m_pFilter->m_iMvcOutputMode;
-  m_bSwapLR = m_pFilter->m_iMvcSwapLR;
+  m_bSwapLR = m_pFilter->m_bMvcSwapLR;
 
   int info[4] = { 0 };
   __cpuid(info, 0);
