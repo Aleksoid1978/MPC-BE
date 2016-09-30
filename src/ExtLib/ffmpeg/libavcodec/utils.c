@@ -724,6 +724,9 @@ int avcodec_default_get_buffer2(AVCodecContext *avctx, AVFrame *frame, int flags
 {
     int ret;
 
+    if (avctx->hw_frames_ctx)
+        return av_hwframe_get_buffer(avctx->hw_frames_ctx, frame, 0);
+
     if ((ret = update_frame_pool(avctx, frame)) < 0)
         return ret;
 
@@ -784,6 +787,12 @@ int ff_init_buffer_info(AVCodecContext *avctx, AVFrame *frame)
             }
         }
         add_metadata_from_side_data(pkt, frame);
+
+        if (pkt->flags & AV_PKT_FLAG_DISCARD) {
+            frame->flags |= AV_FRAME_FLAG_DISCARD;
+        } else {
+            frame->flags = (frame->flags & ~AV_FRAME_FLAG_DISCARD);
+        }
     } else {
         frame->pkt_pts = AV_NOPTS_VALUE;
         av_frame_set_pkt_pos     (frame, -1);
@@ -1116,6 +1125,8 @@ int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt)
         av_freep(&avctx->internal->hwaccel_priv_data);
         avctx->hwaccel = NULL;
 
+        av_buffer_unref(&avctx->hw_frames_ctx);
+
         ret = avctx->get_format(avctx, choices);
 
         desc = av_pix_fmt_desc_get(ret);
@@ -1130,6 +1141,16 @@ int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt)
         if (avctx->codec->capabilities&AV_CODEC_CAP_HWACCEL_VDPAU)
             break;
 #endif
+
+        if (avctx->hw_frames_ctx) {
+            AVHWFramesContext *hw_frames_ctx = (AVHWFramesContext*)avctx->hw_frames_ctx->data;
+            if (hw_frames_ctx->format != ret) {
+                av_log(avctx, AV_LOG_ERROR, "Format returned from get_buffer() "
+                       "does not match the format of provided AVHWFramesContext\n");
+                ret = AV_PIX_FMT_NONE;
+                break;
+            }
+        }
 
         if (!setup_hwaccel(avctx, ret, desc->name))
             break;
@@ -2256,7 +2277,9 @@ fail:
             if(ret == tmp.size)
                 ret = avpkt->size;
         }
-
+        if (picture->flags & AV_FRAME_FLAG_DISCARD) {
+            *got_picture_ptr = 0;
+        }
         if (*got_picture_ptr) {
             if (!avctx->refcounted_frames) {
                 int err = unrefcount_frame(avci, picture);
@@ -2361,6 +2384,13 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
             skip_reason = AV_RL8(side + 8);
             discard_reason = AV_RL8(side + 9);
         }
+
+        if ((frame->flags & AV_FRAME_FLAG_DISCARD) && *got_frame_ptr &&
+            !(avctx->flags2 & AV_CODEC_FLAG2_SKIP_MANUAL)) {
+            avctx->internal->skip_samples -= frame->nb_samples;
+            *got_frame_ptr = 0;
+        }
+
         if (avctx->internal->skip_samples > 0 && *got_frame_ptr &&
             !(avctx->flags2 & AV_CODEC_FLAG2_SKIP_MANUAL)) {
             if(frame->nb_samples <= avctx->internal->skip_samples){
