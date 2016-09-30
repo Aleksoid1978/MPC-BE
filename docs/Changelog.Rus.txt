@@ -11,7 +11,7 @@ Windows XP больше не поддерживается.
 Вместо d3dcompiler_43.dll теперь используется d3dcompiler_47.dll.
 
 Обновлены библиотеки:
-	ffmpeg git-n3.2-dev-904-g140da8e;
+	ffmpeg git-n3.2-dev-1065-g97e7f03;
 	jsoncpp 1.7.5;
 	libflac git-1.3.1-215-ga52177b;
 	Little-CMS git-2.7-69-g5c23621;

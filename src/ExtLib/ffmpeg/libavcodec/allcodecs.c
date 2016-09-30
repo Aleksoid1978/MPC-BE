@@ -242,7 +242,6 @@ void avcodec_register_all(void)
     REGISTER_PARSER (VP9, vp9);
 
     /* external libraries */
-    //REGISTER_DECODER (LIBDCADEC, libdcadec);
     REGISTER_DECODER (LIBOPENJPEG, libopenjpeg);
     //REGISTER_DECODER (LIBOPUS, libopus);
     REGISTER_DECODER (LIBSPEEX, libspeex);
