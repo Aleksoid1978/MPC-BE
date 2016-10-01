@@ -427,7 +427,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	g_nFrameType = PICT_NONE;
 
 	CRenderersSettings& rs = GetRenderersSettings();
-	CRenderersData* renderersData = GetRenderersData();
+	CRenderersData* rd = GetRenderersData();
 
 	CAutoLock lock(&m_RenderLock);
 
@@ -1251,6 +1251,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	CRenderersSettings& rs = GetRenderersSettings();
+	CRenderersData* rd = GetRenderersData();
 
 	//TRACE("Thread: %d\n", (LONG)((CRITICAL_SECTION &)m_RenderLock).OwningThread);
 
@@ -1261,8 +1262,6 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		__debugbreak();
 	}
 #endif
-
-	CRenderersData * pApp = GetRenderersData();
 
 	LONGLONG StartPaint = GetPerfCounter();
 	CAutoLock cRenderLock(&m_RenderLock);
@@ -1275,11 +1274,10 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			//TRACE("UNORDERED PAINT!!!!!!\n");
 		}
 
-
 		return false;
 	}
 
-	HRESULT hr;
+	HRESULT hr = S_OK;
 
 	m_pD3DDevEx->BeginScene();
 
@@ -1317,12 +1315,12 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	// paint subtitles on the backbuffer
 	AlphaBltSubPic(rDstPri, rDstVid);
 
-	if (pApp->m_bResetStats) {
+	if (rd->m_bResetStats) {
 		ResetStats();
-		pApp->m_bResetStats = false;
+		rd->m_bResetStats = false;
 	}
 
-	if (pApp->m_iDisplayStats) {
+	if (rd->m_iDisplayStats) {
 		DrawStats();
 	}
 
@@ -1714,9 +1712,10 @@ void CDX9AllocatorPresenter::ResetStats()
 void CDX9AllocatorPresenter::DrawStats()
 {
 	const CRenderersSettings& rs = GetRenderersSettings();
-	const CRenderersData *pApp = GetRenderersData();
+	const CRenderersData* rd = GetRenderersData();
+
 	int iDetailedStats = 2;
-	switch (pApp->m_iDisplayStats) {
+	switch (rd->m_iDisplayStats) {
 		case 1:
 			iDetailedStats = 2;
 			break;
