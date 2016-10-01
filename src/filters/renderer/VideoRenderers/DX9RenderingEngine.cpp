@@ -237,7 +237,7 @@ void CDX9RenderingEngine::CleanupRenderingEngine()
 HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 {
 	HRESULT hr;
-	CRenderersSettings& settings = GetRenderersSettings();
+	CRenderersSettings& rs = GetRenderersSettings();
 
 	// Free previously allocated video surfaces
 	FreeVideoSurfaces();
@@ -246,7 +246,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 	m_pRotateTexture = NULL;
 	NULL_PTR_ARRAY(m_pFrameTextures);
 
-	if (settings.iSurfaceType == SURFACE_TEXTURE2D) {
+	if (rs.iSurfaceType == SURFACE_TEXTURE2D) {
 		if (FAILED(hr = m_pD3DDevEx->CreateTexture(
 			m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
 			D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
@@ -263,13 +263,13 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 
 		m_RenderingPath = RENDERING_PATH_STRETCHRECT;
 	}
-	else if (settings.iSurfaceType == SURFACE_TEXTURE3D) {
+	else if (rs.iSurfaceType == SURFACE_TEXTURE3D) {
 		m_VideoBufferFmt = m_SurfaceFmt;
 		if (m_D3D9VendorId == PCIV_Intel) {
 			if (m_bIsEVR) {
 				// on Intel EVR-Mixer can work with X8R8G8B8 surface only
 				m_VideoBufferFmt = D3DFMT_X8R8G8B8;
-			} else if (m_SurfaceFmt == D3DFMT_A32B32G32R32F && settings.bVMRMixerMode && settings.bVMRMixerYUV) {
+			} else if (m_SurfaceFmt == D3DFMT_A32B32G32R32F && rs.bVMRMixerMode && rs.bVMRMixerYUV) {
 				// on Intel VMR-9r with YUV Mixing Mode can not work with A32B32G32R32F surface
 				m_VideoBufferFmt = D3DFMT_A16B16G16R16F;
 			}
@@ -350,8 +350,8 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		return S_OK;
 	}
 
-	CRenderersSettings& settings = GetRenderersSettings();
-	CRenderersData* data = GetRenderersData();
+	CRenderersSettings& rs = GetRenderersSettings();
+	CRenderersData* rd = GetRenderersData();
 
 	// Initialize the processing pipeline
 	bool bCustomPixelShaders;
@@ -359,7 +359,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	bool bFinalPass;
 
 	int screenSpacePassCount = 0;
-	DWORD iResizer = settings.iResizer;
+	DWORD iResizer = rs.iResizer;
 
 	{
 		// Final pass. Must be initialized first!
@@ -388,7 +388,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			screenSpacePassCount += (int)m_pCustomScreenSpacePixelShaders.GetCount();
 		}
 
-		if (data->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+		if (rd->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 			screenSpacePassCount++;
 		}
 
@@ -539,7 +539,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 
 	Transform(destRect, dest);
 
-	if (bCustomScreenSpacePixelShaders || bFinalPass || data->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+	if (bCustomScreenSpacePixelShaders || bFinalPass || rd->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 		CComPtr<IDirect3DSurface9> pTemporarySurface;
 		hr = m_pScreenSpaceTextures[0]->GetSurfaceLevel(0, &pTemporarySurface);
 
@@ -631,7 +631,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 				Shader.Compile(m_pPSC);
 			}
 
-			if (pos || bFinalPass || data->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+			if (pos || bFinalPass || rd->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 				CComPtr<IDirect3DSurface9> pTemporarySurface;
 				hr = m_pScreenSpaceTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
 				if (SUCCEEDED(hr)) {
@@ -647,7 +647,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		}
 	}
 
-	if (data->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+	if (rd->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 		if (!m_pConvertToInterlacePixelShader) {
 			if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 				hr = CreateShaderFromResource(m_pD3DDevEx, &m_pConvertToInterlacePixelShader, IDF_SHADER_PS20_CONVERT_TO_INTERLACE);
