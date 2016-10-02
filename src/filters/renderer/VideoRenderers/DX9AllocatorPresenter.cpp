@@ -1320,19 +1320,6 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	// paint subtitles on the backbuffer
 	AlphaBltSubPic(rDstPri, rDstVid);
 
-	if (bStereo3DTransform) {
-		Stereo3DTransform(pBackBuffer, rDstVid);
-	}
-
-	if (rd->m_bResetStats) {
-		ResetStats();
-		rd->m_bResetStats = false;
-	}
-
-	if (rd->m_iDisplayStats) {
-		DrawStats();
-	}
-
 	// Casimir666 : show OSD
 	if (m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_UPDATE) {
 		CAutoLock BitMapLock(&m_VMR9AlphaBitmapLock);
@@ -1380,7 +1367,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 			rcDst.left += rcDst.Width() / 2;
 			rcTemp.OffsetRect(xOffsetInPixels * 2, 0);
-		} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM) {
+		} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM || rd->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 			CRect rcTemp(rcDst);
 			rcTemp.bottom -= rcTemp.Height() / 2;
 			rcTemp.OffsetRect(-xOffsetInPixels, 0);
@@ -1392,6 +1379,19 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		}
 
 		AlphaBlt(rSrcPri, rcDst, m_pOSDTexture);
+	}
+
+	if (bStereo3DTransform) {
+		Stereo3DTransform(pBackBuffer, rDstVid);
+	}
+
+	if (rd->m_bResetStats) {
+		ResetStats();
+		rd->m_bResetStats = false;
+	}
+
+	if (rd->m_iDisplayStats) {
+		DrawStats();
 	}
 
 	m_pD3DDevEx->EndScene();
