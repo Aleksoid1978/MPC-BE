@@ -115,6 +115,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SyncRenderer.cpp" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VMR9AllocatorPresenter.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +141,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SyncAllocatorPresenter.h" />
     <ClInclude Include="SyncRenderer.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="VMR9AllocatorPresenter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
