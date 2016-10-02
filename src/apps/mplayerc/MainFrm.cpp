@@ -6456,7 +6456,6 @@ void CMainFrame::OnUpdateViewTearingTest(CCmdUI* pCmdUI)
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& r = s.m_RenderersSettings;
 	bool supported = (s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-					  s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS ||
 					  s.iVideoRenderer == VIDRNDT_SYNC) &&
 					 r.iSurfaceType == SURFACE_TEXTURE3D;
 
@@ -6474,7 +6473,6 @@ void CMainFrame::OnUpdateViewDisplayStats(CCmdUI* pCmdUI)
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& r = s.m_RenderersSettings;
 	bool supported = (s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-					  s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS ||
 					  s.iVideoRenderer == VIDRNDT_SYNC) &&
 					 r.iSurfaceType == SURFACE_TEXTURE3D;
 
@@ -6506,7 +6504,6 @@ void CMainFrame::OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI)
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& r = s.m_RenderersSettings;
 	bool supported = ((s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-					   s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS ||
 					   s.iVideoRenderer == VIDRNDT_SYNC) &&
 					  r.iSurfaceType == SURFACE_TEXTURE3D);
 
@@ -6519,7 +6516,6 @@ void CMainFrame::OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI)
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& rs = s.m_RenderersSettings;
 	bool supported = ((s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-					   s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS ||
 					   s.iVideoRenderer == VIDRNDT_SYNC) &&
 					  rs.iSurfaceType == SURFACE_TEXTURE3D &&
 					  (IsWinVista() || IsWin7()));
@@ -6595,9 +6591,7 @@ void CMainFrame::OnViewResetDefault()
 void CMainFrame::OnUpdateViewReset(CCmdUI* pCmdUI)
 {
 	CAppSettings& s = AfxGetAppSettings();
-	bool supported = s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-					 s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS ||
-					 s.iVideoRenderer == VIDRNDT_SYNC;
+	bool supported = (s.iVideoRenderer == VIDRNDT_EVR_CUSTOM || s.iVideoRenderer == VIDRNDT_SYNC);
 	pCmdUI->Enable(supported);
 }
 

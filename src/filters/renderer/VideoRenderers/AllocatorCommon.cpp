@@ -23,7 +23,6 @@
 #include "AllocatorCommon.h"
 #include "moreuuids.h"
 
-#include "VMR9AllocatorPresenter.h"
 #include "DXRAllocatorPresenter.h"
 #include "madVRAllocatorPresenter.h"
 #include "EVRAllocatorPresenter.h"
@@ -54,10 +53,7 @@ HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAlloca
 	HRESULT hr = E_FAIL;
 	CString Error;
 
-	if (IsEqualCLSID(clsid, CLSID_VMR9AllocatorPresenter)) {
-		*ppAP = DNew CVMR9AllocatorPresenter(hWnd, bFullscreen, hr, Error);
-	}
-	else if (IsEqualCLSID(clsid, CLSID_DXRAllocatorPresenter)) {
+	if (IsEqualCLSID(clsid, CLSID_DXRAllocatorPresenter)) {
 		*ppAP = DNew CDXRAllocatorPresenter(hWnd, hr, Error);
 	}
 	else if (IsEqualCLSID(clsid, CLSID_madVRAllocatorPresenter)) {

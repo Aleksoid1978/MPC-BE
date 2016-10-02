@@ -108,7 +108,6 @@
     <ClCompile Include="madVRAllocatorPresenter.cpp" />
     <ClCompile Include="MemUsage.cpp" />
     <ClCompile Include="OuterEVR.cpp" />
-    <ClCompile Include="OuterVMR.cpp" />
     <ClCompile Include="PixelShaderCompiler.cpp" />
     <ClCompile Include="RenderersSettings.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -116,7 +115,6 @@
     </ClCompile>
     <ClCompile Include="SyncRenderer.cpp" />
     <ClCompile Include="Utils.cpp" />
-    <ClCompile Include="VMR9AllocatorPresenter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllocatorCommon.h" />
@@ -135,14 +133,12 @@
     <ClInclude Include="madVRAllocatorPresenter.h" />
     <ClInclude Include="MemUsage.h" />
     <ClInclude Include="OuterEVR.h" />
-    <ClInclude Include="OuterVMR.h" />
     <ClInclude Include="PixelShaderCompiler.h" />
     <ClInclude Include="RenderersSettings.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SyncAllocatorPresenter.h" />
     <ClInclude Include="SyncRenderer.h" />
     <ClInclude Include="Utils.h" />
-    <ClInclude Include="VMR9AllocatorPresenter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
