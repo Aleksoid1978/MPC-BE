@@ -1278,6 +1278,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	HRESULT hr = S_OK;
+	bool bStereo3DTransform = (m_RenderingPath == RENDERING_PATH_DRAW && rd->m_iStereo3DTransform != STEREO3D_AsIs);
 
 	m_pD3DDevEx->BeginScene();
 
@@ -1295,7 +1296,11 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	CRect rDstPri(m_windowRect);
 
 	// Render the current video frame
-	hr = RenderVideo(pBackBuffer, rSrcVid, rDstVid);
+	if (bStereo3DTransform) {
+		hr = RenderVideo(NULL, rSrcVid, rDstVid);
+	} else {
+		hr = RenderVideo(pBackBuffer, rSrcVid, rDstVid);
+	}
 
 	if (FAILED(hr)) {
 		if (m_RenderingPath == RENDERING_PATH_STRETCHRECT) {
@@ -1383,6 +1388,10 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		}
 
 		AlphaBlt(rSrcPri, rcDst, m_pOSDTexture);
+	}
+
+	if (bStereo3DTransform) {
+		Stereo3DTransform(pBackBuffer, rDstVid);
 	}
 
 	m_pD3DDevEx->EndScene();
