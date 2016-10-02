@@ -2838,35 +2838,35 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
 bool CMainFrame::DoAfterPlaybackEvent()
 {
-	CAppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
-	bool fExit = (s.nCLSwitches & CLSW_CLOSE) || s.fExitAfterPlayback;
+	bool bExit = (s.nCLSwitches & CLSW_CLOSE) || s.fExitAfterPlayback;
 
 	if (s.nCLSwitches & CLSW_STANDBY) {
 		SetPrivilege(SE_SHUTDOWN_NAME);
 		SetSystemPowerState(TRUE, FALSE);
-		fExit = true; // TODO: unless the app closes, it will call standby or hibernate once again forever, how to avoid that?
+		bExit = true; // TODO: unless the app closes, it will call standby or hibernate once again forever, how to avoid that?
 	} else if (s.nCLSwitches & CLSW_HIBERNATE) {
 		SetPrivilege(SE_SHUTDOWN_NAME);
 		SetSystemPowerState(FALSE, FALSE);
-		fExit = true; // TODO: unless the app closes, it will call standby or hibernate once again forever, how to avoid that?
+		bExit = true; // TODO: unless the app closes, it will call standby or hibernate once again forever, how to avoid that?
 	} else if (s.nCLSwitches & CLSW_SHUTDOWN) {
 		SetPrivilege(SE_SHUTDOWN_NAME);
-		ExitWindowsEx(EWX_SHUTDOWN | EWX_POWEROFF | EWX_FORCEIFHUNG, 0);
-		fExit = true;
+		ExitWindowsEx(EWX_SHUTDOWN | EWX_HYBRID_SHUTDOWN | EWX_POWEROFF | EWX_FORCEIFHUNG, 0);
+		bExit = true;
 	} else if (s.nCLSwitches & CLSW_LOGOFF) {
 		SetPrivilege(SE_SHUTDOWN_NAME);
 		ExitWindowsEx(EWX_LOGOFF | EWX_FORCEIFHUNG, 0);
-		fExit = true;
+		bExit = true;
 	} else if (s.nCLSwitches & CLSW_LOCK) {
 		LockWorkStation();
 	}
 
-	if (fExit) {
+	if (bExit) {
 		SendMessage(WM_COMMAND, ID_FILE_EXIT);
 	}
 
-	return fExit;
+	return bExit;
 }
 
 //
