@@ -1320,6 +1320,10 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	// paint subtitles on the backbuffer
 	AlphaBltSubPic(rDstPri, rDstVid);
 
+	if (bStereo3DTransform) {
+		Stereo3DTransform(pBackBuffer, rDstVid);
+	}
+
 	if (rd->m_bResetStats) {
 		ResetStats();
 		rd->m_bResetStats = false;
@@ -1388,10 +1392,6 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		}
 
 		AlphaBlt(rSrcPri, rcDst, m_pOSDTexture);
-	}
-
-	if (bStereo3DTransform) {
-		Stereo3DTransform(pBackBuffer, rDstVid);
 	}
 
 	m_pD3DDevEx->EndScene();
