@@ -100,6 +100,7 @@ namespace DSObjects
 		void FreeVideoSurfaces();
 
 		HRESULT RenderVideo(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect);
+		HRESULT Stereo3DTransform(IDirect3DSurface9* pRenderTarget, const CRect& destRect);
 
 		HRESULT DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect);
 		HRESULT AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9* pTexture);
@@ -127,6 +128,7 @@ namespace DSObjects
 		CComPtr<IDirect3DTexture9>	m_pFrameTextures[2];
 		CComPtr<IDirect3DTexture9>	m_pResizeTexture;
 		CComPtr<IDirect3DTexture9>	m_pScreenSpaceTextures[2];
+		unsigned					m_iScreenTex;
 
 		int							m_ScreenSpaceTexWidth;
 		int							m_ScreenSpaceTexHeight;
