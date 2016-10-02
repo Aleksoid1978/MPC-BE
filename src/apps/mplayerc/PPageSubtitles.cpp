@@ -125,8 +125,7 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 	bool VRwithSR =
 		s.iVideoRenderer == VIDRNDT_MADVR ||
 		s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-		s.iVideoRenderer == VIDRNDT_SYNC ||
-		s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS;
+		s.iVideoRenderer == VIDRNDT_SYNC;
 
 	str = L"VSFilter/xy-VSFilter";
 	if (!IsCLSIDRegistered(CLSID_VSFilter_autoloading)) {

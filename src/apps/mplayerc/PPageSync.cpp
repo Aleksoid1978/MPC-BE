@@ -97,7 +97,7 @@ void CPPageSync::InitDialogPrivate()
 	m_chkVMRFlushGPUAfterPresent.SetCheck(rs.bFlushGPUAfterPresent);
 	m_chkVMRFlushGPUWait.SetCheck(rs.bFlushGPUWait);
 
-	if ((s.iVideoRenderer == VIDRNDT_EVR_CUSTOM || s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS) && rs.iSurfaceType == SURFACE_TEXTURE3D) {
+	if (s.iVideoRenderer == VIDRNDT_EVR_CUSTOM && rs.iSurfaceType == SURFACE_TEXTURE3D) {
 		m_chkVMR9VSync.EnableWindow(TRUE);
 		m_chkVMR9VSyncAccurate.EnableWindow(TRUE);
 		m_chkVMR9AlterativeVSync.EnableWindow(TRUE);
@@ -115,8 +115,7 @@ void CPPageSync::InitDialogPrivate()
 	OnAlterativeVSyncCheck();
 
 	if ((IsWinVista() || IsWin7()) &&
-			(s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS ||
-			s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
+			(s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
 			s.iVideoRenderer == VIDRNDT_MADVR ||
 			s.iVideoRenderer == VIDRNDT_SYNC)) {
 		m_chkDisableAero.EnableWindow(TRUE);
@@ -214,7 +213,7 @@ void CPPageSync::OnAlterativeVSyncCheck()
 	CRenderersSettings& rs = s.m_RenderersSettings;
 
 	if (m_chkVMR9AlterativeVSync.GetCheck() == BST_CHECKED &&
-			(s.iVideoRenderer == VIDRNDT_EVR_CUSTOM || s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS) &&
+			s.iVideoRenderer == VIDRNDT_EVR_CUSTOM &&
 			rs.iSurfaceType == SURFACE_TEXTURE3D) {
 		GetDlgItem(IDC_STATIC1)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT1)->EnableWindow(TRUE);

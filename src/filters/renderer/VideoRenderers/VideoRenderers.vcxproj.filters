@@ -47,9 +47,6 @@
     <ClCompile Include="SyncRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VMR9AllocatorPresenter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Dither.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -57,9 +54,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OuterEVR.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OuterVMR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GPUUsage.cpp">
@@ -118,9 +112,6 @@
     <ClInclude Include="SyncRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VMR9AllocatorPresenter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Dither.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -128,9 +119,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OuterEVR.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OuterVMR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GPUUsage.h">

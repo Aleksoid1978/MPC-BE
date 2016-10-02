@@ -2670,8 +2670,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	bool VRwithSR =
 		s.iVideoRenderer == VIDRNDT_MADVR ||
 		s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-		s.iVideoRenderer == VIDRNDT_SYNC ||
-		s.iVideoRenderer == VIDRNDT_VMR9RENDERLESS;
+		s.iVideoRenderer == VIDRNDT_SYNC;
 
 	switch (s.iSubtitleRenderer) {
 		case SUBRNDT_NONE:
@@ -2863,9 +2862,6 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		switch (s.iVideoRenderer) {
 			case VIDRNDT_VMR9WINDOWED:
 				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"Video Mixing Renderer 9", m_vrmerit));
-				break;
-			case VIDRNDT_VMR9RENDERLESS:
-				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VMR9AllocatorPresenter, L"Video Mixing Renderer 9 (Renderless)", m_vrmerit));
 				break;
 			case VIDRNDT_EVR:
 				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", m_vrmerit));

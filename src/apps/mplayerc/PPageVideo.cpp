@@ -184,7 +184,6 @@ BOOL CPPageVideo::OnInitDialog()
 		switch (nID) {
 		case VIDRNDT_SYSDEFAULT:		sName = ResStr(IDS_PPAGE_OUTPUT_SYS_DEF);			break;
 		case VIDRNDT_VMR9WINDOWED:		sName = ResStr(IDS_PPAGE_OUTPUT_VMR9WINDOWED);		break;
-		case VIDRNDT_VMR9RENDERLESS:	sName = ResStr(IDS_PPAGE_OUTPUT_VMR9RENDERLESS);	break;
 		case VIDRNDT_DXR:				sName = ResStr(IDS_PPAGE_OUTPUT_DXR);				break;
 		case VIDRNDT_NULL_COMP:			sName = ResStr(IDS_PPAGE_OUTPUT_NULL_COMP);			break;
 		case VIDRNDT_NULL_UNCOMP:		sName = ResStr(IDS_PPAGE_OUTPUT_NULL_UNCOMP);		break;
@@ -209,7 +208,6 @@ BOOL CPPageVideo::OnInitDialog()
 	m_iDSVRTC.SetRedraw(FALSE);
 	addRenderer(VIDRNDT_SYSDEFAULT);
 	addRenderer(VIDRNDT_VMR9WINDOWED);
-	addRenderer(VIDRNDT_VMR9RENDERLESS);
 	addRenderer(VIDRNDT_EVR);
 	addRenderer(VIDRNDT_EVR_CUSTOM);
 	addRenderer(VIDRNDT_SYNC);
@@ -257,7 +255,6 @@ BOOL CPPageVideo::OnInitDialog()
 	m_cbD3D9RenderDevice.EnableWindow(FALSE);
 
 	switch (m_iVideoRendererType) {
-		case VIDRNDT_VMR9RENDERLESS:
 		case VIDRNDT_EVR_CUSTOM:
 			if (m_cbD3D9RenderDevice.GetCount() > 1) {
 					GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
@@ -370,8 +367,7 @@ void CPPageVideo::OnUpdateMixerYUV(CCmdUI* pCmdUI)
 {
 	int vrenderer = GetCurItemData(m_cbVideoRenderer);
 
-	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_DSVMRLOADMIXER)
-					&& (vrenderer == VIDRNDT_VMR9WINDOWED || vrenderer == VIDRNDT_VMR9RENDERLESS));
+	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_DSVMRLOADMIXER) && vrenderer == VIDRNDT_VMR9WINDOWED);
 }
 
 void CPPageVideo::OnSurfaceChange()
@@ -392,7 +388,7 @@ void CPPageVideo::OnSurfaceChange()
 		case SURFACE_TEXTURE3D:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_TEXTURESURF3D), &m_cbAPSurfaceUsage);
 			const int vrenderer = GetCurItemData(m_cbVideoRenderer);
-			if (vrenderer == VIDRNDT_VMR9RENDERLESS || vrenderer == VIDRNDT_EVR_CUSTOM) {
+			if (vrenderer == VIDRNDT_EVR_CUSTOM) {
 				m_cbDX9SurfaceFormat.EnableWindow(TRUE);
 			} else {
 				m_cbDX9SurfaceFormat.EnableWindow(FALSE);
@@ -461,40 +457,6 @@ void CPPageVideo::OnDSRendererChange()
 			m_chkVMRMixerYUV.EnableWindow(TRUE);
 
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9WIN), &m_cbVideoRenderer);
-			break;
-		case VIDRNDT_VMR9RENDERLESS:
-			if (m_cbD3D9RenderDevice.GetCount() > 1) {
-				GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
-				m_cbD3D9RenderDevice.EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE));
-			}
-			m_chkVMRMixerMode.EnableWindow(TRUE);
-			m_chkVMRMixerYUV.EnableWindow(TRUE);
-			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
-			GetDlgItem(IDC_STATIC1)->EnableWindow(TRUE);
-			m_cbAPSurfaceUsage.EnableWindow(TRUE);
-			GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
-			m_cbDX9SurfaceFormat.EnableWindow(TRUE);
-			GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
-			m_cbDX9Resizer.EnableWindow(TRUE);
-			GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(TRUE);
-			GetDlgItem(IDC_CHECK1)->EnableWindow(m_chkD3DFullscreen.GetCheck() == BST_CHECKED);
-			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
-			if (m_cbAPSurfaceUsage.GetCurSel() == SURFACE_TEXTURE3D) {
-				D3DFORMAT surfmt = (D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat);
-				if (surfmt == D3DFMT_A16B16G16R16F || surfmt == D3DFMT_A32B32G32R32F) {
-					// Color Managment
-					m_chkColorManagment.ShowWindow(SW_SHOW);
-					m_cbCMInputType.ShowWindow(SW_SHOW);
-					m_cbCMAmbientLight.ShowWindow(SW_SHOW);
-					m_cbCMRenderingIntent.ShowWindow(SW_SHOW);
-					GetDlgItem(IDC_STATIC6)->ShowWindow(SW_SHOW);
-					GetDlgItem(IDC_STATIC7)->ShowWindow(SW_SHOW);
-					GetDlgItem(IDC_STATIC8)->ShowWindow(SW_SHOW);
-					GetDlgItem(IDC_STATIC9)->ShowWindow(SW_SHOW);
-				}
-			}
-
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSVMR9REN), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_EVR:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR), &m_cbVideoRenderer);
@@ -608,7 +570,7 @@ void CPPageVideo::OnSurfaceFormatChange()
 	D3DFORMAT surfmt = (D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat);
 	UINT CurrentVR = GetCurItemData(m_cbVideoRenderer);
 
-	if ((CurrentVR == VIDRNDT_VMR9RENDERLESS || CurrentVR == VIDRNDT_EVR_CUSTOM) && (surfmt == D3DFMT_A16B16G16R16F || surfmt == D3DFMT_A32B32G32R32F)) {
+	if (CurrentVR == VIDRNDT_EVR_CUSTOM && (surfmt == D3DFMT_A16B16G16R16F || surfmt == D3DFMT_A32B32G32R32F)) {
 		// Color Managment
 		m_chkColorManagment.ShowWindow(SW_SHOW);
 		m_cbCMInputType.ShowWindow(SW_SHOW);
