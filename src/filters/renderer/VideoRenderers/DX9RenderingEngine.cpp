@@ -147,7 +147,6 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_ScreenSpaceTexWidth(0)
 	, m_ScreenSpaceTexHeight(0)
 	, m_iScreenTex(0)
-	, m_bIsEVR(false)
 	, m_bFinalPass(false)
 	, m_bColorManagement(false)
 	, m_InputVideoSystem(VIDEO_SYSTEM_UNKNOWN)
@@ -267,15 +266,10 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 	else if (rs.iSurfaceType == SURFACE_TEXTURE3D) {
 		m_VideoBufferFmt = m_SurfaceFmt;
 		if (m_D3D9VendorId == PCIV_Intel) {
-			if (m_bIsEVR) {
-				// on Intel EVR-Mixer can work with X8R8G8B8 surface only
-				m_VideoBufferFmt = D3DFMT_X8R8G8B8;
-			} else if (m_SurfaceFmt == D3DFMT_A32B32G32R32F && rs.bVMRMixerMode && rs.bVMRMixerYUV) {
-				// on Intel VMR-9r with YUV Mixing Mode can not work with A32B32G32R32F surface
-				m_VideoBufferFmt = D3DFMT_A16B16G16R16F;
-			}
+			// on Intel EVR-Mixer can work with X8R8G8B8 surface only
+			m_VideoBufferFmt = D3DFMT_X8R8G8B8;
 		}
-		else if (m_D3D9VendorId == PCIV_nVidia && m_bIsEVR
+		else if (m_D3D9VendorId == PCIV_nVidia
 				&& m_nativeVideoSize.cx == 1920 && m_nativeVideoSize.cy == 1088
 				&& (m_SurfaceFmt == D3DFMT_A16B16G16R16F || m_SurfaceFmt == D3DFMT_A32B32G32R32F)) {
 			// fix Nvidia driver bug ('Integer division by zero' in nvd3dumx.dll)
@@ -2105,7 +2099,7 @@ STDMETHODIMP CDX9RenderingEngine::GetString(LPCSTR field, LPWSTR* value, int* ch
 	CheckPointer(chars, E_POINTER);
 
 	if (!strcmp(field, "name")) {
-		CStringW ret = m_bIsEVR ? L"MPC-BE: EVR (custom presenter)" : L"MPC-BE: VMR-9 (renderless)";
+		CStringW ret = L"MPC-BE: EVR (custom presenter)";
 		int len = ret.GetLength();
 		size_t sz = (len + 1) * sizeof(WCHAR);
 		LPWSTR buf = (LPWSTR)LocalAlloc(LPTR, sz);

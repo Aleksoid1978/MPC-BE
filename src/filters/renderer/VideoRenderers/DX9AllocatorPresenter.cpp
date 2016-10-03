@@ -74,8 +74,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_bIsRendering(false)
 	, m_FocusThread(NULL)
 {
-	m_bIsEVR = bIsEVR;
-
 	if (FAILED(hr)) {
 		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
 		return;
@@ -408,10 +406,7 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 		}
 	}
 
-	if (m_bIsEVR) {
-		bRet = bRet || New.b10BitOutput != Current.b10BitOutput;
-
-	}
+	bRet = bRet || New.b10BitOutput != Current.b10BitOutput;
 	bRet = bRet || New.iSurfaceFormat != Current.iSurfaceFormat;
 
 	Current.Fill(New);
@@ -563,14 +558,13 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			m_SurfaceFmt = D3DFMT_A16B16G16R16F;
 			break;
 		}
-	case D3DFMT_A2R10G10B10:
-		if (m_bIsEVR) {
-			bool b10bitSupport = SUCCEEDED(m_pD3DEx->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_TEXTURE, D3DFMT_A2R10G10B10));
-			if (b10bitSupport) {
-				m_SurfaceFmt = D3DFMT_A2R10G10B10;
-				break;
-			}
+	case D3DFMT_A2R10G10B10: {
+		bool b10bitSupport = SUCCEEDED(m_pD3DEx->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_TEXTURE, D3DFMT_A2R10G10B10));
+		if (b10bitSupport) {
+			m_SurfaceFmt = D3DFMT_A2R10G10B10;
+			break;
 		}
+	}
 	default:
 		m_SurfaceFmt = D3DFMT_X8R8G8B8;
 	}
@@ -1449,7 +1443,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		if (!bDoVSyncInPresent) {
 			LONGLONG Time = GetPerfCounter();
 			OnVBlankFinished(fAll, Time);
-			if (!m_bIsEVR || m_OrderedPaint) {
+			if (m_OrderedPaint) {
 				CalculateJitter(Time);
 			}
 		}
@@ -1491,7 +1485,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		int bInVBlank;
 		GetVBlank(ScanLine, bInVBlank, false);
 
-		if (fAll && (!m_bIsEVR || m_OrderedPaint)) {
+		if (fAll && m_OrderedPaint) {
 			m_VBlankEndPresent = ScanLine;
 		}
 
@@ -1517,7 +1511,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 	if (bDoVSyncInPresent) {
 		LONGLONG Time = GetPerfCounter();
-		if (!m_bIsEVR || m_OrderedPaint) {
+		if (m_OrderedPaint) {
 			CalculateJitter(Time);
 		}
 		OnVBlankFinished(fAll, Time);
@@ -1603,8 +1597,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	if (m_OrderedPaint) {
 		--m_OrderedPaint;
 	} else {
-		//if (m_bIsEVR)
-		//	TRACE("UNORDERED PAINT!!!!!!\n");
+		//TRACE("UNORDERED PAINT!!!!!!\n");
 	}
 	return true;
 }
@@ -1809,18 +1802,10 @@ void CDX9AllocatorPresenter::DrawStats()
 				rtFPS = 10000000.0 / (double)(m_rtTimePerFrame);
 			}
 
-			if (m_bIsEVR) {
-				if (g_nFrameType != PICT_NONE) {
-					strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f, %s)   (%7.3f ms = %.03f%s, %2.03f StdDev)  Clock: %1.4f %%", m_fAvrFps, rtMS, rtFPS, g_nFrameType == PICT_FRAME ? L"P" : L"I", GetFrameTime() * 1000.0, GetFrameRate(), m_DetectedLock ? L" L" : L"", m_DetectedFrameTimeStdDev / 10000.0, m_ModeratedTimeSpeed*100.0);
-				} else {
-					strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f)   (%7.3f ms = %.03f%s, %2.03f StdDev)  Clock: %1.4f %%", m_fAvrFps, rtMS, rtFPS, GetFrameTime() * 1000.0, GetFrameRate(), m_DetectedLock ? L" L" : L"", m_DetectedFrameTimeStdDev / 10000.0, m_ModeratedTimeSpeed*100.0);
-				}
+			if (g_nFrameType != PICT_NONE) {
+				strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f, %s)   (%7.3f ms = %.03f%s, %2.03f StdDev)  Clock: %1.4f %%", m_fAvrFps, rtMS, rtFPS, g_nFrameType == PICT_FRAME ? L"P" : L"I", GetFrameTime() * 1000.0, GetFrameRate(), m_DetectedLock ? L" L" : L"", m_DetectedFrameTimeStdDev / 10000.0, m_ModeratedTimeSpeed*100.0);
 			} else {
-				if (g_nFrameType != PICT_NONE) {
-					strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f, %s)", m_fAvrFps, rtMS, rtFPS, g_nFrameType == PICT_FRAME ? L"P" : L"I");
-				} else {
-					strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f)", m_fAvrFps, rtMS, rtFPS);
-				}
+				strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f)   (%7.3f ms = %.03f%s, %2.03f StdDev)  Clock: %1.4f %%", m_fAvrFps, rtMS, rtFPS, GetFrameTime() * 1000.0, GetFrameRate(), m_DetectedLock ? L" L" : L"", m_DetectedFrameTimeStdDev / 10000.0, m_ModeratedTimeSpeed*100.0);
 			}
 		} else {
 			strText.Format(L"Frame rate   : %7.03f   (%.03f%s)", m_fAvrFps, GetFrameRate(), m_DetectedLock ? L" L" : L"");
@@ -1838,11 +1823,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		if (iDetailedStats > 1) {
 			strText = L"Settings     : ";
 
-			if (m_bIsEVR) {
-				strText += L"EVR ";
-			} else {
-				strText += L"VMR9 ";
-			}
+			strText += L"EVR ";
 
 			if (m_bIsFullscreen) {
 				strText += L"FS ";
@@ -1880,15 +1861,13 @@ void CDX9AllocatorPresenter::DrawStats()
 				strText.AppendFormat(L"VSOfst(%d)", rs.iVSyncOffset);
 			}
 
-			if (m_bIsEVR) {
-				if (rs.bEVRFrameTimeCorrection) {
-					strText += L"FTC ";
-				}
-				if (rs.iEVROutputRange == 0) {
-					strText += L"0-255 ";
-				} else if (rs.iEVROutputRange == 1) {
-					strText += L"16-235 ";
-				}
+			if (rs.bEVRFrameTimeCorrection) {
+				strText += L"FTC ";
+			}
+			if (rs.iEVROutputRange == 0) {
+				strText += L"0-255 ";
+			} else if (rs.iEVROutputRange == 1) {
+				strText += L"16-235 ";
 			}
 
 			drawText(strText);
@@ -1906,15 +1885,13 @@ void CDX9AllocatorPresenter::DrawStats()
 				, GetD3DFormatStr(m_BackbufferFmt));
 			drawText(strText);
 
-			if (m_bIsEVR) {
-				if (rs.bVSync) {
-					strText.Format(L"Refresh rate : %.05f Hz    SL: %4d     (%3u Hz)      ", m_DetectedRefreshRate, int(m_DetectedScanlinesPerFrame + 0.5), m_refreshRate);
-				} else {
-					strText.Format(L"Refresh rate : %3u Hz      ", m_refreshRate);
-				}
-				strText.AppendFormat(L"Last Duration: %8.4f      Corrected Frame Time: %s", double(m_LastFrameDuration) / 10000.0, m_bCorrectedFrameTime ? L"Yes" : L"No");
-				drawText(strText);
+			if (rs.bVSync) {
+				strText.Format(L"Refresh rate : %.05f Hz    SL: %4d     (%3u Hz)      ", m_DetectedRefreshRate, int(m_DetectedScanlinesPerFrame + 0.5), m_refreshRate);
+			} else {
+				strText.Format(L"Refresh rate : %3u Hz      ", m_refreshRate);
 			}
+			strText.AppendFormat(L"Last Duration: %8.4f      Corrected Frame Time: %s", double(m_LastFrameDuration) / 10000.0, m_bCorrectedFrameTime ? L"Yes" : L"No");
+			drawText(strText);
 		}
 
 		if (m_bSyncStatsAvailable) {
@@ -1999,11 +1976,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		}
 
 		if (iDetailedStats > 1) {
-			if (m_bIsEVR) {
-				strText.Format(L"Buffering    : Buffered %3d    Free %3d    Current Surface %3u", m_nUsedBuffer, m_nNbDXSurface - m_nUsedBuffer, m_nCurSurface);
-			} else {
-				strText.Format(L"Buffering    : VMR9Surfaces %3d   VMR9Surface %3d", m_nVMR9Surfaces, m_iVMR9Surface);
-			}
+			strText.Format(L"Buffering    : Buffered %3d    Free %3d    Current Surface %3u", m_nUsedBuffer, m_nNbDXSurface - m_nUsedBuffer, m_nCurSurface);
 		} else {
 			strText.Format(L"Buffered     : %3d", m_nUsedBuffer);
 		}

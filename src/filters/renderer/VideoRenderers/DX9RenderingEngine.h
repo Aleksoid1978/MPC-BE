@@ -72,7 +72,6 @@ namespace DSObjects
 		CSize						m_ScreenSize;
 		unsigned					m_nNbDXSurface; // Total number of DX Surfaces
 		unsigned					m_nCurSurface;  // Surface currently displayed
-		bool						m_bIsEVR;
 		DWORD						m_D3D9VendorId;
 		bool						m_bFP16Support;
 
