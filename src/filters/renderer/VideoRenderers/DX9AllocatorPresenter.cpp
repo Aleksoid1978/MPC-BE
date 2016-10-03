@@ -83,10 +83,10 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 	HINSTANCE hDll = GetD3X9Dll();
 	if (hDll) {
-		(FARPROC&)m_pD3DXLoadSurfaceFromMemory	= GetProcAddress(hDll, "D3DXLoadSurfaceFromMemory");
-		(FARPROC&)m_pD3DXCreateLine				= GetProcAddress(hDll, "D3DXCreateLine");
-		(FARPROC&)m_pD3DXCreateFont				= GetProcAddress(hDll, "D3DXCreateFontW");
-		(FARPROC&)m_pD3DXCreateSprite			= GetProcAddress(hDll, "D3DXCreateSprite");
+		(FARPROC&)m_pD3DXLoadSurfaceFromMemory = GetProcAddress(hDll, "D3DXLoadSurfaceFromMemory");
+		(FARPROC&)m_pD3DXCreateLine            = GetProcAddress(hDll, "D3DXCreateLine");
+		(FARPROC&)m_pD3DXCreateFont            = GetProcAddress(hDll, "D3DXCreateFontW");
+		(FARPROC&)m_pD3DXCreateSprite          = GetProcAddress(hDll, "D3DXCreateSprite");
 	} else {
 		_Error += L"The installed DirectX End-User Runtime is outdated. Please download and install the June 2010 release or newer in order for MPC-BE to function properly.\n";
 	}
@@ -771,7 +771,9 @@ HRESULT CDX9AllocatorPresenter::InitializeISR(CString &_Error)
 		m_pSubPicQueue->GetSubPicProvider(&pSubPicProvider);
 	}
 
-	InitMaxSubtitleTextureSize(GetRenderersSettings().iSubpicMaxTexWidth, m_ScreenSize);
+	const CRenderersSettings& rs = GetRenderersSettings();
+
+	InitMaxSubtitleTextureSize(rs.iSubpicMaxTexWidth, m_ScreenSize);
 
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(m_pD3DDevEx);
@@ -786,9 +788,9 @@ HRESULT CDX9AllocatorPresenter::InitializeISR(CString &_Error)
 	HRESULT hr = S_OK;
 	if (!m_pSubPicQueue) {
 		CAutoLock cAutoLock(this);
-		m_pSubPicQueue = GetRenderersSettings().nSubpicCount > 0
-						 ? (ISubPicQueue*)DNew CSubPicQueue(GetRenderersSettings().nSubpicCount, !GetRenderersSettings().bSubpicAnimationWhenBuffering, GetRenderersSettings().bSubpicAllowDrop, m_pAllocator, &hr)
-						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!GetRenderersSettings().bSubpicAnimationWhenBuffering, m_pAllocator, &hr);
+		m_pSubPicQueue = rs.nSubpicCount > 0
+						 ? (ISubPicQueue*)DNew CSubPicQueue(rs.nSubpicCount, !rs.bSubpicAnimationWhenBuffering, rs.bSubpicAllowDrop, m_pAllocator, &hr)
+						 : (ISubPicQueue*)DNew CSubPicQueueNoThread(!rs.bSubpicAnimationWhenBuffering, m_pAllocator, &hr);
 	} else {
 		m_pSubPicQueue->Invalidate();
 	}
