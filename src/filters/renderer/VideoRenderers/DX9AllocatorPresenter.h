@@ -27,9 +27,9 @@
 #include "GPUUsage.h"
 #include "MemUsage.h"
 
-#define VMRBITMAP_UPDATE			0x80000000
+#define VMRBITMAP_UPDATE 0x80000000
 
-#define NB_JITTER					126
+#define NB_JITTER        126
 
 extern bool g_bNoDuration;
 extern bool g_bExternalSubtitleTime;
@@ -127,34 +127,6 @@ namespace DSObjects
 		virtual void OnVBlankFinished(bool fAll, LONGLONG PerformanceCounter) {}
 
 		// Casimir666
-		typedef HRESULT (WINAPI * D3DXLoadSurfaceFromMemoryPtr)(
-			LPDIRECT3DSURFACE9	pDestSurface,
-			CONST PALETTEENTRY*	pDestPalette,
-			CONST RECT*		pDestRect,
-			LPCVOID			pSrcMemory,
-			D3DFORMAT		SrcFormat,
-			UINT			SrcPitch,
-			CONST PALETTEENTRY*	pSrcPalette,
-			CONST RECT*		pSrcRect,
-			DWORD			Filter,
-			D3DCOLOR		ColorKey);
-
-		typedef HRESULT (WINAPI* D3DXCreateLinePtr) (LPDIRECT3DDEVICE9   pDevice, LPD3DXLINE* ppLine);
-
-		typedef HRESULT (WINAPI* D3DXCreateFontPtr)(
-			LPDIRECT3DDEVICE9	pDevice,
-			int				Height,
-			UINT			Width,
-			UINT			Weight,
-			UINT			MipLevels,
-			bool			Italic,
-			DWORD			CharSet,
-			DWORD			OutputPrecision,
-			DWORD			Quality,
-			DWORD			PitchAndFamily,
-			LPCWSTR			pFaceName,
-			LPD3DXFONT*		ppFont);
-
 		void				ResetStats();
 		void				DrawStats();
 		virtual void		OnResetDevice() {};
@@ -169,10 +141,40 @@ namespace DSObjects
 		CRect					m_VMR9AlphaBitmapRect;
 		int						m_VMR9AlphaBitmapWidthBytes;
 
-		D3DXLoadSurfaceFromMemoryPtr	m_pD3DXLoadSurfaceFromMemory;
-		D3DXCreateLinePtr		m_pD3DXCreateLine;
-		D3DXCreateFontPtr		m_pD3DXCreateFont;
-		HRESULT (__stdcall *m_pD3DXCreateSprite)(LPDIRECT3DDEVICE9 pDevice, LPD3DXSPRITE * ppSprite);
+		HRESULT (__stdcall *m_pD3DXLoadSurfaceFromMemory)(
+			_In_       LPDIRECT3DSURFACE9 pDestSurface,
+			_In_ const PALETTEENTRY       *pDestPalette,
+			_In_ const RECT               *pDestRect,
+			_In_       LPCVOID            pSrcMemory,
+			_In_       D3DFORMAT          SrcFormat,
+			_In_       UINT               SrcPitch,
+			_In_ const PALETTEENTRY       *pSrcPalette,
+			_In_ const RECT               *pSrcRect,
+			_In_       DWORD              Filter,
+			_In_       D3DCOLOR           ColorKey
+		);
+		HRESULT (__stdcall *m_pD3DXCreateLine)(
+			_In_  LPDIRECT3DDEVICE9 pDevice,
+			_Out_ LPD3DXLINE        *ppLine
+		);
+		HRESULT (__stdcall *m_pD3DXCreateFont)(
+			_In_  LPDIRECT3DDEVICE9 pDevice,
+			_In_  INT               Height,
+			_In_  UINT              Width,
+			_In_  UINT              Weight,
+			_In_  UINT              MipLevels,
+			_In_  BOOL              Italic,
+			_In_  DWORD             CharSet,
+			_In_  DWORD             OutputPrecision,
+			_In_  DWORD             Quality,
+			_In_  DWORD             PitchAndFamily,
+			_In_  LPCTSTR           pFacename,
+			_Out_ LPD3DXFONT        *ppFont
+		);
+		HRESULT (__stdcall *m_pD3DXCreateSprite)(
+			_In_  LPDIRECT3DDEVICE9 pDevice,
+			_Out_ LPD3DXSPRITE      *ppSprite
+		);
 
 		int						m_nVMR9Surfaces;				// Total number of DX Surfaces
 		int						m_iVMR9Surface;
