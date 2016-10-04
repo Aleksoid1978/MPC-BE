@@ -332,7 +332,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CComPtr<IMadVRSettings> m_pMVRS;
 	CComPtr<IMadVRCommand> m_pMVRC;
 	CComPtr<IMadVRInfo> m_pMVRI;
-	int m_iMVRDefRotation;
+;
 
 	CComQIPtr<IBaseFilter>			m_pMainSourceFilter;
 	CComQIPtr<IBaseFilter>			m_pSwitcherFilter;
@@ -582,7 +582,7 @@ protected:
 	double m_PlaybackRate;
 
 	double m_ZoomX, m_ZoomY, m_PosX, m_PosY;
-	int m_AngleZ;
+	int m_iDefRotation;
 
 	// Operations
 	bool OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD);

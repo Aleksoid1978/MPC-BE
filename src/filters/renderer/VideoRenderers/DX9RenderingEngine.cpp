@@ -387,6 +387,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	bool bCustomScreenSpacePixelShaders = false;
 	bool bFinalPass = false;
 	DWORD iResizer = rs.iResizer;
+	int iRotation = m_iRotation;
 
 	{
 		int screenSpacePassCount = 0;
@@ -512,9 +513,9 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	}
 
 	Vector dest[4];
-	if (m_iRotation) {
+	if (iRotation) {
 		CComPtr<IDirect3DSurface9> pTemporarySurface;
-		switch (m_iRotation) {
+		switch (iRotation) {
 		case 90:
 			dest[0].Set((float)videoDesc.Width, 0.0f, 0.5f);
 			dest[1].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
@@ -551,7 +552,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		hr = m_pD3DDevEx->SetPixelShader(NULL);
 		hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_LINEAR);
 
-		if (m_iRotation == 180) {
+		if (iRotation == 180) {
 			pVideoTexture = m_pFrameTextures[dst];
 		}
 		else { // 90 and 270
@@ -2079,6 +2080,26 @@ STDMETHODIMP_(SIZE) CDX9RenderingEngine::GetVideoSizeAR()
 	return size;
 }
 
+STDMETHODIMP CDX9RenderingEngine::SetRotation(int rotation)
+{
+	if (rotation % 90 == 0) {
+		rotation %= 360;
+		if (rotation < 0) {
+			rotation += 360;
+		}
+		m_iRotation = rotation;
+
+		return S_OK;
+	}
+
+	return  E_INVALIDARG;
+}
+
+STDMETHODIMP_(int) CDX9RenderingEngine::GetRotation()
+{
+	return m_iRotation;
+}
+
 // ISubRenderOptions
 
 STDMETHODIMP CDX9RenderingEngine::GetInt(LPCSTR field, int* value)
@@ -2087,7 +2108,7 @@ STDMETHODIMP CDX9RenderingEngine::GetInt(LPCSTR field, int* value)
 	if (strcmp(field, "rotation") == 0) {
 		*value = m_iRotation;
 
-		return S_OK; // TODO
+		return S_OK;
 	}
 
 	return __super::GetInt(field, value);

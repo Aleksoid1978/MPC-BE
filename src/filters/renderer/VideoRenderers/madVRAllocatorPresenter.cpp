@@ -169,6 +169,26 @@ STDMETHODIMP_(void) CmadVRAllocatorPresenter::SetPosition(RECT w, RECT v)
 	}
 }
 
+STDMETHODIMP CmadVRAllocatorPresenter::SetRotation(int rotation)
+{
+	HRESULT hr = E_NOTIMPL;
+	if (CComQIPtr<IMadVRCommand> pMVRC = m_pMVR) {
+		hr = pMVRC->SendCommandInt("rotate", rotation);
+	}
+	return hr;
+}
+
+STDMETHODIMP_(int) CmadVRAllocatorPresenter::GetRotation()
+{
+	if (CComQIPtr<IMadVRInfo> pMVRI = m_pMVR) {
+		int rotation = 0;
+		if (SUCCEEDED(pMVRI->GetInt("rotation", &rotation))) {
+			return rotation;
+		}
+	}
+	return 0;
+}
+
 STDMETHODIMP_(SIZE) CmadVRAllocatorPresenter::GetVideoSize()
 {
 	SIZE size = {0, 0};

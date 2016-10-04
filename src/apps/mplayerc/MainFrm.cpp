@@ -621,7 +621,7 @@ CMainFrame::CMainFrame() :
 	m_nLoops(0),
 	m_iSubtitleSel(-1),
 	m_ZoomX(1), m_ZoomY(1), m_PosX(0.5), m_PosY(0.5),
-	m_AngleZ(0),
+	m_iDefRotation(0),
 	m_fCustomGraph(false),
 	m_fShockwaveGraph(false),
 	m_fFrameSteppingActive(false),
@@ -657,7 +657,6 @@ CMainFrame::CMainFrame() :
 	m_bfirstPlay(false),
 	m_dwLastRun(0),
 	IsMadVRExclusiveMode(false),
-	m_iMVRDefRotation(0),
 	m_pBFmadVR(NULL),
 	m_hDWMAPI(0),
 	m_hWtsLib(0),
@@ -7190,9 +7189,8 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 		case ID_VIEW_RESET:
 			m_ZoomX = m_ZoomY = 1.0;
 			m_PosX = m_PosY = 0.5;
-			m_AngleZ = 0;
-			if (m_pMVRC) {
-				m_pMVRC->SendCommandInt("rotate", m_iMVRDefRotation);
+			if (m_pCAP) {
+				m_pCAP->SetRotation(m_iDefRotation);
 			}
 			break;
 		case ID_VIEW_INCSIZE:
@@ -7352,56 +7350,34 @@ void CMainFrame::OnUpdateViewPanNScanPresets(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewRotate(UINT nID)
 {
-	HRESULT hr = E_NOTIMPL;
-
-	if (m_pMVRC && m_pMVRI) {
-		int rotation;
-		if (FAILED(m_pMVRI->GetInt("rotation", &rotation))) {
-			return;
-		}
+	if (m_pCAP) {
+		HRESULT hr = S_OK;
+		int rotation = m_pCAP->GetRotation();
 
 		switch (nID) {
-			case ID_PANSCAN_ROTATEZP:
-				rotation += 270;
-				break;
-			case ID_PANSCAN_ROTATEZM:
-				rotation += 90;
-				break;
-			default:
-				return;
+		case ID_PANSCAN_ROTATEZP:
+			rotation += 270;
+			break;
+		case ID_PANSCAN_ROTATEZM:
+			rotation += 90;
+			break;
+		default:
+			return;
 		}
 		rotation %= 360;
 		ASSERT(rotation >= 0);
 
-		if (SUCCEEDED(hr = m_pMVRC->SendCommandInt("rotate", rotation))) {
-			m_AngleZ = (360 + m_iMVRDefRotation - rotation) % 360;
+		hr = m_pCAP->SetRotation(rotation);
+		if (S_OK == hr) {
+			if (!m_pMVRC) {
+				MoveVideoWindow(); // need for EVRcp and Sync renderer
+			}
+
+			CString info;
+			info.Format(L"Rotation: %d°", rotation);
+			SendStatusMessage(info, 3000);
 		}
-	} else if (m_pCAP) {
-		switch (nID) {
-			case ID_PANSCAN_ROTATEZP:
-				m_AngleZ += 90;
-				if (m_AngleZ >= 360) { m_AngleZ -= 360; }
-				break;
-			case ID_PANSCAN_ROTATEZM:
-				m_AngleZ -= 90;
-				if (m_AngleZ <= -360) { m_AngleZ += 360; }
-				break;
-			default:
-				return;
-		}
-
-		hr = m_pCAP->SetVideoAngle(Vector(0.0f, 0.0f, Vector::DegToRad(m_AngleZ)));
-		hr = m_pCAP->Paint(true);
 	}
-
-	if (FAILED(hr)) {
-		m_AngleZ = 0;
-		return;
-	}
-
-	CString info;
-	info.Format(L"Rotation: %d°", m_AngleZ);
-	SendStatusMessage(info, 3000);
 }
 
 void CMainFrame::OnUpdateViewRotate(CCmdUI* pCmdUI)
@@ -10848,7 +10824,6 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 
 		if (m_pCAP) {
 			m_pCAP->SetPosition(wr, vr);
-			m_pCAP->SetVideoAngle(Vector(0.0f, 0.0f, Vector::DegToRad(m_AngleZ)));
 			m_pCAP->Paint(true);
 		} else {
 			HRESULT hr;
@@ -12331,7 +12306,7 @@ void CMainFrame::OpenSetupVideo()
 		// get initial rotation value for madVR
 		int rotation;
 		if (S_OK == (m_pMVRI->GetInt("rotation", &rotation))) {
-			m_iMVRDefRotation = rotation;
+			m_iDefRotation = rotation;
 		}
 	}
 
@@ -13358,7 +13333,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	SetEvent(m_hRefreshNotifyRenderThreadEvent);
 
 	m_PlaybackRate = 1.0;
-	m_iMVRDefRotation = 0;
+	m_iDefRotation = 0;
 
 	ClearDXVAState();
 
