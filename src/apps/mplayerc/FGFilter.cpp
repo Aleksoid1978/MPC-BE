@@ -439,78 +439,89 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 	CheckPointer(ppBF, E_POINTER);
 
 	HRESULT hr = S_OK;
-
 	CComPtr<ISubPicAllocatorPresenter3> pCAP;
 
-	if (m_clsid == CLSID_DXRAllocatorPresenter
-			|| m_clsid == CLSID_madVRAllocatorPresenter
-			|| m_clsid == CLSID_EVRAllocatorPresenter
-			|| m_clsid == CLSID_SyncAllocatorPresenter) {
-		bool bFullscreen = (AfxGetApp()->m_pMainWnd != NULL) && (((CMainFrame*)AfxGetApp()->m_pMainWnd)->IsD3DFullScreenMode());
-		if (SUCCEEDED(CreateAP9(m_clsid, m_hWnd, bFullscreen, &pCAP))
-				|| SUCCEEDED(CreateEVR(m_clsid, m_hWnd, bFullscreen, &pCAP))
-				|| SUCCEEDED(CreateSyncRenderer(m_clsid, m_hWnd, bFullscreen, &pCAP))) {
-			CComPtr<IUnknown> pRenderer;
-			if (SUCCEEDED(hr = pCAP->CreateRenderer(&pRenderer))) {
-				*ppBF = CComQIPtr<IBaseFilter>(pRenderer).Detach();
-				pUnks.AddTail(pCAP);
+	auto pMainFrame = (CMainFrame *)(AfxGetApp()->m_pMainWnd);
+	const bool bFullscreen = pMainFrame && pMainFrame->IsD3DFullScreenMode();
 
-				if (m_clsid == CLSID_madVRAllocatorPresenter) {
-					if (CComQIPtr<IMadVRSubclassReplacement> pMVRSR = pCAP) {
-						VERIFY(SUCCEEDED(pMVRSR->DisableSubclassing()));
-					}
-					// madVR supports calling IVideoWindow::put_Owner before the pins are connected - from MPC-HC
-					if (CComQIPtr<IVideoWindow> pVW = pCAP) {
-						HRESULT hrVR = pVW->put_Owner((OAHWND)m_hWnd);
-					}
-				}
-			}
-		}
+	if (m_clsid == CLSID_EVRAllocatorPresenter) {
+		hr = CreateEVR(m_clsid, m_hWnd, bFullscreen, &pCAP);
+	} else if (m_clsid == CLSID_SyncAllocatorPresenter) {
+		hr = CreateSyncRenderer(m_clsid, m_hWnd, bFullscreen, &pCAP);
+	} else if (m_clsid == CLSID_DXRAllocatorPresenter) {
+		hr = CreateAP9(m_clsid, m_hWnd, bFullscreen, &pCAP);
+	} else if (m_clsid == CLSID_madVRAllocatorPresenter) {
+		hr = CreateAP9(m_clsid, m_hWnd, bFullscreen, &pCAP);
 	} else {
 		CComPtr<IBaseFilter> pBF;
-		if (SUCCEEDED(pBF.CoCreateInstance(m_clsid))) {
-			if (m_clsid == CLSID_EnhancedVideoRenderer) {
-				CComQIPtr<IEVRFilterConfig> pConfig = pBF;
-				pConfig->SetNumberOfStreams(3);
+		hr = pBF.CoCreateInstance(m_clsid);
+		EXIT_ON_ERROR(hr);
+
+		if (m_clsid == CLSID_EnhancedVideoRenderer) {
+			if (CComQIPtr<IEVRFilterConfig> pConfig = pBF) {
+				VERIFY(SUCCEEDED(pConfig->SetNumberOfStreams(3)));
 			}
 
-			BeginEnumPins(pBF, pEP, pPin) {
-				if (CComQIPtr<IMixerPinConfig, &IID_IMixerPinConfig> pMPC = pPin) {
-					pUnks.AddTail(pMPC);
-					break;
+			if (CComQIPtr<IMFGetService> pMFGS = pBF) {
+				CComPtr<IMFVideoDisplayControl> pMFVDC;
+				if (SUCCEEDED(pMFGS->GetService(MR_VIDEO_RENDER_SERVICE, IID_PPV_ARGS(&pMFVDC)))) {
+					VERIFY(SUCCEEDED(pMFVDC->SetVideoWindow(m_hWnd)));
 				}
 			}
-			EndEnumPins;
+		}
 
-			*ppBF = pBF.Detach();
+		BeginEnumPins(pBF, pEP, pPin) {
+			if (CComQIPtr<IMixerPinConfig, &IID_IMixerPinConfig> pMPC = pPin) {
+				pUnks.AddTail(pMPC);
+				break;
+			}
+		}
+		EndEnumPins;
+
+		const CRenderersSettings& rs = GetRenderersSettings();
+		if (GetRenderersSettings().bVMRMixerMode) {
+			// VMR9
+			if (CComQIPtr<IVMRFilterConfig9> pConfig = pBF) {
+				VERIFY(SUCCEEDED(pConfig->SetNumberOfStreams(4)));
+
+				if (CComQIPtr<IVMRMixerControl9> pVMRMC9 = pBF) {
+					DWORD dwPrefs;
+					VERIFY(SUCCEEDED(pVMRMC9->GetMixingPrefs(&dwPrefs)));
+
+					// See http://msdn.microsoft.com/en-us/library/dd390928(VS.85).aspx
+					dwPrefs |= MixerPref9_NonSquareMixing;
+					dwPrefs |= MixerPref9_NoDecimation;
+					if (rs.bVMRMixerYUV) {
+						dwPrefs &= ~MixerPref9_RenderTargetMask;
+						dwPrefs |= MixerPref9_RenderTargetYUV;
+					}
+					VERIFY(SUCCEEDED(pVMRMC9->SetMixingPrefs(dwPrefs)));
+				}
+			}
+		}
+
+		*ppBF = pBF.Detach();
+	}
+
+	if (pCAP) {
+		CComPtr<IUnknown> pRenderer;
+		if (SUCCEEDED(hr = pCAP->CreateRenderer(&pRenderer))) {
+			*ppBF = CComQIPtr<IBaseFilter>(pRenderer).Detach();
+			pUnks.AddTail(pCAP);
+
+			if (m_clsid == CLSID_madVRAllocatorPresenter) {
+				if (CComQIPtr<IMadVRSubclassReplacement> pMVRSR = *ppBF) {
+					VERIFY(SUCCEEDED(pMVRSR->DisableSubclassing()));
+				}
+				// madVR supports calling IVideoWindow::put_Owner before the pins are connected
+				if (CComQIPtr<IVideoWindow> pVW = *ppBF) {
+					VERIFY(SUCCEEDED(pVW->put_Owner((OAHWND)m_hWnd)));
+				}
+			}
 		}
 	}
 
-	if (!*ppBF) {
-		hr = E_FAIL;
-	}
-
-	CRenderersSettings& rs = GetRenderersSettings();
-	if (rs.bVMRMixerMode) {
-		// VMR9
-		if (CComQIPtr<IVMRFilterConfig9> pConfig = *ppBF) {
-			pConfig->SetNumberOfStreams(4);
-
-			if (CComQIPtr<IVMRMixerControl9> pVMRMC9 = *ppBF) {
-				DWORD dwPrefs;
-				pVMRMC9->GetMixingPrefs(&dwPrefs);
-
-				// See http://msdn.microsoft.com/en-us/library/dd390928(VS.85).aspx
-				dwPrefs |= MixerPref9_NonSquareMixing;
-				dwPrefs |= MixerPref9_NoDecimation;
-				if (rs.bVMRMixerYUV) {
-					dwPrefs &= ~MixerPref9_RenderTargetMask;
-					dwPrefs |= MixerPref9_RenderTargetYUV;
-				}
-				pVMRMC9->SetMixingPrefs(dwPrefs);
-			}
-		}
-	}
+	CheckPointer(*ppBF, E_FAIL);
 
 	return hr;
 }
