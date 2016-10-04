@@ -84,7 +84,6 @@ namespace DSObjects
 		CComPtr<IDirect3DSurface9>	m_pVideoSurfaces[MAX_VIDEO_SURFACES];
 
 		bool	m_bColorManagement;
-		int		m_iRotation; // Rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
 		DXVA2_ExtendedFormat m_inputExtFormat;
 		const wchar_t* m_wsResizer;
 
@@ -131,6 +130,8 @@ namespace DSObjects
 
 		int							m_ScreenSpaceTexWidth;
 		int							m_ScreenSpaceTexHeight;
+
+		int							m_iRotation; // total rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
 
 		class CExternalPixelShader
 		{
@@ -205,12 +206,14 @@ namespace DSObjects
 
 	public:
 		// ISubPicAllocatorPresenter3
-		STDMETHODIMP_(SIZE) GetVideoSize();
-		STDMETHODIMP_(SIZE) GetVideoSizeAR();
+		STDMETHODIMP_(SIZE) GetVideoSize() override;
+		STDMETHODIMP_(SIZE) GetVideoSizeAR() override;
+		STDMETHODIMP SetRotation(int rotation) override;
+		STDMETHODIMP_(int) GetRotation() override;
 
 		// ISubRenderOptions
-		STDMETHODIMP GetInt(LPCSTR field, int* value);
-		STDMETHODIMP GetString(LPCSTR field, LPWSTR* value, int* chars);
+		STDMETHODIMP GetInt(LPCSTR field, int* value) override;
+		STDMETHODIMP GetString(LPCSTR field, LPWSTR* value, int* chars) override;
 	};
 
 }

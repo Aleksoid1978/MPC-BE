@@ -1407,13 +1407,8 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 				if (CComQIPtr<IPropertyBag> pPB = pBF) {
 					CComVariant var;
 					if (SUCCEEDED(pPB->Read(L"ROTATION", &var, NULL)) && var.vt == VT_BSTR) {
-						int rotation = _wtoi(var.bstrVal) % 360;
-						if (rotation && (rotation % 90 == 0)) {
-							if (rotation < 0) {
-								rotation += 360;
-							}
-							m_iRotation = rotation;
-						}
+						int rotation = _wtoi(var.bstrVal);
+						SetRotation(rotation);
 						break;
 					}
 				}

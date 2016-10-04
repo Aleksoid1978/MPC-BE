@@ -2130,10 +2130,12 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 	CSize framesize = GetVideoSize();
 	const CSize dar = GetVideoSizeAR();
+	const int rotation = GetRotation();
+
 	if (dar.cx > 0 && dar.cy > 0) {
 		framesize.cx = MulDiv(framesize.cy, dar.cx, dar.cy);
 	}
-	if (m_iRotation == 90 || m_iRotation == 270) {
+	if (rotation == 90 || rotation == 270) {
 		std::swap(framesize.cx, framesize.cy);
 	}
 
@@ -2167,7 +2169,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	bih->biSizeImage      = DIBSIZE(*bih);
 
 	uint32_t* p = NULL;
-	if (m_iRotation) {
+	if (rotation) {
 		p = DNew uint32_t[bih->biWidth * bih->biHeight];
 	}
 
@@ -2182,7 +2184,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 		int h = bih->biHeight;
 		uint32_t* out = (uint32_t*)(bih + 1);
 
-		switch (m_iRotation) {
+		switch (rotation) {
 		case 90:
 			for (int x = w-1; x >= 0; x--) {
 				for (int y = 0; y < h; y++) {

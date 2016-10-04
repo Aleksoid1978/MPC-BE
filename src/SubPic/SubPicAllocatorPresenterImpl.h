@@ -78,6 +78,8 @@ public:
 	STDMETHODIMP_(SIZE) GetVideoSize();
 	STDMETHODIMP_(SIZE) GetVideoSizeAR();
 	STDMETHODIMP_(void) SetPosition(RECT w, RECT v);
+	STDMETHODIMP SetRotation(int rotation) { return E_NOTIMPL; }
+	STDMETHODIMP_(int) GetRotation() { return 0; }
 	STDMETHODIMP_(bool) Paint(bool fAll) { return false; }
 	STDMETHODIMP_(void) SetTime(REFERENCE_TIME rtNow);
 	STDMETHODIMP_(void) SetSubtitleDelay(int delay_ms);
@@ -86,7 +88,6 @@ public:
 	STDMETHODIMP_(void) SetSubPicProvider(ISubPicProvider* pSubPicProvider);
 	STDMETHODIMP_(void) Invalidate(REFERENCE_TIME rtInvalidate = -1);
 	STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) { return E_NOTIMPL; }
-	STDMETHODIMP SetVideoAngle(Vector v);
 	STDMETHODIMP ClearPixelShaders(int target) { return E_NOTIMPL; }
 	STDMETHODIMP AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile) { return E_NOTIMPL; }
 	STDMETHODIMP_(bool) ResetDevice() { return false; }

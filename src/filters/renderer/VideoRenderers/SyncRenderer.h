@@ -270,7 +270,7 @@ namespace GothSync
 		long m_nUsedBuffer;
 
 		CSize m_ScreenSize;
-		int m_iRotation;	// Rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
+		int m_iRotation; // total rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
 		DXVA2_ExtendedFormat m_inputExtFormat;
 		const wchar_t* m_wsResizer;
 
@@ -355,6 +355,8 @@ namespace GothSync
 		// ISubPicAllocatorPresenter3
 		STDMETHODIMP_(SIZE) GetVideoSize();
 		STDMETHODIMP_(SIZE) GetVideoSizeAR();
+		STDMETHODIMP SetRotation(int rotation) override;
+		STDMETHODIMP_(int) GetRotation() override;
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
 		STDMETHODIMP ClearPixelShaders(int target);

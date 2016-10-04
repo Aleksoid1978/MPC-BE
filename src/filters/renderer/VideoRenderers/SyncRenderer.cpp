@@ -714,6 +714,26 @@ STDMETHODIMP_(SIZE) CBaseAP::GetVideoSizeAR()
 	return size;
 }
 
+STDMETHODIMP CBaseAP::SetRotation(int rotation)
+{
+	if (rotation % 90 == 0) {
+		rotation %= 360;
+		if (rotation < 0) {
+			rotation += 360;
+		}
+		m_iRotation = rotation;
+
+		return S_OK;
+	}
+	
+	return  E_INVALIDARG;
+}
+
+STDMETHODIMP_(int) CBaseAP::GetRotation()
+{
+	return m_iRotation;
+}
+
 bool CBaseAP::ClipToSurface(IDirect3DSurface9* pSurface, CRect& s, CRect& d)
 {
 	D3DSURFACE_DESC d3dsd;
@@ -1192,6 +1212,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	REFERENCE_TIME llCurRefTime = 0;
 	REFERENCE_TIME llSyncOffset = 0;
 	double dSyncOffset = 0.0;
+	int iRotation = m_iRotation;
 
 	CAutoLock cRenderLock(&m_allocatorLock);
 
@@ -1301,8 +1322,8 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			}
 
 			Vector dest[4];
-			if (m_iRotation) {
-				switch (m_iRotation) {
+			if (iRotation) {
+				switch (iRotation) {
 				case 90:
 					dest[0].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
 					dest[1].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
@@ -1336,7 +1357,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				hr = m_pD3DDevEx->SetPixelShader(NULL);
 				hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_LINEAR);
 
-				if (m_iRotation == 180) {
+				if (iRotation == 180) {
 					pVideoTexture = m_pVideoTextures[m_nSurface + 1];
 				} else { // 90 and 270
 					pVideoTexture = m_pRotateTexture;
@@ -3298,13 +3319,8 @@ STDMETHODIMP CSyncAP::InitializeDevice(AM_MEDIA_TYPE* pMediaType)
 				if (CComQIPtr<IPropertyBag> pPB = pBF) {
 					CComVariant var;
 					if (SUCCEEDED(pPB->Read(L"ROTATION", &var, NULL)) && var.vt == VT_BSTR) {
-						int rotation = _wtoi(var.bstrVal) % 360;
-						if (rotation && (rotation % 90 == 0)) {
-							if (rotation < 0) {
-								rotation += 360;
-							}
-							m_iRotation = rotation;
-						}
+						int rotation = _wtoi(var.bstrVal);
+						SetRotation(rotation);
 						break;
 					}
 				}

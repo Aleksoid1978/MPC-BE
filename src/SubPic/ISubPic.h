@@ -185,6 +185,8 @@ public IUnknown {
 	STDMETHOD_(SIZE, GetVideoSize) () PURE;
 	STDMETHOD_(SIZE, GetVideoSizeAR) () PURE;
 	STDMETHOD_(void, SetPosition) (RECT w, RECT v) PURE;
+	STDMETHOD (SetRotation) (int rotation) PURE;
+	STDMETHOD_(int, GetRotation) () PURE;
 	STDMETHOD_(bool, Paint) (bool fAll) PURE;
 
 	STDMETHOD_(void, SetTime) (REFERENCE_TIME rtNow) PURE;
@@ -197,7 +199,6 @@ public IUnknown {
 
 	STDMETHOD (GetDIB) (BYTE* lpDib, DWORD* size) PURE;
 
-	STDMETHOD (SetVideoAngle) (Vector v) PURE;
 	STDMETHOD (ClearPixelShaders) (int target) PURE;
 	STDMETHOD (AddPixelShader) (int target, LPCSTR sourceCode, LPCSTR profile) PURE;
 
