@@ -209,10 +209,6 @@
 #define ID_PANSCAN_MOVEDOWNLEFT         874
 #define ID_PANSCAN_MOVEDOWNRIGHT        875
 #define ID_PANSCAN_CENTER               876
-#define ID_PANSCAN_ROTATEXP             877
-#define ID_PANSCAN_ROTATEXM             878
-#define ID_PANSCAN_ROTATEYP             879
-#define ID_PANSCAN_ROTATEYM             880
 #define ID_PANSCAN_ROTATEZP             881
 #define ID_PANSCAN_ROTATEZM             882
 #define ID_ONTOP_NEVER                  883
