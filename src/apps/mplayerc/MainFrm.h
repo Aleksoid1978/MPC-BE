@@ -582,7 +582,7 @@ protected:
 	double m_PlaybackRate;
 
 	double m_ZoomX, m_ZoomY, m_PosX, m_PosY;
-	int m_AngleX, m_AngleY, m_AngleZ;
+	int m_AngleZ;
 
 	// Operations
 	bool OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD);

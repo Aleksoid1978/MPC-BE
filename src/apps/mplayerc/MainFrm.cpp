@@ -365,8 +365,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_RESET, ID_PANSCAN_CENTER, OnUpdateViewPanNScan)
 	ON_COMMAND_RANGE(ID_PANNSCAN_PRESETS_START, ID_PANNSCAN_PRESETS_END, OnViewPanNScanPresets)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_PANNSCAN_PRESETS_START, ID_PANNSCAN_PRESETS_END, OnUpdateViewPanNScanPresets)
-	ON_COMMAND_RANGE(ID_PANSCAN_ROTATEXP, ID_PANSCAN_ROTATEZM, OnViewRotate)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_PANSCAN_ROTATEXP, ID_PANSCAN_ROTATEZM, OnUpdateViewRotate)
+	ON_COMMAND_RANGE(ID_PANSCAN_ROTATEZP, ID_PANSCAN_ROTATEZM, OnViewRotate)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_PANSCAN_ROTATEZP, ID_PANSCAN_ROTATEZM, OnUpdateViewRotate)
 	ON_COMMAND_RANGE(ID_ASPECTRATIO_START, ID_ASPECTRATIO_END, OnViewAspectRatio)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_ASPECTRATIO_START, ID_ASPECTRATIO_END, OnUpdateViewAspectRatio)
 	ON_COMMAND(ID_ASPECTRATIO_NEXT, OnViewAspectRatioNext)
@@ -621,7 +621,7 @@ CMainFrame::CMainFrame() :
 	m_nLoops(0),
 	m_iSubtitleSel(-1),
 	m_ZoomX(1), m_ZoomY(1), m_PosX(0.5), m_PosY(0.5),
-	m_AngleX(0), m_AngleY(0), m_AngleZ(0),
+	m_AngleZ(0),
 	m_fCustomGraph(false),
 	m_fShockwaveGraph(false),
 	m_fFrameSteppingActive(false),
@@ -7190,7 +7190,7 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 		case ID_VIEW_RESET:
 			m_ZoomX = m_ZoomY = 1.0;
 			m_PosX = m_PosY = 0.5;
-			m_AngleX = m_AngleY = m_AngleZ = 0;
+			m_AngleZ = 0;
 			if (m_pMVRC) {
 				m_pMVRC->SendCommandInt("rotate", m_iMVRDefRotation);
 			}
@@ -7378,45 +7378,29 @@ void CMainFrame::OnViewRotate(UINT nID)
 		}
 	} else if (m_pCAP) {
 		switch (nID) {
-			case ID_PANSCAN_ROTATEXP:
-				m_AngleX += 2;
-				if (m_AngleX >= 360) { m_AngleX -= 360; }
-				break;
-			case ID_PANSCAN_ROTATEXM:
-				m_AngleX -= 2;
-				if (m_AngleX <= -360) { m_AngleX += 360; }
-				break;
-			case ID_PANSCAN_ROTATEYP:
-				m_AngleY += 2;
-				if (m_AngleY >= 360) { m_AngleY -= 360; }
-				break;
-			case ID_PANSCAN_ROTATEYM:
-				m_AngleY -= 2;
-				if (m_AngleY <= -360) { m_AngleY += 360; }
-				break;
 			case ID_PANSCAN_ROTATEZP:
-				m_AngleZ += 2;
+				m_AngleZ += 90;
 				if (m_AngleZ >= 360) { m_AngleZ -= 360; }
 				break;
 			case ID_PANSCAN_ROTATEZM:
-				m_AngleZ -= 2;
+				m_AngleZ -= 90;
 				if (m_AngleZ <= -360) { m_AngleZ += 360; }
 				break;
 			default:
 				return;
 		}
 
-		hr = m_pCAP->SetVideoAngle(Vector(Vector::DegToRad(m_AngleX), Vector::DegToRad(m_AngleY), Vector::DegToRad(m_AngleZ)));
+		hr = m_pCAP->SetVideoAngle(Vector(0.0f, 0.0f, Vector::DegToRad(m_AngleZ)));
 		hr = m_pCAP->Paint(true);
 	}
 
 	if (FAILED(hr)) {
-		m_AngleX = m_AngleY = m_AngleZ = 0;
+		m_AngleZ = 0;
 		return;
 	}
 
 	CString info;
-	info.Format(L"x: %d°, y: %d°, z: %d°", m_AngleX, m_AngleY, m_AngleZ);
+	info.Format(L"Rotation: %d°", m_AngleZ);
 	SendStatusMessage(info, 3000);
 }
 
@@ -10864,7 +10848,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 
 		if (m_pCAP) {
 			m_pCAP->SetPosition(wr, vr);
-			m_pCAP->SetVideoAngle(Vector(Vector::DegToRad(m_AngleX), Vector::DegToRad(m_AngleY), Vector::DegToRad(m_AngleZ)));
+			m_pCAP->SetVideoAngle(Vector(0.0f, 0.0f, Vector::DegToRad(m_AngleZ)));
 			m_pCAP->Paint(true);
 		} else {
 			HRESULT hr;
