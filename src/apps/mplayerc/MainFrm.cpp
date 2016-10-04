@@ -2851,7 +2851,11 @@ bool CMainFrame::DoAfterPlaybackEvent()
 		bExit = true; // TODO: unless the app closes, it will call standby or hibernate once again forever, how to avoid that?
 	} else if (s.nCLSwitches & CLSW_SHUTDOWN) {
 		SetPrivilege(SE_SHUTDOWN_NAME);
-		ExitWindowsEx(EWX_SHUTDOWN | EWX_HYBRID_SHUTDOWN | EWX_POWEROFF | EWX_FORCEIFHUNG, 0);
+		UINT uFlags = EWX_SHUTDOWN | EWX_POWEROFF | EWX_FORCEIFHUNG;
+		if (IsWin8orLater()) {
+			uFlags |= EWX_HYBRID_SHUTDOWN;
+		}
+		ExitWindowsEx(uFlags, 0);
 		bExit = true;
 	} else if (s.nCLSwitches & CLSW_LOGOFF) {
 		SetPrivilege(SE_SHUTDOWN_NAME);
