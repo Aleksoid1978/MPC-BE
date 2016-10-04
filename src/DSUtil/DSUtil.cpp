@@ -187,8 +187,6 @@ bool IsVideoRenderer(const CLSID clsid)
 	if (clsid == CLSID_OverlayMixer
 		|| clsid == CLSID_VideoMixingRenderer
 		|| clsid == CLSID_VideoMixingRenderer9
-		|| clsid == CLSID_VMR7AllocatorPresenter
-		|| clsid == CLSID_VMR9AllocatorPresenter
 		|| clsid == CLSID_EnhancedVideoRenderer
 		|| clsid == CLSID_EVRAllocatorPresenter
 		|| clsid == CLSID_DXRAllocatorPresenter
