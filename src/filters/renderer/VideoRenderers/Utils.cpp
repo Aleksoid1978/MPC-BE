@@ -91,3 +91,13 @@ HRESULT DumpDX9Texture(IDirect3DDevice9* pD3DDev, IDirect3DTexture9* pTexture, w
 
 	return DumpDX9Surface(pD3DDev, pSurface, filename);
 }
+
+HRESULT DumpDX9RenderTarget(IDirect3DDevice9* pD3DDev, wchar_t* filename)
+{
+	CheckPointer(pD3DDev, E_POINTER);
+
+	CComPtr<IDirect3DSurface9> pSurface;
+	pD3DDev->GetRenderTarget(0, &pSurface);
+
+	return DumpDX9Surface(pD3DDev, pSurface, filename);
+}

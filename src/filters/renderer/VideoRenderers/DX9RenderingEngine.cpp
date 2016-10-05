@@ -512,8 +512,8 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		pVideoTexture = m_pFrameTextures[src];
 	}
 
-	Vector dest[4];
 	if (iRotation) {
+		Vector dest[4];
 		CComPtr<IDirect3DSurface9> pTemporarySurface;
 		switch (iRotation) {
 		case 90:
@@ -561,9 +561,6 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	}
 
 	// Resize the frame
-
-	Transform(destRect, dest);
-
 	if (bCustomScreenSpacePixelShaders || bFinalPass || !pRenderTarget) {
 		CComPtr<IDirect3DSurface9> pTemporarySurface;
 		hr = m_pScreenSpaceTextures[0]->GetSurfaceLevel(0, &pTemporarySurface);
@@ -582,48 +579,48 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 
 	if (srcSize == dstSize) {
 		m_wsResizer = L""; // empty string, not nullptr
-		hr = TextureResize(pVideoTexture, dest, srcRect, D3DTEXF_POINT);
+		hr = TextureResize(pVideoTexture, srcRect, destRect, D3DTEXF_POINT);
 	} else {
 		switch (iResizer) {
 		case RESIZER_NEAREST:
 			m_wsResizer = L"Nearest neighbor";
-			hr = TextureResize(pVideoTexture, dest, srcRect, D3DTEXF_POINT);
+			hr = TextureResize(pVideoTexture, srcRect, destRect, D3DTEXF_POINT);
 			break;
 		case RESIZER_BILINEAR:
 			m_wsResizer = L"Bilinear";
-			hr = TextureResize(pVideoTexture, dest, srcRect, D3DTEXF_LINEAR);
+			hr = TextureResize(pVideoTexture, srcRect, destRect, D3DTEXF_LINEAR);
 			break;
 		case RESIZER_SHADER_BSPLINE4:
 			m_wsResizer = L"B-spline4";
-			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_bspline4_x);
+			hr = TextureResizeShader2pass(pVideoTexture, srcRect, destRect, shader_bspline4_x);
 			break;
 		case RESIZER_SHADER_MITCHELL4:
 			m_wsResizer = L"Mitchell-Netravali spline4";
-			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_mitchell4_x);
+			hr = TextureResizeShader2pass(pVideoTexture, srcRect, destRect, shader_mitchell4_x);
 			break;
 		case RESIZER_SHADER_CATMULL4:
 			m_wsResizer = L"Catmull-Rom spline4";
-			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_catmull4_x);
+			hr = TextureResizeShader2pass(pVideoTexture, srcRect, destRect, shader_catmull4_x);
 			break;
 		case RESIZER_SHADER_BICUBIC06:
 			m_wsResizer = L"Bicubic A=-0.6";
-			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_bicubic06_x);
+			hr = TextureResizeShader2pass(pVideoTexture, srcRect, destRect, shader_bicubic06_x);
 			break;
 		case RESIZER_SHADER_BICUBIC08:
 			m_wsResizer = L"Bicubic A=-0.8";
-			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_bicubic08_x);
+			hr = TextureResizeShader2pass(pVideoTexture, srcRect, destRect, shader_bicubic08_x);
 			break;
 		case RESIZER_SHADER_BICUBIC10:
 			m_wsResizer = L"Bicubic A=-1.0";
-			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_bicubic10_x);
+			hr = TextureResizeShader2pass(pVideoTexture, srcRect, destRect, shader_bicubic10_x);
 			break;
 		case RESIZER_SHADER_LANCZOS2:
 			m_wsResizer = L"Lanczos2";
-			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_lanczos2_x);
+			hr = TextureResizeShader2pass(pVideoTexture, srcRect, destRect, shader_lanczos2_x);
 			break;
 		case RESIZER_SHADER_LANCZOS3:
 			m_wsResizer = L"Lanczos3";
-			hr = TextureResizeShader2pass(pVideoTexture, dest, srcRect, shader_lanczos3_x);
+			hr = TextureResizeShader2pass(pVideoTexture, srcRect, destRect, shader_lanczos3_x);
 			break;
 		}
 	}
@@ -1159,7 +1156,7 @@ HRESULT CDX9RenderingEngine::InitShaderResizer()
 	return S_OK;
 }
 
-HRESULT CDX9RenderingEngine::TextureResize(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, D3DTEXTUREFILTERTYPE filter)
+HRESULT CDX9RenderingEngine::TextureResize(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, D3DTEXTUREFILTERTYPE filter)
 {
 	HRESULT hr;
 
@@ -1168,19 +1165,15 @@ HRESULT CDX9RenderingEngine::TextureResize(IDirect3DTexture9* pTexture, Vector d
 		return E_FAIL;
 	}
 
-	float w = (float)desc.Width;
-	float h = (float)desc.Height;
-
-	float dx2 = 1.0f/w;
-	float dy2 = 1.0f/h;
+	float dx = 1.0f / desc.Width;
+	float dy = 1.0f / desc.Height;
 
 	MYD3DVERTEX<1> v[] = {
-		{dst[0].x, dst[0].y, dst[0].z, 1.0f/dst[0].z, {srcRect.left * dx2,  srcRect.top * dy2} },
-		{dst[1].x, dst[1].y, dst[1].z, 1.0f/dst[1].z, {srcRect.right * dx2, srcRect.top * dy2} },
-		{dst[2].x, dst[2].y, dst[2].z, 1.0f/dst[2].z, {srcRect.left * dx2,  srcRect.bottom * dy2} },
-		{dst[3].x, dst[3].y, dst[3].z, 1.0f/dst[3].z, {srcRect.right * dx2, srcRect.bottom * dy2} },
+		{(float)destRect.left - 0.5f,  (float)destRect.top - 0.5f,    0.5f, 2.0f, {srcRect.left  * dx, srcRect.top    * dy} },
+		{(float)destRect.right - 0.5f, (float)destRect.top - 0.5f,    0.5f, 2.0f, {srcRect.right * dx, srcRect.top    * dy} },
+		{(float)destRect.left - 0.5f,  (float)destRect.bottom - 0.5f, 0.5f, 2.0f, {srcRect.left  * dx, srcRect.bottom * dy} },
+		{(float)destRect.right - 0.5f, (float)destRect.bottom - 0.5f, 0.5f, 2.0f, {srcRect.right * dx, srcRect.bottom * dy} },
 	};
-	AdjustQuad(v, 0, 0);
 
 	hr = m_pD3DDevEx->SetTexture(0, pTexture);
 	hr = m_pD3DDevEx->SetPixelShader(NULL);
@@ -1189,7 +1182,7 @@ HRESULT CDX9RenderingEngine::TextureResize(IDirect3DTexture9* pTexture, Vector d
 	return hr;
 }
 
-HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, int iShader1)
+HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader1)
 {
 	HRESULT hr;
 
@@ -1198,8 +1191,8 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 		return E_FAIL;
 	}
 
-	float w2 = sqrt(pow(dst[1].x - dst[0].x, 2) + pow(dst[1].y - dst[0].y, 2) + pow(dst[1].z - dst[0].z, 2));
-	float h2 = sqrt(pow(dst[2].x - dst[0].x, 2) + pow(dst[2].y - dst[0].y, 2) + pow(dst[2].z - dst[0].z, 2));
+	float w2 = destRect.Width();
+	float h2 = destRect.Height();
 
 	float rx = srcRect.Width() / w2;
 	float ry = srcRect.Height() / h2;
@@ -1223,12 +1216,12 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 					D3DPOOL_DEFAULT, &m_pResizeTexture, NULL);
 		if (FAILED(hr)) {
 			m_pResizeTexture = NULL;
-			return TextureResize(pTexture, dst, srcRect, D3DTEXF_LINEAR);
+			return TextureResize(pTexture, srcRect, destRect, D3DTEXF_LINEAR);
 		}
 	}
 
 	if (FAILED(m_pResizeTexture->GetLevelDesc(0, &desc))) {
-		return TextureResize(pTexture, dst, srcRect, D3DTEXF_LINEAR);
+		return TextureResize(pTexture, srcRect, destRect, D3DTEXF_LINEAR);
 	}
 	float w1 = (float)desc.Width;
 	float h1 = (float)desc.Height;
@@ -1252,10 +1245,10 @@ HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTextur
 	};
 
 	MYD3DVERTEX<1> vy[] = {
-		{dst[0].x - 0.5f, dst[0].y - 0.5f, dst[0].z, 1.0/dst[0].z, { -0.5f, -0.5f } },
-		{dst[1].x - 0.5f, dst[1].y - 0.5f, dst[1].z, 1.0/dst[1].z, {    w1, -0.5f } },
-		{dst[2].x - 0.5f, dst[2].y - 0.5f, dst[2].z, 1.0/dst[2].z, { -0.5f,    h1 } },
-		{dst[3].x - 0.5f, dst[3].y - 0.5f, dst[3].z, 1.0/dst[3].z, {    w1,    h1 } },
+		{destRect.left , destRect.top,    0.5f, 2.0f, { -0.5f, -0.5f } },
+		{destRect.right, destRect.top,    0.5f, 2.0f, {    w1, -0.5f } },
+		{destRect.left , destRect.bottom, 0.5f, 2.0f, { -0.5f,    h1 } },
+		{destRect.right, destRect.bottom, 0.5f, 2.0f, {    w1,    h1 } },
 	};
 
 	// remember current RenderTarget

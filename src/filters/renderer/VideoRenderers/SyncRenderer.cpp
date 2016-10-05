@@ -892,7 +892,7 @@ HRESULT CBaseAP::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect)
 	return DrawRectBase(m_pD3DDevEx, v);
 }
 
-HRESULT CBaseAP::TextureResize(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &SrcRect, D3DTEXTUREFILTERTYPE filter)
+HRESULT CBaseAP::TextureResize(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, D3DTEXTUREFILTERTYPE filter)
 {
 	HRESULT hr;
 
@@ -901,19 +901,15 @@ HRESULT CBaseAP::TextureResize(IDirect3DTexture9* pTexture, Vector dst[4], const
 		return E_FAIL;
 	}
 
-	float w = (float)desc.Width;
-	float h = (float)desc.Height;
-
-	float dx2 = 1.0f/w;
-	float dy2 = 1.0f/h;
+	float dx = 1.0f / desc.Width;
+	float dy = 1.0f / desc.Height;
 
 	MYD3DVERTEX<1> v[] = {
-		{dst[0].x, dst[0].y, dst[0].z, 1.0f/dst[0].z,  SrcRect.left * dx2, SrcRect.top * dy2},
-		{dst[1].x, dst[1].y, dst[1].z, 1.0f/dst[1].z,  SrcRect.right * dx2, SrcRect.top * dy2},
-		{dst[2].x, dst[2].y, dst[2].z, 1.0f/dst[2].z,  SrcRect.left * dx2, SrcRect.bottom * dy2},
-		{dst[3].x, dst[3].y, dst[3].z, 1.0f/dst[3].z,  SrcRect.right * dx2, SrcRect.bottom * dy2},
+		{(float)destRect.left - 0.5f,  (float)destRect.top - 0.5f,    0.5f, 2.0f, {srcRect.left  * dx, srcRect.top    * dy} },
+		{(float)destRect.right - 0.5f, (float)destRect.top - 0.5f,    0.5f, 2.0f, {srcRect.right * dx, srcRect.top    * dy} },
+		{(float)destRect.left - 0.5f,  (float)destRect.bottom - 0.5f, 0.5f, 2.0f, {srcRect.left  * dx, srcRect.bottom * dy} },
+		{(float)destRect.right - 0.5f, (float)destRect.bottom - 0.5f, 0.5f, 2.0f, {srcRect.right * dx, srcRect.bottom * dy} },
 	};
-	AdjustQuad(v, 0, 0);
 
 	hr = m_pD3DDevEx->SetTexture(0, pTexture);
 	hr = m_pD3DDevEx->SetPixelShader(NULL);
@@ -922,7 +918,7 @@ HRESULT CBaseAP::TextureResize(IDirect3DTexture9* pTexture, Vector dst[4], const
 	return hr;
 }
 
-HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector dst[4], const CRect &srcRect, int iShader1)
+HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader1)
 {
 	HRESULT hr;
 
@@ -931,8 +927,8 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector ds
 		return E_FAIL;
 	}
 
-	float w2 = sqrt(pow(dst[1].x - dst[0].x, 2) + pow(dst[1].y - dst[0].y, 2) + pow(dst[1].z - dst[0].z, 2));
-	float h2 = sqrt(pow(dst[2].x - dst[0].x, 2) + pow(dst[2].y - dst[0].y, 2) + pow(dst[2].z - dst[0].z, 2));
+	float w2 = destRect.Width();
+	float h2 = destRect.Height();
 
 	float rx = srcRect.Width() / w2;
 	float ry = srcRect.Height() / h2;
@@ -956,12 +952,12 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector ds
 			D3DPOOL_DEFAULT, &m_pResizeTexture, NULL);
 		if (FAILED(hr)) {
 			m_pResizeTexture = NULL;
-			return TextureResize(pTexture, dst, srcRect, D3DTEXF_LINEAR);
+			return TextureResize(pTexture, srcRect, destRect, D3DTEXF_LINEAR);
 		}
 	}
 
 	if (FAILED(m_pResizeTexture->GetLevelDesc(0, &desc))) {
-		return TextureResize(pTexture, dst, srcRect, D3DTEXF_LINEAR);
+		return TextureResize(pTexture, srcRect, destRect, D3DTEXF_LINEAR);
 	}
 	float w1 = (float)desc.Width;
 	float h1 = (float)desc.Height;
@@ -978,17 +974,17 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector ds
 	h1 -= 0.5f;
 
 	MYD3DVERTEX<1> vx[] = {
-		{ -0.5f, -0.5f, 0.5f, 2.0f,{ tx0, ty0 } },
-		{ w1, -0.5f, 0.5f, 2.0f,{ tx1, ty0 } },
-		{ -0.5f,    h1, 0.5f, 2.0f,{ tx0, ty1 } },
-		{ w1,    h1, 0.5f, 2.0f,{ tx1, ty1 } },
+		{ -0.5f, -0.5f, 0.5f, 2.0f, { tx0, ty0 } },
+		{    w1, -0.5f, 0.5f, 2.0f, { tx1, ty0 } },
+		{ -0.5f,    h1, 0.5f, 2.0f, { tx0, ty1 } },
+		{    w1,    h1, 0.5f, 2.0f, { tx1, ty1 } },
 	};
 
 	MYD3DVERTEX<1> vy[] = {
-		{ dst[0].x - 0.5f, dst[0].y - 0.5f, dst[0].z, 1.0 / dst[0].z,{ -0.5f, -0.5f } },
-		{ dst[1].x - 0.5f, dst[1].y - 0.5f, dst[1].z, 1.0 / dst[1].z,{ w1, -0.5f } },
-		{ dst[2].x - 0.5f, dst[2].y - 0.5f, dst[2].z, 1.0 / dst[2].z,{ -0.5f,    h1 } },
-		{ dst[3].x - 0.5f, dst[3].y - 0.5f, dst[3].z, 1.0 / dst[3].z,{ w1,    h1 } },
+		{destRect.left , destRect.top,    0.5f, 2.0f, { -0.5f, -0.5f } },
+		{destRect.right, destRect.top,    0.5f, 2.0f, {    w1, -0.5f } },
+		{destRect.left , destRect.bottom, 0.5f, 2.0f, { -0.5f,    h1 } },
+		{destRect.right, destRect.bottom, 0.5f, 2.0f, {    w1,    h1 } },
 	};
 
 	// remember current RenderTarget
@@ -1006,12 +1002,12 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector ds
 	// resize width
 	hr = m_pD3DDevEx->SetTexture(0, pTexture);
 	if (rx > 2.0f) {
-		float fConstData[][4] = { { dx0, dy0, 0, 0 },{ rx, 0, 0, 0 } };
+		float fConstData[][4] = {{dx0, dy0, 0, 0}, {rx, 0, 0, 0}};
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[shader_downscaling_x]);
 	}
 	else {
-		float fConstData[][4] = { { dx0, dy0, 0, 0 } };
+		float fConstData[][4] = {{dx0, dy0, 0, 0}};
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader1]);
 	}
@@ -1023,12 +1019,12 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, Vector ds
 	// resize height
 	hr = m_pD3DDevEx->SetTexture(0, m_pResizeTexture);
 	if (ry > 2.0f) {
-		float fConstData[][4] = { { dx1, dy1, 0, 0 },{ 0, ry, 0, 0 } };
+		float fConstData[][4] = {{dx1, dy1, 0, 0}, {0, ry, 0, 0}};
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[shader_downscaling_y]);
 	}
 	else {
-		float fConstData[][4] = { { dx1, dy1, 0, 0 } };
+		float fConstData[][4] = {{dx1, dy1, 0, 0}};
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader1 + 1]);
 	}
@@ -1321,8 +1317,9 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				hr = m_pD3DDevEx->SetPixelShader(NULL);
 			}
 
-			Vector dest[4];
 			if (iRotation) {
+				Vector dest[4];
+
 				switch (iRotation) {
 				case 90:
 					dest[0].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
@@ -1365,8 +1362,6 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 				m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
 			}
-
-			Transform(rDstVid, dest);
 
 			// init resizer
 			DWORD iResizer = rs.iResizer;
@@ -1414,48 +1409,48 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				switch (iResizer) {
 				case RESIZER_NEAREST:
 					m_wsResizer = L"Nearest neighbor";
-					hr = TextureResize(pVideoTexture, dest, rSrcVid, D3DTEXF_POINT);
+					hr = TextureResize(pVideoTexture, rSrcVid, rDstVid, D3DTEXF_POINT);
 					break;
 				case RESIZER_BILINEAR:
 					m_wsResizer = L"Bilinear";
-					hr = TextureResize(pVideoTexture, dest, rSrcVid, D3DTEXF_LINEAR);
+					hr = TextureResize(pVideoTexture, rSrcVid, rDstVid, D3DTEXF_LINEAR);
 					break;
 				case RESIZER_SHADER_BSPLINE4:
 					m_wsResizer = L"B-spline4";
-					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_bspline4_x);
+					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_bspline4_x);
 					break;
 				case RESIZER_SHADER_MITCHELL4:
 					m_wsResizer = L"Mitchell-Netravali spline4";
-					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_mitchell4_x);
+					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_mitchell4_x);
 					break;
 				case RESIZER_SHADER_CATMULL4:
 					m_wsResizer = L"Catmull-Rom spline4";
-					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_catmull4_x);
+					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_catmull4_x);
 					break;
 				case RESIZER_SHADER_BICUBIC06:
 					m_wsResizer = L"Bicubic A=-0.6";
-					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_bicubic06_x);
+					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_bicubic06_x);
 					break;
 				case RESIZER_SHADER_BICUBIC08:
 					m_wsResizer = L"Bicubic A=-0.8";
-					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_bicubic08_x);
+					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_bicubic08_x);
 					break;
 				case RESIZER_SHADER_BICUBIC10:
 					m_wsResizer = L"Bicubic A=-1.0";
-					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_bicubic10_x);
+					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_bicubic10_x);
 					break;
 				case RESIZER_SHADER_LANCZOS2:
 					m_wsResizer = L"Lanczos2";
-					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_lanczos2_x);
+					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_lanczos2_x);
 					break;
 				case RESIZER_SHADER_LANCZOS3:
 					m_wsResizer = L"Lanczos3";
-					hr = TextureResizeShader2pass(pVideoTexture, dest, rSrcVid, shader_lanczos3_x);
+					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_lanczos3_x);
 					break;
 				}
 			} else {
 				m_wsResizer = L""; // empty string, not nullptr
-				hr = TextureResize(pVideoTexture, dest, rSrcVid, D3DTEXF_POINT);
+				hr = TextureResize(pVideoTexture, rSrcVid, rDstVid, D3DTEXF_POINT);
 			}
 
 			// post-resize pixel shaders
