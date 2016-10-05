@@ -24,3 +24,4 @@
 
 HRESULT DumpDX9Surface(IDirect3DDevice9* pD3DDev, IDirect3DSurface9* pSurface, wchar_t* filename);
 HRESULT DumpDX9Texture(IDirect3DDevice9* pD3DDev, IDirect3DTexture9* pTexture, wchar_t* filename);
+HRESULT DumpDX9RenderTarget(IDirect3DDevice9* pD3DDev, wchar_t* filename);
