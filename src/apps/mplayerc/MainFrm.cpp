@@ -10104,7 +10104,7 @@ void CMainFrame::OnSubtitlePos(UINT nID)
 		}
 
 		if (GetMediaState() != State_Running) {
-			m_pCAP->Invalidate();
+			m_pCAP->Paint(false);
 		}
 	}
 }
