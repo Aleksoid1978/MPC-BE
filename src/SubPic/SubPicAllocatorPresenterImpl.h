@@ -24,7 +24,6 @@
 #include <atlbase.h>
 #include <atlcoll.h>
 #include "ISubPic.h"
-#include "CoordGeom.h"
 #include "SubRenderIntf.h"
 
 class CSubPicAllocatorPresenterImpl
@@ -62,9 +61,6 @@ protected:
 	void InitMaxSubtitleTextureSize(int maxWidth, CSize desktopSize);
 	void AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels = 0);
 	void AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget = NULL, int xOffsetInPixels = 0, const BOOL bUseSpecialCase = TRUE);
-
-	XForm m_xform;
-	void Transform(CRect r, Vector v[4]);
 
 public:
 	CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError);

@@ -23,7 +23,6 @@
 #include "SubPicAllocatorPresenterImpl.h"
 #include "../filters/renderer/VideoRenderers/RenderersSettings.h"
 #include <Version.h>
-#include <math.h>
 #include "XySubPicQueueImpl.h"
 #include "XySubPicProvider.h"
 #include <d3d9.h>
@@ -53,7 +52,6 @@ CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT&
 		return;
 	}
 	GetWindowRect(m_hWnd, &m_windowRect);
-	m_xform = XForm(Ray(Vector(0, 0, 0), Vector()), Vector(1, 1, 1), false);
 	hr = S_OK;
 }
 
@@ -255,27 +253,6 @@ STDMETHODIMP_(void) CSubPicAllocatorPresenterImpl::Invalidate(REFERENCE_TIME rtI
 {
 	if (m_pSubPicQueue) {
 		m_pSubPicQueue->Invalidate(rtInvalidate);
-	}
-}
-
-#include <math.h>
-
-void CSubPicAllocatorPresenterImpl::Transform(CRect r, Vector v[4])
-{
-	v[0] = Vector((float)r.left,  (float)r.top, 0);
-	v[1] = Vector((float)r.right, (float)r.top, 0);
-	v[2] = Vector((float)r.left,  (float)r.bottom, 0);
-	v[3] = Vector((float)r.right, (float)r.bottom, 0);
-
-	Vector center((float)r.CenterPoint().x, (float)r.CenterPoint().y, 0);
-	int l = (int)(Vector((float)r.Size().cx, (float)r.Size().cy, 0).Length() * 1.5f) + 1;
-
-	for (size_t i = 0; i < 4; i++) {
-		v[i] = m_xform << (v[i] - center);
-		v[i].z = v[i].z / l + 0.5f;
-		v[i].x /= v[i].z*2;
-		v[i].y /= v[i].z*2;
-		v[i] += center;
 	}
 }
 
