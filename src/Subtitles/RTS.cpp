@@ -205,12 +205,13 @@ bool CWord::CreateOpaqueBox()
 
 	STSStyle style = m_style;
 	style.borderStyle = 0;
-	style.outlineWidthX = style.outlineWidthY = 0;
+	style.outlineWidthX = style.outlineWidthY = 0.0;
+	style.fontScaleX = style.fontScaleY = 100.0;
 	style.colors[0] = m_style.colors[2];
 	style.alpha[0] = m_style.alpha[2];
 
-	int w = (int)(m_style.outlineWidthX + 0.5);
-	int h = (int)(m_style.outlineWidthY + 0.5);
+	int w = std::lround(m_style.outlineWidthX);
+	int h = std::lround(m_style.outlineWidthY);
 
 	// Convert to pixels rounding to nearest
 	CStringW str;
@@ -987,7 +988,7 @@ CRect CLine::PaintOutline(SubPicDesc& spd, CRect& clipRect, BYTE* pAlphaMask, CP
 			return bbox;	// should not happen since this class is just a line of text without any breaks
 		}
 
-		if (w->m_style.outlineWidthX+w->m_style.outlineWidthY > 0 && !(w->m_ktype == 2 && time < w->m_kstart)) {
+		if (w->m_style.outlineWidthX + w->m_style.outlineWidthY > 0 && !(w->m_ktype == 2 && time < w->m_kstart)) {
 			int x = p.x;
 			int y = p.y + m_ascent - w->m_ascent;
 			DWORD aoutline = w->m_style.alpha[2];
@@ -1075,8 +1076,6 @@ CRect CLine::PaintBody(SubPicDesc& spd, CRect& clipRect, BYTE* pAlphaMask, CPoin
 		if (w->m_style.fBlur) {
 			bluradjust += 8;
 		}
-		double tx = w->m_style.fontAngleZ;
-		UNREFERENCED_PARAMETER(tx);
 		sw[4] = sw[2];
 		sw[5] = 0x00ffffff;
 
@@ -1103,12 +1102,12 @@ CSubtitle::CSubtitle(RenderingCaches& renderingCaches)
 	, m_scrAlignment(0)
 	, m_wrapStyle(0)
 	, m_fAnimated(false)
+	, m_bIsAnimated(false)
 	, m_relativeTo(1)
 	, m_topborder(0)
 	, m_bottomborder(0)
 {
 	ZeroMemory(m_effects, sizeof(Effect*)*EF_NUMBEROFEFFECTS);
-	m_bIsAnimated = false;
 }
 
 CSubtitle::~CSubtitle()
@@ -1365,7 +1364,7 @@ void CSubtitle::CreateClippers(CSize size)
 
 			for (ptrdiff_t j = k; j < l; j++, a += da) {
 				for (ptrdiff_t i = 0; i < w; i++, am++) {
-					*am = ((*am)*a)>>14;
+					*am = BYTE(((*am) * a) >> 14);
 				}
 			}
 		}
@@ -1388,7 +1387,7 @@ void CSubtitle::CreateClippers(CSize size)
 			int j = k;
 			for (; j < l; j++, a += da) {
 				for (ptrdiff_t i = 0; i < w; i++, am++) {
-					*am = ((*am)*a)>>14;
+					*am = BYTE(((*am) * a) >> 14);
 				}
 			}
 
@@ -2987,9 +2986,7 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 					int t2 = s->m_effects[k]->t[1];
 
 					if (t2 < t1) {
-						int t = t1;
-						t1 = t2;
-						t2 = t;
+						std::swap(t1, t2);
 					}
 
 					if (t1 <= 0 && t2 <= 0) {
@@ -3105,7 +3102,8 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 			org2 = org;
 		}
 
-		CPoint p(0, r.top);
+		CPoint p, p2(0, r.top);
+		p = p2;
 
 		// Rectangles for inverse clip
 		CRect iclipRect[4];
@@ -3119,28 +3117,52 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 			CLine* l = s->GetNext(pos);
 
 			p.x = (s->m_scrAlignment % 3) == 1 ? org.x
-				  : (s->m_scrAlignment % 3) == 0 ? org.x - l->m_width
-				  :                              org.x - (l->m_width / 2);
+				: (s->m_scrAlignment % 3) == 0 ? org.x - l->m_width
+				:                                org.x - (l->m_width / 2);
 			if (s->m_clipInverse) {
 				bbox2 |= l->PaintShadow(spd, iclipRect[0], pAlphaMask, p, org2, m_time, alpha);
 				bbox2 |= l->PaintShadow(spd, iclipRect[1], pAlphaMask, p, org2, m_time, alpha);
 				bbox2 |= l->PaintShadow(spd, iclipRect[2], pAlphaMask, p, org2, m_time, alpha);
 				bbox2 |= l->PaintShadow(spd, iclipRect[3], pAlphaMask, p, org2, m_time, alpha);
+			} else {
+				bbox2 |= l->PaintShadow(spd, clipRect, pAlphaMask, p, org2, m_time, alpha);
+			}
+			p.y += l->m_ascent + l->m_descent;
+		}
 
+		p = p2;
+		pos = s->GetHeadPosition();
+		while (pos) {
+			CLine* l = s->GetNext(pos);
+
+			p.x = (s->m_scrAlignment % 3) == 1 ? org.x
+				: (s->m_scrAlignment % 3) == 0 ? org.x - l->m_width
+				:                                org.x - (l->m_width / 2);
+			if (s->m_clipInverse) {
 				bbox2 |= l->PaintOutline(spd, iclipRect[0], pAlphaMask, p, org2, m_time, alpha);
 				bbox2 |= l->PaintOutline(spd, iclipRect[1], pAlphaMask, p, org2, m_time, alpha);
 				bbox2 |= l->PaintOutline(spd, iclipRect[2], pAlphaMask, p, org2, m_time, alpha);
 				bbox2 |= l->PaintOutline(spd, iclipRect[3], pAlphaMask, p, org2, m_time, alpha);
+			} else {
+				bbox2 |= l->PaintOutline(spd, clipRect, pAlphaMask, p, org2, m_time, alpha);
+			}
+			p.y += l->m_ascent + l->m_descent;
+		}
 
+		p = p2;
+		pos = s->GetHeadPosition();
+		while (pos) {
+			CLine* l = s->GetNext(pos);
+
+			p.x = (s->m_scrAlignment % 3) == 1 ? org.x
+				: (s->m_scrAlignment % 3) == 0 ? org.x - l->m_width
+				:                                org.x - (l->m_width / 2);
+			if (s->m_clipInverse) {
 				bbox2 |= l->PaintBody(spd, iclipRect[0], pAlphaMask, p, org2, m_time, alpha);
 				bbox2 |= l->PaintBody(spd, iclipRect[1], pAlphaMask, p, org2, m_time, alpha);
 				bbox2 |= l->PaintBody(spd, iclipRect[2], pAlphaMask, p, org2, m_time, alpha);
 				bbox2 |= l->PaintBody(spd, iclipRect[3], pAlphaMask, p, org2, m_time, alpha);
 			} else {
-				bbox2 |= l->PaintShadow(spd, clipRect, pAlphaMask, p, org2, m_time, alpha);
-
-				bbox2 |= l->PaintOutline(spd, clipRect, pAlphaMask, p, org2, m_time, alpha);
-
 				bbox2 |= l->PaintBody(spd, clipRect, pAlphaMask, p, org2, m_time, alpha);
 			}
 			p.y += l->m_ascent + l->m_descent;
