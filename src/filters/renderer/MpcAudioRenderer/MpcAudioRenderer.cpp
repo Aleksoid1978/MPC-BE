@@ -1395,6 +1395,10 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 				return E_OUTOFMEMORY;
 			}
 			out_samples = m_Resampler.Mixing(buff, out_samples, in_buff, in_samples);
+			if (!out_samples) {
+				delete [] buff;
+				return S_OK;
+			}
 			bUseMixer   = true;
 			sfmt        = out_sf;
 
