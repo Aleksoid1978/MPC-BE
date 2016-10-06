@@ -1184,117 +1184,102 @@ HRESULT CDX9RenderingEngine::TextureResize(IDirect3DTexture9* pTexture, const CR
 	return hr;
 }
 
-HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader1)
+HRESULT CDX9RenderingEngine::TextureResizeShader(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader)
 {
-	HRESULT hr;
+	HRESULT hr = S_OK;
 
 	D3DSURFACE_DESC desc;
 	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc))) {
 		return E_FAIL;
 	}
 
-	float w2 = destRect.Width();
-	float h2 = destRect.Height();
+	const float dx = 1.0f / desc.Width;
+	const float dy = 1.0f / desc.Height;
 
-	float rx = srcRect.Width() / w2;
-	float ry = srcRect.Height() / h2;
-
-	const float dx0 = 1.0f / desc.Width;
-	const float dy0 = 1.0f / desc.Height;
-
-	UINT texWidth = min((UINT)w2, m_Caps.MaxTextureWidth);
-	UINT texHeight = min((UINT)m_nativeVideoSize.cy, m_Caps.MaxTextureHeight);
-
-	if (m_pResizeTexture && m_pResizeTexture->GetLevelDesc(0, &desc) == D3D_OK) {
-		if (texWidth != desc.Width || texHeight != desc.Height) {
-			m_pResizeTexture = NULL;
-		}
-	}
-
-	if (!m_pResizeTexture) {
-		hr = m_pD3DDevEx->CreateTexture(
-					texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET,
-					m_SurfaceFmt == D3DFMT_A32B32G32R32F ? D3DFMT_A32B32G32R32F : D3DFMT_A16B16G16R16F, // use only float textures here
-					D3DPOOL_DEFAULT, &m_pResizeTexture, NULL);
-		if (FAILED(hr)) {
-			m_pResizeTexture = NULL;
-			return TextureResize(pTexture, srcRect, destRect, D3DTEXF_LINEAR);
-		}
-	}
-
-	if (FAILED(m_pResizeTexture->GetLevelDesc(0, &desc))) {
-		return TextureResize(pTexture, srcRect, destRect, D3DTEXF_LINEAR);
-	}
-	float w1 = (float)desc.Width;
-	float h1 = (float)desc.Height;
-
-	const float dx1 = 1.0f / desc.Width;
-	const float dy1 = 1.0f / desc.Height;
+	const float rx = (float)srcRect.Width() / destRect.Width();
+	const float ry = (float)srcRect.Height() / destRect.Height();
 
 	const float tx0 = (float)srcRect.left - 0.5f;
-	const float tx1 = (float)srcRect.right - 0.5f;
 	const float ty0 = (float)srcRect.top - 0.5f;
+	const float tx1 = (float)srcRect.right - 0.5f;
 	const float ty1 = (float)srcRect.bottom - 0.5f;
 
-	w1 -= 0.5f;
-	h1 -= 0.5f;
-
-	MYD3DVERTEX<1> vx[] = {
-		{ -0.5f, -0.5f, 0.5f, 2.0f, { tx0, ty0 } },
-		{    w1, -0.5f, 0.5f, 2.0f, { tx1, ty0 } },
-		{ -0.5f,    h1, 0.5f, 2.0f, { tx0, ty1 } },
-		{    w1,    h1, 0.5f, 2.0f, { tx1, ty1 } },
+	MYD3DVERTEX<1> v[] = {
+		{(float)destRect.left - 0.5f,  (float)destRect.top - 0.5f,    0.5f, 2.0f, { tx0, ty0 } },
+		{(float)destRect.right - 0.5f, (float)destRect.top - 0.5f,    0.5f, 2.0f, { tx1, ty0 } },
+		{(float)destRect.left - 0.5f,  (float)destRect.bottom - 0.5f, 0.5f, 2.0f, { tx0, ty1 } },
+		{(float)destRect.right - 0.5f, (float)destRect.bottom - 0.5f, 0.5f, 2.0f, { tx1, ty1 } },
 	};
 
-	MYD3DVERTEX<1> vy[] = {
-		{destRect.left , destRect.top,    0.5f, 2.0f, { -0.5f, -0.5f } },
-		{destRect.right, destRect.top,    0.5f, 2.0f, {    w1, -0.5f } },
-		{destRect.left , destRect.bottom, 0.5f, 2.0f, { -0.5f,    h1 } },
-		{destRect.right, destRect.bottom, 0.5f, 2.0f, {    w1,    h1 } },
-	};
+	float fConstData[][4] = { { dx, dy, 0, 0 }, { rx, ry, 0, 0 } };
+	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
+	hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader]);
 
-	// remember current RenderTarget
-	CComPtr<IDirect3DSurface9> pRenderTarget;
-	hr = m_pD3DDevEx->GetRenderTarget(0, &pRenderTarget);
-	// set temp RenderTarget
-	CComPtr<IDirect3DSurface9> pTempRenderTarget;
-	hr = m_pResizeTexture->GetSurfaceLevel(0, &pTempRenderTarget);
-	hr = m_pD3DDevEx->SetRenderTarget(0, pTempRenderTarget);
-
-	if (rx > 2.0f && ry > 2.0f) {
-		m_wsResizer = L"Simple averaging";
-	}
-
-	// resize width
 	hr = m_pD3DDevEx->SetTexture(0, pTexture);
-	if (rx > 2.0f) {
-		float fConstData[][4] = {{dx0, dy0, 0, 0}, {rx, 0, 0, 0}};
-		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[shader_downscaling_x]);
-	}
-	else {
-		float fConstData[][4] = {{dx0, dy0, 0, 0}};
-		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader1]);
-	}
-	hr = TextureBlt(m_pD3DDevEx, vx, D3DTEXF_POINT);
+	hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_POINT);
+	m_pD3DDevEx->SetPixelShader(NULL);
 
-	// restore current RenderTarget
-	hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
+	return hr;
+}
 
-	// resize height
-	hr = m_pD3DDevEx->SetTexture(0, m_pResizeTexture);
-	if (ry > 2.0f) {
-		float fConstData[][4] = {{dx1, dy1, 0, 0}, {0, ry, 0, 0}};
-		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[shader_downscaling_y]);
+HRESULT CDX9RenderingEngine::TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader1)
+{
+	HRESULT hr = S_OK;
+
+	int w1 = srcRect.Width();
+	int h1 = srcRect.Height();
+	int w2 = destRect.Width();
+	int h2 = destRect.Height();
+	ASSERT(w1 != w2 || h1 != h2);
+
+	if (w1 != w2 && h1 != h2) { // need two pass
+		D3DSURFACE_DESC desc;
+
+		UINT texWidth = min((UINT)w2, m_Caps.MaxTextureWidth);
+		UINT texHeight = min((UINT)m_nativeVideoSize.cy, m_Caps.MaxTextureHeight);
+
+		if (m_pResizeTexture && m_pResizeTexture->GetLevelDesc(0, &desc) == D3D_OK) {
+			if (texWidth != desc.Width || texHeight != desc.Height) {
+				m_pResizeTexture = NULL; // need new texture
+			}
+		}
+
+		if (!m_pResizeTexture) {
+			hr = m_pD3DDevEx->CreateTexture(
+				texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET,
+				m_SurfaceFmt == D3DFMT_A32B32G32R32F ? D3DFMT_A32B32G32R32F : D3DFMT_A16B16G16R16F, // use only float textures here
+				D3DPOOL_DEFAULT, &m_pResizeTexture, NULL);
+			if (FAILED(hr) || FAILED(m_pResizeTexture->GetLevelDesc(0, &desc))) {
+				m_pResizeTexture = NULL;
+				return TextureResize(pTexture, srcRect, destRect, D3DTEXF_LINEAR);
+			}
+		}
+
+		const CRect resizeRect(0, 0, desc.Width, desc.Height);
+
+		// remember current RenderTarget
+		CComPtr<IDirect3DSurface9> pRenderTarget;
+		hr = m_pD3DDevEx->GetRenderTarget(0, &pRenderTarget);
+		// set temp RenderTarget
+		CComPtr<IDirect3DSurface9> pResizeSurface;
+		hr = m_pResizeTexture->GetSurfaceLevel(0, &pResizeSurface);
+		hr = m_pD3DDevEx->SetRenderTarget(0, pResizeSurface);
+
+		// resize width
+		hr = TextureResizeShader(pTexture, srcRect, resizeRect, (w1 > w2 * 2) ? shader_downscaling_x : iShader1);
+
+		// restore current RenderTarget
+		hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
+
+		// resize height
+		hr = TextureResizeShader(m_pResizeTexture, resizeRect, destRect, (h1 > h2 * 2) ? shader_downscaling_y : iShader1 + 1);
 	}
-	else {
-		float fConstData[][4] = {{dx1, dy1, 0, 0}};
-		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
-		hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader1 + 1]);
+	else if (w1 != w2) {
+		hr = TextureResizeShader(pTexture, srcRect, destRect, (w1 > w2 * 2) ? shader_downscaling_x : iShader1);
 	}
-	hr = TextureBlt(m_pD3DDevEx, vy, D3DTEXF_POINT);
+	else { // if (h1 != h2)
+		hr = TextureResizeShader(pTexture, srcRect, destRect, (h1 > h2 * 2) ? shader_downscaling_y : iShader1 + 1);
+	}
 
 	return hr;
 }
