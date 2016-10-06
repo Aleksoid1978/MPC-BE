@@ -3892,8 +3892,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			pPopupMenu->EnableMenuItem(i, MF_BYPOSITION|fState);
 			continue;
 		}
-		if (firstSubItemID == ID_VIEW_VF_HALF				// is "Video Frame" submenu
-				|| firstSubItemID == ID_VIEW_INCSIZE		// is "Pan&Scan" submenu
+		if (firstSubItemID == ID_VIEW_INCSIZE					// is "Pan&Scan" submenu
 				|| firstSubItemID == ID_ASPECTRATIO_SOURCE	// is "Override Aspect Ratio" submenu
 				|| firstSubItemID == ID_VIEW_ZOOM_50) {		// is "Zoom" submenu
 			UINT fState = (m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly)
@@ -7111,8 +7110,6 @@ void CMainFrame::OnViewDefaultVideoFrame(UINT nID)
 
 void CMainFrame::OnUpdateViewDefaultVideoFrame(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
-
 	if (AfxGetAppSettings().iDefaultVideoSize == (pCmdUI->m_nID - ID_VIEW_VF_HALF)) {
 		CheckMenuRadioItem(ID_VIEW_VF_HALF, ID_VIEW_VF_ZOOM2, pCmdUI->m_nID);
 	}
