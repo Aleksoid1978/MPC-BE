@@ -183,7 +183,7 @@ namespace DSObjects
 		HMODULE m_hDxva2Lib = NULL;
 		BOOL InitializeDXVA2VP(int width, int height);
 		BOOL CreateDXVA2VPDevice(REFGUID guid);
-		HRESULT RenderVideoDXVA(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect);
+		HRESULT TextureResizeDXVA(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect);
 #endif
 
 		// init processing textures
