@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="data-io.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dbesi0.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fft4g32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fft4g64.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pffft32s.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="soxr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vr32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cr32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cr32s.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cr64.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cr64s.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pffft64s.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="util32s.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="util64s.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="soxr-config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="soxr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{baff0326-7ce4-4a76-af73-fdca585477e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b2893af2-4047-4ce5-80aa-39ae4026fcb8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

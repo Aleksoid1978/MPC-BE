@@ -244,6 +244,9 @@
     <ProjectReference Include="..\..\..\ExtLib\openjpeg\openjpeg.vcxproj">
       <Project>{1557aa86-976c-4315-8fe8-a138e33f6580}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\ExtLib\soxr\soxr.vcxproj">
+      <Project>{88240767-4b7a-49e9-9e83-2f9e283d4f26}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\ExtLib\zlib\zlib.vcxproj">
       <Project>{2fcd4b66-9cf9-4c8f-bc70-37cd20002d49}</Project>
     </ProjectReference>
