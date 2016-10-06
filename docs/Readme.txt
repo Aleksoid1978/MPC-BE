@@ -53,6 +53,7 @@ Logitech SDK        -                          -
 MediaInfo           BSD License                http://sourceforge.net/projects/mediainfo/
 MusePack            GPL                        http://musepack.net/
 ResizableLib        Artistic License           http://sourceforge.net/projects/resizablelib/
+soxr                LGPL                       http://soxr.sourceforge.net
 TreePropSheet       -                          -
 VirtualDub          GPLv2                      http://virtualdub.org/
 ZenLib              zlib / libpng License      http://sourceforge.net/projects/zenlib/

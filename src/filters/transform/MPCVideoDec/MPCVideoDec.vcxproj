@@ -283,6 +283,9 @@
     <ProjectReference Include="..\..\..\ExtLib\openjpeg\openjpeg.vcxproj">
       <Project>{1557aa86-976c-4315-8fe8-a138e33f6580}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\ExtLib\soxr\soxr.vcxproj">
+      <Project>{88240767-4b7a-49e9-9e83-2f9e283d4f26}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\ExtLib\VirtualDub\Kasumi\Kasumi.vcxproj">
       <Project>{0d252872-7542-4232-8d02-53f9182aee15}</Project>
     </ProjectReference>

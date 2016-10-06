@@ -517,6 +517,9 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ExtLib\soxr\soxr.vcxproj">
+      <Project>{88240767-4b7a-49e9-9e83-2f9e283d4f26}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Shaders\Shaders.vcxproj">
       <Project>{154D3FA8-9BB8-4EC1-8D56-DA14715ACD56}</Project>
     </ProjectReference>

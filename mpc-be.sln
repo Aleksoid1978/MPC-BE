@@ -26,8 +26,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Transform", "Transform", "{F9F42BF2-3F13-4654-82C5-E27B8879EC4E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mpc-be", "src\apps\mplayerc\mpc-be.vcxproj", "{8CE7E5D0-C821-47AC-A247-28EC95B34670}"
+	ProjectSection(ProjectDependencies) = postProject
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26} = {88240767-4B7A-49E9-9E83-2F9E283D4F26}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DSUtil", "src\DSUtil\DSUtil.vcxproj", "{FC70988B-1AE5-4381-866D-4F405E28AC42}"
+	ProjectSection(ProjectDependencies) = postProject
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26} = {88240767-4B7A-49E9-9E83-2F9E283D4F26}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "src\ExtLib\libpng\libpng.vcxproj", "{FC8080D1-603C-45EC-BCFA-7172E2F3D989}"
 EndProject
@@ -179,6 +185,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BinkSplitter", "src\filters\parser\BinkSplitter\BinkSplitter.vcxproj", "{2BC02329-D46C-4EC5-B5C7-30E21CD41F78}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shaders", "src\Shaders\Shaders.vcxproj", "{154D3FA8-9BB8-4EC1-8D56-DA14715ACD56}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "soxr", "src\ExtLib\soxr\soxr.vcxproj", "{88240767-4B7A-49E9-9E83-2F9E283D4F26}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1230,6 +1238,22 @@ Global
 		{154D3FA8-9BB8-4EC1-8D56-DA14715ACD56}.Release|Win32.Build.0 = Release|Win32
 		{154D3FA8-9BB8-4EC1-8D56-DA14715ACD56}.Release|x64.ActiveCfg = Release|x64
 		{154D3FA8-9BB8-4EC1-8D56-DA14715ACD56}.Release|x64.Build.0 = Release|x64
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Debug Filter|Win32.ActiveCfg = Debug|Win32
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Debug Filter|Win32.Build.0 = Debug|Win32
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Debug Filter|x64.ActiveCfg = Debug|x64
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Debug Filter|x64.Build.0 = Debug|x64
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Debug|Win32.ActiveCfg = Debug|Win32
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Debug|Win32.Build.0 = Debug|Win32
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Debug|x64.ActiveCfg = Debug|x64
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Debug|x64.Build.0 = Debug|x64
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Release Filter|Win32.ActiveCfg = Release|Win32
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Release Filter|Win32.Build.0 = Release|Win32
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Release Filter|x64.ActiveCfg = Release|x64
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Release Filter|x64.Build.0 = Release|x64
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Release|Win32.ActiveCfg = Release|Win32
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Release|Win32.Build.0 = Release|Win32
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Release|x64.ActiveCfg = Release|x64
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1312,5 +1336,6 @@ Global
 		{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87} = {D9A0529B-9EC4-4D30-9E05-A5D533739D95}
 		{2BC02329-D46C-4EC5-B5C7-30E21CD41F78} = {D626CC4F-BFB1-4030-8DD8-1A3A1D41248E}
 		{154D3FA8-9BB8-4EC1-8D56-DA14715ACD56} = {A21F07E6-A891-479C-98EA-EDB58CE4EFAB}
+		{88240767-4B7A-49E9-9E83-2F9E283D4F26} = {D9A0529B-9EC4-4D30-9E05-A5D533739D95}
 	EndGlobalSection
 EndGlobal
