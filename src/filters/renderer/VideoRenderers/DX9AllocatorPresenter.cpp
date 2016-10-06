@@ -1274,7 +1274,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	HRESULT hr = S_OK;
-	bool bStereo3DTransform = (m_RenderingPath == RENDERING_PATH_DRAW && rd->m_iStereo3DTransform != STEREO3D_AsIs && rs.iResizer != RESIZER_DXVA2);
+	const bool bStereo3DTransform = (m_RenderingPath == RENDERING_PATH_DRAW && rd->m_iStereo3DTransform != STEREO3D_AsIs);
 
 	m_pD3DDevEx->BeginScene();
 
