@@ -1389,6 +1389,7 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 			m_Resampler.UpdateInput(in_sf, in_layout, in_samplerate);
 			m_Resampler.UpdateOutput(out_sf, out_layout, out_samplerate);
 			out_samples = m_Resampler.CalcOutSamples(in_samples);
+			int delay   = m_Resampler.GetInputDelay();
 			buff        = DNew BYTE[out_samples * out_channels * get_bytes_per_sample(out_sf)];
 			if (!buff) {
 				return E_OUTOFMEMORY;
@@ -1396,6 +1397,12 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 			out_samples = m_Resampler.Mixing(buff, out_samples, in_buff, in_samples);
 			bUseMixer   = true;
 			sfmt        = out_sf;
+
+			if (delay && rtStart != INVALID_TIME) {
+				const REFERENCE_TIME rtDelay = FramesToTime(delay, m_pWaveFileFormat);
+				rtStart -= rtDelay;
+				rtStop  -= rtDelay;
+			}
 		} else {
 			buff = in_buff;
 		}
@@ -2225,7 +2232,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 					BOOL bReSync = FALSE;
 					if (!m_nSampleOffset) {
 						const REFERENCE_TIME rtTimeDelta = m_CurrentPacket->rtStart - m_rtNextSampleTime;
-						if (abs(rtTimeDelta) > 100) {
+						if (abs(rtTimeDelta) > 200) {
 #if defined(_DEBUG) && DBGLOG_LEVEL
 							DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - Discontinuity detected by %.2f ms", rtTimeDelta / 10000.0);
 #endif
