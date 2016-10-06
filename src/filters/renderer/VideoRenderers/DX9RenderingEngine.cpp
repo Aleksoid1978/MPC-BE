@@ -321,14 +321,6 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 		return S_OK;
 	}
 
-#if DXVAVP
-	if (GetRenderersSettings().iResizer == RESIZER_DXVA2) {
-		if (S_OK == RenderVideoDXVA(pRenderTarget, srcRect, destRect)) {
-			return S_OK;
-		}
-	}
-#endif
-
 	if (m_RenderingPath == RENDERING_PATH_DRAW) {
 		return RenderVideoDrawPath(pRenderTarget, srcRect, destRect);
 	} else {
@@ -589,6 +581,10 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		case RESIZER_BILINEAR:
 			m_wsResizer = L"Bilinear";
 			hr = TextureResize(pVideoTexture, srcRect, destRect, D3DTEXF_LINEAR);
+			break;
+		case RESIZER_DXVA2:
+			m_wsResizer = L"DXVA2-VP";
+			hr = TextureResizeDXVA(pVideoTexture, srcRect, destRect);
 			break;
 		case RESIZER_SHADER_BSPLINE4:
 			m_wsResizer = L"B-spline4";
@@ -890,13 +886,13 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 	return TRUE;
 }
 
-HRESULT CDX9RenderingEngine::RenderVideoDXVA(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect)
+HRESULT CDX9RenderingEngine::TextureResizeDXVA(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect)
 {
-	HRESULT hr;
+	HRESULT hr = S_OK;
 
-	// Return if the render target or the video surface is not initialized
-	if (pRenderTarget == NULL || m_pVideoSurfaces[m_nCurSurface] == NULL) {
-		return S_OK;
+	D3DSURFACE_DESC desc;
+	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc))) {
+		return E_FAIL;
 	}
 
 	if (!m_pDXVAVPD && !InitializeDXVA2VP(srcRect.Width(), srcRect.Height())) {
@@ -913,6 +909,8 @@ HRESULT CDX9RenderingEngine::RenderVideoDXVA(IDirect3DSurface9* pRenderTarget, c
 	LONGLONG end_100ns   = start_100ns + LONGLONG(VIDEO_100NSPF);
 	frame++;
 
+	CComPtr<IDirect3DSurface9> pRenderTarget;
+	m_pD3DDevEx->GetRenderTarget(0, &pRenderTarget);
 	CRect rSrcRect(srcRect);
 	CRect rDstRect(destRect);
 	ClipToSurface(pRenderTarget, rSrcRect, rDstRect);
@@ -976,7 +974,10 @@ HRESULT CDX9RenderingEngine::RenderVideoDXVA(IDirect3DSurface9* pRenderTarget, c
 
 	samples[0].SampleFormat.SampleFormat = DXVA2_SampleProgressiveFrame;
 
-	samples[0].SrcSurface = m_pVideoSurfaces[m_nCurSurface];
+	CComPtr<IDirect3DSurface9> pSurface;
+	pTexture->GetSurfaceLevel(0, &pSurface);
+
+	samples[0].SrcSurface = pSurface;
 
 	// DXVA2_VideoProcess_SubRects
 	samples[0].SrcRect = rSrcRect;
@@ -991,6 +992,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDXVA(IDirect3DSurface9* pRenderTarget, c
 	CRect clientRect;
 	if (rDstRect.left > 0 || rDstRect.top > 0 ||
 			GetClientRect(m_hWnd, clientRect) && (rDstRect.right < clientRect.Width() || rDstRect.bottom < clientRect.Height())) {
+		//m_pD3DDevEx->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0); //  not worked
 		m_pD3DDevEx->ColorFill(pRenderTarget, NULL, 0);
 	}
 
