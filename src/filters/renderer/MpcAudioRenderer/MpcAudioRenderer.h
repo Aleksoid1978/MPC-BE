@@ -165,8 +165,8 @@ public:
 private:
 	HRESULT					GetReferenceClockInterface(REFIID riid, void **ppv);
 
-	WAVEFORMATEX			*m_pWaveFileFormat;
-	WAVEFORMATEX			*m_pWaveFileFormatOutput;
+	WAVEFORMATEX			*m_pWaveFormatExInput;
+	WAVEFORMATEX			*m_pWaveFormatExOutput;
 	CBaseReferenceClock*	m_pReferenceClock;
 	double					m_dRate;
 	long					m_lVolume;
@@ -176,7 +176,7 @@ private:
 	DWORD					m_dwBalanceMask;
 	bool					m_bUpdateBalanceMask; // TODO: remove it
 
-	void					SetBalanceMask(DWORD output_layout);
+	void					SetBalanceMask(const DWORD output_layout);
 	void					ApplyVolumeBalance(BYTE* pData, UINT32 size);
 
 	CFilter					m_Filter;
@@ -286,6 +286,14 @@ private:
 		}
 	};
 	CSimpleArray<AudioParams> m_AudioParamsList;
+
+	struct AudioFormats {
+		SampleFormat sf = SAMPLE_FMT_NONE;
+		DWORD layout    = 0;
+		int channels    = 0;
+		int samplerate  = 0;
+	};
+	AudioFormats m_input_params, m_output_params;
 };
 
 class CMpcAudioRendererInputPin final

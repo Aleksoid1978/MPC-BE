@@ -114,8 +114,8 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	: CBaseRenderer(__uuidof(this), NAME("CMpcAudioRenderer"), punk, phr)
 	, m_dRate(1.0)
 	, m_pReferenceClock(NULL)
-	, m_pWaveFileFormat(NULL)
-	, m_pWaveFileFormatOutput(NULL)
+	, m_pWaveFormatExInput(NULL)
+	, m_pWaveFormatExOutput(NULL)
 	, m_pMMDevice(NULL)
 	, m_pAudioClient(NULL)
 	, m_pRenderClient(NULL)
@@ -291,8 +291,8 @@ CMpcAudioRenderer::~CMpcAudioRenderer()
 		SAFE_RELEASE(m_pReferenceClock);
 	}
 
-	SAFE_DELETE_ARRAY(m_pWaveFileFormat);
-	SAFE_DELETE_ARRAY(m_pWaveFileFormatOutput);
+	SAFE_DELETE_ARRAY(m_pWaveFormatExInput);
+	SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
 
 	if (m_hModule) {
 		FreeLibrary(m_hModule);
@@ -471,7 +471,7 @@ HRESULT CMpcAudioRenderer::SetMediaType(const CMediaType *pmt)
 
 	EXIT_ON_ERROR(hr);
 
-	CopyWaveFormat(pwf, &m_pWaveFileFormat);
+	CopyWaveFormat(pwf, &m_pWaveFormatExInput);
 
 	return CBaseRenderer::SetMediaType(pmt);
 }
@@ -1055,8 +1055,8 @@ STDMETHODIMP CMpcAudioRenderer::GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX**
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	*ppWfxIn  = m_pWaveFileFormat;
-	*ppWfxOut = m_pWaveFileFormatOutput;
+	*ppWfxIn  = m_pWaveFormatExInput;
+	*ppWfxOut = m_pWaveFormatExOutput;
 
 	return S_OK;
 }
@@ -1153,7 +1153,7 @@ HRESULT CMpcAudioRenderer::GetReferenceClockInterface(REFIID riid, void **ppv)
 	return GetReferenceClockInterface(riid, ppv);
 }
 
-void CMpcAudioRenderer::SetBalanceMask(DWORD output_layout)
+void CMpcAudioRenderer::SetBalanceMask(const DWORD output_layout)
 {
 	m_dwBalanceMask = 0;
 	DWORD quiet_layout = 0;
@@ -1228,8 +1228,12 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 		return S_FALSE;
 	}
 
-	CheckPointer(m_pWaveFileFormat, S_FALSE);
-	CheckPointer(m_pWaveFileFormatOutput, S_FALSE);
+	CheckPointer(m_pWaveFormatExInput, S_FALSE);
+	CheckPointer(m_pWaveFormatExOutput, S_FALSE);
+
+	if (m_input_params.sf == SAMPLE_FMT_NONE || m_output_params.sf == SAMPLE_FMT_NONE) {
+		return S_FALSE;
+	}
 
 	long lSize = pMediaSample->GetActualDataLength();
 	if (!lSize) {
@@ -1245,152 +1249,52 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 		return S_FALSE;
 	}
 
-	HRESULT	hr = S_OK;
-
-	BYTE *pMediaBuffer        = NULL;
-	BYTE *pInputBufferPointer = NULL;
-
-	SampleFormat in_sf;
-	DWORD in_layout;
-	int   in_channels;
-	int   in_samplerate;
-	int   in_samples;
-
-	SampleFormat out_sf;
-	DWORD out_layout;
-	int   out_channels;
-	int   out_samplerate;
-
-	BYTE* buff    = NULL;
-	BYTE* out_buf = NULL;
-
-	const bool bFormatChanged = !m_bIsBitstream && IsFormatChanged(m_pWaveFileFormat, m_pWaveFileFormatOutput);
-	if (bFormatChanged) {
-		// prepare for resample ... if needed
-		const WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_pWaveFileFormat;
-		in_channels   = wfe->nChannels;
-		in_samplerate = wfe->nSamplesPerSec;
-		in_samples    = lSize / wfe->nBlockAlign;
-		bool isfloat  = false;
-		if (IsWaveFormatExtensible(wfe)) {
-			const WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)m_pWaveFileFormat;
-			in_layout = wfex->dwChannelMask;
-			isfloat   = !!(wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT);
-		} else {
-			in_layout = GetDefChannelMask(wfe->nChannels);
-			isfloat   = !!(wfe->wFormatTag == WAVE_FORMAT_IEEE_FLOAT);
-		}
-		if (isfloat) {
-			switch (wfe->wBitsPerSample) {
-				case 32:
-					in_sf = SAMPLE_FMT_FLT;
-					break;
-				case 64:
-					in_sf = SAMPLE_FMT_DBL;
-					break;
-				default:
-					return E_INVALIDARG;
-			}
-		} else {
-			switch (wfe->wBitsPerSample) {
-				case 8:
-					in_sf = SAMPLE_FMT_U8;
-					break;
-				case 16:
-					in_sf = SAMPLE_FMT_S16;
-					break;
-				case 24:
-					in_sf = SAMPLE_FMT_S24;
-					break;
-				case 32:
-					in_sf = SAMPLE_FMT_S32;
-					break;
-				default:
-					return E_INVALIDARG;
-			}
-		}
-
-		const WAVEFORMATEX* wfeOutput = (WAVEFORMATEX*)m_pWaveFileFormatOutput;
-		out_channels   = wfeOutput->nChannels;;
-		out_samplerate = wfeOutput->nSamplesPerSec;
-		isfloat        = false;
-		if (IsWaveFormatExtensible(wfeOutput)) {
-			const WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)m_pWaveFileFormatOutput;
-			out_layout = wfex->dwChannelMask;
-			isfloat    = !!(wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT);
-		} else {
-			out_layout = GetDefChannelMask(wfeOutput->nChannels);
-			isfloat    = !!(wfeOutput->wFormatTag == WAVE_FORMAT_IEEE_FLOAT);
-		}
-		if (isfloat) {
-			if (wfeOutput->wBitsPerSample == 32) {
-				out_sf = SAMPLE_FMT_FLT;
-			} else {
-				return E_INVALIDARG;
-			}
-		} else {
-			switch (wfeOutput->wBitsPerSample) {
-				case 16:
-					out_sf = SAMPLE_FMT_S16;
-					break;
-				case 24:
-					out_sf = SAMPLE_FMT_S24;
-					break;
-				case 32:
-					out_sf = SAMPLE_FMT_S32;
-					break;
-				default:
-					return E_INVALIDARG;
-			}
-		}
-	}
-
-	if (m_bUpdateBalanceMask) {
-		const WAVEFORMATEX* wfeOutput = (WAVEFORMATEX*)m_pWaveFileFormatOutput;
-		if (IsWaveFormatExtensible(wfeOutput)) {
-			const WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)m_pWaveFileFormatOutput;
-			out_layout = wfex->dwChannelMask;
-		}
-		else {
-			out_layout = GetDefChannelMask(wfeOutput->nChannels);
-		}
-
-		SetBalanceMask(out_layout);
-		m_bUpdateBalanceMask = false;
-	}
-
-	hr = pMediaSample->GetPointer(&pMediaBuffer);
+	BYTE *pMediaBuffer = NULL;
+	HRESULT hr = pMediaSample->GetPointer(&pMediaBuffer);
 	if (FAILED(hr)) {
 		return hr;
 	}
 
+	BYTE *pInputBufferPointer = NULL;
+
+	BYTE* buff    = NULL;
+	BYTE* out_buf = NULL;
+
+	if (m_bUpdateBalanceMask) {
+		SetBalanceMask(m_output_params.layout);
+		m_bUpdateBalanceMask = false;
+	}
+
+	int in_samples = lSize / m_pWaveFormatExInput->nBlockAlign;
+
+	const bool bFormatChanged = !m_bIsBitstream && IsFormatChanged(m_pWaveFormatExInput, m_pWaveFormatExOutput);
 	if (bFormatChanged) {
 		BYTE* in_buff = &pMediaBuffer[0];
 
 		bool bUseMixer    = false;
 		int out_samples   = in_samples;
-		SampleFormat sfmt = in_sf;
+		SampleFormat sfmt = m_input_params.sf;
 
-		if (in_layout != out_layout || in_samplerate != out_samplerate) {
+		if (m_input_params.layout != m_output_params.layout || m_input_params.samplerate != m_output_params.samplerate) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 2
 			DLog(L"CMpcAudioRenderer::DoRenderSampleWasapi() - use Mixer"));
 			DLog(L"    input:"));
-			DLog(L"        layout     = 0x%x", in_layout));
-			DLog(L"        channels   = %d", in_channels));
-			DLog(L"        samplerate = %d", in_samplerate));
+			DLog(L"        layout     = 0x%x", m_input_params.layout));
+			DLog(L"        channels   = %d",   m_input_params.channels));
+			DLog(L"        samplerate = %d",   m_input_params.samplerate));
 			DLog(L"    output:"));
-			DLog(L"        layout     = 0x%x", out_layout));
-			DLog(L"        channels   = %d", out_channels));
-			DLog(L"        samplerate = %d", out_samplerate));
+			DLog(L"        layout     = 0x%x", m_output_params.layout));
+			DLog(L"        channels   = %d",   m_output_params.channels));
+			DLog(L"        samplerate = %d",   m_output_params.samplerate));
 #endif
 
 			CAutoLock cResamplerLock(&m_csResampler);
 
-			m_Resampler.UpdateInput(in_sf, in_layout, in_samplerate);
-			m_Resampler.UpdateOutput(out_sf, out_layout, out_samplerate);
+			m_Resampler.UpdateInput(m_input_params.sf, m_input_params.layout, m_input_params.samplerate);
+			m_Resampler.UpdateOutput(m_output_params.sf, m_output_params.layout, m_output_params.samplerate);
 			out_samples = m_Resampler.CalcOutSamples(in_samples);
 			int delay   = m_Resampler.GetInputDelay();
-			buff        = DNew BYTE[out_samples * out_channels * get_bytes_per_sample(out_sf)];
+			buff        = DNew BYTE[out_samples * m_output_params.channels * get_bytes_per_sample(m_output_params.sf)];
 			if (!buff) {
 				return E_OUTOFMEMORY;
 			}
@@ -1400,10 +1304,10 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 				return S_OK;
 			}
 			bUseMixer   = true;
-			sfmt        = out_sf;
+			sfmt        = m_output_params.sf;
 
 			if (delay && rtStart != INVALID_TIME) {
-				const REFERENCE_TIME rtDelay = FramesToTime(delay, m_pWaveFileFormat);
+				const REFERENCE_TIME rtDelay = FramesToTime(delay, m_pWaveFormatExInput);
 				rtStart -= rtDelay;
 				rtStop  -= rtDelay;
 			}
@@ -1412,7 +1316,7 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 		}
 
 		{
-			const WAVEFORMATEX* wfeOutput          = (WAVEFORMATEX*)m_pWaveFileFormatOutput;
+			const WAVEFORMATEX* wfeOutput          = (WAVEFORMATEX*)m_pWaveFormatExOutput;
 			const WAVEFORMATEXTENSIBLE* wfexOutput = (WAVEFORMATEXTENSIBLE*)wfeOutput;
 
 			const WORD tag    = wfeOutput->wFormatTag;
@@ -1424,23 +1328,23 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 #if defined(_DEBUG) && DBGLOG_LEVEL > 2
 					DLog(L"CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 16bit PCM", GetSampleFormatString(sfmt));
 #endif
-					lSize   = out_samples * out_channels * sizeof(int16_t);
+					lSize   = out_samples * m_output_params.channels * sizeof(int16_t);
 					out_buf = DNew BYTE[lSize];
-					convert_to_int16(sfmt, out_channels, out_samples, buff, (int16_t*)out_buf);
+					convert_to_int16(sfmt, m_output_params.channels, out_samples, buff, (int16_t*)out_buf);
 				} else if (wfeOutput->wBitsPerSample == 24) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 2
 					DLog(L"CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 24bit PCM", GetSampleFormatString(sfmt));
 #endif
-					lSize   = out_samples * out_channels * sizeof(BYTE) * 3;
+					lSize   = out_samples * m_output_params.channels * sizeof(BYTE) * 3;
 					out_buf = DNew BYTE[lSize];
-					convert_to_int24(sfmt, out_channels, out_samples, buff, out_buf);
+					convert_to_int24(sfmt, m_output_params.channels, out_samples, buff, out_buf);
 				} else if (wfeOutput->wBitsPerSample == 32) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 2
 					DLog(L"CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 32bit PCM", GetSampleFormatString(sfmt));
 #endif
-					lSize   = out_samples * out_channels * sizeof(int32_t);
+					lSize   = out_samples * m_output_params.channels * sizeof(int32_t);
 					out_buf = DNew BYTE[lSize];
-					convert_to_int32(sfmt, out_channels, out_samples, buff, (int32_t*)out_buf);
+					convert_to_int32(sfmt, m_output_params.channels, out_samples, buff, (int32_t*)out_buf);
 				} else {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 2
 					DLog(L"CMpcAudioRenderer::DoRenderSampleWasapi() - unsupported format");
@@ -1451,9 +1355,9 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 #if defined(_DEBUG) && DBGLOG_LEVEL > 2
 					DLog(L"CMpcAudioRenderer::DoRenderSampleWasapi() - convert from '%s' to 32bit FLOAT", GetSampleFormatString(sfmt));
 #endif
-					lSize   = out_samples * out_channels * sizeof(float);
+					lSize   = out_samples * m_output_params.channels * sizeof(float);
 					out_buf = DNew BYTE[lSize];
-					convert_to_float(sfmt, out_channels, out_samples, buff, (float*)out_buf);
+					convert_to_float(sfmt, m_output_params.channels, out_samples, buff, (float*)out_buf);
 				} else {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 2
 					DLog(L"CMpcAudioRenderer::DoRenderSampleWasapi() - unsupported format");
@@ -1482,7 +1386,7 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 	p->SetData(pInputBufferPointer, lSize);
 
 	if (m_bIsBitstream && m_BitstreamMode == BITSTREAM_NONE) {
-		if (m_pWaveFileFormatOutput->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
+		if (m_pWaveFormatExOutput->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
 			m_BitstreamMode = BITSTREAM_DTS;
 			// AC3/DTS
 			if (lSize > 8) {
@@ -1491,8 +1395,8 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 					m_BitstreamMode = BITSTREAM_AC3;
 				}
 			}
-		} else if (IsWaveFormatExtensible(m_pWaveFileFormatOutput)) {
-			const WAVEFORMATEXTENSIBLE *wfex = (WAVEFORMATEXTENSIBLE*)m_pWaveFileFormatOutput;
+		} else if (IsWaveFormatExtensible(m_pWaveFormatExOutput)) {
+			const WAVEFORMATEXTENSIBLE *wfex = (WAVEFORMATEXTENSIBLE*)m_pWaveFormatExOutput;
 			if (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS) {
 				m_BitstreamMode = BITSTREAM_EAC3;
 			} else if (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD) {
@@ -1505,7 +1409,7 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 
 	if (m_dRate != 1.0
 			&& !m_bIsBitstream
-			&& (m_Filter.IsInitialized() || SUCCEEDED(m_Filter.Init(m_dRate, m_pWaveFileFormatOutput)) )) {
+			&& (m_Filter.IsInitialized() || SUCCEEDED(m_Filter.Init(m_dRate, m_pWaveFormatExOutput)) )) {
 		if (SUCCEEDED(m_Filter.Push(p))) {
 			while (SUCCEEDED(m_Filter.Pull(p))) {
 				PushToQueue(p);
@@ -1531,11 +1435,11 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 	}
 
 	if (!m_pRenderClient) {
-		InitAudioClient(m_pWaveFileFormatOutput);
+		InitAudioClient(m_pWaveFormatExOutput);
 	}
 	if (!m_pRenderClient) {
 		if (p->rtStart != INVALID_TIME) {
-			const REFERENCE_TIME rtDuration = FramesToTime(p->GetCount() / m_pWaveFileFormatOutput->nBlockAlign, m_pWaveFileFormatOutput);
+			const REFERENCE_TIME rtDuration = FramesToTime(p->GetCount() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
 			const REFERENCE_TIME rtStop = p->rtStart + rtDuration;
 			REFERENCE_TIME rtRefClock = INVALID_TIME;
 
@@ -1591,7 +1495,7 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 	BOOL bInitNeed = TRUE;
 
 	auto CheckFormatChanged = [&](WAVEFORMATEX *pWaveFormatEx, WAVEFORMATEX **ppNewWaveFormatEx) {
-		if (m_pWaveFileFormat == NULL || IsFormatChanged(pWaveFormatEx, m_pWaveFileFormat)) {
+		if (m_pWaveFormatExInput == NULL || IsFormatChanged(pWaveFormatEx, m_pWaveFormatExInput)) {
 			return CopyWaveFormat(pWaveFormatEx, ppNewWaveFormatEx);
 		}
 
@@ -1599,12 +1503,12 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 	};
 
 	// Compare the exisiting WAVEFORMATEX with the one provided
-	if (CheckFormatChanged(pWaveFormatEx, &m_pWaveFileFormat) || !m_pWaveFileFormatOutput) {
+	if (CheckFormatChanged(pWaveFormatEx, &m_pWaveFormatExInput) || !m_pWaveFormatExOutput) {
 
 		// Format has changed, audio client has to be reinitialized
 		DLog(L"CMpcAudioRenderer::CheckAudioClient() - Format changed, reinitialize the audio client");
 
-		CopyWaveFormat(m_pWaveFileFormat, &m_pWaveFileFormatOutput);
+		CopyWaveFormat(m_pWaveFormatExInput, &m_pWaveFormatExOutput);
 
 		if (IsExclusive(pWaveFormatEx)) { // EXCLUSIVE/BITSTREAM
 			WAVEFORMATEX *pFormat = NULL;
@@ -1632,7 +1536,7 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 							CreateFormat(wfex, wfexAsIs.Format.wBitsPerSample, pWaveFormatEx->nChannels, dwChannelMask, pWaveFormatEx->nSamplesPerSec);
 							hr = InitAudioClient((WAVEFORMATEX*)&wfex, FALSE);
 							if (S_OK == hr) {
-								CopyWaveFormat((WAVEFORMATEX*)&wfex, &m_pWaveFileFormatOutput);
+								CopyWaveFormat((WAVEFORMATEX*)&wfex, &m_pWaveFormatExOutput);
 								bInitNeed = FALSE;
 							}
 						}
@@ -1662,7 +1566,7 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 			if (bInitNeed) {
 				hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, pFormat, NULL);
 				if (S_OK == hr) {
-					CopyWaveFormat(pFormat, &m_pWaveFileFormatOutput);
+					CopyWaveFormat(pFormat, &m_pWaveFormatExOutput);
 				}
 			}
 
@@ -1674,7 +1578,7 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 			WAVEFORMATEX* pDeviceFormat	= NULL;
 			hr = m_pAudioClient->GetMixFormat(&pDeviceFormat);
 			if (SUCCEEDED(hr) && pDeviceFormat) {
-				CopyWaveFormat(pDeviceFormat, &m_pWaveFileFormatOutput);
+				CopyWaveFormat(pDeviceFormat, &m_pWaveFormatExOutput);
 				CoTaskMemFree(pDeviceFormat);
 			}
 		}
@@ -1684,7 +1588,7 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 		DumpWaveFormatEx(pWaveFormatEx);
 
 		DLog(L"    Output format:");
-		DumpWaveFormatEx(m_pWaveFileFormatOutput);
+		DumpWaveFormatEx(m_pWaveFormatExOutput);
 #endif
 
 		if (S_OK == hr) {
@@ -1697,11 +1601,11 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 			}
 		} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr) {
 			DLog(L"CMpcAudioRenderer::CheckAudioClient() - WASAPI client refused the format");
-			SAFE_DELETE_ARRAY(m_pWaveFileFormatOutput);
+			SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
 			return hr;
 		} else {
 			DLog(L"CMpcAudioRenderer::CheckAudioClient() - WASAPI failed: (0x%08x)", hr);
-			SAFE_DELETE_ARRAY(m_pWaveFileFormatOutput);
+			SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
 			return hr;
 		}
 	} else if (m_pRenderClient == NULL) {
@@ -1712,11 +1616,56 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 
 	if (SUCCEEDED(hr) && bInitNeed) {
 		SAFE_RELEASE(m_pRenderClient);
-		hr = InitAudioClient(m_pWaveFileFormatOutput);
+		hr = InitAudioClient(m_pWaveFormatExOutput);
 	}
 
 	if (SUCCEEDED(hr)) {
 		m_Filter.Flush();
+	}
+
+	if (SUCCEEDED(hr)) {
+		auto FillFormats = [](const WAVEFORMATEX* pwfe, AudioFormats& format, bool bInput) {
+			ZeroMemory(&format, sizeof(format));
+			format.sf = SAMPLE_FMT_NONE;
+
+			format.channels   = pwfe->nChannels;
+			format.samplerate = pwfe->nSamplesPerSec;
+
+			bool bFloat = false;
+			if (IsWaveFormatExtensible(pwfe)) {
+				const WAVEFORMATEXTENSIBLE* pwfex = (WAVEFORMATEXTENSIBLE*)pwfe;
+				format.layout = pwfex->dwChannelMask;
+				bFloat        = !!(pwfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT);
+			} else {
+				format.layout = GetDefChannelMask(pwfe->nChannels);
+				bFloat        = !!(pwfe->wFormatTag == WAVE_FORMAT_IEEE_FLOAT);
+			}
+
+			switch (pwfe->wBitsPerSample) {
+				case 8:
+					if (bInput) {
+						format.sf = SAMPLE_FMT_U8;
+					}
+					break;
+				case 16:
+					format.sf = SAMPLE_FMT_S16;
+					break;
+				case 24:
+					format.sf = SAMPLE_FMT_S24;
+					break;
+				case 32:
+					format.sf = bFloat ? SAMPLE_FMT_FLT : SAMPLE_FMT_S32;
+					break;
+				case 64:
+					if (bInput && bFloat) {
+						format.sf = SAMPLE_FMT_DBL;
+					}
+					break;
+			}
+		};
+
+		FillFormats(m_pWaveFormatExInput, m_input_params, true);
+		FillFormats(m_pWaveFormatExOutput, m_output_params, false);
 	}
 
 	return hr;
@@ -2114,7 +2063,7 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 	CAutoLock cRenderLock(&m_csRender);
 
 	WAVEFORMATEX* pWaveFormatEx = NULL;
-	CopyWaveFormat(m_pWaveFileFormat, &pWaveFormatEx);
+	CopyWaveFormat(m_pWaveFormatExInput, &pWaveFormatEx);
 
 	if (m_bIsAudioClientStarted && m_pAudioClient) {
 		m_pAudioClient->Stop();
@@ -2126,7 +2075,7 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 		SAFE_RELEASE(m_pAudioClient);
 		SAFE_RELEASE(m_pMMDevice);
 
-		SAFE_DELETE_ARRAY(m_pWaveFileFormat);
+		SAFE_DELETE_ARRAY(m_pWaveFormatExInput);
 
 		m_wBitsPerSampleList.RemoveAll();
 		m_nChannelsList.RemoveAll();
@@ -2135,7 +2084,7 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 
 		m_bReal32bitSupport = FALSE;
 	}
-	SAFE_DELETE_ARRAY(m_pWaveFileFormatOutput);
+	SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
 
 	HRESULT hr = S_OK;
 
@@ -2162,7 +2111,7 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 {
 	CheckPointer(m_pRenderClient, S_OK);
-	CheckPointer(m_pWaveFileFormatOutput, S_OK);
+	CheckPointer(m_pWaveFormatExOutput, S_OK);
 
 	CAutoLock cRenderLock(&m_csRender);
 
@@ -2180,7 +2129,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 	}
 
 	const UINT32 numFramesAvailable = m_nFramesInBuffer - numFramesPadding;
-	const UINT32 nAvailableBytes = numFramesAvailable * m_pWaveFileFormatOutput->nBlockAlign;
+	const UINT32 nAvailableBytes = numFramesAvailable * m_pWaveFormatExOutput->nBlockAlign;
 
 	BYTE* pData = NULL;
 	hr = m_pRenderClient->GetBuffer(numFramesAvailable, &pData);
@@ -2251,11 +2200,11 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 							}
 						}
 
-						const REFERENCE_TIME rtDuration = FramesToTime(m_CurrentPacket->GetCount() / m_pWaveFileFormatOutput->nBlockAlign, m_pWaveFileFormatOutput);
+						const REFERENCE_TIME rtDuration = FramesToTime(m_CurrentPacket->GetCount() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
 						m_rtNextSampleTime = m_CurrentPacket->rtStart + rtDuration;
 					}
 
-					const REFERENCE_TIME offsetDelay = m_nSampleOffset > 0 ? FramesToTime(m_nSampleOffset / m_pWaveFileFormatOutput->nBlockAlign, m_pWaveFileFormatOutput) : 0;
+					const REFERENCE_TIME offsetDelay = m_nSampleOffset > 0 ? FramesToTime(m_nSampleOffset / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput) : 0;
 					const REFERENCE_TIME dueTime = m_CurrentPacket->rtStart + offsetDelay;
 					if (dueTime < rtRefClock - m_hnsPeriod) {
 #if defined(_DEBUG) && DBGLOG_LEVEL
@@ -2274,8 +2223,8 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 						&& rtRefClock != INVALID_TIME
 						&& rtWaitRenderTime > rtRefClock) {
 					const REFERENCE_TIME rtSilenceDuration = rtWaitRenderTime - rtRefClock;
-					const UINT32 nSilenceFrames = TimeToFrames(rtSilenceDuration, m_pWaveFileFormatOutput);
-					const UINT32 nSilenceBytes = min(nSilenceFrames * m_pWaveFileFormatOutput->nBlockAlign, nAvailableBytes - nWritenBytes);
+					const UINT32 nSilenceFrames = TimeToFrames(rtSilenceDuration, m_pWaveFormatExOutput);
+					const UINT32 nSilenceBytes  = min(nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign, nAvailableBytes - nWritenBytes);
 #if defined(_DEBUG) && DBGLOG_LEVEL
 					DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - Pad silence %.2f ms [%u/%u (frames/bytes)] for clock matching at %I64d/%I64d",
 							rtSilenceDuration / 10000.0, nSilenceFrames, nSilenceBytes, rtRefClock, rtWaitRenderTime);
@@ -2334,11 +2283,11 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 
 void CMpcAudioRenderer::CheckBufferStatus()
 {
-	if (!m_pWaveFileFormatOutput) {
+	if (!m_pWaveFormatExOutput) {
 		return;
 	}
 
-	const size_t nMaxWasapiQueueSize = m_nFramesInBuffer * m_pWaveFileFormatOutput->nBlockAlign * 10; // TODO - optional ???
+	const size_t nMaxWasapiQueueSize = m_nFramesInBuffer * m_pWaveFormatExOutput->nBlockAlign * 10; // TODO - optional ???
 	const size_t nWasapiQueueSize = WasapiQueueSize();
 
 	if (nWasapiQueueSize < nMaxWasapiQueueSize || !m_pRenderClient) {
@@ -2743,11 +2692,10 @@ inline REFERENCE_TIME CMpcAudioRenderer::GetRefClockTime()
 
 void CMpcAudioRenderer::ApplyVolumeBalance(BYTE* pData, UINT32 size)
 {
-	const WAVEFORMATEX* wfeOutput = (WAVEFORMATEX*)m_pWaveFileFormatOutput;
-	const SampleFormat sf = GetSampleFormat(wfeOutput);
-	const size_t channels = wfeOutput->nChannels;
-	const size_t allsamples = size / (wfeOutput->wBitsPerSample / 8);
-	const size_t samples = allsamples / channels;
+	const SampleFormat sf   = m_output_params.sf;
+	const size_t channels   = m_output_params.channels;
+	const size_t allsamples = size / (m_pWaveFormatExOutput->wBitsPerSample / 8);
+	const size_t samples    = allsamples / channels;
 
 	if (m_lBalance == DSBPAN_CENTER) {
 		switch (sf) {
