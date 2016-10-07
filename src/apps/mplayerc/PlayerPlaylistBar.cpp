@@ -1056,7 +1056,7 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CSubtitleItemList
 		if (!redir.IsEmpty()) {
 			POSITION pos = redir.GetHeadPosition();
 			while (pos) {
-				ParsePlayList(sl.GetNext(pos), subs);
+				ParsePlayList(redir.GetNext(pos), subs);
 			}
 			return;
 		}
