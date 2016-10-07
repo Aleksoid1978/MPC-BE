@@ -362,15 +362,27 @@ HRESULT CNullUVideoRenderer::CheckMediaType(const CMediaType* pmt)
 		   : E_FAIL;
 }
 
+#include "../filters/renderer/VideoRenderers/Utils.h"
 HRESULT CNullUVideoRenderer::DoRenderSample(IMediaSample* pSample)
 {
 #ifdef USE_DXVA
-	CComQIPtr<IMFGetService> pService = pSample;
-	if (pService != NULL) {
-		CComPtr<IDirect3DSurface9>	pSurface;
-		pService->GetService(MR_BUFFER_SERVICE, IID_PPV_ARGS(&pSurface));
-		// TODO : render surface...
-	}
+	#if (_DEBUG) && FALSE
+		static int cnt = 1;
+		if (cnt < 1000) {
+			wchar_t strFile[MAX_PATH] = { 0 };
+			swprintf_s(strFile, L"VideoDump%03d.bmp", cnt++);
+
+			if (CComQIPtr<IMFGetService> pService = pSample) {
+				CComPtr<IDirect3DSurface9> pSurface;
+				if (SUCCEEDED(pService->GetService(MR_BUFFER_SERVICE, IID_PPV_ARGS(&pSurface)))) {
+					CComPtr<IDirect3DDevice9> pDevice;
+					if (SUCCEEDED(pSurface->GetDevice(&pDevice))) {
+						DumpDX9Surface(pDevice, pSurface, strFile);
+					}
+				}
+			}
+		}
+	#endif
 #endif
 
 	return S_OK;
