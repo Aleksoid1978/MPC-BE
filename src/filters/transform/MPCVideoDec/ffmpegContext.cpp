@@ -136,6 +136,8 @@ static const WORD PCID_INTEL_4K [] = {
 	0x1926, // Iris Graphics 540
 	0x1927, // Iris Graphics 550
 	0x192B, // Iris Graphics 555
+	0x192D, // Iris Graphics P555
+	0x193A, // Iris Pro Graphics P580
 	0x193B, // Iris Pro Graphics 580
 	0x193D, // Iris Pro Graphics P580
 	// Atom Z8000 Series
