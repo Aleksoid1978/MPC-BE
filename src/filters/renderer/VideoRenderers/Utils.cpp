@@ -101,3 +101,87 @@ HRESULT DumpDX9RenderTarget(IDirect3DDevice9* pD3DDev, wchar_t* filename)
 
 	return DumpDX9Surface(pD3DDev, pSurface, filename);
 }
+
+HRESULT DumpDX9Surface2(IDirect3DSurface9* pSurface, wchar_t* filename)
+{
+	CheckPointer(pSurface, E_POINTER);
+
+	HRESULT hr;
+	D3DSURFACE_DESC desc = {};
+	D3DLOCKED_RECT r;
+
+	if (FAILED(hr = pSurface->GetDesc(&desc))) {
+		return hr;
+	};
+
+	unsigned pseudobitdepth;
+
+	switch (desc.Format) {
+	case FCC('NV12'):
+	case FCC('YV12'):
+		pseudobitdepth = 8;
+		desc.Height = desc.Height * 3 / 2;
+		break;
+	case D3DFMT_UYVY:
+	case D3DFMT_YUY2:
+		pseudobitdepth = 8;
+		break;
+	case FCC('AYUV'):
+	case D3DFMT_A8R8G8B8:
+	case D3DFMT_X8R8G8B8:
+		pseudobitdepth = 32;
+		break;
+	default:
+		return E_INVALIDARG;
+	}
+
+	unsigned tablecolors = (pseudobitdepth == 8) ? 256 : 0;
+
+	if (FAILED(pSurface->LockRect(&r, NULL, D3DLOCK_READONLY))) {
+		return hr;
+	};
+
+	unsigned len = desc.Width * desc.Height * pseudobitdepth / 8;
+	std::unique_ptr<BYTE[]> dib(DNew BYTE[sizeof(BITMAPINFOHEADER) + tablecolors * 4 + len]);
+
+	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)dib.get();
+	memset(bih, 0, sizeof(BITMAPINFOHEADER));
+	bih->biSize = sizeof(BITMAPINFOHEADER);
+	bih->biWidth = desc.Width;
+	bih->biHeight = desc.Height;
+	bih->biBitCount = pseudobitdepth;
+	bih->biPlanes = 1;
+	bih->biSizeImage = DIBSIZE(*bih);
+	bih->biClrUsed = tablecolors;
+
+	BYTE* p = (BYTE*)(bih + 1);
+	for (unsigned i = 0; i < tablecolors; i++) {
+		*p++ = (BYTE)i;
+		*p++ = (BYTE)i;
+		*p++ = (BYTE)i;
+		*p++ = 0;
+	}
+
+	//memcpy(p, r.pBits, len);
+	BitBltFromRGBToRGB(bih->biWidth, bih->biHeight,
+		p, bih->biWidth, pseudobitdepth,
+		(BYTE*)r.pBits + r.Pitch * (desc.Height - 1), -(int)r.Pitch, pseudobitdepth);
+
+	pSurface->UnlockRect();
+
+	BITMAPFILEHEADER bfh;
+	bfh.bfType = 0x4d42;
+	bfh.bfOffBits = sizeof(bfh) + sizeof(BITMAPINFOHEADER) + tablecolors * 4;
+	bfh.bfSize = bfh.bfOffBits + len;
+	bfh.bfReserved1 = bfh.bfReserved2 = 0;
+
+	FILE* fp;
+	_wfopen_s(&fp, filename, L"wb");
+	if (fp) {
+		fwrite(&bfh, sizeof(bfh), 1, fp);
+		fwrite(dib.get(), sizeof(BITMAPINFOHEADER) + tablecolors * 4 + len, 1, fp);
+		fclose(fp);
+	}
+
+	return hr;
+}
