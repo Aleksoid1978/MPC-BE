@@ -24,10 +24,10 @@
 
 // CItemPropertiesDlg
 
-IMPLEMENT_DYNAMIC(CItemPropertiesDlg, CDialog)
+//IMPLEMENT_DYNAMIC(CItemPropertiesDlg, CResizableDialog)
 
 CItemPropertiesDlg::CItemPropertiesDlg(LPCTSTR propName, LPCTSTR propPath, CWnd* pParent /*=NULL*/)
-	: CDialog(CItemPropertiesDlg::IDD, pParent)
+	: CResizableDialog(CItemPropertiesDlg::IDD, pParent)
 	, m_PropertyName(propName)
 	, m_PropertyPath(propPath)
 {
@@ -48,7 +48,7 @@ void CItemPropertiesDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT2, m_PropertyPath);
 }
 
-BEGIN_MESSAGE_MAP(CItemPropertiesDlg, CDialog)
+BEGIN_MESSAGE_MAP(CItemPropertiesDlg, CResizableDialog)
 END_MESSAGE_MAP()
 
 BOOL CItemPropertiesDlg::OnInitDialog()
@@ -58,6 +58,16 @@ BOOL CItemPropertiesDlg::OnInitDialog()
 	CString caption;
 	caption.Format(ResStr(IDS_PROPERTIESFOR), m_PropertyName);
 	SetWindowText(caption);
+	
+	AddAnchor(IDC_EDIT1, TOP_LEFT, BOTTOM_RIGHT);
+	AddAnchor(IDC_EDIT2, TOP_LEFT, BOTTOM_RIGHT);
+	AddAnchor(IDOK, BOTTOM_RIGHT);
+	AddAnchor(IDCANCEL, BOTTOM_RIGHT);
+
+	CRect r;
+	GetWindowRect(r);
+	SetMinTrackSize(r.Size());
+	SetMaxTrackSize({ 1000, r.Height() });
 
 	return TRUE;
 }

@@ -21,11 +21,12 @@
 #pragma once
 
 #include <afxwin.h>
-#include "afxdialogex.h"
+//#include "afxdialogex.h"
+#include <ResizableLib/ResizableDialog.h>
 
-class CItemPropertiesDlg : public CDialog
+class CItemPropertiesDlg : public CResizableDialog
 {
-	DECLARE_DYNAMIC(CItemPropertiesDlg)
+	//DECLARE_DYNAMIC(CItemPropertiesDlg)
 
 public:
 	CItemPropertiesDlg(LPCTSTR propName, LPCTSTR propPath, CWnd* pParent = NULL);

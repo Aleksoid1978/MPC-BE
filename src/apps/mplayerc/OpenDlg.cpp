@@ -135,10 +135,8 @@ BOOL COpenDlg::OnInitDialog()
 
 	CRect r;
 	GetWindowRect(r);
-	CSize sr = r.Size();
-	SetMinTrackSize(sr);
-	sr.cx = 1000;
-	SetMaxTrackSize(sr);
+	SetMinTrackSize(r.Size());
+	SetMaxTrackSize({ 1000, r.Height() });
 
 	if (m_hIcon != NULL) {
 		CStatic *pStat = (CStatic*)GetDlgItem(IDC_MAINFRAME_ICON);
