@@ -27,6 +27,7 @@
 // CFavoriteOrganizeDlg dialog
 
 //IMPLEMENT_DYNAMIC(CFavoriteOrganizeDlg, CResizableDialog)
+
 CFavoriteOrganizeDlg::CFavoriteOrganizeDlg(CWnd* pParent)
 	: CResizableDialog(CFavoriteOrganizeDlg::IDD, pParent)
 {
