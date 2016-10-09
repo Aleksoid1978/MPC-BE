@@ -98,7 +98,7 @@ IF "%BUILDTYPE%" NEQ "clean" (
   )
 
   CALL "%VSCOMNTOOLS%..\..\VC\vcvarsall.bat" %VCVARSTYPE%
-  lib /NOLOGO /ignore:4006,4221 /OUT:%BINDIR%\lib\%TARGETFOLDER%\ffmpeg.lib %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavcodec.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavcodec_b.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavfilter.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavresample.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavutil.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libswresample.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libswscale.a
+  lib /NOLOGO /ignore:4006,4221 /OUT:%BINDIR%\lib\%TARGETFOLDER%\ffmpeg.lib %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavcodec.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavcodec_b.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavfilter.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavutil.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libswresample.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libswscale.a
 )
 
 REM Visual Studio creates a "obj" sub-folder. Since there is no way to disable it - just delete it.
