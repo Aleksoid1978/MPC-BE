@@ -22,12 +22,12 @@
 
 #include "SampleFormat.h"
 
-struct AVAudioResampleContext;
+struct SwrContext;
 
 class CMixer
 {
 protected:
-	AVAudioResampleContext* m_pAVRCxt;
+	SwrContext* m_pSWRCxt;
 	double* m_matrix_dbl;
 	bool    m_ActualContext;
 

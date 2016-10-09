@@ -24,14 +24,15 @@
 
 #pragma warning(disable: 4005)
 extern "C" {
-	#include "ffmpeg/libavresample/avresample.h"
+	#include "ffmpeg/libswresample/swresample.h"
+	#include "ffmpeg/libswresample/swresample_internal.h"
 	#include "ffmpeg/libavutil/samplefmt.h"
 	#include "ffmpeg/libavutil/opt.h"
 }
 #pragma warning(default: 4005)
 
 CMixer::CMixer()
-	: m_pAVRCxt(NULL)
+	: m_pSWRCxt(NULL)
 	, m_matrix_dbl(NULL)
 	, m_ActualContext(false)
 	, m_in_sf(SAMPLE_FMT_NONE)
@@ -44,13 +45,13 @@ CMixer::CMixer()
 	, m_in_avsf(AV_SAMPLE_FMT_NONE)
 	, m_out_avsf(AV_SAMPLE_FMT_NONE)
 {
-	// Allocate Resample Context
-	m_pAVRCxt = avresample_alloc_context();
+	// Allocate SWR Context
+	m_pSWRCxt = swr_alloc();
 }
 
 CMixer::~CMixer()
 {
-	avresample_free(&m_pAVRCxt);
+	swr_free(&m_pSWRCxt);
 
 	av_free(m_matrix_dbl); // If ptr is a NULL pointer, this function simply performs no actions.
 }
@@ -62,42 +63,29 @@ bool CMixer::Init()
 		return false;
 	}
 
-	m_in_avsf  = m_in_sf == SAMPLE_FMT_S24 ? AV_SAMPLE_FMT_S32 : (AVSampleFormat)m_in_sf;
+	m_in_avsf  = m_in_sf  == SAMPLE_FMT_S24 ? AV_SAMPLE_FMT_S32 : (AVSampleFormat)m_in_sf;
 	m_out_avsf = m_out_sf == SAMPLE_FMT_S24 ? AV_SAMPLE_FMT_S32 : (AVSampleFormat)m_out_sf;
 
-	if (m_matrix_dbl) {
-		av_free(m_matrix_dbl);
-		m_matrix_dbl = NULL;
-	}
+	av_freep(&m_matrix_dbl);
 
-	// Close Resample Context
-	avresample_close(m_pAVRCxt);
+	// Close SWR Context
+	swr_close(m_pSWRCxt);
 
 	int ret = 0;
 	// Set options
-	av_opt_set_int(m_pAVRCxt, "in_sample_fmt",      m_in_avsf,        0);
-	av_opt_set_int(m_pAVRCxt, "out_sample_fmt",     m_out_avsf,       0);
-	av_opt_set_int(m_pAVRCxt, "in_channel_layout",  m_in_layout,      0);
-	av_opt_set_int(m_pAVRCxt, "out_channel_layout", m_out_layout,     0);
-	av_opt_set_int(m_pAVRCxt, "in_sample_rate",     m_in_samplerate,  0);
-	av_opt_set_int(m_pAVRCxt, "out_sample_rate",    m_out_samplerate, 0);
+	av_opt_set_int(m_pSWRCxt, "in_sample_fmt",      m_in_avsf,        0);
+	av_opt_set_int(m_pSWRCxt, "out_sample_fmt",     m_out_avsf,       0);
+	av_opt_set_int(m_pSWRCxt, "in_channel_layout",  m_in_layout,      0);
+	av_opt_set_int(m_pSWRCxt, "out_channel_layout", m_out_layout,     0);
+	av_opt_set_int(m_pSWRCxt, "in_sample_rate",     m_in_samplerate,  0);
+	av_opt_set_int(m_pSWRCxt, "out_sample_rate",    m_out_samplerate, 0);
 
-	// Open Resample Context
-	ret = avresample_open(m_pAVRCxt);
-	if (ret < 0) {
-		// try again ...
-		av_opt_set_int(m_pAVRCxt, "internal_sample_fmt", AV_SAMPLE_FMT_FLTP, 0);
-		ret = avresample_open(m_pAVRCxt);
-
-		if (ret < 0) {
-			DLog(L"CMixer::Init() : avresample_open failed");
-			return false;
-		}
-	}
+	av_opt_set    (m_pSWRCxt, "resampler",          "soxr",           0); // use soxr library
+	//av_opt_set_int(m_pSWRCxt, "precision",          28,               0); // SOXR_VHQ
 
 	// Create Matrix
-	int in_ch  = av_popcount(m_in_layout);
-	int out_ch = av_popcount(m_out_layout);
+	const int in_ch  = av_popcount(m_in_layout);
+	const int out_ch = av_popcount(m_out_layout);
 	m_matrix_dbl = (double*)av_mallocz(in_ch * out_ch * sizeof(*m_matrix_dbl));
 
 	// expand mono to front left and front right channels
@@ -143,12 +131,12 @@ bool CMixer::Init()
 		const double center_mix_level   = M_SQRT1_2;
 		const double surround_mix_level = 1.0;
 		const double lfe_mix_level      = 1.0;
-		const int normalize = 0;
-		ret = avresample_build_matrix(m_in_layout, m_out_layout, center_mix_level, surround_mix_level, lfe_mix_level, normalize, m_matrix_dbl, in_ch, AV_MATRIX_ENCODING_NONE);
+		const double rematrix_maxval    = INT_MAX;
+		const double rematrix_volume    = 0.0;
+		ret = swr_build_matrix(m_in_layout, m_out_layout, center_mix_level, surround_mix_level, lfe_mix_level, rematrix_maxval, rematrix_volume, m_matrix_dbl, in_ch, AV_MATRIX_ENCODING_NONE, m_pSWRCxt);
 		if (ret < 0) {
-			DLog(L"CMixer::Init() : avresample_build_matrix failed");
-			av_free(m_matrix_dbl);
-			m_matrix_dbl = NULL;
+			DLog(L"CMixer::Init() : swr_build_matrix failed");
+			av_freep(&m_matrix_dbl);
 			return false;
 		}
 
@@ -188,24 +176,37 @@ bool CMixer::Init()
 	}
 
 #ifdef _DEBUG
-	CStringA matrix_str = "CMixer::Init() : matrix";
+	CString matrix_str = L"CMixer::Init() : matrix";
+	double k = 0.0;
 	for (int j = 0; j < out_ch; j++) {
-		matrix_str.AppendFormat("\n    %d:", j + 1);
+		matrix_str.AppendFormat(L"\n    %d:", j + 1);
 		for (int i = 0; i < in_ch; i++) {
-			double k = m_matrix_dbl[j * in_ch + i];
-			matrix_str.AppendFormat(" %.4f", k);
+			k = m_matrix_dbl[j * in_ch + i];
+			matrix_str.AppendFormat(L" %.4f", k);
 		}
 	}
 	DLog(matrix_str);
 #endif
 
 	// Set Matrix on the context
-	ret = avresample_set_matrix(m_pAVRCxt, m_matrix_dbl, in_ch);
+	ret = swr_set_matrix(m_pSWRCxt, m_matrix_dbl, in_ch);
 	if (ret < 0) {
-		DLog(L"CMixer::Init() : avresample_set_matrix failed");
-		av_free(m_matrix_dbl);
-		m_matrix_dbl = NULL;
+		DLog(L"CMixer::Init() : swr_set_matrix failed");
+		av_freep(&m_matrix_dbl);
 		return false;
+	}
+
+	// init SWR Context
+	ret = swr_init(m_pSWRCxt);
+	if (ret < 0) {
+		// try again ...
+		av_opt_set_int(m_pSWRCxt, "internal_sample_fmt", AV_SAMPLE_FMT_FLTP, 0);
+		ret = swr_init(m_pSWRCxt);
+
+		if (ret < 0) {
+			DLog(L"CMixer::Init() : swr_init failed");
+			return false;
+		}
 	}
 
 	m_ActualContext = true;
@@ -247,13 +248,13 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 		return 0;
 	}
 
-	int in_ch  = av_popcount(m_in_layout);
-	int out_ch = av_popcount(m_out_layout);
+	const int in_ch  = av_popcount(m_in_layout);
+	const int out_ch = av_popcount(m_out_layout);
 
 	int32_t* buf1 = NULL;
 	if (m_in_sf == SAMPLE_FMT_S24) {
 		ASSERT(m_in_avsf == AV_SAMPLE_FMT_S32);
-		buf1 = new int32_t[in_samples * in_ch];
+		buf1 = DNew int32_t[in_samples * in_ch];
 		convert_int24_to_int32(in_samples * in_ch, pInput, buf1);
 		pInput = (BYTE*)buf1;
 	}
@@ -262,7 +263,7 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 	int32_t* buf2 = NULL;
 	if (m_out_sf == SAMPLE_FMT_S24) {
 		ASSERT(m_out_avsf == AV_SAMPLE_FMT_S32);
-		buf2 = new int32_t[out_samples * out_ch];
+		buf2 = DNew int32_t[out_samples * out_ch];
 		output = (BYTE*)buf2;
 	} else {
 		output = pOutput;
@@ -271,25 +272,23 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 	int in_plane_nb   = av_sample_fmt_is_planar(m_in_avsf) ? in_ch : 1;
 	int in_plane_size = in_samples * (av_sample_fmt_is_planar(m_in_avsf) ? 1 : in_ch) * av_get_bytes_per_sample(m_in_avsf);
 
-	static BYTE* ppInput[AVRESAMPLE_MAX_CHANNELS];
+	static BYTE* ppInput[SWR_CH_MAX];
 	for (int i = 0; i < in_plane_nb; i++) {
 		ppInput[i] = pInput + i * in_plane_size;
 	}
 
-	int out_plane_size = out_samples * out_ch * av_get_bytes_per_sample(m_out_avsf);
-
-	out_samples = avresample_convert(m_pAVRCxt, (uint8_t**)&output, out_plane_size, out_samples, ppInput, in_plane_size, in_samples);
+	out_samples = swr_convert(m_pSWRCxt, &output, out_samples, (const uint8_t**)ppInput, in_samples);
 	if (out_samples < 0) {
-		DLog(L"CMixer::Mixing() : avresample_convert failed");
+		DLog(L"CMixer::Mixing() : swr_convert failed");
 		out_samples = 0;
 	}
 
 	if (buf1) {
-		delete[] buf1;
+		delete [] buf1;
 	}
 	if (buf2) {
 		convert_int32_to_int24(out_samples * out_ch, buf2, pOutput);
-		delete[] buf2;
+		delete [] buf2;
 	}
 
 	return out_samples;
@@ -297,7 +296,7 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 
 int CMixer::GetInputDelay()
 {
-	return avresample_get_delay(m_pAVRCxt);
+	return swr_get_delay(m_pSWRCxt, m_in_samplerate);
 }
 
 int CMixer::CalcOutSamples(int in_samples)
@@ -310,28 +309,27 @@ int CMixer::CalcOutSamples(int in_samples)
 	if (m_in_samplerate == m_out_samplerate) {
 		return in_samples;
 	} else {
-		return avresample_available(m_pAVRCxt) + (int)((__int64)(avresample_get_delay(m_pAVRCxt) + in_samples) * m_out_samplerate / m_in_samplerate);
+		return swr_get_out_samples(m_pSWRCxt, in_samples) + swr_get_delay(m_pSWRCxt, m_in_samplerate);
 	}
 }
 
 void CMixer::FlushBuffers()
 {
 	if (m_in_samplerate != m_out_samplerate) {
-		// Close Resample Context
-		avresample_close(m_pAVRCxt);
+		// Close SWR Context
+		swr_close(m_pSWRCxt);
 
-		int ret = 0;
-		// Open Resample Context
-		ret = avresample_open(m_pAVRCxt);
+		// Set Matrix on the context
+		int ret = swr_set_matrix(m_pSWRCxt, m_matrix_dbl, av_popcount(m_in_layout));
 		if (ret < 0) {
-			DLog(L"CMixer::FlushBuffers() : avresample_open failed");
+			DLog(L"CMixer::FlushBuffers() : swr_set_matrix failed");
 			return;
 		}
 
-		// Set Matrix on the context
-		ret = avresample_set_matrix(m_pAVRCxt, m_matrix_dbl, av_popcount(m_in_layout));
+		// init SWR Context
+		ret = swr_init(m_pSWRCxt);
 		if (ret < 0) {
-			DLog(L"CMixer::FlushBuffers() : avresample_set_matrix failed");
+			DLog(L"CMixer::FlushBuffers() : swr_init failed");
 			return;
 		}
 	}
