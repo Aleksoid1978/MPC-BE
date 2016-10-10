@@ -1277,15 +1277,15 @@ HRESULT CMpcAudioRenderer::DoRenderSampleWasapi(IMediaSample *pMediaSample)
 
 		if (m_input_params.layout != m_output_params.layout || m_input_params.samplerate != m_output_params.samplerate) {
 #if defined(_DEBUG) && DBGLOG_LEVEL > 2
-			DLog(L"CMpcAudioRenderer::DoRenderSampleWasapi() - use Mixer"));
-			DLog(L"    input:"));
-			DLog(L"        layout     = 0x%x", m_input_params.layout));
-			DLog(L"        channels   = %d",   m_input_params.channels));
-			DLog(L"        samplerate = %d",   m_input_params.samplerate));
-			DLog(L"    output:"));
-			DLog(L"        layout     = 0x%x", m_output_params.layout));
-			DLog(L"        channels   = %d",   m_output_params.channels));
-			DLog(L"        samplerate = %d",   m_output_params.samplerate));
+			DLog(L"CMpcAudioRenderer::DoRenderSampleWasapi() - use Mixer");
+			DLog(L"    input:");
+			DLog(L"        layout     = 0x%x", m_input_params.layout);
+			DLog(L"        channels   = %d",   m_input_params.channels);
+			DLog(L"        samplerate = %d",   m_input_params.samplerate);
+			DLog(L"    output:");
+			DLog(L"        layout     = 0x%x", m_output_params.layout);
+			DLog(L"        channels   = %d",   m_output_params.channels);
+			DLog(L"        samplerate = %d",   m_output_params.samplerate);
 #endif
 
 			CAutoLock cResamplerLock(&m_csResampler);
@@ -2665,12 +2665,48 @@ size_t CMpcAudioRenderer::WasapiQueueSize()
 
 void CMpcAudioRenderer::WaitFinish()
 {
-	for (;;) {
-		if (m_filterState != State_Running) {
-			break;
-		}
+	if (!m_bIsBitstream && m_input_params.samplerate != m_output_params.samplerate) {
+		int out_samples = m_Resampler.CalcOutSamples(0);
+		if (out_samples) {
+			REFERENCE_TIME rtStart = m_rtNextSampleTime;
+			for (;;) {
+				BYTE* buff = DNew BYTE[out_samples * m_output_params.channels * get_bytes_per_sample(m_output_params.sf)];
+				out_samples = m_Resampler.Receive(buff, out_samples);
+				if (out_samples) {
+					CAutoPtr<CPacket> p(DNew CPacket());
+					p->rtStart = rtStart;
+					p->rtStop  = rtStart + FramesToTime(out_samples, m_pWaveFormatExOutput);
+					p->SetData(buff, out_samples * m_output_params.channels * get_bytes_per_sample(m_output_params.sf));
 
-		if (!WasapiQueueSize()) {
+					rtStart = p->rtStop;
+
+					if (m_dRate != 1.0
+							&& (m_Filter.IsInitialized() || SUCCEEDED(m_Filter.Init(m_dRate, m_pWaveFormatExOutput)) )) {
+						if (SUCCEEDED(m_Filter.Push(p))) {
+							while (SUCCEEDED(m_Filter.Pull(p))) {
+								PushToQueue(p);
+							}
+						}
+					} else {
+						PushToQueue(p);
+					}
+				}
+
+				delete [] buff;
+
+				if (!out_samples) {
+					break;
+				}
+
+				out_samples = m_Resampler.CalcOutSamples(0);
+			}
+		}
+	}
+
+	for (;;) {
+		if (m_filterState != State_Running
+				|| m_bNeedReinitialize || m_bNeedReinitializeFull
+				|| !WasapiQueueSize()) {
 			break;
 		}
 

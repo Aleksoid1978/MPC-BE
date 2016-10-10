@@ -244,7 +244,7 @@ void CMixer::SetOptions(float matrix_norm)
 int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 {
 	if (!m_ActualContext && !Init()) {
-		DLog(L"CMixer::Mixing : Init() failed");
+		DLog(L"CMixer::Mixing() : Init failed");
 		return 0;
 	}
 
@@ -294,6 +294,39 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 	return out_samples;
 }
 
+int CMixer::Receive(BYTE* pOutput, int out_samples)
+{
+	if (!m_ActualContext && !Init()) {
+		DLog(L"CMixer::Receive() : Init failed");
+		return 0;
+	}
+
+	const int out_ch = av_popcount(m_out_layout);
+
+	BYTE* output;
+	int32_t* buf = NULL;
+	if (m_out_sf == SAMPLE_FMT_S24) {
+		ASSERT(m_out_avsf == AV_SAMPLE_FMT_S32);
+		buf = DNew int32_t[out_samples * out_ch];
+		output = (BYTE*)buf;
+	} else {
+		output = pOutput;
+	}
+
+	out_samples = swr_convert(m_pSWRCxt, &output, out_samples, NULL, 0);
+	if (out_samples < 0) {
+		DLog(L"CMixer::Receive() : swr_convert failed");
+		out_samples = 0;
+	}
+
+	if (buf) {
+		convert_int32_to_int24(out_samples * out_ch, buf, pOutput);
+		delete [] buf;
+	}
+
+	return out_samples;
+}
+
 int CMixer::GetInputDelay()
 {
 	return swr_get_delay(m_pSWRCxt, m_in_samplerate);
@@ -302,7 +335,7 @@ int CMixer::GetInputDelay()
 int CMixer::CalcOutSamples(int in_samples)
 {
 	if (!m_ActualContext && !Init()) {
-		DLog(L"Mixer::CalcOutSamples : Init() failed");
+		DLog(L"Mixer::CalcOutSamples() : Init failed");
 		return 0;
 	}
 
