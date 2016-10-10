@@ -102,53 +102,60 @@ HRESULT DumpDX9RenderTarget(IDirect3DDevice9* pD3DDev, wchar_t* filename)
 	return DumpDX9Surface(pD3DDev, pSurface, filename);
 }
 
-HRESULT DumpDX9Surface2(IDirect3DSurface9* pSurface, wchar_t* filename)
+HRESULT SaveRAWVideoAsBMP(BYTE* data, DWORD format, unsigned pitch, unsigned width, unsigned height, wchar_t* filename)
 {
-	CheckPointer(pSurface, E_POINTER);
+	CheckPointer(data, E_POINTER);
 
-	HRESULT hr;
-	D3DSURFACE_DESC desc = {};
-	D3DLOCKED_RECT r;
+	unsigned pseudobitdepth = 8;
 
-	if (FAILED(hr = pSurface->GetDesc(&desc))) {
-		return hr;
-	};
-
-	unsigned pseudobitdepth;
-
-	switch (desc.Format) {
+	switch (format) {
 	case FCC('NV12'):
 	case FCC('YV12'):
-		pseudobitdepth = 8;
-		desc.Height = desc.Height * 3 / 2;
+		height = height * 3 / 2;
 		break;
 	case D3DFMT_UYVY:
 	case D3DFMT_YUY2:
-		pseudobitdepth = 8;
+		width *= 2;
+		break;
+	case FCC('YV16'):
+		height *= 2;
+		break;
+	case FCC('YV24'):
+		height *= 3;
 		break;
 	case FCC('AYUV'):
 	case D3DFMT_A8R8G8B8:
 	case D3DFMT_X8R8G8B8:
 		pseudobitdepth = 32;
 		break;
+	case FCC('P010'):
+	case FCC('P016'):
+		width *= 2;
+		height = height * 3 / 2;
+		break;
+	case FCC('P210'):
+	case FCC('P216'):
+		width *= 2;
+		height *= 2;
+		break;
 	default:
 		return E_INVALIDARG;
 	}
 
+	if (!pitch) {
+		pitch = width * pseudobitdepth / 8;
+	}
+
 	unsigned tablecolors = (pseudobitdepth == 8) ? 256 : 0;
 
-	if (FAILED(pSurface->LockRect(&r, NULL, D3DLOCK_READONLY))) {
-		return hr;
-	};
-
-	unsigned len = desc.Width * desc.Height * pseudobitdepth / 8;
+	unsigned len = width * height * pseudobitdepth / 8;
 	std::unique_ptr<BYTE[]> dib(DNew BYTE[sizeof(BITMAPINFOHEADER) + tablecolors * 4 + len]);
 
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)dib.get();
 	memset(bih, 0, sizeof(BITMAPINFOHEADER));
 	bih->biSize = sizeof(BITMAPINFOHEADER);
-	bih->biWidth = desc.Width;
-	bih->biHeight = desc.Height;
+	bih->biWidth = width;
+	bih->biHeight = height;
 	bih->biBitCount = pseudobitdepth;
 	bih->biPlanes = 1;
 	bih->biSizeImage = DIBSIZE(*bih);
@@ -164,10 +171,8 @@ HRESULT DumpDX9Surface2(IDirect3DSurface9* pSurface, wchar_t* filename)
 
 	//memcpy(p, r.pBits, len);
 	BitBltFromRGBToRGB(bih->biWidth, bih->biHeight,
-		p, bih->biWidth, pseudobitdepth,
-		(BYTE*)r.pBits + r.Pitch * (desc.Height - 1), -(int)r.Pitch, pseudobitdepth);
-
-	pSurface->UnlockRect();
+		p, pitch, pseudobitdepth,
+		(BYTE*)data + pitch * (height - 1), -(int)pitch, pseudobitdepth);
 
 	BITMAPFILEHEADER bfh;
 	bfh.bfType = 0x4d42;
@@ -183,5 +188,5 @@ HRESULT DumpDX9Surface2(IDirect3DSurface9* pSurface, wchar_t* filename)
 		fclose(fp);
 	}
 
-	return hr;
+	return S_OK;
 }

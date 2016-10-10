@@ -47,7 +47,10 @@ public:
 class __declspec(uuid("DD9ED57D-6ABF-42E8-89A2-11D04798DC58"))
 	CNullUVideoRenderer : public CNullRenderer
 {
+	CMediaType m_mt;
+
 protected:
+	HRESULT SetMediaType(const CMediaType *pmt) override;
 	HRESULT CheckMediaType(const CMediaType* pmt);
 
 public:

@@ -24,6 +24,8 @@
 #include <moreuuids.h>
 #include "MediaTypeEx.h"
 #include "D3D9Helper.h"
+#include "Log.h"
+#include "FileHandle.h"
 
 #define USE_DXVA
 
@@ -328,6 +330,26 @@ CNullUVideoRenderer::CNullUVideoRenderer(LPUNKNOWN pUnk, HRESULT* phr)
 #endif
 }
 
+HRESULT CNullUVideoRenderer::SetMediaType(const CMediaType *pmt)
+{
+	HRESULT hr = __super::SetMediaType(pmt);
+
+	if (S_OK == hr) {
+		m_mt = *pmt;
+
+		if (m_mt.formattype == FORMAT_VideoInfo2) {
+			BITMAPINFOHEADER& bih = ((VIDEOINFOHEADER2*)pmt->pbFormat)->bmiHeader;
+			DLog(L"CNullUVideoRenderer::SetMediaType : %s, %dx%d", GetGUIDString(m_mt.subtype), bih.biWidth, bih.biHeight);
+		}
+		else {
+			DLog(L"CNullUVideoRenderer::SetMediaType : %s", GetGUIDString(m_mt.subtype));
+		}
+		
+	}
+
+	return hr;
+}
+
 HRESULT CNullUVideoRenderer::CheckMediaType(const CMediaType* pmt)
 {
 	return pmt->majortype == MEDIATYPE_Video
@@ -346,6 +368,10 @@ HRESULT CNullUVideoRenderer::CheckMediaType(const CMediaType* pmt)
 			   || pmt->subtype == MEDIASUBTYPE_AYUV
 			   || pmt->subtype == MEDIASUBTYPE_YV16
 			   || pmt->subtype == MEDIASUBTYPE_YV24
+			   || pmt->subtype == MEDIASUBTYPE_P010
+			   || pmt->subtype == MEDIASUBTYPE_P016
+			   || pmt->subtype == MEDIASUBTYPE_P210
+			   || pmt->subtype == MEDIASUBTYPE_P216
 			   || pmt->subtype == MEDIASUBTYPE_RGB1
 			   || pmt->subtype == MEDIASUBTYPE_RGB4
 			   || pmt->subtype == MEDIASUBTYPE_RGB8
@@ -365,25 +391,50 @@ HRESULT CNullUVideoRenderer::CheckMediaType(const CMediaType* pmt)
 #include "../filters/renderer/VideoRenderers/Utils.h"
 HRESULT CNullUVideoRenderer::DoRenderSample(IMediaSample* pSample)
 {
-#ifdef USE_DXVA
-	#if (_DEBUG) && 0
-		static int cnt = 0;
+#if _DEBUG && 0
+	static int cnt = 0;
 
-		wchar_t strFile[MAX_PATH] = { 0 };
-		swprintf_s(strFile, L"VideoDump%03d.bmp", cnt++);
+	if (cnt >= 20) {
+		if (0) {
+			cnt = 0; // loop
+		} else {
+			return S_OK; // no dump after 20 frames
+		}
+	}
 
-		if (CComQIPtr<IMFGetService> pService = pSample) {
-			CComPtr<IDirect3DSurface9> pSurface;
-			if (SUCCEEDED(pService->GetService(MR_BUFFER_SERVICE, IID_PPV_ARGS(&pSurface)))) {
-				DumpDX9Surface2(pSurface, strFile);
+	wchar_t strFile[MAX_PATH] = { 0 };
+	swprintf_s(strFile, L"%sVideoDump%03d.bmp", GetProgramDir(), cnt++);
+
+	if (CComQIPtr<IMFGetService> pService = pSample) {
+		CComPtr<IDirect3DSurface9> pSurface;
+		if (SUCCEEDED(pService->GetService(MR_BUFFER_SERVICE, IID_PPV_ARGS(&pSurface)))) {
+			D3DSURFACE_DESC desc = {};
+			D3DLOCKED_RECT r = {};
+
+			if (S_OK == pSurface->GetDesc(&desc) && S_OK == pSurface->LockRect(&r, NULL, D3DLOCK_READONLY)) {
+				SaveRAWVideoAsBMP((BYTE*)r.pBits, desc.Format, r.Pitch, desc.Width, desc.Height, strFile);
+				pSurface->UnlockRect();
+			};
+		}
+	}
+	else if (m_mt.formattype == FORMAT_VideoInfo2) {
+		BYTE* data = NULL;
+		long size = pSample->GetActualDataLength();
+		if (size > 0 && S_OK == pSample->GetPointer(&data)) {
+			BITMAPINFOHEADER& bih = ((VIDEOINFOHEADER2*)m_mt.pbFormat)->bmiHeader;
+
+			DWORD format = bih.biCompression;
+			if (format == BI_RGB) {
+				if (m_mt.subtype == MEDIASUBTYPE_RGB32) {
+					format = D3DFMT_X8R8G8B8;
+				} else if (m_mt.subtype == MEDIASUBTYPE_ARGB32) {
+					format = D3DFMT_A8R8G8B8;
+				}
 			}
-		}
 
-		if (cnt >= 100) {
-			cnt = 0;
+			SaveRAWVideoAsBMP(data, format, 0, bih.biWidth, bih.biHeight, strFile);
 		}
-
-	#endif
+	}
 #endif
 
 	return S_OK;
