@@ -26,4 +26,4 @@ HRESULT DumpDX9Surface(IDirect3DDevice9* pD3DDev, IDirect3DSurface9* pSurface, w
 HRESULT DumpDX9Texture(IDirect3DDevice9* pD3DDev, IDirect3DTexture9* pTexture, wchar_t* filename);
 HRESULT DumpDX9RenderTarget(IDirect3DDevice9* pD3DDev, wchar_t* filename);
 
-HRESULT DumpDX9Surface2(IDirect3DSurface9* pSurface, wchar_t* filename);
+HRESULT SaveRAWVideoAsBMP(BYTE* data, DWORD format, unsigned pitch, unsigned width, unsigned height, wchar_t* filename);
