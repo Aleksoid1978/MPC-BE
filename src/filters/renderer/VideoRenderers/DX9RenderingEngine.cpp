@@ -140,6 +140,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_VideoBufferFmt(D3DFMT_X8R8G8B8)
 	, m_SurfaceFmt(D3DFMT_X8R8G8B8)
 	, m_iRotation(0)
+	, m_bFlip(false)
 	, m_inputExtFormat({ 0 })
 	, m_wsResizer(L"") // empty string, not nullptr
 	, m_bFP16Support(true) // don't disable hardware features before initializing a renderer
@@ -380,6 +381,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	bool bFinalPass = false;
 	DWORD iResizer = rs.iResizer;
 	int iRotation = m_iRotation;
+	bool bFlip = m_bFlip;
 
 	{
 		int screenSpacePassCount = 0;
@@ -504,10 +506,17 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		pVideoTexture = m_pFrameTextures[src];
 	}
 
-	if (iRotation) {
+	if (iRotation || bFlip) {
 		Vector dest[4];
 		CComPtr<IDirect3DSurface9> pTemporarySurface;
 		switch (iRotation) {
+		case 0:
+			dest[0].Set(0.0f, 0.0f, 0.5f);
+			dest[1].Set((float)videoDesc.Width, 0.0f, 0.5f);
+			dest[2].Set(0.0f, (float)videoDesc.Height, 0.5f);
+			dest[3].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
+			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
+			break;
 		case 90:
 			dest[0].Set((float)videoDesc.Width, 0.0f, 0.5f);
 			dest[1].Set((float)videoDesc.Width, (float)videoDesc.Height, 0.5f);
@@ -530,6 +539,11 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			hr = m_pRotateTexture->GetSurfaceLevel(0, &pTemporarySurface);
 			break;
 		}
+		if (bFlip) {
+			std::swap(dest[0], dest[1]);
+			std::swap(dest[2], dest[3]);
+		}
+
 		hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
 
 		MYD3DVERTEX<1> v[] = {
@@ -544,11 +558,11 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		hr = m_pD3DDevEx->SetPixelShader(NULL);
 		hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_LINEAR);
 
-		if (iRotation == 180) {
-			pVideoTexture = m_pFrameTextures[dst];
-		}
-		else { // 90 and 270
+		if (iRotation == 90 || iRotation == 270) {
 			pVideoTexture = m_pRotateTexture;
+		}
+		else { // 0+flip and 180
+			pVideoTexture = m_pFrameTextures[dst];
 		}
 	}
 
@@ -1008,7 +1022,7 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVA(IDirect3DTexture9* pTexture, cons
 HRESULT CDX9RenderingEngine::InitVideoTextures()
 {
 	HRESULT hr = S_OK;
-	size_t count = min(_countof(m_pFrameTextures), m_pCustomPixelShaders.GetCount() + (m_inputExtFormat.VideoTransferMatrix == 7 ? 1 : 0) + (m_iRotation == 180 ? 1 : 0));
+	size_t count = min(_countof(m_pFrameTextures), m_pCustomPixelShaders.GetCount() + (m_inputExtFormat.VideoTransferMatrix == 7 ? 1 : 0) + (m_iRotation == 180 || !m_iRotation && m_bFlip ? 1 : 0));
 
 	for (size_t i = 0; i < count; i++) {
 		if (m_pFrameTextures[i] == NULL) {
@@ -2078,6 +2092,18 @@ STDMETHODIMP CDX9RenderingEngine::SetRotation(int rotation)
 STDMETHODIMP_(int) CDX9RenderingEngine::GetRotation()
 {
 	return m_iRotation;
+}
+
+STDMETHODIMP CDX9RenderingEngine::SetFlip(bool flip)
+{
+	m_bFlip = flip;
+
+	return S_OK;
+}
+
+STDMETHODIMP_(bool) CDX9RenderingEngine::GetFlip()
+{
+	return m_bFlip;
 }
 
 // ISubRenderOptions

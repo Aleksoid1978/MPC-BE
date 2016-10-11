@@ -76,6 +76,8 @@ public:
 	STDMETHODIMP_(void) SetPosition(RECT w, RECT v);
 	STDMETHODIMP SetRotation(int rotation) { return E_NOTIMPL; }
 	STDMETHODIMP_(int) GetRotation() { return 0; }
+	STDMETHODIMP SetFlip(bool flip) { return E_NOTIMPL; }
+	STDMETHODIMP_(bool) GetFlip() { return false; }
 	STDMETHODIMP_(bool) Paint(bool fAll) { return false; }
 	STDMETHODIMP_(void) SetTime(REFERENCE_TIME rtNow);
 	STDMETHODIMP_(void) SetSubtitleDelay(int delay_ms);

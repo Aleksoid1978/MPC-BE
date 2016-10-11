@@ -132,6 +132,7 @@ namespace DSObjects
 		int							m_ScreenSpaceTexHeight;
 
 		int							m_iRotation; // total rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
+		bool						m_bFlip; // horizontal flip. for vertical flip use together with a rotation of 180 deg.
 
 		class CExternalPixelShader
 		{
@@ -211,6 +212,8 @@ namespace DSObjects
 		STDMETHODIMP_(SIZE) GetVideoSizeAR() override;
 		STDMETHODIMP SetRotation(int rotation) override;
 		STDMETHODIMP_(int) GetRotation() override;
+		STDMETHODIMP SetFlip(bool flip) override;
+		STDMETHODIMP_(bool) GetFlip() override;
 
 		// ISubRenderOptions
 		STDMETHODIMP GetInt(LPCSTR field, int* value) override;

@@ -209,6 +209,7 @@
 #define ID_PANSCAN_MOVEDOWNLEFT         874
 #define ID_PANSCAN_MOVEDOWNRIGHT        875
 #define ID_PANSCAN_CENTER               876
+#define ID_PANSCAN_FLIP                 880
 #define ID_PANSCAN_ROTATEZP             881
 #define ID_PANSCAN_ROTATEZM             882
 #define ID_ONTOP_NEVER                  883
@@ -1220,10 +1221,7 @@
 #define IDS_AG_VIDFRM_INSIDE            33228
 #define IDS_AG_VIDFRM_OUTSIDE           33229
 #define IDS_AG_PNS_RESET                33230
-#define IDS_AG_PNS_ROTATEX_P            33231
-#define IDS_AG_PNS_ROTATEX_M            33232
-#define IDS_AG_PNS_ROTATEY_P            33233
-#define IDS_AG_PNS_ROTATEY_M            33234
+#define IDS_AG_PNS_FLIP                 33234
 #define IDS_AG_PNS_ROTATEZ_P            33235
 #define IDS_AG_PNS_ROTATEZ_M            33236
 #define IDS_AG_TEARING_TEST             33237
@@ -1599,11 +1597,7 @@
 #define IDS_THUMB_THUMBNAILS            41507
 #define IDS_THUMB_PIXELS                41508
 #define IDS_THUMB_LEVEL                 41509
-#define IDS_PPAGE_OUTPUT_OVERLAYMIXER   42002
-#define IDS_PPAGE_OUTPUT_VMR7WINDOWED   42003
 #define IDS_PPAGE_OUTPUT_VMR9WINDOWED   42004
-#define IDS_PPAGE_OUTPUT_VMR7RENDERLESS 42005
-#define IDS_PPAGE_OUTPUT_VMR9RENDERLESS 42006
 #define IDS_PPAGE_OUTPUT_EVR            42007
 #define IDS_PPAGE_OUTPUT_EVR_CUSTOM     42008
 #define IDS_PPAGE_OUTPUT_DXR            42009

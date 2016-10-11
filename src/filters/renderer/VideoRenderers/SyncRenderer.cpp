@@ -59,6 +59,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	CSubPicAllocatorPresenterImpl(hWnd, hr, &_Error),
 	m_ScreenSize(0, 0),
 	m_iRotation(0),
+	m_bFlip(false),
 	m_inputExtFormat({0}),
 	m_wsResizer(L""), // empty string, not nullptr
 	m_nSurface(1),
@@ -734,6 +735,18 @@ STDMETHODIMP_(int) CBaseAP::GetRotation()
 	return m_iRotation;
 }
 
+STDMETHODIMP CBaseAP::SetFlip(bool flip)
+{
+	m_bFlip = flip;
+
+	return S_OK;
+}
+
+STDMETHODIMP_(bool) CBaseAP::GetFlip()
+{
+	return m_bFlip;
+}
+
 bool CBaseAP::ClipToSurface(IDirect3DSurface9* pSurface, CRect& s, CRect& d)
 {
 	D3DSURFACE_DESC d3dsd;
@@ -1194,6 +1207,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	REFERENCE_TIME llSyncOffset = 0;
 	double dSyncOffset = 0.0;
 	int iRotation = m_iRotation;
+	bool bFlip = m_bFlip;
 
 	CAutoLock cRenderLock(&m_allocatorLock);
 
@@ -1302,10 +1316,17 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				hr = m_pD3DDevEx->SetPixelShader(NULL);
 			}
 
-			if (iRotation) {
+			if (iRotation || bFlip) {
 				Vector dest[4];
 
 				switch (iRotation) {
+				case 0:
+					dest[0].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
+					dest[1].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
+					dest[2].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
+					dest[3].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
+					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[m_nSurface + 1]);
+					break;
 				case 90:
 					dest[0].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
 					dest[1].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
@@ -1328,6 +1349,11 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					hr = m_pD3DDevEx->SetRenderTarget(0, m_pRotateSurface);
 					break;
 				}
+				if (bFlip) {
+					std::swap(dest[0], dest[1]);
+					std::swap(dest[2], dest[3]);
+				}
+
 				MYD3DVERTEX<1> v[] = {
 					{ dest[0].x, dest[0].y, 0.5f, 2.0f, 0.0f, 0.0f },
 					{ dest[1].x, dest[1].y, 0.5f, 2.0f, 1.0f, 0.0f },
@@ -1339,10 +1365,11 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				hr = m_pD3DDevEx->SetPixelShader(NULL);
 				hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_LINEAR);
 
-				if (iRotation == 180) {
-					pVideoTexture = m_pVideoTextures[m_nSurface + 1];
-				} else { // 90 and 270
+				if (iRotation == 90 || iRotation == 270) {
 					pVideoTexture = m_pRotateTexture;
+				}
+				else { // 0+flip and 180
+					pVideoTexture = m_pVideoTextures[m_nSurface + 1];
 				}
 
 				m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);

@@ -366,7 +366,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_PANNSCAN_PRESETS_START, ID_PANNSCAN_PRESETS_END, OnViewPanNScanPresets)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_PANNSCAN_PRESETS_START, ID_PANNSCAN_PRESETS_END, OnUpdateViewPanNScanPresets)
 	ON_COMMAND_RANGE(ID_PANSCAN_ROTATEZP, ID_PANSCAN_ROTATEZM, OnViewRotate)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_PANSCAN_ROTATEZP, ID_PANSCAN_ROTATEZM, OnUpdateViewRotate)
+	ON_COMMAND(ID_PANSCAN_FLIP, OnViewFlip)
 	ON_COMMAND_RANGE(ID_ASPECTRATIO_START, ID_ASPECTRATIO_END, OnViewAspectRatio)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_ASPECTRATIO_START, ID_ASPECTRATIO_END, OnUpdateViewAspectRatio)
 	ON_COMMAND(ID_ASPECTRATIO_NEXT, OnViewAspectRatioNext)
@@ -7192,6 +7192,7 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 			m_PosX = m_PosY = 0.5;
 			if (m_pCAP) {
 				m_pCAP->SetRotation(m_iDefRotation);
+				m_pCAP->SetFlip(false);
 			}
 			break;
 		case ID_VIEW_INCSIZE:
@@ -7381,9 +7382,16 @@ void CMainFrame::OnViewRotate(UINT nID)
 	}
 }
 
-void CMainFrame::OnUpdateViewRotate(CCmdUI* pCmdUI)
+void CMainFrame::OnViewFlip()
 {
-	pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly && m_pCAP);
+	if (m_pCAP) {
+		HRESULT hr = S_OK;
+		bool flip = !m_pCAP->GetFlip();
+		hr = m_pCAP->SetFlip(flip);
+		if (S_OK == hr) {
+			m_pCAP->Paint(false);
+		}
+	}
 }
 
 const static SIZE s_ar[] = { {0, 0}, {4, 3}, {5, 4}, {16, 9}, {235, 100}, {185, 100} };
