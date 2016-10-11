@@ -2080,6 +2080,13 @@ void CAppSettings::GetFav(favtype ft, CAtlList<CString>& sl)
 		if (s.IsEmpty()) {
 			break;
 		}
+
+		CAtlList<CString> args;
+		ExplodeEsc(s, args, L';');
+		if (args.GetCount() < 4) {
+			ASSERT(FALSE);
+			continue;
+		}
 		sl.AddTail(s);
 	}
 }
