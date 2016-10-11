@@ -24,6 +24,8 @@
 #include "ItemPropertiesDlg.h"
 #include "FavoriteOrganizeDlg.h"
 
+#define GET_BY_INDEX(arg, index) (arg.GetAt(arg.FindIndex(index)))
+
 // CFavoriteOrganizeDlg dialog
 
 //IMPLEMENT_DYNAMIC(CFavoriteOrganizeDlg, CResizableDialog)
@@ -46,10 +48,10 @@ void CFavoriteOrganizeDlg::SetupList(bool fSave)
 
 		for (int j = 0; j < m_list.GetItemCount(); j++) {
 			CAtlList<CString> args;
-			ExplodeEsc(m_sl[i].GetAt((POSITION)m_list.GetItemData(j)), args, _T(';'));
+			ExplodeEsc(m_sl[i].GetAt((POSITION)m_list.GetItemData(j)), args, L';');
 			args.RemoveHeadNoReturn();
 			args.AddHead(m_list.GetItemText(j, 0));
-			sl.AddTail(ImplodeEsc(args, _T(';')));
+			sl.AddTail(ImplodeEsc(args, L';'));
 		}
 
 		m_sl[i].RemoveAll();
@@ -62,7 +64,7 @@ void CFavoriteOrganizeDlg::SetupList(bool fSave)
 			tmp = pos;
 
 			CAtlList<CString> sl;
-			ExplodeEsc(m_sl[i].GetNext(pos), sl, _T(';'), 3);
+			ExplodeEsc(m_sl[i].GetNext(pos), sl, L';', 3);
 
 			int n = m_list.InsertItem(m_list.GetItemCount(), sl.RemoveHead());
 			m_list.SetItemData(n, (DWORD_PTR)tmp);
@@ -70,11 +72,11 @@ void CFavoriteOrganizeDlg::SetupList(bool fSave)
 			if (!sl.IsEmpty()) {
 				REFERENCE_TIME rt = 0;
 
-				if (1 == _stscanf_s(sl.GetHead(), _T("%I64d"), &rt) && rt > 0) {
+				if (1 == _stscanf_s(sl.GetHead(), L"%I64d", &rt) && rt > 0) {
 					DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
 
 					CString str;
-					str.Format(_T("[%02u:%02u:%02u]"), hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
+					str.Format(L"[%02u:%02u:%02u]", hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
 					m_list.SetItemText(n, 1, str);
 				}
 			}
@@ -135,8 +137,8 @@ BOOL CFavoriteOrganizeDlg::OnInitDialog()
 	// m_tab.InsertItem(2, ResStr(IDS_FAVDEVICES));
 	m_tab.SetCurSel(0);
 
-	m_list.InsertColumn(0, _T(""));
-	m_list.InsertColumn(1, _T(""));
+	m_list.InsertColumn(0, L"");
+	m_list.InsertColumn(1, L"");
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	s.GetFav(FAV_FILE, m_sl[0]);
@@ -215,17 +217,20 @@ void CFavoriteOrganizeDlg::OnEditBnClicked()
 {
 	if (POSITION pos = m_list.GetFirstSelectedItemPosition()) {
 		int nItem = m_list.GetNextSelectedItem(pos);
-		CString name = m_list.GetItemText(nItem, 0);
 
 		CAtlList<CString> args;
-		ExplodeEsc(m_sl[m_tab.GetCurSel()].GetAt((POSITION)m_list.GetItemData(nItem)), args, _T(';'));
-		CString path = args.RemoveTail();
+		ExplodeEsc(m_sl[m_tab.GetCurSel()].GetAt((POSITION)m_list.GetItemData(nItem)), args, L';');
+
+		ASSERT(args.GetCount() >= 4);
+		CString& name = GET_BY_INDEX(args, 0);
+		CString& path = GET_BY_INDEX(args, 3);
 
 		CItemPropertiesDlg ipd(name, path);
 		if (ipd.DoModal() == IDOK) {
 			m_list.SetItemText(nItem, 0, ipd.GetPropertyName());
-			args.AddTail(ipd.GetPropertyPath());
-			CString str = ImplodeEsc(args, _T(';'));
+			name = ipd.GetPropertyName();
+			path = ipd.GetPropertyPath();
+			const CString str = ImplodeEsc(args, L';');
 			m_sl[m_tab.GetCurSel()].SetAt((POSITION)m_list.GetItemData(nItem), str);
 		}
 	}
@@ -440,10 +445,13 @@ void CFavoriteOrganizeDlg::OnLvnGetInfoTipList(NMHDR* pNMHDR, LRESULT* pResult)
 	LPNMLVGETINFOTIP pGetInfoTip = reinterpret_cast<LPNMLVGETINFOTIP>(pNMHDR);
 
 	CAtlList<CString> args;
-	ExplodeEsc(m_sl[m_tab.GetCurSel()].GetAt((POSITION)m_list.GetItemData(pGetInfoTip->iItem)), args, _T(';'));
-	CString path = args.RemoveTail();
+	ExplodeEsc(m_sl[m_tab.GetCurSel()].GetAt((POSITION)m_list.GetItemData(pGetInfoTip->iItem)), args, L';');
+
+	ASSERT(args.GetCount() >= 4);
+	const CString& path = GET_BY_INDEX(args, 3);
+
 	// Relative to drive value is always third. If less args are available that means it is not included.
-	int rootLength = (args.GetCount() == 3 && args.RemoveTail() != _T("0")) ? CPath(path).SkipRoot() : 0;
+	const int rootLength = (m_tab.GetCurSel() == 0 && GET_BY_INDEX(args, 2) != L"0") ? CPath(path).SkipRoot() : 0;
 
 	StringCchCopy(pGetInfoTip->pszText, pGetInfoTip->cchTextMax, path.Mid(rootLength));
 	*pResult = 0;
