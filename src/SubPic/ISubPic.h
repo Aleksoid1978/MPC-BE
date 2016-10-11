@@ -187,6 +187,8 @@ public IUnknown {
 	STDMETHOD_(void, SetPosition) (RECT w, RECT v) PURE;
 	STDMETHOD (SetRotation) (int rotation) PURE;
 	STDMETHOD_(int, GetRotation) () PURE;
+	STDMETHOD (SetFlip) (bool flip) PURE;
+	STDMETHOD_(bool, GetFlip) () PURE;
 	STDMETHOD_(bool, Paint) (bool fAll) PURE;
 
 	STDMETHOD_(void, SetTime) (REFERENCE_TIME rtNow) PURE;

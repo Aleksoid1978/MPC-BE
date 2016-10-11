@@ -272,6 +272,7 @@ namespace GothSync
 
 		CSize m_ScreenSize;
 		int m_iRotation; // total rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
+		bool m_bFlip; // horizontal flip. for vertical flip use together with a rotation of 180 deg.
 		DXVA2_ExtendedFormat m_inputExtFormat;
 		const wchar_t* m_wsResizer;
 
@@ -358,6 +359,8 @@ namespace GothSync
 		STDMETHODIMP_(SIZE) GetVideoSizeAR();
 		STDMETHODIMP SetRotation(int rotation) override;
 		STDMETHODIMP_(int) GetRotation() override;
+		STDMETHODIMP SetFlip(bool flip) override;
+		STDMETHODIMP_(bool) GetFlip() override;
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
 		STDMETHODIMP ClearPixelShaders(int target);

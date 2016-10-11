@@ -1042,7 +1042,7 @@ public:
 	afx_msg void OnViewPanNScanPresets(UINT nID);
 	afx_msg void OnUpdateViewPanNScanPresets(CCmdUI* pCmdUI);
 	afx_msg void OnViewRotate(UINT nID);
-	afx_msg void OnUpdateViewRotate(CCmdUI* pCmdUI);
+	afx_msg void OnViewFlip();
 	afx_msg void OnViewAspectRatio(UINT nID);
 	afx_msg void OnUpdateViewAspectRatio(CCmdUI* pCmdUI);
 	afx_msg void OnViewAspectRatioNext();

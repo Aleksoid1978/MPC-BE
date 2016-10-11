@@ -7,7 +7,8 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include "afxres.h"
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -2159,14 +2160,10 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_REGULARSURF         "Video surface will be allocated as a regular offscreen surface."
-    IDS_PPAGE_OUTPUT_OVERLAYMIXER   "Overlay Mixer Renderer"
-    IDS_PPAGE_OUTPUT_VMR7WINDOWED   "Video Mixing Renderer 7 (windowed)"
+    IDC_REGULARSURF                 "Video surface will be allocated as a regular offscreen surface."
     IDS_PPAGE_OUTPUT_VMR9WINDOWED   "Video Mixing Renderer 9 (windowed)"
-    IDS_PPAGE_OUTPUT_VMR7RENDERLESS "Video Mixing Renderer 7 (renderless)"
-    IDS_PPAGE_OUTPUT_VMR9RENDERLESS "Video Mixing Renderer 9 (renderless)"
     IDS_PPAGE_OUTPUT_EVR            "Enhanced Video Renderer"
-    IDS_PPAGE_OUTPUT_EVR_CUSTOM     "Enhanced Video Renderer (custom)"
+    IDS_PPAGE_OUTPUT_EVR_CUSTOM     "Enhanced Video Renderer (custom presenter)"
     IDS_PPAGE_OUTPUT_DXR            "Haali Video Renderer"
     IDS_PPAGE_OUTPUT_NULL_COMP      "Null (compressed)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP    "Null (uncompressed)"
@@ -2310,9 +2307,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_PNS_ROTATEX_M    "PnS Rotate X-"
-    IDS_AG_PNS_ROTATEY_P    "PnS Rotate Y+"
-    IDS_AG_PNS_ROTATEY_M    "PnS Rotate Y-"
+    IDS_AG_PNS_FLIP         "PnS Horizontal Flip"
     IDS_AG_PNS_ROTATEZ_P    "PnS Rotate Z+"
     IDS_AG_PNS_ROTATEZ_M    "PnS Rotate Z-"
     IDS_AG_TEARING_TEST     "Tearing Test"
@@ -2866,7 +2861,6 @@ BEGIN
     IDS_AG_VIDFRM_INSIDE    "VidFrm Inside"
     IDS_AG_VIDFRM_OUTSIDE   "VidFrm Outside"
     IDS_AG_PNS_RESET        "PnS Reset"
-    IDS_AG_PNS_ROTATEX_P    "PnS Rotate X+"
 END
 
 STRINGTABLE
