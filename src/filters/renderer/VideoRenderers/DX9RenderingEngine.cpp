@@ -121,10 +121,6 @@ static HRESULT TextureBlt(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<texcoords> v[4]
 
 using namespace DSObjects;
 
-#define PCIV_ATI     0x1002
-#define PCIV_nVidia  0x10DE
-#define PCIV_Intel   0x8086
-
 CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError)
 	: CSubPicAllocatorPresenterImpl(hWnd, hr, _pError)
 	, m_ScreenSize(0, 0)
