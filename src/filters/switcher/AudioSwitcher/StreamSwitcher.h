@@ -141,6 +141,7 @@ class CStreamSwitcherInputPin : public CBaseInputPin, public IPinConnection, pub
 	HANDLE m_hNotifyEvent;
 
 	CStreamSwitcherFilter* m_pSSF;
+	CComPtr<IAMStreamSelect> m_pISSF;
 
 public:
 	CStreamSwitcherInputPin(CStreamSwitcherFilter* pFilter, HRESULT* phr, LPCWSTR pName);
@@ -148,19 +149,14 @@ public:
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-	CMediaType& CurrentMediaType() {
-		return m_mt;
-	}
-	IMemAllocator* CurrentAllocator() {
-		return m_pAllocator;
-	}
+	CMediaType& CurrentMediaType() { return m_mt; }
+	IMemAllocator* CurrentAllocator() { return m_pAllocator; }
 
-	bool IsUsingOwnAllocator() {
-		return m_bUsingOwnAllocator == TRUE;
-	}
+	bool IsUsingOwnAllocator() { return m_bUsingOwnAllocator == TRUE; }
 
 	CCritSec m_csReceive;
 
+	CComPtr<IAMStreamSelect> GetStreamSelectionFilter() { return m_pISSF; }
 	// pure virtual
 	HRESULT CheckMediaType(const CMediaType* pmt);
 
@@ -204,15 +200,9 @@ public:
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-	CMediaType& CurrentMediaType() {
-		return m_mt;
-	}
-	IMemAllocator* CurrentAllocator() {
-		return m_pAllocator;
-	}
-	IPinConnection* CurrentPinConnection() {
-		return m_pPinConnection;
-	}
+	CMediaType& CurrentMediaType() { return m_mt; }
+	IMemAllocator* CurrentAllocator() { return m_pAllocator; }
+	IPinConnection* CurrentPinConnection() { return m_pPinConnection; }
 
 	// pure virtual
 	HRESULT	DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PROPERTIES* pProperties);

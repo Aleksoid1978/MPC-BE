@@ -89,7 +89,7 @@ HRESULT GetPeer(CStreamSwitcherFilter* pFilter, T** ppT)
 	{ \
 		CBasePin* pPin = m_pFilter->m_pInputs.GetNext(pos); \
 		CComPtr<IPin> pConnected; \
-	    if(FAILED(pPin->ConnectedTo(&pConnected))) \
+		if(FAILED(pPin->ConnectedTo(&pConnected))) \
 			continue; \
 		if(CComQIPtr<IMediaSeeking> pMS = pConnected) \
 		{ \
@@ -107,7 +107,7 @@ HRESULT GetPeer(CStreamSwitcherFilter* pFilter, T** ppT)
 	{ \
 		CBasePin* pPin = m_pFilter->m_pInputs.GetNext(pos); \
 		CComPtr<IPin> pConnected; \
-	    if(FAILED(pPin->ConnectedTo(&pConnected))) \
+		if(FAILED(pPin->ConnectedTo(&pConnected))) \
 			continue; \
 		if(CComQIPtr<IMediaPosition> pMP = pConnected) \
 		{ \
@@ -544,9 +544,9 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 
 	m_pSSF->CompleteConnect(PINDIR_INPUT, this, pReceivePin);
 
-	CStringW fileName;
-	CStringW splitterPinName;
-	CStringW pinName;
+	CString fileName;
+	CString pinName;
+	CString trackName;
 
 	IPin* pPin = (IPin*)this;
 	IBaseFilter* pBF = (IBaseFilter*)m_pFilter;
@@ -556,39 +556,33 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 		pBF = GetFilterFromPin(pPin);
 	}
 	while (pPin && pBF) {
-		BOOL bHaveStream = FALSE;
-		BeginEnumMediaTypes(pPin, pEMT, pmt) {
-			if (pmt->majortype == MEDIATYPE_Stream) {
-				bHaveStream = TRUE;
-				break;
-			}
-		}
-		EndEnumMediaTypes(pmt)
-
-		if (!bHaveStream) {
+		if (IsSplitter(pBF)) {
 			pinName = GetPinName(pPin);
+		}
 
-			if (CComQIPtr<IAMStreamSelect> pSSF = pBF) {
-				DWORD cStreams = 0;
-				hr = pSSF->Count(&cStreams);
-				if (SUCCEEDED(hr) && cStreams == 1) {
-					AM_MEDIA_TYPE* pmt = NULL;
+		DWORD cStreams = 0;
+		if (CComQIPtr<IAMStreamSelect> pSSF = pBF) {
+			hr = pSSF->Count(&cStreams);
+			if (SUCCEEDED(hr)) {
+				for (int i = 0; i < (int)cStreams; i++) {
 					WCHAR* pszName = NULL;
-					hr = pSSF->Info(0, &pmt, NULL, NULL, NULL, &pszName, NULL, NULL);
+					AM_MEDIA_TYPE* pmt = NULL;
+					hr = pSSF->Info(i, &pmt, NULL, NULL, NULL, &pszName, NULL, NULL);
 					if (SUCCEEDED(hr) && pmt && pmt->majortype == MEDIATYPE_Audio) {
-						pinName = pszName;
+						trackName = pszName;
+						m_pISSF = pSSF;
+						DeleteMediaType(pmt);
+						if (pszName) {
+							CoTaskMemFree(pszName);
+						}
+						break;
 					}
-
 					DeleteMediaType(pmt);
 					if (pszName) {
 						CoTaskMemFree(pszName);
 					}
 				}
 			}
-		}
-
-		if (IsSplitter(pBF)) {
-			splitterPinName = !bHaveStream ? pinName : GetPinName(pPin);
 		}
 
 		if (CComQIPtr<IFileSourceFilter> pFSF = pBF) {
@@ -598,20 +592,19 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 				fileName = pszName;
 				CoTaskMemFree(pszName);
 
-				if (!::PathIsURL(fileName)) {
-					fileName.Replace('\\', '/');
-					CStringW fn = fileName.Mid(fileName.ReverseFind('/') + 1);
-					if (!fn.IsEmpty()) {
-						fileName = fn;
-					}
+				if (::PathIsURL(fileName)) {
+					pinName = GetPinName(pPin);
+					fileName = !trackName.IsEmpty() ? trackName : !pinName.IsEmpty() ? pinName : L"Audio";
 				} else {
-					fileName = pinName.IsEmpty() ? L"Audio" : pinName;
-				}
-
-				// Haali & LAVFSplitter return only one "Audio" pin name, cause CMainFrame::OnInitMenuPopup lookup find the wrong popmenu,
-				// add space at the end to prevent this, internal filter never return "Audio" only.
-				if (!splitterPinName.IsEmpty()) {
-					fileName = splitterPinName + L" ";
+					if (!pinName.IsEmpty()) {
+						fileName = pinName;
+					} else {
+						fileName.Replace('\\', '/');
+						CString fn = fileName.Mid(fileName.ReverseFind('/') + 1);
+						if (!fn.IsEmpty()) {
+							fileName = fn;
+						}
+					}
 				}
 
 				WCHAR* pName = DNew WCHAR[fileName.GetLength() + 1];
@@ -619,6 +612,9 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 					wcscpy_s(pName, fileName.GetLength() + 1, fileName);
 					SAFE_DELETE_ARRAY(m_pName);
 					m_pName = pName;
+					if (cStreams == 1) { // Simple external track, no need to use the info from IAMStreamSelect
+						m_pISSF.Release();
+					}
 				}
 			}
 
@@ -653,7 +649,7 @@ STDMETHODIMP CStreamSwitcherInputPin::QueryAccept(const AM_MEDIA_TYPE* pmt)
 STDMETHODIMP CStreamSwitcherInputPin::ReceiveConnection(IPin* pConnector, const AM_MEDIA_TYPE* pmt)
 {
 	// FIXME: this locked up once
-	//    CAutoLock cAutoLock(&((CStreamSwitcherFilter*)m_pFilter)->m_csReceive);
+	// CAutoLock cAutoLock(&((CStreamSwitcherFilter*)m_pFilter)->m_csReceive);
 
 	HRESULT hr;
 	if (S_OK != (hr = QueryAcceptDownstream(pmt))) {
@@ -1112,7 +1108,7 @@ HRESULT CStreamSwitcherOutputPin::GetMediaType(int iPosition, CMediaType* pmt)
 
 	/*
 		if(iPosition < 0) return E_INVALIDARG;
-	    if(iPosition > 0) return VFW_S_NO_MORE_ITEMS;
+		if(iPosition > 0) return VFW_S_NO_MORE_ITEMS;
 
 		CopyMediaType(pmt, &pIn->CurrentMediaType());
 	*/
@@ -1277,7 +1273,7 @@ CStreamSwitcherInputPin* CStreamSwitcherFilter::GetConnectedInputPin(int n)
 			CStreamSwitcherInputPin* pPin = m_pInputs.GetNext(pos);
 			if (pPin->IsConnected()) {
 				if (n == 0) {
-					return(pPin);
+					return pPin;
 				}
 				n--;
 			}
@@ -1368,7 +1364,7 @@ HRESULT CStreamSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	long size = pOut->GetSize();
 
 	if (!pDataIn || !pDataOut /*|| len > size || len <= 0*/) {
-		return S_FALSE;    // FIXME
+		return S_FALSE; // FIXME
 	}
 
 	memcpy(pDataOut, pDataIn, min(len, size));
@@ -1401,13 +1397,34 @@ HRESULT CStreamSwitcherFilter::DeliverNewSegment(REFERENCE_TIME tStart, REFERENC
 
 STDMETHODIMP CStreamSwitcherFilter::Count(DWORD* pcStreams)
 {
-	if (!pcStreams) {
-		return E_POINTER;
-	}
+	CheckPointer(pcStreams, E_POINTER);
 
 	CAutoLock cAutoLock(&m_csPins);
 
-	*pcStreams = GetConnectedInputPinCount();
+	*pcStreams = 0;
+	POSITION pos = m_pInputs.GetHeadPosition();
+	while (pos) {
+		CStreamSwitcherInputPin* pInputPin = m_pInputs.GetNext(pos);
+
+		if (pInputPin->IsConnected()) {
+			if (CComPtr<IAMStreamSelect> pSSF = pInputPin->GetStreamSelectionFilter()) {
+				DWORD cStreams = 0;
+				HRESULT hr = pSSF->Count(&cStreams);
+				if (SUCCEEDED(hr)) {
+					for (int i = 0; i < (int)cStreams; i++) {
+						AM_MEDIA_TYPE* pmt = NULL;
+						hr = pSSF->Info(i, &pmt, NULL, NULL, NULL, NULL, NULL, NULL);
+						if (SUCCEEDED(hr) && pmt && pmt->majortype == MEDIATYPE_Audio) {
+							(*pcStreams)++;
+						}
+						DeleteMediaType(pmt);
+					}
+				}
+			} else {
+				(*pcStreams)++;
+			}
+		}
+	}
 
 	return S_OK;
 }
@@ -1416,36 +1433,87 @@ STDMETHODIMP CStreamSwitcherFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWOR
 {
 	CAutoLock cAutoLock(&m_csPins);
 
-	CBasePin* pPin = GetConnectedInputPin(lIndex);
-	if (!pPin) {
-		return E_INVALIDARG;
-	}
+	bool bFound = false;
+	POSITION pos = m_pInputs.GetHeadPosition();
+	while (pos && !bFound) {
+		CStreamSwitcherInputPin* pInputPin = m_pInputs.GetNext(pos);
 
-	if (ppmt) {
-		*ppmt = CreateMediaType(&m_pOutput->CurrentMediaType());
-	}
+		if (pInputPin->IsConnected()) {
+			if (CComPtr<IAMStreamSelect> pSSF = pInputPin->GetStreamSelectionFilter()) {
+				DWORD cStreams = 0;
+				HRESULT hr = pSSF->Count(&cStreams);
+				if (SUCCEEDED(hr)) {
+					for (int i = 0; i < (int)cStreams; i++) {
+						AM_MEDIA_TYPE* pmt = NULL;
+						DWORD dwFlags;
+						LPWSTR pszName = NULL;
+						hr = pSSF->Info(i, &pmt, &dwFlags, plcid, NULL, &pszName, NULL, NULL);
+						if (SUCCEEDED(hr) && pmt && pmt->majortype == MEDIATYPE_Audio) {
+							if (lIndex == 0) {
+								bFound = true;
 
-	if (pdwFlags) {
-		*pdwFlags = (m_pInput == pPin) ? AMSTREAMSELECTINFO_EXCLUSIVE : 0;
-	}
+								if (ppmt) {
+									*ppmt = pmt;
+								} else {
+									DeleteMediaType(pmt);
+								}
 
-	if (plcid) {
-		*plcid = 0;
-	}
+								if (pdwFlags) {
+									*pdwFlags = (m_pInput == pInputPin) ? dwFlags : 0;
+								}
 
-	if (pdwGroup) {
-		*pdwGroup = 0;
-	}
+								if (pdwGroup) {
+									*pdwGroup = 0;
+								}
 
-	if (ppszName) {
-		*ppszName = (WCHAR*)CoTaskMemAlloc((wcslen(pPin->Name())+1)*sizeof(WCHAR));
-		if (*ppszName) {
-			wcscpy_s(*ppszName, wcslen(pPin->Name()) + 1, pPin->Name());
+								if (ppszName) {
+									*ppszName = pszName;
+								} else {
+									CoTaskMemFree(pszName);
+								}
+
+								break;
+							} else {
+								lIndex--;
+							}
+						}
+						DeleteMediaType(pmt);
+						CoTaskMemFree(pszName);
+					}
+				}
+			} else if (lIndex == 0) {
+				bFound = true;
+
+				if (ppmt) {
+					*ppmt = CreateMediaType(&m_pOutput->CurrentMediaType());
+				}
+
+				if (pdwFlags) {
+					*pdwFlags = (m_pInput == pInputPin) ? AMSTREAMSELECTINFO_EXCLUSIVE : 0;
+				}
+
+				if (plcid) {
+					*plcid = 0;
+				}
+
+				if (pdwGroup) {
+					*pdwGroup = 0;
+				}
+
+				if (ppszName) {
+					*ppszName = (WCHAR*)CoTaskMemAlloc((wcslen(pInputPin->Name()) + 1) * sizeof(WCHAR));
+					if (*ppszName) {
+						wcscpy_s(*ppszName, wcslen(pInputPin->Name()) + 1, pInputPin->Name());
+					}
+				}
+			} else {
+				lIndex--;
+			}
 		}
 	}
 
-	if (ppObject) {
-		*ppObject = NULL;
+	if (!bFound) {
+		return E_INVALIDARG;
 	}
 
 	if (ppUnk) {
@@ -1463,12 +1531,50 @@ STDMETHODIMP CStreamSwitcherFilter::Enable(long lIndex, DWORD dwFlags)
 
 	PauseGraph;
 
-	CStreamSwitcherInputPin* pNewInput = GetConnectedInputPin(lIndex);
-	if (!pNewInput) {
+	bool bFound = false;
+	int i = 0;
+	CStreamSwitcherInputPin* pNewInputPin = NULL;
+	POSITION pos = m_pInputs.GetHeadPosition();
+	while (pos && !bFound) {
+		pNewInputPin = m_pInputs.GetNext(pos);
+
+		if (pNewInputPin->IsConnected()) {
+			if (CComPtr<IAMStreamSelect> pSSF = pNewInputPin->GetStreamSelectionFilter()) {
+				DWORD cStreams = 0;
+				HRESULT hr = pSSF->Count(&cStreams);
+				if (SUCCEEDED(hr)) {
+					for (i = 0; i < (int)cStreams; i++) {
+						AM_MEDIA_TYPE* pmt = NULL;
+						hr = pSSF->Info(i, &pmt, NULL, NULL, NULL, NULL, NULL, NULL);
+						if (SUCCEEDED(hr) && pmt && pmt->majortype == MEDIATYPE_Audio) {
+							if (lIndex == 0) {
+								bFound = true;
+								DeleteMediaType(pmt);
+								break;
+							} else {
+								lIndex--;
+							}
+						}
+						DeleteMediaType(pmt);
+					}
+				}
+			} else if (lIndex == 0) {
+				bFound = true;
+			} else {
+				lIndex--;
+			}
+		}
+	}
+
+	if (!bFound) {
 		return E_INVALIDARG;
 	}
 
-	SelectInput(pNewInput);
+	SelectInput(pNewInputPin);
+
+	if (CComPtr<IAMStreamSelect> pSSF = pNewInputPin->GetStreamSelectionFilter()) {
+		pSSF->Enable(i, dwFlags);
+	}
 
 	ResumeGraph;
 
