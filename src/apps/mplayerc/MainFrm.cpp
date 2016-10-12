@@ -15617,7 +15617,7 @@ void CMainFrame::UpdateSubDefaultStyle()
 			m_pCAP->Paint(false);
 		}
 	} else if (dynamic_cast<CRenderedHdmvSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
-		s.m_RenderersSettings.bSubpicPosRelative	= s.subdefstyle.relativeTo;
+		s.m_RenderersSettings.bSubpicPosRelative = s.subdefstyle.relativeTo;
 		InvalidateSubtitle();
 		if (GetMediaState() != State_Running) {
 			m_pCAP->Paint(false);
@@ -15645,10 +15645,8 @@ void CMainFrame::SetAudioTrackIdx(int index)
 {
 	if (m_eMediaLoadState == MLS_LOADED) {
 		CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
-
 		DWORD cStreams = 0;
-		if (pSS && SUCCEEDED(pSS->Count(&cStreams))
-				&& (index >= 0) && (index < ((int)cStreams))) {
+		if (pSS && SUCCEEDED(pSS->Count(&cStreams))) {
 			pSS->Enable(index, AMSTREAMSELECTENABLE_ENABLE);
 		}
 	}
@@ -15656,14 +15654,14 @@ void CMainFrame::SetAudioTrackIdx(int index)
 
 REFERENCE_TIME CMainFrame::GetPos()
 {
-	return(m_eMediaLoadState == MLS_LOADED ? m_wndSeekBar.GetPos() : 0);
+	return (m_eMediaLoadState == MLS_LOADED ? m_wndSeekBar.GetPos() : 0);
 }
 
 REFERENCE_TIME CMainFrame::GetDur()
 {
 	__int64 stop;
 	m_wndSeekBar.GetRange(stop);
-	return(m_eMediaLoadState == MLS_LOADED ? stop : 0);
+	return (m_eMediaLoadState == MLS_LOADED ? stop : 0);
 }
 
 bool CMainFrame::GetNeighbouringKeyFrames(REFERENCE_TIME rtTarget, std::pair<REFERENCE_TIME, REFERENCE_TIME>& keyframes) const
@@ -16892,12 +16890,12 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 {
-	CAtlList<CString>	fns;
-	REFERENCE_TIME		rtPos	= 0;
+	CAtlList<CString> fns;
+	REFERENCE_TIME    rtPos = 0;
 
 	switch (pCDS->dwData) {
 		case CMD_OPENFILE :
-			fns.AddHead ((LPCWSTR)pCDS->lpData);
+			fns.AddHead((LPCWSTR)pCDS->lpData);
 			m_wndPlaylistBar.Open(fns, false);
 			OpenCurPlaylistItem();
 			break;
@@ -16911,7 +16909,7 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 			OnPlayPlaypause();
 			break;
 		case CMD_ADDTOPLAYLIST :
-			fns.AddHead ((LPCWSTR)pCDS->lpData);
+			fns.AddHead((LPCWSTR)pCDS->lpData);
 			m_wndPlaylistBar.Append(fns, true);
 			break;
 		case CMD_STARTPLAYLIST :
@@ -16921,7 +16919,7 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 			m_wndPlaylistBar.Empty();
 			break;
 		case CMD_SETPOSITION :
-			rtPos = 10000 * REFERENCE_TIME(_wtof((LPCWSTR)pCDS->lpData)*1000); //with accuracy of 1 ms
+			rtPos = 10000i64 * REFERENCE_TIME(_wtof((LPCWSTR)pCDS->lpData) * 1000); //with accuracy of 1 ms
 			// imianz: quick and dirty trick
 			// Pause->SeekTo->Play (in place of SeekTo only) seems to prevents in most cases
 			// some strange video effects on avi files (ex. locks a while and than running fast).
@@ -16936,8 +16934,8 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 			m_OSD.DisplayMessage(OSD_TOPLEFT, m_wndStatusBar.GetStatusTimer(), 2000);
 			break;
 		case CMD_SETAUDIODELAY :
-			rtPos			= _wtol ((LPCWSTR)pCDS->lpData) * 10000;
-			SetAudioDelay (rtPos);
+			rtPos = _wtol((LPCWSTR)pCDS->lpData) * 10000i64;
+			SetAudioDelay(rtPos);
 			break;
 		case CMD_SETSUBTITLEDELAY :
 			SetSubtitleDelay(_wtoi((LPCWSTR)pCDS->lpData));
@@ -16998,11 +16996,11 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 
 void CMainFrame::SendAPICommand(MPCAPI_COMMAND nCommand, LPCWSTR fmt, ...)
 {
-	CAppSettings&	s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
 	if (s.hMasterWnd) {
-		COPYDATASTRUCT	CDS;
-		TCHAR			buff[800];
+		COPYDATASTRUCT CDS;
+		TCHAR          buff[800] = { 0 };
 
 		va_list args;
 		va_start(args, fmt);
@@ -17111,10 +17109,9 @@ void CMainFrame::SendNowPlayingToApi()
 
 void CMainFrame::SendSubtitleTracksToApi()
 {
-	CStringW	strSubs;
-	POSITION	pos = m_pSubStreams.GetHeadPosition();
-
+	CString strSubs;
 	if (m_eMediaLoadState == MLS_LOADED) {
+		POSITION pos = m_pSubStreams.GetHeadPosition();
 		if (pos) {
 			while (pos) {
 				CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
@@ -17147,12 +17144,13 @@ void CMainFrame::SendSubtitleTracksToApi()
 	} else {
 		strSubs.Append (L"-2");
 	}
+
 	SendAPICommand(CMD_LISTSUBTITLETRACKS, strSubs);
 }
 
 void CMainFrame::SendAudioTracksToApi()
 {
-	CStringW	strAudios;
+	CString strAudios;
 
 	if (m_eMediaLoadState == MLS_LOADED) {
 		CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
@@ -17161,8 +17159,8 @@ void CMainFrame::SendAudioTracksToApi()
 		if (pSS && SUCCEEDED(pSS->Count(&cStreams))) {
 			int currentStream = -1;
 			for (int i = 0; i < (int)cStreams; i++) {
-				DWORD dwFlags	= DWORD_MAX;
-				WCHAR* pszName	= NULL;
+				DWORD dwFlags  = DWORD_MAX;
+				WCHAR* pszName = NULL;
 				if (FAILED(pSS->Info(i, NULL, &dwFlags, NULL, NULL, &pszName, NULL, NULL))) {
 					return;
 				}
@@ -17188,13 +17186,13 @@ void CMainFrame::SendAudioTracksToApi()
 	} else {
 		strAudios.Append(L"-2");
 	}
+
 	SendAPICommand(CMD_LISTAUDIOTRACKS, strAudios);
 }
 
 void CMainFrame::SendPlaylistToApi()
 {
-	CStringW		strPlaylist;
-	int index;
+	CString strPlaylist;
 
 	POSITION pos = m_wndPlaylistBar.m_pl.GetHeadPosition(), pos2;
 	while (pos) {
@@ -17212,12 +17210,14 @@ void CMainFrame::SendPlaylistToApi()
 			}
 		}
 	}
-	index = m_wndPlaylistBar.GetSelIdx();
+
+	int index = m_wndPlaylistBar.GetSelIdx();
 	if (strPlaylist.IsEmpty()) {
 		strPlaylist.Append(L"-1");
 	} else {
 		strPlaylist.AppendFormat(L"|%i", index);
 	}
+
 	SendAPICommand(CMD_PLAYLIST, strPlaylist);
 }
 
