@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include <moreuuids.h>
+#include <mpc_defines.h>
 #include "DXVA2DecoderH264.h"
 #include "../MPCVideoDec.h"
 #include "../FfmpegContext.h"

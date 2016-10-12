@@ -41,3 +41,8 @@
 
 #define SAFE_DELETE(p)       { if (p) { delete (p);     (p) = NULL; } }
 #define SAFE_DELETE_ARRAY(p) { if (p) { delete [] (p);  (p) = NULL; } }
+
+#define PCIV_ATI         0x1002
+#define PCIV_nVidia      0x10DE
+#define PCIV_Intel       0x8086
+#define PCIV_S3_Graphics 0x5333

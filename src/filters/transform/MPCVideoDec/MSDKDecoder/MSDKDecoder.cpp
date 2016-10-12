@@ -181,7 +181,7 @@ static UINT GetIntelAdapterIdD3D9()
     D3DADAPTER_IDENTIFIER9 adIdentifier;
     for (UINT adp = 0, num_adp = pD3D9->GetAdapterCount(); adp < num_adp; ++adp) {
       if (SUCCEEDED(pD3D9->GetAdapterIdentifier(adp, 0, &adIdentifier))
-          && adIdentifier.VendorId == 0x8086) {
+          && adIdentifier.VendorId == PCIV_Intel) {
         return adp;
       }
     }
