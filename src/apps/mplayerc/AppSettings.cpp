@@ -743,19 +743,12 @@ void CAppSettings::SaveSettings()
 
 		if (fRememberFilePos) {
 			for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
-				CString strFilePos;
-				CString strValue;
+				CString lpKeyName;
+				CString lpString;
 
-				strFilePos.Format(L"File Name %d", i);
-				pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, FilePosition[i].strFile);
-
-				strFilePos.Format(L"File Position %d", i);
-				strValue.Format(L"%I64d", FilePosition[i].llPosition);
-				pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, strValue);
-
-				strFilePos.Format(L"File Data %d", i);
-				strValue.Format(L"%d;%d", FilePosition[i].nAudioTrack, FilePosition[i].nSubtitleTrack);
-				pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, strValue);
+				lpKeyName.Format(L"File Name %d", i);
+				lpString.Format(L"%s;%I64d;%d;%d", FilePosition[i].strFile, FilePosition[i].llPosition, FilePosition[i].nAudioTrack, FilePosition[i].nSubtitleTrack);
+				pApp->WriteProfileString(IDS_R_SETTINGS, lpKeyName, lpString);
 			}
 		}
 	}
@@ -1526,20 +1519,27 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fRememberFilePos     = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FILEPOS, 0);
 	nCurrentFilePosition = -1;
 	for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
-		CString	strFilePos;
-		CString strValue;
+		CString lpKeyName;
+		CString lpString;
 
-		strFilePos.Format(L"File Name %d", i);
-		FilePosition[i].strFile = pApp->GetProfileString(IDS_R_SETTINGS, strFilePos);
+		lpKeyName.Format(L"File Name %d", i);
+		lpString = pApp->GetProfileString(IDS_R_SETTINGS, lpKeyName);
+		
+		CAtlList<CString> args;
+		ExplodeEsc(lpString, args, L';');
+		if (!args.IsEmpty()) {
+			FilePosition[i].strFile = args.RemoveHead();
+			if (!args.IsEmpty()) {
+				FilePosition[i].llPosition = _wtoi64(args.RemoveHead());
 
-		strFilePos.Format(L"File Position %d", i);
-		strValue = pApp->GetProfileString(IDS_R_SETTINGS, strFilePos);
-		FilePosition[i].llPosition = _tstoi64(strValue);
+				if (!args.IsEmpty()) {
+					swscanf_s(args.RemoveHead(), L"%d", &FilePosition[i].nAudioTrack);
 
-		strFilePos.Format(L"File Data %d", i);
-		strValue = pApp->GetProfileString(IDS_R_SETTINGS, strFilePos);
-		if (swscanf_s(strValue, L"%d;%d", &FilePosition[i].nAudioTrack, &FilePosition[i].nSubtitleTrack) != 2) {
-			FilePosition[i].nAudioTrack = FilePosition[i].nSubtitleTrack = -1;
+					if (!args.IsEmpty()) {
+						swscanf_s(args.RemoveHead(), L"%d", &FilePosition[i].nSubtitleTrack);
+					}
+				}
+			}
 		}
 	}
 
@@ -1812,35 +1812,25 @@ void CAppSettings::SaveCurrentFilePosition()
 	CString strValue;
 	int i = nCurrentFilePosition;
 
-	strFilePos.Format(L"File Name %d", i);
-	pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, FilePosition[i].strFile);
+	CString lpKeyName;
+	CString lpString;
 
-	strFilePos.Format(L"File Position %d", i);
-	strValue.Format(L"%I64d", FilePosition[i].llPosition);
-	pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, strValue);
-
-	strFilePos.Format(L"File Data %d", i);
-	strValue.Format(L"%d;%d", FilePosition[i].nAudioTrack, FilePosition[i].nSubtitleTrack);
-	pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, strValue);
+	lpKeyName.Format(L"File Name %d", i);
+	lpString.Format(L"%s;%I64d;%d;%d", FilePosition[i].strFile, FilePosition[i].llPosition, FilePosition[i].nAudioTrack, FilePosition[i].nSubtitleTrack);
+	pApp->WriteProfileString(IDS_R_SETTINGS, lpKeyName, lpString);
 }
 
 void CAppSettings::ClearFilePositions()
 {
 	CWinApp* pApp = AfxGetApp();
-	CString strFilePos;
+	CString lpKeyName;
 	for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
 		FilePosition[i].strFile.Empty();
 		FilePosition[i].llPosition = 0;
 		FilePosition[i].nAudioTrack = FilePosition[i].nSubtitleTrack = -1;
 
-		strFilePos.Format(L"File Name %d", i);
-		pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, L"");
-
-		strFilePos.Format(L"File Position %d", i);
-		pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, L"");
-
-		strFilePos.Format(L"File Data %d", i);
-		pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, L"");
+		lpKeyName.Format(L"File Name %d", i);
+		pApp->WriteProfileString(IDS_R_SETTINGS, lpKeyName, L"");
 	}
 }
 
