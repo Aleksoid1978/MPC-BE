@@ -184,7 +184,9 @@ struct DVD_POSITION {
 #define MAX_FILE_POSITION 50
 struct FILE_POSITION {
 	CString				strFile;
-	LONGLONG			llPosition;
+	LONGLONG			llPosition     = 0;
+	int					nAudioTrack    = -1;
+	int					nSubtitleTrack = -1;
 };
 
 enum {
@@ -837,8 +839,8 @@ public:
 	void			SaveCurrentFilePosition();
 	void			ClearFilePositions();
 
-	void			DeserializeHex (LPCTSTR strVal, BYTE* pBuffer, int nBufSize) const;
-	CString			SerializeHex (BYTE* pBuffer, int nBufSize) const;
+	void			DeserializeHex(LPCTSTR strVal, BYTE* pBuffer, int nBufSize);
+	CString			SerializeHex(BYTE* pBuffer, int nBufSize) const;
 
 	// list of temporary files
 	CAtlList<CString> slTMPFilesList;
