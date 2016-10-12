@@ -29,6 +29,8 @@ extern void CorrectComboListWidth(CComboBox& ComboBox);
 extern void CorrectCWndWidth(CWnd* pWnd);
 
 extern void SelectByItemData(CComboBox& ComboBox, int data);
-extern void SelectByItemData(CListBox ListBox, int data);
+extern void SelectByItemData(CListBox& ListBox, int data);
 extern inline int GetCurItemData(CComboBox& ComboBox);
 extern inline int GetCurItemData(CListBox& ListBox);
+
+extern inline void AddStringData(CComboBox& ComboBox, LPCTSTR str, int data);

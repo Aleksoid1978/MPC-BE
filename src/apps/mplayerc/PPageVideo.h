@@ -40,6 +40,7 @@ private:
 	CComboBox m_cbAPSurfaceUsage;
 	CComboBox m_cbDX9SurfaceFormat;
 	CComboBox m_cbDX9Resizer;
+	CComboBox m_cbDownscaler;
 	CComboBox m_cbEVROutputRange;
 	CButton   m_chkD3DFullscreen;
 	CButton   m_chk10bitOutput;
@@ -72,6 +73,7 @@ protected:
 	virtual BOOL OnApply();
 
 	void UpdateResizerList(int select);
+	void UpdateDownscalerList(int select);
 
 	DECLARE_MESSAGE_MAP()
 
