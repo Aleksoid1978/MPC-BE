@@ -353,7 +353,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	CCritSec m_csSubLock;
 	CInterfaceList<ISubStream> m_pSubStreams;
-	int m_iSubtitleSel; // if (m_iSubtitleSel & (1 << 31)): disabled ...
+	int m_iSubtitleSel; // if (m_iSubtitleSel & 0x80000000) - disabled
 	CComPtr<ISubStream> m_pCurrentSubStream;
 
 	friend class CTextPassThruFilter;
@@ -778,6 +778,9 @@ public:
 
 	void SetAudioTrackIdx(int index);
 	void SetSubtitleTrackIdx(int index);
+
+	int  GetAudioTrackIdx();
+	int  GetSubtitleTrackIdx();
 
 	// shaders
 	CAtlList<CString> m_shaderlabels;
@@ -1339,6 +1342,9 @@ private:
 
 	BOOL		m_bLeftMouseDown			= FALSE;
 	BOOL		m_bLeftMouseDownFullScreen	= FALSE;
+
+	int			m_nAudioTrackStored    = -1;
+	int			m_nSubtitleTrackStored = -1;
 
 public:
 	BOOL		CheckMainFilter(IBaseFilter* pBF);

@@ -3405,6 +3405,8 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 
 	CAppSettings& s = AfxGetAppSettings();
 
+	m_nAudioTrackStored = m_nSubtitleTrackStored = -1;
+
 	if (!m_closingmsg.IsEmpty()) {
 		CString aborted(ResStr(IDS_AG_ABORTED));
 
@@ -4496,13 +4498,13 @@ void CMainFrame::OnStreamAudio(UINT nID)
 		if (pSS && SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 1) {
 			for (DWORD i = 0; i < cStreams; i++) {
 				DWORD dwFlags = 0;
-				CComHeapPtr<WCHAR> pszName;
 				if (FAILED(pSS->Info(i, NULL, &dwFlags, NULL, NULL, NULL, NULL, NULL))) {
 					return;
 				}
 				if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
 					long lNextStream = (i + (nID == 0 ? 1 : cStreams - 1)) % cStreams;
 					pSS->Enable(lNextStream, AMSTREAMSELECTENABLE_ENABLE);
+					CComHeapPtr<WCHAR> pszName;
 					if (SUCCEEDED(pSS->Info(lNextStream, NULL, NULL, NULL, NULL, &pszName, NULL, NULL))) {
 						CString	strMessage;
 						strMessage.Format(ResStr(IDS_AUDIO_STREAM), pszName);
@@ -9161,6 +9163,14 @@ void CMainFrame::OnNavigateSubpic(UINT nID)
 
 void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 {
+	int streamCount = GetStreamCount(2);
+	if (streamCount) {
+		streamCount--;
+	}
+	if (id >= (m_pSubStreams.GetCount() + streamCount)) {
+		id = 0;
+	}
+
 	int splsubcnt = 0;
 	int i = (int)id;
 
@@ -9226,10 +9236,8 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 			DWORD cStreams = 0;
 			if (!FAILED(pSS->Count(&cStreams))) {
 
-				BOOL bIsHaali = FALSE;
 				CComQIPtr<IBaseFilter> pBF = pSS;
 				if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
-					bIsHaali = TRUE;
 					cStreams--;
 				}
 
@@ -9629,9 +9637,9 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 		str.Remove(';');
 
 		// RememberPos
-		CString pos(_T("0"));
+		CString pos(L"0");
 		if (s.bFavRememberPos) {
-			pos.Format(_T("%I64d"), GetPos());
+			pos.Format(L"%I64d", GetPos());
 		}
 
 		str += ';';
@@ -9639,23 +9647,25 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 
 		// RelativeDrive
 		CString relativeDrive;
-		relativeDrive.Format(_T("%d"), s.bFavRelativeDrive);
+		relativeDrive.Format(L"%d", s.bFavRelativeDrive);
 
 		str += ';';
 		str += relativeDrive;
 
 		// Paths
 		if (m_LastOpenBDPath.GetLength() > 0) {
-			str += _T(";") + m_LastOpenBDPath;
+			str += L";" + m_LastOpenBDPath;
 		} else {
 			CPlaylistItem pli;
 			if (m_wndPlaylistBar.GetCur(pli)) {
 				POSITION pos = pli.m_fns.GetHeadPosition();
 				while (pos) {
-					str += _T(";") + pli.m_fns.GetNext(pos).GetName();
+					str += L";" + pli.m_fns.GetNext(pos).GetName();
 				}
 			}
 		}
+
+		str.AppendFormat(L";%d;%d", GetAudioTrackIdx(), GetSubtitleTrackIdx());
 
 		s.AddFav(FAV_FILE, str);
 
@@ -9800,9 +9810,20 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 
 	ExplodeEsc(fav, args, L';');
 	args.RemoveHeadNoReturn();								// desc / name
-	_stscanf_s(args.RemoveHead(), L"%I64d", &rtStart);		// pos
-	_stscanf_s(args.RemoveHead(), L"%d", &bRelativeDrive);	// relative drive
+	swscanf_s(args.RemoveHead(), L"%I64d", &rtStart);		// pos
+	swscanf_s(args.RemoveHead(), L"%d", &bRelativeDrive);	// relative drive
 	rtStart = max(rtStart, 0ll);
+
+	m_nAudioTrackStored    = -1;
+	m_nSubtitleTrackStored = -1;
+	if (args.GetCount() > 2) {
+		if (swscanf_s(args.GetTail(), L"%d", &m_nSubtitleTrackStored) == 1) {
+			args.RemoveTailNoReturn();
+		}
+		if (swscanf_s(args.GetTail(), L"%d", &m_nAudioTrackStored) == 1) {
+			args.RemoveTailNoReturn();
+		}
+	}
 
 	// NOTE: This is just for the favorites but we could add a global settings that does this always when on. Could be useful when using removable devices.
 	//       All you have to do then is plug in your 500 gb drive, full with movies and/or music, start MPC-BE (from the 500 gb drive) with a preloaded playlist and press play.
@@ -12655,6 +12676,11 @@ void CMainFrame::OpenSetupAudioStream()
 		return;
 	}
 
+	if (m_nAudioTrackStored != -1) {
+		SetAudioTrackIdx(m_nAudioTrackStored);
+		return;
+	}
+
 	CAtlList<CString> extAudioList;
 	CPlaylistItem pli;
 	if (m_wndPlaylistBar.GetCur(pli)) {
@@ -13072,6 +13098,11 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 		pos = m_pSubStreams.GetHeadPosition();
 		while (!subs.IsEmpty()) {
 			pos = m_pSubStreams.InsertBefore(pos, subs.RemoveTail());
+		}
+
+		if (m_nSubtitleTrackStored != -1) {
+			SetSubtitleTrackIdx(m_nSubtitleTrackStored);
+			return;
 		}
 
 		if (!s.fUseInternalSelectTrackLogic) {
@@ -13507,8 +13538,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	EndWaitCursor();
 
-	m_closingmsg	= err;
-	WPARAM wp		= (WPARAM)pOMD.Detach();
+	m_closingmsg = err;
+	WPARAM wp    = (WPARAM)pOMD.Detach();
 	if (::GetCurrentThreadId() == AfxGetApp()->m_nThreadID) {
 		OnPostOpen(wp, NULL);
 	} else {
@@ -15625,31 +15656,86 @@ void CMainFrame::UpdateSubDefaultStyle()
 	}
 }
 
-void CMainFrame::SetSubtitleTrackIdx(int index)
-{
-	if (m_eMediaLoadState == MLS_LOADED) {
-		if (index < 0) {
-			m_iSubtitleSel ^= 0x80000000;
-		} else {
-			POSITION pos = m_pSubStreams.FindIndex(index);
-			if (pos) {
-				m_iSubtitleSel = index;
-			}
-		}
-		UpdateSubtitle();
-		AfxGetAppSettings().fEnableSubtitles = !(m_iSubtitleSel & 0x80000000);
-	}
-}
-
 void CMainFrame::SetAudioTrackIdx(int index)
 {
-	if (m_eMediaLoadState == MLS_LOADED) {
+	if (/*m_eMediaLoadState == MLS_LOADED && */GetPlaybackMode() == PM_FILE) {
 		CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
 		DWORD cStreams = 0;
 		if (pSS && SUCCEEDED(pSS->Count(&cStreams))) {
 			pSS->Enable(index, AMSTREAMSELECTENABLE_ENABLE);
 		}
 	}
+}
+
+void CMainFrame::SetSubtitleTrackIdx(int index)
+{
+	if (/*m_eMediaLoadState == MLS_LOADED && */GetPlaybackMode() == PM_FILE) {
+		OnNavMixStreamSubtitleSelectSubMenu(index, 2);
+	}
+}
+
+int CMainFrame::GetAudioTrackIdx()
+{
+	if (m_eMediaLoadState == MLS_LOADED && GetPlaybackMode() == PM_FILE) {
+		CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
+		DWORD cStreams = 0;
+		if (pSS && SUCCEEDED(pSS->Count(&cStreams))) {
+			for (int i = 0; i < (int)cStreams; i++) {
+				DWORD dwFlags = 0;
+				if (FAILED(pSS->Info(i, NULL, &dwFlags, NULL, NULL, NULL, NULL, NULL))) {
+					return -1;
+				}
+				if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
+					return i;
+				}
+			}
+		}
+	}
+
+	return -1;
+}
+
+int CMainFrame::GetSubtitleTrackIdx()
+{
+	if (m_eMediaLoadState == MLS_LOADED && GetPlaybackMode() == PM_FILE
+			&& !(m_iSubtitleSel & 0x80000000)) {
+		int subStreams = 0;
+		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
+		if (pSS && !AfxGetAppSettings().fDisableInternalSubtitles) {
+			DWORD cStreams = 0;
+			if (SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 0) {
+				CComQIPtr<IBaseFilter> pBF = pSS;
+				if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
+					cStreams--;
+				}
+
+				for (DWORD i = 0; i < cStreams; i++) {
+					DWORD dwFlags = DWORD_MAX;
+					DWORD dwGroup = DWORD_MAX;
+					if (FAILED(pSS->Info(i, NULL, &dwFlags, NULL, &dwGroup, NULL, NULL, NULL))) {
+						return -1;
+					}
+
+					if (dwGroup == 2) {
+						if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
+							if (!m_iSubtitleSel) {
+								return subStreams;
+							}
+						}
+						subStreams++;
+					}
+				}
+
+				if (subStreams) {
+					subStreams--;
+				}
+			}
+		}
+
+		return m_iSubtitleSel + subStreams;
+	}
+
+	return -1;
 }
 
 REFERENCE_TIME CMainFrame::GetPos()
