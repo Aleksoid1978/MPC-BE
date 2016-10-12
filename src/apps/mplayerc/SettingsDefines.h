@@ -30,6 +30,7 @@
 #define IDS_R_LOGINS						_T("Logins")
 #define IDS_R_FAVORITES						_T("Favorites")
 #define IDS_R_SHADERS						_T("Shaders")
+#define IDS_R_RECENTFILES					_T("RecentFiles")
 
 #define IDS_RS_FAV_REMEMBERPOS				_T("RememberPosition")
 #define IDS_RS_FAV_RELATIVEDRIVE			_T("RelativeDrive")

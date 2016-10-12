@@ -746,9 +746,9 @@ void CAppSettings::SaveSettings()
 				CString lpKeyName;
 				CString lpString;
 
-				lpKeyName.Format(L"File Name %d", i);
+				lpKeyName.Format(L"File%d", i+1);
 				lpString.Format(L"%s|%I64d|%d|%d", FilePosition[i].strFile, FilePosition[i].llPosition, FilePosition[i].nAudioTrack, FilePosition[i].nSubtitleTrack);
-				pApp->WriteProfileString(IDS_R_SETTINGS, lpKeyName, lpString);
+				pApp->WriteProfileString(IDS_R_RECENTFILES, lpKeyName, lpString);
 			}
 		}
 	}
@@ -1522,8 +1522,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		CString lpKeyName;
 		CString lpString;
 
-		lpKeyName.Format(L"File Name %d", i);
-		lpString = pApp->GetProfileString(IDS_R_SETTINGS, lpKeyName);
+		lpKeyName.Format(L"File%d", i+1);
+		lpString = pApp->GetProfileString(IDS_R_RECENTFILES, lpKeyName);
 		
 		CAtlList<CString> args;
 		ExplodeEsc(lpString, args, L'|');
@@ -1815,9 +1815,9 @@ void CAppSettings::SaveCurrentFilePosition()
 	CString lpKeyName;
 	CString lpString;
 
-	lpKeyName.Format(L"File Name %d", i);
+	lpKeyName.Format(L"File%d", i+1);
 	lpString.Format(L"%s|%I64d|%d|%d", FilePosition[i].strFile, FilePosition[i].llPosition, FilePosition[i].nAudioTrack, FilePosition[i].nSubtitleTrack);
-	pApp->WriteProfileString(IDS_R_SETTINGS, lpKeyName, lpString);
+	pApp->WriteProfileString(IDS_R_RECENTFILES, lpKeyName, lpString);
 }
 
 void CAppSettings::ClearFilePositions()
@@ -1829,8 +1829,8 @@ void CAppSettings::ClearFilePositions()
 		FilePosition[i].llPosition = 0;
 		FilePosition[i].nAudioTrack = FilePosition[i].nSubtitleTrack = -1;
 
-		lpKeyName.Format(L"File Name %d", i);
-		pApp->WriteProfileString(IDS_R_SETTINGS, lpKeyName, L"");
+		lpKeyName.Format(L"File%d", i+1);
+		pApp->WriteProfileString(IDS_R_RECENTFILES, lpKeyName, L"");
 	}
 }
 
