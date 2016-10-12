@@ -64,8 +64,6 @@ namespace DSObjects
 		// Variables initialized/managed by the allocator-presenter!
 		CComPtr<IDirect3D9Ex>		m_pD3DEx;
 		CComPtr<IDirect3DDevice9Ex>	m_pD3DDevEx;
-		UINT						m_CurrentAdapter;
-		UINT						m_AdapterCount;
 
 		D3DFORMAT					m_BackbufferFmt;
 		D3DFORMAT					m_DisplayFmt;
