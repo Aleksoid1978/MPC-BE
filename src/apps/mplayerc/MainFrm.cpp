@@ -2395,7 +2395,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
 						if (!m_bEndOfStream) {
 							CAppSettings& s = AfxGetAppSettings();
-							FILE_POSITION*	FilePosition = s.CurrentFilePosition();
+							FILE_POSITION* FilePosition = s.CurrentFilePosition();
 							if (FilePosition) {
 								FilePosition->llPosition = rtNow;
 
@@ -2406,6 +2406,9 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 								if ((time.QuadPart - m_LastSaveTime.QuadPart) >= 30 * freq.QuadPart) { // save every half of minute
 									m_LastSaveTime = time;
 									if (s.fKeepHistory && s.fRememberFilePos) {
+										FilePosition->nAudioTrack = GetAudioTrackIdx();
+										FilePosition->nSubtitleTrack = GetSubtitleTrackIdx();
+
 										s.SaveCurrentFilePosition();
 									}
 								}
@@ -2881,6 +2884,8 @@ bool CMainFrame::GraphEventComplete()
 	FILE_POSITION*	FilePosition = s.CurrentFilePosition();
 	if (FilePosition) {
 		FilePosition->llPosition = 0;
+		FilePosition->nAudioTrack = -1;
+		FilePosition->nSubtitleTrack = -1;
 
 		QueryPerformanceCounter(&m_LastSaveTime);
 		if (s.fKeepHistory && s.fRememberFilePos) {
@@ -11554,9 +11559,18 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 		if ((CString(fn).MakeLower().Find(_T("://"))) < 0 && bFirst) {
 			if (s.fKeepHistory && s.fRememberFilePos && !s.NewFile(fn)) {
-				REFERENCE_TIME rtPos = s.CurrentFilePosition()->llPosition;
+				FILE_POSITION* FilePosition = s.CurrentFilePosition();
+				REFERENCE_TIME rtPos = FilePosition->llPosition;
 				if (m_pMS) {
 					m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
+				}
+
+				if (m_nAudioTrackStored == -1) {
+					m_nAudioTrackStored = FilePosition->nAudioTrack;
+				}
+
+				if (m_nSubtitleTrackStored == -1) {
+					m_nSubtitleTrackStored = FilePosition->nSubtitleTrack;
 				}
 			}
 		}
@@ -13556,6 +13570,19 @@ void CMainFrame::CloseMediaPrivate()
 	ASSERT(m_eMediaLoadState == MLS_CLOSING);
 
 	KillTimer(TIMER_DM_AUTOCHANGING);
+
+	if (!m_bEndOfStream && GetPlaybackMode() == PM_FILE) {
+		CAppSettings& s = AfxGetAppSettings();
+		if (s.fKeepHistory && s.fRememberFilePos) {
+			FILE_POSITION* FilePosition = s.CurrentFilePosition();
+			if (FilePosition) {
+				FilePosition->nAudioTrack = GetAudioTrackIdx();
+				FilePosition->nSubtitleTrack = GetSubtitleTrackIdx();
+
+				s.SaveCurrentFilePosition();
+			}
+		}
+	}
 
 	m_strCurPlaybackLabel.Empty();
 	m_strFnFull.Empty();
@@ -15679,7 +15706,7 @@ void CMainFrame::SetSubtitleTrackIdx(int index)
 
 int CMainFrame::GetAudioTrackIdx()
 {
-	if (m_eMediaLoadState == MLS_LOADED && GetPlaybackMode() == PM_FILE) {
+	if (/*m_eMediaLoadState == MLS_LOADED && */GetPlaybackMode() == PM_FILE) {
 		CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
 		DWORD cStreams = 0;
 		if (pSS && SUCCEEDED(pSS->Count(&cStreams))) {
@@ -15700,7 +15727,7 @@ int CMainFrame::GetAudioTrackIdx()
 
 int CMainFrame::GetSubtitleTrackIdx()
 {
-	if (m_eMediaLoadState == MLS_LOADED && GetPlaybackMode() == PM_FILE
+	if (/*m_eMediaLoadState == MLS_LOADED && */GetPlaybackMode() == PM_FILE
 			&& !(m_iSubtitleSel & 0x80000000)) {
 		int subStreams = 0;
 		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;

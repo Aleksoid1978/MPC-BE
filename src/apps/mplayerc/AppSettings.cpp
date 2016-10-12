@@ -397,8 +397,8 @@ CString CAppSettings::SelectedAudioRenderer() const
 
 void CAppSettings::ResetPositions()
 {
-	nCurrentDvdPosition		= -1;
-	nCurrentFilePosition	= -1;
+	nCurrentDvdPosition  = -1;
+	nCurrentFilePosition = -1;
 }
 
 DVD_POSITION* CAppSettings::CurrentDVDPosition()
@@ -450,12 +450,17 @@ bool CAppSettings::NewFile(LPCTSTR strFileName)
 
 	// If it is unknown, we put it first
 	for (int i = min(iRecentFilesNumber, MAX_FILE_POSITION) - 1; i > 0; i--) {
-		FilePosition[i].strFile		= FilePosition[i - 1].strFile;
-		FilePosition[i].llPosition	= FilePosition[i - 1].llPosition;
+		FilePosition[i].strFile        = FilePosition[i - 1].strFile;
+		FilePosition[i].llPosition     = FilePosition[i - 1].llPosition;
+		FilePosition[i].nAudioTrack    = FilePosition[i - 1].nAudioTrack;
+		FilePosition[i].nSubtitleTrack = FilePosition[i - 1].nSubtitleTrack;
 	}
-	FilePosition[0].strFile		= strFileName;
-	FilePosition[0].llPosition	= 0;
-	nCurrentFilePosition		= 0;
+	FilePosition[0].strFile        = strFileName;
+	FilePosition[0].llPosition     = 0;
+	FilePosition[0].nAudioTrack    = -1;
+	FilePosition[0].nSubtitleTrack = -1;
+
+	nCurrentFilePosition = 0;
 	return true;
 }
 
@@ -473,8 +478,10 @@ bool CAppSettings::RemoveFile(LPCTSTR strFileName)
 
 	if (idx != -1) {
 		for (int i = idx; i < MAX_FILE_POSITION - 1; i++) {
-			FilePosition[i].strFile		= FilePosition[i + 1].strFile;
-			FilePosition[i].llPosition	= FilePosition[i + 1].llPosition;
+			FilePosition[i].strFile        = FilePosition[i + 1].strFile;
+			FilePosition[i].llPosition     = FilePosition[i + 1].llPosition;
+			FilePosition[i].nAudioTrack    = FilePosition[i + 1].nAudioTrack;
+			FilePosition[i].nSubtitleTrack = FilePosition[i + 1].nSubtitleTrack;
 		}
 
 		return true;
@@ -483,7 +490,7 @@ bool CAppSettings::RemoveFile(LPCTSTR strFileName)
 	return false;
 }
 
-void CAppSettings::DeserializeHex (LPCTSTR strVal, BYTE* pBuffer, int nBufSize) const
+void CAppSettings::DeserializeHex(LPCTSTR strVal, BYTE* pBuffer, int nBufSize)
 {
 	long lRes;
 
@@ -493,7 +500,7 @@ void CAppSettings::DeserializeHex (LPCTSTR strVal, BYTE* pBuffer, int nBufSize) 
 	}
 }
 
-CString CAppSettings::SerializeHex (BYTE* pBuffer, int nBufSize) const
+CString CAppSettings::SerializeHex(BYTE* pBuffer, int nBufSize) const
 {
 	CString strTemp;
 	CString strResult;
@@ -739,10 +746,15 @@ void CAppSettings::SaveSettings()
 				CString strFilePos;
 				CString strValue;
 
-				strFilePos.Format(_T("File Name %d"), i);
+				strFilePos.Format(L"File Name %d", i);
 				pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, FilePosition[i].strFile);
-				strFilePos.Format(_T("File Position %d"), i);
-				strValue.Format(_T("%I64d"), FilePosition[i].llPosition);
+
+				strFilePos.Format(L"File Position %d", i);
+				strValue.Format(L"%I64d", FilePosition[i].llPosition);
+				pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, strValue);
+
+				strFilePos.Format(L"File Data %d", i);
+				strValue.Format(L"%d;%d", FilePosition[i].nAudioTrack, FilePosition[i].nSubtitleTrack);
 				pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, strValue);
 			}
 		}
@@ -1511,18 +1523,24 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 
 	// playback positions for last played files
-	fRememberFilePos		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FILEPOS, 0);
-	nCurrentFilePosition	= -1;
+	fRememberFilePos     = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FILEPOS, 0);
+	nCurrentFilePosition = -1;
 	for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
 		CString	strFilePos;
 		CString strValue;
 
-		strFilePos.Format(_T("File Name %d"), i);
+		strFilePos.Format(L"File Name %d", i);
 		FilePosition[i].strFile = pApp->GetProfileString(IDS_R_SETTINGS, strFilePos);
 
-		strFilePos.Format(_T("File Position %d"), i);
+		strFilePos.Format(L"File Position %d", i);
 		strValue = pApp->GetProfileString(IDS_R_SETTINGS, strFilePos);
 		FilePosition[i].llPosition = _tstoi64(strValue);
+
+		strFilePos.Format(L"File Data %d", i);
+		strValue = pApp->GetProfileString(IDS_R_SETTINGS, strFilePos);
+		if (swscanf_s(strValue, L"%d;%d", &FilePosition[i].nAudioTrack, &FilePosition[i].nSubtitleTrack) != 2) {
+			FilePosition[i].nAudioTrack = FilePosition[i].nSubtitleTrack = -1;
+		}
 	}
 
 	fStartMainTitle			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, 0);
@@ -1794,10 +1812,15 @@ void CAppSettings::SaveCurrentFilePosition()
 	CString strValue;
 	int i = nCurrentFilePosition;
 
-	strFilePos.Format(_T("File Name %d"), i);
+	strFilePos.Format(L"File Name %d", i);
 	pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, FilePosition[i].strFile);
-	strFilePos.Format(_T("File Position %d"), i);
-	strValue.Format(_T("%I64d"), FilePosition[i].llPosition);
+
+	strFilePos.Format(L"File Position %d", i);
+	strValue.Format(L"%I64d", FilePosition[i].llPosition);
+	pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, strValue);
+
+	strFilePos.Format(L"File Data %d", i);
+	strValue.Format(L"%d;%d", FilePosition[i].nAudioTrack, FilePosition[i].nSubtitleTrack);
 	pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, strValue);
 }
 
@@ -1808,10 +1831,15 @@ void CAppSettings::ClearFilePositions()
 	for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
 		FilePosition[i].strFile.Empty();
 		FilePosition[i].llPosition = 0;
+		FilePosition[i].nAudioTrack = FilePosition[i].nSubtitleTrack = -1;
 
-		strFilePos.Format(_T("File Name %d"), i);
+		strFilePos.Format(L"File Name %d", i);
 		pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, L"");
-		strFilePos.Format(_T("File Position %d"), i);
+
+		strFilePos.Format(L"File Position %d", i);
+		pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, L"");
+
+		strFilePos.Format(L"File Data %d", i);
 		pApp->WriteProfileString(IDS_R_SETTINGS, strFilePos, L"");
 	}
 }
