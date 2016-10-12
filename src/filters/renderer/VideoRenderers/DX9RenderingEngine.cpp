@@ -30,7 +30,7 @@
 #define NULL_PTR_ARRAY(a) for (size_t i = 0; i < _countof(a); i++) { a[i] = NULL; }
 
 #pragma pack(push, 1)
-template<int texcoords>
+template<unsigned texcoords>
 struct MYD3DVERTEX {
 	float x, y, z, rhw;
 	struct {
@@ -45,7 +45,7 @@ struct MYD3DVERTEX<0> {
 };
 #pragma pack(pop)
 
-template<int texcoords>
+template<unsigned texcoords>
 static void AdjustQuad(MYD3DVERTEX<texcoords>* v, double dx, double dy)
 {
 	for (int i = 0; i < 4; i++) {
@@ -64,7 +64,7 @@ static void AdjustQuad(MYD3DVERTEX<texcoords>* v, double dx, double dy)
 	}
 }
 
-template<int texcoords>
+template<unsigned texcoords>
 static HRESULT TextureBlt(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<texcoords> v[4], D3DTEXTUREFILTERTYPE filter)
 {
 	if (!pD3DDev) {
@@ -74,16 +74,16 @@ static HRESULT TextureBlt(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<texcoords> v[4]
 	DWORD FVF = 0;
 
 	switch (texcoords) {
-		case 1: FVF = D3DFVF_TEX1; break;
-		case 2: FVF = D3DFVF_TEX2; break;
-		case 3: FVF = D3DFVF_TEX3; break;
-		case 4: FVF = D3DFVF_TEX4; break;
-		case 5: FVF = D3DFVF_TEX5; break;
-		case 6: FVF = D3DFVF_TEX6; break;
-		case 7: FVF = D3DFVF_TEX7; break;
-		case 8: FVF = D3DFVF_TEX8; break;
-		default:
-			return E_FAIL;
+	case 1: FVF = D3DFVF_TEX1; break;
+	case 2: FVF = D3DFVF_TEX2; break;
+	case 3: FVF = D3DFVF_TEX3; break;
+	case 4: FVF = D3DFVF_TEX4; break;
+	case 5: FVF = D3DFVF_TEX5; break;
+	case 6: FVF = D3DFVF_TEX6; break;
+	case 7: FVF = D3DFVF_TEX7; break;
+	case 8: FVF = D3DFVF_TEX8; break;
+	default:
+		return E_FAIL;
 	}
 
 	HRESULT hr;
@@ -95,9 +95,9 @@ static HRESULT TextureBlt(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<texcoords> v[4]
 	hr = pD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	hr = pD3DDev->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	hr = pD3DDev->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
-	hr = pD3DDev->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA|D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
+	hr = pD3DDev->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_RED);
 
-	for (int i = 0; i < texcoords; i++) {
+	for (unsigned i = 0; i < texcoords; i++) {
 		hr = pD3DDev->SetSamplerState(i, D3DSAMP_MAGFILTER, filter);
 		hr = pD3DDev->SetSamplerState(i, D3DSAMP_MINFILTER, filter);
 		hr = pD3DDev->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
@@ -106,16 +106,12 @@ static HRESULT TextureBlt(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<texcoords> v[4]
 		hr = pD3DDev->SetSamplerState(i, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	}
 
-	//
-
 	hr = pD3DDev->SetFVF(D3DFVF_XYZRHW | FVF);
-	// hr = pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, v, sizeof(v[0]));
+	//hr = pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, v, sizeof(v[0]));
 	std::swap(v[2], v[3]);
 	hr = pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, v, sizeof(v[0]));
 
-	//
-
-	for (int i = 0; i < texcoords; i++) {
+	for (unsigned i = 0; i < texcoords; i++) {
 		pD3DDev->SetTexture(i, NULL);
 	}
 
@@ -134,8 +130,6 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_ScreenSize(0, 0)
 	, m_nNbDXSurface(1)
 	, m_nCurSurface(0)
-	, m_CurrentAdapter(UINT_MAX)
-	, m_AdapterCount(0)
 	, m_D3D9VendorId(0)
 	, m_VideoBufferFmt(D3DFMT_X8R8G8B8)
 	, m_SurfaceFmt(D3DFMT_X8R8G8B8)
@@ -547,12 +541,11 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
 
 		MYD3DVERTEX<1> v[] = {
-			{ dest[0].x, dest[0].y, 0.5f, 2.0f, 0.0f, 0.0f },
-			{ dest[1].x, dest[1].y, 0.5f, 2.0f, 1.0f, 0.0f },
-			{ dest[2].x, dest[2].y, 0.5f, 2.0f, 0.0f, 1.0f },
-			{ dest[3].x, dest[3].y, 0.5f, 2.0f, 1.0f, 1.0f },
+			{ dest[0].x - 0.5f, dest[0].y - 0.5f, 0.5f, 2.0f, 0.0f, 0.0f },
+			{ dest[1].x - 0.5f, dest[1].y - 0.5f, 0.5f, 2.0f, 1.0f, 0.0f },
+			{ dest[2].x - 0.5f, dest[2].y - 0.5f, 0.5f, 2.0f, 0.0f, 1.0f },
+			{ dest[3].x - 0.5f, dest[3].y - 0.5f, 0.5f, 2.0f, 1.0f, 1.0f },
 		};
-		AdjustQuad(v, 0, 0);
 
 		hr = m_pD3DDevEx->SetTexture(0, pVideoTexture);
 		hr = m_pD3DDevEx->SetPixelShader(NULL);
@@ -1892,7 +1885,6 @@ HRESULT CDX9RenderingEngine::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_
 	//D3DRS_COLORVERTEX
 	hr = m_pD3DDevEx->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	hr = m_pD3DDevEx->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
-
 
 	hr = m_pD3DDevEx->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA|D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
 

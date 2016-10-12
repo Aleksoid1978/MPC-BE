@@ -105,7 +105,7 @@ namespace GothSync
 
 #pragma pack(push, 1)
 
-	template<int texcoords>
+	template<unsigned texcoords>
 	struct MYD3DVERTEX {
 		float x, y, z, rhw;
 		struct {
@@ -202,9 +202,7 @@ namespace GothSync
 		void DrawText(const RECT &rc, const CString &strText, int _Priority);
 		void DrawStats();
 
-		template<int texcoords>
-		void AdjustQuad(MYD3DVERTEX<texcoords>* v, double dx, double dy);
-		template<int texcoords>
+		template<unsigned texcoords>
 		HRESULT TextureBlt(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<texcoords> v[4], D3DTEXTUREFILTERTYPE filter);
 		MFOffset GetOffset(float v);
 		MFVideoArea GetArea(float x, float y, DWORD width, DWORD height);

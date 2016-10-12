@@ -48,9 +48,9 @@ using namespace D3D9Helper;
 
 CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error)
 	: CDX9RenderingEngine(hWnd, hr, &_Error)
+	, m_CurrentAdapter(UINT_MAX)
+	, m_AdapterCount(0)
 	, m_nTearingPos(0)
-	, m_nVMR9Surfaces(0)
-	, m_iVMR9Surface(0)
 	, m_rtTimePerFrame(0)
 	, m_nUsedBuffer(0)
 	, m_OrderedPaint(0)

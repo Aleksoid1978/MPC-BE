@@ -212,28 +212,7 @@ CBaseAP::~CBaseAP()
 	}
 }
 
-template<int texcoords>
-void CBaseAP::AdjustQuad(MYD3DVERTEX<texcoords>* v, double dx, double dy)
-{
-	float offset = 0.5;
-
-	for (int i = 0; i < 4; i++) {
-		v[i].x -= offset;
-		v[i].y -= offset;
-
-		for (int j = 0; j < max(texcoords-1, 1); j++) {
-			v[i].t[j].u -= (float)(offset*dx);
-			v[i].t[j].v -= (float)(offset*dy);
-		}
-
-		if (texcoords > 1) {
-			v[i].t[texcoords-1].u -= offset;
-			v[i].t[texcoords-1].v -= offset;
-		}
-	}
-}
-
-template<int texcoords>
+template<unsigned texcoords>
 HRESULT CBaseAP::TextureBlt(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<texcoords> v[4], D3DTEXTUREFILTERTYPE filter = D3DTEXF_LINEAR)
 {
 	if (!pD3DDev) {
@@ -264,7 +243,7 @@ HRESULT CBaseAP::TextureBlt(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<texcoords> v[
 	hr = pD3DDev->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 	hr = pD3DDev->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA|D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
 
-	for (int i = 0; i < texcoords; i++) {
+	for (unsigned i = 0; i < texcoords; i++) {
 		hr = pD3DDev->SetSamplerState(i, D3DSAMP_MAGFILTER, filter);
 		hr = pD3DDev->SetSamplerState(i, D3DSAMP_MINFILTER, filter);
 		hr = pD3DDev->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
@@ -278,7 +257,7 @@ HRESULT CBaseAP::TextureBlt(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<texcoords> v[
 	std::swap(v[2], v[3]);
 	hr = pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, v, sizeof(v[0]));
 
-	for (int i = 0; i < texcoords; i++) {
+	for (unsigned i = 0; i < texcoords; i++) {
 		pD3DDev->SetTexture(i, NULL);
 	}
 
@@ -1355,12 +1334,11 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				}
 
 				MYD3DVERTEX<1> v[] = {
-					{ dest[0].x, dest[0].y, 0.5f, 2.0f, 0.0f, 0.0f },
-					{ dest[1].x, dest[1].y, 0.5f, 2.0f, 1.0f, 0.0f },
-					{ dest[2].x, dest[2].y, 0.5f, 2.0f, 0.0f, 1.0f },
-					{ dest[3].x, dest[3].y, 0.5f, 2.0f, 1.0f, 1.0f },
+					{ dest[0].x - 0.5f, dest[0].y- 0.5f, 0.5f, 2.0f, 0.0f, 0.0f },
+					{ dest[1].x - 0.5f, dest[1].y- 0.5f, 0.5f, 2.0f, 1.0f, 0.0f },
+					{ dest[2].x - 0.5f, dest[2].y- 0.5f, 0.5f, 2.0f, 0.0f, 1.0f },
+					{ dest[3].x - 0.5f, dest[3].y- 0.5f, 0.5f, 2.0f, 1.0f, 1.0f },
 				};
-				AdjustQuad(v, 0, 0);
 				hr = m_pD3DDevEx->SetTexture(0, pVideoTexture);
 				hr = m_pD3DDevEx->SetPixelShader(NULL);
 				hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_LINEAR);

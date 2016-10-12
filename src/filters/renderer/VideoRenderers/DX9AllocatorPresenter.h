@@ -48,6 +48,9 @@ namespace DSObjects
 		void					UpdateAlphaBitmap();
 
 	protected:
+		UINT	m_CurrentAdapter;
+		UINT	m_AdapterCount;
+
 		bool	m_bAlternativeVSync;
 		bool	m_bCompositionEnabled;
 		int		m_OrderedPaint;
@@ -176,8 +179,6 @@ namespace DSObjects
 			_Out_ LPD3DXSPRITE      *ppSprite
 		);
 
-		int						m_nVMR9Surfaces;				// Total number of DX Surfaces
-		int						m_iVMR9Surface;
 		long					m_nUsedBuffer;
 
 		double					m_fAvrFps;						// Estimate the real FPS
