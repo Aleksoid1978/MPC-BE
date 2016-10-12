@@ -1697,6 +1697,7 @@ void CAppSettings::SaveRenderers()
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, rs.iSurfaceType);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, rs.iResizer);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DOWNSCALER, rs.iDownscaler);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, rs.bVMRMixerMode);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, rs.bVMRMixerYUV);
 
@@ -1748,6 +1749,7 @@ void CAppSettings::LoadRenderers()
 
 	rs.iSurfaceType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_APSURACEFUSAGE, SURFACE_TEXTURE3D);
 	rs.iResizer = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DX9_RESIZER, 1);
+	rs.iDownscaler = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DOWNSCALER, 1);
 	rs.bVMRMixerMode = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERMODE, TRUE);
 	rs.bVMRMixerYUV = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VMRMIXERYUV, TRUE);
 

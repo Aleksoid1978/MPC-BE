@@ -220,6 +220,7 @@
 #define IDS_RS_DX9_10BITOUTPUT				_T("DX9TenBitOutput")
 #define IDS_RS_DX9_SURFACEFORMAT			_T("DX9SurfaceFormat")
 #define IDS_RS_DX9_RESIZER					_T("DX9Resizer")
+#define IDS_RS_DOWNSCALER					_T("Downscaler")
 #define IDS_RS_WEBSERVERCGI					_T("WebServerCGI")
 #define IDS_RS_WEBDEFINDEX					_T("WebDefIndex")
 #define IDS_RS_LIMITWINDOWPROPORTIONS		_T("LimitWindowProportions")

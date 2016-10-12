@@ -123,7 +123,7 @@ void SelectByItemData(CComboBox& ComboBox, int data)
 	}
 }
 
-void SelectByItemData(CListBox ListBox, int data)
+void SelectByItemData(CListBox& ListBox, int data)
 {
 	for (int i = 0; i < ListBox.GetCount(); i++) {
 		if (ListBox.GetItemData(i) == (DWORD_PTR)data) {
@@ -142,4 +142,9 @@ inline int GetCurItemData(CComboBox& ComboBox)
 inline int GetCurItemData(CListBox& ListBox)
 {
 	return (int)ListBox.GetItemData(ListBox.GetCurSel());
+}
+
+inline void AddStringData(CComboBox& ComboBox, LPCTSTR str, int data)
+{
+	ComboBox.SetItemData(ComboBox.AddString(str), data);
 }

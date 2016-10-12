@@ -110,6 +110,7 @@ public:
 	int		iSurfaceFormat;
 	bool	b10BitOutput;
 	int		iResizer;
+	int		iDownscaler;
 
 	// frame synchronization
 	bool	bVSync;
