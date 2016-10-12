@@ -315,7 +315,7 @@ void CPlayerNavigationDialog::OnSelChangeComboAudio()
 	nID = m_ComboAudio.GetCurSel() + ID_NAVIGATE_AUDIO_SUBITEM_START;
 
 	TempWnd = static_cast<CPlayerNavigationBar*> (m_pParent) -> m_pParent;
-	static_cast<CMainFrame*>(TempWnd)->OnNavigateAudioMix(nID);
+	static_cast<CMainFrame*>(TempWnd)->OnNavigateAudio(nID);
 
 	pChannel->SetDefaultAudio(m_ComboAudio.GetCurSel());
 	pChannel->ToString();

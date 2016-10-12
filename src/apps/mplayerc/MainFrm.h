@@ -382,10 +382,9 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	void SetupOpenCDSubMenu();
 	void SetupFiltersSubMenu();
-	void SetupAudioSwitcherSubMenu();
 	void SetupAudioOptionSubMenu();
 	void SetupSubtitlesSubMenu();
-	void SetupNavMixAudioSubMenu();
+	void SetupAudioSubMenu();
 	void SetupNavMixSubtitleSubMenu();
 	void SetupVideoStreamsSubMenu();
 	void SetupNavChaptersSubMenu();
@@ -397,9 +396,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	IBaseFilter* FindSwitcherFilter();
 	void SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
 	void OnNavStreamSelectSubMenu(UINT id, DWORD dwSelGroup);
-
-	void SetupNavMixStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
-	void OnNavMixStreamSelectSubMenu(UINT id, DWORD dwSelGroup);
 
 	void SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
 	void OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup);
@@ -418,13 +414,13 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CInterfaceArray<IAMStreamSelect> m_ssarray;
 
 	struct Stream {
-		int  Filter		= 0;
-		int  Index		= 0;
-		int  Num		= -1;
-		int  Sel		= -1;
-		bool Ext		= false;
-		bool forced		= false;
-		bool def		= false;
+		int  Filter = 0;
+		int  Index  = 0;
+		int  Num    = -1;
+		int  Sel    = -1;
+		bool Ext    = false;
+		bool forced	= false;
+		bool def    = false;
 		CString Name;
 	};
 
@@ -525,7 +521,8 @@ public:
 	bool m_bStartInD3DFullscreen;
 	bool m_bHideCursor;
 
-	CMenu m_navMixAudioMenu, m_navMixSubtitleMenu;
+	CMenu m_navAudioMenu;
+	CMenu m_navMixSubtitleMenu;
 
 	CComPtr<IBaseFilter> m_pRefClock; // Adjustable reference clock. GothSync
 	CComPtr<ISyncClock> m_pSyncClock;
@@ -1141,7 +1138,7 @@ public:
 	afx_msg void OnUpdateNavigateSkipFile(CCmdUI* pCmdUI);
 	afx_msg void OnNavigateMenu(UINT nID);
 	afx_msg void OnUpdateNavigateMenu(CCmdUI* pCmdUI);
-	afx_msg void OnNavigateAudioMix(UINT nID);
+	afx_msg void OnNavigateAudio(UINT nID);
 	afx_msg void OnNavigateSubpic(UINT nID);
 	afx_msg void OnNavigateAngle(UINT nID);
 	afx_msg void OnNavigateChapters(UINT nID);
