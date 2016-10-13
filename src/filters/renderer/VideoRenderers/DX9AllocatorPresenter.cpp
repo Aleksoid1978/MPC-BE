@@ -1274,7 +1274,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	HRESULT hr = S_OK;
-	const bool bStereo3DTransform = (m_RenderingPath == RENDERING_PATH_DRAW && rd->m_iStereo3DTransform != STEREO3D_AsIs);
+	const bool bStereo3DTransform = rd->m_iStereo3DTransform != STEREO3D_AsIs;
 
 	m_pD3DDevEx->BeginScene();
 
@@ -1296,21 +1296,6 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		hr = RenderVideo(NULL, rSrcVid, rDstVid);
 	} else {
 		hr = RenderVideo(pBackBuffer, rSrcVid, rDstVid);
-	}
-
-	if (FAILED(hr)) {
-		if (m_RenderingPath == RENDERING_PATH_STRETCHRECT) {
-			// Support ffdshow queueing
-			// m_pD3DDev->StretchRect may fail if ffdshow is using queue output samples.
-			// Here we don't want to show the black buffer.
-			if (m_OrderedPaint) {
-				--m_OrderedPaint;
-			} else {
-				//TRACE("UNORDERED PAINT!!!!!!\n");
-			}
-
-			return false;
-		}
 	}
 
 	// paint subtitles on the backbuffer

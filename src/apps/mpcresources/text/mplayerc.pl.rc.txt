@@ -478,7 +478,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Zmiany zostaną wprowadzone po ponownym uruchomieniu programu."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Renderer wideo"
 7		"Ustawienia VMR-7/VMR-9 (Renderless) i EVR-CP"
 8		"Wybór urzadzenia renderującego D3D9"
@@ -487,17 +487,16 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 12		"VMR Mixer Mode"
 13		"YUV Mixing"
 14		"Ponowne inicjowanie po zmianie wyświelacza"
-15		"Płaszczyzna:"
-17		"Format:"
-19		"Skalowanie:"
-21		"Downscaling*:"
-23		"Zakres wyjścia:"
-25		"Bufor EVR:"
-29		"Zarządzanie kolorami"
-30		"Format wejściowy:"
-32		"Oświetlenie otoczenia:"
-34		"Sposób renderowania:"
-36		"Domyślne"
+15		"Surface format:"
+17		"Skalowanie:"
+19		"Downscaling*:"
+21		"Zakres wyjścia:"
+23		"Bufor EVR:"
+27		"Zarządzanie kolorami"
+28		"Format wejściowy:"
+30		"Oświetlenie otoczenia:"
+32		"Sposób renderowania:"
+34		"Domyślne"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

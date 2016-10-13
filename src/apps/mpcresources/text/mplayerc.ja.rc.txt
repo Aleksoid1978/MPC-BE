@@ -478,7 +478,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"ファイルを開き直すと変更が有効になります。"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"ビデオ レンダラー"
 7		"VMR-7/VMR-9 (レンダレス) と EVR-CP 設定"
 8		"D3D9 レンダー デバイスを選択"
@@ -487,17 +487,16 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 12		"VMR ミキサー モード"
 13		"YUV ミキシング"
 14		"ディスプレイ変更時にリセット"
-15		"サーフェス:"
-17		"方式:"
-19		"リサイザー:"
-21		"ダウンスケーリング*:"
-23		"出力範囲:"
-25		"EVR バッファー:"
-29		"色管理"
-30		"入力タイプ:"
-32		"アンビエント ライト:"
-34		"レンダリング インテント:"
-36		"デフォルト"
+15		"Surface format:"
+17		"リサイザー:"
+19		"ダウンスケーリング*:"
+21		"出力範囲:"
+23		"EVR バッファー:"
+27		"色管理"
+28		"入力タイプ:"
+30		"アンビエント ライト:"
+32		"レンダリング インテント:"
+34		"デフォルト"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

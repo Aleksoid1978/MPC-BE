@@ -106,7 +106,6 @@ public:
 	bool	bResetDevice;
 
 	// surfaces and resizer
-	int		iSurfaceType;
 	int		iSurfaceFormat;
 	bool	b10BitOutput;
 	int		iResizer;

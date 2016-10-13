@@ -478,7 +478,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Modificările vor avea efect după ce redarea a fost închisă și repornită."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Video renderer"
 7		"Setări pentru VMR-7/VMR-9 (fără randare) și EVR (CP)"
 8		"Selectați dispozitivul de randare D3D9"
@@ -487,17 +487,16 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 12		"VMR în mod mixare"
 13		"Mixare YUV"
 14		"Reinițializează la schimbarea ecranului"
-15		"Suprafaţă:"
-17		"Format:"
-19		"Redimensionare:"
-21		"Downscaling*:"
-23		"Output range:"
-25		"Preîncărcări EVR:"
-29		"Color Management"
-30		"Input type:"
-32		"Ambient Light:"
-34		"Rendering Intent:"
-36		"Default"
+15		"Surface format:"
+17		"Redimensionare:"
+19		"Downscaling*:"
+21		"Output range:"
+23		"Preîncărcări EVR:"
+27		"Color Management"
+28		"Input type:"
+30		"Ambient Light:"
+32		"Rendering Intent:"
+34		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

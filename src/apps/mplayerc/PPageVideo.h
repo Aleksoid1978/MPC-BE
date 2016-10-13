@@ -37,7 +37,6 @@ private:
 
 	CComboBox m_cbVideoRenderer;
 	CComboBox m_cbD3D9RenderDevice;
-	CComboBox m_cbAPSurfaceUsage;
 	CComboBox m_cbDX9SurfaceFormat;
 	CComboBox m_cbDX9Resizer;
 	CComboBox m_cbDownscaler;
@@ -79,7 +78,6 @@ protected:
 
 public:
 	afx_msg void OnUpdateMixerYUV(CCmdUI* pCmdUI);
-	afx_msg void OnSurfaceChange();
 	afx_msg void OnDSRendererChange();
 	afx_msg void OnResetDevice();
 	afx_msg void OnFullscreenCheck();
