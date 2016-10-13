@@ -176,17 +176,17 @@ enum favtype {
 
 #define MAX_DVD_POSITION 50
 struct DVD_POSITION {
-	ULONGLONG			llDVDGuid;
-	ULONG				lTitle;
-	DVD_HMSF_TIMECODE	Timecode;
+	ULONGLONG         llDVDGuid = 0;
+	ULONG             lTitle    = 0;
+	DVD_HMSF_TIMECODE Timecode  = { 0 };
 };
 
 #define MAX_FILE_POSITION 50
 struct FILE_POSITION {
-	CString				strFile;
-	LONGLONG			llPosition     = 0;
-	int					nAudioTrack    = -1;
-	int					nSubtitleTrack = -1;
+	CString  strFile;
+	LONGLONG llPosition     = 0;
+	int      nAudioTrack    = -1;
+	int      nSubtitleTrack = -1;
 };
 
 enum {
