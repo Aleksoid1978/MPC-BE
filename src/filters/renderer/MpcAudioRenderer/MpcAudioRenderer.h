@@ -186,7 +186,7 @@ private:
 	HRESULT					CreateAudioClient();
 	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCheckFormat = TRUE);
 	HRESULT					CheckAudioClient(WAVEFORMATEX *pWaveFormatEx = NULL);
-	HRESULT					DoRenderSampleWasapi(IMediaSample *pMediaSample);
+	HRESULT					Transform(IMediaSample *pMediaSample);
 	HRESULT					PushToQueue(CAutoPtr<CPacket> p);
 
 	bool					IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const WAVEFORMATEX *pNewWaveFormatEx);
