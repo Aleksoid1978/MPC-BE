@@ -173,11 +173,7 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	}
 
 	// Bufferize frame only with 3D texture!
-	if (rs.iSurfaceType == SURFACE_TEXTURE3D) {
-		m_nNbDXSurface = clamp(rs.nEVRBuffers, 4, MAX_VIDEO_SURFACES);
-	} else {
-		m_nNbDXSurface = 1;
-	}
+	m_nNbDXSurface = clamp(rs.nEVRBuffers, 4, MAX_VIDEO_SURFACES);
 }
 
 CEVRAllocatorPresenter::~CEVRAllocatorPresenter(void)

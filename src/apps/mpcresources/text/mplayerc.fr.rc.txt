@@ -478,7 +478,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Les changements prennent effet après que la lecture soit arretée et redémarrée."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Video renderer"
 7		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
 8		"Select D3D9 Render Device"
@@ -487,17 +487,16 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 12		"VMR Mixer Mode"
 13		"YUV Mixing"
 14		"Reset when changing display"
-15		"Surfaces :"
-17		"Format:"
-19		"Resizer:"
-21		"Downscaling*:"
-23		"Output range:"
-25		"EVR Buffers:"
-29		"Color Management"
-30		"Input type:"
-32		"Ambient Light:"
-34		"Rendering Intent:"
-36		"Default"
+15		"Surface format:"
+17		"Resizer:"
+19		"Downscaling*:"
+21		"Output range:"
+23		"EVR Buffers:"
+27		"Color Management"
+28		"Input type:"
+30		"Ambient Light:"
+32		"Rendering Intent:"
+34		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

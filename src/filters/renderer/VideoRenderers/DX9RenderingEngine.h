@@ -74,7 +74,6 @@ namespace DSObjects
 		bool						m_bFP16Support;
 
 		// Variables initialized/managed by this class but can be accessed by the allocator-presenter
-		RenderingPath				m_RenderingPath;
 		D3DFORMAT					m_VideoBufferFmt;
 		D3DFORMAT					m_SurfaceFmt;
 
@@ -120,8 +119,8 @@ namespace DSObjects
 		DXVA2_Fixed32 m_DFilterValues[6];
 #endif
 
-		CComPtr<IDirect3DTexture9>	m_pRotateTexture;
 		CComPtr<IDirect3DTexture9>	m_pFrameTextures[2];
+		CComPtr<IDirect3DTexture9>	m_pRotateTexture;
 		CComPtr<IDirect3DTexture9>	m_pResizeTexture;
 		CComPtr<IDirect3DTexture9>	m_pScreenSpaceTextures[2];
 		unsigned					m_iScreenTex;

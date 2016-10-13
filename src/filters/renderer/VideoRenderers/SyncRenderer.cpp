@@ -616,40 +616,26 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 	m_SurfaceFmt = Format;
 
 	HRESULT hr;
-	if (rs.iSurfaceType == SURFACE_TEXTURE2D || rs.iSurfaceType == SURFACE_TEXTURE3D) {
-		int nTexturesNeeded = rs.iSurfaceType == SURFACE_TEXTURE3D ? m_nSurface+2 : 1;
+	int nTexturesNeeded = m_nSurface+2;
 
-		for (int i = 0; i < nTexturesNeeded; i++) {
-			if (FAILED(hr = m_pD3DDevEx->CreateTexture(
-								m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &m_pVideoTextures[i], NULL))) {
-				return hr;
-			}
-
-			if (FAILED(hr = m_pVideoTextures[i]->GetSurfaceLevel(0, &m_pVideoSurfaces[i]))) {
-				return hr;
-			}
-		}
-
-		if (rs.iSurfaceType == SURFACE_TEXTURE3D) {
-			UINT a = max(m_nativeVideoSize.cx, m_nativeVideoSize.cy);
-			if (FAILED(hr = m_pD3DDevEx->CreateTexture(
-				a, a, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &m_pRotateTexture, NULL))) {
-				return hr;
-			}
-			if (FAILED(hr = m_pRotateTexture->GetSurfaceLevel(0, &m_pRotateSurface))) {
-				return hr;
-			}
-		}
-
-		if (rs.iSurfaceType == SURFACE_TEXTURE2D) {
-			for (int i = 0; i < m_nSurface+2; i++) {
-				m_pVideoTextures[i] = NULL;
-			}
-		}
-	} else {
-		if (FAILED(hr = m_pD3DDevEx->CreateOffscreenPlainSurface(m_nativeVideoSize.cx, m_nativeVideoSize.cy, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &m_pVideoSurfaces[m_iCurSurface], NULL))) {
+	for (int i = 0; i < nTexturesNeeded; i++) {
+		if (FAILED(hr = m_pD3DDevEx->CreateTexture(
+							m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &m_pVideoTextures[i], NULL))) {
 			return hr;
 		}
+
+		if (FAILED(hr = m_pVideoTextures[i]->GetSurfaceLevel(0, &m_pVideoSurfaces[i]))) {
+			return hr;
+		}
+	}
+
+	UINT a = max(m_nativeVideoSize.cx, m_nativeVideoSize.cy);
+	if (FAILED(hr = m_pD3DDevEx->CreateTexture(
+		a, a, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &m_pRotateTexture, NULL))) {
+		return hr;
+	}
+	if (FAILED(hr = m_pRotateTexture->GetSurfaceLevel(0, &m_pRotateSurface))) {
+		return hr;
 	}
 
 	hr = m_pD3DDevEx->ColorFill(m_pVideoSurfaces[m_iCurSurface], NULL, 0);
@@ -2267,11 +2253,7 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	}
 
 	// Bufferize frame only with 3D texture
-	if (rs.iSurfaceType == SURFACE_TEXTURE3D) {
-		m_nSurface = max(min (rs.nEVRBuffers, MAX_PICTURE_SLOTS-2), 4);
-	} else {
-		m_nSurface = 1;
-	}
+	m_nSurface = max(min (rs.nEVRBuffers, MAX_PICTURE_SLOTS-2), 4);
 
 	m_nRenderState = Shutdown;
 	m_bStepping = false;

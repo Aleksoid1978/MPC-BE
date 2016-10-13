@@ -478,7 +478,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Οι αλλαγές θα ενεργοποιηθούν μετά το κλείσιμο κι επανεκκίνηση της αναπαραγωγής."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Video renderer"
 7		"VMR-7/VMR-9 (χωρίς απόδοση) και ρυθμίσεις EVR (CP)"
 8		"Επιλογή συσκευής απόδοσης D3D9"
@@ -487,17 +487,16 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 12		"Λειτουργία μείκτη VMR"
 13		"Μείξη YUV"
 14		"Αρχικοποίηση ξανά όταν αλλάζει η οθόνη"
-15		"Επιφάνεια:"
-17		"Format:"
-19		"Αλλαγή μεγέθους:"
-21		"Downscaling*:"
-23		"Output range:"
-25		"Προσωρινές μνήμες EVR:"
-29		"Color Management"
-30		"Input type:"
-32		"Ambient Light:"
-34		"Rendering Intent:"
-36		"Default"
+15		"Surface format:"
+17		"Αλλαγή μεγέθους:"
+19		"Downscaling*:"
+21		"Output range:"
+23		"Προσωρινές μνήμες EVR:"
+27		"Color Management"
+28		"Input type:"
+30		"Ambient Light:"
+32		"Rendering Intent:"
+34		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

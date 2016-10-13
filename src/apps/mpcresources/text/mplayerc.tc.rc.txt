@@ -478,7 +478,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"要關閉或是重新啟動播放後，變更才會有效。"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"視訊繪製器"
 7		"VMR-7/VMR-9 (無轉換) 及 EVR 自訂呈現設定"
 8		"選擇 D3D9 繪製裝置"
@@ -487,17 +487,16 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 12		"VMR 混合模式"
 13		"YUV 混合"
 14		"變更螢幕時重新初始化"
-15		"繪圖頁:"
-17		"格式:"
-19		"變更大小:"
-21		"影像降階*:"
-23		"輸出範圍:"
-25		"EVR 緩衝區:"
-29		"色彩管理"
-30		"輸入類型:"
-32		"環境光:"
-34		"色彩對應方式:"
-36		"預設值"
+15		"Surface format:"
+17		"變更大小:"
+19		"影像降階*:"
+21		"輸出範圍:"
+23		"EVR 緩衝區:"
+27		"色彩管理"
+28		"輸入類型:"
+30		"環境光:"
+32		"色彩對應方式:"
+34		"預設值"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

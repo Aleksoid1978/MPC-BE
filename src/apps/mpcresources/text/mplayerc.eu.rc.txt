@@ -478,7 +478,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Aldaketek eragina dute irakurketa itxi eta berrabiarazi ondoren."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 5		"Bideo aurkezlea"
 7		"VMR-7/VMR-9 (Aurkezgabe) eta EVR-CP ezarpenak"
 8		"Hautatu D3D9 Aurkezpen Gailua"
@@ -487,17 +487,16 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 12		"VMR Nahastzaile Modua"
 13		"YUV Nahasketa"
 14		"Berrezarri erakuspena aldatzerakoan"
-15		"Azalekoa:"
-17		"Heuskarria:"
-19		"Birneurr.:"
-21		"Downscaling*:"
-23		"Irteera maila:"
-25		"EVR Bufferrak:"
-29		"Margo Kudeaketa"
-30		"Sarrera mota:"
-32		"Giro Argia:"
-34		"Aurkezpen Saiakera:"
-36		"Berezkoa"
+15		"Surface format:"
+17		"Birneurr.:"
+19		"Downscaling*:"
+21		"Irteera maila:"
+23		"EVR Bufferrak:"
+27		"Margo Kudeaketa"
+28		"Sarrera mota:"
+30		"Giro Argia:"
+32		"Aurkezpen Saiakera:"
+34		"Berezkoa"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

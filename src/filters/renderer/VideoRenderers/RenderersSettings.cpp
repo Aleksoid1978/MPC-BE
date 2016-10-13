@@ -34,7 +34,6 @@ void CRenderersSettings::SetDefault()
 	sD3DRenderDevice.Empty();
 	bResetDevice					= true;
 
-	iSurfaceType					= SURFACE_TEXTURE3D;
 	iSurfaceFormat					= D3DFMT_X8R8G8B8;
 	b10BitOutput					= false;
 	iResizer						= 1;

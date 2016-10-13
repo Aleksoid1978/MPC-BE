@@ -66,7 +66,6 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_VIDRND_COMBO, m_cbVideoRenderer);
 	DDX_Control(pDX, IDC_D3D9DEVICE_COMBO, m_cbD3D9RenderDevice);
-	DDX_Control(pDX, IDC_DX_SURFACE, m_cbAPSurfaceUsage);
 	DDX_Control(pDX, IDC_COMBO1, m_cbDX9SurfaceFormat);
 	DDX_Control(pDX, IDC_DX9RESIZER_COMBO, m_cbDX9Resizer);
 	DDX_Control(pDX, IDC_COMBO7, m_cbDownscaler);
@@ -91,7 +90,6 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
 	ON_CBN_SELCHANGE(IDC_VIDRND_COMBO, OnDSRendererChange)
-	ON_CBN_SELCHANGE(IDC_DX_SURFACE, OnSurfaceChange)
 	ON_BN_CLICKED(IDC_D3D9DEVICE, OnD3D9DeviceCheck)
 	ON_BN_CLICKED(IDC_RESETDEVICE, OnResetDevice)
 	ON_BN_CLICKED(IDC_FULLSCREEN_MONITOR_CHECK, OnFullscreenCheck)
@@ -107,9 +105,11 @@ BOOL CPPageVideo::OnInitDialog()
 {
 	__super::OnInitDialog();
 
+	GetDlgItem(IDC_STATIC10)->ShowWindow(SW_HIDE);
+	m_cbDownscaler.ShowWindow(SW_HIDE);
+
 	SetCursor(m_hWnd, IDC_VIDRND_COMBO, IDC_HAND);
 	SetCursor(m_hWnd, IDC_D3D9DEVICE_COMBO, IDC_HAND);
-	SetCursor(m_hWnd, IDC_DX_SURFACE, IDC_HAND);
 	SetCursor(m_hWnd, IDC_DX9RESIZER_COMBO, IDC_HAND);
 	SetCursor(m_hWnd, IDC_COMBO7, IDC_HAND);
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
@@ -128,11 +128,6 @@ BOOL CPPageVideo::OnInitDialog()
 	m_chk10bitOutput.SetCheck(rs.b10BitOutput);
 	m_chkVMRMixerMode.SetCheck(rs.bVMRMixerMode);
 	m_chkVMRMixerYUV.SetCheck(rs.bVMRMixerYUV);
-
-	m_cbAPSurfaceUsage.AddString(ResStr(IDS_PPAGE_OUTPUT_SURF_OFFSCREEN));
-	m_cbAPSurfaceUsage.AddString(ResStr(IDS_PPAGE_OUTPUT_SURF_2D));
-	m_cbAPSurfaceUsage.AddString(ResStr(IDS_PPAGE_OUTPUT_SURF_3D));
-	m_cbAPSurfaceUsage.SetCurSel(rs.iSurfaceType);
 
 	m_cbEVROutputRange.AddString(L"0-255");
 	m_cbEVROutputRange.AddString(L"16-235");
@@ -238,18 +233,16 @@ BOOL CPPageVideo::OnInitDialog()
 
 	CreateToolTip();
 	m_wndToolTip.AddTool(GetDlgItem(IDC_VIDRND_COMBO), L"");
-	m_wndToolTip.AddTool(&m_cbAPSurfaceUsage, L"");
 
 	OnDSRendererChange();
 
-	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"8-bit Integer Surfaces"), D3DFMT_X8R8G8B8);
-	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"10-bit Integer Surfaces"), D3DFMT_A2R10G10B10);
-	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"16-bit Floating Point Surfaces"), D3DFMT_A16B16G16R16F);
-	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"32-bit Floating Point Surfaces"), D3DFMT_A32B32G32R32F);
+	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"8-bit Integer"), D3DFMT_X8R8G8B8);
+	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"10-bit Integer"), D3DFMT_A2R10G10B10);
+	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"16-bit Floating Point"), D3DFMT_A16B16G16R16F);
+	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"32-bit Floating Point"), D3DFMT_A32B32G32R32F);
 	m_cbDX9SurfaceFormat.SetCurSel(0); // default
 	SelectByItemData(m_cbDX9SurfaceFormat, rs.iSurfaceFormat);
 
-	OnSurfaceChange();
 	UpdateResizerList(rs.iResizer);
 	UpdateDownscalerList(rs.iDownscaler);
 
@@ -312,7 +305,6 @@ BOOL CPPageVideo::OnApply()
 	CRenderersSettings& rs = s.m_RenderersSettings;
 
 	s.iVideoRenderer	= m_iVideoRendererType = m_iVideoRendererType_store = GetCurItemData(m_cbVideoRenderer);
-	rs.iSurfaceType		= m_cbAPSurfaceUsage.GetCurSel();
 	rs.iResizer			= GetCurItemData(m_cbDX9Resizer);
 	rs.iDownscaler		= GetCurItemData(m_cbDownscaler);
 	rs.bVMRMixerMode	= !!m_chkVMRMixerMode.GetCheck();
@@ -344,23 +336,19 @@ void CPPageVideo::UpdateResizerList(int select)
 
 	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Nearest neighbor"), RESIZER_NEAREST);
 	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Bilinear"), RESIZER_BILINEAR);
-
 #if DXVAVP
 	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
 		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"DXVA2 (Intel GPU only)"), RESIZER_DXVA2);
 	}
 #endif
-
-	if (m_cbAPSurfaceUsage.GetCurSel() == SURFACE_TEXTURE3D) {
-		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: B-spline4"), RESIZER_SHADER_BSPLINE4);
-		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Mitchell-Netravali spline4"), RESIZER_SHADER_MITCHELL4);
-		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Catmull-Rom spline4"), RESIZER_SHADER_CATMULL4);
-		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Bicubic A=-0.6"), RESIZER_SHADER_BICUBIC06);
-		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Bicubic A=-0.8"), RESIZER_SHADER_BICUBIC08);
-		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Bicubic A=-1.0"), RESIZER_SHADER_BICUBIC10);
-		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Lanczos2"), RESIZER_SHADER_LANCZOS2);
-		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Lanczos3"), RESIZER_SHADER_LANCZOS3);
-	}
+	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: B-spline4"), RESIZER_SHADER_BSPLINE4);
+	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Mitchell-Netravali spline4"), RESIZER_SHADER_MITCHELL4);
+	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Catmull-Rom spline4"), RESIZER_SHADER_CATMULL4);
+	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Bicubic A=-0.6"), RESIZER_SHADER_BICUBIC06);
+	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Bicubic A=-0.8"), RESIZER_SHADER_BICUBIC08);
+	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Bicubic A=-1.0"), RESIZER_SHADER_BICUBIC10);
+	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Lanczos2"), RESIZER_SHADER_LANCZOS2);
+	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Lanczos3"), RESIZER_SHADER_LANCZOS3);
 
 	m_cbDX9Resizer.SetCurSel(1); // default
 	SelectByItemData(m_cbDX9Resizer, select);
@@ -374,16 +362,12 @@ void CPPageVideo::UpdateDownscalerList(int select)
 
 	m_cbDownscaler.SetItemData(m_cbDownscaler.AddString(L"Nearest neighbor"), RESIZER_NEAREST);
 	m_cbDownscaler.SetItemData(m_cbDownscaler.AddString(L"Bilinear"), RESIZER_BILINEAR);
-
 #if DXVAVP
 	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
 		m_cbDownscaler.SetItemData(m_cbDownscaler.AddString(L"DXVA2"), RESIZER_DXVA2);
 	}
 #endif
-
-	if (m_cbAPSurfaceUsage.GetCurSel() == SURFACE_TEXTURE3D) {
-		m_cbDownscaler.SetItemData(m_cbDownscaler.AddString(L"PS: Simple averaging"), RESIZER_SHADER_AVERAGE);
-	}
+	m_cbDownscaler.SetItemData(m_cbDownscaler.AddString(L"PS: Simple averaging"), RESIZER_SHADER_AVERAGE);
 
 	m_cbDownscaler.SetCurSel(1); // default
 	SelectByItemData(m_cbDownscaler, select);
@@ -395,38 +379,6 @@ void CPPageVideo::OnUpdateMixerYUV(CCmdUI* pCmdUI)
 	int vrenderer = GetCurItemData(m_cbVideoRenderer);
 
 	pCmdUI->Enable(!!IsDlgButtonChecked(IDC_DSVMRLOADMIXER) && vrenderer == VIDRNDT_VMR9WINDOWED);
-}
-
-void CPPageVideo::OnSurfaceChange()
-{
-	UpdateData();
-
-	switch (m_cbAPSurfaceUsage.GetCurSel()) {
-		case SURFACE_OFFSCREEN:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_REGULARSURF), &m_cbAPSurfaceUsage);
-			m_cbDX9SurfaceFormat.EnableWindow(FALSE);
-			SelectByItemData(m_cbDX9SurfaceFormat, D3DFMT_X8R8G8B8);
-			break;
-		case SURFACE_TEXTURE2D:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_TEXTURESURF2D), &m_cbAPSurfaceUsage);
-			m_cbDX9SurfaceFormat.EnableWindow(FALSE);
-			SelectByItemData(m_cbDX9SurfaceFormat, D3DFMT_X8R8G8B8);
-			break;
-		case SURFACE_TEXTURE3D:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_TEXTURESURF3D), &m_cbAPSurfaceUsage);
-			const int vrenderer = GetCurItemData(m_cbVideoRenderer);
-			if (vrenderer == VIDRNDT_EVR_CUSTOM) {
-				m_cbDX9SurfaceFormat.EnableWindow(TRUE);
-			} else {
-				m_cbDX9SurfaceFormat.EnableWindow(FALSE);
-			}
-			break;
-	}
-
-	UpdateResizerList(GetCurItemData(m_cbDX9Resizer));
-	UpdateDownscalerList(GetCurItemData(m_cbDownscaler));
-
-	SetModified();
 }
 
 void CPPageVideo::OnDSRendererChange()
@@ -447,7 +399,9 @@ void CPPageVideo::OnDSRendererChange()
 		}
 	}
 
-	m_cbAPSurfaceUsage.EnableWindow(FALSE);
+	CRenderersSettings& rs = GetRenderersSettings();
+
+	//m_cbAPSurfaceUsage.EnableWindow(FALSE);
 	m_cbDX9SurfaceFormat.EnableWindow(FALSE);
 	m_cbDX9Resizer.EnableWindow(FALSE);
 	GetDlgItem(IDC_FULLSCREEN_MONITOR_CHECK)->EnableWindow(FALSE);
@@ -460,7 +414,6 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
 	m_cbD3D9RenderDevice.EnableWindow(FALSE);
 	m_cbEVROutputRange.EnableWindow(FALSE);
-	GetDlgItem(IDC_STATIC1)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC2)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC3)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC4)->EnableWindow(FALSE);
@@ -495,9 +448,8 @@ void CPPageVideo::OnDSRendererChange()
 				m_cbD3D9RenderDevice.EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE));
 			}
 
-			// Force 3D surface with EVR Custom
-			m_cbAPSurfaceUsage.SetCurSel(2);
-			OnSurfaceChange();
+			UpdateResizerList(rs.iResizer);
+			UpdateDownscalerList(rs.iDownscaler);
 
 			GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
 			m_cbDX9SurfaceFormat.EnableWindow(TRUE);
@@ -531,9 +483,8 @@ void CPPageVideo::OnDSRendererChange()
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSEVR_CUSTOM), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_SYNC:
-			// Force 3D surface with EVR Sync
-			m_cbAPSurfaceUsage.SetCurSel(2);
-			OnSurfaceChange();
+			UpdateResizerList(GetCurItemData(m_cbDX9Resizer));
+			UpdateDownscalerList(GetCurItemData(m_cbDownscaler));
 
 			GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
@@ -657,14 +608,12 @@ void CPPageVideo::OnBnClickedDefault()
 
 	UpdateData(FALSE);
 
-	m_cbAPSurfaceUsage.SetCurSel(SURFACE_TEXTURE3D);
 	m_cbEVROutputRange.SetCurSel(0);
 	m_chkVMRMixerMode.SetCheck(BST_CHECKED);
 	m_chkVMRMixerYUV.SetCheck(BST_CHECKED);
 
 	m_chkD3DFullscreen.SetCheck(BST_UNCHECKED);
 	m_chk10bitOutput.SetCheck(BST_UNCHECKED);
-	m_cbAPSurfaceUsage.SetCurSel(SURFACE_TEXTURE3D);
 
 	SelectByItemData(m_cbDX9SurfaceFormat, D3DFMT_X8R8G8B8);
 	UpdateResizerList(RESIZER_BILINEAR);
@@ -676,7 +625,6 @@ void CPPageVideo::OnBnClickedDefault()
 	m_cbCMRenderingIntent.SetCurSel(0);
 
 	OnFullscreenCheck();
-	OnSurfaceChange();
 	OnSurfaceFormatChange();
 	OnColorManagmentCheck();
 

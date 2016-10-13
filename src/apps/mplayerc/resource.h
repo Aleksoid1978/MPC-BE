@@ -761,7 +761,6 @@
 #define IDC_TEXTURESURF3D               10729
 #define IDC_DX9RESIZER_COMBO            10730
 #define IDC_DSVMRLOADMIXER              10731
-#define IDC_DX_SURFACE                  10733
 #define IDC_DSVMRYUVMIXER               10734
 #define IDC_DSVMR9LOADMIXER2            10735
 #define IDC_BUTTON_MI_SAVEAS            10736

@@ -134,7 +134,6 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_inputExtFormat({ 0 })
 	, m_wsResizer(L"") // empty string, not nullptr
 	, m_bFP16Support(true) // don't disable hardware features before initializing a renderer
-	, m_RenderingPath(RENDERING_PATH_STRETCHRECT)
 	, m_ScreenSpaceTexWidth(0)
 	, m_ScreenSpaceTexHeight(0)
 	, m_iScreenTex(0)
@@ -234,63 +233,34 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 	FreeVideoSurfaces();
 
 	// Free previously allocated temporary video textures, because the native video size might have been changed!
-	m_pRotateTexture = NULL;
 	NULL_PTR_ARRAY(m_pFrameTextures);
+	m_pRotateTexture = NULL;
 
-	if (rs.iSurfaceType == SURFACE_TEXTURE2D) {
-		if (FAILED(hr = m_pD3DDevEx->CreateTexture(
-			m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
-			D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
-			D3DPOOL_DEFAULT, &m_pVideoTextures[0], NULL))) {
-			return hr;
-		}
-
-		hr = m_pVideoTextures[0]->GetSurfaceLevel(0, &m_pVideoSurfaces[0]);
-		m_pVideoTextures[0] = NULL;
-
-		if (FAILED(hr)) {
-			return hr;
-		}
-
-		m_RenderingPath = RENDERING_PATH_STRETCHRECT;
+	if (m_D3D9VendorId == PCIV_Intel) {
+		// on Intel EVR-Mixer can work with X8R8G8B8 surface only
+		m_VideoBufferFmt = D3DFMT_X8R8G8B8;
 	}
-	else if (rs.iSurfaceType == SURFACE_TEXTURE3D) {
-		m_VideoBufferFmt = m_SurfaceFmt;
-		if (m_D3D9VendorId == PCIV_Intel) {
-			// on Intel EVR-Mixer can work with X8R8G8B8 surface only
-			m_VideoBufferFmt = D3DFMT_X8R8G8B8;
-		}
-		else if (m_D3D9VendorId == PCIV_nVidia
-				&& m_nativeVideoSize.cx == 1920 && m_nativeVideoSize.cy == 1088
-				&& (m_SurfaceFmt == D3DFMT_A16B16G16R16F || m_SurfaceFmt == D3DFMT_A32B32G32R32F)) {
-			// fix Nvidia driver bug ('Integer division by zero' in nvd3dumx.dll)
-			m_VideoBufferFmt = D3DFMT_A2R10G10B10;
-		}
-
-		for (unsigned i = 0; i < m_nNbDXSurface; i++) {
-			if (FAILED(hr = m_pD3DDevEx->CreateTexture(
-								m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
-								D3DUSAGE_RENDERTARGET, m_VideoBufferFmt,
-								D3DPOOL_DEFAULT, &m_pVideoTextures[i], NULL))) {
-				return hr;
-			}
-
-			if (FAILED(hr = m_pVideoTextures[i]->GetSurfaceLevel(0, &m_pVideoSurfaces[i]))) {
-				return hr;
-			}
-		}
-
-		m_RenderingPath = RENDERING_PATH_DRAW;
+	else if (m_D3D9VendorId == PCIV_nVidia
+		&& m_nativeVideoSize.cx == 1920 && m_nativeVideoSize.cy == 1088
+		&& (m_SurfaceFmt == D3DFMT_A16B16G16R16F || m_SurfaceFmt == D3DFMT_A32B32G32R32F)) {
+		// fix Nvidia driver bug ('Integer division by zero' in nvd3dumx.dll)
+		m_VideoBufferFmt = D3DFMT_A2R10G10B10;
 	}
 	else {
-		if (FAILED(hr = m_pD3DDevEx->CreateOffscreenPlainSurface(
-							m_nativeVideoSize.cx, m_nativeVideoSize.cy,
-							m_SurfaceFmt,
-							D3DPOOL_DEFAULT, &m_pVideoSurfaces[m_nCurSurface], NULL))) {
+		m_VideoBufferFmt = m_SurfaceFmt;
+	}
+
+	for (unsigned i = 0; i < m_nNbDXSurface; i++) {
+		if (FAILED(hr = m_pD3DDevEx->CreateTexture(
+							m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
+							D3DUSAGE_RENDERTARGET, m_VideoBufferFmt,
+							D3DPOOL_DEFAULT, &m_pVideoTextures[i], NULL))) {
 			return hr;
 		}
 
-		m_RenderingPath = RENDERING_PATH_STRETCHRECT;
+		if (FAILED(hr = m_pVideoTextures[i]->GetSurfaceLevel(0, &m_pVideoSurfaces[i]))) {
+			return hr;
+		}
 	}
 
 	hr = m_pD3DDevEx->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0);
@@ -312,11 +282,7 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 		return S_OK;
 	}
 
-	if (m_RenderingPath == RENDERING_PATH_DRAW) {
-		return RenderVideoDrawPath(pRenderTarget, srcRect, destRect);
-	} else {
-		return RenderVideoStretchRectPath(pRenderTarget, srcRect, destRect);
-	}
+	return RenderVideoDrawPath(pRenderTarget, srcRect, destRect);
 }
 
 HRESULT CDX9RenderingEngine::Stereo3DTransform(IDirect3DSurface9* pRenderTarget, const CRect& destRect)
