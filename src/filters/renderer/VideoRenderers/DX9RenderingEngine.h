@@ -105,7 +105,7 @@ namespace DSObjects
 
 	private:
 		D3DCAPS9					m_Caps;
-		LPCSTR						m_ShaderProfile;
+		LPCSTR						m_ShaderProfile; // for shader compiler
 
 #if DXVAVP
 		CComPtr<IDirectXVideoProcessorService> m_pDXVAVPS;
@@ -175,7 +175,6 @@ namespace DSObjects
 
 		// Video rendering paths
 		HRESULT RenderVideoDrawPath(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect);
-		HRESULT RenderVideoStretchRectPath(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect);
 
 #if DXVAVP
 		HMODULE m_hDxva2Lib = NULL;
