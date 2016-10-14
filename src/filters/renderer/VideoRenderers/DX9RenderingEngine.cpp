@@ -123,32 +123,36 @@ using namespace DSObjects;
 
 CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError)
 	: CSubPicAllocatorPresenterImpl(hWnd, hr, _pError)
+	, m_BackbufferFmt(D3DFMT_X8R8G8B8)
+	, m_DisplayFmt(D3DFMT_X8R8G8B8)
 	, m_ScreenSize(0, 0)
 	, m_nNbDXSurface(1)
 	, m_nCurSurface(0)
 	, m_D3D9VendorId(0)
+	, m_bFP16Support(true) // don't disable hardware features before initializing a renderer
 	, m_VideoBufferFmt(D3DFMT_X8R8G8B8)
 	, m_SurfaceFmt(D3DFMT_X8R8G8B8)
-	, m_iRotation(0)
-	, m_bFlip(false)
-	, m_inputExtFormat({ 0 })
+	, m_inputExtFormat({})
 	, m_wsResizer(L"") // empty string, not nullptr
-	, m_bFP16Support(true) // don't disable hardware features before initializing a renderer
+	, m_Caps({})
+	, m_ShaderProfile(NULL)
+#if DXVAVP
+	, m_VideoDesc({})
+	, m_VPCaps({})
+#endif
+	, m_iScreenTex(0)
 	, m_ScreenSpaceTexWidth(0)
 	, m_ScreenSpaceTexHeight(0)
-	, m_iScreenTex(0)
-	, m_bFinalPass(false)
+	, m_iRotation(0)
+	, m_bFlip(false)
 	, m_bColorManagement(false)
 	, m_InputVideoSystem(VIDEO_SYSTEM_UNKNOWN)
 	, m_AmbientLight(AMBIENT_LIGHT_BRIGHT)
 	, m_RenderingIntent(COLOR_RENDERING_INTENT_PERCEPTUAL)
+	, m_bFinalPass(false)
 {
 #if DXVAVP
 	m_hDxva2Lib = LoadLibrary(L"dxva2.dll");
-
-	ZeroMemory(&m_VideoDesc, sizeof(m_VideoDesc));
-	ZeroMemory(&m_VPCaps,    sizeof(m_VPCaps));
-
 	ZeroMemory(m_ProcAmpValues, sizeof(m_ProcAmpValues));
 	ZeroMemory(m_NFilterValues, sizeof(m_NFilterValues));
 	ZeroMemory(m_DFilterValues, sizeof(m_DFilterValues));
@@ -653,38 +657,6 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	hr = m_pD3DDevEx->SetPixelShader(NULL);
 
 	m_iScreenTex = src;
-
-	return hr;
-}
-
-HRESULT CDX9RenderingEngine::RenderVideoStretchRectPath(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect)
-{
-	HRESULT hr;
-
-	// Return if the render target or the video surface is not initialized
-	if (pRenderTarget == NULL || m_pVideoSurfaces[m_nCurSurface] == NULL) {
-		return S_OK;
-	}
-
-	D3DTEXTUREFILTERTYPE filter;
-	if (GetRenderersSettings().iResizer == RESIZER_NEAREST) {
-		filter = D3DTEXF_POINT;
-		m_wsResizer = L"Nearest neighbor";
-	} else {
-		filter = D3DTEXF_LINEAR;
-		m_wsResizer = L"Bilinear";
-	}
-
-	CRect rSrcVid(srcRect);
-	CRect rDstVid(destRect);
-
-	ClipToSurface(pRenderTarget, rSrcVid, rDstVid); // grrr
-	// IMPORTANT: rSrcVid has to be aligned on mod2 for yuy2->rgb conversion with StretchRect!!!
-	rSrcVid.left &= ~1;
-	rSrcVid.right &= ~1;
-	rSrcVid.top &= ~1;
-	rSrcVid.bottom &= ~1;
-	hr = m_pD3DDevEx->StretchRect(m_pVideoSurfaces[m_nCurSurface], rSrcVid, pRenderTarget, rDstVid, filter);
 
 	return hr;
 }
@@ -1782,7 +1754,6 @@ HRESULT CDX9RenderingEngine::TextureCopy(IDirect3DTexture9* pTexture)
 bool CDX9RenderingEngine::ClipToSurface(IDirect3DSurface9* pSurface, CRect& s, CRect& d)
 {
 	D3DSURFACE_DESC d3dsd;
-	ZeroMemory(&d3dsd, sizeof(d3dsd));
 	if (FAILED(pSurface->GetDesc(&d3dsd))) {
 		return false;
 	}
@@ -1869,7 +1840,6 @@ HRESULT CDX9RenderingEngine::AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9*
 	HRESULT hr;
 
 	D3DSURFACE_DESC d3dsd;
-	ZeroMemory(&d3dsd, sizeof(d3dsd));
 	if (FAILED(pTexture->GetLevelDesc(0, &d3dsd)) /*|| d3dsd.Type != D3DRTYPE_TEXTURE*/) {
 		return E_FAIL;
 	}
