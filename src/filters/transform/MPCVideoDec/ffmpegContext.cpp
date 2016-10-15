@@ -439,11 +439,10 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 
 	if (nPCIVendor == PCIV_nVidia) {
 		if (DriverVersionCheck(VideoDriverVersion, 9, 18, 13, 2018)) {
-			// The video frame size is checked in the driver
-			// For graphics cards with support for 4k, you must install the driver v320.18 and newer.
+			// For Nvidia graphics cards with support for 4k, you must install the driver v320.18 or newer.
 			return TRUE;
 		}
-		else if (width <= 2032 && height <= 2032 && width * height <= 8190 * 16 * 16) {
+		if (width <= 2032 && height <= 2032 && width * height <= 8190 * 16 * 16) {
 			// tested H.264, VC-1 and MPEG-2 on VP4 (feature set C) (G210M, GT220)
 			return TRUE;
 		}
@@ -454,17 +453,16 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 			// not tested
 			return TRUE;
 		}
-		else if (width <= 2048 && height <= 2304 && width * height <= 2048 * 2048) {
+		if (width <= 2048 && height <= 2304 && width * height <= 2048 * 2048) {
 			// tested H.264 on UVD 2.2 (HD5670, HD5770, HD5850)
 			// it may also work if width = 2064, but unstable
 			return TRUE;
 		}
 	}
-	else if (nPCIVendor == PCIV_Intel && CheckPCID(nPCIDevice, PCID_INTEL_4K, _countof(PCID_INTEL_4K))) {
-		if (width <= 4096 && height <= 4096) { // driver >= v.9.17.10.2867
-			// complete test was performed (HD 4000)
-			return TRUE;
-		}
+	else if (nPCIVendor == PCIV_Intel && DriverVersionCheck(VideoDriverVersion, 10, 0, 18, 0)) {
+		// For Intel graphics cards with support for 4k, you must install the driver v15.33.32.4061 or newer.
+		// PS: real driver version is 10.18.10.4061, but sometimes Windows reports 10.0.18.0
+		return TRUE;
 	}
 	else if (width <= 1920 && height <= 1088) {
 		return TRUE;
