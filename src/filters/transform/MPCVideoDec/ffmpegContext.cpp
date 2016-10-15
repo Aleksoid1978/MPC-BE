@@ -459,9 +459,8 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 			return TRUE;
 		}
 	}
-	else if (nPCIVendor == PCIV_Intel && DriverVersionCheck(VideoDriverVersion, 10, 0, 18, 0)) {
+	else if (nPCIVendor == PCIV_Intel && DriverVersionCheck(VideoDriverVersion, 10, 18, 10, 4061)) {
 		// For Intel graphics cards with support for 4k, you must install the driver v15.33.32.4061 or newer.
-		// PS: real driver version is 10.18.10.4061, but sometimes Windows reports 10.0.18.0
 		return TRUE;
 	}
 	else if (width <= 1920 && height <= 1088) {

@@ -1129,12 +1129,16 @@ void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 
 	CComPtr<IDirect3D9> pD3D9 = D3D9Helper::Direct3DCreate9();
 	if (pD3D9) {
-		D3DADAPTER_IDENTIFIER9 adapterIdentifier = {};
-		if (pD3D9->GetAdapterIdentifier(D3D9Helper::GetAdapter(pD3D9, hWnd), 0, &adapterIdentifier) == S_OK) {
-			m_nPCIVendor         = adapterIdentifier.VendorId;
-			m_nPCIDevice         = adapterIdentifier.DeviceId;
-			m_VideoDriverVersion = adapterIdentifier.DriverVersion.QuadPart;
-			m_strDeviceDescription.Format(L"%S (%04X:%04X)", adapterIdentifier.Description, m_nPCIVendor, m_nPCIDevice);
+		D3DADAPTER_IDENTIFIER9 AdapID9 = {};
+		if (pD3D9->GetAdapterIdentifier(D3D9Helper::GetAdapter(pD3D9, hWnd), 0, &AdapID9) == S_OK) {
+			m_nPCIVendor         = AdapID9.VendorId;
+			m_nPCIDevice         = AdapID9.DeviceId;
+			m_VideoDriverVersion = AdapID9.DriverVersion.QuadPart;
+			if (IsWin81orLater() && (m_VideoDriverVersion & 0xffff00000000) == 0 && (m_VideoDriverVersion & 0xffff) == 0) {
+				// fix bug in GetAdapterIdentifier()
+				m_VideoDriverVersion = (m_VideoDriverVersion & 0xffff000000000000) | ((m_VideoDriverVersion & 0xffff0000) << 16) | 0xffffffff;
+			}
+			m_strDeviceDescription.Format(L"%S (%04X:%04X)", AdapID9.Description, m_nPCIVendor, m_nPCIDevice);
 		}
 	}
 }
@@ -3316,9 +3320,13 @@ HRESULT CMPCVideoDecFilter::DetectVideoCard_EVR(IPin *pPin)
 							hr = pD3D9->GetAdapterIdentifier(DevPar9.AdapterOrdinal, 0, &AdapID9);
 							if (SUCCEEDED(hr)) {
 								// copy adapter description
-								m_nPCIVendor			= AdapID9.VendorId;
-								m_nPCIDevice			= AdapID9.DeviceId;
-								m_VideoDriverVersion	= AdapID9.DriverVersion.QuadPart;
+								m_nPCIVendor         = AdapID9.VendorId;
+								m_nPCIDevice         = AdapID9.DeviceId;
+								m_VideoDriverVersion = AdapID9.DriverVersion.QuadPart;
+								if (IsWin81orLater() && (m_VideoDriverVersion & 0xffff00000000) == 0 && (m_VideoDriverVersion & 0xffff) == 0) {
+									// fix bug in GetAdapterIdentifier()
+									m_VideoDriverVersion = (m_VideoDriverVersion & 0xffff000000000000) | ((m_VideoDriverVersion & 0xffff0000) << 16) | 0xffffffff;
+								}
 								m_strDeviceDescription.Format(L"%S (%04X:%04X)", AdapID9.Description, m_nPCIVendor, m_nPCIDevice);
 							}
 						}
