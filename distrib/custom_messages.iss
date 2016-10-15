@@ -1,4 +1,4 @@
-﻿;
+;
 ; (C) 2009-2016 see Authors.txt
 ;
 ; This file is part of MPC-BE.
@@ -121,7 +121,7 @@ sk.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended
 sk.WinVersionTooLowError=[name] requires Windows Vista or newer to run.
 
 ;Chinese Traditional
-tc.WelcomeLabel2=這將會安裝 [name] 在你的電腦中。%n%n建議您關閉所有其它應用程式然後再繼續。
+tc.WelcomeLabel2=本程式將會安裝 [name] 到您的電腦中。%n%n建議您先關閉所有其他應用程式後再繼續安裝。
 tc.WinVersionTooLowError=執行 [name] 需要 Windows Vista 或更新的版本。
 
 ;Turkish
@@ -764,9 +764,9 @@ nl.langcode=nl
 nl.comp_mpciconlib=Iconen voor mediabestanden
 nl.comp_mpcresources=Localisaties
 nl.comp_mpcbeshellext=Shellextensie installeren
-nl.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
+nl.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloaden)
 nl.msg_DeleteSettings=Wilt u ook de instellingen van MPC-BE verwijderen?%n%nAls u MPC-BE opnieuw gaat installeren is dit niet nodig.
-nl.msg_NoD3DX9DLL_found=De nieuwste DirectX-runtime is niet geinstalleerd!%n%nGraag de nieuwste DirectX-runtime June 2010 downloaden en installeren ongeacht uw Windowsversie.
+nl.msg_NoD3DX9DLL_found=De nieuwste DirectX-runtime is niet geinstalleerd!%n%nGraag de nieuwste DirectX-runtime (Juni 2010) downloaden en installeren ongeacht uw Windowsversie.
 nl.msg_SetupIsRunningWarning=MPC-BE installatie is al gestart!
 #if defined(sse_required)
 nl.msg_simd_sse=Deze versie van MPC-BE heeft een processor nodig die SSE ondersteunt.%n%nUw processor ondersteunt dit niet.
@@ -918,9 +918,9 @@ sc.langcode=sc
 sc.comp_mpciconlib=图标库
 sc.comp_mpcresources=翻译
 sc.comp_mpcbeshellext=安装 shell extension
-sc.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
+sc.comp_intel_msdk=H.264 MVC 3D 解码器（另外下载）
 sc.msg_DeleteSettings=是否同时删除 MPC-BE 设置?%n%n如果您打算再次安装 MPC-BE 则无需删除。
-sc.msg_NoD3DX9DLL_found=还没安装最新版本的 DirectX 运行库!%n%n不论您所使用的作业系统请下载及更新至最新版本的 DirectX 运行库 June 2010。
+sc.msg_NoD3DX9DLL_found=还没安装最新版本的 DirectX 运行库!%n%n不论您所使用的作业系统请下载及更新至最新版本的 DirectX 运行库（2010 年 6 月）。
 sc.msg_SetupIsRunningWarning=MPC-BE 安装程序已在运行中！
 #if defined(sse_required)
 sc.msg_simd_sse=这个编译版的 MPC-BE 需要一个支持 SSE 指令集的 CPU。%n%n但是您的 CPU 并不支持这个功能。
@@ -1035,9 +1035,9 @@ tc.langcode=tc
 tc.comp_mpciconlib=圖示庫
 tc.comp_mpcresources=翻譯
 tc.comp_mpcbeshellext=安裝 shell extension
-tc.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
+tc.comp_intel_msdk=H.264 MVC 3D 解碼器（額外下載）
 tc.msg_DeleteSettings=您是否也要刪除 MPC-BE 設定？%n%n如果您打算再次安裝 MPC-BE 則無需刪除。
-tc.msg_NoD3DX9DLL_found=未安裝最新版本的 DirectX Runtime！%n%n不論您使用的作業系統為何，請下載並更新至最新版本的 DirectX Runtime June 2010。
+tc.msg_NoD3DX9DLL_found=未安裝最新版本的 DirectX Runtime！%n%n不論您使用的作業系統為何，請下載並更新至最新版本的 DirectX Runtime （2010 年 6 月）。
 tc.msg_SetupIsRunningWarning=已在執行 MPC-BE 安裝程式！
 #if defined(sse_required)
 tc.msg_simd_sse=此版的 MPC-BE 需要有支援 SSE 延伸指令集的 CPU。%n%n您的 CPU 並未相容這些功能。
@@ -1046,7 +1046,7 @@ tc.msg_simd_sse2=此版的 MPC-BE 需要有支援 SSE2 延伸指令集的 CPU。
 #endif
 tc.tsk_AllUsers=安裝給所有使用者
 tc.tsk_CurrentUser=僅安裝給目前使用者
-tc.tsk_Other=其它工作：
+tc.tsk_Other=其他工作：
 tc.tsk_ResetSettings=重設設定
 tc.types_DefaultInstallation=預設安裝
 tc.types_CustomInstallation=自訂安裝
