@@ -61,6 +61,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	CCritSec m_csProps;
 
 	CAutoPtrList<CPacket> m_MVCExtensionQueue;
+	CAutoPtrList<CPacket> m_MVCBaseQueue;
 	BOOL  m_bUseMVCExtension          = FALSE;
 	DWORD m_dwMasterH264TrackNumber   = DWORD_MAX;
 	DWORD m_dwMVCExtensionTrackNumber = DWORD_MAX;

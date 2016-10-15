@@ -675,19 +675,41 @@ HRESULT CMpegSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 		if (TrackNumber == m_dwMVCExtensionTrackNumber) {
 			m_MVCExtensionQueue.AddTail(p);
 		} else if (TrackNumber == m_dwMasterH264TrackNumber) {
-			while (!m_MVCExtensionQueue.IsEmpty()) {
-				CAutoPtr<CPacket>& pMVCExtensionPacket = m_MVCExtensionQueue.GetHead();
-				if (pMVCExtensionPacket->rtStart == p->rtStart) {
-					p->Append(*pMVCExtensionPacket);
-					m_MVCExtensionQueue.RemoveHeadNoReturn();
+			m_MVCBaseQueue.AddTail(p);
+			if (m_MVCExtensionQueue.IsEmpty()) {
+				return S_OK;
+			}
 
-					return __super::DeliverPacket(p);
-				} else if (pMVCExtensionPacket->rtStart < p->rtStart) {
-					DLog(L"CMpegSplitterFilter::DeliverPacket() : Dropping MVC extension %I64d, base is %I64d", pMVCExtensionPacket->rtStart, p->rtStart);
-					m_MVCExtensionQueue.RemoveHeadNoReturn();
-				} else {
-					DLog(L"CMpegSplitterFilter::DeliverPacket() : Dropping base %I64d, next MVC extension is %I64d", p->rtStart, pMVCExtensionPacket->rtStart);
-					break;
+			POSITION pos = m_MVCBaseQueue.GetHeadPosition();
+			while (pos) {
+				CAutoPtr<CPacket>& pMVCBasePacket = m_MVCBaseQueue.GetAt(pos);
+
+				POSITION pos_remove = NULL;
+				while (!m_MVCExtensionQueue.IsEmpty()) {
+					CAutoPtr<CPacket>& pMVCExtensionPacket = m_MVCExtensionQueue.GetHead();
+					if (pMVCExtensionPacket->rtStart == pMVCBasePacket->rtStart) {
+						pMVCBasePacket->Append(*pMVCExtensionPacket);
+						m_MVCExtensionQueue.RemoveHeadNoReturn();
+
+						__super::DeliverPacket(pMVCBasePacket);
+						pos_remove = pos;
+						m_MVCBaseQueue.GetNext(pos);
+						m_MVCBaseQueue.RemoveAt(pos_remove);
+						break;
+					} else if (pMVCExtensionPacket->rtStart < pMVCBasePacket->rtStart) {
+						DLog(L"CMpegSplitterFilter::DeliverPacket() : Dropping MVC extension %I64d, base is %I64d", pMVCExtensionPacket->rtStart, pMVCBasePacket->rtStart);
+						m_MVCExtensionQueue.RemoveHeadNoReturn();
+					} else {
+						DLog(L"CMpegSplitterFilter::DeliverPacket() : Dropping base %I64d, next MVC extension is %I64d", pMVCBasePacket->rtStart, pMVCExtensionPacket->rtStart);
+						pos_remove = pos;
+						m_MVCBaseQueue.GetNext(pos);
+						m_MVCBaseQueue.RemoveAt(pos_remove);
+						break;
+					}
+				}
+
+				if (!pos_remove) {
+					m_MVCBaseQueue.GetNext(pos);
 				}
 			}
 		} else {
@@ -1401,6 +1423,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	}
 
 	m_MVCExtensionQueue.RemoveAll();
+	m_MVCBaseQueue.RemoveAll();
 
 	CMpegSplitterFile::stream& masterStream = pMasterStream->GetHead();
 	DWORD TrackNum = masterStream;
