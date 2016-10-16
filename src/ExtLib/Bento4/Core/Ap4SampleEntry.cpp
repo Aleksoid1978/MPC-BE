@@ -1015,8 +1015,8 @@ AP4_VisualSampleEntry::ReadFields(AP4_ByteStream& stream)
     char compressor_name[33];
     stream.Read(compressor_name, 32);
     int name_length = compressor_name[0];
-    if (name_length < 32) {
-        compressor_name[name_length+1] = 0;
+    if (name_length > 0 && name_length < 32) {
+        compressor_name[name_length + 1] = 0;
         m_CompressorName = &compressor_name[1];
     }
 

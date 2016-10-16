@@ -171,9 +171,11 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         stream.Seek(start);
         return result;
     }
+    if (parent && parent->GetType() == type) {
+        type = 0x0000;
+    }
 
-    if (size == 1)
-    {
+    if (size == 1) {
         AP4_UI64 size_high;
 
         result = stream.ReadUI64(size_high);
