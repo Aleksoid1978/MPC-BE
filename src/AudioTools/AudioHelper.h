@@ -44,14 +44,16 @@
                      (uint64_t)(x) << 56)
 #endif
 
-#define INT8_PEAK       128
-#define INT16_PEAK      32768
-#define INT24_PEAK      8388608
-#define INT32_PEAK      2147483648
-#define F8MAX  ( float(INT8_MAX)  / INT8_PEAK)
-#define F16MAX ( float(INT16_MAX) / INT16_PEAK)
-#define D24MAX (double(INT24_MAX) / INT24_PEAK)
-#define D32MAX (double(INT32_MAX) / INT32_PEAK)
+#define INT8_PEAK  128
+#define INT16_PEAK 32768
+#define INT24_PEAK 8388608
+#define INT32_PEAK 2147483648
+#define INT24_MAX  8388607
+
+static const float  F8MAX  =  float(INT8_MAX ) / INT8_PEAK;
+static const float  F16MAX =  float(INT16_MAX) / INT16_PEAK;
+static const double D24MAX = double(INT24_MAX) / INT24_PEAK;
+static const double D32MAX = double(INT32_MAX) / INT32_PEAK;
 
 #define round_f(x) ((x) > 0 ? (x) + 0.5f : (x) - 0.5f)
 #define round_d(x) ((x) > 0 ? (x) + 0.5  : (x) - 0.5)
