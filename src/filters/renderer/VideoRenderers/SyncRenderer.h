@@ -97,12 +97,6 @@ static const GUID GUID_SURFACE_INDEX = { 0x30c8e9f6, 0x415, 0x4b81, { 0xa3, 0x15
 
 namespace GothSync
 {
-	typedef enum {
-		MSG_MIXERIN,
-		MSG_MIXEROUT,
-		MSG_ERROR
-	} EVR_STATS_MSG;
-
 #pragma pack(push, 1)
 
 	template<unsigned texcoords>
@@ -328,7 +322,8 @@ namespace GothSync
 		bool m_bVideoSlowerThanDisplay;
 
 		double m_TextScale;
-		CString m_strStatsMsg[10];
+		CString m_strMixerFmtOut;
+		CString m_strMsgError;
 
 		CGenlock *m_pGenlock; // The video - display synchronizer class
 		CComPtr<IReferenceClock> m_pRefClock; // The reference clock. Used in Paint()

@@ -33,11 +33,6 @@
 
 #define MIN_FRAME_TIME 15000
 
-enum EVR_STATS_MSG {
-	MSG_MIXERIN,
-	MSG_MIXEROUT
-};
-
 // Guid to tag IMFSample with DirectX surface index
 static const GUID GUID_SURFACE_INDEX = { 0x30c8e9f6, 0x415, 0x4b81, { 0xa3, 0x15, 0x1, 0xa, 0xc6, 0xa9, 0xda, 0x19 } };
 
@@ -730,7 +725,7 @@ HRESULT CEVRAllocatorPresenter::SetMediaType(IMFMediaType* pType)
 	if (SUCCEEDED(hr == InitializeDevice(pType))) {
 		D3DFORMAT format = D3DFMT_UNKNOWN;
 		GetMediaTypeFourCC(pType, (DWORD*)&format);
-		m_strStatsMsg[MSG_MIXEROUT] = GetD3DFormatStr(format);
+		m_strMixerFmtOut = GetD3DFormatStr(format);
 	}
 
 	pType->FreeRepresentation(FORMAT_VideoInfo2, (LPVOID)pAMMedia);
