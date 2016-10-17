@@ -86,8 +86,6 @@ inline static void convert_float_to_int24_sse2(BYTE* pOut, float* pIn, const siz
 	__m128  __tmpIn  = _mm_setzero_ps();
 	__m128i __tmpOut = _mm_setzero_si128();
 
-	int32_t tmp[4] = { 0 };
-
 	size_t k = 0;
 	for (; k < allsamples - 3; k += 4) {
 		__tmpIn  = _mm_loadu_ps(&pIn[k]);                                   // in = pIn
@@ -95,16 +93,37 @@ inline static void convert_float_to_int24_sse2(BYTE* pOut, float* pIn, const siz
 		__tmpIn  = _mm_mul_ps(__tmpIn, __32bitScalar);                      // in = in * INT32_PEAK
 
 		__tmpOut = _mm_cvtps_epi32(__tmpIn);                                // out = in
-		_mm_storeu_si128((__m128i*)&tmp, __tmpOut);                         // tmp = out
-
-		for (size_t i = 0; i < 4; i++) {                                    // pOut = tmp
-			int32_to_int24(tmp[i], pOut)
+		for (size_t i = 0; i < 4; i++) {                                    // pOut = out
+			int32_to_int24(__tmpOut.m128i_i32[i], pOut)
 		}
 	}
 
 	for (; k < allsamples; k++) {
 		int32_t i32 = SAMPLE_float_to_int32(pIn[k]);
 		int32_to_int24(i32, pOut);
+	}
+}
+
+inline static void convert_int24_to_float_sse2(float* pOut, BYTE* pIn, const size_t allsamples)
+{
+	__m128i __tmpIn  = _mm_setzero_si128();
+	__m128  __tmpOut = _mm_setzero_ps();
+
+	size_t k = 0;
+	for (; k < allsamples - 3; k += 4) {
+		__tmpIn = _mm_setr_epi32(int24_to_int32((&(pIn[3 * (k    )]))), // in = pIn
+								 int24_to_int32((&(pIn[3 * (k + 1)]))),
+								 int24_to_int32((&(pIn[3 * (k + 2)]))),
+								 int24_to_int32((&(pIn[3 * (k + 3)]))));
+		
+		__tmpOut = _mm_cvtepi32_ps(__tmpIn);                            // out = in
+		__tmpOut = _mm_mul_ps(__tmpOut, __32bitScalarDiv);              // out = out / INT32_PEAK;
+		_mm_storeu_ps(&pOut[k], __tmpOut);                              // pOut = out
+	}
+
+	for (; k < allsamples; k++) {
+		int32_t i32 = int24_to_int32((&(pIn[3 * k])));
+        pOut[k] = SAMPLE_int32_to_float(i32);
 	}
 }
 
@@ -390,11 +409,7 @@ HRESULT convert_to_int32(const SampleFormat sfmt, const WORD nChannels, const DW
 			convert_int16_to_int32(pOut, (int16_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S24:
-			for (size_t i = 0; i < allsamples; ++i) {
-				pOut[i] = (uint32_t)pIn[3 * i]     << 8  |
-				          (uint32_t)pIn[3 * i + 1] << 16 |
-				          (uint32_t)pIn[3 * i + 2] << 24;
-			}
+			convert_int24_to_int32(pOut, pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S32:
 			memcpy(pOut, pIn, nSamples * nChannels * sizeof(int32_t));
@@ -472,7 +487,11 @@ HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DW
 			}
 			break;
 		case SAMPLE_FMT_S24:
-			convert_int24_to_float(pOut, pIn, allsamples);
+			if (bSSE2) {
+				convert_int24_to_float_sse2(pOut, pIn, allsamples);
+			} else {
+				convert_int24_to_float(pOut, pIn, allsamples);
+			}
 			break;
 		case SAMPLE_FMT_S32:
 			if (bSSE2) {
