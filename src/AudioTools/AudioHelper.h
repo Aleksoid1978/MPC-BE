@@ -121,26 +121,17 @@ HRESULT convert_to_planar_float(const SampleFormat sfmt, const WORD nChannels, c
 
 HRESULT convert_float_to(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, float* pIn, BYTE* pOut);
 
-inline void convert_int24_to_int32(size_t allsamples, BYTE* pIn, int32_t* pOut)
+#define int24_to_int32(pIn)  \
+    (uint32_t)pIn[0] <<  8 | \
+    (uint32_t)pIn[1] << 16 | \
+    (uint32_t)pIn[2] << 24   \
+
+inline void convert_int24_to_int32(int32_t* pOut, BYTE* pIn, size_t allsamples)
 {
-    for (size_t i = 0; i < allsamples; ++i) {
-        pOut[i] = (uint32_t)pIn[3 * i]     << 8  |
-                  (uint32_t)pIn[3 * i + 1] << 16 |
-                  (uint32_t)pIn[3 * i + 2] << 24;
+    for (size_t i = 0; i < allsamples; i++) {
+        pOut[i] = int24_to_int32((&(pIn[3 * i])));
     }
 }
-
-//inline void convert_int24_to_int32(size_t allsamples, BYTE* pIn, int32_t* pOut)
-//{
-//    for (size_t i = 0; i < allsamples; ++i) {
-//        BYTE* p = (BYTE*)&pOut[i];
-//        p[0] = 0;
-//        p[1] = *pIn++;
-//        p[2] = *pIn++;
-//        p[3] = *pIn++;
-//    }
-//}
-//need perfomance tests
 
 #define int32_to_int24(i32, pOut) \
     *pOut++ = (BYTE)(i32 >>  8);  \
@@ -149,24 +140,22 @@ inline void convert_int24_to_int32(size_t allsamples, BYTE* pIn, int32_t* pOut)
 
 inline void convert_int32_to_int24(BYTE* pOut, int32_t* pIn, size_t allsamples)
 {
-    for (size_t i = 0; i < allsamples; ++i) {
+    for (size_t i = 0; i < allsamples; i++) {
         int32_to_int24(pIn[i], pOut);
     }
 }
 
 inline void convert_int24_to_float(float* pOut, BYTE* pIn, size_t allsamples)
 {
-    for (size_t i = 0; i < allsamples; ++i) {
-        int32_t i32 = (uint32_t)pIn[3 * i]     << 8  |
-                      (uint32_t)pIn[3 * i + 1] << 16 |
-                      (uint32_t)pIn[3 * i + 2] << 24;
+    for (size_t i = 0; i < allsamples; i++) {
+        int32_t i32 = int24_to_int32((&(pIn[3 * i])));
         pOut[i] = SAMPLE_int32_to_float(i32);
     }
 }
 
 inline void convert_float_to_int24(BYTE* pOut, float* pIn, size_t allsamples)
 {
-    for (size_t i = 0; i < allsamples; ++i) {
+    for (size_t i = 0; i < allsamples; i++) {
         int32_t i32 = SAMPLE_float_to_int32(pIn[i]);
         int32_to_int24(i32, pOut);
     }

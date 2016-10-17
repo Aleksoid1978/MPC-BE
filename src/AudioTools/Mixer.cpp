@@ -255,7 +255,7 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 	if (m_in_sf == SAMPLE_FMT_S24) {
 		ASSERT(m_in_avsf == AV_SAMPLE_FMT_S32);
 		buf1 = DNew int32_t[in_samples * in_ch];
-		convert_int24_to_int32(in_samples * in_ch, pInput, buf1);
+		convert_int24_to_int32(buf1, pInput, in_samples * in_ch);
 		pInput = (BYTE*)buf1;
 	}
 
