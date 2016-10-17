@@ -52,7 +52,6 @@
 
 static const float  F8MAX  =  float(INT8_MAX ) / INT8_PEAK;
 static const float  F16MAX =  float(INT16_MAX) / INT16_PEAK;
-static const double D24MAX = double(INT24_MAX) / INT24_PEAK;
 static const double D32MAX = double(INT32_MAX) / INT32_PEAK;
 
 #define round_f(x) ((x) > 0 ? (x) + 0.5f : (x) - 0.5f)
@@ -143,35 +142,32 @@ inline void convert_int24_to_int32(size_t allsamples, BYTE* pIn, int32_t* pOut)
 //}
 //need perfomance tests
 
-inline void convert_int32_to_int24(size_t allsamples, int32_t* pIn, BYTE* pOut)
+#define int32_to_int24(i32, pOut) \
+    *pOut++ = (BYTE)(i32 >>  8);  \
+    *pOut++ = (BYTE)(i32 >> 16);  \
+    *pOut++ = (BYTE)(i32 >> 24);  \
+
+inline void convert_int32_to_int24(BYTE* pOut, int32_t* pIn, size_t allsamples)
 {
     for (size_t i = 0; i < allsamples; ++i) {
-        BYTE* p = (BYTE*)&pIn[i];
-        *pOut++ = p[1];
-        *pOut++ = p[2];
-        *pOut++ = p[3];
+        int32_to_int24(pIn[i], pOut);
     }
 }
 
-inline void convert_int24_to_float(size_t allsamples, BYTE* pIn, float* pOut)
+inline void convert_int24_to_float(float* pOut, BYTE* pIn, size_t allsamples)
 {
     for (size_t i = 0; i < allsamples; ++i) {
         int32_t i32 = (uint32_t)pIn[3 * i]     << 8  |
                       (uint32_t)pIn[3 * i + 1] << 16 |
                       (uint32_t)pIn[3 * i + 2] << 24;
-        pOut[i] = (float)((double)i32 / INT32_MAX);
+        pOut[i] = SAMPLE_int32_to_float(i32);
     }
 }
 
-inline void convert_float_to_int24(size_t allsamples, float* pIn, BYTE* pOut)
+inline void convert_float_to_int24(BYTE* pOut, float* pIn, size_t allsamples)
 {
     for (size_t i = 0; i < allsamples; ++i) {
-        double d = (double)pIn[i] * INT32_MAX;
-        if (d < INT32_MIN) { d = INT32_MIN; } else if (d > INT32_MAX) { d = INT32_MAX; }
-        int32_t i32 = (int32_t)d;
-        BYTE* p = (BYTE*)i32;
-        *pOut++ = p[1];
-        *pOut++ = p[2];
-        *pOut++ = p[3];
+        int32_t i32 = SAMPLE_float_to_int32(pIn[i]);
+        int32_to_int24(i32, pOut);
     }
 }
