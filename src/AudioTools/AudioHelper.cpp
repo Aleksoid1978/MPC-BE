@@ -37,10 +37,11 @@ static bool haveSSE2()
 
 static const bool bSSE2 = haveSSE2();
 
-static const __m128 __32bitScalar    = _mm_set_ps1(INT32_PEAK);
-static const __m128 __32bitScalarDiv = _mm_set_ps1(1.0f / INT32_PEAK);
-static const __m128 __32bitMax       = _mm_set_ps1(-1.0f);
-static const __m128 __32bitMin       = _mm_set_ps1((float)INT24_MAX / INT24_PEAK);
+static const __m128  __32bitScalar    = _mm_set_ps1(INT32_PEAK);
+static const __m128  __32bitScalarDiv = _mm_set_ps1(1.0f / INT32_PEAK);
+static const __m128  __32bitMax       = _mm_set_ps1(-1.0f);
+static const __m128  __32bitMin       = _mm_set_ps1((float)INT24_MAX / INT24_PEAK);
+static const __m128i __shift          = _mm_set_epi32(0, 0, 0, 8);
 
 inline static void convert_float_to_int32_sse2(int32_t* pOut, float* pIn, const size_t allsamples)
 {
@@ -69,11 +70,11 @@ inline static void convert_int32_to_float_sse2(float* pOut, int32_t* pIn, const 
 
 	size_t k = 0;
 	for (; k < allsamples - 3; k += 4) {
-		__tmpIn  = _mm_load_si128((const __m128i*)&pIn[k]); // in = pIn
+		__tmpIn  = _mm_loadu_si128((const __m128i*)&pIn[k]); // in = pIn
 		
-		__tmpOut = _mm_cvtepi32_ps(__tmpIn);                // out = in
-		__tmpOut = _mm_mul_ps(__tmpOut, __32bitScalarDiv);  // out = out / INT32_PEAK;
-		_mm_storeu_ps(&pOut[k], __tmpOut);                  // pOut = out
+		__tmpOut = _mm_cvtepi32_ps(__tmpIn);                 // out = in
+		__tmpOut = _mm_mul_ps(__tmpOut, __32bitScalarDiv);   // out = out / INT32_PEAK;
+		_mm_storeu_ps(&pOut[k], __tmpOut);                   // pOut = out
 	}
 
 	for (; k < allsamples; k++) {
@@ -87,14 +88,16 @@ inline static void convert_float_to_int24_sse2(BYTE* pOut, float* pIn, const siz
 	__m128i __tmpOut = _mm_setzero_si128();
 
 	size_t k = 0;
-	for (; k < allsamples - 3; k += 4) {
+	for (; k < allsamples - 7; k += 4) {
 		__tmpIn  = _mm_loadu_ps(&pIn[k]);                                   // in = pIn
 		__tmpIn  = _mm_min_ps(_mm_max_ps(__tmpIn, __32bitMax), __32bitMin); // in = min(max(in, -1.0f), 24MAX)
 		__tmpIn  = _mm_mul_ps(__tmpIn, __32bitScalar);                      // in = in * INT32_PEAK
 
 		__tmpOut = _mm_cvtps_epi32(__tmpIn);                                // out = in
+		__tmpOut = _mm_srl_epi32(__tmpOut, __shift);                        // out >> 8
 		for (size_t i = 0; i < 4; i++) {                                    // pOut = out
-			int32_to_int24(__tmpOut.m128i_i32[i], pOut)
+			*(int32_t*)(pOut) = __tmpOut.m128i_i32[i];
+			pOut += 3;
 		}
 	}
 
@@ -104,21 +107,21 @@ inline static void convert_float_to_int24_sse2(BYTE* pOut, float* pIn, const siz
 	}
 }
 
+#define GETINT(pos) *(int32_t*)(pIn + 3 * (k + pos))
 inline static void convert_int24_to_float_sse2(float* pOut, BYTE* pIn, const size_t allsamples)
 {
 	__m128i __tmpIn  = _mm_setzero_si128();
 	__m128  __tmpOut = _mm_setzero_ps();
 
 	size_t k = 0;
-	for (; k < allsamples - 3; k += 4) {
-		__tmpIn = _mm_setr_epi32(int24_to_int32((&(pIn[3 * (k    )]))), // in = pIn
-								 int24_to_int32((&(pIn[3 * (k + 1)]))),
-								 int24_to_int32((&(pIn[3 * (k + 2)]))),
-								 int24_to_int32((&(pIn[3 * (k + 3)]))));
+	for (; k < allsamples - 7; k += 4) {
+		__tmpIn = _mm_setr_epi32(GETINT(0), GETINT(1),     // in = pIn
+								 GETINT(2), GETINT(3));
+		__tmpIn = _mm_sll_epi32(__tmpIn, __shift);         // in << 8
 		
-		__tmpOut = _mm_cvtepi32_ps(__tmpIn);                            // out = in
-		__tmpOut = _mm_mul_ps(__tmpOut, __32bitScalarDiv);              // out = out / INT32_PEAK;
-		_mm_storeu_ps(&pOut[k], __tmpOut);                              // pOut = out
+		__tmpOut = _mm_cvtepi32_ps(__tmpIn);               // out = in
+		__tmpOut = _mm_mul_ps(__tmpOut, __32bitScalarDiv); // out = out / INT32_PEAK;
+		_mm_storeu_ps(&pOut[k], __tmpOut);                 // pOut = out
 	}
 
 	for (; k < allsamples; k++) {
@@ -165,7 +168,7 @@ inline static void convert_int16_to_float_sse2(float* pOut, int16_t* pIn, const 
 
 	size_t k = 0;
 	for (; k < allsamples - 7; k += 8) {
-		__tmpIn    = _mm_load_si128((const __m128i*)&pIn[k]);              // in = pIn
+		__tmpIn    = _mm_loadu_si128((const __m128i*)&pIn[k]);             // in = pIn
 
 		__tmpOutLo = _mm_cvtepi32_ps(_mm_unpacklo_epi16(__zero, __tmpIn)); // out = in
 		__tmpOutLo = _mm_mul_ps(__tmpOutLo, __32bitScalarDiv);             // out = out / INT32_PEAK;
