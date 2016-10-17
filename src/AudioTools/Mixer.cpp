@@ -287,7 +287,7 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 		delete [] buf1;
 	}
 	if (buf2) {
-		convert_int32_to_int24(out_samples * out_ch, buf2, pOutput);
+		convert_int32_to_int24(pOutput, buf2, out_samples * out_ch);
 		delete [] buf2;
 	}
 
@@ -320,7 +320,7 @@ int CMixer::Receive(BYTE* pOutput, int out_samples)
 	}
 
 	if (buf) {
-		convert_int32_to_int24(out_samples * out_ch, buf, pOutput);
+		convert_int32_to_int24(pOutput, buf, out_samples * out_ch);
 		delete [] buf;
 	}
 

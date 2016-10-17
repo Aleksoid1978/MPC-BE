@@ -81,6 +81,33 @@ inline static void convert_int32_to_float_sse2(float* pOut, int32_t* pIn, const 
 	}
 }
 
+inline static void convert_float_to_int24_sse2(BYTE* pOut, float* pIn, const size_t allsamples)
+{
+	__m128  __tmpIn  = _mm_setzero_ps();
+	__m128i __tmpOut = _mm_setzero_si128();
+
+	int32_t tmp[4] = { 0 };
+
+	size_t k = 0;
+	for (; k < allsamples - 3; k += 4) {
+		__tmpIn  = _mm_loadu_ps(&pIn[k]);                                   // in = pIn
+		__tmpIn  = _mm_min_ps(_mm_max_ps(__tmpIn, __32bitMax), __32bitMin); // in = min(max(in, -1.0f), 24MAX)
+		__tmpIn  = _mm_mul_ps(__tmpIn, __32bitScalar);                      // in = in * INT32_PEAK
+
+		__tmpOut = _mm_cvtps_epi32(__tmpIn);                                // out = in
+		_mm_storeu_si128((__m128i*)&tmp, __tmpOut);                         // tmp = out
+
+		for (size_t i = 0; i < 4; i++) {                                    // pOut = tmp
+			int32_to_int24(tmp[i], pOut)
+		}
+	}
+
+	for (; k < allsamples; k++) {
+		int32_t i32 = SAMPLE_float_to_int32(pIn[k]);
+		int32_to_int24(i32, pOut);
+	}
+}
+
 static const __m128  __16bitScalar = _mm_set_ps1(INT16_PEAK);
 static const __m128  __16bitMax    = __32bitMax;
 static const __m128  __16bitMin    = _mm_set_ps1(F16MAX);
@@ -284,9 +311,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 				double d = (double)(*(float*)pIn);
 				limit(-1, d, D32MAX);
 				uint32_t u32 = (uint32_t)(int32_t)round_d(d * INT32_PEAK);
-				*pOut++ = (BYTE)(u32 >> 8);
-				*pOut++ = (BYTE)(u32 >> 16);
-				*pOut++ = (BYTE)(u32 >> 24);
+				int32_to_int24(u32, pOut);
 				pIn += sizeof(float);
 			}
 			break;
@@ -295,9 +320,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 				double d = *(double*)pIn;
 				limit(-1, d, D32MAX);
 				uint32_t u32 = (uint32_t)(int32_t)round_d(d * INT32_PEAK);
-				*pOut++ = (BYTE)(u32 >> 8);
-				*pOut++ = (BYTE)(u32 >> 16);
-				*pOut++ = (BYTE)(u32 >> 24);
+				int32_to_int24(u32, pOut);
 				pIn += sizeof(double);
 			}
 			break;
@@ -325,9 +348,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 			for (size_t i = 0; i < nSamples; ++i) {
 				for (int ch = 0; ch < nChannels; ++ch) {
 					uint32_t u32 = ((uint32_t*)pIn)[nSamples * ch + i];
-					*pOut++ = (BYTE)(u32 >> 8);
-					*pOut++ = (BYTE)(u32 >> 16);
-					*pOut++ = (BYTE)(u32 >> 24);
+					int32_to_int24(u32, pOut);
 				}
 			}
 			break;
@@ -337,9 +358,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 					double d = (double)((float*)pIn)[nSamples * ch + i];
 					limit(-1, d, D32MAX);
 					uint32_t u32 = (uint32_t)(int32_t)round_d(d * INT32_PEAK);
-					*pOut++ = (BYTE)(u32 >> 8);
-					*pOut++ = (BYTE)(u32 >> 16);
-					*pOut++ = (BYTE)(u32 >> 24);
+					int32_to_int24(u32, pOut);
 				}
 			}
 			break;
@@ -349,9 +368,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 					double d = ((double*)pIn)[nSamples * ch + i];
 					limit(-1, d, D32MAX);
 					uint32_t u32 = (uint32_t)(int32_t)round_d(d * INT32_PEAK);
-					*pOut++ = (BYTE)(u32 >> 8);
-					*pOut++ = (BYTE)(u32 >> 16);
-					*pOut++ = (BYTE)(u32 >> 24);
+					int32_to_int24(u32, pOut);
 				}
 			}
 			break;
@@ -455,15 +472,7 @@ HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DW
 			}
 			break;
 		case SAMPLE_FMT_S24:
-			for (size_t i = 0; i < allsamples; ++i) {
-				int32_t i32 = 0;
-				BYTE* p = (BYTE*)(&i32);
-				p[1] = *(pIn++);
-				p[2] = *(pIn++);
-				p[3] = *(pIn++);
-				i32 >>= 8;
-				*pOut++ = (float)((double)i32 / INT24_PEAK);
-			}
+			convert_int24_to_float(pOut, pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S32:
 			if (bSSE2) {
@@ -616,13 +625,10 @@ HRESULT convert_float_to(const SampleFormat sfmt, const WORD nChannels, const DW
 			}
 			break;
 		case SAMPLE_FMT_S24:
-			for (size_t i = 0; i < allsamples; ++i) {
-				double d = (double)(*pIn++);
-				limit(-1, d, D32MAX);
-				uint32_t u32 = (uint32_t)(int32_t)round_d(d * INT32_PEAK);
-				*pOut++ = (BYTE)(u32 >> 8);
-				*pOut++ = (BYTE)(u32 >> 16);
-				*pOut++ = (BYTE)(u32 >> 24);
+			if (bSSE2) {
+				convert_float_to_int24_sse2(pOut, pIn, allsamples);
+			} else {
+				convert_float_to_int24(pOut, pIn, allsamples);
 			}
 			break;
 		case SAMPLE_FMT_S32:
