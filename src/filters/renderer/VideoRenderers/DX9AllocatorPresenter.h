@@ -102,7 +102,6 @@ namespace DSObjects
 			}
 		}
 
-		CString m_D3DDevExError;
 		CComPtr<IDirect3DTexture9>		m_pOSDTexture;
 		CComPtr<IDirect3DSurface9>		m_pOSDSurface;
 		CComPtr<ID3DXLine>				m_pLine;
@@ -276,7 +275,8 @@ namespace DSObjects
 		LONGLONG				m_LastFrameDuration;
 		LONGLONG				m_LastSampleTime;
 
-		CString					m_strStatsMsg[10];
+		CString					m_strMixerFmtIn;
+		CString					m_strMixerFmtOut;
 
 		CString					m_D3D9Device;
 		CString					m_D3D9DeviceName;

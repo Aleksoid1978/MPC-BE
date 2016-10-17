@@ -231,7 +231,6 @@ void CDX9RenderingEngine::CleanupRenderingEngine()
 HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 {
 	HRESULT hr;
-	CRenderersSettings& rs = GetRenderersSettings();
 
 	// Free previously allocated video surfaces
 	FreeVideoSurfaces();

@@ -589,7 +589,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		// there's no Desktop composition to take care of alternative vSync in exclusive mode, alternative vSync is therefore unused
 		m_d3dpp.hDeviceWindow = m_hWnd;
 		m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
-		m_D3DDevExError = L"No m_pD3DEx";
 
 		if (!m_FocusThread) {
 			m_FocusThread = (CFocusThread*)AfxBeginThread(RUNTIME_CLASS(CFocusThread), 0, 0, 0);
@@ -613,8 +612,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 						GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS | D3DCREATE_NOWINDOWCHANGES, //D3DCREATE_MANAGED
 						&m_d3dpp, &d3ddmEx, &m_pD3DDevEx);
 			}
+			DLog(L"CDX9AllocatorPresenter: ResetEx/CreateDeviceEx : %s", FAILED(hr) ? GetWindowsErrorMessage(hr, m_hD3D9) : L"OK");
 
-			m_D3DDevExError = FAILED(hr) ? GetWindowsErrorMessage(hr, m_hD3D9) : L"";
 			if (m_pD3DDevEx) {
 				m_BackbufferFmt = m_d3dpp.BackBufferFormat;
 				m_DisplayFmt = d3ddmEx.Format;
@@ -649,6 +648,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 						GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS, //D3DCREATE_MANAGED
 						&m_d3dpp, NULL, &m_pD3DDevEx);
 			}
+			DLog(L"CDX9AllocatorPresenter: ResetEx/CreateDeviceEx : %s", FAILED(hr) ? GetWindowsErrorMessage(hr, m_hD3D9) : L"OK");
+
 			if (m_pD3DDevEx) {
 				m_DisplayFmt = d3ddmEx.Format;
 			}
@@ -1863,8 +1864,8 @@ void CDX9AllocatorPresenter::DrawStats()
 			ASSERT(m_BackbufferFmt == m_DisplayFmt);
 
 			strText.Format(L"             | %-6s | %-11s | %-13s | %-13s | %-18s |"
-				, m_strStatsMsg[0]
-				, m_strStatsMsg[1]
+				, m_strMixerFmtIn
+				, m_strMixerFmtOut
 				, GetD3DFormatStr(m_VideoBufferFmt)
 				, GetD3DFormatStr(m_SurfaceFmt)
 				, GetD3DFormatStr(m_BackbufferFmt));
@@ -2219,11 +2220,11 @@ void CDX9AllocatorPresenter::FillAddingField(CComPtr<IPin> pPin, CMediaType* mt)
 
 	CString subtypestr = GetGUIDString(mt->subtype);
 	if (subtypestr.Left(13) == L"MEDIASUBTYPE_") {
-		m_strStatsMsg[0] = subtypestr.Mid(13);
+		m_strMixerFmtIn = subtypestr.Mid(13);
 	} else {
 		BITMAPINFOHEADER bih;
 		if (ExtractBIH(mt, &bih)) {
-			m_strStatsMsg[0].Format(L"%C%C%C%C",
+			m_strMixerFmtIn.Format(L"%C%C%C%C",
 				((char*)&bih.biCompression)[0],
 				((char*)&bih.biCompression)[1],
 				((char*)&bih.biCompression)[2],

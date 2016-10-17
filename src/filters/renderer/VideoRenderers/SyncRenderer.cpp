@@ -437,7 +437,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_b10BitOutput = rs.b10BitOutput;
 		if (m_b10BitOutput) {
 			if (FAILED(m_pD3DEx->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3ddm.Format, D3DFMT_A2R10G10B10, false))) {
-				m_strStatsMsg[MSG_ERROR] = L"10 bit RGB is not supported by this graphics device in this resolution.";
+				m_strMsgError = L"10 bit RGB is not supported by this graphics device in this resolution.";
 				m_b10BitOutput = false;
 			}
 		}
@@ -488,7 +488,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_b10BitOutput = rs.b10BitOutput;
 		if (m_b10BitOutput) {
 			if (FAILED(m_pD3DEx->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3ddm.Format, D3DFMT_A2R10G10B10, false))) {
-				m_strStatsMsg[MSG_ERROR] = L"10 bit RGB is not supported by this graphics device in this resolution.";
+				m_strMsgError = L"10 bit RGB is not supported by this graphics device in this resolution.";
 				m_b10BitOutput = false;
 			}
 		}
@@ -1878,11 +1878,11 @@ void CBaseAP::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
-			for (int i=0; i<6; i++) {
-				if (m_strStatsMsg[i][0]) {
-					DrawText(rc, m_strStatsMsg[i], 1);
-					OffsetRect(&rc, 0, TextHeight);
-				}
+			DrawText(rc, m_strMixerFmtOut, 1);
+			OffsetRect(&rc, 0, TextHeight);
+			if (m_strMsgError.GetLength()) {
+				DrawText(rc, m_strMsgError, 1);
+				OffsetRect(&rc, 0, TextHeight);
 			}
 		}
 		OffsetRect(&rc, 0, TextHeight); // Extra "line feed"
@@ -2748,7 +2748,7 @@ HRESULT CSyncAP::SetMediaType(IMFMediaType* pType)
 	if (SUCCEEDED(hr)) {
 		strTemp = GetMediaTypeName(pAMMedia->subtype);
 		strTemp.Replace(L"MEDIASUBTYPE_", L"");
-		m_strStatsMsg[MSG_MIXEROUT].Format (L"Mixer output : %s", strTemp);
+		m_strMixerFmtOut.Format (L"Mixer output : %s", strTemp);
 	}
 
 	pType->FreeRepresentation(FORMAT_VideoInfo2, (void*)pAMMedia);
