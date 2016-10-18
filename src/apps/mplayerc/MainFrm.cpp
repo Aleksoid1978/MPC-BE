@@ -4194,6 +4194,13 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	CAppSettings& s = AfxGetAppSettings();
 
+	if (CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), m_pGB)) {
+		const BOOL bMvcActive = pVDF->GetMvcActive();
+		if (bMvcActive && s.iStereo3DMode == 0) {
+			GetRenderersData()->m_iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
+		}
+	}
+
 	if (s.fEnableEDLEditor) {
 		m_wndEditListEditor.OpenFile(m_lastOMD->title);
 	}
@@ -7352,18 +7359,15 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 
 	s.iStereo3DMode = nID - ID_STEREO3D_AUTO;
 
-	IFilterGraph* pFG = m_pGB;
-	if (pFG) {
-		CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), pFG);
-		if (pVDF) {
-			pVDF->SetMvcOutputMode(s.iStereo3DMode == 3 ? 2 : s.iStereo3DMode, s.bStereo3DSwapLR);
-		}
+	BOOL bMvcActive = FALSE;
+	if (CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), m_pGB)) {
+		pVDF->SetMvcOutputMode(s.iStereo3DMode == 3 ? 2 : s.iStereo3DMode, s.bStereo3DSwapLR);
+		bMvcActive = pVDF->GetMvcActive();
 	}
 
-	if (nID == ID_STEREO3D_ROW_INTERLEAVED) {
+	if (nID == ID_STEREO3D_ROW_INTERLEAVED || (nID == ID_STEREO3D_AUTO && bMvcActive)) {
 		GetRenderersData()->m_iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
-	}
-	else {
+	} else {
 		GetRenderersData()->m_iStereo3DTransform = STEREO3D_AsIs;
 	}
 

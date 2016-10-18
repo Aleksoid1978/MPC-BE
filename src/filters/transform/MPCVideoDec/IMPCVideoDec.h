@@ -140,4 +140,5 @@ public IUnknown {
 	STDMETHOD_(int, GetColorSpaceConversion()) PURE;
 
 	STDMETHOD(SetMvcOutputMode(int nMode, bool bSwapLR)) PURE;
+	STDMETHOD_(int, GetMvcActive()) PURE;
 };

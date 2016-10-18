@@ -238,6 +238,7 @@ public:
 	STDMETHODIMP_(int) GetColorSpaceConversion();
 
 	STDMETHODIMP SetMvcOutputMode(int nMode, bool bSwapLR);
+	STDMETHODIMP_(int) GetMvcActive();
 
 	// === common functions
 	BOOL						IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);

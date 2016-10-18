@@ -3605,6 +3605,11 @@ STDMETHODIMP CMPCVideoDecFilter::SetMvcOutputMode(int nMode, bool bSwapLR)
 	return S_OK;
 }
 
+STDMETHODIMP_(int) CMPCVideoDecFilter::GetMvcActive()
+{
+	return m_pMSDKDecoder != NULL;
+}
+
 STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 {
 	CAutoLock cAutoLock(&m_csProps);
