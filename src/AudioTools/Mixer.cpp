@@ -41,7 +41,6 @@ CMixer::CMixer()
 	, m_out_layout(0)
 	, m_in_samplerate(0)
 	, m_out_samplerate(0)
-	, m_matrix_norm(0.0f)
 	, m_in_avsf(AV_SAMPLE_FMT_NONE)
 	, m_out_avsf(AV_SAMPLE_FMT_NONE)
 {
@@ -145,13 +144,13 @@ bool CMixer::Init()
 		const double surround_mix_level = 1.0;
 		const double lfe_mix_level      = 1.0;
 		const double rematrix_maxval    = INT_MAX; // matrix coefficients will not be normalized
-		const double rematrix_volume    = 0.0;
+		const double rematrix_volume    = 0.0; // not to do a rematrix.
 		ret = swr_build_matrix(
 			m_in_layout, m_out_layout,
 			center_mix_level, surround_mix_level, lfe_mix_level,
 			rematrix_maxval, rematrix_volume,
 			m_matrix_dbl, in_ch,
-			AV_MATRIX_ENCODING_NONE, m_pSWRCxt);
+			AV_MATRIX_ENCODING_NONE, NULL);
 		if (ret < 0) {
 			DLog(L"CMixer::Init() : swr_build_matrix failed");
 			av_freep(&m_matrix_dbl);
@@ -170,25 +169,6 @@ bool CMixer::Init()
 				for (int i = 0; i < in_ch * 2; i++) {
 					m_matrix_dbl[4 * in_ch + i] = (m_matrix_dbl[6 * in_ch + i] *= M_SQRT1_2);
 				}
-			}
-		}
-	}
-
-	if (m_matrix_norm > 0.0f && m_matrix_norm <= 1.0f) { // 0.0 - normalize off; 1.0 - full normalize matrix
-		double max_peak = 0;
-		for (int j = 0; j < out_ch; j++) {
-			double peak = 0;
-			for (int i = 0; i < in_ch; i++) {
-				peak += fabs(m_matrix_dbl[j * in_ch + i]);
-			}
-			if (peak > max_peak) {
-				max_peak = peak;
-			}
-		}
-		if (max_peak > 1.0) {
-			double g = ((max_peak - 1.0) * (1.0 - m_matrix_norm) + 1.0) / max_peak;
-			for (int i = 0, n = in_ch * out_ch; i < n; i++) {
-				m_matrix_dbl[i] *= g;
 			}
 		}
 	}
@@ -248,14 +228,6 @@ void CMixer::UpdateOutput(SampleFormat out_sf, DWORD out_layout, int out_sampler
 		m_out_sf         = out_sf;
 		m_out_samplerate = out_samplerate;
 		m_ActualContext  = false;
-	}
-}
-
-void CMixer::SetOptions(float matrix_norm)
-{
-	if (matrix_norm != m_matrix_norm) {
-		m_matrix_norm   = matrix_norm;
-		m_ActualContext = false;
 	}
 }
 
