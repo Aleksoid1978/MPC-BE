@@ -126,17 +126,17 @@ HRESULT convert_float_to(const SampleFormat sfmt, const WORD nChannels, const DW
     (uint32_t)pIn[1] << 16 | \
     (uint32_t)pIn[2] << 24   \
 
-inline void convert_int24_to_int32(int32_t* pOut, BYTE* pIn, size_t allsamples)
-{
-    for (size_t i = 0; i < allsamples; i++) {
-        pOut[i] = int24_to_int32((&(pIn[3 * i])));
-    }
-}
-
 #define int32_to_int24(i32, pOut) \
     *pOut++ = (BYTE)(i32 >>  8);  \
     *pOut++ = (BYTE)(i32 >> 16);  \
     *pOut++ = (BYTE)(i32 >> 24);  \
+
+inline void convert_int24_to_int32(int32_t* pOut, BYTE* pIn, size_t allsamples)
+{
+    for (size_t i = 0; i < allsamples; i++) {
+        pOut[i] = int24_to_int32((pIn + 3 * i));
+    }
+}
 
 inline void convert_int32_to_int24(BYTE* pOut, int32_t* pIn, size_t allsamples)
 {
@@ -148,7 +148,7 @@ inline void convert_int32_to_int24(BYTE* pOut, int32_t* pIn, size_t allsamples)
 inline void convert_int24_to_float(float* pOut, BYTE* pIn, size_t allsamples)
 {
     for (size_t i = 0; i < allsamples; i++) {
-        int32_t i32 = int24_to_int32((&(pIn[3 * i])));
+        int32_t i32 = int24_to_int32((pIn + 3 * i));
         pOut[i] = SAMPLE_int32_to_float(i32);
     }
 }

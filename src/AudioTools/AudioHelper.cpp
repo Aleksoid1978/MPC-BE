@@ -125,7 +125,7 @@ inline static void convert_int24_to_float_sse2(float* pOut, BYTE* pIn, const siz
 	}
 
 	for (; k < allsamples; k++) {
-		int32_t i32 = int24_to_int32((&(pIn[3 * k])));
+		int32_t i32 = int24_to_int32((pIn + 3 * k));
         pOut[k] = SAMPLE_int32_to_float(i32);
 	}
 }
