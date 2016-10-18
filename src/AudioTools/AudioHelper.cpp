@@ -95,10 +95,15 @@ inline static void convert_float_to_int24_sse2(BYTE* pOut, float* pIn, const siz
 
 		__tmpOut = _mm_cvtps_epi32(__tmpIn);                                // out = in
 		__tmpOut = _mm_srl_epi32(__tmpOut, __shift);                        // out >> 8
-		for (size_t i = 0; i < 4; i++) {                                    // pOut = out
-			*(int32_t*)(pOut) = __tmpOut.m128i_i32[i];
-			pOut += 3;
-		}
+
+		*(int32_t*)(pOut) = _mm_extract_epi32(__tmpOut, 0);                 // pOut = out
+		pOut += 3;
+		*(int32_t*)(pOut) = _mm_extract_epi32(__tmpOut, 1);
+		pOut += 3;
+		*(int32_t*)(pOut) = _mm_extract_epi32(__tmpOut, 2);
+		pOut += 3;
+		*(int32_t*)(pOut) = _mm_extract_epi32(__tmpOut, 3);
+		pOut += 3;
 	}
 
 	for (; k < allsamples; k++) {
