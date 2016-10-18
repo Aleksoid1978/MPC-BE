@@ -37,7 +37,6 @@ protected:
 	DWORD   m_out_layout;
 	int     m_in_samplerate;
 	int     m_out_samplerate;
-	float   m_matrix_norm;
 
 	enum AVSampleFormat m_in_avsf;
 	enum AVSampleFormat m_out_avsf;
@@ -50,7 +49,6 @@ public:
 
 	void UpdateInput (SampleFormat  in_sf, DWORD  in_layout, int  in_samplerate = 48000);
 	void UpdateOutput(SampleFormat out_sf, DWORD out_layout, int out_samplerate = 48000);
-	void SetOptions(float matrix_norm = 0.0f);
 
 	int  Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples);
 
