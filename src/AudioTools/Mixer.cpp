@@ -47,6 +47,19 @@ CMixer::CMixer()
 {
 	// Allocate SWR Context
 	m_pSWRCxt = swr_alloc();
+
+	{
+		// fix swresample bug
+		// need first run swr_init(), because swr_set_matrix() is not working properly for 6.1 input layout
+		av_opt_set_int(m_pSWRCxt, "in_sample_fmt", AV_SAMPLE_FMT_S16, 0);
+		av_opt_set_int(m_pSWRCxt, "out_sample_fmt", AV_SAMPLE_FMT_FLT, 0);
+		av_opt_set_int(m_pSWRCxt, "in_channel_layout", AV_CH_LAYOUT_5POINT1, 0);
+		av_opt_set_int(m_pSWRCxt, "out_channel_layout", AV_CH_LAYOUT_STEREO, 0);
+		av_opt_set_int(m_pSWRCxt, "in_sample_rate", 48000, 0);
+		av_opt_set_int(m_pSWRCxt, "out_sample_rate", 48000, 0);
+		int ret = swr_init(m_pSWRCxt);
+		swr_close(m_pSWRCxt);
+	}
 }
 
 CMixer::~CMixer()
@@ -67,11 +80,11 @@ bool CMixer::Init()
 	m_out_avsf = m_out_sf == SAMPLE_FMT_S24 ? AV_SAMPLE_FMT_S32 : (AVSampleFormat)m_out_sf;
 
 	av_freep(&m_matrix_dbl);
+	int ret = 0;
 
 	// Close SWR Context
 	swr_close(m_pSWRCxt);
 
-	int ret = 0;
 	// Set options
 	av_opt_set_int(m_pSWRCxt, "in_sample_fmt",      m_in_avsf,        0);
 	av_opt_set_int(m_pSWRCxt, "out_sample_fmt",     m_out_avsf,       0);
@@ -123,7 +136,7 @@ bool CMixer::Init()
 		}
 		if (m_out_layout & (AV_CH_SIDE_LEFT | AV_CH_SIDE_RIGHT)) {
 			m_matrix_dbl[i++] =  0.6666;
-			m_matrix_dbl[i++] =  (-0.2222);
+			m_matrix_dbl[i++] = (-0.2222);
 			m_matrix_dbl[i++] = (-0.2222);
 			m_matrix_dbl[i++] = 0.6666;
 		}
@@ -131,9 +144,14 @@ bool CMixer::Init()
 		const double center_mix_level   = M_SQRT1_2;
 		const double surround_mix_level = 1.0;
 		const double lfe_mix_level      = 1.0;
-		const double rematrix_maxval    = INT_MAX;
+		const double rematrix_maxval    = INT_MAX; // matrix coefficients will not be normalized
 		const double rematrix_volume    = 0.0;
-		ret = swr_build_matrix(m_in_layout, m_out_layout, center_mix_level, surround_mix_level, lfe_mix_level, rematrix_maxval, rematrix_volume, m_matrix_dbl, in_ch, AV_MATRIX_ENCODING_NONE, m_pSWRCxt);
+		ret = swr_build_matrix(
+			m_in_layout, m_out_layout,
+			center_mix_level, surround_mix_level, lfe_mix_level,
+			rematrix_maxval, rematrix_volume,
+			m_matrix_dbl, in_ch,
+			AV_MATRIX_ENCODING_NONE, m_pSWRCxt);
 		if (ret < 0) {
 			DLog(L"CMixer::Init() : swr_build_matrix failed");
 			av_freep(&m_matrix_dbl);
