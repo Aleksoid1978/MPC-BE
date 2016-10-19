@@ -30,9 +30,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CpuId.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DXVAAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -83,9 +80,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CpuId.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DXVAAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>

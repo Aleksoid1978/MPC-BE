@@ -21,21 +21,9 @@
 #include "stdafx.h"
 #include <MMReg.h>
 #include "AudioHelper.h"
+#include "../DSUtil/CPUInfo.h"
 
 #define limit(a, x, b) if (x < a) { x = a; } else if (x > b) { x = b; }
-
-static bool haveSSE2()
-{
-	int info[4] = { 0 };
-	__cpuid(info, 0);
-	if (info[0] >= 1) {
-		__cpuid(info, 0x00000001);
-		return ((info[3] & (1 << 26)) != 0);
-	}
-	return false;
-}
-
-static const bool bSSE2 = haveSSE2();
 
 static const __m128  __32bitScalar    = _mm_set_ps1(INT32_PEAK);
 static const __m128  __32bitScalarDiv = _mm_set_ps1(1.0f / INT32_PEAK);
@@ -247,7 +235,7 @@ HRESULT convert_to_int16(const SampleFormat sfmt, const WORD nChannels, const DW
 			convert_int32_to_int16(pOut, (int32_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_FLT:
-			if (bSSE2) {
+			if (CPUInfo::HaveSSE2()) {
 				convert_float_to_int16_sse2(pOut, (float*)pIn, allsamples);
 			} else {
 				convert_float_to_int16(pOut, (float*)pIn, allsamples);
@@ -423,7 +411,7 @@ HRESULT convert_to_int32(const SampleFormat sfmt, const WORD nChannels, const DW
 			memcpy(pOut, pIn, nSamples * nChannels * sizeof(int32_t));
 			break;
 		case SAMPLE_FMT_FLT:
-			if (bSSE2) {
+			if (CPUInfo::HaveSSE2()) {
 				convert_float_to_int32_sse2(pOut, (float*)pIn, allsamples);
 			} else {
 				convert_float_to_int32(pOut, (float*)pIn, allsamples);
@@ -488,21 +476,21 @@ HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DW
 			convert_uint8_to_float(pOut, (uint8_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S16:
-			if (bSSE2) {
+			if (CPUInfo::HaveSSE2()) {
 				convert_int16_to_float_sse2(pOut, (int16_t*)pIn, allsamples);
 			} else {
 				convert_int16_to_float(pOut, (int16_t*)pIn, allsamples);
 			}
 			break;
 		case SAMPLE_FMT_S24:
-			if (bSSE2) {
+			if (CPUInfo::HaveSSE2()) {
 				convert_int24_to_float_sse2(pOut, pIn, allsamples);
 			} else {
 				convert_int24_to_float(pOut, pIn, allsamples);
 			}
 			break;
 		case SAMPLE_FMT_S32:
-			if (bSSE2) {
+			if (CPUInfo::HaveSSE2()) {
 				convert_int32_to_float_sse2(pOut, (int32_t*)pIn, allsamples);
 			} else {
 				convert_int32_to_float(pOut, (int32_t*)pIn, allsamples);
@@ -611,14 +599,14 @@ HRESULT convert_to_planar_float(const SampleFormat sfmt, const WORD nChannels, c
 			convert_uint8_to_float(pOut, (uint8_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S16P:
-			if (bSSE2) {
+			if (CPUInfo::HaveSSE2()) {
 				convert_int16_to_float_sse2(pOut, (int16_t*)pIn, allsamples);
 			} else {
 				convert_int16_to_float(pOut, (int16_t*)pIn, allsamples);
 			}
 			break;
 		case SAMPLE_FMT_S32P:
-			if (bSSE2) {
+			if (CPUInfo::HaveSSE2()) {
 				convert_int32_to_float_sse2(pOut, (int32_t*)pIn, allsamples);
 			} else {
 				convert_int32_to_float(pOut, (int32_t*)pIn, allsamples);
@@ -645,21 +633,21 @@ HRESULT convert_float_to(const SampleFormat sfmt, const WORD nChannels, const DW
 			convert_float_to_uint8((uint8_t*)pOut, pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S16:
-			if (bSSE2) {
+			if (CPUInfo::HaveSSE2()) {
 				convert_float_to_int16_sse2((int16_t*)pOut, (float*)pIn, allsamples);
 			} else {
 				convert_float_to_int16((int16_t*)pOut, pIn, allsamples);
 			}
 			break;
 		case SAMPLE_FMT_S24:
-			if (bSSE2) {
+			if (CPUInfo::HaveSSE2()) {
 				convert_float_to_int24_sse2(pOut, pIn, allsamples);
 			} else {
 				convert_float_to_int24(pOut, pIn, allsamples);
 			}
 			break;
 		case SAMPLE_FMT_S32:
-			if (bSSE2) {
+			if (CPUInfo::HaveSSE2()) {
 				convert_float_to_int32_sse2((int32_t*)pOut, pIn, allsamples);
 			} else {
 				convert_float_to_int32((int32_t*)pOut, pIn, allsamples);

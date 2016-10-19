@@ -23,6 +23,7 @@
 #include <math.h>
 #include <intrin.h>
 #include "RTS.h"
+#include "../DSUtil/CPUInfo.h"
 
 // WARNING: this isn't very thread safe, use only one RTS a time. We should use TLS in future.
 static HDC g_hDC;
@@ -190,7 +191,7 @@ void CWord::Paint(const CPoint& p, const CPoint& org)
 
 void CWord::Transform(CPoint org)
 {
-	if (m_bUseSSE2) { // SSE code
+	if (CPUInfo::HaveSSE2()) { // SSE code
 		Transform_SSE2(org);
 	} else { // C-code
 		Transform_C(org);
