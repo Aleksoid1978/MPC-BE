@@ -39,8 +39,6 @@ struct AVCodecContext;
 struct AVCodecParserContext;
 struct AVFrame;
 
-class CCpuId;
-
 class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	CMPCVideoDecFilter
 	: public CBaseVideoFilter
@@ -59,7 +57,6 @@ protected:
 	int										m_nSwRGBLevels;
 	//
 
-	CCpuId*									m_pCpuId;
 	CCritSec								m_csProps;
 
 	bool									m_DXVAFilters[VDEC_DXVA_LAST];

@@ -19,9 +19,9 @@
  */
 
 #include "stdafx.h"
-#include "FormatConverter.h"
-#include "CpuId.h"
 #include <moreuuids.h>
+#include "FormatConverter.h"
+#include "../../../DSUtil/CPUInfo.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
@@ -196,12 +196,9 @@ CFormatConverter::CFormatConverter()
 	m_FProps.colorspace	= AVCOL_SPC_UNSPECIFIED;
 	m_FProps.colorrange	= AVCOL_RANGE_UNSPECIFIED;
 
-	CCpuId cpuId;
-	m_nCPUFlag = cpuId.GetFeatures();
-
 	pConvertFn			= &CFormatConverter::ConvertGeneric;
 
-	m_NumThreads		= min(8, max(1, cpuId.GetProcessorNumber() / 2));
+	m_NumThreads		= min(8, max(1, CPUInfo::GetProcessorNumber() / 2));
 }
 
 CFormatConverter::~CFormatConverter()
@@ -282,7 +279,7 @@ void CFormatConverter::SetConvertFunc()
 	pConvertFn = &CFormatConverter::ConvertGeneric;
 	m_RequiredAlignment = 16;
 
-	if (m_nCPUFlag & CCpuId::MPC_MM_SSE2) {
+	if (CPUInfo::HaveSSE2()) {
 		switch (m_out_pixfmt) {
 			case PixFmt_AYUV:
 				if (m_FProps.pftype == PFType_YUV444Px) {
@@ -378,7 +375,7 @@ void CFormatConverter::SetConvertFunc()
 		pConvertFn = &CFormatConverter::plane_copy;
 	}
 
-	if (m_nCPUFlag & CCpuId::MPC_MM_SSE4) {
+	if (CPUInfo::HaveSSE4()) {
 		if (m_out_pixfmt == PixFmt_NV12 && m_FProps.pftype == PFType_NV12) {
 			pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
 		} else if (m_out_pixfmt == PixFmt_YV12 && m_FProps.pftype == PFType_NV12) {

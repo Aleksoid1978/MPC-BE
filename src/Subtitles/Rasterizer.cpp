@@ -24,9 +24,9 @@
 #include <math.h>
 #include <vector>
 #include <algorithm>
-#include <intrin.h>
 #include "Rasterizer.h"
 #include "SeparableFilter.h"
+#include "../DSUtil/CPUInfo.h"
 
 #define MAX_DIMENSION 4000 // Maximum width or height supported
 #define SUBPIXEL_MULTIPLIER 8
@@ -56,9 +56,6 @@ Rasterizer::Rasterizer()
 	, mEdgeNext(0)
 	, mpScanBuffer(0)
 {
-	int cpuInfo[4] = { -1 };
-	__cpuid(cpuInfo, 1);
-	m_bUseSSE2 = !!(cpuInfo[3] & (1 << 26));
 }
 
 Rasterizer::~Rasterizer()
@@ -903,7 +900,7 @@ bool Rasterizer::Rasterize(int xsub, int ysub, int fBlur, double fGaussianBlur)
 
 			byte* src = m_pOutlineData->mWideOutline.empty() ? m_pOverlayData->mpOverlayBufferBody : m_pOverlayData->mpOverlayBufferBorder;
 
-			if (m_bUseSSE2) {
+			if (CPUInfo::HaveSSE2()) {
 				SeparableFilterX_SSE2(src, tmp, m_pOverlayData->mOverlayWidth, m_pOverlayData->mOverlayHeight, pitch,
 									  filter.kernel, filter.width, filter.divisor);
 				SeparableFilterY_SSE2(tmp, src, m_pOverlayData->mOverlayWidth, m_pOverlayData->mOverlayHeight, pitch,
@@ -1603,7 +1600,7 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 		if (switchpts[1] == DWORD_MAX) {
 			// fBody is true if we're rendering a fill or a shadow.
 			if (fBody) {
-				if (m_bUseSSE2) {
+				if (CPUInfo::HaveSSE2()) {
 					Draw_noAlpha_spFF_Body_sse2(rnfo);
 				} else {
 					Draw_noAlpha_spFF_Body_0(rnfo);
@@ -1611,7 +1608,7 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 			}
 			// Not painting body, ie. painting border without fill in it
 			else {
-				if (m_bUseSSE2) {
+				if (CPUInfo::HaveSSE2()) {
 					Draw_noAlpha_spFF_noBody_sse2(rnfo);
 				} else {
 					Draw_noAlpha_spFF_noBody_0(rnfo);
@@ -1624,7 +1621,7 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 			//const long *sw = switchpts;
 
 			if (fBody) {
-				if (m_bUseSSE2) {
+				if (CPUInfo::HaveSSE2()) {
 					Draw_noAlpha_sp_Body_sse2(rnfo);
 				} else {
 					Draw_noAlpha_sp_Body_0(rnfo);
@@ -1632,7 +1629,7 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 			}
 			// Not body
 			else {
-				if (m_bUseSSE2) {
+				if (CPUInfo::HaveSSE2()) {
 					Draw_noAlpha_sp_noBody_sse2(rnfo);
 				} else {
 					Draw_noAlpha_sp_noBody_0(rnfo);
@@ -1644,13 +1641,13 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 	else {
 		if (switchpts[1] == DWORD_MAX) {
 			if (fBody) {
-				if (m_bUseSSE2) {
+				if (CPUInfo::HaveSSE2()) {
 					Draw_Alpha_spFF_Body_sse2(rnfo);
 				} else {
 					Draw_Alpha_spFF_Body_0(rnfo);
 				}
 			} else {
-				if (m_bUseSSE2) {
+				if (CPUInfo::HaveSSE2()) {
 					Draw_Alpha_spFF_noBody_sse2(rnfo);
 				} else {
 					Draw_Alpha_spFF_noBody_0(rnfo);
@@ -1660,13 +1657,13 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 			//const long *sw = switchpts;
 
 			if (fBody) {
-				if (m_bUseSSE2) {
+				if (CPUInfo::HaveSSE2()) {
 					Draw_Alpha_sp_Body_sse2(rnfo);
 				} else {
 					Draw_Alpha_sp_Body_0(rnfo);
 				}
 			} else {
-				if (m_bUseSSE2) {
+				if (CPUInfo::HaveSSE2()) {
 					Draw_Alpha_sp_noBody_sse2(rnfo);
 				} else {
 					Draw_Alpha_sp_noBody_0(rnfo);
@@ -1688,7 +1685,7 @@ void Rasterizer::FillSolidRect(SubPicDesc& spd, int x, int y, int nWidth, int nH
 	for (int wy=y; wy<y+nHeight; wy++) {
 		DWORD* dst = (DWORD*)((BYTE*)spd.bits + spd.pitch * wy) + x;
 		for (int wt=0; wt<nWidth; ++wt) {
-			if (m_bUseSSE2) {
+			if (CPUInfo::HaveSSE2()) {
 				pixmix_sse2(&dst[wt], lColor, 0x40); // 0x40 because >> 6 in pixmix (to preserve tranparency)
 			} else {
 				pixmix(&dst[wt], lColor, 0x40);

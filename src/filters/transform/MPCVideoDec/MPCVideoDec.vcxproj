@@ -215,7 +215,6 @@
     <ProjectReference />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CpuId.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2Decoder.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2DecoderH264.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2DecoderHEVC.cpp" />
@@ -239,7 +238,6 @@
     <ClCompile Include="DXVAAllocator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CpuId.h" />
     <ClInclude Include="DXVADecoder\DXVA2Decoder.h" />
     <ClInclude Include="DXVADecoder\DXVA2DecoderH264.h" />
     <ClInclude Include="DXVADecoder\DXVA2DecoderHEVC.h" />

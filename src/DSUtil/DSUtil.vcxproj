@@ -96,6 +96,7 @@
     <ClCompile Include="ApeTag.cpp" />
     <ClCompile Include="AudioParser.cpp" />
     <ClCompile Include="AudioTools.cpp" />
+    <ClCompile Include="CPUInfo.cpp" />
     <ClCompile Include="CUE.cpp" />
     <ClCompile Include="D3D9Helper.cpp" />
     <ClCompile Include="deinterlace.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="ApeTag.h" />
     <ClInclude Include="AudioParser.h" />
     <ClInclude Include="AudioTools.h" />
+    <ClInclude Include="CPUInfo.h" />
     <ClInclude Include="CUE.h" />
     <ClInclude Include="D3D9Helper.h" />
     <ClInclude Include="DSMPropertyBag.h" />

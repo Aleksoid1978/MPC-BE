@@ -29,9 +29,9 @@
 
 #include "MPCVideoDec.h"
 #include "DXVAAllocator.h"
-#include "CpuId.h"
 #include "FfmpegContext.h"
 
+#include "../../../DSUtil/CPUInfo.h"
 #include "../../../DSUtil/D3D9Helper.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/SysVersion.h"
@@ -1018,8 +1018,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	memset(&m_VideoFilters, false, sizeof(m_VideoFilters));
 	m_VideoFilters[VDEC_UNCOMPRESSED] = true;
 
-	m_pCpuId = DNew CCpuId();
-
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	ULONG len = 255;
@@ -1117,8 +1115,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 CMPCVideoDecFilter::~CMPCVideoDecFilter()
 {
 	Cleanup();
-
-	SAFE_DELETE(m_pCpuId);
 }
 
 void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
@@ -2924,7 +2920,7 @@ HRESULT CMPCVideoDecFilter::ReopenVideo()
 void CMPCVideoDecFilter::SetThreadCount()
 {
 	if (m_pAVCtx) {
-		int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : m_pCpuId->GetProcessorNumber() * 3/2;
+		int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : CPUInfo::GetProcessorNumber() * 3/2;
 		m_pAVCtx->thread_count = max(1, min((IsDXVASupported() || m_nCodecId == AV_CODEC_ID_MPEG4) ? 1 : nThreadNumber, MAX_AUTO_THREADS));
 	}
 }

@@ -173,7 +173,6 @@ protected:
 	BYTE* mpPathTypes;
 	POINT* mpPathPoints;
 	int mPathPoints;
-	bool m_bUseSSE2;
 
 private:
 	enum {

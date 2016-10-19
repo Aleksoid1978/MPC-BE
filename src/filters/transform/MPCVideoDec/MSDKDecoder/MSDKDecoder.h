@@ -125,6 +125,4 @@ private:
   int                   m_iOutputMode = MVC_OUTPUT_Auto;
   int                   m_iNewOutputMode = MVC_OUTPUT_Auto;
   bool                  m_bSwapLR = false;
-
-  bool                  m_bSSE2 = false;
 };

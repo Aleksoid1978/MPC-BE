@@ -32,6 +32,7 @@ extern "C" {
 #include "MSDKDecoder.h"
 #include <moreuuids.h>
 #include <IMediaSample3D.h>
+#include "../../../../DSUtil/CPUInfo.h"
 #include "../../../../DSUtil/D3D9Helper.h"
 #include "../../../../DSUtil/DSUtil.h"
 #include "../../../../DSUtil/SysVersion.h"
@@ -39,7 +40,6 @@ extern "C" {
 
 #include "../MPCVideoDec.h"
 #include "../pixconv_sse2_templates.h"
-#include <intrin.h>
 
 inline void CopyEverySecondLine(uint8_t* dst, uint8_t* src1, uint8_t* src2, size_t linesize, unsigned lines)
 {
@@ -160,13 +160,6 @@ CMSDKDecoder::CMSDKDecoder(CMPCVideoDecFilter* pFilter)
 {
   m_iOutputMode = m_iNewOutputMode = m_pFilter->m_iMvcOutputMode;
   m_bSwapLR = m_pFilter->m_bMvcSwapLR;
-
-  int info[4] = { 0 };
-  __cpuid(info, 0);
-  if (info[0] >= 1) {
-    __cpuid(info, 0x00000001);
-    m_bSSE2 = (info[3] & (1 << 26)) != 0;
-  }
 }
 
 CMSDKDecoder::~CMSDKDecoder()
@@ -690,7 +683,7 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       uint8_t* srcBase = swapLR ? pExtraView->surface.Data.Y : pBaseView->surface.Data.Y;
       uint8_t* srcExtra = (swapLR ? pBaseView->surface.Data.Y : pExtraView->surface.Data.Y) + linesize;
 
-      if (m_bSSE2 && ((size_t)dst % 16) == 0) {
+      if (CPUInfo::HaveSSE2() && ((size_t)dst % 16) == 0) {
         CopyEverySecondLineSSE2(dst, srcBase, srcExtra, linesize, height / 2);
       } else {
         CopyEverySecondLine(dst, srcBase, srcExtra, linesize, height / 2);
@@ -701,7 +694,7 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       srcBase  = swapLR ? pExtraView->surface.Data.UV : pBaseView->surface.Data.UV;
       srcExtra = (swapLR ? pBaseView->surface.Data.UV : pExtraView->surface.Data.UV) + linesize;
 
-      if (m_bSSE2 && ((size_t)dst % 16) == 0) {
+      if (CPUInfo::HaveSSE2() && ((size_t)dst % 16) == 0) {
         CopyEverySecondLineSSE2(dst, srcBase, srcExtra, linesize, height / 4);
       } else {
         CopyEverySecondLine(dst, srcBase, srcExtra, linesize, height / 4);
