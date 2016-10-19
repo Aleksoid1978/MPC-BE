@@ -46,19 +46,6 @@ CMixer::CMixer()
 {
 	// Allocate SWR Context
 	m_pSWRCxt = swr_alloc();
-
-	{
-		// fix swresample bug
-		// need first run swr_init(), because swr_set_matrix() is not working properly for 6.1 input layout
-		av_opt_set_int(m_pSWRCxt, "in_sample_fmt", AV_SAMPLE_FMT_S16, 0);
-		av_opt_set_int(m_pSWRCxt, "out_sample_fmt", AV_SAMPLE_FMT_FLT, 0);
-		av_opt_set_int(m_pSWRCxt, "in_channel_layout", AV_CH_LAYOUT_5POINT1, 0);
-		av_opt_set_int(m_pSWRCxt, "out_channel_layout", AV_CH_LAYOUT_STEREO, 0);
-		av_opt_set_int(m_pSWRCxt, "in_sample_rate", 48000, 0);
-		av_opt_set_int(m_pSWRCxt, "out_sample_rate", 48000, 0);
-		int ret = swr_init(m_pSWRCxt);
-		swr_close(m_pSWRCxt);
-	}
 }
 
 CMixer::~CMixer()
