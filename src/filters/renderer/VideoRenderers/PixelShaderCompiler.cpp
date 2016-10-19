@@ -46,6 +46,8 @@ HINSTANCE GetD3dcompilerDll()
 	return s_hD3dcompilerDll;
 }
 
+// CPixelShaderCompiler
+
 CPixelShaderCompiler::CPixelShaderCompiler(IDirect3DDevice9* pD3DDev, bool fStaySilent)
 	: m_pD3DDev(pD3DDev)
 	, m_fnD3DCompile(NULL)
@@ -123,6 +125,17 @@ HRESULT CPixelShaderCompiler::CompileShader(
 		}
 	}
 
+	return S_OK;
+}
+
+// CExternalPixelShader
+
+HRESULT CExternalPixelShader::Compile(CPixelShaderCompiler* pCompiler)
+{
+	HRESULT hr = pCompiler->CompileShader(m_SourceCode, "main", m_Profile, 0, NULL, &m_pPixelShader);
+	if (FAILED(hr)) {
+		return hr;
+	}
 	return S_OK;
 }
 

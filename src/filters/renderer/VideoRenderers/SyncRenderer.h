@@ -158,21 +158,6 @@ namespace GothSync
 		CSyncRenderer*				m_pOuterEVR;
 
 		// Shaders
-		class CExternalPixelShader
-		{
-		public:
-			CComPtr<IDirect3DPixelShader9> m_pPixelShader;
-			CStringA m_SourceCode;
-			CStringA m_Profile;
-			HRESULT Compile(CPixelShaderCompiler *pCompiler) {
-				HRESULT hr = pCompiler->CompileShader(m_SourceCode, "main", m_Profile, 0, NULL, &m_pPixelShader);
-				if (FAILED(hr)) {
-					return hr;
-				}
-				return S_OK;
-			}
-		};
-
 		LPCSTR m_ShaderProfile;
 		CAutoPtr<CPixelShaderCompiler>	m_pPSC;
 		CAtlList<CExternalPixelShader>	m_pPixelShaders;

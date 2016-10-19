@@ -25,6 +25,8 @@
 #include <D3Dcompiler.h>
 #include <d3d9.h>
 
+// CPixelShaderCompiler
+
 class CPixelShaderCompiler
 {
 	pD3DCompile m_fnD3DCompile;
@@ -45,6 +47,18 @@ public:
 		IDirect3DPixelShader9** ppPixelShader,
 		CString* errmsg = NULL,
 		CString* disasm = NULL);
+};
+
+// CExternalPixelShader
+
+class CExternalPixelShader
+{
+public:
+	CComPtr<IDirect3DPixelShader9> m_pPixelShader;
+	CStringA m_SourceCode;
+	CStringA m_Profile;
+
+	HRESULT Compile(CPixelShaderCompiler* pCompiler);
 };
 
 //

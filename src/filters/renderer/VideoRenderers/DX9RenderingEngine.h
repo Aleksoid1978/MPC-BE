@@ -131,22 +131,6 @@ namespace DSObjects
 		int							m_iRotation; // total rotation angle clockwise of frame (0, 90, 180 or 270 deg.)
 		bool						m_bFlip; // horizontal flip. for vertical flip use together with a rotation of 180 deg.
 
-		class CExternalPixelShader
-		{
-		public:
-			CComPtr<IDirect3DPixelShader9> m_pPixelShader;
-			CStringA m_SourceCode;
-			CStringA m_Profile;
-			HRESULT Compile(CPixelShaderCompiler *pCompiler) {
-				HRESULT hr = pCompiler->CompileShader(m_SourceCode, "main", m_Profile, 0, NULL, &m_pPixelShader);
-				if (FAILED(hr)) {
-					return hr;
-				}
-
-				return S_OK;
-			}
-		};
-
 		CAutoPtr<CPixelShaderCompiler>	m_pPSC;
 
 		// Settings
