@@ -277,6 +277,8 @@ namespace DSObjects
 
 		CString					m_strMixerFmtIn;
 		CString					m_strMixerFmtOut;
+		CString					m_strSurfaceFmt;
+		CString					m_strBackbufferFmt;
 
 		CString					m_D3D9Device;
 		CString					m_D3D9DeviceName;

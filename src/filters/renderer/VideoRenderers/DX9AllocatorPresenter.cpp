@@ -706,6 +706,9 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		m_rcMonitor = mi.rcMonitor;
 	}
 
+	m_strSurfaceFmt = GetD3DFormatStr(m_SurfaceFmt);
+	m_strBackbufferFmt = GetD3DFormatStr(m_BackbufferFmt);
+
 	return S_OK;
 }
 
@@ -1844,7 +1847,7 @@ void CDX9AllocatorPresenter::DrawStats()
 				strText += L"AccVS ";
 			}
 			if (rs.iVSyncOffset) {
-				strText.AppendFormat(L"VSOfst(%d)", rs.iVSyncOffset);
+				strText.AppendFormat(L"VSOfst(%d) ", rs.iVSyncOffset);
 			}
 
 			if (rs.bEVRFrameTimeCorrection) {
@@ -1867,8 +1870,8 @@ void CDX9AllocatorPresenter::DrawStats()
 				, m_strMixerFmtIn
 				, m_strMixerFmtOut
 				, GetD3DFormatStr(m_VideoBufferFmt)
-				, GetD3DFormatStr(m_SurfaceFmt)
-				, GetD3DFormatStr(m_BackbufferFmt));
+				, m_strSurfaceFmt
+				, m_strBackbufferFmt);
 			drawText(strText);
 
 			if (rs.bVSync) {
