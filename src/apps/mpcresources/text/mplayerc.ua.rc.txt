@@ -1019,6 +1019,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 220		"В&ихід\tAlt+X"
 END
 
+STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
 STRING IDC_BUTTON_EXT_SET		"Після натискання цієї кнопки, відмітки вибору групи форматів будуть встановлені відповідно до наявних асоціацій файлів для MPC-BE. Щойно додані роширення зазвичай будуть помічатися ""сірим"", тому не забувайте виділити їх знову перед закриттям вікна!"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Вимкнення цієї опції запобіжить мигтінню субтитрів, але може спричнити пропуск кадрів рендерером відео."
 STRING IDC_CHECK_RELATIVETO		"Стандартний стан успадковується іншими стилями, в яких він ще не визначений."

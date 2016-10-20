@@ -1019,6 +1019,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 220		"終了(&X)\tAlt+X"
 END
 
+STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
 STRING IDC_BUTTON_EXT_SET		"このボタンをクリックすると MPC-BE の実際のファイルの関連付けが、関連付け設定のチェック状態に反映されます。\n新しく拡張子が追加されると大抵チェックボックスは灰色になるので、このダイアログを閉じる前に再びチェックすることを忘れないでください！"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"このオプションを無効にすることで字幕のチラツキを防止できますが、ビデオ レンダラーが一部ビデオ フレームをスキップしてしまうかもしれません。"
 STRING IDC_CHECK_RELATIVETO		"未設定のスタイルにはデフォルト状態の設定が適用されます"

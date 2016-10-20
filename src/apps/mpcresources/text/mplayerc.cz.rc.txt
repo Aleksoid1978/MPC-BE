@@ -1019,6 +1019,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 220		"Konec\tAlt+X"
 END
 
+STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
 STRING IDC_BUTTON_EXT_SET		"Stav zaškrtávacího políčka u skupin formátů určuje aktuální asociace MPC-BE. Nově přidaná přípona většinou zruší zaškrtnutí dané skupiny, proto ji před zavřením tohoto dialogu nezapomeňte znovu zaškrtnout!"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Výchozí stav bude převzat ostatními styly ve kterých ještě nebyla tato volba nastavena."

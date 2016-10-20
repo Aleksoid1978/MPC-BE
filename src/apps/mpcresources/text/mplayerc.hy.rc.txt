@@ -1019,6 +1019,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 220		"Դ&ուրս գալ\tAlt+X"
 END
 
+STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
 STRING IDC_BUTTON_EXT_SET		"Այս կոճակը սեղմելուց հետո ցույց կտրվի MPC-BE-ի հետ ասոցացված տեսակների խմբերը։ Նոր ավելացումները երևում են մոխրագույն գույնով, ուստի մի մոռացեք նորից ստուգել դրանք պատուհանը փակելիս։"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Ծրագրային վիճակը որոշվում է այնտեղ, որտեղ այն դեռ չի որոշվել"

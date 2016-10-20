@@ -1019,6 +1019,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 220		"Ç&ıkış\tAlt+X"
 END
 
+STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
 STRING IDC_BUTTON_EXT_SET		"Bu tuşa tıkladıktan sonra, seçili olan grup biçimi MPC-BE'nin geçerli dosya ilişkilendirmesi seçeneği olarak ayarlanacaktır. Genellikle yeni eklenen uzantı gri renkle gösterilecektir, yani bu ekranı kapatmadan önce uzantıyı tekrar seçmeniz gerektiğini unutmayınız!"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Varsayılan durum hala tanımsız olduğu için diğer biçimlerden etkileniyor"

@@ -1019,6 +1019,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 220		"Kilépés\tAlt+X"
 END
 
+STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
 STRING IDC_BUTTON_EXT_SET		"Miután rákattint erre a gombra, a formátumcsoport bepipált állapota az MPC-BE való aktuális fájlhozzárendeléseket fogja tükrözni. Egy újonnan hozzáadott kiterjesztéssel rendszerint szürkítettre fog váltani, tehát mielőtt bezárja a párbeszédpanelt, ne felejtse el újra bepipálni azt a csoportot!"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Az alapértelmezett pozíciót örökli a többi stílus, ahol ez még nincs meghatározva"

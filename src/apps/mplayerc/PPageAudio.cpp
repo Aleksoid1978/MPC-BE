@@ -61,7 +61,7 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDC_CHECK7, m_chkMixer);
 	DDX_Control(pDX, IDC_COMBO2, m_cmbMixerLayout);
-	DDX_Control(pDX, IDC_CHECK8, m_chkBassRedirect);
+	DDX_Control(pDX, IDC_BASSREDIRECT_CHECK, m_chkBassRedirect);
 
 	DDX_Control(pDX, IDC_SLIDER1, m_sldGain);
 	DDX_Control(pDX, IDC_STATIC4, m_stcGain);
@@ -231,6 +231,8 @@ BOOL CPPageAudio::OnInitDialog()
 	UpdateData(FALSE);
 
 	OnAudioRendererChange();
+
+	CreateToolTip();
 
 	return TRUE;
 }
