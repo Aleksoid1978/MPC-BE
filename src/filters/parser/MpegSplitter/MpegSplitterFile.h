@@ -198,7 +198,14 @@ public:
 		MPEG,
 		VC1,
 		OPUS,
-		ARIB
+		DIRAC,
+		AC3,
+		EAC3,
+		DTS,
+		ARIB,
+		PGS,
+		DVB,
+		TELETEXT
 	};
 
 	enum stream_type {
