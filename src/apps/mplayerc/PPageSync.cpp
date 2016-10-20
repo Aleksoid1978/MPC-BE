@@ -44,7 +44,7 @@ void CPPageSync::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDC_CHECK1, m_chkVMR9VSync);
 	DDX_Control(pDX, IDC_CHECK2, m_chkVMR9VSyncAccurate);
-	DDX_Control(pDX, IDC_CHECK3, m_chkVMR9AlterativeVSync);
+	DDX_Control(pDX, IDC_DSVMR9ALTERNATIVEVSYNC, m_chkVMR9AlterativeVSync);
 	DDX_Control(pDX, IDC_EDIT1, m_edtVMR9VSyncOffset);
 	DDX_Control(pDX, IDC_SPIN1, m_spnVMR9VSyncOffset);
 	DDX_Control(pDX, IDC_CHECK4, m_chkDisableAero);
@@ -66,6 +66,8 @@ BOOL CPPageSync::OnInitDialog()
 	__super::OnInitDialog();
 
 	InitDialogPrivate();
+
+	CreateToolTip();
 
 	return TRUE;
 }
@@ -203,7 +205,7 @@ BOOL CPPageSync::OnApply()
 }
 
 BEGIN_MESSAGE_MAP(CPPageSync, CPPageBase)
-	ON_BN_CLICKED(IDC_CHECK3, OnAlterativeVSyncCheck)
+	ON_BN_CLICKED(IDC_DSVMR9ALTERNATIVEVSYNC, OnAlterativeVSyncCheck)
 	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO1, IDC_RADIO3, OnSyncModeClicked)
 END_MESSAGE_MAP()
 
