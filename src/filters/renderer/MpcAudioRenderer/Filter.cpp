@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2015 see Authors.txt
+ * (C) 2014-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,21 +33,14 @@ extern "C"
 }
 
 CFilter::CFilter()
-	: m_pFilterGraph(NULL)
-	, m_pFilterBufferSrc(NULL)
-	, m_pFilterBufferSink(NULL)
-	, m_av_sample_fmt(AV_SAMPLE_FMT_NONE)
-	, m_sample_fmt(SAMPLE_FMT_NONE)
-	, m_layout(0)
-	, m_SamplesPerSec(0)
-	, m_Channels(0)
-	, m_dRate(1.0)
 {
 	avfilter_register_all();
+	m_pFrame = av_frame_alloc();
 }
 
 CFilter::~CFilter()
 {
+	av_frame_free(&m_pFrame);
 	avfilter_graph_free(&m_pFilterGraph);
 }
 
@@ -173,9 +166,9 @@ HRESULT CFilter::Init(double dRate, const WAVEFORMATEX* wfe)
 	m_av_sample_fmt = av_sample_fmt;
 	m_sample_fmt = sample_fmt;
 
-	m_layout = layout;
 	m_SamplesPerSec = wfe->nSamplesPerSec;
 	m_Channels = wfe->nChannels;
+	m_layout = layout;
 
 	m_dRate = dRate;
 
@@ -185,12 +178,10 @@ HRESULT CFilter::Init(double dRate, const WAVEFORMATEX* wfe)
 HRESULT CFilter::Push(CAutoPtr<CPacket> p)
 {
 	CheckPointer(m_pFilterGraph, E_FAIL);
+	CheckPointer(m_pFrame, E_FAIL);
 
-	AVFrame *pFrame = av_frame_alloc();
-	CheckPointer(pFrame, E_FAIL);
-
-	BYTE *pData		= p->GetData();
-	BYTE* pTmpBuf	= NULL;
+	BYTE *pData   = p->GetData();
+	BYTE* pTmpBuf = NULL;
 
 	int nSamples = p->GetCount() / (m_Channels * av_get_bytes_per_sample(m_av_sample_fmt));
 
@@ -201,21 +192,21 @@ HRESULT CFilter::Push(CAutoPtr<CPacket> p)
 		pData = &pTmpBuf[0];
 	}
 
-	pFrame->nb_samples		= nSamples;
-	pFrame->format			= m_av_sample_fmt;
-	pFrame->channels		= m_Channels;
-	pFrame->channel_layout	= m_layout;
-	pFrame->sample_rate		= m_SamplesPerSec;
-	pFrame->pts				= p->rtStart;
+	m_pFrame->nb_samples     = nSamples;
+	m_pFrame->format         = m_av_sample_fmt;
+	m_pFrame->channels       = m_Channels;
+	m_pFrame->channel_layout = m_layout;
+	m_pFrame->sample_rate    = m_SamplesPerSec;
+	m_pFrame->pts            = p->rtStart;
 
-	int buffersize = av_samples_get_buffer_size(NULL, pFrame->channels, pFrame->nb_samples, m_av_sample_fmt, 1);
-	int ret = avcodec_fill_audio_frame(pFrame, pFrame->channels, m_av_sample_fmt, pData, buffersize, 1);
+	int buffersize = av_samples_get_buffer_size(NULL, m_pFrame->channels, m_pFrame->nb_samples, m_av_sample_fmt, 1);
+	int ret = avcodec_fill_audio_frame(m_pFrame, m_pFrame->channels, m_av_sample_fmt, pData, buffersize, 1);
 	if (ret >= 0) {
-		ret = av_buffersrc_write_frame(m_pFilterBufferSrc, pFrame);
+		ret = av_buffersrc_write_frame(m_pFilterBufferSrc, m_pFrame);
 	}
 
 	SAFE_DELETE_ARRAY(pTmpBuf);
-	av_frame_free(&pFrame);
+	av_frame_unref(m_pFrame);
 
 	return ret < 0 ? E_FAIL : S_OK;
 }
@@ -223,33 +214,31 @@ HRESULT CFilter::Push(CAutoPtr<CPacket> p)
 HRESULT CFilter::Pull(CAutoPtr<CPacket>& p)
 {
 	CheckPointer(m_pFilterGraph, E_FAIL);
-
-	AVFrame *pFrame = av_frame_alloc();
-	CheckPointer(pFrame, E_FAIL);
+	CheckPointer(m_pFrame, E_FAIL);
 
 	if (!p) {
 		p.Attach(DNew CPacket());
 	}
 	CheckPointer(p, E_FAIL);
 
-	int ret = av_buffersink_get_frame(m_pFilterBufferSink, pFrame);
+	int ret = av_buffersink_get_frame(m_pFilterBufferSink, m_pFrame);
 	if (ret >= 0) {
-		p->rtStart	= av_rescale(pFrame->pts, m_pFilterBufferSink->inputs[0]->time_base.num * 10000000LL, m_pFilterBufferSink->inputs[0]->time_base.den);
-		p->rtStop	= p->rtStart + (10000000i64 * pFrame->nb_samples / pFrame->sample_rate);
+		p->rtStart = av_rescale(m_pFrame->pts, m_pFilterBufferSink->inputs[0]->time_base.num * UNITS, m_pFilterBufferSink->inputs[0]->time_base.den);
+		p->rtStop  = p->rtStart + llMulDiv(UNITS, m_pFrame->nb_samples, m_pFrame->sample_rate, 0);
 
 		if (m_av_sample_fmt == AV_SAMPLE_FMT_S32 && m_sample_fmt == SAMPLE_FMT_S24) {
-			DWORD pSize		= pFrame->nb_samples * pFrame->channels * sizeof(BYTE) * 3;
-			BYTE* pTmpBuf	= DNew BYTE[pSize];
-			convert_to_int24(SAMPLE_FMT_S32, m_Channels, pFrame->nb_samples, pFrame->data[0], pTmpBuf);
+			DWORD pSize   = m_pFrame->nb_samples * m_pFrame->channels * sizeof(BYTE) * 3;
+			BYTE* pTmpBuf = DNew BYTE[pSize];
+			convert_to_int24(SAMPLE_FMT_S32, m_Channels, m_pFrame->nb_samples, m_pFrame->data[0], pTmpBuf);
 
 			p->SetData(pTmpBuf, pSize);
 			delete [] pTmpBuf;
 		} else {
-			int buffersize = av_samples_get_buffer_size(NULL, pFrame->channels, pFrame->nb_samples, m_av_sample_fmt, 1);
-			p->SetData(pFrame->data[0], buffersize);
+			int buffersize = av_samples_get_buffer_size(NULL, m_pFrame->channels, m_pFrame->nb_samples, m_av_sample_fmt, 1);
+			p->SetData(m_pFrame->data[0], buffersize);
 		}
 	}
-	av_frame_free(&pFrame);
+	av_frame_unref(m_pFrame);
 
 	return ret < 0 ? E_FAIL : S_OK;
 }
