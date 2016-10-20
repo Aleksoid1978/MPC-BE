@@ -1,5 +1,5 @@
 /*
-  * (C) 2014-2015  see Authors.txt
+ * (C) 2014-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,25 +26,27 @@
 struct AVFilterGraph;
 struct AVFilterContext;
 struct AVFrame;
-enum AVSampleFormat;
+enum   AVSampleFormat;
 
 class CFilter final
 {
-	CCritSec		m_csFilter;
+	CCritSec        m_csFilter;
 
 private:
-	AVFilterGraph	*m_pFilterGraph;
-	AVFilterContext	*m_pFilterBufferSrc;
-	AVFilterContext	*m_pFilterBufferSink;
+	AVFilterGraph   *m_pFilterGraph      = NULL;
+	AVFilterContext *m_pFilterBufferSrc  = NULL;
+	AVFilterContext *m_pFilterBufferSink = NULL;
 
-	AVSampleFormat	m_av_sample_fmt;
-	SampleFormat	m_sample_fmt;
+	AVFrame         *m_pFrame            = NULL;
 
-	DWORD			m_layout;
-	DWORD			m_SamplesPerSec;
-	WORD			m_Channels;
+	AVSampleFormat  m_av_sample_fmt      = (AVSampleFormat)-1;
+	SampleFormat    m_sample_fmt         = SAMPLE_FMT_NONE;
 
-	double			m_dRate;
+	DWORD           m_layout             = 0;
+	DWORD           m_SamplesPerSec      = 0;
+	WORD            m_Channels           = 0;
+
+	double          m_dRate              = 1.0;
 
 public:
 	CFilter();
