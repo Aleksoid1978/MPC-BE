@@ -812,7 +812,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			DWORD TrackNumber = m_pFile->AddStream(0, b, peshdr.id_ext, peshdr.len);
 			if (GetOutputPin(TrackNumber)) {
 				const __int64 nBytes = peshdr.len - (m_pFile->GetPos() - pos);
-				hr = HandleMPEGPacket(TrackNumber, nBytes, peshdr, rtStartOffset, m_pFile->m_StreamsUsePTS[TrackNumber]);
+				hr = HandleMPEGPacket(TrackNumber, nBytes, peshdr, rtStartOffset, m_pFile->m_streamData[TrackNumber].usePTS);
 			}
 			m_pFile->Seek(pos + peshdr.len);
 		}
@@ -848,7 +848,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 				if (h.bytes > (m_pFile->GetPos() - pos)) {
 					const __int64 nBytes = h.bytes - (m_pFile->GetPos() - pos);
-					hr = HandleMPEGPacket(TrackNumber, nBytes, peshdr, rtStartOffset, m_pFile->m_StreamsUsePTS[TrackNumber]);
+					hr = HandleMPEGPacket(TrackNumber, nBytes, peshdr, rtStartOffset, m_pFile->m_streamData[TrackNumber].usePTS);
 				}
 			}
 		}
@@ -864,7 +864,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 		DWORD TrackNumber = pvahdr.streamid;
 		if (GetOutputPin(TrackNumber)) {
-			hr = HandleMPEGPacket(TrackNumber, pvahdr.length, pvahdr, rtStartOffset, m_pFile->m_StreamsUsePTS[TrackNumber]);
+			hr = HandleMPEGPacket(TrackNumber, pvahdr.length, pvahdr, rtStartOffset, m_pFile->m_streamData[TrackNumber].usePTS);
 		}
 
 		m_pFile->Seek(pos + pvahdr.length);

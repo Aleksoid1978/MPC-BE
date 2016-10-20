@@ -284,7 +284,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		while (pos) {
 			const stream& s = streams.GetNext(pos);
 			const SyncPoints& sps = m_SyncPoints[s];
-			m_StreamsUsePTS[s] = sps.GetCount() > 1;
+			m_streamData[s].usePTS = sps.GetCount() > 1;
 		}
 	}
 
@@ -986,10 +986,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				}
 
 				// OPUS
-				if (type == stream_type::unknown && (stream_type & OPUS_AUDIO)) {
+				if (type == stream_type::unknown && (stream_type & OPUS_AUDIO) && m_streamData[s].codec == stream_codec::OPUS) {
 					Seek(start);
 					opus_ts_hdr h;
-					if (Read(h, len, m_pPMT_ExtraData[pid], &s.mt)) {
+					if (Read(h, len, m_streamData[s].pmt.extraData, &s.mt)) {
 						type = stream_type::audio;
 					}
 				}
@@ -1240,10 +1240,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 	if (bAddStream && type != stream_type::unknown && !m_streams[type].Find(s)) {
 		if (s.pid) {
 			if (!s.lang_set) {
-				CStringA lang_name;
-				m_pPMT_Lang.Lookup(s.pid, lang_name);
-				if (!lang_name.IsEmpty()) {
-					memcpy(s.lang, lang_name, 4);
+				streamData _streamData;
+				m_streamData.Lookup(s, _streamData);
+				if (!_streamData.pmt.lang.IsEmpty()) {
+					memcpy(s.lang, _streamData.pmt.lang, 4);
 					s.lang_set = true;
 				}
 			}
@@ -1443,23 +1443,23 @@ void CMpegSplitterFile::ReadPAT(CAtlArray<BYTE>& pData)
 static const char und[4] = "und";
 
 // ISO 639 language descriptor
-static void Descriptor_0A(CGolombBuffer& gb, CString& ISO_639_language_code)
+static void Descriptor_0A(CGolombBuffer& gb, CStringA& ISO_639_language_code)
 {
 	const char ch[4] = { 0 };
 	gb.ReadBuffer((BYTE *)ch, 3); // ISO 639 language code
 	gb.BitRead(8);                // audio type
 
 	if (ch[0] && strncmp(ch, und, 3)) {
-		ISO_639_language_code = CString(ch);
+		ISO_639_language_code = ch;
 	}
 }
 
 // Teletext descriptor
-static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, CString& ISO_639_language_code)
+static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, CStringA& ISO_639_language_code)
 {
 #ifdef _DEBUG
 	// for future use
-	CAtlMap<USHORT, CString> teletexts;
+	CAtlMap<USHORT, CStringA> teletexts;
 #endif
 
 	const int section_len = 5;
@@ -1474,13 +1474,13 @@ static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, CString& ISO
 
 		if (teletext_type == 0x02 || teletext_type == 0x05) {
 			if (ISO_639_language_code.IsEmpty() && ch[0] && strncmp(ch, und, 3)) {
-				ISO_639_language_code = CString(ch);
+				ISO_639_language_code = ch;
 			}
 
 #ifdef _DEBUG
 			if (teletext_magazine_number == 0) teletext_magazine_number = 8;
 			USHORT page = (teletext_magazine_number << 8) | (teletext_page_number_1 << 4) | teletext_page_number_2;
-			teletexts[page] = CString(ch);
+			teletexts[page] = CStringA(ch);
 #endif
 		}
 
@@ -1492,7 +1492,7 @@ static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, CString& ISO
 		DLog(L"ReadPMT() : found %Iu teletext pages", teletexts.GetCount());
 		POSITION pos = teletexts.GetStartPosition();
 		while (pos) {
-			CAtlMap<USHORT, CString>::CPair* pPair = teletexts.GetNext(pos);
+			CAtlMap<USHORT, CStringA>::CPair* pPair = teletexts.GetNext(pos);
 			DLog(L"    => %03x - '%s'", pPair->m_key, pPair->m_value);
 		}
 	}
@@ -1500,7 +1500,7 @@ static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, CString& ISO
 }
 
 // Subtitling descriptor
-static void Descriptor_59(CGolombBuffer& gb, int descriptor_length, CString& ISO_639_language_code)
+static void Descriptor_59(CGolombBuffer& gb, int descriptor_length, CStringA& ISO_639_language_code)
 {
 	const int section_len = 8;
 	int pos = 0;
@@ -1512,7 +1512,7 @@ static void Descriptor_59(CGolombBuffer& gb, int descriptor_length, CString& ISO
 		gb.BitRead(16);               // ancillary page id
 
 		if (ISO_639_language_code.IsEmpty() && ch[0] && strncmp(ch, und, 3)) {
-			ISO_639_language_code = CString(ch);
+			ISO_639_language_code = ch;
 		}
 
 		pos += section_len;
@@ -1602,7 +1602,7 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 						break;
 					}
 
-					CString ISO_639_language_code;
+					CStringA ISO_639_language_code;
 					switch (descriptor_tag) {
 						case 0x0a: // ISO 639 language descriptor
 							Descriptor_0A(gb, ISO_639_language_code);
@@ -1617,11 +1617,11 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 							break;
 						case 0x7f: // DVB extension descriptor
 							{
-								BYTE ext_desc_tag = gb.BitRead(8);
+								const BYTE ext_desc_tag = gb.BitRead(8);
 								if (ext_desc_tag == 0x80) {
 									int channel_config_code = gb.BitRead(8);
 									if (channel_config_code >= 0 && channel_config_code <= 0x8) {
-										CAtlArray<BYTE>& extradata = m_pPMT_ExtraData[pid];
+										CAtlArray<BYTE>& extradata = m_streamData[pid].pmt.extraData;
 										if (extradata.GetCount() != sizeof(opus_default_extradata)) {
 											extradata.SetCount(sizeof(opus_default_extradata));
 											memcpy(extradata.GetData(), &opus_default_extradata, sizeof(opus_default_extradata));
@@ -1634,8 +1634,19 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 											if (channels >= 1) {
 												memcpy(&extradata[21], opus_channel_map[channels - 1], channels);
 											}
+
+											m_streamData[pid].codec = stream_codec::OPUS;
 										}
 									}
+								}
+							}
+							break;
+						case 0xfd: // Data Component descriptor
+							{
+								const SHORT data_component_id = gb.ReadShort();
+								if (data_component_id == 0x0008) {
+									// ARIB Subtitle
+									m_streamData[pid].codec = stream_codec::ARIB;
 								}
 							}
 							break;
@@ -1645,7 +1656,7 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 					}
 
 					if (!ISO_639_language_code.IsEmpty()) {
-						m_pPMT_Lang[pid] = ISO_639_language_code;
+						m_streamData[pid].pmt.lang = ISO_639_language_code;
 					}
 					if (info_length <= 2) {
 						if (info_length > 0) {
@@ -1666,10 +1677,10 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 					s.pid = pid;
 
 					if (!m_streams[stream_type::subpic].Find(s)) {
-						CStringA lang_name;
-						m_pPMT_Lang.Lookup(s.pid, lang_name);
-						if (!lang_name.IsEmpty()) {
-							memcpy(s.lang, lang_name, 4);
+						streamData _streamData;
+						m_streamData.Lookup(s, _streamData);
+						if (!_streamData.pmt.lang.IsEmpty()) {
+							memcpy(s.lang, _streamData.pmt.lang, 4);
 							s.lang_set = true;
 						}
 
@@ -1974,8 +1985,8 @@ void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 					while (pos) {
 						CAtlMap<USHORT, CString>::CPair* pPair = ISO_639_languages.GetNext(pos);
 						const WORD& pid = pPair->m_key;
-						if (m_pPMT_Lang[pid].IsEmpty()) {
-							m_pPMT_Lang[pid] = pPair->m_value;
+						if (m_streamData[pid].pmt.lang.IsEmpty()) {
+							m_streamData[pid].pmt.lang = pPair->m_value;
 						}
 					}
 				}

@@ -196,7 +196,9 @@ public:
 		MVC,
 		HEVC,
 		MPEG,
-		VC1
+		VC1,
+		OPUS,
+		ARIB
 	};
 
 	enum stream_type {
@@ -431,7 +433,6 @@ public:
 
 		bool IsFull() { return !pData.IsEmpty() && pData.GetCount() == section_length; }
 	};
-
 	CAtlMap<WORD, programData> m_ProgramData;
 
 	void SearchPrograms(__int64 start, __int64 stop);
@@ -447,10 +448,26 @@ public:
 	PES_STREAM_TYPE m_psm[256];
 	void UpdatePSM();
 
-	CAtlMap<DWORD, CStringA> m_pPMT_Lang;
-	CAtlMap<DWORD, CAtlArray<BYTE>> m_pPMT_ExtraData;
-
 	bool GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type);
 
-	CAtlMap<DWORD, BOOL> m_StreamsUsePTS;
+	struct streamData {
+		struct {
+			CStringA        lang;
+			CAtlArray<BYTE> extraData;
+		} pmt;
+
+		BOOL         usePTS = FALSE;
+		stream_codec codec  = stream_codec::NONE;
+
+		streamData& operator = (const streamData& src) {
+			pmt.lang = src.pmt.lang;
+			pmt.extraData.Append(src.pmt.extraData);
+
+			usePTS   = src.usePTS;
+			codec    = src.codec;
+
+			return *this;
+		}
+	};
+	CAtlMap<WORD, streamData> m_streamData;
 };
