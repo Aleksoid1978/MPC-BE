@@ -673,21 +673,21 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 	}
 }
 
-#define MPEG_AUDIO          (1ULL << 0)
-#define AAC_AUDIO           (1ULL << 1)
-#define AC3_AUDIO           (1ULL << 2)
-#define DTS_AUDIO           (1ULL << 3)
-#define LPCM_AUDIO          (1ULL << 4)
-#define MPEG2_VIDEO         (1ULL << 5)
-#define H264_VIDEO          (1ULL << 6)
-#define VC1_VIDEO           (1ULL << 7)
-#define DIRAC_VIDEO         (1ULL << 8)
-#define HEVC_VIDEO          (1ULL << 9)
-#define PGS_SUB             (1ULL << 10)
-#define DVB_SUB             (1ULL << 11)
-#define TELETEXT_SUB        (1ULL << 12)
-#define OPUS_AUDIO          (1ULL << 13)
-#define DTS_EXPRESS_AUDIO   (1ULL << 14)
+#define MPEG_AUDIO        (1ULL << 0)
+#define AAC_AUDIO         (1ULL << 1)
+#define AC3_AUDIO         (1ULL << 2)
+#define DTS_AUDIO         (1ULL << 3)
+#define LPCM_AUDIO        (1ULL << 4)
+#define MPEG2_VIDEO       (1ULL << 5)
+#define H264_VIDEO        (1ULL << 6)
+#define VC1_VIDEO         (1ULL << 7)
+#define DIRAC_VIDEO       (1ULL << 8)
+#define HEVC_VIDEO        (1ULL << 9)
+#define PGS_SUB           (1ULL << 10)
+#define DVB_SUB           (1ULL << 11)
+#define TELETEXT_SUB      (1ULL << 12)
+#define OPUS_AUDIO        (1ULL << 13)
+#define DTS_EXPRESS_AUDIO (1ULL << 14)
 
 #define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | OPUS_AUDIO | DTS_EXPRESS_AUDIO)
 
@@ -740,6 +740,22 @@ static const struct StreamType {
 	{ PES_PRIVATE,							TELETEXT_SUB}
 };
 
+static const struct {
+	DWORD                           codec_tag;
+	CMpegSplitterFile::stream_codec codec;
+	ULONGLONG                       stream_type;
+} StreamDesc[] = {
+	{ 'drac', CMpegSplitterFile::stream_codec::DIRAC, DIRAC_VIDEO },
+	{ 'AC-3', CMpegSplitterFile::stream_codec::AC3,   AC3_AUDIO   },
+	{ 'DTS1', CMpegSplitterFile::stream_codec::DTS,   DTS_AUDIO   },
+	{ 'DTS2', CMpegSplitterFile::stream_codec::DTS,   DTS_AUDIO   },
+	{ 'DTS3', CMpegSplitterFile::stream_codec::DTS,   DTS_AUDIO   },
+	{ 'EAC3', CMpegSplitterFile::stream_codec::EAC3,  AC3_AUDIO   },
+	{ 'HEVC', CMpegSplitterFile::stream_codec::HEVC,  HEVC_VIDEO  },
+	{ 'VC-1', CMpegSplitterFile::stream_codec::VC1,   VC1_VIDEO   },
+	{ 'Opus', CMpegSplitterFile::stream_codec::OPUS,  OPUS_AUDIO  }
+};
+
 DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, BOOL bAddStream/* = TRUE*/)
 {
 	if (pid) {
@@ -778,6 +794,15 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		for (size_t i = 0; i < _countof(PES_types); i++) {
 			if (PES_types[i].pes_stream_type == pes_stream_type) {
 				stream_type |= PES_types[i].stream_type;
+			}
+		}
+	}
+
+	if (m_streamData[s].codec != stream_codec::NONE) {
+		for (size_t i = 0; i < _countof(StreamDesc); i++) {
+			if (StreamDesc[i].codec == m_streamData[s].codec) {
+				stream_type = StreamDesc[i].stream_type;
+				break;
 			}
 		}
 	}
@@ -986,7 +1011,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				}
 
 				// OPUS
-				if (type == stream_type::unknown && (stream_type & OPUS_AUDIO) && m_streamData[s].codec == stream_codec::OPUS) {
+				if (type == stream_type::unknown && stream_type == OPUS_AUDIO) {
 					Seek(start);
 					opus_ts_hdr h;
 					if (Read(h, len, m_streamData[s].pmt.extraData, &s.mt)) {
@@ -1604,6 +1629,20 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 
 					CStringA ISO_639_language_code;
 					switch (descriptor_tag) {
+						case 0x05: // registration descriptor
+							{
+								const DWORD codec_tag = gb.ReadDword();
+								if (descriptor_length > 4) {
+									gb.SkipBytes(descriptor_length  - 4);
+								}
+								for (size_t i = 0; i < _countof(StreamDesc); i++) {
+									if (codec_tag == StreamDesc[i].codec_tag) {
+										m_streamData[pid].codec = StreamDesc[i].codec;
+										break;
+									}
+								}
+							}
+							break;
 						case 0x0a: // ISO 639 language descriptor
 							Descriptor_0A(gb, ISO_639_language_code);
 							break;
@@ -1688,16 +1727,19 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 							CMpegSplitterFile::hdmvsubhdr hdr;
 							if (Read(hdr, &s.mt, NULL)) {
 								m_streams[stream_type::subpic].Insert(s, subpic);
+								m_streamData[pid].codec = stream_codec::PGS;
 							}
 						} else if (DVB_SUBTITLE) {
 							CMpegSplitterFile::dvbsub hdr;
 							if (Read(hdr, 0, &s.mt, true)) {
 								m_streams[stream_type::subpic].Insert(s, subpic);
+								m_streamData[pid].codec = stream_codec::DVB;
 							}
 						} else if (TELETEXT_SUBTITLE) {
 							CMpegSplitterFile::teletextsub hdr;
 							if (Read(hdr, 0, &s.mt, true)) {
 								m_streams[stream_type::subpic].Insert(s, subpic);
+								m_streamData[pid].codec = stream_codec::TELETEXT;
 							}
 						}
 					}
