@@ -743,11 +743,7 @@
 #define IDC_EDITLIST                    10628
 #define IDC_CHECK_SUBRESYNC             10629
 #define IDC_DSSYSDEF                    10700
-#define IDC_DSOVERLAYMIXER              10702
-#define IDC_DSVMR7WIN                   10703
 #define IDC_DSVMR9WIN                   10704
-#define IDC_DSVMR7REN                   10705
-#define IDC_DSVMR9REN                   10706
 #define IDC_DSDXR                       10707
 #define IDC_DSNULL_COMP                 10708
 #define IDC_DSNULL_UNCOMP               10709
@@ -755,7 +751,6 @@
 #define IDC_DSEVR_CUSTOM                10711
 #define IDC_DSMADVR                     10712
 #define IDC_DSSYNC                      10713
-#define IDC_REULARSURF                  10726
 #define IDC_REGULARSURF                 10727
 #define IDC_TEXTURESURF2D               10728
 #define IDC_TEXTURESURF3D               10729
