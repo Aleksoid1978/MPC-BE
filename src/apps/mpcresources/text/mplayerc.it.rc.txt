@@ -1019,6 +1019,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 220		"&Esci\tAlt+X"
 END
 
+STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
 STRING IDC_BUTTON_EXT_SET		"Cliccando questo pulsante, lo stato selezionato del gruppo rifletterà le attuali associazioni di file. Estensioni aggiunte successivamente lo renderanno grigio, quindi ricordati di riselezionarlo prima di chiudere questa finestra!"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabitilare questa opzione impedirà ai sottotitoli di lampeggiare, ma può causare lo skip di alcuni frame da parte del video renderer."
 STRING IDC_CHECK_RELATIVETO		"Lo stato di default eredita da altri stili finché non viene definito"

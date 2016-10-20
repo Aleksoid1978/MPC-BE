@@ -1019,6 +1019,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 220		"Beenden\tAlt+X"
 END
 
+STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
 STRING IDC_BUTTON_EXT_SET		"Dieser Button bewirkt die Anzeige der momentan im System zugewiesenen Dateiendungen. Dies bedeutet, dass der Erweiterungen-Eintrag einen grauen Haken bekommt. Um die neu hinzugefügte Endung auch zu aktivieren, muss der graue Haken erneut angeklickt werden."
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Die Deaktivierung dieser Option wird das Blinken von Untertiteln verhindern, kann aber verursachen, dass der Video-Renderer einige Videoframes überspringt."
 STRING IDC_CHECK_RELATIVETO		"Standardwert wird auch für andere Stile verwendet, für die noch nichts definiert wurde"

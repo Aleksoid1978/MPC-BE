@@ -1019,6 +1019,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 220		"E&xit\tAlt+X"
 END
 
+STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
 STRING IDC_BUTTON_EXT_SET		"After clicking this button, the checked state of the format group will reflect the actual file association for MPC-BE. A newly added extension will usually make it grayed, so don't forget to check it again before closing this dialog!"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"Default state gets inherited to other styles where it is still undefined"
@@ -1031,7 +1032,7 @@ STRING IDC_DSMADVR		"High-quality renderer, requires a GPU that supports D3D9 or
 STRING IDC_DSNULL_COMP		"Connects to any video-like media type and will send the incoming samples to nowhere. Use it when you don't need the video display and want to save the cpu from working unnecessarily."
 STRING IDC_DSNULL_UNCOMP		"Same as the normal Null renderer, but this will only connect to uncompressed types."
 STRING IDC_DSSYNC		"Same as the EVR (CP), but offers several options to synchronize the video frame rate with the display refresh rate to eliminate skipped or duplicated video frames."
-STRING IDC_DSSYSDEF		"Default video renderer filter for DirectShow. Others will fall back to this one when they can't be loaded for some reason. On Windown XP this is the same as VMR-7 (windowed)."
+STRING IDC_DSSYSDEF		"Default video renderer filter for DirectShow (VMR-7). Others will fall back to this one when they can't be loaded for some reason."
 STRING IDC_DSVMR9ALTERNATIVEVSYNC		"Reduces tearing by bypassing the default VSync built into D3D."
 STRING IDC_DSVMR9WIN		"Only available if you have DirectX 9 installed. Has the same abilities as VMR-7 (windowed), but it will never use Overlay rendering and because of this it may be a little slower than VMR-7 (windowed)."
 STRING IDC_DSVMRLOADMIXER		"Puts VMR into mixer mode, this means most of the controls on its property page will work and it will use a separate worker thread to renderer frames."

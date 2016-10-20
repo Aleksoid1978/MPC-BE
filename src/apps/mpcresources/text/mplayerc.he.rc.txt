@@ -1019,6 +1019,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 220		"יציאה\tAlt+X"
 END
 
+STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
 STRING IDC_BUTTON_EXT_SET		"אחרי לחיצה על כפתור זה, המצב המסומן של קבוצת פורמטים ייצג את השיוך האמיתי של הקבצים ל-MPC-BE. הרחבת חדשה שנוספת בדרך כלל תהפוך זאת לאפור, אז אל תשכח לסמון אותו שוב לפני שאתה סוגר את הדיאלוג!"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the subtitles from blinking but it may cause the video renderer to skip some video frames."
 STRING IDC_CHECK_RELATIVETO		"מצב ברירת המחדל עובר בירושה לסגנונות אחרים בהם שם הוא עדיין אינו מוגדר"

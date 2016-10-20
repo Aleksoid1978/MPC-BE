@@ -742,6 +742,7 @@
 #define IDC_PLAYERTIME                  10627
 #define IDC_EDITLIST                    10628
 #define IDC_CHECK_SUBRESYNC             10629
+#define IDC_BASSREDIRECT_CHECK          10630
 #define IDC_DSSYSDEF                    10700
 #define IDC_DSVMR9WIN                   10704
 #define IDC_DSDXR                       10707

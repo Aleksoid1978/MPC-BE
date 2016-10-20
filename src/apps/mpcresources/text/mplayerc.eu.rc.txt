@@ -1019,6 +1019,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 220		"I&rten\tAlt+X"
 END
 
+STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
 STRING IDC_BUTTON_EXT_SET		"Botoi hau sakatu ondoren, hautatutako multzo heuskarri egoerak  MPC-BE-rentzat oraingo agiri elkarketa adieraziko du. Berriki gehitutako hedapen ba arrunt urdinabarrago ikusiko da, hortaz ez ahaztu hura berriro hautatzeaz elkarrizketa hau itxitakoan!"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Aukera hau ezgaitzeak azpidatziek keinuka egitea saihestuko du baina bideo aurkezleak zenbait bide frame jauzi egitea eragin dezake."
 STRING IDC_CHECK_RELATIVETO		"Berezko egoera beste estilo batzuetatik lortzen da oraindik zehaztugabe dagoenean."

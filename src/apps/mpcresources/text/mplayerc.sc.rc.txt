@@ -1019,6 +1019,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 220		"退出(&X)\tAlt+X"
 END
 
+STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
 STRING IDC_BUTTON_EXT_SET		"在点击此按钮后,被选的格式组的状态将会对 MPC-BE 的实际文件关联做出更改。最新添加的扩展名通常会变灰，所以请不要忘记在关闭此对话框前再次选中此类型的文件。"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"禁用此选项可防止字幕闪烁，但它可能会导致视频渲染器跳过某些视频帧。"
 STRING IDC_CHECK_RELATIVETO		"如未定义，默认状态将会从其它风格获取"
