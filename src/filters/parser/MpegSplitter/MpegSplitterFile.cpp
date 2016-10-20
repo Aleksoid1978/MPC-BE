@@ -1868,7 +1868,7 @@ void CMpegSplitterFile::ReadSDT(CAtlArray<BYTE>& pData, BYTE table_id)
 }
 
 // ATSC - service location
-static void Descriptor_A1(CGolombBuffer& gb, int descriptor_length, CAtlMap<WORD, CString>& ISO_639_languages)
+static void Descriptor_A1(CGolombBuffer& gb, int descriptor_length, CAtlMap<WORD, CStringA>& ISO_639_languages)
 {
 	BYTE reserved        = (BYTE)gb.BitRead(3);
 	WORD PCR_PID         = (WORD)gb.BitRead(13);
@@ -1886,7 +1886,7 @@ static void Descriptor_A1(CGolombBuffer& gb, int descriptor_length, CAtlMap<WORD
 		const char ch[4] = { 0 };
 		gb.ReadBuffer((BYTE *)ch, 3);    // ISO 639 language code
 		if (ch[0] && strncmp(ch, und, 3)) {
-			ISO_639_languages[pid] = CString(ch);
+			ISO_639_languages[pid] = ch;
 		}
 
 		descriptor_length -= 6;
@@ -1969,7 +1969,7 @@ void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 					break;
 				}
 
-				CAtlMap<WORD, CString> ISO_639_languages;
+				CAtlMap<WORD, CStringA> ISO_639_languages;
 
 				switch (descriptor_tag) {
 					case 0xA1: // ATSC - service location
@@ -1983,7 +1983,7 @@ void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 				if (!ISO_639_languages.IsEmpty()) {
 					POSITION pos = ISO_639_languages.GetStartPosition();
 					while (pos) {
-						CAtlMap<USHORT, CString>::CPair* pPair = ISO_639_languages.GetNext(pos);
+						CAtlMap<USHORT, CStringA>::CPair* pPair = ISO_639_languages.GetNext(pos);
 						const WORD& pid = pPair->m_key;
 						if (m_streamData[pid].pmt.lang.IsEmpty()) {
 							m_streamData[pid].pmt.lang = pPair->m_value;
