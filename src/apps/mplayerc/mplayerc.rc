@@ -788,7 +788,7 @@ BEGIN
     GROUPBOX        "Video renderer",IDC_STATIC,5,5,285,29
     COMBOBOX        IDC_VIDRND_COMBO,10,15,276,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "VMR-7/VMR-9 (Renderless) and EVR-CP settings",IDC_STATIC,5,37,285,130
-    CONTROL         "Select D3D9 Render Device",IDC_D3D9DEVICE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,51,120,10
+    CONTROL         "Select D3D9 Render Device",IDC_D3D9DEVICE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,51,120,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "D3D Fullscreen",IDC_FULLSCREEN_MONITOR_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,63,100,10
     CONTROL         "10-bit RGB output",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,75,92,10
@@ -2182,6 +2182,7 @@ END
 
 STRINGTABLE
 BEGIN
+    IDC_D3D9DEVICE_CHECK            "Specify a graphics adapter for rendering. Warning: possible incorrect work on the displays is connected to another adapter."
     IDC_TEXTURESURF2D               "Video surface will be allocated as a texture but still the 2d functions will be used to copy and stretch it onto the backbuffer. Requires a video card which can allocate 32bit, RGBA, non-power-of-two sized textures and at least in the resolution of the video."
     IDC_TEXTURESURF3D               "Video surface will be allocated as a texture and drawn as two triangles in 3d. Antialiasing turned on at the display settings may have a bad effect on the rendering speed."
     IDC_DX9RESIZER_COMBO            "If there is no Pixel Shader 2.0 support, simple bilinear is used automatically."

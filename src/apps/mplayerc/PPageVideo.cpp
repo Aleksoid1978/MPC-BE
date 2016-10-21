@@ -70,7 +70,7 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_DX9RESIZER_COMBO, m_cbDX9Resizer);
 	DDX_Control(pDX, IDC_COMBO7, m_cbDownscaler);
 	DDX_CBIndex(pDX, IDC_D3D9DEVICE_COMBO, m_iD3D9RenderDevice);
-	DDX_Check(pDX, IDC_D3D9DEVICE, m_bD3D9RenderDevice);
+	DDX_Check(pDX, IDC_D3D9DEVICE_CHECK, m_bD3D9RenderDevice);
 	DDX_Check(pDX, IDC_RESETDEVICE, m_bResetDevice);
 	DDX_Control(pDX, IDC_FULLSCREEN_MONITOR_CHECK, m_chkD3DFullscreen);
 	DDX_Control(pDX, IDC_CHECK1, m_chk10bitOutput);
@@ -90,7 +90,7 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
 	ON_CBN_SELCHANGE(IDC_VIDRND_COMBO, OnDSRendererChange)
-	ON_BN_CLICKED(IDC_D3D9DEVICE, OnD3D9DeviceCheck)
+	ON_BN_CLICKED(IDC_D3D9DEVICE_CHECK, OnD3D9DeviceCheck)
 	ON_BN_CLICKED(IDC_RESETDEVICE, OnResetDevice)
 	ON_BN_CLICKED(IDC_FULLSCREEN_MONITOR_CHECK, OnFullscreenCheck)
 	ON_UPDATE_COMMAND_UI(IDC_DSVMRYUVMIXER, OnUpdateMixerYUV)
@@ -246,24 +246,24 @@ BOOL CPPageVideo::OnInitDialog()
 	UpdateResizerList(rs.iResizer);
 	UpdateDownscalerList(rs.iDownscaler);
 
-	CheckDlgButton(IDC_D3D9DEVICE, BST_UNCHECKED);
-	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
+	CheckDlgButton(IDC_D3D9DEVICE_CHECK, BST_UNCHECKED);
+	GetDlgItem(IDC_D3D9DEVICE_CHECK)->EnableWindow(FALSE);
 	m_cbD3D9RenderDevice.EnableWindow(FALSE);
 
 	switch (m_iVideoRendererType) {
 		case VIDRNDT_EVR_CUSTOM:
 			if (m_cbD3D9RenderDevice.GetCount() > 1) {
-					GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
+					GetDlgItem(IDC_D3D9DEVICE_CHECK)->EnableWindow(TRUE);
 					m_cbD3D9RenderDevice.EnableWindow(FALSE);
-					CheckDlgButton(IDC_D3D9DEVICE, BST_UNCHECKED);
+					CheckDlgButton(IDC_D3D9DEVICE_CHECK, BST_UNCHECKED);
 					if (m_iD3D9RenderDevice != -1) {
-						CheckDlgButton(IDC_D3D9DEVICE, BST_CHECKED);
+						CheckDlgButton(IDC_D3D9DEVICE_CHECK, BST_CHECKED);
 						m_cbD3D9RenderDevice.EnableWindow(TRUE);
 					}
 			}
 			break;
 		default:
-			GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
+			GetDlgItem(IDC_D3D9DEVICE_CHECK)->EnableWindow(FALSE);
 			m_cbD3D9RenderDevice.EnableWindow(FALSE);
 	}
 
@@ -411,7 +411,7 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_RESETDEVICE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(FALSE);
 	m_spnEvrBuffers.EnableWindow(FALSE);
-	GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(FALSE);
+	GetDlgItem(IDC_D3D9DEVICE_CHECK)->EnableWindow(FALSE);
 	m_cbD3D9RenderDevice.EnableWindow(FALSE);
 	m_cbEVROutputRange.EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC2)->EnableWindow(FALSE);
@@ -444,8 +444,8 @@ void CPPageVideo::OnDSRendererChange()
 			break;
 		case VIDRNDT_EVR_CUSTOM:
 			if (m_cbD3D9RenderDevice.GetCount() > 1) {
-				GetDlgItem(IDC_D3D9DEVICE)->EnableWindow(TRUE);
-				m_cbD3D9RenderDevice.EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE));
+				GetDlgItem(IDC_D3D9DEVICE_CHECK)->EnableWindow(TRUE);
+				m_cbD3D9RenderDevice.EnableWindow(IsDlgButtonChecked(IDC_D3D9DEVICE_CHECK));
 			}
 
 			UpdateResizerList(rs.iResizer);

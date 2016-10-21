@@ -758,7 +758,6 @@
 #define IDC_DX9RESIZER_COMBO            10730
 #define IDC_DSVMRLOADMIXER              10731
 #define IDC_DSVMRYUVMIXER               10734
-#define IDC_DSVMR9LOADMIXER2            10735
 #define IDC_BUTTON_MI_SAVEAS            10736
 #define IDC_MIEDIT                      10737
 #define IDC_LISTCHANNELS                10738
@@ -897,7 +896,7 @@
 #define IDC_CONTROLLIMIT                22038
 #define IDC_SYNCDISPLAY2                22039
 #define IDC_SYNCNEAREST                 22040
-#define IDC_D3D9DEVICE                  22041
+#define IDC_D3D9DEVICE_CHECK            22041
 #define IDC_NAVIGATION_AUDIO            22042
 #define IDC_NAVIGATION_SCAN             22043
 #define IDC_LIST_CHANNELS               22044

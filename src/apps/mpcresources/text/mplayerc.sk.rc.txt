@@ -1025,6 +1025,7 @@ STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the 
 STRING IDC_CHECK_RELATIVETO		"Predvolené hodnoty sa nastavia aj v iných štýloch, ak užívateľ nastavenia nezmení"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Ak je použitá vyrovnávacia pamäť pre podobrázky väčšia ako 0, môžu sa titulky animovať. Zablokovaním tejto voľby znížite vyťaženie procesora. Voľbu zablokujte aj v prípade, že titulky blikajú."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
+STRING IDC_D3D9DEVICE_CHECK		"Specify a graphics adapter for rendering. Warning: possible incorrect work on the displays is connected to another adapter."
 STRING IDC_DSDXR		"Same as the VMR-9 (renderless), but uses a true two-pass bicubic resizer."
 STRING IDC_DSEVR		"Only available on Vista or later or on XP with at least .NET Framework 3.5 installed."
 STRING IDC_DSEVR_CUSTOM		"Same as the EVR, but with the Allocator-Presenter of MPC-BE for subtitling and postprocessing. Recommended for Windows Vista or later."

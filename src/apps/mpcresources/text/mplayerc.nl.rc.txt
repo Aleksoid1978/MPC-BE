@@ -1025,6 +1025,7 @@ STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Deactivering van deze optie zal de flik
 STRING IDC_CHECK_RELATIVETO		"Standaardwaarden worden ook op andere stijlen toegepast, waar nog geen waarde voor bepaald is."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Maakt ondertitelings-animatie mogelijk bij een subafbeeldingsbuffer groter dan 0. Dit uitzetten zal de CPU ontlasten. Zet dit ook uit als de ondertiteling flikkert."
 STRING IDC_CHECK_SUBRESYNC		"Ondertitelbestanden bekijken en bewerken (ook de tijdcode), navigatie met ondertitel. Het laden van ondertitelbestanden wordt aanzienlijk vertraagd."
+STRING IDC_D3D9DEVICE_CHECK		"Specify a graphics adapter for rendering. Warning: possible incorrect work on the displays is connected to another adapter."
 STRING IDC_DSDXR		"Hetzelfde als VMR-9 (renderless), maar met een echte two-pass bicubic resizer."
 STRING IDC_DSEVR		"Enkel beschikbaar voor Vista of hoger, of voor XP met .NET Framework 3.5 geïnstalleerd zijn."
 STRING IDC_DSEVR_CUSTOM		"Hetzelfde als EVR, maar met de Allocator-Presenter plugin van MPC-BE voor ondertiteling en nabewerking. Voor Windows Vista of hoger aanbevolen."
