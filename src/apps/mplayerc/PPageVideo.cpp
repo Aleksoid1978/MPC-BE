@@ -148,8 +148,6 @@ BOOL CPPageVideo::OnInitDialog()
 		for (UINT adp = 0; adp < pD3D9->GetAdapterCount(); ++adp) {
 			if (SUCCEEDED(pD3D9->GetAdapterIdentifier(adp, 0, &adapterIdentifier))) {
 				d3ddevice_str = adapterIdentifier.Description;
-				d3ddevice_str += L" - ";
-				d3ddevice_str += adapterIdentifier.DeviceName;
 				cstrGUID.Empty();
 				if (::StringFromGUID2(adapterIdentifier.DeviceIdentifier, strGUID, 50) > 0) {
 					cstrGUID = strGUID;
