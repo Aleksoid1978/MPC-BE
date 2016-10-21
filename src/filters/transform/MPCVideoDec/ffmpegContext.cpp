@@ -377,6 +377,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 				}
 				break;
 			case AV_CODEC_ID_PNG:
+			case AV_CODEC_ID_JPEG2000:
 				pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; // and other RGB formats, but it is not important here
 				break;
 			case AV_CODEC_ID_HQ_HQA:
