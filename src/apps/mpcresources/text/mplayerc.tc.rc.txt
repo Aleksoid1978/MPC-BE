@@ -1025,6 +1025,7 @@ STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"停用此選項將防止字幕閃爍，
 STRING IDC_CHECK_RELATIVETO		"如果依舊沒定義，預設會繼承其他的樣式"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"當子畫面緩衝大於 0 時允許字幕動畫。停用此選項將降低 CPU 使用量。如果字幕在閃爍亦請停用。"
 STRING IDC_CHECK_SUBRESYNC		"啟用此選項可檢視並編輯字幕檔案 (包括時間碼)，透過選取字幕導覽影片。啟用此選項會明顯減慢字幕的載入速度。"
+STRING IDC_D3D9DEVICE_CHECK		"Specify a graphics adapter for rendering. Warning: possible incorrect work on the displays is connected to another adapter."
 STRING IDC_DSDXR		"和 VMR-9 (無轉換) 相同，但使用真正的 two-pass bicubic 變更大小。"
 STRING IDC_DSEVR		"只有在 Vista 或更新版本系統，或安裝了 .NET Framework 3.5 的 XP 系統才能使用。"
 STRING IDC_DSEVR_CUSTOM		"和 EVR 相同，但藉助 MPC-BE 的配置呈現器顯示字幕及進行後期處理。建議在 Windows Vista 或更新版本使用。"
