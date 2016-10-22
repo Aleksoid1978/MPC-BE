@@ -1019,13 +1019,13 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 220		"В&ихід\tAlt+X"
 END
 
-STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
+STRING IDC_BASSREDIRECT_CHECK		"НЧ складові (баси) з фронтальних каналів перенаправляються до сабвуфера (LFE)"
 STRING IDC_BUTTON_EXT_SET		"Після натискання цієї кнопки, відмітки вибору групи форматів будуть встановлені відповідно до наявних асоціацій файлів для MPC-BE. Щойно додані роширення зазвичай будуть помічатися ""сірим"", тому не забувайте виділити їх знову перед закриттям вікна!"
 STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Вимкнення цієї опції запобіжить мигтінню субтитрів, але може спричнити пропуск кадрів рендерером відео."
 STRING IDC_CHECK_RELATIVETO		"Стандартний стан успадковується іншими стилями, в яких він ще не визначений."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Дозволяє анімацію субтитрів при використанні буфера субзображень більшого за 0. Вимкнення цієї опції дозволить дещо зменшити завантаження ЦП. Використовуйте якщо помітне мигтіння субтитрів."
 STRING IDC_CHECK_SUBRESYNC		"Дозволяє відображати і редагувати субтитри(включаючи тайм-коди), здійснювати навігацію по субтитрам. Може значно сповільнити завантаження субтитрів."
-STRING IDC_D3D9DEVICE_CHECK		"Specify a graphics adapter for rendering. Warning: possible incorrect work on the displays is connected to another adapter."
+STRING IDC_D3D9DEVICE_CHECK		"Вказує графічний адаптер для рендерингу. Попередження: можлива некоректна робота з дисплеями, що під'єднані до іншого графічного адаптера."
 STRING IDC_DSDXR		"Так само як і VMR-9 (renderless), але використовує справжній двопрохідний bicubic масштабувальник."
 STRING IDC_DSEVR		"Доступний лише в ОС Windows Vista чи пізніших або в XP з встановленим .NET щонайменше версії 3.5."
 STRING IDC_DSEVR_CUSTOM		"Так само як і EVR, але з Allocator-Presenter MPC-BE для відображення субтитрів і виконання післяобробки. Рекомендований для ОС Windows Vista чи пізніших."
