@@ -247,7 +247,6 @@
 #define ID_AFTERPLAYBACK_SHUTDOWN       915
 #define ID_AFTERPLAYBACK_LOGOFF         916
 #define ID_AFTERPLAYBACK_LOCK           917
-#define ID_AFTERPLAYBACK_DONOTHING      918
 #define ID_NAVIGATE_SKIPBACKFILE        919
 #define ID_NAVIGATE_SKIPFORWARDFILE     920
 #define ID_NAVIGATE_SKIPBACK            921
@@ -277,6 +276,8 @@
 #define ID_BOSS                         944
 #define ID_DUMMYSEPARATOR               945
 #define ID_BUTTONSEP                    946
+#define ID_AFTERPLAYBACK_NEXT           947
+#define ID_AFTERPLAYBACK_DONOTHING      948
 #define ID_MENU_PLAYER_SHORT            949
 #define ID_MENU_PLAYER_LONG             950
 #define ID_MENU_FILTERS                 951
@@ -325,8 +326,6 @@
 #define ID_START                        1007
 #define ID_SAVE                         1008
 #define ID_VIEW_NAVIGATION              1009
-#define ID_SUB_DELAY_DOWN               1010
-#define ID_SUB_DELAY_UP                 1011
 #define ID_SHIFT_SUB_DOWN               1012
 #define ID_SHIFT_SUB_UP                 1013
 #define ID_GOTO_PREV_SUB                1014
@@ -366,7 +365,6 @@
 #define ID_VIEW_RESET_DEFAULT           1075
 
 #define ID_AFTERPLAYBACK_EXIT               1077
-#define ID_AFTERPLAYBACK_NEXT               1078
 #define ID_AFTERPLAYBACK_NEXT_LOOPED        1079
 #define ID_AFTERPLAYBACK_EVERYTIMEDONOTHING 1080
 
@@ -922,6 +920,10 @@
 #define IDC_CHECK_CHM                   22066
 #define IDC_COMBOSPEEDSTEP              22067
 #define IDC_CHECK_FLYBAR                22068
+//
+#define ID_SUB_DELAY_DOWN               24000
+#define ID_SUB_DELAY_UP                 24001
+//
 #define IDS_MPLAYERC_104                24002
 #define IDS_MPLAYERC_105                24003
 #define IDS_FILE_SAVE_THUMBNAILS        24005
