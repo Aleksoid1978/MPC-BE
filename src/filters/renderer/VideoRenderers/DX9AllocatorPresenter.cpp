@@ -1534,6 +1534,12 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	if (!m_bPendingResetDevice) {
 		bool bResetDevice = false;
 
+		if (hr == S_PRESENT_OCCLUDED) {
+			// hmm. previous device reset was bad?
+			DLog(L"S_PRESENT_OCCLUDED - need Reset Device");
+			bResetDevice = true;
+		}
+
 		if (hr == D3DERR_DEVICELOST && m_pD3DDevEx->TestCooperativeLevel() == D3DERR_DEVICENOTRESET) {
 			DLog(L"D3D Device Lost - need Reset Device");
 			bResetDevice = true;
