@@ -603,7 +603,11 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			m_d3dpp.BackBufferWidth = m_ScreenSize.cx;
 			m_d3dpp.BackBufferHeight = m_ScreenSize.cy;
 
-			bTryToReset = bTryToReset && m_pD3DDevEx && SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&m_d3dpp, &d3ddmEx));
+			bTryToReset = bTryToReset && m_pD3DDevEx;
+			if (bTryToReset) {
+				bTryToReset = SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&m_d3dpp, &d3ddmEx));
+				DLog(L"    => ResetEx(fullscreen) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+			}
 
 			if (!bTryToReset) {
 				m_pD3DDevEx = NULL;
@@ -611,8 +615,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 						m_CurrentAdapter, D3DDEVTYPE_HAL, m_FocusThread->GetFocusWindow(),
 						GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS | D3DCREATE_NOWINDOWCHANGES, //D3DCREATE_MANAGED
 						&m_d3dpp, &d3ddmEx, &m_pD3DDevEx);
+				DLog(L"    => CreateDeviceEx(fullscreen) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
 			}
-			DLog(L"CDX9AllocatorPresenter: ResetEx/CreateDeviceEx : %s", FAILED(hr) ? GetWindowsErrorMessage(hr, m_hD3D9) : L"OK");
 
 			if (m_pD3DDevEx) {
 				m_BackbufferFmt = m_d3dpp.BackBufferFormat;
@@ -637,7 +641,11 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			m_d3dpp.BackBufferWidth = m_ScreenSize.cx;
 			m_d3dpp.BackBufferHeight = m_ScreenSize.cy;
 
-			bTryToReset = bTryToReset && m_pD3DDevEx && SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&m_d3dpp, NULL));
+			bTryToReset = bTryToReset && m_pD3DDevEx;
+			if (bTryToReset) {
+				bTryToReset = SUCCEEDED(hr = m_pD3DDevEx->ResetEx(&m_d3dpp, NULL));
+				DLog(L"    => ResetEx(window) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+			}
 
 			if (!bTryToReset) {
 				m_pD3DDevEx = NULL;
@@ -647,8 +655,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 						m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
 						GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS, //D3DCREATE_MANAGED
 						&m_d3dpp, NULL, &m_pD3DDevEx);
+				DLog(L"    => CreateDeviceEx(window) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
 			}
-			DLog(L"CDX9AllocatorPresenter: ResetEx/CreateDeviceEx : %s", FAILED(hr) ? GetWindowsErrorMessage(hr, m_hD3D9) : L"OK");
 
 			if (m_pD3DDevEx) {
 				m_DisplayFmt = d3ddmEx.Format;
