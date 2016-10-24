@@ -669,7 +669,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	if (m_pD3DDevEx) {
 		while (hr == D3DERR_DEVICELOST) {
 			DLog(L"    => D3DERR_DEVICELOST. Trying to Reset.");
-			hr = m_pD3DDevEx->TestCooperativeLevel();
+			hr = m_pD3DDevEx->CheckDeviceState(m_hWnd);
 		}
 		if (hr == D3DERR_DEVICENOTRESET) {
 			DLog(L"    => D3DERR_DEVICENOTRESET");
@@ -1536,12 +1536,12 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 		if (hr == S_PRESENT_OCCLUDED) {
 			// hmm. previous device reset was bad?
-			DLog(L"S_PRESENT_OCCLUDED - need Reset Device");
+			DLog(L"CDX9AllocatorPresenter::Paint() : S_PRESENT_OCCLUDED - need Reset Device");
 			bResetDevice = true;
 		}
 
-		if (hr == D3DERR_DEVICELOST && m_pD3DDevEx->TestCooperativeLevel() == D3DERR_DEVICENOTRESET) {
-			DLog(L"D3D Device Lost - need Reset Device");
+		if (hr == D3DERR_DEVICELOST && m_pD3DDevEx->CheckDeviceState(m_hWnd) == D3DERR_DEVICENOTRESET) {
+			DLog(L"CDX9AllocatorPresenter::Paint() : D3DERR_DEVICELOST - need Reset Device");
 			bResetDevice = true;
 		}
 
@@ -1552,7 +1552,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		//}
 
 		if (SettingsNeedResetDevice()) {
-			DLog(L"Settings Changed - need Reset Device");
+			DLog(L"CDX9AllocatorPresenter::Paint() : Settings Changed - need Reset Device");
 			bResetDevice = true;
 		}
 
@@ -1564,7 +1564,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			if (m_bIsFullscreen) {
 				m_bCompositionEnabled = (bCompositionEnabled != 0);
 			} else {
-				DLog(L"DWM Composition Changed - need Reset Device");
+				DLog(L"CDX9AllocatorPresenter::Paint() : DWM Composition Changed - need Reset Device");
 				bResetDevice = true;
 			}
 		}
@@ -1580,7 +1580,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 				}
 #endif
 				if (m_CurrentAdapter != GetAdapter(m_pD3DEx)) {
-					DLog(L"D3D adapter changed - need Reset Device");
+					DLog(L"CDX9AllocatorPresenter::Paint() : D3D adapter changed - need Reset Device");
 					bResetDevice = true;
 				}
 #ifdef _DEBUG
