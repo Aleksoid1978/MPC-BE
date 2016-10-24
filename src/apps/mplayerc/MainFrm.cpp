@@ -8808,49 +8808,53 @@ void CMainFrame::OnAfterplayback(UINT nID)
 void CMainFrame::OnUpdateAfterplayback(CCmdUI* pCmdUI)
 {
 	CAppSettings& s = AfxGetAppSettings();
-	bool fChecked = false;
+	bool bChecked = false;
+
+	pCmdUI->SetCheck(FALSE);
 
 	switch (pCmdUI->m_nID) {
 		case ID_AFTERPLAYBACK_CLOSE:
-			fChecked = !!(s.nCLSwitches & CLSW_CLOSE);
+			bChecked = !!(s.nCLSwitches & CLSW_CLOSE);
 			break;
 		case ID_AFTERPLAYBACK_STANDBY:
-			fChecked = !!(s.nCLSwitches & CLSW_STANDBY);
+			bChecked = !!(s.nCLSwitches & CLSW_STANDBY);
 			break;
 		case ID_AFTERPLAYBACK_HIBERNATE:
-			fChecked = !!(s.nCLSwitches & CLSW_HIBERNATE);
+			bChecked = !!(s.nCLSwitches & CLSW_HIBERNATE);
 			break;
 		case ID_AFTERPLAYBACK_SHUTDOWN:
-			fChecked = !!(s.nCLSwitches & CLSW_SHUTDOWN);
+			bChecked = !!(s.nCLSwitches & CLSW_SHUTDOWN);
 			break;
 		case ID_AFTERPLAYBACK_LOGOFF:
-			fChecked = !!(s.nCLSwitches & CLSW_LOGOFF);
+			bChecked = !!(s.nCLSwitches & CLSW_LOGOFF);
 			break;
 		case ID_AFTERPLAYBACK_LOCK:
-			fChecked = !!(s.nCLSwitches & CLSW_LOCK);
+			bChecked = !!(s.nCLSwitches & CLSW_LOCK);
 			break;
 		case ID_AFTERPLAYBACK_DONOTHING:
-			fChecked = !(s.nCLSwitches & CLSW_AFTERPLAYBACK_MASK);
+			bChecked = !(s.nCLSwitches & CLSW_AFTERPLAYBACK_MASK);
 			break;
 		case ID_AFTERPLAYBACK_EXIT:
-			fChecked = !!s.fExitAfterPlayback;
+			bChecked = !!s.fExitAfterPlayback;
 			break;
 		case ID_AFTERPLAYBACK_NEXT:
-			fChecked = !!s.fNextInDirAfterPlayback && !s.fNextInDirAfterPlaybackLooped;
+			bChecked = !!s.fNextInDirAfterPlayback && !s.fNextInDirAfterPlaybackLooped;
 			break;
 		case ID_AFTERPLAYBACK_NEXT_LOOPED:
-			fChecked = !!s.fNextInDirAfterPlayback && !!s.fNextInDirAfterPlaybackLooped;
+			bChecked = !!s.fNextInDirAfterPlayback && !!s.fNextInDirAfterPlaybackLooped;
 			break;
 		case ID_AFTERPLAYBACK_EVERYTIMEDONOTHING:
-			fChecked = !s.fExitAfterPlayback && !s.fNextInDirAfterPlayback;
+			bChecked = !s.fExitAfterPlayback && !s.fNextInDirAfterPlayback;
 			break;
 	}
 
-	if (fChecked) {
+	if (bChecked) {
 		if (pCmdUI->m_nID >= ID_AFTERPLAYBACK_EXIT && pCmdUI->m_nID <= ID_AFTERPLAYBACK_EVERYTIMEDONOTHING) {
 			CheckMenuRadioItem(ID_AFTERPLAYBACK_EXIT, ID_AFTERPLAYBACK_EVERYTIMEDONOTHING, pCmdUI->m_nID);
-		} else {
-			CheckMenuRadioItem(ID_AFTERPLAYBACK_CLOSE, ID_AFTERPLAYBACK_DONOTHING, pCmdUI->m_nID);
+		} else if (pCmdUI->m_nID >= ID_AFTERPLAYBACK_CLOSE && pCmdUI->m_nID <= ID_AFTERPLAYBACK_LOCK) {
+			CheckMenuRadioItem(ID_AFTERPLAYBACK_CLOSE, ID_AFTERPLAYBACK_LOCK, pCmdUI->m_nID);
+		} else if (pCmdUI->m_nID == ID_AFTERPLAYBACK_NEXT || pCmdUI->m_nID == ID_AFTERPLAYBACK_DONOTHING) {
+			CheckMenuRadioItem(pCmdUI->m_nID, pCmdUI->m_nID, pCmdUI->m_nID);
 		}
 	}
 }
