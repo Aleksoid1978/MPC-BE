@@ -449,9 +449,13 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 		}
 	}
 	else if (nPCIVendor == PCIV_ATI) {
+		if (DriverVersionCheck(VideoDriverVersion, 21, 19, 134, 1)) {
+			// For AMD graphics cards with support for 4k, you must install the driver v16.9.1 or newer (need more tests to find the boundary drivers)
+			return TRUE;
+		}
 		// UVD 5, UVD 6
 		if (CheckPCID(nPCIDevice, PCID_AMD_4K, _countof(PCID_AMD_4K)) && CHECK_AVC_L52_SIZE(width, height)) {
-			// not tested
+			// not tested (it will be deleted after the tests of drivers)
 			return TRUE;
 		}
 		if (width <= 2048 && height <= 2304 && width * height <= 2048 * 2048) {
