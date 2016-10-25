@@ -1301,7 +1301,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 						if (rt == INVALID_TIME) {
 							break;
 						}
-						
+
 						timecodes.push_back((rt + 100) / 200); // get a real precision for time codes (need for some files)
 						if (timecodes.size() >= FrameDuration::MAXTESTEDFRAMES) {
 							break;

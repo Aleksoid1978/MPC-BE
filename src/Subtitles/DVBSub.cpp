@@ -230,7 +230,7 @@ HRESULT CDVBSub::ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, REF
 							EnqueuePage(rtStart);
 						}
 						UpdateTimeStamp(rtStart);
-							
+
 						CAutoPtr<DVB_PAGE> pPage;
 						ParsePage(gb, wSegLength, pPage);
 

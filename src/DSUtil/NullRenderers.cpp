@@ -344,7 +344,6 @@ HRESULT CNullUVideoRenderer::SetMediaType(const CMediaType *pmt)
 		else {
 			DLog(L"CNullUVideoRenderer::SetMediaType : %s", GetGUIDString(m_mt.subtype));
 		}
-		
 	}
 
 	return hr;

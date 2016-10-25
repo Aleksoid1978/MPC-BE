@@ -184,7 +184,7 @@ STDMETHODIMP CRenderedHdmvSubtitle::SetSourceTargetInfo(CString yuvMatrix, CStri
 HRESULT CRenderedHdmvSubtitle::ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
-	
+
 	HRESULT hr = m_pSub->ParseSample(pData, nLen, rtStart, rtStop);
 	return hr;
 }
