@@ -691,7 +691,7 @@ STDMETHODIMP CBaseAP::SetRotation(int rotation)
 
 		return S_OK;
 	}
-	
+
 	return  E_INVALIDARG;
 }
 

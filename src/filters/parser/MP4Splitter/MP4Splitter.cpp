@@ -1301,7 +1301,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 								SAFE_DELETE_ARRAY(buff);
 							}
-							
+
 							const REFERENCE_TIME rtStart = FractionScale64(sample.GetCts(), UNITS, track->GetMediaTimeScale());
 							ChapAppend(rtStart, ChapterName);
 						}

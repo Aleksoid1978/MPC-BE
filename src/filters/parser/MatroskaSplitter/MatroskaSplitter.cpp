@@ -1283,7 +1283,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 		}
 	}
-	
+
 	if (pg_offsets.size()) {
 		CString offsets;
 

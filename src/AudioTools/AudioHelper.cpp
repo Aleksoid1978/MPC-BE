@@ -59,7 +59,7 @@ inline static void convert_int32_to_float_sse2(float* pOut, int32_t* pIn, const 
 	size_t k = 0;
 	for (; k < allsamples - 3; k += 4) {
 		__tmpIn  = _mm_loadu_si128((const __m128i*)&pIn[k]); // in = pIn
-		
+
 		__tmpOut = _mm_cvtepi32_ps(__tmpIn);                 // out = in
 		__tmpOut = _mm_mul_ps(__tmpOut, __32bitScalarDiv);   // out = out / INT32_PEAK;
 		_mm_storeu_ps(&pOut[k], __tmpOut);                   // pOut = out
@@ -111,7 +111,7 @@ inline static void convert_int24_to_float_sse2(float* pOut, BYTE* pIn, const siz
 		__tmpIn = _mm_setr_epi32(GETINT(0), GETINT(1),     // in = pIn
 								 GETINT(2), GETINT(3));
 		__tmpIn = _mm_sll_epi32(__tmpIn, __shift);         // in << 8
-		
+
 		__tmpOut = _mm_cvtepi32_ps(__tmpIn);               // out = in
 		__tmpOut = _mm_mul_ps(__tmpOut, __32bitScalarDiv); // out = out / INT32_PEAK;
 		_mm_storeu_ps(&pOut[k], __tmpOut);                 // pOut = out
