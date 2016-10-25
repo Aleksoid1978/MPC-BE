@@ -308,12 +308,11 @@ HRESULT CD3DFont::InitDeviceObjects( LPDIRECT3DDEVICE9 pd3dDevice )
 	m_pTexture->LockRect( 0, &d3dlr, 0, 0 );
 	BYTE* pDstRow;
 	pDstRow = (BYTE*)d3dlr.pBits;
-	WORD* pDst16;
 	BYTE bAlpha; // 4-bit measure of pixel intensity
 	DWORD x, y;
 
 	for ( y=0; y < m_dwTexHeight; y++ ) {
-		pDst16 = (WORD*)pDstRow;
+		WORD* pDst16 = (WORD*)pDstRow;
 		for ( x=0; x < m_dwTexWidth; x++ ) {
 			bAlpha = (BYTE)((pBitmapBits[m_dwTexWidth*y + x] & 0xff) >> 4);
 			if (bAlpha > 0) {

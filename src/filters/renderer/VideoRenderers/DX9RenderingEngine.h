@@ -169,7 +169,7 @@ namespace DSObjects
 
 		// init processing textures
 		HRESULT InitVideoTextures();
-		HRESULT InitScreenSpaceTextures(size_t count);
+		HRESULT InitScreenSpaceTextures(unsigned count);
 
 		// Resizers
 		HRESULT InitShaderResizer();

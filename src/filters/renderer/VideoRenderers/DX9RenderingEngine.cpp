@@ -343,7 +343,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	bool bFlip = m_bFlip;
 
 	{
-		int screenSpacePassCount = 0;
+		unsigned screenSpacePassCount = 0;
 
 		// Final pass. Must be initialized first!
 		hr = InitFinalPass();
@@ -368,7 +368,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 		// Custom screen space pixel shaders
 		bCustomScreenSpacePixelShaders = !m_pCustomScreenSpacePixelShaders.IsEmpty();
 		if (bCustomScreenSpacePixelShaders) {
-			screenSpacePassCount += (int)m_pCustomScreenSpacePixelShaders.GetCount();
+			screenSpacePassCount += m_pCustomScreenSpacePixelShaders.GetCount();
 		}
 
 		// Custom pixel shaders
@@ -985,7 +985,7 @@ HRESULT CDX9RenderingEngine::InitVideoTextures()
 	return hr;
 }
 
-HRESULT CDX9RenderingEngine::InitScreenSpaceTextures(size_t count)
+HRESULT CDX9RenderingEngine::InitScreenSpaceTextures(unsigned count)
 {
 	HRESULT hr = S_OK;
 	if (count > _countof(m_pScreenSpaceTextures)) {
@@ -995,7 +995,7 @@ HRESULT CDX9RenderingEngine::InitScreenSpaceTextures(size_t count)
 	m_ScreenSpaceTexWidth = min(m_ScreenSize.cx, (int)m_Caps.MaxTextureWidth);
 	m_ScreenSpaceTexHeight = min(m_ScreenSize.cy, (int)m_Caps.MaxTextureHeight);
 
-	for (size_t i = 0; i < count; i++) {
+	for (unsigned i = 0; i < count; i++) {
 		if (m_pScreenSpaceTextures[i] == NULL) {
 			hr = m_pD3DDevEx->CreateTexture(
 					m_ScreenSpaceTexWidth, m_ScreenSpaceTexHeight, 1, D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
@@ -1011,7 +1011,7 @@ HRESULT CDX9RenderingEngine::InitScreenSpaceTextures(size_t count)
 	}
 
 	// Free unnecessary textures
-	for (size_t i = count; i < _countof(m_pScreenSpaceTextures); i++) {
+	for (unsigned i = count; i < _countof(m_pScreenSpaceTextures); i++) {
 		m_pScreenSpaceTextures[i] = NULL;
 	}
 
