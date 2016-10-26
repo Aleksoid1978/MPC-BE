@@ -9,9 +9,9 @@
 
 sampler s0 : register(s0);
 float2 dxdy : register(c0);
-float2 r : register(c1);
+float2 steps : register(c1);
 
-static const int ky = clamp(int(r.y+0.5), 2, MAXSTEPS);
+static const int ky = clamp(int(steps.y), 2, MAXSTEPS);
 static const int start = ky / 2 - ky;
 
 float4 main(float2 tex : TEXCOORD0) : COLOR0
