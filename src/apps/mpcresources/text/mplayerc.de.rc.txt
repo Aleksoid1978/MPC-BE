@@ -489,7 +489,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 14		"Bei Anzeigewechsel neu initialisieren"
 15		"Surface format:"
 17		"Resizer:"
-19		"Herunterskalierung*:"
+19		"Herunterskalierung <50%:"
 21		"Ausgabebereich:"
 23		"EVR-Puffer:"
 27		"Farbmanagement"
