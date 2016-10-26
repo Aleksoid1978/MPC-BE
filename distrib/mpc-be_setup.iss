@@ -186,21 +186,19 @@ Name: custom;  Description: {cm:types_CustomInstallation}; Flags: iscustom
 [Components]
 Name: "main";          Description: "{#Description}";           Types: default custom; Flags: fixed
 Name: "mpciconlib";    Description: "{cm:comp_mpciconlib}";     Types: default custom
-
 #ifdef localize
 Name: "mpcresources";  Description: "{cm:comp_mpcresources}";   Types: default custom; Flags: disablenouninstallwarning
 #endif
-
 Name: "mpcberegvid";   Description: "{cm:AssociationVideo}";    Types: custom;         Flags: disablenouninstallwarning;
 Name: "mpcberegaud";   Description: "{cm:AssociationAudio}";    Types: custom;         Flags: disablenouninstallwarning;
 Name: "mpcberegpl";    Description: "{cm:AssociationPlaylist}"; Types: custom;         Flags: disablenouninstallwarning;
-
 Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}";  Types: custom;         Flags: disablenouninstallwarning;
 #ifdef x64Build
 Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 19936456;
 #else
 Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning; ExtraDiskSpaceRequired: 16064712;
 #endif
+
 [Tasks]
 Name: desktopicon;              Description: {cm:CreateDesktopIcon};     GroupDescription: {cm:AdditionalIcons}
 Name: desktopicon\user;         Description: {cm:tsk_CurrentUser};       GroupDescription: {cm:AdditionalIcons}; Flags: exclusive
@@ -214,9 +212,9 @@ Name: reset_settings;           Description: {cm:tsk_ResetSettings};     GroupDe
 [Files]
 Source: "{#bindir}\{#mpcbe_exe}";            DestDir: "{app}"; Flags: ignoreversion;                                   Components: main
 Source: "{#bindir}\mpciconlib.dll";          DestDir: "{app}"; Flags: ignoreversion;                                   Components: mpciconlib
-Source: "{#dxdir}\d3dcompiler_47.dll";       DestDir: "{app}"; Flags: ignoreversion;                                   Components: main;          Check : not D3DCompiler_47_DLLExists();
-Source: "{#dxdir}\d3dx9_43.dll";             DestDir: "{app}"; Flags: ignoreversion;                                   Components: main;          Check : not D3DX9_43_DLLExists();
-Source: "{#bindir_x64}\MPCBEShellExt64.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete regserver noregerror; Components: mpcbeshellext; Check : IsWin64
+Source: "{#dxdir}\d3dcompiler_47.dll";       DestDir: "{app}"; Flags: ignoreversion;                                   Components: main;          Check: not D3DCompiler_47_DLLExists();
+Source: "{#dxdir}\d3dx9_43.dll";             DestDir: "{app}"; Flags: ignoreversion;                                   Components: main;          Check: not D3DX9_43_DLLExists();
+Source: "{#bindir_x64}\MPCBEShellExt64.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete regserver noregerror; Components: mpcbeshellext; Check: IsWin64
 Source: "{#bindir_x86}\MPCBEShellExt.dll";   DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete regserver noregerror; Components: mpcbeshellext;
 #ifdef localize
 Source: "{#bindir}\Lang\mpcresources.??.dll";             DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
@@ -585,6 +583,12 @@ begin
   WizardForm.Bevel.Top := WizardForm.Bevel.Top + DeltaY;
   WizardForm.BeveledLabel.Top := WizardForm.BeveledLabel.Top + DeltaY;
   WizardForm.ComponentsDiskSpaceLabel.Top := WizardForm.ComponentsDiskSpaceLabel.Top + DeltaY;
+
+#ifdef localize
+  WizardForm.ComponentsList.Checked[7] := False;
+#else
+  WizardForm.ComponentsList.Checked[6] := False;
+#endif
 
   idpDownloadAfter(wpReady);
 end;
