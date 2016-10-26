@@ -32,6 +32,7 @@ extern "C" {
 #define class classFFMPEG
 	#include <ffmpeg/libavcodec/mpegvideo.h>
 	#include <ffmpeg/libavcodec/h264dec.h>
+	#include <ffmpeg/libavcodec/ffv1.h>
 #undef class
 	#include <ffmpeg/libavcodec/dxva_h264.h>
 	#include <ffmpeg/libavcodec/dxva_hevc.h>
@@ -417,6 +418,25 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 					case FCC('M8Y0'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;  break;
 					case FCC('M8YA'): pAVCtx->pix_fmt = AV_PIX_FMT_YUVA444P; break;
 					case FCC('M8G0'): pAVCtx->pix_fmt = AV_PIX_FMT_GRAY8;    break;
+					}
+				}
+				break;
+			case AV_CODEC_ID_FFV1:
+				if (pAVCtx->priv_data) {
+					const FFV1Context* h = (FFV1Context*)pAVCtx->priv_data;
+
+					if (h->colorspace == 0) {
+						switch (16 * h->chroma_h_shift + h->chroma_v_shift) {
+						case 0x00: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P; break;
+						case 0x01: pAVCtx->pix_fmt = AV_PIX_FMT_YUV440P; break;
+						case 0x10: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; break;
+						case 0x11: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; break;
+						case 0x20: pAVCtx->pix_fmt = AV_PIX_FMT_YUV411P; break;
+						case 0x22: pAVCtx->pix_fmt = AV_PIX_FMT_YUV410P; break;
+						}
+					}
+					else if (h->colorspace == 1) {
+						pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; // and other RGB formats, but it is not important here
 					}
 				}
 				break;
