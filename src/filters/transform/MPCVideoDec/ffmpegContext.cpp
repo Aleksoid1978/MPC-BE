@@ -422,21 +422,23 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 				}
 				break;
 			case AV_CODEC_ID_FFV1:
+				pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
 				if (pAVCtx->priv_data) {
 					const FFV1Context* h = (FFV1Context*)pAVCtx->priv_data;
-
-					if (h->colorspace == 0) {
-						switch (16 * h->chroma_h_shift + h->chroma_v_shift) {
-						case 0x00: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P; break;
-						case 0x01: pAVCtx->pix_fmt = AV_PIX_FMT_YUV440P; break;
-						case 0x10: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; break;
-						case 0x11: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; break;
-						case 0x20: pAVCtx->pix_fmt = AV_PIX_FMT_YUV411P; break;
-						case 0x22: pAVCtx->pix_fmt = AV_PIX_FMT_YUV410P; break;
+					if (h->version > 0) {
+						if (h->colorspace == 0) {
+							switch (16 * h->chroma_h_shift + h->chroma_v_shift) {
+							case 0x00: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P; break;
+							case 0x01: pAVCtx->pix_fmt = AV_PIX_FMT_YUV440P; break;
+							case 0x10: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; break;
+							case 0x11: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; break;
+							case 0x20: pAVCtx->pix_fmt = AV_PIX_FMT_YUV411P; break;
+							case 0x22: pAVCtx->pix_fmt = AV_PIX_FMT_YUV410P; break;
+							}
 						}
-					}
-					else if (h->colorspace == 1) {
-						pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; // and other RGB formats, but it is not important here
+						else if (h->colorspace == 1) {
+							pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; // and other RGB formats, but it is not important here
+						}
 					}
 				}
 				break;
