@@ -489,7 +489,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 14		"Berrezarri erakuspena aldatzerakoan"
 15		"Surface format:"
 17		"Birneurr.:"
-19		"Downscaling*:"
+19		"Downscaling <50%:"
 21		"Irteera maila:"
 23		"EVR Bufferrak:"
 27		"Margo Kudeaketa"

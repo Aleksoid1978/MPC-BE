@@ -489,7 +489,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 14		"Reinițializează la schimbarea ecranului"
 15		"Surface format:"
 17		"Redimensionare:"
-19		"Downscaling*:"
+19		"Downscaling <50%:"
 21		"Output range:"
 23		"Preîncărcări EVR:"
 27		"Color Management"

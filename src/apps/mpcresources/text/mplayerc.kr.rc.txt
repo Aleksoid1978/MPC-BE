@@ -489,7 +489,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 14		"디스플레이 바꾸면 리셋"
 15		"Surface format:"
 17		"크기조정:"
-19		"Downscaling*:"
+19		"Downscaling <50%:"
 21		"Output range:"
 23		"EVR 버퍼:"
 27		"Color Management"

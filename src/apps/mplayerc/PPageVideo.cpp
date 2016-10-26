@@ -402,6 +402,7 @@ void CPPageVideo::OnDSRendererChange()
 	//m_cbAPSurfaceUsage.EnableWindow(FALSE);
 	m_cbDX9SurfaceFormat.EnableWindow(FALSE);
 	m_cbDX9Resizer.EnableWindow(FALSE);
+	m_cbDownscaler.EnableWindow(FALSE);
 	m_chkD3DFullscreen.EnableWindow(FALSE);
 	m_chk10bitOutput.EnableWindow(FALSE);
 	m_chkVMRMixerMode.EnableWindow(FALSE);
@@ -414,6 +415,7 @@ void CPPageVideo::OnDSRendererChange()
 	m_cbEVROutputRange.EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC2)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC3)->EnableWindow(FALSE);
+	GetDlgItem(IDC_STATIC10)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC4)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
 
@@ -452,7 +454,9 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
 			m_cbDX9SurfaceFormat.EnableWindow(TRUE);
 			GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
+			GetDlgItem(IDC_STATIC10)->EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
+			m_cbDownscaler.EnableWindow(TRUE);
 			m_chkD3DFullscreen.EnableWindow(TRUE);
 			m_chk10bitOutput.EnableWindow(m_chkD3DFullscreen.GetCheck() == BST_CHECKED);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);
@@ -488,7 +492,9 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
 			m_spnEvrBuffers.EnableWindow(TRUE);
 			GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
+			GetDlgItem(IDC_STATIC10)->EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
+			m_cbDownscaler.EnableWindow(TRUE);
 			m_chkD3DFullscreen.EnableWindow(TRUE);
 			m_chk10bitOutput.EnableWindow(m_chkD3DFullscreen.GetCheck() == BST_CHECKED);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);

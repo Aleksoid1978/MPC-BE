@@ -489,7 +489,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 14		"Herinitialisatie bij verandering van monitor"
 15		"Oppervlakformaat:"
 17		"Herschalen:"
-19		"Neerschaling*:"
+19		"Neerschaling <50%:"
 21		"Uitvoerbereik:"
 23		"EVR-buffers:"
 27		"Kleurmanagement"
