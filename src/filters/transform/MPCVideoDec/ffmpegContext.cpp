@@ -23,7 +23,6 @@
 #include <Windows.h>
 #include <time.h> // for the _time64 workaround
 #include <mpc_defines.h>
-#include "../../../DSUtil/SysVersion.h"
 #include "ffmpegContext.h"
 
 extern "C" {
@@ -330,120 +329,125 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 	// fill "Pixel format" properties
 	if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
 		switch (pAVCtx->codec_id) {
-			case AV_CODEC_ID_MPEG1VIDEO:
-			case AV_CODEC_ID_MPEG2VIDEO:
-				{
-					const MpegEncContext* s = (MpegEncContext*)pAVCtx->priv_data;
-					if (s->chroma_format < 2) {
-						pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
-					} else if(s->chroma_format == 2) {
-						pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
-					} else {
-						pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;
+		case AV_CODEC_ID_MPEG1VIDEO:
+		case AV_CODEC_ID_MPEG2VIDEO:
+			if (pAVCtx->priv_data) {
+				const MpegEncContext* s = (MpegEncContext*)pAVCtx->priv_data;
+				if (s->chroma_format < 2) {
+					pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+				}
+				else if (s->chroma_format == 2) {
+					pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
+				}
+				else {
+					pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;
+				}
+			}
+			break;
+		case AV_CODEC_ID_LAGARITH:
+			if (pAVCtx->extradata_size >= 4) {
+				switch (*(DWORD*)pAVCtx->extradata) {
+				case 0:
+					if (pAVCtx->bits_per_coded_sample == 32) {
+						pAVCtx->pix_fmt = AV_PIX_FMT_RGBA;
+					}
+					else if (pAVCtx->bits_per_coded_sample == 24) {
+						pAVCtx->pix_fmt = AV_PIX_FMT_RGB24;
+					}
+					break;
+				case 1:
+					pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
+					break;
+				case 2:
+					pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+					break;
+				}
+			}
+			break;
+		case AV_CODEC_ID_PRORES:
+			if (pAVCtx->extradata_size >= 8) {
+				switch (*(DWORD*)(pAVCtx->extradata + 4)) {
+				case 'hcpa': // Apple ProRes 422 High Quality
+				case 'ncpa': // Apple ProRes 422 Standard Definition
+				case 'scpa': // Apple ProRes 422 LT
+				case 'ocpa': // Apple ProRes 422 Proxy
+					pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10LE;
+					break;
+				case 'h4pa': // Apple ProRes 4444
+					pAVCtx->pix_fmt = pAVCtx->bits_per_coded_sample == 32 ? AV_PIX_FMT_YUVA444P10LE : AV_PIX_FMT_YUV444P10LE;
+					break;
+				}
+			}
+			break;
+		case AV_CODEC_ID_PNG:
+		case AV_CODEC_ID_JPEG2000:
+			pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; // and other RGB formats, but it is not important here
+			break;
+		case AV_CODEC_ID_HQ_HQA:
+			pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
+			break;
+		case AV_CODEC_ID_HQX:
+			pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P16; // or AV_PIX_FMT_YUV444P16
+			break;
+		case AV_CODEC_ID_CFHD:
+			pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10; // most common format
+			break;
+		case AV_CODEC_ID_MJPEG:
+		case AV_CODEC_ID_DNXHD:
+			pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; // most common format
+			break;
+		case AV_CODEC_ID_MAGICYUV:
+			if (pAVCtx->extradata_size >= 32 && *(DWORD*)pAVCtx->extradata == FCC('MAGY')) {
+				int hsize = *(DWORD*)(pAVCtx->extradata + 4);
+				if (hsize >= 32 && pAVCtx->extradata[8] == 7) {
+					switch (pAVCtx->extradata[9]) {
+					case 0x65: pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;     break;
+					case 0x66: pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP;    break;
+					case 0x67: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;  break;
+					case 0x68: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;  break;
+					case 0x69: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;  break;
+					case 0x6a: pAVCtx->pix_fmt = AV_PIX_FMT_YUVA444P; break;
+					case 0x6b: pAVCtx->pix_fmt = AV_PIX_FMT_GRAY8;    break;
 					}
 				}
-				break;
-			case AV_CODEC_ID_LAGARITH:
-				if (pAVCtx->extradata_size >= 4) {
-					switch (*(DWORD*)pAVCtx->extradata) {
-					case 0:
-						if (pAVCtx->bits_per_coded_sample == 32) {
-							pAVCtx->pix_fmt = AV_PIX_FMT_RGBA;
-						} else if (pAVCtx->bits_per_coded_sample == 24) {
-							pAVCtx->pix_fmt = AV_PIX_FMT_RGB24;
-						}
-						break;
-					case 1:
-						pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
-						break;
-					case 2:
-						pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
-						break;
-					}
+			}
+			else if (pAVCtx->extradata_size >= 8) {
+				switch (*(DWORD*)(pAVCtx->extradata + 4)) {
+				case FCC('M8RG'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;     break;
+				case FCC('M8RA'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP;    break;
+				case FCC('M8Y4'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;  break;
+				case FCC('M8Y2'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;  break;
+				case FCC('M8Y0'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;  break;
+				case FCC('M8YA'): pAVCtx->pix_fmt = AV_PIX_FMT_YUVA444P; break;
+				case FCC('M8G0'): pAVCtx->pix_fmt = AV_PIX_FMT_GRAY8;    break;
 				}
-				break;
-			case AV_CODEC_ID_PRORES:
-				if (pAVCtx->extradata_size >= 8) {
-					switch (*(DWORD*)(pAVCtx->extradata + 4)) {
-					case 'hcpa': // Apple ProRes 422 High Quality
-					case 'ncpa': // Apple ProRes 422 Standard Definition
-					case 'scpa': // Apple ProRes 422 LT
-					case 'ocpa': // Apple ProRes 422 Proxy
-						pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10LE;
-						break;
-					case 'h4pa': // Apple ProRes 4444
-						pAVCtx->pix_fmt = pAVCtx->bits_per_coded_sample == 32 ? AV_PIX_FMT_YUVA444P10LE : AV_PIX_FMT_YUV444P10LE;
-						break;
-					}
-				}
-				break;
-			case AV_CODEC_ID_PNG:
-			case AV_CODEC_ID_JPEG2000:
-				pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; // and other RGB formats, but it is not important here
-				break;
-			case AV_CODEC_ID_HQ_HQA:
-				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
-				break;
-			case AV_CODEC_ID_HQX:
-				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P16; // or AV_PIX_FMT_YUV444P16
-				break;
-			case AV_CODEC_ID_CFHD:
-				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10; // most common format
-				break;
-			case AV_CODEC_ID_MJPEG:
-			case AV_CODEC_ID_DNXHD:
-				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; // most common format
-				break;
-			case AV_CODEC_ID_MAGICYUV:
-				if (pAVCtx->extradata_size >= 32 && *(DWORD*)pAVCtx->extradata == FCC('MAGY')) {
-					int hsize = *(DWORD*)(pAVCtx->extradata + 4);
-					if (hsize >= 32 && pAVCtx->extradata[8] == 7) {
-						switch (pAVCtx->extradata[9]) {
-						case 0x65: pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;     break;
-						case 0x66: pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP;    break;
-						case 0x67: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;  break;
-						case 0x68: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;  break;
-						case 0x69: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;  break;
-						case 0x6a: pAVCtx->pix_fmt = AV_PIX_FMT_YUVA444P; break;
-						case 0x6b: pAVCtx->pix_fmt = AV_PIX_FMT_GRAY8;    break;
-						}
-					}
-				}
-				else if (pAVCtx->extradata_size >= 8) {
-					switch (*(DWORD*)(pAVCtx->extradata + 4)) {
-					case FCC('M8RG'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;     break;
-					case FCC('M8RA'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP;    break;
-					case FCC('M8Y4'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;  break;
-					case FCC('M8Y2'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;  break;
-					case FCC('M8Y0'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;  break;
-					case FCC('M8YA'): pAVCtx->pix_fmt = AV_PIX_FMT_YUVA444P; break;
-					case FCC('M8G0'): pAVCtx->pix_fmt = AV_PIX_FMT_GRAY8;    break;
-					}
-				}
-				break;
-			case AV_CODEC_ID_FFV1:
-				pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
-				if (pAVCtx->priv_data) {
-					const FFV1Context* h = (FFV1Context*)pAVCtx->priv_data;
-					if (h->version > 0) {
-						if (h->colorspace == 0) {
-							switch (16 * h->chroma_h_shift + h->chroma_v_shift) {
-							case 0x00: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P; break;
-							case 0x01: pAVCtx->pix_fmt = AV_PIX_FMT_YUV440P; break;
-							case 0x10: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; break;
-							case 0x11: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; break;
-							case 0x20: pAVCtx->pix_fmt = AV_PIX_FMT_YUV411P; break;
-							case 0x22: pAVCtx->pix_fmt = AV_PIX_FMT_YUV410P; break;
-							}
-						}
-						else if (h->colorspace == 1) {
-							pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; // and other RGB formats, but it is not important here
+			}
+			break;
+		case AV_CODEC_ID_FFV1:
+			if (pAVCtx->priv_data) {
+				const FFV1Context* h = (FFV1Context*)pAVCtx->priv_data;
+				if (h->version > 0) { // extra data has been parse
+					if (h->colorspace == 0) {
+						switch (16 * h->chroma_h_shift + h->chroma_v_shift) {
+						case 0x00: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P; break;
+						case 0x01: pAVCtx->pix_fmt = AV_PIX_FMT_YUV440P; break;
+						case 0x10: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; break;
+						case 0x11: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; break;
+						case 0x20: pAVCtx->pix_fmt = AV_PIX_FMT_YUV411P; break;
+						case 0x22: pAVCtx->pix_fmt = AV_PIX_FMT_YUV410P; break;
 						}
 					}
+					else if (h->colorspace == 1) {
+						pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; // and other RGB formats, but it is not important here
+					}
 				}
-				break;
-			default: // most codecs
-				pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; // most common format
+			}
+			break;
+		}
+
+		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
+			pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; // most common format
+			av_log(NULL, AV_LOG_WARNING, "FillAVCodecProps: Unknown pixel format for %s, use AV_PIX_FMT_YUV420P.\n", pAVCtx->codec->name);
 		}
 	}
 }
