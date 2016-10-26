@@ -1136,8 +1136,8 @@ HRESULT CDX9RenderingEngine::TextureResizeShader(IDirect3DTexture9* pTexture, co
 	const float dx = 1.0f / desc.Width;
 	const float dy = 1.0f / desc.Height;
 
-	const float rx = (float)srcRect.Width() / destRect.Width();
-	const float ry = (float)srcRect.Height() / destRect.Height();
+	const float steps_x = floor((float)srcRect.Width() / destRect.Width() + 0.5f);
+	const float steps_y = floor((float)srcRect.Height() / destRect.Height() + 0.5f);
 
 	const float tx0 = (float)srcRect.left - 0.5f;
 	const float ty0 = (float)srcRect.top - 0.5f;
@@ -1151,7 +1151,7 @@ HRESULT CDX9RenderingEngine::TextureResizeShader(IDirect3DTexture9* pTexture, co
 		{(float)destRect.right - 0.5f, (float)destRect.bottom - 0.5f, 0.5f, 2.0f, { tx1, ty1 } },
 	};
 
-	float fConstData[][4] = { { dx, dy, 0, 0 }, { rx, ry, 0, 0 } };
+	float fConstData[][4] = { { dx, dy, 0, 0 }, { steps_x, steps_y, 0, 0 } };
 	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 	hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader]);
 
