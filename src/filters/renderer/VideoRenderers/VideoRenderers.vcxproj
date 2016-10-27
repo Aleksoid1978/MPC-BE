@@ -120,6 +120,7 @@
     <ClInclude Include="AllocatorCommon.h" />
     <ClInclude Include="CPUUsage.h" />
     <ClInclude Include="D3DFont.h" />
+    <ClInclude Include="d3dkmt.h" />
     <ClInclude Include="Dither.h" />
     <ClInclude Include="DX9AllocatorPresenter.h" />
     <ClInclude Include="DX9RenderingEngine.h" />

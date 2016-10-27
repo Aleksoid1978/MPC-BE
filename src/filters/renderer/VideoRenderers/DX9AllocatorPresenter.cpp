@@ -2030,7 +2030,9 @@ void CDX9AllocatorPresenter::DrawStats()
 				if (m_GPUUsage.GetType() != CGPUUsage::UNKNOWN_GPU) {
 					UINT gpu_usage;
 					UINT gpu_clock;
-					m_GPUUsage.GetUsage(gpu_usage, gpu_clock);
+					UINT64 gpu_mem_usage_total;
+					UINT64 gpu_mem_usage_current;
+					m_GPUUsage.GetUsage(gpu_usage, gpu_clock, gpu_mem_usage_total, gpu_mem_usage_current);
 					strText.AppendFormat(L", GPU:%3u%%", gpu_usage & 0xFFFF);
 
 					if (gpu_clock) {
@@ -2040,10 +2042,14 @@ void CDX9AllocatorPresenter::DrawStats()
 					if (m_GPUUsage.GetType() == CGPUUsage::NVIDIA_GPU) {
 						strText.AppendFormat(L", Video Engine:%3u%%", gpu_usage >> 16);
 					}
+
+					if (gpu_mem_usage_total) {
+						strText.AppendFormat(L", GPU Memory:%4llu/%llu MB", gpu_mem_usage_total / MEGABYTE, gpu_mem_usage_current / MEGABYTE);
+					}
 				}
 
 				if (size_t mem_usage = m_MemUsage.GetUsage()) {
-					strText.AppendFormat(L", Memory:%4u MB", mem_usage / 1048576);
+					strText.AppendFormat(L", Memory:%4u MB", mem_usage / MEGABYTE);
 				}
 
 				drawText(strText);
