@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Περί"
 7		"MPC-BE"
 8		"Copyright © 2002-2016 βλέπε Authors.txt"
@@ -266,7 +266,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
-6		"Χρήση του ""σκοτεινού" θέματος (προεπιλογή)"
+6		"Χρήση του ""σκοτεινού"" θέματος (προεπιλογή)"
 7		"Φωτεινότητα :"
 9		"Ρύθμιση του χρώματος από την ένδειξη του ήχου:"
 10		"Γέμισμα:"
