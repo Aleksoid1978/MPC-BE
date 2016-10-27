@@ -46,7 +46,7 @@ using namespace FFV1;
 // Const
 //***************************************************************************
 
-extern int32u Psi_CRC_32_Table[256];
+extern const int32u Psi_CRC_32_Table[256];
 const int32u Slice::Context::N0 = 128;
 const int32s Slice::Context::Cmax = 127;
 const int32s Slice::Context::Cmin = -128;

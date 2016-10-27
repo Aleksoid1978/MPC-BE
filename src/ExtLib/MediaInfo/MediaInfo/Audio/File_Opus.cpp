@@ -37,7 +37,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const char*  Opus_ChannelPositions[]=
+static const char*  Opus_ChannelPositions[]=
 {
     "",
     "Front: C",
@@ -51,7 +51,7 @@ const char*  Opus_ChannelPositions[]=
 };
 
 //---------------------------------------------------------------------------
-const char*  Opus_ChannelPositions2[]=
+static const char*  Opus_ChannelPositions2[]=
 {
     "",
     "1/0/0",

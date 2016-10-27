@@ -37,7 +37,7 @@ const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
 const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
 
 //---------------------------------------------------------------------------
-const char* ProRes_chrominance_factor(int8u chrominance_factor)
+static const char* ProRes_chrominance_factor(int8u chrominance_factor)
 {
     switch (chrominance_factor)
     {
@@ -48,7 +48,7 @@ const char* ProRes_chrominance_factor(int8u chrominance_factor)
 }
 
 //---------------------------------------------------------------------------
-const char* ProRes_frame_type_ScanType(int8u frame_type)
+static const char* ProRes_frame_type_ScanType(int8u frame_type)
 {
     switch (frame_type)
     {
@@ -60,7 +60,7 @@ const char* ProRes_frame_type_ScanType(int8u frame_type)
 }
 
 //---------------------------------------------------------------------------
-const char* ProRes_frame_type_ScanOrder(int8u frame_type)
+static const char* ProRes_frame_type_ScanOrder(int8u frame_type)
 {
     switch (frame_type)
     {
@@ -71,7 +71,7 @@ const char* ProRes_frame_type_ScanOrder(int8u frame_type)
 }
 
 //---------------------------------------------------------------------------
-Ztring ProRes_creatorID(int32u creatorID)
+static Ztring ProRes_creatorID(int32u creatorID)
 {
     switch (creatorID)
     {

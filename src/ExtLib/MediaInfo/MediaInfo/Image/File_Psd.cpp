@@ -42,7 +42,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Psd_ColorMode(int16u ColorMode)
+static const char* Psd_ColorMode(int16u ColorMode)
 {
     switch(ColorMode)
     {

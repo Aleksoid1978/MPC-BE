@@ -23,6 +23,10 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Text/File_Eia608.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+#if MEDIAINFO_EVENTS
+    #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+    #include "MediaInfo/MediaInfo_Events_Internal.h"
+#endif //MEDIAINFO_EVENTS
 using namespace std;
 //---------------------------------------------------------------------------
 
@@ -70,6 +74,9 @@ File_Eia608::File_Eia608()
 
     //In
     cc_type=(int8u)-1;
+    #if MEDIAINFO_EVENTS
+        MuxingMode=(int8u)-1;
+    #endif //MEDIAINFO_EVENTS
 
     //Temp
     XDS_Level=(size_t)-1;
@@ -213,6 +220,29 @@ void File_Eia608::Read_Buffer_Init()
             FrameInfo.PTS=0;
     }
 
+    #if MEDIAINFO_EVENTS
+        if (MuxingMode==(int8u)-1)
+        {
+            if (StreamIDs_Size>=3 && ParserIDs[StreamIDs_Size-3]==MediaInfo_Parser_Mpegv && StreamIDs[StreamIDs_Size-3]==0x4741393400000003LL)
+                MuxingMode=0; //A/53 / DTVCC Transport
+            if (StreamIDs_Size>=3 && ParserIDs[StreamIDs_Size-3]==MediaInfo_Parser_Mpegv && StreamIDs[StreamIDs_Size-3]==0x0000000300000000LL)
+                MuxingMode=1; //SCTE 20
+            if (StreamIDs_Size>=3 && ParserIDs[StreamIDs_Size-3]==MediaInfo_Parser_Mpegv && StreamIDs[StreamIDs_Size-3]==0x434301F800000000LL)
+                MuxingMode=2; //DVD-Video
+            if (StreamIDs_Size>=4 && (ParserIDs[StreamIDs_Size-4]==MediaInfo_Parser_Gxf || ParserIDs[StreamIDs_Size-4]==MediaInfo_Parser_Lxf || ParserIDs[StreamIDs_Size-4]==MediaInfo_Parser_Mxf) && ParserIDs[StreamIDs_Size-2]==MediaInfo_Parser_Cdp)
+                MuxingMode=3; //Ancillary data / CDP
+            if (StreamIDs_Size>=3 && ParserIDs[StreamIDs_Size-3]==MediaInfo_Parser_Avc)
+                MuxingMode=4; //SCTE 128 / DTVCC Transport
+            if (StreamIDs_Size>=2 && ParserIDs[StreamIDs_Size-2]==MediaInfo_Parser_DvDif)
+                MuxingMode=5; //DV
+            if (StreamIDs_Size>=3 && ParserIDs[StreamIDs_Size-3]==MediaInfo_Parser_Mpeg4 && ParserIDs[StreamIDs_Size-2]==MediaInfo_Parser_Cdp)
+                MuxingMode=6; //Final Cut / CDP
+            if (StreamIDs_Size>=2 && ParserIDs[StreamIDs_Size-2]==MediaInfo_Parser_Scc)
+                MuxingMode=10; //SCC
+            if (StreamIDs_Size>=3 && ParserIDs[StreamIDs_Size-3]==MediaInfo_Parser_Mpeg4 && ParserIDs[StreamIDs_Size-2]==MediaInfo_Parser_Mpeg4)
+                MuxingMode=14; //Final Cut / cdat
+        }
+    #endif //MEDIAINFO_EVENTS
 }
 
 //---------------------------------------------------------------------------
@@ -544,6 +574,7 @@ void File_Eia608::Special(int8u cc_data_1, int8u cc_data_2)
     }
 
     cc_data_1&=0xF7;
+
     if (cc_data_1==0x15 && (cc_data_2&0xF0)==0x20)
         cc_data_1=0x14;
 
@@ -1089,6 +1120,24 @@ void File_Eia608::Character_Fill(wchar_t Character)
 //---------------------------------------------------------------------------
 void File_Eia608::HasChanged()
 {
+    #if MEDIAINFO_EVENTS
+            size_t StreamPos=TextMode*2+DataChannelMode;
+            if (StreamPos<Streams.size() && Streams[StreamPos])
+            EVENT_BEGIN (Eia608, CC_Content, 0)
+                Event.Field=1+cc_type;
+                Event.MuxingMode=MuxingMode;
+                Event.Service=1+(TextMode?1:0)*2+(DataChannelMode?1:0);
+                for (size_t Pos_Y=0; Pos_Y<Streams[StreamPos]->CC_Displayed.size(); Pos_Y++)
+                {
+                    for (size_t Pos_X=0; Pos_X<Streams[StreamPos]->CC_Displayed[Pos_Y].size(); Pos_X++)
+                    {
+                        Event.Row_Values[Pos_Y][Pos_X]=Streams[StreamPos]->CC_Displayed[Pos_Y][Pos_X].Value;
+                        Event.Row_Attributes[Pos_Y][Pos_X]=Streams[StreamPos]->CC_Displayed[Pos_Y][Pos_X].Attribute;
+                    }
+                    Event.Row_Values[Pos_Y][32]=L'\0';
+                }
+            EVENT_END   ()
+    #endif //MEDIAINFO_EVENTS
 }
 
 //---------------------------------------------------------------------------

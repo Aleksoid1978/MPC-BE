@@ -74,7 +74,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const char* Lxf_Format_Video[16]=
+static const char* Lxf_Format_Video[16]=
 {
     "JPEG",
     "MPEG Video", //Version 1
@@ -95,7 +95,7 @@ const char* Lxf_Format_Video[16]=
 };
 
 //---------------------------------------------------------------------------
-const char* Lxf_PictureType[4]=
+static const char* Lxf_PictureType[4]=
 {
     "I", //Closed
     "I", //Open
@@ -104,7 +104,7 @@ const char* Lxf_PictureType[4]=
 };
 
 //---------------------------------------------------------------------------
-extern const float64 Mpegv_frame_rate[]; //In Video/File_Mpegv.cpp
+extern const float64 Mpegv_frame_rate[16]; //In Video/File_Mpegv.cpp
 
 //***************************************************************************
 // Constructor/Destructor
@@ -677,8 +677,8 @@ void File_Lxf::Header_Parse()
                     }
                     break;
         case 1 :
-            Get_L8 (TimeStamp,                          "TimeStamp"); Param_Info3(((float64)TimeStamp)/720000, " s", 3); FrameInfo.DTS=FrameInfo.PTS=float64_int64s(((float64)TimeStamp)*1000000/720);
-            Get_L8 (Duration,                           "Duration"); Param_Info3(((float64)Duration)/720000, " s", 3); FrameInfo.DUR=float64_int64s(((float64)Duration)*1000000/720);
+                    Get_L8 (TimeStamp,                          "TimeStamp"); Param_Info3(((float64)TimeStamp)/720000, " s", 3); FrameInfo.DTS=FrameInfo.PTS=float64_int64s(((float64)TimeStamp)*1000000/720);
+                    Get_L8 (Duration,                           "Duration"); Param_Info3(((float64)Duration)/720000, " s", 3); FrameInfo.DUR=float64_int64s(((float64)Duration)*1000000/720);
                     break;
         default:    ;
     }

@@ -35,7 +35,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Smpte_St0302_ChannelsPositions(int8u Channels)
+static const char* Smpte_St0302_ChannelsPositions(int8u Channels)
 {
     switch (Channels)
     {
@@ -48,7 +48,7 @@ const char* Smpte_St0302_ChannelsPositions(int8u Channels)
 }
 
 //---------------------------------------------------------------------------
-const char* Smpte_St0302_ChannelsPositions2(int8u Channels)
+static const char* Smpte_St0302_ChannelsPositions2(int8u Channels)
 {
     switch (Channels)
     {
@@ -393,25 +393,32 @@ void File_Pcm::Data_Parse()
     #if MEDIAINFO_DEMUX
     if (Frame_Count_Valid_Demux)
     {
-        Frame_Count+=Frame_Count_Valid_Demux-1;
+        FrameInfo_Next=frame_info();
+        Frame_Count+=Frame_Count_Valid_Demux;
         if (Frame_Count_NotParsedIncluded!=(int64u)-1)
-            Frame_Count_NotParsedIncluded+=Frame_Count_Valid_Demux-1;
-        FrameInfo.DUR/=Frame_Count_Valid_Demux;
-        if (FrameInfo.DTS!=(int64u)-1)
-            FrameInfo.DTS+=FrameInfo.DUR*Frame_Count;
+            Frame_Count_NotParsedIncluded+=Frame_Count_Valid_Demux;
+        if (FrameInfo.DTS!=(int64u)-1 && FrameInfo.DUR!=(int64u)-1)
+        {
+            FrameInfo.DUR/=Frame_Count_Valid_Demux;
+            if (FrameInfo.DTS!=(int64u)-1)
+                FrameInfo.DTS+=FrameInfo.DUR*Frame_Count;
+        }
         Frame_Count_Valid_Demux=0;
     }
+    else
     #endif //MEDIAINFO_DEMUX
-    Frame_Count++;
-    if (Frame_Count_NotParsedIncluded!=(int64u)-1)
-        Frame_Count_NotParsedIncluded++;
-    if (FrameInfo.DTS!=(int64u)-1 && FrameInfo.DUR!=(int64u)-1)
     {
-        if (BitDepth && Channels && SamplingRate)
-            FrameInfo.DTS+=Element_Size*1000000000*8/BitDepth/Channels/SamplingRate;
-        else
-            FrameInfo.DTS+=FrameInfo.DUR;
-        FrameInfo.PTS=FrameInfo.DTS;
+        if (FrameInfo.DTS!=(int64u)-1 && FrameInfo.DUR!=(int64u)-1)
+        {
+            if (BitDepth && Channels && SamplingRate)
+                FrameInfo.DTS+=Element_Size*1000000000*8/BitDepth/Channels/SamplingRate;
+            else
+                FrameInfo.DTS+=FrameInfo.DUR;
+            FrameInfo.PTS=FrameInfo.DTS;
+        }
+        Frame_Count++;
+        if (Frame_Count_NotParsedIncluded!=(int64u)-1)
+            Frame_Count_NotParsedIncluded++;
     }
     if ((!Status[IsAccepted] && Frame_Count>=Frame_Count_Valid) || File_Offset+Buffer_Size>=File_Size)
     {

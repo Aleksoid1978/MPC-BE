@@ -779,6 +779,7 @@ void File_Ac3::Streams_Fill()
         Fill(Stream_General, 0, General_Format, "AC-3");
         Fill(Stream_Audio, 0, Audio_Format, "AC-3");
         Fill(Stream_Audio, 0, Audio_Codec, "AC3");
+        Fill(Stream_Audio, 0, Audio_BitDepth, 16);
 
         int32u Divider=bsid_Max==9?2:1; // Unofficial hack for low sample rate (e.g. 22.05 kHz)
         if (Ztring::ToZtring(AC3_SamplingRate[fscod]/Divider)!=Retrieve(Stream_Audio, 0, Audio_SamplingRate))

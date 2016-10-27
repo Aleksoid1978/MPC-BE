@@ -33,7 +33,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* DPX_Orientation[]=
+static const char* DPX_Orientation[]=
 {
     "Left to right, Top to bottom",
     "Right to left, Top to bottom",
@@ -47,7 +47,7 @@ const char* DPX_Orientation[]=
 };
 
 //---------------------------------------------------------------------------
-const char* DPX_Descriptors0[]=
+static const char* DPX_Descriptors0[]=
 {
     "User defined (or unspecified single component)",
     "Red (R)",
@@ -61,14 +61,14 @@ const char* DPX_Descriptors0[]=
     "Composite video"
 };
 
-const char* DPX_Descriptors50[]=
+static const char* DPX_Descriptors50[]=
 {
     "R,G,B",
     "R,G,B, Alpha (A)",
     "A, B, G, R"
 };
 
-const char* DPX_Descriptors100[]=
+static const char* DPX_Descriptors100[]=
 {
     "CB, Y, CR, Y (4:2:2) ---- based on SMPTE 125M",
     "CB, Y, A, CR, Y, A (4:2:2:4)",
@@ -87,7 +87,7 @@ const char* DPX_Descriptors150[]=
     "User-defined 8-component element"
 };
 
-const char* DPX_Descriptors(int8u i)
+static const char* DPX_Descriptors(int8u i)
 {
     if(i<10)
         return DPX_Descriptors0[i];
@@ -107,7 +107,7 @@ const char* DPX_Descriptors(int8u i)
 }
 
 //---------------------------------------------------------------------------
-const char* DPX_Descriptors_ColorSpace(int8u i)
+static const char* DPX_Descriptors_ColorSpace(int8u i)
 {
     switch (i)
     {
@@ -130,7 +130,7 @@ const char* DPX_Descriptors_ColorSpace(int8u i)
 }
 
 //---------------------------------------------------------------------------
-const char* DPX_Descriptors_ChromaSubsampling(int8u i)
+static const char* DPX_Descriptors_ChromaSubsampling(int8u i)
 {
     switch (i)
     {
@@ -142,7 +142,7 @@ const char* DPX_Descriptors_ChromaSubsampling(int8u i)
 
 //---------------------------------------------------------------------------
 const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
-const char* DPX_TransferCharacteristic(int8u TransferCharacteristic)
+static const char* DPX_TransferCharacteristic(int8u TransferCharacteristic)
 {
     switch (TransferCharacteristic)
     {
@@ -164,7 +164,7 @@ const char* DPX_TransferCharacteristic(int8u TransferCharacteristic)
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 const char* Mpegv_colour_primaries(int8u colour_primaries);
-const char* DPX_ColorimetricSpecification(int8u ColorimetricSpecification)
+static const char* DPX_ColorimetricSpecification(int8u ColorimetricSpecification)
 {
     switch (ColorimetricSpecification)
     {
@@ -180,7 +180,7 @@ const char* DPX_ColorimetricSpecification(int8u ColorimetricSpecification)
 }
 
 //---------------------------------------------------------------------------
-const char* DPX_ValidBitDephs(int8u i)
+static const char* DPX_ValidBitDephs(int8u i)
 {
     switch(i)
     {
@@ -200,7 +200,7 @@ const char* DPX_ValidBitDephs(int8u i)
 }
 
 //---------------------------------------------------------------------------
-const char* DPX_ComponentDataPackingMethod[]=
+static const char* DPX_ComponentDataPackingMethod[]=
 {
     "Packed into 32-bit words",
     "Filled to 32-bit words, method A",
@@ -213,7 +213,7 @@ const char* DPX_ComponentDataPackingMethod[]=
 };
 
 //---------------------------------------------------------------------------
-const char* DPX_ComponentDataEncodingMethod[]=
+static const char* DPX_ComponentDataEncodingMethod[]=
 {
     "No encoding applied",
     "Run-length encoded",
@@ -226,7 +226,7 @@ const char* DPX_ComponentDataEncodingMethod[]=
 };
 
 //---------------------------------------------------------------------------
-const char* DPX_VideoSignalStandard0[]=
+static const char* DPX_VideoSignalStandard0[]=
 {
     "Undefined",
     "NTSC",
@@ -235,19 +235,19 @@ const char* DPX_VideoSignalStandard0[]=
     "SECAM"
 };
 
-const char* DPX_VideoSignalStandard50[]=
+static const char* DPX_VideoSignalStandard50[]=
 {
     "YCBCR ITU-R 601-5 525-line, 2:1 interlace, 4:3 aspect ratio",
     "YCBCR ITU-R 601-5 625-line, 2:1 interlace, 4:3 aspect ratio"
 };
 
-const char* DPX_VideoSignalStandard100[]=
+static const char* DPX_VideoSignalStandard100[]=
 {
     "YCBCR ITU-R 601-5 525-line, 2:1 interlace, 16:9 aspect ratio",
     "YCBCR ITU-R 601-5 625-line, 2:1 interlace, 16:9 aspect ratio"
 };
 
-const char* DPX_VideoSignalStandard150[]=
+static const char* DPX_VideoSignalStandard150[]=
 {
     "YCBCR 1050-line, 2:1 interlace, 16:9 aspect ratio",
     "YCBCR 1125-line, 2:1 interlace, 16:9 aspect ratio (SMPTE 274M)",
@@ -255,7 +255,7 @@ const char* DPX_VideoSignalStandard150[]=
     "YCBCR 1125-line, 2:1 interlace, 16:9 aspect ratio (SMPTE 240M)"
 };
 
-const char* DPX_VideoSignalStandard200[]=
+static const char* DPX_VideoSignalStandard200[]=
 {
     "YCBCR 525-line, 1:1 progressive, 16:9 aspect ratio",
     "YCBCR 625-line, 1:1 progressive, 16:9 aspect ratio",
@@ -263,7 +263,7 @@ const char* DPX_VideoSignalStandard200[]=
     "YCBCR 1125-line, 1:1 progressive, 16:9 aspect ratio (SMPTE 274M)"
 };
 
-const char* DPX_VideoSignalStandard(int8u i)
+static const char* DPX_VideoSignalStandard(int8u i)
 {
     if(i<5)
         return DPX_VideoSignalStandard0[i];

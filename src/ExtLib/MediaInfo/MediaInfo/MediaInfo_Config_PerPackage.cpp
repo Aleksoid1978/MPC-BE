@@ -67,6 +67,13 @@ Ztring MediaInfo_Config_PerPackage::Option (const String &Option, const String &
         return __T("Option not known");
 }
 
+//---------------------------------------------------------------------------
+#if MEDIAINFO_EVENTS
+void MediaInfo_Config_PerPackage::Unsynch ()
+{
+}
+#endif //MEDIAINFO_EVENTS
+
 //***************************************************************************
 // Event
 //***************************************************************************
@@ -129,6 +136,20 @@ void MediaInfo_Config_PerPackage::Event_Send (File__Analyze* Source, const int8u
 
     if (Event_CallBackFunction)
         Event_CallBackFunction ((unsigned char*)Data_Content, Data_Size, Event_UserHandler);
+}
+#endif //MEDIAINFO_EVENTS
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_EVENTS
+void MediaInfo_Config_PerPackage::FrameForAlignment (File__Analyze* Source, bool IsClosedGop)
+{
+}
+#endif //MEDIAINFO_EVENTS
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_EVENTS
+void MediaInfo_Config_PerPackage::IsClosedGOP (File__Analyze* Source)
+{
 }
 #endif //MEDIAINFO_EVENTS
 

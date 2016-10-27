@@ -35,7 +35,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-int8u Pcm_M2TS_channel_assignment[16]=
+static int8u Pcm_M2TS_channel_assignment[16]=
 {
         0,
         1,
@@ -56,7 +56,7 @@ int8u Pcm_M2TS_channel_assignment[16]=
 };
 
 //---------------------------------------------------------------------------
-int32u Pcm_M2TS_sampling_frequency[16]=
+static int32u Pcm_M2TS_sampling_frequency[16]=
 {
         0,
     48000,
@@ -77,7 +77,7 @@ int32u Pcm_M2TS_sampling_frequency[16]=
 };
 
 //---------------------------------------------------------------------------
-int8u Pcm_M2TS_bits_per_sample[4]=
+static int8u Pcm_M2TS_bits_per_sample[4]=
 {
         0,
        16,

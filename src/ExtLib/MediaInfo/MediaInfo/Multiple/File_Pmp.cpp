@@ -38,7 +38,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Pmp_video_format(int32u video_format)
+static const char* Pmp_video_format(int32u video_format)
 {
     switch (video_format)
     {
@@ -49,7 +49,7 @@ const char* Pmp_video_format(int32u video_format)
 }
 
 //---------------------------------------------------------------------------
-const char* Pmp_audio_format(int32u audio_format)
+static const char* Pmp_audio_format(int32u audio_format)
 {
     switch (audio_format)
     {

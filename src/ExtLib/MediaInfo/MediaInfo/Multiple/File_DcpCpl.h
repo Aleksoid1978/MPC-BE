@@ -55,6 +55,25 @@ private :
 
     //Temp
     File__ReferenceFilesHelper*     ReferenceFiles;
+    #if MEDIAINFO_ADVANCED
+        struct descriptor
+        {
+            std::vector<descriptor*> SubDescriptors;
+            int16u Jpeg2000_Rsiz;
+
+            descriptor()
+            : Jpeg2000_Rsiz((int16u)-1)
+            {
+            }
+
+            ~descriptor()
+            {
+                for (std::vector<descriptor*>::iterator SubDescriptor=SubDescriptors.begin(); SubDescriptor!=SubDescriptors.end(); ++SubDescriptor)
+                    delete *SubDescriptor; //*SubDescriptor=NULL;
+            }
+        };
+        std::map<string, descriptor*> EssenceDescriptorList;
+    #endif //MEDIAINFO_ADVANCED
 };
 
 } //NameSpace

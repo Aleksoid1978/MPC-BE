@@ -53,6 +53,7 @@ private :
         Ztring Content;
     };
     std::vector<item> Items;
+    size_t Items_Pos;
     #endif //MEDIAINFO_DEMUX
 };
 

@@ -23,6 +23,11 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Text/File_Eia708.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+
+#if MEDIAINFO_EVENTS
+    #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+    #include "MediaInfo/MediaInfo_Events_Internal.h"
+#endif //MEDIAINFO_EVENTS
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -43,6 +48,9 @@ File_Eia708::File_Eia708()
     //In
     cc_type=(int8u)-1;
     AspectRatio=((float32)4)/3; //Default to 4:3
+    #if MEDIAINFO_EVENTS
+        MuxingMode=(int8u)-1;
+    #endif //MEDIAINFO_EVENTS
     ParserName="EIA-708";
 
     //Stream
@@ -153,6 +161,27 @@ bool File_Eia708::Synched_Test()
 //---------------------------------------------------------------------------
 void File_Eia708::Read_Buffer_Init()
 {
+    #if MEDIAINFO_EVENTS
+        if (MuxingMode==(int8u)-1)
+        {
+            if (StreamIDs_Size>=3 && ParserIDs[StreamIDs_Size-3]==MediaInfo_Parser_Mpegv && StreamIDs[StreamIDs_Size-3]==0x4741393400000003LL)
+                MuxingMode=0; //A/53 / DTVCC Transport
+            if (StreamIDs_Size>=3 && ParserIDs[StreamIDs_Size-3]==MediaInfo_Parser_Mpegv && StreamIDs[StreamIDs_Size-3]==0x0000000300000000LL)
+                MuxingMode=1; //SCTE 20
+            if (StreamIDs_Size>=3 && ParserIDs[StreamIDs_Size-3]==MediaInfo_Parser_Mpegv && StreamIDs[StreamIDs_Size-3]==0x434301F800000000LL)
+                MuxingMode=2; //DVD-Video
+            if (StreamIDs_Size>=4 && (ParserIDs[StreamIDs_Size-4]==MediaInfo_Parser_Gxf || ParserIDs[StreamIDs_Size-4]==MediaInfo_Parser_Lxf || ParserIDs[StreamIDs_Size-4]==MediaInfo_Parser_Mxf) && ParserIDs[StreamIDs_Size-2]==MediaInfo_Parser_Cdp)
+                MuxingMode=3; //Ancillary data / CDP
+            if (StreamIDs_Size>=3 && ParserIDs[StreamIDs_Size-3]==MediaInfo_Parser_Avc)
+                MuxingMode=4; //SCTE 128 / DTVCC Transport
+            if (StreamIDs_Size>=2 && ParserIDs[StreamIDs_Size-2]==MediaInfo_Parser_DvDif)
+                MuxingMode=5; //DV
+            if (StreamIDs_Size>=3 && ParserIDs[StreamIDs_Size-3]==MediaInfo_Parser_Mpeg4 && ParserIDs[StreamIDs_Size-2]==MediaInfo_Parser_Cdp)
+                MuxingMode=6; //Final Cut / CDP
+            if (StreamIDs_Size>=2 && ParserIDs[StreamIDs_Size-2]==MediaInfo_Parser_Scc)
+                MuxingMode=7; //SCC
+        }
+    #endif //MEDIAINFO_EVENTS
 }
 
 //---------------------------------------------------------------------------
@@ -1047,7 +1076,7 @@ void File_Eia708::DLW()
     StandAloneCommand=false;
 
     //Bug in some files
-    bool Bug_WindowOffset=false;
+    //bool Bug_WindowOffset=false;
 
     Element_Begin1("DeleteWindows");
     BS_Begin();
@@ -1060,13 +1089,13 @@ void File_Eia708::DLW()
         Get_SB (   IsSet,                                       Ztring(__T("window ")+Ztring::ToZtring(WindowID)).To_Local().c_str());
 
         //Bug in some files
-        if (IsSet && WindowID==1 && Streams[service_number]->Windows[0]!=NULL && Streams[service_number]->Windows[1]==NULL) //Mix between Windows 0 and 1
-        {
-            Bug_WindowOffset=true;
-            //Fill(Stream_Text, 0, "Bug", "WindowID_Bug", Unlimited, true, true);
-        }
-        if (!IsSet && WindowID==0 && Bug_WindowOffset)
-            IsSet=true;
+        //if (IsSet && WindowID==1 && Streams[service_number]->Windows[0]!=NULL && Streams[service_number]->Windows[1]==NULL) //Mix between Windows 0 and 1
+        //{
+        //    Bug_WindowOffset=true;
+        //    //Fill(Stream_Text, 0, "Bug", "WindowID_Bug", Unlimited, true, true);
+        //}
+        //if (!IsSet && WindowID==0 && Bug_WindowOffset)
+        //    IsSet=true;
 
         if (IsSet)
         {
@@ -1318,7 +1347,7 @@ void File_Eia708::DFx(int8u WindowID)
     if (relative_positioning)
     {
         Window->Minimal.Window_y=(int8u)(((float)15)*anchor_vertical/100);
-        Window->Minimal.Window_x=(int8u)(24*AspectRatio*anchor_horizontal/100);;
+        Window->Minimal.Window_x=(int8u)(24*AspectRatio*anchor_horizontal/100);
     }
     else
     {
@@ -1449,11 +1478,51 @@ void File_Eia708::Character_Fill(wchar_t Character)
 //---------------------------------------------------------------------------
 void File_Eia708::Window_HasChanged()
 {
+    int8u WindowID=Streams[service_number]->WindowID;
+    if (WindowID==(int8u)-1)
+        return; //Must wait for the corresponding CWx
+    window* Window=Streams[service_number]->Windows[WindowID];
+    if (Window==NULL)
+        return; //Must wait for the corresponding DFx
+
+    #if MEDIAINFO_EVENTS
+        EVENT_BEGIN (DtvccCaption, Window_Content_Minimal, 0)
+            Event.MuxingMode=MuxingMode;
+            Event.Service=service_number;
+            Event.Window=Streams[service_number]->WindowID;
+            for (size_t Pos_Y=0; Pos_Y<Window->Minimal.CC.size(); Pos_Y++)
+            {
+                for (size_t Pos_X=0; Pos_X<Window->Minimal.CC[Pos_Y].size(); Pos_X++)
+                {
+                    Event.Row_Values[Pos_Y][Pos_X]=Window->Minimal.CC[Pos_Y][Pos_X].Value;
+                    Event.Row_Attributes[Pos_Y][Pos_X]=Window->Minimal.CC[Pos_Y][Pos_X].Attribute;
+                }
+                Event.Row_Values[Pos_Y][Window->Minimal.CC[Pos_Y].size()]=L'\0';
+            }
+            for (size_t Pos_Y=Window->Minimal.CC.size(); Pos_Y<15; Pos_Y++)
+                Event.Row_Values[Pos_Y][0]=L'\0';
+        EVENT_END   ()
+    #endif //MEDIAINFO_EVENTS
 }
 
 //---------------------------------------------------------------------------
 void File_Eia708::HasChanged()
 {
+    #if MEDIAINFO_EVENTS
+        EVENT_BEGIN (DtvccCaption, Content_Minimal, 0)
+            Event.MuxingMode=MuxingMode;
+            Event.Service=service_number;
+            for (size_t Pos_Y=0; Pos_Y<Streams[service_number]->Minimal.CC.size(); Pos_Y++)
+            {
+                for (size_t Pos_X=0; Pos_X<Streams[service_number]->Minimal.CC[Pos_Y].size(); Pos_X++)
+                {
+                    Event.Row_Values[Pos_Y][Pos_X]=Streams[service_number]->Minimal.CC[Pos_Y][Pos_X].Value;
+                    Event.Row_Attributes[Pos_Y][Pos_X]=Streams[service_number]->Minimal.CC[Pos_Y][Pos_X].Attribute;
+                }
+                Event.Row_Values[Pos_Y][(size_t)(24*AspectRatio)]=L'\0';
+            }
+        EVENT_END   ()
+    #endif //MEDIAINFO_EVENTS
 }
 
 //---------------------------------------------------------------------------

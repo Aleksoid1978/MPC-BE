@@ -40,7 +40,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Pcx_VersionInfo(int16u Version)
+static const char* Pcx_VersionInfo(int16u Version)
 {
     switch(Version)
     {

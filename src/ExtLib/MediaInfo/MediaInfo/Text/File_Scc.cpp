@@ -33,9 +33,9 @@ namespace MediaInfoLib
 // Utils
 //***************************************************************************
 
-int64u Scc_str2timecode(const char* Value)
+static int64u Scc_str2timecode(const char* Value)
 {
-    size_t Length=strlen(Value);
+    const size_t Length=strlen(Value);
          if (Length==11
      && Value[0]>='0' && Value[0]<='9'
      && Value[1]>='0' && Value[1]<='9'

@@ -31,7 +31,6 @@
 #include "ZenLib/Translation.h"
 #include "ZenLib/InfoMap.h"
 using namespace ZenLib;
-using namespace std;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -130,6 +129,8 @@ public :
     #if MEDIAINFO_ADVANCED
         void          File_DefaultFrameRate_Set (float64 NewValue);
         float64       File_DefaultFrameRate_Get ();
+        void          File_DefaultTimeCode_Set (string NewValue);
+        string        File_DefaultTimeCode_Get ();
     #endif //MEDIAINFO_ADVANCED
 
     #if MEDIAINFO_ADVANCED
@@ -257,6 +258,8 @@ public :
     void          Event_Send(File__Analyze* Source, const int8u* Data_Content, size_t Data_Size, const Ztring &File_Name=Ztring());
     void          Event_Accepted(File__Analyze* Source);
     void          Event_SubFile_Start(const Ztring &FileName_Absolute);
+    void          Event_SubFile_Missing(const Ztring &FileName_Relative);
+    void          Event_SubFile_Missing_Absolute(const Ztring &FileName_Absolute);
     #endif //MEDIAINFO_EVENTS
 
     #if MEDIAINFO_DEMUX
@@ -368,6 +371,9 @@ public :
     bool          File_DtvccTransport_Stream_IsPresent;
     bool          File_DtvccTransport_Descriptor_IsPresent;
     #endif //defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+    #if defined(MEDIAINFO_MPEGPS_YES)
+    bool          File_MpegPs_PTS_Begin_IsNearZero;
+    #endif //defined(MEDIAINFO_MPEGPS_YES)
     int64u        File_Current_Offset;
     int64u        File_Current_Size;
     int64u        File_IgnoreEditsBefore;
@@ -411,6 +417,7 @@ private :
         bool                File_IgnoreSequenceFilesCount;
         int64u              File_SequenceFilesSkipFrames;
         float64             File_DefaultFrameRate;
+        string              File_DefaultTimeCode;
         bool                File_Source_List;
         bool                File_RiskyBitRateEstimation;
         bool                File_MergeBitRateInfo;

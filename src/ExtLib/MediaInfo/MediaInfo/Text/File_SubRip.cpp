@@ -101,6 +101,9 @@ File_SubRip::File_SubRip()
     //Temp
     IsVTT=false;
     HasBOM=false;
+    #if MEDIAINFO_DEMUX
+        Items_Pos=0;
+    #endif //MEDIAINFO_DEMUX
 }
 
 //***************************************************************************
@@ -232,6 +235,9 @@ bool File_SubRip::FileHeader_Begin()
 size_t File_SubRip::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
 {
     GoTo(0);
+    #if MEDIAINFO_DEMUX
+        Items_Pos=0;
+    #endif //MEDIAINFO_DEMUX
     Open_Buffer_Unsynch();
     return 1;
 }
@@ -243,6 +249,46 @@ void File_SubRip::Read_Buffer_Continue()
     #if MEDIAINFO_DEMUX
         Demux(Buffer+(HasBOM?3:0), Buffer_Size-((HasBOM && Buffer_Size>=3)?3:0), ContentType_MainStream);
     #endif //MEDIAINFO_DEMUX
+
+    // Output
+    #if MEDIAINFO_EVENTS
+        for (; Items_Pos<Items.size(); Items_Pos++)
+        {
+            Frame_Count_NotParsedIncluded=Frame_Count;
+            EVENT_BEGIN (Global, SimpleText, 0)
+                Event.DTS=Items[Items_Pos].PTS_Begin;
+                Event.PTS=Event.DTS;
+                Event.DUR=Items[Items_Pos].PTS_End-Items[Items_Pos].PTS_Begin;
+                Event.Content=Items[Items_Pos].Content.c_str();
+                Event.Flags=IsVTT?1:0;
+                Event.MuxingMode=(int8u)-1;
+                Event.Service=(int8u)-1;
+                Event.Row_Max=0;
+                Event.Column_Max=0;
+                Event.Row_Values=NULL;
+                Event.Row_Attributes=NULL;
+            EVENT_END   ()
+            
+            if (Items_Pos+1==Items.size() || Items[Items_Pos].PTS_End!=Items[Items_Pos+1].PTS_Begin)
+            {
+                EVENT_BEGIN (Global, SimpleText, 0)
+                    Event.DTS=Items[Items_Pos].PTS_End;
+                    Event.PTS=Event.DTS;
+                    Event.DUR=0;
+                    Event.Content=__T("");
+                    Event.Flags=IsVTT?1:0;
+                    Event.MuxingMode=(int8u)-1;
+                    Event.Service=(int8u)-1;
+                    Event.Row_Max=0;
+                    Event.Column_Max=0;
+                    Event.Row_Values=NULL;
+                    Event.Row_Attributes=NULL;
+                EVENT_END   ()
+            }
+
+            Frame_Count++;
+        }
+    #endif //MEDIAINFO_EVENTS
 
     Buffer_Offset=Buffer_Size;
 }

@@ -311,7 +311,7 @@ namespace Elements
 // for each data byte do
 //     CRC32=(CRC32>>8) ^ Mk_CRC32_Table[(CRC32&0xFF)^*Buffer_Current++];
 // End: CRC32 ^= 0;
-int32u Mk_CRC32_Table[256] =
+static const int32u Mk_CRC32_Table[256] =
 {
     0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA,
     0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
@@ -380,7 +380,7 @@ int32u Mk_CRC32_Table[256] =
 };
 
 //---------------------------------------------------------------------------
-const char* Mk_ContentCompAlgo(int64u Algo)
+static const char* Mk_ContentCompAlgo(int64u Algo)
 {
     switch (Algo)
     {
@@ -393,7 +393,7 @@ const char* Mk_ContentCompAlgo(int64u Algo)
 }
 
 //---------------------------------------------------------------------------
-const char* Mk_StereoMode(int64u StereoMode)
+static const char* Mk_StereoMode(int64u StereoMode)
 {
     switch (StereoMode)
     {
@@ -417,7 +417,7 @@ const char* Mk_StereoMode(int64u StereoMode)
 }
 
 //---------------------------------------------------------------------------
-const char* Mk_StereoMode_v2(int64u StereoMode)
+static const char* Mk_StereoMode_v2(int64u StereoMode)
 {
     switch (StereoMode)
     {
@@ -430,7 +430,7 @@ const char* Mk_StereoMode_v2(int64u StereoMode)
 }
 
 //---------------------------------------------------------------------------
-const char* Mk_OriginalSourceMedium_From_Source_ID (const Ztring &Value)
+static const char* Mk_OriginalSourceMedium_From_Source_ID (const Ztring &Value)
 {
     if (Value.size()==6 && Value[0] == __T('0') && Value[1] == __T('0'))
         return "Blu-ray";
@@ -440,7 +440,7 @@ const char* Mk_OriginalSourceMedium_From_Source_ID (const Ztring &Value)
 }
 
 //---------------------------------------------------------------------------
-Ztring Mk_ID_From_Source_ID (const Ztring &Value)
+static Ztring Mk_ID_From_Source_ID (const Ztring &Value)
 {
     if (Value.size()==6 && Value[0] == __T('0') && Value[1] == __T('0'))
     {
@@ -490,7 +490,7 @@ Ztring Mk_ID_From_Source_ID (const Ztring &Value)
 }
 
 //---------------------------------------------------------------------------
-Ztring Mk_ID_String_From_Source_ID (const Ztring &Value)
+static Ztring Mk_ID_String_From_Source_ID (const Ztring &Value)
 {
     if (Value.size()==6 && Value[0] == __T('0') && Value[1] == __T('0'))
     {

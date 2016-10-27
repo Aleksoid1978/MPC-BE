@@ -36,7 +36,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-int8u ilog(int32u Value)
+static int8u ilog(int32u Value)
 {
     int8u ToReturn=0;
     while(Value)

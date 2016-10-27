@@ -38,7 +38,7 @@ namespace MediaInfoLib
 // Info
 //***************************************************************************
 
-const char* AAf_tagSTGTY (int8u tagSTGTY)
+static const char* AAf_tagSTGTY (int8u tagSTGTY)
 {
     switch (tagSTGTY)
     {
@@ -52,7 +52,7 @@ const char* AAf_tagSTGTY (int8u tagSTGTY)
     }
 }
 
-const char* AAf_tagDECOLOR (int8u tagDECOLOR)
+static const char* AAf_tagDECOLOR (int8u tagDECOLOR)
 {
     switch (tagDECOLOR)
     {

@@ -44,7 +44,7 @@ extern MediaInfo_Config Config;
 size_t File__Analyze::Stream_Prepare (stream_t KindOfStream, size_t StreamPos)
 {
     //Integrity
-    if (!Status[IsAccepted] || KindOfStream>Stream_Max)
+    if (KindOfStream>Stream_Max)
         return Error;
 
     //Clear
@@ -169,18 +169,19 @@ size_t File__Analyze::Stream_Prepare (stream_t KindOfStream, size_t StreamPos)
         Fill (Stream_General, 0, General_FileSize, File_Size);
 
     //Fill with already ready data
-    for (size_t Pos=0; Pos<Fill_Temp.size(); Pos++)
-        if (Fill_Temp(Pos, 0).IsNumber())
-            Fill(StreamKind_Last, StreamPos_Last, Fill_Temp(Pos, 0).To_int32u(), Fill_Temp(Pos, 1));
+    stream_t Fill_Temp_StreamKind=(Fill_Temp[StreamKind_Last].empty()?Stream_Max:StreamKind_Last);
+    for (size_t Pos=0; Pos<Fill_Temp[Fill_Temp_StreamKind].size(); Pos++)
+        if (Fill_Temp[Fill_Temp_StreamKind][Pos].Parameter.IsNumber())
+            Fill(StreamKind_Last, StreamPos_Last, Fill_Temp[Fill_Temp_StreamKind][Pos].Parameter.To_int32u(), Fill_Temp[Fill_Temp_StreamKind][Pos].Value);
         else
         {
-            Fill(StreamKind_Last, StreamPos_Last, Fill_Temp(Pos, 0).To_UTF8().c_str(), Fill_Temp(Pos, 1));
+            Fill(StreamKind_Last, StreamPos_Last, Fill_Temp[Fill_Temp_StreamKind][Pos].Parameter.To_UTF8().c_str(), Fill_Temp[Fill_Temp_StreamKind][Pos].Value);
             #if MEDIAINFO_DEMUX
                 if (!Retrieve(KindOfStream, StreamPos_Last, "Demux_InitBytes").empty())
                     (*Stream_More)[KindOfStream][StreamPos_Last](Ztring().From_Local("Demux_InitBytes"), Info_Options)=__T("N NT"); //TODO: find a better way to hide additional fields by default
             #endif //MEDIAINFO_DEMUX
         }
-    Fill_Temp.clear();
+    Fill_Temp[Fill_Temp_StreamKind].clear();
 
     return StreamPos_Last; //The position in the stream count
 }
@@ -188,7 +189,7 @@ size_t File__Analyze::Stream_Prepare (stream_t KindOfStream, size_t StreamPos)
 size_t File__Analyze::Stream_Erase (stream_t KindOfStream, size_t StreamPos)
 {
     //Integrity
-    if (!Status[IsAccepted] || KindOfStream>Stream_Max || StreamPos>=Count_Get(KindOfStream))
+    if (KindOfStream>Stream_Max || StreamPos>=Count_Get(KindOfStream))
         return Error;
 
     //Filling Lists & Counts
@@ -257,16 +258,55 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
     }
 
     //Integrity
-    if (!Status[IsAccepted] || StreamKind>Stream_Max || Parameter==(size_t)-1)
+    if (StreamKind>Stream_Max || Parameter==(size_t)-1)
         return;
+
+    //Handling values with \r\n inside
+    if (Value.find(__T('\r'))!=string::npos || Value.find(__T('\n'))!=string::npos)
+    {
+        Ztring NewValue=Value;
+        NewValue.FindAndReplace(__T("\r\n"), __T(" / "), 0, Ztring_Recursive);
+        NewValue.FindAndReplace(__T("\r"), __T(" / "), 0, Ztring_Recursive);
+        NewValue.FindAndReplace(__T("\n"), __T(" / "), 0, Ztring_Recursive);
+        if (NewValue.size()>=3 && NewValue.rfind(__T(" / "))==NewValue.size()-3)
+            NewValue.resize(NewValue.size()-3);
+        Fill(StreamKind, StreamPos, Parameter, NewValue, Replace);
+        return;
+    }
 
     //Handle Value before StreamKind
     if (StreamKind==Stream_Max || StreamPos>=(*Stream)[StreamKind].size())
     {
-        ZtringList NewList;
-        NewList.push_back(Ztring().From_Number(Parameter));
-        NewList.push_back(Value);
-        Fill_Temp.push_back(NewList);
+        size_t StreamKindS=(size_t)StreamKind;
+        if (StreamKind!=Stream_Max)
+        {
+            //Stream kind is found, moving content
+            for (size_t Pos=0; Pos<Fill_Temp[Stream_Max].size(); Pos++)
+                Fill_Temp[StreamKind].push_back(Fill_Temp[Stream_Max][Pos]);
+            Fill_Temp[Stream_Max].clear();
+        }
+        else
+        {
+            //Stream kind is not found, checking if it was found previously
+            for (StreamKindS=(size_t)Stream_General+1; StreamKindS<(size_t)Stream_Max; StreamKindS++)
+                if (!Fill_Temp[StreamKindS].empty())
+                    break;
+        }
+
+        if (Replace)
+        {
+            Ztring Parameter_String=Ztring::ToZtring(Parameter);
+            for (size_t Pos=0; Pos<Fill_Temp[StreamKindS].size(); Pos++)
+                if (Fill_Temp[StreamKindS][Pos].Parameter==Parameter_String)
+                {
+                    Fill_Temp[StreamKindS][Pos].Value=Value;
+                    return;
+                }
+        }
+        fill_temp_item NewList;
+        NewList.Parameter=Ztring::ToZtring(Parameter);
+        NewList.Value=Value;
+        Fill_Temp[StreamKindS].push_back(NewList);
         return; //No streams
     }
 
@@ -861,24 +901,55 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
 void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, const Ztring &Value, bool Replace)
 {
     //Integrity
-    if (!Status[IsAccepted] || StreamKind>Stream_Max || Parameter==NULL || Parameter[0]=='\0')
+    if (StreamKind>Stream_Max || Parameter==NULL || Parameter[0]=='\0')
         return;
+
+    //Handling values with \r\n inside
+    if (Value.find(__T('\r'))!=string::npos || Value.find(__T('\n'))!=string::npos)
+    {
+        Ztring NewValue=Value;
+        NewValue.FindAndReplace(__T("\r\n"), __T(" / "), 0, Ztring_Recursive);
+        NewValue.FindAndReplace(__T("\r"), __T(" / "), 0, Ztring_Recursive);
+        NewValue.FindAndReplace(__T("\n"), __T(" / "), 0, Ztring_Recursive);
+        if (NewValue.size()>=3 && NewValue.rfind(__T(" / "))==NewValue.size()-3)
+            NewValue.resize(NewValue.size()-3);
+        Fill(StreamKind, StreamPos, Parameter, NewValue, Replace);
+        return;
+    }
 
     //Handle Value before StreamKind
     if (StreamKind==Stream_Max || StreamPos>=(*Stream)[StreamKind].size())
     {
-        Ztring ParameterZ=Ztring().From_UTF8(Parameter);
+        size_t StreamKindS=(size_t)StreamKind;
+        if (StreamKind!=Stream_Max)
+        {
+            //Stream kind is found, moving content
+            for (size_t Pos=0; Pos<Fill_Temp[Stream_Max].size(); Pos++)
+                Fill_Temp[StreamKind].push_back(Fill_Temp[Stream_Max][Pos]);
+            Fill_Temp[Stream_Max].clear();
+        }
+        else
+        {
+            //Stream kind is not found, checking if it was found previously
+            for (StreamKindS=(size_t)Stream_General+1; StreamKindS<(size_t)Stream_Max; StreamKindS++)
+                if (!Fill_Temp[StreamKindS].empty())
+                    break;
+        }
+
         if (Replace)
-            for (size_t Pos=0; Pos<Fill_Temp.size(); Pos++)
-                if (Fill_Temp[Pos](0)==ParameterZ)
+        {
+            Ztring Parameter_String=Ztring().From_UTF8(Parameter);
+            for (size_t Pos=0; Pos<Fill_Temp[StreamKindS].size(); Pos++)
+                if (Fill_Temp[StreamKindS][Pos].Parameter==Parameter_String)
                 {
-                    Fill_Temp.erase(Fill_Temp.begin()+Pos);
-                    Pos--;
+                    Fill_Temp[StreamKindS][Pos].Value=Value;
+                    return;
                 }
-        ZtringList NewList;
-        NewList.push_back(ParameterZ);
-        NewList.push_back(Value);
-        Fill_Temp.push_back(NewList);
+        }
+        fill_temp_item NewList;
+        NewList.Parameter=Ztring().From_UTF8(Parameter);
+        NewList.Value=Value;
+        Fill_Temp[StreamKindS].push_back(NewList);
         return; //No streams
     }
 
@@ -1006,9 +1077,13 @@ void File__Analyze::Clear (stream_t StreamKind, size_t StreamPos, const char* Pa
 
     if (StreamPos>=(*Stream)[StreamKind].size())
     {
-        size_t Pos=Fill_Temp.Find(Ztring().From_UTF8(Parameter));
-        if (Pos!=string::npos)
-            Fill_Temp.erase(Fill_Temp.begin()+Pos);
+        Ztring Parameter_String=Ztring().From_UTF8(Parameter);
+        for (size_t Pos=0; Pos<Fill_Temp[StreamKind].size(); Pos++)
+            if (Fill_Temp[StreamKind][Pos].Parameter==Parameter_String)
+            {
+                Fill_Temp[StreamKind].erase(Fill_Temp[StreamKind].begin() + Pos);
+                return;
+            }
         return;
     }
 
@@ -1120,7 +1195,8 @@ void File__Analyze::Clear (stream_t StreamKind)
 void File__Analyze::Fill_Flush()
 {
     Stream_Prepare(Stream_Max); //clear filling
-    Fill_Temp.clear();
+    for (size_t StreamKind=(size_t)Stream_General; StreamKind<(size_t)Stream_Max+1; StreamKind++) // +1 because Fill_Temp[Stream_Max] is used when StreamKind is unknown
+        Fill_Temp[StreamKind].clear();
 }
 
 //---------------------------------------------------------------------------
@@ -1208,7 +1284,7 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, bool Erase)
 size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t StreamPos_From, size_t StreamPos_To, bool Erase)
 {
     //Integrity
-    if (!Status[IsAccepted] || &ToAdd==NULL || StreamKind>=Stream_Max || !ToAdd.Stream || StreamPos_From>=(*ToAdd.Stream)[StreamKind].size())
+    if (&ToAdd==NULL || StreamKind>=Stream_Max || !ToAdd.Stream || StreamPos_From>=(*ToAdd.Stream)[StreamKind].size())
         return 0;
 
     //Destination

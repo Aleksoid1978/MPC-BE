@@ -42,7 +42,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Cdp_cc_type(int8u cc_type)
+static const char* Cdp_cc_type(int8u cc_type)
 {
     switch (cc_type)
     {
@@ -55,7 +55,7 @@ const char* Cdp_cc_type(int8u cc_type)
 }
 
 //---------------------------------------------------------------------------
-float32 Cdp_cdp_frame_rate(int8u cdp_frame_rate)
+static float32 Cdp_cdp_frame_rate(int8u cdp_frame_rate)
 {
     switch (cdp_frame_rate)
     {

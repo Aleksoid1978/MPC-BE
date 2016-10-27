@@ -41,7 +41,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Tga_Image_Type_Compression(int8u Image_Type)
+static const char* Tga_Image_Type_Compression(int8u Image_Type)
 {
     switch (Image_Type)
     {
@@ -58,7 +58,7 @@ const char* Tga_Image_Type_Compression(int8u Image_Type)
 }
 
 //---------------------------------------------------------------------------
-const char* Tga_Image_Type_ColorSpace(int8u Image_Type)
+static const char* Tga_Image_Type_ColorSpace(int8u Image_Type)
 {
     switch (Image_Type)
     {

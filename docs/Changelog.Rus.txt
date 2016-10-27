@@ -12,11 +12,12 @@ Windows XP больше не поддерживается.
 
 Обновлены библиотеки:
 	ffmpeg git-n3.2-dev-1065-g97e7f03;
-	jsoncpp 1.7.5;
+	jsoncpp git-1.7.7-2-ga1db52b;
 	libflac git-1.3.1-215-ga52177b;
 	Little-CMS git-2.7-69-g5c23621;
-	MediaInfo v0.7.89;
+	MediaInfo git-v0.7.89-122-gbf9e14f;
 	soxr git-0.1.2-22-g5fa7eeb;
+	ZenLib git-v0.4.33-40-gb8e6f4d.
 
 1.4.6
 ==============================

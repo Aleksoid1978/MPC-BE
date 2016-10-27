@@ -1243,6 +1243,7 @@ void File__Analyze::Get_Local(int64u Bytes, Ztring &Info)
 }
 
 //---------------------------------------------------------------------------
+extern const wchar_t ISO_6937_2_Tables[];
 void File__Analyze::Get_ISO_6937_2(int64u Bytes, Ztring &Info)
 {
     INTEGRITY_SIZE_ATLEAST_STRING(Bytes);
@@ -1336,15 +1337,19 @@ void File__Analyze::Get_ISO_6937_2(int64u Bytes, Ztring &Info)
         {
             if (Pos+1<End)
             {
+                if (Buffer[Pos]>=0xC0 && Buffer[Pos]<=0xCF && Buffer[Pos+1]>=0x40 && Buffer[Pos+1]<=0x7F)
+                    Info+=Ztring().From_Unicode(ISO_6937_2_Tables[((Buffer[Pos]-0xC0))*0x40+(Buffer[Pos+1]-0x40)]);
+                else
+                {
                 Info+=(Char)(Buffer[Pos+1]);
                 Info+=Ztring().From_Unicode(&EscapeChar, 1); //(EscapeChar) after new ZenLib release
+                }
                 EscapeChar=__T('\x0000');
                 Pos++;
             }
         }
         else if (NewChar)
             Info+=Ztring().From_Unicode(&NewChar, 1); //(NewChar) after new ZenLib release
-
     }
     Element_Offset+=Bytes;
 }

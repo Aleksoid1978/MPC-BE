@@ -38,7 +38,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const int16u Wvpk_Resolution[]=
+static const int16u Wvpk_Resolution[]=
 {
      8,
     16,
@@ -47,7 +47,7 @@ const int16u Wvpk_Resolution[]=
 };
 
 //---------------------------------------------------------------------------
-const int32u Wvpk_SamplingRate[]=
+static const int32u Wvpk_SamplingRate[]=
 {
       6000,
       8000,
@@ -68,7 +68,7 @@ const int32u Wvpk_SamplingRate[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Wvpk_id(int8u ID)
+static const char* Wvpk_id(int8u ID)
 {
     switch (ID)
     {
@@ -576,7 +576,7 @@ void File_Wvpk::id_07()
 
     FILLING_BEGIN();
         if (Retrieve(Stream_Audio, 0, Audio_Compression_Mode).empty())
-            Fill(Stream_Audio, 0, Audio_Compression_Mode, "Lossless");
+            Fill(Stream_Audio, 0, Audio_Compression_Mode, "Lossless", Unlimited, true, true);
     FILLING_END();
 }
 

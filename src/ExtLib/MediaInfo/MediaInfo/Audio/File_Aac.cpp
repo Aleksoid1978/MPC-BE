@@ -40,6 +40,12 @@ namespace MediaInfoLib
 File_Aac::File_Aac()
 :File__Analyze(), File__Tags_Helper()
 {
+    //Config
+    #if MEDIAINFO_EVENTS
+        ParserIDs[0]=MediaInfo_Parser_Aac;
+        StreamIDs_Width[0]=0;
+    #endif //MEDIAINFO_EVENTS
+
     //File__Tags_Helper
     Base=this;
 

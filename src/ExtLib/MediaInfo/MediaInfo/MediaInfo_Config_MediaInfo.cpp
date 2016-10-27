@@ -120,8 +120,8 @@ using namespace std;
         _TOAPPEND; \
         Debug_Close();
 #else // MEDIAINFO_DEBUG
-    #define MEDIAINFO_DEBUG1(_NAME,__TOAPPEND)
-    #define MEDIAINFO_DEBUG2(_NAME,__TOAPPEND)
+    #define MEDIAINFO_DEBUG1(_NAME,_TOAPPEND)
+    #define MEDIAINFO_DEBUG2(_NAME,_TOAPPEND)
 #endif // MEDIAINFO_DEBUG
 
 namespace MediaInfoLib
@@ -254,6 +254,9 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     File_DtvccTransport_Stream_IsPresent=false;
     File_DtvccTransport_Descriptor_IsPresent=false;
     #endif //defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+    #if defined(MEDIAINFO_MPEGPS_YES)
+    File_MpegPs_PTS_Begin_IsNearZero=false;
+    #endif //defined(MEDIAINFO_MPEGPS_YES)
     File_Current_Offset=0;
     File_Current_Size=(int64u)-1;
     File_IgnoreEditsBefore=0;
@@ -406,6 +409,15 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     {
         return File_ID_OnlyRoot_Get()?"1":"0";
     }
+    else if (Option_Lower==__T("file_ignoresequencefilesize"))
+    {
+        #if MEDIAINFO_ADVANCED
+            File_IgnoreSequenceFileSize_Set(!(Value==__T("0") || Value.empty()));
+            return Ztring();
+        #else //MEDIAINFO_ADVANCED
+            return __T("Disabled due to compilation options");
+        #endif //MEDIAINFO_ADVANCED
+    }
     else if (Option_Lower==__T("file_ignoresequencefilescount"))
     {
         #if MEDIAINFO_ADVANCED
@@ -431,6 +443,15 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
             return Ztring();
         #else //MEDIAINFO_ADVANCED
             return __T("File_DefaultFrameRate is disabled due to compilation options");
+        #endif //MEDIAINFO_ADVANCED
+    }
+    else if (Option_Lower==__T("file_defaulttimecode"))
+    {
+        #if MEDIAINFO_ADVANCED
+            File_DefaultTimeCode_Set(Ztring(Value).To_UTF8());
+            return Ztring();
+        #else //MEDIAINFO_ADVANCED
+            return __T("File_DefaultTimeCode is disabled due to compilation options");
         #endif //MEDIAINFO_ADVANCED
     }
     else if (Option_Lower==__T("file_source_list"))
@@ -1433,6 +1454,21 @@ float64 MediaInfo_Config_MediaInfo::File_DefaultFrameRate_Get ()
 {
     CriticalSectionLocker CSL(CS);
     return File_DefaultFrameRate;
+}
+#endif //MEDIAINFO_ADVANCED
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_ADVANCED
+void MediaInfo_Config_MediaInfo::File_DefaultTimeCode_Set(string NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    File_DefaultTimeCode = NewValue;
+}
+
+string MediaInfo_Config_MediaInfo::File_DefaultTimeCode_Get()
+{
+    CriticalSectionLocker CSL(CS);
+    return File_DefaultTimeCode;
 }
 #endif //MEDIAINFO_ADVANCED
 
@@ -2647,6 +2683,65 @@ void MediaInfo_Config_MediaInfo::Event_SubFile_Start(const Ztring &FileName_Abso
     memset(&Event, 0xFF, sizeof(struct MediaInfo_Event_Generic));
     Event.EventCode=MediaInfo_EventCode_Create(0, MediaInfo_Event_General_SubFile_Start, 0);
     Event.EventSize=sizeof(struct MediaInfo_Event_General_SubFile_Start_0);
+    Event.StreamIDs_Size=0;
+
+    std::string FileName_Relative_Ansi=FileName_Relative.To_UTF8();
+    std::wstring FileName_Relative_Unicode=FileName_Relative.To_Unicode();
+    std::string FileName_Absolute_Ansi=FileName_Absolute.To_UTF8();
+    std::wstring FileName_Absolute_Unicode=FileName_Absolute.To_Unicode();
+    Event.FileName_Relative=FileName_Relative_Ansi.c_str();
+    Event.FileName_Relative_Unicode=FileName_Relative_Unicode.c_str();
+    Event.FileName_Absolute=FileName_Absolute_Ansi.c_str();
+    Event.FileName_Absolute_Unicode=FileName_Absolute_Unicode.c_str();
+
+    Event_Send(NULL, (const int8u*)&Event, Event.EventSize);
+}
+
+//---------------------------------------------------------------------------
+void MediaInfo_Config_MediaInfo::Event_SubFile_Missing(const Ztring &FileName_Relative)
+{
+    struct MediaInfo_Event_General_SubFile_Missing_0 Event;
+    memset(&Event, 0xFF, sizeof(struct MediaInfo_Event_Generic));
+    Event.EventCode=MediaInfo_EventCode_Create(0, MediaInfo_Event_General_SubFile_Missing, 0);
+    Event.EventSize=sizeof(struct MediaInfo_Event_General_SubFile_Start_0);
+    Event.StreamIDs_Size=0;
+
+    std::string FileName_Relative_Ansi=FileName_Relative.To_UTF8();
+    std::wstring FileName_Relative_Unicode=FileName_Relative.To_Unicode();
+    Event.FileName_Relative=FileName_Relative_Ansi.c_str();
+    Event.FileName_Relative_Unicode=FileName_Relative_Unicode.c_str();
+    Event.FileName_Absolute=NULL;
+    Event.FileName_Absolute_Unicode=NULL;
+
+    Event_Send(NULL, (const int8u*)&Event, Event.EventSize);
+}
+
+//---------------------------------------------------------------------------
+void MediaInfo_Config_MediaInfo::Event_SubFile_Missing_Absolute(const Ztring &FileName_Absolute)
+{
+    Ztring FileName_Relative;
+    if (File_Names_RootDirectory.empty())
+    {
+        FileName FN(FileName_Absolute);
+        FileName_Relative=FN.Name_Get();
+        if (!FN.Extension_Get().empty())
+        {
+            FileName_Relative+=__T('.');
+            FileName_Relative+=FN.Extension_Get();
+        }
+    }
+    else
+    {
+        Ztring Root=File_Names_RootDirectory+PathSeparator;
+        FileName_Relative=FileName_Absolute;
+        if (FileName_Relative.find(Root)==0)
+            FileName_Relative.erase(0, Root.size());
+    }
+
+    struct MediaInfo_Event_General_SubFile_Missing_0 Event;
+    memset(&Event, 0xFF, sizeof(struct MediaInfo_Event_Generic));
+    Event.EventCode=MediaInfo_EventCode_Create(0, MediaInfo_Event_General_SubFile_Missing, 0);
+    Event.EventSize=sizeof(struct MediaInfo_Event_General_SubFile_Missing_0);
     Event.StreamIDs_Size=0;
 
     std::string FileName_Relative_Ansi=FileName_Relative.To_UTF8();

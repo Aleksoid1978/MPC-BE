@@ -53,7 +53,7 @@ namespace Elements
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Mpeg_Psi_ATSC_table_type(int16u ID)
+static const char* Mpeg_Psi_ATSC_table_type(int16u ID)
 {
     switch (ID)
     {
@@ -519,7 +519,7 @@ const char* Mpeg_Psi_table_id(int8u table_id)
 }
 
 //---------------------------------------------------------------------------
-const char* Mpeg_Psi_atsc_service_type(int8u service_type)
+static const char* Mpeg_Psi_atsc_service_type(int8u service_type)
 {
     switch (service_type)
     {
@@ -533,7 +533,7 @@ const char* Mpeg_Psi_atsc_service_type(int8u service_type)
 }
 
 //---------------------------------------------------------------------------
-string Mpeg_Psi_atsc_modulation_mode(int8u modulation_mode)
+static string Mpeg_Psi_atsc_modulation_mode(int8u modulation_mode)
 {
     switch (modulation_mode)
     {
@@ -547,7 +547,7 @@ string Mpeg_Psi_atsc_modulation_mode(int8u modulation_mode)
 }
 
 //---------------------------------------------------------------------------
-const char* Mpeg_Psi_table_id_extension(int8u table_id)
+static const char* Mpeg_Psi_table_id_extension(int8u table_id)
 {
     switch (table_id)
     {
@@ -609,7 +609,7 @@ const char* Mpeg_Psi_table_id_extension(int8u table_id)
 // Init: int32u CRC_32 = 0xFFFFFFFF;
 // for each data byte do
 //     CRC_32=(CRC_32<<8) ^ CRC_32_Table[(CRC_32>>24)^(data_byte)];
-int32u Psi_CRC_32_Table[256] =
+extern const int32u Psi_CRC_32_Table[256] =
 {
   0x00000000, 0x04C11DB7, 0x09823B6E, 0x0D4326D9,
   0x130476DC, 0x17C56B6B, 0x1A864DB2, 0x1E475005,
@@ -678,7 +678,7 @@ int32u Psi_CRC_32_Table[256] =
 };
 
 //---------------------------------------------------------------------------
-const char* Mpeg_Psi_running_status[]=
+static const char* Mpeg_Psi_running_status[]=
 {
     "",
     "Not running",
@@ -694,7 +694,7 @@ const char* Mpeg_Psi_running_status[]=
 extern const char* Mpeg_Descriptors_original_network_id(int16u original_network_id);
 
 //---------------------------------------------------------------------------
-const char* Mpeg_Psi_splice_command_type(int8u splice_command_type)
+static const char* Mpeg_Psi_splice_command_type(int8u splice_command_type)
 {
     switch (splice_command_type)
     {

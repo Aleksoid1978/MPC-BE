@@ -78,6 +78,7 @@ const char* Avc_profile_idc(int8u profile_idc)
 #endif //MEDIAINFO_ADVANCED2
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+    #include "MediaInfo/MediaInfo_Config_PerPackage.h"
     #include "MediaInfo/MediaInfo_Events.h"
     #include "MediaInfo/MediaInfo_Events_Internal.h"
 #endif //MEDIAINFO_EVENTS
@@ -141,7 +142,7 @@ const char* Avc_video_full_range[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Avc_primary_pic_type[]=
+static const char* Avc_primary_pic_type[]=
 {
     "I",
     "I, P",
@@ -154,7 +155,7 @@ const char* Avc_primary_pic_type[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Avc_slice_type[]=
+static const char* Avc_slice_type[]=
 {
     "P",
     "B",
@@ -170,7 +171,7 @@ const char* Avc_slice_type[]=
 
 //---------------------------------------------------------------------------
 const int8u Avc_pic_struct_Size=9;
-const char* Avc_pic_struct[]=
+static const char* Avc_pic_struct[]=
 {
     "frame",
     "top field",
@@ -184,7 +185,7 @@ const char* Avc_pic_struct[]=
 };
 
 //---------------------------------------------------------------------------
-const int8u Avc_NumClockTS[]=
+static const int8u Avc_NumClockTS[]=
 {
     1,
     1,
@@ -198,7 +199,7 @@ const int8u Avc_NumClockTS[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Avc_ct_type[]=
+static const char* Avc_ct_type[]=
 {
     "Progressive",
     "Interlaced",
@@ -207,7 +208,7 @@ const char* Avc_ct_type[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Avc_Colorimetry_format_idc[]=
+static const char* Avc_Colorimetry_format_idc[]=
 {
     "monochrome",
     "4:2:0",
@@ -216,7 +217,7 @@ const char* Avc_Colorimetry_format_idc[]=
 };
 
 //---------------------------------------------------------------------------
-const int8u Avc_SubWidthC[]=
+static const int8u Avc_SubWidthC[]=
 {
     1,
     2,
@@ -375,6 +376,7 @@ namespace AVC_Intra_Headers
                                                             0x1E, 0x30, 0x10, 0x10, 0x14, 0x00, 0x00, 0x0F, 0xA4, 0x00, 0x07, 0x53, 0x02, 0x10, 0x00, 0x00,
                                                             0x00, 0x00, 0x01, 0x68, 0xCE, 0x33, 0x48, 0xD0 };
 };
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -1018,6 +1020,7 @@ bool File_Avc::Demux_UnpacketizeContainer_Test()
 
         //Computing final size
         size_t TranscodedBuffer_Size=0;
+        size_t Buffer_Offset_Save=Buffer_Offset;
         while (Buffer_Offset+SizeOfNALU_Minus1+1+1<=Buffer_Size)
         {
             size_t Size;
@@ -1065,7 +1068,7 @@ bool File_Avc::Demux_UnpacketizeContainer_Test()
             TranscodedBuffer_Size+=Size;
             Buffer_Offset+=Size;
         }
-        Buffer_Offset=0;
+        Buffer_Offset=Buffer_Offset_Save;
 
         //Adding SPS/PPS sizes
         if (RandomAccess)
@@ -1224,7 +1227,14 @@ bool File_Avc::Demux_UnpacketizeContainer_Test()
         File_Avc* MI=new File_Avc;
         Element_Code=(int64u)-1;
         Open_Buffer_Init(MI);
+        #ifdef MEDIAINFO_EVENTS
+            MediaInfo_Config_PerPackage* Config_PerPackage_Temp=MI->Config->Config_PerPackage;
+            MI->Config->Config_PerPackage=NULL;
+        #endif //MEDIAINFO_EVENTS
         Open_Buffer_Continue(MI, Buffer, Buffer_Size);
+        #ifdef MEDIAINFO_EVENTS
+            MI->Config->Config_PerPackage=Config_PerPackage_Temp;
+        #endif //MEDIAINFO_EVENTS
         bool IsOk=MI->Status[IsAccepted];
         delete MI;
         if (!IsOk)
@@ -1780,6 +1790,58 @@ void File_Avc::Data_Parse()
         }
     #endif //MEDIAINFO_ADVANCED2
 
+    #if MEDIAINFO_DEMUX
+        if (Demux_Avc_Transcode_Iso14496_15_to_Iso14496_10)
+        {
+            if (Element_Code==0x07)
+            {
+                std::vector<seq_parameter_set_struct*>::iterator Data_Item=seq_parameter_sets.begin();
+                if (Data_Item!=seq_parameter_sets.end() && (*Data_Item))
+                {
+                    delete[] (*Data_Item)->Iso14496_10_Buffer;
+                    (*Data_Item)->Iso14496_10_Buffer_Size=(size_t)(Element_Size+4);
+                    (*Data_Item)->Iso14496_10_Buffer=new int8u[(*Data_Item)->Iso14496_10_Buffer_Size];
+                    (*Data_Item)->Iso14496_10_Buffer[0]=0x00;
+                    (*Data_Item)->Iso14496_10_Buffer[1]=0x00;
+                    (*Data_Item)->Iso14496_10_Buffer[2]=0x01;
+                    (*Data_Item)->Iso14496_10_Buffer[3]=0x67;
+                    std::memcpy((*Data_Item)->Iso14496_10_Buffer+4, Buffer+Buffer_Offset, (size_t)Element_Size);
+                }
+            }
+            if (Element_Code==0x08)
+            {
+                std::vector<pic_parameter_set_struct*>::iterator Data_Item=pic_parameter_sets.begin();
+                if (Data_Item!=pic_parameter_sets.end() && (*Data_Item))
+                {
+                    delete[] (*Data_Item)->Iso14496_10_Buffer;
+                    (*Data_Item)->Iso14496_10_Buffer_Size=(size_t)(Element_Size+4);
+                    (*Data_Item)->Iso14496_10_Buffer=new int8u[(*Data_Item)->Iso14496_10_Buffer_Size];
+                    (*Data_Item)->Iso14496_10_Buffer[0]=0x00;
+                    (*Data_Item)->Iso14496_10_Buffer[1]=0x00;
+                    (*Data_Item)->Iso14496_10_Buffer[2]=0x01;
+                    (*Data_Item)->Iso14496_10_Buffer[3]=0x68;
+                    std::memcpy((*Data_Item)->Iso14496_10_Buffer+4, Buffer+Buffer_Offset, (size_t)Element_Size);
+                }
+            }
+            if (Element_Code==0x0F)
+            {
+                std::vector<seq_parameter_set_struct*>::iterator Data_Item=subset_seq_parameter_sets.begin();
+                if (Data_Item!=subset_seq_parameter_sets.end() && (*Data_Item))
+                {
+                    SizeOfNALU_Minus1=0;
+                    delete[] (*Data_Item)->Iso14496_10_Buffer;
+                    (*Data_Item)->Iso14496_10_Buffer_Size=(size_t)(Element_Size+4);
+                    (*Data_Item)->Iso14496_10_Buffer=new int8u[(*Data_Item)->Iso14496_10_Buffer_Size];
+                    (*Data_Item)->Iso14496_10_Buffer[0]=0x00;
+                    (*Data_Item)->Iso14496_10_Buffer[1]=0x00;
+                    (*Data_Item)->Iso14496_10_Buffer[2]=0x01;
+                    (*Data_Item)->Iso14496_10_Buffer[3]=0x6F;
+                    std::memcpy((*Data_Item)->Iso14496_10_Buffer+4, Buffer+Buffer_Offset, (size_t)Element_Size);
+                }
+            }
+        }
+    #endif //MEDIAINFO_DEMUX
+
     //Trailing zeroes
     Element_Size=Element_Size_SaveBeforeZeroes;
 }
@@ -1843,7 +1905,21 @@ void File_Avc::slice_header()
     Get_UE (first_mb_in_slice,                                  "first_mb_in_slice");
     Get_UE (slice_type,                                         "slice_type"); Param_Info1C((slice_type<10), Avc_slice_type[slice_type]);
     #if MEDIAINFO_EVENTS
+        if (!first_mb_in_slice)
         {
+            switch(Element_Code)
+            {
+                case 5 :    // This is an IDR frame
+                            if (Config->Config_PerPackage && Element_Code==0x05) // First slice of an IDR frame
+                            {
+                                // IDR
+                                Config->Config_PerPackage->FrameForAlignment(this, true);
+                                Config->Config_PerPackage->IsClosedGOP(this);
+                            }
+                            break;
+                default :   ; // This is not an IDR frame
+            }
+
             EVENT_BEGIN (Video, SliceInfo, 0)
                 Event.FieldPosition=Field_Count;
                 Event.SlicePosition=Element_IsOK()?first_mb_in_slice:(int64u)-1;

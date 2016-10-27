@@ -79,6 +79,7 @@ bool File_Pdf::FileHeader_Begin()
     //Temp
     Catalog_Level=0;
     Offsets_Max=0;
+    Objects_Current=Objects.end();
 
     //All should be OK...
     return true;
@@ -192,6 +193,9 @@ void File_Pdf::Data_Parse()
 
     for (;;)
     {
+        if (Objects_Current==Objects.end())
+            break;
+
         Objects_Current->second.BottomPos++;
         if (Objects_Current->second.BottomPos>=Objects_Current->second.Bottoms.size())
         {
@@ -341,7 +345,7 @@ void File_Pdf::trailer()
     objects::iterator Object_Top=Objects.find((int32u)-1);
     if (Offsets.empty() || Object_Top==Objects.end())
     {
-        Finish();
+        ForceFinish();
         return;
     }
 

@@ -34,6 +34,7 @@ public :
     //In
     void                            AddSequence(sequence* NewSequence);
     void                            UpdateFileName(const Ztring& OldFileName, const Ztring& NewFileName);
+    void                            UpdateMetaDataFromSourceEncoding(const string& SourceEncoding, const string& Name, const string& Value);
     bool                            TestContinuousFileNames;
     bool                            ContainerHasNoId;
     int64u                          ID_Max;

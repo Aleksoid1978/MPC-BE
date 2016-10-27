@@ -89,6 +89,7 @@ void File_Teletext::Streams_Finish()
     //TODO: filter subtitles and non subtitles, some files have normal teletext in subtitles block.
     if (Parser)
     {
+        Parser->Finish();
         for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
             for (size_t StreamPos=0; StreamPos<Parser->Count_Get((stream_t)StreamKind); StreamPos++)
             {
@@ -573,7 +574,7 @@ void File_Teletext::Header_Parse()
             Stream_HasChanged=0;
         }
 
-		if (C[4] && PageNumber!=0xFF)
+        if (C[4] && PageNumber!=0xFF)
         {
             stream &Stream=Streams[(X<<8)|PageNumber];
             for (size_t PosY=0; PosY<26; ++PosY)
@@ -722,6 +723,35 @@ void File_Teletext::Data_Parse()
 //---------------------------------------------------------------------------
 void File_Teletext::HasChanged()
 {
+    #if MEDIAINFO_EVENTS
+        EVENT_BEGIN (Global, SimpleText, 0)
+            wstring Content;
+            stream &Stream=Streams[Stream_HasChanged];
+            const wchar_t* Row_Values[26];
+            for (size_t PosY=0; PosY<26; ++PosY)
+            {
+                if (PosY)
+                    Content+=EOL;
+                Content+=Stream.CC_Displayed_Values[PosY];
+                Row_Values[PosY]=Stream.CC_Displayed_Values[PosY].c_str();
+            }
+            Event.StreamIDs[StreamIDs_Size-1]=Stream_HasChanged;
+            Event.DTS=FrameInfo.DTS;
+            Event.PTS=Event.DTS;
+            Event.DUR=(int64u)-1;
+            Event.Content=Content.c_str();
+            Event.Flags=0;
+            if (StreamIDs_Size>1 && Event.ParserIDs[StreamIDs_Size-2]==MediaInfo_Parser_Sdp)
+                Event.MuxingMode=12; //Ancillary data / OP-47 / SDP
+            else
+                Event.MuxingMode=14; //Usually Teletext in MPEG-TS
+            Event.Service=(int8u)-1;
+            Event.Row_Max=26;
+            Event.Column_Max=40;
+            Event.Row_Values=(wchar_t**)&Row_Values;
+            Event.Row_Attributes=NULL;
+        EVENT_END   ()
+    #endif //MEDIAINFO_EVENTS
 }
 
 //***************************************************************************

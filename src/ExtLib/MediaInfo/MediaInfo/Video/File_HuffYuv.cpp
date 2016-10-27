@@ -42,7 +42,7 @@ namespace MediaInfoLib
 // Info
 //***************************************************************************
 
-const char* HuffYUV_ColorSpace (int16u BitCount)
+static const char* HuffYUV_ColorSpace (int16u BitCount)
 {
     switch (BitCount&0xFFF8)
     {
@@ -54,7 +54,7 @@ const char* HuffYUV_ColorSpace (int16u BitCount)
     }
 }
 
-const char* HuffYUV_ChromaSubsampling (int16u BitCount)
+static const char* HuffYUV_ChromaSubsampling (int16u BitCount)
 {
     switch (BitCount&0xFFF8)
     {
@@ -64,7 +64,7 @@ const char* HuffYUV_ChromaSubsampling (int16u BitCount)
     }
 }
 
-const string HuffYUV_ColorSpace(bool rgb, bool chroma, bool alpha)
+static const string HuffYUV_ColorSpace(bool rgb, bool chroma, bool alpha)
 {
     string ToReturn;
 
@@ -83,7 +83,7 @@ const string HuffYUV_ColorSpace(bool rgb, bool chroma, bool alpha)
     return ToReturn;
 }
 
-const char* HuffYUV_method (int16u BitCount, int8u method)
+static const char* HuffYUV_method (int16u BitCount, int8u method)
 {
     switch (BitCount&0x0007)
     {

@@ -88,6 +88,17 @@ void resource::UpdateFileName(const Ztring& OldFileName, const Ztring& NewFileNa
             FileNames[Pos]=NewFileName;
 }
 
+//---------------------------------------------------------------------------
+#if MEDIAINFO_ADVANCED
+void resource::UpdateMetaDataFromSourceEncoding(const string& SourceEncoding, const string& Name, const string& Value)
+{
+    size_t SourceEncoding_Size=SourceEncodings.size();
+    for (size_t Pos=0; Pos<SourceEncoding_Size; Pos++)
+        if (SourceEncodings[Pos]==SourceEncoding)
+            MetadataFromPlaylist[Name]=Value;
+}
+#endif //MEDIAINFO_ADVANCED
+
 } //NameSpace
 
 #endif //MEDIAINFO_REFERENCES_YES

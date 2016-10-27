@@ -37,6 +37,9 @@ public :
     bool    HasCcis;
     bool    ParseCcis;
     bool    IsAncillaryData;
+    #if MEDIAINFO_EVENTS
+        int8u   MuxingMode;
+    #endif //MEDIAINFO_EVENTS
 
     //enums
     enum graphic_set

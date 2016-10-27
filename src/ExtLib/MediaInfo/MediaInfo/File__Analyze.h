@@ -1051,7 +1051,12 @@ public :
     #ifdef SIZE_T_IS_LONG
     inline void Fill (stream_t StreamKind, size_t StreamPos, const char* Parameter, size_t         Value, int8u Radix=10, bool Replace=false) {Fill(StreamKind, StreamPos, Parameter, Ztring::ToZtring(Value, Radix).MakeUpperCase(), Replace);}
     #endif //SIZE_T_IS_LONG
-    ZtringListList Fill_Temp;
+    struct fill_temp_item
+    {
+        Ztring Parameter;
+        Ztring Value;
+    };
+    vector<fill_temp_item> Fill_Temp[Stream_Max+1]; // +1 because Fill_Temp[Stream_Max] is used when StreamKind is unknown
     void Fill_Flush ();
     static size_t Fill_Parameter(stream_t StreamKind, generic StreamPos);
 
@@ -1115,6 +1120,10 @@ public :
     void CodecID_Fill           (const Ztring &Value, stream_t StreamKind, size_t StreamPos, infocodecid_format_t Format, stream_t StreamKind_CodecID=Stream_Max);
     void PixelAspectRatio_Fill  (const Ztring &Value, stream_t StreamKind, size_t StreamPos, size_t Parameter_Width, size_t Parameter_Height, size_t Parameter_PixelAspectRatio, size_t Parameter_DisplayAspectRatio);
     void DisplayAspectRatio_Fill(const Ztring &Value, stream_t StreamKind, size_t StreamPos, size_t Parameter_Width, size_t Parameter_Height, size_t Parameter_PixelAspectRatio, size_t Parameter_DisplayAspectRatio);
+    #if MEDIAINFO_EVENTS
+    static stream_t Streamkind_Get(int8u* ParserIDs, size_t StreamIDs_Size) {if ((ParserIDs[StreamIDs_Size-1]&0xF0)==0x80) return Stream_Video; if ((ParserIDs[StreamIDs_Size-1]&0xF0)==0xA0) return Stream_Audio; return Stream_Max;}
+    stream_t Streamkind_Get() {return Streamkind_Get(ParserIDs, StreamIDs_Size);}
+    #endif //MEDIAINFO_EVENTS
 
     //***************************************************************************
     // Finalize

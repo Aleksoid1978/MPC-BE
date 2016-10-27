@@ -40,21 +40,21 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char*  DTS_FrameType[]=
+static const char*  DTS_FrameType[]=
 {
     "Termination",
     "Normal",
 };
 
 //---------------------------------------------------------------------------
-const int32u DTS_SamplingRate[]=
+static const int32u DTS_SamplingRate[]=
 {
         0,  8000,  16000,  32000,      0,      0,  11025,  22050,
     44100,     0,      0,  12000,  24000,  48000,  96000, 192000,
 };
 
 //---------------------------------------------------------------------------
-const int32u DTS_BitRate[]=
+static const int32u DTS_BitRate[]=
 {
       32000,   56000,   64000,   96000,  112000,  128000,  192000,  224000,
      256000,  320000,  384000,  448000,  512000,  576000,  640000,  754500,
@@ -63,14 +63,14 @@ const int32u DTS_BitRate[]=
 };
 
 //---------------------------------------------------------------------------
-const int8u DTS_Channels[]=
+static const int8u DTS_Channels[]=
 {
     1, 2, 2, 2, 2, 3, 3, 4,
     4, 5, 6, 6, 6, 7, 8, 8,
 };
 
 //---------------------------------------------------------------------------
-const int8u DTS_Resolution[]=
+static const int8u DTS_Resolution[]=
 {16, 20, 24, 24};
 
 //---------------------------------------------------------------------------
@@ -116,7 +116,7 @@ const char*  DTS_ChannelPositions2[16]=
 };
 
 //---------------------------------------------------------------------------
-const char*  DTS_ChannelLayout[16]=
+static const char*  DTS_ChannelLayout[16]=
 {
     "C",
     "1+1",
@@ -137,7 +137,7 @@ const char*  DTS_ChannelLayout[16]=
 };
 
 //---------------------------------------------------------------------------
-const char* DTS_ExtensionAudioDescriptor[]=
+static const char* DTS_ExtensionAudioDescriptor[]=
 {
     "Channel Extension",
     "Reserved",
@@ -150,7 +150,7 @@ const char* DTS_ExtensionAudioDescriptor[]=
 };
 
 //---------------------------------------------------------------------------
-const char* DTS_HD_RefClockCode[]=
+static const char* DTS_HD_RefClockCode[]=
 {
     "1/32000",
     "1/44100",
@@ -290,7 +290,7 @@ std::string DTS_HD_SpeakerActivityMask2 (int16u SpeakerActivityMask, bool AddCs=
 }
 
 //---------------------------------------------------------------------------
-const char* DTS_HD_TypeDescriptor[]=
+static const char* DTS_HD_TypeDescriptor[]=
 {
     "Music",
     "Effects",
@@ -311,7 +311,7 @@ const char* DTS_HD_TypeDescriptor[]=
 };
 
 //---------------------------------------------------------------------------
-int32u DTS_HD_MaximumSampleRate[]=
+static int32u DTS_HD_MaximumSampleRate[]=
 {
       8000,
      16000,

@@ -38,7 +38,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* OpenMG_CodecID_Format (int8u CodecID)
+static const char* OpenMG_CodecID_Format (int8u CodecID)
 {
     switch (CodecID)
     {
@@ -53,7 +53,7 @@ const char* OpenMG_CodecID_Format (int8u CodecID)
 }
 
 //---------------------------------------------------------------------------
-const char* OpenMG_CodecID_Encryption (int8u CodecID)
+static const char* OpenMG_CodecID_Encryption (int8u CodecID)
 {
     switch (CodecID)
     {
@@ -63,7 +63,7 @@ const char* OpenMG_CodecID_Encryption (int8u CodecID)
 }
 
 //---------------------------------------------------------------------------
-int32u OpenMG_SamplingRate (int8u SamplingRate_Code)
+static int32u OpenMG_SamplingRate (int8u SamplingRate_Code)
 {
     switch (SamplingRate_Code)
     {
@@ -77,7 +77,7 @@ int32u OpenMG_SamplingRate (int8u SamplingRate_Code)
 }
 
 //---------------------------------------------------------------------------
-int8u OpenMG_Channels (int8u Channels_Code)
+static int8u OpenMG_Channels (int8u Channels_Code)
 {
     if (Channels_Code<=4)
         return Channels_Code;
@@ -86,7 +86,7 @@ int8u OpenMG_Channels (int8u Channels_Code)
 }
 
 //---------------------------------------------------------------------------
-const char* OpenMG_ChannelPositions (int8u Channels_Code)
+static const char* OpenMG_ChannelPositions (int8u Channels_Code)
 {
     switch (Channels_Code)
     {

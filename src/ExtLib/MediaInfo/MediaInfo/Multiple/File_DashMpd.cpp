@@ -45,7 +45,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-void DashMpd_Transform (Ztring &Value, std::map<Ztring, Ztring> &Attributes)
+static void DashMpd_Transform (Ztring &Value, std::map<Ztring, Ztring> &Attributes)
 {
     size_t Pos1=0;
     for (;;)
@@ -78,7 +78,7 @@ void DashMpd_Transform (Ztring &Value, std::map<Ztring, Ztring> &Attributes)
 }
 
 //---------------------------------------------------------------------------
-stream_t DashMpd_mimeType_StreamKind (const char* mimeType)
+static stream_t DashMpd_mimeType_StreamKind (const char* mimeType)
 {
     Ztring StreamKind; StreamKind.From_UTF8(mimeType);
         if (StreamKind.find(__T("video"))==0)
@@ -92,7 +92,7 @@ stream_t DashMpd_mimeType_StreamKind (const char* mimeType)
 }
 
 //---------------------------------------------------------------------------
-Ztring DashMpd_codecid_CodecID (const char* codecid)
+static Ztring DashMpd_codecid_CodecID (const char* codecid)
 {
     Ztring CodecID;
 

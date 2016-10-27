@@ -59,7 +59,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Gxf_Tag_Name(int8u Tag)
+static const char* Gxf_Tag_Name(int8u Tag)
 {
     switch (Tag)
     {
@@ -87,7 +87,7 @@ const char* Gxf_Tag_Name(int8u Tag)
 }
 
 //---------------------------------------------------------------------------
-const char* Gxf_MediaTypes(int8u Type)
+static const char* Gxf_MediaTypes(int8u Type)
 {
     switch (Type)
     {
@@ -117,7 +117,7 @@ const char* Gxf_MediaTypes(int8u Type)
 }
 
 //---------------------------------------------------------------------------
-stream_t Gxf_MediaTypes_StreamKind(int8u Type)
+static stream_t Gxf_MediaTypes_StreamKind(int8u Type)
 {
     switch (Type)
     {
@@ -147,7 +147,7 @@ stream_t Gxf_MediaTypes_StreamKind(int8u Type)
 }
 
 //---------------------------------------------------------------------------
-const char* Gxf_MediaTypes_Format(int8u Type)
+static const char* Gxf_MediaTypes_Format(int8u Type)
 {
     switch (Type)
     {
@@ -189,7 +189,7 @@ double Gxf_FrameRate(int32u Content)
 }
 
 //---------------------------------------------------------------------------
-int32u Gxf_LinesPerFrame_Height(int32u Content)
+static int32u Gxf_LinesPerFrame_Height(int32u Content)
 {
     switch (Content)
     {
@@ -202,7 +202,7 @@ int32u Gxf_LinesPerFrame_Height(int32u Content)
 }
 
 //---------------------------------------------------------------------------
-int32u Gxf_LinesPerFrame_Width(int32u Content)
+static int32u Gxf_LinesPerFrame_Width(int32u Content)
 {
     switch (Content)
     {
@@ -215,7 +215,7 @@ int32u Gxf_LinesPerFrame_Width(int32u Content)
 }
 
 //---------------------------------------------------------------------------
-const char* Gxf_FieldsPerFrame(int32u Tag)
+static const char* Gxf_FieldsPerFrame(int32u Tag)
 {
     switch (Tag)
     {
@@ -1053,6 +1053,7 @@ void File_Gxf::map()
                         case 22 :
                         case 23 :   //MPEG Video
                                      {
+                                        #ifdef MEDIAINFO_MPEGV_YES
                                         File__Analyze* Parser=new File_Mpegv();
                                         ((File_Mpegv*)Parser)->FrameIsAlwaysComplete=true;
                                         ((File_Mpegv*)Parser)->Ancillary=&Ancillary;
@@ -1061,6 +1062,7 @@ void File_Gxf::map()
 
                                         Parsers_Count++;
                                         Streams[TrackID].Searching_Payload=true;
+                                        #endif //MEDIAINFO_MPEGV_YES
                                      }
                                     break;
                         case 13 :
@@ -1095,6 +1097,7 @@ void File_Gxf::map()
                                     break;
                         case 21 :   //Ancillary Metadata
                                     {
+                                        #ifdef MEDIAINFO_RIFF_YES
                                         File__Analyze* Parser=new File_Riff();
                                         ((File_Riff*)Parser)->Ancillary=&Ancillary;
                                         Open_Buffer_Init(Parser);
@@ -1110,6 +1113,7 @@ void File_Gxf::map()
                                         AncillaryData_StreamID=TrackID;
                                         if (SizeToAnalyze<8*16*1024*1024)
                                             SizeToAnalyze*=8; //10x more, to be sure to find captions
+                                        #endif //MEDIAINFO_RIFF_YES
                                     }
                                     break;
                         default :   ;

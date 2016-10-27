@@ -315,6 +315,20 @@ void File__ReferenceFilesHelper::UpdateFileName(const Ztring& OldFileName, const
     }
 }
 
+//---------------------------------------------------------------------------
+#if MEDIAINFO_ADVANCED
+void File__ReferenceFilesHelper::UpdateMetaDataFromSourceEncoding(const string& SourceEncoding, const string& Name, const string& Value)
+{
+    size_t Sequences_Size=Sequences.size();
+    for (size_t Sequences_Pos=0; Sequences_Pos<Sequences_Size; ++Sequences_Pos)
+    {
+        sequence* Sequence=Sequences[Sequences_Pos];
+
+        Sequence->UpdateMetaDataFromSourceEncoding(SourceEncoding, Name, Value);
+    }
+}
+#endif //MEDIAINFO_ADVANCED
+
 //***************************************************************************
 // Streams management
 //***************************************************************************
@@ -606,6 +620,9 @@ void File__ReferenceFilesHelper::ParseReferences()
             else
             {
                 Sequences[Sequences_Current]->Status.set(File__Analyze::IsFinished);
+                #if MEDIAINFO_EVENTS
+                    Config->Event_SubFile_Missing(Sequences[Sequences_Current]->Source);
+                #endif //MEDIAINFO_EVENTS
                 if (Sequences[Sequences_Current]->StreamKind!=Stream_Max && !Sequences[Sequences_Current]->Source.empty())
                 {
                     MI->Fill(Sequences[Sequences_Current]->StreamKind, Sequences[Sequences_Current]->StreamPos, "Source_Info", "Missing");
@@ -750,7 +767,8 @@ void File__ReferenceFilesHelper::ParseReferences()
                             else
                                 DTS_Temp=0;
                         }
-                        DTS_Temp+=(*ReferenceTemp)->Resources[(*ReferenceTemp)->Resources_Current]->Demux_Offset_DTS;
+                        if ((*ReferenceTemp)->Resources_Current<(*ReferenceTemp)->Resources.size())
+                            DTS_Temp+=(*ReferenceTemp)->Resources[(*ReferenceTemp)->Resources_Current]->Demux_Offset_DTS;
                         if (DTS_Minimal>DTS_Temp)
                             DTS_Minimal=DTS_Temp;
                     }
@@ -927,6 +945,9 @@ bool File__ReferenceFilesHelper::ParseReference_Init()
         #endif //MEDIAINFO_EVENTS
         if (!Sequences[Sequences_Current]->MI->Open(Sequences[Sequences_Current]->FileNames.Read()))
         {
+            #if MEDIAINFO_EVENTS
+                Config->Event_SubFile_Missing(Sequences[Sequences_Current]->Source);
+            #endif //MEDIAINFO_EVENTS
             if (Sequences[Sequences_Current]->StreamKind!=Stream_Max)
                 MI->Fill(Sequences[Sequences_Current]->StreamKind, Sequences[Sequences_Current]->StreamPos, "Source_Info", "Missing", Unlimited, true, true);
             if (!Config->File_KeepInfo_Get())
@@ -1185,6 +1206,9 @@ void File__ReferenceFilesHelper::ParseReference_Finalize_PerStream ()
         int64u FrameCount_Temp=0;
         int64u StreamSize_Temp=0;
         int64u FileSize_Temp=0;
+        #if MEDIAINFO_ADVANCED
+            std::vector<string> Format_Profiles_FromStream, Format_Profiles_FromContainer, Format_Profiles_FromPlaylist;
+        #endif //MEDIAINFO_ADVANCED
         for (size_t Pos=0; Pos<Sequences[Sequences_Current]->Resources.size(); Pos++)
         {
             MediaInfo_Internal MI2;
@@ -1235,7 +1259,65 @@ void File__ReferenceFilesHelper::ParseReference_Finalize_PerStream ()
                 FileSize_Temp=(int64u)-1;
                 break;
             }
+
+            #if MEDIAINFO_ADVANCED
+                //Profile
+                map<string, string>::iterator MetadataFromPlaylist_Item=Sequences[Sequences_Current]->Resources[Pos]->MetadataFromPlaylist.find("Format_Profile");
+                if (MetadataFromPlaylist_Item!=Sequences[Sequences_Current]->Resources[Pos]->MetadataFromPlaylist.end())
+                    Format_Profiles_FromPlaylist.push_back(MetadataFromPlaylist_Item->second);
+                else
+                    Format_Profiles_FromPlaylist.push_back(string());
+                Format_Profiles_FromContainer.push_back(MI2.Get(StreamKind_Last, StreamPos_From, __T("Format_Profile_FromContainer")).To_UTF8());
+                Format_Profiles_FromStream.push_back(MI2.Get(StreamKind_Last, StreamPos_From, MI->Fill_Parameter(StreamKind_Last, Generic_Format_Profile)).To_UTF8());
+            #endif //MEDIAINFO_ADVANCED
         }
+        #if MEDIAINFO_ADVANCED
+            //Test of coherency between Playlist and Stream
+            //Test of same values for all resources
+            bool Format_Profile_NotSame=false;
+            bool Format_Profile_CoherencyIssue=false;
+            bool Format_Profile_FromContainer_IsPresent=false;
+            for (size_t Pos=0; Pos<Format_Profiles_FromStream.size(); Pos++)
+            {
+                if (Format_Profiles_FromStream[Pos]!=Format_Profiles_FromStream[0])
+                    Format_Profile_NotSame=true;
+                if (!Format_Profiles_FromPlaylist[Pos].empty() && Format_Profiles_FromStream[Pos]!=Format_Profiles_FromPlaylist[Pos])
+                    Format_Profile_CoherencyIssue=true;
+                if (!Format_Profiles_FromContainer[Pos].empty())
+                    Format_Profile_FromContainer_IsPresent=true;
+            }
+            if (Format_Profile_NotSame)
+            {
+                MI->Clear(StreamKind_Last, StreamPos_To, "Format_Profile");
+                for (size_t Pos=0; Pos<Format_Profiles_FromStream.size(); Pos++)
+                    MI->Fill(StreamKind_Last, StreamPos_To, "Format_Profile", Format_Profiles_FromStream[Pos]);
+                MI->Fill(StreamKind_Last, StreamPos_To, "Format_Profile_EssencesMismatch", "Yes");
+            }
+            if (Format_Profile_CoherencyIssue)
+            {
+                MI->Clear(StreamKind_Last, StreamPos_To, "Format_Profile_FromStream");
+                if (Format_Profile_FromContainer_IsPresent)
+                    MI->Clear(StreamKind_Last, StreamPos_To, "Format_Profile_FromContainer");
+                MI->Clear(StreamKind_Last, StreamPos_To, "Format_Profile_FromPlaylist");
+                for (size_t Pos=0; Pos<Format_Profiles_FromStream.size(); Pos++)
+                {
+                    MI->Fill(StreamKind_Last, StreamPos_To, "Format_Profile_FromStream", Format_Profiles_FromStream[Pos]);
+                    if (Format_Profile_FromContainer_IsPresent)
+                        MI->Fill(StreamKind_Last, StreamPos_To, "Format_Profile_FromContainer", Format_Profiles_FromContainer[Pos].empty()?Format_Profiles_FromStream[Pos]:Format_Profiles_FromContainer[Pos]);
+                    MI->Fill(StreamKind_Last, StreamPos_To, "Format_Profile_FromPlaylist", Format_Profiles_FromPlaylist[Pos]);
+                }
+            }
+            else if (Format_Profile_FromContainer_IsPresent)
+            {
+                MI->Clear(StreamKind_Last, StreamPos_To, "Format_Profile_FromStream");
+                MI->Clear(StreamKind_Last, StreamPos_To, "Format_Profile_FromContainer");
+                for (size_t Pos=0; Pos<Format_Profiles_FromStream.size(); Pos++)
+                {
+                    MI->Fill(StreamKind_Last, StreamPos_To, "Format_Profile_FromStream", Format_Profiles_FromStream[Pos]);
+                    MI->Fill(StreamKind_Last, StreamPos_To, "Format_Profile_FromContainer", Format_Profiles_FromContainer[Pos].empty()?Format_Profiles_FromStream[Pos]:Format_Profiles_FromContainer[Pos]);
+                }
+            }
+        #endif //MEDIAINFO_ADVANCED
 
         if (Duration_Temp!=(int64u)-1)
             MI->Fill(StreamKind_Last, StreamPos_To, MI->Fill_Parameter(StreamKind_Last, Generic_Duration), Duration_Temp, 10, true);
@@ -1286,7 +1368,7 @@ void File__ReferenceFilesHelper::ParseReference_Finalize_PerStream ()
             {
                 Sequences[Sequences_Current]->MenuPos=MI->Stream_Prepare(Stream_Menu);
                 MI->Fill(Stream_Menu, Sequences[Sequences_Current]->MenuPos, General_ID, ID_Base);
-                MI->Fill(Stream_Menu, Sequences[Sequences_Current]->StreamPos, "Source", Sequences[Sequences_Current]->Source);
+                MI->Fill(Stream_Menu, Sequences[Sequences_Current]->MenuPos, "Source", Sequences[Sequences_Current]->Source);
             }
             Ztring List=Sequences[Sequences_Current]->MI->Get(StreamKind_Last, StreamPos_From, General_ID);
             Ztring List_String=Sequences[Sequences_Current]->MI->Get(StreamKind_Last, StreamPos_From, General_ID_String);
@@ -1471,6 +1553,8 @@ MediaInfo_Internal* File__ReferenceFilesHelper::MI_Create()
 {
     //Configuration
     MediaInfo_Internal* MI_Temp=new MediaInfo_Internal();
+    for (std::map<string, Ztring>::iterator Config_Item=Sequences[Sequences_Current]->Config.begin(); Config_Item!=Sequences[Sequences_Current]->Config.end(); ++Config_Item)
+        MI_Temp->Option(Ztring().From_UTF8(Config_Item->first.c_str()), Config_Item->second);
     MI_Temp->Option(__T("File_IsReferenced"), __T("1"));
     MI_Temp->Option(__T("File_FileNameFormat"), __T("CSV"));
     MI_Temp->Option(__T("File_KeepInfo"), __T("1"));
@@ -1593,6 +1677,11 @@ void File__ReferenceFilesHelper::Read_Buffer_Unsynched()
         DTS_Minimal=(int64u)-1;
         Config->Demux_EventWasSent=true; //We want not try to read new data from the file
     #endif //MEDIAINFO_DEMUX
+
+    #if MEDIAINFO_EVENTS
+        if (Config->Config_PerPackage)
+            Config->Config_PerPackage->Unsynch();
+    #endif //MEDIAINFO_EVENTS
 }
 
 //---------------------------------------------------------------------------
@@ -1634,13 +1723,21 @@ size_t File__ReferenceFilesHelper::Seek (size_t Method, int64u Value, int64u ID)
                             //Init
                             if (!Duration)
                             {
+                                Ztring FileName;
+                                if (HasMainFile)
+                                    for (size_t Sequences_Pos = 0; Sequences_Pos < Sequences.size(); Sequences_Pos++)
+                                        if (Sequences[Sequences_Pos]->IsMain && !Sequences[Sequences_Pos]->FileNames.empty())
+                                            FileName=Sequences[Sequences_Pos]->FileNames[0];
+                                if (FileName.empty())
+                                    FileName=MI->File_Name;
+
                                 MediaInfo_Internal MI2;
                                 MI2.Option(__T("File_KeepInfo"), __T("1"));
                                 Ztring ParseSpeed_Save=MI2.Option(__T("ParseSpeed_Get"), __T(""));
                                 Ztring Demux_Save=MI2.Option(__T("Demux_Get"), __T(""));
                                 MI2.Option(__T("ParseSpeed"), __T("0"));
                                 MI2.Option(__T("Demux"), Ztring());
-                                size_t MiOpenResult=MI2.Open(MI->File_Name);
+                                size_t MiOpenResult=MI2.Open(FileName);
                                 MI2.Option(__T("ParseSpeed"), ParseSpeed_Save); //This is a global value, need to reset it. TODO: local value
                                 MI2.Option(__T("Demux"), Demux_Save); //This is a global value, need to reset it. TODO: local value
                                 if (!MiOpenResult)
@@ -1721,13 +1818,21 @@ size_t File__ReferenceFilesHelper::Seek (size_t Method, int64u Value, int64u ID)
                         //Init
                         if (!Duration)
                         {
+                            Ztring FileName;
+                            if (HasMainFile)
+                                for (size_t Sequences_Pos = 0; Sequences_Pos < Sequences.size(); Sequences_Pos++)
+                                    if (Sequences[Sequences_Pos]->IsMain && !Sequences[Sequences_Pos]->FileNames.empty())
+                                        FileName=Sequences[Sequences_Pos]->FileNames[0];
+                            if (FileName.empty())
+                                FileName=MI->File_Name;
+
                             MediaInfo_Internal MI2;
                             MI2.Option(__T("File_KeepInfo"), __T("1"));
                             Ztring ParseSpeed_Save=MI2.Option(__T("ParseSpeed_Get"), __T(""));
                             Ztring Demux_Save=MI2.Option(__T("Demux_Get"), __T(""));
                             MI2.Option(__T("ParseSpeed"), __T("0"));
                             MI2.Option(__T("Demux"), Ztring());
-                            size_t MiOpenResult=MI2.Open(MI->File_Name);
+                            size_t MiOpenResult=MI2.Open(FileName);
                             MI2.Option(__T("ParseSpeed"), ParseSpeed_Save); //This is a global value, need to reset it. TODO: local value
                             MI2.Option(__T("Demux"), Demux_Save); //This is a global value, need to reset it. TODO: local value
                             if (!MiOpenResult)

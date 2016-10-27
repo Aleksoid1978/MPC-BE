@@ -102,8 +102,8 @@ int128::int128 (const char * sz) throw ()
             ++i;
         };
     };
-
-    for (; i < strlen (sz); ++i) {
+    const unsigned int len = strlen(sz);
+    for (; i < len; ++i) {
         unsigned int n = 0;
         if (sz [i] >= '0' && sz [i] <= (('0' + (int) radix) < '9'?('0' + (int) radix):'9')) //if (sz [i] >= '0' && sz [i] <= (('0' + (int) radix) <? '9'))
             n = sz [i] - '0';

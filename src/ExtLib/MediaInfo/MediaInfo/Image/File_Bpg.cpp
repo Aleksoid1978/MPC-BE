@@ -36,7 +36,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const char* Bpg_ColorSpace(int8u ColorSpace)
+static const char* Bpg_ColorSpace(int8u ColorSpace)
 {
     switch (ColorSpace)
     {
@@ -50,7 +50,7 @@ const char* Bpg_ColorSpace(int8u ColorSpace)
 };
 
 //---------------------------------------------------------------------------
-const char* Bpg_colour_primaries(int8u ColorSpace)
+static const char* Bpg_colour_primaries(int8u ColorSpace)
 {
     switch (ColorSpace)
     {
@@ -62,7 +62,7 @@ const char* Bpg_colour_primaries(int8u ColorSpace)
 };
 
 //---------------------------------------------------------------------------
-const char* Bpg_Pixel_format(int8u PixelFormat)
+static const char* Bpg_Pixel_format(int8u PixelFormat)
 {
     switch (PixelFormat)
     {

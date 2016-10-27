@@ -120,6 +120,20 @@ void sequence::UpdateFileName(const Ztring& OldFileName, const Ztring& NewFileNa
 }
 
 //---------------------------------------------------------------------------
+#if MEDIAINFO_ADVANCED
+void sequence::UpdateMetaDataFromSourceEncoding(const string& SourceEncoding, const string& Name, const string& Value)
+{
+    size_t Resources_Size=Resources.size();
+    for (size_t Resources_Pos=0; Resources_Pos<Resources_Size; ++Resources_Pos)
+    {
+        resource* Resource=Resources[Resources_Pos];
+
+        Resource->UpdateMetaDataFromSourceEncoding(SourceEncoding, Name, Value);
+    }
+}
+#endif //MEDIAINFO_ADVANCED
+
+//---------------------------------------------------------------------------
 void sequence::FrameRate_Set(float64 NewFrameRate)
 {
     FrameRate=NewFrameRate;
