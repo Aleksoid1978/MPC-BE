@@ -1989,7 +1989,13 @@ void CDX9AllocatorPresenter::DrawStats()
 			strText.Format(L"Video size   : %d x %d (%d:%d)", m_nativeVideoSize.cx, m_nativeVideoSize.cy, m_aspectRatio.cx, m_aspectRatio.cy);
 			CSize videoSize = m_videoRect.Size();
 			if (m_nativeVideoSize != videoSize) {
-				strText.AppendFormat(L" -> %d x %d %s", videoSize.cx, videoSize.cy, m_wsResizer);
+				strText.AppendFormat(L" -> %d x %d", videoSize.cx, videoSize.cy);
+				if (m_wsResizer) {
+					strText.AppendFormat(L" %s", m_wsResizer);
+					if (m_wsResizer2) {
+						strText.AppendFormat(L":Õ + %s:Y", m_wsResizer2);
+					}
+				}
 			}
 			drawText(strText);
 			if (m_pVideoTextures[0] || m_pVideoSurfaces[0]) {
