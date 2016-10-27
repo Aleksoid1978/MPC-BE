@@ -176,7 +176,6 @@ namespace DSObjects
 		HRESULT InitShaderResizer(int resizer);
 		HRESULT TextureResize(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, D3DTEXTUREFILTERTYPE filter);
 		HRESULT TextureResizeShader(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader);
-		HRESULT TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader1);
 		HRESULT ApplyResize(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int resizer, int y);
 		HRESULT Resize(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect);
 
