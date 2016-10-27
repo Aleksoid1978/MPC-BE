@@ -48,6 +48,8 @@ namespace MediaInfoLib
 const char *LocalName(const XMLElement* Elem)
 {
     const char* Name=Elem->Name();
+    if (!Name)
+        return "";
     const char* Colon=strrchr(Name, ':');
     return Colon ? Colon+1 : Name;
 }
@@ -57,6 +59,8 @@ const char *LocalName(const XMLElement* Elem)
 const char *LocalName(const XMLElement* Elem, const char* &Ns /* out */)
 {
     const char* Name=Elem->Name();
+    if (!Name)
+        return "";
     if (const char* Colon=strrchr(Name, ':'))
     {
         // Search element and ancestors for given namespace prefix

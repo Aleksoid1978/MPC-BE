@@ -32,6 +32,7 @@
 #include <algorithm>
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+    #include "MediaInfo/MediaInfo_Config_PerPackage.h"
     #include "MediaInfo/MediaInfo_Events.h"
     #include "MediaInfo/MediaInfo_Events_Internal.h"
 #endif //MEDIAINFO_EVENTS
@@ -46,7 +47,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const int8u Hevc_SubWidthC[]=
+static const int8u Hevc_SubWidthC[]=
 {
     1,
     2,
@@ -55,7 +56,7 @@ const int8u Hevc_SubWidthC[]=
 };
 
 //---------------------------------------------------------------------------
-const int8u Hevc_SubHeightC[]=
+static const int8u Hevc_SubHeightC[]=
 {
     1,
     2,
@@ -64,13 +65,13 @@ const int8u Hevc_SubHeightC[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Hevc_tier_flag(bool tier_flag)
+static const char* Hevc_tier_flag(bool tier_flag)
 {
     return tier_flag ? "High" : "Main";
 }
 
 //---------------------------------------------------------------------------
-const char* Hevc_profile_idc(int32u profile_idc)
+static const char* Hevc_profile_idc(int32u profile_idc)
 {
     switch (profile_idc)
     {
@@ -83,7 +84,7 @@ const char* Hevc_profile_idc(int32u profile_idc)
 }
 
 //---------------------------------------------------------------------------
-const char* Hevc_chroma_format_idc(int8u chroma_format_idc)
+static const char* Hevc_chroma_format_idc(int8u chroma_format_idc)
 {
     switch (chroma_format_idc)
     {
@@ -96,7 +97,7 @@ const char* Hevc_chroma_format_idc(int8u chroma_format_idc)
 }
 
 //---------------------------------------------------------------------------
-const char* Hevc_pic_type[]=
+static const char* Hevc_pic_type[]=
 {
     "I",
     "I, P",
@@ -111,7 +112,7 @@ const char* Hevc_pic_type[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Hevc_slice_type(int32u slice_type)
+static const char* Hevc_slice_type(int32u slice_type)
 {
     switch (slice_type)
     {
@@ -208,10 +209,12 @@ void File_Hevc::Streams_Fill()
         Fill(Stream_Video, 0, "MaxCLL", Ztring::ToZtring(maximum_content_light_level) + __T(" cd/m2"));
     if (maximum_frame_average_light_level)
         Fill(Stream_Video, 0, "MaxFALL", Ztring::ToZtring(maximum_frame_average_light_level) + __T(" cd/m2"));
-    if (chroma_sample_loc_type_top_field!=(int32u)-1)
-        Fill(Stream_Video, 0, "ChromaSubsampling_Position", __T("Type ") + Ztring::ToZtring(chroma_sample_loc_type_top_field));
-    if (chroma_sample_loc_type_bottom_field!=(int32u)-1 && chroma_sample_loc_type_bottom_field!=chroma_sample_loc_type_bottom_field)
-        Fill(Stream_Video, 0, "ChromaSubsampling_Position", __T("Type ") + Ztring::ToZtring(chroma_sample_loc_type_bottom_field));
+    if (chroma_sample_loc_type_top_field != (int32u)-1)
+    {
+	Fill(Stream_Video, 0, "ChromaSubsampling_Position", __T("Type ") + Ztring::ToZtring(chroma_sample_loc_type_top_field));
+	if (chroma_sample_loc_type_bottom_field != (int32u)-1 && chroma_sample_loc_type_bottom_field != chroma_sample_loc_type_top_field)
+		Fill(Stream_Video, 0, "ChromaSubsampling_Position", __T("Type ") + Ztring::ToZtring(chroma_sample_loc_type_bottom_field));
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -413,6 +416,7 @@ bool File_Hevc::Demux_UnpacketizeContainer_Test()
 
         //Computing final size
         size_t TranscodedBuffer_Size=0;
+        size_t Buffer_Offset_Save=Buffer_Offset;
         while (Buffer_Offset+lengthSizeMinusOne+1+1<=Buffer_Size)
         {
             size_t Size;
@@ -480,7 +484,7 @@ bool File_Hevc::Demux_UnpacketizeContainer_Test()
             TranscodedBuffer_Size+=Size;
             Buffer_Offset+=Size;
         }
-        Buffer_Offset=0;
+        Buffer_Offset=Buffer_Offset_Save;
 
         //Adding VPS/SPS/PPS sizes
         if (RandomAccess)
@@ -678,7 +682,14 @@ bool File_Hevc::Demux_UnpacketizeContainer_Test()
         File_Hevc* MI=new File_Hevc;
         Element_Code=(int64u)-1;
         Open_Buffer_Init(MI);
+        #ifdef MEDIAINFO_EVENTS
+            MediaInfo_Config_PerPackage* Config_PerPackage_Temp=MI->Config->Config_PerPackage;
+            MI->Config->Config_PerPackage=NULL;
+        #endif //MEDIAINFO_EVENTS
         Open_Buffer_Continue(MI, Buffer, Buffer_Size);
+        #ifdef MEDIAINFO_EVENTS
+            MI->Config->Config_PerPackage=Config_PerPackage_Temp;
+        #endif //MEDIAINFO_EVENTS
         bool IsOk=MI->Status[IsAccepted];
         delete MI;
         if (!IsOk)
@@ -2195,6 +2206,25 @@ void File_Hevc::slice_segment_header()
     Skip_BS(Data_BS_Remain(),                                   "(ToDo)");
 
     Element_End0();
+
+    #if MEDIAINFO_EVENTS
+        if (first_slice_segment_in_pic_flag)
+        {
+            switch(Element_Code)
+            {
+                case 19 :
+                case 20 :   // This is an IDR frame
+                            if (Config->Config_PerPackage && Element_Code==0x05) // First slice of an IDR frame
+                            {
+                                // IDR
+                                Config->Config_PerPackage->FrameForAlignment(this, true);
+                                Config->Config_PerPackage->IsClosedGOP(this);
+                            }
+                            break;
+                default:    ; // This is not an IDR frame
+            }
+        }
+    #endif //MEDIAINFO_EVENTS
 }
 
 //---------------------------------------------------------------------------

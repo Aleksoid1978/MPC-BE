@@ -55,7 +55,7 @@ namespace MediaInfoLib
 // Constants
 //***************************************************************************
 
-const char* Wm_CodecList_Kind(int32u Kind)
+static const char* Wm_CodecList_Kind(int32u Kind)
 {
     switch (Kind)
     {
@@ -65,7 +65,7 @@ const char* Wm_CodecList_Kind(int32u Kind)
     }
 }
 
-const char* Wm_BannerImageData_Type(int32u Type)
+static const char* Wm_BannerImageData_Type(int32u Type)
 {
     switch (Type)
     {
@@ -134,7 +134,7 @@ namespace Elements
     UUID(Mutex_Bitrate,                                         D6E22A01, 35DA, 11D1, 9034, 00A0C90349BE);
 }
 
-const char* Wm_StreamType(const int128u Kind)
+static const char* Wm_StreamType(const int128u Kind)
 {
     switch (Kind.hi)
     {
@@ -149,7 +149,7 @@ const char* Wm_StreamType(const int128u Kind)
     }
 }
 
-const char* Wm_ExclusionType(const int128u ExclusionType)
+static const char* Wm_ExclusionType(const int128u ExclusionType)
 {
     switch (ExclusionType.hi)
     {

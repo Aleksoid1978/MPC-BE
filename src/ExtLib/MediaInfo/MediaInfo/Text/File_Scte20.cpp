@@ -41,7 +41,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Scte20_field_number (int8u field_number)
+static const char* Scte20_field_number (int8u field_number)
 {
     switch (field_number)
     {

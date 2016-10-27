@@ -84,7 +84,7 @@ const Char* Mpeg7_Type(MediaInfo_Internal &MI) //TO ADAPT
         return __T("Video");
     if (Format==__T("MPEG Audio") || Format==__T("Wave"))
         return __T("Audio");
-    if (Format==__T("BMP") || Format==__T("GIF") || Format==__T("JPEG") || Format==__T("JPEG 2000") || Format==__T("JPEG 2000") || Format==__T("PNG") || Format==__T("TIFF"))
+    if (Format==__T("BMP") || Format==__T("GIF") || Format==__T("JPEG") || Format==__T("JPEG 2000") || Format==__T("PNG") || Format==__T("TIFF"))
         return __T("Image");
     return __T("Multimedia");
 }

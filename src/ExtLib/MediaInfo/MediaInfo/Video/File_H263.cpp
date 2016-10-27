@@ -36,7 +36,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* H263_Source_Format[]=
+static const char* H263_Source_Format[]=
 {
     "",
     "sub-QCIF",
@@ -49,7 +49,7 @@ const char* H263_Source_Format[]=
 };
 
 //---------------------------------------------------------------------------
-const int16u H263_Source_Format_Width[]=
+static const int16u H263_Source_Format_Width[]=
 {
     0,
     128,
@@ -62,7 +62,7 @@ const int16u H263_Source_Format_Width[]=
 };
 
 //---------------------------------------------------------------------------
-const int16u H263_Source_Format_Height[]=
+static const int16u H263_Source_Format_Height[]=
 {
     0,
     96,
@@ -75,7 +75,7 @@ const int16u H263_Source_Format_Height[]=
 };
 
 //---------------------------------------------------------------------------
-const int8u H263_PAR_W[]=
+static const int8u H263_PAR_W[]=
 {
     0,
     12,
@@ -95,7 +95,7 @@ const int8u H263_PAR_W[]=
     0,
 };
 
-const int8u H263_PAR_H[]=
+static const int8u H263_PAR_H[]=
 {
     0,
     11,

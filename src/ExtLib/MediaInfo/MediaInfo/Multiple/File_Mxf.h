@@ -25,7 +25,6 @@
 #include <vector>
 #include <set>
 #include <bitset>
-using namespace std;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -82,9 +81,9 @@ protected :
     void Streams_Finish_Essence_FillID (int32u EssenceUID, int128u TrackUID);
     void Streams_Finish_Descriptor (const int128u DescriptorUID, const int128u PackageUID);
     void Streams_Finish_Locator (const int128u DescriptorUID, const int128u LocatorUID);
-    void Streams_Finish_Component (const int128u ComponentUID, float64 EditRate, int32u TrackID, int64u Origin);
-    void Streams_Finish_Component_ForTimeCode (const int128u ComponentUID, float64 EditRate, int32u TrackID, int64u Origin, bool IsSourcePackage);
-    void Streams_Finish_Component_ForAS11 (const int128u ComponentUID, float64 EditRate, int32u TrackID, int64u Origin);
+    void Streams_Finish_Component (const int128u ComponentUID, float64 EditRate, int32u TrackID, int64s Origin);
+    void Streams_Finish_Component_ForTimeCode (const int128u ComponentUID, float64 EditRate, int32u TrackID, int64s Origin, bool IsSourcePackage);
+    void Streams_Finish_Component_ForAS11 (const int128u ComponentUID, float64 EditRate, int32u TrackID, int64s Origin);
     void Streams_Finish_Identification (const int128u IdentificationUID);
     void Streams_Finish_CommercialNames ();
 
@@ -192,7 +191,7 @@ protected :
     void ClosedCompleteFooterPartition();
     void Primer();
     void IndexTableSegment();
-    void RandomIndexMetadata();
+    void RandomIndexPack();
     void SDTI_SystemMetadataPack();
     void SDTI_PackageMetadataSet();
     void SDTI_PictureMetadataSet();
@@ -569,13 +568,13 @@ protected :
     };
 
     // Temp
-    struct randomindexmetadata
+    struct randomindexpack
     {
         int64u ByteOffset;
         int32u BodySID;
     };
-    std::vector<randomindexmetadata> RandomIndexMetadatas;
-    bool                             RandomIndexMetadatas_AlreadyParsed;
+    std::vector<randomindexpack>     RandomIndexPacks;
+    bool                             RandomIndexPacks_AlreadyParsed;
     std::set<int64u>                 PartitionPack_AlreadyParsed;
     size_t Streams_Count;
     int128u Code;
@@ -668,7 +667,7 @@ protected :
         int32u TrackNumber;
         float64 EditRate_Real; //Before demux adaptation
         float64 EditRate;
-        int64u  Origin;
+        int64s  Origin;
         bool   Stream_Finish_Done;
 
         track()
@@ -732,7 +731,7 @@ protected :
     };
     typedef std::map<int32u, essence> essences; //Key is TrackNumber
     essences Essences;
-    bitset<Stream_Max+1> StreamPos_StartAtZero; //information about the base of StreamPos (0 or 1, 1 is found in 1 file) TODO: per Essence code (last 4 bytes of the Essence header 0xTTXXTTXX)
+    std::bitset<Stream_Max+1> StreamPos_StartAtZero; //information about the base of StreamPos (0 or 1, 1 is found in 1 file) TODO: per Essence code (last 4 bytes of the Essence header 0xTTXXTTXX)
 
     //Descriptor
     struct descriptor
@@ -787,7 +786,9 @@ protected :
         bool HasMPEG2VideoDescriptor;
         bool IsAes3Descriptor;
         int32u ByteRate;
-
+        #if MEDIAINFO_ADVANCED
+            int16u Jpeg2000_Rsiz;
+        #endif //MEDIAINFO_ADVANCED
 
         //MCALabelSubDescriptor specific (including SoundfieldGroupLabelSubDescriptor...)
         int128u     MCALabelDictionaryID;
@@ -841,6 +842,9 @@ protected :
             HasMPEG2VideoDescriptor=false;
             IsAes3Descriptor=false;
             ByteRate=(int32u)-1;
+            #if MEDIAINFO_ADVANCED
+                Jpeg2000_Rsiz=(int16u)-1;
+            #endif //MEDIAINFO_ADVANCED
 
             //MCALabelSubDescriptor specific (including SoundfieldGroupLabelSubDescriptor...)
             MCALabelDictionaryID.hi=(int64u)-1;
@@ -855,6 +859,7 @@ protected :
     };
     typedef std::map<int128u, descriptor> descriptors; //Key is InstanceUID of Descriptor
     descriptors Descriptors;
+    void Descriptor_Fill(const char* Name, const Ztring& Value);
 
     //Locator
     struct locator
@@ -1106,14 +1111,14 @@ protected :
         inline void Locators_CleanUp() {}
         inline void Locators_Test() {}
     #endif //defined(MEDIAINFO_REFERENCES_YES)
-    void NextRandomIndexMetadata();
+    void NextRandomIndexPack();
     void TryToFinish();
 
     //Temp
     int128u EssenceContainer_FromPartitionMetadata;
     int64u PartitionMetadata_PreviousPartition;
     int64u PartitionMetadata_FooterPartition;
-    int64u RandomIndexMetadatas_MaxOffset;
+    int64u RandomIndexPacks_MaxOffset;
     mxftimecode MxfTimeCodeForDelay;
     mxftimecode MxfTimeCodeMaterial;
     float64 DTS_Delay; //In seconds

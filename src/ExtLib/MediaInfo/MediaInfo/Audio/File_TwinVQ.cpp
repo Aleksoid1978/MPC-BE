@@ -40,7 +40,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* TwinVQ_samplerate(int32u samplerate)
+static const char* TwinVQ_samplerate(int32u samplerate)
 {
     switch (samplerate)
     {

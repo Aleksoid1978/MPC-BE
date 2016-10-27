@@ -930,6 +930,12 @@ size_t MediaInfo_Internal::Open_Buffer_Finalize ()
     {
         delete[] Config.File_Buffer; Config.File_Buffer=NULL; Config.File_Buffer_Size=0; Config.File_Buffer_Size_Max=0;
     }
+    #if MEDIAINFO_EVENTS
+        if (!Config.File_IsReferenced_Get()) //TODO: get its own metadata in order to know if it was created by this instance
+        {
+            delete Config.Config_PerPackage; Config.Config_PerPackage=NULL;
+        }
+    #endif //MEDIAINFO_EVENTS
 
     EXECUTE_SIZE_T(1, Debug+=__T("Open_Buffer_Finalize, will return 1"))
 }

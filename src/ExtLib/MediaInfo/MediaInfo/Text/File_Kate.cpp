@@ -39,7 +39,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Ztring Kate_Category(const Ztring &Category)
+static Ztring Kate_Category(const Ztring &Category)
 {
     //http://wiki.xiph.org/index.php/OggText#Categories_of_Text_Codecs
     if (Category==__T("CC"))

@@ -34,21 +34,21 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const int8u  Swf_SoundType[]=
+static const int8u  Swf_SoundType[]=
 {
     1,
     2,
 };
 
 //---------------------------------------------------------------------------
-const int8u  Swf_SoundSize[]=
+static const int8u  Swf_SoundSize[]=
 {
      8,
     16,
 };
 
 //---------------------------------------------------------------------------
-const int16u Swf_SoundRate[]=
+static const int16u Swf_SoundRate[]=
 {
      5500,
     11025,
@@ -57,7 +57,7 @@ const int16u Swf_SoundRate[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Swf_Format_Audio[]=
+static const char* Swf_Format_Audio[]=
 {
     "PCM",
     "ADPCM",
@@ -78,7 +78,7 @@ const char* Swf_Format_Audio[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Swf_Format_Version_Audio[]=
+static const char* Swf_Format_Version_Audio[]=
 {
     "",
     "",
@@ -99,7 +99,7 @@ const char* Swf_Format_Version_Audio[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Swf_Format_Profile_Audio[]=
+static const char* Swf_Format_Profile_Audio[]=
 {
     "",
     "",
@@ -120,7 +120,7 @@ const char* Swf_Format_Profile_Audio[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Swf_SoundFormat[]=
+static const char* Swf_SoundFormat[]=
 {
     "Uncompressed",
     "SWF ADPCM",
@@ -141,7 +141,7 @@ const char* Swf_SoundFormat[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Swf_Format_Video[]=
+static const char* Swf_Format_Video[]=
 {
     "",
     "",
@@ -162,7 +162,7 @@ const char* Swf_Format_Video[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Swf_Format_Profile_Video[]=
+static const char* Swf_Format_Profile_Video[]=
 {
     "",
     "",
@@ -183,7 +183,7 @@ const char* Swf_Format_Profile_Video[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Swf_Codec_Video[]=
+static const char* Swf_Codec_Video[]=
 {
     "",
     "",

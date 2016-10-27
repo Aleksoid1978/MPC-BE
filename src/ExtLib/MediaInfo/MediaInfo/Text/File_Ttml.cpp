@@ -242,7 +242,77 @@ void File_Ttml::Read_Buffer_Continue()
                 ContentUtf8+=printer.CStr();
                 while (!ContentUtf8.empty() && (ContentUtf8[ContentUtf8.size()-1]=='\r' || ContentUtf8[ContentUtf8.size()-1]=='\n'))
                     ContentUtf8.resize(ContentUtf8.size()-1);
-                Ztring Content; if (p->FirstChild()) Content.From_UTF8(p->FirstChild()->Value());
+                Ztring Content; Content.From_UTF8(ContentUtf8.c_str());
+
+                Frame_Count_NotParsedIncluded=Frame_Count;
+                EVENT_BEGIN (Global, SimpleText, 0)
+                    //Hack: remove "p", "span", "br"
+                    Content.FindAndReplace(__T("\r"), Ztring(), 0, ZenLib::Ztring_Recursive);
+                    Content.FindAndReplace(__T("\n"), Ztring(), 0, ZenLib::Ztring_Recursive);
+                    for (;;)
+                    {
+                        size_t Span_Begin=Content.find(__T("<p"));
+                        if (Span_Begin==string::npos)
+                            break;
+                        
+                        size_t Span_End=Content.find(__T(">"), Span_Begin+5);
+                        if (Span_End==string::npos)
+                            break;
+
+                        size_t ShlashSpan_Begin=Content.find(__T("</p>"), Span_End+1);
+                        if (ShlashSpan_Begin==string::npos)
+                            break;
+
+                        Content.erase(ShlashSpan_Begin, 7);
+                        Content.erase(Span_Begin, Span_End-Span_Begin+1);
+                    }
+                    for (;;)
+                    {
+                        size_t Span_Begin=Content.find(__T("<span"));
+                        if (Span_Begin==string::npos)
+                            break;
+                        
+                        size_t Span_End=Content.find(__T(">"), Span_Begin+5);
+                        if (Span_End==string::npos)
+                            break;
+
+                        size_t ShlashSpan_Begin=Content.find(__T("</span>"), Span_End+1);
+                        if (ShlashSpan_Begin==string::npos)
+                            break;
+
+                        Content.erase(ShlashSpan_Begin, 7);
+                        Content.erase(Span_Begin, Span_End-Span_Begin+1);
+                    }
+                    Content.FindAndReplace(__T("<br>"), EOL, 0, ZenLib::Ztring_Recursive);
+                    Content.FindAndReplace(__T("<br/>"), EOL, 0, ZenLib::Ztring_Recursive);
+                    Content.FindAndReplace(__T("<br />"), EOL, 0, ZenLib::Ztring_Recursive);
+
+                    Event.DTS=DTS_Begin;
+                    Event.PTS=Event.DTS;
+                    Event.DUR=DTS_End-DTS_Begin;
+                    Event.Content=Content.c_str();
+                    Event.Flags=0;
+                    Event.MuxingMode=MuxingMode;
+                    Event.Service=(int8u)Element_Code;
+                    Event.Row_Max=0;
+                    Event.Column_Max=0;
+                    Event.Row_Values=NULL;
+                    Event.Row_Attributes=NULL;
+                EVENT_END   ()
+                EVENT_BEGIN (Global, SimpleText, 0)
+                    Event.DTS=DTS_End;
+                    Event.PTS=Event.DTS;
+                    Event.DUR=0;
+                    Event.Content=__T("");
+                    Event.Flags=0;
+                    Event.MuxingMode=MuxingMode;
+                    Event.Service=(int8u)Element_Code;
+                    Event.Row_Max=0;
+                    Event.Column_Max=0;
+                    Event.Row_Values=NULL;
+                    Event.Row_Attributes=NULL;
+                EVENT_END   ()
+
                 Frame_Count++;
             }
         }

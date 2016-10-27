@@ -1616,7 +1616,6 @@ void File_Mpeg4v::vop_start()
         Skip_S4(4,                                              "reserved_bits");
         Element_End0();
 
-        bool vop_coded;
         Skip_S2(10,                                             "temporal_reference");
         Skip_S1(2,                                              "vop_structure");
         Get_S1 (2, vop_coding_type,                             "vop_coding_type"); Param_Info1(Mpeg4v_vop_coding_type[vop_coding_type]);

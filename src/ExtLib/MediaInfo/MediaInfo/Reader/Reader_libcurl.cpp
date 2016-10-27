@@ -190,7 +190,7 @@ struct Reader_libcurl::curl_data
     bool                Ssh_IgnoreSecurity;
     bool                Init_AlreadyDone;
     bool                Init_NotAFile;
-#if MEDIAINFO_NEXTPACKET
+    #if MEDIAINFO_NEXTPACKET
         bool            NextPacket;
     #endif //MEDIAINFO_NEXTPACKET
     time_t              Time_Max;

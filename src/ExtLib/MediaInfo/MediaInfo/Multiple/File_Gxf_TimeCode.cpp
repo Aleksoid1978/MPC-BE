@@ -54,7 +54,7 @@ namespace MediaInfoLib
 #endif //defined(MEDIAINFO_GXF_YES)
 
 //---------------------------------------------------------------------------
-const char* Atc_PayloadType (int8u PayloadType)
+static const char* Atc_PayloadType (int8u PayloadType)
 {
     switch (PayloadType)
     {

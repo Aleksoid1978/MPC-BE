@@ -39,7 +39,7 @@ extern const char* Aac_audioObjectType(int8u audioObjectType);
 extern const char* Aac_Format_Profile(int8u ID);
 
 //---------------------------------------------------------------------------
-const char* Aac_id_syn_ele[8]=
+static const char* Aac_id_syn_ele[8]=
 {
     "SCE - single_channel_element",
     "CPE - channel_pair_element",
@@ -52,7 +52,7 @@ const char* Aac_id_syn_ele[8]=
 };
 
 //---------------------------------------------------------------------------
-const char* Aac_window_sequence[4]=
+static const char* Aac_window_sequence[4]=
 {
     "ONLY_LONG_SEQUENCE",
     "LONG_START_SEQUENCE",

@@ -9,6 +9,12 @@
 #ifndef MediaInfo_EventsH
 #define MediaInfo_EventsH
 
+#ifdef __cplusplus
+#include <stdlib.h>
+#include <string.h>
+#include <sstream>
+#endif //__cplusplus
+
 /***************************************************************************/
 /* Platforms (from libzen)                                                 */
 /***************************************************************************/
@@ -692,6 +698,19 @@ struct MediaInfo_Event_DvDif_Analysis_Frame_0
 
 #define MediaInfo_Parser_Eia608         0xF0
 
+/*-------------------------------------------------------------------------*/
+/* MediaInfo_Event_Eia608_Content                                          */
+#define MediaInfo_Event_Eia608_CC_Content 0xA000
+struct MediaInfo_Event_Eia608_CC_Content_0
+{
+    MEDIAINFO_EVENT_GENERIC
+    MediaInfo_int8u     Field;
+    MediaInfo_int8u     MuxingMode;
+    MediaInfo_int8u     Service;
+    wchar_t             Row_Values[15][33]; /*offset 32 is for \0*/
+    MediaInfo_int8u     Row_Attributes[15][32];
+};
+
 /***************************************************************************/
 /* DTVCC Transport (CEA-708, formely IEA-708)                              */
 /***************************************************************************/
@@ -704,6 +723,31 @@ struct MediaInfo_Event_DvDif_Analysis_Frame_0
 /***************************************************************************/
 
 #define MediaInfo_Parser_DtvccCaption   0xF2
+
+/*-------------------------------------------------------------------------*/
+/* MediaInfo_Event_DtvccCaption_Content_Minimal                            */
+#define MediaInfo_Event_DtvccCaption_Content_Minimal 0xA000
+struct MediaInfo_Event_DtvccCaption_Content_Minimal_0
+{
+    MEDIAINFO_EVENT_GENERIC
+    MediaInfo_int8u     MuxingMode;
+    MediaInfo_int8u     Service;
+    wchar_t             Row_Values[15][65]; /*offset 32 (4:3) or 42 (16:9) is for \0, reserving data after 42 for future extensions*/
+    MediaInfo_int8u     Row_Attributes[15][64];
+};
+
+/*-------------------------------------------------------------------------*/
+/* MediaInfo_Event_DtvccCaption_Window_Content_Minimal                     */
+#define MediaInfo_Event_DtvccCaption_Window_Content_Minimal 0xA001
+struct MediaInfo_Event_DtvccCaption_Window_Content_Minimal_0
+{
+    MEDIAINFO_EVENT_GENERIC
+    MediaInfo_int8u     MuxingMode;
+    MediaInfo_int8u     Service;
+    MediaInfo_int8u     Window;
+    wchar_t             Row_Values[15][33]; /*offset 32 is for \0*/
+    MediaInfo_int8u     Row_Attributes[15][32];
+};
 
 /***************************************************************************/
 /* CDP                                                                     */
@@ -770,5 +814,155 @@ struct MediaInfo_Event_DvDif_Analysis_Frame_0
 /***************************************************************************/
 
 #define MediaInfo_Parser_Sdp            0xFD
+
+/*-------------------------------------------------------------------------*/
+/* Utilities                                                               */
+/*-------------------------------------------------------------------------*/
+
+// Flags: bit 0 = has ID containing 2 numbers (e.g. 0x00010002, main ID is 1 and subID is 2) 
+#define MediaInfo_ID_FromEvent_int MediaInfo_ID_FromEvent_intA
+inline MediaInfo_int64u MediaInfo_ID_FromEvent_intA (MediaInfo_Event_Generic* Event, int) // Flags)
+{
+    if (Event->StreamIDs_Size>=2 && Event->ParserIDs[0]==MediaInfo_Parser_MpegPs && Event->ParserIDs[1]==MediaInfo_Parser_MpegPs_Ext)   // DVD-Video
+        return (Event->StreamIDs[0]<<16) | Event->StreamIDs[1];
+    if (Event->StreamIDs_Size>=2 && Event->ParserIDs[0]==MediaInfo_Parser_HdsF4m && Event->StreamIDs_Width[1])                          // HDS F4M having more than one stream per referenced file
+        return Event->StreamIDs[0]<<16 | Event->StreamIDs[1];
+    if (Event->StreamIDs_Size>=3 && Event->ParserIDs[0]==MediaInfo_Parser_HlsIndex)                                                     // HLS Index
+    {
+        if (Event->ParserIDs[1]==MediaInfo_Parser_Hls)
+            return (Event->StreamIDs[0]<<16) | Event->StreamIDs[2];
+        else
+            return (Event->StreamIDs[0]<<16) | Event->StreamIDs[1];
+    }
+    if (Event->StreamIDs_Size>=2 && Event->ParserIDs[0]==MediaInfo_Parser_Hls)                                                          // HLS Sequence
+        return Event->StreamIDs[1];
+    if (Event->StreamIDs_Size>=2 && Event->ParserIDs[0]==MediaInfo_Parser_Ism && Event->StreamIDs_Width[1])                             // ISM having more than one stream per referenced file
+        return Event->StreamIDs[0]<<16 | Event->StreamIDs[1];
+    if (Event->StreamIDs_Size>=3 && Event->ParserIDs[0]==MediaInfo_Parser_Dxw && Event->ParserIDs[1]==MediaInfo_Parser_MpegTs)          // DXW with MPEG-TS
+        return (Event->StreamIDs[0]<<16) | Event->StreamIDs[1];
+    if (Event->StreamIDs_Size>=3 && Event->ParserIDs[0]==MediaInfo_Parser_DcpAm)                                                        // DCP/IMF AM
+        return (Event->StreamIDs[0]<<24) | (Event->StreamIDs[1]<<16) | Event->StreamIDs[2];
+    if (Event->StreamIDs_Size>=3 && Event->ParserIDs[0]==MediaInfo_Parser_DcpPkl)                                                       // DCP/IMF PKL
+        return (Event->StreamIDs[0]<<24) | (Event->StreamIDs[1]<<16) | Event->StreamIDs[2];
+    if (Event->StreamIDs_Size>=2 && Event->ParserIDs[0]==MediaInfo_Parser_DcpCpl)                                                       // DCP/IMF CPL
+        return (Event->StreamIDs[0]<<16) | Event->StreamIDs[1];
+    if (Event->StreamIDs_Size)
+        return Event->StreamIDs[0];
+    return (MediaInfo_int64u)-1; // No identifier
+}
+
+#ifdef __cplusplus
+#define MediaInfo_ID_FromEvent_string MediaInfo_ID_FromEvent_stringA
+inline std::string MediaInfo_ID_FromEvent_stringA (MediaInfo_Event_Generic* Event, int) // Flags)
+{
+    std::stringstream ToReturn;
+
+    if (Event->StreamIDs_Size>=2 && Event->ParserIDs[0]==MediaInfo_Parser_MpegPs && Event->ParserIDs[1]==MediaInfo_Parser_MpegPs_Ext)        // DVD-Video
+    {
+        ToReturn<<Event->StreamIDs[0];
+        ToReturn<<'-';
+        ToReturn<<Event->StreamIDs[1];
+    }
+    else if (Event->StreamIDs_Size>=2 && Event->ParserIDs[0]==MediaInfo_Parser_HdsF4m && Event->StreamIDs_Width[1])                          // HDS F4M having more than one stream per referenced file
+    {
+        ToReturn<<Event->StreamIDs[0];
+        ToReturn<<'-';
+        ToReturn<<Event->StreamIDs[1];
+    }
+    else if (Event->StreamIDs_Size>=3 && Event->ParserIDs[0]==MediaInfo_Parser_HlsIndex)                                                     // HLS Index
+    {
+        ToReturn<<Event->StreamIDs[0];
+        ToReturn<<'-';
+        if (Event->ParserIDs[1]==MediaInfo_Parser_Hls)
+            ToReturn<<Event->StreamIDs[2];
+        else
+            ToReturn<<Event->StreamIDs[1];
+    }
+    else if (Event->StreamIDs_Size>=2 && Event->ParserIDs[0]==MediaInfo_Parser_Hls)                                                          // HLS Sequence
+    {
+        ToReturn<<Event->StreamIDs[1];
+    }
+    else if (Event->StreamIDs_Size>=2 && Event->ParserIDs[0]==MediaInfo_Parser_Ism && Event->StreamIDs_Width[1])                             // ISM having more than one stream per referenced file
+    {
+        ToReturn<<Event->StreamIDs[0];
+        ToReturn<<'-';
+        ToReturn<<Event->StreamIDs[1];
+    }
+    else if (Event->StreamIDs_Size>=3 && Event->ParserIDs[0]==MediaInfo_Parser_Dxw && Event->ParserIDs[1]==MediaInfo_Parser_MpegTs)          // DXW with MPEG-TS
+    {
+        ToReturn<<Event->StreamIDs[0];
+        ToReturn<<'-';
+        ToReturn<<Event->StreamIDs[1];
+    }
+    else if (Event->StreamIDs_Size>=3 && Event->ParserIDs[0]==MediaInfo_Parser_DcpAm)                                                        // DCP/IMF AM
+    {
+        ToReturn<<Event->StreamIDs[0];
+        ToReturn<<'-';
+        ToReturn<<Event->StreamIDs[1];
+        ToReturn<<'-';
+        ToReturn<<Event->StreamIDs[2];
+    }
+    else if (Event->StreamIDs_Size>=3 && Event->ParserIDs[0]==MediaInfo_Parser_DcpPkl)                                                       // DCP/IMF PKL
+    {
+        ToReturn<<Event->StreamIDs[0];
+        ToReturn<<'-';
+        ToReturn<<Event->StreamIDs[1];
+        ToReturn<<'-';
+        ToReturn<<Event->StreamIDs[2];
+    }
+    else if (Event->StreamIDs_Size>=3 && Event->ParserIDs[0]==MediaInfo_Parser_DcpCpl)                                                       // DCP/IMF CPL
+    {
+        ToReturn<<Event->StreamIDs[0];
+        ToReturn<<'-';
+        ToReturn<<Event->StreamIDs[1];
+    }
+    else if (Event->StreamIDs_Size)
+    {
+        ToReturn<<Event->StreamIDs[0];
+    }
+    return ToReturn.str();
+}
+#endif //__cplusplus
+
+#define MediaInfo_ID_FromGet_int MediaInfo_ID_FromGet_intA
+inline MediaInfo_int64u MediaInfo_ID_FromGet_intA (const char* ID, const char* ContainerFormat, const char* MuxingMode)
+{
+    MediaInfo_int64u ToReturn;
+    const char* SubID;
+
+    ToReturn=(MediaInfo_int64u)atoi(ID);
+    SubID=strstr(ID, "-");
+    if (SubID)
+    {
+        MediaInfo_int64u ToReturn2;
+
+        ToReturn2=atoi(SubID+1);
+
+        SubID=strstr(SubID+1, "-");
+        if (SubID)
+        {
+            MediaInfo_int64u ToReturn3;
+
+            ToReturn3=atoi(SubID+1);
+            if (strcmp(ContainerFormat, "DCP AM")==0                                            // DCP AM
+             || strcmp(ContainerFormat, "DCP PKL")==0                                           // DCP PKL
+             || strcmp(ContainerFormat, "IMF AM")==0                                            // IMF AM
+             || strcmp(ContainerFormat, "IMF PKL")==0)                                          // IMF PKL
+                ToReturn=(ToReturn<<24) | (ToReturn2<<16) | ToReturn2;
+        }
+        else if (
+            strcmp(MuxingMode, "DVD-Video")==0                                                  // DVD-Video
+         || strcmp(ContainerFormat, "HDS F4M")==0                                               // HDS F4M having more than one stream per referenced file
+         || strcmp(ContainerFormat, "HLS")==0 && strstr(MuxingMode, "HLS")==MuxingMode          // HLS Index
+         || strcmp(ContainerFormat, "HLS")==0 && strstr(MuxingMode, "MPEG-TS")==MuxingMode      // HLS Index
+         || strcmp(ContainerFormat, "ISM")==0                                                   // ISM having more than one stream per referenced file
+         || strcmp(ContainerFormat, "DXW")==0 && strstr(MuxingMode, "MPEG-TS")==MuxingMode      // DXW with MPEG-TS
+         || strcmp(ContainerFormat, "DCP CPL")==0                                               // DCP CPL
+         || strcmp(ContainerFormat, "IMF CPL")==0)                                              // IMF CPL
+            ToReturn=(ToReturn<<16) | ToReturn2;
+    }
+
+    return ToReturn;
+}
 
 #endif //MediaInfo_EventsH

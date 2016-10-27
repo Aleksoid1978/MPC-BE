@@ -53,8 +53,12 @@ public :
 
     //General
     Ztring Option (const String &Option, const String &Value=Ztring());
+    #if MEDIAINFO_EVENTS
+    void   Unsynch();
+    #endif //MEDIAINFO_EVENTS
 
     #if MEDIAINFO_EVENTS
+    void          FrameForAlignment (File__Analyze* Source, bool IsClosedGop);
     void          IsClosedGOP (File__Analyze* Source);
     #endif //MEDIAINFO_EVENTS
 
@@ -63,7 +67,6 @@ public :
     Ztring        Event_CallBackFunction_Set (const Ztring &Value);
     Ztring        Event_CallBackFunction_Get ();
     void          Event_Send(File__Analyze* Source, const int8u* Data_Content, size_t Data_Size, const Ztring &File_Name=Ztring());
-    void          Event_SubFile_Start(const Ztring &FileName_Absolute);
     #endif //MEDIAINFO_EVENTS
 
     //Internal

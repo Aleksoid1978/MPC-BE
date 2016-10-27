@@ -41,7 +41,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Png_Colour_type(int8u Colour_type)
+static const char* Png_Colour_type(int8u Colour_type)
 {
     switch (Colour_type)
     {

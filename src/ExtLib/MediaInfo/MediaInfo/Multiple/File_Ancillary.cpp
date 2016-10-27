@@ -53,7 +53,7 @@ namespace MediaInfoLib
 // Infos
 //***************************************************************************
 
-const char* Ancillary_DataID(int8u DataID, int8u SecondaryDataID)
+static const char* Ancillary_DataID(int8u DataID, int8u SecondaryDataID)
 {
     // TODO: check http://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.1364-2-201003-I!!PDF-E.pdf
     switch (DataID)

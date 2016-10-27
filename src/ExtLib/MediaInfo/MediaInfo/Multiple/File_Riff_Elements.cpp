@@ -2028,10 +2028,13 @@ void File_Riff::AVI__hdlr_strl_strh()
     switch (fccType)
     {
         case Elements::AVI__hdlr_strl_strh_vids :
-            if (FrameRate>0)  Fill(Stream_Video, StreamPos_Last, "FrameRate", FrameRate, 3);
+            if (FrameRate>0)  Fill(Stream_Video, StreamPos_Last, Video_FrameRate, FrameRate, 3);
+            if (Right-Left>0) Fill(Stream_Video, StreamPos_Last, Video_Width,  Right-Left, 10, true);
+            if (Bottom-Top>0) Fill(Stream_Video, StreamPos_Last, Video_Height, Bottom-Top, 10, true);
+            break;
         case Elements::AVI__hdlr_strl_strh_txts :
-            if (Right-Left>0) Fill(Stream_Text, StreamPos_Last, "Width",  Right-Left, 10, true);
-            if (Bottom-Top>0) Fill(Stream_Text, StreamPos_Last, "Height", Bottom-Top, 10, true);
+            if (Right-Left>0) Fill(Stream_Text, StreamPos_Last, Text_Width,  Right-Left, 10, true);
+            if (Bottom-Top>0) Fill(Stream_Text, StreamPos_Last, Text_Height, Bottom-Top, 10, true);
             break;
         default: ;
     }

@@ -1227,7 +1227,7 @@ void MediaInfo_Config_Format (InfoMap &Info)
     "DolbyE;;;A;Aes3;;dde\n"
     "DTS;;;A;Dts;Digital Theater Systems;dts;;;Lossy\n"
     "DTS-HD;;;A;Dts;Digital Theater Systems;dts;;;Lossy\n"
-    "E-AC-3;;;A;Ac3;Audio Coding 3;dd+ ec3;audio/eac3;;Lossy\n"
+    "E-AC-3;;;A;Ac3;Enhanced Audio Coding 3;dd+ ec3;audio/eac3;;Lossy\n"
     "Extended Module;;;A;ExtendedModule;;xm;;\n"
     "FLAC;;;A;Flac;Free Lossless Audio Codec;flac;;http://flac.sourceforge.net/\n"
     "G.719;;;A;;;;audio/G719;;Lossy\n"

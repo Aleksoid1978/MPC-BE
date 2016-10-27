@@ -44,7 +44,7 @@ namespace MediaInfoLib
 // Init: int32u CRC_32 = 0xFFFFFFFF;
 // for each data byte do
 //     CRC_32=(CRC_32<<8) ^ CRC_32_Table[(CRC_32>>24)^(data_byte)];
-extern int32u Psi_CRC_32_Table[256];
+extern const int32u Psi_CRC_32_Table[256];
 
 //***************************************************************************
 // Constructor/Destructor

@@ -44,13 +44,13 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const char*  IFO_VTS_Category[]=
+static const char*  IFO_VTS_Category[]=
 {
     "Normal",
     "Karaoke",
 };
 
-const char*  IFO_Format_V[]=
+static const char*  IFO_Format_V[]=
 {
     "MPEG Video",
     "MPEG Video",
@@ -58,7 +58,7 @@ const char*  IFO_Format_V[]=
     "",
 };
 
-const char*  IFO_Format_Version_V[]=
+static const char*  IFO_Format_Version_V[]=
 {
     "Version 1",
     "Version 2",
@@ -66,7 +66,7 @@ const char*  IFO_Format_Version_V[]=
     "",
 };
 
-const char*  IFO_CodecV[]=
+static const char*  IFO_CodecV[]=
 {
     "MPEG-1V",
     "MPEG-2V",
@@ -74,7 +74,7 @@ const char*  IFO_CodecV[]=
     "",
 };
 
-const char*  IFO_Standard[]=
+static const char*  IFO_Standard[]=
 {
     "NTSC",
     "PAL",
@@ -82,7 +82,7 @@ const char*  IFO_Standard[]=
     "",
 };
 
-float32  IFO_AspectRatio[]=
+static const float32  IFO_AspectRatio[]=
 {
     (float32)1.333,
     (float32)0.000,
@@ -90,26 +90,26 @@ float32  IFO_AspectRatio[]=
     (float32)1.778,
 };
 
-const char*  IFO_BitRate_Mode[]=
+static const char*  IFO_BitRate_Mode[]=
 {
     "VBR",
     "CBR",
 };
 
-const size_t IFO_Width[]=
+static const size_t IFO_Width[]=
 {720, 704, 352, 352,   0,   0,   0,   0};
 
-const size_t IFO_Height[4][8]=
+static const size_t IFO_Height[4][8]=
 {{480, 480, 480, 240,   0,   0,   0,   0}, //NTSC
  {576, 576, 576, 288,   0,   0,   0,   0}, //PAL
  {  0,   0,   0,   0,   0,   0,   0,   0}, //Unknown
  {  0,   0,   0,   0,   0,   0,   0,   0}, //Unknown
  };
 
-const float64 IFO_FrameRate[]=
+static const float64 IFO_FrameRate[]=
 {29.970, 25.000};
 
-const char*  IFO_Format_A[]=
+static const char*  IFO_Format_A[]=
 {
     "AC-3",
     "",
@@ -121,7 +121,7 @@ const char*  IFO_Format_A[]=
     "SDDS",
 };
 
-const char*  IFO_Format_Profile_A[]=
+static const char*  IFO_Format_Profile_A[]=
 {
     "",
     "",
@@ -133,7 +133,7 @@ const char*  IFO_Format_Profile_A[]=
     "",
 };
 
-const char*  IFO_CodecA[]=
+static const char*  IFO_CodecA[]=
 {
     "AC3",
     "",
@@ -145,7 +145,7 @@ const char*  IFO_CodecA[]=
     "SDDS",
 };
 
-const char*  IFO_ModeA[]=
+static const char*  IFO_ModeA[]=
 {
     "",
     "Karaoke",
@@ -153,7 +153,7 @@ const char*  IFO_ModeA[]=
     "",
 };
 
-const char*  IFO_ResolutionA[]=
+static const char*  IFO_ResolutionA[]=
 {
     "16",
     "20",
@@ -161,10 +161,10 @@ const char*  IFO_ResolutionA[]=
     "DRC",
 };
 
-const int16u IFO_SamplingRate[]=
+static const int16u IFO_SamplingRate[]=
 {48000, 0, 0, 0, 0, 0, 0, 0};
 
-const char*  IFO_Language_MoreA[]=
+static const char*  IFO_Language_MoreA[]=
 {
     "",
     "",
@@ -176,7 +176,7 @@ const char*  IFO_Language_MoreA[]=
     "",
 };
 
-const char*  IFO_Format_T[]=
+static const char*  IFO_Format_T[]=
 {
     "RLE",
     "",
@@ -188,7 +188,7 @@ const char*  IFO_Format_T[]=
     "",
 };
 
-const char*  IFO_Resolution_T[]=
+static const char*  IFO_Resolution_T[]=
 {
     "2",
     "",
@@ -200,7 +200,7 @@ const char*  IFO_Resolution_T[]=
     "",
 };
 
-const char*  IFO_CodecT[]=
+static const char*  IFO_CodecT[]=
 {
     "2-bit RLE",
     "",
@@ -212,7 +212,7 @@ const char*  IFO_CodecT[]=
     "",
 };
 
-const char*  IFO_Language_MoreT[]=
+static const char*  IFO_Language_MoreT[]=
 {
     "",
     "Normal",
@@ -232,10 +232,10 @@ const char*  IFO_Language_MoreT[]=
     "Director comments children",
 };
 
-const size_t IFO_PlaybackTime_FrameRate[]=
+static const size_t IFO_PlaybackTime_FrameRate[]=
 {1, 25, 1, 30};
 
-const char*  IFO_MenuType[]=
+static const char*  IFO_MenuType[]=
 {
     "",
     "",

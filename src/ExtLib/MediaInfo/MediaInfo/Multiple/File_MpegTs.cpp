@@ -33,6 +33,7 @@
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
     #include "MediaInfo/MediaInfo_Events_Internal.h"
+    #include "MediaInfo/MediaInfo_Config_PerPackage.h"
 #endif //MEDIAINFO_EVENTS
 #if MEDIAINFO_IBIUSAGE && MEDIAINFO_SEEK
     #include "MediaInfo/Multiple/File_Ibi.h"
@@ -58,7 +59,7 @@ namespace Elements
     const int64u    Config_VbrDetection_Occurences=4;
 #endif // MEDIAINFO_ADVANCED
 
-const char* Scte128_tag (int8u tag)
+static const char* Scte128_tag (int8u tag)
 {
     switch (tag)
     {
@@ -110,7 +111,7 @@ extern const char* Mpeg_Descriptors_CA_system_ID(int16u CA_system_ID);
 const size_t MpegTs_DtsNeural_2_Count=9;
 const size_t MpegTs_DtsNeural_6_Count=4;
 
-const int8u MpegTs_DtsNeural_Channels_2[MpegTs_DtsNeural_2_Count]=
+static const int8u MpegTs_DtsNeural_Channels_2[MpegTs_DtsNeural_2_Count]=
 {
     0,
     3,
@@ -123,7 +124,7 @@ const int8u MpegTs_DtsNeural_Channels_2[MpegTs_DtsNeural_2_Count]=
     7,
 };
 
-const int8u MpegTs_DtsNeural_Channels_6[MpegTs_DtsNeural_6_Count]=
+static const int8u MpegTs_DtsNeural_Channels_6[MpegTs_DtsNeural_6_Count]=
 {
     0,
     6,
@@ -131,7 +132,7 @@ const int8u MpegTs_DtsNeural_Channels_6[MpegTs_DtsNeural_6_Count]=
     8,
 };
 
-const int8u MpegTs_DtsNeural_Channels(int8u Channels, int8u config_id)
+static const int8u MpegTs_DtsNeural_Channels(int8u Channels, int8u config_id)
 {
     if (config_id==0)
         return 0;
@@ -150,7 +151,7 @@ const int8u MpegTs_DtsNeural_Channels(int8u Channels, int8u config_id)
     }
 }
 
-const char* MpegTs_DtsNeural_ChannelPositions_2[MpegTs_DtsNeural_2_Count]=
+static const char* MpegTs_DtsNeural_ChannelPositions_2[MpegTs_DtsNeural_2_Count]=
 {
     "",
     "Front: L R, LFE",
@@ -163,7 +164,7 @@ const char* MpegTs_DtsNeural_ChannelPositions_2[MpegTs_DtsNeural_2_Count]=
     "Front: L R, Side: L R, Back: L R, LFE",
 };
 
-const char* MpegTs_DtsNeural_ChannelPositions_6[MpegTs_DtsNeural_6_Count]=
+static const char* MpegTs_DtsNeural_ChannelPositions_6[MpegTs_DtsNeural_6_Count]=
 {
     "",
     "Front: L C R, Side: L R",
@@ -171,7 +172,7 @@ const char* MpegTs_DtsNeural_ChannelPositions_6[MpegTs_DtsNeural_6_Count]=
     "Front: L C R, Side: L R, Back: L R",
 };
 
-const char* MpegTs_DtsNeural_ChannelPositions(int8u Channels, int8u config_id)
+static const char* MpegTs_DtsNeural_ChannelPositions(int8u Channels, int8u config_id)
 {
     if (config_id==0)
         return "";
@@ -190,7 +191,7 @@ const char* MpegTs_DtsNeural_ChannelPositions(int8u Channels, int8u config_id)
     }
 }
 
-const char* MpegTs_DtsNeural_ChannelPositions2_2[MpegTs_DtsNeural_2_Count]=
+static const char* MpegTs_DtsNeural_ChannelPositions2_2[MpegTs_DtsNeural_2_Count]=
 {
     "",
     "2/0/0.1",
@@ -203,7 +204,7 @@ const char* MpegTs_DtsNeural_ChannelPositions2_2[MpegTs_DtsNeural_2_Count]=
     "2/2/2.1",
 };
 
-const char* MpegTs_DtsNeural_ChannelPositions2_6[MpegTs_DtsNeural_6_Count]=
+static const char* MpegTs_DtsNeural_ChannelPositions2_6[MpegTs_DtsNeural_6_Count]=
 {
     "",
     "3/2/0.1",
@@ -211,7 +212,7 @@ const char* MpegTs_DtsNeural_ChannelPositions2_6[MpegTs_DtsNeural_6_Count]=
     "3/2/2.1",
 };
 
-const char* MpegTs_DtsNeural_ChannelPositions2(int8u Channels, int8u config_id)
+static const char* MpegTs_DtsNeural_ChannelPositions2(int8u Channels, int8u config_id)
 {
     if (config_id==0)
         return "";
@@ -231,7 +232,7 @@ const char* MpegTs_DtsNeural_ChannelPositions2(int8u Channels, int8u config_id)
 }
 
 //---------------------------------------------------------------------------
-Ztring Decimal_Hexa(int64u Number)
+static Ztring Decimal_Hexa(int64u Number)
 {
     Ztring Temp;
     Temp.From_Number(Number);
@@ -315,7 +316,7 @@ void File_MpegTs::Streams_Accept()
             Config->Demux_EventWasSent=true;
     #endif //MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
 
-    if (!IsSub)
+    if (!IsSub && !Config->File_IsReferenced_Get())
     {
         #if MEDIAINFO_ADVANCED
             // TODO: temporary disabling theses options for MPEG-TS, because it does not work as expected
@@ -540,7 +541,7 @@ void File_MpegTs::Streams_Update_Programs()
                         {
                             Ztring LawRating_Temp=Complete_Stream->Streams[elementary_PID]->Parser->Retrieve(Stream_General, 0, General_LawRating);
                             if (!LawRating_Temp.empty())
-                                LawRating+=LawRating_Temp+__T(" / ");;
+                                LawRating+=LawRating_Temp+__T(" / ");
                             Ztring Title_Temp=Complete_Stream->Streams[elementary_PID]->Parser->Retrieve(Stream_General, 0, General_Title);
                             if (!Title_Temp.empty())
                                 Title+=Title_Temp+__T(" / ");
@@ -926,9 +927,10 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
     }
 
     //Teletext
-    if (StreamKind_Last==Stream_Max)
+    bool RelyOnTsInfo=(StreamKind_Last==Stream_Max);
+    for (std::map<int16u, teletext>::iterator Teletext=Temp->Teletexts.begin(); Teletext!=Temp->Teletexts.end(); ++Teletext)
     {
-        for (std::map<int16u, teletext>::iterator Teletext=Temp->Teletexts.begin(); Teletext!=Temp->Teletexts.end(); ++Teletext)
+        if (RelyOnTsInfo)
         {
             std::map<std::string, Ztring>::iterator Info_Format=Teletext->second.Infos.find("Format");
             Stream_Prepare((Info_Format!=Teletext->second.Infos.end() && Info_Format->second==__T("Teletext"))?Stream_Other:Stream_Text);
@@ -940,17 +942,33 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
                 Fill(StreamKind_Last, StreamPos_Last, General_MenuID, Temp->program_numbers[Pos], 10, Pos==0);
                 Fill(StreamKind_Last, StreamPos_Last, General_MenuID_String, Decimal_Hexa(Temp->program_numbers[Pos]), Pos==0);
             }
+        }
+        else
+        {
+            StreamKind_Last=Stream_Max;
+            StreamPos_Last=(size_t)-1;
+            Ztring ID=Ztring::ToZtring(StreamID)+__T('-')+Ztring::ToZtring(Teletext->first);
+            for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
+                for (size_t StreamPos=0; StreamPos<Count_Get((stream_t)StreamKind); StreamPos++)
+                    if (Retrieve((stream_t)StreamKind, StreamPos, General_ID) == ID)
+                    {
+                        StreamKind_Last=(stream_t)StreamKind;
+                        StreamPos_Last=StreamPos;
+                    }
+        }
 
-            //TS info
+        //TS info
+        if (StreamKind_Last!=Stream_Max)
+        {
             for (std::map<std::string, ZenLib::Ztring>::iterator Info=Teletext->second.Infos.begin(); Info!=Teletext->second.Infos.end(); ++Info)
             {
                 if (Retrieve(StreamKind_Last, StreamPos_Last, Info->first.c_str()).empty())
                     Fill(StreamKind_Last, StreamPos_Last, Info->first.c_str(), Info->second);
             }
             Teletext->second.Infos.clear();
-            Teletext->second.StreamKind=StreamKind_Last;
-            Teletext->second.StreamPos=StreamPos_Last;
         }
+        Teletext->second.StreamKind=StreamKind_Last;
+        Teletext->second.StreamPos=StreamPos_Last;
     }
 
     //Law rating
@@ -1738,7 +1756,12 @@ bool File_MpegTs::Synched_Test()
                                 && (File_Offset+Buffer_Offset-Buffer_TotalBytes_FirstSynched)*2<File_Size)
                                 {
                                     if (program_clock_reference<Complete_Stream->Streams[pid]->TimeStamp_Start)
-                                        program_clock_reference+=0x200000000LL*300; //33 bits, cyclic
+                                    {
+                                        if (Complete_Stream->Streams[pid]->TimeStamp_Start-program_clock_reference<10LL*90000*300) //Testing if difference is less that 10 seconds (value arbitrary choosen)
+                                            Complete_Stream->Streams[pid]->TimeStamp_Start=program_clock_reference; //Looks like we have a small jump in the past in a buggy file, accepting it.
+                                        else
+                                            program_clock_reference+=0x200000000LL*300; //33 bits, cyclic
+                                    }
                                     if ((program_clock_reference-Complete_Stream->Streams[pid]->TimeStamp_Start)>Begin_MaxDuration)
                                     {
                                         Complete_Stream->Streams[pid]->EndTimeStampMoreThanxSeconds=true;
@@ -1898,6 +1921,10 @@ void File_MpegTs::Read_Buffer_Unsynched()
     Clear(Stream_General, 0, General_Duration_End);
     for (size_t StreamPos=0; StreamPos<Count_Get(Stream_Menu); StreamPos++)
         Clear(Stream_Menu, StreamPos, Menu_Duration);
+    #if MEDIAINFO_EVENTS
+        if (Config->Config_PerPackage)
+            Config->Config_PerPackage->Unsynch();
+    #endif //MEDIAINFO_EVENTS
 }
 
 //---------------------------------------------------------------------------
@@ -1992,13 +2019,17 @@ void File_MpegTs::Read_Buffer_AfterParsing()
                     {
                         complete_stream::stream* &Stream=*It;
 
-                        if (Stream && Stream->Kind==complete_stream::stream::pes && Stream->TimeStamp_Start!=(int64u)-1)
+                        if (Stream && Stream->Kind==complete_stream::stream::pes && Stream->TimeStamp_Start!=(int64u)-1 && Stream->TimeStamp_End!=(int64u)-1 && Stream->TimeStamp_Start!=Stream->TimeStamp_End)
                         {
                             int64u Duration=Stream->TimeStamp_End-Stream->TimeStamp_Start;
-                            if (Duration>0 && Duration<27000000*2) // 2 seconds // mpc-be patch
+                            if (Duration<27000000*2) // 2 seconds
                             {
-                                int64u Ratio=(27000000*2)/Duration;
+                                int64u Ratio = 0;
+                                if (Duration) 
+                                    Ratio = (27000000 * 2) / Duration; 
                                 MpegTs_JumpTo_End*=Ratio;
+                                if (MpegTs_JumpTo_End>MediaInfoLib::Config.MpegTs_MaximumOffset_Get()/4)
+                                    MpegTs_JumpTo_End=MediaInfoLib::Config.MpegTs_MaximumOffset_Get()/4;
                                 break; //Using the first PES found
                             }
                         }
@@ -2537,7 +2568,12 @@ void File_MpegTs::Header_Parse_AdaptationField()
                     && (File_Offset+Buffer_Offset-Buffer_TotalBytes_FirstSynched)*2<File_Size)
                     {
                         if (program_clock_reference<Complete_Stream->Streams[pid]->TimeStamp_Start)
-                            program_clock_reference+=0x200000000LL*300; //33 bits, cyclic
+                        {
+                            if (Complete_Stream->Streams[pid]->TimeStamp_Start-program_clock_reference<10LL*90000*300) //Testing if difference is less that 10 seconds (value arbitrary choosen)
+                                Complete_Stream->Streams[pid]->TimeStamp_Start=program_clock_reference; //Looks like we have a small jump in the past in a buggy file, accepting it.
+                            else
+                                program_clock_reference+=0x200000000LL*300; //33 bits, cyclic
+                        }
                         if ((program_clock_reference-Complete_Stream->Streams[pid]->TimeStamp_Start)>Begin_MaxDuration)
                         {
                             Complete_Stream->Streams[pid]->EndTimeStampMoreThanxSeconds=true;
@@ -2775,7 +2811,12 @@ void File_MpegTs::Header_Parse_AdaptationField()
                     && (File_Offset+Buffer_Offset-Buffer_TotalBytes_FirstSynched)*2<File_Size)
                     {
                         if (program_clock_reference<Complete_Stream->Streams[pid]->TimeStamp_Start)
-                            program_clock_reference+=0x200000000LL*300; //33 bits, cyclic
+                        {
+                            if (Complete_Stream->Streams[pid]->TimeStamp_Start-program_clock_reference<10LL*90000*300) //Testing if difference is less that 10 seconds (value arbitrary choosen)
+                                Complete_Stream->Streams[pid]->TimeStamp_Start=program_clock_reference; //Looks like we have a small jump in the past in a buggy file, accepting it.
+                            else
+                                program_clock_reference+=0x200000000LL*300; //33 bits, cyclic
+                        }
                         if ((program_clock_reference-Complete_Stream->Streams[pid]->TimeStamp_Start)>Begin_MaxDuration)
                         {
                             Complete_Stream->Streams[pid]->EndTimeStampMoreThanxSeconds=true;
@@ -3211,6 +3252,9 @@ void File_MpegTs::PSI()
     //Initializing
     if (payload_unit_start_indicator)
     {
+        #if MEDIAINFO_EVENTS
+            StreamIDs[StreamIDs_Size-1]=pid;
+        #endif //MEDIAINFO_EVENTS
         delete ((File_Mpeg_Psi*)Complete_Stream->Streams[pid]->Parser); Complete_Stream->Streams[pid]->Parser=new File_Mpeg_Psi;
         Open_Buffer_Init(Complete_Stream->Streams[pid]->Parser);
         ((File_Mpeg_Psi*)Complete_Stream->Streams[pid]->Parser)->Complete_Stream=Complete_Stream;
@@ -3440,13 +3484,13 @@ void File_MpegTs::transport_private_data(int8u transport_private_data_length)
                                             if (EBP_time_flag)
                                             {
                                                 Element_Begin1("EBP_acquisition_time");
-                                                if (Complete_Stream->Streams[pid] && !Complete_Stream->Streams[pid]->EBP_IsPresent)
+                                                if (Complete_Stream->Streams[pid] && !Complete_Stream->Streams[pid]->EBP_Marker_Detected)
                                                 {
                                                     int32u Seconds, Fraction;
                                                     Get_B4 (Seconds, "Seconds");  Param_Info1(Ztring().Date_From_Seconds_1970((int32u)(Seconds-2208988800))); //Param_Info1(Ztring().Date_From_Seconds_1900(Seconds)); //Temp for old ZenLib
                                                     Get_B4 (Fraction, "Fraction"); Param_Info1(Ztring::ToZtring(((float64)Fraction)/0x100000000LL, 9));
                                                     Complete_Stream->Streams[pid]->Infos["EBP_AcquisitionTime"]=Ztring().Date_From_Seconds_1970((int32u)(Seconds-2208988800))+__T('.')+Ztring::ToZtring(((float64)Fraction)/0x100000000LL, 9).substr(2); //.Date_From_Seconds_1900(Seconds)); //Temp for old ZenLib
-                                                    Complete_Stream->Streams[pid]->EBP_IsPresent=true;
+                                                    Complete_Stream->Streams[pid]->EBP_Marker_Detected=true;
                                                 }
                                                 else
                                                 {

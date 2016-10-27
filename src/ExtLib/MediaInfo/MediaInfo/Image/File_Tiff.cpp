@@ -58,7 +58,7 @@ namespace Tiff_Tag
 }
 
 //---------------------------------------------------------------------------
-const char* Tiff_Tag_Name(int32u Tag)
+static const char* Tiff_Tag_Name(int32u Tag)
 {
     switch (Tag)
     {
@@ -83,7 +83,7 @@ namespace Tiff_Type
 }
 
 //---------------------------------------------------------------------------
-const char* Tiff_Type_Name(int32u Type)
+static const char* Tiff_Type_Name(int32u Type)
 {
     switch (Type)
     {
@@ -95,7 +95,7 @@ const char* Tiff_Type_Name(int32u Type)
 }
 
 //---------------------------------------------------------------------------
-const int8u Tiff_Type_Size(int32u Type)
+static const int8u Tiff_Type_Size(int32u Type)
 {
     switch (Type)
     {
@@ -107,7 +107,7 @@ const int8u Tiff_Type_Size(int32u Type)
 }
 
 //---------------------------------------------------------------------------
-const char* Tiff_Compression(int32u Compression)
+static const char* Tiff_Compression(int32u Compression)
 {
     switch (Compression)
     {
@@ -122,7 +122,7 @@ const char* Tiff_Compression(int32u Compression)
 }
 
 //---------------------------------------------------------------------------
-const char* Tiff_Compression_Mode(int32u Compression)
+static const char* Tiff_Compression_Mode(int32u Compression)
 {
     switch (Compression)
     {
@@ -136,7 +136,7 @@ const char* Tiff_Compression_Mode(int32u Compression)
 }
 
 //---------------------------------------------------------------------------
-const char* Tiff_PhotometricInterpretation(int32u PhotometricInterpretation)
+static const char* Tiff_PhotometricInterpretation(int32u PhotometricInterpretation)
 {
     switch (PhotometricInterpretation)
     {
@@ -153,7 +153,7 @@ const char* Tiff_PhotometricInterpretation(int32u PhotometricInterpretation)
 }
 
 //---------------------------------------------------------------------------
-const char* Tiff_PhotometricInterpretation_ColorSpace (int32u PhotometricInterpretation)
+static const char* Tiff_PhotometricInterpretation_ColorSpace (int32u PhotometricInterpretation)
 {
     switch (PhotometricInterpretation)
     {
@@ -169,7 +169,7 @@ const char* Tiff_PhotometricInterpretation_ColorSpace (int32u PhotometricInterpr
     }
 }
 
-const char* Tiff_ExtraSamples(int32u ExtraSamples)
+static const char* Tiff_ExtraSamples(int32u ExtraSamples)
 {
     switch (ExtraSamples)
     {
@@ -180,7 +180,7 @@ const char* Tiff_ExtraSamples(int32u ExtraSamples)
     }
 }
 
-const char* Tiff_ExtraSamples_ColorSpace(int32u ExtraSamples)
+static const char* Tiff_ExtraSamples_ColorSpace(int32u ExtraSamples)
 {
     switch (ExtraSamples)
     {

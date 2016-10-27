@@ -935,6 +935,13 @@ void File_Riff::Header_Parse()
         if (Name==Elements::RF64)
             IsRIFF64=true;
         Get_C4 (Name,                                           "Real Name");
+
+        //Handling buggy files
+        if (Size_Complete>=8 && Size_Complete<12) //Not possible (would contain only the name of the RIFF block + the name of the sub-element, no size)
+        {
+            Size_Complete=Element_TotalSize_Get()-8;
+            Fill(Stream_General, 0, "BuggyHeader", Ztring().From_CC4(Name));
+        }
     }
 
     //Integrity

@@ -33,6 +33,11 @@ public:
     //In
     void                            UpdateFileName(const Ztring& OldFileName, const Ztring& NewFileName);
     ZtringList                      FileNames; //Source file name (relative path)
+    #if MEDIAINFO_ADVANCED
+    void                            UpdateMetaDataFromSourceEncoding(const string& SourceEncoding, const string& Name, const string& Value);
+    std::vector<string>             SourceEncodings; //Source unique IDs, associated to a file name
+    std::map<string, string>        MetadataFromPlaylist;
+    #endif //MEDIAINFO_ADVANCED
     float64                         EditRate;
     int64u                          IgnoreEditsBefore;
     int64u                          IgnoreEditsAfter;

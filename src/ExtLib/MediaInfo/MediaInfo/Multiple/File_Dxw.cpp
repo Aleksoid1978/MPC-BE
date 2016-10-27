@@ -147,6 +147,12 @@ bool File_Dxw::FileHeader_Begin()
                                  Sequence->IsMain=true;
                         }
 
+                        Attribute=Track->Attribute("default_timecode");
+                        if (Attribute)
+                        {
+                            Sequence->Config["File_DefaultTimeCode"].From_UTF8(Attribute);
+                        }
+
                         Sequence->StreamID=ReferenceFiles->Sequences_Size()+1;
                     }
 

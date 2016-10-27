@@ -30,6 +30,7 @@ class File_N19 : public File__Analyze
 {
 public :
     File_N19();
+    ~File_N19();
 
 private :
     //Buffer - File header
@@ -50,7 +51,12 @@ private :
     int64u DFC;
     int16u CCT;
     #if MEDIAINFO_DEMUX
+        int64u TCP_Offset;
         int64u TCO_Latest;
+        int8u  Row_Max;
+        int8u  Column_Max;
+        bool   IsTeletext;
+        wchar_t** Row_Values;
     #endif //MEDIAINFO_DEMUX
 };
 

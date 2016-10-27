@@ -67,7 +67,7 @@ Ztring AvsV_level(int8u level_id)
 }
 
 //---------------------------------------------------------------------------
-const float32 AvsV_frame_rate[]=
+static const float32 AvsV_frame_rate[]=
 {
     (float32)0,
     ((float32)24000)/1001,
@@ -88,7 +88,7 @@ const float32 AvsV_frame_rate[]=
 };
 
 //---------------------------------------------------------------------------
-const char* AvsV_chroma_format[]=
+static const char* AvsV_chroma_format[]=
 {
     "",
     "4:2:0",
@@ -97,7 +97,7 @@ const char* AvsV_chroma_format[]=
 };
 
 //---------------------------------------------------------------------------
-const char* AvsV_extension_start_code_identifier[]=
+static const char* AvsV_extension_start_code_identifier[]=
 {
     "",
     "",
@@ -118,7 +118,7 @@ const char* AvsV_extension_start_code_identifier[]=
 };
 
 //---------------------------------------------------------------------------
-const char* AvsV_video_format[]=
+static const char* AvsV_video_format[]=
 {
     "Component",
     "PAL",
@@ -131,7 +131,7 @@ const char* AvsV_video_format[]=
 };
 
 //---------------------------------------------------------------------------
-const float32 AvsV_aspect_ratio[]=
+static const float32 AvsV_aspect_ratio[]=
 {
     (float32)0,
     (float32)1,
@@ -152,7 +152,7 @@ const float32 AvsV_aspect_ratio[]=
 };
 
 //---------------------------------------------------------------------------
-const char* AvsV_picture_coding_type[]=
+static const char* AvsV_picture_coding_type[]=
 {
     "",
     "P",

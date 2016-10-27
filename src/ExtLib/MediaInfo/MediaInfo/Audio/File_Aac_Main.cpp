@@ -42,14 +42,14 @@ extern const int32u Aac_sampling_frequency[13]=
  16000, 12000, 11025,  8000,  7350};
 
 //---------------------------------------------------------------------------
-const char* Aac_Adts_ID[]=
+static const char* Aac_Adts_ID[]=
 {
     "MPEG-4",
     "MPEG-2",
 };
 
 //---------------------------------------------------------------------------
-const char* Aac_Format(int8u ID)
+static const char* Aac_Format(int8u ID)
 {
     switch (ID)
     {
@@ -156,7 +156,7 @@ const char* Aac_audioObjectType(int8u audioObjectType)
 }
 
 //---------------------------------------------------------------------------
-const int8u Aac_Channels[]=
+static const int8u Aac_Channels[]=
 {
     0,
     1,
@@ -177,7 +177,7 @@ const int8u Aac_Channels[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Aac_ChannelConfiguration[]=
+static const char* Aac_ChannelConfiguration[]=
 {
     "",
     "Front: C",
@@ -198,7 +198,7 @@ const char* Aac_ChannelConfiguration[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Aac_ChannelConfiguration2[]=
+static const char* Aac_ChannelConfiguration2[]=
 {
     "",
     "1/0/0",
@@ -219,7 +219,7 @@ const char* Aac_ChannelConfiguration2[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Aac_ChannelLayout[]=
+static const char* Aac_ChannelLayout[]=
 {
     "",
     "C",

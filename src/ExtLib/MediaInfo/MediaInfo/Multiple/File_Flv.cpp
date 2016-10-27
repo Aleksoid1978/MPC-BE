@@ -61,19 +61,19 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const int16u  Flv_Channels[]=
+static const int16u  Flv_Channels[]=
 {
     1,
     2,
 };
 
-const int16u  Flv_Resolution[]=
+static const int16u  Flv_Resolution[]=
 {
     8,
     16,
 };
 
-const int16u Flv_SamplingRate[]=
+static const int16u Flv_SamplingRate[]=
 {
     5500,
     11025,
@@ -82,7 +82,7 @@ const int16u Flv_SamplingRate[]=
     8000, //Special case for Nellymoser 8kHz mono
 };
 
-const char* Flv_Format_Audio[16]=
+static const char* Flv_Format_Audio[16]=
 {
     "PCM",
     "ADPCM",
@@ -102,7 +102,7 @@ const char* Flv_Format_Audio[16]=
     "",
 };
 
-const char* Flv_Format_Profile_Audio[16]=
+static const char* Flv_Format_Profile_Audio[16]=
 {
     "",
     "",
@@ -122,7 +122,7 @@ const char* Flv_Format_Profile_Audio[16]=
     "",
 };
 
-const char* Flv_Codec_Audio[16]=
+static const char* Flv_Codec_Audio[16]=
 {
     "Uncompressed",
     "ADPCM",
@@ -142,7 +142,7 @@ const char* Flv_Codec_Audio[16]=
     "",
 };
 
-const char* Flv_CodecID_Hint_Audio[16]=
+static const char* Flv_CodecID_Hint_Audio[16]=
 {
     "",
     "",
@@ -162,7 +162,7 @@ const char* Flv_CodecID_Hint_Audio[16]=
     "",
 };
 
-const char* Flv_Format_Video[16]=
+static const char* Flv_Format_Video[16]=
 {
     "",
     "",
@@ -182,7 +182,7 @@ const char* Flv_Format_Video[16]=
     "",
 };
 
-const char* Flv_Format_Profile_Video[16]=
+static const char* Flv_Format_Profile_Video[16]=
 {
     "",
     "",
@@ -202,7 +202,7 @@ const char* Flv_Format_Profile_Video[16]=
     "",
 };
 
-const char* Flv_Codec_Video[16]=
+static const char* Flv_Codec_Video[16]=
 {
     "",
     "",
@@ -222,7 +222,7 @@ const char* Flv_Codec_Video[16]=
     "",
 };
 
-const char* Flv_CodecID_Hint_Video[16]=
+static const char* Flv_CodecID_Hint_Video[16]=
 {
     "",
     "",
@@ -242,7 +242,7 @@ const char* Flv_CodecID_Hint_Video[16]=
     "",
 };
 
-const char* Flv_H263_PictureSize[]=
+static const char* Flv_H263_PictureSize[]=
 {
     "custom, 1 byte",
     "custom, 2 bytes",
@@ -254,7 +254,7 @@ const char* Flv_H263_PictureSize[]=
     "",
 };
 
-const int16u Flv_H263_WidthHeight[8][2]=
+static const int16u Flv_H263_WidthHeight[8][2]=
 {
     {  0,   0},
     {  0,   0},
@@ -266,26 +266,26 @@ const int16u Flv_H263_WidthHeight[8][2]=
     {0, 0},
 };
 
-const char* Flv_H263_PictureType[]=
+static const char* Flv_H263_PictureType[]=
 {
     "IntraFrame",
     "InterFrame",
     "InterFrame (Disposable)",
     "",
 };
-const char* Flv_VP6_FrameMode[]=
+static const char* Flv_VP6_FrameMode[]=
 {
     "IntraFrame",
     "",
 };
 
-const char* Flv_VP6_Marker[]=
+static const char* Flv_VP6_Marker[]=
 {
     "VP6.1/6.2",
     "VP6.0",
 };
 
-const char* Flv_VP6_Version[]=
+static const char* Flv_VP6_Version[]=
 {
     "",
     "",
@@ -321,7 +321,7 @@ const char* Flv_VP6_Version[]=
     "",
 };
 
-const char* Flv_VP6_Version2[]=
+static const char* Flv_VP6_Version2[]=
 {
     "VP6.0",
     "",
@@ -329,7 +329,7 @@ const char* Flv_VP6_Version2[]=
     "VP6.1/6.2",
 };
 
-const char* Flv_FrameType[]=
+static const char* Flv_FrameType[]=
 {
     "",
     "KeyFrame",
@@ -349,7 +349,7 @@ const char* Flv_FrameType[]=
     "",
 };
 
-const char* Flv_TagType[]=
+static const char* Flv_TagType[]=
 {
     "DOUBLE",
     "UI8",
@@ -371,7 +371,7 @@ const char* Flv_TagType[]=
     "AMF3 data",
 };
 
-const char* Flv_Amf3Type[]=
+static const char* Flv_Amf3Type[]=
 {
     "Undefined",
     "Null",
@@ -388,7 +388,7 @@ const char* Flv_Amf3Type[]=
     "ByteArray",
 };
 
-const char* Flv_AVCPacketType(int8u Value)
+static const char* Flv_AVCPacketType(int8u Value)
 {
     switch (Value)
     {
@@ -399,7 +399,7 @@ const char* Flv_AVCPacketType(int8u Value)
     }
 }
 
-const char* Flv_AACPacketType(int8u Value)
+static const char* Flv_AACPacketType(int8u Value)
 {
     switch (Value)
     {

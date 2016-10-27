@@ -760,7 +760,7 @@ int element_details::Element_Node::Print_Micro_Xml(std::ostringstream& ss, size_
     else
         ss << " s=\"" << Size << "\">";
 
-	level += 4;
+    level += 4;
 print_children:
     for (size_t i = 0; i < Children.size(); ++i)
         Children[i]->Print_Micro_Xml(ss, level);
@@ -836,7 +836,7 @@ int element_details::Element_Node::Print_Xml(std::ostringstream& ss, size_t leve
 
     ss << "\n";
 
-	level += 4;
+    level += 4;
 print_children:
     for (size_t i = 0; i < Children.size(); ++i)
         Children[i]->Print_Xml(ss, level);
@@ -925,7 +925,7 @@ int element_details::Element_Node::Print_Tree(std::ostringstream& ss, size_t lev
 
     ss << "\n";
 
-	level += 1;
+    level += 1;
 print_children:
     for (size_t i = 0; i < Children.size(); ++i)
         Children[i]->Print_Tree(ss, level);

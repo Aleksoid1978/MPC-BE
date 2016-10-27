@@ -34,6 +34,12 @@ public :
     int8u   Endianness;
     bool    Aligned;
 
+    #if MEDIAINFO_EVENTS
+        int16u pid;
+        int8u  stream_id;
+        bool   IgnoreGuardBandTest;
+    #endif MEDIAINFO_EVENTS
+
     // Constructor/Destructor
     File_SmpteSt0337();
     ~File_SmpteSt0337();
@@ -69,8 +75,8 @@ private :
     int8u   Stream_Bits;
     int8u   data_type;
     std::map<int64u, int64u> FrameSizes;
-    int64u  GuardBand_Before;
-    int64u  GuardBand_After;
+    int64s  GuardBand_Before;
+    int64s  GuardBand_After;
     size_t  NullPadding_Size;
 
     // Parser

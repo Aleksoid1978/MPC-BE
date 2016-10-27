@@ -337,7 +337,7 @@ namespace Elements
     UUID(060E2B34, 02050101, 0D010201, 01040400, 0000, "SMPTE ST 377-1", ClosedCompleteFooterPartition, "")
     UUID(060E2B34, 02050101, 0D010201, 01050100, 0000, "SMPTE ST 377-1", Primer, "")
     UUID(060E2B34, 02530101, 0D010201, 01100100, 0000, "SMPTE ST 377-1", IndexTableSegment, "")
-    UUID(060E2B34, 02050101, 0D010201, 01110100, 0000, "SMPTE ST 377-1", RandomIndexMetadata, "")
+    UUID(060E2B34, 02050101, 0D010201, 01110100, 0000, "SMPTE ST 377-1", RandomIndexPack, "")
 
     //                           03 - ?
     //                             01 - ?
@@ -440,6 +440,7 @@ namespace Elements
 extern const char* Mpegv_profile_and_level_indication_profile[];
 extern const char* Mpegv_profile_and_level_indication_level[];
 extern const char* Mpeg4v_Profile_Level(int32u Profile_Level);
+extern string Jpeg2000_Rsiz(int16u Rsiz);
 
 //---------------------------------------------------------------------------
 extern const char* AfdBarData_active_format[];
@@ -447,7 +448,7 @@ extern const char* AfdBarData_active_format_4_3[];
 extern const char* AfdBarData_active_format_16_9[];
 
 //---------------------------------------------------------------------------
-const char* Mxf_Category(int8u Category)
+static const char* Mxf_Category(int8u Category)
 {
     switch(Category)
     {
@@ -460,7 +461,7 @@ const char* Mxf_Category(int8u Category)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_Registry(int8u Category, int8u Registry)
+static const char* Mxf_Registry(int8u Category, int8u Registry)
 {
     switch(Category)
     {
@@ -491,7 +492,7 @@ const char* Mxf_Registry(int8u Category, int8u Registry)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_Structure(int8u Category, int8u Registry, int8u Structure)
+static const char* Mxf_Structure(int8u Category, int8u Registry, int8u Structure)
 {
     switch(Category)
     {
@@ -511,7 +512,7 @@ const char* Mxf_Structure(int8u Category, int8u Registry, int8u Structure)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_MPEG2_CodedContentType(int8u CodedContentType)
+static const char* Mxf_MPEG2_CodedContentType(int8u CodedContentType)
 {
     switch(CodedContentType)
     {
@@ -523,7 +524,7 @@ const char* Mxf_MPEG2_CodedContentType(int8u CodedContentType)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_OperationalPattern(const int128u OperationalPattern)
+static const char* Mxf_OperationalPattern(const int128u OperationalPattern)
 {
     //Item and Package Complexity
     int32u Code_Compare4=(int32u)OperationalPattern.lo;
@@ -556,7 +557,7 @@ const char* Mxf_OperationalPattern(const int128u OperationalPattern)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_EssenceElement(const int128u EssenceElement)
+static const char* Mxf_EssenceElement(const int128u EssenceElement)
 {
     if ((EssenceElement.hi&0xFFFFFFFFFFFFFF00LL)!=0x060E2B3401020100LL)
         return "";
@@ -646,7 +647,7 @@ const char* Mxf_EssenceElement(const int128u EssenceElement)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_EssenceContainer(const int128u EssenceContainer)
+static const char* Mxf_EssenceContainer(const int128u EssenceContainer)
 {
     if ((EssenceContainer.hi&0xFFFFFFFFFFFFFF00LL)!=0x060E2B3404010100LL)
         return "";
@@ -753,7 +754,7 @@ const char* Mxf_EssenceContainer(const int128u EssenceContainer)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_EssenceContainer_Mapping(int8u Code6, int8u Code7, int8u Code8)
+static const char* Mxf_EssenceContainer_Mapping(int8u Code6, int8u Code7, int8u Code8)
 {
     switch (Code6)
     {
@@ -834,7 +835,7 @@ const char* Mxf_EssenceContainer_Mapping(int8u Code6, int8u Code7, int8u Code8)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_EssenceCompression(const int128u EssenceCompression)
+static const char* Mxf_EssenceCompression(const int128u EssenceCompression)
 {
     if ((EssenceCompression.hi&0xFFFFFFFFFFFFFF00LL)!=0x060E2B3404010100LL || !((EssenceCompression.lo&0xFF00000000000000LL)==0x0400000000000000LL || (EssenceCompression.lo&0xFF00000000000000LL)==0x0E00000000000000LL))
         return "";
@@ -1034,7 +1035,7 @@ const char* Mxf_EssenceCompression(const int128u EssenceCompression)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_EssenceCompression_Profile(const int128u EssenceCompression)
+static const char* Mxf_EssenceCompression_Profile(const int128u EssenceCompression)
 {
     int8u Code2=(int8u)((EssenceCompression.lo&0x00FF000000000000LL)>>48);
     int8u Code3=(int8u)((EssenceCompression.lo&0x0000FF0000000000LL)>>40);
@@ -1088,7 +1089,7 @@ const char* Mxf_EssenceCompression_Profile(const int128u EssenceCompression)
     }
 }
 //---------------------------------------------------------------------------
-const char* Mxf_EssenceCompression_Version(const int128u EssenceCompression)
+static const char* Mxf_EssenceCompression_Version(const int128u EssenceCompression)
 {
     int8u Code2=(int8u)((EssenceCompression.lo&0x00FF000000000000LL)>>48);
     int8u Code3=(int8u)((EssenceCompression.lo&0x0000FF0000000000LL)>>40);
@@ -1157,7 +1158,7 @@ const char* Mxf_EssenceCompression_Version(const int128u EssenceCompression)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_Sequence_DataDefinition(const int128u DataDefinition)
+static const char* Mxf_Sequence_DataDefinition(const int128u DataDefinition)
 {
     int8u Code4=(int8u)((DataDefinition.lo&0x000000FF00000000LL)>>32);
     int8u Code5=(int8u)((DataDefinition.lo&0x00000000FF000000LL)>>24);
@@ -1186,7 +1187,7 @@ const char* Mxf_Sequence_DataDefinition(const int128u DataDefinition)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_FrameLayout(int8u FrameLayout)
+static const char* Mxf_FrameLayout(int8u FrameLayout)
 {
     switch (FrameLayout)
     {
@@ -1200,7 +1201,7 @@ const char* Mxf_FrameLayout(int8u FrameLayout)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_FrameLayout_ScanType(int8u FrameLayout)
+static const char* Mxf_FrameLayout_ScanType(int8u FrameLayout)
 {
     switch (FrameLayout)
     {
@@ -1214,7 +1215,7 @@ const char* Mxf_FrameLayout_ScanType(int8u FrameLayout)
 }
 
 //---------------------------------------------------------------------------
-int8u Mxf_FrameLayout_Multiplier(int8u FrameLayout)
+static int8u Mxf_FrameLayout_Multiplier(int8u FrameLayout)
 {
     switch (FrameLayout)
     {
@@ -1228,7 +1229,7 @@ int8u Mxf_FrameLayout_Multiplier(int8u FrameLayout)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_ColorPrimaries(const int128u ColorPrimaries)
+static const char* Mxf_ColorPrimaries(const int128u ColorPrimaries)
 {
     int32u Code_Compare4=(int32u)ColorPrimaries.lo;
     switch ((int8u)(Code_Compare4>>16))
@@ -1241,7 +1242,7 @@ const char* Mxf_ColorPrimaries(const int128u ColorPrimaries)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_TransferCharacteristic(const int128u TransferCharacteristic)
+static const char* Mxf_TransferCharacteristic(const int128u TransferCharacteristic)
 {
     int32u Code_Compare4=(int32u)TransferCharacteristic.lo;
     switch ((int8u)(Code_Compare4>>16))
@@ -1258,7 +1259,7 @@ const char* Mxf_TransferCharacteristic(const int128u TransferCharacteristic)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_CodingEquations(const int128u CodingEquations)
+static const char* Mxf_CodingEquations(const int128u CodingEquations)
 {
     int32u Code_Compare4=(int32u)CodingEquations.lo;
     switch ((int8u)(Code_Compare4>>16))
@@ -1271,7 +1272,7 @@ const char* Mxf_CodingEquations(const int128u CodingEquations)
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_ChannelAssignment_ChannelPositions(const int128u ChannelLayout, int32u ChannelsCount)
+static const char* Mxf_ChannelAssignment_ChannelPositions(const int128u ChannelLayout, int32u ChannelsCount)
 {
     //Sound Channel Labeling
     if ((ChannelLayout.hi&0xFFFFFFFFFFFFFF00LL)!=0x060E2B3404010100LL && (ChannelLayout.lo&0xFFFFFFFF00000000LL)!=0x0402021000000000LL)
@@ -1318,7 +1319,7 @@ const char* Mxf_ChannelAssignment_ChannelPositions(const int128u ChannelLayout, 
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_ChannelAssignment_ChannelPositions2(const int128u ChannelLayout, int32u ChannelsCount=(int32u)-1)
+static const char* Mxf_ChannelAssignment_ChannelPositions2(const int128u ChannelLayout, int32u ChannelsCount=(int32u)-1)
 {
     //Sound Channel Labeling
     if ((ChannelLayout.hi&0xFFFFFFFFFFFFFF00LL)!=0x060E2B3404010100LL && (ChannelLayout.lo&0xFFFFFFFF00000000LL)!=0x0402021000000000LL)
@@ -1365,7 +1366,7 @@ const char* Mxf_ChannelAssignment_ChannelPositions2(const int128u ChannelLayout,
 }
 
 //---------------------------------------------------------------------------
-const char* Mxf_ChannelAssignment_ChannelLayout(const int128u ChannelLayout, int32u ChannelsCount=(int32u)-1)
+static const char* Mxf_ChannelAssignment_ChannelLayout(const int128u ChannelLayout, int32u ChannelsCount=(int32u)-1)
 {
     //Sound Channel Labeling
     if ((ChannelLayout.hi&0xFFFFFFFFFFFFFF00LL)!=0x060E2B3404010100LL && (ChannelLayout.lo&0xFFFFFFFF00000000LL)!=0x0402021000000000LL)
@@ -1410,15 +1411,15 @@ const char* Mxf_ChannelAssignment_ChannelLayout(const int128u ChannelLayout, int
         default   : return "";
     }
 }
-const char* Mxf_ChannelAssignment_ChannelLayout(const int128u ChannelLayout)
+static const char* Mxf_ChannelAssignment_ChannelLayout(const int128u ChannelLayout)
 {
     return Mxf_ChannelAssignment_ChannelLayout(ChannelLayout, (int32u)-1);
 }
 
-string MXF_MCALabelDictionaryID_ChannelPositions(const std::vector<int128u> &MCALabelDictionaryIDs)
+static string MXF_MCALabelDictionaryID_ChannelPositions(const std::vector<int128u> &MCALabelDictionaryIDs)
 {
     string ToReturn;
-    bitset<8> Front, Side, Back, Lfe;
+    std::bitset<8> Front, Side, Back, Lfe;
     bool IsOk=true;
 
     for (size_t Pos=0; Pos<MCALabelDictionaryIDs.size(); Pos++)
@@ -1554,7 +1555,7 @@ string MXF_MCALabelDictionaryID_ChannelPositions(const std::vector<int128u> &MCA
     return ToReturn;
 }
 
-string MXF_MCALabelDictionaryID_ChannelLayout(const std::vector<int128u> &MCALabelDictionaryIDs)
+static string MXF_MCALabelDictionaryID_ChannelLayout(const std::vector<int128u> &MCALabelDictionaryIDs)
 {
     string ToReturn;
 
@@ -1636,7 +1637,7 @@ string MXF_MCALabelDictionaryID_ChannelLayout(const std::vector<int128u> &MCALab
 
 //---------------------------------------------------------------------------
 const size_t Mxf_AS11_ClosedCaptionType_Count=2;
-const char* Mxf_AS11_ClosedCaptionType[Mxf_AS11_ClosedCaptionType_Count]=
+static const char* Mxf_AS11_ClosedCaptionType[Mxf_AS11_ClosedCaptionType_Count]=
 {
     "Hard of Hearing",
     "Translation",
@@ -1644,7 +1645,7 @@ const char* Mxf_AS11_ClosedCaptionType[Mxf_AS11_ClosedCaptionType_Count]=
 
 //---------------------------------------------------------------------------
 const size_t Mxf_AS11_AudioTrackLayout_Count=0x35;
-const char* Mxf_AS11_AudioTrackLayout[Mxf_AS11_AudioTrackLayout_Count]=
+static const char* Mxf_AS11_AudioTrackLayout[Mxf_AS11_AudioTrackLayout_Count]=
 {
     "EBU R 48: 1a",
     "EBU R 48: 1b",
@@ -1705,7 +1706,7 @@ struct mxf_as11_audiotracklayout_assignment
     size_t Count;
     const char* Assign[16];
 };
-const mxf_as11_audiotracklayout_assignment Mxf_AS11_AudioTrackLayout_ChannelPositions[Mxf_AS11_AudioTrackLayout_Count]=
+static const mxf_as11_audiotracklayout_assignment Mxf_AS11_AudioTrackLayout_ChannelPositions[Mxf_AS11_AudioTrackLayout_Count]=
 {
     {  2, "Front: C", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, }, //48 1a
     {  4, "Front: C", NULL, "Front: C", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, }, //48 1b
@@ -1761,7 +1762,7 @@ const mxf_as11_audiotracklayout_assignment Mxf_AS11_AudioTrackLayout_ChannelPosi
     { 16, "Front: L", "Front: R", "Front: C", "LFE", "Side: L", "Side: R", "Front: L", "Front: R", "Front: C", "LFE", "Side: L", "Side: R", "Side: L", "Side: R", "Side: L", "Side: R", }, //123 16e
     { 16, "Front: L", "Front: R", NULL, NULL, "Front: L", "Front: R", NULL, NULL, "Front: L", "Front: R", NULL, NULL, "Front: L", "Front: R", "Front: L", "Front: R", }, //123 16f
 };
-const mxf_as11_audiotracklayout_assignment Mxf_AS11_AudioTrackLayout_ChannelLayout[Mxf_AS11_AudioTrackLayout_Count]=
+static const mxf_as11_audiotracklayout_assignment Mxf_AS11_AudioTrackLayout_ChannelLayout[Mxf_AS11_AudioTrackLayout_Count]=
 {
     {  2, "C", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, }, //48 1a
     {  4, "C", NULL, "C", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, }, //48 1b
@@ -1821,7 +1822,7 @@ const mxf_as11_audiotracklayout_assignment Mxf_AS11_AudioTrackLayout_ChannelLayo
 
 //---------------------------------------------------------------------------
 const size_t Mxf_AS11_FpaPass_Count=3;
-const char* Mxf_AS11_FpaPass[Mxf_AS11_FpaPass_Count]=
+static const char* Mxf_AS11_FpaPass[Mxf_AS11_FpaPass_Count]=
 {
     "Yes",
     "No",
@@ -1830,7 +1831,7 @@ const char* Mxf_AS11_FpaPass[Mxf_AS11_FpaPass_Count]=
 
 //---------------------------------------------------------------------------
 const size_t Mxf_AS11_SigningPresent_Count=3;
-const char* Mxf_AS11_SigningPresent[Mxf_AS11_SigningPresent_Count]=
+static const char* Mxf_AS11_SigningPresent[Mxf_AS11_SigningPresent_Count]=
 {
     "Yes",
     "No",
@@ -1839,7 +1840,7 @@ const char* Mxf_AS11_SigningPresent[Mxf_AS11_SigningPresent_Count]=
 
 //---------------------------------------------------------------------------
 const size_t Mxf_AS11_3D_Type_Count=4;
-const char* Mxf_AS11_3D_Type[Mxf_AS11_3D_Type_Count]=
+static const char* Mxf_AS11_3D_Type[Mxf_AS11_3D_Type_Count]=
 {
     "Side by side",
     "Dual",
@@ -1849,7 +1850,7 @@ const char* Mxf_AS11_3D_Type[Mxf_AS11_3D_Type_Count]=
 
 //---------------------------------------------------------------------------
 const size_t Mxf_AS11_AudioLoudnessStandard_Count=2;
-const char* Mxf_AS11_AudioLoudnessStandard[Mxf_AS11_AudioLoudnessStandard_Count]=
+static const char* Mxf_AS11_AudioLoudnessStandard[Mxf_AS11_AudioLoudnessStandard_Count]=
 {
     "",
     "EBU R 128",
@@ -1857,7 +1858,7 @@ const char* Mxf_AS11_AudioLoudnessStandard[Mxf_AS11_AudioLoudnessStandard_Count]
 
 //---------------------------------------------------------------------------
 const size_t Mxf_AS11_AudioDescriptionType_Count=2;
-const char* Mxf_AS11_AudioDescriptionType[Mxf_AS11_AudioDescriptionType_Count]=
+static const char* Mxf_AS11_AudioDescriptionType[Mxf_AS11_AudioDescriptionType_Count]=
 {
     "Control data / Narration",
     "AD Mix",
@@ -1865,7 +1866,7 @@ const char* Mxf_AS11_AudioDescriptionType[Mxf_AS11_AudioDescriptionType_Count]=
 
 //---------------------------------------------------------------------------
 const size_t Mxf_AS11_OpenCaptionsType_Count=2;
-const char* Mxf_AS11_OpenCaptionsType[Mxf_AS11_OpenCaptionsType_Count]=
+static const char* Mxf_AS11_OpenCaptionsType[Mxf_AS11_OpenCaptionsType_Count]=
 {
     "Hard of Hearing",
     "Translation",
@@ -1873,7 +1874,7 @@ const char* Mxf_AS11_OpenCaptionsType[Mxf_AS11_OpenCaptionsType_Count]=
 
 //---------------------------------------------------------------------------
 const size_t Mxf_AS11_SignLanguage_Count=2;
-const char* Mxf_AS11_SignLanguage[Mxf_AS11_SignLanguage_Count]=
+static const char* Mxf_AS11_SignLanguage[Mxf_AS11_SignLanguage_Count]=
 {
     "BSL (British Sign Language)",
     "BSL (Makaton)",
@@ -1882,7 +1883,7 @@ const char* Mxf_AS11_SignLanguage[Mxf_AS11_SignLanguage_Count]=
 
 //---------------------------------------------------------------------------
 // EBU Tech 3349
-string Mxf_CameraUnitMetadata_GammaforCDL(int8u Value)
+static string Mxf_CameraUnitMetadata_GammaforCDL(int8u Value)
 {
     switch(Value)
     {
@@ -1897,7 +1898,7 @@ string Mxf_CameraUnitMetadata_GammaforCDL(int8u Value)
 
 //---------------------------------------------------------------------------
 // EBU Tech 3349
-string Mxf_CameraUnitMetadata_NeutralDensityFilterWheelSetting(int16u Value)
+static string Mxf_CameraUnitMetadata_NeutralDensityFilterWheelSetting(int16u Value)
 {
     switch(Value)
     {
@@ -1908,7 +1909,7 @@ string Mxf_CameraUnitMetadata_NeutralDensityFilterWheelSetting(int16u Value)
 
 //---------------------------------------------------------------------------
 // EBU Tech 3349
-string Mxf_CameraUnitMetadata_ImageSensorReadoutMode(int8u Value)
+static string Mxf_CameraUnitMetadata_ImageSensorReadoutMode(int8u Value)
 {
     switch(Value)
     {
@@ -1922,7 +1923,7 @@ string Mxf_CameraUnitMetadata_ImageSensorReadoutMode(int8u Value)
 
 //---------------------------------------------------------------------------
 // EBU Tech 3349
-string Mxf_CameraUnitMetadata_CaptureGammaEquation(int128u Value)
+static string Mxf_CameraUnitMetadata_CaptureGammaEquation(int128u Value)
 {
     switch(Value.lo)
     {
@@ -1986,7 +1987,7 @@ string Mxf_CameraUnitMetadata_CaptureGammaEquation(int128u Value)
 
 //---------------------------------------------------------------------------
 // RDD 18
-string Mxf_CameraUnitMetadata_AutoExposureMode(int128u Value)
+static string Mxf_CameraUnitMetadata_AutoExposureMode(int128u Value)
 {
     switch(Value.lo)
     {
@@ -2008,7 +2009,7 @@ string Mxf_CameraUnitMetadata_AutoExposureMode(int128u Value)
 
 //---------------------------------------------------------------------------
 // RDD 18
-string Mxf_CameraUnitMetadata_AutoFocusSensingAreaSetting(int8u Value)
+static string Mxf_CameraUnitMetadata_AutoFocusSensingAreaSetting(int8u Value)
 {
     switch(Value)
     {
@@ -2023,7 +2024,7 @@ string Mxf_CameraUnitMetadata_AutoFocusSensingAreaSetting(int8u Value)
 
 //---------------------------------------------------------------------------
 // RDD 18
-string Mxf_CameraUnitMetadata_ColorCorrectionFilterWheelSetting(int8u Value)
+static string Mxf_CameraUnitMetadata_ColorCorrectionFilterWheelSetting(int8u Value)
 {
     switch(Value)
     {
@@ -2038,7 +2039,7 @@ string Mxf_CameraUnitMetadata_ColorCorrectionFilterWheelSetting(int8u Value)
 
 //---------------------------------------------------------------------------
 // RDD 18
-string Mxf_CameraUnitMetadata_AutoWhiteBalanceMode(int8u Value)
+static string Mxf_CameraUnitMetadata_AutoWhiteBalanceMode(int8u Value)
 {
     switch(Value)
     {
@@ -2052,7 +2053,7 @@ string Mxf_CameraUnitMetadata_AutoWhiteBalanceMode(int8u Value)
 
 //---------------------------------------------------------------------------
 // CameraUnitMetadata
-string Mxf_AcquisitionMetadata_ElementName(int16u Value, bool IsSony=false)
+static string Mxf_AcquisitionMetadata_ElementName(int16u Value, bool IsSony=false)
 {
     if (IsSony)
         switch (Value)
@@ -2119,7 +2120,7 @@ string Mxf_AcquisitionMetadata_ElementName(int16u Value, bool IsSony=false)
 //---------------------------------------------------------------------------
 // CameraUnitMetadata - Sony E201 (Values are internal MI)
 const size_t Mxf_AcquisitionMetadata_Sony_E201_ElementCount = 11;
-const char* Mxf_AcquisitionMetadata_Sony_E201_ElementName[Mxf_AcquisitionMetadata_Sony_E201_ElementCount] =
+static const char* Mxf_AcquisitionMetadata_Sony_E201_ElementName[Mxf_AcquisitionMetadata_Sony_E201_ElementCount] =
 {
     "FocusDistance",
     "ApertureValue",
@@ -2136,7 +2137,7 @@ const char* Mxf_AcquisitionMetadata_Sony_E201_ElementName[Mxf_AcquisitionMetadat
 
 //---------------------------------------------------------------------------
 // Read from SR Viewer program
-string Mxf_AcquisitionMetadata_Sony_CameraProcessDiscriminationCode(int16u Value)
+static string Mxf_AcquisitionMetadata_Sony_CameraProcessDiscriminationCode(int16u Value)
 {
     switch (Value)
     {
@@ -2149,7 +2150,7 @@ string Mxf_AcquisitionMetadata_Sony_CameraProcessDiscriminationCode(int16u Value
 
 //---------------------------------------------------------------------------
 // Read from SR Viewer program
-string Mxf_AcquisitionMetadata_Sony_MonitoringBaseCurve(int128u Value)
+static string Mxf_AcquisitionMetadata_Sony_MonitoringBaseCurve(int128u Value)
 {
     switch(Value.lo)
     {
@@ -2192,7 +2193,7 @@ File_Mxf::File_Mxf()
     #endif //MEDIAINFO_DEMUX
 
     //Temp
-    RandomIndexMetadatas_AlreadyParsed=false;
+    RandomIndexPacks_AlreadyParsed=false;
     Streams_Count=(size_t)-1;
     OperationalPattern=0;
     Buffer_Begin=(int64u)-1;
@@ -2212,7 +2213,7 @@ File_Mxf::File_Mxf()
     IdIsAlwaysSame_Offset=0;
     PartitionMetadata_PreviousPartition=(int64u)-1;
     PartitionMetadata_FooterPartition=(int64u)-1;
-    RandomIndexMetadatas_MaxOffset=(int64u)-1;
+    RandomIndexPacks_MaxOffset=(int64u)-1;
     DTS_Delay=0;
     SDTI_TimeCode_RepetitionCount=0;
     SDTI_SizePerFrame=0;
@@ -3006,7 +3007,7 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
 
         //Positioning other streams
         for (essences::iterator Essence_Temp=Essence; Essence_Temp!=Essences.end(); ++Essence_Temp)
-            if (*(Essence_Temp->second.Parsers.begin()) && (*(Essence_Temp->second.Parsers.begin()))->Count_Get(Stream_Audio))
+            if (!Essence_Temp->second.Parsers.empty() && Essence_Temp->second.Parsers[0]->Count_Get(Stream_Audio))
             {
                 Essence_Temp->second.StreamPos-=2; //ChannelGrouping
                 Essence_Temp->second.StreamPos+=(*(Essence_Temp->second.Parsers.begin()))->Count_Get(Stream_Audio);
@@ -3701,6 +3702,13 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
                                                     Fill(Stream_Audio, StreamPos_Last, Info->first.c_str(), Info->second, true);
                                                 break;
                         default:                ;
+                                                #if MEDIAINFO_ADVANCED
+                                                    if (SubDescriptor->second.Jpeg2000_Rsiz!=(int16u)-1 && !Retrieve(StreamKind_Last, StreamPos_Last, "Format_Profile").empty() && Jpeg2000_Rsiz(SubDescriptor->second.Jpeg2000_Rsiz)!=Retrieve(StreamKind_Last, StreamPos_Last, "Format_Profile").To_UTF8())
+                                                    {
+                                                        Fill(StreamKind_Last, StreamPos_Last, "Format_Profile_FromStream", Retrieve(StreamKind_Last, StreamPos_Last, "Format_Profile"));
+                                                        Fill(StreamKind_Last, StreamPos_Last, "Format_Profile_FromContainer", Jpeg2000_Rsiz(SubDescriptor->second.Jpeg2000_Rsiz));
+                                                    }
+                                                #endif //MEDIAINFO_ADVANCED
                     }
 
                     for (std::map<std::string, Ztring>::iterator Info=SubDescriptor->second.Infos.begin(); Info!=SubDescriptor->second.Infos.end(); ++Info)
@@ -3818,7 +3826,7 @@ void File_Mxf::Streams_Finish_CommercialNames ()
 }
 
 //---------------------------------------------------------------------------
-void File_Mxf::Streams_Finish_Component(const int128u ComponentUID, float64 EditRate, int32u TrackID, int64u Origin)
+void File_Mxf::Streams_Finish_Component(const int128u ComponentUID, float64 EditRate, int32u TrackID, int64s Origin)
 {
     components::iterator Component=Components.find(ComponentUID);
     if (Component==Components.end())
@@ -3881,7 +3889,7 @@ void File_Mxf::Streams_Finish_Component(const int128u ComponentUID, float64 Edit
 }
 
 //---------------------------------------------------------------------------
-void File_Mxf::Streams_Finish_Component_ForTimeCode(const int128u ComponentUID, float64 EditRate, int32u TrackID, int64u Origin, bool IsSourcePackage)
+void File_Mxf::Streams_Finish_Component_ForTimeCode(const int128u ComponentUID, float64 EditRate, int32u TrackID, int64s Origin, bool IsSourcePackage)
 {
     components::iterator Component=Components.find(ComponentUID);
     if (Component==Components.end())
@@ -3945,7 +3953,7 @@ void File_Mxf::Streams_Finish_Component_ForTimeCode(const int128u ComponentUID, 
 }
 
 //---------------------------------------------------------------------------
-void File_Mxf::Streams_Finish_Component_ForAS11(const int128u ComponentUID, float64 EditRate, int32u TrackID, int64u Origin)
+void File_Mxf::Streams_Finish_Component_ForAS11(const int128u ComponentUID, float64 EditRate, int32u TrackID, int64s Origin)
 {
     components::iterator Component=Components.find(ComponentUID);
     if (Component==Components.end())
@@ -4473,7 +4481,7 @@ void File_Mxf::Read_Buffer_AfterParsing()
 
         if (IsParsingEnd)
         {
-            if (PartitionMetadata_PreviousPartition && RandomIndexMetadatas.empty() && !RandomIndexMetadatas_AlreadyParsed)
+            if (PartitionMetadata_PreviousPartition && RandomIndexPacks.empty() && !RandomIndexPacks_AlreadyParsed)
             {
                 Partitions_Pos=0;
                 while (Partitions_Pos<Partitions.size() && Partitions[Partitions_Pos].StreamOffset!=PartitionMetadata_PreviousPartition)
@@ -5120,7 +5128,7 @@ bool File_Mxf::FileHeader_Begin()
         return false;
     }
 
-    //DCA uses buffer interface without filename
+    //In case of buffer interface without filename
     if (File_Name.empty())
         File_Name=Config->File_FileName_Get();
 
@@ -5281,6 +5289,8 @@ bool File_Mxf::Header_Begin()
                             DemuxedSampleCount_Current=Config->File_IgnoreEditsAfter-DemuxedSampleCount_Total;
                             Element_Size=DemuxedSampleCount_Current*SingleDescriptor->second.BlockAlign;
                         }
+                        if (DemuxedSampleCount_Total+DemuxedSampleCount_Current+1==IgnoreSamplesAfter)
+                            DemuxedSampleCount_Current++; //Avoid rounding issues (sometimes it remains only 1 sample)
                     }
                 #endif //MEDIAINFO_DEMUX
             }
@@ -5745,7 +5755,7 @@ void File_Mxf::Data_Parse()
     ELEMENT(ClosedCompleteFooterPartition,                      "Closed and Complete Footer Partition Pack")
     ELEMENT(Primer,                                             "Primer")
     ELEMENT(IndexTableSegment,                                  "Index Table (Segment)")
-    ELEMENT(RandomIndexMetadata,                                "Random Index Metadata")
+    ELEMENT(RandomIndexPack,                                    "Random Index Pack")
     ELEMENT(SDTI_SystemMetadataPack,                            "SDTI System Metadata Pack")
     else if (Code_Compare1==Elements::SDTI_SystemMetadataPack1
           && ((Code_Compare2)&0xFF00FFFF)==(Elements::SDTI_SystemMetadataPack2&0xFF00FFFF)
@@ -5845,7 +5855,7 @@ void File_Mxf::Data_Parse()
 
         if (IsParsingEnd)
         {
-            NextRandomIndexMetadata();
+            NextRandomIndexPack();
             return;
         }
 
@@ -6358,8 +6368,8 @@ void File_Mxf::Data_Parse()
         Open_Buffer_Unsynch();
     }
 
-    if (File_Offset+Buffer_Offset+Element_Size>=RandomIndexMetadatas_MaxOffset)
-        NextRandomIndexMetadata();
+    if (File_Offset+Buffer_Offset+Element_Size>=RandomIndexPacks_MaxOffset)
+        NextRandomIndexPack();
 }
 
 //***************************************************************************
@@ -6438,8 +6448,8 @@ void File_Mxf::CDCIEssenceDescriptor()
         default: GenericPictureEssenceDescriptor();
     }
 
-    if (Descriptors[InstanceUID].Infos["ColorSpace"].empty())
-        Descriptors[InstanceUID].Infos["ColorSpace"]="YUV";
+    if (Descriptors[InstanceUID].Infos.find("ColorSpace")==Descriptors[InstanceUID].Infos.end())
+        Descriptor_Fill("ColorSpace", "YUV");
 }
 
 //---------------------------------------------------------------------------
@@ -7135,52 +7145,46 @@ void File_Mxf::RGBAEssenceDescriptor()
         default: GenericPictureEssenceDescriptor();
     }
 
-    if (Descriptors[InstanceUID].Infos["ColorSpace"].empty())
-        Descriptors[InstanceUID].Infos["ColorSpace"]="RGB";
+    if (Descriptors[InstanceUID].Infos.find("ColorSpace")==Descriptors[InstanceUID].Infos.end())
+        Descriptor_Fill("ColorSpace", "RGB");
 }
 
 //---------------------------------------------------------------------------
-void File_Mxf::RandomIndexMetadata()
+void File_Mxf::RandomIndexPack()
 {
-    if (RandomIndexMetadatas_AlreadyParsed)
-    {
-        Skip_XX(Element_Size,                                   "(Already parsed)");
-        return;
-    }
-
     //Parsing
     while (Element_Offset+4<Element_Size)
     {
         Element_Begin1("PartitionArray");
-        randomindexmetadata RandomIndexMetadata;
-        Get_B4 (RandomIndexMetadata.BodySID,                    "BodySID"); Element_Info1(RandomIndexMetadata.BodySID);
-        Get_B8 (RandomIndexMetadata.ByteOffset,                 "ByteOffset"); Element_Info1(Ztring::ToZtring(RandomIndexMetadata.ByteOffset, 16));
+        randomindexpack RandomIndexPack;
+        Get_B4 (RandomIndexPack.BodySID,                        "BodySID"); Element_Info1(RandomIndexPack.BodySID);
+        Get_B8 (RandomIndexPack.ByteOffset,                     "ByteOffset"); Element_Info1(Ztring::ToZtring(RandomIndexPack.ByteOffset, 16));
         Element_End0();
 
         FILLING_BEGIN();
-            if (!RandomIndexMetadatas_AlreadyParsed && PartitionPack_AlreadyParsed.find(RandomIndexMetadata.ByteOffset)==PartitionPack_AlreadyParsed.end())
-                RandomIndexMetadatas.push_back(RandomIndexMetadata);
+            if (!RandomIndexPacks_AlreadyParsed && PartitionPack_AlreadyParsed.find(RandomIndexPack.ByteOffset)==PartitionPack_AlreadyParsed.end())
+                RandomIndexPacks.push_back(RandomIndexPack);
         FILLING_END();
     }
     Skip_B4(                                                    "Length");
 
     FILLING_BEGIN();
-        if (MediaInfoLib::Config.ParseSpeed_Get()<1.0 && !RandomIndexMetadatas_AlreadyParsed && !RandomIndexMetadatas.empty() && Config->File_Mxf_ParseIndex_Get())
+        if (MediaInfoLib::Config.ParseSpeed_Get()<1.0 && !RandomIndexPacks_AlreadyParsed && !RandomIndexPacks.empty() && Config->File_Mxf_ParseIndex_Get())
         {
             IsParsingEnd=true;
-            GoTo(RandomIndexMetadatas[0].ByteOffset);
-            RandomIndexMetadatas.erase(RandomIndexMetadatas.begin());
+            GoTo(RandomIndexPacks[0].ByteOffset);
+            RandomIndexPacks.erase(RandomIndexPacks.begin());
             Open_Buffer_Unsynch();
 
             //Hints
             if (File_Buffer_Size_Hint_Pointer)
                 (*File_Buffer_Size_Hint_Pointer)=64*1024;
         }
-        else if (!RandomIndexMetadatas_AlreadyParsed && !Partitions_IsFooter && !RandomIndexMetadatas.empty() && (!RandomIndexMetadatas[RandomIndexMetadatas.size()-1].BodySID || File_Offset+Buffer_Offset-Header_Size-RandomIndexMetadatas[RandomIndexMetadatas.size()-1].ByteOffset<16*1024*1024)) // If footer was not parsed but is available
+        else if (!RandomIndexPacks_AlreadyParsed && !Partitions_IsFooter && !RandomIndexPacks.empty() && (!RandomIndexPacks[RandomIndexPacks.size()-1].BodySID || File_Offset+Buffer_Offset-Header_Size-RandomIndexPacks[RandomIndexPacks.size()-1].ByteOffset<16*1024*1024)) // If footer was not parsed but is available
         {
-            GoTo(RandomIndexMetadatas[RandomIndexMetadatas.size()-1].ByteOffset);
+            GoTo(RandomIndexPacks[RandomIndexPacks.size()-1].ByteOffset);
         }
-        RandomIndexMetadatas_AlreadyParsed=true;
+        RandomIndexPacks_AlreadyParsed=true;
     FILLING_END();
 }
 
@@ -8618,11 +8622,7 @@ void File_Mxf::CDCIEssenceDescriptor_ComponentDepth()
     Get_B4 (Data,                                                "Data"); Element_Info1(Data);
 
     FILLING_BEGIN();
-        if (!Partitions_IsFooter || Descriptors[InstanceUID].Infos["BitDepth"].empty())
-        {
-            if (Data)
-                Descriptors[InstanceUID].Infos["BitDepth"].From_Number(Data);
-        }
+        Descriptor_Fill("BitDepth", Ztring().From_Number(Data));
     FILLING_END();
 }
 
@@ -8843,7 +8843,7 @@ void File_Mxf::FileDescriptor_SampleRate()
 
     FILLING_BEGIN();
         if (Descriptors[InstanceUID].SampleRate && Descriptors[InstanceUID].Duration!=(int64u)-1)
-            Descriptors[InstanceUID].Infos["Duration"].From_Number(Descriptors[InstanceUID].Duration/Descriptors[InstanceUID].SampleRate*1000, 0);
+            Descriptor_Fill("Duration", Ztring().From_Number(Descriptors[InstanceUID].Duration/Descriptors[InstanceUID].SampleRate*1000, 0));
     FILLING_END();
 }
 
@@ -8879,7 +8879,7 @@ void File_Mxf::FileDescriptor_EssenceContainer()
         int8u Code8=(int8u)((EssenceContainer.lo&0x00000000000000FFLL)    );
 
         Descriptors[InstanceUID].EssenceContainer=EssenceContainer;
-        Descriptors[InstanceUID].Infos["Format_Settings_Wrapping"].From_UTF8(Mxf_EssenceContainer_Mapping(Code6, Code7, Code8));
+        Descriptor_Fill("Format_Settings_Wrapping", Mxf_EssenceContainer_Mapping(Code6, Code7, Code8));
 
         if (!DataMustAlwaysBeComplete && Descriptors[InstanceUID].Infos["Format_Settings_Wrapping"].find(__T("Frame"))!=string::npos)
             DataMustAlwaysBeComplete=true;
@@ -8956,7 +8956,11 @@ void File_Mxf::InterchangeObject_InstanceUID()
                 //Merging
                 Descriptor->second.Infos.insert(Descriptor_Previous->second.Infos.begin(), Descriptor_Previous->second.Infos.end()); //TODO: better implementation
             }
+            for (std::map<std::string, Ztring>::iterator Info = Descriptor->second.Infos.begin(); Info != Descriptor->second.Infos.end(); ++Info) //Note: can not be mapped directly because there are some tests done in Descriptor_Fill
+                Descriptor_Fill(Info->first.c_str(), Info->second);
+            std::map<std::string, Ztring> Infos_Temp=Descriptors[InstanceUID].Infos; //Quick method for copying the whole descriptor without erasing the modifications made by Descriptor_Fill(). TODO: a better method in order to be more generic
             Descriptors[InstanceUID]=Descriptor->second;
+            Descriptors[InstanceUID].Infos=Infos_Temp;
             Descriptors.erase(Descriptor);
         }
         locators::iterator Locator=Locators.find(0);
@@ -9081,9 +9085,9 @@ void File_Mxf::GenericPictureEssenceDescriptor_PictureEssenceCoding()
     FILLING_BEGIN();
         Descriptors[InstanceUID].EssenceCompression=Data;
         Descriptors[InstanceUID].StreamKind=Stream_Video;
-        Descriptors[InstanceUID].Infos["Format"]=Mxf_EssenceCompression(Data);
-        Descriptors[InstanceUID].Infos["Format_Profile"]=Mxf_EssenceCompression_Profile(Data);
-        Descriptors[InstanceUID].Infos["Format_Version"]=Mxf_EssenceCompression_Version(Data);
+        Descriptor_Fill("Format", Mxf_EssenceCompression(Data));
+        Descriptor_Fill("Format_Version", Mxf_EssenceCompression_Version(Data));
+        Descriptor_Fill("Format_Profile", Mxf_EssenceCompression_Profile(Data));
     FILLING_END();
 }
 
@@ -9299,7 +9303,7 @@ void File_Mxf::GenericPictureEssenceDescriptor_AspectRatio()
         if (Data)
         {
             Descriptors[InstanceUID].DisplayAspectRatio=Data;
-            Descriptors[InstanceUID].Infos["DisplayAspectRatio"].From_Number(Data, 3);
+            Descriptor_Fill("DisplayAspectRatio", Ztring().From_Number(Data, 3));
         }
     FILLING_END();
 }
@@ -9321,7 +9325,7 @@ void File_Mxf::GenericPictureEssenceDescriptor_TransferCharacteristic()
     Get_UL(Data,                                                "Data", Mxf_TransferCharacteristic);  Element_Info1(Mxf_TransferCharacteristic(Data));
 
     FILLING_BEGIN();
-        Descriptors[InstanceUID].Infos["transfer_characteristics"]=Mxf_TransferCharacteristic(Data);
+        Descriptor_Fill("transfer_characteristics", Mxf_TransferCharacteristic(Data));
     FILLING_END();
 }
 
@@ -9427,7 +9431,7 @@ void File_Mxf::GenericPictureEssenceDescriptor_ColorPrimaries()
     Get_UL(Data,                                                "Data", Mxf_ColorPrimaries);  Element_Info1(Mxf_ColorPrimaries(Data));
 
     FILLING_BEGIN();
-        Descriptors[InstanceUID].Infos["colour_primaries"]=Mxf_ColorPrimaries(Data);
+        Descriptor_Fill("colour_primaries", Mxf_ColorPrimaries(Data));
     FILLING_END();
 }
 
@@ -9440,7 +9444,7 @@ void File_Mxf::GenericPictureEssenceDescriptor_CodingEquations()
     Get_UL(Data,                                                "Data", Mxf_CodingEquations);  Element_Info1(Mxf_CodingEquations(Data));
 
     FILLING_BEGIN();
-        Descriptors[InstanceUID].Infos["matrix_coefficients"]=Mxf_CodingEquations(Data);
+        Descriptor_Fill("matrix_coefficients", Mxf_CodingEquations(Data));
     FILLING_END();
 }
 
@@ -9455,7 +9459,7 @@ void File_Mxf::GenericSoundEssenceDescriptor_QuantizationBits()
     FILLING_BEGIN();
         if (Data)
         {
-            Descriptors[InstanceUID].Infos["BitDepth"].From_Number(Data);
+            Descriptor_Fill("BitDepth", Ztring().From_Number(Data));
             Descriptors[InstanceUID].QuantizationBits=Data;
         }
     FILLING_END();
@@ -9466,7 +9470,12 @@ void File_Mxf::GenericSoundEssenceDescriptor_QuantizationBits()
 void File_Mxf::GenericSoundEssenceDescriptor_Locked()
 {
     //Parsing
-    Info_B1(Data,                                               "Data"); Element_Info1(Data?"Yes":"No");
+    int8u Data;
+    Get_B1 (Data,                                               "Data"); Element_Info1(Data?"Yes":"No");
+
+    FILLING_BEGIN();
+        Descriptor_Fill("Locked", Data?"Yes":"No");
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -9478,7 +9487,7 @@ void File_Mxf::GenericSoundEssenceDescriptor_AudioSamplingRate()
     Get_Rational(Data); Element_Info1(Data);
 
     FILLING_BEGIN();
-        Descriptors[InstanceUID].Infos["SamplingRate"].From_Number(Data, 0);
+        Descriptor_Fill("SamplingRate", Ztring().From_Number(Data, 0));
     FILLING_END();
 }
 
@@ -9509,10 +9518,10 @@ void File_Mxf::GenericSoundEssenceDescriptor_SoundEssenceCompression()
     FILLING_BEGIN();
         Descriptors[InstanceUID].EssenceCompression=Data;
         Descriptors[InstanceUID].StreamKind=Stream_Audio;
-        Descriptors[InstanceUID].Infos["Format"]=Mxf_EssenceCompression(Data);
-        Descriptors[InstanceUID].Infos["Format_Version"]=Mxf_EssenceCompression_Version(Data);
+        Descriptor_Fill("Format", Mxf_EssenceCompression(Data));
+        Descriptor_Fill("Format_Version", Mxf_EssenceCompression_Version(Data));
         if ((Data.lo&0xFFFFFFFFFF000000LL)==0x040202017e000000LL)
-            Descriptors[InstanceUID].Infos["Format_Settings_Endianness"]=__T("Big");
+            Descriptor_Fill("Format_Settings_Endianness", "Big");
     FILLING_END();
 }
 
@@ -9526,7 +9535,7 @@ void File_Mxf::GenericSoundEssenceDescriptor_ChannelCount()
 
     FILLING_BEGIN();
         Descriptors[InstanceUID].ChannelCount=Value;
-        Descriptors[InstanceUID].Infos["Channel(s)"].From_Number(Value);
+        Descriptor_Fill("Channel(s)", Ztring().From_Number(Value));
 
         //if (Descriptors[InstanceUID].ChannelAssignment.lo!=(int64u)-1)
         //{
@@ -9883,8 +9892,9 @@ void File_Mxf::IndexTableSegment_IndexStartPosition()
                         IndexTables.erase(IndexTables.begin()+Pos);
                     else
                     {
-                        IndexTables.erase(IndexTables.begin()+IndexTables.size()-1);
-                        Element_Offset=Element_Size;
+                        //Removed in order to get all indexes, even the duplicated ones (in order to check duplicated index in the footer)
+                        //IndexTables.erase(IndexTables.begin()+IndexTables.size()-1);
+                        //Element_Offset=Element_Size;
                     }
 
                     return;
@@ -9933,8 +9943,17 @@ void File_Mxf::IndexTableSegment_8002()
 // 0x8001
 void File_Mxf::JPEG2000PictureSubDescriptor_Rsiz()
 {
-    //Parsing
-    Info_B2(Data,                                                "Data"); Element_Info1(Data);
+    #if MEDIAINFO_ADVANCED
+        //Parsing
+        int16u Data;
+        Get_B2 (Data,                                            "Data"); Element_Info1(Data);
+
+        FILLING_BEGIN();
+            Descriptors[InstanceUID].Jpeg2000_Rsiz=Data;
+        FILLING_END();
+    #else //MEDIAINFO_ADVANCED
+        Info_B2(Data,                                            "Data"); Element_Info1(Data);
+    #endif //MEDIAINFO_ADVANCED
 }
 
 //---------------------------------------------------------------------------
@@ -10119,7 +10138,7 @@ void File_Mxf::RFC5646AudioLanguageCode()
     Get_Local (Length2-(SizeIsPresent?4:0), Value,              "Value"); Element_Info1(Value);
 
     FILLING_BEGIN();
-        Descriptors[InstanceUID].Infos["Language"]=Value;
+        Descriptor_Fill("Language", Value);
     FILLING_END();
 }
 
@@ -10226,7 +10245,7 @@ void File_Mxf::MPEG2VideoDescriptor_ProfileAndLevel()
 
     FILLING_BEGIN();
         if (profile_and_level_indication_profile && profile_and_level_indication_level)
-            Descriptors[InstanceUID].Infos["Format_Profile"]=Ztring().From_Local(Mpegv_profile_and_level_indication_profile[profile_and_level_indication_profile])+__T("@")+Ztring().From_Local(Mpegv_profile_and_level_indication_level[profile_and_level_indication_level]);
+            Descriptor_Fill("Format_Profile", Ztring().From_UTF8(Mpegv_profile_and_level_indication_profile[profile_and_level_indication_profile])+__T("@")+Ztring().From_UTF8(Mpegv_profile_and_level_indication_level[profile_and_level_indication_level]));
     FILLING_END();
 }
 
@@ -10240,7 +10259,7 @@ void File_Mxf::Mpeg4VisualDescriptor_ProfileAndLevel()
 
     FILLING_BEGIN();
         if (profile_and_level_indication)
-            Descriptors[InstanceUID].Infos["Format_Profile"]=Ztring().From_Local(Mpeg4v_Profile_Level(profile_and_level_indication));
+            Descriptor_Fill("Format_Profile", Mpeg4v_Profile_Level(profile_and_level_indication));
     FILLING_END();
 }
 
@@ -10253,7 +10272,7 @@ void File_Mxf::MPEG2VideoDescriptor_BitRate()
     Get_B4 (Data,                                               "Data"); Element_Info1(Data);
 
     FILLING_BEGIN();
-        Descriptors[InstanceUID].Infos["BitRate"].From_Number(Data);
+        Descriptor_Fill("BitRate", Ztring().From_Number(Data));
     FILLING_END();
 }
 
@@ -10388,7 +10407,7 @@ void File_Mxf::PartitionMetadata()
         if (IsParsingEnd)
         {
             //Parsing only index
-            RandomIndexMetadatas_MaxOffset=File_Offset+Buffer_Offset+Element_Size+HeaderByteCount+IndexByteCount;
+            RandomIndexPacks_MaxOffset=File_Offset+Buffer_Offset+Element_Size+HeaderByteCount+IndexByteCount;
 
             //Hints
             if (File_Buffer_Size_Hint_Pointer && Buffer_Offset+Element_Size+HeaderByteCount+IndexByteCount>=Buffer_Size)
@@ -11022,11 +11041,10 @@ void File_Mxf::Track_Origin()
 {
     //Parsing
     int64u Data;
-    Get_B8 (Data,                                                "Data"); Element_Info1(Data);
+    Get_B8 (Data,                                                "Data"); Element_Info1(Data); //Note: Origin is signed but there is no signed Get_* in MediaInfo
 
     FILLING_BEGIN();
-        if (Data!=(int64u)-1)
-            Tracks[InstanceUID].Origin=Data;
+        Tracks[InstanceUID].Origin=(int64s)Data; //Origin is signed
     FILLING_END();
 }
 
@@ -11039,7 +11057,7 @@ void File_Mxf::WaveAudioDescriptor_AvgBps()
     Get_B4 (Data,                                               "Data"); Element_Info1(Data);
 
     FILLING_BEGIN();
-        Descriptors[InstanceUID].Infos["BitRate"].From_Number(Data*8);
+        Descriptor_Fill("BitRate", Ztring().From_Number(Data*8));
         Descriptors[InstanceUID].ByteRate=Data;
     FILLING_END();
 }
@@ -16871,13 +16889,13 @@ void File_Mxf::Locators_Test()
 #endif //defined(MEDIAINFO_REFERENCES_YES)
 
 //---------------------------------------------------------------------------
-void File_Mxf::NextRandomIndexMetadata()
+void File_Mxf::NextRandomIndexPack()
 {
     //We have the necessary for indexes, jumping to next index
     Skip_XX(Element_Size-Element_Offset,                        "Data");
-    if (RandomIndexMetadatas.empty())
+    if (RandomIndexPacks.empty())
     {
-        if (!RandomIndexMetadatas_AlreadyParsed)
+        if (!RandomIndexPacks_AlreadyParsed)
         {
             Partitions_Pos=0;
             while (Partitions_Pos<Partitions.size() && Partitions[Partitions_Pos].StreamOffset!=PartitionMetadata_PreviousPartition)
@@ -16895,12 +16913,12 @@ void File_Mxf::NextRandomIndexMetadata()
     }
     else
     {
-        GoTo(RandomIndexMetadatas[0].ByteOffset);
-        RandomIndexMetadatas.erase(RandomIndexMetadatas.begin());
+        GoTo(RandomIndexPacks[0].ByteOffset);
+        RandomIndexPacks.erase(RandomIndexPacks.begin());
         Open_Buffer_Unsynch();
     }
 
-    RandomIndexMetadatas_MaxOffset=(int64u)-1;
+    RandomIndexPacks_MaxOffset=(int64u)-1;
 }
 
 //---------------------------------------------------------------------------
@@ -16919,6 +16937,28 @@ void File_Mxf::TryToFinish()
     }
 
     Finish();
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::Descriptor_Fill(const char* Name, const Ztring& Value)
+{
+    descriptor& Descriptor = Descriptors[InstanceUID];
+    std::map<std::string, Ztring>::iterator Info = Descriptor.Infos.find(Name);
+
+    //Ignore value if header partition has aleady a value
+    if (Partitions_IsFooter && InstanceUID != int128u() && Info != Descriptor.Infos.end())
+    {
+        //Test
+        if (Value != Info->second)
+            Descriptor.Infos[string(Name)+"_Footer"] = Value;
+
+        return;
+    }
+
+    if (Info == Descriptor.Infos.end())
+        Descriptor.Infos[Name] = Value;
+    else
+        Info->second = Value;
 }
 
 } //NameSpace

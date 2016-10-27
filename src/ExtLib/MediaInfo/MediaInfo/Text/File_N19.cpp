@@ -37,7 +37,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* N19_CodePageNumber(int32u CPN)
+static const char* N19_CodePageNumber(int32u CPN)
 {
     switch (CPN)
     {
@@ -51,7 +51,7 @@ const char* N19_CodePageNumber(int32u CPN)
 }
 
 //---------------------------------------------------------------------------
-const char* N19_CharacterCodeTable(int16u CCT)
+static const char* N19_CharacterCodeTable(int16u CCT)
 {
     switch (CCT)
     {
@@ -65,20 +65,26 @@ const char* N19_CharacterCodeTable(int16u CCT)
 }
 
 //---------------------------------------------------------------------------
-float64 N19_DiskFormatCode_FrameRate(int64u DFC)
+static float64 N19_DiskFormatCode_FrameRate(int64u DFC)
 {
     switch (DFC)
     {
-        case 0x53544C32332E3031LL : return (float64)24000 / (float64)1001; 
+        case 0x53544C32332E3031LL : return (float64)24000/(float64)1001;
+        case 0x53544C32342E3031LL : return (float64)24;
         case 0x53544C32352E3031LL : return (float64)25;
-        case 0x53544C32392E3031LL : return (float64)30000 / (float64)1001;
+        case 0x53544C32392E3031LL : return (float64)30000/(float64)1001;
         case 0x53544C33302E3031LL : return (float64)30;
+        case 0x53544C34372E3031LL : return (float64)48000/(float64)1001;
+        case 0x53544C34382E3031LL : return (float64)48;
+        case 0x53544C35350E3031LL : return (float64)50;
+        case 0x53544C35392E3031LL : return (float64)60000/(float64)1001;
+        case 0x53544C36302E3031LL : return (float64)60;
         default                   : return (float64) 0;
     }
 }
 
 //---------------------------------------------------------------------------
-const char* N19_DisplayStandardCode(int8u DSC)
+static const char* N19_DisplayStandardCode(int8u DSC)
 {
     switch (DSC)
     {
@@ -90,7 +96,7 @@ const char* N19_DisplayStandardCode(int8u DSC)
 }
 
 //---------------------------------------------------------------------------
-const char* N19_LanguageCode(int16u LC)
+static const char* N19_LanguageCode(int16u LC)
 {
     switch (LC)
     {
@@ -214,6 +220,24 @@ File_N19::File_N19()
         ParserIDs[0]=MediaInfo_Parser_N19;
         StreamIDs_Width[0]=0;
     #endif //MEDIAINFO_EVENTS
+
+    #if MEDIAINFO_DEMUX
+        TCP_Offset=0;
+        Row_Values=NULL;
+    #endif //MEDIAINFO_DEMUX
+}
+
+//---------------------------------------------------------------------------
+File_N19::~File_N19()
+{
+    #if MEDIAINFO_DEMUX
+        if (Row_Values)
+        {
+            for (int8u Row_Pos=0; Row_Pos<Row_Max; ++Row_Pos)
+                delete[] Row_Values[Row_Pos];
+            delete[] Row_Values;
+        }
+    #endif //MEDIAINFO_DEMUX
 }
 
 //***************************************************************************
@@ -255,10 +279,10 @@ void File_N19::FileHeader_Parse()
     Ztring OPT, RD, TNS, MNC, MNR, CO, EN;
     string TCP;
     int16u LC;
-    int8u TCS;
+    int8u  DSC, TCS;
     Info_C3   (    CPN,                                         "CPN - Code Page Number"); Param_Info1(N19_CodePageNumber(CPN));
     Get_C8    (    DFC,                                         "DFC - Disk Format Code"); Param_Info1(N19_DiskFormatCode_FrameRate(DFC));
-    Info_C1   (    DSC,                                         "DSC - Display Standard Code"); Param_Info1(N19_DisplayStandardCode(DSC));
+    Get_C1    (    DSC,                                         "DSC - Display Standard Code"); Param_Info1(N19_DisplayStandardCode(DSC));
     Get_C2    (    CCT,                                         "CCT - Character Code Table number"); Param_Info1(N19_CharacterCodeTable(CCT));
     Get_C2    (    LC,                                          "LC - Language Code"); Param_Info1(N19_LanguageCode(LC));
     Get_Local (32, OPT,                                         "OPT - Original Programme Title");
@@ -327,10 +351,15 @@ void File_N19::FileHeader_Parse()
                 Frames+=(((int8u)TCP[7])-'0');
                 Delay+=float64_int64s(Frames*1000/N19_DiskFormatCode_FrameRate(DFC));
                 //Fill(Stream_Text, 0, Text_Delay, Delay); //TODO is 0???
-                /*TCP.insert(':', 2);
-                TCP.insert(':', 5);
-                TCP.insert(':', 8);
-                Fill(Stream_Text, 0, "Delay/String4", TCP);*/
+                TCP.insert(TCP.begin()+2, ':');
+                TCP.insert(TCP.begin()+5, ':');
+                TCP.insert(TCP.begin()+8, ':');
+                //Fill(Stream_Text, 0, "Delay/String4", TCP);
+                Fill(Stream_Text, 0, "TimeCode_First", TCP);
+
+#if MEDIAINFO_DEMUX
+				TCP_Offset=Delay;
+#endif
             }
         }
         Fill(Stream_Text, 0, Text_Width, MNC.To_int32u());
@@ -342,6 +371,21 @@ void File_N19::FileHeader_Parse()
         #if MEDIAINFO_DEMUX
             Frame_Count=0;
             TCO_Latest=(int64u)-1;
+            Row_Max=MNR.To_int8u();
+            if ((DSC=='1' || DSC=='2') && Row_Max<23)
+            {
+                Row_Max=23;
+                IsTeletext=true;
+            }
+            else
+                IsTeletext=false;
+            Column_Max=MNC.To_int8u();
+            Row_Values=new wchar_t*[Row_Max];
+            for (int8u Row_Pos=0; Row_Pos<Row_Max; ++Row_Pos)
+            {
+                Row_Values[Row_Pos]=new wchar_t[Column_Max+1];
+                Row_Values[Row_Pos][Column_Max]=__T('\0');
+            }
         #endif //MEDIAINFO_DEMUX
     FILLING_END();
 }
@@ -382,6 +426,7 @@ void File_N19::Data_Parse()
     //Parsing
     Ztring TF;
     int32u TCI, TCO;
+    int8u  VP, JC;
     Skip_B1   (                                                 "SGN - Subtitle Group Number");
     Skip_B2   (                                                 "SN - Subtitle Number");
     Skip_B1   (                                                 "EBN - Extension Block Number");
@@ -390,16 +435,22 @@ void File_N19::Data_Parse()
     TCI=((TCI>>24)&0xFF)*60*60*1000
       + ((TCI>>16)&0xFF)   *60*1000
       + ((TCI>>8 )&0xFF)      *1000
-      +  float64_int64s((TCI     &0xFF)      *1000/N19_DiskFormatCode_FrameRate(DFC));
+      +  (int32u)float64_int64s((TCI     &0xFF)      *1000/N19_DiskFormatCode_FrameRate(DFC));
     Param_Info1(Ztring().Duration_From_Milliseconds((int64u)TCI));
     Get_B4    (TCO,                                             "TCO - Time Code Out");
     TCO=((TCO>>24)&0xFF)*60*60*1000
       + ((TCO>>16)&0xFF)   *60*1000
       + ((TCO>>8 )&0xFF)      *1000
-      +  float64_int64s((TCO     &0xFF)      *1000/N19_DiskFormatCode_FrameRate(DFC));
+      +  (int32u)float64_int64s((TCO     &0xFF)      *1000/N19_DiskFormatCode_FrameRate(DFC));
     Param_Info1(Ztring().Duration_From_Milliseconds((int64u)TCO));
-    Skip_B1   (                                                 "VP - Vertical Position");
-    Skip_B1   (                                                 "JC - Justification Code");
+    Get_B1    (VP,                                              "VP - Vertical Position");
+    if (VP 
+#if MEDIAINFO_DEMUX
+		&& IsTeletext
+#endif
+		)
+        VP--; //1-Based
+    Get_B1    (JC,                                              "JC - Justification Code");
     Skip_B1   (                                                 "CF - Comment Flag");
     switch (CCT)
     {
@@ -437,6 +488,128 @@ void File_N19::Data_Parse()
     #endif //MEDIAINFO_TRACE
 
     FILLING_BEGIN();
+        #if MEDIAINFO_DEMUX
+        for (size_t i = 0; i < TF.size(); ++i)
+            switch (TF[i])
+            {
+                case 0x8A:  //EOL
+                            TF[i] = EOL[0]; 
+                            {
+                                size_t j = 1;
+                                while (EOL[j] != __T('\0'))
+                                    TF.insert(++i, 1, EOL[j++]);
+                            };
+                            break;
+                case 0x8F:  // Padding
+                            TF.erase(i--, 1);
+                            break;
+                default:
+                    if ( TF[i]< 0x20
+                     || (TF[i]>=0x80 && TF[i]<0xA0))
+                        TF.erase(i--, 1);
+            }
+            Frame_Count_NotParsedIncluded=Frame_Count;
+
+            int8u Row_Pos=0;
+            for (; Row_Pos<Row_Max; ++Row_Pos)
+                for (int8u Column_Pos=0; Column_Pos<Column_Max; ++Column_Pos)
+                    Row_Values[Row_Pos][Column_Pos]=__T(' ');
+
+            if (TCO_Latest!=(int64u)-1 && TCI!=TCO_Latest)
+            {
+                EVENT_BEGIN (Global, SimpleText, 0)
+                    Event.DTS=((int64u)(TCO_Latest))*1000000; // "-TCP_Offset" removed for the moment. TODO: find a way for when TCP_Offset should be removed and when it should not
+                    Event.PTS=Event.DTS;
+                    Event.DUR=((int64u)(TCI-TCO_Latest))*1000000;
+                    Event.Content=__T("");
+                    Event.Flags=0;
+                    Event.MuxingMode=(int8u)-1;
+                    Event.Service=(int8u)-1;
+                    Event.Row_Max=Row_Max;
+                    Event.Column_Max=Column_Max;
+                    Event.Row_Values=Row_Values;
+                    Event.Row_Attributes=NULL;
+                EVENT_END   ()
+            }
+
+            ZtringList List;
+            List.Separator_Set(0, EOL);
+            List.Write(TF);
+            Row_Pos=0;
+            if (VP+List.size()>Row_Max)
+            {
+                if (List.size()<=Row_Max)
+                    VP=Row_Max-(int8u)List.size();
+                else
+                {
+                    VP=0;
+                    List.resize(Row_Max);
+                }
+            }
+            Row_Pos=VP;
+            for (; Row_Pos<Row_Max; ++Row_Pos)
+            {
+                if (Row_Pos-VP>=(int8u)List.size())
+                    break;
+                if (List[Row_Pos-VP].size()>Column_Max)
+                    List[Row_Pos-VP].resize(Column_Max);
+
+                switch (JC)
+                {
+                    case 1 :    //Left-justified
+                    case 0 :    //Unchanged
+                                for (int8u Column_Pos=0; Column_Pos<Column_Max; ++Column_Pos)
+                                {
+                                    if (JC==1) //Left-justified
+                                        List[Row_Pos-VP].Trim();    
+                                    if (Column_Pos>=List[Row_Pos-VP].size())
+                                        break;
+                                    if (List[Row_Pos-VP][Column_Pos]>=0x20)
+                                        Row_Values[Row_Pos][Column_Pos]=List[Row_Pos-VP][Column_Pos];
+                                }
+                                break;
+                    case 2 :    //Centered
+                                for (int8u Column_Pos=(Column_Max-(int8u)List[Row_Pos-VP].size())/2; Column_Pos<Column_Max; ++Column_Pos)
+                                {
+                                    List[Row_Pos-VP].Trim();    
+                                    if (Column_Pos-(Column_Max-List[Row_Pos-VP].size())/2>=List[Row_Pos-VP].size())
+                                        break;
+                                    if (List[Row_Pos-VP][Column_Pos-(Column_Max-List[Row_Pos-VP].size())/2]>=0x20)
+                                        Row_Values[Row_Pos][Column_Pos]=List[Row_Pos-VP][Column_Pos-(Column_Max-List[Row_Pos-VP].size())/2];
+                                }
+                                break;
+                    case 3 :    //Right-justified
+                                for (int8u Column_Pos=Column_Max-(int8u)List[Row_Pos-VP].size(); Column_Pos<Column_Max; ++Column_Pos)
+                                {
+                                    List[Row_Pos-VP].Trim();    
+                                    if (Column_Pos-(Column_Max-List[Row_Pos-VP].size())>=List[Row_Pos-VP].size())
+                                        break;
+                                    if (List[Row_Pos-VP][Column_Pos-(Column_Max-List[Row_Pos-VP].size())]>=0x20)
+                                        Row_Values[Row_Pos][Column_Pos]=List[Row_Pos-VP][Column_Pos-(Column_Max-List[Row_Pos-VP].size())];
+                                }
+                                break;
+                    default:    ;
+                }
+            }
+
+            EVENT_BEGIN (Global, SimpleText, 0)
+                Event.DTS=((int64u)(TCI))*1000000; // "-TCP_Offset" removed for the moment. TODO: find a way for when TCP_Offset should be removed and when it should not
+                Event.PTS=Event.DTS;
+                Event.DUR=((int64u)(TCO-TCI))*1000000;
+                Event.Content=TF.c_str();
+                Event.Flags=0;
+                Event.MuxingMode=(int8u)-1;
+                Event.Service=(int8u)-1;
+                Event.Row_Max=Row_Max;
+                Event.Column_Max=Column_Max;
+                Event.Row_Values=Row_Values;
+                Event.Row_Attributes=NULL;
+            EVENT_END   ()
+
+            Frame_Count++;
+            TCO_Latest=TCO;
+        #endif //MEDIAINFO_DEMUX
+
         if (FirstFrame_TCI==(int64u)-1)
         {
             FirstFrame_TCI=TCI;

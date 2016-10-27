@@ -51,7 +51,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Smpte_St0337_data_type[32]= // SMPTE ST 338
+static const char* Smpte_St0337_data_type[32]= // SMPTE ST 338
 {
     "",
     "AC-3",
@@ -88,7 +88,7 @@ const char* Smpte_St0337_data_type[32]= // SMPTE ST 338
 };
 
 //---------------------------------------------------------------------------
-stream_t Smpte_St0337_data_type_StreamKind[32]= // SMPTE 338M
+static stream_t Smpte_St0337_data_type_StreamKind[32]= // SMPTE 338M
 {
     Stream_Max,
     Stream_Audio,
@@ -152,6 +152,12 @@ File_SmpteSt0337::File_SmpteSt0337()
     GuardBand_Before=0;
     GuardBand_After=0;
     NullPadding_Size=0;
+
+    #if MEDIAINFO_EVENTS
+        pid=(int16u)-1;
+        stream_id=(int8u)-1;
+        IgnoreGuardBandTest=false;
+    #endif MEDIAINFO_EVENTS
 
     // Parser
     Parser=NULL;
@@ -582,17 +588,27 @@ bool File_SmpteSt0337::Synchronize()
             Buffer_Offset++;
     }
 
-    // Guard band
-    GuardBand_Before+=Buffer_Offset-Buffer_Offset_Base;
-
     // Parsing last bytes if needed
     if (Buffer_Offset+16>Buffer_Size)
     {
+        if (!Status[IsAccepted])
+            GuardBand_Before+=Buffer_Offset;
         return false;
     }
 
     if (!Status[IsAccepted])
         Accept("SMPTE ST 337");
+
+    // Guard band
+    GuardBand_Before+=Buffer_Offset-Buffer_Offset_Base;
+    if (GuardBand_After)
+    {
+        if (GuardBand_Before>GuardBand_After)
+            GuardBand_Before-=GuardBand_After;
+        else
+            GuardBand_Before=0;
+        GuardBand_After=0;
+    }
 
     // Synched
     return true;
@@ -601,6 +617,9 @@ bool File_SmpteSt0337::Synchronize()
 //---------------------------------------------------------------------------
 bool File_SmpteSt0337::Synched_Test()
 {
+    // Guard band
+    size_t Buffer_Offset_Base=Buffer_Offset;
+
     // Skip NULL padding
     size_t Buffer_Offset_Temp=Buffer_Offset;
     if (Aligned)
@@ -718,8 +737,6 @@ bool File_SmpteSt0337::Synched_Test()
         {
             Element_Size=Buffer_Offset_Temp-Buffer_Offset;
             Skip_XX(Buffer_Offset_Temp-Buffer_Offset,           "Guard band");
-
-            GuardBand_Before+=Buffer_Offset_Temp-Buffer_Offset;
         }
     #endif // MEDIAINFO_TRACE
     Buffer_Offset=Buffer_Offset_Temp;
@@ -784,6 +801,17 @@ bool File_SmpteSt0337::Synched_Test()
                     }
                     break;
         default    : ; // Should never happen
+    }
+
+    // Guard band
+    GuardBand_Before+=Buffer_Offset-Buffer_Offset_Base;
+    if (GuardBand_After)
+    {
+        if (GuardBand_Before>GuardBand_After)
+            GuardBand_Before-=GuardBand_After;
+        else
+            GuardBand_Before=0;
+        GuardBand_After=0;
     }
 
     // We continue
@@ -869,7 +897,6 @@ void File_SmpteSt0337::Header_Parse()
     if (Container_Bits!=Stream_Bits)
     {
         Size*=Container_Bits; Size/=Stream_Bits;
-        GuardBand_Before*=Container_Bits; GuardBand_Before/=Stream_Bits;
     }
 
     // Coherency test
@@ -903,10 +930,6 @@ void File_SmpteSt0337::Header_Parse()
     // Filling
     Header_Fill_Size(Container_Bits*4/8+Size/8);
     Header_Fill_Code(0, "SMPTE ST 337");
-
-    //Guard band
-    if (IsSub && FrameInfo.DTS!=(int64u)-1)
-        GuardBand_After+=Element_Size-(Container_Bits*4/8+Size/8);
 }
 
 //---------------------------------------------------------------------------
@@ -1261,13 +1284,17 @@ void File_SmpteSt0337::Data_Parse()
         }
      #endif //MEDIAINFO_DEMUX
 
+    // Guard band
+    GuardBand_After=0;
+
     if (Parser && !Parser->Status[IsFinished])
     {
         switch(data_type)
         {
             case 28 :
-                        ((File_DolbyE*)Parser)->GuardBand_Before+=GuardBand_Before;
-                        ((File_DolbyE*)Parser)->GuardBand_After+=GuardBand_After;
+                        ((File_DolbyE*)Parser)->GuardBand_Before=GuardBand_Before;
+                        ((File_DolbyE*)Parser)->GuardBand_Before*=Stream_Bits;
+                        ((File_DolbyE*)Parser)->GuardBand_Before/=Container_Bits;
                         break;
             default : ;
         }
@@ -1283,6 +1310,16 @@ void File_SmpteSt0337::Data_Parse()
                 FrameInfo.DTS=(int64u)-1;
             FrameInfo.PTS=FrameInfo.DTS;
         #endif // MEDIAINFO_DEMUX
+
+        switch (data_type)
+        {
+            case 28 :
+                        GuardBand_After=((File_DolbyE*)Parser)->GuardBand_After;
+                        GuardBand_After*=Container_Bits;
+                        GuardBand_After/=Stream_Bits;
+                        break;
+            default : ;
+        }
     }
     else
     {
@@ -1313,7 +1350,6 @@ void File_SmpteSt0337::Data_Parse()
 
     // Guard band
     GuardBand_Before=0;
-    GuardBand_After=0;
 }
 
 //***************************************************************************

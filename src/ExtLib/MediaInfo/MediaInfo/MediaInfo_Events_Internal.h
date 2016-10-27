@@ -11,7 +11,6 @@
 #include "MediaInfo/TimeCode.h"
 #include <cstring>
 using namespace MediaInfoLib;
-using namespace std;
 
 //---------------------------------------------------------------------------
 // Generic
@@ -29,6 +28,72 @@ using namespace std;
 #define EVENT(_EventType, _EventName, _EventVersion) \
     EVENT_BEGIN(_EventType, _EventName, _EventVersion) \
     EVENT_END  ()
+
+//---------------------------------------------------------------------------
+// MPEG-TS
+#define MEDIAINFO_EVENT_MPEGTS_BEGIN(_EVENTID, _EVENTVERSION, _TEST) \
+if (_TEST) \
+{ \
+    StreamIDs[StreamIDs_Size-1]=pid; \
+    EVENT_BEGIN (MpegTs, _EVENTID, _EVENTVERSION) \
+
+#define MEDIAINFO_EVENT_MPEGTS_BEGI2(_EVENTID, _EVENTVERSION, _TEST) \
+MEDIAINFO_EVENT_MPEGTS_BEGIN(_EVENTID, _EVENTVERSION, _TEST) \
+    StreamIDs[StreamIDs_Size-1]=pid; \
+    EVENT_BEGIN (MpegTs, _EVENTID, _EVENTVERSION) \
+
+#define MEDIAINFO_EVENT_MPEGTS_END(_EVENTID, _EVENTVERSION) \
+    EVENT_END   () \
+}
+
+#define MEDIAINFO_EVENT_MPEGTS(_EVENTID, _EVENTVERSION, _TEST) \
+    MEDIAINFO_EVENT_MPEGTS_BEGIN(_EVENTID, _EVENTVERSION, _TEST) \
+    MEDIAINFO_EVENT_MPEGTS_END  (_EVENTID, _EVENTVERSION)
+
+//---------------------------------------------------------------------------
+// MPEG-PS
+#define MEDIAINFO_EVENT_MPEGPS_BEGIN(_EVENTID, _EVENTVERSION, _TEST) \
+if (_TEST) \
+{ \
+    EVENT_BEGIN (MpegPs, _EVENTID, 0) \
+
+#define MEDIAINFO_EVENT_MPEGPS_END(_EVENTID, _EVENTVERSION) \
+    EVENT_END   () \
+}
+
+#define MEDIAINFO_EVENT_MPEGPS(_EVENTID, _EVENTVERSION, _TEST) \
+    MEDIAINFO_EVENT_MPEGPS_BEGIN(_EVENTID, _EVENTVERSION, _TEST) \
+    MEDIAINFO_EVENT_MPEGPS_END  (_EVENTID, _EVENTVERSION)
+
+//---------------------------------------------------------------------------
+// AVC
+#define MEDIAINFO_EVENT_AVC_BEGIN(_EVENTID, _EVENTVERSION, _TEST) \
+if (_TEST) \
+{ \
+    EVENT_BEGIN (Avc, _EVENTID, 0) \
+
+#define MEDIAINFO_EVENT_AVC_END(_EVENTID, _EVENTVERSION) \
+    EVENT_END   () \
+}
+
+#define MEDIAINFO_EVENT_AVC(_EVENTID, _EVENTVERSION, _TEST) \
+    MEDIAINFO_EVENT_AVC_BEGIN(_EVENTID, _EVENTVERSION, _TEST) \
+    MEDIAINFO_EVENT_AVC_END  (_EVENTID, _EVENTVERSION)
+
+//---------------------------------------------------------------------------
+// Dolby E
+#define MEDIAINFO_EVENT_DOLBYE_BEGIN(_EVENTID, _EVENTVERSION, _TEST) \
+if (_TEST) \
+{ \
+    EVENT_BEGIN (DolbyE, _EVENTID, 0) \
+
+#define MEDIAINFO_EVENT_DOLBYE_END(_EVENTID, _EVENTVERSION) \
+    EVENT_END   () \
+}
+
+#define MEDIAINFO_EVENT_DOLBYE(_EVENTID, _EVENTVERSION, _TEST) \
+    MEDIAINFO_EVENT_DOLBYE_BEGIN(_EVENTID, _EVENTVERSION, _TEST) \
+    MEDIAINFO_EVENT_DOLBYE_END  (_EVENTID, _EVENTVERSION)
 
 //---------------------------------------------------------------------------
 // Helpers

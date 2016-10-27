@@ -32,7 +32,7 @@ namespace MediaInfoLib
 // Info
 //***************************************************************************
 
-const int8u DvbSubtitle_region_depth[8]=
+static const int8u DvbSubtitle_region_depth[8]=
 {
     0,
     2,

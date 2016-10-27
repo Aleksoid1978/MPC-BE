@@ -85,7 +85,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Mpeg4_Descriptors_Predefined(int8u ID)
+static const char* Mpeg4_Descriptors_Predefined(int8u ID)
 {
     switch (ID)
     {
@@ -97,7 +97,7 @@ const char* Mpeg4_Descriptors_Predefined(int8u ID)
 }
 
 //---------------------------------------------------------------------------
-const char* Mpeg4_Descriptors_ObjectTypeIndication(int8u ID)
+static const char* Mpeg4_Descriptors_ObjectTypeIndication(int8u ID)
 {
     switch (ID)
     {
@@ -150,7 +150,7 @@ const char* Mpeg4_Descriptors_ObjectTypeIndication(int8u ID)
 }
 
 //---------------------------------------------------------------------------
-const char* Mpeg4_Descriptors_StreamType(int8u ID)
+static const char* Mpeg4_Descriptors_StreamType(int8u ID)
 {
     switch (ID)
     {
@@ -172,13 +172,13 @@ const char* Mpeg4_Descriptors_StreamType(int8u ID)
 }
 
 //---------------------------------------------------------------------------
-const char* Mpeg4_Descriptors_ODProfileLevelIndication(int8u /*ID*/)
+static const char* Mpeg4_Descriptors_ODProfileLevelIndication(int8u /*ID*/)
 {
     return "";
 }
 
 //---------------------------------------------------------------------------
-const char* Mpeg4_Descriptors_SceneProfileLevelIndication(int8u ID)
+static const char* Mpeg4_Descriptors_SceneProfileLevelIndication(int8u ID)
 {
     switch (ID)
     {
@@ -198,7 +198,7 @@ const char* Mpeg4_Descriptors_SceneProfileLevelIndication(int8u ID)
 }
 
 //---------------------------------------------------------------------------
-const char* Mpeg4_Descriptors_AudioProfileLevelIndication(int8u ID)
+static const char* Mpeg4_Descriptors_AudioProfileLevelIndication(int8u ID)
 {
     switch (ID)
     {
@@ -259,7 +259,7 @@ const char* Mpeg4_Descriptors_AudioProfileLevelIndication(int8u ID)
 extern const char* Mpeg4v_Profile_Level(int32u Profile_Level);
 
 //---------------------------------------------------------------------------
-const char* Mpeg4_Descriptors_GraphicsProfileLevelIndication(int8u ID)
+static const char* Mpeg4_Descriptors_GraphicsProfileLevelIndication(int8u ID)
 {
     switch (ID)
     {

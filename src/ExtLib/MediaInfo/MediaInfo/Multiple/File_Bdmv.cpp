@@ -60,7 +60,7 @@ namespace Elements
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Clpi_Offsets[]=
+static const char* Clpi_Offsets[]=
 {
     "ClipInfo",
     "SequenceInfo",
@@ -74,7 +74,7 @@ const char* Clpi_Offsets[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Indx_Offsets[]=
+static const char* Indx_Offsets[]=
 {
     "AppInfoBDMV",
     "Indexes",
@@ -88,7 +88,7 @@ const char* Indx_Offsets[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Mobj_Offsets[]=
+static const char* Mobj_Offsets[]=
 {
     "MovieObjects",
     "Reserved",
@@ -102,7 +102,7 @@ const char* Mobj_Offsets[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Mpls_Offsets[]=
+static const char* Mpls_Offsets[]=
 {
     "AppInfoPlayList",
     "PlayList",
@@ -116,7 +116,7 @@ const char* Mpls_Offsets[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Bdmv_Type(int32u Type_Indicator, size_t Start_Adress_Pos)
+static const char* Bdmv_Type(int32u Type_Indicator, size_t Start_Adress_Pos)
 {
     switch (Type_Indicator)
     {
@@ -129,7 +129,7 @@ const char* Bdmv_Type(int32u Type_Indicator, size_t Start_Adress_Pos)
 }
 
 //---------------------------------------------------------------------------
-const char* Clpi_Format(int8u StreamType)
+static const char* Clpi_Format(int8u StreamType)
 {
     switch (StreamType)
     {
@@ -157,7 +157,7 @@ const char* Clpi_Format(int8u StreamType)
 }
 
 //---------------------------------------------------------------------------
-const char* Clpi_Format_Profile(int8u StreamType)
+static const char* Clpi_Format_Profile(int8u StreamType)
 {
     switch (StreamType)
     {
@@ -169,7 +169,7 @@ const char* Clpi_Format_Profile(int8u StreamType)
 }
 
 //---------------------------------------------------------------------------
-stream_t Clpi_Type(int8u StreamType)
+static stream_t Clpi_Type(int8u StreamType)
 {
     switch (StreamType)
     {
@@ -197,7 +197,7 @@ stream_t Clpi_Type(int8u StreamType)
 }
 
 //---------------------------------------------------------------------------
-const char* Clpi_Video_Format[]=
+static const char* Clpi_Video_Format[]=
 {
     "",
     "480i",
@@ -218,7 +218,7 @@ const char* Clpi_Video_Format[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Clpi_Video_Interlacement[]=
+static const char* Clpi_Video_Interlacement[]=
 {
     "",
     "Interlaced",
@@ -239,7 +239,7 @@ const char* Clpi_Video_Interlacement[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Clpi_Video_Standard[]=
+static const char* Clpi_Video_Standard[]=
 {
     "",
     "NTSC",
@@ -260,7 +260,7 @@ const char* Clpi_Video_Standard[]=
 };
 
 //---------------------------------------------------------------------------
-int16u Clpi_Video_Width[]=
+static const int16u Clpi_Video_Width[]=
 {
     0,
     720,
@@ -281,7 +281,7 @@ int16u Clpi_Video_Width[]=
 };
 
 //---------------------------------------------------------------------------
-int16u Clpi_Video_Height[]=
+static const int16u Clpi_Video_Height[]=
 {
     0,
     480,
@@ -302,7 +302,7 @@ int16u Clpi_Video_Height[]=
 };
 
 //---------------------------------------------------------------------------
-float32 Clpi_Video_FrameRate[]=
+static const float32 Clpi_Video_FrameRate[]=
 {
     (float32) 0.000,
     (float32)23.976,
@@ -323,7 +323,7 @@ float32 Clpi_Video_FrameRate[]=
 };
 
 //---------------------------------------------------------------------------
-float32 Clpi_Video_AspectRatio[]=
+static const float32 Clpi_Video_AspectRatio[]=
 {
     (float32)0.000,
     (float32)0.000,
@@ -344,7 +344,7 @@ float32 Clpi_Video_AspectRatio[]=
 };
 
 //---------------------------------------------------------------------------
-int8u Clpi_Audio_Channels[]=
+static const int8u Clpi_Audio_Channels[]=
 {
     0,
     1,
@@ -365,7 +365,7 @@ int8u Clpi_Audio_Channels[]=
 };
 
 //---------------------------------------------------------------------------
-int32u Clpi_Audio_SamplingRate[]=
+static const int32u Clpi_Audio_SamplingRate[]=
 {
         0,
     48000,
@@ -386,7 +386,7 @@ int32u Clpi_Audio_SamplingRate[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Indx_object_type[]=
+static const char* Indx_object_type[]=
 {
     "",
     "HDMV",
@@ -395,7 +395,7 @@ const char* Indx_object_type[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Indx_playback_type[4][4]=
+static const char* Indx_playback_type[4][4]=
 {
     {"",            "",             "",             "",             },
     {"Movie",       "Interactive",  "",             "",             },
@@ -404,7 +404,7 @@ const char* Indx_playback_type[4][4]=
 };
 
 //---------------------------------------------------------------------------
-const char* Indx_title_search[]=
+static const char* Indx_title_search[]=
 {
     "Permitted",
     "Prohibited1",
@@ -413,7 +413,7 @@ const char* Indx_title_search[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Mpls_playback_type[]=
+static const char* Mpls_playback_type[]=
 {
     "Sequential",
     "Random",
@@ -422,7 +422,7 @@ const char* Mpls_playback_type[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Mpls_PlayListMarks_Mark_type(int8u type)
+static const char* Mpls_PlayListMarks_Mark_type(int8u type)
 {
     switch (type)
     {
@@ -437,7 +437,7 @@ const char* Mpls_PlayListMarks_Mark_type(int8u type)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Ztring Bdmv_Decimal_Hexa(int64u Number)
+static Ztring Bdmv_Decimal_Hexa(int64u Number)
 {
     Ztring Temp;
     Temp.From_Number(Number);

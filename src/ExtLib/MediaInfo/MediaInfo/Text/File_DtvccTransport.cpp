@@ -46,7 +46,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* DtvccTransport_cc_type (int8u cc_type)
+static const char* DtvccTransport_cc_type (int8u cc_type)
 {
     switch (cc_type)
     {

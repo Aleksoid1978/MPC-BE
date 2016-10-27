@@ -253,7 +253,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const float32 Mpegv_aspect_ratio1[]=
+static const float32 Mpegv_aspect_ratio1[]=
 {
     (float32)0,
     (float32)1,
@@ -274,7 +274,7 @@ const float32 Mpegv_aspect_ratio1[]=
 };
 
 //---------------------------------------------------------------------------
-const float32 Mpegv_aspect_ratio2[]=
+static const float32 Mpegv_aspect_ratio2[]=
 {
     (float32)0,
     (float32)1,
@@ -295,7 +295,7 @@ const float32 Mpegv_aspect_ratio2[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Mpegv_video_format[]=
+static const char* Mpegv_video_format[]=
 {
     "Component",
     "PAL",
@@ -308,7 +308,7 @@ const char* Mpegv_video_format[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Mpegv_picture_structure[]=
+static const char* Mpegv_picture_structure[]=
 {
     "",
     "T", //Top Field
@@ -316,7 +316,7 @@ const char* Mpegv_picture_structure[]=
     "F", //Frame
 };
 
-const char* Mpegv_picture_coding_type[]=
+static const char* Mpegv_picture_coding_type[]=
 {
     "",
     "I",
@@ -328,7 +328,7 @@ const char* Mpegv_picture_coding_type[]=
     "",
 };
 
-const char* Mpegv_extension_start_code_identifier[]=
+static const char* Mpegv_extension_start_code_identifier[]=
 {
     "",
     "Sequence",
@@ -350,7 +350,7 @@ const char* Mpegv_extension_start_code_identifier[]=
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_MACROBLOCKS
-const int8u Mpegv_block_count[4]=
+static const int8u Mpegv_block_count[4]=
 {
     0,
     6,
@@ -1272,6 +1272,8 @@ void File_Mpegv::Streams_Fill()
     //BitRate
     if (vbv_delay==0xFFFF || (MPEG_Version==1 && bit_rate_value==0x3FFFF))
         Fill(Stream_Video, 0, Video_BitRate_Mode, "VBR");
+    else
+        Fill(Stream_Video, 0, Video_BitRate_Mode, "CBR");
     if (bit_rate_value_IsValid && (bit_rate_extension>0 || bit_rate_value!=0x3FFFF))
         Fill(Stream_Video, 0, Video_BitRate_Maximum, ((((int32u)bit_rate_extension<<12))+bit_rate_value)*400);
 
@@ -3673,6 +3675,7 @@ void File_Mpegv::sequence_header()
 
         //Setting as OK
         sequence_header_IsParsed=true;
+        FirstFieldFound=false;
         if (Frame_Count==0 && FrameInfo.DTS==(int64u)-1)
             FrameInfo.DTS=0; //No DTS in container
 

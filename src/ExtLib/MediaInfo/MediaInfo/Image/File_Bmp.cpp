@@ -41,13 +41,13 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Bmp_CompressionMethod(int32u CompressionMethod)
+static const char* Bmp_CompressionMethod(int32u CompressionMethod)
 {
     switch(CompressionMethod)
     {
         case 0 : return "RGB";
-        case 1 : return "RLE";
-        case 2 : return "RLE";
+        case 1 : return "RLE8";
+        case 2 : return "RLE4";
         case 3 : return "Bit field";
         case 4 : return "JPEG";
         case 5 : return "PNG";
@@ -220,7 +220,12 @@ void File_Bmp::BitmapInfoHeader(int8u Version)
             BitsPerPixel=8; //It is a palette
 
         Fill(Stream_Image, 0, Image_Width, Width);
-        Fill(Stream_Image, 0, Image_Height, Height);
+	const int32s sHeight = int32s(Height);
+	Fill(Stream_Image, 0, Image_Height, std::abs(sHeight));
+	if (sHeight < 0)
+	{
+		Fill(Stream_Image, 0, "Method", "Top down");
+	}
         Fill(Stream_Image, 0, Image_BitDepth, BitsPerPixel);
         Fill(Stream_Image, 0, Image_Format, Bmp_CompressionMethod(CompressionMethod));
         Fill(Stream_Image, 0, Image_Codec, Bmp_CompressionMethod(CompressionMethod));

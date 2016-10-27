@@ -223,7 +223,8 @@ bool File_SequenceInfo::FileHeader_Begin()
                     }
                     while (DirNumber<1000000000);
 
-                    ReferenceFiles->AddSequence(Sequence);
+                    if (!Sequence->FileNames.empty())
+                        ReferenceFiles->AddSequence(Sequence);
                 }
             }
         }

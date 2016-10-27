@@ -35,7 +35,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const bool Vc3_FromCID_IsSupported (int32u CompressionID)
+static const bool Vc3_FromCID_IsSupported (int32u CompressionID)
 {
     switch (CompressionID)
     {
@@ -59,7 +59,7 @@ const bool Vc3_FromCID_IsSupported (int32u CompressionID)
 }
 
 //---------------------------------------------------------------------------
-const int32u Vc3_CompressedFrameSize(int32u CompressionID)
+static const int32u Vc3_CompressedFrameSize(int32u CompressionID)
 {
     switch (CompressionID)
     {
@@ -83,7 +83,7 @@ const int32u Vc3_CompressedFrameSize(int32u CompressionID)
 };
 
 //---------------------------------------------------------------------------
-const int8u Vc3_SBD(int32u SBD) //Sample Bit Depth
+static const int8u Vc3_SBD(int32u SBD) //Sample Bit Depth
 {
     switch (SBD)
     {
@@ -94,7 +94,7 @@ const int8u Vc3_SBD(int32u SBD) //Sample Bit Depth
 };
 
 //---------------------------------------------------------------------------
-const int8u Vc3_SBD_FromCID (int32u CompressionID)
+static const int8u Vc3_SBD_FromCID (int32u CompressionID)
 {
     switch (CompressionID)
     {
@@ -119,7 +119,7 @@ const int8u Vc3_SBD_FromCID (int32u CompressionID)
 }
 
 //---------------------------------------------------------------------------
-const char* Vc3_FFC[4]=
+static const char* Vc3_FFC[4]=
 {
     "",
     "Progressive",
@@ -128,7 +128,7 @@ const char* Vc3_FFC[4]=
 };
 
 //---------------------------------------------------------------------------
-const char* Vc3_FFC_ScanOrder[4]=
+static const char* Vc3_FFC_ScanOrder[4]=
 {
     "",
     "",
@@ -137,21 +137,21 @@ const char* Vc3_FFC_ScanOrder[4]=
 };
 
 //---------------------------------------------------------------------------
-const char* Vc3_FFE[2]=
+static const char* Vc3_FFE[2]=
 {
     "Interlaced",
     "Progressive",
 };
 
 //---------------------------------------------------------------------------
-const char* Vc3_SST[2]=
+static const char* Vc3_SST[2]=
 {
     "Progressive",
     "Interlaced",
 };
 
 //---------------------------------------------------------------------------
-const char* Vc3_SST_FromCID (int32u CompressionID)
+static const char* Vc3_SST_FromCID (int32u CompressionID)
 {
     switch (CompressionID)
     {
@@ -172,7 +172,7 @@ const char* Vc3_SST_FromCID (int32u CompressionID)
 }
 
 //---------------------------------------------------------------------------
-const int16u Vc3_SPL_FromCID (int32u CompressionID)
+static const int16u Vc3_SPL_FromCID (int32u CompressionID)
 {
     switch (CompressionID)
     {
@@ -193,7 +193,7 @@ const int16u Vc3_SPL_FromCID (int32u CompressionID)
 }
 
 //---------------------------------------------------------------------------
-const int16u Vc3_ALPF_PerFrame_FromCID (int32u CompressionID)
+static const int16u Vc3_ALPF_PerFrame_FromCID (int32u CompressionID)
 {
     switch (CompressionID)
     {
@@ -214,7 +214,7 @@ const int16u Vc3_ALPF_PerFrame_FromCID (int32u CompressionID)
 }
 
 //---------------------------------------------------------------------------
-const char* Vc3_CLR[8]=
+static const char* Vc3_CLR[8]=
 {
     "YUV",
     "RGB",
@@ -227,7 +227,7 @@ const char* Vc3_CLR[8]=
 };
 
 //---------------------------------------------------------------------------
-const char* Vc3_CLR_FromCID (int32u CompressionID)
+static const char* Vc3_CLR_FromCID (int32u CompressionID)
 {
     switch (CompressionID)
     {
@@ -252,14 +252,14 @@ const char* Vc3_CLR_FromCID (int32u CompressionID)
 };
 
 //---------------------------------------------------------------------------
-const char* Vc3_SSC[2]=
+static const char* Vc3_SSC[2]=
 {
     "4:2:2",
     "4:4:4",
 };
 
 //---------------------------------------------------------------------------
-const char* Vc3_SSC_FromCID (int32u CompressionID)
+static const char* Vc3_SSC_FromCID (int32u CompressionID)
 {
     switch (CompressionID)
     {
