@@ -105,9 +105,6 @@ BOOL CPPageVideo::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	GetDlgItem(IDC_STATIC10)->ShowWindow(SW_HIDE);
-	m_cbDownscaler.ShowWindow(SW_HIDE);
-
 	SetCursor(m_hWnd, IDC_VIDRND_COMBO, IDC_HAND);
 	SetCursor(m_hWnd, IDC_D3D9DEVICE_COMBO, IDC_HAND);
 	SetCursor(m_hWnd, IDC_DX9RESIZER_COMBO, IDC_HAND);
@@ -362,7 +359,7 @@ void CPPageVideo::UpdateDownscalerList(int select)
 	m_cbDownscaler.SetItemData(m_cbDownscaler.AddString(L"Bilinear"), RESIZER_BILINEAR);
 #if DXVAVP
 	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
-		m_cbDownscaler.SetItemData(m_cbDownscaler.AddString(L"DXVA2"), RESIZER_DXVA2);
+		m_cbDownscaler.SetItemData(m_cbDownscaler.AddString(L"DXVA2 (Intel GPU only)"), RESIZER_DXVA2);
 	}
 #endif
 	m_cbDownscaler.SetItemData(m_cbDownscaler.AddString(L"PS: Simple averaging"), RESIZER_SHADER_AVERAGE);
@@ -492,9 +489,7 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
 			m_spnEvrBuffers.EnableWindow(TRUE);
 			GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
-			GetDlgItem(IDC_STATIC10)->EnableWindow(TRUE);
 			m_cbDX9Resizer.EnableWindow(TRUE);
-			m_cbDownscaler.EnableWindow(TRUE);
 			m_chkD3DFullscreen.EnableWindow(TRUE);
 			m_chk10bitOutput.EnableWindow(m_chkD3DFullscreen.GetCheck() == BST_CHECKED);
 			GetDlgItem(IDC_RESETDEVICE)->EnableWindow(TRUE);

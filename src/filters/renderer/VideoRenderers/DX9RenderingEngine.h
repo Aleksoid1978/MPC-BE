@@ -83,6 +83,7 @@ namespace DSObjects
 		bool	m_bColorManagement;
 		DXVA2_ExtendedFormat m_inputExtFormat;
 		const wchar_t* m_wsResizer;
+		const wchar_t* m_wsResizer2;
 
 
 		CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError);
@@ -172,10 +173,12 @@ namespace DSObjects
 		HRESULT InitScreenSpaceTextures(unsigned count);
 
 		// Resizers
-		HRESULT InitShaderResizer();
+		HRESULT InitShaderResizer(int resizer);
 		HRESULT TextureResize(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, D3DTEXTUREFILTERTYPE filter);
 		HRESULT TextureResizeShader(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader);
 		HRESULT TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader1);
+		HRESULT ApplyResize(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int resizer, int y);
+		HRESULT Resize(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect);
 
 		// Final pass
 		HRESULT InitFinalPass();
