@@ -21,6 +21,7 @@
 
 #include "StdAfx.h"
 #include "GPUUsage.h"
+#include "../../../DSUtil/SysVersion.h"
 
 // Memory allocation function
 static void* __stdcall ADL_Main_Memory_Alloc(int iSize)
@@ -31,16 +32,40 @@ static void* __stdcall ADL_Main_Memory_Alloc(int iSize)
 CGPUUsage::CGPUUsage()
 	: m_iGPUUsage(0)
 	, m_iGPUClock(0)
+	, m_llGPUdedicatedBytesUsedTotal(0)
+	, m_llGPUdedicatedBytesUsedCurrent(0)
 	, m_dwLastRun(0)
 	, m_lRunCount(0)
 	, m_GPUType(UNKNOWN_GPU)
 {
 	Clean();
+
+	if (IsWin7orLater()) {
+		gdi32Handle = LoadLibrary(L"gdi32.dll");
+		if (gdi32Handle) {
+			pD3DKMTQueryStatistics = (PFND3DKMT_QUERYSTATISTICS)GetProcAddress(gdi32Handle, "D3DKMTQueryStatistics");
+
+			dxgiHandle = LoadLibrary(L"dxgi.dll");
+			if (dxgiHandle) {
+				pCreateDXGIFactory = (CreateDXGIFactory_t)GetProcAddress(dxgiHandle, "CreateDXGIFactory");
+			}
+		}
+
+		processHandle = GetCurrentProcess();
+	}
 }
 
 CGPUUsage::~CGPUUsage()
 {
 	Clean();
+
+	if (gdi32Handle) {
+		FreeLibrary(gdi32Handle);
+	}
+
+	if (dxgiHandle) {
+		FreeLibrary(dxgiHandle);
+	}
 }
 
 void CGPUUsage::Clean()
@@ -83,6 +108,8 @@ void CGPUUsage::Clean()
 	NVData.gpuSelected							= -1;
 
 	NVData.hNVApi								= NULL;
+
+	ZeroMemory(&dxgiAdapterDesc, sizeof(dxgiAdapterDesc));
 }
 
 
@@ -254,13 +281,36 @@ HRESULT CGPUUsage::Init(CString DeviceName, CString Device)
 		}
 	}
 
+	if (m_GPUType != UNKNOWN_GPU && !Device.IsEmpty() && pCreateDXGIFactory) {
+		IDXGIFactory* pDXGIFactory = NULL;
+		if (SUCCEEDED(pCreateDXGIFactory(IID_PPV_ARGS(&pDXGIFactory)))) {
+			IDXGIAdapter *pDXGIAdapter = NULL;
+			for (UINT i = 0; pDXGIFactory->EnumAdapters(i, &pDXGIAdapter) != DXGI_ERROR_NOT_FOUND; ++i) {
+				DXGI_ADAPTER_DESC adapterDesc = { 0 };
+				pDXGIAdapter->GetDesc(&adapterDesc);
+				pDXGIAdapter->Release();
+
+				const CString Description = CString(adapterDesc.Description).Trim();
+				if (Description == Device) {
+					memcpy(&dxgiAdapterDesc, &adapterDesc, sizeof(adapterDesc));
+					break;
+				}
+			}
+
+			pDXGIFactory->Release();
+		}
+	}
+
 	return m_GPUType == UNKNOWN_GPU ? E_FAIL : S_OK;
 }
 
-void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock)
+void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage_total, UINT64& gpu_mem_usage_current)
 {
-	gpu_usage = m_iGPUUsage;
-	gpu_clock = m_iGPUClock;
+	gpu_usage             = m_iGPUUsage;
+	gpu_clock             = m_iGPUClock;
+	gpu_mem_usage_total   = m_llGPUdedicatedBytesUsedTotal;
+	gpu_mem_usage_current = m_llGPUdedicatedBytesUsedCurrent;
+
 	if (m_GPUType != UNKNOWN_GPU && ::InterlockedIncrement(&m_lRunCount) == 1) {
 		if (!EnoughTimePassed()) {
 			::InterlockedDecrement(&m_lRunCount);
@@ -306,9 +356,60 @@ void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock)
 			}
 		}
 
+		if (dxgiAdapterDesc.AdapterLuid.LowPart) {
+			m_llGPUdedicatedBytesUsedTotal = 0;
+			m_llGPUdedicatedBytesUsedCurrent = 0;
+
+			D3DKMT_QUERYSTATISTICS queryStatistics = {};
+			queryStatistics.Type = D3DKMT_QUERYSTATISTICS_ADAPTER;
+			queryStatistics.AdapterLuid = dxgiAdapterDesc.AdapterLuid;
+			if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))) {
+				const ULONG segmentCount = queryStatistics.QueryResult.AdapterInformation.NbSegments;
+				for (ULONG i = 0; i < segmentCount; i++) {
+					ZeroMemory(&queryStatistics, sizeof(D3DKMT_QUERYSTATISTICS));
+					queryStatistics.Type = D3DKMT_QUERYSTATISTICS_SEGMENT;
+					queryStatistics.AdapterLuid = dxgiAdapterDesc.AdapterLuid;
+					queryStatistics.QuerySegment.SegmentId = i;
+
+					if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))) {
+						ULONG aperture;
+						ULONG64 commitLimit;
+
+						if (IsWin81orLater()) {
+							aperture = queryStatistics.QueryResult.SegmentInformation.Aperture;
+							commitLimit = queryStatistics.QueryResult.SegmentInformation.BytesResident;
+						} else {
+							aperture = queryStatistics.QueryResult.SegmentInformationV1.Aperture;
+							commitLimit = queryStatistics.QueryResult.SegmentInformationV1.BytesResident;
+						}
+
+						if (!aperture) {
+							m_llGPUdedicatedBytesUsedTotal += commitLimit;
+
+							ZeroMemory(&queryStatistics, sizeof(D3DKMT_QUERYSTATISTICS));
+							queryStatistics.Type = D3DKMT_QUERYSTATISTICS_PROCESS_SEGMENT;
+							queryStatistics.hProcess = processHandle;
+							queryStatistics.AdapterLuid = dxgiAdapterDesc.AdapterLuid;
+							queryStatistics.QuerySegment.SegmentId = i;
+							if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))) {
+								if (IsWin81orLater()) {
+									m_llGPUdedicatedBytesUsedCurrent += queryStatistics.QueryResult.ProcessSegmentInformation.BytesCommitted;
+								} else {
+									m_llGPUdedicatedBytesUsedCurrent += (ULONG)queryStatistics.QueryResult.ProcessSegmentInformation.BytesCommitted;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		gpu_usage             = m_iGPUUsage;
+		gpu_clock             = m_iGPUClock;
+		gpu_mem_usage_total   = m_llGPUdedicatedBytesUsedTotal;
+		gpu_mem_usage_current = m_llGPUdedicatedBytesUsedCurrent;
+
 		m_dwLastRun = GetTickCount();
-		gpu_usage = m_iGPUUsage;
-		gpu_clock = m_iGPUClock;
 	}
 
 	::InterlockedDecrement(&m_lRunCount);

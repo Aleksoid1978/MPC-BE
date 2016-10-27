@@ -20,7 +20,9 @@
  */
 
 #pragma once
+
 #include <adl/adl_sdk.h>
+#include "d3dkmt.h"
 
 class CGPUUsage
 {
@@ -84,15 +86,17 @@ public:
 	~CGPUUsage();
 	HRESULT Init(CString DeviceName, CString Device);
 
-	void	GetUsage(UINT& gpu_usage, UINT& gpu_clock);
+	void	GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage_total, UINT64& gpu_mem_usage_current);
 	GPUType	GetType() const { return m_GPUType; }
 
 private:
 	bool EnoughTimePassed();
 
-	UINT m_iGPUUsage;
-	UINT m_iGPUClock;
-	DWORD m_dwLastRun;
+	UINT   m_iGPUUsage;
+	UINT   m_iGPUClock;
+	UINT64 m_llGPUdedicatedBytesUsedTotal;
+	UINT64 m_llGPUdedicatedBytesUsedCurrent;
+	DWORD  m_dwLastRun;
 
 	GPUType m_GPUType;
 
@@ -120,6 +124,16 @@ private:
 		NvAPI_GPU_GetPStates_t   NvAPI_GPU_GetPStates;
 		NvAPI_GPU_GetAllClocks_t NvAPI_GPU_GetAllClocks;
 	} NVData;
+
+	HMODULE gdi32Handle = NULL;
+	PFND3DKMT_QUERYSTATISTICS pD3DKMTQueryStatistics = NULL;
+
+	HMODULE dxgiHandle = NULL;
+	typedef HRESULT (WINAPI *CreateDXGIFactory_t)(REFIID riid, _Out_ void **ppFactory);
+	CreateDXGIFactory_t pCreateDXGIFactory = NULL;
+	DXGI_ADAPTER_DESC dxgiAdapterDesc = { 0 };
+
+	HANDLE processHandle = NULL;
 
 	void Clean();
 };
