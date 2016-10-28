@@ -867,7 +867,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"יציאה\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"קובץ"
 7		"פתיחה מהירה של קובץ...\tCtrl+Q"
 9		"&Open File/URL...\tCtrl+O"
@@ -1014,9 +1014,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"נטרל הרכבת שולחן עבודה (Aero)"
 213		"הפעל תיקון זמן פריים\tC"
 215		"אפס להגדרות ברירת מחדל של תצוגה"
-217		"מאפיינים"
-218		"הגדרות..."
-220		"יציאה\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"מאפיינים"
+228		"הגדרות..."
+230		"יציאה\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"

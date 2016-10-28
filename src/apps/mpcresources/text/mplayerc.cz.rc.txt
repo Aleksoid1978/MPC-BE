@@ -867,7 +867,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"&Konec\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"Soubor"
 7		"Rychle otevřít soubor...\tCtrl+Q"
 9		"&Open File/URL...\tCtrl+O"
@@ -1014,9 +1014,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"Zakázat kompozici plochy"
 213		"Povolit opravu času snímků\tC"
 215		"Obnovit výchozí nastavení rendereru"
-217		"&Vlastnosti"
-218		"&Možnosti..."
-220		"Konec\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"&Vlastnosti"
+228		"&Možnosti..."
+230		"Konec\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"

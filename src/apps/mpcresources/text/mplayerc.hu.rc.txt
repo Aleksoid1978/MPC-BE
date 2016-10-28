@@ -867,7 +867,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"Kilépés\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"&Fájl"
 7		"&Gyors fájl megnyitás...\tCtrl+Q"
 9		"&Open File/URL...\tCtrl+O"
@@ -1014,9 +1014,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"Asztal-összeállítás kikapcsolása"
 213		"Képkocka időzítés-javítás engedélyezése\tC"
 215		"Alapértelmezett videó átalakító beállítások visszaállítása"
-217		"Tulajdonságok"
-218		"&Beállítások..."
-220		"Kilépés\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"Tulajdonságok"
+228		"&Beállítások..."
+230		"Kilépés\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"

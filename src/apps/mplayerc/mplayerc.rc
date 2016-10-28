@@ -2001,6 +2001,16 @@ BEGIN
             END
             MENUITEM "Reset to default renderer settings", ID_VIEW_RESET_DEFAULT
         END
+        POPUP "Stereo 3D Mode"
+        BEGIN
+            MENUITEM "Auto",                        ID_STEREO3D_AUTO
+            MENUITEM "Mono",                        ID_STEREO3D_MONO
+            MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
+            MENUITEM "Row Interleaved",             ID_STEREO3D_ROW_INTERLEAVED
+            MENUITEM SEPARATOR
+            MENUITEM "Swap Left/Right",             ID_STEREO3D_SWAP_LEFTRIGHT
+        END
+        MENUITEM SEPARATOR
         MENUITEM "P&roperties",                 ID_FILE_PROPERTIES
         MENUITEM "&Options...",                 ID_VIEW_OPTIONS
         MENUITEM SEPARATOR

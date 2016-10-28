@@ -868,7 +868,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"Έ&ξοδος\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"&Αρχείο"
 7		"&Γρήγορο άνοιγμα αρχείου...\tCtrl+Q"
 9		"Ά&νοιγμα αρχείου...\tCtrl+O"
@@ -1017,9 +1017,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"Απενεργοποίηση σύνθεσης επιφάνειας εργασίας (Aero)"
 213		"Ενεργοποίηση διόρθωσης χρόνου καρέ\tC"
 215		"Επαναφορά στις προεπιλεγμένες ρυθμίσεις απόδοσης"
-217		"&Ιδιότητες"
-218		"Επι&λογές..."
-220		"Έ&ξοδος\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"&Ιδιότητες"
+228		"Επι&λογές..."
+230		"Έ&ξοδος\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"

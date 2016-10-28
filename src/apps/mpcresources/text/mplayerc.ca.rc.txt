@@ -867,7 +867,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"So&rtir\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"&Arxiu"
 7		"Obrir Arxiu &Ràpid...\tCtrl+Q"
 9		"&Open File/URL...\tCtrl+O"
@@ -1014,9 +1014,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"Desactivar Composició de l'escriptori(Aero)"
 213		"Activar correcció temporal de quadre\tC"
 215		"Reinicialitzar ajustaments predeterminats del renderitzador"
-217		"P&ropietats"
-218		"&Opcions..."
-220		"So&rtir\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"P&ropietats"
+228		"&Opcions..."
+230		"So&rtir\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"

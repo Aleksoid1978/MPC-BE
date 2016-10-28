@@ -867,7 +867,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"離開(&X)\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"檔案(&F)"
 7		"快速開啟檔案(&Q)...\tCtrl+Q"
 9		"開啟檔案/網址(&O)...\tCtrl+O"
@@ -1014,9 +1014,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"停用桌面轉譯 (Aero)"
 213		"啟用影格時間校正\tC"
 215		"重新設定為預設的繪製器設定"
-217		"內容(&R)"
-218		"選項(&O)..."
-220		"離開(&X)\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"內容(&R)"
+228		"選項(&O)..."
+230		"離開(&X)\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
