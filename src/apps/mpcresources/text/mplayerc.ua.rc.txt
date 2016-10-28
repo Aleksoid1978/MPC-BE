@@ -867,7 +867,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"В&ихід\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"Фай&л"
 7		"Пр&осто відкрити файл...\tCtrl+Q"
 9		"&Відкрити файл/URL...\tCtrl+O"
@@ -1014,9 +1014,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"Вимкнути ефекти робочого столу"
 213		"Дозволити корекцію часу кадру\tC"
 215		"Відновити &звичайні налаштування рендерера"
-217		"В&ластивості"
-218		"&Налаштування..."
-220		"В&ихід\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"В&ластивості"
+228		"&Налаштування..."
+230		"В&ихід\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"НЧ складові (баси) з фронтальних каналів перенаправляються до сабвуфера (LFE)"

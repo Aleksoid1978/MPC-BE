@@ -867,7 +867,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"A&vsluta\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"&Arkiv"
 7		"&Snabb Öppna Fil...\tCtrl+Q"
 9		"&Open File/URL...\tCtrl+O"
@@ -1014,9 +1014,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"Avaktivera skrivbordets sammansättning"
 213		"Aktivera Bild Tids Rättelse\tC"
 215		"Återställ till standard renderar inställningar"
-217		"E&genskaper"
-218		"&Valmöjligheter..."
-220		"A&vsluta\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"E&genskaper"
+228		"&Valmöjligheter..."
+230		"A&vsluta\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"

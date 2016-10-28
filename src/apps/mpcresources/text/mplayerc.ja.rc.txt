@@ -867,7 +867,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"終了(&X)\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"ファイル(&F)"
 7		"クイック再生(&Q)...\tCtrl+Q"
 9		"ファイル/URL を開く(&O)...\tCtrl+O"
@@ -1014,9 +1014,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"デスクトップ コンポジション (Aero) の無効化"
 213		"フレーム時間補正\tC"
 215		"デフォルトのレンダラー設定"
-217		"プロパティ(&R)"
-218		"オプション(&O)..."
-220		"終了(&X)\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"プロパティ(&R)"
+228		"オプション(&O)..."
+230		"終了(&X)\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"

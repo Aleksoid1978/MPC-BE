@@ -867,7 +867,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"Ç&ıkış\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"&Dosya"
 7		"&Hızlı Dosya Aç...\tCtrl+Q"
 9		"&Dosya/URL Aç...\tCtrl+O"
@@ -1014,9 +1014,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"Masaüstü düzeltmesini kapat"
 213		"Görüntü süresi düzeltmesini aç\tC"
 215		"Varsayılan çevirici ayarlarına dön"
-217		"Ö&zellikler"
-218		"&Seçenekler..."
-220		"Ç&ıkış\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"Ö&zellikler"
+228		"&Seçenekler..."
+230		"Ç&ıkış\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"

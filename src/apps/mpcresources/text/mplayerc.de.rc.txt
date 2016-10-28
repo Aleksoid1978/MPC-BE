@@ -867,7 +867,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"&Beenden\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"&Datei"
 7		"Mediendatei öff&nen...\tCtrl+Q"
 9		"Medien öff&nen...\tCtrl+O"
@@ -1014,9 +1014,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"Windows-Desktopgestaltung (Aero) deaktivieren"
 213		"Bildzeit-Korrektur\tC"
 215		"Standard-Einstellungen laden"
-217		"Eigenschaften"
-218		"&Optionen..."
-220		"Beenden\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"Eigenschaften"
+228		"&Optionen..."
+230		"Beenden\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Den Bass von den vorderen Kanälen wegnehmen und ihn zum Subwoofer umleiten."

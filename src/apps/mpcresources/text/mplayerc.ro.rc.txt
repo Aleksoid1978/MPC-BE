@@ -868,7 +868,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"I&eșire\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"&Fișier"
 7		"&Deschide rapid un fișier...\tCtrl+Q"
 9		"&Deschide fișier...\tCtrl+O"
@@ -1017,9 +1017,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"Dezactivează compoziție desktop (Aero)"
 213		"Activează corecție de timp pentru cadru\tC"
 215		"Resetează la setări implicite ale randorului"
-217		"P&roprietăți"
-218		"&Opțiuni..."
-220		"I&eșire\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"P&roprietăți"
+228		"&Opțiuni..."
+230		"I&eșire\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"

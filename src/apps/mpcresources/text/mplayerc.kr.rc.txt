@@ -867,7 +867,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"종료(&X)\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"파일(&F)"
 7		"파일 바로 열기(&Q)...\tCtrl+Q"
 9		"파일/URL 열기(&O)...\tCtrl+O"
@@ -1014,9 +1014,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"데스크톱 합성 사용안함"
 213		"프레임시간수정 사용\tC"
 215		"기본값으로 초기화"
-217		"등록정보(&R)"
-218		"옵션(&O)..."
-220		"종료(&X)\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"등록정보(&R)"
+228		"옵션(&O)..."
+230		"종료(&X)\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"

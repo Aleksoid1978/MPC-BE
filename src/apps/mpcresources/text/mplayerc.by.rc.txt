@@ -867,7 +867,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"В&ыхад\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"&Файл"
 7		"&Хутка адкрыць файл...\tCtrl+Q"
 9		"&Open File/URL...\tCtrl+O"
@@ -1014,9 +1014,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"Адкл. эфекты прац. стала"
 213		"Укл. карэкцыю часу кадра\tC"
 215		"Скінуць налады рэндэрэнгу па змаўчанні"
-217		"Уласцівасці"
-218		"&Налады..."
-220		"В&ыхад\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"Уласцівасці"
+228		"&Налады..."
+230		"В&ыхад\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"

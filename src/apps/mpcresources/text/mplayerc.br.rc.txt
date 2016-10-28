@@ -867,7 +867,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"Sair\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"&Arquivo"
 7		"Abrir arquivo &rápidamente...\tCtrl+Q"
 9		"&Open File/URL...\tCtrl+O"
@@ -1014,9 +1014,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"Desativar composição da área de trabalho"
 213		"Ativar correção dos tempos dos quadros\tC"
 215		"Reiniciar aos ajustes pré-determinados do render"
-217		"P&ropriedades"
-218		"&Opções..."
-220		"Sair\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"P&ropriedades"
+228		"&Opções..."
+230		"Sair\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"

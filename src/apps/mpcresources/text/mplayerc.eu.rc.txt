@@ -867,7 +867,7 @@ BEGIN MENU IDR_POPUP LINES 195
 193		"I&rten\tAlt+X"
 END
 
-BEGIN MENU IDR_POPUPMAIN LINES 222
+BEGIN MENU IDR_POPUPMAIN LINES 232
 5		"&Agiria"
 7		"Agiri Irekitze A&zkarra...\tKtrl+Q"
 9		"&Ireki Agiria/URL-a...\tCtrl+O"
@@ -1014,9 +1014,15 @@ BEGIN MENU IDR_POPUPMAIN LINES 222
 212		"Ezgaitu mahaigain osaketa (Aero)"
 213		"Gaitu Frame Denbora Zuzentzea\tC"
 215		"Berrezarri aurkezlearen berezko ezarpenetan"
-217		"E&zagugarriak"
-218		"A&ukerak..."
-220		"I&rten\tAlt+X"
+217		"Stereo 3D Mode"
+219		"Auto"
+220		"Mono"
+221		"Half OverUnder"
+222		"Row Interleaved"
+224		"Swap Left/Right"
+227		"E&zagugarriak"
+228		"A&ukerak..."
+230		"I&rten\tAlt+X"
 END
 
 STRING IDC_BASSREDIRECT_CHECK		"Takes the bass away from front channels and feed it to the subwoofer"
