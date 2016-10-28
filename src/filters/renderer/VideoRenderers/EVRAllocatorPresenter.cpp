@@ -824,13 +824,11 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int*
 	return hr;
 }
 
-LPCTSTR FindD3DFormat(const D3DFORMAT Format);
-
 LPCTSTR CEVRAllocatorPresenter::GetMediaTypeFormatDesc(IMFMediaType* pMediaType)
 {
 	D3DFORMAT Format = D3DFMT_UNKNOWN;
 	GetMediaTypeFourCC(pMediaType, (DWORD*)&Format);
-	return FindD3DFormat(Format);
+	return D3DFormatToString(Format);
 }
 
 HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
