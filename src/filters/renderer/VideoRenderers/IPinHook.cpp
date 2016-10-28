@@ -55,68 +55,6 @@ REFERENCE_TIME g_tSampleStart  = 0;
 
 FRAME_TYPE g_nFrameType = PICT_NONE;
 
-struct D3DFORMAT_TYPE {
-	const int     Format;
-	const LPCTSTR Description;
-};
-
-#define E(x) { x, L#x }
-const D3DFORMAT_TYPE D3DFormatType[] = {
-	E(D3DFMT_UNKNOWN),
-	E(D3DFMT_R8G8B8),
-	E(D3DFMT_A8R8G8B8),
-	E(D3DFMT_X8R8G8B8),
-	E(D3DFMT_R5G6B5),
-	E(D3DFMT_X1R5G5B5),
-	E(D3DFMT_A1R5G5B5),
-	E(D3DFMT_A4R4G4B4),
-	E(D3DFMT_R3G3B2),
-	E(D3DFMT_A8),
-	E(D3DFMT_A8R3G3B2),
-	E(D3DFMT_X4R4G4B4),
-	E(D3DFMT_A2B10G10R10),
-	E(D3DFMT_A8B8G8R8),
-	E(D3DFMT_X8B8G8R8),
-	E(D3DFMT_G16R16),
-	E(D3DFMT_A2R10G10B10),
-	E(D3DFMT_A16B16G16R16),
-	E(D3DFMT_A8P8),
-	E(D3DFMT_P8),
-	E(D3DFMT_L8),
-	E(D3DFMT_A8L8),
-	E(D3DFMT_A4L4),
-	E(D3DFMT_X8L8V8U8),
-	E(D3DFMT_Q8W8V8U8),
-	E(D3DFMT_V16U16),
-	E(D3DFMT_A2W10V10U10),
-	E(D3DFMT_UYVY),
-	E(D3DFMT_R8G8_B8G8),
-	E(D3DFMT_YUY2),
-	E(D3DFMT_G8R8_G8B8),
-	E(D3DFMT_DXT1),
-	E(D3DFMT_DXT2),
-	E(D3DFMT_DXT3),
-	E(D3DFMT_DXT4),
-	E(D3DFMT_DXT5),
-	E(D3DFMT_D16_LOCKABLE),
-	E(D3DFMT_D32),
-	E(D3DFMT_D15S1),
-	E(D3DFMT_D24S8),
-	E(D3DFMT_D24X8),
-	E(D3DFMT_D24X4S4),
-	E(D3DFMT_D16),
-	E(D3DFMT_D32F_LOCKABLE),
-	E(D3DFMT_D24FS8),
-	E(D3DFMT_L16),
-	E(D3DFMT_VERTEXDATA),
-	E(D3DFMT_INDEX16),
-	E(D3DFMT_INDEX32),
-	E(D3DFMT_Q16W16V16U16),
-	{ MAKEFOURCC('N','V','1','2') , L"D3DFMT_NV12" },
-	{ MAKEFOURCC('N','V','2','4') , L"D3DFMT_NV24" },
-};
-#undef E
-
 const LPCTSTR DXVAVersion[] = {
 	_T("DXVA "),
 	_T("DXVA1"),
@@ -142,17 +80,6 @@ void ClearDXVAState()
 {
 	g_guidDXVADecoder = GUID_NULL;
 	g_nDXVAVersion    = 0;
-}
-
-LPCTSTR FindD3DFormat(const D3DFORMAT Format)
-{
-	for (int i = 0; i < _countof(D3DFormatType); i++) {
-		if (Format == D3DFormatType[i].Format) {
-			return D3DFormatType[i].Description;
-		}
-	}
-
-	return D3DFormatType[0].Description;
 }
 
 // DirectShow hooks
@@ -986,7 +913,7 @@ static void LogDXVA2Config(const DXVA2_ConfigPictureDecode* pConfig)
 static void LogDXVA2VideoDesc(const DXVA2_VideoDesc* pVideoDesc)
 {
 	LOG(_T("VideoDesc"));
-	LOG(_T("	- Format                            %s  (0x%08x)"), FindD3DFormat(pVideoDesc->Format), pVideoDesc->Format);
+	LOG(_T("	- Format                            %s  (0x%08x)"), D3DFormatToString(pVideoDesc->Format), pVideoDesc->Format);
 	LOG(_T("	- InputSampleFreq                   %d/%d"), pVideoDesc->InputSampleFreq.Numerator, pVideoDesc->InputSampleFreq.Denominator);
 	LOG(_T("	- OutputFrameFreq                   %d/%d"), pVideoDesc->OutputFrameFreq.Numerator, pVideoDesc->OutputFrameFreq.Denominator);
 	LOG(_T("	- SampleFormat                      %d"), pVideoDesc->SampleFormat.value);
