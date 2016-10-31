@@ -1064,14 +1064,14 @@ bool CDX9AllocatorPresenter::WaitForVBlankRange(int &_RasterStart, int _RasterSi
 	}
 	double RefreshRate = GetRefreshRate();
 	LONG ScanLines = GetScanLines();
-	int MinRange = max(min(int(0.0015 * double(ScanLines) * RefreshRate + 0.5), ScanLines/3), 5); // 1.5 ms or max 33 % of Time
+	int MinRange = clamp(long(0.0015 * double(ScanLines) * RefreshRate + 0.5), 5L, ScanLines/3); // 1.5 ms or max 33 % of Time
 	int NoSleepStart = _RasterStart - MinRange;
 	int NoSleepRange = MinRange;
 	if (NoSleepStart < 0) {
 		NoSleepStart += m_ScreenSize.cy;
 	}
 
-	int MinRange2 = max(min(int(0.0050 * double(ScanLines) * RefreshRate + 0.5), ScanLines/3), 5); // 5 ms or max 33 % of Time
+	int MinRange2 = clamp(long(0.0050 * double(ScanLines) * RefreshRate + 0.5), 5L, ScanLines/3); // 5 ms or max 33 % of Time
 	int D3DDevLockStart = _RasterStart - MinRange2;
 	int D3DDevLockRange = MinRange2;
 	if (D3DDevLockStart < 0) {
@@ -1183,7 +1183,7 @@ int CDX9AllocatorPresenter::GetVBlackPos()
 		if (m_bAlternativeVSync) {
 			return rs.iVSyncOffset;
 		} else {
-			int MinRange = max(min(int(0.005 * double(m_ScreenSize.cy) * GetRefreshRate() + 0.5), m_ScreenSize.cy/3), 5); // 5  ms or max 33 % of Time
+			int MinRange = clamp(long(0.005 * double(m_ScreenSize.cy) * GetRefreshRate() + 0.5), 5L, m_ScreenSize.cy/3); // 5  ms or max 33 % of Time
 			int WaitFor = m_ScreenSize.cy - (MinRange + WaitRange);
 			return WaitFor;
 		}

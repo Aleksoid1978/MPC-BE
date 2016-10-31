@@ -1454,7 +1454,7 @@ void CEVRAllocatorPresenter::GetMixerThread()
 	DWORD		dwResolution;
 
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution = min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
+	dwResolution = min(tc.wPeriodMin, tc.wPeriodMax); // hmm
 	timeBeginPeriod(dwResolution);
 
 	while (!bQuit) {
@@ -1809,7 +1809,7 @@ void CEVRAllocatorPresenter::RenderThread()
 	}
 
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution = min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
+	dwResolution = min(tc.wPeriodMin, tc.wPeriodMax); // hmm
 	timeBeginPeriod(dwResolution);
 	CRenderersSettings& rs = GetRenderersSettings();
 
@@ -1996,7 +1996,7 @@ void CEVRAllocatorPresenter::RenderThread()
 								} else {
 									MinMargin = MIN_FRAME_TIME + min(LONGLONG(m_DetectedFrameTimeStdDev), 20000);
 								}
-								LONGLONG TimePerFrameMargin = min(max(TimePerFrame*2/100, MinMargin), TimePerFrame*11/100); // (0.02..0.11)TimePerFrame
+								LONGLONG TimePerFrameMargin = clamp(TimePerFrame*2/100, MinMargin, TimePerFrame*11/100); // (0.02..0.11)TimePerFrame
 								LONGLONG TimePerFrameMargin0 = TimePerFrameMargin/2;
 								LONGLONG TimePerFrameMargin1 = 0;
 
@@ -2163,7 +2163,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 	DWORD		dwResolution;
 
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution = min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
+	dwResolution = min(tc.wPeriodMin, tc.wPeriodMax); // hmm
 	timeBeginPeriod(dwResolution);
 
 	CRenderersSettings& rs	= GetRenderersSettings();
@@ -2180,7 +2180,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 					if (m_nRenderState == Started) {
 						int VSyncPos = GetVBlackPos();
 						int WaitRange = max(m_ScreenSize.cy / 40, 5);
-						int MinRange = max(min(int(0.003 * double(m_ScreenSize.cy) * double(m_refreshRate) + 0.5), m_ScreenSize.cy / 3), 5); // 1.8  ms or max 33 % of Time
+						int MinRange = clamp(long(0.003 * double(m_ScreenSize.cy) * double(m_refreshRate) + 0.5), 5L, m_ScreenSize.cy/3); // 1.8  ms or max 33 % of Time
 
 						VSyncPos += MinRange + WaitRange;
 
