@@ -3314,7 +3314,7 @@ void CSyncAP::MixerThread()
 	DWORD dwUser = 0;
 
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution = min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
+	dwResolution = min(tc.wPeriodMin, tc.wPeriodMax); // hmm
 	dwUser = timeBeginPeriod(dwResolution);
 
 	while (!bQuit) {
@@ -3373,7 +3373,7 @@ void CSyncAP::RenderThread()
 
 	// Set timer resolution
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution = min(max(tc.wPeriodMin, 0), tc.wPeriodMax);
+	dwResolution = min(tc.wPeriodMin, tc.wPeriodMax); // hmm
 	dwUser = timeBeginPeriod(dwResolution);
 	pNewSample = NULL;
 
