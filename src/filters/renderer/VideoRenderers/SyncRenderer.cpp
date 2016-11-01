@@ -1098,8 +1098,7 @@ void CBaseAP::SyncStats(LONGLONG syncTime)
 		double deviation = m_pllJitter[i] - m_fJitterMean;
 		DeviationSum += deviation * deviation;
 		LONGLONG deviationInt = std::llround(deviation);
-		m_MaxJitter = max(m_MaxJitter, deviationInt);
-		m_MinJitter = min(m_MinJitter, deviationInt);
+		expand_range(deviationInt, m_MinJitter, m_MaxJitter);
 	}
 
 	m_fJitterStdDev = sqrt(DeviationSum/NB_JITTER);
@@ -1117,8 +1116,7 @@ void CBaseAP::SyncOffsetStats(LONGLONG syncOffset)
 	for (int i=0; i<NB_JITTER; i++) {
 		LONGLONG Offset = m_pllSyncOffset[i];
 		AvrageSum += Offset;
-		m_MaxSyncOffset = max(m_MaxSyncOffset, Offset);
-		m_MinSyncOffset = min(m_MinSyncOffset, Offset);
+		expand_range(Offset, m_MinSyncOffset, m_MaxSyncOffset);
 	}
 	double MeanOffset = double(AvrageSum)/NB_JITTER;
 	double DeviationSum = 0;
@@ -1574,8 +1572,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	DWORD tmp;
 	if (m_pAudioStats != NULL) {
 		m_pAudioStats->GetStatParam(AM_AUDREND_STAT_PARAM_SLAVE_ACCUMERROR, &m_lAudioLag, &tmp);
-		m_lAudioLagMin = min((long)m_lAudioLag, m_lAudioLagMin);
-		m_lAudioLagMax = max((long)m_lAudioLag, m_lAudioLagMax);
+		expand_range((long)m_lAudioLag, m_lAudioLagMin, m_lAudioLagMax);
 		m_pAudioStats->GetStatParam(AM_AUDREND_STAT_PARAM_SLAVE_MODE, &m_lAudioSlaveMode, &tmp);
 	}
 
@@ -4173,11 +4170,10 @@ HRESULT CGenlock::ControlDisplay(double syncOffset, double frameCycle)
 	ATOM setTiming;
 
 	syncOffsetAvg = syncOffsetFifo->Average(syncOffset);
-	minSyncOffset = min(minSyncOffset, syncOffset);
-	maxSyncOffset = max(maxSyncOffset, syncOffset);
+	expand_range(syncOffset, minSyncOffset, maxSyncOffset);
+
 	frameCycleAvg = frameCycleFifo->Average(frameCycle);
-	minFrameCycle = min(minFrameCycle, frameCycle);
-	maxFrameCycle = max(maxFrameCycle, frameCycle);
+	expand_range(frameCycle, minFrameCycle, maxFrameCycle);
 
 	if (!PowerstripRunning() || !powerstripTimingExists) {
 		return E_FAIL;
@@ -4230,11 +4226,10 @@ HRESULT CGenlock::ControlDisplay(double syncOffset, double frameCycle)
 HRESULT CGenlock::ControlClock(double syncOffset, double frameCycle)
 {
 	syncOffsetAvg = syncOffsetFifo->Average(syncOffset);
-	minSyncOffset = min(minSyncOffset, syncOffset);
-	maxSyncOffset = max(maxSyncOffset, syncOffset);
+	expand_range(syncOffset, minSyncOffset, maxSyncOffset);
+
 	frameCycleAvg = frameCycleFifo->Average(frameCycle);
-	minFrameCycle = min(minFrameCycle, frameCycle);
-	maxFrameCycle = max(maxFrameCycle, frameCycle);
+	expand_range(frameCycle, minFrameCycle, maxFrameCycle);
 
 	if (!syncClock) {
 		return E_FAIL;
@@ -4270,10 +4265,10 @@ HRESULT CGenlock::ControlClock(double syncOffset, double frameCycle)
 HRESULT CGenlock::UpdateStats(double syncOffset, double frameCycle)
 {
 	syncOffsetAvg = syncOffsetFifo->Average(syncOffset);
-	minSyncOffset = min(minSyncOffset, syncOffset);
-	maxSyncOffset = max(maxSyncOffset, syncOffset);
+	expand_range(syncOffset, minSyncOffset, maxSyncOffset);
+
 	frameCycleAvg = frameCycleFifo->Average(frameCycle);
-	minFrameCycle = min(minFrameCycle, frameCycle);
-	maxFrameCycle = max(maxFrameCycle, frameCycle);
+	expand_range(frameCycle, minFrameCycle, maxFrameCycle);
+
 	return S_OK;
 }

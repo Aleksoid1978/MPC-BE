@@ -1730,8 +1730,7 @@ void CEVRAllocatorPresenter::OnVBlankFinished(bool fAll, LONGLONG PerformanceCou
 		for (int i=0; i<NB_JITTER; i++) {
 			LONGLONG Offset = m_pllSyncOffset[i];
 			AvrageSum += Offset;
-			m_MaxSyncOffset = max(m_MaxSyncOffset, Offset);
-			m_MinSyncOffset = min(m_MinSyncOffset, Offset);
+			expand_range(Offset, m_MinSyncOffset, m_MaxSyncOffset);
 		}
 		double MeanOffset = double(AvrageSum)/NB_JITTER;
 		double DeviationSum = 0;
@@ -2080,8 +2079,7 @@ void CEVRAllocatorPresenter::RenderThread()
 									LONGLONG VSyncOffsetMin = 30000000000000;
 									LONGLONG VSyncOffsetMax = -30000000000000;
 									for (int i = 0; i < 5; ++i) {
-										VSyncOffsetMin = min(m_VSyncOffsetHistory[i], VSyncOffsetMin);
-										VSyncOffsetMax = max(m_VSyncOffsetHistory[i], VSyncOffsetMax);
+										expand_range(m_VSyncOffsetHistory[i], VSyncOffsetMin, VSyncOffsetMax);
 									}
 
 									m_VSyncOffsetHistory[m_VSyncOffsetHistoryPos] = VSyncOffset0;
