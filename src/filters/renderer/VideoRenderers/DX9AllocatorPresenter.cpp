@@ -1161,8 +1161,7 @@ bool CDX9AllocatorPresenter::WaitForVBlankRange(int &_RasterStart, int _RasterSi
 		}
 
 		m_RasterStatusWaitTime = m_RasterStatusWaitTimeMaxCalc;
-		m_RasterStatusWaitTimeMin = min(m_RasterStatusWaitTimeMin, m_RasterStatusWaitTime);
-		m_RasterStatusWaitTimeMax = max(m_RasterStatusWaitTimeMax, m_RasterStatusWaitTime);
+		expand_range(m_RasterStatusWaitTime, m_RasterStatusWaitTimeMin, m_RasterStatusWaitTimeMax);
 	}
 
 	return bWaited;
@@ -1422,8 +1421,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 	if (fAll) {
 		m_PaintTime = (GetPerfCounter() - StartPaint);
-		m_PaintTimeMin = min(m_PaintTimeMin, m_PaintTime);
-		m_PaintTimeMax = max(m_PaintTimeMax, m_PaintTime);
+		expand_range(m_PaintTime, m_PaintTimeMin, m_PaintTimeMax);
 	}
 
 	bool bWaited = false;
@@ -1492,13 +1490,10 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 		if (fAll && bDoVSyncInPresent) {
 			m_PresentWaitTime = (GetPerfCounter() - llPerf) + PresentWaitTime;
-			m_PresentWaitTimeMin = min(m_PresentWaitTimeMin, m_PresentWaitTime);
-			m_PresentWaitTimeMax = max(m_PresentWaitTimeMax, m_PresentWaitTime);
 		} else {
 			m_PresentWaitTime = 0;
-			m_PresentWaitTimeMin = min(m_PresentWaitTimeMin, m_PresentWaitTime);
-			m_PresentWaitTimeMax = max(m_PresentWaitTimeMax, m_PresentWaitTime);
 		}
+		expand_range(m_PresentWaitTime, m_PresentWaitTimeMin, m_PresentWaitTimeMax);
 	}
 
 	if (bDoVSyncInPresent) {
