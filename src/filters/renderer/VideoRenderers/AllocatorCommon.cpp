@@ -30,16 +30,6 @@
 static bool bIsErrorShowing		= false;
 static bool bIsWarningShowing	= false;
 
-bool IsVMR9InGraph(IFilterGraph* pFG)
-{
-	BeginEnumFilters(pFG, pEF, pBF)
-	if (CComQIPtr<IVMRWindowlessControl9>(pBF)) {
-		return true;
-	}
-	EndEnumFilters
-	return false;
-}
-
 //
 
 HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP)
@@ -121,6 +111,8 @@ HRESULT CreateEVR(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAlloca
 
 	return hr;
 }
+
+//
 
 CString GetWindowsErrorMessage(HRESULT _Error, HMODULE _Module)
 {

@@ -2253,7 +2253,7 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	}
 
 	// Bufferize frame only with 3D texture
-	m_nSurface = max(min (rs.nEVRBuffers, MAX_PICTURE_SLOTS-2), 4);
+	m_nSurface = clamp(rs.nEVRBuffers, 4, MAX_PICTURE_SLOTS-2);
 
 	m_nRenderState = Shutdown;
 	m_bStepping = false;
@@ -3604,9 +3604,9 @@ void CSyncAP::RemoveAllSamples()
 HRESULT CSyncAP::GetFreeSample(IMFSample** ppSample)
 {
 	CAutoLock lock(&m_SampleQueueLock);
-	HRESULT		hr = S_OK;
+	HRESULT hr = S_OK;
 
-	if (m_FreeSamples.GetCount() > 1) {	// Cannot use first free buffer (can be currently displayed)
+	if (m_FreeSamples.GetCount() > 1) { // <= Cannot use first free buffer (can be currently displayed)
 		InterlockedIncrement(&m_nUsedBuffer);
 		*ppSample = m_FreeSamples.RemoveHead().Detach();
 	} else {
@@ -3619,7 +3619,7 @@ HRESULT CSyncAP::GetFreeSample(IMFSample** ppSample)
 HRESULT CSyncAP::GetScheduledSample(IMFSample** ppSample, int &_Count)
 {
 	CAutoLock lock(&m_SampleQueueLock);
-	HRESULT		hr = S_OK;
+	HRESULT hr = S_OK;
 
 	_Count = (int)m_ScheduledSamples.GetCount();
 	if (_Count > 0) {

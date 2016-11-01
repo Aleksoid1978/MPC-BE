@@ -2344,7 +2344,7 @@ HRESULT CEVRAllocatorPresenter::GetFreeSample(IMFSample** ppSample)
 	HRESULT hr = S_OK;
 
 	if (m_FreeSamples.GetCount() > 1) { // <= Cannot use first free buffer (can be currently displayed)
-		InterlockedIncrement (&m_nUsedBuffer);
+		InterlockedIncrement(&m_nUsedBuffer);
 		*ppSample = m_FreeSamples.RemoveHead().Detach();
 	} else {
 		hr = MF_E_SAMPLEALLOCATOR_EMPTY;
@@ -2372,13 +2372,13 @@ HRESULT CEVRAllocatorPresenter::GetScheduledSample(IMFSample** ppSample, int &_C
 void CEVRAllocatorPresenter::MoveToFreeList(IMFSample* pSample, bool bTail)
 {
 	CAutoLock lock(&m_SampleQueueLock);
-	InterlockedDecrement (&m_nUsedBuffer);
+	InterlockedDecrement(&m_nUsedBuffer);
 	if (m_bPendingMediaFinished && m_nUsedBuffer == 0) {
 		m_bPendingMediaFinished = false;
 		m_pSink->Notify(EC_COMPLETE, 0, 0);
 	}
 	if (bTail) {
-		m_FreeSamples.AddTail (pSample);
+		m_FreeSamples.AddTail(pSample);
 	} else {
 		m_FreeSamples.AddHead(pSample);
 	}
