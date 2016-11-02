@@ -54,12 +54,7 @@ namespace DSObjects
 		: public CSubPicAllocatorPresenterImpl
 	{
 	protected:
-		enum RenderingPath {
-			RENDERING_PATH_STRETCHRECT,
-			RENDERING_PATH_DRAW,
-		};
-
-		static const int MAX_VIDEO_SURFACES = 30;
+		static const int MAX_VIDEO_SURFACES = RS_EVRBUFFERS_MAX;
 
 		// Variables initialized/managed by the allocator-presenter!
 		CComPtr<IDirect3D9Ex>		m_pD3DEx;
@@ -68,8 +63,8 @@ namespace DSObjects
 		D3DFORMAT					m_BackbufferFmt;
 		D3DFORMAT					m_DisplayFmt;
 		CSize						m_ScreenSize;
-		unsigned					m_nNbDXSurface; // Total number of DX Surfaces
-		unsigned					m_nCurSurface;  // Surface currently displayed
+		unsigned					m_nSurfaces;   // Total number of DX Surfaces
+		UINT32						m_iCurSurface; // Surface currently displayed
 		DWORD						m_D3D9VendorId;
 		bool						m_bFP16Support;
 

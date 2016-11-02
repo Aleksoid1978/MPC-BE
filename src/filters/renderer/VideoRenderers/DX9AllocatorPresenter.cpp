@@ -1969,7 +1969,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		}
 
 		if (iDetailedStats > 1) {
-			strText.Format(L"Buffering    : Buffered %3d    Free %3d    Current Surface %3u", m_nUsedBuffer, m_nNbDXSurface - m_nUsedBuffer, m_nCurSurface);
+			strText.Format(L"Buffering    : Buffered %3d    Free %3d    Current Surface %3u", m_nUsedBuffer, m_nSurfaces - m_nUsedBuffer, m_iCurSurface);
 		} else {
 			strText.Format(L"Buffered     : %3d", m_nUsedBuffer);
 		}
@@ -2129,7 +2129,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	HRESULT hr;
 
 	D3DSURFACE_DESC desc = {};
-	if (FAILED(hr = m_pVideoSurfaces[m_nCurSurface]->GetDesc(&desc))) {
+	if (FAILED(hr = m_pVideoSurfaces[m_iCurSurface]->GetDesc(&desc))) {
 		return hr;
 	};
 
@@ -2159,7 +2159,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	CComPtr<IDirect3DSurface9> pSurface;
 	D3DLOCKED_RECT r;
 	if (FAILED(hr = m_pD3DDevEx->CreateRenderTarget(framesize.cx, framesize.cy, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pSurface, NULL))
-			|| (FAILED(hr = m_pD3DDevEx->StretchRect(m_pVideoSurfaces[m_nCurSurface], NULL, pSurface, NULL, D3DTEXF_NONE)))
+			|| (FAILED(hr = m_pD3DDevEx->StretchRect(m_pVideoSurfaces[m_iCurSurface], NULL, pSurface, NULL, D3DTEXF_NONE)))
 			|| (FAILED(hr = pSurface->LockRect(&r, NULL, D3DLOCK_READONLY)))) {
 		return hr;
 	}

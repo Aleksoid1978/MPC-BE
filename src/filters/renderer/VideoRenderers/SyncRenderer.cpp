@@ -62,7 +62,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	m_bFlip(false),
 	m_inputExtFormat({0}),
 	m_wsResizer(L""), // empty string, not nullptr
-	m_nSurface(1),
+	m_nSurfaces(1),
 	m_iCurSurface(0),
 	m_bSnapToVSync(false),
 	m_nUsedBuffer(0),
@@ -604,7 +604,7 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 
 	CRenderersSettings& rs = GetRenderersSettings();
 
-	for (int i = 0; i < m_nSurface+2; i++) {
+	for (unsigned i = 0; i < m_nSurfaces+2; i++) {
 		m_pVideoTextures[i] = NULL;
 		m_pVideoSurfaces[i] = NULL;
 	}
@@ -616,9 +616,9 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 	m_SurfaceFmt = Format;
 
 	HRESULT hr;
-	int nTexturesNeeded = m_nSurface+2;
+	unsigned nTexturesNeeded = m_nSurfaces+2;
 
-	for (int i = 0; i < nTexturesNeeded; i++) {
+	for (unsigned i = 0; i < nTexturesNeeded; i++) {
 		if (FAILED(hr = m_pD3DDevEx->CreateTexture(
 							m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &m_pVideoTextures[i], NULL))) {
 			return hr;
@@ -647,7 +647,7 @@ void CBaseAP::DeleteSurfaces()
 	CAutoLock cAutoLock(this);
 	CAutoLock cRenderLock(&m_allocatorLock);
 
-	for (int i = 0; i < m_nSurface+2; i++) {
+	for (unsigned i = 0; i < m_nSurfaces+2; i++) {
 		m_pVideoTextures[i] = NULL;
 		m_pVideoSurfaces[i] = NULL;
 	}
@@ -1211,8 +1211,8 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 		if (m_pVideoTextures[m_iCurSurface]) {
 			CComPtr<IDirect3DTexture9> pVideoTexture = m_pVideoTextures[m_iCurSurface];
 
-			int src = m_iCurSurface;
-			int dst = m_nSurface;
+			unsigned src = m_iCurSurface;
+			unsigned dst = m_nSurfaces;
 
 			if (m_inputExtFormat.VideoTransferMatrix == 7) {
 				if (!m_pYCgCoCorrectionPixelShader) {
@@ -1270,8 +1270,8 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					pVideoTexture = m_pVideoTextures[dst];
 
 					src = dst;
-					if (++dst >= m_nSurface+2) {
-						dst = m_nSurface;
+					if (++dst >= m_nSurfaces+2) {
+						dst = m_nSurfaces;
 					}
 				}
 
@@ -1288,7 +1288,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					dest[1].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
 					dest[2].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
 					dest[3].Set((float)rSrcVid.right, (float)rSrcVid.bottom, 0.5f);
-					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[m_nSurface + 1]);
+					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[m_nSurfaces + 1]);
 					break;
 				case 90:
 					dest[0].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
@@ -1302,7 +1302,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					dest[1].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
 					dest[2].Set((float)rSrcVid.right, (float)rSrcVid.top,    0.5f);
 					dest[3].Set((float)rSrcVid.left,  (float)rSrcVid.top,    0.5f);
-					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[m_nSurface + 1]);
+					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[m_nSurfaces + 1]);
 					break;
 				case 270:
 					dest[0].Set((float)rSrcVid.left,  (float)rSrcVid.bottom, 0.5f);
@@ -1331,7 +1331,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					pVideoTexture = m_pRotateTexture;
 				}
 				else { // 0+flip and 180
-					pVideoTexture = m_pVideoTextures[m_nSurface + 1];
+					pVideoTexture = m_pVideoTextures[m_nSurfaces + 1];
 				}
 
 				m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
@@ -1840,7 +1840,7 @@ void CBaseAP::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
-			strText.Format(L"Buffering    : Buffered %3d    Free %3d    Current Surface %3d", m_nUsedBuffer, m_nSurface - m_nUsedBuffer, m_iCurSurface);
+			strText.Format(L"Buffering    : Buffered %3d    Free %3d    Current Surface %3d", m_nUsedBuffer, m_nSurfaces - m_nUsedBuffer, m_iCurSurface);
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
@@ -2250,7 +2250,7 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	}
 
 	// Bufferize frame only with 3D texture
-	m_nSurface = clamp(rs.nEVRBuffers, 4, MAX_PICTURE_SLOTS-2);
+	m_nSurfaces = clamp(rs.nEVRBuffers, 4, MAX_PICTURE_SLOTS-2);
 
 	m_nRenderState = Shutdown;
 	m_bStepping = false;
@@ -2893,7 +2893,7 @@ bool CSyncAP::GetSampleFromMixer()
 	LONGLONG llClockAfter  = 0;
 	LONGLONG llMixerLatency;
 
-	UINT dwSurface;
+	UINT32 iSurface;
 	bool newSample = false;
 
 	while (SUCCEEDED(hr)) { // Get as many frames as there are and that we have samples for
@@ -2905,7 +2905,7 @@ bool CSyncAP::GetSampleFromMixer()
 
 		memset(&Buffer, 0, sizeof(Buffer));
 		Buffer.pSample = pSample;
-		pSample->GetUINT32(GUID_SURFACE_INDEX, &dwSurface);
+		pSample->GetUINT32(GUID_SURFACE_INDEX, &iSurface);
 		{
 			llClockBefore = GetPerfCounter();
 			hr = m_pMixer->ProcessOutput(0 , 1, &Buffer, &dwStatus);
@@ -2930,11 +2930,11 @@ bool CSyncAP::GetSampleFromMixer()
 			rcTearing.top = 0;
 			rcTearing.right	= rcTearing.left + 4;
 			rcTearing.bottom = m_nativeVideoSize.cy;
-			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[dwSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
+			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[iSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
 
 			rcTearing.left = (rcTearing.right + 15) % m_nativeVideoSize.cx;
 			rcTearing.right	= rcTearing.left + 4;
-			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[dwSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
+			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[iSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
 			m_nTearingPos = (m_nTearingPos + 7) % m_nativeVideoSize.cx;
 		}
 		MoveToScheduledList(pSample, false); // Schedule, then go back to see if there is more where that came from
@@ -3265,7 +3265,7 @@ STDMETHODIMP CSyncAP::InitializeDevice(AM_MEDIA_TYPE* pMediaType)
 		hr = AllocSurfaces(D3DFMT_X8R8G8B8);
 	}
 
-	for (int i = 0; i < m_nSurface; i++) {
+	for (unsigned i = 0; i < m_nSurfaces; i++) {
 		CComPtr<IMFSample> pMFSample;
 		hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurfaces[i], &pMFSample);
 		if (SUCCEEDED (hr)) {
@@ -3520,7 +3520,7 @@ void CSyncAP::RenderThread()
 					m_pcFramesDropped++;
 					stepForward = true;
 				} else if (pNewSample && (m_nStepCount > 0)) {
-					pNewSample->GetUINT32(GUID_SURFACE_INDEX, (UINT32 *)&m_iCurSurface);
+					pNewSample->GetUINT32(GUID_SURFACE_INDEX, &m_iCurSurface);
 					if (!g_bExternalSubtitleTime) {
 						__super::SetTime (g_tSegmentStart + m_llSampleTime);
 					}
@@ -3529,7 +3529,7 @@ void CSyncAP::RenderThread()
 					m_pcFramesDrawn++;
 					stepForward = true;
 				} else if (pNewSample && !m_bStepping) { // When a stepped frame is shown, a new one is fetched that we don't want to show here while stepping
-					pNewSample->GetUINT32(GUID_SURFACE_INDEX, (UINT32*)&m_iCurSurface);
+					pNewSample->GetUINT32(GUID_SURFACE_INDEX, &m_iCurSurface);
 					if (!g_bExternalSubtitleTime) {
 						__super::SetTime (g_tSegmentStart + m_llSampleTime);
 					}
@@ -3563,7 +3563,7 @@ STDMETHODIMP_(bool) CSyncAP::ResetDevice()
 
 	bool bResult = __super::ResetDevice();
 
-	for (int i = 0; i < m_nSurface; i++) {
+	for (unsigned i = 0; i < m_nSurfaces; i++) {
 		CComPtr<IMFSample> pMFSample;
 		HRESULT hr = pfMFCreateVideoSampleFromSurface (m_pVideoSurfaces[i], &pMFSample);
 		if (SUCCEEDED (hr)) {
