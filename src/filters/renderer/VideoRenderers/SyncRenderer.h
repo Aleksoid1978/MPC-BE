@@ -28,7 +28,6 @@
 #include <dxva2api.h>
 
 #define VMRBITMAP_UPDATE 0x80000000
-#define MAX_PICTURE_SLOTS (30+2) // Last 2 for pixels shader!
 #define NB_JITTER 126
 
 extern bool g_bNoDuration; // Defined in MainFrm.cpp
@@ -124,6 +123,8 @@ namespace GothSync
 		public CSubPicAllocatorPresenterImpl
 	{
 	protected:
+		static const int MAX_PICTURE_SLOTS = RS_EVRBUFFERS_MAX + 2; // Last 2 for pixels shader!
+
 		CAffectingRenderersSettings m_LastAffectingSettings;
 
 		HMODULE m_hDWMAPI;
@@ -194,40 +195,6 @@ namespace GothSync
 		HRESULT TextureResizeShader(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader);
 		HRESULT TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect, int iShader1);
 
-		typedef HRESULT (WINAPI * D3DXLoadSurfaceFromMemoryPtr)(
-			LPDIRECT3DSURFACE9 pDestSurface,
-			CONST PALETTEENTRY* pDestPalette,
-			CONST RECT* pDestRect,
-			LPCVOID pSrcMemory,
-			D3DFORMAT SrcFormat,
-			UINT SrcPitch,
-			CONST PALETTEENTRY*	pSrcPalette,
-			CONST RECT* pSrcRect,
-			DWORD Filter,
-			D3DCOLOR ColorKey);
-
-		typedef HRESULT (WINAPI* D3DXCreateLinePtr)(
-			LPDIRECT3DDEVICE9 pDevice,
-			LPD3DXLINE* ppLine);
-
-		typedef HRESULT (WINAPI* D3DXCreateFontPtr)(
-			LPDIRECT3DDEVICE9 pDevice,
-			int Height,
-			UINT Width,
-			UINT Weight,
-			UINT MipLevels,
-			bool Italic,
-			DWORD CharSet,
-			DWORD OutputPrecision,
-			DWORD Quality,
-			DWORD PitchAndFamily,
-			LPCWSTR pFaceName,
-			LPD3DXFONT* ppFont);
-
-		typedef HRESULT (WINAPI* D3DXCreateSpritePtr)(
-			LPDIRECT3DDEVICE9 pDevice,
-			LPD3DXSPRITE *ppSprite);
-
 		HRESULT AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9* pTexture);
 
 		virtual void OnResetDevice() {};
@@ -238,13 +205,43 @@ namespace GothSync
 		CRect m_VMR9AlphaBitmapRect;
 		int m_VMR9AlphaBitmapWidthBytes;
 
-		D3DXLoadSurfaceFromMemoryPtr m_pD3DXLoadSurfaceFromMemory;
-		D3DXCreateLinePtr m_pD3DXCreateLine;
-		D3DXCreateFontPtr m_pD3DXCreateFont;
-		D3DXCreateSpritePtr m_pD3DXCreateSprite;
+		HRESULT (__stdcall *m_pD3DXLoadSurfaceFromMemory)(
+			_In_       LPDIRECT3DSURFACE9 pDestSurface,
+			_In_ const PALETTEENTRY       *pDestPalette,
+			_In_ const RECT               *pDestRect,
+			_In_       LPCVOID            pSrcMemory,
+			_In_       D3DFORMAT          SrcFormat,
+			_In_       UINT               SrcPitch,
+			_In_ const PALETTEENTRY       *pSrcPalette,
+			_In_ const RECT               *pSrcRect,
+			_In_       DWORD              Filter,
+			_In_       D3DCOLOR           ColorKey
+		);
+		HRESULT (__stdcall *m_pD3DXCreateLine)(
+			_In_  LPDIRECT3DDEVICE9 pDevice,
+			_Out_ LPD3DXLINE        *ppLine
+		);
+		HRESULT (__stdcall *m_pD3DXCreateFont)(
+			_In_  LPDIRECT3DDEVICE9 pDevice,
+			_In_  INT               Height,
+			_In_  UINT              Width,
+			_In_  UINT              Weight,
+			_In_  UINT              MipLevels,
+			_In_  BOOL              Italic,
+			_In_  DWORD             CharSet,
+			_In_  DWORD             OutputPrecision,
+			_In_  DWORD             Quality,
+			_In_  DWORD             PitchAndFamily,
+			_In_  LPCTSTR           pFacename,
+			_Out_ LPD3DXFONT        *ppFont
+		);
+		HRESULT (__stdcall *m_pD3DXCreateSprite)(
+			_In_  LPDIRECT3DDEVICE9 pDevice,
+			_Out_ LPD3DXSPRITE      *ppSprite
+		);
 
-		int m_nSurface;		// Total number of DX Surfaces
-		int m_iCurSurface;	// Surface currently displayed
+		unsigned m_nSurfaces; // Total number of DX Surfaces
+		UINT32 m_iCurSurface; // Surface currently displayed
 		long m_nUsedBuffer;
 
 		CSize m_ScreenSize;

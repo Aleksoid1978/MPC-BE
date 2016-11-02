@@ -126,8 +126,8 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_BackbufferFmt(D3DFMT_X8R8G8B8)
 	, m_DisplayFmt(D3DFMT_X8R8G8B8)
 	, m_ScreenSize(0, 0)
-	, m_nNbDXSurface(1)
-	, m_nCurSurface(0)
+	, m_nSurfaces(1)
+	, m_iCurSurface(0)
 	, m_D3D9VendorId(0)
 	, m_bFP16Support(true) // don't disable hardware features before initializing a renderer
 	, m_VideoBufferFmt(D3DFMT_X8R8G8B8)
@@ -252,7 +252,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 		m_VideoBufferFmt = m_SurfaceFmt;
 	}
 
-	for (unsigned i = 0; i < m_nNbDXSurface; i++) {
+	for (unsigned i = 0; i < m_nSurfaces; i++) {
 		if (FAILED(hr = m_pD3DDevEx->CreateTexture(
 							m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
 							D3DUSAGE_RENDERTARGET, m_VideoBufferFmt,
@@ -272,7 +272,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 
 void CDX9RenderingEngine::FreeVideoSurfaces()
 {
-	for (unsigned i = 0; i < m_nNbDXSurface; i++) {
+	for (unsigned i = 0; i < m_nSurfaces; i++) {
 		m_pVideoTextures[i] = NULL;
 		m_pVideoSurfaces[i] = NULL;
 	}
@@ -326,7 +326,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	HRESULT hr;
 
 	// Return if the video texture is not initialized
-	if (m_pVideoTextures[m_nCurSurface] == NULL) {
+	if (m_pVideoTextures[m_iCurSurface] == NULL) {
 		return S_OK;
 	}
 
@@ -378,9 +378,9 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 	}
 
 	// Apply the custom pixel shaders if there are any. Result: pVideoTexture
-	CComPtr<IDirect3DTexture9> pVideoTexture = m_pVideoTextures[m_nCurSurface];
+	CComPtr<IDirect3DTexture9> pVideoTexture = m_pVideoTextures[m_iCurSurface];
 	D3DSURFACE_DESC videoDesc;
-	m_pVideoTextures[m_nCurSurface]->GetLevelDesc(0, &videoDesc);
+	m_pVideoTextures[m_iCurSurface]->GetLevelDesc(0, &videoDesc);
 
 	unsigned src = 1;
 	unsigned dst = 0;
@@ -400,7 +400,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
 			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
 			hr = m_pD3DDevEx->SetPixelShader(m_pYCgCoCorrectionPixelShader);
-			TextureCopy(m_pVideoTextures[m_nCurSurface]);
+			TextureCopy(m_pVideoTextures[m_iCurSurface]);
 			first = false;
 			std::swap(src, dst);
 			pVideoTexture = m_pFrameTextures[src];
@@ -445,7 +445,7 @@ HRESULT CDX9RenderingEngine::RenderVideoDrawPath(IDirect3DSurface9* pRenderTarge
 			hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
 
 			if (first) {
-				TextureCopy(m_pVideoTextures[m_nCurSurface]);
+				TextureCopy(m_pVideoTextures[m_iCurSurface]);
 				first = false;
 			} else {
 				TextureCopy(m_pFrameTextures[src]);
