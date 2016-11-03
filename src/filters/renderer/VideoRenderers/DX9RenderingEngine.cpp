@@ -1113,10 +1113,12 @@ HRESULT CDX9RenderingEngine::ApplyResize(IDirect3DTexture9* pTexture, const CRec
 		wsResizer = L"Bilinear";
 		hr = TextureResize(pTexture, srcRect, destRect, D3DTEXF_LINEAR);
 		break;
+#if DXVAVP
 	case RESIZER_DXVA2:
-		wsResizer = L"DXVA2-VP";
+		wsResizer = L"DXVA2 VP";
 		hr = TextureResizeDXVA(pTexture, srcRect, destRect);
 		break;
+#endif
 	case RESIZER_SHADER_BSPLINE4:
 		wsResizer = L"B-spline4";
 		hr = TextureResizeShader(pTexture, srcRect, destRect, shader_bspline4_x + y);
@@ -1481,18 +1483,18 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(TCHAR* profilePath, float* lut3
 	VideoSystem videoSystem;
 
 	if (m_InputVideoSystem == VIDEO_SYSTEM_UNKNOWN) {
-		static const int ntscSizes[][2] = {{720, 480}, {720, 486}, {704, 480}};
-		static const int palSizes[][2] = {{720, 576}, {704, 576}};
+		static const long ntscSizes[][2] = {{720, 480}, {720, 486}, {704, 480}};
+		static const long palSizes[][2] = {{720, 576}, {704, 576}};
 
 		videoSystem = VIDEO_SYSTEM_HDTV; // default
 
-		for (int i = 0; i < _countof(ntscSizes); i++) {
+		for (unsigned i = 0; i < _countof(ntscSizes); i++) {
 			if (m_nativeVideoSize.cx == ntscSizes[i][0] && m_nativeVideoSize.cy == ntscSizes[i][1]) {
 				videoSystem = VIDEO_SYSTEM_SDTV_NTSC;
 			}
 		}
 
-		for (int i = 0; i < _countof(palSizes); i++) {
+		for (unsigned i = 0; i < _countof(palSizes); i++) {
 			if (m_nativeVideoSize.cx == palSizes[i][0] && m_nativeVideoSize.cy == palSizes[i][1]) {
 				videoSystem = VIDEO_SYSTEM_SDTV_PAL;
 			}
@@ -1598,10 +1600,7 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(TCHAR* profilePath, float* lut3
 	// For more information, see the paper at http://www.poynton.com/notes/PU-PR-IS/Poynton-PU-PR-IS.pdf
 	cmsToneCurve* transferFunction = cmsBuildGamma(0, gamma);
 
-	cmsToneCurve* transferFunctionRGB[3];
-	for (int i = 0; i < 3; i++) {
-		transferFunctionRGB[i] = transferFunction;
-	}
+	cmsToneCurve* transferFunctionRGB[3] = { transferFunction, transferFunction, transferFunction};
 
 	// Create the input profile
 	cmsHPROFILE hInputProfile = cmsCreateRGBProfile(&whitePoint, &primaries, transferFunctionRGB);

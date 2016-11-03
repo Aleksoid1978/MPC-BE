@@ -3949,14 +3949,8 @@ CGenlock::CGenlock(double target, double limit, int lineD, int colD, double cloc
 CGenlock::~CGenlock()
 {
 	ResetTiming();
-	if (syncOffsetFifo != NULL) {
-		delete syncOffsetFifo;
-		syncOffsetFifo = NULL;
-	}
-	if (frameCycleFifo != NULL) {
-		delete frameCycleFifo;
-		frameCycleFifo = NULL;
-	}
+	SAFE_DELETE_ARRAY(syncOffsetFifo);
+	SAFE_DELETE_ARRAY(frameCycleFifo);
 	syncClock = NULL;
 };
 

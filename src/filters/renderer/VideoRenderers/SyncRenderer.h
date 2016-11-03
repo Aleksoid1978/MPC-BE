@@ -156,7 +156,6 @@ namespace GothSync
 		CComPtr<ID3DXLine>			m_pLine;
 		CComPtr<ID3DXFont>			m_pFont;
 		CComPtr<ID3DXSprite>		m_pSprite;
-		CSyncRenderer*				m_pOuterEVR;
 
 		// Shaders
 		LPCSTR m_ShaderProfile;
@@ -199,12 +198,6 @@ namespace GothSync
 
 		virtual void OnResetDevice() {};
 
-		int m_nTearingPos;
-		VMR9AlphaBitmap m_VMR9AlphaBitmap;
-		CAutoVectorPtr<BYTE> m_VMR9AlphaBitmapData;
-		CRect m_VMR9AlphaBitmapRect;
-		int m_VMR9AlphaBitmapWidthBytes;
-
 		HRESULT (__stdcall *m_pD3DXLoadSurfaceFromMemory)(
 			_In_       LPDIRECT3DSURFACE9 pDestSurface,
 			_In_ const PALETTEENTRY       *pDestPalette,
@@ -239,6 +232,12 @@ namespace GothSync
 			_In_  LPDIRECT3DDEVICE9 pDevice,
 			_Out_ LPD3DXSPRITE      *ppSprite
 		);
+
+		int m_nTearingPos;
+		VMR9AlphaBitmap m_VMR9AlphaBitmap;
+		CAutoVectorPtr<BYTE> m_VMR9AlphaBitmapData;
+		CRect m_VMR9AlphaBitmapRect;
+		int m_VMR9AlphaBitmapWidthBytes;
 
 		unsigned m_nSurfaces; // Total number of DX Surfaces
 		UINT32 m_iCurSurface; // Surface currently displayed
@@ -477,12 +476,14 @@ namespace GothSync
 		typedef BOOL (__stdcall *PTR_AvSetMmThreadPriority)(HANDLE AvrtHandle, AVRT_PRIORITY Priority);
 		typedef BOOL (__stdcall *PTR_AvRevertMmThreadCharacteristics)(HANDLE AvrtHandle);
 
-		typedef enum {
-			Started = State_Running,
-			Stopped = State_Stopped,
-			Paused = State_Paused,
+		enum RENDER_STATE {
+			Stopped  = State_Stopped,
+			Paused   = State_Paused,
+			Started  = State_Running,
 			Shutdown = State_Running + 1
-		} RENDER_STATE;
+		} ;
+
+		CSyncRenderer* m_pOuterEVR;
 
 		CComPtr<IMFClock> m_pClock;
 		CComPtr<IDirect3DDeviceManager9> m_pD3DManager;
@@ -613,20 +614,14 @@ namespace GothSync
 			double sum;
 
 		public:
-			MovingAverage(int size) :
-				fifoSize(size),
-				oldestSample(0),
-				sum(0)
+			MovingAverage(int size)
+				: fifoSize(max(size, MAX_FIFO_SIZE))
+				, oldestSample(0)
+				, sum(0)
 			{
-				if (fifoSize > MAX_FIFO_SIZE) {
-					fifoSize = MAX_FIFO_SIZE;
-				}
 				for (int i = 0; i < MAX_FIFO_SIZE; i++) {
 					fifo[i] = 0;
 				}
-			}
-
-			~MovingAverage() {
 			}
 
 			double Average(double sample)
@@ -690,7 +685,7 @@ namespace GothSync
 		double displayFreqFaster;
 
 		double controlLimit; // How much the sync offset is allowed to drift from target sync offset
-		WPARAM monitor; // The monitor to be controlled. 0-based.
+		UINT monitor; // The monitor to be controlled. 0-based.
 		CComPtr<ISyncClock> syncClock; // Interface to an adjustable reference clock
 
 		HWND psWnd; // PowerStrip window
