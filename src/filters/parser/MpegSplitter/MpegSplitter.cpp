@@ -1020,7 +1020,7 @@ CString CMpegSplitterFilter::FormatStreamName(CMpegSplitterFile::stream& s, CMpe
 	CStringA lang_name	= s.lang;
 	lang_name			= m_pTI ? CStringA(m_pTI->GetTrackName(s.ps1id)) : lang_name;
 
-	CString FormatDesc = GetMediaTypeDesc(&s.mts[0], pClipInfo, StreamType, lang_name);
+	CString FormatDesc = GetMediaTypeDesc(s.mts.empty() ? &s.mt : &s.mts[0], pClipInfo, StreamType, lang_name);
 
 	if (!FormatDesc.IsEmpty()) {
 		str.Format(L"%s (%04x,%02x,%02x)", FormatDesc, s.pid, s.pesid, s.ps1id);
