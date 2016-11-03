@@ -104,6 +104,7 @@ namespace DSObjects
 		LPCSTR						m_ShaderProfile; // for shader compiler
 
 #if DXVAVP
+		HMODULE m_hDxva2Lib = NULL;
 		CComPtr<IDirectXVideoProcessorService> m_pDXVAVPS;
 		CComPtr<IDirectXVideoProcessor> m_pDXVAVPD;
 
@@ -157,7 +158,6 @@ namespace DSObjects
 		HRESULT RenderVideoDrawPath(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect);
 
 #if DXVAVP
-		HMODULE m_hDxva2Lib = NULL;
 		BOOL InitializeDXVA2VP(int width, int height);
 		BOOL CreateDXVA2VPDevice(REFGUID guid);
 		HRESULT TextureResizeDXVA(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect);
