@@ -154,9 +154,6 @@ namespace DSObjects
 		CAtlList<CExternalPixelShader>	m_pCustomScreenSpacePixelShaders;
 		CComPtr<IDirect3DPixelShader9>	m_pConvertToInterlacePixelShader;
 
-		// Video rendering paths
-		HRESULT RenderVideoDrawPath(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect);
-
 #if DXVAVP
 		BOOL InitializeDXVA2VP(int width, int height);
 		BOOL CreateDXVA2VPDevice(REFGUID guid);
