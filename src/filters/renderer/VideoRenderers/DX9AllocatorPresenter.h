@@ -44,8 +44,8 @@ namespace DSObjects
 		, public ID3DFullscreenControl
 	{
 	public:
-		CCritSec				m_VMR9AlphaBitmapLock;
-		void					UpdateAlphaBitmap();
+		CCritSec	m_VMR9AlphaBitmapLock;
+		void		UpdateAlphaBitmap();
 
 	protected:
 		UINT	m_CurrentAdapter;
@@ -60,59 +60,32 @@ namespace DSObjects
 		bool	m_bNeedCheckSample;
 		DWORD	m_MainThreadId;
 
-		bool	m_bIsRendering;
-
 		CAffectingRenderersSettings m_LastAffectingSettings;
 
+		HMODULE m_hDWMAPI;
 		HRESULT (__stdcall * m_pDwmIsCompositionEnabled)(__out BOOL* pfEnabled);
 		HRESULT (__stdcall * m_pDwmEnableComposition)(UINT uCompositionAction);
-
-		HMODULE m_hDWMAPI;
-
-		HRESULT (__stdcall * m_pDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**);
 		HMODULE m_hD3D9;
+		HRESULT (__stdcall * m_pDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**);
 
 		CCritSec m_RenderLock;
 
 		CComPtr<IDirectDraw> m_pDirectDraw;
 
-		void LockD3DDevice() {
-			if (m_pD3DDevEx) {
-				_RTL_CRITICAL_SECTION *pCritSec = (_RTL_CRITICAL_SECTION *)((size_t)m_pD3DDevEx.p + sizeof(size_t));
-
-				if (!IsBadReadPtr(pCritSec, sizeof(*pCritSec)) && !IsBadWritePtr(pCritSec, sizeof(*pCritSec))
-						&& !IsBadReadPtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo))) && !IsBadWritePtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo)))) {
-					if (pCritSec->DebugInfo->CriticalSection == pCritSec) {
-						EnterCriticalSection(pCritSec);
-					}
-				}
-			}
-		}
-
-		void UnlockD3DDevice() {
-			if (m_pD3DDevEx) {
-				_RTL_CRITICAL_SECTION *pCritSec = (_RTL_CRITICAL_SECTION *)((size_t)m_pD3DDevEx.p + sizeof(size_t));
-
-				if (!IsBadReadPtr(pCritSec, sizeof(*pCritSec)) && !IsBadWritePtr(pCritSec, sizeof(*pCritSec))
-						&& !IsBadReadPtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo))) && !IsBadWritePtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo)))) {
-					if (pCritSec->DebugInfo->CriticalSection == pCritSec) {
-						LeaveCriticalSection(pCritSec);
-					}
-				}
-			}
-		}
-
-		CComPtr<IDirect3DTexture9>		m_pOSDTexture;
-		CComPtr<IDirect3DSurface9>		m_pOSDSurface;
-		CComPtr<ID3DXLine>				m_pLine;
-		CComPtr<ID3DXFont>				m_pFont;
-		CComPtr<ID3DXSprite>			m_pSprite;
+		CComPtr<IDirect3DTexture9>	m_pOSDTexture;
+		CComPtr<IDirect3DSurface9>	m_pOSDSurface;
+		CComPtr<ID3DXLine>			m_pLine;
+		CComPtr<ID3DXFont>			m_pFont;
+		CComPtr<ID3DXSprite>		m_pSprite;
 
 		bool SettingsNeedResetDevice();
 
-		virtual HRESULT CreateDevice(CString &_Error);
-		virtual HRESULT AllocSurfaces();
-		virtual void DeleteSurfaces();
+		void LockD3DDevice();
+		void UnlockD3DDevice();
+
+		HRESULT CreateDevice(CString &_Error);
+		HRESULT AllocSurfaces();
+		void DeleteSurfaces();
 
 		HRESULT ResetD3D9Device();
 		HRESULT InitializeISR(CString &_Error);
@@ -311,9 +284,6 @@ namespace DSObjects
 		STDMETHODIMP AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
 		STDMETHODIMP_(bool) ResetDevice();
 		STDMETHODIMP_(bool) DisplayChange();
-		STDMETHODIMP_(bool) IsRendering() {
-			return m_bIsRendering;
-		}
 
 		// ID3DFullscreenControl
 		STDMETHODIMP SetD3DFullscreen(bool fEnabled);
