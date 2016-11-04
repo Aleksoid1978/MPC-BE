@@ -68,7 +68,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_pD3DXCreateLine(NULL)
 	, m_pD3DXCreateFont(NULL)
 	, m_pD3DXCreateSprite(NULL)
-	, m_bIsRendering(false)
 	, m_FocusThread(NULL)
 {
 	if (FAILED(hr)) {
@@ -407,6 +406,34 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 	Current.Fill(New);
 
 	return bRet;
+}
+
+void CDX9AllocatorPresenter::LockD3DDevice()
+{
+	if (m_pD3DDevEx) {
+		_RTL_CRITICAL_SECTION *pCritSec = (_RTL_CRITICAL_SECTION *)((size_t)m_pD3DDevEx.p + sizeof(size_t));
+
+		if (!IsBadReadPtr(pCritSec, sizeof(*pCritSec)) && !IsBadWritePtr(pCritSec, sizeof(*pCritSec))
+			&& !IsBadReadPtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo))) && !IsBadWritePtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo)))) {
+			if (pCritSec->DebugInfo->CriticalSection == pCritSec) {
+				EnterCriticalSection(pCritSec);
+			}
+		}
+	}
+}
+
+void CDX9AllocatorPresenter::UnlockD3DDevice()
+{
+	if (m_pD3DDevEx) {
+		_RTL_CRITICAL_SECTION *pCritSec = (_RTL_CRITICAL_SECTION *)((size_t)m_pD3DDevEx.p + sizeof(size_t));
+
+		if (!IsBadReadPtr(pCritSec, sizeof(*pCritSec)) && !IsBadWritePtr(pCritSec, sizeof(*pCritSec))
+			&& !IsBadReadPtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo))) && !IsBadWritePtr(pCritSec->DebugInfo, sizeof(*(pCritSec->DebugInfo)))) {
+			if (pCritSec->DebugInfo->CriticalSection == pCritSec) {
+				LeaveCriticalSection(pCritSec);
+			}
+		}
+	}
 }
 
 HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
@@ -1126,7 +1153,7 @@ bool CDX9AllocatorPresenter::WaitForVBlankRange(int &_RasterStart, int _RasterSi
 			ScanLineDiffLock += m_ScreenSize.cy;
 		}
 
-		if (((ScanLineDiffLock >= 0 && ScanLineDiffLock <= D3DDevLockRange) || (LastLineDiffLock < 0 && ScanLineDiffLock > 0))) {
+		if ((ScanLineDiffLock >= 0 && ScanLineDiffLock <= D3DDevLockRange) || (LastLineDiffLock < 0 && ScanLineDiffLock > 0)) {
 			if (!_bTakenLock && _bMeasure) {
 				_bTakenLock = true;
 				llPerfLock = GetPerfCounter();

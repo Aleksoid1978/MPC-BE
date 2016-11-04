@@ -90,7 +90,7 @@ public:
 	STDMETHODIMP AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile) { return E_NOTIMPL; }
 	STDMETHODIMP_(bool) ResetDevice() { return false; }
 	STDMETHODIMP_(bool) DisplayChange() { return false; }
-	//STDMETHODIMP_(bool) IsRendering() { return true; }
+	STDMETHODIMP_(bool) IsRendering() { return true; }
 
 	// ISubRenderOptions
 	STDMETHODIMP GetBool(LPCSTR field, bool* value);
