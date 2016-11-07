@@ -1551,7 +1551,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	if (!m_bPendingResetDevice) {
 		bool bResetDevice = false;
 
-		if (hr == S_PRESENT_OCCLUDED) {
+		if (hr == S_PRESENT_OCCLUDED && m_bIsFullscreen) {
 			// hmm. previous device reset was bad?
 			DLog(L"CDX9AllocatorPresenter::Paint() : S_PRESENT_OCCLUDED - need Reset Device");
 			bResetDevice = true;
