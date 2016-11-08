@@ -4,16 +4,7 @@
  * party and contributor rights, including patent rights, and no such rights
  * are granted under this license.
  *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
- * Copyright (c) 2003-2014, Antonin Descampe
- * Copyright (c) 2003-2009, Francois-Olivier Devaux
- * Copyright (c) 2005, Herve Drolon, FreeImage Team
- * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2001-2003, David Janssens
- * Copyright (c) 2011-2012, Centre National d'Etudes Spatiales (CNES), France 
- * Copyright (c) 2012, CS Systemes d'Information, France
- *
+ * Copyright (c) 2012, Mathieu Malaterre <mathieu.malaterre@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,3 +28,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef OPJ_INTTYPES_H
+#define OPJ_INTTYPES_H
+
+#include "opj_config_private.h"
+#ifdef OPJ_HAVE_INTTYPES_H
+#include <inttypes.h>
+#else
+#if defined(_WIN32)
+#define PRId64 "I64d"
+#define PRIi64 "I64i"
+#define PRIu64 "I64u"
+#define PRIx64 "I64x"
+#else
+#error unsupported platform
+#endif
+#endif
+
+#endif /* OPJ_INTTYPES_H */

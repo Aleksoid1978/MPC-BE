@@ -11,133 +11,163 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dwt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="event.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="int.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="j2k.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="j2k_lib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jp2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="jpt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mct.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mqc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="openjpeg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="opj_config_private.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="opj_includes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="opj_malloc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pi.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="raw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="t1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="t1_luts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="t2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tcd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tgt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClCompile Include="openjpeg-2.1\bio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\cio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\dwt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\event.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\function_list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\image.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\invert.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\j2k.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\jp2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\mct.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\mqc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\openjpeg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\opj_clock.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\opj_malloc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\pi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\raw.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\t1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\t2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\tcd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\tgt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openjpeg-2.1\thread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="bio.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cio.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dwt.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="event.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="image.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="j2k.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="j2k_lib.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="jp2.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="jpt.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="mct.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="mqc.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="openjpeg.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pi.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="raw.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="t1.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="t2.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tcd.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tgt.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClInclude Include="openjpeg-2.1\bio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\cio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\dwt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\function_list.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\invert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\j2k.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\jp2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\mct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\mqc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\mqc_inl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\openjpeg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\opj_clock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\opj_codec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\opj_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\opj_config_private.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\opj_includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\opj_intmath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\opj_inttypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\opj_malloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\opj_stdint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\pi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\raw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\t1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\t1_luts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\t2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\tcd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\tgt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.1\tls_keys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
