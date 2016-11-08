@@ -45,43 +45,45 @@ namespace Youtube
 		int		quality;
 		LPCTSTR	ext;
 		bool	fps60;
+		bool	bit10;
 	};
 
 	// MP4, WebM and 360p resolution or above only
 	static const YoutubeProfile YProfiles[] = {
 		// MP4 (H.264)
-		{266, y_mp4,  y_video, 2160, L"mp4",  false},
-		//{138, y_mp4,  y_video, 2160, L"mp4",  false}, // sometimes duplicates the 266, so useless
-		{264, y_mp4,  y_video, 1440, L"mp4",  false},
-		{299, y_mp4,  y_video, 1080, L"mp4",  true },
-		{137, y_mp4,  y_video, 1080, L"mp4",  false},
-		{298, y_mp4,  y_video,  720, L"mp4",  true },
-		{ 22, y_mp4,  y_media,  720, L"mp4",  false}, // H.264 + AAC
-		{135, y_mp4,  y_video,  480, L"mp4",  false},
-		{ 18, y_mp4,  y_media,  360, L"mp4",  false}, // H.264 + AAC
+		{266, y_mp4,  y_video, 2160, L"mp4",  false, false},
+		//{138, y_mp4,  y_video, 2160, L"mp4",  false, false}, // sometimes duplicates the 266, so useless
+		{264, y_mp4,  y_video, 1440, L"mp4",  false, false},
+		{299, y_mp4,  y_video, 1080, L"mp4",  true , false},
+		{137, y_mp4,  y_video, 1080, L"mp4",  false, false},
+		{298, y_mp4,  y_video,  720, L"mp4",  true , false},
+		{ 22, y_mp4,  y_media,  720, L"mp4",  false, false}, // H.264 + AAC
+		{135, y_mp4,  y_video,  480, L"mp4",  false, false},
+		{ 18, y_mp4,  y_media,  360, L"mp4",  false, false}, // H.264 + AAC
 		// WebM (VP9)
-		{315, y_webm, y_video, 2160, L"webm", true },
-		{313, y_webm, y_video, 2160, L"webm", false},
-		{308, y_webm, y_video, 1440, L"webm", true },
-		{271, y_webm, y_video, 1440, L"webm", false},
-		{303, y_webm, y_video, 1080, L"webm", true },
-		{248, y_webm, y_video, 1080, L"webm", false},
-		{302, y_webm, y_video,  720, L"webm", true },
-		{247, y_webm, y_video,  720, L"webm", false},
-		{244, y_webm, y_video,  480, L"webm", false},
-		{ 43, y_webm, y_media,  360, L"webm", false}, // VP8 + Vorbis
+		{337, y_webm, y_video, 2160, L"webm", true , true },
+		{315, y_webm, y_video, 2160, L"webm", true , false},
+		{313, y_webm, y_video, 2160, L"webm", false, false},
+		{308, y_webm, y_video, 1440, L"webm", true , false},
+		{271, y_webm, y_video, 1440, L"webm", false, false},
+		{303, y_webm, y_video, 1080, L"webm", true , false},
+		{248, y_webm, y_video, 1080, L"webm", false, false},
+		{302, y_webm, y_video,  720, L"webm", true , false},
+		{247, y_webm, y_video,  720, L"webm", false, false},
+		{244, y_webm, y_video,  480, L"webm", false, false},
+		{ 43, y_webm, y_media,  360, L"webm", false, false}, // VP8 + Vorbis
 	};
 
 	static const YoutubeProfile YAudioProfiles[] = {
 		// AAC
-		{140, y_mp4,  y_audio, 128, L"m4a",  false},
-		{139, y_mp4,  y_audio,  48, L"m4a",  false}, // may be outdated and no longer supported
+		{140, y_mp4,  y_audio, 128, L"m4a",  false, false},
+		{139, y_mp4,  y_audio,  48, L"m4a",  false, false}, // may be outdated and no longer supported
 		// Opus
-		{251, y_webm, y_audio, 160, L"webm", false},
-		{250, y_webm, y_audio,  70, L"webm", false},
-		{249, y_webm, y_audio,  50, L"webm", false},
+		{251, y_webm, y_audio, 160, L"webm", false, false},
+		{250, y_webm, y_audio,  70, L"webm", false, false},
+		{249, y_webm, y_audio,  50, L"webm", false, false},
 		// Vorbis
-		//{249, y_webm, y_audio, 128, L"webm", false},
+		//{249, y_webm, y_audio, 128, L"webm", false, false},
 	};
 
 	struct YoutubeFields {
