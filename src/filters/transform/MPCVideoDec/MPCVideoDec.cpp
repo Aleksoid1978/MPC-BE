@@ -957,7 +957,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_DXVADecoderGUID(GUID_NULL)
 	, m_nActiveCodecs(CODECS_ALL & ~CODEC_H264_MVC)
 	, m_rtAvrTimePerFrame(0)
-	, m_rtLastStart(0)
 	, m_rtLastStop(0)
 	, m_rtStartCache(INVALID_TIME)
 	, m_rtStopCache(INVALID_TIME)
@@ -978,8 +977,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_hDevice(INVALID_HANDLE_VALUE)
 	, m_bWaitingForKeyFrame(TRUE)
 	, m_bRVDropBFrameTimings(FALSE)
-	, m_bUsePTS(FALSE)
-	, m_bCorrectPTS(FALSE)
 	, m_PixelFormat(AV_PIX_FMT_NONE)
 	, m_bInterlaced(FALSE)
 	, m_fSYNC(0)
@@ -1155,7 +1152,7 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 {
 	const REFERENCE_TIME AvgTimePerFrame = GetFrameDuration();
 
-	if (rtStart == INVALID_TIME || (m_bCorrectPTS && rtStart > 0 && rtStart < m_rtLastStart)) {
+	if (rtStart == INVALID_TIME) {
 		rtStart = m_rtLastStop;
 		rtStop = INVALID_TIME;
 	}
@@ -1169,13 +1166,12 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 		rtStop = rtStart + (rtFrameDuration / m_dRate);
 	}
 
-	m_rtLastStart = rtStart;
 	m_rtLastStop = rtStop;
 }
 
 void CMPCVideoDecFilter::GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
-	rtStart = m_bUsePTS ? pFrame->pkt_pts : av_frame_get_best_effort_timestamp(pFrame);
+	rtStart = av_frame_get_best_effort_timestamp(pFrame);
 	int64_t pkt_duration = av_frame_get_pkt_duration(pFrame);
 	if (pkt_duration) {
 		rtStop = rtStart + pkt_duration;
@@ -1734,8 +1730,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 								|| bNotTrustSourceTimeStamp);
 
 		m_bRVDropBFrameTimings = (m_nCodecId == AV_CODEC_ID_RV10 || m_nCodecId == AV_CODEC_ID_RV20 || m_nCodecId == AV_CODEC_ID_RV30 || m_nCodecId == AV_CODEC_ID_RV40);
-
-		m_bCorrectPTS = m_bUsePTS = m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_MPEG1VIDEO;
 	}
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
@@ -2344,7 +2338,6 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	m_rtStart		= rtStart;
 	m_rtStartCache	= INVALID_TIME;
 	m_rtStopCache	= INVALID_TIME;
-	m_rtLastStart	= 0;
 	m_rtLastStop	= 0;
 
 	if (m_nCodecId == AV_CODEC_ID_H264 && m_bDecodingStart && (m_nDecoderMode == MODE_SOFTWARE || (m_nPCIVendor == PCIV_ATI && m_bInterlaced))) {

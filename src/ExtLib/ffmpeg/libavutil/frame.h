@@ -178,7 +178,7 @@ typedef struct AVFrameSideData {
  * without breaking compatibility with each other.
  *
  * Fields can be accessed through AVOptions, the name string used, matches the
- * C structure field name for fields accessable through AVOptions. The AVClass
+ * C structure field name for fields accessible through AVOptions. The AVClass
  * for AVFrame can be obtained from avcodec_get_frame_class()
  */
 typedef struct AVFrame {
@@ -267,10 +267,14 @@ typedef struct AVFrame {
      */
     int64_t pts;
 
+#if FF_API_PKT_PTS
     /**
      * PTS copied from the AVPacket that was decoded to produce this frame.
+     * @deprecated use the pts field instead
      */
+    attribute_deprecated
     int64_t pkt_pts;
+#endif
 
     /**
      * DTS copied from the AVPacket that triggered returning this frame. (if frame threading isn't used)
