@@ -768,7 +768,12 @@ int ff_init_buffer_info(AVCodecContext *avctx, AVFrame *frame)
     };
 
     if (pkt) {
+        frame->pts = pkt->pts;
+#if FF_API_PKT_PTS
+FF_DISABLE_DEPRECATION_WARNINGS
         frame->pkt_pts = pkt->pts;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
         av_frame_set_pkt_pos     (frame, pkt->pos);
         av_frame_set_pkt_duration(frame, pkt->duration);
         av_frame_set_pkt_size    (frame, pkt->size);
@@ -794,7 +799,12 @@ int ff_init_buffer_info(AVCodecContext *avctx, AVFrame *frame)
             frame->flags = (frame->flags & ~AV_FRAME_FLAG_DISCARD);
         }
     } else {
+        frame->pts = AV_NOPTS_VALUE;
+#if FF_API_PKT_PTS
+FF_DISABLE_DEPRECATION_WARNINGS
         frame->pkt_pts = AV_NOPTS_VALUE;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
         av_frame_set_pkt_pos     (frame, -1);
         av_frame_set_pkt_duration(frame, 0);
         av_frame_set_pkt_size    (frame, -1);
@@ -1003,6 +1013,7 @@ int avcodec_default_execute(AVCodecContext *c, int (*func)(AVCodecContext *c2, v
         if (ret)
             ret[i] = r;
     }
+    emms_c();
     return 0;
 }
 
@@ -1015,6 +1026,7 @@ int avcodec_default_execute2(AVCodecContext *c, int (*func)(AVCodecContext *c2, 
         if (ret)
             ret[i] = r;
     }
+    emms_c();
     return 0;
 }
 
@@ -1985,6 +1997,8 @@ int attribute_align_arg avcodec_encode_video2(AVCodecContext *avctx,
     ret = avctx->codec->encode2(avctx, avpkt, frame, got_packet_ptr);
     av_assert0(ret <= 0);
 
+    emms_c();
+
     if (avpkt->data && avpkt->data == avctx->internal->byte_buffer) {
         needs_realloc = 0;
         if (user_pkt.data) {
@@ -2022,7 +2036,6 @@ int attribute_align_arg avcodec_encode_video2(AVCodecContext *avctx,
     if (ret < 0 || !*got_packet_ptr)
         av_packet_unref(avpkt);
 
-    emms_c();
     return ret;
 }
 
@@ -2046,7 +2059,7 @@ int avcodec_encode_subtitle(AVCodecContext *avctx, uint8_t *buf, int buf_size,
  * which case the output will as well.
  *
  * @param pts the pts field of the decoded AVPacket, as passed through
- * AVFrame.pkt_pts
+ * AVFrame.pts
  * @param dts the dts field of the decoded AVPacket
  * @return one of the input values, may be AV_NOPTS_VALUE
  */
@@ -2290,7 +2303,7 @@ fail:
             avctx->frame_number++;
             av_frame_set_best_effort_timestamp(picture,
                                                guess_correct_pts(avctx,
-                                                                 picture->pkt_pts,
+                                                                 picture->pts,
                                                                  picture->pkt_dts));
         } else
             av_frame_unref(picture);
@@ -2363,7 +2376,7 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
             avctx->frame_number++;
             av_frame_set_best_effort_timestamp(frame,
                                                guess_correct_pts(avctx,
-                                                                 frame->pkt_pts,
+                                                                 frame->pts,
                                                                  frame->pkt_dts));
             if (frame->format == AV_SAMPLE_FMT_NONE)
                 frame->format = avctx->sample_fmt;
@@ -2405,8 +2418,14 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
                     int64_t diff_ts = av_rescale_q(avctx->internal->skip_samples,
                                                    (AVRational){1, avctx->sample_rate},
                                                    avctx->pkt_timebase);
+                    if(frame->pts!=AV_NOPTS_VALUE)
+                        frame->pts += diff_ts;
+#if FF_API_PKT_PTS
+FF_DISABLE_DEPRECATION_WARNINGS
                     if(frame->pkt_pts!=AV_NOPTS_VALUE)
                         frame->pkt_pts += diff_ts;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
                     if(frame->pkt_dts!=AV_NOPTS_VALUE)
                         frame->pkt_dts += diff_ts;
                     if (av_frame_get_pkt_duration(frame) >= diff_ts)
@@ -2469,6 +2488,12 @@ fail:
     }
 
     av_assert0(ret <= avpkt->size);
+
+    if (!avci->showed_multi_packet_warning &&
+        ret >= 0 && ret != avpkt->size && !(avctx->codec->capabilities & AV_CODEC_CAP_SUBFRAMES)) {
+            av_log(avctx, AV_LOG_WARNING, "Multiple frames in a packet.\n");
+        avci->showed_multi_packet_warning = 1;
+    }
 
     return ret;
 }
@@ -2822,6 +2847,9 @@ int attribute_align_arg avcodec_send_packet(AVCodecContext *avctx, const AVPacke
     if (avctx->internal->draining)
         return AVERROR_EOF;
 
+    if (avpkt && !avpkt->size && avpkt->data)
+        return AVERROR(EINVAL);
+
     if (!avpkt || !avpkt->size) {
         avctx->internal->draining = 1;
         avpkt = NULL;
@@ -2870,7 +2898,14 @@ int attribute_align_arg avcodec_receive_frame(AVCodecContext *avctx, AVFrame *fr
     if (avctx->codec->receive_frame) {
         if (avctx->internal->draining && !(avctx->codec->capabilities & AV_CODEC_CAP_DELAY))
             return AVERROR_EOF;
-        return avctx->codec->receive_frame(avctx, frame);
+        ret = avctx->codec->receive_frame(avctx, frame);
+        if (ret >= 0) {
+            if (av_frame_get_best_effort_timestamp(frame) == AV_NOPTS_VALUE) {
+                av_frame_set_best_effort_timestamp(frame,
+                    guess_correct_pts(avctx, frame->pts, frame->pkt_dts));
+            }
+        }
+        return ret;
     }
 
     // Emulation via old API.
@@ -3228,7 +3263,21 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
                                 av_get_colorspace_name(enc->colorspace));
             }
 
-            if (av_log_get_level() >= AV_LOG_DEBUG &&
+            if (enc->field_order != AV_FIELD_UNKNOWN) {
+                const char *field_order = "progressive";
+                if (enc->field_order == AV_FIELD_TT)
+                    field_order = "top first";
+                else if (enc->field_order == AV_FIELD_BB)
+                    field_order = "bottom first";
+                else if (enc->field_order == AV_FIELD_TB)
+                    field_order = "top coded first (swapped)";
+                else if (enc->field_order == AV_FIELD_BT)
+                    field_order = "bottom coded first (swapped)";
+
+                av_strlcatf(detail, sizeof(detail), "%s, ", field_order);
+            }
+
+            if (av_log_get_level() >= AV_LOG_VERBOSE &&
                 enc->chroma_sample_location != AVCHROMA_LOC_UNSPECIFIED)
                 av_strlcatf(detail, sizeof(detail), "%s, ",
                             av_chroma_location_name(enc->chroma_sample_location));
