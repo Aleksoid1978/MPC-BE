@@ -353,6 +353,21 @@ bool CBaseAP::SettingsNeedResetDevice()
 	return bRet;
 }
 
+static void GetMaxResolution(IDirect3D9Ex* pD3DEx, CSize& size)
+{
+	UINT cx = 0;
+	UINT cy = 0;
+	for (UINT adp = 0, num_adp = pD3DEx->GetAdapterCount(); adp < num_adp; ++adp) {
+		D3DDISPLAYMODE d3ddm = { sizeof(d3ddm) };
+		if (SUCCEEDED(pD3DEx->GetAdapterDisplayMode(adp, &d3ddm))) {
+			cx = max(cx, d3ddm.Width);
+			cy = max(cy, d3ddm.Height);
+		}
+	}
+
+	size.SetSize(cx, cy);
+}
+
 HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 {
 	DLog(L"--> CBaseAP::CreateDXDevice on thread: %u", GetCurrentThreadId());
@@ -423,6 +438,9 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	}
 	m_bCompositionEnabled = bCompositionEnabled != 0;
 
+	CSize backBufferSize;
+	GetMaxResolution(m_pD3DEx, backBufferSize);
+
 	ZeroMemory(&pp, sizeof(pp));
 	if (m_bIsFullscreen) { // Exclusive mode fullscreen
 		pp.Windowed = FALSE;
@@ -481,8 +499,8 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		pp.SwapEffect = D3DSWAPEFFECT_COPY;
 		pp.Flags = D3DPRESENTFLAG_VIDEO;
 		pp.BackBufferCount = 1;
-		pp.BackBufferWidth = d3ddm.Width;
-		pp.BackBufferHeight = d3ddm.Height;
+		pp.BackBufferWidth = backBufferSize.cx;
+		pp.BackBufferHeight = backBufferSize.cy;
 		m_BackbufferFmt = d3ddm.Format;
 		m_DisplayFmt = d3ddm.Format;
 		m_b10BitOutput = rs.b10BitOutput;
@@ -544,7 +562,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_filter = D3DTEXF_NONE;
 	}
 
-	InitMaxSubtitleTextureSize(GetRenderersSettings().iSubpicMaxTexWidth, m_ScreenSize);
+	InitMaxSubtitleTextureSize(GetRenderersSettings().iSubpicMaxTexWidth, m_bIsFullscreen ? m_ScreenSize : backBufferSize);
 
 	if (m_pAllocator) {
 		m_pAllocator->ChangeDevice(m_pD3DDevEx);

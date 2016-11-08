@@ -69,7 +69,7 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::NonDelegatingQueryInterface(REFIID r
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
-void CSubPicAllocatorPresenterImpl::InitMaxSubtitleTextureSize(int maxWidth, CSize desktopSize)
+void CSubPicAllocatorPresenterImpl::InitMaxSubtitleTextureSize(const int maxWidth, const CSize& desktopSize)
 {
 	switch (maxWidth) {
 		case 0:
@@ -107,7 +107,7 @@ void CSubPicAllocatorPresenterImpl::InitMaxSubtitleTextureSize(int maxWidth, CSi
 }
 
 #define DefaultStereoOffsetInPixels 4
-void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels)
+void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels/* = 0*/)
 {
 	if (m_pSubPicProvider) {
 		CComPtr<ISubPic> pSubPic;

@@ -88,7 +88,7 @@ namespace DSObjects
 		void DeleteSurfaces();
 
 		HRESULT ResetD3D9Device();
-		HRESULT InitializeISR(CString &_Error);
+		HRESULT InitializeISR(CString& _Error, const CSize& desktopSize);
 
 		LONGLONG m_LastAdapterCheck;
 		UINT GetAdapter(IDirect3D9 *pD3D);

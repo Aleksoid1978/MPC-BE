@@ -1791,7 +1791,7 @@ void CAppSettings::LoadRenderers()
 		delete[] dPtr;
 	}
 
-	rs.bResetDevice = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), TRUE);
+	rs.bResetDevice = !!pApp->GetProfileInt(IDS_R_SETTINGS, _T("ResetDevice"), FALSE);
 
 	rs.nSubpicCount = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPCSIZE, RS_SPCSIZE_DEF);
 	rs.iSubpicMaxTexWidth = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPMAXTEXRES, 1280);
