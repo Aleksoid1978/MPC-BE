@@ -90,7 +90,11 @@ namespace Youtube
 			return (a->quality > b->quality);
 		}
 
-		return (a->fps60 > b->fps60);
+		if (a->fps60 != b->fps60) {
+			return (a->fps60 > b->fps60);
+		}
+
+		return (a->bit10 > b->bit10);
 	}
 
 	static bool CompareUrllistItem(YoutubeUrllistItem a, YoutubeUrllistItem b)
@@ -642,6 +646,9 @@ namespace Youtube
 							profile->quality);
 						if (profile->fps60) {
 							item.title.Append(L" 60fps");
+						}
+						if (profile->bit10) {
+							item.title.Append(L" 10 bit");
 						}
 						if (profile->type == y_video) {
 							item.title.Append(L" dash");
