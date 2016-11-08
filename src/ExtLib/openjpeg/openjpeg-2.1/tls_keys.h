@@ -4,16 +4,7 @@
  * party and contributor rights, including patent rights, and no such rights
  * are granted under this license.
  *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
- * Copyright (c) 2003-2014, Antonin Descampe
- * Copyright (c) 2003-2009, Francois-Olivier Devaux
- * Copyright (c) 2005, Herve Drolon, FreeImage Team
- * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2001-2003, David Janssens
- * Copyright (c) 2011-2012, Centre National d'Etudes Spatiales (CNES), France 
- * Copyright (c) 2012, CS Systemes d'Information, France
- *
+ * Copyright (c) 2016, Even Rouault
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,3 +28,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
+#ifndef TLS_KEYS_H
+#define TLS_KEYS_H
+
+#define OPJ_TLS_KEY_T1  0
+
+#endif

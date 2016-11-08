@@ -4,16 +4,7 @@
  * party and contributor rights, including patent rights, and no such rights
  * are granted under this license.
  *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
- * Copyright (c) 2003-2014, Antonin Descampe
- * Copyright (c) 2003-2009, Francois-Olivier Devaux
- * Copyright (c) 2005, Herve Drolon, FreeImage Team
- * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2001-2003, David Janssens
- * Copyright (c) 2011-2012, Centre National d'Etudes Spatiales (CNES), France 
- * Copyright (c) 2012, CS Systemes d'Information, France
- *
+ * Copyright (c) 2012, Mathieu Malaterre <mathieu.malaterre@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,3 +28,25 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef OPJ_STDINT_H
+#define OPJ_STDINT_H
+
+#include "opj_config.h"
+#ifdef OPJ_HAVE_STDINT_H
+#include <stdint.h>
+#else
+#if defined(_WIN32)
+typedef   signed __int8   int8_t;
+typedef unsigned __int8   uint8_t;
+typedef   signed __int16  int16_t;
+typedef unsigned __int16  uint16_t;
+typedef   signed __int32  int32_t;
+typedef unsigned __int32  uint32_t;
+typedef   signed __int64  int64_t;
+typedef unsigned __int64  uint64_t;
+#else
+#error unsupported platform
+#endif
+#endif
+
+#endif /* OPJ_STDINT_H */

@@ -4,16 +4,7 @@
  * party and contributor rights, including patent rights, and no such rights
  * are granted under this license.
  *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
- * Copyright (c) 2003-2014, Antonin Descampe
- * Copyright (c) 2003-2009, Francois-Olivier Devaux
- * Copyright (c) 2005, Herve Drolon, FreeImage Team
- * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2001-2003, David Janssens
- * Copyright (c) 2011-2012, Centre National d'Etudes Spatiales (CNES), France 
- * Copyright (c) 2012, CS Systemes d'Information, France
- *
+ * Copyright (c) 2008, Jerome Fimes, Communications & Systemes <jerome.fimes@c-s.fr>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,3 +28,37 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
+#ifndef __INVERT_H
+#define __INVERT_H
+/**
+@file invert.h
+@brief Implementation of the matrix inversion
+
+The function in INVERT.H compute a matrix inversion with a LUP method
+*/
+
+/** @defgroup INVERT INVERT - Implementation of a matrix inversion */
+/*@{*/
+/** @name Exported functions */
+/*@{*/
+/* ----------------------------------------------------------------------- */
+
+/**
+ * Calculates a n x n double matrix inversion with a LUP method. Data is aligned, rows after rows (or columns after columns).
+ * The function does not take ownership of any memory block, data must be fred by the user.
+ *
+ * @param pSrcMatrix	the matrix to invert.
+ * @param pDestMatrix	data to store the inverted matrix. 
+ * @param n size of the matrix
+ * @return OPJ_TRUE if the inversion is successful, OPJ_FALSE if the matrix is singular.
+ */
+OPJ_BOOL opj_matrix_inversion_f(OPJ_FLOAT32 * pSrcMatrix,
+                                OPJ_FLOAT32 * pDestMatrix, 
+                                OPJ_UINT32 nb_compo);
+/* ----------------------------------------------------------------------- */
+/*@}*/
+
+/*@}*/
+
+#endif /* __INVERT_H */ 

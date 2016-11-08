@@ -4,16 +4,7 @@
  * party and contributor rights, including patent rights, and no such rights
  * are granted under this license.
  *
- * Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium
- * Copyright (c) 2002-2014, Professor Benoit Macq
- * Copyright (c) 2003-2014, Antonin Descampe
- * Copyright (c) 2003-2009, Francois-Olivier Devaux
  * Copyright (c) 2005, Herve Drolon, FreeImage Team
- * Copyright (c) 2002-2003, Yannick Verschueren
- * Copyright (c) 2001-2003, David Janssens
- * Copyright (c) 2011-2012, Centre National d'Etudes Spatiales (CNES), France 
- * Copyright (c) 2012, CS Systemes d'Information, France
- *
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,3 +28,32 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef __OPJ_CLOCK_H
+#define __OPJ_CLOCK_H
+/**
+@file opj_clock.h
+@brief Internal function for timing
+
+The functions in OPJ_CLOCK.C are internal utilities mainly used for timing.
+*/
+
+/** @defgroup MISC MISC - Miscellaneous internal functions */
+/*@{*/
+
+/** @name Exported functions */
+/*@{*/
+/* ----------------------------------------------------------------------- */
+
+/**
+Difference in successive opj_clock() calls tells you the elapsed time
+@return Returns time in seconds
+*/
+OPJ_FLOAT64 opj_clock(void);
+
+/* ----------------------------------------------------------------------- */
+/*@}*/
+
+/*@}*/
+
+#endif /* __OPJ_CLOCK_H */
+
