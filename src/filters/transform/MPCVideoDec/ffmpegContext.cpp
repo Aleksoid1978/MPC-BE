@@ -444,10 +444,11 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 			}
 			break;
 		case AV_CODEC_ID_VP9:
-			if (pAVCtx->extradata_size == 16 && GETDWORD(pAVCtx->extradata) == FCC('VP90')) {
-				pAVCtx->profile     = FCC(GETDWORD(pAVCtx->extradata + 4));
-				pAVCtx->pix_fmt     = (AVPixelFormat)FCC(GETDWORD(pAVCtx->extradata + 8));
-				pAVCtx->color_range = (AVColorRange)FCC(GETDWORD(pAVCtx->extradata + 12));
+			if (pAVCtx->extradata_size == 12 && AV_RB32(pAVCtx->extradata) == 'VP90') {
+				pAVCtx->profile     = AV_RB16(pAVCtx->extradata + 4);
+				pAVCtx->pix_fmt     = (AVPixelFormat)AV_RB16(pAVCtx->extradata + 6);
+				pAVCtx->colorspace  = (AVColorSpace)AV_RB16(pAVCtx->extradata + 8);
+				pAVCtx->color_range = (AVColorRange)AV_RB16(pAVCtx->extradata + 10);
 			}
 			break;
 		}
