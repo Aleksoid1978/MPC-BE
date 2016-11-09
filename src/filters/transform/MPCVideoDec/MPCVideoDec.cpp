@@ -1902,7 +1902,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 				}
 			}
 			else if (m_nCodecId == AV_CODEC_ID_VP9) {
-				if (m_pAVCtx->profile > FF_PROFILE_VP9_0) {
+				if (m_pAVCtx->profile > FF_PROFILE_VP9_0 || depth != 8) {
 					break;
 				}
 			}
