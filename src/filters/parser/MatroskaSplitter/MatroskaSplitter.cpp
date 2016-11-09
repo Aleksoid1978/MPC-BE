@@ -629,6 +629,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 												#define VP9_SYNCCODE 0x498342
 
 												AVPixelFormat pix_fmt = AV_PIX_FMT_NONE;
+												AVColorSpace colorspace = AVCOL_SPC_UNSPECIFIED;
 												AVColorRange color_range = AVCOL_RANGE_UNSPECIFIED;
 												if (!gb.BitRead(1)) {
 													BYTE keyframe = !gb.BitRead(1);
@@ -643,7 +644,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 															};
 
 															const int bits = profile <= 1 ? 0 : 1 + gb.BitRead(1); // 0:8, 1:10, 2:12
-															const AVColorSpace colorspace = colorspaces[gb.BitRead(3)];
+															colorspace = colorspaces[gb.BitRead(3)];
 															if (colorspace == AVCOL_SPC_RGB) {
 																static const enum AVPixelFormat pix_fmt_rgb[3] = {
 																	AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRP10, AV_PIX_FMT_GBRP12
@@ -674,12 +675,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 												}
 
 												CAtlArray<BYTE> ptr;
-												ptr.SetCount(16);
+												ptr.SetCount(12);
 												BYTE *dst = ptr.GetData();
-												GETDWORD(dst)      = FCC('VP90');
-												GETDWORD(dst + 4)  = FCC(profile);
-												GETDWORD(dst + 8)  = FCC(pix_fmt);
-												GETDWORD(dst + 12) = FCC(color_range);
+												GETDWORD(dst)     = _byteswap_ulong('VP90');
+												GETWORD(dst + 4)  = _byteswap_ushort(profile);
+												GETWORD(dst + 6)  = _byteswap_ushort(pix_fmt);
+												GETWORD(dst + 8)  = _byteswap_ushort(colorspace);
+												GETWORD(dst + 10) = _byteswap_ushort(color_range);
 
 												VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + ptr.GetCount());
 												memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), ptr.GetData(), ptr.GetCount());
