@@ -33,6 +33,7 @@
 #include <moreuuids.h>
 #include <basestruct.h>
 #include <list>
+#include <libavutil/pixfmt.h>
 
 // option names
 #define OPT_REGKEY_MATROSKASplit	_T("Software\\MPC-BE Filters\\Matroska Splitter")
@@ -578,6 +579,123 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + extralen);
 								memcpy(pvih + 1, extra, extralen);
 								mts.InsertAt(0, mt);
+							}
+
+							if (mt.subtype == MEDIASUBTYPE_VP90) {
+								const __int64 pos = m_pFile->GetPos();
+
+								CMatroskaNode Root(m_pFile);
+								m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
+								m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
+
+								Cluster c;
+								c.ParseTimeCode(m_pCluster);
+
+								if (!m_pBlock) {
+									m_pBlock = m_pCluster->GetFirstBlock();
+								}
+
+								BOOL bIsParse = FALSE;
+								do {
+									CBlockGroupNode bgn;
+
+									if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
+										bgn.Parse(m_pBlock, true);
+									} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
+										CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+										bg->Block.Parse(m_pBlock, true);
+										bgn.AddTail(bg);
+									}
+
+									while (bgn.GetCount() && !bIsParse) {
+										CAutoPtr<MatroskaReader::BlockGroup> bg = bgn.RemoveHead();
+										if (bg->Block.TrackNumber != pTE->TrackNumber) {
+											continue;
+										}
+
+										if (!bg->Block.BlockData.IsEmpty()) {
+											CBinary* pb = bg->Block.BlockData.GetHead();
+											pTE->Expand(*pb, ContentEncoding::AllFrameContents);
+
+											CGolombBuffer gb(pb->GetData(), pb->GetCount());
+											const BYTE marker = gb.BitRead(2);
+											if (marker == 0x2) {
+												BYTE profile = gb.BitRead(1);
+												profile |= gb.BitRead(1) << 1;
+												if (profile == 3) {
+													profile += gb.BitRead(1);
+												}
+
+												#define VP9_SYNCCODE 0x498342
+
+												AVPixelFormat pix_fmt = AV_PIX_FMT_NONE;
+												AVColorRange color_range = AVCOL_RANGE_UNSPECIFIED;
+												if (!gb.BitRead(1)) {
+													BYTE keyframe = !gb.BitRead(1);
+													gb.BitRead(1);
+													gb.BitRead(1);
+
+													if (keyframe) {
+														if (VP9_SYNCCODE == gb.BitRead(24)) {
+															static const enum AVColorSpace colorspaces[8] = {
+																AVCOL_SPC_UNSPECIFIED, AVCOL_SPC_BT470BG, AVCOL_SPC_BT709, AVCOL_SPC_SMPTE170M,
+																AVCOL_SPC_SMPTE240M, AVCOL_SPC_BT2020_NCL, AVCOL_SPC_RESERVED, AVCOL_SPC_RGB,
+															};
+
+															const int bits = profile <= 1 ? 0 : 1 + gb.BitRead(1); // 0:8, 1:10, 2:12
+															const AVColorSpace colorspace = colorspaces[gb.BitRead(3)];
+															if (colorspace == AVCOL_SPC_RGB) {
+																static const enum AVPixelFormat pix_fmt_rgb[3] = {
+																	AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRP10, AV_PIX_FMT_GBRP12
+																};
+																color_range = AVCOL_RANGE_JPEG;
+																pix_fmt = pix_fmt_rgb[bits];
+															} else {
+																static const enum AVPixelFormat pix_fmt_for_ss[3][2 /* v */][2 /* h */] = {
+																	{ { AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUV422P },
+																	  { AV_PIX_FMT_YUV440P, AV_PIX_FMT_YUV420P } },
+																	{ { AV_PIX_FMT_YUV444P10, AV_PIX_FMT_YUV422P10 },
+																	  { AV_PIX_FMT_YUV440P10, AV_PIX_FMT_YUV420P10 } },
+																	{ { AV_PIX_FMT_YUV444P12, AV_PIX_FMT_YUV422P12 },
+																	  { AV_PIX_FMT_YUV440P12, AV_PIX_FMT_YUV420P12 } }
+																};
+
+																color_range = gb.BitRead(1) ? AVCOL_RANGE_JPEG : AVCOL_RANGE_MPEG;
+																if (profile & 1) {
+																	const BYTE h = gb.BitRead(1);
+																	const BYTE v = gb.BitRead(1);
+																	pix_fmt = pix_fmt_for_ss[bits][v][h];
+																} else {
+																	pix_fmt = pix_fmt_for_ss[bits][1][1];
+																}
+															}
+														}
+													}
+												}
+
+												CAtlArray<BYTE> ptr;
+												ptr.SetCount(16);
+												BYTE *dst = ptr.GetData();
+												GETDWORD(dst)      = FCC('VP90');
+												GETDWORD(dst + 4)  = FCC(profile);
+												GETDWORD(dst + 8)  = FCC(pix_fmt);
+												GETDWORD(dst + 12) = FCC(color_range);
+
+												VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + ptr.GetCount());
+												memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), ptr.GetData(), ptr.GetCount());
+
+												mts.InsertAt(0, mt);
+											}
+
+											bIsParse = TRUE;
+										}
+									}
+								} while (m_pBlock->NextBlock() && SUCCEEDED(hr) && !CheckRequest(NULL) && !bIsParse);
+
+								m_pBlock.Free();
+								m_pCluster.Free();
+
+								m_pFile->Seek(pos);
 							}
 						}
 

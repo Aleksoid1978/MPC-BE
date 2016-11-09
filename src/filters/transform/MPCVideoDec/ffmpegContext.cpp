@@ -346,7 +346,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 			break;
 		case AV_CODEC_ID_LAGARITH:
 			if (pAVCtx->extradata_size >= 4) {
-				switch (*(DWORD*)pAVCtx->extradata) {
+				switch (GETDWORD(pAVCtx->extradata)) {
 				case 0:
 					if (pAVCtx->bits_per_coded_sample == 32) {
 						pAVCtx->pix_fmt = AV_PIX_FMT_RGBA;
@@ -366,7 +366,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 			break;
 		case AV_CODEC_ID_PRORES:
 			if (pAVCtx->extradata_size >= 8) {
-				switch (*(DWORD*)(pAVCtx->extradata + 4)) {
+				switch (GETDWORD(pAVCtx->extradata + 4)) {
 				case 'hcpa': // Apple ProRes 422 High Quality
 				case 'ncpa': // Apple ProRes 422 Standard Definition
 				case 'scpa': // Apple ProRes 422 LT
@@ -398,7 +398,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 			break;
 		case AV_CODEC_ID_MAGICYUV:
 			if (pAVCtx->extradata_size >= 32 && *(DWORD*)pAVCtx->extradata == FCC('MAGY')) {
-				int hsize = *(DWORD*)(pAVCtx->extradata + 4);
+				int hsize = GETDWORD(pAVCtx->extradata + 4);
 				if (hsize >= 32 && pAVCtx->extradata[8] == 7) {
 					switch (pAVCtx->extradata[9]) {
 					case 0x65: pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;     break;
@@ -412,7 +412,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 				}
 			}
 			else if (pAVCtx->extradata_size >= 8) {
-				switch (*(DWORD*)(pAVCtx->extradata + 4)) {
+				switch (GETDWORD(pAVCtx->extradata + 4)) {
 				case FCC('M8RG'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;     break;
 				case FCC('M8RA'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP;    break;
 				case FCC('M8Y4'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;  break;
@@ -441,6 +441,13 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 						pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; // and other RGB formats, but it is not important here
 					}
 				}
+			}
+			break;
+		case AV_CODEC_ID_VP9:
+			if (pAVCtx->extradata_size == 16 && GETDWORD(pAVCtx->extradata) == FCC('VP90')) {
+				pAVCtx->profile     = FCC(GETDWORD(pAVCtx->extradata + 4));
+				pAVCtx->pix_fmt     = (AVPixelFormat)FCC(GETDWORD(pAVCtx->extradata + 8));
+				pAVCtx->color_range = (AVColorRange)FCC(GETDWORD(pAVCtx->extradata + 12));
 			}
 			break;
 		}
