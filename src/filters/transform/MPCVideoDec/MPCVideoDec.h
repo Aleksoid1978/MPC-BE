@@ -140,6 +140,8 @@ protected:
 
 	BOOL									m_MVC_Base_View_R_flag;
 
+	MediaSideDataHDR*						m_MasterDataHDR = NULL;
+
 	// === Private functions
 	void			Cleanup();
 	void			ffmpegCleanup();
