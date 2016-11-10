@@ -278,6 +278,44 @@ namespace MatroskaReader
 		HRESULT ParseTimeCode(CMatroskaNode* pMN);
 	};
 
+	class MasteringMetadata
+	{
+	public:
+		CFloat PrimaryRChromaticityX, PrimaryRChromaticityY;
+		CFloat PrimaryGChromaticityX, PrimaryGChromaticityY;
+		CFloat PrimaryBChromaticityX, PrimaryBChromaticityY;
+		CFloat WhitePointChromaticityX, WhitePointChromaticityY;
+		CFloat LuminanceMax, LuminanceMin;
+
+		MasteringMetadata() {
+			PrimaryRChromaticityX.Set(0.0);PrimaryRChromaticityY.Set(0.0);
+			PrimaryGChromaticityX.Set(0.0);PrimaryGChromaticityY.Set(0.0);
+			PrimaryBChromaticityX.Set(0.0);PrimaryBChromaticityX.Set(0.0);
+			WhitePointChromaticityX.Set(0.0);WhitePointChromaticityY.Set(0.0);
+			LuminanceMax.Set(0.0);LuminanceMin.Set(0.0);
+		}
+		HRESULT Parse(CMatroskaNode* pMN);
+	};
+
+	class Colour
+	{
+	public:
+		CUInt MatrixCoefficients;
+		CUInt Range;
+		CUInt TransferCharacteristics;
+		CUInt Primaries;
+
+		MasteringMetadata SMPTE2086MasteringMetadata;
+		
+		Colour() {
+			MatrixCoefficients.Set(0);
+			Range.Set(0);
+			TransferCharacteristics.Set(0);
+			Primaries.Set(0);
+		}
+		HRESULT Parse(CMatroskaNode* pMN);
+	};
+
 	class Video
 	{
 	public:
@@ -288,6 +326,8 @@ namespace MatroskaReader
 		CUInt ColourSpace;
 		CFloat GammaValue;
 		CFloat FramePerSec;
+
+		Colour VideoColorInformation;
 
 		Video() {
 			FlagInterlaced.Set(0);
