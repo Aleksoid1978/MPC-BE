@@ -287,12 +287,16 @@ namespace MatroskaReader
 		CFloat WhitePointChromaticityX, WhitePointChromaticityY;
 		CFloat LuminanceMax, LuminanceMin;
 
+		bool bValid;
+
 		MasteringMetadata() {
 			PrimaryRChromaticityX.Set(0.0);PrimaryRChromaticityY.Set(0.0);
 			PrimaryGChromaticityX.Set(0.0);PrimaryGChromaticityY.Set(0.0);
 			PrimaryBChromaticityX.Set(0.0);PrimaryBChromaticityX.Set(0.0);
 			WhitePointChromaticityX.Set(0.0);WhitePointChromaticityY.Set(0.0);
 			LuminanceMax.Set(0.0);LuminanceMin.Set(0.0);
+
+			bValid = false;
 		}
 		HRESULT Parse(CMatroskaNode* pMN);
 	};

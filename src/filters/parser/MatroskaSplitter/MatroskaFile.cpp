@@ -541,33 +541,43 @@ HRESULT MasteringMetadata::Parse(CMatroskaNode* pMN0)
 	BeginChunk
 	case 0x55D1:
 		PrimaryRChromaticityX.Parse(pMN);
+		bValid = true;
 		break;
 	case 0x55D2:
 		PrimaryRChromaticityY.Parse(pMN);
+		bValid = true;
 		break;
 	case 0x55D3:
 		PrimaryGChromaticityX.Parse(pMN);
+		bValid = true;
 		break;
 	case 0x55D4:
 		PrimaryGChromaticityY.Parse(pMN);
+		bValid = true;
 		break;
 	case 0x55D5:
 		PrimaryBChromaticityX.Parse(pMN);
+		bValid = true;
 		break;
 	case 0x55D6:
 		PrimaryBChromaticityY.Parse(pMN);
+		bValid = true;
 		break;
 	case 0x55D7:
 		WhitePointChromaticityX.Parse(pMN);
+		bValid = true;
 		break;
 	case 0x55D8:
 		WhitePointChromaticityY.Parse(pMN);
+		bValid = true;
 		break;
 	case 0x55D9:
 		LuminanceMax.Parse(pMN);
+		bValid = true;
 		break;
 	case 0x55DA:
 		LuminanceMin.Parse(pMN);
+		bValid = true;
 		break;
 	EndChunk
 }
