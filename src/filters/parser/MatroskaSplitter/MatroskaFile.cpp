@@ -536,6 +536,63 @@ bool TrackEntry::Expand(CBinary& data, UINT64 Scope)
 	return true;
 }
 
+HRESULT MasteringMetadata::Parse(CMatroskaNode* pMN0)
+{
+	BeginChunk
+	case 0x55D1:
+		PrimaryRChromaticityX.Parse(pMN);
+		break;
+	case 0x55D2:
+		PrimaryRChromaticityY.Parse(pMN);
+		break;
+	case 0x55D3:
+		PrimaryGChromaticityX.Parse(pMN);
+		break;
+	case 0x55D4:
+		PrimaryGChromaticityY.Parse(pMN);
+		break;
+	case 0x55D5:
+		PrimaryBChromaticityX.Parse(pMN);
+		break;
+	case 0x55D6:
+		PrimaryBChromaticityY.Parse(pMN);
+		break;
+	case 0x55D7:
+		WhitePointChromaticityX.Parse(pMN);
+		break;
+	case 0x55D8:
+		WhitePointChromaticityY.Parse(pMN);
+		break;
+	case 0x55D9:
+		LuminanceMax.Parse(pMN);
+		break;
+	case 0x55DA:
+		LuminanceMin.Parse(pMN);
+		break;
+	EndChunk
+}
+
+HRESULT Colour::Parse(CMatroskaNode* pMN0)
+{
+	BeginChunk
+	case 0x55B1:
+		MatrixCoefficients.Parse(pMN);
+		break;
+	case 0x55B9:
+		Range.Parse(pMN);
+		break;
+	case 0x55BA:
+		TransferCharacteristics.Parse(pMN);
+		break;
+	case 0x55BB:
+		Primaries.Parse(pMN);
+		break;
+	case 0x55D0:
+		SMPTE2086MasteringMetadata.Parse(pMN);
+		break;
+	EndChunk
+}
+
 HRESULT Video::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
@@ -593,6 +650,9 @@ HRESULT Video::Parse(CMatroskaNode* pMN0)
 		break;
 	case 0x2383E3:
 		FramePerSec.Parse(pMN);
+		break;
+	case 0x55B0:
+		VideoColorInformation.Parse(pMN);
 		break;
 	EndChunk
 }
