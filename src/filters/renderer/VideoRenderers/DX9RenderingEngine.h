@@ -175,7 +175,7 @@ namespace DSObjects
 		// Final pass
 		HRESULT InitFinalPass();
 		void CleanupFinalPass();
-		HRESULT CreateIccProfileLut(TCHAR* profilePath, float* lut3D);
+		HRESULT CreateIccProfileLut(wchar_t* profilePath, float* lut3D);
 		HRESULT FinalPass(IDirect3DTexture9* pTexture);
 
 		HRESULT TextureCopy(IDirect3DTexture9* pTexture);

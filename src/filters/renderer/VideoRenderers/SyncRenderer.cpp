@@ -2714,9 +2714,13 @@ HRESULT CSyncAP::CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType
 
 	m_pMediaType->SetUINT32(MF_MT_PAN_SCAN_ENABLED, 0);
 
-	const CRenderersSettings& rs = GetRenderersSettings();
-	m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, rs.iEVROutputRange == 1 ? MFNominalRange_16_235 : MFNominalRange_0_255);
-	m_LastSetOutputRange = rs.iEVROutputRange;
+	int iOutputRange = GetRenderersSettings().iEVROutputRange;
+	if (m_inputExtFormat.NominalRange == MFNominalRange_0_255) {
+		m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, iOutputRange == 1 ? MFNominalRange_48_208 : MFNominalRange_16_235); // fix EVR bug
+	} else {
+		m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, iOutputRange == 1 ? MFNominalRange_16_235 : MFNominalRange_0_255);
+	}
+	m_LastSetOutputRange = iOutputRange;
 
 	ULARGE_INTEGER ui64FrameSize;
 	m_pMediaType->GetUINT64(MF_MT_FRAME_SIZE, &ui64FrameSize.QuadPart);
@@ -2945,12 +2949,12 @@ bool CSyncAP::GetSampleFromMixer()
 
 			rcTearing.left = m_nTearingPos;
 			rcTearing.top = 0;
-			rcTearing.right	= rcTearing.left + 4;
+			rcTearing.right = rcTearing.left + 4;
 			rcTearing.bottom = m_nativeVideoSize.cy;
 			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[iSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
 
 			rcTearing.left = (rcTearing.right + 15) % m_nativeVideoSize.cx;
-			rcTearing.right	= rcTearing.left + 4;
+			rcTearing.right = rcTearing.left + 4;
 			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[iSurface], &rcTearing, D3DCOLOR_ARGB (255,255,0,0));
 			m_nTearingPos = (m_nTearingPos + 7) % m_nativeVideoSize.cx;
 		}
@@ -3030,12 +3034,12 @@ STDMETHODIMP CSyncAP::Invoke( __RPC__in_opt IMFAsyncResult *pAsyncResult)
 STDMETHODIMP CSyncAP::GetNativeVideoSize(SIZE *pszVideo, SIZE *pszARVideo)
 {
 	if (pszVideo) {
-		pszVideo->cx	= m_nativeVideoSize.cx;
-		pszVideo->cy	= m_nativeVideoSize.cy;
+		pszVideo->cx = m_nativeVideoSize.cx;
+		pszVideo->cy = m_nativeVideoSize.cy;
 	}
 	if (pszARVideo) {
-		pszARVideo->cx	= m_nativeVideoSize.cx * m_aspectRatio.cx;
-		pszARVideo->cy	= m_nativeVideoSize.cy * m_aspectRatio.cy;
+		pszARVideo->cx = m_nativeVideoSize.cx * m_aspectRatio.cx;
+		pszARVideo->cy = m_nativeVideoSize.cy * m_aspectRatio.cy;
 	}
 	return S_OK;
 }
@@ -3043,8 +3047,8 @@ STDMETHODIMP CSyncAP::GetNativeVideoSize(SIZE *pszVideo, SIZE *pszARVideo)
 STDMETHODIMP CSyncAP::GetIdealVideoSize(SIZE *pszMin, SIZE *pszMax)
 {
 	if (pszMin) {
-		pszMin->cx	= 1;
-		pszMin->cy	= 1;
+		pszMin->cx = 1;
+		pszMin->cy = 1;
 	}
 
 	if (pszMax) {
@@ -3052,8 +3056,8 @@ STDMETHODIMP CSyncAP::GetIdealVideoSize(SIZE *pszMin, SIZE *pszMax)
 
 		ZeroMemory(&d3ddm, sizeof(d3ddm));
 		if (SUCCEEDED(m_pD3DEx->GetAdapterDisplayMode(GetAdapter(m_pD3DEx, m_hWnd), &d3ddm))) {
-			pszMax->cx	= d3ddm.Width;
-			pszMax->cy	= d3ddm.Height;
+			pszMax->cx = d3ddm.Width;
+			pszMax->cy = d3ddm.Height;
 		}
 	}
 	return S_OK;
@@ -3190,51 +3194,51 @@ STDMETHODIMP CSyncAP::DisableImageExport(BOOL bDisable)
 // IDirect3DDeviceManager9
 STDMETHODIMP CSyncAP::ResetDevice(IDirect3DDevice9 *pDevice,UINT resetToken)
 {
-	HRESULT		hr = m_pD3DManager->ResetDevice (pDevice, resetToken);
+	HRESULT hr = m_pD3DManager->ResetDevice (pDevice, resetToken);
 	return hr;
 }
 
 STDMETHODIMP CSyncAP::OpenDeviceHandle(HANDLE *phDevice)
 {
-	HRESULT		hr = m_pD3DManager->OpenDeviceHandle (phDevice);
+	HRESULT hr = m_pD3DManager->OpenDeviceHandle (phDevice);
 	return hr;
 }
 
 STDMETHODIMP CSyncAP::CloseDeviceHandle(HANDLE hDevice)
 {
-	HRESULT		hr = m_pD3DManager->CloseDeviceHandle(hDevice);
+	HRESULT hr = m_pD3DManager->CloseDeviceHandle(hDevice);
 	return hr;
 }
 
 STDMETHODIMP CSyncAP::TestDevice(HANDLE hDevice)
 {
-	HRESULT		hr = m_pD3DManager->TestDevice(hDevice);
+	HRESULT hr = m_pD3DManager->TestDevice(hDevice);
 	return hr;
 }
 
 STDMETHODIMP CSyncAP::LockDevice(HANDLE hDevice, IDirect3DDevice9 **ppDevice, BOOL fBlock)
 {
-	HRESULT		hr = m_pD3DManager->LockDevice(hDevice, ppDevice, fBlock);
+	HRESULT hr = m_pD3DManager->LockDevice(hDevice, ppDevice, fBlock);
 	return hr;
 }
 
 STDMETHODIMP CSyncAP::UnlockDevice(HANDLE hDevice, BOOL fSaveState)
 {
-	HRESULT		hr = m_pD3DManager->UnlockDevice(hDevice, fSaveState);
+	HRESULT hr = m_pD3DManager->UnlockDevice(hDevice, fSaveState);
 	return hr;
 }
 
 STDMETHODIMP CSyncAP::GetVideoService(HANDLE hDevice, REFIID riid, void **ppService)
 {
-	HRESULT		hr = m_pD3DManager->GetVideoService(hDevice, riid, ppService);
+	HRESULT hr = m_pD3DManager->GetVideoService(hDevice, riid, ppService);
 
 	if (riid == __uuidof(IDirectXVideoDecoderService)) {
-		UINT		nNbDecoder = 5;
-		GUID*		pDecoderGuid;
-		IDirectXVideoDecoderService*		pDXVAVideoDecoder = (IDirectXVideoDecoderService*) *ppService;
+		UINT nNbDecoder = 5;
+		GUID* pDecoderGuid;
+		IDirectXVideoDecoderService* pDXVAVideoDecoder = (IDirectXVideoDecoderService*) *ppService;
 		pDXVAVideoDecoder->GetDecoderDeviceGuids (&nNbDecoder, &pDecoderGuid);
 	} else if (riid == __uuidof(IDirectXVideoProcessorService)) {
-		IDirectXVideoProcessorService*		pDXVAProcessor = (IDirectXVideoProcessorService*) *ppService;
+		IDirectXVideoProcessorService* pDXVAProcessor = (IDirectXVideoProcessorService*) *ppService;
 		UNREFERENCED_PARAMETER(pDXVAProcessor);
 	}
 
@@ -3247,16 +3251,16 @@ STDMETHODIMP CSyncAP::GetNativeVideoSize(LONG* lpWidth, LONG* lpHeight, LONG* lp
 	ASSERT (FALSE);
 
 	if (lpWidth) {
-		*lpWidth	= m_nativeVideoSize.cx;
+		*lpWidth = m_nativeVideoSize.cx;
 	}
-	if (lpHeight)	{
-		*lpHeight	= m_nativeVideoSize.cy;
+	if (lpHeight) {
+		*lpHeight = m_nativeVideoSize.cy;
 	}
-	if (lpARWidth)	{
-		*lpARWidth	= m_aspectRatio.cx;
+	if (lpARWidth) {
+		*lpARWidth = m_aspectRatio.cx;
 	}
-	if (lpARHeight)	{
-		*lpARHeight	= m_aspectRatio.cy;
+	if (lpARHeight) {
+		*lpARHeight = m_aspectRatio.cy;
 	}
 	return S_OK;
 }

@@ -1334,16 +1334,16 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	// Initialize the color management if necessary
 	if (bColorManagement) {
 		// Get the ICC profile path
-		TCHAR* iccProfilePath = 0;
+		wchar_t* iccProfilePath = NULL;
 		HDC hDC = GetDC(m_hWnd);
 
 		if (hDC != NULL) {
 			DWORD icmProfilePathSize = 0;
-			GetICMProfile(hDC, &icmProfilePathSize, NULL);
-			iccProfilePath = DNew TCHAR[icmProfilePathSize];
-			if (!GetICMProfile(hDC, &icmProfilePathSize, iccProfilePath)) {
+			GetICMProfileW(hDC, &icmProfilePathSize, NULL);
+			iccProfilePath = DNew wchar_t[icmProfilePathSize];
+			if (!GetICMProfileW(hDC, &icmProfilePathSize, iccProfilePath)) {
 				delete[] iccProfilePath;
-				iccProfilePath = 0;
+				iccProfilePath = NULL;
 			}
 
 			ReleaseDC(m_hWnd, hDC);
@@ -1456,26 +1456,29 @@ void CDX9RenderingEngine::CleanupFinalPass()
 	m_pFinalPixelShader = NULL;
 }
 
-HRESULT CDX9RenderingEngine::CreateIccProfileLut(TCHAR* profilePath, float* lut3D)
+HRESULT CDX9RenderingEngine::CreateIccProfileLut(wchar_t* profilePath, float* lut3D)
 {
 	// Get the input video system
 	VideoSystem videoSystem;
 
 	if (m_InputVideoSystem == VIDEO_SYSTEM_UNKNOWN) {
-		static const long ntscSizes[][2] = {{720, 480}, {720, 486}, {704, 480}};
-		static const long palSizes[][2] = {{720, 576}, {704, 576}};
+		// DVD-Video and D-1
+		static const long ntscSizes[][2] = { {720, 480}, {704, 480}, {352, 480}, {352, 240}, {720, 486} };
+		static const long palSizes[][2] = { {720, 576}, {704, 576}, {352, 576}, {352, 288} };
 
 		videoSystem = VIDEO_SYSTEM_HDTV; // default
 
 		for (unsigned i = 0; i < _countof(ntscSizes); i++) {
 			if (m_nativeVideoSize.cx == ntscSizes[i][0] && m_nativeVideoSize.cy == ntscSizes[i][1]) {
 				videoSystem = VIDEO_SYSTEM_SDTV_NTSC;
+				break;
 			}
 		}
 
 		for (unsigned i = 0; i < _countof(palSizes); i++) {
 			if (m_nativeVideoSize.cx == palSizes[i][0] && m_nativeVideoSize.cy == palSizes[i][1]) {
 				videoSystem = VIDEO_SYSTEM_SDTV_PAL;
+				break;
 			}
 		}
 	} else {
@@ -1486,44 +1489,23 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(TCHAR* profilePath, float* lut3
 	double gamma;
 
 	switch (m_AmbientLight) {
-		case AMBIENT_LIGHT_BRIGHT:
-			gamma = 2.2;
-			break;
-
-		case AMBIENT_LIGHT_DIM:
-			gamma = 2.35;
-			break;
-
-		case AMBIENT_LIGHT_DARK:
-			gamma = 2.4;
-			break;
-
-		default:
-			return E_FAIL;
+	case AMBIENT_LIGHT_BRIGHT: gamma = 2.2;  break;
+	case AMBIENT_LIGHT_DIM:    gamma = 2.35; break;
+	case AMBIENT_LIGHT_DARK:   gamma = 2.4;  break;
+	default:
+		return E_INVALIDARG;
 	}
 
 	// Get the rendering intent
 	cmsUInt32Number intent;
 
 	switch (m_RenderingIntent) {
-		case COLOR_RENDERING_INTENT_PERCEPTUAL:
-			intent = INTENT_PERCEPTUAL;
-			break;
-
-		case COLOR_RENDERING_INTENT_RELATIVE_COLORIMETRIC:
-			intent = INTENT_RELATIVE_COLORIMETRIC;
-			break;
-
-		case COLOR_RENDERING_INTENT_SATURATION:
-			intent = INTENT_SATURATION;
-			break;
-
-		case COLOR_RENDERING_INTENT_ABSOLUTE_COLORIMETRIC:
-			intent = INTENT_ABSOLUTE_COLORIMETRIC;
-			break;
-
-		default:
-			return E_FAIL;
+	case COLOR_RENDERING_INTENT_PERCEPTUAL:            intent = INTENT_PERCEPTUAL;            break;
+	case COLOR_RENDERING_INTENT_RELATIVE_COLORIMETRIC: intent = INTENT_RELATIVE_COLORIMETRIC; break;
+	case COLOR_RENDERING_INTENT_SATURATION:            intent = INTENT_SATURATION;            break;
+	case COLOR_RENDERING_INTENT_ABSOLUTE_COLORIMETRIC: intent = INTENT_ABSOLUTE_COLORIMETRIC; break;
+	default:
+		return E_INVALIDARG;
 	}
 
 	// Set the input white point. It's D65 in all cases.
@@ -1594,7 +1576,7 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(TCHAR* profilePath, float* lut3
 	FILE* outputProfileStream;
 
 	if (profilePath != 0) {
-		if (_wfopen_s(&outputProfileStream, T2W(profilePath), L"rb") != 0) {
+		if (_wfopen_s(&outputProfileStream, profilePath, L"rb") != 0) {
 			cmsCloseProfile(hInputProfile);
 			return E_FAIL;
 		}
