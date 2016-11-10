@@ -1210,6 +1210,11 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 			} else {
 				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR data of an unexpected size (%d)", sd->size));
 			}
+		} else if (m_MasterDataHDR) {
+			pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)m_MasterDataHDR, sizeof(MediaSideDataHDR));
+			SAFE_DELETE(m_MasterDataHDR);
+
+			return true;
 		}
 	}
 
@@ -1477,6 +1482,8 @@ void CMPCVideoDecFilter::ffmpegCleanup()
 
 	m_nCodecNb	= -1;
 	m_nCodecId	= AV_CODEC_ID_NONE;
+
+	SAFE_DELETE(m_MasterDataHDR);
 }
 
 STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -1809,6 +1816,11 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	}
 
 	AllocExtradata(m_pAVCtx, pmt);
+
+	if (m_nCodecId == AV_CODEC_ID_VP9 && m_pAVCtx->extradata_size >= (16 + sizeof(MediaSideDataHDR))) {
+		m_MasterDataHDR = DNew MediaSideDataHDR;
+		memcpy(m_MasterDataHDR, m_pAVCtx->extradata + 16, sizeof(MediaSideDataHDR));
+	}
 
 	if (bChangeType) {
 		ExtractAvgTimePerFrame(&m_pInput->CurrentMediaType(), m_rtAvrTimePerFrame);
