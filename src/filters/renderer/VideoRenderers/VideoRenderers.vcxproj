@@ -73,24 +73,48 @@
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <FxCompile>
+      <ShaderType>Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>3.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <FxCompile>
+      <ShaderType>Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>3.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <FxCompile>
+      <ShaderType>Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>3.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\ExtLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <FxCompile>
+      <ShaderType>Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>3.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AllocatorCommon.cpp" />
@@ -124,7 +148,6 @@
     <ClInclude Include="Dither.h" />
     <ClInclude Include="DX9AllocatorPresenter.h" />
     <ClInclude Include="DX9RenderingEngine.h" />
-    <ClInclude Include="FinalPassShader.h" />
     <ClInclude Include="DXRAllocatorPresenter.h" />
     <ClInclude Include="EVRAllocatorPresenter.h" />
     <ClInclude Include="FocusThread.h" />
@@ -140,6 +163,14 @@
     <ClInclude Include="SyncAllocatorPresenter.h" />
     <ClInclude Include="SyncRenderer.h" />
     <ClInclude Include="Utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="final_pass.hlsl">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">LEVELS_ENABLED=1;LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">LEVELS_ENABLED=1;LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">LEVELS_ENABLED=1;LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">LEVELS_ENABLED=1;LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

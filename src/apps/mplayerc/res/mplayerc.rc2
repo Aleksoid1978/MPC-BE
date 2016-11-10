@@ -43,7 +43,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 IDF_LOGO0                        FILE                    "res\\logo.0.png"
 IDF_LOGO1                        FILE                    "res\\logo.1.png"
-IDF_SHADER_EMPTY                 FILE                    "res\\empty.hlsl"
 IDF_1PIX_GIF                     FILE                    "res\\web\\1pix.gif"
 IDF_BOTTOMSIDE_PNG               FILE                    "res\\web\\bottomside.png"
 IDF_CONTROLBACK_PNG              FILE                    "res\\web\\controlback.png"
@@ -77,12 +76,14 @@ IDF_SLIDERGRIP_GIF               FILE                    "res\\web\\slidergrip.g
 IDF_VBR_PNG                      FILE                    "res\\web\\vbg.png"
 IDF_VBS_PNG                      FILE                    "res\\web\\vbs.png"
 IDF_FAVICON                      FILE                    "res\\web\\favicon.png"
-
+IDF_SHADER_EMPTY                 FILE                    "res\\empty.hlsl"
+IDF_SHADER_FINAL                 FILE                    "..\\..\\filters\\renderer\\VideoRenderers\\final_pass.hlsl"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // SHADER
 //
+
 IDF_SHADER_RESIZER_BSPLINE4_X    SHADER                  "..\\..\\..\\bin\\shaders\\resizer_bspline4_x.cso"
 IDF_SHADER_RESIZER_BSPLINE4_Y    SHADER                  "..\\..\\..\\bin\\shaders\\resizer_bspline4_y.cso"
 IDF_SHADER_RESIZER_MITCHELL4_X   SHADER                  "..\\..\\..\\bin\\shaders\\resizer_mitchell4_x.cso"
