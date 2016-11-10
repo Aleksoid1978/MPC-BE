@@ -22,7 +22,6 @@
 #include <algorithm>
 #include <lcms2/include/lcms2.h>
 #include <DirectXPackedVector.h>
-#include "FinalPassShader.h"
 #include "Dither.h"
 #include "DX9RenderingEngine.h"
 #include "../../../apps/mplayerc/resource.h"
@@ -1253,31 +1252,25 @@ HRESULT CDX9RenderingEngine::Resize(IDirect3DTexture9* pTexture, const CRect& sr
 HRESULT CDX9RenderingEngine::InitFinalPass()
 {
 	HRESULT hr;
-
 	CRenderersSettings& rs = GetRenderersSettings();
-	CRenderersData* rd = GetRenderersData();
 
-	// Check whether the final pass must be initialized
-	bool bColorManagement = rs.bColorManagementEnable;
+	const bool bColorManagement = m_bFP16Support && rs.bColorManagementEnable;
 	VideoSystem inputVideoSystem = (VideoSystem)rs.iColorManagementInput;
 	AmbientLight ambientLight = (AmbientLight)rs.iColorManagementAmbientLight;
 	ColorRenderingIntent renderingIntent = (ColorRenderingIntent)rs.iColorManagementIntent;
 
-	bool bInitRequired = false;
+	const bool bDither = (m_bFP16Support && m_SurfaceFmt != D3DFMT_X8R8G8B8 && m_SurfaceFmt != m_DisplayFmt);
 
-	if (m_bColorManagement != bColorManagement) {
+	if (!bColorManagement & !bDither) {
+		m_bFinalPass = false;
+		return S_FALSE;
+	}
+
+	bool bInitRequired = false;
+	if (bColorManagement != m_bColorManagement || bDither != m_bDither ) {
 		bInitRequired = true;
 	}
-
-	if (m_bColorManagement && bColorManagement) {
-		if ((m_InputVideoSystem != inputVideoSystem) ||
-				(m_RenderingIntent != renderingIntent) ||
-				(m_AmbientLight != ambientLight)) {
-			bInitRequired = true;
-		}
-	}
-
-	if (!m_bFinalPass) {
+	else if (bColorManagement && (m_InputVideoSystem != inputVideoSystem || m_RenderingIntent != renderingIntent || m_AmbientLight != ambientLight)) {
 		bInitRequired = true;
 	}
 
@@ -1285,30 +1278,19 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 		return S_OK;
 	}
 
-	// Check whether the final pass is supported by the hardware
-	m_bFinalPass = m_bFP16Support;
-	if (!m_bFinalPass) {
-		return S_OK;
-	}
-
 	// Update the settings
+	m_bFinalPass = true;
 	m_bColorManagement = bColorManagement;
 	m_InputVideoSystem = inputVideoSystem;
 	m_AmbientLight = ambientLight;
 	m_RenderingIntent = renderingIntent;
-
-	// Check whether the final pass is required
-	m_bFinalPass = bColorManagement || m_SurfaceFmt == D3DFMT_A16B16G16R16F || m_SurfaceFmt == D3DFMT_A32B32G32R32F || m_SurfaceFmt == D3DFMT_A2R10G10B10 && m_DisplayFmt != D3DFMT_A2R10G10B10;
-
-	if (!m_bFinalPass) {
-		return S_OK;
-	}
+	m_bDither = bDither;
 
 	// Initial cleanup
 	m_pLut3DTexture = NULL;
 	m_pFinalPixelShader = NULL;
 
-	if (!m_pDitherTexture) {
+	if (bDither && !m_pDitherTexture) {
 		// Create the dither texture
 		hr = m_pD3DDevEx->CreateTexture(DITHER_MATRIX_SIZE, DITHER_MATRIX_SIZE,
 									  1,
@@ -1438,22 +1420,24 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	}
 
 	// Compile the final pixel shader
-	LPCSTR pSrcData = shader_final;
-	D3D_SHADER_MACRO ShaderMacros[5] = { { NULL, NULL }, };
+	CStringA srcdata;
+	if (!LoadResource(IDF_SHADER_FINAL, srcdata, L"FILE")) {
+		return E_FAIL;
+	}
+
+	D3D_SHADER_MACRO ShaderMacros[6] = {};
 	size_t i = 0;
 
 	ShaderMacros[i++] = { "Ml", m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0) ? "1" : "0" };
-	ShaderMacros[i++] = { "QUANTIZATION", m_DisplayFmt == D3DFMT_A2R10G10B10 ? "1023.0" : "255.0"}; // 10-bit or 8-bit
-	ShaderMacros[i++] = { "LUT3D_ENABLED", bColorManagement ? "1": "0" };
-
-	if (bColorManagement) {
-		static char lut3DSizeStr[12];
-		sprintf(lut3DSizeStr, "%u", m_Lut3DSize);
-		ShaderMacros[i++] = { "LUT3D_SIZE", lut3DSizeStr };
-	}
+	ShaderMacros[i++] = { "QUANTIZATION", m_DisplayFmt == D3DFMT_A2R10G10B10 ? "1023.0" : "255.0" }; // 10-bit or 8-bit
+	ShaderMacros[i++] = { "LUT3D_ENABLED", bColorManagement ? "1" : "0" };
+	static char lut3DSizeStr[8];
+	sprintf(lut3DSizeStr, "%u", m_Lut3DSize);
+	ShaderMacros[i++] = { "LUT3D_SIZE", lut3DSizeStr };
+	ShaderMacros[i++] = { "DITHER_ENABLED", bDither ? "1" : "0" };
 
 	CString ErrorMessage;
-	hr = m_pPSC->CompileShader(pSrcData, "main", m_ShaderProfile, 0, ShaderMacros, &m_pFinalPixelShader, &ErrorMessage);
+	hr = m_pPSC->CompileShader(srcdata, "main", m_ShaderProfile, 0, ShaderMacros, &m_pFinalPixelShader, &ErrorMessage);
 	if (FAILED(hr)) {
 		DLog(L"CDX9RenderingEngine::InitFinalPass() : shader compilation failed\n%s", ErrorMessage.GetString());
 		ASSERT(0);
@@ -1689,16 +1673,11 @@ HRESULT CDX9RenderingEngine::FinalPass(IDirect3DTexture9* pTexture)
 	float h = (float)desc.Height;
 
 	MYD3DVERTEX<1> v[] = {
-		{0, 0, 0.5f, 2.0f, 0, 0},
-		{w, 0, 0.5f, 2.0f, 1, 0},
-		{0, h, 0.5f, 2.0f, 0, 1},
-		{w, h, 0.5f, 2.0f, 1, 1},
+		{   -0.5f,    -0.5f, 0.5f, 2.0f, 0, 0},
+		{w - 0.5f,    -0.5f, 0.5f, 2.0f, 1, 0},
+		{   -0.5f, h - 0.5f, 0.5f, 2.0f, 0, 1},
+		{w - 0.5f, h - 0.5f, 0.5f, 2.0f, 1, 1},
 	};
-
-	for (int i = 0; i < _countof(v); i++) {
-		v[i].x -= 0.5f;
-		v[i].y -= 0.5f;
-	}
 
 	hr = m_pD3DDevEx->SetPixelShader(m_pFinalPixelShader);
 
@@ -1735,7 +1714,9 @@ HRESULT CDX9RenderingEngine::FinalPass(IDirect3DTexture9* pTexture)
 	}
 
 	// Set constants
-	float fConstData[][4] = {{(float)w / DITHER_MATRIX_SIZE, (float)h / DITHER_MATRIX_SIZE, 0, 0}};
+	float fConstData[][4] = {
+		{w / DITHER_MATRIX_SIZE, h / DITHER_MATRIX_SIZE, 0.0f, 0.0f}
+	};
 	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 
 	hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_POINT);

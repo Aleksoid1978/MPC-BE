@@ -75,10 +75,11 @@ namespace DSObjects
 		CComPtr<IDirect3DTexture9>	m_pVideoTextures[MAX_VIDEO_SURFACES];
 		CComPtr<IDirect3DSurface9>	m_pVideoSurfaces[MAX_VIDEO_SURFACES];
 
-		bool	m_bColorManagement;
-		DXVA2_ExtendedFormat m_inputExtFormat;
-		const wchar_t* m_wsResizer;
-		const wchar_t* m_wsResizer2;
+		bool						m_bColorManagement;
+		bool						m_bDither;
+		DXVA2_ExtendedFormat		m_inputExtFormat;
+		const wchar_t*				m_wsResizer;
+		const wchar_t*				m_wsResizer2;
 
 
 		CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError);

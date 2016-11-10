@@ -678,9 +678,13 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 
 	m_pMediaType->SetUINT32(MF_MT_PAN_SCAN_ENABLED, 0);
 
-	const CRenderersSettings& rs = GetRenderersSettings();
-	m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, rs.iEVROutputRange == 1 ? MFNominalRange_16_235 : MFNominalRange_0_255);
-	m_LastSetOutputRange = rs.iEVROutputRange;
+	int iOutputRange = GetRenderersSettings().iEVROutputRange;
+	if (m_inputExtFormat.NominalRange == MFNominalRange_0_255) {
+		m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, iOutputRange == 1 ? MFNominalRange_48_208 : MFNominalRange_16_235); // fix EVR bug
+	} else {
+		m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, iOutputRange == 1 ? MFNominalRange_16_235 : MFNominalRange_0_255);
+	}
+	m_LastSetOutputRange = iOutputRange;
 
 	ULARGE_INTEGER ui64FrameSize;
 	m_pMediaType->GetUINT64(MF_MT_FRAME_SIZE, &ui64FrameSize.QuadPart);
@@ -853,6 +857,11 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 			m_inputMediaType = *pMT;
 			pType->FreeRepresentation(FORMAT_VideoInfo2, (LPVOID)pMT);
 		}
+	}
+
+	m_inputExtFormat.value = 0;
+	if (m_inputMediaType.formattype == FORMAT_VideoInfo2) {
+		m_inputExtFormat.value = ((VIDEOINFOHEADER2*)m_inputMediaType.pbFormat)->dwControlFlags;
 	}
 
 	// Loop through all of the mixer's proposed output types.
@@ -1485,11 +1494,6 @@ void CEVRAllocatorPresenter::GetMixerThread()
 							&& SUCCEEDED(pPin->ConnectionMediaType(&mt)) ) {
 
 						FillAddingField(pPin, &mt);
-
-						m_inputExtFormat.value = 0;
-						if (mt.formattype == FORMAT_VideoInfo2) {
-							m_inputExtFormat.value = ((VIDEOINFOHEADER2*)mt.pbFormat)->dwControlFlags;
-						}
 					}
 					// If framerate not set by Video Decoder - choose 23.976
 					if (m_rtTimePerFrame == 1) {
@@ -1845,7 +1849,6 @@ void CEVRAllocatorPresenter::RenderThread()
 				break;
 
 			case WAIT_TIMEOUT :
-
 				if (m_LastSetOutputRange != -1 && m_LastSetOutputRange != rs.iEVROutputRange) {
 					{
 						CAutoLock Lock(&m_csExternalMixerLock);
@@ -1859,11 +1862,11 @@ void CEVRAllocatorPresenter::RenderThread()
 				}
 
 				// Discard timer events if playback stop
-				//			if ((dwObject == WAIT_OBJECT_0 + 3) && (m_nRenderState != Started)) continue;
+				//if ((dwObject == WAIT_OBJECT_0 + 3) && (m_nRenderState != Started)) continue;
 
-				//			TRACE_EVR("EVR: RenderThread ==>> Waiting buffer\n");
+				//TRACE_EVR("EVR: RenderThread ==>> Waiting buffer\n");
 
-				//			if (WaitForMultipleObjects(_countof(hEvtsBuff), hEvtsBuff, FALSE, INFINITE) == WAIT_OBJECT_0+2)
+				//if (WaitForMultipleObjects(_countof(hEvtsBuff), hEvtsBuff, FALSE, INFINITE) == WAIT_OBJECT_0+2)
 				{
 					CComPtr<IMFSample> pMFSample;
 					LONGLONG	llPerf = GetPerfCounter();
