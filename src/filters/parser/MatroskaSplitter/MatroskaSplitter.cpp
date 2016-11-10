@@ -26,6 +26,7 @@
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/VideoParser.h"
 #include "../../../DSUtil/GolombBuffer.h"
+#include <IMediaSideData.h>
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -675,13 +676,35 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 												}
 
 												CAtlArray<BYTE> ptr;
-												ptr.SetCount(12);
+												ptr.SetCount(16);
 												BYTE *dst = ptr.GetData();
 												GETDWORD(dst)     = _byteswap_ulong('VP90');
 												GETWORD(dst + 4)  = _byteswap_ushort(profile);
 												GETWORD(dst + 6)  = _byteswap_ushort(pix_fmt);
 												GETWORD(dst + 8)  = _byteswap_ushort(colorspace);
-												GETWORD(dst + 10) = _byteswap_ushort(color_range);
+												GETWORD(dst + 10) = _byteswap_ushort(pTE->v.VideoColorInformation.Primaries);
+												GETWORD(dst + 12) = _byteswap_ushort(color_range);
+												GETWORD(dst + 14) = _byteswap_ushort(pTE->v.VideoColorInformation.TransferCharacteristics);
+
+												if (pTE->v.VideoColorInformation.SMPTE2086MasteringMetadata.bValid) {
+													size_t size = ptr.GetCount();
+													ptr.SetCount(size + sizeof(MediaSideDataHDR));
+
+													MasteringMetadata& metadata = pTE->v.VideoColorInformation.SMPTE2086MasteringMetadata;
+
+													MediaSideDataHDR* hdr = (MediaSideDataHDR*)(ptr.GetData() + size);
+													hdr->display_primaries_x[0] = metadata.PrimaryBChromaticityX;
+													hdr->display_primaries_y[0] = metadata.PrimaryBChromaticityY;
+													hdr->display_primaries_x[1] = metadata.PrimaryGChromaticityX;
+													hdr->display_primaries_y[1] = metadata.PrimaryGChromaticityY;
+													hdr->display_primaries_x[2] = metadata.PrimaryRChromaticityX;
+													hdr->display_primaries_y[2] = metadata.PrimaryRChromaticityY;
+													
+													hdr->white_point_x = metadata.WhitePointChromaticityX;
+													hdr->white_point_y = metadata.WhitePointChromaticityY;
+													hdr->max_display_mastering_luminance = metadata.LuminanceMax;
+													hdr->min_display_mastering_luminance = metadata.LuminanceMin;
+												}
 
 												VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + ptr.GetCount());
 												memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), ptr.GetData(), ptr.GetCount());
