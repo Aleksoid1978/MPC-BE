@@ -94,7 +94,7 @@ namespace Youtube
 			return (a->fps60 > b->fps60);
 		}
 
-		return (a->bit10 > b->bit10);
+		return (a->hdr > b->hdr);
 	}
 
 	static bool CompareUrllistItem(YoutubeUrllistItem a, YoutubeUrllistItem b)
@@ -644,14 +644,14 @@ namespace Youtube
 						item.title.Format(L"%s %dp",
 							profile->format == 1 ? L"WebM" : L"MP4",
 							profile->quality);
+						if (profile->type == y_video) {
+							item.title.Append(L" dash");
+						}
 						if (profile->fps60) {
 							item.title.Append(L" 60fps");
 						}
-						if (profile->bit10) {
-							item.title.Append(L" 10 bit");
-						}
-						if (profile->type == y_video) {
-							item.title.Append(L" dash");
+						if (profile->hdr) {
+							item.title.Append(L" HDR (10 bit)");
 						}
 
 						youtubeUrllist.emplace_back(item);
@@ -710,7 +710,7 @@ namespace Youtube
 								// same resolution as that of the previous, but not suitable fps
 								continue;
 							}
-							if (profile->bit10 != s.YoutubeFormat.hdr) {
+							if (profile->hdr != s.YoutubeFormat.hdr) {
 								// same resolution as that of the previous, but not suitable HDR
 								continue;
 							}
