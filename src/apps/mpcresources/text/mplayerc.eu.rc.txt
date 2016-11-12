@@ -513,11 +513,12 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI kudeatzaileak: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 12
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 13
 6		"Erabili barnebildutako web orrialde aztertzailea"
 7		"Heuskarri Hobetsia:"
 10		"60 fps"
-11		"Gertatu irakur-zerrenda"
+11		"HDR"
+12		"Gertatu irakur-zerrenda"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

@@ -7,8 +7,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
-
+#include "afxres.h"
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -825,8 +824,9 @@ BEGIN
     CONTROL         "Use the built-in web page parser",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,5,120,10
     LTEXT           "Preferred format:",IDC_STATIC2,10,20,104,8
     COMBOBOX        IDC_COMBO1,114,18,40,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_COMBO2,158,18,70,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "60 fps",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,240,20,30,10
+    COMBOBOX        IDC_COMBO2,158,18,57,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "60 fps",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,220,20,30,10
+    CONTROL         "HDR",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,255,20,30,10
     CONTROL         "Load playlist",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,38,100,10
 END
 

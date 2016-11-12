@@ -513,11 +513,12 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Интерпретаторы CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 12
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 13
 6		"Использовать встроенный парсер веб-страниц"
 7		"Предпочитаемый формат просмотра:"
 10		"60 fps"
-11		"Загружать плейлист"
+11		"HDR"
+12		"Загружать плейлист"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

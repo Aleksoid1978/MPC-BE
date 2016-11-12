@@ -866,6 +866,7 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_YOUTUBE_FORMAT, YoutubeFormat.fmt == 1 ? L"WEBM" : L"MP4");
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
@@ -1555,6 +1556,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	YoutubeFormat.fmt = (str == L"WEBM") ? 1 : 0;
 	YoutubeFormat.res		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_RESOLUTION, 720);
 	YoutubeFormat.fps60		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_60FPS, FALSE);
+	YoutubeFormat.hdr		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_HDR, FALSE);
 	bYoutubeLoadPlaylist	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, FALSE);
 
 	nLastFileInfoPage		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, 0);

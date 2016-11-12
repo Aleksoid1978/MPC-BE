@@ -300,6 +300,7 @@
 #define IDS_RS_YOUTUBE_FORMAT				_T("YoutubeFormat")
 #define IDS_RS_YOUTUBE_RESOLUTION			_T("YoutubeResolution")
 #define IDS_RS_YOUTUBE_60FPS				_T("Youtube60fps")
+#define IDS_RS_YOUTUBE_HDR					_T("YoutubeHDR")
 #define IDS_RS_YOUTUBE_LOAD_PLAYLIST		_T("YoutubeLoadPlaylist")
 
 #define IDS_R_FILTERS_PRIORITY				_T("\\Filters Priority")

@@ -42,6 +42,7 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO1, m_cbFormat);
 	DDX_Control(pDX, IDC_COMBO2, m_cbResolution);
 	DDX_Control(pDX, IDC_CHECK3, m_chk60fps);
+	DDX_Control(pDX, IDC_CHECK4, m_chkHdr);
 	DDX_Control(pDX, IDC_CHECK1, m_chkLoadPlaylist);
 }
 
@@ -75,6 +76,7 @@ BOOL CPPageYoutube::OnInitDialog()
 	SelectByItemData(m_cbResolution, s.YoutubeFormat.res);
 
 	m_chk60fps.SetCheck(s.YoutubeFormat.fps60 ? BST_CHECKED : BST_UNCHECKED);
+	m_chkHdr.SetCheck(s.YoutubeFormat.hdr ? BST_CHECKED : BST_UNCHECKED);
 
 	m_chkLoadPlaylist.SetCheck(s.bYoutubeLoadPlaylist);
 
@@ -97,6 +99,7 @@ BOOL CPPageYoutube::OnApply()
 	s.YoutubeFormat.fmt		= m_cbFormat.GetCurSel();
 	s.YoutubeFormat.res		= GetCurItemData(m_cbResolution);
 	s.YoutubeFormat.fps60	= !!m_chk60fps.GetCheck();
+	s.YoutubeFormat.hdr		= !!m_chkHdr.GetCheck();
 	s.bYoutubeLoadPlaylist	= !!m_chkLoadPlaylist.GetCheck();
 
 	return __super::OnApply();

@@ -513,11 +513,12 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Δείκτες χειρισμού CGI: (.ext1=κατάλογος1, .ext2=κατάλογος2, ...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 12
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 13
 6		"Χρήση ενσωματωμένης μορφής στην ιστοσελίδα"
 7		"Προτίμηση μορφής:"
 10		"60 fps"
-11		"Φόρτωση λίστας αναπαραγωγής"
+11		"HDR"
+12		"Φόρτωση λίστας αναπαραγωγής"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

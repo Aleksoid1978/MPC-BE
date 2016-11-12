@@ -513,11 +513,12 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Gestors de CGI: (.ext1=ruta1;.ext2=ruta2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 12
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 13
 6		"Use the built-in web page parser"
 7		"Preferred format:"
 10		"60 fps"
-11		"Load playlist"
+11		"HDR"
+12		"Load playlist"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
