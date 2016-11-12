@@ -780,7 +780,9 @@ bool CWebTextFile::Save(LPCTSTR lpszFileName, enc e)
 
 void CWebTextFile::Close()
 {
-	__super::Close();
+	if (m_pStream) {
+		__super::Close();
+	}
 
 	if (!m_tempfn.IsEmpty()) {
 		_tremove(m_tempfn);
