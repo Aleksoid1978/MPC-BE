@@ -45,7 +45,7 @@ namespace Youtube
 		int		quality;
 		LPCTSTR	ext;
 		bool	fps60;
-		bool	bit10;
+		bool	hdr;
 	};
 
 	// MP4, WebM and 360p resolution or above only
