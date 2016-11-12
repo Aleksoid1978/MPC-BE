@@ -705,9 +705,15 @@ namespace Youtube
 					auto profile = youtubeUrllist[i].profile;
 
 					if (final_item->profile->format == profile->format) {
-						if (profile->quality == final_item->profile->quality && profile->fps60 != s.YoutubeFormat.fps60) {
-							// same resolution as that of the previous, but not suitable fps
-							continue;
+						if (profile->quality == final_item->profile->quality) {
+							if (profile->fps60 != s.YoutubeFormat.fps60) {
+								// same resolution as that of the previous, but not suitable fps
+								continue;
+							}
+							if (profile->bit10 != s.YoutubeFormat.hdr) {
+								// same resolution as that of the previous, but not suitable HDR
+								continue;
+							}
 						}
 
 						if (profile->quality < final_item->profile->quality && final_item->profile->quality <= s.YoutubeFormat.res) {

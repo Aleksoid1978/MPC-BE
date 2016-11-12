@@ -48,6 +48,7 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
 	ON_COMMAND(IDC_CHECK2, OnCheckPageParser)
+	ON_COMMAND(IDC_CHECK3, OnCheck60fps)
 END_MESSAGE_MAP()
 
 // CPPageYoutube message handlers
@@ -83,6 +84,7 @@ BOOL CPPageYoutube::OnInitDialog()
 	CorrectCWndWidth(GetDlgItem(IDC_CHECK2));
 
 	OnCheckPageParser();
+	OnCheck60fps();
 
 	UpdateData(FALSE);
 
@@ -113,6 +115,18 @@ void CPPageYoutube::OnCheckPageParser()
 	} else {
 		GetDlgItem(IDC_STATIC2)->EnableWindow(FALSE);
 		m_cbFormat.EnableWindow(FALSE);
+	}
+
+	SetModified();
+}
+
+void CPPageYoutube::OnCheck60fps()
+{
+	if (m_chk60fps.GetCheck()) {
+		m_chkHdr.EnableWindow(TRUE);
+	} else {
+		m_chkHdr.SetCheck(BST_UNCHECKED);
+		m_chkHdr.EnableWindow(FALSE);
 	}
 
 	SetModified();
