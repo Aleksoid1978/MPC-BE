@@ -513,11 +513,12 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Інтерпретація CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 12
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 13
 6		"Використовувати вбудований парсер веб-сторінок"
 7		"Вибір формату перегляду:"
 10		"60 кадрів\с"
-11		"Завантажити список відтворення"
+11		"HDR"
+12		"Завантажити список відтворення"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

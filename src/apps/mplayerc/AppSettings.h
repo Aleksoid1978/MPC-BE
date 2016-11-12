@@ -853,6 +853,7 @@ public:
 		int		fmt;
 		int		res;
 		bool	fps60;
+		bool	hdr;
 	} YoutubeFormat;
 	bool			bYoutubeLoadPlaylist;
 	int				iYoutubeTagSelected = 0; // not saved

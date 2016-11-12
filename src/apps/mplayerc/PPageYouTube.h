@@ -33,6 +33,7 @@ private:
 	CComboBox m_cbFormat;
 	CComboBox m_cbResolution;
 	CButton m_chk60fps;
+	CButton m_chkHdr;
 	CButton m_chkLoadPlaylist;
 
 public:

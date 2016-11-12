@@ -513,11 +513,12 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Obsługa interfejsu CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 12
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 13
 6		"Użyj wbudowanego analizatora strony internetowej"
 7		"Preferowany format:"
 10		"60 fps"
-11		"Wgraj listę odtwarzania"
+11		"HDR"
+12		"Wgraj listę odtwarzania"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
