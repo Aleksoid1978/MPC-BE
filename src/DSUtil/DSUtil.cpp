@@ -2598,7 +2598,8 @@ static const struct {
 	{&DXVA2_NoEncrypt,					_T("No encryption")},
 	{&DXVA_ModeHEVC_VLD_Main,			_T("H.265, bitstream decoder, Main")},
 	{&DXVA_ModeHEVC_VLD_Main10,			_T("H.265, bitstream decoder, Main10")},
-	{&DXVA_VP9_VLD_Profile0,			_T("VP9, bitstream decoder, profile 0")}
+	{&DXVA_ModeVP9_VLD_Profile0,		_T("VP9, bitstream decoder, profile 0")},
+	{&DXVA_ModeVP9_VLD_10bit_Profile2,	_T("VP9, bitstream decoder, profile 2 10 bit")}
 };
 
 CString GetDXVAMode(const GUID* guidDecoder)
