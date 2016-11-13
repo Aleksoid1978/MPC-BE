@@ -183,7 +183,7 @@ DXVA_PARAMS DXVA_VC1 = {
 DXVA_PARAMS DXVA_VP9 = {
 	24,		// PicEntryNumber
 	1,		// PreferedConfigBitstream
-	{ &DXVA_VP9_VLD_Profile0, &GUID_NULL }
+	{ &DXVA_ModeVP9_VLD_Profile0, &GUID_NULL }
 };
 
 

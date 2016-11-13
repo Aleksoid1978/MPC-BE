@@ -73,7 +73,7 @@ CDXVA2Decoder* CDXVA2Decoder::CreateDXVA2Decoder(CMPCVideoDecFilter* pFilter, ID
 		pDecoder = DNew CDXVA2DecoderHEVC(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
 	} else if (*guidDecoder == DXVA2_ModeMPEG2_VLD) {
 		pDecoder = DNew CDXVA2DecoderMPEG2(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
-	} else if (*guidDecoder == DXVA_VP9_VLD_Profile0) {
+	} else if (*guidDecoder == DXVA_ModeVP9_VLD_Profile0) {
 		pDecoder = DNew CDXVA2DecoderVP9(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
 	} else {
 		ASSERT(FALSE); // Unknown decoder !!
