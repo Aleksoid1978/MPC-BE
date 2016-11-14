@@ -140,7 +140,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="final_pass.hlsl" />
-  </ItemGroup>
 </Project>

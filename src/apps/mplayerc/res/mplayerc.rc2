@@ -77,7 +77,7 @@ IDF_VBR_PNG                      FILE                    "res\\web\\vbg.png"
 IDF_VBS_PNG                      FILE                    "res\\web\\vbs.png"
 IDF_FAVICON                      FILE                    "res\\web\\favicon.png"
 IDF_SHADER_EMPTY                 FILE                    "res\\empty.hlsl"
-IDF_SHADER_FINAL                 FILE                    "..\\..\\filters\\renderer\\VideoRenderers\\final_pass.hlsl"
+IDF_SHADER_FINAL                 FILE                    "..\\..\\Shaders\\Transformation\\final_pass.hlsl"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -102,7 +102,7 @@ IDF_SHADER_RESIZER_LANCZOS3_X    SHADER                  "..\\..\\..\\bin\\shade
 IDF_SHADER_RESIZER_LANCZOS3_Y    SHADER                  "..\\..\\..\\bin\\shaders\\resizer_lanczos3_y.cso"
 IDF_SHADER_DOWNSCALING_X         SHADER                  "..\\..\\..\\bin\\shaders\\resizer_downscaling_x.cso"
 IDF_SHADER_DOWNSCALING_Y         SHADER                  "..\\..\\..\\bin\\shaders\\resizer_downscaling_y.cso"
-IDF_SHADER_YCGCOCORRECTION       SHADER                  "..\\..\\..\\bin\\shaders\\YCgCo_correction.cso"
+IDF_SHADER_YCGCOCORRECTION       SHADER                  "..\\..\\..\\bin\\shaders\\ycgco_correction.cso"
 IDF_SHADER_CONVERT_TO_INTERLACE  SHADER                  "..\\..\\..\\bin\\shaders\\halfoverunder_to_interlace.cso"
 
 IDF_SHADER_PS20_BSPLINE4_X       SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_bspline4_x.cso"
@@ -121,7 +121,7 @@ IDF_SHADER_PS20_LANCZOS2_X       SHADER                  "..\\..\\..\\bin\\shade
 IDF_SHADER_PS20_LANCZOS2_Y       SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_lanczos2_y.cso"
 IDF_SHADER_PS20_DOWNSCALING_X    SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_downscaling_x.cso"
 IDF_SHADER_PS20_DOWNSCALING_Y    SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_downscaling_y.cso"
-IDF_SHADER_PS20_YCGCOCORRECTION  SHADER                  "..\\..\\..\\bin\\shaders\\ps20_YCgCo_correction.cso"
+IDF_SHADER_PS20_YCGCOCORRECTION  SHADER                  "..\\..\\..\\bin\\shaders\\ps20_ycgco_correction.cso"
 IDF_SHADER_PS20_CONVERT_TO_INTERLACE SHADER              "..\\..\\..\\bin\\shaders\\ps20_halfoverunder_to_interlace.cso"
 
 /////////////////////////////////////////////////////////////////////////////

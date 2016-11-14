@@ -19,30 +19,36 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="halfoverunder_to_interlace.hlsl" />
-    <FxCompile Include="YCgCo_correction.hlsl" />
+    <FxCompile Include="Transformation\final_pass.hlsl">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </FxCompile>
+    <FxCompile Include="Transformation\halfoverunder_to_interlace.hlsl" />
+    <FxCompile Include="Transformation\ycgco_correction.hlsl" />
     <None Include="OnePassResizers\resizer_bicubic06.hlsl">
       <FileType>Document</FileType>
     </None>
-    <FxCompile Include="resizer_bicubic06_x.hlsl" />
-    <FxCompile Include="resizer_bicubic06_y.hlsl" />
+    <FxCompile Include="Resizers\resizer_bicubic06_x.hlsl" />
+    <FxCompile Include="Resizers\resizer_bicubic06_y.hlsl" />
     <None Include="OnePassResizers\resizer_bicubic08.hlsl">
       <FileType>Document</FileType>
     </None>
-    <FxCompile Include="resizer_bicubic08_x.hlsl" />
-    <FxCompile Include="resizer_bicubic08_y.hlsl" />
+    <FxCompile Include="Resizers\resizer_bicubic08_x.hlsl" />
+    <FxCompile Include="Resizers\resizer_bicubic08_y.hlsl" />
     <None Include="OnePassResizers\resizer_bicubic10.hlsl">
       <FileType>Document</FileType>
     </None>
-    <FxCompile Include="resizer_bicubic10_x.hlsl" />
-    <FxCompile Include="resizer_bicubic10_y.hlsl" />
+    <FxCompile Include="Resizers\resizer_bicubic10_x.hlsl" />
+    <FxCompile Include="Resizers\resizer_bicubic10_y.hlsl" />
     <None Include="OnePassResizers\resizer_bicubic_base.hlsl">
       <FileType>Document</FileType>
     </None>
-    <None Include="resizer_bicubic_base_x.hlsl">
+    <None Include="Resizers\resizer_bicubic_base_x.hlsl">
       <FileType>Document</FileType>
     </None>
-    <None Include="resizer_bicubic_base_y.hlsl">
+    <None Include="Resizers\resizer_bicubic_base_y.hlsl">
       <FileType>Document</FileType>
     </None>
     <None Include="OnePassResizers\resizer_bilinear.hlsl">
@@ -51,27 +57,27 @@
     <None Include="OnePassResizers\resizer_bspline4.hlsl">
       <FileType>Document</FileType>
     </None>
-    <FxCompile Include="resizer_bspline4_x.hlsl" />
-    <FxCompile Include="resizer_bspline4_y.hlsl" />
+    <FxCompile Include="Resizers\resizer_bspline4_x.hlsl" />
+    <FxCompile Include="Resizers\resizer_bspline4_y.hlsl" />
     <None Include="OnePassResizers\resizer_catmull4.hlsl">
       <FileType>Document</FileType>
     </None>
-    <FxCompile Include="resizer_catmull4_x.hlsl" />
-    <FxCompile Include="resizer_catmull4_y.hlsl" />
+    <FxCompile Include="Resizers\resizer_catmull4_x.hlsl" />
+    <FxCompile Include="Resizers\resizer_catmull4_y.hlsl" />
     <None Include="OnePassResizers\resizer_downscaling.hlsl">
       <FileType>Document</FileType>
     </None>
-    <FxCompile Include="resizer_downscaling_x.hlsl" />
-    <FxCompile Include="resizer_downscaling_y.hlsl" />
-    <FxCompile Include="resizer_lanczos2_x.hlsl" />
-    <FxCompile Include="resizer_lanczos2_y.hlsl" />
-    <FxCompile Include="resizer_lanczos3_x.hlsl" />
-    <FxCompile Include="resizer_lanczos3_y.hlsl" />
+    <FxCompile Include="Resizers\resizer_downscaling_x.hlsl" />
+    <FxCompile Include="Resizers\resizer_downscaling_y.hlsl" />
+    <FxCompile Include="Resizers\resizer_lanczos2_x.hlsl" />
+    <FxCompile Include="Resizers\resizer_lanczos2_y.hlsl" />
+    <FxCompile Include="Resizers\resizer_lanczos3_x.hlsl" />
+    <FxCompile Include="Resizers\resizer_lanczos3_y.hlsl" />
     <None Include="OnePassResizers\resizer_mitchell4.hlsl">
       <FileType>Document</FileType>
     </None>
-    <FxCompile Include="resizer_mitchell4_x.hlsl" />
-    <FxCompile Include="resizer_mitchell4_y.hlsl" />
+    <FxCompile Include="Resizers\resizer_mitchell4_x.hlsl" />
+    <FxCompile Include="Resizers\resizer_mitchell4_y.hlsl" />
     <None Include="OnePassResizers\resizer_nearest.hlsl">
       <FileType>Document</FileType>
     </None>
