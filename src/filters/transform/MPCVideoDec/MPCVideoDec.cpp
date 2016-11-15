@@ -958,6 +958,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nActiveCodecs(CODECS_ALL & ~CODEC_H264_MVC)
 	, m_rtAvrTimePerFrame(0)
 	, m_rtLastStop(0)
+	, m_bUsePTS(FALSE)
 	, m_rtStartCache(INVALID_TIME)
 	, m_rtStopCache(INVALID_TIME)
 	, m_nWorkaroundBug(FF_BUG_AUTODETECT)
@@ -1171,7 +1172,7 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 
 void CMPCVideoDecFilter::GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
-	rtStart = av_frame_get_best_effort_timestamp(pFrame);
+	rtStart = m_bUsePTS ? pFrame->pts : av_frame_get_best_effort_timestamp(pFrame);
 	int64_t pkt_duration = av_frame_get_pkt_duration(pFrame);
 	if (pkt_duration) {
 		rtStop = rtStart + pkt_duration;
@@ -1737,6 +1738,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 								|| bNotTrustSourceTimeStamp);
 
 		m_bRVDropBFrameTimings = (m_nCodecId == AV_CODEC_ID_RV10 || m_nCodecId == AV_CODEC_ID_RV20 || m_nCodecId == AV_CODEC_ID_RV30 || m_nCodecId == AV_CODEC_ID_RV40);
+		m_bUsePTS = (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_MPEG1VIDEO);
 	}
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
