@@ -46,7 +46,6 @@ jsoncpp             MIT License                https://github.com/open-source-pa
 libflac             GPLv2 / BSD License        https://github.com/xiph/flac/
 libpng              zlib / libpng License      https://github.com/glennrp/libpng/
 libopenjpeg         BSD License                https://github.com/uclouvain/openjpeg/
-libopus             BSD License                http://opus-codec.org/
 libspeex            BSD License                http://speex.org/
 Little CMS          MIT License                http://littlecms.com/
 Logitech SDK        -                          -
