@@ -121,6 +121,7 @@ protected:
 
 	BOOL									m_bWaitingForKeyFrame;
 	BOOL									m_bRVDropBFrameTimings;
+	BOOL									m_bUsePTS;
 
 	REFERENCE_TIME							m_rtStart;
 	REFERENCE_TIME							m_rtStartCache;
