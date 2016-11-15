@@ -42,7 +42,7 @@ HRESULT DumpDX9Surface(IDirect3DDevice9* pD3DDev, IDirect3DSurface9* pSurface, w
 	}
 
 	unsigned len = desc.Width * desc.Height * 4;
-	std::unique_ptr<BYTE[]> dib(DNew BYTE[sizeof(BITMAPINFOHEADER) + len]);
+	std::unique_ptr<BYTE[]> dib(new(std::nothrow) BYTE[sizeof(BITMAPINFOHEADER) + len]);
 	if (!dib) {
 		return E_OUTOFMEMORY;
 	}
@@ -149,7 +149,10 @@ HRESULT SaveRAWVideoAsBMP(BYTE* data, DWORD format, unsigned pitch, unsigned wid
 	unsigned tablecolors = (pseudobitdepth == 8) ? 256 : 0;
 
 	unsigned len = width * height * pseudobitdepth / 8;
-	std::unique_ptr<BYTE[]> dib(DNew BYTE[sizeof(BITMAPINFOHEADER) + tablecolors * 4 + len]);
+	std::unique_ptr<BYTE[]> dib(new(std::nothrow) BYTE[sizeof(BITMAPINFOHEADER) + tablecolors * 4 + len]);
+	if (!dib) {
+		return E_OUTOFMEMORY;
+	}
 
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)dib.get();
 	memset(bih, 0, sizeof(BITMAPINFOHEADER));
