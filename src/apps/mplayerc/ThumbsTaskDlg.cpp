@@ -101,7 +101,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 	const int height = infoheight + margin + (thumbsize.cy + margin) * rows;
 	const int dibsize = sizeof(BITMAPINFOHEADER) + width * height * 4;
 
-	std::unique_ptr<BYTE[]> dib(DNew BYTE[dibsize]);
+	std::unique_ptr<BYTE[]> dib(new(std::nothrow) BYTE[dibsize]);
 	if (!dib) {
 		m_iProgress = PROGRESS_E_MEMORY;
 		return;
@@ -135,7 +135,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 		}
 	}
 
-	std::unique_ptr<BYTE[]> thumb(DNew BYTE[thumbsize.cx * thumbsize.cy * 4]);
+	std::unique_ptr<BYTE[]> thumb(new(std::nothrow) BYTE[thumbsize.cx * thumbsize.cy * 4]);
 	if (!thumb) {
 		m_iProgress = PROGRESS_E_MEMORY;
 		return;
