@@ -2213,7 +2213,7 @@ void CAppSettings::CRecentFileAndURLList::Add(LPCTSTR lpszPathName)
 
 	// fully qualify the path name
 	if (!fURL) {
-		AfxFullPath(pathName.GetBufferSetLength(pathName.GetLength() + 1024), lpszPathName);
+		AfxFullPath(pathName.GetBuffer(pathName.GetLength() + 1024), lpszPathName);
 		pathName.ReleaseBuffer();
 	}
 

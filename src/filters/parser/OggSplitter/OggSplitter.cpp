@@ -305,7 +305,7 @@ start:
 			} else if (!memcmp(page.GetData(), "\x80kate\x00\x00\x00", 8) && page.GetCount() == 64) {
 				if (PinNotExist) {
 					CStringA lang;
-					memcpy(lang.GetBufferSetLength(16), page.GetData() + 32, 16);
+					memcpy(lang.GetBuffer(16), page.GetData() + 32, 16);
 					lang.ReleaseBuffer();
 
 					name.Format(L"Kate %d (%hS)", streamId++, lang);
