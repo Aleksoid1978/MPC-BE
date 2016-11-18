@@ -1334,17 +1334,15 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	// Initialize the color management if necessary
 	if (bColorManagement) {
 		// Get the ICC profile path
-		wchar_t* iccProfilePath = NULL;
+		CStringW iccProfilePath;
 		HDC hDC = GetDC(m_hWnd);
 
 		if (hDC != NULL) {
 			DWORD icmProfilePathSize = 0;
 			GetICMProfileW(hDC, &icmProfilePathSize, NULL);
-			iccProfilePath = DNew wchar_t[icmProfilePathSize];
-			if (!GetICMProfileW(hDC, &icmProfilePathSize, iccProfilePath)) {
-				delete[] iccProfilePath;
-				iccProfilePath = NULL;
-			}
+
+			GetICMProfileW(hDC, &icmProfilePathSize, iccProfilePath.GetBuffer(icmProfilePathSize));
+			iccProfilePath.ReleaseBuffer();
 
 			ReleaseDC(m_hWnd, hDC);
 		}
@@ -1359,35 +1357,30 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 											NULL);
 
 		if (FAILED(hr)) {
-			delete[] iccProfilePath;
 			CleanupFinalPass();
 			return hr;
 		}
 
-		float* lut3DFloat32 = DNew float[m_Lut3DEntryCount * 3];
-		hr = CreateIccProfileLut(iccProfilePath, lut3DFloat32);
-		delete[] iccProfilePath;
+		auto lut3DFloat32 = std::make_unique<float[]>(m_Lut3DEntryCount * 3);
+		hr = CreateIccProfileLut(iccProfilePath.GetBuffer(), lut3DFloat32.get());
 		if (FAILED(hr)) {
-			delete[] lut3DFloat32;
 			CleanupFinalPass();
 			return hr;
 		}
 
-		DirectX::PackedVector::HALF* lut3DFloat16 = DNew DirectX::PackedVector::HALF[m_Lut3DEntryCount * 3];
-		DirectX::PackedVector::XMConvertFloatToHalfStream(lut3DFloat16, sizeof(lut3DFloat16[0]), lut3DFloat32, sizeof(lut3DFloat32[0]), m_Lut3DEntryCount * 3);
-		delete[] lut3DFloat32;
+		auto lut3DFloat16 = std::make_unique<DirectX::PackedVector::HALF[]>(m_Lut3DEntryCount * 3);
+		DirectX::PackedVector::XMConvertFloatToHalfStream(lut3DFloat16.get(), sizeof(lut3DFloat16[0]), lut3DFloat32.get(), sizeof(lut3DFloat32[0]), m_Lut3DEntryCount * 3);
 
 		DirectX::PackedVector::HALF oneFloat16 = DirectX::PackedVector::XMConvertFloatToHalf(1.0f);
 
 		D3DLOCKED_BOX lockedBox;
 		hr = m_pLut3DTexture->LockBox(0, &lockedBox, NULL, D3DLOCK_DISCARD);
 		if (FAILED(hr)) {
-			delete[] lut3DFloat16;
 			CleanupFinalPass();
 			return hr;
 		}
 
-		DirectX::PackedVector::HALF* lut3DFloat16Iterator = lut3DFloat16;
+		DirectX::PackedVector::HALF* lut3DFloat16Iterator = lut3DFloat16.get();
 		char* outputSliceIterator = static_cast<char*>(lockedBox.pBits);
 		for (unsigned b = 0; b < m_Lut3DSize; b++) {
 			char* outputRowIterator = outputSliceIterator;
@@ -1412,7 +1405,6 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 		}
 
 		hr = m_pLut3DTexture->UnlockBox(0);
-		delete[] lut3DFloat16;
 		if (FAILED(hr)) {
 			CleanupFinalPass();
 			return hr;
@@ -1575,7 +1567,7 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(wchar_t* profilePath, float* lu
 	cmsHPROFILE hOutputProfile;
 	FILE* outputProfileStream;
 
-	if (profilePath != 0) {
+	if (profilePath && *profilePath) {
 		if (_wfopen_s(&outputProfileStream, profilePath, L"rb") != 0) {
 			cmsCloseProfile(hInputProfile);
 			return E_FAIL;
@@ -1611,10 +1603,10 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(wchar_t* profilePath, float* lu
 	}
 
 	// Create the 3D LUT input
-	unsigned short* lut3DOutput = DNew unsigned short[m_Lut3DEntryCount * 3];
-	unsigned short* lut3DInput  = DNew unsigned short[m_Lut3DEntryCount * 3];
+	uint16_t* lut3DOutput = DNew uint16_t[m_Lut3DEntryCount * 3];
+	uint16_t* lut3DInput  = DNew uint16_t[m_Lut3DEntryCount * 3];
 
-	unsigned short* lut3DInputIterator = lut3DInput;
+	uint16_t* lut3DInputIterator = lut3DInput;
 
 	for (unsigned b = 0; b < m_Lut3DSize; b++) {
 		for (unsigned g = 0; g < m_Lut3DSize; g++) {
