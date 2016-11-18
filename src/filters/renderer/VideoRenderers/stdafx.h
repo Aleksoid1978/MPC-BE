@@ -31,6 +31,7 @@
 #include <BaseClasses/streams.h>
 #include <dvdmedia.h>
 #include <mpconfig.h>
+#include <memory>
 
 #include "../../../DSUtil/DSUtil.h"
 
