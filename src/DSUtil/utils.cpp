@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include <basestruct.h>
 #include "utils.h"
 
 uint32_t CountBits(uint32_t v)
@@ -30,25 +31,98 @@ uint32_t CountBits(uint32_t v)
 	return (v * 0x01010101) >> 24;
 }
 
-//#ifdef _MSC_VER
-//inline uint16_t bswap_16(uint16_t value) { return (uint16_t)_byteswap_ushort((unsigned short)value); }
-//inline uint32_t bswap_32(uint32_t value) { return (uint32_t)_byteswap_ulong((unsigned long)value); }
-//inline uint64_t bswap_64(uint64_t value) { return (uint64_t)_byteswap_uint64((unsigned __int64)value); }
-//#else
-//inline uint16_t bswap_16(uint16_t value) {
-//	return (value >> 8) + (value << 8);
-//}
-//inline uint32_t bswap_32(uint32_t value) {
-//	return (value >> 24) + (value << 24) + ((value & 0xff00) << 8) + ((value & 0xff0000) >> 8);
-//}
-//inline uint64_t bswap_64(uint64_t value) {
-//	return	((value & 0xFF00000000000000) >> 56) +
-//		((value & 0x00FF000000000000) >> 40) +
-//		((value & 0x0000FF0000000000) >> 24) +
-//		((value & 0x000000FF00000000) >> 8) +
-//		((value & 0x00000000FF000000) << 8) +
-//		((value & 0x0000000000FF0000) << 24) +
-//		((value & 0x000000000000FF00) << 40) +
-//		((value & 0x00000000000000FF) << 56);
-//}
-//#endif
+int GCD(int a, int b) {
+	if (b) return GCD(b, a%b);
+	else  return a;
+}
+
+void ReduceDim(long &num, long &den)
+{
+	if (den > 0 && num > 0) {
+		int gcd = GCD(labs(num), labs(den));
+		num /= gcd;
+		den /= gcd;
+	}
+}
+
+void ReduceDim(SIZE &dim)
+{
+	ReduceDim(dim.cx, dim.cy);
+}
+
+// code from ffmpeg
+int64_t av_gcd(int64_t a, int64_t b) {
+	if (b) return av_gcd(b, a%b);
+	else  return a;
+}
+
+int av_reduce(int *dst_num, int *dst_den,
+	int64_t num, int64_t den, int64_t max)
+{
+	fraction_t a0 = { 0, 1 }, a1 = { 1, 0 };
+	int sign = (num < 0) ^ (den < 0);
+	int64_t gcd = av_gcd(abs(num), abs(den));
+
+	if (gcd) {
+		num = abs(num) / gcd;
+		den = abs(den) / gcd;
+	}
+	if (num <= max && den <= max) {
+		a1 = { (int)num, (int)den };
+		den = 0;
+	}
+
+	while (den) {
+		int64_t x        = num / den;
+		int64_t next_den = num - den * x;
+		int64_t a2n      = x * a1.num + a0.num;
+		int64_t a2d      = x * a1.den + a0.den;
+
+		if (a2n > max || a2d > max) {
+			if (a1.num) x =        (max - a0.num) / a1.num;
+			if (a1.den) x = min(x, (max - a0.den) / a1.den);
+
+			if (den * (2 * x * a1.den + a0.den) > num * a1.den)
+				a1 = { int(x * a1.num + a0.num), int(x * a1.den + a0.den) };
+			break;
+		}
+
+		a0 = a1;
+		a1 = { (int)a2n, (int)a2d };
+		num = den;
+		den = next_den;
+	}
+	ASSERT(av_gcd(a1.num, a1.den) <= 1U);
+
+	*dst_num = sign ? -a1.num : a1.num;
+	*dst_den = a1.den;
+
+	return den == 0;
+}
+
+fraction_t av_d2q(double d, int max)
+{
+#define LOG2  0.69314718055994530941723212145817656807550013436025
+	fraction_t a;
+	int exponent;
+	INT64 den;
+	if (isnan(d))
+		return { 0,0 };
+	if (fabs(d) > INT_MAX + 3LL)
+		return{ d < 0 ? -1 : 1, 0 };
+	exponent = max((int)(log(fabs(d) + 1e-20) / LOG2), 0);
+	den = 1LL << (61 - exponent);
+	// (int64_t)rint() and llrint() do not work with gcc on ia64 and sparc64
+	av_reduce(&a.num, &a.den, floor(d * den + 0.5), den, max);
+	if ((!a.num || !a.den) && d && max>0 && max<INT_MAX)
+		av_reduce(&a.num, &a.den, floor(d * den + 0.5), den, INT_MAX);
+
+	return a;
+}
+//
+
+SIZE ReduceDim(double value)
+{
+	fraction_t a = av_d2q(value, INT_MAX);
+	return{ a.num, a.den };
+}
