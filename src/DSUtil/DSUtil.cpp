@@ -2674,9 +2674,8 @@ REFERENCE_TIME StringToReftime(LPCTSTR strVal)
 	int				lSecond		= 0;
 	int				lMillisec	= 0;
 
-	if (_stscanf_s (strVal, _T("%02d:%02d:%02d,%03d"), &lHour, &lMinute, &lSecond, &lMillisec) == 4) {
-		rt = ((((lHour * 60) + lMinute) * 60 + lSecond) * MILLISECONDS + lMillisec) * (UNITS/MILLISECONDS);
-	} else if (_stscanf_s (strVal, _T("%02d:%02d:%02d.%03d"), &lHour, &lMinute, &lSecond, &lMillisec) == 4) {
+	if (_stscanf_s(strVal, _T("%02d:%02d:%02d.%03d"), &lHour, &lMinute, &lSecond, &lMillisec) == 4
+			|| _stscanf_s(strVal, _T("%02d:%02d:%02d,%03d"), &lHour, &lMinute, &lSecond, &lMillisec) == 4) {
 		rt = ((((lHour * 60) + lMinute) * 60 + lSecond) * MILLISECONDS + lMillisec) * (UNITS/MILLISECONDS);
 	}
 
@@ -2689,10 +2688,9 @@ REFERENCE_TIME StringToReftime2(LPCTSTR strVal)
 	int				lHour		= 0;
 	int				lMinute		= 0;
 	int				lSecond		= 0;
-	int				lMillisec	= 0;
 
 	if (_stscanf_s (strVal, _T("%02d:%02d:%02d"), &lHour, &lMinute, &lSecond) == 3) {
-		rt = ((((lHour * 60) + lMinute) * 60 + lSecond) * MILLISECONDS) * (UNITS/MILLISECONDS);
+		rt = (((lHour * 60) + lMinute) * 60 + lSecond) * UNITS;
 	}
 
 	return rt;
