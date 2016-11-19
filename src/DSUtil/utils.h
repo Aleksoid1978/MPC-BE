@@ -50,6 +50,7 @@ inline void expand_range(T const& val, T& lo, T& hi)
 
 uint32_t CountBits(uint32_t v);
 
-//extern inline uint16_t bswap_16(uint16_t value);
-//extern inline uint32_t bswap_32(uint32_t value);
-//extern inline uint64_t bswap_64(uint64_t value);
+void ReduceDim(long &num, long &den);
+void ReduceDim(SIZE &dim);
+
+SIZE ReduceDim(double value);

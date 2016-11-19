@@ -189,10 +189,6 @@ extern void				CreateVorbisMediaType(CMediaType& mt, CAtlArray<CMediaType>& mts,
 extern CStringA			VobSubDefHeader(int w, int h, CStringA palette = "");
 extern void				CorrectWaveFormatEx(CMediaType& mt);
 
-extern void				ReduceDim(LONG& num, LONG& den);
-extern void				ReduceDim(SIZE &dim);
-extern SIZE				ReduceDim(double value);
-
 extern inline const LONGLONG GetPerfCounter();
 
 class CPinInfo : public PIN_INFO
