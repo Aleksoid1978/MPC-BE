@@ -1276,7 +1276,7 @@ HRESULT CMpaDecFilter::ProcessPCMraw() //'raw '
 			uint16_t* pOut = (uint16_t*)outBuff.GetData();
 
 			for (size_t i = 0; i < nSamples; i++) {
-				pOut[i] = bswap_16(pIn[i]);
+				pOut[i] = _byteswap_ushort(pIn[i]);
 			}
 		}
 		break;
@@ -1318,7 +1318,7 @@ HRESULT CMpaDecFilter::ProcessPCMintBE() // 'twos', big-endian 'in24' and 'in32'
 			uint16_t* pOut = (uint16_t*)outBuff.GetData();
 
 			for (size_t i = 0; i < nSamples; i++) {
-				pOut[i] = bswap_16(pIn[i]);
+				pOut[i] = _byteswap_ushort(pIn[i]);
 			}
 		}
 		break;
@@ -1340,7 +1340,7 @@ HRESULT CMpaDecFilter::ProcessPCMintBE() // 'twos', big-endian 'in24' and 'in32'
 			uint32_t* pOut = (uint32_t*)outBuff.GetData();
 
 			for (size_t i = 0; i < nSamples; i++) {
-				pOut[i] = bswap_32(pIn[i]);
+				pOut[i] = _byteswap_ulong(pIn[i]);
 			}
 		}
 		break;
@@ -1415,7 +1415,7 @@ HRESULT CMpaDecFilter::ProcessPCMfloatBE() // big-endian 'fl32' and 'fl64'
 			uint32_t* pIn  = (uint32_t*)m_buff.GetData();
 			uint32_t* pOut = (uint32_t*)outBuff.GetData();
 			for (size_t i = 0; i < nSamples; i++) {
-				pOut[i] = bswap_32(pIn[i]);
+				pOut[i] = _byteswap_ulong(pIn[i]);
 			}
 		}
 		break;
@@ -1424,7 +1424,7 @@ HRESULT CMpaDecFilter::ProcessPCMfloatBE() // big-endian 'fl32' and 'fl64'
 			uint64_t* pIn  = (uint64_t*)m_buff.GetData();
 			uint64_t* pOut = (uint64_t*)outBuff.GetData();
 			for (size_t i = 0; i < nSamples; i++) {
-				pOut[i] = bswap_64(pIn[i]);
+				pOut[i] = _byteswap_uint64(pIn[i]);
 			}
 		}
 		break;

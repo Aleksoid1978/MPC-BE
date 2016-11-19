@@ -30,6 +30,7 @@
 #include "Log.h"
 #include <basestruct.h>
 #include <mpc_defines.h>
+#include "utils.h"
 
 #define LCID_NOSUBTITLES    -1
 
@@ -193,32 +194,6 @@ extern void				ReduceDim(SIZE &dim);
 extern SIZE				ReduceDim(double value);
 
 extern inline const LONGLONG GetPerfCounter();
-
-template <typename T>
-// Clamps the specified value to the specified minimum and maximum range.
-inline T clamp(T const& val, T const& lo, T const& hi)
-{
-	return (val > hi) ? hi : (val < lo) ? lo : val;
-}
-
-template <typename T, typename D>
-// If the specified value is out of range, set to default values.
-inline T discard(T const& val, T const& lo, T const& hi, D const& def)
-{
-	return (val > hi || val < lo) ? def : val;
-}
-
-template <typename T>
-// If the specified value is out of range, update lo or hi values.
-inline void expand_range(T const& val, T& lo, T& hi)
-{
-	if (val > hi) {
-		hi = val;
-	}
-	if (val < lo) { // do not use "else if" because at the beginning 'lo' may be greater than 'hi'
-		lo = val;
-	}
-}
 
 class CPinInfo : public PIN_INFO
 {
