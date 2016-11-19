@@ -22,45 +22,24 @@
 #include "stdafx.h"
 #include "Ifo.h"
 
-#ifdef WORDS_BIGENDIAN
-#define bswap_16(x) (x)
-#define bswap_32(x) (x)
-#define bswap_64(x) (x)
+#if 0 // stupid warning LNK4006 and LNK4088
+#define bswap_16(x) _byteswap_ushort((unsigned short)(x))
+#define bswap_32(x) _byteswap_ulong ((unsigned long)(x))
+#define bswap_64(x) _byteswap_uint64((unsigned __int64)(x))
 #else
-
-// code from bits/byteswap.h (C) 1997, 1998 Free Software Foundation, Inc.
-#define bswap_16(x) \
-     ((((x) >> 8) & 0xff) | (((x) & 0xff) << 8))
-
-// code from bits/byteswap.h (C) 1997, 1998 Free Software Foundation, Inc.
-#define bswap_32(x) \
-     ((((x) & 0xff000000) >> 24) | (((x) & 0x00ff0000) >>  8) | \
-      (((x) & 0x0000ff00) <<  8) | (((x) & 0x000000ff) << 24))
-
-#define bswap_64(x) \
-     (__extension__						\
-      ({ union { __extension__ unsigned long long int __ll;	\
-                 unsigned long int __l[2]; } __w, __r;		\
-         __w.__ll = (x);					\
-         __r.__l[0] = bswap_32 (__w.__l[1]);			\
-         __r.__l[1] = bswap_32 (__w.__l[0]);			\
-         __r.__ll; }))
-#endif
-
-#ifdef WORDS_BIGENDIAN
-#define be2me_16(x) (x)
-#define be2me_32(x) (x)
-#define be2me_64(x) (x)
-#define le2me_16(x) bswap_16(x)
-#define le2me_32(x) bswap_32(x)
-#define le2me_64(x) bswap_64(x)
-#else
-#define be2me_16(x) bswap_16(x)
-#define be2me_32(x) bswap_32(x)
-#define be2me_64(x) bswap_64(x)
-#define le2me_16(x) (x)
-#define le2me_32(x) (x)
-#define le2me_64(x) (x)
+#define bswap_16(x) ((uint16_t)(x) >> 8 | (uint16_t)(x) << 8)
+#define bswap_32(x) ((uint32_t)(x) >> 24              | \
+                    ((uint32_t)(x) & 0x00ff0000) >> 8 | \
+                    ((uint32_t)(x) & 0x0000ff00) << 8 | \
+                     (uint32_t)(x) << 24)
+#define bswap_64(x) ((uint64_t)(x) >> 56                       | \
+                    ((uint64_t)(x) & 0x00FF000000000000) >> 40 | \
+                    ((uint64_t)(x) & 0x0000FF0000000000) >> 24 | \
+                    ((uint64_t)(x) & 0x000000FF00000000) >>  8 | \
+                    ((uint64_t)(x) & 0x00000000FF000000) <<  8 | \
+                    ((uint64_t)(x) & 0x0000000000FF0000) << 24 | \
+                    ((uint64_t)(x) & 0x000000000000FF00) << 40 | \
+                     (uint64_t)(x) << 56)
 #endif
 
 #define DVD_VIDEO_LB_LEN	2048
@@ -71,7 +50,7 @@ extern HANDLE (__stdcall * Real_CreateFileW)(LPCWSTR lpFileName, DWORD dwDesired
 
 uint32_t get4bytes (const BYTE* buf)
 {
-	return be2me_32 (*((uint32_t*)buf));
+	return bswap_32(*(uint32_t*)buf);
 }
 
 // VMG files
@@ -97,7 +76,7 @@ int CIfo::GetMiscPGCI (CIfo::ifo_hdr_t *hdr, int title, uint8_t **ptr)
 	*ptr	 += IFO_HDR_LEN;
 	pgci_sub  = (pgci_sub_t *) *ptr + title;
 
-	*ptr = (uint8_t *) hdr + be2me_32 (pgci_sub->start);
+	*ptr = (uint8_t *) hdr + bswap_32(pgci_sub->start);
 
 	return 0;
 }
@@ -109,7 +88,7 @@ void CIfo::RemovePgciUOPs (uint8_t *ptr)
 	int			i;
 
 	ptr += IFO_HDR_LEN;
-	num  = be2me_16(hdr->num);
+	num  = bswap_16(hdr->num);
 
 	for (i=1; i<=num; i++) {
 		lu_sub_t *lu_sub = (lu_sub_t *) ptr;
@@ -118,7 +97,7 @@ void CIfo::RemovePgciUOPs (uint8_t *ptr)
 		ptr += LU_SUB_LEN;
 	}
 
-	for (i=0; i<be2me_16(hdr->num); i++) {
+	for (i=0; i<bswap_16(hdr->num); i++) {
 		uint8_t *ptr;
 
 		if (GetMiscPGCI (hdr, i, &ptr) >= 0) {
@@ -147,10 +126,10 @@ CIfo::pgc_t* CIfo::GetPGCI(const int title, const ifo_hdr_t* hdr)
 
 	pgci_sub = (pgci_sub_t *) ptr + title;
 
-	ptr = (uint8_t *) hdr + be2me_32 (pgci_sub->start);
+	ptr = (uint8_t *) hdr + bswap_32(pgci_sub->start);
 
 	/* jdw */
-	if ( ptr >= ( (uint8_t *) hdr + be2me_32 ( hdr->len ))) {
+	if ( ptr >= ( (uint8_t *) hdr + bswap_32( hdr->len ))) {
 		return NULL ;
 	}
 	/* /jdw */
@@ -212,7 +191,7 @@ bool CIfo::RemoveUOPs()
 		pgc	= GetFirstPGC();
 		pgc->prohibited_ops = 0;
 
-		for (int i=0; i<be2me_16(m_pPGCI->num); i++) {
+		for (int i=0; i<bswap_16(m_pPGCI->num); i++) {
 			pgc = GetPGCI(i, m_pPGCI);
 			if (pgc) {
 				RemovePgciUOPs ((uint8_t*)pgc);
@@ -220,7 +199,7 @@ bool CIfo::RemoveUOPs()
 		}
 	}
 	if (m_pPGCIT) {
-		for (int i=0; i<be2me_16(m_pPGCIT->num); i++) {
+		for (int i=0; i<bswap_16(m_pPGCIT->num); i++) {
 			pgc = GetPGCI(i, m_pPGCIT);
 			if (pgc) {
 				pgc->prohibited_ops = 0;

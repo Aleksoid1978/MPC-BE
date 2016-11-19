@@ -75,7 +75,6 @@ enum {
 
 DWORD GetDefChannelMask(WORD nChannels);
 DWORD GetVorbisChannelMask(WORD nChannels);
-DWORD CountBits(DWORD v);
 
 struct audioframe_t {
 	int size;
