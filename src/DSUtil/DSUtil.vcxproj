@@ -123,7 +123,7 @@
     </ClCompile>
     <ClCompile Include="SysVersion.cpp" />
     <ClCompile Include="text.cpp" />
-    <ClCompile Include="utils.cpp" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="vd.cpp" />
     <ClCompile Include="vd_asm.cpp">
       <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
@@ -162,7 +162,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SysVersion.h" />
     <ClInclude Include="text.h" />
-    <ClInclude Include="utils.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="vd.h" />
     <ClInclude Include="vd_asm.h" />
     <ClInclude Include="VideoParser.h" />

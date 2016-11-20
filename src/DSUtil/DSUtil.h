@@ -30,7 +30,7 @@
 #include "Log.h"
 #include <basestruct.h>
 #include <mpc_defines.h>
-#include "utils.h"
+#include "Utils.h"
 
 #define LCID_NOSUBTITLES    -1
 

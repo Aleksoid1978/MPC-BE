@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "AudioHelper.h"
 #include <MMReg.h>
-#include "../DSUtil/utils.h" // for CountBits()
+#include "../DSUtil/Utils.h" // for CountBits()
 #include "BassRedirect.h"
 
 int get_channel_num(DWORD layout, DWORD channel)
