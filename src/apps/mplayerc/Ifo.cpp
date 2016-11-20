@@ -23,28 +23,33 @@
 #include "Ifo.h"
 
 #if 0 // stupid warning LNK4006 and LNK4088
-#define bswap_16(x) _byteswap_ushort((unsigned short)(x))
-#define bswap_32(x) _byteswap_ulong ((unsigned long)(x))
-#define bswap_64(x) _byteswap_uint64((unsigned __int64)(x))
+inline uint16_t bswap_16(uint16_t value) { return (uint16_t)_byteswap_ushort((unsigned short)value); }
+inline uint32_t bswap_32(uint32_t value) { return (uint32_t)_byteswap_ulong((unsigned long)value); }
+inline uint64_t bswap_64(uint64_t value) { return (uint64_t)_byteswap_uint64((unsigned __int64)value); }
 #else
-#define bswap_16(x) ((uint16_t)(x) >> 8 | (uint16_t)(x) << 8)
-#define bswap_32(x) ((uint32_t)(x) >> 24              | \
-                    ((uint32_t)(x) & 0x00ff0000) >> 8 | \
-                    ((uint32_t)(x) & 0x0000ff00) << 8 | \
-                     (uint32_t)(x) << 24)
-#define bswap_64(x) ((uint64_t)(x) >> 56                       | \
-                    ((uint64_t)(x) & 0x00FF000000000000) >> 40 | \
-                    ((uint64_t)(x) & 0x0000FF0000000000) >> 24 | \
-                    ((uint64_t)(x) & 0x000000FF00000000) >>  8 | \
-                    ((uint64_t)(x) & 0x00000000FF000000) <<  8 | \
-                    ((uint64_t)(x) & 0x0000000000FF0000) << 24 | \
-                    ((uint64_t)(x) & 0x000000000000FF00) << 40 | \
-                     (uint64_t)(x) << 56)
+inline uint16_t bswap_16(uint16_t value) {
+	return (value >> 8) + (value << 8);
+}
+
+inline uint32_t bswap_32(uint32_t value) {
+	return (value >> 24) + (value << 24) + ((value & 0xff00) << 8) + ((value & 0xff0000) >> 8);
+}
+
+inline uint64_t bswap_64(uint64_t value) {
+	return	((value & 0xFF00000000000000) >> 56) +
+			((value & 0x00FF000000000000) >> 40) +
+			((value & 0x0000FF0000000000) >> 24) +
+			((value & 0x000000FF00000000) >>  8) +
+			((value & 0x00000000FF000000) <<  8) +
+			((value & 0x0000000000FF0000) << 24) +
+			((value & 0x000000000000FF00) << 40) +
+			((value & 0x00000000000000FF) << 56);
+}
 #endif
 
-#define DVD_VIDEO_LB_LEN	2048
-#define IFO_HDR_LEN			   8
-#define LU_SUB_LEN			   8
+#define DVD_VIDEO_LB_LEN 2048
+#define IFO_HDR_LEN         8
+#define LU_SUB_LEN          8
 
 extern HANDLE (__stdcall * Real_CreateFileW)(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
 
@@ -54,11 +59,11 @@ uint32_t get4bytes (const BYTE* buf)
 }
 
 // VMG files
-#define OFF_VMGM_PGCI_UT(buf)        get4bytes (buf + 200)
+#define OFF_VMGM_PGCI_UT(buf) get4bytes (buf + 200)
 
 // VTS files
-#define OFF_VTSM_PGCI_UT(buf)        get4bytes (buf + 208)
-#define OFF_VTS_PGCIT(buf)           get4bytes (buf + 204)
+#define OFF_VTSM_PGCI_UT(buf) get4bytes (buf + 208)
+#define OFF_VTS_PGCIT(buf)    get4bytes (buf + 204)
 
 CIfo::CIfo()
 {
@@ -84,24 +89,20 @@ int CIfo::GetMiscPGCI (CIfo::ifo_hdr_t *hdr, int title, uint8_t **ptr)
 void CIfo::RemovePgciUOPs (uint8_t *ptr)
 {
 	ifo_hdr_t*	hdr = (ifo_hdr_t *) ptr;
-	uint16_t	num;
-	int			i;
 
 	ptr += IFO_HDR_LEN;
-	num  = bswap_16(hdr->num);
+	int num = bswap_16(hdr->num);
 
-	for (i=1; i<=num; i++) {
-		lu_sub_t *lu_sub = (lu_sub_t *) ptr;
+	for (int i = 1; i <= num; i++) {
+		lu_sub_t* lu_sub = (lu_sub_t*)ptr;
 		UNREFERENCED_PARAMETER(lu_sub);
-
 		ptr += LU_SUB_LEN;
 	}
 
-	for (i=0; i<bswap_16(hdr->num); i++) {
+	for (int i = 0; i < num; i++) {
 		uint8_t *ptr;
-
-		if (GetMiscPGCI (hdr, i, &ptr) >= 0) {
-			pgc_t*		pgc = (pgc_t*) ptr;
+		if (GetMiscPGCI(hdr, i, &ptr) >= 0) {
+			pgc_t* pgc = (pgc_t*)ptr;
 			pgc->prohibited_ops = 0;
 		}
 	}
@@ -185,27 +186,32 @@ bool CIfo::OpenFile (LPCTSTR strFile)
 
 bool CIfo::RemoveUOPs()
 {
-	pgc_t*	pgc;
+	pgc_t* pgc;
 
 	if (m_pPGCI) {
-		pgc	= GetFirstPGC();
+		pgc = GetFirstPGC();
 		pgc->prohibited_ops = 0;
+		int num = bswap_16(m_pPGCI->num);
 
-		for (int i=0; i<bswap_16(m_pPGCI->num); i++) {
+		for (int i = 0; i < num; i++) {
 			pgc = GetPGCI(i, m_pPGCI);
 			if (pgc) {
-				RemovePgciUOPs ((uint8_t*)pgc);
+				RemovePgciUOPs((uint8_t*)pgc);
 			}
 		}
 	}
+
 	if (m_pPGCIT) {
-		for (int i=0; i<bswap_16(m_pPGCIT->num); i++) {
+		int num = bswap_16(m_pPGCIT->num);
+
+		for (int i = 0; i < num; i++) {
 			pgc = GetPGCI(i, m_pPGCIT);
 			if (pgc) {
 				pgc->prohibited_ops = 0;
 			}
 		}
 	}
+
 	return true;
 }
 
