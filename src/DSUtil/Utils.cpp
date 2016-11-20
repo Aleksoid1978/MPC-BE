@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include <basestruct.h>
-#include "utils.h"
+#include "Utils.h"
 
 uint32_t CountBits(uint32_t v)
 {
