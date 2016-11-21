@@ -1619,25 +1619,25 @@ AP4_Tx3gSampleEntry::GetFontNameById(AP4_Ordinal Id, AP4_String& Name)
     return AP4_FAILURE;
 }
 
-static int freq[] = {48000, 44100, 32000, 0};
-static int channels[] = {2, 1, 2, 3, 3, 4, 4, 5};
+static int freq[]     = { 48000, 44100, 32000, 24000, 22050, 16000 };
+static int channels[] = { 2, 1, 2, 3, 3, 4, 4, 5 };
 
 /*----------------------------------------------------------------------
 |       AP4_AC3SampleEntry::AP4_AC3SampleEntry
 +---------------------------------------------------------------------*/
 AP4_AC3SampleEntry::AP4_AC3SampleEntry(AP4_Size         size,
-                                         AP4_ByteStream&  stream,
-                                         AP4_AtomFactory& atom_factory) :
-    AP4_AudioSampleEntry(AP4_ATOM_TYPE__AC3, size)
+                                       AP4_ByteStream&  stream,
+                                       AP4_AtomFactory& atom_factory) :
+    AP4_AudioSampleEntry(AP4_ATOM_TYPE__AC3, size),
+    m_ExtSize(0)
 {
-
     // read fields
     ReadFields(stream);
 
     AP4_Size fields_size = GetFieldsSize();
 
-    // read children atoms (ex: esds and maybe others)
-    ReadChildren(atom_factory, stream, size-AP4_ATOM_HEADER_SIZE-fields_size);
+    // read children atoms
+    ReadChildren(atom_factory, stream, size - AP4_ATOM_HEADER_SIZE - fields_size);
 }
 
 /*----------------------------------------------------------------------
@@ -1646,35 +1646,44 @@ AP4_AC3SampleEntry::AP4_AC3SampleEntry(AP4_Size         size,
 AP4_Result
 AP4_AC3SampleEntry::ReadFields(AP4_ByteStream& stream)
 {
-
     AP4_AudioSampleEntry::ReadFields(stream);
 
     // SampleSize field from AudioSampleEntry shall be ignored
     m_SampleSize = 0;
 
-    // AC3SpecificBox
+    // AC3SpecificBox - 'dac3' atom
+    AP4_UI32 size, atom;
+    stream.ReadUI32(size);
+    stream.ReadUI32(atom);
+    if (atom != AP4_ATOM_TYPE('d','a','c','3')) {
+        AP4_Offset offset;
+        stream.Tell(offset);
+        stream.Seek(offset - 8);
+        return AP4_SUCCESS;
+    }
 
-    // BoxHeader.Size, BoxHeader.Type
-    char junk[8];
-    stream.Read(junk, 8);
+    m_ExtSize = size;
 
     AP4_UI32 data;
     stream.ReadUI24(data);
 
     // fscod
-    m_SampleRate = freq[(data>>22) & 0x3];
+    m_SampleRate = freq[(data >> 22) & 0x3];
     m_SampleRate <<= 16;
 
-    // acmod
-    m_ChannelCount = channels[(data>>11) & 0x7] + ((data>>10) & 0x1);
+    // acmod + lfeon
+    m_ChannelCount = channels[(data >> 11) & 0x7] + ((data >> 10) & 0x1);
 
     return AP4_SUCCESS;
 }
 
+/*----------------------------------------------------------------------
+|       AP4_AC3SampleEntry::GetFieldsSize
++---------------------------------------------------------------------*/
 AP4_Size
 AP4_AC3SampleEntry::GetFieldsSize()
 {
-    return AP4_AudioSampleEntry::GetFieldsSize() + 11;
+    return AP4_AudioSampleEntry::GetFieldsSize() + m_ExtSize;
 }
 
 /*----------------------------------------------------------------------
@@ -1683,6 +1692,62 @@ AP4_AC3SampleEntry::GetFieldsSize()
 AP4_EAC3SampleEntry::AP4_EAC3SampleEntry(AP4_Size         size,
                                          AP4_ByteStream&  stream,
                                          AP4_AtomFactory& atom_factory) :
-    AP4_AudioSampleEntry(AP4_ATOM_TYPE_EAC3, size, stream, atom_factory)
+    AP4_AudioSampleEntry(AP4_ATOM_TYPE_EAC3, size),
+    m_ExtSize(0)
 {
+    // read fields
+    ReadFields(stream);
+
+    AP4_Size fields_size = GetFieldsSize();
+
+    // read children atoms
+    ReadChildren(atom_factory, stream, size - AP4_ATOM_HEADER_SIZE - fields_size);
+}
+
+/*----------------------------------------------------------------------
+|       AP4_EAC3SampleEntry::ReadFields
++---------------------------------------------------------------------*/
+AP4_Result
+AP4_EAC3SampleEntry::ReadFields(AP4_ByteStream& stream)
+{
+    AP4_AudioSampleEntry::ReadFields(stream);
+
+    // SampleSize field from AudioSampleEntry shall be ignored
+    m_SampleSize = 0;
+
+    // EAC3SpecificBox - 'dec3' atom
+    AP4_UI32 size, atom;
+    stream.ReadUI32(size);
+    stream.ReadUI32(atom);
+    if (atom != AP4_ATOM_TYPE('d','e','c','3')) {
+        AP4_Offset offset;
+        stream.Tell(offset);
+        stream.Seek(offset - 8);
+        return AP4_SUCCESS;
+    }
+
+    m_ExtSize = size;
+
+    AP4_UI16 skip;
+    stream.ReadUI16(skip); // data_rate and substream_count
+    AP4_UI32 data;
+    stream.ReadUI24(data);
+
+    // fscod
+    m_SampleRate = freq[(data >> 6) & 0x3];
+    m_SampleRate <<= 16;
+
+    // acmod + lfeon
+    m_ChannelCount = channels[(data >> 9) & 0x7] + ((data >> 8) & 0x1);
+
+    return AP4_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       AP4_EAC3SampleEntry::GetFieldsSize
++---------------------------------------------------------------------*/
+AP4_Size
+AP4_EAC3SampleEntry::GetFieldsSize()
+{
+    return AP4_AudioSampleEntry::GetFieldsSize() + m_ExtSize;
 }
