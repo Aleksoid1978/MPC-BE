@@ -1482,6 +1482,11 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		return;
 	}
 
+	if (rt <= 0) {
+		DemuxInit();
+		return;
+	}
+
 	AP4_Movie* movie = m_pFile->GetMovie();
 
 	if (movie->HasFragmentsIndex()
