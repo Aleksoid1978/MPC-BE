@@ -313,10 +313,19 @@ const AP4_Atom::Type AP4_ATOM_TYPE_WFEX = AP4_ATOM_TYPE('w','f','e','x');
 const AP4_Atom::Type AP4_ATOM_TYPE_MP4V = AP4_ATOM_TYPE('m','p','4','v');
 // H.264/AVC
 const AP4_Atom::Type AP4_ATOM_TYPE_AVC1 = AP4_ATOM_TYPE('a','v','c','1');
+const AP4_Atom::Type AP4_ATOM_TYPE_AVC2 = AP4_ATOM_TYPE('a','v','c','2');
+const AP4_Atom::Type AP4_ATOM_TYPE_AVC3 = AP4_ATOM_TYPE('a','v','c','3');
+const AP4_Atom::Type AP4_ATOM_TYPE_AVC4 = AP4_ATOM_TYPE('a','v','c','4');
+const AP4_Atom::Type AP4_ATOM_TYPE_DVAV = AP4_ATOM_TYPE('d','v','a','v');
+const AP4_Atom::Type AP4_ATOM_TYPE_DVA1 = AP4_ATOM_TYPE('d','v','a','1');
+
 const AP4_Atom::Type AP4_ATOM_TYPE_AVCC = AP4_ATOM_TYPE('a','v','c','C');
 // HEVC
 const AP4_Atom::Type AP4_ATOM_TYPE_HVC1 = AP4_ATOM_TYPE('h','v','c','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_HEV1 = AP4_ATOM_TYPE('h','e','v','1');
+const AP4_Atom::Type AP4_ATOM_TYPE_DVHE = AP4_ATOM_TYPE('d','v','h','e');
+const AP4_Atom::Type AP4_ATOM_TYPE_DVH1 = AP4_ATOM_TYPE('d','v','h','1');
+
 const AP4_Atom::Type AP4_ATOM_TYPE_HVCC = AP4_ATOM_TYPE('h','v','c','C');
 // image
 const AP4_Atom::Type AP4_ATOM_TYPE_JPEG = AP4_ATOM_TYPE('j','p','e','g');

@@ -1238,56 +1238,24 @@ AP4_Mp4vSampleEntry::AP4_Mp4vSampleEntry(AP4_Size         size,
 }
 
 /*----------------------------------------------------------------------
-|       AP4_Avc1SampleEntry::AP4_Avc1SampleEntry
+|       AP4_AvcSampleEntry::AP4_AvcSampleEntry
 +---------------------------------------------------------------------*/
-AP4_Avc1SampleEntry::AP4_Avc1SampleEntry(AP4_UI16          width,
-                                         AP4_UI16          height,
-                                         AP4_UI16          depth,
-                                         const char*       compressor_name,
-                                         AP4_EsDescriptor* descriptor) :
-    AP4_VisualSampleEntry(AP4_ATOM_TYPE_AVC1,
-                          descriptor,
-                          width,
-                          height,
-                          depth,
-                          compressor_name)
+AP4_AvcSampleEntry::AP4_AvcSampleEntry(AP4_UI32         format,
+                                       AP4_Size         size,
+                                       AP4_ByteStream&  stream,
+                                       AP4_AtomFactory& atom_factory) :
+    AP4_VisualSampleEntry(format, size, stream, atom_factory)
 {
 }
 
 /*----------------------------------------------------------------------
-|       AP4_Avc1SampleEntry::AP4_Avc1SampleEntry
+|       AP4_HevcSampleEntry::AP4_HevcSampleEntry
 +---------------------------------------------------------------------*/
-AP4_Avc1SampleEntry::AP4_Avc1SampleEntry(AP4_Size         size,
+AP4_HevcSampleEntry::AP4_HevcSampleEntry(AP4_UI32         format,
+                                         AP4_Size         size,
                                          AP4_ByteStream&  stream,
                                          AP4_AtomFactory& atom_factory) :
-    AP4_VisualSampleEntry(AP4_ATOM_TYPE_AVC1, size, stream, atom_factory)
-{
-}
-
-/*----------------------------------------------------------------------
-|       AP4_Hvc1SampleEntry::AP4_Hvc1SampleEntry
-+---------------------------------------------------------------------*/
-AP4_Hvc1SampleEntry::AP4_Hvc1SampleEntry(AP4_UI16          width,
-                                         AP4_UI16          height,
-                                         AP4_UI16          depth,
-                                         const char*       compressor_name,
-                                         AP4_EsDescriptor* descriptor) :
-    AP4_VisualSampleEntry(AP4_ATOM_TYPE_HVC1,
-                          descriptor,
-                          width,
-                          height,
-                          depth,
-                          compressor_name)
-{
-}
-
-/*----------------------------------------------------------------------
-|       AP4_Hvc1SampleEntry::AP4_Hvc1SampleEntry
-+---------------------------------------------------------------------*/
-AP4_Hvc1SampleEntry::AP4_Hvc1SampleEntry(AP4_Size         size,
-                                         AP4_ByteStream&  stream,
-                                         AP4_AtomFactory& atom_factory) :
-    AP4_VisualSampleEntry(AP4_ATOM_TYPE_HVC1, size, stream, atom_factory)
+    AP4_VisualSampleEntry(format, size, stream, atom_factory)
 {
 }
 

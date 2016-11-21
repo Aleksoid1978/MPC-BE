@@ -267,12 +267,19 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
             break;
 
         case AP4_ATOM_TYPE_AVC1:
-            atom = new AP4_Avc1SampleEntry(size, stream, *this);
+        case AP4_ATOM_TYPE_AVC2:
+        case AP4_ATOM_TYPE_AVC3:
+        case AP4_ATOM_TYPE_AVC4:
+        case AP4_ATOM_TYPE_DVAV:
+        case AP4_ATOM_TYPE_DVA1:
+            atom = new AP4_AvcSampleEntry(type, size, stream, *this);
             break;
 
         case AP4_ATOM_TYPE_HVC1:
         case AP4_ATOM_TYPE_HEV1:
-            atom = new AP4_Hvc1SampleEntry(size, stream, *this);
+        case AP4_ATOM_TYPE_DVHE:
+        case AP4_ATOM_TYPE_DVH1:
+            atom = new AP4_HevcSampleEntry(type, size, stream, *this);
             break;
 
         case AP4_ATOM_TYPE_ENCA:
@@ -413,9 +420,6 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 
         // other
         case AP4_ATOM_TYPE_AVCC:
-            atom = new AP4_DataInfoAtom(type, size, stream);
-            break;
-
         case AP4_ATOM_TYPE_HVCC:
             atom = new AP4_DataInfoAtom(type, size, stream);
             break;
