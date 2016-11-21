@@ -135,7 +135,7 @@ STDMETHODIMP CMP4SplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
-void SetTrackName(CString *TrackName, CString Suffix)
+static void SetTrackName(CString *TrackName, CString Suffix)
 {
 	if (TrackName->IsEmpty()) {
 		*TrackName = Suffix;
@@ -183,7 +183,7 @@ static void SetAspect(CSize& Aspect, LONG width, LONG height, LONG codec_width, 
 	}
 }
 
-static CString ConvertStr(const char* S)
+static const CString ConvertStr(const char* S)
 {
 	CString str = AltUTF8To16(S);
 	if (str.IsEmpty()) {
@@ -193,7 +193,7 @@ static CString ConvertStr(const char* S)
 	return str;
 }
 
-DWORD GetFourcc(AP4_VisualSampleEntry* vse)
+static const DWORD GetFourcc(AP4_VisualSampleEntry* vse)
 {
 	DWORD fourcc = -1;
 
@@ -1055,12 +1055,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						DWORD nAvgBytesPerSec = 0;
 						if (type == AP4_ATOM_TYPE_EAC3) {
-							AP4_Sample sample;
-							AP4_DataBuffer sample_data;
-
-							if (track->GetSampleCount() && AP4_SUCCEEDED(track->ReadSample(1, sample, sample_data)) && sample_data.GetDataSize() >= 7) {
+							AP4_DataBuffer data;
+							if (AP4_SUCCEEDED(sample.ReadData(data)) && data.GetDataSize() >= 7) {
 								audioframe_t aframe;
-								if (ParseEAC3Header(sample_data.GetData(), &aframe)) {
+								if (ParseEAC3Header(data.GetData(), &aframe)) {
 									samplerate		= aframe.samplerate;
 									channels		= aframe.channels;
 									nAvgBytesPerSec	= (aframe.size * 8i64 * samplerate / aframe.samples + 4) /8;
