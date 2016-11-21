@@ -1053,19 +1053,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							SetTrackName(&TrackName, _T("PCM"));
 						}
 
-						DWORD nAvgBytesPerSec = 0;
-						if (type == AP4_ATOM_TYPE_EAC3) {
-							AP4_DataBuffer data;
-							if (AP4_SUCCEEDED(sample.ReadData(data)) && data.GetDataSize() >= 7) {
-								audioframe_t aframe;
-								if (ParseEAC3Header(data.GetData(), &aframe)) {
-									samplerate		= aframe.samplerate;
-									channels		= aframe.channels;
-									nAvgBytesPerSec	= (aframe.size * 8i64 * samplerate / aframe.samples + 4) /8;
-								}
-							}
-						}
-
 						mt.majortype = MEDIATYPE_Audio;
 						mt.formattype = FORMAT_WaveFormatEx;
 						wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX));
@@ -1077,7 +1064,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						wfe->nChannels			= channels;
 						wfe->wBitsPerSample		= bitspersample;
 						wfe->nBlockAlign		= ase->GetBytesPerFrame();
-						wfe->nAvgBytesPerSec	= nAvgBytesPerSec ? nAvgBytesPerSec : (ase->GetSamplesPerPacket() ? wfe->nSamplesPerSec * wfe->nBlockAlign / ase->GetSamplesPerPacket() : 0);
+						wfe->nAvgBytesPerSec	= ase->GetSamplesPerPacket() ? wfe->nSamplesPerSec * wfe->nBlockAlign / ase->GetSamplesPerPacket() : 0;
 
 						mt.subtype = FOURCCMap(fourcc);
 						if (type == AP4_ATOM_TYPE_EAC3) {

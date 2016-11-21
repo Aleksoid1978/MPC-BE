@@ -382,8 +382,8 @@ class AP4_TextSampleEntry : public AP4_SampleEntry
 public:
     // methods
     AP4_TextSampleEntry(AP4_Size         size,
-                           AP4_ByteStream&  stream,
-                           AP4_AtomFactory& atom_factory);
+                        AP4_ByteStream&  stream,
+                        AP4_AtomFactory& atom_factory);
     virtual ~AP4_TextSampleEntry();
     
     struct AP4_TextDescription
@@ -416,8 +416,8 @@ class AP4_Tx3gSampleEntry : public AP4_SampleEntry
 public:
     // methods
     AP4_Tx3gSampleEntry(AP4_Size         size,
-                           AP4_ByteStream&  stream,
-                           AP4_AtomFactory& atom_factory);
+                        AP4_ByteStream&  stream,
+                        AP4_AtomFactory& atom_factory);
     virtual ~AP4_Tx3gSampleEntry();
     
     struct AP4_Tx3gDescription
@@ -453,11 +453,14 @@ class AP4_AC3SampleEntry : public AP4_AudioSampleEntry
  public:
     // constructors
     AP4_AC3SampleEntry(AP4_Size         size,
-                        AP4_ByteStream&  stream,
-                        AP4_AtomFactory& atom_factory);
+                       AP4_ByteStream&  stream,
+                       AP4_AtomFactory& atom_factory);
 
-    AP4_Result ReadFields(AP4_ByteStream& stream);
-    AP4_Size   GetFieldsSize();
+    virtual AP4_Result ReadFields(AP4_ByteStream& stream);
+    virtual AP4_Size   GetFieldsSize();
+
+protected:
+    AP4_Size m_ExtSize;
 };
 
 /*----------------------------------------------------------------------
@@ -470,6 +473,12 @@ class AP4_EAC3SampleEntry : public AP4_AudioSampleEntry
     AP4_EAC3SampleEntry(AP4_Size         size,
                         AP4_ByteStream&  stream,
                         AP4_AtomFactory& atom_factory);
+
+    virtual AP4_Result ReadFields(AP4_ByteStream& stream);
+    virtual AP4_Size   GetFieldsSize();
+
+protected:
+    AP4_Size m_ExtSize;
 };
 
 #endif // _AP4_SAMPLE_ENTRY_H_
