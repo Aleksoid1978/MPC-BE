@@ -748,76 +748,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mts.Add(mt);
 					}
 				}
-			} else if (AP4_Avc1SampleEntry* avc1 = dynamic_cast<AP4_Avc1SampleEntry*>(
-					track->GetTrakAtom()->FindChild("mdia/minf/stbl/stsd/avc1"))) {
-				if (AP4_DataInfoAtom* avcC = dynamic_cast<AP4_DataInfoAtom*>(avc1->GetChild(AP4_ATOM_TYPE_AVCC))) {
-					SetTrackName(&TrackName, _T("MPEG4 Video (H264)"));
-
-					const AP4_DataBuffer* di = avcC->GetData();
-					if (!di) {
-						di = &empty;
-					}
-
-					BYTE* data			= (BYTE*)di->GetData();
-					size_t size			= (size_t)di->GetDataSize();
-
-					BITMAPINFOHEADER pbmi;
-					memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
-					pbmi.biSize			= sizeof(pbmi);
-					pbmi.biWidth		= (LONG)avc1->GetWidth();
-					pbmi.biHeight		= (LONG)avc1->GetHeight();
-					pbmi.biCompression	= '1CVA';
-					pbmi.biPlanes		= 1;
-					pbmi.biBitCount		= 24;
-					pbmi.biSizeImage	= DIBSIZE(pbmi);
-
-					HandlePASP(avc1);
-					SetAspect(Aspect, width, height, pbmi.biWidth, pbmi.biHeight, vih2);
-
-					CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
-					mt.SetSampleSize(pbmi.biSizeImage);
-
-					mts.Add(mt);
-					//b_HasVideo = true;
-				}
-			} else if (AP4_Hvc1SampleEntry* hvc1 = dynamic_cast<AP4_Hvc1SampleEntry*>(
-					track->GetTrakAtom()->FindChild("mdia/minf/stbl/stsd/hvc1"))) {
-				if (AP4_DataInfoAtom* hvcC = dynamic_cast<AP4_DataInfoAtom*>(hvc1->GetChild(AP4_ATOM_TYPE_HVCC))) {
-					SetTrackName(&TrackName, _T("HEVC Video (H.265)"));
-
-					const AP4_DataBuffer* di = hvcC->GetData();
-					if (!di) {
-						di = &empty;
-					}
-
-					BYTE* data			= (BYTE*)di->GetData();
-					size_t size			= (size_t)di->GetDataSize();
-
-					BITMAPINFOHEADER pbmi;
-					memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
-					pbmi.biSize			= sizeof(pbmi);
-					pbmi.biWidth		= (LONG)hvc1->GetWidth();
-					pbmi.biHeight		= (LONG)hvc1->GetHeight();
-					pbmi.biCompression	= FCC('HVC1');
-					pbmi.biPlanes		= 1;
-					pbmi.biBitCount		= 24;
-					pbmi.biSizeImage	= DIBSIZE(pbmi);
-
-					HandlePASP(hvc1);
-					SetAspect(Aspect, width, height, pbmi.biWidth, pbmi.biHeight, vih2);
-
-					CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
-					mt.SetSampleSize(pbmi.biSizeImage);
-
-					vc_params_t params;
-					if (HEVCParser::ParseHEVCDecoderConfigurationRecord(data, size, params, false)) {
-						MPEG2VIDEOINFO* pm2vi	= (MPEG2VIDEOINFO*)mt.pbFormat;
-						pm2vi->dwProfile		= params.profile;
-						pm2vi->dwLevel			= params.level;
-						pm2vi->dwFlags			= params.nal_length_size;
-					}
-					mts.Add(mt);
-				}
 			} else if (AP4_StsdAtom* stsd = dynamic_cast<AP4_StsdAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stsd"))) {
 				const AP4_DataBuffer& db = stsd->GetDataBuffer();
 
@@ -969,7 +899,83 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							track->SetPalette(vse->GetPalette());
 						}
 
-						break;
+						switch (type) {
+							case AP4_ATOM_TYPE_AVC1:
+							case AP4_ATOM_TYPE_AVC2:
+							case AP4_ATOM_TYPE_AVC3:
+							case AP4_ATOM_TYPE_AVC4:
+							case AP4_ATOM_TYPE_DVAV:
+							case AP4_ATOM_TYPE_DVA1:
+								{
+									SetTrackName(&TrackName, L"MPEG4 Video (H264)");
+
+									const AP4_DataBuffer* di = NULL;
+									if (AP4_DataInfoAtom* avcC = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_AVCC))) {
+										di = avcC->GetData();
+									}
+									if (!di) {
+										di = &empty;
+									}
+
+									BYTE* data         = (BYTE*)di->GetData();
+									size_t size        = (size_t)di->GetDataSize();
+
+									BITMAPINFOHEADER pbmi;
+									memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
+									pbmi.biSize        = sizeof(pbmi);
+									pbmi.biWidth       = (LONG)vse->GetWidth();
+									pbmi.biHeight      = (LONG)vse->GetHeight();
+									pbmi.biCompression = FCC('AVC1');
+									pbmi.biPlanes      = 1;
+									pbmi.biBitCount    = 24;
+									pbmi.biSizeImage   = DIBSIZE(pbmi);
+
+									CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
+									mt.SetSampleSize(pbmi.biSizeImage);
+
+									mts.RemoveAll();
+									mts.Add(mt);
+								}
+								break;
+							case AP4_ATOM_TYPE_HVC1:
+							case AP4_ATOM_TYPE_HEV1:
+							case AP4_ATOM_TYPE_DVHE:
+							case AP4_ATOM_TYPE_DVH1:
+								{
+									SetTrackName(&TrackName, L"HEVC Video (H.265)");
+
+									const AP4_DataBuffer* di = NULL;
+									if (AP4_DataInfoAtom* hvcC = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_HVCC))) {
+										di = hvcC->GetData();
+									}
+									if (!di) {
+										di = &empty;
+									}
+
+									BYTE* data         = (BYTE*)di->GetData();
+									size_t size        = (size_t)di->GetDataSize();
+
+									BITMAPINFOHEADER pbmi;
+									memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
+									pbmi.biSize        = sizeof(pbmi);
+									pbmi.biWidth       = (LONG)vse->GetWidth();
+									pbmi.biHeight      = (LONG)vse->GetHeight();
+									pbmi.biCompression = FCC('HVC1');
+									pbmi.biPlanes      = 1;
+									pbmi.biBitCount    = 24;
+									pbmi.biSizeImage   = DIBSIZE(pbmi);
+
+									vc_params_t params = { 0 };
+									HEVCParser::ParseHEVCDecoderConfigurationRecord(data, size, params, false);
+
+									CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size, params.profile, params.level, params.nal_length_size);
+									mt.SetSampleSize(pbmi.biSizeImage);
+
+									mts.RemoveAll();
+									mts.Add(mt);
+								}
+								break;
+						}
 					} else if (AP4_AudioSampleEntry* ase = dynamic_cast<AP4_AudioSampleEntry*>(atom)) {
 						DWORD fourcc        = _byteswap_ulong(ase->GetType());
 						DWORD samplerate    = ase->GetSampleRate();
