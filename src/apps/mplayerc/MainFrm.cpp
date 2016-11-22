@@ -9172,7 +9172,15 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 	if (streamCount) {
 		streamCount--;
 	}
-	if (id != -1 && id >= (m_pSubStreams.GetCount() + streamCount)) {
+
+	size_t subStreamCount = 0;
+	POSITION pos = m_pSubStreams.GetHeadPosition();
+	while (pos) {
+		CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
+		subStreamCount += pSubStream->GetStreamCount();
+	}
+
+	if (id != -1 && id >= (subStreamCount + streamCount)) {
 		id = 0;
 	}
 
