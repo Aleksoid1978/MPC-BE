@@ -39,6 +39,9 @@ class CGPUUsage
 	typedef int (*ADL_OVERDRIVE6_CAPABILITIES_GET)(int iAdapterIndex, ADLOD6Capabilities *lpODCapabilities);
 	typedef int	(*ADL_OVERDRIVE6_CURRENTSTATUS_GET)(int iAdapterIndex, ADLOD6CurrentStatus *lpCurrentStatus);
 
+	typedef int (*ADL2_OVERDRIVEN_CAPABILITIES_GET)(ADL_CONTEXT_HANDLE, int, ADLODNCapabilities*);
+	typedef int (*ADL2_OVERDRIVEN_PERFORMANCESTATUS_GET)(ADL_CONTEXT_HANDLE, int, ADLODNPerformanceStatus*);
+
 	#define OK                            0
 	#define NVAPI_MAX_PHYSICAL_GPUS      64
 	#define NVAPI_MAX_USAGES_PER_GPU     33
@@ -103,13 +106,14 @@ private:
 	volatile LONG m_lRunCount;
 
 	struct {
-		HMODULE                            hAtiADL;
-		int                                iAdapterId;
-		int                                iOverdriveVersion;
+		HMODULE                               hAtiADL;
+		int                                   iAdapterId;
+		int                                   iOverdriveVersion;
 
-		ADL_MAIN_CONTROL_DESTROY           ADL_Main_Control_Destroy;
-		ADL_OVERDRIVE5_CURRENTACTIVITY_GET ADL_Overdrive5_CurrentActivity_Get;
-		ADL_OVERDRIVE6_CURRENTSTATUS_GET   ADL_Overdrive6_CurrentStatus_Get;
+		ADL_MAIN_CONTROL_DESTROY              ADL_Main_Control_Destroy;
+		ADL_OVERDRIVE5_CURRENTACTIVITY_GET    ADL_Overdrive5_CurrentActivity_Get;
+		ADL_OVERDRIVE6_CURRENTSTATUS_GET      ADL_Overdrive6_CurrentStatus_Get;
+		ADL2_OVERDRIVEN_PERFORMANCESTATUS_GET ADL2_OverdriveN_PerformanceStatus_Get;
 	} ATIData;
 
 	struct {
