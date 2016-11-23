@@ -1614,45 +1614,44 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 	m_DXVADecoderGUID = GUID_NULL;
 
 	if (m_pDecoderService) {
-		UINT cDecoderGuids				= 0;
-		GUID* pDecoderGuids				= NULL;
-		GUID guidDecoder				= GUID_NULL;
-		BOOL bFoundDXVA2Configuration	= FALSE;
-		DXVA2_ConfigPictureDecode config;
-		ZeroMemory(&config, sizeof(config));
+		UINT cDecoderGuids               = 0;
+		GUID* pDecoderGuids              = NULL;
+		GUID decoderGuid                 = GUID_NULL;
+		BOOL bFoundDXVA2Configuration    = FALSE;
+		DXVA2_ConfigPictureDecode config = { 0 };
 
 		if (SUCCEEDED(hr = m_pDecoderService->GetDecoderDeviceGuids(&cDecoderGuids, &pDecoderGuids)) && cDecoderGuids) {
 
-			BOOL supported = FALSE;
+			std::vector<GUID> supportedDecoderGuids;
 			DbgLog((LOG_TRACE, 3, L"	=> Enumerating supported DXVA2 modes:"));
 			for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
 				CString msg;
 				msg.Format(L"		%s", GetGUIDString(pDecoderGuids[iGuid]));
 				if (IsSupportedDecoderMode(&pDecoderGuids[iGuid])) {
 					msg.Append(L" - supported");
-					supported = TRUE;
+					supportedDecoderGuids.emplace_back(pDecoderGuids[iGuid]);
 				}
 				DbgLog((LOG_TRACE, 3, msg));
 			}
 
-			if (supported) {
+			if (!supportedDecoderGuids.empty()) {
 				UINT idx = 0;
-				while (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[idx] != GUID_NULL && guidDecoder == GUID_NULL) {
-					for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
-						if (*ffCodecs[m_nCodecNb].DXVAModes->Decoder[idx] == pDecoderGuids[iGuid]) {
-							DbgLog((LOG_TRACE, 3, L"	=> Attempt : %s", GetGUIDString(pDecoderGuids[iGuid])));
+				auto decoderGuids = ffCodecs[m_nCodecNb].DXVAModes->Decoder;
+				while (*decoderGuids[idx] != GUID_NULL && decoderGuid == GUID_NULL) {
+					auto guid = std::find(supportedDecoderGuids.begin(), supportedDecoderGuids.end(), *decoderGuids[idx]);
+					if (guid != supportedDecoderGuids.end()) {
+						DbgLog((LOG_TRACE, 3, L"	=> Attempt : %s", GetGUIDString(*guid)));
 
-							// Find a configuration that we support.
-							if (FAILED(hr = FindDXVA2DecoderConfiguration(m_pDecoderService, pDecoderGuids[iGuid], &config, &bFoundDXVA2Configuration))) {
-								break;
-							}
+						// Find a configuration that we support.
+						if (FAILED(hr = FindDXVA2DecoderConfiguration(m_pDecoderService, *guid, &config, &bFoundDXVA2Configuration))) {
+							break;
+						}
 
-							if (bFoundDXVA2Configuration) {
-								// Found a good configuration. Save the GUID.
-								guidDecoder = pDecoderGuids[iGuid];
-								DbgLog((LOG_TRACE, 3, L"	=> Use : %s", GetGUIDString(guidDecoder)));
-								break;
-							}
+						if (bFoundDXVA2Configuration) {
+							// Found a good configuration. Save the GUID.
+							decoderGuid = *guid;
+							DbgLog((LOG_TRACE, 3, L"	=> Use : %s", GetGUIDString(decoderGuid)));
+							break;
 						}
 					}
 					idx++;
@@ -1668,8 +1667,8 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 		}
 
 		if (SUCCEEDED(hr)) {
-			m_DXVA2Config		= config;
-			m_DXVADecoderGUID	= guidDecoder;
+			m_DXVA2Config     = config;
+			m_DXVADecoderGUID = decoderGuid;
 		}
 	}
 
