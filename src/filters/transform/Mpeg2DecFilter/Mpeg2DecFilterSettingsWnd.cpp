@@ -98,10 +98,10 @@ bool CMpeg2DecSettingsWnd::OnActivate()
 
 	m_ditype_static.Create(ResStr(IDS_MPEG2_DEINTERLACING), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(100), m_fontheight)), this);
 	m_ditype_combo.Create(dwStyle | CBS_DROPDOWNLIST, CRect(p + CSize(ScaleX(110), -4), CSize(ScaleX(100), 200)), this, IDC_PP_COMBO1);
-	m_ditype_combo.SetItemData(m_ditype_combo.AddString(_T("Auto")), (DWORD)DIAuto);
-	m_ditype_combo.SetItemData(m_ditype_combo.AddString(_T("Weave")), (DWORD)DIWeave);
-	m_ditype_combo.SetItemData(m_ditype_combo.AddString(_T("Blend")), (DWORD)DIBlend);
-	m_ditype_combo.SetItemData(m_ditype_combo.AddString(_T("Bob")), (DWORD)DIBob);
+	AddStringData(m_ditype_combo, L"Auto",  DIAuto);
+	AddStringData(m_ditype_combo, L"Weave", DIWeave);
+	AddStringData(m_ditype_combo, L"Blend", DIBlend);
+	AddStringData(m_ditype_combo, L"Bob",   DIBob);
 	m_ditype_combo.SetCurSel(0);
 	SelectByItemData(m_ditype_combo, m_ditype);
 	m_ditype_combo.EnableWindow(!IsDlgButtonChecked(m_interlaced_check.GetDlgCtrlID()));

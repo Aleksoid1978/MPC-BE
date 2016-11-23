@@ -94,7 +94,7 @@ BOOL CMediaTypesDlg::OnInitDialog()
 			continue;
 		}
 
-		m_pins.SetItemData(m_pins.AddString(CString(path.GetTail())), (DWORD_PTR)i);
+		AddStringData(m_pins, path.GetTail(), i);
 	}
 
 	m_pins.SetCurSel(0);

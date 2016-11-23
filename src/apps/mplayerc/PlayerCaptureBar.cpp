@@ -465,7 +465,7 @@ static void InitCodecList(CAtlArray<Codec>& codecs, CComboBox& box, const GUID& 
 	box.ResetContent();
 	box.EnableWindow(FALSE);
 
-	box.SetItemData(box.AddString(L"Uncompressed"), (DWORD_PTR)-1);
+	AddStringData(box, L"Uncompressed", -1);
 
 	BeginEnumSysDev(cat, pMoniker) {
 		Codec c;
@@ -509,9 +509,7 @@ static void InitCodecList(CAtlArray<Codec>& codecs, CComboBox& box, const GUID& 
 		}
 		c.FriendlyName.AppendFormat(L" %s", var.bstrVal);
 
-		box.SetItemData(
-			box.AddString(c.FriendlyName),
-			(DWORD_PTR)codecs.Add(c));
+		AddStringData(box, c.FriendlyName, (int)codecs.Add(c));
 	}
 	EndEnumSysDev
 
@@ -1049,7 +1047,7 @@ void CPlayerCaptureDialog::SetupVideoControls(
 						break;
 				}
 
-				m_vidinput.SetItemData(m_vidinput.AddString(str), i);
+				AddStringData(m_vidinput, str, i);
 			}
 		}
 	}
@@ -1124,13 +1122,13 @@ void CPlayerCaptureDialog::SetupVideoControls(
 
 	if (m_pAMVfwCD = pAMVfwCD) {
 		if (S_OK == m_pAMVfwCD->HasDialog(VfwCaptureDialog_Source)) {
-			m_vidinput.SetItemData(m_vidinput.AddString(_T("Source")), (DWORD_PTR)VfwCaptureDialog_Source);
+			AddStringData(m_vidinput, L"Source", VfwCaptureDialog_Source);
 		}
 		if (S_OK == m_pAMVfwCD->HasDialog(VfwCaptureDialog_Format)) {
-			m_vidinput.SetItemData(m_vidinput.AddString(_T("Format")), (DWORD_PTR)VfwCaptureDialog_Format);
+			AddStringData(m_vidinput, L"Format", VfwCaptureDialog_Format);
 		}
 		if (S_OK == m_pAMVfwCD->HasDialog(VfwCaptureDialog_Display)) {
-			m_vidinput.SetItemData(m_vidinput.AddString(_T("Display")), (DWORD_PTR)VfwCaptureDialog_Display);
+			AddStringData(m_vidinput, L"Display", VfwCaptureDialog_Display);
 		}
 
 		if (m_vidinput.GetCount() > 0) {
@@ -1189,7 +1187,7 @@ void CPlayerCaptureDialog::SetupAudioControls(
 
 		for (size_t i = 0; i < m_pAMAIM.GetCount(); i++) {
 			CComQIPtr<IPin> pPin = m_pAMAIM[i];
-			m_audinput.SetItemData(m_audinput.AddString(CString(GetPinName(pPin))), i);
+			AddStringData(m_audinput, GetPinName(pPin), i);
 
 			BOOL fEnable;
 			if (SUCCEEDED(m_pAMAIM[i]->get_Enable(&fEnable)) && fEnable) {

@@ -121,18 +121,12 @@ BOOL CPPagePlayback::OnInitDialog()
 	}
 	m_nVolumeStep = s.nVolumeStep - 1;
 
-	m_nSpeedStepCtrl.AddString(ResStr(IDS_AG_AUTO));
-	m_nSpeedStepCtrl.SetItemData(m_nSpeedStepCtrl.GetCount() - 1, 0);
-	m_nSpeedStepCtrl.AddString(L"0.1");
-	m_nSpeedStepCtrl.SetItemData(m_nSpeedStepCtrl.GetCount() - 1, 10);
-	m_nSpeedStepCtrl.AddString(L"0.2");
-	m_nSpeedStepCtrl.SetItemData(m_nSpeedStepCtrl.GetCount() - 1, 20);
-	m_nSpeedStepCtrl.AddString(L"0.25");
-	m_nSpeedStepCtrl.SetItemData(m_nSpeedStepCtrl.GetCount() - 1, 25);
-	m_nSpeedStepCtrl.AddString(L"0.5");
-	m_nSpeedStepCtrl.SetItemData(m_nSpeedStepCtrl.GetCount() - 1, 50);
-	m_nSpeedStepCtrl.AddString(L"1.0");
-	m_nSpeedStepCtrl.SetItemData(m_nSpeedStepCtrl.GetCount() - 1, 100);
+	AddStringData(m_nSpeedStepCtrl, ResStr(IDS_AG_AUTO), 0);
+	AddStringData(m_nSpeedStepCtrl, L"0.1",  10);
+	AddStringData(m_nSpeedStepCtrl, L"0.2",  20);
+	AddStringData(m_nSpeedStepCtrl, L"0.25", 25);
+	AddStringData(m_nSpeedStepCtrl, L"0.5",  50);
+	AddStringData(m_nSpeedStepCtrl, L"1.0", 100);
 	SelectByItemData(m_nSpeedStepCtrl, s.nSpeedStep);
 
 	m_chkRememberZoomLevel.SetCheck(s.fRememberZoomLevel);

@@ -192,7 +192,7 @@ BOOL CPPageVideo::OnInitDialog()
 			sName.AppendFormat(L" %s", ResStr(IDS_REND_NOT_AVAILABLE));
 		}
 
-		m_cbVideoRenderer.SetItemData(m_cbVideoRenderer.AddString(sName), nID);
+		AddStringData(m_cbVideoRenderer, sName, nID);
 	};
 
 
@@ -231,10 +231,10 @@ BOOL CPPageVideo::OnInitDialog()
 
 	OnDSRendererChange();
 
-	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"8-bit Integer"), D3DFMT_X8R8G8B8);
-	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"10-bit Integer"), D3DFMT_A2R10G10B10);
-	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"16-bit Floating Point"), D3DFMT_A16B16G16R16F);
-	m_cbDX9SurfaceFormat.SetItemData(m_cbDX9SurfaceFormat.AddString(L"32-bit Floating Point"), D3DFMT_A32B32G32R32F);
+	AddStringData(m_cbDX9SurfaceFormat, L"8-bit Integer", D3DFMT_X8R8G8B8);
+	AddStringData(m_cbDX9SurfaceFormat, L"10-bit Integer", D3DFMT_A2R10G10B10);
+	AddStringData(m_cbDX9SurfaceFormat, L"16-bit Floating Point", D3DFMT_A16B16G16R16F);
+	AddStringData(m_cbDX9SurfaceFormat, L"32-bit Floating Point", D3DFMT_A32B32G32R32F);
 	m_cbDX9SurfaceFormat.SetCurSel(0); // default
 	SelectByItemData(m_cbDX9SurfaceFormat, rs.iSurfaceFormat);
 
@@ -329,21 +329,21 @@ void CPPageVideo::UpdateResizerList(int select)
 	m_cbDX9Resizer.SetRedraw(FALSE);
 	m_cbDX9Resizer.ResetContent();
 
-	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Nearest neighbor"), RESIZER_NEAREST);
-	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"Bilinear"), RESIZER_BILINEAR);
+	AddStringData(m_cbDX9Resizer, L"Nearest neighbor", RESIZER_NEAREST);
+	AddStringData(m_cbDX9Resizer, L"Bilinear", RESIZER_BILINEAR);
 #if DXVAVP
 	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
-		m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"DXVA2 (Intel GPU only)"), RESIZER_DXVA2);
+		AddStringData(m_cbDX9Resizer, L"DXVA2 (Intel GPU only)", RESIZER_DXVA2);
 	}
 #endif
-	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: B-spline4"), RESIZER_SHADER_BSPLINE4);
-	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Mitchell-Netravali spline4"), RESIZER_SHADER_MITCHELL4);
-	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Catmull-Rom spline4"), RESIZER_SHADER_CATMULL4);
-	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Bicubic A=-0.6"), RESIZER_SHADER_BICUBIC06);
-	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Bicubic A=-0.8"), RESIZER_SHADER_BICUBIC08);
-	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Bicubic A=-1.0"), RESIZER_SHADER_BICUBIC10);
-	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Lanczos2"), RESIZER_SHADER_LANCZOS2);
-	m_cbDX9Resizer.SetItemData(m_cbDX9Resizer.AddString(L"PS: Lanczos3"), RESIZER_SHADER_LANCZOS3);
+	AddStringData(m_cbDX9Resizer, L"PS: B-spline4", RESIZER_SHADER_BSPLINE4);
+	AddStringData(m_cbDX9Resizer, L"PS: Mitchell-Netravali spline4", RESIZER_SHADER_MITCHELL4);
+	AddStringData(m_cbDX9Resizer, L"PS: Catmull-Rom spline4", RESIZER_SHADER_CATMULL4);
+	AddStringData(m_cbDX9Resizer, L"PS: Bicubic A=-0.6", RESIZER_SHADER_BICUBIC06);
+	AddStringData(m_cbDX9Resizer, L"PS: Bicubic A=-0.8", RESIZER_SHADER_BICUBIC08);
+	AddStringData(m_cbDX9Resizer, L"PS: Bicubic A=-1.0", RESIZER_SHADER_BICUBIC10);
+	AddStringData(m_cbDX9Resizer, L"PS: Lanczos2", RESIZER_SHADER_LANCZOS2);
+	AddStringData(m_cbDX9Resizer, L"PS: Lanczos3", RESIZER_SHADER_LANCZOS3);
 
 	m_cbDX9Resizer.SetCurSel(1); // default
 	SelectByItemData(m_cbDX9Resizer, select);
@@ -355,14 +355,14 @@ void CPPageVideo::UpdateDownscalerList(int select)
 	m_cbDownscaler.SetRedraw(FALSE);
 	m_cbDownscaler.ResetContent();
 
-	m_cbDownscaler.SetItemData(m_cbDownscaler.AddString(L"Nearest neighbor"), RESIZER_NEAREST);
-	m_cbDownscaler.SetItemData(m_cbDownscaler.AddString(L"Bilinear"), RESIZER_BILINEAR);
+	AddStringData(m_cbDownscaler, L"Nearest neighbor", RESIZER_NEAREST);
+	AddStringData(m_cbDownscaler, L"Bilinear", RESIZER_BILINEAR);
 #if DXVAVP
 	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
-		m_cbDownscaler.SetItemData(m_cbDownscaler.AddString(L"DXVA2 (Intel GPU only)"), RESIZER_DXVA2);
+		AddStringData(m_cbDownscaler, L"DXVA2 (Intel GPU only)", RESIZER_DXVA2);
 	}
 #endif
-	m_cbDownscaler.SetItemData(m_cbDownscaler.AddString(L"PS: Simple averaging"), RESIZER_SHADER_AVERAGE);
+	AddStringData(m_cbDownscaler, L"PS: Simple averaging", RESIZER_SHADER_AVERAGE);
 
 	m_cbDownscaler.SetCurSel(1); // default
 	SelectByItemData(m_cbDownscaler, select);
