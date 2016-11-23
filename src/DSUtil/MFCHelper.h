@@ -28,11 +28,9 @@ extern void SetCursor(HWND m_hWnd, UINT nID, LPCTSTR lpCursorName);
 extern void CorrectComboListWidth(CComboBox& ComboBox);
 extern void CorrectCWndWidth(CWnd* pWnd);
 
-extern void SelectByItemData(CComboBox& ComboBox, int data);
-extern void SelectByItemData(CListBox& ListBox, int data);
-
-extern inline int GetCurItemData(CComboBox& ComboBox);
-extern inline int GetCurItemData(CListBox& ListBox);
-
-extern inline void AddStringData(CComboBox& ComboBox, LPCTSTR str, int data);
-extern inline void AddStringData(CListBox& ListBox, LPCTSTR str, int data);
+extern inline void AddStringData(CComboBox& ComboBox, LPCTSTR str, DWORD_PTR data);
+extern inline void AddStringData(CListBox& ListBox, LPCTSTR str, DWORD_PTR data);
+extern inline DWORD_PTR GetCurItemData(CComboBox& ComboBox);
+extern inline DWORD_PTR GetCurItemData(CListBox& ListBox);
+extern void SelectByItemData(CComboBox& ComboBox, DWORD_PTR data);
+extern void SelectByItemData(CListBox& ListBox, DWORD_PTR data);
