@@ -113,43 +113,43 @@ void CorrectCWndWidth(CWnd* pWnd)
 	pWnd->MoveWindow(r);
 }
 
-void SelectByItemData(CComboBox& ComboBox, int data)
+inline void AddStringData(CComboBox& ComboBox, LPCTSTR str, DWORD_PTR data)
+{
+	ComboBox.SetItemData(ComboBox.AddString(str), data);
+}
+
+inline void AddStringData(CListBox& ListBox, LPCTSTR str, DWORD_PTR data)
+{
+	ListBox.SetItemData(ListBox.AddString(str), data);
+}
+
+inline DWORD_PTR GetCurItemData(CComboBox& ComboBox)
+{
+	return ComboBox.GetItemData(ComboBox.GetCurSel());
+}
+
+inline DWORD_PTR GetCurItemData(CListBox& ListBox)
+{
+	return ListBox.GetItemData(ListBox.GetCurSel());
+}
+
+void SelectByItemData(CComboBox& ComboBox, DWORD_PTR data)
 {
 	for (int i = 0; i < ComboBox.GetCount(); i++) {
-		if (ComboBox.GetItemData(i) == (DWORD_PTR)data) {
+		if (ComboBox.GetItemData(i) == data) {
 			ComboBox.SetCurSel(i);
 			break;
 		}
 	}
 }
 
-void SelectByItemData(CListBox& ListBox, int data)
+void SelectByItemData(CListBox& ListBox, DWORD_PTR data)
 {
 	for (int i = 0; i < ListBox.GetCount(); i++) {
-		if (ListBox.GetItemData(i) == (DWORD_PTR)data) {
+		if (ListBox.GetItemData(i) == data) {
 			ListBox.SetCurSel(i);
 			ListBox.SetTopIndex(i);
 			break;
 		}
 	}
-}
-
-inline int GetCurItemData(CComboBox& ComboBox)
-{
-	return (int)ComboBox.GetItemData(ComboBox.GetCurSel());
-}
-
-inline int GetCurItemData(CListBox& ListBox)
-{
-	return (int)ListBox.GetItemData(ListBox.GetCurSel());
-}
-
-inline void AddStringData(CComboBox& ComboBox, LPCTSTR str, int data)
-{
-	ComboBox.SetItemData(ComboBox.AddString(str), (DWORD_PTR)data);
-}
-
-inline void AddStringData(CListBox& ListBox, LPCTSTR str, int data)
-{
-	ListBox.SetItemData(ListBox.AddString(str), (DWORD_PTR)data);
 }
