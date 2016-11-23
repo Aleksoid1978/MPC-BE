@@ -43,7 +43,7 @@ ifeq ($(64BIT),yes)
 else
 	TARGET_OS	 = i686-w64-mingw32
 	CFLAGS		+= -DWIN32 -D_WIN32 -DARCH_X86_32
-	OPTFLAGS	 = -m32 -march=i686 -msse -mfpmath=sse,387
+	OPTFLAGS	 = -m32 -march=i686 -msse -mfpmath=sse
 	YASMFLAGS	+= -f win32 -m x86 -DWIN32=1 -DARCH_X86_32=1 -DARCH_X86_64=0 -DPREFIX
 endif
 
@@ -302,6 +302,7 @@ SRCS_LC = \
 	libavcodec/mpeg12.c \
 	libavcodec/mpeg12data.c \
 	libavcodec/mpeg12dec.c \
+	libavcodec/mpeg12framerate.c \
 	libavcodec/mpeg4audio.c \
 	libavcodec/mpeg4video.c \
 	libavcodec/mpeg4video_parser.c \
@@ -345,8 +346,10 @@ SRCS_LC_B = \
 	libavcodec/opus.c \
 	libavcodec/opus_celt.c \
 	libavcodec/opus_parser.c \
+	libavcodec/opus_rc.c \
 	libavcodec/opus_silk.c \
 	libavcodec/opusdec.c \
+	libavcodec/opustab.c \
 	libavcodec/parser.c \
 	libavcodec/pixblockdsp.c \
 	libavcodec/png.c \
