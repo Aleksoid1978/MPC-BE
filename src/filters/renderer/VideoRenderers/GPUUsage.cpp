@@ -84,12 +84,13 @@ void CGPUUsage::Clean()
 
 	m_GPUType = UNKNOWN_GPU;
 
-	ATIData.iAdapterId							= -1;
-	ATIData.iOverdriveVersion					= 0;
-	ATIData.hAtiADL								= NULL;
-	ATIData.ADL_Main_Control_Destroy			= NULL;
-	ATIData.ADL_Overdrive5_CurrentActivity_Get	= NULL;
-	ATIData.ADL_Overdrive6_CurrentStatus_Get	= NULL;
+	ATIData.iAdapterId                            = -1;
+	ATIData.iOverdriveVersion                     = 0;
+	ATIData.hAtiADL                               = NULL;
+	ATIData.ADL_Main_Control_Destroy              = NULL;
+	ATIData.ADL_Overdrive5_CurrentActivity_Get    = NULL;
+	ATIData.ADL_Overdrive6_CurrentStatus_Get      = NULL;
+	ATIData.ADL2_OverdriveN_PerformanceStatus_Get = NULL;
 
 	ZeroMemory(&NVData.gpuHandles, sizeof(NVData.gpuHandles));
 
@@ -133,12 +134,14 @@ HRESULT CGPUUsage::Init(CString DeviceName, CString Device)
 			ADL_ADAPTER_NUMBEROFADAPTERS_GET ADL_Adapter_NumberOfAdapters_Get;
 			ADL_ADAPTER_ADAPTERINFO_GET      ADL_Adapter_AdapterInfo_Get;
 			ADL_ADAPTER_ACTIVE_GET           ADL_Adapter_Active_Get;
+			ADL_OVERDRIVE_CAPS               ADL_Overdrive_Caps;
 
 			ADL_Main_Control_Create          = (ADL_MAIN_CONTROL_CREATE)GetProcAddress(ATIData.hAtiADL,"ADL_Main_Control_Create");
 			ATIData.ADL_Main_Control_Destroy = (ADL_MAIN_CONTROL_DESTROY)GetProcAddress(ATIData.hAtiADL,"ADL_Main_Control_Destroy");
 			ADL_Adapter_NumberOfAdapters_Get = (ADL_ADAPTER_NUMBEROFADAPTERS_GET)GetProcAddress(ATIData.hAtiADL,"ADL_Adapter_NumberOfAdapters_Get");
 			ADL_Adapter_AdapterInfo_Get      = (ADL_ADAPTER_ADAPTERINFO_GET)GetProcAddress(ATIData.hAtiADL,"ADL_Adapter_AdapterInfo_Get");
 			ADL_Adapter_Active_Get           = (ADL_ADAPTER_ACTIVE_GET)GetProcAddress(ATIData.hAtiADL, "ADL_Adapter_Active_Get");
+			ADL_Overdrive_Caps               = (ADL_OVERDRIVE_CAPS)GetProcAddress(ATIData.hAtiADL, "ADL_Overdrive_Caps");
 
 			if (NULL == ADL_Main_Control_Create ||
 					NULL == ATIData.ADL_Main_Control_Destroy ||
@@ -166,44 +169,77 @@ HRESULT CGPUUsage::Init(CString DeviceName, CString Device)
 									continue;
 								}
 
-								static const int iOverdriveVersions[] = {6, 5};
-								for (int i = 0; i < _countof(iOverdriveVersions); i++) {
-									if (iOverdriveVersions[i] == 5) {
-										ADL_OVERDRIVE5_ODPARAMETERS_GET ADL_Overdrive5_ODParameters_Get;
+								int iOverdriveVersions[] = {5, 6, 7};
+								int iOverdriveSupported  = 0;
+								int iOverdriveEnabled    = 0;
+								int iOverdriveVersion    = 0;
+								if (ADL_Overdrive_Caps
+										&& ADL_OK == ADL_Overdrive_Caps(adapterInfo.iAdapterIndex, &iOverdriveSupported, &iOverdriveEnabled, &iOverdriveVersion)
+										&& iOverdriveSupported) {
+									iOverdriveVersions[0] = iOverdriveVersion;
+									iOverdriveVersions[1] = 0;
+									iOverdriveVersions[2] = 0;
+								}
 
-										ADL_Overdrive5_ODParameters_Get            = (ADL_OVERDRIVE5_ODPARAMETERS_GET)GetProcAddress(ATIData.hAtiADL, "ADL_Overdrive5_ODParameters_Get");
-										ATIData.ADL_Overdrive5_CurrentActivity_Get = (ADL_OVERDRIVE5_CURRENTACTIVITY_GET)GetProcAddress(ATIData.hAtiADL, "ADL_Overdrive5_CurrentActivity_Get");
-										if (NULL == ADL_Overdrive5_ODParameters_Get || NULL == ATIData.ADL_Overdrive5_CurrentActivity_Get) {
-											continue;
-										}
+								for (int i = 0; i < _countof(iOverdriveVersions) && iOverdriveVersions[i] != 0; i++) {
+									switch (iOverdriveVersions[i]) {
+										case 5:
+											{
+												ADL_OVERDRIVE5_ODPARAMETERS_GET ADL_Overdrive5_ODParameters_Get;
 
-										ADLODParameters overdriveParameters = { sizeof(overdriveParameters) };
-										if (ADL_OK != ADL_Overdrive5_ODParameters_Get(adapterInfo.iAdapterIndex, &overdriveParameters) || !overdriveParameters.iActivityReportingSupported) {
-											continue;
-										}
+												ADL_Overdrive5_ODParameters_Get            = (ADL_OVERDRIVE5_ODPARAMETERS_GET)GetProcAddress(ATIData.hAtiADL, "ADL_Overdrive5_ODParameters_Get");
+												ATIData.ADL_Overdrive5_CurrentActivity_Get = (ADL_OVERDRIVE5_CURRENTACTIVITY_GET)GetProcAddress(ATIData.hAtiADL, "ADL_Overdrive5_CurrentActivity_Get");
+												if (NULL == ADL_Overdrive5_ODParameters_Get || NULL == ATIData.ADL_Overdrive5_CurrentActivity_Get) {
+													continue;
+												}
 
-										ATIData.iAdapterId = adapterInfo.iAdapterIndex;
-										ATIData.iOverdriveVersion = iOverdriveVersions[i];
+												ADLODParameters overdriveParameters = { sizeof(overdriveParameters) };
+												if (ADL_OK != ADL_Overdrive5_ODParameters_Get(adapterInfo.iAdapterIndex, &overdriveParameters) || !overdriveParameters.iActivityReportingSupported) {
+													continue;
+												}
 
-										break;
-									} else if (iOverdriveVersions[i] == 6) {
-										ADL_OVERDRIVE6_CAPABILITIES_GET ADL_Overdrive6_Capabilities_Get;
+												ATIData.iAdapterId = adapterInfo.iAdapterIndex;
+												ATIData.iOverdriveVersion = iOverdriveVersions[i];
+											}
+											break;
+										case 6:
+											{
+												ADL_OVERDRIVE6_CAPABILITIES_GET ADL_Overdrive6_Capabilities_Get;
 
-										ADL_Overdrive6_Capabilities_Get          = (ADL_OVERDRIVE6_CAPABILITIES_GET)GetProcAddress(ATIData.hAtiADL, "ADL_Overdrive6_Capabilities_Get");
-										ATIData.ADL_Overdrive6_CurrentStatus_Get = (ADL_OVERDRIVE6_CURRENTSTATUS_GET)GetProcAddress(ATIData.hAtiADL, "ADL_Overdrive6_CurrentStatus_Get");
-										if (NULL == ADL_Overdrive6_Capabilities_Get || NULL == ATIData.ADL_Overdrive6_CurrentStatus_Get) {
-											continue;
-										}
+												ADL_Overdrive6_Capabilities_Get          = (ADL_OVERDRIVE6_CAPABILITIES_GET)GetProcAddress(ATIData.hAtiADL, "ADL_Overdrive6_Capabilities_Get");
+												ATIData.ADL_Overdrive6_CurrentStatus_Get = (ADL_OVERDRIVE6_CURRENTSTATUS_GET)GetProcAddress(ATIData.hAtiADL, "ADL_Overdrive6_CurrentStatus_Get");
+												if (NULL == ADL_Overdrive6_Capabilities_Get || NULL == ATIData.ADL_Overdrive6_CurrentStatus_Get) {
+													continue;
+												}
 
-										ADLOD6Capabilities od6Capabilities = { 0 };
-										if (ADL_OK != ADL_Overdrive6_Capabilities_Get(adapterInfo.iAdapterIndex, &od6Capabilities) || (od6Capabilities.iCapabilities & ADL_OD6_CAPABILITY_GPU_ACTIVITY_MONITOR) != ADL_OD6_CAPABILITY_GPU_ACTIVITY_MONITOR) {
-											continue;
-										}
+												ADLOD6Capabilities od6Capabilities = { 0 };
+												if (ADL_OK != ADL_Overdrive6_Capabilities_Get(adapterInfo.iAdapterIndex, &od6Capabilities) || (od6Capabilities.iCapabilities & ADL_OD6_CAPABILITY_GPU_ACTIVITY_MONITOR) != ADL_OD6_CAPABILITY_GPU_ACTIVITY_MONITOR) {
+													continue;
+												}
 
-										ATIData.iAdapterId = adapterInfo.iAdapterIndex;
-										ATIData.iOverdriveVersion = iOverdriveVersions[i];
+												ATIData.iAdapterId = adapterInfo.iAdapterIndex;
+												ATIData.iOverdriveVersion = iOverdriveVersions[i];
+											}
+											break;
+										case 7:
+											{
+												ADL2_OVERDRIVEN_CAPABILITIES_GET ADL2_OverdriveN_Capabilities_Get;
 
-										break;
+												ADL2_OverdriveN_Capabilities_Get              = (ADL2_OVERDRIVEN_CAPABILITIES_GET)GetProcAddress(ATIData.hAtiADL, "ADL2_OverdriveN_Capabilities_Get");
+												ATIData.ADL2_OverdriveN_PerformanceStatus_Get = (ADL2_OVERDRIVEN_PERFORMANCESTATUS_GET)GetProcAddress(ATIData.hAtiADL,"ADL2_OverdriveN_PerformanceStatus_Get");
+												if (NULL == ADL2_OverdriveN_Capabilities_Get || NULL == ATIData.ADL2_OverdriveN_PerformanceStatus_Get) {
+													continue;
+												}
+
+												ADLODNCapabilities overdriveCapabilities = { 0 };
+												if (ADL_OK != ADL2_OverdriveN_Capabilities_Get(NULL, adapterInfo.iAdapterIndex, &overdriveCapabilities)) {
+													continue;
+												}
+
+												ATIData.iAdapterId = adapterInfo.iAdapterIndex;
+												ATIData.iOverdriveVersion = iOverdriveVersions[i];
+											}
+											break;
 									}
 								}
 
@@ -323,18 +359,34 @@ void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage
 		}
 
 		if (m_GPUType == ATI_GPU) {
-			if (ATIData.iOverdriveVersion == 5) {
-				ADLPMActivity activity = { sizeof(activity) };
-				if (ADL_OK == ATIData.ADL_Overdrive5_CurrentActivity_Get(ATIData.iAdapterId, &activity)) {
-					m_iGPUUsage = activity.iActivityPercent;
-					m_iGPUClock = activity.iEngineClock / 100;
-				}
-			} else if (ATIData.iOverdriveVersion == 6) {
-				ADLOD6CurrentStatus currentStatus = { 0 };
-				if (ADL_OK == ATIData.ADL_Overdrive6_CurrentStatus_Get(ATIData.iAdapterId, &currentStatus)) {
-					m_iGPUUsage = currentStatus.iActivityPercent;
-					m_iGPUClock = currentStatus.iEngineClock / 100;
-				}
+			switch (ATIData.iOverdriveVersion) {
+				case 5:
+					{
+						ADLPMActivity activity = { sizeof(activity) };
+						if (ADL_OK == ATIData.ADL_Overdrive5_CurrentActivity_Get(ATIData.iAdapterId, &activity)) {
+							m_iGPUUsage = activity.iActivityPercent;
+							m_iGPUClock = activity.iEngineClock / 100;
+						}
+					}
+					break;
+				case 6:
+					{
+						ADLOD6CurrentStatus currentStatus = { 0 };
+						if (ADL_OK == ATIData.ADL_Overdrive6_CurrentStatus_Get(ATIData.iAdapterId, &currentStatus)) {
+							m_iGPUUsage = currentStatus.iActivityPercent;
+							m_iGPUClock = currentStatus.iEngineClock / 100;
+						}
+					}
+					break;
+				case 7:
+					{
+						ADLODNPerformanceStatus odNPerformanceStatus = { 0 };
+						if (ADL_OK == ATIData.ADL2_OverdriveN_PerformanceStatus_Get(NULL, ATIData.iAdapterId, &odNPerformanceStatus)) {
+							m_iGPUUsage = odNPerformanceStatus.iGPUActivityPercent;
+							m_iGPUClock = odNPerformanceStatus.iCoreClock / 100;
+						}
+					}
+					break;
 			}
 		} else if (m_GPUType == NVIDIA_GPU) {
 			const int idx = NVData.gpuSelected;
