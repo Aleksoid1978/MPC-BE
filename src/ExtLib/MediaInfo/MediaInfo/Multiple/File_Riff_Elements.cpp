@@ -722,6 +722,7 @@ void File_Riff::AIFF_COMM()
     }
     #endif
 
+    stream& StreamItem = Stream[Stream_ID];
     #if defined(MEDIAINFO_PCM_YES)
         File_Pcm* Parser=new File_Pcm;
         Parser->Codec=Retrieve(Stream_Audio, StreamPos_Last, Audio_CodecID);
@@ -740,9 +741,9 @@ void File_Riff::AIFF_COMM()
         #else //MEDIAINFO_DEMUX
             Parser->Frame_Count_Valid=(int64u)-1; //Disabling it, waiting for SMPTE ST 337 parser reject
         #endif //MEDIAINFO_DEMUX
-        Stream[Stream_ID].Parsers.push_back(Parser);
-        Stream[Stream_ID].IsPcm=true;
-        Stream[Stream_ID].StreamKind=Stream_Audio;
+        StreamItem.Parsers.push_back(Parser);
+        StreamItem.IsPcm=true;
+        StreamItem.StreamKind=Stream_Audio;
     #endif
     #if MEDIAINFO_DEMUX
         BlockAlign=numChannels*sampleSize/8;
@@ -750,8 +751,7 @@ void File_Riff::AIFF_COMM()
     #endif //MEDIAINFO_DEMUX
 
     Element_Code=(int64u)-1;
-    for (size_t Pos=0; Pos<Stream[Stream_ID].Parsers.size(); Pos++)
-        Open_Buffer_Init(Stream[Stream_ID].Parsers[Pos]);
+    Open_Buffer_Init_All();
 }
 
 //---------------------------------------------------------------------------
@@ -1148,6 +1148,7 @@ void File_Riff::AVI__hdlr_strl_indx_SuperIndex(int32u Entry_Count, int32u ChunkI
     Skip_L4(                                                    "Reserved0");
     Skip_L4(                                                    "Reserved1");
     Skip_L4(                                                    "Reserved2");
+    stream& StreamItem = Stream[Stream_ID];
     for (int32u Pos=0; Pos<Entry_Count; Pos++)
     {
         int32u Duration;
@@ -1156,7 +1157,7 @@ void File_Riff::AVI__hdlr_strl_indx_SuperIndex(int32u Entry_Count, int32u ChunkI
         Skip_L4(                                                "Size"); //Size of index chunk at this offset
         Get_L4 (Duration,                                       "Duration"); //time span in stream ticks
         Index_Pos[Offset]=ChunkId;
-        Stream[Stream_ID].indx_Duration+=Duration;
+        StreamItem.indx_Duration+=Duration;
         Element_End0();
     }
 
@@ -1185,7 +1186,8 @@ void File_Riff::AVI__hdlr_strl_strf()
     Element_Name("Stream format");
 
     //Parse depending of kind of stream
-    switch (Stream[Stream_ID].fccType)
+    stream& StreamItem = Stream[Stream_ID];
+    switch (StreamItem.fccType)
     {
         case Elements::AVI__hdlr_strl_strh_auds : AVI__hdlr_strl_strf_auds(); break;
         case Elements::AVI__hdlr_strl_strh_iavs : AVI__hdlr_strl_strf_iavs(); break;
@@ -1196,8 +1198,8 @@ void File_Riff::AVI__hdlr_strl_strf()
     }
 
     //Registering stream
-    Stream[Stream_ID].StreamKind=StreamKind_Last;
-    Stream[Stream_ID].StreamPos=StreamPos_Last;
+    StreamItem.StreamKind=StreamKind_Last;
+    StreamItem.StreamPos=StreamPos_Last;
 }
 
 //---------------------------------------------------------------------------
@@ -1236,7 +1238,8 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
 
     //Filling
     Stream_Prepare(Stream_Audio);
-    Stream[Stream_ID].Compression=FormatTag;
+    stream& StreamItem = Stream[Stream_ID];
+    StreamItem.Compression=FormatTag;
     Ztring Codec; Codec.From_Number(FormatTag, 16);
     Codec.MakeUpperCase();
     CodecID_Fill(Codec, Stream_Audio, StreamPos_Last, InfoCodecID_Format_Riff);
@@ -1250,7 +1253,7 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
         Fill(Stream_Audio, StreamPos_Last, Audio_BitRate, AvgBytesPerSec*8);
     if (BitsPerSample)
         Fill(Stream_Audio, StreamPos_Last, Audio_BitDepth, BitsPerSample);
-    Stream[Stream_ID].AvgBytesPerSec=AvgBytesPerSec; //Saving bitrate for each stream
+    StreamItem.AvgBytesPerSec=AvgBytesPerSec; //Saving bitrate for each stream
     if (SamplesPerSec && TimeReference!=(int64u)-1)
     {
         Fill(Stream_Audio, 0, Audio_Delay, float64_int64s(((float64)TimeReference)*1000/SamplesPerSec));
@@ -1274,7 +1277,7 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
                     Demux_Level=4; //Intermediate
                 }
             #endif //MEDIAINFO_DEMUX
-            Stream[Stream_ID].Parsers.push_back(Parser);
+            StreamItem.Parsers.push_back(Parser);
         }
         #endif
 
@@ -1292,7 +1295,7 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
                     Demux_Level=4; //Intermediate
                 }
             #endif //MEDIAINFO_DEMUX
-            Stream[Stream_ID].Parsers.push_back(Parser);
+            StreamItem.Parsers.push_back(Parser);
         }
         #endif
     }
@@ -1306,7 +1309,7 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
         File_Mpega* Parser=new File_Mpega;
         Parser->CalculateDelay=true;
         Parser->ShouldContinueParsing=true;
-        Stream[Stream_ID].Parsers.push_back(Parser);
+        StreamItem.Parsers.push_back(Parser);
     }
     #endif
     #if defined(MEDIAINFO_AC3_YES)
@@ -1316,7 +1319,7 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
         Parser->Frame_Count_Valid=2;
         Parser->CalculateDelay=true;
         Parser->ShouldContinueParsing=true;
-        Stream[Stream_ID].Parsers.push_back(Parser);
+        StreamItem.Parsers.push_back(Parser);
     }
     #endif
     #if defined(MEDIAINFO_DTS_YES)
@@ -1325,7 +1328,7 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
         File_Dts* Parser=new File_Dts;
         Parser->Frame_Count_Valid=2;
         Parser->ShouldContinueParsing=true;
-        Stream[Stream_ID].Parsers.push_back(Parser);
+        StreamItem.Parsers.push_back(Parser);
     }
     #endif
     #if defined(MEDIAINFO_AAC_YES)
@@ -1335,7 +1338,7 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
         Parser->Mode=File_Aac::Mode_ADTS;
         Parser->Frame_Count_Valid=1;
         Parser->ShouldContinueParsing=true;
-        Stream[Stream_ID].Parsers.push_back(Parser);
+        StreamItem.Parsers.push_back(Parser);
     }
     #endif
     #if defined(MEDIAINFO_PCM_YES)
@@ -1357,8 +1360,9 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
         #else //MEDIAINFO_DEMUX
             Parser->Frame_Count_Valid=(int64u)-1; //Disabling it, waiting for SMPTE ST 337 parser reject
         #endif //MEDIAINFO_DEMUX
-        Stream[Stream_ID].Parsers.push_back(Parser);
-        Stream[Stream_ID].IsPcm=true;
+        stream& StreamItem = Stream[Stream_ID];
+        StreamItem.Parsers.push_back(Parser);
+        StreamItem.IsPcm=true;
     }
     #endif
     #if defined(MEDIAINFO_ADPCM_YES)
@@ -1383,11 +1387,10 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
     {
         File_Ogg* Parser=new File_Ogg;
         Parser->ShouldContinueParsing=true;
-        Stream[Stream_ID].Parsers.push_back(Parser);
+        StreamItem.Parsers.push_back(Parser);
     }
     #endif
-    for (size_t Pos=0; Pos<Stream[Stream_ID].Parsers.size(); Pos++)
-        Open_Buffer_Init(Stream[Stream_ID].Parsers[Pos]);
+    Open_Buffer_Init_All();
 
     //Options
     if (Element_Offset+2>Element_Size)
@@ -1508,10 +1511,11 @@ void File_Riff::AVI__hdlr_strl_strf_auds_Vorbis2()
     Skip_XX(8,                                                  "Vorbis Unknown");
     Element_Begin1("Vorbis options");
     #if defined(MEDIAINFO_OGG_YES)
-        Open_Buffer_Continue(Stream[Stream_ID].Parsers[0]);
-        Open_Buffer_Continue(Stream[Stream_ID].Parsers[0], 0);
-        Finish(Stream[Stream_ID].Parsers[0]);
-        Merge(*Stream[Stream_ID].Parsers[0], StreamKind_Last, 0, StreamPos_Last);
+        stream& StreamItem = Stream[Stream_ID];
+        Open_Buffer_Continue(StreamItem.Parsers[0]);
+        Open_Buffer_Continue(StreamItem.Parsers[0], 0);
+        Finish(StreamItem.Parsers[0]);
+        Merge(*StreamItem.Parsers[0], StreamKind_Last, 0, StreamPos_Last);
         Element_Show();
     #else //MEDIAINFO_MPEG4_YES
         Skip_XX(Element_Size-Element_Offset,                    "(Vorbis headers)");
@@ -1555,13 +1559,12 @@ void File_Riff::AVI__hdlr_strl_strf_auds_ExtensibleWave()
                         Demux_Level=4; //Intermediate
                     }
                 #endif //MEDIAINFO_DEMUX
-                Stream[Stream_ID].Parsers.push_back(Parser);
-                Stream[Stream_ID].IsPcm=true;
+                stream& StreamItem = Stream[Stream_ID];
+                StreamItem.Parsers.push_back(Parser);
+                StreamItem.IsPcm=true;
             }
             #endif
-
-            for (size_t Pos=0; Pos<Stream[Stream_ID].Parsers.size(); Pos++)
-                Open_Buffer_Init(Stream[Stream_ID].Parsers[Pos]);
+            Open_Buffer_Init_All();
         }
         else
         {
@@ -1620,8 +1623,9 @@ void File_Riff::AVI__hdlr_strl_strf_iavs()
         Finish(DV_FromHeader);
 
         Stream_Prepare(Stream_Video);
-        Stream[Stream_ID].Parsers.push_back(new File_DvDif);
-        Open_Buffer_Init(Stream[Stream_ID].Parsers[0]);
+        stream& StreamItem = Stream[Stream_ID];
+        StreamItem.Parsers.push_back(new File_DvDif);
+        Open_Buffer_Init(StreamItem.Parsers[0]);
 
     #else //MEDIAINFO_DVDIF_YES
         //Parsing
@@ -1692,15 +1696,15 @@ void File_Riff::AVI__hdlr_strl_strf_txts()
         if (Element_Size==0)
         {
             //Creating the parser
+            stream& StreamItem = Stream[Stream_ID];
             #if defined(MEDIAINFO_SUBRIP_YES)
-                Stream[Stream_ID].Parsers.push_back(new File_SubRip);
+            StreamItem.Parsers.push_back(new File_SubRip);
             #endif
             #if defined(MEDIAINFO_OTHERTEXT_YES)
-                Stream[Stream_ID].Parsers.push_back(new File_OtherText); //For SSA
+            StreamItem.Parsers.push_back(new File_OtherText); //For SSA
             #endif
 
-            for (size_t Pos=0; Pos<Stream[Stream_ID].Parsers.size(); Pos++)
-                Open_Buffer_Init(Stream[Stream_ID].Parsers[Pos]);
+            Open_Buffer_Init_All();
         }
         else
         {
@@ -1874,8 +1878,7 @@ void File_Riff::AVI__hdlr_strl_strf_vids()
         Stream[Stream_ID].Parsers.push_back(Parser);
     }
     #endif
-    for (size_t Pos=0; Pos<Stream[Stream_ID].Parsers.size(); Pos++)
-        Open_Buffer_Init(Stream[Stream_ID].Parsers[Pos]);
+    Open_Buffer_Init_All();
 
     //Options
     if (Element_Offset>=Element_Size)
@@ -1899,7 +1902,8 @@ void File_Riff::AVI__hdlr_strl_strf_vids_Avc()
     Element_Begin1("AVC options");
     #if defined(MEDIAINFO_AVC_YES)
         //Can be sized block or with 000001
-        File_Avc* Parser=(File_Avc*)Stream[Stream_ID].Parsers[0];
+        stream& StreamItem = Stream[Stream_ID];
+        File_Avc* Parser=(File_Avc*)StreamItem.Parsers[0];
         Parser->MustParse_SPS_PPS=false;
         Parser->SizedBlocks=false;
         Parser->MustSynchronize=true;
@@ -1908,8 +1912,8 @@ void File_Riff::AVI__hdlr_strl_strf_vids_Avc()
         if (!Parser->Status[IsAccepted])
         {
             Element_Offset=Element_Offset_Save;
-            delete Stream[Stream_ID].Parsers[0]; Stream[Stream_ID].Parsers[0]=new File_Avc;
-            Parser=(File_Avc*)Stream[Stream_ID].Parsers[0];
+            delete StreamItem.Parsers[0]; StreamItem.Parsers[0]=new File_Avc;
+            Parser=(File_Avc*)StreamItem.Parsers[0];
             Open_Buffer_Init(Parser);
             Parser->FrameIsAlwaysComplete=true;
             Parser->MustParse_SPS_PPS=true;
@@ -2038,12 +2042,13 @@ void File_Riff::AVI__hdlr_strl_strh()
             break;
         default: ;
     }
-    Stream[Stream_ID].fccType=fccType;
-    Stream[Stream_ID].fccHandler=fccHandler;
-    Stream[Stream_ID].Scale=Scale;
-    Stream[Stream_ID].Rate=Rate;
-    Stream[Stream_ID].Start=Start;
-    Stream[Stream_ID].Length=Length;
+    stream& StreamItem = Stream[Stream_ID];
+    StreamItem.fccType=fccType;
+    StreamItem.fccHandler=fccHandler;
+    StreamItem.Scale=Scale;
+    StreamItem.Rate=Rate;
+    StreamItem.Start=Start;
+    StreamItem.Length=Length;
 }
 
 //---------------------------------------------------------------------------
@@ -2506,13 +2511,14 @@ void File_Riff::AVI__movi_xxxx()
         return;
     }
 
+    stream& StreamItem = Stream[Stream_ID];
     #if MEDIAINFO_DEMUX
-        if (Stream[Stream_ID].Rate) //AVI
+        if (StreamItem.Rate) //AVI
         {
             int64u Element_Code_Old=Element_Code;
             Element_Code=((Element_Code_Old>>24)&0xF)*10+((Element_Code_Old>>16)&0xF);
-            Frame_Count_NotParsedIncluded=Stream[Stream_ID].PacketPos;
-            FrameInfo.DTS=Frame_Count_NotParsedIncluded*1000000000*Stream[Stream_ID].Scale/Stream[Stream_ID].Rate;
+            Frame_Count_NotParsedIncluded= StreamItem.PacketPos;
+            FrameInfo.DTS=Frame_Count_NotParsedIncluded*1000000000* StreamItem.Scale/ StreamItem.Rate;
             Demux(Buffer+Buffer_Offset, (size_t)Element_Size, ContentType_MainStream);
             Element_Code=Element_Code_Old;
             Frame_Count_NotParsedIncluded=(int64u)-1;
@@ -2523,10 +2529,10 @@ void File_Riff::AVI__movi_xxxx()
         }
     #endif //MEDIAINFO_DEMUX
 
-    Stream[Stream_ID].PacketPos++;
+        StreamItem.PacketPos++;
 
     //Finished?
-    if (!Stream[Stream_ID].SearchingPayload)
+    if (!StreamItem.SearchingPayload)
     {
         Element_DoNotShow();
         AVI__movi_StreamJump();
@@ -2558,37 +2564,37 @@ void File_Riff::AVI__movi_xxxx()
     }
 
     //Parsing
-    for (size_t Pos=0; Pos<Stream[Stream_ID].Parsers.size(); Pos++)
-        if (Stream[Stream_ID].Parsers[Pos])
+    for (size_t Pos=0; Pos<StreamItem.Parsers.size(); Pos++)
+        if (StreamItem.Parsers[Pos])
         {
             if (FrameInfo.PTS!=(int64u)-1)
-                Stream[Stream_ID].Parsers[Pos]->FrameInfo.PTS=FrameInfo.PTS;
+                StreamItem.Parsers[Pos]->FrameInfo.PTS=FrameInfo.PTS;
             if (FrameInfo.DTS!=(int64u)-1)
-                Stream[Stream_ID].Parsers[Pos]->FrameInfo.DTS=FrameInfo.DTS;
+                StreamItem.Parsers[Pos]->FrameInfo.DTS=FrameInfo.DTS;
 
-            Open_Buffer_Continue(Stream[Stream_ID].Parsers[Pos], Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
+            Open_Buffer_Continue(StreamItem.Parsers[Pos], Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
             Element_Show();
-            if (Stream[Stream_ID].Parsers.size()==1 && Stream[Stream_ID].Parsers[Pos]->Buffer_Size>0)
-                Stream[Stream_ID].ChunksAreComplete=false;
+            if (StreamItem.Parsers.size()==1 && StreamItem.Parsers[Pos]->Buffer_Size>0)
+                StreamItem.ChunksAreComplete=false;
 
-            if (Stream[Stream_ID].Parsers.size()>1)
+            if (StreamItem.Parsers.size()>1)
             {
-                if (!Stream[Stream_ID].Parsers[Pos]->Status[IsAccepted] && Stream[Stream_ID].Parsers[Pos]->Status[IsFinished])
+                if (!StreamItem.Parsers[Pos]->Status[IsAccepted] && StreamItem.Parsers[Pos]->Status[IsFinished])
                 {
-                    delete *(Stream[Stream_ID].Parsers.begin()+Pos);
-                    Stream[Stream_ID].Parsers.erase(Stream[Stream_ID].Parsers.begin()+Pos);
+                    delete *(StreamItem.Parsers.begin()+Pos);
+                    StreamItem.Parsers.erase(StreamItem.Parsers.begin()+Pos);
                     Pos--;
                 }
-                else if (Stream[Stream_ID].Parsers.size()>1 && Stream[Stream_ID].Parsers[Pos]->Status[IsAccepted])
+                else if (StreamItem.Parsers.size()>1 && StreamItem.Parsers[Pos]->Status[IsAccepted])
                 {
-                    File__Analyze* Parser=Stream[Stream_ID].Parsers[Pos];
-                    for (size_t Pos2=0; Pos2<Stream[Stream_ID].Parsers.size(); Pos2++)
+                    File__Analyze* Parser= StreamItem.Parsers[Pos];
+                    for (size_t Pos2=0; Pos2<StreamItem.Parsers.size(); Pos2++)
                     {
                         if (Pos2!=Pos)
-                            delete *(Stream[Stream_ID].Parsers.begin()+Pos2);
+                            delete *(StreamItem.Parsers.begin()+Pos2);
                     }
-                    Stream[Stream_ID].Parsers.clear();
-                    Stream[Stream_ID].Parsers.push_back(Parser);
+                    StreamItem.Parsers.clear();
+                    StreamItem.Parsers.push_back(Parser);
                     Pos=0;
                 }
             }
@@ -2596,7 +2602,7 @@ void File_Riff::AVI__movi_xxxx()
             #if MEDIAINFO_DEMUX
                 if (Config->Demux_EventWasSent)
                 {
-                    Demux_Parser=Stream[Stream_ID].Parsers[Pos];
+                    Demux_Parser= StreamItem.Parsers[Pos];
                     return;
                 }
             #endif //MEDIAINFO_DEMUX
@@ -2623,11 +2629,12 @@ void File_Riff::AVI__movi_xxxx()
 void File_Riff::AVI__movi_xxxx___dc()
 {
     //Finish (if requested)
-    if (Stream[Stream_ID].Parsers.empty()
-     || Stream[Stream_ID].Parsers[0]->Status[IsFinished]
-     || (Stream[Stream_ID].PacketPos>=300 && MediaInfoLib::Config.ParseSpeed_Get()<1.00))
+    stream& StreamItem = Stream[Stream_ID];
+    if (StreamItem.Parsers.empty()
+     || StreamItem.Parsers[0]->Status[IsFinished]
+     || (StreamItem.PacketPos>=300 && MediaInfoLib::Config.ParseSpeed_Get()<1.00))
     {
-        Stream[Stream_ID].SearchingPayload=false;
+        StreamItem.SearchingPayload=false;
         stream_Count--;
         return;
     }
@@ -2664,12 +2671,13 @@ void File_Riff::AVI__movi_xxxx___tx()
 void File_Riff::AVI__movi_xxxx___wb()
 {
     //Finish (if requested)
-    if (Stream[Stream_ID].PacketPos>=4 //For having the chunk alignement
-     && (Stream[Stream_ID].Parsers.empty()
-      || Stream[Stream_ID].Parsers[0]->Status[IsFinished]
-      || (Stream[Stream_ID].PacketPos>=300 && MediaInfoLib::Config.ParseSpeed_Get()<1.00)))
+    stream& StreamItem = Stream[Stream_ID];
+    if (StreamItem.PacketPos>=4 //For having the chunk alignement
+     && (StreamItem.Parsers.empty()
+      || StreamItem.Parsers[0]->Status[IsFinished]
+      || (StreamItem.PacketPos>=300 && MediaInfoLib::Config.ParseSpeed_Get()<1.00)))
     {
-        Stream[Stream_ID].SearchingPayload=false;
+        StreamItem.SearchingPayload=false;
         stream_Count--;
     }
 }
@@ -3814,7 +3822,12 @@ void File_Riff::W3DI()
     Fill(Stream_General, 0, General_Comment, Comment);
     Fill(Stream_General, 0, General_Track_Position, TrackPos);
 }
-
+void File_Riff::Open_Buffer_Init_All()
+{
+    stream& StreamItem = Stream[Stream_ID];
+    for (size_t Pos = 0; Pos<StreamItem.Parsers.size(); Pos++)
+        Open_Buffer_Init(StreamItem.Parsers[Pos]);
+}
 //***************************************************************************
 // C++
 //***************************************************************************

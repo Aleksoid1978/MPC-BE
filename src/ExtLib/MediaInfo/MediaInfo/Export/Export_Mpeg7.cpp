@@ -115,7 +115,7 @@ int32u Mpeg7_ContentCS_termID(MediaInfo_Internal &MI)
         return 40200;
     if (Format==__T("MPEG Audio") || Format==__T("Wave"))
         return 10000;
-    if (Format==__T("BMP") || Format==__T("GIF") || Format==__T("JPEG") || Format==__T("JPEG 2000") || Format==__T("JPEG 2000") || Format==__T("PNG") || Format==__T("TIFF"))
+    if (Format==__T("BMP") || Format==__T("GIF") || Format==__T("JPEG") || Format==__T("JPEG 2000") || Format==__T("PNG") || Format==__T("TIFF"))
         return 40100;
     return 500000;
 }
@@ -173,7 +173,7 @@ int32u Mpeg7_FileFormatCS_termID(MediaInfo_Internal &MI)
         return 60000;
     if (Format==__T("JPEG"))
         return 10000;
-    if (Format==__T("JPEG 2000") || Format==__T("JPEG 2000"))
+    if (Format==__T("JPEG 2000"))
         return 20000;
     if (Format==__T("MPEG Audio"))
         return (MI.Get(Stream_Audio, 0, Audio_Format_Profile).find(__T("3"))!=string::npos)?40000:0;

@@ -60,6 +60,8 @@ File_DcpCpl::File_DcpCpl()
 
     //Temp
     ReferenceFiles=NULL;
+    //PKL
+    PKL_Pos = (size_t)-1;
 }
 
 //---------------------------------------------------------------------------

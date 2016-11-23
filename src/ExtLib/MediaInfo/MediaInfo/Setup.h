@@ -322,6 +322,20 @@
         #define MEDIAINFO_READTHREAD 1
     #endif
 #endif
+#if !defined(MEDIAINFO_FIXITY)
+    #if defined(MEDIAINFO_FIXITY_NO) && defined(MEDIAINFO_FIXITY_YES)
+        #undef MEDIAINFO_FIXITY_NO //MEDIAINFO_FIXITY_YES has priority
+    #endif
+    #if defined(MEDIAINFO_FIXITY_NO)
+        #define MEDIAINFO_FIXITY 0
+    #else
+        #if MEDIAINFO_ADVANCED
+            #define MEDIAINFO_FIXITY 1
+        #else //MEDIAINFO_ADVANCED
+            #define MEDIAINFO_FIXITY 0
+        #endif //MEDIAINFO_ADVANCED
+    #endif
+#endif
 
 //***************************************************************************
 // Precise configuration

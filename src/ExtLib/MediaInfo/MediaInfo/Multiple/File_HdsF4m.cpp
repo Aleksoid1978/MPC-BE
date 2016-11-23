@@ -129,10 +129,8 @@ bool File_HdsF4m::FileHeader_Begin()
                 if (string(Root_Item->Value())=="media")
                 {
                     sequence* Sequence=new sequence;
-                    const char* Attribute;
-
                     //Attributes - mineType
-                    Attribute=Root_Item->Attribute("url");
+                    const char* Attribute=Root_Item->Attribute("url");
                     if (Attribute)
                         Sequence->AddFileName(Ztring().From_UTF8(Attribute)+__T("Seg1.f4f"));
 

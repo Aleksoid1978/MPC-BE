@@ -35,6 +35,7 @@ using namespace std;
 namespace ZenLib
 {
 
+bool MemoryDebug::g_IsShutdown = false;
 //***************************************************************************
 // Constructors/destructor
 //***************************************************************************
@@ -47,6 +48,7 @@ MemoryDebug::~MemoryDebug()
 {
     if (!m_Blocks.empty())
         ReportLeaks();
+    g_IsShutdown = true;
 }
 
 //***************************************************************************

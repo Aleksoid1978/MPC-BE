@@ -202,7 +202,6 @@ private :
     void   Filling_FrameHeader(int32u intra);
     int    slice(states &States);
     int    slice_header(states &States);
-    int32u CRC_Compute(size_t Size);
     int32s get_symbol_with_bias_correlation(Slice::ContextPtr context);
     void rgb();
     void plane(int32u pos);

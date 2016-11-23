@@ -2647,9 +2647,9 @@ void File_Mpeg4::IsParsing_mdat_Set()
             File_Mpeg4_TimeCode* Parser = new File_Mpeg4_TimeCode;
             Open_Buffer_Init(Parser);
 
-            ((File_Mpeg4_TimeCode*)Parser)->NumberOfFrames = tc->NumberOfFrames;
-            ((File_Mpeg4_TimeCode*)Parser)->DropFrame = tc->DropFrame;
-            ((File_Mpeg4_TimeCode*)Parser)->NegativeTimes = tc->NegativeTimes;
+            Parser->NumberOfFrames = tc->NumberOfFrames;
+            Parser->DropFrame = tc->DropFrame;
+            Parser->NegativeTimes = tc->NegativeTimes;
 
             int32u TimeCode_Value = TimeCode((TimeCode_String[ 0]-'0') * 10 + (TimeCode_String[ 1]-'0'),
                                              (TimeCode_String[ 3]-'0') * 10 + (TimeCode_String[ 4]-'0'),

@@ -36,10 +36,10 @@ public :
 
     //Output buffer
     size_t Output_Buffer_Get (unsigned char** Output_Buffer=NULL);
-
-//private :
+    bool Is_Wanted(int16u ProgNum, int16u PID) const;
+private :
     File__Duplicate__Writer Writer;
-
+    void Internal_Remove_Wanted_Program(int16u Program_number, bool ToRemove);
     //Configuration
     std::set<int16u> Wanted_program_numbers;
     std::set<int16u> Wanted_program_map_PIDs;
@@ -49,8 +49,10 @@ public :
     std::set<int16u> Remove_elementary_PIDs;
 
     //Current
+public:
     std::vector<int8u> program_map_PIDs;
     std::vector<int8u> elementary_PIDs;
+private:
     std::vector<int16u> elementary_PIDs_program_map_PIDs;
 
     struct buffer

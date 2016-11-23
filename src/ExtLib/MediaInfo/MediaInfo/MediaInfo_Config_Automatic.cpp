@@ -701,6 +701,7 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "Language_en-us;English (United States)\n"
     "Language_eo;Esperanto\n"
     "Language_es;Spanish\n"
+    "Language_es-419;Spanish (Latin America)\n"
     "Language_et;Estonian\n"
     "Language_eu;Basque\n"
     "Language_fa;Persian\n"

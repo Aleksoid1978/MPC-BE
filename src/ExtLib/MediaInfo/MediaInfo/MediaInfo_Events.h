@@ -948,7 +948,7 @@ inline MediaInfo_int64u MediaInfo_ID_FromGet_intA (const char* ID, const char* C
              || strcmp(ContainerFormat, "DCP PKL")==0                                           // DCP PKL
              || strcmp(ContainerFormat, "IMF AM")==0                                            // IMF AM
              || strcmp(ContainerFormat, "IMF PKL")==0)                                          // IMF PKL
-                ToReturn=(ToReturn<<24) | (ToReturn2<<16) | ToReturn2;
+                ToReturn=(ToReturn<<24) | (ToReturn2<<16) | ToReturn3;
         }
         else if (
             strcmp(MuxingMode, "DVD-Video")==0                                                  // DVD-Video

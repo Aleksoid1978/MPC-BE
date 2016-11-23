@@ -118,29 +118,16 @@ struct element_details
             data.set_Option(Option);
             data = parameter;
             if (_Measure)
-            {
-                size_t len = strlen(_Measure);
-                Measure = new char[len + 1];
-                std::memcpy(Measure, _Measure, len);
-                Measure[len] = '\0';
-            }
-            else
-                Measure = NULL;
-        }
-
-        ~Element_Node_Info()
-        {
-            delete[] Measure;
+                Measure = _Measure;
         }
 
         friend std::ostream& operator<<(std::ostream& os, element_details::Element_Node_Info* v);
 
         Element_Node_Data data;
-        char*             Measure;
-
-        Element_Node_Info& operator=(const Element_Node_Info&);
+        std::string       Measure;
 
     private:
+        Element_Node_Info& operator=(const Element_Node_Info&);
         Element_Node_Info(const Element_Node_Info&);
     };
 
@@ -154,7 +141,7 @@ struct element_details
         int64u                           Pos;             // Position of the element in the file
         int64u                           Size;            // Size of the element (including header and sub-elements)
     private:
-        char*                            Name;            // Name planned for this element
+        std::string                      Name;            // Name planned for this element
     public:
         Element_Node_Data                Value;           // The value (currently used only with Trace XML)
         std::vector<Element_Node_Info*>  Infos;           // More info about the element
@@ -163,12 +150,16 @@ struct element_details
         bool                             NoShow;          // Don't show this element
         bool                             OwnChildren;     // Child is owned by this node
         bool                             IsCat;           // Node is a category
+        bool                             HasError;        // Node or sub-nodes has Nok
+        bool                             RemoveIfNoErrors;// Remove Children Node if no NOK appears
 
         void                             Init();          //Initialize with common values
-        void Add_Child(Element_Node* node);              //Add a subchild to the current node
-        void Set_Name(const char* Name_);
-        void Set_Name(const string &Name_);
-        const char* Get_Name() {return Name;}
+        void Add_Child(Element_Node* node);               //Add a subchild to the current node
+        void Set_Name(const string &Name_)
+        {
+            Name = Name_;
+        }
+        bool Name_Is_Empty() const {return Name.empty();}
 
         // Print
         int  Print(MediaInfo_Config::trace_Format Format, std::string& str);  //Print the node into str

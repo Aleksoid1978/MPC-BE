@@ -281,6 +281,9 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     #if MEDIAINFO_SEEK
         File_GoTo_IsFrameOffset=false;
     #endif //MEDIAINFO_SEEK
+    #if MEDIAINFO_FIXITY
+        TryToFix=false;
+    #endif //MEDIAINFO_SEEK
 }
 
 MediaInfo_Config_MediaInfo::~MediaInfo_Config_MediaInfo()
@@ -1091,6 +1094,15 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
         #else //defined(MEDIAINFO_LIBCURL_YES)
             return __T("Libcurl support is disabled due to compilation options");
         #endif //defined(MEDIAINFO_LIBCURL_YES)
+    }
+    else if (Option_Lower==__T("file_trytofix"))
+    {
+        #if MEDIAINFO_FIXITY
+            TryToFix_Set(!(Value==__T("0") || Value.empty()));
+            return Ztring();
+        #else //MEDIAINFO_FIXITY
+            return __T("Fixity support is disabled due to compilation options");
+        #endif //MEDIAINFO_FIXITY
     }
     else if (Option_Lower.find(__T("file_curl,"))==0 || Option_Lower.find(__T("file_curl;"))==0)
     {
@@ -1996,6 +2008,21 @@ bool MediaInfo_Config_MediaInfo::Ibi_Create_Get ()
     return Ibi_Create;
 }
 #endif //MEDIAINFO_IBIUSAGE
+
+#if MEDIAINFO_FIXITY
+//---------------------------------------------------------------------------
+void MediaInfo_Config_MediaInfo::TryToFix_Set (bool NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    TryToFix=NewValue;
+}
+
+bool MediaInfo_Config_MediaInfo::TryToFix_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return TryToFix || MediaInfoLib::Config.TryToFix_Get();
+}
+#endif //MEDIAINFO_FIXITY
 
 //***************************************************************************
 // Encryption

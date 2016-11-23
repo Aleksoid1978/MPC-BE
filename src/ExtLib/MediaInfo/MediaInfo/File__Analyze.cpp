@@ -494,25 +494,30 @@ void File__Analyze::Open_Buffer_OutOfBand (File__Analyze* Sub, const int8u* ToAd
     #endif //MEDIAINFO_DEMUX
 
     #if MEDIAINFO_TRACE
-        if (Trace_Activated)
-        {
-            //Details handling
-            if ((Sub->Element[0].TraceNode.Get_Name() || Sub->Element[0].TraceNode.Children.size()) && !Trace_DoNotSave)
-            {
-                //From Sub
-                while(Sub->Element_Level)
-                    Sub->Element_End0();
-
-                //Add Sub to this node
-                Element[Element_Level].TraceNode.Add_Child(&Sub->Element[0].TraceNode);
-                Sub->Element[0].TraceNode.Init();
-            }
-            else
-                Element[Element_Level].TraceNode.NoShow=true; //We don't want to show this item because there is no info in it
-        }
-    #endif
+        Trace_Details_Handling(Sub);
+    #endif // MEDIAINFO_TRACE
 }
+#if MEDIAINFO_TRACE
+void File__Analyze::Trace_Details_Handling(File__Analyze* Sub)
+{
+    if (Trace_Activated)
+    {
+        //Details handling
+        if ((!Sub->Element[0].TraceNode.Name_Is_Empty() || Sub->Element[0].TraceNode.Children.size()) && !Trace_DoNotSave)
+        {
+            //From Sub
+            while (Sub->Element_Level)
+                Sub->Element_End0();
 
+            //Add Sub to this node
+            Element[Element_Level].TraceNode.Add_Child(&Sub->Element[0].TraceNode);
+            Sub->Element[0].TraceNode.Init();
+        }
+        else
+            Element[Element_Level].TraceNode.NoShow = true; //We don't want to show this item because there is no info in it
+    }
+}
+#endif // MEDIAINFO_TRACE
 //---------------------------------------------------------------------------
 void File__Analyze::Open_Buffer_Continue (const int8u* ToAdd, size_t ToAdd_Size)
 {
@@ -1047,21 +1052,8 @@ void File__Analyze::Open_Buffer_Continue (File__Analyze* Sub, const int8u* ToAdd
     }
 
     #if MEDIAINFO_TRACE
-        if (Trace_Activated)
-        {
-            //Details handling
-            if ((Sub->Element[0].TraceNode.Get_Name() || Sub->Element[0].TraceNode.Children.size()) && !Trace_DoNotSave)
-            {
-                //From Sub
-                while(Sub->Element_Level)
-                    Sub->Element_End0();
-                Element[Element_Level].TraceNode.Add_Child(&Sub->Element[0].TraceNode);
-                Sub->Element[0].TraceNode.Init();
-            }
-            else
-                Element[Element_Level].TraceNode.NoShow=true; //We don't want to show this item because there is no info in it
-        }
-    #endif
+        Trace_Details_Handling(Sub);
+    #endif //MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
@@ -2249,7 +2241,7 @@ bool File__Analyze::Header_Manage()
     #if MEDIAINFO_TRACE
     if (Trace_Activated)
     {
-        if (!Element[Element_Level-1].TraceNode.Get_Name())
+        if (Element[Element_Level-1].TraceNode.Name_Is_Empty())
             Element[Element_Level-1].TraceNode.Set_Name("Unknown");
         Element[Element_Level].TraceNode.Size=Element_Offset;
         if (Element_Offset==0)
@@ -3446,9 +3438,72 @@ void File__Analyze::Element_DoNotShow ()
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_TRACE
+void File__Analyze::Element_DoNotShow_Children ()
+{
+    for (size_t i = 0; i < Element[Element_Level].TraceNode.Children.size(); ++i)
+    {
+        if (!Element[Element_Level].TraceNode.Children[i])
+            continue;
+        Element[Element_Level].TraceNode.Children[i]->NoShow=true;
+    }
+}
+#endif //MEDIAINFO_TRACE
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_TRACE
+void File__Analyze::Element_Remove_Children_IfNoErrors ()
+{
+    for (size_t i = 0; i < Element[Element_Level].TraceNode.Children.size(); ++i)
+    {
+        if (!Element[Element_Level].TraceNode.Children[i])
+            continue;
+        delete Element[Element_Level].TraceNode.Children[i];
+        Element[Element_Level].TraceNode.Children[i] = NULL;
+    }
+
+    Element[Element_Level].TraceNode.Children.clear();
+}
+#endif //MEDIAINFO_TRACE
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_TRACE
+void File__Analyze::Element_Children_IfNoErrors ()
+{
+    if (Element[Element_Level].TraceNode.HasError)
+        return;
+
+    //TODO: option to keep the nodes
+    // Element_DoNotShow_Children();
+    Element_Remove_Children_IfNoErrors();
+}
+#endif //MEDIAINFO_TRACE
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_TRACE
+void File__Analyze::Element_Set_Remove_Children_IfNoErrors ()
+{
+    Element[Element_Level].TraceNode.RemoveIfNoErrors = true;
+}
+#endif //MEDIAINFO_TRACE
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_TRACE
 void File__Analyze::Element_Show ()
 {
     Element[Element_Level].TraceNode.NoShow=false;
+}
+#endif //MEDIAINFO_TRACE
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_TRACE
+void File__Analyze::Element_Show_Children ()
+{
+    for (size_t i = 0; i < Element[Element_Level].TraceNode.Children.size(); ++i)
+    {
+        if (!Element[Element_Level].TraceNode.Children[i])
+            continue;
+        Element[Element_Level].TraceNode.Children[i]->NoShow=false;
+    }
 }
 #endif //MEDIAINFO_TRACE
 

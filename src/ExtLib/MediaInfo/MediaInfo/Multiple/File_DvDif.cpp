@@ -48,7 +48,7 @@ static const char*  Dv_sct[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Dv_Ssyb_Pc0(int8u Pc0)
+static const char* Dv_Ssyb_Pc0(int8u Pc0)
 {
     switch (Pc0)
     {

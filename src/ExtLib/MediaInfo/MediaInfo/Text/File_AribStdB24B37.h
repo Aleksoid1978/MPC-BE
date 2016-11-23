@@ -85,7 +85,7 @@ private :
     void data_unit_data(int64u End);
     void Character(int16u CharacterSet, int8u G_Value, int8u FirstByte, int8u SecondByte);
     void Add(Char Character);
-    void Add(Ztring Character);
+    void Add(const Ztring& Character);
     void DefaultMacro();
     void control_code();
     void NUL();

@@ -117,7 +117,7 @@ private :
     };
     std::map<int32u, stream> Stream;
     int32u                   Stream_ID;
-
+    void Open_Buffer_Init_All();
     struct stream_structure
     {
         int64u                  Name;

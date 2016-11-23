@@ -598,32 +598,13 @@ std::ostream& operator<<(std::ostream& os, const element_details::Element_Node_D
 //***************************************************************************
 // Element_Node_Info
 //***************************************************************************
-
-//---------------------------------------------------------------------------
-element_details::Element_Node_Info& element_details::Element_Node_Info::operator=(const Element_Node_Info& v)
-{
-    if (this == &v)
-        return *this;
-
-    data = v.data;
-    if (v.Measure)
-    {
-        size_t len = strlen(v.Measure) + 1;
-        Measure = new char[len];
-        std::memcpy(Measure, v.Measure, len);
-    }
-
-    return *this;
-}
-
-//---------------------------------------------------------------------------
 std::ostream& operator<<(std::ostream& os, element_details::Element_Node_Info* v)
 {
     if (!v)
         return os;
 
     os << v->data;
-    if (v->Measure)
+    if (!v->Measure.empty())
         os << v->Measure;
 
     return os;
@@ -634,8 +615,8 @@ std::ostream& operator<<(std::ostream& os, element_details::Element_Node_Info* v
 //***************************************************************************
 //---------------------------------------------------------------------------
 element_details::Element_Node::Element_Node()
-: Pos(0), Size(0), Name(NULL),
-  Current_Child(-1), NoShow(false), OwnChildren(true), IsCat(false)
+: Pos(0), Size(0),
+  Current_Child(-1), NoShow(false), OwnChildren(true), IsCat(false), HasError(false), RemoveIfNoErrors(false)
 {
 }
 
@@ -647,18 +628,7 @@ element_details::Element_Node::Element_Node(const Element_Node& node)
 
     Pos = node.Pos;
     Size = node.Size;
-    if (node.Name)
-    {
-        size_t len = strlen(node.Name);
-        if (len)
-        {
-            len++;
-            Name = new char[len];
-            std::memcpy(Name, node.Name, len);
-        }
-    }
-    else
-        Name = NULL;
+    Name = node.Name;
     Value = node.Value;
     Infos = node.Infos;
     Children = node.Children;
@@ -666,13 +636,13 @@ element_details::Element_Node::Element_Node(const Element_Node& node)
     NoShow = node.NoShow;
     OwnChildren = node.OwnChildren;
     IsCat = node.IsCat;
+    HasError = node.HasError;
+    RemoveIfNoErrors = node.RemoveIfNoErrors;
 }
 
 //---------------------------------------------------------------------------
 element_details::Element_Node::~Element_Node()
 {
-    delete[] Name;
-
     if (!OwnChildren)
         return;
 
@@ -690,11 +660,7 @@ void element_details::Element_Node::Init()
 {
     Pos = 0;
     Size = 0;
-    if (Name)
-    {
-        delete[] Name;
-        Name = NULL;
-    }
+    Name.clear();
     Value.clear();
     if (Children.size() && OwnChildren)
         for (size_t i = 0; i < Children.size(); ++i)
@@ -708,12 +674,17 @@ void element_details::Element_Node::Init()
     NoShow = false;
     OwnChildren = true;
     IsCat = false;
+    HasError = false;
+    RemoveIfNoErrors = false;
 }
 
 //---------------------------------------------------------------------------
 int element_details::Element_Node::Print_Micro_Xml(std::ostringstream& ss, size_t level)
 {
-    if (IsCat || !Name)
+    if (NoShow)
+        return 0;
+
+    if (IsCat || Name_Is_Empty())
         goto print_children;
 
     if (Value.empty())
@@ -737,7 +708,7 @@ int element_details::Element_Node::Print_Micro_Xml(std::ostringstream& ss, size_
     {
         Element_Node_Info* Info = Infos[i];
 
-        if (Info->Measure && !std::strcmp(Info->Measure, "Parser"))
+        if (Info->Measure == "Parser")
         {
             if (!(Info->data == string()))
                 ss << " parser=\"" << Info->data << "\"";
@@ -765,7 +736,7 @@ print_children:
     for (size_t i = 0; i < Children.size(); ++i)
         Children[i]->Print_Micro_Xml(ss, level);
 
-    if (!IsCat && Name)
+    if (!IsCat && !Name_Is_Empty())
     {
         //end tag
         if (Value.empty())
@@ -781,10 +752,13 @@ print_children:
 //---------------------------------------------------------------------------
 int element_details::Element_Node::Print_Xml(std::ostringstream& ss, size_t level)
 {
+    if (NoShow)
+        return 0;
+
     std::string spaces;
     bool Modified = false;
 
-    if (IsCat || !Name)
+    if (IsCat || Name_Is_Empty())
         goto print_children;
 
     spaces.resize(level, ' ');
@@ -811,7 +785,7 @@ int element_details::Element_Node::Print_Xml(std::ostringstream& ss, size_t leve
     {
         Element_Node_Info* Info = Infos[i];
 
-        if (Info->Measure && !std::strcmp(Info->Measure, "Parser"))
+        if (Info->Measure == "Parser")
         {
             if (!(Info->data == string()))
                 ss << " parser=\"" << Info->data << "\"";
@@ -841,7 +815,7 @@ print_children:
     for (size_t i = 0; i < Children.size(); ++i)
         Children[i]->Print_Xml(ss, level);
 
-    if (!IsCat && Name)
+    if (!IsCat && !Name_Is_Empty())
     {
         //end tag
         if (Value.empty())
@@ -882,9 +856,12 @@ int element_details::Element_Node::Print_Tree(std::ostringstream& ss, size_t lev
 {
     std::string spaces;
 
+    if (NoShow)
+        return 0;
+
     if (IsCat)
         return Print_Tree_Cat(ss, level);
-    else if (!Name)
+    else if (Name_Is_Empty())
         goto print_children;
 
     ss << std::setfill('0') << std::setw(8) << std::hex << std::uppercase << Pos << std::nouppercase << std::dec;
@@ -898,7 +875,7 @@ int element_details::Element_Node::Print_Tree(std::ostringstream& ss, size_t lev
     if (!Value.empty())
     {
         ss << ":";
-        int nb_free = NB_SPACES - level - (Name ? 0 : strlen(Name)); // 40 - len(Name) - len(spaces)
+        int nb_free = NB_SPACES - level - (Name_Is_Empty() ? 0 : Name.length()); // 40 - len(Name) - len(spaces)
         spaces.resize(nb_free > 0 ? nb_free : 1, ' ');
         Value.Set_Output_Format(Element_Node_Data::Format_Tree);
         ss << spaces << Value;
@@ -910,7 +887,7 @@ int element_details::Element_Node::Print_Tree(std::ostringstream& ss, size_t lev
     {
         Element_Node_Info* Info = Infos[i];
 
-        if (Info->Measure && !std::strcmp(Info->Measure, "Parser"))
+        if (Info->Measure == "Parser")
         {
             if (!(Info->data == string()))
                 ss << " - Parser=" << Info->data;
@@ -961,51 +938,17 @@ int element_details::Element_Node::Print(MediaInfo_Config::trace_Format Format, 
 //---------------------------------------------------------------------------
 void element_details::Element_Node::Add_Child(Element_Node* node)
 {
+    if (node->HasError)
+        HasError = node->HasError;
+
+    if (RemoveIfNoErrors && !HasError)
+        return;
+
     Element_Node *new_node = new Element_Node(*node);
     node->OwnChildren = false;
     Children.push_back(new_node);
 }
 
-//---------------------------------------------------------------------------
-void element_details::Element_Node::Set_Name(const char* Name_)
-{
-    delete[] Name;
-
-    if (!Name_)
-    {
-        Name = NULL;
-        return;
-    }
-
-    size_t len = strlen(Name_);
-    if (!len)
-    {
-        Name = NULL;
-        return;
-    }
-
-    len++;
-    Name = new char[len];
-    std::memcpy(Name, Name_, len);
-}
-
-//---------------------------------------------------------------------------
-void element_details::Element_Node::Set_Name(const string &Name_)
-{
-    delete[] Name;
-
-
-    size_t len = Name_.length();;
-    if (!len)
-    {
-        Name = NULL;
-        return;
-    }
-
-    Name = new char[len + 1];
-    std::memcpy(Name, Name_.c_str(), len);
-    Name[len] = '\0';
-}
 #endif
 
 }

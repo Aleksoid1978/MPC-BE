@@ -74,9 +74,7 @@ bool File_Xmp::FileHeader_Begin()
         //RDF item
         if (!strcmp(Rdf_Item->Value(), (NameSpace+"Description").c_str()))
         {
-            const char* Attribute;
-
-            Attribute=Rdf_Item->Attribute("xmlns:pdfaid");
+            const char* Attribute=Rdf_Item->Attribute("xmlns:pdfaid");
             if (Attribute)
             {
                 string Profile;

@@ -62,14 +62,7 @@ public:
     }
     bool operator!= (const TimeCode &tc) const
     {
-        return Hours                !=tc.Hours
-            || Minutes              !=tc.Minutes
-            || Seconds              !=tc.Seconds
-            || Frames               !=tc.Frames
-            || FramesPerSecond      !=tc.FramesPerSecond
-            || DropFrame            !=tc.DropFrame
-            || MustUseSecondField   !=tc.MustUseSecondField
-            || IsSecondField        !=tc.IsSecondField;
+        return !(*this == tc);
     }
 
     //Helpers

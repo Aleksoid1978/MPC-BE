@@ -1035,7 +1035,7 @@ static const char* Mxf_EssenceCompression(const int128u EssenceCompression)
 }
 
 //---------------------------------------------------------------------------
-static const char* Mxf_EssenceCompression_Profile(const int128u EssenceCompression)
+static const char* Mxf_EssenceCompression_Profile(const int128u& EssenceCompression)
 {
     int8u Code2=(int8u)((EssenceCompression.lo&0x00FF000000000000LL)>>48);
     int8u Code3=(int8u)((EssenceCompression.lo&0x0000FF0000000000LL)>>40);
@@ -1089,7 +1089,7 @@ static const char* Mxf_EssenceCompression_Profile(const int128u EssenceCompressi
     }
 }
 //---------------------------------------------------------------------------
-static const char* Mxf_EssenceCompression_Version(const int128u EssenceCompression)
+static const char* Mxf_EssenceCompression_Version(const int128u& EssenceCompression)
 {
     int8u Code2=(int8u)((EssenceCompression.lo&0x00FF000000000000LL)>>48);
     int8u Code3=(int8u)((EssenceCompression.lo&0x0000FF0000000000LL)>>40);
@@ -1237,6 +1237,8 @@ static const char* Mxf_ColorPrimaries(const int128u ColorPrimaries)
         case 0x01 : return "BT.601 NTSC";
         case 0x02 : return "BT.470 System B";
         case 0x03 : return "BT.709";
+        case 0x04 : return "BT.2020";
+        case 0x06 : return "P3D65";
         default   : return "";
     }
 }
@@ -1254,6 +1256,9 @@ static const char* Mxf_TransferCharacteristic(const int128u TransferCharacterist
         case 0x05 : return "BT.1361 extended colour gamut system";
         case 0x06 : return "Linear";
         case 0x07 : return "SMPTE 428M";
+        case 0x08 : return "xvYCC";
+        case 0x09 : return "BT.2020";
+        case 0x0A : return "SMPTE ST 2084";
         default   : return "";
     }
 }
@@ -1267,6 +1272,7 @@ static const char* Mxf_CodingEquations(const int128u CodingEquations)
         case 0x01 : return "BT.601";
         case 0x02 : return "BT.709";
         case 0x03 : return "SMPTE 240M";
+        case 0x06 : return "BT.2020";
         default   : return "";
     }
 }
@@ -1319,7 +1325,7 @@ static const char* Mxf_ChannelAssignment_ChannelPositions(const int128u ChannelL
 }
 
 //---------------------------------------------------------------------------
-static const char* Mxf_ChannelAssignment_ChannelPositions2(const int128u ChannelLayout, int32u ChannelsCount=(int32u)-1)
+static const char* Mxf_ChannelAssignment_ChannelPositions2(const int128u& ChannelLayout, int32u ChannelsCount=(int32u)-1)
 {
     //Sound Channel Labeling
     if ((ChannelLayout.hi&0xFFFFFFFFFFFFFF00LL)!=0x060E2B3404010100LL && (ChannelLayout.lo&0xFFFFFFFF00000000LL)!=0x0402021000000000LL)
@@ -1366,7 +1372,7 @@ static const char* Mxf_ChannelAssignment_ChannelPositions2(const int128u Channel
 }
 
 //---------------------------------------------------------------------------
-static const char* Mxf_ChannelAssignment_ChannelLayout(const int128u ChannelLayout, int32u ChannelsCount=(int32u)-1)
+static const char* Mxf_ChannelAssignment_ChannelLayout(const int128u& ChannelLayout, int32u ChannelsCount=(int32u)-1)
 {
     //Sound Channel Labeling
     if ((ChannelLayout.hi&0xFFFFFFFFFFFFFF00LL)!=0x060E2B3404010100LL && (ChannelLayout.lo&0xFFFFFFFF00000000LL)!=0x0402021000000000LL)
@@ -2890,14 +2896,9 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
 
     for (std::map<std::string, Ztring>::iterator Info=Essence->second.Infos.begin(); Info!=Essence->second.Infos.end(); ++Info)
         Fill(StreamKind_Last, StreamPos_Last, Info->first.c_str(), Info->second, true);
-    if (MxfTimeCodeForDelay.RoundedTimecodeBase && MxfTimeCodeForDelay.StartTimecode!=(int64u)-1)
+    if (MxfTimeCodeForDelay.IsInit())
     {
-        float64 TimeCode_StartTimecode_Temp=((float64)(MxfTimeCodeForDelay.StartTimecode+Config->File_IgnoreEditsBefore))/MxfTimeCodeForDelay.RoundedTimecodeBase;
-        if (MxfTimeCodeForDelay.DropFrame)
-        {
-            TimeCode_StartTimecode_Temp*=1001;
-            TimeCode_StartTimecode_Temp/=1000;
-        }
+        const float64 TimeCode_StartTimecode_Temp = MxfTimeCodeForDelay.Get_TimeCode_StartTimecode_Temp(Config->File_IgnoreEditsBefore);
         Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay), TimeCode_StartTimecode_Temp*1000, 0, true);
         Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay_Source), "Container");
         Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay_DropFrame), MxfTimeCodeForDelay.DropFrame?"Yes":"No");
@@ -3084,14 +3085,9 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
                 Stream_Prepare(Stream_Audio);
                 size_t Pos=Count_Get(Stream_Audio)-1;
                 (*Parser)->Finish();
-                if (MxfTimeCodeForDelay.RoundedTimecodeBase && MxfTimeCodeForDelay.StartTimecode!=(int64u)-1)
+                if (MxfTimeCodeForDelay.IsInit())
                 {
-                    float64 TimeCode_StartTimecode_Temp=((float64)(MxfTimeCodeForDelay.StartTimecode+Config->File_IgnoreEditsBefore))/MxfTimeCodeForDelay.RoundedTimecodeBase;
-                    if (MxfTimeCodeForDelay.DropFrame)
-                    {
-                        TimeCode_StartTimecode_Temp*=1001;
-                        TimeCode_StartTimecode_Temp/=1000;
-                    }
+                    const float64 TimeCode_StartTimecode_Temp = MxfTimeCodeForDelay.Get_TimeCode_StartTimecode_Temp(Config->File_IgnoreEditsBefore);
                     Fill(Stream_Audio, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay), TimeCode_StartTimecode_Temp*1000, 0, true);
                     Fill(Stream_Audio, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay_Source), "Container");
                 }
@@ -3124,14 +3120,9 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
             Fill_Flush();
             Stream_Prepare(Stream_Text);
             (*Parser)->Finish();
-            if (MxfTimeCodeForDelay.RoundedTimecodeBase && MxfTimeCodeForDelay.StartTimecode!=(int64u)-1)
+            if (MxfTimeCodeForDelay.IsInit())
             {
-                float64 TimeCode_StartTimecode_Temp=((float64)(MxfTimeCodeForDelay.StartTimecode+Config->File_IgnoreEditsBefore))/MxfTimeCodeForDelay.RoundedTimecodeBase;
-                if (MxfTimeCodeForDelay.DropFrame)
-                {
-                    TimeCode_StartTimecode_Temp*=1001;
-                    TimeCode_StartTimecode_Temp/=1000;
-                }
+                const float64 TimeCode_StartTimecode_Temp= MxfTimeCodeForDelay.Get_TimeCode_StartTimecode_Temp(Config->File_IgnoreEditsBefore);
                 Fill(Stream_Text, Parser_Text_Pos, Fill_Parameter(StreamKind_Last, Generic_Delay), TimeCode_StartTimecode_Temp*1000, 0, true);
                 Fill(Stream_Text, Parser_Text_Pos, Fill_Parameter(StreamKind_Last, Generic_Delay_Source), "Container");
             }
@@ -3963,7 +3954,7 @@ void File_Mxf::Streams_Finish_Component_ForAS11(const int128u ComponentUID, floa
     int64u TC_Temp=0;
     int8u FrameRate_TempI;
     bool DropFrame_Temp;
-    if (MxfTimeCodeMaterial.RoundedTimecodeBase && MxfTimeCodeMaterial.StartTimecode!=(int64u)-1)
+    if (MxfTimeCodeMaterial.IsInit())
     {
         TC_Temp=MxfTimeCodeMaterial.StartTimecode;
         FrameRate_TempI=(int8u)MxfTimeCodeMaterial.RoundedTimecodeBase;

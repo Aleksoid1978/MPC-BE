@@ -80,16 +80,16 @@ void File_MpegTs::Option_Manage()
                 Complete_Stream->Streams[0x0000]->ShouldDuplicate=true;
 
                 //For each program
-                for (complete_stream::transport_stream::programs::iterator Program=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs.begin(); Program!=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs.end(); ++Program)
+                const complete_stream::transport_stream& transportItem = Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id];
+                for (complete_stream::transport_stream::programs::const_iterator Program= transportItem.Programs.begin(); Program!= transportItem.Programs.end(); ++Program)
                 {
                     //Do we want this program?
                     bool Wanted=false;
-                    for (std::map<const String, File__Duplicate_MpegTs*>::iterator Duplicate=Complete_Stream->Duplicates.begin(); Duplicate!=Complete_Stream->Duplicates.end(); ++Duplicate)
+                    for (std::map<const String, File__Duplicate_MpegTs*>::const_iterator Duplicate=Complete_Stream->Duplicates.begin(); Duplicate!=Complete_Stream->Duplicates.end(); ++Duplicate)
                     {
-                        if (Duplicate->second->Wanted_program_numbers.find(Program->first)!=Duplicate->second->Wanted_program_numbers.end())
-                            Wanted=true;
-                        if (Duplicate->second->Wanted_program_map_PIDs.find(Program->second.pid)!=Duplicate->second->Wanted_program_map_PIDs.end())
-                            Wanted=true;
+                        Wanted = Duplicate->second->Is_Wanted(Program->first, Program->second.pid);
+                        if (Wanted)
+                            break;
                     }
 
                     //Enabling it if wanted

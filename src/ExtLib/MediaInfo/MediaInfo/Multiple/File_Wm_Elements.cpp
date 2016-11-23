@@ -134,7 +134,7 @@ namespace Elements
     UUID(Mutex_Bitrate,                                         D6E22A01, 35DA, 11D1, 9034, 00A0C90349BE);
 }
 
-static const char* Wm_StreamType(const int128u Kind)
+static const char* Wm_StreamType(const int128u& Kind)
 {
     switch (Kind.hi)
     {
@@ -149,7 +149,7 @@ static const char* Wm_StreamType(const int128u Kind)
     }
 }
 
-static const char* Wm_ExclusionType(const int128u ExclusionType)
+static const char* Wm_ExclusionType(const int128u& ExclusionType)
 {
     switch (ExclusionType.hi)
     {
@@ -320,10 +320,11 @@ void File_Wm::Header_StreamProperties ()
         Skip_XX(ErrorCorrectionTypeLength,                      "Error Correction Data");
 
     //Filling
-    Stream[Stream_Number].StreamKind=StreamKind_Last;
-    Stream[Stream_Number].StreamPos=StreamPos_Last;
-    Stream[Stream_Number].Info["ID"].From_Number(Stream_Number);
-    Stream[Stream_Number].Info["StreamOrder"].From_Number(Header_StreamProperties_StreamOrder);
+    stream& StreamItem = Stream[Stream_Number];
+    StreamItem.StreamKind=StreamKind_Last;
+    StreamItem.StreamPos=StreamPos_Last;
+    StreamItem.Info["ID"].From_Number(Stream_Number);
+    StreamItem.Info["StreamOrder"].From_Number(Header_StreamProperties_StreamOrder);
     Header_StreamProperties_StreamOrder++;
 }
 
@@ -362,9 +363,11 @@ void File_Wm::Header_StreamProperties_Audio ()
         #if defined(MEDIAINFO_MPEGA_YES)
         else if (MediaInfoLib::Config.CodecID_Get(Stream_Audio, InfoCodecID_Format_Riff, Ztring::ToZtring(CodecID, 16))==__T("MPEG Audio"))
         {
-            Stream[Stream_Number].Parser=new File_Mpega;
-            ((File_Mpega*)Stream[Stream_Number].Parser)->Frame_Count_Valid=8;
-            Stream[Stream_Number].Parser->ShouldContinueParsing=true;
+            stream& StreamItem = Stream[Stream_Number];
+            File_Mpega* Parser = new File_Mpega;
+            StreamItem.Parser= Parser;
+            Parser->Frame_Count_Valid=8;
+            StreamItem.Parser->ShouldContinueParsing=true;
         }
         #endif
         Open_Buffer_Init(Stream[Stream_Number].Parser);
@@ -487,14 +490,16 @@ void File_Wm::Header_StreamProperties_Video ()
     #if defined(MEDIAINFO_VC1_YES)
     else if (MediaInfoLib::Config.CodecID_Get(Stream_Video, InfoCodecID_Format_Riff, Ztring().From_CC4(Compression), InfoCodecID_Format)==__T("VC-1"))
     {
-        Stream[Stream_Number].Parser=new File_Vc1;
+        stream& StreamItem = Stream[Stream_Number];
+        File_Vc1* Parser = new File_Vc1;
+        StreamItem.Parser= Parser;
         if (Compression==CC4("WMV3"))
         {
-            ((File_Vc1*)Stream[Stream_Number].Parser)->From_WMV3=true;
-            ((File_Vc1*)Stream[Stream_Number].Parser)->MustSynchronize=false;
+            Parser->From_WMV3=true;
+            Parser->MustSynchronize=false;
         }
-        ((File_Vc1*)Stream[Stream_Number].Parser)->FrameIsAlwaysComplete=true; //Warning: this is not always the case, see data parsing
-        Open_Buffer_Init(Stream[Stream_Number].Parser);
+        Parser->FrameIsAlwaysComplete=true; //Warning: this is not always the case, see data parsing
+        Open_Buffer_Init(StreamItem.Parser);
         if (Data_Size>40)
         {
 
@@ -518,18 +523,18 @@ void File_Wm::Header_StreamProperties_Video ()
                     default :   ;
                 }
             #endif //MEDIAINFO_DEMUX
-
-            Open_Buffer_Continue(Stream[Stream_Number].Parser, (size_t)(Data_Size-40));
-            if (Stream[Stream_Number].Parser->Status[IsFinished])
+            stream& StreamItem = Stream[Stream_Number];
+            Open_Buffer_Continue(StreamItem.Parser, (size_t)(Data_Size-40));
+            if (StreamItem.Parser->Status[IsFinished])
             {
-                Finish(Stream[Stream_Number].Parser);
-                Merge(*Stream[Stream_Number].Parser, Stream_Video, 0, StreamPos_Last);
-                delete Stream[Stream_Number].Parser; Stream[Stream_Number].Parser=NULL;
+                Finish(StreamItem.Parser);
+                Merge(*StreamItem.Parser, Stream_Video, 0, StreamPos_Last);
+                delete StreamItem.Parser; StreamItem.Parser=NULL;
             }
             else
             {
-                ((File_Vc1*)Stream[Stream_Number].Parser)->Only_0D=true;
-                ((File_Vc1*)Stream[Stream_Number].Parser)->MustSynchronize=false;
+                ((File_Vc1*)StreamItem.Parser)->Only_0D=true;
+                ((File_Vc1*)StreamItem.Parser)->MustSynchronize=false;
             }
         }
     }
@@ -537,9 +542,11 @@ void File_Wm::Header_StreamProperties_Video ()
     #if defined(MEDIAINFO_MPEGV_YES)
     else if (MediaInfoLib::Config.Codec_Get(Ztring().From_CC4(Compression), InfoCodec_KindofCodec).find(__T("MPEG-2"))==0)
     {
-        Stream[Stream_Number].Parser=new File_Mpegv;
-        ((File_Mpegv*)Stream[Stream_Number].Parser)->Frame_Count_Valid=30; //For searching Pulldown
-        Open_Buffer_Init(Stream[Stream_Number].Parser);
+        stream& StreamItem = Stream[Stream_Number];
+        File_Mpegv* Parser = new File_Mpegv;
+        StreamItem.Parser  = Parser;
+        Parser->Frame_Count_Valid=30; //For searching Pulldown
+        Open_Buffer_Init(StreamItem.Parser);
     }
     #endif
     else if (Data_Size>40) //TODO: see "The Mummy_e"
@@ -699,9 +706,10 @@ void File_Wm::Header_HeaderExtension_ExtendedStreamProperties()
     }
 
     //Filling
-    Stream[StreamNumber].LanguageID=LanguageID;
-    Stream[StreamNumber].AverageBitRate=DataBitrate;
-    Stream[StreamNumber].AverageTimePerFrame=AverageTimePerFrame;
+    stream& StreamItem = Stream[StreamNumber];
+    StreamItem.LanguageID=LanguageID;
+    StreamItem.AverageBitRate=DataBitrate;
+    StreamItem.AverageTimePerFrame=AverageTimePerFrame;
 }
 
 //---------------------------------------------------------------------------
@@ -1248,8 +1256,9 @@ void File_Wm::Header_StreamBitRate()
         Element_End0();
 
         //Filling
-        if (Stream[StreamNumber].AverageBitRate==0) //Prefere Average bitrate of Extended Stream Properties if present
-            Stream[StreamNumber].AverageBitRate=AverageBitRate;
+        stream& StreamItem = Stream[StreamNumber];
+        if (StreamItem.AverageBitRate==0) //Prefere Average bitrate of Extended Stream Properties if present
+            StreamItem.AverageBitRate=AverageBitRate;
     }
 }
 
@@ -1532,7 +1541,8 @@ void File_Wm::Data_Packet()
             Demux(Buffer+(size_t)Element_Offset, (size_t)PayloadLength, ContentType_MainStream);
 
             //Analyzing
-            if (Stream[Stream_Number].Parser && Stream[Stream_Number].SearchingPayload)
+            stream& StreamItem = Stream[Stream_Number];
+            if (StreamItem.Parser && StreamItem.SearchingPayload)
             {
                 //Handling of spanned on multiple chunks
                 #if defined(MEDIAINFO_VC1_YES)
@@ -1556,16 +1566,16 @@ void File_Wm::Data_Packet()
 
                 //Codec specific
                 #if defined(MEDIAINFO_VC1_YES)
-                if (Retrieve(Stream[Stream_Number].StreamKind, Stream[Stream_Number].StreamPos, Fill_Parameter(Stream[Stream_Number].StreamKind, Generic_Format))==__T("VC-1"))
-                    ((File_Vc1*)Stream[Stream_Number].Parser)->FrameIsAlwaysComplete=FrameIsAlwaysComplete;
+                if (Retrieve(StreamItem.StreamKind, StreamItem.StreamPos, Fill_Parameter(StreamItem.StreamKind, Generic_Format))==__T("VC-1"))
+                    ((File_Vc1*)StreamItem.Parser)->FrameIsAlwaysComplete=FrameIsAlwaysComplete;
                 #endif
 
-                Open_Buffer_Continue(Stream[Stream_Number].Parser, (size_t)PayloadLength);
-                if (Stream[Stream_Number].Parser->Status[IsFinished]
-                 || (Stream[Stream_Number].PresentationTimes.size()>=300 && MediaInfoLib::Config.ParseSpeed_Get()<1))
+                Open_Buffer_Continue(StreamItem.Parser, (size_t)PayloadLength);
+                if (StreamItem.Parser->Status[IsFinished]
+                 || (StreamItem.PresentationTimes.size()>=300 && MediaInfoLib::Config.ParseSpeed_Get()<1))
                 {
-                    Stream[Stream_Number].Parser->Open_Buffer_Unsynch();
-                    Stream[Stream_Number].SearchingPayload=false;
+                    StreamItem.Parser->Open_Buffer_Unsynch();
+                    StreamItem.SearchingPayload=false;
                     Streams_Count--;
                 }
 
@@ -1574,10 +1584,10 @@ void File_Wm::Data_Packet()
             else
             {
                 Skip_XX(PayloadLength,                              "Data");
-                if (Stream[Stream_Number].SearchingPayload
-                 && (Stream[Stream_Number].StreamKind==Stream_Video && Stream[Stream_Number].PresentationTimes.size()>=300))
+                if (StreamItem.SearchingPayload
+                 && (StreamItem.StreamKind==Stream_Video && StreamItem.PresentationTimes.size()>=300))
                 {
-                    Stream[Stream_Number].SearchingPayload=false;
+                    StreamItem.SearchingPayload=false;
                     Streams_Count--;
                 }
             }
@@ -1604,20 +1614,21 @@ void File_Wm::Data_Packet_ReplicatedData(int32u Size)
 {
     Element_Begin1("Replicated Data");
     int64u Element_Offset_Final=Element_Offset+Size;
-    for (size_t Pos=0; Pos<Stream[Stream_Number].Payload_Extension_Systems.size(); Pos++)
+    stream& StreamItem = Stream[Stream_Number];
+    for (size_t Pos=0; Pos<StreamItem.Payload_Extension_Systems.size(); Pos++)
     {
         Element_Begin0();
-        switch (Stream[Stream_Number].Payload_Extension_Systems[Pos].ID.hi)
+        switch (StreamItem.Payload_Extension_Systems[Pos].ID.hi)
         {
             case Elements::Payload_Extension_System_TimeStamp :     Data_Packet_ReplicatedData_TimeStamp(); break;
             default :                                               //Not enough info to validate this algorithm
-                                                                    //if (Stream[Stream_Number].Payload_Extension_Systems[Pos].Size!=(int16u)-1)
+                                                                    //if (StreamItem.Payload_Extension_Systems[Pos].Size!=(int16u)-1)
                                                                     //{
                                                                     //    Element_Name("Unknown");
-                                                                    //    Skip_XX(Stream[Stream_Number].Payload_Extension_Systems[Pos].Size, "Unknown");
+                                                                    //    Skip_XX(StreamItem.Payload_Extension_Systems[Pos].Size, "Unknown");
                                                                     //}
                                                                     //else
-                                                                        Pos=Stream[Stream_Number].Payload_Extension_Systems.size(); //Disabling the rest, all is unknown
+                                                                        Pos=StreamItem.Payload_Extension_Systems.size(); //Disabling the rest, all is unknown
         }
         Element_End0();
     }
@@ -1653,9 +1664,9 @@ void File_Wm::Data_Packet_ReplicatedData_TimeStamp()
     Skip_L4(                                                    "Unknown");
     Skip_L4(                                                    "Unknown");
     Skip_L4(                                                    "Unknown");
-
-    if (Stream[Stream_Number].TimeCode_First==(int64u)-1 && TS0!=(int64u)-1)
-        Stream[Stream_Number].TimeCode_First=TS0/10000;
+    stream& StreamItem = Stream[Stream_Number];
+    if (StreamItem.TimeCode_First==(int64u)-1 && TS0!=(int64u)-1)
+        StreamItem.TimeCode_First=TS0/10000;
 }
 
 //---------------------------------------------------------------------------

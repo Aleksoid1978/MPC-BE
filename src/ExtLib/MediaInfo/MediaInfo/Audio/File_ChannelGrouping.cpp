@@ -141,6 +141,7 @@ void File_ChannelGrouping::Read_Buffer_Init()
             Common->Parsers.push_back(Parser);
         }
 
+#ifdef MEDIAINFO_PCM_YES
         //PCM
         if (CanBePcm)
         {
@@ -165,6 +166,7 @@ void File_ChannelGrouping::Read_Buffer_Init()
             #endif //MEDIAINFO_DEMUX
             Open_Buffer_Init(Common->Parsers[Pos]);
         }
+#endif // MEDIAINFO_PCM_YES
     }
     Common->Instances++;
     Common->Instances_Max++;

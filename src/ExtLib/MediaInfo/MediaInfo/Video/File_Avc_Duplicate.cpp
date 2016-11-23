@@ -204,7 +204,7 @@ void File_Avc::File__Duplicate_Write (int64u Element_Code, int32u frame_num)
     }
     else if (frame_num!=(int32u)-1)
     {
-        if (frame_num!=frame_num_Old && frame_num_Old!=(int32u)-1 && frame_num!=(int32u)-1)
+        if (frame_num!=frame_num_Old && frame_num_Old!=(int32u)-1)
         {
             // Form:
             //  8 bytes : PTS

@@ -40,7 +40,7 @@ class MemoryDebug
 public :
     ~MemoryDebug();
     static MemoryDebug& Instance();
-
+    static bool g_IsShutdown;
     void* Allocate(std::size_t Size, const char* File, int Line, bool Array);
     void  Free(void* Ptr, bool Array);
     void  NextDelete(const char*, int Line); //Sauvegarde les infos sur la désallocation courante
@@ -79,12 +79,18 @@ inline void* operator new[](std::size_t Size, const char* File, int Line)
 
 inline void operator delete(void* Ptr)
 {
-    ZenLib::MemoryDebug::Instance().Free(Ptr, false);
+    if (ZenLib::MemoryDebug::g_IsShutdown)
+        free(Ptr);
+    else
+        ZenLib::MemoryDebug::Instance().Free(Ptr, false);
 }
 
 inline void operator delete[](void* Ptr)
 {
-    ZenLib::MemoryDebug::Instance().Free(Ptr, true);
+    if (ZenLib::MemoryDebug::g_IsShutdown)
+        free(Ptr);
+    else
+        ZenLib::MemoryDebug::Instance().Free(Ptr, true);
 }
 
 #if !defined(__BORLANDC__) // Borland does not support overloaded delete

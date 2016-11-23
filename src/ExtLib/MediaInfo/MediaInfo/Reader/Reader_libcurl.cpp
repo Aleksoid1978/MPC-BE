@@ -64,7 +64,7 @@ namespace MediaInfoLib
 namespace Http
 {
     //Helpers
-    void CutHead(std::string &Input, std::string &Output, std::string Delimiter)
+   static  void CutHead(std::string &Input, std::string &Output, const std::string& Delimiter)
     {
         // Remove the delimiter and everything that precedes
         size_t Delimiter_Pos = Input.find(Delimiter);
@@ -75,7 +75,7 @@ namespace Http
             Input           = Input.substr(Begin, Input.size() - Begin);
         }
     }
-    void CutTail(std::string &Input, std::string &Output, const std::string &Delimiter, bool KeepDelimiter=false)
+    static void CutTail(std::string &Input, std::string &Output, const std::string &Delimiter, bool KeepDelimiter=false)
     {
         // Remove the delimiter and everything that follows
         size_t Delimiter_Pos = Input.find(Delimiter);

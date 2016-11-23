@@ -100,13 +100,7 @@ void File_Tta::FileHeader_Parse()
     Get_L4 (CRC32,                                              "CRC32");
 
     FILLING_BEGIN();
-        if (SampleRate==0)
-            return;
-        Duration=((int64u)Samples)*1000/SampleRate;
-        if (Duration==0)
-            return;
-        UncompressedSize=((int64u)Samples)*Channels*(BitsPerSample/8);
-        if (UncompressedSize==0)
+        if (!CalcDurationUncompressedSize(Samples, SampleRate, BitsPerSample, Channels)) 
             return;
 
         //Filling data
