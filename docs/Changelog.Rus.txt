@@ -159,7 +159,7 @@ MPCBEShellExt
 Обновлен греческий перевод (автор Lampros Zouloumis).
 
 Обновлены библиотеки:
-	ffmpeg git-n3.3-dev-149-gef6a786;
+	ffmpeg git-n3.3-dev-485-g42ae9c6;
 	jsoncpp git-1.7.7-2-ga1db52b;
 	libflac git-1.3.1-223-g55fba7e;
 	libpng git-v1.6.27beta01-2-gd65a92b;
