@@ -90,8 +90,13 @@ void from8toDBL(void* dst, const void* src)
 static
 void from8toHLF(void* dst, const void* src)
 {
+#ifndef CMS_NO_HALF_SUPPORT
        cmsFloat32Number n = (*(cmsUInt8Number*)src) / 255.0f;
        *(cmsUInt16Number*)dst = _cmsFloat2Half(n);
+#else
+    cmsUNUSED_PARAMETER(dst);
+    cmsUNUSED_PARAMETER(src);
+#endif
 }
 
 // From 16
@@ -122,8 +127,13 @@ void from16toDBL(void* dst, const void* src)
 static
 void from16toHLF(void* dst, const void* src)
 {
+#ifndef CMS_NO_HALF_SUPPORT
        cmsFloat32Number n = (*(cmsUInt16Number*)src) / 65535.0f;
        *(cmsUInt16Number*)dst = _cmsFloat2Half(n);
+#else
+    cmsUNUSED_PARAMETER(dst);
+    cmsUNUSED_PARAMETER(src);
+#endif
 }
 
 // From Float
@@ -158,8 +168,13 @@ void fromFLTtoDBL(void* dst, const void* src)
 static
 void fromFLTtoHLF(void* dst, const void* src)
 {
+#ifndef CMS_NO_HALF_SUPPORT
        cmsFloat32Number n = *(cmsFloat32Number*)src;
        *(cmsUInt16Number*)dst = _cmsFloat2Half(n);
+#else
+    cmsUNUSED_PARAMETER(dst);
+    cmsUNUSED_PARAMETER(src);
+#endif
 }
 
 
@@ -168,27 +183,48 @@ void fromFLTtoHLF(void* dst, const void* src)
 static
 void fromHLFto8(void* dst, const void* src)
 {
+#ifndef CMS_NO_HALF_SUPPORT
        cmsFloat32Number n = _cmsHalf2Float(*(cmsUInt16Number*)src);
        *(cmsUInt8Number*)dst = _cmsQuickSaturateByte(n * 255.0f);
+#else
+    cmsUNUSED_PARAMETER(dst);
+    cmsUNUSED_PARAMETER(src);
+#endif
+
 }
 
 static
 void fromHLFto16(void* dst, const void* src)
 {
+#ifndef CMS_NO_HALF_SUPPORT
        cmsFloat32Number n = _cmsHalf2Float(*(cmsUInt16Number*)src);
        *(cmsUInt16Number*)dst = _cmsQuickSaturateWord(n * 65535.0f);
+#else
+    cmsUNUSED_PARAMETER(dst);
+    cmsUNUSED_PARAMETER(src);
+#endif
 }
 
 static
 void fromHLFtoFLT(void* dst, const void* src)
 {
+#ifndef CMS_NO_HALF_SUPPORT
        *(cmsFloat32Number*)dst = _cmsHalf2Float(*(cmsUInt16Number*)src);
+#else
+    cmsUNUSED_PARAMETER(dst);
+    cmsUNUSED_PARAMETER(src);
+#endif
 }
 
 static
 void fromHLFtoDBL(void* dst, const void* src)
 {
+#ifndef CMS_NO_HALF_SUPPORT
        *(cmsFloat64Number*)dst = (cmsFloat64Number)_cmsHalf2Float(*(cmsUInt16Number*)src);
+#else
+    cmsUNUSED_PARAMETER(dst);
+    cmsUNUSED_PARAMETER(src);
+#endif
 }
 
 // From double
@@ -216,8 +252,13 @@ void fromDBLtoFLT(void* dst, const void* src)
 static
 void fromDBLtoHLF(void* dst, const void* src)
 {
+#ifndef CMS_NO_HALF_SUPPORT
        cmsFloat32Number n = (cmsFloat32Number) *(cmsFloat64Number*)src;
        *(cmsUInt16Number*)dst = _cmsFloat2Half(n);
+#else
+    cmsUNUSED_PARAMETER(dst);
+    cmsUNUSED_PARAMETER(src);
+#endif
 }
 
 static
@@ -235,8 +276,10 @@ int FormatterPos(cmsUInt32Number frm)
 
        if (b == 0 && T_FLOAT(frm))
               return 4; // DBL
+#ifndef CMS_NO_HALF_SUPPORT
        if (b == 2 && T_FLOAT(frm))
               return 2; // HLF
+#endif
        if (b == 4 && T_FLOAT(frm))
               return 3; // FLT
        if (b == 2 && !T_FLOAT(frm))

@@ -414,13 +414,13 @@ cmsStage*  CMSEXPORT cmsStageAllocMatrix(cmsContext ContextID, cmsUInt32Number R
 
     if (Offset != NULL) {
 
-        NewElem ->Offset = (cmsFloat64Number*) _cmsCalloc(ContextID, Cols, sizeof(cmsFloat64Number));
+        NewElem ->Offset = (cmsFloat64Number*) _cmsCalloc(ContextID, Rows, sizeof(cmsFloat64Number));
         if (NewElem->Offset == NULL) {
            MatrixElemTypeFree(NewMPE);
            return NULL;
         }
 
-        for (i=0; i < Cols; i++) {
+        for (i=0; i < Rows; i++) {
                 NewElem ->Offset[i] = Offset[i];
         }
 

@@ -185,6 +185,34 @@ cmsINLINE cmsUInt16Number _cmsQuickSaturateWord(cmsFloat64Number d)
 #include <windows.h>
 
 
+// The locking scheme in LCMS requires a single 'top level' mutex
+// to work. This is actually implemented on Windows as a
+// CriticalSection, because they are lighter weight. With
+// pthreads, this is statically inited. Unfortunately, windows
+// can't officially statically init critical sections.
+//
+// We can work around this in 2 ways.
+//
+// 1) We can use a proper mutex purely to protect the init
+// of the CriticalSection. This in turns requires us to protect
+// the Mutex creation, which we can do using the snappily
+// named InterlockedCompareExchangePointer API (present on
+// windows XP and above).
+//
+// 2) In cases where we want to work on pre-Windows XP, we
+// can use an even more horrible hack described below.
+//
+// So why wouldn't we always use 2)? Because not calling
+// the init function for a critical section means it fails
+// testing with ApplicationVerifier (and presumably similar
+// tools).
+//
+// We therefore default to 1, and people who want to be able
+// to run on pre-Windows XP boxes can build with:
+//     CMS_RELY_ON_WINDOWS_STATIC_MUTEX_INIT
+// defined. This is automatically set for builds using
+// versions of MSVC that don't have this API available.
+//
 // From: http://locklessinc.com/articles/pthreads_on_windows/
 // The pthreads API has an initialization macro that has no correspondence to anything in 
 // the windows API. By investigating the internal definition of the critical section type, 
@@ -206,12 +234,28 @@ cmsINLINE cmsUInt16Number _cmsQuickSaturateWord(cmsFloat64Number d)
 
 typedef CRITICAL_SECTION _cmsMutex;
 
-#define CMS_MUTEX_INITIALIZER {(PRTL_CRITICAL_SECTION_DEBUG) -1,-1,0,0,0,0}
-
 #ifdef _MSC_VER
 #    if (_MSC_VER >= 1800)
 #          pragma warning(disable : 26135)
 #    endif
+#endif
+
+#ifndef CMS_RELY_ON_WINDOWS_STATIC_MUTEX_INIT
+// If we are building with a version of MSVC smaller
+// than 1400 (i.e. before VS2005) then we don't have
+// the InterlockedCompareExchangePointer API, so use
+// the old version.
+#    ifdef _MSC_VER
+#       if _MSC_VER < 1400
+#          define CMS_RELY_ON_WINDOWS_STATIC_MUTEX_INIT
+#       endif
+#    endif
+#endif
+
+#ifdef CMS_RELY_ON_WINDOWS_STATIC_MUTEX_INIT
+#      define CMS_MUTEX_INITIALIZER {(PRTL_CRITICAL_SECTION_DEBUG) -1,-1,0,0,0,0}
+#else
+#      define CMS_MUTEX_INITIALIZER {(PRTL_CRITICAL_SECTION_DEBUG)NULL,-1,0,0,0,0}
 #endif
 
 cmsINLINE int _cmsLockPrimitive(_cmsMutex *m)

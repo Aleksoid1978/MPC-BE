@@ -338,7 +338,7 @@ cmsPipeline* _cmsReadInputLUT(cmsHPROFILE hProfile, int Intent)
 
     // This is an attempt to reuse this function to retrieve the matrix-shaper as pipeline no
     // matter other LUT are present and have precedence. Intent = -1 means just this.
-    if (Intent != -1) {
+    if (Intent >= INTENT_PERCEPTUAL && Intent <= INTENT_ABSOLUTE_COLORIMETRIC) {
 
         tag16 = Device2PCS16[Intent];
         tagFloat = Device2PCSFloat[Intent];
@@ -590,7 +590,7 @@ cmsPipeline* _cmsReadOutputLUT(cmsHPROFILE hProfile, int Intent)
     cmsContext ContextID  = cmsGetProfileContextID(hProfile);
 
 
-    if (Intent != -1) {
+    if (Intent >= INTENT_PERCEPTUAL && Intent <= INTENT_ABSOLUTE_COLORIMETRIC) {
 
         tag16 = PCS2Device16[Intent];
         tagFloat = PCS2DeviceFloat[Intent];
@@ -709,15 +709,21 @@ cmsPipeline* _cmsReadDevicelinkLUT(cmsHPROFILE hProfile, int Intent)
 {
     cmsPipeline* Lut;
     cmsTagTypeSignature OriginalType;
-    cmsTagSignature tag16    = Device2PCS16[Intent];
-    cmsTagSignature tagFloat = Device2PCSFloat[Intent];
+    cmsTagSignature tag16;
+    cmsTagSignature tagFloat;
     cmsContext ContextID = cmsGetProfileContextID(hProfile);
 
+
+    if (Intent < INTENT_PERCEPTUAL || Intent > INTENT_ABSOLUTE_COLORIMETRIC)
+        return NULL;
+
+    tag16 = Device2PCS16[Intent];
+    tagFloat = Device2PCSFloat[Intent];
 
     // On named color, take the appropriate tag
     if (cmsGetDeviceClass(hProfile) == cmsSigNamedColorClass) {
 
-        cmsNAMEDCOLORLIST* nc = (cmsNAMEDCOLORLIST*) cmsReadTag(hProfile, cmsSigNamedColor2Tag);
+        cmsNAMEDCOLORLIST* nc = (cmsNAMEDCOLORLIST*)cmsReadTag(hProfile, cmsSigNamedColor2Tag);
 
         if (nc == NULL) return NULL;
 
@@ -733,11 +739,12 @@ cmsPipeline* _cmsReadDevicelinkLUT(cmsHPROFILE hProfile, int Intent)
                 goto Error;
 
         return Lut;
-Error:
+    Error:
         cmsPipelineFree(Lut);
         cmsFreeNamedColorList(nc);
         return NULL;
     }
+
 
     if (cmsIsTag(hProfile, tagFloat)) {  // Float tag takes precedence
 
@@ -748,19 +755,19 @@ Error:
     tagFloat = Device2PCSFloat[0];
     if (cmsIsTag(hProfile, tagFloat)) {
 
-        return cmsPipelineDup((cmsPipeline*) cmsReadTag(hProfile, tagFloat));
+        return cmsPipelineDup((cmsPipeline*)cmsReadTag(hProfile, tagFloat));
     }
 
     if (!cmsIsTag(hProfile, tag16)) {  // Is there any LUT-Based table?
 
-        tag16    = Device2PCS16[0];
+        tag16 = Device2PCS16[0];
         if (!cmsIsTag(hProfile, tag16)) return NULL;
     }
 
     // Check profile version and LUT type. Do the necessary adjustments if needed
 
     // Read the tag
-    Lut = (cmsPipeline*) cmsReadTag(hProfile, tag16);
+    Lut = (cmsPipeline*)cmsReadTag(hProfile, tag16);
     if (Lut == NULL) return NULL;
 
     // The profile owns the Lut, so we need to copy it
@@ -773,7 +780,7 @@ Error:
         ChangeInterpolationToTrilinear(Lut);
 
     // After reading it, we have info about the original type
-    OriginalType =  _cmsGetTagTrueType(hProfile, tag16);
+    OriginalType = _cmsGetTagTrueType(hProfile, tag16);
 
     // We need to adjust data for Lab16 on output
     if (OriginalType != cmsSigLut16Type) return Lut;
@@ -781,12 +788,12 @@ Error:
     // Here it is possible to get Lab on both sides
 
     if (cmsGetColorSpace(hProfile) == cmsSigLabData) {
-        if(!cmsPipelineInsertStage(Lut, cmsAT_BEGIN, _cmsStageAllocLabV4ToV2(ContextID)))
+        if (!cmsPipelineInsertStage(Lut, cmsAT_BEGIN, _cmsStageAllocLabV4ToV2(ContextID)))
             goto Error2;
     }
 
     if (cmsGetPCS(hProfile) == cmsSigLabData) {
-        if(!cmsPipelineInsertStage(Lut, cmsAT_END, _cmsStageAllocLabV2ToV4(ContextID)))
+        if (!cmsPipelineInsertStage(Lut, cmsAT_END, _cmsStageAllocLabV2ToV4(ContextID)))
             goto Error2;
     }
 

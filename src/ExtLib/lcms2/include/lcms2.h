@@ -23,7 +23,7 @@
 //
 //---------------------------------------------------------------------------------
 //
-// Version 2.8beta0
+// Version 2.8
 //
 
 #ifndef _lcms2_H
@@ -57,6 +57,9 @@
 
 // Uncomment to get rid of pthreads/windows dependency
 // #define CMS_NO_PTHREADS  1
+
+// Uncomment this for special windows mutex initialization (see lcms2_internal.h)
+// #define CMS_RELY_ON_WINDOWS_STATIC_MUTEX_INIT
 
 // ********** End of configuration toggles ******************************
 

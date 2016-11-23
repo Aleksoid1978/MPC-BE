@@ -750,6 +750,30 @@ cmsContext CMSEXPORT cmsCreateContext(void* Plugin, void* UserData)
     struct _cmsContext_struct* ctx;
     struct _cmsContext_struct  fakeContext;
         
+    // See the comments regarding locking in lcms2_internal.h
+    // for an explanation of why we need the following code.
+#ifdef CMS_IS_WINDOWS_
+#ifndef CMS_RELY_ON_WINDOWS_STATIC_MUTEX_INIT
+    {
+        static HANDLE _cmsWindowsInitMutex = NULL;
+        static volatile HANDLE *mutex = &_cmsWindowsInitMutex;
+
+        if (*mutex == NULL)
+        {
+            HANDLE p = CreateMutex(NULL, FALSE, NULL);
+            if (InterlockedCompareExchangePointer((void **)mutex, (void*)p, NULL) != NULL)
+                CloseHandle(p);
+        }
+        if (WaitForSingleObject(*mutex, INFINITE) == WAIT_FAILED)
+            return NULL;
+        if (((void **)&_cmsContextPoolHeadMutex)[0] == NULL)
+            InitializeCriticalSection(&_cmsContextPoolHeadMutex);
+        if (!ReleaseMutex(*mutex))
+            return NULL;
+    }
+#endif
+#endif
+
     _cmsInstallAllocFunctions(_cmsFindMemoryPlugin(Plugin), &fakeContext.DefaultMemoryManager);
     
     fakeContext.chunks[UserPtr]     = UserData;
@@ -776,7 +800,7 @@ cmsContext CMSEXPORT cmsCreateContext(void* Plugin, void* UserData)
     ctx ->chunks[MemPlugin]   = &ctx->DefaultMemoryManager;
    
     // Now we can allocate the pool by using default memory manager
-    ctx ->MemPool = _cmsCreateSubAlloc(ctx, 22 * sizeof(void*));  // default size about 32 pointers
+    ctx ->MemPool = _cmsCreateSubAlloc(ctx, 22 * sizeof(void*));  // default size about 22 pointers
     if (ctx ->MemPool == NULL) {
 
          cmsDeleteContext(ctx);
