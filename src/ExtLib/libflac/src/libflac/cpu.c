@@ -73,13 +73,16 @@
 #endif
 
 
+#if defined FLAC__CPU_IA32
 /* these are flags in EDX of CPUID AX=00000001 */
 static const unsigned FLAC__CPUINFO_IA32_CPUID_CMOV = 0x00008000;
 static const unsigned FLAC__CPUINFO_IA32_CPUID_MMX = 0x00800000;
 static const unsigned FLAC__CPUINFO_IA32_CPUID_FXSR = 0x01000000;
 static const unsigned FLAC__CPUINFO_IA32_CPUID_SSE = 0x02000000;
 static const unsigned FLAC__CPUINFO_IA32_CPUID_SSE2 = 0x04000000;
+#endif
 
+#if FLAC__HAS_X86INTRIN || FLAC__AVX_SUPPORTED
 /* these are flags in ECX of CPUID AX=00000001 */
 static const unsigned FLAC__CPUINFO_IA32_CPUID_SSE3 = 0x00000001;
 static const unsigned FLAC__CPUINFO_IA32_CPUID_SSSE3 = 0x00000200;
@@ -92,6 +95,7 @@ static const unsigned FLAC__CPUINFO_IA32_CPUID_AVX = 0x10000000;
 static const unsigned FLAC__CPUINFO_IA32_CPUID_FMA = 0x00001000;
 /* these are flags in EBX of CPUID AX=00000007 */
 static const unsigned FLAC__CPUINFO_IA32_CPUID_AVX2 = 0x00000020;
+#endif
 
 /*
  * Extra stuff needed for detection of OS support for SSE on IA-32
