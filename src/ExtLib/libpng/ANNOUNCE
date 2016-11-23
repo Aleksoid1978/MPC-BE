@@ -1,4 +1,4 @@
-Libpng 1.6.23rc03 - June 7, 2016
+Libpng 1.6.27beta02 - November 8, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,45 +8,31 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.23rc03.tar.xz (LZMA-compressed, recommended)
-   1.6.23rc03.tar.gz
+   1.6.27beta02.tar.xz (LZMA-compressed, recommended)
+   1.6.27beta02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1623r03.7z  (LZMA-compressed, recommended)
-   lp1623r03.zip
+   lp1627b02.7z  (LZMA-compressed, recommended)
+   lp1627b02.zip
 
 Other information:
 
-   1.6.23rc03-README.txt
-   1.6.23rc03-LICENSE.txt
-   libpng-1.6.23rc03-*.asc (armored detached GPG signatures)
+   1.6.27beta02-README.txt
+   1.6.27beta02-LICENSE.txt
+   libpng-1.6.27beta02-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.22):
+Changes since the last public release (1.6.26):
 
-Version 1.6.23beta01 [May 29, 2016]
-  Stop a potential memory leak in png_set_tRNS() (Bug report by Ted Ying).
-  Fixed the progressive reader to handle empty first IDAT chunk properly
-    (patch by Timothy Nikkel).  This bug was introduced in libpng-1.6.0 and
-    only affected the libpng16 branch.
-  Added tests in pngvalid.c to check zero-length IDAT chunks in various
-    positions.  Fixed the sequential reader to handle these more robustly
-    (John Bowler).
+Version 1.6.27beta01 [November 2, 2016]
+  Restrict the new ADLER32-skipping to IDAT chunks.  It broke iCCP chunk
+    handling: an erroneous iCCP chunk would throw a png_error and reject the
+    entire PNG image instead of rejecting just the iCCP chunk with a warning,
+    if built with zlib-1.2.8.1.
 
-Version 1.6.23rc01 [June 2, 2016]
-  Corrected progressive read input buffer in pngvalid.c. The previous version
-    the code invariably passed just one byte at a time to libpng.  The intent
-    was to pass a random number of bytes in the range 0..511.
-  Moved sse2 prototype from pngpriv.h to contrib/intel/intel_sse.patch.
-  Added missing ")" in pngerror.c (Matt Sarrett).
-
-Version 1.6.23rc02 [June 4, 2016]
-  Fixed undefined behavior in png_push_save_buffer(). Do not call
-    memcpy() with a null source, even if count is zero (Leon Scroggins III).
-
-Version 1.6.23 [June 7, 2016]
-  Fixed bad link to RFC2083 in png.5 (Nikola Forro).
+Version 1.6.27beta02 [November 8, 2016]
+  Revert ADLER32 error handling in pngrutil.c and pngpread.c.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
