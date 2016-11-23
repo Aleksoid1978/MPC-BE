@@ -17,7 +17,7 @@ Updated libraries:
 	jsoncpp git-1.7.7-2-ga1db52b;
 	libflac git-1.3.1-215-ga52177b;
 	libpng git-v1.6.27beta01-2-gd65a92b;
-	Little-CMS git-2.7-69-g5c23621;
+	Little-CMS git-lcms2.8-27-g5d91cf4;
 	MediaInfo git-v0.7.89-122-gbf9e14f;
 	openjpeg 2.1.2 git-7113c4e;
 	soxr git-0.1.2-22-g5fa7eeb;

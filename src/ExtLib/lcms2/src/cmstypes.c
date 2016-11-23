@@ -1117,7 +1117,10 @@ void *Type_Curve_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cm
                NewGamma = cmsBuildTabulatedToneCurve16(self ->ContextID, Count, NULL);
                if (!NewGamma) return NULL;
 
-               if (!_cmsReadUInt16Array(io, Count, NewGamma -> Table16)) return NULL;
+               if (!_cmsReadUInt16Array(io, Count, NewGamma -> Table16)) {
+                   cmsFreeToneCurve(NewGamma);
+                   return NULL;
+               }
 
                *nItems = 1;
                return NewGamma;
@@ -1460,6 +1463,7 @@ void *Type_MLU_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cmsU
 
         // Check for overflow
         if (Offset < (SizeOfHeader + 8)) goto Error;
+        if ((Offset + Len) > SizeOfTag + 8) goto Error;
 
         // True begin of the string
         BeginOfThisString = Offset - SizeOfHeader - 8;
@@ -2352,7 +2356,10 @@ cmsStage* ReadCLUT(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cmsUI
 
         for (i=0; i < Data ->nEntries; i++) {
 
-            if (io ->Read(io, &v, sizeof(cmsUInt8Number), 1) != 1) return NULL;
+            if (io ->Read(io, &v, sizeof(cmsUInt8Number), 1) != 1) {
+                cmsStageFree(CLUT);
+                return NULL;
+            }
             Data ->Tab.T[i] = FROM_8_TO_16(v);
         }
 
@@ -2981,7 +2988,7 @@ void *Type_ColorantTable_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER
     for (i=0; i < Count; i++) {
 
         if (io ->Read(io, Name, 32, 1) != 1) goto Error;
-        Name[33] = 0;
+        Name[32] = 0;
 
         if (!_cmsReadUInt16Array(io, 3, PCS)) goto Error;
 
@@ -3017,6 +3024,8 @@ cmsBool  Type_ColorantTable_Write(struct _cms_typehandler_struct* self, cmsIOHAN
 
         char root[33];
         cmsUInt16Number PCS[3];
+
+        memset(root, 0, sizeof(root));
 
         if (!cmsNamedColorInfo(NamedColorList, i, root, NULL, NULL, PCS, NULL)) return 0;
         root[32] = 0;
@@ -3099,7 +3108,7 @@ void *Type_NamedColor_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* i
 
     if (nDeviceCoords > cmsMAXCHANNELS) {
         cmsSignalError(self->ContextID, cmsERROR_RANGE, "Too many device coordinates '%d'", nDeviceCoords);
-        return 0;
+        goto Error;
     }
     for (i=0; i < count; i++) {
 
@@ -3108,7 +3117,7 @@ void *Type_NamedColor_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* i
         char Root[33];
 
         memset(Colorant, 0, sizeof(Colorant));
-        if (io -> Read(io, Root, 32, 1) != 1) return NULL;
+        if (io -> Read(io, Root, 32, 1) != 1) goto Error;
         Root[32] = 0;  // To prevent exploits
 
         if (!_cmsReadUInt16Array(io, 3, PCS)) goto Error;
@@ -3968,7 +3977,7 @@ cmsToneCurve* ReadSegmentedCurve(struct _cms_typehandler_struct* self, cmsIOHAND
             case cmsSigSampledCurveSeg: {
                 cmsUInt32Number Count;
 
-                if (!_cmsReadUInt32Number(io, &Count)) return NULL;
+                if (!_cmsReadUInt32Number(io, &Count)) goto Error;
 
                 Segments[i].nGridPoints = Count;
                 Segments[i].SampledPoints = (cmsFloat32Number*) _cmsCalloc(self ->ContextID, Count, sizeof(cmsFloat32Number));
@@ -3987,7 +3996,7 @@ cmsToneCurve* ReadSegmentedCurve(struct _cms_typehandler_struct* self, cmsIOHAND
                 _cmsTagSignature2String(String, (cmsTagSignature) ElementSig);
                 cmsSignalError(self->ContextID, cmsERROR_UNKNOWN_EXTENSION, "Unknown curve element type '%s' found.", String);
                 }
-                return NULL;
+                goto Error;
 
          }
      }
@@ -4001,7 +4010,12 @@ cmsToneCurve* ReadSegmentedCurve(struct _cms_typehandler_struct* self, cmsIOHAND
      return Curve;
 
 Error:
-     if (Segments) _cmsFree(self ->ContextID, Segments);
+     if (Segments) {
+         for (i=0; i < nSegments; i++) {
+             if (Segments[i].SampledPoints) _cmsFree(self ->ContextID, Segments[i].SampledPoints);
+         }
+         _cmsFree(self ->ContextID, Segments);
+     }
      return NULL;
 }
 
@@ -4203,7 +4217,11 @@ void *Type_MPEmatrix_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io
 
         cmsFloat32Number v;
 
-        if (!_cmsReadFloat32Number(io, &v)) return NULL;
+        if (!_cmsReadFloat32Number(io, &v)) {
+            _cmsFree(self ->ContextID, Matrix);
+            _cmsFree(self ->ContextID, Offsets);
+            return NULL;
+        }
         Matrix[i] = v;
     }
 
@@ -4212,7 +4230,11 @@ void *Type_MPEmatrix_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io
 
         cmsFloat32Number v;
 
-        if (!_cmsReadFloat32Number(io, &v)) return NULL;
+        if (!_cmsReadFloat32Number(io, &v)) {
+            _cmsFree(self ->ContextID, Matrix);
+            _cmsFree(self ->ContextID, Offsets);
+            return NULL;
+        }
         Offsets[i] = v;
     }
 
@@ -4284,8 +4306,12 @@ void *Type_MPEclut_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, 
 
     // Copy MAX_INPUT_DIMENSIONS at most. Expand to cmsUInt32Number
     nMaxGrids = InputChans > MAX_INPUT_DIMENSIONS ? MAX_INPUT_DIMENSIONS : InputChans;
-    for (i=0; i < nMaxGrids; i++) GridPoints[i] = (cmsUInt32Number) Dimensions8[i];
 
+    for (i = 0; i < nMaxGrids; i++) {
+        if (Dimensions8[i] == 1) goto Error; // Impossible value, 0 for no CLUT and then 2 at least
+        GridPoints[i] = (cmsUInt32Number)Dimensions8[i];
+    }
+    
     // Allocate the true CLUT
     mpe = cmsStageAllocCLutFloatGranular(self ->ContextID, GridPoints, InputChans, OutputChans, NULL);
     if (mpe == NULL) goto Error;
@@ -4312,13 +4338,13 @@ Error:
 static
 cmsBool  Type_MPEclut_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, void* Ptr, cmsUInt32Number nItems)
 {
-    cmsUInt8Number Dimensions8[16];
+    cmsUInt8Number Dimensions8[16];  // 16 because the spec says 16 and not max number of channels
     cmsUInt32Number i;
     cmsStage* mpe = (cmsStage*) Ptr;
     _cmsStageCLutData* clut = (_cmsStageCLutData*) mpe ->Data;
 
-    // Check for maximum number of channels
-    if (mpe -> InputChannels > 15) return FALSE;
+    // Check for maximum number of channels supported by lcms
+    if (mpe -> InputChannels > MAX_INPUT_DIMENSIONS) return FALSE;
 
     // Only floats are supported in MPE
     if (clut ->HasFloatValues == FALSE) return FALSE;

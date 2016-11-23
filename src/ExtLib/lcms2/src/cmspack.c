@@ -1330,7 +1330,7 @@ cmsUInt8Number* PackAnyWords(register _cmsTRANSFORM* info,
                              register cmsUInt32Number Stride)
 {
     int nChan      = T_CHANNELS(info -> OutputFormat);
-    int SwapEndian = T_ENDIAN16(info -> InputFormat);
+    int SwapEndian = T_ENDIAN16(info -> OutputFormat);
     int DoSwap     = T_DOSWAP(info ->OutputFormat);
     int Reverse    = T_FLAVOR(info ->OutputFormat);
     int Extra      = T_EXTRA(info -> OutputFormat);

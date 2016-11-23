@@ -1138,15 +1138,20 @@ cmsHPROFILE CMSEXPORT cmsTransform2DeviceLink(cmsHTRANSFORM hTransform, cmsFloat
     // If no way, then force CLUT that for sure can be written
     if (AllowedLUT == NULL) {
 
+        cmsStage* FirstStage;
+        cmsStage* LastStage;
+
         dwFlags |= cmsFLAGS_FORCE_CLUT;
         _cmsOptimizePipeline(ContextID, &LUT, xform ->RenderingIntent, &FrmIn, &FrmOut, &dwFlags);
 
         // Put identity curves if needed
-        if (cmsPipelineGetPtrToFirstStage(LUT) ->Type != cmsSigCurveSetElemType)
+        FirstStage = cmsPipelineGetPtrToFirstStage(LUT);
+        if (FirstStage != NULL && FirstStage ->Type != cmsSigCurveSetElemType)
              if (!cmsPipelineInsertStage(LUT, cmsAT_BEGIN, _cmsStageAllocIdentityCurves(ContextID, ChansIn)))
                  goto Error;
 
-        if (cmsPipelineGetPtrToLastStage(LUT) ->Type != cmsSigCurveSetElemType)
+        LastStage = cmsPipelineGetPtrToLastStage(LUT);
+        if (LastStage != NULL && LastStage ->Type != cmsSigCurveSetElemType)
              if (!cmsPipelineInsertStage(LUT, cmsAT_END,   _cmsStageAllocIdentityCurves(ContextID, ChansOut)))
                  goto Error;
 

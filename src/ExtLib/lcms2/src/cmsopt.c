@@ -694,7 +694,7 @@ cmsBool OptimizeByResampling(cmsPipeline** Lut, cmsUInt32Number Intent, cmsUInt3
 
     // Allocate the CLUT
     CLUT = cmsStageAllocCLut16bit(Src ->ContextID, nGridPoints, Src ->InputChannels, Src->OutputChannels, NULL);
-    if (CLUT == NULL) return FALSE;
+    if (CLUT == NULL) goto Error;
 
     // Add the CLUT to the destination LUT
     if (!cmsPipelineInsertStage(Dest, cmsAT_END, CLUT)) {
