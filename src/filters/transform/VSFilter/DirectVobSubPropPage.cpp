@@ -463,29 +463,11 @@ void CDVSMainPPage::UpdateControlData(bool fSave)
 		m_langs.SetCurSel(m_iSelectedLanguage);
 
 		m_PARCombo.ResetContent();
-		m_PARCombo.InsertString(0, ResStr(IDS_RT_PAR_DISABLED));
-		m_PARCombo.SetItemData(0, CSimpleTextSubtitle::EPCTDisabled);
-		if (m_ePARCompensationType == CSimpleTextSubtitle::EPCTDisabled) {
-			m_PARCombo.SetCurSel(0);
-		}
-
-		m_PARCombo.InsertString(1, ResStr(IDS_RT_PAR_DOWNSCALE));
-		m_PARCombo.SetItemData(1, CSimpleTextSubtitle::EPCTDownscale);
-		if (m_ePARCompensationType == CSimpleTextSubtitle::EPCTDownscale) {
-			m_PARCombo.SetCurSel(1);
-		}
-
-		m_PARCombo.InsertString(2, ResStr(IDS_RT_PAR_UPSCALE));
-		m_PARCombo.SetItemData(2, CSimpleTextSubtitle::EPCTUpscale);
-		if (m_ePARCompensationType == CSimpleTextSubtitle::EPCTUpscale) {
-			m_PARCombo.SetCurSel(2);
-		}
-
-		m_PARCombo.InsertString(3, ResStr(IDS_RT_PAR_ACCURATE_SIZE));
-		m_PARCombo.SetItemData(3, CSimpleTextSubtitle::EPCTAccurateSize);
-		if (m_ePARCompensationType == CSimpleTextSubtitle::EPCTAccurateSize) {
-			m_PARCombo.SetCurSel(3);
-		}
+		AddStringData(m_PARCombo, ResStr(IDS_RT_PAR_DISABLED),      CSimpleTextSubtitle::EPCTDisabled);
+		AddStringData(m_PARCombo, ResStr(IDS_RT_PAR_DOWNSCALE),     CSimpleTextSubtitle::EPCTDownscale);
+		AddStringData(m_PARCombo, ResStr(IDS_RT_PAR_UPSCALE),       CSimpleTextSubtitle::EPCTUpscale);
+		AddStringData(m_PARCombo, ResStr(IDS_RT_PAR_ACCURATE_SIZE), CSimpleTextSubtitle::EPCTAccurateSize);
+		SelectByItemData(m_PARCombo, m_ePARCompensationType);
 	}
 }
 
@@ -564,44 +546,36 @@ void CDVSGeneralPPage::UpdateControlData(bool fSave)
 		m_bEmbeddedLoad = !!m_embload.GetCheck();
 	} else {
 		m_verext.ResetContent();
-		m_verext.AddString(ResStr(IDS_ORGHEIGHT));
-		m_verext.SetItemData(0, 0);
-		m_verext.AddString(ResStr(IDS_EXTTO169));
-		m_verext.SetItemData(1, 1);
-		m_verext.AddString(ResStr(IDS_EXTTO43));
-		m_verext.SetItemData(2, 2);
-		m_verext.AddString(ResStr(IDS_EXTTO480));
-		m_verext.SetItemData(3, 3);
-		m_verext.AddString(ResStr(IDS_EXTTO576));
-		m_verext.SetItemData(4, 4);
-		m_verext.AddString(ResStr(IDS_CROPTO169));
-		m_verext.SetItemData(5, 0x81);
-		m_verext.AddString(ResStr(IDS_CROPTO43));
-		m_verext.SetItemData(6, 0x82);
+		AddStringData(m_verext, ResStr(IDS_ORGHEIGHT),    0);
+		AddStringData(m_verext, ResStr(IDS_EXTTO169),     1);
+		AddStringData(m_verext, ResStr(IDS_EXTTO43),      2);
+		AddStringData(m_verext, ResStr(IDS_EXTTO480),     3);
+		AddStringData(m_verext, ResStr(IDS_EXTTO576),     4);
+		AddStringData(m_verext, ResStr(IDS_CROPTO169), 0x81);
+		AddStringData(m_verext, ResStr(IDS_CROPTO43),  0x82);
 		m_verext.SetCurSel((m_VerExt&0x7f) + ((m_VerExt&0x80)?4:0));
+
 		m_mod32fix.SetCheck(m_HorExt&1);
+
 		m_resx2.ResetContent();
-		m_resx2.AddString(ResStr(IDS_ORGRES));
-		m_resx2.SetItemData(0, 0);
-		m_resx2.AddString(ResStr(IDS_DBLRES));
-		m_resx2.SetItemData(1, 1);
-		m_resx2.AddString(ResStr(IDS_DBLRESIF));
-		m_resx2.SetItemData(2, 2);
+		AddStringData(m_resx2,ResStr(IDS_ORGRES),   0);
+		AddStringData(m_resx2,ResStr(IDS_DBLRES),   1);
+		AddStringData(m_resx2,ResStr(IDS_DBLRESIF), 2);
 		m_resx2.SetCurSel(m_ResX2);
+
 		m_resx2w.SetRange(0, 2048);
 		m_resx2w.SetPos(m_ResX2minw);
 		m_resx2w.EnableWindow(m_ResX2 == 2);
 		m_resx2h.SetRange(0, 2048);
 		m_resx2h.SetPos(m_ResX2minh);
 		m_resx2h.EnableWindow(m_ResX2 == 2);
+
 		m_load.ResetContent();
-		m_load.AddString(ResStr(IDS_DONOTLOAD));
-		m_load.SetItemData(0, 2);
-		m_load.AddString(ResStr(IDS_LOADWHENNEEDED));
-		m_load.SetItemData(1, 0);
-		m_load.AddString(ResStr(IDS_ALWAYSLOAD));
-		m_load.SetItemData(2, 1);
+		AddStringData(m_load, ResStr(IDS_DONOTLOAD),      2);
+		AddStringData(m_load, ResStr(IDS_LOADWHENNEEDED), 0);
+		AddStringData(m_load, ResStr(IDS_ALWAYSLOAD),     1);
 		m_load.SetCurSel(!m_LoadLevel?1:m_LoadLevel==1?2:0);
+
 		m_extload.SetCheck(m_bExternalLoad);
 		m_webload.SetCheck(m_bWebLoad);
 		m_embload.SetCheck(m_bEmbeddedLoad);

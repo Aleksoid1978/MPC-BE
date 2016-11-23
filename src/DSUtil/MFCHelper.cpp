@@ -146,5 +146,10 @@ inline int GetCurItemData(CListBox& ListBox)
 
 inline void AddStringData(CComboBox& ComboBox, LPCTSTR str, int data)
 {
-	ComboBox.SetItemData(ComboBox.AddString(str), data);
+	ComboBox.SetItemData(ComboBox.AddString(str), (DWORD_PTR)data);
+}
+
+inline void AddStringData(CListBox& ListBox, LPCTSTR str, int data)
+{
+	ListBox.SetItemData(ListBox.AddString(str), (DWORD_PTR)data);
 }
