@@ -37,6 +37,8 @@ public :
 
 private :
     File_Hevc(const File_Hevc &File_Hevc); //No copy
+    File_Hevc &operator =(const File_Hevc &); //No copy
+
 
     //Structures - video_parameter_set
     struct video_parameter_set_struct
@@ -67,6 +69,7 @@ private :
 
     private:
         video_parameter_set_struct &operator=(const video_parameter_set_struct &v);
+        video_parameter_set_struct(const video_parameter_set_struct &a);
         video_parameter_set_struct();
     };
     typedef vector<video_parameter_set_struct*> video_parameter_set_structs;
@@ -99,16 +102,6 @@ private :
                     {
                     }
 
-                    xxl_data &operator=(const xxl_data &x)
-                    {
-                        bit_rate_value = x.bit_rate_value;
-                        cpb_size_value = x.cpb_size_value;
-                        cbr_flag = x.cbr_flag;
-                        //initial_cpb_removal_delay=x.initial_cpb_removal_delay;
-                        //initial_cpb_removal_delay_offset=x.initial_cpb_removal_delay_offset;
-                        return *this;
-                    }
-
                 private:
                     xxl_data();
                 };
@@ -119,15 +112,9 @@ private :
                     SchedSel(SchedSel_)
                 {
                 }
-
-                xxl &operator=(const xxl &x)
-                {
-                    SchedSel = x.SchedSel;
-
-                    return *this;
-                }
-
             private:
+                xxl &operator=(const xxl &x);
+                xxl(const xxl &);
                 xxl();
             };
             struct xxl_common
@@ -149,18 +136,6 @@ private :
                     au_cpb_removal_delay_length_minus1(au_cpb_removal_delay_length_minus1_),
                     dpb_output_delay_length_minus1(dpb_output_delay_length_minus1_)
                 {
-                }
-
-                xxl_common &operator=(const xxl_common &x)
-                {
-                    sub_pic_hrd_params_present_flag = x.sub_pic_hrd_params_present_flag;
-                    du_cpb_removal_delay_increment_length_minus1 = x.du_cpb_removal_delay_increment_length_minus1;
-                    dpb_output_delay_du_length_minus1 = x.dpb_output_delay_du_length_minus1;
-                    initial_cpb_removal_delay_length_minus1 = x.initial_cpb_removal_delay_length_minus1;
-                    au_cpb_removal_delay_length_minus1 = x.au_cpb_removal_delay_length_minus1;
-                    dpb_output_delay_length_minus1 = x.dpb_output_delay_length_minus1;
-
-                    return *this;
                 }
 
             private:
@@ -217,6 +192,7 @@ private :
 
         private:
             vui_parameters_struct &operator=(const vui_parameters_struct &v);
+            vui_parameters_struct(const vui_parameters_struct &);
             vui_parameters_struct();
         };
         vui_parameters_struct* vui_parameters;
@@ -290,6 +266,7 @@ private :
 
     private:
         seq_parameter_set_struct &operator=(const seq_parameter_set_struct &v);
+        seq_parameter_set_struct(const seq_parameter_set_struct &);
         seq_parameter_set_struct();
     };
     typedef vector<seq_parameter_set_struct*> seq_parameter_set_structs;
@@ -331,6 +308,7 @@ private :
 
     private:
         pic_parameter_set_struct &operator=(const pic_parameter_set_struct &v);
+        pic_parameter_set_struct(const pic_parameter_set_struct &a);
         pic_parameter_set_struct();
     };
     typedef vector<pic_parameter_set_struct*> pic_parameter_set_structs;

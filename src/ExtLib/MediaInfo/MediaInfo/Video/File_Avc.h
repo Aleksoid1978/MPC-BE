@@ -56,6 +56,7 @@ public :
 
 private :
     File_Avc(const File_Avc &File_Avc); //No copy
+    File_Avc &operator =(const File_Avc &);
 
     //Structures - seq_parameter_set
     struct seq_parameter_set_struct
@@ -84,17 +85,6 @@ private :
                         //initial_cpb_removal_delay_offset(initial_cpb_removal_delay_offset_)
                     {
                     }
-
-                    xxl_data &operator=(const xxl_data &x)
-                    {
-                        bit_rate_value=x.bit_rate_value;
-                        cpb_size_value=x.cpb_size_value;
-                        cbr_flag=x.cbr_flag;
-                        //initial_cpb_removal_delay=x.initial_cpb_removal_delay;
-                        //initial_cpb_removal_delay_offset=x.initial_cpb_removal_delay_offset;
-                        return *this;
-                    }
-
                 private:
                     xxl_data();
                 };
@@ -113,20 +103,10 @@ private :
                     time_offset_length(time_offset_length_)
                 {
                 }
-
-                xxl &operator=(const xxl &x)
-                {
-                    SchedSel=x.SchedSel;
-                    initial_cpb_removal_delay_length_minus1=x.initial_cpb_removal_delay_length_minus1;
-                    cpb_removal_delay_length_minus1=x.cpb_removal_delay_length_minus1;
-                    dpb_output_delay_length_minus1=x.dpb_output_delay_length_minus1;
-                    time_offset_length=x.time_offset_length;
-
-                    return *this;
-                }
-
             private:
                 xxl();
+                xxl &operator =(const xxl &);
+                xxl(const xxl &);
             };
             struct bitstream_restriction_struct
             {
@@ -137,14 +117,6 @@ private :
                     max_num_reorder_frames(max_num_reorder_frames_)
                 {
                 }
-
-                bitstream_restriction_struct &operator=(const bitstream_restriction_struct &b)
-                {
-                    max_num_reorder_frames=b.max_num_reorder_frames;
-
-                    return *this;
-                }
-
             private:
                 bitstream_restriction_struct();
             };
@@ -201,6 +173,7 @@ private :
 
         private:
             vui_parameters_struct &operator=(const vui_parameters_struct &v);
+            vui_parameters_struct(const vui_parameters_struct &);
             vui_parameters_struct();
         };
         vui_parameters_struct* vui_parameters;
@@ -297,6 +270,7 @@ private :
 
     private:
         seq_parameter_set_struct &operator=(const seq_parameter_set_struct &v);
+        seq_parameter_set_struct(const seq_parameter_set_struct &);
         seq_parameter_set_struct();
     };
     typedef vector<seq_parameter_set_struct*> seq_parameter_set_structs;
@@ -350,6 +324,7 @@ private :
 
     private:
         pic_parameter_set_struct &operator=(const pic_parameter_set_struct &v);
+        pic_parameter_set_struct(const pic_parameter_set_struct &);
         pic_parameter_set_struct();
     };
     typedef vector<pic_parameter_set_struct*> pic_parameter_set_structs;

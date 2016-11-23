@@ -226,10 +226,8 @@ void File_Ttml::Read_Buffer_Continue()
             //p
             if (!strcmp(p->Value(), "p"))
             {
-                const char* Attribute;
-
                 int64u DTS_Begin=(int64u)-1;
-                Attribute=p->Attribute("begin");
+                const char* Attribute=p->Attribute("begin");
                 if (Attribute)
                     DTS_Begin=Ttml_str2timecode(Attribute);
                 int64u DTS_End=(int64u)-1;

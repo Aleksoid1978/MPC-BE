@@ -350,6 +350,21 @@ protected :
 
         Element[Element_Level].TraceNode.Infos.push_back(new element_details::Element_Node_Info(Parameter, Measure, AfterComma));
     }
+
+    void Element_Info (const char* Parameter, const char* Measure=NULL, int8u AfterComma=3)
+    {
+        if (Config_Trace_Level<1)
+            return;
+
+        //Needed?
+        if (Config_Trace_Level<=0.7)
+            return;
+
+        if (Parameter && std::string(Parameter) == "NOK")
+            Element[Element_Level].TraceNode.HasError = true;
+
+        Element[Element_Level].TraceNode.Infos.push_back(new element_details::Element_Node_Info(Parameter, Measure, AfterComma));
+    }
 #endif //MEDIAINFO_TRACE
 
     #ifdef SIZE_T_IS_LONG
@@ -414,7 +429,7 @@ public :
         int64u Pos=Element_Offset+BS->OffsetBeforeLastCall_Get();
 
         element_details::Element_Node *node = new element_details::Element_Node;
-        node->Set_Name(Parameter.c_str());
+        node->Set_Name(Parameter);
         node->Pos = Pos==(int64u)-1 ? Pos : (File_Offset+Buffer_Offset+Pos);
         node->Value.set_Option(GenericOption);
         node->Value = Value;
@@ -450,6 +465,26 @@ public :
 
         // if (!(Trace_Layers.to_ulong()&Config_Trace_Layers.to_ulong()) || Element[Element_Level].TraceNode.Details.size()>64*1024*1024)
         //     return;
+        int32s child = Element[Element_Level].TraceNode.Current_Child;
+        if (child >= 0 && Element[Element_Level].TraceNode.Children[child])
+            Element[Element_Level].TraceNode.Children[child]->Infos.push_back(new element_details::Element_Node_Info(Parameter, Measure, AfterComma));
+        else
+            Element[Element_Level].TraceNode.Infos.push_back(new element_details::Element_Node_Info(Parameter, Measure, AfterComma));
+    }
+
+    void Param_Info(const char* Parameter, const char* Measure=NULL, int8u AfterComma=3)
+    {
+        //Coherancy
+        if (!Trace_Activated)
+            return;
+        if (Element[Element_Level].UnTrusted)
+            return;
+        if (Config_Trace_Level<=0.7)
+            return;
+
+        if (Parameter && std::string(Parameter) == "NOK")
+            Element[Element_Level].TraceNode.HasError = true;
+
         int32s child = Element[Element_Level].TraceNode.Current_Child;
         if (child >= 0 && Element[Element_Level].TraceNode.Children[child])
             Element[Element_Level].TraceNode.Children[child]->Infos.push_back(new element_details::Element_Node_Info(Parameter, Measure, AfterComma));
@@ -1098,6 +1133,11 @@ public :
     void Element_DoNotTrust (const char* Reason);
     void Element_DoNotShow ();
     void Element_Show ();
+    void Element_Set_Remove_Children_IfNoErrors ();
+    void Element_Remove_Children_IfNoErrors ();
+    void Element_Children_IfNoErrors ();
+    void Element_DoNotShow_Children ();
+    void Element_Show_Children ();
     bool Element_Show_Get ();
     void Element_Show_Add (File__Analyze* node);
 
@@ -1238,6 +1278,9 @@ protected :
     bool Synchronize_0x000001();
 public:
     void TestContinuousFileNames(size_t CountOfFiles=24, Ztring FileExtension=Ztring(), bool SkipComputeDelay=false);
+    #if MEDIAINFO_FIXITY
+    bool FixFile(int64u FileOffsetForWriting, const int8u* ToWrite, const size_t ToWrite_Size);
+    #endif// MEDIAINFO_FIXITY
 
 private :
 
@@ -1262,7 +1305,9 @@ protected :
     std::bitset<32> Trace_Layers;
     void Trace_Layers_Update (size_t Layer=(size_t)-1);
 private :
-
+#if MEDIAINFO_TRACE
+    void Trace_Details_Handling(File__Analyze* Sub);
+#endif // MEDIAINFO_TRACE
     //Elements
     size_t Element_Level_Base;      //From other parsers
     std::vector<element_details> Element;

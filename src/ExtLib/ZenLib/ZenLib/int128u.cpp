@@ -35,9 +35,7 @@
   Version: 1.1
 */
 
-#include <memory>
 #include <cmath>
-#include <cstring>
 #if defined (__BORLANDC__) || defined (__SUNPRO_CC)
     #define fmodf fmod
 #endif

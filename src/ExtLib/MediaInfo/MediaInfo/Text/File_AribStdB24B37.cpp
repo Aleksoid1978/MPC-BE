@@ -832,7 +832,7 @@ void File_AribStdB24B37::Add (Char Character)
 }
 
 //---------------------------------------------------------------------------
-void File_AribStdB24B37::Add (Ztring Character)
+void File_AribStdB24B37::Add (const Ztring& Character)
 {
     Streams[(size_t)(Element_Code-1)].Line+=Character;
 }

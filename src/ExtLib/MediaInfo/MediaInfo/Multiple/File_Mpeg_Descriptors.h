@@ -605,7 +605,7 @@ struct complete_stream
     std::vector<File__Duplicate_MpegTs*>                Duplicates_Speed;
     std::vector<std::vector<File__Duplicate_MpegTs*> >  Duplicates_Speed_FromPID;
     std::map<const String, File__Duplicate_MpegTs*>     Duplicates;
-    bool File__Duplicate_Get_From_PID (int16u pid)
+    bool File__Duplicate_Get_From_PID (int16u pid) const
     {
         if (Duplicates_Speed_FromPID.empty())
             return false;

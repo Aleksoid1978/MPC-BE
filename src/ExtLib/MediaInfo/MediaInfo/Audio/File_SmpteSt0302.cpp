@@ -73,6 +73,7 @@ File_SmpteSt0302::~File_SmpteSt0302()
 //---------------------------------------------------------------------------
 void File_SmpteSt0302::Streams_Accept()
 {
+#ifdef MEDIAINFO_SMPTEST0337_YES
     // SMPTE ST 337
     {
         File_SmpteSt0337* SmpteSt0337=new File_SmpteSt0337();
@@ -92,7 +93,8 @@ void File_SmpteSt0302::Streams_Accept()
         #endif //MEDIAINFO_EVENTS
         Parsers.push_back(SmpteSt0337);
     }
-
+#endif // MEDIAINFO_SMPTEST0337_YES
+#ifdef MEDIAINFO_PCM_YES
     // Raw PCM
     {
         File_Pcm* Pcm=new File_Pcm();
@@ -115,6 +117,7 @@ void File_SmpteSt0302::Streams_Accept()
     // Init
     for (size_t Pos=0; Pos<Parsers.size(); Pos++)
         Open_Buffer_Init(Parsers[Pos]);
+#endif // MEDIAINFO_PCM_YES
 
     //Time stamps
     Frequency_b=48000;

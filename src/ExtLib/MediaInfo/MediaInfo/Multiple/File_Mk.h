@@ -391,8 +391,6 @@ private :
     void JumpTo(int64u GoTo);
     void TestMultipleInstances(size_t* Instances=NULL);
     void CRC32_Check();
-    void CRC32_Compute(int32u &CRC32, int32u Init, const int8u* Buffer_Begin, const int8u* Buffer_End);
-    void CRC32_Compute(int32u &CRC32, const int8u* Buffer_Begin, const int8u* Buffer_End);
 #if MEDIAINFO_TRACE
     bool CRC32_Check_In_Node(const std::string& ToSearchInInfo, const std::string& info, element_details::Element_Node *node);
 #endif // MEDIAINFO_TRACE

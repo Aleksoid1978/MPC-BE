@@ -132,11 +132,11 @@ bool Aac_f_master_Compute_0(int8u &num_env_bands_Master, int8u* f_Master, sbr_ha
 //---------------------------------------------------------------------------
 // Master frequency band table
 // Computing for bs_freq_scale != 0
-int int8u_cmp(const void *a, const void *b)
+static int int8u_cmp(const void *a, const void *b)
 {
     return ((int8u)(*(int8u*)a - *(int8u*)b));
 }
-bool Aac_f_master_Compute(int8u &num_env_bands_Master, int8u* f_Master, sbr_handler *sbr, int8u  k0, int8u  k2)
+static bool Aac_f_master_Compute(int8u &num_env_bands_Master, int8u* f_Master, sbr_handler *sbr, int8u  k0, int8u  k2)
 {
     int8u temp1[]={6, 5, 4 };
     int8u bands=temp1[sbr->bs_freq_scale-1];
@@ -233,7 +233,7 @@ bool Aac_f_master_Compute(int8u &num_env_bands_Master, int8u* f_Master, sbr_hand
 
 //---------------------------------------------------------------------------
 // Derived frequency border tables
-bool Aac_bands_Compute(int8u &num_env_bands_Master, int8u* f_Master, sbr_handler *sbr, int8u  k2)
+static bool Aac_bands_Compute(const int8u &num_env_bands_Master, int8u* f_Master, sbr_handler *sbr, int8u  k2)
 {
     sbr->num_env_bands[1]=num_env_bands_Master-sbr->bs_xover_band;
     sbr->num_env_bands[0]=(sbr->num_env_bands[1]>>1)+(sbr->num_env_bands[1]-((sbr->num_env_bands[1]>>1)<<1));
@@ -254,7 +254,7 @@ bool Aac_bands_Compute(int8u &num_env_bands_Master, int8u* f_Master, sbr_handler
 }
 
 //---------------------------------------------------------------------------
-bool Aac_Sbr_Compute(sbr_handler *sbr, int8u extension_sampling_frequency_index)
+static bool Aac_Sbr_Compute(sbr_handler *sbr, int8u extension_sampling_frequency_index)
 {
     if (extension_sampling_frequency_index>=9)
         return 0; //Not supported
@@ -296,7 +296,7 @@ bool Aac_Sbr_Compute(sbr_handler *sbr, int8u extension_sampling_frequency_index)
 }
 
 //---------------------------------------------------------------------------
-int16u File_Aac::sbr_huff_dec(sbr_huffman Table, const char* Name)
+int16u File_Aac::sbr_huff_dec(const sbr_huffman& Table, const char* Name)
 {
     int8u bit;
     int16s index = 0;

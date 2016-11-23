@@ -52,6 +52,52 @@ const int32s Slice::Context::Cmax = 127;
 const int32s Slice::Context::Cmin = -128;
 
 //***************************************************************************
+// Helpers
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+static int32u FFv1_CRC_Compute(const int8u* Buffer, size_t Start, size_t Size)
+{
+    int32u CRC_32 = 0;
+    const int8u* CRC_32_Buffer=Buffer+Start;
+    const int8u* CRC_32_Buffer_End=CRC_32_Buffer+Size;
+
+    while(CRC_32_Buffer<CRC_32_Buffer_End)
+    {
+        CRC_32=(CRC_32<<8) ^ Psi_CRC_32_Table[(CRC_32>>24)^(*CRC_32_Buffer)];
+        CRC_32_Buffer++;
+    }
+    return CRC_32;
+}
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_FIXITY
+static size_t Ffv1_TryToFixCRC(const int8u* Buffer, size_t Buffer_Size)
+{
+    //looking for a bit flip
+    int8u* Buffer2=new int8u[Buffer_Size];
+    memcpy(Buffer2, Buffer, Buffer_Size);
+    vector<size_t> BitPositions;
+    size_t BitPosition_Max=Buffer_Size*8;
+    for (size_t BitPosition=0; BitPosition<BitPosition_Max; BitPosition++)
+    {
+        size_t BytePosition=BitPosition>>3;
+        size_t BitInBytePosition=BitPosition&0x7;
+        Buffer2[BytePosition]^=1<<BitInBytePosition;
+        int32u crc_left_New=FFv1_CRC_Compute(Buffer2, 0, Buffer_Size);
+        if (!crc_left_New)
+        {
+            BitPositions.push_back(BitPosition);
+        }
+        Buffer2[BytePosition]^=1<<BitInBytePosition;
+    }
+    delete[] Buffer2; //Buffer2=NULL
+
+    return BitPositions.size()==1?BitPositions[0]:(size_t)-1;
+}
+#endif //MEDIAINFO_FIXITY
+
+//***************************************************************************
 // RangeCoder
 //***************************************************************************
 
@@ -593,7 +639,7 @@ void File_Ffv1::Read_Buffer_OutOfBand()
 {
     ConfigurationRecordIsPresent=true;
 
-    int32u CRC_32=CRC_Compute((size_t)Element_Size);
+    int32u CRC_32=FFv1_CRC_Compute(Buffer+Buffer_Offset, (size_t)Element_Offset, (size_t)Element_Size);
 
     if (Buffer_Size < 4 || CRC_32)
     {
@@ -694,12 +740,13 @@ void File_Ffv1::Read_Buffer_Continue()
     for (size_t Pos = 0; Pos < Slices_BufferSizes.size(); Pos++)
     {
         Element_Begin1("Slice");
+        int64u Element_Offset_Begin=Element_Offset;
         int64u Element_Size_Save=Element_Size;
         Element_Size=Element_Offset+Slices_BufferSizes[Pos]-tail;
         int32u crc_left=0;
 
         if (error_correction == 1)
-            crc_left=CRC_Compute(Slices_BufferSizes[Pos]);
+            crc_left=FFv1_CRC_Compute(Buffer+Buffer_Offset, (size_t)Element_Offset, Slices_BufferSizes[Pos]);
 
         if (Pos)
         {
@@ -714,12 +761,10 @@ void File_Ffv1::Read_Buffer_Continue()
 #if MEDIAINFO_TRACE
         if (!Frame_Count || Trace_Activated) // Parse slice only if trace feature is activated
         {
-            int64u Start=Element_Offset;
-
             if (!slice(States))
             {
-                int64u SliceRealSize=Element_Offset-Start;
-                Element_Offset=Start;
+                int64u SliceRealSize=Element_Offset-Element_Offset_Begin;
+                Element_Offset=Element_Offset_Begin;
                 Skip_XX(SliceRealSize,                          "slice_data");
                 if (Trusted_Get() && !RC->Underrun() && Element_Offset==Element_Size)
                     Param_Info1("OK");
@@ -741,7 +786,24 @@ void File_Ffv1::Read_Buffer_Continue()
             if (!crc_left)
                 Param_Info1("OK");
             else
+            {
                 Param_Info1("NOK");
+
+                #if MEDIAINFO_FIXITY
+                    if (Config->TryToFix_Get())
+                    {
+                        size_t BitPosition=Ffv1_TryToFixCRC(Buffer+Buffer_Offset+(size_t)Element_Offset_Begin, Element_Offset-Element_Offset_Begin);
+                        if (BitPosition!=(size_t)-1)
+                        {
+                            size_t BytePosition=BitPosition>>3;
+                            size_t BitInBytePosition=BitPosition&0x7;
+                            int8u Modified=Buffer[Buffer_Offset+(size_t)Element_Offset_Begin+BytePosition];
+                            Modified^=1<<BitInBytePosition;
+                            FixFile(File_Offset+Buffer_Offset+(size_t)Element_Offset_Begin+BytePosition, &Modified, 1)?Param_Info1("Fixed"):Param_Info1("Not fixed");
+                        }
+                    }
+                #endif //MEDIAINFO_FIXITY
+            }
         }
         Element_End0();
     }
@@ -1055,10 +1117,13 @@ int File_Ffv1::slice(states &States)
     if (!coder_type && ((version == 3 && micro_version > 1) || version > 3))
         BS_End();
 
-    if (coder_type && version > 2)
+    if (coder_type)
     {
-        int8u s = 129;
-        RC->get_rac(&s);
+        if (version > 2)
+        {
+            int8u s = 129;
+            RC->get_rac(&s);
+        }
         Element_Offset+=RC->BytesUsed();
     }
 
@@ -1535,7 +1600,7 @@ void File_Ffv1::read_quant_table(int i, int j, size_t scale)
             return;
         }
 
-        for (size_t a=0; a<=len_minus1; a++)
+        for (int32u a=0; a<=len_minus1; a++)
         {
             quant_tables[i][j][k] = scale * v;
             k++;
@@ -1556,21 +1621,6 @@ void File_Ffv1::read_quant_table(int i, int j, size_t scale)
 //***************************************************************************
 // Helpers
 //***************************************************************************
-
-//---------------------------------------------------------------------------
-int32u File_Ffv1::CRC_Compute(size_t Size)
-{
-    int32u CRC_32=0;
-    const int8u* CRC_32_Buffer=Buffer+Buffer_Offset+(size_t)Element_Offset;
-    const int8u* CRC_32_Buffer_End=CRC_32_Buffer+Size;
-
-    while(CRC_32_Buffer<CRC_32_Buffer_End)
-    {
-        CRC_32=(CRC_32<<8) ^ Psi_CRC_32_Table[(CRC_32>>24)^(*CRC_32_Buffer)];
-        CRC_32_Buffer++;
-    }
-    return CRC_32;
-}
 
 //---------------------------------------------------------------------------
 int32s File_Ffv1::golomb_rice_decode(int k)

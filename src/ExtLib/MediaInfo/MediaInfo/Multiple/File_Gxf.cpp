@@ -1610,6 +1610,7 @@ void File_Gxf::Detect_EOF()
 //---------------------------------------------------------------------------
 File__Analyze* File_Gxf::ChooseParser_ChannelGrouping(int8u TrackID)
 {
+#ifdef MEDIAINFO_SMPTEST0337_YES
     File_ChannelGrouping* Parser;
     if (Audio_Count%2)
     {
@@ -1644,10 +1645,11 @@ File__Analyze* File_Gxf::ChooseParser_ChannelGrouping(int8u TrackID)
             Parser->Demux_UnpacketizeContainer=true;
         }
     #endif //MEDIAINFO_DEMUX
-
     return Parser;
+#else
+    return NULL;
+#endif // MEDIAINFO_SMPTEST0337_YES
 }
-
 //---------------------------------------------------------------------------
 void File_Gxf::TryToFinish()
 {

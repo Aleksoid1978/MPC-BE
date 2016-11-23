@@ -392,10 +392,11 @@ void File_DvbSubtitle::region_composition_segment()
     }
 
     FILLING_BEGIN();
-        subtitle_streams[subtitle_stream_id].pages[page_id].regions[region_id].region_composition_segment=true;
-        subtitle_streams[subtitle_stream_id].pages[page_id].regions[region_id].region_width=region_width;
-        subtitle_streams[subtitle_stream_id].pages[page_id].regions[region_id].region_height=region_height;
-        subtitle_streams[subtitle_stream_id].pages[page_id].regions[region_id].region_depth=region_depth;
+        region_data& region = subtitle_streams[subtitle_stream_id].pages[page_id].regions[region_id];
+        region.region_composition_segment=true;
+        region.region_width=region_width;
+        region.region_height=region_height;
+        region.region_depth=region_depth;
     FILLING_END();
 }
 

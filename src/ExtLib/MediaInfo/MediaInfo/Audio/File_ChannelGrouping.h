@@ -28,7 +28,7 @@ namespace MediaInfoLib
 //***************************************************************************
 // Class File_ChannelGrouping
 //***************************************************************************
-
+#ifdef MEDIAINFO_SMPTEST0337_YES
 class File_ChannelGrouping : public File__Analyze
 {
 public :
@@ -127,6 +127,7 @@ private :
     void Read_Buffer_Unsynched ();
 };
 
+#endif // MEDIAINFO_SMPTEST0337_YES
 } //NameSpace
 
 #endif

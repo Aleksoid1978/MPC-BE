@@ -1111,10 +1111,10 @@ void File_Mpeg_Psi::Table_00()
         Complete_Stream->transport_stream_id=table_id_extension;
         Complete_Stream->transport_stream_id_IsValid=true;
     }
-
-    if (Complete_Stream->Transport_Streams[table_id_extension].Programs_NotParsedCount==(size_t)-1)
-        Complete_Stream->Transport_Streams[table_id_extension].Programs_NotParsedCount=0;
-    Complete_Stream->Transport_Streams[table_id_extension].programs_List.clear();
+    complete_stream::transport_stream& transportStream = Complete_Stream->Transport_Streams[table_id_extension];
+    if (transportStream.Programs_NotParsedCount==(size_t)-1)
+        transportStream.Programs_NotParsedCount=0;
+    transportStream.programs_List.clear();
 
     //Saving previous status
     std::map<int16u, complete_stream::transport_stream::program> program_numbers_Previous=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs;
@@ -1186,14 +1186,16 @@ void File_Mpeg_Psi::Table_01()
 void File_Mpeg_Psi::Table_02()
 {
     //Informing PSI is parsed
-    if (!Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[table_id_extension].IsParsed && Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs_NotParsedCount)
+    complete_stream::transport_stream& transportStream = Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id];
+    complete_stream::transport_stream::program& progItem = transportStream.Programs[table_id_extension];
+    if (!progItem.IsParsed && transportStream.Programs_NotParsedCount)
     {
-        Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs_NotParsedCount--;
-        Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[table_id_extension].IsParsed=true;
+        transportStream.Programs_NotParsedCount--;
+        progItem.IsParsed=true;
     }
 
     //Saving previous status
-    std::vector<int16u> elementary_PIDs_Previous=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[table_id_extension].elementary_PIDs;
+    std::vector<int16u> elementary_PIDs_Previous= progItem.elementary_PIDs;
 
     //Parsing
     int16u PCR_PID;
@@ -1269,9 +1271,10 @@ void File_Mpeg_Psi::Table_02()
                                 IsAlreadyPresent=true;
                         if (!IsAlreadyPresent)
                         {
-                            Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].elementary_PIDs.push_back(elementary_PID);
+                            complete_stream::transport_stream::program& progItem = Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number];
+                            progItem.elementary_PIDs.push_back(elementary_PID);
                             Complete_Stream->Streams[elementary_PID]->program_numbers.push_back(program_number);
-                            Complete_Stream->Streams[elementary_PID]->registration_format_identifier=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].registration_format_identifier;
+                            Complete_Stream->Streams[elementary_PID]->registration_format_identifier= progItem.registration_format_identifier;
                         }
                         if (Complete_Stream->Streams[elementary_PID]->Kind!=complete_stream::stream::pes)
                         {
@@ -1409,14 +1412,14 @@ void File_Mpeg_Psi::Table_02()
                 }
             #endif //MEDIAINFO_MPEGTS_ALLSTREAMS_YES
         }
-
+        complete_stream::transport_stream::program& progItem = Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number];
         if (Buffer_Offset>=4)
         {
-            Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].ExtraInfos_Content["pointer_field"].From_Number(Buffer_Offset-4);
-            Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].ExtraInfos_Option["pointer_field"]=__T("N NT");
+            progItem.ExtraInfos_Content["pointer_field"].From_Number(Buffer_Offset-4);
+            progItem.ExtraInfos_Option["pointer_field"]=__T("N NT");
         }
-        Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].ExtraInfos_Content["section_length"].From_Number(Element_Size+4);
-        Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].ExtraInfos_Option["section_length"]=__T("N NT");
+        progItem.ExtraInfos_Content["section_length"].From_Number(Element_Size+4);
+        progItem.ExtraInfos_Option["section_length"]=__T("N NT");
     FILLING_END();
 }
 
@@ -1529,8 +1532,9 @@ void File_Mpeg_Psi::Table_46()
 void File_Mpeg_Psi::Table_4E()
 {
     //Clearing
-    Complete_Stream->Transport_Streams[transport_stream_id].Programs[table_id_extension].DVB_EPG_Blocks[table_id].Events.clear();
-    Complete_Stream->Transport_Streams[transport_stream_id].Programs[table_id_extension].DVB_EPG_Blocks_IsUpdated=true;
+    complete_stream::transport_stream::program& progItem = Complete_Stream->Transport_Streams[transport_stream_id].Programs[table_id_extension];
+    progItem.DVB_EPG_Blocks[table_id].Events.clear();
+    progItem.DVB_EPG_Blocks_IsUpdated=true;
     Complete_Stream->Programs_IsUpdated=true;
 
     //Parsing
@@ -1569,10 +1573,12 @@ void File_Mpeg_Psi::Table_4E()
         Element_End1(Ztring::ToZtring_From_CC2(event_id));
 
         FILLING_BEGIN();
-            Complete_Stream->Transport_Streams[transport_stream_id].Programs[table_id_extension].DVB_EPG_Blocks[table_id].Events[event_id].start_time=__T("UTC ")+Date_MJD(date)+__T(" ")+Time_BCD(time);
-            Complete_Stream->Transport_Streams[transport_stream_id].Programs[table_id_extension].DVB_EPG_Blocks[table_id].Events[event_id].duration=Time_BCD(duration);
+            complete_stream::transport_stream::program& progItem = Complete_Stream->Transport_Streams[transport_stream_id].Programs[table_id_extension];
+            complete_stream::transport_stream::program::dvb_epg_block::event& eventItem = progItem.DVB_EPG_Blocks[table_id].Events[event_id];
+            eventItem.start_time=__T("UTC ")+Date_MJD(date)+__T(" ")+Time_BCD(time);
+            eventItem.duration=Time_BCD(duration);
             if (running_status)
-                Complete_Stream->Transport_Streams[transport_stream_id].Programs[table_id_extension].DVB_EPG_Blocks[table_id].Events[event_id].running_status=Mpeg_Psi_running_status[running_status];
+                eventItem.running_status=Mpeg_Psi_running_status[running_status];
         FILLING_END();
     }
 }
@@ -2491,9 +2497,10 @@ void File_Mpeg_Psi::program_number_Update()
 void File_Mpeg_Psi::program_number_Remove()
 {
     //Removing this program_number from the list of program_numbers for each elementary_PID
-    for (size_t Pos=0; Pos<Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].elementary_PIDs.size(); Pos++)
+    complete_stream::transport_stream::program& progItem = Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number];
+    for (size_t Pos=0; Pos<progItem.elementary_PIDs.size(); Pos++)
     {
-        int16u elementary_PID_Temp=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].elementary_PIDs[Pos];
+        const int16u elementary_PID_Temp= progItem.elementary_PIDs[Pos];
 
         //Removing this program_number from the list of program_numbers for this elementary_PID
         for (size_t Pos=0; Pos<Complete_Stream->Streams[elementary_PID_Temp]->program_numbers.size(); Pos++)
@@ -2524,13 +2531,13 @@ void File_Mpeg_Psi::program_number_Remove()
     }
 
     //Removing program_number
-    size_t StreamPos=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].StreamPos;
+    size_t StreamPos= progItem.StreamPos;
     if (StreamPos!=(size_t)-1)
     {
         Complete_Stream->StreamPos_ToRemove[Stream_Menu].push_back(StreamPos);
-        Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].StreamPos=(size_t)-1;
+        progItem.StreamPos=(size_t)-1;
     }
-    int16u program_number_pid=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].pid;
+    const int16u program_number_pid= progItem.pid;
     if (program_number_pid)
     {
         for (size_t Pos=0; Pos<Complete_Stream->Streams[program_number_pid]->program_numbers.size(); Pos++)
@@ -2566,16 +2573,17 @@ void File_Mpeg_Psi::elementary_PID_Update(int16u PCR_PID)
         if (Complete_Stream->Streams_NotParsedCount==(size_t)-1)
             Complete_Stream->Streams_NotParsedCount=0;
         Complete_Stream->Streams_NotParsedCount++;
-        if (stream_type==0x86 && Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[table_id_extension].registration_format_identifier==Elements::CUEI)
+        complete_stream::transport_stream::program& progItem = Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[table_id_extension];
+        if (stream_type==0x86 && progItem.registration_format_identifier==Elements::CUEI)
         {
-            Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[table_id_extension].HasNotDisplayableStreams=true;
+            progItem.HasNotDisplayableStreams=true;
             Complete_Stream->Streams[elementary_PID]->Kind=complete_stream::stream::psi;
             Complete_Stream->Streams[elementary_PID]->Table_IDs.resize(0x100);
             Complete_Stream->Streams[elementary_PID]->Table_IDs[0xFC]=new complete_stream::stream::table_id; //Splice
-            if (Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[table_id_extension].Scte35==NULL)
+            if (progItem.Scte35==NULL)
             {
-                Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[table_id_extension].Scte35=new complete_stream::transport_stream::program::scte35;
-                Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[table_id_extension].Scte35->pid=elementary_PID;
+                progItem.Scte35=new complete_stream::transport_stream::program::scte35;
+                progItem.Scte35->pid=elementary_PID;
             }
             #if MEDIAINFO_TRACE
                 Complete_Stream->Streams[elementary_PID]->Element_Info1="PSI";
@@ -2609,9 +2617,10 @@ void File_Mpeg_Psi::elementary_PID_Update(int16u PCR_PID)
             IsAlreadyPresent=true;
     if (!IsAlreadyPresent)
     {
-        Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].elementary_PIDs.push_back(elementary_PID);
+        complete_stream::transport_stream::program& progItem = Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number];
+        progItem.elementary_PIDs.push_back(elementary_PID);
         Complete_Stream->Streams[elementary_PID]->program_numbers.push_back(program_number);
-        if (ForceStreamDisplay || (Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].registration_format_identifier==Elements::HDMV && Complete_Stream->Streams[elementary_PID]->stream_type==0x90)) //Testing if forcing display of all streams or if it is a PGS from Blu-ray
+        if (ForceStreamDisplay || (progItem.registration_format_identifier==Elements::HDMV && Complete_Stream->Streams[elementary_PID]->stream_type==0x90)) //Testing if forcing display of all streams or if it is a PGS from Blu-ray
             Complete_Stream->PES_PIDs.insert(elementary_PID); //Adding it for sure
     }
 }
@@ -2620,9 +2629,10 @@ void File_Mpeg_Psi::elementary_PID_Update(int16u PCR_PID)
 void File_Mpeg_Psi::elementary_PID_Remove()
 {
     //Removing this elementary_PID from the list of elementary_PIDs for this program_number
-    for (size_t Pos=0; Pos<Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].elementary_PIDs.size(); Pos++)
-        if (Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].elementary_PIDs[Pos]==elementary_PID)
-            Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].elementary_PIDs.erase(Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number].elementary_PIDs.begin()+Pos);
+    complete_stream::transport_stream::program& progItem = Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[program_number];
+    for (size_t Pos=0; Pos<progItem.elementary_PIDs.size(); Pos++)
+        if (progItem.elementary_PIDs[Pos]==elementary_PID)
+            progItem.elementary_PIDs.erase(progItem.elementary_PIDs.begin()+Pos);
 
     //Removing this program_number from the list of program_numbers for this elementary_PID
     for (size_t Pos=0; Pos<Complete_Stream->Streams[elementary_PID]->program_numbers.size(); Pos++)

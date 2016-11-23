@@ -115,6 +115,7 @@ void File__ReferenceFilesHelper_InfoFromFileName (sequences &Sequences)
     ZtringListList List;
     vector<size_t> Iterators;
 
+    size_t ItemsValid=0;
     for (size_t Sequences_Pos=0; Sequences_Pos<Sequences.size(); Sequences_Pos++)
     {
         ZtringList List2;
@@ -139,153 +140,171 @@ void File__ReferenceFilesHelper_InfoFromFileName (sequences &Sequences)
                 List2[Pos].MakeLowerCase();
             List.push_back(List2);
             Iterators.push_back(Sequences_Pos);
+            ItemsValid++;
         }
+        else
+            List.push_back(Ztring());
     }
 
-    if (List.size()<2)
+    if (ItemsValid<2)
         return;
 
-    size_t ChannelLayout_Pos=(size_t)-1;
-    size_t Language_Pos=(size_t)-1;
-    for (size_t Pos2=0; Pos2<List[0].size(); Pos2++)
+    for (size_t Pos2=0; Pos2<List.size(); Pos2++)
     {
-        bool IsChannelLayout=true;
-        bool IsLanguage=true;
-        for (size_t Pos=0; Pos<List.size(); Pos++)
+        size_t ChannelLayout_Pos=(size_t)-1;
+        size_t Language_Pos=(size_t)-1;
+        
+        //Pos = index file parts
+        for (size_t Pos=0; Pos<List[Pos2].size(); Pos++)
         {
-            if (Pos2>=List[Pos].size())
+            if (Pos>=List[Pos2].size())
                 break; //Maybe begin of title
-            const Ztring &Test=List[Pos][List[Pos].size()-1-Pos2];
+            const Ztring &Test=List[Pos2][List[Pos2].size()-1-Pos];
 
             //ChannelLayout
             if (ChannelLayout_Pos==(size_t)-1
-             && Test!=__T("l")
-             && Test!=__T("r")
-             && Test!=__T("lt")
-             && Test!=__T("rt")
-             && Test!=__T("c")
-             && Test!=__T("lf")
-             && Test!=__T("lfe")
-             && Test!=__T("sub")
-             && Test!=__T("ls")
-             && Test!=__T("rs")
-             && Test!=__T("b")
-             && Test!=__T("mono"))
-                IsChannelLayout=false;
+             && (Test==__T("l")
+             || Test==__T("r")
+             || Test==__T("lt")
+             || Test==__T("rt")
+             || Test==__T("c")
+             || Test==__T("lf")
+             || Test==__T("lfe")
+             || Test==__T("sub")
+             || Test==__T("ls")
+             || Test==__T("rs")
+             || Test==__T("lsr")
+             || Test==__T("rsr")             
+             || Test==__T("b")
+             || Test==__T("mono")))
+            {
+                ChannelLayout_Pos = Pos;
+            }
 
             //Language
             if (Language_Pos==(size_t)-1
-             && Test!=__T("ara")
-             && Test!=__T("deu")
-             && Test!=__T("eng")
-             && Test!=__T("fra")
-             && Test!=__T("fre")
-             && Test!=__T("ita")
-             && Test!=__T("jpn")
-             && Test!=__T("rus")
-             && Test!=__T("spa"))
-                IsLanguage=false;
+             && (Test==__T("ara")
+             || Test==__T("deu")
+             || Test==__T("eng")
+             || Test==__T("fra")
+             || Test==__T("fre")
+             || Test==__T("ger")
+             || Test==__T("ita")
+             || Test==__T("jpn")
+             || Test==__T("las") //Latin America Spanish
+             || Test==__T("rus")
+             || Test==__T("spa")))
+            {
+                Language_Pos = Pos;
+            }
+
+            if (ChannelLayout_Pos!=(size_t)-1 && Language_Pos!=(size_t)-1)
+                break;
         }
 
-        if (IsChannelLayout && ChannelLayout_Pos==(size_t)-1)
-            ChannelLayout_Pos=Pos2;
-        if (IsLanguage && Language_Pos==(size_t)-1)
-            Language_Pos=Pos2;
-        if (ChannelLayout_Pos!=(size_t)-1 && Language_Pos!=(size_t)-1)
-            break;
-    }
-
-    //ChannelLayout
-    if (ChannelLayout_Pos!=(size_t)-1)
-        for (size_t Pos=0; Pos<List.size(); Pos++)
+        //ChannelLayout
+        if (ChannelLayout_Pos!=(size_t)-1)
         {
             Ztring ChannelPositions, ChannelPositions2, ChannelLayout;
-            if (List[Pos][List[Pos].size()-1-ChannelLayout_Pos]==__T("l"))
+            if (List[Pos2][List[Pos2].size()-1-ChannelLayout_Pos]==__T("l"))
             {
                 ChannelPositions=__T("Front: L");
                 ChannelPositions2=__T("1/0/0");
                 ChannelLayout=__T("L");
             }
-            if (List[Pos][List[Pos].size()-1-ChannelLayout_Pos]==__T("lt"))
+            else if (List[Pos2][List[Pos2].size()-1-ChannelLayout_Pos]==__T("lt"))
             {
                 ChannelPositions=__T("Front: Lt");
                 ChannelPositions2=__T("1/0/0");
                 ChannelLayout=__T("Lt");
             }
-            if (List[Pos][List[Pos].size()-1-ChannelLayout_Pos]==__T("rt"))
+            else if (List[Pos2][List[Pos2].size()-1-ChannelLayout_Pos]==__T("rt"))
             {
                 ChannelPositions=__T("Front: Rt");
                 ChannelPositions2=__T("1/0/0");
                 ChannelLayout=__T("Rt");
             }
-            if (List[Pos][List[Pos].size()-1-ChannelLayout_Pos]==__T("r"))
+            else if (List[Pos2][List[Pos2].size()-1-ChannelLayout_Pos]==__T("r"))
             {
                 ChannelPositions=__T("Front: R");
                 ChannelPositions2=__T("1/0/0");
                 ChannelLayout=__T("R");
             }
-            if (List[Pos][List[Pos].size()-1-ChannelLayout_Pos]==__T("c") || List[Pos][List[Pos].size()-1-ChannelLayout_Pos]==__T("mono"))
+            else if (List[Pos2][List[Pos2].size()-1-ChannelLayout_Pos]==__T("c") || List[Pos2][List[Pos2].size()-1-ChannelLayout_Pos]==__T("mono"))
             {
                 ChannelPositions=__T("Front: C");
                 ChannelPositions2=__T("1/0/0");
                 ChannelLayout=__T("C");
             }
-            if (List[Pos][List[Pos].size()-1-ChannelLayout_Pos]==__T("lf") || List[Pos][List[Pos].size()-1-ChannelLayout_Pos]==__T("lfe") || List[Pos][List[Pos].size()-1-ChannelLayout_Pos]==__T("sub"))
+            else if (List[Pos2][List[Pos2].size()-1-ChannelLayout_Pos]==__T("lf") || List[Pos2][List[Pos2].size()-1-ChannelLayout_Pos]==__T("lfe") || List[Pos2][List[Pos2].size()-1-ChannelLayout_Pos]==__T("sub"))
             {
                 ChannelPositions=__T("LFE");
                 ChannelPositions2=__T(".1");
                 ChannelLayout=__T("LFE");
             }
-            if (List[Pos][List[Pos].size()-1-ChannelLayout_Pos]==__T("ls"))
+            else if (List[Pos2][List[Pos2].size()-1-ChannelLayout_Pos]==__T("ls"))
             {
                 ChannelPositions=__T("Side: L");
                 ChannelPositions2=__T("0/1/0");
                 ChannelLayout=__T("Ls");
             }
-            if (List[Pos][List[Pos].size()-1-ChannelLayout_Pos]==__T("rs"))
+            else if (List[Pos2][List[Pos2].size()-1-ChannelLayout_Pos]==__T("rs"))
             {
                 ChannelPositions=__T("Side: R");
                 ChannelPositions2=__T("0/1/0");
                 ChannelLayout=__T("Rs");
             }
-            if (List[Pos][List[Pos].size()-1-ChannelLayout_Pos]==__T("b"))
+            else if (List[Pos2][List[Pos2].size()-1-ChannelLayout_Pos]==__T("lsr"))
+            {
+                ChannelPositions=__T("Back: L");
+                ChannelPositions2=__T("0/0/1");
+                ChannelLayout=__T("Lsr");
+            }
+            else if (List[Pos2][List[Pos2].size()-1-ChannelLayout_Pos]==__T("rsr"))
+            {
+                ChannelPositions=__T("Back: R");
+                ChannelPositions2=__T("0/0/1");
+                ChannelLayout=__T("Rsr");
+            }
+            else if (List[Pos2][List[Pos2].size()-1-ChannelLayout_Pos]==__T("b"))
             {
                 ChannelPositions=__T("Back: C");
                 ChannelPositions2=__T("0/0/1");
                 ChannelLayout=__T("Cs");
             }
 
-            Sequences[Iterators[Pos]]->Infos["ChannelPositions"]=ChannelPositions;
-            Sequences[Iterators[Pos]]->Infos["ChannelPositions/String2"]=ChannelPositions2;
-            Sequences[Iterators[Pos]]->Infos["ChannelLayout"]=ChannelLayout;
+            Sequences[Pos2]->Infos["ChannelPositions"]=ChannelPositions;
+            Sequences[Pos2]->Infos["ChannelPositions/String2"]=ChannelPositions2;
+            Sequences[Pos2]->Infos["ChannelLayout"]=ChannelLayout;
         }
-
-    //Language
-    if (Language_Pos!=(size_t)-1)
-        for (size_t Pos=0; Pos<List.size(); Pos++)
-            if (1+Language_Pos<List[Pos].size())
+        
+        //Language
+        if (Language_Pos!=(size_t)-1)
+            if (1+Language_Pos<List[Pos2].size())
             {
                 Ztring Language;
-                if (List[Pos][List[Pos].size()-1-Language_Pos]==__T("ara"))
+                if (List[Pos2][List[Pos2].size()-1-Language_Pos]==__T("ara"))
                     Language=__T("ar");
-                if (List[Pos][List[Pos].size()-1-Language_Pos]==__T("deu"))
+                else if (List[Pos2][List[Pos2].size()-1-Language_Pos]==__T("deu") || List[Pos2][List[Pos2].size()-1-Language_Pos]==__T("ger"))
                     Language=__T("de");
-                if (List[Pos][List[Pos].size()-1-Language_Pos]==__T("eng"))
+                else if (List[Pos2][List[Pos2].size()-1-Language_Pos]==__T("eng"))
                     Language=__T("en");
-                if (List[Pos][List[Pos].size()-1-Language_Pos]==__T("fra") || List[Pos][List[Pos].size()-1-Language_Pos]==__T("fre"))
+                else if (List[Pos2][List[Pos2].size()-1-Language_Pos]==__T("fra") || List[Pos2][List[Pos2].size()-1-Language_Pos]==__T("fre"))
                     Language=__T("fr");
-                if (List[Pos][List[Pos].size()-1-Language_Pos]==__T("ita"))
+                else if (List[Pos2][List[Pos2].size()-1-Language_Pos]==__T("ita"))
                     Language=__T("it");
-                if (List[Pos][List[Pos].size()-1-Language_Pos]==__T("jpn"))
+                else if (List[Pos2][List[Pos2].size()-1-Language_Pos]==__T("jpn"))
                     Language=__T("ja");
-                if (List[Pos][List[Pos].size()-1-Language_Pos]==__T("rus"))
+                else if (List[Pos2][List[Pos2].size()-1-Language_Pos]==__T("las")) //Latin America Spanish
+                    Language=__T("es-419");
+                else if (List[Pos2][List[Pos2].size()-1-Language_Pos]==__T("rus"))
                     Language=__T("ru");
-                if (List[Pos][List[Pos].size()-1-Language_Pos]==__T("spa"))
+                else if (List[Pos2][List[Pos2].size()-1-Language_Pos]==__T("spa"))
                     Language=__T("es");
 
-                if (!Language.empty())
-                    Sequences[Iterators[Pos]]->Infos["Language"]=Language;
+                Sequences[Pos2]->Infos["Language"]=Language.empty()?List[Pos2][List[Pos2].size()-1-Language_Pos]:Language;
             }
+    }
 }
 
 //***************************************************************************

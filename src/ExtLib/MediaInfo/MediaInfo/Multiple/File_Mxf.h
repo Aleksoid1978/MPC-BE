@@ -548,22 +548,34 @@ protected :
     //TimeCode
     struct mxftimecode
     {
-        int16u  RoundedTimecodeBase;
         int64u  StartTimecode;
+        int16u  RoundedTimecodeBase;
         bool    DropFrame;
 
-        mxftimecode()
-            : RoundedTimecodeBase(0)
-            , StartTimecode((int64u)-1)
-            , DropFrame(false)
-        {
-        }
-
-        mxftimecode(int16u RoundedTimecodeBase_, int64u StartTimecode_, bool DropFrame_)
+        mxftimecode(int16u RoundedTimecodeBase_ = 0, int64u StartTimecode_ = (int64u)-1, bool DropFrame_ = false)
             : RoundedTimecodeBase(RoundedTimecodeBase_)
             , StartTimecode(StartTimecode_)
             , DropFrame(DropFrame_)
         {
+        }
+        bool IsInit() const
+        {
+            return RoundedTimecodeBase && StartTimecode != (int64u)-1;
+        }
+        float64 Get_TimeCode_StartTimecode_Temp(const int64u& File_IgnoreEditsBefore) const
+        {
+            if (RoundedTimecodeBase)
+            {
+                float64 TimeCode_StartTimecode_Temp = ((float64)(StartTimecode + File_IgnoreEditsBefore)) / RoundedTimecodeBase;
+                if (DropFrame)
+                {
+                    TimeCode_StartTimecode_Temp *= 1001;
+                    TimeCode_StartTimecode_Temp /= 1000;
+                }
+                return TimeCode_StartTimecode_Temp;
+            }
+            else
+                return 0.0;
         }
     };
 
@@ -1058,6 +1070,7 @@ protected :
             CompletionDate=(int64u)-1;
             TextlessElementsExist=(int8u)-1;
             ProgrammeHasText=(int8u)-1;
+            FpaPass=(int8u)-1;
         }
 
         ~as11()

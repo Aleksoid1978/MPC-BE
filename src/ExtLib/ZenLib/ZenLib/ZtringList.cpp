@@ -17,7 +17,6 @@
 
 //---------------------------------------------------------------------------
 #include <algorithm>
-#include <functional>
 #include "ZenLib/ZtringList.h"
 using namespace std;
 #if defined(_MSC_VER) && _MSC_VER <= 1200

@@ -270,6 +270,10 @@ public :
           void      Ssl_IgnoreSecurity_Set (bool NewValue);
           bool      Ssl_IgnoreSecurity_Get ();
     #endif //defined(MEDIAINFO_LIBCURL_YES)
+    #if MEDIAINFO_FIXITY
+          void      TryToFix_Set (bool NewValue);
+          bool      TryToFix_Get ();
+    #endif //MEDIAINFO_FIXITY
 
 private :
     int64u          FormatDetection_MaximumOffset;
@@ -360,6 +364,10 @@ private :
           Ztring    Ssl_CertificateRevocationListFileName;
           bool      Ssl_IgnoreSecurity;
     #endif //defined(MEDIAINFO_LIBCURL_YES)
+
+    #if MEDIAINFO_FIXITY
+        bool        TryToFix;
+    #endif //MEDIAINFO_SEEK
 
     //Constructor
     MediaInfo_Config (const MediaInfo_Config&);             // Prevent copy-construction

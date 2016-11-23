@@ -23,6 +23,30 @@ namespace MediaInfoLib
 {
 
 //***************************************************************************
+// Class File__UnCompressedSize_Helper
+//***************************************************************************
+class File__UnCompressedSize_Helper
+{
+    protected:
+        int64u Duration;
+        int64u UncompressedSize;
+    public:
+        File__UnCompressedSize_Helper() :Duration(0), UncompressedSize(0) {}
+        bool CalcDurationUncompressedSize(int64u Samples, int32u SampleRate, int8u BitsPerSample, int8u Channels)
+        {
+            if (SampleRate == 0)
+                return false;
+            Duration = Samples * 1000 / SampleRate;
+            if (Duration == 0)
+                return false;
+            UncompressedSize = Samples * Channels * BitsPerSample  / 8;
+            if (UncompressedSize == 0)
+                return false;
+            return true;
+        }
+};
+
+//***************************************************************************
 // Class File__Tags_Helper
 //***************************************************************************
 
