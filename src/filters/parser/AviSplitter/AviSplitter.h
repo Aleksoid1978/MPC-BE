@@ -83,12 +83,11 @@ public:
 	STDMETHODIMP GetPages(CAUUID* pPages);
 	STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage);
 
-	// IMpegSplitterFilter
-	STDMETHODIMP Apply();
+	// IAviSplitterFilter
 
+	STDMETHODIMP Apply();
 	STDMETHODIMP SetBadInterleavedSuport(BOOL nValue);
 	STDMETHODIMP_(BOOL) GetBadInterleavedSuport();
-
 	STDMETHODIMP SetReindex(BOOL nValue);
 	STDMETHODIMP_(BOOL) GetReindex();
 };

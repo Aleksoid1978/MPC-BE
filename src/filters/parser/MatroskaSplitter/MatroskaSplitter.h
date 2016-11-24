@@ -142,8 +142,8 @@ public:
 	STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage);
 
 	// IMatroskaSplitterFilter
-	STDMETHODIMP Apply();
 
+	STDMETHODIMP Apply();
 	STDMETHODIMP SetLoadEmbeddedFonts(BOOL nValue);
 	STDMETHODIMP_(BOOL) GetLoadEmbeddedFonts();
 	STDMETHODIMP SetCalcDuration(BOOL nValue);
