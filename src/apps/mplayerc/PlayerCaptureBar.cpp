@@ -383,8 +383,7 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 
 	for (int i = 0; i < (int)tfa.GetCount(); i++) {
 		CFormat<T>* pf = tfa[i];
-		int j = type.AddString(pf->name);
-		type.SetItemData(j, (DWORD_PTR)pf);
+		AddStringData(type, pf->name, (DWORD_PTR)pf);
 	}
 
 	CFormat<T>* pf = NULL;
@@ -402,8 +401,7 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 
 	for (int i = 0; i < (int)pf->GetCount(); i++) {
 		CFormatElem<T>* pfe = pf->GetAt(i);
-		int j = dim.AddString(tfa.MakeDimensionName(pfe));
-		dim.SetItemData(j, (DWORD_PTR)pfe);
+		AddStringData(dim, tfa.MakeDimensionName(pfe), (DWORD_PTR)pfe);
 	}
 
 	int iType = type.SetCurSel(type.FindStringExact(0, pf->name));
@@ -448,7 +446,7 @@ static bool SetupDimension(CFormatArray<T>& tfa, CComboBox& type, CComboBox& dim
 
 	for (int i = 0; i < (int)pf->GetCount(); i++) {
 		CFormatElem<T>* pfe = pf->GetAt(i);
-		dim.SetItemData(dim.AddString(tfa.MakeDimensionName(pfe)), (DWORD_PTR)pfe);
+		AddStringData(dim, tfa.MakeDimensionName(pfe), (DWORD_PTR)pfe);
 	}
 
 	CorrectComboListWidth(dim);

@@ -997,10 +997,8 @@ void CDVSColorPPage::UpdateControlData(bool fSave)
 					guid = guid.Mid(13);
 				}
 
-				m_dynchglist.AddString(guid);
-				m_dynchglist.SetItemData(i, pData[i]);
-				m_preflist.AddString(guid);
-				m_preflist.SetItemData(i, pData[i]);
+				AddStringData(m_dynchglist, guid, pData[i]);
+				AddStringData(m_preflist, guid, pData[i]);
 			}
 
 			int iPosition = -1;

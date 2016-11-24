@@ -71,8 +71,7 @@ BOOL CPPageYoutube::OnInitDialog()
 	for (int i = 0; i < _countof(resolutions); i++) {
 		CString str;
 		str.Format(L"%dp", resolutions[i]);
-		m_cbResolution.AddString(str);
-		m_cbResolution.SetItemData(i, resolutions[i]);
+		AddStringData(m_cbResolution, str, resolutions[i]);
 	}
 	SelectByItemData(m_cbResolution, s.YoutubeFormat.res);
 

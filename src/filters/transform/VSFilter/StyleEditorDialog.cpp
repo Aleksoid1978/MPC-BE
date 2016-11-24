@@ -128,11 +128,10 @@ void CStyleEditorDialog::UpdateControlData(bool fSave)
 	} else {
 		m_font.SetWindowText(m_stss.fontName);
 		m_iCharset = -1;
-		for (ptrdiff_t i = 0; i < CharSetLen; i++) {
+		for (int i = 0; i < CharSetLen; i++) {
 			CString str;
 			str.Format(_T("%s (%d)"), CharSetNames[i], CharSetList[i]);
-			m_charset.AddString(str);
-			m_charset.SetItemData(i, CharSetList[i]);
+			AddStringData(m_charset, str, CharSetList[i]);
 			if (m_stss.charSet == CharSetList[i]) {
 				m_iCharset = i;
 			}
