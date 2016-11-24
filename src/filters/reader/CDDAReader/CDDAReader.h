@@ -27,6 +27,7 @@
 #include <qnetwork.h>
 #include <AsyncReader/asyncio.h>
 #include <AsyncReader/asyncrdr.h>
+#include "CDDAReaderSettingsWnd.h"
 
 #define CCDDAReaderName L"MPC CDDA Reader"
 
@@ -95,7 +96,12 @@ class __declspec(uuid("54A35221-2C8D-4a31-A5DF-6D809847E393"))
 	: public CAsyncReader
 	, public IFileSourceFilter
 	, public IAMMediaContent
+	, public ISpecifyPropertyPages2
+	, public ICDDAReaderFilter
 {
+	CCritSec m_csProps;
+	bool m_bReadTextInfo;
+
 	CCDDAStream m_stream;
 	CStringW m_fn;
 
@@ -132,4 +138,13 @@ public:
 	STDMETHODIMP get_MoreInfoBannerImage(BSTR* pbstrMoreInfoBannerImage);
 	STDMETHODIMP get_MoreInfoBannerURL(BSTR* pbstrMoreInfoBannerURL);
 	STDMETHODIMP get_MoreInfoText(BSTR* pbstrMoreInfoText);
+
+	// ISpecifyPropertyPages2
+	STDMETHODIMP GetPages(CAUUID* pPages);
+	STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage);
+
+	// ICDDAReaderFilter
+	STDMETHODIMP Apply();
+	STDMETHODIMP SetReadTextInfo(BOOL nValue);
+	STDMETHODIMP_(BOOL) GetReadTextInfo();
 };

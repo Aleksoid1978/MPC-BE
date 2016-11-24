@@ -198,6 +198,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CDDAReader.cpp" />
+    <ClCompile Include="CDDAReaderSettingsWnd.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -207,6 +208,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CDDAReader.h" />
+    <ClInclude Include="CDDAReaderSettingsWnd.h" />
+    <ClInclude Include="ICDDAReader.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
