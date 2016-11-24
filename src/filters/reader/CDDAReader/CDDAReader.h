@@ -80,7 +80,7 @@ public:
 	CString m_discTitle, m_trackTitle;
 	CString m_discArtist, m_trackArtist;
 
-	bool Load(const WCHAR* fnw);
+	bool Load(const WCHAR* fnw, bool bReadTextInfo);
 
 	// overrides
 	HRESULT SetPointer(LONGLONG llPos);
