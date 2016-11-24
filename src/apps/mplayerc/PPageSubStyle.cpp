@@ -177,8 +177,7 @@ void CPPageSubStyle::Init()
 	for (int i = 0; i < CharSetLen; i++) {
 		CString str;
 		str.Format(_T("%s (%d)"), CharSetNames[i], CharSetList[i]);
-		m_charset.AddString(str);
-		m_charset.SetItemData(i, CharSetList[i]);
+		AddStringData(m_charset, str, CharSetList[i]);
 
 		if (m_stss->charSet == CharSetList[i]) {
 			m_iCharset = i;
