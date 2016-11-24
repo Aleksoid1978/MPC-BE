@@ -2293,7 +2293,8 @@ STDMETHODIMP CMatroskaSplitterFilter::CreatePage(const GUID& guid, IPropertyPage
 	return *ppPage ? S_OK : E_FAIL;
 }
 
-// IMpegSplitterFilter
+// IMatroskaSplitterFilter
+
 STDMETHODIMP CMatroskaSplitterFilter::Apply()
 {
 #ifdef REGISTER_FILTER
