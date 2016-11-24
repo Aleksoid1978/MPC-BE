@@ -26,6 +26,11 @@
 #include "CDDAReader.h"
 #include "../../../DSUtil/DSUtil.h"
 
+ // option names
+#define OPT_REGKEY_CDDAReader	_T("Software\\MPC-BE Filters\\CDDAReader")
+#define OPT_SECTION_CDDAReader	_T("Filters\\CDDAReader")
+#define OPT_ReadTextInfo		_T("ReadTextInfo")
+
 #define RAW_SECTOR_SIZE 2352
 #define MSF2UINT(hgs) ((hgs[1]*4500)+(hgs[2]*75)+(hgs[3]))
 
@@ -86,10 +91,25 @@ CFilterApp theApp;
 
 CCDDAReader::CCDDAReader(IUnknown* pUnk, HRESULT* phr)
 	: CAsyncReader(NAME("CCDDAReader"), pUnk, &m_stream, phr, __uuidof(this))
+	, m_bReadTextInfo(true)
 {
 	if (phr) {
 		*phr = S_OK;
 	}
+
+#ifdef REGISTER_FILTER
+	CRegKey key;
+
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_CDDAReader, KEY_READ)) {
+		DWORD dw;
+
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ReadTextInfo, dw)) {
+			m_bReadTextInfo = !!dw;
+		}
+	}
+#else
+	m_bReadTextInfo = !!AfxGetApp()->GetProfileInt(OPT_SECTION_CDDAReader, OPT_ReadTextInfo, m_bReadTextInfo);
+#endif
 }
 
 CCDDAReader::~CCDDAReader()
@@ -103,6 +123,9 @@ STDMETHODIMP CCDDAReader::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 	return
 		QI(IFileSourceFilter)
 		QI2(IAMMediaContent)
+		QI(ICDDAReaderFilter)
+		QI(ISpecifyPropertyPages)
+		//TODO: QI(ISpecifyPropertyPages2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
@@ -248,6 +271,66 @@ STDMETHODIMP CCDDAReader::get_MoreInfoText(BSTR* pbstrMoreInfoText)
 {
 	return E_NOTIMPL;
 }
+
+// ISpecifyPropertyPages2
+
+STDMETHODIMP CCDDAReader::GetPages(CAUUID* pPages)
+{
+	CheckPointer(pPages, E_POINTER);
+
+	pPages->cElems = 1;
+	pPages->pElems = (GUID*)CoTaskMemAlloc(sizeof(GUID) * pPages->cElems);
+	pPages->pElems[0] = __uuidof(CCDDAReaderSettingsWnd);
+
+	return S_OK;
+}
+
+STDMETHODIMP CCDDAReader::CreatePage(const GUID& guid, IPropertyPage** ppPage)
+{
+	CheckPointer(ppPage, E_POINTER);
+
+	if (*ppPage != NULL) {
+		return E_INVALIDARG;
+	}
+
+	HRESULT hr;
+
+	if (guid == __uuidof(CCDDAReaderSettingsWnd)) {
+		(*ppPage = DNew CInternalPropertyPageTempl<CCDDAReaderSettingsWnd>(NULL, &hr))->AddRef();
+	}
+
+	return *ppPage ? S_OK : E_FAIL;
+}
+
+// ICDDAReaderFilter
+
+STDMETHODIMP CCDDAReader::Apply()
+{
+#ifdef REGISTER_FILTER
+	CRegKey key;
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_CDDAReader)) {
+		key.SetDWORDValue(OPT_ReadTextInfo, m_bReadTextInfo);
+	}
+#else
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_CDDAReader, OPT_ReadTextInfo, m_bReadTextInfo);
+#endif
+
+	return S_OK;
+}
+
+STDMETHODIMP CCDDAReader::SetReadTextInfo(BOOL nValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_bReadTextInfo = !!nValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CCDDAReader::GetReadTextInfo()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_bReadTextInfo;
+}
+
 
 // CCDDAStream
 

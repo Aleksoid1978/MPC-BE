@@ -1,6 +1,5 @@
 /*
- * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,8 +20,11 @@
 
 #pragma once
 
-#include "../../../DSUtil/SharedInclude.h"
-#include "../../../../include/stdafx_common.h"
-#include <afxwin.h>                         // MFC core and standard components
-#include "../../../../include/stdafx_common_dshow.h"
-#include "../../../DSUtil/DSUtil.h"
+interface __declspec(uuid("2AE632F2-DC7D-4FA8-B433-CAC02A03F8F3"))
+ICDDAReaderFilter :
+public IUnknown {
+	STDMETHOD(Apply()) PURE;
+
+	STDMETHOD(SetReadTextInfo(BOOL nValue)) PURE;
+	STDMETHOD_(BOOL, GetReadTextInfo()) PURE;
+};
