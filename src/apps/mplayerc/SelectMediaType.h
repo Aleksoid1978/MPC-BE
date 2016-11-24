@@ -24,6 +24,8 @@
 #include <afxwin.h>
 #include <ResizableLib/ResizableDialog.h>
 
+CString GetMediaTypeName(const GUID& guid);
+
 // CSelectMediaType dialog
 
 class CSelectMediaType : public CCmdUIDialog

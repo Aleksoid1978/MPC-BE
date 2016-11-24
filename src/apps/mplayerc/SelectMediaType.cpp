@@ -22,6 +22,13 @@
 #include "stdafx.h"
 #include "SelectMediaType.h"
 
+CString GetMediaTypeName(const GUID& guid)
+{
+	CString ret = (guid == GUID_NULL) ? _T("Any type") : GetGUIDString(guid);
+
+	return ret;
+}
+
 // CSelectMediaType dialog
 
 IMPLEMENT_DYNAMIC(CSelectMediaType, CCmdUIDialog)

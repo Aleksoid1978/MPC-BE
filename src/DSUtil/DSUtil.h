@@ -140,7 +140,6 @@ extern void				UnloadExternalObjects();
 extern CString			MakeFullPath(LPCTSTR path);
 extern bool				IsLikelyPath(LPCTSTR str); // stupid path detector
 
-extern CString			GetMediaTypeName(const GUID& guid);
 extern GUID				GUIDFromCString(CString str);
 extern HRESULT			GUIDFromCString(CString str, GUID& guid);
 extern CString			CStringFromGUID(const GUID& guid);
