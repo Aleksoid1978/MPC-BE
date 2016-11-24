@@ -1045,6 +1045,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									fourcc = type = WAVE_FORMAT_PCM;
 								}
 							}
+						} else if (type == AP4_ATOM_TYPE_FLAC) {
+							SetTrackName(&TrackName, _T("FLAC"));
+							fourcc = WAVE_FORMAT_FLAC;
 						}
 
 						if (type == AP4_ATOM_TYPE_NONE ||
@@ -1155,6 +1158,17 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							memcpy(wfe, pData, size);
 
 							mt.subtype = FOURCCMap(wfe->wFormatTag);
+						} else if (type == AP4_ATOM_TYPE_FLAC) {
+							mt.subtype = MEDIASUBTYPE_FLAC_FRAMED;
+							if (AP4_FLACSampleEntry* flacSample = dynamic_cast<AP4_FLACSampleEntry*>(atom)) {
+								const AP4_DataBuffer* extraData = flacSample->GetData();
+								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + extraData->GetDataSize());
+								wfe->cbSize = extraData->GetDataSize();
+								memcpy(wfe + 1, extraData->GetData(), extraData->GetDataSize());
+							}
+							mts.Add(mt);
+
+							mt.subtype = MEDIASUBTYPE_FLAC;
 						} else if (db.GetDataSize() > 0) {
 							//always needed extra data for QDM2
 							wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + db.GetDataSize());
