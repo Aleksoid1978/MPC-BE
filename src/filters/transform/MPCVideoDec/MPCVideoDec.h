@@ -133,7 +133,7 @@ protected:
 
 	BOOL									m_bDecodingStart;
 
-	BOOL									m_bHEVC10bit;
+	BOOL									m_bHighBitdepth;
 
 	CMSDKDecoder*							m_pMSDKDecoder;
 	int										m_iMvcOutputMode;
@@ -175,7 +175,7 @@ public:
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-	CTransformOutputPin* GetOutputPin() { return m_pOutput; };
+	CTransformOutputPin* GetOutputPin() { return m_pOutput; }
 
 	REFERENCE_TIME	GetFrameDuration();
 	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
@@ -237,9 +237,8 @@ public:
 	STDMETHODIMP_(int) GetMvcActive();
 
 	// === common functions
-	BOOL						IsSupportedDecoderConfig(const D3DFORMAT nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);
-	BOOL						IsSupportedDecoderMode(const GUID* mode);
-	int							GetPicEntryNumber();
+	BOOL						IsSupportedDecoderConfig(const D3DFORMAT& nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);
+	BOOL						IsSupportedDecoderMode(const GUID& decoderGUID);
 	int							PictWidth();
 	int							PictHeight();
 	int							PictWidthAligned();
@@ -247,12 +246,12 @@ public:
 
 	DXVA2_ExtendedFormat		GetDXVA2ExtendedFormat(AVCodecContext *ctx, AVFrame *frame);
 
-	inline bool					UseDXVA2()			const { return (m_nDecoderMode == MODE_DXVA2); };
-	inline AVCodecContext*		GetAVCtx()			const { return m_pAVCtx; };
-	inline AVFrame*				GetFrame()			const { return m_pFrame; };
-	inline enum AVCodecID		GetCodec()			const { return m_nCodecId; };
-	inline DWORD				GetPCIVendor()		const { return m_nPCIVendor; };
-	inline DWORD				GetPCIDevice()		const { return m_nPCIDevice; };
+	inline bool					UseDXVA2()			const { return m_nDecoderMode == MODE_DXVA2; }
+	inline AVCodecContext*		GetAVCtx()			const { return m_pAVCtx; }
+	inline AVFrame*				GetFrame()			const { return m_pFrame; }
+	inline enum AVCodecID		GetCodec()			const { return m_nCodecId; }
+	inline DWORD				GetPCIVendor()		const { return m_nPCIVendor; }
+	inline DWORD				GetPCIDevice()		const { return m_nPCIDevice; }
 
 	bool						IsDXVASupported();
 	void						UpdateAspectRatio();
@@ -260,7 +259,7 @@ public:
 	void						SetTypeSpecificFlags(IMediaSample* pMS);
 
 	// === DXVA2 functions
-	void						FillInVideoDescription(DXVA2_VideoDesc *pDesc, D3DFORMAT Format = D3DFMT_A8R8G8B8);
+	void						FillInVideoDescription(DXVA2_VideoDesc& videoDesc, D3DFORMAT Format = D3DFMT_A8R8G8B8);
 	HRESULT						ConfigureDXVA2(IPin *pPin);
 	HRESULT						SetEVRForDXVA2(IPin *pPin);
 	HRESULT						FindDXVA2DecoderConfiguration(IDirectXVideoDecoderService *pDecoderService,
