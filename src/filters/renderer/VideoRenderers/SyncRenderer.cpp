@@ -2764,7 +2764,7 @@ HRESULT CSyncAP::SetMediaType(IMFMediaType* pType)
 
 	hr = InitializeDevice(pAMMedia);
 	if (SUCCEEDED(hr)) {
-		strTemp = GetMediaTypeName(pAMMedia->subtype);
+		strTemp = GetGUIDString(pAMMedia->subtype);
 		strTemp.Replace(L"MEDIASUBTYPE_", L"");
 		m_strMixerFmtOut.Format (L"Mixer output : %s", strTemp);
 	}

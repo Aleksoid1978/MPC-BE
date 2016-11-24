@@ -1551,29 +1551,6 @@ bool IsLikelyPath(LPCTSTR str) // stupid path detector
 
 //
 
-CString GetMediaTypeName(const GUID& guid)
-{
-	CString ret = guid == GUID_NULL
-				  ? _T("Any type")
-				  : CString(GuidNames[guid]);
-
-	if (ret == _T("FOURCC GUID")) {
-		CString str;
-		if (guid.Data1 >= 0x10000) {
-			str.Format(_T("Video: %c%c%c%c"), (guid.Data1>>0)&0xff, (guid.Data1>>8)&0xff, (guid.Data1>>16)&0xff, (guid.Data1>>24)&0xff);
-		} else {
-			str.Format(_T("Audio: 0x%08x"), guid.Data1);
-		}
-		ret = str;
-	} else if (ret == _T("Unknown GUID Name")) {
-		WCHAR null[128] = {0}, buff[128];
-		StringFromGUID2(GUID_NULL, null, 127);
-		ret = CString(CStringW(StringFromGUID2(guid, buff, 127) ? buff : null));
-	}
-
-	return ret;
-}
-
 GUID GUIDFromCString(CString str)
 {
 	GUID guid = GUID_NULL;
