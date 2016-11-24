@@ -125,7 +125,7 @@ STDMETHODIMP CCDDAReader::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 		QI2(IAMMediaContent)
 		QI(ICDDAReaderFilter)
 		QI(ISpecifyPropertyPages)
-		//TODO: QI(ISpecifyPropertyPages2)
+		QI(ISpecifyPropertyPages2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
@@ -147,7 +147,7 @@ STDMETHODIMP CCDDAReader::QueryFilterInfo(FILTER_INFO* pInfo)
 
 STDMETHODIMP CCDDAReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 {
-	if (!m_stream.Load(pszFileName)) {
+	if (!m_stream.Load(pszFileName, m_bReadTextInfo)) {
 		return E_FAIL;
 	}
 
@@ -365,7 +365,7 @@ CCDDAStream::~CCDDAStream()
 	}
 }
 
-bool CCDDAStream::Load(const WCHAR* fnw)
+bool CCDDAStream::Load(const WCHAR* fnw, bool bReadTextInfo)
 {
 	CString path(fnw);
 
@@ -422,78 +422,79 @@ bool CCDDAStream::Load(const WCHAR* fnw)
 	m_header.riff.hdr.chunkSize = (long)(m_llLength + sizeof(m_header) - 8);
 	m_header.data.hdr.chunkSize = (long)(m_llLength);
 
-	do {
-		CDROM_READ_TOC_EX TOCEx;
-		memset(&TOCEx, 0, sizeof(TOCEx));
-		TOCEx.Format = CDROM_READ_TOC_EX_FORMAT_CDTEXT;
-		TOCEx.SessionTrack = iTrackIndex;
-		WORD size = 0;
-		ASSERT(MINIMUM_CDROM_READ_TOC_EX_SIZE == sizeof(size));
-		if (!DeviceIoControl(m_hDrive, IOCTL_CDROM_READ_TOC_EX, &TOCEx, sizeof(TOCEx), &size, sizeof(size), &BytesReturned, 0)) {
-			break;
-		}
-
-		size = ((size>>8)|(size<<8)) + sizeof(size);
-
-		CAutoVectorPtr<BYTE> pCDTextData;
-		pCDTextData.Allocate(size);
-		memset(pCDTextData, 0, size);
-
-		if (!DeviceIoControl(m_hDrive, IOCTL_CDROM_READ_TOC_EX, &TOCEx, sizeof(TOCEx), pCDTextData, size, &BytesReturned, 0)) {
-			break;
-		}
-
-		size = (WORD)(BytesReturned - sizeof(CDROM_TOC_CD_TEXT_DATA));
-		CDROM_TOC_CD_TEXT_DATA_BLOCK* pDesc = ((CDROM_TOC_CD_TEXT_DATA*)(BYTE*)pCDTextData)->Descriptors;
-
-		CStringArray str[16];
-		for (int i = 0; i < _countof(str); i++) {
-			str[i].SetSize(1+m_TOC.LastTrack);
-		}
-		CString last;
-
-		for (int i = 0; size >= sizeof(CDROM_TOC_CD_TEXT_DATA_BLOCK); i++, size -= sizeof(CDROM_TOC_CD_TEXT_DATA_BLOCK), pDesc++) {
-			if (pDesc->TrackNumber > m_TOC.LastTrack) {
-				continue;
+	if (bReadTextInfo) {
+		do {
+			CDROM_READ_TOC_EX TOCEx;
+			memset(&TOCEx, 0, sizeof(TOCEx));
+			TOCEx.Format = CDROM_READ_TOC_EX_FORMAT_CDTEXT;
+			TOCEx.SessionTrack = iTrackIndex;
+			WORD size = 0;
+			ASSERT(MINIMUM_CDROM_READ_TOC_EX_SIZE == sizeof(size));
+			if (!DeviceIoControl(m_hDrive, IOCTL_CDROM_READ_TOC_EX, &TOCEx, sizeof(TOCEx), &size, sizeof(size), &BytesReturned, 0)) {
+				break;
 			}
 
-			const int lenU = _countof(pDesc->Text);
-			const int lenW = _countof(pDesc->WText);
+			size = ((size>>8)|(size<<8)) + sizeof(size);
 
-			CString text = !pDesc->Unicode
-						   ? CString(CStringA((CHAR*)pDesc->Text, lenU))
-						   : CString(CStringW((WCHAR*)pDesc->WText, lenW));
+			CAutoVectorPtr<BYTE> pCDTextData;
+			pCDTextData.Allocate(size);
+			memset(pCDTextData, 0, size);
 
-			int tlen = text.GetLength();
-			CString tmp = (tlen < 12-1)
-						  ? (!pDesc->Unicode
-							 ? CString(CStringA((CHAR*)pDesc->Text+tlen+1, lenU-(tlen+1)))
-							 : CString(CStringW((WCHAR*)pDesc->WText+tlen+1, lenW-(tlen+1))))
-							  : _T("");
-
-			if ((pDesc->PackType -= 0x80) >= 0x10) {
-				continue;
+			if (!DeviceIoControl(m_hDrive, IOCTL_CDROM_READ_TOC_EX, &TOCEx, sizeof(TOCEx), pCDTextData, size, &BytesReturned, 0)) {
+				break;
 			}
 
-			if (pDesc->CharacterPosition == 0) {
-				str[pDesc->PackType][pDesc->TrackNumber] = text;
-			} else if (pDesc->CharacterPosition <= 0xf) {
-				if (pDesc->CharacterPosition < 0xf && last.GetLength() > 0) {
-					str[pDesc->PackType][pDesc->TrackNumber] = last + text;
-				} else {
-					str[pDesc->PackType][pDesc->TrackNumber] += text;
+			size = (WORD)(BytesReturned - sizeof(CDROM_TOC_CD_TEXT_DATA));
+			CDROM_TOC_CD_TEXT_DATA_BLOCK* pDesc = ((CDROM_TOC_CD_TEXT_DATA*)(BYTE*)pCDTextData)->Descriptors;
+
+			CStringArray str[16];
+			for (int i = 0; i < _countof(str); i++) {
+				str[i].SetSize(1+m_TOC.LastTrack);
+			}
+			CString last;
+
+			for (int i = 0; size >= sizeof(CDROM_TOC_CD_TEXT_DATA_BLOCK); i++, size -= sizeof(CDROM_TOC_CD_TEXT_DATA_BLOCK), pDesc++) {
+				if (pDesc->TrackNumber > m_TOC.LastTrack) {
+					continue;
 				}
+
+				const int lenU = _countof(pDesc->Text);
+				const int lenW = _countof(pDesc->WText);
+
+				CString text = !pDesc->Unicode
+							   ? CString(CStringA((CHAR*)pDesc->Text, lenU))
+							   : CString(CStringW((WCHAR*)pDesc->WText, lenW));
+
+				int tlen = text.GetLength();
+				CString tmp = (tlen < 12-1)
+							  ? (!pDesc->Unicode
+								 ? CString(CStringA((CHAR*)pDesc->Text+tlen+1, lenU-(tlen+1)))
+								 : CString(CStringW((WCHAR*)pDesc->WText+tlen+1, lenW-(tlen+1))))
+								  : _T("");
+
+				if ((pDesc->PackType -= 0x80) >= 0x10) {
+					continue;
+				}
+
+				if (pDesc->CharacterPosition == 0) {
+					str[pDesc->PackType][pDesc->TrackNumber] = text;
+				} else if (pDesc->CharacterPosition <= 0xf) {
+					if (pDesc->CharacterPosition < 0xf && last.GetLength() > 0) {
+						str[pDesc->PackType][pDesc->TrackNumber] = last + text;
+					} else {
+						str[pDesc->PackType][pDesc->TrackNumber] += text;
+					}
+				}
+
+				last = tmp;
 			}
 
-			last = tmp;
-		}
-
-		m_discTitle = str[0][0];
-		m_trackTitle = str[0][iTrackIndex];
-		m_discArtist = str[1][0];
-		m_trackArtist = str[1][iTrackIndex];
-	} while (0);
-
+			m_discTitle = str[0][0];
+			m_trackTitle = str[0][iTrackIndex];
+			m_discArtist = str[1][0];
+			m_trackArtist = str[1][iTrackIndex];
+		} while (0);
+	}
 
 	return true;
 }
