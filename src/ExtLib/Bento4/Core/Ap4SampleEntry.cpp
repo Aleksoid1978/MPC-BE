@@ -316,6 +316,7 @@ AP4_AudioSampleEntry::AP4_AudioSampleEntry(AP4_Atom::Type    format,
     m_QtCompressionId(0),
     m_QtPacketSize(0),
     m_SampleRate(sample_rate),
+    m_SampleRateExtra(0),
     m_QtV1SamplesPerPacket(0),
     m_QtV1BytesPerPacket(0),
     m_QtV1BytesPerFrame(0),
@@ -436,7 +437,7 @@ AP4_AudioSampleEntry::GetSampleRate()
     if (m_QtVersion == 2) {
         return (AP4_UI32)(m_QtV2SampleRate64);
     } else {
-        return m_SampleRate>>16;
+        return m_SampleRateExtra ? m_SampleRateExtra : m_SampleRate>>16;
     }
 }
 
@@ -1636,8 +1637,7 @@ AP4_AC3SampleEntry::ReadFields(AP4_ByteStream& stream)
     stream.ReadUI24(data);
 
     // fscod
-    m_SampleRate = freq[(data >> 22) & 0x3];
-    m_SampleRate <<= 16;
+    m_SampleRateExtra = freq[(data >> 22) & 0x3];
 
     // acmod + lfeon
     m_ChannelCount = channels[(data >> 11) & 0x7] + ((data >> 10) & 0x1);
@@ -1702,8 +1702,7 @@ AP4_EAC3SampleEntry::ReadFields(AP4_ByteStream& stream)
     stream.ReadUI24(data);
 
     // fscod
-    m_SampleRate = freq[(data >> 6) & 0x3];
-    m_SampleRate <<= 16;
+    m_SampleRateExtra = freq[(data >> 6) & 0x3];
 
     // acmod + lfeon
     m_ChannelCount = channels[(data >> 9) & 0x7] + ((data >> 8) & 0x1);
@@ -1716,6 +1715,82 @@ AP4_EAC3SampleEntry::ReadFields(AP4_ByteStream& stream)
 +---------------------------------------------------------------------*/
 AP4_Size
 AP4_EAC3SampleEntry::GetFieldsSize()
+{
+    return AP4_AudioSampleEntry::GetFieldsSize() + m_ExtSize;
+}
+
+/*----------------------------------------------------------------------
+|       AP4_FLACSampleEntry::AP4_FLACSampleEntry
++---------------------------------------------------------------------*/
+AP4_FLACSampleEntry::AP4_FLACSampleEntry(AP4_Size         size,
+                                         AP4_ByteStream&  stream,
+                                         AP4_AtomFactory& atom_factory) :
+    AP4_AudioSampleEntry(AP4_ATOM_TYPE_FLAC, size),
+    m_ExtSize(0)
+{
+    // read fields
+    ReadFields(stream);
+
+    AP4_Size fields_size = GetFieldsSize();
+
+    // read children atoms
+    ReadChildren(atom_factory, stream, size - AP4_ATOM_HEADER_SIZE - fields_size);
+}
+
+#define FLAC_METADATA_TYPE_STREAMINFO  0
+#define FLAC_STREAMINFO_SIZE          34
+
+/*----------------------------------------------------------------------
+|       AP4_FLACSampleEntry::ReadFields
++---------------------------------------------------------------------*/
+AP4_Result
+AP4_FLACSampleEntry::ReadFields(AP4_ByteStream& stream)
+{
+    AP4_AudioSampleEntry::ReadFields(stream);
+
+    // FLACSpecificBox - 'dfLa' atom
+    AP4_UI32 size, atom;
+    stream.ReadUI32(size);
+    stream.ReadUI32(atom);
+    if (atom != AP4_ATOM_TYPE('d','f','L','a')) {
+        AP4_Offset offset;
+        stream.Tell(offset);
+        stream.Seek(offset - 8);
+        return AP4_SUCCESS;
+    }
+
+    m_ExtSize = size;
+
+    AP4_UI08 version;
+    stream.ReadUI08(version);
+    if (version != 0) {
+        return AP4_SUCCESS;
+    }
+    AP4_UI32 flags;
+    stream.ReadUI24(flags);
+
+    AP4_UI08 type;
+    stream.ReadUI08(type); type = type & 0x7F;
+    stream.ReadUI24(size);
+    if (type != FLAC_METADATA_TYPE_STREAMINFO || size != FLAC_STREAMINFO_SIZE) {
+        return AP4_SUCCESS;
+    }
+
+    m_Data.SetDataSize(size);
+    stream.Read(m_Data.UseData(), size);
+
+    const AP4_Byte* data = m_Data.UseData();
+    m_SampleRateExtra = (data[10] << 12) | (data[11] << 4 ) | (data[12] >> 4);
+    m_ChannelCount = ((data[12] >> 1) & 0x7) + 1;
+
+    return AP4_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       AP4_FLACSampleEntry::GetFieldsSize
++---------------------------------------------------------------------*/
+AP4_Size
+AP4_FLACSampleEntry::GetFieldsSize()
 {
     return AP4_AudioSampleEntry::GetFieldsSize() + m_ExtSize;
 }

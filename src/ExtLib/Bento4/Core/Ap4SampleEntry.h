@@ -202,6 +202,7 @@ protected:
     AP4_UI16 m_QtCompressionId; // 0 or -2
     AP4_UI16 m_QtPacketSize;    // always 0
     AP4_UI32 m_SampleRate;      // 16.16 fixed point
+    AP4_UI32 m_SampleRateExtra;
     // Version == 1
     AP4_UI32 m_QtV1SamplesPerPacket;
     AP4_UI32 m_QtV1BytesPerPacket;
@@ -471,6 +472,27 @@ class AP4_EAC3SampleEntry : public AP4_AudioSampleEntry
 
 protected:
     AP4_Size m_ExtSize;
+};
+
+/*----------------------------------------------------------------------
+|       AP4_FLACSampleEntry
++---------------------------------------------------------------------*/
+class AP4_FLACSampleEntry : public AP4_AudioSampleEntry
+{
+ public:
+    // constructors
+    AP4_FLACSampleEntry(AP4_Size         size,
+                        AP4_ByteStream&  stream,
+                        AP4_AtomFactory& atom_factory);
+
+    virtual AP4_Result ReadFields(AP4_ByteStream& stream);
+    virtual AP4_Size   GetFieldsSize();
+
+    const AP4_DataBuffer* GetData() const { return &m_Data; }
+
+protected:
+    AP4_Size m_ExtSize;
+    AP4_DataBuffer m_Data;
 };
 
 #endif // _AP4_SAMPLE_ENTRY_H_

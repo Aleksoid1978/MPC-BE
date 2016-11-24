@@ -609,6 +609,10 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
             atom = new AP4_EAC3SampleEntry(size, stream, *this);
             break;
 
+        case AP4_ATOM_TYPE_FLAC:
+            atom = new AP4_FLACSampleEntry(size, stream, *this);
+            break;
+
         case AP4_ATOM_TYPE_CHPL:
             atom = new AP4_ChplAtom(size, stream);
             break;
