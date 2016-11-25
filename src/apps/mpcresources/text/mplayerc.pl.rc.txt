@@ -296,17 +296,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 46		"Użyj funkcji paska zadań (Windows 7 i nowsze)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 6		"Jeśli chcesz korzystać z zewnętrznych filtrów wyłącz odpowiednie tutaj. Filtry z pogrubionymi nazwami można dwukrotnie kliknąć, aby wyświetlić ich właściwości."
 10		"Konfikuracja\nsplittera AVI"
 11		"Konfiguracja\nsplittera MPEG"
 12		"Konfiguracja\nsplittera Matroska"
-13		"Konfiguracja\nreadera VTS(IFO)"
-14		"Konfiguracja\ndekodera wideo"
-15		"Konfiguracja\ndekodera\nMPEG-2/DVD"
-16		"Konfiguracja\ndekodera audio"
-17		"Długość bufora:"
-20		"sek."
+13		"CDDA Reader\nconfiguration"
+14		"Konfiguracja\nreadera VTS(IFO)"
+15		"Konfiguracja\ndekodera wideo"
+16		"Konfiguracja\ndekodera\nMPEG-2/DVD"
+17		"Konfiguracja\ndekodera audio"
+18		"Długość bufora:"
+21		"sek."
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -1317,6 +1318,7 @@ STRING IDS_CAPTURE_ERROR_VID_CAPT_PIN		"Nie znaleziono pinu przechwytywania obra
 STRING IDS_CAPTURE_ERROR_VID_FILTER		"Nie można dodać filtra przechwytującego obraz do grafu."
 STRING IDS_CAPTURE_LIVE		"Na żywo"
 STRING IDS_CAPTURE_SETTINGS		"Ustawienia przechwytywania"
+STRING IDS_CDDAREADER_READ_TEXT_INFO		"Read CD-TEXT information"
 STRING IDS_CLEAR		"Wyczyść"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Mocne (2.2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Słabe (2.4 Gamma)"

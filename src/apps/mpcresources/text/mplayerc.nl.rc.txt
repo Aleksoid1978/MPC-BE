@@ -296,17 +296,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 46		"Gebruik mogelijkheden van Windows 7 (en hoger)-taakbalk"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 6		"Als u een standalone-versie of een alternatief van deze filters wilt gebruiken, mag u de interne versie hier uitschakelen."
 10		"AVI-splitter\nconfiguratie"
 11		"MPEG-splitter\nconfiguratie"
 12		"Matroska-splitter\nconfiguratie"
-13		"VTS(IFO)-lezer\nconfiguratie"
-14		"Videodecoder\nconfiguratie"
-15		"MPEG-2/DVD-\ndecoder\nconfiguratie"
-16		"Audiodecoder\nconfiguratie"
-17		"Bufferlengte:"
-20		"sec."
+13		"CDDA Reader\nconfiguration"
+14		"VTS(IFO)-lezer\nconfiguratie"
+15		"Videodecoder\nconfiguratie"
+16		"MPEG-2/DVD-\ndecoder\nconfiguratie"
+17		"Audiodecoder\nconfiguratie"
+18		"Bufferlengte:"
+21		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -1326,6 +1327,7 @@ STRING IDS_CAPTURE_ERROR_VID_CAPT_PIN		"Geen video-opnamepin werd gevonden."
 STRING IDS_CAPTURE_ERROR_VID_FILTER		"Kan de video-opnamefilter niet aan de graph toevoegen"
 STRING IDS_CAPTURE_LIVE		"Live"
 STRING IDS_CAPTURE_SETTINGS		"Opname-instellingen"
+STRING IDS_CDDAREADER_READ_TEXT_INFO		"Read CD-TEXT information"
 STRING IDS_CLEAR		"Leegmaken"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Helder (2.2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Donker (2.4 Gamma)"

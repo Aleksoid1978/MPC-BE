@@ -1,5 +1,6 @@
 // Microsoft Visual C++ generated resource script.
 //
+#include "resource.h"
 #include "Version.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
@@ -58,6 +59,11 @@ BEGIN
     END
 END
 
+STRINGTABLE
+BEGIN
+    IDS_FILTER_SETTINGS_CAPTION     "Settings"
+    IDS_CDDAREADER_READ_TEXT_INFO   "Read CD-TEXT information"
+END
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

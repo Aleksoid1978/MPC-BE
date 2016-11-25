@@ -296,17 +296,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 46		"Windows 7(이상) 작업표시줄기능 사용"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 6		"단독버젼 필터나 그외 대체 필터 사용시 여기서 해당항목을 언첵하세요."
 10		"AVI 스플리터\n설정"
 11		"MPEG 스플리터\n설정"
 12		"Matroska 스플리터\n설정"
-13		"VTS(IFO) Reader\nconfiguration"
-14		"Video 디코더\n설정"
-15		"MPEG-2/DVD\n디코더\n설정"
-16		"Audio 디코더\n설정"
-17		"Buffer length:"
-20		"sec."
+13		"CDDA Reader\nconfiguration"
+14		"VTS(IFO) Reader\nconfiguration"
+15		"Video 디코더\n설정"
+16		"MPEG-2/DVD\n디코더\n설정"
+17		"Audio 디코더\n설정"
+18		"Buffer length:"
+21		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -1326,6 +1327,7 @@ STRING IDS_CAPTURE_ERROR_VID_CAPT_PIN		"비디오 캡쳐 핀을 찾을 수 없�
 STRING IDS_CAPTURE_ERROR_VID_FILTER		"비디오 캡쳐 필터를 그래프에 더하지 못했습니다"
 STRING IDS_CAPTURE_LIVE		"라이브"
 STRING IDS_CAPTURE_SETTINGS		"캡쳐 설정"
+STRING IDS_CDDAREADER_READ_TEXT_INFO		"Read CD-TEXT information"
 STRING IDS_CLEAR		"지우기"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Bright (2.2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Dark (2.4 Gamma)"

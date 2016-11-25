@@ -296,17 +296,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 46		"Use Windows 7 (and above) Taskbar features"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 6		"If you would like to use the stand-alone version from these filters or a some other replacement, disable them here. Filters written in bold can be double-clicked to show their property pages."
 10		"AVI Splitter\nconfiguration"
 11		"MPEG Splitter\nconfiguration"
 12		"Matroska Splitter\nconfiguration"
-13		"VTS(IFO) Reader\nconfiguration"
-14		"Video decoder\nconfiguration"
-15		"MPEG-2/DVD\ndecoder\nconfiguration"
-16		"Audio decoder\nconfiguration"
-17		"Buffer length:"
-20		"sec."
+13		"CDDA Reader\nconfiguration"
+14		"VTS(IFO) Reader\nconfiguration"
+15		"Video decoder\nconfiguration"
+16		"MPEG-2/DVD\ndecoder\nconfiguration"
+17		"Audio decoder\nconfiguration"
+18		"Buffer length:"
+21		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -1326,6 +1327,7 @@ STRING IDS_CAPTURE_ERROR_VID_CAPT_PIN		"Nenašiel sa žiadny pin pre záznam vid
 STRING IDS_CAPTURE_ERROR_VID_FILTER		"Can't add video capture filter to the graph"
 STRING IDS_CAPTURE_LIVE		"Live"
 STRING IDS_CAPTURE_SETTINGS		"Capture Settings"
+STRING IDS_CDDAREADER_READ_TEXT_INFO		"Read CD-TEXT information"
 STRING IDS_CLEAR		"Vyčistiť"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Bright (2.2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Dark (2.4 Gamma)"

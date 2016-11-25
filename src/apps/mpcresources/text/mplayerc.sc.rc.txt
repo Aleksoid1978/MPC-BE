@@ -296,17 +296,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 46		"使用 Windows 7（或更高版本）任务栏功能"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 6		"如果您希望使用这些滤镜的独立版本或其它可替代品,请在此禁用它。"
 10		"AVI 分离器\n设置"
 11		"MPEG 分离器\n设置"
 12		"Matroska 分离器\n设置"
-13		"VTS(IFO) 读取器\n设置"
-14		"视频解码器\n设置"
-15		"MPEG-2/DVD\n解码器\n设置"
-16		"音频解码器\n设置"
-17		"缓冲长度:"
-20		"秒"
+13		"CDDA Reader\nconfiguration"
+14		"VTS(IFO) 读取器\n设置"
+15		"视频解码器\n设置"
+16		"MPEG-2/DVD\n解码器\n设置"
+17		"音频解码器\n设置"
+18		"缓冲长度:"
+21		"秒"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -1326,6 +1327,7 @@ STRING IDS_CAPTURE_ERROR_VID_CAPT_PIN		"未找到视频捕捉接口。"
 STRING IDS_CAPTURE_ERROR_VID_FILTER		"不能添加视频捕获滤镜到画面"
 STRING IDS_CAPTURE_LIVE		"现场"
 STRING IDS_CAPTURE_SETTINGS		"捕获设置"
+STRING IDS_CDDAREADER_READ_TEXT_INFO		"Read CD-TEXT information"
 STRING IDS_CLEAR		"清除"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"明亮 (2.2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"黑暗 (2.4 Gamma)"

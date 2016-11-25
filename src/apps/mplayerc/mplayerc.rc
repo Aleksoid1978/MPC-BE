@@ -7,7 +7,8 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include "afxres.h"
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -733,7 +734,8 @@ BEGIN
     PUSHBUTTON      "AVI Splitter\nconfiguration",IDC_BUTTON5,220,47,70,30,BS_MULTILINE
     PUSHBUTTON      "MPEG Splitter\nconfiguration",IDC_BUTTON1,220,82,70,30,BS_MULTILINE
     PUSHBUTTON      "Matroska Splitter\nconfiguration",IDC_BUTTON6,220,117,70,30,BS_MULTILINE
-    PUSHBUTTON      "VTS(IFO) Reader\nconfiguration",IDC_BUTTON7,220,152,70,30,BS_MULTILINE
+    PUSHBUTTON      "CDDA Reader\nconfiguration",IDC_BUTTON8,220,152,70,30,BS_MULTILINE
+    PUSHBUTTON      "VTS(IFO) Reader\nconfiguration",IDC_BUTTON7,220,187,70,30,BS_MULTILINE
     PUSHBUTTON      "Video decoder\nconfiguration",IDC_BUTTON2,220,47,70,30,BS_MULTILINE
     PUSHBUTTON      "MPEG-2/DVD\ndecoder\nconfiguration",IDC_BUTTON3,220,82,70,30,BS_MULTILINE
     PUSHBUTTON      "Audio decoder\nconfiguration",IDC_BUTTON4,220,47,70,30,BS_MULTILINE
@@ -2848,6 +2850,7 @@ BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Load Embedded Fonts"
     IDS_MKVSPLT_CALC_DURATION       "Calculate the duration based on the video data"
     IDS_VTSREADER_LOAD_PGC          "Enable a choice of Title"
+    IDS_CDDAREADER_READ_TEXT_INFO   "Read CD-TEXT information"
 END
 
 STRINGTABLE

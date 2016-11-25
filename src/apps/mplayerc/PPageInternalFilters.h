@@ -82,6 +82,7 @@ public:
 	CButton m_btnAviCfg;
 	CButton m_btnMpegCfg;
 	CButton m_btnMatroskaCfg;
+	CButton m_btnCDDACfg;
 	CButton m_btnVTSCfg;
 	CButton m_btnVideoCfg;
 	CButton m_btnMPEG2Cfg;
@@ -108,6 +109,7 @@ public:
 	afx_msg void OnAviSplitterConfig();
 	afx_msg void OnMpegSplitterConfig();
 	afx_msg void OnMatroskaSplitterConfig();
+	afx_msg void OnCDDAReaderConfig();
 	afx_msg void OnVTSReaderConfig();
 	afx_msg void OnVideoDecConfig();
 	afx_msg void OnMPEG2DecConfig();

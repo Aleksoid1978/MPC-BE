@@ -53,7 +53,7 @@ bool CCDDAReaderSettingsWnd::OnActivate()
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 	CPoint p(10, 10);
 
-	m_cbReadTextInfo.Create (L"Read CD-TEXT information", dwStyle|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(ScaleX(270), m_fontheight)), this, IDC_STATIC);
+	m_cbReadTextInfo.Create (ResStr(IDS_CDDAREADER_READ_TEXT_INFO), dwStyle|BS_AUTOCHECKBOX|BS_LEFTTEXT, CRect(p, CSize(ScaleX(270), m_fontheight)), this, IDC_STATIC);
 
 	if (m_pMSF) {
 		m_cbReadTextInfo.SetCheck(m_pMSF->GetReadTextInfo());

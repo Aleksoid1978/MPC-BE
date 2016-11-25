@@ -3,6 +3,7 @@
 // Used by CDDAReader.rc
 //
 #define IDS_FILTER_SETTINGS_CAPTION     7000
+#define IDS_CDDAREADER_READ_TEXT_INFO   7900
 
 // Next default values for new objects
 // 

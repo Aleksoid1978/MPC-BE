@@ -296,17 +296,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 46		"Windows 7 (とそれ以降) のタスク バー機能を使用"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 6		"スタンドアロン版または代替フィルターを使用したい場合はここで無効にしてください。"
 10		"AVI スプリッター\n設定"
 11		"MPEG スプリッター\n設定"
 12		"Matroska スプリッター\n設定"
-13		"VTS(IFO) リーダー\n設定"
-14		"ビデオ デコーダー\n設定"
-15		"MPEG-2/DVD\nデコーダー\n設定"
-16		"音声デコーダー\n設定"
-17		"バッファー長:"
-20		"秒"
+13		"CDDA Reader\nconfiguration"
+14		"VTS(IFO) リーダー\n設定"
+15		"ビデオ デコーダー\n設定"
+16		"MPEG-2/DVD\nデコーダー\n設定"
+17		"音声デコーダー\n設定"
+18		"バッファー長:"
+21		"秒"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -1326,6 +1327,7 @@ STRING IDS_CAPTURE_ERROR_VID_CAPT_PIN		"ビデオ キャプチャー ピンが�
 STRING IDS_CAPTURE_ERROR_VID_FILTER		"グラフにビデオ キャプチャー フィルターを追加できません。"
 STRING IDS_CAPTURE_LIVE		"ライブ"
 STRING IDS_CAPTURE_SETTINGS		"キャプチャー設定"
+STRING IDS_CDDAREADER_READ_TEXT_INFO		"Read CD-TEXT information"
 STRING IDS_CLEAR		"クリア"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"明るい (ガンマ値 2.2)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"暗い (ガンマ値 2.4)"
