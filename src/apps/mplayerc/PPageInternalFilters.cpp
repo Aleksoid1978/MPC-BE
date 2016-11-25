@@ -366,6 +366,7 @@ void CPPageInternalFilters::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BUTTON5, m_btnAviCfg);
 	DDX_Control(pDX, IDC_BUTTON1, m_btnMpegCfg);
 	DDX_Control(pDX, IDC_BUTTON6, m_btnMatroskaCfg);
+	DDX_Control(pDX, IDC_BUTTON8, m_btnCDDACfg);
 	DDX_Control(pDX, IDC_BUTTON7, m_btnVTSCfg);
 	DDX_Control(pDX, IDC_BUTTON2, m_btnVideoCfg);
 	DDX_Control(pDX, IDC_BUTTON3, m_btnMPEG2Cfg);
@@ -385,6 +386,7 @@ BEGIN_MESSAGE_MAP(CPPageInternalFilters, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON5, OnAviSplitterConfig)
 	ON_BN_CLICKED(IDC_BUTTON1, OnMpegSplitterConfig)
 	ON_BN_CLICKED(IDC_BUTTON6, OnMatroskaSplitterConfig)
+	ON_BN_CLICKED(IDC_BUTTON8, OnCDDAReaderConfig)
 	ON_BN_CLICKED(IDC_BUTTON7, OnVTSReaderConfig)
 	ON_BN_CLICKED(IDC_BUTTON2, OnVideoDecConfig)
 	ON_BN_CLICKED(IDC_BUTTON3, OnMPEG2DecConfig)
@@ -566,6 +568,7 @@ void CPPageInternalFilters::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_btnAviCfg.ShowWindow(SW_SHOW);
 			m_btnMpegCfg.ShowWindow(SW_SHOW);
 			m_btnMatroskaCfg.ShowWindow(SW_SHOW);
+			m_btnCDDACfg.ShowWindow(SW_SHOW);
 			//m_btnVTSCfg.ShowWindow(SW_SHOW);
 			m_btnVideoCfg.ShowWindow(SW_HIDE);
 			m_btnMPEG2Cfg.ShowWindow(SW_HIDE);
@@ -584,6 +587,7 @@ void CPPageInternalFilters::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_btnAviCfg.ShowWindow(SW_HIDE);
 			m_btnMpegCfg.ShowWindow(SW_HIDE);
 			m_btnMatroskaCfg.ShowWindow(SW_HIDE);
+			m_btnCDDACfg.ShowWindow(SW_HIDE);
 			//m_btnVTSCfg.ShowWindow(SW_HIDE);
 			m_btnVideoCfg.ShowWindow(SW_SHOW);
 			m_btnMPEG2Cfg.ShowWindow(SW_SHOW);
@@ -602,6 +606,7 @@ void CPPageInternalFilters::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 			m_btnAviCfg.ShowWindow(SW_HIDE);
 			m_btnMpegCfg.ShowWindow(SW_HIDE);
 			m_btnMatroskaCfg.ShowWindow(SW_HIDE);
+			m_btnCDDACfg.ShowWindow(SW_HIDE);
 			//m_btnVTSCfg.ShowWindow(SW_HIDE);
 			m_btnVideoCfg.ShowWindow(SW_HIDE);
 			m_btnMPEG2Cfg.ShowWindow(SW_HIDE);
@@ -632,6 +637,11 @@ void CPPageInternalFilters::OnMpegSplitterConfig()
 void CPPageInternalFilters::OnMatroskaSplitterConfig()
 {
 	ShowPPage(CreateInstance<CMatroskaSplitterFilter>);
+}
+
+void CPPageInternalFilters::OnCDDAReaderConfig()
+{
+	ShowPPage(CreateInstance<CCDDAReader>);
 }
 
 void CPPageInternalFilters::OnVTSReaderConfig()

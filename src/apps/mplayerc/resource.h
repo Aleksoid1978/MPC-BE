@@ -533,6 +533,8 @@
 #define IDS_MKVSPLT_CALC_DURATION       7701
 // VTS reader
 #define IDS_VTSREADER_LOAD_PGC          7800
+// CDDA reader
+#define IDS_CDDAREADER_READ_TEXT_INFO   7900
 ////////////////////////////////////////////
 // dialogs
 #define IDD_OPEN_DLG                    10000

@@ -296,17 +296,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 46		"Erabili Windows 7 (eta berriagoa) Eginkizun-barra ezaugarriak"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 6		"Iragazki hauen bakarkako bertsioa edo beste ordezko bat erabiltzea nahi baduzu, ezgaitu itzazu hemen. Lodiz idatzitako iragazkiak klik-bikoitzez ireki daitezke beren ezaugarri orrialdeak ikusteko."
 10		"AVI banantzaile\nitxurapena"
 11		"MPEG banantzaile\nitxurapena"
 12		"Matroska banantzaile\nitxurapena"
-13		"VTS(IFO) Irakurtzaile\nitxurapena"
-14		"Bideo dekodeatzaile\nitxurapena"
-15		"MPEG-2/DVD\ndekodeatzaile\nitxurapena"
-16		"Audio dekodeatzaile\nitxurapena"
-17		"Oroimen luzera:"
-20		"seg."
+13		"CDDA Reader\nconfiguration"
+14		"VTS(IFO) Irakurtzaile\nitxurapena"
+15		"Bideo dekodeatzaile\nitxurapena"
+16		"MPEG-2/DVD\ndekodeatzaile\nitxurapena"
+17		"Audio dekodeatzaile\nitxurapena"
+18		"Oroimen luzera:"
+21		"seg."
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -1326,6 +1327,7 @@ STRING IDS_CAPTURE_ERROR_VID_CAPT_PIN		"Ez da bideo harpen pinik aurkitu."
 STRING IDS_CAPTURE_ERROR_VID_FILTER		"Ezinezkoa gehitzea bideo harpen iragazkia grafikara."
 STRING IDS_CAPTURE_LIVE		"Zuzenean"
 STRING IDS_CAPTURE_SETTINGS		"Harpen Ezarpenak"
+STRING IDS_CDDAREADER_READ_TEXT_INFO		"Read CD-TEXT information"
 STRING IDS_CLEAR		"Garbitu"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Dizdira (2.2 Gama)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Itzalia (2.4 Gama)"

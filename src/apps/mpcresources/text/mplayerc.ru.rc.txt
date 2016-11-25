@@ -296,17 +296,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 46		"Использовать возможности таскбара Windows 7 (и выше)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 6		"Если вы хотите использовать отдельную версию этих фильтров или другую замену, отключите их здесь."
 10		"Настройка\nAVI сплиттера"
 11		"Настройка\nMPEG сплиттера"
 12		"Настройка\nMatroska сплиттера"
-13		"Настройка\nVTS(IFO) ридера"
-14		"Настройка\nвидео декодера"
-15		"Настройка\nMPEG-2/DVD\nдекодера"
-16		"Настройка\nаудио декодера"
-17		"Размер буфера:"
-20		"сек."
+13		"Настройка\nCDDA ридера"
+14		"Настройка\nVTS(IFO) ридера"
+15		"Настройка\nвидео декодера"
+16		"Настройка\nMPEG-2/DVD\nдекодера"
+17		"Настройка\nаудио декодера"
+18		"Размер буфера:"
+21		"сек."
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -1326,6 +1327,7 @@ STRING IDS_CAPTURE_ERROR_VID_CAPT_PIN		"Не найден пин для виде
 STRING IDS_CAPTURE_ERROR_VID_FILTER		"Невозможно добавить видеофильтр захвата к графу"
 STRING IDS_CAPTURE_LIVE		"Live"
 STRING IDS_CAPTURE_SETTINGS		"Настройки захвата"
+STRING IDS_CDDAREADER_READ_TEXT_INFO		"Читать данные CD-TEXT"
 STRING IDS_CLEAR		"Очистить"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Яркий (гамма 2.2)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Темный (гамма 2.4)"

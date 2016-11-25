@@ -296,17 +296,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 46		"使用 Windows 7 (或以上) 工作列功能"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 21
+BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 6		"如果您想使用以下篩選器的獨立版本或其他替代品，請先於此停用其內部版本。"
 10		"AVI 分離器\n選項"
 11		"MPEG 分離器\n選項"
 12		"Matroska 分離器\n選項"
-13		"VTS(IFO) 讀取器\n選項"
-14		"影片解碼器\n選項"
-15		"MPEG-2/DVD\n解碼器\n選項"
-16		"音訊解碼器\n選項"
-17		"緩衝長度:"
-20		"秒"
+13		"CDDA Reader\nconfiguration"
+14		"VTS(IFO) 讀取器\n選項"
+15		"影片解碼器\n選項"
+16		"MPEG-2/DVD\n解碼器\n選項"
+17		"音訊解碼器\n選項"
+18		"緩衝長度:"
+21		"秒"
 END
 
 BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
@@ -1326,6 +1327,7 @@ STRING IDS_CAPTURE_ERROR_VID_CAPT_PIN		"找不到影像擷取 Pin。"
 STRING IDS_CAPTURE_ERROR_VID_FILTER		"無法加入影像擷取篩選器至圖表中。"
 STRING IDS_CAPTURE_LIVE		"實時"
 STRING IDS_CAPTURE_SETTINGS		"擷取設定"
+STRING IDS_CDDAREADER_READ_TEXT_INFO		"Read CD-TEXT information"
 STRING IDS_CLEAR		"清除"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"明亮 (2.2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"暗 (2.4 Gamma)"
