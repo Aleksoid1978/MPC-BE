@@ -358,6 +358,11 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			m_pFile->Seek(28);
 			maxpos = 512;
 		}
+		// ?
+		else if (GETDWORD(buf) == FCC('264D') && buf[4] == 'V') {
+			m_pFile->Seek(0x400);
+			maxpos = 2 * KILOBYTE;
+		}
 
 		if (maxpos) {
 			// simple search for the beginning of H.264 packet
