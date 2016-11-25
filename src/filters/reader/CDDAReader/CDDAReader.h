@@ -25,6 +25,7 @@
 #include <winddk/devioctl.h>
 #include <winddk/ntddcdrm.h>
 #include <qnetwork.h>
+#include <vector>
 #include <AsyncReader/asyncio.h>
 #include <AsyncReader/asyncrdr.h>
 #include "CDDAReaderSettingsWnd.h"
@@ -68,10 +69,11 @@ private:
 	LONGLONG m_llPosition, m_llLength;
 
 	HANDLE m_hDrive;
-	CDROM_TOC m_TOC;
-	UINT m_nFirstSector, m_nStartSector, m_nStopSector;
+	UINT m_nStartSector, m_nStopSector;
 
 	WAVEChunck m_header;
+
+	std::vector<BYTE> m_buff;
 
 public:
 	CCDDAStream();
