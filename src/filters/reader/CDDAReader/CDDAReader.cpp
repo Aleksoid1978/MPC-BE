@@ -427,7 +427,12 @@ bool CCDDAStream::Load(const WCHAR* fnw, bool bReadTextInfo)
 				break;
 			}
 
-			size = _byteswap_ushort(size) + sizeof(size);
+			size = _byteswap_ushort(size);
+			if (size <= MINIMUM_CDROM_READ_TOC_EX_SIZE) { // No cd-text information
+				break;
+			}
+			
+			size += 2;
 
 			std::vector<BYTE> pCDTextData(size);
 
