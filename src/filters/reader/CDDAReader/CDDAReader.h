@@ -66,14 +66,17 @@ class CCDDAStream : public CAsyncStream
 private:
 	CCritSec m_csLock;
 
-	LONGLONG m_llPosition, m_llLength;
+	LONGLONG m_llPosition = 0;
+	LONGLONG m_llLength   = 0;
 
-	HANDLE m_hDrive;
-	UINT m_nStartSector, m_nStopSector;
+	HANDLE m_hDrive       = INVALID_HANDLE_VALUE;
+	UINT m_nStartSector   = 0;
+	UINT m_nStopSector    = 0;
 
 	WAVEChunck m_header;
 
 	std::vector<BYTE> m_buff;
+	size_t m_buff_pos     = 0;
 
 public:
 	CCDDAStream();

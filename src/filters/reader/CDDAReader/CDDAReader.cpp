@@ -335,13 +335,7 @@ STDMETHODIMP_(BOOL) CCDDAReader::GetReadTextInfo()
 
 CCDDAStream::CCDDAStream()
 {
-	m_hDrive = INVALID_HANDLE_VALUE;
-
-	m_llPosition = m_llLength = 0;
-
-	m_nStartSector = m_nStopSector = 0;
-
-	memset(&m_header, 0, sizeof(m_header));
+	ZeroMemory(&m_header, sizeof(m_header));
 	m_header.riff.hdr.chunkID = RIFFID;
 	m_header.riff.WAVE = WAVEID;
 	m_header.frm.hdr.chunkID = FormatID;
@@ -494,8 +488,6 @@ bool CCDDAStream::Load(const WCHAR* fnw, bool bReadTextInfo)
 		} while (0);
 	}
 
-	m_buff.resize(20u * RAW_SECTOR_SIZE);
-
 	return true;
 }
 
@@ -504,7 +496,12 @@ HRESULT CCDDAStream::SetPointer(LONGLONG llPos)
 	if (llPos < 0 || llPos > m_llLength) {
 		return S_FALSE;
 	}
-	m_llPosition = llPos;
+
+	if (m_llPosition != llPos) {
+		m_buff_pos   = 0;
+		m_llPosition = llPos;
+	}
+
 	return S_OK;
 }
 
@@ -512,7 +509,7 @@ HRESULT CCDDAStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 {
 	CAutoLock lck(&m_csLock);
 
-	PBYTE pbBufferOrg = pbBuffer;
+	const PBYTE pbBufferOrg = pbBuffer;
 	LONGLONG pos = m_llPosition;
 	size_t len = dwBytesToRead;
 
@@ -525,31 +522,45 @@ HRESULT CCDDAStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 	}
 	pos -= sizeof(m_header);
 
+	if (m_buff_pos && m_buff_pos < m_buff.size()) {
+		size_t size = min(len, m_buff.size() - m_buff_pos);
+		memcpy(pbBuffer, &m_buff[m_buff_pos], size);
+
+		m_buff_pos += size;
+		pbBuffer += size;
+		pos += size;
+		len -= size;
+	}
+
 	while (pos >= 0 && pos < m_llLength && len > 0) {
 		RAW_READ_INFO rawreadinfo;
 		rawreadinfo.TrackMode = CDDA;
 
 		const UINT sector = m_nStartSector + UINT(pos / RAW_SECTOR_SIZE);
 		const UINT offset = pos % RAW_SECTOR_SIZE;
-		const UINT sectorCount = min(20u, m_nStopSector - sector);
 
-		size_t size = min(min(len, (sectorCount * RAW_SECTOR_SIZE) - offset), size_t(m_llLength - pos)) + (RAW_SECTOR_SIZE - 1);
-		size -= size % RAW_SECTOR_SIZE;
-		rawreadinfo.SectorCount = size / RAW_SECTOR_SIZE;
+		// Reading 20 sectors at once seems to be a good trade-off between performance and compatibility
+		rawreadinfo.SectorCount = min(20u, m_nStopSector - sector);
+
+		if (m_buff.size() != rawreadinfo.SectorCount * RAW_SECTOR_SIZE) {
+			m_buff.resize(rawreadinfo.SectorCount * RAW_SECTOR_SIZE);
+		}
 
 		rawreadinfo.DiskOffset.QuadPart = sector * 2048;
 		DWORD dwBytesReturned = 0;
 		VERIFY(DeviceIoControl(m_hDrive, IOCTL_CDROM_RAW_READ,
 							   &rawreadinfo, sizeof(rawreadinfo),
-							   m_buff.data(), size,
+							   m_buff.data(), m_buff.size(),
 							   &dwBytesReturned, 0));
 
-		size = min(min(len, size - offset), size_t(m_llLength - pos));
+		const size_t size = min(min(len, dwBytesReturned - offset), size_t(m_llLength - pos));
 		memcpy(pbBuffer, &m_buff[offset], size);
 
 		pbBuffer += size;
 		pos += size;
 		len -= size;
+
+		m_buff_pos = size;
 	}
 
 	if (pdwBytesRead) {
