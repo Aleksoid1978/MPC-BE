@@ -357,6 +357,29 @@ CCDDAStream::~CCDDAStream()
 	}
 }
 
+enum PacketTypes {
+	CD_TEXT_TITLE,
+	CD_TEXT_PERFORMER,
+	CD_TEXT_SONGWRITER,
+	CD_TEXT_COMPOSER,
+	CD_TEXT_ARRANGER,
+	CD_TEXT_MESSAGES,
+	CD_TEXT_DISC_ID,
+	CD_TEXT_GENRE,
+	CD_TEXT_TOC_INFO,
+	CD_TEXT_TOC_INFO2,
+	CD_TEXT_RESERVED_1,
+	CD_TEXT_RESERVED_2,
+	CD_TEXT_RESERVED_3,
+	CD_TEXT_RESERVED_4,
+	CD_TEXT_CODE,
+	CD_TEXT_SIZE,
+	CD_TEXT_NUM_PACKS
+};
+
+#define CD_TEXT_FIELD_LENGTH         12
+#define CD_TEXT_FIELD_LENGTH_UNICODE  6
+
 bool CCDDAStream::Load(const WCHAR* fnw, bool bReadTextInfo)
 {
 	const CString path(fnw);
@@ -441,55 +464,42 @@ bool CCDDAStream::Load(const WCHAR* fnw, bool bReadTextInfo)
 			}
 
 			size = (WORD)(BytesReturned - sizeof(CDROM_TOC_CD_TEXT_DATA));
-			CDROM_TOC_CD_TEXT_DATA_BLOCK* pDesc = ((CDROM_TOC_CD_TEXT_DATA*)pCDTextData.data())->Descriptors;
+			CDROM_TOC_CD_TEXT_DATA_BLOCK* pCDTextBlock = ((CDROM_TOC_CD_TEXT_DATA*)pCDTextData.data())->Descriptors;
 
-			CStringArray str[16];
-			for (int i = 0; i < _countof(str); i++) {
-				str[i].SetSize(1 + cdrom_TOC.LastTrack);
+			CStringArray CDTextStrings[CD_TEXT_NUM_PACKS];
+			for (int i = 0; i < CD_TEXT_NUM_PACKS; i++) {
+				CDTextStrings[i].SetSize(1 + cdrom_TOC.LastTrack);
 			}
-			CString last;
 
-			for (int i = 0; size >= sizeof(CDROM_TOC_CD_TEXT_DATA_BLOCK); i++, size -= sizeof(CDROM_TOC_CD_TEXT_DATA_BLOCK), pDesc++) {
-				if (pDesc->TrackNumber > cdrom_TOC.LastTrack) {
+			for (; size >= sizeof(CDROM_TOC_CD_TEXT_DATA_BLOCK); size -= sizeof(CDROM_TOC_CD_TEXT_DATA_BLOCK), pCDTextBlock++) {
+				if (pCDTextBlock->TrackNumber > cdrom_TOC.LastTrack) {
 					continue;
 				}
 
-				const int lenU = _countof(pDesc->Text);
-				const int lenW = _countof(pDesc->WText);
-
-				const CString text = !pDesc->Unicode
-									 ? CString(CStringA((CHAR*)pDesc->Text, lenU))
-									 : CString((WCHAR*)pDesc->WText, lenW);
-
-				const int tlen = text.GetLength();
-				const CString tmp = (tlen < 12 - 1)
-									? (!pDesc->Unicode
-										? CString(CStringA((CHAR*)pDesc->Text + tlen + 1, lenU - (tlen + 1)))
-										: CString((WCHAR*)pDesc->WText + tlen + 1, lenW - (tlen + 1)))
-									: L"";
-
-				if (pDesc->PackType < 0x80 || pDesc->PackType >= 0x80 + 0x10) {
+				if (pCDTextBlock->PackType < 0x80 || pCDTextBlock->PackType >= 0x80 + 0x10) {
 					continue;
 				}
-				pDesc->PackType -= 0x80;
+				pCDTextBlock->PackType -= 0x80;
 
-				if (pDesc->CharacterPosition == 0) {
-					str[pDesc->PackType][pDesc->TrackNumber] = text;
-				} else if (pDesc->CharacterPosition <= 0xf) {
-					if (pDesc->CharacterPosition < 0xf && !last.IsEmpty()) {
-						str[pDesc->PackType][pDesc->TrackNumber] = last + text;
-					} else {
-						str[pDesc->PackType][pDesc->TrackNumber] += text;
-					}
+				int nLengthRemaining = pCDTextBlock->Unicode ? CD_TEXT_FIELD_LENGTH_UNICODE : CD_TEXT_FIELD_LENGTH;
+				UINT nMaxLength = nLengthRemaining;
+				UINT nOffset = 0;
+				UCHAR nTrack = pCDTextBlock->TrackNumber;
+				while (nTrack <= cdrom_TOC.LastTrack && nLengthRemaining > 0 && nOffset < nMaxLength) {
+					CString Text = pCDTextBlock->Unicode
+						? CString((WCHAR*)pCDTextBlock->WText + nOffset, nLengthRemaining)
+						: CString(CStringA((CHAR*)pCDTextBlock->Text + nOffset, nLengthRemaining));
+					CDTextStrings[pCDTextBlock->PackType][nTrack] += Text;
+					nOffset += Text.GetLength() + 1;
+					nLengthRemaining -= (Text.GetLength() + 1);
+					++nTrack;
 				}
-
-				last = tmp;
 			}
 
-			m_discTitle = str[0][0];
-			m_trackTitle = str[0][iTrackIndex];
-			m_discArtist = str[1][0];
-			m_trackArtist = str[1][iTrackIndex];
+			m_discTitle   = CDTextStrings[CD_TEXT_TITLE][0];
+			m_trackTitle  = CDTextStrings[CD_TEXT_TITLE][iTrackIndex];
+			m_discArtist  = CDTextStrings[CD_TEXT_PERFORMER][0];
+			m_trackArtist = CDTextStrings[CD_TEXT_PERFORMER][iTrackIndex];
 		} while (0);
 	}
 
