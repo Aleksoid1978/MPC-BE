@@ -277,6 +277,11 @@ void CDX9RenderingEngine::FreeVideoSurfaces()
 	}
 }
 
+void CDX9RenderingEngine::FreeScreenTextures()
+{
+	NULL_PTR_ARRAY(m_pScreenSpaceTextures);
+}
+
 HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect)
 {
 	if (destRect.IsRectEmpty()) {

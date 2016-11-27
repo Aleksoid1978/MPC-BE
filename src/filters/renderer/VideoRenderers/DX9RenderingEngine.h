@@ -90,6 +90,7 @@ namespace DSObjects
 
 		HRESULT CreateVideoSurfaces();
 		void FreeVideoSurfaces();
+		void FreeScreenTextures();
 
 		HRESULT RenderVideo(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect);
 		HRESULT Stereo3DTransform(IDirect3DSurface9* pRenderTarget, const CRect& destRect);
