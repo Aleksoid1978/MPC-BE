@@ -773,7 +773,11 @@ HRESULT CDX9AllocatorPresenter::ResetD3D9Device()
 
 	D3DDISPLAYMODEEX d3ddmEx = { sizeof(d3ddmEx) };
 	m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &d3ddmEx, NULL);
-	m_ScreenSize.SetSize(d3ddmEx.Width, d3ddmEx.Height);
+
+	if (m_ScreenSize.cx != d3ddmEx.Width || m_ScreenSize.cy != d3ddmEx.Height) {
+		m_ScreenSize.SetSize(d3ddmEx.Width, d3ddmEx.Height);
+		FreeScreenTextures();
+	}
 
 	HRESULT hr = E_FAIL;
 
