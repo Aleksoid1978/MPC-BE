@@ -301,7 +301,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
 10		"AVI-Splitter\nEinstellungen"
 11		"MPEG-Splitter\nEinstellungen"
 12		"Matroska-Splitter\nEinstellungen"
-13		"CDDA-Reader\nconfiguration"
+13		"CDDA-Reader\nEinstellungen"
 14		"VTS-Reader (IFO)\nEinstellungen"
 15		"Video-Decoder\nEinstellungen"
 16		"MPEG-2- und\nDVD-Decoder\nEinstellungen"
