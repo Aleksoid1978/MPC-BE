@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "DXVA2DecoderVC1.h"
 #include "../MPCVideoDec.h"
+#include "../FfmpegContext.h"
 #include <ffmpeg/libavcodec/avcodec.h>
 
 CDXVA2DecoderVC1::CDXVA2DecoderVC1(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config)
@@ -32,32 +33,63 @@ CDXVA2DecoderVC1::CDXVA2DecoderVC1(CMPCVideoDecFilter* pFilter, IDirectXVideoDec
 
 HRESULT CDXVA2DecoderVC1::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDXVASize/* = UINT_MAX*/)
 {
-	DXVA_VC1_Picture_Context *ctx_pic	= &m_DXVA_Context.ctx_pic[m_ctx_pic_num];
-	DXVA_SliceInfo *slice				= &ctx_pic->slice;
-	BYTE* current						= pDXVABuffer;
+	DXVA_VC1_Picture_Context *ctx_pic = &m_DXVA_Context.ctx_pic[m_ctx_pic_num];
+	DXVA_SliceInfo *slice             = NULL;
+	BYTE* current                     = pDXVABuffer;
+	UINT MBCount                      = FFGetMBCount(m_pFilter->GetAVCtx());
+	
+	static const BYTE start_code[]    = { 0, 0, 1, 0x0d };
+	const UINT start_code_size        = m_pFilter->GetCodec() == AV_CODEC_ID_VC1 ? sizeof(start_code) : 0;
 
-    static const uint8_t start_code[]	= { 0, 0, 1, 0x0d };
-    const unsigned start_code_size		= m_pFilter->GetCodec() == AV_CODEC_ID_VC1 ? sizeof(start_code) : 0;
-    const unsigned slice_size			= slice->dwSliceBitsInBuffer / 8;
-    const unsigned padding				= 128 - ((start_code_size + slice_size) & 127);
-	nSize								= start_code_size + slice_size + padding;
+	for (unsigned i = 0; i < ctx_pic->slice_count; i++) {
+		slice         = &ctx_pic->slice[i];
+		UINT position = slice->dwSliceDataLocation;
+		UINT size     = slice->dwSliceBitsInBuffer / 8;
 
-	if (nSize > nDXVASize) {
-		nSize = 0;
-		return E_FAIL;
-	}
-
-	if (start_code_size > 0) {
-		memcpy(pDXVABuffer, start_code, start_code_size);
-		if (m_ctx_pic_num == 1) {
-			pDXVABuffer[3] = 0x0c;
+		if ((current - pDXVABuffer) + size + start_code_size > nDXVASize) {
+			nSize = 0;
+			return E_FAIL;
 		}
+		slice->dwSliceDataLocation = current - pDXVABuffer;
+
+		if (i < ctx_pic->slice_count - 1) {
+			slice->wNumberMBsInSlice =
+				slice[1].wNumberMBsInSlice - slice[0].wNumberMBsInSlice;
+		} else {
+			slice->wNumberMBsInSlice =
+				MBCount - slice[0].wNumberMBsInSlice;
+		}
+
+		if (start_code_size) {
+			memcpy(current, start_code, start_code_size);
+			if (i == 0 && m_ctx_pic_num == 1) {
+				current[3] = 0x0c;
+			} else if (i > 0) {
+				current[3] = 0x0b;
+			}
+			
+			current += start_code_size;
+			slice->dwSliceBitsInBuffer += start_code_size * 8;
+		}
+
+		memcpy(current, &ctx_pic->bitstream[position], size);
+		current += size;
 	}
-	memcpy(pDXVABuffer + start_code_size, ctx_pic->bitstream + slice->dwSliceDataLocation, slice_size);
-	if (padding > 0) {
-		memset(pDXVABuffer + start_code_size + slice_size, 0, padding);
+
+	nSize = current - pDXVABuffer;
+	if (slice && nSize % 128) {
+		UINT padding = 128 - (nSize % 128);
+
+		if (nSize + padding > nDXVASize) {
+			nSize = 0;
+			return E_FAIL;
+		}
+
+		memset(current, 0, padding);
+		nSize += padding;
+
+		slice->dwSliceBitsInBuffer += padding * 8;
 	}
-	slice->dwSliceBitsInBuffer = 8 * nSize;
 
 	return S_OK;
 }

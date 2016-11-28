@@ -32,6 +32,7 @@ extern "C" {
 	#include <ffmpeg/libavcodec/mpegvideo.h>
 	#include <ffmpeg/libavcodec/h264dec.h>
 	#include <ffmpeg/libavcodec/ffv1.h>
+	#include <ffmpeg/libavcodec/vc1.h>
 #undef class
 	#include <ffmpeg/libavcodec/dxva_h264.h>
 	#include <ffmpeg/libavcodec/dxva_hevc.h>
@@ -308,6 +309,14 @@ UINT FFGetMBCount(struct AVCodecContext* pAVCtx)
 				const MpegEncContext* s = (MpegEncContext*)pAVCtx->priv_data;
 				const int is_field      = s->picture_structure != PICT_FRAME;
 				MBCount                 = s->mb_width * (s->mb_height >> is_field);
+			}
+			break;
+		case AV_CODEC_ID_VC1:
+		case AV_CODEC_ID_WMV3:
+			{
+				const VC1Context* v     = (VC1Context*)pAVCtx->priv_data;
+				const MpegEncContext* s = &v->s;
+				MBCount                 = s->mb_width * (s->mb_height >> v->field_mode);
 			}
 			break;
 	}

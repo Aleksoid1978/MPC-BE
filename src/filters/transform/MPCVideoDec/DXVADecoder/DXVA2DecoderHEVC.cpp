@@ -35,12 +35,11 @@ HRESULT CDXVA2DecoderHEVC::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nD
 	DXVA_Slice_HEVC_Short *slice		= NULL;
 	BYTE* current						= pDXVABuffer;
 
+	static const BYTE start_code[]		= { 0, 0, 1 };
+	static const UINT start_code_size	= sizeof(start_code);
+
 	for (unsigned i = 0; i < ctx_pic->slice_count; i++) {
-		static const BYTE start_code[]		= { 0, 0, 1 };
-		static const UINT start_code_size	= sizeof(start_code);
-
-		slice = &ctx_pic->slice_short[i];
-
+		slice							= &ctx_pic->slice_short[i];
 		UINT position					= slice->BSNALunitDataLocation;
 		UINT size						= slice->SliceBytesInBuffer;
 

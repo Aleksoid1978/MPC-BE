@@ -20,11 +20,13 @@
 
 #include <dxva.h>
 
-#define MAX_VC1_PICTURE_CONTEXT 2
+#define MAX_SLICE               1024
+#define MAX_VC1_PICTURE_CONTEXT    2
 
 typedef struct DXVA_VC1_Picture_Context {
     DXVA_PictureParameters   pp;
-    DXVA_SliceInfo           slice;
+    unsigned                 slice_count;
+    DXVA_SliceInfo           slice[MAX_SLICE];
     const uint8_t            *bitstream;
     unsigned                 bitstream_size;
 } DXVA_VC1_Picture_Context;

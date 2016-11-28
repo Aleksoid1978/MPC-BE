@@ -152,11 +152,34 @@ static void dxva_fill_picture_parameters(AVCodecContext *avctx,
     pp->bBitstreamConcealmentMethod = 0;
 }
 
-static void dxva_fill_slice(AVCodecContext *avctx, DXVA_VC1_Picture_Context *ctx_pic,
-                            const uint8_t *buffer, uint32_t size)
+static void fill_slice(AVCodecContext *avctx, DXVA_SliceInfo *slice,
+                       unsigned position, unsigned size)
 {
     const VC1Context *v = avctx->priv_data;
     const MpegEncContext *s = &v->s;
+
+    memset(slice, 0, sizeof(*slice));
+    slice->wHorizontalPosition = 0;
+    slice->wVerticalPosition   = s->mb_y;
+    slice->dwSliceBitsInBuffer = 8 * size;
+    slice->dwSliceDataLocation = position;
+    slice->bStartCodeBitOffset = 0;
+    slice->bReservedBits       = (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type) ? v->bfraction_lut_index + 9 : 0;
+    slice->wMBbitOffset        = v->p_frame_skipped ? 0xffff : get_bits_count(&s->gb) + (avctx->codec_id == AV_CODEC_ID_VC1 ? 32 : 0);
+    /* XXX We store the index of the first MB and it will be fixed later */
+    slice->wNumberMBsInSlice   = (s->mb_y >> v->field_mode) * s->mb_width + s->mb_x;
+    slice->wQuantizerScaleCode = v->pq;
+    slice->wBadSliceChopping   = 0;
+}
+
+static int dxva_decode_slice(AVCodecContext *avctx,
+                             DXVA_VC1_Picture_Context *ctx_pic,
+                             const uint8_t *buffer, uint32_t size)
+{
+    unsigned position;
+
+    if (ctx_pic->slice_count >= MAX_SLICE)
+        return -1;
 
     if (avctx->codec_id == AV_CODEC_ID_VC1 &&
         size >= 4 && IS_MARKER(AV_RB32(buffer))) {
@@ -164,18 +187,11 @@ static void dxva_fill_slice(AVCodecContext *avctx, DXVA_VC1_Picture_Context *ctx
         size   -= 4;
     }
 
-    ctx_pic->bitstream_size = size;
-    ctx_pic->bitstream      = buffer;
+    if (!ctx_pic->bitstream)
+        ctx_pic->bitstream = buffer;
+    ctx_pic->bitstream_size += size;
 
-    memset(&ctx_pic->slice, 0, sizeof(ctx_pic->slice));
-    ctx_pic->slice.wHorizontalPosition = 0;
-    ctx_pic->slice.wVerticalPosition   = s->mb_y;
-    ctx_pic->slice.dwSliceBitsInBuffer = 8 * size;
-    ctx_pic->slice.dwSliceDataLocation = 0;
-    ctx_pic->slice.bStartCodeBitOffset = 0;
-    ctx_pic->slice.bReservedBits       = (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type) ? v->bfraction_lut_index + 9 : 0;
-    ctx_pic->slice.wMBbitOffset        = v->p_frame_skipped ? 0xffff : get_bits_count(&s->gb) + (avctx->codec_id == AV_CODEC_ID_VC1 ? 32 : 0);
-    ctx_pic->slice.wNumberMBsInSlice   = s->mb_width * s->mb_height; /* XXX We assume 1 slice */
-    ctx_pic->slice.wQuantizerScaleCode = v->pq;
-    ctx_pic->slice.wBadSliceChopping   = 0;
+    position = buffer - ctx_pic->bitstream;
+    fill_slice(avctx, &ctx_pic->slice[ctx_pic->slice_count++], position, size);
+    return 0;
 }
