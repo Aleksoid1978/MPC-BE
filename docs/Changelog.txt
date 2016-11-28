@@ -13,6 +13,161 @@ Windows XP is no longer supported.
 Build in Visual Studio 2013 is no longer supported.
 Instead d3dcompiler_43.dll now used d3dcompiler_47.dll.
 
+CHTTPAsync
+Increased connection timeout of 10 seconds, removed timeouts when reading data.
+Improved work with some streams.
+
+UDPReader
+Added processing of type "video/unknown" for better compatibility with livestreamer.
+
+CDDAReader
+Added option on / off read text data (CD-TEXT).
+
+Splitters
+Added splitter for Bink Video.
+Removed extra check on extension, where a sufficient check on the signature.
+
+AudioSplitter
+Improved work on the HTTP Protocol.
+Added ID3V2 support for WAV files.
+Fixed opening WAV files with odd-size data region.
+
+MpaSplitter
+Improved work on the HTTP Protocol.
+Added support for reading ApeTag in MP3 files.
+Ignored IFF files (ANIM).
+
+RawVideoSplitter
+Added support for opening HTTP and stdin streams.
+Added simplified support H. 264 RAW, recorded with DVR Polyvision PVDR, LTV-DVR and others.
+
+MpegSplitter
+Fixed artifacts when playing 3D Blu-ray.
+
+MP4Splitter
+Added support for reading the names of the chapters in UTF16 format.
+Improved support for Dash files.
+Added support of RAW video 'b64a'.
+Fixed crash on some files.
+Fixed opening some files with an index that does not start from the beginning of data.
+Added experimental support for FLAC MP4.
+
+MatroskaSplitter
+Added support for reading tag "3d-plane" and export properties "stereo_subtitle_offset_ids".
+Pass the additional parameters of VP9 in MediaType to upstream filter.
+
+Muxers
+Updated code of muxers (thanks to project MPC-HC).
+
+MPCVideoDec
+Removed DXVA1 decoder.
+Added support Ut Video 'UQY2', 'ULH0', 'ULH2', 'UQRG' and 'UQRA'.
+Improved display information about the input format in the status.
+Added support of RAW video 'b64a'.
+Added support for MPEG2 streams without I-frames.
+Fixed crash when converting a NV12->YUY2.
+Added decoder of H. 264 MVC 3D Intel Media SDK (with support for hardware decoding on Intel adapters).
+Added the ability to output stereo 3D in different modes.
+Pass custom DXVA2_ExtendedFormat to upstream filter.
+Optimize convert YUV to RGB (thanks to project LAV Filters). Fixed convert YCgCo to RGB.
+More appropriately define the pixel format at the beginning of playback for JPEG2000, FFV1, Motion-JPEG.
+To support decoding of 4k on Intel graphics (Ivy Bridge and newer) it is now necessary to install the driver-pack is not below v15.33.32.4061.
+To support decoding of 4k on AMD now driver must be installed not lower than v16.9.1.
+Bypass the bug in the function IDrect3D9::GetAdapterIdentifier(), seen on the Win8 system.1 and Win10.
+Fixed conversion 12 bit YUV 444 -> RGB.
+
+AudioSwitcher
+Fill in the LFE channel when converting from 2.0 to 5.1/7.1.
+Added option to redirect bass from the front channels into the LFE.
+Added the ability to use CyberLink TimeStretch Filter (PDVD10).
+
+MpcAudioRenderer
+Updated list of supported formats when changing devices.
+Fixed a deadlock in some situations.
+Added support for output in "real" 32bit.
+Use avresample library instead  swresample.
+To change the frequency of the sound using the SoXR library.
+Added SSE2 optimizations for functions changing sample format.
+
+VideoRenderers
+Removed support for VMR-7 (windowed and renderless), VMR-9 (renderless).
+Videorenderer now report more detailed the name of the renderer.
+Pre-compile all interpolation shaders.
+Use a two pass interpolation shaders.
+Added method of interpolation Lanczos2 and Lanczos3, deleted Perlin Smootherstep.
+In statistics, added displaying the frequency of the GPU and video memory consumption.
+The maximum number of EVR buffers reduced to 30.
+Fixed display YCgCo-live at EVR (custom presenter) and Sync Renderer.
+Added the ability to convert the vertical anamorphic stereo pair mode to interleaving of rows.
+Removed rotations along the axes X and Y. Axis Z is pivoted in 90 degree increments.
+Added "flip horizontal" command.
+Fixed the playback in full screen on secondary display after switching with new Windows SDK.
+Added independent option for running interpolation if you reduce below 50%.
+Set the BackBuffer size sufficient for display on all connected displays. Now the option "Reinitialize when changing the monitor" is off by default.
+Fixed incorrect display YUV in full range Nvidia graphics cards (helps depending on driver settings).
+Fixed hardware decoding HEVC 8bit on a Radeon RX4xx.
+Added support for VP9 DXVA 10-bit Profile 2.
+Fixed EVR (custom presenter) when switching the display at a higher resolution.
+
+Subtitles
+When displaying a stereoscopic subtitle added to the effect of "three-dimensionality".
+Added support for color range (TV/PC).
+For PGS/DVB subtitles added support for color information (BT.601/BT.709, TV/PC).
+Optimized handling of animated subtitles.
+Fixed switching VobSub subtitles with multiple indexes.
+
+Youtube
+Fixed opening live-links (broadcasts in real time, the hls format).
+In the menu "Navigate->Jump to" add list of available formats of Youtube.
+Changed the way the choice of format and resolution of YouTube videos.
+Fixed detection of file name extensions for the links received.
+Added ability to open Youtube playlists with Drag'n'drop.
+When saving the Youtube links, add a suffix video resolution (720p/1080p etc).
+Added support for WebM VP9 10bit.
+
+Player
+Corrected the calculation of the minimum window size.
+The maximum number of chapters increased to 300.
+AssFilterMod blocked due to incorrect operation.
+Added the ability to change channels on the analog TB-tuner buttons Previous and Next.
+Added display of number and frequency of the channel analog TB-tuner switching when you run and exit from a pause or stop.
+Added option to select the priority of the filters for http/https protocols.
+Use high-quality Resizer images when creating thumbnails (the original code - http://www.geisswerks.com/ryan/FAQS/resize.html).
+Added window while saving thumbnails. Now this process can be interrupted.
+Added the ability to save some threads are received over http/https and UDP.
+Reduced number of re-connections when opening http/https links.
+Do not reset the setting to English translation, if the translation file is not available.
+Fixed memorization of the analog capture device in the settings window the "Capture".
+Display the type of audio codecs (ACM) in the capture window.
+Fixed a crash when changing the settings for the capture.
+Added extension .mk3d in group of formats Matroska.
+Improved support .asx playlists.
+Added ability to open "links" to local files beginning with "file://"
+Restored keys "DVD Menu Activate".
+Remember the current display status for remaining time in OSD.
+The minimum number of recent files is reduced to 5.
+Added commands "move back" and "go ahead" when you control using the touch screen.
+Fixed saving some numeric settings with simultaneous completion and closing the settings panel.
+Fixed the transition to full screen by pressing the corresponding button in the preview on the taskbar.
+Adjustment of the description of command line parameters.
+Added commands to switch the output mode to stereo 3D.
+Added support for turning off the computer, followed by rapid incorporation (Windows 8/10).
+Allow you to view and change the settings in the submenu "Frame" without first running video.
+Improved work with bookmarks, memorizing the position in the file/DVD, added remembering of the current audio track and subtitles.
+Changed the way to store data about recent files and DVD.
+Changed command IDs "Subtitle Delay -", "Subtitle Delay +", "After Playback: Do Nothing", "After Playback: Play next in the folder" for compatibility with third-party utilities.
+In the settings panel "External filters" stands more and more media types.
+
+MPCBEShellExt
+Fixed a bug when the system does not open attached links in Explorer.
+
+Updated Ukrainian translation (by arestarh1986).
+Updated Chinese (Traditional and Simplified) and Dutch translation (by beter).
+Updated German translation (by Klaus1189).
+Updated Japanese translation (by Socket774).
+Updated Polish translation (by Volfield).
+Updated Greek translation (by Lampros Zouloumis).
+
 Updated libraries:
 	ffmpeg git-n3.3-dev-485-g42ae9c6;
 	jsoncpp git-1.7.7-2-ga1db52b;
