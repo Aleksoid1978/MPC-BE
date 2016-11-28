@@ -10,6 +10,7 @@ Legend:
 1.5.0 (beta)
 ==============================
 Windows XP is no longer supported.
+Build in Visual Studio 2013 is no longer supported.
 Instead d3dcompiler_43.dll now used d3dcompiler_47.dll.
 
 Updated libraries:
