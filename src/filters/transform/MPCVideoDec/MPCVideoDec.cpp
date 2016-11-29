@@ -1162,16 +1162,23 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 				AVMasteringDisplayMetadata* metadataHDR = (AVMasteringDisplayMetadata*)sd->data;
 				MediaSideDataHDR hdr = { 0 };
 
-				const int mapping[3] = { 1, 2, 0 };
-				for (int i = 0; i < 3; i++) {
-					const int j = mapping[i];
-					hdr.display_primaries_x[i] = CALC_HDR_VALUE(metadataHDR->display_primaries[j][0]);
-					hdr.display_primaries_y[i] = CALC_HDR_VALUE(metadataHDR->display_primaries[j][1]);
+				if (metadataHDR->has_primaries) {
+					// export the display primaries in GBR order
+					hdr.display_primaries_x[0] = CALC_HDR_VALUE(metadataHDR->display_primaries[1][0]);
+					hdr.display_primaries_y[0] = CALC_HDR_VALUE(metadataHDR->display_primaries[1][1]);
+					hdr.display_primaries_x[1] = CALC_HDR_VALUE(metadataHDR->display_primaries[2][0]);
+					hdr.display_primaries_y[1] = CALC_HDR_VALUE(metadataHDR->display_primaries[2][1]);
+					hdr.display_primaries_x[2] = CALC_HDR_VALUE(metadataHDR->display_primaries[0][0]);
+					hdr.display_primaries_y[2] = CALC_HDR_VALUE(metadataHDR->display_primaries[0][1]);
+
+					hdr.white_point_x = CALC_HDR_VALUE(metadataHDR->white_point[0]);
+					hdr.white_point_y = CALC_HDR_VALUE(metadataHDR->white_point[1]);
 				}
-				hdr.white_point_x = CALC_HDR_VALUE(metadataHDR->white_point[0]);
-				hdr.white_point_y = CALC_HDR_VALUE(metadataHDR->white_point[1]);
-				hdr.max_display_mastering_luminance = CALC_HDR_VALUE(metadataHDR->max_luminance);
-				hdr.min_display_mastering_luminance = CALC_HDR_VALUE(metadataHDR->min_luminance);
+
+				if (metadataHDR->has_luminance) {
+					hdr.max_display_mastering_luminance = CALC_HDR_VALUE(metadataHDR->max_luminance);
+					hdr.min_display_mastering_luminance = CALC_HDR_VALUE(metadataHDR->min_luminance);
+				}
 
 				pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)&hdr, sizeof(hdr));
 
