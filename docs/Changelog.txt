@@ -73,8 +73,9 @@ Optimize convert YUV to RGB (thanks to project LAV Filters). Fixed convert YCgCo
 More appropriately define the pixel format at the beginning of playback for JPEG2000, FFV1, Motion-JPEG.
 To support decoding of 4k on Intel graphics (Ivy Bridge and newer) it is now necessary to install the driver-pack is not below v15.33.32.4061.
 To support decoding of 4k on AMD now driver must be installed not lower than v16.9.1.
-Bypass the bug in the function IDrect3D9::GetAdapterIdentifier(), seen on the Win8 system.1 and Win10.
+Bypass the bug in the function IDrect3D9::GetAdapterIdentifier(), seen on the Win8.1 and Win10.
 Fixed conversion 12 bit YUV 444 -> RGB.
+Added DXVA VP9 Profile2 10 bit decoder.
 
 AudioSwitcher
 Fill in the LFE channel when converting from 2.0 to 5.1/7.1.
