@@ -693,10 +693,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 													MasteringMetadata& metadata = pTE->v.VideoColorInformation.SMPTE2086MasteringMetadata;
 
 													MediaSideDataHDR* hdr = (MediaSideDataHDR*)(ptr.GetData() + size);
-													hdr->display_primaries_x[0] = metadata.PrimaryBChromaticityX;
-													hdr->display_primaries_y[0] = metadata.PrimaryBChromaticityY;
-													hdr->display_primaries_x[1] = metadata.PrimaryGChromaticityX;
-													hdr->display_primaries_y[1] = metadata.PrimaryGChromaticityY;
+													hdr->display_primaries_x[0] = metadata.PrimaryGChromaticityX;
+													hdr->display_primaries_y[0] = metadata.PrimaryGChromaticityY;
+													hdr->display_primaries_x[1] = metadata.PrimaryBChromaticityX;
+													hdr->display_primaries_y[1] = metadata.PrimaryBChromaticityY;
 													hdr->display_primaries_x[2] = metadata.PrimaryRChromaticityX;
 													hdr->display_primaries_y[2] = metadata.PrimaryRChromaticityY;
 													
