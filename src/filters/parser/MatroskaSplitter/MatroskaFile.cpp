@@ -587,15 +587,27 @@ HRESULT Colour::Parse(CMatroskaNode* pMN0)
 	BeginChunk
 	case 0x55B1:
 		MatrixCoefficients.Parse(pMN);
+		bValid = true;
+		break;
+	case 0x55B7:
+		ChromaSitingHorz.Parse(pMN);
+		bValid = true;
+		break;
+	case 0x55B8:
+		ChromaSitingVert.Parse(pMN);
+		bValid = true;
 		break;
 	case 0x55B9:
 		Range.Parse(pMN);
+		bValid = true;
 		break;
 	case 0x55BA:
 		TransferCharacteristics.Parse(pMN);
+		bValid = true;
 		break;
 	case 0x55BB:
 		Primaries.Parse(pMN);
+		bValid = true;
 		break;
 	case 0x55D0:
 		SMPTE2086MasteringMetadata.Parse(pMN);

@@ -26,6 +26,8 @@
 #include "MatroskaFile.h"
 #include "MatroskaSplitterSettingsWnd.h"
 #include "../BaseSplitter/BaseSplitter.h"
+#include <basestruct.h>
+#include <IMediaSideData.h>
 #include <ITrackInfo.h>
 
 #define MatroskaSplitterName L"MPC Matroska Splitter"
@@ -88,6 +90,12 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	REFERENCE_TIME m_Seek_rt;
 	BOOL m_bSupportCueDuration;
 
+	MediaSideDataHDR* m_MasterDataHDR;
+	ColorSpace* m_ColorSpace;
+
+	int m_profile;
+	int m_pix_fmt;
+
 private:
 	CCritSec m_csProps;
 	bool m_bLoadEmbeddedFonts, m_bCalcDuration;
@@ -148,6 +156,10 @@ public:
 	STDMETHODIMP_(BOOL) GetLoadEmbeddedFonts();
 	STDMETHODIMP SetCalcDuration(BOOL nValue);
 	STDMETHODIMP_(BOOL) GetCalcDuration();
+
+	// IBaseFilterInfo
+	STDMETHODIMP GetInt(LPCSTR field, int    *value);
+	STDMETHODIMP GetBin(LPCSTR field, LPVOID *value, size_t *size);
 };
 
 class __declspec(uuid("0A68C3B5-9164-4a54-AFAF-995B2FF0E0D4"))
