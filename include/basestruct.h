@@ -99,3 +99,11 @@ struct SyncPoint {
 	REFERENCE_TIME rt;
 	__int64 fp;
 };
+
+struct ColorSpace {
+	BYTE MatrixCoefficients;
+	BYTE Primaries;
+	BYTE Range;
+	BYTE TransferCharacteristics;
+	BYTE ChromaLocation;
+};

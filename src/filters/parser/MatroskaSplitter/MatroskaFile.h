@@ -290,11 +290,11 @@ namespace MatroskaReader
 		bool bValid;
 
 		MasteringMetadata() {
-			PrimaryRChromaticityX.Set(0.0);PrimaryRChromaticityY.Set(0.0);
-			PrimaryGChromaticityX.Set(0.0);PrimaryGChromaticityY.Set(0.0);
-			PrimaryBChromaticityX.Set(0.0);PrimaryBChromaticityX.Set(0.0);
-			WhitePointChromaticityX.Set(0.0);WhitePointChromaticityY.Set(0.0);
-			LuminanceMax.Set(0.0);LuminanceMin.Set(0.0);
+			PrimaryRChromaticityX.Set(0.0); PrimaryRChromaticityY.Set(0.0);
+			PrimaryGChromaticityX.Set(0.0); PrimaryGChromaticityY.Set(0.0);
+			PrimaryBChromaticityX.Set(0.0); PrimaryBChromaticityX.Set(0.0);
+			WhitePointChromaticityX.Set(0.0); WhitePointChromaticityY.Set(0.0);
+			LuminanceMax.Set(0.0); LuminanceMin.Set(0.0);
 
 			bValid = false;
 		}
@@ -305,17 +305,24 @@ namespace MatroskaReader
 	{
 	public:
 		CUInt MatrixCoefficients;
+		CUInt ChromaSitingHorz;
+		CUInt ChromaSitingVert;
 		CUInt Range;
 		CUInt TransferCharacteristics;
 		CUInt Primaries;
 
 		MasteringMetadata SMPTE2086MasteringMetadata;
+
+		bool bValid;
 		
 		Colour() {
 			MatrixCoefficients.Set(0);
+			ChromaSitingHorz.Set(0); ChromaSitingHorz.Set(0);
 			Range.Set(0);
 			TransferCharacteristics.Set(0);
 			Primaries.Set(0);
+
+			bValid = false;
 		}
 		HRESULT Parse(CMatroskaNode* pMN);
 	};
