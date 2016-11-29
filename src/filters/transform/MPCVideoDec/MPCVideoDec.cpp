@@ -1186,9 +1186,9 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 			} else {
 				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR data of an unexpected size (%d)", sd->size));
 			}
-		} else if (m_MasterDataHDR) {
-			pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)m_MasterDataHDR, sizeof(MediaSideDataHDR));
-			SAFE_DELETE(m_MasterDataHDR);
+		} else if (m_baseFilterInfo.masterDataHDR) {
+			pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)m_baseFilterInfo.masterDataHDR, sizeof(MediaSideDataHDR));
+			SAFE_DELETE(m_baseFilterInfo.masterDataHDR);
 
 			return true;
 		}
@@ -1436,6 +1436,8 @@ void CMPCVideoDecFilter::Cleanup()
 
 	m_pDeviceManager.Release();
 	m_pDecoderService.Release();
+
+	m_baseFilterInfo.Clear();
 }
 
 void CMPCVideoDecFilter::ffmpegCleanup()
@@ -1458,8 +1460,6 @@ void CMPCVideoDecFilter::ffmpegCleanup()
 
 	m_nCodecNb	= -1;
 	m_nCodecId	= AV_CODEC_ID_NONE;
-
-	SAFE_DELETE(m_MasterDataHDR);
 }
 
 STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -1806,38 +1806,50 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 	FillAVCodecProps(m_pAVCtx);
 
-	if (pFilter) {
+	if (bChangeType && pFilter) {
+		m_baseFilterInfo.Clear();
+
 		CComPtr<IBaseFilterInfo> pBaseFilterInfo;
 		if (SUCCEEDED(pFilter->QueryInterface(&pBaseFilterInfo))) {
 			int value;
 			if (SUCCEEDED(pBaseFilterInfo->GetInt("VIDEO_PROFILE", &value))) {
-				m_pAVCtx->profile = value;
+				m_baseFilterInfo.profile = value;
 			}
 			if (SUCCEEDED(pBaseFilterInfo->GetInt("VIDEO_PIXEL_FORMAT", &value))) {
-				m_pAVCtx->pix_fmt = (AVPixelFormat)value;
+				m_baseFilterInfo.pix_fmt = value;
 			}
 
 			size_t size = 0;
 			LPVOID pData = NULL;
 			if (SUCCEEDED(pBaseFilterInfo->GetBin("VIDEO_COLOR_SPACE", &pData, &size))) {
 				if (size == sizeof(ColorSpace)) {
-					ColorSpace* colorspace           = (ColorSpace*)pData;
-					m_pAVCtx->colorspace             = (AVColorSpace)colorspace->MatrixCoefficients;
-					m_pAVCtx->color_primaries        = (AVColorPrimaries)colorspace->Primaries;
-					m_pAVCtx->color_range            = (AVColorRange)colorspace->Range;
-					m_pAVCtx->color_trc              = (AVColorTransferCharacteristic)colorspace->TransferCharacteristics;
-					m_pAVCtx->chroma_sample_location = (AVChromaLocation)colorspace->ChromaLocation;
+					m_baseFilterInfo.colorSpace = DNew ColorSpace;
+					memcpy(m_baseFilterInfo.colorSpace, pData, sizeof(ColorSpace));
 				}
 				LocalFree(pData);
 			}
 			if (SUCCEEDED(pBaseFilterInfo->GetBin("HDR_MASTERING_METADATA", &pData, &size))) {
 				if (size == sizeof(MediaSideDataHDR)) {
-					m_MasterDataHDR = DNew MediaSideDataHDR;
-					memcpy(m_MasterDataHDR, pData, sizeof(MediaSideDataHDR));
+					m_baseFilterInfo.masterDataHDR = DNew MediaSideDataHDR;
+					memcpy(m_baseFilterInfo.masterDataHDR, pData, sizeof(MediaSideDataHDR));
 				}
 				LocalFree(pData);
 			}
 		}
+	}
+
+	if (m_baseFilterInfo.profile != -1) {
+		m_pAVCtx->profile = m_baseFilterInfo.profile;
+	}
+	if (m_baseFilterInfo.pix_fmt != AV_PIX_FMT_NONE) {
+		m_pAVCtx->pix_fmt = (AVPixelFormat)m_baseFilterInfo.pix_fmt;
+	}
+	if (m_baseFilterInfo.colorSpace) {
+		m_pAVCtx->colorspace             = (AVColorSpace)m_baseFilterInfo.colorSpace->MatrixCoefficients;
+		m_pAVCtx->color_primaries        = (AVColorPrimaries)m_baseFilterInfo.colorSpace->Primaries;
+		m_pAVCtx->color_range            = (AVColorRange)m_baseFilterInfo.colorSpace->Range;
+		m_pAVCtx->color_trc              = (AVColorTransferCharacteristic)m_baseFilterInfo.colorSpace->TransferCharacteristics;
+		m_pAVCtx->chroma_sample_location = (AVChromaLocation)m_baseFilterInfo.colorSpace->ChromaLocation;
 	}
 
 	m_PixelFormat = m_pAVCtx->pix_fmt;

@@ -28,6 +28,8 @@
 #include "../../../apps/mplayerc/FilterEnum.h"
 
 #include <IMediaSideData.h>
+#include <basestruct.h>
+#include <mpc_defines.h>
 
 #include "./MSDKDecoder/MSDKDecoder.h"
 
@@ -141,7 +143,20 @@ protected:
 
 	BOOL									m_MVC_Base_View_R_flag;
 
-	MediaSideDataHDR*						m_MasterDataHDR = NULL;
+	struct {
+		MediaSideDataHDR*   masterDataHDR = NULL;
+		ColorSpace*         colorSpace    = NULL;
+		int                 profile       = -1;
+		int                 pix_fmt       = -1;
+
+		void Clear() {
+			SAFE_DELETE(masterDataHDR);
+			SAFE_DELETE(colorSpace);
+			profile = -1;
+			pix_fmt = -1;
+		}
+
+	} m_baseFilterInfo;
 
 	// === Private functions
 	void			Cleanup();
