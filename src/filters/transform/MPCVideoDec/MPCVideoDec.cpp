@@ -1662,10 +1662,9 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	}
 
 	// Prevent connection to the video decoder - need to support decoding of uncompressed video (v210, V410, Y800, I420)
-	if (CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected())) {
-		if (IsVideoDecoder(pFilter, true)) {
-			return VFW_E_TYPE_NOT_ACCEPTED;
-		}
+	CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected());
+	if (pFilter && IsVideoDecoder(pFilter, true)) {
+		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
 	m_nCodecNb = nNewCodec;
@@ -1790,11 +1789,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 	AllocExtradata(m_pAVCtx, pmt);
 
-	if (m_nCodecId == AV_CODEC_ID_VP9 && m_pAVCtx->extradata_size >= (16 + sizeof(MediaSideDataHDR))) {
-		m_MasterDataHDR = DNew MediaSideDataHDR;
-		memcpy(m_MasterDataHDR, m_pAVCtx->extradata + 16, sizeof(MediaSideDataHDR));
-	}
-
 	if (bChangeType) {
 		ExtractAvgTimePerFrame(&m_pInput->CurrentMediaType(), m_rtAvrTimePerFrame);
 		int wout, hout;
@@ -1811,6 +1805,41 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	}
 
 	FillAVCodecProps(m_pAVCtx);
+
+	if (pFilter) {
+		CComPtr<IBaseFilterInfo> pBaseFilterInfo;
+		if (SUCCEEDED(pFilter->QueryInterface(&pBaseFilterInfo))) {
+			int value;
+			if (SUCCEEDED(pBaseFilterInfo->GetInt("VIDEO_PROFILE", &value))) {
+				m_pAVCtx->profile = value;
+			}
+			if (SUCCEEDED(pBaseFilterInfo->GetInt("VIDEO_PIXEL_FORMAT", &value))) {
+				m_pAVCtx->pix_fmt = (AVPixelFormat)value;
+			}
+
+			size_t size = 0;
+			LPVOID pData = NULL;
+			if (SUCCEEDED(pBaseFilterInfo->GetBin("VIDEO_COLOR_SPACE", &pData, &size))) {
+				if (size == sizeof(ColorSpace)) {
+					ColorSpace* colorspace           = (ColorSpace*)pData;
+					m_pAVCtx->colorspace             = (AVColorSpace)colorspace->MatrixCoefficients;
+					m_pAVCtx->color_primaries        = (AVColorPrimaries)colorspace->Primaries;
+					m_pAVCtx->color_range            = (AVColorRange)colorspace->Range;
+					m_pAVCtx->color_trc              = (AVColorTransferCharacteristic)colorspace->TransferCharacteristics;
+					m_pAVCtx->chroma_sample_location = (AVChromaLocation)colorspace->ChromaLocation;
+				}
+				LocalFree(pData);
+			}
+			if (SUCCEEDED(pBaseFilterInfo->GetBin("HDR_MASTERING_METADATA", &pData, &size))) {
+				if (size == sizeof(MediaSideDataHDR)) {
+					m_MasterDataHDR = DNew MediaSideDataHDR;
+					memcpy(m_MasterDataHDR, pData, sizeof(MediaSideDataHDR));
+				}
+				LocalFree(pData);
+			}
+		}
+	}
+
 	m_PixelFormat = m_pAVCtx->pix_fmt;
 
 	m_nAlign = 16;
