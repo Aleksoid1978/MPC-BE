@@ -9173,15 +9173,17 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 		streamCount--;
 	}
 
-	size_t subStreamCount = 0;
-	POSITION pos = m_pSubStreams.GetHeadPosition();
-	while (pos) {
-		CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
-		subStreamCount += pSubStream->GetStreamCount();
-	}
+	if (GetPlaybackMode() == PM_FILE && !m_pDVS) {
+		size_t subStreamCount = 0;
+		POSITION pos = m_pSubStreams.GetHeadPosition();
+		while (pos) {
+			CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
+			subStreamCount += pSubStream->GetStreamCount();
+		}
 
-	if (id != -1 && id >= (subStreamCount + streamCount)) {
-		id = 0;
+		if (id != -1 && id >= (subStreamCount + streamCount)) {
+			id = 0;
+		}
 	}
 
 	int splsubcnt = 0;
@@ -9233,7 +9235,7 @@ void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
 					}
 				}
 
-				if (i <= (nLangs-1)) {
+				if (i <= (nLangs - 1)) {
 					m_pDVS->put_SelectedLanguage(i);
 				}
 			}
