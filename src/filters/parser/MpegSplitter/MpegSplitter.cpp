@@ -494,6 +494,7 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	: CBaseSplitterFilter(NAME("CMpegSplitterFilter"), pUnk, phr, clsid)
 	, m_pPipoBimbo(false)
 	, m_rtPlaylistDuration(0)
+	, m_rtSeekOffset(INVALID_TIME)
 	, m_rtMin(0)
 	, m_rtMax(0)
 	, m_rtGlobalPCRTimeStamp(INVALID_TIME)
@@ -502,6 +503,7 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_AC3CoreOnly(0)
 	, m_SubEmptyPin(false)
 	, m_hasHdmvDvbSubPin(false)
+	, m_bIsBD(false)
 {
 	m_nFlag |= SOURCE_SUPPORT_URL;
 	m_nFlag |= PACKET_PTS_DISCONTINUITY;
@@ -721,16 +723,25 @@ inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(DWORD TrackNumber, __int64 
 
 	if (nBytes > 0) {
 		if (bStreamUsePTS) {
-			BOOL bPacketStart = !!h.fpts;
+			const BOOL bPacketStart = h.fpts;
+
 			CAutoPtr<CPacket>& p = pPackets[TrackNumber];
 			if (bPacketStart && p) {
 				if (p->bSyncPoint) {
-					hr = DeliverPacket(p);
+					if (m_rtSeekOffset != INVALID_TIME && p->rtStart < m_rtSeekOffset) {
+						DLog(L"CMpegSplitterFilter::HandleMPEGPacket() : [%u] Dropping packet %I64d, seek offset is %I64d", p->TrackNumber, p->rtStart, m_rtSeekOffset);
+					} else {
+						hr = DeliverPacket(p);
+					}
 				}
 				p.Free();
 			}
 
 			if (!p) {
+				if (!bPacketStart) {
+					return S_OK;
+				}
+
 				p.Attach(DNew CPacket());
 				p->TrackNumber	= TrackNumber;
 				p->bSyncPoint	= bPacketStart;
@@ -1060,7 +1071,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	ReadClipInfo(GetPartFilename(pAsyncReader));
 
-	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo, m_rtPlaylistDuration > 0, m_ForcedSub, m_AC3CoreOnly, m_SubEmptyPin));
+	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo, m_bIsBD, m_ForcedSub, m_AC3CoreOnly, m_SubEmptyPin));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
@@ -1415,6 +1426,9 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		return;
 	}
 
+	m_rtSeekOffset  = INVALID_TIME;
+	m_rtStartOffset = 0;
+
 	m_MVCExtensionQueue.RemoveAll();
 	m_MVCBaseQueue.RemoveAll();
 
@@ -1448,6 +1462,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 			DLog(L"CMpegSplitterFilter::DemuxSeek() : BD seek, %I64d -> %I64d, position - %I64d", rt, minseekrt, minseekpos);
 
+			m_rtSeekOffset = minseekrt;
 			return;
 		}
 
@@ -1519,8 +1534,10 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 		if (minseekpos != _I64_MIN) {
 			DLog(L"CMpegSplitterFilter::DemuxSeek() : seek by timestamp, %I64d -> %I64d, position - %I64d", rt, minseekrt, minseekpos);
-			seekpos         = minseekpos;
-			m_rtStartOffset = 0;
+			seekpos = minseekpos;
+			if (m_bIsBD) {
+				m_rtSeekOffset = minseekrt;
+			}
 		} else {
 			// simple seek by bitrate
 
@@ -1591,6 +1608,8 @@ bool CMpegSplitterFilter::BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPla
 
 		m_rtMax = m_rtMin + rtDur;
 	}
+
+	m_bIsBD = res;
 
 	return res;
 }
