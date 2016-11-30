@@ -504,15 +504,11 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_hasHdmvDvbSubPin(false)
 {
 	m_nFlag |= SOURCE_SUPPORT_URL;
+	m_nFlag |= PACKET_PTS_DISCONTINUITY;
+
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_MPEGSplit, KEY_READ)) {
-		DWORD dw;
-
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ForcedSub, dw)) {
-			m_ForcedSub = !!dw;
-		}
-
 		TCHAR buff[256] = { 0 };
 		ULONG len = _countof(buff);
 		if (ERROR_SUCCESS == key.QueryStringValue(OPT_AudioLangOrder, buff, &len)) {
@@ -525,6 +521,11 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 			m_SubtitlesLanguageOrder = CString(buff);
 		}
 
+		DWORD dw;
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ForcedSub, dw)) {
+			m_ForcedSub = !!dw;
+		}
+
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_AC3CoreOnly, dw)) {
 			m_AC3CoreOnly = dw;
 		}
@@ -534,18 +535,9 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 		}
 	}
 #else
-	m_ForcedSub					= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_ForcedSub, m_ForcedSub);
-
-	bool UseLangOrder			= !!AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_INTERNALSELECTTRACKLOGIC, TRUE);
-	if (UseLangOrder) {
-		m_SubtitlesLanguageOrder	= AfxGetApp()->GetProfileString(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANGORDER);
-		m_AudioLanguageOrder		= AfxGetApp()->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOSLANGORDER);
-	}
-
-	m_AC3CoreOnly				= AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_AC3CoreOnly, m_AC3CoreOnly);
-	m_SubEmptyPin				= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_SubEmptyOutput, m_SubEmptyPin);
-
-	m_nFlag					   |= PACKET_PTS_DISCONTINUITY;
+	m_ForcedSub   = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_ForcedSub, m_ForcedSub);
+	m_AC3CoreOnly = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_AC3CoreOnly, m_AC3CoreOnly);
+	m_SubEmptyPin = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_SubEmptyOutput, m_SubEmptyPin);
 #endif
 }
 
@@ -1922,9 +1914,9 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_MPEGSplit)) {
-		key.SetDWORDValue(OPT_ForcedSub, m_ForcedSub);
 		key.SetStringValue(OPT_AudioLangOrder, m_AudioLanguageOrder);
 		key.SetStringValue(OPT_SubLangOrder, m_SubtitlesLanguageOrder);
+		key.SetDWORDValue(OPT_ForcedSub, m_ForcedSub);
 		key.SetDWORDValue(OPT_AC3CoreOnly, m_AC3CoreOnly);
 		key.SetDWORDValue(OPT_SubEmptyOutput, m_SubEmptyPin);
 	}
@@ -1937,19 +1929,7 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 	return S_OK;
 }
 
-STDMETHODIMP CMpegSplitterFilter::SetForcedSub(BOOL nValue)
-{
-	CAutoLock cAutoLock(&m_csProps);
-	m_ForcedSub = !!nValue;
-	return S_OK;
-}
-
-STDMETHODIMP_(BOOL) CMpegSplitterFilter::GetForcedSub()
-{
-	CAutoLock cAutoLock(&m_csProps);
-	return m_ForcedSub;
-}
-
+#ifdef REGISTER_FILTER
 STDMETHODIMP CMpegSplitterFilter::SetAudioLanguageOrder(WCHAR *nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
@@ -1974,6 +1954,20 @@ STDMETHODIMP_(WCHAR *) CMpegSplitterFilter::GetSubtitlesLanguageOrder()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_SubtitlesLanguageOrder.GetBuffer();
+}
+#endif
+
+STDMETHODIMP CMpegSplitterFilter::SetForcedSub(BOOL nValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_ForcedSub = !!nValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CMpegSplitterFilter::GetForcedSub()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_ForcedSub;
 }
 
 STDMETHODIMP CMpegSplitterFilter::SetTrueHD(int nValue)
@@ -2002,11 +1996,6 @@ STDMETHODIMP_(BOOL) CMpegSplitterFilter::GetSubEmptyPin()
 	return m_SubEmptyPin;
 }
 
-STDMETHODIMP_(int) CMpegSplitterFilter::GetMPEGType()
-{
-	CAutoLock cAutoLock(&m_csProps);
-	return m_pFile->m_type;
-}
 //
 // CMpegSourceFilter
 //
