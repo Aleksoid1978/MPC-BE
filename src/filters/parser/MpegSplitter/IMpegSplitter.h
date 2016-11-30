@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2014 see Authors.txt
+ * (C) 2011-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,20 +25,20 @@ IMpegSplitterFilter :
 public IUnknown {
 	STDMETHOD(Apply()) PURE;
 
-	STDMETHOD(SetForcedSub(BOOL nValue)) PURE;
-	STDMETHOD_(BOOL, GetForcedSub()) PURE;
-
+#ifdef REGISTER_FILTER
 	STDMETHOD(SetAudioLanguageOrder(WCHAR *nValue)) PURE;
 	STDMETHOD_(WCHAR *, GetAudioLanguageOrder()) PURE;
 
 	STDMETHOD(SetSubtitlesLanguageOrder(WCHAR *nValue)) PURE;
 	STDMETHOD_(WCHAR *, GetSubtitlesLanguageOrder()) PURE;
+#endif
+
+	STDMETHOD(SetForcedSub(BOOL nValue)) PURE;
+	STDMETHOD_(BOOL, GetForcedSub()) PURE;
 
 	STDMETHOD(SetTrueHD(int nValue)) PURE;
 	STDMETHOD_(int, GetTrueHD()) PURE;
 
 	STDMETHOD(SetSubEmptyPin(BOOL nValue)) PURE;
 	STDMETHOD_(BOOL, GetSubEmptyPin()) PURE;
-
-	STDMETHOD_(int, GetMPEGType()) PURE;
 };

@@ -55,7 +55,9 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 
 	CAtlMap<DWORD, CAutoPtr<CPacket>> pPackets;
 
+#ifdef REGISTER_FILTER
 	CString m_AudioLanguageOrder, m_SubtitlesLanguageOrder;
+#endif
 	bool m_ForcedSub, m_SubEmptyPin;
 	int m_AC3CoreOnly;
 	CCritSec m_csProps;
@@ -123,22 +125,22 @@ public:
 	// IMpegSplitterFilter
 	STDMETHODIMP Apply();
 
-	STDMETHODIMP SetForcedSub(BOOL nValue);
-	STDMETHODIMP_(BOOL) GetForcedSub();
-
+#ifdef REGISTER_FILTER
 	STDMETHODIMP SetAudioLanguageOrder(WCHAR *nValue);
 	STDMETHODIMP_(WCHAR *) GetAudioLanguageOrder();
 
 	STDMETHODIMP SetSubtitlesLanguageOrder(WCHAR *nValue);
 	STDMETHODIMP_(WCHAR *) GetSubtitlesLanguageOrder();
+#endif
+
+	STDMETHODIMP SetForcedSub(BOOL nValue);
+	STDMETHODIMP_(BOOL) GetForcedSub();
 
 	STDMETHODIMP SetTrueHD(int nValue);
 	STDMETHODIMP_(int) GetTrueHD();
 
 	STDMETHODIMP SetSubEmptyPin(BOOL nValue);
 	STDMETHODIMP_(BOOL) GetSubEmptyPin();
-
-	STDMETHODIMP_(int) GetMPEGType();
 };
 
 class __declspec(uuid("1365BE7A-C86A-473C-9A41-C0A6E82C9FA3"))
