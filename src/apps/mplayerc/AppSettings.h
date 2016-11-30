@@ -98,23 +98,6 @@ enum {
 }; // flags for Caption & Menu Mode
 
 enum {
-	VIDRNDT_SYSDEFAULT,
-	VIDRNDT_OLDRENDERER, // obsolete
-	VIDRNDT_OVERLAYMIXER, // obsolete
-	VIDRNDT_VMR7WINDOWED, // obsolete
-	VIDRNDT_VMR9WINDOWED,
-	VIDRNDT_VMR7RENDERLESS, // obsolete
-	VIDRNDT_VMR9RENDERLESS, // obsolete
-	VIDRNDT_DXR,
-	VIDRNDT_NULL_COMP,
-	VIDRNDT_NULL_UNCOMP,
-	VIDRNDT_EVR,
-	VIDRNDT_EVR_CUSTOM,
-	VIDRNDT_MADVR,
-	VIDRNDT_SYNC
-};
-
-enum {
 	SUBRNDT_NONE = 0,
 	SUBRNDT_ISR,
 	SUBRNDT_VSFILTER,
@@ -415,7 +398,7 @@ public:
 		POSITION pos = values.GetStartPosition();
 		while (pos) {
 			CAtlStringMap<CLSID>::CPair* pPair = values.GetNext(pos);
-			pPair->m_value = GUIDFromCString(AfxGetApp()->GetProfileString(IDS_R_SETTINGS IDS_R_FILTERS_PRIORITY, pPair->m_key, CStringFromGUID(pPair->m_value)));
+			pPair->m_value = GUIDFromCString(AfxGetApp()->GetProfileString(IDS_R_FILTERS_PRIORITY, pPair->m_key, CStringFromGUID(pPair->m_value)));
 		}
 	};
 
@@ -423,7 +406,7 @@ public:
 		POSITION pos = values.GetStartPosition();
 		while (pos) {
 			CAtlStringMap<CLSID>::CPair* pPair = values.GetNext(pos);
-			AfxGetApp()->WriteProfileString(IDS_R_SETTINGS IDS_R_FILTERS_PRIORITY, pPair->m_key, CStringFromGUID(pPair->m_value));
+			AfxGetApp()->WriteProfileString(IDS_R_FILTERS_PRIORITY, pPair->m_key, CStringFromGUID(pPair->m_value));
 		}
 	};
 };
@@ -616,8 +599,7 @@ public:
 	bool			fClosedCaptions;
 
 	// Output
-	CRenderersSettings m_RenderersSettings;
-	int				iVideoRenderer;
+	CRenderersSettings m_VRSettings;
 	int				iSelectedVideoRenderer;
 
 	bool			fDualAudioOutput;
@@ -897,11 +879,6 @@ public:
 
 	int				GetMultiInst();
 	engine_t		GetFileEngine(CString path);
-
-private:
-	void			SaveRenderers();
-	friend void		CRenderersSettings::SaveRenderers();
-	void			LoadRenderers();
 
 public:
 	CFiltersPrioritySettings	FiltersPrioritySettings;

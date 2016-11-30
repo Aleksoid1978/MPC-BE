@@ -117,8 +117,8 @@ BOOL CPPageVideo::OnInitDialog()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	CRenderersSettings& rs = s.m_RenderersSettings;
-	m_iVideoRendererType   = s.iVideoRenderer;
+	CRenderersSettings& rs = s.m_VRSettings;
+	m_iVideoRendererType   = rs.iVideoRenderer;
 
 	m_chkD3DFullscreen.SetCheck(s.fD3DFullscreen);
 	m_chk10bitOutput.EnableWindow(s.fD3DFullscreen);
@@ -133,7 +133,7 @@ BOOL CPPageVideo::OnInitDialog()
 	m_iEvrBuffers = rs.nEVRBuffers;
 	m_spnEvrBuffers.SetRange(RS_EVRBUFFERS_MIN, RS_EVRBUFFERS_MAX);
 
-	m_bResetDevice = s.m_RenderersSettings.bResetDevice;
+	m_bResetDevice = s.m_VRSettings.bResetDevice;
 
 	CComPtr<IDirect3D9> pD3D9 = D3D9Helper::Direct3DCreate9();
 	if (pD3D9) {
@@ -297,9 +297,9 @@ BOOL CPPageVideo::OnApply()
 	UpdateData();
 
 	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& rs = s.m_RenderersSettings;
+	CRenderersSettings& rs = s.m_VRSettings;
 
-	s.iVideoRenderer	= m_iVideoRendererType = m_iVideoRendererType_store = GetCurItemData(m_cbVideoRenderer);
+	rs.iVideoRenderer	= m_iVideoRendererType = m_iVideoRendererType_store = GetCurItemData(m_cbVideoRenderer);
 	rs.iResizer			= GetCurItemData(m_cbDX9Resizer);
 	rs.iDownscaler		= GetCurItemData(m_cbDownscaler);
 	rs.bVMRMixerMode	= !!m_chkVMRMixerMode.GetCheck();

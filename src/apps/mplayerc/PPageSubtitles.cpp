@@ -109,13 +109,14 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 	m_cbSubtitleRenderer.ResetContent();
 
 	CAppSettings& s = AfxGetAppSettings();
+	CRenderersSettings& rs = s.m_VRSettings;
 
 	m_cbSubtitleRenderer.AddString(ResStr(IDS_SUB_NOT_USE)); // SUBRNDT_NONE
 
 	CString str = ResStr(IDS_SUB_USE_INTERNAL);
-	int iVideoRenderer = s.iVideoRenderer;
+	int iVideoRenderer = rs.iVideoRenderer;
 	if (s.iSelectedVideoRenderer != -1) {
-		s.iVideoRenderer = s.iSelectedVideoRenderer;
+		rs.iVideoRenderer = s.iSelectedVideoRenderer;
 	}
 	if (!s.IsISRSelect()) {
 		str += L" " + ResStr(IDS_REND_NOT_AVAILABLE);
@@ -123,9 +124,9 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_ISR
 
 	bool VRwithSR =
-		s.iVideoRenderer == VIDRNDT_MADVR ||
-		s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-		s.iVideoRenderer == VIDRNDT_SYNC;
+		rs.iVideoRenderer == VIDRNDT_MADVR ||
+		rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
+		rs.iVideoRenderer == VIDRNDT_SYNC;
 
 	str = L"VSFilter/xy-VSFilter";
 	if (!IsCLSIDRegistered(CLSID_VSFilter_autoloading)) {
@@ -156,7 +157,7 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 		m_cbSubtitleRenderer.SetCurSel(1);
 	}
 
-	s.iVideoRenderer = iVideoRenderer;
+	rs.iVideoRenderer = iVideoRenderer;
 }
 
 BEGIN_MESSAGE_MAP(CPPageSubtitles, CPPageBase)
