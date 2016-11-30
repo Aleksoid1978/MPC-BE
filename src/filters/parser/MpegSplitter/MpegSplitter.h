@@ -38,6 +38,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	, public IMpegSplitterFilter
 {
 	REFERENCE_TIME	m_rtStartOffset;
+	REFERENCE_TIME	m_rtSeekOffset;
 	bool			m_pPipoBimbo;
 	CHdmvClipInfo	m_ClipInfo;
 
@@ -54,6 +55,8 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	BYTE m_MVC_Base_View_R_flag = 0;
 
 	CAtlMap<DWORD, CAutoPtr<CPacket>> pPackets;
+
+	bool m_bIsBD;
 
 #ifdef REGISTER_FILTER
 	CString m_AudioLanguageOrder, m_SubtitlesLanguageOrder;
