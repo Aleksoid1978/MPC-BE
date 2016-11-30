@@ -31,6 +31,18 @@
 #define RS_SPCSIZE_DEF		10
 #define RS_SPCSIZE_MAX		60
 
+enum {
+	VIDRNDT_SYSDEFAULT = 0,
+	VIDRNDT_VMR9WINDOWED,
+	VIDRNDT_EVR,
+	VIDRNDT_EVR_CUSTOM,
+	VIDRNDT_SYNC,
+	VIDRNDT_RESERVED,
+	VIDRNDT_DXR,
+	VIDRNDT_MADVR,
+	VIDRNDT_NULL_COMP = 10,
+	VIDRNDT_NULL_UNCOMP,
+};
 
 enum {
 	WM_REARRANGERENDERLESS = WM_APP+1,
@@ -94,6 +106,8 @@ enum {
 class CRenderersSettings
 {
 public:
+	int		iVideoRenderer;
+
 	// device
 	CString	sD3DRenderDevice;
 	bool	bResetDevice;
@@ -138,8 +152,8 @@ public:
 	int		iColorManagementIntent;
 
 	// subtitles
-	int		bSubpicPosRelative;
-	CPoint	SubpicShiftPos;
+	int		bSubpicPosRelative; // not saved
+	CPoint	SubpicShiftPos;     // not saved
 	int		nSubpicCount;
 	int		iSubpicMaxTexWidth;
 	bool	bSubpicAnimationWhenBuffering;
@@ -149,8 +163,8 @@ public:
 	CRenderersSettings();
 
 	void	SetDefault();
-	void	SaveRenderers();
-	//void	LoadRenderers();
+	void	Load();
+	void	Save();
 };
 
 class CAffectingRenderersSettings // used in SettingsNeedResetDevice()
@@ -177,10 +191,10 @@ class CRenderersData
 public:
 	CRenderersData();
 
-	bool		m_bTearingTest;
-	int			m_iDisplayStats;
-	bool		m_bResetStats; // Set to reset the presentation statistics
-	int			m_iStereo3DTransform;
+	bool	m_bTearingTest;
+	int		m_iDisplayStats;
+	bool	m_bResetStats; // Set to reset the presentation statistics
+	int		m_iStereo3DTransform;
 };
 
 extern CRenderersSettings&	GetRenderersSettings();

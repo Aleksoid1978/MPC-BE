@@ -109,9 +109,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		return;
 	}
 
-	CRenderersSettings& rs = GetRenderersSettings();
-
-	if (rs.bDisableDesktopComposition) {
+	if (GetRenderersSettings().bDisableDesktopComposition) {
 		m_bDesktopCompositionDisabled = true;
 		if (m_pDwmEnableComposition) {
 			m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);

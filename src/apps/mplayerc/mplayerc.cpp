@@ -2053,5 +2053,5 @@ CRenderersData* GetRenderersData()
 
 CRenderersSettings& GetRenderersSettings()
 {
-	return AfxGetAppSettings().m_RenderersSettings;
+	return AfxGetAppSettings().m_VRSettings;
 }

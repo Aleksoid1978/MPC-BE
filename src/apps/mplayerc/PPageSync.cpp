@@ -82,7 +82,7 @@ BOOL CPPageSync::OnSetActive()
 void CPPageSync::InitDialogPrivate()
 {
 	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& rs = s.m_RenderersSettings;
+	CRenderersSettings& rs = s.m_VRSettings;
 
 	CMainFrame * pFrame;
 	pFrame = (CMainFrame *)(AfxGetApp()->m_pMainWnd);
@@ -99,7 +99,7 @@ void CPPageSync::InitDialogPrivate()
 	m_chkVMRFlushGPUAfterPresent.SetCheck(rs.bFlushGPUAfterPresent);
 	m_chkVMRFlushGPUWait.SetCheck(rs.bFlushGPUWait);
 
-	if (s.iVideoRenderer == VIDRNDT_EVR_CUSTOM) {
+	if (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM) {
 		m_chkVMR9VSync.EnableWindow(TRUE);
 		m_chkVMR9VSyncAccurate.EnableWindow(TRUE);
 		m_chkVMR9AlterativeVSync.EnableWindow(TRUE);
@@ -117,15 +117,15 @@ void CPPageSync::InitDialogPrivate()
 	OnAlterativeVSyncCheck();
 
 	if ((IsWinVista() || IsWin7()) &&
-			(s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-			s.iVideoRenderer == VIDRNDT_MADVR ||
-			s.iVideoRenderer == VIDRNDT_SYNC)) {
+			(rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
+			rs.iVideoRenderer == VIDRNDT_MADVR ||
+			rs.iVideoRenderer == VIDRNDT_SYNC)) {
 		m_chkDisableAero.EnableWindow(TRUE);
 	} else {
 		m_chkDisableAero.EnableWindow(FALSE);
 	}
 
-	m_chkEnableFrameTimeCorrection.EnableWindow(s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ? TRUE : FALSE);
+	m_chkEnableFrameTimeCorrection.EnableWindow(rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM ? TRUE : FALSE);
 
 	m_iSyncMode = rs.iSynchronizeMode == SYNCHRONIZE_VIDEO ? 0
 				: rs.iSynchronizeMode == SYNCHRONIZE_DISPLAY ? 1
@@ -136,7 +136,7 @@ void CPPageSync::InitDialogPrivate()
 	m_edtTargetSyncOffset = rs.dTargetSyncOffset;
 	m_edtControlLimit = rs.dControlLimit;
 
-	if ((s.iVideoRenderer == VIDRNDT_SYNC) && (pFrame->GetPlaybackMode() == PM_NONE)) {
+	if ((rs.iVideoRenderer == VIDRNDT_SYNC) && (pFrame->GetPlaybackMode() == PM_NONE)) {
 		GetDlgItem(IDC_RADIO1)->EnableWindow(TRUE);
 		GetDlgItem(IDC_RADIO2)->EnableWindow(TRUE);
 		GetDlgItem(IDC_RADIO3)->EnableWindow(TRUE);
@@ -212,10 +212,10 @@ END_MESSAGE_MAP()
 void CPPageSync::OnAlterativeVSyncCheck()
 {
 	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& rs = s.m_RenderersSettings;
+	CRenderersSettings& rs = s.m_VRSettings;
 
 	if (m_chkVMR9AlterativeVSync.GetCheck() == BST_CHECKED &&
-			s.iVideoRenderer == VIDRNDT_EVR_CUSTOM) {
+			rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM) {
 		GetDlgItem(IDC_STATIC1)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT1)->EnableWindow(TRUE);
 		m_spnVMR9VSyncOffset.EnableWindow(TRUE);

@@ -2504,7 +2504,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					m_wndStatusBar.SetStatusTimer(str);
 				} else {
 					CString str_temp;
-					bool bmadvr = (AfxGetAppSettings().iVideoRenderer == VIDRNDT_MADVR);
+					bool bmadvr = (GetRenderersSettings().iVideoRenderer == VIDRNDT_MADVR);
 
 					if (m_bOSDLocalTime) {
 						str_temp = GetSystemLocalTime();
@@ -4196,6 +4196,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	CAppSettings& s = AfxGetAppSettings();
+	const CRenderersSettings& rs = s.m_VRSettings;
 
 	if (CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), m_pGB)) {
 		const BOOL bMvcActive = pVDF->GetMvcActive();
@@ -4315,7 +4316,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		// Workaround to avoid MadVR freezing when switching channels in PM_CAPTURE mode:
 		if (IsWindowVisible() && s.fRememberZoomLevel
 				&& !(m_bFullScreen || wp.showCmd == SW_SHOWMAXIMIZED || wp.showCmd == SW_SHOWMINIMIZED)
-				&& GetPlaybackMode() == PM_CAPTURE && s.iVideoRenderer == VIDRNDT_MADVR) {
+				&& GetPlaybackMode() == PM_CAPTURE && rs.iVideoRenderer == VIDRNDT_MADVR) {
 			ShowWindow(SW_MAXIMIZE);
 			wp.showCmd = SW_SHOWMAXIMIZED;
 		}
@@ -5867,14 +5868,14 @@ static CString MakeSnapshotFileName(LPCTSTR prefix)
 BOOL CMainFrame::IsRendererCompatibleWithSaveImage()
 {
 	BOOL result = TRUE;
-	CAppSettings& s = AfxGetAppSettings();
+	const CRenderersSettings& rs = GetRenderersSettings();
 
 	if (m_fShockwaveGraph) {
 		AfxMessageBox(ResStr(IDS_SCREENSHOT_ERROR_SHOCKWAVE), MB_ICONEXCLAMATION | MB_OK);
 		result = FALSE;
 	}
 	// the latest madVR build v0.84.0 now supports screenshots.
-	else if (s.iVideoRenderer == VIDRNDT_MADVR) {
+	else if (rs.iVideoRenderer == VIDRNDT_MADVR) {
 		CRegKey key;
 		CString clsid = _T("{E1A8B82A-32CE-4B0D-BE0D-AA68C772E423}");
 
@@ -6375,8 +6376,8 @@ void CMainFrame::OnRepeatForever()
 
 void CMainFrame::OnUpdateViewTearingTest(CCmdUI* pCmdUI)
 {
-	CAppSettings& s = AfxGetAppSettings();
-	bool supported = (s.iVideoRenderer == VIDRNDT_EVR_CUSTOM || s.iVideoRenderer == VIDRNDT_SYNC);
+	const CRenderersSettings& rs = GetRenderersSettings();
+	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM || rs.iVideoRenderer == VIDRNDT_SYNC);
 
 	pCmdUI->Enable(supported && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
 	pCmdUI->SetCheck(AfxGetMyApp()->m_Renderers.m_bTearingTest);
@@ -6389,8 +6390,8 @@ void CMainFrame::OnViewTearingTest()
 
 void CMainFrame::OnUpdateViewDisplayStats(CCmdUI* pCmdUI)
 {
-	CAppSettings& s = AfxGetAppSettings();
-	bool supported = (s.iVideoRenderer == VIDRNDT_EVR_CUSTOM || s.iVideoRenderer == VIDRNDT_SYNC);
+	const CRenderersSettings& rs = GetRenderersSettings();
+	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM || rs.iVideoRenderer == VIDRNDT_SYNC);
 
 	pCmdUI->Enable(supported && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
 	pCmdUI->SetCheck(supported && (AfxGetMyApp()->m_Renderers.m_iDisplayStats));
@@ -6418,7 +6419,8 @@ void CMainFrame::OnViewDisplayStatsSC()
 void CMainFrame::OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI)
 {
 	CAppSettings& s = AfxGetAppSettings();
-	bool supported = (s.iVideoRenderer == VIDRNDT_EVR_CUSTOM || s.iVideoRenderer == VIDRNDT_SYNC);
+	const CRenderersSettings& rs = s.m_VRSettings;
+	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM || rs.iVideoRenderer == VIDRNDT_SYNC);
 
 	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(s.fD3DFullscreen);
@@ -6426,10 +6428,9 @@ void CMainFrame::OnUpdateViewD3DFullscreen(CCmdUI* pCmdUI)
 
 void CMainFrame::OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI)
 {
-	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& rs = s.m_RenderersSettings;
-	bool supported = ((s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-					   s.iVideoRenderer == VIDRNDT_SYNC) &&
+	const CRenderersSettings& rs = GetRenderersSettings();
+	bool supported = ((rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
+					   rs.iVideoRenderer == VIDRNDT_SYNC) &&
 					  (IsWinVista() || IsWin7()));
 
 	pCmdUI->Enable(supported);
@@ -6438,9 +6439,8 @@ void CMainFrame::OnUpdateViewDisableDesktopComposition(CCmdUI* pCmdUI)
 
 void CMainFrame::OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI)
 {
-	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& rs = s.m_RenderersSettings;
-	bool supported = (s.iVideoRenderer == VIDRNDT_EVR_CUSTOM);
+	const CRenderersSettings& rs = GetRenderersSettings();
+	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM);
 
 	pCmdUI->Enable(supported);
 	pCmdUI->SetCheck(rs.bEVRFrameTimeCorrection);
@@ -6450,7 +6450,7 @@ void CMainFrame::OnViewVSync()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	rs.bVSync = !rs.bVSync;
-	rs.SaveRenderers();
+	rs.Save();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 rs.bVSync ? ResStr(IDS_OSD_RS_VSYNC_ON) : ResStr(IDS_OSD_RS_VSYNC_OFF));
 }
@@ -6459,7 +6459,7 @@ void CMainFrame::OnViewVSyncAccurate()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	rs.bVSyncAccurate = !rs.bVSyncAccurate;
-	rs.SaveRenderers();
+	rs.Save();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 rs.bVSyncAccurate ? ResStr(IDS_OSD_RS_ACCURATE_VSYNC_ON) : ResStr(IDS_OSD_RS_ACCURATE_VSYNC_OFF));
 }
@@ -6477,7 +6477,7 @@ void CMainFrame::OnViewDisableDesktopComposition()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	rs.bDisableDesktopComposition = !rs.bDisableDesktopComposition;
-	rs.SaveRenderers();
+	rs.Save();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 rs.bDisableDesktopComposition ? ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_ON) : ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_OFF));
 }
@@ -6486,7 +6486,7 @@ void CMainFrame::OnViewAlternativeVSync()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	rs.bAlterativeVSync = !rs.bAlterativeVSync;
-	rs.SaveRenderers();
+	rs.Save();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 rs.bAlterativeVSync ? ResStr(IDS_OSD_RS_ALT_VSYNC_ON) : ResStr(IDS_OSD_RS_ALT_VSYNC_OFF));
 }
@@ -6495,14 +6495,14 @@ void CMainFrame::OnViewResetDefault()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	rs.SetDefault();
-	rs.SaveRenderers();
+	rs.Save();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT, ResStr(IDS_OSD_RS_RESET_DEFAULT));
 }
 
 void CMainFrame::OnUpdateViewReset(CCmdUI* pCmdUI)
 {
-	CAppSettings& s = AfxGetAppSettings();
-	bool supported = (s.iVideoRenderer == VIDRNDT_EVR_CUSTOM || s.iVideoRenderer == VIDRNDT_SYNC);
+	const CRenderersSettings& rs = GetRenderersSettings();;
+	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM || rs.iVideoRenderer == VIDRNDT_SYNC);
 	pCmdUI->Enable(supported);
 }
 
@@ -6510,40 +6510,38 @@ void CMainFrame::OnViewEnableFrameTimeCorrection()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 	rs.bEVRFrameTimeCorrection = !rs.bEVRFrameTimeCorrection;
-	rs.SaveRenderers();
+	rs.Save();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 rs.bEVRFrameTimeCorrection ? ResStr(IDS_OSD_RS_FT_CORRECTION_ON) : ResStr(IDS_OSD_RS_FT_CORRECTION_OFF));
 }
 
 void CMainFrame::OnViewVSyncOffsetIncrease()
 {
-	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& rs = s.m_RenderersSettings;
+	CRenderersSettings& rs = GetRenderersSettings();
 	CString strOSD;
-	if (s.iVideoRenderer == VIDRNDT_SYNC) {
+	if (rs.iVideoRenderer == VIDRNDT_SYNC) {
 		rs.dTargetSyncOffset = rs.dTargetSyncOffset - 0.5; // Yeah, it should be a "-"
 		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), rs.dTargetSyncOffset);
 	} else {
 		++rs.iVSyncOffset;
 		strOSD.Format(ResStr(IDS_OSD_RS_VSYNC_OFFSET), rs.iVSyncOffset);
 	}
-	rs.SaveRenderers();
+	rs.Save();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT, strOSD);
 }
 
 void CMainFrame::OnViewVSyncOffsetDecrease()
 {
-	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& rs = s.m_RenderersSettings;
+	CRenderersSettings& rs = GetRenderersSettings();
 	CString strOSD;
-	if (s.iVideoRenderer == VIDRNDT_SYNC) {
+	if (rs.iVideoRenderer == VIDRNDT_SYNC) {
 		rs.dTargetSyncOffset = rs.dTargetSyncOffset + 0.5;
 		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), rs.dTargetSyncOffset);
 	} else {
 		--rs.iVSyncOffset;
 		strOSD.Format(ResStr(IDS_OSD_RS_VSYNC_OFFSET), rs.iVSyncOffset);
 	}
-	rs.SaveRenderers();
+	rs.Save();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT, strOSD);
 }
 
@@ -8337,7 +8335,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 			m_pCAP->Invalidate();
 		}
 	} else if (i == -3) {
-		s.m_RenderersSettings.iSubpicStereoMode = SUBPIC_STEREO_NONE;
+		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_NONE;
 
 		if (m_pCAP) {
 			m_pCAP->Invalidate();
@@ -8348,7 +8346,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
 		m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 3000);
 	} else if (i == -2) {
-		s.m_RenderersSettings.iSubpicStereoMode = SUBPIC_STEREO_SIDEBYSIDE;
+		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_SIDEBYSIDE;
 
 		if (m_pCAP) {
 			m_pCAP->Invalidate();
@@ -8359,7 +8357,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
 		m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 3000);
 	} else if (i == -1) {
-		s.m_RenderersSettings.iSubpicStereoMode = SUBPIC_STEREO_TOPANDBOTTOM;
+		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_TOPANDBOTTOM;
 
 		if (m_pCAP) {
 			m_pCAP->Invalidate();
@@ -8485,11 +8483,11 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 		pCmdUI->SetCheck(s.fForcedSubtitles);
 		pCmdUI->Enable(s.fEnableSubtitles && m_pCAP && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
 	} else if (i == -3) {
-		SetRadioCheck(pCmdUI, s.m_RenderersSettings.iSubpicStereoMode == SUBPIC_STEREO_NONE);
+		SetRadioCheck(pCmdUI, s.m_VRSettings.iSubpicStereoMode == SUBPIC_STEREO_NONE);
 	} else if (i == -2) {
-		SetRadioCheck(pCmdUI, s.m_RenderersSettings.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE);
+		SetRadioCheck(pCmdUI, s.m_VRSettings.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE);
 	} else if (i == -1) {
-		SetRadioCheck(pCmdUI, s.m_RenderersSettings.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM);
+		SetRadioCheck(pCmdUI, s.m_VRSettings.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM);
 	}
 }
 
@@ -10034,20 +10032,20 @@ void CMainFrame::OnSubtitlePos(UINT nID)
 		CAppSettings& s = AfxGetAppSettings();
 		switch (nID) {
 			case ID_SUB_POS_UP:
-				s.m_RenderersSettings.SubpicShiftPos.y--;
+				s.m_VRSettings.SubpicShiftPos.y--;
 				break;
 			case ID_SUB_POS_DOWN:
-				s.m_RenderersSettings.SubpicShiftPos.y++;
+				s.m_VRSettings.SubpicShiftPos.y++;
 				break;
 			case ID_SUB_POS_LEFT:
-				s.m_RenderersSettings.SubpicShiftPos.x--;
+				s.m_VRSettings.SubpicShiftPos.x--;
 				break;
 			case ID_SUB_POS_RIGHT:
-				s.m_RenderersSettings.SubpicShiftPos.x++;
+				s.m_VRSettings.SubpicShiftPos.x++;
 				break;
 			case ID_SUB_POS_RESTORE:
-				s.m_RenderersSettings.SubpicShiftPos.x = 0;
-				s.m_RenderersSettings.SubpicShiftPos.y = 0;
+				s.m_VRSettings.SubpicShiftPos.x = 0;
+				s.m_VRSettings.SubpicShiftPos.y = 0;
 				break;
 		}
 
@@ -12171,8 +12169,8 @@ void CMainFrame::OpenCustomizeGraph()
 	}
 
 	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& rs = s.m_RenderersSettings;
-	if (s.iVideoRenderer == VIDRNDT_SYNC && rs.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
+	const CRenderersSettings& rs = s.m_VRSettings;
+	if (rs.iVideoRenderer == VIDRNDT_SYNC && rs.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
 		HRESULT hr;
 		m_pRefClock = DNew CSyncClockFilter(NULL, &hr);
 		CStringW name;
@@ -15492,8 +15490,8 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.m_RenderersSettings.bSubpicPosRelative	= 0;
-	s.m_RenderersSettings.SubpicShiftPos = {0, 0};
+	s.m_VRSettings.bSubpicPosRelative	= 0;
+	s.m_VRSettings.SubpicShiftPos = {0, 0};
 
 	{
 		CAutoLock cAutoLock(&m_csSubLock);
@@ -15538,7 +15536,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 
 				pRTS->Deinit();
 			} else if (clsid == __uuidof(CRenderedHdmvSubtitle) || clsid == __uuidof(CSupSubFile)) {
-				s.m_RenderersSettings.bSubpicPosRelative = s.subdefstyle.relativeTo;
+				s.m_VRSettings.bSubpicPosRelative = s.subdefstyle.relativeTo;
 			}
 
 			CComQIPtr<ISubRenderOptions> pSRO = m_pCAP;
@@ -15685,7 +15683,7 @@ void CMainFrame::UpdateSubDefaultStyle()
 			m_pCAP->Paint(false);
 		}
 	} else if (dynamic_cast<CRenderedHdmvSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
-		s.m_RenderersSettings.bSubpicPosRelative = s.subdefstyle.relativeTo;
+		s.m_VRSettings.bSubpicPosRelative = s.subdefstyle.relativeTo;
 		InvalidateSubtitle();
 		if (GetMediaState() != State_Running) {
 			m_pCAP->Paint(false);

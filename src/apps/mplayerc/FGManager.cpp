@@ -1468,14 +1468,15 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 	int nTotal = 0, nRendered = 0;
 
 	CAppSettings& s = AfxGetAppSettings();
+	const CRenderersSettings& rs = s.m_VRSettings;
 
 	BeginEnumPins(pBF, pEP, pPin) {
 		if (S_OK == IsPinDirection(pPin, PINDIR_OUTPUT) && S_OK != IsPinConnected(pPin)) {
 			if (GetPinName(pPin)[0] == '~'
-					&& s.iVideoRenderer != VIDRNDT_EVR_CUSTOM
-					&& s.iVideoRenderer != VIDRNDT_EVR
-					&& s.iVideoRenderer != VIDRNDT_SYNC
-					&& s.iVideoRenderer != VIDRNDT_VMR9WINDOWED) {
+					&& rs.iVideoRenderer != VIDRNDT_EVR_CUSTOM
+					&& rs.iVideoRenderer != VIDRNDT_EVR
+					&& rs.iVideoRenderer != VIDRNDT_SYNC
+					&& rs.iVideoRenderer != VIDRNDT_VMR9WINDOWED) {
 
 				// Disable MEDIATYPE_AUXLine21Data - prevent connect Line 21 Decoder
 				if (FindMT(pPin, MEDIATYPE_AUXLine21Data)) {
@@ -1872,6 +1873,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	: CFGManager(pName, pUnk, hWnd, IsPreview)
 {
 	CAppSettings& s = AfxGetAppSettings();
+	const CRenderersSettings& rs = s.m_VRSettings;
 
 	CFGFilter*	pFGF;
 
@@ -2669,9 +2671,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{272D77A0-A852-4851-ADA4-9091FEAD4C86}")), MERIT64_DO_NOT_USE));
 
 	bool VRwithSR =
-		s.iVideoRenderer == VIDRNDT_MADVR ||
-		s.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-		s.iVideoRenderer == VIDRNDT_SYNC;
+		rs.iVideoRenderer == VIDRNDT_MADVR ||
+		rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
+		rs.iVideoRenderer == VIDRNDT_SYNC;
 
 	switch (s.iSubtitleRenderer) {
 		case SUBRNDT_NONE:
@@ -2800,6 +2802,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	CFGFilter* pFGF;
 
 	CAppSettings& s = AfxGetAppSettings();
+	const CRenderersSettings& rs = s.m_VRSettings;
 
 	if (m_pFM) {
 		CComPtr<IEnumMoniker> pEM;
@@ -2860,7 +2863,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	// Renderers
 	if (!m_bIsPreview) {
-		switch (s.iVideoRenderer) {
+		switch (rs.iVideoRenderer) {
 			case VIDRNDT_VMR9WINDOWED:
 				m_transform.AddTail(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"Video Mixing Renderer 9", m_vrmerit));
 				break;
