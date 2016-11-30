@@ -355,10 +355,10 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 	if (p->rtStart != INVALID_TIME && (pSplitter->GetFlag() & PACKET_PTS_DISCONTINUITY)) {
 		// Filter invalid PTS value (if too different from previous packet)
 		if (!IsDiscontinuous()) {
-			REFERENCE_TIME rt = p->rtStart + m_rtOffset;
-			if (abs(rt - m_rtPrev) > MAX_PTS_SHIFT) {
+			const REFERENCE_TIME rt = p->rtStart + m_rtOffset;
+			if (llabs(rt - m_rtPrev) > MAX_PTS_SHIFT) {
 				m_rtOffset += m_rtPrev - rt;
-				DLog(L"CBaseSplitterOutputPin::DeliverPacket() : Packet discontinuity detected, adjusting offset to %I64d", m_rtOffset);
+				DLog(L"CBaseSplitterOutputPin::DeliverPacket() : [%u] packet discontinuity detected, adjusting offset to %I64d", p->TrackNumber, m_rtOffset);
 			}
 		}
 
