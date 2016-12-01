@@ -895,7 +895,7 @@ void CAppSettings::SaveSettings()
 void CAppSettings::SaveExternalFilters()
 {
 	// External Filter settings are saved for a long time. Use only when really necessary.
-	CWinApp* pApp = AfxGetApp();
+	CMPlayerCApp* pApp = AfxGetMyApp();
 	ASSERT(pApp);
 
 	if (!fInitialized) {
@@ -964,7 +964,7 @@ void CAppSettings::SaveExternalFilters()
 
 void CAppSettings::LoadSettings(bool bForce/* = false*/)
 {
-	CWinApp* pApp = AfxGetApp();
+	CMPlayerCApp* pApp = AfxGetMyApp();
 	ASSERT(pApp);
 
 	UINT len;
@@ -1684,7 +1684,7 @@ engine_t CAppSettings::GetFileEngine(CString path)
 
 void CAppSettings::SaveCurrentFilePosition()
 {
-	CWinApp* pApp = AfxGetApp();
+	CMPlayerCApp* pApp = AfxGetMyApp();
 	int i = nCurrentFilePosition;
 
 	CString lpKeyName;
@@ -1697,7 +1697,7 @@ void CAppSettings::SaveCurrentFilePosition()
 
 void CAppSettings::ClearFilePositions()
 {
-	CWinApp* pApp = AfxGetApp();
+	CMPlayerCApp* pApp = AfxGetMyApp();
 	CString lpKeyName;
 
 	for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
@@ -1712,7 +1712,7 @@ void CAppSettings::ClearFilePositions()
 
 void CAppSettings::SaveCurrentDVDPosition()
 {
-	CWinApp* pApp = AfxGetApp();
+	CMPlayerCApp* pApp = AfxGetMyApp();
 	int i = nCurrentDvdPosition;
 
 	CString lpKeyName;
@@ -1725,7 +1725,7 @@ void CAppSettings::SaveCurrentDVDPosition()
 
 void CAppSettings::ClearDVDPositions()
 {
-	CWinApp* pApp = AfxGetApp();
+	CMPlayerCApp* pApp = AfxGetMyApp();
 	CString lpKeyName;
 
 	for (int i = 0; i < min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {

@@ -125,7 +125,7 @@ void CRenderersSettings::SetDefault()
 
 void CRenderersSettings::Load()
 {
-	CWinApp* pApp = AfxGetApp();
+	CMPlayerCApp* pApp = AfxGetMyApp();
 
 #define GET_OPTION_INT(value, name) value = pApp->GetProfileInt(IDS_R_VIDEO, name, value)
 #define GET_OPTION_BOOL(value, name) value = !!pApp->GetProfileInt(IDS_R_VIDEO, name, value)
@@ -193,7 +193,7 @@ void CRenderersSettings::Load()
 
 void CRenderersSettings::Save()
 {
-	CWinApp* pApp = AfxGetApp();
+	CMPlayerCApp* pApp = AfxGetMyApp();
 
 #define WRITE_OPTION_INT(value, name) pApp->WriteProfileInt(IDS_R_VIDEO, name, value)
 
