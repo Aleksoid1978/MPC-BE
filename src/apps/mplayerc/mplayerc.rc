@@ -7,8 +7,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
-
+#include "afxres.h"
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -251,7 +250,7 @@ BEGIN
     CONTROL         "Show seek time",IDC_CHECK15,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,166,148,8
     CONTROL         "Limit window proportions on resize",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,177,160,8
     CONTROL         "Snap to desktop edges",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,189,156,8
-    CONTROL         "Store settings in the player folder",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,201,156,8
+    CONTROL         "Store settings in the player folder",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,201,160,8
     CONTROL         "Disable 'Open Disc' menu",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,213,156,8
     CONTROL         "Process priority above normal",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,225,156,8
 END
@@ -418,13 +417,13 @@ BEGIN
     RTEXT           "Background:",IDC_STATIC,13,184,43,8
     PUSHBUTTON      "G1",IDC_BUTTON_CLRGRAD1,62,181,20,14
     PUSHBUTTON      "G2",IDC_BUTTON_CLRGRAD2,62,199,20,14
-    RTEXT           "Transparent:",IDC_STATIC,86,184,51,8
-    CONTROL         "",IDC_SLIDER_OSDTRANS,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP,141,183,51,12
-    RTEXT           "Border Size:",IDC_STATIC,86,201,51,8
-    EDITTEXT        IDC_EDIT4,144,199,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "",IDC_SPIN10,"msctls_updown32",UDS_WRAP | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,158,199,12,13
+    RTEXT           "Transparent:",IDC_STATIC,86,184,59,8
+    CONTROL         "",IDC_SLIDER_OSDTRANS,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP,149,183,51,12
+    RTEXT           "Border Size:",IDC_STATIC,94,201,51,8
+    EDITTEXT        IDC_EDIT4,152,199,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN10,"msctls_updown32",UDS_WRAP | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,166,199,12,13
     CONTROL         "Shadow",IDC_CHECK_SHADOW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,224,167,46,8
-    CONTROL         "Anti-aliasing",IDC_CHECK_AA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,224,179,61,8
+    CONTROL         "Anti-aliasing",IDC_CHECK_AA,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,224,179,61,18
     CONTROL         "Use Windows 7 (and above) Taskbar features",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,219,270,11
 END
@@ -795,7 +794,7 @@ BEGIN
     CONTROL         "10-bit RGB output",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,75,92,10
     CONTROL         "VMR Mixer Mode",IDC_DSVMRLOADMIXER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,88,100,10
     CONTROL         "YUV Mixing",IDC_DSVMRYUVMIXER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,101,92,10
-    CONTROL         "Reset when changing display",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,12,150,150,10
+    CONTROL         "Reset when changing display",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,12,145,102,17
     LTEXT           "Surface format:",IDC_STATIC2,118,68,72,8
     COMBOBOX        IDC_COMBO1,191,66,95,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Resizer:",IDC_STATIC3,118,85,72,8
@@ -1042,13 +1041,13 @@ BEGIN
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,121,41,12,13
     CONTROL         "Disable desktop composition (Aero)",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,58,170,10
     CONTROL         "Enable frame time correction",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,70,170,10
-    CONTROL         "Flush GPU before VSync",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,5,120,10
+    CONTROL         "Flush GPU before VSync",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,5,140,10
     CONTROL         "Flush GPU after Present",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,17,140,10
     CONTROL         "Wait for flushes",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,30,100,10
     GROUPBOX        "EVR Sync Settings",IDC_STATIC2,5,84,286,146
     CONTROL         "Sync video to display",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,96,140,8
     CONTROL         "Sync display to video",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,125,140,8
-    CONTROL         "Present at nearest VSync",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,10,154,140,8
+    CONTROL         "Present at nearest VSync",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,10,154,167,8
     LTEXT           "Frequency adjustment:",IDC_STATIC5,20,110,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,108,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
     LTEXT           "Frequency adjustment:",IDC_STATIC6,20,139,85,8
