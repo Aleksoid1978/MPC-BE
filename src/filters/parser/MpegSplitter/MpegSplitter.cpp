@@ -28,7 +28,6 @@
 #include "MpegSplitter.h"
 #include <moreuuids.h>
 #include <basestruct.h>
-#include <atlpath.h>
 #include <list>
 
 #include "../../reader/VTSReader/VTSReader.h"
@@ -1478,12 +1477,14 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			POSITION pos = pMasterStream->GetHeadPosition();
 			while (pos) {
 				CMpegSplitterFile::stream& stream = pMasterStream->GetNext(pos);
+				CMpegSplitterFile::stream_codec codec = stream.codec;
 				TrackNum = stream;
 
 				CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNum);
 				if (pPin && pPin->IsConnected()) {
 					if (TrackNum == m_dwMasterH264TrackNumber) {
 						TrackNum = m_dwMVCExtensionTrackNumber;
+						codec = CMpegSplitterFile::stream_codec::MVC;
 					}
 
 					m_pFile->Seek(seekpos);
@@ -1492,18 +1493,18 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					double div = 1.0;
 					__int64 nextPos;
 					for (;;) {
-						REFERENCE_TIME rtPTS = m_pFile->NextPTS(TrackNum, stream.codec, nextPos);
+						REFERENCE_TIME rtPTS = m_pFile->NextPTS(TrackNum, codec, nextPos);
 						if (rtPTS != INVALID_TIME
 								&& rtmin <= rtPTS && rtPTS < rtmax) {
 							minseekrt = rtPTS;
 							minseekpos = m_pFile->GetPos();
 
-							if (stream.codec == CMpegSplitterFile::stream_codec::MPEG
-									|| stream.codec == CMpegSplitterFile::stream_codec::H264) {
-								const REFERENCE_TIME rtLimit = CMpegSplitterFile::stream_codec::MPEG ? rt : rtmax;
+							if (codec == CMpegSplitterFile::stream_codec::MPEG
+									|| codec == CMpegSplitterFile::stream_codec::H264) {
+								const REFERENCE_TIME rtLimit = codec == CMpegSplitterFile::stream_codec::MPEG ? rt : rt - UNITS/2;
 								while (m_pFile->GetRemaining()) {
 									m_pFile->Seek(nextPos);
-									rtPTS = m_pFile->NextPTS(TrackNum, stream.codec, nextPos, TRUE, rtLimit);
+									rtPTS = m_pFile->NextPTS(TrackNum, codec, nextPos, TRUE, rtLimit);
 									if (rtPTS > rtLimit || rtPTS == INVALID_TIME) {
 										break;
 									}
