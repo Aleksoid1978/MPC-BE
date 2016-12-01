@@ -739,6 +739,7 @@ inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(DWORD TrackNumber, __int64 
 
 			if (!p) {
 				if (!bPacketStart) {
+					DLog(L"CMpegSplitterFilter::HandleMPEGPacket() : [%u] Dropping incomplete packet, size %I64d", TrackNumber, nBytes);
 					return S_OK;
 				}
 

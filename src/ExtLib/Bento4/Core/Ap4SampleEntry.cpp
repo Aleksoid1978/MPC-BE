@@ -462,7 +462,7 @@ AP4_AudioSampleEntry::ReadFields(AP4_ByteStream& stream)
 {
     // sample entry
     AP4_Result result = AP4_SampleEntry::ReadFields(stream);
-    if (result < 0) return result;
+    if (result < AP4_SUCCESS) return result;
 
     // read the fields of this class
     stream.ReadUI16(m_QtVersion);
@@ -518,6 +518,8 @@ AP4_AudioSampleEntry::ReadFields(AP4_ByteStream& stream)
         m_QtV2BytesPerAudioPacket      = 0;
         m_QtV2LPCMFramesPerAudioPacket = 0;
     }
+
+    m_SampleRateExtra = 0;
     
     return AP4_SUCCESS;
 }
