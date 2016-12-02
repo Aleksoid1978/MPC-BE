@@ -58,7 +58,7 @@ BOOL CItemPropertiesDlg::OnInitDialog()
 	CString caption;
 	caption.Format(ResStr(IDS_PROPERTIESFOR), m_PropertyName);
 	SetWindowText(caption);
-	
+
 	AddAnchor(IDC_EDIT1, TOP_LEFT, BOTTOM_RIGHT);
 	AddAnchor(IDC_EDIT2, TOP_LEFT, BOTTOM_RIGHT);
 	AddAnchor(IDOK, BOTTOM_RIGHT);

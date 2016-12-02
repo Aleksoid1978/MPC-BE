@@ -651,8 +651,8 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, fUseTimeTooltip);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, nTimeTooltipPosition);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_OSD_SIZE, nOSDSize);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_MPC_OSD_FONT, strOSDFont);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_SIZE, nOSDSize);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_OSD_FONT, strOSDFont);
 
 	// Associated types with icon or not...
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, fAssociatedWithIcons);
@@ -693,8 +693,8 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, (int)fChapterMarker);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, (int)fFlybar);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, (int)fFlybarOnTop);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"OSDFontShadow", (int)fFontShadow);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"OSDFontAA", (int)fFontAA);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTSHADOW, (int)fFontShadow);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTAA, (int)fFontAA);
 
 	// Save analog capture settings
 	pApp->WriteProfileInt   (IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, iDefaultCaptureDevice);
@@ -755,8 +755,6 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, (int)fStartMainTitle);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_INTREALMEDIA, fIntRealMedia);
-
 	pApp->WriteProfileString(IDS_R_PNSPRESETS, NULL, NULL);
 	for (int i = 0, j = m_pnspresets.GetCount(); i < j; i++) {
 		CString str;
@@ -788,19 +786,19 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, fGlobalMedia);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"ThemeBrightness", nThemeBrightness);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"ThemeRed", nThemeRed);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"ThemeGreen", nThemeGreen);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"ThemeBlue", nThemeBlue);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"OSDTransparent", nOSDTransparent);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"OSDBorder", nOSDBorder);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"FileNameOnSeekBar", fFileNameOnSeekBar);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THEMERED, nThemeRed);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEGREEN, nThemeGreen);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEBLUE, nThemeBlue);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_TRANSPARENT, nOSDTransparent);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_BORDER, nOSDBorder);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FILENAMEONSEEKBAR, fFileNameOnSeekBar);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, clrFaceABGR);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, clrOutlineABGR);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"OSDFontColor", clrFontABGR);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"OSDGrad1Color", clrGrad1ABGR);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"OSDGrad2Color", clrGrad2ABGR);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTCOLOR, clrFontABGR);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD1COLOR, clrGrad1ABGR);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD2COLOR, clrGrad2ABGR);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
@@ -809,8 +807,8 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
 
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"DlgPropX", iDlgPropX);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, L"DlgPropY", iDlgPropY);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DLGPROPX, iDlgPropX);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DLGPROPY, iDlgPropY);
 
 	m_Formats.UpdateData(true);
 
@@ -1059,8 +1057,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	fUseTimeTooltip = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, TRUE);
 	nTimeTooltipPosition = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, TIME_TOOLTIP_ABOVE_SEEKBAR);
-	nOSDSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_OSD_SIZE, 18);
-	strOSDFont= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_MPC_OSD_FONT, L"Segoe UI");
+	nOSDSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_SIZE, 18);
+	strOSDFont= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_OSD_FONT, L"Segoe UI");
 
 	// Associated types with icon or not...
 	fAssociatedWithIcons	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, 1);
@@ -1259,8 +1257,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		}
 	}
 
-	fIntRealMedia = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_INTREALMEDIA, 0);
-
 	m_pnspresets.RemoveAll();
 	for (int i = 0; i < (ID_PANNSCAN_PRESETS_END - ID_PANNSCAN_PRESETS_START); i++) {
 		CString str;
@@ -1338,27 +1334,27 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fGlobalMedia = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, 1);
 
 	bUseDarkTheme = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, 1);
-	nThemeBrightness = pApp->GetProfileInt(IDS_R_SETTINGS, L"ThemeBrightness", 15);
-	nThemeRed = pApp->GetProfileInt(IDS_R_SETTINGS, L"ThemeRed", 256);
-	nThemeGreen = pApp->GetProfileInt(IDS_R_SETTINGS, L"ThemeGreen", 256);
-	nThemeBlue = pApp->GetProfileInt(IDS_R_SETTINGS, L"ThemeBlue", 256);
-	nOSDTransparent = pApp->GetProfileInt(IDS_R_SETTINGS, L"OSDTransparent", 100);
-	nOSDBorder = pApp->GetProfileInt(IDS_R_SETTINGS, L"OSDBorder", 1);
-	fFileNameOnSeekBar = !!pApp->GetProfileInt(IDS_R_SETTINGS, L"FileNameOnSeekBar", TRUE);
+	nThemeBrightness = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, 15);
+	nThemeRed = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THEMERED, 256);
+	nThemeGreen = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEGREEN, 256);
+	nThemeBlue = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEBLUE, 256);
+	nOSDTransparent = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_TRANSPARENT, 100);
+	nOSDBorder = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_BORDER, 1);
+	fFileNameOnSeekBar = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FILENAMEONSEEKBAR, TRUE);
 
 	clrFaceABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, 0x00ffffff);
 	clrOutlineABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, 0x00868686);
-	clrFontABGR = pApp->GetProfileInt(IDS_R_SETTINGS, L"OSDFontColor", 0x00E0E0E0);
-	clrGrad1ABGR = pApp->GetProfileInt(IDS_R_SETTINGS, L"OSDGrad1Color", 0x00302820);
-	clrGrad2ABGR = pApp->GetProfileInt(IDS_R_SETTINGS, L"OSDGrad2Color", 0x00302820);
+	clrFontABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTCOLOR, 0x00E0E0E0);
+	clrGrad1ABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD1COLOR, 0x00302820);
+	clrGrad2ABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD2COLOR, 0x00302820);
 
 	nJumpDistS = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, DEFAULT_JUMPDISTANCE_1);
 	nJumpDistM = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, DEFAULT_JUMPDISTANCE_2);
 	nJumpDistL = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTL, DEFAULT_JUMPDISTANCE_3);
 	fLimitWindowProportions = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LIMITWINDOWPROPORTIONS, FALSE);
 
-	iDlgPropX = pApp->GetProfileInt(IDS_R_SETTINGS, L"DlgPropX", 0);
-	iDlgPropY = pApp->GetProfileInt(IDS_R_SETTINGS, L"DlgPropY", 0);
+	iDlgPropX = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DLGPROPX, 0);
+	iDlgPropY = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DLGPROPY, 0);
 
 	m_Formats.UpdateData(false);
 
@@ -1452,8 +1448,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fChapterMarker	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, FALSE);
 	fFlybar			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, TRUE);
 	fFlybarOnTop	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, FALSE);
-	fFontShadow		= !!pApp->GetProfileInt(IDS_R_SETTINGS, L"OSDFontShadow", FALSE);
-	fFontAA			= !!pApp->GetProfileInt(IDS_R_SETTINGS, L"OSDFontAA", TRUE);
+	fFontShadow		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTSHADOW, FALSE);
+	fFontAA			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTAA, TRUE);
 
 	// Save analog capture settings
 	iDefaultCaptureDevice	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, 0);
@@ -1511,7 +1507,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 		lpKeyName.Format(L"File%d", i + 1);
 		lpString = pApp->GetProfileString(IDS_R_RECENTFILES, lpKeyName);
-		
+
 		CAtlList<CString> args;
 		ExplodeEsc(lpString, args, L'|');
 		if (!args.IsEmpty()) {

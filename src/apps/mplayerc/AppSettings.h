@@ -800,8 +800,6 @@ public:
 	CString			strTimeOnSeekBar;
 	bool			bStatusBarIsVisible;
 
-	bool			fIntRealMedia;
-	//int			iVideoRendererType;
 	//bool			fMonitorAutoRefreshRate;
 	bool			fEnableEDLEditor;
 

@@ -37,7 +37,7 @@ HRESULT CDXVA2DecoderVC1::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDX
 	DXVA_SliceInfo *slice             = NULL;
 	BYTE* current                     = pDXVABuffer;
 	UINT MBCount                      = FFGetMBCount(m_pFilter->GetAVCtx());
-	
+
 	static const BYTE start_code[]    = { 0, 0, 1, 0x0d };
 	const UINT start_code_size        = m_pFilter->GetCodec() == AV_CODEC_ID_VC1 ? sizeof(start_code) : 0;
 
@@ -67,7 +67,7 @@ HRESULT CDXVA2DecoderVC1::CopyBitstream(BYTE* pDXVABuffer, UINT& nSize, UINT nDX
 			} else if (i > 0) {
 				current[3] = 0x0b;
 			}
-			
+
 			current += start_code_size;
 			slice->dwSliceBitsInBuffer += start_code_size * 8;
 		}

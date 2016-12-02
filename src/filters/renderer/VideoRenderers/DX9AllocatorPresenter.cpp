@@ -605,7 +605,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	D3DDISPLAYMODEEX d3ddmEx = { sizeof(d3ddmEx) };
 	m_pD3DEx->GetAdapterDisplayModeEx(m_CurrentAdapter, &d3ddmEx, NULL);
 	m_ScreenSize.SetSize(d3ddmEx.Width, d3ddmEx.Height);
-	
+
 	CSize backBufferSize;
 	GetMaxResolution(m_pD3DEx, backBufferSize);
 
