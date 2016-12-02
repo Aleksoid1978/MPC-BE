@@ -493,6 +493,7 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	: CBaseSplitterFilter(NAME("CMpegSplitterFilter"), pUnk, phr, clsid)
 	, m_pPipoBimbo(false)
 	, m_rtPlaylistDuration(0)
+	, m_rtStartOffset(0)
 	, m_rtSeekOffset(INVALID_TIME)
 	, m_rtMin(0)
 	, m_rtMax(0)
@@ -1288,6 +1289,72 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
+	if (m_bUseMVCExtension && !m_Items.IsEmpty()) {
+		SetProperty(L"STEREOSCOPIC3DMODE", m_MVC_Base_View_R_flag ? L"mvc_rl" : L"mvc_lr");
+
+		if (m_Items.GetCount()) {
+			POSITION pos = m_Items.GetHeadPosition();
+			while (pos) {
+				CHdmvClipInfo::PlaylistItem* Item = m_Items.GetNext(pos);
+				Item->m_sps.RemoveAll();
+			}
+		}
+
+		// PG offsets
+		const CHdmvClipInfo::PlaylistItem* Item = m_Items.GetHead();
+		if (Item->m_pg_offset_sequence_id.size()) {
+			std::list<BYTE> pg_offsets;
+			for (auto it = Item->m_pg_offset_sequence_id.begin(); it != Item->m_pg_offset_sequence_id.end(); it++) {
+				if (*it != 0xff) {
+					pg_offsets.push_back(*it);
+
+					CString offset; offset.Format(L"%u", *it);
+					SetProperty(L"stereo_subtitle_offset_id", offset);
+				}
+			}
+			if (pg_offsets.size()) {
+				CString offsets;
+
+				pg_offsets.sort();
+				pg_offsets.unique();
+				for (auto it = pg_offsets.begin(); it != pg_offsets.end(); it++) {
+					if (offsets.IsEmpty()) {
+						offsets.Format(L"%u", *it);
+					} else {
+						offsets.AppendFormat(L",%u", *it);
+					}
+				}
+
+				SetProperty(L"stereo_subtitle_offset_ids", offsets);
+			}
+		}
+
+		// IG offsets
+		if (Item->m_ig_offset_sequence_id.size()) {
+			std::list<BYTE> ig_offsets;
+			for (auto it = Item->m_ig_offset_sequence_id.begin(); it != Item->m_ig_offset_sequence_id.end(); it++) {
+				if (*it != 0xff) {
+					ig_offsets.push_back(*it);
+				}
+			}
+			if (ig_offsets.size()) {
+				CString offsets;
+
+				ig_offsets.sort();
+				ig_offsets.unique();
+				for (auto it = ig_offsets.begin(); it != ig_offsets.end(); it++) {
+					if (offsets.IsEmpty()) {
+						offsets.Format(L"%u", *it);
+					} else {
+						offsets.AppendFormat(L",%u", *it);
+					}
+				}
+
+				SetProperty(L"stereo_interactive_offset_ids", offsets);
+			}
+		}
+	}
+
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
 }
 
@@ -1315,85 +1382,14 @@ bool CMpegSplitterFilter::DemuxInit()
 		return false;
 	}
 
-	m_rtStartOffset = 0;
-
 	if (m_bUseMVCExtension) {
-		BOOL bUseMVCExtension = FALSE;
 		if (IPin* pPin = dynamic_cast<IPin*>(GetOutputPin(m_dwMasterH264TrackNumber))) {
 			CMediaType mt;
 			if (SUCCEEDED(pPin->ConnectionMediaType(&mt))) {
-				bUseMVCExtension = (mt.subtype == MEDIASUBTYPE_AMVC);
-			}
-		}
-
-		if (!bUseMVCExtension) {
-			m_bUseMVCExtension          = FALSE;
-			m_dwMasterH264TrackNumber   = DWORD_MAX;
-			m_dwMVCExtensionTrackNumber = DWORD_MAX;
-		}
-
-		if (m_Items.GetCount()) {
-			POSITION pos = m_Items.GetHeadPosition();
-			while (pos) {
-				CHdmvClipInfo::PlaylistItem* Item = m_Items.GetNext(pos);
-				Item->m_sps.RemoveAll();
-			}
-		}
-
-		if (bUseMVCExtension && !m_Items.IsEmpty()) {
-			SetProperty(L"STEREOSCOPIC3DMODE", m_MVC_Base_View_R_flag ? L"mvc_rl" : L"mvc_lr");
-
-			// PG offsets
-			const CHdmvClipInfo::PlaylistItem* Item = m_Items.GetHead();
-			if (Item->m_pg_offset_sequence_id.size()) {
-				std::list<BYTE> pg_offsets;
-				for (auto it = Item->m_pg_offset_sequence_id.begin(); it != Item->m_pg_offset_sequence_id.end(); it++) {
-					if (*it != 0xff) {
-						pg_offsets.push_back(*it);
-
-						CString offset; offset.Format(L"%u", *it);
-						SetProperty(L"stereo_subtitle_offset_id", offset);
-					}
-				}
-				if (pg_offsets.size()) {
-					CString offsets;
-
-					pg_offsets.sort();
-					pg_offsets.unique();
-					for (auto it = pg_offsets.begin(); it != pg_offsets.end(); it++) {
-						if (offsets.IsEmpty()) {
-							offsets.Format(L"%u", *it);
-						} else {
-							offsets.AppendFormat(L",%u", *it);
-						}
-					}
-
-					SetProperty(L"stereo_subtitle_offset_ids", offsets);
-				}
-			}
-
-			// IG offsets
-			if (Item->m_ig_offset_sequence_id.size()) {
-				std::list<BYTE> ig_offsets;
-				for (auto it = Item->m_ig_offset_sequence_id.begin(); it != Item->m_ig_offset_sequence_id.end(); it++) {
-					if (*it != 0xff) {
-						ig_offsets.push_back(*it);
-					}
-				}
-				if (ig_offsets.size()) {
-					CString offsets;
-
-					ig_offsets.sort();
-					ig_offsets.unique();
-					for (auto it = ig_offsets.begin(); it != ig_offsets.end(); it++) {
-						if (offsets.IsEmpty()) {
-							offsets.Format(L"%u", *it);
-						} else {
-							offsets.AppendFormat(L",%u", *it);
-						}
-					}
-
-					SetProperty(L"stereo_interactive_offset_ids", offsets);
+				if (mt.subtype != MEDIASUBTYPE_AMVC) {
+					m_bUseMVCExtension          = FALSE;
+					m_dwMasterH264TrackNumber   = DWORD_MAX;
+					m_dwMVCExtensionTrackNumber = DWORD_MAX;
 				}
 			}
 		}
