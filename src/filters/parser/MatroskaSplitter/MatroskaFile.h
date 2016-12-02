@@ -314,7 +314,7 @@ namespace MatroskaReader
 		MasteringMetadata SMPTE2086MasteringMetadata;
 
 		bool bValid;
-		
+
 		Colour() {
 			MatrixCoefficients.Set(0);
 			ChromaSitingHorz.Set(0); ChromaSitingHorz.Set(0);

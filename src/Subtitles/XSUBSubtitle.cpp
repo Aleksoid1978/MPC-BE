@@ -212,7 +212,7 @@ HRESULT CXSUBSubtitle::ParseSample(BYTE* pData, long nLen)
 	CAutoLock cAutoLock(&m_csCritSec);
 
 	CheckPointer(pData, E_POINTER);
-	
+
 	if (nLen < (27 + 7 * 2 + 4 * 3)) {
 		return E_FAIL;
 	}
