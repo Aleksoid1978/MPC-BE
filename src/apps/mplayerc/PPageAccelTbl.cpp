@@ -29,82 +29,82 @@ struct APP_COMMAND {
 };
 
 APP_COMMAND	g_CommandList[] = {
-	{0,									_T("")},
-	{APPCOMMAND_BROWSER_BACKWARD,		_T("BROWSER_BACKWARD")},
-	{APPCOMMAND_BROWSER_FORWARD,		_T("BROWSER_FORWARD")},
-	{APPCOMMAND_BROWSER_REFRESH,		_T("BROWSER_REFRESH")},
-	{APPCOMMAND_BROWSER_STOP,			_T("BROWSER_STOP")},
-	{APPCOMMAND_BROWSER_SEARCH,			_T("BROWSER_SEARCH")},
-	{APPCOMMAND_BROWSER_FAVORITES,		_T("BROWSER_FAVORITES")},
-	{APPCOMMAND_BROWSER_HOME,			_T("BROWSER_HOME")},
-	{APPCOMMAND_VOLUME_MUTE,			_T("VOLUME_MUTE")},
-	{APPCOMMAND_VOLUME_DOWN,			_T("VOLUME_DOWN")},
-	{APPCOMMAND_VOLUME_UP,				_T("VOLUME_UP")},
-	{APPCOMMAND_MEDIA_NEXTTRACK,		_T("MEDIA_NEXTTRACK")},
-	{APPCOMMAND_MEDIA_PREVIOUSTRACK,	_T("MEDIA_PREVIOUSTRACK")},
-	{APPCOMMAND_MEDIA_STOP,				_T("MEDIA_STOP")},
-	{APPCOMMAND_MEDIA_PLAY_PAUSE,		_T("MEDIA_PLAY_PAUSE")},
-	{APPCOMMAND_LAUNCH_MAIL,			_T("LAUNCH_MAIL")},
-	{APPCOMMAND_LAUNCH_MEDIA_SELECT,	_T("LAUNCH_MEDIA_SELECT")},
-	{APPCOMMAND_LAUNCH_APP1,			_T("LAUNCH_APP1")},
-	{APPCOMMAND_LAUNCH_APP2,			_T("LAUNCH_APP2")},
-	{APPCOMMAND_BASS_DOWN,				_T("BASS_DOWN")},
-	{APPCOMMAND_BASS_BOOST,				_T("BASS_BOOST")},
-	{APPCOMMAND_BASS_UP,				_T("BASS_UP")},
-	{APPCOMMAND_TREBLE_DOWN,			_T("TREBLE_DOWN")},
-	{APPCOMMAND_TREBLE_UP,				_T("TREBLE_UP")},
-	{APPCOMMAND_MICROPHONE_VOLUME_MUTE, _T("MICROPHONE_VOLUME_MUTE")},
-	{APPCOMMAND_MICROPHONE_VOLUME_DOWN, _T("MICROPHONE_VOLUME_DOWN")},
-	{APPCOMMAND_MICROPHONE_VOLUME_UP,	_T("MICROPHONE_VOLUME_UP")},
-	{APPCOMMAND_HELP,					_T("HELP")},
-	{APPCOMMAND_FIND,					_T("FIND")},
-	{APPCOMMAND_NEW,					_T("NEW")},
-	{APPCOMMAND_OPEN,					_T("OPEN")},
-	{APPCOMMAND_CLOSE,					_T("CLOSE")},
-	{APPCOMMAND_SAVE,					_T("SAVE")},
-	{APPCOMMAND_PRINT,					_T("PRINT")},
-	{APPCOMMAND_UNDO,					_T("UNDO")},
-	{APPCOMMAND_REDO,					_T("REDO")},
-	{APPCOMMAND_COPY,					_T("COPY")},
-	{APPCOMMAND_CUT,					_T("CUT")},
-	{APPCOMMAND_PASTE,					_T("PASTE")},
-	{APPCOMMAND_REPLY_TO_MAIL,			_T("REPLY_TO_MAIL")},
-	{APPCOMMAND_FORWARD_MAIL,			_T("FORWARD_MAIL")},
-	{APPCOMMAND_SEND_MAIL,				_T("SEND_MAIL")},
-	{APPCOMMAND_SPELL_CHECK,			_T("SPELL_CHECK")},
-	{APPCOMMAND_DICTATE_OR_COMMAND_CONTROL_TOGGLE, _T("DICTATE_OR_COMMAND_CONTROL_TOGGLE")},
-	{APPCOMMAND_MIC_ON_OFF_TOGGLE,		_T("MIC_ON_OFF_TOGGLE")},
-	{APPCOMMAND_CORRECTION_LIST,		_T("CORRECTION_LIST")},
-	{APPCOMMAND_MEDIA_PLAY,				_T("MEDIA_PLAY")},
-	{APPCOMMAND_MEDIA_PAUSE,			_T("MEDIA_PAUSE")},
-	{APPCOMMAND_MEDIA_RECORD,			_T("MEDIA_RECORD")},
-	{APPCOMMAND_MEDIA_FAST_FORWARD,		_T("MEDIA_FAST_FORWARD")},
-	{APPCOMMAND_MEDIA_REWIND,			_T("MEDIA_REWIND")},
-	{APPCOMMAND_MEDIA_CHANNEL_UP,		_T("MEDIA_CHANNEL_UP")},
-	{APPCOMMAND_MEDIA_CHANNEL_DOWN,		_T("MEDIA_CHANNEL_DOWN")},
-	{APPCOMMAND_DELETE,					_T("DELETE")},
-	{APPCOMMAND_DWM_FLIP3D,				_T("DWM_FLIP3D")},
-	{MCE_DETAILS,						_T("MCE_DETAILS")},
-	{MCE_GUIDE,							_T("MCE_GUIDE")},
-	{MCE_TVJUMP,						_T("MCE_TVJUMP")},
-	{MCE_STANDBY,						_T("MCE_STANDBY")},
-	{MCE_OEM1,							_T("MCE_OEM1")},
-	{MCE_OEM2,							_T("MCE_OEM2")},
-	{MCE_MYTV,							_T("MCE_MYTV")},
-	{MCE_MYVIDEOS,						_T("MCE_MYVIDEOS")},
-	{MCE_MYPICTURES,					_T("MCE_MYPICTURES")},
-	{MCE_MYMUSIC,						_T("MCE_MYMUSIC")},
-	{MCE_RECORDEDTV,					_T("MCE_RECORDEDTV")},
-	{MCE_DVDANGLE,						_T("MCE_DVDANGLE")},
-	{MCE_DVDAUDIO,						_T("MCE_DVDAUDIO")},
-	{MCE_DVDMENU,						_T("MCE_DVDMENU")},
-	{MCE_DVDSUBTITLE,					_T("MCE_DVDSUBTITLE")},
-	{MCE_RED,							_T("MCE_RED")},
-	{MCE_GREEN,							_T("MCE_GREEN")},
-	{MCE_YELLOW,						_T("MCE_YELLOW")},
-	{MCE_BLUE,							_T("MCE_BLUE")},
-	{MCE_MEDIA_NEXTTRACK,				_T("MCE_MEDIA_NEXTTRACK")},
-	{MCE_MEDIA_PREVIOUSTRACK,			_T("MCE_MEDIA_PREVIOUSTRACK")}
+	{0,									L""},
+	{APPCOMMAND_BROWSER_BACKWARD,		L"BROWSER_BACKWARD"},
+	{APPCOMMAND_BROWSER_FORWARD,		L"BROWSER_FORWARD"},
+	{APPCOMMAND_BROWSER_REFRESH,		L"BROWSER_REFRESH"},
+	{APPCOMMAND_BROWSER_STOP,			L"BROWSER_STOP"},
+	{APPCOMMAND_BROWSER_SEARCH,			L"BROWSER_SEARCH"},
+	{APPCOMMAND_BROWSER_FAVORITES,		L"BROWSER_FAVORITES"},
+	{APPCOMMAND_BROWSER_HOME,			L"BROWSER_HOME"},
+	{APPCOMMAND_VOLUME_MUTE,			L"VOLUME_MUTE"},
+	{APPCOMMAND_VOLUME_DOWN,			L"VOLUME_DOWN"},
+	{APPCOMMAND_VOLUME_UP,				L"VOLUME_UP"},
+	{APPCOMMAND_MEDIA_NEXTTRACK,		L"MEDIA_NEXTTRACK"},
+	{APPCOMMAND_MEDIA_PREVIOUSTRACK,	L"MEDIA_PREVIOUSTRACK"},
+	{APPCOMMAND_MEDIA_STOP,				L"MEDIA_STOP"},
+	{APPCOMMAND_MEDIA_PLAY_PAUSE,		L"MEDIA_PLAY_PAUSE"},
+	{APPCOMMAND_LAUNCH_MAIL,			L"LAUNCH_MAIL"},
+	{APPCOMMAND_LAUNCH_MEDIA_SELECT,	L"LAUNCH_MEDIA_SELECT"},
+	{APPCOMMAND_LAUNCH_APP1,			L"LAUNCH_APP1"},
+	{APPCOMMAND_LAUNCH_APP2,			L"LAUNCH_APP2"},
+	{APPCOMMAND_BASS_DOWN,				L"BASS_DOWN"},
+	{APPCOMMAND_BASS_BOOST,				L"BASS_BOOST"},
+	{APPCOMMAND_BASS_UP,				L"BASS_UP"},
+	{APPCOMMAND_TREBLE_DOWN,			L"TREBLE_DOWN"},
+	{APPCOMMAND_TREBLE_UP,				L"TREBLE_UP"},
+	{APPCOMMAND_MICROPHONE_VOLUME_MUTE, L"MICROPHONE_VOLUME_MUTE"},
+	{APPCOMMAND_MICROPHONE_VOLUME_DOWN, L"MICROPHONE_VOLUME_DOWN"},
+	{APPCOMMAND_MICROPHONE_VOLUME_UP,	L"MICROPHONE_VOLUME_UP"},
+	{APPCOMMAND_HELP,					L"HELP"},
+	{APPCOMMAND_FIND,					L"FIND"},
+	{APPCOMMAND_NEW,					L"NEW"},
+	{APPCOMMAND_OPEN,					L"OPEN"},
+	{APPCOMMAND_CLOSE,					L"CLOSE"},
+	{APPCOMMAND_SAVE,					L"SAVE"},
+	{APPCOMMAND_PRINT,					L"PRINT"},
+	{APPCOMMAND_UNDO,					L"UNDO"},
+	{APPCOMMAND_REDO,					L"REDO"},
+	{APPCOMMAND_COPY,					L"COPY"},
+	{APPCOMMAND_CUT,					L"CUT"},
+	{APPCOMMAND_PASTE,					L"PASTE"},
+	{APPCOMMAND_REPLY_TO_MAIL,			L"REPLY_TO_MAIL"},
+	{APPCOMMAND_FORWARD_MAIL,			L"FORWARD_MAIL"},
+	{APPCOMMAND_SEND_MAIL,				L"SEND_MAIL"},
+	{APPCOMMAND_SPELL_CHECK,			L"SPELL_CHECK"},
+	{APPCOMMAND_DICTATE_OR_COMMAND_CONTROL_TOGGLE, L"DICTATE_OR_COMMAND_CONTROL_TOGGLE"},
+	{APPCOMMAND_MIC_ON_OFF_TOGGLE,		L"MIC_ON_OFF_TOGGLE"},
+	{APPCOMMAND_CORRECTION_LIST,		L"CORRECTION_LIST"},
+	{APPCOMMAND_MEDIA_PLAY,				L"MEDIA_PLAY"},
+	{APPCOMMAND_MEDIA_PAUSE,			L"MEDIA_PAUSE"},
+	{APPCOMMAND_MEDIA_RECORD,			L"MEDIA_RECORD"},
+	{APPCOMMAND_MEDIA_FAST_FORWARD,		L"MEDIA_FAST_FORWARD"},
+	{APPCOMMAND_MEDIA_REWIND,			L"MEDIA_REWIND"},
+	{APPCOMMAND_MEDIA_CHANNEL_UP,		L"MEDIA_CHANNEL_UP"},
+	{APPCOMMAND_MEDIA_CHANNEL_DOWN,		L"MEDIA_CHANNEL_DOWN"},
+	{APPCOMMAND_DELETE,					L"DELETE"},
+	{APPCOMMAND_DWM_FLIP3D,				L"DWM_FLIP3D"},
+	{MCE_DETAILS,						L"MCE_DETAILS"},
+	{MCE_GUIDE,							L"MCE_GUIDE"},
+	{MCE_TVJUMP,						L"MCE_TVJUMP"},
+	{MCE_STANDBY,						L"MCE_STANDBY"},
+	{MCE_OEM1,							L"MCE_OEM1"},
+	{MCE_OEM2,							L"MCE_OEM2"},
+	{MCE_MYTV,							L"MCE_MYTV"},
+	{MCE_MYVIDEOS,						L"MCE_MYVIDEOS"},
+	{MCE_MYPICTURES,					L"MCE_MYPICTURES"},
+	{MCE_MYMUSIC,						L"MCE_MYMUSIC"},
+	{MCE_RECORDEDTV,					L"MCE_RECORDEDTV"},
+	{MCE_DVDANGLE,						L"MCE_DVDANGLE"},
+	{MCE_DVDAUDIO,						L"MCE_DVDAUDIO"},
+	{MCE_DVDMENU,						L"MCE_DVDMENU"},
+	{MCE_DVDSUBTITLE,					L"MCE_DVDSUBTITLE"},
+	{MCE_RED,							L"MCE_RED"},
+	{MCE_GREEN,							L"MCE_GREEN"},
+	{MCE_YELLOW,						L"MCE_YELLOW"},
+	{MCE_BLUE,							L"MCE_BLUE"},
+	{MCE_MEDIA_NEXTTRACK,				L"MCE_MEDIA_NEXTTRACK"},
+	{MCE_MEDIA_PREVIOUSTRACK,			L"MCE_MEDIA_PREVIOUSTRACK"}
 };
 
 // CPPageAccelTbl dialog
@@ -115,9 +115,9 @@ CPPageAccelTbl::CPPageAccelTbl()
 	, m_list(0)
 	, m_counter(0)
 	, m_fWinLirc(FALSE)
-	, m_WinLircLink(_T("http://winlirc.sourceforge.net/"))
+	, m_WinLircLink(L"http://winlirc.sourceforge.net/")
 	, m_fUIce(FALSE)
-	, m_UIceLink(_T("http://www.mediatexx.com/"))
+	, m_UIceLink(L"http://www.mediatexx.com/")
 	, m_fGlobalMedia(FALSE)
 {
 }
@@ -148,7 +148,7 @@ void CPPageAccelTbl::SetupList()
 		m_list.SetItemText(row, COL_KEY, hotkey);
 
 		CString id;
-		id.Format(_T("%d"), wc.cmd);
+		id.Format(L"%d", wc.cmd);
 		m_list.SetItemText(row, COL_ID, id);
 
 		m_list.SetItemText(row, COL_MOUSE, MakeMouseButtonLabel(wc.mouse));
@@ -160,7 +160,7 @@ void CPPageAccelTbl::SetupList()
 		m_list.SetItemText(row, COL_RMCMD, CString(wc.rmcmd));
 
 		CString repcnt;
-		repcnt.Format(_T("%d"), wc.rmrepcnt);
+		repcnt.Format(L"%d", wc.rmrepcnt);
 		m_list.SetItemText(row, COL_RMREPCNT, repcnt);
 	}
 
@@ -182,583 +182,25 @@ CString CPPageAccelTbl::MakeAccelModLabel(BYTE fVirt)
 	CString str;
 	if (fVirt&FCONTROL) {
 		if (!str.IsEmpty()) {
-			str += _T(" + ");
+			str += L" + ";
 		}
-		str += _T("Ctrl");
+		str += L"Ctrl";
 	}
 	if (fVirt&FALT) {
 		if (!str.IsEmpty()) {
-			str += _T(" + ");
+			str += L" + ";
 		}
-		str += _T("Alt");
+		str += L"Alt";
 	}
 	if (fVirt&FSHIFT) {
 		if (!str.IsEmpty()) {
-			str += _T(" + ");
+			str += L" + ";
 		}
-		str += _T("Shift");
+		str += L"Shift";
 	}
 	if (str.IsEmpty()) {
 		str = ResStr(IDS_AG_NONE);
 	}
-	return(str);
-}
-
-CString CPPageAccelTbl::MakeAccelVkeyLabel(WORD key, bool fVirtKey)
-{
-	// Reference page for Virtual-Key Codes: http://msdn.microsoft.com/en-us/library/windows/desktop/dd375731%28v=vs.100%29.aspx
-	CString str;
-
-	switch (key) {
-		case VK_LBUTTON:
-			str = _T("VK_LBUTTON");
-			break;
-		case VK_RBUTTON:
-			str = _T("VK_RBUTTON");
-			break;
-		case VK_CANCEL:
-			str = _T("VK_CANCEL");
-			break;
-		case VK_MBUTTON:
-			str = _T("VK_MBUTTON");
-			break;
-		case VK_XBUTTON1:
-			str = _T("VK_XBUTTON1");
-			break;
-		case VK_XBUTTON2:
-			str = _T("VK_XBUTTON2");
-			break;
-		case VK_BACK:
-			str = _T("VK_BACK");
-			break;
-		case VK_TAB:
-			str = _T("VK_TAB");
-			break;
-		case VK_CLEAR:
-			str = _T("VK_CLEAR");
-			break;
-		case VK_RETURN:
-			str = _T("VK_RETURN");
-			break;
-		case VK_SHIFT:
-			str = _T("VK_SHIFT");
-			break;
-		case VK_CONTROL:
-			str = _T("VK_CONTROL");
-			break;
-		case VK_MENU:
-			str = _T("VK_MENU");
-			break;
-		case VK_PAUSE:
-			str = _T("VK_PAUSE");
-			break;
-		case VK_CAPITAL:
-			str = _T("VK_CAPITAL");
-			break;
-			//	case VK_KANA: str = _T("VK_KANA"); break;
-			//	case VK_HANGEUL: str = _T("VK_HANGEUL"); break;
-		case VK_HANGUL:
-			str = _T("VK_HANGUL");
-			break;
-		case VK_JUNJA:
-			str = _T("VK_JUNJA");
-			break;
-		case VK_FINAL:
-			str = _T("VK_FINAL");
-			break;
-			//	case VK_HANJA: str = _T("VK_HANJA"); break;
-		case VK_KANJI:
-			str = _T("VK_KANJI");
-			break;
-		case VK_ESCAPE:
-			str = _T("VK_ESCAPE");
-			break;
-		case VK_CONVERT:
-			str = _T("VK_CONVERT");
-			break;
-		case VK_NONCONVERT:
-			str = _T("VK_NONCONVERT");
-			break;
-		case VK_ACCEPT:
-			str = _T("VK_ACCEPT");
-			break;
-		case VK_MODECHANGE:
-			str = _T("VK_MODECHANGE");
-			break;
-		case VK_SPACE:
-			str = _T("VK_SPACE");
-			break;
-		case VK_PRIOR:
-			str = _T("VK_PRIOR");
-			break;
-		case VK_NEXT:
-			str = _T("VK_NEXT");
-			break;
-		case VK_END:
-			str = _T("VK_END");
-			break;
-		case VK_HOME:
-			str = _T("VK_HOME");
-			break;
-		case VK_LEFT:
-			str = _T("VK_LEFT");
-			break;
-		case VK_UP:
-			str = _T("VK_UP");
-			break;
-		case VK_RIGHT:
-			str = _T("VK_RIGHT");
-			break;
-		case VK_DOWN:
-			str = _T("VK_DOWN");
-			break;
-		case VK_SELECT:
-			str = _T("VK_SELECT");
-			break;
-		case VK_PRINT:
-			str = _T("VK_PRINT");
-			break;
-		case VK_EXECUTE:
-			str = _T("VK_EXECUTE");
-			break;
-		case VK_SNAPSHOT:
-			str = _T("VK_SNAPSHOT");
-			break;
-		case VK_INSERT:
-			str = _T("VK_INSERT");
-			break;
-		case VK_DELETE:
-			str = _T("VK_DELETE");
-			break;
-		case VK_HELP:
-			str = _T("VK_HELP");
-			break;
-		case VK_LWIN:
-			str = _T("VK_LWIN");
-			break;
-		case VK_RWIN:
-			str = _T("VK_RWIN");
-			break;
-		case VK_APPS:
-			str = _T("VK_APPS");
-			break;
-		case VK_SLEEP:
-			str = _T("VK_SLEEP");
-			break;
-		case VK_NUMPAD0:
-			str = _T("VK_NUMPAD0");
-			break;
-		case VK_NUMPAD1:
-			str = _T("VK_NUMPAD1");
-			break;
-		case VK_NUMPAD2:
-			str = _T("VK_NUMPAD2");
-			break;
-		case VK_NUMPAD3:
-			str = _T("VK_NUMPAD3");
-			break;
-		case VK_NUMPAD4:
-			str = _T("VK_NUMPAD4");
-			break;
-		case VK_NUMPAD5:
-			str = _T("VK_NUMPAD5");
-			break;
-		case VK_NUMPAD6:
-			str = _T("VK_NUMPAD6");
-			break;
-		case VK_NUMPAD7:
-			str = _T("VK_NUMPAD7");
-			break;
-		case VK_NUMPAD8:
-			str = _T("VK_NUMPAD8");
-			break;
-		case VK_NUMPAD9:
-			str = _T("VK_NUMPAD9");
-			break;
-		case VK_MULTIPLY:
-			str = _T("VK_MULTIPLY");
-			break;
-		case VK_ADD:
-			str = _T("VK_ADD");
-			break;
-		case VK_SEPARATOR:
-			str = _T("VK_SEPARATOR");
-			break;
-		case VK_SUBTRACT:
-			str = _T("VK_SUBTRACT");
-			break;
-		case VK_DECIMAL:
-			str = _T("VK_DECIMAL");
-			break;
-		case VK_DIVIDE:
-			str = _T("VK_DIVIDE");
-			break;
-		case VK_F1:
-			str = _T("VK_F1");
-			break;
-		case VK_F2:
-			str = _T("VK_F2");
-			break;
-		case VK_F3:
-			str = _T("VK_F3");
-			break;
-		case VK_F4:
-			str = _T("VK_F4");
-			break;
-		case VK_F5:
-			str = _T("VK_F5");
-			break;
-		case VK_F6:
-			str = _T("VK_F6");
-			break;
-		case VK_F7:
-			str = _T("VK_F7");
-			break;
-		case VK_F8:
-			str = _T("VK_F8");
-			break;
-		case VK_F9:
-			str = _T("VK_F9");
-			break;
-		case VK_F10:
-			str = _T("VK_F10");
-			break;
-		case VK_F11:
-			str = _T("VK_F11");
-			break;
-		case VK_F12:
-			str = _T("VK_F12");
-			break;
-		case VK_F13:
-			str = _T("VK_F13");
-			break;
-		case VK_F14:
-			str = _T("VK_F14");
-			break;
-		case VK_F15:
-			str = _T("VK_F15");
-			break;
-		case VK_F16:
-			str = _T("VK_F16");
-			break;
-		case VK_F17:
-			str = _T("VK_F17");
-			break;
-		case VK_F18:
-			str = _T("VK_F18");
-			break;
-		case VK_F19:
-			str = _T("VK_F19");
-			break;
-		case VK_F20:
-			str = _T("VK_F20");
-			break;
-		case VK_F21:
-			str = _T("VK_F21");
-			break;
-		case VK_F22:
-			str = _T("VK_F22");
-			break;
-		case VK_F23:
-			str = _T("VK_F23");
-			break;
-		case VK_F24:
-			str = _T("VK_F24");
-			break;
-		case VK_NUMLOCK:
-			str = _T("VK_NUMLOCK");
-			break;
-		case VK_SCROLL:
-			str = _T("VK_SCROLL");
-			break;
-			//	case VK_OEM_NEC_EQUAL: str = _T("VK_OEM_NEC_EQUAL"); break;
-		case VK_OEM_FJ_JISHO:
-			str = _T("VK_OEM_FJ_JISHO");
-			break;
-		case VK_OEM_FJ_MASSHOU:
-			str = _T("VK_OEM_FJ_MASSHOU");
-			break;
-		case VK_OEM_FJ_TOUROKU:
-			str = _T("VK_OEM_FJ_TOUROKU");
-			break;
-		case VK_OEM_FJ_LOYA:
-			str = _T("VK_OEM_FJ_LOYA");
-			break;
-		case VK_OEM_FJ_ROYA:
-			str = _T("VK_OEM_FJ_ROYA");
-			break;
-		case VK_LSHIFT:
-			str = _T("VK_LSHIFT");
-			break;
-		case VK_RSHIFT:
-			str = _T("VK_RSHIFT");
-			break;
-		case VK_LCONTROL:
-			str = _T("VK_LCONTROL");
-			break;
-		case VK_RCONTROL:
-			str = _T("VK_RCONTROL");
-			break;
-		case VK_LMENU:
-			str = _T("VK_LMENU");
-			break;
-		case VK_RMENU:
-			str = _T("VK_RMENU");
-			break;
-		case VK_BROWSER_BACK:
-			str = _T("VK_BROWSER_BACK");
-			break;
-		case VK_BROWSER_FORWARD:
-			str = _T("VK_BROWSER_FORWARD");
-			break;
-		case VK_BROWSER_REFRESH:
-			str = _T("VK_BROWSER_REFRESH");
-			break;
-		case VK_BROWSER_STOP:
-			str = _T("VK_BROWSER_STOP");
-			break;
-		case VK_BROWSER_SEARCH:
-			str = _T("VK_BROWSER_SEARCH");
-			break;
-		case VK_BROWSER_FAVORITES:
-			str = _T("VK_BROWSER_FAVORITES");
-			break;
-		case VK_BROWSER_HOME:
-			str = _T("VK_BROWSER_HOME");
-			break;
-		case VK_VOLUME_MUTE:
-			str = _T("VK_VOLUME_MUTE");
-			break;
-		case VK_VOLUME_DOWN:
-			str = _T("VK_VOLUME_DOWN");
-			break;
-		case VK_VOLUME_UP:
-			str = _T("VK_VOLUME_UP");
-			break;
-		case VK_MEDIA_NEXT_TRACK:
-			str = _T("VK_MEDIA_NEXT_TRACK");
-			break;
-		case VK_MEDIA_PREV_TRACK:
-			str = _T("VK_MEDIA_PREV_TRACK");
-			break;
-		case VK_MEDIA_STOP:
-			str = _T("VK_MEDIA_STOP");
-			break;
-		case VK_MEDIA_PLAY_PAUSE:
-			str = _T("VK_MEDIA_PLAY_PAUSE");
-			break;
-		case VK_LAUNCH_MAIL:
-			str = _T("VK_LAUNCH_MAIL");
-			break;
-		case VK_LAUNCH_MEDIA_SELECT:
-			str = _T("VK_LAUNCH_MEDIA_SELECT");
-			break;
-		case VK_LAUNCH_APP1:
-			str = _T("VK_LAUNCH_APP1");
-			break;
-		case VK_LAUNCH_APP2:
-			str = _T("VK_LAUNCH_APP2");
-			break;
-		case VK_OEM_1:
-			str = _T("VK_OEM_1");
-			break;
-		case VK_OEM_PLUS:
-			str = _T("VK_OEM_PLUS");
-			break;
-		case VK_OEM_COMMA:
-			str = _T("VK_OEM_COMMA");
-			break;
-		case VK_OEM_MINUS:
-			str = _T("VK_OEM_MINUS");
-			break;
-		case VK_OEM_PERIOD:
-			str = _T("VK_OEM_PERIOD");
-			break;
-		case VK_OEM_2:
-			str = _T("VK_OEM_2");
-			break;
-		case VK_OEM_3:
-			str = _T("VK_OEM_3");
-			break;
-		case VK_OEM_4:
-			str = _T("VK_OEM_4");
-			break;
-		case VK_OEM_5:
-			str = _T("VK_OEM_5");
-			break;
-		case VK_OEM_6:
-			str = _T("VK_OEM_6");
-			break;
-		case VK_OEM_7:
-			str = _T("VK_OEM_7");
-			break;
-		case VK_OEM_8:
-			str = _T("VK_OEM_8");
-			break;
-		case VK_OEM_AX:
-			str = _T("VK_OEM_AX");
-			break;
-		case VK_OEM_102:
-			str = _T("VK_OEM_102");
-			break;
-		case VK_ICO_HELP:
-			str = _T("VK_ICO_HELP");
-			break;
-		case VK_ICO_00:
-			str = _T("VK_ICO_00");
-			break;
-		case VK_PROCESSKEY:
-			str = _T("VK_PROCESSKEY");
-			break;
-		case VK_ICO_CLEAR:
-			str = _T("VK_ICO_CLEAR");
-			break;
-		case VK_PACKET:
-			str = _T("VK_PACKET");
-			break;
-		case VK_OEM_RESET:
-			str = _T("VK_OEM_RESET");
-			break;
-		case VK_OEM_JUMP:
-			str = _T("VK_OEM_JUMP");
-			break;
-		case VK_OEM_PA1:
-			str = _T("VK_OEM_PA1");
-			break;
-		case VK_OEM_PA2:
-			str = _T("VK_OEM_PA2");
-			break;
-		case VK_OEM_PA3:
-			str = _T("VK_OEM_PA3");
-			break;
-		case VK_OEM_WSCTRL:
-			str = _T("VK_OEM_WSCTRL");
-			break;
-		case VK_OEM_CUSEL:
-			str = _T("VK_OEM_CUSEL");
-			break;
-		case VK_OEM_ATTN:
-			str = _T("VK_OEM_ATTN");
-			break;
-		case VK_OEM_FINISH:
-			str = _T("VK_OEM_FINISH");
-			break;
-		case VK_OEM_COPY:
-			str = _T("VK_OEM_COPY");
-			break;
-		case VK_OEM_AUTO:
-			str = _T("VK_OEM_AUTO");
-			break;
-		case VK_OEM_ENLW:
-			str = _T("VK_OEM_ENLW");
-			break;
-		case VK_OEM_BACKTAB:
-			str = _T("VK_OEM_BACKTAB");
-			break;
-		case VK_ATTN:
-			str = _T("VK_ATTN");
-			break;
-		case VK_CRSEL:
-			str = _T("VK_CRSEL");
-			break;
-		case VK_EXSEL:
-			str = _T("VK_EXSEL");
-			break;
-		case VK_EREOF:
-			str = _T("VK_EREOF");
-			break;
-		case VK_PLAY:
-			str = _T("VK_PLAY");
-			break;
-		case VK_ZOOM:
-			str = _T("VK_ZOOM");
-			break;
-		case VK_NONAME:
-			str = _T("VK_NONAME");
-			break;
-		case VK_PA1:
-			str = _T("VK_PA1");
-			break;
-		case VK_OEM_CLEAR:
-			str = _T("VK_OEM_CLEAR");
-			break;
-		case 0x07:
-		case 0x0E:
-		case 0x0F:
-		case 0x16:
-		case 0x1A:
-		case 0x3A:
-		case 0x3B:
-		case 0x3C:
-		case 0x3D:
-		case 0x3E:
-		case 0x3F:
-		case 0x40:
-			str.Format(_T("Undefined (0x%02x)"), (TCHAR)key);
-			break;
-		case 0x0A:
-		case 0x0B:
-		case 0x5E:
-		case 0xB8:
-		case 0xB9:
-		case 0xC1:
-		case 0xC2:
-		case 0xC3:
-		case 0xC4:
-		case 0xC5:
-		case 0xC6:
-		case 0xC7:
-		case 0xC8:
-		case 0xC9:
-		case 0xCA:
-		case 0xCB:
-		case 0xCC:
-		case 0xCD:
-		case 0xCE:
-		case 0xCF:
-		case 0xD0:
-		case 0xD1:
-		case 0xD2:
-		case 0xD3:
-		case 0xD4:
-		case 0xD5:
-		case 0xD6:
-		case 0xD7:
-		case 0xE0:
-			str.Format(_T("Reserved (0x%02x)"), (TCHAR)key);
-			break;
-		case 0x88:
-		case 0x89:
-		case 0x8A:
-		case 0x8B:
-		case 0x8C:
-		case 0x8D:
-		case 0x8E:
-		case 0x8F:
-		case 0x97:
-		case 0x98:
-		case 0x99:
-		case 0x9A:
-		case 0x9B:
-		case 0x9C:
-		case 0x9D:
-		case 0x9E:
-		case 0x9F:
-		case 0xD8:
-		case 0xD9:
-		case 0xDA:
-		case 0xE8:
-			str.Format(_T("Unassigned (0x%02x)"), (TCHAR)key);
-			break;
-		case 0xFF:
-			str = _T("Multimedia keys");
-			break;
-		default:
-			//	if ('0' <= key && key <= '9' || 'A' <= key && key <= 'Z')
-			str.Format(_T("%c"), (TCHAR)key);
-			break;
-	}
-
 	return(str);
 }
 
@@ -773,7 +215,7 @@ CString CPPageAccelTbl::MakeAccelShortcutLabel(UINT id)
 		}
 	}
 
-	return(_T(""));
+	return(L"");
 }
 
 CString CPPageAccelTbl::MakeAccelShortcutLabel(ACCEL& a)
@@ -782,478 +224,166 @@ CString CPPageAccelTbl::MakeAccelShortcutLabel(ACCEL& a)
 	CString str;
 
 	switch (a.key) {
-		case VK_LBUTTON:
-			str = _T("LBtn");
-			break;
-		case VK_RBUTTON:
-			str = _T("RBtn");
-			break;
-		case VK_CANCEL:
-			str = _T("Cancel");
-			break;
-		case VK_MBUTTON:
-			str = _T("MBtn");
-			break;
-		case VK_XBUTTON1:
-			str = _T("X1Btn");
-			break;
-		case VK_XBUTTON2:
-			str = _T("X2Btn");
-			break;
-		case VK_BACK:
-			str = _T("Back");
-			break;
-		case VK_TAB:
-			str = _T("Tab");
-			break;
-		case VK_CLEAR:
-			str = _T("Clear");
-			break;
-		case VK_RETURN:
-			str = _T("Enter");
-			break;
-		case VK_SHIFT:
-			str = _T("Shift");
-			break;
-		case VK_CONTROL:
-			str = _T("Ctrl");
-			break;
-		case VK_MENU:
-			str = _T("Alt");
-			break;
-		case VK_PAUSE:
-			str = _T("Pause");
-			break;
-		case VK_CAPITAL:
-			str = _T("Capital");
-			break;
-			//	case VK_KANA: str = _T("Kana"); break;
-			//	case VK_HANGEUL: str = _T("Hangeul"); break;
-		case VK_HANGUL:
-			str = _T("Hangul");
-			break;
-		case VK_JUNJA:
-			str = _T("Junja");
-			break;
-		case VK_FINAL:
-			str = _T("Final");
-			break;
-			//	case VK_HANJA: str = _T("Hanja"); break;
-		case VK_KANJI:
-			str = _T("Kanji");
-			break;
-		case VK_ESCAPE:
-			str = _T("Escape");
-			break;
-		case VK_CONVERT:
-			str = _T("Convert");
-			break;
-		case VK_NONCONVERT:
-			str = _T("Non Convert");
-			break;
-		case VK_ACCEPT:
-			str = _T("Accept");
-			break;
-		case VK_MODECHANGE:
-			str = _T("Mode Change");
-			break;
-		case VK_SPACE:
-			str = _T("Space");
-			break;
-		case VK_PRIOR:
-			str = _T("PgUp");
-			break;
-		case VK_NEXT:
-			str = _T("PgDn");
-			break;
-		case VK_END:
-			str = _T("End");
-			break;
-		case VK_HOME:
-			str = _T("Home");
-			break;
-		case VK_LEFT:
-			str = _T("Left");
-			break;
-		case VK_UP:
-			str = _T("Up");
-			break;
-		case VK_RIGHT:
-			str = _T("Right");
-			break;
-		case VK_DOWN:
-			str = _T("Down");
-			break;
-		case VK_SELECT:
-			str = _T("Select");
-			break;
-		case VK_PRINT:
-			str = _T("Print");
-			break;
-		case VK_EXECUTE:
-			str = _T("Execute");
-			break;
-		case VK_SNAPSHOT:
-			str = _T("Snapshot");
-			break;
-		case VK_INSERT:
-			str = _T("Insert");
-			break;
-		case VK_DELETE:
-			str = _T("Delete");
-			break;
-		case VK_HELP:
-			str = _T("Help");
-			break;
-		case VK_LWIN:
-			str = _T("LWin");
-			break;
-		case VK_RWIN:
-			str = _T("RWin");
-			break;
-		case VK_APPS:
-			str = _T("Apps");
-			break;
-		case VK_SLEEP:
-			str = _T("Sleep");
-			break;
-		case VK_NUMPAD0:
-			str = _T("Numpad 0");
-			break;
-		case VK_NUMPAD1:
-			str = _T("Numpad 1");
-			break;
-		case VK_NUMPAD2:
-			str = _T("Numpad 2");
-			break;
-		case VK_NUMPAD3:
-			str = _T("Numpad 3");
-			break;
-		case VK_NUMPAD4:
-			str = _T("Numpad 4");
-			break;
-		case VK_NUMPAD5:
-			str = _T("Numpad 5");
-			break;
-		case VK_NUMPAD6:
-			str = _T("Numpad 6");
-			break;
-		case VK_NUMPAD7:
-			str = _T("Numpad 7");
-			break;
-		case VK_NUMPAD8:
-			str = _T("Numpad 8");
-			break;
-		case VK_NUMPAD9:
-			str = _T("Numpad 9");
-			break;
-		case VK_MULTIPLY:
-			str = _T("Multiply");
-			break;
-		case VK_ADD:
-			str = _T("Add");
-			break;
-		case VK_SEPARATOR:
-			str = _T("Separator");
-			break;
-		case VK_SUBTRACT:
-			str = _T("Subtract");
-			break;
-		case VK_DECIMAL:
-			str = _T("Decimal");
-			break;
-		case VK_DIVIDE:
-			str = _T("Divide");
-			break;
-		case VK_F1:
-			str = _T("F1");
-			break;
-		case VK_F2:
-			str = _T("F2");
-			break;
-		case VK_F3:
-			str = _T("F3");
-			break;
-		case VK_F4:
-			str = _T("F4");
-			break;
-		case VK_F5:
-			str = _T("F5");
-			break;
-		case VK_F6:
-			str = _T("F6");
-			break;
-		case VK_F7:
-			str = _T("F7");
-			break;
-		case VK_F8:
-			str = _T("F8");
-			break;
-		case VK_F9:
-			str = _T("F9");
-			break;
-		case VK_F10:
-			str = _T("F10");
-			break;
-		case VK_F11:
-			str = _T("F11");
-			break;
-		case VK_F12:
-			str = _T("F12");
-			break;
-		case VK_F13:
-			str = _T("F13");
-			break;
-		case VK_F14:
-			str = _T("F14");
-			break;
-		case VK_F15:
-			str = _T("F15");
-			break;
-		case VK_F16:
-			str = _T("F16");
-			break;
-		case VK_F17:
-			str = _T("F17");
-			break;
-		case VK_F18:
-			str = _T("F18");
-			break;
-		case VK_F19:
-			str = _T("F19");
-			break;
-		case VK_F20:
-			str = _T("F20");
-			break;
-		case VK_F21:
-			str = _T("F21");
-			break;
-		case VK_F22:
-			str = _T("F22");
-			break;
-		case VK_F23:
-			str = _T("F23");
-			break;
-		case VK_F24:
-			str = _T("F24");
-			break;
-		case VK_NUMLOCK:
-			str = _T("Numlock");
-			break;
-		case VK_SCROLL:
-			str = _T("Scroll");
-			break;
-			//	case VK_OEM_NEC_EQUAL: str = _T("OEM NEC Equal"); break;
-		case VK_OEM_FJ_JISHO:
-			str = _T("OEM FJ Jisho");
-			break;
-		case VK_OEM_FJ_MASSHOU:
-			str = _T("OEM FJ Msshou");
-			break;
-		case VK_OEM_FJ_TOUROKU:
-			str = _T("OEM FJ Touroku");
-			break;
-		case VK_OEM_FJ_LOYA:
-			str = _T("OEM FJ Loya");
-			break;
-		case VK_OEM_FJ_ROYA:
-			str = _T("OEM FJ Roya");
-			break;
-		case VK_LSHIFT:
-			str = _T("LShift");
-			break;
-		case VK_RSHIFT:
-			str = _T("RShift");
-			break;
-		case VK_LCONTROL:
-			str = _T("LCtrl");
-			break;
-		case VK_RCONTROL:
-			str = _T("RCtrl");
-			break;
-		case VK_LMENU:
-			str = _T("LAlt");
-			break;
-		case VK_RMENU:
-			str = _T("RAlt");
-			break;
-		case VK_BROWSER_BACK:
-			str = _T("Browser Back");
-			break;
-		case VK_BROWSER_FORWARD:
-			str = _T("Browser Forward");
-			break;
-		case VK_BROWSER_REFRESH:
-			str = _T("Browser Refresh");
-			break;
-		case VK_BROWSER_STOP:
-			str = _T("Browser Stop");
-			break;
-		case VK_BROWSER_SEARCH:
-			str = _T("Browser Search");
-			break;
-		case VK_BROWSER_FAVORITES:
-			str = _T("Browser Favorites");
-			break;
-		case VK_BROWSER_HOME:
-			str = _T("Browser Home");
-			break;
-		case VK_VOLUME_MUTE:
-			str = _T("Volume Mute");
-			break;
-		case VK_VOLUME_DOWN:
-			str = _T("Volume Down");
-			break;
-		case VK_VOLUME_UP:
-			str = _T("Volume Up");
-			break;
-		case VK_MEDIA_NEXT_TRACK:
-			str = _T("Media Next Track");
-			break;
-		case VK_MEDIA_PREV_TRACK:
-			str = _T("Media Prev Track");
-			break;
-		case VK_MEDIA_STOP:
-			str = _T("Media Stop");
-			break;
-		case VK_MEDIA_PLAY_PAUSE:
-			str = _T("Media Play/Pause");
-			break;
-		case VK_LAUNCH_MAIL:
-			str = _T("Launch Mail");
-			break;
-		case VK_LAUNCH_MEDIA_SELECT:
-			str = _T("Launch Media Select");
-			break;
-		case VK_LAUNCH_APP1:
-			str = _T("Launch App1");
-			break;
-		case VK_LAUNCH_APP2:
-			str = _T("Launch App2");
-			break;
-		case VK_OEM_1:
-			str = _T("OEM 1");
-			break;
-		case VK_OEM_PLUS:
-			str = _T("Plus");
-			break;
-		case VK_OEM_COMMA:
-			str = _T("Comma");
-			break;
-		case VK_OEM_MINUS:
-			str = _T("Minus");
-			break;
-		case VK_OEM_PERIOD:
-			str = _T("Period");
-			break;
-		case VK_OEM_2:
-			str = _T("OEM 2");
-			break;
-		case VK_OEM_3:
-			str = _T("OEM 3");
-			break;
-		case VK_OEM_4:
-			str = _T("OEM 4");
-			break;
-		case VK_OEM_5:
-			str = _T("OEM 5");
-			break;
-		case VK_OEM_6:
-			str = _T("OEM 6");
-			break;
-		case VK_OEM_7:
-			str = _T("OEM 7");
-			break;
-		case VK_OEM_8:
-			str = _T("OEM 8");
-			break;
-		case VK_OEM_AX:
-			str = _T("OEM AX");
-			break;
-		case VK_OEM_102:
-			str = _T("OEM 102");
-			break;
-		case VK_ICO_HELP:
-			str = _T("ICO Help");
-			break;
-		case VK_ICO_00:
-			str = _T("ICO 00");
-			break;
-		case VK_PROCESSKEY:
-			str = _T("Process Key");
-			break;
-		case VK_ICO_CLEAR:
-			str = _T("ICO Clear");
-			break;
-		case VK_PACKET:
-			str = _T("Packet");
-			break;
-		case VK_OEM_RESET:
-			str = _T("OEM Reset");
-			break;
-		case VK_OEM_JUMP:
-			str = _T("OEM Jump");
-			break;
-		case VK_OEM_PA1:
-			str = _T("OEM PA1");
-			break;
-		case VK_OEM_PA2:
-			str = _T("OEM PA2");
-			break;
-		case VK_OEM_PA3:
-			str = _T("OEM PA3");
-			break;
-		case VK_OEM_WSCTRL:
-			str = _T("OEM WSCtrl");
-			break;
-		case VK_OEM_CUSEL:
-			str = _T("OEM CUSEL");
-			break;
-		case VK_OEM_ATTN:
-			str = _T("OEM ATTN");
-			break;
-		case VK_OEM_FINISH:
-			str = _T("OEM Finish");
-			break;
-		case VK_OEM_COPY:
-			str = _T("OEM Copy");
-			break;
-		case VK_OEM_AUTO:
-			str = _T("OEM Auto");
-			break;
-		case VK_OEM_ENLW:
-			str = _T("OEM ENLW");
-			break;
-		case VK_OEM_BACKTAB:
-			str = _T("OEM Backtab");
-			break;
-		case VK_ATTN:
-			str = _T("ATTN");
-			break;
-		case VK_CRSEL:
-			str = _T("CRSEL");
-			break;
-		case VK_EXSEL:
-			str = _T("EXSEL");
-			break;
-		case VK_EREOF:
-			str = _T("EREOF");
-			break;
-		case VK_PLAY:
-			str = _T("Play");
-			break;
-		case VK_ZOOM:
-			str = _T("Zoom");
-			break;
-		case VK_NONAME:
-			str = _T("Noname");
-			break;
-		case VK_PA1:
-			str = _T("PA1");
-			break;
-		case VK_OEM_CLEAR:
-			str = _T("OEM Clear");
-			break;
+		case VK_LBUTTON:    str = L"LBtn";        break;
+		case VK_RBUTTON:    str = L"RBtn";        break;
+		case VK_CANCEL:     str = L"Cancel";      break;
+		case VK_MBUTTON:    str = L"MBtn";        break;
+		case VK_XBUTTON1:   str = L"X1Btn";       break;
+		case VK_XBUTTON2:   str = L"X2Btn";       break;
+		case VK_BACK:       str = L"Back";        break;
+		case VK_TAB:        str = L"Tab";         break;
+		case VK_CLEAR:      str = L"Clear";       break;
+		case VK_RETURN:     str = L"Enter";       break;
+		case VK_SHIFT:      str = L"Shift";       break;
+		case VK_CONTROL:    str = L"Ctrl";        break;
+		case VK_MENU:       str = L"Alt";         break;
+		case VK_PAUSE:      str = L"Pause";       break;
+		case VK_CAPITAL:    str = L"Capital";     break;
+		//case VK_KANA:     str = L"Kana";        break;
+		//case VK_HANGEUL:  str = L"Hangeul";     break;
+		case VK_HANGUL:     str = L"Hangul";      break;
+		case VK_JUNJA:      str = L"Junja";       break;
+		case VK_FINAL:      str = L"Final";       break;
+		//case VK_HANJA:    str = L"Hanja";       break;
+		case VK_KANJI:      str = L"Kanji";       break;
+		case VK_ESCAPE:     str = L"Escape";      break;
+		case VK_CONVERT:    str = L"Convert";     break;
+		case VK_NONCONVERT: str = L"Non Convert"; break;
+		case VK_ACCEPT:     str = L"Accept";      break;
+		case VK_MODECHANGE: str = L"Mode Change"; break;
+		case VK_SPACE:      str = L"Space";       break;
+		case VK_PRIOR:      str = L"PgUp";        break;
+		case VK_NEXT:       str = L"PgDn";        break;
+		case VK_END:        str = L"End";         break;
+		case VK_HOME:       str = L"Home";        break;
+		case VK_LEFT:       str = L"Left";        break;
+		case VK_UP:         str = L"Up";          break;
+		case VK_RIGHT:      str = L"Right";       break;
+		case VK_DOWN:       str = L"Down";        break;
+		case VK_SELECT:     str = L"Select";      break;
+		case VK_PRINT:      str = L"Print";       break;
+		case VK_EXECUTE:    str = L"Execute";     break;
+		case VK_SNAPSHOT:   str = L"Snapshot";    break;
+		case VK_INSERT:     str = L"Insert";      break;
+		case VK_DELETE:     str = L"Delete";      break;
+		case VK_HELP:       str = L"Help";        break;
+		case VK_LWIN:       str = L"LWin";        break;
+		case VK_RWIN:       str = L"RWin";        break;
+		case VK_APPS:       str = L"Apps";        break;
+		case VK_SLEEP:      str = L"Sleep";       break;
+		case VK_NUMPAD0:    str = L"Numpad 0";    break;
+		case VK_NUMPAD1:    str = L"Numpad 1";    break;
+		case VK_NUMPAD2:    str = L"Numpad 2";    break;
+		case VK_NUMPAD3:    str = L"Numpad 3";    break;
+		case VK_NUMPAD4:    str = L"Numpad 4";    break;
+		case VK_NUMPAD5:    str = L"Numpad 5";    break;
+		case VK_NUMPAD6:    str = L"Numpad 6";    break;
+		case VK_NUMPAD7:    str = L"Numpad 7";    break;
+		case VK_NUMPAD8:    str = L"Numpad 8";    break;
+		case VK_NUMPAD9:    str = L"Numpad 9";    break;
+		case VK_MULTIPLY:   str = L"Multiply";    break;
+		case VK_ADD:        str = L"Add";         break;
+		case VK_SEPARATOR:  str = L"Separator";   break;
+		case VK_SUBTRACT:   str = L"Subtract";    break;
+		case VK_DECIMAL:    str = L"Decimal";     break;
+		case VK_DIVIDE:     str = L"Divide";      break;
+		case VK_F1:         str = L"F1";          break;
+		case VK_F2:         str = L"F2";          break;
+		case VK_F3:         str = L"F3";          break;
+		case VK_F4:         str = L"F4";          break;
+		case VK_F5:         str = L"F5";          break;
+		case VK_F6:         str = L"F6";          break;
+		case VK_F7:         str = L"F7";          break;
+		case VK_F8:         str = L"F8";          break;
+		case VK_F9:         str = L"F9";          break;
+		case VK_F10:        str = L"F10";         break;
+		case VK_F11:        str = L"F11";         break;
+		case VK_F12:        str = L"F12";         break;
+		case VK_F13:        str = L"F13";         break;
+		case VK_F14:        str = L"F14";         break;
+		case VK_F15:        str = L"F15";         break;
+		case VK_F16:        str = L"F16";         break;
+		case VK_F17:        str = L"F17";         break;
+		case VK_F18:        str = L"F18";         break;
+		case VK_F19:        str = L"F19";         break;
+		case VK_F20:        str = L"F20";         break;
+		case VK_F21:        str = L"F21";         break;
+		case VK_F22:        str = L"F22";         break;
+		case VK_F23:        str = L"F23";         break;
+		case VK_F24:        str = L"F24";         break;
+		case VK_NUMLOCK:    str = L"Numlock";     break;
+		case VK_SCROLL:     str = L"Scroll";      break;
+		//case VK_OEM_NEC_EQUAL:    str = L"OEM NEC Equal";     break;
+		case VK_OEM_FJ_JISHO:       str = L"OEM FJ Jisho";      break;
+		case VK_OEM_FJ_MASSHOU:     str = L"OEM FJ Msshou";     break;
+		case VK_OEM_FJ_TOUROKU:     str = L"OEM FJ Touroku";    break;
+		case VK_OEM_FJ_LOYA:        str = L"OEM FJ Loya";       break;
+		case VK_OEM_FJ_ROYA:        str = L"OEM FJ Roya";       break;
+		case VK_LSHIFT:             str = L"LShift";            break;
+		case VK_RSHIFT:             str = L"RShift";            break;
+		case VK_LCONTROL:           str = L"LCtrl";             break;
+		case VK_RCONTROL:           str = L"RCtrl";             break;
+		case VK_LMENU:              str = L"LAlt";              break;
+		case VK_RMENU:              str = L"RAlt";              break;
+		case VK_BROWSER_BACK:       str = L"Browser Back";      break;
+		case VK_BROWSER_FORWARD:    str = L"Browser Forward";   break;
+		case VK_BROWSER_REFRESH:    str = L"Browser Refresh";   break;
+		case VK_BROWSER_STOP:       str = L"Browser Stop";      break;
+		case VK_BROWSER_SEARCH:     str = L"Browser Search";    break;
+		case VK_BROWSER_FAVORITES:  str = L"Browser Favorites"; break;
+		case VK_BROWSER_HOME:       str = L"Browser Home";      break;
+		case VK_VOLUME_MUTE:        str = L"Volume Mute";       break;
+		case VK_VOLUME_DOWN:        str = L"Volume Down";       break;
+		case VK_VOLUME_UP:          str = L"Volume Up";         break;
+		case VK_MEDIA_NEXT_TRACK:   str = L"Media Next Track";  break;
+		case VK_MEDIA_PREV_TRACK:   str = L"Media Prev Track";  break;
+		case VK_MEDIA_STOP:         str = L"Media Stop";        break;
+		case VK_MEDIA_PLAY_PAUSE:   str = L"Media Play/Pause";  break;
+		case VK_LAUNCH_MAIL:        str = L"Launch Mail";       break;
+		case VK_LAUNCH_MEDIA_SELECT:str = L"Launch Media Select"; break;
+		case VK_LAUNCH_APP1:        str = L"Launch App1";       break;
+		case VK_LAUNCH_APP2:        str = L"Launch App2";       break;
+		case VK_OEM_1:      str = L"OEM 1";       break;
+		case VK_OEM_PLUS:   str = L"Plus";        break;
+		case VK_OEM_COMMA:  str = L"Comma";       break;
+		case VK_OEM_MINUS:  str = L"Minus";       break;
+		case VK_OEM_PERIOD: str = L"Period";      break;
+		case VK_OEM_2:      str = L"OEM 2";       break;
+		case VK_OEM_3:      str = L"OEM 3";       break;
+		case VK_OEM_4:      str = L"OEM 4";       break;
+		case VK_OEM_5:      str = L"OEM 5";       break;
+		case VK_OEM_6:      str = L"OEM 6";       break;
+		case VK_OEM_7:      str = L"OEM 7";       break;
+		case VK_OEM_8:      str = L"OEM 8";       break;
+		case VK_OEM_AX:     str = L"OEM AX";      break;
+		case VK_OEM_102:    str = L"OEM 102";     break;
+		case VK_ICO_HELP:   str = L"ICO Help";    break;
+		case VK_ICO_00:     str = L"ICO 00";      break;
+		case VK_PROCESSKEY: str = L"Process Key"; break;
+		case VK_ICO_CLEAR:  str = L"ICO Clear";   break;
+		case VK_PACKET:     str = L"Packet";      break;
+		case VK_OEM_RESET:  str = L"OEM Reset";   break;
+		case VK_OEM_JUMP:   str = L"OEM Jump";    break;
+		case VK_OEM_PA1:    str = L"OEM PA1";     break;
+		case VK_OEM_PA2:    str = L"OEM PA2";     break;
+		case VK_OEM_PA3:    str = L"OEM PA3";     break;
+		case VK_OEM_WSCTRL: str = L"OEM WSCtrl";  break;
+		case VK_OEM_CUSEL:  str = L"OEM CUSEL";   break;
+		case VK_OEM_ATTN:   str = L"OEM ATTN";    break;
+		case VK_OEM_FINISH: str = L"OEM Finish";  break;
+		case VK_OEM_COPY:   str = L"OEM Copy";    break;
+		case VK_OEM_AUTO:   str = L"OEM Auto";    break;
+		case VK_OEM_ENLW:   str = L"OEM ENLW";    break;
+		case VK_OEM_BACKTAB:str = L"OEM Backtab"; break;
+		case VK_ATTN:       str = L"ATTN";        break;
+		case VK_CRSEL:      str = L"CRSEL";       break;
+		case VK_EXSEL:      str = L"EXSEL";       break;
+		case VK_EREOF:      str = L"EREOF";       break;
+		case VK_PLAY:       str = L"Play";        break;
+		case VK_ZOOM:       str = L"Zoom";        break;
+		case VK_NONAME:     str = L"Noname";      break;
+		case VK_PA1:        str = L"PA1";         break;
+		case VK_OEM_CLEAR:  str = L"OEM Clear";   break;
 		case 0x07:
 		case 0x0E:
 		case 0x0F:
@@ -1266,7 +396,7 @@ CString CPPageAccelTbl::MakeAccelShortcutLabel(ACCEL& a)
 		case 0x3E:
 		case 0x3F:
 		case 0x40:
-			str.Format(_T("Undefined (0x%02x)"), (TCHAR)a.key);
+			str.Format(L"Undefined (0x%02x)", (WCHAR)a.key);
 			break;
 		case 0x0A:
 		case 0x0B:
@@ -1297,7 +427,7 @@ CString CPPageAccelTbl::MakeAccelShortcutLabel(ACCEL& a)
 		case 0xD6:
 		case 0xD7:
 		case 0xE0:
-			str.Format(_T("Reserved (0x%02x)"), (TCHAR)a.key);
+			str.Format(L"Reserved (0x%02x)", (WCHAR)a.key);
 			break;
 		case 0x88:
 		case 0x89:
@@ -1320,22 +450,22 @@ CString CPPageAccelTbl::MakeAccelShortcutLabel(ACCEL& a)
 		case 0xD9:
 		case 0xDA:
 		case 0xE8:
-			str.Format(_T("Unassigned (0x%02x)"), (TCHAR)a.key);
+			str.Format(L"Unassigned (0x%02x)", (WCHAR)a.key);
 			break;
 		case 0xFF:
-			str = _T("Multimedia keys");
+			str = L"Multimedia keys";
 			break;
 		default:
 			//	if ('0' <= a.key && a.key <= '9' || 'A' <= a.key && a.key <= 'Z')
-			str.Format(_T("%c"), (TCHAR)a.key);
+			str.Format(L"%c", (WCHAR)a.key);
 			break;
 	}
 
 	if (a.fVirt&(FCONTROL|FALT|FSHIFT)) {
-		str = MakeAccelModLabel(a.fVirt) + _T(" + ") + str;
+		str = MakeAccelModLabel(a.fVirt) + L" + " + str;
 	}
 
-	str.Replace(_T(" + "), _T("+"));
+	str.Replace(L" + ", L"+");
 
 	return(str);
 }
@@ -1348,57 +478,23 @@ CString CPPageAccelTbl::MakeMouseButtonLabel(UINT mouse)
 		default:
 			ret = ResStr(IDS_AG_NONE);
 			break;
-		case wmcmd::LDOWN:
-			ret = _T("Left Down");
-			break;
-		case wmcmd::LUP:
-			ret = _T("Left Up");
-			break;
-		case wmcmd::LDBLCLK:
-			ret = _T("Left DblClk");
-			break;
-		case wmcmd::MDOWN:
-			ret = _T("Middle Down");
-			break;
-		case wmcmd::MUP:
-			ret = _T("Middle Up");
-			break;
-		case wmcmd::MDBLCLK:
-			ret = _T("Middle DblClk");
-			break;
-		case wmcmd::RDOWN:
-			ret = _T("Right Down");
-			break;
-		case wmcmd::RUP:
-			ret = _T("Right Up");
-			break;
-		case wmcmd::RDBLCLK:
-			ret = _T("Right DblClk");
-			break;
-		case wmcmd::X1DOWN:
-			ret = _T("X1 Down");
-			break;
-		case wmcmd::X1UP:
-			ret = _T("X1 Up");
-			break;
-		case wmcmd::X1DBLCLK:
-			ret = _T("X1 DblClk");
-			break;
-		case wmcmd::X2DOWN:
-			ret = _T("X2 Down");
-			break;
-		case wmcmd::X2UP:
-			ret = _T("X2 Up");
-			break;
-		case wmcmd::X2DBLCLK:
-			ret = _T("X2 DblClk");
-			break;
-		case wmcmd::WUP:
-			ret = _T("Wheel Up");
-			break;
-		case wmcmd::WDOWN:
-			ret = _T("Wheel Down");
-			break;
+		case wmcmd::LDOWN:    ret = L"Left Down";     break;
+		case wmcmd::LUP:      ret = L"Left Up";       break;
+		case wmcmd::LDBLCLK:  ret = L"Left DblClk";   break;
+		case wmcmd::MDOWN:    ret = L"Middle Down";   break;
+		case wmcmd::MUP:      ret = L"Middle Up";     break;
+		case wmcmd::MDBLCLK:  ret = L"Middle DblClk"; break;
+		case wmcmd::RDOWN:    ret = L"Right Down";    break;
+		case wmcmd::RUP:      ret = L"Right Up";      break;
+		case wmcmd::RDBLCLK:  ret = L"Right DblClk";  break;
+		case wmcmd::X1DOWN:   ret = L"X1 Down";       break;
+		case wmcmd::X1UP:     ret = L"X1 Up";         break;
+		case wmcmd::X1DBLCLK: ret = L"X1 DblClk";     break;
+		case wmcmd::X2DOWN:   ret = L"X2 Down";       break;
+		case wmcmd::X2UP:     ret = L"X2 Up";         break;
+		case wmcmd::X2DBLCLK: ret = L"X2 DblClk";     break;
+		case wmcmd::WUP:      ret = L"Wheel Up";      break;
+		case wmcmd::WDOWN:    ret = L"Wheel Down";    break;
 	}
 	return ret;
 }
@@ -1491,12 +587,12 @@ BOOL CPPageAccelTbl::OnInitDialog()
 
 	m_list.InsertColumn(COL_CMD, ResStr(IDS_AG_COMMAND), LVCFMT_LEFT, s.AccelTblColWidth.cmd);
 	m_list.InsertColumn(COL_KEY, ResStr(IDS_AG_KEY), LVCFMT_LEFT, s.AccelTblColWidth.key);
-	m_list.InsertColumn(COL_ID, _T("ID"), LVCFMT_LEFT, s.AccelTblColWidth.id);
+	m_list.InsertColumn(COL_ID, L"ID", LVCFMT_LEFT, s.AccelTblColWidth.id);
 	m_list.InsertColumn(COL_MOUSE, ResStr(IDS_AG_MOUSE), LVCFMT_LEFT, s.AccelTblColWidth.mwnd);
 	m_list.InsertColumn(COL_MOUSE_FS, ResStr(IDS_AG_MOUSE_FS), LVCFMT_LEFT, s.AccelTblColWidth.mfs);
 	m_list.InsertColumn(COL_APPCMD, ResStr(IDS_AG_APP_COMMAND), LVCFMT_LEFT, s.AccelTblColWidth.appcmd);
-	m_list.InsertColumn(COL_RMCMD, _T("RemoteCmd"), LVCFMT_LEFT, s.AccelTblColWidth.remcmd);
-	m_list.InsertColumn(COL_RMREPCNT, _T("RepCnt"), LVCFMT_CENTER, s.AccelTblColWidth.repcnt);
+	m_list.InsertColumn(COL_RMCMD, L"RemoteCmd", LVCFMT_LEFT, s.AccelTblColWidth.remcmd);
+	m_list.InsertColumn(COL_RMREPCNT, L"RepCnt", LVCFMT_CENTER, s.AccelTblColWidth.repcnt);
 
 	POSITION pos = m_wmcmds.GetHeadPosition();
 	for (int i = 0; pos; i++) {
@@ -1762,7 +858,7 @@ void CPPageAccelTbl::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		case COL_RMREPCNT:
 			CString str = CString(pItem->pszText).Trim();
 			wc.rmrepcnt = _tcstol(str, NULL, 10);
-			str.Format(_T("%d"), wc.rmrepcnt);
+			str.Format(L"%d", wc.rmrepcnt);
 			m_list.SetItemText(pItem->iItem, pItem->iSubItem, str);
 			*pResult = TRUE;
 			break;

@@ -47,7 +47,6 @@ public:
 	virtual ~CPPageAccelTbl();
 
 	static CString MakeAccelModLabel(BYTE fVirt);
-	static CString MakeAccelVkeyLabel(WORD key, bool fVirtKey);
 	static CString MakeAccelShortcutLabel(UINT id);
 	static CString MakeAccelShortcutLabel(ACCEL& a);
 	static CString MakeMouseButtonLabel(UINT mouse);
