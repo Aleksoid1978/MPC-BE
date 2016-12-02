@@ -317,7 +317,6 @@ namespace GothSync
 		double GetDisplayCycle(); // Get the best estimate of the display cycle time in milliseconds
 		double GetCycleDifference(); // Get the difference in video and display cycle times.
 		void EstimateRefreshTimings(); // Estimate the times for one scan line and one frame respectively from the actual refresh data
-		bool ExtractInterlaced(const AM_MEDIA_TYPE* pmt);
 
 		CFocusThread* m_FocusThread;
 	public:

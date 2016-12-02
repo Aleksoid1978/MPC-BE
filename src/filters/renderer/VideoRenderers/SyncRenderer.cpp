@@ -2053,21 +2053,6 @@ void CBaseAP::EstimateRefreshTimings()
 	}
 }
 
-bool CBaseAP::ExtractInterlaced(const AM_MEDIA_TYPE* pmt)
-{
-	if (pmt->formattype==FORMAT_VideoInfo) {
-		return false;
-	} else if (pmt->formattype==FORMAT_VideoInfo2) {
-		return (((VIDEOINFOHEADER2*)pmt->pbFormat)->dwInterlaceFlags & AMINTERLACE_IsInterlaced) != 0;
-	} else if (pmt->formattype==FORMAT_MPEGVideo) {
-		return false;
-	} else if (pmt->formattype==FORMAT_MPEG2Video) {
-		return (((MPEG2VIDEOINFO*)pmt->pbFormat)->hdr.dwInterlaceFlags & AMINTERLACE_IsInterlaced) != 0;
-	} else {
-		return false;
-	}
-}
-
 STDMETHODIMP CBaseAP::GetDIB(BYTE* lpDib, DWORD* size)
 {
 	CheckPointer(size, E_POINTER);
