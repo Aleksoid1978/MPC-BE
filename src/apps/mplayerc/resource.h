@@ -1348,6 +1348,8 @@
 #define IDS_MFMT_SPEEX                  39524
 #define IDS_MFMT_MLP                    39525
 #define IDS_MFMT_DVDAUDIO               39526
+#define IDS_MFMT_DSD                    39527
+
 // playlists
 #define IDS_MFMT_PLS                    39901
 #define IDS_MFMT_BDPLS                  39902

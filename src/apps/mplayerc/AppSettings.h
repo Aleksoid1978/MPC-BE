@@ -130,12 +130,12 @@ enum MCE_RAW_INPUT {
 	MCE_MEDIA_PREVIOUSTRACK	= 0x0100B6,
 };
 
-#define AUDRNDT_NULL_COMP _T("Null Audio Renderer (Any)")
-#define AUDRNDT_NULL_UNCOMP _T("Null Audio Renderer (Uncompressed)")
-#define AUDRNDT_MPC _T("MPC Audio Renderer")
+#define AUDRNDT_NULL_COMP   L"Null Audio Renderer (Any)"
+#define AUDRNDT_NULL_UNCOMP L"Null Audio Renderer (Uncompressed)"
+#define AUDRNDT_MPC         L"MPC Audio Renderer"
 
-#define DEFAULT_AUDIO_PATHS    _T(".;.\\audio;.\\fandub")
-#define DEFAULT_SUBTITLE_PATHS _T(".;.\\subtitles;.\\subs;.\\sub")
+#define DEFAULT_AUDIO_PATHS    L".;.\\audio;.\\fandub"
+#define DEFAULT_SUBTITLE_PATHS L".;.\\subtitles;.\\subs;.\\sub"
 #define DEFAULT_JUMPDISTANCE_1  1000
 #define DEFAULT_JUMPDISTANCE_2  5000
 #define DEFAULT_JUMPDISTANCE_3 20000

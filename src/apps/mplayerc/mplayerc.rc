@@ -7,7 +7,8 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include "afxres.h"
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -2993,6 +2994,7 @@ BEGIN
     IDS_MFMT_AU                 "AU/SND"
     IDS_MFMT_CDA                "Audio CD track"
     IDS_MFMT_DVDAUDIO           "DVD-Audio"
+    IDS_MFMT_DSD                "DSD"
     IDS_MFMT_FLAC               "FLAC"
     IDS_MFMT_M4A                "MPEG-4 Audio"
     IDS_MFMT_MIDI               "MIDI"

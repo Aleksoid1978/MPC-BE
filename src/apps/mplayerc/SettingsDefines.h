@@ -31,6 +31,8 @@
 #define IDS_R_FAVORITES						L"Favorites"
 #define IDS_R_SHADERS						L"Shaders"
 #define IDS_R_RECENTFILES					L"RecentFiles"
+#define IDS_R_FILEFORMATS					L"FileFormats"
+#define IDS_R_PNSPRESETS					L"Settings\\PnSPresets"
 
 #define IDS_RS_FAV_REMEMBERPOS				L"RememberPosition"
 #define IDS_RS_FAV_RELATIVEDRIVE			L"RelativeDrive"
@@ -144,7 +146,6 @@
 #define IDS_RS_AUDIOWINDOWMODE				L"AudioWindowMode"
 #define IDS_RS_ADDSIMILARFILES				L"AddSimilarFiles"
 #define IDS_RS_ENABLEWORKERTHREADFOROPENING	L"EnableWorkerThreadForOpening"
-#define IDS_RS_PNSPRESETS					L"PnSPresets"
 #define IDS_RS_AUTOLOADAUDIO				L"AutoloadAudio"
 #define IDS_RS_PRIORITIZEEXTERNALAUDIO		L"PrioritizeExternalAudio"
 #define IDS_RS_AUDIOPATHS					L"AudioPaths"
