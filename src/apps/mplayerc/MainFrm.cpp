@@ -4200,7 +4200,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	if (CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), m_pGB)) {
 		const BOOL bMvcActive = pVDF->GetMvcActive();
-		if (bMvcActive && s.iStereo3DMode == 0) {
+		if (bMvcActive && s.iStereo3DMode == 0 && !m_pBFmadVR) {
 			GetRenderersData()->m_iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
 		}
 	}
@@ -7366,7 +7366,7 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 		bMvcActive = pVDF->GetMvcActive();
 	}
 
-	if (nID == ID_STEREO3D_ROW_INTERLEAVED || (nID == ID_STEREO3D_AUTO && bMvcActive)) {
+	if (nID == ID_STEREO3D_ROW_INTERLEAVED || (nID == ID_STEREO3D_AUTO && bMvcActive && !m_pBFmadVR)) {
 		GetRenderersData()->m_iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
 	} else {
 		GetRenderersData()->m_iStereo3DTransform = STEREO3D_AsIs;
