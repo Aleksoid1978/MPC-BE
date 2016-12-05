@@ -26,6 +26,7 @@ Chinese (Simplified) - insolo, beter
 Chinese (Traditional) - beter
 Dutch - beter
 German - Markus Gaugg (gaugg@gmx.at), Sylt, Luan, Klaus
+Greek - Lampros Zouloumis
 Italian - Lord Maius
 Korean - kuh3h3
 Polish - Volfield
