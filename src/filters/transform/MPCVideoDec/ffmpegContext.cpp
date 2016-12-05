@@ -86,67 +86,6 @@ static const WORD PCID_AMD_4K [] = { // not tested
 	0x9874, // Carrizo
 };
 
-static const WORD PCID_INTEL_4K [] = {
-	// IvyBridge
-	0x0152, // HD Graphics 2500        (4k tested)
-	0x0156, // HD Graphics 2500 Mobile
-	0x015A, // HD Graphics P2500
-	0x0162, // HD Graphics 4000        (fully tested)
-	0x0166, // HD Graphics 4000 Mobile
-	0x016A, // HD Graphics P4000
-	// Haswell
-	0x0402, // HD Graphics
-	0x0406, // HD Graphics Mobile
-	0x040A, // HD Graphics
-	0x0412, // HD Graphics 4600
-	0x0416, // HD Graphics 4600 Mobile
-	0x041A, // HD Graphics P4600/P4700
-	0x041E, // HD Graphics 4400"
-	0x0A06, // HD Graphics
-	0x0A0E, // HD Graphics
-	0x0A16, // HD Graphics Family
-	0x0A1E, // HD Graphics Family
-	0x0A26, // HD Graphics 5000
-	0x0A2E, // Iris Graphics 5100
-	0x0D22, // Iris Pro Graphics 5200
-	0x0D26, // Iris Pro Graphics 5200
-	// Atom Z3700 Series
-	0x0F31, // HD Graphics
-	// Broadwell
-	0x1606, // HD Graphics
-	0x160E, // HD Graphics
-	0x1612, // HD Graphics 5600
-	0x1616, // HD Graphics 5500
-	0x161A, // HD Graphics P5700
-	0x161E, // HD Graphics 5300
-	0x1622, // Iris Pro Graphics 6200
-	0x1626, // HD Graphics 6000
-	0x162A, // Iris Pro Graphics P6300
-	0x162B, // Iris Graphics 6100
-	// Skylake
-	0x1902, // HD Graphics 510
-	0x1906, // HD Graphics 510
-	0x190B, // HD Graphics 510
-	0x1912, // HD Graphics 530
-	0x1916, // HD Graphics 520
-	0x191B, // HD Graphics 530
-	0x191D, // HD Graphics P530
-	0x191E, // HD Graphics 515
-	0x1921, // HD Graphics 520
-	0x1923, // HD Graphics 535
-	0x1926, // Iris Graphics 540
-	0x1927, // Iris Graphics 550
-	0x192B, // Iris Graphics 555
-	0x192D, // Iris Graphics P555
-	0x193A, // Iris Pro Graphics P580
-	0x193B, // Iris Pro Graphics 580
-	0x193D, // Iris Pro Graphics P580
-	// Atom Z8000 Series
-	0x22B0, // HD Graphics
-	// Braswell
-	0x22B1, // HD Graphics
-};
-
 static bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t count)
 {
 	WORD wPCID = (WORD)pcid;
