@@ -2,7 +2,7 @@
 
 English translation of the change log made by u_shell.
 
-1.5.0 (beta)
+1.5.0
 ==============================
 Windows XP is no longer supported.
 Build in Visual Studio 2013 is no longer supported.
@@ -129,27 +129,27 @@ Added display of number and frequency of the channel analog TB-tuner switching w
 Added option to select the priority of the filters for http/https protocols.
 Use high-quality Resizer images when creating thumbnails (the original code - http://www.geisswerks.com/ryan/FAQS/resize.html).
 Added window while saving thumbnails. Now this process can be interrupted.
-Added the ability to save some threads are received over http/https and UDP.
+Added the ability to save some HTTP and UDP streams.
 Reduced number of re-connections when opening http/https links.
 Do not reset the setting to English translation, if the translation file is not available.
-Fixed memorization of the analog capture device in the settings window the "Capture".
+Fixed memorization of the analog capture device in "Capture" settings window.
 Display the type of audio codecs (ACM) in the capture window.
 Fixed a crash when changing the settings for the capture.
 Added extension .mk3d in group of formats Matroska.
 Improved support .asx playlists.
-Added ability to open "links" to local files beginning with "file://"
-Restored keys "DVD Menu Activate".
+Added ability to open "links" of local files beginning with "file://"
+Restored "DVD Menu Activate" key.
 Remember the current display status for remaining time in OSD.
 The minimum number of recent files is reduced to 5.
-Added commands "move back" and "go ahead" when you control using the touch screen.
+Added commands "Previous" and "Next" for controlling via touchscreen.
 Fixed saving some numeric settings with simultaneous completion and closing the settings panel.
-Fixed the transition to full screen by pressing the corresponding button in the preview on the taskbar.
+Fixed switching to full screen by pressing the button in the preview on the taskbar.
 Adjustment of the description of command line parameters.
 Added commands to switch the output mode to stereo 3D.
-Added support for turning off the computer, followed by rapid incorporation (Windows 8/10).
-Allow you to view and change the settings in the submenu "Frame" without first running video.
+Added support for turning off the computer followed by a quick power-up. (Windows 8/10).
+Allow you to view and change the settings in the submenu "Frame" without running video.
 Improved work with bookmarks, memorizing the position in the file/DVD, added remembering of the current audio track and subtitles.
-Changed the way to store data about recent files and DVD.
+It changed the method of storage of the latest files and DVD data.
 Changed command IDs "Subtitle Delay -", "Subtitle Delay +", "After Playback: Do Nothing", "After Playback: Play next in the folder" for compatibility with third-party utilities.
 In the settings panel "External filters" stands more and more media types.
 
