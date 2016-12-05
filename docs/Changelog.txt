@@ -1,6 +1,7 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
-English translation of the change log made by u_shell.
+1.5.1 (beta)
+==============================
 
 1.5.0
 ==============================
