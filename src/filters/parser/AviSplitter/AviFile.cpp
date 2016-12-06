@@ -147,10 +147,10 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 			size += (size&1) + 8;
 
 			DLog(L"CAviFile::Parse() : LIST '%c%c%c%c'",
-					TCHAR((id>>0)&0xff),
-					TCHAR((id>>8)&0xff),
-					TCHAR((id>>16)&0xff),
-					TCHAR((id>>24)&0xff));
+					WCHAR((id>>0)&0xff),
+					WCHAR((id>>8)&0xff),
+					WCHAR((id>>16)&0xff),
+					WCHAR((id>>24)&0xff));
 
 			if (id == FCC('movi')) {
 				m_movis.AddTail(pos);
@@ -173,10 +173,10 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 			}
 
 			DLog(L"CAviFile::Parse() : '%c%c%c%c'",
-					TCHAR((id>>0)&0xff),
-					TCHAR((id>>8)&0xff),
-					TCHAR((id>>16)&0xff),
-					TCHAR((id>>24)&0xff));
+					WCHAR((id>>0)&0xff),
+					WCHAR((id>>8)&0xff),
+					WCHAR((id>>16)&0xff),
+					WCHAR((id>>24)&0xff));
 
 			if (parentid == FCC('INFO') && size > 0) {
 				switch (id) {
@@ -314,10 +314,10 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					break;
 				default :
 					DLog(L"CAviFile::Parse() : unknown tag '%c%c%c%c'",
-							TCHAR((id>>0)&0xff),
-							TCHAR((id>>8)&0xff),
-							TCHAR((id>>16)&0xff),
-							TCHAR((id>>24)&0xff));
+							WCHAR((id>>0)&0xff),
+							WCHAR((id>>8)&0xff),
+							WCHAR((id>>16)&0xff),
+							WCHAR((id>>24)&0xff));
 					break;
 			}
 

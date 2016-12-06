@@ -27,10 +27,10 @@
 // CMpeg2DecSettingsWnd
 //
 
-static TCHAR m_strBrightness[100];
-static TCHAR m_strContrast[100];
-static TCHAR m_strHue[100];
-static TCHAR m_strSaturation[100];
+static WCHAR m_strBrightness[100];
+static WCHAR m_strContrast[100];
+static WCHAR m_strHue[100];
+static WCHAR m_strSaturation[100];
 
 CMpeg2DecSettingsWnd::CMpeg2DecSettingsWnd()
 {
