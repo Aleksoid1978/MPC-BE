@@ -128,10 +128,10 @@ CString CMediaFormatCategory::GetFilter()
 	POSITION pos = m_exts.GetHeadPosition();
 
 	while (pos) {
-		filter += _T("*.") + m_exts.GetNext(pos) + _T(";");
+		filter += L"*." + m_exts.GetNext(pos) + L";";
 	}
 
-	filter.TrimRight(_T(';')); // cheap...
+	filter.TrimRight(';'); // cheap...
 	return(filter);
 }
 
@@ -148,10 +148,10 @@ CString CMediaFormatCategory::GetExtsWithPeriod()
 	POSITION pos = m_exts.GetHeadPosition();
 
 	while (pos) {
-		exts += _T(".") + m_exts.GetNext(pos) + _T(" ");
+		exts += L"." + m_exts.GetNext(pos) + L" ";
 	}
 
-	exts.TrimRight(_T(' '));
+	exts.TrimRight(' ');
 
 	return(exts);
 }
@@ -162,10 +162,10 @@ CString CMediaFormatCategory::GetBackupExtsWithPeriod()
 	POSITION pos = m_backupexts.GetHeadPosition();
 
 	while (pos) {
-		exts += _T(".") + m_backupexts.GetNext(pos) + _T(" ");
+		exts += L"." + m_backupexts.GetNext(pos) + L" ";
 	}
 
-	exts.TrimRight(_T(' '));
+	exts.TrimRight(' ');
 
 	return(exts);
 }
@@ -266,7 +266,7 @@ bool CMediaFormats::FindAudioExt(CString ext)
 
 CMediaFormatCategory* CMediaFormats::FindMediaByExt(CString ext)
 {
-	ext.TrimLeft(_T('.'));
+	ext.TrimLeft('.');
 
 	if (!ext.IsEmpty()) {
 		for (size_t i = 0; i < GetCount(); i++) {
@@ -286,86 +286,86 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 
 	// Add All Media formats
 	filter += ResStr(IDS_AG_MEDIAFILES);
-	mask.Add(_T(""));
+	mask.Add(L"");
 
 	for (size_t i = 0; i < GetCount(); i++) {
-		strTemp	= GetAt(i).GetFilter() + _T(";");
-		mask[0]	+= strTemp;
-		filter	+= strTemp;
+		strTemp = GetAt(i).GetFilter() + L";";
+		mask[0] += strTemp;
+		filter += strTemp;
 	}
-	mask[0].TrimRight(_T(';'));
-	filter.TrimRight(_T(';'));
-	filter += _T("|");
+	mask[0].TrimRight(';');
+	filter.TrimRight(';');
+	filter += L"|";
 
 	// Add Video formats
 	filter += ResStr(IDS_AG_VIDEOFILES);
-	mask.Add(_T(""));
+	mask.Add(L"");
 
 	for (size_t i = 0; i < GetCount(); i++) {
 		if (GetAt(i).GetFileType() == TVideo) {
-			strTemp = GetAt(i).GetFilter() + _T(";");
+			strTemp = GetAt(i).GetFilter() + L";";
 			mask[1] += strTemp;
 			filter += strTemp;
 		}
 	}
-	filter.TrimRight(_T(';'));
-	filter += _T("|");
+	filter.TrimRight(';');
+	filter += L"|";
 
 	// Add Audio formats
 	filter += ResStr(IDS_AG_AUDIOFILES);
-	mask.Add(_T(""));
+	mask.Add(L"");
 
 	for (size_t i = 0; i < GetCount(); i++) {
 		if (GetAt(i).GetFileType() == TAudio) {
-			strTemp	= GetAt(i).GetFilter() + _T(";");
-			mask[1]	+= strTemp;
-			filter	+= strTemp;
+			strTemp = GetAt(i).GetFilter() + L";";
+			mask[1] += strTemp;
+			filter += strTemp;
 		}
 	}
-	filter.TrimRight(_T(';'));
-	filter += _T("|");
+	filter.TrimRight(';');
+	filter += L"|";
 
 	for (size_t i = 0; i < GetCount(); i++) {
-		CMediaFormatCategory& mfc	= GetAt(i);
-		filter						+= mfc.GetDescription() + _T("|" + GetAt(i).GetFilter() + _T("|"));
+		CMediaFormatCategory& mfc = GetAt(i);
+		filter += mfc.GetDescription() + L"|" + GetAt(i).GetFilter() + L"|";
 		mask.Add(mfc.GetFilter());
 	}
 
 	filter += ResStr(IDS_AG_ALLFILES);
-	mask.Add(_T("*.*"));
+	mask.Add(L"*.*");
 
-	filter += _T("|");
+	filter += L"|";
 }
 
 void CMediaFormats::GetAudioFilter(CString& filter, CAtlArray<CString>& mask)
 {
 	CString		strTemp;
 	filter += ResStr(IDS_AG_AUDIOFILES);
-	mask.Add(_T(""));
+	mask.Add(L"");
 
 	for (size_t i = 0; i < GetCount(); i++) {
 		CMediaFormatCategory& mfc = GetAt(i);
 		if (mfc.GetFileType() == TAudio) {
-			strTemp	= GetAt(i).GetFilter() + _T(";");
-			mask[0]	+= strTemp;
-			filter	+= strTemp;
+			strTemp = GetAt(i).GetFilter() + L";";
+			mask[0] += strTemp;
+			filter += strTemp;
 		}
 	}
 
-	mask[0].TrimRight(_T(';'));
-	filter.TrimRight(_T(';'));
-	filter += _T("|");
+	mask[0].TrimRight(';');
+	filter.TrimRight(';');
+	filter += L"|";
 
 	for (size_t i = 0; i < GetCount(); i++) {
 		CMediaFormatCategory& mfc = GetAt(i);
 		if (mfc.GetFileType() == TAudio) {
-			filter += mfc.GetDescription() + _T("|") + GetAt(i).GetFilter() + _T("|");
+			filter += mfc.GetDescription() + L"|" + GetAt(i).GetFilter() + L"|";
 			mask.Add(mfc.GetFilter());
 		}
 	}
 
 	filter += ResStr(IDS_AG_ALLFILES);
-	mask.Add(_T("*.*"));
+	mask.Add(L"*.*");
 
-	filter += _T("|");
+	filter += L"|";
 }

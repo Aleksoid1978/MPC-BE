@@ -43,7 +43,7 @@ static HBITMAP OpenImage(CString fn)
 {
 	HBITMAP hB = NULL;
 	if (OpenImageCheck(fn)) {
-		FILE *fp = _tfopen(fn, _T("rb"));
+		FILE *fp = _wfopen(fn, L"rb");
 		if (!fp) {
 			return NULL;
 		}

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,7 @@
 
 #include <afxwin.h>
 
-#define EDIT_BUTTON_LEFTCLICKED		(WM_APP + 842)
+#define EDIT_BUTTON_LEFTCLICKED (WM_APP + 842)
 
 // CEditWithButton_Base
 
@@ -74,7 +74,7 @@ private:
 class CEditWithButton : public CEditWithButton_Base
 {
 public:
-	explicit CEditWithButton(LPCTSTR pszButtonText = _T("..."));
+	explicit CEditWithButton(LPCTSTR pszButtonText = L"...");
 
 	CString GetButtonText() const;
 	void SetButtonText(LPCTSTR buttonText);
