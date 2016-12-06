@@ -857,7 +857,7 @@ void CPPageAccelTbl::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 			break;
 		case COL_RMREPCNT:
 			CString str = CString(pItem->pszText).Trim();
-			wc.rmrepcnt = _tcstol(str, NULL, 10);
+			wc.rmrepcnt = wcstol(str, NULL, 10);
 			str.Format(L"%d", wc.rmrepcnt);
 			m_list.SetItemText(pItem->iItem, pItem->iSubItem, str);
 			*pResult = TRUE;

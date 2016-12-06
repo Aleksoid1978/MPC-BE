@@ -40,10 +40,10 @@ public:
 	CMediaFormatCategory();
 	CMediaFormatCategory(
 		CString label, CString description, CAtlList<CString>& exts, filetype_t filetype = TVideo,
-		CString specreqnote = _T(""));
+		CString specreqnote = L"");
 	CMediaFormatCategory(
 		CString label, CString description, CString exts, filetype_t filetype = TVideo,
-		CString specreqnote = _T(""));
+		CString specreqnote = L"");
 	virtual ~CMediaFormatCategory();
 
 	void UpdateData(bool fSave);
@@ -56,7 +56,7 @@ public:
 	void SetExts(CString exts);
 
 	bool FindExt(CString ext) {
-		return m_exts.Find(ext.TrimLeft(_T('.')).MakeLower()) != NULL;
+		return m_exts.Find(ext.TrimLeft('.').MakeLower()) != NULL;
 	}
 
 	CString GetLabel() const {

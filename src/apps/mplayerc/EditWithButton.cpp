@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "EditWithButton.h"
 
-#define WM_EDITWITHBUTTON_RECALCNCSIZE		(WM_USER + 200)
+#define WM_EDITWITHBUTTON_RECALCNCSIZE (WM_USER + 200)
 
 // CEditWithButton_Base
 
@@ -77,7 +77,7 @@ void CEditWithButton_Base::DrawButton(CRect rectButton)
 {
 	CWindowDC dc(this);
 
-	HTHEME hButtonTheme = OpenThemeData(m_hWnd, _T("Button"));
+	HTHEME hButtonTheme = OpenThemeData(m_hWnd, L"Button");
 
 	if (hButtonTheme)
 	{
@@ -86,7 +86,7 @@ void CEditWithButton_Base::DrawButton(CRect rectButton)
 		// If necessary, first fill with the edit control's background color.
 		if (IsThemeBackgroundPartiallyTransparent(hButtonTheme, BP_PUSHBUTTON, ButtonState))
 		{
-			HTHEME hEditTheme = OpenThemeDataEx(m_hWnd, _T("Edit"), OTD_NONCLIENT);
+			HTHEME hEditTheme = OpenThemeDataEx(m_hWnd, L"Edit", OTD_NONCLIENT);
 
 			COLORREF BgColor = GetThemeSysColor(hEditTheme, (GetStyle() & (ES_READONLY | WS_DISABLED)) ? COLOR_3DFACE : COLOR_WINDOW);
 			dc.FillSolidRect(rectButton, BgColor);

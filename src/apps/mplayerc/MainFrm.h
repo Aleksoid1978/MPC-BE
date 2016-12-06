@@ -110,7 +110,7 @@ public:
 	CDebugMonitor(DWORD dwProcessId) : CWinDebugMonitor(dwProcessId) {
 		static CString sDesktop;
 		if (sDesktop.IsEmpty()) {
-			TCHAR szPath[MAX_PATH];
+			WCHAR szPath[MAX_PATH];
 			if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOP, NULL, 0, szPath))) {
 				sDesktop = CString(szPath) + L"\\";
 			}
@@ -119,18 +119,18 @@ public:
 		m_File = NULL;
 		if (bIsInitialize) {
 			CString fname = sDesktop + L"mpc-be_debug.log";
-			m_File = _tfopen(fname, L"at, ccs=UTF-8");
+			m_File = _wfopen(fname, L"at, ccs=UTF-8");
 			if (m_File) {
 				fseek(m_File, 0, 2);
 
-				_ftprintf_s(m_File, _T("=== Start MPC-BE Debug log [%s] ===\n"), GetLocalTime());
+				fwprintf_s(m_File, L"=== Start MPC-BE Debug log [%s] ===\n", GetLocalTime());
 			}
 		}
 	}
 
 	~CDebugMonitor() {
 		if (m_File) {
-			_ftprintf_s(m_File, _T("=== End MPC-BE Debug log [%s] ===\n"), GetLocalTime());
+			fwprintf_s(m_File, L"=== End MPC-BE Debug log [%s] ===\n", GetLocalTime());
 
 			fclose(m_File);
 		}
@@ -138,7 +138,7 @@ public:
 
 	virtual void OutputWinDebugString(const char *str) {
 		if (m_File) {
-			_ftprintf_s(m_File, _T("%s : %S"), GetLocalTime(), str);
+			fwprintf_s(m_File, L"%s : %S", GetLocalTime(), str);
 		}
 	};
 };

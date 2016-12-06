@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Sergey "Exodus8" (rusguy6@gmail.com)
+ * (C) 2012-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -105,7 +105,7 @@ static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 
 	if (format == L"") {
 		FILE* fp;
-		_tfopen_s(&fp, fn, _T("wb"));
+		_wfopen_s(&fp, fn, L"wb");
 		if (fp) {
 			fwrite(&bfh, sizeof(bfh), 1, fp);
 			fwrite(&bi.bmiHeader, sih, 1, fp);
@@ -145,7 +145,7 @@ static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 static void PNGDIB(LPCTSTR fn, BYTE* pData, int level)
 {
 	FILE* fp;
-	_tfopen_s(&fp, fn, _T("wb"));
+	_wfopen_s(&fp, fn, L"wb");
 	if (fp) {
 		BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 
