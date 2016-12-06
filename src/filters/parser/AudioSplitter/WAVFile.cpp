@@ -229,10 +229,10 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 		__int64 pos = m_pFile->GetPos();
 
 		DLog(L"CWAVFile::Open() : found '%c%c%c%c' chunk.",
-			TCHAR((Chunk.id>>0)&0xff),
-			TCHAR((Chunk.id>>8)&0xff),
-			TCHAR((Chunk.id>>16)&0xff),
-			TCHAR((Chunk.id>>24)&0xff));
+			WCHAR((Chunk.id>>0)&0xff),
+			WCHAR((Chunk.id>>8)&0xff),
+			WCHAR((Chunk.id>>16)&0xff),
+			WCHAR((Chunk.id>>24)&0xff));
 
 		switch (Chunk.id) {
 		case FCC('fmt '):
