@@ -55,7 +55,7 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	CString str;
-	str.Format(_T("0,%d,,%%0%dI64x"), DSMSW_SIZE, DSMSW_SIZE*2);
+	str.Format(L"0,%d,,%%0%dI64x", DSMSW_SIZE, DSMSW_SIZE*2);
 	str.Format(CString(str), DSMSW);
 
 	RegisterSourceFilter(

@@ -461,7 +461,7 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 		}
 
 		m_rtDuration = (__int64)pts * 1000 / 9;
-		m_pStream_Lang[0] = _T("undefined");
+		m_pStream_Lang[0] = L"undefined";
 		isAob = true;
 	}
 
@@ -476,9 +476,9 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 	for(int i = 1; i < 9; i++) { // skip VTS_xx_0.VOB
 		CString vob;
 		if (isAob) {
-			vob.Format(_T("%s%d.aob"), fn, i);
+			vob.Format(L"%s%d.aob", fn, i);
 		} else {
-			vob.Format(_T("%s%d.vob"), fn, i);
+			vob.Format(L"%s%d.vob", fn, i);
 		}
 
 		CFileStatus status;

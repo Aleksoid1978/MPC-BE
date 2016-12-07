@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -72,44 +72,44 @@ STDAPI DllRegisterServer()
 	/*CString clsid = CStringFromGUID(__uuidof(CSubtitleSourcePreview));
 
 	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".sub"),
-		_T("Source Filter"), clsid);
+		L"Media Type\\Extensions", L".sub",
+		L"Source Filter", clsid);
 
 	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".srt"),
-		_T("Source Filter"), clsid);
+		L"Media Type\\Extensions", L".srt",
+		L"Source Filter", clsid);
 
 	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".smi"),
-		_T("Source Filter"), clsid);
+		L"Media Type\\Extensions", L".smi",
+		L"Source Filter", clsid);
 
 	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".ssa"),
-		_T("Source Filter"), clsid);
+		L"Media Type\\Extensions", L".ssa",
+		L"Source Filter", clsid);
 
 	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".ass"),
-		_T("Source Filter"), clsid);
+		L"Media Type\\Extensions", L".ass",
+		L"Source Filter", clsid);
 
 	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".xss"),
-		_T("Source Filter"), clsid);
+		L"Media Type\\Extensions", L".xss",
+		L"Source Filter", clsid);
 
 	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".usf"),
-		_T("Source Filter"), clsid);*/
+		L"Media Type\\Extensions", L".usf",
+		L"Source Filter", clsid);*/
 	return AMovieDllRegisterServer2(TRUE);
 }
 
 STDAPI DllUnregisterServer()
 {
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".sub"));
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".srt"));
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".smi"));
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".ssa"));
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".ass"));
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".xss"));
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".usf"));
+	DeleteRegKey(L"Media Type\\Extensions", L".sub");
+	DeleteRegKey(L"Media Type\\Extensions", L".srt");
+	DeleteRegKey(L"Media Type\\Extensions", L".smi");
+	DeleteRegKey(L"Media Type\\Extensions", L".ssa");
+	DeleteRegKey(L"Media Type\\Extensions", L".ass");
+	DeleteRegKey(L"Media Type\\Extensions", L".xss");
+	DeleteRegKey(L"Media Type\\Extensions", L".usf");
 	/**/
 	return AMovieDllRegisterServer2(FALSE);
 }
@@ -124,15 +124,15 @@ public:
 			return FALSE;
 		}
 
-		_WIDTH = GetProfileInt(_T("SubtitleSource"), _T("w"), 640);
-		_HEIGHT = GetProfileInt(_T("SubtitleSource"), _T("h"), 480);
-		_ATPF = GetProfileInt(_T("SubtitleSource"), _T("atpf"), 400000);
+		_WIDTH = GetProfileInt(L"SubtitleSource", L"w", 640);
+		_HEIGHT = GetProfileInt(L"SubtitleSource", L"h", 480);
+		_ATPF = GetProfileInt(L"SubtitleSource", L"atpf", 400000);
 		if (_ATPF <= 0) {
 			_ATPF = 400000;
 		}
-		WriteProfileInt(_T("SubtitleSource"), _T("w"), _WIDTH);
-		WriteProfileInt(_T("SubtitleSource"), _T("h"), _HEIGHT);
-		WriteProfileInt(_T("SubtitleSource"), _T("atpf"), _ATPF);
+		WriteProfileInt(L"SubtitleSource", L"w", _WIDTH);
+		WriteProfileInt(L"SubtitleSource", L"h", _HEIGHT);
+		WriteProfileInt(L"SubtitleSource", L"atpf", _ATPF);
 
 		return TRUE;
 	}
@@ -640,12 +640,12 @@ HRESULT CSubtitleSourceSSA::GetMediaType(CMediaType* pmt)
 
 	CFile f;
 	TCHAR path[_MAX_PATH], fn[_MAX_PATH];
-	if (!GetTempPath(_MAX_PATH, path) || !GetTempFileName(path, _T("mpc_sts"), 0, fn)) {
+	if (!GetTempPath(_MAX_PATH, path) || !GetTempFileName(path, L"mpc_sts", 0, fn)) {
 		return E_FAIL;
 	}
 
 	_tremove(fn);
-	_tcscat_s(fn, _T(".ssa"));
+	_tcscat_s(fn, L".ssa");
 
 	if (!sts.SaveAs(fn, Subtitle::SSA, -1, 0, CTextFile::UTF8, false) || !f.Open(fn, CFile::modeRead)) {
 		return E_FAIL;
@@ -690,13 +690,13 @@ HRESULT CSubtitleSourceASS::GetMediaType(CMediaType* pmt)
 
 	CFile f;
 	TCHAR path[_MAX_PATH], fn[_MAX_PATH];
-	if (!GetTempPath(_MAX_PATH, path) || !GetTempFileName(path, _T("mpc_sts"), 0, fn)) {
+	if (!GetTempPath(_MAX_PATH, path) || !GetTempFileName(path, L"mpc_sts", 0, fn)) {
 		return E_FAIL;
 	}
 
 	_tremove(fn);
 
-	_tcscat_s(fn, _T(".ass"));
+	_tcscat_s(fn, L".ass");
 
 	if (!sts.SaveAs(fn, Subtitle::ASS, -1, CTextFile::UTF8) || !f.Open(fn, CFile::modeRead)) {
 		return E_FAIL;

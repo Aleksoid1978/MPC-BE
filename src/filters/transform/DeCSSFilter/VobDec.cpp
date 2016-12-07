@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -154,7 +154,7 @@ bool CVobDec::FindKey(BYTE* buff)
 					Salt(buff + 0x54, m_lfsr0, m_lfsr1);
 					m_fFoundKey = true;
 				} else if(count) {
-					//printf(_T("\rblock %d reported %d possible keys, skipping\n"), block, count);
+					//printf(L"\rblock %d reported %d possible keys, skipping\n", block, count);
 				}
 			}
 		}

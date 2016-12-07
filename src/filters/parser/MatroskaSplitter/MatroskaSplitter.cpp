@@ -37,10 +37,10 @@
 #include <libavutil/pixfmt.h>
 
 // option names
-#define OPT_REGKEY_MATROSKASplit	_T("Software\\MPC-BE Filters\\Matroska Splitter")
-#define OPT_SECTION_MATROSKASplit	_T("Filters\\Matroska Splitter")
-#define OPT_LoadEmbeddedFonts		_T("LoadEmbeddedFonts")
-#define OPT_CalcDuration			_T("CalculateDuration")
+#define OPT_REGKEY_MATROSKASplit	L"Software\\MPC-BE Filters\\Matroska Splitter"
+#define OPT_SECTION_MATROSKASplit	L"Filters\\Matroska Splitter"
+#define OPT_LoadEmbeddedFonts		L"LoadEmbeddedFonts"
+#define OPT_CalcDuration			L"CalculateDuration"
 
 #ifdef REGISTER_FILTER
 
@@ -71,7 +71,7 @@ STDAPI DllRegisterServer()
 	RegisterSourceFilter(
 		__uuidof(CMatroskaSourceFilter),
 		MEDIASUBTYPE_Matroska,
-		_T("0,4,,1A45DFA3"),
+		L"0,4,,1A45DFA3",
 		NULL);
 
 	return AMovieDllRegisterServer2(TRUE);
@@ -1462,19 +1462,19 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			while (pos3) {
 				SimpleTag* SimpleTag = Tag->SimpleTag.GetNext(pos3);
 				if (!SimpleTag->TagString.IsEmpty()) {
-					if (SimpleTag->TagName == _T("TITLE")) {
+					if (SimpleTag->TagName == L"TITLE") {
 						SetProperty(L"TITL", SimpleTag->TagString);
-					} else if (SimpleTag->TagName == _T("ARTIST")) {
+					} else if (SimpleTag->TagName == L"ARTIST") {
 						SetProperty(L"AUTH", SimpleTag->TagString);
-					} else if (SimpleTag->TagName == _T("DATE_RELEASED")) {
+					} else if (SimpleTag->TagName == L"DATE_RELEASED") {
 						SetProperty(L"DATE", SimpleTag->TagString);
-					} else if (SimpleTag->TagName == _T("COPYRIGHT")) {
+					} else if (SimpleTag->TagName == L"COPYRIGHT") {
 						SetProperty(L"CPYR", SimpleTag->TagString);
-					} else if (SimpleTag->TagName == _T("COMMENT") || SimpleTag->TagName == _T("DESCRIPTION")) {
+					} else if (SimpleTag->TagName == L"COMMENT" || SimpleTag->TagName == L"DESCRIPTION") {
 						SetProperty(L"DESC", SimpleTag->TagString);
-					} else if (SimpleTag->TagName == _T("RATING")) {
+					} else if (SimpleTag->TagName == L"RATING") {
 						SetProperty(L"RTNG", SimpleTag->TagString);
-					} else if (SimpleTag->TagName == _T("ALBUM")) {
+					} else if (SimpleTag->TagName == L"ALBUM") {
 						SetProperty(L"ALBUM", SimpleTag->TagString);
 					} else if (SimpleTag->TagName == L"3d-plane") {
 						pg_offsets.push_back(_wtoi(SimpleTag->TagString));

@@ -34,13 +34,13 @@
 #include "MpcAudioRenderer.h"
 
 // option names
-#define OPT_REGKEY_AudRend			_T("Software\\MPC-BE Filters\\MPC Audio Renderer")
-#define OPT_SECTION_AudRend			_T("Filters\\MPC Audio Renderer")
-#define OPT_DeviceMode				_T("UseWasapi")
-#define OPT_AudioDeviceId			_T("SoundDeviceId")
-#define OPT_UseBitExactOutput		_T("UseBitExactOutput")
-#define OPT_UseSystemLayoutChannels	_T("UseSystemLayoutChannels")
-#define OPT_SyncMethod				_T("SyncMethod")
+#define OPT_REGKEY_AudRend			L"Software\\MPC-BE Filters\\MPC Audio Renderer"
+#define OPT_SECTION_AudRend			L"Filters\\MPC Audio Renderer"
+#define OPT_DeviceMode				L"UseWasapi"
+#define OPT_AudioDeviceId			L"SoundDeviceId"
+#define OPT_UseBitExactOutput		L"UseBitExactOutput"
+#define OPT_UseSystemLayoutChannels	L"UseSystemLayoutChannels"
+#define OPT_SyncMethod				L"SyncMethod"
 // TODO: rename option values
 
 // set to 1(or more) to enable more detail debug log

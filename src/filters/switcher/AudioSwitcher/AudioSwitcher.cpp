@@ -89,12 +89,12 @@ static struct channel_mode_t {
 }
 channel_mode[] = {
 	//n  libavcodec                               ID          Name
-	{1, AV_CH_LAYOUT_MONO   , /*_T("1.0")*/ }, // SPK_MONO   "Mono"
-	{2, AV_CH_LAYOUT_STEREO , /*_T("2.0")*/ }, // SPK_STEREO "Stereo"
-	{4, AV_CH_LAYOUT_QUAD   , /*_T("4.0")*/ }, // SPK_4_0    "4.0"
-	{5, AV_CH_LAYOUT_5POINT0, /*_T("5.0")*/ }, // SPK_5_0    "5.0"
-	{6, AV_CH_LAYOUT_5POINT1, /*_T("5.1")*/ }, // SPK_5_1    "5.1"
-	{8, AV_CH_LAYOUT_7POINT1, /*_T("7.1")*/ }, // SPK_7_1    "7.1"
+	{1, AV_CH_LAYOUT_MONO   , /*L"1.0"*/ }, // SPK_MONO   "Mono"
+	{2, AV_CH_LAYOUT_STEREO , /*L"2.0"*/ }, // SPK_STEREO "Stereo"
+	{4, AV_CH_LAYOUT_QUAD   , /*L"4.0"*/ }, // SPK_4_0    "4.0"
+	{5, AV_CH_LAYOUT_5POINT0, /*L"5.0"*/ }, // SPK_5_0    "5.0"
+	{6, AV_CH_LAYOUT_5POINT1, /*L"5.1"*/ }, // SPK_5_1    "5.1"
+	{8, AV_CH_LAYOUT_7POINT1, /*L"7.1"*/ }, // SPK_7_1    "7.1"
 };
 
 static DWORD GetChannelLayout(const WAVEFORMATEX* wfe)

@@ -27,9 +27,9 @@
 #include "../../../DSUtil/DSUtil.h"
 
  // option names
-#define OPT_REGKEY_CDDAReader	_T("Software\\MPC-BE Filters\\CDDAReader")
-#define OPT_SECTION_CDDAReader	_T("Filters\\CDDAReader")
-#define OPT_ReadTextInfo		_T("ReadTextInfo")
+#define OPT_REGKEY_CDDAReader	L"Software\\MPC-BE Filters\\CDDAReader"
+#define OPT_SECTION_CDDAReader	L"Filters\\CDDAReader"
+#define OPT_ReadTextInfo		L"ReadTextInfo"
 
 #define RAW_SECTOR_SIZE 2352
 #define MSF2UINT(hgs) ((hgs[1]*4500)+(hgs[2]*75)+(hgs[3]))
@@ -57,24 +57,24 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{54A35221-2C8D-4a31-A5DF-6D809847E393}"),
-		_T("0"), _T("0,4,,52494646,8,4,,43444441")); // "RIFFxxxxCDDA"
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{54A35221-2C8D-4a31-A5DF-6D809847E393}",
+		L"0", L"0,4,,52494646,8,4,,43444441"); // "RIFFxxxxCDDA"
 
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{54A35221-2C8D-4a31-A5DF-6D809847E393}"),
-		_T("Source Filter"), _T("{54A35221-2C8D-4a31-A5DF-6D809847E393}"));
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{54A35221-2C8D-4a31-A5DF-6D809847E393}",
+		L"Source Filter", L"{54A35221-2C8D-4a31-A5DF-6D809847E393}");
 
 	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".cda"),
-		_T("Source Filter"), _T("{54A35221-2C8D-4a31-A5DF-6D809847E393}"));
+		L"Media Type\\Extensions", L".cda",
+		L"Source Filter", L"{54A35221-2C8D-4a31-A5DF-6D809847E393}");
 
 	return AMovieDllRegisterServer2(TRUE);
 }
 
 STDAPI DllUnregisterServer()
 {
-	DeleteRegKey(_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{54A35221-2C8D-4a31-A5DF-6D809847E393}"));
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".cda"));
+	DeleteRegKey(L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{54A35221-2C8D-4a31-A5DF-6D809847E393}");
+	DeleteRegKey(L"Media Type\\Extensions", L".cda");
 
 	return AMovieDllRegisterServer2(FALSE);
 }

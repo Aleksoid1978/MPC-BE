@@ -55,70 +55,70 @@ extern "C" {
 #pragma comment(lib, "libmfx.lib")
 
 // option names
-#define OPT_REGKEY_VideoDec  _T("Software\\MPC-BE Filters\\MPC Video Decoder")
-#define OPT_SECTION_VideoDec _T("Filters\\MPC Video Decoder")
-#define OPT_ThreadNumber     _T("ThreadNumber")
-#define OPT_DiscardMode      _T("DiscardMode")
-#define OPT_Deinterlacing    _T("Deinterlacing")
-#define OPT_ARMode           _T("ARMode")
-#define OPT_DXVACheck        _T("DXVACheckCompatibility")
-#define OPT_DisableDXVA_SD   _T("DisableDXVA_SD")
-#define OPT_SW_prefix        _T("Sw_")
-#define OPT_SwRGBLevels      _T("SwRGBLevels")
+#define OPT_REGKEY_VideoDec  L"Software\\MPC-BE Filters\\MPC Video Decoder"
+#define OPT_SECTION_VideoDec L"Filters\\MPC Video Decoder"
+#define OPT_ThreadNumber     L"ThreadNumber"
+#define OPT_DiscardMode      L"DiscardMode"
+#define OPT_Deinterlacing    L"Deinterlacing"
+#define OPT_ARMode           L"ARMode"
+#define OPT_DXVACheck        L"DXVACheckCompatibility"
+#define OPT_DisableDXVA_SD   L"DisableDXVA_SD"
+#define OPT_SW_prefix        L"Sw_"
+#define OPT_SwRGBLevels      L"SwRGBLevels"
 
 #define MAX_AUTO_THREADS 16
 
 #pragma region any_constants
 
 #ifdef REGISTER_FILTER
-#define OPT_REGKEY_VCodecs   _T("Software\\MPC-BE Filters\\MPC Video Decoder\\Codecs")
+#define OPT_REGKEY_VCodecs   L"Software\\MPC-BE Filters\\MPC Video Decoder\\Codecs"
 
 static const struct vcodec_t {
 	const LPCTSTR          opt_name;
 	const unsigned __int64 flag;
 }
 vcodecs[] = {
-	{_T("h264"),		CODEC_H264		},
-	{_T("h264_mvc"),	CODEC_H264_MVC	},
-	{_T("mpeg1"),		CODEC_MPEG1		},
-	{_T("mpeg3"),		CODEC_MPEG2		},
-	{_T("vc1"),			CODEC_VC1		},
-	{_T("msmpeg4"),		CODEC_MSMPEG4	},
-	{_T("xvid"),		CODEC_XVID		},
-	{_T("divx"),		CODEC_DIVX		},
-	{_T("wmv"),			CODEC_WMV		},
-	{_T("hevc"),		CODEC_HEVC		},
-	{_T("vp356"),		CODEC_VP356		},
-	{_T("vp89"),		CODEC_VP89		},
-	{_T("theora"),		CODEC_THEORA	},
-	{_T("mjpeg"),		CODEC_MJPEG		},
-	{_T("dv"),			CODEC_DV		},
-	{_T("lossless"),	CODEC_LOSSLESS	},
-	{_T("prores"),		CODEC_PRORES	},
-	{_T("canopus"),		CODEC_CANOPUS	},
-	{_T("screc"),		CODEC_SCREC		},
-	{_T("indeo"),		CODEC_INDEO		},
-	{_T("h263"),		CODEC_H263		},
-	{_T("svq3"),		CODEC_SVQ3		},
-	{_T("realv"),		CODEC_REALV		},
-	{_T("dirac"),		CODEC_DIRAC		},
-	{_T("binkv"),		CODEC_BINKV		},
-	{_T("amvv"),		CODEC_AMVV		},
-	{_T("flash"),		CODEC_FLASH		},
-	{_T("utvd"),		CODEC_UTVD		},
-	{_T("png"),			CODEC_PNG		},
-	{_T("uncompressed"),CODEC_UNCOMPRESSED},
-	{_T("dnxhd"),		CODEC_DNXHD		},
-	{_T("cinepak"),		CODEC_CINEPAK	},
-	{_T("quicktime"),	CODEC_QT		},
-	{_T("cineform"),	CODEC_CINEFORM	},
+	{L"h264",			CODEC_H264		},
+	{L"h264_mvc",		CODEC_H264_MVC	},
+	{L"mpeg1",			CODEC_MPEG1		},
+	{L"mpeg3",			CODEC_MPEG2		},
+	{L"vc1",			CODEC_VC1		},
+	{L"msmpeg4",		CODEC_MSMPEG4	},
+	{L"xvid",			CODEC_XVID		},
+	{L"divx",			CODEC_DIVX		},
+	{L"wmv",			CODEC_WMV		},
+	{L"hevc",			CODEC_HEVC		},
+	{L"vp356",			CODEC_VP356		},
+	{L"vp89",			CODEC_VP89		},
+	{L"theora",			CODEC_THEORA	},
+	{L"mjpeg",			CODEC_MJPEG		},
+	{L"dv",				CODEC_DV		},
+	{L"lossless",		CODEC_LOSSLESS	},
+	{L"prores",			CODEC_PRORES	},
+	{L"canopus",		CODEC_CANOPUS	},
+	{L"screc",			CODEC_SCREC		},
+	{L"indeo",			CODEC_INDEO		},
+	{L"h263",			CODEC_H263		},
+	{L"svq3",			CODEC_SVQ3		},
+	{L"realv",			CODEC_REALV		},
+	{L"dirac",			CODEC_DIRAC		},
+	{L"binkv",			CODEC_BINKV		},
+	{L"amvv",			CODEC_AMVV		},
+	{L"flash",			CODEC_FLASH		},
+	{L"utvd",			CODEC_UTVD		},
+	{L"png",			CODEC_PNG		},
+	{L"uncompressed",	CODEC_UNCOMPRESSED},
+	{L"dnxhd",			CODEC_DNXHD		},
+	{L"cinepak",		CODEC_CINEPAK	},
+	{L"quicktime",		CODEC_QT		},
+	{L"cineform",		CODEC_CINEFORM	},
 	// dxva codecs
-	{_T("h264_dxva"),	CODEC_H264_DXVA	},
-	{_T("hevc_dxva"),	CODEC_HEVC_DXVA	},
-	{_T("mpeg2_dxva"),	CODEC_MPEG2_DXVA},
-	{_T("vc1_dxva"),	CODEC_VC1_DXVA	},
-	{_T("wmv3_dxva"),	CODEC_WMV3_DXVA	},
-	{_T("vp9_dxva"),	CODEC_VP9_DXVA	}
+	{L"h264_dxva",		CODEC_H264_DXVA	},
+	{L"hevc_dxva",		CODEC_HEVC_DXVA	},
+	{L"mpeg2_dxva",		CODEC_MPEG2_DXVA},
+	{L"vc1_dxva",		CODEC_VC1_DXVA	},
+	{L"wmv3_dxva",		CODEC_WMV3_DXVA	},
+	{L"vp9_dxva",		CODEC_VP9_DXVA	}
 };
 #endif
 
@@ -1523,17 +1523,17 @@ bool CMPCVideoDecFilter::IsAVI()
 		CFile f;
 		CFileException fileException;
 		if (!f.Open(fname, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone, &fileException)) {
-			DbgLog((LOG_TRACE, 3, _T("CMPCVideoDecFilter::IsAVI() : Can't open file '%s', error = %u"), fname, fileException.m_cause));
+			DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::IsAVI() : Can't open file '%s', error = %u", fname, fileException.m_cause));
 			return false;
 		}
 
 		if (f.Read(&m_fSYNC, sizeof(m_fSYNC)) != sizeof(m_fSYNC)) {
-			DbgLog((LOG_TRACE, 3, _T("CMPCVideoDecFilter::IsAVI() : Can't read SYNC from file '%s'"), fname));
+			DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::IsAVI() : Can't read SYNC from file '%s'", fname));
 			return false;
 		}
 
 		if (m_fSYNC == MAKEFOURCC('R','I','F','F')) {
-			DbgLog((LOG_TRACE, 3, _T("CMPCVideoDecFilter::IsAVI() : '%s' is a valid AVI file"), fname));
+			DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::IsAVI() : '%s' is a valid AVI file", fname));
 			return true;
 		}
 	}
@@ -1601,10 +1601,10 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 		if (SUCCEEDED(hr = m_pDecoderService->GetDecoderDeviceGuids(&cDecoderGuids, &pDecoderGuids)) && cDecoderGuids) {
 
 			std::vector<GUID> supportedDecoderGuids;
-			DbgLog((LOG_TRACE, 3, L"	=> Enumerating supported DXVA2 modes:"));
+			DbgLog((LOG_TRACE, 3, L"    => Enumerating supported DXVA2 modes:"));
 			for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
 				CString msg;
-				msg.Format(L"		%s", GetGUIDString(pDecoderGuids[iGuid]));
+				msg.Format(L"        %s", GetGUIDString(pDecoderGuids[iGuid]));
 				if (IsSupportedDecoderMode(pDecoderGuids[iGuid])) {
 					msg.Append(L" - supported");
 					supportedDecoderGuids.emplace_back(pDecoderGuids[iGuid]);
@@ -1614,7 +1614,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 
 			if (!supportedDecoderGuids.empty()) {
 				for (auto guid = supportedDecoderGuids.begin(); guid != supportedDecoderGuids.end(); guid++) {
-					DbgLog((LOG_TRACE, 3, L"	=> Attempt : %s", GetGUIDString(*guid)));
+					DbgLog((LOG_TRACE, 3, L"    => Attempt : %s", GetGUIDString(*guid)));
 
 					// Find a configuration that we support.
 					if (FAILED(hr = FindDXVA2DecoderConfiguration(m_pDecoderService, *guid, &config, &bFoundDXVA2Configuration))) {
@@ -1624,7 +1624,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 					if (bFoundDXVA2Configuration) {
 						// Found a good configuration. Save the GUID.
 						decoderGuid = *guid;
-						DbgLog((LOG_TRACE, 3, L"	=> Use : %s", GetGUIDString(decoderGuid)));
+						DbgLog((LOG_TRACE, 3, L"    => Use : %s", GetGUIDString(decoderGuid)));
 						break;
 					}
 				}
@@ -3657,18 +3657,18 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 				LONG sarx = m_arx * m_h;
 				LONG sary = m_ary * m_w;
 				ReduceDim(sarx, sary);
-				infostr.Format(_T("%dx%d, SAR %ld:%ld, DAR %d:%d"), m_w, m_h, sarx, sary, m_arx, m_ary);
+				infostr.Format(L"%dx%d, SAR %ld:%ld, DAR %d:%d", m_w, m_h, sarx, sary, m_arx, m_ary);
 			}
 			break;
 		case INFO_OutputFormat:
 			if (GUID* DxvaGuid = GetDXVADecoderGuid()) {
 				if (*DxvaGuid != GUID_NULL) {
-					infostr.Format(_T("DXVA (%s)"), GetDXVAMode(DxvaGuid));
+					infostr.Format(L"DXVA (%s)", GetDXVAMode(DxvaGuid));
 					break;
 				}
 			}
 			if (const SW_OUT_FMT* swof = GetSWOF(m_FormatConverter.GetOutPixFormat())) {
-				infostr.Format(_T("%s (%d-bit %s)"), swof->name, swof->luma_bits, GetChromaSubsamplingStr(swof->av_pix_fmt));
+				infostr.Format(L"%s (%d-bit %s)", swof->name, swof->luma_bits, GetChromaSubsamplingStr(swof->av_pix_fmt));
 			}
 			break;
 		case INFO_GraphicsAdapter:

@@ -65,20 +65,20 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 #ifdef REGISTER_FILTER
 	m_txtAudioLanguageOrder.Create(ResStr(IDS_MPEGSPLITTER_LANG_ORDER), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(200), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	m_edtAudioLanguageOrder.CreateEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), WS_CHILD | WS_VISIBLE | WS_TABSTOP, CRect(p, CSize(ScaleX(305), m_fontheight + 6)), this, IDC_PP_AUDIO_LANGUAGE_ORDER);
+	m_edtAudioLanguageOrder.CreateEx(WS_EX_CLIENTEDGE, L"EDIT", L"", WS_CHILD | WS_VISIBLE | WS_TABSTOP, CRect(p, CSize(ScaleX(305), m_fontheight + 6)), this, IDC_PP_AUDIO_LANGUAGE_ORDER);
 	p.y += h25;
 
 	m_txtSubtitlesLanguageOrder.Create(ResStr(IDS_MPEGSPLITTER_SUB_ORDER), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(200), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	m_edtSubtitlesLanguageOrder.CreateEx(WS_EX_CLIENTEDGE, _T("EDIT"), _T(""), WS_CHILD | WS_VISIBLE | WS_TABSTOP, CRect(p, CSize(ScaleX(305), m_fontheight + 6)), this, IDC_PP_SUBTITLES_LANGUAGE_ORDER);
+	m_edtSubtitlesLanguageOrder.CreateEx(WS_EX_CLIENTEDGE, L"EDIT", L"", WS_CHILD | WS_VISIBLE | WS_TABSTOP, CRect(p, CSize(ScaleX(305), m_fontheight + 6)), this, IDC_PP_SUBTITLES_LANGUAGE_ORDER);
 	p.y += h25;
 #endif
 
 	m_grpTrueHD.Create(ResStr(IDS_MPEGSPLITTER_TRUEHD_OUTPUT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p, CSize(ScaleX(305), h20 + h20)), this, (UINT)IDC_STATIC);
 	p.y += ScaleY(15);
 	p.x += ScaleY(10);
-	m_cbTrueHD.Create(_T("TrueHD"), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP, CRect(p, CSize(ScaleX(60), m_fontheight + 2)), this, IDC_PP_TRUEHD);
-	m_cbAC3Core.Create(_T("AC-3"), dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(ScaleX(160), 0), CSize(ScaleX(60), m_fontheight + 2)), this, IDC_PP_AC3CORE);
+	m_cbTrueHD.Create(L"TrueHD", dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP, CRect(p, CSize(ScaleX(60), m_fontheight + 2)), this, IDC_PP_TRUEHD);
+	m_cbAC3Core.Create(L"AC-3", dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(ScaleX(160), 0), CSize(ScaleX(60), m_fontheight + 2)), this, IDC_PP_AC3CORE);
 
 	if (m_pMSF) {
 		m_cbForcedSub.SetCheck(m_pMSF->GetForcedSub());

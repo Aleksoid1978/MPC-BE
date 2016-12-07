@@ -74,55 +74,55 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
-		_T("0"), _T("0,4,,7FFE8001")); // DTS
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{B4A7BE85-551D-4594-BDC7-832B09185041}",
+		L"0", L"0,4,,7FFE8001"); // DTS
 
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
-		_T("0"), _T("0,4,,fE7f0180")); // DTS LE
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{B4A7BE85-551D-4594-BDC7-832B09185041}",
+		L"0", L"0,4,,fE7f0180"); // DTS LE
 
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
-		_T("0"), _T("0,4,,64582025")); // DTS Substream
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{B4A7BE85-551D-4594-BDC7-832B09185041}",
+		L"0", L"0,4,,64582025"); // DTS Substream
 
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
-		_T("1"), _T("0,2,,0B77")); // AC3, E-AC3
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{B4A7BE85-551D-4594-BDC7-832B09185041}",
+		L"1", L"0,2,,0B77"); // AC3, E-AC3
 
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
-		_T("0"), _T("4,4,,F8726FBB")); // MLP
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{B4A7BE85-551D-4594-BDC7-832B09185041}",
+		L"0", L"4,4,,F8726FBB"); // MLP
 
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"),
-		_T("Source Filter"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"));
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{B4A7BE85-551D-4594-BDC7-832B09185041}",
+		L"Source Filter", L"{B4A7BE85-551D-4594-BDC7-832B09185041}");
 
 	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".dts"),
-		_T("Source Filter"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"));
+		L"Media Type\\Extensions", L".dts",
+		L"Source Filter", L"{B4A7BE85-551D-4594-BDC7-832B09185041}");
 
 	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".dtshd"),
-		_T("Source Filter"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"));
+		L"Media Type\\Extensions", L".dtshd",
+		L"Source Filter", L"{B4A7BE85-551D-4594-BDC7-832B09185041}");
 
 	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".ac3"),
-		_T("Source Filter"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"));
+		L"Media Type\\Extensions", L".ac3",
+		L"Source Filter", L"{B4A7BE85-551D-4594-BDC7-832B09185041}");
 
 	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".eac3"),
-		_T("Source Filter"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"));
+		L"Media Type\\Extensions", L".eac3",
+		L"Source Filter", L"{B4A7BE85-551D-4594-BDC7-832B09185041}");
 
 	return AMovieDllRegisterServer2(TRUE);
 }
 
 STDAPI DllUnregisterServer()
 {
-	DeleteRegKey(_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{B4A7BE85-551D-4594-BDC7-832B09185041}"));
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".dts"));
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".dtshd"));
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".ac3"));
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".eac3"));
+	DeleteRegKey(L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{B4A7BE85-551D-4594-BDC7-832B09185041}");
+	DeleteRegKey(L"Media Type\\Extensions", L".dts");
+	DeleteRegKey(L"Media Type\\Extensions", L".dtshd");
+	DeleteRegKey(L"Media Type\\Extensions", L".ac3");
+	DeleteRegKey(L"Media Type\\Extensions", L".eac3");
 
 	return AMovieDllRegisterServer2(FALSE);
 }
@@ -215,7 +215,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 		{ // search first audio frame
 			bool deepsearch = false;
-			if (ext == _T(".dts") || ext == _T(".dtshd") || ext == _T(".ac3") || ext == _T(".eac3")) { //check only specific extensions
+			if (ext == L".dts" || ext == L".dtshd" || ext == L".ac3" || ext == L".eac3") { //check only specific extensions
 				deepsearch = true; // deep search for specific extensions only
 			}
 

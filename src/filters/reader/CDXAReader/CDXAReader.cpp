@@ -134,19 +134,19 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{D367878E-F3B8-4235-A968-F378EF1B9A44}"),
-		_T("0"), _T("0,4,,52494646,8,4,,43445841")); // "RIFFxxxxCDXA"
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{D367878E-F3B8-4235-A968-F378EF1B9A44}",
+		L"0", L"0,4,,52494646,8,4,,43445841"); // "RIFFxxxxCDXA"
 
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{D367878E-F3B8-4235-A968-F378EF1B9A44}"),
-		_T("Source Filter"), _T("{D367878E-F3B8-4235-A968-F378EF1B9A44}"));
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{D367878E-F3B8-4235-A968-F378EF1B9A44}",
+		L"Source Filter", L"{D367878E-F3B8-4235-A968-F378EF1B9A44}");
 
 	return AMovieDllRegisterServer2(TRUE);
 }
 
 STDAPI DllUnregisterServer()
 {
-	DeleteRegKey(_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{D367878E-F3B8-4235-A968-F378EF1B9A44}"));
+	DeleteRegKey(L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{D367878E-F3B8-4235-A968-F378EF1B9A44}");
 
 	return AMovieDllRegisterServer2(FALSE);
 }
@@ -449,19 +449,19 @@ bool CCDXAStream::LookForMediaSubType()
 	m_llPosition = 0;
 
 	CRegKey majorkey;
-	CString majortype = _T("\\Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}");
+	CString majortype = L"\\Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}";
 	if (ERROR_SUCCESS == majorkey.Open(HKEY_CLASSES_ROOT, majortype, KEY_READ)) {
 		TCHAR subtype[256+1];
 		DWORD len = 256;
 		for (int i = 0; ERROR_SUCCESS == majorkey.EnumKey(i, subtype, &len); i++, len = 256) {
 			CRegKey subkey;
-			if (ERROR_SUCCESS != subkey.Open(HKEY_CLASSES_ROOT, majortype + _T("\\") + subtype, KEY_READ)) {
+			if (ERROR_SUCCESS != subkey.Open(HKEY_CLASSES_ROOT, majortype + L"\\" + subtype, KEY_READ)) {
 				continue;
 			}
 
 			for (int j = 0; true; j++) {
 				TCHAR number[10];
-				_stprintf_s(number, _countof(number), _T("%d"), j);
+				_stprintf_s(number, _countof(number), L"%d", j);
 
 				TCHAR pattern[256+1];
 				ULONG len = 256;

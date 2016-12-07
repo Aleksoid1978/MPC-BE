@@ -59,8 +59,8 @@ STDAPI DllRegisterServer()
 	RegisterSourceFilter(
 		CLSID_AsyncReader,
 		MEDIASUBTYPE_Ogg,
-		_T("0,4,,4F676753"), // OggS
-		_T(".ogg"), _T(".ogm"), NULL);
+		L"0,4,,4F676753", // OggS
+		L".ogg", L".ogm", NULL);
 
 	return AMovieDllRegisterServer2(TRUE);
 }

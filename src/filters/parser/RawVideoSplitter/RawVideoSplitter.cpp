@@ -53,11 +53,11 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	CAtlList<CString> chkbytes;
-	chkbytes.AddTail(_T("0,9,,595556344D50454732"));		// YUV4MPEG2
-	chkbytes.AddTail(_T("0,3,,000001"));					// MPEG1/2, VC-1
-	chkbytes.AddTail(_T("0,4,,00000001"));					// H.264/AVC, H.265/HEVC
-	chkbytes.AddTail(_T("0,4,,434D5331,20,4,,50445652"));	// 'CMS1................PDVR'
-	chkbytes.AddTail(_T("0,4,,FFFFFF88"));
+	chkbytes.AddTail(L"0,9,,595556344D50454732");		// YUV4MPEG2
+	chkbytes.AddTail(L"0,3,,000001");					// MPEG1/2, VC-1
+	chkbytes.AddTail(L"0,4,,00000001");					// H.264/AVC, H.265/HEVC
+	chkbytes.AddTail(L"0,4,,434D5331,20,4,,50445652");	// 'CMS1................PDVR'
+	chkbytes.AddTail(L"0,4,,FFFFFF88");
 
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_NULL, chkbytes, NULL);
 

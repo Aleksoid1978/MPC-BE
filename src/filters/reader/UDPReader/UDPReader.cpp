@@ -50,9 +50,9 @@ int g_cTemplates = _countof(g_Templates);
 
 STDAPI DllRegisterServer()
 {
-	SetRegKeyValue(_T("udp"), 0, _T("Source Filter"), CStringFromGUID(__uuidof(CUDPReader)));
-	SetRegKeyValue(_T("http"), 0, _T("Source Filter"), CStringFromGUID(__uuidof(CUDPReader)));
-	SetRegKeyValue(_T("https"), 0, _T("Source Filter"), CStringFromGUID(__uuidof(CUDPReader)));
+	SetRegKeyValue(L"udp", 0, L"Source Filter", CStringFromGUID(__uuidof(CUDPReader)));
+	SetRegKeyValue(L"http", 0, L"Source Filter", CStringFromGUID(__uuidof(CUDPReader)));
+	SetRegKeyValue(L"https", 0, L"Source Filter", CStringFromGUID(__uuidof(CUDPReader)));
 
 	return AMovieDllRegisterServer2(TRUE);
 }

@@ -35,12 +35,12 @@
 #define LOG_MATRIX     0 // set to 1 for logging DXVA matrix data to a file
 
 #if defined(_DEBUG) && DXVA_LOGFILE_A
-#define LOG_FILE_DXVA       _T("dxva_ipinhook.log")
-#define LOG_FILE_PICTURE    _T("picture.log")
-#define LOG_FILE_BITFIELDS  _T("picture_BitFields.log")
-#define LOG_FILE_SLICELONG  _T("slicelong.log")
-#define LOG_FILE_SLICESHORT _T("sliceshort.log")
-#define LOG_FILE_BITSTREAM  _T("bitstream.log")
+#define LOG_FILE_DXVA       L"dxva_ipinhook.log"
+#define LOG_FILE_PICTURE    L"picture.log"
+#define LOG_FILE_BITFIELDS  L"picture_BitFields.log"
+#define LOG_FILE_SLICELONG  L"slicelong.log"
+#define LOG_FILE_SLICESHORT L"sliceshort.log"
+#define LOG_FILE_BITSTREAM  L"bitstream.log"
 #endif
 
 GUID g_guidDXVADecoder = GUID_NULL;
@@ -56,9 +56,9 @@ REFERENCE_TIME g_tSampleStart  = 0;
 FRAME_TYPE g_nFrameType = PICT_NONE;
 
 const LPCTSTR DXVAVersion[] = {
-	_T("DXVA "),
-	_T("DXVA1"),
-	_T("DXVA2")
+	L"DXVA ",
+	L"DXVA1",
+	L"DXVA2"
 };
 
 CString GetDXVADecoderDescription()
@@ -254,9 +254,9 @@ static void LOG_TOFILE(LPCTSTR FileName, LPCTSTR fmt, ...)
 	if (TCHAR* buff = DNew TCHAR[nCount]) {
 		FILE* f;
 		_vstprintf_s(buff, nCount, fmt, args);
-		if (_tfopen_s(&f, FileName, _T("at")) == 0) {
+		if (_tfopen_s(&f, FileName, L"at") == 0) {
 			fseek(f, 0, 2);
-			_ftprintf_s(f, _T("%s\n"), buff);
+			_ftprintf_s(f, L"%s\n", buff);
 			fclose(f);
 		}
 		delete [] buff;
@@ -272,9 +272,9 @@ static void LOG(LPCTSTR fmt, ...)
 	TCHAR buff[3000];
 	FILE* f;
 	_vstprintf_s(buff, _countof(buff), fmt, args);
-	if (_tfopen_s(&f, LOG_FILE_DXVA, _T("at")) == 0) {
+	if (_tfopen_s(&f, LOG_FILE_DXVA, L"at") == 0) {
 		fseek(f, 0, 2);
-		_ftprintf_s(f, _T("%s\n"), buff);
+		_ftprintf_s(f, L"%s\n", buff);
 		fclose(f);
 	}
 
@@ -288,90 +288,90 @@ static void LogDXVA_PicParams_H264(DXVA_PicParams_H264* pPic)
 	static bool		bFirstParam	= true;
 
 	if (bFirstParam) {
-		LOG_TOFILE (LOG_FILE_PICTURE, _T("RefPicFlag,wFrameWidthInMbsMinus1,wFrameHeightInMbsMinus1,CurrPic.Index7Bits,num_ref_frames,wBitFields,bit_depth_luma_minus8,bit_depth_chroma_minus8,Reserved16Bits,StatusReportFeedbackNumber,RFL.Index7Bits[0],") \
-					_T("RFL.Index7Bits[1],RFL.Index7Bits[2],RFL.Index7Bits[3],RFL.Index7Bits[4],RFL.Index7Bits[5],") \
-					_T("RFL.Index7Bits[6],RFL.Index7Bits[7],RFL.Index7Bits[8],RFL.Index7Bits[9],RFL.Index7Bits[10],") \
-					_T("RFL.Index7Bits[11],RFL.Index7Bits[12],RFL.Index7Bits[13],RFL.Index7Bits[14],RFL.Index7Bits[15],") \
-					_T("CurrFieldOrderCnt[0], CurrFieldOrderCnt[1],FieldOrderCntList[0][0], FieldOrderCntList[0][1],FieldOrderCntList[1][0], FieldOrderCntList[1][1],FieldOrderCntList[2][0], FieldOrderCntList[2][1],FieldOrderCntList[3][0], FieldOrderCntList[3][1],FieldOrderCntList[4][0], FieldOrderCntList[4][1],FieldOrderCntList[5][0],") \
-					_T("FieldOrderCntList[5][1],FieldOrderCntList[6][0], FieldOrderCntList[6][1],FieldOrderCntList[7][0], FieldOrderCntList[7][1],FieldOrderCntList[8][0], FieldOrderCntList[8][1],FieldOrderCntList[9][0], FieldOrderCntList[9][1],FieldOrderCntList[10][0], FieldOrderCntList[10][1],FieldOrderCntList[11][0],")\
-					_T("FieldOrderCntList[11][1],FieldOrderCntList[12][0], FieldOrderCntList[12][1],FieldOrderCntList[13][0], FieldOrderCntList[13][1],FieldOrderCntList[14][0], FieldOrderCntList[14][1],FieldOrderCntList[15][0], FieldOrderCntList[15][1],pic_init_qs_minus26,chroma_qp_index_offset,second_chroma_qp_index_offset,")\
-					_T("ContinuationFlag,pic_init_qp_minus26,num_ref_idx_l0_active_minus1,num_ref_idx_l1_active_minus1,Reserved8BitsA,FrameNumList[0],FrameNumList[1],FrameNumList[2],FrameNumList[3],FrameNumList[4],FrameNumList[5],FrameNumList[6],FrameNumList[7],FrameNumList[8],FrameNumList[9],FrameNumList[10],FrameNumList[11],")\
-					_T("FrameNumList[12],FrameNumList[13],FrameNumList[14],FrameNumList[15],UsedForReferenceFlags,NonExistingFrameFlags,frame_num,log2_max_frame_num_minus4,pic_order_cnt_type,log2_max_pic_order_cnt_lsb_minus4,delta_pic_order_always_zero_flag,direct_8x8_inference_flag,entropy_coding_mode_flag,pic_order_present_flag,")\
-					_T("num_slice_groups_minus1,slice_group_map_type,deblocking_filter_control_present_flag,redundant_pic_cnt_present_flag,Reserved8BitsB,slice_group_change_rate_minus1"));
+		LOG_TOFILE (LOG_FILE_PICTURE, L"RefPicFlag,wFrameWidthInMbsMinus1,wFrameHeightInMbsMinus1,CurrPic.Index7Bits,num_ref_frames,wBitFields,bit_depth_luma_minus8,bit_depth_chroma_minus8,Reserved16Bits,StatusReportFeedbackNumber,RFL.Index7Bits[0]," \
+					L"RFL.Index7Bits[1],RFL.Index7Bits[2],RFL.Index7Bits[3],RFL.Index7Bits[4],RFL.Index7Bits[5]," \
+					L"RFL.Index7Bits[6],RFL.Index7Bits[7],RFL.Index7Bits[8],RFL.Index7Bits[9],RFL.Index7Bits[10]," \
+					L"RFL.Index7Bits[11],RFL.Index7Bits[12],RFL.Index7Bits[13],RFL.Index7Bits[14],RFL.Index7Bits[15]," \
+					L"CurrFieldOrderCnt[0], CurrFieldOrderCnt[1],FieldOrderCntList[0][0], FieldOrderCntList[0][1],FieldOrderCntList[1][0], FieldOrderCntList[1][1],FieldOrderCntList[2][0], FieldOrderCntList[2][1],FieldOrderCntList[3][0], FieldOrderCntList[3][1],FieldOrderCntList[4][0], FieldOrderCntList[4][1],FieldOrderCntList[5][0]," \
+					L"FieldOrderCntList[5][1],FieldOrderCntList[6][0], FieldOrderCntList[6][1],FieldOrderCntList[7][0], FieldOrderCntList[7][1],FieldOrderCntList[8][0], FieldOrderCntList[8][1],FieldOrderCntList[9][0], FieldOrderCntList[9][1],FieldOrderCntList[10][0], FieldOrderCntList[10][1],FieldOrderCntList[11][0],"\
+					L"FieldOrderCntList[11][1],FieldOrderCntList[12][0], FieldOrderCntList[12][1],FieldOrderCntList[13][0], FieldOrderCntList[13][1],FieldOrderCntList[14][0], FieldOrderCntList[14][1],FieldOrderCntList[15][0], FieldOrderCntList[15][1],pic_init_qs_minus26,chroma_qp_index_offset,second_chroma_qp_index_offset,"\
+					L"ContinuationFlag,pic_init_qp_minus26,num_ref_idx_l0_active_minus1,num_ref_idx_l1_active_minus1,Reserved8BitsA,FrameNumList[0],FrameNumList[1],FrameNumList[2],FrameNumList[3],FrameNumList[4],FrameNumList[5],FrameNumList[6],FrameNumList[7],FrameNumList[8],FrameNumList[9],FrameNumList[10],FrameNumList[11],"\
+					L"FrameNumList[12],FrameNumList[13],FrameNumList[14],FrameNumList[15],UsedForReferenceFlags,NonExistingFrameFlags,frame_num,log2_max_frame_num_minus4,pic_order_cnt_type,log2_max_pic_order_cnt_lsb_minus4,delta_pic_order_always_zero_flag,direct_8x8_inference_flag,entropy_coding_mode_flag,pic_order_present_flag,"\
+					L"num_slice_groups_minus1,slice_group_map_type,deblocking_filter_control_present_flag,redundant_pic_cnt_present_flag,Reserved8BitsB,slice_group_change_rate_minus1");
 
 	}
 
-	strRes.AppendFormat(_T("%d,"), pPic->RefPicFlag);
-	strRes.AppendFormat(_T("%d,"), pPic->wFrameWidthInMbsMinus1);
-	strRes.AppendFormat(_T("%d,"), pPic->wFrameHeightInMbsMinus1);
+	strRes.AppendFormat(L"%d,", pPic->RefPicFlag);
+	strRes.AppendFormat(L"%d,", pPic->wFrameWidthInMbsMinus1);
+	strRes.AppendFormat(L"%d,", pPic->wFrameHeightInMbsMinus1);
 
 	//			DXVA_PicEntry_H264  CurrPic)); /* flag is bot field flag */
-	//	strRes.AppendFormat(_T("%d,"), pPic->CurrPic.AssociatedFlag);
-	//	strRes.AppendFormat(_T("%d,"), pPic->CurrPic.bPicEntry);
-	strRes.AppendFormat(_T("%d,"), pPic->CurrPic.Index7Bits);
+	//	strRes.AppendFormat(L"%d,", pPic->CurrPic.AssociatedFlag);
+	//	strRes.AppendFormat(L"%d,", pPic->CurrPic.bPicEntry);
+	strRes.AppendFormat(L"%d,", pPic->CurrPic.Index7Bits);
 
 
-	strRes.AppendFormat(_T("%d,"), pPic->num_ref_frames);
-	strRes.AppendFormat(_T("%d,"), pPic->wBitFields);
-	strRes.AppendFormat(_T("%d,"), pPic->bit_depth_luma_minus8);
-	strRes.AppendFormat(_T("%d,"), pPic->bit_depth_chroma_minus8);
+	strRes.AppendFormat(L"%d,", pPic->num_ref_frames);
+	strRes.AppendFormat(L"%d,", pPic->wBitFields);
+	strRes.AppendFormat(L"%d,", pPic->bit_depth_luma_minus8);
+	strRes.AppendFormat(L"%d,", pPic->bit_depth_chroma_minus8);
 
-	strRes.AppendFormat(_T("%d,"), pPic->Reserved16Bits);
-	strRes.AppendFormat(_T("%d,"), pPic->StatusReportFeedbackNumber);
+	strRes.AppendFormat(L"%d,", pPic->Reserved16Bits);
+	strRes.AppendFormat(L"%d,", pPic->StatusReportFeedbackNumber);
 
 	for (i = 0; i < 16; i++) {
-		//strRes.AppendFormat(_T("%d,"), pPic->RefFrameList[i].AssociatedFlag);
-		//strRes.AppendFormat(_T("%d,"), pPic->RefFrameList[i].bPicEntry);
-		strRes.AppendFormat(_T("%d,"), pPic->RefFrameList[i].Index7Bits);
+		//strRes.AppendFormat(L"%d,", pPic->RefFrameList[i].AssociatedFlag);
+		//strRes.AppendFormat(L"%d,", pPic->RefFrameList[i].bPicEntry);
+		strRes.AppendFormat(L"%d,", pPic->RefFrameList[i].Index7Bits);
 	}
 
-	strRes.AppendFormat(_T("%d, %d,"), pPic->CurrFieldOrderCnt[0], pPic->CurrFieldOrderCnt[1]);
+	strRes.AppendFormat(L"%d, %d,", pPic->CurrFieldOrderCnt[0], pPic->CurrFieldOrderCnt[1]);
 
 	for (int i = 0; i < 16; i++) {
-		strRes.AppendFormat(_T("%d, %d,"), pPic->FieldOrderCntList[i][0], pPic->FieldOrderCntList[i][1]);
+		strRes.AppendFormat(L"%d, %d,", pPic->FieldOrderCntList[i][0], pPic->FieldOrderCntList[i][1]);
 	}
-	//strRes.AppendFormat(_T("%d,"), pPic->FieldOrderCntList[16][2]);
+	//strRes.AppendFormat(L"%d,", pPic->FieldOrderCntList[16][2]);
 
-	strRes.AppendFormat(_T("%d,"), pPic->pic_init_qs_minus26);
-	strRes.AppendFormat(_T("%d,"), pPic->chroma_qp_index_offset);   /* also used for QScb */
-	strRes.AppendFormat(_T("%d,"), pPic->second_chroma_qp_index_offset); /* also for QScr */
-	strRes.AppendFormat(_T("%d,"), pPic->ContinuationFlag);
+	strRes.AppendFormat(L"%d,", pPic->pic_init_qs_minus26);
+	strRes.AppendFormat(L"%d,", pPic->chroma_qp_index_offset);   /* also used for QScb */
+	strRes.AppendFormat(L"%d,", pPic->second_chroma_qp_index_offset); /* also for QScr */
+	strRes.AppendFormat(L"%d,", pPic->ContinuationFlag);
 
 	/* remainder for parsing */
-	strRes.AppendFormat(_T("%d,"), pPic->pic_init_qp_minus26);
-	strRes.AppendFormat(_T("%d,"), pPic->num_ref_idx_l0_active_minus1);
-	strRes.AppendFormat(_T("%d,"), pPic->num_ref_idx_l1_active_minus1);
-	strRes.AppendFormat(_T("%d,"), pPic->Reserved8BitsA);
+	strRes.AppendFormat(L"%d,", pPic->pic_init_qp_minus26);
+	strRes.AppendFormat(L"%d,", pPic->num_ref_idx_l0_active_minus1);
+	strRes.AppendFormat(L"%d,", pPic->num_ref_idx_l1_active_minus1);
+	strRes.AppendFormat(L"%d,", pPic->Reserved8BitsA);
 
 	for (int i=0; i<16; i++) {
-		strRes.AppendFormat(_T("%d,"), pPic->FrameNumList[i]);
+		strRes.AppendFormat(L"%d,", pPic->FrameNumList[i]);
 	}
 
-	//strRes.AppendFormat(_T("%d,"), pPic->FrameNumList[16]);
-	strRes.AppendFormat(_T("%d,"), pPic->UsedForReferenceFlags);
-	strRes.AppendFormat(_T("%d,"), pPic->NonExistingFrameFlags);
-	strRes.AppendFormat(_T("%d,"), pPic->frame_num);
+	//strRes.AppendFormat(L"%d,", pPic->FrameNumList[16]);
+	strRes.AppendFormat(L"%d,", pPic->UsedForReferenceFlags);
+	strRes.AppendFormat(L"%d,", pPic->NonExistingFrameFlags);
+	strRes.AppendFormat(L"%d,", pPic->frame_num);
 
-	strRes.AppendFormat(_T("%d,"), pPic->log2_max_frame_num_minus4);
-	strRes.AppendFormat(_T("%d,"), pPic->pic_order_cnt_type);
-	strRes.AppendFormat(_T("%d,"), pPic->log2_max_pic_order_cnt_lsb_minus4);
-	strRes.AppendFormat(_T("%d,"), pPic->delta_pic_order_always_zero_flag);
+	strRes.AppendFormat(L"%d,", pPic->log2_max_frame_num_minus4);
+	strRes.AppendFormat(L"%d,", pPic->pic_order_cnt_type);
+	strRes.AppendFormat(L"%d,", pPic->log2_max_pic_order_cnt_lsb_minus4);
+	strRes.AppendFormat(L"%d,", pPic->delta_pic_order_always_zero_flag);
 
-	strRes.AppendFormat(_T("%d,"), pPic->direct_8x8_inference_flag);
-	strRes.AppendFormat(_T("%d,"), pPic->entropy_coding_mode_flag);
-	strRes.AppendFormat(_T("%d,"), pPic->pic_order_present_flag);
-	strRes.AppendFormat(_T("%d,"), pPic->num_slice_groups_minus1);
+	strRes.AppendFormat(L"%d,", pPic->direct_8x8_inference_flag);
+	strRes.AppendFormat(L"%d,", pPic->entropy_coding_mode_flag);
+	strRes.AppendFormat(L"%d,", pPic->pic_order_present_flag);
+	strRes.AppendFormat(L"%d,", pPic->num_slice_groups_minus1);
 
-	strRes.AppendFormat(_T("%d,"), pPic->slice_group_map_type);
-	strRes.AppendFormat(_T("%d,"), pPic->deblocking_filter_control_present_flag);
-	strRes.AppendFormat(_T("%d,"), pPic->redundant_pic_cnt_present_flag);
-	strRes.AppendFormat(_T("%d,"), pPic->Reserved8BitsB);
+	strRes.AppendFormat(L"%d,", pPic->slice_group_map_type);
+	strRes.AppendFormat(L"%d,", pPic->deblocking_filter_control_present_flag);
+	strRes.AppendFormat(L"%d,", pPic->redundant_pic_cnt_present_flag);
+	strRes.AppendFormat(L"%d,", pPic->Reserved8BitsB);
 
-	strRes.AppendFormat(_T("%d,"), pPic->slice_group_change_rate_minus1);
+	strRes.AppendFormat(L"%d,", pPic->slice_group_change_rate_minus1);
 
 	//for (int i=0; i<810; i++)
-	//	strRes.AppendFormat(_T("%d,"), pPic->SliceGroupMap[i]);
-	//			strRes.AppendFormat(_T("%d,"), pPic->SliceGroupMap[810]);
+	//	strRes.AppendFormat(L"%d,", pPic->SliceGroupMap[i]);
+	//			strRes.AppendFormat(L"%d,", pPic->SliceGroupMap[810]);
 
 	// SABOTAGE !!!
 	//for (int i=0; i<16; i++)
@@ -393,28 +393,28 @@ static void LogDXVA_PicParams_H264(DXVA_PicParams_H264* pPic)
 	LOG_TOFILE(LOG_FILE_PICTURE, strRes);
 
 	if (bFirstParam) {
-		LOG_TOFILE (LOG_FILE_BITFIELDS, _T("field_pic_flag,")\
-					_T("MbaffFrameFlag, residual_colour_transform_flag, sp_for_switch_flag,") \
-					_T("chroma_format_idc, RefPicFlag, constrained_intra_pred_flag,") \
-					_T("weighted_pred_flag, weighted_bipred_idc, MbsConsecutiveFlag,") \
-					_T("frame_mbs_only_flag, transform_8x8_mode_flag, MinLumaBipredSize8x8Flag, IntraPicFlag"));
+		LOG_TOFILE (LOG_FILE_BITFIELDS, L"field_pic_flag,"\
+					L"MbaffFrameFlag, residual_colour_transform_flag, sp_for_switch_flag," \
+					L"chroma_format_idc, RefPicFlag, constrained_intra_pred_flag," \
+					L"weighted_pred_flag, weighted_bipred_idc, MbsConsecutiveFlag," \
+					L"frame_mbs_only_flag, transform_8x8_mode_flag, MinLumaBipredSize8x8Flag, IntraPicFlag");
 	}
 
 	strRes.Empty();
-	strRes.AppendFormat(_T("%d,"), pPic->field_pic_flag);
-	strRes.AppendFormat(_T("%d,"), pPic->MbaffFrameFlag);
-	strRes.AppendFormat(_T("%d,"), pPic->residual_colour_transform_flag);
-	strRes.AppendFormat(_T("%d,"), pPic->sp_for_switch_flag);
-	strRes.AppendFormat(_T("%d,"), pPic->chroma_format_idc);
-	strRes.AppendFormat(_T("%d,"), pPic->RefPicFlag);
-	strRes.AppendFormat(_T("%d,"), pPic->constrained_intra_pred_flag);
-	strRes.AppendFormat(_T("%d,"), pPic->weighted_pred_flag);
-	strRes.AppendFormat(_T("%d,"), pPic->weighted_bipred_idc);
-	strRes.AppendFormat(_T("%d,"), pPic->MbsConsecutiveFlag);
-	strRes.AppendFormat(_T("%d,"), pPic->frame_mbs_only_flag);
-	strRes.AppendFormat(_T("%d,"), pPic->transform_8x8_mode_flag);
-	strRes.AppendFormat(_T("%d,"), pPic->MinLumaBipredSize8x8Flag);
-	strRes.AppendFormat(_T("%d,"), pPic->IntraPicFlag);
+	strRes.AppendFormat(L"%d,", pPic->field_pic_flag);
+	strRes.AppendFormat(L"%d,", pPic->MbaffFrameFlag);
+	strRes.AppendFormat(L"%d,", pPic->residual_colour_transform_flag);
+	strRes.AppendFormat(L"%d,", pPic->sp_for_switch_flag);
+	strRes.AppendFormat(L"%d,", pPic->chroma_format_idc);
+	strRes.AppendFormat(L"%d,", pPic->RefPicFlag);
+	strRes.AppendFormat(L"%d,", pPic->constrained_intra_pred_flag);
+	strRes.AppendFormat(L"%d,", pPic->weighted_pred_flag);
+	strRes.AppendFormat(L"%d,", pPic->weighted_bipred_idc);
+	strRes.AppendFormat(L"%d,", pPic->MbsConsecutiveFlag);
+	strRes.AppendFormat(L"%d,", pPic->frame_mbs_only_flag);
+	strRes.AppendFormat(L"%d,", pPic->transform_8x8_mode_flag);
+	strRes.AppendFormat(L"%d,", pPic->MinLumaBipredSize8x8Flag);
+	strRes.AppendFormat(L"%d,", pPic->IntraPicFlag);
 
 	LOG_TOFILE(LOG_FILE_BITFIELDS, strRes);
 
@@ -428,17 +428,17 @@ static void LogH264SliceShort(DXVA_Slice_H264_Short* pSlice, int nCount)
 	static bool	bFirstSlice = true;
 
 	if (bFirstSlice) {
-		strRes = _T("nCnt, BSNALunitDataLocation, SliceBytesInBuffer, wBadSliceChopping");
+		strRes = L"nCnt, BSNALunitDataLocation, SliceBytesInBuffer, wBadSliceChopping";
 		LOG_TOFILE (LOG_FILE_SLICESHORT, strRes);
 		strRes = "";
 		bFirstSlice = false;
 	}
 
 	for (int i = 0; i < nCount; i++) {
-		strRes.AppendFormat(_T("%d,"), i);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].BSNALunitDataLocation);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].SliceBytesInBuffer);
-		strRes.AppendFormat(_T("%d"), pSlice[i].wBadSliceChopping);
+		strRes.AppendFormat(L"%d,", i);
+		strRes.AppendFormat(L"%d,", pSlice[i].BSNALunitDataLocation);
+		strRes.AppendFormat(L"%d,", pSlice[i].SliceBytesInBuffer);
+		strRes.AppendFormat(L"%d", pSlice[i].wBadSliceChopping);
 
 		LOG_TOFILE (LOG_FILE_SLICESHORT, strRes);
 		strRes = "";
@@ -451,7 +451,7 @@ static void LogSliceInfo(DXVA_SliceInfo* pSlice, int nCount)
 	static bool	bFirstSlice = true;
 
 	if (bFirstSlice) {
-		strRes = _T("nCnt, wHorizontalPosition, wVerticalPosition, dwSliceBitsInBuffer,dwSliceDataLocation, bStartCodeBitOffset, bReservedBits, wMBbitOffset, wNumberMBsInSlice, wQuantizerScaleCode, wBadSliceChopping");
+		strRes = L"nCnt, wHorizontalPosition, wVerticalPosition, dwSliceBitsInBuffer,dwSliceDataLocation, bStartCodeBitOffset, bReservedBits, wMBbitOffset, wNumberMBsInSlice, wQuantizerScaleCode, wBadSliceChopping";
 
 		LOG_TOFILE (LOG_FILE_SLICESHORT, strRes);
 		strRes = "";
@@ -459,17 +459,17 @@ static void LogSliceInfo(DXVA_SliceInfo* pSlice, int nCount)
 	}
 
 	for (int i = 0; i < nCount; i++) {
-		strRes.AppendFormat(_T("%d,"), i);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].wHorizontalPosition);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].wVerticalPosition);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].dwSliceBitsInBuffer);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].dwSliceDataLocation);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].bStartCodeBitOffset);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].bReservedBits);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].wMBbitOffset);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].wNumberMBsInSlice);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].wQuantizerScaleCode);
-		strRes.AppendFormat(_T("%d"),  pSlice[i].wBadSliceChopping);
+		strRes.AppendFormat(L"%d,", i);
+		strRes.AppendFormat(L"%d,", pSlice[i].wHorizontalPosition);
+		strRes.AppendFormat(L"%d,", pSlice[i].wVerticalPosition);
+		strRes.AppendFormat(L"%d,", pSlice[i].dwSliceBitsInBuffer);
+		strRes.AppendFormat(L"%d,", pSlice[i].dwSliceDataLocation);
+		strRes.AppendFormat(L"%d,", pSlice[i].bStartCodeBitOffset);
+		strRes.AppendFormat(L"%d,", pSlice[i].bReservedBits);
+		strRes.AppendFormat(L"%d,", pSlice[i].wMBbitOffset);
+		strRes.AppendFormat(L"%d,", pSlice[i].wNumberMBsInSlice);
+		strRes.AppendFormat(L"%d,", pSlice[i].wQuantizerScaleCode);
+		strRes.AppendFormat(L"%d",  pSlice[i].wBadSliceChopping);
 
 		LOG_TOFILE (LOG_FILE_SLICESHORT, strRes);
 		strRes = "";
@@ -482,17 +482,17 @@ static void LogH264SliceLong(DXVA_Slice_H264_Long* pSlice, int nCount)
 	CString		strRes;
 
 	if (bFirstSlice) {
-		strRes = _T("nCnt, BSNALunitDataLocation, SliceBytesInBuffer, wBadSliceChopping,") \
-				 _T("first_mb_in_slice, NumMbsForSlice, BitOffsetToSliceData, slice_type,luma_log2_weight_denom,chroma_log2_weight_denom,") \
-				 _T("num_ref_idx_l0_active_minus1,num_ref_idx_l1_active_minus1,slice_alpha_c0_offset_div2,slice_beta_offset_div2,") \
-				 _T("Reserved8Bits,slice_qs_delta,slice_qp_delta,redundant_pic_cnt,direct_spatial_mv_pred_flag,cabac_init_idc,") \
-				 _T("disable_deblocking_filter_idc,slice_id,");
+		strRes = L"nCnt, BSNALunitDataLocation, SliceBytesInBuffer, wBadSliceChopping," \
+				 L"first_mb_in_slice, NumMbsForSlice, BitOffsetToSliceData, slice_type,luma_log2_weight_denom,chroma_log2_weight_denom," \
+				 L"num_ref_idx_l0_active_minus1,num_ref_idx_l1_active_minus1,slice_alpha_c0_offset_div2,slice_beta_offset_div2," \
+				 L"Reserved8Bits,slice_qs_delta,slice_qp_delta,redundant_pic_cnt,direct_spatial_mv_pred_flag,cabac_init_idc," \
+				 L"disable_deblocking_filter_idc,slice_id,";
 
 		for (int i=0; i<2; i++) {	/* L0 & L1 */
 			for (int j=0; j<32; j++) {
-				strRes.AppendFormat(_T("R[%d][%d].AssociatedFlag,"), i, j);
-				strRes.AppendFormat(_T("R[%d][%d].bPicEntry,"),		 i, j);
-				strRes.AppendFormat(_T("R[%d][%d].Index7Bits,"),	 i, j);
+				strRes.AppendFormat(L"R[%d][%d].AssociatedFlag,", i, j);
+				strRes.AppendFormat(L"R[%d][%d].bPicEntry,",		 i, j);
+				strRes.AppendFormat(L"R[%d][%d].Index7Bits,",	 i, j);
 			}
 		}
 
@@ -500,7 +500,7 @@ static void LogH264SliceLong(DXVA_Slice_H264_Long* pSlice, int nCount)
 			for (int b=0; b<32; b++) {
 				for (int c=0; c<3; c++) {
 					for (int d=0; d<2; d++) {
-						strRes.AppendFormat(_T("W[%d][%d][%d][%d],"), a,b,c,d);
+						strRes.AppendFormat(L"W[%d][%d][%d][%d],", a,b,c,d);
 					}
 				}
 			}
@@ -513,39 +513,39 @@ static void LogH264SliceLong(DXVA_Slice_H264_Long* pSlice, int nCount)
 	bFirstSlice = false;
 
 	for (int i = 0; i < nCount; i++) {
-		strRes.AppendFormat(_T("%d,"), i);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].BSNALunitDataLocation);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].SliceBytesInBuffer);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].wBadSliceChopping);
+		strRes.AppendFormat(L"%d,", i);
+		strRes.AppendFormat(L"%d,", pSlice[i].BSNALunitDataLocation);
+		strRes.AppendFormat(L"%d,", pSlice[i].SliceBytesInBuffer);
+		strRes.AppendFormat(L"%d,", pSlice[i].wBadSliceChopping);
 
-		strRes.AppendFormat(_T("%d,"), pSlice[i].first_mb_in_slice);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].NumMbsForSlice);
+		strRes.AppendFormat(L"%d,", pSlice[i].first_mb_in_slice);
+		strRes.AppendFormat(L"%d,", pSlice[i].NumMbsForSlice);
 
-		strRes.AppendFormat(_T("%d,"), pSlice[i].BitOffsetToSliceData);
+		strRes.AppendFormat(L"%d,", pSlice[i].BitOffsetToSliceData);
 
-		strRes.AppendFormat(_T("%d,"), pSlice[i].slice_type);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].luma_log2_weight_denom);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].chroma_log2_weight_denom);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].num_ref_idx_l0_active_minus1);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].num_ref_idx_l1_active_minus1);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].slice_alpha_c0_offset_div2);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].slice_beta_offset_div2);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].Reserved8Bits);
+		strRes.AppendFormat(L"%d,", pSlice[i].slice_type);
+		strRes.AppendFormat(L"%d,", pSlice[i].luma_log2_weight_denom);
+		strRes.AppendFormat(L"%d,", pSlice[i].chroma_log2_weight_denom);
+		strRes.AppendFormat(L"%d,", pSlice[i].num_ref_idx_l0_active_minus1);
+		strRes.AppendFormat(L"%d,", pSlice[i].num_ref_idx_l1_active_minus1);
+		strRes.AppendFormat(L"%d,", pSlice[i].slice_alpha_c0_offset_div2);
+		strRes.AppendFormat(L"%d,", pSlice[i].slice_beta_offset_div2);
+		strRes.AppendFormat(L"%d,", pSlice[i].Reserved8Bits);
 
-		strRes.AppendFormat(_T("%d,"), pSlice[i].slice_qs_delta);
+		strRes.AppendFormat(L"%d,", pSlice[i].slice_qs_delta);
 
-		strRes.AppendFormat(_T("%d,"), pSlice[i].slice_qp_delta);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].redundant_pic_cnt);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].direct_spatial_mv_pred_flag);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].cabac_init_idc);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].disable_deblocking_filter_idc);
-		strRes.AppendFormat(_T("%d,"), pSlice[i].slice_id);
+		strRes.AppendFormat(L"%d,", pSlice[i].slice_qp_delta);
+		strRes.AppendFormat(L"%d,", pSlice[i].redundant_pic_cnt);
+		strRes.AppendFormat(L"%d,", pSlice[i].direct_spatial_mv_pred_flag);
+		strRes.AppendFormat(L"%d,", pSlice[i].cabac_init_idc);
+		strRes.AppendFormat(L"%d,", pSlice[i].disable_deblocking_filter_idc);
+		strRes.AppendFormat(L"%d,", pSlice[i].slice_id);
 
 		for (int a=0; a<2; a++) {	/* L0 & L1 */
 			for (int b=0; b<32; b++) {
-				strRes.AppendFormat(_T("%d,"), pSlice[i].RefPicList[a][b].AssociatedFlag);
-				strRes.AppendFormat(_T("%d,"), pSlice[i].RefPicList[a][b].bPicEntry);
-				strRes.AppendFormat(_T("%d,"), pSlice[i].RefPicList[a][b].Index7Bits);
+				strRes.AppendFormat(L"%d,", pSlice[i].RefPicList[a][b].AssociatedFlag);
+				strRes.AppendFormat(L"%d,", pSlice[i].RefPicList[a][b].bPicEntry);
+				strRes.AppendFormat(L"%d,", pSlice[i].RefPicList[a][b].Index7Bits);
 			}
 		}
 
@@ -553,7 +553,7 @@ static void LogH264SliceLong(DXVA_Slice_H264_Long* pSlice, int nCount)
 			for (int b=0; b<32; b++) {
 				for (int c=0; c<3; c++) {
 					for (int d=0; d<2; d++) {
-						strRes.AppendFormat(_T("%d,"), pSlice[i].Weights[a][b][c][d]);
+						strRes.AppendFormat(L"%d,", pSlice[i].Weights[a][b][c][d]);
 					}
 				}
 			}
@@ -570,11 +570,11 @@ static void LogDXVA_PictureParameters(DXVA_PictureParameters* pPic)
 	CString		strRes;
 
 	if (bFirstPictureParam) {
-		LOG_TOFILE (LOG_FILE_PICTURE, _T("wDecodedPictureIndex,wDeblockedPictureIndex,wForwardRefPictureIndex,wBackwardRefPictureIndex,wPicWidthInMBminus1,wPicHeightInMBminus1,bMacroblockWidthMinus1,bMacroblockHeightMinus1,bBlockWidthMinus1,bBlockHeightMinus1,bBPPminus1,bPicStructure,bSecondField,bPicIntra,bPicBackwardPrediction,bBidirectionalAveragingMode,bMVprecisionAndChromaRelation,bChromaFormat,bPicScanFixed,bPicScanMethod,bPicReadbackRequests,bRcontrol,bPicSpatialResid8,bPicOverflowBlocks,bPicExtrapolation,bPicDeblocked,bPicDeblockConfined,bPic4MVallowed,bPicOBMC,bPicBinPB,bMV_RPS,bReservedBits,wBitstreamFcodes,wBitstreamPCEelements,bBitstreamConcealmentNeed,bBitstreamConcealmentMethod"));
+		LOG_TOFILE (LOG_FILE_PICTURE, L"wDecodedPictureIndex,wDeblockedPictureIndex,wForwardRefPictureIndex,wBackwardRefPictureIndex,wPicWidthInMBminus1,wPicHeightInMBminus1,bMacroblockWidthMinus1,bMacroblockHeightMinus1,bBlockWidthMinus1,bBlockHeightMinus1,bBPPminus1,bPicStructure,bSecondField,bPicIntra,bPicBackwardPrediction,bBidirectionalAveragingMode,bMVprecisionAndChromaRelation,bChromaFormat,bPicScanFixed,bPicScanMethod,bPicReadbackRequests,bRcontrol,bPicSpatialResid8,bPicOverflowBlocks,bPicExtrapolation,bPicDeblocked,bPicDeblockConfined,bPic4MVallowed,bPicOBMC,bPicBinPB,bMV_RPS,bReservedBits,wBitstreamFcodes,wBitstreamPCEelements,bBitstreamConcealmentNeed,bBitstreamConcealmentMethod");
 	}
 	bFirstPictureParam = false;
 
-	strRes.Format (_T("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d"),
+	strRes.Format (L"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
 				   pPic->wDecodedPictureIndex,
 				   pPic->wDeblockedPictureIndex,
 				   pPic->wForwardRefPictureIndex,
@@ -621,26 +621,26 @@ void LogDXVA_Bitstream(BYTE* pBuffer, int nSize)
 	static bool	bFirstBitstream = true;
 
 	if (bFirstBitstream) {
-		LOG_TOFILE (LOG_FILE_BITSTREAM, _T("Size,Start, Stop"));
+		LOG_TOFILE (LOG_FILE_BITSTREAM, L"Size,Start, Stop");
 	}
 	bFirstBitstream = false;
 
-	strRes.Format (_T("%d, -"), nSize);
+	strRes.Format (L"%d, -", nSize);
 
 	for (int i=0; i<20; i++) {
 		if (i < nSize) {
-			strRes.AppendFormat (_T(" %02x"), pBuffer[i]);
+			strRes.AppendFormat (L" %02x", pBuffer[i]);
 		} else {
-			strRes.Append(_T(" --"));
+			strRes.Append(L" --");
 		}
 	}
 
-	strRes.Append (_T(", -"), nSize);
+	strRes.Append (L", -", nSize);
 	for (int i=0; i<20; i++) {
 		if (nSize-i >= 0) {
-			strRes.AppendFormat (_T(" %02x"), pBuffer[i]);
+			strRes.AppendFormat (L" %02x", pBuffer[i]);
 		} else {
-			strRes.Append(_T(" --"));
+			strRes.Append(L" --");
 		}
 	}
 
@@ -663,7 +663,7 @@ inline static void LogDXVA_Bitstream(BYTE* pBuffer, int nSize) {}
 
 static void LogDecodeBufferDesc(DXVA2_DecodeBufferDesc* pDecodeBuff)
 {
-	LOG(_T("DecodeBufferDesc type : %d   Size=%d   NumMBsInBuffer=%d"), pDecodeBuff->CompressedBufferType, pDecodeBuff->DataSize, pDecodeBuff->NumMBsInBuffer);
+	LOG(L"DecodeBufferDesc type : %d   Size=%d   NumMBsInBuffer=%d", pDecodeBuff->CompressedBufferType, pDecodeBuff->DataSize, pDecodeBuff->NumMBsInBuffer);
 }
 
 class CFakeDirectXVideoDecoder : public CUnknown, public IDirectXVideoDecoder
@@ -675,14 +675,14 @@ private :
 
 public :
 	CFakeDirectXVideoDecoder(LPUNKNOWN pUnk, IDirectXVideoDecoder* pDec)
-		: CUnknown(_T("Fake DXVA2 Dec"), pUnk)
+		: CUnknown(L"Fake DXVA2 Dec", pUnk)
 	{
 		m_pDec.Attach(pDec);
 		memset(m_ppBuffer, 0, sizeof(m_ppBuffer));
 	}
 
 	~CFakeDirectXVideoDecoder() {
-		LOG(_T("CFakeDirectXVideoDecoder destroyed !\n"));
+		LOG(L"CFakeDirectXVideoDecoder destroyed !\n");
 	}
 
 	DECLARE_IUNKNOWN;
@@ -697,13 +697,13 @@ public :
 
 	virtual HRESULT STDMETHODCALLTYPE GetVideoDecoderService(IDirectXVideoDecoderService **ppService) {
 		HRESULT hr = m_pDec->GetVideoDecoderService(ppService);
-		LOG(_T("IDirectXVideoDecoder::GetVideoDecoderService  hr = %08x\n"), hr);
+		LOG(L"IDirectXVideoDecoder::GetVideoDecoderService  hr = %08x\n", hr);
 		return hr;
 	}
 
 	virtual HRESULT STDMETHODCALLTYPE GetCreationParameters(GUID *pDeviceGuid, DXVA2_VideoDesc *pVideoDesc, DXVA2_ConfigPictureDecode *pConfig, IDirect3DSurface9 ***pDecoderRenderTargets, UINT *pNumSurfaces) {
 		HRESULT hr = m_pDec->GetCreationParameters(pDeviceGuid, pVideoDesc, pConfig, pDecoderRenderTargets, pNumSurfaces);
-		LOG(_T("IDirectXVideoDecoder::GetCreationParameters hr = %08x\n"), hr);
+		LOG(L"IDirectXVideoDecoder::GetCreationParameters hr = %08x\n", hr);
 		return hr;
 	}
 
@@ -715,26 +715,26 @@ public :
 			m_ppBuffer[BufferType]    = (BYTE*)*ppBuffer;
 			m_ppBufferLen[BufferType] = *pBufferSize;
 		}
-		//			LOG(_T("IDirectXVideoDecoder::GetBuffer Type = %d,  hr = %08x"), BufferType, hr);
+		//			LOG(L"IDirectXVideoDecoder::GetBuffer Type = %d,  hr = %08x", BufferType, hr);
 
 		return hr;
 	}
 
 	virtual HRESULT STDMETHODCALLTYPE ReleaseBuffer(UINT BufferType) {
 		HRESULT hr = m_pDec->ReleaseBuffer(BufferType);
-		//			LOG(_T("IDirectXVideoDecoder::ReleaseBuffer Type = %d,  hr = %08x"), BufferType, hr);
+		//			LOG(L"IDirectXVideoDecoder::ReleaseBuffer Type = %d,  hr = %08x", BufferType, hr);
 		return hr;
 	}
 
 	virtual HRESULT STDMETHODCALLTYPE BeginFrame(IDirect3DSurface9 *pRenderTarget, void *pvPVPData) {
 		HRESULT hr = m_pDec->BeginFrame(pRenderTarget, pvPVPData);
-		LOG(_T("IDirectXVideoDecoder::BeginFrame pRenderTarget = %08x,  hr = %08x"), pRenderTarget, hr);
+		LOG(L"IDirectXVideoDecoder::BeginFrame pRenderTarget = %08x,  hr = %08x", pRenderTarget, hr);
 		return hr;
 	}
 
 	virtual HRESULT STDMETHODCALLTYPE EndFrame(HANDLE *pHandleComplete) {
 		HRESULT hr = m_pDec->EndFrame(pHandleComplete);
-		LOG(_T("IDirectXVideoDecoder::EndFrame  Handle=0x%08x  hr = %08x\n"), pHandleComplete, hr);
+		LOG(L"IDirectXVideoDecoder::EndFrame  Handle=0x%08x  hr = %08x\n", pHandleComplete, hr);
 		return hr;
 	}
 
@@ -747,9 +747,9 @@ public :
 			LogDecodeBufferDesc (&pExecuteParams->pCompressedBuffers[i]);
 			/*
 			for (int j=0; j<4000 && j<pExecuteParams->pCompressedBuffers[i].DataSize; j++)
-				strBuffer.AppendFormat (_T("%02x "), m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType][j]);
+				strBuffer.AppendFormat (L"%02x ", m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType][j]);
 
-			LOG (_T(" - Buffer type=%d,  offset=%d, size=%d"),
+			LOG (L" - Buffer type=%d,  offset=%d, size=%d",
 				pExecuteParams->pCompressedBuffers[i].CompressedBufferType,
 				pExecuteParams->pCompressedBuffers[i].DataOffset,
 				pExecuteParams->pCompressedBuffers[i].DataSize);
@@ -821,14 +821,14 @@ public :
 
 #ifdef _DEBUG
 		if (pExecuteParams->pExtensionData) {
-			LOG(_T("IDirectXVideoDecoder::Execute  %d buffer, fct = %d  (in=%d, out=%d),  hr = %08x"),
+			LOG(L"IDirectXVideoDecoder::Execute  %d buffer, fct = %d  (in=%d, out=%d),  hr = %08x",
 				pExecuteParams->NumCompBuffers,
 				pExecuteParams->pExtensionData->Function,
 				pExecuteParams->pExtensionData->PrivateInputDataSize,
 				pExecuteParams->pExtensionData->PrivateOutputDataSize,
 				hr);
 		} else {
-			LOG(_T("IDirectXVideoDecoder::Execute  %d buffer, hr = %08x"), pExecuteParams->NumCompBuffers, hr);
+			LOG(L"IDirectXVideoDecoder::Execute  %d buffer, hr = %08x", pExecuteParams->NumCompBuffers, hr);
 		}
 #endif
 		return hr;
@@ -890,36 +890,36 @@ static HRESULT (STDMETHODCALLTYPE* GetDecoderConfigurationsOrg)(IDirectXVideoDec
 #ifdef _DEBUG
 static void LogDXVA2Config(const DXVA2_ConfigPictureDecode* pConfig)
 {
-	LOG(_T("Config"));
-	LOG(_T("	- Config4GroupedCoefs               %d"), pConfig->Config4GroupedCoefs);
-	LOG(_T("	- ConfigBitstreamRaw                %d"), pConfig->ConfigBitstreamRaw);
-	LOG(_T("	- ConfigDecoderSpecific             %d"), pConfig->ConfigDecoderSpecific);
-	LOG(_T("	- ConfigHostInverseScan             %d"), pConfig->ConfigHostInverseScan);
-	LOG(_T("	- ConfigIntraResidUnsigned          %d"), pConfig->ConfigIntraResidUnsigned);
-	LOG(_T("	- ConfigMBcontrolRasterOrder        %d"), pConfig->ConfigMBcontrolRasterOrder);
-	LOG(_T("	- ConfigMinRenderTargetBuffCount    %d"), pConfig->ConfigMinRenderTargetBuffCount);
-	LOG(_T("	- ConfigResid8Subtraction           %d"), pConfig->ConfigResid8Subtraction);
-	LOG(_T("	- ConfigResidDiffAccelerator        %d"), pConfig->ConfigResidDiffAccelerator);
-	LOG(_T("	- ConfigResidDiffHost               %d"), pConfig->ConfigResidDiffHost);
-	LOG(_T("	- ConfigSpatialHost8or9Clipping     %d"), pConfig->ConfigSpatialHost8or9Clipping);
-	LOG(_T("	- ConfigSpatialResid8               %d"), pConfig->ConfigSpatialResid8);
-	LOG(_T("	- ConfigSpatialResidInterleaved     %d"), pConfig->ConfigSpatialResidInterleaved);
-	LOG(_T("	- ConfigSpecificIDCT                %d"), pConfig->ConfigSpecificIDCT);
-	LOG(_T("	- guidConfigBitstreamEncryption     %s"), CStringFromGUID(pConfig->guidConfigBitstreamEncryption));
-	LOG(_T("	- guidConfigMBcontrolEncryption     %s"), CStringFromGUID(pConfig->guidConfigMBcontrolEncryption));
-	LOG(_T("	- guidConfigResidDiffEncryption     %s"), CStringFromGUID(pConfig->guidConfigResidDiffEncryption));
+	LOG(L"Config");
+	LOG(L"    - Config4GroupedCoefs               %d", pConfig->Config4GroupedCoefs);
+	LOG(L"    - ConfigBitstreamRaw                %d", pConfig->ConfigBitstreamRaw);
+	LOG(L"    - ConfigDecoderSpecific             %d", pConfig->ConfigDecoderSpecific);
+	LOG(L"    - ConfigHostInverseScan             %d", pConfig->ConfigHostInverseScan);
+	LOG(L"    - ConfigIntraResidUnsigned          %d", pConfig->ConfigIntraResidUnsigned);
+	LOG(L"    - ConfigMBcontrolRasterOrder        %d", pConfig->ConfigMBcontrolRasterOrder);
+	LOG(L"    - ConfigMinRenderTargetBuffCount    %d", pConfig->ConfigMinRenderTargetBuffCount);
+	LOG(L"    - ConfigResid8Subtraction           %d", pConfig->ConfigResid8Subtraction);
+	LOG(L"    - ConfigResidDiffAccelerator        %d", pConfig->ConfigResidDiffAccelerator);
+	LOG(L"    - ConfigResidDiffHost               %d", pConfig->ConfigResidDiffHost);
+	LOG(L"    - ConfigSpatialHost8or9Clipping     %d", pConfig->ConfigSpatialHost8or9Clipping);
+	LOG(L"    - ConfigSpatialResid8               %d", pConfig->ConfigSpatialResid8);
+	LOG(L"    - ConfigSpatialResidInterleaved     %d", pConfig->ConfigSpatialResidInterleaved);
+	LOG(L"    - ConfigSpecificIDCT                %d", pConfig->ConfigSpecificIDCT);
+	LOG(L"    - guidConfigBitstreamEncryption     %s", CStringFromGUID(pConfig->guidConfigBitstreamEncryption));
+	LOG(L"    - guidConfigMBcontrolEncryption     %s", CStringFromGUID(pConfig->guidConfigMBcontrolEncryption));
+	LOG(L"    - guidConfigResidDiffEncryption     %s", CStringFromGUID(pConfig->guidConfigResidDiffEncryption));
 }
 
 static void LogDXVA2VideoDesc(const DXVA2_VideoDesc* pVideoDesc)
 {
-	LOG(_T("VideoDesc"));
-	LOG(_T("	- Format                            %s  (0x%08x)"), D3DFormatToString(pVideoDesc->Format), pVideoDesc->Format);
-	LOG(_T("	- InputSampleFreq                   %d/%d"), pVideoDesc->InputSampleFreq.Numerator, pVideoDesc->InputSampleFreq.Denominator);
-	LOG(_T("	- OutputFrameFreq                   %d/%d"), pVideoDesc->OutputFrameFreq.Numerator, pVideoDesc->OutputFrameFreq.Denominator);
-	LOG(_T("	- SampleFormat                      %d"), pVideoDesc->SampleFormat.value);
-	LOG(_T("	- SampleHeight                      %d"), pVideoDesc->SampleHeight);
-	LOG(_T("	- SampleWidth                       %d"), pVideoDesc->SampleWidth);
-	LOG(_T("	- UABProtectionLevel                %d"), pVideoDesc->UABProtectionLevel);
+	LOG(L"VideoDesc");
+	LOG(L"    - Format                            %s  (0x%08x)", D3DFormatToString(pVideoDesc->Format), pVideoDesc->Format);
+	LOG(L"    - InputSampleFreq                   %d/%d", pVideoDesc->InputSampleFreq.Numerator, pVideoDesc->InputSampleFreq.Denominator);
+	LOG(L"    - OutputFrameFreq                   %d/%d", pVideoDesc->OutputFrameFreq.Numerator, pVideoDesc->OutputFrameFreq.Denominator);
+	LOG(L"    - SampleFormat                      %d", pVideoDesc->SampleFormat.value);
+	LOG(L"    - SampleHeight                      %d", pVideoDesc->SampleHeight);
+	LOG(L"    - SampleWidth                       %d", pVideoDesc->SampleWidth);
+	LOG(L"    - UABProtectionLevel                %d", pVideoDesc->UABProtectionLevel);
 }
 #endif
 
@@ -937,7 +937,7 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(IDirectXVideoDecoderServ
 	g_nDXVAVersion    = 2;
 
 #ifdef _DEBUG
-	LOG(_T("\n\n"));
+	LOG(L"\n\n");
 	LogDXVA2VideoDesc(pVideoDesc);
 	LogDXVA2Config(pConfig);
 #endif
@@ -961,14 +961,14 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(IDirectXVideoDecoderServ
 		}
 
 		for (UINT i = 0; i < NumRenderTargets; i++) {
-			LOG(_T(" - Surf %d : %08x"), i, ppDecoderRenderTargets[i]);
+			LOG(L" - Surf %d : %08x", i, ppDecoderRenderTargets[i]);
 		}
 	}
 #endif
 
 	DLog(L"DXVA Decoder : %s", GetDXVADecoderDescription());
 #ifdef _DEBUG
-	LOG(_T("IDirectXVideoDecoderService::CreateVideoDecoder  %s  (%d render targets) hr = %08x"), GetDXVAMode(&g_guidDXVADecoder), NumRenderTargets, hr);
+	LOG(L"IDirectXVideoDecoderService::CreateVideoDecoder  %s  (%d render targets) hr = %08x", GetDXVAMode(&g_guidDXVADecoder), NumRenderTargets, hr);
 #endif
 	return hr;
 }
@@ -979,7 +979,7 @@ static HRESULT STDMETHODCALLTYPE GetDecoderDeviceGuidsMine(IDirectXVideoDecoderS
 															__deref_out_ecount_opt(*pCount) GUID**	pGuids)
 {
 	HRESULT hr = GetDecoderDeviceGuidsOrg(pThis, pCount, pGuids);
-	LOG(_T("IDirectXVideoDecoderService::GetDecoderDeviceGuids  hr = %08x\n"), hr);
+	LOG(L"IDirectXVideoDecoderService::GetDecoderDeviceGuids  hr = %08x\n", hr);
 
 	return hr;
 }

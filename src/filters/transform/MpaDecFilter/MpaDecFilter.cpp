@@ -45,19 +45,19 @@
 #include <ffmpeg/libavcodec/avcodec.h>
 
 // option names
-#define OPT_REGKEY_MpaDec   _T("Software\\MPC-BE Filters\\MPC Audio Decoder")
-#define OPT_SECTION_MpaDec  _T("Filters\\MPC Audio Decoder")
-#define OPTION_SFormat_i16  _T("SampleFormat_int16")
-#define OPTION_SFormat_i24  _T("SampleFormat_int24")
-#define OPTION_SFormat_i32  _T("SampleFormat_int32")
-#define OPTION_SFormat_flt  _T("SampleFormat_float")
-#define OPTION_DRC          _T("DRC")
-#define OPTION_SPDIF_ac3    _T("SPDIF_ac3")
-#define OPTION_SPDIF_eac3   _T("HDMI_eac3")
-#define OPTION_SPDIF_truehd _T("HDMI_truehd")
-#define OPTION_SPDIF_dts    _T("SPDIF_dts")
-#define OPTION_SPDIF_dtshd  _T("HDMI_dtshd")
-#define OPTION_SPDIF_ac3enc _T("SPDIF_ac3enc")
+#define OPT_REGKEY_MpaDec   L"Software\\MPC-BE Filters\\MPC Audio Decoder"
+#define OPT_SECTION_MpaDec  L"Filters\\MPC Audio Decoder"
+#define OPTION_SFormat_i16  L"SampleFormat_int16"
+#define OPTION_SFormat_i24  L"SampleFormat_int24"
+#define OPTION_SFormat_i32  L"SampleFormat_int32"
+#define OPTION_SFormat_flt  L"SampleFormat_float"
+#define OPTION_DRC          L"DRC"
+#define OPTION_SPDIF_ac3    L"SPDIF_ac3"
+#define OPTION_SPDIF_eac3   L"HDMI_eac3"
+#define OPTION_SPDIF_truehd L"HDMI_truehd"
+#define OPTION_SPDIF_dts    L"SPDIF_dts"
+#define OPTION_SPDIF_dtshd  L"HDMI_dtshd"
+#define OPTION_SPDIF_ac3enc L"SPDIF_ac3enc"
 
 #define MAX_JITTER          1000000i64 // +-100ms jitter is allowed
 #define MAX_DTS_JITTER      1400000i64 // +-140ms jitter is allowed for DTS
@@ -2382,7 +2382,7 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 	CString infostr;
 
 	if (index == AINFO_MPCVersion) {
-		infostr.Format(_T("v%d.%d.%d (build %d)"), MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_PATCH, MPC_VERSION_REV);
+		infostr.Format(L"v%d.%d.%d (build %d)", MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_PATCH, MPC_VERSION_REV);
 
 		return infostr;
 	}

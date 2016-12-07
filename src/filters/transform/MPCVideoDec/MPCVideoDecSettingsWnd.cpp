@@ -103,7 +103,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbThreadNumber.AddString (ResStr (IDS_VDF_AUTO));
 	CString ThreadNumberStr;
 	for (int i = 1; i <= 16; i++) {
-		ThreadNumberStr.Format(_T("%d"), i);
+		ThreadNumberStr.Format(L"%d", i);
 		m_cbThreadNumber.AddString(ThreadNumberStr);
 	}
 	p.y += h25;
@@ -181,42 +181,42 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	// Software output formats
 	m_txtSwOutputFormats.Create(ResStr(IDS_VDF_COLOR_OUTPUT_FORMATS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(width_s, m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	m_txt8bit.Create(_T("8-bit"), WS_VISIBLE|WS_CHILD, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(45), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_txt10bit.Create(_T("10-bit"), WS_VISIBLE|WS_CHILD, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_txt16bit.Create(_T("16-bit"), WS_VISIBLE|WS_CHILD, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txt8bit.Create(L"8-bit", WS_VISIBLE|WS_CHILD, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(45), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txt10bit.Create(L"10-bit", WS_VISIBLE|WS_CHILD, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txt16bit.Create(L"16-bit", WS_VISIBLE|WS_CHILD, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	m_txt420.Create(_T("4:2:0 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbFormat[PixFmt_NV12].Create(_T("NV12"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_NV12);
-	m_cbFormat[PixFmt_YV12].Create(_T("YV12"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(115), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_YV12);
-	m_cbFormat[PixFmt_P010].Create(_T("P010"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P010);
-	m_cbFormat[PixFmt_P016].Create(_T("P016"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P016);
+	m_txt420.Create(L"4:2:0 YUV:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbFormat[PixFmt_NV12].Create(L"NV12", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_NV12);
+	m_cbFormat[PixFmt_YV12].Create(L"YV12", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(115), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_YV12);
+	m_cbFormat[PixFmt_P010].Create(L"P010", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P010);
+	m_cbFormat[PixFmt_P016].Create(L"P016", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P016);
 	p.y += h20;
-	m_txt422.Create(_T("4:2:2 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbFormat[PixFmt_YUY2].Create(_T("YUY2"), dwStyle | BS_3STATE, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(50), m_fontheight)), this, IDC_PP_SW_YUY2);
-	m_cbFormat[PixFmt_YV16].Create(_T("YV16"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(115), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_YV16);
-	m_cbFormat[PixFmt_P210].Create(_T("P210"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P210);
-	m_cbFormat[PixFmt_P216].Create(_T("P216"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P216);
+	m_txt422.Create(L"4:2:2 YUV:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbFormat[PixFmt_YUY2].Create(L"YUY2", dwStyle | BS_3STATE, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(50), m_fontheight)), this, IDC_PP_SW_YUY2);
+	m_cbFormat[PixFmt_YV16].Create(L"YV16", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(115), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_YV16);
+	m_cbFormat[PixFmt_P210].Create(L"P210", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P210);
+	m_cbFormat[PixFmt_P216].Create(L"P216", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_P216);
 	p.y += h20;
-	m_txt444.Create(_T("4:4:4 YUV:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbFormat[PixFmt_AYUV].Create(_T("AYUV"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(51), m_fontheight)), this, IDC_PP_SW_AYUV);
-	m_cbFormat[PixFmt_YV24].Create(_T("YV24"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(115), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_YV24);
-	m_cbFormat[PixFmt_Y410].Create(_T("Y410"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_Y410);
-	m_cbFormat[PixFmt_Y416].Create(_T("Y416"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_Y416);
+	m_txt444.Create(L"4:4:4 YUV:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbFormat[PixFmt_AYUV].Create(L"AYUV", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(51), m_fontheight)), this, IDC_PP_SW_AYUV);
+	m_cbFormat[PixFmt_YV24].Create(L"YV24", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(115), 0), CSize(ScaleX(47), m_fontheight)), this, IDC_PP_SW_YV24);
+	m_cbFormat[PixFmt_Y410].Create(L"Y410", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(170), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_Y410);
+	m_cbFormat[PixFmt_Y416].Create(L"Y416", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(45), m_fontheight)), this, IDC_PP_SW_Y416);
 	p.y += h20;
-	m_txtRGB.Create(_T("RGB:"), WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbFormat[PixFmt_RGB32].Create(_T("RGB32"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(56), m_fontheight)), this, IDC_PP_SW_RGB32);
+	m_txtRGB.Create(L"RGB:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
+	m_cbFormat[PixFmt_RGB32].Create(L"RGB32", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(56), m_fontheight)), this, IDC_PP_SW_RGB32);
 	p.y += h25;
 
 	// Output levels
 	m_txtSwRGBLevels.Create(ResStr(IDS_VDF_COLOR_RGB_LEVELS), WS_VISIBLE|WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbSwRGBLevels.Create(dwStyle|CBS_DROPDOWNLIST|WS_VSCROLL, CRect(p + CSize(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_SWRGBLEVELS);
-	m_cbSwRGBLevels.AddString(_T("PC (0-255)"));
-	m_cbSwRGBLevels.AddString(_T("TV (16-235)"));
+	m_cbSwRGBLevels.AddString(L"PC (0-255)");
+	m_cbSwRGBLevels.AddString(L"TV (16-235)");
 
 	p.y = 10 + ScaleY(115) + 5 + ScaleY(65) + 5 + ScaleY(85) - m_fontheight;
 	int btn_w = ScaleX(75);
 	m_btnReset.Create(ResStr(IDS_FILTER_RESET_SETTINGS), dwStyle|BS_MULTILINE, CRect(p + CPoint(0, - (m_fontheight + 6)), CSize(btn_w, m_fontheight*2 + 6)), this, IDC_PP_RESET);
-	m_txtMPCVersion.Create(_T(""), WS_VISIBLE|WS_CHILD|ES_RIGHT, CRect(p + CPoint(btn_w, - 3), CSize(width_s - btn_w, m_fontheight)), this, (UINT)IDC_STATIC);
+	m_txtMPCVersion.Create(L"", WS_VISIBLE|WS_CHILD|ES_RIGHT, CRect(p + CPoint(btn_w, - 3), CSize(width_s - btn_w, m_fontheight)), this, (UINT)IDC_STATIC);
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
@@ -437,46 +437,46 @@ static const struct {
 	ULONGLONG	CodecId;
 	LPCTSTR		CodeName;
 } mpc_codecs[] = {
-	{CODEC_H264_DXVA,	_T("H.264/AVC (DXVA)")},
-	{CODEC_HEVC_DXVA,	_T("HEVC (DXVA)")},
-	{CODEC_MPEG2_DXVA,	_T("MPEG-2 (DXVA)")},
-	{CODEC_VC1_DXVA,	_T("VC-1 (DXVA)")},
-	{CODEC_WMV3_DXVA,	_T("WMV3 (DXVA)")},
-	{CODEC_VP9_DXVA,	_T("VP9 (DXVA)")},
-	{CODEC_AMVV,		_T("AMV video")},
-	{CODEC_PRORES,		_T("Apple ProRes")},
-	{CODEC_DNXHD,		_T("Avid DNxHD")},
-	{CODEC_BINKV,		_T("Bink video")},
-	{CODEC_CANOPUS,		_T("Canopus Lossless/HQ/HQX")},
-	{CODEC_CINEFORM,	_T("CineForm")},
-	{CODEC_CINEPAK,		_T("Cinepak")},
-	{CODEC_DIRAC,		_T("Dirac")},
-	{CODEC_DIVX,		_T("DivX")},
-	{CODEC_DV,			_T("DV video")},
-	{CODEC_FLASH,		_T("FLV1/4")},
-	{CODEC_H263,		_T("H.263")},
-	{CODEC_H264,		_T("H.264/AVC (FFmpeg)")},
-	{CODEC_H264_MVC,	_T("H264 (MVC 3D)")},
-	{CODEC_HEVC,		_T("HEVC (experimental)")},
-	{CODEC_INDEO,		_T("Indeo 3/4/5")},
-	{CODEC_LOSSLESS,	_T("Lossless video (huffyuv, Lagarith, FFV1, MagicYUV)")},
-	{CODEC_MJPEG,		_T("MJPEG")},
-	{CODEC_MPEG1,		_T("MPEG-1 (FFmpeg)")},
-	{CODEC_MPEG2,		_T("MPEG-2 (FFmpeg)")},
-	{CODEC_MSMPEG4,		_T("MS-MPEG4")},
-	{CODEC_PNG,			_T("PNG")},
-	{CODEC_QT,			_T("QuickTime video (8BPS, QTRle, rpza)")},
-	{CODEC_SCREC,		_T("Screen Recorder (CSCD, MS, TSCC, VMnc)")},
-	{CODEC_SVQ3,		_T("SVQ1/3")},
-	{CODEC_THEORA,		_T("Theora")},
-	{CODEC_UTVD,		_T("Ut video")},
-	{CODEC_VC1,			_T("VC-1 (FFmpeg)")},
-	{CODEC_VP356,		_T("VP3/5/6")},
-	{CODEC_VP89,		_T("VP7/8/9")},
-	{CODEC_WMV,			_T("WMV1/2/3")},
-	{CODEC_XVID,		_T("Xvid/MPEG-4")},
-	{CODEC_REALV,		_T("Real Video")},
-	{CODEC_UNCOMPRESSED,_T("Uncompressed video (v210, V410, Y800, I420, ...)")},
+	{CODEC_H264_DXVA,	L"H.264/AVC (DXVA)"},
+	{CODEC_HEVC_DXVA,	L"HEVC (DXVA)"},
+	{CODEC_MPEG2_DXVA,	L"MPEG-2 (DXVA)"},
+	{CODEC_VC1_DXVA,	L"VC-1 (DXVA)"},
+	{CODEC_WMV3_DXVA,	L"WMV3 (DXVA)"},
+	{CODEC_VP9_DXVA,	L"VP9 (DXVA)"},
+	{CODEC_AMVV,		L"AMV video"},
+	{CODEC_PRORES,		L"Apple ProRes"},
+	{CODEC_DNXHD,		L"Avid DNxHD"},
+	{CODEC_BINKV,		L"Bink video"},
+	{CODEC_CANOPUS,		L"Canopus Lossless/HQ/HQX"},
+	{CODEC_CINEFORM,	L"CineForm"},
+	{CODEC_CINEPAK,		L"Cinepak"},
+	{CODEC_DIRAC,		L"Dirac"},
+	{CODEC_DIVX,		L"DivX"},
+	{CODEC_DV,			L"DV video"},
+	{CODEC_FLASH,		L"FLV1/4"},
+	{CODEC_H263,		L"H.263"},
+	{CODEC_H264,		L"H.264/AVC (FFmpeg)"},
+	{CODEC_H264_MVC,	L"H264 (MVC 3D)"},
+	{CODEC_HEVC,		L"HEVC (experimental)"},
+	{CODEC_INDEO,		L"Indeo 3/4/5"},
+	{CODEC_LOSSLESS,	L"Lossless video (huffyuv, Lagarith, FFV1, MagicYUV)"},
+	{CODEC_MJPEG,		L"MJPEG"},
+	{CODEC_MPEG1,		L"MPEG-1 (FFmpeg)"},
+	{CODEC_MPEG2,		L"MPEG-2 (FFmpeg)"},
+	{CODEC_MSMPEG4,		L"MS-MPEG4"},
+	{CODEC_PNG,			L"PNG"},
+	{CODEC_QT,			L"QuickTime video (8BPS, QTRle, rpza)"},
+	{CODEC_SCREC,		L"Screen Recorder (CSCD, MS, TSCC, VMnc)"},
+	{CODEC_SVQ3,		L"SVQ1/3"},
+	{CODEC_THEORA,		L"Theora"},
+	{CODEC_UTVD,		L"Ut video"},
+	{CODEC_VC1,			L"VC-1 (FFmpeg)"},
+	{CODEC_VP356,		L"VP3/5/6"},
+	{CODEC_VP89,		L"VP7/8/9"},
+	{CODEC_WMV,			L"WMV1/2/3"},
+	{CODEC_XVID,		L"Xvid/MPEG-4"},
+	{CODEC_REALV,		L"Real Video"},
+	{CODEC_UNCOMPRESSED,L"Uncompressed video (v210, V410, Y800, I420, ...)"},
 };
 
 bool CMPCVideoDecCodecWnd::OnActivate()
@@ -485,7 +485,7 @@ bool CMPCVideoDecCodecWnd::OnActivate()
 	int nPos				= 0;
 	ULONGLONG nActiveCodecs	= m_pMDF ? m_pMDF->GetActiveCodecs() : 0;
 
-	m_grpSelectedCodec.Create(_T("Selected codecs"), WS_VISIBLE|WS_CHILD | BS_GROUPBOX, CRect (10,  10, 330, 280), this, (UINT)IDC_STATIC);
+	m_grpSelectedCodec.Create(L"Selected codecs", WS_VISIBLE|WS_CHILD | BS_GROUPBOX, CRect (10,  10, 330, 280), this, (UINT)IDC_STATIC);
 
 	m_lstCodecs.Create(dwStyle | LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP, CRect (20,30, 320, 270), this, 0);
 

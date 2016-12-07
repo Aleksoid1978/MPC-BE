@@ -59,24 +59,24 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{1930D8FF-4739-4e42-9199-3B2EDEAA3BF2}"),
-		_T("0"), _T("0,4,,664C6143"));
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{1930D8FF-4739-4e42-9199-3B2EDEAA3BF2}",
+		L"0", L"0,4,,664C6143");
 
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{1930D8FF-4739-4e42-9199-3B2EDEAA3BF2}"),
-		_T("Source Filter"), _T("{1930D8FF-4739-4e42-9199-3B2EDEAA3BF2}"));
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{1930D8FF-4739-4e42-9199-3B2EDEAA3BF2}",
+		L"Source Filter", L"{1930D8FF-4739-4e42-9199-3B2EDEAA3BF2}");
 
 	SetRegKeyValue(
-		_T("Media Type\\Extensions"), _T(".flac"),
-		_T("Source Filter"), _T("{1930D8FF-4739-4e42-9199-3B2EDEAA3BF2}"));
+		L"Media Type\\Extensions", L".flac",
+		L"Source Filter", L"{1930D8FF-4739-4e42-9199-3B2EDEAA3BF2}");
 
 	return AMovieDllRegisterServer2(TRUE);
 }
 
 STDAPI DllUnregisterServer()
 {
-	DeleteRegKey(_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{1930D8FF-4739-4e42-9199-3B2EDEAA3BF2}"));
-	DeleteRegKey(_T("Media Type\\Extensions"), _T(".flac"));
+	DeleteRegKey(L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{1930D8FF-4739-4e42-9199-3B2EDEAA3BF2}");
+	DeleteRegKey(L"Media Type\\Extensions", L".flac");
 
 	return AMovieDllRegisterServer2(FALSE);
 }
@@ -264,7 +264,7 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			CString Title	= file_info.title;
 			CString Year	= file_info.year;
 			if (!Title.IsEmpty() && !Year.IsEmpty()) {
-				Title += _T(" (") + Year + _T(")");
+				Title += L" (" + Year + L")";
 			}
 
 			((CFLACSource*)m_pFilter)->SetProperty(L"TITL", Title);
@@ -553,13 +553,13 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 
 			REFERENCE_TIME rt = MILLISECONDS_TO_100NS_UNITS(1000*track->offset/m_nSamplesPerSec);
 			CString s;
-			s.Format(_T("Track %02d"), i+1);
+			s.Format(L"Track %02d", i+1);
 			((CFLACSource*)m_pFilter)->ChapAppend(rt, s);
 
 			if (track->num_indices > 1) {
 				for (int j = 0; j < track->num_indices; ++j) {
 					FLAC__StreamMetadata_CueSheet_Index *index = &track->indices[j];
-					s.Format(_T("+ INDEX %02d"), index->number);
+					s.Format(L"+ INDEX %02d", index->number);
 					REFERENCE_TIME r = rt + MILLISECONDS_TO_100NS_UNITS(1000*index->offset/m_nSamplesPerSec);
 					((CFLACSource*)m_pFilter)->ChapAppend(r, s);
 				}

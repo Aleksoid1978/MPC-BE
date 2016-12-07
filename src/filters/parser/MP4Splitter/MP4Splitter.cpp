@@ -71,19 +71,19 @@ int g_cTemplates = _countof(g_Templates);
 
 STDAPI DllRegisterServer()
 {
-	DeleteRegKey(_T("Media Type\\Extensions\\"), _T(".mp4"));
-	DeleteRegKey(_T("Media Type\\Extensions\\"), _T(".mov"));
+	DeleteRegKey(L"Media Type\\Extensions\\", L".mp4");
+	DeleteRegKey(L"Media Type\\Extensions\\", L".mov");
 
 	CAtlList<CString> chkbytes;
 
 	// mov, mp4
-	chkbytes.AddTail(_T("4,4,,66747970")); // '....ftyp'
-	chkbytes.AddTail(_T("4,4,,6d6f6f76")); // '....moov'
-	chkbytes.AddTail(_T("4,4,,6d646174")); // '....mdat'
-	chkbytes.AddTail(_T("4,4,,77696465")); // '....wide'
-	chkbytes.AddTail(_T("4,4,,736b6970")); // '....skip'
-	chkbytes.AddTail(_T("4,4,,66726565")); // '....free'
-	chkbytes.AddTail(_T("4,4,,706e6f74")); // '....pnot'
+	chkbytes.AddTail(L"4,4,,66747970"); // '....ftyp'
+	chkbytes.AddTail(L"4,4,,6d6f6f76"); // '....moov'
+	chkbytes.AddTail(L"4,4,,6d646174"); // '....mdat'
+	chkbytes.AddTail(L"4,4,,77696465"); // '....wide'
+	chkbytes.AddTail(L"4,4,,736b6970"); // '....skip'
+	chkbytes.AddTail(L"4,4,,66726565"); // '....free'
+	chkbytes.AddTail(L"4,4,,706e6f74"); // '....pnot'
 
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MP4, chkbytes, NULL);
 
@@ -140,7 +140,7 @@ static void SetTrackName(CString *TrackName, CString Suffix)
 	if (TrackName->IsEmpty()) {
 		*TrackName = Suffix;
 	} else {
-		*TrackName += _T(" - ");
+		*TrackName += L" - ";
 		*TrackName += Suffix;
 	}
 }
@@ -152,7 +152,7 @@ static void SetTrackName(CString *TrackName, CString Suffix)
 	if (tname.IsEmpty()) {						\
 		tname = name;							\
 	} else if (append) {						\
-		tname.AppendFormat(_T("(%s)"), name);	\
+		tname.AppendFormat(L"(%s)", name);		\
 	}											\
 	SetTrackName(&TrackName, tname);			\
 
@@ -363,7 +363,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					nRotation = tkhd->GetRotation();
 					if (nRotation) {
 						CString prop;
-						prop.Format(_T("%d"), nRotation);
+						prop.Format(L"%d", nRotation);
 						SetProperty(L"ROTATION", prop);
 					}
 				}
@@ -426,7 +426,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				if (mpeg_desc) {
 					CStringW TypeString = CStringW(mpeg_desc->GetObjectTypeString(mpeg_desc->GetObjectTypeId()));
-					if ((TypeString.Find(_T("UNKNOWN")) == -1) && (TypeString.Find(_T("INVALID")) == -1)) {
+					if ((TypeString.Find(L"UNKNOWN") == -1) && (TypeString.Find(L"INVALID") == -1)) {
 						SetTrackName(&TrackName, TypeString);
 					}
 				}
@@ -773,7 +773,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						if ((buff[0] == 'x' || buff[0] == 'h') && buff[1] == 'd') {
 							// Apple HDV/XDCAM
-							FormatTrackName(_T("HDV/XDV MPEG2"), 0);
+							FormatTrackName(L"HDV/XDV MPEG2", 0);
 
 							m_pFile->Seek(sample.GetOffset());
 							CBaseSplitterFileEx::seqhdr h;
@@ -785,23 +785,23 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 							break;
 						} else if (type == AP4_ATOM_TYPE_MJPA || type == AP4_ATOM_TYPE_MJPB || fourcc == FCC('MJPG')) {
-							FormatTrackName(_T("M-Jpeg"), 1);
+							FormatTrackName(L"M-Jpeg", 1);
 						} else if (type == AP4_ATOM_TYPE_MJP2) {
-							FormatTrackName(_T("M-Jpeg 2000"), 1);
+							FormatTrackName(L"M-Jpeg 2000", 1);
 						} else if (type == AP4_ATOM_TYPE_APCN ||
 								   type == AP4_ATOM_TYPE_APCH ||
 								   type == AP4_ATOM_TYPE_APCO ||
 								   type == AP4_ATOM_TYPE_APCS ||
 								   type == AP4_ATOM_TYPE_AP4H) {
-							FormatTrackName(_T("Apple ProRes"), 0);
+							FormatTrackName(L"Apple ProRes", 0);
 						} else if (type == AP4_ATOM_TYPE_SVQ1 ||
 								   type == AP4_ATOM_TYPE_SVQ2 ||
 								   type == AP4_ATOM_TYPE_SVQ3) {
-							FormatTrackName(_T("Sorenson"), 0);
+							FormatTrackName(L"Sorenson", 0);
 						} else if (type == AP4_ATOM_TYPE_CVID) {
-							FormatTrackName(_T("Cinepack"), 0);
+							FormatTrackName(L"Cinepack", 0);
 						} else if (fourcc == FCC('WVC1')) {
-							FormatTrackName(_T("VC-1"), 0);
+							FormatTrackName(L"VC-1", 0);
 							if (AP4_Dvc1Atom* Dvc1 = dynamic_cast<AP4_Dvc1Atom*>(vse->GetChild(AP4_ATOM_TYPE_DVC1))) {
 								pData = (AP4_DataBuffer*)Dvc1->GetDecoderInfo();
 							}
@@ -987,35 +987,35 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							fourcc = type & 0xffff;
 						} else if (type == AP4_ATOM_TYPE_ALAW) {
 							fourcc = WAVE_FORMAT_ALAW;
-							SetTrackName(&TrackName, _T("PCM A-law"));
+							SetTrackName(&TrackName, L"PCM A-law");
 						} else if (type == AP4_ATOM_TYPE_ULAW) {
 							fourcc = WAVE_FORMAT_MULAW;
-							SetTrackName(&TrackName, _T("PCM mu-law"));
+							SetTrackName(&TrackName, L"PCM mu-law");
 						} else if (type == AP4_ATOM_TYPE__MP3) {
-							SetTrackName(&TrackName, _T("MPEG Audio (MP3)"));
+							SetTrackName(&TrackName, L"MPEG Audio (MP3)");
 							fourcc = WAVE_FORMAT_MPEGLAYER3;
 						} else if ((type == AP4_ATOM_TYPE__AC3) || (type == AP4_ATOM_TYPE_SAC3) || (type == AP4_ATOM_TYPE_EAC3)) {
 							if (type == AP4_ATOM_TYPE_EAC3) {
-								SetTrackName(&TrackName, _T("Enhanced AC-3 audio"));
+								SetTrackName(&TrackName, L"Enhanced AC-3 audio");
 								fourcc = WAVE_FORMAT_UNKNOWN;
 							} else {
 								fourcc = WAVE_FORMAT_DOLBY_AC3;
-								SetTrackName(&TrackName, _T("AC-3 Audio"));
+								SetTrackName(&TrackName, L"AC-3 Audio");
 							}
 						} else if (type == AP4_ATOM_TYPE_MP4A) {
 							fourcc = WAVE_FORMAT_RAW_AAC1;
-							SetTrackName(&TrackName, _T("MPEG-2 Audio AAC"));
+							SetTrackName(&TrackName, L"MPEG-2 Audio AAC");
 						} else if (type == AP4_ATOM_TYPE_NMOS) {
 							fourcc = MAKEFOURCC('N','E','L','L');
-							SetTrackName(&TrackName, _T("NellyMoser Audio"));
+							SetTrackName(&TrackName, L"NellyMoser Audio");
 						} else if (type == AP4_ATOM_TYPE_ALAC) {
 							fourcc = MAKEFOURCC('a','l','a','c');
-							SetTrackName(&TrackName, _T("ALAC Audio"));
+							SetTrackName(&TrackName, L"ALAC Audio");
 						} else if (type == AP4_ATOM_TYPE_QDM2) {
-							SetTrackName(&TrackName, _T("QDesign Music 2"));
+							SetTrackName(&TrackName, L"QDesign Music 2");
 						} else if (type == AP4_ATOM_TYPE_SPEX) {
 							fourcc = 0xa109;
-							SetTrackName(&TrackName, _T("Speex"));
+							SetTrackName(&TrackName, L"Speex");
 						} else if ((type == AP4_ATOM_TYPE_NONE || type == AP4_ATOM_TYPE_RAW) && bitspersample == 8 ||
 								    type == AP4_ATOM_TYPE_SOWT && bitspersample == 16 ||
 								   (type == AP4_ATOM_TYPE_IN24 || type == AP4_ATOM_TYPE_IN32) && ase->GetEndian()==ENDIAN_LITTLE) {
@@ -1023,7 +1023,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						} else if ((type == AP4_ATOM_TYPE_FL32 || type == AP4_ATOM_TYPE_FL64) && ase->GetEndian()==ENDIAN_LITTLE) {
 							fourcc = type = WAVE_FORMAT_IEEE_FLOAT;
 						} else if (type == AP4_ATOM_TYPE_LPCM) {
-							SetTrackName(&TrackName, _T("LPCM"));
+							SetTrackName(&TrackName, L"LPCM");
 							DWORD flags = ase->GetFormatSpecificFlags();
 							if (flags & 2) { // big endian
 								if (flags & 1) { // floating point
@@ -1046,7 +1046,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 							}
 						} else if (type == AP4_ATOM_TYPE_FLAC) {
-							SetTrackName(&TrackName, _T("FLAC"));
+							SetTrackName(&TrackName, L"FLAC");
 							fourcc = WAVE_FORMAT_FLAC;
 						}
 
@@ -1059,7 +1059,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							type == AP4_ATOM_TYPE_FL64 ||
 							type == WAVE_FORMAT_PCM    ||
 							type == WAVE_FORMAT_IEEE_FLOAT) {
-							SetTrackName(&TrackName, _T("PCM"));
+							SetTrackName(&TrackName, L"PCM");
 						}
 
 						mt.majortype = MEDIATYPE_Audio;
@@ -1344,10 +1344,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							if (db->GetDataSize() > 10) {
 								DWORD sync = GETDWORD(db->GetData());
 								if ((sync & 0x00ffffff) == 0x00FFD8FF) { // SOI segment + first byte of next segment
-									ResAppend(_T("cover.jpg"), _T("cover"), _T("image/jpeg"), (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
+									ResAppend(L"cover.jpg", L"cover", L"image/jpeg", (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
 								}
 								else if (sync == MAKEFOURCC(0x89, 'P', 'N', 'G')) {
-									ResAppend(_T("cover.png"), _T("cover"), _T("image/png"), (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
+									ResAppend(L"cover.png", L"cover", L"image/png", (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
 								}
 							}
 						} else {

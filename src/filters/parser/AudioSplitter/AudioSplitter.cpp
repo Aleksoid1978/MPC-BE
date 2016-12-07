@@ -59,18 +59,18 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	CAtlList<CString>chkbytes;
-	chkbytes.AddTail(_T("0,4,,4D414320"));                  // 'MAC '
-	chkbytes.AddTail(_T("0,4,,7442614B"));                  // 'tBaK'
-	chkbytes.AddTail(_T("0,4,,54544131"));                  // 'TTA1'
-	chkbytes.AddTail(_T("0,4,,7776706B"));                  // 'wvpk'
-	chkbytes.AddTail(_T("0,6,,2321414D520A"));              // '#!AMR\n'
-	chkbytes.AddTail(_T("0,9,,2321414D522D57420A"));        // '#!AMR-WB\n'
-	chkbytes.AddTail(_T("0,4,,52494646,8,4,,57415645"));    // 'RIFF....WAVE'
-	chkbytes.AddTail(_T("0,16,,726966662E91CF11A5D628DB04C10000,24,16,,77617665F3ACD3118CD100C04F8EDB8A")); // Wave64
-	chkbytes.AddTail(_T("0,3,,494433"));                    // 'ID3' for TTA
-	chkbytes.AddTail(_T("0,12,,445344201C00000000000000")); // 'DSD ...'
-	chkbytes.AddTail(_T("0,4,,46524D38,12,4,,44534420"));   // 'FRM8........DSD '
-	chkbytes.AddTail(_T("0,8,,4454534844484452"));          // 'DTSHDHDR'
+	chkbytes.AddTail(L"0,4,,4D414320");                  // 'MAC '
+	chkbytes.AddTail(L"0,4,,7442614B");                  // 'tBaK'
+	chkbytes.AddTail(L"0,4,,54544131");                  // 'TTA1'
+	chkbytes.AddTail(L"0,4,,7776706B");                  // 'wvpk'
+	chkbytes.AddTail(L"0,6,,2321414D520A");              // '#!AMR\n'
+	chkbytes.AddTail(L"0,9,,2321414D522D57420A");        // '#!AMR-WB\n'
+	chkbytes.AddTail(L"0,4,,52494646,8,4,,57415645");    // 'RIFF....WAVE'
+	chkbytes.AddTail(L"0,16,,726966662E91CF11A5D628DB04C10000,24,16,,77617665F3ACD3118CD100C04F8EDB8A"); // Wave64
+	chkbytes.AddTail(L"0,3,,494433");                    // 'ID3' for TTA
+	chkbytes.AddTail(L"0,12,,445344201C00000000000000"); // 'DSD ...'
+	chkbytes.AddTail(L"0,4,,46524D38,12,4,,44534420");   // 'FRM8........DSD '
+	chkbytes.AddTail(L"0,8,,4454534844484452");          // 'DTSHDHDR'
 
 	RegisterSourceFilter(
 		CLSID_AsyncReader,

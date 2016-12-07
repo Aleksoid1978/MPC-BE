@@ -102,10 +102,10 @@ bool CMpaDecSettingsWnd::OnActivate()
 
 	m_outfmt_group.Create(ResStr(IDS_MPADEC_SAMPLE_FMT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(ScaleX(230), h20 + h20)), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	m_outfmt_i16_check.Create(_T("Int16"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_I16);
-	m_outfmt_i24_check.Create(_T("Int24"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(ScaleX(55), 0), CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_I24);
-	m_outfmt_i32_check.Create(_T("Int32"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(ScaleX(110), 0), CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_I32);
-	m_outfmt_flt_check.Create(_T("Float"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(ScaleX(165), 0), CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_FLT);
+	m_outfmt_i16_check.Create(L"Int16", dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_I16);
+	m_outfmt_i24_check.Create(L"Int24", dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(ScaleX(55), 0), CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_I24);
+	m_outfmt_i32_check.Create(L"Int32", dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(ScaleX(110), 0), CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_I32);
+	m_outfmt_flt_check.Create(L"Float", dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(ScaleX(165), 0), CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_FLT);
 	m_outfmt_i16_check.SetCheck(m_outfmt_i16);
 	m_outfmt_i24_check.SetCheck(m_outfmt_i24);
 	m_outfmt_i32_check.SetCheck(m_outfmt_i32);
@@ -118,13 +118,13 @@ bool CMpaDecSettingsWnd::OnActivate()
 
 	m_spdif_group.Create(ResStr(IDS_MPADEC_SPDIF), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(ScaleX(230), h20 + h20 * 4)), this, (UINT)IDC_STATIC);
 	p.y += h20;
-	m_spdif_ac3_check.Create(_T("AC-3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_AC3);
-	m_spdif_dts_check.Create(_T("DTS"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(ScaleX(110), 0), CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTS);
+	m_spdif_ac3_check.Create(L"AC-3", dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_AC3);
+	m_spdif_dts_check.Create(L"DTS", dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(ScaleX(110), 0), CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTS);
 	p.y += h20;
-	m_spdif_eac3_check.Create(_T("E-AC3"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(55), m_fontheight)), this, IDC_PP_CHECK_SPDIF_EAC3);
-	m_spdif_dtshd_check.Create(_T("DTS-HD"), dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(ScaleX(110), 0), CSize(ScaleX(65), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTSHD);
+	m_spdif_eac3_check.Create(L"E-AC3", dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(55), m_fontheight)), this, IDC_PP_CHECK_SPDIF_EAC3);
+	m_spdif_dtshd_check.Create(L"DTS-HD", dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(ScaleX(110), 0), CSize(ScaleX(65), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTSHD);
 	p.y += h20;
-	m_spdif_truehd_check.Create(_T("TrueHD"), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(60), m_fontheight)), this, IDC_PP_CHECK_SPDIF_TRUEHD);
+	m_spdif_truehd_check.Create(L"TrueHD", dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(60), m_fontheight)), this, IDC_PP_CHECK_SPDIF_TRUEHD);
 	m_spdif_ac3_check.SetCheck(m_spdif_ac3);
 	m_spdif_eac3_check.SetCheck(m_spdif_eac3);
 	m_spdif_truehd_check.SetCheck(m_spdif_truehd);

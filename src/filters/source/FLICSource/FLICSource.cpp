@@ -46,23 +46,23 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}"),
-		_T("0"), _T("4,2,,11AF"));
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}",
+		L"0", L"4,2,,11AF");
 
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}"),
-		_T("1"), _T("4,2,,12AF"));
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}",
+		L"1", L"4,2,,12AF");
 
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}"),
-		_T("Source Filter"), _T("{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}"));
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}",
+		L"Source Filter", L"{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}");
 
 	return AMovieDllRegisterServer2(TRUE);
 }
 
 STDAPI DllUnregisterServer()
 {
-	DeleteRegKey(_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}"));
+	DeleteRegKey(L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{17DB5CF6-39BB-4d5b-B0AA-BEBA44673AD4}");
 
 	return AMovieDllRegisterServer2(FALSE);
 }
