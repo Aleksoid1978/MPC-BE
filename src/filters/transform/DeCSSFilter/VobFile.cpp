@@ -49,7 +49,7 @@ bool CDVDSession::Open(LPCTSTR path)
 	Close();
 
 	CString fn = path;
-	CString drive = _T("\\\\.\\") + fn.Left(fn.Find(':')+1);
+	CString drive = L"\\\\.\\" + fn.Left(fn.Find(':')+1);
 
 	m_hDrive = CreateFile(drive, GENERIC_READ, FILE_SHARE_READ, NULL,
 						  OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_SEQUENTIAL_SCAN, (HANDLE)NULL);
@@ -419,7 +419,7 @@ bool CVobFile::OpenVOBs(const CAtlList<CString>& vobs)
 				CString fn = m_files[0].fn;
 				fn.MakeLower();
 
-				if (fn.Find(_T(":\\video_ts")) == 1 && GetDriveType(fn.Left(3)) == DRIVE_CDROM) {
+				if (fn.Find(L":\\video_ts") == 1 && GetDriveType(fn.Left(3)) == DRIVE_CDROM) {
 					m_fDVD = true;
 				}
 

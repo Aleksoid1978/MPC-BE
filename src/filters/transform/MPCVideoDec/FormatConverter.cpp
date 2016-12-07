@@ -34,24 +34,24 @@ extern "C" {
 #pragma warning(pop)
 
 SW_OUT_FMT s_sw_formats[] = {
-	//  name     biCompression  subtype                                         av_pix_fmt   chroma_w chroma_h actual_bpp luma_bits
+	//name     biCompression  subtype                                         av_pix_fmt   chroma_w chroma_h actual_bpp luma_bits
 	// YUV 8 bit
-	{_T("NV12"),  FCC('NV12'), &MEDIASUBTYPE_NV12,  12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,        1, 1, 12,  8}, // PixFmt_NV12
-	{_T("YV12"),  FCC('YV12'), &MEDIASUBTYPE_YV12,  12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     1, 1, 12,  8}, // PixFmt_YV12
-	{_T("YUY2"),  FCC('YUY2'), &MEDIASUBTYPE_YUY2,  16, 2, 0, {1},     {1},     AV_PIX_FMT_YUYV422,     1, 0, 16,  8}, // PixFmt_YUY2
-	{_T("YV16"),  FCC('YV16'), &MEDIASUBTYPE_YV16,  16, 1, 3, {1,1,1}, {1,2,2}, AV_PIX_FMT_YUV422P,     1, 0, 16,  8}, // PixFmt_YV16
-	{_T("AYUV"),  FCC('AYUV'), &MEDIASUBTYPE_AYUV,  32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P,     0, 0, 24,  8}, // PixFmt_AYUV
-	{_T("YV24"),  FCC('YV24'), &MEDIASUBTYPE_YV24,  24, 1, 3, {1,1,1}, {1,1,1}, AV_PIX_FMT_YUV444P,     0, 0, 24,  8}, // PixFmt_YV24
+	{L"NV12",  FCC('NV12'), &MEDIASUBTYPE_NV12,  12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,        1, 1, 12,  8}, // PixFmt_NV12
+	{L"YV12",  FCC('YV12'), &MEDIASUBTYPE_YV12,  12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     1, 1, 12,  8}, // PixFmt_YV12
+	{L"YUY2",  FCC('YUY2'), &MEDIASUBTYPE_YUY2,  16, 2, 0, {1},     {1},     AV_PIX_FMT_YUYV422,     1, 0, 16,  8}, // PixFmt_YUY2
+	{L"YV16",  FCC('YV16'), &MEDIASUBTYPE_YV16,  16, 1, 3, {1,1,1}, {1,2,2}, AV_PIX_FMT_YUV422P,     1, 0, 16,  8}, // PixFmt_YV16
+	{L"AYUV",  FCC('AYUV'), &MEDIASUBTYPE_AYUV,  32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P,     0, 0, 24,  8}, // PixFmt_AYUV
+	{L"YV24",  FCC('YV24'), &MEDIASUBTYPE_YV24,  24, 1, 3, {1,1,1}, {1,1,1}, AV_PIX_FMT_YUV444P,     0, 0, 24,  8}, // PixFmt_YV24
 	// YUV 10 bit
-	{_T("P010"),  FCC('P010'), &MEDIASUBTYPE_P010,  24, 2, 2, {1,2},   {1,1},   AV_PIX_FMT_YUV420P16LE, 1, 1, 15, 10}, // PixFmt_P010
-	{_T("P210"),  FCC('P210'), &MEDIASUBTYPE_P210,  32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0, 20, 10}, // PixFmt_P210
-	{_T("Y410"),  FCC('Y410'), &MEDIASUBTYPE_Y410,  32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P10LE, 0, 0, 30, 10}, // PixFmt_Y410
+	{L"P010",  FCC('P010'), &MEDIASUBTYPE_P010,  24, 2, 2, {1,2},   {1,1},   AV_PIX_FMT_YUV420P16LE, 1, 1, 15, 10}, // PixFmt_P010
+	{L"P210",  FCC('P210'), &MEDIASUBTYPE_P210,  32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0, 20, 10}, // PixFmt_P210
+	{L"Y410",  FCC('Y410'), &MEDIASUBTYPE_Y410,  32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P10LE, 0, 0, 30, 10}, // PixFmt_Y410
 	// YUV 16 bit
-	{_T("P016"),  FCC('P016'), &MEDIASUBTYPE_P016,  24, 2, 2, {1,2},   {1,1},   AV_PIX_FMT_YUV420P16LE, 1, 1, 24, 16}, // PixFmt_P016
-	{_T("P216"),  FCC('P216'), &MEDIASUBTYPE_P216,  32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0, 32, 16}, // PixFmt_P216
-	{_T("Y416"),  FCC('Y416'), &MEDIASUBTYPE_Y416,  64, 8, 0, {1},     {1},     AV_PIX_FMT_YUV444P16LE, 0, 0, 48, 16}, // PixFmt_Y416
+	{L"P016",  FCC('P016'), &MEDIASUBTYPE_P016,  24, 2, 2, {1,2},   {1,1},   AV_PIX_FMT_YUV420P16LE, 1, 1, 24, 16}, // PixFmt_P016
+	{L"P216",  FCC('P216'), &MEDIASUBTYPE_P216,  32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0, 32, 16}, // PixFmt_P216
+	{L"Y416",  FCC('Y416'), &MEDIASUBTYPE_Y416,  64, 8, 0, {1},     {1},     AV_PIX_FMT_YUV444P16LE, 0, 0, 48, 16}, // PixFmt_Y416
 	// RGB
-	{_T("RGB32"), BI_RGB,      &MEDIASUBTYPE_RGB32, 32, 4, 0, {1},     {1},     AV_PIX_FMT_BGRA,        0, 0, 24,  8}, // PixFmt_RGB32
+	{L"RGB32", BI_RGB,      &MEDIASUBTYPE_RGB32, 32, 4, 0, {1},     {1},     AV_PIX_FMT_BGRA,        0, 0, 24,  8}, // PixFmt_RGB32
 	// PS:
 	// AV_PIX_FMT_YUV444P not equal to AYUV, but is used as an intermediate format.
 	// AV_PIX_FMT_YUV420P16LE not equal to P010, but is used as an intermediate format.
@@ -72,21 +72,21 @@ LPCTSTR GetChromaSubsamplingStr(AVPixelFormat av_pix_fmt)
 
 	if (0 == av_pix_fmt_get_chroma_sub_sample(av_pix_fmt, &h_shift, &v_shift)) {
 		if (h_shift == 0 && v_shift == 0) {
-			return _T("4:4:4");
+			return L"4:4:4";
 		} else if (h_shift == 0 && v_shift == 1) {
-			return _T("4:4:0");
+			return L"4:4:0";
 		} else if (h_shift == 1 && v_shift == 0) {
-			return _T("4:2:2");
+			return L"4:2:2";
 		} else if (h_shift == 1 && v_shift == 1) {
-			return _T("4:2:0");
+			return L"4:2:0";
 		} else if (h_shift == 2 && v_shift == 0) {
-			return _T("4:1:1");
+			return L"4:1:1";
 		} else if (h_shift == 2 && v_shift == 2) {
-			return _T("4:1:0");
+			return L"4:1:0";
 		}
 	}
 
-	return _T("");
+	return L"";
 }
 
 int GetLumaBits(AVPixelFormat av_pix_fmt)

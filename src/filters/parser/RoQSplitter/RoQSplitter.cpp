@@ -90,7 +90,7 @@ int g_cTemplates = _countof(g_Templates);
 
 STDAPI DllRegisterServer()
 {
-	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_RoQ, _T("0,8,,8410FFFFFFFF1E00"));
+	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_RoQ, L"0,8,,8410FFFFFFFF1E00");
 
 	return AMovieDllRegisterServer2(TRUE);
 }

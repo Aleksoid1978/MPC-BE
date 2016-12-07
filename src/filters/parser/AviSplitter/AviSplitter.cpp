@@ -25,10 +25,10 @@
 #include "AviSplitter.h"
 
 // option names
-#define OPT_REGKEY_AVISplit  _T("Software\\MPC-BE Filters\\AVI Splitter")
-#define OPT_SECTION_AVISplit _T("Filters\\AVI Splitter")
-#define OPT_BadInterleaved   _T("BadInterleavedSuport")
-#define OPT_NeededReindex    _T("NeededReindex")
+#define OPT_REGKEY_AVISplit  L"Software\\MPC-BE Filters\\AVI Splitter"
+#define OPT_SECTION_AVISplit L"Filters\\AVI Splitter"
+#define OPT_BadInterleaved   L"BadInterleavedSuport"
+#define OPT_NeededReindex    L"NeededReindex"
 
 #ifdef REGISTER_FILTER
 
@@ -58,9 +58,9 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	CAtlList<CString> chkbytes;
-	chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564920")); // 'RIFF....AVI '
-	chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564958")); // 'RIFF....AVIX'
-	chkbytes.AddTail(_T("0,4,,52494646,8,4,,414D5620")); // 'RIFF....AMV '
+	chkbytes.AddTail(L"0,4,,52494646,8,4,,41564920"); // 'RIFF....AVI '
+	chkbytes.AddTail(L"0,4,,52494646,8,4,,41564958"); // 'RIFF....AVIX'
+	chkbytes.AddTail(L"0,4,,52494646,8,4,,414D5620"); // 'RIFF....AMV '
 
 	RegisterSourceFilter(
 		CLSID_AsyncReader,

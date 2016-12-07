@@ -77,7 +77,7 @@ inline FONT3DVERTEX InitFont3DVertex( const DirectX::XMFLOAT3& p, const DirectX:
 CD3DFont::CD3DFont( const TCHAR* strFontName, DWORD dwHeight, DWORD dwFlags )
 {
 	_tcsncpy_s( m_strFontName, strFontName, _countof(m_strFontName) );
-	m_strFontName[_countof(m_strFontName) - 1] = _T('\0');
+	m_strFontName[_countof(m_strFontName) - 1] = '\0';
 	m_dwFontHeight         = dwHeight;
 	m_dwFontFlags          = dwFlags;
 	m_dwSpacing            = 0;
@@ -141,7 +141,7 @@ HRESULT CD3DFont::CreateGDIFont( HDC hDC, HFONT* pFont )
 HRESULT CD3DFont::PaintAlphabet( HDC hDC, BOOL bMeasureOnly )
 {
 	SIZE size;
-	TCHAR str[2] = _T("x"); // One-character, null-terminated string
+	TCHAR str[2] = L"x"; // One-character, null-terminated string
 
 	// Calculate the spacing between characters based on line height
 	if ( 0 == GetTextExtentPoint32( hDC, str, 1, &size ) ) {
@@ -485,7 +485,7 @@ HRESULT CD3DFont::GetTextExtent( const TCHAR* strText, SIZE* pSize )
 	while ( *strText ) {
 		TCHAR c = *strText++;
 
-		if ( c == _T('\n') ) {
+		if ( c == '\n' ) {
 			fRowWidth = 0.0f;
 			fHeight  += fRowHeight;
 		}
@@ -553,7 +553,7 @@ HRESULT CD3DFont::DrawTextScaled( FLOAT x, FLOAT y, FLOAT z,
 		while ( *strTextTmp ) {
 			TCHAR c = *strTextTmp++;
 
-			if ( c == _T('\n') ) {
+			if ( c == '\n' ) {
 				break;    // Isn't supported.
 			}
 			if ( (c-32) < 0 || (c-32) >= 128-32 ) {
@@ -593,7 +593,7 @@ HRESULT CD3DFont::DrawTextScaled( FLOAT x, FLOAT y, FLOAT z,
 	while ( *strText ) {
 		TCHAR c = *strText++;
 
-		if ( c == _T('\n') ) {
+		if ( c == '\n' ) {
 			sx  = fStartX;
 			sy += fYScale*vp.Height;
 		}
@@ -613,7 +613,7 @@ HRESULT CD3DFont::DrawTextScaled( FLOAT x, FLOAT y, FLOAT z,
 		w *= (fXScale*vp.Height)/fLineHeight;
 		h *= (fYScale*vp.Height)/fLineHeight;
 
-		if ( c != _T(' ') ) {
+		if ( c != ' ' ) {
 			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+h-0.5f,sz,rhw), dwColor, tx1, ty2 );
 			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+0-0.5f,sz,rhw), dwColor, tx1, ty1 );
 			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+w-0.5f,sy+h-0.5f,sz,rhw), dwColor, tx2, ty2 );
@@ -682,7 +682,7 @@ HRESULT CD3DFont::DrawText( FLOAT sx, FLOAT sy, DWORD dwColor,
 		while ( *strTextTmp ) {
 			TCHAR c = *strTextTmp++;
 
-			if ( c == _T('\n') ) {
+			if ( c == '\n' ) {
 				break;    // Isn't supported.
 			}
 			if ( (c-32) < 0 || (c-32) >= 128-32 ) {
@@ -718,7 +718,7 @@ HRESULT CD3DFont::DrawText( FLOAT sx, FLOAT sy, DWORD dwColor,
 	while ( *strText ) {
 		TCHAR c = *strText++;
 
-		if ( c == _T('\n') ) {
+		if ( c == '\n' ) {
 			sx = fStartX;
 			sy += (m_fTexCoords[0][3]-m_fTexCoords[0][1])*m_dwTexHeight;
 		}
@@ -735,7 +735,7 @@ HRESULT CD3DFont::DrawText( FLOAT sx, FLOAT sy, DWORD dwColor,
 		FLOAT w = (tx2-tx1) *  m_dwTexWidth / m_fTextScale;
 		FLOAT h = (ty2-ty1) * m_dwTexHeight / m_fTextScale;
 
-		if ( c != _T(' ') ) {
+		if ( c != ' ' ) {
 			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+h-0.5f,0.9f,1.0f), dwColor, tx1, ty2 );
 			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+0-0.5f,0.9f,1.0f), dwColor, tx1, ty1 );
 			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+w-0.5f,sy+h-0.5f,0.9f,1.0f), dwColor, tx2, ty2 );
@@ -843,7 +843,7 @@ HRESULT CD3DFont::Render3DText( const TCHAR* strText, DWORD dwFlags )
 		FLOAT w = (tx2-tx1) * m_dwTexWidth  / ( 10.0f * m_fTextScale );
 		FLOAT h = (ty2-ty1) * m_dwTexHeight / ( 10.0f * m_fTextScale );
 
-		if ( c != _T(' ') ) {
+		if ( c != ' ' ) {
 			*pVertices++ = InitFont3DVertex( DirectX::XMFLOAT3(x+0,y+0,0), DirectX::XMFLOAT3(0,0,-1), tx1, ty2 );
 			*pVertices++ = InitFont3DVertex( DirectX::XMFLOAT3(x+0,y+h,0), DirectX::XMFLOAT3(0,0,-1), tx1, ty1 );
 			*pVertices++ = InitFont3DVertex( DirectX::XMFLOAT3(x+w,y+0,0), DirectX::XMFLOAT3(0,0,-1), tx2, ty2 );

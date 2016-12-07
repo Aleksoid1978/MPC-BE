@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,9 +25,9 @@
 #include "../../../DSUtil/DSUtil.h"
 
 // option names
-#define OPT_REGKEY_VTSReader		_T("Software\\MPC-BE Filters\\VTS Reader")
-#define OPT_SECTION_VTSReader		_T("Filters\\VTS Reader")
-#define OPT_EnableTitleSelection	_T("EnableTitleSelection")
+#define OPT_REGKEY_VTSReader		L"Software\\MPC-BE Filters\\VTS Reader"
+#define OPT_SECTION_VTSReader		L"Filters\\VTS Reader"
+#define OPT_EnableTitleSelection	L"EnableTitleSelection"
 
 #ifdef REGISTER_FILTER
 
@@ -52,23 +52,23 @@ int g_cTemplates = _countof(g_Templates);
 STDAPI DllRegisterServer()
 {
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73}"),
-		_T("0"), _T("0,12,,445644564944454F2D565453")); // "DVDVIDEO-VTS"
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73}",
+		L"0", L"0,12,,445644564944454F2D565453"); // "DVDVIDEO-VTS"
 
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73}"),
-		_T("0"), _T("0,12,,445644415544494F2D415453")); // "DVDAUDIO-ATS"
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73}",
+		L"0", L"0,12,,445644415544494F2D415453"); // "DVDAUDIO-ATS"
 
 	SetRegKeyValue(
-		_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73}"),
-		_T("Source Filter"), _T("{773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73}"));
+		L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73}",
+		L"Source Filter", L"{773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73}");
 
 	return AMovieDllRegisterServer2(TRUE);
 }
 
 STDAPI DllUnregisterServer()
 {
-	DeleteRegKey(_T("Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}"), _T("{773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73}"));
+	DeleteRegKey(L"Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}", L"{773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73}");
 
 	return AMovieDllRegisterServer2(FALSE);
 }

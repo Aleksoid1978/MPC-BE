@@ -35,7 +35,7 @@ namespace DSObjects
 
 		public:
 			CSubRenderCallback(CDXRAllocatorPresenter* pDXRAP)
-				: CUnknown(_T("CSubRender"), NULL)
+				: CUnknown(L"CSubRender", NULL)
 				, m_pDXRAP(pDXRAP) {
 			}
 

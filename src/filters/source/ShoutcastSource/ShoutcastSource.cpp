@@ -82,12 +82,12 @@ public:
 		/*
 				if (!AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0))
 				{
-					AfxMessageBox(_T("AfxWinInit failed!"));
+					AfxMessageBox(L"AfxWinInit failed!");
 					return FALSE;
 				}
 		*/
 		if (!AfxSocketInit(NULL)) {
-			AfxMessageBox(_T("AfxSocketInit failed!"));
+			AfxMessageBox(L"AfxSocketInit failed!");
 			return FALSE;
 		}
 
@@ -238,8 +238,8 @@ CShoutcastStream::CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, 
 	*phr = S_OK;
 
 	CString fn(wfn);
-	if (fn.Find(_T("://")) < 0) {
-		fn = _T("http://") + fn;
+	if (fn.Find(L"://") < 0) {
+		fn = L"http://" + fn;
 	}
 
 	int redirectTry = 0;
@@ -887,7 +887,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 			}
 			else if (param == "content-disposition") {
 				if (int pos = value.Find("filename=") >= 0) {
-					redirectUrl = _T("/") + CString(value.Mid(pos + 9).Trim());
+					redirectUrl = L"/" + CString(value.Mid(pos + 9).Trim());
 				}
 			}
 			else if (param == "icy-br") {

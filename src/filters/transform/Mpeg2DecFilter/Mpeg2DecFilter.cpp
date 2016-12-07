@@ -84,17 +84,17 @@ private:
 };
 
 // option names
-#define OPT_REGKEY_MPEGDec  _T("Software\\MPC-BE Filters\\MPEG Video Decoder")
-#define OPT_SECTION_MPEGDec _T("Filters\\MPEG Video Decoder")
-#define OPT_DeintMethod     _T("DeinterlaceMethod")
-#define OPT_Brightness      _T("Brightness")
-#define OPT_Contrast        _T("Contrast")
-#define OPT_Hue             _T("Hue")
-#define OPT_Saturation      _T("Saturation")
-#define OPT_ForcedSubs      _T("ForcedSubtitles")
-#define OPT_PlanarYUV       _T("PlanarYUV")
-#define OPT_Interlaced      _T("Interlaced")
-#define OPT_ReadStreamAR    _T("ReadARFromStream")
+#define OPT_REGKEY_MPEGDec  L"Software\\MPC-BE Filters\\MPEG Video Decoder"
+#define OPT_SECTION_MPEGDec L"Filters\\MPEG Video Decoder"
+#define OPT_DeintMethod     L"DeinterlaceMethod"
+#define OPT_Brightness      L"Brightness"
+#define OPT_Contrast        L"Contrast"
+#define OPT_Hue             L"Hue"
+#define OPT_Saturation      L"Saturation"
+#define OPT_ForcedSubs      L"ForcedSubtitles"
+#define OPT_PlanarYUV       L"PlanarYUV"
+#define OPT_Interlaced      L"Interlaced"
+#define OPT_ReadStreamAR    L"ReadARFromStream"
 
 #define EPSILON 1e-4
 
@@ -179,7 +179,7 @@ LONG WINAPI Mine_ChangeDisplaySettingsEx(LONG ret, DWORD dwFlags, LPVOID lParam)
 	if (dwFlags & CDS_VIDEOPARAMETERS) {
 		VIDEOPARAMETERS* vp = (VIDEOPARAMETERS*)lParam;
 
-		if (vp->Guid == GUIDFromCString(_T("{02C62061-1097-11d1-920F-00A024DF156E}"))
+		if (vp->Guid == GUIDFromCString(L"{02C62061-1097-11d1-920F-00A024DF156E}")
 				&& (vp->dwFlags & VP_FLAGS_COPYPROTECT)) {
 			if (vp->dwCommand == VP_COMMAND_GET) {
 				if ((vp->dwTVStandard & VP_TV_STANDARD_WIN_VGA) && vp->dwTVStandard != VP_TV_STANDARD_WIN_VGA) {
@@ -859,8 +859,8 @@ HRESULT CMpeg2DecFilter::CheckConnect(PIN_DIRECTION dir, IPin* pPin)
 					&& clsid != CLSID_VideoMixingRenderer
 					&& clsid != CLSID_VideoMixingRenderer9
 					&& clsid != CLSID_EnhancedVideoRenderer
-					&& clsid != GUIDFromCString(_T("{04FE9017-F873-410E-871E-AB91661A4EF7}")) // ffdshow Video Decoder
-					&& clsid != GUIDFromCString(_T("{0B390488-D80F-4A68-8408-48DC199F0E97}")) // ffdshow raw video filter
+					&& clsid != GUIDFromCString(L"{04FE9017-F873-410E-871E-AB91661A4EF7}") // ffdshow Video Decoder
+					&& clsid != GUIDFromCString(L"{0B390488-D80F-4A68-8408-48DC199F0E97}") // ffdshow raw video filter
 					&& (clsid != CLSID_VSFilter || ver < 0x0234) // dvobsub
 					&& (clsid != CLSID_VSFilter_autoloading || ver < 0x0234) // dvobsub auto
 					&& clsid != CLSID_madVR

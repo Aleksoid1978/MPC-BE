@@ -34,13 +34,13 @@
 #include "../apps/mplayerc/SettingsDefines.h"
 
 // option names
-#define OPT_REGKEY_MPEGSplit  _T("Software\\MPC-BE Filters\\MPEG Splitter")
-#define OPT_SECTION_MPEGSplit _T("Filters\\MPEG Splitter")
-#define OPT_ForcedSub         _T("ForcedSub")
-#define OPT_AudioLangOrder    _T("AudioLanguageOrder")
-#define OPT_SubLangOrder      _T("SubtitlesLanguageOrder")
-#define OPT_AC3CoreOnly       _T("AC3CoreOnly")
-#define OPT_SubEmptyOutput    _T("SubtitleEmptyOutput")
+#define OPT_REGKEY_MPEGSplit  L"Software\\MPC-BE Filters\\MPEG Splitter"
+#define OPT_SECTION_MPEGSplit L"Filters\\MPEG Splitter"
+#define OPT_ForcedSub         L"ForcedSub"
+#define OPT_AudioLangOrder    L"AudioLanguageOrder"
+#define OPT_SubLangOrder      L"SubtitlesLanguageOrder"
+#define OPT_AC3CoreOnly       L"AC3CoreOnly"
+#define OPT_SubEmptyOutput    L"SubtitleEmptyOutput"
 
 #ifdef REGISTER_FILTER
 
@@ -72,20 +72,20 @@ int g_cTemplates = _countof(g_Templates);
 
 STDAPI DllRegisterServer()
 {
-	DeleteRegKey(_T("Media Type\\Extensions\\"), _T(".ts"));
+	DeleteRegKey(L"Media Type\\Extensions\\", L".ts");
 
-	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MPEG1System, _T("0,16,FFFFFFFFF100010001800001FFFFFFFF,000001BA2100010001800001000001BB"), NULL);
-	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MPEG2_PROGRAM, _T("0,5,FFFFFFFFC0,000001BA40"), NULL);
-	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MPEG2_PVA, _T("0,8,fffffc00ffe00000,4156000055000000"), NULL);
+	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MPEG1System, L"0,16,FFFFFFFFF100010001800001FFFFFFFF,000001BA2100010001800001000001BB", NULL);
+	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MPEG2_PROGRAM, L"0,5,FFFFFFFFC0,000001BA40", NULL);
+	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MPEG2_PVA, L"0,8,fffffc00ffe00000,4156000055000000", NULL);
 
 	CAtlList<CString> chkbytes;
-	chkbytes.AddTail(_T("0,1,,47,188,1,,47,376,1,,47"));
-	chkbytes.AddTail(_T("4,1,,47,196,1,,47,388,1,,47"));
-	chkbytes.AddTail(_T("0,4,,54467263,1660,1,,47")); // TFrc
+	chkbytes.AddTail(L"0,1,,47,188,1,,47,376,1,,47");
+	chkbytes.AddTail(L"4,1,,47,196,1,,47,388,1,,47");
+	chkbytes.AddTail(L"0,4,,54467263,1660,1,,47"); // TFrc
 
-	chkbytes.AddTail(_T("0,8,,4D504C5330323030")); // MPLS0200
-	chkbytes.AddTail(_T("0,8,,4D504C5330313030")); // MPLS0100
-	chkbytes.AddTail(_T("0,4,,494D4B48"));			// IMKH
+	chkbytes.AddTail(L"0,8,,4D504C5330323030"); // MPLS0200
+	chkbytes.AddTail(L"0,8,,4D504C5330313030"); // MPLS0100
+	chkbytes.AddTail(L"0,4,,494D4B48");			// IMKH
 
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MPEG2_TRANSPORT, chkbytes, NULL);
 
@@ -632,15 +632,15 @@ void CMpegSplitterFilter::ReadClipInfo(LPCOLESTR pszFileName)
 
 			if (wcscmp(Ext, L".ssif") == 0) {
 				if (Drive[0]) {
-					strClipInfo.Format(_T("%s\\%s\\..\\..\\CLIPINF\\%s.clpi"), Drive, Dir, Filename);
+					strClipInfo.Format(L"%s\\%s\\..\\..\\CLIPINF\\%s.clpi", Drive, Dir, Filename);
 				} else {
-					strClipInfo.Format(_T("%s\\..\\..\\CLIPINF\\%s.clpi"), Dir, Filename);
+					strClipInfo.Format(L"%s\\..\\..\\CLIPINF\\%s.clpi", Dir, Filename);
 				}
 			} else {
 				if (Drive[0]) {
-					strClipInfo.Format(_T("%s\\%s\\..\\CLIPINF\\%s.clpi"), Drive, Dir, Filename);
+					strClipInfo.Format(L"%s\\%s\\..\\CLIPINF\\%s.clpi", Drive, Dir, Filename);
 				} else {
-					strClipInfo.Format(_T("%s\\..\\CLIPINF\\%s.clpi"), Dir, Filename);
+					strClipInfo.Format(L"%s\\..\\CLIPINF\\%s.clpi", Dir, Filename);
 				}
 			}
 
@@ -909,9 +909,9 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 				if (::PathFileExists(fName)) {
 					CPath fname(fName);
 					fname.StripPath();
-					if (!CString(fname).Find(_T("VTS_"))) {
+					if (!CString(fname).Find(L"VTS_")) {
 						fName = fName.Left(fName.ReverseFind('.') + 1);
-						fName.TrimRight(_T(".0123456789")) += _T("0.ifo");
+						fName.TrimRight(L".0123456789") += L"0.ifo";
 
 						if (::PathFileExists(fName)) {
 							// read palette from .ifo file, code from CVobSubFile::ReadIfo()
@@ -1119,12 +1119,12 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	if (!m_AudioLanguageOrder.IsEmpty()) {
 		int tPos = 0;
-		lang = m_AudioLanguageOrder.Tokenize(_T(",; "), tPos);
+		lang = m_AudioLanguageOrder.Tokenize(L",; ", tPos);
 		while (tPos != -1) {
 			if (!lang.IsEmpty()) {
 				audioLangList.AddTail(lang);
 			}
-			lang = m_AudioLanguageOrder.Tokenize(_T(",; "), tPos);
+			lang = m_AudioLanguageOrder.Tokenize(L",; ", tPos);
 		}
 		if (!lang.IsEmpty()) {
 			audioLangList.AddTail(lang);
@@ -1133,12 +1133,12 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	if (!m_SubtitlesLanguageOrder.IsEmpty()) {
 		int tPos = 0;
-		lang = m_SubtitlesLanguageOrder.Tokenize(_T(",; "), tPos);
+		lang = m_SubtitlesLanguageOrder.Tokenize(L",; ", tPos);
 		while (tPos != -1) {
 			if (!lang.IsEmpty()) {
 				subpicLangList.AddTail(lang);
 			}
-			lang = m_SubtitlesLanguageOrder.Tokenize(_T(",; "), tPos);
+			lang = m_SubtitlesLanguageOrder.Tokenize(L",; ", tPos);
 		}
 		if (!lang.IsEmpty()) {
 			subpicLangList.AddTail(lang);
@@ -1808,7 +1808,7 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 					if (ppszName) {
 						CString str;
 						if (p->name.IsEmpty()) {
-							str.Format(_T("Program - %d"), p->program_number);
+							str.Format(L"Program - %d", p->program_number);
 						} else {
 							str = p->name;
 						}

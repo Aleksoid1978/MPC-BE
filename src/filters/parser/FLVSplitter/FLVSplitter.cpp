@@ -100,9 +100,9 @@ int g_cTemplates = _countof(g_Templates);
 
 STDAPI DllRegisterServer()
 {
-	DeleteRegKey(_T("Media Type\\Extensions\\"), _T(".flv"));
+	DeleteRegKey(L"Media Type\\Extensions\\", L".flv");
 
-	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_FLV, _T("0,4,,464C5601"), NULL);
+	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_FLV, L"0,4,,464C5601", NULL);
 
 	return AMovieDllRegisterServer2(TRUE);
 }

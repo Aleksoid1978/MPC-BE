@@ -506,7 +506,7 @@ void CBaseSplitterOutputPin::MakeISCRHappy()
 
 		CComPtr<IBaseFilter> pBF = GetFilterFromPin(pPinTo);
 
-		if (GetCLSID(pBF) == GUIDFromCString(_T("{48025243-2D39-11CE-875D-00608CB78066}"))) { // ISCR
+		if (GetCLSID(pBF) == GUIDFromCString(L"{48025243-2D39-11CE-875D-00608CB78066}")) { // ISCR
 			CAutoPtr<CPacket> p(DNew CPacket());
 			p->TrackNumber = (DWORD)-1;
 			p->rtStart = -1;

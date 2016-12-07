@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,7 +62,7 @@ STDMETHODIMP CMacrovisionKicker::Set(REFGUID PropSet, ULONG Id, LPVOID pInstance
 	if (CComQIPtr<IKsPropertySet> pKsPS = m_pInner) {
 		if (PropSet == AM_KSPROPSETID_CopyProt && Id == AM_PROPERTY_COPY_MACROVISION
 				/*&& DataLength == 4 && *(DWORD*)pPropertyData*/) {
-			TRACE(_T("Oops, no-no-no, no macrovision please\n"));
+			TRACE(L"Oops, no-no-no, no macrovision please\n");
 			return S_OK;
 		}
 

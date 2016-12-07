@@ -134,7 +134,7 @@ public:
 	void OnDeactivate();
 	bool OnApply();
 
-	static LPCTSTR GetWindowTitle() { return _T("Codecs");    }
+	static LPCTSTR GetWindowTitle() { return L"Codecs";    }
 	static CSize GetWindowSize()    { return CSize(340, 290); }
 
 	DECLARE_MESSAGE_MAP()
