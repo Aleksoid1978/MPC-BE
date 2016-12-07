@@ -80,11 +80,12 @@ void CRenderersSettings::SetDefault()
 	iVideoRenderer					= VIDRNDT_EVR_CUSTOM;
 
 	sD3DRenderDevice.Empty();
-	bResetDevice					= true;
+	bResetDevice					= false;
 
 	iSurfaceFormat					= D3DFMT_X8R8G8B8;
 	b10BitOutput					= false;
-	iResizer						= 1;
+	iResizer						= RESIZER_BILINEAR;
+	iDownscaler						= RESIZER_BILINEAR;
 
 	bVSync							= false;
 	bVSyncAccurate					= false;
