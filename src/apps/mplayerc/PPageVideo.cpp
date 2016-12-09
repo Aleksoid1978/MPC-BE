@@ -602,8 +602,8 @@ void CPPageVideo::OnColorManagmentCheck()
 void CPPageVideo::OnBnClickedDefault()
 {
 	m_bD3D9RenderDevice = FALSE;
-	m_bResetDevice = TRUE;
-	m_iEvrBuffers = 5;
+	m_bResetDevice = FALSE;
+	m_iEvrBuffers = RS_EVRBUFFERS_DEF;
 
 	UpdateData(FALSE);
 
