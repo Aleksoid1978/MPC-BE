@@ -572,11 +572,11 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 								GUID clsid = GUIDFromCString(buff);
 
-								len = _countof(buff);
-								len2 = sizeof(buff2);
+								DWORD size = sizeof(buff);
+								len2 = _countof(buff2);
 								for (DWORD k = 0, type;
-										clsid != GUID_NULL && ERROR_SUCCESS == RegEnumValue(subkey, k, buff2, &len2, 0, &type, (BYTE*)buff, &len);
-										k++, len = _countof(buff), len2 = sizeof(buff2)) {
+										clsid != GUID_NULL && ERROR_SUCCESS == RegEnumValueW(subkey, k, buff2, &len2, 0, &type, (BYTE*)buff, &size);
+										k++, size = sizeof(buff), len2 = _countof(buff2)) {
 									if (CheckBytes(hFile, CString(buff))) {
 										CFGFilter* pFGF = LookupFilterRegistry(clsid, m_override);
 										pFGF->AddType(majortype, subtype);
