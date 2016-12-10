@@ -24,8 +24,7 @@
 #include "FGFilter.h"
 #include "BaseGraph.h"
 
-#define LowMeritSuffix L" (low merit)"
-#define LowMerit(x) (CStringW(x) + LowMeritSuffix)
+#define LowMerit(x) (CStringW(x) + L" (low merit)")
 
 class CFGManager
 	: public CUnknown
