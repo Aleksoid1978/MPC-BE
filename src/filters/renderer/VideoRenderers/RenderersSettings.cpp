@@ -253,6 +253,7 @@ CRenderersData::CRenderersData()
 	, m_iDisplayStats(0)
 	, m_bResetStats(false)
 	, m_iStereo3DTransform(STEREO3D_AsIs)
+	, m_bStereo3DSwapLR(false)
 {
 }
 

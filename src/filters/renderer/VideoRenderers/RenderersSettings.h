@@ -195,6 +195,8 @@ public:
 	int		m_iDisplayStats;
 	bool	m_bResetStats; // Set to reset the presentation statistics
 	int		m_iStereo3DTransform;
+
+	bool	m_bStereo3DSwapLR;
 };
 
 extern CRenderersSettings&	GetRenderersSettings();

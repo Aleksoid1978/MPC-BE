@@ -43,6 +43,8 @@ CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT&
 	, m_bDeviceResetRequested(false)
 	, m_bPendingResetDevice(false)
 	, m_rtNow(0)
+	, m_bMVC_Base_View_R_flag(false)
+	, m_bStereo3DSwapLR(false)
 {
 	if (!IsWindow(m_hWnd)) {
 		hr = E_INVALIDARG;
@@ -112,6 +114,8 @@ void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, cons
 	if (m_pSubPicProvider) {
 		CComPtr<ISubPic> pSubPic;
 		if (m_pSubPicQueue->LookupSubPic(m_rtNow, !IsRendering(), pSubPic)) {
+			const int stereoOffsetInPixels = m_bStereo3DSwapLR ? -DefaultStereoOffsetInPixels : DefaultStereoOffsetInPixels;
+
 			CRect rcWindow(windowRect);
 			CRect rcVideo(videoRect);
 
@@ -124,26 +128,26 @@ void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, cons
 				CRect rcTempVideo(videoRect);
 				rcTempVideo.right -= rcTempVideo.Width() / 2;
 
-				xOffsetInPixels = -DefaultStereoOffsetInPixels;
+				xOffsetInPixels = -stereoOffsetInPixels;
 				AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, NULL, xOffsetInPixels, FALSE);
 
 				rcWindow.left += rcWindow.Width() / 2;
 				rcVideo.left += rcVideo.Width() / 2;
 
-				xOffsetInPixels = DefaultStereoOffsetInPixels;
+				xOffsetInPixels = stereoOffsetInPixels;
 			} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM || rd->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 				CRect rcTempWindow(windowRect);
 				rcTempWindow.bottom -= rcTempWindow.Height() / 2;
 				CRect rcTempVideo(videoRect);
 				rcTempVideo.bottom -= rcTempVideo.Height() / 2;
 
-				xOffsetInPixels = -DefaultStereoOffsetInPixels;
+				xOffsetInPixels = -stereoOffsetInPixels;
 				AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, NULL, xOffsetInPixels, FALSE);
 
 				rcWindow.top += rcWindow.Height() / 2;
 				rcVideo.top += rcVideo.Height() / 2;
 
-				xOffsetInPixels = DefaultStereoOffsetInPixels;
+				xOffsetInPixels = stereoOffsetInPixels;
 			}
 
 			AlphaBlt(rcWindow, rcVideo, pSubPic, NULL, xOffsetInPixels, rs.iSubpicStereoMode == SUBPIC_STEREO_NONE && rd->m_iStereo3DTransform != STEREO3D_HalfOverUnder_to_Interlace);

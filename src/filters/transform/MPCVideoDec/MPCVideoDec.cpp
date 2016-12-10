@@ -2286,7 +2286,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			BeginEnumFilters(m_pGraph, pEF, pBF) {
 				if (CComQIPtr<IPropertyBag> pPB = pBF) {
 					CComVariant var;
-					if (SUCCEEDED(pPB->Read(L"STEREOSCOPIC3DMODE", &var, NULL))) {
+					if (SUCCEEDED(pPB->Read(L"STEREOSCOPIC3DMODE", &var, NULL)) && var.vt == VT_BSTR) {
 						CString mode(var.bstrVal); mode.MakeLower();
 						m_MVC_Base_View_R_flag = mode == L"mvc_rl";
 						break;

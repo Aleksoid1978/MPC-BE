@@ -1342,6 +1342,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	// paint subtitles on the backbuffer
+	m_bStereo3DSwapLR = m_bMVC_Base_View_R_flag != rd->m_bStereo3DSwapLR;
 	AlphaBltSubPic(rDstPri, rDstVid);
 
 	// Casimir666 : show OSD
