@@ -1398,7 +1398,8 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 	}
 
 	{
-		// get rotation flag
+		m_bMVC_Base_View_R_flag = false;
+
 		CComPtr<IBaseFilter> pBF;
 		if (SUCCEEDED(m_pOuterEVR->QueryInterface(IID_PPV_ARGS(&pBF)))) {
 			while (pBF = GetUpStreamFilter(pBF)) {
@@ -1407,7 +1408,12 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 					if (SUCCEEDED(pPB->Read(L"ROTATION", &var, NULL)) && var.vt == VT_BSTR) {
 						int rotation = _wtoi(var.bstrVal);
 						SetRotation(rotation);
-						break;
+					}
+					var.Clear();
+
+					if (SUCCEEDED(pPB->Read(L"STEREOSCOPIC3DMODE", &var, NULL)) && var.vt == VT_BSTR) {
+						CString mode(var.bstrVal); mode.MakeLower();
+						m_bMVC_Base_View_R_flag = mode == L"mvc_rl";
 					}
 				}
 			}

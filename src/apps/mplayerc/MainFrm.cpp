@@ -7372,6 +7372,8 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 		GetRenderersData()->m_iStereo3DTransform = STEREO3D_AsIs;
 	}
 
+	GetRenderersData()->m_bStereo3DSwapLR = s.bStereo3DSwapLR;
+
 	RepaintVideo();
 }
 
@@ -7385,6 +7387,7 @@ void CMainFrame::OnViewSwapLeftRight()
 	CAppSettings& s = AfxGetAppSettings();
 
 	s.bStereo3DSwapLR = !s.bStereo3DSwapLR;
+	GetRenderersData()->m_bStereo3DSwapLR = s.bStereo3DSwapLR;
 
 	IFilterGraph* pFG = m_pGB;
 	if (pFG) {
