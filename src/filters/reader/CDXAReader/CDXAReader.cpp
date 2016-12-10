@@ -463,7 +463,7 @@ bool CCDXAStream::LookForMediaSubType()
 				TCHAR number[10];
 				_stprintf_s(number, _countof(number), L"%d", j);
 
-				TCHAR pattern[256+1];
+				TCHAR pattern[256];
 				ULONG len = 256;
 				if (ERROR_SUCCESS != subkey.QueryStringValue(number, pattern, &len)) {
 					break;
