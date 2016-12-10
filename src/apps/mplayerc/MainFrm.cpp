@@ -5880,7 +5880,7 @@ BOOL CMainFrame::IsRendererCompatibleWithSaveImage()
 		CString clsid = _T("{E1A8B82A-32CE-4B0D-BE0D-AA68C772E423}");
 
 		TCHAR buff[256];
-		ULONG len = sizeof(buff);
+		ULONG len = _countof(buff);
 		memset(buff, 0, len);
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("CLSID\\") + clsid + _T("\\InprocServer32"), KEY_READ)

@@ -2655,8 +2655,8 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	{
 		CRegKey key;
 
-		TCHAR buff[256] = { 0 };
-		ULONG len = sizeof(buff);
+		WCHAR buff[256] = { 0 };
+		ULONG len = _countof(buff);
 
 		CString clsid = L"{B38C58A0-1809-11D6-A458-EDAE78F1DF12}";
 
