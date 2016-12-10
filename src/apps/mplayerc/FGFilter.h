@@ -74,7 +74,7 @@ public:
 	virtual HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks) PURE;
 
 	virtual CString GetType() {
-		return _T("CFGFilter");
+		return L"CFGFilter";
 	}
 };
 
@@ -101,7 +101,7 @@ public:
 	HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
 
 	virtual CString GetType() {
-		return _T("CFGFilterRegistry");
+		return L"CFGFilterRegistry";
 	}
 private:
 	void QueryProperties();
@@ -128,7 +128,7 @@ public:
 	}
 
 	virtual CString GetType() {
-		return _T("CFGFilterInternal");
+		return L"CFGFilterInternal";
 	}
 };
 
@@ -144,7 +144,7 @@ public:
 	HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
 
 	virtual CString GetType() {
-		return _T("CFGFilterFile");
+		return L"CFGFilterFile";
 	}
 };
 
@@ -159,7 +159,7 @@ public:
 	HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks);
 
 	virtual CString GetType() {
-		return _T("CFGFilterVideoRenderer");
+		return L"CFGFilterVideoRenderer";
 	}
 };
 

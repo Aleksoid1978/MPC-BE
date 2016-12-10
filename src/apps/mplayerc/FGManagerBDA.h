@@ -181,7 +181,7 @@ private :
 	}
 };
 
-#define LOG_FILE _T("bda.log")
+#define LOG_FILE L"bda.log"
 
 #ifdef _DEBUG
 static void LOG(LPCTSTR fmt, ...)
@@ -189,12 +189,12 @@ static void LOG(LPCTSTR fmt, ...)
 	va_list args;
 	va_start(args, fmt);
 	//int		nCount = _vsctprintf(fmt, args) + 1;
-	TCHAR	buff[3000];
+	WCHAR	buff[3000];
 	FILE*	f;
-	_vstprintf_s(buff, _countof(buff), fmt, args);
-	if (_tfopen_s(&f, LOG_FILE, _T("at")) == 0) {
+	vswprintf_s(buff, _countof(buff), fmt, args);
+	if (_wfopen_s(&f, LOG_FILE, L"at") == 0) {
 		fseek(f, 0, 2);
-		_ftprintf_s(f, _T("%s\n"), buff);
+		fwprintf_s(f, L"%s\n", buff);
 		fclose(f);
 	}
 

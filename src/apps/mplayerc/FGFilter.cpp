@@ -149,17 +149,17 @@ void CFGFilterRegistry::QueryProperties()
 	CComPtr<IPropertyBag> pPB;
 	if (SUCCEEDED(m_pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB))) {
 		CComVariant var;
-		if (SUCCEEDED(pPB->Read(CComBSTR(_T("FriendlyName")), &var, NULL))) {
+		if (SUCCEEDED(pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL))) {
 			m_name = var.bstrVal;
 			var.Clear();
 		}
 
-		if (SUCCEEDED(pPB->Read(CComBSTR(_T("CLSID")), &var, NULL))) {
+		if (SUCCEEDED(pPB->Read(CComBSTR(L"CLSID"), &var, NULL))) {
 			CLSIDFromString(var.bstrVal, &m_clsid);
 			var.Clear();
 		}
 
-		if (SUCCEEDED(pPB->Read(CComBSTR(_T("FilterData")), &var, NULL))) {
+		if (SUCCEEDED(pPB->Read(CComBSTR(L"FilterData"), &var, NULL))) {
 			BSTR* pstr;
 			if (SUCCEEDED(SafeArrayAccessData(var.parray, (void**)&pstr))) {
 				ExtractFilterData((BYTE*)pstr, var.parray->cbElements*(var.parray->rgsabound[0].cElements));
@@ -182,7 +182,7 @@ CFGFilterRegistry::CFGFilterRegistry(const CLSID& clsid, UINT64 merit)
 
 	CRegKey key;
 
-	if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("CLSID\\") + guid, KEY_READ)) {
+	if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + guid, KEY_READ)) {
 		ULONG nChars = 0;
 		if (ERROR_SUCCESS == key.QueryStringValue(NULL, NULL, &nChars)) {
 			CString name;
@@ -197,18 +197,18 @@ CFGFilterRegistry::CFGFilterRegistry(const CLSID& clsid, UINT64 merit)
 
 	CRegKey catkey;
 
-	if (ERROR_SUCCESS == catkey.Open(HKEY_CLASSES_ROOT, _T("CLSID\\{083863F1-70DE-11d0-BD40-00A0C911CE86}\\Instance"), KEY_READ)) {
+	if (ERROR_SUCCESS == catkey.Open(HKEY_CLASSES_ROOT, L"CLSID\\{083863F1-70DE-11d0-BD40-00A0C911CE86}\\Instance", KEY_READ)) {
 		if (ERROR_SUCCESS != key.Open(catkey, guid, KEY_READ)) {
 			// illiminable pack uses the name of the filter and not the clsid, have to enum all keys to find it...
 
 			FILETIME ft;
-			TCHAR buff[256];
+			WCHAR buff[256];
 			DWORD len = _countof(buff);
 			for (DWORD i = 0; ERROR_SUCCESS == catkey.EnumKey(i, buff, &len, &ft); i++, len = _countof(buff)) {
 				if (ERROR_SUCCESS == key.Open(catkey, buff, KEY_READ)) {
-					TCHAR clsid[256];
+					WCHAR clsid[256];
 					len = _countof(clsid);
-					if (ERROR_SUCCESS == key.QueryStringValue(_T("CLSID"), clsid, &len) && GUIDFromCString(clsid) == m_clsid) {
+					if (ERROR_SUCCESS == key.QueryStringValue(L"CLSID", clsid, &len) && GUIDFromCString(clsid) == m_clsid) {
 						break;
 					}
 
@@ -219,18 +219,18 @@ CFGFilterRegistry::CFGFilterRegistry(const CLSID& clsid, UINT64 merit)
 
 		if (key) {
 			ULONG nChars = 0;
-			if (ERROR_SUCCESS == key.QueryStringValue(_T("FriendlyName"), NULL, &nChars)) {
+			if (ERROR_SUCCESS == key.QueryStringValue(L"FriendlyName", NULL, &nChars)) {
 				CString name;
-				if (ERROR_SUCCESS == key.QueryStringValue(_T("FriendlyName"), name.GetBuffer(nChars), &nChars)) {
+				if (ERROR_SUCCESS == key.QueryStringValue(L"FriendlyName", name.GetBuffer(nChars), &nChars)) {
 					name.ReleaseBuffer(nChars);
 					m_name = name;
 				}
 			}
 
 			ULONG nBytes = 0;
-			if (ERROR_SUCCESS == key.QueryBinaryValue(_T("FilterData"), NULL, &nBytes)) {
+			if (ERROR_SUCCESS == key.QueryBinaryValue(L"FilterData", NULL, &nBytes)) {
 				CAutoVectorPtr<BYTE> buff;
-				if (buff.Allocate(nBytes) && ERROR_SUCCESS == key.QueryBinaryValue(_T("FilterData"), buff, &nBytes)) {
+				if (buff.Allocate(nBytes) && ERROR_SUCCESS == key.QueryBinaryValue(L"FilterData", buff, &nBytes)) {
 					ExtractFilterData(buff, nBytes);
 				}
 			}

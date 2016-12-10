@@ -223,7 +223,7 @@ bool CFGManager::CheckBytes(HANDLE hFile, CString chkbytes)
 		CString maskstr = sl.RemoveHead();
 		CString valstr = sl.RemoveHead();
 
-		long cb = _ttol(cbstr);
+		long cb = _wtol(cbstr);
 
 		if (offsetstr.IsEmpty() || cbstr.IsEmpty()
 				|| valstr.IsEmpty() || (valstr.GetLength() & 1)
@@ -232,7 +232,7 @@ bool CFGManager::CheckBytes(HANDLE hFile, CString chkbytes)
 		}
 
 		LARGE_INTEGER offset;
-		offset.QuadPart = _ttoi64(offsetstr);
+		offset.QuadPart = _wtoi64(offsetstr);
 		if (offset.QuadPart < 0) {
 			offset.QuadPart = size.QuadPart - offset.QuadPart;
 		}
@@ -278,7 +278,7 @@ bool CFGManager::CheckBytes(PBYTE buf, DWORD size, CString chkbytes)
 		CString maskstr = sl.RemoveHead();
 		CString valstr = sl.RemoveHead();
 
-		long cb = _ttol(cbstr);
+		long cb = _wtol(cbstr);
 
 		if (offsetstr.IsEmpty() || cbstr.IsEmpty()
 				|| valstr.IsEmpty() || (valstr.GetLength() & 1)
@@ -286,7 +286,7 @@ bool CFGManager::CheckBytes(PBYTE buf, DWORD size, CString chkbytes)
 			return false;
 		}
 
-		__int64 offset = _ttoi64(offsetstr);
+		__int64 offset = _wtoi64(offsetstr);
 		if (offset + valstr.GetLength() > size) {
 			return false;
 		}
@@ -349,7 +349,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 	std::vector<BYTE> httpbuf;
 
-	if ((protocol.GetLength() <= 1 || protocol == L"file") && (ext.Compare(_T(".cda")) != 0)) {
+	if ((protocol.GetLength() <= 1 || protocol == L"file") && (ext.Compare(L".cda") != 0)) {
 		hFile = CreateFile(CString(fn), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
 
 		if (hFile == INVALID_HANDLE_VALUE) {
@@ -359,7 +359,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		Content::Online::GetRaw(lpcwstrFileName, httpbuf);
 	}
 
-	TCHAR buff[256], buff2[256];
+	WCHAR buff[256], buff2[256];
 	ULONG len, len2;
 
 	// internal filters
@@ -489,7 +489,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	}
 
 	// hack for StreamBufferSource - we need override merit from registry.
-	if (ext == _T(".dvr-ms") || ext == _T(".wtv")) {
+	if (ext == L".dvr-ms" || ext == L".wtv") {
 		BOOL bIsBlocked = FALSE;
 		POSITION pos = m_override.GetHeadPosition();
 		while (pos) {
@@ -515,7 +515,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 			CRegKey key;
 			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, CString(protocol), KEY_READ)) {
 				CRegKey exts;
-				if (ERROR_SUCCESS == exts.Open(key, _T("Extensions"), KEY_READ)) {
+				if (ERROR_SUCCESS == exts.Open(key, L"Extensions", KEY_READ)) {
 					len = _countof(buff);
 					if (ERROR_SUCCESS == exts.QueryStringValue(CString(ext), buff, &len)) {
 						fl.Insert(LookupFilterRegistry(GUIDFromCString(buff), m_override), 4);
@@ -523,7 +523,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 				}
 
 				len = _countof(buff);
-				if (ERROR_SUCCESS == key.QueryStringValue(_T("Source Filter"), buff, &len)) {
+				if (ERROR_SUCCESS == key.QueryStringValue(L"Source Filter", buff, &len)) {
 					fl.Insert(LookupFilterRegistry(GUIDFromCString(buff), m_override), 5);
 				}
 			}
@@ -545,7 +545,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 			// check bytes
 
 			CRegKey key;
-			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("Media Type"), KEY_READ)) {
+			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"Media Type", KEY_READ)) {
 				FILETIME ft;
 				len = _countof(buff);
 				for (DWORD i = 0; ERROR_SUCCESS == key.EnumKey(i, buff, &len, &ft); i++, len = _countof(buff)) {
@@ -566,7 +566,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 							CRegKey subkey;
 							if (ERROR_SUCCESS == subkey.Open(majorkey, buff, KEY_READ)) {
 								len = _countof(buff);
-								if (ERROR_SUCCESS != subkey.QueryStringValue(_T("Source Filter"), buff, &len)) {
+								if (ERROR_SUCCESS != subkey.QueryStringValue(L"Source Filter", buff, &len)) {
 									continue;
 								}
 
@@ -595,22 +595,22 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 			// file extension
 
 			CRegKey key;
-			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("Media Type\\Extensions\\") + CString(ext), KEY_READ)) {
+			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"Media Type\\Extensions\\" + CString(ext), KEY_READ)) {
 				ULONG len = _countof(buff);
 				memset(buff, 0, sizeof(buff));
-				LONG ret = key.QueryStringValue(_T("Source Filter"), buff, &len); // QueryStringValue can return ERROR_INVALID_DATA on bogus strings (radlight mpc v1003, fixed in v1004)
+				LONG ret = key.QueryStringValue(L"Source Filter", buff, &len); // QueryStringValue can return ERROR_INVALID_DATA on bogus strings (radlight mpc v1003, fixed in v1004)
 				if (ERROR_SUCCESS == ret || (ERROR_INVALID_DATA == ret && GUIDFromCString(buff) != GUID_NULL)) {
 					GUID clsid = GUIDFromCString(buff);
 					GUID majortype = GUID_NULL;
 					GUID subtype = GUID_NULL;
 
 					len = _countof(buff);
-					if (ERROR_SUCCESS == key.QueryStringValue(_T("Media Type"), buff, &len)) {
+					if (ERROR_SUCCESS == key.QueryStringValue(L"Media Type", buff, &len)) {
 						majortype = GUIDFromCString(buff);
 					}
 
 					len = _countof(buff);
-					if (ERROR_SUCCESS == key.QueryStringValue(_T("Subtype"), buff, &len)) {
+					if (ERROR_SUCCESS == key.QueryStringValue(L"Subtype", buff, &len)) {
 						subtype = GUIDFromCString(buff);
 					}
 
@@ -1886,193 +1886,193 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_SHOUTCAST] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CShoutcastSource>(ShoutcastSourceName);
-		pFGF->m_protocols.AddTail(_T("http"));
+		pFGF->m_protocols.AddTail(L"http");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_UDP] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CUDPReader>(UDPReaderName);
-		pFGF->m_protocols.AddTail(_T("udp"));
-		pFGF->m_protocols.AddTail(_T("http"));
-		pFGF->m_protocols.AddTail(_T("https"));
+		pFGF->m_protocols.AddTail(L"udp");
+		pFGF->m_protocols.AddTail(L"http");
+		pFGF->m_protocols.AddTail(L"https");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_STDINPUT] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CUDPReader>(STDInReaderName);
-		pFGF->m_protocols.AddTail(_T("pipe"));
+		pFGF->m_protocols.AddTail(L"pipe");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_AVI] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAviSourceFilter>(AviSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564920")); // 'RIFF....AVI '
-		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,41564958")); // 'RIFF....AVIX'
-		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,414D5620")); // 'RIFF....AMV '
+		pFGF->m_chkbytes.AddTail(L"0,4,,52494646,8,4,,41564920"); // 'RIFF....AVI '
+		pFGF->m_chkbytes.AddTail(L"0,4,,52494646,8,4,,41564958"); // 'RIFF....AVIX'
+		pFGF->m_chkbytes.AddTail(L"0,4,,52494646,8,4,,414D5620"); // 'RIFF....AMV '
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_MP4] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CMP4SourceFilter>(MP4SourceName);
 		// mov, mp4
-		pFGF->m_chkbytes.AddTail(_T("4,4,,66747970")); // '....ftyp'
-		pFGF->m_chkbytes.AddTail(_T("4,4,,6d6f6f76")); // '....moov'
-		pFGF->m_chkbytes.AddTail(_T("4,4,,6d646174")); // '....mdat'
-		pFGF->m_chkbytes.AddTail(_T("4,4,,77696465")); // '....wide'
-		pFGF->m_chkbytes.AddTail(_T("4,4,,736b6970")); // '....skip'
-		pFGF->m_chkbytes.AddTail(_T("4,4,,66726565")); // '....free'
-		pFGF->m_chkbytes.AddTail(_T("4,4,,706e6f74")); // '....pnot'
-		pFGF->m_extensions.AddTail(_T(".mov"));
+		pFGF->m_chkbytes.AddTail(L"4,4,,66747970"); // '....ftyp'
+		pFGF->m_chkbytes.AddTail(L"4,4,,6d6f6f76"); // '....moov'
+		pFGF->m_chkbytes.AddTail(L"4,4,,6d646174"); // '....mdat'
+		pFGF->m_chkbytes.AddTail(L"4,4,,77696465"); // '....wide'
+		pFGF->m_chkbytes.AddTail(L"4,4,,736b6970"); // '....skip'
+		pFGF->m_chkbytes.AddTail(L"4,4,,66726565"); // '....free'
+		pFGF->m_chkbytes.AddTail(L"4,4,,706e6f74"); // '....pnot'
+		pFGF->m_extensions.AddTail(L".mov");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_FLV] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CFLVSourceFilter>(FlvSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,4,,464C5601")); // FLV (v1)
+		pFGF->m_chkbytes.AddTail(L"0,4,,464C5601"); // FLV (v1)
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_MATROSKA] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CMatroskaSourceFilter>(MatroskaSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,4,,1A45DFA3"));
+		pFGF->m_chkbytes.AddTail(L"0,4,,1A45DFA3");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_REAL] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CRealMediaSourceFilter>(RMSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,4,,2E524D46"));
+		pFGF->m_chkbytes.AddTail(L"0,4,,2E524D46");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_ROQ] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CRoQSourceFilter>(RoQSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,8,,8410FFFFFFFF1E00"));
+		pFGF->m_chkbytes.AddTail(L"0,8,,8410FFFFFFFF1E00");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_DSM] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CDSMSourceFilter>(DSMSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,4,,44534D53"));
+		pFGF->m_chkbytes.AddTail(L"0,4,,44534D53");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_BINK] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CBinkSourceFilter>(BinkSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,3,,42494B"));
+		pFGF->m_chkbytes.AddTail(L"0,3,,42494B");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_FLIC] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CFLICSource>(FlicSourceName);
-		pFGF->m_chkbytes.AddTail(_T("4,2,,11AF"));
-		pFGF->m_chkbytes.AddTail(_T("4,2,,12AF"));
+		pFGF->m_chkbytes.AddTail(L"4,2,,11AF");
+		pFGF->m_chkbytes.AddTail(L"4,2,,12AF");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_FLAC] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CFLACSource>(FlacSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,4,,664C6143"));
-		pFGF->m_extensions.AddTail(_T(".flac"));
+		pFGF->m_chkbytes.AddTail(L"0,4,,664C6143");
+		pFGF->m_extensions.AddTail(L".flac");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_CDDA] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CCDDAReader>(CCDDAReaderName);
-		pFGF->m_extensions.AddTail(_T(".cda"));
+		pFGF->m_extensions.AddTail(L".cda");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_CDXA] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CCDXAReader>(CCDXAReaderName);
-		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,43445841"));
+		pFGF->m_chkbytes.AddTail(L"0,4,,52494646,8,4,,43445841");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_VTS] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CVTSReader>(VTSReaderName);
-		pFGF->m_chkbytes.AddTail(_T("0,12,,445644564944454F2D565453"));
-		pFGF->m_chkbytes.AddTail(_T("0,12,,445644415544494F2D415453"));
+		pFGF->m_chkbytes.AddTail(L"0,12,,445644564944454F2D565453");
+		pFGF->m_chkbytes.AddTail(L"0,12,,445644415544494F2D415453");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_OGG] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<COggSourceFilter>(OggSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,4,,4F676753"));
+		pFGF->m_chkbytes.AddTail(L"0,4,,4F676753");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_MPA] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CMpaSourceFilter>(MpaSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,2,FFE0,FFE0"));
-		pFGF->m_chkbytes.AddTail(_T("0,10,FFFFFF00000080808080,49443300000000000000"));
-		pFGF->m_extensions.AddTail(_T(".mp3"));
-		pFGF->m_extensions.AddTail(_T(".aac"));
+		pFGF->m_chkbytes.AddTail(L"0,2,FFE0,FFE0");
+		pFGF->m_chkbytes.AddTail(L"0,10,FFFFFF00000080808080,49443300000000000000");
+		pFGF->m_extensions.AddTail(L".mp3");
+		pFGF->m_extensions.AddTail(L".aac");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_DTSAC3] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CDTSAC3Source>(DTSAC3SourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,4,,7FFE8001"));               // DTS
-		pFGF->m_chkbytes.AddTail(_T("0,4,,fE7f0180"));               // DTS LE
-		pFGF->m_chkbytes.AddTail(_T("0,4,,64582025"));               // DTS Substream
-		pFGF->m_chkbytes.AddTail(_T("0,2,,0B77"));                   // AC3, E-AC3
-		pFGF->m_chkbytes.AddTail(_T("4,4,,F8726FBB"));               // MLP
-		pFGF->m_extensions.AddTail(_T(".ac3"));
-		pFGF->m_extensions.AddTail(_T(".dts"));
-		pFGF->m_extensions.AddTail(_T(".dtshd"));
-		pFGF->m_extensions.AddTail(_T(".eac3"));
+		pFGF->m_chkbytes.AddTail(L"0,4,,7FFE8001");               // DTS
+		pFGF->m_chkbytes.AddTail(L"0,4,,fE7f0180");               // DTS LE
+		pFGF->m_chkbytes.AddTail(L"0,4,,64582025");               // DTS Substream
+		pFGF->m_chkbytes.AddTail(L"0,2,,0B77");                   // AC3, E-AC3
+		pFGF->m_chkbytes.AddTail(L"4,4,,F8726FBB");               // MLP
+		pFGF->m_extensions.AddTail(L".ac3");
+		pFGF->m_extensions.AddTail(L".dts");
+		pFGF->m_extensions.AddTail(L".dtshd");
+		pFGF->m_extensions.AddTail(L".eac3");
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_AMR] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,6,,2321414D520A"));           // '#!AMR\n'
-		pFGF->m_chkbytes.AddTail(_T("0,9,,2321414D522D57420A"));     // '#!AMR-WB\n'
+		pFGF->m_chkbytes.AddTail(L"0,6,,2321414D520A");           // '#!AMR\n'
+		pFGF->m_chkbytes.AddTail(L"0,9,,2321414D522D57420A");     // '#!AMR-WB\n'
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_APE] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,4,,4D414320"));               // 'MAC '
+		pFGF->m_chkbytes.AddTail(L"0,4,,4D414320");               // 'MAC '
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_TAK] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,4,,7442614B"));               // 'tBaK'
+		pFGF->m_chkbytes.AddTail(L"0,4,,7442614B");               // 'tBaK'
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_TTA] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,4,,54544131"));               // 'TTA1'
-		pFGF->m_chkbytes.AddTail(_T("0,3,,494433"));                 // 'ID3'
+		pFGF->m_chkbytes.AddTail(L"0,4,,54544131");               // 'TTA1'
+		pFGF->m_chkbytes.AddTail(L"0,3,,494433");                 // 'ID3'
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_WAVPACK] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,4,,7776706B"));               // 'wvpk'
+		pFGF->m_chkbytes.AddTail(L"0,4,,7776706B");               // 'wvpk'
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_WAV] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,4,,52494646,8,4,,57415645")); // 'RIFF....WAVE'
-		pFGF->m_chkbytes.AddTail(_T("0,16,,726966662E91CF11A5D628DB04C10000,24,16,,77617665F3ACD3118CD100C04F8EDB8A")); // Wave64
+		pFGF->m_chkbytes.AddTail(L"0,4,,52494646,8,4,,57415645"); // 'RIFF....WAVE'
+		pFGF->m_chkbytes.AddTail(L"0,16,,726966662E91CF11A5D628DB04C10000,24,16,,77617665F3ACD3118CD100C04F8EDB8A"); // Wave64
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_DSD] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,12,,445344201C00000000000000")); // 'DSD..."
-		pFGF->m_chkbytes.AddTail(_T("0,4,,46524D38,12,4,,44534420")); // 'FRM8........DSD '
+		pFGF->m_chkbytes.AddTail(L"0,12,,445344201C00000000000000"); // 'DSD..."
+		pFGF->m_chkbytes.AddTail(L"0,4,,46524D38,12,4,,44534420"); // 'FRM8........DSD '
 		m_source.AddTail(pFGF);
 	}
 
 	if (src[SRC_DTSAC3] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,8,,4454534844484452"));       // DTSHDHDR
+		pFGF->m_chkbytes.AddTail(L"0,8,,4454534844484452");       // DTSHDHDR
 		m_source.AddTail(pFGF);
 	}
 
@@ -2084,12 +2084,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_RAWVIDEO] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CRawVideoSourceFilter>(RawVideoSourceName);
-		pFGF->m_chkbytes.AddTail(_T("0,9,,595556344D50454732"));		// YUV4MPEG2
-		pFGF->m_chkbytes.AddTail(_T("0,3,,000001"));					// MPEG1/2, VC-1
-		pFGF->m_chkbytes.AddTail(_T("0,4,,00000001"));					// H.264/AVC, H.265/HEVC
-		pFGF->m_chkbytes.AddTail(_T("0,4,,434D5331,20,4,,50445652"));	// 'CMS1................PDVR'
-		pFGF->m_chkbytes.AddTail(_T("0,5,,3236344456"));				// '264DV'
-		pFGF->m_chkbytes.AddTail(_T("0,4,,FFFFFF88"));
+		pFGF->m_chkbytes.AddTail(L"0,9,,595556344D50454732");		// YUV4MPEG2
+		pFGF->m_chkbytes.AddTail(L"0,3,,000001");					// MPEG1/2, VC-1
+		pFGF->m_chkbytes.AddTail(L"0,4,,00000001");					// H.264/AVC, H.265/HEVC
+		pFGF->m_chkbytes.AddTail(L"0,4,,434D5331,20,4,,50445652");	// 'CMS1................PDVR'
+		pFGF->m_chkbytes.AddTail(L"0,5,,3236344456");				// '264DV'
+		pFGF->m_chkbytes.AddTail(L"0,4,,FFFFFF88");
 		m_source.AddTail(pFGF);
 	}
 
@@ -2632,24 +2632,24 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	// "Subtitle Mixer" makes an access violation around the
 	// 11-12th media type when enumerating them on its output.
-	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{00A95963-3BE5-48C0-AD9F-3356D67EA09D}")), MERIT64_DO_NOT_USE));
+	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(L"{00A95963-3BE5-48C0-AD9F-3356D67EA09D}"), MERIT64_DO_NOT_USE));
 
 	// DiracSplitter.ax is crashing MPC-BE when opening invalid files...
-	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{09E7F58E-71A1-419D-B0A0-E524AE1454A9}")), MERIT64_DO_NOT_USE));
-	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{5899CFB9-948F-4869-A999-5544ECB38BA5}")), MERIT64_DO_NOT_USE));
-	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{F78CF248-180E-4713-B107-B13F7B5C31E1}")), MERIT64_DO_NOT_USE));
+	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(L"{09E7F58E-71A1-419D-B0A0-E524AE1454A9}"), MERIT64_DO_NOT_USE));
+	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(L"{5899CFB9-948F-4869-A999-5544ECB38BA5}"), MERIT64_DO_NOT_USE));
+	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(L"{F78CF248-180E-4713-B107-B13F7B5C31E1}"), MERIT64_DO_NOT_USE));
 
 	// ISCR suxx
-	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{48025243-2D39-11CE-875D-00608CB78066}")), MERIT64_DO_NOT_USE));
+	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(L"{48025243-2D39-11CE-875D-00608CB78066}"), MERIT64_DO_NOT_USE));
 
 	// Samsung's "mpeg-4 demultiplexor" can even open matroska files, amazing...
-	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{99EC0C72-4D1B-411B-AB1F-D561EE049D94}")), MERIT64_DO_NOT_USE));
+	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(L"{99EC0C72-4D1B-411B-AB1F-D561EE049D94}"), MERIT64_DO_NOT_USE));
 
 	// LG Video Renderer (lgvid.ax) just crashes when trying to connect it
-	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{9F711C60-0668-11D0-94D4-0000C02BA972}")), MERIT64_DO_NOT_USE));
+	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(L"{9F711C60-0668-11D0-94D4-0000C02BA972}"), MERIT64_DO_NOT_USE));
 
 	// palm demuxer crashes (even crashes graphedit when dropping an .ac3 onto it)
-	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{BE2CF8A7-08CE-4A2C-9A25-FD726A999196}")), MERIT64_DO_NOT_USE));
+	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(L"{BE2CF8A7-08CE-4A2C-9A25-FD726A999196}"), MERIT64_DO_NOT_USE));
 
 	// DCDSPFilter (early versions crash mpc)
 	{
@@ -2658,9 +2658,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		TCHAR buff[256] = { 0 };
 		ULONG len = sizeof(buff);
 
-		CString clsid = _T("{B38C58A0-1809-11D6-A458-EDAE78F1DF12}");
+		CString clsid = L"{B38C58A0-1809-11D6-A458-EDAE78F1DF12}";
 
-		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("CLSID\\") + clsid + _T("\\InprocServer32"), KEY_READ)
+		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + clsid + L"\\InprocServer32", KEY_READ)
 				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)
 				&& CFileVersionInfo::GetFileVersion(buff) < 0x0001000000030000ui64) {
 			m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(clsid), MERIT64_DO_NOT_USE));
@@ -2668,7 +2668,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	// mainconcept color space converter
-	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{272D77A0-A852-4851-ADA4-9091FEAD4C86}")), MERIT64_DO_NOT_USE));
+	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(L"{272D77A0-A852-4851-ADA4-9091FEAD4C86}"), MERIT64_DO_NOT_USE));
 
 	bool VRwithSR =
 		rs.iVideoRenderer == VIDRNDT_MADVR ||
@@ -2717,7 +2717,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	// Blacklist Accusoft PICVideo M-JPEG Codec 2.1 since causes a DEP crash
-	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{4C4CD9E1-F876-11D2-962F-00500471FDDC}")), MERIT64_DO_NOT_USE));
+	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(L"{4C4CD9E1-F876-11D2-962F-00500471FDDC}"), MERIT64_DO_NOT_USE));
 
 	// Overrides
 	WORD merit_low = 1;
@@ -2950,7 +2950,7 @@ CFGManagerDVD::CFGManagerDVD(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPr
 	: CFGManagerPlayer(pName, pUnk, hWnd, IsPreview)
 {
 	// elecard's decoder isn't suited for dvd playback (atm)
-	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(_T("{F50B3F13-19C4-11CF-AA9A-02608C9BABA2}")), MERIT64_DO_NOT_USE));
+	m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(L"{F50B3F13-19C4-11CF-AA9A-02608C9BABA2}"), MERIT64_DO_NOT_USE));
 }
 
 class CResetDVD : public CDVDSession
