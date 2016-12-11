@@ -46,9 +46,9 @@ CComPtr<IApplicationAssociationRegistration> CPPageFormats::m_pAAR;
 // TODO: change this along with the root key for settings and the mutex name to
 //       avoid possible risks of conflict with the old MPC (non BE version).
 #ifdef _WIN64
-	#define PROGID _T("mpc-be64")
+	#define PROGID L"mpc-be64"
 #else
-	#define PROGID _T("mpc-be")
+	#define PROGID L"mpc-be"
 #endif // _WIN64
 
 IMPLEMENT_DYNAMIC(CPPageFormats, CPPageBase)
@@ -108,12 +108,12 @@ void CPPageFormats::SetChecked(int iItem, int iChecked)
 
 CString CPPageFormats::GetEnqueueCommand()
 {
-	return _T("\"") + GetProgramPath() + _T("\" /add \"%1\"");
+	return L"\"" + GetProgramPath() + L"\" /add \"%1\"";
 }
 
 CString CPPageFormats::GetOpenCommand()
 {
-	return _T("\"") + GetProgramPath() + _T("\" \"%1\"");
+	return L"\"" + GetProgramPath() + L"\" \"%1\"";
 }
 
 bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
@@ -127,7 +127,7 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 	} else {
 		// The 2000/XP/10 way
 		CRegKey key;
-		TCHAR   buff[_MAX_PATH] = { 0 };
+		WCHAR   buff[_MAX_PATH] = { 0 };
 		ULONG   len = _countof(buff);
 
 		if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext, KEY_READ)) {
@@ -144,11 +144,11 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 	// Check if association is for this instance of MPC
 	if (bIsDefault) {
 		CRegKey key;
-		TCHAR   buff[_MAX_PATH] = { 0 };
+		WCHAR   buff[_MAX_PATH] = { 0 };
 		ULONG   len = _countof(buff);
 
 		bIsDefault = FALSE;
-		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\open\\command"), KEY_READ)) {
+		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, strProgID + L"\\shell\\open\\command", KEY_READ)) {
 			CString strCommand = GetOpenCommand();
 			if (ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)) {
 				bIsDefault = (strCommand.CompareNoCase(CString(buff)) == 0);
@@ -158,7 +158,7 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 
 	if (bIsDefault && IsWin10orLater() && bCheckProgId) {
 		CRegKey key;
-		TCHAR   buff[_MAX_PATH] = { 0 };
+		WCHAR   buff[_MAX_PATH] = { 0 };
 		ULONG   len = _countof(buff);
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, CString(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + ext + L"\\UserChoice"), KEY_READ)) {
@@ -193,22 +193,22 @@ bool CPPageFormats::RegisterApp()
 
 	AppIcon = GetProgramPath();
 	AppIcon = "\""+AppIcon+"\"";
-	AppIcon += _T(",0");
+	AppIcon += L",0";
 
 	// Register MPC for the windows "Default application" manager
 	CRegKey key;
 
-	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\RegisteredApplications"))) {
-		key.SetStringValue(_T("MPC-BE"), GetRegisteredKey());
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"SOFTWARE\\RegisteredApplications")) {
+		key.SetStringValue(L"MPC-BE", GetRegisteredKey());
 
 		if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE, GetRegisteredKey())) {
 			return false;
 		}
 
 		// ==>>  TODO icon !!!
-		key.SetStringValue(_T("ApplicationDescription"), ResStr(IDS_APP_DESCRIPTION), REG_EXPAND_SZ);
-		key.SetStringValue(_T("ApplicationIcon"), AppIcon, REG_EXPAND_SZ);
-		key.SetStringValue(_T("ApplicationName"), ResStr(IDR_MAINFRAME), REG_EXPAND_SZ);
+		key.SetStringValue(L"ApplicationDescription", ResStr(IDS_APP_DESCRIPTION), REG_EXPAND_SZ);
+		key.SetStringValue(L"ApplicationIcon", AppIcon, REG_EXPAND_SZ);
+		key.SetStringValue(L"ApplicationName", ResStr(IDR_MAINFRAME), REG_EXPAND_SZ);
 	}
 
 	return true;
@@ -219,7 +219,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 	CRegKey key;
 	CString strProgID = PROGID + ext;
 
-	bool bSetValue = true || (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\open\\command"), KEY_READ));
+	bool bSetValue = true || (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, strProgID + L"\\shell\\open\\command", KEY_READ));
 	// Why bSetValue?
 
 	// Create ProgID for this file type
@@ -232,17 +232,17 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 
 	// Add to playlist option
 	if (SetContextFiles && !ShellExtExists()) {
-		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\enqueue"))) {
+		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\shell\\enqueue")) {
 			return false;
 		}
 		if (ERROR_SUCCESS != key.SetStringValue(NULL, ResStr(IDS_ADD_TO_PLAYLIST))) {
 			return false;
 		}
-		if (ERROR_SUCCESS != key.SetStringValue(_T("Icon"), _T("\"") + GetProgramPath() + _T("\",0"))) {
+		if (ERROR_SUCCESS != key.SetStringValue(L"Icon", L"\"" + GetProgramPath() + L"\",0")) {
 			return false;
 		}
 
-		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\enqueue\\command"))) {
+		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\shell\\enqueue\\command")) {
 			return false;
 		}
 		if (bSetValue && (ERROR_SUCCESS != key.SetStringValue(NULL, GetEnqueueCommand()))) {
@@ -251,34 +251,34 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 	} else {
 		key.Close();
 		key.Attach(HKEY_CLASSES_ROOT);
-		key.RecurseDeleteKey(strProgID + _T("\\shell\\enqueue"));
+		key.RecurseDeleteKey(strProgID + L"\\shell\\enqueue");
 	}
 
 	// Play option
-	if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\open"))) {
+	if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\shell\\open")) {
 		return false;
 	}
 	if (SetContextFiles && !ShellExtExists()) {
 		if (ERROR_SUCCESS != key.SetStringValue(NULL, ResStr(IDS_OPEN_WITH_MPC))) {
 			return false;
 		}
-		if (ERROR_SUCCESS != key.SetStringValue(_T("Icon"), _T("\"") + GetProgramPath() + _T("\",0"))) {
+		if (ERROR_SUCCESS != key.SetStringValue(L"Icon", L"\"" + GetProgramPath() + L"\",0")) {
 			return false;
 		}
 	} else {
-		if (ERROR_SUCCESS != key.SetStringValue(NULL, _T(""))) {
+		if (ERROR_SUCCESS != key.SetStringValue(NULL, L"")) {
 			return false;
 		}
 	}
 
-	if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\shell\\open\\command"))) {
+	if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\shell\\open\\command")) {
 		return false;
 	}
 	if (bSetValue && (ERROR_SUCCESS != key.SetStringValue(NULL, GetOpenCommand()))) {
 		return false;
 	}
 
-	if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE, CString(GetRegisteredKey()) + _T("\\FileAssociations"))) {
+	if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE, CString(GetRegisteredKey()) + L"\\FileAssociations")) {
 		return false;
 	}
 	if (ERROR_SUCCESS != key.SetStringValue(ext, strProgID)) {
@@ -290,27 +290,27 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 
 		// first look for the icon
 		CString ext_icon = GetProgramDir();
-		ext_icon.AppendFormat(_T("icons\\%s.ico"), CString(ext).TrimLeft(_T(".")));
+		ext_icon.AppendFormat(L"icons\\%s.ico", CString(ext).TrimLeft('.'));
 		if (::PathFileExists(ext_icon)) {
-			AppIcon.Format(_T("\"%s\",0"), ext_icon);
+			AppIcon.Format(L"\"%s\",0", ext_icon);
 		} else {
 			// then look for the iconlib
-			CString mpciconlib = GetProgramDir() + _T("mpciconlib.dll");
+			CString mpciconlib = GetProgramDir() + L"mpciconlib.dll";
 			if (::PathFileExists(mpciconlib)) {
 				int icon_index = GetIconIndex(ext);
 				if (icon_index < 0) {
 					if (filetype == TAudio) {
-						icon_index = GetIconIndex(_T(":audio"));
+						icon_index = GetIconIndex(L":audio");
 					} else if (filetype == TPlaylist) {
-						icon_index = GetIconIndex(_T(":playlist"));
+						icon_index = GetIconIndex(L":playlist");
 					}
 
 					if (icon_index < 0) {
-						icon_index = GetIconIndex(_T(":video"));
+						icon_index = GetIconIndex(L":video");
 					}
 				}
 				if (icon_index >= 0 && ExtractIcon(AfxGetApp()->m_hInstance,(LPCWSTR)mpciconlib, icon_index)) {
-					AppIcon.Format(_T("\"%s\",%d"), mpciconlib, icon_index);
+					AppIcon.Format(L"\"%s\",%d", mpciconlib, icon_index);
 				}
 			}
 		}
@@ -319,10 +319,10 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 		if ((AppIcon.IsEmpty())) {
 			AppIcon = GetProgramPath();
 			AppIcon = "\""+AppIcon+"\"";
-			AppIcon += _T(",0");
+			AppIcon += L",0";
 		}
 
-		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\DefaultIcon"))) {
+		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\DefaultIcon")) {
 			return false;
 		}
 		if (bSetValue && (ERROR_SUCCESS != key.SetStringValue(NULL, AppIcon))) {
@@ -331,7 +331,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 	} else {
 		key.Close();
 		key.Attach(HKEY_CLASSES_ROOT);
-		key.RecurseDeleteKey(strProgID + _T("\\DefaultIcon"));
+		key.RecurseDeleteKey(strProgID + L"\\DefaultIcon");
 	}
 
 	if (!IsRegistered(ext)) {
@@ -434,13 +434,13 @@ bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
 	if (hDLL == NULL) {
 		if (::PathFileExists(lpszLibrary)) {
 			CRegKey key;
-			if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
-				key.SetStringValue(_T("MpcPath"), GetProgramPath());
+			if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+				key.SetStringValue(L"MpcPath", GetProgramPath());
 			}
 
 			CString strParameters;
-			strParameters.Format(_T(" /s \"%s\""), lpszLibrary);
-			Execute(_T("regsvr32.exe"), strParameters);
+			strParameters.Format(L" /s \"%s\"", lpszLibrary);
+			Execute(L"regsvr32.exe", strParameters);
 
 			return true;
 		}
@@ -473,8 +473,8 @@ bool CPPageFormats::UnRegisterShellExt(LPCTSTR lpszLibrary)
 	if (hDLL == NULL) {
 		if (::PathFileExists(lpszLibrary)) {
 			CString strParameters;
-			strParameters.Format(_T(" /s /u \"%s\""), lpszLibrary);
-			Execute(_T("regsvr32.exe"), strParameters);
+			strParameters.Format(L" /s /u \"%s\"", lpszLibrary);
+			Execute(L"regsvr32.exe", strParameters);
 
 			return true;
 		}
@@ -517,7 +517,7 @@ void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
 	CRegKey key;
 
 	if (fRegister) {
-		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, _T("MPCBE.Autorun"))) {
+		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, L"MPCBE.Autorun")) {
 			return;
 		}
 		key.Close();
@@ -526,25 +526,25 @@ void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
 										CString(CStringA("MPCBE.Autorun\\Shell\\Play") + handlers[i].verb + "\\Command"))) {
 			return;
 		}
-		key.SetStringValue(NULL, _T("\"") + exe + _T("\"") + handlers[i].cmd);
+		key.SetStringValue(NULL, L"\"" + exe + L"\"" + handlers[i].cmd);
 		key.Close();
 
 		if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE,
 										CString(CStringA("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers\\Handlers\\MPCBEPlay") + handlers[i].verb + "OnArrival"))) {
 			return;
 		}
-		key.SetStringValue(_T("Action"), ResStr(handlers[i].action));
-		key.SetStringValue(_T("Provider"), _T("MPC-BE"));
-		key.SetStringValue(_T("InvokeProgID"), _T("MPCBE.Autorun"));
-		key.SetStringValue(_T("InvokeVerb"), CString(CStringA("Play") + handlers[i].verb));
-		key.SetStringValue(_T("DefaultIcon"), exe + _T(",0"));
+		key.SetStringValue(L"Action", ResStr(handlers[i].action));
+		key.SetStringValue(L"Provider", L"MPC-BE");
+		key.SetStringValue(L"InvokeProgID", L"MPCBE.Autorun");
+		key.SetStringValue(L"InvokeVerb", CString(CStringA("Play") + handlers[i].verb));
+		key.SetStringValue(L"DefaultIcon", exe + L",0");
 		key.Close();
 
 		if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE,
 										CString(CStringA("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers\\EventHandlers\\Play") + handlers[i].verb + "OnArrival"))) {
 			return;
 		}
-		key.SetStringValue(CString(CStringA("MPCBEPlay") + handlers[i].verb + "OnArrival"), _T(""));
+		key.SetStringValue(CString(CStringA("MPCBEPlay") + handlers[i].verb + "OnArrival"), L"");
 	} else {
 		if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE,
 										CString(CStringA("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers\\EventHandlers\\Play") + handlers[i].verb + "OnArrival"))) {
@@ -569,13 +569,13 @@ bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 		return false;
 	}
 
-	TCHAR buff[_MAX_PATH] = { 0 };
+	WCHAR buff[_MAX_PATH] = { 0 };
 	ULONG len = _countof(buff);
 
 	CString exe = GetProgramPath();
 
 	if (ERROR_SUCCESS != key.QueryStringValue(
-				CString(_T("MPCBEPlay")) + handlers[i].verb + _T("OnArrival"),
+				CString(L"MPCBEPlay") + handlers[i].verb + L"OnArrival",
 				buff, &len)) {
 		return false;
 	}
@@ -590,7 +590,7 @@ bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 	if (ERROR_SUCCESS != key.QueryStringValue(NULL, buff, &len)) {
 		return false;
 	}
-	if (_tcsnicmp(_T("\"") + exe, buff, exe.GetLength() + 1)) {
+	if (_wcsnicmp(L"\"" + exe, buff, exe.GetLength() + 1)) {
 		return false;
 	}
 
@@ -655,7 +655,7 @@ BOOL CPPageFormats::OnInitDialog()
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT);
 
-	m_list.InsertColumn(COL_CATEGORY, _T("Category"), LVCFMT_LEFT);
+	m_list.InsertColumn(COL_CATEGORY, L"Category", LVCFMT_LEFT);
 
 	int dpiY = 96;
 
@@ -683,7 +683,7 @@ BOOL CPPageFormats::OnInitDialog()
 	mf.UpdateData(FALSE);
 	for (int i = 0; i < (int)mf.GetCount(); i++) {
 		CString label;
-		label.Format (_T("%s (%s)"), mf[i].GetDescription(), mf[i].GetExts());
+		label.Format (L"%s (%s)", mf[i].GetDescription(), mf[i].GetExts());
 
 		int iItem = m_list.InsertItem(i, label);
 		m_list.SetItemData(iItem, i);
@@ -746,7 +746,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 	CString extoldreg, extOldIcon;
 	CRegKey key;
 	HRESULT hr = S_OK;
-	TCHAR   buff[_MAX_PATH] = { 0 };
+	WCHAR   buff[_MAX_PATH] = { 0 };
 	ULONG   len = _countof(buff);
 
 	if (m_pAAR) {
@@ -770,13 +770,13 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 
 				// Get current icon for file type
 				/*
-				if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, CString(pszCurrentAssociation) + _T("\\DefaultIcon")))
+				if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, CString(pszCurrentAssociation) + L"\\DefaultIcon"))
 				{
 					len = _countof(buff);
 					memset(buff, 0, len);
 					if (ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && !CString(buff).Trim().IsEmpty())
 					{
-						if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\DefaultIcon")))
+						if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\DefaultIcon"))
 							key.SetStringValue (NULL, buff);
 					}
 				}
@@ -816,7 +816,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 			/*
 			if (!extoldreg.IsEmpty())
 			{
-				if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, extoldreg + _T("\\DefaultIcon")))
+				if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, extoldreg + L"\\DefaultIcon"))
 				{
 					len = _countof(buff);
 					memset(buff, 0, len);
@@ -833,7 +833,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 			key.SetStringValue(GetOldAssoc(), extoldreg);
 
 			/*
-			if (!extOldIcon.IsEmpty() && (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, strProgID + _T("\\DefaultIcon"))))
+			if (!extOldIcon.IsEmpty() && (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\DefaultIcon")))
 				key.SetStringValue (NULL, extOldIcon);
 			*/
 		} else {
@@ -972,27 +972,27 @@ BOOL CPPageFormats::OnApply()
 
 	CRegKey key;
 	if (m_fContextDir.GetCheck() && !ShellExtExists()) {
-		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, _T("Directory\\shell\\") PROGID _T(".enqueue"))) {
+		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, L"Directory\\shell\\" PROGID L".enqueue")) {
 			key.SetStringValue(NULL, ResStr(IDS_ADD_TO_PLAYLIST));
-			key.SetStringValue(_T("Icon"), _T("\"") + GetProgramPath() + _T("\",0"));
+			key.SetStringValue(L"Icon", L"\"" + GetProgramPath() + L"\",0");
 		}
 
-		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, _T("Directory\\shell\\") PROGID _T(".enqueue\\command"))) {
+		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, L"Directory\\shell\\" PROGID L".enqueue\\command")) {
 			key.SetStringValue(NULL, GetEnqueueCommand());
 		}
 
-		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, _T("Directory\\shell\\") PROGID _T(".play"))) {
+		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, L"Directory\\shell\\" PROGID L".play")) {
 			key.SetStringValue(NULL, ResStr(IDS_OPEN_WITH_MPC));
-			key.SetStringValue(_T("Icon"), _T("\"") + GetProgramPath() + _T("\",0"));
+			key.SetStringValue(L"Icon", L"\"" + GetProgramPath() + L"\",0");
 		}
 
-		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, _T("Directory\\shell\\") PROGID _T(".play\\command"))) {
+		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, L"Directory\\shell\\" PROGID L".play\\command")) {
 			key.SetStringValue(NULL, GetOpenCommand());
 		}
 	} else {
 		key.Attach(HKEY_CLASSES_ROOT);
-		key.RecurseDeleteKey(_T("Directory\\shell\\") PROGID _T(".enqueue"));
-		key.RecurseDeleteKey(_T("Directory\\shell\\") PROGID _T(".play"));
+		key.RecurseDeleteKey(L"Directory\\shell\\" PROGID L".enqueue");
+		key.RecurseDeleteKey(L"Directory\\shell\\" PROGID L".play");
 	}
 
 	SetListItemState(m_list.GetSelectionMark());
@@ -1139,7 +1139,7 @@ void CPPageFormats::OnBnClickedAudio()
 void CPPageFormats::OnBnRunAdmin()
 {
 	CString strCmd;
-	strCmd.Format(_T("/adminoption %d"), IDD);
+	strCmd.Format(L"/adminoption %d", IDD);
 
 	AfxGetMyApp()->RunAsAdministrator(GetProgramPath(), strCmd, true);
 
@@ -1182,7 +1182,7 @@ void CPPageFormats::OnBnClickedDefault()
 		m_exts = mf[i].GetExtsWithPeriod();
 
 		CString label;
-		label.Format(_T("%s (%s)"), mf[i].GetDescription(), mf[i].GetExts());
+		label.Format(L"%s (%s)", mf[i].GetDescription(), mf[i].GetExts());
 		m_list.SetItemText(iItem, COL_CATEGORY, label);
 		m_list.SetColumnWidth(COL_CATEGORY, LVSCW_AUTOSIZE);
 
@@ -1209,7 +1209,7 @@ void CPPageFormats::OnBnClickedSet()
 		m_exts = mf[i].GetExtsWithPeriod();
 
 		CString label;
-		label.Format(_T("%s (%s)"), mf[i].GetDescription(), mf[i].GetExts());
+		label.Format(L"%s (%s)", mf[i].GetDescription(), mf[i].GetExts());
 		m_list.SetItemText(iItem, COL_CATEGORY, label);
 		m_list.SetColumnWidth(COL_CATEGORY, LVSCW_AUTOSIZE);
 

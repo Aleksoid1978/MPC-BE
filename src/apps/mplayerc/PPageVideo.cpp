@@ -137,7 +137,7 @@ BOOL CPPageVideo::OnInitDialog()
 
 	CComPtr<IDirect3D9> pD3D9 = D3D9Helper::Direct3DCreate9();
 	if (pD3D9) {
-		TCHAR strGUID[50] = {};
+		WCHAR strGUID[50] = {};
 		CString cstrGUID;
 		CString d3ddevice_str;
 		D3DADAPTER_IDENTIFIER9 adapterIdentifier = {};
