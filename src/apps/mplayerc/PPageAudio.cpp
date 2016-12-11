@@ -100,14 +100,14 @@ BOOL CPPageAudio::OnInitDialog()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m_AudioRendererDisplayNames.Add(_T(""));
+	m_AudioRendererDisplayNames.Add(L"");
 	m_iAudioRendererTypeCtrl.SetRedraw(FALSE);
-	m_iAudioRendererTypeCtrl.AddString(_T("1. ") + ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
+	m_iAudioRendererTypeCtrl.AddString(L"1. " + ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
 	m_iAudioRendererType = 0;
 
 	m_DualAudioOutput.SetCheck(s.fDualAudioOutput);
 	m_iSecAudioRendererTypeCtrl.SetRedraw(FALSE);
-	m_iSecAudioRendererTypeCtrl.AddString(_T("1. ") + ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
+	m_iSecAudioRendererTypeCtrl.AddString(L"1. " + ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
 	m_iSecAudioRendererType = 0;
 
 	OnDualAudioOutputCheck();
@@ -142,7 +142,7 @@ BOOL CPPageAudio::OnInitDialog()
 					m_AudioRendererDisplayNames.Add(CString(olestr));
 
 					CString str;
-					str.Format(_T("%d. %s"), i++, fname);
+					str.Format(L"%d. %s", i++, fname);
 					m_iAudioRendererTypeCtrl.AddString(str);
 					m_iSecAudioRendererTypeCtrl.AddString(str);
 				}
@@ -166,7 +166,7 @@ BOOL CPPageAudio::OnInitDialog()
 			m_AudioRendererDisplayNames.Add(AudioDevAddon[idx]);
 
 			CString str;
-			str.Format(_T("%d. %s"), i++, AudioDevAddon[idx]);
+			str.Format(L"%d. %s", i++, AudioDevAddon[idx]);
 			m_iAudioRendererTypeCtrl.AddString(str);
 			m_iSecAudioRendererTypeCtrl.AddString(str);
 		}

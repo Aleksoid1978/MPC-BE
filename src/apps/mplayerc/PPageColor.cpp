@@ -97,10 +97,10 @@ BOOL CPPageColor::OnInitDialog()
 	m_SliSaturation.SetPos			(m_iSaturation);
 	m_SliSaturation.SetPageSize		(10);
 
-	m_iBrightness ? m_sBrightness.Format(_T("%+d"), m_iBrightness) : m_sBrightness = _T("0");
-	m_iContrast   ? m_sContrast.Format  (_T("%+d"), m_iContrast)   : m_sContrast   = _T("0");
-	m_iHue        ? m_sHue.Format       (_T("%+d"), m_iHue)        : m_sHue        = _T("0");
-	m_iSaturation ? m_sSaturation.Format(_T("%+d"), m_iSaturation) : m_sSaturation = _T("0");
+	m_iBrightness ? m_sBrightness.Format(L"%+d", m_iBrightness) : m_sBrightness = L"0";
+	m_iContrast   ? m_sContrast.Format  (L"%+d", m_iContrast)   : m_sContrast   = L"0";
+	m_iHue        ? m_sHue.Format       (L"%+d", m_iHue)        : m_sHue        = L"0";
+	m_iSaturation ? m_sSaturation.Format(L"%+d", m_iSaturation) : m_sSaturation = L"0";
 
 	UpdateData(FALSE);
 
@@ -129,22 +129,22 @@ void CPPageColor::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	if (*pScrollBar == m_SliBrightness) {
 		m_iBrightness = m_SliBrightness.GetPos();
 		pMainFrame->SetColorControl(ProcAmp_Brightness, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
-		m_iBrightness ? m_sBrightness.Format(_T("%+d"), m_iBrightness) : m_sBrightness = _T("0");
+		m_iBrightness ? m_sBrightness.Format(L"%+d", m_iBrightness) : m_sBrightness = L"0";
 	}
 	else if (*pScrollBar == m_SliContrast) {
 		m_iContrast = m_SliContrast.GetPos();
 		pMainFrame->SetColorControl(ProcAmp_Contrast, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
-		m_iContrast ? m_sContrast.Format(_T("%+d"), m_iContrast) : m_sContrast = _T("0");
+		m_iContrast ? m_sContrast.Format(L"%+d", m_iContrast) : m_sContrast = L"0";
 	}
 	else if (*pScrollBar == m_SliHue) {
 		m_iHue = m_SliHue.GetPos();
 		pMainFrame->SetColorControl(ProcAmp_Hue, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
-		m_iHue ? m_sHue.Format(_T("%+d"), m_iHue) : m_sHue = _T("0");
+		m_iHue ? m_sHue.Format(L"%+d", m_iHue) : m_sHue = L"0";
 	}
 	else if (*pScrollBar == m_SliSaturation) {
 		m_iSaturation = m_SliSaturation.GetPos();
 		pMainFrame->SetColorControl(ProcAmp_Saturation, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
-		m_iSaturation ? m_sSaturation.Format(_T("%+d"), m_iSaturation) : m_sSaturation = _T("0");
+		m_iSaturation ? m_sSaturation.Format(L"%+d", m_iSaturation) : m_sSaturation = L"0";
 	}
 
 	UpdateData(FALSE);
@@ -165,10 +165,10 @@ void CPPageColor::OnBnClickedReset()
 	m_SliHue.SetPos			(m_iHue);
 	m_SliSaturation.SetPos	(m_iSaturation);
 
-	m_iBrightness ? m_sBrightness.Format(_T("%+d"), m_iBrightness) : m_sBrightness = _T("0");
-	m_iContrast   ? m_sContrast.Format  (_T("%+d"), m_iContrast)   : m_sContrast   = _T("0");
-	m_iHue        ? m_sHue.Format       (_T("%+d"), m_iHue)        : m_sHue        = _T("0");
-	m_iSaturation ? m_sSaturation.Format(_T("%+d"), m_iSaturation) : m_sSaturation = _T("0");
+	m_iBrightness ? m_sBrightness.Format(L"%+d", m_iBrightness) : m_sBrightness = L"0";
+	m_iContrast   ? m_sContrast.Format  (L"%+d", m_iContrast)   : m_sContrast   = L"0";
+	m_iHue        ? m_sHue.Format       (L"%+d", m_iHue)        : m_sHue        = L"0";
+	m_iSaturation ? m_sSaturation.Format(L"%+d", m_iSaturation) : m_sSaturation = L"0";
 
 	pMainFrame->SetColorControl(ProcAmp_All, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
 

@@ -74,8 +74,8 @@ BOOL CPPageSubtitles::OnInitDialog()
 	m_ISDb = s.strISDb;
 	m_ISDbCombo.AddString(m_ISDb);
 
-	if (m_ISDb.CompareNoCase(_T("www.opensubtitles.org/isdb"))) {
-		m_ISDbCombo.AddString(_T("www.opensubtitles.org/isdb"));
+	if (m_ISDb.CompareNoCase(L"www.opensubtitles.org/isdb")) {
+		m_ISDbCombo.AddString(L"www.opensubtitles.org/isdb");
 	}
 
 	UpdateData(FALSE);
@@ -187,15 +187,15 @@ void CPPageSubtitles::OnBnClickedButton2()
 	m_ISDbCombo.GetWindowText(ISDb);
 	ISDb.TrimRight('/');
 
-	ver.Format(_T("ISDb v%d"), ISDb_PROTOCOL_VERSION);
+	ver.Format(L"ISDb v%d", ISDb_PROTOCOL_VERSION);
 
 	CWebTextFile wtf;
 	UINT nIconType = MB_ICONEXCLAMATION;
 
-	if (wtf.Open(_T("http://") + ISDb + _T("/test.php")) && wtf.ReadString(str) && str == ver) {
+	if (wtf.Open(L"http://" + ISDb + L"/test.php") && wtf.ReadString(str) && str == ver) {
 		msg = ResStr(IDS_PPSDB_URLCORRECT);
 		nIconType = MB_ICONINFORMATION;
-	} else if (str.Find(_T("ISDb v")) == 0) {
+	} else if (str.Find(L"ISDb v") == 0) {
 		msg = ResStr(IDS_PPSDB_PROTOCOLERR);
 	} else {
 		msg = ResStr(IDS_PPSDB_BADURL);

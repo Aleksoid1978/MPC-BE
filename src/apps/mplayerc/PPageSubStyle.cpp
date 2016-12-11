@@ -176,7 +176,7 @@ void CPPageSubStyle::Init()
 
 	for (int i = 0; i < CharSetLen; i++) {
 		CString str;
-		str.Format(_T("%s (%d)"), CharSetNames[i], CharSetList[i]);
+		str.Format(L"%s (%d)", CharSetNames[i], CharSetList[i]);
 		AddStringData(m_charset, str, CharSetList[i]);
 
 		if (m_stss->charSet == CharSetList[i]) {
@@ -265,7 +265,7 @@ void CPPageSubStyle::OnBnClickedButton1()
 		CString str(lf.lfFaceName);
 
 		if (str.GetLength() > 16) {
-			str = str.Left(14) + _T("...");
+			str = str.Left(14) + L"...";
 		}
 
 		m_font.SetWindowText(str);
