@@ -1252,7 +1252,7 @@ BOOL CMPlayerCApp::InitInstance()
 	wndcls.hCursor = LoadCursor(IDC_ARROW);
 	wndcls.hbrBackground = 0;//(HBRUSH)(COLOR_WINDOW + 1); // no bkg brush, the view and the bars should always fill the whole client area
 	wndcls.lpszMenuName = NULL;
-	wndcls.lpszClassName = MPC_WND_CLASS_NAME;
+	wndcls.lpszClassName = _T(MPC_WND_CLASS_NAME);
 
 	if (!AfxRegisterClass(&wndcls)) {
 		AfxMessageBox(L"MainFrm class registration failed!");
@@ -1282,12 +1282,12 @@ BOOL CMPlayerCApp::InitInstance()
 
 	if (m_s.nCLSwitches & CLSW_RESET) { // reset settings
 		// We want the other instances to be closed before resetting the settings.
-		HWND hWnd = FindWindow(MPC_WND_CLASS_NAME, NULL);
+		HWND hWnd = FindWindow(_T(MPC_WND_CLASS_NAME), NULL);
 
 		while (hWnd) {
 			Sleep(500);
 
-			hWnd = FindWindow(MPC_WND_CLASS_NAME, NULL);
+			hWnd = FindWindow(_T(MPC_WND_CLASS_NAME), NULL);
 
 			if (hWnd && MessageBox(NULL, ResStr(IDS_RESET_SETTINGS_MUTEX), ResStr(IDS_RESET_SETTINGS), MB_ICONEXCLAMATION | MB_RETRYCANCEL) == IDCANCEL) {
 				return FALSE;
@@ -1413,7 +1413,7 @@ BOOL CMPlayerCApp::InitInstance()
 		return FALSE;
 	}
 
-	m_mutexOneInstance.Create(NULL, TRUE, MPC_WND_CLASS_NAME);
+	m_mutexOneInstance.Create(NULL, TRUE, _T(MPC_WND_CLASS_NAME));
 
 	if (GetLastError() == ERROR_ALREADY_EXISTS
 			&& !(m_s.nCLSwitches & CLSW_NEW)
@@ -1423,7 +1423,7 @@ BOOL CMPlayerCApp::InitInstance()
 
 		DWORD res = WaitForSingleObject(m_mutexOneInstance.m_h, 5000);
 		if (res == WAIT_OBJECT_0 || res == WAIT_ABANDONED) {
-			HWND hWnd = ::FindWindow(MPC_WND_CLASS_NAME, NULL);
+			HWND hWnd = ::FindWindow(_T(MPC_WND_CLASS_NAME), NULL);
 			if (hWnd) {
 				DWORD dwProcessId = 0;
 				if (GetWindowThreadProcessId(hWnd, &dwProcessId) && dwProcessId) {

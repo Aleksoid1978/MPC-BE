@@ -895,7 +895,7 @@ BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 	GetWindowThreadProcessId(hwnd, &procid);
 	GetClassName(hwnd, WindowClass, _countof(WindowClass));
 
-	if (procid == GetCurrentProcessId() && wcscmp(WindowClass, MPC_WND_CLASS_NAME) == 0) {
+	if (procid == GetCurrentProcessId() && wcscmp(WindowClass, _T(MPC_WND_CLASS_NAME)) == 0) {
 		HWND* pWnd = (HWND*) lParam;
 		*pWnd = hwnd;
 		return FALSE;

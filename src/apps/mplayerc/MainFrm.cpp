@@ -1288,7 +1288,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
 	cs.dwExStyle &= ~WS_EX_CLIENTEDGE;
 
-	cs.lpszClass = MPC_WND_CLASS_NAME;
+	cs.lpszClass = _T(MPC_WND_CLASS_NAME);
 
 	return TRUE;
 }
