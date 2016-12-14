@@ -98,8 +98,8 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT);
 
-	m_list.InsertColumn(0, _T("Name"), LVCFMT_LEFT, 187);
-	m_list.InsertColumn(1, _T("Mime Type"), LVCFMT_LEFT, 127);
+	m_list.InsertColumn(0, L"Name", LVCFMT_LEFT, 187);
+	m_list.InsertColumn(1, L"Mime Type", LVCFMT_LEFT, 127);
 
 	POSITION pos = m_res.GetHeadPosition();
 	while (pos) {
@@ -134,23 +134,23 @@ void CPPageFileInfoRes::OnSaveAs()
 	CString fname(r.name);
 	CString ext = ::PathFindExtension(fname);
 
-	CString ext_list = _T("All files|*.*|");
+	CString ext_list = L"All files|*.*|";
 	CString mime(r.mime);
 	mime.MakeLower();
-	if (mime == _T("application/x-truetype-font") || mime == _T("application/x-font-ttf")) {
-		ext_list = _T("TrueType Font (*.ttf)|*.ttf|");
+	if (mime == L"application/x-truetype-font" || mime == L"application/x-font-ttf") {
+		ext_list = L"TrueType Font (*.ttf)|*.ttf|";
 		if (ext.IsEmpty()) {
-			fname += _T(".ttf");
+			fname += L".ttf";
 		}
-	} else if (mime == _T("image/jpeg") || mime == _T("image/jpg")) {
-		ext_list = _T("JPG - JPEG Image (*.jpg)|*.jpg|");
+	} else if (mime == L"image/jpeg" || mime == L"image/jpg") {
+		ext_list = L"JPG - JPEG Image (*.jpg)|*.jpg|";
 		if (ext.IsEmpty()) {
-			fname += _T(".jpg");
+			fname += L".jpg";
 		}
-	} else if (mime == _T("image/png")) {
-		ext_list = _T("PNG - Portable Network Graphics (*.png)|*.png|");
+	} else if (mime == L"image/png") {
+		ext_list = L"PNG - Portable Network Graphics (*.png)|*.png|";
 		if (ext.IsEmpty()) {
-			fname += _T(".png");
+			fname += L".png";
 		}
 	}
 
@@ -159,7 +159,7 @@ void CPPageFileInfoRes::OnSaveAs()
 				   ext_list, this, 0);
 	if (fd.DoModal() == IDOK) {
 		FILE* f = NULL;
-		if (!_tfopen_s(&f, fd.GetPathName(), _T("wb"))) {
+		if (!_wfopen_s(&f, fd.GetPathName(), L"wb")) {
 			fwrite(r.data.GetData(), 1, r.data.GetCount(), f);
 			fclose(f);
 		}

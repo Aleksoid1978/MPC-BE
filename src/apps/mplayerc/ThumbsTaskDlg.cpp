@@ -263,7 +263,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 				FindClose(hFind);
 
 				const __int64 size = (__int64(wfd.nFileSizeHigh) << 32) | wfd.nFileSizeLow;
-				TCHAR szFileSize[65] = { 0 };
+				WCHAR szFileSize[65] = { 0 };
 				StrFormatByteSize(size, szFileSize, _countof(szFileSize));
 				CString szByteSize;
 				szByteSize.Format(L"%I64d", size);

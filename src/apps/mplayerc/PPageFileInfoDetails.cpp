@@ -44,10 +44,10 @@ static CString FormatDateTime(FILETIME tm)
 {
 	SYSTEMTIME st;
 	FileTimeToSystemTime(&tm, &st);
-	TCHAR buff[256];
+	WCHAR buff[256];
 	GetDateFormat(LOCALE_USER_DEFAULT, DATE_LONGDATE, &st, NULL, buff, 256);
-	CString	ret(buff);
-	ret += _T(" ");
+	CString ret(buff);
+	ret += L" ";
 	GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, NULL, buff, 256);
 	ret += buff;
 	return ret;
@@ -155,12 +155,12 @@ CPPageFileInfoDetails::CPPageFileInfoDetails(CString fn, IFilterGraph* pFG, ISub
 	}
 
 	if (wh.cx > 0 && wh.cy > 0) {
-		m_res.Format(_T("%dx%d"), wh.cx, wh.cy);
+		m_res.Format(L"%dx%d", wh.cx, wh.cy);
 		ReduceDim(arxy);
 
 		if (arxy.cx > 0 && arxy.cy > 0 && arxy.cx*wh.cy != arxy.cy*wh.cx) {
 			CString ar;
-			ar.Format(_T(" (AR %d:%d)"), arxy.cx, arxy.cy);
+			ar.Format(L" (AR %d:%d)", arxy.cx, arxy.cy);
 			m_res += ar;
 		}
 	}
@@ -206,10 +206,10 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 		m_icon.SetIcon(m_hIcon);
 	}
 
-	CString ext = m_fn.Left(m_fn.Find(_T("://")) + 1).TrimRight(':');
+	CString ext = m_fn.Left(m_fn.Find(L"://") + 1).TrimRight(':');
 
-	if (ext.IsEmpty() || !ext.CompareNoCase(_T("file"))) {
-		ext = _T(".") + m_fn.Mid(m_fn.ReverseFind('.')+1);
+	if (ext.IsEmpty() || !ext.CompareNoCase(L"file")) {
+		ext = L"." + m_fn.Mid(m_fn.ReverseFind('.')+1);
 	}
 
 	if (!LoadType(ext, m_type)) {
@@ -220,8 +220,8 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 	m_fn.Replace('\\', '/');
 
 	CString tmpStr;
-	if (m_fn.Find(_T("://")) > 0) {
-		if (m_fn.Find(_T("/"), m_fn.Find(_T("://")) + 3) < 0) {
+	if (m_fn.Find(L"://") > 0) {
+		if (m_fn.Find(L"/", m_fn.Find(L"://") + 3) < 0) {
 			tmpStr = m_fn;
 		}
 	}
@@ -294,7 +294,7 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 					CString str = mt.ToString();
 					if (!str.IsEmpty()) {
 						if (pszName && wcslen(pszName)) {
-							str.AppendFormat(_T(" [%s]"), pszName);
+							str.AppendFormat(L" [%s]", pszName);
 						}
 						if (mt.majortype == MEDIATYPE_Video || mt.subtype == MEDIASUBTYPE_MPEG2_VIDEO) {
 							videoStreams.AddTail(str);
@@ -368,10 +368,10 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 							case DVD_AUD_EXT_NotSpecified:
 								break;
 							case DVD_AUD_EXT_Captions:
-								str += _T(" (Captions)");
+								str += L" (Captions)";
 								break;
 							case DVD_AUD_EXT_VisuallyImpaired:
-								str += _T(" (Visually Impaired)");
+								str += L" (Visually Impaired)";
 								break;
 							case DVD_AUD_EXT_DirectorComments1:
 								str += ResStr(IDS_MAINFRM_121);
@@ -427,31 +427,31 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 							case DVD_SP_EXT_Caption_Normal:
 								break;
 							case DVD_SP_EXT_Caption_Big:
-								str += _T(" (Big)");
+								str += L" (Big)";
 								break;
 							case DVD_SP_EXT_Caption_Children:
-								str += _T(" (Children)");
+								str += L" (Children)";
 								break;
 							case DVD_SP_EXT_CC_Normal:
-								str += _T(" (CC)");
+								str += L" (CC)";
 								break;
 							case DVD_SP_EXT_CC_Big:
-								str += _T(" (CC Big)");
+								str += L" (CC Big)";
 								break;
 							case DVD_SP_EXT_CC_Children:
-								str += _T(" (CC Children)");
+								str += L" (CC Children)";
 								break;
 							case DVD_SP_EXT_Forced:
-								str += _T(" (Forced)");
+								str += L" (Forced)";
 								break;
 							case DVD_SP_EXT_DirectorComments_Normal:
-								str += _T(" (Director Comments)");
+								str += L" (Director Comments)";
 								break;
 							case DVD_SP_EXT_DirectorComments_Big:
-								str += _T(" (Director Comments, Big)");
+								str += L" (Director Comments, Big)";
 								break;
 							case DVD_SP_EXT_DirectorComments_Children:
-								str += _T(" (Director Comments, Children)");
+								str += L" (Director Comments, Children)";
 								break;
 						}
 					}

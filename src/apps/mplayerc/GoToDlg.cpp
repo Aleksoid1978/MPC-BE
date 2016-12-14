@@ -34,10 +34,10 @@ CGoToDlg::CGoToDlg(REFERENCE_TIME time, REFERENCE_TIME maxTime, double fps, CWnd
 	, m_fps(fps)
 {
 	if (m_fps == 0) {
-		CString str = AfxGetApp()->GetProfileString(IDS_R_SETTINGS, IDS_RS_GOTO_FPS, _T("0"));
+		CString str = AfxGetApp()->GetProfileString(IDS_R_SETTINGS, IDS_RS_GOTO_FPS, L"0");
 		float fps;
 
-		if (_stscanf_s(str, _T("%f"), &fps) == 1) {
+		if (_stscanf_s(str, L"%f", &fps) == 1) {
 			m_fps = fps;
 		}
 	}
@@ -64,9 +64,9 @@ BOOL CGoToDlg::OnInitDialog()
 	bool showHours = (m_maxTime >= 3600*1000*10000i64);
 
 	if (showHours) {
-		m_timeedit.EnableMask(_T("DD DD DD DDD"), _T("__:__:__.___"), L'0', _T("0123456789"));
+		m_timeedit.EnableMask(L"DD DD DD DDD", L"__:__:__.___", L'0', L"0123456789");
 	} else {
-		m_timeedit.EnableMask(_T("DD DD DDD"), _T("__:__.___"), L'0', _T("0123456789"));
+		m_timeedit.EnableMask(L"DD DD DDD", L"__:__.___", L'0', L"0123456789");
 	}
 
 	m_timeedit.EnableGetMaskedCharsOnly(false);
@@ -76,15 +76,15 @@ BOOL CGoToDlg::OnInitDialog()
 
 	if (time >= 0) {
 		if (showHours) {
-			m_timestr.Format(_T("%02d:%02d:%02d.%03d"),
+			m_timestr.Format(L"%02d:%02d:%02d.%03d",
 							 (time/(1000*60*60))%60, (time/(1000*60))%60, (time/1000)%60, time%1000);
 		} else {
-			m_timestr.Format(_T("%02d:%02d.%03d"),
+			m_timestr.Format(L"%02d:%02d.%03d",
 							 (time/(1000*60))%60, (time/1000)%60, time%1000);
 		}
 
 		if (m_fps > 0) {
-			m_framestr.Format(_T("%d, %.3f"), (int)(m_fps*m_time/10000000), m_fps);
+			m_framestr.Format(L"%d, %.3f", (int)(m_fps*m_time/10000000), m_fps);
 		}
 
 		UpdateData(FALSE);
