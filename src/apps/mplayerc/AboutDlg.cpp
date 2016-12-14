@@ -55,7 +55,7 @@ BOOL CAboutDlg::OnInitDialog()
 
 #if defined(__INTEL_COMPILER)
 	#if (__INTEL_COMPILER >= 1210)
-		m_MPCCompiler = _T("ICL ") MAKE_STR(__INTEL_COMPILER) _T(" Build ") MAKE_STR(__INTEL_COMPILER_BUILD_DATE);
+		m_MPCCompiler = L"ICL " MAKE_STR(__INTEL_COMPILER) L" Build ") MAKE_STR(__INTEL_COMPILER_BUILD_DATE);
 	#else
 		#error Compiler is not supported!
 #endif

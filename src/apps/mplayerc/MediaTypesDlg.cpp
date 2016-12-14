@@ -49,7 +49,7 @@ void CMediaTypesDlg::DoDataExchange(CDataExchange* pDX)
 
 void CMediaTypesDlg::AddLine(CString str)
 {
-	str += _T("\r\n");
+	str += L"\r\n";
 	int len = m_report.GetWindowTextLength();
 	m_report.SetSel(len, len, TRUE);
 	m_report.ReplaceSel(str);
@@ -113,7 +113,7 @@ BOOL CMediaTypesDlg::OnInitDialog()
 
 void CMediaTypesDlg::OnCbnSelchangeCombo1()
 {
-	m_report.SetWindowText(_T(""));
+	m_report.SetWindowText(L"");
 
 	int i = m_pins.GetCurSel();
 
@@ -141,9 +141,9 @@ void CMediaTypesDlg::OnCbnSelchangeCombo1()
 
 	for (int j = 0; pos; j++) {
 		CString str;
-		str.Format(_T("Media Type %d:"), j);
+		str.Format(L"Media Type %d:", j);
 		AddLine(str);
-		AddLine(_T("--------------------------"));
+		AddLine(L"--------------------------");
 		AddMediaType(&mts.GetNext(pos));
 		AddLine();
 	}

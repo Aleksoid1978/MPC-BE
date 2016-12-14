@@ -511,7 +511,7 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_MPEGSplit, KEY_READ)) {
-		TCHAR buff[256] = { 0 };
+		WCHAR buff[256] = { 0 };
 		ULONG len = _countof(buff);
 		if (ERROR_SUCCESS == key.QueryStringValue(OPT_AudioLangOrder, buff, &len)) {
 			m_AudioLanguageOrder = CString(buff);

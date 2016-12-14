@@ -166,7 +166,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 
 #ifdef REGISTER_FILTER
 	CRegKey key;
-	TCHAR buff[256];
+	WCHAR buff[256];
 	ULONG len;
 
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_AudRend, KEY_READ)) {

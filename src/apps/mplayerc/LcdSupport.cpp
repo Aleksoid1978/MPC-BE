@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -555,7 +555,7 @@ CMPC_Lcd::CMPC_Lcd(void)
 	// lcd init
 	ZeroMemory(&m_ConnCtx, sizeof(m_ConnCtx));
 
-	m_ConnCtx.appFriendlyName = _T(LCD_APP_NAME);
+	m_ConnCtx.appFriendlyName = LCD_APP_NAME;
 	m_ConnCtx.dwAppletCapabilitiesSupported = LGLCD_APPLET_CAP_BW | LGLCD_APPLET_CAP_QVGA;
 	m_ConnCtx.isAutostartable = FALSE;
 	m_ConnCtx.isPersistent = FALSE;

@@ -159,7 +159,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 				max_ref_frames = 16;
 			}
 		} else if (nPCIVendor == PCIV_ATI && !CheckPCID(nPCIDevice, PCID_ATI_UVD, _countof(PCID_ATI_UVD))) {
-			TCHAR path[MAX_PATH] = { 0 };
+			WCHAR path[MAX_PATH] = { 0 };
 			GetSystemDirectory(path, MAX_PATH);
 			wcscat(path, L"\\drivers\\atikmdag.sys\0");
 			UINT64 atikmdag_ver = GetFileVersion(path);

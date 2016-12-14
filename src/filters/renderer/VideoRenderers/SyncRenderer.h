@@ -692,10 +692,10 @@ namespace GothSync
 		const static int MAX_LOADSTRING = 100;
 		UINT displayTiming[TIMING_PARAM_CNT]; // Display timing parameters
 		UINT displayTimingSave[TIMING_PARAM_CNT]; // So that we can reset the display at exit
-		TCHAR faster[MAX_LOADSTRING]; // String corresponding to faster display frequency
-		TCHAR cruise[MAX_LOADSTRING]; // String corresponding to nominal display frequency
-		TCHAR slower[MAX_LOADSTRING]; // String corresponding to slower display frequency
-		TCHAR savedTiming[MAX_LOADSTRING]; // String version of saved timing (to be restored upon exit)
+		WCHAR faster[MAX_LOADSTRING]; // String corresponding to faster display frequency
+		WCHAR cruise[MAX_LOADSTRING]; // String corresponding to nominal display frequency
+		WCHAR slower[MAX_LOADSTRING]; // String corresponding to slower display frequency
+		WCHAR savedTiming[MAX_LOADSTRING]; // String version of saved timing (to be restored upon exit)
 		double lowSyncOffset; // The closest we want to let the scheduled render time to get to the next vsync. In % of the frame time
 		double targetSyncOffset; // Where we want the scheduled render time to be in relation to the next vsync
 		double highSyncOffset; // The furthers we want to let the scheduled render time to get to the next vsync

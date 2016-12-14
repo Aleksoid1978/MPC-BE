@@ -451,7 +451,7 @@ bool CCDXAStream::LookForMediaSubType()
 	CRegKey majorkey;
 	CString majortype = L"\\Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}";
 	if (ERROR_SUCCESS == majorkey.Open(HKEY_CLASSES_ROOT, majortype, KEY_READ)) {
-		TCHAR subtype[256+1];
+		WCHAR subtype[256];
 		DWORD len = 256;
 		for (int i = 0; ERROR_SUCCESS == majorkey.EnumKey(i, subtype, &len); i++, len = 256) {
 			CRegKey subkey;
@@ -460,10 +460,10 @@ bool CCDXAStream::LookForMediaSubType()
 			}
 
 			for (int j = 0; true; j++) {
-				TCHAR number[10];
+				WCHAR number[10];
 				_stprintf_s(number, _countof(number), L"%d", j);
 
-				TCHAR pattern[256];
+				WCHAR pattern[256];
 				ULONG len = 256;
 				if (ERROR_SUCCESS != subkey.QueryStringValue(number, pattern, &len)) {
 					break;
@@ -482,14 +482,14 @@ bool CCDXAStream::LookForMediaSubType()
 					CString s = p.Mid(k, l-k);
 					DLog(s);
 
-					TCHAR* end = NULL;
+					WCHAR* end = NULL;
 
 					switch (nTries&3) {
 						case 0:
-							offset = _tcstol(s, &end, 10);
+							offset = wcstol(s, &end, 10);
 							break;
 						case 1:
-							cb = _tcstol(s, &end, 10);
+							cb = wcstol(s, &end, 10);
 							break;
 						case 2:
 							CStringToBin(s, mask);

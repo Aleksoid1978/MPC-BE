@@ -73,7 +73,7 @@ public:
 	void Start(CWnd* pWnd);
 	void Stop();
 
-	void DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration = 5000, int FontSize = 0, CString OSD_Font = _T(""));
+	void DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration = 5000, int FontSize = 0, CString OSD_Font = L"");
 	void DebugMessage(LPCTSTR format, ...);
 	void ClearMessage(bool hide = false);
 	void HideMessage(bool hide);

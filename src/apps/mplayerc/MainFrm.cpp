@@ -1288,7 +1288,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
 	cs.dwExStyle &= ~WS_EX_CLIENTEDGE;
 
-	cs.lpszClass = _T(MPC_WND_CLASS_NAME);
+	cs.lpszClass = MPC_WND_CLASS_NAME;
 
 	return TRUE;
 }
@@ -5216,7 +5216,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 			dir.ReleaseBufferSetLength(GetCurrentDirectory(_MAX_PATH, dir.GetBuffer(_MAX_PATH)));
 
 			GetCDROMType(dir[0], sl);
-			for (TCHAR drive = 'C'; sl.IsEmpty() && drive <= 'Z'; drive++) {
+			for (WCHAR drive = 'C'; sl.IsEmpty() && drive <= 'Z'; drive++) {
 				GetCDROMType(drive, sl);
 			}
 		}
@@ -5417,7 +5417,7 @@ void CMainFrame::OnFileOpenCD(UINT nID)
 	nID -= ID_FILE_OPEN_CD_START;
 
 	nID++;
-	for (TCHAR drive = 'C'; drive <= 'Z'; drive++) {
+	for (WCHAR drive = 'C'; drive <= 'Z'; drive++) {
 		CAtlList<CString> sl;
 
 		cdrom_t CDRom_t = GetCDROMType(drive, sl);
@@ -9856,7 +9856,7 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 				const int rootLength = path.SkipRoot();
 
 				if (path.StripToRoot()) {
-					if (_tcsicmp(exeDrive, path) != 0) { // Do we need to replace the drive letter ?
+					if (_wcsicmp(exeDrive, path) != 0) { // Do we need to replace the drive letter ?
 						// Replace drive letter
 						CString newPath(exeDrive);
 
@@ -9950,7 +9950,7 @@ void CMainFrame::PlayFavoriteDVD(CString fav)
 
 	stream.AddRef();
 
-	ExplodeEsc(fav, args, _T(';'), 4);
+	ExplodeEsc(fav, args, L';', 4);
 	size_t cnt = args.GetCount();
 	args.RemoveHeadNoReturn();			// desc / name
 	if (cnt == 4) {
@@ -13893,7 +13893,7 @@ void CMainFrame::SetupOpenCDSubMenu()
 
 	UINT id = ID_FILE_OPEN_CD_START;
 
-	for (TCHAR drive = 'C'; drive <= 'Z'; drive++) {
+	for (WCHAR drive = 'C'; drive <= 'Z'; drive++) {
 		CAtlList<CString> files;
 		cdrom_t CDrom_t = GetCDROMType(drive, files);
 		if (CDrom_t != CDROM_NotFound && CDrom_t != CDROM_Unknown) {
@@ -15053,7 +15053,7 @@ void CMainFrame::SetupFavoritesSubMenu()
 		f_str.Replace(L"\t", L" ");
 
 		CAtlList<CString> sl;
-		ExplodeEsc(f_str, sl, _T(';'), 3);
+		ExplodeEsc(f_str, sl, L';', 3);
 
 		f_str = sl.RemoveHead();
 
@@ -15108,7 +15108,7 @@ void CMainFrame::SetupFavoritesSubMenu()
 		str.Replace(L"&", L"&&");
 
 		CAtlList<CString> sl;
-		ExplodeEsc(str, sl, _T(';'), 4);
+		ExplodeEsc(str, sl, L';', 4);
 		size_t cnt = sl.GetCount();
 
 		str = sl.RemoveHead();
@@ -15152,7 +15152,7 @@ void CMainFrame::SetupFavoritesSubMenu()
 		str.Replace(L"&", L"&&");
 
 		CAtlList<CString> sl;
-		ExplodeEsc(str, sl, _T(';'), 2);
+		ExplodeEsc(str, sl, L';', 2);
 
 		str = sl.RemoveHead();
 
@@ -18630,7 +18630,7 @@ void CMainFrame::MakeBDLabel(CString path, CString& label, CString* pBDlabel)
 		}
 
 		if (fn2.GetLength() == 2 && fn2[fn2.GetLength() - 1] == ':') {
-			TCHAR drive = fn2[0];
+			WCHAR drive = fn2[0];
 			CAtlList<CString> sl;
 			cdrom_t CDRom_t = GetCDROMType(drive, sl);
 			if (CDRom_t == CDROM_BDVideo) {
@@ -18667,7 +18667,7 @@ void CMainFrame::MakeDVDLabel(CString& label, CString* pDVDlabel)
 			}
 
 			if (fn2.GetLength() == 2 && fn2[fn2.GetLength() - 1] == ':') {
-				TCHAR drive = fn2[0];
+				WCHAR drive = fn2[0];
 				CAtlList<CString> sl;
 				cdrom_t CDRom_t = GetCDROMType(drive, sl);
 				if (CDRom_t == CDROM_DVDVideo) {
@@ -18742,7 +18742,7 @@ BOOL CMainFrame::OpenIso(CString pathName)
 	if (m_DiskImage.CheckExtension(pathName)) {
 		SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 
-		TCHAR diskletter = m_DiskImage.MountDiskImage(pathName);
+		WCHAR diskletter = m_DiskImage.MountDiskImage(pathName);
 		if (diskletter) {
 
 			if (OpenBD(CString(diskletter) + L":\\", INVALID_TIME, FALSE)) {

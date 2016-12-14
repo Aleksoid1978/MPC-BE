@@ -555,7 +555,7 @@ DWORD CUDPStream::ThreadProc()
 
 #if ENABLE_DUMP
 	const CString fname = m_protocol == protocol::PR_HTTP ? L"http.dump" : m_protocol == protocol::PR_UDP ? L"udp.dump" : L"stdin.dump";
-	FILE* dump = _tfopen(fname, L"wb");
+	FILE* dump = _wfopen(fname, L"wb");
 #endif
 
 	for (;;) {
