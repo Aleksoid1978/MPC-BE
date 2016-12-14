@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,7 +37,7 @@ private:
 	CComPtr<IGraphBuilderDeadEnd> m_pGBDE;
 	enum {UNKNOWN, VIDEO, AUDIO} m_type;
 	GUID m_subtype;
-	void AddLine(CString str = _T(""));
+	void AddLine(CString str = L"");
 	void AddMediaType(AM_MEDIA_TYPE* pmt);
 
 public:

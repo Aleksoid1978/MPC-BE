@@ -577,7 +577,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 							}
 						} else if (AMF0Array[i].type == AMF_DATA_TYPE_STRING && AMF0Array[i].name == L"HM compatibility") {
-							metaHM_compatibility = (int)(_tstof(AMF0Array[i].value_s) * 10.0);
+							metaHM_compatibility = (int)(_wtof(AMF0Array[i].value_s) * 10.0);
 						} else if (AMF0Array[i].type == AMF_DATA_TYPE_BOOL) {
 							if (AMF0Array[i].name == L"hasVideo") {
 								bVideoMetadataExists = (bool)AMF0Array[i];

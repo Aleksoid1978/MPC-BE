@@ -1982,19 +1982,19 @@ HRESULT CRealVideoDecoder::CheckInputType(const CMediaType* mtIn)
 		CAtlList<CString> paths;
 		CString olddll, newdll, oldpath, newpath;
 
-		olddll.Format(L"drv%c3260.dll", (TCHAR)((mtIn->subtype.Data1>>16)&0xff));
+		olddll.Format(L"drv%c3260.dll", (WCHAR)((mtIn->subtype.Data1>>16)&0xff));
 		newdll =
 			mtIn->subtype == FOURCCMap('14VR') ? L"drvi.dll" :
 			mtIn->subtype == FOURCCMap('02VR') ? L"drv2.dll" :
 			L"drvc.dll";
 
 		CRegKey key;
-		TCHAR buff[_MAX_PATH];
+		WCHAR buff[_MAX_PATH];
 		ULONG len = _countof(buff);
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"Software\\RealNetworks\\Preferences\\DT_Codecs", KEY_READ)
-				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && _tcslen(buff) > 0) {
+				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && wcslen(buff) > 0) {
 			oldpath = buff;
-			TCHAR c = oldpath[oldpath.GetLength()-1];
+			WCHAR c = oldpath[oldpath.GetLength()-1];
 			if (c != L'\\' && c != L'/') {
 				oldpath += L'\\';
 			}
@@ -2002,9 +2002,9 @@ HRESULT CRealVideoDecoder::CheckInputType(const CMediaType* mtIn)
 		}
 		len = _countof(buff);
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"Helix\\HelixSDK\\10.0\\Preferences\\DT_Codecs", KEY_READ)
-				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && _tcslen(buff) > 0) {
+				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && wcslen(buff) > 0) {
 			newpath = buff;
-			TCHAR c = newpath[newpath.GetLength()-1];
+			WCHAR c = newpath[newpath.GetLength()-1];
 			if (c != L'\\' && c != L'/') {
 				newpath += L'\\';
 			}
@@ -2478,28 +2478,28 @@ HRESULT CRealAudioDecoder::CheckInputType(const CMediaType* mtIn)
 		CAtlList<CString> paths;
 		CString olddll, newdll, oldpath, newpath;
 
-		TCHAR fourcc[5] = {
-			(TCHAR)((mtIn->subtype.Data1>>0)&0xff),
-			(TCHAR)((mtIn->subtype.Data1>>8)&0xff),
-			(TCHAR)((mtIn->subtype.Data1>>16)&0xff),
-			(TCHAR)((mtIn->subtype.Data1>>24)&0xff),
+		WCHAR fourcc[5] = {
+			(WCHAR)((mtIn->subtype.Data1>>0)&0xff),
+			(WCHAR)((mtIn->subtype.Data1>>8)&0xff),
+			(WCHAR)((mtIn->subtype.Data1>>16)&0xff),
+			(WCHAR)((mtIn->subtype.Data1>>24)&0xff),
 			0
 		};
 
-		if (!_tcscmp(L"RACP", fourcc) || !_tcscmp(L"\xff", fourcc)) {
-			_tcscpy_s(fourcc, L"RAAC");
+		if (!wcscmp(L"RACP", fourcc) || !wcscmp(L"\xff", fourcc)) {
+			wcscpy_s(fourcc, L"RAAC");
 		}
 
 		olddll.Format(L"%s3260.dll", fourcc);
 		newdll.Format(L"%s.dll", fourcc);
 
 		CRegKey key;
-		TCHAR buff[_MAX_PATH];
+		WCHAR buff[_MAX_PATH];
 		ULONG len = sizeof(buff);
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"Software\\RealNetworks\\Preferences\\DT_Codecs", KEY_READ)
-				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && _tcslen(buff) > 0) {
+				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && wcslen(buff) > 0) {
 			oldpath = buff;
-			TCHAR c = oldpath[oldpath.GetLength()-1];
+			WCHAR c = oldpath[oldpath.GetLength()-1];
 			if (c != L'\\' && c != L'/') {
 				oldpath += L'\\';
 			}
@@ -2507,9 +2507,9 @@ HRESULT CRealAudioDecoder::CheckInputType(const CMediaType* mtIn)
 		}
 		len = _countof(buff);
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"Helix\\HelixSDK\\10.0\\Preferences\\DT_Codecs", KEY_READ)
-				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && _tcslen(buff) > 0) {
+				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && wcslen(buff) > 0) {
 			newpath = buff;
-			TCHAR c = newpath[newpath.GetLength()-1];
+			WCHAR c = newpath[newpath.GetLength()-1];
 			if (c != L'\\' && c != L'/') {
 				newpath += L'\\';
 			}

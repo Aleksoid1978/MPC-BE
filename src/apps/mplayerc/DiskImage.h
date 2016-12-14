@@ -1,5 +1,5 @@
 /*
- * (C) 2014 see Authors.txt
+ * (C) 2014-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,7 @@ private:
 	enum DriveType {NONE, WIN8, DTLITE, VCD};
 
 	DriveType	m_DriveType;
-	TCHAR		m_DriveLetter;
+	WCHAR		m_DriveLetter;
 
 	// Windows 8 VirtualDisk
 	HMODULE		m_hVirtualDiskModule;
@@ -66,21 +66,21 @@ public:
 
 	void Init();
 	bool DriveAvailable();
-	const LPCTSTR GetExts();
-	bool CheckExtension(LPCTSTR pathName);
+	const LPCWSTR GetExts();
+	bool CheckExtension(LPCWSTR pathName);
 
-	TCHAR MountDiskImage(LPCTSTR pathName);
+	WCHAR MountDiskImage(LPCWSTR pathName);
 	void UnmountDiskImage();
 
-	TCHAR GetDriveLetter() { return m_DriveLetter; };
+	WCHAR GetDriveLetter() { return m_DriveLetter; };
 
 private:
 	// Windows 8 VirtualDisk
-	TCHAR MountWin8(LPCTSTR pathName);
+	WCHAR MountWin8(LPCWSTR pathName);
 
 	// DAEMON Tools Lite
-	TCHAR MountDTLite(LPCTSTR pathName);
+	WCHAR MountDTLite(LPCWSTR pathName);
 
 	// Virtual CloneDrive
-	TCHAR MountVCD(LPCTSTR pathName);
+	WCHAR MountVCD(LPCWSTR pathName);
 };

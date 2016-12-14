@@ -484,12 +484,12 @@ void COSD::DrawDebug()
 		CString msg, tmp;
 		POSITION pos;
 		pos = m_debugMessages.GetHeadPosition();
-		msg.Format(_T("%s"), m_debugMessages.GetNext(pos));
+		msg.Format(L"%s", m_debugMessages.GetNext(pos));
 
 		while (pos) {
 			tmp = m_debugMessages.GetNext(pos);
 			if (!tmp.IsEmpty()) {
-				msg.AppendFormat(_T("\r\n%s"), tmp);
+				msg.AppendFormat(L"\r\n%s", tmp);
 			}
 		}
 

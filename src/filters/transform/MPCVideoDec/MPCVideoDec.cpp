@@ -891,11 +891,11 @@ CFilterApp theApp;
 BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 {
 	DWORD	procid = 0;
-	TCHAR	WindowClass[40];
+	WCHAR	WindowClass[40];
 	GetWindowThreadProcessId(hwnd, &procid);
 	GetClassName(hwnd, WindowClass, _countof(WindowClass));
 
-	if (procid == GetCurrentProcessId() && _tcscmp(WindowClass, _T(MPC_WND_CLASS_NAME)) == 0) {
+	if (procid == GetCurrentProcessId() && wcscmp(WindowClass, MPC_WND_CLASS_NAME) == 0) {
 		HWND* pWnd = (HWND*) lParam;
 		*pWnd = hwnd;
 		return FALSE;

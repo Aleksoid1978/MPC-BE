@@ -1,5 +1,5 @@
 /*
- * (C) 2014 see Authors.txt
+ * (C) 2014-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -61,7 +61,7 @@ void CDiskImage::Init()
 	// DAEMON Tools Lite
 	m_dtlite_path.Empty();
 
-	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\DTLite.exe"), KEY_READ)) {
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\DTLite.exe", KEY_READ)) {
 		ULONG nChars = 0;
 		if (ERROR_SUCCESS == key.QueryStringValue(NULL, NULL, &nChars)) {
 			if (ERROR_SUCCESS == key.QueryStringValue(NULL, m_dtlite_path.GetBuffer(nChars), &nChars)) {
@@ -99,7 +99,7 @@ void CDiskImage::Init()
 	// Virtual CloneDrive
 	m_vcd_path.Empty();
 
-	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\VCDMount.exe"), KEY_READ)) {
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\VCDMount.exe", KEY_READ)) {
 		ULONG nChars = 0;
 		if (ERROR_SUCCESS == key.QueryStringValue(NULL, NULL, &nChars)) {
 			if (ERROR_SUCCESS == key.QueryStringValue(NULL, m_vcd_path.GetBuffer(nChars), &nChars)) {
@@ -143,27 +143,27 @@ bool CDiskImage::DriveAvailable()
 	return (m_DriveType > NONE);
 }
 
-const LPCTSTR CDiskImage::GetExts()
+const LPCWSTR CDiskImage::GetExts()
 {
 	// DAEMON Tools Lite
 	if (m_DriveType == DTLITE) {
-		return _T("*.iso;*.nrg;*.mdf;*.isz;*.ccd");
+		return L"*.iso;*.nrg;*.mdf;*.isz;*.ccd";
 	}
 
 	// Virtual CloneDrive
 	if (m_DriveType == VCD) {
-		return _T("*.iso;*.ccd");
+		return L"*.iso;*.ccd";
 	}
 
 	// Windows 8 VirtualDisk
 	if (m_DriveType == WIN8) {
-		return _T("*.iso");
+		return L"*.iso";
 	}
 
 	return NULL;
 }
 
-bool CDiskImage::CheckExtension(LPCTSTR pathName)
+bool CDiskImage::CheckExtension(LPCWSTR pathName)
 {
 	CString ext = GetFileExt(pathName).MakeLower();
 
@@ -189,7 +189,7 @@ bool CDiskImage::CheckExtension(LPCTSTR pathName)
 	return false;
 }
 
-TCHAR CDiskImage::MountDiskImage(LPCTSTR pathName)
+WCHAR CDiskImage::MountDiskImage(LPCWSTR pathName)
 {
 	UnmountDiskImage();
 
@@ -209,7 +209,7 @@ TCHAR CDiskImage::MountDiskImage(LPCTSTR pathName)
 
 		if (m_DriveLetter) {
 			// check for supported disc format
-			CString anyfiles = CString(m_DriveLetter) + _T(":\\*.*");
+			CString anyfiles = CString(m_DriveLetter) + L":\\*.*";
 			WIN32_FIND_DATA fd = { 0 };
 			HANDLE hFind = FindFirstFile(anyfiles, &fd);
 			if (hFind == INVALID_HANDLE_VALUE) {
@@ -275,7 +275,7 @@ void CDiskImage::UnmountDiskImage()
 	m_DriveLetter = 0;
 }
 
-TCHAR CDiskImage::MountWin8(LPCTSTR pathName)
+WCHAR CDiskImage::MountWin8(LPCWSTR pathName)
 {
 	if (m_hVirtualDiskModule) {
 		CString ISOVolumeName;
@@ -300,14 +300,14 @@ TCHAR CDiskImage::MountWin8(LPCTSTR pathName)
 			ret_code = m_AttachVirtualDiskFunc(m_VHDHandle, NULL, ATTACH_VIRTUAL_DISK_FLAG_READ_ONLY, 0, &avdp, NULL);
 
 			if (ret_code == ERROR_SUCCESS) {
-				TCHAR physicalDriveName[MAX_PATH] = L"";
+				WCHAR physicalDriveName[MAX_PATH] = L"";
 				DWORD physicalDriveNameSize = _countof(physicalDriveName);
 
 				ret_code = m_GetVirtualDiskPhysicalPathFunc(m_VHDHandle, &physicalDriveNameSize, physicalDriveName);
 				if (ret_code == ERROR_SUCCESS) {
-					TCHAR volumeNameBuffer[MAX_PATH] = L"";
+					WCHAR volumeNameBuffer[MAX_PATH] = L"";
 					DWORD volumeNameBufferSize = _countof(volumeNameBuffer);
-					HANDLE hVol = ::FindFirstVolume(volumeNameBuffer, volumeNameBufferSize);
+					HANDLE hVol = ::FindFirstVolumeW(volumeNameBuffer, volumeNameBufferSize);
 					if (hVol != INVALID_HANDLE_VALUE) {
 						do {
 							size_t len = wcslen(volumeNameBuffer);
@@ -371,7 +371,7 @@ TCHAR CDiskImage::MountWin8(LPCTSTR pathName)
 											volumeNameBuffer[len - 1] = '\\';
 											WCHAR VolumeName[MAX_PATH] = L"";
 											DWORD VolumeNameSize = _countof(VolumeName);
-											BOOL bRes = GetVolumePathNamesForVolumeName(volumeNameBuffer, VolumeName, VolumeNameSize, &VolumeNameSize);
+											BOOL bRes = GetVolumePathNamesForVolumeNameW(volumeNameBuffer, VolumeName, VolumeNameSize, &VolumeNameSize);
 											if (bRes) {
 												ISOVolumeName = VolumeName;
 											}
@@ -380,7 +380,7 @@ TCHAR CDiskImage::MountWin8(LPCTSTR pathName)
 								}
 								CloseHandle(volumeHandle);
 							}
-						} while(::FindNextVolume(hVol, volumeNameBuffer, volumeNameBufferSize) != FALSE && ISOVolumeName.IsEmpty());
+						} while(::FindNextVolumeW(hVol, volumeNameBuffer, volumeNameBufferSize) != FALSE && ISOVolumeName.IsEmpty());
 						::FindVolumeClose(hVol);
 					}
 				}
@@ -397,7 +397,7 @@ TCHAR CDiskImage::MountWin8(LPCTSTR pathName)
 	return 0;
 }
 
-TCHAR CDiskImage::MountDTLite(LPCTSTR pathName)
+WCHAR CDiskImage::MountDTLite(LPCWSTR pathName)
 {
 	m_dtdrive = dt_none;
 
@@ -436,7 +436,7 @@ TCHAR CDiskImage::MountDTLite(LPCTSTR pathName)
 	} else {
 		return 0;
 	}
-	TCHAR letter = 'A' + ec;
+	WCHAR letter = 'A' + ec;
 	execinfo.lpParameters = parameters;
 
 	ec = (DWORD)-1;
@@ -450,14 +450,14 @@ TCHAR CDiskImage::MountDTLite(LPCTSTR pathName)
 	return 0;
 }
 
-TCHAR CDiskImage::MountVCD(LPCTSTR pathName)
+WCHAR CDiskImage::MountVCD(LPCWSTR pathName)
 {
-	TCHAR letter = 0;
+	WCHAR letter = 0;
 
 	DWORD VCD_drive = 0;
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\Elaborate Bytes\\VirtualCloneDrive"), KEY_READ)) {
-		if (ERROR_SUCCESS == key.QueryDWORDValue(_T("VCDDriveMask"), VCD_drive)) { // get all VCD drives
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\Elaborate Bytes\\VirtualCloneDrive", KEY_READ)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(L"VCDDriveMask", VCD_drive)) { // get all VCD drives
 			for (int i = 0; i < 26; i++) {
 				if (VCD_drive & (1 << i)) {
 					VCD_drive = (1 << i); // select the first drive
@@ -493,7 +493,7 @@ TCHAR CDiskImage::MountVCD(LPCTSTR pathName)
 		WaitForSingleObject(execinfo.hProcess, INFINITE);
 		if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec == 0) {
 			// wait until Virtual CloneDrive initialized.
-			CString anyfiles = CString(letter) + _T(":\\*.*");
+			CString anyfiles = CString(letter) + L":\\*.*";
 			WIN32_FIND_DATA fd = {0};
 			HANDLE hFind;
 			for (int i = 0; i < 100; i++) {

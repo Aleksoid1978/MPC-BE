@@ -639,13 +639,13 @@ HRESULT CSubtitleSourceSSA::GetMediaType(CMediaType* pmt)
 	sts.RemoveAll();
 
 	CFile f;
-	TCHAR path[_MAX_PATH], fn[_MAX_PATH];
+	WCHAR path[_MAX_PATH], fn[_MAX_PATH];
 	if (!GetTempPath(_MAX_PATH, path) || !GetTempFileName(path, L"mpc_sts", 0, fn)) {
 		return E_FAIL;
 	}
 
-	_tremove(fn);
-	_tcscat_s(fn, L".ssa");
+	_wremove(fn);
+	wcscat_s(fn, L".ssa");
 
 	if (!sts.SaveAs(fn, Subtitle::SSA, -1, 0, CTextFile::UTF8, false) || !f.Open(fn, CFile::modeRead)) {
 		return E_FAIL;
@@ -661,7 +661,7 @@ HRESULT CSubtitleSourceSSA::GetMediaType(CMediaType* pmt)
 	f.Read(pmt->pbFormat + psi->dwOffset, len);
 	f.Close();
 
-	_tremove(fn);
+	_wremove(fn);
 
 	return NOERROR;
 }
@@ -689,14 +689,14 @@ HRESULT CSubtitleSourceASS::GetMediaType(CMediaType* pmt)
 	sts.RemoveAll();
 
 	CFile f;
-	TCHAR path[_MAX_PATH], fn[_MAX_PATH];
+	WCHAR path[_MAX_PATH], fn[_MAX_PATH];
 	if (!GetTempPath(_MAX_PATH, path) || !GetTempFileName(path, L"mpc_sts", 0, fn)) {
 		return E_FAIL;
 	}
 
-	_tremove(fn);
+	_wremove(fn);
 
-	_tcscat_s(fn, L".ass");
+	wcscat_s(fn, L".ass");
 
 	if (!sts.SaveAs(fn, Subtitle::ASS, -1, CTextFile::UTF8) || !f.Open(fn, CFile::modeRead)) {
 		return E_FAIL;
@@ -711,7 +711,7 @@ HRESULT CSubtitleSourceASS::GetMediaType(CMediaType* pmt)
 	f.Read(pmt->pbFormat + psi->dwOffset, len);
 	f.Close();
 
-	_tremove(fn);
+	_wremove(fn);
 
 	return NOERROR;
 }

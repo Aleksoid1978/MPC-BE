@@ -3979,7 +3979,7 @@ HRESULT CGenlock::GetTiming()
 	int i = 0;
 	int j = 0;
 	int params = 0;
-	TCHAR tmpStr[MAX_LOADSTRING];
+	WCHAR tmpStr[MAX_LOADSTRING];
 
 	CAutoLock lock(&csGenlockLock);
 	if (!PowerstripRunning()) {
@@ -3997,7 +3997,7 @@ HRESULT CGenlock::GetTiming()
 		}
 		i++; // Skip trailing comma
 		j = 0;
-		displayTiming[params] = _ttoi(tmpStr);
+		displayTiming[params] = _wtoi(tmpStr);
 		displayTimingSave[params] = displayTiming[params];
 		params++;
 	}

@@ -1851,7 +1851,7 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
 				CString strFile	= ParseFileName(cmdln.GetNext(pos));
 				int nPos		= strFile.Find (L"DELAY");
 				if (nPos != -1) {
-					rtShift = 10000 * _tstol(strFile.Mid(nPos + 6));
+					rtShift = 10000 * _wtol(strFile.Mid(nPos + 6));
 				}
 				slDubs.AddTail(strFile);
 			} else if (sw == L"sub" && pos) {
@@ -1881,7 +1881,7 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
 			} else if (sw == L"unregaud") {
 				nCLSwitches |= CLSW_UNREGEXT;    /* keep for compatibility with old versions */
 			} else if (sw == L"start" && pos) {
-				rtStart = 10000i64*_tcstol(cmdln.GetNext(pos), NULL, 10);
+				rtStart = 10000i64 * wcstol(cmdln.GetNext(pos), NULL, 10);
 				nCLSwitches |= CLSW_STARTVALID;
 			} else if (sw == L"startpos" && pos) {
 				rtStart = 10000i64 * ConvertTimeToMSec(cmdln.GetNext(pos));
@@ -1904,26 +1904,26 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
 				nCLSwitches |= CLSW_D3DFULLSCREEN;
 			} else if (sw == L"adminoption") {
 				nCLSwitches |= CLSW_ADMINOPTION;
-				iAdminOption = _ttoi(cmdln.GetNext(pos));
+				iAdminOption = _wtoi(cmdln.GetNext(pos));
 			} else if (sw == L"slave" && pos) {
 				nCLSwitches |= CLSW_SLAVE;
-				hMasterWnd = (HWND)IntToPtr(_ttoi(cmdln.GetNext(pos)));
+				hMasterWnd = (HWND)IntToPtr(_wtoi(cmdln.GetNext(pos)));
 			} else if (sw == L"fixedsize" && pos) {
 				CAtlList<CString> sl;
 				Explode(cmdln.GetNext(pos), sl, L',', 2);
 				if (sl.GetCount() == 2) {
-					sizeFixedWindow.SetSize(_ttol(sl.GetHead()), _ttol(sl.GetTail()));
+					sizeFixedWindow.SetSize(_wtol(sl.GetHead()), _wtol(sl.GetTail()));
 					if (sizeFixedWindow.cx > 0 && sizeFixedWindow.cy > 0) {
 						nCLSwitches |= CLSW_FIXEDSIZE;
 					}
 				}
 			} else if (sw == L"monitor" && pos) {
-				iMonitor = _tcstol(cmdln.GetNext(pos), NULL, 10);
+				iMonitor = wcstol(cmdln.GetNext(pos), NULL, 10);
 				nCLSwitches |= CLSW_MONITOR;
 			} else if (sw == L"pns") {
 				strPnSPreset = cmdln.GetNext(pos);
 			} else if (sw == L"webport" && pos) {
-				int tmpport = _tcstol(cmdln.GetNext(pos), NULL, 10);
+				int tmpport = wcstol(cmdln.GetNext(pos), NULL, 10);
 				if ( tmpport >= 0 && tmpport <= 65535 ) {
 					nCmdlnWebServerPort = tmpport;
 				}
@@ -1932,7 +1932,7 @@ void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
 			} else if (sw == L"nominidump") {
 				CMiniDump::SetState(false);
 			} else if (sw == L"audiorenderer" && pos) {
-				SetAudioRenderer(_ttoi(cmdln.GetNext(pos)));
+				SetAudioRenderer(_wtoi(cmdln.GetNext(pos)));
 			} else if (sw == L"reset") {
 				nCLSwitches |= CLSW_RESET;
 			} else {
@@ -2087,7 +2087,7 @@ void CAppSettings::CRecentFileAndURLList::Add(LPCTSTR lpszPathName)
 	// update the MRU list, if an existing MRU string matches file name
 	int iMRU;
 	for (iMRU = 0; iMRU < m_nSize-1; iMRU++) {
-		if ((fURL && !_tcscmp(m_arrNames[iMRU], pathName))
+		if ((fURL && !wcscmp(m_arrNames[iMRU], pathName))
 				|| AfxComparePath(m_arrNames[iMRU], pathName)) {
 			break;    // iMRU will point to matching entry
 		}

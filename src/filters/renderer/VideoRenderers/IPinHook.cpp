@@ -251,12 +251,12 @@ static void LOG_TOFILE(LPCTSTR FileName, LPCTSTR fmt, ...)
 	va_list args;
 	va_start(args, fmt);
 	int nCount = _vsctprintf(fmt, args) + 1;
-	if (TCHAR* buff = DNew TCHAR[nCount]) {
+	if (WCHAR* buff = DNew WCHAR[nCount]) {
 		FILE* f;
 		_vstprintf_s(buff, nCount, fmt, args);
-		if (_tfopen_s(&f, FileName, L"at") == 0) {
+		if (_wfopen_s(&f, FileName, L"at") == 0) {
 			fseek(f, 0, 2);
-			_ftprintf_s(f, L"%s\n", buff);
+			fwprintf_s(f, L"%s\n", buff);
 			fclose(f);
 		}
 		delete [] buff;
@@ -269,12 +269,12 @@ static void LOG(LPCTSTR fmt, ...)
 	va_list args;
 	va_start(args, fmt);
 	//int   nCount = _vsctprintf(fmt, args) + 1;
-	TCHAR buff[3000];
+	WCHAR buff[3000];
 	FILE* f;
 	_vstprintf_s(buff, _countof(buff), fmt, args);
-	if (_tfopen_s(&f, LOG_FILE_DXVA, L"at") == 0) {
+	if (_wfopen_s(&f, LOG_FILE_DXVA, L"at") == 0) {
 		fseek(f, 0, 2);
-		_ftprintf_s(f, L"%s\n", buff);
+		fwprintf_s(f, L"%s\n", buff);
 		fclose(f);
 	}
 

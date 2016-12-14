@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -61,7 +61,7 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 		}
 
 		LOGFONT lf = { 0 };
-		_tcscpy_s(lf.lfFaceName, face);
+		wcscpy_s(lf.lfFaceName, face);
 		lf.lfHeight = -PointsToPixels(height);
 		lf.lfWeight = FW_NORMAL;
 		lf.lfCharSet = DEFAULT_CHARSET;
@@ -70,9 +70,9 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 		}
 
 		lf.lfHeight -= -1;
-		_tcscpy_s(lf.lfFaceName, L"Lucida Console");
+		wcscpy_s(lf.lfFaceName, L"Lucida Console");
 		if (!m_monospacefont.CreateFontIndirect(&lf)) {
-			_tcscpy_s(lf.lfFaceName, L"Courier New");
+			wcscpy_s(lf.lfFaceName, L"Courier New");
 			if (!m_monospacefont.CreateFontIndirect(&lf)) {
 				return FALSE;
 			}
@@ -513,7 +513,7 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 			PinInfo.pFilter->GetClassID(&FilterClsid);
 			CString clsid = CStringFromGUID(FilterClsid);
 
-			TCHAR buff[MAX_PATH] = { 0 };
+			WCHAR buff[MAX_PATH] = { 0 };
 			ULONG len = _countof(buff);
 			CRegKey key;
 			if (ERROR_SUCCESS == key.Open (HKEY_CLASSES_ROOT, L"CLSID\\{083863F1-70DE-11D0-BD40-00A0C911CE86}\\Instance\\" + clsid, KEY_READ)

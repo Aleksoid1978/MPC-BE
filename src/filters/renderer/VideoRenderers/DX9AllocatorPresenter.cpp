@@ -865,7 +865,7 @@ UINT CDX9AllocatorPresenter::GetAdapter(IDirect3D9* pD3D)
 
 	const CRenderersSettings& rs = GetRenderersSettings();
 	if (pD3D->GetAdapterCount() > 1 && rs.sD3DRenderDevice.GetLength() > 0) {
-		TCHAR strGUID[50] = { 0 };
+		WCHAR strGUID[50] = { 0 };
 		D3DADAPTER_IDENTIFIER9 adapterIdentifier;
 
 		for (UINT adp = 0, num_adp = pD3D->GetAdapterCount(); adp < num_adp; ++adp) {
