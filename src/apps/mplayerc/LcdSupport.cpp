@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "LcdSupport.h"
 
-#define LCD_APP_NAME MPC_WND_CLASS_NAME
+#define LCD_APP_NAME _T(MPC_WND_CLASS_NAME)
 #define LCD_UPD_TIMER 40
 
 
