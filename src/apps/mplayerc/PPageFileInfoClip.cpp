@@ -49,12 +49,12 @@ CPPageFileInfoClip::CPPageFileInfoClip(CString fn, IFilterGraph* pFG)
 			}
 
 			CComVariant var;
-			if (SUCCEEDED(pPB->Read(CComBSTR(_T("ALBUM")), &var, NULL))) {
+			if (SUCCEEDED(pPB->Read(CComBSTR(L"ALBUM"), &var, NULL))) {
 				m_album = var.bstrVal;
 			}
 
 			var.Clear();
-			if (SUCCEEDED(pPB->Read(CComBSTR(_T("LYRICS")), &var, NULL))) {
+			if (SUCCEEDED(pPB->Read(CComBSTR(L"LYRICS"), &var, NULL))) {
 				m_descText = var.bstrVal;
 				if (m_descText.Find('\n') && m_descText.Find(L"\r\n") == -1) {
 					m_descText.Replace(L"\n", L"\r\n");
@@ -107,12 +107,12 @@ BOOL CPPageFileInfoClip::PreTranslateMessage(MSG* pMsg)
 		CString path = m_location_str;
 
 		if (path[path.GetLength() - 1] != '\\') {
-			path += _T("\\");
+			path += L"\\";
 		}
 
 		path += m_fn;
 
-		if (path.Find(_T("://")) == -1 && ExploreToFile(path)) {
+		if (path.Find(L"://") == -1 && ExploreToFile(path)) {
 			return TRUE;
 		}
 	}
@@ -154,8 +154,8 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 
 	m_fn.TrimRight('/');
 
-	if (m_fn.Find(_T("://")) > 0) {
-		if (m_fn.Find(_T("/"), m_fn.Find(_T("://")) + 3) < 0) {
+	if (m_fn.Find(L"://") > 0) {
+		if (m_fn.Find(L"/", m_fn.Find(L"://") + 3) < 0) {
 			m_location_str = m_fn;
 		}
 	}

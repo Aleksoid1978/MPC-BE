@@ -208,7 +208,7 @@ void CMPlayerCApp::InitProfile()
 		FILE* fp;
 		int fpStatus;
 		do { // Open mpc-be.ini in UNICODE mode, retry if it is already being used by another process
-			fp = _tfsopen(m_pszProfileName, _T("r, ccs=UNICODE"), _SH_SECURE);
+			fp = _wfsopen(m_pszProfileName, L"r, ccs=UNICODE", _SH_SECURE);
 			if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
 				break;
 			}
@@ -223,7 +223,7 @@ void CMPlayerCApp::InitProfile()
 			fpStatus = fclose(fp);
 			ASSERT(fpStatus == 0);
 			do { // Reopen mpc-be.ini in ANSI mode, retry if it is already being used by another process
-				fp = _tfsopen(m_pszProfileName, _T("r"), _SH_SECURE);
+				fp = _wfsopen(m_pszProfileName, L"r", _SH_SECURE);
 				if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
 					break;
 				}
@@ -248,14 +248,14 @@ void CMPlayerCApp::InitProfile()
 			//  - omits keys with empty names
 			//  - omits unnamed sections
 			int pos = 0;
-			if (line[0] == _T('[')) {
-				pos = line.Find(_T(']'));
+			if (line[0] == '[') {
+				pos = line.Find(']');
 				if (pos == -1) {
 					continue;
 				}
 				section = line.Mid(1, pos - 1);
-			} else if (line[0] != _T(';')) {
-				pos = line.Find(_T('='));
+			} else if (line[0] != ';') {
+				pos = line.Find('=');
 				if (pos == -1) {
 					continue;
 				}
@@ -290,7 +290,7 @@ void CMPlayerCApp::FlushProfile(bool bForce/* = true*/)
         FILE* fp;
         int fpStatus;
         do { // Open mpc-be.ini, retry if it is already being used by another process
-            fp = _tfsopen(m_pszProfileName, _T("w, ccs=UTF-8"), _SH_SECURE);
+            fp = _wfsopen(m_pszProfileName, L"w, ccs=UTF-8", _SH_SECURE);
             if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
                 break;
             }
@@ -303,12 +303,12 @@ void CMPlayerCApp::FlushProfile(bool bForce/* = true*/)
         CStdioFile file(fp);
         CString line;
         try {
-            file.WriteString(_T("; MPC-BE\n"));
+            file.WriteString(L"; MPC-BE\n");
             for (auto it1 = m_ProfileMap.begin(); it1 != m_ProfileMap.end(); ++it1) {
-                line.Format(_T("[%s]\n"), it1->first);
+                line.Format(L"[%s]\n", it1->first);
                 file.WriteString(line);
                 for (auto it2 = it1->second.begin(); it2 != it1->second.end(); ++it2) {
-                    line.Format(_T("%s=%s\n"), it2->first, it2->second);
+                    line.Format(L"%s=%s\n", it2->first, it2->second);
                     file.WriteString(line);
                 }
             }
@@ -401,7 +401,7 @@ UINT CMPlayerCApp::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDe
         if (it1 != m_ProfileMap.end()) {
             auto it2 = it1->second.find(keyStr);
             if (it2 != it1->second.end()) {
-                res = _ttoi(it2->second);
+                res = _wtoi(it2->second);
             }
         }
     }
@@ -461,7 +461,7 @@ BOOL CMPlayerCApp::WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LP
         }
         CString valueStr;
 
-        TCHAR* buffer = valueStr.GetBufferSetLength(nBytes * 2);
+        WCHAR* buffer = valueStr.GetBufferSetLength(nBytes * 2);
         // Encoding: each 4-bit sequence is coded in one character, from 'A' for 0x0 to 'P' for 0xf
         for (UINT i = 0; i < nBytes; i++) {
             buffer[i * 2] = 'A' + (pData[i] & 0xf);
@@ -497,7 +497,7 @@ BOOL CMPlayerCApp::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int n
             return FALSE;
         }
         CString valueStr;
-        valueStr.Format(_T("%d"), nValue);
+        valueStr.Format(L"%d", nValue);
 
         InitProfile();
         CString& old = m_ProfileMap[sectionStr][keyStr];
@@ -596,7 +596,7 @@ void CMPlayerCApp::ShowCmdlnSwitches() const
 		for (int i = 0; i < __argc; i++) {
 			sl.AddTail(__targv[i]);
 		}
-		s += ResStr(IDS_UNKNOWN_SWITCH) + Implode(sl, ' ') + _T("\n\n");
+		s += ResStr(IDS_UNKNOWN_SWITCH) + Implode(sl, ' ') + L"\n\n";
 	}
 
 	s += ResStr(IDS_USAGE);
@@ -616,14 +616,14 @@ bool CMPlayerCApp::StoreSettingsToIni()
 	free((void*)m_pszRegistryKey);
 	m_pszRegistryKey = NULL;
 	free((void*)m_pszProfileName);
-	m_pszProfileName = _tcsdup(GetIniPath());
+	m_pszProfileName = _wcsdup(GetIniPath());
 
 	if (!::PathFileExists(m_pszProfileName)) {
 		// Create an empty mpc-be.ini file to be sure that the function IsIniValid() works correctly
 		FILE* fp;
 		int fpStatus;
 		do { // Open mpc-be.ini, retry if it is already being used by another process
-			fp = _tfsopen(m_pszProfileName, _T("w, ccs=UTF-8"), _SH_SECURE);
+			fp = _wfsopen(m_pszProfileName, L"w, ccs=UTF-8", _SH_SECURE);
 			if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
 				break;
 			}
@@ -645,7 +645,7 @@ bool CMPlayerCApp::StoreSettingsToRegistry()
 	free((void*)m_pszRegistryKey);
 	m_pszRegistryKey = NULL;
 
-	SetRegistryKey(_T(""));
+	SetRegistryKey(L"");
 
 	return true;
 }
@@ -653,7 +653,7 @@ bool CMPlayerCApp::StoreSettingsToRegistry()
 CString CMPlayerCApp::GetIniPath() const
 {
 	CString path = GetProgramPath();
-	path = path.Left(path.ReverseFind('.') + 1) + _T("ini");
+	path = path.Left(path.ReverseFind('.') + 1) + L"ini";
 	return path;
 }
 
@@ -675,7 +675,7 @@ bool CMPlayerCApp::GetAppSavePath(CString& path)
 			return false;
 		}
 		CPath p;
-		p.Combine(path, _T("MPC-BE"));
+		p.Combine(path, L"MPC-BE");
 		path = AddSlash(p);
 	}
 
@@ -699,21 +699,21 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 		success = StoreSettingsToIni();
 	} else {
 		success = StoreSettingsToRegistry();
-		_tremove(GetIniPath());
+		_wremove(GetIniPath());
 	}
 
 	if (success && oldpath.GetLength() > 0) {
-		DeleteFile(oldpath + _T("default.mpcpl"));
+		DeleteFile(oldpath + L"default.mpcpl");
 
 		WIN32_FIND_DATA wfd;
-		HANDLE hFile = FindFirstFile(oldpath + _T("Shaders\\*.hlsl"), &wfd);
+		HANDLE hFile = FindFirstFile(oldpath + L"Shaders\\*.hlsl", &wfd);
 		if (hFile != INVALID_HANDLE_VALUE) {
 			do {
-				DeleteFile(oldpath + _T("Shaders\\") + wfd.cFileName);
+				DeleteFile(oldpath + L"Shaders\\" + wfd.cFileName);
 			} while (FindNextFile(hFile, &wfd));
 			FindClose(hFile);
 		}
-		::RemoveDirectory(oldpath + _T("Shaders"));
+		::RemoveDirectory(oldpath + L"Shaders");
 	}
 	// Ensure the shaders are properly saved
 	AfxGetAppSettings().fShadersNeedSave = true;
@@ -794,7 +794,7 @@ static bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
 		switch (type) {
 			case REG_SZ:
 				{
-					CString str((TCHAR*)data);
+					CString str((WCHAR*)data);
 					str.Replace(L"\\", L"\\\\");
 					str.Replace(L"\"", L"\\\"");
 					buffer.Format(L"\"%s\"=\"%s\"\n", valueName, str);
@@ -854,7 +854,7 @@ static bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
 
 void CMPlayerCApp::ExportSettings()
 {
-	CString ext = IsIniValid() ? _T("ini") : _T("reg");
+	CString ext = IsIniValid() ? L"ini" : L"reg";
 	CString ext_list;
 	ext_list.Format(L"Export files (*.%s)|*.%s|", ext, ext);
 
@@ -865,7 +865,7 @@ void CMPlayerCApp::ExportSettings()
 	if (fileSaveDialog.DoModal() == IDOK) {
 		CString savePath = fileSaveDialog.GetPathName();
 		if (ext.CompareNoCase(fileSaveDialog.GetFileExt()) != 0) {
-			savePath.Append(_T(".") + ext);
+			savePath.Append(L"." + ext);
 		}
 
 		auto& s = AfxGetAppSettings();
@@ -879,12 +879,12 @@ void CMPlayerCApp::ExportSettings()
 			success = !!CopyFile(GetIniPath(), savePath, FALSE);
 		} else {
 			CString regKey;
-			regKey.Format(_T("Software\\%s"), m_pszProfileName);
+			regKey.Format(L"Software\\%s", m_pszProfileName);
 
 			FILE* fStream;
-			errno_t error = _tfopen_s(&fStream, savePath, _T("wt,ccs=UNICODE"));
+			errno_t error = _wfopen_s(&fStream, savePath, L"wt,ccs=UNICODE");
 			CStdioFile file(fStream);
-			file.WriteString(_T("Windows Registry Editor Version 5.00\n\n"));
+			file.WriteString(L"Windows Registry Editor Version 5.00\n\n");
 
 			success = !error && ExportRegistryKey(file, HKEY_CURRENT_USER, regKey);
 
@@ -906,7 +906,7 @@ void CMPlayerCApp::PreProcessCommandLine()
 	m_cmdln.RemoveAll();
 
 	for (int i = 1; i < __argc; i++) {
-		m_cmdln.AddTail(CString(__targv[i]).Trim(_T(" \"")));
+		m_cmdln.AddTail(CString(__targv[i]).Trim(L" \""));
 	}
 }
 
@@ -920,7 +920,7 @@ BOOL CMPlayerCApp::SendCommandLine(HWND hWnd)
 
 	POSITION pos = m_cmdln.GetHeadPosition();
 	while (pos) {
-		bufflen += (m_cmdln.GetNext(pos).GetLength()+1)*sizeof(TCHAR);
+		bufflen += (m_cmdln.GetNext(pos).GetLength()+1)*sizeof(WCHAR);
 	}
 
 	CAutoVectorPtr<BYTE> buff;
@@ -936,7 +936,7 @@ BOOL CMPlayerCApp::SendCommandLine(HWND hWnd)
 	pos = m_cmdln.GetHeadPosition();
 	while (pos) {
 		CString s = m_cmdln.GetNext(pos);
-		int len = (s.GetLength()+1)*sizeof(TCHAR);
+		int len = (s.GetLength()+1)*sizeof(WCHAR);
 		memcpy(p, s, len);
 		p += len;
 	}
@@ -1047,7 +1047,7 @@ LONG WINAPI Mine_ChangeDisplaySettingsEx(LONG ret, DWORD dwFlags, LPVOID lParam)
 	if (dwFlags&CDS_VIDEOPARAMETERS) {
 		VIDEOPARAMETERS* vp = (VIDEOPARAMETERS*)lParam;
 
-		if (vp->Guid == GUIDFromCString(_T("{02C62061-1097-11d1-920F-00A024DF156E}"))
+		if (vp->Guid == GUIDFromCString(L"{02C62061-1097-11d1-920F-00A024DF156E}")
 				&& (vp->dwFlags&VP_FLAGS_COPYPROTECT)) {
 			if (vp->dwCommand == VP_COMMAND_GET) {
 				if ((vp->dwTVStandard&VP_TV_STANDARD_WIN_VGA)
@@ -1781,7 +1781,7 @@ void CRemoteCtrlClient::Connect(CString addr)
 	Create();
 
 	CString ip = addr.Left(addr.Find(':')+1).TrimRight(':');
-	int port = _tcstol(addr.Mid(addr.Find(':')+1), NULL, 10);
+	int port = wcstol(addr.Mid(addr.Find(':')+1), NULL, 10);
 
 	__super::Connect(ip, port);
 
@@ -2034,7 +2034,7 @@ void CMPlayerCApp::RunAsAdministrator(LPCTSTR strCommand, LPCTSTR strArgs, bool 
 	memset(&execinfo, 0, sizeof(execinfo));
 	execinfo.lpFile			= strCommand;
 	execinfo.cbSize			= sizeof(execinfo);
-	execinfo.lpVerb			= _T("runas");
+	execinfo.lpVerb			= L"runas";
 	execinfo.fMask			= SEE_MASK_NOCLOSEPROCESS;
 	execinfo.nShow			= SW_SHOWDEFAULT;
 	execinfo.lpParameters	= strArgs;

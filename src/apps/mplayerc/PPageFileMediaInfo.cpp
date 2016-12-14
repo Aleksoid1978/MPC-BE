@@ -131,7 +131,7 @@ static bool IsFontInstalled(LPCTSTR lpszFont)
 	// Any character set will do
 	lf.lfCharSet = DEFAULT_CHARSET;
 	// Set the facename to check for
-	_tcscpy_s(lf.lfFaceName, lpszFont);
+	wcscpy_s(lf.lfFaceName, lpszFont);
 	LPARAM lParam = 0;
 	// Enumerate fonts
 	EnumFontFamiliesEx(dc.GetSafeHdc(), &lf, (FONTENUMPROC)EnumFontFamExProc, (LPARAM)&lParam, 0);
@@ -153,14 +153,14 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 
 	MediaInfo MI;
 
-	MI.Option(_T("ParseSpeed"), _T("0"));
-	MI.Option(_T("Language"), mi_get_lang_file());
-	MI.Option(_T("Complete"));
+	MI.Option(L"ParseSpeed", L"0");
+	MI.Option(L"Language", mi_get_lang_file());
+	MI.Option(L"Complete");
 	MI.Open(m_fn.GetString());
 	MI_Text = MI.Inform().c_str();
 	MI.Close();
 
-	if (!MI_Text.Find(_T("Unable to load"))) {
+	if (!MI_Text.Find(L"Unable to load")) {
 		MI_Text.Empty();
 	}
 
@@ -168,7 +168,7 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	memset(&lf, 0, sizeof(lf));
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
 
-	LPCTSTR fonts[] = {_T("Consolas"), _T("Lucida Console"), _T("Courier New"), _T("") };
+	LPCTSTR fonts[] = {L"Consolas", L"Lucida Console", L"Courier New", L"" };
 
 	UINT i = 0;
 	BOOL success;

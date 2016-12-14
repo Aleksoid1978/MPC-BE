@@ -76,29 +76,29 @@ BOOL CPPageFiltersPriority::OnApply()
 
 	s.FiltersPrioritySettings.SetDefault();
 	if (POSITION pos = (POSITION)m_HTTP.GetItemDataPtr(m_HTTP.GetCurSel())) {
-		s.FiltersPrioritySettings.values[_T("http")] = m_pFilters.GetAt(pos)->clsid;
+		s.FiltersPrioritySettings.values[L"http"] = m_pFilters.GetAt(pos)->clsid;
 	}
 
 	if (POSITION pos = (POSITION)m_AVI.GetItemDataPtr(m_AVI.GetCurSel())) {
-		s.FiltersPrioritySettings.values[_T("avi")] = m_pFilters.GetAt(pos)->clsid;
+		s.FiltersPrioritySettings.values[L"avi"] = m_pFilters.GetAt(pos)->clsid;
 	}
 	if (POSITION pos = (POSITION)m_MKV.GetItemDataPtr(m_MKV.GetCurSel())) {
-		s.FiltersPrioritySettings.values[_T("mkv")] = m_pFilters.GetAt(pos)->clsid;
+		s.FiltersPrioritySettings.values[L"mkv"] = m_pFilters.GetAt(pos)->clsid;
 	}
 	if (POSITION pos = (POSITION)m_MPEGTS.GetItemDataPtr(m_MPEGTS.GetCurSel())) {
-		s.FiltersPrioritySettings.values[_T("mpegts")] = m_pFilters.GetAt(pos)->clsid;
+		s.FiltersPrioritySettings.values[L"mpegts"] = m_pFilters.GetAt(pos)->clsid;
 	}
 	if (POSITION pos = (POSITION)m_MPEG.GetItemDataPtr(m_MPEG.GetCurSel())) {
-		s.FiltersPrioritySettings.values[_T("mpeg")] = m_pFilters.GetAt(pos)->clsid;
+		s.FiltersPrioritySettings.values[L"mpeg"] = m_pFilters.GetAt(pos)->clsid;
 	}
 	if (POSITION pos = (POSITION)m_MP4.GetItemDataPtr(m_MP4.GetCurSel())) {
-		s.FiltersPrioritySettings.values[_T("mp4")] = m_pFilters.GetAt(pos)->clsid;
+		s.FiltersPrioritySettings.values[L"mp4"] = m_pFilters.GetAt(pos)->clsid;
 	}
 	if (POSITION pos = (POSITION)m_FLV.GetItemDataPtr(m_FLV.GetCurSel())) {
-		s.FiltersPrioritySettings.values[_T("flv")] = m_pFilters.GetAt(pos)->clsid;
+		s.FiltersPrioritySettings.values[L"flv"] = m_pFilters.GetAt(pos)->clsid;
 	}
 	if (POSITION pos = (POSITION)m_WMV.GetItemDataPtr(m_WMV.GetCurSel())) {
-		s.FiltersPrioritySettings.values[_T("wmv")] = m_pFilters.GetAt(pos)->clsid;
+		s.FiltersPrioritySettings.values[L"wmv"] = m_pFilters.GetAt(pos)->clsid;
 	}
 
 	return __super::OnApply();
@@ -200,7 +200,7 @@ void CPPageFiltersPriority::Init()
 		if (bIsSource) {
 			int i = m_HTTP.AddString(name);
 			m_HTTP.SetItemDataPtr(i, pos2);
-			if (s.FiltersPrioritySettings.values[_T("http")] == clsid) {
+			if (s.FiltersPrioritySettings.values[L"http"] == clsid) {
 				m_HTTP.SetCurSel(i);
 			}
 		}
@@ -208,14 +208,14 @@ void CPPageFiltersPriority::Init()
 		if (CLSID_List.Find(MEDIASUBTYPE_Avi) || CLSID_List.Find(MEDIASUBTYPE_NULL)) {
 			int i = m_AVI.AddString(name);
 			m_AVI.SetItemDataPtr(i, pos2);
-			if (s.FiltersPrioritySettings.values[_T("avi")] == clsid) {
+			if (s.FiltersPrioritySettings.values[L"avi"] == clsid) {
 				m_AVI.SetCurSel(i);
 			}
 		}
 		if (CLSID_List.Find(MEDIASUBTYPE_Matroska) || CLSID_List.Find(MEDIASUBTYPE_NULL)) {
 			int i = m_MKV.AddString(name);
 			m_MKV.SetItemDataPtr(i, pos2);
-			if (s.FiltersPrioritySettings.values[_T("mkv")] == clsid) {
+			if (s.FiltersPrioritySettings.values[L"mkv"] == clsid) {
 				m_MKV.SetCurSel(i);
 			}
 		}
@@ -227,13 +227,13 @@ void CPPageFiltersPriority::Init()
 			|| CLSID_List.Find(MEDIASUBTYPE_NULL)) {
 			int i = m_MPEGTS.AddString(name);
 			m_MPEGTS.SetItemDataPtr(i, pos2);
-			if (s.FiltersPrioritySettings.values[_T("mpegts")] == clsid) {
+			if (s.FiltersPrioritySettings.values[L"mpegts"] == clsid) {
 				m_MPEGTS.SetCurSel(i);
 			}
 
 			i = m_MPEG.AddString(name);
 			m_MPEG.SetItemDataPtr(i, pos2);
-			if (s.FiltersPrioritySettings.values[_T("mpeg")] == clsid) {
+			if (s.FiltersPrioritySettings.values[L"mpeg"] == clsid) {
 				m_MPEG.SetCurSel(i);
 			}
 		}
@@ -241,7 +241,7 @@ void CPPageFiltersPriority::Init()
 		if (CLSID_List.Find(MEDIASUBTYPE_MP4) || CLSID_List.Find(MEDIASUBTYPE_NULL)) {
 			int i = m_MP4.AddString(name);
 			m_MP4.SetItemDataPtr(i, pos2);
-			if (s.FiltersPrioritySettings.values[_T("mp4")] == clsid) {
+			if (s.FiltersPrioritySettings.values[L"mp4"] == clsid) {
 				m_MP4.SetCurSel(i);
 			}
 		}
@@ -249,7 +249,7 @@ void CPPageFiltersPriority::Init()
 		if (CLSID_List.Find(MEDIASUBTYPE_FLV) || CLSID_List.Find(MEDIASUBTYPE_NULL)) {
 			int i = m_FLV.AddString(name);
 			m_FLV.SetItemDataPtr(i, pos2);
-			if (s.FiltersPrioritySettings.values[_T("flv")] == clsid) {
+			if (s.FiltersPrioritySettings.values[L"flv"] == clsid) {
 				m_FLV.SetCurSel(i);
 			}
 		}
@@ -257,7 +257,7 @@ void CPPageFiltersPriority::Init()
 		if (CLSID_List.Find(MEDIASUBTYPE_Asf) || CLSID_List.Find(MEDIASUBTYPE_NULL)) {
 			int i = m_WMV.AddString(name);
 			m_WMV.SetItemDataPtr(i, pos2);
-			if (s.FiltersPrioritySettings.values[_T("wmv")] == clsid) {
+			if (s.FiltersPrioritySettings.values[L"wmv"] == clsid) {
 				m_WMV.SetCurSel(i);
 			}
 		}

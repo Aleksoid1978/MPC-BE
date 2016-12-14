@@ -92,7 +92,7 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 		m_fn = m_fn.Mid(i+1);
 	}
 
-	m_fn = m_fn + _T(".MediaInfo.txt");
+	m_fn = m_fn + L".MediaInfo.txt";
 
 	GetDlgItem(IDCANCEL)->ShowWindow(SW_HIDE);
 	GetDlgItem(ID_APPLY_NOW)->ShowWindow(SW_HIDE);
@@ -147,16 +147,16 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 
 void CPPageFileInfoSheet::OnSaveAs()
 {
-	CFileDialog filedlg (FALSE, _T("*.txt"), m_fn,
+	CFileDialog filedlg (FALSE, L"*.txt", m_fn,
 						 OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
-						 _T("Text Files (*.txt)|*.txt|All Files (*.*)|*.*||"), NULL);
+						 L"Text Files (*.txt)|*.txt|All Files (*.*)|*.*||", NULL);
 
 	if (filedlg.DoModal() == IDOK) {
 		CFile mFile;
 		if (mFile.Open(filedlg.GetPathName(), CFile::modeCreate | CFile::modeWrite)) {
-			const TCHAR bom = 0xFEFF;
-			mFile.Write(&bom, sizeof(TCHAR));
-			mFile.Write(LPCTSTR(m_mi.MI_Text), m_mi.MI_Text.GetLength() * sizeof(TCHAR));
+			const WCHAR bom = 0xFEFF;
+			mFile.Write(&bom, sizeof(WCHAR));
+			mFile.Write(LPCTSTR(m_mi.MI_Text), m_mi.MI_Text.GetLength() * sizeof(WCHAR));
 			mFile.Close();
 		}
 	}
@@ -164,7 +164,7 @@ void CPPageFileInfoSheet::OnSaveAs()
 
 void CPPageFileInfoSheet::OnCopyToClipboard()
 {
-	size_t cbStr = (m_mi.MI_Text.GetLength() + 1) * sizeof(TCHAR);
+	size_t cbStr = (m_mi.MI_Text.GetLength() + 1) * sizeof(WCHAR);
 	HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, cbStr);
 	if (hGlob) {
 		LPVOID pData = GlobalLock(hGlob);

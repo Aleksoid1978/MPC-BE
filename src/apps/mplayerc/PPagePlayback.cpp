@@ -116,7 +116,7 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_fRewind		= s.fRewind;
 
 	for (int idx = 1; idx <= 10; idx++) {
-		CString str; str.Format(_T("%d"), idx);
+		CString str; str.Format(L"%d", idx);
 		m_nVolumeStepCtrl.AddString(str);
 	}
 	m_nVolumeStep = s.nVolumeStep - 1;
@@ -285,14 +285,14 @@ BOOL CPPagePlayback::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)
 	static CString strTipText;
 
 	if (nID == IDC_SLIDER1) {
-		strTipText.Format(_T("%d%%"), m_nVolume);
+		strTipText.Format(L"%d%%", m_nVolume);
 	} else if (nID == IDC_SLIDER2) {
 		if (m_nBalance > 0) {
-			strTipText.Format(_T("R +%d%%"), m_nBalance);
+			strTipText.Format(L"R +%d%%", m_nBalance);
 		} else if (m_nBalance < 0) {
-			strTipText.Format(_T("L +%d%%"), -m_nBalance);
+			strTipText.Format(L"L +%d%%", -m_nBalance);
 		} else { //if (m_nBalance == 0)
-			strTipText = _T("L = R");
+			strTipText = L"L = R";
 		}
 	} else {
 		return FALSE;

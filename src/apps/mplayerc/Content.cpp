@@ -223,7 +223,7 @@ namespace Content {
 
 			if (url.Find(L"://") < 0) {
 				DWORD dwUrlLen = src.GetUrlLength() + 1;
-				TCHAR* szUrl = new TCHAR[dwUrlLen];
+				WCHAR* szUrl = new WCHAR[dwUrlLen];
 
 				// Retrieve the contents of the CUrl object
 				src.CreateUrl(szUrl, &dwUrlLen);
@@ -243,9 +243,9 @@ namespace Content {
 				dst.CrackUrl(url);
 			}
 
-			if (_tcsicmp(src.GetSchemeName(), dst.GetSchemeName())
-					|| _tcsicmp(src.GetHostName(), dst.GetHostName())
-					|| _tcsicmp(src.GetUrlPath(), dst.GetUrlPath())) {
+			if (_wcsicmp(src.GetSchemeName(), dst.GetSchemeName())
+					|| _wcsicmp(src.GetHostName(), dst.GetHostName())
+					|| _wcsicmp(src.GetUrlPath(), dst.GetUrlPath())) {
 				urls.AddTail(url);
 			} else {
 				// recursive
@@ -346,7 +346,7 @@ namespace Content {
 			GetContentTypeByExt(fn, ct);
 
 			FILE* f = NULL;
-			_tfopen_s(&f, fn, _T("rb"));
+			_wfopen_s(&f, fn, L"rb");
 			if (f) {
 				CStringA str;
 				str.ReleaseBufferSetLength(fread(str.GetBuffer(3), 1, 3, f));

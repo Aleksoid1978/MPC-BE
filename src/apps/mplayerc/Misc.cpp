@@ -117,13 +117,13 @@ CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw/* = GetLastError()*/)
 	// Format the error message
 
 	lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
-		(lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR));
-	StringCchPrintf((LPTSTR)lpDisplayBuf,
-		LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+		(lstrlen((LPCWSTR)lpMsgBuf) + lstrlen((LPCWSTR)lpszFunction) + 40) * sizeof(WCHAR));
+	StringCchPrintf((LPWSTR)lpDisplayBuf,
+		LocalSize(lpDisplayBuf) / sizeof(WCHAR),
 		L"Function '%s' failed with error %d: %s",
 		lpszFunction, dw, lpMsgBuf);
 
-	CString ret = (LPCTSTR)lpDisplayBuf;
+	CString ret = (LPCWSTR)lpDisplayBuf;
 
 	LocalFree(lpMsgBuf);
 	LocalFree(lpDisplayBuf);
@@ -137,26 +137,26 @@ HICON LoadIcon(CString fn, bool fSmall)
 		return NULL;
 	}
 
-	CString ext = fn.Left(fn.Find(_T("://"))+1).TrimRight(':');
-	if (ext.IsEmpty() || !ext.CompareNoCase(_T("file"))) {
-		ext = _T(".") + fn.Mid(fn.ReverseFind('.')+1);
+	CString ext = fn.Left(fn.Find(L"://")+1).TrimRight(':');
+	if (ext.IsEmpty() || !ext.CompareNoCase(L"file")) {
+		ext = L"." + fn.Mid(fn.ReverseFind('.')+1);
 	}
 
 	CSize size(fSmall?16:32, fSmall?16:32);
 
-	if (!ext.CompareNoCase(_T(".ifo"))) {
+	if (!ext.CompareNoCase(L".ifo")) {
 		if (HICON hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DVD), IMAGE_ICON, size.cx, size.cy, 0)) {
 			return hIcon;
 		}
 	}
 
-	if (!ext.CompareNoCase(_T(".cda"))) {
+	if (!ext.CompareNoCase(L".cda")) {
 		if (HICON hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_AUDIOCD), IMAGE_ICON, size.cx, size.cy, 0)) {
 			return hIcon;
 		}
 	}
 
-	if ((CString(fn).MakeLower().Find(_T("://"))) >= 0) {
+	if ((CString(fn).MakeLower().Find(L"://")) >= 0) {
 		if (HICON hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, size.cx, size.cy, 0)) {
 			return hIcon;
 		}
@@ -164,7 +164,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 		return NULL;
 	}
 
-	TCHAR buff[MAX_PATH];
+	WCHAR buff[MAX_PATH];
 	lstrcpy(buff, fn.GetBuffer());
 
 	SHFILEINFO sfi;
@@ -181,19 +181,19 @@ HICON LoadIcon(CString fn, bool fSmall)
 		CRegKey key;
 
 		CString RegPathAssociated;
-		RegPathAssociated.Format(_T("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\%ws\\UserChoice"), ext);
+		RegPathAssociated.Format(L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\%ws\\UserChoice", ext);
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, RegPathAssociated, KEY_READ)) {
 			len = _countof(buff);
 			memset(buff, 0, sizeof(buff));
 
 			CString ext_Associated = ext;
-			if (ERROR_SUCCESS == key.QueryStringValue(_T("Progid"), buff, &len) && !(ext_Associated = buff).Trim().IsEmpty()) {
+			if (ERROR_SUCCESS == key.QueryStringValue(L"Progid", buff, &len) && !(ext_Associated = buff).Trim().IsEmpty()) {
 				ext = ext_Associated;
 			}
 		}
 
-		if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext + _T("\\DefaultIcon"), KEY_READ)) {
+		if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext + L"\\DefaultIcon", KEY_READ)) {
 			if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext, KEY_READ)) {
 				break;
 			}
@@ -204,7 +204,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 				break;
 			}
 
-			if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext + _T("\\DefaultIcon"), KEY_READ)) {
+			if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext + L"\\DefaultIcon", KEY_READ)) {
 				break;
 			}
 		}
@@ -223,12 +223,12 @@ HICON LoadIcon(CString fn, bool fSmall)
 		}
 
 		int id = 0;
-		if (_stscanf_s(icon.Mid(i+1), _T("%d"), &id) != 1) {
+		if (_stscanf_s(icon.Mid(i+1), L"%d", &id) != 1) {
 			break;
 		}
 
 		icon = icon.Left(i);
-		icon.Replace(_T("\""), _T(""));
+		icon.Replace(L"\"", L"");
 
 		hIcon = NULL;
 		UINT cnt = fSmall
@@ -248,9 +248,9 @@ bool LoadType(CString fn, CString& type)
 	bool found = false;
 
 	if (!fn.IsEmpty()) {
-		CString ext = fn.Left(fn.Find(_T("://"))+1).TrimRight(':');
-		if (ext.IsEmpty() || !ext.CompareNoCase(_T("file"))) {
-			ext = _T(".") + fn.Mid(fn.ReverseFind('.')+1);
+		CString ext = fn.Left(fn.Find(L"://")+1).TrimRight(':');
+		if (ext.IsEmpty() || !ext.CompareNoCase(L"file")) {
+			ext = L"." + fn.Mid(fn.ReverseFind('.')+1);
 		}
 
 		// Try MPC-BE's internal formats list
@@ -263,7 +263,7 @@ bool LoadType(CString fn, CString& type)
 			CRegKey key;
 
 			CString tmp;
-			CString mplayerc_ext = _T("mplayerc") + ext;
+			CString mplayerc_ext = L"mplayerc" + ext;
 
 			if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, mplayerc_ext)) {
 				tmp = mplayerc_ext;
@@ -276,7 +276,7 @@ bool LoadType(CString fn, CString& type)
 					tmp = ext;
 				}
 
-				TCHAR buff[256] = { 0 };
+				WCHAR buff[256] = { 0 };
 				ULONG len;
 
 				while (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, tmp)) {

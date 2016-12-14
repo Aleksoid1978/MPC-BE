@@ -277,20 +277,20 @@ BOOL CPPageExternalFilters::OnInitDialog()
 	while (pos) {
 		CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_filters.GetNext(pos)));
 
-		CString name(_T("<unknown>"));
+		CString name(L"<unknown>");
 
 		if (f->type == FilterOverride::REGISTERED) {
 			name = CFGFilterRegistry(f->dispname).GetName();
 			if (name.IsEmpty()) {
-				name = f->name + _T(" <not registered>");
+				name = f->name + L" <not registered>";
 			}
 		} else if (f->type == FilterOverride::EXTERNAL) {
 			name = f->name;
 			if (f->fTemporary) {
-				name += _T(" <temporary>");
+				name += L" <temporary>";
 			}
 			if (!CPath(MakeFullPath(f->path)).FileExists()) {
-				name += _T(" <not found!>");
+				name += L" <not found!>";
 			}
 		}
 
@@ -379,7 +379,7 @@ void CPPageExternalFilters::OnAddRegistered()
 
 				if (f->type == FilterOverride::EXTERNAL) {
 					if (!CPath(MakeFullPath(f->path)).FileExists()) {
-						name += _T(" <not found!>");
+						name += L" <not found!>";
 					}
 				}
 
@@ -636,7 +636,7 @@ void CPPageExternalFilters::OnLbnSelchangeList1()
 		UpdateData(FALSE);
 		m_dwMerit = f->dwMerit;
 
-		HTREEITEM dummy_item = m_tree.InsertItem(_T(""), 0,0, NULL, TVI_FIRST);
+		HTREEITEM dummy_item = m_tree.InsertItem(L"", 0,0, NULL, TVI_FIRST);
 		if (dummy_item)
 			for (HTREEITEM item = m_tree.GetNextVisibleItem(dummy_item); item; item = m_tree.GetNextVisibleItem(dummy_item)) {
 				m_tree.DeleteItem(item);
@@ -760,10 +760,10 @@ void CPPageExternalFilters::OnDropFiles(HDROP hDropInfo)
 {
 	SetActiveWindow();
 
-	UINT nFiles = ::DragQueryFile(hDropInfo, (UINT)-1, NULL, 0);
+	UINT nFiles = ::DragQueryFileW(hDropInfo, (UINT)-1, NULL, 0);
 	for (UINT iFile = 0; iFile < nFiles; iFile++) {
-		TCHAR szFileName[_MAX_PATH];
-		::DragQueryFile(hDropInfo, iFile, szFileName, _MAX_PATH);
+		WCHAR szFileName[_MAX_PATH];
+		::DragQueryFileW(hDropInfo, iFile, szFileName, _MAX_PATH);
 
 		CFilterMapper2 fm2(false);
 		fm2.Register(szFileName);
