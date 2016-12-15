@@ -253,7 +253,7 @@ void COpenDlg::OnUpdateDub(CCmdUI* pCmdUI)
 	UpdateData();
 
 	pCmdUI->Enable(AfxGetAppSettings().GetFileEngine(m_path) == DirectShow
-					&& ((CString(m_path).MakeLower().Find(_T("://"))) == -1));
+					&& ((CString(m_path).MakeLower().Find(L"://")) == -1));
 }
 
 void COpenDlg::OnUpdateAppendToPlaylist(CCmdUI* pCmdUI)
@@ -272,7 +272,7 @@ void COpenDlg::OnUpdateOk(CCmdUI* pCmdUI)
 
 // COpenFileDlg
 
-#define __DUMMY__ _T("*.*")
+#define __DUMMY__ L"*.*"
 
 bool COpenFileDlg::m_fAllowDirSelection = false;
 WNDPROC COpenFileDlg::m_wndProc = NULL;
@@ -299,21 +299,21 @@ COpenFileDlg::COpenFileDlg(CAtlArray<CString>& mask, bool fAllowDirSelection, LP
 		}
 	}
 
-	if (str.Find(_T("://")) > 0) {
+	if (str.Find(L"://") > 0) {
 		str.Empty();
 	}
 
 	str = GetFolderOnly(str);
 
 	int size = max(1000, str.GetLength() + 1);
-	m_InitialDir = DNew TCHAR[size];
-	memset(m_InitialDir, 0, size * sizeof(TCHAR));
-	_tcscpy(m_InitialDir, str);
+	m_InitialDir = DNew WCHAR[size];
+	memset(m_InitialDir, 0, size * sizeof(WCHAR));
+	wcscpy(m_InitialDir, str);
 	m_pOFN->lpstrInitialDir = m_InitialDir;
 
 	size = 10000;
-	m_buff = DNew TCHAR[size];
-	memset(m_buff, 0, size * sizeof(TCHAR));
+	m_buff = DNew WCHAR[size];
+	memset(m_buff, 0, size * sizeof(WCHAR));
 	m_pOFN->lpstrFile	= m_buff;
 	m_pOFN->nMaxFile	= size;
 }
@@ -334,10 +334,10 @@ LRESULT CALLBACK COpenFileDlg::WindowProcNew(HWND hwnd, UINT message, WPARAM wPa
 {
 	if (message ==  WM_COMMAND && HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDOK
 			&& m_fAllowDirSelection) {
-		CAutoVectorPtr<TCHAR> path;
+		CAutoVectorPtr<WCHAR> path;
 		path.Allocate(_MAX_PATH+1);
 
-		if (::GetDlgItemText(hwnd, cmb13, (TCHAR*)path, _MAX_PATH) == 0) {
+		if (::GetDlgItemText(hwnd, cmb13, (WCHAR*)path, _MAX_PATH) == 0) {
 			::SendMessage(hwnd, CDM_SETCONTROLTEXT, edt1, (LPARAM)__DUMMY__);
 		}
 	}
@@ -390,7 +390,7 @@ BOOL COpenFileDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 
 BOOL COpenFileDlg::OnIncludeItem(OFNOTIFYEX* pOFNEx, LRESULT* pResult)
 {
-	TCHAR buff[_MAX_PATH];
+	WCHAR buff[_MAX_PATH];
 
 	if (!SHGetPathFromIDList((PCIDLIST_ABSOLUTE)pOFNEx->pidl, buff)) {
 		STRRET s;
@@ -402,10 +402,10 @@ BOOL COpenFileDlg::OnIncludeItem(OFNOTIFYEX* pOFNEx, LRESULT* pResult)
 
 		switch (s.uType) {
 			case STRRET_CSTR:
-				_tcscpy_s(buff, CString(s.cStr));
+				wcscpy_s(buff, CString(s.cStr));
 				break;
 			case STRRET_WSTR:
-				_tcscpy_s(buff, CString(s.pOleStr));
+				wcscpy_s(buff, CString(s.pOleStr));
 				CoTaskMemFree(s.pOleStr);
 				break;
 			default:
@@ -427,10 +427,10 @@ BOOL COpenFileDlg::OnIncludeItem(OFNOTIFYEX* pOFNEx, LRESULT* pResult)
 		return FALSE;
 	}
 
-	CString mask = m_mask[pOFNEx->lpOFN->nFilterIndex-1] + _T(";");
-	CString ext = fn.Mid(i).MakeLower() + _T(";");
+	CString mask = m_mask[pOFNEx->lpOFN->nFilterIndex-1] + L";";
+	CString ext = fn.Mid(i).MakeLower() + L";";
 
-	*pResult = mask.Find(ext) >= 0 || mask.Find(_T("*.*")) >= 0;
+	*pResult = mask.Find(ext) >= 0 || mask.Find(L"*.*") >= 0;
 
 	return TRUE;
 }

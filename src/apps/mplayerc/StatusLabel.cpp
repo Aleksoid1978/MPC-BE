@@ -56,11 +56,11 @@ void CStatusLabel::ScaleFont()
 	if (AfxGetAppSettings().bUseDarkTheme) {
 		m_font.CreateFont(AfxGetMainFrame()->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
 						  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
-						  _T("Tahoma"));
+						  L"Tahoma");
 	} else {
 		m_font.CreateFont(AfxGetMainFrame()->ScaleY(16), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
 						  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
-						  _T("Segoe UI"));
+						  L"Segoe UI");
 	}
 }
 
@@ -107,7 +107,7 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	if (m_fAddEllipses) {
 		while (size.cx > r.Width()-3 && str.GetLength() > 3) {
-			str = str.Left(str.GetLength()-4) + _T("...");
+			str = str.Left(str.GetLength()-4) + L"...";
 			size = dc.GetTextExtent(str);
 		}
 	}

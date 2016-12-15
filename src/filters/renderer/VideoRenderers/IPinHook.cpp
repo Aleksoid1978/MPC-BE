@@ -253,7 +253,7 @@ static void LOG_TOFILE(LPCTSTR FileName, LPCTSTR fmt, ...)
 	int nCount = _vsctprintf(fmt, args) + 1;
 	if (WCHAR* buff = DNew WCHAR[nCount]) {
 		FILE* f;
-		_vstprintf_s(buff, nCount, fmt, args);
+		vswprintf_s(buff, nCount, fmt, args);
 		if (_wfopen_s(&f, FileName, L"at") == 0) {
 			fseek(f, 0, 2);
 			fwprintf_s(f, L"%s\n", buff);
@@ -271,7 +271,7 @@ static void LOG(LPCTSTR fmt, ...)
 	//int   nCount = _vsctprintf(fmt, args) + 1;
 	WCHAR buff[3000];
 	FILE* f;
-	_vstprintf_s(buff, _countof(buff), fmt, args);
+	vswprintf_s(buff, _countof(buff), fmt, args);
 	if (_wfopen_s(&f, LOG_FILE_DXVA, L"at") == 0) {
 		fseek(f, 0, 2);
 		fwprintf_s(f, L"%s\n", buff);

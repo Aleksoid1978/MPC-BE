@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -98,7 +98,6 @@ private:
 	static UINT RunThread(LPVOID pParam);
 	static int CALLBACK SortCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 	static int CALLBACK DefSortCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
-	static size_t StrMatch(LPCTSTR a, LPCTSTR b);
 	static CString LangCodeToName(LPCSTR code);
 	static bool OpenUrl(CInternetSession& is, CString url, CStringA& str);
 

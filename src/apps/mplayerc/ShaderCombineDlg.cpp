@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -90,7 +90,7 @@ BOOL CShaderCombineDlg::OnInitDialog()
 		m_list1.AddString(m_labels1.GetNext(pos));
 	}
 
-	m_list1.AddString(_T(""));
+	m_list1.AddString(L"");
 
 	pos = m_labels2.GetHeadPosition();
 
@@ -98,7 +98,7 @@ BOOL CShaderCombineDlg::OnInitDialog()
 		m_list2.AddString(m_labels2.GetNext(pos));
 	}
 
-	m_list2.AddString(_T(""));
+	m_list2.AddString(L"");
 
 	pos = s.m_shaders.GetHeadPosition();
 	CString str;

@@ -1,5 +1,5 @@
 /*
- * (C) 2014 see Authors.txt
+ * (C) 2014-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -52,16 +52,16 @@ void CPlayerBar::LoadState(CFrameWnd *pParent)
 	CRect rDesktop;
 	GetDesktopWindow()->GetWindowRect(&rDesktop);
 
-	CString section = _T("ToolBars\\") + m_strSettingName;
+	CString section = L"ToolBars\\" + m_strSettingName;
 
-	__super::LoadState(section + _T("\\State"));
+	__super::LoadState(section + L"\\State");
 
-	UINT dockBarID = pApp->GetProfileInt(section, _T("DockState"), m_defDockBarID);
+	UINT dockBarID = pApp->GetProfileInt(section, L"DockState", m_defDockBarID);
 
 	if (dockBarID == AFX_IDW_DOCKBAR_FLOAT) {
 		CPoint p;
-		p.x = pApp->GetProfileInt(section, _T("DockPosX"), r.right);
-		p.y = pApp->GetProfileInt(section, _T("DockPosY"), r.top);
+		p.x = pApp->GetProfileInt(section, L"DockPosX", r.right);
+		p.y = pApp->GetProfileInt(section, L"DockPosY", r.top);
 
 		if (p.x < rDesktop.left) {
 			p.x = rDesktop.left;
@@ -89,20 +89,20 @@ void CPlayerBar::SaveState()
 {
 	CWinApp* pApp = AfxGetApp();
 
-	CString section = _T("ToolBars\\") + m_strSettingName;
+	CString section = L"ToolBars\\" + m_strSettingName;
 
-	__super::SaveState(section + _T("\\State"));
+	__super::SaveState(section + L"\\State");
 
 	UINT dockBarID = GetParent()->GetDlgCtrlID();
 
 	if (dockBarID == AFX_IDW_DOCKBAR_FLOAT) {
 		CRect r;
 		GetParent()->GetParent()->GetWindowRect(r);
-		pApp->WriteProfileInt(section, _T("DockPosX"), r.left);
-		pApp->WriteProfileInt(section, _T("DockPosY"), r.top);
+		pApp->WriteProfileInt(section, L"DockPosX", r.left);
+		pApp->WriteProfileInt(section, L"DockPosY", r.top);
 	}
 
-	pApp->WriteProfileInt(section, _T("DockState"), dockBarID);
+	pApp->WriteProfileInt(section, L"DockState", dockBarID);
 }
 
 void CPlayerBar::OnWindowPosChanged(WINDOWPOS* lpwndpos)

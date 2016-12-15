@@ -399,7 +399,7 @@ void CPPageCapture::FindAnalogDevices()
 
 	{
 		int i = m_cbAnalogAudio.AddString(L"<Video Capture Device>");
-		m_audnames.Add(_T(""));
+		m_audnames.Add(L"");
 
 		if (s.strAnalogAudio.IsEmpty()) {
 			iSel = i;
@@ -487,7 +487,7 @@ void CPPageCapture::FindDigitalDevices()
 		pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB);
 
 		CComVariant var;
-		pPB->Read(CComBSTR(_T("FriendlyName")), &var, NULL);
+		pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL);
 		int i = m_cbDigitalNetworkProvider.AddString(CString(var.bstrVal));
 
 		LPOLESTR strName = NULL;
@@ -514,7 +514,7 @@ void CPPageCapture::FindDigitalDevices()
 		pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB);
 
 		CComVariant var;
-		pPB->Read(CComBSTR(_T("FriendlyName")), &var, NULL);
+		pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL);
 		int i = m_cbDigitalTuner.AddString(CString(var.bstrVal));
 
 		LPOLESTR strName = NULL;
@@ -541,7 +541,7 @@ void CPPageCapture::FindDigitalDevices()
 		pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB);
 
 		CComVariant var;
-		pPB->Read(CComBSTR(_T("FriendlyName")), &var, NULL);
+		pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL);
 		int i = m_cbDigitalReceiver.AddString(CString(var.bstrVal));
 
 		LPOLESTR strName = NULL;

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -76,11 +76,11 @@ int CALLBACK COpenDirHelper::BrowseCallbackProcDIR(HWND hwnd, UINT uMsg, LPARAM 
 		RECT ClientArea;
 		RECT ButtonRect;
 
-		checkbox = CreateWindowEx(0, _T("BUTTON"), ResStr(IDS_MAINFRM_DIR_CHECK),
+		checkbox = CreateWindowEx(0, L"BUTTON", ResStr(IDS_MAINFRM_DIR_CHECK),
 								  WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | BS_AUTOCHECKBOX | BS_MULTILINE,
 								  0, 100, 100, 50, hwnd, 0, AfxGetApp()->m_hInstance, NULL);
 
-		HWND ListView = FindWindowEx(hwnd, NULL, _T("SysTreeView32"), NULL);
+		HWND ListView = FindWindowEx(hwnd, NULL, L"SysTreeView32", NULL);
 
 		HWND id_ok = GetDlgItem(hwnd, IDOK);
 		HWND id_cancel = GetDlgItem(hwnd, IDCANCEL);
@@ -102,7 +102,7 @@ int CALLBACK COpenDirHelper::BrowseCallbackProcDIR(HWND hwnd, UINT uMsg, LPARAM 
 		MoveWindow(id_cancel, ButtonRect.left - Dialog.left + 49, ButtonRect.top - Dialog.top + 40, ButtonRect.right - ButtonRect.left, ButtonRect.bottom - ButtonRect.top, TRUE);
 
 		SetWindowPos(checkbox, HWND_BOTTOM, ListViewRect.left-Dialog.left - 3, ClientArea.bottom - 35, 180, 27, SWP_SHOWWINDOW);
-		SetFont(checkbox, _T("Tahoma"), 13);
+		SetFont(checkbox, L"Tahoma", 13);
 
 		CBProc = (WNDPROC)SetWindowLongPtr(checkbox, GWLP_WNDPROC, (LONG_PTR)CheckBoxSubclassProc);
 		SendMessage(checkbox, BM_SETCHECK, (WPARAM)m_incl_subdir, 0);
@@ -115,13 +115,13 @@ void COpenDirHelper::RecurseAddDir(CString path, CAtlList<CString>* sl)
 {
 	WIN32_FIND_DATA fd = {0};
 
-	HANDLE hFind = FindFirstFile(path + _T("*.*"), &fd);
+	HANDLE hFind = FindFirstFile(path + L"*.*", &fd);
 
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
 			CString f_name = fd.cFileName;
 
-			if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (f_name!=_T(".")) && (f_name!=_T(".."))) {
+			if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (f_name!=L".") && (f_name!=L"..")) {
 				CString fullpath = path + f_name;
 
 				if (fullpath[fullpath.GetLength() - 1] != '\\') {

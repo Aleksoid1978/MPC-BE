@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "LineNumberEdit.h"
 
-UINT urm_SELECTLINE = ::RegisterWindowMessage( _T("_LINE_NUMBER_EDIT_SELECTLINE_") );
+UINT urm_SELECTLINE = ::RegisterWindowMessage( L"_LINE_NUMBER_EDIT_SELECTLINE_" );
 
 // CLineNumberEdit
 
@@ -32,7 +32,7 @@ CLineNumberEdit::CLineNumberEdit()
 	m_line.m_hWnd = NULL;
 	m_zero.cx = 0;
 	m_zero.cy = 0;
-	m_format = _T( "%03i" );
+	m_format = L"%03i";
 	m_LineDelta = 1;
 
 	// Could default m_maxval to 99,999, but may cause problems
@@ -234,7 +234,7 @@ int CLineNumberEdit::CalcLineNumberWidth()
 	CFont* font = GetFont();
 	CFont* oldFont = dc.SelectObject( font );
 
-	m_zero=dc.GetTextExtent( _T( "0" ) );
+	m_zero=dc.GetTextExtent(L"0");
 	CString format;
 
 	// GetLimitText returns the number of bytes the edit box may contain,
@@ -326,7 +326,7 @@ CLineNumberStatic::CLineNumberStatic()
 {
 	m_bgcol = RGB( 255, 255, 248 );
 	m_fgcol = RGB( 0, 0, 0 );
-	m_format = _T( "%05i" );
+	m_format = L"%05i";
 	m_topmargin = 0;
 	m_topline = 0;
 	m_bottomline = 0;
@@ -378,7 +378,7 @@ void CLineNumberStatic::OnPaint()
 	// Output the line numbers
 	if( m_bottomline )
 	{
-		int lineheight = dc.GetTextExtent( _T( "0" ) ).cy;
+		int lineheight = dc.GetTextExtent(L"0").cy;
 		for( int t = m_topline ; t < m_bottomline ; t++ )
 		{
 			CString output;
@@ -402,7 +402,7 @@ void CLineNumberStatic::OnLButtonDown( UINT nFlags, CPoint point )
 	// Find the line clicked on
 	CClientDC	dc( this );
 	dc.SelectObject( GetParent()->GetFont() );
-	int lineheight = dc.GetTextExtent( _T( "0" ) ).cy;
+	int lineheight = dc.GetTextExtent(L"0").cy;
 	int lineno = ( int ) ( ( double ) point.y / ( double ) lineheight );
 
 	// Select this line in the edit control

@@ -89,7 +89,7 @@ void CPlayerToolBar::SwitchTheme()
 	}
 
 	if (s.bUseDarkTheme) {
-		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
+		if (HMODULE h = LoadLibrary(L"uxtheme.dll")) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
 
 			if (f) {
@@ -109,7 +109,7 @@ void CPlayerToolBar::SwitchTheme()
 		tb.SetColorScheme(&cs);
 		tb.SetIndent(5);
 	} else {
-		if (HMODULE h = LoadLibrary(_T("uxtheme.dll"))) {
+		if (HMODULE h = LoadLibrary(L"uxtheme.dll")) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
 
 			if (f) {
@@ -946,10 +946,10 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		(fs == State_Running) ? m_strTipText = ResStr(IDS_AG_PAUSE) : m_strTipText = ResStr(IDS_AG_PLAY);
 
 	} else if (pNMHDR->idFrom == ID_PLAY_STOP) {
-		m_strTipText = ResStr(IDS_AG_STOP) + _T(" | ") + ResStr(IDS_AG_CLOSE);
+		m_strTipText = ResStr(IDS_AG_STOP) + L" | " + ResStr(IDS_AG_CLOSE);
 
 	} else if (pNMHDR->idFrom == ID_PLAY_FRAMESTEP) {
-		m_strTipText = ResStr(IDS_AG_STEP) + _T(" | ") + ResStr(IDS_AG_JUMP_TO);
+		m_strTipText = ResStr(IDS_AG_STEP) + L" | " + ResStr(IDS_AG_JUMP_TO);
 
 	} else if (pNMHDR->idFrom == ID_VOLUME_MUTE) {
 
@@ -974,7 +974,7 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		}
 
 	} else if (pNMHDR->idFrom == ID_FILE_OPENQUICK) {
-		m_strTipText = ResStr(IDS_MPLAYERC_0) + _T(" | ") + ResStr(IDS_RECENT_FILES);
+		m_strTipText = ResStr(IDS_MPLAYERC_0) + L" | " + ResStr(IDS_RECENT_FILES);
 
 	} else if (pNMHDR->idFrom == ID_NAVIGATE_SKIPFORWARD) {
 		m_strTipText = ResStr(IDS_AG_NEXT);
@@ -983,10 +983,10 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		m_strTipText = ResStr(IDS_AG_PREVIOUS);
 
 	} else if (pNMHDR->idFrom == ID_NAVIGATE_SUBTITLES) {
-		m_strTipText = ResStr(IDS_AG_SUBTITLELANG) + _T(" | ") + ResStr(IDS_AG_OPTIONS);
+		m_strTipText = ResStr(IDS_AG_SUBTITLELANG) + L" | " + ResStr(IDS_AG_OPTIONS);
 
 	} else if (pNMHDR->idFrom == ID_NAVIGATE_AUDIO) {
-		m_strTipText = ResStr(IDS_AG_AUDIOLANG) + _T(" | ") + ResStr(IDS_AG_OPTIONS);
+		m_strTipText = ResStr(IDS_AG_AUDIOLANG) + L" | " + ResStr(IDS_AG_OPTIONS);
 	}
 
 	pTTT->lpszText = m_strTipText.GetBuffer();

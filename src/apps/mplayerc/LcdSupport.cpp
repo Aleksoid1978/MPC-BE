@@ -43,13 +43,13 @@ void LCD_UpdateThread(void* Control)
 			// Format the current time structure into a string
 			// using %#x is the long date representation,
 			// appropriate to the current locale
-			if (_wcsftime_l(str, _countof(str), _T("%#x"), (const struct tm*)&thetime, locale) &&
+			if (_wcsftime_l(str, _countof(str), L"%#x", (const struct tm*)&thetime, locale) &&
 			(ltime > ctrl->nThread_tTimeout || ltime < otime)) { // message displayed, no update until timeout
 				ctrl->m_MonoPage.m_Text[0].SetText(str);
 				ctrl->m_ColorPage.m_Text[0].SetText(str);
 			}
 
-			if (_wcsftime_l(str, _countof(str), _T("%X"), (const struct tm*)&thetime, locale)) {
+			if (_wcsftime_l(str, _countof(str), L"%X", (const struct tm*)&thetime, locale)) {
 				ctrl->m_MonoPage.m_Text[1].SetText(str);
 				ctrl->m_ColorPage.m_Text[1].SetText(str);
 			}
@@ -220,7 +220,7 @@ HRESULT CLCDMyMonoPage::Initialize()
 	m_Text1.SetSize(160 - x, 13);
 	m_Text1.SetAlignment(DT_CENTER);
 	m_Text1.SetWordWrap(false);
-	m_Text1.SetText(_T(""));
+	m_Text1.SetText(L"");
 	m_Text1.SetStartDelay(5000);
 	m_Text1.SetEndDelay(2000);
 	m_Text1.EnableRepeat(true);
@@ -254,11 +254,11 @@ HRESULT CLCDMyMonoPage::Initialize()
 	m_Text[0].SetSize(160 - x, /*13*/25);
 	m_Text[0].SetAlignment(DT_CENTER);
 	m_Text[0].SetWordWrap(false);
-	m_Text[0].SetText(_T(""));
+	m_Text[0].SetText(L"");
 	m_Text[0].SetFontPointSize(7);
 	hFont = m_Text[0].GetFont();
 	GetObject(hFont, sizeof(LOGFONT), &lf);
-	wcscpy_s(lf.lfFaceName, LF_FACESIZE, _T("Microsoft Sans Serif"));
+	wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Microsoft Sans Serif");
 	m_Text[0].SetFont(lf);
 
 	y += 10;
@@ -267,11 +267,11 @@ HRESULT CLCDMyMonoPage::Initialize()
 	m_Text[1].SetSize(160 - x, /*13*/25);
 	m_Text[1].SetAlignment(DT_CENTER);
 	m_Text[1].SetWordWrap(false);
-	m_Text[1].SetText(_T(""));
+	m_Text[1].SetText(L"");
 	m_Text[1].SetFontPointSize(7);
 	hFont = m_Text[1].GetFont();
 	GetObject(hFont, sizeof(LOGFONT), &lf);
-	wcscpy_s(lf.lfFaceName, LF_FACESIZE, _T("Microsoft Sans Serif"));
+	wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Microsoft Sans Serif");
 	m_Text[1].SetFont(lf);
 
 	// Initialize the progressbar control (volume)
@@ -411,7 +411,7 @@ HRESULT CLCDMyColorPage::Initialize()
 	m_Text1.SetSize(320 - x, 26);
 	m_Text1.SetAlignment(DT_CENTER | DT_VCENTER);
 	m_Text1.SetWordWrap(false);
-	m_Text1.SetText(_T(""));
+	m_Text1.SetText(L"");
 	m_Text1.SetFontPointSize(16);
 	m_Text1.SetStartDelay(5000);
 	m_Text1.SetEndDelay(2000);
@@ -447,11 +447,11 @@ HRESULT CLCDMyColorPage::Initialize()
 	m_Text[0].SetSize(320 - x, /*13*/50);
 	m_Text[0].SetAlignment(DT_CENTER);
 	m_Text[0].SetWordWrap(false);
-	m_Text[0].SetText(_T(""));
+	m_Text[0].SetText(L"");
 	m_Text[0].SetFontPointSize(14);
 	hFont = m_Text[0].GetFont();
 	GetObject(hFont, sizeof(LOGFONT), &lf);
-	wcscpy_s(lf.lfFaceName, LF_FACESIZE, _T("Microsoft Sans Serif"));
+	wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Microsoft Sans Serif");
 	m_Text[0].SetFont(lf);
 
 	y += 22;
@@ -460,11 +460,11 @@ HRESULT CLCDMyColorPage::Initialize()
 	m_Text[1].SetSize(320 - x, /*13*/50);
 	m_Text[1].SetAlignment(DT_CENTER);
 	m_Text[1].SetWordWrap(false);
-	m_Text[1].SetText(_T(""));
+	m_Text[1].SetText(L"");
 	m_Text[1].SetFontPointSize(14);
 	hFont = m_Text[1].GetFont();
 	GetObject(hFont, sizeof(LOGFONT), &lf);
-	wcscpy_s(lf.lfFaceName, LF_FACESIZE, _T("Microsoft Sans Serif"));
+	wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Microsoft Sans Serif");
 	m_Text[1].SetFont(lf);
 
 	// Initialize the progressbar control (volume)
@@ -571,7 +571,7 @@ CMPC_Lcd::CMPC_Lcd(void)
 	}
 
 	if (FALSE == m_Connection.Initialize(m_ConnCtx)) {
-		//_tperror(_T("Initialize"));
+		//_wperror(L"Initialize");
 		return;
 	}
 
@@ -607,7 +607,7 @@ CMPC_Lcd::~CMPC_Lcd(void)
 }
 
 /* update title name */
-void CMPC_Lcd::SetMediaTitle(const TCHAR* text)
+void CMPC_Lcd::SetMediaTitle(const WCHAR* text)
 {
 	EnterCriticalSection(&cs);
 	m_MonoPage.m_Text1.SetText(text);
@@ -666,7 +666,7 @@ void CMPC_Lcd::SetMediaPos(__int64 nPos)
 }
 
 /* update status message (displayed for nTimeOut milliseconds) */
-void CMPC_Lcd::SetStatusMessage(const TCHAR* text, int nTimeOut)
+void CMPC_Lcd::SetStatusMessage(const WCHAR* text, int nTimeOut)
 {
 	if (!m_Connection.IsConnected()) {
 		return;

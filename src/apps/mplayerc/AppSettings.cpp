@@ -40,7 +40,7 @@ enum {
 };
 
 const LPCWSTR channel_mode_sets[] = {
-	//            ID          Name
+	//         ID          Name
 	L"1.0", // SPK_MONO   "Mono"
 	L"2.0", // SPK_STEREO "Stereo"
 	L"4.0", // SPK_4_0    "4.0"

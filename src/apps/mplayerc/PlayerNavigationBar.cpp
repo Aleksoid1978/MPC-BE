@@ -38,7 +38,7 @@ CPlayerNavigationBar::~CPlayerNavigationBar()
 
 BOOL CPlayerNavigationBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 {
-	if (!CPlayerBar::Create(ResStr(IDS_NAVIGATION_BAR), pParentWnd, ID_VIEW_NAVIGATION, defDockBarID, _T("Navigation Bar"))) {
+	if (!CPlayerBar::Create(ResStr(IDS_NAVIGATION_BAR), pParentWnd, ID_VIEW_NAVIGATION, defDockBarID, L"Navigation Bar")) {
 		return FALSE;
 	}
 

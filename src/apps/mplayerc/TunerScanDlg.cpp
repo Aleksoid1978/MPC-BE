@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -63,7 +63,7 @@ BOOL CTunerScanDlg::OnInitDialog()
 	m_ChannelList.InsertColumn(TSCC_NAME, ResStr(IDS_DVB_CHANNEL_NAME), LVCFMT_LEFT, 250);
 	m_ChannelList.InsertColumn(TSCC_FREQUENCY, ResStr(IDS_DVB_CHANNEL_FREQUENCY), LVCFMT_LEFT, 100);
 	m_ChannelList.InsertColumn(TSCC_ENCRYPTED, ResStr(IDS_DVB_CHANNEL_ENCRYPTION), LVCFMT_LEFT, 80);
-	m_ChannelList.InsertColumn(TSCC_CHANNEL, _T("Channel"), LVCFMT_LEFT, 0);
+	m_ChannelList.InsertColumn(TSCC_CHANNEL, L"Channel", LVCFMT_LEFT, 0);
 
 	m_Progress.SetRange(0, 100);
 	m_Strength.SetRange(0, 100);
@@ -196,14 +196,14 @@ LRESULT CTunerScanDlg::OnNewChannel(WPARAM wParam, LPARAM lParam)
 			nChannelNumber = nItem = m_ChannelList.GetItemCount();
 		}
 
-		strTemp.Format(_T("%d"), nChannelNumber);
+		strTemp.Format(L"%d", nChannelNumber);
 		nItem = m_ChannelList.InsertItem (nItem, strTemp);
 
 		m_ChannelList.SetItemData (nItem, Channel.GetOriginNumber());
 
 		m_ChannelList.SetItemText (nItem, TSCC_NAME, Channel.GetName());
 
-		strTemp.Format(_T("%lu"), Channel.GetFrequency());
+		strTemp.Format(L"%lu", Channel.GetFrequency());
 		m_ChannelList.SetItemText (nItem, TSCC_FREQUENCY, strTemp);
 
 		strTemp = Channel.IsEncrypted() ? ResStr(IDS_DVB_CHANNEL_ENCRYPTED) : ResStr(IDS_DVB_CHANNEL_NOT_ENCRYPTED);
@@ -218,10 +218,10 @@ LRESULT CTunerScanDlg::OnNewChannel(WPARAM wParam, LPARAM lParam)
 void CTunerScanDlg::SetProgress (bool bState)
 {
 	if (bState) {
-		m_btnStart.SetWindowTextW(_T("Stop"));
+		m_btnStart.SetWindowTextW(L"Stop");
 		m_btnSave.EnableWindow(FALSE);
 	} else {
-		m_btnStart.SetWindowTextW(_T("Start"));
+		m_btnStart.SetWindowTextW(L"Start");
 		m_Progress.SetPos (0);
 		m_btnSave.EnableWindow(TRUE);
 	}

@@ -269,7 +269,7 @@ void CPreView::OnPaint()
 
 	font.CreateFont(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET,
 									OUT_RASTER_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH | FF_MODERN,
-									_T("Tahoma"));
+									L"Tahoma");
 
 	mdc.SelectObject(&font);
 	CRect rtime = rcBar;

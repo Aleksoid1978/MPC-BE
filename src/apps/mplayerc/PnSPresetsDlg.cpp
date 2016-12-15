@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -71,13 +71,13 @@ void CPnSPresetsDlg::StringToParams(CString str, CString& label, double& PosX, d
 {
 	int i = 0, j = 0;
 
-	for (CString token = str.Tokenize(_T(","), i); !token.IsEmpty(); token = str.Tokenize(_T(","), i), j++) {
+	for (CString token = str.Tokenize(L",", i); !token.IsEmpty(); token = str.Tokenize(L",", i), j++) {
 		if (j == 0) {
 			label = token;
 		} else {
 			float f = 0;
 
-			if (_stscanf_s(token, _T("%f"), &f) != 1) {
+			if (swscanf_s(token, L"%f", &f) != 1) {
 				continue;
 			}
 
@@ -104,7 +104,7 @@ void CPnSPresetsDlg::StringToParams(CString str, CString& label, double& PosX, d
 CString CPnSPresetsDlg::ParamsToString(CString label, double PosX, double PosY, double ZoomX, double ZoomY)
 {
 	CString str;
-	str.Format(_T("%s,%.3f,%.3f,%.3f,%.3f"), label, PosX, PosY, ZoomX, ZoomY);
+	str.Format(L"%s,%.3f,%.3f,%.3f,%.3f", label, PosX, PosY, ZoomX, ZoomY);
 
 	return(str);
 }
@@ -138,10 +138,10 @@ void CPnSPresetsDlg::OnLbnSelchangeList1()
 		m_ZoomY = ZoomY;
 	} else {
 		m_label.Empty();
-		m_PosX.SetWindowText(_T(""));
-		m_PosY.SetWindowText(_T(""));
-		m_ZoomX.SetWindowText(_T(""));
-		m_ZoomY.SetWindowText(_T(""));
+		m_PosX.SetWindowText(L"");
+		m_PosY.SetWindowText(L"");
+		m_ZoomX.SetWindowText(L"");
+		m_ZoomY.SetWindowText(L"");
 	}
 
 	UpdateData(FALSE);
@@ -149,8 +149,8 @@ void CPnSPresetsDlg::OnLbnSelchangeList1()
 
 void CPnSPresetsDlg::OnBnClickedButton2() // new
 {
-	m_pnspresets.Add(_T("New,0.5,0.5,1.0,1.0"));
-	m_list.SetCurSel(m_list.AddString(_T("New")));
+	m_pnspresets.Add(L"New,0.5,0.5,1.0,1.0");
+	m_list.SetCurSel(m_list.AddString(L"New"));
 
 	OnLbnSelchangeList1();
 }
@@ -164,7 +164,7 @@ void CPnSPresetsDlg::OnUpdateButton2(CCmdUI* pCmdUI)
 		m_list.GetText(len-1, str);
 	}
 
-	pCmdUI->Enable(str != _T("New"));
+	pCmdUI->Enable(str != L"New");
 }
 
 void CPnSPresetsDlg::OnBnClickedButton6() // del

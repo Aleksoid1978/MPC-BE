@@ -37,7 +37,7 @@ CGoToDlg::CGoToDlg(REFERENCE_TIME time, REFERENCE_TIME maxTime, double fps, CWnd
 		CString str = AfxGetApp()->GetProfileString(IDS_R_SETTINGS, IDS_RS_GOTO_FPS, L"0");
 		float fps;
 
-		if (_stscanf_s(str, L"%f", &fps) == 1) {
+		if (swscanf_s(str, L"%f", &fps) == 1) {
 			m_fps = fps;
 		}
 	}

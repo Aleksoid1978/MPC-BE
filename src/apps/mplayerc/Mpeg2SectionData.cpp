@@ -507,11 +507,11 @@ HRESULT CMpeg2DataParser::ParseEIT(ULONG ulSID, PresentFollowing &NowNext)
 			 (m_Filter.SectionNumber <= 22));
 
 	if (InfoEvent.ServiceId != ulSID) {
-		NowNext.StartTime = _T("");
-		NowNext.Duration = _T("");
-		NowNext.cPresent = _T(" Info not available.");
-		NowNext.SummaryDesc = _T("");
-		NowNext.cFollowing = _T("");
+		NowNext.StartTime = L"";
+		NowNext.Duration = L"";
+		NowNext.cPresent = L" Info not available.";
+		NowNext.SummaryDesc = L"";
+		NowNext.cFollowing = L"";
 	}
 
 	return S_OK;

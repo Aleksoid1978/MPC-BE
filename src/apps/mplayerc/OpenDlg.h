@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -69,8 +69,8 @@ class COpenFileDlg : public CFileDialog
 	DECLARE_DYNAMIC(COpenFileDlg)
 
 private:
-	TCHAR* m_buff;
-	TCHAR* m_InitialDir;
+	WCHAR* m_buff;
+	WCHAR* m_InitialDir;
 	CAtlArray<CString>& m_mask;
 
 public:

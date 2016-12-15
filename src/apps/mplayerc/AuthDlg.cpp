@@ -73,7 +73,7 @@ BOOL CAuthDlg::OnInitDialog()
 
 		if (hSecKey) {
 			int i = 0;
-			TCHAR username[256], password[256];
+			WCHAR username[256], password[256];
 
 			for (;;) {
 				DWORD unlen = _countof(username);
@@ -89,12 +89,12 @@ BOOL CAuthDlg::OnInitDialog()
 			}
 		}
 	} else {
-		CAutoVectorPtr<TCHAR> buff;
-		buff.Allocate(32767/sizeof(TCHAR));
+		CAutoVectorPtr<WCHAR> buff;
+		buff.Allocate(32767/sizeof(WCHAR));
 
-		DWORD len = GetPrivateProfileSection(IDS_R_LOGINS, buff, 32767/sizeof(TCHAR), pApp->m_pszProfileName);
+		DWORD len = GetPrivateProfileSection(IDS_R_LOGINS, buff, 32767/sizeof(WCHAR), pApp->m_pszProfileName);
 
-		TCHAR* p = buff;
+		WCHAR* p = buff;
 		while (*p && len > 0) {
 			CString str = p;
 			p += str.GetLength()+1;
@@ -120,7 +120,7 @@ void CAuthDlg::OnBnClickedOk()
 
 	if (!m_username.IsEmpty()) {
 		CWinApp* pApp = AfxGetApp();
-		pApp->WriteProfileString(IDS_R_LOGINS, m_username, m_remember ? DEncrypt(m_password) : _T(""));
+		pApp->WriteProfileString(IDS_R_LOGINS, m_username, m_remember ? DEncrypt(m_password) : L"");
 	}
 
 	OnOK();

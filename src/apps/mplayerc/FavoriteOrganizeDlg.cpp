@@ -72,7 +72,7 @@ void CFavoriteOrganizeDlg::SetupList(bool fSave)
 			if (!sl.IsEmpty()) {
 				REFERENCE_TIME rt = 0;
 
-				if (1 == _stscanf_s(sl.GetHead(), L"%I64d", &rt) && rt > 0) {
+				if (1 == swscanf_s(sl.GetHead(), L"%I64d", &rt) && rt > 0) {
 					DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
 
 					CString str;

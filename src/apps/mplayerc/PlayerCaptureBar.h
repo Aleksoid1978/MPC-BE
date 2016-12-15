@@ -43,7 +43,7 @@ class CFormat : public CAutoPtrArray<CFormatElem<T> >
 {
 public:
 	CString name;
-	CFormat(CString name = _T("")) {
+	CFormat(CString name = L"") {
 		this->name = name;
 	}
 	virtual ~CFormat() {}
@@ -161,7 +161,7 @@ class CVidFormatArray : public CFormatArray<VIDEO_STREAM_CONFIG_CAPS>
 {
 public:
 	CString MakeFormatName(AM_MEDIA_TYPE* pmt) {
-		CString str(_T("Default"));
+		CString str(L"Default");
 
 		if (!pmt) {
 			return(str);
@@ -181,9 +181,11 @@ public:
 			StringFromGUID2(pmt->subtype, guid, 100);
 
 			if (CStringW(guid).MakeUpper().Find(L"0000-0010-8000-00AA00389B71") >= 0) {
-				str.Format(_T("%c%c%c%c"),
-						   (TCHAR)((pmt->subtype.Data1>>0)&0xff), (TCHAR)((pmt->subtype.Data1>>8)&0xff),
-						   (TCHAR)((pmt->subtype.Data1>>16)&0xff), (TCHAR)((pmt->subtype.Data1>>24)&0xff));
+				str.Format(L"%c%c%c%c",
+						   (WCHAR)((pmt->subtype.Data1>>0)&0xff),
+						   (WCHAR)((pmt->subtype.Data1>>8)&0xff),
+						   (WCHAR)((pmt->subtype.Data1>>16)&0xff),
+						   (WCHAR)((pmt->subtype.Data1>>24)&0xff));
 			}
 
 			return(str);
@@ -191,27 +193,29 @@ public:
 
 		switch (bih->biCompression) {
 			case BI_RGB:
-				str.Format(_T("RGB%d"), bih->biBitCount);
+				str.Format(L"RGB%d", bih->biBitCount);
 				break;
 			case BI_RLE8:
-				str = _T("RLE8");
+				str = L"RLE8";
 				break;
 			case BI_RLE4:
-				str = _T("RLE4");
+				str = L"RLE4";
 				break;
 			case BI_BITFIELDS:
-				str.Format(_T("BITF%d"), bih->biBitCount);
+				str.Format(L"BITF%d", bih->biBitCount);
 				break;
 			case BI_JPEG:
-				str = _T("JPEG");
+				str = L"JPEG";
 				break;
 			case BI_PNG:
-				str = _T("PNG");
+				str = L"PNG";
 				break;
 			default:
-				str.Format(_T("%c%c%c%c"),
-						   (TCHAR)((bih->biCompression>>0)&0xff), (TCHAR)((bih->biCompression>>8)&0xff),
-						   (TCHAR)((bih->biCompression>>16)&0xff), (TCHAR)((bih->biCompression>>24)&0xff));
+				str.Format(L"%c%c%c%c",
+						   (WCHAR)((bih->biCompression>>0)&0xff),
+						   (WCHAR)((bih->biCompression>>8)&0xff),
+						   (WCHAR)((bih->biCompression>>16)&0xff),
+						   (WCHAR)((bih->biCompression>>24)&0xff));
 				break;
 		}
 
@@ -219,7 +223,7 @@ public:
 	}
 
 	CString MakeDimensionName(CVidFormatElem* pfe) {
-		CString str(_T("Default"));
+		CString str(L"Default");
 
 		if (!pfe) {
 			return(str);
@@ -235,12 +239,12 @@ public:
 			return(str);
 		}
 
-		str.Format(_T("%dx%d %.2f"), bih->biWidth, bih->biHeight, (float)10000000/((VIDEOINFOHEADER*)pfe->mt.pbFormat)->AvgTimePerFrame);
+		str.Format(L"%dx%d %.2f", bih->biWidth, bih->biHeight, (float)10000000/((VIDEOINFOHEADER*)pfe->mt.pbFormat)->AvgTimePerFrame);
 
 		if (pfe->mt.formattype == FORMAT_VideoInfo2) {
 			VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)pfe->mt.pbFormat;
 			CString str2;
-			str2.Format(_T(" i%02x %d:%d"), vih2->dwInterlaceFlags, vih2->dwPictAspectRatioX, vih2->dwPictAspectRatioY);
+			str2.Format(L" i%02x %d:%d", vih2->dwInterlaceFlags, vih2->dwPictAspectRatioX, vih2->dwPictAspectRatioY);
 			str += str2;
 		}
 
@@ -255,7 +259,7 @@ class CAudFormatArray : public CFormatArray<AUDIO_STREAM_CONFIG_CAPS>
 {
 public:
 	CString MakeFormatName(AM_MEDIA_TYPE* pmt) {
-		CString str(_T("Unknown"));
+		CString str(L"Unknown");
 
 		if (!pmt) {
 			return(str);
@@ -271,7 +275,7 @@ public:
 			StringFromGUID2(pmt->subtype, guid, 100);
 
 			if (CStringW(guid).MakeUpper().Find(L"0000-0010-8000-00AA00389B71") >= 0) {
-				str.Format(_T("0x%04x"), pmt->subtype.Data1);
+				str.Format(L"0x%04x", pmt->subtype.Data1);
 			}
 
 			return(str);
@@ -279,10 +283,10 @@ public:
 
 		switch (wfe->wFormatTag) {
 			case 1:
-				str = _T("PCM ");
+				str = L"PCM ";
 				break;
 			default:
-				str.Format(_T("0x%03x "), wfe->wFormatTag);
+				str.Format(L"0x%03x ", wfe->wFormatTag);
 				break;
 		}
 
@@ -290,7 +294,7 @@ public:
 	}
 
 	CString MakeDimensionName(CAudFormatElem* pfe) {
-		CString str(_T("Unknown"));
+		CString str(L"Unknown");
 
 		if (!pfe) {
 			return(str);
@@ -307,26 +311,26 @@ public:
 		str.Empty();
 		CString str2;
 
-		str2.Format(_T("%6dKHz "), wfe->nSamplesPerSec);
+		str2.Format(L"%6dKHz ", wfe->nSamplesPerSec);
 		str += str2;
 
-		str2.Format(_T("%dbps "), wfe->wBitsPerSample);
+		str2.Format(L"%dbps ", wfe->wBitsPerSample);
 		str += str2;
 
 		switch (wfe->nChannels) {
 			case 1:
-				str += _T("mono ");
+				str += L"mono ";
 				break;
 			case 2:
-				str += _T("stereo ");
+				str += L"stereo ";
 				break;
 			default:
-				str2.Format(_T("%d channels "), wfe->nChannels);
+				str2.Format(L"%d channels ", wfe->nChannels);
 				str += str2;
 				break;
 		}
 
-		str2.Format(_T("%3dkbps "), wfe->nAvgBytesPerSec*8/1000);
+		str2.Format(L"%3dkbps ", wfe->nAvgBytesPerSec*8/1000);
 		str += str2;
 
 		return(str);
