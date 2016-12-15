@@ -234,11 +234,11 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 
 	SetMinTrackSize(CSize(250, 40));
 
-	m_targets.AddString(_T("ps_2_0"));
-	m_targets.AddString(_T("ps_2_a"));
-	m_targets.AddString(_T("ps_2_sw"));
-	m_targets.AddString(_T("ps_3_0"));
-	m_targets.AddString(_T("ps_3_sw"));
+	m_targets.AddString(L"ps_2_0");
+	m_targets.AddString(L"ps_2_a");
+	m_targets.AddString(L"ps_2_sw");
+	m_targets.AddString(L"ps_3_0");
+	m_targets.AddString(L"ps_3_sw");
 
 	POSITION pos = AfxGetAppSettings().m_shaders.GetHeadPosition();
 
@@ -303,7 +303,7 @@ BOOL CShaderEditorDlg::PreTranslateMessage(MSG* pMsg)
 		int nStartChar, nEndChar;
 		m_srcdata.GetSel(nStartChar, nEndChar);
 		if (nStartChar == nEndChar) {
-			m_srcdata.ReplaceSel(_T("\t"));
+			m_srcdata.ReplaceSel(L"\t");
 		}
 		return TRUE;
 	} else if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE) {
@@ -339,13 +339,13 @@ void CShaderEditorDlg::OnCbnSelchangeCombo1()
 
 	if (i < 0) {
 		CStringA srcdata;
-		if (!LoadResource(IDF_SHADER_EMPTY, srcdata, _T("FILE"))) {
+		if (!LoadResource(IDF_SHADER_EMPTY, srcdata, L"FILE")) {
 			return;
 		}
 
 		CAppSettings::Shader s;
 		s.label = label;
-		s.target = _T("ps_2_0");
+		s.target = L"ps_2_0";
 		s.srcdata = CString(srcdata);
 
 		POSITION pos = AfxGetAppSettings().m_shaders.AddTail(s);
@@ -360,7 +360,7 @@ void CShaderEditorDlg::OnCbnSelchangeCombo1()
 	m_targets.SetWindowText(m_pShader->target);
 
 	CString srcdata = m_pShader->srcdata;
-	srcdata.Replace(_T("\n"), _T("\r\n"));
+	srcdata.Replace(L"\n", L"\r\n");
 	m_srcdata.SetWindowText(srcdata);
 
 	AfxGetMainFrame()->UpdateShaders(m_pShader->label);
@@ -382,7 +382,7 @@ void CShaderEditorDlg::OnBnClickedButton2()
 		if (m_pShader == &s.m_shaders.GetAt(pos)) {
 			CString strShaderPath;
 			if (AfxGetMyApp()->GetAppSavePath(strShaderPath)) {
-				strShaderPath += _T("Shaders\\") + m_pShader->label + _T(".hlsl");
+				strShaderPath += L"Shaders\\" + m_pShader->label + L".hlsl";
 				DeleteFile(strShaderPath);
 			}
 
@@ -394,11 +394,11 @@ void CShaderEditorDlg::OnBnClickedButton2()
 				m_labels.DeleteString(i);
 			}
 
-			m_labels.SetWindowText(_T(""));
-			m_targets.SetWindowText(_T(""));
-			m_srcdata.SetWindowText(_T(""));
-			m_output.SetWindowText(_T(""));
-			AfxGetMainFrame()->UpdateShaders(_T(""));
+			m_labels.SetWindowText(L"");
+			m_targets.SetWindowText(L"");
+			m_srcdata.SetWindowText(L"");
+			m_output.SetWindowText(L"");
+			AfxGetMainFrame()->UpdateShaders(L"");
 			break;
 		}
 	}
@@ -409,7 +409,7 @@ void CShaderEditorDlg::OnTimer(UINT_PTR nIDEvent)
 	if (nIDEvent == m_nIDEventShader && IsWindowVisible() && m_pShader) {
 		CString srcdata;
 		m_srcdata.GetWindowText(srcdata);
-		srcdata.Replace(_T("\r"), _T(""));
+		srcdata.Replace(L"\r", L"");
 		srcdata.Trim();
 
 		CString target;
@@ -430,14 +430,14 @@ void CShaderEditorDlg::OnTimer(UINT_PTR nIDEvent)
 			HRESULT hr = m_pPSC->CompileShader(CStringA(srcdata), "main", CStringA(target), D3DCOMPILE_DEBUG, NULL, NULL, &errmsg, &disasm);
 
 			if (SUCCEEDED(hr)) {
-				errmsg = _T("D3DXCompileShader succeeded\n");
-				errmsg += _T("\n");
+				errmsg = L"D3DXCompileShader succeeded\n";
+				errmsg += L"\n";
 				errmsg += disasm;
 
 				AfxGetMainFrame()->UpdateShaders(m_pShader->label);
 			}
 
-			errmsg.Replace(_T("\n"), _T("\r\n"));
+			errmsg.Replace(L"\n", L"\r\n");
 
 			m_output.SetWindowText(errmsg);
 

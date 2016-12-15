@@ -29,7 +29,7 @@ class CShaderAutoCompleteDlg : public CResizableDialog
 {
 	TOOLINFO m_ti;
 	HWND m_hToolTipWnd;
-	TCHAR m_text[1024];
+	WCHAR m_text[1024];
 
 public:
 	CShaderAutoCompleteDlg(CWnd* pParent = NULL);

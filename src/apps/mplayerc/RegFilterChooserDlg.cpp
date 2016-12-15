@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -53,7 +53,7 @@ void CRegFilterChooserDlg::AddToList(IMoniker* pMoniker)
 	CComPtr<IPropertyBag> pPB;
 	if (SUCCEEDED(pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB))) {
 		CComVariant var;
-		if (SUCCEEDED(pPB->Read(CComBSTR(_T("FriendlyName")), &var, NULL))) {
+		if (SUCCEEDED(pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL))) {
 			m_list.SetItemData(
 				m_list.InsertItem(-1, CString(CStringW(var.bstrVal))),
 				(DWORD_PTR)m_monikers.AddTail(pMoniker));
@@ -146,7 +146,7 @@ void CRegFilterChooserDlg::OnBnClickedButton1()
 
 	CFileDialog dlg(TRUE, NULL, NULL,
 					OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
-					_T("DirectShow Filters (*.ax,*.dll)|*.ax;*.dll|"), this, 0);
+					L"DirectShow Filters (*.ax,*.dll)|*.ax;*.dll|", this, 0);
 	dlg.m_ofn.lpstrInitialDir = s.strLastOpenFilterDir;
 
 	if (dlg.DoModal() == IDOK) {

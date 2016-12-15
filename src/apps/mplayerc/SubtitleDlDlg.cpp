@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,6 +29,32 @@
 #define UWM_PARSE	(WM_USER + 100)
 #define UWM_FAILED	(WM_USER + 101)
 
+size_t StrMatchA(LPCSTR a, LPCSTR b)
+{
+	size_t count = 0;
+
+	for (; *a && *b; a++, b++, count++) {
+		if (tolower(*a) != tolower(*b)) {
+			break;
+		}
+	}
+
+	return count;
+}
+
+size_t StrMatchW(LPCWSTR a, LPCWSTR b)
+{
+	size_t count = 0;
+
+	for (; *a && *b; a++, b++, count++) {
+		if (towlower(*a) != towlower(*b)) {
+			break;
+		}
+	}
+
+	return count;
+}
+
 CSubtitleDlDlg::CSubtitleDlDlg(CWnd* pParent, const CStringA& url, const CString& filename)
 	: CResizableDialog(CSubtitleDlDlg::IDD, pParent)
 	, m_ps(&m_list, 0, TRUE)
@@ -51,25 +77,12 @@ void CSubtitleDlDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST1, m_list);
 }
 
-size_t CSubtitleDlDlg::StrMatch(LPCTSTR a, LPCTSTR b)
-{
-	size_t count = 0;
-
-	for (; *a && *b; a++, b++, count++) {
-		if (_totlower(*a) != _totlower(*b)) {
-			break;
-		}
-	}
-
-	return count;
-}
-
 CString CSubtitleDlDlg::LangCodeToName(LPCSTR code)
 {
 	// accept only three-letter language codes
 	size_t codeLen = strlen(code);
 	if (codeLen != 3) {
-		return _T("");
+		return L"";
 	}
 
 	CString name = ISO6392ToLanguage(code);
@@ -99,12 +112,11 @@ CString CSubtitleDlDlg::LangCodeToName(LPCSTR code)
 	};
 
 	for (size_t i = 0; i < _countof(ltable); ++i) {
-		CString name2 = ltable[i];
-		if (StrMatch(name2, CString(code)) == codeLen) {
-			return name2;
+		if (StrMatchA(ltable[i], code) == codeLen) {
+			return CString(ltable[i]);
 		}
 	}
-	return _T("");
+	return L"";
 }
 
 int CALLBACK CSubtitleDlDlg::DefSortCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
@@ -131,7 +143,7 @@ int CALLBACK CSubtitleDlDlg::DefSortCompare(LPARAM lParam1, LPARAM lParam2, LPAR
 		return 1;
 	} else if (lpos == INT_MAX && rpos == INT_MAX) {
 		// lexicographical order
-		int res = _tcscmp(left, right);
+		int res = wcscmp(left, right);
 		if (res != 0) {
 			return res;
 		}
@@ -140,8 +152,8 @@ int CALLBACK CSubtitleDlDlg::DefSortCompare(LPARAM lParam1, LPARAM lParam2, LPAR
 	// sort by filename
 	left  = defps->m_list->GetItemText(nLeft, COL_FILENAME);
 	right = defps->m_list->GetItemText(nRight, COL_FILENAME);
-	size_t lmatch = StrMatch(defps->m_filename, left);
-	size_t rmatch = StrMatch(defps->m_filename, right);
+	size_t lmatch = StrMatchW(defps->m_filename, left);
+	size_t rmatch = StrMatchW(defps->m_filename, right);
 
 	// sort by matching character number
 	if (lmatch > rmatch) {
@@ -168,7 +180,7 @@ void CSubtitleDlDlg::LoadList()
 	for (int i = 0; i < m_parsed_movies.GetCount(); ++i) {
 		isdb_movie_parsed& m = m_parsed_movies[i];
 
-		int iItem = m_list.InsertItem(i, _T(""));
+		int iItem = m_list.InsertItem(i, L"");
 		m_list.SetItemData(iItem, m.ptr);
 		m_list.SetItemText(iItem, COL_FILENAME, m.name);
 		m_list.SetItemText(iItem, COL_LANGUAGE, m.language);
@@ -252,7 +264,7 @@ bool CSubtitleDlDlg::Parse()
 			p.name = UTF8To16(s.name);
 			p.language = s.language;
 			p.format = s.format;
-			p.disc.Format(_T("%d/%d"), s.disc_no, s.discs);
+			p.disc.Format(L"%d/%d", s.disc_no, s.discs);
 			p.ptr = reinterpret_cast<DWORD_PTR>(&s);
 
 			m_parsed_movies.Add(p);
@@ -306,12 +318,12 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 	CArray<int> columnWidth;
 
 	CString strColumnWidth = AfxGetApp()->GetProfileString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH);
-	CString token = strColumnWidth.Tokenize(_T(","), curPos);
+	CString token = strColumnWidth.Tokenize(L",", curPos);
 
 	while (!token.IsEmpty()) {
-		if (_stscanf_s(token, L"%d", &n) == 1) {
+		if (swscanf_s(token, L"%d", &n) == 1) {
 			columnWidth.Add(n);
-			token = strColumnWidth.Tokenize(_T(","), curPos);
+			token = strColumnWidth.Tokenize(L",", curPos);
 		} else {
 			throw 1;
 		}
@@ -351,7 +363,7 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 	// fill language->position map
 	int listPos = 0;
 	int tPos = 0;
-	CString langCode = order.Tokenize(_T(",; "), tPos);
+	CString langCode = order.Tokenize(L",; ", tPos);
 	while (tPos != -1) {
 		int pos;
 		CString langCodeISO6391 = ISO6392To6391(CStringA(langCode));
@@ -362,7 +374,7 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 		if (!langName.IsEmpty() && !m_defps.m_langPos.Lookup(langName, pos)) {
 			m_defps.m_langPos[langName] = listPos;
 		}
-		langCode = order.Tokenize(_T(",; "), tPos);
+		langCode = order.Tokenize(L",; ", tPos);
 		listPos++;
 	}
 
@@ -422,7 +434,7 @@ void CSubtitleDlDlg::OnOK()
 		if (OpenUrl(is, CString(url), str)) {
 
 			if (pFrame->m_pDVS) {
-				TCHAR lpszTempPath[_MAX_PATH] = { 0 };
+				WCHAR lpszTempPath[_MAX_PATH] = { 0 };
 				if (::GetTempPath(_MAX_PATH, lpszTempPath)) {
 					CString subFileName(lpszTempPath);
 					subFileName.Append(CString(sub.name));

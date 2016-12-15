@@ -7215,7 +7215,7 @@ void CMainFrame::OnViewPanNScanPresets(UINT nID)
 	int i = 0, j = 0;
 	for (CString token = str.Tokenize(L",", i); !token.IsEmpty(); token = str.Tokenize(L",", i), j++) {
 		float f = 0;
-		if (_stscanf_s(token, L"%f", &f) != 1) {
+		if (swscanf_s(token, L"%f", &f) != 1) {
 			continue;
 		}
 
@@ -15062,7 +15062,7 @@ void CMainFrame::SetupFavoritesSubMenu()
 		if (!sl.IsEmpty()) {
 			// pos
 			REFERENCE_TIME rt = 0;
-			if (1 == _stscanf_s(sl.GetHead(), L"%I64d", &rt) && rt > 0) {
+			if (1 == swscanf_s(sl.GetHead(), L"%I64d", &rt) && rt > 0) {
 				DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
 				str.Format(L"[%02u:%02u:%02u]", hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
 			}
@@ -15072,7 +15072,7 @@ void CMainFrame::SetupFavoritesSubMenu()
 				sl.RemoveHeadNoReturn();
 
 				BOOL bRelativeDrive = FALSE;
-				if (_stscanf_s(sl.GetHead(), L"%d", &bRelativeDrive) == 1) {
+				if (swscanf_s(sl.GetHead(), L"%d", &bRelativeDrive) == 1) {
 					if (bRelativeDrive) {
 						str.Format(L"[RD]%s", str);
 					}
@@ -15118,7 +15118,7 @@ void CMainFrame::SetupFavoritesSubMenu()
 				// pos
 				CString posStr;
 				REFERENCE_TIME rt = 0;
-				if (1 == _stscanf_s(sl.GetHead(), L"%I64d", &rt) && rt > 0) {
+				if (1 == swscanf_s(sl.GetHead(), L"%I64d", &rt) && rt > 0) {
 					DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
 					posStr.Format(L"[%02u:%02u:%02u]", hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
 				}

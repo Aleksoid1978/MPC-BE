@@ -52,7 +52,7 @@ LPTOP_LEVEL_EXCEPTION_FILTER WINAPI MyDummySetUnhandledExceptionFilter( LPTOP_LE
 
 BOOL CMiniDump::PreventSetUnhandledExceptionFilter()
 {
-	HMODULE hKernel32 = LoadLibrary(_T("kernel32.dll"));
+	HMODULE hKernel32 = LoadLibrary(L"kernel32.dll");
 	if (hKernel32 == NULL) {
 		return FALSE;
 	}
@@ -82,17 +82,17 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 {
 	LONG	retval	= EXCEPTION_CONTINUE_SEARCH;
 	HMODULE	hDll	= NULL;
-	TCHAR	szResult[800] = {0};
+	WCHAR	szResult[800] = {0};
 	CString strDumpPath;
 
 	if (!m_bMiniDumpEnabled) {
 		return retval;
 	}
 
-	hDll = ::LoadLibrary(GetProgramDir() + _T("DBGHELP.DLL"));
+	hDll = ::LoadLibrary(GetProgramDir() + L"DBGHELP.DLL");
 
 	if (hDll == NULL) {
-		hDll = ::LoadLibrary(_T("DBGHELP.DLL"));
+		hDll = ::LoadLibrary(L"DBGHELP.DLL");
 	}
 
 	if (hDll != NULL) {
@@ -103,7 +103,7 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 				VERIFY(CreateDirectory(strDumpPath, NULL));
 			}
 
-			strDumpPath.AppendFormat(_T("%s.exe.%d.%d.%d.%d.dmp"), AfxGetApp()->m_pszExeName, MPC_VERSION_NUM_SVN);
+			strDumpPath.AppendFormat(L"%s.exe.%d.%d.%d.%d.dmp", AfxGetApp()->m_pszExeName, MPC_VERSION_NUM_SVN);
 
 			HANDLE hFile = ::CreateFile(strDumpPath, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS,
 										FILE_ATTRIBUTE_NORMAL, NULL);
@@ -117,24 +117,24 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 
 				BOOL bDumpCreated = pMiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &ExInfo, NULL, NULL);
 				if (bDumpCreated) {
-					_stprintf_s(szResult, _countof(szResult), ResStr(IDS_MPC_CRASH), strDumpPath);
+					swprintf_s(szResult, _countof(szResult), ResStr(IDS_MPC_CRASH), strDumpPath);
 					retval = EXCEPTION_EXECUTE_HANDLER;
 				} else {
-					_stprintf_s(szResult, _countof(szResult), ResStr(IDS_MPC_MINIDUMP_FAIL), strDumpPath, GetLastError());
+					swprintf_s(szResult, _countof(szResult), ResStr(IDS_MPC_MINIDUMP_FAIL), strDumpPath, GetLastError());
 				}
 
 				::CloseHandle( hFile );
 			} else {
-				_stprintf_s(szResult, _countof(szResult), ResStr(IDS_MPC_MINIDUMP_FAIL), strDumpPath, GetLastError());
+				swprintf_s(szResult, _countof(szResult), ResStr(IDS_MPC_MINIDUMP_FAIL), strDumpPath, GetLastError());
 			}
 		}
 		FreeLibrary(hDll);
 	}
 
 	if (szResult[0]) {
-		switch (MessageBox(AfxGetApp()->GetMainWnd()->m_hWnd, szResult, _T("MPC-BE Mini Dump"), retval ? MB_YESNO : MB_OK)) {
+		switch (MessageBox(AfxGetApp()->GetMainWnd()->m_hWnd, szResult, L"MPC-BE Mini Dump", retval ? MB_YESNO : MB_OK)) {
 			case IDYES:
-				ShellExecute(NULL, _T("open"), _T("http://sourceforge.net/p/mpcbe/tickets/"), NULL, NULL, SW_SHOWDEFAULT); // hmm
+				ShellExecute(NULL, L"open", L"http://sourceforge.net/p/mpcbe/tickets/", NULL, NULL, SW_SHOWDEFAULT); // hmm
 				ExploreToFile(strDumpPath);
 				break;
 			case IDNO:

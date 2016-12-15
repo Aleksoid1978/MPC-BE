@@ -223,7 +223,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 		}
 
 		int id = 0;
-		if (_stscanf_s(icon.Mid(i+1), L"%d", &id) != 1) {
+		if (swscanf_s(icon.Mid(i+1), L"%d", &id) != 1) {
 			break;
 		}
 

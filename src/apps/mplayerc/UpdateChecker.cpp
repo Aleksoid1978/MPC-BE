@@ -187,7 +187,7 @@ BOOL UpdateCheckerDlg::OnInitDialog()
 void UpdateCheckerDlg::OnOK()
 {
 	if (m_updateStatus == UPDATER_NEW_VERSION_IS_AVAILABLE) {
-		ShellExecute(NULL, _T("open"), m_latestURL, NULL, NULL, SW_SHOWDEFAULT);
+		ShellExecute(NULL, L"open", m_latestURL, NULL, NULL, SW_SHOWDEFAULT);
 	}
 
 	__super::OnOK();

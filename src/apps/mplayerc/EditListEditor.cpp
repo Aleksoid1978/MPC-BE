@@ -58,7 +58,7 @@ void CClip::SetOut (REFERENCE_TIME rtVal)
 CString CClip::GetIn()
 {
 	if (m_rtIn == INVALID_TIME) {
-		return _T("");
+		return L"";
 	} else {
 		return ReftimeToString(m_rtIn);
 	}
@@ -67,7 +67,7 @@ CString CClip::GetIn()
 CString CClip::GetOut()
 {
 	if (m_rtOut == INVALID_TIME) {
-		return _T("");
+		return L"";
 	} else {
 		return ReftimeToString(m_rtOut);
 	}
@@ -105,17 +105,17 @@ END_MESSAGE_MAP()
 
 BOOL CEditListEditor::Create(CWnd* pParentWnd, UINT defDockBarID)
 {
-	if (!__super::Create(ResStr(IDS_EDIT_LIST_EDITOR), pParentWnd, ID_VIEW_EDITLISTEDITOR, defDockBarID, _T("Edit List Editor"))) {
+	if (!__super::Create(ResStr(IDS_EDIT_LIST_EDITOR), pParentWnd, ID_VIEW_EDITLISTEDITOR, defDockBarID, L"Edit List Editor")) {
 		return FALSE;
 	}
 
-	m_stUsers.Create(_T("User :"), WS_VISIBLE | WS_CHILD, CRect (5,5,100,21), this, 0);
+	m_stUsers.Create(L"User :", WS_VISIBLE | WS_CHILD, CRect (5,5,100,21), this, 0);
 	m_cbUsers.Create(WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST, CRect (90,0, 260, 21), this, 0);
-	FillCombo(_T("Users.txt"), m_cbUsers, false);
+	FillCombo(L"Users.txt", m_cbUsers, false);
 
-	m_stHotFolders.Create(_T("Hot folder :"), WS_VISIBLE | WS_CHILD, CRect (5,35,100,51), this, 0);
+	m_stHotFolders.Create(L"Hot folder :", WS_VISIBLE | WS_CHILD, CRect (5,35,100,51), this, 0);
 	m_cbHotFolders.Create(WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST, CRect (90,30, 260, 21), this, 0);
-	FillCombo(_T("HotFolders.txt"), m_cbHotFolders, true);
+	FillCombo(L"HotFolders.txt", m_cbHotFolders, true);
 
 	m_list.CreateEx(
 		WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE,
@@ -126,10 +126,10 @@ BOOL CEditListEditor::Create(CWnd* pParentWnd, UINT defDockBarID)
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
-	m_list.InsertColumn(COL_IN,	 _T("Nb."),  LVCFMT_LEFT, 35);
-	m_list.InsertColumn(COL_IN,	 _T("In"),  LVCFMT_LEFT, 100);
-	m_list.InsertColumn(COL_OUT, _T("Out"), LVCFMT_LEFT, 100);
-	m_list.InsertColumn(COL_NAME, _T("Name"), LVCFMT_LEFT, 150);
+	m_list.InsertColumn(COL_IN,	 L"Nb.",  LVCFMT_LEFT, 35);
+	m_list.InsertColumn(COL_IN,	 L"In",  LVCFMT_LEFT, 100);
+	m_list.InsertColumn(COL_OUT, L"Out", LVCFMT_LEFT, 100);
+	m_list.InsertColumn(COL_NAME, L"Name", LVCFMT_LEFT, 150);
 
 	m_fakeImageList.Create(1, 16, ILC_COLOR4, 10, 10);
 	m_list.SetImageList(&m_fakeImageList, LVSIL_SMALL);
@@ -186,7 +186,7 @@ void CEditListEditor::SaveEditListToFile()
 				CClip&	CurClip = m_EditList.GetAt(pos);
 
 				if (CurClip.HaveIn() && CurClip.HaveOut()) {
-					strLine.Format(_T("%s\t%s\t%s\t%s\t%s\n"), CurClip.GetIn(), CurClip.GetOut(), CurClip.GetName(), strUser, strHotFolders);
+					strLine.Format(L"%s\t%s\t%s\t%s\t%s\n", CurClip.GetIn(), CurClip.GetOut(), CurClip.GetName(), strUser, strHotFolders);
 					EditListFile.WriteString (strLine);
 				}
 			}
@@ -215,27 +215,27 @@ void CEditListEditor::OpenFile(LPCTSTR lpFileName)
 	CString			strHotFolders;
 
 	CloseFile();
-	m_strFileName.Format(_T("%s.edl"), lpFileName);
+	m_strFileName.Format(L"%s.edl", lpFileName);
 
 	if (EditListFile.Open (m_strFileName, CFile::modeRead)) {
 		m_bFileOpen = true;
 
 		while (EditListFile.ReadString(strLine)) {
 			//int		nPos = 0;
-			CString		strIn;		//	= strLine.Tokenize(_T(" \t"), nPos);
-			CString		strOut;		//	= strLine.Tokenize(_T(" \t"), nPos);
-			CString		strName;	//	= strLine.Tokenize(_T(" \t"), nPos);
+			CString		strIn;		//	= strLine.Tokenize(L" \t", nPos);
+			CString		strOut;		//	= strLine.Tokenize(L" \t", nPos);
+			CString		strName;	//	= strLine.Tokenize(L" \t", nPos);
 
-			AfxExtractSubString (strIn,			strLine, 0, _T('\t'));
-			AfxExtractSubString (strOut,		strLine, 1, _T('\t'));
-			AfxExtractSubString (strName,		strLine, 2, _T('\t'));
+			AfxExtractSubString (strIn,			strLine, 0, L'\t');
+			AfxExtractSubString (strOut,		strLine, 1, L'\t');
+			AfxExtractSubString (strName,		strLine, 2, L'\t');
 			if (strUser.IsEmpty()) {
-				AfxExtractSubString (strUser,		 strLine, 3, _T('\t'));
+				AfxExtractSubString (strUser,		 strLine, 3, L'\t');
 				SelectCombo(strUser, m_cbUsers);
 			}
 
 			if (strHotFolders.IsEmpty()) {
-				AfxExtractSubString (strHotFolders, strLine, 4, _T('\t'));
+				AfxExtractSubString (strHotFolders, strLine, 4, L'\t');
 				SelectCombo(strHotFolders, m_cbHotFolders);
 			}
 
@@ -258,7 +258,7 @@ void CEditListEditor::OpenFile(LPCTSTR lpFileName)
 		CStdioFile 	NameFile;
 		CString		str;
 
-		if (NameFile.Open (_T("EditListNames.txt"), CFile::modeRead)) {
+		if (NameFile.Open (L"EditListNames.txt", CFile::modeRead)) {
 			while (NameFile.ReadString(str)) {
 				m_NameList.Add(str);
 			}
@@ -338,7 +338,7 @@ POSITION CEditListEditor::InsertClip(POSITION pos, CClip& NewClip)
 	lv.mask		= LVIF_STATE | LVIF_TEXT;
 	lv.iItem	= FindIndex (pos);
 	lv.iSubItem	= 0;
-	lv.pszText	= _T("");
+	lv.pszText	= L"";
 	lv.state	= m_list.GetItemCount()==0 ? LVIS_SELECTED : 0;
 	m_list.InsertItem(&lv);
 
@@ -381,7 +381,7 @@ void CEditListEditor::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 			pDC->SetTextColor(textcolor);
 			switch (i) {
 				case COL_INDEX :
-					strTemp.Format (_T("%d"), nItem+1);
+					strTemp.Format (L"%d", nItem+1);
 					pDC->DrawText (strTemp, rcItem, DT_CENTER | DT_VCENTER);
 					break;
 				case COL_IN :
@@ -657,7 +657,7 @@ void CEditListEditor::FillCombo(LPCTSTR strFileName, CComboBox& Combo, bool bAll
 	CString	str;
 	if (NameFile.Open (strFileName, CFile::modeRead)) {
 		if (bAllowNull) {
-			Combo.AddString(_T(""));
+			Combo.AddString(L"");
 		}
 
 		while (NameFile.ReadString(str)) {

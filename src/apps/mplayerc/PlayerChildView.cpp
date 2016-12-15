@@ -106,7 +106,7 @@ void CChildView::LoadLogo()
 
 	m_logo.Destroy();
 
-	CString logoFName = _T("logo");
+	CString logoFName = L"logo";
 
 	if (m_logo.FileExists(logoFName, true)) {
 		m_logo.Attach(OpenImage(logoFName));

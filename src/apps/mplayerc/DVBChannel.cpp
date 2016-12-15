@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -49,47 +49,47 @@ void CDVBChannel::FromString(CString strValue)
 	int		i = 0;
 	int		nVersion;
 
-	nVersion		= _tstol(strValue.Tokenize(_T("|"), i));
-	m_strName		= strValue.Tokenize(_T("|"), i);
-	m_ulFrequency	= _tstol(strValue.Tokenize(_T("|"), i));
-	m_nPrefNumber	= _tstol(strValue.Tokenize(_T("|"), i));
-	m_nOriginNumber	= _tstol(strValue.Tokenize(_T("|"), i));
+	nVersion		= _wtol(strValue.Tokenize(L"|", i));
+	m_strName		= strValue.Tokenize(L"|", i);
+	m_ulFrequency	= _wtol(strValue.Tokenize(L"|", i));
+	m_nPrefNumber	= _wtol(strValue.Tokenize(L"|", i));
+	m_nOriginNumber	= _wtol(strValue.Tokenize(L"|", i));
 
 	if (nVersion > FORMAT_VERSION_0) {
-		m_bEncrypted	= !!_tstol(strValue.Tokenize(_T("|"), i));
+		m_bEncrypted	= !!_wtol(strValue.Tokenize(L"|", i));
 	}
 
 	if (nVersion > FORMAT_VERSION_1) {
-		m_bNowNextFlag	= !!_tstol(strValue.Tokenize(_T("|"), i));
+		m_bNowNextFlag	= !!_wtol(strValue.Tokenize(L"|", i));
 	}
 
-	m_ulONID		= _tstol(strValue.Tokenize(_T("|"), i));
-	m_ulTSID		= _tstol(strValue.Tokenize(_T("|"), i));
-	m_ulSID			= _tstol(strValue.Tokenize(_T("|"), i));
-	m_ulPMT			= _tstol(strValue.Tokenize(_T("|"), i));
-	m_ulPCR			= _tstol(strValue.Tokenize(_T("|"), i));
-	m_ulVideoPID	= _tstol(strValue.Tokenize(_T("|"), i));
-	m_nVideoType	= (DVB_STREAM_TYPE)_tstol(strValue.Tokenize(_T("|"), i));
-	m_nAudioCount	= _tstol(strValue.Tokenize(_T("|"), i));
+	m_ulONID		= _wtol(strValue.Tokenize(L"|", i));
+	m_ulTSID		= _wtol(strValue.Tokenize(L"|", i));
+	m_ulSID			= _wtol(strValue.Tokenize(L"|", i));
+	m_ulPMT			= _wtol(strValue.Tokenize(L"|", i));
+	m_ulPCR			= _wtol(strValue.Tokenize(L"|", i));
+	m_ulVideoPID	= _wtol(strValue.Tokenize(L"|", i));
+	m_nVideoType	= (DVB_STREAM_TYPE)_wtol(strValue.Tokenize(L"|", i));
+	m_nAudioCount	= _wtol(strValue.Tokenize(L"|", i));
 
 	if (nVersion > FORMAT_VERSION_1) {
-		m_nDefaultAudio	= _tstol(strValue.Tokenize(_T("|"), i));
+		m_nDefaultAudio	= _wtol(strValue.Tokenize(L"|", i));
 	}
 
-	m_nSubtitleCount = _tstol(strValue.Tokenize(_T("|"), i));
+	m_nSubtitleCount = _wtol(strValue.Tokenize(L"|", i));
 
 	for (int j=0; j<m_nAudioCount; j++) {
-		m_Audios[j].PID			= _tstol(strValue.Tokenize(_T("|"), i));
-		m_Audios[j].Type		= (DVB_STREAM_TYPE)_tstol(strValue.Tokenize(_T("|"), i));
-		m_Audios[j].PesType		= (PES_STREAM_TYPE)_tstol(strValue.Tokenize(_T("|"), i));
-		m_Audios[j].Language	= strValue.Tokenize(_T("|"), i);
+		m_Audios[j].PID			= _wtol(strValue.Tokenize(L"|", i));
+		m_Audios[j].Type		= (DVB_STREAM_TYPE)_wtol(strValue.Tokenize(L"|", i));
+		m_Audios[j].PesType		= (PES_STREAM_TYPE)_wtol(strValue.Tokenize(L"|", i));
+		m_Audios[j].Language	= strValue.Tokenize(L"|", i);
 	}
 
 	for (int j=0; j<m_nSubtitleCount; j++) {
-		m_Subtitles[j].PID		= _tstol(strValue.Tokenize(_T("|"), i));
-		m_Subtitles[j].Type		= (DVB_STREAM_TYPE)_tstol(strValue.Tokenize(_T("|"), i));
-		m_Subtitles[j].PesType	= (PES_STREAM_TYPE)_tstol(strValue.Tokenize(_T("|"), i));
-		m_Subtitles[j].Language	= strValue.Tokenize(_T("|"), i);
+		m_Subtitles[j].PID		= _wtol(strValue.Tokenize(L"|", i));
+		m_Subtitles[j].Type		= (DVB_STREAM_TYPE)_wtol(strValue.Tokenize(L"|", i));
+		m_Subtitles[j].PesType	= (PES_STREAM_TYPE)_wtol(strValue.Tokenize(L"|", i));
+		m_Subtitles[j].Language	= strValue.Tokenize(L"|", i);
 	}
 }
 
@@ -97,7 +97,7 @@ CString CDVBChannel::ToString()
 {
 	CString		strValue;
 
-	strValue.AppendFormat (_T("%d|%s|%lu|%d|%d|%d|%d|%lu|%lu|%lu|%lu|%lu|%lu|%d|%d|%d|%d"),
+	strValue.AppendFormat (L"%d|%s|%lu|%d|%d|%d|%d|%lu|%lu|%lu|%lu|%lu|%lu|%d|%d|%d|%d",
 						   FORMAT_VERSION_CURRENT,
 						   m_strName,
 						   m_ulFrequency,
@@ -117,11 +117,11 @@ CString CDVBChannel::ToString()
 						   m_nSubtitleCount);
 
 	for (int i=0; i<m_nAudioCount; i++) {
-		strValue.AppendFormat (_T("|%lu|%d|%d|%s"), m_Audios[i].PID, m_Audios[i].Type, m_Audios[i].PesType, m_Audios[i].Language);
+		strValue.AppendFormat (L"|%lu|%d|%d|%s", m_Audios[i].PID, m_Audios[i].Type, m_Audios[i].PesType, m_Audios[i].Language);
 	}
 
 	for (int i=0; i<m_nSubtitleCount; i++) {
-		strValue.AppendFormat (_T("|%lu|%d|%d|%s"), m_Subtitles[i].PID, m_Subtitles[i].Type, m_Subtitles[i].PesType, m_Subtitles[i].Language);
+		strValue.AppendFormat (L"|%lu|%d|%d|%s", m_Subtitles[i].PID, m_Subtitles[i].Type, m_Subtitles[i].PesType, m_Subtitles[i].Language);
 	}
 
 	return strValue;

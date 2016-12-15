@@ -79,7 +79,7 @@ CUnknown *CMusePackSplitter::CreateInstance(LPUNKNOWN pUnk, HRESULT *phr)
 }
 
 CMusePackSplitter::CMusePackSplitter(LPUNKNOWN pUnk, HRESULT *phr) :
-	CBaseFilter(_T("Light Alloy/MPC MusePack Splitter"), pUnk, &lock_filter, CLSID_MusePackSplitter, phr),
+	CBaseFilter(L"Light Alloy/MPC MusePack Splitter", pUnk, &lock_filter, CLSID_MusePackSplitter, phr),
 	CAMThread(),
 	reader(NULL),
 	file(NULL),
@@ -126,10 +126,10 @@ CMusePackSplitter::~CMusePackSplitter()
 
 STDMETHODIMP CMusePackSplitter::NonDelegatingQueryInterface(REFIID riid,void **ppv)
 {
-    CheckPointer(ppv,E_POINTER);
+	CheckPointer(ppv,E_POINTER);
 
-    if (riid == IID_IMediaSeeking) {
-        return GetInterface((IMediaSeeking*)this, ppv);
+	if (riid == IID_IMediaSeeking) {
+		return GetInterface((IMediaSeeking*)this, ppv);
 	}
 
 	return
@@ -245,7 +245,7 @@ HRESULT CMusePackSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller,
 		}
 
 		HRESULT hr = S_OK;
-		CMusePackOutputPin *opin = DNew CMusePackOutputPin(_T("Outpin"), this, &hr, L"Out", 5);
+		CMusePackOutputPin *opin = DNew CMusePackOutputPin(L"Outpin", this, &hr, L"Out", 5);
 		ConfigureMediaType(opin);
 		AddOutputPin(opin);
 	}

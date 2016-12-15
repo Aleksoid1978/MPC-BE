@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -121,11 +121,11 @@ public:
 	CMPC_Lcd();
 	~CMPC_Lcd();
 
-	void SetMediaTitle(const TCHAR* text);
+	void SetMediaTitle(const WCHAR* text);
 	void SetMediaRange(__int64 nStart, __int64 nStop);
 	void SetMediaPos(__int64 nPos);
 	void SetVolumeRange(__int64 nStart, __int64 nStop);
 	void SetVolume(__int64 nVol);
-	void SetStatusMessage(const TCHAR* text, int nTimeOut);
+	void SetStatusMessage(const WCHAR* text, int nTimeOut);
 	void SetPlayState(PlayState ps);
 };

@@ -393,7 +393,7 @@ bool CCDDAStream::Load(const WCHAR* fnw, bool bReadTextInfo)
 	while (iTrackIndex > 0 && _istdigit(path[iTrackIndex - 1])) {
 		iTrackIndex--;
 	}
-	if (1 != _stscanf_s(path.Mid(iTrackIndex), L"%d", &iTrackIndex)) {
+	if (1 != swscanf_s(path.Mid(iTrackIndex), L"%d", &iTrackIndex)) {
 		return false;
 	}
 

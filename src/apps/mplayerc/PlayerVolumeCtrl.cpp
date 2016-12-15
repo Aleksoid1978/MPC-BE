@@ -394,7 +394,7 @@ BOOL CVolumeCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 	TOOLTIPTEXT *pTTT = reinterpret_cast<LPTOOLTIPTEXT>(pNMHDR);
 	CString str;
 
-	str.AppendFormat(_T("%d%%"), GetPos());
+	str.AppendFormat(L"%d%%", GetPos());
 
 	if (AfxGetAppSettings().fMute) { // TODO: remove i
 		CString no_sound_str = ResStr(ID_VOLUME_MUTE_DISABLED);
@@ -402,10 +402,10 @@ BOOL CVolumeCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		if (i > 0) {
 			no_sound_str = no_sound_str.Left(i);
 		}
-		str.AppendFormat(_T(" [%ws]"), no_sound_str);
+		str.AppendFormat(L" [%ws]", no_sound_str);
 	}
 
-	_tcscpy_s(pTTT->szText, str);
+	wcscpy_s(pTTT->szText, str);
 	pTTT->hinst = NULL;
 
 	*pResult = 0;

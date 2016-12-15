@@ -86,7 +86,7 @@ private:
 	CSimpleTextSubtitle m_sts;
 
 	int GetStartTime(int iItem), GetEndTime(int iItem);
-	void FormatTime(int iItem, TCHAR* buff, size_t buffLen, int time /* 0:start, 1:newstart, 2:preview */, bool fEnd);
+	void FormatTime(int iItem, WCHAR* buff, size_t buffLen, int time /* 0:start, 1:newstart, 2:preview */, bool fEnd);
 
 	void UpdatePreview(), UpdateStrings();
 

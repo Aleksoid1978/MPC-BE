@@ -34,7 +34,7 @@ CPPageWebServer::CPPageWebServer()
 	, m_fEnableWebServer(FALSE)
 	, m_nWebServerPort(APP_WEBSRVPORT_DEF)
 	, m_nWebServerQuality(APP_WEBSRVQUALITY_DEF)
-	, m_launch(_T("http://localhost:13579/"))
+	, m_launch(L"http://localhost:13579/")
 	, m_fWebServerPrintDebugInfo(FALSE)
 	, m_fWebServerUseCompression(FALSE)
 	, m_fWebRoot(FALSE)
@@ -100,7 +100,7 @@ BOOL CPPageWebServer::OnInitDialog()
 	m_fWebServerUseCompression = s.fWebServerUseCompression;
 	m_fWebRoot = s.strWebRoot.Find('*') < 0;
 	m_WebRoot = s.strWebRoot;
-	m_WebRoot.TrimLeft(_T('*'));
+	m_WebRoot.TrimLeft(L'*');
 	m_WebDefIndex = s.strWebDefIndex;
 	m_WebServerCGI = s.strWebServerCGI;
 
@@ -125,7 +125,7 @@ BOOL CPPageWebServer::OnApply()
 	CString NewWebRoot = m_WebRoot;
 
 	if (!m_fWebRoot) {
-		NewWebRoot = _T("*") + NewWebRoot;
+		NewWebRoot = L"*" + NewWebRoot;
 	}
 
 	bool fRestart = s.nWebServerPort != m_nWebServerPort
@@ -165,7 +165,7 @@ CString CPPageWebServer::GetCurWebRoot()
 
 	CPath path;
 	path.Combine(GetProgramDir(), WebRoot);
-	return path.IsDirectory() ? (LPCTSTR)path : _T("");
+	return path.IsDirectory() ? (LPCTSTR)path : L"";
 }
 
 static int __stdcall BrowseCtrlCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
@@ -223,7 +223,7 @@ void CPPageWebServer::OnEnChangeEdit1()
 	UpdateData();
 
 	CString link;
-	link.Format(_T("http://localhost:%d/"), m_nWebServerPort);
+	link.Format(L"http://localhost:%d/", m_nWebServerPort);
 	m_launch.m_link = link;
 
 	SetModified();
@@ -252,7 +252,7 @@ void CPPageWebServer::OnBnClickedButton2()
 	CString dir;
 
 	if (PickDir(dir)) {
-		dir += _T("\\");
+		dir += L"\\";
 		CWebServer::Deploy(dir);
 	}
 }

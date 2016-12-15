@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2016 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,7 +37,7 @@ enum MPC_PLAYSTATE {
 struct MPC_OSDDATA {
 	int nMsgPos;       // screen position constant (see OSD_MESSAGEPOS constants)
 	int nDurationMS;   // duration in milliseconds
-	TCHAR strMsg[128]; // message to display thought OSD
+	WCHAR strMsg[128]; // message to display thought OSD
 };
 //// MPC_OSDDATA.nMsgPos constants (for host side programming):
 //typedef enum
