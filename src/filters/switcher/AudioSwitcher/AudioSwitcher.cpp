@@ -209,6 +209,13 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 	const SampleFormat in_sampleformat = GetSampleFormat(in_wfe);
 	if (in_sampleformat == SAMPLE_FMT_NONE) {
+		REFERENCE_TIME rtStart, rtStop;
+		if (SUCCEEDED(pIn->GetTime(&rtStart, &rtStop))) {
+			rtStart += m_rtAudioTimeShift;
+			rtStop  += m_rtAudioTimeShift;
+			pOut->SetTime(&rtStart, &rtStop);
+		}
+
 		return __super::Transform(pIn, pOut);
 	}
 
