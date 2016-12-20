@@ -331,6 +331,7 @@ static inline void skip_bits1(GetBitContext *s)
  */
 static inline unsigned int get_bits_long(GetBitContext *s, int n)
 {
+    av_assert2(n>=0 && n<=32);
     if (!n) {
         return 0;
     } else if (n <= MIN_CACHE_BITS) {
@@ -369,6 +370,10 @@ static inline uint64_t get_bits64(GetBitContext *s, int n)
  */
 static inline int get_sbits_long(GetBitContext *s, int n)
 {
+    // sign_extend(x, 0) is undefined
+    if (!n)
+        return 0;
+
     return sign_extend(get_bits_long(s, n), n);
 }
 

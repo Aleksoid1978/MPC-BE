@@ -411,6 +411,7 @@ enum AVCodecID {
     AV_CODEC_ID_MAGICYUV,
     AV_CODEC_ID_SHEERVIDEO,
     AV_CODEC_ID_YLC,
+    AV_CODEC_ID_PSD,
 
     /* various PCM "codecs" */
     AV_CODEC_ID_FIRST_AUDIO = 0x10000,     ///< A dummy id pointing at the start of audio codecs
@@ -1536,7 +1537,13 @@ enum AVPacketSideDataType {
      * should be associated with a video stream and containts data in the form
      * of the AVMasteringDisplayMetadata struct.
      */
-    AV_PKT_DATA_MASTERING_DISPLAY_METADATA
+    AV_PKT_DATA_MASTERING_DISPLAY_METADATA,
+
+    /**
+     * This side data should be associated with a video stream and corresponds
+     * to the AVSphericalMapping structure.
+     */
+    AV_PKT_DATA_SPHERICAL,
 };
 
 #define AV_PKT_DATA_QUALITY_FACTOR AV_PKT_DATA_QUALITY_STATS //DEPRECATED
@@ -3568,6 +3575,14 @@ typedef struct AVCodecContext {
      * - encoding: unused
      */
     int trailing_padding;
+
+    /**
+     * The number of pixels per image to maximally accept.
+     *
+     * - decoding: set by user
+     * - encoding: set by user
+     */
+    int64_t max_pixels;
 
 } AVCodecContext;
 

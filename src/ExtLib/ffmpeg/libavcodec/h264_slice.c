@@ -1452,6 +1452,9 @@ static int h264_field_start(H264Context *h, const H264SliceContext *sl,
                 h->short_ref[0]->f->width == prev->f->width &&
                 h->short_ref[0]->f->height == prev->f->height &&
                 h->short_ref[0]->f->format == prev->f->format) {
+                ff_thread_await_progress(&prev->tf, INT_MAX, 0);
+                if (prev->field_picture)
+                    ff_thread_await_progress(&prev->tf, INT_MAX, 1);
                 // ==> Start patch MPC
                 if (!h->avctx->using_dxva)
                 // ==> End patch MPC
