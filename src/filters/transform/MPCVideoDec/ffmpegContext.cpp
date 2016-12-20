@@ -270,7 +270,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 		const H264Context* h = (H264Context*)pAVCtx->priv_data;
 		const SPS* sps       = h264_getSPS(h);
 		if (sps && sps->mb_height > 0) {
-			pAVCtx->coded_height = sps->mb_height * (2 - sps->frame_mbs_only_flag) * 16;
+			pAVCtx->coded_height = sps->mb_height * 16;
 		}
 	}
 
