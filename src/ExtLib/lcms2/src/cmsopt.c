@@ -1454,6 +1454,7 @@ cmsBool OptimizeByJoiningCurves(cmsPipeline** Lut, cmsUInt32Number Intent, cmsUI
 
         // LUT optimizes to nothing. Set the identity LUT
         cmsStageFree(ObtainedCurves);
+        ObtainedCurves = NULL;
 
         if (!cmsPipelineInsertStage(Dest, cmsAT_BEGIN, cmsStageAllocIdentity(Dest ->ContextID, Src ->InputChannels)))
             goto Error;
@@ -1556,7 +1557,10 @@ void FillFirstShaper(cmsS1Fixed14Number* Table, cmsToneCurve* Curve)
         R   = (cmsFloat32Number) (i / 255.0);
         y   = cmsEvalToneCurveFloat(Curve, R);
 
-        Table[i] = DOUBLE_TO_1FIXED14(y);
+        if (y < 131072.0)
+            Table[i] = DOUBLE_TO_1FIXED14(y);
+        else
+            Table[i] = 0x7fffffff;
     }
 }
 
@@ -1571,6 +1575,12 @@ void FillSecondShaper(cmsUInt16Number* Table, cmsToneCurve* Curve, cmsBool Is8Bi
 
         R   = (cmsFloat32Number) (i / 16384.0);
         Val = cmsEvalToneCurveFloat(Curve, R);    // Val comes 0..1.0
+
+        if (Val < 0)
+            Val = 0;
+
+        if (Val > 1.0)
+            Val = 1.0;
 
         if (Is8BitsOutput) {
 
@@ -1610,7 +1620,7 @@ cmsBool SetMatShaper(cmsPipeline* Dest, cmsToneCurve* Curve1[3], cmsMAT3* Mat, c
     FillSecondShaper(p ->Shaper2G, Curve2[1], Is8Bits);
     FillSecondShaper(p ->Shaper2B, Curve2[2], Is8Bits);
 
-    // Convert matrix to nFixed14. Note that those values may take more than 16 bits as
+    // Convert matrix to nFixed14. Note that those values may take more than 16 bits 
     for (i=0; i < 3; i++) {
         for (j=0; j < 3; j++) {
             p ->Mat[i][j] = DOUBLE_TO_1FIXED14(Mat->v[i].n[j]);

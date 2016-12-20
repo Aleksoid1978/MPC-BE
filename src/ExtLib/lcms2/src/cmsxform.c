@@ -255,6 +255,8 @@ void FloatXFORM(_cmsTRANSFORM* p,
 
     strideIn = 0;
     strideOut = 0;
+    memset(fIn, 0, sizeof(fIn));
+    memset(fOut, 0, sizeof(fIn));
 
     for (i = 0; i < LineCount; i++) {
 
@@ -319,6 +321,7 @@ void NullFloatXFORM(_cmsTRANSFORM* p,
 
     strideIn = 0;
     strideOut = 0;
+    memset(fIn, 0, sizeof(fIn));
 
     for (i = 0; i < LineCount; i++) {
 
@@ -356,6 +359,7 @@ void NullXFORM(_cmsTRANSFORM* p,
 
     strideIn = 0;
     strideOut = 0;
+    memset(wIn, 0, sizeof(wIn));
 
     for (i = 0; i < LineCount; i++) {
 
@@ -393,6 +397,8 @@ void PrecalculatedXFORM(_cmsTRANSFORM* p,
 
     strideIn = 0;
     strideOut = 0;
+    memset(wIn, 0, sizeof(wIn));
+    memset(wOut, 0, sizeof(wOut));
 
     for (i = 0; i < LineCount; i++) {
 
@@ -454,6 +460,8 @@ void PrecalculatedXFORMGamutCheck(_cmsTRANSFORM* p,
 
     strideIn = 0;
     strideOut = 0;
+    memset(wIn, 0, sizeof(wIn));
+    memset(wOut, 0, sizeof(wOut));
 
     for (i = 0; i < LineCount; i++) {
 

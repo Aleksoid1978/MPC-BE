@@ -54,9 +54,11 @@ long int CMSEXPORT cmsfilelength(FILE* f)
     long int p , n;
 
     p = ftell(f); // register current file position
+    if (p == -1L) 
+        return -1L;
 
     if (fseek(f, 0, SEEK_END) != 0) {
-        return -1;
+        return -1L;
     }
 
     n = ftell(f);

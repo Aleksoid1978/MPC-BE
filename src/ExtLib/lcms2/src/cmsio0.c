@@ -337,21 +337,27 @@ cmsBool  FileSeek(cmsIOHANDLER* iohandler, cmsUInt32Number offset)
     return TRUE;
 }
 
-// Returns file pointer position
+// Returns file pointer position or 0 on error, which is also a valid position.
 static
 cmsUInt32Number FileTell(cmsIOHANDLER* iohandler)
 {
-    return (cmsUInt32Number) ftell((FILE*)iohandler ->stream);
+    long t = ftell((FILE*)iohandler ->stream);
+    if (t == -1L) {
+        cmsSignalError(iohandler->ContextID, cmsERROR_FILE, "Tell error; probably corrupted file");
+        return 0;
+    }
+
+    return (cmsUInt32Number)t;
 }
 
 // Writes data to stream, also keeps used space for further reference. Returns TRUE on success, FALSE on error
 static
 cmsBool  FileWrite(cmsIOHANDLER* iohandler, cmsUInt32Number size, const void* Buffer)
 {
-       if (size == 0) return TRUE;  // We allow to write 0 bytes, but nothing is written
+    if (size == 0) return TRUE;  // We allow to write 0 bytes, but nothing is written
 
-       iohandler->UsedSpace += size;
-       return (fwrite(Buffer, size, 1, (FILE*) iohandler->stream) == 1);
+    iohandler->UsedSpace += size;
+    return (fwrite(Buffer, size, 1, (FILE*)iohandler->stream) == 1);
 }
 
 // Closes the file

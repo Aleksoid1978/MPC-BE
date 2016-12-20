@@ -567,33 +567,45 @@ cmsFloat64Number DefaultEvalParametricFn(cmsInt32Number Type, const cmsFloat64Nu
     return Val;
 }
 
-// Evaluate a segmented function for a single value. Return -1 if no valid segment found .
+// Evaluate a segmented function for a single value. Return -Inf if no valid segment found .
 // If fn type is 0, perform an interpolation on the table
 static
 cmsFloat64Number EvalSegmentedFn(const cmsToneCurve *g, cmsFloat64Number R)
 {
     int i;
+    cmsFloat32Number Out32;
+    cmsFloat64Number Out;
 
-    for (i = g ->nSegments-1; i >= 0 ; --i) {
+    for (i = g->nSegments - 1; i >= 0; --i) {
 
         // Check for domain
-        if ((R > g ->Segments[i].x0) && (R <= g ->Segments[i].x1)) {
+        if ((R > g->Segments[i].x0) && (R <= g->Segments[i].x1)) {
 
             // Type == 0 means segment is sampled
-            if (g ->Segments[i].Type == 0) {
+            if (g->Segments[i].Type == 0) {
 
-                cmsFloat32Number R1 = (cmsFloat32Number) (R - g ->Segments[i].x0) / (g ->Segments[i].x1 - g ->Segments[i].x0);
-                cmsFloat32Number Out;
+                cmsFloat32Number R1 = (cmsFloat32Number)(R - g->Segments[i].x0) / (g->Segments[i].x1 - g->Segments[i].x0);
 
                 // Setup the table (TODO: clean that)
-                g ->SegInterp[i]-> Table = g ->Segments[i].SampledPoints;
+                g->SegInterp[i]->Table = g->Segments[i].SampledPoints;
 
-                g ->SegInterp[i] -> Interpolation.LerpFloat(&R1, &Out, g ->SegInterp[i]);
+                g->SegInterp[i]->Interpolation.LerpFloat(&R1, &Out32, g->SegInterp[i]);
+                Out = (cmsFloat64Number) Out32;
 
-                return Out;
             }
+            else {
+                Out = g->Evals[i](g->Segments[i].Type, g->Segments[i].Params, R);
+            }
+
+            if (isinf(Out))
+                return PLUS_INF;
             else
-                return g ->Evals[i](g->Segments[i].Type, g ->Segments[i].Params, R);
+            {
+                if (isinf(-Out))
+                    return MINUS_INF;
+            }
+
+            return Out;
         }
     }
 

@@ -60,6 +60,11 @@ typedef struct _cmsTagTypeLinkedList_st {
 // Helper macro to define a MPE handler. Callbacks do have a fixed naming convention
 #define TYPE_MPE_HANDLER(t, x)  { (t), READ_FN(x), WRITE_FN(x), GenericMPEdup, GenericMPEfree, NULL, 0 }
 
+// Infinites
+#define MINUS_INF   (-1E22F)
+#define PLUS_INF    (+1E22F)
+
+
 // Register a new type handler. This routine is shared between normal types and MPE. LinkedList points to the optional list head
 static
 cmsBool RegisterTypesPlugin(cmsContext id, cmsPluginBase* Data, _cmsMemoryClient pos)
@@ -232,7 +237,7 @@ cmsBool WritePositionTable(struct _cms_typehandler_struct* self,
 
     // Keep starting position of curve offsets
     DirectoryPos = io ->Tell(io);
-
+  
     // Write a fake directory to be filled latter on
     for (i=0; i < Count; i++) {
 
@@ -1816,8 +1821,10 @@ void *Type_LUT8_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cms
         _cmsFree(self ->ContextID, Temp);
         Temp = NULL;
 
-        if (!cmsPipelineInsertStage(NewLUT, cmsAT_END, cmsStageAllocCLut16bit(self ->ContextID, CLUTpoints, InputChannels, OutputChannels, T)))
+        if (!cmsPipelineInsertStage(NewLUT, cmsAT_END, cmsStageAllocCLut16bit(self ->ContextID, CLUTpoints, InputChannels, OutputChannels, T))) {
+            _cmsFree(self ->ContextID, T);
             goto Error;
+        }
         _cmsFree(self ->ContextID, T);
     }
 
@@ -3918,7 +3925,7 @@ cmsToneCurve* ReadSegmentedCurve(struct _cms_typehandler_struct* self, cmsIOHAND
     cmsUInt16Number nSegments;
     cmsCurveSegment*  Segments;
     cmsToneCurve* Curve;
-    cmsFloat32Number PrevBreak = -1E22F;    // - infinite
+    cmsFloat32Number PrevBreak = MINUS_INF;    // - infinite
 
     // Take signature and channels for each element.
      if (!_cmsReadUInt32Number(io, (cmsUInt32Number*) &ElementSig)) return NULL;
@@ -3943,7 +3950,7 @@ cmsToneCurve* ReadSegmentedCurve(struct _cms_typehandler_struct* self, cmsIOHAND
      }
 
      Segments[nSegments-1].x0 = PrevBreak;
-     Segments[nSegments-1].x1 = 1E22F;     // A big cmsFloat32Number number
+     Segments[nSegments-1].x1 = PLUS_INF;     // A big cmsFloat32Number number
 
      // Read segments
      for (i=0; i < nSegments; i++) {
@@ -4316,11 +4323,11 @@ void *Type_MPEclut_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, 
     mpe = cmsStageAllocCLutFloatGranular(self ->ContextID, GridPoints, InputChans, OutputChans, NULL);
     if (mpe == NULL) goto Error;
 
-    // Read the data
+    // Read and sanitize the data
     clut = (_cmsStageCLutData*) mpe ->Data;
     for (i=0; i < clut ->nEntries; i++) {
 
-        if (!_cmsReadFloat32Number(io, &clut ->Tab.TFloat[i])) goto Error;
+        if (!_cmsReadFloat32Number(io, &clut->Tab.TFloat[i])) goto Error;       
     }
 
     *nItems = 1;

@@ -180,7 +180,10 @@ cmsBool CMSEXPORT  _cmsReadFloat32Number(cmsIOHANDLER* io, cmsFloat32Number* n)
         tmp = _cmsAdjustEndianess32(tmp);
         *n = *(cmsFloat32Number*) (void*) &tmp;
     }
-    return TRUE;
+
+    // fpclassify() required by C99
+    return ((fpclassify(*n) == FP_ZERO) || (fpclassify(*n) == FP_NORMAL));
+    
 }
 
 
@@ -194,7 +197,9 @@ cmsBool CMSEXPORT   _cmsReadUInt64Number(cmsIOHANDLER* io, cmsUInt64Number* n)
             return FALSE;
 
     if (n != NULL) _cmsAdjustEndianess64(n, &tmp);
-    return TRUE;
+
+    // fpclassify() required by C99
+    return ((fpclassify(*n) == FP_ZERO) || (fpclassify(*n) == FP_NORMAL));
 }
 
 
@@ -756,19 +761,19 @@ cmsContext CMSEXPORT cmsCreateContext(void* Plugin, void* UserData)
 #ifndef CMS_RELY_ON_WINDOWS_STATIC_MUTEX_INIT
     {
         static HANDLE _cmsWindowsInitMutex = NULL;
-        static volatile HANDLE *mutex = &_cmsWindowsInitMutex;
+        static volatile HANDLE* mutex = &_cmsWindowsInitMutex;
 
         if (*mutex == NULL)
         {
             HANDLE p = CreateMutex(NULL, FALSE, NULL);
-            if (InterlockedCompareExchangePointer((void **)mutex, (void*)p, NULL) != NULL)
+            if (p && InterlockedCompareExchangePointer((void **)mutex, (void*)p, NULL) != NULL)
                 CloseHandle(p);
         }
-        if (WaitForSingleObject(*mutex, INFINITE) == WAIT_FAILED)
+        if (*mutex == NULL || WaitForSingleObject(*mutex, INFINITE) == WAIT_FAILED)
             return NULL;
         if (((void **)&_cmsContextPoolHeadMutex)[0] == NULL)
             InitializeCriticalSection(&_cmsContextPoolHeadMutex);
-        if (!ReleaseMutex(*mutex))
+        if (*mutex == NULL || !ReleaseMutex(*mutex))
             return NULL;
     }
 #endif
