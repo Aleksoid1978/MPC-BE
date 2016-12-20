@@ -1630,7 +1630,6 @@ static int mpeg_field_start(MpegEncContext *s, const uint8_t *buf, int buf_size)
             if (sd)
                 memcpy(sd->data, s1->a53_caption, s1->a53_caption_size);
             av_freep(&s1->a53_caption);
-            avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
         }
 
         if (s1->has_stereo3d) {
@@ -2270,6 +2269,7 @@ static int mpeg_decode_a53_cc(AVCodecContext *avctx,
             s1->a53_caption      = av_malloc(s1->a53_caption_size);
             if (s1->a53_caption)
                 memcpy(s1->a53_caption, p + 7, s1->a53_caption_size);
+            avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
         }
         return 1;
     } else if (buf_size >= 11 &&
@@ -2325,6 +2325,7 @@ static int mpeg_decode_a53_cc(AVCodecContext *avctx,
                     p += 6;
                 }
             }
+            avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
         }
         return 1;
     }
@@ -2425,7 +2426,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
 #endif
 
     s->closed_gop = get_bits1(&s->gb);
-    /* broken_link indicate that after editing the
+    /* broken_link indicates that after editing the
      * reference frames of the first B-Frames after GOP I-Frame
      * are missing (open gop) */
     broken_link = get_bits1(&s->gb);
@@ -2947,6 +2948,7 @@ AVCodec ff_mpeg1video_decoder = {
     .capabilities          = AV_CODEC_CAP_DRAW_HORIZ_BAND | AV_CODEC_CAP_DR1 |
                              AV_CODEC_CAP_TRUNCATED | AV_CODEC_CAP_DELAY |
                              AV_CODEC_CAP_SLICE_THREADS,
+    .caps_internal         = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     .flush                 = flush,
     .max_lowres            = 3,
     .update_thread_context = ONLY_IF_THREADS_ENABLED(mpeg_decode_update_thread_context)
@@ -2964,6 +2966,7 @@ AVCodec ff_mpeg2video_decoder = {
     .capabilities   = AV_CODEC_CAP_DRAW_HORIZ_BAND | AV_CODEC_CAP_DR1 |
                       AV_CODEC_CAP_TRUNCATED | AV_CODEC_CAP_DELAY |
                       AV_CODEC_CAP_SLICE_THREADS,
+    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     .flush          = flush,
     .max_lowres     = 3,
     .profiles       = NULL_IF_CONFIG_SMALL(ff_mpeg2_video_profiles),
@@ -2980,6 +2983,7 @@ AVCodec ff_mpegvideo_decoder = {
     .close          = mpeg_decode_end,
     .decode         = mpeg_decode_frame,
     .capabilities   = AV_CODEC_CAP_DRAW_HORIZ_BAND | AV_CODEC_CAP_DR1 | AV_CODEC_CAP_TRUNCATED | AV_CODEC_CAP_DELAY | AV_CODEC_CAP_SLICE_THREADS,
+    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     .flush          = flush,
     .max_lowres     = 3,
 };

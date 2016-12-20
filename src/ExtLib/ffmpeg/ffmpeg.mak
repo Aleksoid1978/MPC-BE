@@ -540,6 +540,7 @@ SRCS_LF = \
 	libavfilter/buffersrc.c \
 	libavfilter/formats.c \
 	libavfilter/framepool.c \
+	libavfilter/framequeue.c \
 	libavfilter/graphparser.c \
 	libavfilter/pthread.c \
 	libavfilter/vf_yadif.c \

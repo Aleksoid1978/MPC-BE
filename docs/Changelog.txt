@@ -3,6 +3,9 @@
 1.5.1 (beta)
 ==============================
 
+Updated libraries:
+	ffmpeg git-n3.3-dev-746-g25e35b3.
+
 1.5.0
 ==============================
 Windows XP is no longer supported.
