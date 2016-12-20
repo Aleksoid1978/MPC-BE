@@ -1,6 +1,6 @@
 /* alloc - Convenience routines for safely allocating memory
  * Copyright (C) 2007-2009  Josh Coalson
- * Copyright (C) 2011-2014  Xiph.Org Foundation
+ * Copyright (C) 2011-2016  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
