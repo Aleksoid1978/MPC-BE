@@ -157,7 +157,7 @@ File_SmpteSt0337::File_SmpteSt0337()
         pid=(int16u)-1;
         stream_id=(int8u)-1;
         IgnoreGuardBandTest=false;
-    #endif MEDIAINFO_EVENTS
+    #endif // MEDIAINFO_EVENTS
 
     // Parser
     Parser=NULL;

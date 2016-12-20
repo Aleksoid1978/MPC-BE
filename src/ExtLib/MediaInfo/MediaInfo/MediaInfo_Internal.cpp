@@ -1280,22 +1280,22 @@ String MediaInfo_Internal::Option (const String &Option, const String &Value)
                     Ztring FrameNumberZ=List[Pos].substr(List[Pos].find(__T("Frame="))+6, string::npos);
                     SeekValue=FrameNumberZ.To_int64u();
                 }
-                else if (!List[Pos].empty() && List[Pos].find(__T(":"))!=string::npos)
+                else if (!List[Pos].empty() && List[Pos].find(__T(':'))!=string::npos)
                 {
                     Method=2;
                     Ztring ValueZ=List[Pos];
                     SeekValue=0;
-                    size_t Value_Pos=ValueZ.find(__T(":"));
+                    size_t Value_Pos=ValueZ.find(__T(':'));
                     if (Value_Pos==string::npos)
                         Value_Pos=ValueZ.size();
                     SeekValue+=Ztring(ValueZ.substr(0, Value_Pos)).To_int64u()*60*60*1000*1000*1000;
                     ValueZ.erase(0, Value_Pos+1);
-                    Value_Pos=ValueZ.find(__T(":"));
+                    Value_Pos=ValueZ.find(__T(':'));
                     if (Value_Pos==string::npos)
                         Value_Pos=ValueZ.size();
                     SeekValue+=Ztring(ValueZ.substr(0, Value_Pos)).To_int64u()*60*1000*1000*1000;
                     ValueZ.erase(0, Value_Pos+1);
-                    Value_Pos=ValueZ.find(__T("."));
+                    Value_Pos=ValueZ.find(__T('.'));
                     if (Value_Pos==string::npos)
                         Value_Pos=ValueZ.size();
                     SeekValue+=Ztring(ValueZ.substr(0, Value_Pos)).To_int64u()*1000*1000*1000;

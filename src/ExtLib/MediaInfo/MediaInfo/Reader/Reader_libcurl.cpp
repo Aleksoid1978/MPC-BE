@@ -41,7 +41,7 @@
 #define MEDIAINFO_HMAC 1
 #if MEDIAINFO_HMAC
     #include "hmac.h"
-    #include "base64.h"
+    #include "ThirdParty/base64/base64.h"
 #endif //MEDIAINFO_HMAC
 #include "MediaInfo/HashWrapper.h"
 #include "ZenLib/File.h"
@@ -518,7 +518,7 @@ Ztring Reader_libcurl_ExpandFileName(const Ztring &FileName)
         if (env)
             FileName_Modified.FindAndReplace(__T("$HOME"), Ztring().From_Local(env));
     }
-    if (FileName_Modified.find(__T("~"))==0)
+    if (FileName_Modified.find(__T('~'))==0)
     {
         char* env=getenv("HOME");
         if (env)
@@ -1114,7 +1114,7 @@ size_t Reader_libcurl::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                         MessageString.From_Local(curl_easy_strerror(Result));
                     if (Result==CURLE_PEER_FAILED_VERIFICATION)
                     {
-                        size_t Protocol_Limit=Curl_Data->File_Name.find(__T(":"));
+                        size_t Protocol_Limit=Curl_Data->File_Name.find(__T(':'));
                         if (Protocol_Limit!=string::npos)
                         {
                             Ztring Protocol=Curl_Data->File_Name;

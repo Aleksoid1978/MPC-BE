@@ -92,7 +92,7 @@
 #include <cstring>
 #include <cmath>
 #include <algorithm>
-#include "base64.h"
+#include "ThirdParty/base64/base64.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib

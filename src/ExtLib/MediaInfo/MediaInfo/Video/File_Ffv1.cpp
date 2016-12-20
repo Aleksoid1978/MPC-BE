@@ -283,7 +283,7 @@ int32s RangeCoder::get_symbol_s(int8u* States)
 // Info
 //***************************************************************************
 
-const char* Ffv1_coder_type(int8u coder_type)
+static const char* Ffv1_coder_type(int8u coder_type)
 {
     switch (coder_type)
     {
@@ -297,7 +297,7 @@ const char* Ffv1_coder_type(int8u coder_type)
     }
 }
 
-const string Ffv1_colorspace_type(int8u colorspace_type, bool chroma_planes, bool alpha_plane)
+static const string Ffv1_colorspace_type(int8u colorspace_type, bool chroma_planes, bool alpha_plane)
 {
     string ToReturn;
     switch (colorspace_type)
@@ -315,7 +315,7 @@ const string Ffv1_colorspace_type(int8u colorspace_type, bool chroma_planes, boo
     return ToReturn;
 }
 
-const char* Ffv1_picture_structure_ScanType (int8u picture_structure)
+static const char* Ffv1_picture_structure_ScanType (int8u picture_structure)
 {
     switch (picture_structure)
     {
@@ -326,7 +326,7 @@ const char* Ffv1_picture_structure_ScanType (int8u picture_structure)
     }
 }
 
-const char* Ffv1_picture_structure_ScanOrder (int8u picture_structure)
+static const char* Ffv1_picture_structure_ScanOrder (int8u picture_structure)
 {
     switch (picture_structure)
     {
@@ -336,7 +336,7 @@ const char* Ffv1_picture_structure_ScanOrder (int8u picture_structure)
     }
 }
 
-const state_transitions Ffv1_default_state_transition =
+static const state_transitions Ffv1_default_state_transition =
 {
       0,  0,  0,  0,  0,  0,  0,  0, 20, 21, 22, 23, 24, 25, 26, 27,
      28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 37, 38, 39, 40, 41, 42,
@@ -357,7 +357,7 @@ const state_transitions Ffv1_default_state_transition =
 };
 
 // Coming from FFv1 spec.
-const int8u log2_run[41]={
+static const int8u log2_run[41]={
     0 , 0, 0, 0, 1, 1, 1, 1,
     2 , 2, 2, 2, 3, 3, 3, 3,
     4 , 4, 5, 5, 6, 6, 7, 7,
@@ -366,7 +366,7 @@ const int8u log2_run[41]={
     24,
 };
 
-const int32u run[41] =
+static const int32u run[41] =
 {
     1 << 0,
     1 << 0,
@@ -1269,7 +1269,7 @@ void File_Ffv1::rgb()
 
     current_slice->run_index = 0;
 
-    for (int x = 0; x < c_max; x++) {
+    for (size_t x = 0; x < c_max; x++) {
         sample[x][0] = current_slice->sample_buffer +  x * 2      * (current_slice->w + 6) + 3;
         sample[x][1] = sample[x][0] + current_slice->w + 6;
     }

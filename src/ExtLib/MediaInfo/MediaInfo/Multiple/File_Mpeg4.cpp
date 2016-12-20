@@ -2567,7 +2567,7 @@ void File_Mpeg4::TimeCode_Associate(int32u TrackID)
 
     //For each track in the file (but only the last one will be used!)
     for (std::map<int32u, stream>::iterator Strea=Streams.begin(); Strea!=Streams.end(); ++Strea)
-        if (!Streams[TrackID].Parsers.empty() && (IsGeneral && Strea->second.StreamKind!=Stream_Max) || Strea->second.TimeCode_TrackID==TrackID)
+        if ((!Streams[TrackID].Parsers.empty() && (IsGeneral && Strea->second.StreamKind!=Stream_Max)) || Strea->second.TimeCode_TrackID==TrackID)
         {
             if (Strea->second.StreamKind==Stream_Video)
             {
@@ -2625,7 +2625,7 @@ void File_Mpeg4::IsParsing_mdat_Set()
             tc->H24 = false;
             tc->NegativeTimes = false;
             for (std::map<int32u, stream>::iterator StreamTemp = Streams.begin(); StreamTemp != Streams.end(); ++StreamTemp)
-                if (StreamTemp->second.StreamKind = Stream_Video)
+                if ((StreamTemp->second.StreamKind = Stream_Video))
                 {
                     tc->TimeScale = StreamTemp->second.mdhd_TimeScale;
                     tc->FrameDuration = StreamTemp->second.stts_Min;

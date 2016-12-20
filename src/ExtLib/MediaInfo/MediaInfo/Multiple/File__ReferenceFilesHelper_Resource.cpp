@@ -27,7 +27,7 @@
 #include "ZenLib/FileName.h"
 #include "ZenLib/Format/Http/Http_Utils.h"
 #if MEDIAINFO_AES
-    #include "base64.h"
+    #include "ThirdParty/base64/base64.h"
 #endif //MEDIAINFO_AES
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Events_Internal.h"

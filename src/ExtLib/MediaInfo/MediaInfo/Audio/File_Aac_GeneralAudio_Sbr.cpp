@@ -63,7 +63,7 @@ int8u Aac_k2_Compute(int8u bs_stop_freq, int8u extension_sampling_frequency_inde
 
 //---------------------------------------------------------------------------
 //Helper
-int8u Aac_bands_Compute(bool warp, int8u bands, int8u a0, int8u a1)
+static int8u Aac_bands_Compute(bool warp, int8u bands, int8u a0, int8u a1)
 {
     float div=(float)log(2.0);
     if (warp)
@@ -75,7 +75,7 @@ int8u Aac_bands_Compute(bool warp, int8u bands, int8u a0, int8u a1)
 //---------------------------------------------------------------------------
 // Master frequency band table
 // Computing for bs_freq_scale = 0
-bool Aac_f_master_Compute_0(int8u &num_env_bands_Master, int8u* f_Master, sbr_handler *sbr, int8u  k0, int8u  k2)
+static bool Aac_f_master_Compute_0(int8u &num_env_bands_Master, int8u* f_Master, sbr_handler *sbr, int8u  k0, int8u  k2)
 {
     int8u dk, numBands;
     if (sbr->bs_alter_scale)

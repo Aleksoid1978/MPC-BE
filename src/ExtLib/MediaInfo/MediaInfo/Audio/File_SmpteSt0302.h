@@ -36,7 +36,7 @@ public :
     #if MEDIAINFO_EVENTS
         int16u pid;
         int8u  stream_id;
-    #endif MEDIAINFO_EVENTS
+    #endif // MEDIAINFO_EVENTS
 
 private :
     //Streams management

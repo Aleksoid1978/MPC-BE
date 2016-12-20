@@ -53,7 +53,7 @@
 #endif //MEDIAINFO_EVENTS
 #include <algorithm>
 #if MEDIAINFO_DEMUX
-    #include "base64.h"
+    #include "ThirdParty/base64/base64.h"
 #endif //MEDIAINFO_DEMUX
 //---------------------------------------------------------------------------
 

@@ -18,7 +18,6 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Duplicate.h"
 #include "MediaInfo/Multiple/File_Mpeg_Psi.h"
-#include "MediaInfo/Duplicate/File__Duplicate_MpegTs.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib

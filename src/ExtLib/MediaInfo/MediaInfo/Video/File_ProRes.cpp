@@ -152,7 +152,7 @@ void File_ProRes::Read_Buffer_Continue()
         if (chroma)
             Skip_XX(64,                                         "QMatChroma");
     Element_End();
-    if (Element_Offset!=8+hdrSize)
+    if (Element_Offset!=8+(int32u)hdrSize)
         IsOk=false;
     for (int8u PictureNumber=0; PictureNumber<(frame_type?2:1); PictureNumber++)
     {

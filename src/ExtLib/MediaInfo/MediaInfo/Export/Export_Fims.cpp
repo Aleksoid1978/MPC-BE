@@ -67,9 +67,9 @@ int32u Fims_VideoCompressionCodeCS_termID(MediaInfo_Internal &MI, size_t StreamP
 
     if (Format==__T("MPEG Video"))
     {
-        if (Version.find(__T("1"))!=string::npos)
+        if (Version.find(__T('1'))!=string::npos)
             return 10000;
-        if (Version.find(__T("2"))!=string::npos)
+        if (Version.find(__T('2'))!=string::npos)
         {
             if (Profile.find(__T("Simple@"))!=string::npos)
             {
@@ -566,23 +566,23 @@ int32u Fims_AudioCompressionCodeCS_termID(MediaInfo_Internal &MI, size_t StreamP
         return 50000;
     if (Format==__T("MPEG Audio"))
     {
-        if (Version.find(__T("1"))!=string::npos)
+        if (Version.find(__T('1'))!=string::npos)
         {
-            if (Profile.find(__T("1"))!=string::npos)
+            if (Profile.find(__T('1'))!=string::npos)
                 return 70100;
-            if (Profile.find(__T("2"))!=string::npos)
+            if (Profile.find(__T('2'))!=string::npos)
                 return 70200;
-            if (Profile.find(__T("3"))!=string::npos)
+            if (Profile.find(__T('3'))!=string::npos)
                 return 70300;
             return 70000;
         }
-        if (Version.find(__T("2"))!=string::npos)
+        if (Version.find(__T('2'))!=string::npos)
         {
-            if (Profile.find(__T("1"))!=string::npos)
+            if (Profile.find(__T('1'))!=string::npos)
                 return 90100;
-            if (Profile.find(__T("2"))!=string::npos)
+            if (Profile.find(__T('2'))!=string::npos)
                 return 90200;
-            if (Profile.find(__T("3"))!=string::npos)
+            if (Profile.find(__T('3'))!=string::npos)
                 return 90300;
             return 90000;
         }

@@ -4109,7 +4109,7 @@ void File_MpegPs::xxx_stream_Parse(ps_stream &Temp, int8u &stream_Count)
             }
 
             //Checking cases with B-frames displayed before the first I-frame
-            if (Temp.Parsers.size()==1 && Temp.Parsers[0]->PTS_Begin!=(int64u)-1 && Temp.TimeStamp_Start.PTS.TimeStamp!=(int64u)-1 && float64_int64s(((float64)Temp.Parsers[0]->PTS_Begin)*90/1000000)<Temp.TimeStamp_Start.PTS.TimeStamp)
+            if (Temp.Parsers.size()==1 && Temp.Parsers[0]->PTS_Begin!=(int64u)-1 && Temp.TimeStamp_Start.PTS.TimeStamp!=(int64u)-1 && float64_int64s(((float64)Temp.Parsers[0]->PTS_Begin)*90/1000000)<(int64s)Temp.TimeStamp_Start.PTS.TimeStamp)
             {
                 Temp.TimeStamp_Start.PTS.File_Pos=File_Offset+Buffer_Offset-Header_Size;
                 Temp.TimeStamp_Start.PTS.TimeStamp=float64_int64s(((float64)Temp.Parsers[0]->PTS_Begin)*90/1000000); //TODO: same denominator for the time stamp

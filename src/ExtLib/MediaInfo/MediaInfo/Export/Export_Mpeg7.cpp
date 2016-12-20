@@ -145,9 +145,9 @@ int32u Mpeg7_FileFormatCS_termID_MediaInfo(MediaInfo_Internal &MI)
 
     if (Format==__T("MPEG Audio"))
     {
-        if (MI.Get(Stream_Audio, 0, Audio_Format_Profile).find(__T("2"))!=string::npos)
+        if (MI.Get(Stream_Audio, 0, Audio_Format_Profile).find(__T('2'))!=string::npos)
             return 500000; //mp2
-        if (MI.Get(Stream_Audio, 0, Audio_Format_Profile).find(__T("1"))!=string::npos)
+        if (MI.Get(Stream_Audio, 0, Audio_Format_Profile).find(__T('1'))!=string::npos)
             return 510000; //mp1
         return 0;
     }
@@ -176,7 +176,7 @@ int32u Mpeg7_FileFormatCS_termID(MediaInfo_Internal &MI)
     if (Format==__T("JPEG 2000"))
         return 20000;
     if (Format==__T("MPEG Audio"))
-        return (MI.Get(Stream_Audio, 0, Audio_Format_Profile).find(__T("3"))!=string::npos)?40000:0;
+        return (MI.Get(Stream_Audio, 0, Audio_Format_Profile).find(__T('3'))!=string::npos)?40000:0;
     if (Format==__T("MPEG-4"))
         return 50000;
     if (Format==__T("MPEG-PS"))
@@ -254,9 +254,9 @@ int32u Mpeg7_VisualCodingFormatCS_termID(MediaInfo_Internal &MI, size_t StreamPo
 
     if (Format==__T("MPEG Video"))
     {
-        if (Version.find(__T("1"))!=string::npos)
+        if (Version.find(__T('1'))!=string::npos)
             return 10000;
-        if (Version.find(__T("2"))!=string::npos)
+        if (Version.find(__T('2'))!=string::npos)
         {
             if (Profile.find(__T("Simple@"))!=string::npos)
             {
@@ -783,23 +783,23 @@ int32u Mpeg7_AudioCodingFormatCS_termID(MediaInfo_Internal &MI, size_t StreamPos
         return 20000;
     if (Format==__T("MPEG Audio"))
     {
-        if (Version.find(__T("1"))!=string::npos)
+        if (Version.find(__T('1'))!=string::npos)
         {
-            if (Profile.find(__T("1"))!=string::npos)
+            if (Profile.find(__T('1'))!=string::npos)
                 return 30100;
-            if (Profile.find(__T("2"))!=string::npos)
+            if (Profile.find(__T('2'))!=string::npos)
                 return 30200;
-            if (Profile.find(__T("3"))!=string::npos)
+            if (Profile.find(__T('3'))!=string::npos)
                 return 30300;
             return 30000;
         }
-        if (Version.find(__T("2"))!=string::npos)
+        if (Version.find(__T('2'))!=string::npos)
         {
-            if (Profile.find(__T("1"))!=string::npos)
+            if (Profile.find(__T('1'))!=string::npos)
                 return 40100;
-            if (Profile.find(__T("2"))!=string::npos)
+            if (Profile.find(__T('2'))!=string::npos)
                 return 40200;
-            if (Profile.find(__T("3"))!=string::npos)
+            if (Profile.find(__T('3'))!=string::npos)
                 return 40300;
             return 40000;
         }

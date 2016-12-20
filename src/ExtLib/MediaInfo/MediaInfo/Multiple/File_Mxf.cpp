@@ -3483,7 +3483,7 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
                 //Special case
                 if (Info->first=="BitRate" && Retrieve(StreamKind_Last, StreamPos_Last, General_ID).find(__T(" / "))!=string::npos)
                 {
-                    if (Retrieve(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_BitRate)).empty() || Retrieve(StreamKind_Last, StreamPos_Last, General_ID).find(__T("-"))!=string::npos)
+                    if (Retrieve(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_BitRate)).empty() || Retrieve(StreamKind_Last, StreamPos_Last, General_ID).find(__T('-'))!=string::npos)
                         Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_BitRate_Encoded), Info->second.To_int64u()*2, 10, true);
                     else
                         Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_BitRate), Info->second.To_int64u()*2, 10, true);
@@ -3842,7 +3842,7 @@ void File_Mxf::Streams_Finish_Component(const int128u ComponentUID, float64 Edit
             FrameCount-=File_IgnoreEditsBefore;
         }
         Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Duration), FrameCount*1000/EditRate, 0, true);
-        size_t ID_SubStreamInfo_Pos=Retrieve(StreamKind_Last, StreamPos_Last, General_ID).find(__T("-"));
+        size_t ID_SubStreamInfo_Pos=Retrieve(StreamKind_Last, StreamPos_Last, General_ID).find(__T('-'));
         if (ID_SubStreamInfo_Pos!=string::npos)
         {
             Ztring ID=Retrieve(StreamKind_Last, StreamPos_Last, General_ID);

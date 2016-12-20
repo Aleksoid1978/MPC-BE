@@ -24,6 +24,7 @@
 #include "MediaInfo/HashWrapper.h" //For MEDIAINFO_HASH
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Config.h"
+    #include "MediaInfo/MediaInfo_Config_PerPackage.h"
     #include "MediaInfo/MediaInfo_Events.h"
     #include "ZenLib/File.h"
 #endif //MEDIAINFO_EVENTS
@@ -38,7 +39,6 @@ namespace MediaInfoLib
 
 #if MEDIAINFO_EVENTS
     class File__Analyze;
-    class MediaInfo_Config_PerPackage;
 #endif //MEDIAINFO_EVENTS
 
 #if MEDIAINFO_AES

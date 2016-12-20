@@ -76,7 +76,7 @@ extern const char* Id3v2_PictureType(int8u Type)
 #include "MediaInfo/Tag/File_Id3v2.h"
 #include "ZenLib/ZtringListList.h"
 #include "ZenLib/Utils.h"
-#include "base64.h"
+#include "ThirdParty/base64/base64.h"
 #include <cstring>
 using namespace ZenLib;
 //---------------------------------------------------------------------------
@@ -1188,7 +1188,7 @@ void File_Id3v2::Fill_Name()
         case Elements::TCOM : Fill(Stream_General, 0, General_Composer, Element_Value); break;
         case Elements::TCON :
                               {
-                                if (Element_Value.find(__T("("))==0)
+                                if (Element_Value.find(__T('('))==0)
                                     Element_Value=Element_Value.SubString(__T("("), __T(")")); //Replace (nn) by nn
                                 if (Element_Value==__T("0") || Element_Value==__T("255"))
                                     Element_Value.clear();
@@ -1330,7 +1330,7 @@ void File_Id3v2::Fill_Name()
         case Elements::TCM  : Fill(Stream_General, 0, "Composer", Element_Value); break;
         case Elements::TCO  :
                               {
-                                if (Element_Value.find(__T("("))==0)
+                                if (Element_Value.find(__T('('))==0)
                                     Element_Value=Element_Value.SubString(__T("("), __T(")")); //Replace (nn) by nn
                                 if (Element_Value==__T("0") || Element_Value==__T("255"))
                                     Element_Value.clear();

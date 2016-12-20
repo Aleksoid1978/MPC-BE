@@ -96,7 +96,7 @@ bool Request::Http_Begin(std::istream &In, std::ostream &Out)
         Out << "\r\n";
         return false; //Problem
     }
-    if (Http->Path.find("%")!=string::npos)
+    if (Http->Path.find('%')!=string::npos)
         Http->Path=Format::Http::URL_Encoded_Decode(Http->Path);
     //-Norm
     string Line;

@@ -1508,7 +1508,7 @@ void File_Mpeg4v::visual_object_start()
     TEST_SB_END();
     }
     Get_S1 ( 4, visual_object_type,                             "visual_object_type"); Param_Info1(Mpeg4v_visual_object_type[visual_object_type]);
-    if (profile_and_level_indication<B8(11100001) || profile_and_level_indication>B8(11101000) && (visual_object_type==1 || visual_object_type==2))
+    if (profile_and_level_indication<B8(11100001) || (profile_and_level_indication>B8(11101000) && (visual_object_type==1 || visual_object_type==2)))
     {
         TEST_SB_SKIP(                                           "video_signal_type");
             Skip_S1(3,                                          "video_format");

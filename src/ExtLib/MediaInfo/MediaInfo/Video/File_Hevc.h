@@ -235,8 +235,8 @@ private :
             AnnexB_Buffer_Size(0),
             #endif //MEDIAINFO_DEMUX
             profile_space(profile_space_),
-            profile_idc(profile_idc_),
             tier_flag(tier_flag_),
+            profile_idc(profile_idc_),
             level_idc(level_idc_),
             pic_width_in_luma_samples(pic_width_in_luma_samples_),
             pic_height_in_luma_samples(pic_height_in_luma_samples_),

@@ -38,7 +38,7 @@ public :
         int16u pid;
         int8u  stream_id;
         bool   IgnoreGuardBandTest;
-    #endif MEDIAINFO_EVENTS
+    #endif // MEDIAINFO_EVENTS
 
     // Constructor/Destructor
     File_SmpteSt0337();

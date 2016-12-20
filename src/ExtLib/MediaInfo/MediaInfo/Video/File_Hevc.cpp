@@ -1993,7 +1993,7 @@ void File_Hevc::sei_message_user_data_unregistered_x265(int32u payloadSize)
             Encoded_Library_Settings.clear();
             while (Options_Pos_Before!=Data.size())
             {
-                size_t Options_Pos=Data.find(__T(" "), Options_Pos_Before);
+                size_t Options_Pos=Data.find(__T(' '), Options_Pos_Before);
                 if (Options_Pos==std::string::npos)
                     Options_Pos=Data.size();
                 Ztring option;
@@ -2035,7 +2035,7 @@ void File_Hevc::sei_message_user_data_unregistered_x265(int32u payloadSize)
                     Value.erase(Value.begin());
                 while (!Value.empty() && Value[Value.size()-1]<0x30)
                     Value.erase(Value.end()-1);
-                size_t Value_Pos=Value.find(__T(" "));
+                size_t Value_Pos=Value.find(__T(' '));
                 if (Value_Pos!=string::npos)
                     Value.resize(Value_Pos);
                 Encoded_Library=Value;

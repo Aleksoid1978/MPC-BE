@@ -133,7 +133,7 @@ HashWrapper::~HashWrapper ()
         delete (sha512_ctx*)((void**)m)[SHA512];
     #endif //MEDIAINFO_SHA2
 
-    delete[] m;
+    delete[] (void**)m;
 }
 
 void HashWrapper::Update (const int8u* Buffer, const size_t Buffer_Size)

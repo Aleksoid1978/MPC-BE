@@ -814,7 +814,7 @@ void File_DolbyE::Data_Parse()
             }
             GuardBand_After=BytesUpToNextFrame-BytesUpToLastFrame;
             int64u ToRemove=GuardBand_Before+(BitDepth>>1)+Element_Size; // Guardband + AES3 header + Dolby E frame
-            if (ToRemove<GuardBand_After)
+            if (ToRemove<(int64u)GuardBand_After)
                 GuardBand_After-=ToRemove;
             else
                 GuardBand_After=0;

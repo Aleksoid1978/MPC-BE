@@ -110,8 +110,8 @@ void File_Als::FileHeader_Parse()
     BS_End();
 
     FILLING_BEGIN();
-    if (!CalcDurationUncompressedSize(Samples, SampleRate, (BitsPerSample+1)*8, Channels))
-        return;
+        if (!CalcDurationUncompressedSize(Samples, SampleRate, (BitsPerSample+1)*8, Channels))
+            return;
 
         File__Tags_Helper::Accept("ALS");
 
