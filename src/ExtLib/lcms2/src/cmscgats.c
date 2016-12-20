@@ -871,7 +871,7 @@ void InSymbol(cmsIT8* it8)
             k = 0;
             NextCh(it8);
 
-            while (k < MAXSTR && it8->ch != sng) {
+            while (k < (MAXSTR-1) && it8->ch != sng) {
 
                 if (it8->ch == '\n'|| it8->ch == '\r') k = MAXSTR+1;
                 else {
@@ -1944,67 +1944,67 @@ cmsBool HeaderSection(cmsIT8* it8)
 
 
         case SIDENT:
-                strncpy(VarName, it8->id, MAXID-1);
-                VarName[MAXID-1] = 0;
+            strncpy(VarName, it8->id, MAXID - 1);
+            VarName[MAXID - 1] = 0;
 
-                if (!IsAvailableOnList(it8-> ValidKeywords, VarName, NULL, &Key)) {
+            if (!IsAvailableOnList(it8->ValidKeywords, VarName, NULL, &Key)) {
 
 #ifdef CMS_STRICT_CGATS
-                 return SynError(it8, "Undefined keyword '%s'", VarName);
+                return SynError(it8, "Undefined keyword '%s'", VarName);
 #else
-                    Key = AddAvailableProperty(it8, VarName, WRITE_UNCOOKED);
-                    if (Key == NULL) return FALSE;
+                Key = AddAvailableProperty(it8, VarName, WRITE_UNCOOKED);
+                if (Key == NULL) return FALSE;
 #endif
+            }
+
+            InSymbol(it8);
+            if (!GetVal(it8, Buffer, MAXSTR - 1, "Property data expected")) return FALSE;
+
+            if (Key->WriteAs != WRITE_PAIR) {
+                AddToList(it8, &GetTable(it8)->HeaderList, VarName, NULL, Buffer,
+                    (it8->sy == SSTRING) ? WRITE_STRINGIFY : WRITE_UNCOOKED);
+            }
+            else {
+                const char *Subkey;
+                char *Nextkey;
+                if (it8->sy != SSTRING)
+                    return SynError(it8, "Invalid value '%s' for property '%s'.", Buffer, VarName);
+
+                // chop the string as a list of "subkey, value" pairs, using ';' as a separator
+                for (Subkey = Buffer; Subkey != NULL; Subkey = Nextkey)
+                {
+                    char *Value, *temp;
+
+                    //  identify token pair boundary
+                    Nextkey = (char*)strchr(Subkey, ';');
+                    if (Nextkey)
+                        *Nextkey++ = '\0';
+
+                    // for each pair, split the subkey and the value
+                    Value = (char*)strrchr(Subkey, ',');
+                    if (Value == NULL)
+                        return SynError(it8, "Invalid value for property '%s'.", VarName);
+
+                    // gobble the spaces before the coma, and the coma itself
+                    temp = Value++;
+                    do *temp-- = '\0'; while (temp >= Subkey && *temp == ' ');
+
+                    // gobble any space at the right
+                    temp = Value + strlen(Value) - 1;
+                    while (*temp == ' ') *temp-- = '\0';
+
+                    // trim the strings from the left
+                    Subkey += strspn(Subkey, " ");
+                    Value += strspn(Value, " ");
+
+                    if (Subkey[0] == 0 || Value[0] == 0)
+                        return SynError(it8, "Invalid value for property '%s'.", VarName);
+                    AddToList(it8, &GetTable(it8)->HeaderList, VarName, Subkey, Value, WRITE_PAIR);
                 }
+            }
 
-                InSymbol(it8);
-                if (!GetVal(it8, Buffer, MAXSTR-1, "Property data expected")) return FALSE;
-
-                if(Key->WriteAs != WRITE_PAIR) {
-                    AddToList(it8, &GetTable(it8)->HeaderList, VarName, NULL, Buffer,
-                                (it8->sy == SSTRING) ? WRITE_STRINGIFY : WRITE_UNCOOKED);
-                }
-                else {
-                    const char *Subkey;
-                    char *Nextkey;
-                    if (it8->sy != SSTRING)
-                        return SynError(it8, "Invalid value '%s' for property '%s'.", Buffer, VarName);
-
-                    // chop the string as a list of "subkey, value" pairs, using ';' as a separator
-                    for (Subkey = Buffer; Subkey != NULL; Subkey = Nextkey)
-                    {
-                        char *Value, *temp;
-
-                        //  identify token pair boundary
-                        Nextkey = (char*) strchr(Subkey, ';');
-                        if(Nextkey)
-                            *Nextkey++ = '\0';
-
-                        // for each pair, split the subkey and the value
-                        Value = (char*) strrchr(Subkey, ',');
-                        if(Value == NULL)
-                            return SynError(it8, "Invalid value for property '%s'.", VarName);
-
-                        // gobble the spaces before the coma, and the coma itself
-                        temp = Value++;
-                        do *temp-- = '\0'; while(temp >= Subkey && *temp == ' ');
-
-                        // gobble any space at the right
-                        temp = Value + strlen(Value) - 1;
-                        while(*temp == ' ') *temp-- = '\0';
-
-                        // trim the strings from the left
-                        Subkey += strspn(Subkey, " ");
-                        Value += strspn(Value, " ");
-
-                        if(Subkey[0] == 0 || Value[0] == 0)
-                            return SynError(it8, "Invalid value for property '%s'.", VarName);
-                        AddToList(it8, &GetTable(it8)->HeaderList, VarName, Subkey, Value, WRITE_PAIR);
-                    }
-                }
-
-                InSymbol(it8);
-                break;
+            InSymbol(it8);
+            break;
 
 
         case SEOLN: break;
@@ -2024,14 +2024,17 @@ cmsBool HeaderSection(cmsIT8* it8)
 static
 void ReadType(cmsIT8* it8, char* SheetTypePtr)
 {
+    cmsInt32Number cnt = 0;
+
     // First line is a very special case.
 
     while (isseparator(it8->ch))
             NextCh(it8);
 
-    while (it8->ch != '\r' && it8 ->ch != '\n' && it8->ch != '\t' && it8 -> ch != -1) {
+    while (it8->ch != '\r' && it8 ->ch != '\n' && it8->ch != '\t' && it8 -> ch != 0) {
 
-        *SheetTypePtr++= (char) it8 ->ch;
+        if (cnt++ < MAXSTR) 
+            *SheetTypePtr++= (char) it8 ->ch;
         NextCh(it8);
     }
 
@@ -2224,7 +2227,7 @@ void CookPointers(cmsIT8* it8)
 // that should be something like some printable characters plus a \n
 // returns 0 if this is not like a CGATS, or an integer otherwise. This integer is the number of words in first line?
 static
-int IsMyBlock(cmsUInt8Number* Buffer, int n)
+int IsMyBlock(const cmsUInt8Number* Buffer, int n)
 {
     int words = 1, space = 0, quot = 0;
     int i;
@@ -2288,7 +2291,7 @@ cmsBool IsMyFile(const char* FileName)
 // ---------------------------------------------------------- Exported routines
 
 
-cmsHANDLE  CMSEXPORT cmsIT8LoadFromMem(cmsContext ContextID, void *Ptr, cmsUInt32Number len)
+cmsHANDLE  CMSEXPORT cmsIT8LoadFromMem(cmsContext ContextID, const void *Ptr, cmsUInt32Number len)
 {
     cmsHANDLE hIT8;
     cmsIT8*  it8;
@@ -2297,7 +2300,7 @@ cmsHANDLE  CMSEXPORT cmsIT8LoadFromMem(cmsContext ContextID, void *Ptr, cmsUInt3
     _cmsAssert(Ptr != NULL);
     _cmsAssert(len != 0);
 
-    type = IsMyBlock((cmsUInt8Number*)Ptr, len);
+    type = IsMyBlock((const cmsUInt8Number*)Ptr, len);
     if (type == 0) return NULL;
 
     hIT8 = cmsIT8Alloc(ContextID);

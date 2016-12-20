@@ -178,31 +178,32 @@ cmsBool AddMLUBlock(cmsMLU* mlu, cmsUInt32Number size, const wchar_t *Block,
     return TRUE;
 }
 
-// Convert from a 3-char code to a cmsUInt16Number. It is done inthis way because some
+// Convert from a 3-char code to a cmsUInt16Number. It is done in this way because some
 // compilers don't properly align beginning of strings
 
 static
 cmsUInt16Number strTo16(const char str[3])
 {
-    cmsUInt16Number n = ((cmsUInt16Number) str[0] << 8) | str[1];
+    const cmsUInt8Number* ptr8 = (const cmsUInt8Number*)str;
+    cmsUInt16Number n = ((cmsUInt16Number) ptr8[1] << 8) |  ptr8[0];
 
-    return n;  // Always big endian in this case
+    return _cmsAdjustEndianess16(n);
 }
 
 static
 void strFrom16(char str[3], cmsUInt16Number n)
 {
-    // Assiming this would be aligned
+    // Assuming this would be aligned
     union {
 
        cmsUInt16Number n;
-       char str[2];
+       cmsUInt8Number str[2];
        
     } c;
 
-    c.n = n;  // Always big endian in this case
+    c.n = _cmsAdjustEndianess16(n);  
 
-    str[0] = c.str[0]; str[1] = c.str[1]; str[2] = 0;
+    str[0] = (char) c.str[0]; str[1] = (char) c.str[1]; str[2] = (char) 0;
 
 }
 
@@ -517,7 +518,11 @@ cmsBool  GrowNamedColorList(cmsNAMEDCOLORLIST* v)
         size = v ->Allocated * 2;
 
     // Keep a maximum color lists can grow, 100K entries seems reasonable
-    if (size > 1024*100) return FALSE;
+    if (size > 1024 * 100) {
+        _cmsFree(v->ContextID, (void*) v->List);
+        v->List = NULL;
+        return FALSE;
+    }
 
     NewPtr = (_cmsNAMEDCOLOR*) _cmsRealloc(v ->ContextID, v ->List, size * sizeof(_cmsNAMEDCOLOR));
     if (NewPtr == NULL)
@@ -539,8 +544,11 @@ cmsNAMEDCOLORLIST* CMSEXPORT cmsAllocNamedColorList(cmsContext ContextID, cmsUIn
     v ->nColors   = 0;
     v ->ContextID  = ContextID;
 
-    while (v -> Allocated < n){
-        if (!GrowNamedColorList(v)) return NULL;
+    while (v -> Allocated < n) {
+        if (!GrowNamedColorList(v)) {
+            _cmsFree(ContextID, (void*) v);
+            return NULL;
+        }
     }
 
     strncpy(v ->Prefix, Prefix, sizeof(v ->Prefix)-1);

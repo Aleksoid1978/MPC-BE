@@ -835,7 +835,7 @@ static
     cmsHTRANSFORM xform = cmsCreateTransformTHR(ContextID, hProfile, TYPE_GRAY_8, hXYZ, TYPE_XYZ_DBL, Intent, cmsFLAGS_NOOPTIMIZE);
     int i;
 
-    if (Out != NULL) {
+    if (Out != NULL && xform != NULL) {
         for (i=0; i < 256; i++) {
 
             cmsUInt8Number Gray = (cmsUInt8Number) i;
@@ -847,8 +847,8 @@ static
         }
     }
 
-    cmsDeleteTransform(xform);
-    cmsCloseProfile(hXYZ);
+    if (xform) cmsDeleteTransform(xform);
+    if (hXYZ) cmsCloseProfile(hXYZ);
     return Out;
 }
 

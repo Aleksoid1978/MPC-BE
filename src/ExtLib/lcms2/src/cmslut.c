@@ -770,6 +770,9 @@ cmsBool CMSEXPORT cmsStageSampleCLut16bit(cmsStage* mpe, cmsSAMPLER16 Sampler, v
     if (nInputs > MAX_INPUT_DIMENSIONS) return FALSE;
     if (nOutputs >= MAX_STAGE_CHANNELS) return FALSE;
 
+    memset(In, 0, sizeof(In));
+    memset(Out, 0, sizeof(Out));
+
     nTotalPoints = CubeSize(nSamples, nInputs);
     if (nTotalPoints == 0) return FALSE;
 
