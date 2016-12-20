@@ -105,8 +105,7 @@
 #endif
 #include "MediaInfo/Multiple/File_Mpeg4_TimeCode.h"
 #include "ZenLib/FileName.h"
-#include "base64.h"
-#include <cmath>
+#include "ThirdParty/base64/base64.h"
 #include <zlib.h>
 #include <algorithm>
 //---------------------------------------------------------------------------
@@ -2726,7 +2725,9 @@ void File_Mpeg4::moov_meta_ilst_xxxx_data()
                         else if (Value==__T("143460")) Value=__T("Australia");
                         else if (Value==__T("143461")) Value=__T("New Zealand");
                         else if (Value==__T("143462")) Value=__T("Japan");
-                        else Value=__T("Unknown Country");
+                        else if (Value==__T("143463")) Value=__T("Hong Kong");
+                        else if (Value==__T("143469")) Value=__T("Russia");
+                        else if (Value==__T("143470")) Value=__T("Taiwan");
                     }
                     if (!Parameter.empty())
                     {
@@ -3491,7 +3492,7 @@ void File_Mpeg4::moov_trak_mdia_minf_gmhd_tmcd_tcmi()
         Skip_Flags(TextFace, 4,                                 "Shadow");
         Skip_Flags(TextFace, 5,                                 "Condense");
         Skip_Flags(TextFace, 6,                                 "Extend");
-    if (Element_Size>=25 && 25+Buffer[Buffer_Offset+24]==Element_Size)
+    if (Element_Size>=25 && 25+(int64u)Buffer[Buffer_Offset+24]==Element_Size)
         Skip_BFP4(16,                                           "Text size"); //Non-Standard, but found in several files
     else
         Skip_B2(                                                "Text size");
@@ -5717,7 +5718,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_fiel()
     // 6 – B is displayed earliest, B is stored first in the file.
     // 9 – B is displayed earliest, T is stored first in the file.
     //14 – T is displayed earliest, B is stored first in the file.
-    Element_Name("Field/Frame Information");
+    Element_Name("Field handling");
 
     //Parsing
     int8u  fields, detail;

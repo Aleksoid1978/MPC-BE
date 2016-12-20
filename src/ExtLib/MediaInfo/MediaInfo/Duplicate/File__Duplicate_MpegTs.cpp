@@ -29,7 +29,6 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Duplicate/File__Duplicate_MpegTs.h"
 #include "MediaInfo/MediaInfo_Config.h"
-#include "ZenLib/ZtringList.h"
 #include "ZenLib/File.h"
 #include <cstring>
 using namespace ZenLib;

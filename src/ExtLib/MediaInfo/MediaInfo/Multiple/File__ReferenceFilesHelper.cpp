@@ -35,7 +35,7 @@
     #include "MediaInfo/MediaInfo_Config_PerPackage.h"
 #endif //MEDIAINFO_EVENTS
 #if MEDIAINFO_AES
-    #include "base64.h"
+    #include "ThirdParty/base64/base64.h"
 #endif //MEDIAINFO_AES
 using namespace std;
 //---------------------------------------------------------------------------
@@ -1623,7 +1623,7 @@ MediaInfo_Internal* File__ReferenceFilesHelper::MI_Create()
         if (HasMainFile && !Sequences[Sequences_Current]->IsMain)
         {
             ZtringList ID;
-            ID.push_back(Ztring::ToZtring((((int64u)MediaInfo_Parser_SideCar)<<56)|Sequences[Sequences_Current]->StreamID-1));
+            ID.push_back(Ztring::ToZtring((((int64u)MediaInfo_Parser_SideCar)<<56)|(Sequences[Sequences_Current]->StreamID-1)));
             ID.push_back(Ztring::ToZtring(16));
             ID.push_back(Ztring::ToZtring(MediaInfo_Parser_SideCar));
             SubFile_IDs.push_back(ID);

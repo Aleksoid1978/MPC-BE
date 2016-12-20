@@ -27,7 +27,6 @@
 #include "ZenLib/File.h"
 #include "ZenLib/Dir.h"
 #include "ZenLib/FileName.h"
-#include "ZenLib/ZtringList.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib

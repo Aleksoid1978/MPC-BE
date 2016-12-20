@@ -1820,7 +1820,7 @@ int8s Ztring::To_int8s (int8u Radix, ztring_t Options) const
     #endif
 
     //Rounded
-    if (Options==Ztring_Rounded && find(__T("."))!=Error)
+    if (Options==Ztring_Rounded && find(__T('.'))!=Error)
     {
         float80 F=To_float80();
         F-=I;
@@ -1858,7 +1858,7 @@ int8u Ztring::To_int8u (int8u Radix, ztring_t Options) const
     #endif
 
     //Rounded
-    if (Options==Ztring_Rounded && find(__T("."))!=std::string::npos)
+    if (Options==Ztring_Rounded && find(__T('.'))!=std::string::npos)
     {
         float32 F=To_float32();
         F-=I;
@@ -1896,7 +1896,7 @@ int16s Ztring::To_int16s (int8u Radix, ztring_t Options) const
     #endif
 
     //Rounded
-    if (Options==Ztring_Rounded && find(__T("."))!=Error)
+    if (Options==Ztring_Rounded && find(__T('.'))!=Error)
     {
         float80 F=To_float80();
         F-=I;
@@ -1934,7 +1934,7 @@ int16u Ztring::To_int16u (int8u Radix, ztring_t Options) const
     #endif
 
     //Rounded
-    if (Options==Ztring_Rounded && find(__T("."))!=std::string::npos)
+    if (Options==Ztring_Rounded && find(__T('.'))!=std::string::npos)
     {
         float32 F=To_float32();
         F-=I;
@@ -1972,7 +1972,7 @@ int32s Ztring::To_int32s (int8u Radix, ztring_t Options) const
     #endif
 
     //Rounded
-    if (Options==Ztring_Rounded && find(__T("."))!=Error)
+    if (Options==Ztring_Rounded && find(__T('.'))!=Error)
     {
         float80 F=To_float80();
         F-=I;
@@ -2010,7 +2010,7 @@ int32u Ztring::To_int32u (int8u Radix, ztring_t Options) const
     #endif
 
     //Rounded
-    if (Options==Ztring_Rounded && find(__T("."))!=std::string::npos)
+    if (Options==Ztring_Rounded && find(__T('.'))!=std::string::npos)
     {
         float32 F=To_float32();
         F-=I;
@@ -2048,7 +2048,7 @@ int64s Ztring::To_int64s (int8u Radix, ztring_t Options) const
     #endif
 
     //Rounded
-    if (Options==Ztring_Rounded && find(__T("."))!=std::string::npos)
+    if (Options==Ztring_Rounded && find(__T('.'))!=std::string::npos)
     {
         float32 F=To_float32();
         F-=I;
@@ -2086,7 +2086,7 @@ int64u Ztring::To_int64u (int8u Radix, ztring_t Options) const
     #endif
 
     //Rounded
-    if (Options==Ztring_Rounded && find(__T("."))!=std::string::npos)
+    if (Options==Ztring_Rounded && find(__T('.'))!=std::string::npos)
     {
         float32 F=To_float32();
         F-=I;

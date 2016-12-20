@@ -23,7 +23,7 @@
     #include "ZenLib/FileName.h"
 #endif //MEDIAINFO_EVENTS
 #if MEDIAINFO_IBI || MEDIAINFO_AES
-    #include "base64.h"
+    #include "ThirdParty/base64/base64.h"
 #endif //MEDIAINFO_IBI || MEDIAINFO_AES
 #include <algorithm>
 #if MEDIAINFO_DEMUX
@@ -764,21 +764,21 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     {
         #if MEDIAINFO_DEMUX
             int64u ValueInt64u;
-            if (Value.find(__T(":"))!=string::npos)
+            if (Value.find(__T(':'))!=string::npos)
             {
                 Ztring ValueZ=Value;
                 ValueInt64u=0;
-                size_t Value_Pos=ValueZ.find(__T(":"));
+                size_t Value_Pos=ValueZ.find(__T(':'));
                 if (Value_Pos==string::npos)
                     Value_Pos=ValueZ.size();
                 ValueInt64u+=Ztring(ValueZ.substr(0, Value_Pos)).To_int64u()*60*60*1000*1000*1000;
                 ValueZ.erase(0, Value_Pos+1);
-                Value_Pos=ValueZ.find(__T(":"));
+                Value_Pos=ValueZ.find(__T(':'));
                 if (Value_Pos==string::npos)
                     Value_Pos=ValueZ.size();
                 ValueInt64u+=Ztring(ValueZ.substr(0, Value_Pos)).To_int64u()*60*1000*1000*1000;
                 ValueZ.erase(0, Value_Pos+1);
-                Value_Pos=ValueZ.find(__T("."));
+                Value_Pos=ValueZ.find(__T('.'));
                 if (Value_Pos==string::npos)
                     Value_Pos=ValueZ.size();
                 ValueInt64u+=Ztring(ValueZ.substr(0, Value_Pos)).To_int64u()*1000*1000*1000;

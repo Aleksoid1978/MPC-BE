@@ -156,7 +156,7 @@ void File_ApeTag::Data_Parse()
     else if (Key=="COPYRIGHT")      Fill(Stream_General, 0, General_Copyright, Value);
     else if (Key=="DISK")
     {
-                                    if (Value.find(__T("/"))!=Error)
+                                    if (Value.find(__T('/'))!=Error)
                                     {
                                         Fill(Stream_General, 0, General_Part_Position_Total, Value.SubString(__T("/"), __T("")));
                                         Fill(Stream_General, 0, General_Part_Position, Value.SubString(__T(""), __T("/")));
@@ -170,7 +170,7 @@ void File_ApeTag::Data_Parse()
     else if (Key=="TITLE")          Fill(Stream_General, 0, General_Title, Value);
     else if (Key=="TRACK")
     {
-                                    if (Value.find(__T("/"))!=Error)
+                                    if (Value.find(__T('/'))!=Error)
                                     {
                                         Fill(Stream_General, 0, General_Track_Position_Total, Value.SubString(__T("/"), __T("")));
                                         Fill(Stream_General, 0, General_Track_Position, Value.SubString(__T(""), __T("/")));

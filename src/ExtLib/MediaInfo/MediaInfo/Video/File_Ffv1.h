@@ -119,7 +119,7 @@ public:
         inline void update_correlation_value_and_shift()
         {
             // Step 11: Resets
-            if (N == N0)
+            if ((int64u)N == N0)
             {
                 // divide by 2, if >= 0 : ROUND, otherwise, CEIL
                 N >>= 1;

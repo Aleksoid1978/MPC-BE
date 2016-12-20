@@ -42,7 +42,7 @@
 #endif //defined(MEDIAINFO_PBCORE_YES)
 #include "MediaInfo/MediaInfo_Internal.h"
 #include "MediaInfo/File__Analyze.h"
-#include "base64.h"
+#include "ThirdParty/base64/base64.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -589,9 +589,9 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
 
     //Gestion $xx$
     size_t PosX=0;
-    while (Retour.find(__T("$"), PosX)!=(size_t)-1)
+    while (Retour.find(__T('$'), PosX)!=(size_t)-1)
     {
-        PosX=Retour.find(__T("$"), PosX);
+        PosX=Retour.find(__T('$'), PosX);
         if (Retour.size()>PosX+2 && !(Retour(PosX+1)==__T('i') && Retour(PosX+2)==__T('f') && Retour(PosX+3)==__T('('))) //To keep out "%" without any signification, or "$if(..."
         {
             Ztring ARemplacer=Ztring(__T("$")+Retour.SubString(__T("$"), __T("$"), PosX))+__T("$");
@@ -668,9 +668,9 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
 
     //Gestion %xxx%
     PosX=0;
-    while (Retour.find(__T("%"), PosX)!=(size_t)-1)
+    while (Retour.find(__T('%'), PosX)!=(size_t)-1)
     {
-        PosX=Retour.find(__T("%"), PosX);
+        PosX=Retour.find(__T('%'), PosX);
         if (Retour.size() > PosX + 2 && Retour[PosX + 1] >= __T('A') && Retour[PosX + 1] <= __T('Z')) //To keep out "%" without any signification
         {
             Ztring ARemplacer = Ztring(__T("%") + Retour.SubString(__T("%"), __T("%"), PosX)) + __T("%");

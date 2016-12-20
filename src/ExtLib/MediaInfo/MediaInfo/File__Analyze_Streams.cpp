@@ -815,10 +815,10 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
         if (Parameter==Fill_Parameter(StreamKind, Generic_ServiceName)
          || Parameter==Fill_Parameter(StreamKind, Generic_ServiceProvider))
         {
-            if (Retrieve(StreamKind, StreamPos, Parameter).find(__T(" - "))==string::npos && (Retrieve(StreamKind, StreamPos, Parameter).find(__T(":"))==2 || Retrieve(StreamKind, StreamPos, Parameter).find(__T(":"))==3))
+            if (Retrieve(StreamKind, StreamPos, Parameter).find(__T(" - "))==string::npos && (Retrieve(StreamKind, StreamPos, Parameter).find(__T(':'))==2 || Retrieve(StreamKind, StreamPos, Parameter).find(__T(':'))==3))
             {
                 Ztring Temp=Retrieve(StreamKind, StreamPos, Parameter);
-                Temp.erase(0, Retrieve(StreamKind, StreamPos, Parameter).find(__T(":"))+1);
+                Temp.erase(0, Retrieve(StreamKind, StreamPos, Parameter).find(__T(':'))+1);
                 (*Stream)[StreamKind][StreamPos](Parameter)=Temp;
             }
         }
@@ -2290,6 +2290,7 @@ void File__Analyze::PixelAspectRatio_Fill(const Ztring &Value, stream_t StreamKi
 
     if (Retrieve(StreamKind, StreamPos, Parameter_DisplayAspectRatio).empty())
     {
+        //TODO: trash this crazy test after PAR is in num/den format.
         float32 PAR=Value.To_float32();
         if (PAR>(float32)12/(float32)11*0.999 && PAR<(float32)12/(float32)11*1.001)
             PAR=(float32)12/(float32)11;
@@ -2297,6 +2298,8 @@ void File__Analyze::PixelAspectRatio_Fill(const Ztring &Value, stream_t StreamKi
             PAR=(float32)10/(float32)11;
         if (PAR>(float32)16/(float32)11*0.999 && PAR<(float32)16/(float32)11*1.001)
             PAR=(float32)16/(float32)11;
+        if (PAR>(float32)16/(float32)15*0.999 && PAR<(float32)16/(float32)15*1.001)
+            PAR=(float32)16/(float32)15;
         if (PAR>(float32)40/(float32)33*0.999 && PAR<(float32)40/(float32)33*1.001)
             PAR=(float32)40/(float32)33;
         if (PAR>(float32)24/(float32)11*0.999 && PAR<(float32)24/(float32)11*1.001)

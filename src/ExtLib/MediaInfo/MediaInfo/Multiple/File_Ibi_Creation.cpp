@@ -25,7 +25,7 @@
 #include <cstring>
 #include <ctime>
 #include <zlib.h>
-#include "base64.h"
+#include "ThirdParty/base64/base64.h"
 #include "ZenLib/File.h"
 #include "ZenLib/OS_Utils.h"
 #ifdef WINDOWS

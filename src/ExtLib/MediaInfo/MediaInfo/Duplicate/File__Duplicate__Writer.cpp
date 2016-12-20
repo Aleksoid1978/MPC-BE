@@ -24,7 +24,6 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Duplicate/File__Duplicate__Writer.h"
 #include "MediaInfo/MediaInfo_Config.h"
-#include "ZenLib/ZtringList.h"
 #include "ZenLib/File.h"
 #include <cstring>
 using namespace ZenLib;
@@ -69,9 +68,9 @@ void File__Duplicate__Writer::Configure (const Ztring &Target)
     //Form: "memory://pointer:size"  <--Memory block is specified by user
     //WARNING: pointer must be in ***DECIMAL*** format.
     //Example: "memory://123456789:1316"
-    if (Target.find(__T("memory://"))==0 && Target.find(__T(":"), 9)!=std::string::npos)
+    if (Target.find(__T("memory://"))==0 && Target.find(__T(':'), 9)!=std::string::npos)
     {
-        size_t SemiColumn_Pos=Target.find(__T(":"), 9);
+        size_t SemiColumn_Pos=Target.find(__T(':'), 9);
         Ztring Address=Target.substr(9, SemiColumn_Pos-9);
         Ztring Size=Target.substr(SemiColumn_Pos+1);
         Method=method_buffer;

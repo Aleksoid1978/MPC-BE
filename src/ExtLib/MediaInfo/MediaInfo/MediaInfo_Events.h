@@ -931,14 +931,14 @@ inline MediaInfo_int64u MediaInfo_ID_FromGet_intA (const char* ID, const char* C
     const char* SubID;
 
     ToReturn=(MediaInfo_int64u)atoi(ID);
-    SubID=strstr(ID, "-");
+    SubID= strchr(ID, '-');
     if (SubID)
     {
         MediaInfo_int64u ToReturn2;
 
         ToReturn2=atoi(SubID+1);
 
-        SubID=strstr(SubID+1, "-");
+        SubID= strchr(SubID+1, '-');
         if (SubID)
         {
             MediaInfo_int64u ToReturn3;
@@ -953,10 +953,10 @@ inline MediaInfo_int64u MediaInfo_ID_FromGet_intA (const char* ID, const char* C
         else if (
             strcmp(MuxingMode, "DVD-Video")==0                                                  // DVD-Video
          || strcmp(ContainerFormat, "HDS F4M")==0                                               // HDS F4M having more than one stream per referenced file
-         || strcmp(ContainerFormat, "HLS")==0 && strstr(MuxingMode, "HLS")==MuxingMode          // HLS Index
-         || strcmp(ContainerFormat, "HLS")==0 && strstr(MuxingMode, "MPEG-TS")==MuxingMode      // HLS Index
+         || (strcmp(ContainerFormat, "HLS")==0 && strstr(MuxingMode, "HLS")==MuxingMode)        // HLS Index
+         || (strcmp(ContainerFormat, "HLS")==0 && strstr(MuxingMode, "MPEG-TS")==MuxingMode)    // HLS Index
          || strcmp(ContainerFormat, "ISM")==0                                                   // ISM having more than one stream per referenced file
-         || strcmp(ContainerFormat, "DXW")==0 && strstr(MuxingMode, "MPEG-TS")==MuxingMode      // DXW with MPEG-TS
+         || (strcmp(ContainerFormat, "DXW")==0 && strstr(MuxingMode, "MPEG-TS")==MuxingMode)    // DXW with MPEG-TS
          || strcmp(ContainerFormat, "DCP CPL")==0                                               // DCP CPL
          || strcmp(ContainerFormat, "IMF CPL")==0)                                              // IMF CPL
             ToReturn=(ToReturn<<16) | ToReturn2;

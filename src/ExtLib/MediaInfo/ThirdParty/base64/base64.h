@@ -29,13 +29,17 @@ namespace Base64 {
     @return Base64 encoded string
 */
 inline std::string Base64::encode(const std::string &sString) {
-  static const std::string sBase64Table(
-  // 0000000000111111111122222222223333333333444444444455555555556666
-  // 0123456789012345678901234567890123456789012345678901234567890123
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-  );
-  static const char cFillChar = '=';
-  std::string::size_type   nLength = sString.length();
+   static const char sBase64Table[64] =
+    { 'A','B','C','D','E','F','G','H',
+        'I','J','K','L','M','N','O','P',
+        'Q','R','S','T','U','V','W','X',
+        'Y','Z','a','b','c','d','e','f',
+        'g','h','i','j','k','l','m','n',
+        'o','p','q','r','s','t','u','v',
+        'w','x','y','z','0','1','2','3',
+        '4','5','6','7','8','9','+','/' };
+  const char cFillChar = '=';
+  const std::string::size_type   nLength = sString.length();
   std::string              sResult;
 
   // Allocate memory for the converted string

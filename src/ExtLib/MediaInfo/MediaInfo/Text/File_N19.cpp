@@ -489,25 +489,26 @@ void File_N19::Data_Parse()
 
     FILLING_BEGIN();
         #if MEDIAINFO_DEMUX
-        for (size_t i = 0; i < TF.size(); ++i)
-            switch (TF[i])
-            {
-                case 0x8A:  //EOL
-                            TF[i] = EOL[0]; 
-                            {
-                                size_t j = 1;
-                                while (EOL[j] != __T('\0'))
-                                    TF.insert(++i, 1, EOL[j++]);
-                            };
-                            break;
-                case 0x8F:  // Padding
+            for (size_t i = 0; i < TF.size(); ++i)
+                switch (TF[i])
+                {
+                    case 0x8A:  //EOL
+                                TF[i] = EOL[0];
+                                {
+                                    size_t j = 1;
+                                    while (EOL[j] != __T('\0'))
+                                        TF.insert(++i, 1, EOL[j++]);
+                                };
+                                break;
+                    case 0x8F:  // Padding
+                                TF.erase(i--, 1);
+                                break;
+                    default:
+                        if ( TF[i]< 0x20
+                         || (TF[i]>=0x80 && TF[i]<0xA0))
                             TF.erase(i--, 1);
-                            break;
-                default:
-                    if ( TF[i]< 0x20
-                     || (TF[i]>=0x80 && TF[i]<0xA0))
-                        TF.erase(i--, 1);
-            }
+                }
+
             Frame_Count_NotParsedIncluded=Frame_Count;
 
             int8u Row_Pos=0;

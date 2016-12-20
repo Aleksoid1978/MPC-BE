@@ -253,7 +253,7 @@ void File_Ttml::Read_Buffer_Continue()
                         if (Span_Begin==string::npos)
                             break;
                         
-                        size_t Span_End=Content.find(__T(">"), Span_Begin+5);
+                        size_t Span_End=Content.find(__T('>'), Span_Begin+5);
                         if (Span_End==string::npos)
                             break;
 
@@ -270,7 +270,7 @@ void File_Ttml::Read_Buffer_Continue()
                         if (Span_Begin==string::npos)
                             break;
                         
-                        size_t Span_End=Content.find(__T(">"), Span_Begin+5);
+                        size_t Span_End=Content.find(__T('>'), Span_Begin+5);
                         if (Span_End==string::npos)
                             break;
 

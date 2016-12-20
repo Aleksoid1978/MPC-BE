@@ -74,7 +74,7 @@ const char* Avc_profile_idc(int8u profile_idc)
     #include "MediaInfo/Text/File_DtvccTransport.h"
 #endif //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
 #if MEDIAINFO_ADVANCED2
-    #include "base64.h"
+    #include "ThirdParty/base64/base64.h"
 #endif //MEDIAINFO_ADVANCED2
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
@@ -3084,7 +3084,7 @@ void File_Avc::sei_message_user_data_unregistered_x264(int32u payloadSize)
             Encoded_Library_Settings.clear();
             do
             {
-                size_t Options_Pos=Data.find(__T(" "), Options_Pos_Before);
+                size_t Options_Pos=Data.find(__T(' '), Options_Pos_Before);
                 if (Options_Pos==std::string::npos)
                     Options_Pos=Data.size();
                 Ztring option;

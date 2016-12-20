@@ -125,7 +125,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.90");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.91");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -1509,7 +1509,7 @@ void MediaInfo_Config::Language_Set (stream_t StreamKind)
             ToReplace.FindAndReplace(__T("/String9"), Ztring());
             ToReplace.FindAndReplace(__T("/String"),  Ztring());
         }
-        if (!Language_Raw && ToReplace.find(__T("/"))!=Error) //Complex values, like XXX/YYY --> We translate both XXX and YYY
+        if (!Language_Raw && ToReplace.find(__T('/'))!=Error) //Complex values, like XXX/YYY --> We translate both XXX and YYY
         {
             Ztring ToReplace1=ToReplace.SubString(Ztring(), __T("/"));
             Ztring ToReplace2=ToReplace.SubString(__T("/"), Ztring());

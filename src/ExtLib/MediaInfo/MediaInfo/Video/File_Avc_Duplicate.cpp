@@ -30,7 +30,6 @@
 #include "MediaInfo/Video/File_Avc.h"
 #include "MediaInfo/MediaInfo_Config.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
-#include "ZenLib/ZtringList.h"
 #include "ZenLib/File.h"
 #include <cstring>
 using namespace ZenLib;

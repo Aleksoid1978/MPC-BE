@@ -122,7 +122,7 @@ void File_VorbisCom::FileHeader_Parse()
                 if (Library_Date.size()>9)
                 {
                     Library_Version=Library_Date.substr(9, std::string::npos);
-                    if (Library_Version.find(__T("("))==std::string::npos)
+                    if (Library_Version.find(__T('('))==std::string::npos)
                     {
                         Library_Version.FindAndReplace(__T(" "), __T("."), 0, Ztring_Recursive);
                         Library_Date.resize(8);

@@ -39,7 +39,7 @@
 #endif //MEDIAINFO_EVENTS
 #if MEDIAINFO_DEMUX
     #include <cstring>
-    #include "base64.h"
+    #include "ThirdParty/base64/base64.h"
 #endif //MEDIAINFO_DEMUX
 using namespace std;
 using namespace ZenLib;

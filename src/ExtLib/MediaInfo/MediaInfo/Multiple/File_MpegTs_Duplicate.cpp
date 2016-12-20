@@ -30,7 +30,6 @@
 #include "MediaInfo/Multiple/File_MpegTs.h"
 #include "MediaInfo/MediaInfo_Config.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
-#include "ZenLib/ZtringList.h"
 #include "ZenLib/File.h"
 using namespace ZenLib;
 using namespace std;

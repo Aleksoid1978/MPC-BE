@@ -548,8 +548,8 @@ protected :
     //TimeCode
     struct mxftimecode
     {
-        int64u  StartTimecode;
         int16u  RoundedTimecodeBase;
+        int64u  StartTimecode;
         bool    DropFrame;
 
         mxftimecode(int16u RoundedTimecodeBase_ = 0, int64u StartTimecode_ = (int64u)-1, bool DropFrame_ = false)

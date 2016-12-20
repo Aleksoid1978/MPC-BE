@@ -1641,7 +1641,7 @@ void File_Lxf::Video_Stream_1()
     Get_L1 (Lines_Allocated,                            "Lines allocated");
     Get_L1 (Lines_Used,                                 "Lines used");
 
-    if (Lines_Allocated==0 || Lines_Used>Lines_Allocated || Video_Sizes[1]<2+Lines_Used)
+    if (Lines_Allocated==0 || Lines_Used>Lines_Allocated || Video_Sizes[1]<(int32u)2+Lines_Used)
     {
         Skip_XX(Video_Sizes[1]-2,                       "Unknown");
         return;

@@ -190,8 +190,8 @@ bool ZtringListListF::CFG_Charger ()
 
     for (size_t Pos=0; Pos<List.size(); Pos++)
     {
-        Ztring &Lu=List(Pos);
-        if (Lu.find(__T("="))>0)
+        const Ztring &Lu=List(Pos);
+        if (Lu.find(__T('='))>0)
         {
             //Obtention du Name
             Propriete=Lu.SubString(Ztring(), __T("="));

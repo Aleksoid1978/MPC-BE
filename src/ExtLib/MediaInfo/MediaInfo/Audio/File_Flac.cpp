@@ -23,7 +23,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Audio/File_Flac.h"
 #include "MediaInfo/Tag/File_VorbisCom.h"
-#include "base64.h"
+#include "ThirdParty/base64/base64.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
